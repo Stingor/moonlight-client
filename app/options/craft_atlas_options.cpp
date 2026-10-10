@@ -86,7 +86,7 @@ void CraftAtlasOptions::Compose() {
                   tally_.recipes, tally_.materials, tally_.arrows);
     tally_text_ = text.data();
   } else {
-    tally_text_ = Tr("Fichier de recettes absent : SystemEN\\bourgeon_recipes.yaml");
+    tally_text_ = Tr("Fichier de recettes absent : SystemEN\\craft_recipes.yml");
   }
   // ⚠ LA VUE APRÈS L'ÉCRITURE DE LA CHAÎNE : elle pointe dedans.
   rows_.push_back(Note(CraftAtlasRow::kTally, tally_text_.c_str()));

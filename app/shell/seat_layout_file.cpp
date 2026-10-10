@@ -16,9 +16,8 @@
 namespace moonclient {
 namespace {
 
-// LES CLÉS. ⚠ GRAVÉES, ET CE SONT CELLES DE `bourgeon_charselect_layout.yaml` :
-// les changer perdrait la mise en page de tous les joueurs, et celle que ce
-// fichier porte.
+// LES CLÉS. ⚠ GRAVÉES : les changer perdrait la mise en page de tous les
+// joueurs.
 constexpr const char* kVersionField = "version";
 constexpr const char* kBackgroundField = "background";
 constexpr const char* kHideFreeField = "hide_empty_seats";
@@ -41,8 +40,7 @@ constexpr int kFormatVersion = 1;
 constexpr const char* kFileHeader =
     "# La mise en page de la tablee : sieges, poses, blocs d'interface, decor.\n"
     "# Ecrite par le mode << Personnaliser >> ; les coordonnees sont des\n"
-    "# fractions de l'ecran, donc valables a toute resolution. Meme format que\n"
-    "# bourgeon_charselect_layout.yaml.\n";
+    "# fractions de l'ecran, donc valables a toute resolution.\n";
 
 // L'ASCII imprimable, de l'espace au tilde.
 constexpr unsigned char kPrintableLowest = 0x20;
@@ -263,13 +261,6 @@ std::filesystem::path MisplacedBackgroundDirectory(const std::filesystem::path& 
 SeatLayoutBook LoadSeatLayout(const std::filesystem::path& client_root) {
   std::string text;
   if (ReadText(SeatLayoutPath(client_root), text)) {
-    return ParseSeatLayout(text);
-  }
-  // 🔴 `bourgeon_charselect_layout.yaml`, TANT QUE LE NÔTRE N'EXISTE PAS : la
-  // salle qu'il porte suit le joueur ici. Le nôtre prend le relais dès la
-  // première écriture, et l'autre n'est jamais touché.
-  if (ReadText(client_root / kLegacySeatLayoutFileName, text)) {
-    ro::core::LogInfo("tablée : mise en page reprise de {}", kLegacySeatLayoutFileName);
     return ParseSeatLayout(text);
   }
   return SeatLayoutBook{};

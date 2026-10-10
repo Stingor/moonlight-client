@@ -12,12 +12,9 @@ namespace moonclient {
 
 // Les presets d'équipement sur le disque, tous personnages dans un fichier.
 //
-// Le format est celui de `bourgeon_settings.yaml`, clé pour clé, la touche en
-// code de touche virtuelle de Windows : ce fichier se relit tant que le nôtre
-// n'existe pas — et ne s'écrit jamais.
+// La touche s'y écrit en code de touche virtuelle de Windows.
 
 inline constexpr std::string_view kEquipPresetFileName = "equip_presets.yml";
-inline constexpr std::string_view kLegacySettingsFileName = "bourgeon_settings.yaml";
 
 [[nodiscard]] std::filesystem::path EquipPresetFilePath(const std::filesystem::path& client_root);
 

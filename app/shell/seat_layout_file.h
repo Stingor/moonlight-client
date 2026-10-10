@@ -14,17 +14,12 @@ namespace moonclient {
 // LA MISE EN PAGE DE LA TABLÉE, sur le disque : l'état courant et les mises en
 // page que le joueur a enregistrées sous un nom.
 //
-// 🔴 LE FORMAT EST CELUI DE `bourgeon_charselect_layout.yaml`, clé pour clé :
-// une salle déjà composée se retrouve ici sans rien refaire — on relit ce
-// fichier tant que le nôtre n'existe pas. Et le décor s'y nomme relativement à
-// `data\texture\`.
+// Le décor s'y nomme relativement à `data\texture\`.
 //
 // ⚠ CHEZ LE JOUEUR, avec les autres fichiers du client : c'est une commodité
 // de SA machine, pas un état de jeu.
 
 inline constexpr std::string_view kSeatLayoutFileName = "charselect_layout.yml";
-// L'autre fichier relu, à la racine de l'installation.
-inline constexpr std::string_view kLegacySeatLayoutFileName = "bourgeon_charselect_layout.yaml";
 
 // OÙ LE JOUEUR DÉPOSE SES DÉCORS, relativement à la racine du client.
 //
@@ -82,8 +77,8 @@ struct SeatLayoutBook {
 [[nodiscard]] std::filesystem::path MisplacedBackgroundDirectory(
     const std::filesystem::path& client_root);
 
-// Le nôtre, sinon `bourgeon_charselect_layout.yaml`, sinon l'usine. ⚠ UN
-// FICHIER ABSENT N'EST PAS UNE PANNE : c'est un premier lancement.
+// Le fichier, sinon l'usine. ⚠ UN FICHIER ABSENT N'EST PAS UNE PANNE : c'est
+// un premier lancement.
 [[nodiscard]] SeatLayoutBook LoadSeatLayout(const std::filesystem::path& client_root);
 
 // Rend faux si le disque refuse : la mise en page reste alors en mémoire, et

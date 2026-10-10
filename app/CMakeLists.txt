@@ -1070,7 +1070,7 @@ target_include_directories(moonclient_skinlook PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 # ⚠ À PART DES AUTRES RÉGLAGES parce qu'elle seule parle en types de `ro_ui` :
 # la mise en page EST l'état de la scène, et la lier à `moonclient_settings`
 # ferait dépendre tous ses fichiers d'ImGui. Ce qui s'achète ici est un banc —
-# lire, écrire et relire `bourgeon_charselect_layout.yaml` sans fenêtre.
+# lire, écrire et relire la mise en page sans fenêtre.
 add_library(moonclient_seatlayout STATIC
     shell/seat_layout_file.cpp)
 

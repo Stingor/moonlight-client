@@ -18,7 +18,7 @@ namespace moonclient {
 
 // ── LE LIVRE DES RECETTES : ce que le serveur sait fabriquer ────────────────
 //
-// Lu dans `bourgeon_recipes.yaml`, que le serveur GÉNÈRE depuis ses propres
+// Lu dans `craft_recipes.yml`, que le serveur GÉNÈRE depuis ses propres
 // tables (`moonlight/tools/gen_metalprocess.py`) et livre avec le patch.
 //
 // 🔴 C'EST LA SEULE SOURCE QUI SE PARCOURT. Le serveur n'envoie une liste de
@@ -39,7 +39,7 @@ namespace moonclient {
 // `SystemEN\` — que `moonlight.grf` porte, et qu'un dossier du même nom sur le
 // disque remplace. Il se lit donc par le VFS, jamais par un chemin de fichier.
 inline constexpr std::array<std::string_view, 1> kCraftBookPaths = {
-    "SystemEN\\bourgeon_recipes.yaml",
+    "SystemEN\\craft_recipes.yml",
 };
 
 // Le « skill » d'une recette qui ne demande aucun skill : elle s'ouvre en

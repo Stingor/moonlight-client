@@ -16,9 +16,8 @@
 namespace moonclient {
 namespace {
 
-// Les clés partagées avec `bourgeon_settings.yaml` : en changer une rendrait
-// chacun des deux fichiers illisible pour l'autre.
-constexpr const char* kLegacyRootField = "moonlight_ui";
+// Les clés du fichier : en changer une rendrait illisibles les fichiers déjà
+// écrits chez le joueur.
 constexpr const char* kPresetsField = "equip_presets";
 constexpr const char* kCharacterField = "cid";
 constexpr const char* kNameField = "name";
@@ -53,10 +52,9 @@ constexpr int kVirtualKeySpace = 0x20;
 constexpr const char* kFileHeader =
     "# Les presets d'equipement de moonclient, tous personnages confondus.\n"
     "#\n"
-    "# Meme format que bourgeon_settings.yaml, cle pour cle : cid est le personnage,\n"
-    "# hkvk la touche du raccourci en code de touche virtuelle de Windows (0 :\n"
-    "# aucune), hkc / hka / hks ce qu'on tient avec (Ctrl, Alt, Maj), costumes\n"
-    "# si le preset pilote les costumes.\n"
+    "# cid est le personnage, hkvk la touche du raccourci en code de touche\n"
+    "# virtuelle de Windows (0 : aucune), hkc / hka / hks ce qu'on tient avec\n"
+    "# (Ctrl, Alt, Maj), costumes si le preset pilote les costumes.\n"
     "#\n"
     "# Une piece : id l'objet, refine et grade, cards les quatre cartes, left une\n"
     "# arme de la main gauche, kind sa famille (0 equipement, 1 costume,\n"
@@ -159,17 +157,17 @@ struct FileRead {
   std::vector<Stored> presets;
 };
 
-// La liste rangée sous `root`, s'il y en a un, puis `equip_presets`. Un
-// fichier abîmé n'empêche pas de jouer : son exception s'attrape.
-[[nodiscard]] FileRead ReadFile(const std::filesystem::path& path, const char* root) {
+// La liste rangée sous `equip_presets`. Un fichier abîmé n'empêche pas de
+// jouer : son exception s'attrape.
+[[nodiscard]] FileRead ReadStored(const std::filesystem::path& client_root) {
+  const std::filesystem::path path = EquipPresetFilePath(client_root);
   std::error_code missing;
   if (!std::filesystem::exists(path, missing)) {
     return {};
   }
   try {
-    const YAML::Node whole = YAML::LoadFile(path.string());
+    const YAML::Node base = YAML::LoadFile(path.string());
     // Une racine qui n'est pas une table n'a pas de champs : l'indexer lèverait.
-    const YAML::Node base = root == nullptr ? whole : (whole.IsMap() ? whole[root] : YAML::Node());
     if (!base || !base.IsMap()) {
       return FileRead{.state = FileState::kRead};
     }
@@ -178,20 +176,6 @@ struct FileRead {
     ro::core::LogWarning("presets d'équipement : {} illisible ({})", path.string(), broken.what());
     return FileRead{.state = FileState::kBroken};
   }
-}
-
-// Notre fichier, ou `bourgeon_settings.yaml` tant que le nôtre n'existe pas.
-[[nodiscard]] FileRead ReadStored(const std::filesystem::path& client_root) {
-  FileRead ours = ReadFile(EquipPresetFilePath(client_root), nullptr);
-  if (ours.state != FileState::kMissing) {
-    return ours;
-  }
-  FileRead theirs = ReadFile(client_root / kLegacySettingsFileName, kLegacyRootField);
-  // Le sien abîmé ne bloque rien : on ne l'écrit jamais.
-  if (theirs.state == FileState::kBroken) {
-    theirs.state = FileState::kMissing;
-  }
-  return theirs;
 }
 
 void Emit(YAML::Emitter& out, std::uint32_t character_id, const EquipPreset& preset) {

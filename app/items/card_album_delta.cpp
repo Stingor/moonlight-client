@@ -15,7 +15,7 @@ namespace moonclient {
 namespace {
 
 // Le nom du fichier et sa clé racine. ⚠ GRAVÉS : ce sont ceux que le script lit.
-constexpr const char* kFileName = "bourgeon_card_album_delta.yaml";
+constexpr const char* kFileName = "card_album_delta.yml";
 constexpr const char* kRootKey = "card_album_delta";
 constexpr const char* kAlbumField = "album";
 constexpr const char* kCardField = "card";
@@ -37,7 +37,8 @@ constexpr const char* kHeader =
     "# packageitem.lub en est ENGENDRÉ — ne jamais l'éditer à la main.\n"
     "#\n"
     "# À appliquer par :  python apply_card_album_delta.py\n"
-    "#   (dépôt moonlight-client, auprès de gen_packageitem.py)\n"
+    "#   (dépôt des données du client, data/luafiles514/lua files/probabilityinfo/,\n"
+    "#   auprès de gen_packageitem.py)\n"
     "# Il patche le YAML serveur, régénère le lub, puis vide ce fichier.\n";
 
 }  // namespace

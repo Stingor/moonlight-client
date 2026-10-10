@@ -23,8 +23,8 @@ namespace moonclient {
 // base du serveur, puis régénère le fichier d'affichage. Le sens de la
 // synchronisation reste serveur → client.
 //
-// ⚠ `bourgeon_card_album_delta.yaml`, AU MÊME ENDROIT ET AU MÊME FORMAT quel
-// que soit le client qui l'écrit : le script le lit tel quel.
+// ⚠ `savedata\card_album_delta.yml` : son nom, sa clé racine et ses champs sont
+// un contrat, le script le lit tel quel.
 // Absent, c'est le cas nominal — personne n'a rien demandé.
 
 enum class AlbumDeltaAction : std::uint8_t { kAdd, kRemove };

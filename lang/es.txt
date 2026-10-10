@@ -13015,8 +13015,8 @@ tr: En las listas: clic izquierdo para seguir un item, clic derecho para su men�
 fr: Entre dans %d recettes.
 tr: Entra en %d recetas.
 
-fr: Fichier de recettes absent : SystemEN\\bourgeon_recipes.yaml
-tr: Falta el archivo de recetas: SystemEN\\bourgeon_recipes.yaml
+fr: Fichier de recettes absent : SystemEN\\craft_recipes.yml
+tr: Falta el archivo de recetas: SystemEN\\craft_recipes.yml
 
 fr: Filtrer par nom ou par id…
 tr: Filtrar por nombre o por id…
@@ -13030,8 +13030,8 @@ tr: Injugable aquí: ninguna clase de este servidor aprende este skill.
 fr: L'Atlas répertorie tout ce que le serveur sait fabriquer : par skill, par produit, par matériau, et les flèches. Le jeu ne peut pas le faire seul — le serveur n'envoie une liste qu'après le lancement d'un skill.
 tr: El Atlas recoge todo lo que el servidor sabe fabricar: por skill, por producto, por material, y las flechas. El juego no puede hacerlo solo — el servidor solo envía una lista tras lanzar un skill.
 
-fr: Le fichier de recettes est introuvable ou illisible (SystemEN\\bourgeon_recipes.yaml). L'Atlas ne peut rien montrer tant qu'il manque — le reste du client fonctionne normalement.
-tr: El archivo de recetas no se encuentra o no se puede leer (SystemEN\\bourgeon_recipes.yaml). El Atlas no puede mostrar nada mientras falte — el resto del cliente funciona con normalidad.
+fr: Le fichier de recettes est introuvable ou illisible (SystemEN\\craft_recipes.yml). L'Atlas ne peut rien montrer tant qu'il manque — le reste du client fonctionne normalement.
+tr: El archivo de recetas no se encuentra o no se puede leer (SystemEN\\craft_recipes.yml). El Atlas no puede mostrar nada mientras falte — el resto del cliente funciona con normalidad.
 
 fr: Le résultat n'est pas ce produit : le serveur tire dans sa propre table de transmutation, avec ses taux et ses quantités.
 tr: El resultado no es este producto: el servidor tira de su propia tabla de transmutación, con sus tasas y sus cantidades.
