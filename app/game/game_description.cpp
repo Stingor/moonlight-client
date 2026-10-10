@@ -60,6 +60,15 @@ void Game::FollowDescriptionLink(const ro::ui::DescriptionWindowAction& asked,
   if (asked.followed.empty()) {
     return;
   }
+  if (asked.followed_kind == ro::ui::RichLinkKind::kItem) {
+    // UN OBJET SE DÉCRIT, comme au clic de tout lien d'objet.
+    if (const std::optional<std::uint32_t> item_id = ro::ui::ReadRichItem(asked.followed)) {
+      FollowCatalogItem(
+          ro::ui::ChatLinkAsk{.gesture = ro::ui::ChatLinkGesture::kDescribe, .item_id = *item_id},
+          now_ms);
+    }
+    return;
+  }
   if (asked.followed_kind == ro::ui::RichLinkKind::kPlace) {
     // LE LIEU LANCE LE GUIDAGE, et la conversation dit vers où : le trajet se
     // lit sur la minimap et au sol, la destination reste écrite.

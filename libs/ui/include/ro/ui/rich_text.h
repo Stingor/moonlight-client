@@ -29,6 +29,12 @@ namespace ro::ui {
 //             retour à la couleur par défaut du bloc.
 // `<URL>texte<INFO>adresse</INFO></URL>`   un lien vers le dehors.
 // `<NAVI>texte<INFO>carte,x,y,…</INFO></NAVI>`   un lien vers un lieu.
+// `<ITEM>nom<INFO>id</INFO></ITEM>`   un lien vers un objet, par son
+//             identifiant. Une charge qui n'en est pas un ne fait pas de lien :
+//             le nom reste du texte, dans la couleur du flux.
+// `<TIPBOX>texte<INFO>id</INFO></TIPBOX>`   une fiche d'aide, par son rang.
+//             Le client ne lit pas ces fiches : balises et charge s'effacent,
+//             le texte se lit comme le reste du flux.
 //
 // 🔴 LA COULEUR EST UN FLUX, PAS UN ATTRIBUT DE LIGNE. Un `^RRGGBB` ouvert
 // reste actif sur les lignes SUIVANTES jusqu'à sa fermeture : les tables du jeu
@@ -44,6 +50,10 @@ enum class RichLinkKind : std::uint8_t {
   kAddress,
   // Un lieu : « carte,x,y,… ». Le client y envoie le personnage.
   kPlace,
+  // Un objet : son identifiant en décimal. Le clic le décrit, Maj + clic le
+  // repose dans la saisie, le clic droit ouvre son menu — les gestes de tout
+  // lien d'objet.
+  kItem,
 };
 
 // UN LIEU, lu dans la charge d'un lien `kPlace` : « carte,x,y,… ». Rien quand
@@ -54,6 +64,10 @@ struct RichPlace {
   int y = 0;
 };
 [[nodiscard]] std::optional<RichPlace> ReadRichPlace(std::string_view payload);
+
+// L'OBJET, lu dans la charge d'un lien `kItem` : un identifiant décimal non
+// nul, seul. Rien sinon.
+[[nodiscard]] std::optional<std::uint32_t> ReadRichItem(std::string_view payload);
 
 struct RichLink {
   RichLinkKind kind = RichLinkKind::kAddress;
@@ -118,6 +132,9 @@ using RichMeasure = float (*)(std::string_view piece, void* owner);
                                       float wrap_width, float line_height, RichMeasure measure,
                                       void* owner);
 
+// LE TEXTE QUE MONTRE UN LIEN, tiré du texte plat : la tête de son menu.
+[[nodiscard]] std::string RichLinkText(const RichText& laid, int link);
+
 // LA LONGUEUR VISIBLE D'UNE LIGNE : ce qu'elle montre, tokens de couleur et
 // balises retirés. Sert à qui doit juger de la largeur d'une ligne SOURCE.
 [[nodiscard]] int VisibleLength(std::string_view line);
@@ -141,6 +158,12 @@ struct RichTextAction {
   // suivre une adresse est un geste vers le DEHORS, et il se décide chez
   // l'appelant — pas au fond d'une couche de dessin.
   int followed = -1;
+  // Maj était tenu à ce clic : un lien d'objet se repose au lieu de s'ouvrir.
+  bool followed_with_shift = false;
+  // Le rang du lien survolé, ou moins un : l'aperçu n'attend pas un clic.
+  int hovered = -1;
+  // Le rang du lien sous un clic droit relâché, ou moins un : son menu.
+  int menu = -1;
 };
 
 // QUAND LE TEXTE D'UN BLOC SE SÉLECTIONNE.

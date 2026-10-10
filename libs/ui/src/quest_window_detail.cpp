@@ -6,6 +6,7 @@
 #include <cfloat>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <optional>
 #include <span>
@@ -222,30 +223,70 @@ void DrawNpc(const std::optional<QuestNpcView>& place, const SkinArt& skin,
 
 // ── LES SECTIONS ────────────────────────────────────────────────────────────
 
-// DES LIGNES BALISÉES, aux liens actifs : un lieu guide, une adresse remonte.
-void DrawMarkedLines(const char* id, std::span<const std::string> lines,
-                     QuestWindowAction& action) {
+// L'objet que vise un lien, ou zéro : un lien d'un autre genre n'en vise aucun.
+[[nodiscard]] std::uint32_t ItemOf(const RichLink& link) {
+  return link.kind == RichLinkKind::kItem ? ReadRichItem(link.payload).value_or(0) : 0;
+}
+
+// DES LIGNES BALISÉES, aux liens actifs : un lieu guide, une adresse remonte, un
+// objet a les gestes d'une récompense — ils s'écrivent dans `action.item`, et
+// son clic droit arme `item_menu`, celui de la fenêtre.
+void DrawMarkedLines(const char* id, std::span<const std::string> lines, QuestWindowAction& action,
+                     ItemLinkMenu& item_menu) {
   RichText laid = LayOutRichTextHere(lines, BodyInk(), ImGui::GetContentRegionAvail().x);
   KeepReadable(laid, Paper());
-  const RichTextAction followed = DrawRichText(id, laid, ImGui::GetTextLineHeightWithSpacing());
-  if (followed.followed < 0 || followed.followed >= static_cast<int>(laid.links.size())) {
+  const RichTextAction acted = DrawRichText(id, laid, ImGui::GetTextLineHeightWithSpacing());
+  const auto link_at = [&laid](int rank) -> const RichLink* {
+    return rank >= 0 && rank < static_cast<int>(laid.links.size())
+               ? &laid.links[static_cast<std::size_t>(rank)]
+               : nullptr;
+  };
+  if (const RichLink* hovered = link_at(acted.hovered); hovered != nullptr) {
+    if (const std::uint32_t item_id = ItemOf(*hovered); item_id != 0) {
+      action.item.hovered_id = item_id;
+      action.item.hovered_kind = ChatLinkKind::kItem;
+      action.item.hovered_token = 0;
+      action.item.hovering = true;
+    }
+  }
+  if (const RichLink* aimed = link_at(acted.menu); aimed != nullptr) {
+    if (const std::uint32_t item_id = ItemOf(*aimed); item_id != 0) {
+      item_menu = ItemLinkMenu{.armed = true,
+                               .kind = ChatLinkKind::kItem,
+                               .item_id = item_id,
+                               .label = RichLinkText(laid, acted.menu)};
+    }
+  }
+  const RichLink* const link = link_at(acted.followed);
+  if (link == nullptr) {
     return;
   }
   // ⚠ LA CHARGE SE RECOPIE : la disposition meurt à la fin de cette image.
-  const RichLink& link = laid.links[static_cast<std::size_t>(followed.followed)];
-  if (link.kind == RichLinkKind::kPlace) {
-    action.guide_to = ReadRichPlace(link.payload);
-  } else {
-    action.followed_address = link.payload;
+  switch (link->kind) {
+    case RichLinkKind::kPlace:
+      action.guide_to = ReadRichPlace(link->payload);
+      break;
+    case RichLinkKind::kItem:
+      // MAJ + CLIC REPOSE LE LIEN dans la saisie, le clic seul le décrit :
+      // les gestes de `HitChatLink`.
+      action.item.gesture =
+          acted.followed_with_shift ? ChatLinkGesture::kRepost : ChatLinkGesture::kDescribe;
+      action.item.kind = ChatLinkKind::kItem;
+      action.item.item_id = ItemOf(*link);
+      action.item.token = 0;
+      break;
+    case RichLinkKind::kAddress:
+      action.followed_address = link->payload;
+      break;
   }
 }
 
-void DrawDescription(const QuestRowView& row, QuestWindowAction& action) {
+void DrawDescription(const QuestRowView& row, QuestWindowAction& action, PaneRequests& requests) {
   if (row.description.empty()) {
     return;
   }
   SectionHeading(core::Tr("Description"));
-  DrawMarkedLines("##quete_description", row.description, action);
+  DrawMarkedLines("##quete_description", row.description, action, requests.reward_menu);
 }
 
 // UNE CHASSE : son libellé — un lien vers la fiche du monstre quand il est
@@ -388,7 +429,7 @@ void DrawPoster(const SkinImage& image) {
 }
 
 void DrawRecommendedDetail(const QuestRecommendedView& entry, const SkinArt& skin,
-                           QuestWindowAction& action) {
+                           PaneRequests& requests, QuestWindowAction& action) {
   DrawPoster(entry.image);
   ImGui::PushFont(nullptr, kDetailTitleSize);
   BoldText(entry.title, PaperInk(kDetailTitleText), ImGui::GetContentRegionAvail().x);
@@ -404,7 +445,7 @@ void DrawRecommendedDetail(const QuestRecommendedView& entry, const SkinArt& ski
     ImGui::Dummy(ImVec2(0.0F, Px(kSectionGap)));
     const std::vector<std::string> lines = LinesOf(entry.blocks[rank]);
     ImGui::PushID(static_cast<int>(rank));
-    DrawMarkedLines("##affiche_bloc", lines, action);
+    DrawMarkedLines("##affiche_bloc", lines, action, requests.reward_menu);
     ImGui::PopID();
   }
   ImGui::Dummy(ImVec2(0.0F, Px(kSectionGap)));
@@ -423,7 +464,7 @@ void DrawDetail(const QuestWindowView& view, const QuestArt& art, const SkinArt&
       DrawNothingChosen(art.detail_recommended.usable() ? art.detail_recommended : art.detail_empty,
                         core::Tr("Choisissez une recommandation."));
     } else {
-      DrawRecommendedDetail(*view.selected_recommended, skin, action);
+      DrawRecommendedDetail(*view.selected_recommended, skin, requests, action);
     }
     return;
   }
@@ -448,7 +489,7 @@ void DrawDetail(const QuestWindowView& view, const QuestArt& art, const SkinArt&
   if (row.unknown) {
     ColoredText(FaintInk(), core::Tr("Cette quête n'est pas dans le catalogue."));
   }
-  DrawDescription(row, action);
+  DrawDescription(row, action, requests);
   DrawObjectives(row, action);
   DrawRewards(row, action, requests);
   ImGui::PopStyleColor();

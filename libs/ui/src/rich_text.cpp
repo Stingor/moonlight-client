@@ -1,6 +1,7 @@
 #include "ro/ui/rich_text.h"
 
 #include <algorithm>
+#include <array>
 #include <charconv>
 #include <cstddef>
 #include <utility>
@@ -22,6 +23,12 @@ constexpr std::string_view kOpenAddress = "<URL>";
 constexpr std::string_view kCloseAddress = "</URL>";
 constexpr std::string_view kOpenPlace = "<NAVI>";
 constexpr std::string_view kClosePlace = "</NAVI>";
+constexpr std::string_view kOpenItem = "<ITEM>";
+constexpr std::string_view kCloseItem = "</ITEM>";
+// ⚠ UNE FICHE D'AIDE N'EST PAS UN LIEN : ses balises s'effacent, sa charge ne
+// s'affiche pas, son texte reste dans le flux.
+constexpr std::string_view kOpenTip = "<TIPBOX>";
+constexpr std::string_view kCloseTip = "</TIPBOX>";
 constexpr std::string_view kOpenPayload = "<INFO>";
 constexpr std::string_view kClosePayload = "</INFO>";
 
@@ -74,6 +81,43 @@ constexpr ImU32 kSelectionVeil = IM_COL32(60, 110, 220, 90);
 // adresse, le vert d'un lieu.
 constexpr ImU32 kAddressColor = IM_COL32(64, 132, 224, 255);
 constexpr ImU32 kPlaceColor = IM_COL32(60, 175, 90, 255);
+
+// La couleur d'un lien. ⚠ UN OBJET PREND LE BLEU D'UNE ADRESSE : c'est un lien
+// qu'on ouvre, et seul le lieu, qui déplace le personnage, se distingue.
+[[nodiscard]] ImU32 LinkColor(RichLinkKind kind) {
+  return kind == RichLinkKind::kPlace ? kPlaceColor : kAddressColor;
+}
+
+// UNE BALISE DE LIEN : son ouverture, sa fermeture, ce qu'elle vise.
+struct LinkTag {
+  std::string_view open;
+  std::string_view close;
+  RichLinkKind kind;
+};
+constexpr std::array<LinkTag, 3> kLinkTags = {
+    LinkTag{.open = kOpenAddress, .close = kCloseAddress, .kind = RichLinkKind::kAddress},
+    LinkTag{.open = kOpenPlace, .close = kClosePlace, .kind = RichLinkKind::kPlace},
+    LinkTag{.open = kOpenItem, .close = kCloseItem, .kind = RichLinkKind::kItem}};
+
+// La balise de lien qui s'ouvre ici, ou rien.
+[[nodiscard]] const LinkTag* LinkOpeningAt(std::string_view line, std::size_t at) {
+  for (const LinkTag& tag : kLinkTags) {
+    if (StartsWith(line, at, tag.open)) {
+      return &tag;
+    }
+  }
+  return nullptr;
+}
+
+// La balise de lien qui se ferme ici, ou rien.
+[[nodiscard]] const LinkTag* LinkClosingAt(std::string_view line, std::size_t at) {
+  for (const LinkTag& tag : kLinkTags) {
+    if (StartsWith(line, at, tag.close)) {
+      return &tag;
+    }
+  }
+  return nullptr;
+}
 
 }  // namespace
 
@@ -159,9 +203,7 @@ RichText LayOutRichText(std::span<const std::string> lines, ImU32 default_color,
     }
     ImU32 shown = color;
     if (link >= 0) {
-      shown = laid.links[static_cast<std::size_t>(link)].kind == RichLinkKind::kPlace
-                  ? kPlaceColor
-                  : kAddressColor;
+      shown = LinkColor(laid.links[static_cast<std::size_t>(link)].kind);
     }
     const float word_width = measure(word, owner);
     if (pen_x > 0.0F) {
@@ -204,21 +246,51 @@ RichText LayOutRichText(std::span<const std::string> lines, ImU32 default_color,
     word.clear();
   };
 
+  // La couleur du flux à l'ouverture du lien en cours, et sa première boîte :
+  // de quoi rendre au texte un lien d'objet qui ne désigne rien.
+  ImU32 link_stream_color = default_color;
+  std::size_t link_first_box = 0;
+  // 🔴 UN LIEN D'OBJET SANS IDENTIFIANT LISIBLE N'EST PAS UN LIEN. Il se
+  // jugerait au clic seulement : souligné et cliquable, il ne ferait rien. Ses
+  // glyphes redeviennent donc du texte, dans la couleur du flux.
+  const auto close_link = [&]() {
+    if (link < 0) {
+      return;
+    }
+    const RichLink& closing = laid.links[static_cast<std::size_t>(link)];
+    if (closing.kind == RichLinkKind::kItem && !ReadRichItem(closing.payload).has_value()) {
+      for (std::size_t rank = link_first_box; rank < laid.boxes.size(); ++rank) {
+        RichBox& box = laid.boxes[rank];
+        if (box.link == link) {
+          box.link = -1;
+          box.color = link_stream_color;
+        }
+      }
+    }
+    link = -1;
+  };
+
   for (const std::string& line : lines) {
     for (std::size_t at = 0; at < line.size();) {
-      if (StartsWith(line, at, kOpenAddress) || StartsWith(line, at, kOpenPlace)) {
-        const bool place = StartsWith(line, at, kOpenPlace);
+      if (const LinkTag* opening = LinkOpeningAt(line, at); opening != nullptr) {
         flush_word();
+        close_link();
         link = static_cast<int>(laid.links.size());
-        laid.links.push_back(
-            RichLink{.kind = place ? RichLinkKind::kPlace : RichLinkKind::kAddress});
-        at += place ? kOpenPlace.size() : kOpenAddress.size();
+        laid.links.push_back(RichLink{.kind = opening->kind});
+        link_stream_color = color;
+        link_first_box = laid.boxes.size();
+        at += opening->open.size();
         continue;
       }
-      if (StartsWith(line, at, kCloseAddress) || StartsWith(line, at, kClosePlace)) {
+      if (const LinkTag* closing = LinkClosingAt(line, at); closing != nullptr) {
         flush_word();
-        link = -1;
-        at += StartsWith(line, at, kClosePlace) ? kClosePlace.size() : kCloseAddress.size();
+        close_link();
+        at += closing->close.size();
+        continue;
+      }
+      if (StartsWith(line, at, kOpenTip) || StartsWith(line, at, kCloseTip)) {
+        flush_word();
+        at += StartsWith(line, at, kOpenTip) ? kOpenTip.size() : kCloseTip.size();
         continue;
       }
       if (StartsWith(line, at, kOpenPayload)) {
@@ -265,7 +337,7 @@ RichText LayOutRichText(std::span<const std::string> lines, ImU32 default_color,
     flush_word();
     // ⚠ UN LIEN NE TRAVERSE PAS UNE FIN DE LIGNE, la couleur si : le premier est
     // une balise que la source ferme, la seconde un flux qu'elle laisse ouvert.
-    link = -1;
+    close_link();
     inside_payload = false;
     laid.text.push_back('\n');
     pen_x = 0.0F;
@@ -458,8 +530,13 @@ RichTextAction DrawRichText(const char* id, const RichText& laid, float line_hei
                             place->y);
         }
       }
+      acted.hovered = under;
       if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && anchor == head) {
         acted.followed = under;
+        acted.followed_with_shift = mouse.KeyShift;
+      }
+      if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+        acted.menu = under;
       }
     }
   }
@@ -504,6 +581,30 @@ std::optional<RichPlace> ReadRichPlace(std::string_view payload) {
     return std::nullopt;
   }
   return place;
+}
+
+std::optional<std::uint32_t> ReadRichItem(std::string_view payload) {
+  std::uint32_t item_id = 0;
+  const char* const end = payload.data() + payload.size();
+  const auto [after, error] = std::from_chars(payload.data(), end, item_id);
+  if (error != std::errc() || after != end || item_id == 0) {
+    return std::nullopt;
+  }
+  return item_id;
+}
+
+std::string RichLinkText(const RichText& laid, int link) {
+  std::string shown;
+  for (const RichBox& box : laid.boxes) {
+    if (box.link == link && link >= 0) {
+      shown.append(laid.text, static_cast<std::size_t>(box.offset),
+                   static_cast<std::size_t>(box.length));
+    }
+  }
+  // Le séparateur posé devant le premier mot appartient au lien : il ne se
+  // montre pas en tête d'un menu.
+  const std::size_t first = shown.find_first_not_of(' ');
+  return first == std::string::npos ? std::string() : shown.substr(first);
 }
 
 }  // namespace ro::ui
