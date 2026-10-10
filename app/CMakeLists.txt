@@ -878,9 +878,11 @@ target_include_directories(moonclient_cursor PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 #
 # 🔴 EN BIBLIOTHÈQUE POUR LA MÊME RAISON QUE LES DÉGÂTS : elle ne connaît ni
 # carte ni rendu — rien qu'un monde et une case —, et la sortir du module qui
-# tient les arcs est ce qui permet de l'éprouver sans charger une carte.
+# tient les arcs est ce qui permet de l'éprouver sans charger une carte. Le
+# souvenir des piliers y loge pour la même raison.
 add_library(moonclient_itemdrop STATIC
-    world/item_dropper.cpp)
+    world/item_dropper.cpp
+    world/item_pillar_memory.cpp)
 
 target_link_libraries(moonclient_itemdrop
     PUBLIC ro_render ro_sim

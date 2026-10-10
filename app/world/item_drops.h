@@ -14,6 +14,7 @@
 #include "effects/effect_view.h"
 #include "world/actor_sounds.h"
 #include "world/item_dropper.h"
+#include "world/item_pillar_memory.h"
 #include "world/map_stage.h"
 
 // LE BUTIN QUI TOMBE : ce qu'un objet au sol fait entre l'instant où le serveur
@@ -86,7 +87,8 @@ class ItemDrops {
   //
   // ⚠ LE SON NE PART QU'À LA NAISSANCE. La boucle ne le rejoue pas : un
   // battement par seconde sur chaque butin rare de la carte s'entendrait comme
-  // un défaut.
+  // un défaut. Un butin RÉANNONCÉ — à l'arrivée sur une carte, au retour en vue
+  // — retrouve sa colonne, et reste muet : il ne tombe pas.
   [[nodiscard]] std::vector<SownNamedSound> NoticePillars(const ro::sim::World& world,
                                                           const MapStage& stage,
                                                           EffectsInPlay& effects,
@@ -115,6 +117,9 @@ class ItemDrops {
 
   // Plus aucun arc : le changement de carte emporte tous les objets, et les
   // départs qu'on gardait parlent d'un monde qui n'existe plus.
+  //
+  // ⚠ LE SOUVENIR DES PILIERS RESTE : voir `ItemPillarMemory`. Les butins
+  // restés à terre reviennent par un paquet qui ne les dit plus.
   void Forget() {
     starts_.clear();
     lit_.clear();
@@ -154,6 +159,7 @@ class ItemDrops {
   };
 
   std::unordered_map<std::uint32_t, Body> bodies_;
+  ItemPillarMemory pillars_;
   ro::render::ItemDropSettings settings_;
 };
 

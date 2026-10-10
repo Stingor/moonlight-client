@@ -95,7 +95,16 @@ std::vector<SownNamedSound> ItemDrops::NoticePillars(const ro::sim::World& world
   std::erase_if(lit_, [&world](std::uint32_t id) { return world.Find(id) == nullptr; });
 
   for (const auto& [id, item] : world.actors()) {
-    if (!item.ground_item.has_value() || !item.ground_item->show_drop_effect) {
+    // ⚠ CE QUE DIT L'ANNONCE, OU CE QU'ON A RETENU DU MÊME OBJET : un butin
+    // retrouvé après une arrivée ne porte plus son mode — voir
+    // `ItemPillarMemory`.
+    //
+    // ⚠ CE N'EST PAS LE SEUL EFFET QUE LE CLIENT JOUE ICI. Le drapeau seul lui
+    // en fait chercher un second, propre à l'OBJET, dans sa fiche — une table
+    // Lua de l'installation que nous ne lisons pas encore. Un butin dont le mode
+    // est nul reste donc muet chez nous.
+    const std::uint16_t mode = pillars_.ModeOf(world.map_name(), item);
+    if (mode == 0) {
       continue;
     }
     // OÙ LE BUTIN SE TIENT À CETTE IMAGE, et non où il se posera : sa colonne le
@@ -110,12 +119,7 @@ std::vector<SownNamedSound> ItemDrops::NoticePillars(const ro::sim::World& world
       effects.MoveLooping(id, where);
       continue;
     }
-    // ⚠ CE N'EST PAS LE SEUL EFFET QUE LE CLIENT JOUE ICI. Le drapeau seul lui
-    // en fait chercher un second, propre à l'OBJET, dans sa fiche — une table
-    // Lua de l'installation que nous ne lisons pas encore. Un butin dont le mode
-    // est nul reste donc muet chez nous.
-    const std::uint16_t effect_id =
-        ro::render::ItemDropPillarEffectId(item.ground_item->drop_effect_mode);
+    const std::uint16_t effect_id = ro::render::ItemDropPillarEffectId(mode);
     if (effect_id == 0) {
       continue;
     }
@@ -136,8 +140,9 @@ std::vector<SownNamedSound> ItemDrops::NoticePillars(const ro::sim::World& world
     const bool pillar_bottom = effects.PlayLooping(folder + std::string(pillar.bottom), where,
                                                    now_ms, kOnTheGround, id, kBehindActors);
     // Ce qui n'a rien pu montrer ne fait rien entendre : un bruit sans image
-    // ferait chercher un effet là où l'installation n'a pas le fichier.
-    if (pillar_top || pillar_bottom) {
+    // ferait chercher un effet là où l'installation n'a pas le fichier. Et seul
+    // un butin qui TOMBE se fait entendre : voir la déclaration.
+    if ((pillar_top || pillar_bottom) && item.ground_item->falling) {
       heard.push_back(SownNamedSound{pillar.sound, item.position});
     }
   }
