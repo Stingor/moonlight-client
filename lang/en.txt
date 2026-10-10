@@ -5456,8 +5456,8 @@ tr: On every entity
 fr: Surligner mon camp
 tr: Highlight my side
 
-fr: Survol : aperçu   -   Clic droit : description
-tr: Hover: preview   -   Right click: description
+fr: Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat
+tr: Hover: preview   -   Right-click: menu   -   Shift+click: link in chat
 
 fr: Système
 tr: System

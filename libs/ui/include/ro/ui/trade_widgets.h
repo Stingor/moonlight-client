@@ -9,6 +9,8 @@
 
 #include <imgui.h>
 
+#include "ro/ui/chat_link.h"
+#include "ro/ui/item_link_cell.h"
 #include "ro/ui/skin_art.h"
 
 namespace ro::ui {
@@ -42,16 +44,41 @@ struct TradeItemView {
 };
 
 // CE QU'UNE LIGNE D'OBJET A VU PASSER pendant l'image.
+//
+// 🔴 UN ITEM DE COMMERCE SE MANIE COMME UNE CELLULE D'OBJET (`DrawItemLinkCell`) :
+// Maj + clic gauche repose son lien dans la saisie, le clic droit ouvre LE menu
+// des objets. Le clic gauche simple reste aux actions de la ligne — panier,
+// glisser, double-clic. Les deux clics se lisent au relâchement : partie de
+// l'enfoncement, la fenêtre qu'ils ouvrent naîtrait derrière le commerce.
 struct TradeItemGesture {
   bool hovered = false;
-  // Le clic DROIT : la description. Le clic gauche reste aux actions de la
-  // ligne.
-  bool describe = false;
+  // Maj + clic gauche : le lien dans la saisie.
+  bool repost = false;
+  // Le clic droit : le menu.
+  bool menu = false;
 };
 
 // L'icône et le nom, sur la ligne courante. Le nom d'un objet cassé porte
 // l'ombre rouge du client ; `suffix` s'écrit après le nom (« x3 »).
 TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffix = {});
+
+// Ajoute à `gesture` ce que le DERNIER élément ImGui a vu passer : pour une
+// ligne qui groupe l'item avec ce qui l'accompagne, et se manie d'un bloc.
+void AddLastItemGesture(TradeItemGesture& gesture);
+
+// ARME LE MENU sur le clic droit d'une ligne. `token` est ce qui désigne l'item
+// DANS SA FENÊTRE — une case, un rang —, rendu tel quel avec le choix : seule
+// la fenêtre sait le relire. Rend vrai sur Maj + clic, que l'appelant note
+// comme une demande de lien.
+bool NoteTradeItemLink(const TradeItemGesture& gesture, const TradeItemView& item,
+                       std::uint32_t token, ItemLinkMenu& menu);
+
+// LE MENU qu'une ligne a armé : celui de la cellule d'objet (`DrawItemLinkMenu`),
+// et la même règle — une fois par image, au niveau de la fenêtre, hors de toute
+// table et de tout enfant. Rend ce qu'on y a choisi, avec l'item et le jeton de
+// la ligne ; `kNothing` sinon.
+[[nodiscard]] ChatLinkAsk DrawTradeItemMenu(const char* popup_id, ItemLinkMenu& menu,
+                                            std::span<const VoteShopOffer> vote_shop);
 
 // UN PRIX : « base -> facturé » quand ils diffèrent, sinon le prix seul.
 //

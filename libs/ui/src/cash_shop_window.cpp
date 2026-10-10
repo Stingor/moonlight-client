@@ -70,6 +70,8 @@ constexpr int kLeastPerLine = 1;
 
 constexpr std::size_t kLabelBytes = 96;
 
+constexpr const char* kItemMenuId = "##cash_shop_item_menu";
+
 // Les onglets du serveur. Voir `CashShopTabShown`.
 constexpr std::array<bool, kCashShopTabCount> kTabShown = {true,  true, false, false, false,
                                                            false, true, true,  false};
@@ -367,17 +369,17 @@ void DrawCardName(const CashShopCard& card, const CardGeometry& geometry, const 
 }
 
 // LES GESTES D'UNE CARTE, ceux de tout item montré dans un commerce : le
-// survol demande l'aperçu de sa description, le clic droit la description,
-// Maj + clic gauche repose son lien dans la saisie. Rien ne se glisse : l'item
-// n'est à personne tant qu'il n'est pas acheté.
+// survol demande l'aperçu de sa description, le clic droit ouvre le menu des
+// objets, Maj + clic gauche repose son lien dans la saisie. Rien ne se glisse :
+// l'item n'est à personne tant qu'il n'est pas acheté.
 //
 // ⚠ UN BOUTON OU LE PANTIN SURVOLÉ GARDE SON INFOBULLE, et l'aperçu se tait :
 // deux bulles se recouvriraient. Maj + clic sur un bouton reste au bouton.
 //
 // 🔴 LES CLICS SE LISENT AU RELÂCHEMENT : partie de l'enfoncement, la
-// description naîtrait derrière la boutique.
+// fenêtre qu'ils ouvrent naîtrait derrière la boutique.
 void NoteCardGestures(const CashShopCard& card, bool card_hovered, bool button_hovered,
-                      bool doll_shown, CashShopWindowAction& action) {
+                      bool doll_shown, ItemLinkMenu& menu, CashShopWindowAction& action) {
   if (!card_hovered) {
     return;
   }
@@ -386,11 +388,13 @@ void NoteCardGestures(const CashShopCard& card, bool card_hovered, bool button_h
     action.item.hovered_kind = ChatLinkKind::kItem;
     action.item.hovering = true;
   }
-  if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-    action.item.gesture = ChatLinkGesture::kDescribe;
-    action.item.item_id = card.item_id;
-  } else if (!button_hovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
-             ImGui::GetIO().KeyShift) {
+  const TradeItemGesture gesture{.hovered = true,
+                                 .repost = !button_hovered &&
+                                           ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
+                                           ImGui::GetIO().KeyShift,
+                                 .menu = ImGui::IsMouseReleased(ImGuiMouseButton_Right)};
+  if (NoteTradeItemLink(gesture, TradeItemView{.item_id = card.item_id, .name = card.name}, 0,
+                        menu)) {
     action.item.gesture = ChatLinkGesture::kRepost;
     action.item.item_id = card.item_id;
   }
@@ -491,7 +495,8 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
   ImGui::EndChild();
   ImGui::PopStyleVar();
   ImGui::PopStyleColor();
-  NoteCardGestures(card, ImGui::IsItemHovered(), button_hovered, doll_shown, action);
+  NoteCardGestures(card, ImGui::IsItemHovered(), button_hovered, doll_shown, state.item_menu,
+                   action);
   ImGui::PopID();
 }
 
@@ -741,6 +746,11 @@ CashShopWindowAction DrawCashShopWindow(CashShopWindowState& state, const CashSh
     DrawGrid(state, view, art, grid_width, action);
     if (show_cart) {
       DrawCart(state, view, art, cart_width, action);
+    }
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, {});
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.item.gesture = chosen.gesture;
+      action.item.item_id = chosen.item_id;
     }
     ImGui::PopStyleVar();
   }

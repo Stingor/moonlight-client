@@ -92,6 +92,8 @@ struct BuyingStoreSellState {
   std::vector<BuyingStoreTypedAmount> typed;
   // LA VENTE ATTEND SA CONFIRMATION : ce qui partira si le joueur dit oui.
   std::vector<BuyingStoreSaleCartLine> pending;
+  // Le menu qu'un clic droit sur un item a armé ; son jeton est la case du sac.
+  ItemLinkMenu item_menu;
 };
 
 struct BuyingStoreSellAction {
@@ -99,10 +101,15 @@ struct BuyingStoreSellAction {
   bool close = false;
   // CE QUI PART, confirmé. ⚠ `app` REJUGE AVANT D'ÉMETTRE.
   std::vector<BuyingStoreSaleCartLine> sell;
+  // L'item survolé, pour l'aperçu, et celui qu'un geste vise, avec leur case du
+  // sac — nulle pour un item recherché.
   std::uint32_t hovered_id = 0;
   std::uint16_t hovered_slot = 0;
   std::uint32_t describe_id = 0;
   std::uint16_t describe_slot = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // Remet la vente à zéro si l'échoppe montrée change ; rend vrai dans ce cas.
@@ -121,8 +128,9 @@ bool OpenBuyingStoreSellOn(BuyingStoreSellState& state, std::uint32_t buyer_acco
 int AddToBuyingStoreSale(BuyingStoreSellState& state, std::span<const BuyingStoreWantedView> wanted,
                          const BuyingStoreOfferView& offer, int amount);
 
-[[nodiscard]] BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
-                                                              const BuyingStoreSellView& view,
-                                                              const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+[[nodiscard]] BuyingStoreSellAction DrawBuyingStoreSellWindow(
+    BuyingStoreSellState& state, const BuyingStoreSellView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

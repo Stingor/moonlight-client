@@ -28,6 +28,8 @@ constexpr float kTimeColumnPixels = 100.0F;
 constexpr float kBuyerColumnPixels = 90.0F;
 
 constexpr const char* kCloseConfirmId = "##vending_shop_close";
+constexpr const char* kShopItemMenuId = "##vending_shop_item_menu";
+constexpr const char* kLogItemMenuId = "##vending_log_item_menu";
 
 void Constrain() {
   const float scale = Scale();
@@ -35,7 +37,8 @@ void Constrain() {
                                       ImVec2(kMostWidthPixels * scale, FLT_MAX));
 }
 
-void DrawShopLines(const VendingShopView& view, VendingShopAction& action) {
+void DrawShopLines(VendingShopWindowState& state, const VendingShopView& view,
+                   VendingShopAction& action) {
   const float scale = Scale();
   if (!ImGui::BeginTable("##vending_shop_lines", 4,
                          ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg)) {
@@ -57,8 +60,9 @@ void DrawShopLines(const VendingShopView& view, VendingShopAction& action) {
     if (gesture.hovered) {
       action.hovered_slot = line.cart_slot;
     }
-    if (gesture.describe) {
+    if (NoteTradeItemLink(gesture, line.item, line.cart_slot, state.item_menu)) {
       action.describe_slot = line.cart_slot;
+      action.item_gesture = ChatLinkGesture::kRepost;
     }
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
@@ -77,7 +81,8 @@ void DrawShopLines(const VendingShopView& view, VendingShopAction& action) {
 }  // namespace
 
 VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const VendingShopView& view,
-                                        const SkinArt& art) {
+                                        const SkinArt& art,
+                                        std::span<const VoteShopOffer> vote_shop) {
   VendingShopAction action;
   // 🔴 UNE FENÊTRE BAISSÉE N'EST PAS UNE ÉCHOPPE FERMÉE : la croix ou Échap ne
   // font que POSER LA QUESTION. La fenêtre se relève, et c'est la réponse qui
@@ -99,7 +104,7 @@ VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const Ven
     if (view.lines.empty()) {
       ImGui::TextDisabled("%s", core::Tr("Tout est vendu."));
     } else {
-      DrawShopLines(view, action);
+      DrawShopLines(state, view, action);
     }
     ImGui::Separator();
     ImGui::Text(core::Tr("Encaissé : %s"), TradeAmountText(view.earned, kZenySuffix).c_str());
@@ -129,13 +134,19 @@ VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const Ven
           break;
       }
     }
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kShopItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_slot = static_cast<std::uint16_t>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
   }
   EndSkinnedWindow();
   return action;
 }
 
 VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state, const VendingLogView& view,
-                                      const SkinArt& art) {
+                                      const SkinArt& art,
+                                      std::span<const VoteShopOffer> vote_shop) {
   VendingLogAction action;
   if (!state.open) {
     return action;
@@ -174,8 +185,10 @@ VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state, const Vendin
         if (gesture.hovered) {
           action.hovered_rank = sale.rank + 1;
         }
-        if (gesture.describe) {
+        if (NoteTradeItemLink(gesture, sale.item, static_cast<std::uint32_t>(sale.rank + 1),
+                              state.item_menu)) {
           action.describe_rank = sale.rank + 1;
+          action.item_gesture = ChatLinkGesture::kRepost;
         }
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
@@ -205,6 +218,11 @@ VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state, const Vendin
                 TradeAmountText(view.total, kZenySuffix).c_str());
     if (SkinButton(core::Tr("Fermer"), art)) {
       state.open = false;
+    }
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kLogItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_rank = chosen.token;
+      action.item_gesture = chosen.gesture;
     }
   }
   EndSkinnedWindow();

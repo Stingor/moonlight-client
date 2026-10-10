@@ -10,51 +10,57 @@
 
 namespace moonclient {
 
-void UiStage::DrawTradeWindows(TradeWindows& trade) {
+void UiStage::DrawTradeWindows(TradeWindows& trade,
+                               std::span<const ro::ui::VoteShopOffer> vote_shop) {
   // LE TITRE ENTIER D'UNE ENSEIGNE COUPÉE, sous la souris.
   ro::ui::DrawSignboardTip(trade.signboard_tips);
   // LA BOUTIQUE D'UN PNJ, avant la description qu'on ouvre depuis ses lignes.
   if (trade.npc_shop.view != nullptr) {
     trade.npc_shop.answer =
-        ro::ui::DrawNpcShopWindow(trade.npc_shop.state, *trade.npc_shop.view, skin_);
+        ro::ui::DrawNpcShopWindow(trade.npc_shop.state, *trade.npc_shop.view, skin_, vote_shop);
   }
   // LE TROC, au même rang : c'est une boutique de PNJ qui se paie en items.
   if (trade.barter.view != nullptr) {
-    trade.barter.answer = ro::ui::DrawBarterWindow(trade.barter.state, *trade.barter.view, skin_);
+    trade.barter.answer =
+        ro::ui::DrawBarterWindow(trade.barter.state, *trade.barter.view, skin_, vote_shop);
   }
   // L'ÉCHOPPE D'ACHAT : ses quatre fenêtres, chacune seulement quand l'étage
   // lui a composé une vue.
   BuyingStoreWindows& buying = trade.buying_store;
   if (buying.setup.view != nullptr) {
-    buying.setup.answer =
-        ro::ui::DrawBuyingStoreSetupWindow(buying.setup.state, *buying.setup.view, skin_);
+    buying.setup.answer = ro::ui::DrawBuyingStoreSetupWindow(buying.setup.state, *buying.setup.view,
+                                                             skin_, vote_shop);
   }
   if (buying.own.view != nullptr) {
-    buying.own.answer = ro::ui::DrawBuyingStoreOwnWindow(buying.own.state, *buying.own.view, skin_);
+    buying.own.answer =
+        ro::ui::DrawBuyingStoreOwnWindow(buying.own.state, *buying.own.view, skin_, vote_shop);
   }
   if (buying.log.view != nullptr) {
-    buying.log.answer = ro::ui::DrawBuyingStoreLogWindow(buying.log.state, *buying.log.view, skin_);
+    buying.log.answer =
+        ro::ui::DrawBuyingStoreLogWindow(buying.log.state, *buying.log.view, skin_, vote_shop);
   }
   if (buying.sell.view != nullptr) {
     buying.sell.answer =
-        ro::ui::DrawBuyingStoreSellWindow(buying.sell.state, *buying.sell.view, skin_);
+        ro::ui::DrawBuyingStoreSellWindow(buying.sell.state, *buying.sell.view, skin_, vote_shop);
   }
   // L'ÉCHOPPE DE VENTE : ses quatre fenêtres, chacune seulement quand l'étage
   // lui a composé une vue, puis la boîte d'un avis du serveur.
   VendingWindows& vending = trade.vending;
   if (vending.setup_view != nullptr) {
     vending.setup_answer =
-        ro::ui::DrawVendingSetupWindow(vending.setup, *vending.setup_view, skin_);
+        ro::ui::DrawVendingSetupWindow(vending.setup, *vending.setup_view, skin_, vote_shop);
   }
   if (vending.shop_view != nullptr) {
-    vending.shop_answer = ro::ui::DrawVendingShopWindow(vending.shop, *vending.shop_view, skin_);
+    vending.shop_answer =
+        ro::ui::DrawVendingShopWindow(vending.shop, *vending.shop_view, skin_, vote_shop);
   }
   if (vending.log_view != nullptr) {
-    vending.log_answer = ro::ui::DrawVendingLogWindow(vending.log, *vending.log_view, skin_);
+    vending.log_answer =
+        ro::ui::DrawVendingLogWindow(vending.log, *vending.log_view, skin_, vote_shop);
   }
   if (vending.visit_view != nullptr) {
     vending.visit_answer =
-        ro::ui::DrawVendingVisitWindow(vending.visit, *vending.visit_view, skin_);
+        ro::ui::DrawVendingVisitWindow(vending.visit, *vending.visit_view, skin_, vote_shop);
   }
   const std::string notice_id = std::string(ro::core::Tr("Shop")) + "###vending_notice";
   ro::ui::DrawTradeNotice(vending.notice, notice_id.c_str(), skin_);
@@ -71,7 +77,7 @@ void UiStage::DrawTradeWindows(TradeWindows& trade) {
     deal.proposal_answer = ro::ui::DrawDealProposal(deal.proposal, *deal.proposal_view, skin_);
   }
   if (deal.view != nullptr) {
-    deal.answer = ro::ui::DrawDealWindow(deal.state, *deal.view, skin_);
+    deal.answer = ro::ui::DrawDealWindow(deal.state, *deal.view, skin_, vote_shop);
   }
 }
 

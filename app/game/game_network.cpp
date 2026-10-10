@@ -659,10 +659,15 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   pieces_.cash_shop.Advance(windows_.cash_shop.state, std::exchange(windows_.cash_shop.answer, {}),
                             link_, world_, pieces_.item_words, styles_, now_ms);
   windows_.cash_shop.view = pieces_.cash_shop.view();
-  // MAJ + CLIC SUR UNE CARTE : son lien dans la saisie du chat.
+  // MAJ + CLIC SUR UNE CARTE : son lien dans la saisie du chat ; et ce que son
+  // menu a choisi d'autre que la description.
   if (const std::optional<ro::vfs::ItemLink> reposted = pieces_.cash_shop.TakeReposted();
       reposted.has_value()) {
     PostChatLink(*reposted);
+  }
+  if (const std::optional<ro::ui::ChatLinkAsk> chosen = pieces_.cash_shop.TakeChosen();
+      chosen.has_value()) {
+    FollowCatalogItem(*chosen, now_ms);
   }
   // LES COMMERCES : ce que leurs fenêtres ont rendu, et les vues qu'elles
   // dessineront. Un objet du sac se décrit par sa case, qui dit raffinement et
@@ -715,19 +720,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     described = std::move(rewarded);
   }
   if (described.has_value()) {
-    windows_.description.item_id = described->item_id;
-    windows_.description.from_slot = described->bag_slot;
-    windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-    // L'OBJET D'UN AUTRE se décrit comme un lien : raffinement, cartes et
-    // options voyagent avec lui.
-    if (described->link.has_value() && item_description_.has_value()) {
-      item_description_->NoteLinked(*described->link);
-      windows_.description.from_slot = 0;
-      windows_.description.from_holder = ro::ui::ItemHolder::kChatLink;
-    }
-    windows_.description.open = true;
-    windows_.description.place_at_mouse = true;
-    windows_.description.raise = true;
+    FollowTradeItem(*described, now_ms);
   }
 
   // L'objet visé se ramasse en arrivant à côté de lui — ou s'oublie, si l'on n'y

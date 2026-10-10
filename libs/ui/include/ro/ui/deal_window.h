@@ -138,6 +138,8 @@ struct DealWindowState {
   // LA VALIDATION QUI ATTEND SA CONFIRMATION, et le rang qu'elle a montré.
   bool confirming = false;
   std::uint32_t confirming_revision = 0;
+  // Le menu qu'un clic droit sur un item a armé.
+  ItemLinkMenu item_menu;
 };
 
 struct DealWindowAction {
@@ -152,9 +154,14 @@ struct DealWindowAction {
   // ⚠ `app` REJUGE AVANT D'ÉMETTRE : le verdict dessiné a une image de retard.
   bool execute = false;
   std::uint32_t execute_revision = 0;
-  // La ligne survolée, pour l'aperçu, et celle qu'on veut décrire.
+  // La ligne survolée, pour l'aperçu, et celle qu'un geste vise — ou la case du
+  // sac, pour une pile qu'on pourrait offrir ; zéro pour aucune.
   DealLineRef hovered;
   DealLineRef described;
+  std::uint16_t described_bag_slot = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // Le texte du récapitulatif : ce que je donne, ce que je reçois, zeny en
@@ -186,9 +193,11 @@ void ChooseDealBagSlot(DealWindowState& state, const DealBagView& bag, DealWindo
 // Remet la fenêtre à l'état d'une ouverture neuve.
 void OpenDealOn(DealWindowState& state, std::uint32_t opening_seq);
 
-// Dessine la fenêtre si elle est ouverte.
+// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
+// shop, pour le menu d'un item.
 [[nodiscard]] DealWindowAction DrawDealWindow(DealWindowState& state, const DealView& view,
-                                              const SkinArt& art);
+                                              const SkinArt& art,
+                                              std::span<const VoteShopOffer> vote_shop = {});
 
 // ── LA PROPOSITION ──────────────────────────────────────────────────────────
 //

@@ -131,7 +131,9 @@ class MailStage {
   void Send(const ro::ui::MailComposeSend& send, const TradeContext& context);
   void SayNews(MailWindows& windows, const TradeContext& context);
   void SayHeld(const TradeContext& context);
-  void Note(std::span<const ro::sim::InventoryItem> items, int index, bool hovered, bool described);
+  // `gesture` : ce que demande l'objet décrit, sans objet pour un survol.
+  void Note(std::span<const ro::sim::InventoryItem> items, int index, bool hovered, bool described,
+            ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
   void LoadIcons();
   void ComposeBox(const MailWindows& windows, const TradeContext& context);
   void ComposeWrite(const MailWindows& windows, const TradeContext& context);

@@ -404,4 +404,38 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   }
 }
 
+void Game::FollowTradeItem(const TradeItemFocus& focus, std::uint32_t now_ms) {
+  // LE LIEN DANS LA SAISIE : celui que porte l'objet d'un autre, sinon celui de
+  // sa case du sac, sinon l'entrée du catalogue.
+  if (focus.gesture == ro::ui::ChatLinkGesture::kRepost) {
+    if (focus.link.has_value()) {
+      PostChatLink(*focus.link);
+    } else if (focus.bag_slot != 0) {
+      PostItemLink(world_.inventory(), focus.bag_slot);
+    } else {
+      PostChatLink(ro::vfs::ItemLink{.item_id = focus.item_id});
+    }
+    return;
+  }
+  // LES AUTRES ENTRÉES DU MENU DES OBJETS ne lisent que l'identifiant.
+  if (focus.gesture != ro::ui::ChatLinkGesture::kDescribe) {
+    FollowCatalogItem(ro::ui::ChatLinkAsk{.gesture = focus.gesture, .item_id = focus.item_id},
+                      now_ms);
+    return;
+  }
+  windows_.description.item_id = focus.item_id;
+  windows_.description.from_slot = focus.bag_slot;
+  windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
+  // L'OBJET D'UN AUTRE se décrit comme un lien : raffinement, cartes et options
+  // voyagent avec lui.
+  if (focus.link.has_value() && item_description_.has_value()) {
+    item_description_->NoteLinked(*focus.link);
+    windows_.description.from_slot = 0;
+    windows_.description.from_holder = ro::ui::ItemHolder::kChatLink;
+  }
+  windows_.description.open = true;
+  windows_.description.place_at_mouse = true;
+  windows_.description.raise = true;
+}
+
 }  // namespace moonclient

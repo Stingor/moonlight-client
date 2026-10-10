@@ -21,6 +21,7 @@ constexpr float kPriceColumnPixels = 90.0F;
 constexpr float kTotalColumnPixels = 90.0F;
 
 constexpr const char* kCloseConfirmId = "##buying_store_own_close";
+constexpr const char* kItemMenuId = "##buying_store_own_item_menu";
 
 }  // namespace
 
@@ -31,7 +32,8 @@ void OpenBuyingStoreOwnOn(BuyingStoreOwnState& state, std::uint32_t opening_seq)
 }
 
 BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
-                                              const BuyingStoreOwnView& view, const SkinArt& art) {
+                                              const BuyingStoreOwnView& view, const SkinArt& art,
+                                              std::span<const VoteShopOffer> vote_shop) {
   BuyingStoreOwnAction action;
   // UN INTERRUPTEUR BAISSÉ par la pile d'Échap : la fenêtre revient, et
   // demande.
@@ -78,8 +80,9 @@ BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
         if (gesture.hovered) {
           action.hovered_id = line.item.item_id;
         }
-        if (gesture.describe) {
+        if (NoteTradeItemLink(gesture, line.item, 0, state.item_menu)) {
           action.describe_id = line.item.item_id;
+          action.item_gesture = ChatLinkGesture::kRepost;
         }
         // Une ligne pleine reste, grisée : le serveur la liste encore.
         const ImVec4 color =
@@ -121,6 +124,11 @@ BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
       case ModalAnswer::kNo:
       case ModalAnswer::kWaiting:
         break;
+    }
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_id = chosen.item_id;
+      action.item_gesture = chosen.gesture;
     }
   }
   EndSkinnedWindow();

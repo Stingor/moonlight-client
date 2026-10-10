@@ -11,6 +11,7 @@
 
 #include "ro/ui/chat_link.h"
 #include "ro/ui/description_window.h"
+#include "ro/ui/item_link_cell.h"
 #include "ro/ui/skin_art.h"
 
 namespace ro::ui {
@@ -152,6 +153,9 @@ struct CashShopWindowState {
   float chrome_width = 0.0F;
   float chrome_height = 0.0F;
   bool snap_known = false;
+
+  // Le menu qu'un clic droit sur une carte a armé.
+  ItemLinkMenu item_menu;
 };
 
 // Ajoute une unité au panier, ou une de plus à sa ligne. ⚠ PLAFONNÉE À
@@ -191,9 +195,10 @@ struct CashShopWindowAction {
   std::uint32_t event_points_spent = 0;
   bool close_after_purchase = false;
   // LES GESTES D'UNE CARTE, ceux d'un item de commerce : le survol
-  // (`hovered_id`) pour l'aperçu de sa description, le clic droit
-  // (`kDescribe`) pour la description, Maj + clic (`kRepost`) pour son lien
-  // dans la saisie.
+  // (`hovered_id`) pour l'aperçu de sa description, Maj + clic (`kRepost`)
+  // pour son lien dans la saisie, et ce qu'on a choisi au menu des objets
+  // qu'ouvre le clic droit — la description (`kDescribe`), la base de données,
+  // les commandes du serveur.
   ChatLinkAsk item;
   // 🔴 LES ITEMS DONT UNE CARTE A ÉTÉ DESSINÉE, pour leurs images : un onglet
   // en compte des milliers, et `app` ne charge que celles qu'on a vues. ⚠ UNE

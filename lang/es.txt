@@ -5456,8 +5456,8 @@ tr: En cualquier entidad
 fr: Surligner mon camp
 tr: Resaltar mi bando
 
-fr: Survol : aperçu   -   Clic droit : description
-tr: Pasar el ratón: vista previa   -   Clic derecho: descripción
+fr: Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat
+tr: Pasar el ratón: vista previa   -   Clic derecho: menú   -   Mayús+clic: enlace en el chat
 
 fr: Système
 tr: Sistema

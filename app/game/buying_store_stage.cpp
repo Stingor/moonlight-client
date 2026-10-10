@@ -87,11 +87,12 @@ bool BuyingStoreStage::HoldsWorld() const noexcept {
   return store_.phase() != BuyingStorePhase::kClosed || store_.visiting();
 }
 
-void BuyingStoreStage::Note(std::uint32_t item_id, std::uint16_t slot, bool hovered) {
+void BuyingStoreStage::Note(std::uint32_t item_id, std::uint16_t slot, bool hovered,
+                            ro::ui::ChatLinkGesture gesture) {
   if (item_id == 0) {
     return;
   }
-  const TradeItemFocus focus{.item_id = item_id, .bag_slot = slot};
+  const TradeItemFocus focus{.item_id = item_id, .bag_slot = slot, .gesture = gesture};
   if (hovered) {
     hovered_ = focus;
   } else {
@@ -109,7 +110,7 @@ void BuyingStoreStage::FollowSetup(ro::ui::BuyingStoreSetupState& state,
                                    const ro::ui::BuyingStoreSetupAction& answer,
                                    const TradeContext& context) {
   Note(answer.hovered_id, 0, true);
-  Note(answer.describe_id, 0, false);
+  Note(answer.describe_id, 0, false, answer.item_gesture);
   // ⚠ SEULEMENT UNE FENÊTRE QUI MONTRAIT DÉJÀ CETTE PRÉPARATION : à l'image où
   // elle arrive, la fenêtre est encore baissée.
   if (!Preparing(store_) || state.preparation_seen != store_.preparation_seq()) {
@@ -152,7 +153,7 @@ void BuyingStoreStage::FollowSetup(ro::ui::BuyingStoreSetupState& state,
 void BuyingStoreStage::FollowOwn(const ro::ui::BuyingStoreOwnState& state,
                                  const ro::ui::BuyingStoreOwnAction& answer) {
   Note(answer.hovered_id, 0, true);
-  Note(answer.describe_id, 0, false);
+  Note(answer.describe_id, 0, false, answer.item_gesture);
   // LA FERMETURE EST CONFIRMÉE PAR LA FENÊTRE : un interrupteur baissé ne vaut
   // rien ici, seule la réponse compte.
   if (answer.close && store_.open() && state.opening_seen == store_.opening_seq()) {
@@ -163,7 +164,7 @@ void BuyingStoreStage::FollowOwn(const ro::ui::BuyingStoreOwnState& state,
 void BuyingStoreStage::FollowLog(const ro::ui::BuyingStoreLogState& state,
                                  const ro::ui::BuyingStoreLogAction& answer) {
   Note(answer.hovered_id, 0, true);
-  Note(answer.describe_id, 0, false);
+  Note(answer.describe_id, 0, false, answer.item_gesture);
   // L'historique refermé est oublié : il ne parlait que de l'échoppe finie.
   // ⚠ SEULEMENT S'IL ÉTAIT MONTRÉ : pendant la vente, l'interrupteur est
   // baissé et le journal se remplit.

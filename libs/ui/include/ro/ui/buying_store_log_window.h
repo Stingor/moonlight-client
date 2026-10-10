@@ -40,17 +40,24 @@ struct BuyingStoreLogView {
 
 struct BuyingStoreLogState {
   bool open = false;
+  // Le menu qu'un clic droit sur un item a armé.
+  ItemLinkMenu item_menu;
 };
 
 struct BuyingStoreLogAction {
   // Fermer, la croix ou Échap. ⚠ AUSSI ÉCRITE DANS `state.open`.
   bool close = false;
+  // L'item survolé, pour l'aperçu, et celui qu'un geste vise.
   std::uint32_t hovered_id = 0;
   std::uint32_t describe_id = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
-[[nodiscard]] BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
-                                                            const BuyingStoreLogView& view,
-                                                            const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+[[nodiscard]] BuyingStoreLogAction DrawBuyingStoreLogWindow(
+    BuyingStoreLogState& state, const BuyingStoreLogView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

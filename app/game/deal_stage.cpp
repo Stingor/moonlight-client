@@ -209,7 +209,8 @@ std::optional<TradeItemFocus> DealStage::TakeDescribed() noexcept {
   return std::exchange(described_, std::nullopt);
 }
 
-void DealStage::Note(const ro::ui::DealLineRef& line, bool hovered, bool described) {
+void DealStage::Note(const ro::ui::DealLineRef& line, bool hovered, bool described,
+                     ro::ui::ChatLinkGesture gesture) {
   if (!line.valid()) {
     return;
   }
@@ -220,7 +221,7 @@ void DealStage::Note(const ro::ui::DealLineRef& line, bool hovered, bool describ
   const ro::sim::InventoryItem& item = items[static_cast<std::size_t>(line.index)];
   // L'OBJET SE DÉCRIT PAR CE QU'IL PORTE : offert, il a quitté le sac ; celui du
   // partenaire n'y a jamais été.
-  const TradeItemFocus focus{.item_id = item.item_id, .link = ItemLinkOf(item)};
+  const TradeItemFocus focus{.item_id = item.item_id, .link = ItemLinkOf(item), .gesture = gesture};
   if (hovered) {
     hovered_ = focus;
   }
@@ -333,7 +334,18 @@ void DealStage::FollowWindow(DealWindows& windows, const TradeContext& context) 
     return;
   }
   Note(answer.hovered, true, false);
-  Note(answer.described, false, true);
+  Note(answer.described, false, true, answer.item_gesture);
+  // UNE PILE DU SAC À OFFRIR se désigne par sa case, qui dit raffinement et
+  // cartes.
+  if (answer.described_bag_slot != 0) {
+    if (const ro::sim::InventoryItem* item =
+            context.world.inventory().Find(answer.described_bag_slot);
+        item != nullptr) {
+      described_ = TradeItemFocus{.item_id = item->item_id,
+                                  .bag_slot = answer.described_bag_slot,
+                                  .gesture = answer.item_gesture};
+    }
+  }
   // LA CROIX, ÉCHAP OU « ANNULER » : l'échange s'annule chez le serveur.
   if (answer.cancel || (shown && !windows.state.open)) {
     if (auto sent = ro::net::CancelDeal(context.link, deal_); !sent) {

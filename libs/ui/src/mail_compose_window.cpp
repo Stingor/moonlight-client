@@ -38,6 +38,7 @@ constexpr float kCancelButtonPixels = 110.0F;
 constexpr std::size_t kSentenceBytes = 256;
 
 constexpr std::string_view kSendConfirmId = "rodex_send_confirm";
+constexpr const char* kItemMenuId = "##rodex_compose_item_menu";
 
 // Les octets de suite d'un caractère UTF-8 : 10xxxxxx.
 constexpr unsigned char kUtf8ContinuationMask = 0xC0;
@@ -205,8 +206,10 @@ void DrawAttachments(MailComposeWindowState& state, const MailComposeView& view,
     if (gesture.hovered) {
       action.hovered_item = static_cast<int>(index);
     }
-    if (gesture.describe) {
+    if (NoteTradeItemLink(gesture, attachment.line.item, static_cast<std::uint32_t>(index),
+                          state.item_menu)) {
       action.described_item = static_cast<int>(index);
+      action.item_gesture = ChatLinkGesture::kRepost;
     }
     ImGui::SameLine();
     if (SkinButton(core::Tr("Retirer"), art)) {
@@ -378,7 +381,8 @@ std::string MailSendRecapText(const MailComposeWindowState& state, const MailCom
 }
 
 MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state, const MailComposeView& view,
-                                        const SkinArt& art) {
+                                        const SkinArt& art,
+                                        std::span<const VoteShopOffer> vote_shop) {
   MailComposeAction action;
   if (!state.open) {
     // Une question laissée en suspens ne survit pas à la fenêtre qui la posait.
@@ -399,6 +403,11 @@ MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state, const Mai
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, mail::kChildRoundingPixels * scale);
     DrawBody(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.described_item = static_cast<int>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
     ImGui::PopStyleVar();
   }
   EndSkinnedWindow();

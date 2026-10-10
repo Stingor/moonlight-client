@@ -468,8 +468,8 @@ UiStage::Answers UiStage::Draw(
     windows.cash_shop.answer =
         ro::ui::DrawCashShopWindow(windows.cash_shop.state, *windows.cash_shop.view, skin_);
   }
-  DrawTradeWindows(windows.trade);
-  DrawMailWindows(windows.mail);
+  DrawTradeWindows(windows.trade, windows.chat.vote_shop);
+  DrawMailWindows(windows.mail, windows.chat.vote_shop);
   DrawQuestWindows(windows.quests, windows.tracker);
   DrawAchievementWindows(windows.achievements);
 

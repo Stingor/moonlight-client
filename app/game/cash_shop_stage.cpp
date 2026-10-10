@@ -317,6 +317,8 @@ void CashShopStage::Advance(ro::ui::CashShopWindowState& state,
       described_ = DescribedLinkOf(answer.item.item_id);
     } else if (answer.item.gesture == ro::ui::ChatLinkGesture::kRepost) {
       reposted_ = DescribedLinkOf(answer.item.item_id);
+    } else if (answer.item.gesture != ro::ui::ChatLinkGesture::kNothing) {
+      chosen_ = ro::ui::ChatLinkAsk{.gesture = answer.item.gesture, .item_id = answer.item.item_id};
     }
   }
 

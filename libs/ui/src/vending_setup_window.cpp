@@ -48,6 +48,7 @@ constexpr const char* kStockPayload = "VEND_AVAIL";
 constexpr const char* kLinePayload = "VEND_ROW";
 constexpr const char* kAskPopupId = "##vending_setup_ask";
 constexpr const char* kConfirmId = "##vending_setup_confirm";
+constexpr const char* kItemMenuId = "##vending_setup_item_menu";
 
 const VendingStockView* StockAt(const VendingSetupView& view, std::uint16_t cart_slot) {
   const auto found = std::ranges::find_if(
@@ -67,13 +68,14 @@ int& StockAmountFor(VendingSetupWindowState& state, std::uint16_t cart_slot, int
   return found->second;
 }
 
-void NoteItem(const TradeItemGesture& gesture, std::uint16_t cart_slot,
-              VendingSetupAction& action) {
+void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint16_t cart_slot,
+              ItemLinkMenu& menu, VendingSetupAction& action) {
   if (gesture.hovered) {
     action.hovered_slot = cart_slot;
   }
-  if (gesture.describe) {
+  if (NoteTradeItemLink(gesture, item, cart_slot, menu)) {
     action.describe_slot = cart_slot;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
@@ -163,7 +165,7 @@ void DrawStockList(VendingSetupWindowState& state, const VendingSetupView& view,
     ImGui::PushID(row.cart_slot);
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    NoteItem(DrawTradeItem(row.item), row.cart_slot, action);
+    NoteItem(DrawTradeItem(row.item), row.item, row.cart_slot, state.item_menu, action);
     if (row.refusal.empty() && remaining > 0 &&
         ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
       ImGui::SetDragDropPayload(kStockPayload, &row.cart_slot, sizeof(row.cart_slot));
@@ -207,7 +209,7 @@ void DrawStockGrid(VendingSetupWindowState& state, const VendingSetupView& view,
     }
     ImGui::PushID(kTileIdBase + row.cart_slot);
     const TradeItemGesture tile = DrawTradeTile(row.item, row.refine_level, remaining);
-    NoteItem(tile, row.cart_slot, action);
+    NoteItem(tile, row.item, row.cart_slot, state.item_menu, action);
     const bool can = CanPlace(state, view, row, remaining);
     if (can && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
       ImGui::SetDragDropPayload(kStockPayload, &row.cart_slot, sizeof(row.cart_slot));
@@ -249,7 +251,7 @@ void DrawLines(VendingSetupWindowState& state, const VendingSetupView& view, con
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     if (row != nullptr) {
-      NoteItem(DrawTradeItem(row->item), line.cart_slot, action);
+      NoteItem(DrawTradeItem(row->item), row->item, line.cart_slot, state.item_menu, action);
     } else {
       ImGui::AlignTextToFramePadding();
       ImGui::TextDisabled("%s", core::Tr("(n'est plus dans le cart)"));
@@ -578,7 +580,8 @@ std::vector<std::size_t> VendingHighPricedLines(const VendingSetupWindowState& s
 }
 
 VendingSetupAction DrawVendingSetupWindow(VendingSetupWindowState& state,
-                                          const VendingSetupView& view, const SkinArt& art) {
+                                          const VendingSetupView& view, const SkinArt& art,
+                                          std::span<const VoteShopOffer> vote_shop) {
   VendingSetupAction action;
   if (!state.open) {
     return action;
@@ -672,6 +675,11 @@ VendingSetupAction DrawVendingSetupWindow(VendingSetupWindowState& state,
     DrawFooter(state, view, art, action);
     DrawConfirmation(state, view, art, action);
     state.footer_pixels = ImGui::GetCursorPosY() - footer_top;
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_slot = static_cast<std::uint16_t>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
   }
   EndSkinnedWindow();
   if (!state.open) {

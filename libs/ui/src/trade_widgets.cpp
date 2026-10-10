@@ -90,8 +90,7 @@ TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffi
   } else {
     DrawMissingIcon(side);
   }
-  gesture.hovered |= ImGui::IsItemHovered();
-  gesture.describe |= ImGui::IsItemClicked(ImGuiMouseButton_Right);
+  AddLastItemGesture(gesture);
   ImGui::SameLine();
 
   std::string label(item.name.empty() ? std::string_view("?") : item.name);
@@ -109,9 +108,36 @@ TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffi
                                         label.c_str());
   }
   ImGui::TextUnformatted(label.c_str());
-  gesture.hovered |= ImGui::IsItemHovered();
-  gesture.describe |= ImGui::IsItemClicked(ImGuiMouseButton_Right);
+  AddLastItemGesture(gesture);
   return gesture;
+}
+
+void AddLastItemGesture(TradeItemGesture& gesture) {
+  if (!ImGui::IsItemHovered()) {
+    return;
+  }
+  gesture.hovered = true;
+  gesture.menu |= ImGui::IsMouseReleased(ImGuiMouseButton_Right);
+  gesture.repost |= ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::GetIO().KeyShift;
+}
+
+bool NoteTradeItemLink(const TradeItemGesture& gesture, const TradeItemView& item,
+                       std::uint32_t token, ItemLinkMenu& menu) {
+  if (gesture.menu) {
+    menu.armed = true;
+    menu.kind = ChatLinkKind::kItem;
+    menu.item_id = item.item_id;
+    menu.token = token;
+    menu.label = std::string(item.name);
+  }
+  return gesture.repost;
+}
+
+ChatLinkAsk DrawTradeItemMenu(const char* popup_id, ItemLinkMenu& menu,
+                              std::span<const VoteShopOffer> vote_shop) {
+  ChatLinkAsk chosen;
+  DrawItemLinkMenu(popup_id, menu, chosen, vote_shop);
+  return chosen;
 }
 
 std::string TradeAmountText(std::int64_t amount, std::string_view unit) {
@@ -333,8 +359,7 @@ TradeItemGesture DrawTradeTile(const TradeItemView& item, int refine_level, int 
   const float side = kTradeTilePixels * Scale();
   const ImVec2 top_left = ImGui::GetCursorScreenPos();
   ImGui::InvisibleButton("##tile", ImVec2(side, side));
-  gesture.hovered = ImGui::IsItemHovered();
-  gesture.describe = ImGui::IsItemClicked(ImGuiMouseButton_Right);
+  AddLastItemGesture(gesture);
   const ImVec2 bottom_right(top_left.x + side, top_left.y + side);
   ImDrawList* into = ImGui::GetWindowDrawList();
   if (gesture.hovered) {

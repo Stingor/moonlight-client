@@ -55,6 +55,7 @@ constexpr ImVec4 kSystemBadgeText = ImVec4(0.20F, 0.40F, 0.70F, 1.0F);
 constexpr std::size_t kLabelBytes = 96;
 
 constexpr std::string_view kConfirmId = "rodex_confirm";
+constexpr const char* kItemMenuId = "##rodex_item_menu";
 // Les boutons de la confirmation.
 constexpr float kConfirmButtonPixels = 110.0F;
 
@@ -327,7 +328,7 @@ void DrawList(MailboxWindowState& state, const MailboxView& view, const SkinArt&
 // ── LA LECTURE ──────────────────────────────────────────────────────────────
 
 void DrawAttachments(const MailRowView& row, const MailContentView* content, const SkinArt& art,
-                     MailboxAction& action) {
+                     ItemLinkMenu& menu, MailboxAction& action) {
   const bool has_zeny = (row.carried & kMailCarriesZeny) != 0;
   const bool has_items = (row.carried & kMailCarriesItems) != 0;
   if (!has_zeny && !has_items) {
@@ -348,8 +349,10 @@ void DrawAttachments(const MailRowView& row, const MailContentView* content, con
       if (gesture.hovered) {
         action.hovered_item = static_cast<int>(index);
       }
-      if (gesture.describe) {
+      if (NoteTradeItemLink(gesture, content->items[index].item, static_cast<std::uint32_t>(index),
+                            menu)) {
         action.described_item = static_cast<int>(index);
+        action.item_gesture = ChatLinkGesture::kRepost;
       }
       ImGui::PopID();
     }
@@ -408,7 +411,7 @@ void DrawDetail(MailboxWindowState& state, const MailboxView& view, const SkinAr
   }
   ImGui::EndChild();
 
-  DrawAttachments(*row, content, art, action);
+  DrawAttachments(*row, content, art, state.item_menu, action);
 
   const ImVec2 button(kActionButtonPixels * scale, 0.0F);
   if (SkinButton(core::Tr("Répondre"), art, button)) {
@@ -561,8 +564,7 @@ TradeItemGesture DrawItemRow(const MailItemView& line) {
     ImGui::TextDisabled("x%d", line.amount);
   }
   ImGui::EndGroup();
-  gesture.hovered |= ImGui::IsItemHovered();
-  gesture.describe |= ImGui::IsItemClicked(ImGuiMouseButton_Right);
+  AddLastItemGesture(gesture);
   return gesture;
 }
 
@@ -695,7 +697,7 @@ std::vector<MailRef> MailDeleteTargets(std::span<const MailRowView> rows,
 }
 
 MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& view,
-                                const SkinArt& art) {
+                                const SkinArt& art, std::span<const VoteShopOffer> vote_shop) {
   MailboxAction action;
   if (!state.open) {
     Forget(state);
@@ -733,6 +735,11 @@ MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& vi
       ImGui::TextDisabled("%s", core::Tr("Clique sur un courrier pour le lire."));
     }
     DrawConfirmation(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.described_item = static_cast<int>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
     ImGui::PopStyleVar();
     // La mesure de fin d'image sert de base à l'agrandissement, et suit donc
     // les redimensionnements du joueur.

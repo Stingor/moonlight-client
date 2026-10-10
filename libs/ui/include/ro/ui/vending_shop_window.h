@@ -45,18 +45,25 @@ struct VendingShopWindowState {
   bool open = false;
   std::uint32_t opening_seen = 0;
   bool confirming = false;
+  // Le menu qu'un clic droit sur un item a armé ; son jeton est la case du cart.
+  ItemLinkMenu item_menu;
 };
 
 struct VendingShopAction {
   // Fermeture CONFIRMÉE : `app` la dit au serveur.
   bool close_shop = false;
+  // La case du cart survolée, et celle qu'un geste vise ; zéro pour aucune.
   std::uint16_t hovered_slot = 0;
   std::uint16_t describe_slot = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
-[[nodiscard]] VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state,
-                                                      const VendingShopView& view,
-                                                      const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+[[nodiscard]] VendingShopAction DrawVendingShopWindow(
+    VendingShopWindowState& state, const VendingShopView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 // UNE VENTE DU JOURNAL.
 struct VendingLogLineView {
@@ -80,17 +87,25 @@ struct VendingLogWindowState {
   bool open = false;
   // Le rang du journal montré : `app` rouvre la fenêtre sur un journal neuf.
   std::uint32_t journal_seen = 0;
+  // Le menu qu'un clic droit sur un item a armé ; son jeton est le rang de la
+  // vente, plus un.
+  ItemLinkMenu item_menu;
 };
 
 struct VendingLogAction {
   bool close = false;
-  // Le rang de la vente survolée, et de celle qu'on veut décrire, plus un ;
-  // zéro pour aucune.
+  // Le rang de la vente survolée, et de celle qu'un geste vise, plus un ; zéro
+  // pour aucune.
   std::size_t hovered_rank = 0;
   std::size_t describe_rank = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
 [[nodiscard]] VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state,
-                                                    const VendingLogView& view, const SkinArt& art);
+                                                    const VendingLogView& view, const SkinArt& art,
+                                                    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

@@ -142,7 +142,7 @@ void BarterStage::Follow(ro::ui::BarterWindowState& state, const ro::ui::BarterW
                          const TradeContext& context) {
   hovered_ = TradeItemFocus{.item_id = answer.hovered_id};
   if (answer.describe_id != 0) {
-    described_ = TradeItemFocus{.item_id = answer.describe_id};
+    described_ = TradeItemFocus{.item_id = answer.describe_id, .gesture = answer.item_gesture};
   }
   if (!barter_.open()) {
     return;

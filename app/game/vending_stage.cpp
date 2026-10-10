@@ -74,13 +74,15 @@ std::optional<TradeItemFocus> VendingStage::TakeDescribed() noexcept {
   return std::exchange(described_, std::nullopt);
 }
 
-void VendingStage::Note(const ro::sim::InventoryItem* item, bool hovered, bool described) {
+void VendingStage::Note(const ro::sim::InventoryItem* item, bool hovered, bool described,
+                        ro::ui::ChatLinkGesture gesture) {
   if (item == nullptr || item->item_id == 0) {
     return;
   }
   // L'OBJET SE DÉCRIT PAR CE QU'IL PORTE : il n'est pas dans le sac, et sa case
   // n'y dirait rien.
-  const TradeItemFocus focus{.item_id = item->item_id, .link = ItemLinkOf(*item)};
+  const TradeItemFocus focus{
+      .item_id = item->item_id, .link = ItemLinkOf(*item), .gesture = gesture};
   if (hovered) {
     hovered_ = focus;
   }
@@ -137,7 +139,7 @@ void VendingStage::FollowSetup(VendingWindows& windows, const TradeContext& cont
   ro::ui::VendingSetupWindowState& state = windows.setup;
   const ro::ui::VendingSetupAction answer = std::exchange(windows.setup_answer, {});
   Note(CartItemAt(context.world, answer.hovered_slot), true, false);
-  Note(CartItemAt(context.world, answer.describe_slot), false, true);
+  Note(CartItemAt(context.world, answer.describe_slot), false, true, answer.item_gesture);
   if (answer.settings_changed) {
     memory_.grid = state.grid;
     memory_.confirm_high_prices = state.confirm_high_prices;
@@ -220,7 +222,7 @@ void VendingStage::Resume(ro::ui::VendingSetupWindowState& state, const TradeCon
 void VendingStage::FollowShop(VendingWindows& windows, const TradeContext& context) {
   const ro::ui::VendingShopAction answer = std::exchange(windows.shop_answer, {});
   Note(ShopItemAt(vending_, answer.hovered_slot), true, false);
-  Note(ShopItemAt(vending_, answer.describe_slot), false, true);
+  Note(ShopItemAt(vending_, answer.describe_slot), false, true, answer.item_gesture);
   if (answer.close_shop && vending_.shop_open()) {
     if (auto sent = ro::net::RequestVendingShopClose(context.link, vending_); !sent) {
       ro::core::LogError("échoppe : {}", ro::core::Describe(sent.error()));
@@ -235,7 +237,7 @@ void VendingStage::FollowLog(VendingWindows& windows) {
     Note(&journal[answer.hovered_rank - 1].item, true, false);
   }
   if (answer.describe_rank > 0 && answer.describe_rank <= journal.size()) {
-    Note(&journal[answer.describe_rank - 1].item, false, true);
+    Note(&journal[answer.describe_rank - 1].item, false, true, answer.item_gesture);
   }
 }
 

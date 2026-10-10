@@ -33,6 +33,7 @@ constexpr int kOfferIdBase = 2000;
 constexpr int kCartIdBase = 3000;
 
 constexpr const char* kSaleConfirmId = "##buying_store_sale_confirm";
+constexpr const char* kItemMenuId = "##buying_store_sell_item_menu";
 
 const BuyingStoreWantedView* WantedOf(std::span<const BuyingStoreWantedView> wanted,
                                       std::uint32_t item_id) {
@@ -63,20 +64,25 @@ std::int64_t UnitPrice(const BuyingStoreSellView& view, const BuyingStoreSaleCar
   return wanted == nullptr ? 0 : wanted->price;
 }
 
-void NoteItem(const TradeItemGesture& gesture, std::uint32_t item_id, std::uint16_t slot,
-              BuyingStoreSellAction& action) {
+// Le geste d'une ligne. Le jeton du menu est la case du sac, nulle pour un item
+// recherché : c'est elle qui dit le raffinement.
+void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint32_t item_id,
+              std::uint16_t slot, ItemLinkMenu& menu, BuyingStoreSellAction& action) {
   if (gesture.hovered) {
     action.hovered_id = item_id;
     action.hovered_slot = slot;
   }
-  if (gesture.describe) {
+  TradeItemView aimed = item;
+  aimed.item_id = item_id;
+  if (NoteTradeItemLink(gesture, aimed, slot, menu)) {
     action.describe_id = item_id;
     action.describe_slot = slot;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
 void DrawWanted(const BuyingStoreSellView& view, const SkinArt& art, float height,
-                BuyingStoreSellAction& action) {
+                ItemLinkMenu& menu, BuyingStoreSellAction& action) {
   const float scale = Scale();
   ImGui::TextUnformatted(core::Tr("Items recherchés"));
   ImGui::BeginChild("##buying_store_wanted_pane", ImVec2(-1.0F, height), ImGuiChildFlags_Borders);
@@ -95,7 +101,7 @@ void DrawWanted(const BuyingStoreSellView& view, const SkinArt& art, float heigh
       ImGui::PushID(static_cast<int>(rank));
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      NoteItem(DrawTradeItem(line.item), line.item.item_id, 0, action);
+      NoteItem(DrawTradeItem(line.item), line.item, line.item.item_id, 0, menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
       ImGui::TextColored(kTradeBlackText, "%d", line.wanted);
@@ -133,7 +139,8 @@ void DrawOffers(BuyingStoreSellState& state, const BuyingStoreSellView& view, co
       ImGui::PushID(kOfferIdBase + static_cast<int>(rank));
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      NoteItem(DrawTradeItem(offer.item), offer.item.item_id, offer.client_slot, action);
+      NoteItem(DrawTradeItem(offer.item), offer.item, offer.item.item_id, offer.client_slot,
+               state.item_menu, action);
       // UNE PILE REFUSÉE RESTE, GRISÉE, AVEC SA RAISON : absente, elle passerait
       // pour un item que l'acheteur ne veut pas.
       if (!offer.barred.empty()) {
@@ -212,7 +219,7 @@ void DrawCart(BuyingStoreSellState& state, const BuyingStoreSellView& view, cons
       ImGui::TableNextColumn();
       const TradeItemView item =
           offer != nullptr ? offer->item : TradeItemView{.item_id = line.item_id};
-      NoteItem(DrawTradeItem(item), line.item_id, line.client_slot, action);
+      NoteItem(DrawTradeItem(item), item, line.item_id, line.client_slot, state.item_menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
       ImGui::TextColored(kTradeBlackText, "%d", line.amount);
@@ -383,8 +390,8 @@ int AddToBuyingStoreSale(BuyingStoreSellState& state, std::span<const BuyingStor
 }
 
 BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
-                                                const BuyingStoreSellView& view,
-                                                const SkinArt& art) {
+                                                const BuyingStoreSellView& view, const SkinArt& art,
+                                                std::span<const VoteShopOffer> vote_shop) {
   BuyingStoreSellAction action;
   if (!state.open) {
     return action;
@@ -418,11 +425,17 @@ BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
     const float pane = ImGui::GetTextLineHeightWithSpacing() * kPaneRows;
     const float footer =
         ImGui::GetTextLineHeightWithSpacing() * kFooterTextRows + SkinFooterHeight(art);
-    DrawWanted(view, art, pane, action);
+    DrawWanted(view, art, pane, state.item_menu, action);
     DrawOffers(state, view, art, pane, action);
     DrawCart(state, view, art, footer, action);
     DrawFooter(state, view, art);
     DrawSaleConfirmation(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_id = chosen.item_id;
+      action.describe_slot = static_cast<std::uint16_t>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
   }
   EndSkinnedWindow();
   if (!state.open) {

@@ -134,6 +134,8 @@ struct BarterWindowState {
   std::vector<BarterLine> pending;
   bool pending_immediate = false;
   std::uint32_t pending_cart_seq = 0;
+  // Le menu qu'un clic droit sur un item a armé.
+  ItemLinkMenu item_menu;
 };
 
 struct BarterWindowAction {
@@ -148,9 +150,12 @@ struct BarterWindowAction {
   std::vector<BarterLine> exchange;
   bool immediate = false;
   std::uint32_t cart_seq = 0;
-  // L'item survolé, pour l'aperçu, et celui dont on veut la description.
+  // L'item survolé, pour l'aperçu, et celui qu'un geste vise.
   std::uint32_t hovered_id = 0;
   std::uint32_t describe_id = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // CE QU'UN ÉCHANGE CONSOMME ET LIVRE, devise par devise, cumulé sur ses lignes.
@@ -183,8 +188,10 @@ struct BarterRecap {
 // Remet la fenêtre à l'état d'une ouverture neuve.
 void OpenBarterOn(BarterWindowState& state, std::uint32_t opening_seq);
 
-// Dessine la fenêtre si elle est ouverte.
+// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
+// shop, pour le menu d'un item.
 [[nodiscard]] BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& view,
-                                                  const SkinArt& art);
+                                                  const SkinArt& art,
+                                                  std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

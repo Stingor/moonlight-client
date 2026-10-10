@@ -65,7 +65,9 @@ class BuyingStoreStage {
   void AskRefresh(const TradeContext& context);
   void ComposeSell(const ro::ui::BuyingStoreSellState& state, const TradeContext& context);
 
-  void Note(std::uint32_t item_id, std::uint16_t slot, bool hovered);
+  // `gesture` : ce que demande l'objet visé, sans objet pour un survol.
+  void Note(std::uint32_t item_id, std::uint16_t slot, bool hovered,
+            ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
 
   // Ce que la conversation dit, en rouge ou dans sa couleur.
   static void Say(const TradeContext& context, std::string text, std::uint32_t color);

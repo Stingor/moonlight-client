@@ -740,12 +740,12 @@ class UiStage {
   // Glisse le rappel dans la liste de fond, puis rend à l'interface l'état
   // qu'il a changé.
   static void PaintOverWorld(const OverWorldPaint& over_world);
-  // LES COMMERCES : leur dessin, et leur place dans la pile d'Échap. Voir
-  // `ui_stage_trade.cpp`.
-  void DrawTradeWindows(TradeWindows& trade);
+  // LES COMMERCES : leur dessin, le catalogue du vote shop pour le menu d'un
+  // item, et leur place dans la pile d'Échap. Voir `ui_stage_trade.cpp`.
+  void DrawTradeWindows(TradeWindows& trade, std::span<const ro::ui::VoteShopOffer> vote_shop);
   void RegisterTradeEscapes(TradeWindows& trade);
   // LE COURRIER, de même : voir `ui_stage_mail.cpp`.
-  void DrawMailWindows(MailWindows& mail);
+  void DrawMailWindows(MailWindows& mail, std::span<const ro::ui::VoteShopOffer> vote_shop);
   void RegisterMailEscapes(MailWindows& mail);
   // LES SALONS, de même : voir `ui_stage_chat_room.cpp`. La salle porte la barre
   // de la conversation : ce qu'elle rend s'ajoute à celui des conversations.

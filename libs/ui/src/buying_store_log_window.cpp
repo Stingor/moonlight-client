@@ -23,10 +23,13 @@ constexpr float kSellerColumnPixels = 80.0F;
 // Un long journal fait défiler la fenêtre plutôt que de sortir de l'écran.
 constexpr float kMostScreenShare = 0.6F;
 
+constexpr const char* kItemMenuId = "##buying_store_log_item_menu";
+
 }  // namespace
 
 BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
-                                              const BuyingStoreLogView& view, const SkinArt& art) {
+                                              const BuyingStoreLogView& view, const SkinArt& art,
+                                              std::span<const VoteShopOffer> vote_shop) {
   BuyingStoreLogAction action;
   if (!state.open) {
     return action;
@@ -70,8 +73,9 @@ BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
         if (gesture.hovered) {
           action.hovered_id = line.item.item_id;
         }
-        if (gesture.describe) {
+        if (NoteTradeItemLink(gesture, line.item, 0, state.item_menu)) {
           action.describe_id = line.item.item_id;
+          action.item_gesture = ChatLinkGesture::kRepost;
         }
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
@@ -102,6 +106,11 @@ BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
     ImGui::Text(core::Tr("Total des achats : %s"), TradeAmountText(view.total, "z").c_str());
     if (SkinButton(core::Tr("Fermer"), art)) {
       state.open = false;
+    }
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_id = chosen.item_id;
+      action.item_gesture = chosen.gesture;
     }
   }
   EndSkinnedWindow();

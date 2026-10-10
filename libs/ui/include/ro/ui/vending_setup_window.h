@@ -113,6 +113,8 @@ struct VendingSetupWindowState {
   // qu'occupent les lignes posées. Le surplus va au stock.
   float footer_pixels = 0.0F;
   float lines_content_pixels = 0.0F;
+  // Le menu qu'un clic droit sur un item a armé ; son jeton est la case du cart.
+  ItemLinkMenu item_menu;
 };
 
 struct VendingSetupAction {
@@ -124,9 +126,12 @@ struct VendingSetupAction {
   bool resume = false;
   // Un réglage a bougé : `app` l'écrit sur le disque.
   bool settings_changed = false;
-  // La case du cart survolée, et celle qu'on veut décrire ; zéro pour aucune.
+  // La case du cart survolée, et celle qu'un geste vise ; zéro pour aucune.
   std::uint16_t hovered_slot = 0;
   std::uint16_t describe_slot = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // Remet la fenêtre à l'état d'une préparation neuve. Le nom et les réglages
@@ -152,9 +157,10 @@ void TakeFromVendingSetup(VendingSetupWindowState& state, std::uint16_t cart_slo
 // Les rangs des lignes dont le prix se confirme.
 [[nodiscard]] std::vector<std::size_t> VendingHighPricedLines(const VendingSetupWindowState& state);
 
-// Dessine la fenêtre si elle est ouverte.
-[[nodiscard]] VendingSetupAction DrawVendingSetupWindow(VendingSetupWindowState& state,
-                                                        const VendingSetupView& view,
-                                                        const SkinArt& art);
+// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
+// shop, pour le menu d'un item.
+[[nodiscard]] VendingSetupAction DrawVendingSetupWindow(
+    VendingSetupWindowState& state, const VendingSetupView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

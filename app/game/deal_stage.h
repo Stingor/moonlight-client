@@ -103,7 +103,9 @@ class DealStage {
   void SayRefusedFrames(const TradeContext& context);
   void Compose(const TradeContext& context);
   void ComposeProposal(const TradeContext& context);
-  void Note(const ro::ui::DealLineRef& line, bool hovered, bool described);
+  // `gesture` : ce que demande l'objet décrit, sans objet pour un survol.
+  void Note(const ro::ui::DealLineRef& line, bool hovered, bool described,
+            ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
 
   ro::sim::Deal deal_;
   ro::sim::ApproachWalkClock* approach_clock_ = nullptr;

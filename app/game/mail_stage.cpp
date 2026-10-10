@@ -276,14 +276,14 @@ std::optional<TradeItemFocus> MailStage::TakeDescribed() noexcept {
 }
 
 void MailStage::Note(std::span<const ro::sim::InventoryItem> items, int index, bool hovered,
-                     bool described) {
+                     bool described, ro::ui::ChatLinkGesture gesture) {
   if (index < 0 || static_cast<std::size_t>(index) >= items.size()) {
     return;
   }
   const ro::sim::InventoryItem& item = items[static_cast<std::size_t>(index)];
   // UNE PIÈCE JOINTE SE DÉCRIT PAR CE QU'ELLE PORTE, comme une offre d'échange :
   // reçue, elle n'est pas dans le sac.
-  const TradeItemFocus focus{.item_id = item.item_id, .link = ItemLinkOf(item)};
+  const TradeItemFocus focus{.item_id = item.item_id, .link = ItemLinkOf(item), .gesture = gesture};
   if (hovered) {
     hovered_ = focus;
   }
@@ -440,7 +440,7 @@ void MailStage::FollowBox(MailWindows& windows, const TradeContext& context) {
   }
   if (box_view_.content != nullptr) {
     Note(content_items_, answer.hovered_item, true, false);
-    Note(content_items_, answer.described_item, false, true);
+    Note(content_items_, answer.described_item, false, true, answer.item_gesture);
   }
   if (answer.refresh) {
     RequestList(context);
@@ -497,7 +497,7 @@ void MailStage::FollowCompose(MailWindows& windows, const TradeContext& context)
     return;
   }
   Note(attached_items_, answer.hovered_item, true, false);
-  Note(attached_items_, answer.described_item, false, true);
+  Note(attached_items_, answer.described_item, false, true, answer.item_gesture);
   // LA CROIX, ÉCHAP OU « ANNULER » : l'écriture s'annule chez le serveur, qui
   // rend les pièces jointes.
   if (answer.cancel || !windows.compose.open) {

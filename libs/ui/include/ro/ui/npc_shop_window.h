@@ -135,6 +135,8 @@ struct NpcShopWindowState {
   // La boîte de confirmation est à OUVRIR, au niveau de la fenêtre : voir
   // `DrawNpcShopWindow`.
   bool sale_asked = false;
+  // Le menu qu'un clic droit sur un item a armé ; son jeton est la case du sac.
+  ItemLinkMenu item_menu;
 };
 
 struct NpcShopWindowAction {
@@ -149,12 +151,15 @@ struct NpcShopWindowAction {
   std::vector<NpcShopCartLine> sell;
   // L'achat ou la vente vient d'un Ctrl + clic : le panier n'est pas touché.
   bool immediate = false;
-  // L'objet survolé, pour l'aperçu, et celui dont on veut la description. La
-  // case du sac les accompagne à la vente : c'est elle qui dit le raffinement.
+  // L'objet survolé, pour l'aperçu, et celui qu'un geste vise. La case du sac
+  // les accompagne à la vente : c'est elle qui dit le raffinement.
   std::uint32_t hovered_id = 0;
   std::uint16_t hovered_slot = 0;
   std::uint32_t describe_id = 0;
   std::uint16_t describe_slot = 0;
+  // Ce que le geste demande de l'objet visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
   // UN ITEM DU SAC A ÉTÉ LÂCHÉ SUR LA VENTE, mais le PNJ ne l'achète pas —
   // ou il est porté : `app` le dit.
   bool drop_refused = false;
@@ -168,8 +173,10 @@ void OpenNpcShopOn(NpcShopWindowState& state, std::uint32_t opening_seq, bool bu
 // la ligne était déjà pleine — un équipement ne s'achète qu'un à la fois.
 bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine& line);
 
-// Dessine la fenêtre si elle est ouverte.
+// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
+// shop, pour le menu d'un item.
 [[nodiscard]] NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state,
-                                                    const NpcShopView& view, const SkinArt& art);
+                                                    const NpcShopView& view, const SkinArt& art,
+                                                    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

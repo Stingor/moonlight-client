@@ -50,6 +50,32 @@ constexpr std::size_t kZenyTextBytes = 32;
 constexpr std::size_t kSentenceBytes = 256;
 
 constexpr const char* kConfirmId = "##deal_confirm";
+constexpr const char* kItemMenuId = "##deal_item_menu";
+
+// LE JETON DU MENU D'UN ITEM : d'où il vient, puis son rang dans sa colonne —
+// ou sa case, pour une pile du sac à offrir.
+enum class MenuSource : std::uint32_t { kMine = 0, kPartner = 1, kBag = 2 };
+constexpr std::uint32_t kMenuSourceCount = 3;
+
+[[nodiscard]] std::uint32_t MenuToken(MenuSource source, std::uint32_t rank) {
+  return rank * kMenuSourceCount + static_cast<std::uint32_t>(source);
+}
+
+// Le choix du menu, rendu dans les termes de l'action.
+void NoteMenuChoice(const ChatLinkAsk& chosen, DealWindowAction& action) {
+  if (chosen.gesture == ChatLinkGesture::kNothing) {
+    return;
+  }
+  const auto source = static_cast<MenuSource>(chosen.token % kMenuSourceCount);
+  const std::uint32_t rank = chosen.token / kMenuSourceCount;
+  if (source == MenuSource::kBag) {
+    action.described_bag_slot = static_cast<std::uint16_t>(rank);
+  } else {
+    action.described =
+        DealLineRef{.partner = source == MenuSource::kPartner, .index = static_cast<int>(rank)};
+  }
+  action.item_gesture = chosen.gesture;
+}
 
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
   while (!text.empty() && text.front() == ' ') {
@@ -132,16 +158,21 @@ void AppendSide(std::string& text, std::span<const DealLineView> lines, std::int
 
 // ── LES COLONNES ────────────────────────────────────────────────────────────
 
-void NoteGesture(const TradeItemGesture& gesture, DealLineRef ref, DealWindowAction& action) {
+void NoteGesture(const TradeItemGesture& gesture, const TradeItemView& item, DealLineRef ref,
+                 ItemLinkMenu& menu, DealWindowAction& action) {
   if (gesture.hovered) {
     action.hovered = ref;
   }
-  if (gesture.describe) {
+  const MenuSource source = ref.partner ? MenuSource::kPartner : MenuSource::kMine;
+  if (NoteTradeItemLink(gesture, item, MenuToken(source, static_cast<std::uint32_t>(ref.index)),
+                        menu)) {
     action.described = ref;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
-void DrawLine(const DealLineView& line, DealLineRef ref, DealWindowAction& action) {
+void DrawLine(const DealLineView& line, DealLineRef ref, ItemLinkMenu& menu,
+              DealWindowAction& action) {
   ImGui::PushID(ref.index);
   // UN DÉPÔT EN ROUTE SE GRISE sans se désactiver : il se survole et se décrit
   // comme les autres.
@@ -152,7 +183,7 @@ void DrawLine(const DealLineView& line, DealLineRef ref, DealWindowAction& actio
   if (line.changed_after_my_lock) {
     ImGui::PushStyleColor(ImGuiCol_Text, kChangedText);
   }
-  NoteGesture(DrawTradeItem(line.item, CountSuffix(line.amount)), ref, action);
+  NoteGesture(DrawTradeItem(line.item, CountSuffix(line.amount)), line.item, ref, menu, action);
   if (line.changed_after_my_lock) {
     ImGui::SameLine();
     ImGui::TextUnformatted(core::Tr("nouveau"));
@@ -251,7 +282,7 @@ void DrawMine(DealWindowState& state, const DealView& view, const SkinArt& art, 
                     ImGuiChildFlags_Borders);
   for (std::size_t index = 0; index < view.mine.size(); ++index) {
     DrawLine(view.mine[index], DealLineRef{.partner = false, .index = static_cast<int>(index)},
-             action);
+             state.item_menu, action);
   }
   if (view.mine.empty()) {
     ImGui::TextDisabled(
@@ -297,7 +328,7 @@ void DrawPartnerZeny(const DealView& view) {
   }
 }
 
-void DrawPartner(const DealView& view, float width, DealWindowAction& action) {
+void DrawPartner(const DealView& view, float width, ItemLinkMenu& menu, DealWindowAction& action) {
   ImGui::BeginGroup();
   const std::string_view name = PartnerName(view);
   ImGui::TextUnformatted(name.data(), name.data() + name.size());
@@ -305,7 +336,7 @@ void DrawPartner(const DealView& view, float width, DealWindowAction& action) {
                     ImGuiChildFlags_Borders);
   for (std::size_t index = 0; index < view.partner.size(); ++index) {
     DrawLine(view.partner[index], DealLineRef{.partner = true, .index = static_cast<int>(index)},
-             action);
+             menu, action);
   }
   if (view.partner.empty()) {
     ImGui::TextDisabled("%s", core::Tr("(vide)"));
@@ -349,6 +380,11 @@ void DrawBagRow(DealWindowState& state, const DealBagView& bag, const SkinArt& a
     if (gesture.hovered && !refusal.empty()) {
       SkinTooltip(refusal.c_str());
     }
+  }
+  if (NoteTradeItemLink(gesture, bag.item, MenuToken(MenuSource::kBag, bag.client_slot),
+                        state.item_menu)) {
+    action.described_bag_slot = bag.client_slot;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
   ImGui::PopID();
 }
@@ -544,13 +580,13 @@ void DrawConfirmation(DealWindowState& state, const DealView& view, const SkinAr
 }
 
 void DrawBody(DealWindowState& state, const DealView& view, const SkinArt& art,
-              DealWindowAction& action) {
+              std::span<const VoteShopOffer> vote_shop, DealWindowAction& action) {
   const float scale = Scale();
   const float gap = kColumnGapPixels * scale;
   const float column = std::max(0.0F, (ImGui::GetContentRegionAvail().x - gap) * 0.5F);
   DrawMine(state, view, art, column, action);
   ImGui::SameLine(0.0F, gap);
-  DrawPartner(view, column, action);
+  DrawPartner(view, column, state.item_menu, action);
 
   if (state.picking && !view.lock_sent) {
     DrawPicking(state, view, art, action);
@@ -568,8 +604,10 @@ void DrawBody(DealWindowState& state, const DealView& view, const SkinArt& art,
     state.open = false;
   }
   DrawStatus(state, view);
-  ImGui::TextDisabled("%s", core::Tr("Survol : aperçu   -   Clic droit : description"));
+  ImGui::TextDisabled(
+      "%s", core::Tr("Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat"));
   DrawConfirmation(state, view, art, action);
+  NoteMenuChoice(DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop), action);
 }
 
 }  // namespace
@@ -672,7 +710,8 @@ void OpenDealOn(DealWindowState& state, std::uint32_t opening_seq) {
   state.confirming_revision = 0;
 }
 
-DealWindowAction DrawDealWindow(DealWindowState& state, const DealView& view, const SkinArt& art) {
+DealWindowAction DrawDealWindow(DealWindowState& state, const DealView& view, const SkinArt& art,
+                                std::span<const VoteShopOffer> vote_shop) {
   DealWindowAction action;
   if (!state.open) {
     // Une question laissée en suspens ne survit pas à la fenêtre qui la posait.
@@ -694,7 +733,7 @@ DealWindowAction DrawDealWindow(DealWindowState& state, const DealView& view, co
                                              ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kChildRoundingPixels * scale);
-    DrawBody(state, view, art, action);
+    DrawBody(state, view, art, vote_shop, action);
     ImGui::PopStyleVar();
   }
   EndSkinnedWindow();

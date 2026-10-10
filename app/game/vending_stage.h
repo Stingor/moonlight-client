@@ -80,7 +80,9 @@ class VendingStage {
   // Ce que le joueur possède, zéro tant que le serveur ne l'a pas dit.
   [[nodiscard]] static std::int64_t ZenyOf(const ro::sim::World& world);
 
-  void Note(const ro::sim::InventoryItem* item, bool hovered, bool described);
+  // `gesture` : ce que demande l'objet décrit, sans objet pour un survol.
+  void Note(const ro::sim::InventoryItem* item, bool hovered, bool described,
+            ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
   static void Say(const TradeContext& context, std::string text, std::uint32_t color);
 
   ro::sim::Vending vending_;

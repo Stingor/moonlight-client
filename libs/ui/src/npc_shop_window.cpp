@@ -40,6 +40,7 @@ constexpr float kChildRoundingPixels = 6.0F;
 constexpr int kCartIdBase = 2000;
 
 constexpr const char* kSaleConfirmId = "##npc_shop_confirm_sale";
+constexpr const char* kItemMenuId = "##npc_shop_item_menu";
 
 enum class OfferColumn : int { kItem, kPrice, kStock, kSteps };
 
@@ -124,15 +125,16 @@ void AskSale(NpcShopWindowState& state, const NpcShopView& view, std::vector<Npc
   action.immediate = immediate;
 }
 
-void NoteItem(const TradeItemGesture& gesture, std::uint32_t item_id, std::uint16_t slot,
-              NpcShopWindowAction& action) {
+void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint16_t slot,
+              NpcShopWindowState& state, NpcShopWindowAction& action) {
   if (gesture.hovered) {
-    action.hovered_id = item_id;
+    action.hovered_id = item.item_id;
     action.hovered_slot = slot;
   }
-  if (gesture.describe) {
-    action.describe_id = item_id;
+  if (NoteTradeItemLink(gesture, item, slot, state.item_menu)) {
+    action.describe_id = item.item_id;
     action.describe_slot = slot;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
@@ -218,7 +220,7 @@ void DrawBuyList(NpcShopWindowState& state, const NpcShopView& view, const SkinA
     ImGui::PushID(static_cast<int>(index));
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    NoteItem(DrawTradeItem(offer.item), offer.item.item_id, 0, action);
+    NoteItem(DrawTradeItem(offer.item), offer.item, 0, state, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     const bool affordable = view.purse == kTradeNoPurse || offer.price <= view.purse;
@@ -329,7 +331,7 @@ void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const Skin
     ImGui::TableNextColumn();
     std::array<char, 16> count{};
     std::snprintf(count.data(), count.size(), "x%d", sold.amount);
-    NoteItem(DrawTradeItem(sold.item, count.data()), sold.item.item_id, sold.client_slot, action);
+    NoteItem(DrawTradeItem(sold.item, count.data()), sold.item, sold.client_slot, state, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     DrawTradePrice(sold.base_price, sold.price, kTradeBlackText, view.unit);
@@ -557,7 +559,8 @@ bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine&
 }
 
 NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state, const NpcShopView& view,
-                                      const SkinArt& art) {
+                                      const SkinArt& art,
+                                      std::span<const VoteShopOffer> vote_shop) {
   NpcShopWindowAction action;
   if (!state.open) {
     return action;
@@ -610,11 +613,19 @@ NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state, const NpcShopVi
     }
     ImGui::SameLine();
     ImGui::AlignTextToFramePadding();
-    ImGui::TextDisabled("%s", core::Tr("Survol : aperçu   -   Clic droit : description"));
+    ImGui::TextDisabled(
+        "%s",
+        core::Tr("Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat"));
     if (std::exchange(state.sale_asked, false)) {
       AskModal(kSaleConfirmId);
     }
     DrawSaleConfirmation(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_id = chosen.item_id;
+      action.describe_slot = static_cast<std::uint16_t>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
     ImGui::PopStyleVar();
   }
   EndSkinnedWindow();

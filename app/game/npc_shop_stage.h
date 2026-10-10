@@ -29,6 +29,9 @@ struct TradeItemFocus {
   // ici, comme dans un lien de conversation. Absent : l'identifiant et la case
   // du sac suffisent.
   std::optional<ro::vfs::ItemLink> link;
+  // CE QUE LE GESTE DEMANDE de l'objet visé : sa description, son lien dans la
+  // saisie, ou une autre entrée du menu des objets. Sans objet pour un survol.
+  ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe;
 };
 
 class NpcShopStage {

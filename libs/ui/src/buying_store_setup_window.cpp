@@ -41,6 +41,7 @@ constexpr int kCandidateIdBase = 10000;
 constexpr std::int64_t kWireMostZeny = std::numeric_limits<std::int32_t>::max();
 
 constexpr const char* kDearConfirmId = "##buying_store_dear_confirm";
+constexpr const char* kItemMenuId = "##buying_store_setup_item_menu";
 
 bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
   return filter.PassFilter(name.data(), name.data() + name.size());
@@ -59,13 +60,16 @@ bool Placed(const BuyingStoreSetupState& state, std::uint32_t item_id) {
          state.lines.end();
 }
 
-void NoteItem(const TradeItemGesture& gesture, std::uint32_t item_id,
-              BuyingStoreSetupAction& action) {
+void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint32_t item_id,
+              ItemLinkMenu& menu, BuyingStoreSetupAction& action) {
   if (gesture.hovered) {
     action.hovered_id = item_id;
   }
-  if (gesture.describe) {
+  TradeItemView aimed = item;
+  aimed.item_id = item_id;
+  if (NoteTradeItemLink(gesture, aimed, 0, menu)) {
     action.describe_id = item_id;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
@@ -120,7 +124,8 @@ void DrawCandidates(BuyingStoreSetupState& state, const BuyingStoreSetupView& vi
       ImGui::PushID(kCandidateIdBase + static_cast<int>(index));
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      NoteItem(DrawTradeItem(candidate.item), candidate.item.item_id, action);
+      NoteItem(DrawTradeItem(candidate.item), candidate.item, candidate.item.item_id,
+               state.item_menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
       ImGui::TextColored(kTradeBlackText, "%d", candidate.owned);
@@ -181,7 +186,7 @@ void DrawLines(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, c
       ImGui::TableNextColumn();
       const TradeItemView item =
           candidate != nullptr ? candidate->item : TradeItemView{.item_id = line.item_id};
-      NoteItem(DrawTradeItem(item), line.item_id, action);
+      NoteItem(DrawTradeItem(item), item, line.item_id, state.item_menu, action);
       // LA LIGNE EN CAUSE SE DÉSIGNE : le serveur refuserait l'échoppe entière
       // sans dire laquelle.
       if (rank < view.line_notes.size() && !view.line_notes[rank].empty()) {
@@ -333,7 +338,8 @@ bool BuyingStoreSetupHasDearPrice(const BuyingStoreSetupState& state) {
 
 BuyingStoreSetupAction DrawBuyingStoreSetupWindow(BuyingStoreSetupState& state,
                                                   const BuyingStoreSetupView& view,
-                                                  const SkinArt& art) {
+                                                  const SkinArt& art,
+                                                  std::span<const VoteShopOffer> vote_shop) {
   BuyingStoreSetupAction action;
   if (!state.open) {
     return action;
@@ -395,6 +401,11 @@ BuyingStoreSetupAction DrawBuyingStoreSetupWindow(BuyingStoreSetupState& state,
     DrawFooter(state, view, art, action);
     state.footer_pixels = ImGui::GetCursorPosY() - footer_top;
     DrawDearConfirmation(art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_id = chosen.item_id;
+      action.item_gesture = chosen.gesture;
+    }
   }
   EndSkinnedWindow();
   if (!state.open) {

@@ -79,6 +79,9 @@ struct VendingVisitWindowState {
   // La boîte de confirmation est demandée. ⚠ ELLE S'OUVRE AU NIVEAU DE LA
   // FENÊTRE, là où elle se dessine, jamais depuis une ligne de table.
   bool pending_asked = false;
+  // Le menu qu'un clic droit sur un item a armé ; son jeton est la case de
+  // l'échoppe.
+  ItemLinkMenu item_menu;
 };
 
 struct VendingVisitAction {
@@ -88,8 +91,12 @@ struct VendingVisitAction {
   std::vector<VendingBasketEntry> buy;
   // Un Ctrl + clic : le panier n'est pas touché.
   bool immediate = false;
+  // La case de l'échoppe survolée, et celle qu'un geste vise ; zéro pour aucune.
   std::uint16_t hovered_slot = 0;
   std::uint16_t describe_slot = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // Remet la fenêtre à l'état d'une visite neuve.
@@ -109,8 +116,9 @@ bool AddToVendingBasket(std::vector<VendingBasketEntry>& basket, std::uint16_t s
 void FitVendingBasket(std::vector<VendingBasketEntry>& basket,
                       std::span<const VendingOfferView> offers);
 
-[[nodiscard]] VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
-                                                        const VendingVisitView& view,
-                                                        const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+[[nodiscard]] VendingVisitAction DrawVendingVisitWindow(
+    VendingVisitWindowState& state, const VendingVisitView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

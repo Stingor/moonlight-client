@@ -31,6 +31,7 @@ constexpr float kAmountFieldPixels = 56.0F;
 constexpr int kBasketIdBase = 1000;
 
 constexpr const char* kConfirmId = "##vending_visit_confirm";
+constexpr const char* kItemMenuId = "##vending_visit_item_menu";
 
 const VendingOfferView* OfferAt(std::span<const VendingOfferView> offers, std::uint16_t shop_slot) {
   const auto found = std::ranges::find_if(
@@ -49,13 +50,14 @@ int& OfferAmountFor(VendingVisitWindowState& state, std::uint16_t shop_slot, int
   return found->second;
 }
 
-void NoteItem(const TradeItemGesture& gesture, std::uint16_t shop_slot,
-              VendingVisitAction& action) {
+void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint16_t shop_slot,
+              ItemLinkMenu& menu, VendingVisitAction& action) {
   if (gesture.hovered) {
     action.hovered_slot = shop_slot;
   }
-  if (gesture.describe) {
+  if (NoteTradeItemLink(gesture, item, shop_slot, menu)) {
     action.describe_slot = shop_slot;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
@@ -101,7 +103,7 @@ void DrawOffers(VendingVisitWindowState& state, const VendingVisitView& view, co
     ImGui::PushID(offer.shop_slot);
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    NoteItem(DrawTradeItem(offer.item), offer.shop_slot, action);
+    NoteItem(DrawTradeItem(offer.item), offer.item, offer.shop_slot, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     ImGui::Text("%d", offer.stock);
@@ -171,7 +173,7 @@ void DrawBasket(VendingVisitWindowState& state, const VendingVisitView& view, co
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     if (offer != nullptr) {
-      NoteItem(DrawTradeItem(offer->item), entry.shop_slot, action);
+      NoteItem(DrawTradeItem(offer->item), offer->item, entry.shop_slot, state.item_menu, action);
     } else {
       ImGui::AlignTextToFramePadding();
       ImGui::TextDisabled("%s", core::Tr("(n'est plus en vente)"));
@@ -292,7 +294,8 @@ void FitVendingBasket(std::vector<VendingBasketEntry>& basket,
 }
 
 VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
-                                          const VendingVisitView& view, const SkinArt& art) {
+                                          const VendingVisitView& view, const SkinArt& art,
+                                          std::span<const VoteShopOffer> vote_shop) {
   VendingVisitAction action;
   if (!state.open) {
     return action;
@@ -369,6 +372,11 @@ VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
       state.open = false;
     }
     DrawConfirmation(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_slot = static_cast<std::uint16_t>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
   }
   EndSkinnedWindow();
   if (!state.open) {

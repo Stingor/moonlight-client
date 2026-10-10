@@ -95,6 +95,8 @@ struct BuyingStoreSetupState {
   // La hauteur du pied, mesurée à l'image précédente : la liste des lignes
   // prend ce qui reste.
   float footer_pixels = 0.0F;
+  // Le menu qu'un clic droit sur un item a armé.
+  ItemLinkMenu item_menu;
 };
 
 struct BuyingStoreSetupAction {
@@ -102,8 +104,12 @@ struct BuyingStoreSetupAction {
   bool cancel = false;
   // « Ouvrir », confirmé s'il le fallait. ⚠ `app` REJUGE AVANT D'ÉMETTRE.
   bool open_store = false;
+  // L'item survolé, pour l'aperçu, et celui qu'un geste vise.
   std::uint32_t hovered_id = 0;
   std::uint32_t describe_id = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // Remet la fenêtre à l'état d'une préparation neuve.
@@ -116,8 +122,9 @@ bool AddBuyingStoreSetupLine(BuyingStoreSetupState& state, std::uint32_t item_id
 // Vrai si une ligne demande un prix qui se confirme.
 [[nodiscard]] bool BuyingStoreSetupHasDearPrice(const BuyingStoreSetupState& state);
 
-[[nodiscard]] BuyingStoreSetupAction DrawBuyingStoreSetupWindow(BuyingStoreSetupState& state,
-                                                                const BuyingStoreSetupView& view,
-                                                                const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+[[nodiscard]] BuyingStoreSetupAction DrawBuyingStoreSetupWindow(
+    BuyingStoreSetupState& state, const BuyingStoreSetupView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

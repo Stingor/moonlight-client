@@ -56,7 +56,9 @@ void BuyingStoreStage::FollowSell(ro::ui::BuyingStoreSellState& state,
     hovered_ = TradeItemFocus{.item_id = answer.hovered_id, .bag_slot = answer.hovered_slot};
   }
   if (answer.describe_id != 0) {
-    described_ = TradeItemFocus{.item_id = answer.describe_id, .bag_slot = answer.describe_slot};
+    described_ = TradeItemFocus{.item_id = answer.describe_id,
+                                .bag_slot = answer.describe_slot,
+                                .gesture = answer.item_gesture};
   }
   if (!store_.visiting()) {
     return;

@@ -49,7 +49,7 @@ void VendingStage::FollowVisit(VendingWindows& windows, const TradeContext& cont
   ro::ui::VendingVisitWindowState& state = windows.visit;
   const ro::ui::VendingVisitAction answer = std::exchange(windows.visit_answer, {});
   Note(OfferItemAt(vending_, answer.hovered_slot), true, false);
-  Note(OfferItemAt(vending_, answer.describe_slot), false, true);
+  Note(OfferItemAt(vending_, answer.describe_slot), false, true, answer.item_gesture);
   if (!vending_.visiting()) {
     return;
   }

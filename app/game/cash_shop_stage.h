@@ -107,6 +107,13 @@ class CashShopStage {
     return std::exchange(reposted_, std::nullopt);
   }
 
+  // LA CARTE DONT LE MENU DES OBJETS A CHOISI UNE AUTRE ENTRÉE — la base de
+  // données, une commande du serveur —, une fois. Elles ne lisent que
+  // l'identifiant.
+  [[nodiscard]] std::optional<ro::ui::ChatLinkAsk> TakeChosen() noexcept {
+    return std::exchange(chosen_, std::nullopt);
+  }
+
   // La vue que la fenêtre dessine, nulle quand la boutique est fermée.
   [[nodiscard]] const ro::ui::CashShopView* view() const noexcept {
     return shop_.open() ? &view_ : nullptr;
@@ -132,6 +139,7 @@ class CashShopStage {
   std::optional<ro::vfs::ItemLink> described_;
   std::optional<ro::vfs::ItemLink> hovered_;
   std::optional<ro::vfs::ItemLink> reposted_;
+  std::optional<ro::ui::ChatLinkAsk> chosen_;
   // Le rang du dernier achat dont on a tiré les conséquences.
   std::uint32_t purchase_handled_ = 0;
   std::vector<ro::ui::VoteShopOffer> offers_;

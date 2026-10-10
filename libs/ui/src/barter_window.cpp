@@ -45,6 +45,7 @@ constexpr ImVec4 kLackingText = kTradeRefusedText;
 constexpr std::int64_t kWeightTenths = 10;
 
 constexpr const char* kConfirmId = "##barter_confirm";
+constexpr const char* kItemMenuId = "##barter_item_menu";
 
 bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
   return filter.PassFilter(name.data(), name.data() + name.size());
@@ -73,20 +74,27 @@ std::string WeightText(std::int64_t tenths) {
 
 std::string CountSuffix(std::int64_t amount) { return "x" + TradeAmountText(amount, {}); }
 
-void NoteItem(const TradeItemGesture& gesture, std::uint32_t item_id, BarterWindowAction& action) {
+// Le geste d'une ligne. ⚠ L'ITEM SE DÉSIGNE PAR `item_id`, celui de la ligne :
+// le jeton du menu reste nul, un item de troc n'est à personne.
+void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint32_t item_id,
+              ItemLinkMenu& menu, BarterWindowAction& action) {
   if (gesture.hovered) {
     action.hovered_id = item_id;
   }
-  if (gesture.describe) {
+  TradeItemView aimed = item;
+  aimed.item_id = item_id;
+  if (NoteTradeItemLink(gesture, aimed, 0, menu)) {
     action.describe_id = item_id;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
 // UNE DEVISE : l'icône, le nom raffinement compris, la quantité, puis ce que le
 // joueur en tient — vert s'il suffit à `needed`, rouge sinon.
-void DrawPrice(const BarterPriceView& price, std::int64_t needed, BarterWindowAction& action) {
+void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& menu,
+               BarterWindowAction& action) {
   const std::string suffix = CountSuffix(needed);
-  NoteItem(DrawTradeItem(price.item, suffix), price.item_id, action);
+  NoteItem(DrawTradeItem(price.item, suffix), price.item, price.item_id, menu, action);
   if (ImGui::IsItemHovered() && price.refine_level > 0) {
     std::array<char, 96> tip{};
     std::snprintf(tip.data(), tip.size(), core::Tr("Raffinement exigé : +%d ou plus"),
@@ -128,11 +136,11 @@ void DrawOfferRow(BarterWindowState& state, const BarterView& view, const Barter
                   const SkinArt& art, BarterWindowAction& action) {
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
-  NoteItem(DrawTradeItem(offer.item), offer.item.item_id, action);
+  NoteItem(DrawTradeItem(offer.item), offer.item, offer.item.item_id, state.item_menu, action);
 
   ImGui::TableNextColumn();
   for (const BarterPriceView& price : offer.prices) {
-    DrawPrice(price, price.amount, action);
+    DrawPrice(price, price.amount, state.item_menu, action);
   }
   if (offer.zeny > 0) {
     DrawZeny(offer.zeny);
@@ -259,7 +267,7 @@ void DrawCartLines(const BarterView& view, const SkinArt& art, BarterWindowActio
 
 // CE QUI PART : chaque devise totalisée sur le panier, ce qu'on en tient, et le
 // zeny.
-void DrawCartCosts(const BarterView& view, BarterWindowAction& action) {
+void DrawCartCosts(const BarterView& view, ItemLinkMenu& menu, BarterWindowAction& action) {
   std::vector<BarterLine> lines;
   lines.reserve(view.cart.size());
   for (const BarterCartLineView& line : view.cart) {
@@ -268,7 +276,7 @@ void DrawCartCosts(const BarterView& view, BarterWindowAction& action) {
   const BarterRecap recap = RecapBarterLines(view.offers, lines);
   ImGui::TextUnformatted(core::Tr("Part :"));
   for (const BarterCost& cost : recap.costs) {
-    DrawPrice(cost.price, cost.total, action);
+    DrawPrice(cost.price, cost.total, menu, action);
   }
   if (recap.zeny > 0) {
     DrawZeny(recap.zeny);
@@ -290,7 +298,7 @@ void DrawCart(BarterWindowState& state, const BarterView& view, const SkinArt& a
   const float reserved = kCartFooterLines * ImGui::GetFrameHeightWithSpacing();
   ImGui::BeginChild("##barter_cart_lines", ImVec2(0.0F, -reserved));
   DrawCartLines(view, art, action);
-  DrawCartCosts(view, action);
+  DrawCartCosts(view, state.item_menu, action);
   PaintWindowScrollbar(art);
   ImGui::EndChild();
 
@@ -429,7 +437,7 @@ void OpenBarterOn(BarterWindowState& state, std::uint32_t opening_seq) {
 }
 
 BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& view,
-                                    const SkinArt& art) {
+                                    const SkinArt& art, std::span<const VoteShopOffer> vote_shop) {
   BarterWindowAction action;
   if (!state.open) {
     // Une question laissée en suspens ne survit pas à la fenêtre qui la posait.
@@ -481,8 +489,15 @@ BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& 
     }
     ImGui::SameLine();
     ImGui::AlignTextToFramePadding();
-    ImGui::TextDisabled("%s", core::Tr("Survol : aperçu   -   Clic droit : description"));
+    ImGui::TextDisabled(
+        "%s",
+        core::Tr("Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat"));
     DrawConfirmation(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_id = chosen.item_id;
+      action.item_gesture = chosen.gesture;
+    }
     ImGui::PopStyleVar();
   }
   EndSkinnedWindow();

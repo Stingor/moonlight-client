@@ -146,6 +146,9 @@ struct MailboxWindowState {
   bool detail_shown = false;
   float last_width = 0.0F;
   float last_height = 0.0F;
+  // Le menu qu'un clic droit sur une pièce jointe a armé ; son jeton est son
+  // rang dans `content->items`.
+  ItemLinkMenu item_menu;
 };
 
 struct MailboxAction {
@@ -168,10 +171,13 @@ struct MailboxAction {
   // « Supprimer tout » confirmé : les courriers de l'onglet qui ne portent plus
   // rien. Le serveur n'a pas de suppression groupée : une par courrier.
   std::vector<MailRef> erase_all;
-  // La pièce jointe du courrier ouvert survolée, pour l'aperçu, et celle qu'on
-  // veut décrire — un rang dans `content->items`, -1 sinon.
+  // La pièce jointe du courrier ouvert survolée, pour l'aperçu, et celle qu'un
+  // geste vise — un rang dans `content->items`, -1 sinon.
   int hovered_item = -1;
   int described_item = -1;
+  // Ce que le geste demande de la pièce visée : sa description, son lien dans
+  // la saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // LES COMPTES PAR ONGLET, et si l'onglet « Compte » se montre.
@@ -215,8 +221,10 @@ void SettleMailboxTab(MailboxWindowState& state, const MailboxTabs& tabs);
 [[nodiscard]] std::vector<MailRef> MailDeleteTargets(std::span<const MailRowView> rows,
                                                      const MailboxWindowState& state);
 
+// `vote_shop` : le catalogue du vote shop, pour le menu d'une pièce jointe.
 [[nodiscard]] MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& view,
-                                              const SkinArt& art);
+                                              const SkinArt& art,
+                                              std::span<const VoteShopOffer> vote_shop = {});
 
 // ── L'ÉCRITURE ──────────────────────────────────────────────────────────────
 
@@ -289,6 +297,9 @@ struct MailComposeWindowState {
   bool asking_amount = false;
   std::uint16_t asking_slot = 0;
   int asking_value = 1;
+  // Le menu qu'un clic droit sur une pièce jointe a armé ; son jeton est son
+  // rang dans `attachments`.
+  ItemLinkMenu item_menu;
 };
 
 // LA SAISIE, recopiée telle quelle : `app` la juge et l'encode.
@@ -313,10 +324,13 @@ struct MailComposeAction {
   std::optional<MailComposeSend> send;
   std::optional<MailAttachmentMove> attach;
   std::optional<MailAttachmentMove> remove;
-  // La pièce jointe survolée et celle à décrire — un rang dans `attachments`,
-  // -1 sinon.
+  // La pièce jointe survolée et celle qu'un geste vise — un rang dans
+  // `attachments`, -1 sinon.
   int hovered_item = -1;
   int described_item = -1;
+  // Ce que le geste demande de la pièce visée : sa description, son lien dans
+  // la saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 // Une écriture neuve : saisie vide, destinataire pré-rempli (vide ou nul pour
@@ -333,8 +347,9 @@ void OpenMailCompose(MailComposeWindowState& state, std::string_view recipient);
 [[nodiscard]] std::string MailSendRecapText(const MailComposeWindowState& state,
                                             const MailComposeView& view);
 
-[[nodiscard]] MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state,
-                                                      const MailComposeView& view,
-                                                      const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'une pièce jointe.
+[[nodiscard]] MailComposeAction DrawMailComposeWindow(
+    MailComposeWindowState& state, const MailComposeView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

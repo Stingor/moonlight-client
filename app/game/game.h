@@ -152,8 +152,7 @@ class Game : public Screen {
   //
   // ⚠ ELLE NE PRÉSENTE PAS, et ne plafonne pas la cadence : la coquille possède
   // la boucle. C'est ce qui permettra à l'écran de connexion de partager
-  // exactement la même — deux boucles, c'est deux rythmes et deux façons de
-  // quitter.
+  // exactement la même — deux boucles, c'est deux rythmes et deux façons de quitter.
   [[nodiscard]] ro::core::Result<void> Frame(std::uint32_t now_ms) override;
 
   // Vrai tant que le joueur n'a ni fermé la fenêtre ni quitté par le menu.
@@ -728,12 +727,13 @@ class Game : public Screen {
   // jour l'une oublier de déplier la barre, et le lien partirait dans un champ
   // que personne ne voit.
   [[nodiscard]] bool PlaceInChatInput(PendingChatLink link);
-  // Joue ce que le joueur vient de faire d'un lien, d'où qu'il vienne ; puis d'un
-  // item de CATALOGUE, sans jeton — un butin, un matériau.
+  // Joue ce que le joueur vient de faire d'un lien, d'où qu'il vienne ; d'un item
+  // de CATALOGUE, sans jeton — un butin, un matériau ; puis d'un objet de COMMERCE.
   void FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms);
   void FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link, std::string_view sender,
                      std::uint32_t now_ms);
   void FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms);
+  void FollowTradeItem(const TradeItemFocus& focus, std::uint32_t now_ms);
   // UN NOM DE MONSTRE d'où qu'il vienne, puis une recherche `<NAVS>` et son ouverture.
   void FollowMonsterGesture(ro::ui::ChatLinkGesture gesture, const MonsterLink& monster,
                             bool by_view, std::uint32_t now_ms);

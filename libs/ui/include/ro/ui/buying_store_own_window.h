@@ -51,19 +51,26 @@ struct BuyingStoreOwnState {
   // La question est à poser à la prochaine image. ⚠ ELLE SE POSE DANS LA
   // FENÊTRE : l'identité d'une boîte dépend de la pile d'ImGui où on l'ouvre.
   bool ask_close = false;
+  // Le menu qu'un clic droit sur un item a armé.
+  ItemLinkMenu item_menu;
 };
 
 struct BuyingStoreOwnAction {
   // La fermeture, CONFIRMÉE.
   bool close = false;
+  // L'item survolé, pour l'aperçu, et celui qu'un geste vise.
   std::uint32_t hovered_id = 0;
   std::uint32_t describe_id = 0;
+  // Ce que le geste demande de l'item visé : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
 void OpenBuyingStoreOwnOn(BuyingStoreOwnState& state, std::uint32_t opening_seq);
 
-[[nodiscard]] BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
-                                                            const BuyingStoreOwnView& view,
-                                                            const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+[[nodiscard]] BuyingStoreOwnAction DrawBuyingStoreOwnWindow(
+    BuyingStoreOwnState& state, const BuyingStoreOwnView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui
