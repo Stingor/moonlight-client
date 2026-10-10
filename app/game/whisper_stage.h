@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <functional>
 #include <map>
+#include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -27,7 +29,10 @@
 
 #include "chat/chat_item_link.h"
 #include "chat/player_link_judge.h"
+#include "chat/whisper_block_memory.h"
 #include "chat/whisper_desk.h"
+#include "web/http_transport.h"
+#include "web/user_config_web.h"
 
 namespace moonclient {
 
@@ -76,6 +81,13 @@ class WhisperStage {
   [[nodiscard]] const WhisperDesk& desk() const noexcept { return desk_; }
   // QUI NE PEUT PLUS NOUS CHUCHOTER, tel que le serveur l'a dit.
   [[nodiscard]] ro::sim::WhisperBlockList& blocks() noexcept { return blocks_; }
+
+  // LA LISTE DE BLOCAGE RANGÉE AU SERVICE WEB : relue dès maintenant, rejouée
+  // après la première carte, sauvegardée à chaque changement — voir
+  // `chat/whisper_block_memory.h`. `origin` vide : pas de service.
+  void RememberBlocks(std::string origin, web::UserConfigIdentity identity);
+  // L'avis de chargement d'une carte est parti : le serveur écoute.
+  void NoteMapEntered() noexcept;
 
   // Les deux paquets du chuchotement, puis les trois réponses du blocage. ⚠
   // AVANT LE MONDE : lui lirait les deux premiers, mais sans nos amis ni nos
@@ -132,6 +144,9 @@ class WhisperStage {
   WhisperDesk desk_;
   ro::sim::WhisperOutbox outbox_;
   ro::sim::WhisperBlockList blocks_;
+  // ⚠ LE TRANSPORT AVANT LA MÉMOIRE QUI LE REGARDE : elle meurt la première.
+  std::unique_ptr<web::HttpTransport> blocks_transport_;
+  std::optional<WhisperBlockMemory> block_memory_;
   // Les titres de l'image. ⚠ LES VUES POINTENT DEDANS : ils se composent tous
   // avant qu'une vue ne soit prise.
   std::vector<std::string> titles_;

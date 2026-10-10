@@ -13,6 +13,7 @@
 #include <SDL3/SDL.h>
 
 #include "ro/core/log.h"
+#include "ro/formats/assist_address.h"
 #include "ro/render/emotion.h"
 #include "ro/render/map_scene.h"
 #include "ro/ui/chat_emote_names.h"
@@ -444,6 +445,13 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LES CONVERSATIONS 1:1 : aucune n'est ouverte, aucun envoi n'attend.
   pieces_.whispers.StartSession(world_.last_chat_seq());
   windows_.whispers = WhisperWindows{};
+  // LA LISTE DE BLOCAGE DU COMPTE, que le service web garde d'une connexion à
+  // l'autre : relue maintenant, rejouée après la première carte.
+  pieces_.whispers.RememberBlocks(
+      shell_.web().empty() ? std::string() : ro::formats::AssistOrigin(shell_.web()),
+      web::UserConfigIdentity{.account_id = ticket_.account.account_id,
+                              .token = ticket_.account.web_token,
+                              .world_name = ticket_.account.world_name});
   // LES MENTIONS : ce qui a été dit avant d'entrer ne sonne pas.
   pieces_.mentions.StartSession(world_.last_chat_seq());
   // LES SUCCÈS AUSSI : leur progression est celle du personnage qui entre.

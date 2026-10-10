@@ -460,14 +460,17 @@ target_include_directories(moonclient_chatroom PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 
 # LES CHUCHOTEMENTS VUS DE L'ÉCRAN : l'en-tête d'une ligne selon l'endroit où
 # elle se lit, et les conversations 1:1 — ce qui les ouvre, ce qu'elles prennent
-# au fil, leur non-lu. Règles pures, jugées sur un banc sans fenêtre.
+# au fil, leur non-lu. Règles pures, jugées sur un banc sans fenêtre. La liste
+# de blocage rangée au service web aussi : `moonclient_web` ne connaît aucune
+# plateforme, et le transport se donne au constructeur.
 add_library(moonclient_whispers STATIC
     chat/player_link_judge.cpp
     chat/whisper_desk.cpp
+    chat/whisper_block_memory.cpp
     chat/whisper_lines.cpp)
 
 target_link_libraries(moonclient_whispers
-    PUBLIC ro_core ro_sim ro_vfs ro_ui
+    PUBLIC ro_core ro_sim ro_vfs ro_ui moonclient_web
     PRIVATE ro_warnings)
 
 target_include_directories(moonclient_whispers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -1152,6 +1155,7 @@ add_library(moonclient_web STATIC
     web/emblem_web.cpp
     web/json_value.cpp
     web/multipart_body.cpp
+    web/user_config_web.cpp
     web/web_credentials.cpp
     web/web_login.cpp)
 

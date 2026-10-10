@@ -198,6 +198,24 @@ void WhisperStage::StartSession(std::uint64_t last_seq) {
   chip_labels_.clear();
 }
 
+void WhisperStage::RememberBlocks(std::string origin, web::UserConfigIdentity identity) {
+  block_memory_.reset();
+  blocks_transport_.reset();
+  if (!origin.empty()) {
+    // 🔴 LE CLAIR : c'est le même service que celui des emblèmes, voir
+    // `web::WebScheme`.
+    blocks_transport_ =
+        std::make_unique<web::HttpTransport>(std::move(origin), web::WebScheme::kPlainAllowed);
+  }
+  block_memory_.emplace(blocks_transport_.get(), std::move(identity));
+}
+
+void WhisperStage::NoteMapEntered() noexcept {
+  if (block_memory_.has_value()) {
+    block_memory_->NoteMapEntered();
+  }
+}
+
 ro::net::FrameOutcome WhisperStage::ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                const ro::sim::FriendList& friends,
                                                const ro::sim::GuildBook& guild,
@@ -250,6 +268,18 @@ void WhisperStage::FollowPlayer(std::string_view name, ro::ui::ChatLinkGesture g
 }
 
 int WhisperStage::Advance(WhisperWindows& windows, const WhisperContext& context) {
+  // LA LISTE RANGÉE suit ce que les réponses ont changé, et se rejoue une fois.
+  std::vector<ro::sim::WhisperBlockChange> changes = blocks_.TakeChanges();
+  if (block_memory_.has_value()) {
+    for (const std::string& name : block_memory_->Advance(changes)) {
+      if (const ro::core::Result<void> sent = ro::net::RequestWhisperBlock(
+              context.link, blocks_, name, ro::sim::WhisperBlockWay::kBlock);
+          !sent) {
+        ro::core::LogWarning("liste de blocage : « {} » non rejoué : {}", name,
+                             ro::core::Describe(sent.error()));
+      }
+    }
+  }
   std::vector<std::pair<std::string, ro::ui::WhisperWindowAction>> answers =
       std::exchange(windows.answers, {});
   // ⚠ LES FERMETURES D'ABORD : une conversation refermée à l'image d'avant ne

@@ -27,9 +27,13 @@ WhisperBlockAnswer WhisperBlockList::Settle(WhisperBlockWay way, std::uint8_t re
   const auto code = static_cast<WhisperBlockResult>(result);
   if (way == WhisperBlockWay::kBlock && code == WhisperBlockResult::kDone) {
     Add(answer.name);
+    changes_.push_back(
+        WhisperBlockChange{.kind = WhisperBlockChangeKind::kAdded, .name = answer.name});
   } else if (way == WhisperBlockWay::kAllow &&
              (code == WhisperBlockResult::kDone || code == WhisperBlockResult::kFailed)) {
     Remove(answer.name);
+    changes_.push_back(
+        WhisperBlockChange{.kind = WhisperBlockChangeKind::kRemoved, .name = answer.name});
   }
   return answer;
 }
@@ -39,16 +43,11 @@ void WhisperBlockList::SettleEveryone(WhisperBlockWay way, bool failed) {
     everyone_ = true;
     return;
   }
-  if (failed) {
-    everyone_ = false;
+  if (failed || !everyone_) {
     names_.clear();
-    return;
+    changes_.push_back(WhisperBlockChange{.kind = WhisperBlockChangeKind::kEmptied});
   }
-  if (everyone_) {
-    everyone_ = false;
-  } else {
-    names_.clear();
-  }
+  everyone_ = false;
 }
 
 void WhisperBlockList::Replace(std::vector<std::string> names) {
@@ -63,7 +62,14 @@ void WhisperBlockList::Replace(std::vector<std::string> names) {
 void WhisperBlockList::Clear() noexcept {
   names_.clear();
   pending_.clear();
+  changes_.clear();
   everyone_ = false;
+}
+
+std::vector<WhisperBlockChange> WhisperBlockList::TakeChanges() {
+  std::vector<WhisperBlockChange> taken;
+  taken.swap(changes_);
+  return taken;
 }
 
 void WhisperBlockList::Add(const std::string& name) {

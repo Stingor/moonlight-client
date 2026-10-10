@@ -578,14 +578,14 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       map_effects_raised_ = false;
     }
     // L'avis part MÊME si la carte n'a pas pu se charger : sans lui le serveur
-    // laisse le personnage hors de la carte et n'écoute plus rien.
-    //
-    // ⚠ SAUF PENDANT UN CHANGEMENT DE SERVEUR : `MapPhase` l'envoie elle-même
-    // au nouveau, dès l'acceptation, et l'ancien ne l'écoute plus.
+    // laisse le personnage hors de la carte et n'écoute plus rien — ni la
+    // liste de blocage rejouée. ⚠ SAUF PENDANT UN CHANGEMENT DE SERVEUR :
+    // `MapPhase` l'envoie elle-même au nouveau, et l'ancien ne l'écoute plus.
     if (!moving_.has_value()) {
       if (auto told = ro::net::NotifyMapLoaded(link_); !told) {
         ro::core::LogError("avis de chargement refusé : {}", ro::core::Describe(told.error()));
       }
+      pieces_.whispers.NoteMapEntered();
       pieces_.companion_ai.NoteArrival(static_cast<std::uint32_t>(SDL_GetTicks()));
     }
   }

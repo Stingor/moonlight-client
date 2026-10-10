@@ -59,6 +59,23 @@ struct WhisperBlockAnswer {
   std::uint8_t result = 0;
 };
 
+// CE QU'UNE RÉPONSE DU SERVEUR A CHANGÉ À LA LISTE, pour qui la garde ailleurs.
+//
+// ⚠ UN BLOCAGE RÉUSSI SE NOTE MÊME SI LE NOM Y ÉTAIT DÉJÀ : le serveur dit
+// « réussi » dans les deux cas, et la liste gardée ailleurs peut ne pas l'avoir.
+enum class WhisperBlockChangeKind : std::uint8_t {
+  kAdded,
+  kRemoved,
+  // « Tout autoriser » a vidé la liste.
+  kEmptied,
+};
+
+struct WhisperBlockChange {
+  WhisperBlockChangeKind kind = WhisperBlockChangeKind::kAdded;
+  // Vide pour `kEmptied`.
+  std::string name;
+};
+
 // Combien de demandes peuvent attendre leur réponse à la fois. Bien au-delà
 // de ce qu'une main clique : la borne n'empêche qu'un serveur muet de faire
 // grandir la file sans fin.
@@ -100,8 +117,13 @@ class WhisperBlockList {
   void Replace(std::vector<std::string> names);
 
   // Une partie commence, ou un autre serveur de zone prend la main : il ne
-  // tient rien pour nous.
+  // tient rien pour nous. ⚠ CE N'EST PAS UN CHANGEMENT : rien ne se note.
   void Clear() noexcept;
+
+  // CE QUE LES RÉPONSES ONT CHANGÉ depuis la dernière fois, dans l'ordre.
+  // ⚠ SE PREND ET S'EFFACE. La liste que le serveur redit (`Replace`) ne s'y
+  // note pas : elle constate, elle ne change rien.
+  [[nodiscard]] std::vector<WhisperBlockChange> TakeChanges();
 
  private:
   struct Pending {
@@ -114,6 +136,7 @@ class WhisperBlockList {
 
   std::vector<std::string> names_;
   std::deque<Pending> pending_;
+  std::vector<WhisperBlockChange> changes_;
   bool everyone_ = false;
 };
 
