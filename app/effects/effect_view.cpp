@@ -199,13 +199,18 @@ bool EffectsInPlay::PlayById(std::uint32_t effect_id, glm::vec3 ground_position,
                              float instance_second, const std::optional<glm::vec3>& target_position,
                              std::int32_t instance_param) {
   // UNE CLASSE INSCRITE PASSE DEVANT LE FICHIER ET LE PATRON : voir
-  // `EffectClassesInPlay`.
+  // `EffectClassesInPlay`. Elle sonne comme les autres : le flacon d'Acid
+  // Terror est une classe, et c'est `NoteLaunched` qui réclame son bruit.
   if (ro::render::IsPortedEffectClass(effect_id)) {
-    return classes_.Spawn({.effect_id = effect_id,
-                           .owner_id = owner_id,
-                           .ground_position = ground_position,
-                           .bound_ground_position = target_position},
-                          now_ms);
+    const bool spawned = classes_.Spawn({.effect_id = effect_id,
+                                         .owner_id = owner_id,
+                                         .ground_position = ground_position,
+                                         .bound_ground_position = target_position},
+                                        now_ms);
+    if (spawned && announce_sound) {
+      NoteLaunched(effect_id, {ground_position.x, ground_position.y, ground_position.z}, owner_id);
+    }
+    return spawned;
   }
   // 🔴 SOUS `/mineffect`, CERTAINS BÂTISSEURS SORTENT ENTIERS : ni nœud, ni
   // bruit. Voir `ro::render::EffectVanishesWithMinimalEffects`.
