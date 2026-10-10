@@ -63,7 +63,9 @@ class StoreSearchStage {
   void Search(const ro::ui::StoreSearchWindowState& state, const TradeContext& context);
   void SayNews(StoreSearchWindows& windows, const TradeContext& context);
   void Compose(const ro::ui::StoreSearchWindowState& state, const TradeContext& context);
-  void Note(const ro::ui::StoreSearchWindowState& state, int row, bool hovered, bool described);
+  // `gesture` : ce que demande l'objet décrit, sans objet pour un survol.
+  void Note(const ro::ui::StoreSearchWindowState& state, int row, bool hovered, bool described,
+            ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
   [[nodiscard]] const ro::sim::StoreSearchResult* ResultAt(
       const ro::ui::StoreSearchWindowState& state, int row) const;
 

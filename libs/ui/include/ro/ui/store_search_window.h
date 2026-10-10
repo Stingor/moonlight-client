@@ -25,7 +25,9 @@ namespace ro::ui {
 // - un DOUBLE-CLIC sur le nom d'une échoppe la désigne au serveur ; quand
 //   l'objet de catalogue ouvre les échoppes à distance, une boîte le confirme ;
 // - le survol montre en bulle le nom de l'échoppe, ou celui de l'objet ;
-// - le clic DROIT sur l'icône ou l'objet ouvre sa description.
+// - l'icône et l'objet d'un résultat se manient comme un item de commerce
+//   (`TradeItemGesture`) : Maj + clic repose son lien dans la saisie, le clic
+//   DROIT ouvre le menu des objets de la cellule d'objet.
 //
 // ⚠ PRESQUE TOUS LES TEXTES SORTENT DE LA TABLE DE MESSAGES de l'installation,
 // et la vue les apporte. Passent par notre catalogue : les quatre étiquettes
@@ -121,6 +123,9 @@ struct StoreSearchWindowState {
   // La boîte est demandée. ⚠ ELLE S'OUVRE AU NIVEAU DE LA FENÊTRE, jamais
   // depuis une ligne de table.
   bool pending_asked = false;
+  // Le menu qu'un clic droit sur un objet a armé ; son jeton est le rang de la
+  // ligne dans la page.
+  ItemLinkMenu item_menu;
 };
 
 struct StoreSearchAction {
@@ -134,7 +139,11 @@ struct StoreSearchAction {
   // ligne à ce rang est toujours la même.
   StoreSearchPick clicked;
   int hovered_row = kStoreSearchNoRow;
+  // Le rang de la ligne dont l'objet est visé par un geste.
   int describe_row = kStoreSearchNoRow;
+  // Ce que le geste demande de cet objet : sa description, son lien dans la
+  // saisie (Maj + clic), ou une autre entrée du menu des objets.
+  ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 // Remet la fenêtre à l'état d'une recherche neuve : champs vides, première
 // page, objets similaires cochés.
@@ -149,8 +158,9 @@ struct StoreSearchPriceInk {
 };
 [[nodiscard]] StoreSearchPriceInk StoreSearchPriceInkOf(std::int64_t price_zeny);
 
-[[nodiscard]] StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state,
-                                                      const StoreSearchView& view,
-                                                      const SkinArt& art);
+// `vote_shop` : le catalogue du vote shop, pour le menu d'un objet.
+[[nodiscard]] StoreSearchAction DrawStoreSearchWindow(
+    StoreSearchWindowState& state, const StoreSearchView& view, const SkinArt& art,
+    std::span<const VoteShopOffer> vote_shop = {});
 
 }  // namespace ro::ui

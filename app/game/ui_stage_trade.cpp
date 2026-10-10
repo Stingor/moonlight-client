@@ -67,7 +67,7 @@ void UiStage::DrawTradeWindows(TradeWindows& trade,
   // LA RECHERCHE D'ÉCHOPPES, puis la boîte de ses refus.
   StoreSearchWindows& search = trade.store_search;
   if (search.view != nullptr) {
-    search.answer = ro::ui::DrawStoreSearchWindow(search.state, *search.view, skin_);
+    search.answer = ro::ui::DrawStoreSearchWindow(search.state, *search.view, skin_, vote_shop);
   }
   const std::string search_notice_id = std::string(ro::core::Tr("Shop")) + "###store_search_notice";
   ro::ui::DrawTradeNotice(search.notice, search_notice_id.c_str(), skin_);

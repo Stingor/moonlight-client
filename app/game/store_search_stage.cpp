@@ -122,12 +122,15 @@ const ro::sim::StoreSearchResult* StoreSearchStage::ResultAt(
 }
 
 void StoreSearchStage::Note(const ro::ui::StoreSearchWindowState& state, int row, bool hovered,
-                            bool described) {
+                            bool described, ro::ui::ChatLinkGesture gesture) {
   const ro::sim::StoreSearchResult* result = ResultAt(state, row);
   if (result == nullptr || result->item.item_id == 0) {
     return;
   }
-  const TradeItemFocus focus{.item_id = result->item.item_id, .link = ItemLinkOf(result->item)};
+  // L'OFFRE SE DÉCRIT ET SE LIE PAR CE QU'ELLE PORTE : raffinement et cartes
+  // voyagent avec elle, jusque dans le lien de la saisie.
+  const TradeItemFocus focus{
+      .item_id = result->item.item_id, .link = ItemLinkOf(result->item), .gesture = gesture};
   if (hovered) {
     hovered_ = focus;
   }
@@ -179,7 +182,7 @@ void StoreSearchStage::Follow(StoreSearchWindows& windows, const TradeContext& c
       break;
   }
   Note(state, answer.hovered_row, true, false);
-  Note(state, answer.describe_row, false, true);
+  Note(state, answer.describe_row, false, true, answer.item_gesture);
   if (answer.search) {
     Search(state, context);
   }

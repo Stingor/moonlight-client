@@ -38,6 +38,7 @@ constexpr ImU32 kHoveredRowColor = IM_COL32(202, 223, 251, 255);
 constexpr std::string_view kPriceUnit = " Z";
 
 constexpr const char* kConfirmId = "##store_search_confirm";
+constexpr const char* kItemMenuId = "##store_search_item_menu";
 
 // LES ORDRES DE GRANDEUR D'UN PRIX, du plus haut au plus bas, et leur encre.
 struct PriceTier {
@@ -101,15 +102,20 @@ void DrawIcon(const TradeItemView& item) {
   }
 }
 
-// La bulle et le clic droit d'une cellule qui montre l'objet.
-void NoteItemCell(int row, const TradeItemView& item, StoreSearchAction& action) {
-  if (!ImGui::IsItemHovered()) {
+// La bulle et les gestes d'une cellule qui montre l'objet : ceux d'un item de
+// commerce, le rang de la ligne pour jeton.
+void NoteItemCell(int row, const TradeItemView& item, ItemLinkMenu& menu,
+                  StoreSearchAction& action) {
+  TradeItemGesture gesture;
+  AddLastItemGesture(gesture);
+  if (!gesture.hovered) {
     return;
   }
   action.hovered_row = row;
   SkinTooltip(std::string(item.name).c_str());
-  if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+  if (NoteTradeItemLink(gesture, item, static_cast<std::uint32_t>(row), menu)) {
     action.describe_row = row;
+    action.item_gesture = ChatLinkGesture::kRepost;
   }
 }
 
@@ -202,7 +208,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
     }
     ImGui::TableNextColumn();
     DrawIcon(row.item);
-    NoteItemCell(row_index, row.item, action);
+    NoteItemCell(row_index, row.item, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     // 🔴 LE DOUBLE-CLIC SUR L'ÉCHOPPE, et lui seul, la désigne au serveur.
@@ -225,7 +231,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     TextOf(row.item.name);
-    NoteItemCell(row_index, row.item, action);
+    NoteItemCell(row_index, row.item, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     const std::string amount = std::to_string(row.amount);
@@ -321,7 +327,8 @@ StoreSearchPriceInk StoreSearchPriceInkOf(std::int64_t price_zeny) {
 }
 
 StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state, const StoreSearchView& view,
-                                        const SkinArt& art) {
+                                        const SkinArt& art,
+                                        std::span<const VoteShopOffer> vote_shop) {
   StoreSearchAction action;
   if (!state.open) {
     return action;
@@ -338,6 +345,11 @@ StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state, const Sto
     DrawResults(state, view, action);
     DrawFooter(state, view, art, action);
     DrawConfirmation(state, view, art, action);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+        chosen.gesture != ChatLinkGesture::kNothing) {
+      action.describe_row = static_cast<int>(chosen.token);
+      action.item_gesture = chosen.gesture;
+    }
   }
   EndSkinnedWindow();
   if (!state.open) {
