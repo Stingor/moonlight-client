@@ -15,9 +15,6 @@ using ro::core::Tr;
 using ro::ui::EntityMenuItem;
 using ro::ui::EntityMenuQuestion;
 
-// Les deux compagnons qui ont une IA, et donc un bloc de verbes chacun.
-constexpr int kAiCompanionCount = kTacticVerbCompanions;
-
 // LA COMPOSITION, avec ses deux règles de forme.
 //
 // ⚠ UN TRAIT OUVRE UN BLOC, et il appartient au bloc, pas à sa première ligne :
@@ -257,6 +254,22 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
       Composer::Disable(befriend, Tr("Votre liste d'amis est pleine."));
     }
   }
+  // LE COURRIER S'ADRESSE PAR LE NOM : sans nom connu, ou quand l'écriture est
+  // refusée d'avance, la ligne se grise.
+  EntityMenuItem& mail = menu.Add(Tr("Envoyer un courrier"), EntityVerb::kMailSend);
+  if (facts.name.empty()) {
+    Composer::Disable(mail, Tr("Le nom de ce joueur n'est pas encore connu."));
+  } else if (!facts.mail_refusal.empty()) {
+    Composer::Disable(mail, facts.mail_refusal.c_str());
+  }
+  // L'ADOPTION, SEULEMENT QUAND CE QUE LE CLIENT SAIT LA PERMET : le serveur
+  // refuse presque tout le reste en silence, et une ligne qui ne mène à rien
+  // n'apprendrait rien au joueur.
+  if (facts.adoption_possible) {
+    menu.Add(Tr("Adopter"), EntityVerb::kAdopt,
+             Tr("Avec votre conjoint, qui doit être dans ce groupe et porter son alliance.\nS'il "
+                "accepte, ce joueur devient pour toujours un bébé de sa classe."));
+  }
   // UNE BASCULE, PAS DEUX LIGNES : le blocage est un état que le serveur nous
   // dit, et proposer les deux offrirait toujours une ligne qui ne fait rien.
   const char* whisper_tip =
@@ -380,6 +393,20 @@ void AddGroundItem(Composer& menu, const EntityMenuFacts& facts) {
   };
   unless_known(menu.Add(Tr("Description"), EntityVerb::kItemDescription));
   unless_known(menu.Add(Tr("Linker cet item"), EntityVerb::kItemLink));
+  // LE RAMASSAGE AUTOMATIQUE : la liste du compte, celle de la description. Une
+  // ligne OU l'autre, selon la liste que le serveur a dite ; avant qu'il l'ait
+  // dite, aucune. ⚠ SANS SENS SUR UN OBJET INCONNU : dire qu'il est déjà listé
+  // trahirait ce qu'il est.
+  if (facts.item_autolooted.has_value()) {
+    menu.Group();
+    const bool listed = known && *facts.item_autolooted;
+    const char* label = !known   ? Tr("Ramassage automatique")
+                        : listed ? Tr("Retirer du ramassage automatique")
+                                 : Tr("Ajouter au ramassage automatique");
+    unless_known(menu.Add(label, listed ? EntityVerb::kAutolootRemove : EntityVerb::kAutolootAdd,
+                          Tr("La liste @alootid du compte, la même que dans la description : ces "
+                             "items vont droit dans l'inventory quand ils tombent pour vous.")));
+  }
   // Par le chemin COMPLET d'une ligne tapée : leur réponse revient dans la
   // conversation.
   menu.Group();
@@ -508,86 +535,6 @@ void AddOwnHomunculus(Composer& menu, const EntityMenuFacts& facts) {
 }
 
 }  // namespace
-
-int TacticVerb(ro::sim::AiCompanion companion, int choice) noexcept {
-  const int companion_rank = companion == ro::sim::AiCompanion::kHomunculus ? 0 : 1;
-  return kTacticVerbBase + (companion_rank * kTacticVerbsPerCompanion) + choice;
-}
-
-std::optional<TacticVerbParts> TacticVerbOf(int verb) noexcept {
-  const int offset = verb - kTacticVerbBase;
-  if (offset < 0 || offset >= kAiCompanionCount * kTacticVerbsPerCompanion) {
-    return std::nullopt;
-  }
-  return TacticVerbParts{.companion = offset < kTacticVerbsPerCompanion
-                                          ? ro::sim::AiCompanion::kHomunculus
-                                          : ro::sim::AiCompanion::kMercenary,
-                         .choice = offset % kTacticVerbsPerCompanion};
-}
-
-int ConductVerb(ro::sim::AiCompanion companion, int choice) noexcept {
-  return TacticVerb(companion, choice) - kTacticVerbBase + kConductVerbBase;
-}
-
-std::optional<TacticVerbParts> ConductVerbOf(int verb) noexcept {
-  if (verb < kConductVerbBase) {
-    return std::nullopt;
-  }
-  return TacticVerbOf(verb - kConductVerbBase + kTacticVerbBase);
-}
-
-void RefreshConductChecks(ro::ui::EntityMenuView& view, ro::sim::AiCompanion companion,
-                          const std::optional<ro::sim::CompanionPlayerConduct>& line) {
-  for (ro::ui::EntityMenuItem& item : view.items) {
-    const std::optional<TacticVerbParts> parts = ConductVerbOf(item.verb);
-    if (!parts.has_value() || parts->companion != companion) {
-      continue;
-    }
-    const int rank = parts->choice - static_cast<int>(TacticMenuChoice::kRankFirst);
-    const int trigger = parts->choice - static_cast<int>(TacticMenuChoice::kTriggerFirst);
-    if (rank >= 0 && rank < static_cast<int>(ro::sim::kTacticRankCount)) {
-      item.checked = line.has_value() && static_cast<int>(line->rank) == rank;
-    } else if (trigger >= 0 && trigger < static_cast<int>(ro::sim::kTacticTriggerCount)) {
-      item.checked = line.has_value() && static_cast<int>(line->trigger) == trigger;
-    } else if (parts->choice == static_cast<int>(TacticMenuChoice::kRemove)) {
-      item.disabled = !line.has_value();
-      item.tip = line.has_value() ? std::string()
-                                  : std::string(Tr("Aucune conduite n'est posée pour ce joueur."));
-    }
-  }
-}
-
-const char* TacticRankLabel(ro::sim::TacticRank rank) {
-  switch (rank) {
-    case ro::sim::TacticRank::kAbsolute:
-      return Tr("Priorité absolue");
-    case ro::sim::TacticRank::kHigh:
-      return Tr("Haut");
-    case ro::sim::TacticRank::kMedium:
-      return Tr("Moyen");
-    case ro::sim::TacticRank::kLow:
-      return Tr("Bas");
-    case ro::sim::TacticRank::kLast:
-      return Tr("En dernier");
-    case ro::sim::TacticRank::kHold:
-      return Tr("Tenir");
-    case ro::sim::TacticRank::kIgnore:
-      return Tr("Ignorer");
-  }
-  return Tr("Moyen");
-}
-
-const char* TacticTriggerLabel(ro::sim::TacticTrigger trigger) {
-  switch (trigger) {
-    case ro::sim::TacticTrigger::kAlways:
-      return Tr("Toujours");
-    case ro::sim::TacticTrigger::kIfAttacks:
-      return Tr("S'il attaque");
-    case ro::sim::TacticTrigger::kIfAttacksCompanion:
-      return Tr("S'il attaque le compagnon");
-  }
-  return Tr("Toujours");
-}
 
 const char* EntityFamilyLabel(EntityFamily family) {
   switch (family) {

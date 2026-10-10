@@ -31,6 +31,8 @@ constexpr std::array<std::uint16_t, 3> kOptionsOffsets = {2, 6, 7};
 constexpr std::string_view kWhisperBlockHandler = "clif_parse_PMIgnore";
 constexpr std::array<std::uint16_t, 2> kWhisperBlockOffsets = {2, 26};
 constexpr std::string_view kWhisperListHandler = "clif_parse_PMIgnoreList";
+constexpr std::string_view kAdoptionHandler = "clif_parse_Adopt_request";
+constexpr std::array<std::uint16_t, 1> kAdoptionOffsets = {2};
 
 constexpr std::size_t kNameSize = 24;
 // Le serveur n'écrit jamais plus d'entrées de partage que de places dans un
@@ -168,6 +170,19 @@ core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockListRequest& /*
   return frame;
 }
 
+core::Result<std::vector<std::uint8_t>> Encode(const AdoptionRequest& request) {
+  if (!Declared(AdoptionRequest::kOpcode, kAdoptionHandler, kAdoptionOffsets,
+                AdoptionRequest::kWireSize)) {
+    return std::unexpected(LayoutDrift());
+  }
+  std::vector<std::uint8_t> frame;
+  frame.reserve(AdoptionRequest::kWireSize);
+  ByteWriter writer(frame);
+  writer.U16(AdoptionRequest::kOpcode);
+  writer.U32(request.account_id);
+  return frame;
+}
+
 core::Result<FriendRequestNotice> DecodeFriendRequestNotice(std::span<const std::uint8_t> frame) {
   auto reader = FixedFrame(frame, FriendRequestNotice::kOpcode, FriendRequestNotice::kWireSize);
   if (!reader) {
@@ -213,6 +228,31 @@ core::Result<PartyOptionsNotice> DecodePartyOptionsNotice(std::span<const std::u
   notice.exp_share = reader->U32();
   notice.item_pickup = reader->U8();
   notice.item_share = reader->U8();
+  return notice;
+}
+
+core::Result<AdoptionInvitationNotice> DecodeAdoptionInvitationNotice(
+    std::span<const std::uint8_t> frame) {
+  auto reader =
+      FixedFrame(frame, AdoptionInvitationNotice::kOpcode, AdoptionInvitationNotice::kWireSize);
+  if (!reader) {
+    return std::unexpected(reader.error());
+  }
+  AdoptionInvitationNotice notice;
+  notice.parent_account_id = reader->U32();
+  notice.spouse_account_id = reader->U32();
+  notice.parent_name = std::string(reader->FixedString(kNameSize));
+  return notice;
+}
+
+core::Result<AdoptionRefusalNotice> DecodeAdoptionRefusalNotice(
+    std::span<const std::uint8_t> frame) {
+  auto reader = FixedFrame(frame, AdoptionRefusalNotice::kOpcode, AdoptionRefusalNotice::kWireSize);
+  if (!reader) {
+    return std::unexpected(reader.error());
+  }
+  AdoptionRefusalNotice notice;
+  notice.reason = reader->U32();
   return notice;
 }
 

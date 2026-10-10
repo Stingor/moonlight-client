@@ -211,11 +211,15 @@ void DescriptionView::EnableComparison() {
 }
 
 void DescriptionView::ToggleAutoloot(ro::net::Connection& link, std::uint32_t item_id) {
+  SetAutoloot(link, item_id, !asker_.facts().Autoloots(item_id));
+}
+
+void DescriptionView::SetAutoloot(ro::net::Connection& link, std::uint32_t item_id, bool listed) {
   ro::sim::ItemFacts& facts = asker_.facts();
-  if (item_id == 0 || !facts.autoloot_told() || !link.is_open()) {
+  if (item_id == 0 || !facts.autoloot_told() || !link.is_open() ||
+      facts.Autoloots(item_id) == listed) {
     return;
   }
-  const bool listed = !facts.Autoloots(item_id);
   ro::net::RequestAutoloot(link, item_id, listed);
   facts.NoteAutoloot(item_id, listed);
 }

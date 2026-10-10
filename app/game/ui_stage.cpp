@@ -31,6 +31,7 @@ constexpr const char* kHomunculusSkillsKey = "character.homunculus.skills";
 constexpr const char* kMercenarySkillsKey = "character.mercenary.skills";
 
 constexpr const char* kPartyDisbandId = "groupe_dissolution";
+constexpr const char* kAdoptionId = "adoption_demande";
 
 }  // namespace
 
@@ -317,6 +318,19 @@ UiStage::Answers UiStage::Draw(
                            ro::core::Tr("Dissoudre"), ro::core::Tr("Annuler"),
                            skin_) == ro::ui::ModalAnswer::kYes) {
     windows.party.disband_confirmed = true;
+  }
+  // LA DEMANDE D'ADOPTION REÇUE : la boîte s'ouvre à son arrivée, et attend.
+  AdoptionBox& adoption = windows.party.adoption;
+  if (std::exchange(adoption.ask, false)) {
+    ro::ui::AskModal(kAdoptionId);
+  }
+  if (!adoption.question.empty()) {
+    const ro::ui::ModalAnswer adopted =
+        ro::ui::DrawModalBox(kAdoptionId, adoption.question.c_str(), ro::core::Tr("Accepter"),
+                             ro::core::Tr("Refuser"), skin_);
+    if (adopted != ro::ui::ModalAnswer::kWaiting) {
+      adoption.answer = adopted == ro::ui::ModalAnswer::kYes;
+    }
   }
 
   // L'ÉDITEUR DE STYLE, juste après la fiche : c'est la même apparence qu'on

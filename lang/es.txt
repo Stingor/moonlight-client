@@ -15972,3 +15972,45 @@ tr: Esta guild ya es enemiga.
 
 fr: Les hostilités entre guildes sont désactivées.
 tr: Las hostilidades entre guilds están desactivadas.
+
+fr: Envoyer un courrier
+tr: Enviar un correo
+
+fr: Adopter
+tr: Adoptar
+
+fr: Avec votre conjoint, qui doit être dans ce groupe et porter son alliance.\nS'il accepte, ce joueur devient pour toujours un bébé de sa classe.
+tr: Con tu cónyuge, que debe estar en este grupo y llevar su anillo de boda.\nSi acepta, este jugador se convierte para siempre en un bebé de su clase.
+
+fr: Demande d'adoption envoyée à %s : il lui reste à l'accepter.
+tr: Solicitud de adopción enviada a %s: aún tiene que aceptarla.
+
+fr: %s et son conjoint veulent vous adopter. Accepter, c'est devenir pour toujours un bébé de votre classe. Accepter ?
+tr: %s y su cónyuge quieren adoptarte. Aceptar es convertirte para siempre en un bebé de tu clase. ¿Aceptar?
+
+fr: Adoption refusée : vous ou votre conjoint avez déjà un enfant.
+tr: Adopción rechazada: tú o tu cónyuge ya tenéis un hijo.
+
+fr: Adoption refusée : vous et votre conjoint devez avoir atteint le niveau 70.
+tr: Adopción rechazada: tú y tu cónyuge debéis haber alcanzado el nivel 70.
+
+fr: Adoption refusée : on n'adopte pas un joueur marié.
+tr: Adopción rechazada: no se puede adoptar a un jugador casado.
+
+fr: Adoption refusée.
+tr: Adopción rechazada.
+
+fr: Un échange est en cours : le serveur refuse d'ouvrir un courrier.
+tr: Hay un intercambio en curso: el servidor se niega a abrir un correo.
+
+fr: Ramassage automatique
+tr: Recogida automática
+
+fr: Ajouter au ramassage automatique
+tr: Añadir a la recogida automática
+
+fr: Retirer du ramassage automatique
+tr: Quitar de la recogida automática
+
+fr: La liste @alootid du compte, la même que dans la description : ces items vont droit dans l'inventory quand ils tombent pour vous.
+tr: La lista @alootid de la cuenta, la misma que en la descripción: estos objetos van directos al inventario cuando caen para ti.

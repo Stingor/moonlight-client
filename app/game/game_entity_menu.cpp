@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/net/adoption.h"
 #include "ro/net/friends.h"
 #include "ro/net/guild.h"
 #include "ro/net/inventory.h"
@@ -20,6 +21,7 @@
 #include "ro/net/party.h"
 #include "ro/net/staff_requests.h"
 #include "ro/net/whisper_blocks.h"
+#include "ro/sim/adoption.h"
 #include "ro/sim/bank.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
@@ -263,6 +265,10 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
           actor, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
           pieces_.item_words);
     }
+    // LA LISTE DE RAMASSAGE AUTOMATIQUE, celle que la description tient.
+    if (item_description_.has_value() && item_description_->facts().autoloot_told()) {
+      facts.item_autolooted = item_description_->facts().Autoloots(facts.item_id);
+    }
   } else {
     facts.name = actor.name;
   }
@@ -318,6 +324,16 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
     if (const char* refusal = JudgeMvpInvite(actor.name, hunt); refusal != nullptr) {
       facts.mvp_invite_refusal = refusal;
     }
+    // LE COURRIER : le serveur refuse d'en ouvrir un second, et pendant un
+    // échange.
+    if (pieces_.mail.writing()) {
+      facts.mail_refusal = Tr("Un courrier est déjà en cours d'écriture.");
+    } else if (facts.dealing) {
+      facts.mail_refusal = Tr("Un échange est en cours : le serveur refuse d'ouvrir un courrier.");
+    }
+    facts.adoption_possible = ro::sim::AdoptionLooksPossible(
+        ro::sim::AdoptionFactsOf(world_.player_status().base_level, world_.inventory(),
+                                 world_.skill_book(), facts.target_in_party, actor.look.job));
     for (const ro::sim::AiCompanion companion :
          {ro::sim::AiCompanion::kHomunculus, ro::sim::AiCompanion::kMercenary}) {
       if (pieces_.companion_ai.present(companion)) {
@@ -419,6 +435,33 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
                                                  verb == EntityVerb::kWhisperBlock
                                                      ? ro::sim::WhisperBlockWay::kBlock
                                                      : ro::sim::WhisperBlockWay::kAllow));
+      return;
+    case EntityVerb::kMailSend:
+      // ⚠ JAMAIS POUR SOI : le menu de soi n'a pas l'entrée, et le clic le
+      // revérifie.
+      if (id != world_.player_id() && !name.empty()) {
+        pieces_.mail.Compose(name);
+      }
+      return;
+    case EntityVerb::kAdopt: {
+      // Le serveur ne répond qu'à trois refus ; une demande transmise ne se
+      // voit que chez l'adopté. Le dire ici est donc la seule trace du geste.
+      ReportRefusal(ro::net::RequestAdoption(link_, id));
+      std::array<char, kLineBytes> line{};
+      std::snprintf(line.data(), line.size(),
+                    Tr("Demande d'adoption envoyée à %s : il lui reste à l'accepter."),
+                    name.c_str());
+      world_.RecordChat(ro::sim::ChatKind::kServer, 0, line.data(), now_ms, kClientSaysColor);
+      return;
+    }
+    case EntityVerb::kAutolootAdd:
+    case EntityVerb::kAutolootRemove:
+      // La même liste et le même chemin que la description ; la réponse du
+      // serveur revient dans la conversation.
+      if (item_description_.has_value()) {
+        item_description_->SetAutoloot(link_, menu_target_.item_id,
+                                       verb == EntityVerb::kAutolootAdd);
+      }
       return;
     case EntityVerb::kWhisperWindow:
       // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant, et prend

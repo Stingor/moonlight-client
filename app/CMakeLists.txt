@@ -795,7 +795,8 @@ target_include_directories(moonclient_spritesounds PUBLIC ${CMAKE_CURRENT_SOURCE
 add_library(moonclient_entitymenu STATIC
     options/context_menu_options.cpp
     world/blocked_npcs.cpp
-    world/entity_menu.cpp)
+    world/entity_menu.cpp
+    world/entity_menu_tactics.cpp)
 # ⚠ LES LIENS DU CHAT EN PRIVÉ : « Linker ce NPC » ne s'offre que pour un nom
 # que la balise `<NAVS>` peut porter, et cette règle est la leur.
 target_link_libraries(moonclient_entitymenu
@@ -804,17 +805,19 @@ target_link_libraries(moonclient_entitymenu
 target_include_directories(moonclient_entitymenu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LE GROUPE ET LES AMIS : ce que la fenêtre et la grille montrent, le rythme
-# auquel on demande le PS des membres, et les deux pages de réglages. En
+# auquel on demande le PS des membres, les deux pages de réglages, et la
+# demande d'adoption reçue. En
 # bibliothèque pour la raison habituelle : la composition ne voit le jeu qu'à
 # travers une interface, et ses règles — ma tuile hors groupe, un PS périmé qui
 # se tait, une demande toutes les 250 ms — ne se vérifient pas en jouant.
 add_library(moonclient_party STATIC
+    game/adoption_stage.cpp
     party/party_compose.cpp
     party/party_option_rows.cpp
     party/party_options.cpp
     party/party_poll.cpp)
 target_link_libraries(moonclient_party
-    PUBLIC ro_sim ro_ui moonclient_settings
+    PUBLIC ro_net ro_sim ro_ui moonclient_settings
     PRIVATE ro_warnings)
 target_include_directories(moonclient_party PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

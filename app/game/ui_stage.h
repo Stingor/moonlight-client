@@ -61,8 +61,6 @@
 #include "ro/ui/options_window.h"
 #include "ro/ui/packet_window.h"
 #include "ro/ui/palette_editor.h"
-#include "ro/ui/party_friend_window.h"
-#include "ro/ui/party_grid.h"
 #include "ro/ui/patch_screen.h"
 #include "ro/ui/pet_hatch_window.h"
 #include "ro/ui/pet_window.h"
@@ -95,6 +93,7 @@
 #include "game/mail_stage.h"
 #include "game/navigation_windows.h"
 #include "game/over_world_paint.h"
+#include "game/party_windows.h"
 #include "game/quest_stage.h"
 #include "game/trade_windows.h"
 #include "game/whisper_stage.h"
@@ -383,23 +382,9 @@ class UiStage {
     // LE CARNET DE CHASSE MVP. Voir `ui_stage_mvp_tracker.cpp`.
     MvpTrackerWindows mvp_tracker;
     BattlegroundWindows battleground;  // Voir `ui_stage_battleground.cpp`.
-    // LA FENÊTRE GROUPE / AMIS ET LA GRILLE DE GROUPE, même aller-retour. ⚠ LA
-    // FENÊTRE SE DESSINE À CHAQUE IMAGE, MÊME FERMÉE : la demande reçue et
-    // l'annonce des règles du groupe vivent hors d'elle. La modale de
-    // dissolution s'ouvre quand personne ne peut reprendre la direction.
-    struct Party {
-      ro::ui::PartyFriendWindowState window;
-      const ro::ui::PartyFriendView* view = nullptr;
-      const ro::ui::PartyFriendLook* look = nullptr;
-      ro::ui::PartyFriendAction answer;
-      const ro::ui::PartyGridView* grid_view = nullptr;
-      ro::ui::PartyGridLook* grid_look = nullptr;
-      ro::ui::PartyGridState grid_state;
-      ro::ui::PartyGridAnswer grid_answer;
-      bool ask_disband = false;
-      bool disband_confirmed = false;
-    };
-    Party party;
+    // LA FENÊTRE GROUPE / AMIS ET LA GRILLE DE GROUPE, même aller-retour. Voir
+    // `game/party_windows.h`.
+    PartyWindows party;
     // Les éléments déverrouillés à l'écran, déjà traduits : l'avis de pose
     // (`game/hud_lock.h`) paraît tant qu'il y en a un, et les nomme.
     std::vector<const char*> unlocked_hud;

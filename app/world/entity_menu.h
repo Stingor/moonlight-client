@@ -224,6 +224,14 @@ enum class EntityVerb : int {
   // deux, selon la liste que le serveur tient.
   kWhisperBlock,
   kWhisperAllow,
+  // « ENVOYER UN COURRIER » : l'écriture, adressée à ce joueur.
+  kMailSend,
+  // « ADOPTER » ce joueur, avec son conjoint.
+  kAdopt,
+  // L'OBJET AU SOL entre dans la liste de ramassage automatique, ou en sort :
+  // une seule des deux, selon la liste que le serveur tient.
+  kAutolootAdd,
+  kAutolootRemove,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -245,7 +253,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kWhisperAllow) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kAutolootRemove) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==
@@ -334,9 +342,17 @@ struct EntityMenuFacts {
   // Un échange est ouvert, ou une proposition attend : on n'en propose pas un
   // second.
   bool dealing = false;
+  // Ce qui grise « Envoyer un courrier », DÉJÀ TRADUIT ; vide quand il est
+  // offert.
+  std::string mail_refusal;
+  // Ce que le client sait de l'adoption la permet : sans quoi, pas d'entrée.
+  bool adoption_possible = false;
   // Un objet au sol : son identifiant, et s'il est identifié.
   std::uint32_t item_id = 0;
   bool item_identified = false;
+  // Sa place dans la liste de ramassage automatique ; sans valeur tant que le
+  // serveur n'a pas dit la liste, et l'entrée est alors absente.
+  std::optional<bool> item_autolooted;
   bool npc_blocked = false;
   // Notre pet porte un accessoire : sans lui, « Retirer l'accessoire » se grise.
   bool pet_has_accessory = false;

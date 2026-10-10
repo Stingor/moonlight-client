@@ -118,6 +118,8 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   if (!link_.is_open()) {
     return;
   }
+  // L'ADOPTION : la réponse à la demande reçue, et les refus de la nôtre.
+  pieces_.adoption.Advance(windows_.party.adoption, link_, world_, now_ms);
 
   // Un membre qu'un acteur représente : son menu d'entité, ou la désignation.
   const auto open_menu = [this, own, now_ms](std::uint32_t account_id) {

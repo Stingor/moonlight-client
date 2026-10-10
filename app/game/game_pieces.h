@@ -47,6 +47,7 @@
 #include "chat/emotion_view.h"
 #include "debug/debug_console.h"
 #include "game/achievement_stage.h"
+#include "game/adoption_stage.h"
 #include "game/battleground_stage.h"
 #include "game/cart_choice_stage.h"
 #include "game/cash_shop_stage.h"
@@ -152,6 +153,8 @@ struct GamePieces {
   // LES TROIS COMPAGNONS QUI ONT UNE FICHE : le familier, l'homoncule et le
   // mercenaire.
   PetStage pet;
+  // L'ADOPTION : la demande qu'un couple nous adresse, et les refus du serveur.
+  AdoptionStage adoption;
   HomunculusStage homunculus;
   MercenaryStage mercenary;
   // L'IA DE CES DEUX DERNIERS : voir `CompanionAiStage`.

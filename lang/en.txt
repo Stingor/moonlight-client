@@ -15972,3 +15972,45 @@ tr: This guild is already an enemy.
 
 fr: Les hostilités entre guildes sont désactivées.
 tr: Hostilities between guilds are disabled.
+
+fr: Envoyer un courrier
+tr: Send a mail
+
+fr: Adopter
+tr: Adopt
+
+fr: Avec votre conjoint, qui doit être dans ce groupe et porter son alliance.\nS'il accepte, ce joueur devient pour toujours un bébé de sa classe.
+tr: With your spouse, who must be in this party and wear their wedding ring.\nIf they accept, this player becomes a baby of their class for good.
+
+fr: Demande d'adoption envoyée à %s : il lui reste à l'accepter.
+tr: Adoption request sent to %s: they still have to accept it.
+
+fr: %s et son conjoint veulent vous adopter. Accepter, c'est devenir pour toujours un bébé de votre classe. Accepter ?
+tr: %s and their spouse want to adopt you. Accepting makes you a baby of your class for good. Accept?
+
+fr: Adoption refusée : vous ou votre conjoint avez déjà un enfant.
+tr: Adoption refused: you or your spouse already have a child.
+
+fr: Adoption refusée : vous et votre conjoint devez avoir atteint le niveau 70.
+tr: Adoption refused: you and your spouse must both have reached level 70.
+
+fr: Adoption refusée : on n'adopte pas un joueur marié.
+tr: Adoption refused: a married player cannot be adopted.
+
+fr: Adoption refusée.
+tr: Adoption refused.
+
+fr: Un échange est en cours : le serveur refuse d'ouvrir un courrier.
+tr: A trade is in progress: the server refuses to open a mail.
+
+fr: Ramassage automatique
+tr: Autoloot
+
+fr: Ajouter au ramassage automatique
+tr: Add to autoloot
+
+fr: Retirer du ramassage automatique
+tr: Remove from autoloot
+
+fr: La liste @alootid du compte, la même que dans la description : ces items vont droit dans l'inventory quand ils tombent pour vous.
+tr: The account's @alootid list, the same as in the description: these items go straight into the inventory when they drop for you.

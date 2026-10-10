@@ -432,6 +432,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                    &pieces_.item_words, &pieces_.job_names,
                    pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
   pieces_.mail.StartSession();
+  // NI LA DEMANDE D'ADOPTION REÇUE.
+  pieces_.adoption.StartSession();
   windows_.mail = MailWindows{};
   // LES SALONS : on n'est dans aucun. ⚠ LA SAISIE DU FORMULAIRE SURVIT, elle
   // n'appartient pas au personnage.

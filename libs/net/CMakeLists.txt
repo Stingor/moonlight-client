@@ -89,6 +89,7 @@ add_library(ro_net STATIC
     src/mercenary_frames.cpp
     src/member_statuses.cpp
     src/friends.cpp
+    src/adoption.cpp
     src/social_text.cpp
     src/session.cpp
     src/npc_dialog.cpp

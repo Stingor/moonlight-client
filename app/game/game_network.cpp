@@ -18,6 +18,7 @@
 
 #include "ro/core/log.h"
 #include "ro/net/action.h"
+#include "ro/net/adoption.h"
 #include "ro/net/attack_reach.h"
 #include "ro/net/bug_report.h"
 #include "ro/net/card_album.h"
@@ -151,12 +152,13 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       outcome = guided;
     }
     // LE BOSS D'UN CONVEX MIRROR, les nouvelles d'objets — le ramassage d'un
-    // membre du groupe, une pièce abîmée, que le sac lit aussi —, et l'issue
-    // d'une alliance ou d'une hostilité de guilde.
+    // membre du groupe, une pièce abîmée, que le sac lit aussi —, l'issue d'une
+    // alliance ou d'une hostilité de guilde, et l'adoption.
     for (const ro::net::FrameOutcome told :
          {ro::net::ApplyBossInfoFrame(received, navi_.guidance, world_, now_ms),
           ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms),
-          ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms)}) {
+          ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms),
+          ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk())}) {
       if (outcome == ro::net::FrameOutcome::kUnhandled) {
         outcome = told;
       }

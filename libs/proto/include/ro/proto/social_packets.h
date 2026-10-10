@@ -92,6 +92,16 @@ struct WhisperBlockListRequest {
   static constexpr std::size_t kWireSize = 2;
 };
 
+// « Je veux adopter ce joueur. » Par son COMPTE ; le serveur cherche lui-même
+// le conjoint, et juge seul toutes les conditions. La réponse de l'adopté part
+// par le paquet engendré `CzJoinBaby`.
+struct AdoptionRequest {
+  static constexpr std::uint16_t kOpcode = 0x01F9;
+  static constexpr std::size_t kWireSize = 6;
+
+  std::uint32_t account_id = 0;
+};
+
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const FriendAddRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const FriendRemoveRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const FriendAnswerRequest& request);
@@ -100,6 +110,7 @@ struct WhisperBlockListRequest {
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(
     const WhisperBlockListRequest& request);
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const AdoptionRequest& request);
 
 // ── CE QUE LE SERVEUR ENVOIE ────────────────────────────────────────────────
 
@@ -154,6 +165,32 @@ struct PartyOptionsNotice {
 [[nodiscard]] core::Result<FriendRemovedNotice> DecodeFriendRemovedNotice(
     std::span<const std::uint8_t> frame);
 [[nodiscard]] core::Result<PartyOptionsNotice> DecodePartyOptionsNotice(
+    std::span<const std::uint8_t> frame);
+
+// UN COUPLE DEMANDE À NOUS ADOPTER : le compte de celui qui demande, celui de
+// son conjoint, et le nom du premier. La réponse renvoie les deux comptes.
+struct AdoptionInvitationNotice {
+  static constexpr std::uint16_t kOpcode = 0x01F6;
+  static constexpr std::size_t kWireSize = 34;
+
+  std::uint32_t parent_account_id = 0;
+  std::uint32_t spouse_account_id = 0;
+  // Tel que le fil le porte.
+  std::string parent_name;
+};
+
+// UNE DEMANDE D'ADOPTION REFUSÉE, quand le serveur dit pourquoi : il ne le dit
+// que pour trois causes, et refuse les autres en silence.
+struct AdoptionRefusalNotice {
+  static constexpr std::uint16_t kOpcode = 0x0216;
+  static constexpr std::size_t kWireSize = 6;
+
+  std::uint32_t reason = 0;
+};
+
+[[nodiscard]] core::Result<AdoptionInvitationNotice> DecodeAdoptionInvitationNotice(
+    std::span<const std::uint8_t> frame);
+[[nodiscard]] core::Result<AdoptionRefusalNotice> DecodeAdoptionRefusalNotice(
     std::span<const std::uint8_t> frame);
 
 // QUI, DANS LE GROUPE, EST HORS DU PARTAGE D'EXP.

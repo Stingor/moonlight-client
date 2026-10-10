@@ -151,6 +151,9 @@ class DescriptionView {
   // « +/- alootid » : l'item entre dans la liste de ramassage, ou en sort. Noté
   // d'avance — le serveur ne confirme pas un ajout, il ne dément qu'un refus.
   void ToggleAutoloot(ro::net::Connection& link, std::uint32_t item_id);
+  // La même liste, dans un SENS voulu : rien ne part quand l'item y est déjà
+  // tel qu'on le veut — le menu d'entité, ouvert avant, a pu la voir changer.
+  void SetAutoloot(ro::net::Connection& link, std::uint32_t item_id, bool listed);
   // Le nom d'un monstre des sources, vide s'il n'y est pas.
   [[nodiscard]] std::string_view SourceNameOf(std::uint32_t monster_id) const;
 
