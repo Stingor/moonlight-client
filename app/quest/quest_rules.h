@@ -29,8 +29,14 @@ inline constexpr std::string_view kQuestOtherCategory = "etc";
 [[nodiscard]] std::string QuestFill(std::string_view pattern,
                                     std::initializer_list<std::string_view> values);
 
-// « Poring Lv.1~Lv.10 », « Poring Lv.5 », « Poring » : le nom que le serveur
-// donne, puis la tranche de niveaux qu'il borne.
+// CE QU'UNE CHASSE VISE : le nom du monstre que le serveur donne ; pour une
+// chasse générique (sans monstre), ses critères dans la langue courante —
+// « Monstres : race Bête, taille Petite, sur prt_fild08 », « Monstres de toute
+// sorte » —, ou la description du serveur telle quelle si elle ne se lit pas.
+[[nodiscard]] std::string HuntTargetName(const ro::sim::QuestHunt& hunt);
+
+// « Poring Lv.1~Lv.10 », « Poring Lv.5 », « Poring » : ce que la chasse vise,
+// puis la tranche de niveaux que le serveur borne.
 [[nodiscard]] std::string HuntLabel(const ro::sim::QuestHunt& hunt);
 
 // LE TEMPS QUI RESTE AVANT UNE ÉCHÉANCE.

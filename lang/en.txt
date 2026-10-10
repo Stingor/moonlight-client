@@ -15915,3 +15915,21 @@ tr: Commission : 1 EA = %s Zeny
 
 fr: Zeny actuels : %s Z
 tr: Current Zeny : %s Z
+
+fr: race {}
+tr: race {}
+
+fr: taille {}
+tr: size {}
+
+fr: élément {}
+tr: element {}
+
+fr: sur {}
+tr: on {}
+
+fr: Monstres : {}
+tr: Monsters: {}
+
+fr: Monstres de toute sorte
+tr: Monsters of any kind

@@ -241,8 +241,8 @@ void QuestStage::SayProgress(const ro::sim::QuestRecord& quest, std::size_t hunt
   }
   const ro::sim::QuestHunt& hunt = quest.hunts[hunt_rank];
   std::string line = QuestFill(ro::core::Tr("[{}] {} : {} / {}"),
-                               {TitleOf(quest.quest_id), hunt.mob_name, std::to_string(hunt.killed),
-                                std::to_string(hunt.total)});
+                               {TitleOf(quest.quest_id), HuntTargetName(hunt),
+                                std::to_string(hunt.killed), std::to_string(hunt.total)});
   world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kQuestInfo, 0, std::move(line),
                    now_ms, kQuestChatColor);
 }

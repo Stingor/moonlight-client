@@ -610,8 +610,9 @@ std::optional<CompanionAiFileRead> SaveCompanionAiEdits(const std::filesystem::p
   // ⚠ RELU JUSTE AVANT D'ÉCRIRE : un autre client sur la même installation a pu
   // l'enregistrer entre-temps, et ses lignes survivent à la fusion.
   const std::optional<std::string> current = ReadWhole(path);
+  std::vector<CompanionRenameShift> shifts;
   const std::optional<std::string> merged =
-      current.has_value() ? MergeCompanionAi(*current, edits) : std::nullopt;
+      current.has_value() ? MergeCompanionAi(*current, edits, &shifts) : std::nullopt;
   if (!merged.has_value()) {
     ro::core::LogWarning(
         "IA des compagnons : {} n'est pas réécrit (illisible, ou d'une version inconnue) ; les "
@@ -624,6 +625,12 @@ std::optional<CompanionAiFileRead> SaveCompanionAiEdits(const std::filesystem::p
     ro::core::LogWarning("IA des compagnons : écriture impossible ({})",
                          ro::core::Describe(written.error()));
     return std::nullopt;
+  }
+  for (const CompanionRenameShift& shift : shifts) {
+    ro::core::LogWarning(
+        "IA des compagnons : un autre client a écrit un profil « {} » (classe {}) ; le profil "
+        "renommé est enregistré sous « {} »",
+        shift.wanted, shift.job, shift.written);
   }
   return ParseCompanionAi(*merged);
 }

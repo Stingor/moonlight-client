@@ -46,6 +46,9 @@ enum class ProfileRefusal : std::uint8_t {
 // `renamed` : le profil qu'on renomme, dont le nom actuel reste permis.
 [[nodiscard]] ProfileRefusal NameRefusal(const CompanionProfiles& profiles, std::uint16_t job,
                                          std::string_view name, std::string_view renamed = {});
+// LE CANDIDAT DE RANG `rank` tiré de `wanted` : lui-même au rang zéro, puis
+// suivi de « (2) », « (3) »…, raccourci pour tenir dans sa longueur.
+[[nodiscard]] std::string SuffixedProfileName(std::string_view wanted, std::size_t rank);
 // UN NOM LIBRE tiré de `wanted` : lui-même s'il est libre, sinon suivi de
 // « (2) », « (3) »…, raccourci pour tenir dans sa longueur.
 [[nodiscard]] std::string FreeProfileName(const CompanionProfiles& profiles, std::uint16_t job,

@@ -534,7 +534,7 @@ add_library(moonclient_quests STATIC
 
 target_link_libraries(moonclient_quests
     PUBLIC ro_core ro_sim ro_ui
-    PRIVATE moonclient_yamltext yaml-cpp::yaml-cpp ro_warnings)
+    PRIVATE moonclient_yamltext ro_vfs yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_quests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

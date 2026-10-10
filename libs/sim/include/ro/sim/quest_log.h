@@ -12,9 +12,11 @@ namespace ro::sim {
 // UNE CHASSE d'une quête : quel monstre, combien sont tombés sur combien.
 struct QuestHunt {
   std::uint32_t hunt_id = 0;
-  // La race, la taille ou l'élément qu'une chasse sans monstre désigne ; zéro
-  // pour une chasse d'un monstre précis.
+  // La race, à défaut la taille, à défaut l'élément de la chasse, tel que le
+  // serveur le code. ⚠ ININTERPRÉTABLE SEUL : rien n'y dit lequel des trois, et
+  // « toutes races » y vaut aussi pour la chasse d'un monstre précis.
   std::uint32_t mob_type = 0;
+  // Nul pour une chasse générique : aucune fiche de monstre ne s'y rattache.
   std::uint32_t mob_id = 0;
   std::int16_t level_min = 0;
   std::int16_t level_max = 0;
@@ -84,9 +86,8 @@ class QuestLog {
   // sur la chasse de ce RANG dans cette quête. Faux si la quête ou le rang
   // n'existent pas.
   // ⚠ LE MONSTRE EST POSÉ MÊME À ZÉRO : ce paquet porte l'identifiant brut de la
-  // base, nul pour une chasse générique (race, taille, élément), alors que la
-  // quête neuve et la liste entière mettent un monstre de remplacement à sa
-  // place. Zéro dit à l'interface de ne pas proposer la fiche d'un monstre.
+  // base, nul pour une chasse générique (race, taille, élément). Zéro dit à
+  // l'interface de ne pas proposer la fiche d'un monstre.
   bool SetHuntTotalAt(std::uint32_t quest_id, std::size_t hunt_rank, std::uint32_t mob_id,
                       std::int16_t total, std::int16_t killed);
   // De même, sur la chasse que ce `hunt_id` désigne — la forme d'un serveur

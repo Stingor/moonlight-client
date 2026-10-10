@@ -3,6 +3,7 @@
 #include "ro/net/quest_log.h"
 
 #include <algorithm>
+#include <string_view>
 #include <utility>
 
 #include "ro/core/text.h"
@@ -13,6 +14,22 @@
 namespace ro::net {
 namespace {
 
+// UNE CHASSE GÉNÉRIQUE — race, taille, élément ou carte, sans monstre précis —
+// se dit sous le Poring dans la liste entière et dans la quête neuve : le
+// serveur n'y peut pas écrire zéro. Elle se reconnaît à son nom, qui est alors
+// la description de la chasse et non celui du Poring.
+constexpr std::uint32_t kGenericHuntStandInMobId = 1002;
+constexpr std::string_view kGenericHuntStandInName = "Poring";
+
+// Le monstre d'une chasse, NUL POUR UNE CHASSE GÉNÉRIQUE, comme les totaux
+// (0x08FE) le disent : l'interface n'y propose pas la fiche d'un monstre.
+[[nodiscard]] std::uint32_t HuntMobId(std::uint32_t wire_mob_id, std::string_view wire_mob_name) {
+  if (wire_mob_id == kGenericHuntStandInMobId && wire_mob_name != kGenericHuntStandInName) {
+    return 0;
+  }
+  return wire_mob_id;
+}
+
 [[nodiscard]] sim::QuestRecord QuestOf(const proto::QuestEntry& entry) {
   sim::QuestRecord quest{.quest_id = entry.quest_id,
                          .active = entry.active,
@@ -22,7 +39,7 @@ namespace {
   for (const proto::QuestHuntEntry& hunt : entry.hunts) {
     quest.hunts.push_back(sim::QuestHunt{.hunt_id = hunt.hunt_id,
                                          .mob_type = hunt.mob_type,
-                                         .mob_id = hunt.mob_id,
+                                         .mob_id = HuntMobId(hunt.mob_id, hunt.mob_name),
                                          .level_min = hunt.level_min,
                                          .level_max = hunt.level_max,
                                          .killed = hunt.killed,
@@ -39,7 +56,7 @@ namespace {
   for (const proto::QuestAddedHunt& hunt : added.hunts) {
     quest.hunts.push_back(sim::QuestHunt{.hunt_id = hunt.hunt_id,
                                          .mob_type = hunt.mob_type,
-                                         .mob_id = hunt.mob_id,
+                                         .mob_id = HuntMobId(hunt.mob_id, hunt.mob_name),
                                          .level_min = hunt.level_min,
                                          .level_max = hunt.level_max,
                                          .killed = hunt.killed,

@@ -15915,3 +15915,21 @@ tr: Comisión : 1 u. = %s Zeny
 
 fr: Zeny actuels : %s Z
 tr: Zeny actual : %s Z
+
+fr: race {}
+tr: raza {}
+
+fr: taille {}
+tr: tamaño {}
+
+fr: élément {}
+tr: elemento {}
+
+fr: sur {}
+tr: en {}
+
+fr: Monstres : {}
+tr: Monstruos: {}
+
+fr: Monstres de toute sorte
+tr: Monstruos de cualquier tipo

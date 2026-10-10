@@ -278,10 +278,26 @@ bool RenameInCharacter(CompanionCharacter& character, std::uint16_t job, std::st
 
 // LE TEXTE, sans I/O : c'est ce que les essais éprouvent.
 [[nodiscard]] CompanionAiFileRead ParseCompanionAi(std::string_view text);
+// UN RENOMMAGE ENREGISTRÉ SOUS UN AUTRE NOM : un autre client avait écrit,
+// entre-temps, un profil sous le nom voulu.
+struct CompanionRenameShift {
+  std::uint16_t job = 0;
+  std::string wanted;
+  std::string written;
+};
+
 // Le texte courant avec ces modifications fusionnées ; rien quand il est
 // illisible, d'une version inconnue, ou d'une forme qu'on ne sait pas compléter.
-[[nodiscard]] std::optional<std::string> MergeCompanionAi(std::string_view current_text,
-                                                          const CompanionProfileEdits& edits);
+//
+// 🔴 LA FUSION N'ÉCRIT JAMAIS UN SECOND PROFIL D'UN NOM DÉJÀ PRIS dans le type :
+// la lecture ne garderait que le premier. Le profil qu'un autre client a écrit
+// n'est pas renommé, parce que ce client le désigne encore sous ce nom et y
+// portera ses propres modifications. Un renommage vers un nom qu'il occupe
+// s'enregistre donc sous un nom libre, « Y (2) » ; les modifications et les
+// fiches de cette session le suivent, et `shifts` le dit.
+[[nodiscard]] std::optional<std::string> MergeCompanionAi(
+    std::string_view current_text, const CompanionProfileEdits& edits,
+    std::vector<CompanionRenameShift>* shifts = nullptr);
 // Un fichier neuf qui porte ces profils et ces fiches.
 [[nodiscard]] std::string FormatCompanionAi(const CompanionProfiles& profiles);
 

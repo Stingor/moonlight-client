@@ -80,23 +80,26 @@ ProfileRefusal NameRefusal(const CompanionProfiles& profiles, std::uint16_t job,
   return ProfileRefusal::kNone;
 }
 
-std::string FreeProfileName(const CompanionProfiles& profiles, std::uint16_t job,
-                            std::string_view wanted) {
+std::string SuffixedProfileName(std::string_view wanted, std::size_t rank) {
   const std::string base = CutTo(TrimmedProfileName(wanted), kProfileNameMostBytes);
-  if (NameRefusal(profiles, job, base) == ProfileRefusal::kNone) {
+  if (rank == 0) {
     return base;
   }
+  const std::string tail = " (" + std::to_string(kFirstSuffix + rank - 1) + ")";
+  return CutTo(base, kProfileNameMostBytes - tail.size()) + tail;
+}
+
+std::string FreeProfileName(const CompanionProfiles& profiles, std::uint16_t job,
+                            std::string_view wanted) {
   // Un type tient au plus `kCompanionProfileMost` profils : un suffixe de plus
   // trouve toujours une place.
-  const int last_suffix = kFirstSuffix + static_cast<int>(kCompanionProfileMost);
-  for (int suffix = kFirstSuffix; suffix <= last_suffix; ++suffix) {
-    const std::string tail = " (" + std::to_string(suffix) + ")";
-    const std::string name = CutTo(base, kProfileNameMostBytes - tail.size()) + tail;
+  for (std::size_t rank = 0; rank <= kCompanionProfileMost + 1; ++rank) {
+    const std::string name = SuffixedProfileName(wanted, rank);
     if (NameRefusal(profiles, job, name) == ProfileRefusal::kNone) {
       return name;
     }
   }
-  return base;
+  return SuffixedProfileName(wanted, 0);
 }
 
 std::vector<std::size_t> RulesMissingSkill(std::span<const ro::sim::CompanionRule> rules,

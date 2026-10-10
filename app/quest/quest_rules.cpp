@@ -8,15 +8,137 @@
 #include <cstdio>
 #include <ctime>
 #include <limits>
+#include <optional>
 
 #include "ro/core/decimal_text.h"
 #include "ro/core/i18n.h"
+#include "ro/vfs/item_words.h"
+#include "ro/vfs/monster_words.h"
 
 namespace moonclient {
 namespace {
 
 using ro::sim::QuestHunt;
 using ro::sim::QuestRecord;
+
+// ── LA DESCRIPTION D'UNE CHASSE GÉNÉRIQUE ───────────────────────────────────
+//
+// Le serveur la compose en anglais, critères dans cet ordre et séparés par
+// « , » : la carte, la race, la taille, l'élément — chacun absent quand il les
+// prend tous. Elle tient dans le champ de nom d'un monstre, qui la tronque.
+
+constexpr std::string_view kHuntCriterionSeparator = ", ";
+
+// Rangés comme les constantes du serveur : le rang est la valeur.
+constexpr std::array<std::string_view, ro::vfs::kMonsterRaceCount> kServerRaceWords = {
+    "Formless", "Undead", "Brute",     "Plant", "Insect",
+    "Fish",     "Demon",  "Demihuman", "Angel", "Dragon"};
+constexpr std::array<std::string_view, ro::vfs::kMonsterSizeCount> kServerSizeWords = {
+    "Small", "Medium", "Large"};
+constexpr std::array<std::string_view, ro::vfs::kMonsterElementCount> kServerElementWords = {
+    "Neutral Element", "Water Element", "Earth Element",  "Fire Element",  "Wind Element",
+    "Poison Element",  "Holy Element",  "Shadow Element", "Ghost Element", "Undead Element"};
+
+struct GenericHuntCriteria {
+  std::string_view map_name;
+  std::optional<std::size_t> race;
+  std::optional<std::size_t> size;
+  std::optional<std::size_t> element;
+};
+
+// Le rang du mot `said` dans `words` ; `truncated` admet un début de mot, pour
+// le dernier critère que le champ a coupé.
+template <std::size_t kCount>
+[[nodiscard]] std::optional<std::size_t> WordRank(const std::array<std::string_view, kCount>& words,
+                                                  std::string_view said, bool truncated) {
+  for (std::size_t rank = 0; rank < kCount; ++rank) {
+    if (words[rank] == said || (truncated && !said.empty() && words[rank].starts_with(said))) {
+      return rank;
+    }
+  }
+  return std::nullopt;
+}
+
+// Rien si un critère n'est pas reconnu, ou n'est pas à sa place.
+[[nodiscard]] std::optional<GenericHuntCriteria> ParseGenericHunt(std::string_view described) {
+  // Une coupure peut laisser la moitié d'un séparateur.
+  while (!described.empty() && (described.back() == ',' || described.back() == ' ')) {
+    described.remove_suffix(1);
+  }
+  GenericHuntCriteria criteria;
+  // Les étapes, dans l'ordre du serveur : chaque critère vient après le précédent.
+  enum class Step : std::uint8_t { kMap, kRace, kSize, kElement, kDone };
+  Step next = Step::kMap;
+  while (!described.empty()) {
+    const std::size_t cut = described.find(kHuntCriterionSeparator);
+    const std::string_view said = described.substr(0, cut);
+    described = cut == std::string_view::npos
+                    ? std::string_view()
+                    : described.substr(cut + kHuntCriterionSeparator.size());
+    const bool last = described.empty();
+    if (next <= Step::kRace) {
+      if (const auto race = WordRank(kServerRaceWords, said, last)) {
+        criteria.race = race;
+        next = Step::kSize;
+        continue;
+      }
+    }
+    if (next <= Step::kSize) {
+      if (const auto size = WordRank(kServerSizeWords, said, last)) {
+        criteria.size = size;
+        next = Step::kElement;
+        continue;
+      }
+    }
+    if (next <= Step::kElement) {
+      if (const auto element = WordRank(kServerElementWords, said, last)) {
+        criteria.element = element;
+        next = Step::kDone;
+        continue;
+      }
+    }
+    if (next != Step::kMap || said.empty()) {
+      return std::nullopt;
+    }
+    criteria.map_name = said;
+    next = Step::kRace;
+  }
+  return criteria;
+}
+
+// « Monstres : race Bête, taille Petite, sur prt_fild08 », dans la langue
+// courante ; la description du serveur telle quelle si elle ne se lit pas.
+[[nodiscard]] std::string GenericHuntName(std::string_view described) {
+  const std::optional<GenericHuntCriteria> criteria = ParseGenericHunt(described);
+  if (!criteria) {
+    return std::string(described);
+  }
+  ro::vfs::MonsterWords words;
+  ro::vfs::FillMonsterWords(words);
+  std::string said;
+  const auto add = [&said](std::string_view pattern, std::string_view value) {
+    if (!said.empty()) {
+      said += kHuntCriterionSeparator;
+    }
+    said += QuestFill(pattern, {value});
+  };
+  if (criteria->race) {
+    add(ro::core::Tr("race {}"), words.race[*criteria->race]);
+  }
+  if (criteria->size) {
+    add(ro::core::Tr("taille {}"), words.size[*criteria->size]);
+  }
+  if (criteria->element) {
+    add(ro::core::Tr("élément {}"), words.element[*criteria->element]);
+  }
+  if (!criteria->map_name.empty()) {
+    add(ro::core::Tr("sur {}"), criteria->map_name);
+  }
+  if (said.empty()) {
+    return ro::core::Tr("Monstres de toute sorte");
+  }
+  return QuestFill(ro::core::Tr("Monstres : {}"), {said});
+}
 
 constexpr std::int64_t kSecondsPerMinute = 60;
 constexpr std::int64_t kSecondsPerHour = 3600;
@@ -106,8 +228,12 @@ std::string QuestFill(std::string_view pattern, std::initializer_list<std::strin
   return out;
 }
 
+std::string HuntTargetName(const QuestHunt& hunt) {
+  return hunt.mob_id == 0 ? GenericHuntName(hunt.mob_name) : hunt.mob_name;
+}
+
 std::string HuntLabel(const QuestHunt& hunt) {
-  std::string label = hunt.mob_name;
+  std::string label = HuntTargetName(hunt);
   const bool has_min = hunt.level_min > 0;
   const bool has_max = hunt.level_max > 0;
   if (has_min && has_max && hunt.level_min != hunt.level_max) {
@@ -242,7 +368,7 @@ bool QuestMatches(const QuestRecord& quest, const QuestInfo* info, std::string_v
     }
   }
   return std::ranges::any_of(quest.hunts, [needle](const QuestHunt& hunt) {
-    return QuestTextContains(hunt.mob_name, needle);
+    return QuestTextContains(HuntTargetName(hunt), needle);
   });
 }
 

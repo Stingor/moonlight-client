@@ -8,13 +8,17 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <map>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>
 
 #include "game/companion_ai_file.h"
+#include "game/companion_ai_profiles.h"
 #include "game/companion_ai_yaml.h"
 
 namespace moonclient {
@@ -174,75 +178,188 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
   out << YAML::EndMap;
 }
 
-// LES PROFILS D'UN TYPE : renommages et retraits joués dans l'ordre, puis
-// chaque profil modifié à sa place, sous son nom d'arrivée ; les profils neufs
-// à la fin.
-[[nodiscard]] bool EmitProfiles(YAML::Emitter& out, const YAML::Node& profiles, std::uint16_t job,
-                                const TypeEdits& edits) {
-  struct Entry {
-    YAML::Node node;
-    std::optional<std::string> name;
-    bool renamed = false;
-    bool removed = false;
-  };
-  std::vector<Entry> entries;
+// ── LE PLAN D'UN TYPE : quel profil du fichier devient quoi ────────────────
+
+// UN PROFIL DU FICHIER, suivi à travers les renommages et les retraits.
+struct PlannedProfile {
+  YAML::Node node;
+  // Son nom dans le fichier écrit.
+  std::optional<std::string> name;
+  // Le nom sous lequel cette session le désigne ; vide pour un profil qu'elle ne
+  // connaît pas — écrit par un autre client sous un nom qu'elle a donné à l'un
+  // des siens, ou doublon que la lecture ignorait.
+  std::optional<std::string> session_name;
+  bool renamed = false;
+  bool removed = false;
+};
+
+struct TypePlan {
+  std::vector<PlannedProfile> profiles;
+  // LES OPÉRATIONS TELLES QU'ELLES TOMBENT SUR LE FICHIER, dans l'ordre : ce
+  // qu'il faut jouer sur les fiches qu'il porte.
+  std::vector<ProfileOp> file_ops;
+};
+
+// Un nom pris : par un profil du fichier qui reste, ou par un nom que cette
+// session emploie — modifié, créé, renommé, ou choisi par une fiche.
+[[nodiscard]] bool NameTaken(const TypePlan& plan, std::uint16_t job, const TypeEdits& edits,
+                             const CompanionProfileEdits& all_edits, const std::string& name) {
+  const bool on_file = std::ranges::any_of(plan.profiles, [&name](const PlannedProfile& one) {
+    return !one.removed && one.name == name;
+  });
+  const bool by_ops = std::ranges::any_of(
+      edits.ops, [&name](const ProfileOp& op) { return op.name == name || op.to == name; });
+  const bool by_character =
+      std::ranges::any_of(all_edits.characters, [job, &name](const CompanionCharacter& character) {
+        const auto chosen = character.active.find(job);
+        return chosen != character.active.end() &&
+               std::ranges::find(chosen->second, std::optional(name)) != chosen->second.end();
+      });
+  return on_file || by_ops || by_character || edits.profiles.contains(name) ||
+         std::ranges::find(edits.created, name) != edits.created.end();
+}
+
+// Le premier nom libre tiré de `wanted`, suffixé. Chaque nom pris n'écarte
+// qu'un candidat : un de plus que leur nombre en trouve toujours un.
+[[nodiscard]] std::string FreeNameOnFile(const TypePlan& plan, std::uint16_t job,
+                                         const TypeEdits& edits,
+                                         const CompanionProfileEdits& all_edits,
+                                         const std::string& wanted) {
+  const std::size_t most_taken = plan.profiles.size() + (2 * edits.ops.size()) +
+                                 edits.profiles.size() + edits.created.size() +
+                                 (all_edits.characters.size() * ro::sim::kCompanionAiContextCount);
+  for (std::size_t rank = 1; rank <= most_taken + 1; ++rank) {
+    std::string name = SuffixedProfileName(wanted, rank);
+    if (!NameTaken(plan, job, edits, all_edits, name)) {
+      return name;
+    }
+  }
+  return wanted;
+}
+
+// RENOMMAGES ET RETRAITS JOUÉS DANS L'ORDRE sur les profils du fichier, chacun
+// sur le profil que la session désigne par ce nom.
+[[nodiscard]] TypePlan PlanProfiles(const YAML::Node& profiles, std::uint16_t job,
+                                    const TypeEdits& edits, const CompanionProfileEdits& all_edits,
+                                    std::vector<CompanionRenameShift>* shifts) {
+  TypePlan plan;
   if (profiles && profiles.IsSequence()) {
     for (const YAML::Node& profile : profiles) {
-      Entry entry{.node = profile};
+      PlannedProfile entry{.node = profile};
       if (profile.IsMap() && profile[kNameField] && profile[kNameField].IsScalar()) {
         entry.name = profile[kNameField].Scalar();
+        // D'un doublon déjà écrit, la lecture n'a gardé que le premier.
+        const bool seen = std::ranges::any_of(
+            plan.profiles, [&entry](const PlannedProfile& one) { return one.name == entry.name; });
+        if (!seen) {
+          entry.session_name = entry.name;
+        }
       }
-      entries.push_back(std::move(entry));
+      plan.profiles.push_back(std::move(entry));
     }
   }
   for (const ProfileOp& op : edits.ops) {
-    const auto found = std::ranges::find_if(
-        entries, [&op](const Entry& entry) { return !entry.removed && entry.name == op.name; });
-    if (found == entries.end()) {
+    const auto found = std::ranges::find_if(plan.profiles, [&op](const PlannedProfile& entry) {
+      return !entry.removed && entry.session_name == op.name;
+    });
+    if (found == plan.profiles.end()) {
+      // Sans profil au fichier, l'opération vaut encore pour ses fiches.
+      plan.file_ops.push_back(op);
       continue;
     }
     if (op.kind == ProfileOp::Kind::kDelete) {
       found->removed = true;
-    } else {
-      found->name = op.to;
+      plan.file_ops.push_back(ProfileOp{.kind = ProfileOp::Kind::kDelete, .name = *found->name});
+      continue;
+    }
+    // Le profil qu'un autre client a écrit sous ce nom, la session ne le
+    // connaît pas : le nom désigne désormais le sien.
+    for (PlannedProfile& other : plan.profiles) {
+      if (&other != &*found && other.session_name == op.to) {
+        other.session_name.reset();
+      }
+    }
+    found->session_name = op.to;
+    const bool occupied = std::ranges::any_of(plan.profiles, [&](const PlannedProfile& other) {
+      return &other != &*found && !other.removed && other.name == op.to;
+    });
+    std::string written = occupied ? FreeNameOnFile(plan, job, edits, all_edits, op.to) : op.to;
+    if (occupied && shifts != nullptr) {
+      shifts->push_back(CompanionRenameShift{.job = job, .wanted = op.to, .written = written});
+    }
+    if (written != *found->name) {
+      plan.file_ops.push_back(
+          ProfileOp{.kind = ProfileOp::Kind::kRename, .name = *found->name, .to = written});
+      found->name = std::move(written);
       found->renamed = true;
     }
   }
+  return plan;
+}
+
+// LE PROFIL DU FICHIER QUI REÇOIT LES MODIFICATIONS de `key` : celui que la
+// session désigne ainsi, sinon celui qui porte ce nom sans qu'elle le connaisse
+// (un profil créé l'emporte sur celui qu'un autre client a écrit) ; aucun pour
+// un profil neuf.
+[[nodiscard]] std::optional<std::size_t> TargetOf(const TypePlan& plan, const std::string& key) {
+  for (const bool by_session : {true, false}) {
+    for (std::size_t index = 0; index < plan.profiles.size(); ++index) {
+      const PlannedProfile& entry = plan.profiles[index];
+      if (!entry.removed && (by_session ? entry.session_name == key
+                                        : !entry.session_name.has_value() && entry.name == key)) {
+        return index;
+      }
+    }
+  }
+  return std::nullopt;
+}
+
+// LES PROFILS D'UN TYPE : chaque profil du fichier à sa place, modifié sous son
+// nom d'arrivée ou recopié ; les profils neufs à la fin.
+[[nodiscard]] bool EmitProfiles(YAML::Emitter& out, const TypePlan& plan, std::uint16_t job,
+                                const TypeEdits& edits) {
+  std::vector<std::optional<std::string>> edited_by(plan.profiles.size());
+  std::vector<std::string> fresh;
+  // Les créés dans l'ordre de leur création, puis les autres (un profil qu'un
+  // autre client a retiré entre-temps).
+  std::vector<std::string> keys;
+  for (const std::string& name : edits.created) {
+    if (edits.profiles.contains(name)) {
+      keys.push_back(name);
+    }
+  }
+  for (const auto& [name, profile_edits] : edits.profiles) {
+    if (std::ranges::find(keys, name) == keys.end()) {
+      keys.push_back(name);
+    }
+  }
+  for (const std::string& key : keys) {
+    const std::optional<std::size_t> target = TargetOf(plan, key);
+    if (!target.has_value()) {
+      fresh.push_back(key);
+    } else if (!edited_by[*target].has_value()) {
+      edited_by[*target] = key;
+    }
+  }
   out << YAML::BeginSeq;
-  std::vector<std::string> placed;
-  for (const Entry& entry : entries) {
+  for (std::size_t index = 0; index < plan.profiles.size(); ++index) {
+    const PlannedProfile& entry = plan.profiles[index];
     if (entry.removed) {
       continue;
     }
-    const auto edited =
-        entry.name.has_value() ? edits.profiles.find(*entry.name) : edits.profiles.end();
-    if (edited != edits.profiles.end() && std::ranges::find(placed, *entry.name) == placed.end()) {
-      if (!EmitProfileEntry(out, entry.node, edited->second, job, *entry.name)) {
+    if (edited_by[index].has_value()) {
+      if (!EmitProfileEntry(out, entry.node, edits.profiles.at(*edited_by[index]), job,
+                            *entry.name)) {
         return false;
       }
-      placed.push_back(*entry.name);
     } else if (entry.renamed) {
       EmitRenamed(out, entry.node, *entry.name);
     } else {
       out << entry.node;
     }
   }
-  // LES PROFILS NEUFS : les créés dans l'ordre de leur création, puis les
-  // autres (un profil qu'un autre client a retiré entre-temps).
-  std::vector<std::string> fresh;
-  for (const std::string& name : edits.created) {
-    if (edits.profiles.contains(name)) {
-      fresh.push_back(name);
-    }
-  }
-  for (const auto& [name, profile_edits] : edits.profiles) {
-    if (std::ranges::find(fresh, name) == fresh.end()) {
-      fresh.push_back(name);
-    }
-  }
   for (const std::string& name : fresh) {
-    if (std::ranges::find(placed, name) == placed.end() &&
-        !EmitProfileEntry(out, YAML::Node(YAML::NodeType::Map), edits.profiles.at(name), job,
+    if (!EmitProfileEntry(out, YAML::Node(YAML::NodeType::Map), edits.profiles.at(name), job,
                           name)) {
       return false;
     }
@@ -252,7 +369,7 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
 }
 
 [[nodiscard]] bool EmitType(YAML::Emitter& out, const YAML::Node& type, std::uint16_t job,
-                            const TypeEdits& edits) {
+                            const TypeEdits& edits, const TypePlan& plan) {
   if (!UsableSequence(type[kProfilesField])) {
     return false;
   }
@@ -262,7 +379,7 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
     class_written = class_written || IsField(field.first, kClassField);
     out << YAML::Key << field.first << YAML::Value;
     if (IsField(field.first, kProfilesField)) {
-      if (!EmitProfiles(out, field.second, job, edits)) {
+      if (!EmitProfiles(out, plan, job, edits)) {
         return false;
       }
     } else {
@@ -274,7 +391,7 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
   }
   if (!type[kProfilesField]) {
     out << YAML::Key << kProfilesField << YAML::Value;
-    if (!EmitProfiles(out, YAML::Node(), job, edits)) {
+    if (!EmitProfiles(out, plan, job, edits)) {
       return false;
     }
   }
@@ -282,8 +399,53 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
   return true;
 }
 
+using TypePlans = std::map<std::uint16_t, TypePlan>;
+
+// LE TYPE DE CETTE CLASSE QUE LA FUSION RÉÉCRIT : le premier du fichier.
+[[nodiscard]] YAML::Node EditedTypeOf(const YAML::Node& types, std::uint16_t job) {
+  if (types && types.IsSequence()) {
+    for (const YAML::Node& type : types) {
+      if (type.IsMap() && NumberOf<std::uint16_t>(type[kClassField]) == job) {
+        return type;
+      }
+    }
+  }
+  return YAML::Node(YAML::NodeType::Map);
+}
+
+[[nodiscard]] TypePlans PlanTypes(const YAML::Node& types, const CompanionProfileEdits& edits,
+                                  std::vector<CompanionRenameShift>* shifts) {
+  TypePlans plans;
+  for (const auto& [job, type_edits] : edits.by_job) {
+    plans.emplace(job, PlanProfiles(EditedTypeOf(types, job)[kProfilesField], job, type_edits,
+                                    edits, shifts));
+  }
+  return plans;
+}
+
+// CE QUE LES FICHES RÉÉCRIVENT : les opérations telles qu'elles tombent sur le
+// fichier, et les fiches de la session, dont le choix suit un profil
+// enregistré sous un autre nom que le sien.
+[[nodiscard]] CompanionProfileEdits CharacterEditsOf(const CompanionProfileEdits& edits,
+                                                     const TypePlans& plans) {
+  CompanionProfileEdits for_characters;
+  for_characters.characters = edits.characters;
+  for (const auto& [job, plan] : plans) {
+    for_characters.by_job[job].ops = plan.file_ops;
+    for (const PlannedProfile& entry : plan.profiles) {
+      if (entry.removed || !entry.session_name.has_value() || entry.session_name == entry.name) {
+        continue;
+      }
+      for (CompanionCharacter& character : for_characters.characters) {
+        RenameInCharacter(character, job, *entry.session_name, *entry.name);
+      }
+    }
+  }
+  return for_characters;
+}
+
 [[nodiscard]] bool EmitTypes(YAML::Emitter& out, const YAML::Node& types,
-                             const CompanionProfileEdits& edits) {
+                             const CompanionProfileEdits& edits, const TypePlans& plans) {
   out << YAML::BeginSeq;
   std::vector<std::uint16_t> done;
   if (types && types.IsSequence()) {
@@ -295,7 +457,7 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
         out << type;
         continue;
       }
-      if (!EmitType(out, type, *job, edited->second)) {
+      if (!EmitType(out, type, *job, edited->second, plans.at(*job))) {
         return false;
       }
       done.push_back(*job);
@@ -305,7 +467,7 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
     // Un type neuf dont rien ne reste à écrire — un profil créé puis retiré —
     // ne s'ajoute pas.
     if (std::ranges::find(done, job) == done.end() && !type_edits.profiles.empty() &&
-        !EmitType(out, YAML::Node(YAML::NodeType::Map), job, type_edits)) {
+        !EmitType(out, YAML::Node(YAML::NodeType::Map), job, type_edits, plans.at(job))) {
       return false;
     }
   }
@@ -316,7 +478,8 @@ void EmitRenamed(YAML::Emitter& out, const YAML::Node& profile, const std::strin
 }  // namespace
 
 std::optional<std::string> MergeCompanionAi(std::string_view current_text,
-                                            const CompanionProfileEdits& edits) {
+                                            const CompanionProfileEdits& edits,
+                                            std::vector<CompanionRenameShift>* shifts) {
   YAML::Node whole;
   try {
     whole = YAML::Load(std::string(current_text));
@@ -331,33 +494,41 @@ std::optional<std::string> MergeCompanionAi(std::string_view current_text,
       !UsableSequence(whole[kTypesField]) || !UsableSequence(whole[kCharactersField])) {
     return std::nullopt;
   }
+  // LES TYPES ET LES FICHES SUIVENT LE MÊME PLAN, quel que soit l'ordre de
+  // leurs sections dans le fichier.
+  std::vector<CompanionRenameShift> planned_shifts;
+  const TypePlans plans = PlanTypes(whole[kTypesField], edits, &planned_shifts);
+  const CompanionProfileEdits for_characters = CharacterEditsOf(edits, plans);
   YAML::Emitter out;
   out << YAML::BeginMap;
   for (const auto& field : whole) {
     out << YAML::Key << field.first << YAML::Value;
     if (IsField(field.first, kTypesField)) {
-      if (!EmitTypes(out, field.second, edits)) {
+      if (!EmitTypes(out, field.second, edits, plans)) {
         return std::nullopt;
       }
     } else if (IsField(field.first, kCharactersField)) {
-      EmitCharacters(out, field.second, edits);
+      EmitCharacters(out, field.second, for_characters);
     } else {
       out << field.second;
     }
   }
   if (!whole[kTypesField]) {
     out << YAML::Key << kTypesField << YAML::Value;
-    if (!EmitTypes(out, YAML::Node(), edits)) {
+    if (!EmitTypes(out, YAML::Node(), edits, plans)) {
       return std::nullopt;
     }
   }
-  if (!whole[kCharactersField] && !edits.characters.empty()) {
+  if (!whole[kCharactersField] && !for_characters.characters.empty()) {
     out << YAML::Key << kCharactersField << YAML::Value;
-    EmitCharacters(out, YAML::Node(), edits);
+    EmitCharacters(out, YAML::Node(), for_characters);
   }
   out << YAML::EndMap;
   if (!out.good()) {
     return std::nullopt;
+  }
+  if (shifts != nullptr) {
+    *shifts = std::move(planned_shifts);
   }
   return std::string(kFileHeader) + out.c_str() + "\n";
 }
