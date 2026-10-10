@@ -14,6 +14,7 @@ add_library(ro_vfs STATIC
     src/achievement_words.cpp
     src/battle_words.cpp
     src/card_illustrations.cpp
+    src/card_item_list.cpp
     src/cash_shop_words.cpp
     src/chat_room_words.cpp
     src/craft_words.cpp

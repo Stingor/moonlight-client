@@ -421,7 +421,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                     &pieces_.item_words);
   pieces_.trade.SeeCommands(&pieces_.commands.settings());
   pieces_.trade.deal().SeeApproachClock(&grimoire_.approach_clock());
-  pieces_.trade.store_search().SeeCards(&pieces_.card_illustrations);
+  pieces_.trade.store_search().SeeCards(
+      {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});
   pieces_.trade.vending().SeeSaveRoot(client_root_);
   pieces_.trade.StartSession();
   windows_.trade = TradeWindows{};

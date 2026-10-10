@@ -27,6 +27,7 @@
 #include "ro/render/sleep_bubbles.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/vfs/card_illustrations.h"
+#include "ro/vfs/card_item_list.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/job_names.h"
 #include "ro/vfs/lua_chain.h"
@@ -319,10 +320,17 @@ void LoadItemWords(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.item_words_language = static_cast<std::size_t>(-1);
 }
 
-// LES ILLUSTRATIONS DE CARTES. Une carte ne se reconnaît pas à sa ressource —
-// elles la partagent toutes — mais à sa présence dans cette table, qui nomme
-// aussi son dessin. Absente, les cartes gardent le dos de carte générique.
+// LES TABLES DE CARTES. Une carte ne se reconnaît pas à sa ressource — elles
+// la partagent toutes — mais à sa présence dans la table des illustrations, qui
+// nomme aussi son dessin, ou dans la liste des cartes. Absente, la première
+// laisse aux cartes le dos de carte générique ; la seconde, sa recherche par
+// illustration ou par mot.
 void LoadCardIllustrations(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  if (auto listed = ro::vfs::ReadCardItemList(vfs); listed) {
+    pieces.card_items = std::move(*listed);
+  } else {
+    ro::core::LogWarning("liste des cartes : {}", ro::core::Describe(listed.error()));
+  }
   auto cards = ro::vfs::ReadCardIllustrations(vfs);
   if (!cards) {
     ro::core::LogWarning("illustrations de cartes : {} — les cards garderont le dos générique",

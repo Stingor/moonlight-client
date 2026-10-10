@@ -14,9 +14,9 @@
 #include "ro/sim/store_search.h"
 #include "ro/ui/store_search_window.h"
 #include "ro/ui/trade_widgets.h"
-#include "ro/vfs/card_illustrations.h"
 
 #include "game/npc_shop_stage.h"
+#include "game/store_search_catalogue.h"
 #include "game/trade_items.h"
 
 namespace moonclient {
@@ -37,11 +37,9 @@ class StoreSearchStage {
   [[nodiscard]] ro::sim::StoreSearch& search() noexcept { return search_; }
   [[nodiscard]] const ro::sim::StoreSearch& search() const noexcept { return search_; }
 
-  // Les illustrations de cartes, qui disent quels objets sont des cartes.
-  // Facultatives. ⚠ LEUR ADRESSE NE BOUGE PAS d'une partie à l'autre.
-  void SeeCards(const ro::vfs::CardIllustrations* illustrations) noexcept {
-    card_illustrations_ = illustrations;
-  }
+  // Les tables qui disent quels objets sont des cartes. Facultatives.
+  // ⚠ LEUR ADRESSE NE BOUGE PAS d'une partie à l'autre.
+  void SeeCards(const StoreSearchCardTables& cards) noexcept { cards_ = cards; }
 
   // Une partie commence : rien de la précédente ne survit.
   void StartSession();
@@ -70,7 +68,7 @@ class StoreSearchStage {
       const ro::ui::StoreSearchWindowState& state, int row) const;
 
   ro::sim::StoreSearch search_;
-  const ro::vfs::CardIllustrations* card_illustrations_ = nullptr;
+  StoreSearchCardTables cards_;
   TradeItemFocus hovered_;
   std::optional<TradeItemFocus> described_;
 

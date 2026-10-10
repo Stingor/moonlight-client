@@ -28,6 +28,7 @@
 #include "ro/vfs/achievement_titles.h"
 #include "ro/vfs/books.h"
 #include "ro/vfs/card_illustrations.h"
+#include "ro/vfs/card_item_list.h"
 #include "ro/vfs/item_stacking.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/job_names.h"
@@ -351,6 +352,9 @@ struct GamePieces {
   // LE NOM DE FICHIER DE L'ILLUSTRATION DE CHAQUE CARTE. ⚠ AVANT LES ICÔNES,
   // qui la DÉSIGNENT : l'ordre de déclaration décide de l'ordre de destruction.
   ro::vfs::CardIllustrations card_illustrations;
+  // LES CARTES QUE NOMME LA LISTE DE L'INSTALLATION, avec ou sans dessin ni mot.
+  // La recherche d'échoppes la désigne.
+  ro::vfs::CardItemList card_items;
 
   // ⚠ APRÈS LA GARDE-ROBE, et ce n'est pas un détail de rangement : ces
   // icônes DÉSIGNENT la table des objets, qui vit dans le catalogue que la

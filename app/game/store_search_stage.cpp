@@ -2,16 +2,15 @@
 
 #include "game/store_search_stage.h"
 
-#include <algorithm>
 #include <string_view>
 #include <utility>
 
 #include "ro/core/log.h"
 #include "ro/net/store_search.h"
-#include "ro/vfs/card_illustrations.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/trade_words.h"
 
+#include "game/store_search_catalogue.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -63,33 +62,6 @@ std::optional<TradeWord> NoticeWordOf(std::uint8_t reason) {
     default:
       return std::nullopt;
   }
-}
-
-// LA TABLE DES OBJETS, telle que la recherche la parcourt : triée par
-// identifiant, comme celle du client d'origine. ⚠ LES VUES POINTENT DANS LA
-// TABLE ET DANS LES MOTS : elle ne survit pas à l'appel qui l'a demandée.
-//
-// UNE CARTE est un objet qui a une illustration OU un mot de carte : le client
-// d'origine range dans sa table des cartes ces deux fichiers-là, plus une
-// liste de noms que nous ne lisons pas.
-std::vector<ro::sim::StoreSearchCatalogueEntry> CatalogueOf(
-    const ro::vfs::ItemTable& table, const ro::vfs::ItemWords& words,
-    const ro::vfs::CardIllustrations* illustrations) {
-  std::vector<ro::sim::StoreSearchCatalogueEntry> catalogue;
-  catalogue.reserve(table.size());
-  for (const auto& [item_id, entry] : table.entries()) {
-    ro::sim::StoreSearchCatalogueEntry line{.item_id = item_id, .name = entry.name};
-    if (const ro::vfs::CardWord* card = words.FindCard(item_id); card != nullptr) {
-      line.card = true;
-      line.card_word = card->text;
-    }
-    if (illustrations != nullptr && !illustrations->Find(item_id).empty()) {
-      line.card = true;
-    }
-    catalogue.push_back(line);
-  }
-  std::ranges::sort(catalogue, {}, &ro::sim::StoreSearchCatalogueEntry::item_id);
-  return catalogue;
 }
 
 std::string_view ShownShopName(std::string_view name) {
@@ -210,7 +182,7 @@ void StoreSearchStage::Search(const ro::ui::StoreSearchWindowState& state,
                               const TradeContext& context) {
   std::vector<ro::sim::StoreSearchCatalogueEntry> catalogue;
   if (const ro::vfs::ItemTable* table = context.items.table(); table != nullptr) {
-    catalogue = CatalogueOf(*table, context.words, card_illustrations_);
+    catalogue = StoreSearchCatalogueOf(*table, context.words, cards_);
   }
   const ro::sim::StoreSearchForm form{.kind = state.kind == ro::ui::kStoreSearchSellKind
                                                   ? ro::sim::StoreSearchKind::kVending
