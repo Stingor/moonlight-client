@@ -65,6 +65,18 @@ void LoadPackageItems(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.package_items = std::move(*items);
 }
 
+// LES ITEMS QUE LE SERVEUR N'EMPILE PAS. Absente ou illisible, la table reste
+// inconnue : le staff demande un item sans que rien ne borne sa quantité.
+void LoadItemStacking(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  auto stacking = ro::vfs::ReadItemStacking(vfs);
+  if (!stacking) {
+    ro::core::LogWarning("items non empilables : {} — l'@item du staff ne sera pas borné",
+                         ro::core::Describe(stacking.error()));
+    return;
+  }
+  pieces.item_stacking = std::move(*stacking);
+}
+
 // LES LIBELLÉS DES OPTIONS ALÉATOIRES. Absents, une option s'écrit par son
 // numéro et sa valeur.
 void LoadRandomOptionNames(ro::vfs::Vfs& vfs, GamePieces& pieces) {
@@ -666,6 +678,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   OpenStatusIcons(vfs, pieces);
   LoadItemWords(vfs, pieces);
   LoadPackageItems(vfs, pieces);
+  LoadItemStacking(vfs, pieces);
   LoadRandomOptionNames(vfs, pieces);
   LoadBooks(vfs, pieces);
   // ⚠ APRÈS LES MOTS ET LA GARDE-ROBE : il les DÉSIGNE tous les deux.

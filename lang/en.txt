@@ -15867,3 +15867,18 @@ tr: /in (character name): allows whispering from the character again
 
 fr: Ce nom ne peut pas partir tel quel : il est trop long, ou porte un caractère que le jeu n'écrit pas.
 tr: This name cannot be sent as is: it is too long, or carries a character the game cannot write.
+
+fr: (%d au plus)
+tr: (%d at most)
+
+fr: Cet item ne s'empile pas : chaque exemplaire prend une case, et la demande est ramenée aux %d cases libres de l'inventory.
+tr: This item does not stack: every copy takes a slot, and the request is cut down to the %d free inventory slots.
+
+fr: L'inventory est plein : cet item ne s'empile pas, chaque exemplaire prend une case.
+tr: The inventory is full: this item does not stack, every copy takes a slot.
+
+fr: L'inventory est plein : un ingrédient qui ne s'empile pas prend une case par exemplaire, et n'est pas demandé.
+tr: The inventory is full: an ingredient that does not stack takes a slot per copy, and is not requested.
+
+fr: Un ingrédient qui ne s'empile pas prend une case par exemplaire : il est ramené aux cases libres de l'inventory.
+tr: An ingredient that does not stack takes a slot per copy: it is cut down to the free inventory slots.

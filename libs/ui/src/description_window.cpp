@@ -291,13 +291,41 @@ void DrawStaffItemRow(const DescriptionView& view, const SkinArt& art, int& amou
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * kStaffAmountWidthEm);
   static_cast<void>(SkinInputInt("##staff_item_amount", &amount, 1, kStaffItemMostAmount, 1,
                                  kStaffAmountFastStep, art));
+  // 🔴 LE CHAMP GARDE SA QUANTITÉ, la demande seule est bornée : le champ est
+  // retenu d'un item à l'autre, et une armure ne doit pas réduire la quantité
+  // de la potion décrite ensuite.
+  const int granted = std::min(amount, StaffItemMostFor(view.stackable, view.free_bag_slots));
+  const StaffItemRoom room = StaffItemRoomFor(view.stackable, view.free_bag_slots, amount);
   ImGui::SameLine();
+  ImGui::BeginDisabled(granted <= 0);
   if (SkinSmallButton(core::Tr("@item"), art)) {
-    action.staff_item = StaffItemGrant{.item_id = view.item_id, .amount = amount};
+    action.staff_item = StaffItemGrant{.item_id = view.item_id, .amount = granted};
   }
-  SkinTooltip(
-      core::Tr("Envoie « @item » au serveur : l'item décrit, à cette quantité. Un "
-               "équipement ne s'empile pas : chaque exemplaire prend sa case."));
+  ImGui::EndDisabled();
+  const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+  if (room == StaffItemRoom::kBounded) {
+    ImGui::SameLine();
+    ImGui::TextDisabled(core::Tr("(%d au plus)"), granted);
+  }
+  if (!hovered) {
+    return;
+  }
+  switch (room) {
+    case StaffItemRoom::kFull:
+      SkinTooltipFormat("%s", core::Tr("L'inventory est plein : cet item ne s'empile pas, chaque "
+                                       "exemplaire prend une case."));
+      break;
+    case StaffItemRoom::kBounded:
+      SkinTooltipFormat(core::Tr("Cet item ne s'empile pas : chaque exemplaire prend une case, "
+                                 "et la demande est ramenée aux %d cases libres de l'inventory."),
+                        granted);
+      break;
+    case StaffItemRoom::kFits:
+      SkinTooltipFormat("%s", core::Tr("Envoie « @item » au serveur : l'item décrit, à cette "
+                                       "quantité. Un équipement ne s'empile pas : chaque "
+                                       "exemplaire prend sa case."));
+      break;
+  }
 }
 
 // LE CORPS D'UNE DESCRIPTION : l'illustration, le lien de la base de données, et

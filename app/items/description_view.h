@@ -79,7 +79,14 @@ class DescriptionView {
 
   // LA LIGNE « @item » DU STAFF, APRÈS `Refresh` — qui l'efface. ⚠ LA PIÈCE
   // PORTÉE d'une comparaison ne la reçoit jamais : on demande l'item décrit.
-  void NoteStaff(bool staff_tools) noexcept { view_.staff_item = staff_tools; }
+  // `stackable` et `free_bag_slots` bornent la quantité d'un item non
+  // empilable ; vides, on ne les sait pas et rien n'est borné.
+  void NoteStaff(bool staff_tools, std::optional<bool> stackable,
+                 std::optional<int> free_bag_slots) noexcept {
+    view_.staff_item = staff_tools;
+    view_.stackable = stackable;
+    view_.free_bag_slots = free_bag_slots;
+  }
 
   // LA TABLE DE TIRAGE DES CONTENEURS, pour l'onglet « Probabilités ». ⚠ LA
   // FENÊTRE SEULEMENT : l'aperçu au survol n'a pas d'onglets.

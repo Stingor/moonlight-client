@@ -1,8 +1,10 @@
 #pragma once
 
+#include <optional>
 #include <span>
 
 #include "ro/net/connection.h"
+#include "ro/sim/inventory.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/character_staff.h"
 #include "ro/ui/staff_item_grant.h"
@@ -85,5 +87,10 @@ void SendStaffWarp(const PlaceLink& place, ro::ui::SessionRights rights, ro::net
 // n'est jeté, rien n'est puni.
 void SendStaffItems(std::span<const ro::ui::StaffItemGrant> grants, ro::ui::SessionRights rights,
                     ro::net::Connection& link, const ro::sim::World& world);
+
+// LES CASES LIBRES DU SAC, qui bornent un `@item` d'item non empilable : la
+// capacité moins les cases occupées. Vide tant que le serveur n'a pas dit la
+// capacité — une capacité nulle veut dire « pas encore dite ».
+[[nodiscard]] std::optional<int> StaffFreeBagSlots(const ro::sim::Inventory& bag);
 
 }  // namespace moonclient

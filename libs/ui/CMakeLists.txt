@@ -66,6 +66,7 @@ add_library(ro_ui STATIC
     src/character_staff.cpp
     src/character_stats.cpp
     src/character_titles.cpp
+    src/craft_atlas_grants.cpp
     src/craft_atlas_window.cpp
     src/craft_window_parts.cpp
     src/make_item_window.cpp

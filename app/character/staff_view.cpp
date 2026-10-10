@@ -1,5 +1,6 @@
 #include "character/staff_view.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <string>
@@ -185,6 +186,13 @@ void SendStaffItems(std::span<const ro::ui::StaffItemGrant> grants, ro::ui::Sess
                            ro::core::Describe(sent.error()));
     }
   }
+}
+
+std::optional<int> StaffFreeBagSlots(const ro::sim::Inventory& bag) {
+  if (bag.capacity() <= 0) {
+    return std::nullopt;
+  }
+  return std::max(bag.capacity() - static_cast<int>(bag.size()), 0);
 }
 
 }  // namespace moonclient

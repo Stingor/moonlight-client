@@ -252,6 +252,16 @@ ro::ui::CraftAtlasRow CraftAtlasView::RowOf(std::uint32_t item_id) {
       .owned = Owned(item_id)};
 }
 
+void CraftAtlasView::NoteStaff(bool staff_tools, const ro::vfs::ItemStacking& stacking,
+                               std::optional<int> free_bag_slots) {
+  view_.staff_items = staff_tools;
+  view_.free_bag_slots = free_bag_slots;
+  // ⚠ EN PLACE : la recette de la fiche désigne ces lignes, elle ne les copie pas.
+  for (ro::ui::CraftAtlasRow& ingredient : ingredients_) {
+    ingredient.stackable = stacking.IsStackable(ingredient.item_id);
+  }
+}
+
 int CraftAtlasView::Owned(std::uint32_t item_id) const {
   const auto found = owned_.find(item_id);
   return found == owned_.end() ? 0 : found->second;

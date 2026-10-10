@@ -12,6 +12,7 @@
 #include "ro/sim/inventory.h"
 #include "ro/sim/skill_tree.h"
 #include "ro/ui/craft_atlas_window.h"
+#include "ro/vfs/item_stacking.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/vfs.h"
 
@@ -64,9 +65,11 @@ class CraftAtlasView {
   void NoteVoteShop(std::span<const ro::ui::VoteShopOffer> offers) noexcept {
     view_.vote_shop = offers;
   }
-  // Le droit du staff, pour la ligne « fabrications ». Même règle : après
-  // `Refresh`.
-  void NoteStaff(bool staff_tools) noexcept { view_.staff_items = staff_tools; }
+  // Le droit du staff, pour la ligne « fabrications », et ce qui borne ses
+  // demandes : l'empilement de chaque ingrédient de la fiche et les cases libres
+  // du sac — vides quand on ne les sait pas. Même règle : après `Refresh`.
+  void NoteStaff(bool staff_tools, const ro::vfs::ItemStacking& stacking,
+                 std::optional<int> free_bag_slots);
 
   // Les items dont la fenêtre a dessiné une ligne : leurs icônes se chargent.
   void NoteDrawn(std::span<const std::uint32_t> item_ids);

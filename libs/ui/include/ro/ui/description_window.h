@@ -308,6 +308,12 @@ struct DescriptionView {
   // paraît sous les boutons. Faux, elle n'existe pas. ⚠ FAUX AUSSI POUR LA
   // PIÈCE PORTÉE d'une comparaison : on demande l'item qu'on décrit.
   bool staff_item = false;
+  // L'ITEM S'EMPILE-T-IL sur le serveur ? Vide : on ne sait pas, et la
+  // quantité du staff n'est bornée que par une pile pleine.
+  std::optional<bool> stackable;
+  // Les cases libres du sac, qui bornent la demande d'un item non empilable.
+  // Vide tant que le serveur n'a pas dit la capacité du sac : rien n'est borné.
+  std::optional<int> free_bag_slots;
 
   // ── L'ONGLET « PROBABILITÉS » ─────────────────────────────────────────────
   //

@@ -148,7 +148,9 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
       item_description_->NoteVoteShopTag(label.data());
     }
     // LA LIGNE « @item », pour le staff seulement.
-    item_description_->NoteStaff(Rights().staff_tools);
+    item_description_->NoteStaff(Rights().staff_tools,
+                                 pieces_.item_stacking.IsStackable(windows_.description.item_id),
+                                 StaffFreeBagSlots(world_.inventory()));
   }
   // ⚠ L'APERÇU NE SE BÂTIT QUE S'IL SE MONTRE : sans le réglage, il n'a rien à
   // composer, et une description entière par image de survol serait payée pour

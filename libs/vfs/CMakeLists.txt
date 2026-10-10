@@ -5,6 +5,9 @@
 # tout est en UTF-8 ; en dessous, `formats` n'indexe que des octets bruts et
 # ignore qu'un encodage existe.
 
+# Les tables exportées du serveur, sous data\yaml_files\, sont du YAML.
+find_package(yaml-cpp CONFIG REQUIRED)
+
 add_library(ro_vfs STATIC
     src/achievement_catalog.cpp
     src/achievement_titles.cpp
@@ -20,6 +23,7 @@ add_library(ro_vfs STATIC
     src/npc_illustration_paths.cpp
     src/item_link.cpp
     src/item_name.cpp
+    src/item_stacking.cpp
     src/item_table.cpp
     src/item_words.cpp
     src/job_names.cpp
@@ -49,7 +53,7 @@ add_library(ro::vfs ALIAS ro_vfs)
 target_include_directories(ro_vfs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ro_vfs
     PUBLIC ro_core ro_formats
-    PRIVATE ro_warnings)
+    PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 # Sous Windows le transcodage CP949 passe par l'API Win32 ; ailleurs, par iconv,
 # qui fait partie de la libc sur glibc et demande une bibliothèque à part sinon.

@@ -88,6 +88,8 @@ struct CraftAtlasRow {
   bool kept = false;
   // USAGE : le skill de la recette où il sert, déjà nommé.
   std::string_view skill_label;
+  // INGRÉDIENT : l'item s'empile-t-il sur le serveur ? Vide : on ne sait pas.
+  std::optional<bool> stackable;
 };
 
 // Les produits d'un skill, pour l'onglet des skills.
@@ -176,6 +178,9 @@ struct CraftAtlasView {
   // paraît sous la recette. Faux, elle n'existe pas — rien n'est grisé, rien
   // n'est dit. Voir `StaffToolsAllowed`.
   bool staff_items = false;
+  // Les cases libres du sac, qui bornent les ingrédients non empilables. Vide
+  // tant que le serveur n'a pas dit la capacité du sac : rien n'est borné.
+  std::optional<int> free_bag_slots;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -243,11 +248,25 @@ enum class CraftAtlasGrantKind : std::uint8_t {
   kMissing,
 };
 
+struct CraftAtlasGrantPlan {
+  std::vector<StaffItemGrant> grants;
+  // Le pire de ce que le sac a permis : `kFull` dès qu'un ingrédient non
+  // empilable n'a plus trouvé une seule case.
+  StaffItemRoom room = StaffItemRoom::kFits;
+};
+
 // LES DEMANDES DU STAFF POUR `crafts` FABRICATIONS, dans l'ordre de la
 // recette. `crafts` est ramené à [1, `kCraftAtlasMostCrafts`], et chaque
 // quantité à `kStaffItemMostAmount`.
-[[nodiscard]] std::vector<StaffItemGrant> CraftAtlasGrants(
-    std::span<const CraftAtlasRow> ingredients, int crafts, CraftAtlasGrantKind kind);
+//
+// 🔴 LES CASES LIBRES SE PARTAGENT, dans l'ordre où le serveur reçoit les
+// commandes : un ingrédient non empilable prend une case par exemplaire, une
+// pile nouvelle d'un ingrédient empilable en prend une. Un ingrédient non
+// empilable est ramené à ce qu'il en reste, et omis s'il n'en reste aucune ; un
+// ingrédient empilable ou d'empilement inconnu n'est jamais borné.
+[[nodiscard]] CraftAtlasGrantPlan CraftAtlasGrants(std::span<const CraftAtlasRow> ingredients,
+                                                   int crafts, CraftAtlasGrantKind kind,
+                                                   std::optional<int> free_bag_slots);
 
 // ── L'APERÇU AU SURVOL D'UN LIEN DE RECETTE ─────────────────────────────────
 //

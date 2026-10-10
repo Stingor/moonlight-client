@@ -5,7 +5,6 @@
 #include <cfloat>
 #include <cstdint>
 #include <cstdio>
-#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -356,6 +355,21 @@ void DrawYield(const CraftAtlasRecipeView& recipe) {
   }
 }
 
+// La bulle d'un bouton du staff : son motif, puis ce que le sac a retranché.
+void GrantTooltip(const char* purpose, StaffItemRoom room) {
+  const char* bag = nullptr;
+  if (room == StaffItemRoom::kBounded) {
+    bag = core::Tr(
+        "Un ingrédient qui ne s'empile pas prend une case par exemplaire : il est "
+        "ramené aux cases libres de l'inventory.");
+  } else if (room == StaffItemRoom::kFull) {
+    bag = core::Tr(
+        "L'inventory est plein : un ingrédient qui ne s'empile pas prend une case par "
+        "exemplaire, et n'est pas demandé.");
+  }
+  SkinTooltipFormat("%s%s%s", purpose, bag != nullptr ? "\n\n" : "", bag != nullptr ? bag : "");
+}
+
 // LA LIGNE DU STAFF : se faire donner les ingrédients de N fabrications.
 //
 //     Staff — fabrications [-][ N ][+]
@@ -363,7 +377,8 @@ void DrawYield(const CraftAtlasRecipeView& recipe) {
 //
 // ⚠ LES BOUTONS S'ALIGNENT SOUS LE CHAMP : c'est lui qu'ils multiplient.
 void DrawStaffGrants(CraftAtlasWindowState& state, const SkinArt& art,
-                     const CraftAtlasRecipeView& recipe, CraftAtlasAnswer& answer) {
+                     const CraftAtlasRecipeView& recipe, std::optional<int> free_bag_slots,
+                     CraftAtlasAnswer& answer) {
   state.staff_crafts = std::clamp(state.staff_crafts, 1, kCraftAtlasMostCrafts);
   ImGui::Spacing();
   ImGui::AlignTextToFramePadding();
@@ -375,32 +390,35 @@ void DrawStaffGrants(CraftAtlasWindowState& state, const SkinArt& art,
                                  kCraftAtlasMostCrafts, 1, kStaffCraftsFastStep, art));
   ImGui::SetCursorPosX(field_x);
 
-  ImGui::BeginDisabled(recipe.ingredients.empty());
+  // ⚠ LES DEMANDES SE CALCULENT AVANT LES BOUTONS : un bouton qui n'enverrait
+  // rien se grise avec son motif, plutôt que de répondre au clic par un silence.
+  CraftAtlasGrantPlan all = CraftAtlasGrants(recipe.ingredients, state.staff_crafts,
+                                             CraftAtlasGrantKind::kAll, free_bag_slots);
+  ImGui::BeginDisabled(all.grants.empty());
   if (SkinSmallButton(core::Tr("Obtenir tout"), art)) {
-    answer.staff_items =
-        CraftAtlasGrants(recipe.ingredients, state.staff_crafts, CraftAtlasGrantKind::kAll);
-  }
-  ImGui::EndDisabled();
-  SkinTooltip(
-      core::Tr("Envoie « @item » pour chaque ingrédient, en quantité multipliée par le "
-               "nombre de fabrications, sans regarder l'inventory."));
-  ImGui::SameLine();
-  // ⚠ CE QUI MANQUE SE CALCULE AVANT LE BOUTON : un bouton qui n'enverrait rien
-  // se grise avec son motif, plutôt que de répondre au clic par un silence.
-  std::vector<StaffItemGrant> missing =
-      CraftAtlasGrants(recipe.ingredients, state.staff_crafts, CraftAtlasGrantKind::kMissing);
-  const bool nothing_missing = missing.empty();
-  ImGui::BeginDisabled(nothing_missing);
-  if (SkinSmallButton(core::Tr("Obtenir le manque"), art)) {
-    answer.staff_items = std::move(missing);
+    answer.staff_items = std::move(all.grants);
   }
   ImGui::EndDisabled();
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", nothing_missing
-                                ? core::Tr("Rien ne manque : l'inventory suffit pour ce nombre "
-                                           "de fabrications.")
-                                : core::Tr("N'envoie « @item » que pour ce qui manque à "
-                                           "l'inventory pour ce nombre de fabrications."));
+    GrantTooltip(core::Tr("Envoie « @item » pour chaque ingrédient, en quantité multipliée par "
+                          "le nombre de fabrications, sans regarder l'inventory."),
+                 all.room);
+  }
+  ImGui::SameLine();
+  CraftAtlasGrantPlan missing = CraftAtlasGrants(recipe.ingredients, state.staff_crafts,
+                                                 CraftAtlasGrantKind::kMissing, free_bag_slots);
+  const bool nothing_missing = missing.grants.empty() && missing.room == StaffItemRoom::kFits;
+  ImGui::BeginDisabled(missing.grants.empty());
+  if (SkinSmallButton(core::Tr("Obtenir le manque"), art)) {
+    answer.staff_items = std::move(missing.grants);
+  }
+  ImGui::EndDisabled();
+  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    GrantTooltip(nothing_missing ? core::Tr("Rien ne manque : l'inventory suffit pour ce nombre "
+                                            "de fabrications.")
+                                 : core::Tr("N'envoie « @item » que pour ce qui manque à "
+                                            "l'inventory pour ce nombre de fabrications."),
+                 missing.room);
   }
 }
 
@@ -489,7 +507,7 @@ void DrawRecipe(CraftAtlasWindowState& state, const CraftAtlasView& view, const 
             enough ? PaintingLook().good_text : PaintingLook().bad_text);
   }
   if (view.staff_items) {
-    DrawStaffGrants(state, art, recipe, answer);
+    DrawStaffGrants(state, art, recipe, view.free_bag_slots, answer);
   }
 }
 
@@ -715,37 +733,6 @@ void DrawCraftRecipePreview(const CraftRecipePreview& preview, const SkinArt& ar
   ImGui::TextColored(dim, "%s", core::Tr("Clic : ouvrir dans l'Atlas des recettes"));
   ImGui::PopTextWrapPos();
   EndSkinnedTooltip(art);
-}
-
-int CraftIngredientNeed(const CraftAtlasRow& ingredient, int crafts) noexcept {
-  // Un matériau non consommé est satisfait dès qu'on en a UN : exiger sa
-  // quantité, qui vaut zéro, le peindrait en rouge sur une recette faisable.
-  if (ingredient.kept) {
-    return 1;
-  }
-  const std::int64_t need = static_cast<std::int64_t>(ingredient.quantity) * std::max(crafts, 1);
-  return static_cast<int>(std::clamp<std::int64_t>(need, 0, std::numeric_limits<int>::max()));
-}
-
-int CraftIngredientShortfall(const CraftAtlasRow& ingredient, int crafts) noexcept {
-  return std::max(CraftIngredientNeed(ingredient, crafts) - std::max(ingredient.owned, 0), 0);
-}
-
-std::vector<StaffItemGrant> CraftAtlasGrants(std::span<const CraftAtlasRow> ingredients, int crafts,
-                                             CraftAtlasGrantKind kind) {
-  const int bounded = std::clamp(crafts, 1, kCraftAtlasMostCrafts);
-  std::vector<StaffItemGrant> grants;
-  for (const CraftAtlasRow& ingredient : ingredients) {
-    const int amount = kind == CraftAtlasGrantKind::kAll
-                           ? CraftIngredientNeed(ingredient, bounded)
-                           : CraftIngredientShortfall(ingredient, bounded);
-    if (ingredient.item_id == 0 || amount <= 0) {
-      continue;
-    }
-    grants.push_back(StaffItemGrant{.item_id = ingredient.item_id,
-                                    .amount = std::min(amount, kStaffItemMostAmount)});
-  }
-  return grants;
 }
 
 void OpenCraftAtlasOn(CraftAtlasWindowState& state, std::uint32_t item_id) {

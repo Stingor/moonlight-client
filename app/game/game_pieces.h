@@ -28,6 +28,7 @@
 #include "ro/vfs/achievement_titles.h"
 #include "ro/vfs/books.h"
 #include "ro/vfs/card_illustrations.h"
+#include "ro/vfs/item_stacking.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/job_names.h"
 #include "ro/vfs/kafra_move_maps.h"
@@ -363,6 +364,9 @@ struct GamePieces {
   // CE QUE REND CHAQUE CONTENEUR — boîtes, albums d'objets. L'album de cartes y
   // lit d'où tombe une carte.
   ro::vfs::PackageItems package_items;
+  // LES ITEMS QUE LE SERVEUR N'EMPILE PAS, qui bornent un « @item » du staff.
+  // Inconnue quand la table manque.
+  ro::vfs::ItemStacking item_stacking;
   // LES LIBELLÉS DES OPTIONS ALÉATOIRES, que la description écrit sous l'objet.
   ro::vfs::RandomOptionNames random_option_names;
   // LES ITEMS QUI SONT DES LIVRES, que « Lire » ouvre.

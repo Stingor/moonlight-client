@@ -15867,3 +15867,18 @@ tr: /in (nombre del personaje): vuelve a permitir sus susurros
 
 fr: Ce nom ne peut pas partir tel quel : il est trop long, ou porte un caractère que le jeu n'écrit pas.
 tr: Este nombre no puede enviarse tal cual: es demasiado largo o lleva un carácter que el juego no escribe.
+
+fr: (%d au plus)
+tr: (%d como máximo)
+
+fr: Cet item ne s'empile pas : chaque exemplaire prend une case, et la demande est ramenée aux %d cases libres de l'inventory.
+tr: Este item no se apila: cada ejemplar ocupa una casilla, y la petición se reduce a las %d casillas libres del inventory.
+
+fr: L'inventory est plein : cet item ne s'empile pas, chaque exemplaire prend une case.
+tr: El inventory está lleno: este item no se apila, cada ejemplar ocupa una casilla.
+
+fr: L'inventory est plein : un ingrédient qui ne s'empile pas prend une case par exemplaire, et n'est pas demandé.
+tr: El inventory está lleno: un ingrediente que no se apila ocupa una casilla por ejemplar, y no se pide.
+
+fr: Un ingrédient qui ne s'empile pas prend une case par exemplaire : il est ramené aux cases libres de l'inventory.
+tr: Un ingrediente que no se apila ocupa una casilla por ejemplar: se reduce a las casillas libres del inventory.
