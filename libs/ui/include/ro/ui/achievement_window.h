@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 
+#include "ro/ui/gauge_fill.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/tracker_panel.h"
 
@@ -371,11 +372,22 @@ struct AchievementTabHit {
 // L'abscisse de la récompense `index` parmi `count`, cadres de `frame_width`.
 [[nodiscard]] float AchievementRewardX(std::size_t index, std::size_t count, float frame_width);
 
-// La largeur du remplissage d'une jauge de largeur `width`. Rien du tout —
-// cadre compris — quand le compte dépasse le maximum. ⚠ ELLE PART DE LA
-// LARGEUR ENTIÈRE : pleine, la barre couvre le cadre droit.
-[[nodiscard]] std::optional<float> AchievementGaugeFill(float width, std::int64_t current,
+// La largeur du remplissage dans un intérieur de jauge large de
+// `interior_width` pixels d'art : le pourcentage tronqué, puis la largeur
+// tronquée au pixel. Pleine, elle vaut l'intérieur et jamais plus. Rien du
+// tout — cadre compris — quand le compte dépasse le maximum.
+[[nodiscard]] std::optional<float> AchievementGaugeFill(float interior_width, std::int64_t current,
                                                         std::int64_t maximum);
+
+// L'INTÉRIEUR d'une jauge des succès, en pixels d'art : la jauge moins ses deux
+// cadres d'un pixel. Ses coins sont droits, comme ceux de son cadre.
+[[nodiscard]] RoundedBox AchievementGaugeInterior(ImVec2 gauge_min, ImVec2 gauge_max);
+
+// LA BOÎTE REMPLIE de cet intérieur, depuis la gauche, en pixels d'art. Rien du
+// tout quand le compte dépasse le maximum.
+[[nodiscard]] std::optional<AxisBox> AchievementGaugeFillBox(const RoundedBox& interior,
+                                                             std::int64_t current,
+                                                             std::int64_t maximum);
 
 // Le pouce d'un ascenseur vertical : son haut et sa longueur, flèches comprises
 // dans la hauteur de la piste.

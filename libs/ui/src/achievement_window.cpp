@@ -494,7 +494,8 @@ float AchievementRewardX(std::size_t index, std::size_t count, float frame_width
   return first + kRewardPitch * static_cast<float>(index);
 }
 
-std::optional<float> AchievementGaugeFill(float width, std::int64_t current, std::int64_t maximum) {
+std::optional<float> AchievementGaugeFill(float interior_width, std::int64_t current,
+                                          std::int64_t maximum) {
   if (current < 0 || maximum < 0 || current > maximum) {
     return std::nullopt;
   }
@@ -506,8 +507,22 @@ std::optional<float> AchievementGaugeFill(float width, std::int64_t current, std
   if (percent <= 0.0F) {
     return 0.0F;
   }
-  const int filled = static_cast<int>(width) * static_cast<int>(percent) / kPercent;
+  const int filled = static_cast<int>(interior_width) * static_cast<int>(percent) / kPercent;
   return static_cast<float>(filled);
+}
+
+RoundedBox AchievementGaugeInterior(ImVec2 gauge_min, ImVec2 gauge_max) {
+  return GaugeInterior(gauge_min, gauge_max, /*frame_rounding=*/0.0F, paint_kit::kGaugeInsetPixels);
+}
+
+std::optional<AxisBox> AchievementGaugeFillBox(const RoundedBox& interior, std::int64_t current,
+                                               std::int64_t maximum) {
+  const std::optional<float> filled =
+      AchievementGaugeFill(interior.max.x - interior.min.x, current, maximum);
+  if (!filled.has_value()) {
+    return std::nullopt;
+  }
+  return AxisBox{interior.min, ImVec2(interior.min.x + *filled, interior.max.y)};
 }
 
 AchievementThumb AchievementScrollThumb(float track_height, int position, int range, int page,

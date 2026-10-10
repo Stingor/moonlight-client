@@ -11,6 +11,7 @@
 #include <imgui_internal.h>
 
 #include "ro/ui/achievement_window.h"
+#include "ro/ui/gauge_fill.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -242,23 +243,29 @@ class Painter {
     Text(x, y, text, size, color, bold);
   }
 
-  // LA JAUGE : deux cadres, le fond, puis le remplissage. Rien du tout quand le
+  // LA JAUGE : deux cadres, le fond, puis le remplissage, qui tient dans
+  // l'intérieur — les deux cadres déduits — à toute part. Rien du tout quand le
   // compte dépasse le maximum.
   void Gauge(float x, float y, float width, float height, std::int64_t current,
              std::int64_t maximum, const GaugeColors& colors) const {
-    const std::optional<float> fill = AchievementGaugeFill(width, current, maximum);
-    if (!fill.has_value()) {
+    const RoundedBox interior =
+        AchievementGaugeInterior(ImVec2(x, y), ImVec2(x + width, y + height));
+    const std::optional<AxisBox> filled = AchievementGaugeFillBox(interior, current, maximum);
+    if (!filled.has_value()) {
       return;
     }
     Frame(x, y, width, height, Laid(colors.outer));
     Frame(x + kGaugeFramePixels, y + kGaugeFramePixels, width - 2.0F * kGaugeFramePixels,
           height - 2.0F * kGaugeFramePixels, Laid(colors.inner));
-    Fill(x + kGaugeInsetPixels, y + kGaugeInsetPixels, width - 2.0F * kGaugeInsetPixels,
-         height - 2.0F * kGaugeInsetPixels, Laid(colors.background));
-    // ⚠ ÉCRÊTÉ À LA JAUGE, pas au fond : pleine, la barre couvre le cadre droit.
-    const float shown = std::min(*fill, width - kGaugeInsetPixels);
-    Fill(x + kGaugeInsetPixels, y + kGaugeInsetPixels, shown, height - 2.0F * kGaugeInsetPixels,
-         Laid(colors.fill));
+    Fill(interior.min.x, interior.min.y, interior.max.x - interior.min.x,
+         interior.max.y - interior.min.y, Laid(colors.background));
+    const RoundedBox shown{.min = At(interior.min.x, interior.min.y),
+                           .max = At(interior.max.x, interior.max.y),
+                           .rounding = interior.rounding};
+    FillRoundedBoxWithin(
+        *into_, shown,
+        AxisBox{.min = At(filled->min.x, filled->min.y), .max = At(filled->max.x, filled->max.y)},
+        Laid(colors.fill));
   }
 
   // UN RECTANGLE CLIQUABLE, sans dessin. Par défaut il réagit à l'APPUI, comme
