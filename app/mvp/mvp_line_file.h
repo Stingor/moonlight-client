@@ -9,9 +9,9 @@
 namespace moonclient {
 
 // LES LIGNES DÉTACHÉES DU CARNET DE CHASSE MVP, sur le disque :
-// `savedata\mvp_tracker_lines.yaml`, clés anglaises, HORS des profils — une
+// `savedata\mvp_tracker_lines.yml`, clés anglaises, HORS des profils — une
 // ligne posée à l'écran tient à ce poste, pas à un jeu de réglages.
-inline constexpr const char* kMvpLineFileName = "mvp_tracker_lines.yaml";
+inline constexpr const char* kMvpLineFileName = "mvp_tracker_lines.yml";
 
 // UNE LIGNE DÉTACHÉE : la clé STABLE (monstre, carte) — jamais le rang du
 // créneau, que le serveur refait à chaque démarrage —, et sa place à l'écran

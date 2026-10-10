@@ -22,7 +22,7 @@ namespace moonclient {
 // ⚠ CHEZ LE JOUEUR, avec les autres fichiers du client : c'est une commodité
 // de SA machine, pas un état de jeu.
 
-inline constexpr std::string_view kSeatLayoutFileName = "charselect_layout.yaml";
+inline constexpr std::string_view kSeatLayoutFileName = "charselect_layout.yml";
 // L'autre fichier relu, à la racine de l'installation.
 inline constexpr std::string_view kLegacySeatLayoutFileName = "bourgeon_charselect_layout.yaml";
 

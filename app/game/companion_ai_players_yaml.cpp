@@ -1,4 +1,4 @@
-// LES CONDUITES ENVERS LES JOUEURS D'UN PROFIL DE `companion_ai.yaml`. Voir
+// LES CONDUITES ENVERS LES JOUEURS D'UN PROFIL DE `companion_ai.yml`. Voir
 // `game/companion_ai_yaml.h`.
 
 #include <algorithm>

@@ -23,7 +23,7 @@ namespace moonclient {
 //
 // ⚠ C'EST ENTIÈREMENT CLIENT : le serveur n'en sait rien.
 
-inline constexpr std::string_view kChatRoomMemoryFileName = "salons.yaml";
+inline constexpr std::string_view kChatRoomMemoryFileName = "salons.yml";
 
 // Combien de titres le menu des derniers garde.
 inline constexpr std::size_t kChatRoomRecentTitles = 10;

@@ -16,7 +16,7 @@ namespace moonclient {
 class GameOptions;
 struct OptionTargets;
 
-// LES RÉGLAGES, vus comme une famille de profils : ceux de `settings.yaml`
+// LES RÉGLAGES, vus comme une famille de profils : ceux de `settings.yml`
 // hors de la machine. Voir `SettingsFile::MachineScope`.
 class SettingsPort final : public ProfilePort<SettingsValues> {
  public:
@@ -47,7 +47,7 @@ class SettingsPort final : public ProfilePort<SettingsValues> {
 };
 
 // LES PROFILS DE RÉGLAGES, VIVANTS. ⚠ RIEN N'EST POSÉ AU DÉMARRAGE :
-// `settings.yaml` porte déjà l'état de la dernière session ; c'est l'entrée en
+// `settings.yml` porte déjà l'état de la dernière session ; c'est l'entrée en
 // jeu qui pose le profil du personnage.
 class SettingsProfiles {
  public:

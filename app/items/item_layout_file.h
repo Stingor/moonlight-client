@@ -17,7 +17,7 @@ namespace moonclient {
 // ⚠ IL NE VOYAGE PAS AVEC LE PERSONNAGE : la table dit où le JOUEUR aime poser
 // ses objets, et il la retrouve sur chacun des siens. Un fichier par
 // personnage coûterait pour un gain que personne n'a demandé.
-inline constexpr std::string_view kItemLayoutFileName = "sac_placement.yaml";
+inline constexpr std::string_view kItemLayoutFileName = "sac_placement.yml";
 
 [[nodiscard]] std::filesystem::path ItemLayoutFilePath(const std::filesystem::path& client_root);
 

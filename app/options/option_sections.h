@@ -56,7 +56,7 @@ enum class OptionSection : std::size_t {
   // il habille toutes les fenêtres qui suivent.
   kSkin,
   // LA MINIMAP. ⚠ SOUS L'INTERFACE, en tête de ses fenêtres : c'est le premier
-  // repère qu'on pose à l'écran. Ses réglages vivent dans `navigation.yaml`,
+  // repère qu'on pose à l'écran. Ses réglages vivent dans `navigation.yml`,
   // que tient la partie — voir `MinimapPanelOptions`.
   kMinimap,
   // LES ICÔNES DU MENU. ⚠ CONTRE L'INTERFACE : c'est le premier HUD qu'on pose,

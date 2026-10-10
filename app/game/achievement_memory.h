@@ -23,7 +23,7 @@ namespace moonclient {
 // ⚠ C'EST ENTIÈREMENT CLIENT : le serveur ne sait rien du suivi, et le client
 // d'origine l'oubliait à chaque session.
 
-inline constexpr std::string_view kAchievementMemoryFileName = "succes.yaml";
+inline constexpr std::string_view kAchievementMemoryFileName = "succes.yml";
 
 struct RememberedAchievements {
   // Le nom du personnage : un compte en porte plusieurs, un nom n'en désigne

@@ -242,6 +242,6 @@ class SettingsFile {
 inline constexpr std::uint32_t kSettingsFlushDelayMs = 700;
 
 // Le fichier, dans `savedata\` du client — avec les touches et la barre.
-inline constexpr std::string_view kSettingsFileName = "settings.yaml";
+inline constexpr std::string_view kSettingsFileName = "settings.yml";
 
 }  // namespace moonclient

@@ -1,4 +1,4 @@
-// LES FICHES DE PERSONNAGE DE `companion_ai.yaml` : le profil actif par classe
+// LES FICHES DE PERSONNAGE DE `companion_ai.yml` : le profil actif par classe
 // et par contexte, la dernière forme vue de chaque genre, les propositions
 // refusées et celles qui attendent. Voir `game/companion_ai_yaml.h`.
 

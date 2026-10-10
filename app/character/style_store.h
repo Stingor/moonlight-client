@@ -103,8 +103,8 @@ class StyleDrafts {
 
 // ── SUR LE DISQUE ───────────────────────────────────────────────────────────
 
-inline constexpr std::string_view kStylePresetsFileName = "style_prereglages.yaml";
-inline constexpr std::string_view kStyleDraftsFileName = "style_brouillon.yaml";
+inline constexpr std::string_view kStylePresetsFileName = "style_prereglages.yml";
+inline constexpr std::string_view kStyleDraftsFileName = "style_brouillon.yml";
 
 [[nodiscard]] std::filesystem::path StylePresetsPath(const std::filesystem::path& client_root);
 [[nodiscard]] std::filesystem::path StyleDraftsPath(const std::filesystem::path& client_root);

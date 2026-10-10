@@ -54,7 +54,7 @@ class StorageTabNames {
 };
 
 // ── SUR LE DISQUE ────────────────────────────────────────────────────────────
-inline constexpr std::string_view kStorageTabNamesFileName = "coffre_onglets.yaml";
+inline constexpr std::string_view kStorageTabNamesFileName = "coffre_onglets.yml";
 
 [[nodiscard]] std::filesystem::path StorageTabNamesPath(const std::filesystem::path& client_root);
 

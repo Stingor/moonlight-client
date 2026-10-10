@@ -16,7 +16,7 @@ namespace moonclient {
 // code de touche virtuelle de Windows : ce fichier se relit tant que le nôtre
 // n'existe pas — et ne s'écrit jamais.
 
-inline constexpr std::string_view kEquipPresetFileName = "equip_presets.yaml";
+inline constexpr std::string_view kEquipPresetFileName = "equip_presets.yml";
 inline constexpr std::string_view kLegacySettingsFileName = "bourgeon_settings.yaml";
 
 [[nodiscard]] std::filesystem::path EquipPresetFilePath(const std::filesystem::path& client_root);

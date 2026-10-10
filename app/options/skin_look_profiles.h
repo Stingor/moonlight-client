@@ -12,7 +12,7 @@
 
 namespace moonclient {
 
-// ── LES PROFILS D'HABILLAGE : `savedata/skin_look_profiles.yaml` ────────────
+// ── LES PROFILS D'HABILLAGE : `savedata/skin_look_profiles.yml` ────────────
 //
 // Des habillages nommés — tout ce que porte `look.yaml` —, qu'on enregistre,
 // qu'on pose, qu'on copie et qu'on supprime, comme les profils de réglages et
@@ -24,7 +24,7 @@ namespace moonclient {
 // ⚠ PAS DE PROFIL PAR PERSONNAGE : l'habillage habille aussi l'écran de
 // connexion, avant tout personnage. LE DERNIER PROFIL POSÉ est retenu à la
 // place, avec l'habillage du skin, et reposé au démarrage suivant.
-inline constexpr std::string_view kSkinLookProfileFileName = "skin_look_profiles.yaml";
+inline constexpr std::string_view kSkinLookProfileFileName = "skin_look_profiles.yml";
 
 [[nodiscard]] std::filesystem::path SkinLookProfilePath(const std::filesystem::path& client_root);
 

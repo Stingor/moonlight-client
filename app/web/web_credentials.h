@@ -27,7 +27,7 @@ namespace moonclient::web {
 // que lui ne traverse jamais le protocole du jeu.
 
 // Le fichier, dans le dossier du joueur.
-inline constexpr std::string_view kWebCredentialsFileName = "moonlight_login.yaml";
+inline constexpr std::string_view kWebCredentialsFileName = "moonlight_login.yml";
 
 // LA PLUS GRANDE TAILLE QU'ON ACCEPTE DE ROUVRIR, en octets du scellé.
 //

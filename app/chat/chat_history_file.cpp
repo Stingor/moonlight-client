@@ -51,7 +51,7 @@ constexpr const char* kFileHeader =
     "# la décocher efface ce fichier.\n"
     "#\n"
     "# « type » est le numéro de la case de filtre de la ligne, de 0 à 25, dans\n"
-    "# l'ordre des « filter » de chat_tabs.yaml. Une ligne sans type valable est\n"
+    "# l'ordre des « filter » de chat_tabs.yml. Une ligne sans type valable est\n"
     "# IGNORÉE : elle ne saurait plus dans quel onglet aller.\n"
     "#\n"
     "# « color » est celle que la ligne avait à l'écran, en 0xRRGGBB ; absente,\n"

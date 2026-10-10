@@ -24,7 +24,7 @@ namespace moonclient {
 // fois qu'on a joué ce personnage ICI. Une recette changée depuis un autre
 // poste ne s'y verra qu'après y avoir rejoué.
 
-inline constexpr std::string_view kCharacterStylesFileName = "styles_personnages.yaml";
+inline constexpr std::string_view kCharacterStylesFileName = "styles_personnages.yml";
 
 [[nodiscard]] std::filesystem::path CharacterStylesPath(const std::filesystem::path& client_root);
 

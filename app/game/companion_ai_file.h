@@ -18,7 +18,7 @@
 
 namespace moonclient {
 
-// ── L'IA DES COMPAGNONS SUR LE DISQUE : `savedata/companion_ai.yaml` ───────
+// ── L'IA DES COMPAGNONS SUR LE DISQUE : `savedata/companion_ai.yml` ───────
 //
 // Chaque type de compagnon (sa classe exacte) a des PROFILS NOMMÉS. Un profil
 // porte tout ce qui se règle : les réglages du niveau 1 (skills compris), les
@@ -48,7 +48,7 @@ namespace moonclient {
 // LA VERSION DU FICHIER, aux clés et aux mots anglais (ADR 0093). Un fichier
 // sans profil nommé ni fiche reste un fichier de cette version.
 inline constexpr int kCompanionAiFileVersion = 1;
-inline constexpr std::string_view kCompanionAiFileName = "companion_ai.yaml";
+inline constexpr std::string_view kCompanionAiFileName = "companion_ai.yml";
 // LES NOMS GRAVÉS : des données, pas des libellés ; la fenêtre les traduit.
 // L'IA basique n'est jamais écrite comme profil, seulement nommée par une fiche.
 inline constexpr std::string_view kBasicProfileName = "Basic AI";

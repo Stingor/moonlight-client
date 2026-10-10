@@ -28,7 +28,7 @@ namespace moonclient {
 // savoir.
 
 // Le fichier, à la racine du client.
-inline constexpr std::string_view kRecentCharactersFileName = "recent_characters.yaml";
+inline constexpr std::string_view kRecentCharactersFileName = "recent_characters.yml";
 
 // COMBIEN ON S'EN RAPPELLE.
 //

@@ -86,7 +86,7 @@ inline constexpr std::uint32_t kClientSaysColor = 0xFFAA00;
 //
 // ⚠ SON PROPRE FICHIER, comme les favoris du coffre : c'est une LISTE, et le
 // fichier de réglages ne sait décrire que des valeurs nommées.
-inline constexpr std::string_view kBlockedNpcsFileName = "pnj_bloques.yaml";
+inline constexpr std::string_view kBlockedNpcsFileName = "pnj_bloques.yml";
 
 [[nodiscard]] std::filesystem::path BlockedNpcsPath(const std::filesystem::path& client_root);
 

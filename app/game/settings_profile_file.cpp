@@ -21,7 +21,7 @@ constexpr const char* kSettingsField = "settings";
 constexpr const char* kFileHeader =
     "# Les profils de réglages.\n"
     "#\n"
-    "# Sous « profiles », chaque profil porte les réglages de settings.yaml, sous\n"
+    "# Sous « profiles », chaque profil porte les réglages de settings.yml, sous\n"
     "# les mêmes clés — sauf ceux de la machine : écran, son, langue, échelle.\n"
     "# Une clé absente prend sa valeur d'origine. Sous « characters », le profil\n"
     "# que chaque personnage pose en entrant en jeu ; sans fiche, c'est « Default ».\n";

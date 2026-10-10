@@ -1,6 +1,6 @@
 #pragma once
 
-// CE QUE LES FICHIERS DE `companion_ai.yaml` PARTAGENT : la lecture des mots et
+// CE QUE LES FICHIERS DE `companion_ai.yml` PARTAGENT : la lecture des mots et
 // des nombres, et l'écriture puis la relecture d'une section de profil —
 // réglages, règles, amis. Interne à `moonclient_companionai`.
 

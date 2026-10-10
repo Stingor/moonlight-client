@@ -30,7 +30,7 @@ namespace moonclient {
 // nombres ne veut plus rien dire et personne ne s'en aperçoit.
 
 // Notre fichier, dans le dossier que nomme `save_folder.h`.
-inline constexpr std::string_view kHotkeyFileName = "hotkeys.yaml";
+inline constexpr std::string_view kHotkeyFileName = "hotkeys.yml";
 
 // Le chemin du fichier, sous la racine du client.
 [[nodiscard]] std::filesystem::path HotkeyFilePath(const std::filesystem::path& client_root);

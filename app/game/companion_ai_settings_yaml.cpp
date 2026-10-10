@@ -1,4 +1,4 @@
-// LES RÉGLAGES DU NIVEAU 1 DANS `companion_ai.yaml` : leur lecture par-dessus
+// LES RÉGLAGES DU NIVEAU 1 DANS `companion_ai.yml` : leur lecture par-dessus
 // l'IA basique, et leur réécriture qui garde ce qu'elle n'a pas compris. Voir
 // `game/companion_ai_yaml.h`.
 

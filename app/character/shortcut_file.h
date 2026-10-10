@@ -25,7 +25,7 @@ namespace moonclient {
 // un numéro. Même raison que pour les touches : le fichier se relit et se
 // corrige à la main, et il ne dépend pas d'une numérotation qui pourrait bouger.
 
-inline constexpr std::string_view kShortcutFileName = "shortcut_bar.yaml";
+inline constexpr std::string_view kShortcutFileName = "shortcut_bar.yml";
 
 [[nodiscard]] std::filesystem::path ShortcutFilePath(const std::filesystem::path& client_root);
 

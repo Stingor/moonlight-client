@@ -9,18 +9,18 @@
 
 namespace moonclient {
 
-// ── LES PROFILS DE RÉGLAGES SUR LE DISQUE : `savedata/settings_profiles.yaml`
+// ── LES PROFILS DE RÉGLAGES SUR LE DISQUE : `savedata/settings_profiles.yml`
 //
-// Des profils nommés, chacun les réglages de `settings.yaml` sauf ceux de la
+// Des profils nommés, chacun les réglages de `settings.yml` sauf ceux de la
 // machine — voir `SettingsFile::MachineScope` —, et le profil de chaque
-// personnage. `settings.yaml` reste le réglage VIVANT ; un profil en est une
+// personnage. `settings.yml` reste le réglage VIVANT ; un profil en est une
 // copie, qui se pose en entrant en jeu.
 //
 // ⚠ LE FORMAT EST VERSIONNÉ : un fichier d'une version inconnue ne se relit
 // pas, et ne s'écrase pas.
 
 inline constexpr int kSettingsProfileFileVersion = 1;
-inline constexpr std::string_view kSettingsProfileFileName = "settings_profiles.yaml";
+inline constexpr std::string_view kSettingsProfileFileName = "settings_profiles.yml";
 
 using SettingsProfileBook = ProfileBook<SettingsValues>;
 

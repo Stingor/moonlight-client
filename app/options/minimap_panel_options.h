@@ -13,8 +13,8 @@ namespace moonclient {
 // ── LA SECTION « MINIMAP », sous l'Interface ───────────────────────────────
 //
 // Les mêmes réglages que le sous-menu de la minimap, par le même dessin
-// (`ro::ui::DrawMinimapSettings`). Ils ne sont pas dans `settings.yaml` mais dans
-// `navigation.yaml`, que tient la partie : c'est elle qui CONFIE le dessin à
+// (`ro::ui::DrawMinimapSettings`). Ils ne sont pas dans `settings.yml` mais dans
+// `navigation.yml`, que tient la partie : c'est elle qui CONFIE le dessin à
 // l'entrée en jeu, et le reprend à la sortie. Hors partie, la section le dit.
 inline constexpr int kMinimapPanelRowBase = 8100;
 

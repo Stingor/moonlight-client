@@ -27,7 +27,7 @@ namespace moonclient {
 // cartes —, pas à son seul identifiant : le prix d'une épée +7 ne doit pas se
 // poser sur une épée +0.
 
-inline constexpr std::string_view kVendingMemoryFileName = "echoppes.yaml";
+inline constexpr std::string_view kVendingMemoryFileName = "echoppes.yml";
 
 struct RememberedVendingLine {
   std::uint32_t item_id = 0;

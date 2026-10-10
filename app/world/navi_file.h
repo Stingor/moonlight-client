@@ -39,7 +39,7 @@ struct NaviPrefs {
   std::map<std::string, std::vector<NaviMemo>, std::less<>> memos;
 };
 
-inline constexpr std::string_view kNaviPrefsFileName = "navigation.yaml";
+inline constexpr std::string_view kNaviPrefsFileName = "navigation.yml";
 
 [[nodiscard]] std::filesystem::path NaviPrefsPath(const std::filesystem::path& client_root);
 

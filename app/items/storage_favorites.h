@@ -45,7 +45,7 @@ class StorageFavorites {
 //
 // ⚠ SON PROPRE FICHIER, comme le placement libre du sac : c'est une LISTE, et le
 // fichier de réglages ne sait décrire que des valeurs nommées.
-inline constexpr std::string_view kStorageFavoritesFileName = "coffre_favoris.yaml";
+inline constexpr std::string_view kStorageFavoritesFileName = "coffre_favoris.yml";
 
 [[nodiscard]] std::filesystem::path StorageFavoritesPath(const std::filesystem::path& client_root);
 

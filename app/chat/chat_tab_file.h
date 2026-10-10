@@ -18,7 +18,7 @@ namespace moonclient {
 // ⚠ CLÉS ANGLAISES (ADR 0093) : `tabs`, puis par onglet `name`, `filter` — les
 // vingt-sept cases des types, vrai ou faux, dans l'ordre des numéros —,
 // `window`, `locked`, `content` et `look`.
-inline constexpr std::string_view kChatTabFileName = "chat_tabs.yaml";
+inline constexpr std::string_view kChatTabFileName = "chat_tabs.yml";
 
 [[nodiscard]] std::filesystem::path ChatTabFilePath(const std::filesystem::path& client_root);
 

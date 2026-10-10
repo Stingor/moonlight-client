@@ -25,7 +25,7 @@ namespace moonclient {
 // curseurs, des onglets et de la grille de l'Inventory —, avec trois thèmes,
 // classique, sombre et sépia.
 //
-// 🔴 RANGÉ AVEC LE SKIN, et non dans `settings.yaml` : `skin\<actif>\look.yaml`.
+// 🔴 RANGÉ AVEC LE SKIN, et non dans `settings.yml` : `skin\<actif>\look.yaml`.
 // Un skin sombre veut un habillage sombre ; le partager, c'est partager son
 // dossier. Le fichier a son propre `SettingsFile`, donc la même écriture
 // différée que les réglages.

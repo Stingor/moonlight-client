@@ -1,4 +1,4 @@
-// LA FUSION DE `companion_ai.yaml` : les modifications en attente portées sur
+// LA FUSION DE `companion_ai.yml` : les modifications en attente portées sur
 // le fichier relu. Voir `game/companion_ai_file.h`.
 //
 // 🔴 LE TEXTE RELU N'EST JAMAIS MODIFIÉ : on le parcourt en réémettant chaque

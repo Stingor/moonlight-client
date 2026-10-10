@@ -10,7 +10,7 @@
 
 namespace moonclient {
 
-// ── LES PROFILS DE DISPOSITION SUR LE DISQUE : `savedata/ui_layouts.yaml` ──
+// ── LES PROFILS DE DISPOSITION SUR LE DISQUE : `savedata/ui_layouts.yml` ──
 //
 // Des profils nommés, chacun une disposition entière — voir
 // `ro::ui::LayoutProfile` —, et pour chaque personnage le nom du profil qu'il
@@ -20,7 +20,7 @@ namespace moonclient {
 // pas, et ne s'écrase pas.
 
 inline constexpr int kUiLayoutFileVersion = 1;
-inline constexpr std::string_view kUiLayoutFileName = "ui_layouts.yaml";
+inline constexpr std::string_view kUiLayoutFileName = "ui_layouts.yml";
 
 using UiLayoutBook = ProfileBook<ro::ui::LayoutProfile>;
 

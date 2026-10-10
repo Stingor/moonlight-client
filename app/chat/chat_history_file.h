@@ -30,7 +30,7 @@ namespace moonclient {
 // service, mais il écrit sur le disque des conversations privées, et personne ne
 // doit le découvrir après coup.
 
-inline constexpr std::string_view kChatHistoryFileName = "chat_history.yaml";
+inline constexpr std::string_view kChatHistoryFileName = "chat_history.yml";
 
 // Combien de lignes on garde, et les bornes du réglage. En deçà de vingt, la
 // relecture n'apprend rien ; au-delà de mille, le fichier devient un journal,

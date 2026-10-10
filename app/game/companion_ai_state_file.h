@@ -16,11 +16,11 @@ namespace moonclient {
 
 // ── CE QUE L'IA DES COMPAGNONS GARDE D'UNE SESSION À L'AUTRE ────────────────
 //
-// `savedata/companion_ai_state.yaml` : les délais des règles, les traces des
+// `savedata/companion_ai_state.yml` : les délais des règles, les traces des
 // skills, les suspensions et l'attente (voir `ro/sim/companion_memory.h`), par
 // personnage, puis par compagnon (sa classe), puis par profil pour les règles.
 //
-// ⚠ UN FICHIER À PART DE `companion_ai.yaml`, et non une section : celui-ci
+// ⚠ UN FICHIER À PART DE `companion_ai.yml`, et non une section : celui-ci
 // s'écrit au plus toutes les `kCompanionStateSaveEveryMs` et à la sortie de la
 // partie, quand celui des profils ne s'écrit que sur un geste du joueur, qui le
 // corrige à la main. Un fichier de profils illisible n'empêche ainsi pas de
@@ -36,7 +36,7 @@ namespace moonclient {
 // personnages et les autres compagnons restent, l'écriture est atomique.
 
 inline constexpr int kCompanionStateFileVersion = 1;
-inline constexpr std::string_view kCompanionStateFileName = "companion_ai_state.yaml";
+inline constexpr std::string_view kCompanionStateFileName = "companion_ai_state.yml";
 // L'ÉCRITURE PÉRIODIQUE : au plus une fois par cette période.
 inline constexpr std::uint32_t kCompanionStateSaveEveryMs = 30000;
 

@@ -1,4 +1,4 @@
-// LES RÈGLES SI/ALORS ET LES AMIS D'UN PROFIL DE `companion_ai.yaml`. Voir
+// LES RÈGLES SI/ALORS ET LES AMIS D'UN PROFIL DE `companion_ai.yml`. Voir
 // `game/companion_ai_yaml.h`.
 
 #include <algorithm>
