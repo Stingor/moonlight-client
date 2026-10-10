@@ -15,6 +15,7 @@
 #include "ro/core/text.h"
 #include "ro/net/action.h"
 #include "ro/net/chat_target.h"
+#include "ro/net/rank_notices.h"
 #include "ro/net/staff_requests.h"
 #include "ro/net/warp_memo.h"
 #include "ro/net/whisper.h"
@@ -34,6 +35,7 @@
 #include "chat/dev_commands.h"
 #include "chat/native_slash_commands.h"
 #include "chat/navigation_command.h"
+#include "chat/rank_command.h"
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
 #include "items/warp_memo_report.h"
@@ -698,6 +700,14 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
   }
   if (line == kSaveChatCommand && to.chat_tabs != nullptr) {
     SaveChatAndSay(*to.chat_tabs, to.chat_rooms, /*tabs_too=*/true, *to.world, said_ms);
+    return;
+  }
+  // LES CLASSEMENTS : la réponse s'écrit quand elle arrive, ses noms avec —
+  // voir `RankNotices`.
+  if (const std::optional<ro::net::RankKind> rank = ReadRankCommand(line); rank.has_value()) {
+    if (to.link->is_open()) {
+      ro::net::RequestRanking(*to.link, *rank);
+    }
     return;
   }
   // LA MÉMORISATION DU POINT DE WARP. La demande part sans champ, et la réponse

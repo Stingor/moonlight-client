@@ -91,6 +91,7 @@
 #include "world/npc_illustration_stage.h"
 #include "world/overlay_view.h"
 #include "world/quest_marker_view.h"
+#include "world/rank_notices.h"
 #include "world/skill_refusal_report.h"
 #include "world/sleep_bubbles_view.h"
 
@@ -466,6 +467,8 @@ struct GamePieces {
   MvpTrackerStage mvp_tracker;
   // LE CHAMP DE BATAILLE : voir `BattlegroundStage`.
   BattlegroundStage battleground;
+  // LES CLASSEMENTS ET LES AVIS D'ÉTOILE : voir `RankNotices`.
+  RankNotices rank_notices;
   // CE QUE CE CLIENT SAIT MONTRER, annoncé au serveur : voir `SurfaceAnnouncer`.
   SurfaceAnnouncer surfaces;
 };

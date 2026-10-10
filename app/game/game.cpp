@@ -132,6 +132,14 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   };
   play_sounds(pieces_.battleground.TakeSounds(), "du champ de bataille");
   play_sounds(pieces_.chat_rooms.TakeSounds(), "du salon");
+  // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
+  pieces_.rank_notices.Advance(world_, now_ms);
+  std::vector<InterfaceSoundFile> star_sounds;
+  for (std::string& sound : pieces_.rank_notices.TakeSounds()) {
+    star_sounds.push_back(
+        InterfaceSoundFile{.place = InterfaceSoundPlace::kSoundArchive, .path = std::move(sound)});
+  }
+  play_sounds(std::move(star_sounds), "d'un avis d'étoile");
   // ⚠ APRÈS LE RÉSEAU, DONC APRÈS `AimCamera`, ET AVANT LE DESSIN : la veille
   // écrit la pose de la caméra, et elle doit écraser le cadrage du personnage,
   // pas être écrasée par lui.

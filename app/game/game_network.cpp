@@ -341,6 +341,13 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
         outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = hunted;
     }
+    // ET LES CLASSEMENTS, LES POINTS DE RANG ET LES AVIS D'ÉTOILE. ⚠ ÉMET : un
+    // classement demande les noms qui lui manquent.
+    if (const ro::net::FrameOutcome ranked =
+            pieces_.rank_notices.ApplyFrame(received, world_, link_, now_ms);
+        outcome == ro::net::FrameOutcome::kUnhandled) {
+      outcome = ranked;
+    }
     // ET LE CHAMP DE BATAILLE : la file d'inscription, puis le combat.
     if (const ro::net::FrameOutcome fought =
             pieces_.battleground.ApplyFrame(received, world_, now_ms);

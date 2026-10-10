@@ -108,6 +108,7 @@ add_library(ro_net STATIC
     src/world_arrivals.cpp
     src/world_relay.cpp
     src/warp_list.cpp
+    src/rank_notices.cpp
     src/warp_memo.cpp
     src/world_update.cpp
     src/zone_move.cpp)

@@ -16014,3 +16014,87 @@ tr: Remove from autoloot
 
 fr: La liste @alootid du compte, la même que dans la description : ces items vont droit dans l'inventory quand ils tombent pour vous.
 tr: The account's @alootid list, the same as in the description: these items go straight into the inventory when they drop for you.
+
+fr: %s désigne %s comme Solar Space.
+tr: %s has designated %s as Solar Space.
+
+fr: %s désigne %s comme Luna Space.
+tr: %s has designated %s as Luna Space.
+
+fr: %s désigne %s comme Stellar Space.
+tr: %s has designated %s as Stellar Space.
+
+fr: %s désigne %s comme Solar Monster.
+tr: %s has designated %s as Solar Monster.
+
+fr: %s désigne %s comme Luna Monster.
+tr: %s has designated %s as Luna Monster.
+
+fr: %s désigne %s comme Stellar Monster.
+tr: %s has designated %s as Stellar Monster.
+
+fr: Solar Space de %s : %s
+tr: %s's Solar Space: %s
+
+fr: Luna Space de %s : %s
+tr: %s's Luna Space: %s
+
+fr: Stellar Space de %s : %s
+tr: %s's Stellar Space: %s
+
+fr: Solar Monster de %s : %s
+tr: %s's Solar Monster: %s
+
+fr: Luna Monster de %s : %s
+tr: %s's Luna Monster: %s
+
+fr: Stellar Monster de %s : %s
+tr: %s's Stellar Monster: %s
+
+fr: ========== BLACKSMITH RANK ============
+tr: ========== BLACKSMITH RANK ============
+
+fr: =========== ALCHEMIST RANK =============
+tr: =========== ALCHEMIST RANK =============
+
+fr: =========== KILLER RANK ==============
+tr: =========== KILLER RANK ==============
+
+fr: ============ TAEKWON RANK =============
+tr: ============ TAEKWON RANK =============
+
+fr: MY POINT    :  %4d POINT 
+tr: MY POINT    :  %4d POINT 
+
+fr: [ %2d ] %s  :  %4d POINT
+tr: [ %2d ] %s  :  %4d POINT
+
+fr: Récupération du classement…
+tr: Fetching rank...
+
+fr: Target HP : %u
+tr: Target HP : %u
+
+fr: [Collector Rank] Item cible : %s
+tr: [Collector Rank] Target Item: %s
+
+fr: [POINT] %d points de rang Slayer gagnés. Total : %d.
+tr: [POINT] You have been rewarded with %d Slayer rank points. Your point total is %d.
+
+fr: [POINT] %d points de rang Taekwon Mission gagnés. Total : %d.
+tr: [POINT] You have been rewarded with %d Tae-Kwon Mission rank points. Your point total is %d.
+
+fr: [Point] %d points de rang Alchemist gagnés. Total : %d.
+tr: [Point] You have been rewarded with %d Alchemist rank points. Your point total is %d.
+
+fr: [Point] %d points de rang Blacksmith gagnés. Total : %d.
+tr: [Point] You have been rewarded with %d Blacksmith rank points. Your point total is %d.
+
+fr: [Solar, Lunar and Stellar Angel] Les lieux et les monstres désignés sont remis à zéro.
+tr: [Solar, Lunar and Stellar Angel] Designated places and monsters have been reset.
+
+fr: [Taekwon Mission] Monstre cible : %s (%d%%)
+tr: [Taekwon Mission] Target Monster: %s (%d%%)
+
+fr: [Taming Mission] Monstre cible : %s
+tr: [Taming Mission] Target Monster: %s
