@@ -13015,8 +13015,8 @@ tr: In the lists: left click to follow an item, right click for its menu, Shift 
 fr: Entre dans %d recettes.
 tr: Used in %d recipes.
 
-fr: Fichier de recettes absent : SystemEN\\craft_recipes.yml
-tr: Recipe file missing: SystemEN\\craft_recipes.yml
+fr: Fichier de recettes absent : data\\yaml_files\\craft_recipes.yml
+tr: Recipe file missing: data\\yaml_files\\craft_recipes.yml
 
 fr: Filtrer par nom ou par id…
 tr: Filter by name or id…
@@ -13030,8 +13030,8 @@ tr: Unplayable here: no class on this server learns this skill.
 fr: L'Atlas répertorie tout ce que le serveur sait fabriquer : par skill, par produit, par matériau, et les flèches. Le jeu ne peut pas le faire seul — le serveur n'envoie une liste qu'après le lancement d'un skill.
 tr: The Atlas lists everything the server can craft: by skill, by product, by material, and arrows. The game cannot do this on its own — the server only sends a list after a skill is cast.
 
-fr: Le fichier de recettes est introuvable ou illisible (SystemEN\\craft_recipes.yml). L'Atlas ne peut rien montrer tant qu'il manque — le reste du client fonctionne normalement.
-tr: The recipe file is missing or unreadable (SystemEN\\craft_recipes.yml). The Atlas cannot show anything until it is there — the rest of the client works normally.
+fr: Le fichier de recettes est introuvable ou illisible (data\\yaml_files\\craft_recipes.yml). L'Atlas ne peut rien montrer tant qu'il manque — le reste du client fonctionne normalement.
+tr: The recipe file is missing or unreadable (data\\yaml_files\\craft_recipes.yml). The Atlas cannot show anything until it is there — the rest of the client works normally.
 
 fr: Le résultat n'est pas ce produit : le serveur tire dans sa propre table de transmutation, avec ses taux et ses quantités.
 tr: The result is not this product: the server draws from its own transmutation table, with its own rates and quantities.

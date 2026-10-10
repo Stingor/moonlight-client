@@ -647,7 +647,7 @@ void DrawBody(CraftAtlasWindowState& state, const CraftAtlasView& view, const Sk
     // fabrique sur ce serveur », ce qui est faux.
     ColoredWrapped(PaintingLook().warn_text,
                    core::Tr("Le fichier de recettes est introuvable ou illisible "
-                            "(SystemEN\\craft_recipes.yml). L'Atlas ne peut rien montrer "
+                            "(data\\yaml_files\\craft_recipes.yml). L'Atlas ne peut rien montrer "
                             "tant qu'il manque — le reste du client fonctionne normalement."));
     return;
   }

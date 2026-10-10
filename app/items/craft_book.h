@@ -39,7 +39,7 @@ namespace moonclient {
 // `SystemEN\` — que `moonlight.grf` porte, et qu'un dossier du même nom sur le
 // disque remplace. Il se lit donc par le VFS, jamais par un chemin de fichier.
 inline constexpr std::array<std::string_view, 1> kCraftBookPaths = {
-    "SystemEN\\craft_recipes.yml",
+    "data\\yaml_files\\craft_recipes.yml",
 };
 
 // Le « skill » d'une recette qui ne demande aucun skill : elle s'ouvre en
