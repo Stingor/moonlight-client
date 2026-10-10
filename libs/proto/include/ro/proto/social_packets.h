@@ -71,11 +71,35 @@ struct PartyOptionsRequest {
   std::uint8_t item_share = 0;
 };
 
+// « Bloque, ou débloque, les chuchotements de ce personnage. » Par le NOM, que
+// le serveur compare octet pour octet : la casse compte.
+struct WhisperBlockRequest {
+  static constexpr std::uint16_t kOpcode = 0x00CF;
+  static constexpr std::size_t kWireSize = 27;
+  static constexpr std::size_t kNameSize = 24;
+  // Le sens, tel que le serveur le lit.
+  static constexpr std::uint8_t kBlock = 0;
+  static constexpr std::uint8_t kAllow = 1;
+
+  // ⚠ DÉJÀ DANS L'ENCODAGE DU FIL : c'est l'appelant qui convertit.
+  std::string name;
+  std::uint8_t type = kBlock;
+};
+
+// « Redis-moi qui je bloque. » Sans champ ; la réponse est 0x00D4.
+struct WhisperBlockListRequest {
+  static constexpr std::uint16_t kOpcode = 0x00D3;
+  static constexpr std::size_t kWireSize = 2;
+};
+
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const FriendAddRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const FriendRemoveRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const FriendAnswerRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PartyLeaderRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PartyOptionsRequest& request);
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockRequest& request);
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(
+    const WhisperBlockListRequest& request);
 
 // ── CE QUE LE SERVEUR ENVOIE ────────────────────────────────────────────────
 

@@ -99,6 +99,7 @@ add_library(ro_net STATIC
     src/storage_facts.cpp
     src/storage_list.cpp
     src/whisper.cpp
+    src/whisper_blocks.cpp
     src/world_notice.cpp
     src/world_skill.cpp
     src/world_arrivals.cpp

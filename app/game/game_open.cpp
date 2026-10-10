@@ -613,6 +613,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .option_targets = OptionsTargets(),
       .chat_rooms = &pieces_.chat_rooms,
       .whispers = &pieces_.whispers.outbox(),
+      .whisper_blocks = &pieces_.whispers.blocks(),
       .line_preview = &chat_preview_});
   // ⚠ LA SECONDE PASSE, et la coquille a déjà fait la première.
   //

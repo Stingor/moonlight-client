@@ -220,6 +220,10 @@ enum class EntityVerb : int {
   // « LINKER CE NPC » : sa recherche `<NAVS>`, bornée à notre carte, posée
   // dans la saisie.
   kNpcLink,
+  // « BLOQUER » OU « AUTORISER LES CHUCHOTEMENTS » de ce joueur : une seule des
+  // deux, selon la liste que le serveur tient.
+  kWhisperBlock,
+  kWhisperAllow,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -241,7 +245,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kNpcLink) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kWhisperAllow) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==
@@ -324,6 +328,9 @@ struct EntityMenuFacts {
   bool target_other_party = false;
   bool target_is_friend = false;
   bool friends_full = false;
+  // Ses chuchotements sont bloqués, nommément : la ligne propose alors de les
+  // autoriser.
+  bool whisper_blocked = false;
   // Un échange est ouvert, ou une proposition attend : on n'en propose pas un
   // second.
   bool dealing = false;

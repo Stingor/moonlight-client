@@ -257,6 +257,17 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
       Composer::Disable(befriend, Tr("Votre liste d'amis est pleine."));
     }
   }
+  // UNE BASCULE, PAS DEUX LIGNES : le blocage est un état que le serveur nous
+  // dit, et proposer les deux offrirait toujours une ligne qui ne fait rien.
+  const char* whisper_tip =
+      Tr("Ses chuchotements ne vous parviennent plus, jusqu'à la "
+         "déconnexion. Le chat public, le groupe et la guilde ne sont pas "
+         "filtrés.");
+  if (facts.whisper_blocked) {
+    menu.Add(Tr("Autoriser les chuchotements"), EntityVerb::kWhisperAllow, whisper_tip);
+  } else {
+    menu.Add(Tr("Bloquer les chuchotements"), EntityVerb::kWhisperBlock, whisper_tip);
+  }
   menu.Group();
   menu.Add(Tr("Copier le nom"), EntityVerb::kCopyName);
   AddCompanionFriends(menu, facts);

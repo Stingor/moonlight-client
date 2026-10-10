@@ -18,6 +18,7 @@
 #include "ro/sim/guild.h"
 #include "ro/sim/party_roster.h"
 #include "ro/sim/whisper.h"
+#include "ro/sim/whisper_blocks.h"
 #include "ro/sim/world.h"
 #include "ro/ui/chat_input.h"
 #include "ro/ui/chat_link.h"
@@ -73,9 +74,12 @@ class WhisperStage {
 
   [[nodiscard]] ro::sim::WhisperOutbox& outbox() noexcept { return outbox_; }
   [[nodiscard]] const WhisperDesk& desk() const noexcept { return desk_; }
+  // QUI NE PEUT PLUS NOUS CHUCHOTER, tel que le serveur l'a dit.
+  [[nodiscard]] ro::sim::WhisperBlockList& blocks() noexcept { return blocks_; }
 
-  // Les deux paquets du chuchotement. ⚠ AVANT LE MONDE : lui les lirait aussi,
-  // mais sans nos amis ni nos envois.
+  // Les deux paquets du chuchotement, puis les trois réponses du blocage. ⚠
+  // AVANT LE MONDE : lui lirait les deux premiers, mais sans nos amis ni nos
+  // envois.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  const ro::sim::FriendList& friends,
                                                  const ro::sim::GuildBook& guild,
@@ -127,6 +131,7 @@ class WhisperStage {
 
   WhisperDesk desk_;
   ro::sim::WhisperOutbox outbox_;
+  ro::sim::WhisperBlockList blocks_;
   // Les titres de l'image. ⚠ LES VUES POINTENT DEDANS : ils se composent tous
   // avant qu'une vue ne soit prise.
   std::vector<std::string> titles_;

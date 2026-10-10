@@ -15819,3 +15819,51 @@ tr: @item
 
 fr: Envoie « @item » au serveur : l'item décrit, à cette quantité. Un équipement ne s'empile pas : chaque exemplaire prend sa case.
 tr: Envía « @item » al servidor: el item descrito, en esta cantidad. Un equipo no se apila: cada ejemplar ocupa su casilla.
+
+fr: Bloquer les chuchotements
+tr: Bloquear susurros
+
+fr: Autoriser les chuchotements
+tr: Permitir susurros
+
+fr: Ses chuchotements ne vous parviennent plus, jusqu'à la déconnexion. Le chat public, le groupe et la guilde ne sont pas filtrés.
+tr: Sus susurros ya no te llegan, hasta que te desconectes. El chat público, el grupo y el clan no se filtran.
+
+fr: %s : chuchotements acceptés.
+tr: %s: susurros aceptados.
+
+fr: %s : échec du blocage des chuchotements.
+tr: %s: fallo al bloquear los susurros.
+
+fr: %s : échec du blocage des chuchotements. La liste de blocage est pleine.
+tr: %s: fallo al bloquear los susurros. La lista de bloqueo está llena.
+
+fr: %s : échec du déblocage, ce nom n'était pas bloqué.
+tr: %s: fallo al desbloquear, este nombre no estaba bloqueado.
+
+fr: %s : échec du déblocage.
+tr: %s: fallo al desbloquear.
+
+fr: -Liste de blocage-
+tr: -Lista de bloqueo-
+
+fr: La liste de blocage est vide.
+tr: No hay lista de bloqueo.
+
+fr: Les chuchotements de tous les personnages sont bloqués.
+tr: Susurros de todos los personajes bloqueados.
+
+fr: Les chuchotements de tous les personnages sont autorisés.
+tr: Susurros de todos los personajes permitidos.
+
+fr: Échec du blocage de tous les chuchotements : ils l'étaient déjà.
+tr: No se pudieron bloquear todos los susurros: ya lo estaban.
+
+fr: Échec : aucun chuchotement n'était bloqué.
+tr: Fallo: ningún susurro estaba bloqueado.
+
+fr: /in (nom du personnage) : autorise de nouveau ses chuchotements
+tr: /in (nombre del personaje): vuelve a permitir sus susurros
+
+fr: Ce nom ne peut pas partir tel quel : il est trop long, ou porte un caractère que le jeu n'écrit pas.
+tr: Este nombre no puede enviarse tal cual: es demasiado largo o lleva un carácter que el juego no escribe.

@@ -95,6 +95,7 @@ add_library(ro_sim STATIC
     src/walk_path.cpp
     src/warp_menu.cpp
     src/whisper.cpp
+    src/whisper_blocks.cpp
     src/actor_traces.cpp
     src/world.cpp
     src/world_bearers.cpp

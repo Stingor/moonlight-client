@@ -21,6 +21,7 @@
 #include "ro/render/sprite_renderer.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/whisper.h"
+#include "ro/sim/whisper_blocks.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/item_words.h"
@@ -132,6 +133,9 @@ struct ChatDispatch {
   // LES ENVOIS QUI ATTENDENT LEUR ACCUSÉ : l'écho d'un chuchotement se compose
   // de ce qu'on y garde. Nul : aucun écho.
   ro::sim::WhisperOutbox* whispers = nullptr;
+  // QUI NE PEUT PLUS NOUS CHUCHOTER : `/ex` et `/in` y notent leur demande,
+  // que la réponse du serveur retrouve. Nul : ces commandes se taisent.
+  ro::sim::WhisperBlockList* whisper_blocks = nullptr;
   // LA BARRE, qui suit le canal où une commande partie a lié la parole
   // publique : sa place en dépend. Nul : rien ne se suit.
   ChatLinePreviewMaker* line_preview = nullptr;

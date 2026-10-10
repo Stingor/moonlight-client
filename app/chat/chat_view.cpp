@@ -18,6 +18,7 @@
 #include "ro/net/staff_requests.h"
 #include "ro/net/warp_memo.h"
 #include "ro/net/whisper.h"
+#include "ro/net/whisper_blocks.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/screen_text.h"
 #include "ro/sim/chat_line.h"
@@ -33,6 +34,7 @@
 #include "chat/dev_commands.h"
 #include "chat/native_slash_commands.h"
 #include "chat/navigation_command.h"
+#include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
 #include "items/warp_memo_report.h"
 #include "world/click_action.h"
@@ -354,6 +356,53 @@ namespace {
   return true;
 }
 
+// `/ex`, `/in`, `/exall`, `/inall`. Rend faux quand la ligne n'en est pas une.
+// Voir `whisper_block_command.h`. Hors ligne, rien à demander à personne.
+[[nodiscard]] bool RunWhisperBlockCommand(const ChatDispatch& to, const std::string& line,
+                                          std::uint32_t said_ms) {
+  const WhisperBlockCommand command = ReadWhisperBlockCommand(line);
+  if (command.kind == WhisperBlockCommandKind::kNone) {
+    return false;
+  }
+  if (command.kind == WhisperBlockCommandKind::kAllowWithoutName) {
+    to.world->RecordChat(
+        ro::sim::ChatKind::kServer, 0,
+        ro::core::Tr("/in (nom du personnage) : autorise de nouveau ses chuchotements"), said_ms);
+    return true;
+  }
+  if (!to.link->is_open() || to.whisper_blocks == nullptr) {
+    return true;
+  }
+  switch (command.kind) {
+    case WhisperBlockCommandKind::kBlock:
+    case WhisperBlockCommandKind::kAllow:
+      if (!ro::net::RequestWhisperBlock(*to.link, *to.whisper_blocks, command.name,
+                                        command.kind == WhisperBlockCommandKind::kBlock
+                                            ? ro::sim::WhisperBlockWay::kBlock
+                                            : ro::sim::WhisperBlockWay::kAllow)) {
+        to.world->RecordChat(ro::sim::ChatKind::kServer, 0,
+                             ro::core::Tr("Ce nom ne peut pas partir tel quel : il est trop "
+                                          "long, ou porte un caractère que le jeu n'écrit pas."),
+                             said_ms);
+      }
+      break;
+    case WhisperBlockCommandKind::kList:
+      ReportRefusal(ro::net::RequestWhisperBlockList(*to.link));
+      break;
+    case WhisperBlockCommandKind::kBlockEveryone:
+    case WhisperBlockCommandKind::kAllowEveryone:
+      ReportRefusal(ro::net::RequestWhisperBlockEveryone(
+          *to.link, command.kind == WhisperBlockCommandKind::kBlockEveryone
+                        ? ro::sim::WhisperBlockWay::kBlock
+                        : ro::sim::WhisperBlockWay::kAllow));
+      break;
+    case WhisperBlockCommandKind::kNone:
+    case WhisperBlockCommandKind::kAllowWithoutName:
+      break;
+  }
+  return true;
+}
+
 // `/battlechat` : la barre bascule entre le champ de bataille et la voix haute.
 // Hors d'une carte de champ, rien ne s'arme — la barre y reviendrait d'elle-même
 // à la voix haute à l'image suivante.
@@ -606,6 +655,9 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     return;
   }
   if (RunAnnounceCommand(to, line, said_ms)) {
+    return;
+  }
+  if (RunWhisperBlockCommand(to, line, said_ms)) {
     return;
   }
   if (line == kMacroWindowCommand && to.macro_window != nullptr) {

@@ -19,6 +19,7 @@
 #include "ro/net/guild.h"
 #include "ro/net/party.h"
 #include "ro/net/whisper.h"
+#include "ro/net/whisper_blocks.h"
 
 #include "chat/chat_line_preview.h"
 #include "chat/chat_mvp_link.h"
@@ -189,6 +190,7 @@ void PlayWhisperAlarm(ro::audio::AudioEngine& audio, ro::vfs::Vfs& vfs,
 void WhisperStage::StartSession(std::uint64_t last_seq) {
   desk_.Clear(last_seq);
   outbox_.Clear();
+  blocks_.Clear();
   titles_.clear();
   links_.clear();
   links_peer_.clear();
@@ -200,9 +202,13 @@ ro::net::FrameOutcome WhisperStage::ApplyFrame(const ro::net::Frame& frame, ro::
                                                const ro::sim::FriendList& friends,
                                                const ro::sim::GuildBook& guild,
                                                std::uint32_t now_ms) {
-  return ro::net::ApplyWhisperFrame(
+  const ro::net::FrameOutcome whispered = ro::net::ApplyWhisperFrame(
       frame, world,
       ro::net::WhisperCircle{.friends = &friends, .guild = &guild, .outbox = &outbox_}, now_ms);
+  if (whispered != ro::net::FrameOutcome::kUnhandled) {
+    return whispered;
+  }
+  return ro::net::ApplyWhisperBlockFrame(frame, blocks_, world, now_ms);
 }
 
 void WhisperStage::Open(std::string_view peer) {

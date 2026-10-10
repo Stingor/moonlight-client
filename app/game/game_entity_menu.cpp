@@ -19,6 +19,7 @@
 #include "ro/net/npc_dialog.h"
 #include "ro/net/party.h"
 #include "ro/net/staff_requests.h"
+#include "ro/net/whisper_blocks.h"
 #include "ro/sim/bank.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
@@ -282,6 +283,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   const ro::sim::Friend* befriended = friends_.FindByName(actor.name);
   facts.target_is_friend = befriended != nullptr && befriended->account_id == actor.id;
   facts.friends_full = friends_.full();
+  facts.whisper_blocked = pieces_.whispers.blocks().Blocks(actor.name);
   facts.dealing = pieces_.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
   facts.npc_blocked = page.blocked().Has(actor.id);
   facts.pet_has_accessory = pieces_.pet.has_accessory();
@@ -410,6 +412,14 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       windows_.chat.main.input.wants_focus = true;
       return;
     }
+    case EntityVerb::kWhisperBlock:
+    case EntityVerb::kWhisperAllow:
+      // La liste ne change qu'à la réponse du serveur : le menu suivant la lira.
+      ReportRefusal(ro::net::RequestWhisperBlock(link_, pieces_.whispers.blocks(), name,
+                                                 verb == EntityVerb::kWhisperBlock
+                                                     ? ro::sim::WhisperBlockWay::kBlock
+                                                     : ro::sim::WhisperBlockWay::kAllow));
+      return;
     case EntityVerb::kWhisperWindow:
       // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant, et prend
       // le clavier.

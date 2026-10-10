@@ -28,6 +28,9 @@ constexpr std::string_view kLeaderHandler = "clif_parse_PartyChangeLeader";
 constexpr std::array<std::uint16_t, 1> kLeaderOffsets = {2};
 constexpr std::string_view kOptionsHandler = "clif_parse_PartyChangeOption";
 constexpr std::array<std::uint16_t, 3> kOptionsOffsets = {2, 6, 7};
+constexpr std::string_view kWhisperBlockHandler = "clif_parse_PMIgnore";
+constexpr std::array<std::uint16_t, 2> kWhisperBlockOffsets = {2, 26};
+constexpr std::string_view kWhisperListHandler = "clif_parse_PMIgnoreList";
 
 constexpr std::size_t kNameSize = 24;
 // Le serveur n'écrit jamais plus d'entrées de partage que de places dans un
@@ -136,6 +139,32 @@ core::Result<std::vector<std::uint8_t>> Encode(const PartyOptionsRequest& reques
   writer.U32(request.exp_share);
   writer.U8(request.item_pickup);
   writer.U8(request.item_share);
+  return frame;
+}
+
+core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockRequest& request) {
+  if (!Declared(WhisperBlockRequest::kOpcode, kWhisperBlockHandler, kWhisperBlockOffsets,
+                WhisperBlockRequest::kWireSize)) {
+    return std::unexpected(LayoutDrift());
+  }
+  std::vector<std::uint8_t> frame;
+  frame.reserve(WhisperBlockRequest::kWireSize);
+  ByteWriter writer(frame);
+  writer.U16(WhisperBlockRequest::kOpcode);
+  writer.FixedString(request.name, WhisperBlockRequest::kNameSize);
+  writer.U8(request.type);
+  return frame;
+}
+
+core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockListRequest& /*request*/) {
+  if (!Declared(WhisperBlockListRequest::kOpcode, kWhisperListHandler, {},
+                WhisperBlockListRequest::kWireSize)) {
+    return std::unexpected(LayoutDrift());
+  }
+  std::vector<std::uint8_t> frame;
+  frame.reserve(WhisperBlockListRequest::kWireSize);
+  ByteWriter writer(frame);
+  writer.U16(WhisperBlockListRequest::kOpcode);
   return frame;
 }
 
