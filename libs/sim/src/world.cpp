@@ -120,6 +120,9 @@ void World::Spawn(Actor actor) {
     actor.skill_scale = found->second.skill_scale;
     actor.chat_text = std::move(found->second.chat_text);
     actor.chat_since_ms = found->second.chat_since_ms;
+    // LA JAUGE aussi : la barre de progression d'un PNJ n'est redite qu'à
+    // l'entrée en vue.
+    actor.gauge = found->second.gauge;
     // Même raison, et elle mord plus fort ici : le serveur n'annonce l'enseigne
     // qu'À L'ENTRÉE EN VUE (clif_getareachar_pc), jamais à une réannonce. La
     // perdre serait définitif — tant que le vendeur reste en vue, rien ne la

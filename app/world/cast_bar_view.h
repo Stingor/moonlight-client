@@ -24,9 +24,9 @@ namespace moonclient {
 
 // L'INCANTATION QU'UN ACTEUR MONTRE À CET INSTANT, ou rien.
 //
-// 🔴 UNE SEULE BARRE PAR ACTEUR : l'incantation et la barre qu'une compétence
-// annoncée pose sont la même jauge chez le client, que la dernière pose
-// reprend. Une incantation ÉCHUE n'en montre plus : le serveur n'annonce pas
+// 🔴 UNE SEULE BARRE PAR ACTEUR : l'incantation, la barre qu'une compétence
+// annoncée pose et celle d'un script sont la même jauge chez le client, que la
+// dernière pose reprend. Une incantation ÉCHUE n'en montre plus : le serveur n'annonce pas
 // qu'un sort aboutit, il en a donné la durée.
 struct ShownCast {
   std::uint32_t started_ms = 0;
@@ -36,6 +36,11 @@ struct ShownCast {
   std::uint16_t skill_id = 0;
 };
 [[nodiscard]] bool ShownCastOf(const ro::sim::Actor& actor, std::uint32_t now_ms, ShownCast* into);
+
+// LE JOUEUR PORTE-T-IL UNE BARRE à cet instant : incantation, compétence
+// annoncée ou barre de progression d'un script. C'est ce qui garde la souris
+// vivante sous un dialogue — voir `WorldMouseFrozen`.
+[[nodiscard]] bool OwnBarShown(const ro::sim::World& world, std::uint32_t now_ms);
 
 // MON INCANTATION, POUR LA JAUGE « CAST » DU HUD : l'écoulé sur la durée, et le
 // texte déjà composé — « Storm Gust  1,4 s », ou le temps seul pour un sort

@@ -109,6 +109,7 @@ add_library(ro_sim STATIC
     src/world_spirit_charm.cpp
     src/world_npc_dialog.cpp
     src/npc_illustration.cpp
+    src/progress_bar.cpp
     src/npc_shop.cpp
     src/npc_shop_cart.cpp
     src/world_pvp_rings.cpp

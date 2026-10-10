@@ -1,10 +1,11 @@
-// LES COMPÉTENCES SANS DÉGÂTS ET LES INCANTATIONS : la part du monde qui les
-// note sur qui les porte.
+// LES COMPÉTENCES SANS DÉGÂTS, LES INCANTATIONS ET LES JAUGES : la part du monde
+// qui les note sur qui les porte.
 //
 // Elle vit à part de `world.cpp` pour tenir le plafond de huit cents lignes.
 
 #include <algorithm>
 #include <cstdint>
+#include <optional>
 
 #include "ro/sim/skill_side_effects.h"
 #include "ro/sim/world.h"
@@ -70,6 +71,15 @@ bool World::CancelCast(std::uint32_t id, std::uint32_t now_ms) {
     cast.duration_ms = std::max<std::uint32_t>(played_ms, 1);
     cast.cancelled = true;
   }
+  return true;
+}
+
+bool World::SetGauge(std::uint32_t id, std::optional<SkillGauge> gauge) {
+  const auto found = actors_.find(id);
+  if (found == actors_.end()) {
+    return false;
+  }
+  found->second.gauge = gauge;
   return true;
 }
 

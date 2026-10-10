@@ -672,8 +672,8 @@ struct Actor {
   // liste en garde seize, et l'instance du dix-septième joue peut-être encore.
   std::vector<std::uint32_t> removed_effects;
   std::uint32_t removed_effects_total = 0;
-  // LA BARRE qu'une compétence annoncée pose sous le joueur local, hors
-  // incantation — voir `SkillGauge`. Vide quand il n'y en a pas.
+  // LA BARRE posée hors incantation — compétence annoncée, barre de
+  // progression d'un script : voir `SkillGauge`. Vide quand il n'y en a pas.
   std::optional<SkillGauge> gauge;
   // LA POSE D'ARRIVÉE qu'un coup a armée, puis l'instant où l'arrivée l'a
   // levée — voir `kArrivalPoseSkill`.

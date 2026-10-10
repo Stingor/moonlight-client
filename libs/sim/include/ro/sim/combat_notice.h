@@ -186,14 +186,15 @@ struct Cast {
   bool cancelled = false;
 };
 
-// LA BARRE QU'UNE COMPÉTENCE ANNONCÉE POSE SOUS SON LANCEUR, hors de toute
-// incantation : la même jauge que celle d'une incantation, que le client fait
-// naître par un message à l'acteur et retire par un autre.
+// LA BARRE POSÉE SUR UN ACTEUR hors de toute incantation : la même jauge que
+// celle d'une incantation, que le client fait naître par un message à l'acteur
+// et retire par un autre. Deux sources la posent : une compétence annoncée, et
+// la barre de progression d'un script (`ro/sim/progress_bar.h`).
 //
-// ⚠ AUTO COUNTER EST LE SEUL, ET SEULEMENT POUR SOI : l'annonce pose une barre
-// de quatre cents millisecondes par niveau, puis la retire aussitôt quand le
-// lanceur n'est pas le joueur local. Une barre encore là se PROLONGE — son
-// départ et sa fin repartent de l'instant.
+// ⚠ AUTO COUNTER EST LA SEULE COMPÉTENCE, ET SEULEMENT POUR SOI : l'annonce
+// pose une barre de quatre cents millisecondes par niveau, puis la retire
+// aussitôt quand le lanceur n'est pas le joueur local. Une barre encore là se
+// PROLONGE — son départ et sa fin repartent de l'instant.
 struct SkillGauge {
   std::uint32_t started_ms = 0;
   std::uint32_t duration_ms = 0;

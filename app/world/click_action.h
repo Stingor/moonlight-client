@@ -256,8 +256,8 @@ struct WorldClick {
 };
 
 // Ce qui arrête la souris dans le monde, à cet instant : la mort, le coffre, un
-// commerce ouvert, et le dialogue d'un PNJ qui retient le monde — sauf pendant
-// une incantation qui pose sa barre.
+// commerce ouvert, et le dialogue d'un PNJ qui retient le monde — sauf tant que
+// le joueur porte une barre : voir `WorldMouseFrozen`.
 [[nodiscard]] MouseRoute MouseRouteOf(const ro::sim::World& world, const SkillBookPanel& skills,
                                       const MouseEngagement& engagement, std::uint32_t now_ms);
 

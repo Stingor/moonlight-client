@@ -13,7 +13,6 @@
 #include "ro/render/actor_pick.h"
 #include "ro/render/ground_pick.h"
 #include "ro/render/map_scene.h"
-#include "ro/render/skill_impl.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/skill_book.h"
 #include "ro/sim/world.h"
@@ -21,6 +20,7 @@
 #include "world/actor_visibility.h"
 #include "world/attack_intent.h"
 #include "world/blocked_npcs.h"
+#include "world/cast_bar_view.h"
 #include "world/ground_unit_view.h"
 #include "world/overlay_view.h"
 
@@ -117,16 +117,7 @@ void NoteDeedOfClickOn(MouseEngagement* engagement, const ro::sim::Actor& target
 
 MouseRoute MouseRouteOf(const ro::sim::World& world, const SkillBookPanel& skills,
                         const MouseEngagement& engagement, std::uint32_t now_ms) {
-  const ro::sim::Actor* self = world.player();
-  // Une incantation qui pose sa barre au-dessus du personnage garde la souris
-  // vivante pendant un dialogue.
-  const bool cast_bar =
-      self != nullptr && self->cast.has_value() &&
-      now_ms - self->cast->started_ms < self->cast->duration_ms &&
-      ro::render::SkillImplFor(self->cast->skill_id).ShowsCastBar(self->cast->duration_ms);
-  const bool dialog_holds = world.npc_dialog().has_value() && world.npc_dialog()->holds_world;
-  return {.frozen = engagement.death_freeze || engagement.trade_freeze ||
-                    (dialog_holds && !cast_bar) || world.storage_open(),
+  return {.frozen = WorldMouseFrozen(engagement, world, OwnBarShown(world, now_ms)),
           .suspended = skills.aim() == SkillAim::kGround};
 }
 

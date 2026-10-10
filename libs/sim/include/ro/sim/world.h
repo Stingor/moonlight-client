@@ -335,6 +335,8 @@ class World {
   // INTERROMPUE. Elle reste connue, sa durée ramenée à ce qui en a été joué : le
   // repos qui suit sait qu'on la quitte. Rend faux si cet acteur n'en avait pas.
   bool CancelCast(std::uint32_t id, std::uint32_t now_ms);
+  // Pose la jauge d'un acteur, ou la retire si elle est vide. Faux pour un acteur hors de vue.
+  bool SetGauge(std::uint32_t id, std::optional<SkillGauge> gauge);
 
   // Note ce qu'un acteur DIT, et l'instant. Un locuteur inconnu — zéro, ou
   // quelqu'un qu'on n'a jamais vu — ne fait qu'entrer dans la conversation :
@@ -617,14 +619,12 @@ class World {
   // l'ancienne les ferait apparaître sur la nouvelle.
   void Clear();
 
-  // Fait entrer le monde sur une carte, à la case donnée.
-  //
-  // Les acteurs de l'ancienne s'en vont — le serveur réannonce ceux de la
-  // nouvelle — mais le JOUEUR traverse : il garde son identifiant et son
-  // apparence, que le serveur ne redit pas, ainsi que la direction de son
-  // regard, que le paquet ne porte pas. Ce qu'il faisait sur l'ancienne — un
-  // coup porté, un coup reçu, un ramassage — s'oublie : ces faits nomment des
-  // acteurs qui ne sont plus là.
+  // Fait entrer le monde sur une carte, à la case donnée. Les acteurs de l'ancienne
+  // s'en vont — le serveur réannonce ceux de la nouvelle — mais le JOUEUR traverse :
+  // il garde son identifiant et son apparence, que le serveur ne redit pas, ainsi que
+  // la direction de son regard, que le paquet ne porte pas. Ce qu'il faisait sur
+  // l'ancienne — un coup porté, un coup reçu, un ramassage — s'oublie : ces faits
+  // nomment des acteurs qui ne sont plus là.
   //
   // ⚠ SES EFFETS S'ÉTEIGNENT AUSSI : le client natif détruit l'acteur, et ses
   // instances d'effet avec lui. Le serveur s'appuie là-dessus pour rendre sa

@@ -35,6 +35,7 @@ add_library(ro_net STATIC
     src/cart_choice.cpp
     src/cash_shop.cpp
     src/npc_illustration.cpp
+    src/progress_bar.cpp
     src/character.cpp
     src/chat_channels.cpp
     src/chat_target.cpp

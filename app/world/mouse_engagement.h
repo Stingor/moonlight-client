@@ -162,6 +162,14 @@ void SkipSettle(MouseEngagement& engagement, PointerPx mouse);
 // conserve.
 void EnterMap(MouseEngagement& engagement, bool same_map);
 
+// LA SOURIS EST FIGÉE DANS LE MONDE : la mort, un commerce, le coffre, ou le
+// dialogue d'un PNJ qui retient le monde — sauf tant que le joueur porte une
+// barre au-dessus de la tête (`own_bar_shown`) : incantation, compétence
+// annoncée ou barre de progression d'un script. Sous celle-ci, un pas demandé
+// est la façon d'annuler.
+[[nodiscard]] bool WorldMouseFrozen(const MouseEngagement& engagement, const ro::sim::World& world,
+                                    bool own_bar_shown);
+
 // Le siège de la carte : annoncé maintenant, ou depuis l'arrivée.
 [[nodiscard]] bool SiegeMap(const MouseEngagement& engagement, const ro::sim::MapMode& mode);
 void NoteMapMode(MouseEngagement& engagement, const ro::sim::MapMode& mode);

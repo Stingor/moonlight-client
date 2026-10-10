@@ -39,6 +39,7 @@
 #include "ro/net/npc_illustration.h"
 #include "ro/net/party.h"
 #include "ro/net/player_config.h"
+#include "ro/net/progress_bar.h"
 #include "ro/net/refusal_text.h"
 #include "ro/net/repair_list.h"
 #include "ro/net/server_message.h"
@@ -57,7 +58,7 @@
 #include "game/bug_report_context.h"
 #include "game/connected_session.h"
 #include "game/game.h"
-#include "game/surface_announcer.h"
+#include "game/handshake_pump.h"
 #include "input/camera_aim.h"
 #include "items/warp_memo_report.h"
 #include "world/attack_intent.h"
@@ -257,11 +258,14 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
         outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = quested;  // Le journal des quêtes.
     }
-    // ET L'ILLUSTRATION QU'UN SCRIPT MONTRE, ou efface.
-    const ro::net::FrameOutcome illustrated =
-        ro::net::ApplyNpcIllustrationFrame(received, pieces_.npc_illustration.slot());
-    if (outcome == ro::net::FrameOutcome::kUnhandled) {
-      outcome = illustrated;
+    // ET CE QU'UN SCRIPT POSE À L'ÉCRAN : l'illustration, montrée ou effacée, et
+    // la barre de progression — voir ro/net/progress_bar.h.
+    for (const ro::net::FrameOutcome scripted :
+         {ro::net::ApplyNpcIllustrationFrame(received, pieces_.npc_illustration.slot()),
+          ro::net::ApplyProgressFrame(received, world_, pieces_.progress, now_ms)}) {
+      if (outcome == ro::net::FrameOutcome::kUnhandled) {
+        outcome = scripted;
+      }
     }
     // ET LA FICHE D'UN MONSTRE, avec le relevé du skill Sense.
     if (monster_sheet_.has_value()) {
@@ -467,6 +471,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // durée s'achève ne vaut aucun paquet, et sans ce balayage son icône
   // resterait jusqu'au suivant, quel qu'il soit.
   world_.ExpirePlayerStatuses(now_ms);
+  // ET LA BARRE DE PROGRESSION DU JOUEUR, échue ou annulée : le script attend.
+  ReportRefusal(ro::net::ReportProgressDone(link_, world_, pieces_.progress, now_ms));
 
   // LE FILET DE LA PAGE DE DIALOGUE, pour la même raison : une page dont le
   // paquet terminal n'arrive jamais — un script qui écrit puis dort, ou qui
@@ -474,39 +480,11 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // donc il ne peut se déclencher qu'ici, une fois le drain fini.
   static_cast<void>(world_.CommitNpcPageIfIdle(now_ms));
 
-  // LA POIGNÉE DE MAIN D'INTÉGRITÉ, aussitôt la liaison ouverte : le serveur arme
-  // son minuteur à l'entrée en carte, et ce qu'on lui doit tient en un paquet.
-  // Ce que le journal en dit ne se répète pas — seul un CHANGEMENT
-  // d'état s'écrit, sinon le renvoi toutes les trois secondes noierait le reste.
+  // LA POIGNÉE DE MAIN D'INTÉGRITÉ, aussitôt la liaison ouverte, et ce qu'elle
+  // débloque : voir `PumpHandshake`.
   if (link_.is_open()) {
-    handshake_.Pump(link_, now_ms);
-    if (handshake_.state() != reported_handshake_) {
-      reported_handshake_ = handshake_.state();
-      // 🔴 DEUX DES CINQ ÉTATS ANNONCENT LA FIN DE LA SESSION — le refus, qui
-      // donne cinq secondes, et l'abandon après cinq envois. Les écrire au même
-      // rang que « émise » et « acceptée » les faisait disparaître du filtre par
-      // gravité à l'instant précis où le joueur y cherche pourquoi il a été
-      // éjecté.
-      const bool cut_off = reported_handshake_ == ro::net::MoonclientHandshakeState::kRefused ||
-                           reported_handshake_ == ro::net::MoonclientHandshakeState::kGivenUp;
-      if (cut_off) {
-        ro::core::LogWarning("{}", ro::net::DescribeHandshake(reported_handshake_));
-      } else {
-        ro::core::LogInfo("{}", ro::net::DescribeHandshake(reported_handshake_));
-      }
-      if (reported_handshake_ == ro::net::MoonclientHandshakeState::kVerified) {
-        // LE CATALOGUE DE LA BOUTIQUE, une fois par partie : le personnage est
-        // sur sa carte, et le serveur écoute.
-        pieces_.cash_shop.RequestCatalogueOnce(link_);
-      }
-    }
-    // 🔴 LE SERVEUR NOUS RECONNAÎT : c'est alors qu'il accepte nos annonces, et il
-    // les oublie à chaque entrée en zone. Sans elles, il refuse toute commande
-    // d'album et dépouille les dialogues de leurs images. Le carnet y entre et en
-    // sort avec son interrupteur.
-    pieces_.surfaces.Pump(
-        link_, handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
-        ShownSurfaces(settings_->options().pages().mvp_tracker.settings().enabled));
+    PumpHandshake(link_, handshake_, reported_handshake_, pieces_,
+                  settings_->options().pages().mvp_tracker.settings().enabled, now_ms);
   }
 
   // L'ANNEAU DES DIX PREMIERS S'ACCORDE AU RANG DE CHACUN, à chaque battement.

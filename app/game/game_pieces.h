@@ -23,6 +23,7 @@
 #include "ro/render/skin_textures.h"
 #include "ro/render/status_icons.h"
 #include "ro/render/title_table.h"
+#include "ro/sim/progress_bar.h"
 #include "ro/sim/skill_tree.h"
 #include "ro/vfs/achievement_catalog.h"
 #include "ro/vfs/achievement_titles.h"
@@ -168,6 +169,9 @@ struct GamePieces {
   CraftStage craft;
   // L'illustration que montre un PNJ : voir `NpcIllustrationStage`.
   NpcIllustrationStage npc_illustration;
+  // La réponse qu'attend la barre de progression d'un script : voir
+  // `ro::sim::ProgressReport`.
+  ro::sim::ProgressReport progress;
   // Le bandeau du nom de la carte : voir `MapSignStage`.
   MapSignStage map_sign;
 

@@ -177,6 +177,13 @@ void EnterMap(MouseEngagement& engagement, bool same_map) {
   }
 }
 
+bool WorldMouseFrozen(const MouseEngagement& engagement, const ro::sim::World& world,
+                      bool own_bar_shown) {
+  const bool dialog_holds = world.npc_dialog().has_value() && world.npc_dialog()->holds_world;
+  return engagement.death_freeze || engagement.trade_freeze || (dialog_holds && !own_bar_shown) ||
+         world.storage_open();
+}
+
 bool SiegeMap(const MouseEngagement& engagement, const ro::sim::MapMode& mode) {
   return engagement.siege_map || mode.guild_emblems_shown;
 }

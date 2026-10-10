@@ -33,6 +33,12 @@ bool ShownCastOf(const ro::sim::Actor& actor, std::uint32_t now_ms, ShownCast* i
   return true;
 }
 
+bool OwnBarShown(const ro::sim::World& world, std::uint32_t now_ms) {
+  const ro::sim::Actor* player = world.player();
+  ShownCast shown;
+  return player != nullptr && ShownCastOf(*player, now_ms, &shown);
+}
+
 ro::ui::StatBarValue OwnCastGauge(const ro::sim::World& world, const ro::sim::SkillTree* skills,
                                   std::uint32_t now_ms) {
   ro::ui::StatBarValue gauge;
