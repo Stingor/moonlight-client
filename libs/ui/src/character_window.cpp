@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/chat_link_offer.h"
@@ -28,6 +29,11 @@ namespace {
 // d'interface.
 constexpr float kFirstHeightPixels = 490.0F;
 constexpr float kMinimumHeightPixels = 450.0F;
+// Les compagnons que ce plancher loge sans grandir : le premier prend la place
+// libre de la rangée des mains, le second la rangée qu'il ajoute dessous.
+// Chacun de plus empile une rangée de cases sous la colonne de gauche, et le
+// plancher la gagne.
+constexpr std::size_t kCompanionsWithinFloor = 2;
 // L'arrondi de la fenêtre et celui des cadres de ses onglets, plus ronds que la
 // peau commune.
 constexpr float kWindowRoundingPixels = 8.0F;
@@ -45,6 +51,20 @@ constexpr float kNoHeightCeiling = 10000.0F;
 // laisser passer un volet réellement trop serré. Même raison que la tolérance de
 // bord d'écran de la chatbox.
 constexpr float kStatsPaneSlack = 6.0F;
+
+// LE PLANCHER DE LA FENÊTRE : une rangée de cases de plus par compagnon au-delà
+// de ceux qu'il loge. Les compagnons restent EN COLONNE, à la place que le
+// client leur donne ; c'est la fenêtre qui leur cède la hauteur.
+//
+// ⚠ IL VAUT POUR TOUS LES ONGLETS, et non pour le seul onglet Équipement qui
+// montre les compagnons : un plancher propre à l'onglet ferait sauter la
+// hauteur de la fenêtre à chaque passage de l'un à l'autre.
+[[nodiscard]] float MinimumHeight(std::size_t companion_count) {
+  const std::size_t extra_rows =
+      companion_count > kCompanionsWithinFloor ? companion_count - kCompanionsWithinFloor : 0;
+  const float row_step = kEquipSlotPixels + kEquipSlotGapPixels;
+  return (kMinimumHeightPixels + static_cast<float>(extra_rows) * row_step) * Scale();
+}
 
 // La largeur du volet du mannequin : le plus large de son bloc et des cases
 // posées sous les poses, plus ce que l'enfant prend de marge. ⚠ MESURÉE À LA
@@ -336,7 +356,7 @@ CharacterWindowAction DrawCharacterWindow(
   // ne ferait qu'étirer le vide entre deux volets.
   ImGui::SetNextWindowSizeConstraints(
       ImVec2(state.width.force_wide ? state.width.wide : state.width.narrow,
-             kMinimumHeightPixels * scale),
+             MinimumHeight(view.companions.size())),
       ImVec2(state.width.extra, kNoHeightCeiling), SnapToPaneSteps, &state.width);
   // La fenêtre s'ouvre sur le mannequin ET ses nombres : c'est la vue que le
   // joueur cherche, et la replier tout de suite serait lui faire élargir à
