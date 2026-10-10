@@ -8,7 +8,8 @@
 // et 10 par les cas du répartiteur des ÉMETTEURS, que ni l'un ni l'autre ne
 // porte : scripts/client_effect_emitters.json. Ne lire que le premier laissait
 // muets des effets dont le bruit était relevé — le soin du prêtre en était,
-// et EF_PHARMACY_OK, à onze sites d'émission, en était aussi.
+// et EF_PHARMACY_OK, à onze sites d'émission, en était aussi. Et 7 sont mis
+// en file par une CLASSE à sa naissance : scripts/client_effect_class_sounds.json.
 //
 // ⚠ ET CHAQUE BRUIT A SON TIC. Le client en joue beaucoup à un tic PRÉCIS de
 // l'instance et non à sa naissance — trente-sept pour l'onde de Bash, soixante
@@ -55,7 +56,7 @@ namespace {
 //
 // Les 7 noms que le client FORME au tirage gardent leur `%d`, et le nombre
 // de fichiers entre lesquels il tire : chaque appel tire à neuf.
-constexpr std::array<EffectSoundEntry, 697> kEffectSounds = {{
+constexpr std::array<EffectSoundEntry, 704> kEffectSounds = {{
     {1, "effect\\EF_hit2.wav", 0},
     {2, "effect\\EF_hit3.wav", 0},
     {3, "effect\\EF_hit4.wav", 0},
@@ -213,6 +214,7 @@ constexpr std::array<EffectSoundEntry, 697> kEffectSounds = {{
     {273, "effect\\mon_연환.wav", 0},
     {274, "effect\\rog_steal coin.wav", 0},
     {275, "effect\\rog_back stap.wav", 20},
+    {298, "_heal_effect.wav", 0},
     {300, "apocalips_attack.wav", 0},
     {301, "effect\\폭죽.wav", 300, 0, 0, true},
     {303, "effect\\연주붕격.wav", 0},
@@ -329,6 +331,10 @@ constexpr std::array<EffectSoundEntry, 697> kEffectSounds = {{
     {609, "caramel_die.wav", 50},
     {610, "_heal_effect.wav", 0},
     {611, "caramel_die.wav", 0},
+    {613, "effect\\닌자_던지기.wav", 0},
+    {614, "effect\\닌자_던지기.wav", 0},
+    {615, "effect\\닌자_던지기.wav", 0},
+    {616, "effect\\닌자_던지기.wav", 0},
     {618, "effect\\EF_FireArrow%d.wav", 12, 0, 3},
     {618, "effect\\EF_FireArrow%d.wav", 13, 0, 3},
     {618, "effect\\EF_FireArrow%d.wav", 14, 0, 3},
@@ -447,6 +453,7 @@ constexpr std::array<EffectSoundEntry, 697> kEffectSounds = {{
     {910, "effect\\LG_INSPIRATION.wav", 10},
     {911, "effect\\EF_BeginSpell.wav", 0},
     {913, "effect\\EF_FireBall.wav", 5, 0, 0, true},
+    {914, "effect\\G스포어익스플로젼.wav", 0},
     {930, "effect\\프레셔.wav", 3},
     {930, "effect\\S바레티르스피어.wav", 22},
     {942, "effect\\wizard_waterball_chulung.wav", 0, 0, 0, true},
@@ -472,6 +479,7 @@ constexpr std::array<EffectSoundEntry, 697> kEffectSounds = {{
     {1103, "effect\\su_scratch.wav", 0},
     {1107, "effect\\su_scaroftarou.wav", 0},
     {1109, "effect\\su_pickypeck.wav", 0},
+    {1110, "effect\\su_roottwist.wav", 0},
     {1116, "effect\\su_brunchofshrimp.wav", 0},
     {1123, "effect\\su_grooming.wav", 0},
     {1124, "effect\\su_chattering.wav", 0},

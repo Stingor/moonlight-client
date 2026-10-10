@@ -23,9 +23,9 @@ constexpr std::uint32_t kFirstSoundVariant = 1;
 constexpr std::uint32_t kDrawMixer = 2654435761U;
 constexpr std::uint32_t kDrawMixedShift = 16U;
 
-// LES SONS D'EFFET CHOISIS PAR LE JOUEUR, à l'écart du client d'origine, qui
-// n'en joue aucun pour ces effets. Ils ne passent qu'à défaut du relevé : la
-// bouteille d'Acid Terror éclate comme UNE flèche de Fire Bolt, l'une des trois
+// LES SONS D'EFFET CHOISIS PAR LE JOUEUR, à l'écart du client d'origine. Ils
+// passent DEVANT le relevé : la bouteille d'Acid Terror, qui sonne comme un
+// soin chez le natif, éclate ici comme UNE flèche de Fire Bolt, l'une des trois
 // variantes tirée au sort.
 constexpr std::uint8_t kFireBoltVariants = 3;
 constexpr std::array<EffectSoundEntry, 1> kPlayerChosenEffectSounds = {{
@@ -60,11 +60,11 @@ std::span<const EffectSoundEntry> EffectSounds(std::uint32_t effect_id) {
     return table.subspan(static_cast<std::size_t>(first - table.begin()),
                          static_cast<std::size_t>(last - first));
   };
-  if (const std::span<const EffectSoundEntry> measured = among(EffectSoundTable());
-      !measured.empty()) {
-    return measured;
+  if (const std::span<const EffectSoundEntry> chosen = among(kPlayerChosenEffectSounds);
+      !chosen.empty()) {
+    return chosen;
   }
-  return among(kPlayerChosenEffectSounds);
+  return among(EffectSoundTable());
 }
 
 std::string_view EffectSound(std::uint32_t effect_id) {

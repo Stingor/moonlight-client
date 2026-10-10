@@ -19,17 +19,14 @@ namespace ro::render {
 namespace {
 
 // Triée par identifiant : la recherche est dichotomique.
-constexpr std::array<SkillSoundEntry, 132> kSkillSounds = {{
+constexpr std::array<SkillSoundEntry, 129> kSkillSounds = {{
     {16, "_stonecurse.wav"},
     {273, "effect\\mon_맹룡과강.wav"},
     {370, "effect\\맹호경파산.wav"},
     {387, "effect\\EF_IncAgility.wav"},
     {462, "effect\\priest_resurrection.wav"},
     {489, "effect\\priest_slowpoison.wav"},
-    {522, "_heal_effect.wav"},
-    {523, "effect\\EF_Blessing.wav"},
     {654, "effect\\EF_FireWall.wav"},
-    {662, "effect\\mapae.wav"},
     {666, "_stonecurse.wav"},
     {667, "amon_ra_die01.wav"},
     {668, "effect\\widesleep.wav"},
