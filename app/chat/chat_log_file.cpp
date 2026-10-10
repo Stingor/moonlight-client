@@ -51,6 +51,32 @@ constexpr unsigned char kFirstPrintable = 0x20;
   return path;
 }
 
+void AppendLine(std::string& content, const PastChatLine& line) {
+  content += ChatLogLine(line);
+  content += kLineEnd;
+}
+
+// Le dossier des dumps, créé au besoin.
+//
+// ⚠ RÉCURSIF, contrairement au `_mkdir` du client : c'est ce qui rend son
+// `/savechat` muet quand un dossier intermédiaire manque.
+[[nodiscard]] ChatLogDump StartDump(const std::filesystem::path& client_root) {
+  ChatLogDump done{.folder = ChatLogFolder(client_root)};
+  std::error_code failed;
+  std::filesystem::create_directories(done.folder, failed);
+  return done;
+}
+
+// Écrit un dump sous le premier nom libre, et le compte dans `done`.
+void WriteDump(ChatLogDump& done, std::string_view stem, std::string_view content) {
+  const std::filesystem::path path = DumpPathFor(done.folder, stem);
+  if (ro::core::WriteFileAtomically(path, content).has_value()) {
+    ++done.files;
+  } else {
+    ro::core::LogWarning("journal de conversation : {} n'a pas pu être écrit", path.string());
+  }
+}
+
 }  // namespace
 
 std::filesystem::path ChatLogFolder(const std::filesystem::path& client_root) {
@@ -81,12 +107,7 @@ std::string ChatLogLine(const PastChatLine& line) {
 
 ChatLogDump DumpChatLogs(const std::filesystem::path& client_root, std::span<const ChatTab> tabs,
                          std::span<const ChatLogPart> parts) {
-  ChatLogDump done{.folder = ChatLogFolder(client_root)};
-  std::error_code failed;
-  // ⚠ RÉCURSIF, contrairement au `_mkdir` du client : c'est ce qui rend son
-  // `/savechat` muet quand un dossier intermédiaire manque.
-  std::filesystem::create_directories(done.folder, failed);
-
+  ChatLogDump done = StartDump(client_root);
   for (const ChatTab& tab : tabs) {
     std::string content(kUtf8Bom);
     int kept = 0;
@@ -103,21 +124,29 @@ ChatLogDump DumpChatLogs(const std::filesystem::path& client_root, std::span<con
           content += kLineEnd;
           titled = true;
         }
-        content += ChatLogLine(line);
-        content += kLineEnd;
+        AppendLine(content, line);
         ++kept;
       }
     }
     if (kept == 0) {
       continue;  // un onglet vide ne mérite pas un fichier vide
     }
-    const std::filesystem::path path = DumpPathFor(done.folder, SafeFileStem(tab.name));
-    if (ro::core::WriteFileAtomically(path, content).has_value()) {
-      ++done.files;
-    } else {
-      ro::core::LogWarning("journal de conversation : {} n'a pas pu être écrit", path.string());
-    }
+    WriteDump(done, SafeFileStem(tab.name), content);
   }
+  return done;
+}
+
+ChatLogDump DumpChatRoomLog(const std::filesystem::path& client_root, std::string_view room_title,
+                            std::span<const PastChatLine> lines) {
+  if (lines.empty()) {
+    return ChatLogDump{.folder = ChatLogFolder(client_root)};
+  }
+  ChatLogDump done = StartDump(client_root);
+  std::string content(kUtf8Bom);
+  for (const PastChatLine& line : lines) {
+    AppendLine(content, line);
+  }
+  WriteDump(done, std::string(kChatRoomDumpPrefix) + SafeFileStem(room_title), content);
   return done;
 }
 

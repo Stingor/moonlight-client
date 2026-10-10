@@ -39,6 +39,10 @@ inline constexpr std::string_view kChatLogFolderName = "Chat";
 inline constexpr std::string_view kChatDumpPrefix = "Chat_";
 inline constexpr std::string_view kChatLogPrefix = "ChatLog_";
 inline constexpr std::string_view kChatLogSuffix = ".txt";
+// LE FIL D'UN SALON s'écrit à côté des onglets, sous un nom qui dit d'où il
+// vient : le préfixe des dumps, celui-ci, puis le titre. Le titre seul se
+// confondrait avec un onglet du même nom.
+inline constexpr std::string_view kChatRoomDumpPrefix = "Salon_";
 
 // Jusqu'où va la rotation. Le client s'arrête à trois chiffres et nous aussi :
 // au-delà, ce n'est plus un dump ponctuel mais un journal, et il y en a un.
@@ -92,6 +96,13 @@ struct ChatLogPart {
 [[nodiscard]] ChatLogDump DumpChatLogs(const std::filesystem::path& client_root,
                                        std::span<const ChatTab> tabs,
                                        std::span<const ChatLogPart> parts);
+
+// LE FIL D'UN SALON, en un fichier : toutes ses lignes, sans filtre — la salle
+// n'a pas d'onglets. Même dossier, même forme de ligne et même rotation que
+// `DumpChatLogs`. Un salon sans ligne n'a pas de fichier.
+[[nodiscard]] ChatLogDump DumpChatRoomLog(const std::filesystem::path& client_root,
+                                          std::string_view room_title,
+                                          std::span<const PastChatLine> lines);
 
 // LE JOURNAL CONTINU : un fichier par JOUR, en ajout.
 //

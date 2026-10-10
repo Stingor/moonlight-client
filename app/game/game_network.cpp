@@ -694,6 +694,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
           .link = link_,
           .world = world_,
           .words = pieces_.item_words,
+          .friends = friends_,
           .stores =
               ChatRoomStoreState{.in_room = pieces_.chat_rooms.room().in_room(),
                                  .vending_open = pieces_.trade.vending().vending().shop_open(),

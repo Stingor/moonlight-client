@@ -3232,6 +3232,9 @@ tr: Saves the equipment currently worn under this name
 fr: Enregistrer l'équipement porté (%d/%d)
 tr: Save the equipment worn (%d/%d)
 
+fr: Enregistrer le chat
+tr: Save chat
+
 fr: Enregistré
 tr: Saved
 

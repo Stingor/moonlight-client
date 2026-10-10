@@ -68,6 +68,21 @@ void CopyInto(std::span<char> buffer, std::string_view text) {
   buffer[kept] = '\0';
 }
 
+// Le libellé d'une ligne du menu d'un membre.
+[[nodiscard]] std::string MemberVerbLabel(ChatRoomMemberVerb verb, const ChatRoomView& view) {
+  switch (verb) {
+    case ChatRoomMemberVerb::kExpel:
+      return Owned(view.words.kick);
+    case ChatRoomMemberVerb::kGiveOwner:
+      return Owned(view.words.give_owner);
+    case ChatRoomMemberVerb::kBefriend:
+      return core::Tr("Ajouter en ami");
+    case ChatRoomMemberVerb::kSaveChat:
+      return core::Tr("Enregistrer le chat");
+  }
+  return {};
+}
+
 void DrawMembers(ChatRoomWindowState& state, const ChatRoomView& view,
                  ChatRoomWindowAction& action) {
   for (const ChatRoomMemberView& member : view.members) {
@@ -96,23 +111,33 @@ void DrawMembers(ChatRoomWindowState& state, const ChatRoomView& view,
     } else {
       ImGui::TextUnformatted(name.c_str());
     }
-    // LE MENU DU CHEF, au clic droit. Le client d'origine n'en a pas sur la
-    // liste : il fallait passer par sa fenêtre de réglages.
-    if (view.owned && !member.me && ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+    // LE MENU D'UN MEMBRE, au clic droit sur son nom.
+    if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
       state.menu_member = name;
       ImGui::OpenPopup(kMemberMenu);
     }
   }
   if (BeginSkinPopup(kMemberMenu)) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-    ImGui::TextUnformatted(state.menu_member.c_str());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-    if (ImGui::MenuItem(Owned(view.words.kick).c_str())) {
-      action.expel = state.menu_member;
-    }
-    if (ImGui::MenuItem(Owned(view.words.give_owner).c_str())) {
-      action.give_owner = state.menu_member;
+    // ⚠ LE MEMBRE SE RELIT À CHAQUE IMAGE : parti entre-temps, il n'a plus de
+    // menu, et ses droits ont pu changer depuis le clic.
+    const auto aimed = std::ranges::find(view.members, std::string_view(state.menu_member),
+                                         &ChatRoomMemberView::name);
+    if (aimed == view.members.end()) {
+      ImGui::CloseCurrentPopup();
+    } else {
+      ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+      ImGui::TextUnformatted(state.menu_member.c_str());
+      ImGui::PopStyleColor();
+      ImGui::Separator();
+      for (const ChatRoomMemberEntry& entry : ChatRoomMemberMenu(*aimed, view)) {
+        if (ImGui::MenuItem(MemberVerbLabel(entry.verb, view).c_str(), nullptr, false,
+                            entry.refusal == nullptr)) {
+          ChooseChatRoomMemberVerb(entry.verb, state.menu_member, action);
+        }
+        if (entry.refusal != nullptr) {
+          SkinTooltip(entry.refusal);
+        }
+      }
     }
     EndSkinPopup();
   }
@@ -306,6 +331,46 @@ ChatRoomWindowAction DrawChatRoomWindow(ChatRoomWindowState& state, const ChatRo
     action.leave = true;
   }
   return action;
+}
+
+std::vector<ChatRoomMemberEntry> ChatRoomMemberMenu(const ChatRoomMemberView& member,
+                                                    const ChatRoomView& view) {
+  std::vector<ChatRoomMemberEntry> entries;
+  if (!member.me) {
+    if (view.owned) {
+      entries.push_back(ChatRoomMemberEntry{.verb = ChatRoomMemberVerb::kExpel});
+      entries.push_back(ChatRoomMemberEntry{.verb = ChatRoomMemberVerb::kGiveOwner});
+    }
+    // LES MÊMES REFUS QUE LE MENU D'UN PSEUDO : pas deux fois le même, pas
+    // au-delà de la liste.
+    ChatRoomMemberEntry befriend{.verb = ChatRoomMemberVerb::kBefriend};
+    if (member.befriended) {
+      befriend.refusal = core::Tr("Déjà dans votre liste d'amis.");
+    } else if (view.friends_full) {
+      befriend.refusal = core::Tr("Votre liste d'amis est pleine.");
+    }
+    entries.push_back(befriend);
+  }
+  entries.push_back(ChatRoomMemberEntry{.verb = ChatRoomMemberVerb::kSaveChat});
+  return entries;
+}
+
+void ChooseChatRoomMemberVerb(ChatRoomMemberVerb verb, std::string_view member,
+                              ChatRoomWindowAction& action) {
+  switch (verb) {
+    case ChatRoomMemberVerb::kExpel:
+      action.expel = std::string(member);
+      return;
+    case ChatRoomMemberVerb::kGiveOwner:
+      action.give_owner = std::string(member);
+      return;
+    case ChatRoomMemberVerb::kBefriend:
+      action.befriend = std::string(member);
+      return;
+    case ChatRoomMemberVerb::kSaveChat:
+      action.save_chat = true;
+      return;
+  }
 }
 
 }  // namespace ro::ui

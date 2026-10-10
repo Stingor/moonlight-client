@@ -9,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/net/friends.h"
 #include "ro/vfs/chat_room_words.h"
 #include "ro/vfs/trade_words.h"
 
@@ -345,6 +346,18 @@ void ChatRoomStage::FollowRoom(ChatRoomWindows& windows, const ChatRoomContext& 
       ro::core::LogWarning("salon : {}", ro::core::Describe(sent.error()));
     }
   }
+  // LA DEMANDE D'AMITIÉ, celle du menu d'entité, par le nom. Le menu ne
+  // l'offre ni pour soi ni pour un ami : ce qui arrive ici malgré tout ne part
+  // pas.
+  if (answer.befriend.has_value() && *answer.befriend != context.world.player_name() &&
+      !context.friends.HasName(*answer.befriend) && !context.friends.full()) {
+    if (auto sent = ro::net::RequestFriend(context.link, *answer.befriend); !sent) {
+      ro::core::LogWarning("salon : {}", ro::core::Describe(sent.error()));
+    }
+  }
+  if (answer.save_chat) {
+    save_asked_ = true;
+  }
   if (answer.apply_settings) {
     ApplySettings(windows, context);
   }
@@ -564,13 +577,15 @@ void ChatRoomStage::Compose(ChatRoomWindows& windows, const ChatRoomContext& con
       members_.push_back(
           ro::ui::ChatRoomMemberView{.name = member.name,
                                      .owner = member.owner,
-                                     .me = member.name == context.world.player_name()});
+                                     .me = member.name == context.world.player_name(),
+                                     .befriended = context.friends.HasName(member.name)});
     }
     room_view_ = ro::ui::ChatRoomView{.limits = Limits(),
                                       .words = words_,
                                       .caption = caption_,
                                       .members = members_,
                                       .owned = inside->owned,
+                                      .friends_full = context.friends.full(),
                                       .settings_error = settings_error_,
                                       .title = inside->title,
                                       .password = inside->password,

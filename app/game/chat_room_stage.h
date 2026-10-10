@@ -15,6 +15,7 @@
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
 #include "ro/sim/chat_room.h"
+#include "ro/sim/friend_list.h"
 #include "ro/sim/world.h"
 #include "ro/ui/chat_room_window.h"
 #include "ro/vfs/item_words.h"
@@ -46,6 +47,9 @@ struct ChatRoomContext {
   ro::net::Connection& link;
   ro::sim::World& world;
   const ro::vfs::ItemWords& words;
+  // Pour griser « Ajouter en ami », et pour ne pas envoyer ce que le serveur
+  // refuserait.
+  const ro::sim::FriendList& friends;
   ChatRoomStoreState stores;
   std::uint32_t now_ms = 0;
 };
@@ -82,6 +86,11 @@ class ChatRoomStage {
   // `/q` : on sort du salon, s'il y en a un. Rend faux hors salon.
   bool AskLeave() noexcept;
 
+  // « Enregistrer le chat », choisi dans le menu d'un membre depuis le dernier
+  // appel. L'écriture revient à qui tient le fil horodaté : voir
+  // `ChatTabsView::SaveRoomLog`.
+  [[nodiscard]] bool TakeSaveAsked() noexcept { return std::exchange(save_asked_, false); }
+
   // La barre de la conversation est-elle prêtée à la salle ?
   [[nodiscard]] bool LendsInput() const noexcept { return room_.in_room(); }
 
@@ -116,6 +125,7 @@ class ChatRoomStage {
   Asked asked_ = Asked::kNone;
   bool raise_room_ = false;
   bool leave_asked_ = false;
+  bool save_asked_ = false;
   // L'enseigne qu'un double-clic a désignée, jouée à l'image suivante.
   struct JoinAsk {
     std::uint32_t room_id = 0;

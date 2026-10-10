@@ -164,6 +164,10 @@ class ChatTabsView {
     return room_.lines;
   }
   [[nodiscard]] ro::ui::ChatLogLayout* room_layout() const noexcept { return &room_.layout; }
+  // « Enregistrer le chat », et `/savechat` en salon : le fil du salon dans
+  // son fichier, horodaté comme à l'écran. Voir `DumpChatRoomLog`.
+  [[nodiscard]] ChatLogDump SaveRoomLog(std::span<const ro::sim::ChatLine> lines,
+                                        std::string_view room_title) const;
 
   // ── LES CHUCHOTEMENTS — chat_whisper_lines.cpp ─────────────────────────
   // Ce qu'une conversation 1:1 a pris ne paraît plus dans le fil. Nul : rien

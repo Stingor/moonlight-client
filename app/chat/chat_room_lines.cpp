@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <imgui.h>
 
@@ -25,6 +26,14 @@ constexpr int kRedShift = 16;
 constexpr int kGreenShift = 8;
 constexpr std::uint32_t kByteMask = 0xFF;
 constexpr int kOpaque = 255;
+
+// L'heure du jour d'une ligne, en secondes, depuis la seconde du jour relevée
+// au démarrage.
+[[nodiscard]] int DaySecondOf(int day_second_at_boot, std::uint32_t said_ms) {
+  return ((day_second_at_boot + static_cast<int>(said_ms / kMsPerSecond)) % kSecondsPerDay +
+          kSecondsPerDay) %
+         kSecondsPerDay;
+}
 
 }  // namespace
 
@@ -48,10 +57,7 @@ void ChatTabsView::RefreshRoom(std::span<const ro::sim::ChatLine> lines, std::ui
     // L'heure, comme dans la conversation : le repère est la seconde du jour
     // relevée au démarrage, et le salon n'en tient que si elle l'a été.
     if (day_second_at_boot_ >= 0) {
-      const int second =
-          ((day_second_at_boot_ + static_cast<int>(line.said_ms / kMsPerSecond)) % kSecondsPerDay +
-           kSecondsPerDay) %
-          kSecondsPerDay;
+      const int second = DaySecondOf(day_second_at_boot_, line.said_ms);
       view.hour = static_cast<std::uint8_t>(second / kSecondsPerHour);
       view.minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute);
       view.second = static_cast<std::uint8_t>(second % kSecondsPerMinute);
@@ -67,6 +73,25 @@ void ChatTabsView::RefreshRoom(std::span<const ro::sim::ChatLine> lines, std::ui
     view.seq = line.seq;
     room_.lines.push_back(view);
   }
+}
+
+ChatLogDump ChatTabsView::SaveRoomLog(std::span<const ro::sim::ChatLine> lines,
+                                      std::string_view room_title) const {
+  std::vector<PastChatLine> written;
+  written.reserve(lines.size());
+  for (const ro::sim::ChatLine& line : lines) {
+    PastChatLine past{.type = line.type, .text = line.text};
+    // Sans repère d'heure, la ligne porte minuit, comme elle n'en porte aucune
+    // à l'écran.
+    if (day_second_at_boot_ >= 0) {
+      const int second = DaySecondOf(day_second_at_boot_, line.said_ms);
+      past.hour = static_cast<std::uint8_t>(second / kSecondsPerHour);
+      past.minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute);
+      past.second = static_cast<std::uint8_t>(second % kSecondsPerMinute);
+    }
+    written.push_back(std::move(past));
+  }
+  return DumpChatRoomLog(client_root_, room_title, written);
 }
 
 }  // namespace moonclient

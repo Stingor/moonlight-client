@@ -3232,6 +3232,9 @@ tr: Guarda con este nombre el equipo puesto actualmente
 fr: Enregistrer l'équipement porté (%d/%d)
 tr: Guardar el equipo puesto (%d/%d)
 
+fr: Enregistrer le chat
+tr: Guardar el chat
+
 fr: Enregistré
 tr: Guardado
 

@@ -118,7 +118,7 @@ struct ChatDispatch {
   ro::net::ChatArming* arming = nullptr;
   // LES ONGLETS, pour `/savechat` — et pour rien d'autre. Le routage ne trie
   // pas, ne dessine pas et ne règle rien : il demande le dump et redit ce
-  // qu'on lui répond.
+  // qu'on lui répond. En salon, le fil du salon s'y ajoute.
   ChatTabsView* chat_tabs = nullptr;
   // LES OPTIONS DU JOUEUR, et ce qu'elles touchent.
   //
@@ -289,6 +289,12 @@ inline constexpr std::string_view kBattleModeCommandLong = "/battlemode";
 // tout haut à soi-même. Tout le reste part au serveur — les commandes
 // d'administration y comprises, qu'il reconnaît dans le texte.
 void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms);
+
+// CE QUE `/savechat` ÉCRIT : les onglets, et en salon le fil du salon. Le menu
+// d'un membre n'écrit que le salon (`tabs_too` faux). Le dossier, ou l'absence
+// de ligne, se dit dans la conversation.
+void SaveChatAndSay(const ChatTabsView& tabs, const ChatRoomStage* rooms, bool tabs_too,
+                    ro::sim::World& world, std::uint32_t said_ms);
 
 // LES PAROLES RÉCENTES, projetées à l'écran : où flotte chacune, et depuis
 // combien de temps.

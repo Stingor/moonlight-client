@@ -209,6 +209,10 @@ void Game::StageChat(std::uint32_t now_ms) {
   // LE FIL DU SALON, APRÈS : il prend ses jetons de liens à la suite de ceux de
   // la conversation. Et la barre se prête à sa salle tant qu'il dure.
   chat_tabs_->RefreshRoom(pieces_.chat_rooms.room().lines(), pieces_.chat_rooms.room().room_seq());
+  // « ENREGISTRER LE CHAT », choisi dans le menu d'un membre : le salon seul.
+  if (pieces_.chat_rooms.TakeSaveAsked()) {
+    SaveChatAndSay(*chat_tabs_, &pieces_.chat_rooms, /*tabs_too=*/false, world_, now_ms);
+  }
   // LES CONVERSATIONS 1:1, de même.
   chat_tabs_->RefreshWhispers(world_.chat_lines(), pieces_.whispers.desk().conversations());
   windows_.chat.main.input_lent = pieces_.chat_rooms.LendsInput();

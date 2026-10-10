@@ -472,6 +472,32 @@ void SendLine(const ChatDispatch& to, const std::string& line, std::uint32_t sai
 
 }  // namespace
 
+void SaveChatAndSay(const ChatTabsView& tabs, const ChatRoomStage* rooms, bool tabs_too,
+                    ro::sim::World& world, std::uint32_t said_ms) {
+  ChatLogDump done;
+  if (tabs_too) {
+    done = tabs.SaveLogs();
+  }
+  if (rooms != nullptr) {
+    if (const std::optional<ro::sim::ChatRoomInside>& inside = rooms->room().inside();
+        inside.has_value()) {
+      const ChatLogDump room = tabs.SaveRoomLog(rooms->room().lines(), inside->title);
+      done.files += room.files;
+      done.folder = room.folder;
+    }
+  }
+  // ⚠ ON DIT LE DOSSIER, pas seulement le succès. Le client d'origine annonce
+  // « … is Saved. » sans jamais nommer l'endroit, et sa commande est MUETTE
+  // quand l'écriture échoue — on a assez souffert de commandes qui ne disent
+  // rien pour ne pas en fabriquer une de plus.
+  world.RecordChat(
+      ro::sim::ChatKind::kServer, 0,
+      done.files > 0
+          ? std::format("journal : {} fichier(s) dans {}", done.files, done.folder.string())
+          : std::string("journal : rien à enregistrer, aucun fil ne montre de ligne"),
+      said_ms);
+}
+
 void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms) {
   if (line.empty()) {
     return;
@@ -671,17 +697,7 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     return;
   }
   if (line == kSaveChatCommand && to.chat_tabs != nullptr) {
-    const ChatLogDump done = to.chat_tabs->SaveLogs();
-    // ⚠ ON DIT LE DOSSIER, pas seulement le succès. Le client d'origine annonce
-    // « … is Saved. » sans jamais nommer l'endroit, et sa commande est MUETTE
-    // quand l'écriture échoue — on a assez souffert de commandes qui ne disent
-    // rien pour ne pas en fabriquer une de plus.
-    to.world->RecordChat(
-        ro::sim::ChatKind::kServer, 0,
-        done.files > 0
-            ? std::format("journal : {} fichier(s) dans {}", done.files, done.folder.string())
-            : std::string("journal : rien à enregistrer, aucun onglet ne montre de ligne"),
-        said_ms);
+    SaveChatAndSay(*to.chat_tabs, to.chat_rooms, /*tabs_too=*/true, *to.world, said_ms);
     return;
   }
   // LA MÉMORISATION DU POINT DE WARP. La demande part sans champ, et la réponse

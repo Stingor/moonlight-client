@@ -7,6 +7,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ro/ui/chat_input.h"
 #include "ro/ui/chat_link.h"
@@ -144,8 +145,11 @@ struct ChatRoomMakeAction {
 struct ChatRoomMemberView {
   std::string_view name;
   bool owner = false;
-  // Le joueur lui-même : on ne se chuchote pas, on ne s'expulse pas.
+  // Le joueur lui-même : on ne se chuchote pas, on ne s'expulse pas, on ne
+  // s'ajoute pas en ami.
   bool me = false;
+  // Déjà dans la liste d'amis : « Ajouter en ami » se grise.
+  bool befriended = false;
 };
 
 // CE QUE LA SALLE MONTRE, recomposé à chaque image.
@@ -157,6 +161,8 @@ struct ChatRoomView {
   std::span<const ChatRoomMemberView> members;
   // Le joueur porte-t-il les droits de chef ?
   bool owned = false;
+  // La liste d'amis est pleine : « Ajouter en ami » se grise.
+  bool friends_full = false;
   // Le refus des derniers réglages envoyés, dit dans leur volet, ou vide.
   std::string_view settings_error;
   // Les réglages courants, pour pré-remplir le volet à son ouverture.
@@ -191,7 +197,7 @@ struct ChatRoomWindowState {
   bool settings_show_password = false;
   int settings_limit = kChatRoomFirstLimit;
   bool settings_public = true;
-  // Le membre visé par le menu du chef.
+  // Le membre visé par le menu d'un membre.
   std::string menu_member;
 };
 
@@ -200,6 +206,10 @@ struct ChatRoomWindowAction {
   bool leave = false;
   std::optional<std::string> expel;
   std::optional<std::string> give_owner;
+  // La demande d'amitié, par le nom, comme celle du menu d'entité.
+  std::optional<std::string> befriend;
+  // « Enregistrer le chat » : le fil du salon, dans son fichier.
+  bool save_chat = false;
   // Les réglages à appliquer, tels que le volet les tient.
   bool apply_settings = false;
   // CE QUE LA BARRE A RENDU, à router comme celle de la conversation.
@@ -211,6 +221,27 @@ struct ChatRoomWindowAction {
 
 [[nodiscard]] ChatRoomWindowAction DrawChatRoomWindow(ChatRoomWindowState& state,
                                                       const ChatRoomView& view, const SkinArt& art);
+
+// ── LE MENU D'UN MEMBRE, au clic droit sur son nom ───────────────────────────
+//
+// Tout membre l'a, soi-même compris : « Enregistrer le chat » ne vise personne.
+// Le chef y trouve en plus l'expulsion et la cession de ses droits.
+
+enum class ChatRoomMemberVerb : std::uint8_t { kExpel, kGiveOwner, kBefriend, kSaveChat };
+
+struct ChatRoomMemberEntry {
+  ChatRoomMemberVerb verb = ChatRoomMemberVerb::kSaveChat;
+  // Pourquoi la ligne est grisée, déjà traduit ; nul quand elle est permise.
+  const char* refusal = nullptr;
+};
+
+// Les lignes du menu de ce membre, dans leur ordre.
+[[nodiscard]] std::vector<ChatRoomMemberEntry> ChatRoomMemberMenu(const ChatRoomMemberView& member,
+                                                                  const ChatRoomView& view);
+
+// L'intention qu'une ligne choisie émet pour ce membre.
+void ChooseChatRoomMemberVerb(ChatRoomMemberVerb verb, std::string_view member,
+                              ChatRoomWindowAction& action);
 
 // ── L'INVITE DE MOT DE PASSE ────────────────────────────────────────────────
 
