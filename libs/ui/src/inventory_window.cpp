@@ -45,6 +45,11 @@ constexpr std::array<ItemTab, 7> kInventoryTabs = {
     ItemTab::kAll, ItemTab::kConsumable, ItemTab::kEquipment, ItemTab::kAmmo,
     ItemTab::kEtc, ItemTab::kCard,       ItemTab::kFavorite};
 
+// LES RANGS DE POSE DES RACCOURCIS DE LA BARRE DE TITRE, ceux que relit
+// `TitleActionClicked`.
+constexpr int kCartRank = 0;
+constexpr int kStorageRank = 1;
+
 // Le groupement des montants : trois chiffres, séparés par une virgule.
 constexpr std::size_t kThousandsGroup = 3;
 constexpr char kThousandsSeparator = ',';
@@ -233,6 +238,21 @@ InventoryWindowAction DrawInventoryWindow(InventoryWindowState& state,
         core::Tr("Storage"),
         view.storage_open ? core::Tr("Refermer le storage") : core::Tr("Ouvrir le storage"), true);
   }
+  // LE BOUTON DU STAFF, POSÉ EN DERNIER : il se range à gauche des raccourcis
+  // sans en déplacer aucun, et c'est lui qui s'efface le premier quand la barre
+  // rétrécit. Son rang est celui qui suit les raccourcis présents.
+  //
+  // 🔴 AUCUNE CONFIRMATION, et c'est voulu : le staff vide son sac entre deux
+  // essais. L'infobulle dit ce qui part et ce qui reste.
+  const int wipe_rank = state.storage_button ? kStorageRank + 1 : kCartRank;
+  if (view.staff_tools) {
+    SetNextWindowTitleAction(
+        core::Tr("Vider"),
+        core::Tr("Vider l'inventory (@itemreset)\nSupprime TOUS les items, sauf l'équipement "
+                 "porté, les favoris et l'œuf du familier sorti. Irréversible, et sans "
+                 "confirmation."),
+        true);
+  }
   // ⚠ L'INFOBULLE EST LE SEUL ANNONCEUR : la puce ne change pas d'aspect en
   // devenant cliquable, et c'est le dessin du client.
   SetNextWindowBulletClickable(core::Tr("Réglages de cette fenêtre"));
@@ -258,12 +278,19 @@ InventoryWindowAction DrawInventoryWindow(InventoryWindowState& state,
   }
   // ⚠ LES RACCOURCIS, EUX, N'EXISTENT PAS REPLIÉS : ce sont de vrais éléments
   // ImGui, et une fenêtre repliée n'en accepte aucun. Les lire ici ne coûte
-  // rien et garde les trois réponses au même endroit.
-  if (TitleActionClicked(0)) {
+  // rien et garde toutes les réponses de la barre au même endroit.
+  //
+  // ⚠ UN RANG NE VAUT QUE POUR UN BOUTON POSÉ : sans les raccourcis, le rang
+  // zéro est celui du staff, et le lire comme « Cart » ouvrirait la charrette à
+  // chaque sac vidé.
+  if (state.storage_button && TitleActionClicked(kCartRank)) {
     action.toggle_cart = true;
   }
-  if (TitleActionClicked(1)) {
+  if (state.storage_button && TitleActionClicked(kStorageRank)) {
     action.toggle_storage = true;
+  }
+  if (view.staff_tools && TitleActionClicked(wipe_rank)) {
+    action.staff_wipe = true;
   }
   if (!body_shown) {
     EndSkinnedWindow();

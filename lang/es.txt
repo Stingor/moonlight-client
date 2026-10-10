@@ -10747,6 +10747,9 @@ tr: Aplicar y compartir mi estilo
 fr: Vider l'inventory
 tr: Vaciar el inventario
 
+fr: Vider l'inventory (@itemreset)\nSupprime TOUS les items, sauf l'équipement porté, les favoris et l'œuf du familier sorti. Irréversible, et sans confirmation.
+tr: Vaciar el inventario (@itemreset)\nBorra TODOS los objetos, salvo el equipo puesto, los favoritos y el huevo de la mascota invocada. Irreversible y sin confirmación.
+
 fr: Viser sans tenir Maj
 tr: Apuntar sin mantener Mayús
 

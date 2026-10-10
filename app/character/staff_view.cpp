@@ -195,4 +195,16 @@ std::optional<int> StaffFreeBagSlots(const ro::sim::Inventory& bag) {
   return std::max(bag.capacity() - static_cast<int>(bag.size()), 0);
 }
 
+void SendStaffItemReset(ro::ui::SessionRights rights, ro::net::Connection& link,
+                        const ro::sim::World& world) {
+  const std::string command = StaffItemResetCommand(rights);
+  if (command.empty()) {
+    return;
+  }
+  if (auto sent = ro::net::SendServerCommand(link, world.player_name(), command); !sent) {
+    ro::core::LogWarning("commande de staff « {} » non émise : {}", command,
+                         ro::core::Describe(sent.error()));
+  }
+}
+
 }  // namespace moonclient

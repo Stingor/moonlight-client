@@ -93,4 +93,9 @@ void SendStaffItems(std::span<const ro::ui::StaffItemGrant> grants, ro::ui::Sess
 // capacité — une capacité nulle veut dire « pas encore dite ».
 [[nodiscard]] std::optional<int> StaffFreeBagSlots(const ro::sim::Inventory& bag);
 
+// LE `@itemreset` DU BOUTON « Vider » de l'inventaire. ⚠ `rights` SE RELIT AU
+// GESTE, comme pour `SendStaffWarp` : sans lui, rien ne part.
+void SendStaffItemReset(ro::ui::SessionRights rights, ro::net::Connection& link,
+                        const ro::sim::World& world);
+
 }  // namespace moonclient

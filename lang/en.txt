@@ -10747,6 +10747,9 @@ tr: Apply and share my style
 fr: Vider l'inventory
 tr: Empty the inventory
 
+fr: Vider l'inventory (@itemreset)\nSupprime TOUS les items, sauf l'équipement porté, les favoris et l'œuf du familier sorti. Irréversible, et sans confirmation.
+tr: Empty the inventory (@itemreset)\nDeletes ALL items, except worn equipment, favorites and the egg of the summoned pet. Irreversible, with no confirmation.
+
 fr: Viser sans tenir Maj
 tr: Aim without holding Shift
 

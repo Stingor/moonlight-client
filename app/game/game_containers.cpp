@@ -127,6 +127,8 @@ void Game::StageContainers() {
   windows_.inventory_view.album_open = windows_.card_album.open;
   // LE COURRIER EN COURS D'ÉCRITURE : une pièce jointe peut partir du menu.
   windows_.inventory_view.mail_writing = pieces_.mail.writing();
+  // LE BOUTON « Vider » DE LA BARRE DE TITRE, pour le staff seulement.
+  windows_.inventory_view.staff_tools = Rights().staff_tools;
   if (windows_.card_album.open) {
     card_album_.Compose(
         CardAlbumPieces{
@@ -227,6 +229,10 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
   // se seraient annulées.
   if (answers.inventory.toggle_cart || answers.storage.toggle_cart) {
     windows_.cart.open = !windows_.cart.open;
+  }
+  // Le « Vider » du staff : le droit se relit ici, au geste.
+  if (answers.inventory.staff_wipe) {
+    SendStaffItemReset(Rights(), link_, world_);
   }
   if (answers.cart.toggle_inventory || answers.storage.toggle_inventory) {
     windows_.inventory.open = !windows_.inventory.open;

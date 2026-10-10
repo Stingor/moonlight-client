@@ -31,4 +31,11 @@ std::vector<std::string> StaffItemCommands(std::span<const ro::ui::StaffItemGran
   return lines;
 }
 
+std::string StaffItemResetCommand(ro::ui::SessionRights rights) {
+  if (!rights.staff_tools) {
+    return {};
+  }
+  return "@itemreset";
+}
+
 }  // namespace moonclient

@@ -29,4 +29,13 @@ namespace moonclient {
 [[nodiscard]] std::vector<std::string> StaffItemCommands(
     std::span<const ro::ui::StaffItemGrant> grants, ro::ui::SessionRights rights);
 
+// ── « @itemreset » : LE STAFF VIDE SON SAC ──────────────────────────────────
+//
+// Le serveur supprime tout l'inventaire SAUF l'équipement porté, les favoris
+// et l'œuf du familier sorti. Il ne demande aucune confirmation, et le client
+// non plus : c'est le choix du bouton.
+//
+// La commande, VIDE SANS LE DROIT du staff, relu au geste comme pour `@item`.
+[[nodiscard]] std::string StaffItemResetCommand(ro::ui::SessionRights rights);
+
 }  // namespace moonclient

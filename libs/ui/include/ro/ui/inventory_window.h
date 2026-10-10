@@ -262,6 +262,9 @@ struct InventoryWindowView {
   std::uint16_t quick_insert_equip = 0;
   bool quick_insert_answered = false;
   std::span<const QuickInsertCardView> quick_insert_cards;
+  // LE STAFF PEUT VIDER SON SAC : un bouton « Vider » paraît dans la barre de
+  // titre. Faux, il n'existe pas.
+  bool staff_tools = false;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -430,6 +433,9 @@ struct InventoryWindowAction {
   // Les raccourcis de barre de titre vers les autres fenêtres d'objets.
   bool toggle_storage = false;
   bool toggle_cart = false;
+  // LE BOUTON « Vider » DU STAFF. ⚠ UNE INTENTION : c'est `app` qui relit le
+  // droit au geste et qui sait ce que le serveur attend.
+  bool staff_wipe = false;
   // La PUCE de la barre de titre a été cliquée : le joueur veut les réglages de
   // CETTE fenêtre. ⚠ C'est `app` qui sait laquelle — `ui` ne connaît pas les
   // sections du panneau.
