@@ -26,11 +26,22 @@ EffectNodeSeed EffectNodeSeedFromPattern(const EffectNodePattern& pattern, std::
   // ⚠ UN RENDEZ-VOUS REMPLACE LA VIE, il ne la borne pas. Sans rendez-vous, la
   // vie reste celle du patron — TIRÉE s'il le faut — et c'est la fin de l'effet
   // qui l'éteint en fondu : voir `EffectNode::fades_with_its_instance`.
+  //
+  // 🔴 ET LA VIE VIENT PARFOIS DE L'EFFET : le bâtisseur recopie alors la durée
+  // de l'instance dans son nœud — le feu de Demonstration vit autant que son
+  // unité. Prendre la vie du patron, qui n'est que le défaut du constructeur,
+  // l'éteignait en une seconde et demie. La fenêtre du tirage, elle, reste
+  // celle du patron, comme pour un anneau : voir `EffectNodeFromPattern`.
   if (pattern.life_until_tick > 0) {
     seed.life_ticks = ticks_left;
   } else {
-    seed.life_ticks = pattern.life_ticks;
-    seed.life_ticks_high = pattern.life_ticks_high;
+    const std::int32_t base = pattern.life_from_effect ? EffectNodeLifeFor(pattern.effect_id) +
+                                                             pattern.life_offset_from_effect
+                                                       : pattern.life_ticks;
+    seed.life_ticks = base;
+    seed.life_ticks_high = pattern.life_ticks_high > pattern.life_ticks
+                               ? base + (pattern.life_ticks_high - pattern.life_ticks)
+                               : pattern.life_ticks_high;
   }
   // La table porte le TIC où la sortie commence, comme le client ; le patron
   // du nœud veut une DURÉE. Moins un veut dire qu'il n'y a pas de sortie ; zéro
