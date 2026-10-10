@@ -44,6 +44,7 @@ add_library(ro_net STATIC
     src/discord_relay.cpp
     src/frame_tally.cpp
     src/guild.cpp
+    src/guild_relation_answer.cpp
     src/guild_requests.cpp
     src/inventory.cpp
     src/item_news.cpp

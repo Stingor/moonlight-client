@@ -150,11 +150,13 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = guided;
     }
-    // LE BOSS D'UN CONVEX MIRROR, et les nouvelles d'objets : le ramassage d'un
-    // membre du groupe, une pièce abîmée — que le sac lit aussi.
+    // LE BOSS D'UN CONVEX MIRROR, les nouvelles d'objets — le ramassage d'un
+    // membre du groupe, une pièce abîmée, que le sac lit aussi —, et l'issue
+    // d'une alliance ou d'une hostilité de guilde.
     for (const ro::net::FrameOutcome told :
          {ro::net::ApplyBossInfoFrame(received, navi_.guidance, world_, now_ms),
-          ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms)}) {
+          ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms),
+          ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms)}) {
       if (outcome == ro::net::FrameOutcome::kUnhandled) {
         outcome = told;
       }

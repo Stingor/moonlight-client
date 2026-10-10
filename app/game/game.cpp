@@ -543,7 +543,10 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                                   .titles = title_view_->view(),
                                   .guild = guild_panel_->view(),
                                   .companions = companion_tabs,
-                                  .guild_invitation = guild_panel_->invitation()},
+                                  .guild_invitation = guild_panel_->invitation(),
+                                  .guild_alliance = guild_book_.alliance_offer().has_value()
+                                                        ? guild_book_.alliance_offer()->guild_name
+                                                        : std::string_view()},
       style_view_->view(), style_preview_->view(), bag_->cells(), bag_->tally(), cart_->cells(),
       cart_->tally(), storage_->cells(), storage_->tally(), BankView::Of(world_),
       settings_->hotkey_view(), shortcuts_->slots(), settings_->options().shortcut_bars(),

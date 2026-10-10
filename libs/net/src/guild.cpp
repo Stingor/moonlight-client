@@ -333,6 +333,13 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
         return FrameOutcome::kApplied;
       });
 
+    case proto::ZcReqAllyGuild::kOpcode:
+      return Decoded<proto::ZcReqAllyGuild>(frame, [&guild](const auto& packet) {
+        guild.TellAllianceOffer(
+            sim::GuildAllianceOffer{packet.inviterId, Name(packet.inviterGuildName)});
+        return FrameOutcome::kApplied;
+      });
+
     case proto::ZcAckReqJoinGuild::kOpcode:
       return Decoded<proto::ZcAckReqJoinGuild>(frame, [&guild](const auto& packet) {
         if (packet.result > kLastInviteAnswer) {

@@ -15933,3 +15933,36 @@ tr: Monsters: {}
 
 fr: Monstres de toute sorte
 tr: Monsters of any kind
+
+fr: La guilde « %s » propose une alliance à la tienne. Accepter ?
+tr: The guild "%s" proposes an alliance with yours. Accept?
+
+fr: Ta guilde est déjà alliée à celle-ci.
+tr: Your guild is already allied with this one.
+
+fr: Ce joueur examine déjà une autre proposition d'alliance.
+tr: This player is already considering another alliance proposal.
+
+fr: L'alliance est conclue.
+tr: The alliance is concluded.
+
+fr: L'alliance ne se fera pas : elle a été refusée, l'autre guilde n'a plus de place, ou son joueur n'est plus là.
+tr: The alliance will not happen: it was refused, the other guild has no room left, or its player is gone.
+
+fr: Ta guilde compte déjà trop d'alliances.
+tr: Your guild already has too many alliances.
+
+fr: Seul le maître de l'autre guilde peut recevoir une alliance.
+tr: Only the other guild's master can receive an alliance.
+
+fr: La guilde est désormais ennemie.
+tr: The guild is now an enemy.
+
+fr: Ta guilde compte déjà trop de guildes ennemies.
+tr: Your guild already has too many enemy guilds.
+
+fr: Cette guilde est déjà ennemie.
+tr: This guild is already an enemy.
+
+fr: Les hostilités entre guildes sont désactivées.
+tr: Hostilities between guilds are disabled.

@@ -430,4 +430,23 @@ bool DrawGuildInvitation(std::string_view guild_name, bool& accepted, const Skin
   return true;
 }
 
+bool DrawGuildAllianceOffer(std::string_view guild_name, bool& accepted, const SkinArt& art) {
+  constexpr const char* kAllianceId = "###guild_alliance_offer";
+  if (!ImGui::IsPopupOpen(kAllianceId)) {
+    AskModal(kAllianceId);
+  }
+  std::array<char, 256> question = {};
+  const std::string name(guild_name);
+  std::snprintf(question.data(), question.size(),
+                core::Tr("La guilde « %s » propose une alliance à la tienne. Accepter ?"),
+                name.c_str());
+  const ModalAnswer answer =
+      DrawModalBox(kAllianceId, question.data(), core::Tr("Accepter"), core::Tr("Refuser"), art);
+  if (answer == ModalAnswer::kWaiting) {
+    return false;
+  }
+  accepted = answer == ModalAnswer::kYes;
+  return true;
+}
+
 }  // namespace ro::ui

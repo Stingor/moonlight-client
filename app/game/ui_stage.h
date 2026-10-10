@@ -155,9 +155,11 @@ class UiStage {
     ro::ui::GuildView guild;
     // Les onglets de l'homoncule et du mercenaire.
     ro::ui::CompanionTabsView companions;
-    // L'INVITATION DANS UNE GUILDE qui attend sa réponse, ou vide. ⚠ HORS DE LA
-    // FICHE : elle arrive fenêtre fermée, et doit se voir quand même.
+    // L'INVITATION DANS UNE GUILDE, et LA GUILDE qui propose une alliance à la
+    // nôtre, en attente de réponse, ou vides. ⚠ HORS DE LA FICHE : elles
+    // arrivent fenêtre fermée, et doivent se voir quand même.
     std::string_view guild_invitation;
+    std::string_view guild_alliance;
   };
 
   // Ce qu'une fenêtre de conversation a demandé, et laquelle.
@@ -398,10 +400,8 @@ class UiStage {
       bool disband_confirmed = false;
     };
     Party party;
-    // L'AVIS DE POSE, quand un élément déverrouillé est à l'écran : voir
-    // `game/hud_lock.h`.
     // Les éléments déverrouillés à l'écran, déjà traduits : l'avis de pose
-    // paraît tant qu'il y en a un, et les nomme.
+    // (`game/hud_lock.h`) paraît tant qu'il y en a un, et les nomme.
     std::vector<const char*> unlocked_hud;
   };
 
@@ -411,8 +411,9 @@ class UiStage {
   // la troisième ajouterait un second paramètre de sortie. Ce qui est vide ne
   // coûte rien.
   struct Answers {
-    // La réponse à l'invitation dans une guilde : accepter, ou refuser.
+    // Les réponses à l'invitation et à l'alliance : accepter, ou refuser.
     std::optional<bool> guild_invitation;
+    std::optional<bool> guild_alliance;
     // Vrai quand une jauge libre vient d'être déplacée ou retaillée : la
     // boucle persiste alors le fichier, UNE fois.
     bool stat_bars_moved = false;
@@ -428,8 +429,6 @@ class UiStage {
     // raccourcis, ou le fichier à mettre à jour.
     ro::ui::ChatMacroAsk macros;
     ro::ui::NpcDialogAnswer npc;
-    // Ce qu'il a fait de la conversation : la ligne validée, et ce qu'il a
-    // demandé à ses onglets.
     // Ce que CHAQUE fenêtre de conversation a demandé, avec le groupe qui la
     // désigne.
     //

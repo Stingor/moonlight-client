@@ -119,6 +119,16 @@ void Game::ApplyGuildAnswers(const UiStage::Answers& answers) {
     }
     guild_book_.ForgetInvitation();
   }
+  // L'ALLIANCE PROPOSÉE : la réponse vise le compte qui l'a proposée.
+  if (answers.guild_alliance.has_value() && guild_book_.alliance_offer().has_value()) {
+    const auto answered = ro::net::AnswerGuildAlliance(
+        link_, guild_book_.alliance_offer()->inviter_account_id, *answers.guild_alliance);
+    if (!answered) {
+      ro::core::LogWarning("guilde, réponse à l'alliance : {}",
+                           ro::core::Describe(answered.error()));
+    }
+    guild_book_.ForgetAllianceOffer();
+  }
 }
 
 }  // namespace moonclient

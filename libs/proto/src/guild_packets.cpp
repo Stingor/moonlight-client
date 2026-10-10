@@ -31,6 +31,8 @@ constexpr std::string_view kRelationHandler = "clif_parse_GuildDelAlliance";
 constexpr std::array<std::uint16_t, 2> kRelationOffsets = {2, 6};
 constexpr std::string_view kAllianceHandler = "clif_parse_GuildRequestAlliance";
 constexpr std::array<std::uint16_t, 3> kAllianceOffsets = {2, 6, 10};
+constexpr std::string_view kAllianceAnswerHandler = "clif_parse_GuildReplyAlliance";
+constexpr std::array<std::uint16_t, 2> kAllianceAnswerOffsets = {2, 6};
 constexpr std::string_view kOppositionHandler = "clif_parse_GuildOpposition";
 constexpr std::array<std::uint16_t, 1> kOppositionOffsets = {2};
 
@@ -183,6 +185,20 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceRequest& reque
   writer.U32(request.target_account_id);
   writer.U32(request.own_account_id);
   writer.U32(request.own_char_id);
+  return frame;
+}
+
+core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceAnswer& request) {
+  if (!Declared(GuildAllianceAnswer::kOpcode, kAllianceAnswerHandler, kAllianceAnswerOffsets,
+                GuildAllianceAnswer::kWireSize)) {
+    return std::unexpected(LayoutDrift());
+  }
+  std::vector<std::uint8_t> frame;
+  frame.reserve(GuildAllianceAnswer::kWireSize);
+  ByteWriter writer(frame);
+  writer.U16(GuildAllianceAnswer::kOpcode);
+  writer.U32(request.inviter_account_id);
+  writer.U32(request.answer);
   return frame;
 }
 

@@ -15933,3 +15933,36 @@ tr: Monstruos: {}
 
 fr: Monstres de toute sorte
 tr: Monstruos de cualquier tipo
+
+fr: La guilde « %s » propose une alliance à la tienne. Accepter ?
+tr: La guild "%s" propone una alianza con la tuya. ¿Aceptar?
+
+fr: Ta guilde est déjà alliée à celle-ci.
+tr: Tu guild ya es aliada de esta.
+
+fr: Ce joueur examine déjà une autre proposition d'alliance.
+tr: Este jugador ya está considerando otra propuesta de alianza.
+
+fr: L'alliance est conclue.
+tr: La alianza está sellada.
+
+fr: L'alliance ne se fera pas : elle a été refusée, l'autre guilde n'a plus de place, ou son joueur n'est plus là.
+tr: La alianza no se hará: fue rechazada, la otra guild no tiene más sitio, o su jugador ya no está.
+
+fr: Ta guilde compte déjà trop d'alliances.
+tr: Tu guild ya tiene demasiadas alianzas.
+
+fr: Seul le maître de l'autre guilde peut recevoir une alliance.
+tr: Solo el maestro de la otra guild puede recibir una alianza.
+
+fr: La guilde est désormais ennemie.
+tr: La guild es ahora enemiga.
+
+fr: Ta guilde compte déjà trop de guildes ennemies.
+tr: Tu guild ya tiene demasiadas guilds enemigas.
+
+fr: Cette guilde est déjà ennemie.
+tr: Esta guild ya es enemiga.
+
+fr: Les hostilités entre guildes sont désactivées.
+tr: Las hostilidades entre guilds están desactivadas.

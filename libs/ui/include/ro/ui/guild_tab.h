@@ -342,4 +342,9 @@ struct GuildAction {
 [[nodiscard]] bool DrawGuildInvitation(std::string_view guild_name, bool& accepted,
                                        const SkinArt& art);
 
+// L'alliance proposée à notre guilde : « La guilde Untel propose une alliance ».
+// Même contrat que l'invitation, et hors de la fiche pour la même raison.
+[[nodiscard]] bool DrawGuildAllianceOffer(std::string_view guild_name, bool& accepted,
+                                          const SkinArt& art);
+
 }  // namespace ro::ui

@@ -154,6 +154,15 @@ core::Result<void> AnswerGuildInvitation(Connection& link, std::int32_t guild_id
   return {};
 }
 
+core::Result<void> AnswerGuildAlliance(Connection& link, std::uint32_t inviter_account_id,
+                                       bool accept) {
+  proto::GuildAllianceAnswer request;
+  request.inviter_account_id = inviter_account_id;
+  request.answer =
+      accept ? proto::GuildAllianceAnswer::kAccept : proto::GuildAllianceAnswer::kRefuse;
+  return SendEncoded(link, proto::Encode(request));
+}
+
 core::Result<void> RequestGuildEmblemImage(Connection& link, std::int32_t guild_id) {
   proto::CzReqGuildEmblemImg1 request;
   request.guild_id = guild_id;

@@ -117,6 +117,18 @@ struct GuildAllianceRequest {
   std::uint32_t own_char_id = 0;
 };
 
+// « Voici ma réponse à l'alliance proposée. » Le serveur retrouve la guilde
+// par le COMPTE du joueur qui l'a proposée, celui que la demande reçue nomme.
+struct GuildAllianceAnswer {
+  static constexpr std::uint16_t kOpcode = 0x0172;
+  static constexpr std::size_t kWireSize = 10;
+  static constexpr std::uint32_t kRefuse = 0;
+  static constexpr std::uint32_t kAccept = 1;
+
+  std::uint32_t inviter_account_id = 0;
+  std::uint32_t answer = kRefuse;
+};
+
 // « Déclare la guilde de ce joueur ennemie. » Réservé au maître, et immédiat :
 // l'autre guilde n'a rien à accepter.
 struct GuildOppositionRequest {
@@ -135,6 +147,7 @@ struct GuildOppositionRequest {
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(
     const GuildRelationDeleteRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceRequest& request);
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceAnswer& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const GuildOppositionRequest& request);
 
 // ── CE QUE LE SERVEUR ENVOIE SANS STRUCTURE LISIBLE ─────────────────────────

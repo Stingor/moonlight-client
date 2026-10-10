@@ -193,6 +193,13 @@ enum class GuildInviteAnswer : std::uint8_t {
   kGuildFull = 3,
 };
 
+// UNE ALLIANCE PROPOSÉE À NOTRE GUILDE, en attente de réponse : le compte du
+// joueur qui la propose — c'est lui que la réponse désigne — et sa guilde.
+struct GuildAllianceOffer {
+  std::uint32_t inviter_account_id = 0;
+  std::string guild_name;
+};
+
 class GuildBook {
  public:
   // ── L'APPARTENANCE ──────────────────────────────────────────────────────
@@ -344,6 +351,20 @@ class GuildBook {
     ++invite_answer_seq_;
   }
 
+  // ── L'ALLIANCE PROPOSÉE ─────────────────────────────────────────────────
+  //
+  // 🔴 SEULE LA RÉPONSE L'EFFACE. Tant que le serveur ne l'a pas reçue, il
+  // refuse à toute autre guilde de nous proposer une alliance : ni quitter la
+  // guilde ni changer de carte ne la retire.
+  //
+  // ⚠ UNE NOUVELLE PROPOSITION REMPLACE L'ANCIENNE. Le serveur n'en tient
+  // qu'une, la dernière, et ignore une réponse qui ne vise pas sa guilde.
+  [[nodiscard]] const std::optional<GuildAllianceOffer>& alliance_offer() const noexcept {
+    return alliance_offer_;
+  }
+  void TellAllianceOffer(GuildAllianceOffer offer) { alliance_offer_ = std::move(offer); }
+  void ForgetAllianceOffer() noexcept { alliance_offer_.reset(); }
+
  private:
   std::optional<GuildBelonging> belonging_;
   std::optional<GuildSummary> summary_;
@@ -368,6 +389,7 @@ class GuildBook {
   std::optional<GuildInvitation> invitation_;
   std::optional<GuildInviteAnswer> invite_answer_;
   std::uint64_t invite_answer_seq_ = 0;
+  std::optional<GuildAllianceOffer> alliance_offer_;
 };
 
 }  // namespace ro::sim

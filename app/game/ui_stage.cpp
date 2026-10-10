@@ -297,6 +297,12 @@ UiStage::Answers UiStage::Draw(
       answers.guild_invitation = accepted;
     }
   }
+  if (!sheet.guild_alliance.empty()) {
+    bool accepted = false;
+    if (ro::ui::DrawGuildAllianceOffer(sheet.guild_alliance, accepted, skin_)) {
+      answers.guild_alliance = accepted;
+    }
+  }
   // LA FENÊTRE GROUPE / AMIS, avec la fiche : on y passe de l'une à l'autre.
   if (windows.party.view != nullptr && windows.party.look != nullptr) {
     windows.party.answer = ro::ui::DrawPartyFriendWindow(windows.party.window, *windows.party.view,

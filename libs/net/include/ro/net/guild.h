@@ -9,6 +9,7 @@
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
 #include "ro/sim/guild.h"
+#include "ro/sim/world_fwd.h"
 
 namespace ro::net {
 
@@ -102,6 +103,22 @@ struct GuildPositionEdit {
 // RÉPONDRE À UNE INVITATION reçue.
 [[nodiscard]] core::Result<void> AnswerGuildInvitation(Connection& link, std::int32_t guild_id,
                                                        bool accept);
+
+// RÉPONDRE À UNE ALLIANCE PROPOSÉE, en nommant le compte qui l'a proposée.
+[[nodiscard]] core::Result<void> AnswerGuildAlliance(Connection& link,
+                                                     std::uint32_t inviter_account_id, bool accept);
+
+// ── L'ISSUE D'UNE ALLIANCE OU D'UNE HOSTILITÉ ───────────────────────────────
+//
+// ZC 0x0173 et ZC 0x0181 : un numéro de verdict, que ce traducteur écrit dans
+// la conversation. Il ne touche pas au carnet — après un succès, le serveur
+// renvoie la liste des relations entière à chaque membre concerné.
+//
+// ⚠ UN VERDICT NE DIT PAS À QUI IL RÉPOND. L'auteur d'une proposition reçoit
+// le même numéro pour un refus, une guilde pleine ou un départ : la phrase les
+// nomme tous plutôt que d'en affirmer un. Un numéro inconnu n'écrit rien.
+[[nodiscard]] FrameOutcome ApplyGuildRelationAnswerFrame(const Frame& frame, sim::World& world,
+                                                         std::uint32_t now_ms);
 
 // L'IMAGE DE L'EMBLÈME PAR LE FIL — le chemin historique. Le serveur ne répond
 // que s'il en garde une.
