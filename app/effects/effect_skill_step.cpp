@@ -66,6 +66,7 @@ void EffectsInPlay::PlaySkillEffect(const ro::sim::World& world, const MapStage&
     if (const ro::sim::Actor* bearer = on_caster_only ? world.Find(caster_id) : &target) {
       const auto cell = ro::sim::InterpolatedCell(*bearer, planner.PathFor(*bearer), started_ms);
       actor_effects_to_record_.push_back({bearer->id, effect, started_ms});
+      MarkCarried(per_map_, effect, bearer->id, started_ms);
       NoteLaunched(effect, GroundPositionAt(stage, cell.x, cell.y), bearer->id);
       // UNE DEMANDE DE BRUIT PAR INSTANCE : `Notice`, qui fait sonner celles
       // que le serveur annonce, tient celle-ci pour déjà entendue.

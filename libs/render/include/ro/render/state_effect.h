@@ -126,6 +126,23 @@ struct StateSoundEntry {
 [[nodiscard]] std::span<const StateEffectEntry> StateRemovalTable();
 [[nodiscard]] std::span<const StateEffectEntry> StateRemovalsFor(std::uint16_t state_id);
 
+// UN GESTE QUE LE MESSAGE 110 JOUE À LA POSE COMME À LA LEVÉE, gardé par un
+// effet que l'acteur porte : naître, ou se retirer. La course du Taekwon pose
+// son effet d'arrêt sur qui court encore, et le rebond contre un mur efface les
+// traces de la course.
+struct StateGuardedGesture {
+  std::uint16_t state_id = 0;
+  std::uint16_t effect_id = 0;
+  // Vrai pour un retrait.
+  bool withdraws = false;
+  // L'effet que l'acteur doit porter pour que le geste ait lieu, zéro sans
+  // garde.
+  std::uint16_t carried_effect_id = 0;
+};
+
+// Les gestes gardés d'un état, dans l'ordre où le client les fait.
+[[nodiscard]] std::span<const StateGuardedGesture> StateGuardedGesturesFor(std::uint16_t state_id);
+
 // Le son d'un changement d'état, ou une chaîne vide.
 [[nodiscard]] std::span<const StateSoundEntry> StateSoundTable();
 [[nodiscard]] std::string_view StateSoundFor(std::uint16_t state_id);

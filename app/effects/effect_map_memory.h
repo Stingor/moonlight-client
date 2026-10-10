@@ -319,6 +319,12 @@ struct EffectMapMemory {
   // tant que l'effet peut mourir de lui-même : voir
   // `EffectsInPlay::NoticeStateEffects`.
   std::map<std::pair<std::uint32_t, std::uint32_t>, std::uint32_t> state_actor_effects;
+  // CE QU'UN ACTEUR PORTE SANS QU'AUCUN DESSIN LE TIENNE, par porteur et par
+  // effet, avec l'instant où l'instance meurt — rien : jusqu'à son retrait. Un
+  // effet d'acteur ne vit que dans son mot de rendu, un effet sans figure que
+  // dans son instance ; la garde « porte-t-il cet effet ? » d'une suite doit
+  // pourtant les voir. Voir `EffectsInPlay::Carries`.
+  std::map<std::pair<std::uint32_t, std::uint32_t>, std::optional<std::uint32_t>> carried_marks;
   // LA DERNIÈRE VALEUR vue d'un état qui pose une classe, par porteur ; vide
   // pour un paquet qui ne la portait pas. Voir
   // `EffectsInPlay::RenewStateClasses`.
@@ -375,5 +381,10 @@ struct EffectMapMemory {
   // déclenche — voir `ro/render/effect_update_quake.h`.
   std::vector<PendingQuake> pending_quakes;
 };
+
+// Note qu'un acteur porte cet effet, jusqu'à la fin de sa vie : voir
+// `EffectMapMemory::carried_marks`.
+void MarkCarried(EffectMapMemory& memory, std::uint32_t effect_id, std::uint32_t actor_id,
+                 std::uint32_t now_ms);
 
 }  // namespace moonclient

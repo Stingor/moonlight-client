@@ -4,16 +4,16 @@
 // scripts/client_state_effects.json, pas écrit à la main.
 //
 // À LA POSE (et à la levée) d'un état, par le message 110 de l'acteur :
-//   169 états, 193 couples — 2 chute, 168 pose, 23 toujours.
+//   167 états, 191 couples — 2 chute, 168 pose, 21 toujours.
 // AU PAQUET (ce que les deux traitements du changement d'état créent
 //   eux-mêmes avant de poster ce message) : 11 couples.
 // AU REBÂTISSAGE (le sprite du JOUEUR est refait et tous ses états sont
 //   reposés d'un coup) :
 //   104 états, 118 couples.
-// CE QUI DISPARAÎT à la levée d'un état : 172 couples.
+// CE QUI DISPARAÎT à la levée d'un état : 170 couples.
 // CE QUI VIT JUSQU'À CE QU'ON LE RETIRE — les AURAS : 43 couples à la pose,
 //   39 au rebâtissage, 32 effets distincts.
-// LES SONS d'un changement d'état : 3.
+// LES SONS d'un changement d'état : 4.
 // CE QUI SE CALCULE SUR LA VALEUR de l'état : 2 états.
 //   152 — EFST_DEVIL1, la vue qui s'assombrit : `valeur + 473`, valeur de 2 à 11
 //     toute la famille vit jusqu'au retrait
@@ -45,7 +45,7 @@ namespace ro::render {
 namespace {
 
 // Triées par état, puis par effet : la recherche rend une tranche.
-constexpr std::array<StateEffectEntry, 193> kStateEffects = {{
+constexpr std::array<StateEffectEntry, 191> kStateEffects = {{
     {2, 166, StateEffectMoment::kOnApply, false},
     {25, 166, StateEffectMoment::kOnApply, false},
     {31, 166, StateEffectMoment::kOnApply, false},
@@ -80,8 +80,6 @@ constexpr std::array<StateEffectEntry, 193> kStateEffects = {{
     {121, 396, StateEffectMoment::kOnApply, true},
     {122, 396, StateEffectMoment::kOnApply, true},
     {123, 394, StateEffectMoment::kOnApply, false},
-    {133, 443, StateEffectMoment::kAlways, false},
-    {134, 426, StateEffectMoment::kAlways, false},
     {152, 164, StateEffectMoment::kAlways, true},
     {152, 487, StateEffectMoment::kAlways, false},
     {153, 419, StateEffectMoment::kOnApply, true},
@@ -376,7 +374,7 @@ constexpr std::array<StateEffectEntry, 118> kStateRebuildEffects = {{
     {1319, 2278, StateEffectMoment::kAlways, false},
 }};
 
-constexpr std::array<StateEffectEntry, 172> kStateRemovals = {{
+constexpr std::array<StateEffectEntry, 170> kStateRemovals = {{
     {2, 166, StateEffectMoment::kAlways, false},
     {25, 166, StateEffectMoment::kAlways, false},
     {31, 166, StateEffectMoment::kAlways, false},
@@ -412,8 +410,6 @@ constexpr std::array<StateEffectEntry, 172> kStateRemovals = {{
     {121, 396, StateEffectMoment::kAlways, true},
     {122, 396, StateEffectMoment::kAlways, true},
     {123, 394, StateEffectMoment::kAlways, false},
-    {133, 442, StateEffectMoment::kAlways, false},
-    {134, 442, StateEffectMoment::kAlways, false},
     {149, 424, StateEffectMoment::kAlways, true},
     {152, 164, StateEffectMoment::kAlways, true},
     {153, 419, StateEffectMoment::kAlways, true},
@@ -551,10 +547,20 @@ constexpr std::array<StateEffectEntry, 172> kStateRemovals = {{
     {1339, 2302, StateEffectMoment::kOnRelease, false},
 }};
 
-constexpr std::array<StateSoundEntry, 3> kStateSounds = {{
+constexpr std::array<StateSoundEntry, 4> kStateSounds = {{
+    {134, "effect\\T_벽튕김.wav"},
     {152, "effect\\_blind.wav"},
     {182, "lava_golem_move.wav"},
     {422, "effect\\manhole.wav"},
+}};
+
+// Les gestes que le message 110 joue à la pose COMME à la levée, gardés par
+// un effet porté — lus à la main dans scripts/gen_client_state_effects.py.
+constexpr std::array<StateGuardedGesture, 4> kStateGuardedGestures = {{
+    {133, 443, false, 442},
+    {133, 442, true, 442},
+    {134, 426, false, 0},
+    {134, 442, true, 442},
 }};
 
 constexpr std::array<StateValueEffectEntry, 2> kStateValueEffects = {{
@@ -623,6 +629,15 @@ std::span<const StateEffectEntry> StateRemovalsFor(std::uint16_t state_id) {
   const auto last = std::find_if(
       first, kStateRemovals.end(),
       [state_id](const StateEffectEntry& entry) { return entry.state_id != state_id; });
+  return {first, last};
+}
+
+std::span<const StateGuardedGesture> StateGuardedGesturesFor(std::uint16_t state_id) {
+  const auto first =
+      std::ranges::find(kStateGuardedGestures, state_id, &StateGuardedGesture::state_id);
+  const auto last = std::find_if(
+      first, kStateGuardedGestures.end(),
+      [state_id](const StateGuardedGesture& gesture) { return gesture.state_id != state_id; });
   return {first, last};
 }
 

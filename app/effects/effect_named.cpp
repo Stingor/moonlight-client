@@ -314,6 +314,19 @@ namespace {
 // qui l'a posé ; la levée de n'importe lequel des états qui le posent l'en
 // retire, comme le client qui éteint toutes les instances de ce numéro. Vrai
 // quand l'effet est de ceux-là.
+}  // namespace
+
+void MarkCarried(EffectMapMemory& memory, std::uint32_t effect_id, std::uint32_t actor_id,
+                 std::uint32_t now_ms) {
+  const std::optional<std::uint64_t> life_ms = OwnLifeMs(effect_id);
+  memory.carried_marks.insert_or_assign(
+      std::pair{actor_id, effect_id},
+      life_ms.has_value() ? std::optional{now_ms + static_cast<std::uint32_t>(*life_ms)}
+                          : std::nullopt);
+}
+
+namespace {
+
 bool QueueActorChange(EffectMapMemory& memory,
                       std::vector<EffectsInPlay::ActorEffectToRecord>& queue,
                       std::uint32_t effect_id, std::uint32_t actor_id,
@@ -330,8 +343,10 @@ bool QueueActorChange(EffectMapMemory& memory,
   const auto key = std::pair{actor_id, effect_id};
   if (withdrawn) {
     memory.state_actor_effects.erase(key);
+    memory.carried_marks.erase(key);
     return true;
   }
+  MarkCarried(memory, effect_id, actor_id, now_ms);
   if (OwnLifeMs(effect_id).has_value()) {
     memory.state_actor_effects.insert_or_assign(key, now_ms);
   } else {
@@ -418,6 +433,7 @@ void EffectsInPlay::StopById(std::uint32_t effect_id, std::uint32_t actor_id) {
   classes_.Stop(effect_id, actor_id);
   // Et la teinte de celui qui dessinait en teignant : voir `AlsoChangeBearer`.
   AlsoChangeBearer(effect_id, actor_id, 0, true);
+  per_map_.carried_marks.erase(std::pair{actor_id, effect_id});
 }
 
 bool EffectsInPlay::Carries(std::uint32_t effect_id, std::uint32_t actor_id) const {
@@ -427,7 +443,8 @@ bool EffectsInPlay::Carries(std::uint32_t effect_id, std::uint32_t actor_id) con
                return shown.from_effect_id == effect_id &&
                       (shown.actor_id == actor_id || shown.loops_with_actor == actor_id);
              }) ||
-         nodes_->CarriesEffect(effect_id, actor_id) || classes_.Carries(effect_id, actor_id);
+         nodes_->CarriesEffect(effect_id, actor_id) || classes_.Carries(effect_id, actor_id) ||
+         per_map_.carried_marks.contains(std::pair{actor_id, effect_id});
 }
 
 bool SkillSuiteConditionHolds(const EffectsInPlay* effects, const ro::render::SkillSuiteStep& step,
@@ -522,6 +539,9 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
                                        ro::sim::WalkPlanner& planner, std::uint32_t now_ms) {
   player_id_ = world.player_id();
   ExpireStateActorEffects(world, per_map_, actor_effects_to_record_, now_ms);
+  std::erase_if(per_map_.carried_marks, [now_ms](const auto& mark) {
+    return mark.second.has_value() && static_cast<std::int32_t>(now_ms - *mark.second) >= 0;
+  });
   // UN ACTEUR PARTI EMPORTE SES ÉTATS, et ses semis avec eux : sans cela, un
   // effet infini tournerait pour toujours sur une case vide, et le premier état
   // de qui reprendrait son identifiant se croirait déjà posé.
@@ -553,6 +573,7 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
           !ro::render::StatePacketEffectsFor(state).empty() ||
           !ro::render::StateRebuildEffectsFor(state).empty() ||
           !ro::render::StateRemovalsFor(state).empty() ||
+          !ro::render::StateGuardedGesturesFor(state).empty() ||
           !ro::render::StateSoundFor(state).empty()) {
         shown_states.insert(state);
       }
@@ -592,10 +613,34 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
                           entry.effect_param >= 0 ? std::optional{entry.effect_param} : state_value,
                           ground, now_ms, entry.endless));
     };
+    // LES GESTES GARDÉS, à la pose comme à la levée : un effet ne naît, ou ne
+    // se retire, que sur qui porte l'effet qu'il exige.
+    const auto play_guarded = [&](ro::sim::StatusEffectId state) {
+      for (const ro::render::StateGuardedGesture& gesture :
+           ro::render::StateGuardedGesturesFor(state)) {
+        if (gesture.carried_effect_id != 0 && !Carries(gesture.carried_effect_id, id) &&
+            std::ranges::none_of(actor.effects, [&gesture](const ro::sim::PlayedEffect& played) {
+              return played.id == gesture.carried_effect_id;
+            })) {
+          continue;
+        }
+        if (QueueActorChange(per_map_, actor_effects_to_record_, gesture.effect_id, id, ground,
+                             now_ms, state, gesture.withdraws)) {
+          continue;
+        }
+        if (gesture.withdraws) {
+          StopById(gesture.effect_id, id);
+          continue;
+        }
+        static_cast<void>(
+            PlayStateEffect(gesture.effect_id, id, std::nullopt, ground, now_ms, false));
+      }
+    };
     for (const ro::sim::StatusEffectId state : shown_states) {
       if (seen_states.contains(state)) {
         continue;
       }
+      play_guarded(state);
       const std::optional<std::int32_t> state_value =
           actor.status_values.contains(state) ? std::optional{actor.status_values.at(state)}
                                               : std::nullopt;
@@ -672,6 +717,7 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
         }
         PlayNamedEntry(entry.name, entry.verb, id, false, posed_cell, entry.anchor, false, now_ms);
       }
+      play_guarded(state);
       // 🔴 CE QUE LA LEVÉE EMPORTE. Le client retire par deux voies — l'appel
       // direct, ou le message 109 envoyé à l'acteur —, dans la branche « non
       // posé » ou sans garde du tout : un retrait sans garde tombe aussi à la

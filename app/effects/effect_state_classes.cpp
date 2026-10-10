@@ -104,6 +104,11 @@ bool EffectsInPlay::PlayStateEffect(std::uint32_t effect_id, std::uint32_t beare
   if (played) {
     return true;
   }
+  // UN CAS SANS FIGURE A POURTANT SON INSTANCE, que la garde d'une suite
+  // interroge : la course du Taekwon pose son marqueur d'arrêt ainsi.
+  if (ro::render::EffectCaseFor(effect_id) != nullptr) {
+    MarkCarried(per_map_, effect_id, bearer_id, now_ms);
+  }
   if (ro::render::EffectCaseFor(effect_id) == nullptr ||
       ro::render::EffectSounds(effect_id).empty()) {
     return false;
