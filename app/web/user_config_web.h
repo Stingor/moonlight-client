@@ -19,7 +19,7 @@ namespace moonclient::web {
 // Le service web du serveur de jeu garde, par compte et par monde, un document
 // JSON que le client relit et complète :
 //
-//   relire     /userconfig/load  ←  AID, WorldName
+//   relire     /userconfig/load  ←  AID, AuthToken s'il est connu, WorldName
 //              →  {"Type":1, "data":{…}}, ou {"Type":1} pour un compte neuf ;
 //   compléter  /userconfig/save  ←  AID, AuthToken, WorldName, data
 //              où `data` est un document {"data":{…}} que le service FUSIONNE
@@ -30,8 +30,9 @@ namespace moonclient::web {
 // porte que la liste de blocage. Un tableau, lui, se remplace en entier : la
 // liste envoyée est LA liste.
 //
-// ⚠ LA RELECTURE NE DEMANDE PAS DE JETON, la sauvegarde si : un jeton refusé
-// ne se voit qu'à la première sauvegarde.
+// ⚠ LE JETON PART AUX DEUX. La sauvegarde l'exige ; la relecture le vérifie
+// s'il est présent, et n'est servie que depuis l'adresse de la session active.
+// Sans jeton, seule la relecture part, sans le champ.
 
 inline constexpr std::string_view kUserConfigLoadPath = "/userconfig/load";
 inline constexpr std::string_view kUserConfigSavePath = "/userconfig/save";
@@ -78,6 +79,7 @@ class UserConfigWeb {
   UserConfigWeb(WebTransport& transport, UserConfigIdentity identity)
       : transport_(&transport), identity_(std::move(identity)) {}
 
+  // Prête à tout envoyer : relecture et sauvegarde.
   [[nodiscard]] bool ready() const noexcept { return identity_.usable(); }
 
   // Demande la relecture. Sans effet si elle attend déjà.

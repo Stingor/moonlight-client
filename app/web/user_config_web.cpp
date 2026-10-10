@@ -106,7 +106,7 @@ void UserConfigWeb::Advance() {
     }
     flight_ = Flight::kNothing;
   }
-  if (!ready() || transport_->busy()) {
+  if (identity_.account_id == 0 || transport_->busy()) {
     return;
   }
   // ⚠ LES NOMS DES CHAMPS SONT CEUX QUE LE SERVICE LIT, casse comprise : il
@@ -116,9 +116,12 @@ void UserConfigWeb::Advance() {
   if (load_wanted_) {
     load_wanted_ = false;
     request.path = std::string(kUserConfigLoadPath);
+    if (!identity_.token.empty()) {
+      request.parts.push_back(Field("AuthToken", identity_.token));
+    }
     request.parts.push_back(Field("WorldName", identity_.world_name));
     flight_ = Flight::kLoad;
-  } else if (save_document_.has_value()) {
+  } else if (save_document_.has_value() && ready()) {
     request.path = std::string(kUserConfigSavePath);
     request.parts.push_back(Field("AuthToken", identity_.token));
     request.parts.push_back(Field("WorldName", identity_.world_name));
