@@ -8698,6 +8698,9 @@ tr: ID
 fr: ID : %u
 tr: ID: %u
 
+fr: ID : %u (%.*s)
+tr: ID: %u (%.*s)
+
 fr: ID d'item
 tr: ID de ítem
 

@@ -14,6 +14,7 @@
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/staff_skill_id.h"
 #include "ro/ui/wheel_gate.h"
 
 namespace ro::ui {
@@ -156,7 +157,8 @@ void DrawUseLevelBadge(ImDrawList* into, const SkillCellView& cell, ImVec2 icon_
   into->AddText(at, kBadgeText, text.data());
 }
 
-void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> siblings) {
+void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> siblings,
+                      bool staff_allowed) {
   if (BeginSkinTooltip()) {
     ImGui::TextUnformatted(cell.name.data(), cell.name.data() + cell.name.size());
     if (cell.max_level > 0) {
@@ -221,13 +223,14 @@ void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> 
     if (cell.castable) {
       ImGui::TextDisabled(core::Tr("Glisser : poser sur une barre d'action"));
     }
+    DrawStaffSkillId(staff_allowed, StaffSkillId{.skill_id = cell.skill_id, .idname = cell.idname});
     EndSkinTooltip();
   }
 }
 
 void SkillCellGestures(const SkillCellView& cell, std::span<const SkillCellView> siblings,
                        SkillWindowState& state, const SkinArt& art, float icon_side, bool hot,
-                       SkillWindowAction& action) {
+                       bool staff_allowed, SkillWindowAction& action) {
   // ── LA MOLETTE RÈGLE LE RANG DE LANCEMENT ───────────────────────────────
   //
   // 🔴 AU SURVOL ET PENDANT LE GLISSER, et il faut les deux : dans les deux cas
@@ -296,7 +299,7 @@ void SkillCellGestures(const SkillCellView& cell, std::span<const SkillCellView>
   // COURANT — dépenser un point —, et Ctrl + clic droit reprend le « décrire »
   // déjà en place dans le sac, le coffre et la charrette.
   if (hot) {
-    ShowSkillTooltip(cell, siblings);
+    ShowSkillTooltip(cell, siblings, staff_allowed);
     // ⚠ NE PAS REMETTRE À ZÉRO AU SECOND CLIC D'UN DOUBLE : `IsItemClicked` y
     // est vrai aussi, et repartir de zéro ici effacerait le verdict que le
     // double-clic attend.

@@ -340,7 +340,7 @@ std::string GuildModalName(const char* title, std::string_view id) {
 }
 
 GuildAction DrawGuildTab(GuildTabState& state, const GuildView& view, bool& smooth_icons,
-                         const SkinArt& art) {
+                         const SkinArt& art, bool staff_allowed) {
   GuildAction action;
   if (!view.in_guild) {
     DrawNoGuild(state, view, art, action);
@@ -371,7 +371,7 @@ GuildAction DrawGuildTab(GuildTabState& state, const GuildView& view, bool& smoo
     }
     if (ImGui::BeginTabItem(core::Tr("Skills"))) {
       if (ImGui::BeginChild("competences", ImVec2(0.0F, list_height()), ImGuiChildFlags_Borders)) {
-        DrawGuildSkills(state, view, smooth_icons, art, action);
+        DrawGuildSkills(state, view, smooth_icons, staff_allowed, art, action);
       }
       ImGui::EndChild();
       ImGui::EndTabItem();

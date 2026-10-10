@@ -527,8 +527,10 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   companion_tabs.mercenary.ai_proposal =
       pieces_.companion_ai.ProposalText(ro::sim::AiCompanion::kMercenary);
   // ⚠ RELU À CHAQUE IMAGE, comme celui de la fiche : il montre la section
-  // « Staff » de l'onglet de l'homoncule.
+  // « Staff » de l'onglet de l'homoncule, et l'identifiant au survol d'une
+  // compétence des deux compagnons.
   companion_tabs.homunculus.staff_allowed = Rights().staff_tools;
+  companion_tabs.mercenary.staff_allowed = Rights().staff_tools;
   ListUnlockedHudShown(settings_->options(), windows_, windows_.unlocked_hud);
   interface_->SetSkinLook(settings_->options().pages().skin_look.look());
   const UiStage::Answers answers = interface_->Draw(

@@ -24,6 +24,8 @@ struct MercenarySkillRow {
   std::uint16_t level = 0;
   // Le nom du jeu, ou à défaut le nom interne du serveur.
   std::string_view name;
+  // Le nom INTERNE (« MS_BASH »), que seul le staff voit au survol.
+  std::string_view idname;
   // Vide quand l'installation n'a pas l'icône.
   SkinImage icon;
   // Elle n'est pas passive. `app` tranche, d'après les drapeaux du serveur.
@@ -41,6 +43,9 @@ struct MercenarySkillRow {
 struct MercenaryTabView {
   // Vrai quand le serveur a dit qu'il existe.
   bool present = false;
+  // LE DROIT DU STAFF, relu par `app` à chaque image : l'identifiant paraît au
+  // survol d'une compétence.
+  bool staff_allowed = false;
 
   std::string_view name;
   // « Mercenaire : Archer », déjà traduit.

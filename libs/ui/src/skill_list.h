@@ -21,6 +21,6 @@
 namespace ro::ui {
 
 void DrawSkillList(SkillWindowState& state, const SkillGroupView& group, std::string_view filter,
-                   const SkinArt& art, SkillWindowAction& action);
+                   const SkinArt& art, bool staff_allowed, SkillWindowAction& action);
 
 }  // namespace ro::ui

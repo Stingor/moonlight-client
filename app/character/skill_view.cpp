@@ -220,6 +220,7 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
         .skill_id = one.skill_id,
         .position = one.position,
         .name = node != nullptr ? std::string_view(node->display_name) : std::string_view(),
+        .idname = node != nullptr ? std::string_view(node->idname) : std::string_view(),
         .icon =
             ro::ui::SkinImage{.id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name())
                                                   : ImTextureID{0},

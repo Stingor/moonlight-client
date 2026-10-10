@@ -581,8 +581,8 @@ inline constexpr std::uint32_t kSkillDamageAgainstSelf = 0xFFFFFFFFU;
 // Ce que la fenêtre de compétence montre.
 struct SkillDescriptionView {
   std::uint16_t skill_id = 0;
-  // Le libellé du client — « Heal ». ⚠ PAS LE NOM INTERNE : celui-ci ne sert
-  // qu'à nommer le fichier de l'icône.
+  // Le libellé du client — « Heal ». ⚠ PAS LE NOM INTERNE, qui nomme le
+  // fichier de l'icône.
   std::string_view name;
   // Les lignes de la table, BALISAGE COMPRIS. Voir `rich_text.h`.
   //

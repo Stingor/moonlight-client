@@ -171,6 +171,7 @@ void HomunculusStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
     rows_.push_back(ro::ui::HomunculusSkillRow{
         .skill_id = skill.skill_id,
         .name = node != nullptr ? std::string_view(node->display_name) : std::string_view(),
+        .idname = node != nullptr ? std::string_view(node->idname) : std::string_view(),
         .icon = IconOf(pieces, skill.skill_id, node),
         .level = skill.level,
         .sp_cost = skill.sp_cost,

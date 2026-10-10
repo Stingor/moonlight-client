@@ -14,6 +14,7 @@
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/staff_skill_id.h"
 
 namespace ro::ui {
 namespace {
@@ -283,7 +284,8 @@ void DrawStats(const MercenaryTabView& view) {
 
 // Les gestes s'attachent au DERNIER élément soumis : rappelés après l'icône ET
 // après le nom, pour que la cellule entière réagisse.
-void SkillGestures(const MercenarySkillRow& skill, bool dragging, MercenaryTabAction& action) {
+void SkillGestures(const MercenarySkillRow& skill, bool dragging, bool staff_allowed,
+                   MercenaryTabAction& action) {
   // Glisser vers une barre ce qui part d'ici : une case qui ne partirait jamais
   // n'a rien à faire dans une barre. `SourceAllowNullID` parce que ni l'image
   // ni le texte ne portent d'identifiant.
@@ -332,7 +334,8 @@ void SkillGestures(const MercenarySkillRow& skill, bool dragging, MercenaryTabAc
                   core::Tr("%s  ·  SP %s  ·  portée %s\nClic droit : description"),
                   skill.active ? core::Tr("actif") : core::Tr("passif"), sp.c_str(), range.c_str());
   }
-  SkinTooltipFormat("%s", tip.data());
+  SkinTooltipWithStaffSkillId(tip.data(), staff_allowed,
+                              StaffSkillId{.skill_id = skill.skill_id, .idname = skill.idname});
 }
 
 void DrawSkills(MercenaryTabState& state, const MercenaryTabView& view,
@@ -363,12 +366,12 @@ void DrawSkills(MercenaryTabState& state, const MercenaryTabView& view,
         const bool dragging = ImGui::GetDragDropPayload() != nullptr;
         if (skill.icon.usable()) {
           ImGui::Image(skill.icon.id, ImVec2(Px(kRowIconPixels), Px(kRowIconPixels)));
-          SkillGestures(skill, dragging, action);
+          SkillGestures(skill, dragging, view.staff_allowed, action);
           ImGui::SameLine();
         }
         const std::string name(skill.name);
         ImGui::TextUnformatted(name.c_str());
-        SkillGestures(skill, dragging, action);
+        SkillGestures(skill, dragging, view.staff_allowed, action);
         ImGui::TableNextColumn();
         ImGui::Text("%d", skill.level);
         ImGui::PopID();

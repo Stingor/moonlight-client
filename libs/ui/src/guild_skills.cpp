@@ -16,6 +16,7 @@
 #include "ro/ui/skin_text.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/staff_skill_id.h"
 
 #include "guild_panes.h"
 #include "skill_cell.h"
@@ -107,7 +108,7 @@ constexpr std::uint32_t kSecondsPerMinute = 60;
 
 // L'INFOBULLE COMMUNE AUX DEUX VUES : la grille n'affiche que l'icône, tout le
 // reste se lit ici.
-void SkillTooltip(const GuildSkillView& skill, int points) {
+void SkillTooltip(const GuildSkillView& skill, int points, bool staff_allowed) {
   std::array<char, 192> line = {};
   std::string tip = Label(skill);
   if (!skill.locked && !skill.technical.empty()) {
@@ -159,7 +160,9 @@ void SkillTooltip(const GuildSkillView& skill, int points) {
   if (!skill.locked && skill.cell.raisable && points > 0) {
     add(core::Tr("Clic gauche : monter d'un niveau"));
   }
-  SkinTooltipFormat("%s", tip.c_str());
+  SkinTooltipWithStaffSkillId(
+      tip.c_str(), staff_allowed,
+      StaffSkillId{.skill_id = skill.cell.skill_id, .idname = skill.technical});
 }
 
 // LE GLISSER VERS UNE BARRE : seulement ce qui se lance, au niveau appris, et
@@ -230,7 +233,8 @@ void DescribeOnRightClick(bool hot, std::uint16_t id, GuildAction& action) {
 // Les compétences de guilde n'ont pas de place dans les tables du client : la
 // grille se construit depuis l'arbre, les compétences d'un même palier côte à
 // côte.
-void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, GuildAction& action) {
+void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, bool staff_allowed,
+              GuildAction& action) {
   if (!ImGui::BeginChild("grille", ImVec2(0.0F, 0.0F), ImGuiChildFlags_None)) {
     ImGui::EndChild();
     return;
@@ -303,7 +307,7 @@ void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, Gu
     DragSource(skill);
     if (hot && ImGui::GetDragDropPayload() == nullptr) {
       hovered_now = skill.cell.skill_id;
-      SkillTooltip(skill, view.skill_points);
+      SkillTooltip(skill, view.skill_points, staff_allowed);
     }
     ClickGestures(state, skill, view.skill_points, action);
     DescribeOnRightClick(hot, skill.cell.skill_id, action);
@@ -345,7 +349,7 @@ void CooldownLabel(std::uint32_t cooldown_ms, std::array<char, 16>& label) {
 }
 
 // ── LA LISTE : l'arbre indenté, avec ses coudes de liaison ──────────────────
-void DrawList(GuildTabState& state, const GuildView& view, const SkinArt& art,
+void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, const SkinArt& art,
               GuildAction& action) {
   const auto flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter |
                      ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_ScrollY;
@@ -443,7 +447,7 @@ void DrawList(GuildTabState& state, const GuildView& view, const SkinArt& art,
     DescribeOnRightClick(hot, id, action);
     if (hot) {
       hovered_now = id;
-      SkillTooltip(skill, view.skill_points);
+      SkillTooltip(skill, view.skill_points, staff_allowed);
     }
     ImGui::Unindent(indent);
 
@@ -540,7 +544,7 @@ void DrawList(GuildTabState& state, const GuildView& view, const SkinArt& art,
 }  // namespace
 
 void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_icons,
-                     const SkinArt& art, GuildAction& action) {
+                     bool staff_allowed, const SkinArt& art, GuildAction& action) {
   if (!view.skills_known) {
     GuildTextColored(kGuildLabelColor,
                      core::Tr("Skills non encore reçus — clic sur « Actualiser »."));
@@ -594,9 +598,9 @@ void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_i
     return;
   }
   if (state.skill_grid) {
-    DrawGrid(state, view, smooth_icons, action);
+    DrawGrid(state, view, smooth_icons, staff_allowed, action);
   } else {
-    DrawList(state, view, art, action);
+    DrawList(state, view, staff_allowed, art, action);
   }
 }
 

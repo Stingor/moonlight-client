@@ -134,7 +134,7 @@ constexpr ImVec4 kReservedColor(0.85F, 0.65F, 0.20F, 1.0F);
 }  // namespace
 
 void DrawSkillList(SkillWindowState& state, const SkillGroupView& group, std::string_view filter,
-                   const SkinArt& art, SkillWindowAction& action) {
+                   const SkinArt& art, bool staff_allowed, SkillWindowAction& action) {
   const std::span<const SkillCellView> cells = group.cells;
   if (cells.empty()) {
     return;
@@ -258,7 +258,7 @@ void DrawSkillList(SkillWindowState& state, const SkillGroupView& group, std::st
         ImVec2(at.x + icon + ImGui::GetStyle().ItemSpacing.x, at.y),
         ImGui::GetColorU32(cell.effective_level() == 0 ? ImGuiCol_TextDisabled : ImGuiCol_Text),
         cell.name.data(), cell.name.data() + cell.name.size());
-    SkillCellGestures(cell, cells, state, art, icon, hot, action);
+    SkillCellGestures(cell, cells, state, art, icon, hot, staff_allowed, action);
     ImGui::Unindent(indent);
 
     // ── LE RANG, LE COÛT, LA PORTÉE ─────────────────────────────────────────

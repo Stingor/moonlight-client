@@ -450,7 +450,8 @@ CharacterWindowAction DrawCharacterWindow(
                CharacterTab::kGuild)) {
       state.tab = CharacterTab::kGuild;
       if (ImGui::BeginChild("guilde", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders)) {
-        action.guild = DrawGuildTab(state.guild, guild, state.grimoire.smooth_icons, art);
+        action.guild =
+            DrawGuildTab(state.guild, guild, state.grimoire.smooth_icons, art, view.staff_allowed);
         PaintWindowScrollbar(art);
       }
       ImGui::EndChild();

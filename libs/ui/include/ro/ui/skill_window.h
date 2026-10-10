@@ -38,6 +38,9 @@ struct SkillCellView {
   // arbres sont fusionnés dans le même onglet.
   int position = 0;
   std::string_view name;
+  // Le nom INTERNE (« SM_BASH »), que seul le staff voit au survol. Vide quand
+  // les tables de l'installation ne portent pas la compétence.
+  std::string_view idname;
   // L'icône, vide quand l'installation ne l'a pas. La case reste alors lisible :
   // le rang s'écrit dessous de toute façon.
   SkinImage icon;
@@ -341,7 +344,8 @@ struct SkillPointTally {
 // 🔴 `staff_allowed` MONTRE LA LIGNE DU STAFF, et c'est le droit de la fiche,
 // relu à chaque image : un droit retiré en cours de session doit faire
 // disparaître la ligne sans attendre une reconnexion. Voir
-// `StaffToolsAllowed`. `staff` ne sert que sous ce droit.
+// `StaffToolsAllowed`. `staff` ne sert que sous ce droit. Le même droit ajoute
+// l'identifiant au survol d'une case, voir `ro/ui/staff_skill_id.h`.
 [[nodiscard]] SkillWindowAction DrawGrimoireTab(SkillWindowState& state,
                                                 std::span<const SkillGroupView> groups,
                                                 SkillPointTally points, bool staff_allowed,

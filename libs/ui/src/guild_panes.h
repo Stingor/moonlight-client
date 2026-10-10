@@ -65,7 +65,7 @@ void DrawGuildMembers(GuildTabState& state, const GuildView& view, float list_he
 void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinArt& art,
                         GuildAction& action);
 void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_icons,
-                     const SkinArt& art, GuildAction& action);
+                     bool staff_allowed, const SkinArt& art, GuildAction& action);
 void DrawGuildRelations(GuildTabState& state, const GuildView& view, const SkinArt& art);
 void DrawGuildBans(const GuildView& view);
 

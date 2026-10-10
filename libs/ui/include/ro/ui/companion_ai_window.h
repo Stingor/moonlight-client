@@ -116,6 +116,8 @@ struct CompanionBaseFields {
 struct OffensiveSkillRow {
   std::uint16_t skill_id = 0;
   std::string label;
+  // Le nom INTERNE que le serveur donne, que seul le staff voit au survol.
+  std::string idname;
   int learned_level = 0;
 };
 
@@ -323,6 +325,9 @@ struct CompanionAiView {
   // FAUX TANT QUE LE PROFIL NE SE DÉSIGNE PAS (classe inconnue) : la fenêtre le
   // dit, et rien ne s'y règle.
   bool editable = true;
+  // LE DROIT DU STAFF, relu par `app` à chaque image : l'identifiant paraît au
+  // survol d'un skill offensif.
+  bool staff_allowed = false;
   // LE DERNIER GESTE REFUSÉ, et sa raison, déjà traduite ; vide sans refus.
   // `refused_rule` : la règle en cause, moins de zéro pour aucune.
   std::string refusal;

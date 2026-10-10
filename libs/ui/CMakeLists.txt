@@ -203,6 +203,7 @@ add_library(ro_ui STATIC
     src/party_grid_tile.cpp
     src/sound_zones.cpp
     src/staff_tools.cpp
+    src/staff_skill_id.cpp
     src/unlock_notice.cpp
     src/quick_cast_look.cpp
     src/camera_hud.cpp

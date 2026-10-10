@@ -130,10 +130,13 @@ void MercenaryStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
   skill_rows_.clear();
   std::size_t rank = 0;
   for (const ro::sim::MercenarySkill& skill : book_.skills()) {
+    const ro::sim::SkillNode* node = tree != nullptr ? tree->Find(skill.skill_id) : nullptr;
     ro::ui::MercenarySkillRow row{
         .skill_id = skill.skill_id,
         .level = skill.level,
         .name = skill_names_[rank],
+        // ⚠ LE NOM DU SERVEUR EST DÉJÀ L'INTERNE : il sert quand l'arbre manque.
+        .idname = node != nullptr ? std::string_view(node->idname) : std::string_view(skill.name),
         .active = skill.targeting != ro::sim::kSkillPassive,
         .castable = skill.level > 0 && skill.targeting != ro::sim::kSkillPassive,
         .needs_aim = skill.targeting != ro::sim::kSkillPassive && !SelfCast(skill),
@@ -142,7 +145,6 @@ void MercenaryStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
     };
     ++rank;
     if (pieces.skill_icons.has_value()) {
-      const ro::sim::SkillNode* node = tree != nullptr ? tree->Find(skill.skill_id) : nullptr;
       const ro::render::IconTexture& icon =
           pieces.skill_icons->Get(skill.skill_id, node != nullptr ? node->idname : skill.name);
       if (icon.usable()) {

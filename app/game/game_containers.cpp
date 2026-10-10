@@ -81,6 +81,8 @@ void Game::StageContainers() {
           .monster_sheets = monster_sheet_.has_value() ? &monster_sheet_->book() : nullptr,
           .job_names = &pieces_.job_names},
       windows_.companion_ai, windows_.companion_ai_view);
+  // Le droit du staff, relu à chaque image : l'identifiant d'un skill au survol.
+  windows_.companion_ai_view.staff_allowed = Rights().staff_tools;
   // 🔴 LE COFFRE MANGE L'ÉCHANGE SAC <-> CHARRETTE, et le serveur le refuse
   // sans un mot (`pc_cant_act2` compte `storage_flag`). Les deux fenêtres
   // doivent donc le savoir : l'une grise son entrée, l'autre change de

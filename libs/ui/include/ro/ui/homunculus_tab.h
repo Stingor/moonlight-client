@@ -105,6 +105,9 @@ struct HomunculusSkillRow {
   std::uint16_t skill_id = 0;
   // Vide quand l'arbre de l'installation ne la nomme pas.
   std::string_view name;
+  // Le nom INTERNE (« HAMI_CASTLE »), que seul le staff voit au survol. Vide
+  // quand l'arbre de l'installation ne la porte pas.
+  std::string_view idname;
   SkinImage icon;
   int level = 0;
   int sp_cost = 0;
@@ -162,7 +165,8 @@ struct HomunculusTabView {
   std::string_view ai_proposal;
 
   // LE DROIT DU STAFF, relu par `app` à chaque image : il montre la section
-  // « Staff ». ⚠ D'AFFICHAGE SEULEMENT : le serveur revalide chaque commande.
+  // « Staff », et l'identifiant au survol d'une compétence. ⚠ D'AFFICHAGE
+  // SEULEMENT : le serveur revalide chaque commande.
   bool staff_allowed = false;
   // ÉVOLUÉ, quand `app` connaît la classe ; vide sinon, et le serveur juge.
   std::optional<bool> evolved;

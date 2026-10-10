@@ -21,6 +21,7 @@
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/staff_skill_id.h"
 
 #include "homunculus_staff.h"
 
@@ -441,7 +442,7 @@ void DrawStats(const HomunculusTabView& view) {
 // ⚠ UNE COMPÉTENCE QUI VISE UNE CIBLE OU UNE CASE S'ARME : le clic suivant la
 // donne à l'IA de l'homoncule, qui s'approche jusqu'à la portée mesurée depuis
 // lui ; le joueur ne marche pas.
-void SkillGestures(const HomunculusSkillRow& skill, bool resting, bool dragging,
+void SkillGestures(const HomunculusSkillRow& skill, bool resting, bool dragging, bool staff_allowed,
                    HomunculusTabAction& action) {
   const bool active = !skill.passive && skill.level > 0;
   // Glisser une compétence ACTIVE vers une barre ; une passive n'irait nulle
@@ -496,7 +497,8 @@ void SkillGestures(const HomunculusSkillRow& skill, bool resting, bool dragging,
     tip = Lines({facts.data(), core::Tr("Double-clic : lancer  ·  Glisser : poser dans la barre"),
                  core::Tr("Clic droit : description")});
   }
-  SkinTooltipFormat("%s", tip.c_str());
+  SkinTooltipWithStaffSkillId(tip.c_str(), staff_allowed,
+                              StaffSkillId{.skill_id = skill.skill_id, .idname = skill.idname});
 }
 
 void DrawSkillRows(HomunculusTabState& state, const HomunculusTabView& view, const SkinArt& art,
@@ -518,11 +520,11 @@ void DrawSkillRows(HomunculusTabState& state, const HomunculusTabView& view, con
     const bool dragging = ImGui::GetDragDropPayload() != nullptr;
     if (skill.icon.usable()) {
       ImGui::Image(skill.icon.id, ImVec2(Px(kSkillIconPixels), Px(kSkillIconPixels)));
-      SkillGestures(skill, view.resting, dragging, action);
+      SkillGestures(skill, view.resting, dragging, view.staff_allowed, action);
       ImGui::SameLine();
     }
     ImGui::TextUnformatted(SkillLabel(skill).c_str());
-    SkillGestures(skill, view.resting, dragging, action);
+    SkillGestures(skill, view.resting, dragging, view.staff_allowed, action);
 
     ImGui::TableNextColumn();
     ImGui::Text("%d", skill.level);

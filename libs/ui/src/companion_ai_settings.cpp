@@ -12,6 +12,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/staff_skill_id.h"
 
 #include "companion_ai_window_parts.h"
 
@@ -74,7 +75,11 @@ void DrawSkillPermissions(CompanionBaseFields& fields, const CompanionAiView& vi
     SkillPermissionField& permission = fields.permissions[index];
     ImGui::PushID(skill.skill_id);
     changed |= SkinCheckBox(skill.label.c_str(), &permission.allowed, art);
-    SkinTooltip(core::Tr("Coché, ce skill peut partir de lui-même."));
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+      SkinTooltipWithStaffSkillId(core::Tr("Coché, ce skill peut partir de lui-même."),
+                                  view.staff_allowed,
+                                  StaffSkillId{.skill_id = skill.skill_id, .idname = skill.idname});
+    }
     if (permission.allowed) {
       ImGui::SameLine();
       ImGui::SetNextItemWidth(Px(kTacticComboPixels));

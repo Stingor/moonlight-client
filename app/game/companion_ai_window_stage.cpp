@@ -213,6 +213,7 @@ void CompanionAiStage::StageAiWindow(const HomunculusStage& homunculus,
     if (ro::sim::IsOffensiveCompanionSkill(fact)) {
       offensive_rows_.push_back(ro::ui::OffensiveSkillRow{.skill_id = fact.skill_id,
                                                           .label = names.skill(fact.skill_id),
+                                                          .idname = skill.server_name,
                                                           .learned_level = fact.level});
     }
   }

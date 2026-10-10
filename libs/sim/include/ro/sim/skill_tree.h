@@ -52,8 +52,9 @@ struct SkillScaleCells {
 
 struct SkillNode {
   std::uint16_t id = 0;
-  // Le nom INTERNE, « SM_BASH ». C'est lui qui nomme le fichier de l'icône, et
-  // c'est la seule raison de le garder.
+  // Le nom INTERNE, « SM_BASH ». C'est lui qui nomme le fichier de l'icône et
+  // qui désigne la compétence dans une barre sauvegardée ; le staff le lit
+  // aussi au survol.
   std::string idname;
   // Le libellé affiché, dans la langue du client.
   std::string display_name;

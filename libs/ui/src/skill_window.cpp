@@ -479,7 +479,7 @@ void DrawStaffRow(SkillWindowState& state, bool staff_allowed, const GrimoireSta
 
 // ── LA GRILLE ───────────────────────────────────────────────────────────────
 void DrawGrid(SkillWindowState& state, const SkillGroupView& group, std::string_view filter,
-              const SkinArt& art, SkillWindowAction& action) {
+              const SkinArt& art, bool staff_allowed, SkillWindowAction& action) {
   const float scale = Scale();
   ImDrawList* into = ImGui::GetWindowDrawList();
   const ImVec2 origin = ImGui::GetCursorScreenPos();
@@ -570,7 +570,7 @@ void DrawGrid(SkillWindowState& state, const SkillGroupView& group, std::string_
     DrawUseLevelBadge(into, cell, icon_at, icon_side);
     PaintLevel(into, cell, top_left, scale, icon_at.y + icon_side);
 
-    SkillCellGestures(cell, group.cells, state, art, icon_side, hot, action);
+    SkillCellGestures(cell, group.cells, state, art, icon_side, hot, staff_allowed, action);
     ImGui::PopID();
   }
   state.hovered_skill = hovered_now;
@@ -689,9 +689,9 @@ SkillWindowAction DrawGrimoireTab(SkillWindowState& state, std::span<const Skill
     // pour dire ce qui mène à quoi.
     const SkillGroupView& shown = groups[static_cast<std::size_t>(state.group)];
     if (state.grid) {
-      DrawGrid(state, shown, state.filter, art, action);
+      DrawGrid(state, shown, state.filter, art, staff_allowed, action);
     } else {
-      DrawSkillList(state, shown, state.filter, art, action);
+      DrawSkillList(state, shown, state.filter, art, staff_allowed, action);
     }
     // L'ascenseur de l'enfant, peint tant qu'il est la fenêtre courante :
     // sans cela il défilerait sans rien montrer.

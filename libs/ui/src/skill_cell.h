@@ -30,8 +30,10 @@ namespace ro::ui {
 void DrawUseLevelBadge(ImDrawList* into, const SkillCellView& cell, ImVec2 icon_at, float side,
                        bool always = false);
 
-// LE SURVOL : le nom, le rang, et ce qu'il faut avant.
-void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> siblings);
+// LE SURVOL : le nom, le rang, et ce qu'il faut avant. `staff_allowed` y
+// ajoute l'identifiant, voir `ro/ui/staff_skill_id.h`.
+void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> siblings,
+                      bool staff_allowed);
 
 // TOUT CE QUI SE FAIT SUR UNE CASE : glisser vers la barre, survoler, réserver,
 // lancer, décrire, ouvrir le menu.
@@ -42,9 +44,10 @@ void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> 
 //
 // `icon_side` est la taille de l'icône dans la charge du glisser ; `hot` dit si
 // la case est survolée, l'appelant l'ayant déjà demandé pour son propre dessin.
+// `staff_allowed` est le droit que `DrawGrimoireTab` a reçu.
 void SkillCellGestures(const SkillCellView& cell, std::span<const SkillCellView> siblings,
                        SkillWindowState& state, const SkinArt& art, float icon_side, bool hot,
-                       SkillWindowAction& action);
+                       bool staff_allowed, SkillWindowAction& action);
 
 // ── CE QUE LA GRILLE DU GRIMOIRE PRÊTE À CELLE DE LA GUILDE ────────────────
 //

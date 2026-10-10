@@ -328,8 +328,12 @@ struct GuildAction {
 
 // ⚠ `smooth_icons` EST LE RÉGLAGE DU GRIMOIRE, partagé : une seule préférence
 // « icônes de compétence ».
+//
+// `staff_allowed` est le droit de la fiche, relu à chaque image : il ajoute
+// l'identifiant au survol d'une compétence, voir `ro/ui/staff_skill_id.h`.
 [[nodiscard]] GuildAction DrawGuildTab(GuildTabState& state, const GuildView& view,
-                                       bool& smooth_icons, const SkinArt& art);
+                                       bool& smooth_icons, const SkinArt& art,
+                                       bool staff_allowed = false);
 
 // L'invitation reçue : « Untel t'invite dans sa guilde ». Rend vrai si le
 // joueur a répondu, et `accepted` dit comment.
