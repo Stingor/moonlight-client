@@ -11,7 +11,7 @@
 #include <string>
 
 #include "ro/core/i18n.h"
-#include "ro/ui/gauge_corners.h"
+#include "ro/ui/gauge_fill.h"
 #include "ro/ui/status_bar.h"
 
 namespace ro::ui {
@@ -43,9 +43,6 @@ constexpr float kTextMargin = 4.0F;
 constexpr std::size_t kClippedRoom = 512;
 // Trois points ASCII : l'ellipse typographique n'a pas de glyphe dans la police.
 constexpr char kEllipsis[] = "...";
-
-// Une jauge pleine à ce point garde ses quatre coins arrondis.
-constexpr float kBrimming = 0.999F;
 
 // La réserve de magie qu'un monstre n'a pas : le serveur écrit 1 faute de
 // pouvoir écrire 0.
@@ -148,23 +145,13 @@ void PaintGauge(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const Ta
   const bool known = value.has_value() && most.has_value();
   const std::uint32_t now = known ? *value : 0;
   const std::uint32_t full = known ? *most : 0;
-  const float width = bottom_right.x - top_left.x;
 
-  const float fill = GaugeFill(known, now, full, is_magic);
-  if (fill > 0.0F) {
-    const float wide = width * fill;
-    if (wide >= 1.0F) {
-      // Les coins ne s'arrondissent qu'à l'arrière, sauf quand la courbe du
-      // creux rattrape le front.
-      const ImDrawFlags corners =
-          fill >= kBrimming
-              ? ImDrawFlags_RoundCornersAll
-              : GaugeFillCorners(width - wide, look.rounding, ImDrawFlags_RoundCornersLeft,
-                                 ImDrawFlags_RoundCornersRight);
-      into.AddRectFilled(top_left, ImVec2(top_left.x + wide, bottom_right.y), fill_color,
-                         look.rounding, corners);
-    }
-  }
+  // 🔴 DANS L'INTÉRIEUR DU CADRE : son trait se peint AVANT le contenu, et une
+  // part pleine posée sur toute la surface le recouvrait. Voir `gauge_fill.h`.
+  const RoundedBox interior = GaugeInterior(top_left, bottom_right, look.rounding,
+                                            look.border ? kHudFrameBorderPixels : 0.0F);
+  PaintGaugeFill(into, interior, GaugeFill(known, now, full, is_magic), GaugeGrowth::kRightward,
+                 fill_color);
   const std::string caption = GaugeCaption(known, now, full, GaugeTextOf(look.gauge_text),
                                            GaugeNumbersAllowed(target, is_magic, known), is_magic);
   if (!caption.empty()) {

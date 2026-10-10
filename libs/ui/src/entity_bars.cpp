@@ -11,7 +11,7 @@
 #include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
-#include "ro/ui/gauge_corners.h"
+#include "ro/ui/gauge_fill.h"
 
 namespace ro::ui {
 namespace {
@@ -149,23 +149,18 @@ void PaintEntityBar(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, floa
   const float rounding = std::max(look.rounding, 0.0F);
 
   // LE CREUX SUR TOUTE LA SURFACE, puis la part pleine, puis le cadre EN TRAIT.
-  // ⚠ L'ORDRE EST LE SUJET : voir l'en-tête. Un cadre plein posé DESSOUS oblige
-  // le contenu à rentrer d'un pixel, et un pixel de moins en hauteur, c'est un
-  // pixel d'arrondi en moins — celui qu'on voyait.
+  // ⚠ L'ORDRE EST LE SUJET : voir l'en-tête. Un cadre PLEIN posé dessous ferait
+  // du creux un rectangle plus bas d'un pixel par côté, et ImGui bornant tout
+  // rayon à `hauteur / 2 - 1`, son arrondi tomberait. En trait par-dessus, le
+  // creux garde toute la hauteur de la barre.
   into.AddRectFilled(top_left, bottom_right, Faded(look.background, opacity), rounding);
 
-  const float share = std::clamp(fill, 0.0F, 1.0F);
-  if (share > 0.0F) {
-    const ImVec2 filled(top_left.x + (bottom_right.x - top_left.x) * share, bottom_right.y);
-    // ⚠ LES COINS DE GAUCHE TOUJOURS, CEUX DE DROITE SEULEMENT QUAND LA COURBE
-    // DU CREUX LES RATTRAPE : voir `gauge_corners.h`. Le seuil se lit en PIXELS
-    // restants, jamais en part remplie — à 99 % d'une barre de soixante, il
-    // reste moins d'un pixel et un coin carré posé là dépasse.
-    const ImDrawFlags corners =
-        GaugeFillCorners(bottom_right.x - filled.x, rounding, ImDrawFlags_RoundCornersLeft,
-                         ImDrawFlags_RoundCornersRight);
-    into.AddRectFilled(top_left, filled, Faded(ink, opacity), rounding, corners);
-  }
+  // LA PART PLEINE, DANS L'INTÉRIEUR DU CADRE, bordure déduite : voir
+  // `gauge_fill.h`. Son rayon est celui du creux moins la bordure, sur le même
+  // centre, et une part minuscule suit la courbe du coin au lieu d'en dépasser.
+  const RoundedBox interior =
+      GaugeInterior(top_left, bottom_right, rounding, look.border ? kEntityBarBorderPixels : 0.0F);
+  PaintGaugeFill(into, interior, fill, GaugeGrowth::kRightward, Faded(ink, opacity));
 
   if (look.border) {
     into.AddRect(top_left, bottom_right, Faded(look.border_color, opacity), rounding,

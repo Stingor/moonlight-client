@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/gauge_fill.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/status_bar.h"
@@ -148,17 +149,20 @@ void DrawTile(ImDrawList& into, const PartyGridTileView& member, ImVec2 top_left
 
   into.AddRectFilled(top_left, bottom_right, look.tile_background, rounding);
 
+  // ⚠ LES DEUX JAUGES SE TIENNENT DANS L'INTÉRIEUR DE LA TUILE, sous son trait le
+  // plus fin — toujours peint — et découpées dans sa forme arrondie : voir
+  // `gauge_fill.h`. Une bande de magie rectangulaire dépassait des coins bas.
+  const RoundedBox interior =
+      GaugeInterior(top_left, bottom_right, rounding, kPlainBorderThickness);
+
   // La barre de vie EST le fond de la tuile. PV inconnus : rien, car une tuile
   // vide se lirait « mort » alors que le membre n'est que trop loin.
   const bool has_hp = !member.offline && member.hp_known && member.max_hp > 0;
   if (has_hp) {
     const float fraction =
         std::clamp(static_cast<float>(member.hp) / static_cast<float>(member.max_hp), 0.0F, 1.0F);
-    if (fraction > 0.0F) {
-      into.AddRectFilled(
-          top_left, ImVec2(top_left.x + (bottom_right.x - top_left.x) * fraction, bottom_right.y),
-          PartyGridHpInk(look, member.hp, member.max_hp), rounding);
-    }
+    PaintGaugeFill(into, interior, fraction, GaugeGrowth::kRightward,
+                   PartyGridHpInk(look, member.hp, member.max_hp));
   }
 
   // La barre de SP se résout AVANT le reste : elle mange le bas de la tuile, et
@@ -188,12 +192,11 @@ void DrawTile(ImDrawList& into, const PartyGridTileView& member, ImVec2 top_left
   if (sp_shown) {
     const float fraction =
         std::clamp(static_cast<float>(member.sp) / static_cast<float>(member.max_sp), 0.0F, 1.0F);
-    const ImVec2 track(top_left.x, bottom);
-    into.AddRectFilled(track, bottom_right, WithAlpha(look.tile_background, kSpTrackAlphaMask));
-    if (fraction > 0.0F) {
-      into.AddRectFilled(
-          track, ImVec2(track.x + (bottom_right.x - track.x) * fraction, bottom_right.y), look.sp);
-    }
+    const AxisBox track{ImVec2(interior.min.x, bottom), interior.max};
+    FillRoundedBoxWithin(into, interior, track, WithAlpha(look.tile_background, kSpTrackAlphaMask));
+    const AxisBox filled{track.min,
+                         ImVec2(track.min.x + (track.max.x - track.min.x) * fraction, track.max.y)};
+    FillRoundedBoxWithin(into, interior, filled, look.sp);
   }
 
   if (paint.hovered) {

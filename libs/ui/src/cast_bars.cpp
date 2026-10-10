@@ -9,17 +9,16 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/entity_bars.h"
+#include "ro/ui/gauge_fill.h"
 
 namespace ro::ui {
 namespace {
 
-// La part pleine qui arrondit ses quatre coins plutôt que les deux de gauche.
-// ⚠ PRESQUE UN ET NON UN : la part d'une barre qui s'achève n'atteint pas
-// toujours l'unité au millième près, et son front resterait carré.
-constexpr float kRoundedEndShare = 0.999F;
 // En deçà d'un pixel, la part pleine ne se peint pas : un trait d'un demi-pixel
 // arrondi fait une tache, pas une barre.
 constexpr float kLeastFillPixels = 1.0F;
+// L'épaisseur du cadre, en pixels. La part pleine se tient à l'intérieur.
+constexpr float kBorderPixels = 1.0F;
 
 // L'étiquette : blanche, en relief noir d'un pixel en bas à droite.
 constexpr ImU32 kCaptionColor = IM_COL32(255, 255, 255, 255);
@@ -75,18 +74,17 @@ void PaintReplacedBar(ImDrawList& into, const CastBarView& what, const CastBarLo
   const ImVec2 bottom_right(top_left.x + width, top_left.y + height);
 
   into.AddRectFilled(top_left, bottom_right, Faded(look.background, opacity), rounding);
+  // ⚠ LA PART PLEINE DANS L'INTÉRIEUR DU CADRE, découpée dans sa forme arrondie :
+  // voir `gauge_fill.h`. Le front qui avance reste une arête franche, sans quoi
+  // il « fond » à mesure qu'il progresse, et ne suit la courbe qu'au bout.
+  const RoundedBox interior =
+      GaugeInterior(top_left, bottom_right, rounding, look.border ? kBorderPixels : 0.0F);
   const float share = CastBarProgress(what);
-  const float filled = width * share;
-  if (filled >= kLeastFillPixels) {
-    // ⚠ SEULS LES COINS DE DÉPART S'ARRONDISSENT : le front qui avance reste une
-    // arête franche, sans quoi il « fond » à mesure qu'il progresse.
-    const ImDrawFlags corners =
-        share >= kRoundedEndShare ? ImDrawFlags_RoundCornersAll : ImDrawFlags_RoundCornersLeft;
-    into.AddRectFilled(top_left, ImVec2(top_left.x + filled, bottom_right.y),
-                       Faded(look.fill, opacity), rounding, corners);
+  if ((interior.max.x - interior.min.x) * share >= kLeastFillPixels) {
+    PaintGaugeFill(into, interior, share, GaugeGrowth::kRightward, Faded(look.fill, opacity));
   }
   if (look.border) {
-    into.AddRect(top_left, bottom_right, Faded(kBorderColor, opacity), rounding);
+    into.AddRect(top_left, bottom_right, Faded(kBorderColor, opacity), rounding, kBorderPixels);
   }
 
   const std::string caption = CastBarCaption(look, what);

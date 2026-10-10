@@ -42,6 +42,10 @@ enum HudEdge : int {
 inline constexpr float kHudEdgeGrab = 5.0F;
 inline constexpr float kHudCornerGrab = 12.0F;
 
+// L'épaisseur du trait d'un cadre bordé, en pixels. ⚠ IL SE PEINT AVANT LE
+// CONTENU : ce qui remplit le cadre doit s'en tenir à l'intérieur.
+inline constexpr float kHudFrameBorderPixels = 1.0F;
+
 // Le rayon d'aimantation entre cadres frères.
 inline constexpr float kHudSnapReach = 10.0F;
 

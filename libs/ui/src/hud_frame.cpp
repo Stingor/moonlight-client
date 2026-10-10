@@ -457,7 +457,7 @@ bool BeginHudFrame(const char* id, HudRect& stored, const HudFrameLook& look,
       into->AddRectFilled(top_left, bottom_right, *look.background, look.rounding);
     }
     if (look.border) {
-      into->AddRect(top_left, bottom_right, kFrameBorder, look.rounding);
+      into->AddRect(top_left, bottom_right, kFrameBorder, look.rounding, kHudFrameBorderPixels);
     }
     // ⚠ LE REPÈRE SE PEINT AVANT LE CONTENU, comme le fond : dessiné après, il
     // barrerait ce qu'il doit sous-tendre.

@@ -13,7 +13,7 @@
 #include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
-#include "ro/ui/gauge_corners.h"
+#include "ro/ui/gauge_fill.h"
 #include "ro/ui/inventory_window.h"
 
 #include "item_grid.h"
@@ -37,7 +37,6 @@ constexpr std::array<const char*, kStatBarCount> kBarIds = {
 
 constexpr float kShadowShare = 0.08F;
 constexpr float kLeastShadow = 1.0F;
-constexpr float kBrimming = 0.999F;
 constexpr ImU32 kCaptionShadow = IM_COL32(0, 0, 0, 190);
 constexpr float kBorderThickness = 1.0F;
 
@@ -333,62 +332,43 @@ void PaintRingBorder(ImDrawList& into, const OrbSurface& disc, float thickness, 
                  kBorderThickness);
 }
 
-// Le remplissage d'une BARRE, depuis l'un ou l'autre bout.
-void PaintBarFill(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, float fill, bool vertical,
-                  bool reversed, float rounding, ImU32 color, bool relief) {
-  if (fill <= 0.0F) {
+// Le sens de remplissage d'une barre. ⚠ L'ARRIÈRE DÉPEND DU SENS : une barre
+// inversée part de la droite, une barre verticale du bas — inversée, du haut, ce
+// qui est le seul cas où elle se lit comme une vidange, et c'est le joueur qui
+// l'aura demandé.
+[[nodiscard]] GaugeGrowth BarGrowth(bool vertical, bool reversed) {
+  if (vertical) {
+    return reversed ? GaugeGrowth::kDownward : GaugeGrowth::kUpward;
+  }
+  return reversed ? GaugeGrowth::kLeftward : GaugeGrowth::kRightward;
+}
+
+// Le remplissage d'une BARRE, dans l'intérieur de son cadre.
+//
+// ⚠ LA FORME VIENT DE `gauge_fill.h` : l'intérieur arrondi découpé par la part
+// remplie. Le front reste une arête franche au milieu du creux, ne suit la
+// courbe que là où elle le rattrape, et une part minuscule ne dépasse pas des
+// coins.
+void PaintBarFill(ImDrawList& into, const RoundedBox& interior, float fill, GaugeGrowth growth,
+                  ImU32 color, bool relief) {
+  if (!PathGaugeFill(into, interior, fill, growth)) {
     return;
   }
-  const ImVec2 size(bottom_right.x - top_left.x, bottom_right.y - top_left.y);
-  // Les coins ne s'arrondissent qu'à L'ARRIÈRE : le front de la jauge doit
-  // rester une arête franche, sans quoi il a l'air de s'effacer avant d'arriver.
-  // ⚠ ET L'ARRIÈRE DÉPEND DU SENS : une barre inversée part de la droite, une
-  // barre verticale du bas — inversée, du haut, ce qui est le seul cas où elle
-  // se lit comme une vidange, et c'est le joueur qui l'aura demandé.
-  //
-  // 🔴 SAUF QUAND LA COURBE DU CREUX RATTRAPE LE FRONT. Le seuil ne se lit pas
-  // en PART REMPLIE — « pas tout à fait pleine, donc arête franche » —, il se
-  // lit en PIXELS RESTANTS : à quatre-vingt-dix-neuf
-  // pour cent d'une barre de soixante, il reste moins d'un pixel et le coin
-  // carré dépasse l'arrondi du creux. Voir `gauge_corners.h`.
-  ImDrawFlags corners = ImDrawFlags_RoundCornersAll;
-  ImVec2 from = top_left;
-  ImVec2 to = bottom_right;
-  if (fill < kBrimming) {
-    if (vertical) {
-      const float front = size.y * fill;
-      corners =
-          GaugeFillCorners(size.y - front, rounding,
-                           reversed ? ImDrawFlags_RoundCornersTop : ImDrawFlags_RoundCornersBottom,
-                           reversed ? ImDrawFlags_RoundCornersBottom : ImDrawFlags_RoundCornersTop);
-      if (reversed) {
-        to.y = top_left.y + front;
-      } else {
-        from.y = bottom_right.y - front;
-      }
-    } else {
-      const float front = size.x * fill;
-      corners =
-          GaugeFillCorners(size.x - front, rounding,
-                           reversed ? ImDrawFlags_RoundCornersRight : ImDrawFlags_RoundCornersLeft,
-                           reversed ? ImDrawFlags_RoundCornersLeft : ImDrawFlags_RoundCornersRight);
-      if (reversed) {
-        from.x = bottom_right.x - front;
-      } else {
-        to.x = top_left.x + front;
-      }
-    }
-  }
-  into.PathRect(from, to, rounding, corners);
   FillPath(into, color, relief);
 
   // LE FIL DE LUMIÈRE SUR L'ARÊTE HAUTE : c'est lui qui fait lire un tube de
-  // verre et non une bande de couleur. Rentré des coins, pour ne pas dépasser
-  // de l'arrondi.
+  // verre et non une bande de couleur. ⚠ RENTRÉ DE CE QUE LA COURBE MANGE à sa
+  // hauteur, et borné à la part remplie : il ne doit dépasser ni l'arrondi ni
+  // le front.
   if (relief) {
-    const float inset = std::min(rounding, (to.x - from.x) * 0.5F);
-    into.AddLine(ImVec2(from.x + inset, from.y + kBorderThickness),
-                 ImVec2(to.x - inset, from.y + kBorderThickness), kBarHighlight, kBorderThickness);
+    const AxisBox box = GaugeFillBox(interior, fill, growth);
+    const float line_y = box.min.y + kBorderThickness;
+    const float inset = RoundedBoxInsetAt(interior, line_y - kBorderThickness * 0.5F);
+    const float left = std::max(box.min.x, interior.min.x + inset);
+    const float right = std::min(box.max.x, interior.max.x - inset);
+    if (right > left && line_y < box.max.y) {
+      into.AddLine(ImVec2(left, line_y), ImVec2(right, line_y), kBarHighlight, kBorderThickness);
+    }
   }
 }
 
@@ -740,8 +720,10 @@ void DrawStatBars(const StatBarValues& values, const StatBarWarnings& warnings,
 
         switch (shape) {
           case StatBarShape::kBar:
-            PaintBarFill(*into, top_left, bottom_right, fill, mine.vertical, reversed,
-                         mine.rounding, ink, mine.glossy);
+            PaintBarFill(*into,
+                         GaugeInterior(top_left, bottom_right, mine.rounding,
+                                       mine.border ? kBorderThickness : 0.0F),
+                         fill, BarGrowth(mine.vertical, reversed), ink, mine.glossy);
             if (mine.border) {
               into->AddRect(top_left, bottom_right, mine.border_color, mine.rounding,
                             ImDrawFlags_None, kBorderThickness);

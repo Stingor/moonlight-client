@@ -211,6 +211,7 @@ add_library(ro_ui STATIC
     src/zone_capture.cpp
     src/stat_bars.cpp
     src/entity_bars.cpp
+    src/gauge_fill.cpp
     src/entity_sample.cpp
     src/cast_bars.cpp
     src/damage_texts.cpp
