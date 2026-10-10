@@ -1,0 +1,19 @@
+# Arbres de build
+/build/
+/out/
+CMakeUserPresets.json
+/vcpkg_installed/
+
+# Éditeurs
+/.vs/
+/.vscode/
+*.user
+
+# Sorties de construction
+*.log
+*.pdb
+*.ilk
+
+# Données de jeu : jamais dans ce dépôt.
+*.grf
+*.gpf

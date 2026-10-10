@@ -1,0 +1,177 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows",
+      "displayName": "Windows / MSVC x64",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/windows",
+      "cacheVariables": {
+        "MOONCLIENT_BUILD_TESTS": "ON",
+        "MOONCLIENT_WERROR": "ON"
+      }
+    },
+    {
+      "name": "windows-asan",
+      "displayName": "Windows / MSVC x64 + AddressSanitizer",
+      "inherits": "windows",
+      "binaryDir": "${sourceDir}/build/windows-asan",
+      "cacheVariables": {
+        "MOONCLIENT_ASAN": "ON"
+      }
+    },
+    {
+      "name": "linux-clang",
+      "displayName": "Linux / clang",
+      "description": "EXIGE CLANG 19 OU PLUS. Le <expected> de libstdc++ est garde par __cpp_concepts >= 202002L, et clang ne pose cette valeur qu'a partir de la 19 : sous clang 18, std::expected n'existe tout simplement pas, donc ro/core/error.h ne compile pas. L'integration emploie linux-gcc-asan pour cette raison.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-clang",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MOONCLIENT_BUILD_TESTS": "ON",
+        "MOONCLIENT_WERROR": "ON"
+      }
+    },
+    {
+      "name": "linux-clang-asan",
+      "displayName": "Linux / clang + ASan + UBSan",
+      "inherits": "linux-clang",
+      "binaryDir": "${sourceDir}/build/linux-clang-asan",
+      "cacheVariables": {
+        "MOONCLIENT_ASAN": "ON",
+        "MOONCLIENT_PLATFORM_LAYERS": "OFF",
+        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": "ON",
+        "VCPKG_MANIFEST_FEATURES": "tests;ui"
+      }
+    },
+    {
+      "name": "linux-gcc",
+      "displayName": "Linux / g++-14",
+      "description": "La version est nommee, et non laissee au meta-paquet g++ : celui-ci suit la distribution, et le meme arbre passerait un jour pour echouer le lendemain sans qu'une ligne ait ete ecrite.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-gcc",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc-14",
+        "CMAKE_CXX_COMPILER": "g++-14",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MOONCLIENT_BUILD_TESTS": "ON",
+        "MOONCLIENT_WERROR": "ON"
+      }
+    },
+    {
+      "name": "linux-gcc-asan",
+      "displayName": "Linux / g++-14 + ASan + UBSan",
+      "inherits": "linux-gcc",
+      "binaryDir": "${sourceDir}/build/linux-gcc-asan",
+      "cacheVariables": {
+        "MOONCLIENT_ASAN": "ON",
+        "MOONCLIENT_PLATFORM_LAYERS": "OFF",
+        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": "ON",
+        "VCPKG_MANIFEST_FEATURES": "tests;ui"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows",
+      "configuration": "Debug",
+      "jobs": 0
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows",
+      "configuration": "Release",
+      "jobs": 0
+    },
+    {
+      "name": "windows-release-client",
+      "configurePreset": "windows",
+      "configuration": "Release",
+      "targets": [
+        "moonclient"
+      ],
+      "jobs": 0
+    },
+    {
+      "name": "windows-asan",
+      "configurePreset": "windows-asan",
+      "configuration": "Debug",
+      "jobs": 0
+    },
+    {
+      "name": "linux-clang",
+      "configurePreset": "linux-clang",
+      "jobs": 0
+    },
+    {
+      "name": "linux-clang-asan",
+      "configurePreset": "linux-clang-asan",
+      "jobs": 0
+    },
+    {
+      "name": "linux-gcc",
+      "configurePreset": "linux-gcc",
+      "jobs": 0
+    },
+    {
+      "name": "linux-gcc-asan",
+      "configurePreset": "linux-gcc-asan",
+      "jobs": 0
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-clang",
+      "configurePreset": "linux-clang",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-clang-asan",
+      "configurePreset": "linux-clang-asan",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-gcc",
+      "configurePreset": "linux-gcc",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-gcc-asan",
+      "configurePreset": "linux-gcc-asan",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

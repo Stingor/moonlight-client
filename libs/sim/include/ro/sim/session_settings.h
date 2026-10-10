@@ -1,0 +1,64 @@
+#pragma once
+
+#include <cstdint>
+
+namespace ro::sim {
+
+// CE QUE LE SERVEUR DIT DE LA SESSION dans ses réglages (`ZC_MOONLIGHT_SETTINGS`),
+// et seulement à un client qu'il a reconnu.
+//
+// ⚠ RIEN NE S'Y DEVINE NI NE S'Y GARDE : chaque champ vaut son défaut tant que
+// le serveur n'a rien dit, et ce qu'il dit ensuite fait foi, y compris à la
+// baisse. Ce qui en dépend le relit à chaque image plutôt que de retenir un
+// verdict.
+struct SessionSettings {
+  // LE NIVEAU DE GROUPE DU COMPTE. Zéro : un joueur, ou un serveur muet.
+  std::uint8_t group_level = 0;
+
+  // LA VITESSE DE MARCHE, en millisecondes par case.
+  //
+  // ⚠ ZÉRO VEUT DIRE « IL N'A RIEN DIT », et ce n'est pas la même chose que la
+  // vitesse normale : tant qu'elle vaut zéro, le curseur du volet du staff garde
+  // son défaut au lieu de sauter sur un chiffre inventé.
+  std::uint16_t walk_speed = 0;
+
+  // `@killer` : le personnage attaque les joueurs hors des cartes PvP.
+  bool killer = false;
+  // `@killable` : les joueurs peuvent l'attaquer hors des cartes PvP.
+  bool killable = false;
+  // `@playertest` : les plafonds GM d'ASPD et de delay de skill sont ignorés,
+  // pour jouer à la cadence d'un joueur.
+  bool player_test = false;
+  // `@nodelay` : les skills n'ont ni cooldown, ni after-cast delay, ni incantation.
+  bool no_delay = false;
+  // LE RELAI DU CANAL DISCORD se montre-t-il dans le fil ? Le serveur retient ce
+  // réglage par personnage, et le croit vrai tant qu'il n'a rien dit.
+  bool discord_chat = true;
+
+  // ── LES RÈGLES DU SERVEUR (`ZC_MOONLIGHT_SERVER_RULES`) ────────────────────
+  //
+  // Les défauts sont ceux d'un serveur rAthena pre-renewal d'usine, sauf le
+  // délai après téléportation, propre au serveur Moonlight : ils valent tant que
+  // le serveur n'a rien dit, et un serveur qui ne connaît pas ce paquet ne le
+  // dira jamais.
+  //
+  // LE RAYON DE VUE, en cases autour du personnage : le serveur ne fait
+  // connaître au client que les acteurs à cette distance. Au-delà, un compagnon
+  // disparaît du monde connu, et une cible n'y figure pas.
+  int view_cells = kDefaultViewCells;
+  // Les niveaux maximum d'un homoncule, et d'une forme mutée (« S »).
+  int homunculus_max_level = kDefaultHomunculusMaxLevel;
+  int homunculus_s_max_level = kDefaultHomunculusSMaxLevel;
+  // Le délai pendant lequel le serveur refuse l'attaque d'un homoncule après sa
+  // téléportation avec le maître, en millisecondes. ⚠ UNE OPTION DU SERVEUR
+  // MOONLIGHT (`homunc_teleport_acd`), qu'un rAthena d'usine n'a pas : le défaut
+  // est la valeur de sa configuration.
+  std::uint32_t homunculus_teleport_hold_ms = kDefaultHomunculusTeleportHoldMs;
+
+  static constexpr int kDefaultViewCells = 14;
+  static constexpr int kDefaultHomunculusMaxLevel = 99;
+  static constexpr int kDefaultHomunculusSMaxLevel = 275;
+  static constexpr std::uint32_t kDefaultHomunculusTeleportHoldMs = 5000;
+};
+
+}  // namespace ro::sim

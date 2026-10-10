@@ -1,0 +1,45 @@
+// L'ombre d'une classe : de combien le disque sous ses pieds s'étale.
+//
+// À part de sprite_catalog.cpp, qui touchait au plafond. Le sujet se tient tout
+// seul : il ne lit qu'une table du client et ne compose aucun chemin.
+
+#include <cstdint>
+#include <optional>
+
+#include "ro/render/shown_job.h"
+#include "ro/render/sprite_catalog.h"
+
+#include "sprite_catalog_internal.h"
+
+namespace ro::render {
+
+float ShadowScaleFor(const SpriteCatalog& catalog, const ActorLook& look) {
+  // La tombe d'un monstre n'a pas d'ombre : le client l'écarte par sa classe.
+  constexpr std::uint32_t kMobTombClass = 565;
+  if (look.item || look.job == kMobTombClass) {
+    return 0.0F;
+  }
+  // LA COMBINAISON DE MADOGEAR élargit l'ombre, et ce qu'en disent les tables
+  // ne compte plus. Moins pour le bébé.
+  constexpr std::uint32_t kBabyMadogearJob = 4112;
+  constexpr float kMadogearSuitShadow = 1.5F;
+  constexpr float kBabyMadogearSuitShadow = 1.12F;
+  if (look.madogear_suit && IsMadogearJob(look.job)) {
+    return look.job == kBabyMadogearJob ? kBabyMadogearSuitShadow : kMadogearSuitShadow;
+  }
+  // Le rayon d'abord : il ne concerne que les plus grandes créatures, et il
+  // l'emporte quand il est là.
+  if (const std::optional<double> radius =
+          catalog_internal::TableNumber(catalog, kNpcRadiusTableGlobal, look.job);
+      radius.has_value() && *radius != 0.0) {
+    return 2.0F * static_cast<float>(*radius) + 1.0F;
+  }
+  if (const std::optional<double> factor =
+          catalog_internal::TableNumber(catalog, kShadowFactorTableGlobal, look.job);
+      factor.has_value()) {
+    return static_cast<float>(*factor);
+  }
+  return 1.0F;
+}
+
+}  // namespace ro::render

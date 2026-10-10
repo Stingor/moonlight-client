@@ -1,0 +1,56 @@
+# Jeu volontairement resserré : une règle qui crie sans rien attraper de réel
+# finit désactivée en bloc, et emporte les utiles avec elle.
+#
+# Les familles retenues visent ce qui coûte le plus de temps dans un client
+# de ce genre : lectures hors bornes, conversions silencieuses, ressources non
+# possédées, et les pièges C hérités (memset sur agrégat, casts C).
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  cert-*,
+  -cert-err58-cpp,
+  clang-analyzer-*,
+  cppcoreguidelines-init-variables,
+  cppcoreguidelines-prefer-member-initializer,
+  cppcoreguidelines-pro-type-cstyle-cast,
+  cppcoreguidelines-pro-type-member-init,
+  cppcoreguidelines-slicing,
+  misc-*,
+  -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-avoid-c-arrays,
+  performance-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-braces-around-statements,
+  -readability-function-cognitive-complexity
+
+WarningsAsErrors: 'bugprone-*,clang-analyzer-*,cert-*'
+
+HeaderFilterRegex: '.*/(libs|tools)/.*'
+
+CheckOptions:
+  # Nommage : Google.
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: '_'
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  # Un nom porte contenu + unité + origine (elapsed_ms, item_id) : ces trois-là
+  # ne disent rien et reviennent sans arrêt sous une plume pressée.
+  - key: readability-identifier-naming.LocalVariableIgnoredRegexp
+    value: '^(i|j|k|it)$'
+  - key: readability-function-size.LineThreshold
+    value: 120
+  - key: readability-function-size.NestingThreshold
+    value: 5

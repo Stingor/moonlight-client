@@ -1,0 +1,39 @@
+# La configuration du client Moonlight-Destiny : à qui il parle.
+#
+# Ce fichier vit À CÔTÉ de Moonlight-Destiny.exe. Sans lui, le client s'arrête
+# et le dit : il ne connaît aucune adresse par cœur.
+
+# Les serveurs de connexion. Le PREMIER est celui que rejoint un lancement
+# ordinaire (double-clic, sans argument).
+servers:
+  - name: Moonlight-Destiny
+    address: moonlight-destiny.fr
+    port: 16900
+  # - name: Local
+    # address: 127.0.0.1
+    # port: 6900
+
+# Le service web du serveur (emblèmes de guilde). Sans schéma, c'est du http.
+web: moonlight-destiny.fr:8888
+
+# Les archives du jeu, par priorité DÉCROISSANTE : la première l'emporte. Des
+# noms relatifs à ce dossier. C'est cette liste, et elle seule, que le client
+# monte. Une archive absente est passée.
+archives:
+  - moonlight.grf
+  - data.grf
+
+# Les mises à jour, appliquées au lancement avant d'ouvrir les archives. Sans
+# cette section, le client ne se patche pas. Les adresses sont en https://,
+# sinon le fichier est refusé.
+patcher:
+  # Le premier serveur qui répond sert.
+  mirrors:
+    - name: Moon Patch Server
+      list: https://moonlight-destiny.fr/moonpatcher/plist.txt
+      archives: https://moonlight-destiny.fr/moonpatcher/data/
+  # L'archive qu'enrichit un patch qui ne nomme pas la sienne.
+  default_grf: moonlight.grf
+  # true : un patch sans empreinte SHA-256 dans la liste est refusé. Une
+  # empreinte présente est vérifiée dans tous les cas.
+  require_hashes: false

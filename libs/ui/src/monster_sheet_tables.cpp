@@ -1,0 +1,333 @@
+// Les quatre onglets à tables de la fiche de monstre : résistances, butin,
+// apparitions, compétences.
+
+#include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <numeric>
+#include <span>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include <imgui.h>
+
+#include "ro/core/i18n.h"
+#include "ro/ui/skin_widgets.h"
+
+#include "monster_sheet_parts.h"
+
+namespace ro::ui::monster_sheet {
+namespace {
+
+// Les résistances, cinq par ligne.
+constexpr int kResistColumns = 5;
+// Les seuils qui colorent une résistance : immunisé ou soigné, faible, normal.
+constexpr int kResistHalfPercent = 50;
+constexpr int kResistNormalPercent = 100;
+
+// Les colonnes des tables, en pixels d'interface.
+constexpr float kFilterWidthPixels = 180.0F;
+constexpr float kRateColumnPixels = 70.0F;
+constexpr float kKindColumnPixels = 95.0F;
+constexpr float kCountColumnPixels = 80.0F;
+constexpr float kLevelColumnPixels = 60.0F;
+constexpr float kIdColumnPixels = 50.0F;
+// L'icône d'un butin, en lignes de texte.
+constexpr float kDropIconLines = 1.4F;
+
+// Les centièmes d'un taux, et les pour-cent qu'ils font.
+constexpr float kHundredthsPerPercent = 100.0F;
+
+constexpr const char* kDropMenuId = "##mi_link_menu";
+
+// Les colonnes que les tris désignent.
+constexpr int kDropRateColumn = 1;
+constexpr int kDropKindColumn = 2;
+constexpr int kSpawnCountColumn = 1;
+constexpr int kSkillLevelColumn = 1;
+constexpr int kSkillIdColumn = 2;
+
+// Vert = le monstre encaisse peu, rouge = il encaisse plein ou plus. ⚠ LE CAS
+// NORMAL PREND LA COULEUR DE TEXTE COURANTE : sur un corps clair, toute teinte
+// pâle disparaîtrait.
+[[nodiscard]] ImU32 ResistColor(int percent) {
+  if (percent <= 0) {
+    return kGreenColor;
+  }
+  if (percent < kResistHalfPercent) {
+    return kLowResistColor;
+  }
+  if (percent <= kResistNormalPercent) {
+    return ImGui::GetColorU32(ImGuiCol_Text);
+  }
+  return kRedColor;
+}
+
+template <typename T>
+[[nodiscard]] int Compare(const T& left, const T& right) {
+  return left < right ? -1 : (right < left ? 1 : 0);
+}
+
+// Sans égard à la casse ASCII. Les octets d'un texte
+// accentué se comparent tels quels.
+[[nodiscard]] int CompareFolded(std::string_view left, std::string_view right) {
+  const auto fold = [](char c) {
+    return static_cast<unsigned char>(std::tolower(static_cast<unsigned char>(c)));
+  };
+  const std::size_t common = std::min(left.size(), right.size());
+  for (std::size_t at = 0; at < common; ++at) {
+    if (const int said = Compare(fold(left[at]), fold(right[at])); said != 0) {
+      return said;
+    }
+  }
+  return Compare(left.size(), right.size());
+}
+
+// Un lien se suit au RELÂCHEMENT, comme tout lien du client : la fenêtre qu'il
+// ouvre naît à l'image suivante, et partie de l'enfoncement elle s'ouvrirait
+// derrière celle d'où le clic vient.
+[[nodiscard]] bool LinkReleased(bool hovered, bool right_too) {
+  return hovered && (ImGui::IsMouseReleased(ImGuiMouseButton_Left) ||
+                     (right_too && ImGui::IsMouseReleased(ImGuiMouseButton_Right)));
+}
+
+// L'ORDRE D'UNE TABLE, refait à chaque image depuis son tri. ⚠ LE MODÈLE NE
+// BOUGE PAS : l'ordre du serveur reste la référence, et une table de deux cent
+// cinquante-cinq lignes se trie sans qu'on la retienne.
+template <typename Row, typename Compared>
+void SortRows(std::vector<int>& order, std::span<const Row> rows, Compared compared) {
+  const ImGuiTableSortSpecs* const sort = ImGui::TableGetSortSpecs();
+  if (sort == nullptr || sort->SpecsCount == 0) {
+    return;
+  }
+  const ImGuiTableColumnSortSpecs& spec = sort->Specs[0];
+  const bool ascending = spec.SortDirection == ImGuiSortDirection_Ascending;
+  std::ranges::stable_sort(order, [&](int left, int right) {
+    const int said = compared(rows[static_cast<std::size_t>(left)],
+                              rows[static_cast<std::size_t>(right)], spec.ColumnIndex);
+    return ascending ? said < 0 : said > 0;
+  });
+}
+
+// Un nom de butin, icône comprise, avec les gestes de tout objet
+// (`ro::ui::ItemLinkCell`).
+void DropCell(MonsterSheetWindowState& state, const MonsterSheetDropView& drop, int row,
+              MonsterSheetAnswer& answer) {
+  ImGui::PushID(row);
+  const char* const shown = drop.name.empty() ? core::Tr("(item inconnu)") : drop.name.c_str();
+  DrawItemLinkCell(ItemLinkCell{.item_id = drop.item_id,
+                                .text = shown,
+                                .icon = drop.icon,
+                                .icon_side = ImGui::GetTextLineHeight() * kDropIconLines,
+                                .keep_icon_place = true},
+                   state.menu, answer.item);
+  ImGui::PopID();
+}
+
+// Le menu d'un butin, ouvert HORS de la table : une cellule change la pile
+// d'ids, et le surgissant ne s'y retrouverait pas.
+void DrawDropMenu(MonsterSheetWindowState& state, const MonsterSheetView& view,
+                  MonsterSheetAnswer& answer) {
+  DrawItemLinkMenu(kDropMenuId, state.menu, answer.item, view.vote_shop);
+}
+
+}  // namespace
+
+void DrawResistTab(const MonsterSheetView& view) {
+  Label(
+      core::Tr("Pourcentage de dégâts ENCAISSÉS par élément d'attaque. 100 % = normal, 0 % "
+               "= immunisé, au-dessus de 100 % = faiblesse."));
+  const std::string element(view.words.element_value);
+  ImGui::Text(core::Tr("Élément du monstre : %s niveau %u"), element.c_str(),
+              static_cast<unsigned>(view.element_level));
+  ImGui::Separator();
+  if (!ImGui::BeginTable(
+          "##mi_resist", kResistColumns,
+          ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+    return;
+  }
+  for (std::size_t element_rank = 0; element_rank < kMonsterSheetResistCount; ++element_rank) {
+    ImGui::TableNextColumn();
+    const std::string label(view.words.resist[element_rank]);
+    Label(label.c_str());
+    const int percent = view.resist_percent[element_rank];
+    Colored(ResistColor(percent), Printed("%d %%", percent).c_str());
+  }
+  ImGui::EndTable();
+}
+
+void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
+                  MonsterSheetAnswer& answer) {
+  if (view.drops.empty()) {
+    Label(core::Tr("Ce monstre ne laisse rien tomber."));
+    return;
+  }
+  ImGui::SetNextItemWidth(Px(kFilterWidthPixels));
+  state.drop_filter.Draw(core::Tr("Filtrer (item)"));
+
+  constexpr ImGuiTableFlags kFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                                     ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable |
+                                     ImGuiTableFlags_SizingStretchProp;
+  if (ImGui::BeginTable("##mi_drops", 3, kFlags)) {
+    ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn(core::Tr("Taux"),
+                            ImGuiTableColumnFlags_WidthFixed |
+                                ImGuiTableColumnFlags_PreferSortDescending |
+                                ImGuiTableColumnFlags_DefaultSort,
+                            Px(kRateColumnPixels));
+    ImGui::TableSetupColumn(core::Tr("Type"), ImGuiTableColumnFlags_WidthFixed,
+                            Px(kKindColumnPixels));
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableHeadersRow();
+
+    state.drop_order.clear();
+    for (std::size_t rank = 0; rank < view.drops.size(); ++rank) {
+      if (state.drop_filter.PassFilter(view.drops[rank].name.c_str())) {
+        state.drop_order.push_back(static_cast<int>(rank));
+      }
+    }
+    SortRows(state.drop_order, view.drops,
+             [](const MonsterSheetDropView& left, const MonsterSheetDropView& right, int column) {
+               if (column == kDropRateColumn) {
+                 return Compare(left.rate_hundredths, right.rate_hundredths);
+               }
+               if (column == kDropKindColumn) {
+                 return Compare(left.mvp_reward, right.mvp_reward);
+               }
+               return CompareFolded(left.name, right.name);
+             });
+
+    for (const int rank : state.drop_order) {
+      const MonsterSheetDropView& drop = view.drops[static_cast<std::size_t>(rank)];
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      DropCell(state, drop, rank, answer);
+      ImGui::TableNextColumn();
+      // Deux décimales, en centièmes de pour cent, comme la fiche d'objet.
+      ImGui::Text("%.2f%%", static_cast<double>(static_cast<float>(drop.rate_hundredths) /
+                                                kHundredthsPerPercent));
+      ImGui::TableNextColumn();
+      if (drop.mvp_reward) {
+        Colored(kAmberColor, core::Tr("Récompense MVP"));
+      } else {
+        Label(core::Tr("Drop normal"));
+      }
+    }
+    PaintWindowScrollbar(art);
+    ImGui::EndTable();
+  }
+  DrawDropMenu(state, view, answer);
+}
+
+void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
+                   MonsterSheetAnswer& answer) {
+  if (view.spawns.empty()) {
+    LabelWrapped(
+        core::Tr("Aucun spawn permanent connu : ce monstre n'apparaît que par script "
+                 "(invocation, quête, instance) ou n'est plus placé sur aucune carte."));
+    return;
+  }
+  if (ImGui::BeginTable("##mi_spawns", 2,
+                        ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                            ImGuiTableFlags_Sortable | ImGuiTableFlags_SizingStretchProp)) {
+    ImGui::TableSetupColumn(core::Tr("Carte"),
+                            ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultSort);
+    ImGui::TableSetupColumn(
+        core::Tr("Nombre"),
+        ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_PreferSortDescending,
+        Px(kCountColumnPixels));
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableHeadersRow();
+
+    state.spawn_order.resize(view.spawns.size());
+    std::iota(state.spawn_order.begin(), state.spawn_order.end(), 0);
+    SortRows(state.spawn_order, view.spawns,
+             [](const MonsterSheetSpawnView& left, const MonsterSheetSpawnView& right, int column) {
+               return column == kSpawnCountColumn ? Compare(left.count, right.count)
+                                                  : CompareFolded(left.label, right.label);
+             });
+    for (const int rank : state.spawn_order) {
+      const MonsterSheetSpawnView& spawn = view.spawns[static_cast<std::size_t>(rank)];
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      // LE NOM QU'ON LIT, PUIS LE NOM INTERNE entre parenthèses : le premier
+      // dit où c'est, le second sert dans une commande et entre joueurs. La
+      // colonne trie sur ce qu'elle montre.
+      ImGui::PushID(rank);
+      Colored(LinkColor(), spawn.label.c_str());
+      const bool hovered = ImGui::IsItemHovered();
+      DecorateLink(hovered);
+      if (LinkReleased(hovered, false)) {
+        answer.follow_map = spawn.map_name;
+      }
+      ImGui::PopID();
+      ImGui::TableNextColumn();
+      ImGui::Text("%u", static_cast<unsigned>(spawn.count));
+    }
+    PaintWindowScrollbar(art);
+    ImGui::EndTable();
+  }
+  Label(core::Tr("Clic sur une carte : sa destination dans la conversation."));
+  Label(core::Tr("Les spawns d'instance et les invocations de script ne sont pas comptés."));
+}
+
+void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
+                   MonsterSheetAnswer& answer) {
+  Label(core::Tr("Clic sur un skill : sa description (fenêtre du client)."));
+  if (!ImGui::BeginTable("##mi_skills", 3,
+                         ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                             ImGuiTableFlags_Sortable | ImGuiTableFlags_SizingStretchProp)) {
+    return;
+  }
+  ImGui::TableSetupColumn(core::Tr("Skill"),
+                          ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultSort);
+  ImGui::TableSetupColumn(
+      core::Tr("Niveau"),
+      ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_PreferSortDescending,
+      Px(kLevelColumnPixels));
+  ImGui::TableSetupColumn(core::Tr("ID"), ImGuiTableColumnFlags_WidthFixed, Px(kIdColumnPixels));
+  ImGui::TableSetupScrollFreeze(0, 1);
+  ImGui::TableHeadersRow();
+
+  state.skill_order.resize(view.skills.size());
+  std::iota(state.skill_order.begin(), state.skill_order.end(), 0);
+  SortRows(state.skill_order, view.skills,
+           [](const MonsterSheetSkillView& left, const MonsterSheetSkillView& right, int column) {
+             if (column == kSkillLevelColumn) {
+               return Compare(left.level, right.level);
+             }
+             if (column == kSkillIdColumn) {
+               return Compare(left.skill_id, right.skill_id);
+             }
+             return CompareFolded(left.name, right.name);
+           });
+  for (const int rank : state.skill_order) {
+    const MonsterSheetSkillView& skill = view.skills[static_cast<std::size_t>(rank)];
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    ImGui::PushID(rank);
+    // ⚠ CLIQUABLE SEULEMENT QUAND L'INSTALLATION A UNE DESCRIPTION : les
+    // autres sont listées, elles ne mentent juste pas sur ce qu'un clic
+    // donnerait.
+    if (skill.describable) {
+      Colored(LinkColor(), skill.name.c_str());
+      const bool hovered = ImGui::IsItemHovered();
+      DecorateLink(hovered);
+      if (LinkReleased(hovered, true)) {
+        answer.describe_skill = skill.skill_id;
+      }
+    } else {
+      ImGui::TextUnformatted(skill.name.c_str());
+    }
+    ImGui::PopID();
+    ImGui::TableNextColumn();
+    ImGui::Text("%u", static_cast<unsigned>(skill.level));
+    ImGui::TableNextColumn();
+    Label(Printed("%u", static_cast<unsigned>(skill.skill_id)).c_str());
+  }
+  PaintWindowScrollbar(art);
+  ImGui::EndTable();
+}
+
+}  // namespace ro::ui::monster_sheet

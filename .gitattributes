@@ -1,0 +1,29 @@
+# Fins de ligne normalisées dès le premier commit.
+#
+# Sans lui, le mélange LF/CRLF gonfle un diff de centaines de lignes pour
+# quelques modifications réelles, et un contrôle bash lu sur des fins CRLF
+# « passe toujours » sans rien mesurer.
+* text=auto eol=lf
+
+# Binaires : jamais de conversion.
+*.png   binary
+*.jpg   binary
+*.tga   binary
+*.bmp   binary
+*.ico   binary
+*.grf   binary
+*.spr   binary
+*.act   binary
+*.pal   binary
+*.gnd   binary
+*.gat   binary
+*.rsw   binary
+*.rsm   binary
+*.str   binary
+*.ttf   binary
+*.otf   binary
+*.bin   binary
+*.cap   binary
+
+# Fixtures de test : l'octet EST le sujet du test.
+tests/data/** binary

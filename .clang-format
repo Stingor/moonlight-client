@@ -1,0 +1,27 @@
+# Style Google : un style répandu, que la main connaît déjà, vaut mieux qu'un
+# style choisi. Deux écarts assumés, tous deux justifiés ci-dessous.
+BasedOnStyle: Google
+
+# 100 colonnes plutôt que 80 : le code de ce dépôt vit dans des namespaces
+# imbriqués (ro::formats::…) et manipule des types longs (std::expected<…>).
+# À 80, une signature sur trois se casse en trois lignes pour rien.
+ColumnLimit: 100
+
+# Les includes sont triés et regroupés : en-tête associé, puis standard, puis
+# tiers, puis projet. Un include manquant devient visible.
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<[a-z_]+>$'
+    Priority: 1
+  - Regex: '^<.*\.h>$'
+    Priority: 2
+  - Regex: '^<.*>$'
+    Priority: 3
+  - Regex: '^"ro/'
+    Priority: 4
+  - Regex: '.*'
+    Priority: 5
+
+DerivePointerAlignment: false
+PointerAlignment: Left

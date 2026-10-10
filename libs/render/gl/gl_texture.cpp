@@ -1,0 +1,93 @@
+#include "ro/render/gl_texture.h"
+
+#include <array>
+#include <string>
+#include <utility>
+
+#include <glad/glad.h>
+
+#include "ro/render/texture_bleed.h"
+
+namespace ro::render {
+namespace {
+
+using core::ErrorCode;
+using core::Fail;
+
+GLuint CreateRgba(int width, int height, const void* pixels, GlTexture::Filtering filtering) {
+  GLuint texture = 0;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  // Aucun mipmap, sur aucune texture : voir docs/adr/0008.
+  // Seule l'image qui glisse se répète. Toute autre doit être bornée : sinon le
+  // filtrage rapporte au bord la couleur du bord opposé.
+  const GLint wrap = filtering == GlTexture::Filtering::kSharp ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+  // L'art d'interface se lit au plus proche : voir Filtering::kPixelArt.
+  const GLint sampling = filtering == GlTexture::Filtering::kPixelArt ? GL_NEAREST : GL_LINEAR;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sampling);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sampling);
+  return texture;
+}
+
+}  // namespace
+
+GlTexture::GlTexture(GlTexture&& other) noexcept : texture_(other.texture_) { other.texture_ = 0; }
+
+GlTexture& GlTexture::operator=(GlTexture&& other) noexcept {
+  if (this != &other) {
+    if (texture_ != 0) {
+      glDeleteTextures(1, &texture_);
+    }
+    texture_ = other.texture_;
+    other.texture_ = 0;
+  }
+  return *this;
+}
+
+GlTexture::~GlTexture() {
+  if (texture_ != 0) {
+    glDeleteTextures(1, &texture_);
+  }
+}
+
+core::Result<GlTexture> GlTexture::Upload(const formats::Image& image, Filtering filtering) {
+  if (image.width <= 0 || image.height <= 0 || image.pixels.empty()) {
+    return Fail(ErrorCode::kCorruptData, "image vide");
+  }
+  // RIEN À ÉTALER : un atlas n'a pas de couleur clé, et une image sans texel
+  // transparent n'a pas de bord à repeindre. Elle part telle quelle, sans copie.
+  if (!FillsTransparentEdges(filtering) || !HasTransparentTexel(image)) {
+    return GlTexture(CreateRgba(image.width, image.height, image.pixels.data(), filtering));
+  }
+  // Le remplissage a lieu ICI, et pas chez l'appelant, parce qu'il va de pair
+  // avec le filtrage posé juste en dessous : c'est lui qui mélange un texel
+  // opaque avec un texel de couleur clé. Voir texture_bleed.h.
+  const formats::Image bled = BleedTransparentEdges(image);
+  return GlTexture(CreateRgba(bled.width, bled.height, bled.pixels.data(), filtering));
+}
+
+core::Result<GlTexture> GlTexture::Placeholder() {
+  // Magenta franc : une texture manquante doit se VOIR, pas se fondre dans le
+  // décor. Un gris neutre laisserait croire à une carte correctement rendue.
+  constexpr std::array<std::uint8_t, 4> kMagenta = {255, 0, 255, 255};
+  return GlTexture(CreateRgba(1, 1, kMagenta.data(), Filtering::kSharp));
+}
+
+void GlTexture::Bind(int unit) const {
+  glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + unit));
+  glBindTexture(GL_TEXTURE_2D, texture_);
+}
+
+void GlTexture::GenerateMipmaps() {
+  if (texture_ == 0) {
+    return;
+  }
+  glBindTexture(GL_TEXTURE_2D, texture_);
+  glGenerateMipmap(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+}  // namespace ro::render

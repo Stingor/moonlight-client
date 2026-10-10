@@ -1,0 +1,24 @@
+#pragma once
+
+#include <string_view>
+
+// ⚠ FICHIER PRODUIT PAR CMAKE — voir `cmake/build_stamp.h.in`. Le retoucher ne
+// sert à rien : il est réécrit à chaque configuration.
+
+namespace ro::core {
+
+// La version du client, telle que le projet la déclare.
+inline constexpr std::string_view kBuildVersion = "@PROJECT_VERSION@";
+
+// LA RÉVISION EXACTE qui a produit ce binaire.
+//
+// C'est elle qui permet de retrouver les symboles d'un plantage : une pile
+// d'appels ne se lit qu'avec les symboles de SON binaire, et ceux d'une autre
+// version donnent des noms faux — ce qui est pire que pas de noms.
+inline constexpr std::string_view kBuildCommit = "@MOONCLIENT_COMMIT@";
+
+// « propre », ou « MODIFIE » quand l'arbre portait des retouches non validées.
+// Un binaire bâti sur un arbre sale ne correspond à aucune révision.
+inline constexpr std::string_view kBuildTree = "@MOONCLIENT_TREE@";
+
+}  // namespace ro::core

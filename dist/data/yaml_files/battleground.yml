@@ -1,0 +1,90 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les terrains du champ de bataille
+#
+#  Lu par moonclient pour sa fenêtre d'inscription (app/game/battleground_file.cpp).
+#  Remplace entryqueuelist.lua et battlefieldinfo.lub du client d'origine.
+#
+#  ── Où ce fichier doit vivre chez le joueur ─────────────────────────────────
+#      <jeu>\data\yaml_files\battleground.yml
+#  dans moonlight.grf, livré par le patcheur. C'est de la donnée de client, pas
+#  un réglage du joueur.
+#
+#  ── Un terrain ──────────────────────────────────────────────────────────────
+#  server_name   🔴 Le « Name » EXACT du terrain dans db/battleground_db.yml du
+#                serveur. Il part tel quel sur le fil : JAMAIS traduit.
+#  name          Ce que le joueur lit. Absent : server_name.
+#  objective     La condition de victoire.
+#  help          Ce qu'il faut savoir du terrain ; facultatif.
+#  minimap       L'image sous <skin>\map\ du jeu.
+#  team          Joueurs par camp : min et max. Égaux, la fenêtre dit
+#                « 3 contre 3 » ; sinon « 3 à 15 par camp ». À garder d'accord
+#                avec MinPlayers / MaxPlayers du serveur (MaxPlayers absent
+#                vaut 15 là-bas).
+#  apply         Les inscriptions offertes : solo, party, guild.
+#  level         Niveau de base d'entrée : min, max, l'un ou l'autre.
+#  rewards       win / draw / lose : une liste de récompenses, chacune
+#                    { item: <id>, count: <n> }  un objet de la base, nommé et
+#                                                iconé dans la langue du joueur
+#                    { text: { fr: …, en: … } }  pour ce qui n'est pas un objet
+#                Un `text` à côté d'un `item` remplace le nom de la base.
+#
+#  ── Les textes ──────────────────────────────────────────────────────────────
+#  Une table par langue : { fr: "…", en: "…", es: "…" }. Une langue absente
+#  retombe sur le français. Une simple chaîne vaut pour le français seul.
+#  Le journal du client signale un texte qui manque d'une langue employée
+#  ailleurs dans le fichier, une entrée écartée, un objet absent de la base.
+#
+#  🔴 TOUTE VALEUR DE TEXTE SE MET ENTRE GUILLEMETS : sans eux, un « : » dans
+#  une phrase en fait une paire clé/valeur, et le texte s'affiche vide.
+#
+#  ── version ─────────────────────────────────────────────────────────────────
+#  La version du schéma. Le client refuse un fichier d'une autre version.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: 1
+
+fields:
+  - server_name: "Tierra Gorge"
+    name: { fr: "Gorge de Tierra", en: "Tierra Gorge", es: "Garganta de Tierra" }
+    objective:
+      fr: "Détruire la Réserve du camp adverse."
+      en: "Destroy the enemy camp's Reserve."
+      es: "Destruir la Reserva del bando enemigo."
+    minimap: "bat_a01.bmp"
+    team: { min: 3, max: 15 }
+    apply: [solo, party, guild]
+    level: { min: 80 }
+    rewards:
+      win: [{ item: 7828, count: 3 }]
+      draw: [{ item: 7828, count: 1 }]
+      lose: [{ item: 7828, count: 1 }]
+
+  - server_name: "Flavius"
+    name: { fr: "Flavius", en: "Flavius", es: "Flavius" }
+    objective:
+      fr: "Détruire le Cristal du camp adverse."
+      en: "Destroy the enemy camp's Crystal."
+      es: "Destruir el Cristal del bando enemigo."
+    minimap: "bat_b01.bmp"
+    team: { min: 3, max: 15 }
+    apply: [solo, party, guild]
+    level: { min: 80 }
+    rewards:
+      win: [{ item: 7829, count: 9 }]
+      draw: [{ item: 7829, count: 3 }]
+      lose: [{ item: 7829, count: 3 }]
+
+  - server_name: "KVM"
+    name: { fr: "KVM", en: "KVM", es: "KVM" }
+    objective:
+      fr: "Éliminer toute l'équipe adverse."
+      en: "Wipe out the whole enemy team."
+      es: "Eliminar a todo el equipo enemigo."
+    minimap: "bat_c01.bmp"
+    team: { min: 2, max: 15 }
+    apply: [solo, party, guild]
+    level: { min: 80 }
+    rewards:
+      win: [{ text: { fr: "10 points KVM", en: "10 KVM points", es: "10 puntos KVM" } }]
+      draw: [{ text: { fr: "2 points KVM", en: "2 KVM points", es: "2 puntos KVM" } }]
+      lose: [{ text: { fr: "2 points KVM", en: "2 KVM points", es: "2 puntos KVM" } }]

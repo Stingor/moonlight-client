@@ -1,0 +1,76 @@
+{
+  "name": "moonclient",
+  "version": "0.1.0",
+  "description": "Client Ragnarok Online autonome",
+  "dependencies": [
+    "zlib",
+    "spdlog",
+    "glm",
+    "stb",
+    "freetype",
+    "yaml-cpp"
+  ],
+  "features": {
+    "tests": {
+      "description": "Suite de tests",
+      "dependencies": [
+        "catch2"
+      ]
+    },
+    "render": {
+      "description": "Couche de rendu OpenGL : fenêtre, contexte et chargeur GL. Hors Windows, libwebp décode aussi les aperçus WebP du chat, que Windows confie à son propre codec.",
+      "dependencies": [
+        "sdl3",
+        "glad",
+        {
+          "name": "libwebp",
+          "platform": "!windows"
+        }
+      ]
+    },
+    "audio": {
+      "description": "Couche de son : musique et bruits",
+      "dependencies": [
+        "sdl3",
+        {
+          "name": "sdl3-mixer",
+          "features": [
+            "mpg123"
+          ]
+        }
+      ]
+    },
+    "ui": {
+      "description": "Couche d'interface : ImGui SANS aucun dos, donc sans plateforme. C'est ce qui permet aux fenêtres d'être bâties et testées sur le runner Linux sous sanitizers, où SDL n'est même pas téléchargé.",
+      "dependencies": [
+        {
+          "name": "imgui",
+          "features": [
+            "freetype",
+            "wchar32"
+          ]
+        }
+      ]
+    },
+    "ui-gl": {
+      "description": "Le DOS d'ImGui : SDL3 pour les entrées, OpenGL 3 pour le dessin. Séparé de `ui` parce que lui seul touche à la plateforme.",
+      "dependencies": [
+        {
+          "name": "imgui",
+          "features": [
+            "opengl3-binding",
+            "sdl3-binding"
+          ]
+        }
+      ]
+    }
+  },
+  "default-features": [
+    "tests",
+    "render",
+    "audio",
+    "ui",
+    "ui-gl"
+  ],
+  "builtin-baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4"
+}

@@ -1,0 +1,135 @@
+# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
+# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
+# This file can be distributed, used and modified freely
+# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
+#
+# Fichier produit par scripts/yaml_tables/recommended_quests.py à partir de la table native du
+# client, puis tenu à la main : on n'y garde que ce qui existe sur le serveur.
+#
+# L'onglet « Recommandées » du journal des quêtes, dans l'ordre de ce fichier. Chaque affiche :
+#   title, summary          texte nu (langue de `language:`) ou { fr, en, es }
+#   icon                    clé d'icône de quests.yml (ep, gq, jq…)
+#   image                   illustration, sous renew_questui\ dans l'installation
+#   npc                     le PNJ de départ : sprite, map, x, y
+#   blocks                  les blocs de texte, balisage du jeu compris (^RRGGBB, <NAVI>)
+version: 1
+source: SystemEN\RecommendedQuests.lub
+language: en
+recommended:
+  99:
+    title:
+      fr: "Épisode 15 : Phantasmagorica"
+      en: "Episode 15: Phantasmagorica"
+      es: "Episodio 15: Phantasmagorica"
+    summary:
+      fr: Une science qui dépasse Juperos
+      en: Science beyond Juperos
+      es: Una ciencia más allá de Juperos
+    icon: ep
+    image: reco_99.bmp
+    npc:
+      sprite: 4_F_EDEN_OFFICER
+      map: moc_para01
+      x: 38
+      y: 175
+    blocks:
+    - fr: |-
+        Nous recrutons des membres pour les fouilles de Phantasmagorica, récemment découverte.
+        Pourquoi ne pas explorer une civilisation scientifique qui dépasse Juperos ?
+        Pour rejoindre l'équipe de fouilles, présentez-vous dès maintenant au groupe Eden !
+      en: |-
+        We are recruiting excavators for the research of the newly discovered Phantasmagorica.
+        Why not explore a scientific civilization that goes beyond Juperos?
+        If you would like to join the excavation team, come to the Eden Group right now!
+      es: |-
+        Buscamos voluntarios para las excavaciones de Phantasmagorica, descubierta hace poco.
+        ¿Por qué no explorar una civilización científica que va más allá de Juperos?
+        Si quieres unirte al equipo de excavación, ¡preséntate ya en el Grupo Eden!
+    - fr: |-
+        ^3275f0Conditions^000000
+        Niveau de base 140 ou plus
+        Porter l'insigne du groupe Eden
+      en: |-
+        ^3275f0Prerequisites^000000
+        Base level 140 or higher
+        Holder of the Eden Group Mark
+      es: |-
+        ^3275f0Requisitos^000000
+        Nivel base 140 o superior
+        Tener la insignia del Grupo Eden
+  98:
+    title:
+      fr: "Épisode 16.1 : Le banquet des héros"
+      en: "Episode 16.1: Banquet for Heroes"
+      es: "Episodio 16.1: El banquete de los héroes"
+    summary:
+      fr: Vous qui avez tant fait, profitez-en !
+      en: You who have tried! Enjoy!
+      es: ¡Tú que tanto has hecho, disfruta!
+    icon: ep
+    image: reco_98.bmp
+    npc:
+      sprite: 4_M_ZONDAOYAJI
+      map: prontera
+      x: 121
+      y: 72
+    blocks:
+    - fr: |-
+        Un banquet célèbre la reconquête de Morocc avec les héros de l'expédition.
+        Si vous avez pris part à l'expédition, venez recevoir votre invitation au banquet !
+      en: |-
+        A banquet celebrates the reconquest of Morocc with the heroes of the expedition.
+        If you took part in the expedition, come and receive your banquet invitation!
+      es: |-
+        Un banquete celebra la reconquista de Morocc con los héroes de la expedición.
+        Si participaste en la expedición, ¡ven a recoger tu invitación al banquete!
+    - fr: |-
+        ^3275f0Conditions^000000
+        Avoir visité le camp de l'expédition
+        Niveau de base 100 ou plus
+      en: |-
+        ^3275f0Prerequisites^000000
+        Visit the Expeditionary Camp
+        Base level 100 or higher
+      es: |-
+        ^3275f0Requisitos^000000
+        Haber visitado el campamento de la expedición
+        Nivel base 100 o superior
+  97:
+    title:
+      fr: "Épisode 16.2 : Terra Gloria"
+      en: "Episode 16.2: Terra Gloria"
+      es: "Episodio 16.2: Terra Gloria"
+    summary:
+      fr: Partir reprendre le symbole royal disparu
+      en: Journey to reclaim the vanished royal symbol
+      es: Viaje para recuperar el símbolo real desaparecido
+    icon: ep
+    image: reco_97.bmp
+    npc:
+      sprite: 4_EP16_NIHIL
+      map: prt_cas_q
+      x: 21
+      y: 39
+    blocks:
+    - fr: |-
+        Nihil et Spica, jeunes héritiers de la famille royale, veulent que vous rejoigniez leur opération secrète.
+        Partez avec eux reprendre le symbole royal disparu !
+      en: |-
+        Nihil and Spica, the young blood of the royal family, want you to join their secret operation.
+        Join them on a journey to reclaim the vanished royal symbol!
+      es: |-
+        Nihil y Spica, jóvenes herederos de la familia real, quieren que te unas a su operación secreta.
+        ¡Únete a ellos para recuperar el símbolo real desaparecido!
+    - fr: |-
+        ^3275f0Conditions^000000
+        Avoir achevé l'épisode 16.1
+        Niveau de base 100 ou plus
+      en: |-
+        ^3275f0Prerequisites^000000
+        Episode 16.1 complete
+        Base level 100 or higher
+      es: |-
+        ^3275f0Requisitos^000000
+        Haber completado el episodio 16.1
+        Nivel base 100 o superior
