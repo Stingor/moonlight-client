@@ -25,6 +25,7 @@
 
 #include "effects/effect_layers.h"
 #include "game/game.h"
+#include "game/setting_destination_open.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
 #include "world/ground_unit_view.h"
@@ -541,6 +542,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .bubbles_on_screen = &chat_bubbles_,
       .bubble_texts = &bubble_texts_,
       .item_icon = chat_tabs_.has_value() ? &chat_tabs_->rich().item_icon : nullptr,
+      .setting_reach = SettingReachOf(pieces_),
       .entity_bars = settings_->options().entity_bars(),
       .entity_bars_on_screen = &entity_bars_,
       .shop_signboards_shown = settings_->options().shops().signboards_shown(),

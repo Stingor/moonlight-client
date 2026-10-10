@@ -176,7 +176,8 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
     const ro::ui::ChatBubbleLook& look, const ro::vfs::ItemTable* items,
     const ro::vfs::ItemWords* words, std::deque<DecoratedChatLine>* decorated,
     const ro::sim::SkillTree* skills, const CreatorNames* creators,
-    const ro::vfs::MapDisplayNames* maps, const ItemIconLookup* item_icon) {
+    const ro::vfs::MapDisplayNames* maps, const ItemIconLookup* item_icon,
+    const SettingReach& settings) {
   static const ItemIconLookup kNoIcon;
   const ItemIconLookup& icon_of = item_icon != nullptr ? *item_icon : kNoIcon;
   std::vector<ro::ui::ChatBubbleView> bubbles;
@@ -259,10 +260,13 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
     if (!banner && decorated != nullptr) {
       DecoratedChatLine rewritten;
       // UN ITEM FORGÉ LIÉ se nomme par son forgeron, comme dans le fil.
-      if (DecorateBubbleLine(
-              said,
-              ChatDecorTables{.items = items, .words = words, .creators = creators, .maps = maps},
-              icon_of, &rewritten)) {
+      if (DecorateBubbleLine(said,
+                             ChatDecorTables{.items = items,
+                                             .words = words,
+                                             .creators = creators,
+                                             .maps = maps,
+                                             .settings = &settings},
+                             icon_of, &rewritten)) {
         decorated->push_back(std::move(rewritten));
         const DecoratedChatLine& kept = decorated->back();
         bubble.text = kept.text;

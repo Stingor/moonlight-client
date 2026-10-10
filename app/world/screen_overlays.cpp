@@ -222,8 +222,8 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
         camera, aspect_ratio, actors.drawn, actors.ids, world, now_ms, viewport_width,
         viewport_height, what.bubbles, what.items, what.words, what.bubble_texts,
         pieces.skill_tree.has_value() ? &*pieces.skill_tree : nullptr, &what.creators,
-        pieces.map_display_names.has_value() ? &*pieces.map_display_names : nullptr,
-        what.item_icon);
+        pieces.map_display_names.has_value() ? &*pieces.map_display_names : nullptr, what.item_icon,
+        what.setting_reach);
     const std::vector<ro::ui::ChatBubbleView> talkbox =
         TalkboxBubblesOnScreen(camera, aspect_ratio, what.talkbox_speakers, world, now_ms,
                                viewport_width, viewport_height, what.bubbles);

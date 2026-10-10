@@ -27,6 +27,7 @@
 #include "game/game_pieces.h"
 #include "guild/emblem_plates.h"
 #include "options/battleground_options.h"
+#include "options/setting_links.h"
 #include "world/actor_view.h"
 #include "world/ground_unit_pick.h"
 
@@ -81,6 +82,9 @@ struct ScreenOverlays {
   // L'ICÔNE D'UN OBJET, celle du fil : un lien d'objet la montre aussi dans
   // une bulle. Nul : aucune icône.
   const ItemIconLookup* item_icon = nullptr;
+  // CE QUE LE LECTEUR A, celui du fil : un lien de réglage d'une bulle est un
+  // lien quand le fil le montre en lien, inerte sinon.
+  SettingReach setting_reach;
   // LES BARRES DE VIE ET DE MAGIE DES ENTITÉS : récoltées ici, peintes par
   // l'étage d'interface, comme les bulles et pour la même raison — elles
   // écrivent parfois leurs nombres.

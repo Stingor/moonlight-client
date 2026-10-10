@@ -10,6 +10,7 @@ add_library(ro_core STATIC
     src/ascii.cpp
     src/byte_sink.cpp
     src/byte_source.cpp
+    src/case_fold.cpp
     src/console.cpp
     src/crash_report.cpp
     src/error.cpp
@@ -22,7 +23,8 @@ add_library(ro_core STATIC
     src/sha256.cpp
     src/text.cpp
     src/web_address.cpp
-    src/web_preview_policy.cpp)
+    src/web_preview_policy.cpp
+    generated/case_fold_table.cpp)
 add_library(ro::core ALIAS ro_core)
 
 # LES OUTILS DE DÉVELOPPEMENT, en Debug seulement : voir `ro/core/build_flavor.h`.

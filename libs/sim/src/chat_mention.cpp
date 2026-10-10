@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "ro/core/ascii.h"
+#include "ro/core/case_fold.h"
 
 namespace ro::sim {
 namespace {
@@ -39,6 +39,24 @@ constexpr unsigned char kFirstNonAscii = 0x80U;
   const auto byte = static_cast<unsigned char>(letter);
   return (byte >= 'a' && byte <= 'z') || (byte >= 'A' && byte <= 'Z') ||
          (byte >= '0' && byte <= '9') || byte == '_' || byte >= kFirstNonAscii;
+}
+
+// LE MOT ENTIER, dans un texte et un mot déjà repliés : la casse ne compte
+// plus, et les bornes du mot se lisent sur le texte replié.
+[[nodiscard]] bool FoldedTextMentions(std::string_view folded_text, std::string_view folded_word) {
+  if (folded_word.empty()) {
+    return false;
+  }
+  for (std::size_t at = folded_text.find(folded_word); at != std::string_view::npos;
+       at = folded_text.find(folded_word, at + 1)) {
+    const std::size_t past = at + folded_word.size();
+    const bool starts_word = at == 0 || !ContinuesWord(folded_text[at - 1]);
+    const bool ends_word = past == folded_text.size() || !ContinuesWord(folded_text[past]);
+    if (starts_word && ends_word) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // LA LIGNE D'UN CANAL SANS SON ÉTIQUETTE : « [#main] Ana : … » commence par le
@@ -137,7 +155,7 @@ std::vector<std::string> SplitMentionWords(std::string_view typed) {
       continue;
     }
     const bool known = std::ranges::any_of(
-        words, [word](const std::string& kept) { return core::AsciiEqualsFolded(kept, word); });
+        words, [word](const std::string& kept) { return core::EqualsFolded(kept, word); });
     if (!known) {
       words.emplace_back(word);
     }
@@ -146,21 +164,7 @@ std::vector<std::string> SplitMentionWords(std::string_view typed) {
 }
 
 bool TextMentions(std::string_view text, std::string_view word) {
-  if (word.empty() || word.size() > text.size()) {
-    return false;
-  }
-  for (std::size_t at = 0; at + word.size() <= text.size(); ++at) {
-    if (!core::AsciiEqualsFolded(text.substr(at, word.size()), word)) {
-      continue;
-    }
-    const std::size_t past = at + word.size();
-    const bool starts_word = at == 0 || !ContinuesWord(text[at - 1]);
-    const bool ends_word = past == text.size() || !ContinuesWord(text[past]);
-    if (starts_word && ends_word) {
-      return true;
-    }
-  }
-  return false;
+  return FoldedTextMentions(core::CaseFolded(text), core::CaseFolded(word));
 }
 
 bool IsOwnChatLine(const ChatLine& line, std::string_view own_name, std::uint32_t own_id) {
@@ -207,12 +211,14 @@ bool MentionsMe(const ChatLine& line, const MentionRules& rules) {
   if (!IsSpoken(line) || IsOwnChatLine(line, rules.own_name, rules.own_id)) {
     return false;
   }
-  const std::string_view said = SaidPart(line);
-  if (!rules.own_name.empty() && TextMentions(said, rules.own_name)) {
+  // Le texte ne se replie qu'une fois, quel que soit le nombre de mots-clés.
+  const std::string said = core::CaseFolded(SaidPart(line));
+  if (!rules.own_name.empty() && FoldedTextMentions(said, core::CaseFolded(rules.own_name))) {
     return true;
   }
-  return std::ranges::any_of(rules.words,
-                             [said](const std::string& word) { return TextMentions(said, word); });
+  return std::ranges::any_of(rules.words, [&said](const std::string& word) {
+    return FoldedTextMentions(said, core::CaseFolded(word));
+  });
 }
 
 }  // namespace ro::sim

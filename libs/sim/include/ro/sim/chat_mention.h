@@ -13,10 +13,8 @@ namespace ro::sim {
 // ── UNE LIGNE QUI NOUS NOMME ────────────────────────────────────────────────
 //
 // Ce qui la signale : notre nom, ou l'un des mots-clés du joueur, en mot entier
-// et sans casse ASCII. Ce qu'on a dit soi-même ne nous mentionne jamais.
-//
-// ⚠ LA CASSE NE SE MET DE CÔTÉ QUE POUR L'ASCII : les octets non ASCII se
-// comparent exactement, faute de tables Unicode.
+// et à la casse près — « ÉLODIE » cite « Élodie », par le repli simple de
+// `ro/core/case_fold.h`. Ce qu'on a dit soi-même ne nous mentionne jamais.
 
 struct MentionRules {
   std::string_view own_name;
@@ -24,9 +22,9 @@ struct MentionRules {
   std::span<const std::string> words;
 };
 
-// "a;b" : nettoyés, deux octets au moins.
+// "a;b" : nettoyés, deux octets au moins, sans doublon à la casse près.
 [[nodiscard]] std::vector<std::string> SplitMentionWords(std::string_view typed);
-// Mot entier, casse ASCII ignorée.
+// Mot entier, casse ignorée.
 [[nodiscard]] bool TextMentions(std::string_view text, std::string_view word);
 // Vraie pour `kSelf` ; un chuchotement envoyé ou non remis ; `speaker_id ==
 // own_id` ; un texte qui commence par « own_name : » — derrière l'étiquette

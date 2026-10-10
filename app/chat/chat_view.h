@@ -31,6 +31,7 @@
 #include "effects/effect_view.h"
 #include "game/ui_stage.h"
 #include "options/game_options.h"
+#include "options/setting_links.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
 
@@ -323,7 +324,8 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
 // donc exister pour qu'elle paraisse.
 //
 // `item_icon` est celui du fil : un objet lié y porte la même icône. Nul : la
-// bulle n'en montre aucune.
+// bulle n'en montre aucune. `settings` aussi : un lien de réglage n'y est un
+// lien que si le lecteur a sa destination, et sans lui, aucun ne l'est.
 //
 // ⚠ LA VIE D'UNE BULLE SE MESURE SUR CE QU'ELLE MONTRE, décoration faite.
 [[nodiscard]] std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
@@ -333,6 +335,7 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     const ro::ui::ChatBubbleLook& look, const ro::vfs::ItemTable* items,
     const ro::vfs::ItemWords* words, std::deque<DecoratedChatLine>* decorated,
     const ro::sim::SkillTree* skills, const CreatorNames* creators = nullptr,
-    const ro::vfs::MapDisplayNames* maps = nullptr, const ItemIconLookup* item_icon = nullptr);
+    const ro::vfs::MapDisplayNames* maps = nullptr, const ItemIconLookup* item_icon = nullptr,
+    const SettingReach& settings = {});
 
 }  // namespace moonclient
