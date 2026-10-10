@@ -32,6 +32,7 @@
 #include "effects/effect_view.h"
 #include "world/actor_view.h"
 #include "world/hit_popup_rules.h"
+#include "world/song_music.h"
 #include "world/struck_place.h"
 
 namespace moonclient {
@@ -689,6 +690,13 @@ void ActorSounds::HearSkillUnits(const SoundStage& scene, std::span<const std::u
   std::erase_if(placed_units_, [&scene](const auto& kept) {
     return !scene.world->skill_units().contains(kept.first);
   });
+  std::erase_if(song_units_, [&scene](const auto& kept) {
+    const bool gone = !scene.world->skill_units().contains(kept.first);
+    if (gone && scene.audio != nullptr) {
+      StopSongMusic(*scene.audio, kept.second);
+    }
+    return gone;
+  });
 
   for (const auto& [id, unit] : scene.world->skill_units()) {
     if (unit.unit_id == ro::sim::kSilentSkillUnit) {
@@ -699,6 +707,9 @@ void ActorSounds::HearSkillUnits(const SoundStage& scene, std::span<const std::u
       continue;
     }
     placed_units_.insert_or_assign(id, unit.placed_ms);
+    if (const std::optional<std::uint16_t> song = SongSkillOfUnit(unit.unit_id)) {
+      song_units_.insert_or_assign(id, *song);
+    }
     if (const ro::render::SkillUnitSoundEntry* entry =
             ro::render::SkillUnitPlacementSound(unit.unit_id);
         entry != nullptr) {

@@ -499,6 +499,22 @@ void AudioEngine::StopSounds(SoundChannel channel) {
   }
 }
 
+void AudioEngine::StopSound(const std::string& name) {
+  const auto found = sounds_.find(name);
+  if (found == sounds_.end()) {
+    return;
+  }
+  for (Voice& voice : voices_) {
+    if (voice.sound != found->second.audio || !MIX_TrackPlaying(AsTrack(voice.track))) {
+      continue;
+    }
+    MIX_StopTrack(AsTrack(voice.track),
+                  MIX_TrackMSToFrames(AsTrack(voice.track), kSilencingFadeMs));
+    // Comme pour une famille : la voix qui s'éteint ne se rejoint plus.
+    voice.sound = nullptr;
+  }
+}
+
 void AudioEngine::ApplySide(const Voice& voice) const {
   // LE CÔTÉ, en gains de voie. On s'écarte du centre sans jamais passer sous
   // zéro.

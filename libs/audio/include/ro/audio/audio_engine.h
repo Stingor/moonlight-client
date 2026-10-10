@@ -205,6 +205,11 @@ class AudioEngine {
   // bruits qui durent plus longtemps que le voyage vers la suivante.
   void StopSounds(SoundChannel channel);
 
+  // FAIT TAIRE LES VOIX QUI JOUENT UN BRUIT, par le même fondu, quelle que soit
+  // leur famille. Sans effet sur un nom inconnu ou un bruit qui ne joue pas :
+  // la musique d'une chanson s'arrête avec la chanson.
+  void StopSound(const std::string& name);
+
  private:
   void Close() noexcept;
 

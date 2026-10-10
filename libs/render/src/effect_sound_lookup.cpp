@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <string>
 #include <string_view>
@@ -22,6 +23,15 @@ constexpr std::uint32_t kFirstSoundVariant = 1;
 constexpr std::uint32_t kDrawMixer = 2654435761U;
 constexpr std::uint32_t kDrawMixedShift = 16U;
 
+// LES SONS D'EFFET CHOISIS PAR LE JOUEUR, à l'écart du client d'origine, qui
+// n'en joue aucun pour ces effets. Ils ne passent qu'à défaut du relevé : la
+// bouteille d'Acid Terror éclate comme UNE flèche de Fire Bolt, l'une des trois
+// variantes tirée au sort.
+constexpr std::uint8_t kFireBoltVariants = 3;
+constexpr std::array<EffectSoundEntry, 1> kPlayerChosenEffectSounds = {{
+    {.effect_id = 298, .sound = "effect\\EF_FireArrow%d.wav", .variants = kFireBoltVariants},
+}};
+
 }  // namespace
 
 std::string EffectSoundVariantFile(const EffectSoundEntry& entry, std::uint32_t variant) {
@@ -44,11 +54,17 @@ std::string EffectSoundFile(const EffectSoundEntry& entry, std::uint32_t draw) {
 }
 
 std::span<const EffectSoundEntry> EffectSounds(std::uint32_t effect_id) {
-  const std::span<const EffectSoundEntry> table = EffectSoundTable();
-  const auto first = std::ranges::lower_bound(table, effect_id, {}, &EffectSoundEntry::effect_id);
-  const auto last = std::ranges::upper_bound(table, effect_id, {}, &EffectSoundEntry::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  const auto among = [effect_id](std::span<const EffectSoundEntry> table) {
+    const auto first = std::ranges::lower_bound(table, effect_id, {}, &EffectSoundEntry::effect_id);
+    const auto last = std::ranges::upper_bound(table, effect_id, {}, &EffectSoundEntry::effect_id);
+    return table.subspan(static_cast<std::size_t>(first - table.begin()),
+                         static_cast<std::size_t>(last - first));
+  };
+  if (const std::span<const EffectSoundEntry> measured = among(EffectSoundTable());
+      !measured.empty()) {
+    return measured;
+  }
+  return among(kPlayerChosenEffectSounds);
 }
 
 std::string_view EffectSound(std::uint32_t effect_id) {

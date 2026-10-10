@@ -321,6 +321,8 @@ class ActorSounds {
   // L'instant de pose de chaque unité déjà entendue : une unité vit des
   // minutes, et son bruit d'arrivée ne se fait qu'une fois.
   std::unordered_map<std::uint32_t, std::uint32_t> placed_units_;
+  // Les unités de CHANSON vues, et leur compétence : leur départ tait la musique.
+  std::unordered_map<std::uint32_t, std::uint16_t> song_units_;
 
   // UN SON QUI ATTEND SON INSTANT. Le client joue nombre de bruits d'effet à
   // un tic PRÉCIS de l'instance et non à sa naissance — trente-sept pour l'onde

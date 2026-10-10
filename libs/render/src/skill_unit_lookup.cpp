@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <optional>
 
@@ -22,10 +23,20 @@ const SkillUnitSoundEntry* Found(std::span<const SkillUnitSoundEntry> table,
   return &*found;
 }
 
+// LES SONS DE POSE CHOISIS PAR LE JOUEUR, à l'écart du client d'origine, qui
+// n'en joue aucun pour ces unités. Ils ne passent qu'à défaut du relevé :
+// l'unité de Demonstration crépite comme un Fire Wall.
+constexpr std::array<SkillUnitSoundEntry, 1> kPlayerChosenPlacementSounds = {{
+    {177, "effect\\EF_FireWall.wav", 1},
+}};
+
 }  // namespace
 
 const SkillUnitSoundEntry* SkillUnitPlacementSound(std::uint32_t unit_id) {
-  return Found(SkillUnitPlacementSoundTable(), unit_id);
+  if (const SkillUnitSoundEntry* measured = Found(SkillUnitPlacementSoundTable(), unit_id)) {
+    return measured;
+  }
+  return Found(kPlayerChosenPlacementSounds, unit_id);
 }
 
 const SkillUnitSoundEntry* SkillUnitSustainSound(std::uint32_t unit_id) {
