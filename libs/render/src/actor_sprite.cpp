@@ -499,9 +499,9 @@ void LayerDrawsOf(const ComposedActor& composed, ActorPartSet shown_parts,
     if ((shown_parts & bit) == 0) {
       continue;
     }
-    out.push_back(LayerDraw{index, (additive_parts & bit) != 0});
+    out.push_back(LayerDraw{index, (additive_parts & bit) != 0, part});
     if (doubles_weapon && part == ActorPart::kWeapon) {
-      out.push_back(LayerDraw{index, true});
+      out.push_back(LayerDraw{index, true, part});
     }
   }
 }

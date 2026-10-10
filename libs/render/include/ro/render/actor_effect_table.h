@@ -357,14 +357,18 @@ struct ActorBodyPose {
   // la double qu'une image sur deux : c'est à l'appelant, qui compte les images,
   // de n'en retenir qu'une sur deux.
   bool doubles_weapon = false;
-  // OÙ LE CORPS EN EST DE SON CERCLE, en pixels de sprite d'ÉCRAN : x vers la
-  // droite, y vers le haut. Zéro pour un corps qui ne tourne pas.
+  // OÙ LA TÊTE EN EST DE SON CERCLE, en pixels de sprite d'ÉCRAN : x vers la
+  // droite, y vers le haut. Zéro pour une tête qui ne tourne pas.
+  //
+  // 🔴 LE CORPS NE TOURNE PAS : seuls ses calques tournent autour de lui, la
+  // tête sur un cercle de quarante pixels, les autres calques sur un cercle de
+  // dix. Un monstre, qui n'a qu'un corps, reste sur son pivot.
   //
   // ⚠ CE N'EST PAS `up_pixels`, et les deux ne se confondent pas : la montée
   // d'un saut se fait dans le MONDE, ce balancement dans le repère du panneau.
-  // Un corps qui tourne autour de sa place tourne à l'écran, pas autour d'un
-  // axe de la carte.
   std::array<float, 2> swing_pixels = {0.0F, 0.0F};
+  // Le même cercle pour les calques qui ne sont ni le corps ni la tête.
+  std::array<float, 2> layer_swing_pixels = {0.0F, 0.0F};
   // DE COMBIEN LE CORPS TREMBLE, en pixels de sprite ; zéro s'il ne tremble
   // pas. C'est une AMPLITUDE, pas un décalage : le client tire un nombre au
   // sort pour chacun des quatre bords à chaque image, et `render` reste sans

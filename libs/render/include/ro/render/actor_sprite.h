@@ -155,6 +155,8 @@ struct ComposedActor {
 struct LayerDraw {
   std::size_t quad = 0;
   bool additive = false;
+  // La partie dont le quad est un calque.
+  ActorPart part = ActorPart::kBody;
 
   [[nodiscard]] friend bool operator==(const LayerDraw&, const LayerDraw&) = default;
 };

@@ -326,6 +326,15 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
       const float left_u = quad.mirrored ? 1.0F : 0.0F;
       const float right_u = quad.mirrored ? 0.0F : 1.0F;
       SpriteQuad scaled = quad;
+      // LE DÉCALAGE D'UNE PARTIE, avant l'échelle. L'ombre n'a pas de parties.
+      if (const glm::vec2 part_offset =
+              drawn.part_offset_pixels[static_cast<std::size_t>(layer.part)];
+          layered && part_offset != glm::vec2(0.0F, 0.0F)) {
+        for (glm::vec2& corner : scaled.corners) {
+          corner.x += part_offset.x;
+          corner.y -= part_offset.y;
+        }
+      }
       if (drawn.scale != 1.0F) {
         for (glm::vec2& corner : scaled.corners) {
           corner *= drawn.scale;

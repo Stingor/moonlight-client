@@ -114,13 +114,10 @@ inline constexpr std::int32_t kPressedHoldLastStep = 33;
 inline constexpr float kPressedFallPerStep = 0.2F;
 inline constexpr float kPressedHeld = 0.4F;
 
-// LE RAYON DU CERCLE, en pixels de sprite.
-//
-// ⚠ LE CLIENT EN A DEUX : quarante pour le corps, dix pour ses calques
-// secondaires, qui tournent donc moins large que lui. Nous déplaçons l'acteur
-// ENTIER — `DrawnActor` n'a pas de décalage par calque —, et c'est le rayon du
-// corps qui décide. La différence se verrait sur une coiffe, pas sur la course.
+// LES RAYONS DU CERCLE, en pixels de sprite : quarante pour la tête, dix pour
+// les autres calques. Le corps, lui, reste en place.
 inline constexpr float kSwingRadiusPixels = 40.0F;
+inline constexpr float kLayerSwingRadiusPixels = 10.0F;
 
 // L'ANGLE DU CERCLE, EN DEGRÉS, à ce pas du compteur.
 //
@@ -228,6 +225,9 @@ ActorBodyPose BodyPoseAfterEffects(std::span<const ActorEffectPlay> played) {
         // Le client retranche `cos × 40 − 40` d'une ordonnée qui DESCEND : vers
         // le haut, cela vaut `40 cos − 40`, nul au départ du cercle.
         pose.swing_pixels[1] += std::cos(radians) * kSwingRadiusPixels - kSwingRadiusPixels;
+        pose.layer_swing_pixels[0] += std::sin(radians) * kLayerSwingRadiusPixels;
+        pose.layer_swing_pixels[1] +=
+            std::cos(radians) * kLayerSwingRadiusPixels - kLayerSwingRadiusPixels;
       }
     }
     if ((raised & kFadeOutRising) != 0) {

@@ -1,6 +1,7 @@
 #include "world/actor_view.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -538,11 +539,25 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // couleur et une transparence en plus.
     std::array<ro::render::ActorBodyCopy, ro::render::kMaxBodyCopies> veils;
     const std::size_t veil_count = ro::render::BodyVeilsAfterEffects(played_effects, veils);
+    // LE CERCLE DES CALQUES : la tête et le reste tournent, le corps reste.
+    const auto swing_layers = [&pose](ro::render::DrawnActor& drawn) {
+      for (std::size_t part = 0; part < ro::render::kActorPartCount; ++part) {
+        if (part == static_cast<std::size_t>(ro::render::ActorPart::kBody)) {
+          continue;
+        }
+        const std::array<float, 2>& swing =
+            part == static_cast<std::size_t>(ro::render::ActorPart::kHead)
+                ? pose.swing_pixels
+                : pose.layer_swing_pixels;
+        drawn.part_offset_pixels[part] = glm::vec2(swing[0], swing[1]);
+      }
+    };
     for (std::size_t copy_rank = 0; copy_rank < veil_count; ++copy_rank) {
       scene.front.push_back(
           ro::render::DrawnActor{&composed, nullptr, feet, veils[copy_rank].tint, 0.0F, scale});
       scene.front.back().fogged = false;
       CopyLayers(veils[copy_rank], scene.front.back());
+      swing_layers(scene.front.back());
     }
     // LES RÉMANENCES : une copie du corps, semée derrière lui. Elle vit un tour
     // de l'animation qu'il joue, ce que la tenue seule sait dire.
@@ -557,9 +572,9 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
                                 tint,
                                 PickBiasOf(actor),
                                 scale,
-                                BodyJitter(id, now_ms, pose.jitter_pixels) +
-                                    glm::vec2(pose.swing_pixels[0], pose.swing_pixels[1]),
+                                BodyJitter(id, now_ms, pose.jitter_pixels),
                                 pose.height_scale};
+    swing_layers(body);
     BlendLayers(pose, weapon_echo_frame, body);
     scene.drawn.push_back(body);
     scene.ids.push_back(scene_id);

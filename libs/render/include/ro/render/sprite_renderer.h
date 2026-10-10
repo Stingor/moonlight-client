@@ -117,6 +117,10 @@ struct DrawnActor {
   // LA PART DE SON EMPRISE ÉLARGIE qu'il garde autour de son centre. Un pour
   // tout acteur ; moins pour celui que le serveur ne peut pas viser.
   float pick_share = 1.0F;
+  // DE COMBIEN CHAQUE PARTIE SE DÉCALE de sa place dans le sprite, en pixels de
+  // sprite : x vers la droite, y vers le haut. Le décalage s'ajoute AVANT
+  // l'échelle, comme celui que le client ajoute à l'attache d'un calque.
+  std::array<glm::vec2, kActorPartCount> part_offset_pixels{};
 };
 
 // Dessine les acteurs, en panneaux face à la caméra.
