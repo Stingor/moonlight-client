@@ -430,6 +430,9 @@ void LobbyScreen::Route(const ro::ui::LoginWindowAction& asked) {
       }
       form_.pincode.fill('\0');
       break;
+    case ro::ui::LoginVerb::kQuit:
+      Quit();
+      break;
   }
 }
 

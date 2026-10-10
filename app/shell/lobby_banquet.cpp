@@ -378,10 +378,14 @@ void LobbyScreen::RouteSeats(const ro::ui::CharacterSelectAction& asked) {
       break;
     }
     case ro::ui::CharacterSelectVerb::kQuit:
-      SaveLayoutIfDirty();
-      running_ = false;
+      Quit();
       break;
   }
+}
+
+void LobbyScreen::Quit() {
+  SaveLayoutIfDirty();
+  running_ = false;
 }
 
 }  // namespace moonclient

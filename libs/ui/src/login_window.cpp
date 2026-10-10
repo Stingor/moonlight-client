@@ -5,6 +5,8 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/modal_box.h"
+#include "ro/ui/options_window.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -42,6 +44,10 @@ constexpr ImU32 kRefusalColor = IM_COL32(255, 96, 96, 255);
 constexpr ImU32 kCoverColor = IM_COL32(0, 0, 0, 205);
 constexpr ImU32 kCoverTextColor = IM_COL32(232, 232, 238, 255);
 
+[[nodiscard]] bool AnyPopupOpen() {
+  return ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+}
+
 // Vrai si le champ porte quelque chose.
 [[nodiscard]] bool Filled(const std::array<char, kLoginFieldBytes>& field) {
   return field[0] != '\0';
@@ -70,9 +76,11 @@ constexpr ImU32 kCoverTextColor = IM_COL32(232, 232, 238, 255);
   ImGui::Spacing();
   const bool clicked = SkinButton(core::Tr("Se connecter"), art, ImVec2(FormWidth(), 0.0F));
   // ⚠ ENTRÉE VALIDE DEPUIS N'IMPORTE OÙ, et pas seulement depuis le champ du
-  // mot de passe : c'est le geste qu'on fait après avoir tapé son compte.
-  const bool entered = ImGui::IsKeyPressed(ImGuiKey_Enter, false) ||
-                       ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false);
+  // mot de passe : c'est le geste qu'on fait après avoir tapé son compte. Sauf
+  // sous un surgissant : la confirmation de sortie prend Entrée pour elle, et
+  // la connexion ne doit pas partir au même instant.
+  const bool entered = !AnyPopupOpen() && (ImGui::IsKeyPressed(ImGuiKey_Enter, false) ||
+                                           ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false));
 
   // ⚠ LES DEUX CHAMPS REMPLIS, ET LA GARDE EST ICI plutôt que sur le bouton :
   // un bouton grisé ne dit pas POURQUOI il l'est, et le joueur clique quand même
@@ -272,6 +280,23 @@ void DrawRefusal(const std::string& message) {
   ImGui::PopTextWrapPos();
 }
 
+// LA SORTIE, en bas à droite, sous TOUTES les formes de la fenêtre.
+//
+// ⚠ JAMAIS GRISÉE, même pendant une connexion : quitter doit toujours marcher,
+// et c'est justement quand le serveur ne répond pas qu'on le cherche.
+//
+// ⚠ À APPELER EN DÉBUT DE LIGNE, comme `FormWidth`, dont la mesure part du
+// curseur : le bouton finit au bord droit, donc la fenêtre ne grandit pas.
+void DrawQuitRow(const SkinArt& art, LoginWindowAction& action) {
+  const char* label = core::Tr("Quitter le jeu");
+  const float width = SkinButtonWidth(label, art);
+  ImGui::Spacing();
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(FormWidth() - width, 0.0F));
+  if (SkinButton(label, art, ImVec2(width, 0.0F))) {
+    action.verb = LoginVerb::kQuit;
+  }
+}
+
 }  // namespace
 
 LoginWindowAction DrawLoginWindow(LoginWindowState& state, const LoginWindowView& view,
@@ -330,7 +355,7 @@ LoginWindowAction DrawLoginWindow(LoginWindowState& state, const LoginWindowView
   // C'est la même fenêtre qui change de nom sur sa barre : la place et la
   // taille que le joueur lui a données lui restent quand il change de porte.
   // ⚠ SANS CROIX — `nullptr` : une croix qui n'a rien derrière elle ne ferme
-  // pas, elle quitte le jeu, et ce geste appartient à la fenêtre du système.
+  // pas, elle quitte le jeu. Ce geste-là porte son nom, en bas du formulaire.
   static WindowName classic_name(kLoginWindowTitle, kLoginWindowId);
   static WindowName moonlight_name(kMoonlightWindowTitle, kLoginWindowId);
   // LES RÉGLAGES DU LOGIN, DANS LA BARRE DE TITRE : le bouton ne bouge pas quand
@@ -370,6 +395,7 @@ LoginWindowAction DrawLoginWindow(LoginWindowState& state, const LoginWindowView
     }
     DrawRefusal(view.message);
     action.first_screen = DrawFirstScreen(view.first_screen, art);
+    DrawQuitRow(art, action);
     EndSkinnedWindow();
     return action;
   }
@@ -421,8 +447,30 @@ LoginWindowAction DrawLoginWindow(LoginWindowState& state, const LoginWindowView
   }
 
   action.first_screen = DrawFirstScreen(view.first_screen, art);
+  DrawQuitRow(art, action);
   EndSkinnedWindow();
   return action;
+}
+
+bool FollowLoginEscape(EscapeStack& escape, bool* settings_open, const SkinArt& art) {
+  escape.Register(kLoginSettingsWindowId, settings_open);
+  // ⚠ UNE BOÎTE QUI A PRIS ÉCHAP Y A RÉPONDU « NON » : la fenêtre dessous reste.
+  if (PopupTakesEscape()) {
+    escape.Suppress();
+  }
+  escape.Process();
+
+  const ModalAnswer answer =
+      DrawModalBox(kLoginQuitConfirmId, core::Tr("Quitter le jeu ?"), core::Tr("Quitter"),
+                   core::Tr("Annuler"), art, ModalEnter::kYes);
+  // 🔴 DEMANDÉE APRÈS LE DESSIN DE LA BOÎTE, jamais avant : ouverte dans la même
+  // image, elle lirait l'Échap qui l'ouvre et se refermerait aussitôt.
+  //
+  // ⚠ PAS PENDANT UNE SAISIE : là, Échap quitte le champ, et c'est tout.
+  if (escape.escape_unclaimed() && !ImGui::GetIO().WantTextInput) {
+    AskModal(kLoginQuitConfirmId);
+  }
+  return answer == ModalAnswer::kYes;
 }
 
 }  // namespace ro::ui

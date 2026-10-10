@@ -37,6 +37,17 @@ enum class ModalAnswer : std::uint8_t {
   kNo,
 };
 
+// CE QUE VAUT LA TOUCHE ENTRÉE DANS LA BOÎTE.
+//
+// ⚠ RIEN PAR DÉFAUT : la plupart des boîtes gardent un geste qui détruit ou qui
+// coûte, et un Entrée tapé par réflexe — celui qui validait la fenêtre dessous
+// — ne doit pas y répondre « oui ». Seule une question dont le « oui » est le
+// geste attendu l'accepte au clavier.
+enum class ModalEnter : std::uint8_t {
+  kIgnored,
+  kYes,
+};
+
 // Ouvre la boîte. Sûre à appeler pendant le dessin d'autre chose : elle ne fait
 // que poser l'état que l'appel suivant consomme.
 void AskModal(const char* id);
@@ -46,7 +57,8 @@ void AskModal(const char* id);
 // `question`, `yes` et `no` sont DÉJÀ TRADUITS par l'appelant — même frontière
 // que partout dans cette couche.
 [[nodiscard]] ModalAnswer DrawModalBox(const char* id, const char* question, const char* yes,
-                                       const char* no, const SkinArt& art);
+                                       const char* no, const SkinArt& art,
+                                       ModalEnter enter = ModalEnter::kIgnored);
 
 // LA BOÎTE QUI SE RÉPOND « NON » TOUTE SEULE.
 //

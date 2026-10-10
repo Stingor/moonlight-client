@@ -155,7 +155,7 @@ bool PopupTakesEscape() {
 }
 
 ModalAnswer DrawModalBox(const char* id, const char* question, const char* yes, const char* no,
-                         const SkinArt& art) {
+                         const SkinArt& art, ModalEnter enter) {
   // ⚠ AU CENTRE, À CHAQUE FOIS. Une boîte qu'on doit chercher a manqué son but :
   // elle interrompt, donc elle tombe sous les yeux.
   const ImGuiViewport* screen = ImGui::GetMainViewport();
@@ -205,6 +205,10 @@ ModalAnswer DrawModalBox(const char* id, const char* question, const char* yes, 
     // congédier au clavier retient le jeu entier.
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
       answer = ModalAnswer::kNo;
+    }
+    if (enter == ModalEnter::kYes && (ImGui::IsKeyPressed(ImGuiKey_Enter, false) ||
+                                      ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false))) {
+      answer = ModalAnswer::kYes;
     }
     if (answer != ModalAnswer::kWaiting) {
       ImGui::CloseCurrentPopup();

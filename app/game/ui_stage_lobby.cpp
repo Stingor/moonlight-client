@@ -11,8 +11,6 @@
 // d'interface, ce serait deux atlas — et ImGui grave ses textures au fil des
 // images.
 
-#include "ro/ui/modal_box.h"
-
 #include "game/ui_stage.h"
 
 namespace moonclient {
@@ -24,7 +22,7 @@ ro::ui::LoginWindowAction UiStage::DrawLobby(ro::ui::LoginWindowState& login,
                                              std::span<const ro::ui::OptionSectionView> pages,
                                              ro::ui::OptionsWindowAction* settings_asked) {
   backend_.BeginFrame(*ui_);
-  const ro::ui::LoginWindowAction action = ro::ui::DrawLoginWindow(login, view, skin_);
+  ro::ui::LoginWindowAction action = ro::ui::DrawLoginWindow(login, view, skin_);
   // ⚠ APRÈS LE FORMULAIRE, donc PAR-DESSUS : c'est de lui qu'on l'ouvre.
   *settings_asked = ro::ui::DrawLoginSettingsWindow(settings, pages, skin_);
   // Le nom de la ville du décor, par-dessus le formulaire comme en jeu.
@@ -34,13 +32,10 @@ ro::ui::LoginWindowAction UiStage::DrawLobby(ro::ui::LoginWindowState& login,
   // ⚠ LA PILE D'ÉCHAPPEMENT TOURNE AUSSI ICI : elle est ce qui décide à qui va
   // la touche, et un écran qui la sauterait laisserait la partie suivante
   // hériter d'un état vieux d'une session. Échap ferme les réglages, comme les
-  // Options en jeu.
-  escape_.Register(ro::ui::kLoginSettingsWindowId, &settings.open);
-  // ⚠ UNE BOÎTE QUI A PRIS ÉCHAP Y A RÉPONDU « NON » : la fenêtre dessous reste.
-  if (ro::ui::PopupTakesEscape()) {
-    escape_.Suppress();
+  // Options en jeu ; sans rien à fermer, il demande s'il faut quitter.
+  if (ro::ui::FollowLoginEscape(escape_, &settings.open, skin_)) {
+    action.verb = ro::ui::LoginVerb::kQuit;
   }
-  escape_.Process();
   ui_->EndFrame();
   backend_.Draw();
   return action;

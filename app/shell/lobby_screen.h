@@ -136,6 +136,10 @@ class LobbyScreen : public Screen {
   void Route(const ro::ui::LoginWindowAction& asked);
   // Ce que la scène de sélection a demandé.
   void RouteSeats(const ro::ui::CharacterSelectAction& asked);
+  // FERME LE CLIENT PROPREMENT. ⚠ LA SEULE SORTIE DES BOUTONS « Quitter le
+  // jeu », du formulaire comme de la tablée : ce qu'on y grave en partant ne
+  // doit pas dépendre de l'écran d'où l'on part.
+  void Quit();
   // Ce que la fenêtre de création a demandé.
   void RouteCreate(const ro::ui::CharacterCreateAction& asked);
   // Ce que la machine à états dit à la fenêtre de création.

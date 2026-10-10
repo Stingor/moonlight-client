@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/escape_stack.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/web_door.h"
 
@@ -198,16 +199,17 @@ struct LoginWindowState {
 // ⚠ ELLE N'ENVOIE RIEN ELLE-MÊME : elle rend un verbe, et c'est `app` qui parle
 // au serveur. Même règle que ses voisines.
 //
-// ⚠ ET IL N'Y A PAS DE VERBE « QUITTER ». La fenêtre n'a pas de croix, parce
-// qu'une croix qui n'a rien derrière elle ne ferme pas,
-// elle quitte le jeu : ce geste-là appartient à la fenêtre du système et à la
-// touche d'échappement, que la coquille écoute déjà.
+// ⚠ QUITTER EST UN BOUTON NOMMÉ, PAS UNE CROIX. Une croix promet de fermer la
+// fenêtre ; ici, sans fenêtre derrière, elle quitterait le jeu sans l'avoir
+// dit. « Quitter le jeu », en bas du formulaire, dit ce qu'il fait.
 enum class LoginVerb : std::uint8_t {
   kNothing,
   // Se connecter avec ce que portent les champs.
   kSubmit,
   // Répondre au code PIN.
   kSubmitPincode,
+  // Fermer le client, par la même sortie que la sélection de personnage.
+  kQuit,
 };
 
 // CE QUE LES TROIS RÉGLAGES DU PREMIER ÉCRAN ONT DEMANDÉ.
@@ -245,5 +247,19 @@ struct LoginWindowAction {
 //     derrière.
 [[nodiscard]] LoginWindowAction DrawLoginWindow(LoginWindowState& state,
                                                 const LoginWindowView& view, const SkinArt& art);
+
+// L'identité de la confirmation « Quitter le jeu ? ».
+inline constexpr const char* kLoginQuitConfirmId = "##login_quit";
+
+// ÉCHAP SUR L'ÉCRAN DE CONNEXION. Une fois par image, APRÈS le formulaire et
+// ses réglages ; rend vrai quand le joueur a confirmé qu'il quitte.
+//
+// ⚠ LES RÉGLAGES D'ABORD : ouverts, Échap les ferme et rien d'autre. Un Échap
+// que personne ne prend — ni fenêtre, ni surgissant, ni champ en saisie —
+// demande « Quitter le jeu ? ». Échap de nouveau vaut « non », Entrée « oui ».
+//
+// ⚠ UNE QUESTION, ET NON UNE SORTIE SÈCHE : Échap est aussi le geste qu'on fait
+// pour refermer ce qu'on croit encore ouvert.
+[[nodiscard]] bool FollowLoginEscape(EscapeStack& escape, bool* settings_open, const SkinArt& art);
 
 }  // namespace ro::ui

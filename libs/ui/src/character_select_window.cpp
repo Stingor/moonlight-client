@@ -627,17 +627,25 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   // les pose.
   ImVec2 exit_pos = exit_at;
   if (!editing) {
+    const float row_height = BarRowHeight(art);
+    // 🔴 LA SORTIE TIENT ENTIÈRE DANS L'ÉCRAN. Son ancre est une FRACTION de
+    // l'écran, fixée pour la largeur de ses libellés à la taille du moment :
+    // sur un écran plus étroit, ou dans une langue aux libellés plus longs,
+    // « Quitter le jeu » sortirait par la droite — et c'est le seul bouton de
+    // la tablée qui ferme le client.
+    exit_pos.x = std::max(std::min(exit_pos.x, display.x - exit_bar_width), 0.0F);
+    exit_pos.y = std::max(std::min(exit_pos.y, display.y - row_height), 0.0F);
+
     int widest_count = 0;
     const BarShape widest = WidestActionBar(art, &widest_count);
     const int widest_per_row = widest.rows > 1 ? (widest_count + 1) / 2 : widest_count;
     const float widest_width =
         static_cast<float>(widest_per_row) * (widest.width + kBarGapPixels) - kBarGapPixels;
-    const float row_height = BarRowHeight(art);
     const float action_left = action_at.x - widest_width * 0.5F;
     const float action_right = action_left + widest_width;
-    const bool same_row = std::fabs(exit_at.y - action_at.y) < row_height;
-    const bool overlap = action_right + kBarGapPixels > exit_at.x &&
-                         exit_at.x + exit_bar_width + kBarGapPixels > action_left;
+    const bool same_row = std::fabs(exit_pos.y - action_at.y) < row_height;
+    const bool overlap = action_right + kBarGapPixels > exit_pos.x &&
+                         exit_pos.x + exit_bar_width + kBarGapPixels > action_left;
     if (same_row && overlap) {
       exit_pos.y = action_at.y - static_cast<float>(widest.rows) * row_height;
     }

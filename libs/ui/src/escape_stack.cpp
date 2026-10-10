@@ -34,8 +34,10 @@ void EscapeStack::Process() {
   has_work_ = !open_windows_.empty();
   const bool suppressed = suppressed_;
   suppressed_ = false;
+  const bool pressed = ImGui::IsKeyPressed(ImGuiKey_Escape, /*repeat=*/false);
+  escape_unclaimed_ = pressed && !suppressed && !has_work_;
 
-  if (!suppressed && has_work_ && ImGui::IsKeyPressed(ImGuiKey_Escape, /*repeat=*/false)) {
+  if (!suppressed && has_work_ && pressed) {
     // UNE FENÊTRE QU'ON LIT D'ABORD, puis LA PLUS AU-DESSUS : le plus grand
     // ordre de focus est la plus récemment passée devant, donc celle que le
     // joueur regarde.

@@ -9820,6 +9820,9 @@ tr: Abandonar la guild
 fr: Quitter le jeu
 tr: Salir del juego
 
+fr: Quitter le jeu ?
+tr: ¿Salir del juego?
+
 fr: Quitter…
 tr: Salir…
 

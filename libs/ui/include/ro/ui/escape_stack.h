@@ -57,6 +57,11 @@ class EscapeStack {
   // ce qui était ouvert alors est ce que le joueur avait sous les yeux.
   [[nodiscard]] bool has_work() const noexcept { return has_work_; }
 
+  // Vrai quand Échap a été pressé CETTE image et que personne ne l'a pris : ni
+  // une fenêtre à fermer, ni un surgissant. ⚠ VERDICT DU DERNIER `Process` :
+  // c'est à l'appelant de dire ce qu'un Échap libre veut dire sur son écran.
+  [[nodiscard]] bool escape_unclaimed() const noexcept { return escape_unclaimed_; }
+
  private:
   struct Closable {
     ImGuiWindow* window = nullptr;
@@ -71,6 +76,7 @@ class EscapeStack {
   bool skip_next_ = false;
   bool suppressed_ = false;
   bool has_work_ = false;
+  bool escape_unclaimed_ = false;
 };
 
 }  // namespace ro::ui
