@@ -19,6 +19,7 @@
 #include "ro/vfs/trade_words.h"
 
 #include "game/buying_store_rules.h"
+#include "game/trade_recap.h"
 
 namespace moonclient {
 namespace {
@@ -63,6 +64,7 @@ void BuyingStoreStage::StartSession() {
   store_.ClearJournal();
   (void)store_.TakeFarewell();
   open_refusal_said_ = store_.open_refusal_seq();
+  opening_said_ = store_.opening_seq();
   end_said_ = store_.end_seq();
   sale_seq_said_ = store_.sale_seq();
   sales_said_ = store_.sales().size();
@@ -223,6 +225,22 @@ void BuyingStoreStage::SayOwnOutcomes(const TradeContext& context) {
     }
     Say(context, std::move(text), kBuyingStoreFailedColor);
   }
+  // L'OUVERTURE SE RÉCAPITULE, sur la liste que le serveur renvoie : ce qu'il a
+  // accepté, pas ce qui a été saisi.
+  if (BuyListRecapDue(store_, opening_said_)) {
+    std::vector<TradeRecapItem> items;
+    for (const ro::sim::BuyingStoreLine& line : store_.lines()) {
+      items.push_back({.name = context.items.NameOf(line.item_id),
+                       .unit_price_zeny = line.price,
+                       .amount = line.wanted});
+    }
+    const std::int64_t zeny = context.world.player_status().zeny;
+    for (VendingChatLine& line :
+         BuyListRecap(context.words, items, zeny == ro::sim::kUnknownStat ? 0 : zeny)) {
+      Say(context, std::move(line.text), line.color);
+    }
+  }
+  opening_said_ = store_.opening_seq();
   if (store_.end_seq() != end_said_) {
     end_said_ = store_.end_seq();
     const std::uint16_t code = store_.end_result();

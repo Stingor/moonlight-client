@@ -18,6 +18,14 @@ namespace {
 // Le nom sous lequel un gabarit fautif se journalise.
 constexpr std::string_view kTemplateName = "un gabarit des commerces";
 
+// LA MISE EN PAGE DES RÉCAPITULATIFS, qui n'appartient à aucune langue : le
+// bandeau autour du titre, le retrait d'une ligne d'objet, et celui, bien plus
+// large, qui pousse le zeny vers la droite.
+constexpr std::string_view kRecapBannerLead = "======================  ";
+constexpr std::string_view kRecapBannerTrail = "  ======================";
+constexpr std::string_view kRecapItemIndent = "    ";
+constexpr std::string_view kRecapZenyIndent = "                                          ";
+
 // UN ARGUMENT À IMPRIMER : une chaîne ou un entier, et rien d'autre.
 using Argument = std::variant<std::string_view, std::int64_t>;
 
@@ -136,6 +144,12 @@ std::string TradeTextWith(const ItemWords& words, TradeWord word, std::string_vi
   return Format(words, word, arguments);
 }
 
+std::string TradeTextWith(const ItemWords& words, TradeWord word, std::string_view first,
+                          std::string_view second, std::string_view third) {
+  const std::array<Argument, 3> arguments = {first, second, third};
+  return Format(words, word, arguments);
+}
+
 void FillTradeWords(TradeWords& words) {
   // DANS L'ORDRE DE `TradeWord` : le rang de l'un est l'indice de l'autre.
   auto texts = std::to_array<std::string>({
@@ -237,6 +251,12 @@ void FillTradeWords(TradeWords& words) {
       core::Tr("Le nom ou le préfixe/suffixe sélectionné n'existe pas."),
       core::Tr("Préc."),
       core::Tr("Suiv."),
+      Edged(kRecapBannerLead, core::Tr("LISTE DE VENTE"), kRecapBannerTrail),
+      Edged(kRecapBannerLead, core::Tr("LISTE D'ACHAT"), kRecapBannerTrail),
+      Edged(kRecapItemIndent, core::Tr("%s  :  %s  Zeny"), ""),
+      core::Tr("%s : %s  Zeny => %s u."),
+      core::Tr("Commission : 1 u. = %s Zeny"),
+      Edged(kRecapZenyIndent, core::Tr("Zeny actuels : %s Z"), ""),
   });
   // ⚠ UN TEXTE OUBLIÉ NE SE VERRAIT PAS : tous les mots suivants seraient
   // décalés d'un rang. Le compte se vérifie à la compilation.

@@ -14,6 +14,7 @@
 #include "ro/sim/world.h"
 #include "ro/ui/inventory_window.h"
 
+#include "game/trade_recap.h"
 #include "game/vending_said.h"
 #include "items/inventory_view.h"
 
@@ -243,7 +244,19 @@ void VendingStage::FollowLog(VendingWindows& windows) {
 
 void VendingStage::SayOwnNews(VendingWindows& windows, const TradeContext& context) {
   // LE RÉSULTAT DE L'OUVERTURE : une boîte pour l'échec, une ligne pour la case
-  // interdite, rien pour la réussite — la liste de l'échoppe l'a déjà dite.
+  // interdite, le récapitulatif pour la réussite — l'échoppe telle que le
+  // serveur l'a acceptée, sa liste étant arrivée juste avant.
+  if (SaleListRecapDue(vending_, opening_result_said_)) {
+    std::vector<TradeRecapItem> items;
+    for (const ro::sim::VendingLine& line : vending_.shop_lines()) {
+      items.push_back({.name = context.items.NameOf(line.item, context.creators),
+                       .unit_price_zeny = line.price_zeny,
+                       .amount = line.item.amount});
+    }
+    for (VendingChatLine& line : SaleListRecap(context.words, items, ZenyOf(context.world))) {
+      Say(context, std::move(line.text), line.color);
+    }
+  }
   if (vending_.opening_result_seq() != opening_result_said_) {
     opening_result_said_ = vending_.opening_result_seq();
     VendingOpeningNews news = SaidOfOpeningResult(context.words, vending_.opening_result());

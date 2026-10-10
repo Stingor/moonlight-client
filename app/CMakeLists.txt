@@ -445,14 +445,16 @@ target_include_directories(moonclient_storesearch PUBLIC ${CMAKE_CURRENT_SOURCE_
 
 # L'ÉCHOPPE DE VENTE VUE DE L'ÉCRAN, à part de son étage : les mots d'un code du
 # serveur, la dernière échoppe retenue sur le disque et reposée sur le cart, et
-# l'enseigne qu'un clic vise. Chacun se juge sur un banc, sans fenêtre.
+# l'enseigne qu'un clic vise, et les récapitulatifs qu'écrit l'ouverture d'une
+# échoppe, de vente comme d'achat. Chacun se juge sur un banc, sans fenêtre.
 add_library(moonclient_vending STATIC
+    game/trade_recap.cpp
     game/vending_memory.cpp
     game/vending_said.cpp
     world/signboard_pick.cpp)
 
 target_link_libraries(moonclient_vending
-    PUBLIC ro_core ro_render ro_sim ro_vfs
+    PUBLIC ro_core ro_render ro_sim ro_ui ro_vfs
     PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_vending PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

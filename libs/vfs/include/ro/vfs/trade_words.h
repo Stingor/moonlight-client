@@ -119,6 +119,13 @@ enum class TradeWord : std::uint8_t {
   kSearchUnknownCard,
   kSearchPreviousPage,
   kSearchNextPage,
+  // ── Récapitulatifs, à l'ouverture de mon échoppe ────────────────────────
+  kRecapSaleTitle,    // bandeau compris
+  kRecapBuyTitle,     // bandeau compris
+  kRecapSaleLine,     // %s puis %s, retrait compris
+  kRecapBuyLine,      // %s, %s, %s
+  kRecapCommission,   // un %s
+  kRecapCurrentZeny,  // un %s, retrait compris
   kCount,
 };
 
@@ -151,6 +158,9 @@ struct TradeWords {
 [[nodiscard]] std::string TradeTextWith(const ItemWords& words, TradeWord word,
                                         std::string_view text, std::int64_t first,
                                         std::int64_t second);
+[[nodiscard]] std::string TradeTextWith(const ItemWords& words, TradeWord word,
+                                        std::string_view first, std::string_view second,
+                                        std::string_view third);
 
 // La suite des conversions d'un gabarit, une lettre par conversion : « s » pour
 // une chaîne, « d » pour un entier. Vide si une conversion n'est ni l'une ni

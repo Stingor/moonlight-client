@@ -78,6 +78,7 @@ class BuyingStoreStage {
 
   // ── LES RANGS DÉJÀ DITS ────────────────────────────────────────────────────
   std::uint32_t open_refusal_said_ = 0;
+  std::uint32_t opening_said_ = 0;
   std::uint32_t end_said_ = 0;
   std::uint32_t sale_seq_said_ = 0;
   std::size_t sales_said_ = 0;

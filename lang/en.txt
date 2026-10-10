@@ -15897,3 +15897,21 @@ tr: The inventory is full: an ingredient that does not stack takes a slot per co
 
 fr: Un ingrédient qui ne s'empile pas prend une case par exemplaire : il est ramené aux cases libres de l'inventory.
 tr: An ingredient that does not stack takes a slot per copy: it is cut down to the free inventory slots.
+
+fr: LISTE DE VENTE
+tr: SALE LIST
+
+fr: LISTE D'ACHAT
+tr: BUY LIST
+
+fr: %s  :  %s  Zeny
+tr: %s  :  %s  Zeny
+
+fr: %s : %s  Zeny => %s u.
+tr: %s : %s  Zeny => %s ea.
+
+fr: Commission : 1 u. = %s Zeny
+tr: Commission : 1 EA = %s Zeny
+
+fr: Zeny actuels : %s Z
+tr: Current Zeny : %s Z

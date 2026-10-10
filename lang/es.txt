@@ -15897,3 +15897,21 @@ tr: El inventory está lleno: un ingrediente que no se apila ocupa una casilla p
 
 fr: Un ingrédient qui ne s'empile pas prend une case par exemplaire : il est ramené aux cases libres de l'inventory.
 tr: Un ingrediente que no se apila ocupa una casilla por ejemplar: se reduce a las casillas libres del inventory.
+
+fr: LISTE DE VENTE
+tr: LISTA DE VENTA
+
+fr: LISTE D'ACHAT
+tr: LISTA DE COMPRA
+
+fr: %s  :  %s  Zeny
+tr: %s  :  %s  Zeny
+
+fr: %s : %s  Zeny => %s u.
+tr: %s : %s  Zeny => %s u.
+
+fr: Commission : 1 u. = %s Zeny
+tr: Comisión : 1 u. = %s Zeny
+
+fr: Zeny actuels : %s Z
+tr: Zeny actual : %s Z
