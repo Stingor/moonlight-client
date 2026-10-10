@@ -109,10 +109,15 @@ struct EffectParticleQuadRequest {
   // ⚠ CE N'EST PAS UN RECTANGLE ORIENTÉ : rien ne garantit que le premier soit
   // plus petit que le second, et un dessinateur RETOURNE son image en les
   // échangeant. Les ranger en minimum et maximum effacerait ce retournement.
+  //
+  // 🔴 PAR DÉFAUT, LE BAS DE L'IMAGE VA AUX DEUX PREMIERS COINS : v = 1 sur A et
+  // B, v = 0 sur C et D, ce que passent les dessinateurs du client presque sans
+  // exception. L'inverse retournait l'image de toutes les figures qui s'en
+  // remettent au défaut.
   float u_at_a_and_d = 0.0F;
   float u_at_b_and_c = 1.0F;
-  float v_at_a_and_b = 0.0F;
-  float v_at_c_and_d = 1.0F;
+  float v_at_a_and_b = 1.0F;
+  float v_at_c_and_d = 0.0F;
 
   // LA VARIANTE DE PROFONDEUR, dernier paramètre de la sortie : voir
   // `EffectQuadDepth`. Le dessinateur la choisit par marque ou par style.

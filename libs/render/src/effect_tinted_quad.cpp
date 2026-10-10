@@ -50,11 +50,13 @@ constexpr float kLiftOfRaisedMark = 110.0F;
 constexpr std::int16_t kAddedBlend = 0;
 constexpr std::int16_t kOrdinaryBlend = 1;
 
-// L'image entière, dans l'ordre où le client range ses quatre nombres.
+// L'image entière. ⚠ LE BAS DE L'IMAGE VA AUX DEUX PREMIERS COINS : le client
+// pose v = 1 sur A et B et v = 0 sur C et D. Les inverser retournait toutes
+// les images de cette figure — les pommes, les sacs, les notes des chansons.
 constexpr float kTextureAtLeft = 0.0F;
 constexpr float kTextureAtRight = 1.0F;
-constexpr float kTextureAtNear = 0.0F;
-constexpr float kTextureAtFar = 1.0F;
+constexpr float kTextureAtFirstCorners = 1.0F;
+constexpr float kTextureAtLastCorners = 0.0F;
 
 // LA MARQUE QUI DÉLÈGUE À UNE SOUS-MARQUE. Elle seule lit `sub_mark`, et ses
 // six branches sont six teintes de plus.
@@ -219,8 +221,8 @@ std::optional<EffectWorldQuad> ComposeTintedRotatedQuad(const EffectTrack& track
   request.texture = track.mark[kMarkOfTexture];
   request.u_at_a_and_d = kTextureAtLeft;
   request.u_at_b_and_c = kTextureAtRight;
-  request.v_at_a_and_b = kTextureAtNear;
-  request.v_at_c_and_d = kTextureAtFar;
+  request.v_at_a_and_b = kTextureAtFirstCorners;
+  request.v_at_c_and_d = kTextureAtLastCorners;
   return ComposeEffectParticleQuad(request, glm::vec3{0.0F, 0.0F, 0.0F});
 }
 

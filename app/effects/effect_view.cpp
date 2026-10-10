@@ -472,6 +472,18 @@ void EffectsInPlay::NoticeSkillUnitVisuals(const ro::sim::World& world, const Ma
     if (unit.unit_id == ro::sim::kSilentSkillUnit) {
       continue;
     }
+    // 🔴 UNE UNITÉ DÉJÀ POSÉE QUI REPARAÎT AILLEURS SE DÉPLACE, elle ne renaît
+    // pas : le serveur renvoie la même unité à sa nouvelle case quand son groupe
+    // suit son poseur — les chansons et les danses à chaque pas du barde. Ce
+    // qu'elle porte la suit alors selon la table de suivi de chaque effet,
+    // comme le porteur d'un effet d'acteur.
+    if (const auto already_sown = per_map_.sown_units.find(id);
+        already_sown != per_map_.sown_units.end() && (already_sown->second.cell.x != unit.cell.x ||
+                                                      already_sown->second.cell.y != unit.cell.y)) {
+      already_sown->second.cell = unit.cell;
+      const std::array<float, 3> moved = GroundPositionAt(stage, unit.cell.x, unit.cell.y);
+      nodes_->FollowActor(id, glm::vec3(moved[0], moved[1], moved[2]), 0.0F);
+    }
     // LA FABRIQUE D'ABORD, et elle exclut les deux autres chemins : une unité
     // qu'elle sert n'a ni effet d'apparition ni effet d'entretien.
     const std::span<const ro::render::SkillUnitNamedEffectEntry> named =
@@ -520,7 +532,7 @@ void EffectsInPlay::NoticeSkillUnitVisuals(const ro::sim::World& world, const Ma
     const std::array<float, 3> ground = GroundPositionAt(stage, unit.cell.x, unit.cell.y);
     const std::uint32_t period_ms =
         SowUnitVisual(*visual, glm::vec3(ground[0], ground[1], ground[2]), now_ms, first, id);
-    per_map_.sown_units.insert_or_assign(id, SownUnit{now_ms, period_ms});
+    per_map_.sown_units.insert_or_assign(id, SownUnit{now_ms, period_ms, 0, unit.cell});
     // Ce qui n'a rien pu semer ne fait rien entendre non plus : le client joue
     // le son dans le même souffle que l'image, et un bruit sans image ferait
     // chercher un effet là où il n'y en a pas.
