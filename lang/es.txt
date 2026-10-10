@@ -15910,8 +15910,14 @@ tr: %s  :  %s  Zeny
 fr: %s : %s  Zeny => %s u.
 tr: %s : %s  Zeny => %s u.
 
-fr: Commission : 1 u. = %s Zeny
-tr: Comisión : 1 u. = %s Zeny
+fr: Commission : aucune
+tr: Comisión : ninguna
+
+fr: Commission : %s %% sur tout achat
+tr: Comisión : %s %% en toda compra
+
+fr: Commission : %s %% à partir de %s Zeny par achat
+tr: Comisión : %s %% a partir de %s Zeny por compra
 
 fr: Zeny actuels : %s Z
 tr: Zeny actual : %s Z

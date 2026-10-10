@@ -54,11 +54,21 @@ struct SessionSettings {
   // MOONLIGHT (`homunc_teleport_acd`), qu'un rAthena d'usine n'a pas : le défaut
   // est la valeur de sa configuration.
   std::uint32_t homunculus_teleport_hold_ms = kDefaultHomunculusTeleportHoldMs;
+  // LA TAXE DES ÉCHOPPES DE VENTE, en dix-millièmes du total d'une demande
+  // d'achat : l'acheteur paie le total, le vendeur en touche le reste, tronqué.
+  // Elle ne s'applique qu'à un total d'au moins `vending_tax_min_zeny`. Une
+  // taxe nulle ne retient rien ; l'échoppe d'achat n'est jamais taxée.
+  int vending_tax_permyriad = kDefaultVendingTaxPermyriad;
+  std::int64_t vending_tax_min_zeny = kDefaultVendingTaxMinZeny;
 
   static constexpr int kDefaultViewCells = 14;
   static constexpr int kDefaultHomunculusMaxLevel = 99;
   static constexpr int kDefaultHomunculusSMaxLevel = 275;
   static constexpr std::uint32_t kDefaultHomunculusTeleportHoldMs = 5000;
+  static constexpr int kDefaultVendingTaxPermyriad = 500;
+  static constexpr std::int64_t kDefaultVendingTaxMinZeny = 100'000'000;
+  // La taxe entière : le vendeur ne touche rien.
+  static constexpr int kMaxVendingTaxPermyriad = 10'000;
 };
 
 }  // namespace ro::sim

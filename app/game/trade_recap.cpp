@@ -2,6 +2,8 @@
 
 #include "game/trade_recap.h"
 
+#include <cstddef>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -13,11 +15,9 @@ namespace {
 
 using ro::vfs::TradeWord;
 
-// Au-delà de ce prix unitaire, la commission annoncée s'applique.
-constexpr std::int64_t kCommissionFreeUpToZeny = 10'000'000;
-// Le taux annoncé, en pour cent.
-constexpr std::int64_t kCommissionPercent = 5;
-constexpr std::int64_t kPercentBase = 100;
+// Dix-millièmes par pour cent, et chiffres après la virgule d'un pour cent.
+constexpr int kPermyriadPerPercent = 100;
+constexpr std::size_t kPercentFractionDigits = 2;
 
 // Le trait qui ferme le récapitulatif. Il n'appartient à aucune langue.
 constexpr std::string_view kRecapClosingRule =
@@ -27,14 +27,6 @@ void Push(std::vector<VendingChatLine>& lines, std::string text, std::uint32_t c
   if (!text.empty()) {
     lines.push_back({std::move(text), color});
   }
-}
-
-void PushCommission(std::vector<VendingChatLine>& lines, const ro::vfs::ItemWords& words,
-                    std::int64_t unit_price_zeny) {
-  Push(lines,
-       ro::vfs::TradeTextWith(words, TradeWord::kRecapCommission,
-                              ro::ui::GroupThousands(AnnouncedCommission(unit_price_zeny))),
-       kRecapItemColor);
 }
 
 // La fin commune : le zeny du joueur, puis le trait.
@@ -48,16 +40,35 @@ void PushClosing(std::vector<VendingChatLine>& lines, const ro::vfs::ItemWords& 
 
 }  // namespace
 
-std::int64_t AnnouncedCommission(std::int64_t unit_price_zeny) {
-  if (unit_price_zeny <= kCommissionFreeUpToZeny) {
-    return 0;
+std::string VendingTaxPercent(int permyriad) {
+  std::string percent = std::to_string(permyriad / kPermyriadPerPercent);
+  std::string fraction = std::to_string(permyriad % kPermyriadPerPercent);
+  fraction.insert(0, kPercentFractionDigits - fraction.size(), '0');
+  while (!fraction.empty() && fraction.back() == '0') {
+    fraction.pop_back();
   }
-  return unit_price_zeny * kCommissionPercent / kPercentBase;
+  if (!fraction.empty()) {
+    percent += '.';
+    percent += fraction;
+  }
+  return percent;
+}
+
+std::string VendingCommissionText(const ro::vfs::ItemWords& words, const VendingTax& tax) {
+  if (tax.permyriad <= 0) {
+    return std::string(ro::vfs::TradeText(words, TradeWord::kRecapCommissionNone));
+  }
+  const std::string percent = VendingTaxPercent(tax.permyriad);
+  if (tax.from_zeny <= 0) {
+    return ro::vfs::TradeTextWith(words, TradeWord::kRecapCommissionAlways, percent);
+  }
+  return ro::vfs::TradeTextWith(words, TradeWord::kRecapCommissionFrom, percent,
+                                ro::ui::GroupThousands(tax.from_zeny));
 }
 
 std::vector<VendingChatLine> SaleListRecap(const ro::vfs::ItemWords& words,
-                                           std::span<const TradeRecapItem> items,
-                                           std::int64_t zeny) {
+                                           std::span<const TradeRecapItem> items, std::int64_t zeny,
+                                           const VendingTax& tax) {
   std::vector<VendingChatLine> lines;
   Push(lines, std::string(ro::vfs::TradeText(words, TradeWord::kRecapSaleTitle)), kRecapFrameColor);
   for (const TradeRecapItem& item : items) {
@@ -65,8 +76,8 @@ std::vector<VendingChatLine> SaleListRecap(const ro::vfs::ItemWords& words,
          ro::vfs::TradeTextWith(words, TradeWord::kRecapSaleLine, item.name,
                                 ro::ui::GroupThousands(item.unit_price_zeny)),
          kRecapItemColor);
-    PushCommission(lines, words, item.unit_price_zeny);
   }
+  Push(lines, VendingCommissionText(words, tax), kRecapItemColor);
   PushClosing(lines, words, zeny);
   return lines;
 }
@@ -82,7 +93,6 @@ std::vector<VendingChatLine> BuyListRecap(const ro::vfs::ItemWords& words,
                                 ro::ui::GroupThousands(item.unit_price_zeny),
                                 ro::ui::GroupThousands(item.amount)),
          kRecapItemColor);
-    PushCommission(lines, words, item.unit_price_zeny);
   }
   PushClosing(lines, words, zeny);
   return lines;

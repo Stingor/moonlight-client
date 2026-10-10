@@ -21,12 +21,15 @@ namespace ro::net {
 // sans casser ce client. Une longueur qui ne tombe pas sur un nombre entier de
 // paires, ou qui contredit la trame, rend la trame indécodable : rien n'en est
 // retenu. Une valeur hors de son domaine (un rayon nul, un niveau nul, un délai
-// négatif) est ignorée, et le défaut ou la valeur précédente reste.
+// ou un seuil négatif, une taxe hors de 0 à 10 000 dix-millièmes) est ignorée,
+// et le défaut ou la valeur précédente reste.
 enum class ServerRuleKey : std::uint16_t {
   kViewCells = 1,
   kHomunculusMaxLevel = 2,
   kHomunculusSMaxLevel = 3,
   kHomunculusTeleportHoldMs = 4,
+  kVendingTaxPermyriad = 5,
+  kVendingTaxMinZeny = 6,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

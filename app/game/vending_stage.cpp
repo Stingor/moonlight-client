@@ -11,6 +11,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/vending.h"
+#include "ro/sim/session_settings.h"
 #include "ro/sim/world.h"
 #include "ro/ui/inventory_window.h"
 
@@ -253,7 +254,10 @@ void VendingStage::SayOwnNews(VendingWindows& windows, const TradeContext& conte
                        .unit_price_zeny = line.price_zeny,
                        .amount = line.item.amount});
     }
-    for (VendingChatLine& line : SaleListRecap(context.words, items, ZenyOf(context.world))) {
+    const ro::sim::SessionSettings& rules = context.world.session();
+    const VendingTax tax{.permyriad = rules.vending_tax_permyriad,
+                         .from_zeny = rules.vending_tax_min_zeny};
+    for (VendingChatLine& line : SaleListRecap(context.words, items, ZenyOf(context.world), tax)) {
       Say(context, std::move(line.text), line.color);
     }
   }

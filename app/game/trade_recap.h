@@ -5,13 +5,18 @@
 //
 //   ======================  SALE LIST  ======================   jaune pâle
 //       <nom composé>  :  <prix>  Zeny                         jaune
-//   Commission : 1 EA = <commission> Zeny                       jaune
-//   (… une paire par objet, dans l'ordre de la liste …)
+//   (… une ligne par objet, dans l'ordre de la liste …)
+//   Commission : <la règle du serveur>                         jaune
 //                                             Current Zeny : <zeny> Z   jaune moyen
 //   ============================ ============================  jaune pâle
 //
 // L'échoppe d'achat écrit la même chose sous « BUY LIST », chaque objet par
-// « <nom> : <prix>  Zeny => <quantité> ea. », sans raffinement ni carte.
+// « <nom> : <prix>  Zeny => <quantité> ea. », sans raffinement ni carte, et
+// SANS COMMISSION : le serveur ne taxe pas l'échoppe d'achat.
+//
+// LA COMMISSION DIT LA RÈGLE DU SERVEUR, une fois pour toute l'échoppe : sa
+// taxe porte sur le total d'une demande d'achat, pas sur un exemplaire, et ne
+// se calcule donc pas objet par objet.
 //
 // ⚠ PURES : elles ne lisent que ce qu'on leur donne. La liste est celle que le
 // serveur a ACCEPTÉE, pas la saisie.
@@ -34,12 +39,22 @@ inline constexpr std::uint32_t kRecapFrameColor = 0xFFFF96;
 inline constexpr std::uint32_t kRecapItemColor = 0xFFFF5A;
 inline constexpr std::uint32_t kRecapZenyColor = 0xFFFF78;
 
-// La commission ANNONCÉE pour un exemplaire : cinq pour cent au-delà de dix
-// millions de zeny l'unité, rien en deçà, tronquée au zeny.
-//
-// ⚠ C'EST LA RÈGLE QU'AFFICHE LE CLIENT, PAS CELLE DU SERVEUR : Moonlight taxe
-// cinq pour cent d'un ACHAT dont le total atteint cent millions.
-[[nodiscard]] std::int64_t AnnouncedCommission(std::int64_t unit_price_zeny);
+// LA TAXE DES ÉCHOPPES DE VENTE, telle que le serveur la retient : tant de
+// dix-millièmes du total d'une demande d'achat, dès que ce total atteint
+// `from_zeny`. Voir `sim::SessionSettings`.
+struct VendingTax {
+  int permyriad = 0;
+  std::int64_t from_zeny = 0;
+};
+
+// Le taux, en pour cent, lisible : « 5 », « 0.5 », « 1.25 », sans zéro de
+// queue.
+[[nodiscard]] std::string VendingTaxPercent(int permyriad);
+
+// La ligne de commission : « aucune » pour une taxe nulle, sinon le taux, et le
+// seuil d'un achat s'il en a un.
+[[nodiscard]] std::string VendingCommissionText(const ro::vfs::ItemWords& words,
+                                                const VendingTax& tax);
 
 // Un objet du récapitulatif : son nom déjà composé, son prix unitaire, et la
 // quantité (lue par la seule échoppe d'achat).
@@ -53,7 +68,7 @@ struct TradeRecapItem {
 // su imprimer reste vide, et ne s'écrit pas.
 [[nodiscard]] std::vector<VendingChatLine> SaleListRecap(const ro::vfs::ItemWords& words,
                                                          std::span<const TradeRecapItem> items,
-                                                         std::int64_t zeny);
+                                                         std::int64_t zeny, const VendingTax& tax);
 [[nodiscard]] std::vector<VendingChatLine> BuyListRecap(const ro::vfs::ItemWords& words,
                                                         std::span<const TradeRecapItem> items,
                                                         std::int64_t zeny);

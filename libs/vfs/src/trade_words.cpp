@@ -255,7 +255,9 @@ void FillTradeWords(TradeWords& words) {
       Edged(kRecapBannerLead, core::Tr("LISTE D'ACHAT"), kRecapBannerTrail),
       Edged(kRecapItemIndent, core::Tr("%s  :  %s  Zeny"), ""),
       core::Tr("%s : %s  Zeny => %s u."),
-      core::Tr("Commission : 1 u. = %s Zeny"),
+      core::Tr("Commission : aucune"),
+      core::Tr("Commission : %s %% sur tout achat"),
+      core::Tr("Commission : %s %% à partir de %s Zeny par achat"),
       Edged(kRecapZenyIndent, core::Tr("Zeny actuels : %s Z"), ""),
   });
   // ⚠ UN TEXTE OUBLIÉ NE SE VERRAIT PAS : tous les mots suivants seraient

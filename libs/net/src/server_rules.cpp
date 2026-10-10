@@ -48,6 +48,16 @@ void Keep(sim::SessionSettings& session, const proto::ZcMoonlightServerRulesEntr
         session.homunculus_teleport_hold_ms = static_cast<std::uint32_t>(rule.value);
       }
       return;
+    case ServerRuleKey::kVendingTaxPermyriad:
+      if (rule.value >= 0 && rule.value <= sim::SessionSettings::kMaxVendingTaxPermyriad) {
+        session.vending_tax_permyriad = rule.value;
+      }
+      return;
+    case ServerRuleKey::kVendingTaxMinZeny:
+      if (rule.value >= 0) {
+        session.vending_tax_min_zeny = rule.value;
+      }
+      return;
   }
   // Une clé que ce client ne connaît pas : le serveur en a ajouté une.
 }

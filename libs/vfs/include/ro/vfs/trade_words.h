@@ -120,12 +120,14 @@ enum class TradeWord : std::uint8_t {
   kSearchPreviousPage,
   kSearchNextPage,
   // ── Récapitulatifs, à l'ouverture de mon échoppe ────────────────────────
-  kRecapSaleTitle,    // bandeau compris
-  kRecapBuyTitle,     // bandeau compris
-  kRecapSaleLine,     // %s puis %s, retrait compris
-  kRecapBuyLine,      // %s, %s, %s
-  kRecapCommission,   // un %s
-  kRecapCurrentZeny,  // un %s, retrait compris
+  kRecapSaleTitle,         // bandeau compris
+  kRecapBuyTitle,          // bandeau compris
+  kRecapSaleLine,          // %s puis %s, retrait compris
+  kRecapBuyLine,           // %s, %s, %s
+  kRecapCommissionNone,    // la taxe des échoppes de vente est nulle
+  kRecapCommissionAlways,  // un %s : le taux, en pour cent
+  kRecapCommissionFrom,    // %s puis %s : le taux, puis le seuil d'un achat
+  kRecapCurrentZeny,       // un %s, retrait compris
   kCount,
 };
 
