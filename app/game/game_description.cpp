@@ -359,9 +359,14 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   // LES COMMERCES, qui montrent leur aperçu comme le sac : un objet du sac
   // par sa case, un objet de la boutique par son identifiant.
   if (hovered_item_ == 0) {
-    // Une pièce jointe de courrier survolée vaut une offre de commerce.
-    const TradeItemFocus traded =
+    // Une pièce jointe de courrier survolée vaut une offre de commerce, et une
+    // carte de la boutique de vote aussi.
+    TradeItemFocus traded =
         pieces_.trade.hovered().item_id != 0 ? pieces_.trade.hovered() : pieces_.mail.hovered();
+    if (const std::optional<ro::vfs::ItemLink>& voted = pieces_.cash_shop.hovered();
+        traded.item_id == 0 && voted.has_value()) {
+      traded = TradeItemFocus{.item_id = voted->item_id, .link = voted};
+    }
     hovered_item_ = traded.item_id;
     hovered_slot_ = traded.bag_slot;
     hovered_holder_ = ro::ui::ItemHolder::kInventory;

@@ -12,6 +12,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/trade_widgets.h"
 #include "ro/ui/wheel_gate.h"
 
 namespace ro::ui {
@@ -77,24 +78,6 @@ enum SortKey : int { kSortName = 0, kSortId = 1, kSortPrice = 2 };
 constexpr std::array<const char*, 3> kSortLabels = {core::TrText("Nom"), core::TrText("ID"),
                                                     core::TrText("Coût")};
 
-// L'ORDRE DES EMPLACEMENTS DANS LE FILTRE : les coiffes, le corps, les
-// accessoires, les armes, puis les costumes — qui passent pourtant AVANT à la
-// lecture d'un masque, ce catalogue en étant fait.
-enum SlotKey : int {
-  kSlotHeadTop = 0,
-  kSlotHeadMid = 1,
-  kSlotHeadLow = 2,
-  kSlotArmor = 3,
-  kSlotGarment = 4,
-  kSlotShoes = 5,
-  kSlotAccessory = 6,
-  kSlotShield = 7,
-  kSlotWeapon = 8,
-  kSlotAmmo = 9,
-  kSlotCostumeHead = 10,
-  kSlotCostumeGarment = 13,
-};
-
 // Le libellé d'un onglet du serveur, traduit.
 [[nodiscard]] const char* TabLabel(std::size_t tab) {
   switch (tab) {
@@ -118,23 +101,6 @@ enum SlotKey : int {
       return core::Tr("Soldes");
   }
 }
-
-// Les masques d'équipement du serveur.
-constexpr std::uint32_t kEquipHeadLow = 0x0001;
-constexpr std::uint32_t kEquipHandRight = 0x0002;
-constexpr std::uint32_t kEquipGarment = 0x0004;
-constexpr std::uint32_t kEquipAccessoryLeft = 0x0008;
-constexpr std::uint32_t kEquipArmor = 0x0010;
-constexpr std::uint32_t kEquipHandLeft = 0x0020;
-constexpr std::uint32_t kEquipShoes = 0x0040;
-constexpr std::uint32_t kEquipAccessoryRight = 0x0080;
-constexpr std::uint32_t kEquipHeadTop = 0x0100;
-constexpr std::uint32_t kEquipHeadMid = 0x0200;
-constexpr std::uint32_t kEquipCostumeHeadTop = 0x0400;
-constexpr std::uint32_t kEquipCostumeHeadMid = 0x0800;
-constexpr std::uint32_t kEquipCostumeHeadLow = 0x1000;
-constexpr std::uint32_t kEquipCostumeGarment = 0x2000;
-constexpr std::uint32_t kEquipAmmo = 0x8000;
 
 // ── CE QUE LA FENÊTRE MONTRE D'UNE CARTE ────────────────────────────────────
 
@@ -400,6 +366,36 @@ void DrawCardName(const CashShopCard& card, const CardGeometry& geometry, const 
       look.card_band_text, name.c_str());
 }
 
+// LES GESTES D'UNE CARTE, ceux de tout item montré dans un commerce : le
+// survol demande l'aperçu de sa description, le clic droit la description,
+// Maj + clic gauche repose son lien dans la saisie. Rien ne se glisse : l'item
+// n'est à personne tant qu'il n'est pas acheté.
+//
+// ⚠ UN BOUTON OU LE PANTIN SURVOLÉ GARDE SON INFOBULLE, et l'aperçu se tait :
+// deux bulles se recouvriraient. Maj + clic sur un bouton reste au bouton.
+//
+// 🔴 LES CLICS SE LISENT AU RELÂCHEMENT : partie de l'enfoncement, la
+// description naîtrait derrière la boutique.
+void NoteCardGestures(const CashShopCard& card, bool card_hovered, bool button_hovered,
+                      bool doll_shown, CashShopWindowAction& action) {
+  if (!card_hovered) {
+    return;
+  }
+  if (!button_hovered && !doll_shown) {
+    action.item.hovered_id = card.item_id;
+    action.item.hovered_kind = ChatLinkKind::kItem;
+    action.item.hovering = true;
+  }
+  if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+    action.item.gesture = ChatLinkGesture::kDescribe;
+    action.item.item_id = card.item_id;
+  } else if (!button_hovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
+             ImGui::GetIO().KeyShift) {
+    action.item.gesture = ChatLinkGesture::kRepost;
+    action.item.item_id = card.item_id;
+  }
+}
+
 void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashShopCard& card,
               const CardGeometry& geometry, const SkinArt& art, CashShopWindowAction& action,
               bool& preview_now) {
@@ -428,10 +424,19 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
   } else {
     ImGui::Dummy(ImVec2(image_width, image_height));
   }
-  if (card.wearable_preview && ImGui::IsItemHovered()) {
+  const bool doll_shown = card.wearable_preview && ImGui::IsItemHovered();
+  if (doll_shown) {
     DrawDoll(state, card);
     preview_now = true;
   }
+
+  // ⚠ LE SOLDE QUI COMPTE EST CELUI QUE L'ACHAT DÉPENSERA : les deux monnaies
+  // avec la case, les points de vote seuls sans elle. Et quand cocher la case
+  // suffirait, l'infobulle le dit.
+  const long long spendable =
+      CashShopSpendable(view.vote_points, view.event_points, state.use_event_points);
+  const long long both = CashShopSpendable(view.vote_points, view.event_points, true);
+  const bool affordable = static_cast<long long>(card.price) <= spendable;
 
   // ── LA COLONNE DE DROITE : le prix, puis deux boutons pleine largeur ──────
   const float frame_height = ImGui::GetFrameHeight();
@@ -446,15 +451,9 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
   ImGui::SetCursorPos(
       ImVec2(column_x + (column_width > price_width ? (column_width - price_width) * 0.5F : 0.0F),
              column_y));
-  ImGui::TextColored(kBlackText, "%s", price.data());
+  // Un prix hors de portée s'écrit en rouge, comme dans tout commerce.
+  ImGui::TextColored(affordable ? kTradeBlackText : kTradeUnaffordableText, "%s", price.data());
 
-  // ⚠ LE SOLDE QUI COMPTE EST CELUI QUE L'ACHAT DÉPENSERA : les deux monnaies
-  // avec la case, les points de vote seuls sans elle. Et quand cocher la case
-  // suffirait, l'infobulle le dit.
-  const long long spendable =
-      CashShopSpendable(view.vote_points, view.event_points, state.use_event_points);
-  const long long both = CashShopSpendable(view.vote_points, view.event_points, true);
-  const bool affordable = static_cast<long long>(card.price) <= spendable;
   const bool event_helps = !state.use_event_points && static_cast<long long>(card.price) <= both;
   const char* why =
       event_helps ? core::Tr("Solde Vote insuffisant - cochez \"Utiliser Event\" pour cumuler")
@@ -466,7 +465,9 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
   if (SkinButton(core::Tr("Panier"), art, ImVec2(column_width, frame_height))) {
     AddToCashShopCart(state, card.item_id, state.tab, card.price);
   }
+  bool button_hovered = false;
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    button_hovered = true;
     SkinTooltipFormat("%s",
                       affordable ? core::Tr("Ajouter au panier (achat groupé via Acheter)") : why);
   }
@@ -480,6 +481,7 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
     action.close_after_purchase = true;
   }
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    button_hovered = true;
     SkinTooltipFormat(
         "%s", affordable ? core::Tr("Achat immédiat d'1 unité, puis fermeture du shop") : why);
   }
@@ -489,12 +491,7 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
   ImGui::EndChild();
   ImGui::PopStyleVar();
   ImGui::PopStyleColor();
-  // LE CLIC DROIT OUVRE LA DESCRIPTION, au relâchement : partie de
-  // l'enfoncement, elle naîtrait derrière la boutique.
-  if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-    action.item.gesture = ChatLinkGesture::kDescribe;
-    action.item.item_id = card.item_id;
-  }
+  NoteCardGestures(card, ImGui::IsItemHovered(), button_hovered, doll_shown, action);
   ImGui::PopID();
 }
 
@@ -645,47 +642,6 @@ void SnapToCards(ImGuiSizeCallbackData* data) {
 
 bool CashShopTabShown(std::size_t tab) noexcept {
   return tab < kCashShopTabCount && kTabShown[tab];
-}
-
-CashShopSlot CashShopSlotOf(std::uint32_t equip_location) {
-  if ((equip_location & kEquipCostumeGarment) != 0) {
-    return {kSlotCostumeGarment, core::Tr("Costume garment")};
-  }
-  if ((equip_location & (kEquipCostumeHeadTop | kEquipCostumeHeadMid | kEquipCostumeHeadLow)) !=
-      0) {
-    return {kSlotCostumeHead, core::Tr("Costume head")};
-  }
-  if ((equip_location & kEquipHeadTop) != 0) {
-    return {kSlotHeadTop, core::Tr("Head top")};
-  }
-  if ((equip_location & kEquipHeadMid) != 0) {
-    return {kSlotHeadMid, core::Tr("Head mid")};
-  }
-  if ((equip_location & kEquipHeadLow) != 0) {
-    return {kSlotHeadLow, core::Tr("Head bot")};
-  }
-  if ((equip_location & kEquipArmor) != 0) {
-    return {kSlotArmor, core::Tr("Armor")};
-  }
-  if ((equip_location & kEquipGarment) != 0) {
-    return {kSlotGarment, core::Tr("Garment")};
-  }
-  if ((equip_location & kEquipShoes) != 0) {
-    return {kSlotShoes, core::Tr("Shoes")};
-  }
-  if ((equip_location & (kEquipAccessoryLeft | kEquipAccessoryRight)) != 0) {
-    return {kSlotAccessory, core::Tr("Accessory")};
-  }
-  if ((equip_location & kEquipHandLeft) != 0) {
-    return {kSlotShield, core::Tr("Shield")};
-  }
-  if ((equip_location & kEquipHandRight) != 0) {
-    return {kSlotWeapon, core::Tr("Weapon")};
-  }
-  if ((equip_location & kEquipAmmo) != 0) {
-    return {kSlotAmmo, core::Tr("Ammunition")};
-  }
-  return {kCashShopSlotOther, core::Tr("Autre")};
 }
 
 void AddToCashShopCart(CashShopWindowState& state, std::uint32_t item_id, std::size_t tab,

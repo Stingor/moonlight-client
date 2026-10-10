@@ -659,17 +659,10 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   pieces_.cash_shop.Advance(windows_.cash_shop.state, std::exchange(windows_.cash_shop.answer, {}),
                             link_, world_, pieces_.item_words, styles_, now_ms);
   windows_.cash_shop.view = pieces_.cash_shop.view();
-  // LA DESCRIPTION D'UNE CARTE, comme celle d'un lien : l'item n'est à
-  // personne, et ce qu'on en sait voyage avec lui.
-  if (const std::optional<ro::vfs::ItemLink> described = pieces_.cash_shop.TakeDescribed();
-      described.has_value() && item_description_.has_value()) {
-    item_description_->NoteLinked(*described);
-    windows_.description.item_id = described->item_id;
-    windows_.description.from_slot = 0;
-    windows_.description.from_holder = ro::ui::ItemHolder::kChatLink;
-    windows_.description.open = true;
-    windows_.description.place_at_mouse = true;
-    windows_.description.raise = true;
+  // MAJ + CLIC SUR UNE CARTE : son lien dans la saisie du chat.
+  if (const std::optional<ro::vfs::ItemLink> reposted = pieces_.cash_shop.TakeReposted();
+      reposted.has_value()) {
+    PostChatLink(*reposted);
   }
   // LES COMMERCES : ce que leurs fenêtres ont rendu, et les vues qu'elles
   // dessineront. Un objet du sac se décrit par sa case, qui dit raffinement et
@@ -708,6 +701,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     AskBugReport(windows_.bug_report, std::move(*report));
   }
   std::optional<TradeItemFocus> described = pieces_.trade.TakeDescribed();
+  // UNE CARTE DE LA BOUTIQUE DE VOTE se décrit comme une offre de commerce :
+  // l'item n'est à personne, et son lien porte ce qu'on en sait.
+  if (std::optional<ro::vfs::ItemLink> voted = pieces_.cash_shop.TakeDescribed();
+      voted.has_value()) {
+    described = TradeItemFocus{.item_id = voted->item_id, .link = std::move(voted)};
+  }
   if (std::optional<TradeItemFocus> mailed = pieces_.mail.TakeDescribed(); mailed.has_value()) {
     described = std::move(mailed);
   }

@@ -190,7 +190,10 @@ struct CashShopWindowAction {
   std::vector<CashShopCartLine> purchase;
   std::uint32_t event_points_spent = 0;
   bool close_after_purchase = false;
-  // Le clic droit sur une carte : sa description.
+  // LES GESTES D'UNE CARTE, ceux d'un item de commerce : le survol
+  // (`hovered_id`) pour l'aperçu de sa description, le clic droit
+  // (`kDescribe`) pour la description, Maj + clic (`kRepost`) pour son lien
+  // dans la saisie.
   ChatLinkAsk item;
   // 🔴 LES ITEMS DONT UNE CARTE A ÉTÉ DESSINÉE, pour leurs images : un onglet
   // en compte des milliers, et `app` ne charge que celles qu'on a vues. ⚠ UNE

@@ -60,6 +60,7 @@ add_library(ro_ui STATIC
     src/cart_choice_window.cpp
     src/repair_window.cpp
     src/spell_list_window.cpp
+    src/cash_shop_slots.cpp
     src/cash_shop_window.cpp
     src/npc_illustration_window.cpp
     src/character_doll.cpp

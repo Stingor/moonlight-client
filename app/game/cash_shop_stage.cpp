@@ -304,9 +304,20 @@ void CashShopStage::Advance(ro::ui::CashShopWindowState& state,
                             const ro::sim::World& world, const ro::vfs::ItemWords& words,
                             ActorStyles& dressing, std::uint32_t now_ms) {
   NoteDrawn(answer.drawn);
-  // ── LE CLIC DROIT D'UNE CARTE : sa description ──────────────────────────
-  if (answer.item.gesture == ro::ui::ChatLinkGesture::kDescribe && answer.item.item_id != 0) {
-    described_ = DescribedLinkOf(answer.item.item_id);
+  // ── LES GESTES D'UNE CARTE : le survol, la description, le lien ─────────
+  //
+  // ⚠ L'ITEM N'EST À PERSONNE : chacun se dit par le lien que porte sa
+  // description, apparence et emplacement compris.
+  hovered_.reset();
+  if (answer.item.hovered_id != 0) {
+    hovered_ = DescribedLinkOf(answer.item.hovered_id);
+  }
+  if (answer.item.item_id != 0) {
+    if (answer.item.gesture == ro::ui::ChatLinkGesture::kDescribe) {
+      described_ = DescribedLinkOf(answer.item.item_id);
+    } else if (answer.item.gesture == ro::ui::ChatLinkGesture::kRepost) {
+      reposted_ = DescribedLinkOf(answer.item.item_id);
+    }
   }
 
   // ── L'ACHAT ── ⚠ AVANT LA FERMETURE : l'ordre du fil garantit que le

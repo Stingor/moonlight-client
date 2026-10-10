@@ -96,6 +96,17 @@ class CashShopStage {
     return std::exchange(described_, std::nullopt);
   }
 
+  // LA CARTE SURVOLÉE, pour l'aperçu de sa description : le même lien que sa
+  // description. Vide quand la souris n'est sur aucune carte.
+  [[nodiscard]] const std::optional<ro::vfs::ItemLink>& hovered() const noexcept {
+    return hovered_;
+  }
+
+  // LA CARTE DONT MAJ + CLIC DEMANDE LE LIEN DANS LA SAISIE, une fois.
+  [[nodiscard]] std::optional<ro::vfs::ItemLink> TakeReposted() noexcept {
+    return std::exchange(reposted_, std::nullopt);
+  }
+
   // La vue que la fenêtre dessine, nulle quand la boutique est fermée.
   [[nodiscard]] const ro::ui::CashShopView* view() const noexcept {
     return shop_.open() ? &view_ : nullptr;
@@ -119,6 +130,8 @@ class CashShopStage {
   // L'item à montrer dès que le serveur aura ouvert, zéro pour aucun.
   std::uint32_t pending_item_ = 0;
   std::optional<ro::vfs::ItemLink> described_;
+  std::optional<ro::vfs::ItemLink> hovered_;
+  std::optional<ro::vfs::ItemLink> reposted_;
   // Le rang du dernier achat dont on a tiré les conséquences.
   std::uint32_t purchase_handled_ = 0;
   std::vector<ro::ui::VoteShopOffer> offers_;
