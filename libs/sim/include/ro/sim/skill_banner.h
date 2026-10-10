@@ -42,6 +42,12 @@ inline constexpr std::array<std::uint16_t, 13> kSkillsWithoutPlayerBanner = {
 // CELLES QUE PERSONNE N'ANNONCE, joueur comme monstre.
 inline constexpr std::array<std::uint16_t, 3> kSkillsWithoutAnyBanner = {318, 326, 492};
 
+// CELLES QU'UN MONSTRE OU UN PNJ TAIT, ici et non chez le client d'origine :
+// l'invocation de suivants (196) et leur rappel (209), qu'une Bloody Branch
+// lâche en nombre, couvriraient l'écran de bulles « … !! ». Un joueur qui les
+// lance garde sa bannière.
+inline constexpr std::array<std::uint16_t, 2> kSkillsWithoutCreatureBanner = {196, 209};
+
 // ⚠ LA 336 MONTRE UN NOM PORTÉ PAR L'ACTEUR, pas celui de la compétence. Nous
 // la traitons comme les autres faute de savoir ce que ce nom est — le noter
 // vaut mieux que l'inventer.
@@ -65,7 +71,8 @@ inline constexpr std::array<std::uint16_t, 2> kSkillsBannerNamingTarget = {334, 
     return false;
   }
   if (monster_or_npc) {
-    return true;
+    return std::ranges::find(kSkillsWithoutCreatureBanner, skill_id) ==
+           kSkillsWithoutCreatureBanner.end();
   }
   return std::ranges::find(kSkillsWithoutPlayerBanner, skill_id) ==
          kSkillsWithoutPlayerBanner.end();
