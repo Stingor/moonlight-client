@@ -4,12 +4,14 @@
 #include <string>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/window_bounds.h"
 
 #include "minimap_parts.h"
 
@@ -82,14 +84,25 @@ void KeepSquare(ImGuiSizeCallbackData* data) {
   data->DesiredSize = FitMinimapSquare(data->DesiredSize, *fit);
 }
 
-// LE COIN OÙ LA FENÊTRE SE TIENT : celui que le joueur a glissé, ou, tant qu'il
-// ne l'a pas fait, le coin haut-droit de l'écran du moment.
+// LE COIN OÙ LA FENÊTRE SE MONTRE : celui que le joueur a glissé, ou, tant qu'il
+// ne l'a pas fait, le coin haut-droit de l'écran du moment — ramené, dans les
+// deux cas, pour que la fenêtre de cette taille tienne entière dans l'écran.
 [[nodiscard]] ImVec2 CornerOf(const MinimapSettings& settings, ImVec2 size) {
+  ImVec2 wanted(static_cast<float>(settings.pos_x), static_cast<float>(settings.pos_y));
   if (settings.pos_x == kMinimapUnplaced && settings.pos_y == kMinimapUnplaced) {
     const float margin = kMinimapScreenMargin * ImGui::GetStyle().FontScaleMain;
-    return {ImGui::GetIO().DisplaySize.x - margin - size.x, margin};
+    wanted = ImVec2(ImGui::GetIO().DisplaySize.x - margin - size.x, margin);
   }
-  return {static_cast<float>(settings.pos_x), static_cast<float>(settings.pos_y)};
+  return ClampWindowPosToScreen(wanted, size);
+}
+
+// LE JOUEUR TIENT LA FENÊTRE : il la glisse, tire une poignée, ou presse un de
+// ses boutons. Seul ce geste écrit la position et le côté dans les réglages ;
+// hors de lui, la fenêtre reçoit à chaque image la place qu'ils donnent sur
+// l'écran du moment.
+[[nodiscard]] bool HeldByPlayer(const ImGuiWindow* window) {
+  const ImGuiContext& context = *ImGui::GetCurrentContext();
+  return window != nullptr && context.ActiveId != 0 && context.ActiveIdWindow == window;
 }
 
 // Maj au-dessus de la carte l'engage, et un geste en cours la retient.
@@ -338,14 +351,19 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
   if (!interactive) {
     flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoResize;
   }
-  const std::array<int, 2> asked_pos{settings.pos_x, settings.pos_y};
-  const bool pos_changed_elsewhere = state.known_pos != asked_pos;
-  state.known_pos = asked_pos;
-  ImGui::SetNextWindowPos(
-      corner, interactive && !pos_changed_elsewhere ? ImGuiCond_Once : ImGuiCond_Always);
-  // La taille n'est imposée qu'une fois ; ensuite la poignée commande, et la
-  // contrainte refait tenir la fenêtre quand une ligne de texte apparaît.
-  ImGui::SetNextWindowSize(window_size, ImGuiCond_Once);
+  // ⚠ UN NOM STABLE : il porte l'identité de la fenêtre. Le faire varier avec
+  // la carte lui ferait perdre sa place à chaque déplacement.
+  const std::string name = std::string("###") + kMinimapWindowId;
+  // 🔴 LA PLACE ET LA TAILLE S'IMPOSENT À CHAQUE IMAGE, sauf pendant le geste du
+  // joueur. Imposées une seule fois, elles resteraient celles du premier écran
+  // vu — inconnu, ou plus petit que celui qui suit —, et la fenêtre ne suivrait
+  // plus ni son coin ni l'écran. Un réglage changé ailleurs — réinitialisé,
+  // relu d'un fichier — s'impose de la même façon.
+  const bool held = HeldByPlayer(ImGui::FindWindowByName(name.c_str()));
+  if (!held) {
+    ImGui::SetNextWindowPos(corner, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
+  }
   ImGui::SetNextWindowSizeConstraints(
       ImVec2(kMinimapLeastSide + fit.pad_x, kMinimapLeastSide + fit.pad_y + fit.extra_height),
       ImVec2(fit.most_side + fit.pad_x, fit.most_side + fit.pad_y + fit.extra_height), KeepSquare,
@@ -355,29 +373,29 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
   ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, kGripHoveredColor);
   ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, kGripActiveColor);
 
-  // ⚠ UN NOM STABLE : il porte l'identité de la fenêtre. Le faire varier avec
-  // la carte lui ferait perdre sa place à chaque déplacement.
-  const std::string name = std::string("###") + kMinimapWindowId;
   if (ImGui::Begin(name.c_str(), nullptr, flags)) {
-    // ⚠ COMPARÉ AU COIN OÙ ELLE SE TIENT, pas au réglage : une minimap jamais
-    // glissée ne s'écrit pas dans le fichier tant qu'elle reste à son coin.
-    if (interactive) {
+    // ⚠ COMPARÉ AU COIN OÙ ELLE SE MONTRE, pas au réglage : une minimap jamais
+    // glissée ne s'écrit pas dans le fichier tant qu'elle reste à son coin, et
+    // une place ramenée dans l'écran ne remplace pas celle du joueur.
+    if (held) {
       const ImVec2 at = ImGui::GetWindowPos();
       if (static_cast<int>(at.x) != static_cast<int>(corner.x) ||
           static_cast<int>(at.y) != static_cast<int>(corner.y)) {
         settings.pos_x = static_cast<int>(at.x);
         settings.pos_y = static_cast<int>(at.y);
-        state.known_pos = std::array<int, 2>{settings.pos_x, settings.pos_y};
         state.save_pending = true;
       }
     }
     // 🔴 LE CÔTÉ VIENT DE LA FENÊTRE, pas du réglage : la poignée commande, et
     // la relire ici rend le redimensionnement persistant sans second chemin.
+    // ⚠ ÉCRIT SOUS LE SEUL GESTE, et comparé au côté montré : un côté rabattu
+    // par un petit écran ne remplace pas celui que le joueur a choisi.
+    const float shown_side = side;
     const float available = ImGui::GetContentRegionAvail().x;
     if (available >= kMinimapLeastSide && available <= fit.most_side) {
       side = available;
     }
-    if (static_cast<int>(side) != settings.side_px) {
+    if (held && static_cast<int>(side) != static_cast<int>(shown_side)) {
       settings.side_px = static_cast<int>(side);
       state.save_pending = true;
     }

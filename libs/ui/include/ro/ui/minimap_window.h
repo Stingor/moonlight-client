@@ -33,6 +33,15 @@ namespace ro::ui {
 // `kMinimapScreenShare` de l'écran — une fenêtre plus grande que l'écran met sa
 // poignée hors d'atteinte, et l'état se persisterait.
 //
+// ── LE CHOIX DU JOUEUR, ET CE QUE L'ÉCRAN EN MONTRE ─────────────────────────
+// La position et le côté des réglages sont ce que le joueur a CHOISI ; la
+// fenêtre en montre, à chaque image, la version bornée à l'écran du moment :
+// entièrement dedans, côté rabattu à la part d'écran permise. Le bornage
+// n'écrit jamais dans les réglages — seul le geste du joueur, qui tient la
+// fenêtre par un glisser ou une poignée, les change. Un écran inconnu ou
+// minuscule à la première image, puis un redimensionnement, ne laissent donc
+// ni une fenêtre hors de l'écran ni un choix rogné.
+//
 // ── TRAVERSER LES CLICS ─────────────────────────────────────────────────────
 // Un mode où la souris passe au travers, pour qu'on clique le monde derrière.
 // Maintenir Maj au-dessus la réveille le temps du geste ; un rappel le dit au
@@ -82,11 +91,13 @@ struct MinimapSettings {
   // ⚠ `kMinimapUnplaced` TANT QUE LE JOUEUR NE L'A PAS GLISSÉE : elle se tient alors
   // au coin haut-droit, calculé à chaque image contre l'écran du moment — le coin
   // haut-gauche est celui des icônes de menu. Un coin écrit dans le fichier
-  // serait celui d'UNE taille d'écran.
+  // serait celui d'UNE taille d'écran. Une place qui ne tient plus dans l'écran
+  // s'y montre ramenée, sans être réécrite.
   int pos_x = kMinimapUnplaced;
   int pos_y = kMinimapUnplaced;
   // Le côté de la ZONE DE CARTE, en pixels — pas la taille de la fenêtre.
-  // Réglé à la poignée, jamais par un curseur.
+  // Réglé à la poignée, jamais par un curseur. Un écran trop petit le montre
+  // rabattu, sans le réécrire.
   int side_px = 220;
   // La souris traverse la fenêtre ; elle cesse alors aussi d'être déplaçable et
   // redimensionnable — trois faces du même choix.
@@ -264,11 +275,6 @@ struct MinimapWindowState {
   // Un réglage a bougé ; l'annonce attend la fin du geste.
   bool save_pending = false;
   WheelGateState wheel;
-  // LA POSITION DU RÉGLAGE QUE LA FENÊTRE CONNAÎT. Quand le réglage en change
-  // sans elle — une réinitialisation, un fichier relu —, la nouvelle place
-  // s'impose : sans quoi la fenêtre restait où elle était, et réécrivait aussitôt
-  // son ancienne place dans le réglage.
-  std::optional<std::array<int, 2>> known_pos;
 };
 
 struct MinimapMemoAdd {
