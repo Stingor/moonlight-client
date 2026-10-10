@@ -35,17 +35,12 @@ bool HitPopups::Alive(const Popup& popup, std::uint32_t now_ms, const HitPopupLo
 }
 
 void HitPopups::NoticeSupport(const ro::sim::World& world, const HitPopupLook& look) {
-  for (const auto& [id, actor] : world.actors()) {
-    if (!actor.support.has_value()) {
+  for (const ro::sim::RecordedSupport& taken : noticed_supports_.Take(world.supports())) {
+    if (world.Find(taken.target_id) == nullptr) {
       continue;
     }
-    const ro::sim::SupportHit& support = *actor.support;
-    const auto seen = noticed_support_.find(id);
-    if (seen != noticed_support_.end() && seen->second == support.started_ms) {
-      continue;
-    }
-    noticed_support_.insert_or_assign(id, support.started_ms);
-    SpawnSupport(id, support.started_ms, support.skill_id, support.amount, look);
+    const ro::sim::SupportHit& support = taken.support;
+    SpawnSupport(taken.target_id, support.started_ms, support.skill_id, support.amount, look);
   }
 }
 

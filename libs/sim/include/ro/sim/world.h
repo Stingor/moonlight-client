@@ -283,8 +283,7 @@ class World {
   // La portée d'attaque annoncée, en cases.
   void SetPlayerAttackRange(std::int64_t cells) { player_status_.attack_range = cells; }
 
-  // Le seuil de surcharge, en pour cent. Hors de `SetPlayerParameter` : le
-  // serveur l'envoie par un paquet à lui.
+  // Le seuil de surcharge, en pour cent, hors de `SetPlayerParameter` : à part.
   void SetOverweightPercent(std::int64_t percent) { player_status_.overweight_percent = percent; }
 
   // Note un coup sur qui le porte et sur qui le reçoit, tourne le premier vers
@@ -308,9 +307,10 @@ class World {
     return unseen_ground_skills_;
   }
 
-  // Note une compétence SANS DÉGÂTS sur qui la reçoit. Faux pour un acteur
-  // qu'on ne voit pas — le serveur annonce aussi celles qui le touchent.
+  // Note une compétence SANS DÉGÂTS sur qui la reçoit, et l'inscrit au journal
+  // `supports()`. Faux pour un acteur qu'on ne voit pas.
   bool RecordSupport(std::uint32_t target_id, const SupportHit& hit);
+  [[nodiscard]] const SupportLog& supports() const noexcept { return supports_; }
   // Le délai de combo, et l'instant ; ses sphères ÉLÉMENTAIRES (`spirit_charm_element`),
   // puis SPIRITUELLES — l'effet de sa classe, au nouveau nombre. Faux : inconnu.
   bool RecordComboDelay(std::uint32_t id, std::uint32_t delay_ms, std::uint32_t now_ms);
@@ -778,6 +778,7 @@ class World {
   std::uint32_t devotion_serial_ = 0;
   DamageMeter damage_meter_;
   StrikeLog strikes_;
+  SupportLog supports_;
   UnseenGroundSkillLog unseen_ground_skills_;
   std::uint32_t selected_id_ = 0;
   TargetDetail target_detail_;

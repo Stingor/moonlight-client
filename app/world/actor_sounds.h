@@ -315,9 +315,9 @@ class ActorSounds {
   std::array<float, 3> ambience_listener_{0.0F, 0.0F, 0.0F};
   // Les coups déjà entendus. Voir `ro::sim::StrikeLog`.
   ro::sim::StrikeCursor heard_strikes_;
-  // Le même témoin pour les compétences SANS DÉGÂTS : un acteur peut être
-  // soigné et frappé dans la même image.
-  std::unordered_map<std::uint32_t, std::uint32_t> heard_support_;
+  // Les compétences SANS DÉGÂTS déjà entendues, TOUTES : voir
+  // `ro::sim::SupportLog`.
+  ro::sim::SupportCursor heard_supports_;
   // L'instant de pose de chaque unité déjà entendue : une unité vit des
   // minutes, et son bruit d'arrivée ne se fait qu'une fois.
   std::unordered_map<std::uint32_t, std::uint32_t> placed_units_;

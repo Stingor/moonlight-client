@@ -238,10 +238,10 @@ struct EffectMapMemory {
   // interroge l'acteur pour savoir s'il porte encore l'effet 888 : ce qu'elle
   // empêche, c'est de resemer à CHAQUE VICTIME d'une même salve.
   std::unordered_map<std::uint32_t, std::uint32_t> hit_extras_sown;
-  // La compétence annoncée, repère du chemin Lua ; le coup est dans
+  // Les compétences sans dégâts lues par le chemin Lua ; le coup est dans
   // `lua_strikes_`. Ils sont à lui parce que ce chemin ne remplace aucun des
   // autres — le client consulte son Lua EN PLUS de ce que son switch a fait.
-  std::unordered_map<std::uint32_t, std::uint32_t> lua_used;
+  ro::sim::SupportCursor lua_supports;
   // LES ACTEURS DONT LA GARDE D'AUTO COUNTER EST ARMÉE, et l'instant où elle
   // l'a été. Le client tient ce drapeau sur l'acteur lui-même, que le
   // changement de carte détruit, celui du joueur compris bien qu'il garde son
@@ -261,9 +261,9 @@ struct EffectMapMemory {
   // Le même repère pour les compétences lancées sur une case : elles vivent à
   // part, et le même acteur peut frapper et poser dans la même image.
   std::unordered_map<std::uint32_t, std::uint32_t> ground_cast;
-  // Et pour les compétences SANS DÉGÂTS reçues : un acteur peut être soigné et
-  // frappé dans la même image.
-  std::unordered_map<std::uint32_t, std::uint32_t> supported;
+  // Les compétences SANS DÉGÂTS déjà jouées, TOUTES : le serveur en envoie
+  // souvent deux d'affilée sur la même cible — voir `ro::sim::SupportLog`.
+  ro::sim::SupportCursor supports;
   // Les UNITÉS au sol déjà vues : leur effet ne se joue qu'à la pose, et une
   // unité vit bien plus longtemps qu'un effet.
   std::unordered_map<std::uint32_t, std::uint32_t> placed;

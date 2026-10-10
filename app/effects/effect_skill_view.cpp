@@ -626,34 +626,40 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
         PlayGroundSkillPacket(stage, planner, &actor, id, use);
       }
     }
-    // Une compétence SANS DÉGÂTS : un soin, un renfort, un état posé. Le
-    // serveur l'annonce par son propre paquet, et c'est un AUTRE répartiteur du
-    // client qui en fait naître l'effet. Sans ce passage, toute la famille
-    // acolyte et prêtre reste muette à l'écran, quoi que la table dise d'elle.
-    if (actor.support.has_value()) {
-      const ro::sim::SupportHit& given = *actor.support;
-      const auto seen = per_map_.supported.find(id);
-      if (seen == per_map_.supported.end() || seen->second != given.started_ms) {
-        per_map_.supported.insert_or_assign(id, given.started_ms);
-        // ⚠ LE CHEMIN NOMMÉ EXCLUT L'AUTRE, et c'est ce que fait le client : son
-        // répartiteur de ZC_USE_SKILL ne consulte le registre des actions qu'au
-        // DÉFAUT de son switch — donc pour les compétences dont il n'a pas fait
-        // un cas, ce que sont toutes les modernes. Jouer les deux montrerait
-        // l'effet d'une compétence par-dessus celui d'une autre.
-        // Le paquet ne porte qu'un champ pour le niveau et le montant : c'est
-        // lui que la méthode reçoit comme niveau.
-        if (!PlayNamedSkill(stage, planner, id, actor, given.skill_id,
-                            ro::render::kSkillNamedOnUseSkill, given.started_ms,
-                            world.Find(given.source_id), given.amount)) {
-          // ⚠ LE PARAMÈTRE DU CHEMIN SANS DÉGÂTS N'EST PAS LU : le paquet ne
-          // porte qu'un champ pour le niveau et le montant, et ce que le
-          // répartiteur de ZC_USE_SKILL en pose dans l'instance n'est pas
-          // connu. Un, comme le chemin nu, plutôt qu'un montant pris pour un
-          // compte de boules.
-          PlaySkillOn(world, stage, planner, actor, given.skill_id, given.source_id,
-                      given.started_ms, kRawEffectParam, SkillMoment::kAnnounced, given.amount);
-        }
-      }
+  }
+  // Une compétence SANS DÉGÂTS : un soin, un renfort, un état posé. Le serveur
+  // l'annonce par son propre paquet, et c'est un AUTRE répartiteur du client
+  // qui en fait naître l'effet. Sans ce passage, toute la famille acolyte et
+  // prêtre reste muette à l'écran, quoi que la table dise d'elle.
+  //
+  // 🔴 TOUTES, ET DANS L'ORDRE : Potion Pitcher arrive suivie d'un Heal sans
+  // lanceur sur la même cible, dans la même trame. Ne lire que la dernière
+  // perdait la potion lancée.
+  for (const ro::sim::RecordedSupport& taken : per_map_.supports.Take(world.supports())) {
+    const ro::sim::Actor* const target = world.Find(taken.target_id);
+    if (target == nullptr) {
+      continue;
+    }
+    const std::uint32_t id = taken.target_id;
+    const ro::sim::Actor& actor = *target;
+    const ro::sim::SupportHit& given = taken.support;
+    // ⚠ LE CHEMIN NOMMÉ EXCLUT L'AUTRE, et c'est ce que fait le client : son
+    // répartiteur de ZC_USE_SKILL ne consulte le registre des actions qu'au
+    // DÉFAUT de son switch — donc pour les compétences dont il n'a pas fait
+    // un cas, ce que sont toutes les modernes. Jouer les deux montrerait
+    // l'effet d'une compétence par-dessus celui d'une autre.
+    // Le paquet ne porte qu'un champ pour le niveau et le montant : c'est
+    // lui que la méthode reçoit comme niveau.
+    if (!PlayNamedSkill(stage, planner, id, actor, given.skill_id,
+                        ro::render::kSkillNamedOnUseSkill, given.started_ms,
+                        world.Find(given.source_id), given.amount)) {
+      // ⚠ LE PARAMÈTRE DU CHEMIN SANS DÉGÂTS N'EST PAS LU : le paquet ne
+      // porte qu'un champ pour le niveau et le montant, et ce que le
+      // répartiteur de ZC_USE_SKILL en pose dans l'instance n'est pas
+      // connu. Un, comme le chemin nu, plutôt qu'un montant pris pour un
+      // compte de boules.
+      PlaySkillOn(world, stage, planner, actor, given.skill_id, given.source_id, given.started_ms,
+                  kRawEffectParam, SkillMoment::kAnnounced, given.amount);
     }
   }
   // 🔴 UN LANCEUR HORS DE VUE N'ÉTEINT PAS LA CASE : le serveur l'annonce à qui

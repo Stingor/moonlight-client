@@ -112,7 +112,8 @@ add_library(ro_sim STATIC
     src/npc_shop_cart.cpp
     src/world_pvp_rings.cpp
     src/world_skill_unit_speech.cpp
-    src/world_storage.cpp)
+    src/world_storage.cpp
+    src/world_support.cpp)
 add_library(ro::sim ALIAS ro_sim)
 
 target_include_directories(ro_sim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

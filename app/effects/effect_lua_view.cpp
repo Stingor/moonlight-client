@@ -70,33 +70,34 @@ void EffectsInPlay::NoticeLuaEffects(const ro::sim::World& world, const MapStage
     }
   };
 
-  for (const auto& [id, actor] : world.actors()) {
-    // LE CHEMIN DE L'EMPLOI : celui d'une compétence annoncée sans dégâts.
-    if (actor.support.has_value()) {
-      const ro::sim::SupportHit& given = *actor.support;
-      const auto vu = per_map_.lua_used.find(id);
-      if (vu == per_map_.lua_used.end() || vu->second != given.started_ms) {
-        per_map_.lua_used.insert_or_assign(id, given.started_ms);
-        // ⚠ `onTarget` NE DÉPLACE QUE CET EMPLACEMENT-LÀ. Les effets de cible
-        // ont déjà le leur, et appliquer le drapeau aux deux poserait deux fois
-        // le même sur la victime.
-        //
-        // Le porteur du paquet sans dégâts EST la cible ; sa source est
-        // `source_id`. Le drapeau choisit donc entre les deux.
-        const bool on_target = ro::render::SkillLuaPutsCasterEffectOnTarget(given.skill_id);
-        const std::uint32_t bearer_id = on_target ? id : given.source_id;
-        const ro::sim::Actor* bearer = on_target ? &actor : world.Find(given.source_id);
-        const ro::sim::Actor* caster = world.Find(given.source_id);
-        for (const ro::render::SkillLuaEffectEntry& entry :
-             ro::render::SkillLuaEffectsFor(given.skill_id, ro::render::SkillLuaSlot::kCaster)) {
-          if (ro::render::IsPortedEffectClass(entry.effect_id)) {
-            if (caster != nullptr) {
-              sow_class(*caster, entry.effect_id, id, given.started_ms);
-            }
-          } else if (bearer != nullptr) {
-            sow(*bearer, entry.effect_id, bearer_id, given.started_ms);
-          }
+  // LE CHEMIN DE L'EMPLOI : celui d'une compétence annoncée sans dégâts —
+  // toutes, dans l'ordre : voir `ro::sim::SupportLog`.
+  for (const ro::sim::RecordedSupport& taken : per_map_.lua_supports.Take(world.supports())) {
+    const ro::sim::Actor* const target = world.Find(taken.target_id);
+    if (target == nullptr) {
+      continue;
+    }
+    const std::uint32_t id = taken.target_id;
+    const ro::sim::Actor& actor = *target;
+    const ro::sim::SupportHit& given = taken.support;
+    // ⚠ `onTarget` NE DÉPLACE QUE CET EMPLACEMENT-LÀ. Les effets de cible ont
+    // déjà le leur, et appliquer le drapeau aux deux poserait deux fois le même
+    // sur la victime.
+    //
+    // Le porteur du paquet sans dégâts EST la cible ; sa source est
+    // `source_id`. Le drapeau choisit donc entre les deux.
+    const bool on_target = ro::render::SkillLuaPutsCasterEffectOnTarget(given.skill_id);
+    const std::uint32_t bearer_id = on_target ? id : given.source_id;
+    const ro::sim::Actor* bearer = on_target ? &actor : world.Find(given.source_id);
+    const ro::sim::Actor* caster = world.Find(given.source_id);
+    for (const ro::render::SkillLuaEffectEntry& entry :
+         ro::render::SkillLuaEffectsFor(given.skill_id, ro::render::SkillLuaSlot::kCaster)) {
+      if (ro::render::IsPortedEffectClass(entry.effect_id)) {
+        if (caster != nullptr) {
+          sow_class(*caster, entry.effect_id, id, given.started_ms);
         }
+      } else if (bearer != nullptr) {
+        sow(*bearer, entry.effect_id, bearer_id, given.started_ms);
       }
     }
   }

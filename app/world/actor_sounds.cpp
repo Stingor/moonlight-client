@@ -172,7 +172,6 @@ void ActorSounds::Hear(const SoundStage& scene, std::span<const ro::render::Draw
 void ActorSounds::ForgetDeparted(const ro::sim::World& world) {
   const auto departed = [&world](const auto& kept) { return !world.actors().contains(kept.first); };
   std::erase_if(seen_, departed);
-  std::erase_if(heard_support_, departed);
 }
 
 void ActorSounds::PlayFrames(const SoundStage& scene, const Listener& listener,
@@ -353,22 +352,21 @@ void ActorSounds::PlayBlow(const SoundStage& scene, std::uint32_t target_id,
 }
 
 void ActorSounds::PlaySkills(const SoundStage& scene, const Listener& listener) {
-  for (const auto& [id, actor] : scene.world->actors()) {
-    // Une compétence SANS DÉGÂTS s'entend aussi : le soin, le renfort, l'état
-    // posé. Elle n'arrive par aucun paquet de coup, et rester sur les seuls
-    // coups la rend muette.
-    if (actor.support.has_value()) {
-      const ro::sim::SupportHit& given = *actor.support;
-      const auto heard = heard_support_.find(id);
-      if (heard == heard_support_.end() || heard->second != given.started_ms) {
-        heard_support_.insert_or_assign(id, given.started_ms);
-        const ro::sim::FractionalCell cell =
-            ro::sim::InterpolatedCell(actor, scene.planner->PathFor(actor), given.started_ms);
-        PlaySkillSound(scene, listener, id, GroundPositionAt(*scene.stage, cell.x, cell.y),
-                       scene.world->Find(given.source_id), given.skill_id, given.started_ms,
-                       /*on_hit=*/false, given.amount);
-      }
+  // Une compétence SANS DÉGÂTS s'entend aussi : le soin, le renfort, l'état
+  // posé. Elle n'arrive par aucun paquet de coup, et rester sur les seuls coups
+  // la rend muette. TOUTES, dans l'ordre : deux arrivent souvent ensemble sur
+  // la même cible.
+  for (const ro::sim::RecordedSupport& taken : heard_supports_.Take(scene.world->supports())) {
+    const ro::sim::Actor* const target = scene.world->Find(taken.target_id);
+    if (target == nullptr) {
+      continue;
     }
+    const ro::sim::SupportHit& given = taken.support;
+    const ro::sim::FractionalCell cell =
+        ro::sim::InterpolatedCell(*target, scene.planner->PathFor(*target), given.started_ms);
+    PlaySkillSound(scene, listener, taken.target_id, GroundPositionAt(*scene.stage, cell.x, cell.y),
+                   scene.world->Find(given.source_id), given.skill_id, given.started_ms,
+                   /*on_hit=*/false, given.amount);
   }
   for (const ro::sim::RecordedStrike& taken : heard_strikes_.Take(scene.world->strikes())) {
     const ro::sim::Strike& strike = taken.strike;

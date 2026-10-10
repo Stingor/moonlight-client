@@ -153,7 +153,6 @@ class HitPopups {
     numbers_.clear();
     drawn_.clear();
     texts_.clear();
-    noticed_support_.clear();
     noticed_effect_.clear();
     // ⚠ ET LES TOTAUX CONTINUS : un coup reçu juste après l'arrivée
     // reprendrait sinon la somme encaissée sur la carte quittée.
@@ -251,9 +250,9 @@ class HitPopups {
   std::vector<SampledNumber> sampled_;
   // Les coups déjà remarqués. Voir `ro::sim::StrikeLog`.
   ro::sim::StrikeCursor noticed_strikes_;
-  // Le même repère pour les compétences sans dégâts, qui vivent à part : un
-  // acteur peut être soigné et frappé dans la même image.
-  std::unordered_map<std::uint32_t, std::uint32_t> noticed_support_;
+  // Les compétences sans dégâts déjà remarquées, TOUTES : une potion qui rend
+  // PV et SP envoie les deux sur la même cible. Voir `ro::sim::SupportLog`.
+  ro::sim::SupportCursor noticed_supports_;
   // Et pour les effets à valeur, pour la même raison — mais la clé y porte
   // l'EFFET autant que l'acteur : un acteur en porte plusieurs à la fois, et
   // un témoin par acteur ferait passer le second pour une redite du premier.
