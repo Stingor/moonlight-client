@@ -16,6 +16,7 @@
 #include "ro/vfs/item_link.h"
 
 #include "world/skill_refusal_texts.h"
+#include "world/twilight_shortfall.h"
 
 namespace moonclient {
 namespace {
@@ -72,10 +73,46 @@ std::string ServerMessageText(std::uint32_t message_id) {
   return ro::core::Tr(found->french);
 }
 
+// LA LIGNE D'UNE TWILIGHT QUI MANQUE DE MATIÈRE, ou vide : le serveur ne dit
+// qu'« échec », sans objet ; le sac dit ce qui manque. Chaque besoin s'écrit en
+// lien d'item, avec ce que le sac en porte et ce qu'il en faut.
+std::string TwilightShortfallLine(const ro::sim::SkillRefusal& refusal, const ro::sim::World& world,
+                                  const ro::sim::SkillTree* skills,
+                                  const ro::vfs::ItemTable* items) {
+  if (refusal.item_id != 0 || !IsTwilightAlchemy(refusal.skill_id)) {
+    return {};
+  }
+  const std::vector<TwilightNeed> missing = TwilightShortfall(refusal.skill_id, world.inventory());
+  if (missing.empty()) {
+    return {};
+  }
+  std::string list;
+  for (const TwilightNeed& need : missing) {
+    std::string piece = "%s %d/%d";
+    // ⚠ LES NOMBRES D'ABORD : le nom de l'objet, posé avant, pourrait porter
+    // un `%d` qu'on prendrait pour le trou.
+    Fill(piece, kNumberHole, std::to_string(need.owned));
+    Fill(piece, kNumberHole, std::to_string(need.required));
+    Fill(piece, kTextHole, ItemLinkOf(need.item_id, items));
+    if (!list.empty()) {
+      list += ", ";
+    }
+    list += piece;
+  }
+  std::string line = ro::core::Tr("%s : il manque %s");
+  Fill(line, kTextHole, SkillNameOf(refusal.skill_id, world, skills));
+  Fill(line, kTextHole, list);
+  return line;
+}
+
 }  // namespace
 
 std::string SkillRefusalLine(const ro::sim::SkillRefusal& refusal, const ro::sim::World& world,
                              const ro::sim::SkillTree* skills, const ro::vfs::ItemTable* items) {
+  if (std::string twilight = TwilightShortfallLine(refusal, world, skills, items);
+      !twilight.empty()) {
+    return twilight;
+  }
   const RefusalPhrase phrase = RefusalPhraseOf(refusal);
   std::string said;
   if (phrase.french != nullptr) {
@@ -137,7 +174,11 @@ void SkillRefusalReport::Notice(ro::sim::World& world, const ro::sim::SkillTree*
   // sur le grimoire, que le monde porte comme la conversation.
   std::vector<std::pair<std::string, std::uint32_t>> lines;
   for (const ro::sim::SkillRefusal& refusal : book.refusals()) {
-    if (refusal.seq <= seen_seq_ || (!skill_fail_shown && RefusalFollowsSkillFailSwitch(refusal))) {
+    // ⚠ UNE TWILIGHT QUI MANQUE DE MATIÈRE PARLE MÊME SOUS `/skillfail` éteint :
+    // sa ligne ne dit plus « échec » mais ce qui manque.
+    if (refusal.seq <= seen_seq_ ||
+        (!skill_fail_shown && RefusalFollowsSkillFailSwitch(refusal) &&
+         TwilightShortfallLine(refusal, world, skills, items).empty())) {
       continue;
     }
     if (std::string line = SkillRefusalLine(refusal, world, skills, items); !line.empty()) {

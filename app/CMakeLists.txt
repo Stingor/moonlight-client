@@ -259,7 +259,8 @@ target_include_directories(moonclient_chatlinks PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # que ce que le serveur a refuse, et cela ne se voit qu'en jeu.
 add_library(moonclient_skillrefusal STATIC
     world/skill_refusal_report.cpp
-    world/skill_refusal_texts.cpp)
+    world/skill_refusal_texts.cpp
+    world/twilight_shortfall.cpp)
 
 target_link_libraries(moonclient_skillrefusal
     PUBLIC ro_sim ro_vfs
