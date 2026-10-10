@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 #  Les items qui ne s'empilent pas
 #
-#  Exporté de l'item_db du serveur Moonlight (mode Renewal) par
+#  Exporté de l'item_db du serveur Moonlight (mode Prerenewal) par
 #  scripts/yaml_tables/non_stackable_items.py. Ne pas éditer à la main :
 #      python scripts/yaml_tables/non_stackable_items.py \
 #          --serveur <dépôt moonlight> --sortie dist/data/yaml_files/non_stackable_items.yml
@@ -14,7 +14,7 @@
 #  aux cases libres du sac. Absent, le client ne borne rien.
 # ─────────────────────────────────────────────────────────────────────────────
 version: 1
-mode: Renewal
+mode: Prerenewal
 non_stackable: [
   1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112,
   1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123, 1124,
