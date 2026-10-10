@@ -62,12 +62,24 @@ float CartChoiceWindowHeight(std::size_t count) noexcept {
 
 std::optional<std::size_t> CartChoiceButtonAt(std::span<const std::uint8_t> types,
                                               ImVec2 point) noexcept {
+  // LÀ OÙ DEUX CASES SE RECOUVRENT, LE CENTRE LE PLUS PROCHE L'EMPORTE : un
+  // clic sur une charrette va à cette charrette, et non à la case voisine qui
+  // déborde sur elle.
   std::optional<std::size_t> found;
+  float nearest = 0.0F;
+  const float half = kCartChoiceButtonSide / 2.0F;
   for (std::size_t rank = 0; rank < types.size(); ++rank) {
     const ImVec2 origin = CartChoiceButtonOrigin(rank, types[rank]);
-    if (point.x >= origin.x && point.x < origin.x + kCartChoiceButtonSide && point.y >= origin.y &&
-        point.y < origin.y + kCartChoiceButtonSide) {
+    if (point.x < origin.x || point.x >= origin.x + kCartChoiceButtonSide || point.y < origin.y ||
+        point.y >= origin.y + kCartChoiceButtonSide) {
+      continue;
+    }
+    const float dx = point.x - (origin.x + half);
+    const float dy = point.y - (origin.y + half);
+    const float distance = (dx * dx) + (dy * dy);
+    if (!found.has_value() || distance < nearest) {
       found = rank;
+      nearest = distance;
     }
   }
   return found;
@@ -128,7 +140,7 @@ CartChoiceWindowAction DrawCartChoiceWindow(CartChoiceWindowState& state,
   }
 
   // LE CLIC SE LIT SUR TOUT LE CORPS, puis se range au bouton qu'il touche : les
-  // boutons se chevauchent, et c'est la règle du dernier posé qui tranche.
+  // boutons se chevauchent, et c'est le centre le plus proche qui tranche.
   //
   // ⚠ UNE SEULE ZONE CLIQUABLE COUVRE LE CORPS : sans elle, appuyer sur un
   // bouton ferait glisser la fenêtre au lieu de le presser.
@@ -137,8 +149,11 @@ CartChoiceWindowAction DrawCartChoiceWindow(CartChoiceWindowState& state,
     ImGui::InvisibleButton("##cart_buttons", body);
   }
   const ImVec2 mouse = ImGui::GetIO().MousePos;
+  // 🔴 LA ZONE CLIQUABLE DEVIENT L'ÉLÉMENT ACTIF dès qu'on appuie, et une
+  // fenêtre dont un élément est actif ne se dit plus survolée : sans ce
+  // drapeau, aucun clic posé sur les images n'était vu.
   const std::optional<std::size_t> under =
-      ImGui::IsWindowHovered()
+      ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)
           ? CartChoiceButtonAt(view.types,
                                ImVec2((mouse.x - corner.x) / scale, (mouse.y - corner.y) / scale))
           : std::nullopt;

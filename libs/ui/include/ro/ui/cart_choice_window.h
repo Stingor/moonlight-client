@@ -22,7 +22,8 @@ namespace ro::ui {
 // ⚠ SES BOUTONS SE CHEVAUCHENT, et c'est le dessin du client : cent pixels de
 // côté posés tous les soixante-dix, avec un décalage propre à chaque type pour
 // que la charrette tombe au milieu de sa case. Là où deux se recouvrent, c'est
-// le DERNIER posé qui prend le clic.
+// celui dont le CENTRE est le plus proche qui prend le clic : un clic sur une
+// charrette doit la choisir, elle.
 //
 // ⚠ SON OUVERTURE N'APPARTIENT PAS AU JOUEUR : c'est la compétence, ou la liste
 // du serveur, qui l'ouvre. Un choix la referme, comme la croix.
@@ -47,8 +48,8 @@ inline constexpr float kCartChoiceButtonSide = 100.0F;
 // RANGÉE : le client ne la redimensionne pas.
 [[nodiscard]] float CartChoiceWindowHeight(std::size_t count) noexcept;
 
-// LE BOUTON SOUS UN POINT de la fenêtre, en pixels d'art : le dernier posé
-// l'emporte là où deux se recouvrent. Vide hors de tout bouton.
+// LE BOUTON SOUS UN POINT de la fenêtre, en pixels d'art : le centre le plus
+// proche l'emporte là où deux se recouvrent. Vide hors de tout bouton.
 [[nodiscard]] std::optional<std::size_t> CartChoiceButtonAt(std::span<const std::uint8_t> types,
                                                             ImVec2 point) noexcept;
 
