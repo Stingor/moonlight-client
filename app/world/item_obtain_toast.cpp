@@ -66,11 +66,14 @@ void ItemObtainToast::Notice(const ro::sim::World& world, const ro::ui::ItemObta
   if (last_seq < seen_seq_) {
     seen_seq_ = 0;
   }
-  if (AwaitsCreator(bag, seen_seq_, creators, now_ms)) {
+  if (AwaitsCreator(bag, seen_seq_, creators, now_ms) ||
+      ro::sim::AwaitsTradeVerdict(bag, seen_seq_, now_ms)) {
     return;
   }
   for (const ro::sim::ObtainedItem& entry : bag.obtained()) {
-    if (entry.seq <= seen_seq_) {
+    // UN DÉPÔT D'ÉCHANGE RENDU N'EST PAS UN GAIN : l'échange le dit, une fois.
+    if (entry.seq <= seen_seq_ ||
+        ro::sim::VerdictOf(entry, now_ms) == ro::sim::ObtainedVerdict::kTradeReturn) {
       continue;
     }
     const std::size_t at = MergeOrPushObtained(

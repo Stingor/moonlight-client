@@ -289,6 +289,49 @@ std::span<const ObtainedItem> Inventory::obtained() const noexcept { return obta
 
 std::uint64_t Inventory::last_obtained_seq() const noexcept { return obtained_seen_; }
 
+void Inventory::SuspectTradeReturn(std::uint64_t seq) {
+  for (ObtainedItem& entry : obtained_) {
+    if (entry.seq == seq && entry.trade_return == TradeReturn::kNone) {
+      entry.trade_return = TradeReturn::kSuspected;
+    }
+  }
+}
+
+std::size_t Inventory::SettleTradeReturns(bool cancelled) {
+  std::size_t returned = 0;
+  for (ObtainedItem& entry : obtained_) {
+    if (entry.trade_return != TradeReturn::kSuspected) {
+      continue;
+    }
+    entry.trade_return = cancelled ? TradeReturn::kConfirmed : TradeReturn::kNone;
+    if (cancelled) {
+      ++returned;
+    }
+  }
+  return returned;
+}
+
+ObtainedVerdict VerdictOf(const ObtainedItem& entry, std::uint32_t now_ms) noexcept {
+  switch (entry.trade_return) {
+    case TradeReturn::kNone:
+      return ObtainedVerdict::kGain;
+    case TradeReturn::kConfirmed:
+      return ObtainedVerdict::kTradeReturn;
+    case TradeReturn::kSuspected:
+      // ⚠ EN DIFFÉRENCE NON SIGNÉE : l'horloge de l'appelant peut boucler.
+      return now_ms - entry.obtained_ms < kTradeReturnVerdictMs ? ObtainedVerdict::kUndecided
+                                                                : ObtainedVerdict::kGain;
+  }
+  return ObtainedVerdict::kGain;
+}
+
+bool AwaitsTradeVerdict(const Inventory& bag, std::uint64_t seen_seq,
+                        std::uint32_t now_ms) noexcept {
+  return std::ranges::any_of(bag.obtained(), [seen_seq, now_ms](const ObtainedItem& entry) {
+    return entry.seq > seen_seq && VerdictOf(entry, now_ms) == ObtainedVerdict::kUndecided;
+  });
+}
+
 void Inventory::RecordRefused(std::uint8_t result, std::uint32_t at_ms) {
   // ⚠ LE CODE ENTRE TEL QUEL, sans tri ni traduction : `sim` ne sait pas
   // lesquels ce serveur émet, et le choix d'en taire un appartient à la couche

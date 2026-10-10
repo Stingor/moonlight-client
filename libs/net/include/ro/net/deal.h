@@ -19,6 +19,10 @@ namespace ro::net {
 //
 // Ce traducteur lit aussi, SANS LES CONSOMMER, les deux changements de carte :
 // le serveur a annulé l'échange avant de déplacer le joueur.
+//
+// ⚠ ET L'ACCUSÉ DE RAMASSAGE, APRÈS LE MONDE : le gain déjà inscrit au journal
+// du sac y devient un soupçon s'il ressemble à un dépôt, et l'annulation ou la
+// conclusion de l'échange le tranche (`sim::TradeReturn`).
 [[nodiscard]] FrameOutcome ApplyDealFrame(const Frame& frame, sim::Deal& deal, sim::Inventory& bag);
 
 // ── LES VERBES ──────────────────────────────────────────────────────────────

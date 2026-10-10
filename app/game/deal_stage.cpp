@@ -431,6 +431,12 @@ void DealStage::SayNews(const TradeContext& context) {
         Say(context, GameOr(words, TradeWord::kDealDone, ro::core::Tr("L'échange a été effectué.")),
             kSucceededColor);
         break;
+      // ⚠ UNE SEULE LIGNE POUR TOUS LES DÉPÔTS RENDUS, qui ne s'annoncent pas
+      // comme des gains : rien n'a été gagné.
+      case ro::sim::DealNewsKind::kStakeReturned:
+        Say(context, ro::core::Tr("Ce que vous aviez déposé dans l'échange vous a été rendu."),
+            kSucceededColor);
+        break;
     }
   }
 }

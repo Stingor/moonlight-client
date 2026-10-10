@@ -48,11 +48,17 @@ void ItemPickupReport::Notice(ro::sim::World& world, const CreatorNames& creator
   }
   // ⚠ LES REFUS ATTENDENT AUSSI : écrits seuls, ils passeraient devant le gain
   // retenu qui les précède.
-  if (AwaitsCreator(bag, seen_obtained_seq_, creators, now_ms)) {
+  //
+  // ⚠ ET UN GAIN QUI EST PEUT-ÊTRE UN DÉPÔT D'ÉCHANGE RENDU attend que
+  // l'échange le tranche : voir `ro::sim::kTradeReturnVerdictMs`.
+  if (AwaitsCreator(bag, seen_obtained_seq_, creators, now_ms) ||
+      ro::sim::AwaitsTradeVerdict(bag, seen_obtained_seq_, now_ms)) {
     return;
   }
   for (const ro::sim::ObtainedItem& entry : bag.obtained()) {
-    if (entry.seq <= seen_obtained_seq_) {
+    // Un dépôt rendu se tait : l'échange dit, une fois, qu'ils sont revenus.
+    if (entry.seq <= seen_obtained_seq_ ||
+        ro::sim::VerdictOf(entry, now_ms) == ro::sim::ObtainedVerdict::kTradeReturn) {
       continue;
     }
     if (items_ == nullptr) {

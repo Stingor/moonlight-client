@@ -78,6 +78,7 @@ void Deal::Tell(DealNewsKind kind, std::uint8_t code, const InventoryItem* item)
 
 void Deal::NoteProposalSent(DealPartner partner, std::uint32_t now_ms) {
   Close();
+  ForgetReturns();
   phase_ = DealPhase::kProposing;
   partner_ = std::move(partner);
   proposal_sent_ms_ = now_ms;
@@ -85,6 +86,7 @@ void Deal::NoteProposalSent(DealPartner partner, std::uint32_t now_ms) {
 
 void Deal::TellProposal(std::string name, std::uint32_t account_id, std::uint16_t base_level) {
   Close();
+  ForgetReturns();
   phase_ = DealPhase::kProposed;
   partner_ =
       DealPartner{.account_id = account_id, .name = std::move(name), .base_level = base_level};
@@ -108,6 +110,7 @@ void Deal::TellAnswer(std::uint8_t code, std::uint32_t partner_aid, std::uint16_
       return;
     }
     Reset();
+    ForgetReturns();
     phase_ = DealPhase::kOpen;
     if (partner_aid != 0) {
       partner_.account_id = partner_aid;
@@ -387,26 +390,76 @@ void Deal::NoteExecuteSent() noexcept { execute_sent_ = true; }
 void Deal::NoteCancelSent() {
   if (phase_ == DealPhase::kOpen) {
     Tell(DealNewsKind::kCancelled);
+    AwaitReturns();
   }
   Close();
 }
 
 void Deal::TellCancelled() {
-  if (phase_ == DealPhase::kNone) {
-    return;
-  }
   if (phase_ == DealPhase::kOpen) {
     Tell(execute_sent_ ? DealNewsKind::kRefusedAtExecution : DealNewsKind::kCancelled);
+    AwaitReturns();
   }
-  Close();
+  // ⚠ MÊME FERMÉ : après MON annulation, c'est celle du serveur qui clôt le
+  // renvoi des dépôts.
+  SettleReturns();
+  if (phase_ != DealPhase::kNone) {
+    Close();
+  }
 }
 
 void Deal::TellExecuted(std::uint8_t result) {
+  // Conclu, l'échange n'a rien rendu : ce qui ressemblait à un dépôt est un gain.
+  ForgetReturns();
   if (phase_ != DealPhase::kOpen) {
     return;
   }
   Tell(result == 0 ? DealNewsKind::kExecuted : DealNewsKind::kRefusedAtExecution, result);
   Close();
+}
+
+// ── LES DÉPÔTS RENDUS ──────────────────────────────────────────────────────
+
+void Deal::AwaitReturns() {
+  awaited_returns_.clear();
+  for (const DealLine& line : my_offer_) {
+    awaited_returns_.push_back(line.item);
+  }
+  awaited_zeny_ = my_zeny_ > 0;
+}
+
+void Deal::ForgetReturns() noexcept {
+  awaited_returns_.clear();
+  awaited_zeny_ = false;
+  claimed_slots_.clear();
+}
+
+void Deal::SettleReturns() {
+  if (!claimed_slots_.empty() || awaited_zeny_) {
+    Tell(DealNewsKind::kStakeReturned);
+  }
+  ForgetReturns();
+}
+
+bool Deal::ClaimReturn(const InventoryItem& picked) {
+  if (std::ranges::find(claimed_slots_, picked.client_slot) != claimed_slots_.end()) {
+    return false;
+  }
+  const auto same_deposit = [&picked](const InventoryItem& deposit) {
+    return deposit.client_slot == picked.client_slot && deposit.amount == picked.amount &&
+           SameStack(deposit, picked);
+  };
+  bool found = false;
+  if (phase_ == DealPhase::kOpen) {
+    found = std::ranges::any_of(
+        my_offer_, [&same_deposit](const DealLine& line) { return same_deposit(line.item); });
+  } else {
+    found = std::ranges::any_of(awaited_returns_, same_deposit);
+  }
+  if (found) {
+    claimed_slots_.push_back(picked.client_slot);
+  }
+  return found;
 }
 
 void Deal::CloseForMapChange() {

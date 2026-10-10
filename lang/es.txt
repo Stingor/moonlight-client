@@ -14551,6 +14551,9 @@ tr: El intercambio se ha cancelado.
 fr: L'échange a été effectué.
 tr: El intercambio se ha realizado.
 
+fr: Ce que vous aviez déposé dans l'échange vous a été rendu.
+tr: Lo que habías puesto en el intercambio se te ha devuelto.
+
 fr: L'inventory de {} n'a plus de place pour {}.
 tr: La bolsa de {} no tiene sitio para {}.
 

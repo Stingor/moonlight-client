@@ -3,8 +3,10 @@
 #include "ro/net/deal.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <limits>
 #include <optional>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -49,6 +51,27 @@ sim::InventoryItem ItemFrom(const proto::ZcAddExchangeItem& packet) {
   item.refine_level = packet.refine;
   item.grade = packet.grade;
   return item;
+}
+
+// Le gain que ce paquet vient d'inscrire au sac ressemble-t-il à un dépôt ?
+//
+// ⚠ LE GAIN SE RELIT DANS LE JOURNAL, à la condition d'être LE DERNIER et de
+// porter la case, l'item et la quantité du paquet. Un ramassage refusé n'inscrit
+// rien et remet ces champs à zéro : il ne peut pas désigner un gain plus ancien.
+void SuspectReturn(const proto::ZcItemPickupAck& packet, sim::Deal& deal, sim::Inventory& bag) {
+  const std::span<const sim::ObtainedItem> obtained = bag.obtained();
+  if (obtained.empty()) {
+    return;
+  }
+  const sim::ObtainedItem& last = obtained.back();
+  if (last.seq != bag.last_obtained_seq() || last.picked.client_slot != packet.Index ||
+      last.picked.item_id != packet.nameid ||
+      last.picked.amount != static_cast<std::int16_t>(packet.count)) {
+    return;
+  }
+  if (deal.ClaimReturn(last.picked)) {
+    bag.SuspectTradeReturn(last.seq);
+  }
 }
 
 const char* AddFaultText(sim::DealAddFault fault) {
@@ -173,6 +196,7 @@ FrameOutcome ApplyDealFrame(const Frame& frame, sim::Deal& deal, sim::Inventory&
 
     case proto::ZcCancelExchangeItem::kOpcode:
       deal.TellCancelled();
+      static_cast<void>(bag.SettleTradeReturns(/*cancelled=*/true));
       return FrameOutcome::kApplied;
 
     case proto::ZcExecExchangeItem::kOpcode: {
@@ -181,7 +205,19 @@ FrameOutcome ApplyDealFrame(const Frame& frame, sim::Deal& deal, sim::Inventory&
         return FrameOutcome::kUndecodable;
       }
       deal.TellExecuted(packet.result);
+      static_cast<void>(bag.SettleTradeReturns(/*cancelled=*/false));
       return FrameOutcome::kApplied;
+    }
+
+    // UN GAIN QUI EST PEUT-ÊTRE UN DÉPÔT RENDU : le monde l'a déjà rangé et
+    // noté, il ne reste qu'à le soupçonner. Lu sans être pris.
+    case proto::ZcItemPickupAck::kOpcode: {
+      proto::ZcItemPickupAck packet;
+      if (!proto::Decode(frame.bytes, packet)) {
+        return FrameOutcome::kUnhandled;
+      }
+      SuspectReturn(packet, deal, bag);
+      return FrameOutcome::kUnhandled;
     }
 
     // ⚠ LE SERVEUR NE L'ÉMET JAMAIS, et son propre code en ignore l'usage : lu

@@ -14551,6 +14551,9 @@ tr: The trade was cancelled.
 fr: L'échange a été effectué.
 tr: The trade is complete.
 
+fr: Ce que vous aviez déposé dans l'échange vous a été rendu.
+tr: What you had put up in the trade has been returned to you.
+
 fr: L'inventory de {} n'a plus de place pour {}.
 tr: {}'s bag has no room left for {}.
 

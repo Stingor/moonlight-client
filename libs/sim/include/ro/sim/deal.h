@@ -31,6 +31,13 @@ namespace ro::sim {
 // retirer à l'accusé les doublerait dans un cas et les laisserait en fantôme
 // dans l'autre. `TellAddResult` rend donc ce qui doit sortir du sac.
 //
+// 🔴 ET CE RENVOI N'EST PAS UN GAIN, quoiqu'il en ait le paquet. Il arrive
+// AVANT l'annonce de l'annulation — et, quand c'est moi qui annule, après que
+// le modèle s'est déjà fermé. Les dépôts restent donc reconnaissables jusqu'à
+// cette annonce (`ClaimReturn`) ; le sac en tient les entrées pour des
+// soupçons, que l'annonce confirme (`TradeReturn`). Les dépôts rendus ne
+// s'annoncent pas un à un : l'échange dit, une fois, qu'ils sont revenus.
+//
 // ⚠ L'ACCUSÉ D'UN DÉPÔT NE PORTE QUE LA CASE : la quantité n'est connue que de
 // nous, d'où la file des dépôts en route. Et le serveur se TAIT sur plusieurs
 // refus — quantité au-delà de la pile, onzième item, œuf éclos, item rangé
@@ -131,6 +138,8 @@ enum class DealNewsKind : std::uint8_t {
   // plein, poids, bourse pleine chez l'un des deux.
   kRefusedAtExecution,
   kExecuted,
+  // L'annulation m'a rendu ce que j'avais déposé : items, zeny, ou les deux.
+  kStakeReturned,
 };
 
 struct DealNews {
@@ -261,6 +270,15 @@ class Deal {
   // Un changement de carte : le serveur a annulé de lui-même.
   void CloseForMapChange();
 
+  // ── LES DÉPÔTS RENDUS ───────────────────────────────────────────────────
+
+  // Le sac vient de recevoir `picked` : est-ce un de mes dépôts que le serveur
+  // rend ? Oui s'il lui ressemble trait pour trait — case, item, quantité,
+  // raffinement, cartes, options — et n'a pas déjà été reconnu ; pendant
+  // l'échange, ou après MON annulation tant que celle du serveur n'est pas
+  // venue.
+  [[nodiscard]] bool ClaimReturn(const InventoryItem& picked);
+
   // ── LES LECTURES ────────────────────────────────────────────────────────
 
   [[nodiscard]] std::span<const DealLine> my_offer() const noexcept { return my_offer_; }
@@ -298,6 +316,12 @@ class Deal {
   void Tell(DealNewsKind kind, std::uint8_t code = 0, const InventoryItem* item = nullptr);
   void NotePartnerChange();
   [[nodiscard]] std::size_t DistinctOffered() const noexcept;
+  // Ma propre annulation ferme le modèle avant que le serveur rende quoi que
+  // ce soit : ce qui était en jeu se garde pour le reconnaître.
+  void AwaitReturns();
+  void ForgetReturns() noexcept;
+  // L'annulation du serveur : dit ce qui est revenu, et oublie les dépôts.
+  void SettleReturns();
 
   DealPhase phase_ = DealPhase::kNone;
   DealPartner partner_;
@@ -321,6 +345,12 @@ class Deal {
   bool execute_sent_ = false;
   std::uint32_t partner_revision_ = 0;
   std::uint32_t partner_revision_at_my_lock_ = 0;
+
+  // Mes dépôts tels que le serveur les rendra, après MON annulation.
+  std::vector<InventoryItem> awaited_returns_;
+  bool awaited_zeny_ = false;
+  // Les cases déjà reconnues comme rendues : un dépôt ne revient qu'une fois.
+  std::vector<std::uint16_t> claimed_slots_;
 
   std::vector<DealNews> news_;
   std::uint32_t news_seq_ = 0;

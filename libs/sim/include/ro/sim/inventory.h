@@ -214,6 +214,31 @@ enum class ItemCategory : std::uint8_t {
 // nommer.
 using PickupArrival = std::uint64_t;
 
+// UNE ENTRÉE DANS LE SAC QUI EST PEUT-ÊTRE UN DÉPÔT D'ÉCHANGE RENDU.
+//
+// 🔴 LE SERVEUR REND UN DÉPÔT PAR LE PAQUET D'UN GAIN, et AVANT l'annonce de
+// l'annulation : l'entrée qui ressemble trait pour trait à un dépôt n'est
+// qu'un SOUPÇON tant que l'annulation n'est pas venue. Elle la confirme ; la
+// conclusion de l'échange, ou `kTradeReturnVerdictMs` de silence, la rend à
+// l'état de gain.
+enum class TradeReturn : std::uint8_t {
+  kNone,
+  // Pareil à un dépôt : l'annulation dira si c'en est un.
+  kSuspected,
+  // Un dépôt rendu par une annulation : ce n'est pas un gain.
+  kConfirmed,
+};
+
+// LE DÉLAI AU-DELÀ DUQUEL UN SOUPÇON REDEVIENT UN GAIN.
+//
+// Le serveur écrit les dépôts rendus et l'annonce d'annulation dans la même
+// fonction, l'un après l'autre : ils partent dans le même envoi et arrivent à
+// quelques millisecondes d'écart, au pire sur deux lectures du réseau. Une
+// seconde couvre un lien encombré ; et c'est aussi le plus long retard que
+// subit l'annonce d'un VRAI gain qui ressemblerait trait pour trait à un dépôt
+// — même case, même item, même quantité — pendant un échange.
+inline constexpr std::uint32_t kTradeReturnVerdictMs = 1000;
+
 // CE QUI VIENT D'ARRIVER DANS LE SAC, ET QUAND.
 //
 // 🔴 LA QUANTITÉ RAMASSÉE NE SURVIT PAS AU RANGEMENT : le serveur annonce un
@@ -224,7 +249,21 @@ struct ObtainedItem {
   PickupArrival arrival = 0;      // l'ordre d'arrivée, comparable à celui d'un refus
   std::uint32_t obtained_ms = 0;  // l'horloge de l'appelant
   InventoryItem picked;           // `amount` = la quantité RAMASSÉE, pas le total
+  TradeReturn trade_return = TradeReturn::kNone;
 };
+
+// CE QUE CETTE ENTRÉE EST À `now_ms`, pour qui l'annonce.
+enum class ObtainedVerdict : std::uint8_t {
+  // Un gain : il s'annonce.
+  kGain,
+  // Un dépôt d'échange rendu : il se tait, l'échange le dit.
+  kTradeReturn,
+  // Un soupçon encore dans son délai : l'annonce attend, et tout ce qui suit
+  // avec elle, pour garder l'ordre.
+  kUndecided,
+};
+
+[[nodiscard]] ObtainedVerdict VerdictOf(const ObtainedItem& entry, std::uint32_t now_ms) noexcept;
 
 // COMBIEN DE GAINS ON GARDE.
 //
@@ -405,6 +444,14 @@ class Inventory {
   // Zéro tant que rien n'a été ramassé : un témoin à zéro est donc sûr.
   [[nodiscard]] std::uint64_t last_obtained_seq() const noexcept;
 
+  // Le gain de rang `seq` ressemble à un dépôt d'échange : il devient un
+  // soupçon. Sans effet sur un rang évincé ou inconnu.
+  void SuspectTradeReturn(std::uint64_t seq);
+
+  // L'échange est fini : `cancelled`, les soupçons sont des dépôts rendus ;
+  // sinon, ce sont des gains. Rend le nombre de dépôts rendus.
+  std::size_t SettleTradeReturns(bool cancelled);
+
   // Note un refus : `result` est le code du serveur TEL QUEL, et `at_ms`
   // l'horloge de l'appelant.
   //
@@ -483,5 +530,11 @@ class Inventory {
   std::int64_t max_weight_ = 0;
   bool filling_ = false;
 };
+
+// UN GAIN POSTÉRIEUR À `seen_seq` ATTEND-IL ENCORE DE SAVOIR S'IL EST UN DÉPÔT
+// RENDU ? Qui annonce les gains s'arrête alors, et reprend au passage suivant :
+// voir `kTradeReturnVerdictMs`.
+[[nodiscard]] bool AwaitsTradeVerdict(const Inventory& bag, std::uint64_t seen_seq,
+                                      std::uint32_t now_ms) noexcept;
 
 }  // namespace ro::sim
