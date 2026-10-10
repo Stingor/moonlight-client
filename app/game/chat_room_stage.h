@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ro/net/chat_room.h"
@@ -20,6 +21,7 @@
 
 #include "game/chat_room_memory.h"
 #include "game/chat_room_rules.h"
+#include "game/interface_sound.h"
 
 namespace moonclient {
 
@@ -86,6 +88,10 @@ class ChatRoomStage {
   // L'IMAGE : les réponses des fenêtres, les nouvelles à dire, puis les vues.
   void Advance(ChatRoomWindows& windows, const ChatRoomContext& context);
 
+  // Les sons d'interface que les nouvelles du salon ont demandés depuis le
+  // dernier appel : l'arrivée d'un membre. Voir `ChatRoomNewsRings`.
+  [[nodiscard]] std::vector<InterfaceSoundFile> TakeSounds() { return std::exchange(sounds_, {}); }
+
  private:
   enum class Asked : std::uint8_t { kNone, kToggle, kOpen };
 
@@ -118,6 +124,8 @@ class ChatRoomStage {
   std::optional<JoinAsk> join_;
   // Le salon dont la fenêtre s'est préparée en dernier.
   std::uint32_t shown_room_seq_ = 0;
+  // Les sons à jouer, que `TakeSounds` vide.
+  std::vector<InterfaceSoundFile> sounds_;
 
   // ── CE QUI SE COMPOSE À CHAQUE IMAGE ─────────────────────────────────────
   // ⚠ LES VUES POINTENT DEDANS : elles se prennent une fois tout rempli.

@@ -124,4 +124,8 @@ ChatRoomJoinStep ChatRoomJoinStepOf(std::uint8_t status) noexcept {
   }
 }
 
+bool ChatRoomNewsRings(const ro::sim::ChatRoomNews& news, std::string_view self_name) noexcept {
+  return news.kind == ro::sim::ChatRoomNewsKind::kMemberJoined && news.name != self_name;
+}
+
 }  // namespace moonclient

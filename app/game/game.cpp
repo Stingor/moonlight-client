@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <SDL3/SDL.h>
 
@@ -115,16 +116,22 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   }
   // UNE RÉCOMPENSE se décrit, se relaie et s'interroge comme un butin.
   FollowCatalogItem(pieces_.battleground.TakeItemGesture(), now_ms);
-  for (const InterfaceSoundFile& sound : pieces_.battleground.TakeSounds()) {
-    if (vfs_ == nullptr) {
-      break;
+  // LES SONS D'INTERFACE de l'image : ceux du champ de bataille, puis l'arrivée
+  // d'un membre au salon.
+  const auto play_sounds = [this](std::vector<InterfaceSoundFile> sounds, std::string_view from) {
+    for (const InterfaceSoundFile& sound : sounds) {
+      if (vfs_ == nullptr) {
+        return;
+      }
+      if (const ro::core::Result<void> played =
+              PlayInterfaceSound(audio_, *vfs_, client_root_, sound);
+          !played) {
+        ro::core::LogWarning("son {} : {}", from, ro::core::Describe(played.error()));
+      }
     }
-    if (const ro::core::Result<void> played =
-            PlayInterfaceSound(audio_, *vfs_, client_root_, sound);
-        !played) {
-      ro::core::LogWarning("son du champ de bataille : {}", ro::core::Describe(played.error()));
-    }
-  }
+  };
+  play_sounds(pieces_.battleground.TakeSounds(), "du champ de bataille");
+  play_sounds(pieces_.chat_rooms.TakeSounds(), "du salon");
   // ⚠ APRÈS LE RÉSEAU, DONC APRÈS `AimCamera`, ET AVANT LE DESSIN : la veille
   // écrit la pose de la caméra, et elle doit écraser le cadrage du personnage,
   // pas être écrasée par lui.

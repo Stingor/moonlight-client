@@ -5,6 +5,7 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/sim/chat_room.h"
 #include "ro/sim/world.h"
 
 namespace moonclient {
@@ -73,5 +74,15 @@ struct NearbyChatRoom {
 // fermées (zone PK) non ; un salon privé demande son mot de passe d'abord.
 enum class ChatRoomJoinStep : std::uint8_t { kNone, kAskPassword, kEnter };
 [[nodiscard]] ChatRoomJoinStep ChatRoomJoinStepOf(std::uint8_t status) noexcept;
+
+// UNE NOUVELLE DU SALON SONNE-T-ELLE ? Seule l'arrivée d'un AUTRE membre fait
+// entendre le son de bouton ; un départ, une expulsion, et le nom du joueur
+// lui-même — le créateur peut le recevoir par ce chemin — se taisent.
+//
+// ⚠ L'INTERRUPTEUR QUI LE COMMANDE est celui des bruitages, que le mélangeur
+// garantit : bruits coupés, le son d'interface ne joue pas. Voir
+// `PlayInterfaceSound`.
+[[nodiscard]] bool ChatRoomNewsRings(const ro::sim::ChatRoomNews& news,
+                                     std::string_view self_name) noexcept;
 
 }  // namespace moonclient

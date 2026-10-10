@@ -13,10 +13,14 @@ namespace moonclient {
 
 // ── LES SONS DE L'INTERFACE ─────────────────────────────────────────────────
 //
-// Une alarme de chuchotement, l'alerte d'un favori du carnet : des sons que
-// l'interface joue d'elle-même, hors de toute entité et de toute carte. Ils
-// passent par le moteur, au volume du client, sur le canal des bruits de
-// sprite, et se taisent quand les bruits sont coupés.
+// Une alarme de chuchotement, l'arrivée d'un membre au salon, l'alerte d'un
+// favori du carnet : des sons que l'interface joue d'elle-même, hors de toute
+// entité et de toute carte. Ils passent par le moteur, au centre, dans la
+// famille `SoundChannel::kInterface`, et se taisent quand les bruits sont
+// coupés.
+//
+// ⚠ CETTE FAMILLE N'A PAS DE CURSEUR À ELLE : elle suit celui des effets et
+// des compétences, sous le volume général. Voir `GameOption::kEffectSoundVolume`.
 
 // OÙ SE LIT UN SON D'INTERFACE.
 enum class InterfaceSoundPlace : std::uint8_t {

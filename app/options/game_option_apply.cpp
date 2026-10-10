@@ -87,8 +87,11 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
       }
       break;
     case GameOption::kEffectSoundVolume:
+      // LES SONS DE L'INTERFACE SUIVENT CE CURSEUR : ils n'en ont pas à eux.
       if (to.audio != nullptr) {
         to.audio->SetChannelVolume(ro::audio::SoundChannel::kEffects,
+                                   sound_options_.effect_sound_volume);
+        to.audio->SetChannelVolume(ro::audio::SoundChannel::kInterface,
                                    sound_options_.effect_sound_volume);
       }
       break;

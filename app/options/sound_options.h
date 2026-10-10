@@ -21,6 +21,7 @@ struct SoundOptions {
   // Le client d'origine n'a qu'un volume pour tous ses bruits ; tout à fond
   // rend sa conduite. Voir `ro::audio::SoundChannel`.
   float sprite_sound_volume = 1.0F;
+  // ⚠ IL RÈGLE AUSSI LES SONS DE L'INTERFACE, qui n'ont pas de curseur à eux.
   float effect_sound_volume = 1.0F;
   float ambience_volume = 1.0F;
   // ── UN AJOUT AU NATIF, ET IL SE DÉBRANCHE ─────────────────────────────────

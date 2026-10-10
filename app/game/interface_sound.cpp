@@ -151,7 +151,7 @@ ro::core::Result<void> PlayInterfaceSound(ro::audio::AudioEngine& audio, ro::vfs
     }
     ForgetOlderVersions(audio, file, held_name);
   }
-  audio.PlaySound(held_name, kInterfaceGain, kInterfacePan, ro::audio::SoundChannel::kSprites);
+  audio.PlaySound(held_name, kInterfaceGain, kInterfacePan, ro::audio::SoundChannel::kInterface);
   if (held_name_out != nullptr) {
     *held_name_out = held_name;
   }

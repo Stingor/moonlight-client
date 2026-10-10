@@ -133,6 +133,7 @@ void ChatRoomStage::StartSession() {
   raise_room_ = false;
   join_.reset();
   leave_asked_ = false;
+  sounds_.clear();
   error_.clear();
   error_field_ = ro::ui::ChatRoomField::kNone;
   password_error_.clear();
@@ -422,6 +423,9 @@ void ChatRoomStage::SayNews(ro::sim::World& world, const ro::vfs::ItemWords& wor
                             std::uint32_t now_ms) {
   const ChatRoomSaid said{.world = world, .words = words, .now_ms = now_ms};
   for (const ro::sim::ChatRoomNews& news : room_.TakeNews()) {
+    if (ChatRoomNewsRings(news, world.player_name())) {
+      sounds_.push_back(ButtonSoundFile());
+    }
     switch (news.kind) {
       case ro::sim::ChatRoomNewsKind::kCreated:
         Say(said, ChatRoomText(words, ChatRoomWord::kRoomMade), kRoomMadeColor);

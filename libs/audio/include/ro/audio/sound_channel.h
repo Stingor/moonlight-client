@@ -25,13 +25,18 @@ enum class SoundChannel : std::uint8_t {
   // Les sources de son posées par la carte : l'eau, le vent, les animaux, la
   // foule.
   kAmbience,
+  // Ce que l'interface fait entendre d'elle-même, hors de toute entité et de
+  // toute carte : l'alarme d'un chuchotement, l'arrivée d'un membre au salon,
+  // l'alerte d'un MVP. ⚠ JAMAIS PLACÉ DANS LE MONDE : son site d'appel le joue
+  // au centre, sans atténuation par la distance.
+  kInterface,
 };
 
-inline constexpr std::size_t kSoundChannelCount = 3;
+inline constexpr std::size_t kSoundChannelCount = 4;
 
 // Le volume de chaque famille, de zéro à un, à fond par défaut.
 using SoundChannelVolumes = std::array<float, kSoundChannelCount>;
-inline constexpr SoundChannelVolumes kFullSoundChannelVolumes = {1.0F, 1.0F, 1.0F};
+inline constexpr SoundChannelVolumes kFullSoundChannelVolumes = {1.0F, 1.0F, 1.0F, 1.0F};
 
 [[nodiscard]] constexpr std::size_t IndexOf(SoundChannel channel) noexcept {
   return static_cast<std::size_t>(channel);
