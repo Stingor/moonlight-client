@@ -264,6 +264,10 @@ struct ActorEffectChange {
   // DE COMBIEN D'UNITÉS DU MONDE la copie naît DERRIÈRE son porteur, sur l'axe
   // de son corps. Zéro pour une copie posée à sa place.
   float clone_behind_units = 0.0F;
+  // TOUS LES COMBIEN DE TICS l'effet lève ses bits : au tic dont l'âge est un
+  // multiple, et à aucun autre. Le mot de rendu retombant à zéro à chaque
+  // image, un voile levé un tic sur quatre CLIGNOTE. Un pour chaque tic.
+  std::uint8_t render_bits_period_ticks = 1;
 };
 
 // Vrai quand l'effet agit sur l'acteur à cet âge : passé son premier tic, et

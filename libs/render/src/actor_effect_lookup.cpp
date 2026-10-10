@@ -132,6 +132,9 @@ std::uint32_t RenderBitsAt(const ActorEffectChange& change, std::uint32_t age_ti
   if (change.life_ticks != 0 && age_ticks >= change.life_ticks) {
     return change.render_bits & change.unbounded_render_bits;
   }
+  if (change.render_bits_period_ticks > 1 && age_ticks % change.render_bits_period_ticks != 0) {
+    return 0;
+  }
   // 🔴 UN EFFET QUI CLIGNOTE NE REND SES CALQUES ADDITIFS QU'AVEC SA TEINTE
   // PRINCIPALE : le client lève ce bit dans la même branche que la couleur des
   // tics pairs, et le mot de rendu retombe à zéro à chaque image. Levé à chaque
