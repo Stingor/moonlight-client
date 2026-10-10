@@ -226,7 +226,13 @@ std::vector<ro::render::ScreenQuad> DrawnName(
       names.kinds[static_cast<std::size_t>(NamePlateKindOf(actor, world))];
 
   ro::render::NamePlateText what;
-  what.name = name.empty() ? std::string_view(actor.name) : name;
+  // Le libellé que le serveur veut montrer passe devant le nom du personnage —
+  // l'étiquette d'absence, voir `NameCard::shown_name`.
+  std::string_view label = actor.name;
+  if (actor.card.has_value() && !actor.card->shown_name.empty()) {
+    label = actor.card->shown_name;
+  }
+  what.name = name.empty() ? label : name;
   // ⚠ LA QUANTITÉ PREND LA PLACE DE L'« ASIDE », celle qui s'écrit entre
   // parenthèses à la suite du nom. Un objet au sol n'a pas de carte de nom : la
   // place est libre, et elle donne « Red Potion (5) » sans rien inventer.

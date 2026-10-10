@@ -3,11 +3,15 @@
 
 #include "ro/net/actor_name.h"
 
+#include <cstddef>
+#include <string>
+#include <string_view>
 #include <utility>
 
 #include "ro/core/text.h"
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
+#include "ro/sim/actor.h"
 #include "ro/sim/world.h"
 
 namespace ro::net {
@@ -15,6 +19,32 @@ namespace {
 
 // Le texte vient du JEU, donc de sa page de codes : voir ro/core/text.h.
 [[nodiscard]] std::string Said(const std::string& wire) { return core::Utf8FromCp1252(wire); }
+
+// L'ÉTIQUETTE D'ABSENCE que le serveur colle devant le pseudo d'un joueur
+// absent — dans ce paquet seulement, jamais dans celui d'apparition.
+constexpr std::string_view kAbsenceTag = "[AFK] ";
+// Ce que le champ de nom porte, zéro final non compris (`NAME_LENGTH` moins
+// un). L'étiquette s'y paie sur la FIN du pseudo, et un caractère de la page de
+// codes du jeu y occupe un octet : on compte donc en caractères.
+constexpr std::size_t kNameFieldChars = 23;
+
+// Vrai quand `shown` est `known` derrière l'étiquette d'absence, tronqué comme
+// le serveur le compose.
+//
+// ⚠ LA COMPARAISON EST EXACTE, et pas un simple préfixe : un joueur qui
+// s'appelle vraiment « [AFK] Bob » garde son nom quand il est présent.
+[[nodiscard]] bool IsAbsenceLabel(std::string_view shown, std::string_view known) {
+  if (known.empty() || !shown.starts_with(kAbsenceTag)) {
+    return false;
+  }
+  const std::size_t room_chars = kNameFieldChars - kAbsenceTag.size();
+  std::size_t kept_bytes = 0;
+  for (std::size_t kept_chars = 0; kept_bytes < known.size() && kept_chars < room_chars;
+       ++kept_chars) {
+    static_cast<void>(core::NextCodePoint(known, kept_bytes));
+  }
+  return shown.substr(kAbsenceTag.size()) == known.substr(0, kept_bytes);
+}
 
 // Pose la carte, ou dit que personne ne portait cet identifiant.
 //
@@ -43,8 +73,17 @@ FrameOutcome ApplyActorNameFrame(const Frame& frame, sim::World& world) {
     // qui le traduit — `title_tbl`, dans `titletable.lub`. La couche réseau ne
     // lit aucun fichier du jeu : elle porte le numéro, et `render` le résout.
     card.title_id = packet.title_id;
-    return Posted(world, static_cast<std::uint32_t>(packet.gid), Said(packet.name),
-                  std::move(card));
+    const auto id = static_cast<std::uint32_t>(packet.gid);
+    std::string name = Said(packet.name);
+    // 🔴 L'ABSENCE NE RENOMME PAS : elle se peint, et le nom du personnage
+    // reste celui de l'apparition — c'est lui que le serveur cherche quand on
+    // l'invite par son nom. Un nom vide garde celui qu'on a.
+    if (const sim::Actor* actor = world.Find(id);
+        actor != nullptr && IsAbsenceLabel(name, actor->name)) {
+      card.shown_name = std::move(name);
+      name.clear();
+    }
+    return Posted(world, id, std::move(name), std::move(card));
   }
 
   if (frame.opcode == proto::ZcAckReqnameallNpc::kOpcode) {

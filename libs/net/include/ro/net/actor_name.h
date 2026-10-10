@@ -19,6 +19,11 @@ namespace ro::net {
 // nom masqué d'un siège. Il porte en outre ce qu'aucune apparition ne dit —
 // groupe, guilde, rang, titre.
 //
+// 🔴 L'ÉTIQUETTE D'ABSENCE NE RENOMME PAS L'ACTEUR : « [AFK] Nom » va dans
+// `NameCard::shown_name`, et `Actor::name` garde le nom du personnage. Le
+// serveur cherche un joueur invité par son nom EXACT ; lui envoyer le libellé
+// répond « pas connecté ou n'existe pas » tant que l'autre reste absent.
+//
 // DEUX PAQUETS, ET LE SERVEUR CHOISIT PAR L'ESPÈCE (`clif_name`) :
 //
 //   · `ZC 0x0A30` — un JOUEUR, un monstre de garnison, et TOUT monstre dès que

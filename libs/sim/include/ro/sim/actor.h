@@ -212,6 +212,13 @@ struct NameCard {
   // Le numéro du titre équipé, de la table `title_tbl` de l'installation. Zéro
   // quand le joueur n'en porte aucun — la table commence à mille.
   std::int32_t title_id = 0;
+  // LE NOM TEL QUE L'ÉTIQUETTE L'ÉCRIT, quand il n'est pas celui du personnage
+  // — « [AFK] Nom » pour un joueur absent. Vide sinon.
+  //
+  // 🔴 CE N'EST PAS UN NOM, et il ne remplace pas `Actor::name` : le serveur
+  // cherche un joueur par son nom EXACT (invitation, ami, guilde, murmure), et
+  // ce libellé-ci n'appartient à personne.
+  std::string shown_name;
 };
 
 // Ce qu'un acteur fait de son corps : debout, assis, ou mort — à terre, là
