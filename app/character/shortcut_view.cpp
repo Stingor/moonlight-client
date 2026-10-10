@@ -399,15 +399,10 @@ void ShortcutBarView::Apply(const ro::ui::ShortcutBarsAction& asked, SkillBookPa
     bar_.Clear(static_cast<std::size_t>(asked.cleared));
   }
   // ⚠ LE RANG SE POSE SUR LA CASE, pas sur la compétence : la barre peut porter
-  // la MÊME deux fois à deux rangs différents. `Assign` la réécrit entière, donc
-  // on relit l'identifiant qu'elle portait.
+  // la MÊME deux fois à deux rangs différents.
   if (asked.level_for >= 0) {
-    const ro::sim::ShortcutSlot held = bar_.At(static_cast<std::size_t>(asked.level_for));
-    if (held.skill_id != 0) {
-      bar_.Assign(static_cast<std::size_t>(asked.level_for),
-                  ro::sim::ShortcutSlot{.skill_id = held.skill_id,
-                                        .level = static_cast<std::uint16_t>(asked.level)});
-    }
+    bar_.SetLevel(static_cast<std::size_t>(asked.level_for),
+                  static_cast<std::uint16_t>(asked.level));
   }
   if (asked.cast >= 0) {
     Cast(static_cast<std::size_t>(asked.cast), book, link, world, now_ms);

@@ -81,11 +81,20 @@ class ShortcutBars {
   // un déplacement : celui-ci passe par `Swap`, qui ne peut rien dupliquer.
   //
   // ⚠ RETIRE LA MÊME ENTRÉE DE SA BARRE, ET DE CELLE-LÀ SEULEMENT. Deux cases
-  // voisines pour la même compétence ne servent qu'à se tromper de touche ;
+  // voisines qui partent à l'identique ne servent qu'à se tromper de touche ;
   // mais poser `Heal` sur la barre de soin ET sur celle de mêlée est la chose
   // même pour quoi l'on fait huit barres. Voir la fiche 0038.
+  //
+  // 🔴 LA MÊME ENTRÉE, C'EST LA MÊME COMPÉTENCE AU MÊME RANG. Un autre rang est
+  // une autre entrée, et reste : la barre porte Heal 1 et Heal 10 côte à côte.
   void Assign(std::size_t index, ShortcutSlot what);
   void Clear(std::size_t index);
+
+  // RÈGLE LE RANG D'UNE CASE DE COMPÉTENCE, sans rien retirer ailleurs.
+  //
+  // ⚠ UN RÉGLAGE ET NON UN DÉPÔT : amener une case au rang de sa voisine ne doit
+  // pas vider la voisine. Une case vide ou d'objet ne change pas.
+  void SetLevel(std::size_t index, std::uint16_t level);
 
   // ÉCHANGE DEUX CASES — le glisser de l'une sur l'autre.
   //

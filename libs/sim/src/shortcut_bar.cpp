@@ -17,7 +17,11 @@ void ShortcutBars::Assign(std::size_t index, ShortcutSlot what) {
   }
   // ⚠ UNE ENTRÉE NE TIENT QU'UNE CASE DE SA BARRE. Le jeu retire celle qu'on
   // dépose de son ancienne place, sans quoi un dépôt la DUPLIQUE — et deux cases
-  // voisines pour la même compétence ne servent qu'à se tromper de touche.
+  // voisines qui partent à l'identique ne servent qu'à se tromper de touche.
+  //
+  // 🔴 L'ENTRÉE D'UNE COMPÉTENCE EST LE COUPLE (compétence, rang). Heal 1 sous
+  // une touche et Heal 10 sous la voisine sont deux gestes distincts, que le
+  // joueur règle exprès : poser l'un ne doit pas effacer l'autre.
   //
   // 🔴 DE SA BARRE, ET PAS AU-DELÀ. Balayer les huit interdirait de poser `Heal`
   // sur la barre de soin ET sur celle de mêlée, c'est-à-dire la chose même pour
@@ -30,14 +34,24 @@ void ShortcutBars::Assign(std::size_t index, ShortcutSlot what) {
       // identifiants de compétence viderait toutes les cases d'OBJET en posant
       // un objet : leur identifiant de compétence vaut zéro, comme celui de la
       // case qu'on pose — et les cases vides y passeraient aussi.
-      const bool same = what.holds_item() ? other.item_id == what.item_id
-                                          : other.skill_id != 0 && other.skill_id == what.skill_id;
+      const bool same =
+          what.holds_item()
+              ? other.item_id == what.item_id
+              : other.skill_id != 0 && other.skill_id == what.skill_id && other.level == what.level;
       if (same) {
         other = ShortcutSlot{};
       }
     }
   }
   slots_[index] = what;
+  ++revision_;
+}
+
+void ShortcutBars::SetLevel(std::size_t index, std::uint16_t level) {
+  if (index >= slots_.size() || slots_[index].skill_id == 0 || slots_[index].level == level) {
+    return;
+  }
+  slots_[index].level = level;
   ++revision_;
 }
 
