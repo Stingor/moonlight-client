@@ -101,10 +101,17 @@ app      ← tout
 
 Le code est sous licence MIT (voir `LICENSE`).
 
-`dist/data/yaml_files/quests.yml` et `recommended_quests.yml` sont dérivés des
-traductions [ROenglishRE](https://github.com/llchrisll/ROenglishRE), dont la
-licence en permet la distribution et la modification ; chacun en porte la
-mention en tête, et ils ne sont pas revendiqués comme partie de ce projet.
+Les tables de `dist/data/yaml_files/` sont des conversions : chacune dit en
+tête d'où elle vient et comment la régénérer.
+
+- `quests.yml` et `recommended_quests.yml` sont dérivés des traductions
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE), dont la licence en
+  permet la distribution et la modification ; ils ne sont pas revendiqués comme
+  partie de ce projet.
+- `item_properties.yml` et `monster_list.yml` sont exportés des bases d'objets
+  et de monstres du serveur Moonlight.
+- `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
+  client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 
 Ragnarok Online est une marque de Gravity Co., Ltd. Ce projet n'est ni
 affilié à Gravity ni approuvé par elle.
