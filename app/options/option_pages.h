@@ -35,6 +35,7 @@
 #include "options/pick_precision_options.h"
 #include "options/quick_cast_options.h"
 #include "options/shop_options.h"
+#include "options/skill_view_options.h"
 #include "options/skin_look_options.h"
 #include "options/skin_options.h"
 #include "options/sprite_sound_options.h"
@@ -108,6 +109,7 @@ struct OptionPages {
   WhisperOptions whispers;
   GreyWorldOptions grey_world;
   GrimoireKeyOptions grimoire_keys;
+  SkillViewOptions skill_views;
   SpriteSoundOptions sprite_sounds;
   MvpTrackerOptions mvp_tracker;
   BattlegroundOptions battleground;

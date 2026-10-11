@@ -156,6 +156,8 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   // posée ici est celle que l'en-tête du grimoire cochera dans la même image.
   windows.character.grimoire.smooth_icons = options_.grimoire_smooth_icons();
   windows.character.grimoire.keyboard_layout = options_.pages().grimoire_keys.keyboard_layout();
+  windows.character.grimoire.grid = options_.pages().skill_views.grimoire_grid();
+  windows.character.guild.skill_grid = options_.pages().skill_views.guild_grid();
   // 🔴 LE SOUVENIR DU VOLET DU STAFF, et il ne peut PAS vivre dans `imgui.ini`.
   // Le droit n'arrive qu'après l'entrée sur la carte : les premières images
   // posent un plafond de largeur SANS volet, ImGui y rabote la fenêtre
@@ -287,6 +289,12 @@ void GameSettings::NoteGrimoireIcons(const UiStage::Windows& windows) {
   }
   if (options_.pages().grimoire_keys.NoteKeyboardLayout(
           windows.character.grimoire.keyboard_layout)) {
+    file_.Touch();
+  }
+  if (options_.pages().skill_views.NoteGrimoireGrid(windows.character.grimoire.grid)) {
+    file_.Touch();
+  }
+  if (options_.pages().skill_views.NoteGuildGrid(windows.character.guild.skill_grid)) {
     file_.Touch();
   }
 }

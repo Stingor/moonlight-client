@@ -75,9 +75,10 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kChat, chat_web);
   into.Section("GreyWorld");
   DeclareOn(into, OptionSection::kGameplay, grey_world);
-  // AUCUNE PAGE : le mode du grimoire se choisit dans le grimoire.
+  // AUCUNE PAGE : le mode et la vue d'un arbre se choisissent dans l'arbre.
   into.Section("Le grimoire");
   grimoire_keys.Declare(into);
+  skill_views.Declare(into);
   into.Section("Les sons des monstres et des pets");
   {
     const SettingsFile::PageScope scope(into, kSpriteSoundsSettingsPage);
