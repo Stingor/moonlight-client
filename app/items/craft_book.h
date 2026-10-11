@@ -18,8 +18,8 @@ namespace moonclient {
 
 // ── LE LIVRE DES RECETTES : ce que le serveur sait fabriquer ────────────────
 //
-// Lu dans `craft_recipes.yml`, que le serveur GÉNÈRE depuis ses propres
-// tables (`moonlight/tools/gen_metalprocess.py`) et livre avec le patch.
+// Lu dans `craft_recipes.yml`, exporté des propres tables du serveur par
+// `scripts/yaml_tables/craft_recipes.py` et livré avec le patch.
 //
 // 🔴 C'EST LA SEULE SOURCE QUI SE PARCOURT. Le serveur n'envoie une liste de
 // fabrication qu'APRÈS le lancement d'un skill, et déjà filtrée sur ce que le
