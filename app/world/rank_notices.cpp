@@ -208,8 +208,12 @@ std::optional<StarNoticeOutcome> StarNoticeOutcomeOf(const ro::net::StarNotice& 
       return outcome;
     case StarNoticeCode::kTaekwonMission:
       // LA CIBLE EST UN LIEN : un clic ouvre la fiche du monstre.
-      outcome.line.text = Printed(Tr("[Taekwon Mission] Monstre cible : %s (%d%%)"),
-                                  MonsterNamed(notice).c_str(), static_cast<int>(notice.star));
+      // ET SON AVANCEMENT : le serveur donne le compte des tués, sur cent.
+      outcome.line.text =
+          Printed(Tr("[Taekwon Mission] Monstre cible : %s — %d / %d tués, il en reste %d"),
+                  MonsterNamed(notice).c_str(), static_cast<int>(notice.star),
+                  static_cast<int>(kTaekwonMissionGoal),
+                  static_cast<int>(kTaekwonMissionGoal) - static_cast<int>(notice.star));
       outcome.effect_id = kStarNoticeEffect;
       return outcome;
     case StarNoticeCode::kTamingMission:
@@ -273,6 +277,9 @@ ro::net::FrameOutcome RankNotices::ApplyFrame(const ro::net::Frame& frame, ro::s
     return ro::net::FrameOutcome::kApplied;
   }
   if (const std::optional<ro::net::StarNotice> notice = ro::net::ReadStarNotice(frame)) {
+    if (notice->code == StarNoticeCode::kTaekwonMission) {
+      mission_.Start(notice->subject_id, notice->name, notice->star);
+    }
     const ro::sim::Actor* player = world.player();
     const std::optional<StarNoticeOutcome> outcome =
         StarNoticeOutcomeOf(*notice, player != nullptr ? player->name : std::string());
@@ -292,6 +299,7 @@ ro::net::FrameOutcome RankNotices::ApplyFrame(const ro::net::Frame& frame, ro::s
 }
 
 void RankNotices::Advance(ro::sim::World& world, std::uint32_t now_ms) {
+  mission_.Advance(world, now_ms);
   if (!pending_.has_value()) {
     return;
   }

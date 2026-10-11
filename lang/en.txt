@@ -16117,8 +16117,11 @@ tr: [Point] You have been rewarded with %d Blacksmith rank points. Your point to
 fr: [Solar, Lunar and Stellar Angel] Les lieux et les monstres désignés sont remis à zéro.
 tr: [Solar, Lunar and Stellar Angel] Designated places and monsters have been reset.
 
-fr: [Taekwon Mission] Monstre cible : %s (%d%%)
-tr: [Taekwon Mission] Target Monster: %s (%d%%)
+fr: [Taekwon Mission] Monstre cible : %s — %d / %d tués, il en reste %d
+tr: [Taekwon Mission] Target Monster: %s — %d / %d killed, %d to go
+
+fr: [Taekwon Mission] %s : %d / %d tués, il en reste %d
+tr: [Taekwon Mission] %s: %d / %d killed, %d to go
 
 fr: [Taming Mission] Monstre cible : %s
 tr: [Taming Mission] Target Monster: %s

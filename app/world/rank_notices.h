@@ -13,6 +13,8 @@
 #include "ro/net/world_update.h"
 #include "ro/sim/world.h"
 
+#include "world/taekwon_mission.h"
+
 namespace moonclient {
 
 // ── LES CLASSEMENTS ET LES AVIS D'ÉTOILE, DANS LA CONVERSATION ──────────────
@@ -64,8 +66,9 @@ class RankNotices {
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  ro::net::Connection& link, std::uint32_t now_ms);
   // Imprime le classement en attente quand ses noms sont là, ou que le délai
-  // est passé.
+  // est passé ; et tient le compte de la mission Taekwon.
   void Advance(ro::sim::World& world, std::uint32_t now_ms);
+  [[nodiscard]] const TaekwonMission& mission() const noexcept { return mission_; }
   // Les sons à jouer depuis la dernière fois, nommés dans le dossier des sons.
   [[nodiscard]] std::vector<std::string> TakeSounds();
 
@@ -115,6 +118,7 @@ class RankNotices {
   };
   std::optional<QuietRequest> quiet_;
   std::vector<std::string> sounds_;
+  TaekwonMission mission_;
 };
 
 }  // namespace moonclient

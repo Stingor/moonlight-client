@@ -786,6 +786,7 @@ target_include_directories(moonclient_songmusic PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # qu'en jeu.
 add_library(moonclient_ranknotices STATIC
     world/rank_notices.cpp
+    world/taekwon_mission.cpp
     world/ranking_board.cpp
     chat/rank_command.cpp)
 target_link_libraries(moonclient_ranknotices

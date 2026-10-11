@@ -16117,8 +16117,11 @@ tr: [Point] Has ganado %d puntos de rango Blacksmith. Total: %d.
 fr: [Solar, Lunar and Stellar Angel] Les lieux et les monstres désignés sont remis à zéro.
 tr: [Solar, Lunar and Stellar Angel] Los lugares y monstruos designados se han reiniciado.
 
-fr: [Taekwon Mission] Monstre cible : %s (%d%%)
-tr: [Taekwon Mission] Monstruo objetivo: %s (%d%%)
+fr: [Taekwon Mission] Monstre cible : %s — %d / %d tués, il en reste %d
+tr: [Taekwon Mission] Monstruo objetivo: %s — %d / %d eliminados, faltan %d
+
+fr: [Taekwon Mission] %s : %d / %d tués, il en reste %d
+tr: [Taekwon Mission] %s: %d / %d eliminados, faltan %d
 
 fr: [Taming Mission] Monstre cible : %s
 tr: [Taming Mission] Monstruo objetivo: %s
