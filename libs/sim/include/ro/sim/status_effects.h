@@ -105,6 +105,11 @@ inline constexpr StatusEffectId kEfstNight = 160;
 inline constexpr StatusEffectId kEfstSoulFairy = 1056;
 inline constexpr StatusEffectId kEfstSoulDivision = 1059;
 
+// LE DÉLAI APRÈS UNE FILE QUITTÉE (EFST_ENTRY_QUEUE_APPLY_DELAY). Le serveur le
+// pose pour une minute sur qui sort d'une file de champ de bataille ; tant
+// qu'il tient, le client refuse d'envoyer une nouvelle inscription.
+inline constexpr StatusEffectId kEfstEntryQueueApplyDelay = 668;
+
 // SI LA CARTE S'ASSOMBRIT, selon les états du JOUEUR. Ceux d'un autre acteur
 // n'y font rien.
 //

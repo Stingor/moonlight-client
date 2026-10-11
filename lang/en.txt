@@ -840,9 +840,6 @@ tr: Enlarge image
 fr: Aide
 tr: Help
 
-fr: Aide : champ de bataille
-tr: Help: battleground
-
 fr: Aider le maître
 tr: Assist the owner
 
@@ -1723,9 +1720,6 @@ tr: Pick an item above and click "Place".
 fr: Choisissez un résultat.
 tr: Pick a result.
 
-fr: Choisissez un terrain dans la liste, puis inscrivez-vous seul, avec votre party ou avec votre guilde. Seul le chef de la party ou le maître de la guilde inscrit son groupe ; le serveur vérifie ensuite l'effectif et le niveau.
-tr: Pick a battleground from the list, then sign up alone, with your party or with your guild. Only the party leader or the guild master can sign up their group; the server then checks the head count and the level.
-
 fr: Choisissez une quête.
 tr: Choose a quest.
 
@@ -1975,9 +1969,6 @@ tr: Standby (%zu)
 fr: En attente de la réponse du serveur…
 tr: Waiting for the server's answer…
 
-fr: En bataille, commencez une ligne par & ou par /bc pour parler à votre équipe, ou basculez tout le chat vers elle avec /battlechat. Le score des deux camps s'affiche en haut à droite de l'écran, celui de votre camp surligné.
-tr: In battle, start a line with & or /bc to talk to your team, or switch the whole chat to it with /battlechat. Both sides' scores show at the top right of the screen, with your side highlighted.
-
 fr: En dernier
 tr: Last
 
@@ -2175,9 +2166,6 @@ tr: Sign up your guild for “%s”?
 
 fr: Inscrire votre party à « %s » ?
 tr: Sign up your party for “%s”?
-
-fr: Inscrit, vous attendez dans la file : sa fenêtre montre le nombre de joueurs inscrits et le temps écoulé. La fermer ne vous fait pas quitter la file ; l'icône Champ de bataille du menu porte alors une pastille, et la rouvre d'un clic.
-tr: Once signed up, you wait in the queue: its window shows how many players are queued and how long you have waited. Closing it does not take you out of the queue; the Battleground menu icon then shows a dot, and reopens it with a click.
 
 fr: Inutilisable à bord du Mado Gear.
 tr: Can't be used while on Mado Gear.
@@ -2533,9 +2521,6 @@ tr: New message
 fr: Objectif
 tr: Objective
 
-fr: On ne s'inscrit pas depuis un champ de bataille.
-tr: You cannot apply from a battleground.
-
 fr: Ouvre l'onglet « Joueurs » de la fenêtre « IA du compagnon ». Une conduite ne sert qu'en PvP et en WoE.
 tr: Opens the “Players” tab of the “Companion AI” window. A behavior only applies in PvP and WoE.
 
@@ -2631,9 +2616,6 @@ tr: Ready on: %s
 
 fr: Quand
 tr: When
-
-fr: Quand assez de joueurs sont réunis, le terrain est prêt : vous avez 20 secondes pour entrer ou refuser. Sans réponse, l'invitation expire et vous sortez de la file.
-tr: When enough players have gathered, the battleground is ready: you have 20 seconds to enter or decline. Without an answer, the invitation expires and you leave the queue.
 
 fr: Quitter la file
 tr: Leave the queue
@@ -2784,12 +2766,6 @@ tr: No effect on a BIG sprite: its surface comes from its drawing, not from this
 
 fr: Score en haut à droite
 tr: Score at the top right
-
-fr: Seul le chef de la party peut l'inscrire.
-tr: Only the party leader can apply for the party.
-
-fr: Seul le maître de guilde peut l'inscrire.
-tr: Only the guild master can apply for the guild.
 
 fr: Seul le propriétaire du groupe peut exclure un membre.
 tr: Only the group owner can remove a member.
@@ -6187,9 +6163,6 @@ tr: You are not in a party.
 
 fr: Vous n'êtes dans aucune guilde.
 tr: You are not in any guild.
-
-fr: Vous n'êtes dans aucune party.
-tr: You are not in a party.
 
 fr: Vous ne pourrez plus expulser ni nommer de chef.
 tr: You will no longer be able to expel members or appoint a leader.
@@ -16788,3 +16761,57 @@ tr: Do not hide the EXP bars at max level
 
 fr: Au niveau maximum, la jauge d'EXP de base — ou celle du job au niveau de job maximum — s'efface d'elle-même. Cochée, elle reste.
 tr: At max level, the base EXP gauge — or the job one at max job level — hides by itself. Checked, it stays.
+
+fr: [Vous ne pouvez pas vous inscrire depuis cette carte.]
+tr: [You can't apply on this map.]
+
+fr: [Vous devez attendre environ 1 minute avant de vous inscrire.]
+tr: [You must wait about 1 minute to apply.]
+
+fr: [Vous devez être dans une party.]
+tr: [You must be in a party.]
+
+fr: [Seul le chef de la party peut inscrire.]
+tr: [Only party leader can apply.]
+
+fr: [Trop de membres de la party sont connectés.]
+tr: [Too many party members online.]
+
+fr: [Vous devez être dans une guilde.]
+tr: [You must be in a guild.]
+
+fr: [Seul le maître de guilde peut inscrire.]
+tr: [Only guild master can apply.]
+
+fr: [Trop de membres de la guilde sont connectés.]
+tr: [Too many guild members online.]
+
+fr: Aide : inscription au champ de bataille
+tr: Request help battle position
+
+fr: [Règles d'inscription au champ de bataille]
+tr: [Battlefield application rules]
+
+fr: L'inscription et l'entrée au champ de bataille sont impossibles dans les cas suivants
+tr: Application and position into the battlefield cannot be applied under this circumtances
+
+fr: 1. On ne peut pas s'inscrire à plusieurs types de bataille à la fois.
+tr: 1. Different types of battle cannot be applied simultaneously.
+
+fr: 2. On ne peut pas s'inscrire à la fois en solo, en party et en guilde.
+tr: 2. Personal / party / guild battle cannot be applied simultaneously.
+
+fr: 3. Seul le chef de la party peut l'inscrire.
+tr: 3. Parties can only be applied by their party leaders.
+
+fr: Les membres de la party hors ligne n'entrent pas dans la file.
+tr: Offline party members won't proceed to the queue.
+
+fr: 4. On peut demander l'entrée dans l'arène depuis n'importe quelle carte, sauf celles qui interdisent la téléportation et le warp.
+tr: 4. You can add request to enter the arena from any map except for those who don't allow teleport/warp.
+
+fr: À la fin de la bataille, votre personnage revient à l'endroit où il était ou, si c'est impossible, à son point de sauvegarde.
+tr: When the battle is finished your character will be returned to the current spot or (if it's not possible) to the save point.
+
+fr: 5. Les récompenses se consultent et se choisissent dans la salle d'attente de l'arène.
+tr: 5. You can view and choose rewards in the arena waiting room.

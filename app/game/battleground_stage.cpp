@@ -212,12 +212,18 @@ void BattlegroundStage::ApplyAnswer(BattlegroundWindows& windows,
     }
     const BattlegroundField& field = table_->fields()[action.field_rank];
     const ro::sim::World& world = context.world;
-    const ApplyFacts facts{.on_battlefield = world.map_mode().battlefield,
-                           .in_party = context.party.in_party(),
-                           .party_leader = context.party.AmILeader(world.player_id()),
-                           .in_guild = context.guild.in_guild(),
-                           .guild_master = context.guild.IsMaster(context.own_char_id),
-                           .link_ready = context.link_ready};
+    const std::optional<ro::sim::GuildSummary>& guild_summary = context.guild.summary();
+    const ApplyFacts facts{
+        .on_battlefield = world.map_mode().battlefield,
+        .apply_delayed = HasApplyDelay(world.player_statuses()),
+        .in_party = context.party.in_party(),
+        .party_leader = context.party.AmILeader(world.player_id()),
+        .party_online = OnlinePartyMembers(context.party.members()),
+        .in_guild = context.guild.in_guild(),
+        .guild_master = context.guild.IsMaster(context.own_char_id),
+        .guild_online = guild_summary.has_value() ? guild_summary->online_count : 0,
+        .team_most = field.team_max,
+        .link_ready = context.link_ready};
     if (const char* refusal = ApplyRefusal(*kind, facts); refusal != nullptr) {
       notice_shown_ = refusal;
       return;

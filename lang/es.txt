@@ -840,9 +840,6 @@ tr: Ampliar la imagen
 fr: Aide
 tr: Ayuda
 
-fr: Aide : champ de bataille
-tr: Ayuda: campo de batalla
-
 fr: Aider le maître
 tr: Ayudar al amo
 
@@ -1723,9 +1720,6 @@ tr: Elige un item arriba y pulsa «Colocar».
 fr: Choisissez un résultat.
 tr: Elige un resultado.
 
-fr: Choisissez un terrain dans la liste, puis inscrivez-vous seul, avec votre party ou avec votre guilde. Seul le chef de la party ou le maître de la guilde inscrit son groupe ; le serveur vérifie ensuite l'effectif et le niveau.
-tr: Elige un campo de la lista y luego inscríbete solo, con tu party o con tu guild. Solo el líder de la party o el guild master inscribe a su grupo; después el servidor comprueba el número de jugadores y el nivel.
-
 fr: Choisissez une quête.
 tr: Elige una misión.
 
@@ -1975,9 +1969,6 @@ tr: En espera (%zu)
 fr: En attente de la réponse du serveur…
 tr: Esperando la respuesta del servidor…
 
-fr: En bataille, commencez une ligne par & ou par /bc pour parler à votre équipe, ou basculez tout le chat vers elle avec /battlechat. Le score des deux camps s'affiche en haut à droite de l'écran, celui de votre camp surligné.
-tr: En batalla, empieza una línea con & o con /bc para hablar con tu equipo, o pasa todo el chat a él con /battlechat. La puntuación de los dos bandos aparece arriba a la derecha de la pantalla, con la de tu bando resaltada.
-
 fr: En dernier
 tr: En último lugar
 
@@ -2175,9 +2166,6 @@ tr: ¿Inscribir a tu guild en «%s»?
 
 fr: Inscrire votre party à « %s » ?
 tr: ¿Inscribir a tu party en «%s»?
-
-fr: Inscrit, vous attendez dans la file : sa fenêtre montre le nombre de joueurs inscrits et le temps écoulé. La fermer ne vous fait pas quitter la file ; l'icône Champ de bataille du menu porte alors une pastille, et la rouvre d'un clic.
-tr: Una vez inscrito, esperas en la cola: su ventana muestra cuántos jugadores hay inscritos y el tiempo transcurrido. Cerrarla no te saca de la cola; el icono Campo de batalla del menú muestra entonces un punto y la vuelve a abrir con un clic.
 
 fr: Inutilisable à bord du Mado Gear.
 tr: No se puede usar a bordo del Mado Gear.
@@ -2533,9 +2521,6 @@ tr: Mensaje nuevo
 fr: Objectif
 tr: Objetivo
 
-fr: On ne s'inscrit pas depuis un champ de bataille.
-tr: No puedes inscribirte desde un campo de batalla.
-
 fr: Ouvre l'onglet « Joueurs » de la fenêtre « IA du compagnon ». Une conduite ne sert qu'en PvP et en WoE.
 tr: Abre la pestaña «Jugadores» de la ventana «IA del compañero». Un comportamiento solo sirve en PvP y en WoE.
 
@@ -2631,9 +2616,6 @@ tr: Lista el: %s
 
 fr: Quand
 tr: Cuándo
-
-fr: Quand assez de joueurs sont réunis, le terrain est prêt : vous avez 20 secondes pour entrer ou refuser. Sans réponse, l'invitation expire et vous sortez de la file.
-tr: Cuando hay suficientes jugadores, el campo está listo: tienes 20 segundos para entrar o rechazar. Sin respuesta, la invitación caduca y sales de la cola.
 
 fr: Quitter la file
 tr: Salir de la cola
@@ -2784,12 +2766,6 @@ tr: Sin efecto en un sprite GRANDE: su superficie viene de su dibujo, no de este
 
 fr: Score en haut à droite
 tr: Marcador arriba a la derecha
-
-fr: Seul le chef de la party peut l'inscrire.
-tr: Solo el líder de la party puede inscribirla.
-
-fr: Seul le maître de guilde peut l'inscrire.
-tr: Solo el guild master puede inscribirlo.
 
 fr: Seul le propriétaire du groupe peut exclure un membre.
 tr: Solo el propietario del grupo puede expulsar a un miembro.
@@ -6187,9 +6163,6 @@ tr: No estás en ninguna party.
 
 fr: Vous n'êtes dans aucune guilde.
 tr: No estás en ninguna guild.
-
-fr: Vous n'êtes dans aucune party.
-tr: No estás en ninguna party.
 
 fr: Vous ne pourrez plus expulser ni nommer de chef.
 tr: Ya no podrás expulsar miembros ni nombrar líder.
@@ -16788,3 +16761,57 @@ tr: No ocultar las barras de EXP en el nivel máximo
 
 fr: Au niveau maximum, la jauge d'EXP de base — ou celle du job au niveau de job maximum — s'efface d'elle-même. Cochée, elle reste.
 tr: En el nivel máximo, la barra de EXP base — o la de job en el nivel de job máximo — se oculta sola. Marcada, se queda.
+
+fr: [Vous ne pouvez pas vous inscrire depuis cette carte.]
+tr: [No puedes inscribirte desde este mapa.]
+
+fr: [Vous devez attendre environ 1 minute avant de vous inscrire.]
+tr: [Debes esperar alrededor de 1 minuto para inscribirte.]
+
+fr: [Vous devez être dans une party.]
+tr: [Debes estar en una party.]
+
+fr: [Seul le chef de la party peut inscrire.]
+tr: [Solo el líder de la party puede inscribirla.]
+
+fr: [Trop de membres de la party sont connectés.]
+tr: [Demasiados miembros de la party están conectados.]
+
+fr: [Vous devez être dans une guilde.]
+tr: [Debes estar en un gremio.]
+
+fr: [Seul le maître de guilde peut inscrire.]
+tr: [Solo el maestro del gremio puede inscribirlo.]
+
+fr: [Trop de membres de la guilde sont connectés.]
+tr: [Demasiados miembros del gremio están conectados.]
+
+fr: Aide : inscription au champ de bataille
+tr: Ayuda: inscripción al campo de batalla
+
+fr: [Règles d'inscription au champ de bataille]
+tr: [Reglas de inscripción al campo de batalla]
+
+fr: L'inscription et l'entrée au champ de bataille sont impossibles dans les cas suivants
+tr: La inscripción y la entrada al campo de batalla son imposibles en los casos siguientes
+
+fr: 1. On ne peut pas s'inscrire à plusieurs types de bataille à la fois.
+tr: 1. No se puede inscribir a varios tipos de batalla a la vez.
+
+fr: 2. On ne peut pas s'inscrire à la fois en solo, en party et en guilde.
+tr: 2. No se puede inscribir a la vez en solitario, en party y en gremio.
+
+fr: 3. Seul le chef de la party peut l'inscrire.
+tr: 3. Solo el líder de la party puede inscribirla.
+
+fr: Les membres de la party hors ligne n'entrent pas dans la file.
+tr: Los miembros de la party desconectados no entran en la cola.
+
+fr: 4. On peut demander l'entrée dans l'arène depuis n'importe quelle carte, sauf celles qui interdisent la téléportation et le warp.
+tr: 4. Se puede pedir la entrada a la arena desde cualquier mapa, salvo los que prohíben el teletransporte y el warp.
+
+fr: À la fin de la bataille, votre personnage revient à l'endroit où il était ou, si c'est impossible, à son point de sauvegarde.
+tr: Al terminar la batalla, tu personaje vuelve al lugar donde estaba o, si no es posible, a su punto de guardado.
+
+fr: 5. Les récompenses se consultent et se choisissent dans la salle d'attente de l'arène.
+tr: 5. Las recompensas se consultan y se eligen en la sala de espera de la arena.

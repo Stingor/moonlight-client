@@ -2,6 +2,7 @@
 
 #include "game/battleground_rules.h"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdio>
@@ -19,7 +20,24 @@ constexpr std::string_view kForwardSound = "se_btg_forward.wav";
 
 constexpr std::size_t kConditionCapacity = 128;
 
+// UN GROUPE ENTIER DOIT TENIR DANS UN CAMP : ses membres connectés partent
+// tous en file. Un terrain qui ne dit pas sa taille ne refuse rien.
+[[nodiscard]] bool OutnumbersTeam(int online, int team_most) {
+  return team_most > 0 && online > team_most;
+}
+
 }  // namespace
+
+bool HasApplyDelay(std::span<const ro::sim::ActiveStatus> player_statuses) {
+  return std::ranges::any_of(player_statuses, [](const ro::sim::ActiveStatus& status) {
+    return status.effect == ro::sim::kEfstEntryQueueApplyDelay;
+  });
+}
+
+int OnlinePartyMembers(std::span<const ro::sim::PartyMember> members) {
+  return static_cast<int>(std::ranges::count_if(
+      members, [](const ro::sim::PartyMember& member) { return !member.offline; }));
+}
 
 const char* ApplyRefusal(ro::sim::EntryQueueApplyKind kind, const ApplyFacts& facts) {
   // ⚠ LA MÊME PHRASE QUE LES FENÊTRES DISENT d'un bouton éteint hors liaison.
@@ -28,25 +46,32 @@ const char* ApplyRefusal(ro::sim::EntryQueueApplyKind kind, const ApplyFacts& fa
         "Liaison avec le serveur en cours de vérification : réessayez dans un instant.");
   }
   if (facts.on_battlefield) {
-    return ro::core::Tr("On ne s'inscrit pas depuis un champ de bataille.");
+    return ro::core::Tr("[Vous ne pouvez pas vous inscrire depuis cette carte.]");
+  }
+  if (facts.apply_delayed) {
+    return ro::core::Tr("[Vous devez attendre environ 1 minute avant de vous inscrire.]");
   }
   switch (kind) {
     case ro::sim::EntryQueueApplyKind::kParty:
       if (!facts.in_party) {
-        return ro::core::Tr("Vous n'êtes dans aucune party.");
+        return ro::core::Tr("[Vous devez être dans une party.]");
       }
-      // Le chef seul ; l'effectif, le serveur le juge.
       if (!facts.party_leader) {
-        return ro::core::Tr("Seul le chef de la party peut l'inscrire.");
+        return ro::core::Tr("[Seul le chef de la party peut inscrire.]");
+      }
+      if (OutnumbersTeam(facts.party_online, facts.team_most)) {
+        return ro::core::Tr("[Trop de membres de la party sont connectés.]");
       }
       return nullptr;
     case ro::sim::EntryQueueApplyKind::kGuild:
       if (!facts.in_guild) {
-        return ro::core::Tr("Vous n'êtes dans aucune guilde.");
+        return ro::core::Tr("[Vous devez être dans une guilde.]");
       }
-      // Le maître seul ; le nombre de membres, le serveur le juge.
       if (!facts.guild_master) {
-        return ro::core::Tr("Seul le maître de guilde peut l'inscrire.");
+        return ro::core::Tr("[Seul le maître de guilde peut inscrire.]");
+      }
+      if (OutnumbersTeam(facts.guild_online, facts.team_most)) {
+        return ro::core::Tr("[Trop de membres de la guilde sont connectés.]");
       }
       return nullptr;
     case ro::sim::EntryQueueApplyKind::kSolo:

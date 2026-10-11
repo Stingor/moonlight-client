@@ -25,7 +25,7 @@ namespace ro::ui {
 namespace {
 
 constexpr const char* kListTitle = core::TrText("Champ de bataille");
-constexpr const char* kHelpTitle = core::TrText("Aide : champ de bataille");
+constexpr const char* kHelpTitle = core::TrText("Aide : inscription au champ de bataille");
 // La boîte de confirmation, nommée DANS la fenêtre qui la demande.
 constexpr const char* kConfirmId = "##entry_queue_confirm";
 // Le menu du lien d'une récompense, nommé dans la liste.
@@ -374,7 +374,7 @@ void DrawFieldDetail(const EntryQueueFieldView& field, ItemLinkMenu& menu, ChatL
   return action;
 }
 
-// L'AIDE : comment s'inscrire, la file, l'invitation, le combat.
+// L'AIDE : les cas où l'inscription et l'entrée sont refusées.
 void DrawHelpWindow(EntryQueueWindowState& state, const SkinArt& art) {
   const ImGuiViewport* screen = ImGui::GetMainViewport();
   ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_FirstUseEver, ImVec2(0.5F, 0.5F));
@@ -386,26 +386,26 @@ void DrawHelpWindow(EntryQueueWindowState& state, const SkinArt& art) {
     EndSkinnedWindow();
     return;
   }
-  const std::array<const char*, 4> paragraphs = {
-      core::Tr("Choisissez un terrain dans la liste, puis inscrivez-vous seul, avec votre party "
-               "ou avec votre guilde. Seul le chef de la party ou le maître de la guilde inscrit "
-               "son groupe ; le serveur vérifie ensuite l'effectif et le niveau."),
-      core::Tr("Inscrit, vous attendez dans la file : sa fenêtre montre le nombre de joueurs "
-               "inscrits et le temps écoulé. La fermer ne vous fait pas quitter la file ; l'icône "
-               "Champ de bataille du menu porte alors une pastille, et la rouvre d'un clic."),
-      core::Tr("Quand assez de joueurs sont réunis, le terrain est prêt : vous avez 20 secondes "
-               "pour entrer ou refuser. Sans réponse, l'invitation expire et vous sortez de la "
-               "file."),
-      core::Tr("En bataille, commencez une ligne par & ou par /bc pour parler à votre équipe, ou "
-               "basculez tout le chat vers elle avec /battlechat. Le score des deux camps "
-               "s'affiche en haut à droite de l'écran, celui de votre camp surligné."),
+  // LES RÈGLES D'INSCRIPTION, une ligne chacune : un titre, puis cinq cas
+  // numérotés, dont deux se prolongent d'une ligne sans numéro.
+  const std::array<const char*, 9> lines = {
+      core::Tr("[Règles d'inscription au champ de bataille]"),
+      core::Tr("L'inscription et l'entrée au champ de bataille sont impossibles dans les cas "
+               "suivants"),
+      core::Tr("1. On ne peut pas s'inscrire à plusieurs types de bataille à la fois."),
+      core::Tr("2. On ne peut pas s'inscrire à la fois en solo, en party et en guilde."),
+      core::Tr("3. Seul le chef de la party peut l'inscrire."),
+      core::Tr("Les membres de la party hors ligne n'entrent pas dans la file."),
+      core::Tr("4. On peut demander l'entrée dans l'arène depuis n'importe quelle carte, sauf "
+               "celles qui interdisent la téléportation et le warp."),
+      core::Tr("À la fin de la bataille, votre personnage revient à l'endroit où il était ou, si "
+               "c'est impossible, à son point de sauvegarde."),
+      core::Tr("5. Les récompenses se consultent et se choisissent dans la salle d'attente de "
+               "l'arène."),
   };
   ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kEntryQueueWrapFonts);
-  for (std::size_t rank = 0; rank < paragraphs.size(); ++rank) {
-    if (rank > 0) {
-      ImGui::Spacing();
-    }
-    ImGui::TextUnformatted(paragraphs[rank]);
+  for (const char* line : lines) {
+    ImGui::TextUnformatted(line);
   }
   ImGui::PopTextWrapPos();
   ImGui::Spacing();
