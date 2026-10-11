@@ -199,7 +199,8 @@ target_include_directories(moonclient_titles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # LES QUATRE AIDES DE TEXTE DE L'AFFICHAGE, a part : elles ne connaissent que des
 # chaines et des nombres, donc un essai les atteint sans monter tout le jeu.
 add_library(moonclient_display STATIC
-    options/display_options.cpp)
+    options/display_options.cpp
+    options/screen_choice.cpp)
 
 target_link_libraries(moonclient_display
     PUBLIC ro_core ro_render_gl

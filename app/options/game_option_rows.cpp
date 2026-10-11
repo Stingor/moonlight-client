@@ -25,11 +25,6 @@ using ro::core::Tr;
 using ro::ui::OptionKind;
 using ro::ui::OptionRowView;
 
-// ⚠ ECRITS A LA MAIN et non composes : un libelle compose a chaque image serait
-// une chaine qui ne vit pas assez longtemps pour la vue qui la designe. Le
-// premier ne sert pas -- « Aucune » se traduit.
-constexpr std::array<const char*, 6> kFrameLimitLabels = {"", "30", "60", "120", "144", "240"};
-
 [[nodiscard]] OptionRowView Volume(GameOption which, const char* label, float ratio) {
   return OptionRowView{.id = static_cast<int>(which),
                        .label = label,
@@ -434,70 +429,8 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
                     .kind = OptionKind::kAction,
                     .confirm = Tr("Effacer la conversation et les lignes tapées ? Sans retour.")});
 
-  // ── L'AFFICHAGE ───────────────────────────────────────────────────────────
-  //
-  // ⚠ SA PROPRE SECTION, la première du panneau : c'est ce qu'on vient régler
-  // avant tout le reste, et souvent une seule fois.
-  display_mode_names_.clear();
-  display_mode_names_.push_back(Tr("Fenêtré"));
-  display_mode_names_.push_back(Tr("Sans bordure"));
-  display_mode_names_.push_back(Tr("Plein écran"));
-  frame_limit_names_.clear();
-  frame_limit_names_.push_back(Tr("Aucune"));
-  for (std::size_t rank = 1; rank < kFrameLimits.size(); ++rank) {
-    frame_limit_names_.push_back(kFrameLimitLabels[rank]);
-  }
-  screen_rows_.clear();
-  screen_rows_.push_back(
-      Choice(GameOption::kDisplayMode, Tr("Mode d'affichage"),
-             Tr("Fenêtré laisse le bureau accessible. Sans bordure occupe tout "
-                "l'écran sans changer son mode vidéo : on en sort et on y revient "
-                "sans attente. Plein écran change le mode de l'écran — il seul "
-                "peut imposer une résolution plus petite que le bureau, au prix "
-                "d'une resynchronisation à chaque bascule."),
-             display_mode_names_, display_mode_));
-  screen_rows_.push_back(Choice(GameOption::kResolution, Tr("Résolution"),
-                                Tr("La taille de la fenêtre, ou le mode vidéo en plein écran. Sans "
-                                   "effet en sans bordure, qui suit toujours le bureau."),
-                                resolution_choices_, ResolutionRank()));
-  screen_rows_.push_back(
-      Toggle(GameOption::kLockWindowSize, Tr("Verrouiller la taille de la fenêtre"),
-             Tr("Le bord de la fenêtre ne répond plus à la souris. Pour qui a "
-                "trouvé sa taille et ne veut plus la perdre d'un glissement. Sans "
-                "objet hors du mode fenêtré."),
-             nullptr, lock_window_size_));
-  screen_rows_.push_back(
-      Toggle(GameOption::kVerticalSync, Tr("Synchronisation verticale"),
-             Tr("Attend le balayage de l'écran avant de montrer l'image : pas de "
-                "déchirure, et la carte cesse de dessiner des images que personne "
-                "ne voit. Le pilote peut l'imposer ou l'interdire."),
-             nullptr, vertical_sync_));
-  screen_rows_.push_back(
-      Choice(GameOption::kFrameLimit, Tr("Limite d'images"),
-             Tr("Un plafond, quand la synchronisation verticale est éteinte. "
-                "Au-delà de ce que l'écran affiche, une image de plus ne se voit "
-                "pas — elle chauffe."),
-             frame_limit_names_, FrameLimitRank()));
-  screen_rows_.push_back(
-      Toggle(GameOption::kFrameMeter, Tr("Compteur d'images"),
-             Tr("Un petit panneau posé sur le jeu : la cadence, la latence et la "
-                "courbe des temps d'image."),
-             nullptr, frame_meter_));
-  screen_rows_.push_back(
-      Toggle(GameOption::kFrameMeterLocked, Tr("Compteur figé et traversant"),
-             Tr("Le compteur ne se déplace plus et laisse passer les clics au jeu "
-                "en dessous. Déverrouillez-le pour le glisser ailleurs."),
-             nullptr, frame_meter_locked_));
-  screen_rows_.push_back(Toggle(GameOption::kFrameMeterGraph, Tr("Courbe des temps d'image"),
-                                Tr("Les 120 dernières images, de 0 à 33 ms. Un pic visible est un "
-                                   "à-coup — c'est précisément ce qu'un compteur moyenné cache."),
-                                nullptr, frame_meter_graph_));
-  screen_rows_.push_back(
-      Toggle(GameOption::kFrameMeterPing, Tr("Latence serveur"),
-             Tr("Mesurée sur le battement d'horloge que le client entretient déjà "
-                "avec le serveur, toutes les quelques secondes : rien n'est "
-                "envoyé en plus. « -- » tant qu'aucun échange n'a eu lieu."),
-             nullptr, frame_meter_ping_));
+  // L'AFFICHAGE, à part : voir `display_settings.cpp`.
+  ComposeScreenRows();
 
   // LES TROIS FENÊTRES D'OBJETS, à part : le sac, la charrette et le coffre
   // portent une section chacune, et elles se répondent. Voir

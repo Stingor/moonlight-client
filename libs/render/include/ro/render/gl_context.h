@@ -2,7 +2,9 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <vector>
 
@@ -56,6 +58,24 @@ struct Resolution {
   [[nodiscard]] bool operator==(const Resolution& other) const noexcept = default;
 };
 
+// UN ÉCRAN BRANCHÉ, tel que le système le décrit.
+//
+// ⚠ IL SE DÉSIGNE PAR SON RANG dans la liste que rend
+// `GlContext::ConnectedScreens`, et ce rang ne vaut que le temps d'une lecture :
+// brancher ou débrancher un moniteur réordonne la liste.
+struct ScreenInfo {
+  // Le nom que le système donne au moniteur. Deux moniteurs du même modèle
+  // portent le même : seul le rang les sépare alors.
+  std::string name;
+  // La taille du bureau sur cet écran. Nulle si l'écran ne répond pas.
+  Resolution desktop;
+  bool primary = false;
+};
+
+// CHOISIT L'ÉCRAN OÙ LA FENÊTRE NAÎT : reçoit les écrans branchés, rend le rang
+// de celui qu'on veut, ou moins un pour laisser le système choisir.
+using ScreenPicker = std::function<int(std::span<const ScreenInfo>)>;
+
 // Taille en pixels du tampon de dessin.
 //
 // Ce n'est PAS forcément la taille demandée à la création : sur un écran à
@@ -82,9 +102,18 @@ class GlContext {
   [[nodiscard]] static core::Result<std::unique_ptr<GlContext>> CreateHeadless(int width,
                                                                                int height);
 
-  // Fenêtre visible et redimensionnable, pour l'affichage interactif.
+  // Fenêtre visible et redimensionnable, pour l'affichage interactif, CENTRÉE
+  // sur l'écran que `pick` désigne — l'écran principal s'il est vide ou s'il
+  // rend un rang hors liste.
   [[nodiscard]] static core::Result<std::unique_ptr<GlContext>> CreateWindowed(
-      const std::string& title, int width, int height);
+      const std::string& title, int width, int height, const ScreenPicker& pick = {});
+
+  // LES ÉCRANS BRANCHÉS, dans l'ordre du système.
+  //
+  // ⚠ VIDE TANT QU'AUCUNE FENÊTRE N'EXISTE : la lecture ne démarre pas la vidéo
+  // d'elle-même, si bien qu'un essai qui compose les réglages sans écran
+  // n'ouvre rien.
+  [[nodiscard]] static std::vector<ScreenInfo> ConnectedScreens();
 
   [[nodiscard]] SDL_Window* window() const noexcept { return window_; }
 
@@ -138,6 +167,23 @@ class GlContext {
   [[nodiscard]] WindowPlace position() const;
   void SetPosition(WindowPlace where) const;
 
+  // Le rang, dans `ConnectedScreens`, de l'écran où se tient la fenêtre ; moins
+  // un s'il ne répond pas.
+  [[nodiscard]] int screen_rank() const;
+
+  // Le rang de l'écran qui contient ce point du bureau ; moins un s'il tombe
+  // hors de tout écran — celui qui le portait a été débranché.
+  [[nodiscard]] static int ScreenRankAt(WindowPlace where);
+
+  // PORTE LA FENÊTRE SUR UN AUTRE ÉCRAN, centrée. Sans effet sur un rang hors
+  // liste.
+  //
+  // 🔴 ELLE QUITTE D'ABORD LE PLEIN ÉCRAN : une fenêtre en plein écran exclusif
+  // est rivée à son écran, et le système ignore qu'on la déplace. À l'appelant
+  // de reposer ensuite le mode d'affichage — sur le nouvel écran, puisque
+  // `SetDisplayMode` prend toujours celui où se tient la fenêtre.
+  void MoveToScreen(int screen_rank) const;
+
   // Ramène la fenêtre dans la partie UTILISABLE de son écran — celle qui exclut
   // la barre des tâches.
   //
@@ -179,7 +225,8 @@ class GlContext {
 
   [[nodiscard]] static core::Result<std::unique_ptr<GlContext>> Create(const std::string& title,
                                                                        int width, int height,
-                                                                       bool visible);
+                                                                       bool visible,
+                                                                       const ScreenPicker& pick);
 
   SDL_Window* window_ = nullptr;
   SDL_GLContextState* context_ = nullptr;

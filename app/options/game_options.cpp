@@ -145,11 +145,12 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
   // 🔴 AVANT L'AIGUILLAGE : c'est LUI qui écrit le champ. Relevée après,
   // l'ancienne valeur serait déjà la neuve, et « Revenir » ne reviendrait nulle
   // part.
-  const std::string previous_resolution = resolution_;
-  const int previous_mode = display_mode_;
-  const float previous_scale = interface_scale_;
+  const DisplayRevert before{.resolution = resolution_,
+                             .display_mode = display_mode_,
+                             .interface_scale = interface_scale_,
+                             .screen = screen_};
 
-  const bool display_gesture = which == GameOption::kDisplayMode ||
+  const bool display_gesture = which == GameOption::kScreen || which == GameOption::kDisplayMode ||
                                which == GameOption::kResolution ||
                                which == GameOption::kInterfaceScale;
 
@@ -217,6 +218,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
       // gagne une entrée dès que `/echelle` pose une valeur hors palier, et un
       // rang enregistré ne voudrait alors plus dire la même chose.
       interface_scale_ = InterfaceScaleAt(asked.chosen);
+      break;
+    case GameOption::kScreen:
+      screen_ = ScreenChoiceAt(screens_, asked.chosen, screen_);
       break;
     case GameOption::kDisplayMode:
       // ⚠ `chosen` ET NON `value` : c'est une liste déroulante, et `value` y
@@ -785,11 +789,7 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
   Apply(which, to);
 
   if (display_gesture) {
-    // ⚠ LE MOTEUR BORNE L'ÉCHELLE : on compare ce qu'il a RETENU, pas ce qu'on
-    // lui a demandé. Sans cela, un curseur poussé au-delà du plafond armerait le
-    // filet sur un changement qui n'a pas eu lieu.
-    ArmDisplayRevert(now_ms, previous_resolution, previous_mode, previous_scale,
-                     interface_scale_ != previous_scale, to);
+    ArmDisplayRevert(now_ms, before, to);
   }
   Record(to);
 }

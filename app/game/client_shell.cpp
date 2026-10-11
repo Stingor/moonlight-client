@@ -9,6 +9,7 @@
 #include "game/client_shell.h"
 
 #include <filesystem>
+#include <span>
 #include <string_view>
 #include <system_error>
 #include <utility>
@@ -21,6 +22,7 @@
 #include "game/save_folder.h"
 #include "game/skin_reload.h"
 #include "game/system_fonts.h"
+#include "options/screen_choice.h"
 #include "shell/skin_folder.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
@@ -130,7 +132,13 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   // que ce lot change : la fenêtre existe avant qu'on sache où l'on entre. Il
   // porte donc le nom et la version SEULS, sans le tiret qui introduit une
   // carte ; la partie le renomme à chaque image. Voir `WindowTitle`.
-  auto context = ro::render::GlContext::CreateWindowed(WindowTitle(), first_width, first_height);
+  // ⚠ ET SUR L'ÉCRAN CHOISI, ou le principal s'il a été débranché.
+  const ScreenChoice saved_screen = settings_->options().saved_screen();
+  auto context = ro::render::GlContext::CreateWindowed(
+      WindowTitle(), first_width, first_height,
+      [&saved_screen](std::span<const ro::render::ScreenInfo> connected) {
+        return PickScreen(saved_screen, connected);
+      });
   if (!context) {
     return std::unexpected(context.error());
   }

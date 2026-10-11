@@ -153,6 +153,8 @@ class GameOptions {
   // surtout toute disposition calculée entre les deux l'aurait été contre un
   // écran que le joueur n'aura pas.
   [[nodiscard]] ro::render::Resolution saved_resolution() const;
+  // L'ÉCRAN CHOISI, relu du fichier pour la même raison : la fenêtre y naît.
+  [[nodiscard]] const ScreenChoice& saved_screen() const noexcept { return screen_; }
 
   // LES DEUX MODIFICATEURS DE CIBLAGE, relus à chaque clic. Voir `no_shift_`
   // pour ce que « permanent » veut dire ici, et pourquoi ce n'est pas une
@@ -397,18 +399,17 @@ class GameOptions {
   void KeepDisplay() noexcept;
   // Il n'a rien dit, ou il a refusé : on remet ce qui marchait.
   void RevertDisplay(const OptionTargets& to);
-  // Arme le filet si le changement qu'on vient de poser peut cacher la question.
-  void ArmDisplayRevert(std::uint32_t now_ms, const std::string& previous_resolution,
-                        int previous_mode, float previous_scale, bool scale_changed,
-                        const OptionTargets& to);
+  // Arme le filet si le changement qu'on vient de poser, depuis `before`, peut
+  // cacher la question.
+  void ArmDisplayRevert(std::uint32_t now_ms, const DisplayRevert& before, const OptionTargets& to);
 
   // LA FENÊTRE VIENT DE BOUGER. ⚠ APPELÉE À CHAQUE DÉPLACEMENT, donc plusieurs
   // fois par seconde pendant un glisser : c'est l'anti-rebond du fichier qui
   // encaisse, et c'est exactement ce pour quoi il existe.
   //
   // Rend vrai si la place a changé — l'appelant n'a alors qu'à toucher le
-  // fichier.
-  [[nodiscard]] bool NoteWindowMoved(ro::render::WindowPlace where);
+  // fichier. ⚠ L'ÉCRAN SUIT : glisser la fenêtre sur un autre écran le choisit.
+  [[nodiscard]] bool NoteWindowMoved(const ro::render::GlContext& display);
 
   // Rend à la fenêtre la place qu'elle avait. ⚠ TOUJOURS RABATTUE DANS L'ÉCRAN :
   // l'écran où elle était a pu être débranché, et une place relue telle quelle
@@ -542,6 +543,7 @@ class GameOptions {
   // fait. C'est ce qui distingue « jamais réglé » de « réglé sur cette valeur ».
   std::string resolution_;
   int display_mode_ = 0;
+  ScreenChoice screen_;
   bool lock_window_size_ = false;
   // ⚠ ALLUMÉE PAR DÉFAUT. Sans elle la carte dessine aussi vite qu'elle peut,
   // chauffe, et l'écran n'en montre qu'une image sur trois.
@@ -642,6 +644,7 @@ class GameOptions {
   std::vector<ro::render::Resolution> resolutions_;
   std::vector<std::string> resolution_labels_;
   std::vector<const char*> resolution_choices_;
+  ScreenOffer screens_;
   // LES PALIERS D'ÉCHELLE OFFERTS, en pour cent. Voir `kInterfaceScalePercents`.
   //
   // ⚠ REFAITS À CHAQUE COMPOSITION, comme les noms de modes : le facteur courant
@@ -654,8 +657,7 @@ class GameOptions {
   std::vector<const char*> display_mode_names_;
   std::vector<const char*> frame_limit_names_;
 
-  // Le rang de la valeur enregistrée dans la liste offerte, ou zéro quand elle
-  // n'y est pas — un écran débranché, une valeur venue d'un autre poste.
+  // Le rang de la valeur enregistrée dans la liste offerte ; zéro si absente.
   [[nodiscard]] int ResolutionRank() const;
   [[nodiscard]] int FrameLimitRank() const;
   [[nodiscard]] int InterfaceScaleRank() const;
@@ -715,6 +717,7 @@ class GameOptions {
   // Les deux moitiés du panneau des barres, dans `game_option_bars.cpp` : ce
   // qu'il MONTRE, et ce qu'une de ses lignes CHANGE.
   void ComposeShortcutRows(int shown_bar);
+  void ComposeScreenRows();
   // LE SORT EN MAIN : sept lignes COMMUNES aux barres, dans
   // `game_option_armed.cpp`. ⚠ AU-DESSUS DES ONGLETS comme les deux autres
   // réglages communs : posées dessous, elles se liraient comme celles de la

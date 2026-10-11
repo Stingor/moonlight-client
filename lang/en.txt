@@ -16275,3 +16275,9 @@ tr: You have no party ad to remove.
 
 fr: Aucune annonce de groupe ne correspond à cette recherche.
 tr: No party ad matches this search.
+
+fr: Écran
+tr: Screen
+
+fr: Le moniteur où le jeu s'affiche. La fenêtre s'y porte aussitôt, centrée, et le plein écran s'y fait. Au lancement, un écran débranché laisse place au principal.
+tr: The monitor the game is shown on. The window moves there at once, centred, and fullscreen happens there. At launch, an unplugged screen gives way to the primary one.

@@ -8,6 +8,8 @@
 
 #include "ro/render/gl_context.h"
 
+#include "options/screen_choice.h"
+
 // CE QUE L'AFFICHAGE ÉCRIT DANS LE FICHIER, ET COMMENT ON LE RELIT.
 //
 // ⚠ UN EN-TÊTE PRIVÉ, dans `app/` : deux fichiers de la même classe s'en
@@ -39,6 +41,9 @@ struct DisplayRevert {
   // panneau où l'on vient de la poser n'est plus lisible — donc plus utilisable
   // pour la défaire.
   float interface_scale = 1.0F;
+  // ⚠ L'ÉCRAN AUSSI : celui qu'on vient de choisir peut être éteint, et la
+  // question s'y pose avec la fenêtre.
+  ScreenChoice screen;
   std::uint32_t deadline_ms = 0;
 };
 

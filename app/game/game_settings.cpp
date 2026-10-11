@@ -252,7 +252,7 @@ void GameSettings::NoteWindowPlace(const OptionTargets& to) {
   if (options_.display_mode() != 0) {
     return;
   }
-  if (options_.NoteWindowMoved(to.display->position())) {
+  if (options_.NoteWindowMoved(*to.display)) {
     file_.Touch();
   }
 }

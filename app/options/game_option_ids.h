@@ -41,6 +41,9 @@ enum class GameOption : std::uint8_t {
   // L'avis qui paraît tant qu'un élément d'interface est déverrouillé.
   kUnlockNotice,
   // ── L'AFFICHAGE ───────────────────────────────────────────────────────────
+  // ⚠ L'ÉCRAN AVANT LE MODE : `ApplyAll` suit cet ordre, et le mode se pose sur
+  // l'écran où se tient déjà la fenêtre.
+  kScreen,
   kDisplayMode,
   kResolution,
   kLockWindowSize,

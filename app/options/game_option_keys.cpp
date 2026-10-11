@@ -44,6 +44,8 @@ constexpr const char* kEffectsShownKey = "effects_shown";
 constexpr const char* kMinimalEffectsKey = "effects_minimal";
 constexpr const char* kLanguageKey = "language";
 constexpr const char* kLoginAccountKey = "count_held";
+constexpr const char* kScreenNameKey = "display_screen";
+constexpr const char* kScreenRankKey = "display_screen_rank";
 constexpr const char* kDisplayModeKey = "display_mode";
 constexpr const char* kResolutionKey = "display_resolution";
 constexpr const char* kLockWindowSizeKey = "display_size_locked";
@@ -533,6 +535,8 @@ void GameOptions::Declare(SettingsFile& into) {
   {
     // L'ÉCRAN TIENT À LA MACHINE : charger un profil ne le fait pas clignoter.
     const SettingsFile::MachineScope machine(into);
+    into.Declare(kScreenNameKey, &screen_.name);
+    into.Declare(kScreenRankKey, &screen_.rank);
     into.Declare(kDisplayModeKey, &display_mode_);
     into.Declare(kResolutionKey, &resolution_);
     into.Declare(kLockWindowSizeKey, &lock_window_size_);

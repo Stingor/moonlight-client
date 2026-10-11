@@ -1,7 +1,10 @@
 #include "ro/render/gl_context.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
@@ -27,7 +30,87 @@ constexpr int kStencilBits = 8;
   return Resolution{.width = usable.w, .height = usable.h};
 }
 
+// Les identifiants des écrans branchés, dans l'ordre du système. Vide si la
+// vidéo ne répond pas.
+[[nodiscard]] std::vector<SDL_DisplayID> DisplayIds() {
+  std::vector<SDL_DisplayID> ids;
+  int count = 0;
+  SDL_DisplayID* found = SDL_GetDisplays(&count);
+  if (found == nullptr) {
+    return ids;
+  }
+  ids.assign(found, found + count);
+  SDL_free(found);
+  return ids;
+}
+
+// L'écran de ce rang, ou zéro — l'identifiant que SDL réserve à « aucun ».
+[[nodiscard]] SDL_DisplayID DisplayAtRank(int rank) {
+  const std::vector<SDL_DisplayID> ids = DisplayIds();
+  if (rank < 0 || rank >= static_cast<int>(ids.size())) {
+    return 0;
+  }
+  return ids[static_cast<std::size_t>(rank)];
+}
+
+// Le rang de cet écran, ou moins un.
+[[nodiscard]] int RankOfDisplay(SDL_DisplayID display) {
+  if (display == 0) {
+    return -1;
+  }
+  const std::vector<SDL_DisplayID> ids = DisplayIds();
+  const auto found = std::ranges::find(ids, display);
+  return found == ids.end() ? -1 : static_cast<int>(found - ids.begin());
+}
+
 }  // namespace
+
+std::vector<ScreenInfo> GlContext::ConnectedScreens() {
+  std::vector<ScreenInfo> screens;
+  if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+    return screens;
+  }
+  const SDL_DisplayID primary = SDL_GetPrimaryDisplay();
+  for (const SDL_DisplayID display : DisplayIds()) {
+    ScreenInfo screen;
+    if (const char* name = SDL_GetDisplayName(display); name != nullptr) {
+      screen.name = name;
+    }
+    if (const SDL_DisplayMode* desktop = SDL_GetDesktopDisplayMode(display); desktop != nullptr) {
+      screen.desktop = Resolution{.width = desktop->w, .height = desktop->h};
+    }
+    screen.primary = display == primary;
+    screens.push_back(std::move(screen));
+  }
+  return screens;
+}
+
+int GlContext::screen_rank() const { return RankOfDisplay(SDL_GetDisplayForWindow(window_)); }
+
+int GlContext::ScreenRankAt(WindowPlace where) {
+  const SDL_Point point{.x = where.x, .y = where.y};
+  return RankOfDisplay(SDL_GetDisplayForPoint(&point));
+}
+
+void GlContext::MoveToScreen(int screen_rank) const {
+  const SDL_DisplayID display = DisplayAtRank(screen_rank);
+  if (display == 0) {
+    return;
+  }
+  if ((SDL_GetWindowFlags(window_) & SDL_WINDOW_FULLSCREEN) != 0) {
+    SDL_SetWindowFullscreen(window_, false);
+    SDL_SyncWindow(window_);
+  }
+  // ⚠ UNE FENÊTRE AGRANDIE EST CALÉE PAR LE SYSTÈME sur la zone de travail de
+  // son écran, et il refuserait de la déplacer.
+  if ((SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED) != 0) {
+    SDL_RestoreWindow(window_);
+    SDL_SyncWindow(window_);
+  }
+  const auto centered = static_cast<int>(SDL_WINDOWPOS_CENTERED_DISPLAY(display));
+  SDL_SetWindowPosition(window_, centered, centered);
+  SDL_SyncWindow(window_);
+}
 
 GlContext::~GlContext() {
   if (context_ != nullptr) {
@@ -40,7 +123,8 @@ GlContext::~GlContext() {
 }
 
 core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& title, int width,
-                                                           int height, bool visible) {
+                                                           int height, bool visible,
+                                                           const ScreenPicker& pick) {
   if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
     return Fail(ErrorCode::kIoFailure, std::string("SDL_InitSubSystem : ") + SDL_GetError());
   }
@@ -61,11 +145,30 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
   // fichier peut dépasser un petit écran. Les bords ne sont pas encore connus,
   // d'où la part réservée de `FitWindowSize`. Une fenêtre cachée — rendu hors
   // écran — garde la taille demandée au pixel près.
+  //
+  // ⚠ ET ELLE NAÎT SUR L'ÉCRAN CHOISI, centrée : l'ouvrir sur le principal pour
+  // la déplacer ensuite se verrait.
+  SDL_DisplayID display = SDL_GetPrimaryDisplay();
+  if (visible && pick) {
+    if (const SDL_DisplayID wanted = DisplayAtRank(pick(ConnectedScreens())); wanted != 0) {
+      display = wanted;
+    }
+  }
   Resolution asked{.width = width, .height = height};
   if (visible) {
-    asked = FitWindowSize(asked, UsableRoom(SDL_GetPrimaryDisplay()));
+    asked = FitWindowSize(asked, UsableRoom(display));
   }
-  context->window_ = SDL_CreateWindow(title.c_str(), asked.width, asked.height, flags);
+  const SDL_PropertiesID properties = SDL_CreateProperties();
+  const auto centered = static_cast<Sint64>(SDL_WINDOWPOS_CENTERED_DISPLAY(display));
+  SDL_SetStringProperty(properties, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str());
+  SDL_SetNumberProperty(properties, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, asked.width);
+  SDL_SetNumberProperty(properties, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, asked.height);
+  SDL_SetNumberProperty(properties, SDL_PROP_WINDOW_CREATE_X_NUMBER, centered);
+  SDL_SetNumberProperty(properties, SDL_PROP_WINDOW_CREATE_Y_NUMBER, centered);
+  SDL_SetNumberProperty(properties, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER,
+                        static_cast<Sint64>(flags));
+  context->window_ = SDL_CreateWindowWithProperties(properties);
+  SDL_DestroyProperties(properties);
   if (context->window_ == nullptr) {
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     return Fail(ErrorCode::kIoFailure, std::string("SDL_CreateWindow : ") + SDL_GetError());
@@ -92,12 +195,13 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
 }
 
 core::Result<std::unique_ptr<GlContext>> GlContext::CreateHeadless(int width, int height) {
-  return Create("moonclient", width, height, false);
+  return Create("moonclient", width, height, false, {});
 }
 
 core::Result<std::unique_ptr<GlContext>> GlContext::CreateWindowed(const std::string& title,
-                                                                   int width, int height) {
-  return Create(title, width, height, true);
+                                                                   int width, int height,
+                                                                   const ScreenPicker& pick) {
+  return Create(title, width, height, true, pick);
 }
 
 DrawableSize GlContext::drawable_size() const {

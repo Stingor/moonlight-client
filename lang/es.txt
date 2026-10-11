@@ -16275,3 +16275,9 @@ tr: No tienes ningún anuncio de grupo que retirar.
 
 fr: Aucune annonce de groupe ne correspond à cette recherche.
 tr: Ningún anuncio de grupo coincide con esta búsqueda.
+
+fr: Écran
+tr: Pantalla
+
+fr: Le moniteur où le jeu s'affiche. La fenêtre s'y porte aussitôt, centrée, et le plein écran s'y fait. Au lancement, un écran débranché laisse place au principal.
+tr: El monitor donde se muestra el juego. La ventana se lleva allí al instante, centrada, y la pantalla completa se hace en él. Al iniciar, una pantalla desconectada deja paso a la principal.

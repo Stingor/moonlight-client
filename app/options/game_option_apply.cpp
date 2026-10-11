@@ -38,6 +38,7 @@ namespace {
     case GameOption::kEffectSoundVolume:
     case GameOption::kAmbienceVolume:
     case GameOption::kSpatialSound:
+    case GameOption::kScreen:
     case GameOption::kDisplayMode:
     case GameOption::kResolution:
     case GameOption::kLockWindowSize:
@@ -110,6 +111,28 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
       // Rien à pousser : la langue se pose par `SetLanguage`, qui seule sait
       // dire si le catalogue a pu être lu.
       break;
+    case GameOption::kScreen: {
+      if (to.display == nullptr) {
+        break;
+      }
+      // ⚠ LE RANG SE RELIT ICI, contre les écrans branchés À CET INSTANT : celui
+      // de la liste montrée peut dater d'avant un moniteur débranché.
+      const int rank = PickScreen(screen_, ro::render::GlContext::ConnectedScreens());
+      if (rank < 0 || rank == to.display->screen_rank()) {
+        break;
+      }
+      // 🔴 LE DÉPLACEMENT QUITTE LE PLEIN ÉCRAN : le mode se repose donc sur le
+      // nouvel écran, avec sa résolution, puis la fenêtre — que la taille vient
+      // peut-être de rabattre — s'y recentre.
+      to.display->MoveToScreen(rank);
+      Apply(GameOption::kDisplayMode, to);
+      if (DisplayModeOf(display_mode_) == ro::render::DisplayMode::kWindowed) {
+        to.display->MoveToScreen(rank);
+      }
+      // Les tailles offertes sont celles du NOUVEL écran.
+      ReadResolutions(to);
+      break;
+    }
     case GameOption::kDisplayMode:
     case GameOption::kResolution: {
       // 🔴 LES DEUX ENSEMBLE, TOUJOURS. Le mode décide de ce que la résolution
