@@ -15,10 +15,12 @@ namespace ro::net {
 // tous les paquets déjà lus.
 //
 // L'EXPÉRIENCE (`ZC_NOTIFY_EXP2 0x0ACC`), gagnée ou perdue : une ligne de la
-// conversation par gain, rangée sous `ChatKind::kExp`. Jaune pour un gain
-// ordinaire, violette pour celui d'une quête. Un gain nul, celui d'un autre
-// personnage, et un paramètre qui n'est ni la base ni le métier ne s'écrivent
-// pas.
+// conversation par gain, rangée sous `ChatKind::kExp` : « '1200' d'expérience
+// de base obtenus. » Le début suit le paramètre (base ou job), la fin le sens
+// (« obtenus » ou « perdus »). Jaune pour un gain ordinaire, violette pour
+// celui d'une quête. Un gain nul et celui d'un autre
+// personnage ne s'écrivent pas ; un paramètre qui n'est ni la base ni le
+// métier n'écrit que la fin de phrase.
 [[nodiscard]] FrameOutcome ApplyCharacterNoticeFrame(const Frame& frame, sim::World& world,
                                                      std::uint32_t now_ms);
 

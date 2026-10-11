@@ -87,8 +87,8 @@ void GameOptions::BuildStatBarShared() {
   stat_bar_shared_rows_.back().disabled = bars_off || stat_bars_.locked;
   stat_bar_shared_rows_.push_back(Toggle(
       GameOption::kStatBarsKeepMaxedExp, Tr("Ne pas masquer les barres d'EXP au niveau maximum"),
-      Tr("Au niveau maximum, la jauge d'EXP de base — ou celle du métier au niveau "
-         "de métier maximum — s'efface d'elle-même. Cochée, elle reste."),
+      Tr("Au niveau maximum, la jauge d'EXP de base — ou celle du job au niveau "
+         "de job maximum — s'efface d'elle-même. Cochée, elle reste."),
       nullptr, stat_bars_.keep_maxed_exp));
   stat_bar_shared_rows_.back().disabled = bars_off;
   stat_bar_shared_rows_.push_back(

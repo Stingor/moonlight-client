@@ -15520,6 +15520,12 @@ tr: '%lld' Job Experience acquired.
 fr: '%lld' d'expérience de job perdus.
 tr: '%lld' Job Experience has lost.
 
+fr: obtenus.
+tr: acquired.
+
+fr: perdus.
+tr: has lost.
+
 fr: Vous pouvez être joint par l'appel d'urgence. (/call)
 tr: You can be "called" with Emergency Call. (/call)
 

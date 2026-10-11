@@ -78,9 +78,11 @@ constexpr std::array kServerMessages = {
     ServerMessageEntry{3837, TrText("Votre poids dépasse 70 %. Réduisez le poids et réessayez.")},
 };
 
-// LES REFUS ÉCRITS EN ROUGE, même quand le paquet demande une autre couleur.
-// Certains n'ont pas de texte dans la table : la couleur ne dépend pas d'elle.
-constexpr std::array<std::uint16_t, 7> kRedMessageIds = {52, 220, 1221, 1222, 1879, 1880, 2182};
+// LES REFUS ÉCRITS EN ROUGE par `ZC_MSG` et `ZC_MSG_COLOR`, même quand le
+// paquet demande une autre couleur ; les autres messages par numéro ne
+// rougissent jamais. Certains n'ont pas de texte dans la table : la couleur ne
+// dépend pas d'elle. Les refus de surcharge (52, 220) restent blancs.
+constexpr std::array<std::uint16_t, 5> kRedMessageIds = {1221, 1222, 1879, 1880, 2182};
 
 // LES PLAFONDS DU TRIBUT D'EXPÉRIENCE À LA GUILDE : celle de la guilde est
 // pleine, ou celle du personnage. Le client d'origine les range sous la case

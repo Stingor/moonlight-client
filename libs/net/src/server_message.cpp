@@ -80,7 +80,8 @@ FrameOutcome Say(sim::World& world, std::uint16_t opcode, std::uint32_t message_
   return FrameOutcome::kApplied;
 }
 
-// La couleur d'un message, sauf pour un refus que la table veut rouge.
+// La couleur d'un message par `ZC_MSG` ou `ZC_MSG_COLOR`, sauf pour un refus
+// que la table veut rouge.
 [[nodiscard]] std::uint32_t ColorOf(std::uint16_t message_id, std::uint32_t asked_rgb) {
   return ServerMessageIsRed(message_id) ? kRedMessageColor : asked_rgb;
 }
@@ -118,8 +119,8 @@ FrameOutcome ApplyServerMessageFrame(const Frame& frame, sim::World& world,
       });
     case proto::ZcMsgValue::kOpcode:
       return Decoded<proto::ZcMsgValue>(frame, [&](const proto::ZcMsgValue& packet) {
-        return Say(world, frame.opcode, packet.message, {},
-                   ColorOf(packet.message, kValueMessageColor), now_ms, packet.value);
+        return Say(world, frame.opcode, packet.message, {}, kValueMessageColor, now_ms,
+                   packet.value);
       });
     case proto::ZcMsgSkill::kOpcode:
       return Decoded<proto::ZcMsgSkill>(frame, [&](const proto::ZcMsgSkill& packet) {

@@ -56,14 +56,23 @@ constexpr std::uint8_t kUnreadEvictionCode = 0;
 constexpr std::string_view kBroadcastBlueTag = "blue";
 constexpr std::string_view kBroadcastWoeTag = "ssss";
 
-// Le texte d'une annonce, sans son étiquette de couleur.
-std::string_view AnnouncementText(std::string_view message) {
-  for (const std::string_view tag : {kBroadcastBlueTag, kBroadcastWoeTag}) {
-    if (message.starts_with(tag)) {
-      return message.substr(tag.size());
-    }
+// Une annonce lue : son texte sans étiquette, et sa case.
+struct Announcement {
+  std::string_view text;
+  sim::ChatType type = sim::ChatType::kBroadcast;
+};
+
+// ⚠ L'ANNONCE DE SIÈGE A SA CASE, « Informations WOE » : le client d'origine
+// range sous elle ce que « ssss » annonce, et sous la case des annonces tout le
+// reste.
+Announcement ReadAnnouncement(std::string_view message) {
+  if (message.starts_with(kBroadcastWoeTag)) {
+    return {.text = message.substr(kBroadcastWoeTag.size()), .type = sim::ChatType::kSiegeInfo};
   }
-  return message;
+  if (message.starts_with(kBroadcastBlueTag)) {
+    return {.text = message.substr(kBroadcastBlueTag.size())};
+  }
+  return {.text = message};
 }
 
 }  // namespace
@@ -133,8 +142,9 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
         // UNE ANNONCE DU SERVEUR. Elle ne vient de personne : l'orateur est
         // ZÉRO, comme pour les réponses de commande, et rien ne paraît donc
         // au-dessus d'une tête.
-        world.RecordChat(sim::ChatKind::kAnnouncement, 0,
-                         core::Utf8FromWire(AnnouncementText(packet.message)), now_ms);
+        const Announcement announcement = ReadAnnouncement(packet.message);
+        world.RecordChat(sim::ChatKind::kAnnouncement, announcement.type, 0,
+                         core::Utf8FromWire(announcement.text), now_ms);
         return FrameOutcome::kApplied;
       });
 

@@ -15520,6 +15520,12 @@ tr: '%lld' de experiencia de job obtenidos.
 fr: '%lld' d'expérience de job perdus.
 tr: '%lld' de experiencia de job perdidos.
 
+fr: obtenus.
+tr: obtenidos.
+
+fr: perdus.
+tr: perdidos.
+
 fr: Vous pouvez être joint par l'appel d'urgence. (/call)
 tr: Puedes ser contactado por la llamada de emergencia. (/call)
 

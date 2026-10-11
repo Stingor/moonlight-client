@@ -16,8 +16,10 @@ namespace ro::net {
 // numéro dans la table de messages du client, et c'est le client qui l'écrit.
 //
 //   ZC 0x0291 [op][msg:2]                 en blanc, sauf les refus rouges
-//   ZC 0x09CD [op][msg:2][couleur:4]      dans la couleur du paquet (BGR)
-//   ZC 0x07E2 [op][msg:2][valeur:4]       en jaune, la valeur dans le gabarit
+//   ZC 0x09CD [op][msg:2][couleur:4]      dans la couleur du paquet (BGR), sauf
+//                                         les mêmes refus rouges
+//   ZC 0x07E2 [op][msg:2][valeur:4]       toujours en jaune, la valeur dans le
+//                                         gabarit
 //   ZC 0x07E6 [op][skill:2][msg:4]        en lavande, « [compétence] message »
 //
 // Chaque message devient une ligne `kServer` de la conversation. Sa case est la

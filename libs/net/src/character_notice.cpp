@@ -5,7 +5,7 @@
 #include <array>
 #include <cstdio>
 #include <string>
-#include <utility>
+#include <string_view>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
@@ -29,8 +29,11 @@ constexpr std::uint32_t kQuestExpColor = 0xBE58BE;
 
 constexpr std::size_t kExpLineCapacity = 128;
 
-// La phrase d'un gain, selon le paramètre et le sens ; vide pour un paramètre
-// inconnu.
+// Ce qui précède la fin de phrase quand le paramètre n'a pas de début.
+constexpr std::string_view kLoneEndPrefix = " ";
+
+// La phrase d'un gain, selon le paramètre et le sens : le nombre et le
+// paramètre, puis « obtenus » ou « perdus ».
 //
 // ⚠ CHAQUE PHRASE PASSE EN LITTÉRAL à `snprintf` : un format choisi à part ne
 // se vérifie plus contre ses arguments.
@@ -49,6 +52,10 @@ constexpr std::size_t kExpLineCapacity = 128;
     std::snprintf(line.data(), line.size(), core::Tr("'%lld' d'expérience de job perdus."), shown);
   } else if (var_id == kJobExpVar) {
     std::snprintf(line.data(), line.size(), core::Tr("'%lld' d'expérience de job obtenus."), shown);
+  } else {
+    // Un autre paramètre n'a pas de début de phrase : seule la fin s'écrit,
+    // derrière son espace.
+    return std::string(kLoneEndPrefix) + (lost ? core::Tr("perdus.") : core::Tr("obtenus."));
   }
   return std::string(line.data());
 }
@@ -58,11 +65,7 @@ constexpr std::size_t kExpLineCapacity = 128;
   if (notice.account_id != world.player_id() || notice.amount == 0) {
     return FrameOutcome::kIgnored;
   }
-  std::string line = ExpLine(notice.var_id, notice.amount);
-  if (line.empty()) {
-    return FrameOutcome::kIgnored;
-  }
-  world.RecordChat(sim::ChatKind::kExp, 0, std::move(line), now_ms,
+  world.RecordChat(sim::ChatKind::kExp, 0, ExpLine(notice.var_id, notice.amount), now_ms,
                    notice.exp_type == kQuestExpType ? kQuestExpColor : kExpColor);
   return FrameOutcome::kApplied;
 }
