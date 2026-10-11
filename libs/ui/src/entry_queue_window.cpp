@@ -68,23 +68,20 @@ struct ApplyButton {
   // Ce qu'elle fait, quand elle peut partir.
   const char* help;
   bool allowed;
+  // Le refus que `app` a jugé ; vide : la confirmation peut s'ouvrir.
+  std::string_view refusal;
 };
 
-// LA QUESTION DE LA CONFIRMATION, pour ce terrain.
-//
-// ⚠ UN GABARIT LITTÉRAL PAR CAS, et non un gabarit rangé dans une table : le
-// compilateur ne vérifie les arguments que d'un format qu'il voit.
+// LA QUESTION DE LA CONFIRMATION : le nom du terrain, puis la question du mode
+// d'inscription, qui ne le redit pas.
 [[nodiscard]] Text ApplyQuestion(EntryQueueVerb verb, std::string_view field_name) {
-  const std::string name = Owned(field_name);
-  Text question{};
+  const char* asked = nullptr;
   switch (verb) {
     case EntryQueueVerb::kApplyParty:
-      std::snprintf(question.data(), question.size(), core::Tr("Inscrire votre party à « %s » ?"),
-                    name.c_str());
+      asked = core::Tr("Voulez-vous participer à la bataille des parties ?");
       break;
     case EntryQueueVerb::kApplyGuild:
-      std::snprintf(question.data(), question.size(), core::Tr("Inscrire votre guilde à « %s » ?"),
-                    name.c_str());
+      asked = core::Tr("Voulez-vous participer à la bataille des guildes ?");
       break;
     case EntryQueueVerb::kApplySolo:
     case EntryQueueVerb::kNothing:
@@ -92,10 +89,11 @@ struct ApplyButton {
     case EntryQueueVerb::kAccept:
     case EntryQueueVerb::kDecline:
     case EntryQueueVerb::kNoticeSeen:
-      std::snprintf(question.data(), question.size(), core::Tr("Vous inscrire seul à « %s » ?"),
-                    name.c_str());
+      asked = core::Tr("Voulez-vous participer à la bataille individuelle ?");
       break;
   }
+  Text question{};
+  std::snprintf(question.data(), question.size(), "%s %s", Owned(field_name).c_str(), asked);
   return question;
 }
 
@@ -267,15 +265,18 @@ void DrawFieldDetail(const EntryQueueFieldView& field, ItemLinkMenu& menu, ChatL
       ApplyButton{.verb = EntryQueueVerb::kApplySolo,
                   .label = core::Tr("Solo"),
                   .help = core::Tr("Vous inscrire seul."),
-                  .allowed = field.private_apply},
+                  .allowed = field.private_apply,
+                  .refusal = field.solo_refusal},
       ApplyButton{.verb = EntryQueueVerb::kApplyParty,
                   .label = core::Tr("Party"),
                   .help = core::Tr("Inscrire toute votre party : réservé à son chef."),
-                  .allowed = field.party_apply},
+                  .allowed = field.party_apply,
+                  .refusal = field.party_refusal},
       ApplyButton{.verb = EntryQueueVerb::kApplyGuild,
                   .label = core::Tr("Guilde"),
                   .help = core::Tr("Inscrire votre guilde : réservé au maître de guilde."),
-                  .allowed = field.guild_apply},
+                  .allowed = field.guild_apply,
+                  .refusal = field.guild_refusal},
   };
   EntryQueueAction action;
   for (std::size_t rank = 0; rank < buttons.size(); ++rank) {
@@ -286,7 +287,14 @@ void DrawFieldDetail(const EntryQueueFieldView& field, ItemLinkMenu& menu, ChatL
     const char* blocker = ApplyBlocker(view, button.allowed);
     ImGui::BeginDisabled(blocker != nullptr);
     if (SkinButton(button.label, art)) {
-      AskEntryQueueVerb(state, button.verb);
+      // 🔴 REFUSÉE, L'INSCRIPTION NE POSE PAS SA QUESTION : la demande part
+      // non confirmée, `app` la juge et ouvre la boîte de son refus.
+      if (button.refusal.empty()) {
+        AskEntryQueueVerb(state, button.verb);
+      } else {
+        action.verb = button.verb;
+        action.field_rank = state.selected;
+      }
     }
     ImGui::EndDisabled();
     TellEntryQueueWhy(blocker != nullptr ? blocker : button.help);
@@ -298,11 +306,12 @@ void DrawFieldDetail(const EntryQueueFieldView& field, ItemLinkMenu& menu, ChatL
     const Text question = ApplyQuestion(button.verb, field.display_name);
     // 🔴 LA RÉPONSE SE REJUGE AU « OUI » : la file a pu bouger pendant que la
     // boîte attendait, et une inscription devenue impossible ne part pas.
-    if (ConfirmEntryQueueVerb(state, button.verb, question.data(), core::Tr("S'inscrire"),
-                              core::Tr("Annuler"), art) &&
+    if (ConfirmEntryQueueVerb(state, button.verb, question.data(), core::Tr("Oui"), core::Tr("Non"),
+                              art) &&
         ApplyBlocker(view, button.allowed) == nullptr) {
       action.verb = button.verb;
       action.field_rank = state.selected;
+      action.confirmed = true;
     }
   }
   return action;

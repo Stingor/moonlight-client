@@ -118,6 +118,11 @@ class BattlegroundStage {
   void EnsureTable(ro::vfs::Vfs* vfs);
   // Ce que les fenêtres ont demandé à l'image précédente.
   void ApplyAnswer(BattlegroundWindows& windows, const BattlegroundContext& context);
+  // LE REFUS D'UNE INSCRIPTION à ce terrain, déjà traduit ; nul si elle peut
+  // partir. Jugé pour la vue comme pour la demande : voir `ApplyRefusal`.
+  [[nodiscard]] static const char* RefusalOf(ro::sim::EntryQueueApplyKind kind,
+                                             const BattlegroundField& field,
+                                             const BattlegroundContext& context);
   // Les fenêtres suivent la phase de la file, à chaque changement.
   void FollowTransitions(BattlegroundWindows& windows);
   // Les avis et les sons que la file a levés.

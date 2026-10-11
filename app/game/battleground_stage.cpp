@@ -211,21 +211,14 @@ void BattlegroundStage::ApplyAnswer(BattlegroundWindows& windows,
       return;
     }
     const BattlegroundField& field = table_->fields()[action.field_rank];
-    const ro::sim::World& world = context.world;
-    const std::optional<ro::sim::GuildSummary>& guild_summary = context.guild.summary();
-    const ApplyFacts facts{
-        .on_battlefield = world.map_mode().battlefield,
-        .apply_delayed = HasApplyDelay(world.player_statuses()),
-        .in_party = context.party.in_party(),
-        .party_leader = context.party.AmILeader(world.player_id()),
-        .party_online = OnlinePartyMembers(context.party.members()),
-        .in_guild = context.guild.in_guild(),
-        .guild_master = context.guild.IsMaster(context.own_char_id),
-        .guild_online = guild_summary.has_value() ? guild_summary->online_count : 0,
-        .team_most = field.team_max,
-        .link_ready = context.link_ready};
-    if (const char* refusal = ApplyRefusal(*kind, facts); refusal != nullptr) {
+    // 🔴 REJUGÉE À LA RÉCEPTION : le monde a pu bouger depuis la vue. Refusée,
+    // la boîte dit pourquoi ; acceptée sans le « oui » de la confirmation, la
+    // demande ne part pas — le joueur n'a pas vu la question.
+    if (const char* refusal = RefusalOf(*kind, field, context); refusal != nullptr) {
       notice_shown_ = refusal;
+      return;
+    }
+    if (!action.confirmed) {
       return;
     }
     // 🔴 LE NOM QUI PART EST CELUI DU SERVEUR, jamais celui qu'on lit : un nom
@@ -290,6 +283,24 @@ void BattlegroundStage::ApplyAnswer(BattlegroundWindows& windows,
     case EntryQueueVerb::kNoticeSeen:
       return;
   }
+}
+
+const char* BattlegroundStage::RefusalOf(ro::sim::EntryQueueApplyKind kind,
+                                         const BattlegroundField& field,
+                                         const BattlegroundContext& context) {
+  const ro::sim::World& world = context.world;
+  const std::optional<ro::sim::GuildSummary>& guild_summary = context.guild.summary();
+  return ApplyRefusal(
+      kind, ApplyFacts{.on_battlefield = world.map_mode().battlefield,
+                       .apply_delayed = HasApplyDelay(world.player_statuses()),
+                       .in_party = context.party.in_party(),
+                       .party_leader = context.party.AmILeader(world.player_id()),
+                       .party_online = OnlinePartyMembers(context.party.members()),
+                       .in_guild = context.guild.in_guild(),
+                       .guild_master = context.guild.IsMaster(context.own_char_id),
+                       .guild_online = guild_summary.has_value() ? guild_summary->online_count : 0,
+                       .team_most = field.team_max,
+                       .link_ready = context.link_ready});
 }
 
 void BattlegroundStage::CollectQueueNews() {

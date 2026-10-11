@@ -58,6 +58,12 @@ struct EntryQueueFieldView {
   bool private_apply = false;
   bool party_apply = false;
   bool guild_apply = false;
+  // LE REFUS DE CHAQUE INSCRIPTION, déjà jugé par `app` et traduit ; vide :
+  // elle peut passer à sa confirmation. 🔴 UN REFUS PASSE AVANT LA QUESTION :
+  // le clic ne demande pas « voulez-vous ? » à qui ne le peut pas.
+  std::string_view solo_refusal;
+  std::string_view party_refusal;
+  std::string_view guild_refusal;
   // La minimap du terrain ; inutilisable, le détail s'en passe.
   SkinImage minimap;
 };
@@ -104,6 +110,10 @@ enum class EntryQueueVerb : std::uint8_t {
 struct EntryQueueAction {
   EntryQueueVerb verb = EntryQueueVerb::kNothing;
   std::size_t field_rank = 0;
+  // POUR UNE INSCRIPTION : le joueur a dit « oui » à la confirmation. Sans ce
+  // oui, elle n'est qu'une demande que `app` juge pour en dire le refus, et qui
+  // ne part jamais.
+  bool confirmed = false;
   // Le bouton de rapport de bug d'une des deux fenêtres a été cliqué. Il
   // s'ajoute au verbe : `field_rank` dit aussi le terrain choisi.
   bool report_bug = false;

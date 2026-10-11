@@ -2164,12 +2164,6 @@ tr: Sign up your whole party: leader only.
 fr: Inscrire votre guilde : réservé au maître de guilde.
 tr: Sign up your guild: guild master only.
 
-fr: Inscrire votre guilde à « %s » ?
-tr: Sign up your guild for “%s”?
-
-fr: Inscrire votre party à « %s » ?
-tr: Sign up your party for “%s”?
-
 fr: Inutilisable à bord du Mado Gear.
 tr: Can't be used while on Mado Gear.
 
@@ -2742,9 +2736,6 @@ tr: If it attacks the companion
 
 fr: S'il ne bouge pas
 tr: If it does not move
-
-fr: S'inscrire
-tr: Sign up
 
 fr: S'écarter de (cases)
 tr: Step away by (cells)
@@ -6084,6 +6075,15 @@ tr: Your character
 fr: Votre position dans la guilde ne permet pas d'inviter.
 tr: Your guild position does not allow inviting.
 
+fr: Voulez-vous participer à la bataille des guildes ?
+tr: Do you want to participate in the guilds battle?
+
+fr: Voulez-vous participer à la bataille des parties ?
+tr: Do you want to participate in the parties battle?
+
+fr: Voulez-vous participer à la bataille individuelle ?
+tr: Do you want to participate in the individuals battle?
+
 fr: Voulez-vous vraiment nourrir votre pet ?
 tr: Are you sure that you want to feed your pet?
 
@@ -6095,8 +6095,6 @@ tr: You left the queue.
 
 fr: Vous avez quitté le groupe.
 tr: You left the party.
-fr: Vous inscrire seul à « %s » ?
-tr: Sign up alone for “%s”?
 
 fr: Vous inscrire seul.
 tr: Sign up alone.

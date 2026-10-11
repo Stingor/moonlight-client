@@ -109,6 +109,10 @@ void BattlegroundStage::ComposeView(BattlegroundWindows& windows,
       minimap = context.image_at(std::string(kMinimapFolder) + field.minimap_file);
     }
     const std::string_view name = field.name.In(language);
+    const auto refusal_of = [&](ro::sim::EntryQueueApplyKind kind) {
+      const char* refusal = RefusalOf(kind, field, context);
+      return refusal != nullptr ? std::string_view(refusal) : std::string_view();
+    };
     field_views_.push_back(ro::ui::EntryQueueFieldView{
         .display_name = name.empty() ? std::string_view(field.server_name) : name,
         .victory = field.objective.In(language),
@@ -121,6 +125,9 @@ void BattlegroundStage::ComposeView(BattlegroundWindows& windows,
         .private_apply = field.solo_apply,
         .party_apply = field.party_apply,
         .guild_apply = field.guild_apply,
+        .solo_refusal = refusal_of(ro::sim::EntryQueueApplyKind::kSolo),
+        .party_refusal = refusal_of(ro::sim::EntryQueueApplyKind::kParty),
+        .guild_refusal = refusal_of(ro::sim::EntryQueueApplyKind::kGuild),
         .minimap = minimap});
   }
 

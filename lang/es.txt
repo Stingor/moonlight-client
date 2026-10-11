@@ -2164,12 +2164,6 @@ tr: Inscribir a toda tu party: solo su líder.
 fr: Inscrire votre guilde : réservé au maître de guilde.
 tr: Inscribir a tu guild: solo el guild master.
 
-fr: Inscrire votre guilde à « %s » ?
-tr: ¿Inscribir a tu guild en «%s»?
-
-fr: Inscrire votre party à « %s » ?
-tr: ¿Inscribir a tu party en «%s»?
-
 fr: Inutilisable à bord du Mado Gear.
 tr: No se puede usar a bordo del Mado Gear.
 
@@ -2742,9 +2736,6 @@ tr: Si ataca al compañero
 
 fr: S'il ne bouge pas
 tr: Si no se mueve
-
-fr: S'inscrire
-tr: Inscribirse
 
 fr: S'écarter de (cases)
 tr: Apartarse (casillas)
@@ -6084,6 +6075,15 @@ tr: Tu personaje
 fr: Votre position dans la guilde ne permet pas d'inviter.
 tr: Tu cargo en la guild no permite invitar.
 
+fr: Voulez-vous participer à la bataille des guildes ?
+tr: ¿Quieres participar en la batalla de guilds?
+
+fr: Voulez-vous participer à la bataille des parties ?
+tr: ¿Quieres participar en la batalla de parties?
+
+fr: Voulez-vous participer à la bataille individuelle ?
+tr: ¿Quieres participar en la batalla individual?
+
 fr: Voulez-vous vraiment nourrir votre pet ?
 tr: ¿Seguro que quieres alimentar a tu mascota?
 
@@ -6095,8 +6095,6 @@ tr: Has salido de la cola.
 
 fr: Vous avez quitté le groupe.
 tr: Ha abandonado el grupo.
-fr: Vous inscrire seul à « %s » ?
-tr: ¿Inscribirte solo en «%s»?
 
 fr: Vous inscrire seul.
 tr: Inscribirte solo.
