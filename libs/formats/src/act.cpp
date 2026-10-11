@@ -167,16 +167,14 @@ void ReadTrailingTables(ByteReader& reader, std::int32_t version, std::vector<Ac
   if (version < kVersionSpeedTable) {
     return;
   }
-  // La table des cadences est la DERNIÈRE du fichier, et elle est souvent
-  // tronquée. On retient alors la dernière valeur lue plutôt que d'échouer :
-  // c'est elle qui fixe la vitesse d'animation, et une cadence approchée vaut
-  // mieux qu'une absence d'animation.
-  float speed_units = kDefaultSpeedUnits;
+  // La table des cadences est la DERNIÈRE du fichier. Tronquée, elle ne fait
+  // pas échouer la lecture : chaque action qu'elle n'atteint pas garde la
+  // cadence par défaut, posée à la construction de l'action.
   for (ActAction& action : actions) {
-    if (reader.ok() && reader.remaining() >= 4) {
-      speed_units = reader.F32();
+    if (!reader.ok() || reader.remaining() < 4) {
+      break;
     }
-    action.speed_units = speed_units;
+    action.speed_units = reader.F32();
   }
 }
 

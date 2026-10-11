@@ -65,8 +65,9 @@ struct ActFrame {
 // pas du client : il divise le temps écoulé par 24 pour trouver l'image.
 inline constexpr float kMillisecondsPerSpeedUnit = 24.0F;
 
-// Cadence retenue quand le fichier n'en déclare pas, soit 144 ms par image.
-inline constexpr float kDefaultSpeedUnits = 6.0F;
+// Cadence d'une action dont le fichier ne déclare pas la sienne — version
+// sans table, ou table qui s'arrête avant elle —, soit 96 ms par image.
+inline constexpr float kDefaultSpeedUnits = 4.0F;
 
 struct ActAction {
   std::vector<ActFrame> frames;
