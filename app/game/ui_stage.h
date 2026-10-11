@@ -98,6 +98,7 @@
 #include "game/trade_windows.h"
 #include "game/whisper_stage.h"
 #include "mvp/mvp_tracker_stage.h"
+#include "party/party_booking_board.h"
 #include "ui_backend_gl.h"
 #include "world/ranking_board.h"
 
@@ -384,6 +385,7 @@ class UiStage {
     MvpTrackerWindows mvp_tracker;
     BattlegroundWindows battleground;   // Voir `ui_stage_battleground.cpp`.
     RankingBoardWindows ranking_board;  // Voir `ui_stage_ranking.cpp`.
+    PartyBookingWindows party_booking;  // Voir `ui_stage_party_booking.cpp`.
     // LA FENÊTRE GROUPE / AMIS ET LA GRILLE DE GROUPE, même aller-retour. Voir
     // `game/party_windows.h`.
     PartyWindows party;
@@ -760,6 +762,8 @@ class UiStage {
   void RegisterBattlegroundEscapes(BattlegroundWindows& battleground);
   void DrawRankingWindows(RankingBoardWindows& ranking);  // `ui_stage_ranking.cpp`
   void RegisterRankingEscapes(RankingBoardWindows& ranking);
+  void DrawPartyBookingWindows(PartyBookingWindows& booking);  // `ui_stage_party_booking.cpp`
+  void RegisterPartyBookingEscapes(PartyBookingWindows& booking);
   // LA NAVIGATION ET SES DEUX INFOBULLES : voir `ui_stage_navigation.cpp`.
   void DrawNavigationWindows(Windows::Navigation& navigation);
   void RegisterNavigationEscapes(Windows::Navigation& navigation);

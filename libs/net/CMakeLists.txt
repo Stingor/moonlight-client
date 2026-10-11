@@ -54,6 +54,7 @@ add_library(ro_net STATIC
     src/monster_sheet.cpp
     src/movement.cpp
     src/mvp_tracker.cpp
+    src/party_booking.cpp
     src/player_bonuses.cpp
     src/player_config.cpp
     src/pvp_rank.cpp

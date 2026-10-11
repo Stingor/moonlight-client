@@ -348,6 +348,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
         outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = ranked;
     }
+    // ET LA RECHERCHE DE GROUPE, dont les avis s'écrivent dans la conversation.
+    if (const ro::net::FrameOutcome booked =
+            pieces_.party_booking.ApplyFrame(received, world_, now_ms);
+        outcome == ro::net::FrameOutcome::kUnhandled) {
+      outcome = booked;
+    }
     // ET LE CHAMP DE BATAILLE : la file d'inscription, puis le combat.
     if (const ro::net::FrameOutcome fought =
             pieces_.battleground.ApplyFrame(received, world_, now_ms);

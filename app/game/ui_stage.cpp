@@ -493,6 +493,7 @@ UiStage::Answers UiStage::Draw(
   DrawQuestWindows(windows.quests, windows.tracker);
   DrawAchievementWindows(windows.achievements);
   DrawRankingWindows(windows.ranking_board);
+  DrawPartyBookingWindows(windows.party_booking);
 
   // L'APERÇU AU SURVOL, APRÈS LES TROIS FENÊTRES D'OBJETS.
   //
@@ -658,6 +659,7 @@ UiStage::Answers UiStage::Draw(
   RegisterMvpTrackerEscapes(windows.mvp_tracker);
   RegisterBattlegroundEscapes(windows.battleground);
   RegisterRankingEscapes(windows.ranking_board);
+  RegisterPartyBookingEscapes(windows.party_booking);
   // LES ATELIERS AUSSI : leur interrupteur recopie la session du serveur, mais
   // la boucle lit un interrupteur BAISSÉ comme une fermeture, et répond au
   // serveur — voir `CraftStage::Apply`.

@@ -821,20 +821,22 @@ target_link_libraries(moonclient_entitymenu
 target_include_directories(moonclient_entitymenu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LE GROUPE ET LES AMIS : ce que la fenêtre et la grille montrent, le rythme
-# auquel on demande le PS des membres, les deux pages de réglages, et la
-# demande d'adoption reçue. En
+# auquel on demande le PS des membres, les deux pages de réglages, la
+# demande d'adoption reçue, et la recherche de groupe. En
 # bibliothèque pour la raison habituelle : la composition ne voit le jeu qu'à
 # travers une interface, et ses règles — ma tuile hors groupe, un PS périmé qui
 # se tait, une demande toutes les 250 ms — ne se vérifient pas en jouant.
 add_library(moonclient_party STATIC
     game/adoption_stage.cpp
+    party/party_booking_board.cpp
+    party/party_booking_places.cpp
     party/party_compose.cpp
     party/party_option_rows.cpp
     party/party_options.cpp
     party/party_poll.cpp)
 target_link_libraries(moonclient_party
     PUBLIC ro_net ro_sim ro_ui moonclient_settings
-    PRIVATE ro_warnings)
+    PRIVATE ro_vfs yaml-cpp::yaml-cpp ro_warnings)
 target_include_directories(moonclient_party PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LA FICHE D'UN MONSTRE : ce qu'on demande au serveur et quand, le relevé de
@@ -1539,6 +1541,7 @@ add_executable(moonclient
     game/achievement_stage.cpp
     game/ui_stage_achievements.cpp
     game/ui_stage_ranking.cpp
+    game/ui_stage_party_booking.cpp
     game/game_quests.cpp
     game/quest_compose.cpp
     game/quest_stage.cpp

@@ -109,9 +109,11 @@ bool MenuCommandPorted(MenuCommand command) {
   // la liste, selon qu'on est en file.
   // LE TABLEAU DES CLASSEMENTS NON PLUS : il n'a pas de touche, `/ranking` et
   // son icône l'ouvrent.
+  // LA RECHERCHE DE GROUPE NON PLUS : son icône, et le bouton de la fenêtre de
+  // groupe.
   return ActionOfMenuCommand(command).has_value() || command == MenuCommand::kOption ||
          command == MenuCommand::kShortcut || command == MenuCommand::kBattleground ||
-         command == MenuCommand::kRankingBoard;
+         command == MenuCommand::kRankingBoard || command == MenuCommand::kBooking;
 }
 
 void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameImages* images,

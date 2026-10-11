@@ -151,6 +151,11 @@ void DrawPartyOptions(PartyFriendWindowState& state, const PartyFriendView& view
 
 void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
                   const PartyFriendLook& look, const SkinArt& art, PartyFriendAction& action) {
+  // LA RECHERCHE DE GROUPE, dans le groupe ou hors de lui : on y cherche des
+  // compagnons comme on y en recrute.
+  if (SkinButton(core::Tr("Recherche de groupe"), art)) {
+    action.booking_asked = true;
+  }
   if (!view.in_party) {
     ImGui::SetNextItemWidth(PartyPx(kNameFieldPixels));
     ImGui::InputText("##partyname", state.new_party_name.data(), state.new_party_name.size());

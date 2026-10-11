@@ -16122,3 +16122,126 @@ tr: Taekwon
 
 fr: Mes points
 tr: Mis puntos
+
+fr: Recherche de groupe
+tr: Búsqueda de grupo
+
+fr: Annonces
+tr: Anuncios
+
+fr: Mon annonce
+tr: Mi anuncio
+
+fr: Niveau (0 : tous)
+tr: Nivel (0: todos)
+
+fr: Filtrer par
+tr: Filtrar por
+
+fr: Lieu
+tr: Lugar
+
+fr: Choisir une région
+tr: Elegir una región
+
+fr: Choisir un job
+tr: Elegir un oficio
+
+fr: Rechercher
+tr: Buscar
+
+fr: Page suivante
+tr: Página siguiente
+
+fr: Recherche en cours…
+tr: Buscando…
+
+fr: Lancez une recherche pour voir les annonces.
+tr: Lanza una búsqueda para ver los anuncios.
+
+fr: Aucune annonce ne correspond.
+tr: Ningún anuncio coincide.
+
+fr: Auteur
+tr: Autor
+
+fr: Niveaux
+tr: Niveles
+
+fr: Ouvrir une conversation
+tr: Abrir una conversación
+
+fr: Jobs recherchés : %d / %d
+tr: Oficios buscados: %d / %d
+
+fr: Modifier les jobs
+tr: Cambiar los oficios
+
+fr: Retirer l'annonce
+tr: Retirar el anuncio
+
+fr: Niveau minimal
+tr: Nivel mínimo
+
+fr: Publication…
+tr: Publicando…
+
+fr: Publier
+tr: Publicar
+
+fr: Cochez au moins un job.
+tr: Marca al menos un oficio.
+
+fr: Défense
+tr: Defensa
+
+fr: Soins
+tr: Curación
+
+fr: Soutien
+tr: Apoyo
+
+fr: Rôles
+tr: Roles
+
+fr: Premiers jobs
+tr: Primeros oficios
+
+fr: Seconds jobs
+tr: Segundos oficios
+
+fr: Troisièmes jobs (1)
+tr: Terceros oficios (1)
+
+fr: Troisièmes jobs (2)
+tr: Terceros oficios (2)
+
+fr: Premiers jobs transcendants
+tr: Primeros oficios trascendentes
+
+fr: Seconds jobs transcendants
+tr: Segundos oficios trascendentes
+
+fr: Autres jobs
+tr: Otros oficios
+
+fr: Lieu %d-%d
+tr: Lugar %d-%d
+
+fr: Une annonce de groupe vient d'être publiée.
+tr: Se acaba de publicar un anuncio de grupo.
+
+fr: La publication de l'annonce de groupe a échoué.
+tr: La publicación del anuncio de grupo ha fallado.
+
+fr: Vous avez déjà une annonce de groupe.
+tr: Ya tienes un anuncio de grupo.
+
+fr: Le retrait de l'annonce de groupe a échoué.
+tr: No se pudo retirar el anuncio de grupo.
+
+fr: Vous n'avez aucune annonce de groupe à retirer.
+tr: No tienes ningún anuncio de grupo que retirar.
+
+fr: Aucune annonce de groupe ne correspond à cette recherche.
+tr: Ningún anuncio de grupo coincide con esta búsqueda.

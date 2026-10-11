@@ -288,6 +288,8 @@ struct PartyFriendAction {
 
   // Ce qui peut arriver dans la même image qu'un verbe.
   bool settings_asked = false;
+  // La fenêtre de recherche de groupe est demandée.
+  bool booking_asked = false;
   bool grid_toggled = false;
   bool grid_enabled = false;
   bool closed = false;

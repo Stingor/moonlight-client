@@ -78,6 +78,7 @@ add_library(ro_sim STATIC
     src/sight_purge.cpp
     src/skill_banner.cpp
     src/skill_side_effects.cpp
+    src/party_booking.cpp
     src/skill_book.cpp
     src/skill_tree.cpp
     src/status_effects.cpp

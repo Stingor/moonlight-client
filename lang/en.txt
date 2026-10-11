@@ -16122,3 +16122,126 @@ tr: Taekwon
 
 fr: Mes points
 tr: My points
+
+fr: Recherche de groupe
+tr: Party Booking
+
+fr: Annonces
+tr: Ads
+
+fr: Mon annonce
+tr: My ad
+
+fr: Niveau (0 : tous)
+tr: Level (0: any)
+
+fr: Filtrer par
+tr: Filter by
+
+fr: Lieu
+tr: Place
+
+fr: Choisir une région
+tr: Choose a region
+
+fr: Choisir un job
+tr: Choose a job
+
+fr: Rechercher
+tr: Search
+
+fr: Page suivante
+tr: Next page
+
+fr: Recherche en cours…
+tr: Searching…
+
+fr: Lancez une recherche pour voir les annonces.
+tr: Run a search to see the ads.
+
+fr: Aucune annonce ne correspond.
+tr: No ad matches.
+
+fr: Auteur
+tr: Author
+
+fr: Niveaux
+tr: Levels
+
+fr: Ouvrir une conversation
+tr: Open a conversation
+
+fr: Jobs recherchés : %d / %d
+tr: Wanted jobs: %d / %d
+
+fr: Modifier les jobs
+tr: Change the jobs
+
+fr: Retirer l'annonce
+tr: Remove the ad
+
+fr: Niveau minimal
+tr: Minimum level
+
+fr: Publication…
+tr: Posting…
+
+fr: Publier
+tr: Post
+
+fr: Cochez au moins un job.
+tr: Tick at least one job.
+
+fr: Défense
+tr: Defense
+
+fr: Soins
+tr: Healing
+
+fr: Soutien
+tr: Support
+
+fr: Rôles
+tr: Roles
+
+fr: Premiers jobs
+tr: First jobs
+
+fr: Seconds jobs
+tr: Second jobs
+
+fr: Troisièmes jobs (1)
+tr: Third jobs (1)
+
+fr: Troisièmes jobs (2)
+tr: Third jobs (2)
+
+fr: Premiers jobs transcendants
+tr: First high jobs
+
+fr: Seconds jobs transcendants
+tr: Second high jobs
+
+fr: Autres jobs
+tr: Other jobs
+
+fr: Lieu %d-%d
+tr: Place %d-%d
+
+fr: Une annonce de groupe vient d'être publiée.
+tr: Party ad has been added.
+
+fr: La publication de l'annonce de groupe a échoué.
+tr: Registering the party ad has failed.
+
+fr: Vous avez déjà une annonce de groupe.
+tr: You already have a party ad.
+
+fr: Le retrait de l'annonce de groupe a échoué.
+tr: Failed to remove the party ad.
+
+fr: Vous n'avez aucune annonce de groupe à retirer.
+tr: You have no party ad to remove.
+
+fr: Aucune annonce de groupe ne correspond à cette recherche.
+tr: No party ad matches this search.

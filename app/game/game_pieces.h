@@ -72,6 +72,7 @@
 #include "items/doll_effects.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "options/commands_page.h"
+#include "party/party_booking_board.h"
 #include "quest/quest_catalog.h"
 #include "quest/recommended_catalog.h"
 #include "world/actor_carts.h"
@@ -479,6 +480,8 @@ struct GamePieces {
   RankNotices rank_notices;
   // LE TABLEAU DES CLASSEMENTS : voir `RankingBoard`.
   RankingBoard ranking_board;
+  // LA RECHERCHE DE GROUPE : voir `PartyBookingBoard`.
+  PartyBookingBoard party_booking;
   // CE QUE CE CLIENT SAIT MONTRER, annoncé au serveur : voir `SurfaceAnnouncer`.
   SurfaceAnnouncer surfaces;
 };

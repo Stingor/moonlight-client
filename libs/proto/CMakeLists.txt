@@ -44,6 +44,7 @@ add_library(ro_proto STATIC
     src/progress_packets.cpp
     src/stop_attack_packet.cpp
     src/repair_packets.cpp
+    src/party_booking_packets.cpp
     src/pincode.cpp
     src/snap_packets.cpp
     src/social_packets.cpp

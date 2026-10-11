@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -103,6 +104,19 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   }
   if (asked.settings_asked) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kPartyFriend);
+  }
+  // LA RECHERCHE DE GROUPE : le bouton du groupe l'ouvre, et un chuchotement
+  // demandé depuis ses annonces prend le chemin de ceux du groupe.
+  if (asked.booking_asked) {
+    windows_.party_booking.open_asked = true;
+  }
+  pieces_.party_booking.Advance(windows_.party_booking, link_, world_, now_ms);
+  if (const std::optional<PartyBookingWhisper> whisper = pieces_.party_booking.TakeWhisper()) {
+    if (whisper->own_window) {
+      pieces_.whispers.Open(whisper->name);
+    } else {
+      WhisperTo(windows_.chat.main.input, whisper->name);
+    }
   }
   if (asked.grid_toggled) {
     page.grid().shown = asked.grid_enabled;
