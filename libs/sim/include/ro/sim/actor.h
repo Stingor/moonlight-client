@@ -143,6 +143,7 @@ inline constexpr std::uint32_t kOptionCloak = 0x4;
 inline constexpr std::uint32_t kOptionInvisible = 0x40;
 // LA TÊTE D'ORC : `@option 0 0 2048`, et l'état que pose l'Orc Head.
 inline constexpr std::uint32_t kOptionOrcishHead = 0x800;
+inline constexpr std::uint32_t kOptionChaseWalk = 0x4000;
 
 // CE QU'UN ACTEUR AFFICHE AU-DESSUS DE LUI, et qui n'est pas son nom : une
 // échoppe qu'il tient, ou un salon qu'il a ouvert.

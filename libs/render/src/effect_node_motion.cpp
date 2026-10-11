@@ -376,10 +376,12 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
       AdvanceSpiralStackTracks(pooled.tracks, generator);
       return;
     case PooledNodeShape::kBreathingQuad:
-      // ⚠ CE MOUVEMENT SUIT SON PORTEUR et NE TIRE RIEN : tout son hasard a été
-      // consommé au semis, dans l'inclinaison de départ.
+    case PooledNodeShape::kFootprint:
+      // ⚠ CES MOUVEMENTS SUIVENT LEUR PORTEUR et NE TIRENT RIEN — l'empreinte, celui
+      // d'une instance posée sur le pas, qui ne bouge pas.
       pooled.ground_position = pooled.owner_position;
-      AdvanceBreathingQuadTracks(pooled.tracks);
+      pooled.shape == PooledNodeShape::kFootprint ? AdvanceFootprintTracks(pooled.tracks)
+                                                  : AdvanceBreathingQuadTracks(pooled.tracks);
       return;
     case PooledNodeShape::kGroundDisc:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR et ne tire rien : le cas du répartiteur

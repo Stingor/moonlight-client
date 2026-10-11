@@ -49,6 +49,7 @@ find_package(yaml-cpp CONFIG REQUIRED)
 # lien est la moitié qui vaut tout de suite ; le déménagement se fera à part.
 add_library(moonclient_effect_nodes STATIC
     effects/effect_draw_gate.cpp
+    effects/effect_footprint_sow.cpp
     effects/effect_judge.cpp
     effects/effect_node_compose.cpp
     effects/effect_node_compose_multi.cpp

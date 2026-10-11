@@ -229,6 +229,9 @@ enum class PooledNodeShape : std::uint8_t {
   // rayon oscille au rythme de l'INCLINAISON, et non du compteur de tics.
   // Voir `AdvanceBreathingQuadTracks`.
   kBreathingQuad,
+  // UNE EMPREINTE, sous-type 67 : la figure du carré qui respire, sans souffle,
+  // qui reste où elle est née et s'efface. Voir `AdvanceFootprintTracks`.
+  kFootprint,
   // UN DISQUE AU SOL, sous-type 26 : le cercle magique des cartes, posé à plat
   // et qui tourne d'un degré par tic.
   //

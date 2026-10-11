@@ -560,6 +560,7 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
           }
           break;
         case ro::render::PooledNodeShape::kBreathingQuad:
+        case ro::render::PooledNodeShape::kFootprint:
         case ro::render::PooledNodeShape::kGroundDisc:
         case ro::render::PooledNodeShape::kGrowingSprite:
           // ⚠ LE STYLE VIENT DU NŒUD, et le RANG de la piste entre dans l'angle

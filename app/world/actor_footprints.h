@@ -9,29 +9,31 @@
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
 
-#include "effects/effect_view.h"
+#include "effects/effect_node_view.h"
 #include "world/map_stage.h"
 
 // LES PAS QU'UN COUREUR LAISSE DERRIÈRE LUI.
 //
-// `EF_RUN` — la course du Taekwon — ne dessine rien elle-même : elle fait poser
-// au coureur une EMPREINTE tous les sept battements, à l'endroit qu'il vient de
-// quitter, en alternant entre deux effets.
+// La course du Taekwon et Chase Walk ne dessinent rien elles-mêmes : elles font
+// tourner, à chaque tic, un semeur que le client tient sur l'acteur. Il compte,
+// et à mi-tour comme au tour plein il pose une EMPREINTE sous les pieds de
+// l'acteur, tournée dans le sens de sa marche — la gauche à mi-tour, la droite
+// au tour plein.
 namespace moonclient {
 
 class ActorFootprints {
  public:
-  // Pose les empreintes dues à cette image.
+  // Fait battre le semeur de chaque acteur pour les tics écoulés, et sème les
+  // empreintes dues.
   //
-  // ⚠ ELLES SE POSENT LÀ OÙ L'ACTEUR ÉTAIT, et non où il est : le client garde
-  // la position du dernier relevé et sème DESSUS avant de la remplacer. Les
-  // poser sous ses pieds les ferait marcher avec lui, ce qui n'est pas une
-  // trace.
+  // ⚠ ELLES SE POSENT SOUS SES PIEDS, là où il est à ce battement, et non là où
+  // il était : le client compare au relevé précédent pour l'angle, puis sème à
+  // la place qu'il vient de relever.
   //
   // ⚠ ET IL NE SÈME QUE S'IL A BOUGÉ. Un coureur arrêté ne laisse rien, même
   // sous l'effet : c'est le déplacement qui fait la trace.
   void Notice(const ro::sim::World& world, const MapStage& stage, ro::sim::WalkPlanner& planner,
-              EffectsInPlay& effects, std::uint32_t now_ms);
+              EffectNodesInPlay& nodes, std::uint32_t now_ms);
 
   // Plus aucune trace en cours : le changement de carte emporte les coureurs
   // avec leurs empreintes, et chacun repart de zéro.
@@ -39,11 +41,12 @@ class ActorFootprints {
 
  private:
   struct Trace {
+    // Le compte du semeur, que la course et Chase Walk partagent.
+    std::int32_t count = 0;
+    // La place du dernier relevé.
     glm::vec3 last_ground{0.0F, 0.0F, 0.0F};
-    std::uint32_t last_sown_ms = 0;
-    // Laquelle des deux empreintes vient ensuite : le client alterne.
-    std::size_t next = 0;
-    bool started = false;
+    // Le dernier tic battu.
+    std::uint32_t beaten_tick = 0;
   };
 
   std::unordered_map<std::uint32_t, Trace> traces_;

@@ -808,6 +808,11 @@ void AdvanceSpiralStackTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
 // voit pas aujourd'hui ; l'écrire à quatre serait une supposition de plus.
 void AdvanceBreathingQuadTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks);
 
+// L'EMPREINTE QUI S'EFFACE : le mouvement du sous-type 67. La première piste,
+// seule allumée, compte ses tics et perd un cran d'alpha aux tics impairs, sans
+// descendre sous zéro. Son inclinaison ne bouge pas : le carré ne respire pas.
+void AdvanceFootprintTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks);
+
 // L'ÉVENTAIL QUI S'OUVRE : le mouvement du sous-type 89.
 //
 // Transcrit le cas 89 du répartiteur. Pour chaque piste vive dont

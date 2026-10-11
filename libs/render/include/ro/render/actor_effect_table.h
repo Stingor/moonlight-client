@@ -483,19 +483,33 @@ inline constexpr std::array<std::uint32_t, 2> kFootprintEffects = {447, 448};
 // seconde n'est pas un fait du client mais de la machine.
 inline constexpr std::uint32_t kFootprintPeriodTicks = 7;
 
+// LES DEUX EMPREINTES DE CHASE WALK, et leur période : l'option du marcheur fait
+// tourner le même semeur, plus lentement, sans attendre aucune horloge.
+inline constexpr std::array<std::uint32_t, 2> kChaseWalkFootprintEffects = {326, 327};
+inline constexpr std::uint32_t kChaseWalkFootprintPeriodTicks = 12;
+
 // CE QU'UN COUREUR LAISSE DERRIÈRE LUI, quand il en laisse.
 //
-// Vide de champs : ce qui varie — l'endroit, l'alternance — n'appartient pas à
-// la table mais à qui suit l'acteur d'une image à l'autre. La table dit
-// seulement QUE la course en laisse, et à quelle cadence.
-struct ActorTrail {};
+// Ce qui varie — l'endroit, l'alternance — n'appartient pas à la table mais à
+// qui suit l'acteur d'une image à l'autre. La table dit QUE la course en laisse,
+// et si son horloge le permet déjà.
+struct ActorTrail {
+  // ⚠ LE SEMEUR TOURNE DÈS QUE LE BIT EST LEVÉ, mais ne pose rien tant que
+  // l'horloge de la course ne dépasse pas sa période : une empreinte posée au
+  // premier tic tomberait sous le pied qui n'a pas encore bougé. Et l'horloge
+  // vit dans un OCTET de l'acteur : elle repasse par zéro tous les deux cent
+  // cinquante-six tics, et la course se tait alors huit tics.
+  bool clock_past_period = false;
+};
 
-// Vrai quand un effet en cours fait laisser des empreintes.
-//
-// ⚠ RIEN NE SORT PENDANT LES SEPT PREMIERS TICS : le semeur du client attend
-// que le compteur de l'effet dépasse sa période, et une empreinte posée au
-// premier tic tomberait sous le pied qui n'a pas encore bougé.
+// Rien quand aucun effet en cours ne fait laisser d'empreintes.
 [[nodiscard]] std::optional<ActorTrail> TrailAfterEffects(std::span<const ActorEffectPlay> played);
+
+// L'ANGLE D'UNE EMPREINTE, en degrés du client, pour une marche de `dx` et
+// `dz` dans SON repère : le premier degré entier dont le cosinus ne dépasse plus
+// la part de `dx`, retourné quand `dz` est négatif, puis tourné d'un quart de
+// tour et demi. Rien pour une marche nulle.
+[[nodiscard]] std::optional<std::int32_t> FootprintAzimuthDegrees(float dx, float dz);
 
 // UNE COPIE DU CORPS qu'un effet ajoute autour de lui.
 //

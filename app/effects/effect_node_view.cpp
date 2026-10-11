@@ -72,6 +72,7 @@
 #include "ro/render/effect_warp_ring_seed.h"
 #include "ro/render/effect_white_burst_seed.h"
 
+#include "effects/effect_footprint_sow.h"
 #include "effects/effect_rising_quad_sow.h"
 #include "effects/effect_spinning_box_sow.h"
 
@@ -337,6 +338,11 @@ bool EffectNodesInPlay::PlayProcedural(std::uint32_t effect_id, glm::vec3 ground
       SowRisingQuads(pool_, effect_id, ground_position, ro::render::EffectNodeLifeFor(effect_id),
                      static_cast<std::uint32_t>(pool_.size()) + beat_ms_ + 1U,
                      [this](const std::string& path) { return !TextureFor(path).empty(); });
+  // L'EMPREINTE reçoit son angle par la face du porteur : c'est l'angle de la
+  // marche que celui qui la sème a calculé.
+  const bool footprints_played =
+      SowFootprints(pool_, effect_id, ground_position, owner_facing_degrees,
+                    [this](const std::string& path) { return !TextureFor(path).empty(); });
   // Celui qui pose le plancher le repose ; l'ancre, elle, se repose d'elle-même
   // à la fin de sa portée — voir `AnchoredSowing`.
   pool_.LiveAtLeast(0);
@@ -380,7 +386,7 @@ bool EffectNodesInPlay::PlayProcedural(std::uint32_t effect_id, glm::vec3 ground
          tetra_vortices_played || radial_petals_played || arcing_lights_played ||
          aimed_spokes_played || shockwave_rays_played || tapered_sheets_played ||
          break_rings_played || spiral_emitters_played || walking_sowers_played ||
-         spinning_boxes_played || rising_quads_played;
+         spinning_boxes_played || rising_quads_played || footprints_played;
 }
 
 void EffectNodesInPlay::NoticeDrawGate(EffectDrawGate gate) {

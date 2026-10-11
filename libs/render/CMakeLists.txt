@@ -241,6 +241,8 @@ add_library(ro_render STATIC
     src/effect_breathing_quad.cpp
     src/effect_breathing_quad_seed.cpp
     generated/effect_breathing_quad_table.cpp
+    src/effect_footprint_seed.cpp
+    generated/effect_footprint_table.cpp
     src/effect_ground_disc_seed.cpp
     generated/effect_ground_disc_table.cpp
     src/effect_thrown_item_seed.cpp

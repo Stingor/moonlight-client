@@ -593,6 +593,7 @@ std::vector<ro::render::EffectWorldQuad> ComposeRemainingNodeShape(
     case ro::render::PooledNodeShape::kPieWedge:
     case ro::render::PooledNodeShape::kConeWedge:
     case ro::render::PooledNodeShape::kBreathingQuad:
+    case ro::render::PooledNodeShape::kFootprint:
     case ro::render::PooledNodeShape::kGroundDisc:
     case ro::render::PooledNodeShape::kGrowingSprite:
     case ro::render::PooledNodeShape::kSparkTube:

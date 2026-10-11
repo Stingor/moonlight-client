@@ -326,9 +326,10 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
   // LES POINTS DE TÉLÉPORTATION : ils ne s'annoncent pas davantage, et leur
   // effet se pose une seule fois par acteur.
   effects.NoticeWarpActors(*scene.world, *scene.stage, scene.now_ms);
-  // Et les PAS d'un coureur, qui se posent la ou il etait : la course ne
-  // dessine rien elle-meme, elle seme une empreinte tous les sept battements.
-  footprints.Notice(*scene.world, *scene.stage, *scene.planner, effects, scene.now_ms);
+  // Et les PAS d'un coureur ou d'un marcheur de Chase Walk : ni la course ni
+  // l'option ne dessinent rien elles-mêmes, elles font semer une empreinte sous
+  // les pieds tous les sept battements, ou tous les douze. Voir `ActorFootprints`.
+  footprints.Notice(*scene.world, *scene.stage, *scene.planner, nodes, scene.now_ms);
   // Et le PILIER DE LUMIÈRE d'un butin que le serveur veut voir de loin : il se
   // plante à la naissance de l'objet, sur la case où il se posera. Son bruit
   // part avec lui, par la même porte que celui des effets nommés — c'est un

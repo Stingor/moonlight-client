@@ -37,6 +37,7 @@
 #include "ro/render/effect_falling_seed.h"
 #include "ro/render/effect_floor_spinner.h"
 #include "ro/render/effect_flying_shard_seed.h"
+#include "ro/render/effect_footprint_seed.h"
 #include "ro/render/effect_frame_and_bar_seed.h"
 #include "ro/render/effect_gliding_slash_seed.h"
 #include "ro/render/effect_glow_sprite_seed.h"
@@ -220,6 +221,7 @@ bool KnowsProceduralEffect(std::uint32_t effect_id) {
          !EffectTurningRingPatternsFor(effect_id).empty() ||
          !EffectTwinDiscPatternsFor(effect_id).empty() ||
          !EffectFadingTwinDiscPatternsFor(effect_id).empty() ||
+         !EffectFootprintPatternsFor(effect_id).empty() ||
          !EffectExpandingRingPatternsFor(effect_id).empty() ||
          !EffectRainstormCylinderPatternsFor(effect_id).empty() ||
          !EffectThunderScatterPatternsFor(effect_id).empty() ||
