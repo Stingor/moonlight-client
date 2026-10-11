@@ -1,0 +1,261 @@
+# Tiré de party_booking.lub du client (data\luafiles514\lua files\seekparty\, global
+# map_list), tel que le livre moonlight.grf. La traduction anglaise des noms vient de ce
+# fichier ; ce dépôt ne la revendique pas comme sienne.
+#
+# Fichier produit par scripts/yaml_tables/party_booking.py. Ne pas éditer à la main :
+#     python scripts/yaml_tables/party_booking.py --client <dossier client> \
+#         --sortie dist/data/yaml_files/party_booking.yml
+# Ne pas réordonner : le rang d'une région et celui d'un lieu forment le code qui part
+# sur le fil.
+version: 1
+regions:
+- name: All Maps
+  offered: false
+  places:
+  - All Maps
+- name: Prontera
+  places:
+  - Fields
+  - Prontera Culvert F1
+  - Prontera Culvert F2
+  - Prontera Culvert F3
+  - Prontera Culvert F4
+  - Labyrinth Forest F1
+  - Labyrinth Forest F2
+  - Labyrinth Forest F3
+- name: Geffen
+  places:
+  - Fields
+  - Gypsy Village
+  - Geffen Dungeon F1
+  - Geffen Dungeon F2
+  - Geffen Dungeon F3
+  - Geffenia
+  - Orc Village
+  - Orc Dungeon F1
+  - Orc Dungeon F2
+- name: Payon
+  places:
+  - Forest
+  - Payon Cave F1
+  - Payon Cave F2
+  - Payon Cave F3
+  - Payon Cave F4 (Underground Temple)
+  - Payon Cave F5 (Underground Temple)
+- name: Aldebaran
+  places:
+  - Mt. Mjolnir North
+  - Mt. Mjolnir Foothills North
+  - Mt. Mjolnir South
+  - Mt. Mjolnir Foothills South
+  - Mjolnir Dead Pit F1
+  - Mjolnir Dead Pit F2
+  - Mjolnir Dead Pit F3
+  - Clock Tower F1
+  - Clock Tower F2
+  - Clock Tower F3
+  - Clock Tower F4
+  - Clock Tower B1
+  - Clock Tower B2
+  - Clock Tower B3
+  - Clock Tower B4
+- name: Alberta
+  places:
+  - Sunken Ship F1
+  - Sunken Ship F1
+  - Turtle Island
+  - Turtle Island Dungeon
+  - Good Turtles Village
+  - Turtle Palace
+- name: Morocc
+  places:
+  - Sograt Desert
+  - Morocc Field (Dimensional Gorge)
+  - Ant Hell F1
+  - Ant Hell F2
+  - Sphinx B1
+  - Sphinx B2
+  - Sphinx B3
+  - Sphinx B4
+  - Sphinx B5
+  - Inside Pyramid F1
+  - Inside Pyramid F2
+  - Inside Pyramid F3
+  - Inside Pyramid F4
+  - Inside Pyramid B1
+  - Inside Pyramid B2
+- name: Izlude
+  places:
+  - Undersea Tunnel F1
+  - Undersea Tunnel F2
+  - Undersea Tunnel F3
+  - Undersea Tunnel F4
+  - Undersea Tunnel F5
+- name: Comodo
+  places:
+  - Papuchicha Forest
+  - Kokomo Beach
+  - Zenhai Marsh
+  - Pharos Beacon Island
+  - Fortress Saint Darmain (East)
+  - Fortress Saint Darmain (South)
+  - Fortress Saint Darmain (West)
+  - Karu, the West Cave
+  - Ruande, the North Cave
+  - Mao, the East Cave
+- name: Lutie
+  places:
+  - Fields
+  - Toy Factory Warehouse
+  - Toy Monitoring Room
+- name: Yuno
+  places:
+  - Border Checkpoint/Post
+  - Kiel Hyre's Cottage
+  - El Mes Plateau
+  - El Mes Gorge (Valley of Abyss)
+  - Kiel Hyre's Academy
+  - Schwarzwald Guards Camp
+  - Fields
+  - Nogg Road F1
+  - Nogg Road F2
+  - External Juperus Ruins
+  - Inside Juperus Ruins
+  - Center of Juperos
+  - Robot Factory Level F1
+  - Robot Factory Level F2
+- name: Umbala
+  places:
+  - Luluka Forest
+  - Kalala Swamp
+  - Hoomga Forest
+  - Hoomga Jungle
+- name: Einbech
+  places:
+  - Mine Dungeon F1
+  - Mine Dungeon F2
+- name: Lighthalzen
+  places:
+  - Field
+  - Lighthalzen Field (Grim Reaper's Valley)
+  - Somatology Laboratory F1
+  - Somatology Laboratory F2
+  - Somatology Laboratory F3
+- name: Thanatos Tower
+  places:
+  - Hacheungbu Museum Entrance
+  - Hacheungbu Museum
+  - Hacheungbu Abandoned Space
+  - Upper Level
+  - Upper Room of Angel
+  - Upper Room of Agony
+  - Upper Room of Sorrow
+  - Upper Room of Despair
+  - Upper Room of Hatred
+  - Unknown Area
+- name: Glast Heim
+  places:
+  - Glast Heim F1
+  - Glast Heim F2
+  - St. Abbey
+  - Catacombs
+  - Underground B1
+  - Underground B2
+  - Inside
+  - Chivalry F1
+  - Chivalry F2
+  - Underprison F1
+  - Underprison F2
+  - Culvert F1
+  - Culvert F2
+  - Culvert F3
+  - Culvert F4
+  - Staircase Dungeon
+- name: Hugel
+  places:
+  - Fields
+  - Odin Temple West
+  - Odin Temple South
+  - Odin Temple North
+  - Abyss Lake
+  - Abyss Lake Underground Cave F1
+  - Abyss Lake Underground Cave F2
+  - Abyss Lake Underground Cave F3
+  - Infront of Thanatos Tower
+- name: Rachel
+  places:
+  - Audumra Grass Land
+  - Ida Plane
+  - Fortu Luna
+  - Temple Sanctuary North F1
+  - Temple Sanctuary West F1
+  - Temple Sanctuary East F1
+  - Temple Sanctuary South F1
+  - Temple Sanctuary Center
+  - Ice Cave F1
+  - Ice Cave F2
+  - Ice Cave F3
+- name: Veins
+  places:
+  - Fields
+  - Nameless Island
+  - Cursed Abbey F1
+  - Cursed Abbey B1
+  - Cursed Abbey B2
+  - Thor's Volcano Dungeon F1
+  - Thor's Volcano Dungeon F2
+  - Thor's Volcano Dungeon F3
+- name: Niflheim
+  places:
+  - Skellington Solitary Village
+  - Valley of Gyoll
+  - Niflheim
+- name: Passage
+  places:
+  - Manuk Field
+  - Splendide Field
+  - Foot of Kamidal Mountain
+  - Kamidal Tunnel
+  - Scaraba Hole
+  - Nidhogg's Dungeon F1
+  - Nidhogg's Dungeon F2
+- name: Amatsu
+  places:
+  - Fields
+  - Tatami Maze
+  - Underground Forest Battle Field
+  - Underground Shrine
+- name: Gonryun
+  places:
+  - Fields
+  - Queen's Shrine
+  - Hermit's Checkers
+  - Arcadia
+- name: Louyang
+  places:
+  - Fields
+  - Royal Tomb
+  - Inside the Royal Tomb
+  - Suei Long Gon
+- name: Ayothaya
+  places:
+  - Fields
+  - Ancient Shrine Maze
+  - Inside Ancient Shrine
+- name: Brasilis
+  places:
+  - Fields
+  - Waterfall Cave Entrance
+  - Inside Waterfall Cave
+- name: Moscovia
+  places:
+  - Fields
+  - Les Forest
+  - Temny Forest
+  - Dremuci Forest
+- name: Memorial Dungeon
+  places:
+  - Endless Tower
+  - Sealed Shrine
+  - Orc Memories
+  - Nidhogg's Nest

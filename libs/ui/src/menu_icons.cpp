@@ -18,16 +18,16 @@ using enum MenuCommand;
 // LE CATALOGUE, dans l'ordre de la grille du client. CATALOGUE : on n'y cherche
 // qu'une entrée à la fois.
 //
-// ⚠ LES NEUF ICÔNES MASQUÉES sont celles que le client de ce serveur ne montre
-// pas : la recherche de party, le replay, les astuces, les réseaux sociaux, la
-// présence, l'agence, la réputation, le guide et les probabilités. Le champ de
-// bataille, lui, est montré.
+// ⚠ LES HUIT ICÔNES MASQUÉES sont celles que le client de ce serveur ne montre
+// pas : le replay, les astuces, les réseaux sociaux, la présence, l'agence, la
+// réputation, le guide et les probabilités. Le champ de bataille et la recherche
+// de groupe, eux, sont montrés.
 constexpr std::array<MenuIconEntry, kMenuCommandCount> kCatalogue = {{
     {kStatus, "status", true, true},
     {kEquipment, "equip", true, false},
     {kItem, "item", true, true},
     {kSkill, "skill", true, true},
-    {kBooking, "booking", false, false},
+    {kBooking, "booking", true, false},
     {kParty, "party", true, false},
     {kGuild, "guild", true, false},
     {kBattleground, "battle", true, false},

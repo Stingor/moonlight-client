@@ -99,7 +99,7 @@ struct MenuIconEntry {
   MenuCommand command = MenuCommand::kStatus;
   // Le nom du bitmap, entre `bt_` et `.bmp` : `menu_icon\bt_<stem>.bmp`.
   std::string_view stem;
-  // 🔴 LA GRILLE LA MONTRE-T-ELLE ? Neuf commandes du jeu n'ont pas d'icône
+  // 🔴 LA GRILLE LA MONTRE-T-ELLE ? Huit commandes du jeu n'ont pas d'icône
   // chez le client de ce serveur — des services que le serveur n'offre pas —,
   // et en dessiner une annoncerait une fonction qui n'existera jamais ici.
   bool shown = false;
