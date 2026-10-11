@@ -2662,6 +2662,15 @@ tr: Rechazado por el servidor (código %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Devuelve este perfil a los ajustes de origen del cliente.
 
+fr: Écraser##profile
+tr: Sobrescribir##profile
+
+fr: Remplace ce profil par l'état présent, sans le poser.
+tr: Sustituye este perfil por el estado actual, sin aplicarlo.
+
+fr: Écraser le profil « %s » par l'état présent ?
+tr: ¿Sobrescribir el perfil «%s» con el estado actual?
+
 fr: Remettre au carnet la ligne détachée ?
 tr: ¿Devolver al cuaderno la línea separada?
 

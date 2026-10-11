@@ -52,6 +52,8 @@ enum class ProfileGesture : std::uint8_t {
   kRename,
   // Remet le profil `target` aux défauts du client.
   kReset,
+  // Écrase le profil `target` par l'état présent, sans le poser.
+  kOverwrite,
   // Supprime le profil `target`.
   kDelete,
 };
@@ -61,7 +63,8 @@ struct ProfilesPageState {
   // pour « celui qui est posé ».
   int selected = -1;
   std::array<char, kProfileNameBytes> name{};
-  // Le geste qui attend sa confirmation : `kReset` ou `kDelete`, sinon rien.
+  // Le geste qui attend sa confirmation : `kReset`, `kOverwrite` ou `kDelete`,
+  // sinon rien.
   ProfileGesture confirming = ProfileGesture::kNone;
 };
 

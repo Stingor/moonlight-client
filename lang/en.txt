@@ -2662,6 +2662,15 @@ tr: Refused by the server (code %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Resets this profile to the client's original settings.
 
+fr: Écraser##profile
+tr: Overwrite##profile
+
+fr: Remplace ce profil par l'état présent, sans le poser.
+tr: Replaces this profile with the current state, without applying it.
+
+fr: Écraser le profil « %s » par l'état présent ?
+tr: Overwrite the "%s" profile with the current state?
+
 fr: Remettre au carnet la ligne détachée ?
 tr: Put the detached line back in the log?
 

@@ -242,6 +242,12 @@ class ProfileKeeper {
           book_.Put(asked.target, port_.Defaults());
         }
         break;
+      case ro::ui::ProfileGesture::kOverwrite:
+        if (!exists(asked.target) || asked.target == active_) {
+          break;
+        }
+        book_.Put(asked.target, port_.Capture());
+        break;
       case ro::ui::ProfileGesture::kDelete:
         if (asked.target == kDefaultProfileName || book_.Find(asked.target) == nullptr) {
           break;

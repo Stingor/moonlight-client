@@ -100,6 +100,12 @@ void DrawChoiceLine(const ProfilesPageView& view, ProfilesPageState& state, int 
     state.selected = -1;
   }
   ImGui::SameLine();
+  // ⚠ LE PROFIL POSÉ S'ENREGISTRE DE LUI-MÊME : l'écraser ne changerait rien.
+  if (PageButton(core::Tr("Écraser##profile"), selected != view.active,
+                 core::Tr("Remplace ce profil par l'état présent, sans le poser."), art)) {
+    state.confirming = ProfileGesture::kOverwrite;
+  }
+  ImGui::SameLine();
   if (PageButton(core::Tr("Réinitialiser##profile"), true,
                  core::Tr("Remet ce profil aux réglages d'origine du client."), art)) {
     state.confirming = ProfileGesture::kReset;
@@ -117,15 +123,18 @@ void DrawChoiceLine(const ProfilesPageView& view, ProfilesPageState& state, int 
 void DrawConfirmLine(const ProfilesPageView& view, ProfilesPageState& state, int selected,
                      const SkinArt& art, ProfilesPageAction& asked) {
   if (state.confirming == ProfileGesture::kNone ||
-      (state.confirming == ProfileGesture::kDelete && selected == view.fixed)) {
+      (state.confirming == ProfileGesture::kDelete && selected == view.fixed) ||
+      (state.confirming == ProfileGesture::kOverwrite && selected == view.active)) {
     return;
   }
+  const char* question = core::Tr("Réinitialiser le profil « %s » ?");
+  if (state.confirming == ProfileGesture::kDelete) {
+    question = core::Tr("Supprimer le profil « %s » ?");
+  } else if (state.confirming == ProfileGesture::kOverwrite) {
+    question = core::Tr("Écraser le profil « %s » par l'état présent ?");
+  }
   std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(),
-                state.confirming == ProfileGesture::kDelete
-                    ? core::Tr("Supprimer le profil « %s » ?")
-                    : core::Tr("Réinitialiser le profil « %s » ?"),
-                LabelAt(view, selected));
+  std::snprintf(line.data(), line.size(), question, LabelAt(view, selected));
   ImGui::TextUnformatted(line.data());
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Confirmer"), art)) {
