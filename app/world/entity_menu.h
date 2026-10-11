@@ -337,6 +337,9 @@ struct EntityMenuFacts {
   bool target_frame_shown = false;
   std::uint32_t own_guild_id = 0;
   bool guild_master = false;
+  // Les droits du rang que le joueur occupe sont connus ET lui refusent
+  // d'inviter. Faux tant qu'ils sont inconnus : on ne grise pas sur un doute.
+  bool guild_invite_forbidden = false;
   std::uint32_t target_guild_id = 0;
   // LE GROUPE ET LES AMIS, vus du joueur. `target_other_party` vient de la carte
   // de nom de la cible : un groupe qui n'est pas le mien.

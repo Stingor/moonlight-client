@@ -99,4 +99,16 @@ void SendPlayerSetting(Connection& link, std::uint16_t id, std::uint32_t value) 
   link.Send(proto::Encode(request));
 }
 
+bool ReviveDiscordRelay(Connection& link, sim::World& world) {
+  sim::SessionSettings& session = world.session();
+  if (session.discord_chat || session.discord_chat_revived || !link.is_open()) {
+    return false;
+  }
+  constexpr std::uint32_t kRelayOn = 1;
+  SendPlayerSetting(link, kSettingDiscordChat, kRelayOn);
+  session.discord_chat = true;
+  session.discord_chat_revived = true;
+  return true;
+}
+
 }  // namespace ro::net

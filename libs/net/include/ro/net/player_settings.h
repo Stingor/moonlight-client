@@ -75,10 +75,9 @@ inline constexpr std::uint16_t kSettingNoDelay = 33;
 inline constexpr std::uint16_t kSettingAutolootAdd = 23;
 inline constexpr std::uint16_t kSettingAutolootRemove = 24;
 
-// LE RELAI DU CANAL DISCORD : le serveur le
-// garde par personnage et le dit à l'entrée en jeu ; le client le lui écrit au
-// clic. Il ne change que ce que CE client montre — la parole publique de la
-// carte part vers Discord, coché ou non.
+// LE RELAI DU CANAL DISCORD : le serveur le garde par personnage et le dit à
+// l'entrée en jeu. Coupé, aucune ligne de Discord ne se montre ; il ne touche
+// pas à la parole publique de la carte, qui part vers Discord de toute façon.
 inline constexpr std::uint16_t kSettingDiscordChat = 9;
 
 // L'en-tête, avant la liste : deux octets d'opcode, deux de longueur, quatre
@@ -109,12 +108,23 @@ inline constexpr std::size_t kPlayerSettingSize = 6;
 // c'est-à-dire tant qu'il n'a pas posé sur la session le drapeau qui la
 // conclut. Ce n'est pas une course — la
 // poignée part à l'entrée en jeu, et rien ici n'est émis avant un geste du
-// joueur —, mais un envoi trop tôt se perd en silence.
+// joueur ou une réponse aux réglages, que le serveur ne pousse qu'après la
+// poignée —, mais un envoi trop tôt se perd en silence.
 //
 // ⚠ RIEN À RENDRE, contrairement aux demandes d'action : ce paquet est de
 // taille FIXE, son encodage ne peut pas échouer, et le serveur n'accuse rien.
 // Qui veut savoir s'il est parti regarde si la liaison est ouverte — et c'est
 // ce que l'appelant doit faire AVANT d'inscrire l'envoi dans son miroir.
 void SendPlayerSetting(Connection& link, std::uint16_t id, std::uint32_t value);
+
+// LE RELAI DISCORD SE RALLUME D'OFFICE. Ce que le joueur voit de Discord se
+// décide par la case « Discord » des onglets de discussion ; aucune case ne
+// commande plus le réglage du serveur. Un personnage qui l'a coupé ne
+// recevrait donc plus rien, sans moyen de le rallumer.
+//
+// Quand le serveur le dit coupé, la demande de le rallumer part, UNE fois par
+// entrée en jeu et sans un mot au joueur ; le miroir la tient d'avance pour
+// faite, le serveur n'accusant rien. Rend vrai quand elle est partie.
+bool ReviveDiscordRelay(Connection& link, sim::World& world);
 
 }  // namespace ro::net

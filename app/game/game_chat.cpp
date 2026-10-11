@@ -37,7 +37,6 @@
 #include "game/game.h"
 #include "game/setting_destination_open.h"
 #include "options/chat_web_options.h"
-#include "options/discord_relay_options.h"
 #include "options/game_option_ids.h"
 #include "world/click_action.h"
 
@@ -123,17 +122,9 @@ void Game::StageChat(std::uint32_t now_ms) {
     pieces_.whispers.ReleaseLinks();
   }
   // ── LE RELAI DISCORD ───────────────────────────────────────────────────
-  // 🔴 LA CASE DEMANDE, LE SERVEUR TIENT LE RÉGLAGE. Il ne répond pas à un
-  // changement : la valeur demandée vaut d'avance, comme s'il l'avait dite.
-  DiscordRelayOptions& relay = settings_->options().pages().discord_relay;
-  if (const std::optional<bool> wanted = relay.TakeRequest();
-      wanted.has_value() && link_.is_open()) {
-    ro::net::SendPlayerSetting(link_, ro::net::kSettingDiscordChat, *wanted ? 1U : 0U);
-    world_.session().discord_chat = *wanted;
-  }
-  // ⚠ HORS LIGNE, LA CASE NE SAIT RIEN : le serveur n'a pas pu le dire.
-  relay.NoteRelay(link_.is_open() ? std::optional<bool>(world_.session().discord_chat)
-                                  : std::nullopt);
+  // Ses lignes se filtrent par la case « Discord » des onglets ; un relai que
+  // le serveur dit coupé pour ce personnage se rallume, une fois.
+  ro::net::ReviveDiscordRelay(link_, world_);
   // ── LES ADRESSES, LES IMAGES ET LES MENTIONS ───────────────────────────
   // ⚠ AVANT LE TRI : le cache libère ses textures ici, et la décoration lit
   // les faits que `Compose` a pu oublier.

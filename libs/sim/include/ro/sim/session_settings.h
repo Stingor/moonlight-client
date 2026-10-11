@@ -31,9 +31,13 @@ struct SessionSettings {
   bool player_test = false;
   // `@nodelay` : les skills n'ont ni cooldown, ni after-cast delay, ni incantation.
   bool no_delay = false;
-  // LE RELAI DU CANAL DISCORD se montre-t-il dans le fil ? Le serveur retient ce
-  // réglage par personnage, et le croit vrai tant qu'il n'a rien dit.
+  // LE RELAI DU CANAL DISCORD est-il ouvert pour ce personnage ? Le serveur
+  // retient ce réglage par personnage, et le croit vrai tant qu'il n'a rien dit.
   bool discord_chat = true;
+  // ⚠ PAS UNE PAROLE DU SERVEUR, LA MARQUE DU CLIENT : la demande de rallumer
+  // ce relai est déjà partie depuis l'entrée en jeu, et elle ne part qu'une
+  // fois (voir `ro::net::ReviveDiscordRelay`).
+  bool discord_chat_revived = false;
 
   // ── LES RÈGLES DU SERVEUR (`ZC_MOONLIGHT_SERVER_RULES`) ────────────────────
   //

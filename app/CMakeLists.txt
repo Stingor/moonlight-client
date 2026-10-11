@@ -1271,13 +1271,15 @@ target_include_directories(moonclient_patcher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 #   patcher (verrou)        fichier sans partage         flock
 #   patcher (relance)       CreateProcess                fork + execv
 #   aperçus du chat         WinHTTP                      libcurl
-#   WebP                    WIC                          libwebp
 #
 # 🔴 LES BIBLIOTHÈQUES DU SYSTÈME, PAS DES COPIES LIVRÉES : la TLS et le
 # magasin de certificats sont ceux que l'administrateur entretient. Sous
 # Linux, libcurl, libsecret et OpenSSL viennent donc de la distribution
-# (`libcurl4-openssl-dev`, `libsecret-1-dev`, `libssl-dev`) ; seul libwebp,
-# qui ne touche ni au réseau ni aux clés, vient de vcpkg.
+# (`libcurl4-openssl-dev`, `libsecret-1-dev`, `libssl-dev`).
+#
+# Le WebP, lui, n'est pas un service du système : libwebp le décode partout,
+# depuis vcpkg (ADR 0137). Il ne touche ni au réseau ni aux clés.
+find_package(WebP CONFIG REQUIRED)
 if(WIN32)
     set(_web_http_sources web/win_http_transport.cpp web/win_secret_store.cpp)
     set(_web_http_libraries crypt32 winhttp)
@@ -1286,14 +1288,13 @@ if(WIN32)
         patcher/win_install_lock.cpp
         patcher/win_relaunch.cpp)
     set(_patcher_net_libraries winhttp)
-    set(_chatweb_net_sources web/win_http_get.cpp web/wic_picture.cpp)
-    set(_chatweb_net_libraries winhttp windowscodecs ole32)
+    set(_chatweb_net_sources web/win_http_get.cpp)
+    set(_chatweb_net_libraries winhttp)
 else()
     find_package(CURL REQUIRED)
     find_package(OpenSSL REQUIRED)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSECRET REQUIRED IMPORTED_TARGET libsecret-1)
-    find_package(WebP CONFIG REQUIRED)
     set(_web_http_sources web/curl_http_transport.cpp web/linux_secret_store.cpp)
     set(_web_http_libraries CURL::libcurl OpenSSL::Crypto PkgConfig::LIBSECRET)
     set(_patcher_net_sources
@@ -1301,8 +1302,8 @@ else()
         patcher/posix_install_lock.cpp
         patcher/posix_relaunch.cpp)
     set(_patcher_net_libraries CURL::libcurl)
-    set(_chatweb_net_sources web/curl_preview_get.cpp web/libwebp_picture.cpp)
-    set(_chatweb_net_libraries CURL::libcurl WebP::webp WebP::webpdemux)
+    set(_chatweb_net_sources web/curl_preview_get.cpp)
+    set(_chatweb_net_libraries CURL::libcurl)
 endif()
 
 add_library(moonclient_web_http STATIC
@@ -1326,11 +1327,13 @@ target_include_directories(moonclient_patcher_net PUBLIC ${CMAKE_CURRENT_SOURCE_
 # LES APERÇUS DES LIENS DU CHAT : un saut HTTP et le décodage du WebP. La
 # boucle des sauts et la liste blanche, elles, sont pures et vivent dans
 # `ro_core`.
-add_library(moonclient_chatweb_net STATIC ${_chatweb_net_sources})
+add_library(moonclient_chatweb_net STATIC
+    web/libwebp_picture.cpp
+    ${_chatweb_net_sources})
 
 target_link_libraries(moonclient_chatweb_net
     PUBLIC ro_core ro_formats
-    PRIVATE ${_chatweb_net_libraries} ro_warnings)
+    PRIVATE ${_chatweb_net_libraries} WebP::webp WebP::webpdemux ro_warnings)
 
 target_include_directories(moonclient_chatweb_net PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -1532,7 +1535,6 @@ add_executable(moonclient
     options/pick_precision_options.cpp
     options/damage_meter_options.cpp
     options/shop_options.cpp
-    options/discord_relay_options.cpp
     options/whisper_options.cpp
     options/grey_world_options.cpp
     game/bug_report_route.cpp

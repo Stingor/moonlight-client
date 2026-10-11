@@ -1675,9 +1675,6 @@ tr: Load##profile
 fr: Chargez un [Cannon Ball].
 tr: Please load a [Cannon Ball].
 
-fr: Chat Discord (Gonryun seulement)
-tr: Discord chat (Gonryun only)
-
 fr: Chat de champ de bataille : coupé, tu parles de nouveau à voix haute. [/battlechat OFF]
 tr: Battleground chat: off, you speak out loud again. [/battlechat OFF]
 
@@ -2442,9 +2439,6 @@ tr: Wheel: zoom · double-click: actual size
 
 fr: Montre dans la table le délai habituel de retour, la loi du script de spawn. Le clic droit sur l'en-tête de la table la montre ou la masque aussi.
 tr: Shows the usual respawn delay, the spawn script's rule, in the table. Right-clicking the table header also shows or hides it.
-
-fr: Montre dans le fil, sur Gonryun, ce qui se dit sur le canal Discord du serveur.\nCe que vous dites à voix haute à Gonryun part sur Discord, case cochée ou non : elle ne change que la mention qui l'accompagne.\nC'est le serveur qui retient ce réglage, pour ce personnage.
-tr: Shows in the chat, on Gonryun, what is said on the server's Discord channel.\nWhat you say out loud in Gonryun goes to Discord, box checked or not: it only changes the note that comes with it.\nThe server keeps this setting, for this character.
 
 fr: Montre en vignettes, dans le fil, les images que le relai Discord dépose sur le site du serveur, et les emotes de Discord.\n\nToute autre adresse d'image reste un lien, dont l'aperçu se règle à part. Décoché, rien n'est téléchargé. Les emotes du jeu ont leur propre case.
 tr: Shows as thumbnails, in the chat, the images the Discord relay places on the server's site, and Discord's emotes.\n\nAny other image address stays a link, whose preview has its own setting. Unchecked, nothing is downloaded. The game's emotes have their own box.
@@ -17071,3 +17065,6 @@ tr: The server could not read its command log: its console says why.
 
 fr: Aucun blocage de chat consigné pour ce personnage.
 tr: No chat ban recorded for this character.
+
+fr: Votre rang ne peut pas inviter dans la guilde.
+tr: Your rank cannot invite into the guild.

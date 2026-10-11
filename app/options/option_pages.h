@@ -20,7 +20,6 @@
 #include "options/craft_atlas_options.h"
 #include "options/damage_meter_options.h"
 #include "options/description_options.h"
-#include "options/discord_relay_options.h"
 #include "options/graphics_options.h"
 #include "options/grey_world_options.h"
 #include "options/grimoire_key_options.h"
@@ -72,9 +71,6 @@ static_assert(kBattlegroundRowBase + static_cast<int>(BattlegroundRow::kCount) <
               "la plage du pet chevauche celle du champ de bataille");
 static_assert(kSkinLookRowBase + static_cast<int>(SkinLookRow::kCount) <= kChatWebRowBase,
               "la plage des liens du chat chevauche celle de l'habillage");
-static_assert(kChatOpenHostRowBase + static_cast<int>(ro::core::kMostUserHosts) <=
-                  kDiscordRelayRowBase,
-              "la plage du relai Discord chevauche celle des sites ouverts sans confirmation");
 
 // LES PAGES DE RÉGLAGES QUI TIENNENT LEUR PROPRE CLASSE — leurs réglages, leurs
 // lignes, leurs listes.
@@ -118,8 +114,6 @@ struct OptionPages {
   CallOptions call;
   // Les liens, les images et les mentions du chat.
   ChatWebOptions chat_web;
-  // ⚠ SANS DÉCLARATION AU FICHIER, comme l'appel : le serveur le tient.
-  DiscordRelayOptions discord_relay;
   // L'ENTITÉ DU CADRE D'ESSAI des barres d'entité, composée par la partie avant
   // la page — voir `world/entity_sample.h`. ⚠ PAS UN RÉGLAGE : une vignette.
   ro::ui::EntitySample entity_sample;

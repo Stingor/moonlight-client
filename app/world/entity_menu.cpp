@@ -199,8 +199,11 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   const bool in_guild = facts.own_guild_id != 0;
   if (in_guild) {
     EntityMenuItem& invite = menu.Add(Tr("Inviter dans la guilde"), EntityVerb::kGuildInvite);
-    // Le serveur refuse un invité qui a déjà une guilde.
-    if (facts.target_guild_id != 0) {
+    // Le serveur refuse l'invitation d'un rang qui n'en a pas le droit, et un
+    // invité qui a déjà une guilde.
+    if (facts.guild_invite_forbidden) {
+      Composer::Disable(invite, Tr("Votre rang ne peut pas inviter dans la guilde."));
+    } else if (facts.target_guild_id != 0) {
       Composer::Disable(invite, Tr("Ce joueur a déjà une guilde."));
     }
   }

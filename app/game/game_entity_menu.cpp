@@ -290,6 +290,8 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
       belonging.has_value()) {
     facts.own_guild_id = static_cast<std::uint32_t>(belonging->guild_id);
     facts.guild_master = guild_book_.IsMaster(ticket_.character_id);
+    const ro::sim::GuildRights rights = guild_book_.RightsOf(ticket_.character_id);
+    facts.guild_invite_forbidden = rights.known && !rights.may_invite;
   }
   facts.target_guild_id = actor.guild_id;
   facts.in_party = party_.in_party();

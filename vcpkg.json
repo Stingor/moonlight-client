@@ -18,13 +18,16 @@
       ]
     },
     "render": {
-      "description": "Couche de rendu OpenGL : fenêtre, contexte et chargeur GL. Hors Windows, libwebp décode aussi les aperçus WebP du chat, que Windows confie à son propre codec.",
+      "description": "Couche de rendu OpenGL : fenêtre, contexte et chargeur GL. libwebp (BSD-3-Clause, ADR 0110) décode aussi les aperçus WebP du chat, sur toutes les plates-formes : le décodeur seul, sans l'outillage ni le multiplexeur.",
       "dependencies": [
         "sdl3",
         "glad",
         {
           "name": "libwebp",
-          "platform": "!windows"
+          "default-features": false,
+          "features": [
+            "simd"
+          ]
         }
       ]
     },

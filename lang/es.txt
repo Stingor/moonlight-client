@@ -1675,9 +1675,6 @@ tr: Cargar##profile
 fr: Chargez un [Cannon Ball].
 tr: Carga una [Cannon Ball].
 
-fr: Chat Discord (Gonryun seulement)
-tr: Chat de Discord (solo Gonryun)
-
 fr: Chat de champ de bataille : coupé, tu parles de nouveau à voix haute. [/battlechat OFF]
 tr: Chat de campo de batalla: desactivado, vuelves a hablar en voz alta. [/battlechat OFF]
 
@@ -2442,9 +2439,6 @@ tr: Rueda: zoom · doble clic: tamaño real
 
 fr: Montre dans la table le délai habituel de retour, la loi du script de spawn. Le clic droit sur l'en-tête de la table la montre ou la masque aussi.
 tr: Muestra en la tabla el retardo habitual de reaparición, la regla del script de spawn. El clic derecho en la cabecera de la tabla también la muestra u oculta.
-
-fr: Montre dans le fil, sur Gonryun, ce qui se dit sur le canal Discord du serveur.\nCe que vous dites à voix haute à Gonryun part sur Discord, case cochée ou non : elle ne change que la mention qui l'accompagne.\nC'est le serveur qui retient ce réglage, pour ce personnage.
-tr: Muestra en el chat, en Gonryun, lo que se dice en el canal de Discord del servidor.\nLo que dices en voz alta en Gonryun se envía a Discord, esté marcada la casilla o no: solo cambia la mención que lo acompaña.\nEs el servidor quien guarda este ajuste, para este personaje.
 
 fr: Montre en vignettes, dans le fil, les images que le relai Discord dépose sur le site du serveur, et les emotes de Discord.\n\nToute autre adresse d'image reste un lien, dont l'aperçu se règle à part. Décoché, rien n'est téléchargé. Les emotes du jeu ont leur propre case.
 tr: Muestra en miniatura, en el chat, las imágenes que el relé de Discord deja en el sitio del servidor, y los emotes de Discord.\n\nCualquier otra dirección de imagen sigue siendo un enlace, cuya vista previa se ajusta aparte. Desmarcada, no se descarga nada. Los emotes del juego tienen su propia casilla.
@@ -17071,3 +17065,6 @@ tr: El servidor no pudo leer su registro de comandos: su consola dice por qué.
 
 fr: Aucun blocage de chat consigné pour ce personnage.
 tr: Ningún chat ban registrado para este personaje.
+
+fr: Votre rang ne peut pas inviter dans la guilde.
+tr: Tu rango no puede invitar a la guild.

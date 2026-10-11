@@ -137,12 +137,11 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {
   whispers.ComposeInto(rows);
-  discord_relay.ComposeInto(rows);
   chat_web.ComposeInto(rows);
 }
 
 bool OptionPages::ChangeServerHeld(const ro::ui::OptionsWindowAction& asked) {
-  return call.Change(asked) || discord_relay.Change(asked);
+  return call.Change(asked);
 }
 
 }  // namespace moonclient
