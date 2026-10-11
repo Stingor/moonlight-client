@@ -22,4 +22,8 @@ namespace moonclient {
 // actions, et il relirait un fichier qu'il ne comprendrait qu'à moitié.
 inline constexpr std::string_view kSaveFolder = "savedata";
 
+// Le fichier où ImGui retient la place et l'ouverture des fenêtres, dans
+// `savedata`.
+inline constexpr std::string_view kInterfaceSettingsFile = "interface.ini";
+
 }  // namespace moonclient

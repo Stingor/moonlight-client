@@ -16,6 +16,11 @@ namespace moonclient {
 
 class UiStage;
 
+// LA DISPOSITION D'USINE : la place de chaque fenêtre et ce qui s'ouvre au
+// premier lancement. Ce que « Réinitialiser » repose. Une fenêtre qu'elle ne
+// nomme pas reprend la place que son code lui donne à la première ouverture.
+[[nodiscard]] ro::ui::LayoutProfile FactoryLayout();
+
 // LA DISPOSITION DES FENÊTRES, vue comme une famille de profils : ce que
 // `ProfileKeeper` relève, pose et range.
 class LayoutPort final : public ProfilePort<ro::ui::LayoutProfile> {
@@ -28,9 +33,10 @@ class LayoutPort final : public ProfilePort<ro::ui::LayoutProfile> {
   [[nodiscard]] std::uint64_t Revision() override;
   [[nodiscard]] ro::ui::LayoutProfile Capture() override;
   void Pose(const ro::ui::LayoutProfile& profile) override;
-  // ⚠ UNE DISPOSITION VIDE : chaque fenêtre reprend la place que son code lui
-  // donne à la première ouverture.
-  [[nodiscard]] ro::ui::LayoutProfile Defaults() override { return {}; }
+  [[nodiscard]] ro::ui::LayoutProfile Defaults() override { return FactoryLayout(); }
+  // ⚠ UNE INSTALLATION NEUVE REÇOIT LA DISPOSITION D'USINE pour « Default ».
+  // Neuve : ni ce fichier ni celui d'ImGui. Le second seul est la disposition
+  // d'un joueur d'avant les profils, et elle devient « Default » telle quelle.
   [[nodiscard]] bool Load(UiLayoutBook& into) override;
   void Save(const UiLayoutBook& from) override;
 

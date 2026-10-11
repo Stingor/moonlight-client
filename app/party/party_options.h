@@ -158,7 +158,7 @@ class PartyOptions {
   [[nodiscard]] bool ChangeGrid(PartyGridRow row, const ro::ui::OptionsWindowAction& asked);
 
   ro::ui::PartyFriendLook window_;
-  ro::ui::PartyGridLook grid_;
+  ro::ui::PartyGridLook grid_{.locked = true};
   bool window_preview_ = false;
   bool grid_preview_ = false;
   bool grid_fake_members_ = false;

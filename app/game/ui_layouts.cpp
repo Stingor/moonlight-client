@@ -1,9 +1,12 @@
 #include "game/ui_layouts.h"
 
+#include <filesystem>
+#include <system_error>
 #include <utility>
 
 #include "ro/core/i18n.h"
 
+#include "game/save_folder.h"
 #include "game/ui_stage.h"
 
 namespace moonclient {
@@ -21,7 +24,19 @@ ro::ui::LayoutProfile LayoutPort::Capture() { return ui_->CurrentLayout(); }
 
 void LayoutPort::Pose(const ro::ui::LayoutProfile& profile) { ui_->UseLayout(profile); }
 
-bool LayoutPort::Load(UiLayoutBook& into) { return LoadUiLayouts(client_root_, into); }
+bool LayoutPort::Load(UiLayoutBook& into) {
+  std::error_code failed;
+  const bool fresh =
+      !std::filesystem::exists(UiLayoutPath(client_root_), failed) &&
+      !std::filesystem::exists(client_root_ / kSaveFolder / kInterfaceSettingsFile, failed);
+  if (!LoadUiLayouts(client_root_, into)) {
+    return false;
+  }
+  if (fresh && into.Find(kDefaultProfileName) == nullptr) {
+    into.Put(kDefaultProfileName, FactoryLayout());
+  }
+  return true;
+}
 
 void LayoutPort::Save(const UiLayoutBook& from) {
   static_cast<void>(SaveUiLayouts(client_root_, from));

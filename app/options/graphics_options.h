@@ -16,6 +16,9 @@
 
 namespace moonclient {
 
+// L'écart d'usine de la disparition des cadavres sous la durée du client.
+inline constexpr std::uint32_t kCorpseFadeShortenedMs = 100;
+
 // LES LIGNES DE LA PAGE portent un identifiant COMPOSÉ, hors de l'énumération
 // des réglages, comme celles de la cible : voir la fiche 0038. ⚠ LA PLAGE SUIT
 // CELLES DU MENU DU CLIC DROIT (5200 et 5300).
@@ -103,7 +106,9 @@ class GraphicsOptions {
   bool fog_ = true;
   bool decor_veil_ = false;
   bool summon_translucent_ = false;
-  std::uint32_t corpse_fade_ms_ = ro::render::kClientCorpseFadeMs;
+  // ⚠ CENT MILLISECONDES SOUS LE CLIENT : le réglage d'usine que le joueur a
+  // choisi.
+  std::uint32_t corpse_fade_ms_ = ro::render::kClientCorpseFadeMs - kCorpseFadeShortenedMs;
   std::uint32_t appear_fade_ms_ = ro::render::kClientAppearFadeMs;
   std::uint32_t leave_fade_ms_ = ro::render::kClientLeaveFadeMs;
   std::uint32_t skill_gesture_floor_ms_ = 0;

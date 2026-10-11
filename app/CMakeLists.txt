@@ -1540,6 +1540,7 @@ add_executable(moonclient
     options/target_options.cpp
     game/display_settings.cpp
     options/game_options.cpp
+    options/factory_layout.cpp
     options/sound_options.cpp
     game/game_settings.cpp
     game/setting_destination_open.cpp
@@ -1554,6 +1555,7 @@ add_executable(moonclient
     character/style_view.cpp
     game/system_fonts.cpp
     game/ui_layouts.cpp
+    game/ui_layout_factory.cpp
     game/ui_stage.cpp
     game/ui_stage_lobby.cpp
     game/ui_stage_trade.cpp

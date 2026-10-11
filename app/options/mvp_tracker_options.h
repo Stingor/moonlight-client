@@ -143,7 +143,9 @@ class MvpTrackerOptions {
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);
 
  private:
-  MvpTrackerSettings settings_;
+  // ⚠ ALLUMÉ D'USINE, à la différence de `MvpTrackerSettings` : c'est la
+  // disposition que le joueur livre.
+  MvpTrackerSettings settings_{.enabled = true};
   std::string open_key_;
   int line_count_ = 0;
   // Ce que les lignes pointent, gardé le temps qu'elles vivent : « ou la touche

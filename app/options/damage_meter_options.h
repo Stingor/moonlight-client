@@ -108,9 +108,9 @@ class DamageMeterOptions {
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);
 
  private:
-  // ⚠ MONTRÉ PAR DÉFAUT ; le palmarès, lui, est un volet qu'on choisit
-  // d'ouvrir.
-  ro::ui::DamageMeterLook look_{.shown = true, .records = false};
+  // ⚠ CACHÉ ET VERROUILLÉ PAR DÉFAUT : on l'allume quand on veut mesurer. Le
+  // palmarès, lui, est un volet qu'on choisit d'ouvrir.
+  ro::ui::DamageMeterLook look_{.shown = false, .locked = true, .records = false};
   int slot_ms_ = 200;
   int window_secs_ = 10;
   int combat_timeout_secs_ = 5;

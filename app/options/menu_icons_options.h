@@ -37,6 +37,11 @@ static_assert(kBugReportRowBase + static_cast<int>(BugReportRow::kCount) <= kMen
   return kMenuIconsRowBase + static_cast<int>(row);
 }
 
+// LA PLACE D'USINE DES ICÔNES : un bloc de cinq colonnes au coin haut-gauche,
+// et le bouton du Vote Shop ancré à droite. Une icône absente de la table garde
+// sa case de la grille du jeu.
+[[nodiscard]] ro::ui::MenuIconsLook FactoryMenuIcons();
+
 class MenuIconsOptions {
  public:
   // ⚠ MUTABLE : les icônes écrivent leur place dedans quand on les déplace.
@@ -58,7 +63,7 @@ class MenuIconsOptions {
   bool ToggleCashShopButton() noexcept;
 
  private:
-  ro::ui::MenuIconsLook look_;
+  ro::ui::MenuIconsLook look_ = FactoryMenuIcons();
   std::vector<ro::ui::OptionRowView> rows_;
 };
 

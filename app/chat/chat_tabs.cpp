@@ -87,8 +87,11 @@ ChatTabs::ChatTabs() {
   // ⚠ UN SEUL ONGLET AU DÉPART, ET IL MONTRE TOUT — c'est ce que fait le client.
   // En poser quatre d'avance déciderait à la place du joueur de la façon dont il
   // range sa conversation.
-  tabs_.push_back(
-      ChatTab{.name = std::string(ro::core::Tr("Tout")), .accepted = kDefaultChatTypes});
+  //
+  // ⚠ ET LA FENÊTRE PRINCIPALE NAÎT FIGÉE : la disposition d'usine la pose en
+  // bas à gauche, et un glisser malheureux ne doit pas l'en décoller.
+  tabs_.push_back(ChatTab{
+      .name = std::string(ro::core::Tr("Tout")), .accepted = kDefaultChatTypes, .locked = true});
 }
 
 std::size_t ChatTabs::Add(std::string name) {

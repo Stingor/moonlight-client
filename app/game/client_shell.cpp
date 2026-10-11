@@ -32,9 +32,6 @@ namespace {
 
 constexpr int kMillisecondsPerSecond = 1000;
 
-// Le fichier où l'interface retient la place et l'ouverture de ses fenêtres.
-constexpr std::string_view kInterfaceSettingsFile = "interface.ini";
-
 // OÙ L'INTERFACE RETIENT SES FENÊTRES : dans `savedata\` du dossier du jeu,
 // avec les autres réglages du joueur — voir `save_folder.h`. Un lancement
 // d'essai, qui a son propre dossier, a donc aussi son propre fichier.

@@ -33,6 +33,7 @@
 #include "game/ui_stage.h"
 #include "options/damage_page_names.h"
 #include "options/display_options.h"
+#include "options/factory_layout.h"
 #include "options/game_option_ids.h"
 #include "options/languages.h"
 #include "options/option_pages.h"
@@ -472,13 +473,11 @@ class GameOptions {
   int character_avatar_pose_ = static_cast<int>(ro::ui::CharacterPose::kReady);
   bool character_avatar_animated_ = true;
   int character_avatar_direction_ = 0;
-  // LA DISPOSITION DES ONGLETS. ⚠ DEBOUT DANS LES DEUX GRILLES, COUCHÉS DANS LE
-  // COFFRE : celui du coffre a sa raison — ses colonnes se disputent déjà la
-  // largeur qu'une bande à gauche prendrait.
+  // LA DISPOSITION DES ONGLETS : debout partout, le coffre compris.
   bool inventory_tabs_vertical_ = true;
   bool inventory_free_layout_ = false;
   bool cart_tabs_vertical_ = true;
-  bool storage_tabs_vertical_ = false;
+  bool storage_tabs_vertical_ = true;
   bool storage_type_tabs_ = true;
   bool storage_tab_images_ = true;
   bool storage_shelf_row_ = false;
@@ -489,27 +488,27 @@ class GameOptions {
   bool storage_value_column_ = true;
   bool storage_total_value_ = true;
   bool inventory_locked_ = false;
-  // ⚠ LEVÉ PAR DÉFAUT : un verrou qu'on n'a pas demandé et qui refuse un geste
-  // ordinaire se prend pour une panne.
+  // ⚠ LE LÂCHER EST LIBRE PAR DÉFAUT : un verrou qu'on n'a pas demandé et qui
+  // refuse un geste ordinaire se prend pour une panne. La vente, elle, est
+  // verrouillée d'usine — c'est le choix du joueur.
   bool inventory_drop_lock_ = false;
-  bool inventory_sell_lock_ = false;
+  bool inventory_sell_lock_ = true;
   bool inventory_sort_ = false;
   // Ce que la conversation garde en mémoire, par genre. ⚠ PAS DANS
   // `chat_look_` : ce n'est pas une apparence, et `ui` ne connaît pas `sim`.
   int chat_kept_per_kind_ = ro::sim::kChatLinesKeptPerKind;
   ro::ui::ChatBubbleLook bubbles_;
-  ro::ui::ItemObtainToastLook item_obtain_;
-  ro::ui::AlignGrid align_grid_;
-  ro::ui::ShortcutBarsLayout shortcut_bars_;
-  ro::ui::StatusBarLayout status_bar_;
-  ro::ui::StatBarsLook stat_bars_;
+  ro::ui::ItemObtainToastLook item_obtain_ = FactoryItemObtain();
+  ro::ui::AlignGrid align_grid_ = FactoryAlignGrid();
+  ro::ui::ShortcutBarsLayout shortcut_bars_ = FactoryShortcutBars();
+  ro::ui::StatusBarLayout status_bar_ = FactoryStatusBar();
+  ro::ui::StatBarsLook stat_bars_ = FactoryStatBars();
   ro::ui::PvpHudLook pvp_hud_;
-  // ⚠ SES DÉFAUTS SONT CEUX DU CLIENT — vert, rouge sous un quart, soixante sur
-  // cinq —, et le fichier de réglages lit la valeur présente à la déclaration :
-  // il n'y a donc pas de « retour au client » à écrire ailleurs.
-  ro::ui::EntityBarsLook entity_bars_;
+  // ⚠ COULEURS ET SEUILS DU CLIENT — vert, rouge sous un quart —, place de la
+  // disposition d'usine : voir `factory_layout.h`.
+  ro::ui::EntityBarsLook entity_bars_ = FactoryEntityBars();
   // ⚠ MÊME REMARQUE : blanc, rose clair, l'étiquette au survol.
-  ro::render::EntityNamesLook entity_names_;
+  ro::render::EntityNamesLook entity_names_ = FactoryEntityNames();
   ro::ui::StaffToolsLook staff_tools_;
   // ⚠ SES DÉFAUTS SONT CEUX DE `HitPopupLook`, qui sont le client : le fichier
   // de réglages lit la valeur présente à la déclaration.
@@ -550,10 +549,10 @@ class GameOptions {
   bool vertical_sync_ = true;
   // Zéro = aucune limite. Le frein n'a de sens que la synchronisation éteinte.
   int frame_limit_ = 0;
-  bool frame_meter_ = false;
-  bool frame_meter_locked_ = false;
-  bool frame_meter_graph_ = true;
-  bool frame_meter_ping_ = true;
+  bool frame_meter_ = true;
+  bool frame_meter_locked_ = true;
+  bool frame_meter_graph_ = false;
+  bool frame_meter_ping_ = false;
 
   // Le filet de l'affichage. Voir `DisplayRevert`.
   DisplayRevert revert_;
@@ -605,9 +604,8 @@ class GameOptions {
   // ⚠ C'EST LA VALEUR PRÉSENTE ICI qui devient le défaut du fichier de
   // réglages.
   ro::render::ItemDropSettings item_drop_;
-  // ⚠ SES DÉFAUTS SONT CEUX DE `ChatAppearance`, et il n'y en a pas d'autres :
-  // le fichier de réglages lit la valeur présente à la déclaration.
-  ro::ui::ChatAppearance chat_look_;
+  // ⚠ LES DÉFAUTS DE `ChatAppearance`, retouchés par la disposition d'usine.
+  ro::ui::ChatAppearance chat_look_ = FactoryChatAppearance();
 
   // Les lignes montrées, par section. Refaites à chaque image de fenêtre
   // ouverte : une vue ne se garde pas au travers d'un changement de langue.

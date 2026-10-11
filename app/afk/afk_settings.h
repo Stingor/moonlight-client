@@ -82,8 +82,8 @@ struct AfkSettings {
   // serveur, et ces valeurs sont celles qu'il a réglées puis choisies pour tout
   // le monde.
   bool enabled = true;
-  // Silence avant bascule.
-  int delay_s = 60;
+  // Silence avant bascule : cinq minutes.
+  int delay_s = 300;
 
   // ── PRÉVENIR L'ENTOURAGE ──────────────────────────────────────────────────
   //
@@ -97,8 +97,8 @@ struct AfkSettings {
   // machine. Ils composent un masque envoyé au serveur, qui seul peut montrer
   // un joueur au voisinage.
   //
-  // ⚠ ALLUMÉE D'USINE ELLE AUSSI, et au MÊME délai que la veille : le joueur a
-  // posé les deux à soixante secondes.
+  // ⚠ ALLUMÉE D'USINE ELLE AUSSI, à soixante secondes : l'entourage est prévenu
+  // bien avant que la veille ne prenne la caméra.
   bool announce = true;
   int announce_delay_s = 60;
   bool announce_zzz = true;
@@ -119,10 +119,9 @@ struct AfkSettings {
   float ease_s = 2.5F;
 
   // ── HABILLAGE ─────────────────────────────────────────────────────────────
-  // ⚠ « CLAVIER SEULEMENT » D'USINE, et c'est le réglage du joueur : une souris
-  // posée sur un bureau qu'on bouscule, un capteur trop sensible, et la veille
-  // ne tient jamais.
-  int wake_on = static_cast<int>(AfkWake::kKeyboard);
+  // ⚠ CLAVIER ET SOURIS D'USINE, et c'est le réglage du joueur : la veille se
+  // défait au premier geste, quel qu'il soit.
+  int wake_on = static_cast<int>(AfkWake::kAny);
   bool hide_ui = true;
   bool hide_cursor = true;
   float vignette = 0.45F;

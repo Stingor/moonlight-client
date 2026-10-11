@@ -97,7 +97,7 @@ class TargetOptions {
 
  private:
   TargetingSettings settings_;
-  ro::ui::TargetHudLook look_;
+  ro::ui::TargetHudLook look_{.locked = true};
   bool status_preview_ = false;
   std::vector<ro::ui::OptionRowView> rows_;
   // Refaits à chaque composition : le pointeur d'un texte traduit meurt au
