@@ -377,6 +377,9 @@ struct StatBarsLook {
   // demande.
   bool center_mark = false;
 
+  // Au niveau maximum, les jauges d'expérience restent au lieu de s'effacer.
+  bool keep_maxed_exp = false;
+
   // LE MODE RÉGLAGE : des valeurs factices qui ondulent, du vide au plein, pour
   // voir en direct ce qu'un réglage fait à une jauge qui bouge — l'arrondi d'une
   // part presque vide, le texte d'une jauge pleine, la bascule de surcharge.
@@ -424,15 +427,17 @@ struct StatBarWarnings {
 // La part remplie, entre 0 et 1.
 [[nodiscard]] float StatBarFill(const StatBarValue& value);
 
-// Au niveau maximum, le serveur donne pour seuil ces plafonds, et l'expérience
-// s'y accumule sans plus mener à rien.
+// Au niveau maximum, le serveur donne pour seuil du niveau suivant ces plafonds
+// au lieu d'un vrai seuil : c'est à eux qu'on reconnaît le niveau maximum, quel
+// qu'il soit — 999 en base, celui de la classe pour le métier.
 inline constexpr std::int64_t kBaseExpCeiling = 99'999'999;
 inline constexpr std::int64_t kJobExpCeiling = 999'999'999;
 
 // VRAI SI LA JAUGE PARAÎT, réglage à part : toutes, sauf l'incantation quand on
-// n'incante pas, et l'expérience de base ou de métier pleine jusqu'à son
-// plafond — elle reparaît si l'expérience redescend.
-[[nodiscard]] bool StatBarPresent(StatBar bar, const StatBarValue& value);
+// n'incante pas, et, sauf `keep_maxed_exp`, l'expérience de base ou de métier
+// au niveau maximum.
+[[nodiscard]] bool StatBarPresent(StatBar bar, const StatBarValue& value,
+                                  bool keep_maxed_exp = false);
 
 // Vrai quand ce poids-là a franchi le seuil que le serveur annonce.
 [[nodiscard]] bool StatBarOverweight(const StatBarValue& weight, const StatBarWarnings& warnings);

@@ -16773,3 +16773,9 @@ tr: El drop de items normales de los monstruos se duplica durante los próximos 
 
 fr: L'EXP de job tirée des monstres augmente de %d %% pendant 30 minutes.
 tr: La EXP de job obtenida de monstruos aumenta un %d %% durante 30 minutos.
+
+fr: Ne pas masquer les barres d'EXP au niveau maximum
+tr: No ocultar las barras de EXP en el nivel máximo
+
+fr: Au niveau maximum, la jauge d'EXP de base — ou celle du job au niveau de job maximum — s'efface d'elle-même. Cochée, elle reste.
+tr: En el nivel máximo, la barra de EXP base — o la de job en el nivel de job máximo — se oculta sola. Marcada, se queda.

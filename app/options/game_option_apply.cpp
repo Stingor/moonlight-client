@@ -248,6 +248,7 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
     case GameOption::kStatBarsSticky:
     case GameOption::kStatBarsCenterMark:
     case GameOption::kStatBarsTuning:
+    case GameOption::kStatBarsKeepMaxedExp:
     case GameOption::kStatBarsWarnOverweight:
     case GameOption::kStatBarsZenyReference:
     // ⚠ RIEN À POUSSER : les deux cadres du classement PVP sont relus à chaque

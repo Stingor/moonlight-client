@@ -657,17 +657,17 @@ bool StatBarOverweight(const StatBarValue& weight, const StatBarWarnings& warnin
   return PercentOf(weight) >= warnings.overweight_percent;
 }
 
-bool StatBarPresent(StatBar bar, const StatBarValue& value) {
-  const auto full_to = [&value](std::int64_t ceiling) {
-    return value.known && value.most == ceiling && value.current >= ceiling;
+bool StatBarPresent(StatBar bar, const StatBarValue& value, bool keep_maxed_exp) {
+  const auto at_max_level = [&value, keep_maxed_exp](std::int64_t ceiling) {
+    return !keep_maxed_exp && value.known && value.most == ceiling;
   };
   switch (bar) {
     case StatBar::kCast:
       return value.known;
     case StatBar::kBaseExp:
-      return !full_to(kBaseExpCeiling);
+      return !at_max_level(kBaseExpCeiling);
     case StatBar::kJobExp:
-      return !full_to(kJobExpCeiling);
+      return !at_max_level(kJobExpCeiling);
     default:
       return true;
   }
@@ -683,7 +683,8 @@ void DrawStatBars(const StatBarValues& values, const StatBarWarnings& warnings,
   std::array<bool, kStatBarCount> shown{};
   for (std::size_t rank = 0; rank < kStatBarCount; ++rank) {
     rects[rank] = look.bars[rank].rect;
-    shown[rank] = look.bars[rank].shown && StatBarPresent(static_cast<StatBar>(rank), values[rank]);
+    shown[rank] = look.bars[rank].shown &&
+                  StatBarPresent(static_cast<StatBar>(rank), values[rank], look.keep_maxed_exp);
   }
 
   for (std::size_t rank = 0; rank < kStatBarCount; ++rank) {

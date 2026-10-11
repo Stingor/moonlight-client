@@ -275,6 +275,7 @@ enum class GameOption : std::uint8_t {
   kStatBarsSticky,
   kStatBarsCenterMark,
   kStatBarsTuning,
+  kStatBarsKeepMaxedExp,
   // ⚠ CES DEUX-LÀ NE CONCERNENT QU'UNE JAUGE CHACUN — le poids, la bourse — et
   // leur rangée vit dans l'onglet de celle-là. Ils restent ici parce qu'ils sont
   // UNIQUES, non parce qu'ils seraient communs.

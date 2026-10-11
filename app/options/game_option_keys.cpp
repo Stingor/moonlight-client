@@ -102,6 +102,7 @@ constexpr const char* kStatBarsShownKey = "gauges_shown";
 constexpr const char* kStatBarsLockedKey = "gauges_locked";
 constexpr const char* kStatBarsStickyKey = "gauges_snapped";
 constexpr const char* kStatBarsCenterMarkKey = "gauges_marker_center";
+constexpr const char* kStatBarsKeepMaxedExpKey = "gauges_exp_kept_at_max_level";
 constexpr const char* kStatBarsWarnKey = "gauges_alert_overload";
 constexpr const char* kStatBarsZenyKey = "gauges_purse_full";
 
@@ -437,6 +438,7 @@ void GameOptions::DeclareStatBars(SettingsFile& into) {
   into.Declare(kStatBarsLockedKey, &stat_bars_.locked);
   into.Declare(kStatBarsStickyKey, &stat_bars_.sticky);
   into.Declare(kStatBarsCenterMarkKey, &stat_bars_.center_mark);
+  into.Declare(kStatBarsKeepMaxedExpKey, &stat_bars_.keep_maxed_exp);
   into.Declare(kStatBarsWarnKey, &stat_bars_.warn_overweight);
   into.Declare(kStatBarsZenyKey, &stat_bars_.zeny_reference);
 

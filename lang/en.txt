@@ -16773,3 +16773,9 @@ tr: Regular item drops from monsters will be doubled for the next 30 minutes.
 
 fr: L'EXP de job tirée des monstres augmente de %d %% pendant 30 minutes.
 tr: Job Exp points from hunting monsters are increased by %d%% for 30 minutes.
+
+fr: Ne pas masquer les barres d'EXP au niveau maximum
+tr: Do not hide the EXP bars at max level
+
+fr: Au niveau maximum, la jauge d'EXP de base — ou celle du job au niveau de job maximum — s'efface d'elle-même. Cochée, elle reste.
+tr: At max level, the base EXP gauge — or the job one at max job level — hides by itself. Checked, it stays.

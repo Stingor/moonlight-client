@@ -350,6 +350,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
     case GameOption::kStatBarsTuning:
       stat_bars_.tuning = asked.on;
       break;
+    case GameOption::kStatBarsKeepMaxedExp:
+      stat_bars_.keep_maxed_exp = asked.on;
+      break;
     case GameOption::kPvpHudLocked:
       pvp_hud_.locked = asked.on;
       break;
