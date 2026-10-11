@@ -32,14 +32,14 @@ inline constexpr float kRankingRankColumnPixels = 44.0F;
 // Celle des points.
 inline constexpr float kRankingPointsColumnPixels = 70.0F;
 
-// LES ONGLETS, dans l'ordre où la fenêtre les montre.
+// LES ONGLETS, dans l'ordre où la fenêtre les montre. Le classement des tueurs
+// n'en a pas : le serveur n'est pas un serveur PK, et ce classement y reste vide.
 enum class RankingTab : std::uint8_t {
   kBlacksmith,
   kAlchemist,
   kTaekwon,
-  kKiller,
 };
-inline constexpr std::size_t kRankingTabCount = 4;
+inline constexpr std::size_t kRankingTabCount = 3;
 
 // Le libellé d'un onglet, déjà traduit.
 [[nodiscard]] const char* RankingTabLabel(RankingTab tab);

@@ -33,7 +33,9 @@ std::optional<ro::ui::RankingTab> RankingTabOf(ro::net::RankKind kind) {
     case ro::net::RankKind::kTaekwon:
       return ro::ui::RankingTab::kTaekwon;
     case ro::net::RankKind::kKiller:
-      return ro::ui::RankingTab::kKiller;
+      // Sans onglet : la liste reçue (par « /pk ») ne s'écrit que dans la
+      // discussion.
+      return std::nullopt;
   }
   return std::nullopt;
 }
@@ -46,8 +48,6 @@ ro::net::RankKind RankKindOf(ro::ui::RankingTab tab) {
       return ro::net::RankKind::kAlchemist;
     case ro::ui::RankingTab::kTaekwon:
       return ro::net::RankKind::kTaekwon;
-    case ro::ui::RankingTab::kKiller:
-      return ro::net::RankKind::kKiller;
   }
   return ro::net::RankKind::kBlacksmith;
 }

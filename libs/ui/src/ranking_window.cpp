@@ -15,7 +15,7 @@ namespace ro::ui {
 namespace {
 
 constexpr std::array<RankingTab, kRankingTabCount> kRankingTabOrder = {
-    RankingTab::kBlacksmith, RankingTab::kAlchemist, RankingTab::kTaekwon, RankingTab::kKiller};
+    RankingTab::kBlacksmith, RankingTab::kAlchemist, RankingTab::kTaekwon};
 
 [[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
@@ -101,8 +101,6 @@ const char* RankingTabLabel(RankingTab tab) {
       return core::Tr("Alchemist");
     case RankingTab::kTaekwon:
       return core::Tr("Taekwon");
-    case RankingTab::kKiller:
-      return core::Tr("Killer");
   }
   return "";
 }
