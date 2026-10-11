@@ -36,10 +36,10 @@ constexpr std::int64_t kLongestCountdownSeconds = 100LL * 24 * 3600;
 // COMBIEN DE SECONDES AVANT QUE LA SUPPRESSION SOIT POSSIBLE, ou moins un
 // quand elle n'est pas programmée.
 //
-// 🔴 `DelRevDate` EST UNE DATE UNIX, POSÉE PAR LE SERVEUR
-// (`time(nullptr) + char_del_delay`). La comparer demande donc l'horloge du
-// MUR, et non celle du programme : `now_ms` compte depuis le lancement du
-// client, et l'employer ici donnerait une échéance à quelques décennies.
+// 🔴 `DelRevDate` EST ICI UNE DATE UNIX : le fil porte un délai restant, que
+// `net` ancre à la réception. La comparer demande donc l'horloge du MUR, et
+// non celle du programme : `now_ms` compte depuis le lancement du client, et
+// l'employer ici donnerait une échéance à quelques décennies.
 //
 // ⚠ ET LES DEUX HORLOGES PEUVENT DIVERGER — la nôtre et celle du serveur. Le
 // compte à rebours est donc une INDICATION ; le serveur, lui, tranche. C'est

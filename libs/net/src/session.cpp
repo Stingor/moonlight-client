@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdio>
+#include <ctime>
 #include <iterator>
 #include <string>
 
@@ -49,6 +50,19 @@ constexpr std::size_t kBareAccountIdSize = 4;
 // l'échéance du personnage sur un refus.
 constexpr std::int32_t kDeleteReserveAccepted = 1;
 constexpr std::int32_t kDeleteCancelAccepted = 1;
+
+// L'ÉCHÉANCE D'UNE SUPPRESSION, en date Unix, depuis ce que porte le fil.
+//
+// 🔴 LE FIL NE PORTE PAS UNE DATE MAIS UN DÉLAI RESTANT, compté à l'envoi :
+// `delete_date - time(nullptr)`, dans la liste comme dans l'accusé de
+// réservation. Il devient NÉGATIF une fois l'heure passée. Lu comme une date,
+// il donnerait « jamais programmée » à un personnage dont la suppression est
+// mûre — plus de rouge, plus d'« Annuler ». On l'ancre donc à la réception :
+// une seconde plus tard, il ne voudrait déjà plus rien dire.
+[[nodiscard]] std::int32_t DeleteDeadlineFrom(std::int32_t remaining_seconds) {
+  const auto now = static_cast<std::int64_t>(std::time(nullptr));
+  return static_cast<std::int32_t>(now + remaining_seconds);
+}
 
 // Le refus du serveur de zone. Il emploie la forme ANCIENNE du refus de
 // connexion — opcode puis un octet de code — là où le serveur de connexion
@@ -453,6 +467,13 @@ PhaseState CharacterPhase::Advance() {
         return state_;
       }
       characters_ = list.characters;
+      // ⚠ ZÉRO RESTE ZÉRO : c'est « pas programmée », et non « mûre à
+      // l'instant ».
+      for (proto::CharacterInfo& who : characters_) {
+        if (who.DelRevDate != 0) {
+          who.DelRevDate = DeleteDeadlineFrom(who.DelRevDate);
+        }
+      }
       list_received_ = true;
       step_ = Step::kAwaitingSelection;
       continue;
@@ -466,11 +487,11 @@ PhaseState CharacterPhase::Advance() {
       }
       if (reserved.result == kDeleteReserveAccepted) {
         // 🔴 L'ÉCHÉANCE SE POSE ICI, dans notre copie de la liste : le serveur
-        // ne la renvoie PAS. Il répond par un verdict et une date, et le
+        // ne la renvoie PAS. Il répond par un verdict et un délai, et le
         // personnage garde en base son `delete_date` — que seule une nouvelle
         // liste montrerait, et il n'en envoie pas.
         if (proto::CharacterInfo* who = Seated(reserved.CID); who != nullptr) {
-          who->DelRevDate = static_cast<std::int32_t>(reserved.date);
+          who->DelRevDate = DeleteDeadlineFrom(static_cast<std::int32_t>(reserved.date));
         }
         deletion_ = DeletionState::kDone;
       } else {

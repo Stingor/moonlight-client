@@ -343,6 +343,10 @@ class CharacterPhase {
   [[nodiscard]] bool pincode_refused() const noexcept { return pincode_refused_; }
 
   [[nodiscard]] Step step() const noexcept { return step_; }
+  // LA LISTE, telle que la tablée la montre.
+  //
+  // ⚠ `DelRevDate` Y EST UNE DATE UNIX, zéro quand rien n'est programmé. Le
+  // fil, lui, porte un délai restant : il est ancré à la réception.
   [[nodiscard]] const std::vector<proto::CharacterInfo>& characters() const noexcept {
     return characters_;
   }
