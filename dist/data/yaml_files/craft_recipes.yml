@@ -1,0 +1,1201 @@
+# GÉNÉRÉ par moonlight/tools/gen_metalprocess.py — NE PAS ÉDITER À LA MAIN.
+# Source : db/pre-re/produce_db.txt + db/create_arrow_db.yml + item_db*.yml
+version: 1
+
+# Une entrée par produit fabricable.
+#   lv       : itemlv de produce_db — 1-3 arme, 11-20 nourriture, sinon exact
+#   skill    : compétence requise (0 = fabrication par script d'objet)
+#   mats     : [id, quantité] ; quantité 0 = à POSSÉDER, non consommé (guides)
+recipes:
+  # Sword
+  - {id: 1101, lv: 1, skill: 99, skill_lv: 1, mats: [[998, 2]]}
+  # Falchion
+  - {id: 1104, lv: 1, skill: 99, skill_lv: 1, mats: [[998, 30]]}
+  # Blade
+  - {id: 1107, lv: 1, skill: 99, skill_lv: 1, mats: [[998, 45], [913, 25]]}
+  # Rapier
+  - {id: 1110, lv: 2, skill: 99, skill_lv: 2, mats: [[999, 20]]}
+  # Scimitar
+  - {id: 1113, lv: 2, skill: 99, skill_lv: 2, mats: [[999, 35]]}
+  # Ring Pommel Saber
+  - {id: 1122, lv: 2, skill: 99, skill_lv: 2, mats: [[999, 40], [920, 50]]}
+  # Saber
+  - {id: 1126, lv: 3, skill: 99, skill_lv: 3, mats: [[999, 5], [984, 8], [727, 1]]}
+  # Haedonggum
+  - {id: 1123, lv: 3, skill: 99, skill_lv: 3, mats: [[984, 8], [999, 10], [728, 1]]}
+  # Tsurugi
+  - {id: 1119, lv: 3, skill: 99, skill_lv: 3, mats: [[984, 8], [999, 15], [718, 1]]}
+  # Flamberge
+  - {id: 1129, lv: 3, skill: 99, skill_lv: 3, mats: [[984, 16], [724, 1]]}
+  # Knife
+  - {id: 1201, lv: 1, skill: 98, skill_lv: 1, mats: [[998, 1], [909, 10]]}
+  # Cutter
+  - {id: 1204, lv: 1, skill: 98, skill_lv: 1, mats: [[998, 25]]}
+  # Main Gauche
+  - {id: 1207, lv: 1, skill: 98, skill_lv: 1, mats: [[998, 50]]}
+  # Dirk
+  - {id: 1210, lv: 2, skill: 98, skill_lv: 2, mats: [[999, 17]]}
+  # Dagger
+  - {id: 1213, lv: 2, skill: 98, skill_lv: 2, mats: [[999, 30]]}
+  # Stiletto
+  - {id: 1216, lv: 2, skill: 98, skill_lv: 2, mats: [[999, 40]]}
+  # Gladius
+  - {id: 1219, lv: 3, skill: 98, skill_lv: 3, mats: [[984, 4], [999, 40], [726, 1]]}
+  # Damascus
+  - {id: 1222, lv: 3, skill: 98, skill_lv: 3, mats: [[984, 4], [999, 60], [729, 1]]}
+  # Katana
+  - {id: 1116, lv: 1, skill: 100, skill_lv: 1, mats: [[998, 35], [958, 15]]}
+  # Slayer
+  - {id: 1151, lv: 2, skill: 100, skill_lv: 2, mats: [[999, 25], [957, 20]]}
+  # Bastard Sword
+  - {id: 1154, lv: 2, skill: 100, skill_lv: 2, mats: [[999, 45]]}
+  # Two-Handed Sword
+  - {id: 1157, lv: 3, skill: 100, skill_lv: 3, mats: [[984, 12], [999, 10]]}
+  # Broad Sword
+  - {id: 1160, lv: 3, skill: 100, skill_lv: 3, mats: [[984, 12], [999, 20]]}
+  # Claymore
+  - {id: 1163, lv: 3, skill: 100, skill_lv: 3, mats: [[984, 16], [999, 20], [733, 1]]}
+  # Axe
+  - {id: 1301, lv: 1, skill: 101, skill_lv: 1, mats: [[998, 10]]}
+  # Battle Axe
+  - {id: 1351, lv: 1, skill: 101, skill_lv: 1, mats: [[998, 110]]}
+  # Hammer
+  - {id: 1354, lv: 2, skill: 101, skill_lv: 2, mats: [[999, 30]]}
+  # Buster
+  - {id: 1357, lv: 3, skill: 101, skill_lv: 3, mats: [[984, 4], [999, 20], [922, 30]]}
+  # Two-Handed Axe
+  - {id: 1360, lv: 3, skill: 101, skill_lv: 3, mats: [[984, 8], [999, 10], [719, 1]]}
+  # Club
+  - {id: 1501, lv: 1, skill: 102, skill_lv: 1, mats: [[998, 3]]}
+  # Mace
+  - {id: 1504, lv: 1, skill: 102, skill_lv: 1, mats: [[998, 30]]}
+  # Smasher
+  - {id: 1507, lv: 2, skill: 102, skill_lv: 2, mats: [[999, 20]]}
+  # Flail
+  - {id: 1510, lv: 2, skill: 102, skill_lv: 2, mats: [[999, 33]]}
+  # Chain
+  - {id: 1519, lv: 2, skill: 102, skill_lv: 2, mats: [[999, 45]]}
+  # Morning Star
+  - {id: 1513, lv: 3, skill: 102, skill_lv: 3, mats: [[999, 85], [730, 1]]}
+  # Sword Mace
+  - {id: 1516, lv: 3, skill: 102, skill_lv: 3, mats: [[999, 100], [963, 20]]}
+  # Stunner
+  - {id: 1522, lv: 3, skill: 102, skill_lv: 3, mats: [[999, 120], [968, 1]]}
+  # Waghnak
+  - {id: 1801, lv: 1, skill: 103, skill_lv: 1, mats: [[998, 160], [722, 1]]}
+  # Knuckle Dusters
+  - {id: 1803, lv: 2, skill: 103, skill_lv: 2, mats: [[999, 50]]}
+  # Studded Knuckles
+  - {id: 1805, lv: 2, skill: 103, skill_lv: 2, mats: [[999, 65]]}
+  # Fist
+  - {id: 1807, lv: 3, skill: 103, skill_lv: 3, mats: [[984, 4], [723, 10]]}
+  # Claw
+  - {id: 1809, lv: 3, skill: 103, skill_lv: 3, mats: [[984, 8], [728, 10]]}
+  # Finger
+  - {id: 1811, lv: 3, skill: 103, skill_lv: 3, mats: [[984, 4], [727, 10]]}
+  # Javelin
+  - {id: 1401, lv: 1, skill: 104, skill_lv: 1, mats: [[998, 3]]}
+  # Spear
+  - {id: 1404, lv: 1, skill: 104, skill_lv: 1, mats: [[998, 35]]}
+  # Pike
+  - {id: 1407, lv: 1, skill: 104, skill_lv: 1, mats: [[998, 70]]}
+  # Guisarme
+  - {id: 1451, lv: 2, skill: 104, skill_lv: 2, mats: [[999, 25]]}
+  # Glaive
+  - {id: 1454, lv: 2, skill: 104, skill_lv: 2, mats: [[999, 40]]}
+  # Partizan
+  - {id: 1457, lv: 2, skill: 104, skill_lv: 2, mats: [[999, 55]]}
+  # Trident
+  - {id: 1460, lv: 3, skill: 104, skill_lv: 3, mats: [[984, 8], [999, 10], [720, 5]]}
+  # Halberd
+  - {id: 1463, lv: 3, skill: 104, skill_lv: 3, mats: [[984, 12], [999, 10]]}
+  # Lance
+  - {id: 1410, lv: 3, skill: 104, skill_lv: 3, mats: [[984, 12], [723, 3], [923, 2]]}
+  # Fried Grasshopper Legs
+  - {id: 12041, lv: 11, skill: 0, skill_lv: 0, mats: [[7472, 0], [940, 5], [7031, 1], [7457, 1]]}
+  # Grape Juice Herbal Tea
+  - {id: 12046, lv: 11, skill: 0, skill_lv: 0, mats: [[7472, 0], [514, 3], [501, 2]]}
+  # Steamed Crab Nippers
+  - {id: 12051, lv: 11, skill: 0, skill_lv: 0, mats: [[7472, 0], [960, 10], [511, 10], [503, 1]]}
+  # Frog Egg Squid Ink Soup
+  - {id: 12056, lv: 11, skill: 0, skill_lv: 0, mats: [[7472, 0], [577, 1], [908, 10], [1024, 1]]}
+  # Honey Grape Juice
+  - {id: 12061, lv: 11, skill: 0, skill_lv: 0, mats: [[7472, 0], [518, 1], [514, 2], [501, 1]]}
+  # Fried Monkey Tails
+  - {id: 12066, lv: 11, skill: 0, skill_lv: 0, mats: [[7472, 0], [942, 5], [7031, 1], [7457, 1]]}
+  # Seasoned Sticky Webfoot
+  - {id: 12042, lv: 12, skill: 0, skill_lv: 0, mats: [[7473, 0], [918, 20], [511, 10], [508, 10], [7454, 1]]}
+  # Assorted Seafood
+  - {id: 12052, lv: 12, skill: 0, skill_lv: 0, mats: [[7473, 0], [966, 10], [956, 5], [951, 5], [579, 1]]}
+  # Autumn Red Tea
+  - {id: 12047, lv: 12, skill: 0, skill_lv: 0, mats: [[7473, 0], [510, 5], [507, 10], [508, 10]]}
+  # Smooth Noodle
+  - {id: 12057, lv: 12, skill: 0, skill_lv: 0, mats: [[7473, 0], [577, 1], [7454, 1], [1062, 5], [515, 3]]}
+  # Chocolate Mousse Cake
+  - {id: 12062, lv: 12, skill: 0, skill_lv: 0, mats: [[7473, 0], [7182, 10], [539, 1], [519, 1], [736, 1]]}
+  # Mixed Juice
+  - {id: 12067, lv: 12, skill: 0, skill_lv: 0, mats: [[7473, 0], [531, 3], [534, 2], [533, 1], [620, 2]]}
+  # Fruit Mix
+  - {id: 12063, lv: 13, skill: 0, skill_lv: 0, mats: [[7474, 0], [512, 5], [513, 5], [582, 5], [578, 5], [7452, 1]]}
+  # Honey Herbal Tea
+  - {id: 12048, lv: 13, skill: 0, skill_lv: 0, mats: [[7474, 0], [518, 2], [509, 10], [7452, 1]]}
+  # Bomber Steak
+  - {id: 12043, lv: 13, skill: 0, skill_lv: 0, mats: [[7474, 0], [517, 4], [7031, 1], [511, 10], [7286, 5], [7455, 1]]}
+  # Clam Soup
+  - {id: 12053, lv: 13, skill: 0, skill_lv: 0, mats: [[7474, 0], [966, 20], [961, 10], [518, 1], [7453, 1]]}
+  # Tentacle Cheese Gratin
+  - {id: 12058, lv: 13, skill: 0, skill_lv: 0, mats: [[7474, 0], [962, 10], [548, 10], [549, 5], [7453, 1]]}
+  # Fried Sweet Potato
+  - {id: 12068, lv: 13, skill: 0, skill_lv: 0, mats: [[7474, 0], [516, 10], [549, 10], [633, 1], [7453, 1]]}
+  # Morocc Fruit Wine
+  - {id: 12049, lv: 14, skill: 0, skill_lv: 0, mats: [[7475, 0], [578, 10], [568, 4], [582, 10], [970, 2], [514, 5]]}
+  # Seasoned Jellyfish
+  - {id: 12054, lv: 14, skill: 0, skill_lv: 0, mats: [[7475, 0], [962, 30], [509, 10], [7194, 10], [7031, 1], [1024, 20]]}
+  # Herb Marinade Beef
+  - {id: 12044, lv: 14, skill: 0, skill_lv: 0, mats: [[7475, 0], [517, 5], [507, 3], [508, 2], [511, 3], [7453, 1], [568, 1]]}
+  # Cream Sandwich
+  - {id: 12064, lv: 14, skill: 0, skill_lv: 0, mats: [[7475, 0], [580, 5], [519, 15], [548, 10], [508, 10], [517, 1], [7453, 1]]}
+  # Lutie Cold Noodle
+  - {id: 12059, lv: 14, skill: 0, skill_lv: 0, mats: [[7475, 0], [577, 3], [7455, 1], [7066, 10], [515, 10], [1062, 10]]}
+  # Steamed Ancient Lips
+  - {id: 12069, lv: 14, skill: 0, skill_lv: 0, mats: [[7475, 0], [1054, 10], [945, 10], [509, 10], [579, 5], [7453, 2]]}
+  # Mastela Fruit Wine
+  - {id: 12050, lv: 15, skill: 0, skill_lv: 0, mats: [[7476, 0], [522, 4], [505, 1], [970, 2], [568, 2], [7452, 1]]}
+  # Lutie Lady's Pancake
+  - {id: 12045, lv: 15, skill: 0, skill_lv: 0, mats: [[7476, 0], [516, 10], [518, 2], [7457, 1], [515, 3], [577, 1]]}
+  # Green Salad
+  - {id: 12065, lv: 15, skill: 0, skill_lv: 0, mats: [[7476, 0], [520, 2], [521, 3], [7100, 10], [7198, 6], [7453, 1], [7452, 1]]}
+  # Steamed Bat Wing in Pumpkin
+  - {id: 12060, lv: 15, skill: 0, skill_lv: 0, mats: [[7476, 0], [7006, 20], [1062, 20], [7482, 1], [520, 10], [507, 10]]}
+  # Spicy Fried Bao
+  - {id: 12055, lv: 15, skill: 0, skill_lv: 0, mats: [[7476, 0], [553, 20], [508, 10], [7455, 1], [7456, 1], [511, 20]]}
+  # Fried Scorpion Tails
+  - {id: 12070, lv: 15, skill: 0, skill_lv: 0, mats: [[7476, 0], [904, 20], [1042, 10], [7198, 10], [7031, 2], [7457, 1]]}
+  # Shiny Marinade Beef
+  - {id: 12071, lv: 16, skill: 0, skill_lv: 0, mats: [[7477, 0], [517, 10], [518, 2], [508, 1], [522, 1], [954, 20]]}
+  # Red Mushroom Wine
+  - {id: 12076, lv: 16, skill: 0, skill_lv: 0, mats: [[7477, 0], [581, 3], [533, 3], [921, 20], [970, 1], [7456, 1]]}
+  # Peach Cake
+  - {id: 12091, lv: 16, skill: 0, skill_lv: 0, mats: [[7477, 0], [7164, 20], [539, 10], [548, 10], [519, 10], [620, 5], [7453, 1]]}
+  # Chile Shrimp Gratin
+  - {id: 12086, lv: 16, skill: 0, skill_lv: 0, mats: [[7477, 0], [7286, 20], [567, 20], [7453, 1], [568, 20]]}
+  # Awfully Bitter Bracer
+  - {id: 12081, lv: 16, skill: 0, skill_lv: 0, mats: [[7477, 0], [7188, 20], [1033, 10], [921, 20], [581, 1], [518, 2]]}
+  # Lucky Soup
+  - {id: 12096, lv: 16, skill: 0, skill_lv: 0, mats: [[7477, 0], [903, 5], [1015, 5], [705, 10], [1061, 10], [704, 1]]}
+  # Whole Roast
+  - {id: 12072, lv: 17, skill: 0, skill_lv: 0, mats: [[7478, 0], [517, 10], [7098, 1], [1003, 2], [7455, 1], [1019, 15], [509, 10]]}
+  # Special Royal Jelly Herbal Tea
+  - {id: 12077, lv: 17, skill: 0, skill_lv: 0, mats: [[7478, 0], [526, 4], [518, 2], [509, 5], [520, 10], [7452, 1]]}
+  # Soul Haunted Bread
+  - {id: 12092, lv: 17, skill: 0, skill_lv: 0, mats: [[7478, 0], [580, 10], [522, 5], [7453, 1], [708, 5], [609, 5], [619, 2]]}
+  # Steamed Alligator with Vegetable
+  - {id: 12087, lv: 17, skill: 0, skill_lv: 0, mats: [[7478, 0], [7003, 10], [1062, 10], [515, 10], [521, 10], [508, 10], [7452, 1]]}
+  # Sumptuous Feast
+  - {id: 12082, lv: 17, skill: 0, skill_lv: 0, mats: [[7478, 0], [1023, 10], [521, 5], [1028, 10], [579, 2], [537, 10], [7453, 1]]}
+  # Assorted Shish Kebob
+  - {id: 12097, lv: 17, skill: 0, skill_lv: 0, mats: [[7478, 0], [936, 10], [956, 5], [7194, 10], [517, 5], [581, 10], [966, 10]]}
+  # Bearfoot Special
+  - {id: 12073, lv: 18, skill: 0, skill_lv: 0, mats: [[7479, 0], [948, 20], [515, 10], [1062, 10], [521, 2], [520, 1], [7454, 1]]}
+  # Royal Family Tea
+  - {id: 12078, lv: 18, skill: 0, skill_lv: 0, mats: [[7479, 0], [576, 4], [520, 10], [610, 3], [521, 10], [526, 6], [7452, 1]]}
+  # Special Toast
+  - {id: 12093, lv: 18, skill: 0, skill_lv: 0, mats: [[7479, 0], [580, 10], [526, 2], [517, 5], [578, 10], [7455, 1], [548, 10], [7453, 1]]}
+  # Incredibly Spicy Curry
+  - {id: 12088, lv: 18, skill: 0, skill_lv: 0, mats: [[7479, 0], [606, 1], [7455, 1], [517, 10], [520, 10], [1062, 10], [515, 10]]}
+  # Giant Burito
+  - {id: 12083, lv: 18, skill: 0, skill_lv: 0, mats: [[7479, 0], [7298, 20], [517, 20], [622, 5], [1062, 10], [7454, 1], [577, 2]]}
+  # Strawberry Flavored Rice Ball
+  - {id: 12098, lv: 18, skill: 0, skill_lv: 0, mats: [[7479, 0], [578, 10], [577, 5], [7298, 10], [7452, 1], [7456, 2], [7454, 1]]}
+  # Tendon Satay
+  - {id: 12074, lv: 19, skill: 0, skill_lv: 0, mats: [[7480, 0], [1050, 40], [7482, 1], [548, 10], [7455, 1], [1003, 2], [511, 30], [1024, 10]]}
+  # Tristan XII
+  - {id: 12079, lv: 19, skill: 0, skill_lv: 0, mats: [[7480, 0], [610, 10], [582, 10], [970, 5], [526, 4], [505, 2], [7452, 1], [521, 10]]}
+  # Heavenly Fruit Juice
+  - {id: 12094, lv: 19, skill: 0, skill_lv: 0, mats: [[7480, 0], [619, 5], [582, 10], [578, 10], [7456, 1], [634, 1], [533, 5], [970, 2]]}
+  # Special Meat Stew
+  - {id: 12089, lv: 19, skill: 0, skill_lv: 0, mats: [[7480, 0], [517, 10], [526, 5], [711, 20], [7454, 4], [508, 5], [509, 10], [507, 5]]}
+  # Ascending Dragon Soup
+  - {id: 12084, lv: 19, skill: 0, skill_lv: 0, mats: [[7480, 0], [7123, 10], [1037, 20], [610, 3], [526, 6], [7455, 1], [7456, 1], [632, 1]]}
+  # Blood Flavored Soda
+  - {id: 12099, lv: 19, skill: 0, skill_lv: 0, mats: [[7480, 0], [702, 1], [605, 2], [606, 2], [970, 2], [526, 6], [7456, 1], [531, 10]]}
+  # Steamed Tongue
+  - {id: 12075, lv: 20, skill: 0, skill_lv: 0, mats: [[7481, 0], [1015, 20], [7482, 1], [970, 1], [606, 2], [7455, 1], [526, 5], [610, 10], [505, 2]]}
+  # Dragon Breath Cocktail
+  - {id: 12080, lv: 20, skill: 0, skill_lv: 0, mats: [[7481, 0], [1033, 10], [707, 1], [521, 5], [526, 5], [568, 5], [576, 5], [607, 1], [510, 10]]}
+  # Hwergelmir's Tonic
+  - {id: 12095, lv: 20, skill: 0, skill_lv: 0, mats: [[7481, 0], [607, 1], [7066, 10], [7119, 10], [526, 4], [645, 3], [970, 5], [576, 2], [710, 1]]}
+  # Steamed Desert Scorpions
+  - {id: 12090, lv: 20, skill: 0, skill_lv: 0, mats: [[7481, 0], [904, 20], [7125, 20], [606, 2], [610, 3], [621, 3], [526, 10], [7455, 1], [7482, 1]]}
+  # Immortal Stew
+  - {id: 12085, lv: 20, skill: 0, skill_lv: 0, mats: [[7481, 0], [929, 20], [934, 10], [608, 1], [605, 2], [950, 10], [7455, 2], [609, 10], [621, 2]]}
+  # Cooked Nine Tail's Tails
+  - {id: 12100, lv: 20, skill: 0, skill_lv: 0, mats: [[7481, 0], [1022, 10], [706, 2], [1033, 10], [7100, 10], [610, 4], [7454, 1], [7452, 1], [709, 2]]}
+  # Iron
+  - {id: 998, lv: 21, skill: 94, skill_lv: 1, mats: [[1002, 1]]}
+  # Steel
+  - {id: 999, lv: 21, skill: 95, skill_lv: 1, mats: [[998, 5], [1003, 1]]}
+  # Star Crumb
+  - {id: 1000, lv: 21, skill: 96, skill_lv: 1, mats: [[1001, 10]]}
+  # Flame Heart
+  - {id: 994, lv: 21, skill: 96, skill_lv: 1, mats: [[990, 10]]}
+  # Mystic Frozen
+  - {id: 995, lv: 21, skill: 96, skill_lv: 1, mats: [[991, 10]]}
+  # Rough Wind
+  - {id: 996, lv: 21, skill: 96, skill_lv: 1, mats: [[992, 10]]}
+  # Great Nature
+  - {id: 997, lv: 21, skill: 96, skill_lv: 1, mats: [[993, 10]]}
+  # Red Potion
+  - {id: 501, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [507, 1], [1093, 1]]}
+  # Yellow Potion
+  - {id: 503, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [508, 1], [1093, 1]]}
+  # White Potion
+  - {id: 504, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [509, 1], [1093, 1]]}
+  # Blue Potion
+  - {id: 505, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [510, 1], [911, 1], [1093, 1]]}
+  # Condensed Red Potion
+  - {id: 545, lv: 22, skill: 228, skill_lv: 1, mats: [[7133, 0], [501, 1], [1092, 1], [952, 1]]}
+  # Condensed Yellow Potion
+  - {id: 546, lv: 22, skill: 228, skill_lv: 1, mats: [[7133, 0], [503, 1], [1092, 1], [1017, 1]]}
+  # Condensed White Potion
+  - {id: 547, lv: 22, skill: 228, skill_lv: 1, mats: [[7133, 0], [504, 1], [1092, 1], [1061, 1]]}
+  # Holy Water
+  - {id: 523, lv: 22, skill: 31, skill_lv: 1, mats: [[713, 1]]}
+  # Poison Bottle
+  - {id: 678, lv: 22, skill: 407, skill_lv: 1, mats: [[937, 1], [952, 1], [939, 1], [7033, 1], [972, 1], [657, 1], [713, 1]]}
+  # Bottle Grenade
+  - {id: 7135, lv: 22, skill: 228, skill_lv: 1, mats: [[7128, 0], [970, 1], [1059, 1], [713, 1]]}
+  # Acid Bottle
+  - {id: 7136, lv: 22, skill: 228, skill_lv: 1, mats: [[7129, 0], [713, 1], [929, 1]]}
+  # Plant Bottle
+  - {id: 7137, lv: 22, skill: 228, skill_lv: 1, mats: [[7130, 0], [713, 1], [1032, 2]]}
+  # Marine Sphere Bottle
+  - {id: 7138, lv: 22, skill: 228, skill_lv: 1, mats: [[7131, 0], [713, 1], [1050, 1], [1051, 1]]}
+  # Glistening Coat
+  - {id: 7139, lv: 22, skill: 228, skill_lv: 1, mats: [[7132, 0], [970, 1], [950, 1], [1044, 1], [713, 1]]}
+  # Fireproof Potion
+  - {id: 12118, lv: 22, skill: 228, skill_lv: 1, mats: [[7434, 0], [1012, 2], [716, 1], [1093, 1]]}
+  # Coldproof Potion
+  - {id: 12119, lv: 22, skill: 228, skill_lv: 1, mats: [[7434, 0], [950, 3], [717, 1], [1093, 1]]}
+  # Earthproof Potion
+  - {id: 12120, lv: 22, skill: 228, skill_lv: 1, mats: [[7434, 0], [7126, 2], [715, 1], [1093, 1]]}
+  # Thunderproof Potion
+  - {id: 12121, lv: 22, skill: 228, skill_lv: 1, mats: [[7434, 0], [1057, 3], [717, 1], [1093, 1]]}
+  # Anodyne
+  - {id: 605, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [708, 1], [970, 1], [713, 1]]}
+  # Aloevera
+  - {id: 606, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [704, 1], [518, 1], [713, 1]]}
+  # Alcohol
+  - {id: 970, lv: 22, skill: 228, skill_lv: 1, mats: [[7127, 0], [713, 1], [7033, 5], [905, 5], [1092, 1]]}
+  # Embryo
+  - {id: 7142, lv: 22, skill: 228, skill_lv: 1, mats: [[7144, 0], [7140, 1], [7141, 1], [7143, 1]]}
+  # Flame Elemental Converter
+  - {id: 12114, lv: 23, skill: 1007, skill_lv: 1, mats: [[7433, 1], [904, 3]]}
+  # Frost Elemental Converter
+  - {id: 12115, lv: 23, skill: 1007, skill_lv: 1, mats: [[7433, 1], [946, 3]]}
+  # Seismic Elemental Converter
+  - {id: 12116, lv: 23, skill: 1007, skill_lv: 1, mats: [[7433, 1], [947, 3]]}
+  # Lightning Elemental Converter
+  - {id: 12117, lv: 23, skill: 1007, skill_lv: 1, mats: [[7433, 1], [1013, 3]]}
+  # Ancilla
+  - {id: 12333, lv: 24, skill: 2039, skill_lv: 1, mats: [[717, 1]]}
+  # Nauthiz Rune
+  - {id: 12725, lv: 24, skill: 2010, skill_lv: 8, mats: [[7069, 1], [7099, 1], [7938, 1], [7939, 1]]}
+  # Raido Rune
+  - {id: 12726, lv: 24, skill: 2010, skill_lv: 7, mats: [[716, 1], [7938, 1], [7939, 1]]}
+  # Berkana Rune
+  - {id: 12727, lv: 24, skill: 2010, skill_lv: 9, mats: [[7210, 1], [7939, 1]]}
+  # Isa Rune
+  - {id: 12728, lv: 24, skill: 2010, skill_lv: 2, mats: [[7097, 1], [7939, 1]]}
+  # Othila Rune
+  - {id: 12729, lv: 24, skill: 2010, skill_lv: 5, mats: [[7002, 1], [7938, 1], [7939, 1]]}
+  # Uruz Rune
+  - {id: 12730, lv: 24, skill: 2010, skill_lv: 6, mats: [[518, 1], [1048, 1], [7939, 1]]}
+  # Thurisaz Rune
+  - {id: 12731, lv: 24, skill: 2010, skill_lv: 1, mats: [[1034, 1], [7030, 1], [7939, 1]]}
+  # Wyrd Rune
+  - {id: 12732, lv: 24, skill: 2010, skill_lv: 3, mats: [[1035, 1], [7221, 1], [7938, 1], [7939, 1]]}
+  # Hagalaz Rune
+  - {id: 12733, lv: 24, skill: 2010, skill_lv: 4, mats: [[1096, 1], [7123, 1], [7939, 1]]}
+  # Antidote
+  - {id: 6128, lv: 25, skill: 2024, skill_lv: 5, mats: [[509, 1], [510, 1], [511, 2]]}
+  # Paralyze
+  - {id: 12717, lv: 25, skill: 2024, skill_lv: 1, mats: [[7134, 1], [7155, 20], [7931, 1], [7937, 1]]}
+  # Leech End
+  - {id: 12718, lv: 25, skill: 2024, skill_lv: 4, mats: [[7134, 1], [7931, 1], [7932, 1], [7936, 1]]}
+  # Oblivion Curse
+  - {id: 12719, lv: 25, skill: 2024, skill_lv: 9, mats: [[709, 1], [950, 10], [7134, 1], [7931, 1]]}
+  # Disheart
+  - {id: 12720, lv: 25, skill: 2024, skill_lv: 3, mats: [[957, 25], [7134, 1], [7931, 1], [7935, 1]]}
+  # Toxin
+  - {id: 12721, lv: 25, skill: 2024, skill_lv: 8, mats: [[7134, 1], [7565, 10], [7931, 1], [7932, 1]]}
+  # Pyrexia
+  - {id: 12722, lv: 25, skill: 2024, skill_lv: 2, mats: [[7003, 20], [7134, 1], [7931, 1], [7933, 1]]}
+  # Magic Mushroom
+  - {id: 12723, lv: 25, skill: 2024, skill_lv: 7, mats: [[7033, 10], [7134, 1], [7931, 1], [7934, 1]]}
+  # Venom Bleed
+  - {id: 12724, lv: 25, skill: 2024, skill_lv: 6, mats: [[709, 1], [7134, 1], [7565, 10], [7931, 1]]}
+  # Cultish Masque
+  - {id: 1045, lv: 26, skill: 2494, skill_lv: 1, mats: [[940, 45], [942, 35]]}
+  # Black Hair
+  - {id: 1020, lv: 26, skill: 2494, skill_lv: 1, mats: [[738, 40], [1029, 5]]}
+  # Phracon
+  - {id: 1010, lv: 26, skill: 2494, skill_lv: 1, mats: [[908, 45], [746, 40]]}
+  # Lantern
+  - {id: 1041, lv: 26, skill: 2494, skill_lv: 1, mats: [[943, 10], [1032, 20]]}
+  # Acorn
+  - {id: 1026, lv: 26, skill: 2494, skill_lv: 1, mats: [[952, 30], [946, 10]]}
+  # Necklace of Oblivion
+  - {id: 1008, lv: 26, skill: 2494, skill_lv: 1, mats: [[754, 25], [1057, 35]]}
+  # Horrendous Mouth
+  - {id: 958, lv: 26, skill: 2494, skill_lv: 1, mats: [[905, 45], [1036, 45]]}
+  # Detrimindexta
+  - {id: 971, lv: 26, skill: 2494, skill_lv: 1, mats: [[915, 40], [966, 10]]}
+  # Detonator
+  - {id: 1051, lv: 26, skill: 2494, skill_lv: 1, mats: [[941, 45], [916, 25]]}
+  # Scorpion Nipper
+  - {id: 1046, lv: 26, skill: 2494, skill_lv: 1, mats: [[955, 40], [753, 5]]}
+  # Little Evil Horn
+  - {id: 1038, lv: 26, skill: 2494, skill_lv: 1, mats: [[953, 5], [907, 10]]}
+  # Maneater Root
+  - {id: 1033, lv: 26, skill: 2494, skill_lv: 1, mats: [[917, 25], [1044, 20]]}
+  # Conch
+  - {id: 961, lv: 26, skill: 2494, skill_lv: 1, mats: [[956, 5], [929, 25]]}
+  # Stinky Scale
+  - {id: 959, lv: 26, skill: 2494, skill_lv: 1, mats: [[935, 20], [1015, 50]]}
+  # Elder Pixie's Moustache
+  - {id: 1040, lv: 26, skill: 2494, skill_lv: 1, mats: [[939, 35], [1039, 45]]}
+  # Frill
+  - {id: 1012, lv: 26, skill: 2494, skill_lv: 1, mats: [[926, 20], [972, 15]]}
+  # Emveretarcon
+  - {id: 1011, lv: 26, skill: 2494, skill_lv: 1, mats: [[950, 5], [752, 40]]}
+  # Squid Ink
+  - {id: 1024, lv: 26, skill: 2494, skill_lv: 1, mats: [[948, 20], [737, 25]]}
+  # Cobweb
+  - {id: 1025, lv: 26, skill: 2494, skill_lv: 1, mats: [[951, 50], [1048, 35]]}
+  # Reins
+  - {id: 1064, lv: 26, skill: 2494, skill_lv: 1, mats: [[742, 30], [740, 50]]}
+  # Trunk
+  - {id: 1019, lv: 26, skill: 2494, skill_lv: 1, mats: [[930, 10], [1052, 10]]}
+  # Tentacle
+  - {id: 962, lv: 26, skill: 2494, skill_lv: 1, mats: [[957, 40], [1028, 5]]}
+  # Mixture
+  - {id: 974, lv: 26, skill: 2494, skill_lv: 1, mats: [[937, 15], [924, 30]]}
+  # Rainbow Shell
+  - {id: 1013, lv: 26, skill: 2494, skill_lv: 1, mats: [[947, 50], [912, 45]]}
+  # Moth Wings
+  - {id: 1058, lv: 26, skill: 2494, skill_lv: 1, mats: [[749, 20], [903, 30]]}
+  # Nipper
+  - {id: 960, lv: 26, skill: 2494, skill_lv: 1, mats: [[938, 25], [1055, 40]]}
+  # Turtle Shell
+  - {id: 967, lv: 26, skill: 2494, skill_lv: 1, mats: [[914, 5], [741, 40]]}
+  # Orc Claw
+  - {id: 1043, lv: 26, skill: 2494, skill_lv: 1, mats: [[945, 50], [910, 10]]}
+  # Dragon Canine
+  - {id: 1035, lv: 26, skill: 2494, skill_lv: 1, mats: [[751, 50], [918, 35]]}
+  # Skirt of Virgin
+  - {id: 1049, lv: 26, skill: 2494, skill_lv: 1, mats: [[936, 30], [1047, 35]]}
+  # Dragon Tail
+  - {id: 1037, lv: 26, skill: 2494, skill_lv: 1, mats: [[913, 25], [1063, 35]]}
+  # Dokebi Horn
+  - {id: 1021, lv: 26, skill: 2494, skill_lv: 1, mats: [[954, 15], [1054, 25]]}
+  # Grit
+  - {id: 1056, lv: 26, skill: 2494, skill_lv: 1, mats: [[747, 35], [1031, 50]]}
+  # Sharp Scale
+  - {id: 963, lv: 26, skill: 2494, skill_lv: 1, mats: [[944, 10], [965, 20]]}
+  # Bug Leg
+  - {id: 1042, lv: 26, skill: 2494, skill_lv: 1, mats: [[920, 20], [911, 45]]}
+  # Witched Starsand
+  - {id: 1061, lv: 26, skill: 2494, skill_lv: 1, mats: [[928, 10], [735, 15]]}
+  # Nine Tails
+  - {id: 1022, lv: 26, skill: 2494, skill_lv: 1, mats: [[919, 10], [739, 15]]}
+  # Blue Hair
+  - {id: 1034, lv: 26, skill: 2494, skill_lv: 1, mats: [[909, 45], [745, 20]]}
+  # Ant Jaw
+  - {id: 1014, lv: 26, skill: 2494, skill_lv: 1, mats: [[743, 20], [748, 20]]}
+  # Heroic Emblem
+  - {id: 968, lv: 26, skill: 2494, skill_lv: 1, mats: [[902, 5], [1018, 45]]}
+  # Hand of God
+  - {id: 1009, lv: 26, skill: 2494, skill_lv: 1, mats: [[904, 10], [1062, 30]]}
+  # Crab Shell
+  - {id: 964, lv: 26, skill: 2494, skill_lv: 1, mats: [[750, 50], [1023, 30]]}
+  # Tendon
+  - {id: 1050, lv: 26, skill: 2494, skill_lv: 1, mats: [[922, 25], [949, 5]]}
+  # Tiger's Footskin
+  - {id: 1030, lv: 26, skill: 2494, skill_lv: 1, mats: [[906, 5], [736, 20]]}
+  # Hinalle
+  - {id: 703, lv: 26, skill: 2494, skill_lv: 1, mats: [[744, 45], [1017, 40]]}
+  # Counteragent
+  - {id: 973, lv: 26, skill: 2494, skill_lv: 1, mats: [[923, 15], [934, 30]]}
+  # Ancient Tooth
+  - {id: 1053, lv: 26, skill: 2494, skill_lv: 1, mats: [[925, 35], [1059, 30]]}
+  # Rat Tail
+  - {id: 1016, lv: 26, skill: 2494, skill_lv: 1, mats: [[921, 35], [1060, 40]]}
+  # Coal
+  - {id: 1003, lv: 26, skill: 2494, skill_lv: 1, mats: [[2101, 1]]}
+  # Cigarette
+  - {id: 2267, lv: 26, skill: 2494, skill_lv: 1, mats: [[1304, 1]]}
+  # Evil Bone Wand
+  - {id: 1615, lv: 26, skill: 2494, skill_lv: 1, mats: [[7752, 100], [7753, 100]]}
+  # Soft Feather
+  - {id: 7063, lv: 26, skill: 2494, skill_lv: 1, mats: [[949, 30], [916, 30]]}
+  # Wind of Verdure
+  - {id: 992, lv: 26, skill: 2494, skill_lv: 1, mats: [[7066, 100]]}
+  # Crystal Blue
+  - {id: 991, lv: 26, skill: 2494, skill_lv: 1, mats: [[920, 100]]}
+  # Soft Silk
+  - {id: 7166, lv: 26, skill: 2494, skill_lv: 1, mats: [[1059, 10]]}
+  # Fabric
+  - {id: 1059, lv: 26, skill: 2494, skill_lv: 1, mats: [[7166, 2]]}
+  # Throwing Boost 500
+  - {id: 13269, lv: 26, skill: 2494, skill_lv: 1, mats: [[1093, 10], [12417, 10], [7200, 10]]}
+  # Throwing Full Swing K
+  - {id: 13270, lv: 26, skill: 2494, skill_lv: 1, mats: [[1093, 10], [12418, 10], [7200, 10]]}
+  # Throwing Mana Plus
+  - {id: 13271, lv: 26, skill: 2494, skill_lv: 1, mats: [[1093, 10], [12419, 10], [7200, 10]]}
+  # Throwing Cure Free
+  - {id: 13272, lv: 26, skill: 2494, skill_lv: 1, mats: [[1093, 10], [12475, 10], [7200, 10]]}
+  # Throwing Muramura M
+  - {id: 13273, lv: 26, skill: 2494, skill_lv: 1, mats: [[1093, 10], [12420, 10], [7200, 10]]}
+  # Throwing Falmons F
+  - {id: 13274, lv: 26, skill: 2494, skill_lv: 1, mats: [[1093, 10], [12421, 10], [7200, 10]]}
+  # Throwing Increase HP Potion (Small)
+  - {id: 13275, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12422, 10]]}
+  # Throwing Increase HP Potion (Medium)
+  - {id: 13276, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12423, 10]]}
+  # Throwing Increase HP Potion (Large)
+  - {id: 13277, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12424, 10]]}
+  # Throwing Increase SP Potion (Small)
+  - {id: 13278, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12425, 10]]}
+  # Throwing Increase SP Potion (Medium)
+  - {id: 13279, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12426, 10]]}
+  # Throwing Increase SP Potion (Large)
+  - {id: 13280, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12427, 10]]}
+  # Throwing Concentrated White Potion Z
+  - {id: 13281, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12428, 10]]}
+  # Throwing Vitata 500
+  - {id: 13282, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12436, 10]]}
+  # Throwing Ceromain Soup
+  - {id: 13283, lv: 26, skill: 2494, skill_lv: 1, mats: [[6297, 10], [12437, 10]]}
+  # Savage Full Roast
+  - {id: 12429, lv: 27, skill: 2495, skill_lv: 1, mats: [[11022, 0], [6248, 1], [6249, 1], [6250, 1], [6251, 1]]}
+  # Cocktail Warg Blood
+  - {id: 12430, lv: 27, skill: 2495, skill_lv: 1, mats: [[11022, 0], [6248, 1], [6252, 3], [6253, 2]]}
+  # Minor Stew
+  - {id: 12431, lv: 27, skill: 2495, skill_lv: 1, mats: [[11022, 0], [6248, 1], [6254, 2], [6255, 1]]}
+  # Siroma Iced Tea
+  - {id: 12432, lv: 27, skill: 2495, skill_lv: 1, mats: [[11022, 0], [6248, 1], [6256, 3], [6257, 2], [6258, 1]]}
+  # Drosera Herb Salad
+  - {id: 12433, lv: 27, skill: 2495, skill_lv: 1, mats: [[11022, 0], [507, 3], [509, 3], [510, 3], [6248, 1], [6255, 1], [6259, 3]]}
+  # Petite Tail Noodles
+  - {id: 12434, lv: 27, skill: 2495, skill_lv: 1, mats: [[11022, 0], [6248, 1], [6260, 2], [6261, 1], [6262, 1]]}
+  # Seed Of Thorny Plant
+  - {id: 6210, lv: 29, skill: 2497, skill_lv: 1, mats: [[6284, 0], [576, 10]]}
+  # Bloodsuck Plant Seed
+  - {id: 6211, lv: 29, skill: 2497, skill_lv: 1, mats: [[6284, 0], [1033, 10]]}
+  # Bomb Mushroom Spore
+  - {id: 6212, lv: 29, skill: 2497, skill_lv: 1, mats: [[6284, 0], [921, 10], [6244, 2], [7033, 5]]}
+  # HP Increase Potion (Small)
+  - {id: 12422, lv: 29, skill: 2497, skill_lv: 1, mats: [[11023, 0], [509, 10], [528, 5], [713, 10], [7455, 1]]}
+  # HP Increase Potion (Medium)
+  - {id: 12423, lv: 29, skill: 2497, skill_lv: 1, mats: [[11023, 0], [508, 10], [509, 10], [713, 10], [7455, 1]]}
+  # HP Increase Potion (Large)
+  - {id: 12424, lv: 29, skill: 2497, skill_lv: 1, mats: [[11023, 0], [509, 15], [522, 3], [523, 1], [713, 10], [7455, 1]]}
+  # SP Increase Potion (Small)
+  - {id: 12425, lv: 29, skill: 2497, skill_lv: 1, mats: [[11024, 0], [514, 10], [568, 10], [713, 10], [7453, 1]]}
+  # SP Increase Potion (Medium)
+  - {id: 12426, lv: 29, skill: 2497, skill_lv: 1, mats: [[11024, 0], [510, 10], [518, 10], [713, 10], [7453, 1]]}
+  # SP Increase Potion (Large)
+  - {id: 12427, lv: 29, skill: 2497, skill_lv: 1, mats: [[11024, 0], [510, 15], [526, 10], [713, 10], [7453, 1]]}
+  # Concentrated White Potion Z
+  - {id: 12428, lv: 29, skill: 2497, skill_lv: 1, mats: [[6285, 0], [504, 20], [509, 10], [970, 1], [1092, 10]]}
+  # Vitata 500
+  - {id: 12436, lv: 29, skill: 2497, skill_lv: 1, mats: [[6285, 0], [510, 10], [514, 10], [518, 10], [1092, 10]]}
+  # Concentrated Ceromain Soup
+  - {id: 12437, lv: 29, skill: 2497, skill_lv: 1, mats: [[6285, 0], [645, 5], [656, 5], [1092, 10], [7455, 5]]}
+  # Cure Free
+  - {id: 12475, lv: 29, skill: 2497, skill_lv: 1, mats: [[6285, 0], [511, 20], [522, 1], [525, 5], [610, 1], [1092, 10]]}
+
+# Fabrication de flèches (db/create_arrow_db.yml). ⚠ La clé est le MATÉRIAU
+# consommé (un par fabrication), et « yields » ce qu'on obtient.
+arrows:
+  # Old Blue Box
+  - {src: 603, yields: [[1764, 50], [1768, 50]]}
+  # Dead Branch
+  - {src: 604, yields: [[1769, 40]]}
+  # Amulet
+  - {src: 609, yields: [[1761, 40]]}
+  # Empty Bottle
+  - {src: 713, yields: [[1770, 2]]}
+  # Emperium
+  - {src: 714, yields: [[1757, 600], [1765, 600], [1769, 600]]}
+  # Yellow Gemstone
+  - {src: 715, yields: [[1768, 1], [1756, 30]]}
+  # Red Gemstone
+  - {src: 716, yields: [[1761, 1], [1763, 1], [1762, 10]]}
+  # Blue Gemstone
+  - {src: 717, yields: [[1754, 30], [1759, 1]]}
+  # Cursed Ruby
+  - {src: 724, yields: [[1761, 50], [1768, 10]]}
+  # Cracked Diamond
+  - {src: 733, yields: [[1764, 50]]}
+  # Rough Oridecon
+  - {src: 756, yields: [[1765, 50]]}
+  # Rough Elunium
+  - {src: 757, yields: [[1753, 200], [1758, 5]]}
+  # Tree Root
+  - {src: 902, yields: [[1750, 7]]}
+  # Scorpion Tail
+  - {src: 904, yields: [[1762, 3]]}
+  # Jellopy
+  - {src: 909, yields: [[1750, 4]]}
+  # Garlet
+  - {src: 910, yields: [[1770, 12]]}
+  # Scell
+  - {src: 911, yields: [[1753, 8]]}
+  # Zargon
+  - {src: 912, yields: [[1751, 50]]}
+  # Tooth of Bat
+  - {src: 913, yields: [[1767, 1]]}
+  # Wolf Claw
+  - {src: 920, yields: [[1770, 15]]}
+  # Orc's Fang
+  - {src: 922, yields: [[1770, 30], [1753, 5], [1756, 10]]}
+  # Evil Horn
+  - {src: 923, yields: [[1767, 20], [1760, 10], [1758, 5]]}
+  # Venom Canine
+  - {src: 937, yields: [[1763, 1]]}
+  # Bee Sting
+  - {src: 939, yields: [[1762, 1]]}
+  # Horn
+  - {src: 947, yields: [[1770, 35]]}
+  # Cactus Needle
+  - {src: 952, yields: [[1750, 50]]}
+  # Gill
+  - {src: 956, yields: [[1754, 150], [1770, 80]]}
+  # Decayed Nail
+  - {src: 957, yields: [[1767, 1], [1762, 1]]}
+  # Horrendous Mouth
+  - {src: 958, yields: [[1767, 5]]}
+  # Stinky Scale
+  - {src: 959, yields: [[1763, 1]]}
+  # Heroic Emblem
+  - {src: 968, yields: [[1765, 1], [1758, 5]]}
+  # Gold
+  - {src: 969, yields: [[1760, 50], [1765, 50]]}
+  # Oridecon
+  - {src: 984, yields: [[1765, 250]]}
+  # Elunium
+  - {src: 985, yields: [[1753, 1000], [1758, 50]]}
+  # Red Blood
+  - {src: 990, yields: [[1752, 600]]}
+  # Crystal Blue
+  - {src: 991, yields: [[1754, 150]]}
+  # Wind of Verdure
+  - {src: 992, yields: [[1755, 150]]}
+  # Green Live
+  - {src: 993, yields: [[1756, 150]]}
+  # Flame Heart
+  - {src: 994, yields: [[1752, 1800], [1769, 5]]}
+  # Mystic Frozen
+  - {src: 995, yields: [[1754, 450], [1759, 5]]}
+  # Rough Wind
+  - {src: 996, yields: [[1755, 450], [1768, 5]]}
+  # Great Nature
+  - {src: 997, yields: [[1760, 5], [1756, 450]]}
+  # Iron
+  - {src: 998, yields: [[1770, 100]]}
+  # Steel
+  - {src: 999, yields: [[1753, 100]]}
+  # Star Crumb
+  - {src: 1000, yields: [[1760, 30]]}
+  # Star Dust
+  - {src: 1001, yields: [[1760, 10]]}
+  # Iron Ore
+  - {src: 1002, yields: [[1770, 50]]}
+  # Coal
+  - {src: 1003, yields: [[1767, 8]]}
+  # Phracon
+  - {src: 1010, yields: [[1770, 50]]}
+  # Emveretarcon
+  - {src: 1011, yields: [[1770, 200], [1751, 40]]}
+  # Mole Claw
+  - {src: 1018, yields: [[1770, 50], [1756, 60]]}
+  # Trunk
+  - {src: 1019, yields: [[1750, 40]]}
+  # Dokebi Horn
+  - {src: 1021, yields: [[1767, 2], [1770, 40]]}
+  # Porcupine Quill
+  - {src: 1027, yields: [[1750, 70], [1756, 30]]}
+  # Mantis Scythe
+  - {src: 1031, yields: [[1764, 1]]}
+  # Dragon Canine
+  - {src: 1035, yields: [[1770, 50], [1765, 1]]}
+  # Little Evil Horn
+  - {src: 1038, yields: [[1761, 2], [1770, 50]]}
+  # Lantern
+  - {src: 1041, yields: [[1770, 80]]}
+  # Orc Claw
+  - {src: 1043, yields: [[1753, 10]]}
+  # Zenorc's Fang
+  - {src: 1044, yields: [[1762, 5]]}
+  # Ancient Tooth
+  - {src: 1053, yields: [[1754, 300], [1753, 20]]}
+  # Fang
+  - {src: 1063, yields: [[1764, 2], [1751, 40]]}
+  # Reins
+  - {src: 1064, yields: [[1770, 100], [1753, 50]]}
+  # Fine-grained Trunk
+  - {src: 1066, yields: [[1750, 20]]}
+  # Solid Trunk
+  - {src: 1067, yields: [[1750, 20]]}
+  # Barren Trunk
+  - {src: 1068, yields: [[1750, 20]]}
+  # Needle of Alarm
+  - {src: 1095, yields: [[1750, 100], [1768, 5]]}
+  # Manacles
+  - {src: 1098, yields: [[1753, 50]]}
+  # Unicorn Horn
+  - {src: 2257, yields: [[1751, 1000]]}
+  # Opera Masque
+  - {src: 2281, yields: [[1769, 40], [1753, 200]]}
+  # Mr. Scream
+  - {src: 2288, yields: [[1764, 200], [1753, 300]]}
+  # Welding Mask
+  - {src: 2292, yields: [[1753, 200], [1758, 40]]}
+  # Glittering Jacket
+  - {src: 2319, yields: [[1760, 1000]]}
+  # Wooden Mail
+  - {src: 2328, yields: [[1750, 700], [1770, 500]]}
+  # Wooden Mail
+  - {src: 2329, yields: [[1750, 1000], [1770, 700]]}
+  # Silver Robe
+  - {src: 2332, yields: [[1751, 700]]}
+  # Silver Robe
+  - {src: 2333, yields: [[1757, 10], [1751, 1000]]}
+  # Shackles
+  - {src: 2408, yields: [[1770, 700], [1753, 50]]}
+  # Matyr's Leash
+  - {src: 2618, yields: [[1755, 150], [1764, 10], [1753, 100]]}
+  # Fin Helm
+  - {src: 5014, yields: [[1754, 600], [1753, 200]]}
+  # Ogre Tooth
+  - {src: 7002, yields: [[1762, 5], [1753, 30]]}
+  # Stiff Horn
+  - {src: 7008, yields: [[1758, 2]]}
+  # Tail of Steel Scorpion
+  - {src: 7010, yields: [[1763, 1], [1753, 250]]}
+  # Young Twig
+  - {src: 7018, yields: [[1769, 1000]]}
+  # Loki's Whispers
+  - {src: 7019, yields: [[1767, 1000]]}
+  # Mother's Nightmare
+  - {src: 7020, yields: [[1761, 1000]]}
+  # Foolishness of the Blind
+  - {src: 7021, yields: [[1760, 200]]}
+  # Old Hilt
+  - {src: 7022, yields: [[1765, 1000]]}
+  # Blade Lost in Darkness
+  - {src: 7023, yields: [[1767, 200], [1764, 600]]}
+  # Bloody Edge
+  - {src: 7024, yields: [[1761, 200], [1764, 600]]}
+  # Lucifer's Lament
+  - {src: 7025, yields: [[1769, 400], [1768, 800], [1758, 800]]}
+  # Key of Clock Tower
+  - {src: 7026, yields: [[1765, 50]]}
+  # Key of Underground
+  - {src: 7027, yields: [[1767, 100]]}
+  # Matchstick
+  - {src: 7035, yields: [[1752, 3000]]}
+  # Fang of Hatii
+  - {src: 7036, yields: [[1754, 300]]}
+  # Ice Cubic
+  - {src: 7066, yields: [[1754, 100]]}
+  # Stone Fragment
+  - {src: 7067, yields: [[1756, 50], [1758, 30]]}
+  # Burnt Tree
+  - {src: 7068, yields: [[1752, 250]]}
+  # Destroyed Armor
+  - {src: 7069, yields: [[1753, 150]]}
+  # Burning Heart
+  - {src: 7097, yields: [[1752, 150]]}
+  # Live Coal
+  - {src: 7098, yields: [[1752, 100]]}
+  # Sharp Leaf
+  - {src: 7100, yields: [[1764, 30]]}
+  # Piece of Shield
+  - {src: 7108, yields: [[1757, 300], [1765, 100], [1753, 100]]}
+  # Shining Spear Blade
+  - {src: 7109, yields: [[1765, 100]]}
+  # Burning Horseshoe
+  - {src: 7120, yields: [[1753, 100]]}
+  # Dragon Skin
+  - {src: 7123, yields: [[1761, 50], [1769, 50], [1753, 10]]}
+  # Piece of Bamboo
+  - {src: 7150, yields: [[1750, 100]]}
+  # Poisonous Toad Skin
+  - {src: 7155, yields: [[1763, 20]]}
+  # Hard Feeler
+  - {src: 7163, yields: [[1764, 20]]}
+  # Solid Peach
+  - {src: 7164, yields: [[1758, 30]]}
+  # Leopard Claw
+  - {src: 7172, yields: [[1764, 10]]}
+  # Armor Piece of Dullahan
+  - {src: 7210, yields: [[1767, 150]]}
+  # Tangled Chains
+  - {src: 7221, yields: [[1767, 50], [1753, 50]]}
+  # Cat's Eye
+  - {src: 7263, yields: [[1755, 200]]}
+  # Dark Crystal Fragment
+  - {src: 7315, yields: [[1767, 50], [1761, 30]]}
+  # Insect Leg
+  - {src: 7316, yields: [[1764, 10], [1763, 50]]}
+  # Old Pick
+  - {src: 7318, yields: [[1762, 100], [1753, 50]]}
+  # Used Iron Plate
+  - {src: 7319, yields: [[1762, 100], [1753, 100]]}
+  # Crystal Fragment
+  - {src: 7321, yields: [[1760, 10], [1768, 30]]}
+  # Battered Kettle
+  - {src: 7323, yields: [[1753, 50]]}
+  # Will of the Darkness
+  - {src: 7340, yields: [[1767, 50], [1761, 30], [1763, 30]]}
+  # Golden Ornament
+  - {src: 7435, yields: [[1772, 300], [1751, 200]]}
+  # Cursed Seal
+  - {src: 7442, yields: [[1761, 50], [1769, 50]]}
+  # Green Bijou
+  - {src: 7445, yields: [[1763, 80], [1756, 100]]}
+  # Blue Bijou
+  - {src: 7446, yields: [[1755, 50], [1754, 50], [1759, 80]]}
+  # Red Bijou
+  - {src: 7447, yields: [[1752, 100], [1760, 80]]}
+  # Yellow Bijou
+  - {src: 7448, yields: [[1757, 50], [1751, 50], [1768, 80]]}
+  # Skeletal Armor Piece
+  - {src: 7450, yields: [[1767, 200], [1757, 500], [1765, 100]]}
+  # Fire Dragon Scale
+  - {src: 7451, yields: [[1752, 300], [1758, 300]]}
+  # Valhalla's Flower
+  - {src: 7510, yields: [[1772, 600], [1757, 600], [1764, 600]]}
+  # Rune of Darkness
+  - {src: 7511, yields: [[1767, 300], [1760, 150]]}
+  # Glacial Heart
+  - {src: 7561, yields: [[1754, 50], [1759, 50]]}
+  # Ice Scale
+  - {src: 7562, yields: [[1754, 150], [1759, 400], [1769, 200]]}
+  # Will of Red Darkness
+  - {src: 7566, yields: [[1767, 100], [1761, 200], [1763, 200]]}
+  # Clattering Skull
+  - {src: 7752, yields: [[1767, 50], [1761, 50]]}
+  # Broken Farming Utensil
+  - {src: 7753, yields: [[1761, 20], [1770, 10], [1762, 50]]}
+
+# Index compétence -> produits. C'est LUI qui rend l'Atlas possible : la
+# table du client n'est interrogeable que par clé, jamais parcourable.
+by_skill:
+  0: [12041, 12046, 12051, 12056, 12061, 12066, 12042, 12052, 12047, 12057, 12062, 12067, 12063, 12048, 12043, 12053, 12058, 12068, 12049, 12054, 12044, 12064, 12059, 12069, 12050, 12045, 12065, 12060, 12055, 12070, 12071, 12076, 12091, 12086, 12081, 12096, 12072, 12077, 12092, 12087, 12082, 12097, 12073, 12078, 12093, 12088, 12083, 12098, 12074, 12079, 12094, 12089, 12084, 12099, 12075, 12080, 12095, 12090, 12085, 12100]
+  31: [523]
+  94: [998]
+  95: [999]
+  96: [1000, 994, 995, 996, 997]
+  98: [1201, 1204, 1207, 1210, 1213, 1216, 1219, 1222]
+  99: [1101, 1104, 1107, 1110, 1113, 1122, 1126, 1123, 1119, 1129]
+  100: [1116, 1151, 1154, 1157, 1160, 1163]
+  101: [1301, 1351, 1354, 1357, 1360]
+  102: [1501, 1504, 1507, 1510, 1519, 1513, 1516, 1522]
+  103: [1801, 1803, 1805, 1807, 1809, 1811]
+  104: [1401, 1404, 1407, 1451, 1454, 1457, 1460, 1463, 1410]
+  228: [501, 503, 504, 505, 545, 546, 547, 7135, 7136, 7137, 7138, 7139, 12118, 12119, 12120, 12121, 605, 606, 970, 7142]
+  407: [678]
+  1007: [12114, 12115, 12116, 12117]
+  2010: [12725, 12726, 12727, 12728, 12729, 12730, 12731, 12732, 12733]
+  2024: [6128, 12717, 12718, 12719, 12720, 12721, 12722, 12723, 12724]
+  2039: [12333]
+  2494: [1045, 1020, 1010, 1041, 1026, 1008, 958, 971, 1051, 1046, 1038, 1033, 961, 959, 1040, 1012, 1011, 1024, 1025, 1064, 1019, 962, 974, 1013, 1058, 960, 967, 1043, 1035, 1049, 1037, 1021, 1056, 963, 1042, 1061, 1022, 1034, 1014, 968, 1009, 964, 1050, 1030, 703, 973, 1053, 1016, 1003, 2267, 1615, 7063, 992, 991, 7166, 1059, 13269, 13270, 13271, 13272, 13273, 13274, 13275, 13276, 13277, 13278, 13279, 13280, 13281, 13282, 13283]
+  2495: [12429, 12430, 12431, 12432, 12433, 12434]
+  2497: [6210, 6211, 6212, 12422, 12423, 12424, 12425, 12426, 12427, 12428, 12436, 12437, 12475]
+
+# ── Ce que CE serveur rend accessible ─────────────────────────────────
+# `renewal` = le mode des FORMULES (src/config/renewal.hpp). Il ne décide
+# PAS de ce qui suit : Moonlight est pre-renewal et ouvre pourtant les
+# classes de 3e, dont les recettes (runes, poisons GC, cuisine et
+# pharmacie Genetic) représentent près de la moitié de produce_db.
+#
+# `unavailable_skills` = les compétences citées par les recettes qu'AUCUNE
+# classe ne peut apprendre ici, d'après l'arbre EFFECTIF (db/pre-re/
+# skill_tree.yml complété par db/import/skill_tree.yml). Leurs recettes
+# existent dans produce_db mais sont injouables : le client les masque.
+# ⚠ Clé ABSENTE = information non calculable (arbre illisible), et non
+# « rien n'est indisponible » : le client doit alors tout montrer plutôt
+# que de masquer sur une supposition.
+server:
+  renewal: false
+  unavailable_skills: [2010, 2024, 2039, 2494, 2495, 2497]
+  # 2010 : 9 recettes masquées
+  # 2024 : 9 recettes masquées
+  # 2039 : 1 recettes masquées
+  # 2494 : 71 recettes masquées
+  # 2495 : 6 recettes masquées
+  # 2497 : 13 recettes masquées
+
+# ── Rendement d'une fabrication : combien d'exemplaires ───────────────
+# 🔴 La réponse est 1 PARTOUT, sauf pour les compétences ci-dessous, où
+# `skill_produce_mix` calcule lui-même une quantité (src/map/skill.cpp, le
+# switch qui précède `if (qty > 1 || rnd()%10000 < make_per)`). Un client
+# qui l'ignore annonce « 1 » sur une recette qui en rend douze.
+#   min/max : les bornes que le serveur peut produire, tous niveaux et
+#             toutes stats confondus — la valeur exacte dépend du
+#             personnage, que ce fichier ne connaît pas.
+#   mode    : per_unit    = chaque exemplaire est tiré séparément à
+#                           make_per (on peut en obtenir MOINS que max) ;
+#             all_or_none = la quantité part d'un coup si ça réussit ;
+#             bonus_roll  = 🔴 CUSTOM MOONLIGHT (bloc « [Stingor] » de
+#                           skill.cpp) : 1 exemplaire, plus un bonus de +1
+#                           a +4 tiré UNE fois sur une fabrication déjà
+#                           réussie. N'existe dans aucun rAthena ;
+#             table       = le rendement n'est pas le produit demandé mais
+#                           une table à part (skill_changematerial_db).
+# ⚠ La clé est le `skill` des recettes (le `req_skill` de produce_db), PAS
+# forcément la compétence que le serveur fait matcher : pour 2024 il
+# normalise GC_RESEARCHNEWPOISON en GC_CREATENEWPOISON (skill.cpp:13020)
+# avant d'entrer dans le switch. Indexer par req_skill est donc ce qui
+# permet au client de retrouver la règle depuis une recette.
+# ⚠ Table DÉCLARÉE, pas extraite : ces formules vivent dans du C++. À
+# revérifier quand skill_produce_mix bouge.
+#   chance  : probabilite du bonus, en POUR MILLE (162 = 16,2 %) ; propre
+#             a « bonus_roll », les autres modes n'ont pas de tirage separe.
+produce_qty:
+  0: {min: 1, max: 5, mode: bonus_roll, chance_permille: 162}   # Cuisine + bonus custom [Stingor]
+  31: {min: 1, max: 5, mode: bonus_roll, chance_permille: 162}   # AL_HOLYWATER + bonus custom [Stingor]
+  228: {min: 1, max: 5, mode: bonus_roll, chance_permille: 162}   # AM_PHARMACY + bonus custom [Stingor]
+  407: {min: 1, max: 5, mode: bonus_roll, chance_permille: 162}   # ASC_CDP + bonus custom [Stingor]
+  1007: {min: 1, max: 5, mode: bonus_roll, chance_permille: 162}   # SA_CREATECON + bonus custom [Stingor]
+  2010: {min: 2, max: 6, mode: per_unit}   # RK_RUNEMASTERY : 2 / 2~4 / 2~6 selon le niveau appris
+  2024: {min: 1, max: 10, mode: per_unit}   # GC_CREATENEWPOISON : 1..niveau de GC_RESEARCHNEWPOISON
+  2494: {min: 0, max: 0, mode: table}   # GN_CHANGEMATERIAL : rendement décrit par skill_changematerial_db
+  2495: {min: 0, max: 11, mode: all_or_none}   # GN_MIX_COOKING : 0/5/8/10/10~11 selon la difficulté
+  2497: {min: 1, max: 12, mode: all_or_none}   # GN_S_PHARMACY : {7..12} selon le niveau, moins 0 à 6
+
+# ── Production en MASSE (Twilight Alchemy) ────────────────────────────
+# Ces compétences rendent une fournée entière d'un seul lancement, sans
+# liste et sans passer par le `req_skill` d'une recette : elles appellent
+# skill_produce_mix avec une quantité en dur (skills/merchant/
+# twilightalchemy{1,2,3}.cpp). produce_db ne les mentionne NULLE PART — les
+# objets rendus y sont, mais sous AM_PHARMACY et à l'unité.
+# 🔴 « jusqu'à », pas « exactement » : chaque exemplaire est tiré à make_per.
+# ⚠ AM_TWILIGHT3 (498) est CUSTOM Moonlight : quantité aléatoire 51 à 89,
+# la MÊME pour les deux bouteilles, et plus d'alcool produit.
+bulk_recipes:
+  496: [[504, 200, 200]]   # White Potion
+  497: [[547, 200, 200]]   # Condensed White Potion
+  498: [[7136, 51, 89], [7135, 51, 89]]   # Acid Bottle, Bottle Grenade
+
+# ── Réglages serveur indispensables au calcul des chances ─────────────
+# 🔴 `weapon_produce` / `potion_produce` MULTIPLIENT make_per :
+#     make_per = make_per * rate / 100     (skill.cpp)
+# À 500, les chances de forge sont donc quintuplées. Un client qui l'ignore
+# annonce un chiffre cinq fois trop bas — d'où leur présence ici.
+# `oridecon_research_fix` conditionne le bonus BS_ORIDEOCON (armes lv >= 3).
+# ⚠ Lus dans items.conf PUIS conf/import/battle_conf.txt, qui surcharge.
+rates:
+  weapon_produce: 500
+  potion_produce: 500
+  oridecon_research_fix: 0
+
+# ── Kits de cuisine : itemId -> niveau (`cooking N;`) ─────────────────
+# 🔴 Le niveau du kit n'est dans AUCUN paquet (le serveur le garde dans
+# menuskill_val), et c'est le terme dominant : +12 % par palier, et
+# réussite GARANTIE à partir de 15. Le client retrouve le kit par l'objet
+# consommé, observé sur CZ_USE_ITEM.
+# ⚠ Un niveau hors [11,20] n'est pas de la cuisine : le serveur retombe
+# alors sur un 50 % plat. (12849 Combination Kit -> 30, et produce_db n'a
+# aucune recette d'itemlv 30 : sa liste est toujours vide.)
+cooking_kits:
+  12125: 11   # Outdoor Cooking Kit
+  12126: 12   # Home Cooking Kit
+  12127: 13   # Professional Cooking Kit
+  12128: 14   # Royal Cooking Kit
+  12129: 15   # Fantastic Cooking Kit
+  12849: 30   # Combination Kit
+
+# ── Refine ────────────────────────────────────────────────────────────
+# `refine_weapon[niveau d'arme][refine VISÉ] = Rate` (type Normal, /100 = %).
+# Le client calcule alors : per = Rate/100 + (classe 3 ? 10 : (job_lv-50)/2),
+# et la probabilité EST per % — le tirage est `per > rnd()%100`.
+refine_weapon:
+  1: {1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000, 6: 10000, 7: 10000, 8: 6000, 9: 4000, 10: 2000}
+  2: {1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000, 6: 10000, 7: 6000, 8: 4000, 9: 2000, 10: 2000}
+  3: {1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000, 6: 6000, 7: 5000, 8: 2000, 9: 2000, 10: 2000}
+  4: {1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 6000, 6: 4000, 7: 4000, 8: 2000, 9: 2000, 10: 1000}
+
+# Niveau d'arme par objet — ABSENT du paquet ZC 0x0221 comme de l'itemInfo,
+# et pourtant indispensable pour choisir la bonne ligne ci-dessus.
+# Les ids consécutifs de même niveau sont COMPRESSÉS en plages « a-b: lv » :
+# les armes se suivent par familles (1101-1109 = épées lv 1), donc 707
+# entrées se réduisent à quelques dizaines. `1101-1109` reste un scalaire
+# YAML valide — le tiret n'est un problème qu'en tête de clé suivi d'une
+# espace.
+weapon_lv:
+  1101-1109: 1
+  1110-1115: 2
+  1116-1118: 1
+  1119-1121: 3
+  1122: 2
+  1123-1124: 3
+  1125: 2
+  1126-1129: 3
+  1130-1141: 4
+  1142-1147: 3
+  1148: 4
+  1149: 3
+  1151-1156: 2
+  1157-1160: 3
+  1161: 4
+  1162-1163: 3
+  1164-1171: 4
+  1172: 3
+  1173-1176: 4
+  1177: 1
+  1178-1182: 4
+  1183-1184: 3
+  1185-1188: 4
+  1189: 2
+  1190: 3
+  1201-1209: 1
+  1210-1218: 2
+  1219-1222: 3
+  1223-1225: 4
+  1226: 3
+  1227-1237: 4
+  1238-1239: 3
+  1240-1242: 4
+  1243: 1
+  1244: 4
+  1245-1246: 3
+  1247-1249: 1
+  1250-1251: 2
+  1252-1260: 3
+  1261: 4
+  1262: 3
+  1263: 4
+  1264: 1
+  1265-1271: 4
+  1272: 1
+  1273-1274: 4
+  1275-1280: 3
+  1281-1283: 4
+  1284-1286: 3
+  1301-1303: 1
+  1304: 3
+  1305: 4
+  1306: 3
+  1307: 2
+  1308: 4
+  1309: 3
+  1310: 4
+  1311-1312: 3
+  1313: 1
+  1314-1315: 4
+  1351-1353: 1
+  1354-1356: 2
+  1357-1362: 3
+  1363-1374: 4
+  1375: 3
+  1376-1378: 4
+  1379-1380: 3
+  1381: 1
+  1382-1383: 4
+  1384: 3
+  1385-1386: 4
+  1387-1388: 3
+  1389-1390: 4
+  1401-1409: 1
+  1410-1412: 3
+  1413-1416: 4
+  1417: 3
+  1418: 4
+  1419: 3
+  1420-1422: 4
+  1423: 1
+  1424: 4
+  1425: 3
+  1426: 4
+  1427: 3
+  1428-1429: 4
+  1430: 1
+  1431-1432: 3
+  1451-1459: 2
+  1460-1465: 3
+  1466-1471: 4
+  1472: 3
+  1473-1481: 4
+  1482-1483: 3
+  1484: 4
+  1485: 2
+  1486: 4
+  1487: 3
+  1488: 4
+  1501-1506: 1
+  1507-1512: 2
+  1513-1518: 3
+  1519-1521: 2
+  1522: 3
+  1523-1528: 4
+  1529: 3
+  1530: 4
+  1531-1532: 3
+  1533: 4
+  1534: 3
+  1535: 4
+  1536: 1
+  1537-1541: 4
+  1542-1544: 3
+  1545: 1
+  1546: 4
+  1547-1549: 3
+  1550: 2
+  1551-1556: 3
+  1557-1559: 4
+  1560: 3
+  1561-1562: 4
+  1563-1564: 3
+  1565: 4
+  1566: 1
+  1567: 4
+  1568-1575: 3
+  1576-1577: 4
+  1578: 3
+  1579: 4
+  1580-1582: 3
+  1599: 1
+  1601-1603: 1
+  1604-1609: 2
+  1610-1615: 3
+  1616: 4
+  1617-1626: 3
+  1627: 1
+  1628: 3
+  1629: 4
+  1630: 3
+  1631: 4
+  1632-1635: 3
+  1636-1637: 4
+  1638: 3
+  1639: 1
+  1640-1641: 4
+  1642: 2
+  1643: 4
+  1644-1647: 3
+  1648: 4
+  1701-1706: 1
+  1707-1712: 2
+  1713-1716: 3
+  1718: 3
+  1719-1720: 4
+  1721: 3
+  1722: 4
+  1723: 3
+  1724-1725: 4
+  1726: 3
+  1727-1729: 4
+  1730-1734: 3
+  1735: 1
+  1736: 3
+  1737: 4
+  1738-1739: 3
+  1740-1741: 4
+  1742: 1
+  1743-1744: 4
+  1745: 3
+  1801-1802: 1
+  1803-1806: 2
+  1807-1812: 3
+  1813-1817: 4
+  1818-1825: 3
+  1826-1828: 4
+  1829: 3
+  1901-1902: 1
+  1903-1906: 2
+  1907-1912: 3
+  1913: 4
+  1914-1917: 3
+  1918: 4
+  1919: 3
+  1920: 4
+  1921: 1
+  1922: 4
+  1923-1925: 3
+  1926-1928: 4
+  1929: 3
+  1950-1951: 1
+  1952-1955: 2
+  1956-1961: 3
+  1962-1964: 4
+  1965-1968: 3
+  1969-1970: 4
+  1971: 3
+  1972-1974: 4
+  1975: 1
+  1976: 4
+  1977-1978: 3
+  1979: 4
+  1980: 3
+  1981-1982: 4
+  1983: 3
+  2000-2004: 4
+  2005: 3
+  13000: 1
+  13001-13002: 4
+  13003-13004: 3
+  13005: 4
+  13006: 3
+  13007-13008: 2
+  13009: 4
+  13010-13011: 1
+  13012-13013: 2
+  13014-13016: 3
+  13017-13022: 4
+  13023: 1
+  13024-13028: 4
+  13029: 1
+  13030-13033: 4
+  13034-13035: 2
+  13036-13039: 3
+  13040-13041: 1
+  13042-13045: 4
+  13046: 2
+  13047-13048: 3
+  13100-13101: 1
+  13102-13105: 2
+  13106-13109: 3
+  13110: 4
+  13112-13113: 1
+  13150: 1
+  13151-13153: 2
+  13154: 1
+  13155-13157: 2
+  13158-13159: 3
+  13160-13162: 2
+  13163-13166: 3
+  13167: 4
+  13168-13175: 3
+  13176-13179: 4
+  13300-13303: 4
+  13304-13306: 3
+  13307-13309: 4
+  13400-13405: 4
+  13406: 1
+  13407-13409: 4
+  13410-13411: 3
+  13412-13413: 4
+  13414: 3
+  13415: 1
+  13416-13418: 4
+  13419: 3
+  13420: 4
+  13421-13422: 3
+  16000-16002: 3
+  16030-16032: 4
+  18100-18102: 4
