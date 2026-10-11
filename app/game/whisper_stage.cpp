@@ -20,6 +20,7 @@
 #include "ro/net/party.h"
 #include "ro/net/whisper.h"
 #include "ro/net/whisper_blocks.h"
+#include "ro/net/world_notice.h"
 
 #include "chat/chat_line_preview.h"
 #include "chat/chat_mvp_link.h"
@@ -226,7 +227,34 @@ ro::net::FrameOutcome WhisperStage::ApplyFrame(const ro::net::Frame& frame, ro::
   if (whispered != ro::net::FrameOutcome::kUnhandled) {
     return whispered;
   }
-  return ro::net::ApplyWhisperBlockFrame(frame, blocks_, world, now_ms);
+  const ro::net::FrameOutcome blocked =
+      ro::net::ApplyWhisperBlockFrame(frame, blocks_, world, now_ms);
+  if (blocked != ro::net::FrameOutcome::kUnhandled) {
+    return blocked;
+  }
+  // 🔴 UN NOM IGNORÉ L'EST AUSSI QUAND LE REFLET L'A OUBLIÉ : un autre serveur de
+  // zone repart d'une liste vide, la liste rangée au service web non.
+  const auto ignores = [this](std::string_view name) {
+    return blocks_.Blocks(name) ||
+           (block_memory_.has_value() &&
+            std::ranges::find(block_memory_->names(), name) != block_memory_->names().end());
+  };
+  return ro::net::ApplyBroadcastFrame(
+      frame, world, ro::net::BroadcastFilter{.ignores = ignores, .banned = &banned_words_}, now_ms);
+}
+
+void WhisperStage::LoadBannedWords(ro::vfs::Vfs* vfs) {
+  banned_words_ = ro::sim::BannedWords{};
+  if (vfs == nullptr) {
+    return;
+  }
+  auto bytes = vfs->Read(ro::sim::kBannedWordsPath);
+  if (!bytes) {
+    // ⚠ SANS FICHIER, RIEN NE SE MASQUE : le client d'origine fait de même.
+    return;
+  }
+  banned_words_ = ro::sim::BannedWords::FromMannerText(
+      std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
 }
 
 void WhisperStage::Open(std::string_view peer) {

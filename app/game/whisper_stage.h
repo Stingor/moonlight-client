@@ -16,6 +16,7 @@
 #include "ro/audio/audio_engine.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/friend_list.h"
 #include "ro/sim/guild.h"
 #include "ro/sim/party_roster.h"
@@ -88,8 +89,12 @@ class WhisperStage {
   void RememberBlocks(std::string origin, web::UserConfigIdentity identity);
   // L'avis de chargement d'une carte est parti : le serveur écoute.
   void NoteMapEntered() noexcept;
+  // LES MOTS INTERDITS DE L'INSTALLATION, relus ; aucun sans `vfs`.
+  void LoadBannedWords(ro::vfs::Vfs* vfs);
 
-  // Les deux paquets du chuchotement, puis les trois réponses du blocage. ⚠
+  // Les deux paquets du chuchotement, les trois réponses du blocage, puis les
+  // deux annonces — la voix d'un nom ignoré s'y tait, les mots interdits s'y
+  // masquent. ⚠
   // AVANT LE MONDE : lui lirait les deux premiers, mais sans nos amis ni nos
   // envois.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
@@ -144,6 +149,7 @@ class WhisperStage {
   WhisperDesk desk_;
   ro::sim::WhisperOutbox outbox_;
   ro::sim::WhisperBlockList blocks_;
+  ro::sim::BannedWords banned_words_;
   // ⚠ LE TRANSPORT AVANT LA MÉMOIRE QUI LE REGARDE : elle meurt la première.
   std::unique_ptr<web::HttpTransport> blocks_transport_;
   std::optional<WhisperBlockMemory> block_memory_;

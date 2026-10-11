@@ -98,6 +98,7 @@ add_library(ro_sim STATIC
     src/warp_menu.cpp
     src/whisper.cpp
     src/whisper_blocks.cpp
+    src/banned_words.cpp
     src/adoption.cpp
     src/actor_traces.cpp
     src/world.cpp

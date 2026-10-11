@@ -454,6 +454,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   windows_.chat_room.make.open = false;
   // LES CONVERSATIONS 1:1 : aucune n'est ouverte, aucun envoi n'attend.
   pieces_.whispers.StartSession(world_.last_chat_seq());
+  pieces_.whispers.LoadBannedWords(vfs_);
   windows_.whispers = WhisperWindows{};
   // LA LISTE DE BLOCAGE DU COMPTE, que le service web garde d'une connexion à
   // l'autre : relue maintenant, rejouée après la première carte.

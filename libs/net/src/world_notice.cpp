@@ -83,12 +83,15 @@ constexpr std::uint32_t kAnnouncementCyan = 0x00FFFF;
 constexpr std::uint32_t kRgbMask = 0xFFFFFF;
 
 // Une annonce lue : son texte sans étiquette, sa case et sa couleur. Une
-// annonce qui ne se montre pas a un texte vide et `shown` faux.
+// annonce qui ne se montre pas a un texte vide et `shown` faux. La voix d'un
+// joueur porte aussi le nom de qui parle, octets du fil.
 struct Announcement {
   std::string text;
   sim::ChatType type = sim::ChatType::kBroadcast;
   std::uint32_t color = kAnnouncementYellow;
   bool shown = true;
+  bool voice = false;
+  std::string voice_name;
 };
 
 // Les octets jusqu'au premier zéro, comme le client lit une chaîne.
@@ -142,9 +145,6 @@ struct Announcement {
 
 // « micc » : le nom, la couleur, puis le texte. Le texte se lit dans la charge
 // BRUTE, parce que le nom s'arrête à son zéro et que la suite reste à lire.
-//
-// ⚠ NI LA LISTE DES NOMS IGNORÉS NI LES MOTS INTERDITS NE S'APPLIQUENT ICI :
-// voir TODO.txt.
 [[nodiscard]] Announcement ReadVoiceAnnouncement(std::string_view payload) {
   const std::size_t color_at = kBroadcastTagSize + kMiccNameSize;
   const std::size_t text_at = color_at + kTagColorDigits;
@@ -157,7 +157,9 @@ struct Announcement {
   }
   return {.text = std::string(text),
           .type = sim::ChatType::kPublic,
-          .color = HexColor(payload.substr(color_at, kTagColorDigits), kAnnouncementYellow)};
+          .color = HexColor(payload.substr(color_at, kTagColorDigits), kAnnouncementYellow),
+          .voice = true,
+          .voice_name = std::string(UpToNul(payload.substr(kBroadcastTagSize, kMiccNameSize)))};
 }
 
 // ⚠ L'ANNONCE DE SIÈGE A SA CASE, « Informations WOE », et la voix d'un joueur
@@ -184,6 +186,11 @@ struct Announcement {
   return {.text = FoldHashName(message)};
 }
 
+// Le texte, ses mots interdits masqués quand le filtre en tient.
+[[nodiscard]] std::string Masked(const BroadcastFilter& filter, std::string utf8_text) {
+  return filter.banned == nullptr ? utf8_text : filter.banned->Mask(utf8_text);
+}
+
 // La charge d'une trame à longueur variable : ce qui suit l'opcode et la
 // longueur.
 [[nodiscard]] std::string_view PayloadOf(const Frame& frame) {
@@ -196,6 +203,56 @@ struct Announcement {
 }
 
 }  // namespace
+
+FrameOutcome ApplyBroadcastFrame(const Frame& frame, sim::World& world,
+                                 const BroadcastFilter& filter, std::uint32_t now_ms) {
+  switch (frame.opcode) {
+    case proto::ZcBroadcast::kOpcode:
+      return Decoded<proto::ZcBroadcast>(frame, [&](const auto& packet) {
+        // UNE ANNONCE DU SERVEUR. Elle ne vient de personne : l'orateur est
+        // ZÉRO, comme pour les réponses de commande, et rien ne paraît donc
+        // au-dessus d'une tête.
+        const Announcement announcement = ReadAnnouncement(packet.message, PayloadOf(frame));
+        if (!announcement.shown) {
+          return FrameOutcome::kIgnored;
+        }
+        std::string text = core::Utf8FromWire(announcement.text);
+        // ⚠ SEULE LA VOIX D'UN JOUEUR SE FILTRE : « tool », « blue », « ssss »
+        // et l'annonce sans étiquette passent telles quelles.
+        if (announcement.voice) {
+          if (filter.ignores && filter.ignores(core::Utf8FromWire(announcement.voice_name))) {
+            return FrameOutcome::kIgnored;
+          }
+          text = Masked(filter, std::move(text));
+        }
+        world.RecordChat(sim::ChatKind::kAnnouncement, announcement.type, 0, std::move(text),
+                         now_ms, announcement.color);
+        return FrameOutcome::kApplied;
+      });
+
+    case proto::ZcBroadcast2::kOpcode:
+      return Decoded<proto::ZcBroadcast2>(frame, [&](const auto& packet) {
+        // LA MÊME ANNONCE, HABILLÉE : couleur, police, taille, hauteur à l'écran.
+        // Aucune étiquette en tête ici — la couleur est un CHAMP, et c'est
+        // précisément pourquoi ce second paquet existe. Le nom suffixé d'un
+        // « # » s'y replie comme dans une annonce sans étiquette.
+        //
+        // ⚠ LE MASQUE PASSE AVANT LE REPLI, sur le texte entier : un mot que le
+        // repli recollerait de part et d'autre du « # » ne se masque pas.
+        //
+        // ⚠ DE CE CHAMP, ON NE PREND QUE LA COULEUR. La police, la taille et la
+        // hauteur à l'écran décrivent la bannière que le client d'origine fait
+        // glisser en haut de l'écran, pas la ligne du fil.
+        world.RecordChat(sim::ChatKind::kAnnouncement, 0,
+                         FoldHashName(Masked(filter, core::Utf8FromWire(packet.message))), now_ms,
+                         packet.fontColor & kRgbMask);
+        return FrameOutcome::kApplied;
+      });
+
+    default:
+      return FrameOutcome::kUnhandled;
+  }
+}
 
 FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32_t now_ms) {
   switch (frame.opcode) {
@@ -258,34 +315,10 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
       });
 
     case proto::ZcBroadcast::kOpcode:
-      return Decoded<proto::ZcBroadcast>(frame, [&frame, &world, now_ms](const auto& packet) {
-        // UNE ANNONCE DU SERVEUR. Elle ne vient de personne : l'orateur est
-        // ZÉRO, comme pour les réponses de commande, et rien ne paraît donc
-        // au-dessus d'une tête.
-        const Announcement announcement = ReadAnnouncement(packet.message, PayloadOf(frame));
-        if (!announcement.shown) {
-          return FrameOutcome::kIgnored;
-        }
-        world.RecordChat(sim::ChatKind::kAnnouncement, announcement.type, 0,
-                         core::Utf8FromWire(announcement.text), now_ms, announcement.color);
-        return FrameOutcome::kApplied;
-      });
-
     case proto::ZcBroadcast2::kOpcode:
-      return Decoded<proto::ZcBroadcast2>(frame, [&world, now_ms](const auto& packet) {
-        // LA MÊME ANNONCE, HABILLÉE : couleur, police, taille, hauteur à l'écran.
-        // Aucune étiquette en tête ici — la couleur est un CHAMP, et c'est
-        // précisément pourquoi ce second paquet existe. Le nom suffixé d'un
-        // « # » s'y replie comme dans une annonce sans étiquette.
-        //
-        // ⚠ DE CE CHAMP, ON NE PREND QUE LA COULEUR. La police, la taille et la
-        // hauteur à l'écran décrivent la bannière que le client d'origine fait
-        // glisser en haut de l'écran, pas la ligne du fil.
-        world.RecordChat(sim::ChatKind::kAnnouncement, 0,
-                         core::Utf8FromWire(FoldHashName(packet.message)), now_ms,
-                         packet.fontColor & kRgbMask);
-        return FrameOutcome::kApplied;
-      });
+      // ⚠ SANS FILTRE : rien ne se tait ni ne se masque. La partie lit ces deux
+      // paquets AVANT le monde, avec ses noms ignorés et ses mots interdits.
+      return ApplyBroadcastFrame(frame, world, BroadcastFilter{}, now_ms);
 
     case proto::WhisperNotice::kOpcode:
     case proto::ZcAckWhisper::kOpcode:
