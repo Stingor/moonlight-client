@@ -17041,3 +17041,30 @@ tr: Armor element:
 
 fr: Équipement inarrachable
 tr: Unstrippable equipment
+
+fr: %s — AID %u
+tr: %s — AID %u
+
+fr: Journal des blocages de chat
+tr: Chat Ban Log
+
+fr: Les @mute et @unmute qui ont visé ce personnage, datés, avec leur auteur et leur durée, tels que le journal des commandes du serveur les a gardés.\nLe serveur revérifie le droit du staff avant de répondre.
+tr: The @mute and @unmute commands that targeted this character, dated, with their author and duration, as the server's command log kept them.\nThe server checks staff rights again before answering.
+
+fr: Date
+tr: Date
+
+fr: Commande
+tr: Command
+
+fr: Ce joueur n'est plus en ligne : le serveur ne retrouve pas son personnage.
+tr: This player is no longer online: the server cannot find their character.
+
+fr: Le journal des commandes est éteint sur ce serveur : aucun blocage n'y est consigné.
+tr: The command log is turned off on this server: no chat ban is recorded there.
+
+fr: Le serveur n'a pas pu lire son journal des commandes : sa console dit pourquoi.
+tr: The server could not read its command log: its console says why.
+
+fr: Aucun blocage de chat consigné pour ce personnage.
+tr: No chat ban recorded for this character.

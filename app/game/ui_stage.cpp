@@ -477,6 +477,10 @@ UiStage::Answers UiStage::Draw(
     windows.entity_inspector.answer = ro::ui::DrawEntityInspectorWindow(
         windows.entity_inspector.state, *windows.entity_inspector.view, skin_);
   }
+  if (windows.chat_block_log.view != nullptr) {
+    windows.chat_block_log.answer = ro::ui::DrawChatBlockLogWindow(
+        windows.chat_block_log.state, *windows.chat_block_log.view, skin_);
+  }
   // L'ATLAS DES RECETTES, avant l'aperçu qui survole ses lignes et la
   // description qu'on ouvre depuis son menu.
   if (windows.craft_atlas.view != nullptr) {
@@ -662,6 +666,7 @@ UiStage::Answers UiStage::Draw(
   // La fiche d'un monstre se lit et se referme, comme une description.
   escape_.RegisterReading(ro::ui::kMonsterSheetWindowId, &windows.monster_sheet.state.open);
   escape_.RegisterReading(ro::ui::kEntityInspectorWindowId, &windows.entity_inspector.state.open);
+  escape_.RegisterReading(ro::ui::kChatBlockLogWindowId, &windows.chat_block_log.state.open);
   // L'Atlas aussi : on le consulte, puis on le referme.
   escape_.Register(ro::ui::kCraftAtlasWindowId, &windows.craft_atlas.state.open);
   RegisterNavigationEscapes(windows.navigation);

@@ -41,7 +41,6 @@
 #include "ro/ui/damage_texts.h"
 #include "ro/ui/description_window.h"
 #include "ro/ui/entity_bars.h"
-#include "ro/ui/entity_inspector_window.h"
 #include "ro/ui/entity_menu.h"
 #include "ro/ui/escape_stack.h"
 #include "ro/ui/frame_meter.h"
@@ -96,6 +95,7 @@
 #include "game/over_world_paint.h"
 #include "game/party_windows.h"
 #include "game/quest_stage.h"
+#include "game/staff_window_rounds.h"
 #include "game/trade_windows.h"
 #include "game/whisper_stage.h"
 #include "mvp/mvp_tracker_stage.h"
@@ -328,13 +328,9 @@ class UiStage {
       ro::ui::MonsterSheetPreviewState preview_state;
     };
     MonsterSheet monster_sheet;
-    // « PROPRIÉTÉS… » DU STAFF, même aller-retour. Vue nulle, rien ne se dessine.
-    struct Inspector {
-      ro::ui::EntityInspectorWindowState state;
-      const ro::ui::EntityInspectorView* view = nullptr;
-      ro::ui::EntityInspectorAnswer answer;
-    };
-    Inspector entity_inspector;
+    // LES FICHES DU STAFF, même aller-retour : voir `game/staff_window_rounds.h`.
+    EntityInspectorRound entity_inspector;
+    ChatBlockLogRound chat_block_log;
     // LA GRILLE D'ICÔNES DE MENU, même aller-retour : ses icônes descendent
     // d'`app` à chaque image, la commande cliquée remonte à la suivante.
     struct MenuIcons {

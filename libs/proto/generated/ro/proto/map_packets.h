@@ -5053,6 +5053,38 @@ struct ZcMoonlightEquipAttributes {
   std::vector<MoonlightEquipBonus> bonuses;
 };
 
+// PACKET_MOONLIGHT_CHAT_BLOCK
+struct MoonlightChatBlock {
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 33;
+
+  std::uint32_t date = 0;
+  std::int32_t minutes = 0;
+  std::uint8_t kind = 0;
+  std::string author;
+};
+
+// PACKET_CZ_MOONLIGHT_REQ_CHAT_BLOCKS
+struct CzMoonlightReqChatBlocks {
+  static constexpr std::uint16_t kOpcode = 0x0f3e;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 8;
+
+  std::int16_t packetLength = 0;
+  std::uint32_t aid = 0;
+};
+
+// PACKET_ZC_MOONLIGHT_CHAT_BLOCKS
+struct ZcMoonlightChatBlocks {
+  static constexpr std::uint16_t kOpcode = 0x0f3f;
+  // Taille sur le fil SANS la queue variable, qui la porte elle-même.
+  static constexpr std::size_t kWireSize = 9;
+
+  std::uint32_t aid = 0;
+  std::uint8_t status = 0;
+  std::vector<MoonlightChatBlock> entries;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8179,6 +8211,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightQuestEnd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightDiscordRich& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightEquipAttributes& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqChatBlocks& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightChatBlocks& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -8774,6 +8808,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightQuestEnd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightDiscordRich& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightEquipAttributes& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqChatBlocks& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

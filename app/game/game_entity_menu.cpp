@@ -134,6 +134,11 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
                                    std::exchange(windows_.entity_inspector.answer, {}),
                                    world_.map_name(), now_ms);
   pieces_.entity_inspector.SendRequest(link_);
+  // ET SON JOURNAL DES BLOCAGES DE CHAT, de même.
+  windows_.chat_block_log.view = &pieces_.chat_block_log.view();
+  pieces_.chat_block_log.Advance(windows_.chat_block_log.state,
+                                 std::exchange(windows_.chat_block_log.answer, {}), now_ms);
+  pieces_.chat_block_log.SendRequest(link_);
 
   // ── CE QUE LE MENU A RENDU À L'IMAGE PRÉCÉDENTE ───────────────────────────
   //
@@ -581,6 +586,14 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
                     name.empty() ? Tr("(nom inconnu)") : name.c_str(), id);
       pieces_.entity_inspector.Open(windows_.entity_inspector.state, id, subject.data(),
                                     world_.map_name(), now_ms);
+      return;
+    }
+    case EntityVerb::kChatBlockLog: {
+      // En tête de la fenêtre : le nom du personnage, et l'AID demandé.
+      std::array<char, kLineBytes> subject{};
+      std::snprintf(subject.data(), subject.size(), Tr("%s — AID %u"),
+                    name.empty() ? Tr("(nom inconnu)") : name.c_str(), id);
+      pieces_.chat_block_log.Open(windows_.chat_block_log.state, id, subject.data(), now_ms);
       return;
     }
     // ── L'OUTILLAGE DU STAFF ───────────────────────────────────────────────

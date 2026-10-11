@@ -43,6 +43,7 @@ add_library(ro_net STATIC
     src/companion.cpp
     src/connection.cpp
     src/discord_relay.cpp
+    src/chat_blocks.cpp
     src/entity_props.cpp
     src/equip_attributes.cpp
     src/frame_tally.cpp

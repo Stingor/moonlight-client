@@ -17041,3 +17041,30 @@ tr: Elemento de la armadura:
 
 fr: Équipement inarrachable
 tr: Equipo inarrancable
+
+fr: %s — AID %u
+tr: %s — AID %u
+
+fr: Journal des blocages de chat
+tr: Registro de Chat Ban
+
+fr: Les @mute et @unmute qui ont visé ce personnage, datés, avec leur auteur et leur durée, tels que le journal des commandes du serveur les a gardés.\nLe serveur revérifie le droit du staff avant de répondre.
+tr: Los @mute y @unmute que han apuntado a este personaje, con su fecha, su autor y su duración, tal como los guardó el registro de comandos del servidor.\nEl servidor vuelve a comprobar los permisos de staff antes de responder.
+
+fr: Date
+tr: Fecha
+
+fr: Commande
+tr: Comando
+
+fr: Ce joueur n'est plus en ligne : le serveur ne retrouve pas son personnage.
+tr: Este jugador ya no está en línea: el servidor no encuentra a su personaje.
+
+fr: Le journal des commandes est éteint sur ce serveur : aucun blocage n'y est consigné.
+tr: El registro de comandos está desactivado en este servidor: no consta ningún chat ban.
+
+fr: Le serveur n'a pas pu lire son journal des commandes : sa console dit pourquoi.
+tr: El servidor no pudo leer su registro de comandos: su consola dice por qué.
+
+fr: Aucun blocage de chat consigné pour ce personnage.
+tr: Ningún chat ban registrado para este personaje.

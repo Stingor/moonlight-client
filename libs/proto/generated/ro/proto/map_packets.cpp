@@ -184,6 +184,8 @@ constexpr std::size_t kMaxFrameSize = 0xFFFF;
 [[maybe_unused]] void ReadMoonlightEquipBonus(ByteReader& reader, MoonlightEquipBonus& value);
 [[maybe_unused]] void WriteMoonlightEquipBonus(ByteWriter& writer,
                                                const MoonlightEquipBonus& value);
+[[maybe_unused]] void ReadMoonlightChatBlock(ByteReader& reader, MoonlightChatBlock& value);
+[[maybe_unused]] void WriteMoonlightChatBlock(ByteWriter& writer, const MoonlightChatBlock& value);
 [[maybe_unused]] void ReadCzSePcBuyCashitemListSub(ByteReader& reader,
                                                    CzSePcBuyCashitemListSub& value);
 [[maybe_unused]] void WriteCzSePcBuyCashitemListSub(ByteWriter& writer,
@@ -1070,6 +1072,20 @@ void WriteMoonlightEquipBonus(ByteWriter& writer, const MoonlightEquipBonus& val
   for (const std::int32_t element : value.values) {
     writer.I32(static_cast<std::int32_t>(element));
   }
+}
+
+void ReadMoonlightChatBlock(ByteReader& reader, MoonlightChatBlock& value) {
+  value.date = static_cast<std::uint32_t>(reader.U32());
+  value.minutes = static_cast<std::int32_t>(reader.I32());
+  value.kind = static_cast<std::uint8_t>(reader.U8());
+  value.author = reader.FixedString(24);
+}
+
+void WriteMoonlightChatBlock(ByteWriter& writer, const MoonlightChatBlock& value) {
+  writer.U32(static_cast<std::uint32_t>(value.date));
+  writer.I32(static_cast<std::int32_t>(value.minutes));
+  writer.U8(static_cast<std::uint8_t>(value.kind));
+  writer.FixedString(value.author, 24);
 }
 
 void ReadCzSePcBuyCashitemListSub(ByteReader& reader, CzSePcBuyCashitemListSub& value) {
@@ -11788,6 +11804,71 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightEquipAttributes& packet) {
   writer.U32(static_cast<std::uint32_t>(packet.id));
   for (const MoonlightEquipBonus& element : packet.bonuses) {
     WriteMoonlightEquipBonus(writer, element);
+  }
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqChatBlocks& packet) {
+  if (frame.size() != CzMoonlightReqChatBlocks::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightReqChatBlocks::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.aid = static_cast<std::uint32_t>(reader.U32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightReqChatBlocks& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightReqChatBlocks::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightReqChatBlocks::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U32(static_cast<std::uint32_t>(packet.aid));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightChatBlocks& packet) {
+  if (frame.size() < ZcMoonlightChatBlocks::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightChatBlocks::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.aid = static_cast<std::uint32_t>(reader.U32());
+  packet.status = static_cast<std::uint8_t>(reader.U8());
+  if (reader.remaining() % MoonlightChatBlock::kWireSize != 0) {
+    reader.Invalidate();
+  } else {
+    packet.entries.resize(reader.remaining() / MoonlightChatBlock::kWireSize);
+    for (MoonlightChatBlock& element : packet.entries) {
+      ReadMoonlightChatBlock(reader, element);
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightChatBlocks::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightChatBlocks::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U32(static_cast<std::uint32_t>(packet.aid));
+  writer.U8(static_cast<std::uint8_t>(packet.status));
+  for (const MoonlightChatBlock& element : packet.entries) {
+    WriteMoonlightChatBlock(writer, element);
   }
   if (writer.size() > kMaxFrameSize ||
       !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {

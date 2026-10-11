@@ -80,6 +80,7 @@
 #include "world/actor_models.h"
 #include "world/ailment_tints.h"
 #include "world/battle_log.h"
+#include "world/chat_block_log.h"
 #include "world/damage_path_sample.h"
 #include "world/decor_veil_view.h"
 #include "world/entity_inspector.h"
@@ -163,6 +164,8 @@ struct GamePieces {
   AdoptionStage adoption;
   // « PROPRIÉTÉS… » DU STAFF : ce que le serveur sait d'une entité désignée.
   EntityInspector entity_inspector;
+  // ET LE JOURNAL DES BLOCAGES DE CHAT D'UN JOUEUR.
+  ChatBlockLog chat_block_log;
   HomunculusStage homunculus;
   MercenaryStage mercenary;
   // L'IA DE CES DEUX DERNIERS : voir `CompanionAiStage`.

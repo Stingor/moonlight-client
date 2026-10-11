@@ -836,6 +836,7 @@ target_include_directories(moonclient_spritesounds PUBLIC ${CMAKE_CURRENT_SOURCE
 add_library(moonclient_entitymenu STATIC
     options/context_menu_options.cpp
     world/blocked_npcs.cpp
+    world/chat_block_log.cpp
     world/entity_inspector.cpp
     world/entity_menu.cpp
     world/entity_menu_tactics.cpp)

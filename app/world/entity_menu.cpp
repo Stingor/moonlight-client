@@ -461,6 +461,10 @@ void AddStaff(Composer& menu, const EntityMenuFacts& facts) {
              Tr("Ajoute 60 minutes de silence. Appliqué deux fois, il prolonge — ce n'est pas un "
                 "interrupteur."));
     menu.Add(Tr("Lui rendre la parole"), EntityVerb::kUnmute);
+    menu.Add(Tr("Journal des blocages de chat"), EntityVerb::kChatBlockLog,
+             Tr("Les @mute et @unmute qui ont visé ce personnage, datés, avec leur auteur et "
+                "leur durée, tels que le journal des commandes du serveur les a gardés.\n"
+                "Le serveur revérifie le droit du staff avant de répondre."));
 
     // CE QUI PUNIT, en rouge et en dernier : on ne clique pas là par erreur en
     // visant la ligne du dessus.
