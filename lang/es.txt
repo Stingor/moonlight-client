@@ -16098,3 +16098,9 @@ tr: [Taming Mission] Monstruo objetivo: %s
 
 fr: Clic sur une carte : le guidage · Maj+clic : son lien dans le chat
 tr: Clic en un mapa: la guía · Mayús+clic: su enlace en el chat
+
+fr: Cet item ne s'achète pas en buying store.
+tr: Este objeto no se puede comprar en un buying store.
+
+fr: Trop lourd : tout acheter mettrait le personnage en surcharge, et le serveur refuse.
+tr: Demasiado pesado: comprarlo todo sobrecargaría al personaje, y el servidor lo rechaza.

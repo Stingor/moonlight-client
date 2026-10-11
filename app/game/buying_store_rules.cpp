@@ -106,7 +106,7 @@ std::string LocalClockText(std::uint32_t unix_s) {
 }
 
 std::vector<BuyingStoreDraftCandidate> BuyingStoreDraftCandidates(
-    std::span<const ro::sim::InventoryItem> bag) {
+    std::span<const ro::sim::InventoryItem> bag, const ro::vfs::ItemProperties* properties) {
   std::vector<const ro::sim::InventoryItem*> order;
   order.reserve(bag.size());
   for (const ro::sim::InventoryItem& item : bag) {
@@ -119,6 +119,9 @@ std::vector<BuyingStoreDraftCandidate> BuyingStoreDraftCandidates(
     if (item->equipped() || item->amount <= 0) {
       continue;
     }
+    if (properties != nullptr && properties->BuyingStoreAllowed(item->item_id) == false) {
+      continue;
+    }
     if (std::ranges::find(candidates, item->item_id, &BuyingStoreDraftCandidate::item_id) !=
         candidates.end()) {
       continue;
@@ -127,6 +130,20 @@ std::vector<BuyingStoreDraftCandidate> BuyingStoreDraftCandidates(
         .item_id = item->item_id, .client_slot = item->client_slot, .owned = item->amount});
   }
   return candidates;
+}
+
+std::vector<ro::sim::BuyingStoreItemFacts> BuyingStoreFactsOf(
+    std::span<const ro::sim::BuyingStoreWish> lines, const ro::vfs::ItemProperties* properties) {
+  std::vector<ro::sim::BuyingStoreItemFacts> facts;
+  if (properties == nullptr || !properties->known()) {
+    return facts;
+  }
+  facts.reserve(lines.size());
+  for (const ro::sim::BuyingStoreWish& line : lines) {
+    facts.push_back({.allowed = properties->BuyingStoreAllowed(line.item_id),
+                     .unit_weight = properties->WeightTenthsOf(line.item_id)});
+  }
+  return facts;
 }
 
 std::vector<BuyingStoreSaleCandidate> BuyingStoreSaleCandidates(
@@ -190,6 +207,11 @@ const char* DraftFaultText(BuyingStoreDraftFault fault) {
       return ro::core::Tr("Renseigne la limite de zeny à dépenser.");
     case BuyingStoreDraftFault::kLimitAboveZeny:
       return ro::core::Tr("La limite dépasse tes zeny.");
+    case BuyingStoreDraftFault::kNotForBuyingStore:
+      return ro::core::Tr("Cet item ne s'achète pas en buying store.");
+    case BuyingStoreDraftFault::kOverweight:
+      return ro::core::Tr(
+          "Trop lourd : tout acheter mettrait le personnage en surcharge, et le serveur refuse.");
     case BuyingStoreDraftFault::kLimitBelowTotalCost:
       return ro::core::Tr(
           "La limite ne paie pas tout : le buying store fermera quand elle sera épuisée.");

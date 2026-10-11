@@ -420,6 +420,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                     pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
                     &pieces_.item_words);
   pieces_.trade.SeeCommands(&pieces_.commands.settings());
+  pieces_.trade.SeeItemProperties(&pieces_.item_properties);
   pieces_.trade.deal().SeeApproachClock(&grimoire_.approach_clock());
   pieces_.trade.store_search().SeeCards(
       {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});

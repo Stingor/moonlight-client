@@ -24,6 +24,7 @@ add_library(ro_vfs STATIC
     src/npc_illustration_paths.cpp
     src/item_link.cpp
     src/item_name.cpp
+    src/item_properties.cpp
     src/item_stacking.cpp
     src/item_table.cpp
     src/item_words.cpp

@@ -2,12 +2,14 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <string_view>
 #include <vector>
 
 #include "ro/sim/buying_store.h"
 #include "ro/sim/inventory.h"
+#include "ro/sim/player_status.h"
 
 namespace ro::sim {
 
@@ -19,10 +21,11 @@ namespace ro::sim {
 // la ligne : la fenêtre les traduit et désigne ce qui cloche.
 //
 // Elles sont PURES : ce qu'on vérifie arrive en arguments, rien n'est lu
-// ailleurs. ⚠ ELLES NE VOIENT PAS TOUT. Le serveur refuse aussi un objet que sa
-// base ne marque pas comme achetable en échoppe (le drapeau `BuyingStore` de
-// l'item_db), un objet non échangeable, et une surcharge de poids ; le client ne
-// connaît ni ce drapeau ni les poids. Ce refus-là revient du serveur.
+// ailleurs. ⚠ ELLES NE VOIENT QUE CE QU'ON LEUR DONNE. L'objet que la base du
+// serveur n'accepte pas en échoppe et la surcharge à l'ouverture ne se jugent
+// que si l'appelant tient la table des propriétés d'item ; sans elle, ce refus
+// revient du serveur. ⚠ LA SURCHARGE DE L'ACHETEUR, à la vente, revient
+// toujours du serveur : le client ne connaît pas le poids d'un autre joueur.
 
 // Ce qui ne va pas dans une échoppe en préparation.
 enum class BuyingStoreDraftFault : std::uint8_t {
@@ -40,6 +43,11 @@ enum class BuyingStoreDraftFault : std::uint8_t {
   kOwnedAboveMost,
   kLimitNotPositive,
   kLimitAboveZeny,
+  // La base du serveur ne l'accepte pas en échoppe d'achat : drapeau
+  // `BuyingStore` baissé, ou objet qui ne s'échange pas.
+  kNotForBuyingStore,
+  // Tout acheter mènerait le poids porté à la surcharge que le serveur refuse.
+  kOverweight,
   // ⚠ PAS UN REFUS : la limite ne paie pas tout ce qui est demandé. Le serveur
   // l'accepte, et l'échoppe s'arrêtera quand la limite sera épuisée — ce que le
   // joueur veut peut-être, et doit en tout cas savoir.
@@ -100,6 +108,27 @@ inline constexpr std::size_t kBuyingStoreSaleLineBytes = 8;
 inline constexpr std::size_t kBuyingStoreMostSaleLines =
     (kBuyingStoreSaleMostFrameBytes - kBuyingStoreSaleHeaderBytes) / kBuyingStoreSaleLineBytes;
 
+// LE SEUIL DE SURCHARGE À L'OUVERTURE, en pour cent du poids maximal : le
+// serveur refuse dès que le poids porté, plus tout ce que l'échoppe achèterait,
+// l'atteint (`major_overweight_rate` de sa configuration de combat).
+inline constexpr std::int64_t kBuyingStoreOverweightPercent = 90;
+inline constexpr std::int64_t kWeightPercentScale = 100;
+
+// CE QUE LA BASE DU SERVEUR DIT D'UN OBJET MIS EN ACHAT, quand le client la
+// connaît. Chaque champ vide veut dire « on ne sait pas ».
+struct BuyingStoreItemFacts {
+  std::optional<bool> allowed;
+  // Le poids d'une unité, en dixièmes.
+  std::optional<std::uint32_t> unit_weight;
+};
+
+// Le poids que porte le personnage et son maximum, en dixièmes ;
+// `kUnknownStat` tant que le serveur ne les a pas dits.
+struct CarriedWeight {
+  std::int64_t weight = kUnknownStat;
+  std::int64_t max_weight = kUnknownStat;
+};
+
 // Ce que coûterait l'échoppe si tout était acheté.
 [[nodiscard]] std::int64_t BuyingStoreDraftCost(std::span<const BuyingStoreWish> lines) noexcept;
 
@@ -107,10 +136,14 @@ inline constexpr std::size_t kBuyingStoreMostSaleLines =
 // Vide : le client n'a rien à redire.
 //
 // `title_on_wire` est le titre tel qu'il partira ; `zeny` est ce que le joueur
-// possède ; `bag` est son sac.
+// possède ; `bag` est son sac. `facts` dit, ligne à ligne, ce que la base du
+// serveur sait de l'objet : vide, ou d'une autre longueur que `lines`, rien
+// n'en est jugé. La surcharge ne se juge que si chaque ligne a son poids et
+// que `carried` est connu.
 [[nodiscard]] std::vector<BuyingStoreDraftProblem> CheckBuyingStoreDraft(
     std::string_view title_on_wire, std::int64_t zeny_limit, std::span<const BuyingStoreWish> lines,
-    std::size_t slots, std::span<const InventoryItem> bag, std::int64_t zeny);
+    std::size_t slots, std::span<const InventoryItem> bag, std::int64_t zeny,
+    std::span<const BuyingStoreItemFacts> facts = {}, CarriedWeight carried = {});
 
 // Ce que rapporterait cette vente, aux prix de l'acheteur. Une ligne d'un objet
 // qu'il ne veut pas compte pour rien.

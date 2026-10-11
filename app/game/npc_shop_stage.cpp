@@ -170,11 +170,18 @@ std::int64_t Carried(const ro::sim::World& world, std::uint32_t item_id) {
   return carried;
 }
 
-std::vector<ro::sim::NpcShopBuyLine> BuyLinesOf(std::span<const ro::ui::NpcShopCartLine> cart) {
+// Le panier d'achat, chaque ligne avec le poids que la table des propriétés
+// d'item lui connaît.
+std::vector<ro::sim::NpcShopBuyLine> BuyLinesOf(std::span<const ro::ui::NpcShopCartLine> cart,
+                                                const ro::vfs::ItemProperties* properties) {
   std::vector<ro::sim::NpcShopBuyLine> lines;
   lines.reserve(cart.size());
   for (const ro::ui::NpcShopCartLine& line : cart) {
-    lines.push_back({.item_id = line.item_id, .amount = line.amount});
+    lines.push_back({.item_id = line.item_id,
+                     .amount = line.amount,
+                     .table_unit_weight = properties != nullptr
+                                              ? properties->WeightTenthsOf(line.item_id)
+                                              : std::nullopt});
   }
   return lines;
 }
@@ -256,7 +263,8 @@ void NpcShopStage::Follow(ro::ui::NpcShopWindowState& state,
   const ro::sim::PlayerStatus& status = context.world.player_status();
   const bool points = shop_.kind() == NpcShopKind::kPoints;
   if (!answer.buy.empty()) {
-    const std::vector<ro::sim::NpcShopBuyLine> lines = BuyLinesOf(answer.buy);
+    const std::vector<ro::sim::NpcShopBuyLine> lines =
+        BuyLinesOf(answer.buy, context.item_properties);
     const std::int64_t money = points ? shop_.points() : status.zeny;
     const ro::sim::NpcShopVerdict verdict = ro::sim::CheckNpcShopBuy(
         shop_, lines, money, context.world.inventory().items(), status.weight, status.max_weight);
@@ -517,7 +525,7 @@ void NpcShopStage::ComposeVerdict(const ro::ui::NpcShopWindowState& state,
     verdict = ro::sim::CheckNpcShopSell(shop_, SellLinesOf(state.cart), world.inventory().items(),
                                         status.zeny);
   } else {
-    verdict = ro::sim::CheckNpcShopBuy(shop_, BuyLinesOf(state.cart),
+    verdict = ro::sim::CheckNpcShopBuy(shop_, BuyLinesOf(state.cart, context.item_properties),
                                        points ? shop_.points() : status.zeny,
                                        world.inventory().items(), status.weight, status.max_weight);
     if (verdict.weight_known) {

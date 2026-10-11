@@ -48,7 +48,8 @@ std::int64_t BuyingStoreDraftCost(std::span<const BuyingStoreWish> lines) noexce
 
 std::vector<BuyingStoreDraftProblem> CheckBuyingStoreDraft(
     std::string_view title_on_wire, std::int64_t zeny_limit, std::span<const BuyingStoreWish> lines,
-    std::size_t slots, std::span<const InventoryItem> bag, std::int64_t zeny) {
+    std::size_t slots, std::span<const InventoryItem> bag, std::int64_t zeny,
+    std::span<const BuyingStoreItemFacts> facts, CarriedWeight carried) {
   std::vector<BuyingStoreDraftProblem> problems;
   const auto flag = [&problems](BuyingStoreDraftFault fault, std::size_t line = kNoFaultLine) {
     problems.push_back(BuyingStoreDraftProblem{.fault = fault, .line = line});
@@ -63,6 +64,11 @@ std::vector<BuyingStoreDraftProblem> CheckBuyingStoreDraft(
   if (title_on_wire.empty()) {
     flag(BuyingStoreDraftFault::kEmptyTitle);
   }
+
+  // Ce que la base du serveur dit des objets ne vaut que ligne pour ligne.
+  const bool facts_known = facts.size() == lines.size();
+  bool weight_known = carried.weight != kUnknownStat && carried.max_weight != kUnknownStat;
+  std::int64_t bought_weight = 0;
 
   for (std::size_t rank = 0; rank < lines.size(); ++rank) {
     const BuyingStoreWish& line = lines[rank];
@@ -84,6 +90,24 @@ std::vector<BuyingStoreDraftProblem> CheckBuyingStoreDraft(
     } else if (static_cast<std::int64_t>(std::max<std::int16_t>(owned->amount, 0)) + line.amount >
                kBuyingStoreMostOwned) {
       flag(BuyingStoreDraftFault::kOwnedAboveMost, rank);
+    }
+    if (facts_known && facts[rank].allowed == false) {
+      flag(BuyingStoreDraftFault::kNotForBuyingStore, rank);
+    }
+    if (facts_known && facts[rank].unit_weight.has_value()) {
+      bought_weight += static_cast<std::int64_t>(*facts[rank].unit_weight) * line.amount;
+    } else {
+      weight_known = false;
+    }
+  }
+
+  // LA SURCHARGE, comme le serveur la calcule : le poids porté plus tout ce que
+  // l'échoppe achèterait, en pour cent entier du maximum.
+  if (weight_known && !lines.empty()) {
+    const std::int64_t percent = (carried.weight + bought_weight) * kWeightPercentScale /
+                                 std::max<std::int64_t>(carried.max_weight, 1);
+    if (percent >= kBuyingStoreOverweightPercent) {
+      flag(BuyingStoreDraftFault::kOverweight);
     }
   }
 

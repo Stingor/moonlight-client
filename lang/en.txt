@@ -16098,3 +16098,9 @@ tr: [Taming Mission] Target Monster: %s
 
 fr: Clic sur une carte : le guidage · Maj+clic : son lien dans le chat
 tr: Click a map: guidance · Shift+click: its link in chat
+
+fr: Cet item ne s'achète pas en buying store.
+tr: This item can't be bought through a buying store.
+
+fr: Trop lourd : tout acheter mettrait le personnage en surcharge, et le serveur refuse.
+tr: Too heavy: buying everything would overload the character, and the server refuses.

@@ -76,10 +76,14 @@ NpcShopVerdict CheckNpcShopBuy(const NpcShop& shop, std::span<const NpcShopBuyLi
       continue;
     }
     verdict.total += static_cast<std::int64_t>(offer->price) * line.amount;
-    if (offer->unit_weight == 0) {
+    // Une liste qui ne porte pas de poids en dit 0 : la table répond alors.
+    const std::optional<std::uint32_t> unit_weight =
+        offer->unit_weight != 0 ? std::optional<std::uint32_t>(offer->unit_weight)
+                                : line.table_unit_weight;
+    if (!unit_weight.has_value()) {
       verdict.weight_known = false;
     }
-    verdict.added_weight += static_cast<std::int64_t>(offer->unit_weight) * line.amount;
+    verdict.added_weight += static_cast<std::int64_t>(unit_weight.value_or(0)) * line.amount;
     const std::int64_t total_wanted = wanted[line.item_id] += line.amount;
     if (!ItemTypeStacks(offer->item_type)) {
       if (total_wanted > 1) {

@@ -52,6 +52,10 @@ std::int64_t KnownZeny(const ro::sim::PlayerStatus& status) {
   return status.zeny == ro::sim::kUnknownStat ? ro::sim::kBuyingStoreMostZeny : status.zeny;
 }
 
+ro::sim::CarriedWeight CarriedOf(const ro::sim::PlayerStatus& status) {
+  return ro::sim::CarriedWeight{.weight = status.weight, .max_weight = status.max_weight};
+}
+
 bool Preparing(const ro::sim::BuyingStore& store) {
   return store.phase() == BuyingStorePhase::kPreparing ||
          store.phase() == BuyingStorePhase::kRequested;
@@ -137,9 +141,11 @@ void BuyingStoreStage::FollowSetup(ro::ui::BuyingStoreSetupState& state,
   // ⚠ REJUGÉ ICI : la fenêtre a pu dessiner un verdict d'une image de retard.
   const std::string wire = ro::net::BuyingStoreTitleOnWire(state.title.data());
   const std::vector<ro::sim::BuyingStoreWish> wishes = WishesOf(state.lines);
+  const ro::sim::PlayerStatus& status = context.world.player_status();
   for (const ro::sim::BuyingStoreDraftProblem& problem : ro::sim::CheckBuyingStoreDraft(
            wire, state.zeny_limit, wishes, store_.slots(), context.world.inventory().items(),
-           KnownZeny(context.world.player_status()))) {
+           KnownZeny(status), BuyingStoreFactsOf(wishes, context.item_properties),
+           CarriedOf(status))) {
     if (ro::sim::BlocksOpening(problem.fault)) {
       Say(context, DraftFaultText(problem.fault), kBuyingStoreFailedColor);
       return;
@@ -313,7 +319,8 @@ void BuyingStoreStage::ComposeSetup(const ro::ui::BuyingStoreSetupState& state,
   setup_view_.slots = store_.slots();
   setup_view_.most_amount = static_cast<int>(ro::sim::kBuyingStoreMostOwned);
 
-  const std::vector<BuyingStoreDraftCandidate> candidates = BuyingStoreDraftCandidates(bag);
+  const std::vector<BuyingStoreDraftCandidate> candidates =
+      BuyingStoreDraftCandidates(bag, context.item_properties);
   candidate_names_.clear();
   candidates_.clear();
   candidate_names_.reserve(candidates.size());
@@ -348,7 +355,8 @@ void BuyingStoreStage::ComposeSetup(const ro::ui::BuyingStoreSetupState& state,
   warning_texts_.clear();
   note_texts_.assign(state.lines.size(), std::string());
   for (const ro::sim::BuyingStoreDraftProblem& problem : ro::sim::CheckBuyingStoreDraft(
-           wire, state.zeny_limit, wishes, store_.slots(), bag, KnownZeny(status))) {
+           wire, state.zeny_limit, wishes, store_.slots(), bag, KnownZeny(status),
+           BuyingStoreFactsOf(wishes, context.item_properties), CarriedOf(status))) {
     const std::string text = DraftFaultText(problem.fault);
     std::vector<std::string>& into =
         ro::sim::BlocksOpening(problem.fault) ? blocker_texts_ : warning_texts_;

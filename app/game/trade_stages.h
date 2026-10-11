@@ -41,6 +41,13 @@ class TradeStages {
   // BOUGE PAS d'une partie à l'autre : on la donne une fois.
   void SeeCommands(const ro::sim::CommandSettings* commands) noexcept { commands_ = commands; }
 
+  // Les propriétés d'item du serveur — poids, drapeau de buying store —, qui
+  // laissent un commerce refuser avant lui. Même règle que les réglages : une
+  // adresse donnée une fois.
+  void SeeItemProperties(const ro::vfs::ItemProperties* properties) noexcept {
+    item_properties_ = properties;
+  }
+
   // Une partie commence : rien de la précédente ne survit.
   void StartSession();
 
@@ -117,6 +124,7 @@ class TradeStages {
 
   TradeItems items_;
   const ro::sim::CommandSettings* commands_ = nullptr;
+  const ro::vfs::ItemProperties* item_properties_ = nullptr;
   NpcShopStage npc_shop_;
   BarterStage barter_;
   BuyingStoreStage buying_store_;

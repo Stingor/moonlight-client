@@ -13,11 +13,16 @@ namespace ro::vfs {
 // LES ITEMS QUE LE SERVEUR N'EMPILE PAS : armes, armures, œufs, équipements de
 // familier et d'ombre. Chacun prend une case du sac par exemplaire.
 //
-// La table est exportée de l'item_db du serveur par
-// `scripts/yaml_tables/non_stackable_items.py`, qui en dit la règle :
+// La liste est exportée de l'item_db du serveur par
+// `scripts/yaml_tables/item_properties.py`, qui en dit la règle, dans la
+// table des propriétés d'item (`item_properties.h`). Cette forme suffit à la
+// lire :
 //
 //     version: 1
 //     non_stackable: [1101, 1102, …]
+//
+// `kItemStackingPath` est l'ANCIENNE table, qui ne portait que cette liste :
+// une installation qui l'a sans la nouvelle la fait encore lire.
 //
 // 🔴 UNE TABLE ABSENTE NE DIT PAS « TOUT S'EMPILE », elle dit « on ne sait
 // pas » : `IsStackable` rend alors `nullopt` pour tout item, et l'appelant

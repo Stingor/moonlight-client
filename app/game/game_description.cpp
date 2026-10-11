@@ -158,7 +158,7 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
     }
     // LA LIGNE « @item », pour le staff seulement.
     item_description_->NoteStaff(Rights().staff_tools,
-                                 pieces_.item_stacking.IsStackable(windows_.description.item_id),
+                                 pieces_.item_properties.IsStackable(windows_.description.item_id),
                                  StaffFreeBagSlots(world_.inventory()));
   }
   // ⚠ L'APERÇU NE SE BÂTIT QUE S'IL SE MONTRE : sans le réglage, il n'a rien à

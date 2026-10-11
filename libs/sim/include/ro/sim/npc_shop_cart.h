@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -19,9 +20,9 @@ namespace ro::sim {
 // d'avance : ces fonctions rendent les raisons, la fenêtre les montre et retient
 // le bouton.
 //
-// ⚠ LE POIDS NE SE SAIT QU'AU MARKET : c'est la seule boutique dont la liste
-// porte le poids d'une unité. Ailleurs, le client n'a aucune table de poids, et
-// le serveur reste seul juge.
+// ⚠ LE POIDS VIENT DE DEUX SOURCES : la liste d'un market porte celui d'une
+// unité ; ailleurs, c'est la table des propriétés d'item, que l'appelant pose
+// sur chaque ligne. Sans l'une ni l'autre, le serveur reste seul juge.
 
 // Les sortes d'objets qui ne s'empilent pas : armes, armures, œufs de familier,
 // équipements de familier, équipements d'ombre (`itemdb_isstackable2` du
@@ -43,6 +44,9 @@ inline constexpr std::int64_t kMostZeny = 2147483647;
 struct NpcShopBuyLine {
   std::uint32_t item_id = 0;
   std::int64_t amount = 0;
+  // Le poids d'une unité selon la table des propriétés d'item, en dixièmes ;
+  // vide sans table. Celui que la liste d'un market porte l'emporte.
+  std::optional<std::uint32_t> table_unit_weight;
 };
 
 // UNE LIGNE DU PANIER DE VENTE : la case du sac, et combien.
@@ -68,7 +72,7 @@ enum class NpcShopIssue : std::uint8_t {
   kOnePerPurchase,
   // Ce qu'on a déjà, plus ce qu'on achète, dépasse une pile.
   kOverStack,
-  // Plus lourd que ce que le personnage peut porter (market seulement).
+  // Plus lourd que ce que le personnage peut porter.
   kOverWeight,
   // Vendre plus qu'on n'en a.
   kOverOwned,

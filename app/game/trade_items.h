@@ -9,6 +9,7 @@
 #include "ro/sim/inventory.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/skin_art.h"
+#include "ro/vfs/item_properties.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/item_words.h"
 
@@ -71,6 +72,10 @@ struct TradeContext {
   // Les réglages de commande du serveur (`@sellstuff`, `@sellitem`…), qui
   // décident de ce que la liste de vente d'un PNJ montre. Nul hors partie.
   const ro::sim::CommandSettings* commands = nullptr;
+  // Les propriétés d'item du serveur. Nulles, ou inconnues faute de table : le
+  // poids d'un achat et le drapeau de buying store ne se jugent pas, et le
+  // serveur reste seul à les refuser.
+  const ro::vfs::ItemProperties* item_properties = nullptr;
 };
 
 }  // namespace moonclient

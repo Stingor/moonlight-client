@@ -19,6 +19,7 @@
 #include "ro/sim/buying_store.h"
 #include "ro/sim/buying_store_checks.h"
 #include "ro/sim/inventory.h"
+#include "ro/vfs/item_properties.h"
 #include "ro/vfs/trade_words.h"
 
 namespace moonclient {
@@ -61,11 +62,12 @@ inline constexpr int kBuyingStoreMostPerSaleLine = 30'000;
 
 // ── CE QU'ON PEUT METTRE EN ACHAT ───────────────────────────────────────────
 //
-// 🔴 LE CLIENT NE SAIT PAS CE QUI S'ACHÈTE EN ÉCHOPPE : c'est un drapeau de la
-// base du serveur. Mais le serveur exige d'en posséder déjà un — c'est la pile
-// qu'il complète. Le sac est donc la liste la plus juste qu'on puisse offrir :
-// un objet par identifiant, pris dans sa PREMIÈRE pile, celle que le serveur
-// compte.
+// Le serveur exige d'en posséder déjà un — c'est la pile qu'il complète. Le sac
+// est donc la liste qu'on offre : un objet par identifiant, pris dans sa
+// PREMIÈRE pile, celle que le serveur compte. Ce qui s'achète en échoppe est un
+// drapeau de la base du serveur : avec la table des propriétés d'item, seuls
+// les objets qu'elle accepte sont proposés ; sans elle, tout le sac l'est, et
+// le serveur tranche.
 struct BuyingStoreDraftCandidate {
   std::uint32_t item_id = 0;
   // La première pile de l'objet, dans l'ordre du sac.
@@ -73,9 +75,17 @@ struct BuyingStoreDraftCandidate {
   int owned = 0;
 };
 
-// Les objets du sac, non portés, un par identifiant, dans l'ordre du sac.
+// Les objets du sac, non portés, un par identifiant, dans l'ordre du sac — ceux
+// que `properties` refuse en échoppe exceptés. Nulle ou inconnue, rien n'est
+// écarté.
 [[nodiscard]] std::vector<BuyingStoreDraftCandidate> BuyingStoreDraftCandidates(
-    std::span<const ro::sim::InventoryItem> bag);
+    std::span<const ro::sim::InventoryItem> bag,
+    const ro::vfs::ItemProperties* properties = nullptr);
+
+// CE QUE LA BASE DU SERVEUR DIT DE CHAQUE LIGNE, pour juger l'échoppe. Vide si
+// `properties` est nulle ou inconnue.
+[[nodiscard]] std::vector<ro::sim::BuyingStoreItemFacts> BuyingStoreFactsOf(
+    std::span<const ro::sim::BuyingStoreWish> lines, const ro::vfs::ItemProperties* properties);
 
 // ── CE QU'ON PEUT VENDRE À UN ACHETEUR ──────────────────────────────────────
 //
