@@ -15556,6 +15556,9 @@ tr: La sombra y la luz horneadas en el suelo, incluidas las de los decorados: si
 fr: Vous ne pouvez pas équiper cet item.
 tr: No puedes equipar este objeto.
 
+fr: Vous ne pouvez pas équiper cet item : vous n'en remplissez pas les conditions.
+tr: No puedes equipar este objeto porque no cumples los requisitos.
+
 fr: Vous ne pouvez pas utiliser cet item assis.
 tr: No puede usar este objeto sentado.
 

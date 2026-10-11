@@ -15556,6 +15556,9 @@ tr: The shadow and light baked into the ground, including the decor's: without t
 fr: Vous ne pouvez pas équiper cet item.
 tr: You can't put this item on.
 
+fr: Vous ne pouvez pas équiper cet item : vous n'en remplissez pas les conditions.
+tr: Can't equip this item because you don't meet the requirements.
+
 fr: Vous ne pouvez pas utiliser cet item assis.
 tr: You cannot use this item while sitting.
 

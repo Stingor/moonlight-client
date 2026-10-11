@@ -6,6 +6,7 @@
 #include <optional>
 #include <utility>
 
+#include "ro/core/i18n.h"
 #include "ro/core/text.h"
 #include "ro/proto/map_packets.h"
 #include "ro/sim/world.h"
@@ -183,6 +184,30 @@ constexpr std::uint8_t kEquipGranted = 0;
 constexpr std::uint8_t kTakeOffGranted = 0;
 constexpr std::uint8_t kUseRefused = 0;
 
+// ── LE REFUS D'ÉQUIPER OU DE RETIRER, DIT DANS LA DISCUSSION ────────────────
+//
+// Une ligne rouge dans la case « Équipement mis/retiré », et seulement pour
+// ces codes-là : un accordé ne dit rien — la pièce bouge sur la poupée —, et un
+// code inconnu non plus.
+//
+//   0x0999 code 1 (niveau insuffisant) : « conditions non remplies » ;
+//   0x0999 code 2 (échec)              : « vous ne pouvez pas équiper » ;
+//   0x099A code 1 (échec)              : « conditions non remplies », la même
+//                                        phrase qu'à l'équipement, telle quelle.
+constexpr std::uint8_t kEquipRefusedRequirements = 1;
+constexpr std::uint8_t kEquipRefused = 2;
+constexpr std::uint8_t kTakeOffRefused = 1;
+constexpr std::uint32_t kEquipRefusalColor = 0xFF0000;
+
+void SayEquipRefusal(sim::World& world, const char* text, std::uint32_t now_ms) {
+  world.RecordChat(sim::ChatKind::kServer, sim::ChatType::kEquipmentOnOff, 0, text, now_ms,
+                   kEquipRefusalColor);
+}
+
+[[nodiscard]] const char* RequirementsRefusalText() {
+  return core::Tr("Vous ne pouvez pas équiper cet item : vous n'en remplissez pas les conditions.");
+}
+
 // LA TAILLE DE BASE DU SAC chez ce serveur (`INVENTORY_BASE_SIZE`).
 //
 // ⚠ LE PAQUET N'ANNONCE QUE L'EXTENSION, pas le total : le serveur écrit
@@ -341,10 +366,16 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
       });
 
     case proto::ZcReqWearEquipAck::kOpcode:
-      return Decoded<proto::ZcReqWearEquipAck>(frame, [&world](const auto& packet) {
+      return Decoded<proto::ZcReqWearEquipAck>(frame, [&world, now_ms](const auto& packet) {
         if (packet.result != kEquipGranted) {
-          // ⚠ REFUS = RIEN À FAIRE, et surtout pas « appliqué » : le sac n'a pas
-          // bougé, et le relevé ne doit pas laisser croire le contraire.
+          // ⚠ REFUS = RIEN À FAIRE AU SAC, et surtout pas « appliqué » : il n'a
+          // pas bougé, et le relevé ne doit pas laisser croire le contraire. Le
+          // refus se DIT, lui.
+          if (packet.result == kEquipRefusedRequirements) {
+            SayEquipRefusal(world, RequirementsRefusalText(), now_ms);
+          } else if (packet.result == kEquipRefused) {
+            SayEquipRefusal(world, core::Tr("Vous ne pouvez pas équiper cet item."), now_ms);
+          }
           return FrameOutcome::kIgnored;
         }
         return world.inventory().Wear(packet.index, packet.wearLocation, packet.wItemSpriteNumber)
@@ -353,8 +384,11 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
       });
 
     case proto::PacketUnequipitemAck::kOpcode:
-      return Decoded<proto::PacketUnequipitemAck>(frame, [&world](const auto& packet) {
+      return Decoded<proto::PacketUnequipitemAck>(frame, [&world, now_ms](const auto& packet) {
         if (packet.result != kTakeOffGranted) {
+          if (packet.result == kTakeOffRefused) {
+            SayEquipRefusal(world, RequirementsRefusalText(), now_ms);
+          }
           return FrameOutcome::kIgnored;
         }
         return world.inventory().TakeOff(packet.index) ? FrameOutcome::kApplied

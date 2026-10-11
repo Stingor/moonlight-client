@@ -65,12 +65,14 @@ inline constexpr ChatTypeMask kFedChatTypes =
     MaskOf(ro::sim::ChatType::kPublic) | MaskOf(ro::sim::ChatType::kPublicChat) |
     MaskOf(ro::sim::ChatType::kWhisper) | MaskOf(ro::sim::ChatType::kPartyChat) |
     MaskOf(ro::sim::ChatType::kGuildChat) | MaskOf(ro::sim::ChatType::kAllianceChat) |
-    MaskOf(ro::sim::ChatType::kItemGetDrop) | MaskOf(ro::sim::ChatType::kSkillFailure) |
-    MaskOf(ro::sim::ChatType::kPartySetup) | MaskOf(ro::sim::ChatType::kBattle) |
-    MaskOf(ro::sim::ChatType::kPartyBattle) | MaskOf(ro::sim::ChatType::kExperience) |
-    MaskOf(ro::sim::ChatType::kClanChat) | MaskOf(ro::sim::ChatType::kCall) |
-    MaskOf(ro::sim::ChatType::kBroadcast) | MaskOf(ro::sim::ChatType::kBattlefield) |
-    MaskOf(ro::sim::ChatType::kDiscord) | MaskOf(ro::sim::ChatType::kSkillUse);
+    MaskOf(ro::sim::ChatType::kItemGetDrop) | MaskOf(ro::sim::ChatType::kEquipmentOnOff) |
+    MaskOf(ro::sim::ChatType::kPartyItem) | MaskOf(ro::sim::ChatType::kDamagedEquipment) |
+    MaskOf(ro::sim::ChatType::kSkillFailure) | MaskOf(ro::sim::ChatType::kPartySetup) |
+    MaskOf(ro::sim::ChatType::kBattle) | MaskOf(ro::sim::ChatType::kPartyBattle) |
+    MaskOf(ro::sim::ChatType::kExperience) | MaskOf(ro::sim::ChatType::kClanChat) |
+    MaskOf(ro::sim::ChatType::kCall) | MaskOf(ro::sim::ChatType::kBroadcast) |
+    MaskOf(ro::sim::ChatType::kBattlefield) | MaskOf(ro::sim::ChatType::kDiscord) |
+    MaskOf(ro::sim::ChatType::kSkillUse);
 
 [[nodiscard]] constexpr bool IsFedChatType(ro::sim::ChatType type) {
   return (kFedChatTypes & MaskOf(type)) != 0;
