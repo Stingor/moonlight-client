@@ -1024,6 +1024,7 @@ add_library(moonclient_postures STATIC
     world/actor_held_image.cpp
     world/actor_led_pose.cpp
     world/actor_look.cpp
+    world/corpse_agony.cpp
     world/actor_skill_posture.cpp
     world/frozen_poses.cpp)
 

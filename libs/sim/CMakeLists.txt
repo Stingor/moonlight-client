@@ -64,6 +64,7 @@ add_library(ro_sim STATIC
     src/companion_players.cpp
     src/companion_brain_players.cpp
     src/companion_brain_memory.cpp
+    src/death_rules.cpp
     src/equip_compare.cpp
     src/ground_skill_log.cpp
     src/pending_action.cpp

@@ -88,6 +88,10 @@ class ActorOutfit {
   // Rien ne s'y substitue, à la différence de `FrameCount`.
   [[nodiscard]] std::size_t BodyActionFrameCount(std::size_t animation,
                                                  std::size_t direction) const;
+  // Le délai qu'une action du CORPS déclare, en pas de vingt-quatre
+  // millisecondes ; une action que le .act ne porte pas en a un de
+  // `ro::render::kUndeclaredActionDelayUnits`, comme sans corps.
+  [[nodiscard]] float BodyActionDelayUnits(std::size_t animation, std::size_t direction) const;
   // L'IMAGE DE FRAPPE de l'animation, lue sur le .act du CORPS : la première
   // qui porte le marqueur du coup, sinon l'avant-dernière — voir
   // `ro::render::AttackSoundFrame`. Zéro sans corps.

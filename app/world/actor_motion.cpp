@@ -22,12 +22,17 @@ namespace moonclient {
 namespace {
 
 // La motion que la posture et le chemin donnent : mort ou assis, en marche, en
-// garde ou en attente — selon le dernier geste, voir `RestMotionAt`.
+// garde ou en attente — selon le dernier geste, voir `RestMotionAt`. Un mort
+// dont l'agonie n'a pas commencé garde la motion d'un vivant.
 ro::render::Motion RestingMotion(const ro::sim::Actor& actor, const ro::sim::WalkPath& path,
-                                 const MotionEvents& events, std::uint32_t now_ms) {
+                                 const MotionEvents& events, std::uint32_t agony_start_ms,
+                                 std::uint32_t now_ms) {
   switch (actor.posture) {
     case ro::sim::Posture::kDead:
-      return ro::render::Motion::kDie;
+      if (now_ms >= agony_start_ms) {
+        return ro::render::Motion::kDie;
+      }
+      break;
     case ro::sim::Posture::kSitting:
       return ro::render::Motion::kSit;
     case ro::sim::Posture::kStanding:
@@ -65,10 +70,14 @@ PlayedMotion ComposedMotionAt(ro::render::ActorWardrobe* wardrobe, const ro::sim
   const ro::render::SpriteLayout layout = LayoutOf(actor);
   MotionEvents events{std::nullopt, played_effects, now_ms};
   PlayedMotion played;
-  played.motion = RestingMotion(actor, path, events, now_ms);
+  const std::uint32_t agony_start_ms = AgonyStartMs(wardrobe, world, actor);
+  played.motion = RestingMotion(actor, path, events, agony_start_ms, now_ms);
   played.animation = ro::render::AnimationFor(played.motion, layout);
-  // Une posture s'anime depuis l'instant où le serveur l'a annoncée.
-  played.elapsed_ms = static_cast<float>(now_ms - actor.posture_since_ms);
+  // Une posture s'anime depuis l'instant où le serveur l'a annoncée — la mort,
+  // depuis le début de l'agonie.
+  played.elapsed_ms = static_cast<float>(now_ms - (played.motion == ro::render::Motion::kDie
+                                                       ? agony_start_ms
+                                                       : actor.posture_since_ms));
   const ro::render::SpriteCatalog* catalog = wardrobe != nullptr ? &wardrobe->catalog() : nullptr;
   // UNE CRÉATURE QUI DORT se fige, jusqu'à la motion suivante : voir
   // `AsleepCreatureMotionAt`.

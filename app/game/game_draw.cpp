@@ -638,6 +638,7 @@ void Game::ForgetWhatPlayed() {
   ghosts_.Forget();
   // Ce qui s'effaçait sur l'ancienne carte n'a rien à faire sur la nouvelle.
   scene_actors_.fading.clear();
+  scene_actors_.corpses.clear();
   pieces_.falcons.Forget();
   pieces_.carts.Forget();
   pieces_.ailment_tints.Forget();

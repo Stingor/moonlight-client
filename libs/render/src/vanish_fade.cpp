@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "ro/formats/act.h"
+
 namespace ro::render {
 namespace {
 
@@ -21,6 +23,11 @@ std::uint32_t Bounded(std::uint32_t corpse_fade_ms) noexcept {
 }
 
 }  // namespace
+
+float AgonyDurationMs(std::size_t frame_count, float delay_units) noexcept {
+  const float delay = std::max(delay_units, kLeastAgonyDelayUnits);
+  return static_cast<float>(frame_count) * delay * formats::kMillisecondsPerSpeedUnit;
+}
 
 std::uint8_t VanishAlphaAt(float agony_ms, std::uint32_t since_death_ms,
                            std::uint32_t corpse_fade_ms) noexcept {

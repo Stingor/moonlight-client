@@ -17,10 +17,17 @@ namespace ro::net {
 // anneaux bleus du portail ; réannoncé, il ne montre rien.
 void SpawnAppearing(sim::World& world, sim::Actor actor, bool player, std::uint32_t now_ms);
 
-// Ce que laisse un départ, noté AVANT qu'on ne retire l'acteur : l'effet d'une
-// déconnexion ou d'une téléportation qu'on voit, joué là où il était ; ou,
-// sorti de vue, sa copie qui s'efface.
-void NoteVanishEffect(sim::World& world, std::uint32_t actor_id, std::uint8_t vanish_type,
-                      std::uint32_t now_ms);
+// Applique une disparition (`clr_type`, dans src/map/clif.hpp). Rend faux pour
+// la mort d'un acteur inconnu, qui n'est pas créé pour autant.
+//
+//   * LA MORT met l'acteur à terre — sauf un PNJ, qui reste debout : voir
+//     `ro::sim::DeathAftermathOf`.
+//   * LE RAFRAÎCHISSEMENT (type 4) retire l'acteur sur-le-champ, sans fondu ni
+//     effet : le serveur le fait aussitôt réapparaître.
+//   * Les autres départs le retirent aussi, après avoir noté ce qu'ils
+//     laissent : l'effet d'une déconnexion ou d'une téléportation qu'on voit,
+//     joué là où il était ; ou, sorti de vue, sa copie qui s'efface.
+[[nodiscard]] bool ApplyVanish(sim::World& world, std::uint32_t actor_id, std::uint8_t vanish_type,
+                               std::uint32_t now_ms);
 
 }  // namespace ro::net

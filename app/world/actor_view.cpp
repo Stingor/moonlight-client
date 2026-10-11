@@ -27,6 +27,9 @@
 
 #include "world/actor_effect_finish.h"
 #include "world/actor_tint.h"
+#include "world/battle_log_rules.h"
+#include "world/corpse_agony.h"
+#include "world/struck_place.h"
 
 namespace moonclient {
 namespace {
@@ -44,7 +47,7 @@ constexpr int kOpaqueAlpha = 255;
 constexpr float kNonPlayerPickBias = 100.0F;
 constexpr float kMonsterPickBias = 200.0F;
 constexpr float kPlayerPickBias = 400.0F;
-// LE CADAVRE D'UN MONSTRE RECULE AU-DELÀ DE TOUT ce que la caméra peut voir :
+// UN MONSTRE QUI AGONISE RECULE AU-DELÀ DE TOUT ce que la caméra peut voir :
 // il ne prend le pixel que si personne d'autre ne le tient. Un monstre vivant
 // posé sur la case d'un mort reste donc désignable, quel que soit le plus
 // proche de l'œil.
@@ -172,31 +175,31 @@ std::optional<ro::render::StrikePlay> StrikePlayFor(ro::render::ActorWardrobe& w
   return play;
 }
 
-namespace {
-
-// L'AGONIE DE CE CORPS s'il doit s'effacer de lui-même, et rien sinon.
-//
-// C'est la SEULE part du fondu qui regarde le monde, et c'est pourquoi elle est
-// ici plutôt que dans `render` : une créature morte se retire d'elle-même, un
-// JOUEUR mort reste à terre. Le client ne pose l'échéance que pour une classe
-// de créature ou une unité spéciale ; les
-// autres, c'est le serveur qui les retire.
-std::optional<float> AgonyMsOf(const ro::sim::Actor& actor, ro::render::ActorOutfit& outfit) {
-  if (actor.posture != ro::sim::Posture::kDead || actor.kind == ro::sim::ActorKind::kPlayer) {
-    return std::nullopt;
+std::uint32_t AgonyStartMs(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
+                           const ro::sim::Actor& actor) {
+  std::uint32_t start_ms = actor.posture_since_ms;
+  if (actor.posture != ro::sim::Posture::kDead || ComposedAsPlayer(actor) || wardrobe == nullptr) {
+    return start_ms;
   }
-  const std::size_t die = ro::render::AnimationFor(ro::render::Motion::kDie, LayoutOf(actor));
-  return outfit.AnimationDurationMs(die);
+  // Les coups reçus AVANT l'annonce : ce sont eux que la file tient encore.
+  const auto wait_for = [&](const ro::sim::Strike& strike) {
+    if (strike.target != actor.id || strike.started_ms > actor.posture_since_ms) {
+      return;
+    }
+    const std::uint32_t first_hit_ms =
+        strike.started_ms + static_cast<std::uint32_t>(HitLandsAtMs(*wardrobe, world, strike));
+    start_ms = AgonyStartAfter(
+        start_ms, actor.id,
+        BattleMessagesOf(strike, SidesOfStrike(world, strike), first_hit_ms, false, false));
+  };
+  for (const ro::sim::RecordedStrike& recorded : world.strikes().Since(0)) {
+    wait_for(recorded.strike);
+  }
+  if (actor.hit.has_value()) {
+    wait_for(*actor.hit);
+  }
+  return start_ms;
 }
-
-// Depuis combien de temps le serveur a annoncé cette mort. Un instant ANTÉRIEUR
-// ne se produit qu'en rejeu ; le traiter comme l'instant même vaut mieux qu'une
-// soustraction non signée, qui effacerait le corps sur-le-champ.
-std::uint32_t SinceDeathMs(const ro::sim::Actor& actor, std::uint32_t now_ms) {
-  return now_ms > actor.posture_since_ms ? now_ms - actor.posture_since_ms : 0;
-}
-
-}  // namespace
 
 // LA CLASSE QU'UN EFFET FAIT PORTER À L'ACTEUR à cet instant, ou zéro.
 //
@@ -220,8 +223,8 @@ std::uint32_t SinceDeathMs(const ro::sim::Actor& actor, std::uint32_t now_ms) {
 }
 
 float PickBiasOf(const ro::sim::Actor& actor) {
-  // ⚠ LE CADAVRE D'UN MONSTRE SEUL : un joueur mort doit rester désignable, on
-  // le vise pour le relever.
+  // ⚠ L'AGONIE D'UN MONSTRE SEUL — son cadavre, lui, ne se désigne plus : un
+  // joueur mort doit rester désignable, on le vise pour le relever.
   if (actor.kind == ro::sim::ActorKind::kMonster && actor.posture == ro::sim::Posture::kDead) {
     return kCorpsePickBias;
   }
@@ -375,14 +378,6 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       ++census.without_body;
       return;
     }
-    // ⚠ AVANT TOUT CE QUI SE PEINT, halos et voiles compris : son fondu est
-    // fini, il ne reste rien à montrer.
-    if (HasVanished(actor, *outfit, now_ms, scene.corpse_fade_ms)) {
-      if (scene_id != 0) {
-        scene.vanished.push_back(id);
-      }
-      return;
-    }
     const ro::sim::WalkPath& path = planner.PathFor(actor);
     const ro::sim::FractionalCell cell = ro::sim::InterpolatedCell(actor, path, now_ms);
     // CE QU'UN OBJET AU SOL FAIT EN ARRIVANT : il tombe du ciel, ou il jaillit
@@ -446,6 +441,22 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       played.animation = held.animation;
       played.held_frame = held.frame;
     }
+    // ⚠ AVANT TOUT CE QUI SE PEINT, halos et voiles compris : l'agonie finie,
+    // l'acteur s'en va et son CADAVRE prend sa place, dessiné à part dès cette
+    // image. Une copie ne repasse pas par là.
+    if (scene_id != 0) {
+      if (const std::optional<Agony> agony =
+              AgonyOf(actor, *outfit, facing, AgonyStartMs(wardrobe, world, actor));
+          agony.has_value() && now_ms >= agony->EndMs()) {
+        scene.vanished.push_back(id);
+        if (std::ranges::none_of(scene.corpses, [id](const ro::sim::FadingActor& corpse) {
+              return corpse.actor.id == id;
+            })) {
+          scene.corpses.push_back(ro::sim::FadingActor{actor, agony->EndMs()});
+        }
+        return;
+      }
+    }
     const ro::render::ComposedActor& composed = outfit->Composed(
         played.animation, facing, played.elapsed_ms, played.loops, played.held_frame);
     frozen_poses.NoteShown(id, {played.animation, facing, composed.frame_index});
@@ -479,8 +490,8 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
         .blur_write = blur_write,
         .idle_frames_since = idle_frames_since,
         .pose_alpha = pose.alpha,
-        .vanish_alpha = static_cast<std::uint8_t>(
-            ArrivalAndDepartureAlpha(actor, *outfit, now_ms, scene) * leaving_alpha / kOpaqueAlpha),
+        .vanish_alpha = static_cast<std::uint8_t>(ArrivalAlpha(actor, now_ms, scene) *
+                                                  leaving_alpha / kOpaqueAlpha),
         .sparkling = drop.sparkling,
         .cold = lighting.cold,
         .ailment_tints = lighting.ailment_tints};
@@ -591,6 +602,17 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     const std::uint32_t since = now_ms > fading.since_ms ? now_ms - fading.since_ms : 0;
     compose(fading.actor, 0, ro::render::LeaveAlphaAt(since, scene.leave_fade_ms));
   }
+  // LES CADAVRES, de même, au fondu du cadavre — compté depuis la fin de
+  // l'agonie, d'où l'agonie nulle.
+  constexpr float kAgonyOver = 0.0F;
+  std::erase_if(scene.corpses, [&scene, now_ms](const ro::sim::FadingActor& corpse) {
+    return now_ms >= corpse.since_ms &&
+           ro::render::VanishIsOver(kAgonyOver, now_ms - corpse.since_ms, scene.corpse_fade_ms);
+  });
+  for (const ro::sim::FadingActor& corpse : scene.corpses) {
+    const std::uint32_t since = now_ms > corpse.since_ms ? now_ms - corpse.since_ms : 0;
+    compose(corpse.actor, 0, ro::render::VanishAlphaAt(kAgonyOver, since, scene.corpse_fade_ms));
+  }
   census.drawn = scene.drawn.size();
   return census;
 }
@@ -606,31 +628,13 @@ void SettleWorld(ro::sim::World& world, const ComposedScene& previous, std::uint
   static_cast<void>(ForgetFinishedEffects(world, now_ms));
 }
 
-std::uint8_t VanishAlpha(const ro::sim::Actor& actor, ro::render::ActorOutfit& outfit,
-                         std::uint32_t now_ms, std::uint32_t corpse_fade_ms) {
-  const std::optional<float> agony_ms = AgonyMsOf(actor, outfit);
-  if (!agony_ms.has_value()) {
+std::uint8_t ArrivalAlpha(const ro::sim::Actor& actor, std::uint32_t now_ms,
+                          const ComposedScene& scene) {
+  if (!actor.appeared_ms.has_value()) {
     return static_cast<std::uint8_t>(kOpaqueAlpha);
   }
-  return ro::render::VanishAlphaAt(*agony_ms, SinceDeathMs(actor, now_ms), corpse_fade_ms);
-}
-
-std::uint8_t ArrivalAndDepartureAlpha(const ro::sim::Actor& actor, ro::render::ActorOutfit& outfit,
-                                      std::uint32_t now_ms, const ComposedScene& scene) {
-  const std::uint32_t leaving = VanishAlpha(actor, outfit, now_ms, scene.corpse_fade_ms);
-  if (!actor.appeared_ms.has_value()) {
-    return static_cast<std::uint8_t>(leaving);
-  }
   const std::uint32_t since = now_ms > *actor.appeared_ms ? now_ms - *actor.appeared_ms : 0;
-  const std::uint32_t arriving = ro::render::AppearAlphaAt(since, scene.appear_fade_ms);
-  return static_cast<std::uint8_t>(leaving * arriving / static_cast<std::uint32_t>(kOpaqueAlpha));
-}
-
-bool HasVanished(const ro::sim::Actor& actor, ro::render::ActorOutfit& outfit, std::uint32_t now_ms,
-                 std::uint32_t corpse_fade_ms) {
-  const std::optional<float> agony_ms = AgonyMsOf(actor, outfit);
-  return agony_ms.has_value() &&
-         ro::render::VanishIsOver(*agony_ms, SinceDeathMs(actor, now_ms), corpse_fade_ms);
+  return ro::render::AppearAlphaAt(since, scene.appear_fade_ms);
 }
 
 }  // namespace moonclient

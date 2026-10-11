@@ -131,11 +131,6 @@ constexpr std::uint8_t kActionSitDown = 2;
 constexpr std::uint8_t kActionStandUp = 3;
 constexpr std::array<std::uint8_t, 7> kBlowActions = {0, 4, 8, 9, 10, 11, 13};
 
-// Les façons de disparaître (clr_type, dans src/map/clif.hpp) qui laissent
-// l'acteur à terre : la mort, et la feinte de mort.
-constexpr std::uint8_t kVanishDead = 1;
-constexpr std::uint8_t kVanishTrickDead = 4;
-
 // Les aspects qu'un changement d'apparence sait changer un à un : les valeurs
 // de enum _look, dans src/map/map.hpp.
 constexpr std::uint8_t kLookBase = 0;
@@ -482,16 +477,8 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
 
     case proto::ZcNotifyVanish::kOpcode:
       return Decoded<proto::ZcNotifyVanish>(frame, [&world, now_ms](const auto& packet) {
-        // Un mort — ou qui feint de l'être — reste à terre : une créature se
-        // retire d'elle-même une fois son agonie jouée.
-        if (packet.type == kVanishDead || packet.type == kVanishTrickDead) {
-          return world.SetPosture(packet.gid, sim::Posture::kDead, now_ms) ? FrameOutcome::kApplied
-                                                                           : FrameOutcome::kIgnored;
-        }
-        NoteVanishEffect(world, packet.gid, packet.type, now_ms);
-        // Retirer un inconnu n'est pas une erreur : il a pu partir avant d'arriver.
-        world.Remove(packet.gid);
-        return FrameOutcome::kApplied;
+        return ApplyVanish(world, packet.gid, packet.type, now_ms) ? FrameOutcome::kApplied
+                                                                   : FrameOutcome::kIgnored;
       });
 
     case proto::ZcNotifyAct::kOpcode:

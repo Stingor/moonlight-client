@@ -14,6 +14,7 @@
 #include "ro/formats/spr.h"
 #include "ro/render/actor_scale.h"
 #include "ro/render/sprite_frame.h"
+#include "ro/render/vanish_fade.h"
 
 namespace ro::render {
 namespace {
@@ -188,6 +189,15 @@ std::size_t ActorOutfit::BodyActionFrameCount(std::size_t animation, std::size_t
     return 1;
   }
   return std::max<std::size_t>(actions[action].frames.size(), 1);
+}
+
+float ActorOutfit::BodyActionDelayUnits(std::size_t animation, std::size_t direction) const {
+  if (pieces_.empty() || pieces_.front().animation == nullptr) {
+    return kUndeclaredActionDelayUnits;
+  }
+  const std::vector<formats::ActAction>& actions = pieces_.front().animation->actions();
+  const std::size_t action = ActionIndex(animation, direction);
+  return action < actions.size() ? actions[action].speed_units : kUndeclaredActionDelayUnits;
 }
 
 std::size_t ActorOutfit::AttackSoundFrame(std::size_t animation) const {

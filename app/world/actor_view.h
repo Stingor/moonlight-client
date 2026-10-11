@@ -475,28 +475,22 @@ void ReportCensus(const SceneCensus& census, SceneCensus& last_reported);
     const ro::sim::WalkPath& path, std::uint16_t skill_id,
     std::optional<std::uint32_t> attack_motion_ms, std::uint32_t at_ms);
 
-// Vrai quand une créature morte a fini son agonie et son cadavre, qui dure
-// `corpse_fade_ms` : le client l'efface de lui-même, le serveur ne le fera
-// pas. Un joueur mort reste.
-[[nodiscard]] bool HasVanished(const ro::sim::Actor& actor, ro::render::ActorOutfit& outfit,
-                               std::uint32_t now_ms, std::uint32_t corpse_fade_ms);
-
-// L'OPACITÉ D'UN CORPS QUI S'EN VA : pleine tant que l'agonie se joue, puis
-// décroissante jusqu'à l'effacement. Pleine aussi pour qui ne disparaît pas.
-//
-// Elle MULTIPLIE l'alpha déjà en place plutôt que de le remplacer : un corps
-// que la mort prend camouflé reste camouflé en s'effaçant.
-[[nodiscard]] std::uint8_t VanishAlpha(const ro::sim::Actor& actor, ro::render::ActorOutfit& outfit,
-                                       std::uint32_t now_ms, std::uint32_t corpse_fade_ms);
+// L'INSTANT OÙ UN MORT ENTRE DANS SON AGONIE : l'annonce de sa mort, ou plus
+// tard la dernière frappe encore en route vers lui. Le client ne le fait mourir
+// qu'une fois rejoués ses dégâts différés — ceux que les lignes de combat
+// rejouent, voir `BattleMessagesOf` —, sauf s'il porte le métier d'un joueur.
+// Jusque-là il garde sa motion, et bronche. L'annonce elle-même pour qui
+// n'est pas mort, ou sans tenues.
+[[nodiscard]] std::uint32_t AgonyStartMs(ro::render::ActorWardrobe* wardrobe,
+                                         const ro::sim::World& world, const ro::sim::Actor& actor);
 
 struct ComposedScene;
 
-// LA MÊME, multipliée par celle d'une créature que le serveur vient de faire
-// APPARAÎTRE : elle monte de la transparence. Voir `ro/render/vanish_fade.h`.
-[[nodiscard]] std::uint8_t ArrivalAndDepartureAlpha(const ro::sim::Actor& actor,
-                                                    ro::render::ActorOutfit& outfit,
-                                                    std::uint32_t now_ms,
-                                                    const ComposedScene& scene);
+// L'OPACITÉ d'une créature que le serveur vient de faire APPARAÎTRE : elle monte
+// de la transparence. Pleine pour tout autre acteur. Voir
+// `ro/render/vanish_fade.h`.
+[[nodiscard]] std::uint8_t ArrivalAlpha(const ro::sim::Actor& actor, std::uint32_t now_ms,
+                                        const ComposedScene& scene);
 
 // CE QU'UNE IMAGE MONTRE DES ACTEURS : les corps, et ce qui se peint autour.
 //
@@ -554,6 +548,11 @@ struct ComposedScene {
   // LES ACTEURS SORTIS DE VUE qui s'effacent encore : des copies, que le monde
   // a déjà oubliées. `Clear` n'y touche pas ; un changement de carte, si.
   std::vector<ro::sim::FadingActor> fading;
+  // LES CADAVRES : la copie d'une créature dont l'agonie est finie, figée sur
+  // sa dernière image, depuis cette fin. Le monde l'a oubliée ; plus rien ne la
+  // désigne, et elle s'efface en `corpse_fade_ms`. Comme `fading`, un
+  // changement de carte les vide.
+  std::vector<ro::sim::FadingActor> corpses;
 
   void Clear() {
     drawn.clear();
