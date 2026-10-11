@@ -550,8 +550,10 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // couleur et une transparence en plus.
     std::array<ro::render::ActorBodyCopy, ro::render::kMaxBodyCopies> veils;
     const std::size_t veil_count = ro::render::BodyVeilsAfterEffects(played_effects, veils);
-    // LE CERCLE DES CALQUES : la tête et le reste tournent, le corps reste.
+    // LE CERCLE DES CALQUES : la tête et le reste tournent autour du corps, qui
+    // reste en place ; et chaque calque fait la culbute sur lui-même.
     const auto swing_layers = [&pose](ro::render::DrawnActor& drawn) {
+      drawn.layer_spin_degrees = pose.layer_spin_degrees;
       for (std::size_t part = 0; part < ro::render::kActorPartCount; ++part) {
         if (part == static_cast<std::size_t>(ro::render::ActorPart::kBody)) {
           continue;

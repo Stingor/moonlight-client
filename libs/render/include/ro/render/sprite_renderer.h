@@ -121,6 +121,9 @@ struct DrawnActor {
   // sprite : x vers la droite, y vers le haut. Le décalage s'ajoute AVANT
   // l'échelle, comme celui que le client ajoute à l'attache d'un calque.
   std::array<glm::vec2, kActorPartCount> part_offset_pixels{};
+  // DE COMBIEN CHAQUE CALQUE TOURNE SUR SON CENTRE, en degrés, dans le sens des
+  // aiguilles d'une montre à l'écran. L'ombre ne tourne pas.
+  float layer_spin_degrees = 0.0F;
 };
 
 // Dessine les acteurs, en panneaux face à la caméra.

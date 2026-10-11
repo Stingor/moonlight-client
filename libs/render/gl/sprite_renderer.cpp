@@ -345,6 +345,10 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
           corner.y *= drawn.height_scale;
         }
       }
+      // LA CULBUTE : le calque tourne sur son propre centre, une fois tassé.
+      if (layered && drawn.layer_spin_degrees != 0.0F) {
+        scaled = SpinSpriteQuad(scaled, drawn.layer_spin_degrees);
+      }
       // LE DÉCALAGE D'ÉCRAN, après l'échelle et dans l'unité des coins.
       //
       // ⚠ L'AXE Y D'UN SPRITE DESCEND : un décalage vers le haut se retranche.

@@ -1,5 +1,7 @@
 #include "ro/render/sprite_billboard.h"
 
+#include <cmath>
+
 namespace ro::render {
 
 BillboardBasis MakeBillboardBasis(const Camera& camera) {
@@ -123,6 +125,22 @@ SpriteQuad GrowSpriteQuad(const SpriteQuad& quad, float grow) {
   grown.corners[2] += across + down;
   grown.corners[3] += -across + down;
   return grown;
+}
+
+SpriteQuad SpinSpriteQuad(const SpriteQuad& quad, float degrees) {
+  SpriteQuad spun = quad;
+  const glm::vec2 center =
+      (quad.corners[0] + quad.corners[1] + quad.corners[2] + quad.corners[3]) * 0.25F;
+  const float radians = glm::radians(degrees);
+  const float cosine = std::cos(radians);
+  const float sine = std::sin(radians);
+  // Y DESCEND : la rotation directe de ce repère tourne à l'écran dans le sens
+  // des aiguilles d'une montre — le haut passe à droite au quart de tour.
+  for (glm::vec2& corner : spun.corners) {
+    const glm::vec2 from = corner - center;
+    corner = center + glm::vec2(from.x * cosine - from.y * sine, from.x * sine + from.y * cosine);
+  }
+  return spun;
 }
 
 }  // namespace ro::render

@@ -164,4 +164,8 @@ inline constexpr float kSpriteStandingClearance = 2.5F;
 // le rectangle que le client élargit avant de le tourner.
 [[nodiscard]] SpriteQuad GrowSpriteQuad(const SpriteQuad& quad, float grow);
 
+// LE QUAD TOURNÉ SUR SON CENTRE de `degrees`, dans le sens des aiguilles d'une
+// montre à l'écran : les coins sont en pixels de sprite, y vers le BAS.
+[[nodiscard]] SpriteQuad SpinSpriteQuad(const SpriteQuad& quad, float degrees);
+
 }  // namespace ro::render

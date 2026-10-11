@@ -129,6 +129,9 @@ inline constexpr float kLayerSwingRadiusPixels = 10.0F;
 // cosinus — elle commence par 1,0 ; 0,99985 ; 0,99939.
 inline constexpr float kSwingHalfTurn = 180.0F;
 inline constexpr float kSwingDegreesPerStep = 5.0F;
+// Le dernier pas où les calques tournent sur eux-mêmes : au-delà, le tour est
+// fait et leur angle retombe à zéro, quand le cercle, lui, continue.
+inline constexpr std::int32_t kSpinLastStep = 36;
 
 // Le champ dont le cercle tire son pas.
 inline constexpr std::uint16_t kSwingField = 0xF4;
@@ -215,11 +218,16 @@ ActorBodyPose BodyPoseAfterEffects(std::span<const ActorEffectPlay> played) {
         // ⚠ LE COMPTEUR RESTE À ZÉRO TANT QUE LE CLIENT NE L'ÉCRIT PAS, comme
         // pour la croix : deux de ces trois effets ne commencent qu'au
         // quatorzième tic, et leur rampe est négative avant.
-        const auto step =
-            static_cast<float>(std::max(0, ValueAt(*write, play.age_ticks, change->life_ticks)));
+        const std::int32_t whole_step =
+            std::max(0, ValueAt(*write, play.age_ticks, change->life_ticks));
+        const auto step = static_cast<float>(whole_step);
         const float angle =
             kSwingHalfTurn - kSwingHalfTurn * std::cos(kSwingDegreesPerStep * step *
                                                        std::numbers::pi_v<float> / kSwingHalfTurn);
+        // CHAQUE CALQUE TOURNE SUR LUI-MÊME du même angle, le temps d'un tour.
+        if (whole_step <= kSpinLastStep) {
+          pose.layer_spin_degrees = angle;
+        }
         const float radians = angle * std::numbers::pi_v<float> / kSwingHalfTurn;
         pose.swing_pixels[0] += std::sin(radians) * kSwingRadiusPixels;
         // Le client retranche `cos × 40 − 40` d'une ordonnée qui DESCEND : vers

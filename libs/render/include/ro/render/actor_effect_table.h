@@ -360,9 +360,10 @@ struct ActorBodyPose {
   // OÙ LA TÊTE EN EST DE SON CERCLE, en pixels de sprite d'ÉCRAN : x vers la
   // droite, y vers le haut. Zéro pour une tête qui ne tourne pas.
   //
-  // 🔴 LE CORPS NE TOURNE PAS : seuls ses calques tournent autour de lui, la
-  // tête sur un cercle de quarante pixels, les autres calques sur un cercle de
-  // dix. Un monstre, qui n'a qu'un corps, reste sur son pivot.
+  // 🔴 LE CORPS NE QUITTE PAS SA PLACE : il tourne sur lui-même — voir
+  // `layer_spin_degrees` —, et ses calques tournent autour de lui, la tête sur
+  // un cercle de quarante pixels, les autres sur un cercle de dix. Un monstre,
+  // qui n'a qu'un corps, fait la culbute sur son pivot.
   //
   // ⚠ CE N'EST PAS `up_pixels`, et les deux ne se confondent pas : la montée
   // d'un saut se fait dans le MONDE, ce balancement dans le repère du panneau.
@@ -374,6 +375,11 @@ struct ActorBodyPose {
   // sort pour chacun des quatre bords à chaque image, et `render` reste sans
   // hasard — c'est l'appelant qui tire, et la table qui dit de combien.
   float jitter_pixels = 0.0F;
+  // DE COMBIEN CHAQUE CALQUE TOURNE SUR LUI-MÊME, en degrés dans le plan de
+  // l'écran, sens des aiguilles d'une montre. Le même tour que le cercle de la
+  // tête : le corps fait un tour complet, la tête passe dessous à mi-course.
+  // Il REMPLACE l'angle du calque, et retombe à zéro le tour fini.
+  float layer_spin_degrees = 0.0F;
 };
 
 // LES CALQUES QUE LE CLIENT TRAITE COMME LE CORPS dans ce que les effets font à
