@@ -159,7 +159,12 @@ std::int32_t ValueAt(const ActorFieldWrite& write, std::uint32_t age_ticks,
   const std::uint32_t age = life_ticks == 0 || write.outlives_life
                                 ? age_ticks
                                 : std::min<std::uint32_t>(age_ticks, life_ticks - 1U);
-  const std::int32_t value = write.slope * static_cast<std::int32_t>(age) + write.offset;
+  if (write.ramp_last_tick != kWriteEveryTick &&
+      age > static_cast<std::uint32_t>(write.ramp_last_tick)) {
+    return std::max(0, write.after_slope * static_cast<std::int32_t>(age) + write.after_offset);
+  }
+  const std::int32_t value =
+      write.slope * static_cast<std::int32_t>(age) / std::max(write.divisor, 1) + write.offset;
   return write.cap == kNoCap ? value : std::min(value, write.cap);
 }
 

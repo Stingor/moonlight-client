@@ -116,6 +116,23 @@ struct ActorFieldWrite {
   // VRAI QUAND L'EFFET ÉCRIT CE CHAMP AVANT DE COMPARER SON ÂGE À SA VIE : il
   // l'écrit alors tant que son instance vit, et l'âge ne se fige pas à la vie.
   bool outlives_life = false;
+  // CE QUI DIVISE LA RAMPE, en entier et vers zéro comme le client :
+  //
+  //     valeur = min(cap, slope × tics / divisor + offset)
+  //
+  // Le voile de Kaupe écrit le tiers de son âge, celui des Warm le huitième.
+  std::int32_t divisor = 1;
+  // LE DERNIER TIC DE LA RAMPE, ou kWriteEveryTick pour une rampe sans fin ;
+  // au-delà, le client écrit une seconde rampe, jamais sous zéro :
+  //
+  //     valeur = max(0, after_slope × tics + after_offset)
+  //
+  // Le voile des Warm monte jusqu'au deux-centième tic puis tient vingt-cinq ;
+  // celui de Kaizel tient vingt-cinq jusqu'au cent cinquantième, puis
+  // redescend de un par tic.
+  std::int16_t ramp_last_tick = kWriteEveryTick;
+  std::int32_t after_slope = 0;
+  std::int32_t after_offset = 0;
 
   [[nodiscard]] friend bool operator==(const ActorFieldWrite&, const ActorFieldWrite&) = default;
 };
