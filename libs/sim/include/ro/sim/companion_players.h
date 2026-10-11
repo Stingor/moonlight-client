@@ -42,8 +42,8 @@ inline constexpr std::size_t kCompanionAiContextCount = 3;
 // ⚠ UN DUEL EST DU PVE : il se joue sur une carte ordinaire, contre un seul
 // adversaire, et les passants n'y sont pas des cibles.
 // ⚠ LE CHAMP DE BATAILLE EST DU PVP, faute de mieux : un profil de siège
-// (emperium, gardiens) n'y a rien à faire. Les joueurs n'y sont visés qu'en
-// défense, voir `PlayerTargetingOf`.
+// (emperium, gardiens) n'y a rien à faire. Les joueurs y sont visés selon leur
+// camp, voir `PlayerStanceOf`.
 [[nodiscard]] CompanionAiContext ContextOfMap(const MapMode& mode) noexcept;
 
 // CE QUE L'IA PEUT FAIRE D'UN JOUEUR sur cette carte.
@@ -51,15 +51,49 @@ enum class PlayerTargeting : std::uint8_t {
   // Rien : une carte où les joueurs ne se frappent pas.
   kNone,
   // Riposter à ce qui attaque le camp, sans initiative, conduite ni
-  // assistance. C'est le duel, où un seul joueur est un adversaire, et le
-  // champ de bataille, où le client ne connaît pas le camp de chacun : un
-  // coéquipier n'y serait pas reconnu.
+  // assistance. C'est le duel, où un seul joueur est un adversaire.
   kDefenceOnly,
-  // Comme un monstre : défense, assistance, conduites et leur initiative.
+  // Défense, assistance, conduites et leur initiative.
   kFull,
+  // Le champ de bataille : chaque joueur se vise selon son camp, que le
+  // serveur dit acteur par acteur. Voir `PlayerStanceOf`.
+  kByCamp,
 };
 
 [[nodiscard]] PlayerTargeting PlayerTargetingOf(const MapMode& mode) noexcept;
+
+// LE CAMP D'UN JOUEUR AU CHAMP DE BATAILLE, vu de notre personnage.
+enum class BattleRelation : std::uint8_t {
+  // Le serveur n'a pas dit son camp, ou pas encore le nôtre.
+  kUnknown,
+  kAlly,
+  kEnemy,
+};
+
+// CE QUE L'IA PEUT FAIRE DE CE JOUEUR-CI.
+enum class PlayerStance : std::uint8_t {
+  // Jamais visé d'elle-même.
+  kNone,
+  // Riposte seulement.
+  kDefenceOnly,
+  // La pleine visée du PvP et du WoE : défense, assistance, et une initiative
+  // que seule une conduite « toujours » donne — « attaquer de lui-même » ne
+  // vise que des monstres.
+  kConducts,
+  // 🔴 COMME UN MONSTRE : défense, assistance, conduites, et l'initiative
+  // d'« attaquer de lui-même » quand aucune ligne ne le désigne. Mêmes règles
+  // de choix, de portée, d'engagement et de laisse.
+  kAsMonster,
+};
+
+// LA VISÉE D'UN JOUEUR, la carte précisée par son camp.
+//
+// 🔴 AU CHAMP DE BATAILLE, L'ADVERSAIRE SE VISE COMME UN MONSTRE : c'est le
+// seul endroit où chaque joueur porte un camp que le serveur nomme, et où
+// l'initiative ne peut donc pas tomber sur un coéquipier. Un joueur du camp
+// n'est jamais visé, même s'il frappe. Un joueur dont le camp n'est pas connu
+// — pas encore dit, ou hors du champ — n'est qu'en défense.
+[[nodiscard]] PlayerStance PlayerStanceOf(PlayerTargeting map, BattleRelation relation) noexcept;
 
 // LA GUILDE DU MAÎTRE EST ÉPARGNÉE là où la carte rend hostile « au-delà de la
 // guilde » — zone de siège, donjon GvG —, hors du champ de bataille, où les

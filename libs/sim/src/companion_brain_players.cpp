@@ -5,6 +5,7 @@
 #include <optional>
 #include <utility>
 
+#include "ro/sim/battlefield.h"
 #include "ro/sim/companion_ai.h"
 #include "ro/sim/companion_players.h"
 #include "ro/sim/world.h"
@@ -13,20 +14,40 @@
 
 namespace ro::sim {
 
+namespace {
+
+[[nodiscard]] bool StanceReadsConducts(PlayerStance stance) noexcept {
+  return stance == PlayerStance::kConducts || stance == PlayerStance::kAsMonster;
+}
+
+}  // namespace
+
+PlayerStance CompanionBrain::StanceOf(const Situation& s, const Actor& player) {
+  if (s.players != PlayerTargeting::kByCamp) {
+    return PlayerStanceOf(s.players, BattleRelation::kUnknown);
+  }
+  const Battlefield& field = s.world.battlefield();
+  const BattleRelation relation = field.IsEnemy(player.id)  ? BattleRelation::kEnemy
+                                  : field.IsAlly(player.id) ? BattleRelation::kAlly
+                                                            : BattleRelation::kUnknown;
+  return PlayerStanceOf(s.players, relation);
+}
+
 bool CompanionBrain::IsPlayerFoe(const Situation& s, const Actor& actor) const {
   // ⚠ LA VUE N'EST PAS JUGÉE ICI : elle borne un joueur comme un monstre, au
   // même endroit (le choix de la cible, le combat qui la perd au-delà de
   // `kCompanionSightCells`).
-  return s.players != PlayerTargeting::kNone && actor.kind == ActorKind::kPlayer &&
+  return actor.kind == ActorKind::kPlayer && StanceOf(s, actor) != PlayerStance::kNone &&
          actor.id != s.owner.id && CanBeTargeted(actor) &&
          !ShieldedPlayer(actor, s.side, s.settings.friends, s.facts.owner_guild_id, s.guild_spared);
 }
 
 std::optional<CompanionTactic> CompanionBrain::PlayerTacticOf(const Situation& s,
                                                               const Actor& player) const {
-  // Une conduite ne se lit que là où la visée des joueurs est pleine : en duel
-  // et en champ de bataille, seule la défense vaut.
-  if (s.players != PlayerTargeting::kFull) {
+  // Une conduite ne se lit que là où la visée des joueurs est pleine : en duel,
+  // et contre un joueur de camp inconnu au champ de bataille, seule la défense
+  // vaut.
+  if (!StanceReadsConducts(StanceOf(s, player))) {
     return std::nullopt;
   }
   const CompanionPlayerConduct* conduct = ConductFor(
@@ -41,7 +62,7 @@ bool CompanionBrain::IsRuleFoe(const Situation& s, const Actor& actor) const {
   if (actor.kind != ActorKind::kPlayer) {
     return IsRuleTarget(s, actor);
   }
-  if (s.players != PlayerTargeting::kFull || !IsPlayerFoe(s, actor) ||
+  if (!StanceReadsConducts(StanceOf(s, actor)) || !IsPlayerFoe(s, actor) ||
       !WithinCells(s.self_cell, StandingCell(actor), kCompanionSightCells)) {
     return false;
   }

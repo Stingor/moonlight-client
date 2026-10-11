@@ -236,21 +236,55 @@ struct CurrencyPool {
   return {};
 }
 
-[[nodiscard]] BarterCartCheck CheckWeight(const Barter& barter,
-                                          std::span<const BarterCartLine> cart,
-                                          const PlayerStatus& status) {
-  if (status.weight < 0 || status.max_weight < 0) {
-    return {};
+// Ce qu'une ligne change à la charge : l'article qui arrive, moins les devises
+// qui partent, chacune à la quantité payée.
+[[nodiscard]] std::int64_t LineLoadChange(const BarterItem& item, std::uint32_t amount,
+                                          const BarterUnitWeight& unit_weight) {
+  const auto bought = static_cast<std::int64_t>(amount);
+  std::int64_t change = static_cast<std::int64_t>(item.weight) * bought;
+  if (!unit_weight) {
+    return change;
   }
-  std::int64_t load = status.weight;
-  for (std::size_t line = 0; line < cart.size(); ++line) {
-    const BarterItem& item = *barter.FindItem(cart[line].shop_index);
-    load += static_cast<std::int64_t>(item.weight) * static_cast<std::int64_t>(cart[line].amount);
-    if (load > status.max_weight) {
-      return Refuse(BarterCartRefusal::kOverWeight, line, item.item_id);
+  for (const BarterCurrency& currency : item.currencies) {
+    const std::optional<std::uint32_t> unit = unit_weight(currency.item_id);
+    if (unit.has_value()) {
+      change -=
+          static_cast<std::int64_t>(*unit) * static_cast<std::int64_t>(currency.amount) * bought;
     }
   }
-  return {};
+  return change;
+}
+
+[[nodiscard]] BarterCartCheck CheckWeight(const Barter& barter,
+                                          std::span<const BarterCartLine> cart,
+                                          const PlayerStatus& status,
+                                          const BarterUnitWeight& unit_weight) {
+  if (status.weight < 0 || status.max_weight < 0 || cart.empty()) {
+    return {};
+  }
+  std::int64_t load_after = status.weight;
+  for (const BarterCartLine& line : cart) {
+    load_after += LineLoadChange(*barter.FindItem(line.shop_index), line.amount, unit_weight);
+  }
+  if (load_after <= status.max_weight) {
+    return {};
+  }
+  // Le panier déborde : on désigne la première ligne où le cumul passe la
+  // limite. Le cumul final valant `load_after`, il y en a toujours une.
+  std::size_t culprit = cart.size() - 1;
+  std::int64_t load = status.weight;
+  for (std::size_t line = 0; line < cart.size(); ++line) {
+    load += LineLoadChange(*barter.FindItem(cart[line].shop_index), cart[line].amount, unit_weight);
+    if (load > status.max_weight) {
+      culprit = line;
+      break;
+    }
+  }
+  BarterCartCheck check = Refuse(BarterCartRefusal::kOverWeight, culprit,
+                                 barter.FindItem(cart[culprit].shop_index)->item_id);
+  check.load_after_tenths = load_after;
+  check.max_load_tenths = status.max_weight;
+  return check;
 }
 
 [[nodiscard]] BarterCartCheck CheckZeny(const Barter& barter, std::span<const BarterCartLine> cart,
@@ -271,8 +305,8 @@ struct CurrencyPool {
 
 [[nodiscard]] BarterCartCheck CheckWholeCart(const Barter& barter,
                                              std::span<const BarterCartLine> cart,
-                                             const Inventory& inventory,
-                                             const PlayerStatus& status) {
+                                             const Inventory& inventory, const PlayerStatus& status,
+                                             const BarterUnitWeight& unit_weight) {
   // ⚠ DANS L'ORDRE, ET UN À UN : les contrôles suivants supposent que la forme
   // a tenu, chaque ligne désignant un article connu.
   const BarterCartCheck shape = CheckShape(barter, cart);
@@ -283,7 +317,7 @@ struct CurrencyPool {
   if (!lines.passed()) {
     return lines;
   }
-  const BarterCartCheck weight = CheckWeight(barter, cart, status);
+  const BarterCartCheck weight = CheckWeight(barter, cart, status, unit_weight);
   if (!weight.passed()) {
     return weight;
   }
@@ -430,13 +464,14 @@ BarterCartCheck CheckBarterCartShape(const Barter& barter) {
 }
 
 BarterCartCheck CheckBarterCart(const Barter& barter, const Inventory& inventory,
-                                const PlayerStatus& status) {
-  return CheckWholeCart(barter, barter.cart(), inventory, status);
+                                const PlayerStatus& status, const BarterUnitWeight& unit_weight) {
+  return CheckWholeCart(barter, barter.cart(), inventory, status, unit_weight);
 }
 
 BarterCartCheck CheckBarterAddition(const Barter& barter, std::uint32_t shop_index,
                                     std::uint32_t amount, const Inventory& inventory,
-                                    const PlayerStatus& status) {
+                                    const PlayerStatus& status,
+                                    const BarterUnitWeight& unit_weight) {
   std::vector<BarterCartLine> cart(barter.cart().begin(), barter.cart().end());
   const auto line = std::ranges::find_if(
       cart, [&](const BarterCartLine& entry) { return entry.shop_index == shop_index; });
@@ -457,7 +492,7 @@ BarterCartCheck CheckBarterAddition(const Barter& barter, std::uint32_t shop_ind
     line->amount = static_cast<std::uint32_t>(std::min<std::uint64_t>(
         std::uint64_t{line->amount} + amount, std::numeric_limits<std::uint32_t>::max()));
   }
-  return CheckWholeCart(barter, cart, inventory, status);
+  return CheckWholeCart(barter, cart, inventory, status, unit_weight);
 }
 
 BarterCurrencyHolding HoldBarterCurrency(const Inventory& inventory, std::uint32_t item_id,

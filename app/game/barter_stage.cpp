@@ -32,6 +32,16 @@ void Say(const TradeContext& context, const std::string& text, std::uint32_t col
   }
 }
 
+// LE POIDS D'UNE DEVISE, lu dans la table des items. Sans table, rien : le
+// contrôle garde alors les devises au sac, et le serveur tranche.
+ro::sim::BarterUnitWeight UnitWeightOf(const TradeContext& context) {
+  const ro::vfs::ItemProperties* properties = context.item_properties;
+  if (properties == nullptr || !properties->known()) {
+    return {};
+  }
+  return [properties](std::uint32_t item_id) { return properties->WeightTenthsOf(item_id); };
+}
+
 }  // namespace
 
 void BarterStage::StartSession() {
@@ -47,7 +57,7 @@ std::optional<TradeItemFocus> BarterStage::TakeDescribed() noexcept {
 }
 
 void BarterStage::Refuse(const ro::sim::BarterCartCheck& check, const TradeContext& context) {
-  Say(context, BarterRefusalText(check.refusal, context.items.NameOf(check.item_id), context.words),
+  Say(context, BarterCheckText(check, context.items.NameOf(check.item_id), context.words),
       kFailedColor);
 }
 
@@ -76,8 +86,8 @@ void BarterStage::Edit(const ro::ui::BarterCartEdit& edit, const TradeContext& c
                               : wanted > carted                             ? wanted - carted
                                                                             : 0;
   if (added > 0) {
-    const ro::sim::BarterCartCheck check =
-        ro::sim::CheckBarterAddition(barter_, index, added, inventory, status);
+    const ro::sim::BarterCartCheck check = ro::sim::CheckBarterAddition(
+        barter_, index, added, inventory, status, UnitWeightOf(context));
     if (!check.passed()) {
       Refuse(check, context);
       return;
@@ -103,7 +113,8 @@ void BarterStage::Exchange(const ro::ui::BarterWindowAction& answer, const Trade
     ro::sim::Barter trial = barter_;
     trial.ClearCart();
     static_cast<void>(trial.PutInCart(line.shop_index, static_cast<std::uint32_t>(line.amount)));
-    if (const ro::sim::BarterCartCheck check = ro::sim::CheckBarterCart(trial, inventory, status);
+    if (const ro::sim::BarterCartCheck check =
+            ro::sim::CheckBarterCart(trial, inventory, status, UnitWeightOf(context));
         !check.passed()) {
       Refuse(check, context);
       return;
@@ -128,7 +139,8 @@ void BarterStage::Exchange(const ro::ui::BarterWindowAction& answer, const Trade
     return;
   }
   // ⚠ REJUGÉ ICI : la fenêtre a montré un verdict d'une image de retard.
-  if (const ro::sim::BarterCartCheck check = ro::sim::CheckBarterCart(barter_, inventory, status);
+  if (const ro::sim::BarterCartCheck check =
+          ro::sim::CheckBarterCart(barter_, inventory, status, UnitWeightOf(context));
       !check.passed()) {
     Refuse(check, context);
     return;
@@ -244,7 +256,8 @@ void BarterStage::Advance(ro::ui::BarterWindowState& state,
                                          .status = world.player_status(),
                                          .words = context.words,
                                          .looks = looks,
-                                         .title = title});
+                                         .title = title,
+                                         .unit_weight = UnitWeightOf(context)});
 }
 
 }  // namespace moonclient

@@ -17,6 +17,7 @@
 #include "game/companion_ai_stage.h"
 #include "game/mail_stage.h"
 #include "game/quest_stage.h"
+#include "input/key_gate.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "world/click_action.h"
 
@@ -187,11 +188,12 @@ void PoseCaptured(ro::ui::HotkeyWindowState* hotkeys, Hotkeys* bindings, ActionR
   return true;
 }
 
-// Une touche de preset, fiche fermée comprise. Ni sur une répétition du
-// clavier, qui renverrait le lot, ni pendant une saisie.
+// Une touche de preset, fiche fermée comprise. Jamais sur une répétition du
+// clavier, qui renverrait le lot ; pendant une saisie, sur F1 à F12 seulement —
+// voir `PresetKeyLive`.
 void TriggerPreset(const KeyPress& to, const SDL_KeyboardEvent& key) {
   if (to.presets == nullptr || to.sheet == nullptr || to.link == nullptr || to.world == nullptr ||
-      key.repeat || to.text_input) {
+      key.repeat || !PresetKeyLive(to.text_input, key.key)) {
     return;
   }
   const Modifiers held = HeldIn(key);

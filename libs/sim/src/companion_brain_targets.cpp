@@ -97,6 +97,10 @@ std::optional<CompanionBrain::TargetPick> CompanionBrain::SelectTarget(const Sit
       refuse(TargetRefusal::kOwnSummon);
       continue;
     }
+    // L'ADVERSAIRE D'UN CHAMP DE BATAILLE se prend comme un monstre, y compris
+    // par « attaquer de lui-même ». Voir `PlayerStanceOf`.
+    const PlayerStance stance = rival ? StanceOf(s, actor) : PlayerStance::kNone;
+    const bool like_monster = monster || stance == PlayerStance::kAsMonster;
     // LA CONDUITE D'UN JOUEUR se lit comme la tactique d'un monstre.
     const std::optional<CompanionTactic> conduct =
         rival ? PlayerTacticOf(s, actor) : std::optional<CompanionTactic>();
@@ -135,11 +139,12 @@ std::optional<CompanionBrain::TargetPick> CompanionBrain::SelectTarget(const Sit
           return IsAttacking(actor, friend_actor->id, s.now_ms);
         });
     // ⚠ AIDER LE MAÎTRE CONTRE UN JOUEUR EST VOULU sous la pleine visée (PvP,
-    // WoE) : le maître a choisi son adversaire. En duel et en champ de bataille,
-    // seule la défense vaut.
-    const bool assisted = !defence_only && settings.assist_owner &&
-                          (monster || s.players == PlayerTargeting::kFull) &&
-                          IsAttacking(s.owner, actor_id, s.now_ms);
+    // WoE, adversaire d'un champ de bataille) : le maître a choisi son
+    // adversaire. En duel, seule la défense vaut.
+    const bool assisted =
+        !defence_only && settings.assist_owner &&
+        (monster || stance == PlayerStance::kConducts || stance == PlayerStance::kAsMonster) &&
+        IsAttacking(s.owner, actor_id, s.now_ms);
 
     // UNE LIGNE NE REMPLACE QUE L'INITIATIVE. La défense et l'assistance du
     // niveau 1 restent ; les déclencheurs « s'il attaque » d'une ligne défendent
@@ -180,14 +185,16 @@ std::optional<CompanionBrain::TargetPick> CompanionBrain::SelectTarget(const Sit
     } else if (assisted) {
       reason = CompanionAiReason::kAssistOwner;
     } else if (initiative_allowed &&
-               // ⚠ « ATTAQUER DE LUI-MÊME » NE VISE QUE DES MONSTRES : un joueur
-               // n'est pris d'initiative que par une ligne « toujours ».
-               (tactic != nullptr ? line_initiative : monster && settings.attack_on_own) &&
+               // ⚠ « ATTAQUER DE LUI-MÊME » NE VISE QUE CE QUI SE PREND COMME UN
+               // MONSTRE : ailleurs qu'au champ de bataille, un joueur n'est pris
+               // d'initiative que par une ligne « toujours ».
+               (tactic != nullptr ? line_initiative : like_monster && settings.attack_on_own) &&
                !SparedFor(s, actor, tactic)) {
       reason = CompanionAiReason::kOwnInitiative;
     }
     if (reason == CompanionAiReason::kNone) {
-      const bool wanted = tactic != nullptr ? line_initiative : monster && settings.attack_on_own;
+      const bool wanted =
+          tactic != nullptr ? line_initiative : like_monster && settings.attack_on_own;
       refuse(!wanted               ? TargetRefusal::kNoMotive
              : !initiative_allowed ? TargetRefusal::kInitiativeBarred
                                    : TargetRefusal::kSpared);

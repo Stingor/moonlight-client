@@ -16109,6 +16109,9 @@ tr: Clic en un mapa: la guía · Mayús+clic: su enlace en el chat
 fr: Cet item ne s'achète pas en buying store.
 tr: Este objeto no se puede comprar en un buying store.
 
+fr: Trop lourd : après l'échange, la charge serait de %s pour %s au plus.
+tr: Demasiado pesado: tras el intercambio, la carga sería de %s sobre %s como máximo.
+
 fr: Trop lourd : tout acheter mettrait le personnage en surcharge, et le serveur refuse.
 tr: Demasiado pesado: comprarlo todo sobrecargaría al personaje, y el servidor lo rechaza.
 

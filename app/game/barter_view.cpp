@@ -32,6 +32,15 @@ std::uint16_t RefineShown(std::uint32_t refine_level) {
       std::min<std::uint32_t>(refine_level, std::numeric_limits<std::uint16_t>::max()));
 }
 
+// Un poids en dixièmes, écrit en unités : « 7 », « 0.5 ».
+std::string WeightText(std::int64_t tenths) {
+  if (tenths % kWeightTenths == 0) {
+    return Printed("%lld", static_cast<long long>(tenths / kWeightTenths));
+  }
+  return Printed("%lld.%lld", static_cast<long long>(tenths / kWeightTenths),
+                 static_cast<long long>(tenths % kWeightTenths));
+}
+
 // Le mot du jeu, ou le nôtre quand l'installation ne le porte pas.
 std::string GameOr(const ro::vfs::ItemWords& words, TradeWord word, std::string fallback) {
   std::string said(ro::vfs::TradeText(words, word));
@@ -130,13 +139,26 @@ std::string BarterRefusalText(BarterCartRefusal refusal, std::string_view item_n
   return {};
 }
 
+std::string BarterCheckText(const ro::sim::BarterCartCheck& check, std::string_view item_name,
+                            const ro::vfs::ItemWords& words) {
+  if (check.refusal == BarterCartRefusal::kOverWeight && check.max_load_tenths > 0) {
+    return Printed(ro::core::Tr("Trop lourd : après l'échange, la charge serait de %s pour %s au "
+                                "plus."),
+                   WeightText(check.load_after_tenths).c_str(),
+                   WeightText(check.max_load_tenths).c_str());
+  }
+  return BarterRefusalText(check.refusal, item_name, words);
+}
+
 // ── LA PLUS GRANDE QUANTITÉ ─────────────────────────────────────────────────
 
 std::uint32_t BarterMostAddable(const ro::sim::Barter& barter, const ro::sim::BarterItem& item,
                                 const ro::sim::Inventory& inventory,
-                                const ro::sim::PlayerStatus& status) {
+                                const ro::sim::PlayerStatus& status,
+                                const ro::sim::BarterUnitWeight& unit_weight) {
   const auto passes = [&](std::uint32_t amount) {
-    return ro::sim::CheckBarterAddition(barter, item.shop_index, amount, inventory, status)
+    return ro::sim::CheckBarterAddition(barter, item.shop_index, amount, inventory, status,
+                                        unit_weight)
         .passed();
   };
   if (!passes(1)) {
@@ -236,12 +258,13 @@ void BarterViewComposer::ComposeOffers(const BarterScene& scene) {
                                    : static_cast<std::int64_t>(barter.RemainingStock(item));
     offer.weight_tenths = item.weight;
     offer.zeny = item.zeny;
-    offer.most = static_cast<int>(BarterMostAddable(barter, item, scene.inventory, scene.status));
+    offer.most = static_cast<int>(
+        BarterMostAddable(barter, item, scene.inventory, scene.status, scene.unit_weight));
     if (offer.most == 0) {
-      const ro::sim::BarterCartCheck check =
-          ro::sim::CheckBarterAddition(barter, item.shop_index, 1, scene.inventory, scene.status);
+      const ro::sim::BarterCartCheck check = ro::sim::CheckBarterAddition(
+          barter, item.shop_index, 1, scene.inventory, scene.status, scene.unit_weight);
       refusals_.push_back(
-          BarterRefusalText(check.refusal, scene.looks.name_of(check.item_id, 0), scene.words));
+          BarterCheckText(check, scene.looks.name_of(check.item_id, 0), scene.words));
     } else {
       refusals_.emplace_back();
     }
@@ -271,7 +294,7 @@ void BarterViewComposer::ComposeCart(const BarterScene& scene) {
     const ro::sim::BarterItem* item = barter.FindItem(line.shop_index);
     std::uint32_t more = 0;
     if (item != nullptr) {
-      more = BarterMostAddable(barter, *item, scene.inventory, scene.status);
+      more = BarterMostAddable(barter, *item, scene.inventory, scene.status, scene.unit_weight);
       weight_tenths += static_cast<std::int64_t>(item->weight) * line.amount;
     }
     const std::uint64_t most = std::uint64_t{line.amount} + more;
@@ -291,10 +314,9 @@ void BarterViewComposer::ComposeCart(const BarterScene& scene) {
     cart_weight_ =
         Printed(ro::core::Tr("+%lld poids"), static_cast<long long>(weight_tenths / kWeightTenths));
     const ro::sim::BarterCartCheck check =
-        ro::sim::CheckBarterCart(barter, scene.inventory, scene.status);
+        ro::sim::CheckBarterCart(barter, scene.inventory, scene.status, scene.unit_weight);
     if (!check.passed()) {
-      blocker_text_ =
-          BarterRefusalText(check.refusal, scene.looks.name_of(check.item_id, 0), scene.words);
+      blocker_text_ = BarterCheckText(check, scene.looks.name_of(check.item_id, 0), scene.words);
       blockers_.push_back(blocker_text_);
     }
   }

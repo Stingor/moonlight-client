@@ -45,6 +45,16 @@ struct BarterResultSaying {
                                             std::string_view item_name,
                                             const ro::vfs::ItemWords& words);
 
+// LE MÊME, DIT D'UN CONTRÔLE ENTIER : un refus de poids y donne ses chiffres.
+//
+// 🔴 « TROP LOURD : », PUIS LA CHARGE QU'AURAIT LE PERSONNAGE APRÈS L'ÉCHANGE ET
+// CE QU'IL PEUT PORTER. La phrase du jeu ne dit pas de combien, et le joueur qui
+// paie en items lourds ne devine pas que le client a déjà retranché ce qui part :
+// les deux nombres lui disent ce qu'il doit déposer.
+[[nodiscard]] std::string BarterCheckText(const ro::sim::BarterCartCheck& check,
+                                          std::string_view item_name,
+                                          const ro::vfs::ItemWords& words);
+
 // COMBIEN DE CET ARTICLE PEUVENT ENCORE ALLER AU PANIER sans qu'il soit refusé :
 // la plus grande quantité que `CheckBarterAddition` accepte. Zéro si la première
 // est déjà refusée.
@@ -53,10 +63,15 @@ struct BarterResultSaying {
 // plafond, poids, devises, zeny), et la borne de départ — stock restant,
 // plafond de ligne, ce que les devises tenues permettent — est au-dessus de la
 // réponse. Deux essais le plus souvent, quinze au pire.
+//
+// ⚠ LE POIDS SEUL PEUT DÉCROÎTRE, quand l'article pèse moins que ses devises.
+// Un personnage déjà en surcharge se voit alors refuser la première unité, même
+// si un lot plus grand le soulagerait assez : il dépose d'abord.
 [[nodiscard]] std::uint32_t BarterMostAddable(const ro::sim::Barter& barter,
                                               const ro::sim::BarterItem& item,
                                               const ro::sim::Inventory& inventory,
-                                              const ro::sim::PlayerStatus& status);
+                                              const ro::sim::PlayerStatus& status,
+                                              const ro::sim::BarterUnitWeight& unit_weight = {});
 
 // LES NOMS ET LES ICÔNES, qu'`app` tire de l'installation. Un nom porte le
 // raffinement qu'on lui passe (« +7 Knife ») ; zéro n'en écrit pas.
@@ -73,6 +88,9 @@ struct BarterScene {
   const ro::vfs::ItemWords& words;
   const BarterLooks& looks;
   std::string_view title;
+  // Le poids d'une unité de devise, tiré de la table des items. Vide : rien ne
+  // se retranche, et le poids se juge comme si les devises restaient au sac.
+  ro::sim::BarterUnitWeight unit_weight;
 };
 
 // La vue d'une image, et ce vers quoi elle pointe.

@@ -27,7 +27,7 @@ bool GameOnlyKey(SDL_Keycode key, SDL_Keymod held) {
   if (IsModifierKey(key)) {
     return false;
   }
-  if (key >= SDLK_F1 && key <= SDLK_F12) {
+  if (FunctionKey(key)) {
     return true;
   }
   if (key == SDLK_INSERT) {
@@ -37,6 +37,10 @@ bool GameOnlyKey(SDL_Keycode key, SDL_Keymod held) {
   // et écrit des caractères, il ne déclenche pas de raccourci.
   return (held & SDL_KMOD_ALT) != 0 && (held & SDL_KMOD_CTRL) == 0;
 }
+
+bool FunctionKey(SDL_Keycode key) { return key >= SDLK_F1 && key <= SDLK_F12; }
+
+bool PresetKeyLive(bool text_input, SDL_Keycode key) { return !text_input || FunctionKey(key); }
 
 bool ChatBarKeepsKey(SDL_Keycode key, SDL_Keymod held) {
   if (key == SDLK_RETURN || key == SDLK_KP_ENTER || key == SDLK_ESCAPE) {

@@ -39,6 +39,20 @@ namespace moonclient {
 // rendrait le champ inutilisable.
 [[nodiscard]] bool GameOnlyKey(SDL_Keycode key, SDL_Keymod held);
 
+// UNE TOUCHE DE FONCTION, de F1 à F12, quels que soient les modificateurs tenus.
+[[nodiscard]] bool FunctionKey(SDL_Keycode key);
+
+// UN PRESET D'ÉQUIPEMENT SE REMET-IL PENDANT UNE SAISIE ?
+//
+// 🔴 SUR UNE TOUCHE DE FONCTION, OUI : F1 à F12 appartiennent au jeu même quand
+// la barre de discussion a le clavier, et c'est vrai de TOUT ce que le joueur y
+// a lié — une case de barre comme un preset. Une touche qui agit ou non selon
+// l'endroit où l'on a cliqué en dernier se lit « mon raccourci est cassé ».
+//
+// ⚠ ALT ET INSER, NON : leur passage sert les raccourcis de fenêtres de la
+// table, pas un changement d'équipement au milieu d'une phrase.
+[[nodiscard]] bool PresetKeyLive(bool text_input, SDL_Keycode key);
+
 // LA BARRE DE CONVERSATION RÉCLAME LES FRAPPES SANS AVOIR LE CLAVIER.
 //
 // 🔴 C'EST L'ÉTAT INTERMÉDIAIRE DU BATTLE MODE : la barre est dépliée, le

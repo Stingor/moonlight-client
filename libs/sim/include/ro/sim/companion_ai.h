@@ -449,6 +449,8 @@ class CompanionBrain {
   // `ShieldedPlayer`). La vue et le rang « Ignorer » de sa conduite se jugent à
   // part.
   [[nodiscard]] bool IsPlayerFoe(const Situation& s, const Actor& actor) const;
+  // CE QUE LA CARTE, ET AU CHAMP DE BATAILLE SON CAMP, PERMETTENT SUR CE JOUEUR.
+  [[nodiscard]] static PlayerStance StanceOf(const Situation& s, const Actor& player);
   // SA CONDUITE, en tactique ; vide sans ligne, et hors de la pleine visée.
   [[nodiscard]] std::optional<CompanionTactic> PlayerTacticOf(const Situation& s,
                                                               const Actor& player) const;

@@ -138,7 +138,7 @@ struct KeyPress {
   // `sheet` —, et celles qui les remettent, fiche fermée comprise.
   PresetView* presets = nullptr;
   // Un champ de saisie a le clavier : Alt et F1 à F12 le traversent pour la
-  // table des raccourcis, pas pour remettre un preset.
+  // table des raccourcis, et F1 à F12 seules pour remettre un preset.
   bool text_input = false;
   // Le mode Ciblage : ses quatre raccourcis, Échap, et les sorts ciblés armés
   // au clavier.

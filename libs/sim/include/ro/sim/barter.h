@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <span>
 #include <vector>
@@ -276,9 +277,18 @@ struct BarterCartCheck {
   std::size_t cart_line = 0;
   // L'objet en cause : l'article, ou la DEVISE qui manque.
   std::uint32_t item_id = 0;
+  // Pour un refus de poids seulement, en dixièmes : la charge qu'aurait le
+  // personnage après l'échange, devises retranchées, et ce qu'il peut porter.
+  std::int64_t load_after_tenths = 0;
+  std::int64_t max_load_tenths = 0;
 
   [[nodiscard]] bool passed() const noexcept { return refusal == BarterCartRefusal::kNone; }
 };
+
+// LE POIDS D'UNE UNITÉ D'UN ITEM, en dixièmes, tel que la table des items du
+// serveur le donne ; rien quand l'item n'y figure pas. Le fil ne dit pas le
+// poids d'une devise : c'est `app` qui le lit dans l'installation.
+using BarterUnitWeight = std::function<std::optional<std::uint32_t>(std::uint32_t item_id)>;
 
 // Ce que le serveur rejetterait EN SILENCE, sans rien d'autre que le troc : troc
 // fermé, panier vide ou trop long, article inconnu, quantité nulle, même objet
@@ -287,10 +297,13 @@ struct BarterCartCheck {
 
 // Tout le panier, contre le sac et la fiche du joueur.
 //
-// ⚠ LE POIDS SE COMPTE COMME LE CLIENT D'ORIGINE : charge courante plus poids du
-// panier, sans retrancher les devises qui partent. Le serveur, lui, les
-// retranche : il accepterait donc un échange lourd contre léger que ce contrôle
-// refuse, à la limite de charge. Un poids, un zeny inconnus ne refusent rien.
+// 🔴 LE POIDS SE COMPTE COMME LE SERVEUR LE COMPTE : charge courante, plus le
+// poids du panier, MOINS celui des devises qui partent, à la quantité payée. Le
+// panier entier se juge d'un bloc — un échange lourd contre léger passe à la
+// limite de charge, comme au serveur — et la ligne désignée est la première où
+// le cumul déborde. Une devise que `unit_weight` ne pèse pas ne retranche rien :
+// le contrôle reste du côté du refus, et le serveur garde le dernier mot. Un
+// poids, un zeny inconnus ne refusent rien.
 //
 // ⚠ LES DEVISES SE COMPTENT COMME LE SERVEUR LES CHERCHE, besoins de toutes les
 // lignes cumulés, sans les objets portés ni les favoris : une devise qui
@@ -301,13 +314,15 @@ struct BarterCartCheck {
 // exemplaire raffiné qu'une ligne suivante exigeait. Il le dit alors par son
 // code.
 [[nodiscard]] BarterCartCheck CheckBarterCart(const Barter& barter, const Inventory& inventory,
-                                              const PlayerStatus& status);
+                                              const PlayerStatus& status,
+                                              const BarterUnitWeight& unit_weight = {});
 
 // Le panier tel qu'il serait après l'ajout de `amount` exemplaires de l'article.
 // C'est ce que le client d'origine demande avant de mettre au panier.
 [[nodiscard]] BarterCartCheck CheckBarterAddition(const Barter& barter, std::uint32_t shop_index,
                                                   std::uint32_t amount, const Inventory& inventory,
-                                                  const PlayerStatus& status);
+                                                  const PlayerStatus& status,
+                                                  const BarterUnitWeight& unit_weight = {});
 
 // ── CE QUE LE JOUEUR TIENT D'UNE DEVISE ─────────────────────────────────────
 //

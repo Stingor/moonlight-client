@@ -63,8 +63,32 @@ PlayerTargeting PlayerTargetingOf(const MapMode& mode) noexcept {
   if (!IsVersusMap(mode)) {
     return PlayerTargeting::kNone;
   }
-  return IsDuelMap(mode) || mode.battlefield ? PlayerTargeting::kDefenceOnly
-                                             : PlayerTargeting::kFull;
+  if (mode.battlefield) {
+    return PlayerTargeting::kByCamp;
+  }
+  return IsDuelMap(mode) ? PlayerTargeting::kDefenceOnly : PlayerTargeting::kFull;
+}
+
+PlayerStance PlayerStanceOf(PlayerTargeting map, BattleRelation relation) noexcept {
+  switch (map) {
+    case PlayerTargeting::kNone:
+      return PlayerStance::kNone;
+    case PlayerTargeting::kDefenceOnly:
+      return PlayerStance::kDefenceOnly;
+    case PlayerTargeting::kFull:
+      return PlayerStance::kConducts;
+    case PlayerTargeting::kByCamp:
+      switch (relation) {
+        case BattleRelation::kEnemy:
+          return PlayerStance::kAsMonster;
+        case BattleRelation::kAlly:
+          return PlayerStance::kNone;
+        case BattleRelation::kUnknown:
+          return PlayerStance::kDefenceOnly;
+      }
+      return PlayerStance::kNone;
+  }
+  return PlayerStance::kNone;
 }
 
 bool OwnerGuildSpared(const MapMode& mode) noexcept {

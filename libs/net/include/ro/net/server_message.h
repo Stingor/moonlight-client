@@ -30,6 +30,10 @@ namespace ro::net {
 // 0x0291 seulement, les plafonds du tribut d'expérience à la guilde (« EXP de
 // contribution »).
 //
+// ⚠ LA BARRE DE SAISIE NE S'OUVRE PAS : un message par numéro s'écrit dans la
+// conversation et rien d'autre. La déplier à chaque annonce volerait le clavier
+// au joueur en pleine marche ou en plein combat.
+//
 // ⚠ UN NUMÉRO QUE LA TABLE NE PORTE PAS N'ÉCRIT RIEN : la trame est `kIgnored`
 // et le journal le dit. Inventer un texte ferait lire au joueur une phrase que
 // le serveur n'a jamais voulue.
