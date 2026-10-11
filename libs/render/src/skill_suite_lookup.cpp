@@ -48,6 +48,12 @@ std::optional<glm::vec3> SkillSuiteAimPoint(const SkillSuiteStep& step,
       return *caster + glm::vec3(std::cos(degrees) * step.aim_ring_radius, 0.0F,
                                  -std::sin(degrees) * step.aim_ring_radius);
     }
+    case SkillSuiteAim::kBeyondTarget:
+      // Sans lanceur, pas de sens du tir : l'autre bout, comme par défaut.
+      if (!caster.has_value()) {
+        return other_end;
+      }
+      return target + (target - *caster);
   }
   return other_end;
 }

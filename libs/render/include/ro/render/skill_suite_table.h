@@ -68,6 +68,10 @@ enum class SkillSuiteAim : std::uint8_t {
   kCaster,
   // Un point de l'anneau centré sur le lanceur, l'angle tiré dans un arc.
   kCasterRing,
+  // AU-DELÀ DE LA CIBLE, dans le sens du tir : la cible plus l'écart qui la
+  // sépare du lanceur. Ce qui naît sur la cible pointe alors à l'opposé du
+  // lanceur, comme un trait qui la traverse.
+  kBeyondTarget,
 };
 
 // LE RÉGLAGE DES EFFETS ALLÉGÉS (`/mineffect`) choisit parfois l'effet : une
