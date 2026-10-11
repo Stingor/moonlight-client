@@ -306,13 +306,34 @@ struct StatBarLook {
   // pleine et arrondie le recouvrait.
   ImU32 text_color = IM_COL32_WHITE;
   ImU32 border_color = IM_COL32(0, 0, 0, 160);
+
+  // LE DÉCALAGE DU TEXTE depuis le centre de la jauge, EN PART DE SA TAILLE :
+  // la largeur pour `text_shift_x`, la hauteur pour `text_shift_y`. Zéro le
+  // laisse au centre ; un pousse d'une largeur entière vers la droite (ou d'une
+  // hauteur vers le bas).
+  //
+  // 🔴 UNE PART ET NON DES PIXELS : le texte suit la jauge qu'on retaille, et
+  // l'échelle du HUD avec elle, sans qu'aucun calcul ne s'en charge à part.
+  float text_shift_x = 0.0F;
+  float text_shift_y = 0.0F;
 };
+
+// Jusqu'où le texte se décale, en tailles de jauge, de part et d'autre : assez
+// pour le poser à côté d'une jauge étroite, pas assez pour le perdre à l'écran.
+inline constexpr float kLargestTextShiftShare = 2.0F;
+
+// LE DÉCALAGE DU TEXTE EN PIXELS pour une jauge de `size` pixels à l'écran,
+// borné à `kLargestTextShiftShare` : le fichier de réglages s'écrit à la main.
+[[nodiscard]] ImVec2 StatBarTextShift(const StatBarLook& look, ImVec2 size);
 
 // RECOPIE LE STYLE D'UNE JAUGE SUR LES SIX AUTRES.
 //
 // 🔴 LE STYLE, ET NON L'IDENTITÉ. Ce qui part : ce qui décrit une MANIÈRE de
 // dessiner — le texte, le fond, le filet, le relief, l'arrondi. Ce qui reste à
-// chacune : sa place, sa visibilité, sa FORME, sa COULEUR et son SENS. Recopier
+// chacune : sa place — celle de son texte comprise —, sa visibilité, sa FORME,
+// sa COULEUR et son SENS. Le décalage du texte reste parce qu'il se règle
+// contre la forme : celui qui sort le texte d'un orbe le jetterait loin d'une
+// barre plate. Recopier
 // la forme mettrait six orbes d'un clic, ce qui détruit précisément la
 // disposition que les formes servent à bâtir ; recopier la couleur obligerait à
 // lire un chiffre pour savoir quelle jauge on regarde.

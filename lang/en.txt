@@ -16314,3 +16314,24 @@ tr: Character experience reaches max, You can no longer accumulate Guild EXP
 
 fr: Votre pet a été nourri. %s (il en reste %d)
 tr: Your pet has been fed. %s (%d) remaining
+
+fr: Aimanter les barres entre elles
+tr: Snap bars to each other
+
+fr: Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde le dernier mot.
+tr: The edges of a bar being moved line up with those of the other shown bars, or join them end to end. The grid, when it snaps, has the last word.
+
+fr: Pose cette barre au milieu de la largeur de l'écran, à la même hauteur. Les autres barres ne bougent pas.
+tr: Places this bar in the middle of the screen's width, at the same height. The other bars do not move.
+
+fr: Décalage du texte, horizontal
+tr: Text offset, horizontal
+
+fr: En largeurs de la jauge : zéro laisse le texte au centre, 1 le pousse d'une largeur entière vers la droite, -1 vers la gauche.
+tr: In gauge widths: zero keeps the text centered, 1 pushes it one full width to the right, -1 to the left.
+
+fr: Décalage du texte, vertical
+tr: Text offset, vertical
+
+fr: En hauteurs de la jauge : zéro laisse le texte au centre, 1 le pousse d'une hauteur entière vers le bas, -1 vers le haut.
+tr: In gauge heights: zero keeps the text centered, 1 pushes it one full height down, -1 up.

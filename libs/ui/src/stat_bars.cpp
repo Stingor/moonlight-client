@@ -503,6 +503,13 @@ std::array<StatBarLook, kStatBarCount> DefaultStatBars() {
   return bars;
 }
 
+ImVec2 StatBarTextShift(const StatBarLook& look, ImVec2 size) {
+  const auto bounded = [](float share) {
+    return std::clamp(share, -kLargestTextShiftShare, kLargestTextShiftShare);
+  };
+  return ImVec2(bounded(look.text_shift_x) * size.x, bounded(look.text_shift_y) * size.y);
+}
+
 void CopyStatBarStyle(std::array<StatBarLook, kStatBarCount>& bars, std::size_t from) {
   if (from >= bars.size()) {
     return;
@@ -767,8 +774,13 @@ void DrawStatBars(const StatBarValues& values, const StatBarWarnings& warnings,
 
         const std::string caption = StatBarCaption(bar, value, mine.text, mine.label);
         if (!caption.empty()) {
-          PaintCentered(*into, top_left, bottom_right, caption.c_str(), mine.font_pixels,
-                        mine.text_color);
+          const ImVec2 shift = StatBarTextShift(mine, size);
+          // ⚠ DÉCOUPÉ À L'ÉCRAN ET NON AU CADRE : un texte décalé sort de la jauge.
+          into->PushClipRectFullScreen();
+          PaintCentered(*into, ImVec2(top_left.x + shift.x, top_left.y + shift.y),
+                        ImVec2(bottom_right.x + shift.x, bottom_right.y + shift.y), caption.c_str(),
+                        mine.font_pixels, mine.text_color);
+          into->PopClipRect();
         }
       }
     }

@@ -16314,3 +16314,24 @@ tr: La experiencia del personaje está al máximo: ya no puedes acumular experie
 
 fr: Votre pet a été nourri. %s (il en reste %d)
 tr: Tu mascota ha sido alimentada. %s (quedan %d)
+
+fr: Aimanter les barres entre elles
+tr: Imantar las barras entre sí
+
+fr: Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde le dernier mot.
+tr: Los bordes de una barra que se mueve se alinean con los de las demás barras mostradas, o se pegan a ellas uno tras otro. La cuadrícula, cuando imanta, tiene la última palabra.
+
+fr: Pose cette barre au milieu de la largeur de l'écran, à la même hauteur. Les autres barres ne bougent pas.
+tr: Coloca esta barra en el centro del ancho de la pantalla, a la misma altura. Las demás barras no se mueven.
+
+fr: Décalage du texte, horizontal
+tr: Desplazamiento del texto, horizontal
+
+fr: En largeurs de la jauge : zéro laisse le texte au centre, 1 le pousse d'une largeur entière vers la droite, -1 vers la gauche.
+tr: En anchos del indicador: cero deja el texto en el centro, 1 lo empuja un ancho entero a la derecha, -1 a la izquierda.
+
+fr: Décalage du texte, vertical
+tr: Desplazamiento del texto, vertical
+
+fr: En hauteurs de la jauge : zéro laisse le texte au centre, 1 le pousse d'une hauteur entière vers le bas, -1 vers le haut.
+tr: En altos del indicador: cero deja el texto en el centro, 1 lo empuja un alto entero hacia abajo, -1 hacia arriba.

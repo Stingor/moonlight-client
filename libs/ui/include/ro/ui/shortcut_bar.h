@@ -10,6 +10,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/hud_frame.h"
 #include "ro/ui/skin_art.h"
 
 namespace ro::ui {
@@ -353,6 +354,10 @@ struct ShortcutBarsLayout {
   // DÉPLACER la barre. Déverrouillée, une barre se saisit de n'importe où — donc
   // ses cases deviennent inertes, sans quoi il n'y aurait rien à attraper.
   bool locked = true;
+  // LA BARRE QU'ON TRAÎNE S'ACCROCHE-T-ELLE AUX AUTRES ? Ses bords se posent sur
+  // ceux des barres affichées — alignés, ou bout à bout. Le même aimant que les
+  // jauges entre elles, et la grille garde le dernier mot quand elle aimante.
+  bool sticky = true;
 };
 
 // CE QU'UN GLISSER PORTE ENTRE DEUX CASES.
@@ -433,5 +438,27 @@ inline constexpr const char* kShortcutBarId = "shortcut_bar";
 [[nodiscard]] ShortcutBarsAction DrawShortcutBars(const ShortcutBarsLayout& layout,
                                                   std::span<const ShortcutSlotView> slots,
                                                   const SkinArt& art);
+
+// ── LA PLACE D'UNE BARRE ────────────────────────────────────────────────────
+//
+// ⚠ LA POSITION RESTE CELLE D'IMGUI, que le placeur des fenêtres retient : ces
+// gestes l'écrivent comme la souris l'écrirait, et rien d'autre ne la garde.
+
+// Le bord gauche qui centre une barre de `bar_width` sur l'écran donné. Pure.
+[[nodiscard]] float CenteredBarLeft(float screen_left, float screen_width, float bar_width);
+
+// La place d'une barre traînée en `at`, accrochée à ses sœurs AFFICHÉES : même
+// bord, ou bout à bout, dans le rayon d'aimantation des cadres de HUD. Pure.
+[[nodiscard]] ImVec2 SnappedAmongBars(ImVec2 at, ImVec2 size, const HudSiblings& bars);
+
+// Accroche la barre qu'on traîne à ses sœurs, quand `layout.sticky` le veut.
+//
+// 🔴 À APPELER AVANT `SnapMovingWindow`, comme le cadre de HUD aimante ses frères
+// avant la grille : une grille aimantée garde ainsi le dernier mot.
+void SnapMovingShortcutBar(const ShortcutBarsLayout& layout);
+
+// Centre la barre `bar` sur la largeur de l'écran, à la même hauteur. Les autres
+// ne bougent pas. Sans effet tant que la barre n'a jamais été dessinée.
+void CenterShortcutBar(std::size_t bar);
 
 }  // namespace ro::ui

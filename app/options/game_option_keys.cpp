@@ -305,6 +305,7 @@ constexpr Language kLanguages[] = {
 // disposition d'origine, sans que rien ne le dise.
 constexpr const char* kShortcutBarKeys = "bar%zu_%s";
 constexpr const char* kShortcutShowKeysKey = "bars_keys";
+constexpr const char* kShortcutStickyKey = "bars_magnetized";
 
 [[nodiscard]] std::string BarKey(std::size_t bar, const char* what) {
   std::array<char, 48> text{};
@@ -325,6 +326,7 @@ void GameOptions::DeclareShortcutBars(SettingsFile& into) {
   // lecture et l'écriture parcourent la même table, donc elles ne peuvent pas
   // diverger. Voir `settings_file.h`.
   into.Declare(kShortcutShowKeysKey, &shortcut_bars_.show_keys);
+  into.Declare(kShortcutStickyKey, &shortcut_bars_.sticky);
   for (std::size_t bar = 0; bar < ro::ui::kShortcutBarCount; ++bar) {
     ro::ui::ShortcutBarLayout& look = shortcut_bars_.bars[bar];
     into.Declare(BarKey(bar, "shown"), &look.shown);
@@ -461,6 +463,8 @@ void GameOptions::DeclareStatBars(SettingsFile& into) {
     into.Declare(StatBarKey(bar, "rule"), &look.border);
     into.Declare(StatBarKey(bar, "background"), &look.background);
     into.Declare(StatBarKey(bar, "text_color"), &look.text_color);
+    into.Declare(StatBarKey(bar, "text_offset_x"), &look.text_shift_x);
+    into.Declare(StatBarKey(bar, "text_offset_y"), &look.text_shift_y);
     into.Declare(StatBarKey(bar, "rule_color"), &look.border_color);
     into.Declare(StatBarKey(bar, "x"), &look.rect.x);
     into.Declare(StatBarKey(bar, "y"), &look.rect.y);

@@ -2,10 +2,10 @@
 //
 // ⚠ À PART DU CATALOGUE ET DES BARRES DE RACCOURCIS, et pour la même raison
 // qu'elles : ceci est une BOUCLE, pas une liste de littéraux qu'on copie l'un
-// sur l'autre. Les sept jauges portent les mêmes seize réglages.
+// sur l'autre. Les sept jauges portent les mêmes dix-huit réglages.
 //
-// 🔴 ET UN ONGLET CHACUNE, PARCE QUE L'APPARENCE EST DEVENUE GRANULAIRE. Seize
-// réglages fois sept font cent douze lignes qui se ressemblent toutes :
+// 🔴 ET UN ONGLET CHACUNE, PARCE QUE L'APPARENCE EST DEVENUE GRANULAIRE. Dix-huit
+// réglages fois sept font cent vingt-six lignes qui se ressemblent toutes :
 // le joueur y chercherait « le fond de la jauge de magie » en faisant défiler,
 // et en comptant. On ne compose donc que les lignes de l'onglet qu'il regarde —
 // exactement le dispositif des huit barres de raccourcis, et il était déjà là.
@@ -104,7 +104,7 @@ void GameOptions::BuildStatBarShared() {
   }
 }
 
-// LES SEIZE RÉGLAGES D'UNE JAUGE.
+// LES DIX-HUIT RÉGLAGES D'UNE JAUGE.
 //
 // 🔴 CE QUI NE S'APPLIQUE PAS À LA FORME CHOISIE EST GRISÉ, JAMAIS RETIRÉ. Un
 // réglage qui disparaît quand on change de forme fait sauter la mise en page, et
@@ -280,6 +280,31 @@ void GameOptions::BuildStatBarRows(int shown_bar) {
                      .color = look.text_color,
                      .indented = true,
                      .disabled = off || mute});
+  // ⚠ EN TAILLES DE JAUGE, ET NON EN PIXELS : le texte suit la jauge qu'on
+  // retaille. Voir `StatBarLook::text_shift_x`.
+  push(OptionRowView{.id = StatBarRow(bar, StatBarField::kTextShiftX),
+                     .label = Tr("Décalage du texte, horizontal"),
+                     .help = Tr("En largeurs de la jauge : zéro laisse le texte au centre, 1 le "
+                                "pousse d'une largeur entière vers la droite, -1 vers la "
+                                "gauche."),
+                     .kind = OptionKind::kSlider,
+                     .value = look.text_shift_x,
+                     .lowest = -ro::ui::kLargestTextShiftShare,
+                     .highest = ro::ui::kLargestTextShiftShare,
+                     .format = "%+.2f",
+                     .indented = true,
+                     .disabled = off || mute});
+  push(OptionRowView{.id = StatBarRow(bar, StatBarField::kTextShiftY),
+                     .label = Tr("Décalage du texte, vertical"),
+                     .help = Tr("En hauteurs de la jauge : zéro laisse le texte au centre, 1 le "
+                                "pousse d'une hauteur entière vers le bas, -1 vers le haut."),
+                     .kind = OptionKind::kSlider,
+                     .value = look.text_shift_y,
+                     .lowest = -ro::ui::kLargestTextShiftShare,
+                     .highest = ro::ui::kLargestTextShiftShare,
+                     .format = "%+.2f",
+                     .indented = true,
+                     .disabled = off || mute});
 
   // ── CE QUI N'APPARTIENT QU'À UNE JAUGE ────────────────────────────────────
   //
@@ -382,6 +407,12 @@ bool GameOptions::ChangeStatBar(const ro::ui::OptionsWindowAction& asked) {
       break;
     case StatBarField::kTextColor:
       look.text_color = asked.color;
+      break;
+    case StatBarField::kTextShiftX:
+      look.text_shift_x = asked.value;
+      break;
+    case StatBarField::kTextShiftY:
+      look.text_shift_y = asked.value;
       break;
     case StatBarField::kCopyLook:
       // ⚠ LE STYLE SEUL. Voir `CopyStatBarStyle`, qui dit ce qui part et ce qui

@@ -1,4 +1,4 @@
-// LES RANGÉES DES BARRES DE RACCOURCIS : dix-neuf par barre, toutes composées.
+// LES RANGÉES DES BARRES DE RACCOURCIS : vingt par barre, toutes composées.
 //
 // ⚠ À PART DU CATALOGUE D'À CÔTÉ, et pas pour la longueur : celui-là est une
 // liste de littéraux qu'on copie l'un sur l'autre, celui-ci est une BOUCLE. Les
@@ -6,8 +6,8 @@
 // cinquante occasions de se tromper de numéro, et autant de plus le jour où une
 // neuvième s'ajoute.
 //
-// 🔴 UNE BARRE À LA FOIS, ET C'EST LA SECTION QUI LE DEMANDE. Huit fois dix-neuf
-// font cent cinquante-deux lignes qui se ressemblent toutes : le joueur y
+// 🔴 UNE BARRE À LA FOIS, ET C'EST LA SECTION QUI LE DEMANDE. Huit fois vingt
+// font cent soixante lignes qui se ressemblent toutes : le joueur y
 // chercherait « la taille des cases de la barre 5 » en faisant défiler, et en
 // comptant. La section porte donc une seconde navigation — un onglet par barre —
 // et l'on ne compose que les lignes de celle qu'il regarde.
@@ -105,6 +105,14 @@ void GameOptions::ComposeShortcutRows(int shown_bar) {
                                                 .label = Tr("Afficher les touches sur les cases"),
                                                 .kind = OptionKind::kToggle,
                                                 .on = shortcut_bars_.show_keys});
+  shortcut_shared_rows_.push_back(OptionRowView{
+      .id = kShortcutStickyRow,
+      .label = Tr("Aimanter les barres entre elles"),
+      .help = Tr("Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres "
+                 "affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde "
+                 "le dernier mot."),
+      .kind = OptionKind::kToggle,
+      .on = shortcut_bars_.sticky});
   ComposeArmedSkillRows();
 
   shortcut_rows_.clear();
@@ -130,6 +138,12 @@ void GameOptions::ComposeShortcutRows(int shown_bar) {
                                "— c'est ainsi qu'on la remplit ou qu'on la déplace encore."),
                     .kind = OptionKind::kToggle,
                     .on = look.click_through});
+  shortcut_rows_.push_back(
+      OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kCenter),
+                    .label = Tr("Centrer horizontalement"),
+                    .help = Tr("Pose cette barre au milieu de la largeur de l'écran, à la même "
+                               "hauteur. Les autres barres ne bougent pas."),
+                    .kind = OptionKind::kAction});
   shortcut_rows_.push_back(
       OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kColumns),
                     .label = Tr("Colonnes"),
@@ -281,6 +295,10 @@ bool GameOptions::ChangeShortcutBar(const ro::ui::OptionsWindowAction& asked) {
     shortcut_bars_.show_keys = asked.on;
     return true;
   }
+  if (asked.changed == kShortcutStickyRow) {
+    shortcut_bars_.sticky = asked.on;
+    return true;
+  }
   if (asked.changed < kShortcutBarRowBase) {
     return false;
   }
@@ -379,6 +397,11 @@ bool GameOptions::ChangeShortcutBar(const ro::ui::OptionsWindowAction& asked) {
         other.slot_side_px = look.slot_side_px;
         other.gap_px = look.gap_px;
       }
+      break;
+    case ShortcutBarField::kCenter:
+      // ⚠ LA PLACE N'EST PAS DANS CES RÉGLAGES : c'est celle de la fenêtre, que
+      // le placeur retient comme après un glisser.
+      ro::ui::CenterShortcutBar(bar);
       break;
     case ShortcutBarField::kCount:
       // Jamais encodé : il ne compte les champs que pour la garde d'en-tête.

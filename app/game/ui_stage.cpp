@@ -192,6 +192,10 @@ UiStage::Answers UiStage::Draw(
   // corriger ici ne dérive jamais, puisqu'il repart du pointeur à chaque
   // image. La corriger plus tard laisserait une image sur deux montrer la
   // position brute, et la fenêtre trembler le long de la ligne.
+  //
+  // ⚠ LES BARRES DE RACCOURCIS ENTRE ELLES D'ABORD, la grille ensuite : c'est
+  // l'ordre du cadre de HUD, et une grille aimantée garde le dernier mot.
+  ro::ui::SnapMovingShortcutBar(shortcut_bars);
   ro::ui::SnapMovingWindow(grid);
   // LES NOMBRES EN POLICE AU FOND DE LA LISTE : c'est là que se peignent ceux
   // du sprite, avec le monde — sous la grille, les jauges et les bulles.

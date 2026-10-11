@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cfloat>
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <string>
@@ -290,6 +291,29 @@ bool g_cursor_was_over_a_bar = true;
 // UN RETOUR : `DrawOneBar` sort par deux chemins, dont le `Begin` qui refuse.
 const ImGuiWindow* g_last_bar_window = nullptr;
 
+// LES FENÊTRES DES HUIT BARRES, une identité chacune — sinon les huit partagent
+// une place à l'écran. Les objets sont gardés d'une image à l'autre : leur
+// identité ne change jamais, et le titre se refait seul au changement de langue.
+//
+// 🔴 LA PREMIÈRE GARDE L'IDENTITÉ NUE, SANS SON NUMÉRO, et l'incohérence est
+// volontaire : c'est celle de la barre unique d'avant. Une identité ne change
+// JAMAIS — c'est la règle de `window_name.h` —, et la renommer « shortcut_bar1 »
+// ferait perdre à chaque joueur la place qu'il avait donnée à sa barre.
+[[nodiscard]] std::array<WindowName, kShortcutBarCount>& BarNames() {
+  static std::array<WindowName, kShortcutBarCount> names = [] {
+    return std::array<WindowName, kShortcutBarCount>{
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId)),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "2"),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "3"),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "4"),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "5"),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "6"),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "7"),
+        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "8")};
+  }();
+  return names;
+}
+
 // LE CURSEUR EST-IL SUR UNE CASE PLEINE DE CETTE BARRE ?
 //
 // 🔴 CALCULÉ À LA MAIN, ET C'EST CE QUI REND LE CLIC-TRAVERSANT POSSIBLE.
@@ -364,26 +388,7 @@ void DrawOneBar(std::size_t bar, const ShortcutBarLayout& look, const ShortcutBa
   if (common.locked) {
     flags |= ImGuiWindowFlags_NoMove;
   }
-  // ⚠ UNE IDENTITÉ PAR BARRE, sinon les huit partagent une place à l'écran —
-  // c'est exactement ce que `WindowName` existe pour permettre. Les objets sont
-  // gardés d'une image à l'autre : leur identité ne change jamais, et le titre
-  // se refait seul au changement de langue.
-  //
-  // 🔴 LA PREMIÈRE GARDE L'IDENTITÉ NUE, SANS SON NUMÉRO, et l'incohérence est
-  // volontaire : c'est celle de la barre unique d'avant. Une identité ne change
-  // JAMAIS — c'est la règle de `window_name.h` —, et la renommer « shortcut_bar1 »
-  // ferait perdre à chaque joueur la place qu'il avait donnée à sa barre.
-  static std::array<WindowName, kShortcutBarCount> names = [] {
-    return std::array<WindowName, kShortcutBarCount>{
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId)),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "2"),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "3"),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "4"),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "5"),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "6"),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "7"),
-        WindowName(kShortcutBarTitle, std::string(kShortcutBarId) + "8")};
-  }();
+  std::array<WindowName, kShortcutBarCount>& names = BarNames();
   // ── CE QUE LE CLIC TRAVERSE ────────────────────────────────────────────────
   //
   // 🔴 UNE BARRE SE POSE SUR LE MONDE, et tout ce qu'elle prend à la souris,
@@ -649,6 +654,71 @@ ShortcutBarsAction DrawShortcutBars(const ShortcutBarsLayout& layout,
     asked.dropped_away = static_cast<const ShortcutDrag*>(carried->Data)->index;
   }
   return asked;
+}
+
+float CenteredBarLeft(float screen_left, float screen_width, float bar_width) {
+  // ⚠ ARRONDI AU PIXEL : une barre posée sur un demi-pixel floute ses icônes.
+  return std::floor(screen_left + (screen_width - bar_width) * 0.5F);
+}
+
+ImVec2 SnappedAmongBars(ImVec2 at, ImVec2 size, const HudSiblings& bars) {
+  return ImVec2(SnappedToSiblings(at.x, size.x, bars, false),
+                SnappedToSiblings(at.y, size.y, bars, true));
+}
+
+void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
+  if (!layout.sticky || layout.locked) {
+    return;
+  }
+  const ImGuiContext* context = ImGui::GetCurrentContext();
+  if (context == nullptr || context->MovingWindow == nullptr) {
+    return;
+  }
+  const ImGuiWindow* moving = context->MovingWindow->RootWindow;
+  std::array<HudRect, kShortcutBarCount> frames{};
+  std::array<bool, kShortcutBarCount> shown{};
+  ImGuiWindow* mine = nullptr;
+  int mine_rank = -1;
+  std::array<WindowName, kShortcutBarCount>& names = BarNames();
+  for (std::size_t bar = 0; bar < kShortcutBarCount; ++bar) {
+    ImGuiWindow* window = ImGui::FindWindowByName(names[bar].Get());
+    // ⚠ UNE BARRE ÉTEINTE N'AIMANTE RIEN : sa fenêtre survit dans ImGui, à la
+    // place où on l'a laissée, et l'on s'alignerait sur ce qu'on ne voit pas.
+    if (window == nullptr || !layout.bars[bar].shown || !window->WasActive) {
+      continue;
+    }
+    frames[bar] = HudRect{
+        .x = window->Pos.x, .y = window->Pos.y, .width = window->Size.x, .height = window->Size.y};
+    shown[bar] = true;
+    if (window == moving) {
+      mine = window;
+      mine_rank = static_cast<int>(bar);
+    }
+  }
+  if (mine == nullptr) {
+    return;
+  }
+  const HudSiblings bars{.frames = frames, .shown = shown, .mine = mine_rank};
+  const ImVec2 posed = SnappedAmongBars(mine->Pos, mine->Size, bars);
+  if (posed.x != mine->Pos.x || posed.y != mine->Pos.y) {
+    ImGui::SetWindowPos(mine, posed, ImGuiCond_Always);
+  }
+}
+
+void CenterShortcutBar(std::size_t bar) {
+  if (bar >= kShortcutBarCount || ImGui::GetCurrentContext() == nullptr) {
+    return;
+  }
+  ImGuiWindow* window = ImGui::FindWindowByName(BarNames()[bar].Get());
+  if (window == nullptr) {
+    return;
+  }
+  // 🔴 LA POSITION D'IMGUI, ÉCRITE COMME LA SOURIS L'ÉCRIRAIT. Le placeur des
+  // fenêtres voit la barre ailleurs que là où il l'avait posée, et retient la
+  // nouvelle place — ancrée au centre — exactement comme après un glisser.
+  const ImGuiViewport* screen = ImGui::GetMainViewport();
+  const float left = CenteredBarLeft(screen->WorkPos.x, screen->WorkSize.x, window->Size.x);
+  ImGui::SetWindowPos(window, ImVec2(left, window->Pos.y), ImGuiCond_Always);
 }
 
 }  // namespace ro::ui

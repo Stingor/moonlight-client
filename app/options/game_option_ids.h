@@ -415,6 +415,7 @@ enum class GameOption : std::uint8_t {
 // ⚠ CES NOMBRES NE SONT PERSISTÉS NULLE PART : ils vivent le temps d'un aller
 // vers la fenêtre et d'un retour. Les clés du fichier, elles, sont les chaînes
 // composées de `DeclareShortcutBars`.
+inline constexpr int kShortcutStickyRow = 989;
 inline constexpr int kShortcutShowKeysRow = 990;
 inline constexpr int kShortcutLockedRow = 991;
 // LE SORT EN MAIN : ce qu'il montre tant qu'il attend sa cible. Rangé avec les
@@ -431,7 +432,7 @@ inline constexpr int kShortcutBarRowBase = 1000;
 // Les réglages d'une barre, dans l'ordre où ils s'encodent. ⚠ PAS DANS L'ORDRE
 // OÙ ILS S'AFFICHENT : la composition met les nuanciers en dernier, leur
 // sélecteur s'ouvrant vers le bas et recouvrant les rangées suivantes.
-inline constexpr int kShortcutFieldsPerBar = 20;
+inline constexpr int kShortcutFieldsPerBar = 21;
 enum class ShortcutBarField : int {
   kShown = 0,
   kClickThrough,
@@ -458,6 +459,9 @@ enum class ShortcutBarField : int {
   // identifiant de ligne comme les autres, et qu'il appartient à une barre —
   // celle dont on copie.
   kCopyLook,
+  // UN GESTE AUSSI : il centre cette barre, et elle seule, sur la largeur de
+  // l'écran.
+  kCenter,
   kCount,
 };
 // 🔴 CE QUI REND UN SIXIÈME RÉGLAGE IMPOSSIBLE À OUBLIER. Le pas d'encodage et
@@ -476,7 +480,7 @@ static_assert(static_cast<int>(ShortcutBarField::kCount) == kShortcutFieldsPerBa
 // le fichier sans jamais paraître en ligne de panneau : personne ne tape la
 // position d'une jauge.
 inline constexpr int kStatBarRowBase = 2000;
-inline constexpr int kStatBarFieldsPerBar = 16;
+inline constexpr int kStatBarFieldsPerBar = 18;
 enum class StatBarField : int {
   kShown = 0,
   kShape,
@@ -493,6 +497,8 @@ enum class StatBarField : int {
   kLabel,
   kFontPixels,
   kTextColor,
+  kTextShiftX,
+  kTextShiftY,
   // UN GESTE, PAS UN RÉGLAGE : il donne le style de cette jauge aux cinq
   // autres. Voir `ro::ui::CopyStatBarStyle`, qui dit ce qui part et ce qui reste.
   kCopyLook,
