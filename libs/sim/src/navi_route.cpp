@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdlib>
 #include <functional>
 #include <limits>
 #include <optional>
@@ -35,21 +34,6 @@ constexpr std::uint32_t kNoPrevious = std::numeric_limits<std::uint32_t>::max();
   return left > kUnreached - right ? kUnreached : left + right;
 }
 
-// ⚠ LE GÉNÉRATEUR RANGE UNE LONGUEUR DE CHEMIN DANS UN OCTET : au-delà de 255
-// pas, la table écrit le reste modulo 256 — 263 pas deviennent 7. Une marche
-// d'une case à l'autre compte au moins autant de pas que le plus grand de ses
-// deux écarts ; tant que la valeur lue est en dessous, on lui rend un tour.
-constexpr std::int32_t kServerStepsWrap = 256;
-
-[[nodiscard]] std::int32_t UnwrappedSteps(std::int32_t steps, std::int32_t from_x,
-                                          std::int32_t from_y, std::int32_t to_x,
-                                          std::int32_t to_y) noexcept {
-  const std::int32_t least = std::max(std::abs(to_x - from_x), std::abs(to_y - from_y));
-  if (steps < 0) return steps;
-  while (steps < least) steps += kServerStepsWrap;
-  return steps;
-}
-
 // La destination précisée depuis la table quand c'est un PNJ : sa carte et sa case
 // font foi, pas celles que l'appelant a pu recopier.
 [[nodiscard]] NaviGoal Resolved(const NaviData& data, NaviGoal goal) {
@@ -72,9 +56,9 @@ constexpr std::int32_t kServerStepsWrap = 256;
       const std::uint32_t link_id = run.first_link_id + offset;
       const NaviLink* link = data.FindLink(link_id);
       if (link == nullptr) continue;
-      legs.emplace(link_id,
-                   StepsToCost(UnwrappedSteps(run.distance_cells, link->dest_cell_x,
-                                              link->dest_cell_y, goal.cell_x, goal.cell_y)));
+      legs.emplace(link_id, StepsToCost(formats::NaviExactSteps(
+                                data.npc_steps, run.distance_cells, link->dest_cell_x,
+                                link->dest_cell_y, goal.cell_x, goal.cell_y)));
     }
   }
   return legs;
@@ -170,8 +154,9 @@ std::optional<NaviRoute> PlanNaviRoute(const NaviData& data, const NaviStart& st
         const auto next = data.LinkSlot(run.first_link_id + offset);
         if (!next || !NaviLinkAllowed(data.links[*next], options)) continue;
         const NaviLink& onward = data.links[*next];
-        const std::int32_t steps = UnwrappedSteps(run.distance_cells, link.dest_cell_x,
-                                                  link.dest_cell_y, onward.cell_x, onward.cell_y);
+        const std::int32_t steps =
+            formats::NaviExactSteps(data.link_steps, run.distance_cells, link.dest_cell_x,
+                                    link.dest_cell_y, onward.cell_x, onward.cell_y);
         offer(*next, Saturating(arrived, StepsToCost(steps)), node);
       }
     }

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include <limits>
 #include <optional>
 #include <string>
@@ -385,6 +386,32 @@ core::Result<void> ReadNaviLinks(std::span<const std::uint8_t> bytes, NaviData& 
 // Même charpente pour les deux : par carte, `"<carte>", <compte>, { … }`, et dans
 // les accolades une entrée par propriétaire — `{ <id>, {…}, {…}, <fin> }`.
 // Seules la forme d'une ligne et son marqueur de fin diffèrent.
+//
+// La ligne de format, quand elle est là, est la PREMIÈRE du fichier. C'est un
+// commentaire Lua : le curseur la saute comme les autres.
+
+namespace {
+
+constexpr std::string_view kFormatLine = "-- navi_format:";
+constexpr std::int32_t kStepsWrap = 256;
+
+[[nodiscard]] NaviSteps StepsOf(std::span<const std::uint8_t> bytes) {
+  const std::string_view text(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+  if (!text.starts_with(kFormatLine)) return NaviSteps::kModulo256;
+  Cursor cursor(bytes.subspan(kFormatLine.size()));
+  const std::optional<std::int64_t> format = cursor.Integer();
+  return format && *format >= kNaviExactStepsFormat ? NaviSteps::kExact : NaviSteps::kModulo256;
+}
+
+}  // namespace
+
+std::int32_t NaviExactSteps(NaviSteps encoding, std::int32_t steps, std::int32_t from_x,
+                            std::int32_t from_y, std::int32_t to_x, std::int32_t to_y) noexcept {
+  if (encoding == NaviSteps::kExact || steps < 0) return steps;
+  const std::int32_t least = std::max(std::abs(to_x - from_x), std::abs(to_y - from_y));
+  while (steps < least) steps += kStepsWrap;
+  return steps;
+}
 
 core::Result<void> ReadNaviLinkDistances(std::span<const std::uint8_t> bytes, NaviData& data) {
   constexpr std::string_view kTable = "Navi_Distance";
@@ -436,6 +463,7 @@ core::Result<void> ReadNaviLinkDistances(std::span<const std::uint8_t> bytes, Na
     if (data.FindLink(owner) == nullptr) ++orphans;
   data.link_passes = std::move(runs);
   data.link_pass_spans = std::move(spans);
+  data.link_steps = StepsOf(bytes);
   data.skipped.distances_from_unknown_link = orphans;
   return {};
 }
@@ -484,6 +512,7 @@ core::Result<void> ReadNaviNpcDistances(std::span<const std::uint8_t> bytes, Nav
 
   data.npc_passes = std::move(runs);
   data.npc_pass_spans = std::move(spans);
+  data.npc_steps = StepsOf(bytes);
   return {};
 }
 

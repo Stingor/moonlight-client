@@ -168,6 +168,27 @@ struct NaviNpcPassRun {
   std::int32_t distance_cells = 0;
 };
 
+// Comment une table de distances écrit la longueur d'une marche.
+//
+// Une table ouverte par la ligne `-- navi_format: <n>`, avec n ≥ 2, l'écrit
+// EXACTE. Sans cette ligne, elle vient d'un générateur qui ne gardait que
+// l'octet du bas : au-delà de 255 pas, elle écrit le reste modulo 256.
+enum class NaviSteps : std::uint8_t {
+  kExact,
+  kModulo256,
+};
+
+// Le premier format dont les longueurs sont exactes.
+inline constexpr std::int64_t kNaviExactStepsFormat = 2;
+
+// La marche lue dans une table, de la case (from) à la case (to), rendue en pas
+// exacts. Pour une table modulo 256 : une marche compte au moins autant de pas
+// que le plus grand de ses deux écarts, donc tant que la valeur lue est en
+// dessous, on lui rend un tour. Une valeur négative passe telle quelle.
+[[nodiscard]] std::int32_t NaviExactSteps(NaviSteps encoding, std::int32_t steps,
+                                          std::int32_t from_x, std::int32_t from_y,
+                                          std::int32_t to_x, std::int32_t to_y) noexcept;
+
 // Où trouver, dans un tableau plat, les suites d'un même propriétaire.
 struct NaviPassSpan {
   std::uint32_t first = 0;
@@ -221,6 +242,9 @@ class NaviData {
   std::unordered_map<std::uint32_t, NaviPassSpan> link_pass_spans;
   std::vector<NaviNpcPassRun> npc_passes;
   std::unordered_map<std::uint32_t, NaviPassSpan> npc_pass_spans;
+  // Comment chacune des deux tables écrit ses longueurs ; posé par son lecteur.
+  NaviSteps link_steps = NaviSteps::kExact;
+  NaviSteps npc_steps = NaviSteps::kExact;
 
  private:
   std::unordered_map<std::string, NaviMapIndex> map_by_lower_name_;

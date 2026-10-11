@@ -63,6 +63,11 @@ void NaviSession::Open(const std::filesystem::path& client_root,
             "cartes inconnues",
             skipped.npcs_on_unknown_map, skipped.links_on_unknown_map,
             skipped.spawns_on_unknown_map);
+      if (data->link_steps == ro::formats::NaviSteps::kModulo256 ||
+          data->npc_steps == ro::formats::NaviSteps::kModulo256)
+        ro::core::LogWarning(
+            "navigation : tables de distances d'un ancien générateur (longueurs modulo 256, "
+            "redressées) — à régénérer");
       loaded.data = std::make_shared<const ro::formats::NaviData>(std::move(*data));
     }
     if (auto towns = ro::vfs::TownInfo::Load(*vfs)) {

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "ro/core/i18n.h"
+#include "ro/net/bug_report.h"
 
 namespace moonclient {
 namespace {
@@ -157,7 +158,9 @@ BugReportContext NavigationBugReport(const NaviBugScene& scene) {
   } else {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Navigation : %s"), subject.c_str());
   }
-  return FieldsBugReport(label.data(), fields);
+  BugReportContext report = FieldsBugReport(label.data(), fields);
+  report.category = static_cast<std::uint8_t>(ro::net::BugReportCategory::kNavigation);
+  return report;
 }
 
 }  // namespace moonclient

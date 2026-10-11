@@ -34,6 +34,7 @@ enum class BugReportCategory : std::uint8_t {
   kNpc = 3,
   kQuest = 4,
   kStyle = 5,
+  kNavigation = 6,
 };
 
 // Ce que le serveur garde du message.
