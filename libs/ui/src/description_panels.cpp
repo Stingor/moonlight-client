@@ -276,7 +276,12 @@ void DrawItemDollTooltip(const DescriptionDollState& doll) {
     if (overlaid) {
       PaintDollOverlay(doll.overlay, call);
     }
-    ImGui::Image(doll.image.id, ImVec2(kDescriptionDollWidthPixels, kDescriptionDollHeightPixels));
+    const ImVec2 doll_size(kDescriptionDollWidthPixels, kDescriptionDollHeightPixels);
+    if (overlaid && doll.body_overlaid) {
+      ImGui::Dummy(doll_size);
+    } else {
+      ImGui::Image(doll.image.id, doll_size);
+    }
     if (overlaid) {
       call.pass = DollOverlayPass::kFront;
       PaintDollOverlay(doll.overlay, call);

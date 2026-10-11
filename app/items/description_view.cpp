@@ -195,6 +195,10 @@ ro::render::VignetteFraming DescriptionView::doll_framing() const noexcept {
   return doll_.has_value() ? doll_->framing() : ro::render::VignetteFraming{};
 }
 
+const DollBody* DescriptionView::doll_body() const noexcept {
+  return doll_.has_value() ? doll_->body() : nullptr;
+}
+
 void DescriptionView::RefreshDoll(const ro::sim::World& world, ro::ui::DescriptionDollState& state,
                                   bool with_effect, ActorStyles& dressing, std::uint32_t now_ms) {
   if (!doll_.has_value()) {

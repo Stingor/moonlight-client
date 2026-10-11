@@ -108,6 +108,10 @@ struct DescriptionDollState {
   SkinImage image;
   // Son effet, posé par `app` après le pantin ; vide sans effet.
   DollOverlay overlay;
+  // LE CORPS SE PEINT PAR LE RAPPEL, derrière les effets de devant : un effet
+  // le change — le rapetisse, l'éclaire, le double —, ce que l'image composée
+  // ne sait pas montrer. L'image ne se pose alors pas ; sa place reste.
+  bool body_overlaid = false;
   // La direction du .ACT, que la molette tourne sur huit crans.
   std::uint8_t direction = 0;
   WheelGateState wheel;

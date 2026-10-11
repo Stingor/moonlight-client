@@ -73,6 +73,8 @@ void ItemDoll::Refresh(const ro::sim::World& world, std::uint16_t view_id,
                        std::uint32_t now_ms) {
   state.image = ro::ui::SkinImage{};
   state.overlay = ro::ui::DollOverlay{};
+  state.body_overlaid = false;
+  body_.reset();
   // Une pièce sans place sur le corps ne se porte pas : nu, sauf son effet.
   const DollLayer layer = view_id == 0 ? DollLayer::kNone : LayerOf(wearable_at);
   const ro::sim::Actor* player = world.player();
@@ -119,6 +121,10 @@ void ItemDoll::Refresh(const ro::sim::World& world, std::uint16_t view_id,
   const ro::render::IconTexture& drawn = doll_->Get(pose);
   if (!drawn.usable()) {
     return;
+  }
+  if (const ro::render::ComposedActor* composed = doll_->composed()) {
+    body_ =
+        DollBody{.composed = *composed, .animation_duration_ms = doll_->animation_duration_ms()};
   }
   state.image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(drawn.texture.name()),
                                   .width = ro::ui::kDescriptionDollWidthPixels,

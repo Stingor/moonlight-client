@@ -20,7 +20,8 @@ namespace ro::render {
 //
 //     hauteur = base + hatEffectPos − 7
 //     base    = 18 + classe de taille du métier affiché
-//               (18 tout court si la fiche ignore la monture ou suit la tête)
+//               (18 tout court si la fiche ignore la monture ou suit la tête ;
+//                23 sur une monture du shop, 18 pour un Doram)
 //     droite  = hatEffectPosX (+ 5 ou 8 pour trois fichiers nommés)
 //
 // les deux multipliées par l'échelle du corps du métier. Une fiche à −11 pose
@@ -38,6 +39,9 @@ namespace ro::render {
 inline constexpr std::int32_t kHatAnchorHeightCorrection = -7;
 // La base : dix-huit unités, plus la classe de taille du métier.
 inline constexpr std::int32_t kHatAnchorBaseHeight = 18;
+// LA BASE SUR UNE MONTURE DU SHOP, quel que soit le métier : la classe de
+// taille ne se lit plus. Un Doram garde la base à pied.
+inline constexpr std::int32_t kHatAnchorCashMountBaseHeight = 23;
 // Ce qu'une fiche attachée à la tête retranche encore pour un Doram.
 inline constexpr std::int32_t kHatAnchorDoramHeadCorrection = -3;
 
@@ -66,6 +70,24 @@ struct HatEffectBearer {
   // La réduction en cours du corps, de un à un demi : voir
   // `BodyShrinkAfterEffects`. Elle ne touche que les fiches qui le demandent.
   float shrink_scale = 1.0F;
+  // MONTÉ SUR UNE MONTURE DU SHOP — l'état « toutes montures ». Elle remplace
+  // la classe de taille du métier dans la base.
+  bool cash_mount = false;
+};
+
+// CE QUE L'ANCRE LIT DE SA FICHE ET DE SON FICHIER, figé quand le `.str`
+// naît. Le porteur, lui, se relit À CHAQUE IMAGE — voir `HatAnchorFor` :
+// monter, descendre ou rapetisser déplace le fichier qu'il porte déjà.
+struct HatAnchorRecipe {
+  // `hatEffectPos`, lu en entier.
+  std::int32_t record_height = 0;
+  // `hatEffectPosX`, plus le décalage que le chemin du fichier donne d'office.
+  float right_units = 0.0F;
+  // La fiche ignore la monture, ou suit la tête : la base reste à dix-huit.
+  bool fixed_base = false;
+  bool attached_head = false;
+  bool adjust_position_when_shrunk = false;
+  bool adjust_size_when_shrunk = false;
 };
 
 // Ce que le semis d'un chapeau fait de son `.str`.
@@ -94,6 +116,14 @@ struct HatEffectAnchor {
 // fiche, ni drapeau — le client ne les lit que sous un rang.
 [[nodiscard]] HatEffectAnchor HatConcreteStrAnchor(std::string_view file,
                                                    const HatEffectBearer& bearer);
+
+// La recette d'une fiche jouée sous son RANG, et celle d'un identifiant concret.
+[[nodiscard]] HatAnchorRecipe HatStrAnchorRecipe(const HatEffect& record, std::string_view file);
+[[nodiscard]] HatAnchorRecipe HatConcreteStrAnchorRecipe(std::string_view file);
+
+// L'ancre qu'une recette donne sur ce porteur, à cet instant.
+[[nodiscard]] HatEffectAnchor HatAnchorFor(const HatAnchorRecipe& recipe,
+                                           const HatEffectBearer& bearer);
 
 // Vrai quand cet identifiant concret prend l'ancre du chapeau.
 [[nodiscard]] bool HatIdIsReadAsStr(std::uint32_t effect_id);

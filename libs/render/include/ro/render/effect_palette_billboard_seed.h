@@ -19,8 +19,8 @@ namespace ro::render {
 //
 // Deux bâtisseurs jumeaux, une image par site et un octet — l'octet est la
 // PALETTE que la figure relit dans la piste : de deux à huit pour les sept
-// éclats de gel, zéro pour le cercle de 1122, qui ne s'éteint donc jamais. Les
-// deux bâtisseurs ne diffèrent que par l'alpha semé.
+// éclats de gel, zéro pour les cercles de 757 et 1122, qui ne s'éteignent
+// donc jamais. Les deux bâtisseurs ne diffèrent que par l'alpha semé.
 //
 // ⚠ LA NUANCE EST LE RANG DE LA PISTE, pas un paramètre. Le bâtisseur y écrit
 // zéro, un, deux et trois, si bien que les quatre nuances d'une palette
@@ -48,7 +48,7 @@ struct EffectPaletteBillboardPattern {
   // La palette, posée telle quelle dans les quatre pistes.
   std::uint8_t palette = 0;
   // L'ALPHA DE DÉPART des quatre pistes : il dépend du BÂTISSEUR, pas du site.
-  // Cent pour les éclats de gel, deux cents pour le cercle de 1122.
+  // Cent pour les éclats de gel, deux cents pour les cercles de 757 et 1122.
   // ⚠ EN QUEUE : la table engendrée remplit cette structure par position.
   std::int16_t alpha = 100;
 };

@@ -8,6 +8,7 @@
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/description_window.h"
 
+#include "items/doll_body.h"
 #include "world/actor_styles.h"
 
 namespace moonclient {
@@ -48,9 +49,19 @@ class ItemDoll {
   // Inutilisable tant que rien n'a été dessiné.
   [[nodiscard]] ro::render::VignetteFraming framing() const noexcept;
 
+  // LE CORPS QUE LE PANTIN MONTRE À CETTE IMAGE, ou nul s'il n'en montre pas :
+  // c'est lui qu'on repeint quand un effet de chapeau change l'acteur. Voir
+  // `DollEffects`.
+  [[nodiscard]] const DollBody* body() const noexcept {
+    return body_.has_value() ? &*body_ : nullptr;
+  }
+
  private:
   ro::render::ActorWardrobe* wardrobe_ = nullptr;
   std::optional<ro::render::ActorVignette> doll_;
+  // ⚠ UNE COPIE : la tenue refait sa composition à chaque appel, et le corps
+  // doit vivre jusqu'à la peinture, après toute l'interface.
+  std::optional<DollBody> body_;
 };
 
 }  // namespace moonclient

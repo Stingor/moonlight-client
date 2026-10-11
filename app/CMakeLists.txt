@@ -126,6 +126,7 @@ add_library(moonclient_effects STATIC
     effects/effect_switches.cpp
     effects/effect_view.cpp
     effects/effect_warp_view.cpp
+    items/doll_body.cpp
     world/actor_effect_finish.cpp
     world/actor_ghosts.cpp
     world/actor_tint.cpp

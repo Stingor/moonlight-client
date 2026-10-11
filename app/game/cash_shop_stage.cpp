@@ -398,4 +398,8 @@ ro::render::VignetteFraming CashShopStage::doll_framing() const noexcept {
   return doll_.has_value() ? doll_->framing() : ro::render::VignetteFraming{};
 }
 
+const DollBody* CashShopStage::doll_body() const noexcept {
+  return doll_.has_value() ? doll_->body() : nullptr;
+}
+
 }  // namespace moonclient

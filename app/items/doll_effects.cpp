@@ -14,6 +14,9 @@
 
 #include "effects/doll_camera.h"
 #include "effects/effect_layers.h"
+#include "items/doll_body.h"
+#include "world/actor_effect_finish.h"
+#include "world/actor_tint.h"
 #include "world/actor_view.h"
 
 namespace moonclient {
@@ -54,8 +57,9 @@ DollEffects::DollEffects(ro::vfs::Vfs& vfs)
 }
 
 void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordinal,
-                          const ro::render::VignetteFraming& framing, const ro::sim::World& world,
-                          const MapStage& stage, std::uint32_t now_ms) {
+                          const ro::render::VignetteFraming& framing, const DollBody* body,
+                          const ro::sim::World& world, const MapStage& stage,
+                          std::uint32_t now_ms) {
   const ro::sim::Actor* player = world.player();
   const bool ready = effect_renderer_.has_value() && sprites_.has_value();
   if (ordinal <= 0 || !doll.image.usable() || !framing.usable() || player == nullptr || !ready) {
@@ -70,7 +74,10 @@ void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordin
   }
   // LE PORTEUR NAÎT À LA CASE DU JOUEUR, et y reste : le sol de la carte est
   // là, et les nœuds qui rebondissent le cherchent.
-  if (ordinal != worn_ || stage.name != map_name_) {
+  // ET IL MONTE COMME LUI : le pantin montre sa monture du shop, et l'ancre
+  // d'un chapeau la lit.
+  const bool mounted = player->status_effects.contains(ro::sim::kStatusAllRiding);
+  if (ordinal != worn_ || stage.name != map_name_ || mounted != mounted_) {
     Rest();
     ro::sim::Actor bearer;
     bearer.id = kBearerId;
@@ -80,8 +87,12 @@ void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordin
     // monture et se réduit avec un bébé.
     bearer.look.job = static_cast<std::uint16_t>(ShownJobOf(*player));
     bearer.hat_effects.insert(worn);
+    if (mounted) {
+      bearer.status_effects.insert(ro::sim::kStatusAllRiding);
+    }
     stand_.Spawn(std::move(bearer));
     worn_ = ordinal;
+    mounted_ = mounted;
     map_name_ = stage.name;
   }
   const ro::sim::Actor* bearer = stand_.Find(kBearerId);
@@ -104,7 +115,20 @@ void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordin
   played_ = effects_.Drawn(now_ms, stage, stand_, planner_);
   static_cast<void>(nodes_.Drawn(now_ms, camera_));
   effects_.SowRequestedEffects(stand_, stage, planner_, now_ms);
-  Drain();
+  Drain(now_ms);
+  // LE CORPS QUE SES EFFETS CHANGENT se repeint ici, et l'image composée se
+  // retire : voir `ComposeChangedDollBody`.
+  body_draws_.clear();
+  doll.body_overlaid = false;
+  if (body != nullptr) {
+    if (const ro::sim::Actor* settled = stand_.Find(kBearerId)) {
+      body_ = *body;
+      PlayedEffectsOf(*settled, now_ms, bearer_effects_);
+      doll.body_overlaid = ComposeChangedDollBody(bearer_effects_, body_, kBearerId,
+                                                  glm::vec3(ground[0], ground[1], ground[2]),
+                                                  ghosts_, now_ms, body_draws_);
+    }
+  }
   // ⚠ CE QUE LA PARTIE PEINT AVANT LES CORPS passe sous le pantin : l'ombre d'un
   // costume, le fichier qu'une fiche range avant le personnage. Voir `PaintInto`.
   doll.overlay = ro::ui::DollOverlay{.paint = &DollEffects::Paint, .painter = this};
@@ -127,8 +151,11 @@ void DollEffects::Rest() {
     sprites_->ForgetUnusedTextures();
   }
   played_ = {};
+  body_draws_.clear();
+  ghosts_.Forget();
   stage_ = nullptr;
   worn_ = 0;
+  mounted_ = false;
   map_name_.clear();
 }
 
@@ -141,13 +168,16 @@ void DollEffects::ForgetTextures() {
   }
 }
 
-void DollEffects::Drain() {
+void DollEffects::Drain(std::uint32_t now_ms) {
   static_cast<void>(nodes_.TakeSounds());
   static_cast<void>(effects_.TakeLaunchedEffects());
   static_cast<void>(effects_.TakeSownNamedSounds());
   static_cast<void>(effects_.TakeScreenQuake());
-  static_cast<void>(effects_.TakeActorEffects());
   static_cast<void>(effects_.TakeChimneys());
+  SettleActorEffects(stand_, effects_.TakeActorEffects());
+  // CE QUI A FINI DE SOI-MÊME S'EN VA, comme en partie : un blanchiment au
+  // bout de sa vie ne se relit plus.
+  static_cast<void>(ForgetFinishedEffects(stand_, now_ms));
 }
 
 void DollEffects::Paint(const ImDrawList* list, const ImDrawCmd* command) {
@@ -219,6 +249,14 @@ void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call) {
       effect_renderer_->Draw(camera_, behind, width / height);
     }
     PaintClassSpritesBehindActors(effects_, *sprites_, camera_, width / height, {});
+    // LE CORPS QUE SES EFFETS CHANGENT, à la place de l'image, rémanences en
+    // tête : il recouvre ce qui passe derrière lui et passe sous ce qui le suit.
+    if (!body_draws_.empty()) {
+      sprites_->Draw(
+          camera_, body_draws_, width / height, ro::render::SpriteRenderer::Blending::kOver,
+          ro::render::SpriteRenderer::DepthWrite::kOff, ro::render::SpriteRenderer::DepthTest::kOff,
+          {}, ro::render::SpriteRenderer::DrawOrder::kAsGiven);
+    }
   } else {
     PaintEffectsUnderStr(effects_, nodes_, painters);
     PaintStrEffects(effects_, nodes_, played_, painters);

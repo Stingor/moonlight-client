@@ -78,6 +78,15 @@ class ActorVignette {
   // comme pour l'emprise cliquable du jeu : c'est d'elle qu'on s'en sert.
   [[nodiscard]] const SpriteBounds& drawn_bounds() const noexcept { return drawn_bounds_; }
 
+  // LE CORPS QUE LE DERNIER `Get` A COMPOSÉ, ou nul s'il n'a rien composé.
+  //
+  // ⚠ IL APPARTIENT À LA TENUE, qui le refait à chaque composition : qui veut
+  // le garder au-delà de l'appel suivant le COPIE.
+  [[nodiscard]] const ComposedActor* composed() const noexcept { return composed_; }
+  // La durée d'un tour de l'animation composée, en millisecondes ; zéro sans
+  // composition.
+  [[nodiscard]] float animation_duration_ms() const noexcept { return animation_duration_ms_; }
+
  private:
   ActorWardrobe* wardrobe_;
   IconTexture texture_;
@@ -94,6 +103,8 @@ class ActorVignette {
   OutfitSpan span_;
   VignetteFraming framing_;
   SpriteBounds drawn_bounds_;
+  const ComposedActor* composed_ = nullptr;
+  float animation_duration_ms_ = 0.0F;
 };
 
 }  // namespace ro::render

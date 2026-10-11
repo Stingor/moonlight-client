@@ -44,6 +44,8 @@ class CashShopStage {
   [[nodiscard]] ro::sim::HatEffectItems& hat_effects() noexcept { return hat_effects_; }
   // Le cadrage du pantin de l'aperçu, que son effet de chapeau suit.
   [[nodiscard]] ro::render::VignetteFraming doll_framing() const noexcept;
+  // Le corps de ce pantin à cette image, ou nul : voir `ItemDoll::body`.
+  [[nodiscard]] const DollBody* doll_body() const noexcept;
 
   // LE CATALOGUE, AVANT QU'ON EN AIT BESOIN. Le serveur ne l'envoie que sur
   // demande, et une fois par session : demandé à la première ouverture

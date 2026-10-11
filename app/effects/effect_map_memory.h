@@ -13,6 +13,7 @@
 
 #include "ro/render/effect_catalog.h"
 #include "ro/render/effect_renderer.h"
+#include "ro/render/hat_effect_anchor.h"
 #include "ro/sim/combat_notice.h"
 #include "ro/sim/packed_position.h"
 #include "ro/sim/status_effects.h"
@@ -109,6 +110,9 @@ struct EffectMapMemory {
     // NÉ D'UN CHAPEAU : la porte de dessin lui retire ses exceptions. Voir
     // `EffectDrawGate::Draws`.
     bool from_hat = false;
+    // L'ANCRE D'UN `.str` DE CHAPEAU, relue sur son porteur à chaque image :
+    // voir `ReseatHatStr`. Vide pour tout autre effet.
+    std::optional<ro::render::HatAnchorRecipe> hat_anchor;
 
     // Vrai une fois ce porteur mort : le lanceur vit tant que son âge
     // n'excède pas sa vie.

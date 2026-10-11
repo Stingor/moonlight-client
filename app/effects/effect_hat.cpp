@@ -27,6 +27,7 @@
 #include "ro/sim/world.h"
 
 #include "effects/effect_actor_change.h"
+#include "effects/effect_hat_seat.h"
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
 #include "world/actor_view.h"
@@ -36,26 +37,13 @@ namespace {
 
 constexpr std::uint32_t kTickMs = static_cast<std::uint32_t>(ro::render::kEffectTickMs);
 
-// Le porteur tel que l'ancre d'un chapeau le lit : son métier MONTRÉ — un corps
-// monté porte son chapeau plus haut —, et ce que ses effets en cours font à la
-// taille de son corps.
-[[nodiscard]] ro::render::HatEffectBearer HatBearerOf(const ro::sim::Actor& actor,
-                                                      std::uint32_t now_ms) {
-  std::vector<ro::render::ActorEffectPlay> played;
-  played.reserve(actor.effects.size());
-  for (const ro::sim::PlayedEffect& effect : actor.effects) {
-    played.push_back(ro::render::ActorEffectPlay{effect.id, (now_ms - effect.since_ms) / kTickMs});
-  }
-  return {.job = ShownJobOf(actor), .shrink_scale = ro::render::BodyShrinkAfterEffects(played)};
-}
-
-// POSE UN `.str` DE CHAPEAU à son ancre. Le déplacement se recalcule à chaque
-// image dans le plan de la vue, autour des pieds que l'effet suit.
-void SeatHatStr(EffectMapMemory::Playing& playing, const ro::render::HatEffectAnchor& anchor,
-                bool before_bodies) {
-  playing.lift_pixels = anchor.lift_pixels;
-  playing.view_offset = anchor.view_offset;
-  playing.scale = anchor.scale;
+// DONNE À UN `.str` DE CHAPEAU SA RECETTE D'ANCRE, et l'y pose une première
+// fois. Le déplacement se recalcule ensuite à chaque image, dans le plan de la
+// vue, autour des pieds que l'effet suit : voir `ReseatHatStr`.
+void SeatHatStr(EffectMapMemory::Playing& playing, const ro::render::HatAnchorRecipe& recipe,
+                const ro::sim::Actor& bearer, std::uint32_t now_ms, bool before_bodies) {
+  playing.hat_anchor = recipe;
+  ReseatHatStr(playing, bearer, now_ms);
   playing.behind_actors = playing.behind_actors || before_bodies;
 }
 
@@ -97,6 +85,29 @@ void WithdrawHatActorChange(EffectMapMemory& memory, ActorChanges& queue, std::u
 }
 
 }  // namespace
+
+ro::render::HatEffectBearer HatBearerOf(const ro::sim::Actor& actor, std::uint32_t now_ms) {
+  std::vector<ro::render::ActorEffectPlay> played;
+  played.reserve(actor.effects.size());
+  for (const ro::sim::PlayedEffect& effect : actor.effects) {
+    played.push_back(ro::render::ActorEffectPlay{effect.id, (now_ms - effect.since_ms) / kTickMs});
+  }
+  return {.job = ShownJobOf(actor),
+          .shrink_scale = ro::render::BodyShrinkAfterEffects(played),
+          .cash_mount = actor.status_effects.contains(ro::sim::kStatusAllRiding)};
+}
+
+void ReseatHatStr(EffectMapMemory::Playing& playing, const ro::sim::Actor& bearer,
+                  std::uint32_t now_ms) {
+  if (!playing.hat_anchor.has_value()) {
+    return;
+  }
+  const ro::render::HatEffectAnchor anchor =
+      ro::render::HatAnchorFor(*playing.hat_anchor, HatBearerOf(bearer, now_ms));
+  playing.lift_pixels = anchor.lift_pixels;
+  playing.view_offset = anchor.view_offset;
+  playing.scale = anchor.scale;
+}
 
 const ro::render::HatEffect* EffectsInPlay::HatEffectFor(std::uint16_t hat_effect_id) {
   if (!hat_effects_read_) {
@@ -242,8 +253,6 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
           ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
       const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
       const glm::vec3 feet(ground[0], ground[1], ground[2]);
-      const ro::render::HatEffectBearer bearer = HatBearerOf(actor, now_ms);
-
       if (!file.empty()) {
         // ⚠ ATTACHÉ À SON PORTEUR, et c'est ce qui distingue cette famille d'un
         // effet posé : un costume suit celui qui le porte, et le laisser à la
@@ -258,8 +267,8 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
               record->file.empty() ? hat_effects_->FindByConcreteId(record->effect_id) : record;
           const ro::render::HatEffect& read = shown != nullptr ? *shown : *record;
           per_map_.playing.back().from_hat = true;
-          SeatHatStr(per_map_.playing.back(), ro::render::HatStrAnchor(read, file, bearer),
-                     read.render_before_character);
+          SeatHatStr(per_map_.playing.back(), ro::render::HatStrAnchorRecipe(read, file), actor,
+                     now_ms, read.render_before_character);
         }
         continue;
       }
@@ -281,9 +290,9 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
       }
       if (ro::render::HatIdIsReadAsStr(record->effect_id) && per_map_.playing.size() > before) {
         SeatHatStr(per_map_.playing.back(),
-                   ro::render::HatConcreteStrAnchor(
-                       ro::render::EffectFile(record->effect_id, now_ms), bearer),
-                   false);
+                   ro::render::HatConcreteStrAnchorRecipe(
+                       ro::render::EffectFile(record->effect_id, now_ms)),
+                   actor, now_ms, false);
       }
     }
   }

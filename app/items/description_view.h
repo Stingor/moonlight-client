@@ -126,6 +126,8 @@ class DescriptionView {
   void NoteHatEffect(bool worn) noexcept;
   // Le cadrage de ce pantin, que son effet de chapeau suit.
   [[nodiscard]] ro::render::VignetteFraming doll_framing() const noexcept;
+  // Le corps de ce pantin à cette image, ou nul : voir `ItemDoll::body`.
+  [[nodiscard]] const DollBody* doll_body() const noexcept;
 
   // L'objet d'où l'on vient, pour « < Retour » ; zéro sans retour.
   void NoteBack(std::uint32_t item_id);

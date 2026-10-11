@@ -71,28 +71,53 @@ std::int32_t HatAnchorJobSizeClass(std::uint32_t job) {
   return 0;
 }
 
-HatEffectAnchor HatStrAnchor(const HatEffect& record, std::string_view file,
-                             const HatEffectBearer& bearer) {
-  const bool fixed_base = record.ignore_riding || record.attached_head;
-  std::int32_t height =
-      kHatAnchorBaseHeight + (fixed_base ? 0 : HatAnchorJobSizeClass(bearer.job)) +
-      static_cast<std::int32_t>(std::lround(record.offset)) + kHatAnchorHeightCorrection;
-  if (record.attached_head && IsDoramJob(bearer.job)) {
+HatAnchorRecipe HatStrAnchorRecipe(const HatEffect& record, std::string_view file) {
+  return HatAnchorRecipe{
+      .record_height = static_cast<std::int32_t>(std::lround(record.offset)),
+      .right_units = NamedShift(file) + record.offset_x,
+      .fixed_base = record.ignore_riding || record.attached_head,
+      .attached_head = record.attached_head,
+      .adjust_position_when_shrunk = record.adjust_position_when_shrunk,
+      .adjust_size_when_shrunk = record.adjust_size_when_shrunk,
+  };
+}
+
+HatAnchorRecipe HatConcreteStrAnchorRecipe(std::string_view file) {
+  return HatAnchorRecipe{.right_units = NamedShift(file)};
+}
+
+HatEffectAnchor HatAnchorFor(const HatAnchorRecipe& recipe, const HatEffectBearer& bearer) {
+  // LA BASE, dans l'ordre où le client tranche : la fiche qui la fixe, puis la
+  // monture du shop — où seul un Doram reste à la base à pied —, puis la
+  // classe de taille du métier affiché.
+  std::int32_t base = kHatAnchorBaseHeight;
+  if (!recipe.fixed_base) {
+    if (bearer.cash_mount) {
+      base = IsDoramJob(bearer.job) ? kHatAnchorBaseHeight : kHatAnchorCashMountBaseHeight;
+    } else {
+      base += HatAnchorJobSizeClass(bearer.job);
+    }
+  }
+  std::int32_t height = base + recipe.record_height + kHatAnchorHeightCorrection;
+  if (recipe.attached_head && IsDoramJob(bearer.job)) {
     height += kHatAnchorDoramHeadCorrection;
   }
   float body_scale = BodyScaleFor(bearer.job);
-  if (record.adjust_position_when_shrunk) {
+  if (recipe.adjust_position_when_shrunk) {
     body_scale *= bearer.shrink_scale;
   }
-  HatEffectAnchor anchor = Anchor(height, NamedShift(file) + record.offset_x, body_scale);
-  anchor.scale = record.adjust_size_when_shrunk ? bearer.shrink_scale : 1.0F;
+  HatEffectAnchor anchor = Anchor(height, recipe.right_units, body_scale);
+  anchor.scale = recipe.adjust_size_when_shrunk ? bearer.shrink_scale : 1.0F;
   return anchor;
 }
 
+HatEffectAnchor HatStrAnchor(const HatEffect& record, std::string_view file,
+                             const HatEffectBearer& bearer) {
+  return HatAnchorFor(HatStrAnchorRecipe(record, file), bearer);
+}
+
 HatEffectAnchor HatConcreteStrAnchor(std::string_view file, const HatEffectBearer& bearer) {
-  const std::int32_t height =
-      kHatAnchorBaseHeight + HatAnchorJobSizeClass(bearer.job) + kHatAnchorHeightCorrection;
-  return Anchor(height, NamedShift(file), BodyScaleFor(bearer.job));
+  return HatAnchorFor(HatConcreteStrAnchorRecipe(file), bearer);
 }
 
 bool HatIdIsReadAsStr(std::uint32_t effect_id) {

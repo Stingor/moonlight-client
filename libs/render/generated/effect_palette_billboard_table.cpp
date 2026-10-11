@@ -2,7 +2,7 @@
 //
 // Une ligne par site d'appel du batisseur.
 //
-// 8 eclats, toutes du sous-type 132. L'image vient du SITE et non du
+// 9 eclats, toutes du sous-type 132. L'image vient du SITE et non du
 // batisseur, qui n'en connait aucune ; l'octet est la PALETTE que la figure relit dans la
 // fois, et ce qu'il decide vit dans le semis : voir
 // effect_palette_billboard_seed.h.
@@ -18,7 +18,8 @@
 namespace ro::render {
 namespace {
 
-constexpr std::array<EffectPaletteBillboardPattern, 8> kPaletteBillboards = {{
+constexpr std::array<EffectPaletteBillboardPattern, 9> kPaletteBillboards = {{
+    {757, "Effect_InitSpiralSpriteLooping", "data\\texture\\effect\\emp shock.tga", 0, 200},
     {861, "Effect_InitSpiralSprite", "data\\texture\\effect\\freeze_a.bmp", 2, 100},
     {865, "Effect_InitSpiralSprite", "data\\texture\\effect\\freeze_a.bmp", 3, 100},
     {867, "Effect_InitSpiralSprite", "data\\texture\\effect\\freeze_a.bmp", 4, 100},

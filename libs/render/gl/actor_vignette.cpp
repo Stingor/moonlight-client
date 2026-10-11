@@ -31,6 +31,8 @@ namespace {
 const IconTexture& ActorVignette::Get(const Pose& pose) {
   const bool drawable = wardrobe_ != nullptr && pose.box.width > 0 && pose.box.height > 0;
   ActorOutfit* outfit = drawable ? wardrobe_->OutfitFor(pose.look) : nullptr;
+  composed_ = nullptr;
+  animation_duration_ms_ = 0.0F;
   if (outfit == nullptr) {
     // ⚠ ON OUBLIE CE QUI ÉTAIT DESSINÉ : sans cela, la vignette d'un
     // personnage reparaîtrait telle quelle à la première image du suivant.
@@ -66,6 +68,8 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
   }
   const ComposedActor& composed =
       outfit->Composed(pose.animation, pose.direction, pose.elapsed_ms, /*loop=*/true, held);
+  composed_ = &composed;
+  animation_duration_ms_ = outfit->AnimationDurationMs(pose.animation);
   // LES BORNES DE CE QUI EST PEINT, relevées à chaque image : elles bougent
   // avec l'animation, même quand la texture n'a pas à être refaite.
   std::vector<SpriteQuad> painted;
