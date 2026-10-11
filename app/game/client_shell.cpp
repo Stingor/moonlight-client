@@ -36,39 +36,13 @@ constexpr int kMillisecondsPerSecond = 1000;
 // avec les autres réglages du joueur — voir `save_folder.h`. Un lancement
 // d'essai, qui a son propre dossier, a donc aussi son propre fichier.
 //
-// ⚠ L'ANCIEN EMPLACEMENT EST LE DOSSIER QUE LE SYSTÈME RÉSERVE AU PROGRAMME
-// (`SDL_GetPrefPath`). Tant que `savedata\` n'a pas son fichier, on y recopie
-// celui-là : sans cela, chaque fenêtre du joueur reviendrait une fois à sa
-// place d'usine. L'ancien n'est jamais déplacé ni effacé — un échec de copie
-// laisse seulement les places d'usine, et le journal le dit.
-//
 // ⚠ ET LE DOSSIER SE CRÉE ICI : ImGui écrit son fichier sans créer le dossier
 // qui le porte, et une première partie sans `savedata\` perdrait tout.
 std::filesystem::path InterfaceSettingsFile(const std::filesystem::path& client_root) {
   const std::filesystem::path folder = client_root / kSaveFolder;
-  const std::filesystem::path file = folder / kInterfaceSettingsFile;
   std::error_code failed;
   std::filesystem::create_directories(folder, failed);
-  if (std::filesystem::exists(file, failed)) {
-    return file;
-  }
-  char* const former_folder = SDL_GetPrefPath("moonlight", "moonclient");
-  if (former_folder == nullptr) {
-    return file;
-  }
-  const std::filesystem::path former =
-      std::filesystem::path(former_folder) / kInterfaceSettingsFile;
-  SDL_free(former_folder);
-  if (!std::filesystem::exists(former, failed)) {
-    return file;
-  }
-  if (std::filesystem::copy_file(former, file, failed)) {
-    ro::core::LogInfo("interface : réglages repris de {}", former.string());
-  } else {
-    ro::core::LogWarning("interface : {} ne se recopie pas ({}) — fenêtres à leur place d'usine",
-                         former.string(), failed.message());
-  }
-  return file;
+  return folder / kInterfaceSettingsFile;
 }
 
 }  // namespace

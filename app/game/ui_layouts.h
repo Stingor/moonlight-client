@@ -36,10 +36,8 @@ class LayoutPort final : public ProfilePort<ro::ui::LayoutProfile> {
   [[nodiscard]] ro::ui::LayoutProfile Defaults() override { return FactoryLayout(); }
   // ⚠ SANS FICHIER DE PROFILS, « Default » EST LA DISPOSITION D'USINE.
   //
-  // 🔴 LE FICHIER D'IMGUI N'Y COMPTE PAS : la coquille en recopie un ancien,
-  // laissé par une version d'avant `savedata\`, dès que le sien manque — une
-  // installation neuve sur une machine qui a déjà joué en hérite, et y perdait
-  // la disposition d'usine.
+  // ⚠ LE FICHIER D'IMGUI N'Y COMPTE PAS : il ne porte qu'un cache des places,
+  // et la vérité est dans le profil.
   [[nodiscard]] bool Load(UiLayoutBook& into) override;
   void Save(const UiLayoutBook& from) override;
 
