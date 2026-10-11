@@ -2,6 +2,7 @@
 // à l'écran, l'action qu'un geste peut porter, et le libellé d'une liaison.
 // Voir `input/hotkeys.h`.
 
+#include <cstdint>
 #include <optional>
 #include <string>
 
@@ -9,6 +10,7 @@
 #include <SDL3/SDL_keycode.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/text.h"
 
 #include "input/hotkeys.h"
 
@@ -16,6 +18,26 @@ namespace moonclient {
 namespace {
 
 constexpr auto kLastGesture = MouseGesture::kRightClick;
+
+// Le dernier point de code Unicode : au-delà, un code de touche n'est plus un caractère.
+constexpr std::uint32_t kLastCodePoint = 0x10FFFF;
+// L'écart entre une minuscule ASCII et sa capitale.
+constexpr std::uint32_t kAsciiCaseGap = 'a' - 'A';
+
+// UNE TOUCHE DONT LE CODE EST UN CARACTÈRE IMPRIMABLE s'écrit par ce caractère,
+// et se relit par lui, sans passer par SDL_GetKeyName ni SDL_GetKeyFromName.
+//
+// 🔴 CES DEUX-LÀ CONSULTENT LA DISPOSITION DU CLAVIER, et le second ne rend pas
+// toujours ce que le premier a écrit. Sur AZERTY, « 4 » peut se relire comme
+// l'apostrophe de la même touche, puisque le 4 s'y tape avec Maj — alors que la
+// touche, pressée en jeu, rend bien « 4 ». La case perdait sa touche à chaque
+// démarrage.
+//
+// ⚠ Espace, Entrée, Tab, Échap, Retour et Suppr gardent leur nom : leur code
+// est un caractère, mais un caractère qui ne se lit pas dans un fichier.
+[[nodiscard]] bool IsCharacterKey(std::uint32_t key) {
+  return key > SDLK_SPACE && key != SDLK_DELETE && key <= kLastCodePoint;
+}
 
 [[nodiscard]] const char* FileNameOfGesture(MouseGesture gesture) {
   switch (gesture) {
@@ -127,6 +149,13 @@ std::string FileNameOfKey(std::uint32_t key) {
   if (const std::optional<MouseGesture> gesture = GestureOfKey(key); gesture.has_value()) {
     return FileNameOfGesture(*gesture);
   }
+  if (IsCharacterKey(key)) {
+    // Une lettre s'écrit en capitale, comme elle est gravée sur la touche.
+    const bool lower_letter = key >= 'a' && key <= 'z';
+    std::string name;
+    ro::core::AppendUtf8(name, static_cast<char32_t>(lower_letter ? key - kAsciiCaseGap : key));
+    return name;
+  }
   const char* name = SDL_GetKeyName(static_cast<SDL_Keycode>(key));
   return name != nullptr ? name : "";
 }
@@ -137,6 +166,15 @@ std::uint32_t KeyOfFileName(const std::string& name) {
     const auto gesture = static_cast<MouseGesture>(rank);
     if (name == FileNameOfGesture(gesture)) {
       return KeyOfGesture(gesture);
+    }
+  }
+  if (!name.empty()) {
+    std::size_t after_first = 0;
+    const char32_t first = ro::core::NextCodePoint(name, after_first);
+    if (after_first == name.size() && first != ro::core::kReplacementCharacter &&
+        IsCharacterKey(first)) {
+      const bool capital_letter = first >= 'A' && first <= 'Z';
+      return capital_letter ? first + kAsciiCaseGap : first;
     }
   }
   return static_cast<std::uint32_t>(SDL_GetKeyFromName(name.c_str()));
