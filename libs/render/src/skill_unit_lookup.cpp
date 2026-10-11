@@ -2,7 +2,9 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <string_view>
 
+#include "ro/render/effect_case_table.h"
 #include "ro/render/effect_duration.h"
 #include "ro/render/effect_frame.h"
 #include "ro/render/effect_node_pattern_table.h"
@@ -91,6 +93,14 @@ std::uint32_t SustainedUnitVisualPeriodMs(std::uint32_t effect_id) {
     return 0;
   }
   return static_cast<std::uint32_t>(*earliest_ticks) * static_cast<std::uint32_t>(kEffectTickMs);
+}
+
+bool SkillUnitVisualSownOnce(const SkillUnitVisualEntry& visual) {
+  // La fabrique qui pose un sprite d'acteur, et le bâtit à la naissance seule.
+  constexpr std::string_view kSpriteFactory = "Effect_Build_ActorSpriteEffectByType";
+  const EffectCaseEntry* builder = EffectCaseFor(visual.effect_id);
+  return visual.shape == SkillUnitVisualShape::kPermanent && builder != nullptr &&
+         builder->client_function == kSpriteFactory;
 }
 
 std::uint32_t SkillUnitVisualPeriodMs(const SkillUnitVisualEntry& visual) {

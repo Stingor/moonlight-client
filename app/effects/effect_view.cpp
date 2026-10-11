@@ -527,9 +527,11 @@ void EffectsInPlay::NoticeSkillUnitVisuals(const ro::sim::World& world, const Ma
       // 🔴 UN VISUEL PERMANENT NE SE RELANCE PAS : chaque tic de l'unité repousse
       // la fin de son instance. Il ne se repose que si tout ce qu'il a semé est mort.
       // Sauf s'il dure autant que son unité : il se relance avant de s'effacer.
+      // Et jamais s'il est le sprite d'une fabrique : voir `SkillUnitVisualSownOnce`.
       if (visual->shape == ro::render::SkillUnitVisualShape::kPermanent &&
           !ro::render::SkillUnitVisualLastsWithUnit(unit.unit_id) &&
-          nodes_->CarriesEffect(visual->effect_id, id)) {
+          (ro::render::SkillUnitVisualSownOnce(*visual) ||
+           nodes_->CarriesEffect(visual->effect_id, id))) {
         sown->second.at_ms = now_ms;
         continue;
       }

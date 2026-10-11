@@ -125,6 +125,16 @@ inline constexpr std::uint16_t kGravitationFieldUnit = 184;
   return unit_id == kGravitationFieldUnit;
 }
 
+// 🔴 UN VISUEL PERMANENT QU'UNE FABRIQUE DE SPRITE BÂTIT NE SE RESÈME JAMAIS.
+//
+// Le client sème un visuel permanent une fois et prolonge son instance à chaque
+// tic de l'unité. La plupart se maintiennent par leur mise à jour, et ce client
+// imite la prolongation en resemant ce qui est mort. Mais la fabrique de sprite
+// ne crée le sien qu'à la naissance, et il joue son action une fois : prolongée,
+// l'instance ne le refait pas. Le resemer ferait rejouer le tatami de
+// Tatamigaeshi une seconde fois, à mi-vie de l'unité.
+[[nodiscard]] bool SkillUnitVisualSownOnce(const SkillUnitVisualEntry& visual);
+
 // L'ATTENTE ENTRE DEUX SEMIS d'un tel visuel, en millisecondes : la troupe
 // suivante naît quand la première des précédentes commence à s'effacer, et les
 // deux se croisent le temps de la sortie — aucune image ne montre le sol nu.
