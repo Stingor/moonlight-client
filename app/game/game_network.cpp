@@ -159,7 +159,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
           ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms),
           ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
           pieces_.entity_inspector.ApplyFrame(received),
-          ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms)}) {
+          ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
+          character_->SayEquipAttributes(received, world_, now_ms)}) {
       if (outcome == ro::net::FrameOutcome::kUnhandled) {
         outcome = told;
       }

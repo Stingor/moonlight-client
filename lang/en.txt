@@ -16848,3 +16848,195 @@ tr: Properties…
 
 fr: Redemander
 tr: Ask again
+
+fr: AGI, DEX, STR
+tr: AGI, DEX, STR
+
+fr: AGI, VIT
+tr: AGI, VIT
+
+fr: ASPD alternative
+tr: Alternate ASPD
+
+fr: ATK (raffinage)
+tr: ATK (refine)
+
+fr: ATK arme
+tr: Weapon ATK
+
+fr: Arme incassable
+tr: Unbreakable weapon
+
+fr: Armure incassable
+tr: Unbreakable armor
+
+fr: Bouclier incassable
+tr: Unbreakable shield
+
+fr: Caché aux monstres qui détectent
+tr: Hidden from detecting monsters
+
+fr: Cape incassable
+tr: Unbreakable garment
+
+fr: Cast ininterruptible
+tr: Uninterruptible cast
+
+fr: Chaussures incassables
+tr: Unbreakable shoes
+
+fr: Coiffe incassable
+tr: Unbreakable headgear
+
+fr: Critiques à distance
+tr: Ranged criticals
+
+fr: DEF (raffinage)
+tr: DEF (refine)
+
+fr: Dég. mag. vs monstre #%d
+tr: M. dmg vs monster #%d
+
+fr: Dég. mag. élément
+tr: M. dmg element
+
+fr: Dégâts arme
+tr: Weapon damage
+
+fr: Dégâts plafonnés en PV max
+tr: Damage capped by Max HP
+
+fr: Dégâts sans malus de taille
+tr: No size penalty
+
+fr: Dégâts selon DEF vs
+tr: Damage by DEF vs
+
+fr: Dégâts vs monstre #%d
+tr: Damage vs monster #%d
+
+fr: Empêche le soin vs
+tr: Prevents healing vs
+
+fr: Immunité divers
+tr: Misc. immunity
+
+fr: Immunité magique
+tr: Magic immunity
+
+fr: Immunité physique
+tr: Physical immunity
+
+fr: Inflige %s
+tr: Inflicts %s
+
+fr: MATK arme
+tr: Weapon MATK
+
+fr: Mado Gear sans carburant
+tr: Mado Gear without fuel
+
+fr: Magnus Exorcismus sur toutes les races
+tr: Magnus Exorcismus on every race
+
+fr: PV par coup
+tr: HP per hit
+
+fr: PV par coup vs
+tr: HP per hit vs
+
+fr: PV/kill à distance
+tr: HP/kill at range
+
+fr: Perte PV toutes les %d ms
+tr: HP loss every %d ms
+
+fr: Perte SP toutes les %d ms
+tr: SP loss every %d ms
+
+fr: Poids max
+tr: Max weight
+
+fr: Réduc. mag. vs monstre #%d
+tr: M. red. vs monster #%d
+
+fr: Réduc. vs monstre #%d
+tr: Red. vs monster #%d
+
+fr: Régén. PV toutes les %d ms
+tr: HP regen every %d ms
+
+fr: Régén. SP toutes les %d ms
+tr: SP regen every %d ms
+
+fr: Résist. mag. vs
+tr: M. resist vs
+
+fr: Résurrection : PV et SP pleins
+tr: Resurrection: full HP and SP
+
+fr: SP par coup
+tr: SP per hit
+
+fr: SP par coup vs
+tr: SP per hit vs
+
+fr: SP/kill à distance
+tr: SP/kill at range
+
+fr: Sans Zeny
+tr: No Zeny cost
+
+fr: Sans bouteilles
+tr: No bottles
+
+fr: Sans consommables
+tr: No consumables
+
+fr: Sans délai de marche aux coups
+tr: No walk delay when hit
+
+fr: Sans gemme
+tr: No gemstone
+
+fr: Sans munitions
+tr: No ammunition
+
+fr: Sans régénération naturelle
+tr: No natural regeneration
+
+fr: Soin de %s
+tr: Healing from %s
+
+fr: Soin du groupe #%d
+tr: Healing from group #%d
+
+fr: Statut sur soi : %s
+tr: Status on self: %s
+
+fr: Toutes les stats
+tr: All stats
+
+fr: Vanish PV
+tr: HP Vanish
+
+fr: Vanish SP
+tr: SP Vanish
+
+fr: Vitesse
+tr: Speed
+
+fr: Voit les cachés
+tr: Sees hidden
+
+fr: par %s
+tr: by %s
+
+fr: Élément d'arme :
+tr: Weapon element:
+
+fr: Élément d'armure :
+tr: Armor element:
+
+fr: Équipement inarrachable
+tr: Unstrippable equipment

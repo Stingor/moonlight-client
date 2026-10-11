@@ -22,15 +22,16 @@ namespace moonclient {
 //
 // Et le Flag Graffiti, que ce client sait peindre au sol, le maître d'un
 // monstre invoqué, les règles du serveur, les queues du carnet, la raison d'une
-// fin de quête, le maître d'un compagnon, l'auteur de la parole et le relais
-// Discord décrit, qu'il sait lire. ⚠ LES QUEUES DU CARNET S'ANNONCENT MÊME
-// CARNET ÉTEINT, et le relais Discord même relais décoché : ces bits disent
+// fin de quête, le maître d'un compagnon, l'auteur de la parole, le relais
+// Discord décrit et ce qu'apporte une pièce posée ou retirée, qu'il sait lire. ⚠ LES QUEUES DU
+// CARNET S'ANNONCENT MÊME CARNET ÉTEINT, et le relais Discord même relais décoché : ces bits disent
 // seulement ce que ce client sait lire, et n'abonnent à rien.
 inline constexpr std::uint32_t kAlwaysShownSurfaces =
     ro::net::kUiCapNpcDialog | ro::net::kUiCapChat | ro::net::kUiCapCardAlbum |
     ro::net::kUiCapCardAlbumDropper | ro::net::kUiCapFlagGraffiti | ro::net::kUiCapUnitMaster |
     ro::net::kUiCapServerRules | ro::net::kUiCapMvpTrackerExt | ro::net::kUiCapQuestEnd |
-    ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich;
+    ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich |
+    ro::net::kUiCapEquipAttributes;
 [[nodiscard]] constexpr std::uint32_t ShownSurfaces(bool mvp_tracker_enabled) noexcept {
   return kAlwaysShownSurfaces | (mvp_tracker_enabled ? ro::net::kUiCapMvpTracker : 0U);
 }

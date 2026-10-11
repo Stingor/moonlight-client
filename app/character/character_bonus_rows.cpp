@@ -12,27 +12,13 @@
 #include "world/entity_traits.h"
 
 namespace moonclient {
-namespace {
-
-// Les cinq familles dans lesquelles un index de bonus conditionnel se lit.
-enum class TargetFamily { kUnknown, kElement, kRace, kSize, kMonsterClass, kRaceGroup };
-
-// ── LES CIBLES D'UN BONUS CONDITIONNEL ──────────────────────────────────────
-//
-// ⚠ CINQ FAMILLES. Élément, race et taille se disent avec les mots de la table de
-// messages du client (voir `entity_traits.h`), dans la langue de l'installation ;
-// la classe et le groupe de monstres, que la table ne nomme pas, passent par
-// `core::Tr`.
-//
-// ⚠ ET CE SONT DES AIGUILLAGES DE LITTÉRAUX, pas des tables : `core::Tr` veut
-// voir sa chaîne à l'appel. Même raison que les six caractéristiques.
 
 // Les groupes de monstres, `e_race2`.
 //
 // ⚠ LA TABLE EST INCOMPLÈTE ET LE RESTERA : le serveur en ajoute au fil de ses
 // épisodes, et un groupe sans nom vaut mieux nommé par son NUMÉRO que « ? » —
 // c'est le numéro qui permet de le retrouver dans `mob_db`.
-[[nodiscard]] std::string RaceGroupName(std::int16_t index) {
+std::string RaceGroupName(std::int16_t index) {
   switch (index) {
     case 1:
       return ro::core::Tr("Goblin");
@@ -67,6 +53,21 @@ enum class TargetFamily { kUnknown, kElement, kRace, kSize, kMonsterClass, kRace
   std::snprintf(named, sizeof(named), ro::core::Tr("groupe #%d"), index);
   return named;
 }
+
+namespace {
+
+// Les cinq familles dans lesquelles un index de bonus conditionnel se lit.
+enum class TargetFamily { kUnknown, kElement, kRace, kSize, kMonsterClass, kRaceGroup };
+
+// ── LES CIBLES D'UN BONUS CONDITIONNEL ──────────────────────────────────────
+//
+// ⚠ CINQ FAMILLES. Élément, race et taille se disent avec les mots de la table de
+// messages du client (voir `entity_traits.h`), dans la langue de l'installation ;
+// la classe et le groupe de monstres, que la table ne nomme pas, passent par
+// `core::Tr`.
+//
+// ⚠ ET CE SONT DES AIGUILLAGES DE LITTÉRAUX, pas des tables : `core::Tr` veut
+// voir sa chaîne à l'appel. Même raison que les six caractéristiques.
 
 // À quoi s'applique un code, et contre qui.
 //

@@ -44,6 +44,7 @@ add_library(ro_net STATIC
     src/connection.cpp
     src/discord_relay.cpp
     src/entity_props.cpp
+    src/equip_attributes.cpp
     src/frame_tally.cpp
     src/guild.cpp
     src/guild_relation_answer.cpp

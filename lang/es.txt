@@ -16848,3 +16848,195 @@ tr: Propiedades…
 
 fr: Redemander
 tr: Volver a pedir
+
+fr: AGI, DEX, STR
+tr: AGI, DEX, STR
+
+fr: AGI, VIT
+tr: AGI, VIT
+
+fr: ASPD alternative
+tr: ASPD alternativa
+
+fr: ATK (raffinage)
+tr: ATK (refine)
+
+fr: ATK arme
+tr: ATK del arma
+
+fr: Arme incassable
+tr: Arma irrompible
+
+fr: Armure incassable
+tr: Armadura irrompible
+
+fr: Bouclier incassable
+tr: Escudo irrompible
+
+fr: Caché aux monstres qui détectent
+tr: Oculto a los monstruos que detectan
+
+fr: Cape incassable
+tr: Capa irrompible
+
+fr: Cast ininterruptible
+tr: Cast ininterrumpible
+
+fr: Chaussures incassables
+tr: Calzado irrompible
+
+fr: Coiffe incassable
+tr: Casco irrompible
+
+fr: Critiques à distance
+tr: Críticos a distancia
+
+fr: DEF (raffinage)
+tr: DEF (refine)
+
+fr: Dég. mag. vs monstre #%d
+tr: Daño mág. vs monstruo #%d
+
+fr: Dég. mag. élément
+tr: Daño mág. elemento
+
+fr: Dégâts arme
+tr: Daño del arma
+
+fr: Dégâts plafonnés en PV max
+tr: Daño limitado por PV máx.
+
+fr: Dégâts sans malus de taille
+tr: Sin penalización de tamaño
+
+fr: Dégâts selon DEF vs
+tr: Daño según DEF vs
+
+fr: Dégâts vs monstre #%d
+tr: Daño vs monstruo #%d
+
+fr: Empêche le soin vs
+tr: Impide la curación vs
+
+fr: Immunité divers
+tr: Inmunidad diversa
+
+fr: Immunité magique
+tr: Inmunidad mágica
+
+fr: Immunité physique
+tr: Inmunidad física
+
+fr: Inflige %s
+tr: Inflige %s
+
+fr: MATK arme
+tr: MATK del arma
+
+fr: Mado Gear sans carburant
+tr: Mado Gear sin combustible
+
+fr: Magnus Exorcismus sur toutes les races
+tr: Magnus Exorcismus sobre todas las razas
+
+fr: PV par coup
+tr: PV por golpe
+
+fr: PV par coup vs
+tr: PV por golpe vs
+
+fr: PV/kill à distance
+tr: PV/kill a distancia
+
+fr: Perte PV toutes les %d ms
+tr: Pérdida de PV cada %d ms
+
+fr: Perte SP toutes les %d ms
+tr: Pérdida de SP cada %d ms
+
+fr: Poids max
+tr: Peso máx.
+
+fr: Réduc. mag. vs monstre #%d
+tr: Reduc. mág. vs monstruo #%d
+
+fr: Réduc. vs monstre #%d
+tr: Reduc. vs monstruo #%d
+
+fr: Régén. PV toutes les %d ms
+tr: Regen. PV cada %d ms
+
+fr: Régén. SP toutes les %d ms
+tr: Regen. SP cada %d ms
+
+fr: Résist. mag. vs
+tr: Resist. mág. vs
+
+fr: Résurrection : PV et SP pleins
+tr: Resurrección: PV y SP llenos
+
+fr: SP par coup
+tr: SP por golpe
+
+fr: SP par coup vs
+tr: SP por golpe vs
+
+fr: SP/kill à distance
+tr: SP/kill a distancia
+
+fr: Sans Zeny
+tr: Sin coste de Zeny
+
+fr: Sans bouteilles
+tr: Sin botellas
+
+fr: Sans consommables
+tr: Sin consumibles
+
+fr: Sans délai de marche aux coups
+tr: Sin retraso al andar al recibir golpes
+
+fr: Sans gemme
+tr: Sin gema
+
+fr: Sans munitions
+tr: Sin munición
+
+fr: Sans régénération naturelle
+tr: Sin regeneración natural
+
+fr: Soin de %s
+tr: Curación de %s
+
+fr: Soin du groupe #%d
+tr: Curación del grupo #%d
+
+fr: Statut sur soi : %s
+tr: Estado sobre uno mismo: %s
+
+fr: Toutes les stats
+tr: Todas las stats
+
+fr: Vanish PV
+tr: Vanish PV
+
+fr: Vanish SP
+tr: Vanish SP
+
+fr: Vitesse
+tr: Velocidad
+
+fr: Voit les cachés
+tr: Ve a los ocultos
+
+fr: par %s
+tr: por %s
+
+fr: Élément d'arme :
+tr: Elemento del arma:
+
+fr: Élément d'armure :
+tr: Elemento de la armadura:
+
+fr: Équipement inarrachable
+tr: Equipo inarrancable

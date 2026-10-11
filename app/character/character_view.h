@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "ro/net/connection.h"
+#include "ro/net/world_update.h"
 #include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/item_icons.h"
@@ -20,6 +21,7 @@
 #include "ro/vfs/job_names.h"
 #include "ro/vfs/status_table.h"
 
+#include "character/equip_attribute_lines.h"
 #include "items/creator_names.h"
 
 namespace moonclient {
@@ -98,7 +100,18 @@ class CharacterView {
   void Apply(const ro::ui::CharacterWindowAction& asked, ro::net::Connection& link,
              const ro::sim::World& world);
 
+  // CE QU'APPORTE UNE PIÈCE OU UN ENSEMBLE qui entre ou sort de l'équipement
+  // (`ZC 0x0F3D`), écrit dans la case « Attributs d'équipement » de la
+  // discussion avec les libellés de la fiche. ⚠ ICI parce que c'est la fiche
+  // qui tient de quoi nommer — cibles, compétences, statuts, objets.
+  [[nodiscard]] ro::net::FrameOutcome SayEquipAttributes(const ro::net::Frame& frame,
+                                                         ro::sim::World& world,
+                                                         std::uint32_t now_ms) const;
+
  private:
+  // Ce qui nomme ce que les bonus désignent, pour la fiche et pour la discussion.
+  [[nodiscard]] EquipAttributeNames Names() const;
+
   // Les trois cases, refaites à chaque image par `Refresh`.
   void RefreshCompanions(const ro::sim::World& world);
 

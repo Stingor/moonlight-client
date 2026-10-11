@@ -143,35 +143,6 @@ void PaintLabelBackground(std::string_view text) {
   return widest + kStatValueGap * Scale();
 }
 
-// La valeur d'une rangée, dans l'unité que le serveur lui donne.
-//
-// ⚠ LE SIGNE S'ÉCRIT TOUJOURS pour les trois unités entières : un apport négatif
-// existe — une réduction de temps d'incantation en est une — et « 12 % » ne dit
-// pas dans quel sens. Les deux unités à virgule, elles, sont des TAUX, que le
-// serveur n'envoie jamais négatifs ; on garde quand même la partie décimale en
-// valeur absolue, sans quoi un jour « -1,-5 % » s'écrirait.
-void WriteBonusValue(char* into, std::size_t room, const CharacterBonusRow& row) {
-  switch (row.unit) {
-    case BonusUnit::kPercent:
-      std::snprintf(into, room, "%+d%%", row.value);
-      return;
-    case BonusUnit::kMilliseconds:
-      std::snprintf(into, room, core::Tr("%+d ms"), row.value);
-      return;
-    case BonusUnit::kPerMille:
-      std::snprintf(into, room, "%d,%d%%", row.value / kPerMillePerPercent,
-                    std::abs(row.value) % kPerMillePerPercent);
-      return;
-    case BonusUnit::kCentiPercent:
-      std::snprintf(into, room, "%d,%02d%%", row.value / kCentiPerPercent,
-                    std::abs(row.value) % kCentiPerPercent);
-      return;
-    case BonusUnit::kFlat:
-      break;
-  }
-  std::snprintf(into, room, "%+d", row.value);
-}
-
 // Une rangée d'APPORT : même colonne que les dérivées, mais le libellé peut la
 // dépasser.
 //
@@ -426,6 +397,35 @@ void DrawCharacterStats(const CharacterStatsView& stats, const SkinArt& art,
       BonusRow(item_bonus);
     }
   }
+}
+
+// La valeur d'une rangée, dans l'unité que le serveur lui donne.
+//
+// ⚠ LE SIGNE S'ÉCRIT TOUJOURS pour les trois unités entières : un apport négatif
+// existe — une réduction de temps d'incantation en est une — et « 12 % » ne dit
+// pas dans quel sens. Les deux unités à virgule, elles, sont des TAUX, que le
+// serveur n'envoie jamais négatifs ; on garde quand même la partie décimale en
+// valeur absolue, sans quoi un jour « -1,-5 % » s'écrirait.
+void WriteBonusValue(char* into, std::size_t room, const CharacterBonusRow& row) {
+  switch (row.unit) {
+    case BonusUnit::kPercent:
+      std::snprintf(into, room, "%+d%%", row.value);
+      return;
+    case BonusUnit::kMilliseconds:
+      std::snprintf(into, room, core::Tr("%+d ms"), row.value);
+      return;
+    case BonusUnit::kPerMille:
+      std::snprintf(into, room, "%d,%d%%", row.value / kPerMillePerPercent,
+                    std::abs(row.value) % kPerMillePerPercent);
+      return;
+    case BonusUnit::kCentiPercent:
+      std::snprintf(into, room, "%d,%02d%%", row.value / kCentiPerPercent,
+                    std::abs(row.value) % kCentiPerPercent);
+      return;
+    case BonusUnit::kFlat:
+      break;
+  }
+  std::snprintf(into, room, "%+d", row.value);
 }
 
 }  // namespace ro::ui

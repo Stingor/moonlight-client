@@ -181,6 +181,9 @@ constexpr std::size_t kMaxFrameSize = 0xFFFF;
                                                       ZcMoonlightServerRulesEntry& value);
 [[maybe_unused]] void WriteZcMoonlightServerRulesEntry(ByteWriter& writer,
                                                        const ZcMoonlightServerRulesEntry& value);
+[[maybe_unused]] void ReadMoonlightEquipBonus(ByteReader& reader, MoonlightEquipBonus& value);
+[[maybe_unused]] void WriteMoonlightEquipBonus(ByteWriter& writer,
+                                               const MoonlightEquipBonus& value);
 [[maybe_unused]] void ReadCzSePcBuyCashitemListSub(ByteReader& reader,
                                                    CzSePcBuyCashitemListSub& value);
 [[maybe_unused]] void WriteCzSePcBuyCashitemListSub(ByteWriter& writer,
@@ -1051,6 +1054,22 @@ void WriteZcMoonlightServerRulesEntry(ByteWriter& writer,
                                       const ZcMoonlightServerRulesEntry& value) {
   writer.U16(static_cast<std::uint16_t>(value.key));
   writer.I32(static_cast<std::int32_t>(value.value));
+}
+
+void ReadMoonlightEquipBonus(ByteReader& reader, MoonlightEquipBonus& value) {
+  value.level = static_cast<std::uint8_t>(reader.U8());
+  value.type = static_cast<std::uint16_t>(reader.U16());
+  for (std::int32_t& element : value.values) {
+    element = static_cast<std::int32_t>(reader.I32());
+  }
+}
+
+void WriteMoonlightEquipBonus(ByteWriter& writer, const MoonlightEquipBonus& value) {
+  writer.U8(static_cast<std::uint8_t>(value.level));
+  writer.U16(static_cast<std::uint16_t>(value.type));
+  for (const std::int32_t element : value.values) {
+    writer.I32(static_cast<std::int32_t>(element));
+  }
 }
 
 void ReadCzSePcBuyCashitemListSub(ByteReader& reader, CzSePcBuyCashitemListSub& value) {
@@ -11726,6 +11745,50 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightDiscordRich& packet) {
   writer.U8(static_cast<std::uint8_t>(packet.avatar_len));
   writer.U8(static_cast<std::uint8_t>(packet.flags));
   writer.U16(static_cast<std::uint16_t>(packet.text_len));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightEquipAttributes& packet) {
+  if (frame.size() < ZcMoonlightEquipAttributes::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightEquipAttributes::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.equipped = static_cast<std::uint8_t>(reader.U8());
+  packet.kind = static_cast<std::uint8_t>(reader.U8());
+  packet.id = static_cast<std::uint32_t>(reader.U32());
+  if (reader.remaining() % MoonlightEquipBonus::kWireSize != 0) {
+    reader.Invalidate();
+  } else {
+    packet.bonuses.resize(reader.remaining() / MoonlightEquipBonus::kWireSize);
+    for (MoonlightEquipBonus& element : packet.bonuses) {
+      ReadMoonlightEquipBonus(reader, element);
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightEquipAttributes& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightEquipAttributes::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightEquipAttributes::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.equipped));
+  writer.U8(static_cast<std::uint8_t>(packet.kind));
+  writer.U32(static_cast<std::uint32_t>(packet.id));
+  for (const MoonlightEquipBonus& element : packet.bonuses) {
+    WriteMoonlightEquipBonus(writer, element);
+  }
   if (writer.size() > kMaxFrameSize ||
       !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
     return {};

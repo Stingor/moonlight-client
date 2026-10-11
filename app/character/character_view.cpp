@@ -8,8 +8,10 @@
 #include "ro/core/log.h"
 #include "ro/net/character.h"
 #include "ro/net/companion.h"
+#include "ro/net/equip_attributes.h"
 #include "ro/net/inventory.h"
 #include "ro/net/player_config.h"
+#include "ro/proto/map_packets.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/sim/equip_location.h"
 #include "ro/sim/player_bonuses.h"
@@ -18,6 +20,7 @@
 #include "ro/vfs/item_name.h"
 
 #include "character/character_bonus_rows.h"
+#include "character/equip_attribute_lines.h"
 #include "character/equip_slot_map.h"
 #include "items/inventory_view.h"
 #include "world/actor_view.h"
@@ -298,26 +301,49 @@ void CharacterView::Refresh(bool open, const ro::sim::World& world, bool costume
   BuildConditionalRows(world.player_bonuses(), words_ != nullptr ? *words_ : no_words,
                        conditional_labels_, conditional_rows_);
   stats_.conditional_bonuses = conditional_rows_;
-  BuildSkillRows(
-      world.player_bonuses(), skills_,
-      [this](std::uint32_t effect_id) {
-        return statuses_ != nullptr ? statuses_->NameOf(effect_id) : std::string_view();
-      },
-      skill_labels_, skill_rows_);
+  const EquipAttributeNames names = Names();
+  BuildSkillRows(world.player_bonuses(), skills_, names.status_of, skill_labels_, skill_rows_);
   stats_.skill_bonuses = skill_rows_;
-  // ⚠ LE NOM NU, SANS RAFFINEMENT NI CARTES : ce bonus vise une ESPÈCE d'objet,
-  // pas un exemplaire. Composer le nom décoré ferait croire à un objet précis.
-  BuildItemRows(
-      world.player_bonuses(),
-      [this](std::uint32_t item_id) {
-        if (items_ == nullptr || words_ == nullptr) {
-          return std::string();
-        }
-        return ro::vfs::ItemNameText(
-            ro::vfs::ComposeItemName(ro::vfs::ItemNameFacts{.item_id = item_id}, *items_, *words_));
-      },
-      item_labels_, item_rows_);
+  BuildItemRows(world.player_bonuses(), names.item_of, item_labels_, item_rows_);
   stats_.item_bonuses = item_rows_;
+}
+
+EquipAttributeNames CharacterView::Names() const {
+  return EquipAttributeNames{
+      .words = words_,
+      .skills = skills_,
+      .status_of =
+          [this](std::uint32_t effect_id) {
+            return statuses_ != nullptr ? statuses_->NameOf(effect_id) : std::string_view();
+          },
+      // ⚠ LE NOM NU, SANS RAFFINEMENT NI CARTES : un bonus vise une ESPÈCE
+      // d'objet, pas un exemplaire. Composer le nom décoré ferait croire à un
+      // objet précis.
+      .item_of =
+          [this](std::uint32_t item_id) {
+            if (items_ == nullptr || words_ == nullptr) {
+              return std::string();
+            }
+            return ro::vfs::ItemNameText(ro::vfs::ComposeItemName(
+                ro::vfs::ItemNameFacts{.item_id = item_id}, *items_, *words_));
+          }};
+}
+
+ro::net::FrameOutcome CharacterView::SayEquipAttributes(const ro::net::Frame& frame,
+                                                        ro::sim::World& world,
+                                                        std::uint32_t now_ms) const {
+  if (frame.opcode != ro::proto::ZcMoonlightEquipAttributes::kOpcode) {
+    return ro::net::FrameOutcome::kUnhandled;
+  }
+  const std::optional<ro::sim::EquipAttributes> told = ro::net::ReadEquipAttributes(frame);
+  if (!told.has_value()) {
+    return ro::net::FrameOutcome::kUndecodable;
+  }
+  for (std::string& line : ComposeEquipAttributeLines(*told, Names())) {
+    world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kEquipAttributes, 0,
+                     std::move(line), now_ms, EquipAttributesColor(told->equipped));
+  }
+  return ro::net::FrameOutcome::kApplied;
 }
 
 void CharacterView::Apply(const ro::ui::CharacterWindowAction& asked, ro::net::Connection& link,

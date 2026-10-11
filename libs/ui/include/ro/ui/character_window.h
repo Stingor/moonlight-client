@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -337,6 +338,10 @@ struct CharacterBonusRow {
   std::int32_t value = 0;
   BonusUnit unit = BonusUnit::kFlat;
 };
+
+// LA VALEUR D'UNE RANGÉE, écrite dans son unité : la fiche la dessine, la
+// discussion l'écrit dans ses lignes d'attributs d'équipement.
+void WriteBonusValue(char* into, std::size_t room, const CharacterBonusRow& row);
 
 struct CharacterStatsView {
   // Dans l'ordre du client : force, agilité, constitution, intelligence,

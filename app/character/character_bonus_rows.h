@@ -23,6 +23,10 @@ using ItemNamer = std::function<std::string(std::uint32_t item_id)>;
 // OBJETS : la table vit dans `vfs`, que cette bibliothèque ne connaît pas.
 using StatusNamer = std::function<std::string_view(std::uint32_t effect_id)>;
 
+// LE NOM D'UN GROUPE DE MONSTRES (`e_race2`), ou son numéro si nous ne le
+// connaissons pas.
+[[nodiscard]] std::string RaceGroupName(std::int16_t index);
+
 // CE QUE L'ÉQUIPEMENT APPORTE, mis en rangées.
 //
 // ⚠ ICI PARCE QUE `ui` NE CONNAÎT NI `sim` NI LE SERVEUR : la fenêtre reçoit une

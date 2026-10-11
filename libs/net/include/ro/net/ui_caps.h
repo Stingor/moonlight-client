@@ -54,6 +54,10 @@ inline constexpr std::uint32_t kUiCapDiscordRich = 0x00000800;
 // 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire le maître d'un compagnon
 // (`ZC 0x0F37`). Même règle : le serveur ne l'envoie qu'à qui l'annonce.
 inline constexpr std::uint32_t kUiCapCompanionMaster = 0x00001000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire ce qu'apporte une pièce ou un
+// ensemble qui entre ou sort de l'équipement (`ZC 0x0F3D`). Même règle : le
+// serveur ne l'envoie qu'à qui l'annonce.
+inline constexpr std::uint32_t kUiCapEquipAttributes = 0x00002000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 
