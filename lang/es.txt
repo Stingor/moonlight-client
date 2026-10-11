@@ -16310,8 +16310,8 @@ tr: Tu mascota ha sido alimentada. %s (quedan %d)
 fr: Aimanter les barres entre elles
 tr: Imantar las barras entre sí
 
-fr: Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde le dernier mot.
-tr: Los bordes de una barra que se mueve se alinean con los de las demás barras mostradas, o se pegan a ellas uno tras otro. La cuadrícula, cuando imanta, tiene la última palabra.
+fr: Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde le dernier mot. CTRL + déplacement emmène en bloc toutes les barres qui se touchent.
+tr: Los bordes de una barra que se mueve se alinean con los de las demás barras mostradas, o se pegan a ellas uno tras otro. La cuadrícula, cuando imanta, tiene la última palabra. CTRL + arrastrar mueve juntas todas las barras que se tocan.
 
 fr: Pose cette barre au milieu de la largeur de l'écran, à la même hauteur. Les autres barres ne bougent pas.
 tr: Coloca esta barra en el centro del ancho de la pantalla, a la misma altura. Las demás barras no se mueven.

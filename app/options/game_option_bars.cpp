@@ -110,7 +110,8 @@ void GameOptions::ComposeShortcutRows(int shown_bar) {
       .label = Tr("Aimanter les barres entre elles"),
       .help = Tr("Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres "
                  "affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde "
-                 "le dernier mot."),
+                 "le dernier mot. CTRL + déplacement emmène en bloc toutes les barres qui se "
+                 "touchent."),
       .kind = OptionKind::kToggle,
       .on = shortcut_bars_.sticky});
   ComposeArmedSkillRows();

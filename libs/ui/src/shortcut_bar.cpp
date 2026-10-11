@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <string>
 
@@ -290,6 +291,18 @@ bool g_cursor_was_over_a_bar = true;
 // La fenêtre de la dernière barre dessinée. ⚠ RENDUE PAR UN CÔTÉ PLUTÔT QUE PAR
 // UN RETOUR : `DrawOneBar` sort par deux chemins, dont le `Begin` qui refuse.
 const ImGuiWindow* g_last_bar_window = nullptr;
+
+// LE BLOC CTRL : les barres qui touchaient celle qu'on a saisie, et l'écart de
+// chacune à elle, figé au début du geste. 🔴 UN ÉCART ET NON UN DÉPLACEMENT
+// CUMULÉ : posées à « saisie + écart », les sœurs suivent la place FINALE de la
+// barre saisie, aimant et grille compris, sans dériver d'un arrondi accumulé.
+struct BarBlock {
+  // La fenêtre que le geste traîne ; zéro hors geste.
+  ImGuiID moving_id = 0;
+  std::uint32_t members = 0;
+  std::array<ImVec2, kShortcutBarCount> offsets{};
+};
+BarBlock g_block;
 
 // LES FENÊTRES DES HUIT BARRES, une identité chacune — sinon les huit partagent
 // une place à l'écran. Les objets sont gardés d'une image à l'autre : leur
@@ -605,12 +618,39 @@ void DrawOneBar(std::size_t bar, const ShortcutBarLayout& look, const ShortcutBa
   ImGui::PopStyleColor(static_cast<int>(kBarColors.size()));
 }
 
+// Pose les sœurs du bloc CTRL à leur écart de la barre saisie. ⚠ AU DESSIN, ET
+// NON AVEC L'AIMANT : la grille corrige la barre saisie APRÈS lui.
+void CarryBarBlock() {
+  const ImGuiContext* context = ImGui::GetCurrentContext();
+  if (g_block.members == 0 || context == nullptr || context->MovingWindow == nullptr ||
+      context->MovingWindow->RootWindow->ID != g_block.moving_id) {
+    return;
+  }
+  const ImVec2 grabbed = context->MovingWindow->RootWindow->Pos;
+  std::array<WindowName, kShortcutBarCount>& names = BarNames();
+  for (std::size_t bar = 0; bar < kShortcutBarCount; ++bar) {
+    if ((g_block.members & (1U << bar)) == 0) {
+      continue;
+    }
+    ImGuiWindow* window = ImGui::FindWindowByName(names[bar].Get());
+    if (window == nullptr) {
+      continue;
+    }
+    const ImVec2 carried(grabbed.x + g_block.offsets[bar].x, grabbed.y + g_block.offsets[bar].y);
+    if (carried.x != window->Pos.x || carried.y != window->Pos.y) {
+      // Écrite comme la souris l'écrirait : le placeur retient la nouvelle place.
+      ImGui::SetWindowPos(window, carried, ImGuiCond_Always);
+    }
+  }
+}
+
 }  // namespace
 
 ShortcutBarsAction DrawShortcutBars(const ShortcutBarsLayout& layout,
                                     std::span<const ShortcutSlotView> slots, const SkinArt& art) {
   static_cast<void>(art);
   ShortcutBarsAction asked;
+  CarryBarBlock();
   // Les fenêtres qu'on vient d'ouvrir, pour savoir ensuite si le curseur est sur
   // l'une d'elles. ⚠ LES OBJETS D'IMGUI, ET NON LEURS NOMS : un nom se traduit,
   // un pointeur de fenêtre est la fenêtre.
@@ -667,11 +707,9 @@ ImVec2 SnappedAmongBars(ImVec2 at, ImVec2 size, const HudSiblings& bars) {
 }
 
 void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
-  if (!layout.sticky || layout.locked) {
-    return;
-  }
   const ImGuiContext* context = ImGui::GetCurrentContext();
-  if (context == nullptr || context->MovingWindow == nullptr) {
+  if (layout.locked || context == nullptr || context->MovingWindow == nullptr) {
+    g_block = BarBlock();
     return;
   }
   const ImGuiWindow* moving = context->MovingWindow->RootWindow;
@@ -696,7 +734,40 @@ void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
     }
   }
   if (mine == nullptr) {
+    g_block = BarBlock();
     return;
+  }
+
+  // LE BLOC SE DÉCIDE AU DÉBUT DU GESTE, CTRL TENU, ⚠ SUR LA PLACE DU CLIC : ImGui
+  // a déjà emporté la barre d'un premier pas, qui la décollerait de sa sœur.
+  if (g_block.moving_id != mine->ID) {
+    g_block = BarBlock();
+    g_block.moving_id = mine->ID;
+    if (ImGui::GetIO().KeyCtrl) {
+      const ImVec2 clicked_at = context->IO.MouseClickedPos[ImGuiMouseButton_Left];
+      const ImVec2 grabbed_at(clicked_at.x - context->ActiveIdClickOffset.x,
+                              clicked_at.y - context->ActiveIdClickOffset.y);
+      std::array<HudRect, kShortcutBarCount> at_click = frames;
+      at_click[static_cast<std::size_t>(mine_rank)].x = grabbed_at.x;
+      at_click[static_cast<std::size_t>(mine_rank)].y = grabbed_at.y;
+      const HudSiblings before{.frames = at_click, .shown = shown, .mine = mine_rank};
+      g_block.members =
+          TouchingFrames(before, mine_rank) & ~(1U << static_cast<unsigned>(mine_rank));
+      for (std::size_t bar = 0; bar < kShortcutBarCount; ++bar) {
+        g_block.offsets[bar] =
+            ImVec2(at_click[bar].x - grabbed_at.x, at_click[bar].y - grabbed_at.y);
+      }
+    }
+  }
+  if (!layout.sticky) {
+    return;
+  }
+  // ⚠ LE BLOC N'AIMANTE PAS SA PROPRE BARRE : ses sœurs la suivent, et la
+  // retenir sur leur place d'avant la collerait sur place.
+  for (std::size_t bar = 0; bar < kShortcutBarCount; ++bar) {
+    if ((g_block.members & (1U << bar)) != 0) {
+      shown[bar] = false;
+    }
   }
   const HudSiblings bars{.frames = frames, .shown = shown, .mine = mine_rank};
   const ImVec2 posed = SnappedAmongBars(mine->Pos, mine->Size, bars);

@@ -16310,8 +16310,8 @@ tr: Your pet has been fed. %s (%d) remaining
 fr: Aimanter les barres entre elles
 tr: Snap bars to each other
 
-fr: Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde le dernier mot.
-tr: The edges of a bar being moved line up with those of the other shown bars, or join them end to end. The grid, when it snaps, has the last word.
+fr: Les bords d'une barre qu'on déplace s'alignent sur ceux des autres barres affichées, ou s'y accolent bout à bout. La grille, quand elle aimante, garde le dernier mot. CTRL + déplacement emmène en bloc toutes les barres qui se touchent.
+tr: The edges of a bar being moved line up with those of the other shown bars, or join them end to end. The grid, when it snaps, has the last word. CTRL + drag moves every touching bar together.
 
 fr: Pose cette barre au milieu de la largeur de l'écran, à la même hauteur. Les autres barres ne bougent pas.
 tr: Places this bar in the middle of the screen's width, at the same height. The other bars do not move.
