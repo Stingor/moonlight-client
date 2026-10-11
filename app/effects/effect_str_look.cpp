@@ -38,6 +38,10 @@ std::vector<std::uint32_t> ShapeStrPlaying(EffectMapMemory::Playing& playing,
                                            std::optional<float> toward_target_degrees) {
   // UN PORTEUR QUI S'EN VA EMPORTE CE FICHIER-CI, ou le laisse finir sur place.
   playing.dies_with_actor = playing.actor_id != 0 && ro::render::StrDiesWithBearer(effect_id);
+  // UN EFFET QUI SE RELÈVE À SA FAÇON : voir `StrAnchorLiftFor`.
+  if (const std::optional<float> lift = ro::render::StrAnchorLiftFor(effect_id)) {
+    playing.lift_pixels = *lift;
+  }
   // UN PRIMITIF DONT LE FICHIER REPART À SA FIN rejoue jusqu'à la fin de sa vie
   // de table, et s'en va plus tôt avec son porteur.
   if (ro::render::PrimitiveStrLoopsForLife(effect_id)) {

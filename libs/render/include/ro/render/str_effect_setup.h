@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <span>
 
 namespace ro::render {
@@ -77,5 +78,25 @@ struct StrEffectSetup {
 // avec son porteur (`lives_with_owner`). Un autre lecteur de `.str` finit sa
 // vie à la dernière place de son porteur.
 [[nodiscard]] bool StrDiesWithBearer(std::uint32_t effect_id);
+
+// ⚠ UN ÉCART VOULU AU CLIENT D'ORIGINE, à la demande du joueur : LA RÉTICULE DE
+// BULL'S EYE.
+//
+// Le client relève l'ancre d'un `.str` de quatre-vingts pixels d'ÉCRAN, que le
+// zoom ne grandit pas ; ce client-ci la relève de quatre-vingts pixels de
+// sprite, qui grandissent avec lui, et le joueur garde ce fonctionnement. Au
+// zoom ordinaire l'ancre se tient alors plus haut que chez le client, et la
+// réticule de Bull's Eye (649) passait au-dessus de la tête au lieu de tomber
+// dessus. Cinquante-huit pixels l'y posent, mesurés sur une capture côte à côte.
+inline constexpr std::uint32_t kBullseyeReticleEffect = 649;
+inline constexpr float kBullseyeReticleLiftPixels = 58.0F;
+
+// Le relèvement propre à un effet, ou rien pour celui de tous.
+[[nodiscard]] constexpr std::optional<float> StrAnchorLiftFor(std::uint32_t effect_id) {
+  if (effect_id == kBullseyeReticleEffect) {
+    return kBullseyeReticleLiftPixels;
+  }
+  return std::nullopt;
+}
 
 }  // namespace ro::render
