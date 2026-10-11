@@ -48,8 +48,16 @@ float BanquetDolls::StandardSpanUnits(int animation) {
   if (reference == nullptr) {
     return 0.0F;
   }
-  const ro::render::OutfitSpan span =
-      ro::render::MeasureOutfitSpan(*reference, static_cast<std::size_t>(measured));
+  // 🔴 UNE SEULE IMAGE : la première, de face. L'enveloppe des huit directions
+  // et de toutes les images est plus large — assis de profil surtout —, la
+  // contrainte de largeur ci-dessous y mord, l'étalon grandit d'autant, et toute
+  // la tablée rapetisse. De face seulement, aussi, pour que l'échelle ne varie
+  // pas quand on tourne un convive à la molette.
+  constexpr std::size_t kFirstFrame = 0;
+  const ro::render::ComposedActor& standard_pose = reference->Composed(
+      static_cast<std::size_t>(measured), static_cast<std::size_t>(ro::ui::kSeatDirection), 0.0F,
+      false, kFirstFrame);
+  const ro::render::OutfitSpan span = ro::render::MeasurePoseSpan(*reference, standard_pose);
   // 🔴 AUX PROPORTIONS D'UN SIÈGE, et non dans un cadre libre : c'est l'échelle
   // qu'aurait choisie l'ajustement pour ce novice-là, CONTRAINTE DE LARGEUR
   // COMPRISE. Sans elle, une pose assise — plus large que haute — mesurerait
