@@ -30,10 +30,6 @@
 #include "game/system_fonts.h"
 #include "options/game_options.h"
 #include "options/option_targets.h"
-// ⚠ POUR LA VIGNETTE SEULE : la pose de la caméra est l'affaire de la scène,
-// pas de cet écran. Voir `kBackdropVignette`, que la passe de teinte lit ici
-// parce qu'elle se joue ENTRE la ville et le formulaire.
-#include "shell/backdrop_camera.h"
 #include "world/overlay_view.h"
 
 namespace moonclient {
@@ -481,32 +477,6 @@ void LobbyScreen::ComposeCursor(std::uint32_t now_ms) {
                               static_cast<float>(now_ms - cursor_since_ms_), mouse_pressed_);
 }
 
-// MONTE LA VIGNETTE, UNE FOIS, LÀ OÙ ELLE SERT.
-//
-// 🔴 ET NON À L'OUVERTURE DE L'ÉCRAN, où elle aurait manqué à qui recoche
-// « Ville en fond » en cours de route : rien ne monte le décor au démarrage
-// quand la case est décochée. Une ressource posée sur UN SEUL chemin
-// d'ouverture, dans un écran qui en a deux, manque sur l'autre. Ici il n'y a
-// pas de chemin à ne pas oublier : le dessin la demande, et elle n'existe que
-// s'il y a une ville à habiller.
-//
-// ⚠ SON ÉCHEC NE FERME PAS L'ÉCRAN : un pilote qui refuse le programme laisse
-// un décor sans assombrissement, pas un joueur sans connexion. Et il ne se
-// redemande pas — le pilote ne changera pas d'avis en cours de partie.
-void LobbyScreen::EnsureTint() {
-  if (tint_tried_) {
-    return;
-  }
-  tint_tried_ = true;
-  auto tint = ro::render::ScreenTint::Create();
-  if (!tint) {
-    ro::core::LogWarning("décor : la vignette ne s'est pas montée — {}",
-                         ro::core::Describe(tint.error()));
-    return;
-  }
-  tint_ = std::move(*tint);
-}
-
 void LobbyScreen::RaiseBackdrop(std::uint32_t now_ms) {
   // ⚠ AUCUNE CARTE DE REPLI D'AVANCE, comme à l'ouverture : l'illustration
   // tient l'écran jusqu'à ce que la ville du serveur arrive, et Prontera ne se
@@ -611,22 +581,21 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
     // `BackdropScene::Draw`.
     ro::render::ActorWardrobe* wardrobe =
         shell_.pieces().wardrobe.has_value() ? &*shell_.pieces().wardrobe : nullptr;
+    // 🔴 LA PAGE « GRAPHICS » SE RELIT À CHAQUE IMAGE, comme en partie : la
+    // ville est l'aperçu de ce que le joueur règle ici. Voir `BackdropLens`.
+    const GraphicsOptions& graphics = shell_.settings().options().graphics();
     const ro::render::DrawableSize surface = shell_.gl().drawable_size();
+    lens_.Begin(shell_.gl(), graphics);
     backdrop_.Draw(aspect_ratio, now_ms - opened_ms_, wardrobe, &flow_.backdrop().world(),
                    flow_.backdrop().map_name(), now_ms, &shell_.audio(),
-                   static_cast<float>(surface.width), static_cast<float>(surface.height));
-    // LA VIGNETTE, ENTRE LA VILLE ET LE FORMULAIRE.
+                   static_cast<float>(surface.width), static_cast<float>(surface.height), graphics);
+    // LE POST-TRAITEMENT PUIS LA VIGNETTE, ENTRE LA VILLE ET LE FORMULAIRE.
     //
-    // ⚠ ELLE N'HABILLE QUE LA VILLE VIVANTE, et c'est une conséquence de
-    // l'ordre des couches, pas un choix : l'illustration de repli se peint avec
-    // l'interface, sur la liste de fond d'ImGui, donc APRÈS cette passe. Poser
-    // la teinte après l'interface assombrirait le formulaire avec elle.
-    //
-    // ⚠ EN DUR : voir `kBackdropVignette`. L'écran de connexion est le même
-    // pour tout le monde.
-    EnsureTint();
-    tint_.Draw(ro::render::ScreenTintLook{.vignette = kBackdropVignette}, surface.width,
-               surface.height, now_ms);
+    // ⚠ LA VIGNETTE N'HABILLE QUE LA VILLE VIVANTE, et c'est une conséquence
+    // de l'ordre des couches, pas un choix : l'illustration de repli se peint
+    // avec l'interface, sur la liste de fond d'ImGui, donc APRÈS cette passe.
+    // Poser la teinte après l'interface assombrirait le formulaire avec elle.
+    lens_.Finish(shell_.gl(), now_ms);
   }
 
   // ⚠ L'UN OU L'AUTRE, JAMAIS LES DEUX : chacun ouvre et ferme la même image

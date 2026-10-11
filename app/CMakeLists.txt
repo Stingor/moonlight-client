@@ -635,6 +635,21 @@ target_link_libraries(moonclient_battlefield
 
 target_include_directories(moonclient_battlefield PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LA PAGE « GRAPHICS » ET CE QU'ELLE DEMANDE À UNE SCÈNE DE CARTE, en
+# bibliothèque : la partie et la ville de fond de l'écran de connexion lisent
+# les mêmes réglages par les mêmes fonctions, et un étage oublié par l'une ne se
+# verrait qu'en comparant deux écrans. Un banc le voit.
+add_library(moonclient_graphics STATIC
+    options/graphics_options.cpp
+    world/scene_graphics.cpp)
+
+target_link_libraries(moonclient_graphics
+    PUBLIC ro_audio ro_core ro_formats ro_sim ro_vfs ro_render ro_ui moonclient_display
+           moonclient_settings
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LES RÈGLES DE LA CAMÉRA, en bibliothèque pour la raison habituelle : bornes,
 # pas des gestes et tables par carte se vérifient sur un banc. Une borne
 # comparée dans le mauvais ordre fige l'inclinaison sans une erreur.
@@ -1349,6 +1364,7 @@ add_executable(moonclient
     game/map_plan_tip.cpp
     game/client_shell.cpp
     shell/backdrop_effects.cpp
+    shell/backdrop_lens.cpp
     shell/backdrop_scene.cpp
     shell/banquet_dolls.cpp
     shell/newcomer_preview.cpp
@@ -1489,7 +1505,6 @@ add_executable(moonclient
     options/game_option_keys.cpp
     options/game_option_rows.cpp
     options/game_option_skill_area.cpp
-    options/graphics_options.cpp
     options/monster_sheet_options.cpp
     options/quick_cast_options.cpp
     options/card_album_options.cpp
@@ -1557,7 +1572,7 @@ add_executable(moonclient
 
 target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_statuses moonclient_titles
-            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
+            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
             moonclient_seatlayout moonclient_settings moonclient_settinglinks ro_audio ro_core ro_formats

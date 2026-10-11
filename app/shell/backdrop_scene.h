@@ -19,6 +19,7 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/vfs.h"
 
+#include "options/graphics_options.h"
 #include "shell/backdrop_effects.h"
 #include "world/actor_ghosts.h"
 #include "world/actor_sounds.h"
@@ -45,6 +46,12 @@ inline constexpr std::string_view kLocalBackdropMap = "prontera";
 // pas geler un décor. Ce décor-ci ne lit aucun monde — il possède sa carte —,
 // si bien que rendre la session spectateur ne lui retire rien du tout. La ville
 // reste debout, et il n'y a pas de gel à écrire.
+//
+// 🔴 IL SUIT LA PAGE « GRAPHICS » DU JOUEUR, SAUF LE BROUILLARD : ombres et
+// lumière de la carte, lumière froide, filtrage du décor, fondus et lumière
+// des passants — et, posés par l'appelant, la cible de la scène et son
+// post-traitement. C'est l'aperçu de ce que le joueur règle depuis l'écran de
+// connexion. Le brouillard reste éteint : voir `kBackdropFogShown`.
 //
 // ⚠ ET IL NE CONSULTE PAS L'ÉTABLI DU STAFF. Un décor qui passerait par le
 // dessin du monde honorerait les réglages de l'établi — `staff_ground_solid` peint
@@ -114,9 +121,14 @@ class BackdropScene {
   //
   // `viewport_width` et `viewport_height` sont la cible, en pixels : la voie
   // d'écran des effets y pose ses quads.
+  //
+  // 🔴 `graphics` SE RELIT À CHAQUE IMAGE, comme en partie : le joueur règle
+  // depuis l'écran de connexion, et la ville est son seul aperçu. Voir
+  // `kBackdropFogShown` pour l'unique réglage que le décor n'écoute pas.
   void Draw(float aspect_ratio, std::uint32_t elapsed_ms, ro::render::ActorWardrobe* wardrobe,
             const ro::sim::World* world, std::string_view world_map, std::uint32_t now_ms,
-            ro::audio::AudioEngine* audio, float viewport_width, float viewport_height);
+            ro::audio::AudioEngine* audio, float viewport_width, float viewport_height,
+            const GraphicsOptions& graphics);
 
   // Ce que la dernière image a constaté, rendu au monde des passants HORS du
   // dessin : les disparitions et les effets finis à `now_ms` (`SettleWorld`),
@@ -150,7 +162,7 @@ class BackdropScene {
   void DrawPassersby(const ro::render::Camera& camera, float aspect_ratio, std::uint32_t elapsed_ms,
                      ro::render::ActorWardrobe& wardrobe, const ro::sim::World& world,
                      std::uint32_t now_ms, ro::audio::AudioEngine* audio,
-                     const ro::render::SceneFog& fog);
+                     const ro::render::SceneFog& fog, const GraphicsOptions& graphics);
 
   std::optional<MapStage> stage_;
   ro::render::TerrainRenderer terrain_;

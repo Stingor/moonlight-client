@@ -8,6 +8,7 @@
 #include "ro/render/terrain_mesh.h"
 
 #include "shell/backdrop_camera.h"
+#include "world/scene_graphics.h"
 
 namespace moonclient {
 
@@ -98,25 +99,25 @@ void BackdropScene::Settle(ro::sim::World& world, std::uint32_t now_ms) {
 void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                          ro::render::ActorWardrobe* wardrobe, const ro::sim::World* world,
                          std::string_view world_map, std::uint32_t now_ms,
-                         ro::audio::AudioEngine* audio, float viewport_width,
-                         float viewport_height) {
+                         ro::audio::AudioEngine* audio, float viewport_width, float viewport_height,
+                         const GraphicsOptions& graphics) {
   if (!stage_.has_value()) {
     return;
   }
   const ro::render::Camera camera = BackdropCamera(LookAt(), elapsed_ms);
-  // ⚠ DES ÉTAGES VIDES, ET C'EST LE POINT : le sol uni de l'établi du staff ne
-  // passe pas par ici. Voir l'en-tête.
+  // LES ÉTAGES QUE LE JOUEUR RÈGLE, et eux seuls : le sol uni de l'établi du
+  // staff ne passe pas par ici. Voir l'en-tête.
   //
-  // 🔴 SANS BROUILLARD, et ce chemin ne lit aucun réglage : voir
-  // `kBackdropFogShown`.
+  // 🔴 SANS BROUILLARD, quel que soit le réglage : voir `kBackdropFogShown`.
   const ro::render::SceneFog fog = FogOf(*stage_, kBackdropFogShown);
   terrain_.Draw(camera, stage_->scene.light, aspect_ratio,
-                ClearColorOf(*stage_, background_, kBackdropFogShown), ro::render::TerrainStages{},
-                fog);
+                ClearColorOf(*stage_, background_, kBackdropFogShown),
+                TerrainStagesOf(graphics, /*lightmap_hidden=*/false), fog);
   if (!model_clock_.started()) {
     model_clock_.Start(stage_->scene.models, elapsed_ms);
   }
   model_clock_.Advance(stage_->scene.models, elapsed_ms);
+  models_.SetTextureFilter(graphics.decor_filter());
   // Les faces à texture mêlée attendent la passe translucide, après les passants.
   models_.Draw(camera, stage_->scene.light, aspect_ratio,
                ro::render::ModelStages{.blended_apart = true}, &model_clock_, fog);
@@ -130,7 +131,8 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   const bool peopled =
       wardrobe != nullptr && world != nullptr && !world_map.empty() && world_map == map_name();
   if (peopled) {
-    DrawPassersby(camera, aspect_ratio, elapsed_ms, *wardrobe, *world, now_ms, audio, fog);
+    DrawPassersby(camera, aspect_ratio, elapsed_ms, *wardrobe, *world, now_ms, audio, fog,
+                  graphics);
   }
   // L'eau APRÈS les corps des passants, comme dans la partie : elle plonge ce qui
   // est sous sa surface. C'est `elapsed_ms` qui l'anime, la même horloge que
@@ -175,12 +177,18 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
 void BackdropScene::DrawPassersby(const ro::render::Camera& camera, float aspect_ratio,
                                   std::uint32_t elapsed_ms, ro::render::ActorWardrobe& wardrobe,
                                   const ro::sim::World& world, std::uint32_t now_ms,
-                                  ro::audio::AudioEngine* audio, const ro::render::SceneFog& fog) {
+                                  ro::audio::AudioEngine* audio, const ro::render::SceneFog& fog,
+                                  const GraphicsOptions& graphics) {
   // ⚠ LA MÊME PORTE QUE LA PARTIE, et sans styles : les recettes de couleur
   // arrivent par des paquets de JEU, qu'une session spectateur ne reçoit pas.
+  // Fondus, geste lisible et lumière de la carte suivent la page « Graphics »,
+  // comme en partie ; les altérations n'ont pas de teinte ici.
+  TimeComposedScene(graphics, actors_);
   static_cast<void>(ComposeScene(&wardrobe, world, planner_, *stage_, camera.yaw_degrees, now_ms,
                                  static_cast<float>(elapsed_ms),
-                                 /*styles=*/nullptr, actors_, ghosts_, drops_, frozen_poses_));
+                                 /*styles=*/nullptr, actors_, ghosts_, drops_, frozen_poses_,
+                                 ActorLightingOf(graphics, &stage_->ground_light,
+                                                 /*ailment_tints=*/nullptr)));
   // CE QUE LES PASSANTS FONT ENTENDRE À CETTE IMAGE.
   //
   // ⚠ APRÈS LA COMPOSITION, comme dans la partie : elle seule sait quelle image

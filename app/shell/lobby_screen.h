@@ -13,7 +13,6 @@
 #include "ro/net/zone_move.h"
 #include "ro/render/cursor.h"
 #include "ro/render/screen_overlay.h"
-#include "ro/render/screen_tint.h"
 #include "ro/sim/bank.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/character_create_window.h"
@@ -24,6 +23,7 @@
 #include "game/client_shell.h"
 #include "lobby/enter_veil.h"
 #include "lobby/lobby_flow.h"
+#include "shell/backdrop_lens.h"
 #include "shell/backdrop_scene.h"
 #include "shell/banquet_dolls.h"
 #include "shell/login_settings.h"
@@ -223,16 +223,12 @@ class LobbyScreen : public Screen {
   // Voir la définition : l'habillage, le filet de l'affichage, l'écriture.
   void FollowSettings(std::uint32_t now_ms);
 
-  // Monte la vignette du décor, une fois, à la première image qui en a besoin.
-  void EnsureTint();
-
   ClientShell& shell_;
   lobby::LobbyFlow flow_;
   BackdropScene backdrop_;
-  // LA VIGNETTE POSÉE SUR LA VILLE, montée à la première image qui en a une à
-  // habiller. Voir `EnsureTint`, et le chemin d'ouverture qu'elle évite.
-  ro::render::ScreenTint tint_;
-  bool tint_tried_ = false;
+  // LE POST-TRAITEMENT DU JOUEUR ET LA VIGNETTE, entre la ville et le
+  // formulaire. Voir `BackdropLens`.
+  BackdropLens lens_;
   ro::ui::LoginWindowState form_;
   // LES RÉGLAGES QUE LE FORMULAIRE OUVRE DE SA BARRE DE TITRE.
   LoginSettings settings_;

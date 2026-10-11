@@ -1,0 +1,40 @@
+#pragma once
+
+#include "ro/render/terrain_renderer.h"
+
+#include "options/graphics_options.h"
+#include "world/actor_view.h"
+
+namespace moonclient {
+
+// ── CE QUE LA PAGE « GRAPHICS » DEMANDE À UNE SCÈNE DE CARTE ─────────────────
+//
+// 🔴 UNE SEULE LECTURE POUR LES DEUX SCÈNES : la partie et la ville de fond de
+// l'écran de connexion. Le joueur règle sur l'une ce qu'il verra sur l'autre ;
+// deux lectures parallèles finiraient par ne plus dire la même chose, et c'est
+// l'aperçu qui mentirait.
+
+// LES ÉTAGES DU TERRAIN : la lumière froide, l'ombre et la lumière que la carte
+// a peintes.
+//
+// `lightmap_hidden` éteint ces deux dernières même quand le joueur les veut :
+// GreyWorld le demande en partie.
+//
+// ⚠ LE SOL UNI N'EN EST PAS : c'est un outil de l'établi du staff, et seule la
+// partie le pose, par-dessus ce résultat.
+[[nodiscard]] ro::render::TerrainStages TerrainStagesOf(const GraphicsOptions& graphics,
+                                                        bool lightmap_hidden);
+
+// LA LUMIÈRE DE LA CARTE SUR LES CORPS : le sol éclairé `ground` quand le
+// joueur garde les ombres de carte, aucun sinon ; la lumière froide comme sur
+// le terrain. `ailment_tints` est nul hors de la partie.
+[[nodiscard]] ActorLighting ActorLightingOf(const GraphicsOptions& graphics,
+                                            const ro::render::GroundLight* ground,
+                                            const AilmentTints* ailment_tints);
+
+// LES FONDUS ET LE GESTE LISIBLE, posés sur la scène avant sa composition :
+// cadavre, apparition, sortie de vue, plancher du geste d'une compétence,
+// incantation déroulée sur sa barre.
+void TimeComposedScene(const GraphicsOptions& graphics, ComposedScene& scene);
+
+}  // namespace moonclient

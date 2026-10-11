@@ -30,6 +30,7 @@
 #include "world/click_action.h"
 #include "world/ground_unit_view.h"
 #include "world/pick_box_view.h"
+#include "world/scene_graphics.h"
 #include "world/screen_overlays.h"
 
 namespace moonclient {
@@ -108,12 +109,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
 
   // LE SOL UNI, quand l'établi ou GreyWorld le demandent : voir `FlatGroundOf`.
   const ro::render::GreyWorldLook& grey_world = settings_->options().pages().grey_world.look();
-  ro::render::TerrainStages stages;
-  stages.cold_light = settings_->options().graphics().cold_light();
-  const bool lightmaps = settings_->options().graphics().lightmaps() &&
-                         !ro::render::GreyWorldHidesLightmap(grey_world);
-  stages.shadowmap = lightmaps;
-  stages.lightmap = lightmaps;
+  ro::render::TerrainStages stages = TerrainStagesOf(
+      settings_->options().graphics(), ro::render::GreyWorldHidesLightmap(grey_world));
   stages.flat_color =
       FlatGroundOf(windows_.staff_tools.look.flat_ground, Rights().staff_tools, grey_world);
   // LE BROUILLARD, pour tout ce que le client peint dessous — voir `SceneFog`.
@@ -250,19 +247,13 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (link_.is_open()) {
     // LA TEINTE QUI RESTE se relit avant la scène qui la montre.
     pieces_.ailment_tints.Observe(world_, now_ms);
-    scene_actors_.corpse_fade_ms = settings_->options().graphics().corpse_fade_ms();
-    scene_actors_.appear_fade_ms = settings_->options().graphics().appear_fade_ms();
-    scene_actors_.leave_fade_ms = settings_->options().graphics().leave_fade_ms();
-    scene_actors_.readable_motion = ReadableMotion{
-        .skill_gesture_floor_ms =
-            static_cast<float>(settings_->options().graphics().skill_gesture_floor_ms()),
-        .cast_spans_bar = settings_->options().graphics().cast_spans_bar()};
-    SceneCensus census = ComposeScene(
-        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, world_, planner_, (*stage_),
-        camera_.yaw_degrees, now_ms, elapsed_ms, &styles_, scene_actors_, ghosts_, drops_,
-        pieces_.frozen_poses,
-        ActorLighting{settings_->options().graphics().lightmaps() ? &stage_->ground_light : nullptr,
-                      settings_->options().graphics().cold_light(), &pieces_.ailment_tints});
+    TimeComposedScene(settings_->options().graphics(), scene_actors_);
+    SceneCensus census =
+        ComposeScene(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, world_, planner_,
+                     (*stage_), camera_.yaw_degrees, now_ms, elapsed_ms, &styles_, scene_actors_,
+                     ghosts_, drops_, pieces_.frozen_poses,
+                     ActorLightingOf(settings_->options().graphics(), &stage_->ground_light,
+                                     &pieces_.ailment_tints));
     // LES ACTEURS EN MODÈLE rejoignent la scène APRÈS les sprites : ils n'y ont
     // qu'une emprise, et leurs triangles se peignent à part, plus bas.
     if (pieces_.actor_models.has_value() && pieces_.wardrobe.has_value()) {
