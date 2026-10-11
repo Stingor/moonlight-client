@@ -28,6 +28,12 @@ namespace ro::sim {
 // ⚠ TOUT AUTRE MASQUE NE COMPARE PAS — un accessoire d'un seul côté non plus.
 // C'est la table du client, reprise telle quelle : l'étendre au bon sens
 // montrerait une comparaison que le jeu ne montre jamais.
+//
+// LES MUNITIONS SONT À PART, hors de la table : elles arrivent dans la liste
+// des objets ordinaires, où le champ d'emplacement dit où elles POURRAIENT se
+// porter. Une munition qui n'est pas celle qu'on a posée se compare à la
+// munition posée — l'unique objet du sac porté à l'emplacement des munitions —,
+// et à rien quand aucune ne l'est.
 
 // L'emplacement comparé, en un bit ; zéro quand le masque n'en a pas.
 [[nodiscard]] std::uint32_t ComparedEquipSlot(std::uint32_t wearable_at) noexcept;

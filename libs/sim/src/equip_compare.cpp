@@ -64,7 +64,10 @@ const InventoryItem* EquippedToCompare(const Inventory& bag,
   if (described.equipped()) {
     return nullptr;
   }
-  const std::uint32_t slot = ComparedEquipSlot(described.wearable_at);
+  // Une munition se compare à la munition posée, et seulement quand son masque
+  // est exactement celui des munitions : la table ne la connaît pas.
+  const std::uint32_t slot =
+      described.wearable_at == kEquipAmmo ? kEquipAmmo : ComparedEquipSlot(described.wearable_at);
   if (slot == 0) {
     return nullptr;
   }
