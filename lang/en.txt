@@ -16335,3 +16335,441 @@ tr: Text offset, vertical
 
 fr: En hauteurs de la jauge : zéro laisse le texte au centre, 1 le pousse d'une hauteur entière vers le bas, -1 vers le haut.
 tr: In gauge heights: zero keeps the text centered, 1 pushes it one full height down, -1 up.
+
+fr: Sur %s : %s
+tr: %s's %s
+
+fr: La vitesse d'attaque augmente.
+tr: Attack Speed is increased.
+
+fr: L'arme est temporairement enchantée de l'élément Poison.
+tr: Weapon is temporarily enchanted with Poison element.
+
+fr: Poison React est lancé.
+tr: Poison React initiated.
+
+fr: La vitesse de déplacement diminue.
+tr: Movement Speed reduced.
+
+fr: Les PV et la DEF augmentent.
+tr: HP and DEF increased.
+
+fr: La STR, l'INT, la DEX et le HIT augmentent.
+tr: STR, INT, DEX and HIT increased.
+
+fr: La vitesse augmente.
+tr: Speed has increased.
+
+fr: La vitesse diminue.
+tr: Speed has decreased.
+
+fr: Slow Poison est lancé.
+tr: Slow Poison initiated.
+
+fr: L'attaque physique et l'attaque magique augmentent.
+tr: Physical attack and magical attack have been improved.
+
+fr: Le délai d'incantation diminue.
+tr: Casting Delay is reduced.
+
+fr: L'arme est temporairement enchantée de l'élément Sacré.
+tr: Weapon is temporarily enchanted with Holy element.
+
+fr: L'armure est temporairement enchantée de l'élément Sacré.
+tr: Armor is temporarily enchanted with the Holy element.
+
+fr: Une barrière se forme.
+tr: Barrier formed.
+
+fr: La régénération des SP augmente.
+tr: SP Regeneration is increased.
+
+fr: LUK accrue.
+tr: LUK increased.
+
+fr: La prochaine attaque reçue fera des dégâts doublés.
+tr: You will receive double damage from 1 attack.
+
+fr: Vitesse d'attaque accrue.
+tr: Attack speed increased.
+
+fr: Weapon Perfection est lancé.
+tr: Weapon Perfection initiated.
+
+fr: Les dégâts de l'arme augmentent.
+tr: Weapon Damage is improved.
+
+fr: Maximize Power est lancé.
+tr: Maximize-Power initiated.
+
+fr: La STR et l'ATK augmentent.
+tr: STR and ATK increased.
+
+fr: Energy Coat est lancé.
+tr: Energy Coat initiated.
+
+fr: L'armure est endommagée.
+tr: Armor damaged.
+
+fr: L'arme est endommagée.
+tr: Weapon damaged.
+
+fr: La STR augmente.
+tr: STR has increased.
+
+fr: L'AGI augmente.
+tr: AGI has increased.
+
+fr: La VIT augmente.
+tr: VIT has increased.
+
+fr: La DEX augmente.
+tr: DEX has increased.
+
+fr: L'INT augmente.
+tr: INT has increased.
+
+fr: La LUK augmente.
+tr: LUK has increased.
+
+fr: Le taux d'esquive (Flee) augmente.
+tr: Flee Rate (Flee) has increased.
+
+fr: Le taux de précision (Hit) augmente.
+tr: Accuracy Rate (Hit) has increased.
+
+fr: Le taux de coup critique (Critical) augmente.
+tr: Critical Attack (Critical) has increased.
+
+fr: Ce personnage ne perdra pas d'EXP s'il meurt dans les 30 prochaines minutes.
+tr: This character will not receive any EXP penalty if killed within the next 30 minutes.
+
+fr: Les boss de la carte sont révélés pendant les 10 prochaines minutes.
+tr: Boss Monster Map Information is revealed for the next 10 minutes.
+
+fr: La vitesse d'attaque diminue.
+tr: Attack Speed is reduced.
+
+fr: L'arme retrouve son état normal.
+tr: Weapon has changed back to normal.
+
+fr: Poison React est annulé.
+tr: Poison React canceled.
+
+fr: Quagmire est annulé.
+tr: Quagmire canceled.
+
+fr: Angelus est annulé.
+tr: Angelus canceled.
+
+fr: Blessing est annulé.
+tr: Blessing canceled.
+
+fr: Slow Poison est annulé.
+tr: Slow Poison canceled.
+
+fr: L'attaque physique et l'attaque magique diminuent.
+tr: Physical attack and magical attack have been reduced.
+
+fr: Le délai d'incantation revient à la normale.
+tr: Casting Delay has returned to normal.
+
+fr: L'armure retrouve son état normal.
+tr: Armor has changed back to normal.
+
+fr: La barrière est annulée.
+tr: Barrier canceled.
+
+fr: Magnificat est annulé.
+tr: Magnificat canceled.
+
+fr: Gloria est annulé.
+tr: Gloria canceled.
+
+fr: Lex Aeterna est annulé.
+tr: Lex Aeterna canceled.
+
+fr: Vitesse d'attaque réduite.
+tr: Attack speed reduced.
+
+fr: Weapon Perfection est annulé.
+tr: Weapon Perfection canceled.
+
+fr: Les dégâts de l'arme diminuent.
+tr: Weapon Damage is reduced.
+
+fr: Maximize Power est annulé.
+tr: Maximize-Power canceled.
+
+fr: Crazy Uproar est annulé.
+tr: Crazy Uproar canceled.
+
+fr: Energy Coat est annulé.
+tr: Energy Coat canceled.
+
+fr: La STR revient à la normale.
+tr: STR has returned to normal.
+
+fr: L'AGI revient à la normale.
+tr: AGI has returned to normal.
+
+fr: La VIT revient à la normale.
+tr: VIT has returned to normal.
+
+fr: La DEX revient à la normale.
+tr: DEX has returned to normal.
+
+fr: L'INT revient à la normale.
+tr: INT has returned to normal.
+
+fr: La LUK revient à la normale.
+tr: LUK has returned to normal.
+
+fr: Le taux d'esquive revient à la normale.
+tr: Flee Rate has returned to normal.
+
+fr: Le taux de précision revient à la normale.
+tr: Accuracy Rate has returned to normal.
+
+fr: Le taux de coup critique revient à la normale.
+tr: Critical Attack has returned to normal.
+
+fr: Les effets de certains skills changent.
+tr: The effects of certain skills has changed.
+
+fr: L'ATK et la P.ATK augmentent.
+tr: ATK and P.ATK has been increased.
+
+fr: La vitesse d'attaque et la chance de Perfect Hit augmentent.
+tr: Attack Speed and Perfect Hit chance has been increased.
+
+fr: Les PV et la RES augmentent.
+tr: HP and Res has been increased.
+
+fr: Les effets de certains skills reviennent à la normale.
+tr: The effects of certain skills have returned to normal.
+
+fr: L'effet qui ignore la RES est accordé.
+tr: The effect of ignoring Res has been granted.
+
+fr: L'effet qui ignore la M.RES est accordé.
+tr: The effect of ignoring M.Res been granted.
+
+fr: L'effet qui ignore la RES vous est accordé.
+tr: The effect of ignoring Res been granted.
+
+fr: La chance de dégâts critiques augmente.
+tr: Critical damage chance has been increased.
+
+fr: La P.ATK et la S.MATK augmentent.
+tr: P.ATK and S.MATK has been increased.
+
+fr: La défense augmente et la puissance d'attaque diminue.
+tr: Defense has been increased and Attack Power decreased.
+
+fr: La puissance d'attaque augmente et la défense diminue.
+tr: Attack Power has been increased and Defense decreased.
+
+fr: Guardian Barrier est accordé.
+tr: Guardian Barrier has been granted.
+
+fr: Les dégâts reçus par l'effet de Devotion diminuent.
+tr: The damage taken by the Devotion effect will be decreased.
+
+fr: Les dégâts de magie Sacré et la résistance aux éléments Ombre et Mort-vivant augmentent.
+tr: Holy elemental magic damage and Shadow/Undead elemental resistance has been increased.
+
+fr: Un effet de résurrection instantanée est accordé.
+tr: Instant resurrection effect was granted.
+
+fr: Chaque attaque physique peut infliger Shadow Wound à l'ennemi.
+tr: The Shadow Wound status can be inflicted on your enemy with a chance on each physical attacks
+
+fr: La SPL, la WIS et la CRT augmentent.
+tr: SPL, WIS and CRT has been increased.
+
+fr: La POW, la CRT et la CON augmentent.
+tr: POW, CRT and CON has been increased.
+
+fr: L'Attack Device est activé.
+tr: The Attack Device has been activated.
+
+fr: La DEF et la RES augmentent.
+tr: DEF and RES increased.
+
+fr: La P.ATK, la S.MATK et le HIT augmentent.
+tr: P.ATK, S.MATK and HIT increased.
+
+fr: L'équipement Shadow est protégé de la destruction et du désarmement.
+tr: Shadow Equipment is protected from destruction and disarming.
+
+fr: Le statut Research Report s'affichera.
+tr: The Research Report Status will be displayed.
+
+fr: Les dégâts contre les monstres de race Plante et Informe augmentent.
+tr: Damage against Plant and Formless race monsters has been increased.
+
+fr: Le vent révèle votre faiblesse et votre apparence.
+tr: Your weakness and appearance are revealed by the wind.
+
+fr: L'effet de Mystic Symphony est accordé.
+tr: The effect of Mystic Symphony has been granted.
+
+fr: Vous pouvez désormais lancer seul les skills d'ensemble.
+tr: You can now use Ensemble skills alone.
+
+fr: La M.RES diminue.
+tr: M.RES decreased.
+
+fr: La RES diminue.
+tr: RES decreased.
+
+fr: La RES augmente.
+tr: RES increased.
+
+fr: La S.MATK et la vitesse de déplacement augmentent.
+tr: S.MATK and Movement Speed increased.
+
+fr: La P.ATK et la vitesse de déplacement augmentent.
+tr: P.ATK and Movement Speed increased.
+
+fr: La S.MATK augmente.
+tr: S.MATK increased.
+
+fr: L'effet de Climax est annulé.
+tr: The Climax effect has been canceled.
+
+fr: L'effet de Powerful Faith est annulé.
+tr: The Powerful Faith effect has been canceled.
+
+fr: Sincere Faith est annulé.
+tr: The Sincere Faith has been canceled.
+
+fr: L'effet de Firm Faith est annulé.
+tr: The Firm Faith effect has been canceled.
+
+fr: L'effet de Servant Weapon est annulé.
+tr: The Servant Weapon effect has been canceled.
+
+fr: L'effet de Charging Pierce est annulé.
+tr: The Charging Pierce effect has been canceled.
+
+fr: L'effet de Vigor est annulé.
+tr: The Vigor effect has been canceled.
+
+fr: L'effet de Shadow Exceed est annulé.
+tr: The Shadow Exceed effect has been canceled.
+
+fr: L'effet de Potent Venom est annulé.
+tr: The Potent Venom effect has been canceled.
+
+fr: L'effet d'Argutus Vita est annulé.
+tr: The Argutus Vita effect has been canceled.
+
+fr: L'effet d'Argutus Telum est annulé.
+tr: The Argutus Telum effect has been canceled.
+
+fr: L'effet de Presens Acies est annulé.
+tr: The Presens Acies effect has been canceled.
+
+fr: L'effet de Competentia est annulé.
+tr: The Competentia effect has been canceled.
+
+fr: L'effet de Guard Stance est annulé.
+tr: The Guard Stance effect has been canceled.
+
+fr: L'effet d'Attack Stance est annulé.
+tr: The Attack Stance effect has been canceled.
+
+fr: L'effet de Guardian Barrier est annulé.
+tr: The Guardian Barrier effect has been canceled.
+
+fr: L'effet de Rebound Shield est annulé.
+tr: The Rebound Shield effect has been canceled.
+
+fr: L'effet de Holy Shield est annulé.
+tr: The Holy Shield effect has been canceled.
+
+fr: Ultimate Sacrifice est annulé.
+tr: Ultimate Sacrifice effect has been canceled.
+
+fr: L'effet d'Enchanting Shadow est annulé.
+tr: The Enchanting Shadow effect has been canceled.
+
+fr: Religio est annulé.
+tr: Religio effect has been canceled.
+
+fr: L'effet de Benedictum est annulé.
+tr: The Benedictum effect has been canceled.
+
+fr: L'Attack Device est désactivé.
+tr: The Attack Device has been disabled.
+
+fr: Le Defense Device est désactivé.
+tr: The Defense Device has been disabled.
+
+fr: L'effet de From the Abyss est annulé.
+tr: The From the Abyss effect has been canceled.
+
+fr: L'effet d'Abyss Slayer est annulé.
+tr: The Abyss Slayer effect has been canceled.
+
+fr: La Full Shadow Protection est annulée.
+tr: The Full Shadow Protection has been canceled.
+
+fr: Le statut Research Report est levé.
+tr: The Research Report Status has been cleared.
+
+fr: L'effet de Hell Tree Powder disparaît.
+tr: The Hell Tree Powder effect has disappeared.
+
+fr: L'effet de Mystic Symphony est annulé.
+tr: The effect of Mystic Symphony has been canceled.
+
+fr: L'effet de Sonata of Kvasir est annulé.
+tr: The Sonata of Kvasir effect has been canceled.
+
+fr: L'effet de Geffenia Nocturne est annulé.
+tr: The Geffenia Nocturne effect has been canceled.
+
+fr: L'effet de Rhapsody of Mineworker est annulé.
+tr: The Rhapsody of Mineworker effect has been canceled.
+
+fr: L'effet de Musical Interlude est annulé.
+tr: The Musical Interlude effect has been canceled.
+
+fr: L'effet de Serenade of Jawaii est annulé.
+tr: The Serenade of Jawaii effect has been canceled.
+
+fr: L'effet de March of Prontera est annulé.
+tr: The March of Prontera effect has been canceled.
+
+fr: L'effet de Spell Enchanting est annulé.
+tr: The Spell Enchanting effect has been canceled.
+
+fr: Pendant %d minutes, votre EXP augmente de %d %%.
+tr: For %d minutes your Exp will increase by %d%%.
+
+fr: Pendant %d heures %.2d minutes, le drop d'items des monstres augmente de %d %%.
+tr: For %d minutes %.2d, item drop rate from defeating monster is increased by %d%%.
+
+fr: Pendant %d minutes, le drop d'items des monstres augmente de %d %%.
+tr: For %d minutes, item drop rate from defeating monster is increased by %d%%.
+
+fr: Pendant %d minutes, l'EXP de job tirée des monstres augmente de %d %%.
+tr: For %d minutes, Job experience obtained from monster is increased by %d%%.
+
+fr: L'EXP de job de chasse que le doublement de %d peut rapporter est de %.2f minutes.
+tr: Monster Job hunting experience that you can get through the doubling of %d is %.2f minutes.
+
+fr: Toutes les caractéristiques diminuent.
+tr: All stats have been reduced.
+
+fr: La baisse de toutes les caractéristiques est levée.
+tr: All stats reducement have been disabled.
+
+fr: Le drop des items ordinaires des monstres est doublé pendant les 30 prochaines minutes.
+tr: Regular item drops from monsters will be doubled for the next 30 minutes.
+
+fr: L'EXP de job tirée des monstres augmente de %d %% pendant 30 minutes.
+tr: Job Exp points from hunting monsters are increased by %d%% for 30 minutes.

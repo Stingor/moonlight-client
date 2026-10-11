@@ -64,6 +64,8 @@ add_library(ro_net STATIC
     src/repair_list.cpp
     src/snap.cpp
     src/spell_list.cpp
+    src/status_chat.cpp
+    src/status_chat_texts.cpp
     src/talkbox.cpp
     src/flag_graffiti.cpp
     src/target_info.cpp

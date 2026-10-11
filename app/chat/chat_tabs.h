@@ -66,6 +66,7 @@ inline constexpr ChatTypeMask kFedChatTypes =
     MaskOf(ro::sim::ChatType::kWhisper) | MaskOf(ro::sim::ChatType::kPartyChat) |
     MaskOf(ro::sim::ChatType::kGuildChat) | MaskOf(ro::sim::ChatType::kAllianceChat) |
     MaskOf(ro::sim::ChatType::kItemGetDrop) | MaskOf(ro::sim::ChatType::kEquipmentOnOff) |
+    MaskOf(ro::sim::ChatType::kAbnormalStatus) | MaskOf(ro::sim::ChatType::kPartyStatus) |
     MaskOf(ro::sim::ChatType::kPartyItem) | MaskOf(ro::sim::ChatType::kDamagedEquipment) |
     MaskOf(ro::sim::ChatType::kSkillFailure) | MaskOf(ro::sim::ChatType::kPartySetup) |
     MaskOf(ro::sim::ChatType::kBattle) | MaskOf(ro::sim::ChatType::kPartyBattle) |

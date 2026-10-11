@@ -16335,3 +16335,441 @@ tr: Desplazamiento del texto, vertical
 
 fr: En hauteurs de la jauge : zéro laisse le texte au centre, 1 le pousse d'une hauteur entière vers le bas, -1 vers le haut.
 tr: En altos del indicador: cero deja el texto en el centro, 1 lo empuja un alto entero hacia abajo, -1 hacia arriba.
+
+fr: Sur %s : %s
+tr: %s: %s
+
+fr: La vitesse d'attaque augmente.
+tr: La velocidad de ataque aumenta.
+
+fr: L'arme est temporairement enchantée de l'élément Poison.
+tr: El arma está imbuida temporalmente con el elemento Veneno.
+
+fr: Poison React est lancé.
+tr: Poison React iniciado.
+
+fr: La vitesse de déplacement diminue.
+tr: La velocidad de movimiento disminuye.
+
+fr: Les PV et la DEF augmentent.
+tr: Los PV y la DEF aumentan.
+
+fr: La STR, l'INT, la DEX et le HIT augmentent.
+tr: La STR, la INT, la DEX y el HIT aumentan.
+
+fr: La vitesse augmente.
+tr: La velocidad aumenta.
+
+fr: La vitesse diminue.
+tr: La velocidad disminuye.
+
+fr: Slow Poison est lancé.
+tr: Slow Poison iniciado.
+
+fr: L'attaque physique et l'attaque magique augmentent.
+tr: El ataque físico y el ataque mágico aumentan.
+
+fr: Le délai d'incantation diminue.
+tr: El retraso de lanzamiento disminuye.
+
+fr: L'arme est temporairement enchantée de l'élément Sacré.
+tr: El arma está imbuida temporalmente con el elemento Sagrado.
+
+fr: L'armure est temporairement enchantée de l'élément Sacré.
+tr: La armadura está imbuida temporalmente con el elemento Sagrado.
+
+fr: Une barrière se forme.
+tr: Se forma una barrera.
+
+fr: La régénération des SP augmente.
+tr: La regeneración de SP aumenta.
+
+fr: LUK accrue.
+tr: LUK aumentada.
+
+fr: La prochaine attaque reçue fera des dégâts doublés.
+tr: El próximo ataque recibido hará daño doble.
+
+fr: Vitesse d'attaque accrue.
+tr: Velocidad de ataque aumentada.
+
+fr: Weapon Perfection est lancé.
+tr: Weapon Perfection iniciado.
+
+fr: Les dégâts de l'arme augmentent.
+tr: El daño del arma aumenta.
+
+fr: Maximize Power est lancé.
+tr: Maximize Power iniciado.
+
+fr: La STR et l'ATK augmentent.
+tr: La STR y el ATK aumentan.
+
+fr: Energy Coat est lancé.
+tr: Energy Coat iniciado.
+
+fr: L'armure est endommagée.
+tr: La armadura está dañada.
+
+fr: L'arme est endommagée.
+tr: El arma está dañada.
+
+fr: La STR augmente.
+tr: La STR aumenta.
+
+fr: L'AGI augmente.
+tr: La AGI aumenta.
+
+fr: La VIT augmente.
+tr: La VIT aumenta.
+
+fr: La DEX augmente.
+tr: La DEX aumenta.
+
+fr: L'INT augmente.
+tr: La INT aumenta.
+
+fr: La LUK augmente.
+tr: La LUK aumenta.
+
+fr: Le taux d'esquive (Flee) augmente.
+tr: La tasa de evasión (Flee) aumenta.
+
+fr: Le taux de précision (Hit) augmente.
+tr: La tasa de precisión (Hit) aumenta.
+
+fr: Le taux de coup critique (Critical) augmente.
+tr: La tasa de golpe crítico (Critical) aumenta.
+
+fr: Ce personnage ne perdra pas d'EXP s'il meurt dans les 30 prochaines minutes.
+tr: Este personaje no perderá EXP si muere en los próximos 30 minutos.
+
+fr: Les boss de la carte sont révélés pendant les 10 prochaines minutes.
+tr: Los jefes del mapa se revelan durante los próximos 10 minutos.
+
+fr: La vitesse d'attaque diminue.
+tr: La velocidad de ataque disminuye.
+
+fr: L'arme retrouve son état normal.
+tr: El arma vuelve a la normalidad.
+
+fr: Poison React est annulé.
+tr: Poison React cancelado.
+
+fr: Quagmire est annulé.
+tr: Quagmire cancelado.
+
+fr: Angelus est annulé.
+tr: Angelus cancelado.
+
+fr: Blessing est annulé.
+tr: Blessing cancelado.
+
+fr: Slow Poison est annulé.
+tr: Slow Poison cancelado.
+
+fr: L'attaque physique et l'attaque magique diminuent.
+tr: El ataque físico y el ataque mágico disminuyen.
+
+fr: Le délai d'incantation revient à la normale.
+tr: El retraso de lanzamiento vuelve a la normalidad.
+
+fr: L'armure retrouve son état normal.
+tr: La armadura vuelve a la normalidad.
+
+fr: La barrière est annulée.
+tr: Barrera cancelada.
+
+fr: Magnificat est annulé.
+tr: Magnificat cancelado.
+
+fr: Gloria est annulé.
+tr: Gloria cancelado.
+
+fr: Lex Aeterna est annulé.
+tr: Lex Aeterna cancelado.
+
+fr: Vitesse d'attaque réduite.
+tr: Velocidad de ataque reducida.
+
+fr: Weapon Perfection est annulé.
+tr: Weapon Perfection cancelado.
+
+fr: Les dégâts de l'arme diminuent.
+tr: El daño del arma disminuye.
+
+fr: Maximize Power est annulé.
+tr: Maximize Power cancelado.
+
+fr: Crazy Uproar est annulé.
+tr: Crazy Uproar cancelado.
+
+fr: Energy Coat est annulé.
+tr: Energy Coat cancelado.
+
+fr: La STR revient à la normale.
+tr: La STR vuelve a la normalidad.
+
+fr: L'AGI revient à la normale.
+tr: La AGI vuelve a la normalidad.
+
+fr: La VIT revient à la normale.
+tr: La VIT vuelve a la normalidad.
+
+fr: La DEX revient à la normale.
+tr: La DEX vuelve a la normalidad.
+
+fr: L'INT revient à la normale.
+tr: La INT vuelve a la normalidad.
+
+fr: La LUK revient à la normale.
+tr: La LUK vuelve a la normalidad.
+
+fr: Le taux d'esquive revient à la normale.
+tr: La tasa de evasión vuelve a la normalidad.
+
+fr: Le taux de précision revient à la normale.
+tr: La tasa de precisión vuelve a la normalidad.
+
+fr: Le taux de coup critique revient à la normale.
+tr: La tasa de golpe crítico vuelve a la normalidad.
+
+fr: Les effets de certains skills changent.
+tr: Los efectos de ciertos skills cambian.
+
+fr: L'ATK et la P.ATK augmentent.
+tr: El ATK y el P.ATK aumentan.
+
+fr: La vitesse d'attaque et la chance de Perfect Hit augmentent.
+tr: La velocidad de ataque y la probabilidad de Perfect Hit aumentan.
+
+fr: Les PV et la RES augmentent.
+tr: Los PV y la RES aumentan.
+
+fr: Les effets de certains skills reviennent à la normale.
+tr: Los efectos de ciertos skills vuelven a la normalidad.
+
+fr: L'effet qui ignore la RES est accordé.
+tr: Se concede el efecto que ignora la RES.
+
+fr: L'effet qui ignore la M.RES est accordé.
+tr: Se concede el efecto que ignora la M.RES.
+
+fr: L'effet qui ignore la RES vous est accordé.
+tr: Se te concede el efecto que ignora la RES.
+
+fr: La chance de dégâts critiques augmente.
+tr: La probabilidad de daño crítico aumenta.
+
+fr: La P.ATK et la S.MATK augmentent.
+tr: El P.ATK y el S.MATK aumentan.
+
+fr: La défense augmente et la puissance d'attaque diminue.
+tr: La defensa aumenta y el poder de ataque disminuye.
+
+fr: La puissance d'attaque augmente et la défense diminue.
+tr: El poder de ataque aumenta y la defensa disminuye.
+
+fr: Guardian Barrier est accordé.
+tr: Se concede Guardian Barrier.
+
+fr: Les dégâts reçus par l'effet de Devotion diminuent.
+tr: El daño recibido por el efecto de Devotion disminuye.
+
+fr: Les dégâts de magie Sacré et la résistance aux éléments Ombre et Mort-vivant augmentent.
+tr: El daño mágico Sagrado y la resistencia a los elementos Sombra y No-muerto aumentan.
+
+fr: Un effet de résurrection instantanée est accordé.
+tr: Se concede un efecto de resurrección instantánea.
+
+fr: Chaque attaque physique peut infliger Shadow Wound à l'ennemi.
+tr: Cada ataque físico puede infligir Shadow Wound al enemigo.
+
+fr: La SPL, la WIS et la CRT augmentent.
+tr: La SPL, la WIS y la CRT aumentan.
+
+fr: La POW, la CRT et la CON augmentent.
+tr: La POW, la CRT y la CON aumentan.
+
+fr: L'Attack Device est activé.
+tr: El Attack Device se activa.
+
+fr: La DEF et la RES augmentent.
+tr: La DEF y la RES aumentan.
+
+fr: La P.ATK, la S.MATK et le HIT augmentent.
+tr: El P.ATK, el S.MATK y el HIT aumentan.
+
+fr: L'équipement Shadow est protégé de la destruction et du désarmement.
+tr: El equipo Shadow está protegido contra la destrucción y el desarme.
+
+fr: Le statut Research Report s'affichera.
+tr: Se mostrará el estado Research Report.
+
+fr: Les dégâts contre les monstres de race Plante et Informe augmentent.
+tr: El daño contra monstruos de raza Planta y Amorfo aumenta.
+
+fr: Le vent révèle votre faiblesse et votre apparence.
+tr: El viento revela tu debilidad y tu apariencia.
+
+fr: L'effet de Mystic Symphony est accordé.
+tr: Se concede el efecto de Mystic Symphony.
+
+fr: Vous pouvez désormais lancer seul les skills d'ensemble.
+tr: Ahora puedes lanzar en solitario los skills de conjunto.
+
+fr: La M.RES diminue.
+tr: La M.RES disminuye.
+
+fr: La RES diminue.
+tr: La RES disminuye.
+
+fr: La RES augmente.
+tr: La RES aumenta.
+
+fr: La S.MATK et la vitesse de déplacement augmentent.
+tr: El S.MATK y la velocidad de movimiento aumentan.
+
+fr: La P.ATK et la vitesse de déplacement augmentent.
+tr: El P.ATK y la velocidad de movimiento aumentan.
+
+fr: La S.MATK augmente.
+tr: El S.MATK aumenta.
+
+fr: L'effet de Climax est annulé.
+tr: El efecto de Climax se cancela.
+
+fr: L'effet de Powerful Faith est annulé.
+tr: El efecto de Powerful Faith se cancela.
+
+fr: Sincere Faith est annulé.
+tr: Sincere Faith se cancela.
+
+fr: L'effet de Firm Faith est annulé.
+tr: El efecto de Firm Faith se cancela.
+
+fr: L'effet de Servant Weapon est annulé.
+tr: El efecto de Servant Weapon se cancela.
+
+fr: L'effet de Charging Pierce est annulé.
+tr: El efecto de Charging Pierce se cancela.
+
+fr: L'effet de Vigor est annulé.
+tr: El efecto de Vigor se cancela.
+
+fr: L'effet de Shadow Exceed est annulé.
+tr: El efecto de Shadow Exceed se cancela.
+
+fr: L'effet de Potent Venom est annulé.
+tr: El efecto de Potent Venom se cancela.
+
+fr: L'effet d'Argutus Vita est annulé.
+tr: El efecto de Argutus Vita se cancela.
+
+fr: L'effet d'Argutus Telum est annulé.
+tr: El efecto de Argutus Telum se cancela.
+
+fr: L'effet de Presens Acies est annulé.
+tr: El efecto de Presens Acies se cancela.
+
+fr: L'effet de Competentia est annulé.
+tr: El efecto de Competentia se cancela.
+
+fr: L'effet de Guard Stance est annulé.
+tr: El efecto de Guard Stance se cancela.
+
+fr: L'effet d'Attack Stance est annulé.
+tr: El efecto de Attack Stance se cancela.
+
+fr: L'effet de Guardian Barrier est annulé.
+tr: El efecto de Guardian Barrier se cancela.
+
+fr: L'effet de Rebound Shield est annulé.
+tr: El efecto de Rebound Shield se cancela.
+
+fr: L'effet de Holy Shield est annulé.
+tr: El efecto de Holy Shield se cancela.
+
+fr: Ultimate Sacrifice est annulé.
+tr: Ultimate Sacrifice se cancela.
+
+fr: L'effet d'Enchanting Shadow est annulé.
+tr: El efecto de Enchanting Shadow se cancela.
+
+fr: Religio est annulé.
+tr: Religio se cancela.
+
+fr: L'effet de Benedictum est annulé.
+tr: El efecto de Benedictum se cancela.
+
+fr: L'Attack Device est désactivé.
+tr: El Attack Device se desactiva.
+
+fr: Le Defense Device est désactivé.
+tr: El Defense Device se desactiva.
+
+fr: L'effet de From the Abyss est annulé.
+tr: El efecto de From the Abyss se cancela.
+
+fr: L'effet d'Abyss Slayer est annulé.
+tr: El efecto de Abyss Slayer se cancela.
+
+fr: La Full Shadow Protection est annulée.
+tr: Full Shadow Protection se cancela.
+
+fr: Le statut Research Report est levé.
+tr: El estado Research Report se levanta.
+
+fr: L'effet de Hell Tree Powder disparaît.
+tr: El efecto de Hell Tree Powder desaparece.
+
+fr: L'effet de Mystic Symphony est annulé.
+tr: El efecto de Mystic Symphony se cancela.
+
+fr: L'effet de Sonata of Kvasir est annulé.
+tr: El efecto de Sonata of Kvasir se cancela.
+
+fr: L'effet de Geffenia Nocturne est annulé.
+tr: El efecto de Geffenia Nocturne se cancela.
+
+fr: L'effet de Rhapsody of Mineworker est annulé.
+tr: El efecto de Rhapsody of Mineworker se cancela.
+
+fr: L'effet de Musical Interlude est annulé.
+tr: El efecto de Musical Interlude se cancela.
+
+fr: L'effet de Serenade of Jawaii est annulé.
+tr: El efecto de Serenade of Jawaii se cancela.
+
+fr: L'effet de March of Prontera est annulé.
+tr: El efecto de March of Prontera se cancela.
+
+fr: L'effet de Spell Enchanting est annulé.
+tr: El efecto de Spell Enchanting se cancela.
+
+fr: Pendant %d minutes, votre EXP augmente de %d %%.
+tr: Durante %d minutos, tu EXP aumenta un %d %%.
+
+fr: Pendant %d heures %.2d minutes, le drop d'items des monstres augmente de %d %%.
+tr: Durante %d horas %.2d minutos, la tasa de drop de items de los monstruos aumenta un %d %%.
+
+fr: Pendant %d minutes, le drop d'items des monstres augmente de %d %%.
+tr: Durante %d minutos, la tasa de drop de items de los monstruos aumenta un %d %%.
+
+fr: Pendant %d minutes, l'EXP de job tirée des monstres augmente de %d %%.
+tr: Durante %d minutos, la EXP de job obtenida de monstruos aumenta un %d %%.
+
+fr: L'EXP de job de chasse que le doublement de %d peut rapporter est de %.2f minutes.
+tr: La EXP de job de caza que la duplicación de %d puede dar es de %.2f minutos.
+
+fr: Toutes les caractéristiques diminuent.
+tr: Todas las estadísticas disminuyen.
+
+fr: La baisse de toutes les caractéristiques est levée.
+tr: La reducción de todas las estadísticas se levanta.
+
+fr: Le drop des items ordinaires des monstres est doublé pendant les 30 prochaines minutes.
+tr: El drop de items normales de los monstruos se duplica durante los próximos 30 minutos.
+
+fr: L'EXP de job tirée des monstres augmente de %d %% pendant 30 minutes.
+tr: La EXP de job obtenida de monstruos aumenta un %d %% durante 30 minutos.

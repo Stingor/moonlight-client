@@ -44,6 +44,7 @@
 #include "ro/net/repair_list.h"
 #include "ro/net/server_message.h"
 #include "ro/net/spell_list.h"
+#include "ro/net/status_chat.h"
 #include "ro/net/title.h"
 #include "ro/net/warp_memo.h"
 #include "ro/net/world_notice.h"
@@ -155,12 +156,13 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
     // LE BOSS D'UN CONVEX MIRROR, les nouvelles d'objets — le ramassage d'un
     // membre du groupe, une pièce abîmée, que le sac lit aussi —, l'issue d'une
-    // alliance ou d'une hostilité de guilde, et l'adoption.
+    // alliance ou d'une hostilité de guilde, l'adoption, et la ligne d'un état.
     for (const ro::net::FrameOutcome told :
          {ro::net::ApplyBossInfoFrame(received, navi_.guidance, world_, now_ms),
           ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms),
           ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms),
-          ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk())}) {
+          ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
+          ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms)}) {
       if (outcome == ro::net::FrameOutcome::kUnhandled) {
         outcome = told;
       }
