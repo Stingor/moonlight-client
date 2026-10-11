@@ -14,17 +14,20 @@
 namespace moonclient {
 namespace {
 
-// Les touches d'origine des cases de la PREMIÈRE barre : F1 à F11.
+// LES TOUCHES D'USINE DES TROIS PREMIÈRES BARRES, celles que le joueur a posées
+// pour tout le monde : F1 à F12, la rangée des chiffres jusqu'au « = », puis la
+// rangée haute d'un clavier AZERTY.
 //
-// 🔴 F12 N'EN EST PAS, et ce n'est pas un oubli : il ouvre le journal. Une
-// douzième case par défaut lui aurait pris sa touche, et le joueur aurait perdu
-// le journal sans comprendre pourquoi.
-//
-// 🔴 ET LES SEPT AUTRES BARRES N'ONT AUCUN DÉFAUT. Quatre-vingt-cinq raccourcis
-// proposés seraient quatre-vingt-cinq collisions avec les touches du jeu.
-constexpr std::array<std::uint32_t, 11> kFirstBarKeys = {SDLK_F1, SDLK_F2,  SDLK_F3, SDLK_F4,
-                                                         SDLK_F5, SDLK_F6,  SDLK_F7, SDLK_F8,
-                                                         SDLK_F9, SDLK_F10, SDLK_F11};
+// ⚠ LES CINQ AUTRES BARRES N'ONT AUCUN DÉFAUT : il ne reste plus de rangée du
+// clavier qui ne serve déjà.
+constexpr std::array<std::uint32_t, 12> kFirstBarKeys = {SDLK_F1, SDLK_F2,  SDLK_F3,  SDLK_F4,
+                                                         SDLK_F5, SDLK_F6,  SDLK_F7,  SDLK_F8,
+                                                         SDLK_F9, SDLK_F10, SDLK_F11, SDLK_F12};
+constexpr std::array<std::uint32_t, 12> kSecondBarKeys = {
+    SDLK_1, SDLK_2, SDLK_3, SDLK_4, SDLK_5,          SDLK_6,
+    SDLK_7, SDLK_8, SDLK_9, SDLK_0, SDLK_RIGHTPAREN, SDLK_EQUALS};
+constexpr std::array<std::uint32_t, 10> kThirdBarKeys = {SDLK_A, SDLK_Z, SDLK_E, SDLK_R, SDLK_T,
+                                                         SDLK_Y, SDLK_U, SDLK_I, SDLK_O, SDLK_P};
 
 // LES DIX TOUCHES DES MACROS, tenues avec Alt. ⚠ LE ZÉRO EN DIXIÈME POSITION :
 // c'est la rangée du clavier qu'on suit, pas la valeur du chiffre, et c'est
@@ -480,7 +483,8 @@ Hotkeys::Hotkeys() {
     set(GameAction::kOpenSkillBook, SDLK_S);
   }
   bindings_[ActionRef(GameAction::kToggleMinimap).rank()] = Binding{.key = SDLK_TAB, .ctrl = true};
-  set(GameAction::kCameraReset, SDLK_R);
+  // ⚠ LE RECENTRAGE DE LA CAMÉRA N'A PAS DE TOUCHE D'USINE : R est à la troisième
+  // barre, et le double-clic droit recentre déjà.
   bindings_[ActionRef(GameAction::kFrameWholeMap).rank()] = Binding{.key = SDLK_R, .shift = true};
   const auto gesture = [this](ActionRef action, MouseGesture made, bool ctrl, bool shift) {
     bindings_[action.rank()] = Binding{.key = KeyOfGesture(made), .ctrl = ctrl, .shift = shift};
@@ -521,10 +525,15 @@ Hotkeys::Hotkeys() {
   // pour un outil qu'on emploie rarement retirerait du clavier trois places que
   // le reste du jeu peut vouloir. C'est aussi ce que fait l'implémentation de
   // référence. Le panneau suffit ; qui filme souvent se les donnera.
-  // F1 à F11 sur la première barre, comme le jeu. Voir `kFirstBarKeys`.
-  for (std::size_t rank = 0; rank < kFirstBarKeys.size(); ++rank) {
-    set(ActionRef::OfShortcut(ro::sim::ShortcutIndex(0, rank)), kFirstBarKeys[rank]);
-  }
+  // LES TROIS PREMIÈRES BARRES. Voir `kFirstBarKeys`.
+  const auto bar_keys = [&set](std::size_t bar, std::span<const std::uint32_t> keys) {
+    for (std::size_t rank = 0; rank < keys.size(); ++rank) {
+      set(ActionRef::OfShortcut(ro::sim::ShortcutIndex(bar, rank)), keys[rank]);
+    }
+  };
+  bar_keys(0, kFirstBarKeys);
+  bar_keys(1, kSecondBarKeys);
+  bar_keys(2, kThirdBarKeys);
   // ALT+1 À ALT+0 SUR LES DIX MACROS, dans cet ordre-là.
   //
   // ⚠ LE ZÉRO EST EN DIXIÈME POSITION, pas en première : c'est la rangée du

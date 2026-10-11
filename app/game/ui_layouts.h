@@ -34,9 +34,12 @@ class LayoutPort final : public ProfilePort<ro::ui::LayoutProfile> {
   [[nodiscard]] ro::ui::LayoutProfile Capture() override;
   void Pose(const ro::ui::LayoutProfile& profile) override;
   [[nodiscard]] ro::ui::LayoutProfile Defaults() override { return FactoryLayout(); }
-  // ⚠ UNE INSTALLATION NEUVE REÇOIT LA DISPOSITION D'USINE pour « Default ».
-  // Neuve : ni ce fichier ni celui d'ImGui. Le second seul est la disposition
-  // d'un joueur d'avant les profils, et elle devient « Default » telle quelle.
+  // ⚠ SANS FICHIER DE PROFILS, « Default » EST LA DISPOSITION D'USINE.
+  //
+  // 🔴 LE FICHIER D'IMGUI N'Y COMPTE PAS : la coquille en recopie un ancien,
+  // laissé par une version d'avant `savedata\`, dès que le sien manque — une
+  // installation neuve sur une machine qui a déjà joué en hérite, et y perdait
+  // la disposition d'usine.
   [[nodiscard]] bool Load(UiLayoutBook& into) override;
   void Save(const UiLayoutBook& from) override;
 

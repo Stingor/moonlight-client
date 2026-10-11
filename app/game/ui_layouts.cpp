@@ -6,7 +6,6 @@
 
 #include "ro/core/i18n.h"
 
-#include "game/save_folder.h"
 #include "game/ui_stage.h"
 
 namespace moonclient {
@@ -26,9 +25,7 @@ void LayoutPort::Pose(const ro::ui::LayoutProfile& profile) { ui_->UseLayout(pro
 
 bool LayoutPort::Load(UiLayoutBook& into) {
   std::error_code failed;
-  const bool fresh =
-      !std::filesystem::exists(UiLayoutPath(client_root_), failed) &&
-      !std::filesystem::exists(client_root_ / kSaveFolder / kInterfaceSettingsFile, failed);
+  const bool fresh = !std::filesystem::exists(UiLayoutPath(client_root_), failed);
   if (!LoadUiLayouts(client_root_, into)) {
     return false;
   }
