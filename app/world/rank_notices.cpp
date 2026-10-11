@@ -65,51 +65,54 @@ constexpr std::string_view kStarRecallSound = "effect\\T_피리.wav";
 // seconde.
 constexpr std::uint32_t kNameLookMs = 1000;
 constexpr std::uint32_t kNameLooks = 3;
+// UNE DEMANDE DU TABLEAU attend sa réponse au plus ce temps ; au-delà, elle est
+// tenue pour perdue et la réponse suivante s'écrit.
+constexpr std::uint32_t kQuietAnswerPatienceMs = 5000;
 
 // Soleil, lune, étoile : trois rangs, et un quatrième n'a pas de phrase.
 constexpr std::uint8_t kStarCount = 3;
 
-const char* PlaceDesignated(std::uint8_t star) {
+std::string PlaceDesignated(std::uint8_t star, const char* own, const char* subject) {
   switch (star) {
     case 0:
-      return Tr("%s désigne %s comme Solar Space.");
+      return Printed(Tr("%s désigne %s comme Solar Space."), own, subject);
     case 1:
-      return Tr("%s désigne %s comme Luna Space.");
+      return Printed(Tr("%s désigne %s comme Luna Space."), own, subject);
     default:
-      return Tr("%s désigne %s comme Stellar Space.");
+      return Printed(Tr("%s désigne %s comme Stellar Space."), own, subject);
   }
 }
 
-const char* PlaceRecalled(std::uint8_t star) {
+std::string PlaceRecalled(std::uint8_t star, const char* own, const char* subject) {
   switch (star) {
     case 0:
-      return Tr("Solar Space de %s : %s");
+      return Printed(Tr("Solar Space de %s : %s"), own, subject);
     case 1:
-      return Tr("Luna Space de %s : %s");
+      return Printed(Tr("Luna Space de %s : %s"), own, subject);
     default:
-      return Tr("Stellar Space de %s : %s");
+      return Printed(Tr("Stellar Space de %s : %s"), own, subject);
   }
 }
 
-const char* TargetDesignated(std::uint8_t star) {
+std::string TargetDesignated(std::uint8_t star, const char* own, const char* subject) {
   switch (star) {
     case 0:
-      return Tr("%s désigne %s comme Solar Monster.");
+      return Printed(Tr("%s désigne %s comme Solar Monster."), own, subject);
     case 1:
-      return Tr("%s désigne %s comme Luna Monster.");
+      return Printed(Tr("%s désigne %s comme Luna Monster."), own, subject);
     default:
-      return Tr("%s désigne %s comme Stellar Monster.");
+      return Printed(Tr("%s désigne %s comme Stellar Monster."), own, subject);
   }
 }
 
-const char* TargetRecalled(std::uint8_t star) {
+std::string TargetRecalled(std::uint8_t star, const char* own, const char* subject) {
   switch (star) {
     case 0:
-      return Tr("Solar Monster de %s : %s");
+      return Printed(Tr("Solar Monster de %s : %s"), own, subject);
     case 1:
-      return Tr("Luna Monster de %s : %s");
+      return Printed(Tr("Luna Monster de %s : %s"), own, subject);
     default:
-      return Tr("Stellar Monster de %s : %s");
+      return Printed(Tr("Stellar Monster de %s : %s"), own, subject);
   }
 }
 
@@ -144,29 +147,28 @@ std::vector<RankNoticeLine> RankingLines(
 }
 
 std::optional<RankNoticeLine> RankingPointsLine(const ro::net::RankingPoints& points) {
-  const char* text = nullptr;
-  std::uint32_t color = kGreyLine;
+  const int gained = static_cast<int>(points.gained);
+  const int total = static_cast<int>(points.total);
   switch (points.kind) {
     case RankKind::kBlacksmith:
-      text = Tr("[Point] %d points de rang Blacksmith gagnés. Total : %d.");
-      break;
+      return RankNoticeLine{
+          Printed(Tr("[Point] %d points de rang Blacksmith gagnés. Total : %d."), gained, total),
+          kGreyLine};
     case RankKind::kAlchemist:
-      text = Tr("[Point] %d points de rang Alchemist gagnés. Total : %d.");
-      color = kGreenLine;
-      break;
+      return RankNoticeLine{
+          Printed(Tr("[Point] %d points de rang Alchemist gagnés. Total : %d."), gained, total),
+          kGreenLine};
     case RankKind::kTaekwon:
-      text = Tr("[POINT] %d points de rang Taekwon Mission gagnés. Total : %d.");
-      color = kBlueLine;
-      break;
+      return RankNoticeLine{
+          Printed(Tr("[POINT] %d points de rang Taekwon Mission gagnés. Total : %d."), gained,
+                  total),
+          kBlueLine};
     case RankKind::kKiller:
-      text = Tr("[POINT] %d points de rang Slayer gagnés. Total : %d.");
-      break;
+      return RankNoticeLine{
+          Printed(Tr("[POINT] %d points de rang Slayer gagnés. Total : %d."), gained, total),
+          kGreyLine};
   }
-  if (text == nullptr) {
-    return std::nullopt;
-  }
-  return RankNoticeLine{
-      Printed(text, static_cast<int>(points.gained), static_cast<int>(points.total)), color};
+  return std::nullopt;
 }
 
 std::optional<StarNoticeOutcome> StarNoticeOutcomeOf(const ro::net::StarNotice& notice,
@@ -180,13 +182,13 @@ std::optional<StarNoticeOutcome> StarNoticeOutcomeOf(const ro::net::StarNotice& 
       if (!known_star) {
         return std::nullopt;
       }
-      outcome.line.text = Printed(PlaceDesignated(notice.star), own.c_str(), notice.name.c_str());
+      outcome.line.text = PlaceDesignated(notice.star, own.c_str(), notice.name.c_str());
       return outcome;
     case StarNoticeCode::kPlaceRecalled:
       if (!known_star) {
         return std::nullopt;
       }
-      outcome.line.text = Printed(PlaceRecalled(notice.star), own.c_str(), notice.name.c_str());
+      outcome.line.text = PlaceRecalled(notice.star, own.c_str(), notice.name.c_str());
       outcome.effect_id = kStarNoticeEffect;
       outcome.sound = std::string(kStarRecallSound);
       return outcome;
@@ -194,13 +196,13 @@ std::optional<StarNoticeOutcome> StarNoticeOutcomeOf(const ro::net::StarNotice& 
       if (!known_star) {
         return std::nullopt;
       }
-      outcome.line.text = Printed(TargetDesignated(notice.star), own.c_str(), notice.name.c_str());
+      outcome.line.text = TargetDesignated(notice.star, own.c_str(), notice.name.c_str());
       return outcome;
     case StarNoticeCode::kTargetRecalled:
       if (!known_star) {
         return std::nullopt;
       }
-      outcome.line.text = Printed(TargetRecalled(notice.star), own.c_str(), notice.name.c_str());
+      outcome.line.text = TargetRecalled(notice.star, own.c_str(), notice.name.c_str());
       outcome.effect_id = kStarNoticeEffect;
       outcome.sound = std::string(kStarRecallSound);
       return outcome;
@@ -249,10 +251,17 @@ ro::net::FrameOutcome RankNotices::ApplyFrame(const ro::net::Frame& frame, ro::s
         static_cast<void>(ro::net::RequestCreatorName(link, character_id));
       }
     }
-    pending_ = Pending{.list = *list, .received_ms = now_ms, .looks_done = 0};
+    const bool quiet = quiet_.has_value() && quiet_->kind == list->kind &&
+                       now_ms - quiet_->asked_ms < kQuietAnswerPatienceMs;
+    quiet_.reset();
+    latest_ = *list;
+    ++list_serial_;
+    pending_ = Pending{.list = *list, .received_ms = now_ms, .looks_done = 0, .quiet = quiet};
     // DÉJÀ CONNUS : le classement s'écrit tout de suite.
     if (AllNamesKnown(*list)) {
-      Print(world, *list, now_ms);
+      if (!quiet) {
+        Print(world, *list, now_ms);
+      }
       pending_.reset();
     }
     return ro::net::FrameOutcome::kApplied;
@@ -290,11 +299,15 @@ void RankNotices::Advance(ro::sim::World& world, std::uint32_t now_ms) {
   while (pending_->looks_done < looks_due) {
     ++pending_->looks_done;
     if (AllNamesKnown(pending_->list) || pending_->looks_done >= kNameLooks) {
-      Print(world, pending_->list, now_ms);
+      if (!pending_->quiet) {
+        Print(world, pending_->list, now_ms);
+      }
       pending_.reset();
       return;
     }
-    world.RecordChat(ro::sim::ChatKind::kServer, 0, Tr("Récupération du classement…"), now_ms);
+    if (!pending_->quiet) {
+      world.RecordChat(ro::sim::ChatKind::kServer, 0, Tr("Récupération du classement…"), now_ms);
+    }
   }
 }
 
@@ -309,15 +322,20 @@ bool RankNotices::AllNamesKnown(const ro::net::RankingList& list) const {
   return true;
 }
 
-void RankNotices::Print(ro::sim::World& world, const ro::net::RankingList& list,
-                        std::uint32_t now_ms) const {
+std::array<std::string, ro::net::kRankingSize> RankNotices::NamesOf(
+    const ro::net::RankingList& list) const {
   std::array<std::string, ro::net::kRankingSize> names;
   for (std::size_t rank = 0; rank < ro::net::kRankingSize; ++rank) {
     if (const auto found = names_.find(list.character_ids[rank]); found != names_.end()) {
       names[rank] = found->second;
     }
   }
-  for (RankNoticeLine& line : RankingLines(list, names)) {
+  return names;
+}
+
+void RankNotices::Print(ro::sim::World& world, const ro::net::RankingList& list,
+                        std::uint32_t now_ms) const {
+  for (RankNoticeLine& line : RankingLines(list, NamesOf(list))) {
     world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(line.text), now_ms, line.color);
   }
 }

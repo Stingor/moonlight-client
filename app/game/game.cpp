@@ -134,6 +134,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   play_sounds(pieces_.chat_rooms.TakeSounds(), "du salon");
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
+  // Le tableau montre le dernier classement, et demande celui d'un onglet.
+  pieces_.ranking_board.Advance(windows_.ranking_board, pieces_.rank_notices, link_, now_ms);
   std::vector<InterfaceSoundFile> star_sounds;
   for (std::string& sound : pieces_.rank_notices.TakeSounds()) {
     star_sounds.push_back(

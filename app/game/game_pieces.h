@@ -93,6 +93,7 @@
 #include "world/overlay_view.h"
 #include "world/quest_marker_view.h"
 #include "world/rank_notices.h"
+#include "world/ranking_board.h"
 #include "world/skill_refusal_report.h"
 #include "world/sleep_bubbles_view.h"
 
@@ -476,6 +477,8 @@ struct GamePieces {
   BattlegroundStage battleground;
   // LES CLASSEMENTS ET LES AVIS D'ÉTOILE : voir `RankNotices`.
   RankNotices rank_notices;
+  // LE TABLEAU DES CLASSEMENTS : voir `RankingBoard`.
+  RankingBoard ranking_board;
   // CE QUE CE CLIENT SAIT MONTRER, annoncé au serveur : voir `SurfaceAnnouncer`.
   SurfaceAnnouncer surfaces;
 };

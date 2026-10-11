@@ -69,12 +69,37 @@ class RankNotices {
   // Les sons à jouer depuis la dernière fois, nommés dans le dossier des sons.
   [[nodiscard]] std::vector<std::string> TakeSounds();
 
+  // LA PROCHAINE RÉPONSE DE CE CLASSEMENT NE S'ÉCRIT PAS dans la conversation :
+  // elle a été demandée par un onglet du tableau, qui la montre. Les commandes
+  // écrivent toujours.
+  //
+  // ⚠ L'ATTENTE A UNE FIN : une demande restée sans réponse ne doit pas faire
+  // taire, des minutes plus tard, la réponse à une commande.
+  void ExpectQuiet(ro::net::RankKind kind, std::uint32_t now_ms) {
+    quiet_ = QuietRequest{.kind = kind, .asked_ms = now_ms};
+  }
+
+  // LE DERNIER CLASSEMENT REÇU, qu'il attende encore ses noms ou non ; rien
+  // avant le premier.
+  [[nodiscard]] const std::optional<ro::net::RankingList>& latest() const noexcept {
+    return latest_;
+  }
+  // Grandit à chaque classement reçu.
+  [[nodiscard]] std::uint32_t list_serial() const noexcept { return list_serial_; }
+  // Le dernier classement attend encore des noms, et le délai n'est pas passé.
+  [[nodiscard]] bool waiting_names() const noexcept { return pending_.has_value(); }
+  // Le nom de chaque rang ; vide quand il n'est pas (encore) connu.
+  [[nodiscard]] std::array<std::string, ro::net::kRankingSize> NamesOf(
+      const ro::net::RankingList& list) const;
+
  private:
   struct Pending {
     ro::net::RankingList list;
     std::uint32_t received_ms = 0;
     // Combien de secondes ont déjà été regardées.
     std::uint32_t looks_done = 0;
+    // Demandé par le tableau : rien ne s'écrit dans la conversation.
+    bool quiet = false;
   };
 
   [[nodiscard]] bool AllNamesKnown(const ro::net::RankingList& list) const;
@@ -82,6 +107,13 @@ class RankNotices {
 
   std::map<std::uint32_t, std::string> names_;
   std::optional<Pending> pending_;
+  std::optional<ro::net::RankingList> latest_;
+  std::uint32_t list_serial_ = 0;
+  struct QuietRequest {
+    ro::net::RankKind kind = ro::net::RankKind::kBlacksmith;
+    std::uint32_t asked_ms = 0;
+  };
+  std::optional<QuietRequest> quiet_;
   std::vector<std::string> sounds_;
 };
 

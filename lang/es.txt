@@ -16104,3 +16104,21 @@ tr: Este objeto no se puede comprar en un buying store.
 
 fr: Trop lourd : tout acheter mettrait le personnage en surcharge, et le serveur refuse.
 tr: Demasiado pesado: comprarlo todo sobrecargaría al personaje, y el servidor lo rechaza.
+
+fr: Tableau des classements
+tr: Tablero de clasificaciones
+
+fr: Choisir le type de classement
+tr: Elige el tipo de clasificación
+
+fr: Blacksmith
+tr: Blacksmith
+
+fr: Alchemist
+tr: Alchemist
+
+fr: Taekwon
+tr: Taekwon
+
+fr: Mes points
+tr: Mis puntos

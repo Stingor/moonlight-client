@@ -99,6 +99,7 @@
 #include "game/whisper_stage.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "ui_backend_gl.h"
+#include "world/ranking_board.h"
 
 struct SDL_Window;
 union SDL_Event;
@@ -381,7 +382,8 @@ class UiStage {
     TrackerWindows tracker;           // Le suivi commun aux succès, de même.
     // LE CARNET DE CHASSE MVP. Voir `ui_stage_mvp_tracker.cpp`.
     MvpTrackerWindows mvp_tracker;
-    BattlegroundWindows battleground;  // Voir `ui_stage_battleground.cpp`.
+    BattlegroundWindows battleground;   // Voir `ui_stage_battleground.cpp`.
+    RankingBoardWindows ranking_board;  // Voir `ui_stage_ranking.cpp`.
     // LA FENÊTRE GROUPE / AMIS ET LA GRILLE DE GROUPE, même aller-retour. Voir
     // `game/party_windows.h`.
     PartyWindows party;
@@ -756,6 +758,8 @@ class UiStage {
   void RegisterMvpTrackerEscapes(MvpTrackerWindows& mvp);
   void DrawBattlegroundWindows(BattlegroundWindows& battleground);  // `ui_stage_battleground.cpp`
   void RegisterBattlegroundEscapes(BattlegroundWindows& battleground);
+  void DrawRankingWindows(RankingBoardWindows& ranking);  // `ui_stage_ranking.cpp`
+  void RegisterRankingEscapes(RankingBoardWindows& ranking);
   // LA NAVIGATION ET SES DEUX INFOBULLES : voir `ui_stage_navigation.cpp`.
   void DrawNavigationWindows(Windows::Navigation& navigation);
   void RegisterNavigationEscapes(Windows::Navigation& navigation);

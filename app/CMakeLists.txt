@@ -778,15 +778,17 @@ target_link_libraries(moonclient_songmusic
     PRIVATE ro_render ro_warnings)
 target_include_directories(moonclient_songmusic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# LES CLASSEMENTS ET LES AVIS D'ÉTOILE DANS LA CONVERSATION, et les trois
-# commandes qui demandent un classement. En bibliothèque pour que leurs lignes
-# s'éprouvent : un rang sans nom, une mission sans lien, une étoile mal lue ne
-# se voient qu'en jeu.
+# LES CLASSEMENTS ET LES AVIS D'ÉTOILE DANS LA CONVERSATION, les trois
+# commandes qui demandent un classement, et le tableau qui le montre. En
+# bibliothèque pour que leurs lignes s'éprouvent : un rang sans nom, une mission
+# sans lien, une étoile mal lue, un onglet qui ne demande rien ne se voient
+# qu'en jeu.
 add_library(moonclient_ranknotices STATIC
     world/rank_notices.cpp
+    world/ranking_board.cpp
     chat/rank_command.cpp)
 target_link_libraries(moonclient_ranknotices
-    PUBLIC ro_net ro_sim
+    PUBLIC ro_net ro_sim ro_ui
     PRIVATE moonclient_chatlinks ro_core ro_vfs ro_warnings)
 target_include_directories(moonclient_ranknotices PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -1535,6 +1537,7 @@ add_executable(moonclient
     game/ui_stage_whisper.cpp
     game/achievement_stage.cpp
     game/ui_stage_achievements.cpp
+    game/ui_stage_ranking.cpp
     game/game_quests.cpp
     game/quest_compose.cpp
     game/quest_stage.cpp
