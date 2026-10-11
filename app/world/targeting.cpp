@@ -230,23 +230,12 @@ bool Targeting::WantsContinuousAttack(bool siege_map, bool ctrl_held, bool no_ct
   return !siege_map && AttackRepeats(ctrl_held, no_ctrl);
 }
 
-bool Targeting::NoteWorldPress(std::uint32_t now_ms, float x, float y,
-                               const DoubleClickRule& rule) {
+void Targeting::NoteWorldPress(bool second_of_double) {
   // Un appui neuf ne sait encore rien de ce qu'il touche : voir `NotePressedOn`.
   pressed_on_id_ = 0;
-  const bool doubled = last_press_ms_ != 0 && now_ms - last_press_ms_ <= rule.delay_ms &&
-                       std::abs(x - last_press_x_) <= rule.tolerance_x &&
-                       std::abs(y - last_press_y_) <= rule.tolerance_y;
-  if (doubled) {
-    // Un troisième appui ne se lit pas comme un nouveau double avec le deuxième.
-    last_press_ms_ = 0;
+  if (second_of_double) {
     double_click_pending_ = true;
-    return true;
   }
-  last_press_ms_ = now_ms;
-  last_press_x_ = x;
-  last_press_y_ = y;
-  return false;
 }
 
 std::uint32_t Targeting::TakeDoubleClickTarget(const ro::sim::World& world, bool skill_armed) {
@@ -381,7 +370,6 @@ void Targeting::Forget() {
   explicit_engage_pending_ = false;
   explicit_attack_once_ = false;
   double_click_pending_ = false;
-  last_press_ms_ = 0;
   frame_click_id_ = 0;
   frame_menu_id_ = 0;
   hidden_id_ = 0;

@@ -55,14 +55,6 @@ struct TargetCandidate {
   float distance_squared = 0.0F;
 };
 
-// La règle du double-clic : le délai et la tolérance de déplacement du système.
-struct DoubleClickRule {
-  std::uint32_t delay_ms = 500;
-  float tolerance_x = 4.0F;
-  float tolerance_y = 4.0F;
-};
-[[nodiscard]] DoubleClickRule SystemDoubleClickRule();
-
 // Les actions d'une demande d'attaque, telles que le serveur les lit : zéro
 // frappe une fois, sept sans fin.
 inline constexpr int kAttackActionOnce = 0;
@@ -161,9 +153,9 @@ class Targeting {
 
   // ── LE DOUBLE-CLIC DANS LE MONDE ──────────────────────────────────────────
 
-  // Un appui du bouton gauche sur le monde. Rend vrai s'il complète un
-  // double-clic, qui attend alors d'être rejoué.
-  bool NoteWorldPress(std::uint32_t now_ms, float x, float y, const DoubleClickRule& rule);
+  // Un appui du bouton gauche sur le monde, second d'un double-clic ou non —
+  // voir `DoubleClickClock`. Le second attend d'être rejoué.
+  void NoteWorldPress(bool second_of_double);
 
   // L'acteur qui a pris cet appui, zéro pour le sol. Le clic le dit une fois
   // qu'il l'a trouvé ; un appui qui n'en dit rien compte comme le sol.
@@ -233,9 +225,6 @@ class Targeting {
   bool explicit_engage_pending_ = false;
   bool explicit_attack_once_ = false;
 
-  std::uint32_t last_press_ms_ = 0;
-  float last_press_x_ = 0.0F;
-  float last_press_y_ = 0.0F;
   bool double_click_pending_ = false;
   std::uint32_t pressed_on_id_ = 0;
 

@@ -3,6 +3,7 @@
 #include "ro/core/text.h"
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
+#include "ro/proto/stop_attack_packet.h"
 
 namespace ro::net {
 namespace {
@@ -25,6 +26,15 @@ core::Result<void> RequestAttack(Connection& link, std::uint32_t target_id, bool
   return SendAction(
       link, target_id,
       repeat ? proto::ActionRequest::kAttackRepeatedly : proto::ActionRequest::kAttackOnce);
+}
+
+core::Result<void> RequestStopAttack(Connection& link) {
+  auto frame = proto::EncodeStopAttack();
+  if (!frame) {
+    return std::unexpected(frame.error());
+  }
+  link.Send(*frame);
+  return {};
 }
 
 core::Result<void> RequestTick(Connection& link, std::uint32_t client_tick) {

@@ -97,6 +97,17 @@ void NoteRelease(MouseEngagement& engagement) {
   }
 }
 
+bool ReleaseStopsAttack(const MouseEngagement& engagement) {
+  const PlayerAction& action = engagement.action;
+  return action.deed == PlayerDeed::kAttack && action.stops_on_release && action.struck;
+}
+
+bool EngagementShowsSword(const MouseEngagement& engagement) {
+  return engagement.engaged && !engagement.continuous && engagement.left_held;
+}
+
+bool RearmedAttackRepeats(const MouseEngagement& engagement) { return engagement.continuous; }
+
 void NoteDeed(MouseEngagement& engagement, PlayerDeed deed, std::uint32_t target_id,
               bool stops_on_release) {
   engagement.action =

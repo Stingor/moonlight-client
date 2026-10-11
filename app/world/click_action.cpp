@@ -99,11 +99,16 @@ bool ClickEngagesAttack(const ro::sim::Actor& actor) {
          actor.posture != ro::sim::Posture::kDead;
 }
 
-void NoteDeedOfClickOn(MouseEngagement* engagement, const ro::sim::Actor& target, bool repeat) {
+void NoteDeedOfClickOn(MouseEngagement* engagement, const ro::sim::World& world,
+                       const ro::sim::Actor& target, bool repeat) {
   if (engagement == nullptr) {
     return;
   }
   if (ClickEngagesAttack(target)) {
+    const ro::sim::Actor* self = world.player();
+    if (self != nullptr && !TakesAttackOrder(*self)) {
+      return;
+    }
     NoteDeed(*engagement, PlayerDeed::kAttack, target.id, /*stops_on_release=*/!repeat);
     engagement->action.target_seen_alive = true;
   } else if (target.kind == ro::sim::ActorKind::kItem) {
@@ -157,6 +162,12 @@ ro::core::Result<void> ClickOn(ro::net::Connection& link, const ro::sim::World& 
       if (target.posture == ro::sim::Posture::kDead) {
         return {};
       }
+      // Assis ou caché, le personnage ne prend pas l'ordre : voir
+      // `TakesAttackOrder`.
+      if (const ro::sim::Actor* self = world.player();
+          self != nullptr && !TakesAttackOrder(*self)) {
+        return {};
+      }
       // RIEN NE PART ENCORE : le tic mesurera la distance à la prochaine
       // image, et n'émettra le coup qu'une fois à portée. Voir
       // `world/attack_intent.h`.
@@ -188,6 +199,10 @@ ro::core::Result<void> ClickOn(ro::net::Connection& link, const ro::sim::World& 
       if (target.look.job == ro::sim::kPortalJob) {
         RequestGroundWalk(link, world, intents.walk_clock, intents.deferred_walk,
                           intents.player_gesture, target.position, now_ms);
+        return {};
+      }
+      // Un compagnon ne parle pas : rien ne part — voir `ClickContactsNpc`.
+      if (!ClickContactsNpc(target)) {
         return {};
       }
       // Tout le reste : on lui parle. C'est le seul geste qui ouvre un
@@ -345,6 +360,12 @@ HeldClick LeftClick(const WorldClick& scene, glm::vec2 mouse_px, const ClickInte
     // descendre au sol : on marche à travers son propre personnage, à travers
     // les autres joueurs, à travers un cadavre. Voir ActorTakesClick.
     if (takes_click) {
+      // MAJ (sans `/noshift`) ou ALT retiennent le clic sur un monstre : il
+      // n'agit pas, et ne descend pas au sol non plus.
+      if (target->kind == ro::sim::ActorKind::kMonster &&
+          MonsterClickWithheld(scene.shift_held, scene.no_shift, scene.alt_held)) {
+        return HeldClick::kNothing;
+      }
       const bool attacks = ClickEngagesAttack(*target);
       // La flèche se lève AVANT que le mode Ciblage ne retienne le coup : elle
       // suit le geste, pas ce qu'il déclenche.
@@ -358,7 +379,7 @@ HeldClick LeftClick(const WorldClick& scene, glm::vec2 mouse_px, const ClickInte
       }
       ReportRefusal(
           ClickOn(*scene.link, *scene.world, *target, scene.now_ms, intents, scene.attack_repeats));
-      NoteDeedOfClickOn(scene.engagement, *target, scene.attack_repeats);
+      NoteDeedOfClickOn(scene.engagement, *scene.world, *target, scene.attack_repeats);
       return HeldClick::kNothing;
     }
   }
@@ -388,6 +409,11 @@ HeldClick LeftClick(const WorldClick& scene, glm::vec2 mouse_px, const ClickInte
     if (aims_at_ground && scene.engagement != nullptr) {
       EndDeed(*scene.engagement);
     }
+    return HeldClick::kNothing;
+  }
+  // CTRL TENU : ni marche ni demi-tour, et rien ne retombe — voir
+  // `GroundClickMoves`.
+  if (!GroundClickMoves(scene.ctrl_held)) {
     return HeldClick::kNothing;
   }
   // MAJ TENUE : on tourne vers la case au lieu d'y aller.

@@ -497,7 +497,12 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // rien et chaque huitième coûterait un clic. Le natif rejoue le sien au même
   // endroit, cent millisecondes après le dernier envoi chez le joueur — c'est
   // l'HORLOGE qui déclenche, la case n'étant que ce qu'il relit en passant.
-  if (link_.is_open() && hovered_cell.has_value() && !over_unit) {
+  //
+  // ⚠ NI SOUS UNE SOURIS FIGÉE, NI CTRL TENU : la reprise rejuge les deux à
+  // chaque fois, comme le clic — voir `WorldTakesClicks` et `GroundClickMoves`.
+  if (link_.is_open() && hovered_cell.has_value() && !over_unit &&
+      WorldTakesClicks(MouseRouteOf(world_, grimoire_, world_mouse_.engagement, now_ms)) &&
+      GroundClickMoves((SDL_GetModState() & SDL_KMOD_CTRL) != 0)) {
     // ⚠ STRICTEMENT PLUS que le délai, comme le plancher de la marche : à
     // égalité, la reprise partirait pour tomber aussitôt sur lui, et la
     // suivante attendrait un délai de plus.

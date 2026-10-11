@@ -120,6 +120,20 @@ void NoteLeftPress(MouseEngagement& engagement, bool second_of_double, MouseRout
 // Le bouton gauche relâché, où que ce soit.
 void NoteRelease(MouseEngagement& engagement);
 
+// LE RELÂCHEMENT ARRÊTE-T-IL L'ATTAQUE ? Une attaque qui ne se poursuit pas et
+// qui a déjà frappé — sans relâche, tant que le bouton était tenu — demande
+// alors au serveur de cesser. À lire AVANT `NoteRelease`, qui l'achève.
+[[nodiscard]] bool ReleaseStopsAttack(const MouseEngagement& engagement);
+
+// L'ÉPÉE DU CURSEUR : un engagement qui ne se poursuit pas, bouton tenu, la
+// montre quoi que la souris désigne. Un engagement continu laisse au curseur sa
+// forme ordinaire.
+[[nodiscard]] bool EngagementShowsSword(const MouseEngagement& engagement);
+
+// LE RÉARMEMENT « TROP LOIN » reprend le type du DERNIER clic d'action, même
+// après que l'engagement est retombé : sans relâche s'il était continu.
+[[nodiscard]] bool RearmedAttackRepeats(const MouseEngagement& engagement);
+
 // La fenêtre a perdu le focus : le bouton n'est plus tenu, sans avoir été
 // relâché pour autant.
 void NoteFocusLost(MouseEngagement& engagement);

@@ -42,6 +42,7 @@ add_library(ro_proto STATIC
     src/npc_shop_packets.cpp
     src/autospell_packets.cpp
     src/progress_packets.cpp
+    src/stop_attack_packet.cpp
     src/repair_packets.cpp
     src/pincode.cpp
     src/snap_packets.cpp

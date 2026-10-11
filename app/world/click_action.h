@@ -19,6 +19,7 @@
 #include "ro/sim/world_fwd.h"
 
 #include "character/skill_book_view.h"
+#include "world/click_rules.h"
 #include "world/deferred_walk.h"
 #include "world/entity_menu.h"
 #include "world/map_stage.h"
@@ -179,8 +180,10 @@ struct ClickIntents {
 
 // CE QUE `ClickOn` LAISSE AU PERSONNAGE, pour l'engagement de la souris : une
 // attaque, un ramassage, ou — pour un portail — une marche, qui fait retomber.
-// Parler à un PNJ ne change rien. Nul : rien à noter.
-void NoteDeedOfClickOn(MouseEngagement* engagement, const ro::sim::Actor& target, bool repeat);
+// Parler à un PNJ ne change rien, et une attaque que le personnage ne prend pas
+// (voir `TakesAttackOrder`) non plus. Nul : rien à noter.
+void NoteDeedOfClickOn(MouseEngagement* engagement, const ro::sim::World& world,
+                       const ro::sim::Actor& target, bool repeat);
 
 // Ce qu'un clic gauche a sous la main.
 //
@@ -212,11 +215,12 @@ struct WorldClick {
   // où le personnage regarde AUJOURD'HUI, ce que sa case n'annonce plus une
   // fois qu'il a marché.
   ro::sim::WalkPlanner* planner = nullptr;
-  // MAJ tenue à l'instant du clic. C'est le seul modificateur que le clic au
-  // sol consulte pour lui-même : il fait TOURNER au lieu de marcher.
+  // MAJ tenue à l'instant du clic. Sur le sol, elle fait TOURNER au lieu de
+  // marcher ; CTRL, lui, n'y fait rien du tout (`ctrl_held`).
   //
-  // ⚠ ET LA MÊME TOUCHE FAIT DEUX CHOSES SANS RAPPORT, selon ce qu'elle
-  // désigne : sur un ACTEUR elle force la cible, sur le SOL elle fait tourner.
+  // ⚠ ET LA MÊME TOUCHE FAIT TROIS CHOSES SANS RAPPORT, selon ce qu'elle
+  // désigne : sur un JOUEUR elle force la cible, sur un MONSTRE elle retient
+  // le clic (`MonsterClickWithheld`), sur le SOL elle fait tourner.
   // Le client d'origine les tient dans deux fonctions distinctes, et
   // `/noshift` ne touche qu'à la première — voir `VersusGate::forced`.
   bool shift_held = false;
@@ -253,6 +257,12 @@ struct WorldClick {
   // emprise : voir `PickGroundUnit`.
   std::span<const GroundUnitPick> ground_units;
   float ground_unit_floor_pixels = ro::render::kGroundPickFloorFactor;
+  // CTRL tenu à l'instant du clic : le sol ne fait ni marcher ni tourner — voir
+  // `GroundClickMoves`.
+  bool ctrl_held = false;
+  // `/noshift` : MAJ ne retient plus le clic sur un monstre — voir
+  // `MonsterClickWithheld`.
+  bool no_shift = false;
 };
 
 // Ce qui arrête la souris dans le monde, à cet instant : la mort, le coffre, un
@@ -289,6 +299,8 @@ struct WorldMouse {
   // OÙ LE BOUTON DROIT S'EST ENFONCÉ dans le monde, jusqu'à son relâchement :
   // un relâchement loin de là clôt un glissé de caméra, pas un clic.
   std::optional<glm::vec2> right_pressed_at;
+  // Le double-clic du bouton gauche : voir `DoubleClickClock`.
+  DoubleClickClock double_click;
 };
 
 // Ce qu'un clic gauche déclenche, dans l'ordre où le jeu tranche.

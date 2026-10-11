@@ -88,7 +88,7 @@ void Game::AdvanceTargeting(std::uint32_t now_ms) {
                       ClickIntents{pickup_, attack_, grimoire_.approach_clock(),
                                    &world_mouse_.deferred_walk, scene_actors_.player_gesture},
                       continuous));
-          NoteDeedOfClickOn(&world_mouse_.engagement, *target, continuous);
+          NoteDeedOfClickOn(&world_mouse_.engagement, world_, *target, continuous);
         }
       }
     }
@@ -134,7 +134,7 @@ void Game::EngageTargetAttack(const ro::sim::Actor& target, bool continuous, std
                                      &world_mouse_.deferred_walk, scene_actors_.player_gesture},
                         continuous));
   // L'attaque part sans engager la souris : la flèche reste où elle était.
-  NoteDeedOfClickOn(&world_mouse_.engagement, target, continuous);
+  NoteDeedOfClickOn(&world_mouse_.engagement, world_, target, continuous);
 }
 
 void Game::NoteScreenTargets() {

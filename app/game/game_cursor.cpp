@@ -57,6 +57,15 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     // clic l'écarte déjà (`LeftClick`) ; sans la même règle ici, une porte PvP
     // ouverte montrait l'épée sur soi, alors qu'on ne peut pas s'attaquer. La
     // compétence armée, elle, le garde : un soin se lance sur soi.
+    //
+    // ⚠ SOUS UNE SOURIS FIGÉE, AUCUNE ENTITÉ NE CHANGE LA FORME : le clic ne
+    // l'atteindra pas. Le sol décide seul, et la compétence armée garde son
+    // anneau lent. Voir `WorldTakesClicks`.
+    const bool world_takes_clicks =
+        WorldTakesClicks(MouseRouteOf(world_, grimoire_, world_mouse_.engagement, now_ms));
+    if (!world_takes_clicks) {
+      designated = nullptr;
+    }
     const ro::sim::Actor* hovered_other =
         designated != nullptr && designated->id == world_.player_id() ? nullptr : designated;
     // Un cadre du HUD qui agit comme la cible en a aussi l'air : l'épée.
@@ -74,7 +83,7 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     // ⚠ SOUS UNE VISÉE DE PIÈGE, TOUTE UNITÉ MONTRE L'ANNEAU LENT, épée ou non :
     // c'est elle que le clic désignera.
     const std::optional<ro::render::CursorShape> on_unit =
-        unit_id.has_value() && GroundUnitOutranks(hovered_other)
+        world_takes_clicks && unit_id.has_value() && GroundUnitOutranks(hovered_other)
             ? std::optional(
                   grimoire_.aim() == SkillAim::kTrap ? ro::render::CursorShape::kGroundTarget
                   : GroundUnitShowsSword(world_.skill_units().at(*unit_id).unit_id,
@@ -103,25 +112,33 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
           SignboardOpensStore(hovered_other->signboard->kind) &&
           !ActorTakesClick(*hovered_other,
                            VersusGateOf(world_, shift_held, settings_->options().no_shift()))));
+    const SkillAim aim =
+        grimoire_.aim() != SkillAim::kNothing ? grimoire_.aim() : pieces_.companion_ai.cursor_aim();
+    // L'ÉPÉE TANT QU'UN ENGAGEMENT QUI NE SE POURSUIT PAS EST TENU, quoi que la
+    // souris désigne : voir `EngagementShowsSword`. Une compétence armée garde
+    // son anneau.
+    const bool held_sword = world_takes_clicks && aim == SkillAim::kNothing &&
+                            EngagementShowsSword(world_mouse_.engagement);
     const ro::render::CursorShape shape =
         gate.mouse_to_ui
             ? over_interface
-            : ArmedCursor(grimoire_.aim() != SkillAim::kNothing ? grimoire_.aim()
-                                                                : pieces_.companion_ai.cursor_aim(),
-                          designated,
-                          // ⚠ MAJ SE RELIT À CHAQUE IMAGE ICI, et non à l'appui :
-                          // presser la touche change la forme du curseur sans
-                          // qu'on bouge la souris, et c'est ainsi qu'on voit
-                          // qu'une cible est devenue atteignable avant de
-                          // cliquer. Le clic, lui, relève l'état de son APPUI.
-                          CameraTurning() ? ro::render::CursorShape::kRotate
-                          : over_store    ? ro::render::CursorShape::kPoint
-                          : on_unit.has_value()
-                              ? *on_unit
-                              : CursorShapeOver(
-                                    hovered_other, GroundHoverOn((*stage_), hovered_cell),
-                                    VersusGateOf(world_, (SDL_GetModState() & SDL_KMOD_SHIFT) != 0,
-                                                 settings_->options().no_shift())));
+            : ArmedCursor(
+                  aim, designated,
+                  // ⚠ MAJ SE RELIT À CHAQUE IMAGE ICI, et non à l'appui :
+                  // presser la touche change la forme du curseur sans
+                  // qu'on bouge la souris, et c'est ainsi qu'on voit
+                  // qu'une cible est devenue atteignable avant de
+                  // cliquer. Le clic, lui, relève l'état de son APPUI.
+                  CameraTurning() ? ro::render::CursorShape::kRotate
+                  : held_sword    ? ro::render::CursorShape::kAttack
+                  : over_store    ? ro::render::CursorShape::kPoint
+                  : on_unit.has_value()
+                      ? *on_unit
+                      : ShapeUnderShift(
+                            CursorShapeOver(
+                                hovered_other, GroundHoverOn((*stage_), hovered_cell),
+                                VersusGateOf(world_, shift_held, settings_->options().no_shift())),
+                            hovered_other, shift_held, settings_->options().no_shift()));
     if (shape != cursor_shape_) {
       cursor_shape_ = shape;
       cursor_since_ms_ = now_ms;

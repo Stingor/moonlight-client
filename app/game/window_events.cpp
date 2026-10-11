@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 
+#include "ro/net/action.h"
 #include "ro/render/actor_pick.h"
 #include "ro/sim/world.h"
 
@@ -61,8 +62,11 @@ struct WindowPixels {
 // ⚠ SANS `/shopping`, SEUL LE SECOND APPUI D'UN DOUBLE-CLIC OUVRE. Le premier,
 // tombé sur une enseigne, est tout de même pris : elle couvre le sol, et le
 // clic n'y fait pas marcher.
+//
+// ⚠ UNE ENSEIGNE EST UNE FENÊTRE, LE MARCHAND EST DU MONDE : sous une souris
+// figée (`world_takes_clicks` faux), seule l'enseigne répond encore.
 [[nodiscard]] bool OpensStore(const EventRouting& to, glm::vec2 pointer, WindowPixels window,
-                              bool shift_held, bool second_of_double) {
+                              bool shift_held, bool second_of_double, bool world_takes_clicks) {
   if (to.trade == nullptr || to.grimoire->aim() != SkillAim::kNothing) {
     return false;
   }
@@ -85,7 +89,7 @@ struct WindowPixels {
     }
     return true;
   }
-  if (!opens) {
+  if (!opens || !world_takes_clicks) {
     return false;
   }
   if (to.scene_actors == nullptr) {
@@ -283,7 +287,9 @@ void OnDrag(const EventRouting& to, MouseGesture gesture, const SDL_MouseMotionE
   DragCamera(*to.camera, drag, to.rig->limits(), CtrlHeld());
 }
 
-void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button) {
+// `second_of_double` : l'appui complète un double-clic, selon `DoubleClickClock`.
+void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
+                 bool second_of_double) {
   to.world_mouse->held_click = HeldClick::kNothing;
   const WindowPixels window = PointerSpaceOf(*to.gl);
   const glm::vec2 pointer{button.x, button.y};
@@ -296,19 +302,25 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button) {
   if (!to.link->is_open() || to.chat_room_form_open) {
     return;
   }
-  // LE DOUBLE-CLIC SE RECONNAÎT ICI, où les deux appuis existent, selon la règle
-  // du système : délai et tolérance de déplacement. Le mode Ciblage le rejoue à
-  // l'image suivante, après le clic qui l'accompagne.
+  // Le mode Ciblage rejoue le double-clic à l'image suivante, après le clic qui
+  // l'accompagne.
   if (to.targeting != nullptr) {
-    static_cast<void>(
-        to.targeting->NoteWorldPress(to.now_ms, button.x, button.y, SystemDoubleClickRule()));
+    to.targeting->NoteWorldPress(second_of_double);
   }
   // ⚠ UN ÉVÉNEMENT DE SOURIS NE PORTE PAS LES MODIFICATEURS, contrairement à un
   // événement de clavier : il faut les demander à l'état courant.
   const SDL_Keymod modifiers = SDL_GetModState();
   const bool shift_held = (modifiers & SDL_KMOD_SHIFT) != 0;
   const bool ctrl_held = (modifiers & SDL_KMOD_CTRL) != 0;
-  if (OpensStore(to, pointer, window, shift_held, button.clicks >= 2)) {
+  const bool world_takes_clicks = WorldTakesClicks(
+      MouseRouteOf(*to.world, *to.grimoire, to.world_mouse->engagement, to.now_ms));
+  if (OpensStore(to, pointer, window, shift_held, second_of_double, world_takes_clicks)) {
+    return;
+  }
+  // 🔴 LA SOURIS FIGÉE — mort, dialogue, commerce, coffre — NE FAIT PLUS QUE
+  // DÉSARMER : ni marche, ni attaque, ni contact, ni ordre aux compagnons.
+  if (!world_takes_clicks) {
+    to.grimoire->Disarm();
     return;
   }
   const bool continuous = Targeting::WantsContinuousAttack(
@@ -330,12 +342,11 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button) {
                    to.now_ms,
                    to.targeting,
                    to.entity_menu};
-  // Une souris figée — mort, dialogue, coffre — n'engage rien et n'achève rien.
-  if (!MouseRouteOf(*to.world, *to.grimoire, to.world_mouse->engagement, to.now_ms).frozen) {
-    scene.engagement = &to.world_mouse->engagement;
-  }
+  scene.engagement = &to.world_mouse->engagement;
   scene.alt_held = (modifiers & SDL_KMOD_ALT) != 0;
-  scene.second_of_double = button.clicks >= 2;
+  scene.second_of_double = second_of_double;
+  scene.ctrl_held = ctrl_held;
+  scene.no_shift = to.no_shift;
   scene.ground_units = to.scene_actors->ground_units;
   scene.ground_unit_floor_pixels = to.scene_actors->ground_unit_floor_pixels;
   // LES COMPAGNONS AVANT LE PERSONNAGE : un skill de compagnon armé, ou le
@@ -357,6 +368,26 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button) {
   // tant qu'on tient, et vers là où la souris pointe alors.
   to.world_mouse->held_click = held;
   to.world_mouse->held_since_ms = to.now_ms;
+}
+
+// TOUT APPUI GAUCHE, fenêtres comprises.
+void OnLeftButtonDown(const EventRouting& to, const SDL_MouseButtonEvent& button,
+                      bool over_interface) {
+  // LE DOUBLE-CLIC SE RECONNAÎT ICI, à chaque appui, fenêtre ou monde : voir
+  // `DoubleClickClock`.
+  const bool second_of_double = to.world_mouse->double_click.NotePress(to.now_ms);
+  // 🔴 TOUT APPUI GAUCHE COMPTE POUR L'ENGAGEMENT, celui qui tombe sur une
+  // fenêtre compris : continu, il le fait retomber, et cliquer la barre de
+  // raccourcis éteint la flèche.
+  if (to.link->is_open()) {
+    NoteLeftPress(to.world_mouse->engagement, second_of_double,
+                  MouseRouteOf(*to.world, *to.grimoire, to.world_mouse->engagement, to.now_ms));
+  }
+  // À L'APPUI, comme dans le jeu : attendre le relâchement retarde chaque coup
+  // et chaque pas de la durée du clic.
+  if (!over_interface) {
+    OnLeftPress(to, button, second_of_double);
+  }
 }
 
 // LE MENU D'UNE ENTITÉ S'OUVRE AU RELÂCHEMENT DU BOUTON DROIT, comme au client
@@ -381,7 +412,11 @@ void OnRightRelease(const EventRouting& to, const SDL_MouseButtonEvent& button,
   const bool clicked =
       to.world_mouse->right_pressed_at.has_value() &&
       glm::distance(*to.world_mouse->right_pressed_at, released_at) <= kCompanionClickSlopPixels;
-  if (clicked && to.companion_ai != nullptr &&
+  // Un ordre au compagnon est un clic sur le monde : la souris figée l'ignore,
+  // et le menu reste.
+  const bool world_takes_clicks = WorldTakesClicks(
+      MouseRouteOf(*to.world, *to.grimoire, to.world_mouse->engagement, to.now_ms));
+  if (clicked && world_takes_clicks && to.companion_ai != nullptr &&
       CompanionRightRelease(*to.companion_ai, CompanionPointerOf(to, released_at),
                             OrderedBy(to, MouseGesture::kRightClick, modifiers),
                             (modifiers & SDL_KMOD_SHIFT) != 0, button.clicks >= 2)) {
@@ -509,7 +544,13 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       // redemander sans fin, le relâchement n'étant jamais vu.
       if (event.button.button == SDL_BUTTON_LEFT) {
         to.world_mouse->held_click = HeldClick::kNothing;
+        // Une attaque d'un seul clic qui frappait sans relâche s'arrête ici :
+        // voir `ReleaseStopsAttack`.
+        const bool stops_attack = ReleaseStopsAttack(to.world_mouse->engagement);
         NoteRelease(to.world_mouse->engagement);
+        if (stops_attack && to.link->is_open()) {
+          ReportRefusal(ro::net::RequestStopAttack(*to.link));
+        }
       }
       // ⚠ LE MENU, LUI, RESPECTE LE LAISSEZ-PASSER : un clic droit relâché
       // au-dessus d'une fenêtre ne vise aucune entité.
@@ -574,19 +615,9 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
           to.trade->CloseVisits();
         }
       }
-      // 🔴 TOUT APPUI GAUCHE COMPTE POUR L'ENGAGEMENT, celui qui tombe sur une
-      // fenêtre compris : continu, il le fait retomber, et cliquer la barre de
-      // raccourcis éteint la flèche.
-      if (event.button.button == SDL_BUTTON_LEFT && to.link->is_open()) {
-        NoteLeftPress(to.world_mouse->engagement, event.button.clicks >= 2,
-                      MouseRouteOf(*to.world, *to.grimoire, to.world_mouse->engagement, to.now_ms));
+      if (event.button.button == SDL_BUTTON_LEFT) {
+        OnLeftButtonDown(to, event.button, gate.mouse_to_ui);
       }
-      // À L'APPUI, comme dans le jeu : attendre le relâchement retarde chaque
-      // coup et chaque pas de la durée du clic.
-      if (event.button.button != SDL_BUTTON_LEFT || gate.mouse_to_ui) {
-        break;
-      }
-      OnLeftPress(to, event.button);
       break;
 
     case SDL_EVENT_MOUSE_MOTION:
@@ -595,6 +626,7 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       // entrée dans le panneau.
       *to.mouse = glm::vec2{event.motion.x, event.motion.y};
       to.world_mouse->pressed = (event.motion.state & SDL_BUTTON_LMASK) != 0;
+      to.world_mouse->double_click.NoteMotion();
       if (const std::optional<MouseGesture> gesture = DragOf(event.motion.state);
           gesture.has_value()) {
         if (CaptureGesture(to.hotkeys, to.bindings, *gesture, SDL_GetModState())) {

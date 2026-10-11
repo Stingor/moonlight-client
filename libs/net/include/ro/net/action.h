@@ -32,6 +32,10 @@ namespace ro::net {
 [[nodiscard]] core::Result<void> RequestAttack(Connection& link, std::uint32_t target_id,
                                                bool repeat);
 
+// CESSER DE FRAPPER : le serveur arrête la suite de coups qu'une demande sans
+// relâche avait lancée.
+[[nodiscard]] core::Result<void> RequestStopAttack(Connection& link);
+
 // Ramasser un objet au sol.
 //
 // Le serveur exige d'en être à deux cases (pc_takeitem, dans src/map/pc.cpp)

@@ -16,6 +16,7 @@
 #include "game/message_language.h"
 #include "game/warp_list_stage.h"
 #include "items/transfer_hold.h"
+#include "world/click_action.h"
 
 namespace moonclient {
 
@@ -167,7 +168,10 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
   //
   // ⚠ ET UNE PILE DEMANDE COMBIEN, comme au menu. La question se pose à l'image
   // suivante, par le même souvenir : `app` ne dessine rien, il arme.
-  if (answers.dropped_on_nothing && !answers.dropped_item.worn && !windows_.inventory.drop_locked) {
+  //
+  // ⚠ SOUS UNE SOURIS FIGÉE, LE SOL REFUSE L'OBJET : voir `WorldTakesClicks`.
+  if (answers.dropped_on_nothing && !answers.dropped_item.worn && !windows_.inventory.drop_locked &&
+      WorldTakesClicks(MouseRouteOf(world_, grimoire_, world_mouse_.engagement, now_ms))) {
     const std::uint16_t slot = answers.dropped_item.client_slot;
     const ro::sim::InventoryItem* const item = world_.inventory().Find(slot);
     if (item != nullptr && item->amount > 1) {

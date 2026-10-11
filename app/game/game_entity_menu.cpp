@@ -514,7 +514,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
                             ClickIntents{pickup_, attack_, grimoire_.approach_clock(),
                                          &world_mouse_.deferred_walk, scene_actors_.player_gesture},
                             false));
-      NoteDeedOfClickOn(&world_mouse_.engagement, *actor, false);
+      NoteDeedOfClickOn(&world_mouse_.engagement, world_, *actor, false);
       return;
     case EntityVerb::kItemDescription:
       // ⚠ L'IDENTIFIANT DE BASE SEULEMENT : le fil ne donne ni raffinement ni

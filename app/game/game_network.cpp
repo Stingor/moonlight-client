@@ -590,17 +590,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // en attente, que ce refus réécrit. Deux poursuites vivantes demanderaient
   // deux marches par image, vers des cases différentes.
   //
-  // ⚠ LE RÉARMEMENT REPREND LE GESTE COURANT, et c'est une APPROXIMATION
-  // assumée : l'action tirée a été effacée, donc ce qu'elle avait retenu est
-  // perdu. Le refus arrive un aller-retour après le coup, si bien que la touche
-  // a rarement changé entre les deux — mais si elle a changé, c'est le nouvel
-  // état qui gagne, et non celui du clic.
+  // ⚠ LE RÉARMEMENT REPREND LE TYPE DU DERNIER CLIC D'ACTION, et non l'état de
+  // Ctrl à l'arrivée du refus : voir `RearmedAttackRepeats`.
   if (AdvanceAttack(link_, world_, planner_, PlannedMapOf(*stage_), attack_,
                     grimoire_.approach_clock(), refused_target,
-                    Targeting::WantsContinuousAttack(
-                        SiegeMap(world_mouse_.engagement, world_.map_mode()),
-                        (SDL_GetModState() & SDL_KMOD_CTRL) != 0, settings_->options().no_ctrl()),
-                    now_ms, &targeting_, &world_mouse_.engagement)) {
+                    RearmedAttackRepeats(world_mouse_.engagement), now_ms, &targeting_,
+                    &world_mouse_.engagement)) {
     grimoire_.CancelPending();
   }
 

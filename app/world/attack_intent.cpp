@@ -10,6 +10,7 @@
 #include "ro/sim/world.h"
 
 #include "world/click_action.h"
+#include "world/click_rules.h"
 
 namespace moonclient {
 
@@ -82,9 +83,13 @@ bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world, ro::sim::Wa
     case ro::sim::PendingStep::kRelease: {
       // À PORTÉE : le coup part, et l'inscription s'efface. ⚠ SANS RELÂCHE —
       // le serveur enchaîne alors les coups de lui-même, et c'est son refus
-      // qui nous rendra la main si la cible s'éloigne.
+      // qui nous rendra la main si la cible s'éloigne. Un clic qui ne se
+      // poursuit pas frappe aussi sans relâche tant que le bouton est tenu :
+      // voir `BasicAttackAction`.
       const std::uint32_t target_id = attack->target_id;
-      const int asked = attack->repeat ? kAttackActionRepeat : kAttackActionOnce;
+      const int asked = engagement != nullptr
+                            ? BasicAttackAction(attack->repeat, engagement->action, target_id)
+                            : (attack->repeat ? kAttackActionRepeat : kAttackActionOnce);
       attack.reset();
       const int action =
           targeting != nullptr ? targeting->FilterBasicAttack(target_id, asked) : asked;

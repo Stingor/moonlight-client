@@ -711,7 +711,7 @@ target_include_directories(moonclient_visibility PUBLIC ${CMAKE_CURRENT_SOURCE_D
 # qu'une règle qui vit dans l'exécutable ne s'éprouve pas.
 add_library(moonclient_targeting STATIC
     world/deferred_walk.cpp
-    world/double_click_rule.cpp
+    world/click_rules.cpp
     world/mouse_engagement.cpp
     world/native_marker.cpp
     world/target_facts.cpp
