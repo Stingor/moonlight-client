@@ -291,6 +291,8 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   } else {
     menu.Add(Tr("Bloquer les chuchotements"), EntityVerb::kWhisperBlock, whisper_tip);
   }
+  menu.Add(Tr("Signaler ce joueur"), EntityVerb::kReportPlayer,
+           Tr("Le signalement est enregistré pour l'équipe, qui le consulte."));
   menu.Group();
   menu.Add(Tr("Copier le nom"), EntityVerb::kCopyName);
   AddCompanionFriends(menu, facts);

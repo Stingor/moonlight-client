@@ -242,6 +242,9 @@ enum class EntityVerb : int {
   // « JOURNAL DES BLOCAGES DE CHAT », au staff, sur un joueur : les @mute et
   // @unmute qui l'ont visé. Voir `world/chat_block_log.h`.
   kChatBlockLog,
+  // « SIGNALER CE JOUEUR » : la fenêtre de signalement, sur un autre joueur.
+  // Voir `world/player_report.h`.
+  kReportPlayer,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -263,7 +266,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kChatBlockLog) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kReportPlayer) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==

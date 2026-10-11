@@ -598,6 +598,12 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       pieces_.chat_block_log.Open(windows_.chat_block_log.state, id, subject.data(), now_ms);
       return;
     }
+    case EntityVerb::kReportPlayer:
+      // ⚠ JAMAIS SOI : le menu de soi n'a pas l'entrée, et le clic le revérifie.
+      if (id != world_.player_id()) {
+        pieces_.player_report.Open(windows_.player_report, id, name);
+      }
+      return;
     // ── L'OUTILLAGE DU STAFF ───────────────────────────────────────────────
     // Aucun compte rendu ici : le serveur rejoue la commande @ et SON verdict —
     // agi, ou refusé faute de permission — revient dans la conversation. Le dire

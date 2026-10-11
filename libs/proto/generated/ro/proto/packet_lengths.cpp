@@ -15,7 +15,7 @@ struct Entry {
 
 // Triée par opcode : la recherche est dichotomique, et un paquet arrive à
 // chaque tour de boucle réseau.
-constexpr std::array<Entry, 1374> kLengths = {{
+constexpr std::array<Entry, 1375> kLengths = {{
     Entry{0x0064, 55},  Entry{0x0065, 17},  Entry{0x0066, 3},   Entry{0x0067, 37},
     Entry{0x0068, 46},  Entry{0x0069, -1},  Entry{0x006a, 23},  Entry{0x006b, -1},
     Entry{0x006c, 3},   Entry{0x006d, 149}, Entry{0x006e, 3},   Entry{0x006f, 2},
@@ -341,25 +341,25 @@ constexpr std::array<Entry, 1374> kLengths = {{
     Entry{0x0ba2, 10},  Entry{0x0ba3, 10},  Entry{0x0ba4, 85},  Entry{0x0ba5, 12},
     Entry{0x0ba8, 7},   Entry{0x0bae, 3},   Entry{0x0baf, 16},  Entry{0x0bb0, 9},
     Entry{0x0bb1, 3},   Entry{0x0bb5, 10},  Entry{0x0bba, -1},  Entry{0x0bbe, 6},
-    Entry{0x0bdd, -1},  Entry{0x0be2, 137}, Entry{0x0be9, 6},   Entry{0x0bea, 10},
-    Entry{0x0bec, 7},   Entry{0x0bed, 9},   Entry{0x0bf3, -1},  Entry{0x0bf5, 6},
-    Entry{0x0bfb, -1},  Entry{0x0c0b, 18},  Entry{0x0c0c, 4},   Entry{0x0c22, 12},
-    Entry{0x0f02, -1},  Entry{0x0f03, -1},  Entry{0x0f04, 10},  Entry{0x0f05, -1},
-    Entry{0x0f06, -1},  Entry{0x0f07, -1},  Entry{0x0f08, -1},  Entry{0x0f09, -1},
-    Entry{0x0f0a, 100}, Entry{0x0f0b, 10},  Entry{0x0f0c, -1},  Entry{0x0f0d, 14},
-    Entry{0x0f0e, -1},  Entry{0x0f0f, -1},  Entry{0x0f10, -1},  Entry{0x0f11, 8},
-    Entry{0x0f12, -1},  Entry{0x0f13, -1},  Entry{0x0f14, -1},  Entry{0x0f15, 7},
-    Entry{0x0f16, -1},  Entry{0x0f17, -1},  Entry{0x0f18, 6},   Entry{0x0f19, -1},
-    Entry{0x0f1a, 4},   Entry{0x0f1b, -1},  Entry{0x0f1c, -1},  Entry{0x0f1d, 5},
-    Entry{0x0f1e, -1},  Entry{0x0f1f, 9},   Entry{0x0f20, -1},  Entry{0x0f21, -1},
-    Entry{0x0f22, 8},   Entry{0x0f23, -1},  Entry{0x0f24, -1},  Entry{0x0f25, 9},
-    Entry{0x0f26, 56},  Entry{0x0f27, -1},  Entry{0x0f28, -1},  Entry{0x0f29, 8},
-    Entry{0x0f2a, -1},  Entry{0x0f2b, 13},  Entry{0x0f2c, 8},   Entry{0x0f2d, -1},
-    Entry{0x0f2e, 5},   Entry{0x0f2f, -1},  Entry{0x0f30, -1},  Entry{0x0f31, -1},
-    Entry{0x0f32, -1},  Entry{0x0f33, -1},  Entry{0x0f34, -1},  Entry{0x0f35, -1},
-    Entry{0x0f36, -1},  Entry{0x0f37, -1},  Entry{0x0f38, -1},  Entry{0x0f39, -1},
-    Entry{0x0f3a, -1},  Entry{0x0f3b, -1},  Entry{0x0f3c, -1},  Entry{0x0f3d, -1},
-    Entry{0x0f3e, 8},   Entry{0x0f3f, -1},
+    Entry{0x0bdd, -1},  Entry{0x0be2, 137}, Entry{0x0be3, 34},  Entry{0x0be9, 6},
+    Entry{0x0bea, 10},  Entry{0x0bec, 7},   Entry{0x0bed, 9},   Entry{0x0bf3, -1},
+    Entry{0x0bf5, 6},   Entry{0x0bfb, -1},  Entry{0x0c0b, 18},  Entry{0x0c0c, 4},
+    Entry{0x0c22, 12},  Entry{0x0f02, -1},  Entry{0x0f03, -1},  Entry{0x0f04, 10},
+    Entry{0x0f05, -1},  Entry{0x0f06, -1},  Entry{0x0f07, -1},  Entry{0x0f08, -1},
+    Entry{0x0f09, -1},  Entry{0x0f0a, 100}, Entry{0x0f0b, 10},  Entry{0x0f0c, -1},
+    Entry{0x0f0d, 14},  Entry{0x0f0e, -1},  Entry{0x0f0f, -1},  Entry{0x0f10, -1},
+    Entry{0x0f11, 8},   Entry{0x0f12, -1},  Entry{0x0f13, -1},  Entry{0x0f14, -1},
+    Entry{0x0f15, 7},   Entry{0x0f16, -1},  Entry{0x0f17, -1},  Entry{0x0f18, 6},
+    Entry{0x0f19, -1},  Entry{0x0f1a, 4},   Entry{0x0f1b, -1},  Entry{0x0f1c, -1},
+    Entry{0x0f1d, 5},   Entry{0x0f1e, -1},  Entry{0x0f1f, 9},   Entry{0x0f20, -1},
+    Entry{0x0f21, -1},  Entry{0x0f22, 8},   Entry{0x0f23, -1},  Entry{0x0f24, -1},
+    Entry{0x0f25, 9},   Entry{0x0f26, 56},  Entry{0x0f27, -1},  Entry{0x0f28, -1},
+    Entry{0x0f29, 8},   Entry{0x0f2a, -1},  Entry{0x0f2b, 13},  Entry{0x0f2c, 8},
+    Entry{0x0f2d, -1},  Entry{0x0f2e, 5},   Entry{0x0f2f, -1},  Entry{0x0f30, -1},
+    Entry{0x0f31, -1},  Entry{0x0f32, -1},  Entry{0x0f33, -1},  Entry{0x0f34, -1},
+    Entry{0x0f35, -1},  Entry{0x0f36, -1},  Entry{0x0f37, -1},  Entry{0x0f38, -1},
+    Entry{0x0f39, -1},  Entry{0x0f3a, -1},  Entry{0x0f3b, -1},  Entry{0x0f3c, -1},
+    Entry{0x0f3d, -1},  Entry{0x0f3e, 8},   Entry{0x0f3f, -1},
 }};
 
 }  // namespace

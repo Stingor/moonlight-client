@@ -94,6 +94,7 @@
 #include "world/night_light_view.h"
 #include "world/npc_illustration_stage.h"
 #include "world/overlay_view.h"
+#include "world/player_report.h"
 #include "world/quest_marker_view.h"
 #include "world/rank_notices.h"
 #include "world/ranking_board.h"
@@ -166,6 +167,8 @@ struct GamePieces {
   EntityInspector entity_inspector;
   // ET LE JOURNAL DES BLOCAGES DE CHAT D'UN JOUEUR.
   ChatBlockLog chat_block_log;
+  // « SIGNALER CE JOUEUR » : le joueur visé, l'envoi et l'accusé.
+  PlayerReportDesk player_report;
   HomunculusStage homunculus;
   MercenaryStage mercenary;
   // L'IA DE CES DEUX DERNIERS : voir `CompanionAiStage`.

@@ -437,10 +437,12 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.mail.StartSession();
   // NI LA DEMANDE D'ADOPTION REÇUE.
   pieces_.adoption.StartSession();
-  // NI L'ENTITÉ, NI LE JOUEUR QUE LE STAFF CONSULTAIT : leurs identifiants
-  // étaient ceux d'une autre partie.
+  // NI L'ENTITÉ, NI LE JOUEUR QUE LE STAFF CONSULTAIT, NI CELUI QU'ON
+  // SIGNALAIT : leurs identifiants étaient ceux d'une autre partie.
   pieces_.entity_inspector = EntityInspector{};
   pieces_.chat_block_log = ChatBlockLog{};
+  pieces_.player_report = PlayerReportDesk{};
+  windows_.player_report.open = false;
   windows_.mail = MailWindows{};
   // LES SALONS : on n'est dans aucun. ⚠ LA SAISIE DU FORMULAIRE SURVIT, elle
   // n'appartient pas au personnage.

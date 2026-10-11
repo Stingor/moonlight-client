@@ -147,11 +147,10 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = befriended;
     }
-    // CE QU'UN SCRIPT MONTRE SUR LA CARTE — les repères, les demandes de
-    // navigation qui attendent qu'on les prenne —, le boss d'un Convex Mirror,
-    // les nouvelles d'objets — le ramassage d'un membre du groupe, une pièce
-    // abîmée, que le sac lit aussi —, l'issue d'une alliance ou d'une hostilité
-    // de guilde, l'adoption, les deux fiches du staff et la ligne d'un état.
+    // CE QU'UN SCRIPT MONTRE SUR LA CARTE (repères, navigation à prendre), le
+    // boss d'un Convex Mirror, les nouvelles d'objets (ramassage d'un membre,
+    // pièce abîmée), l'issue d'une alliance ou d'une hostilité, l'adoption, les
+    // fiches du staff, l'accusé d'un signalement et la ligne d'un état.
     for (const ro::net::FrameOutcome told :
          {ro::net::ApplyMapGuidanceFrame(received, navi_.guidance, now_ms),
           ro::net::ApplyBossInfoFrame(received, navi_.guidance, world_, now_ms),
@@ -160,6 +159,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
           ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
           pieces_.entity_inspector.ApplyFrame(received),
           pieces_.chat_block_log.ApplyFrame(received),
+          PlayerReportDesk::ApplyFrame(received, world_, now_ms),
           ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
           character_->SayEquipAttributes(received, world_, now_ms)}) {
       if (outcome == ro::net::FrameOutcome::kUnhandled) {

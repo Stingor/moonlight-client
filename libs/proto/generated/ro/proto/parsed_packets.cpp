@@ -445,7 +445,7 @@ constexpr std::array<Entry, 436> kParsed = {{
     Entry{0x0bb0, "clif_parse_dull", 475, 0},
     Entry{0x0bb1, "clif_parse_reset_skill", 475, 0},
     Entry{0x0bdd, "clif_parse_dull", 475, 0},
-    Entry{0x0be2, "clif_parse_dull", 475, 0},
+    Entry{0x0be2, "clif_parse_report_user", 475, 0},
     Entry{0x0be9, "clif_parse_cash_emotion_use", 475, 0},
     Entry{0x0bec, "clif_parse_buy_cash_emotion", 475, 0},
     Entry{0x0bf3, "clif_parse_dull", 475, 0},

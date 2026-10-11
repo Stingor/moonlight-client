@@ -60,6 +60,7 @@ add_library(ro_net STATIC
     src/party_booking.cpp
     src/player_bonuses.cpp
     src/player_config.cpp
+    src/player_report.cpp
     src/pvp_rank.cpp
     src/recovery.cpp
     src/refusal_text.cpp

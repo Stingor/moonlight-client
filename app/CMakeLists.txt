@@ -838,6 +838,7 @@ add_library(moonclient_entitymenu STATIC
     options/context_menu_options.cpp
     world/blocked_npcs.cpp
     world/chat_block_log.cpp
+    world/player_report.cpp
     world/entity_inspector.cpp
     world/entity_menu.cpp
     world/entity_menu_tactics.cpp)

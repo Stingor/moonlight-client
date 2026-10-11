@@ -317,6 +317,9 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   }
   RouteBugReports(answers, windows_, world_, *item_description_, skill_description_->view(),
                   settings_->options().bug_report().buttons(), link_);
+  // « SIGNALER CE JOUEUR » : l'envoi que sa fenêtre demande.
+  pieces_.player_report.Advance(windows_.player_report, answers.player_report, world_.player_id(),
+                                link_);
   if (answers.description.read_book || answers.description.recite_book) {
     const bool first_page = settings_->options().descriptions().book_first_page();
     if (answers.description.read_book) {

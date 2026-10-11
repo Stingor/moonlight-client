@@ -1329,6 +1329,9 @@ tr: Fog
 fr: Buffs et debuffs
 tr: Buffs and debuffs
 
+fr: Bug ou abus du système
+tr: Bug and system abuse
+
 fr: Buying store
 tr: Buying store
 
@@ -1343,6 +1346,12 @@ tr: This is the damage BEFORE the target's defense.
 
 fr: C'est votre propre guilde.
 tr: That is your own guild.
+
+fr: Ce joueur est protégé contre les signalements.
+tr: The target is under report protection.
+
+fr: Cible introuvable...
+tr: Target not found...
 
 fr: CID %u
 tr: CID %u
@@ -2176,6 +2185,9 @@ tr: Invite to my MVP log
 fr: Jamais visés d'eux-mêmes : le maître, ses amis, son groupe, et sa guilde là où la carte l'épargne (WoE, donjon GvG).
 tr: Never targeted on its own: the owner, their friends, their party, and their guild where the map spares it (WoE, GvG dungeon).
 
+fr: Joueur signalé : %s
+tr: Reported player: %s
+
 fr: Joueurs en file
 tr: Players queued
 
@@ -2275,11 +2287,20 @@ tr: The file name, relative to the game's savedata folder: "alert.wav", or "soun
 fr: Le nom du site contient des caractères non latins : il peut imiter un autre site.
 tr: The site name contains non-Latin characters: it can imitate another site.
 
+fr: Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.
+tr: If you have exceeded the number of daily reports, you will no longer be able to report.
+
 fr: Le serveur a refusé l'annulation : vous restez en file.
 tr: The server refused the cancellation: you stay in the queue.
 
 fr: Le serveur n'a pas répondu à l'inscription.
 tr: The server did not answer the application.
+
+fr: Le signalement est enregistré pour l'équipe, qui le consulte.
+tr: The report is recorded for the staff, who review it.
+
+fr: Le signalement n'a pas pu être enregistré (erreur serveur).
+tr: The report could not be recorded (server error).
 
 fr: Le skill a échoué (motif %d).
 tr: Skill has failed (reason %d).
@@ -2512,6 +2533,9 @@ tr: New message
 fr: Objectif
 tr: Objective
 
+fr: On ne peut pas signaler dans cette zone.
+tr: This is an area where reporting is not possible.
+
 fr: Ouvre l'onglet « Joueurs » de la fenêtre « IA du compagnon ». Une conduite ne sert qu'en PvP et en WoE.
 tr: Opens the “Players” tab of the “Companion AI” window. A behavior only applies in PvP and WoE.
 
@@ -2598,6 +2622,9 @@ tr: Layout profiles
 
 fr: Profils de réglages
 tr: Settings profiles
+
+fr: Programme illégal soupçonné
+tr: Suspected illegal program
 
 fr: Préavis d'alerte (min)
 tr: Alert lead time (min)
@@ -2745,6 +2772,18 @@ tr: If it does not move
 
 fr: S'écarter de (cases)
 tr: Step away by (cells)
+
+fr: Saisissez le contenu du signalement.
+tr: Enter the details of your report.
+
+fr: Signalement de %s enregistré.
+tr: %s was reported.
+
+fr: Signaler ce joueur
+tr: Report a User
+
+fr: Signaler un joueur
+tr: Report a User
 
 fr: SP à garder
 tr: SP to keep
@@ -3826,6 +3865,12 @@ tr: Always show %s…
 fr: Toujours ouvrir les liens de %s
 tr: Always open links from %s
 
+fr: Un autre joueur vous a signalé.
+tr: You have been reported by another player.
+
+fr: Un usage abusif de cette fonction peut être sanctionné.
+tr: Abusing this feature may result in sanctions.
+
 fr: Une adresse postée dans le chat vient d'un autre joueur, et le texte affiché n'a aucun rapport obligé avec la destination réelle. La confirmation montre l'adresse COMPLÈTE avant d'ouvrir le navigateur.\n\nEn la décochant, un clic sur un lien ouvre directement le navigateur.
 tr: An address posted in the chat comes from another player, and the text shown need not have anything to do with the real destination. The confirmation shows the FULL address before opening the browser.\n\nUnchecked, a click on a link opens the browser directly.
 
@@ -3840,6 +3885,12 @@ tr: Your allowed sites:
 
 fr: Votre personnage marche derrière lui. Un clic gauche arrête le suivi.
 tr: Your character walks after them. A left click stops following.
+
+fr: Vous avez atteint le nombre de signalements permis aujourd'hui.
+tr: You can no longer report beyond the cumulative number of daily reports.
+
+fr: Vous avez déjà signalé ce joueur récemment.
+tr: You have already reported this player recently.
 
 fr: Vous ne suivez personne.
 tr: You are not following anyone.

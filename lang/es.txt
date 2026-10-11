@@ -1329,6 +1329,9 @@ tr: Niebla
 fr: Buffs et debuffs
 tr: Buffs y debuffs
 
+fr: Bug ou abus du système
+tr: Bug y abuso del sistema
+
 fr: Buying store
 tr: Buying store
 
@@ -1343,6 +1346,12 @@ tr: Es el daño ANTES de la defensa del objetivo.
 
 fr: C'est votre propre guilde.
 tr: Esa es tu propia guild.
+
+fr: Ce joueur est protégé contre les signalements.
+tr: Este jugador está protegido contra las denuncias.
+
+fr: Cible introuvable...
+tr: Objetivo no encontrado...
 
 fr: CID %u
 tr: CID %u
@@ -2176,6 +2185,9 @@ tr: Invitar a mi cuaderno MVP
 fr: Jamais visés d'eux-mêmes : le maître, ses amis, son groupe, et sa guilde là où la carte l'épargne (WoE, donjon GvG).
 tr: Nunca atacados por iniciativa propia: el amo, sus amigos, su grupo, y su guild donde el mapa la protege (WoE, mazmorra GvG).
 
+fr: Joueur signalé : %s
+tr: Jugador denunciado: %s
+
 fr: Joueurs en file
 tr: Jugadores en cola
 
@@ -2275,11 +2287,20 @@ tr: El nombre del archivo, relativo a la carpeta savedata del juego: "aviso.wav"
 fr: Le nom du site contient des caractères non latins : il peut imiter un autre site.
 tr: El nombre del sitio contiene caracteres no latinos: puede imitar otro sitio.
 
+fr: Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.
+tr: Has superado el número de denuncias del día: ya no puedes denunciar.
+
 fr: Le serveur a refusé l'annulation : vous restez en file.
 tr: El servidor rechazó la cancelación: sigues en la cola.
 
 fr: Le serveur n'a pas répondu à l'inscription.
 tr: El servidor no respondió a la inscripción.
+
+fr: Le signalement est enregistré pour l'équipe, qui le consulte.
+tr: La denuncia queda registrada para el equipo, que la revisa.
+
+fr: Le signalement n'a pas pu être enregistré (erreur serveur).
+tr: No se pudo registrar la denuncia (error del servidor).
 
 fr: Le skill a échoué (motif %d).
 tr: El skill ha fallado (motivo %d).
@@ -2512,6 +2533,9 @@ tr: Mensaje nuevo
 fr: Objectif
 tr: Objetivo
 
+fr: On ne peut pas signaler dans cette zone.
+tr: En esta zona no se puede denunciar.
+
 fr: Ouvre l'onglet « Joueurs » de la fenêtre « IA du compagnon ». Une conduite ne sert qu'en PvP et en WoE.
 tr: Abre la pestaña «Jugadores» de la ventana «IA del compañero». Un comportamiento solo sirve en PvP y en WoE.
 
@@ -2598,6 +2622,9 @@ tr: Perfiles de disposición
 
 fr: Profils de réglages
 tr: Perfiles de ajustes
+
+fr: Programme illégal soupçonné
+tr: Sospecha de programa ilegal
 
 fr: Préavis d'alerte (min)
 tr: Antelación del aviso (min)
@@ -2745,6 +2772,18 @@ tr: Si no se mueve
 
 fr: S'écarter de (cases)
 tr: Apartarse (casillas)
+
+fr: Saisissez le contenu du signalement.
+tr: Escribe el contenido de la denuncia.
+
+fr: Signalement de %s enregistré.
+tr: Denuncia contra %s registrada.
+
+fr: Signaler ce joueur
+tr: Denunciar a este jugador
+
+fr: Signaler un joueur
+tr: Denunciar a un jugador
 
 fr: SP à garder
 tr: SP a conservar
@@ -3826,6 +3865,12 @@ tr: Mostrar siempre %s…
 fr: Toujours ouvrir les liens de %s
 tr: Abrir siempre los enlaces de %s
 
+fr: Un autre joueur vous a signalé.
+tr: Otro jugador te ha denunciado.
+
+fr: Un usage abusif de cette fonction peut être sanctionné.
+tr: El uso abusivo de esta función puede ser sancionado.
+
 fr: Une adresse postée dans le chat vient d'un autre joueur, et le texte affiché n'a aucun rapport obligé avec la destination réelle. La confirmation montre l'adresse COMPLÈTE avant d'ouvrir le navigateur.\n\nEn la décochant, un clic sur un lien ouvre directement le navigateur.
 tr: Una dirección publicada en el chat viene de otro jugador, y el texto mostrado no tiene por qué guardar relación con el destino real. La confirmación muestra la dirección COMPLETA antes de abrir el navegador.\n\nDesmarcada, un clic en un enlace abre directamente el navegador.
 
@@ -3840,6 +3885,12 @@ tr: Tus sitios permitidos:
 
 fr: Votre personnage marche derrière lui. Un clic gauche arrête le suivi.
 tr: Tu personaje camina tras él. Un clic izquierdo detiene el seguimiento.
+
+fr: Vous avez atteint le nombre de signalements permis aujourd'hui.
+tr: Has alcanzado el número de denuncias permitidas hoy.
+
+fr: Vous avez déjà signalé ce joueur récemment.
+tr: Ya has denunciado a este jugador hace poco.
 
 fr: Vous ne suivez personne.
 tr: No sigues a nadie.

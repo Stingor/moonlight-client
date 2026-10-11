@@ -7776,7 +7776,22 @@ struct CzReqReportUser {
   // Taille sur le fil, en octets.
   static constexpr std::size_t kWireSize = 137;
 
-  std::array<std::uint8_t, 135> unknown = {};
+  std::uint32_t AID = 0;
+  std::uint32_t targetAID = 0;
+  std::string targetName;
+  std::int16_t reason = 0;
+  std::string message;
+};
+
+// PACKET_ZC_ACK_REPORT_USER
+struct ZcAckReportUser {
+  static constexpr std::uint16_t kOpcode = 0x0be3;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 34;
+
+  std::uint32_t targetAID = 0;
+  std::string targetName;
+  std::int32_t result = 0;
 };
 
 // PACKET_CZ_QUEST_STATUS_REQ
@@ -8462,6 +8477,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcWhisperList& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzAllyChat& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzReqReportUser& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcAckReportUser& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzQuestStatusReq& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoveItemToPersonal& packet);
 
@@ -9056,6 +9072,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcWhisperList& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzAllyChat& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzReqReportUser& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcAckReportUser& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzQuestStatusReq& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoveItemToPersonal& packet);
 

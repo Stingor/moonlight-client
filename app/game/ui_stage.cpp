@@ -551,6 +551,7 @@ UiStage::Answers UiStage::Draw(
   answers.menu = ro::ui::DrawGameMenu(windows.menu, skin_, menu_facts);
   // LE RAPPORT DE BUG : une boîte modale, qui passe devant tout, et l'accusé.
   answers.bug_report = ro::ui::DrawBugReportWindow(windows.bug_report, skin_);
+  answers.player_report = ro::ui::DrawPlayerReportWindow(windows.player_report, skin_);
 
   // LE DIALOGUE EN DERNIER : c'est la seule fenêtre à laquelle le joueur DOIT
   // répondre, et elle doit donc passer devant celles qui servent à bâtir.
@@ -667,6 +668,7 @@ UiStage::Answers UiStage::Draw(
   escape_.RegisterReading(ro::ui::kMonsterSheetWindowId, &windows.monster_sheet.state.open);
   escape_.RegisterReading(ro::ui::kEntityInspectorWindowId, &windows.entity_inspector.state.open);
   escape_.RegisterReading(ro::ui::kChatBlockLogWindowId, &windows.chat_block_log.state.open);
+  escape_.Register(ro::ui::kPlayerReportWindowId, &windows.player_report.open);
   // L'Atlas aussi : on le consulte, puis on le referme.
   escape_.Register(ro::ui::kCraftAtlasWindowId, &windows.craft_atlas.state.open);
   RegisterNavigationEscapes(windows.navigation);

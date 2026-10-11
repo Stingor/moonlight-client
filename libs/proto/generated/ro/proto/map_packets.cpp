@@ -18194,9 +18194,11 @@ bool Decode(std::span<const std::uint8_t> frame, CzReqReportUser& packet) {
   if (reader.U16() != CzReqReportUser::kOpcode) {
     return false;
   }
-  for (std::uint8_t& element : packet.unknown) {
-    element = static_cast<std::uint8_t>(reader.U8());
-  }
+  packet.AID = static_cast<std::uint32_t>(reader.U32());
+  packet.targetAID = static_cast<std::uint32_t>(reader.U32());
+  packet.targetName = reader.FixedString(24);
+  packet.reason = static_cast<std::int16_t>(reader.I16());
+  packet.message = reader.FixedString(101);
   return reader.ok();
 }
 
@@ -18205,9 +18207,36 @@ std::vector<std::uint8_t> Encode(const CzReqReportUser& packet) {
   out.reserve(CzReqReportUser::kWireSize);
   ByteWriter writer(out);
   writer.U16(CzReqReportUser::kOpcode);
-  for (const std::uint8_t element : packet.unknown) {
-    writer.U8(static_cast<std::uint8_t>(element));
+  writer.U32(static_cast<std::uint32_t>(packet.AID));
+  writer.U32(static_cast<std::uint32_t>(packet.targetAID));
+  writer.FixedString(packet.targetName, 24);
+  writer.I16(static_cast<std::int16_t>(packet.reason));
+  writer.FixedString(packet.message, 101);
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcAckReportUser& packet) {
+  if (frame.size() != ZcAckReportUser::kWireSize) {
+    return false;
   }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcAckReportUser::kOpcode) {
+    return false;
+  }
+  packet.targetAID = static_cast<std::uint32_t>(reader.U32());
+  packet.targetName = reader.FixedString(24);
+  packet.result = static_cast<std::int32_t>(reader.I32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcAckReportUser& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcAckReportUser::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcAckReportUser::kOpcode);
+  writer.U32(static_cast<std::uint32_t>(packet.targetAID));
+  writer.FixedString(packet.targetName, 24);
+  writer.I32(static_cast<std::int32_t>(packet.result));
   return out;
 }
 

@@ -65,6 +65,7 @@
 #include "ro/ui/pet_hatch_window.h"
 #include "ro/ui/pet_window.h"
 #include "ro/ui/pick_boxes.h"
+#include "ro/ui/player_report_window.h"
 #include "ro/ui/pvp_hud_frames.h"
 #include "ro/ui/repair_window.h"
 #include "ro/ui/shortcut_bar.h"
@@ -210,6 +211,8 @@ class UiStage {
     ro::ui::CardAlbumWindowState card_album;
     // LE RAPPORT DE BUG : sa boîte, son contexte, son accusé. Voir l'ADR 0052.
     ro::ui::BugReportWindowState bug_report;
+    // « SIGNALER CE JOUEUR » : voir `world/player_report.h`.
+    ro::ui::PlayerReportWindowState player_report;
     // LE LIVRE QU'ON LIT, et ce que `app` en montre : ses lignes, et la ligne
     // que le personnage récite.
     ro::ui::BookWindowState book;
@@ -492,6 +495,7 @@ class UiStage {
     // dégâts se demandent au serveur, et seule cette fenêtre sait quand.
     ro::ui::SkillDescriptionAction skill_description;
     ro::ui::BugReportAction bug_report;
+    ro::ui::PlayerReportAnswer player_report;
     ro::ui::BookWindowAction book;
     // L'OBJET LÂCHÉ SUR LE MONDE, hors de toute fenêtre. ⚠ À PART DU RESTE,
     // comme la languette de conversation : il ne vient d'aucune fenêtre en
