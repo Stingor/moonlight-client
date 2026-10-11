@@ -156,6 +156,9 @@ struct CashShopWindowState {
 
   // Le menu qu'un clic droit sur une carte a armé.
   ItemLinkMenu item_menu;
+
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 // Ajoute une unité au panier, ou une de plus à sa ligne. ⚠ PLAFONNÉE À
@@ -204,6 +207,9 @@ struct CashShopWindowAction {
   // en compte des milliers, et `app` ne charge que celles qu'on a vues. ⚠ UNE
   // IMAGE DE RETARD.
   std::vector<std::uint32_t> drawn;
+  // « Signaler un bug » : `app` joint ce que la boutique montre — l'onglet, les
+  // filtres, les soldes, le panier et le dernier refus.
+  bool report_bug = false;
 };
 
 // Dessine la fenêtre si elle est ouverte.

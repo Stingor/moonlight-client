@@ -356,7 +356,7 @@ void SortRows(MvpTrackerWindowState& state, const MvpTrackerView& view) {
   const bool sorted = specs != nullptr && specs->SpecsCount > 0;
   // Une clé par colonne ET par sens ; zéro : aucun tri.
   const int key = sorted
-                      ? (specs->Specs[0].ColumnIndex + 1) * 2 +
+                      ? (specs->Specs[0].ColumnIndex + 1) * kMvpSortKeysPerColumn +
                             (specs->Specs[0].SortDirection == ImGuiSortDirection_Ascending ? 1 : 0)
                       : 0;
   if (key == state.sort_key && keys == state.sorted_keys && rows == state.sorted_rows) {

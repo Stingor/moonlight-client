@@ -412,7 +412,13 @@ target_include_directories(moonclient_itemfacts PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # LE CONTEXTE D'UN RAPPORT DE BUG, à part pour qu'un essai vérifie ce que le
 # serveur recevra : un JSON valable, des noms échappés, la révision du client.
 add_library(moonclient_bugreport STATIC
-    game/bug_report_context.cpp)
+    game/bug_report_context.cpp
+    game/card_album_bug_report.cpp
+    game/cash_shop_bug_report.cpp
+    game/character_bug_report.cpp
+    game/craft_atlas_bug_report.cpp
+    game/hotkey_bug_report.cpp
+    game/options_bug_report.cpp)
 
 target_link_libraries(moonclient_bugreport
     PUBLIC ro_core ro_net ro_ui
@@ -581,11 +587,12 @@ target_include_directories(moonclient_profiles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 # d'écriture. Une annulation oubliée laisse le joueur figé, une saisie effacée
 # après un échec se refait à la main : deux pannes qu'un banc voit avant le jeu.
 add_library(moonclient_mail STATIC
+    game/mail_bug_report.cpp
     game/mail_write_flow.cpp
     items/mail_withheld.cpp)
 
 target_link_libraries(moonclient_mail
-    PUBLIC ro_core ro_sim ro_ui
+    PUBLIC ro_core ro_sim ro_ui moonclient_bugreport
     PRIVATE ro_warnings)
 
 target_include_directories(moonclient_mail PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -612,6 +619,7 @@ target_include_directories(moonclient_cardalbum PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 add_library(moonclient_mvptracker STATIC
     game/interface_sound.cpp
     game/mvp_alert_sound.cpp
+    game/mvp_tracker_bug_report.cpp
     game/surface_announcer.cpp
     mvp/mvp_line_file.cpp
     mvp/mvp_tracker_compose.cpp
@@ -620,8 +628,8 @@ add_library(moonclient_mvptracker STATIC
     options/mvp_tracker_options.cpp)
 
 target_link_libraries(moonclient_mvptracker
-    PUBLIC ro_audio ro_net ro_render ro_render_gl ro_sim ro_ui ro_vfs moonclient_chatlinks
-           moonclient_monstersheet moonclient_settings
+    PUBLIC ro_audio ro_net ro_render ro_render_gl ro_sim ro_ui ro_vfs moonclient_bugreport
+           moonclient_chatlinks moonclient_monstersheet moonclient_settings
     PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_mvptracker PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -870,6 +878,7 @@ target_include_directories(moonclient_entitymenu PUBLIC ${CMAKE_CURRENT_SOURCE_D
 # se tait, une demande toutes les 250 ms — ne se vérifient pas en jouant.
 add_library(moonclient_party STATIC
     game/adoption_stage.cpp
+    game/party_booking_bug_report.cpp
     party/party_booking_board.cpp
     party/party_booking_places.cpp
     party/party_compose.cpp
@@ -877,7 +886,7 @@ add_library(moonclient_party STATIC
     party/party_options.cpp
     party/party_poll.cpp)
 target_link_libraries(moonclient_party
-    PUBLIC ro_net ro_sim ro_ui moonclient_settings
+    PUBLIC ro_net ro_sim ro_ui moonclient_bugreport moonclient_settings
     PRIVATE ro_vfs yaml-cpp::yaml-cpp ro_warnings)
 target_include_directories(moonclient_party PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

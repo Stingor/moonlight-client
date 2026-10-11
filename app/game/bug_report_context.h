@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -42,6 +43,8 @@ struct BugReportContext {
 // Demande la boîte avec ce contexte. ⚠ UNE BOÎTE OUVERTE NE SE REMPLACE PAS :
 // le message en cours de frappe serait jeté.
 void AskBugReport(ro::ui::BugReportWindowState& window, BugReportContext context);
+// De même, s'il y a un rapport : celui qu'un étage rend une fois, ou rien.
+void AskBugReport(ro::ui::BugReportWindowState& window, std::optional<BugReportContext> context);
 
 // Une chaîne prête à entrer entre guillemets dans le JSON.
 [[nodiscard]] std::string JsonEscaped(std::string_view text);

@@ -19,6 +19,7 @@
 #include "chat/chat_mvp_link.h"
 #include "game/game.h"
 #include "game/mvp_alert_sound.h"
+#include "game/mvp_tracker_bug_report.h"
 #include "mvp/mvp_tracker_stage.h"
 
 namespace moonclient {
@@ -47,6 +48,10 @@ void Game::AdvanceMvpTracker(std::uint32_t now_ms) {
   // refaire le catalogue sous la vue d'avant.
   const ro::ui::ChatLinkAsk named = tracker.answer.name_link;
   const bool open_settings = tracker.answer.open_settings;
+  // ⚠ LE RAPPORT AUSSI, et sur la vue d'avant : c'est celle que le joueur a vue.
+  if (tracker.answer.report_bug && tracker.view != nullptr) {
+    AskBugReport(windows_.bug_report, MvpTrackerBugReport(tracker.window, *tracker.view));
+  }
   const MvpTrackerContext context{
       .link = link_,
       .options = page,

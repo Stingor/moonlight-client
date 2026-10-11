@@ -351,6 +351,9 @@ struct OptionsWindowState {
   // voir avec l'onglet 6 d'une autre, et en garder le rang ferait ouvrir une
   // section sur une page que le joueur n'a pas demandée.
   int section_tab_wanted = -1;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage. ⚠ LES
+  // OPTIONS DU JEU SEULES : l'écran de connexion n'a personne à qui l'envoyer.
+  bool bug_report = false;
 };
 
 // Ce que le joueur a changé. ⚠ UNE SEULE LIGNE PAR IMAGE, et c'est suffisant :
@@ -403,6 +406,9 @@ struct OptionsWindowAction {
   // moins un pour la page entière. Voir `chat_link_offer.h`.
   int link_section = -1;
   int link_tab = -1;
+  // « Signaler un bug » : `app` joint ce que la fenêtre montre — la page,
+  // l'onglet, et les valeurs de ses réglages.
+  bool report_bug = false;
 };
 
 // ── UNE SEULE FENÊTRE, DEUX FAMILLES ────────────────────────────────────────

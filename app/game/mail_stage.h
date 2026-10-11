@@ -23,6 +23,7 @@
 #include "ro/ui/mail_window.h"
 #include "ro/vfs/job_names.h"
 
+#include "game/bug_report_context.h"
 #include "game/mail_write_flow.h"
 #include "game/npc_shop_stage.h"
 #include "game/trade_items.h"
@@ -108,6 +109,10 @@ class MailStage {
   [[nodiscard]] TradeItemFocus hovered() const noexcept { return hovered_; }
   [[nodiscard]] std::optional<TradeItemFocus> TakeDescribed() noexcept;
 
+  // Le rapport de bug que le joueur a demandé de la boîte ou de l'écriture,
+  // avec ce que la fenêtre montrait — une fois.
+  [[nodiscard]] std::optional<BugReportContext> TakeBugReport() noexcept;
+
  private:
   struct QueuedAttach {
     std::uint16_t client_slot = 0;
@@ -166,6 +171,7 @@ class MailStage {
   std::string compose_error_;
   TradeItemFocus hovered_;
   std::optional<TradeItemFocus> described_;
+  std::optional<BugReportContext> bug_report_;
 
   // ── CE QUI SE COMPOSE À CHAQUE IMAGE ─────────────────────────────────────
   // ⚠ LES VUES POINTENT DEDANS : elles se prennent une fois les vecteurs remplis.

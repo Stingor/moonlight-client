@@ -5,6 +5,7 @@
 #include <cstddef>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/chat_link_offer.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -51,6 +52,9 @@ constexpr float kNoHeightCeiling = 10000.0F;
 // laisser passer un volet réellement trop serré. Même raison que la tolérance de
 // bord d'écran de la chatbox.
 constexpr float kStatsPaneSlack = 6.0F;
+
+// Le seul bouton de la barre de titre, au rang de sa pose.
+constexpr int kBugReportRank = 0;
 
 // LE PLANCHER DE LA FENÊTRE : une rangée de cases de plus par compagnon au-delà
 // de ceux qu'il loge. Les compagnons restent EN COLONNE, à la place que le
@@ -366,6 +370,7 @@ CharacterWindowAction DrawCharacterWindow(
 
   SetNextWindowPinnable(&state.pinned);
   SetNextWindowRounding(kWindowRoundingPixels);
+  PoseBugReportButton(state.bug_report);
   // ⚠ PAS DE PUCE ICI : cette fenêtre n'a pas de section de réglages à elle.
   // Le jour où elle en aura une, sa lecture ira AVANT ce demi-tour — voir le
   // sac, dont la puce ne répondrait plus sinon une fois la fenêtre repliée.
@@ -374,6 +379,7 @@ CharacterWindowAction DrawCharacterWindow(
     state.presets.capturing = -1;
     return action;
   }
+  action.report_bug = state.bug_report && TitleActionClicked(kBugReportRank);
 
   // Ce que la fenêtre prend de marge, pour les crans de l'image suivante.
   state.chrome_width = ImGui::GetWindowWidth() - ImGui::GetContentRegionAvail().x;

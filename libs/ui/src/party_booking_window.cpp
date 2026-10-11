@@ -11,6 +11,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -322,10 +323,15 @@ PartyBookingAction DrawPartyBookingWindow(PartyBookingWindowState& state,
   ImGui::SetNextWindowSize(
       ImVec2(kPartyBookingFirstWidthPixels * scale, kPartyBookingFirstHeightPixels * scale),
       ImGuiCond_FirstUseEver);
+  PoseBugReportButton(state.bug_report);
   const bool begun = BeginSkinnedWindow(state.name.Get(), &state.open, art, SkinnedTitle::kBar,
                                         ImGuiWindowFlags_NoCollapse);
+  // ⚠ RELU MAINTENANT, POSÉ À LA FIN : un bouton du corps remplace l'intention
+  // entière, et l'effacerait.
+  const bool report_bug = state.bug_report && TitleActionClicked(0);
   if (!begun) {
     EndSkinnedWindow();
+    action.report_bug = report_bug;
     return action;
   }
   if (ImGui::CollapsingHeader(Labelled(core::Tr("Annonces"), "booking_ads").c_str(),
@@ -341,6 +347,7 @@ PartyBookingAction DrawPartyBookingWindow(PartyBookingWindowState& state,
     }
   }
   EndSkinnedWindow();
+  action.report_bug = report_bug;
   return action;
 }
 

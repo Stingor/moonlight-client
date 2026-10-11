@@ -11,6 +11,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/text.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/chat_link_offer.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/nav_panel.h"
@@ -65,6 +66,8 @@ constexpr float kSidePanelWidthPixels = 620.0F;
 constexpr ImU32 kFoldColor = IM_COL32(165, 170, 180, 90);
 // L'air laissé au-dessus d'un bloc qui en suit un autre.
 constexpr float kFoldGapPixels = 6.0F;
+// Le seul bouton de la barre de titre, au rang de sa pose.
+constexpr int kBugReportRank = 0;
 
 // LE BANDEAU D'UN BLOC, et s'il est ouvert.
 //
@@ -585,6 +588,8 @@ struct SettingsWindowWords {
   const char* footnote = nullptr;
   // Le Maj + clic d'une entrée ou d'un onglet pose son lien dans le chat.
   bool offers_links = false;
+  // La barre de titre porte « Signaler un bug », quand le réglage le veut.
+  bool reports_bugs = false;
 };
 
 // LE CORPS D'UN PANNEAU DE RÉGLAGES, quel qu'il soit : la nav, les lignes, et
@@ -603,10 +608,13 @@ struct SettingsWindowWords {
   }
 
   ImGui::SetNextWindowSize(ImVec2(kFirstWidthPixels, kFirstHeightPixels), ImGuiCond_FirstUseEver);
+  const bool bug_button = words.reports_bugs && state.bug_report;
+  PoseBugReportButton(bug_button);
   if (!BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar)) {
     EndSkinnedWindow();
     return asked;
   }
+  asked.report_bug = bug_button && TitleActionClicked(kBugReportRank);
 
   // ⚠ LES ENTRÉES TRAVERSENT EN TAMPON. La nav n'en garde rien ; les rassembler
   // ici les fait vivre le temps de l'appel, et lui évite d'apprendre ce qu'est
@@ -739,7 +747,8 @@ OptionsWindowAction DrawOptionsWindow(OptionsWindowState& state,
       name, state, sections, art,
       SettingsWindowWords{
           .restore_all_question = core::Tr("Rendre à tous les réglages leur valeur d'origine ?"),
-          .offers_links = true});
+          .offers_links = true,
+          .reports_bugs = true});
 }
 
 OptionsWindowAction DrawLoginSettingsWindow(OptionsWindowState& state,

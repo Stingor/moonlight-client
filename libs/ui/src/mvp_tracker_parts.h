@@ -104,6 +104,9 @@ inline constexpr int kMvpColumnReturn = 5;
 inline constexpr int kMvpColumnAge = 6;
 inline constexpr int kMvpColumnSource = 7;
 inline constexpr int kMvpColumnCount = 8;
+// LA CLÉ DE TRI : `(colonne + 1) × kMvpSortKeysPerColumn`, plus un en croissant ;
+// zéro, aucun tri.
+inline constexpr int kMvpSortKeysPerColumn = 2;
 // La table des membres : nom, niveau, état, action.
 inline constexpr int kMvpMemberColumnCount = 4;
 // Un texte composé d'une ligne : une phrase, un en-tête, un titre.

@@ -9,6 +9,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -724,11 +725,13 @@ CashShopWindowAction DrawCashShopWindow(CashShopWindowState& state, const CashSh
         ImVec2(FLT_MAX, FLT_MAX), SnapToCards, &state);
   }
   SetNextWindowRounding(kWindowRoundingPixels);
+  PoseBugReportButton(state.bug_report);
   // ⚠ LE TITRE EST LE NOM QUE LE SERVEUR DONNE À SA BOUTIQUE, l'identité reste
   // la nôtre : la place se retient sous un nom qui ne dépend pas de la table.
   const std::string title = std::string(view.title) + "###" + kCashShopWindowId;
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art, SkinnedTitle::kBar,
                                              ImGuiWindowFlags_NoCollapse);
+  action.report_bug = state.bug_report && TitleActionClicked(0);
   if (!state.open) {
     action.close = true;
   }

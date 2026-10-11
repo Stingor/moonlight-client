@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <string_view>
 
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/chat_link_offer.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/skin_palette.h"
@@ -21,6 +22,8 @@ constexpr float kFirstWidthPixels = 420.0F;
 constexpr float kFirstHeightPixels = 380.0F;
 // La colonne des touches : assez pour « Ctrl+Maj+Retour arrière ».
 constexpr float kKeyColumnPixels = 150.0F;
+// Le seul bouton de la barre de titre, au rang de sa pose.
+constexpr int kBugReportRank = 0;
 
 // L'intertitre d'une famille de lignes : une couleur choisie pour le corps clair
 // du jeu, traduite pour celui de l'habillage.
@@ -85,10 +88,12 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
 
   static WindowName name(kHotkeyWindowTitle, kHotkeyWindowId);
   ImGui::SetNextWindowSize(ImVec2(kFirstWidthPixels, kFirstHeightPixels), ImGuiCond_FirstUseEver);
+  PoseBugReportButton(state.bug_report);
   if (!BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar)) {
     EndSkinnedWindow();
     return asked;
   }
+  asked.report_bug = state.bug_report && TitleActionClicked(kBugReportRank);
 
   ImGui::SetNextItemWidth(-1.0F);
   ImGui::InputTextWithHint("##filtre", core::Tr("Rechercher une action ou une touche..."),

@@ -17128,3 +17128,69 @@ tr: Ningún chat ban registrado para este personaje.
 
 fr: Votre rang ne peut pas inviter dans la guilde.
 tr: Tu rango no puede invitar a la guild.
+
+fr: Options : page %d
+tr: Opciones: página %d
+
+fr: Options : %s, onglet %s
+tr: Opciones: %s, pestaña %s
+
+fr: Options : %s
+tr: Opciones: %s
+
+fr: Raccourcis : capture de « %s »
+tr: Atajos: captura de «%s»
+
+fr: Raccourcis : onglet %s
+tr: Atajos: pestaña %s
+
+fr: Raccourcis : tous les onglets
+tr: Atajos: todas las pestañas
+
+fr: Personnage : onglet %s
+tr: Personaje: pestaña %s
+
+fr: Album de cartes : recherche « %s »
+tr: Álbum de cards: búsqueda «%s»
+
+fr: Album de cartes : %d / %d pochettes ouvertes
+tr: Álbum de cards: %d / %d fundas desbloqueadas
+
+fr: Atlas des recettes : %s (#%u)
+tr: Atlas de recetas: %s (#%u)
+
+fr: Atlas des recettes : recherche « %s »
+tr: Atlas de recetas: búsqueda «%s»
+
+fr: Boutique de vote : panier de %d ligne(s), %lld pts
+tr: Vote Shop: carrito de %d línea(s), %lld pts
+
+fr: Boutique de vote : onglet %d
+tr: Vote Shop: pestaña %d
+
+fr: Carnet MVP : %s sur %s (créneau %u)
+tr: Cuaderno MVP: %s en %s (casilla %u)
+
+fr: Carnet MVP : filtre « %s »
+tr: Cuaderno MVP: filtro «%s»
+
+fr: Carnet MVP : %u créneaux
+tr: Cuaderno MVP: %u casillas
+
+fr: Recherche de groupe : mon annonce (%s)
+tr: Búsqueda de grupo: mi anuncio (%s)
+
+fr: Recherche de groupe : %u annonces
+tr: Búsqueda de grupo: %u anuncios
+
+fr: Courrier : « %s » de %s (#%lld)
+tr: Correo: «%s» de %s (#%lld)
+
+fr: Courrier : onglet %s, %u courriers
+tr: Correo: pestaña %s, %u correos
+
+fr: Courrier : écriture à %s
+tr: Correo: redactando a %s
+
+fr: Courrier : écriture
+tr: Correo: redactando

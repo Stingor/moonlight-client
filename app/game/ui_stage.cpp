@@ -17,6 +17,7 @@
 #include "ro/ui/modal_box.h"
 #include "ro/ui/unlock_notice.h"
 
+#include "game/character_bug_report.h"
 #include "game/system_fonts.h"
 
 namespace moonclient {
@@ -292,6 +293,13 @@ UiStage::Answers UiStage::Draw(
   answers.character = ro::ui::DrawCharacterWindow(
       windows.character, windows.character_view, sheet.header, sheet.slots, sheet.stats,
       sheet.presets, sheet.titles, sheet.guild, skills, points, skin_, sheet.companions);
+  if (answers.character.report_bug) {
+    // Les vues mêmes que la fiche vient de dessiner, dans l'ordre de la scène.
+    AskBugReport(windows.bug_report, CharacterBugReport(CharacterBugScene{
+                                         &windows.character, &windows.character_view, &sheet.header,
+                                         sheet.slots, &sheet.stats, &sheet.presets, &sheet.titles,
+                                         &sheet.guild, skills, points, &sheet.companions}));
+  }
   // Échap qui a annulé l'attente d'une touche de preset ne ferme pas la fiche.
   if (answers.character.presets.escape_spent) {
     escape_.Suppress();

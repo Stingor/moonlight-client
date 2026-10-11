@@ -12,6 +12,7 @@
 #include <cstring>
 #include <string>
 
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -612,11 +613,13 @@ CardAlbumWindowAction DrawCardAlbumWindow(CardAlbumWindowState& state, const Car
   }
   // La puce de la barre de titre mène aux réglages de CETTE fenêtre.
   SetNextWindowBulletClickable(core::Tr("Options de l'album"));
+  PoseBugReportButton(state.bug_report);
   state.shown = true;
   if (BeginSkinnedWindow(state.title.c_str(), &state.open, art)) {
     if (TitleBulletClicked()) {
       action.settings_asked = true;
     }
+    action.report_bug = state.bug_report && TitleActionClicked(0);
     DrawHeader(state, view, art, action);
     DrawTabs(state, view, art);
     if (state.order_dirty) {

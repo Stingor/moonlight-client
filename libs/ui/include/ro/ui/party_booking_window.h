@@ -125,6 +125,8 @@ struct PartyBookingWindowState {
   std::uint32_t edited_index = 0;
   bool edited_loaded = false;
   WindowName name{kPartyBookingWindowTitle, kPartyBookingWindowId};
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 enum class PartyBookingVerb : std::uint8_t {
@@ -147,6 +149,10 @@ struct PartyBookingAction {
   PartyBookingSlots jobs = kPartyBookingNoSlots;
   // L'auteur à qui chuchoter.
   std::string name;
+  // « Signaler un bug » : `app` joint ce que la fenêtre montre — la recherche,
+  // la liste, l'annonce du joueur ou celle qu'il rédige. Il accompagne le verbe
+  // de l'image, sans le remplacer.
+  bool report_bug = false;
 };
 
 // ── LES RÈGLES, séparées du dessin pour être éprouvées ──────────────────────

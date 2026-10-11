@@ -17128,3 +17128,69 @@ tr: No chat ban recorded for this character.
 
 fr: Votre rang ne peut pas inviter dans la guilde.
 tr: Your rank cannot invite into the guild.
+
+fr: Options : page %d
+tr: Options: page %d
+
+fr: Options : %s, onglet %s
+tr: Options: %s, tab %s
+
+fr: Options : %s
+tr: Options: %s
+
+fr: Raccourcis : capture de « %s »
+tr: Shortcuts: capturing "%s"
+
+fr: Raccourcis : onglet %s
+tr: Shortcuts: tab %s
+
+fr: Raccourcis : tous les onglets
+tr: Shortcuts: all tabs
+
+fr: Personnage : onglet %s
+tr: Character: tab %s
+
+fr: Album de cartes : recherche « %s »
+tr: Card album: search "%s"
+
+fr: Album de cartes : %d / %d pochettes ouvertes
+tr: Card album: %d / %d sleeves unlocked
+
+fr: Atlas des recettes : %s (#%u)
+tr: Recipe Atlas: %s (#%u)
+
+fr: Atlas des recettes : recherche « %s »
+tr: Recipe Atlas: search "%s"
+
+fr: Boutique de vote : panier de %d ligne(s), %lld pts
+tr: Vote Shop: cart of %d line(s), %lld pts
+
+fr: Boutique de vote : onglet %d
+tr: Vote Shop: tab %d
+
+fr: Carnet MVP : %s sur %s (créneau %u)
+tr: MVP log: %s on %s (slot %u)
+
+fr: Carnet MVP : filtre « %s »
+tr: MVP log: filter "%s"
+
+fr: Carnet MVP : %u créneaux
+tr: MVP log: %u slots
+
+fr: Recherche de groupe : mon annonce (%s)
+tr: Party Booking: my ad (%s)
+
+fr: Recherche de groupe : %u annonces
+tr: Party Booking: %u ads
+
+fr: Courrier : « %s » de %s (#%lld)
+tr: Mail: "%s" from %s (#%lld)
+
+fr: Courrier : onglet %s, %u courriers
+tr: Mail: %s tab, %u mails
+
+fr: Courrier : écriture à %s
+tr: Mail: writing to %s
+
+fr: Courrier : écriture
+tr: Mail: writing

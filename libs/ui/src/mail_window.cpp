@@ -11,6 +11,7 @@
 #include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -723,8 +724,10 @@ MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& vi
   }
 
   const std::string title = MailboxTitle(view.unread);
+  PoseBugReportButton(state.bug_report);
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art, SkinnedTitle::kBar,
                                              ImGuiWindowFlags_NoCollapse);
+  action.report_bug = state.bug_report && TitleActionClicked(0);
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, mail::kChildRoundingPixels * scale);
     DrawList(state, view, art, action);

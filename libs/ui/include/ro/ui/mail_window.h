@@ -149,6 +149,8 @@ struct MailboxWindowState {
   // Le menu qu'un clic droit sur une pièce jointe a armé ; son jeton est son
   // rang dans `content->items`.
   ItemLinkMenu item_menu;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 struct MailboxAction {
@@ -178,6 +180,9 @@ struct MailboxAction {
   // Ce que le geste demande de la pièce visée : sa description, son lien dans
   // la saisie (Maj + clic), ou une autre entrée du menu des objets.
   ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
+  // « Signaler un bug » : `app` joint ce que la boîte montre — l'onglet, le
+  // filtre, et le courrier ouvert.
+  bool report_bug = false;
 };
 
 // LES COMPTES PAR ONGLET, et si l'onglet « Compte » se montre.
@@ -300,6 +305,8 @@ struct MailComposeWindowState {
   // Le menu qu'un clic droit sur une pièce jointe a armé ; son jeton est son
   // rang dans `attachments`.
   ItemLinkMenu item_menu;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 // LA SAISIE, recopiée telle quelle : `app` la juge et l'encode.
@@ -331,6 +338,10 @@ struct MailComposeAction {
   // Ce que le geste demande de la pièce visée : sa description, son lien dans
   // la saisie (Maj + clic), ou une autre entrée du menu des objets.
   ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
+  // « Signaler un bug » : `app` joint ce que l'écriture montre — destinataire
+  // et sa vérification, pièces jointes, zeny, frais, dernier refus —, sans le
+  // message.
+  bool report_bug = false;
 };
 
 // Une écriture neuve : saisie vide, destinataire pré-rempli (vide ou nul pour

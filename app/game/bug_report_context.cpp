@@ -132,4 +132,10 @@ void AskBugReport(ro::ui::BugReportWindowState& window, BugReportContext context
   window.asked = true;
 }
 
+void AskBugReport(ro::ui::BugReportWindowState& window, std::optional<BugReportContext> context) {
+  if (context.has_value()) {
+    AskBugReport(window, std::move(*context));
+  }
+}
+
 }  // namespace moonclient

@@ -15,6 +15,7 @@
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
 
+#include "game/mail_bug_report.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -230,6 +231,7 @@ void MailStage::StartSession() {
   compose_error_.clear();
   hovered_ = {};
   described_.reset();
+  bug_report_.reset();
 }
 
 ro::net::FrameOutcome MailStage::ApplyFrame(const ro::net::Frame& frame, std::int64_t now_unix_s) {
@@ -273,6 +275,10 @@ std::optional<std::string> MailStage::RecipientWire(std::string_view typed_utf8)
 
 std::optional<TradeItemFocus> MailStage::TakeDescribed() noexcept {
   return std::exchange(described_, std::nullopt);
+}
+
+std::optional<BugReportContext> MailStage::TakeBugReport() noexcept {
+  return std::exchange(bug_report_, std::nullopt);
 }
 
 void MailStage::Note(std::span<const ro::sim::InventoryItem> items, int index, bool hovered,
@@ -430,6 +436,10 @@ void MailStage::FollowAsks(MailWindows& windows, const TradeContext& context) {
 
 void MailStage::FollowBox(MailWindows& windows, const TradeContext& context) {
   ro::ui::MailboxAction answer = std::exchange(windows.box_answer, {});
+  // ⚠ AVANT TOUT CHANGEMENT : le rapport décrit l'image que le joueur a vue.
+  if (answer.report_bug && box_shown_) {
+    bug_report_ = MailboxBugReport(windows.box, box_view_);
+  }
   // LA CROIX OU ÉCHAP : la boîte se ferme, sans un octet.
   if (box_shown_ && (answer.close || !windows.box.open)) {
     mailbox_.Close();
@@ -495,6 +505,10 @@ void MailStage::FollowCompose(MailWindows& windows, const TradeContext& context)
   const ro::ui::MailComposeAction answer = std::exchange(windows.compose_answer, {});
   if (!flow_.shown()) {
     return;
+  }
+  // ⚠ AVANT TOUT CHANGEMENT, comme celui de la boîte.
+  if (answer.report_bug) {
+    bug_report_ = MailComposeBugReport(windows.compose, compose_view_);
   }
   Note(attached_items_, answer.hovered_item, true, false);
   Note(attached_items_, answer.described_item, false, true, answer.item_gesture);

@@ -4,6 +4,8 @@
 
 #include "ro/core/i18n.h"
 
+#include "game/hotkey_bug_report.h"
+#include "game/options_bug_report.h"
 #include "input/hotkey_file.h"
 #include "items/item_layout_file.h"
 
@@ -391,6 +393,23 @@ void GameSettings::Apply(const UiStage::Answers& answers, const OptionTargets& t
   }
 
   const std::span<const ActionRef> actions = AllBindableActions();
+  // « SIGNALER UN BUG » ⚠ AVANT TOUT CHANGEMENT : le rapport décrit ce que la
+  // fenêtre montrait, pas ce que les demandes de cette image en font.
+  if (answers.hotkeys.report_bug) {
+    std::vector<std::string> action_keys;
+    action_keys.reserve(actions.size());
+    for (const ActionRef action : actions) {
+      action_keys.push_back(SavedKeyOfAction(action));
+    }
+    AskBugReport(windows.bug_report, HotkeyBugReport(HotkeyBugScene{.window = &windows.hotkeys,
+                                                                    .view = hotkey_view(),
+                                                                    .action_keys = action_keys}));
+  }
+  if (answers.options.report_bug) {
+    AskBugReport(windows.bug_report,
+                 OptionsBugReport(
+                     OptionsBugScene{.window = &windows.options, .sections = options_.sections()}));
+  }
   if (answers.hotkeys.cleared >= 0 &&
       static_cast<std::size_t>(answers.hotkeys.cleared) < actions.size()) {
     // Retirer une touche ne peut la prendre à personne : rien à annoncer.

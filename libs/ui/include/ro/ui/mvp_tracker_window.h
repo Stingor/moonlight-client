@@ -275,6 +275,8 @@ struct MvpTrackerWindowState {
   std::string wanted_map;
   // Le titre composé, identité comprise.
   std::string title;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 // CE QUE LE JOUEUR A DEMANDÉ à cette image.
@@ -313,6 +315,9 @@ struct MvpTrackerAction {
   std::uint16_t alert_slot = kMvpNoSlotView;
   // La colonne « Délai » montrée ou masquée au clic droit de l'en-tête.
   std::optional<bool> delay_shown;
+  // « Signaler un bug » : `app` joint ce que le carnet montre — le tri, le
+  // filtre, le groupe, et le créneau visé.
+  bool report_bug = false;
 };
 
 // L'APERÇU AU SURVOL D'UN LIEN `<MVPL>`, composé par `app` : les textes sont
@@ -366,6 +371,9 @@ void DrawMvpLinkTip(const MvpLinkTip& tip);
 [[nodiscard]] const char* MvpTrackerOffText();
 // Le libellé d'une source d'observation ; « ? » pour une source inconnue.
 [[nodiscard]] const char* MvpSourceLabel(std::uint8_t source_raw);
+// LE TRI DE LA TABLE que retient `MvpTrackerWindowState::sort_key` : la colonne
+// et le sens, « name_asc », « return_desc »… ; « none » sans tri.
+[[nodiscard]] std::string MvpSortWord(int sort_key);
 // Le filtre de la table : sous-chaîne sans casse du libellé ou de la carte.
 [[nodiscard]] bool MvpMatchesFilter(const MvpSlotView& slot, std::string_view filter);
 // LA HAUTEUR DONNÉE AU CLIPPER. ⚠ ELLE DOIT ÉGALER CELLE QUE LES CELLULES

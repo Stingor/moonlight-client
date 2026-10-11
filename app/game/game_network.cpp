@@ -694,6 +694,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   pieces_.mail.Advance(
       windows_.mail, link_, world_, pieces_.item_words,
       item_description_.has_value() ? item_description_->creator_names() : CreatorNames(), now_ms);
+  AskBugReport(windows_.bug_report, pieces_.mail.TakeBugReport());
   // LES SALONS : ce que leurs fenêtres ont rendu, les nouvelles, et les vues.
   pieces_.chat_rooms.Advance(
       windows_.chat_room,
@@ -709,10 +710,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
           .now_ms = now_ms});
   // LES SUCCÈS : ce que la fenêtre et le panneau ont rendu, et leurs vues.
   pieces_.achievements.Advance(windows_.achievements, link_, world_, now_ms);
-  if (std::optional<BugReportContext> report = pieces_.achievements.TakeBugReport();
-      report.has_value()) {
-    AskBugReport(windows_.bug_report, std::move(*report));
-  }
+  AskBugReport(windows_.bug_report, pieces_.achievements.TakeBugReport());
   std::optional<TradeItemFocus> described = pieces_.trade.TakeDescribed();
   // UNE CARTE DE LA BOUTIQUE DE VOTE se décrit comme une offre de commerce :
   // l'item n'est à personne, et son lien porte ce qu'on en sait.

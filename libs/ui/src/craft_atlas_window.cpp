@@ -12,6 +12,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -659,18 +660,22 @@ void DrawBody(CraftAtlasWindowState& state, const CraftAtlasView& view, const Sk
   if (ImGui::BeginChild("##atlas_list", ImVec2(list_width, 0.0F), ImGuiChildFlags_Borders)) {
     if (BeginSkinTabBar("##atlas_tabs", art, ImGuiTabBarFlags_FittingPolicyScroll)) {
       if (ImGui::BeginTabItem(core::Tr("Skills"))) {
+        state.tab = CraftAtlasTab::kSkills;
         DrawSkillTree(state, view, answer);
         ImGui::EndTabItem();
       }
       if (ImGui::BeginTabItem(core::Tr("Produits"))) {
+        state.tab = CraftAtlasTab::kProducts;
         DrawProductList(state, view, answer);
         ImGui::EndTabItem();
       }
       if (ImGui::BeginTabItem(core::Tr("Matériaux"))) {
+        state.tab = CraftAtlasTab::kMaterials;
         DrawMaterialList(state, view, answer);
         ImGui::EndTabItem();
       }
       if (ImGui::BeginTabItem(core::Tr("Flèches"))) {
+        state.tab = CraftAtlasTab::kArrows;
         DrawArrowList(state, view, answer);
         ImGui::EndTabItem();
       }
@@ -758,13 +763,16 @@ CraftAtlasAnswer DrawCraftAtlasWindow(CraftAtlasWindowState& state, const CraftA
                                       ImVec2(FLT_MAX, FLT_MAX));
   // LA PUCE MÈNE AUX RÉGLAGES DE L'ATLAS, comme celles des fenêtres d'items.
   SetNextWindowBulletClickable(core::Tr("Réglages de l'Atlas"));
+  PoseBugReportButton(state.bug_report);
   // ⚠ L'IDENTITÉ, PAS LE TITRE : la place se retient sous un nom qui ne dépend
   // pas de la langue.
   const std::string title =
       std::string(core::Tr("Atlas des recettes")) + "###" + kCraftAtlasWindowId;
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art);
-  // ⚠ LUE HORS DU CORPS : la puce vaut aussi pour une fenêtre repliée.
+  // ⚠ LUES HORS DU CORPS : la puce et le bouton valent aussi pour une fenêtre
+  // repliée.
   answer.open_settings = TitleBulletClicked();
+  answer.report_bug = state.bug_report && TitleActionClicked(0);
   if (body_shown) {
     DrawBody(state, view, art, answer);
   }

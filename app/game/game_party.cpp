@@ -15,6 +15,7 @@
 
 #include "chat/player_link_judge.h"
 #include "game/game.h"
+#include "game/party_booking_bug_report.h"
 #include "options/option_sections.h"
 #include "world/click_action.h"
 #include "world/map_stage.h"
@@ -109,6 +110,12 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   // demandé depuis ses annonces prend le chemin de ceux du groupe.
   if (asked.booking_asked) {
     windows_.party_booking.open_asked = true;
+  }
+  // ⚠ LE RAPPORT AVANT L'AVANCÉE, qui consomme la réponse et refait la vue :
+  // il décrit celle que le joueur a vue.
+  if (windows_.party_booking.answer.report_bug && windows_.party_booking.view != nullptr) {
+    AskBugReport(windows_.bug_report, PartyBookingBugReport(windows_.party_booking.window,
+                                                            *windows_.party_booking.view));
   }
   pieces_.party_booking.Advance(windows_.party_booking, link_, world_, now_ms);
   if (const std::optional<PartyBookingWhisper> whisper = pieces_.party_booking.TakeWhisper()) {

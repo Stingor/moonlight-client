@@ -223,6 +223,9 @@ struct CardAlbumWindowAction {
   std::uint32_t hovered_id = 0;
   // La puce de la barre de titre : les réglages de l'album.
   bool settings_asked = false;
+  // « Signaler un bug » : `app` joint ce que les pages montrent — la vue, la
+  // double page, le dialogue en cours et le dernier compte rendu.
+  bool report_bug = false;
   CardAlbumStaffAsk staff;
 };
 
@@ -261,6 +264,8 @@ struct CardAlbumWindowState {
   bool shown = false;
   bool raise = false;
   CardAlbumLook look;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 
   // ── Ce que les pages montrent ──────────────────────────────────────────────
   char filter[64] = {};

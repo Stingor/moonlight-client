@@ -329,6 +329,40 @@ const char* MvpSourceLabel(std::uint8_t source_raw) {
   return "?";
 }
 
+std::string MvpSortWord(int sort_key) {
+  using mvp_tracker::kMvpSortKeysPerColumn;
+  if (sort_key < kMvpSortKeysPerColumn) {
+    return "none";
+  }
+  const char* column = "?";
+  switch (sort_key / kMvpSortKeysPerColumn - 1) {
+    case mvp_tracker::kMvpColumnFavorite:
+      column = "favorite";
+      break;
+    case mvp_tracker::kMvpColumnName:
+      column = "name";
+      break;
+    case mvp_tracker::kMvpColumnMap:
+      column = "map";
+      break;
+    case mvp_tracker::kMvpColumnDelay:
+      column = "delay";
+      break;
+    case mvp_tracker::kMvpColumnReturn:
+      column = "return";
+      break;
+    case mvp_tracker::kMvpColumnAge:
+      column = "age";
+      break;
+    case mvp_tracker::kMvpColumnSource:
+      column = "source";
+      break;
+    default:
+      break;
+  }
+  return std::string(column) + (sort_key % kMvpSortKeysPerColumn != 0 ? "_asc" : "_desc");
+}
+
 bool MvpMatchesFilter(const MvpSlotView& slot, std::string_view filter) {
   // Sur le NOM et la CARTE, lisible comme interne : c'est par l'un ou par
   // l'autre qu'on cherche un MVP, et exiger de savoir lequel avant de taper

@@ -76,6 +76,8 @@ struct HotkeyWindowState {
   // Posé par la boucle quand Échap annule une capture : la même frappe ne ferme
   // pas la fenêtre.
   bool escape_spent = false;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 // Ce que le joueur a demandé.
@@ -87,6 +89,9 @@ struct HotkeyWindowAction {
   // L'ONGLET dont il veut poser le lien dans le chat — son rang, ou
   // `kAllHotkeyTabs` pour « Tout ».
   std::optional<int> link_tab;
+  // « Signaler un bug » : `app` joint ce que la fenêtre montre — l'onglet, la
+  // recherche, la capture en cours et la touche reprise.
+  bool report_bug = false;
 };
 
 inline constexpr const char* kHotkeyWindowTitle = core::TrText("Raccourcis clavier");

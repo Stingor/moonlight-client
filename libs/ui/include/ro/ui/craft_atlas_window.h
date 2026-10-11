@@ -183,6 +183,9 @@ struct CraftAtlasView {
   std::optional<int> free_bag_slots;
 };
 
+// Les onglets de la colonne des listes, dans leur ordre.
+enum class CraftAtlasTab : std::uint8_t { kSkills, kProducts, kMaterials, kArrows };
+
 // Ce que la fenêtre garde d'une image à l'autre.
 struct CraftAtlasWindowState {
   bool open = false;
@@ -200,6 +203,12 @@ struct CraftAtlasWindowState {
   // d'une recette à l'autre : on éprouve souvent plusieurs produits d'une même
   // série au même compte.
   int staff_crafts = 1;
+  // L'onglet que la colonne des listes a montré à la dernière image. ⚠ LA
+  // BARRE D'ONGLETS TIENT SA PROPRE SÉLECTION : ce champ la relit, il ne la
+  // commande pas.
+  CraftAtlasTab tab = CraftAtlasTab::kSkills;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 // Ouvre l'Atlas SUR un item — la porte des autres fenêtres. L'historique repart
@@ -216,6 +225,9 @@ struct CraftAtlasAnswer {
   bool share_recipe = false;
   // La puce de la barre de titre : les réglages de l'Atlas.
   bool open_settings = false;
+  // « Signaler un bug » : `app` joint ce que la fenêtre montre — l'onglet, la
+  // recherche et la fiche de l'item choisi.
+  bool report_bug = false;
   // « Obtenir tout » ou « Obtenir le manque » : les ingrédients que le staff
   // demande, déjà multipliés et déjà filtrés. Vide sans geste.
   std::vector<StaffItemGrant> staff_items;

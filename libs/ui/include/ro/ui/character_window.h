@@ -530,6 +530,8 @@ struct CharacterWindowState {
   // étroite d'un padding et le volet des nombres ne s'afficherait jamais au cran
   // qui vient d'être calé pour lui.
   float chrome_width = 0.0F;
+  // Le bouton « Signaler un bug » de la barre de titre, selon le réglage.
+  bool bug_report = false;
 };
 
 // Ce que le joueur a demandé pendant l'image.
@@ -585,6 +587,9 @@ struct CharacterWindowAction {
   std::optional<bool> show_equipment;
   // « VOIR LES COSTUMES » : l'état que la case demande, sous la même règle.
   std::optional<bool> show_costumes;
+  // « Signaler un bug » : `app` joint ce que la fiche montre — l'onglet, le
+  // métier et les niveaux, et ce qui est propre à l'onglet.
+  bool report_bug = false;
 
   // Ce que le grimoire a demandé, quand c'est lui qui était à l'écran.
   SkillWindowAction grimoire;

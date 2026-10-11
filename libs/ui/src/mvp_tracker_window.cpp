@@ -12,6 +12,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
@@ -458,6 +459,7 @@ void DrawWindow(MvpTrackerWindowState& state, const MvpTrackerView& view, const 
   // La puce mène aux réglages du carnet ; l'épingle le sort de la pile d'Échap.
   SetNextWindowBulletClickable(core::Tr("Réglages du carnet"));
   SetNextWindowPinnable(&state.pinned);
+  PoseBugReportButton(state.bug_report);
   // 🔴 REPLIÉE, LA BARRE DIT LA PROCHAINE ÉCHÉANCE : c'est tout ce qui reste à
   // l'écran. Le pli n'est connu qu'APRÈS le `Begin` : on se fie à l'image
   // précédente, une image de retard invisible à l'œil. ⚠ `###` FIGE L'IDENTITÉ,
@@ -467,10 +469,12 @@ void DrawWindow(MvpTrackerWindowState& state, const MvpTrackerView& view, const 
                 "###" + kMvpTrackerWindowId;
   const bool begun = BeginSkinnedWindow(state.title.c_str(), &state.open, art);
   state.was_collapsed = !begun && state.open;
-  // ⚠ LU HORS DU `if (begun)` : la puce se clique aussi sur une fenêtre repliée.
+  // ⚠ LUS HORS DU `if (begun)` : la puce et le rapport se cliquent aussi sur une
+  // fenêtre repliée.
   if (TitleBulletClicked()) {
     action.open_settings = true;
   }
+  action.report_bug = state.bug_report && TitleActionClicked(0);
   if (!begun) {
     EndSkinnedWindow();
     return;

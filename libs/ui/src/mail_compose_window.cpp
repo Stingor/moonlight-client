@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/mail_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/shortcut_bar.h"
@@ -398,8 +399,10 @@ MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state, const Mai
                            ImGuiCond_FirstUseEver);
   const std::string title =
       std::string(core::Tr("Écrire un courrier")) + "###" + kMailComposeWindowId;
+  PoseBugReportButton(state.bug_report);
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art, SkinnedTitle::kBar,
                                              ImGuiWindowFlags_NoCollapse);
+  action.report_bug = state.bug_report && TitleActionClicked(0);
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, mail::kChildRoundingPixels * scale);
     DrawBody(state, view, art, action);

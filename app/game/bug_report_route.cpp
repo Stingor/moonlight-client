@@ -12,6 +12,9 @@
 
 #include "character/style_recipe.h"
 #include "game/bug_report_context.h"
+#include "game/card_album_bug_report.h"
+#include "game/cash_shop_bug_report.h"
+#include "game/craft_atlas_bug_report.h"
 
 namespace moonclient {
 namespace {
@@ -65,6 +68,17 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
   if (answers.companion_tactic.report_bug) {
     AskBugReport(box, CompanionTacticBugReport(windows.companion_tactic_view));
   }
+  // ⚠ COMPOSÉS APRÈS LE DESSIN ET AVANT QUE LEUR ÉTAGE NE CONSOMME LA RÉPONSE :
+  // l'état et la vue sont ceux que l'image a montrés.
+  if (answers.card_album.report_bug && windows.card_album_view != nullptr) {
+    AskBugReport(box, CardAlbumBugReport(windows.card_album, *windows.card_album_view));
+  }
+  if (windows.craft_atlas.answer.report_bug && windows.craft_atlas.view != nullptr) {
+    AskBugReport(box, CraftAtlasBugReport(windows.craft_atlas.state, *windows.craft_atlas.view));
+  }
+  if (windows.cash_shop.answer.report_bug && windows.cash_shop.view != nullptr) {
+    AskBugReport(box, CashShopBugReport(windows.cash_shop.state, *windows.cash_shop.view));
+  }
   if (answers.bug_report.send) {
     if (const auto sent = ro::net::SendBugReport(link, box.category, box.context_json,
                                                  answers.bug_report.message);
@@ -86,6 +100,16 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
   windows.battleground.window.bug_report = buttons;
   windows.companion_ai.bug_report = buttons;
   windows.companion_tactic.bug_report = buttons;
+  windows.options.bug_report = buttons;
+  windows.hotkeys.bug_report = buttons;
+  windows.character.bug_report = buttons;
+  windows.card_album.bug_report = buttons;
+  windows.craft_atlas.state.bug_report = buttons;
+  windows.cash_shop.state.bug_report = buttons;
+  windows.mvp_tracker.window.bug_report = buttons;
+  windows.party_booking.window.bug_report = buttons;
+  windows.mail.box.bug_report = buttons;
+  windows.mail.compose.bug_report = buttons;
 }
 
 }  // namespace moonclient
