@@ -651,7 +651,19 @@ bool StatBarOverweight(const StatBarValue& weight, const StatBarWarnings& warnin
 }
 
 bool StatBarPresent(StatBar bar, const StatBarValue& value) {
-  return bar != StatBar::kCast || value.known;
+  const auto full_to = [&value](std::int64_t ceiling) {
+    return value.known && value.most == ceiling && value.current >= ceiling;
+  };
+  switch (bar) {
+    case StatBar::kCast:
+      return value.known;
+    case StatBar::kBaseExp:
+      return !full_to(kBaseExpCeiling);
+    case StatBar::kJobExp:
+      return !full_to(kJobExpCeiling);
+    default:
+      return true;
+  }
 }
 
 void DrawStatBars(const StatBarValues& values, const StatBarWarnings& warnings,

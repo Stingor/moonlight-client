@@ -403,8 +403,14 @@ struct StatBarWarnings {
 // La part remplie, entre 0 et 1.
 [[nodiscard]] float StatBarFill(const StatBarValue& value);
 
+// Au niveau maximum, le serveur donne pour seuil ces plafonds, et l'expérience
+// s'y accumule sans plus mener à rien.
+inline constexpr std::int64_t kBaseExpCeiling = 99'999'999;
+inline constexpr std::int64_t kJobExpCeiling = 999'999'999;
+
 // VRAI SI LA JAUGE PARAÎT, réglage à part : toutes, sauf l'incantation quand on
-// n'incante pas.
+// n'incante pas, et l'expérience de base ou de métier pleine jusqu'à son
+// plafond — elle reparaît si l'expérience redescend.
 [[nodiscard]] bool StatBarPresent(StatBar bar, const StatBarValue& value);
 
 // Vrai quand ce poids-là a franchi le seuil que le serveur annonce.
