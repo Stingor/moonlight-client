@@ -2,6 +2,9 @@
 
 #include <algorithm>
 #include <array>
+#include <memory>
+
+#include "ro/render/scene_cutout.h"
 
 namespace ro::render {
 namespace {
@@ -73,10 +76,24 @@ struct PrimSource {
   std::optional<std::size_t> lot_base;
 };
 
+// Vrai pour une suite que `only_textures` laisse passer : voir `EmitVeiledPose`.
+[[nodiscard]] bool Selected(std::span<const std::uint8_t> only_textures,
+                            std::int32_t texture_index) {
+  if (only_textures.empty()) {
+    return true;
+  }
+  const auto rank = static_cast<std::size_t>(texture_index);
+  return texture_index >= 0 && rank < only_textures.size() && only_textures[rank] != 0;
+}
+
 void EmitPrims(const PrimSource& source, const VeiledPose& pose, const FaceRule& rule,
                const glm::mat3& normal_transform, const glm::mat4& view_projection,
-               std::vector<ModelVertex>& vertices, std::vector<VeiledPrim>& prims) {
+               std::vector<ModelVertex>& vertices, std::vector<VeiledPrim>& prims,
+               std::span<const std::uint8_t> only_textures) {
   for (const ModelPrim& prim : source.prims) {
+    if (!Selected(only_textures, prim.texture_index)) {
+      continue;
+    }
     const auto first = static_cast<std::uint32_t>(vertices.size());
     float key = 0.0F;
     for (std::uint32_t offset = 0; offset + kVerticesPerFace <= prim.vertex_count;
@@ -135,7 +152,8 @@ void EmitPrims(const PrimSource& source, const VeiledPose& pose, const FaceRule&
 
 void EmitVeiledPose(const VeiledPose& pose, const ModelInstances& model,
                     std::span<const glm::mat4> node_poses, const glm::mat4& view_projection,
-                    std::vector<ModelVertex>& vertices, std::vector<VeiledPrim>& prims) {
+                    std::vector<ModelVertex>& vertices, std::vector<VeiledPrim>& prims,
+                    std::span<const std::uint8_t> only_textures) {
   const bool animated = pose.group.has_value();
   const std::vector<glm::mat4>* transforms =
       animated ? (*pose.group < model.animated.size() ? &model.animated[*pose.group].transforms
@@ -153,7 +171,7 @@ void EmitVeiledPose(const VeiledPose& pose, const ModelInstances& model,
                          .two_sided = model.mesh.two_sided,
                          .prims = model.mesh.prims,
                          .transform = instance},
-              pose, rule, normal_transform, view_projection, vertices, prims);
+              pose, rule, normal_transform, view_projection, vertices, prims, only_textures);
     return;
   }
   std::size_t lot_base = 0;
@@ -164,9 +182,44 @@ void EmitVeiledPose(const VeiledPose& pose, const ModelInstances& model,
                          .prims = part.prims,
                          .transform = instance * node,
                          .lot_base = lot_base},
-              pose, rule, normal_transform, view_projection, vertices, prims);
+              pose, rule, normal_transform, view_projection, vertices, prims, only_textures);
     lot_base += part.surfaces.size();
   }
+}
+
+std::vector<std::uint8_t> BlendedTextures(const ModelInstances& model) {
+  std::vector<std::uint8_t> blended;
+  blended.reserve(model.textures.size());
+  for (const std::shared_ptr<const formats::Image>& image : model.textures) {
+    blended.push_back(image != nullptr && SceneCutoutOf(image->file).blended ? 1 : 0);
+  }
+  return blended;
+}
+
+std::vector<VeiledPose> BlendedPoses(const ModelInstances& model, std::size_t model_index,
+                                     std::span<const VeiledPose> veiled) {
+  std::vector<VeiledPose> poses;
+  if (!std::ranges::any_of(BlendedTextures(model), [](std::uint8_t mark) { return mark != 0; })) {
+    return poses;
+  }
+  const auto add_unless_veiled = [&](std::optional<std::size_t> group, std::size_t index) {
+    const bool is_veiled = std::ranges::any_of(veiled, [&](const VeiledPose& pose) {
+      return pose.model_index == model_index && pose.group == group && pose.index == index;
+    });
+    if (!is_veiled) {
+      poses.push_back(
+          VeiledPose{.model_index = model_index, .group = group, .index = index, .across = true});
+    }
+  };
+  for (std::size_t index = 0; index < model.transforms.size(); ++index) {
+    add_unless_veiled(std::nullopt, index);
+  }
+  for (std::size_t group = 0; group < model.animated.size(); ++group) {
+    for (std::size_t index = 0; index < model.animated[group].transforms.size(); ++index) {
+      add_unless_veiled(group, index);
+    }
+  }
+  return poses;
 }
 
 void SortVeiledPrims(std::vector<VeiledPrim>& prims) {

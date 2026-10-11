@@ -1,6 +1,7 @@
 #include "world/decor_veil_view.h"
 
 #include <array>
+#include <span>
 
 #include "ro/render/model_sight.h"
 #include "ro/sim/movement.h"
@@ -53,10 +54,9 @@ void DecorVeilView::Draw(const ro::render::ModelRenderer& models, const ro::rend
                          const MapStage& stage, const ro::render::SceneLight& light,
                          float aspect_ratio, const ro::render::ModelClock* clock,
                          const ro::render::SceneFog& fog) const {
-  if (!enabled_) {
-    return;
-  }
-  models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veils_.veiled(), clock, fog);
+  const std::span<const ro::render::VeiledPose> veiled =
+      enabled_ ? veils_.veiled() : std::span<const ro::render::VeiledPose>();
+  models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veiled, clock, fog);
 }
 
 }  // namespace moonclient

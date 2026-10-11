@@ -29,14 +29,21 @@ inline constexpr float kBlendedCutoutAlphaReference = 0.1F;
 struct SceneCutout {
   GlTexture::Filtering filtering = GlTexture::Filtering::kSprite;
   float alpha_reference = kBlendedCutoutAlphaReference;
+  // MÊLÉE AU FOND : sur le décor, ses faces quittent la passe opaque pour la
+  // passe translucide, triée. Voir `BlendedTextures`.
+  bool blended = false;
 };
 
 // Selon le FICHIER, comme le jeu : une BMP garde ses texels vides noirs et se
-// découpe haut ; le reste garde le remplissage de ses bords et un seuil bas.
+// découpe haut ; une TGA se mêle au fond ; le reste garde le remplissage de ses
+// bords et un seuil bas.
 [[nodiscard]] constexpr SceneCutout SceneCutoutOf(formats::ImageFile file) noexcept {
   if (file == formats::ImageFile::kBmp) {
     return SceneCutout{.filtering = GlTexture::Filtering::kKeyedImage,
                        .alpha_reference = kBitmapCutoutAlphaReference};
+  }
+  if (file == formats::ImageFile::kTga) {
+    return SceneCutout{.blended = true};
   }
   return SceneCutout{};
 }

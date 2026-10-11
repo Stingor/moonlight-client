@@ -117,8 +117,9 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
     model_clock_.Start(stage_->scene.models, elapsed_ms);
   }
   model_clock_.Advance(stage_->scene.models, elapsed_ms);
-  models_.Draw(camera, stage_->scene.light, aspect_ratio, ro::render::ModelStages(), &model_clock_,
-               fog);
+  // Les faces à texture mêlée attendent la passe translucide, après les passants.
+  models_.Draw(camera, stage_->scene.light, aspect_ratio,
+               ro::render::ModelStages{.blended_apart = true}, &model_clock_, fog);
   // LES EFFETS QUI PASSENT DERRIÈRE LES CORPS, avant eux.
   if (effects_.has_value()) {
     effects_->DrawBehindActors(camera, aspect_ratio, fog, sprites_);
@@ -146,6 +147,9 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                 SpriteRenderer::BodySilhouette::kAvoided);
   sprites_.Draw(camera, actors_.front, aspect_ratio, SpriteRenderer::Blending::kOver,
                 SpriteRenderer::DepthWrite::kOff, SpriteRenderer::DepthTest::kOn, fog);
+  // LA PASSE TRANSLUCIDE DU DÉCOR, sans pose voilée : ses faces mêlées.
+  models_.DrawVeiled(camera, stage_->scene.light, aspect_ratio, stage_->scene.models, {},
+                     &model_clock_, fog);
 
   // LES EFFETS APRÈS LES PASSANTS, comme dans la partie : ceux de la ville
   // toujours, ceux des passants quand ils sont sur cette carte.

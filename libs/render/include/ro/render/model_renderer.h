@@ -35,6 +35,11 @@ struct ModelStages {
   // se dessine que du côté que sa pose montre, voir `ShowsCounterClockwise`.
   // Coupé, tout se dessine des deux côtés : c'est ce qu'il retire qui se mesure.
   bool one_sided = true;
+  // LES FACES À TEXTURE MÊLÉE LAISSÉES À LA PASSE TRANSLUCIDE : la passe opaque
+  // les saute, et c'est `DrawVeiled` qui les peint, triées et voilant ce qui est
+  // derrière. ⚠ UN APPELANT QUI LE POSE DOIT APPELER `DrawVeiled`, sans quoi ces
+  // faces disparaissent ; un autre les garde opaques.
+  bool blended_apart = false;
 };
 
 // Dessine les modèles du décor.
@@ -96,6 +101,10 @@ class ModelRenderer {
   // leurs suites de faces triées de la plus lointaine à la plus proche, mêlées
   // à ce qui est derrière, sans écrire la profondeur. `models` sont ceux
   // téléversés, dans le même ordre. Voir `veiled_prims.h`.
+  //
+  // Elle peint aussi, triées avec elles, les faces à texture mêlée de toutes
+  // les poses pleines : voir `ModelStages::blended_apart`. Elle se dessine donc
+  // même sans aucune pose voilée.
   void DrawVeiled(const Camera& camera, const SceneLight& light, float aspect_ratio,
                   const std::vector<ModelInstances>& models, std::span<const VeiledPose> veiled,
                   const ModelClock* clock = nullptr, const SceneFog& fog = SceneFog()) const;
@@ -130,6 +139,9 @@ class ModelRenderer {
     std::vector<const GlTexture*> textures;
     // Le seuil de découpe de chacune, dans le même ordre : voir `SceneCutoutOf`.
     std::vector<float> alpha_references;
+    // Vrai pour une texture que le jeu mêle au fond, dans le même ordre : voir
+    // `BlendedTextures`.
+    std::vector<std::uint8_t> blended;
     // Vrai pour une texture qu'un nœud du modèle anime, dans le même ordre :
     // elle se répète, là où toutes les autres se bornent à leurs bords.
     std::vector<std::uint8_t> repeats;
@@ -170,11 +182,12 @@ class ModelRenderer {
   // Lie la texture et son échantillonneur ; rend la texture liée, nulle pour le
   // repli.
   const GlTexture* BindTexture(const Batch& batch, std::int32_t texture_index, bool filtered) const;
+  // `blended_apart` saute une texture mêlée : voir `ModelStages::blended_apart`.
   void DrawRange(const Batch& batch, std::int32_t texture_index, std::uint32_t first_vertex,
-                 std::uint32_t vertex_count, bool filtered) const;
+                 std::uint32_t vertex_count, bool filtered, bool blended_apart) const;
   // Les poses figées d'un lot, moins celles qui ne sont plus pleines.
-  void DrawStillExcept(const Batch& batch, std::span<const std::uint8_t> opacity,
-                       bool filtered) const;
+  void DrawStillExcept(const Batch& batch, std::span<const std::uint8_t> opacity, bool filtered,
+                       bool blended_apart) const;
   [[nodiscard]] const Batch* BatchOf(std::size_t model_index) const;
   [[nodiscard]] GroupPose PoseOf(const Batch& batch, const ModelClock* clock,
                                  std::size_t group) const;

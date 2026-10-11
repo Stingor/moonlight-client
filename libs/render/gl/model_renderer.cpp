@@ -394,6 +394,7 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
           SceneCutoutOf(image != nullptr ? image->file : formats::ImageFile::kOther)
               .alpha_reference);
     }
+    batch.blended = BlendedTextures(model);
     batch.repeats = AnimatedTextures(model);
     const BakedModel baked = BakeInstances(model.mesh, model.transforms, model.rsm_version);
     if (!baked.vertices.empty()) {
@@ -478,8 +479,13 @@ const GlTexture* ModelRenderer::BindTexture(const Batch& batch, std::int32_t tex
 }
 
 void ModelRenderer::DrawRange(const Batch& batch, std::int32_t texture_index,
-                              std::uint32_t first_vertex, std::uint32_t vertex_count,
-                              bool filtered) const {
+                              std::uint32_t first_vertex, std::uint32_t vertex_count, bool filtered,
+                              bool blended_apart) const {
+  const auto rank = static_cast<std::size_t>(texture_index);
+  if (blended_apart && texture_index >= 0 && rank < batch.blended.size() &&
+      batch.blended[rank] != 0) {
+    return;
+  }
   const GlTexture* texture = BindTexture(batch, texture_index, filtered);
   program_.SetFloat("u_alpha_reference",
                     texture != nullptr
@@ -489,7 +495,7 @@ void ModelRenderer::DrawRange(const Batch& batch, std::int32_t texture_index,
 }
 
 void ModelRenderer::DrawStillExcept(const Batch& batch, std::span<const std::uint8_t> opacity,
-                                    bool filtered) const {
+                                    bool filtered, bool blended_apart) const {
   const std::size_t poses = batch.still_poses;
   const auto kept = [&opacity](std::size_t pose) {
     return pose >= opacity.size() || opacity[pose] == kVeilOpaque;
@@ -509,7 +515,8 @@ void ModelRenderer::DrawStillExcept(const Batch& batch, std::span<const std::uin
       DrawRange(
           batch, surface.texture_index,
           surface.first_vertex + static_cast<std::uint32_t>(start) * surface.vertices_per_pose,
-          static_cast<std::uint32_t>(pose - start) * surface.vertices_per_pose, filtered);
+          static_cast<std::uint32_t>(pose - start) * surface.vertices_per_pose, filtered,
+          blended_apart);
     }
   }
 }
@@ -597,10 +604,11 @@ void ModelRenderer::Draw(const Camera& camera, const SceneLight& light, float as
       }
       if (all_full) {
         for (const BakedRun& run : batch.baked_runs) {
-          DrawRange(batch, run.texture_index, run.first_vertex, run.vertex_count, filtered);
+          DrawRange(batch, run.texture_index, run.first_vertex, run.vertex_count, filtered,
+                    stages.blended_apart);
         }
       } else {
-        DrawStillExcept(batch, opacity, filtered);
+        DrawStillExcept(batch, opacity, filtered, stages.blended_apart);
       }
     }
 
@@ -626,7 +634,7 @@ void ModelRenderer::Draw(const Camera& camera, const SceneLight& light, float as
           for (const ModelSurface& surface : part.surfaces) {
             SetTextureMotion(motions[lot++]);
             DrawRange(batch, surface.texture_index, surface.first_vertex, surface.vertex_count,
-                      filtered);
+                      filtered, stages.blended_apart);
           }
         }
       }
@@ -640,21 +648,35 @@ void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, fl
                                const std::vector<ModelInstances>& models,
                                std::span<const VeiledPose> veiled, const ModelClock* clock,
                                const SceneFog& fog) const {
-  if (veiled.empty() || veiled_.vertex_buffer == 0) {
+  if (veiled_.vertex_buffer == 0) {
     return;
   }
   const glm::mat4 view_projection = camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix();
   std::vector<ModelVertex> vertices;
   std::vector<VeiledPrim> prims;
-  for (const VeiledPose& pose : veiled) {
+  const auto emit = [&](const VeiledPose& pose, std::span<const std::uint8_t> only_textures) {
     const Batch* batch = BatchOf(pose.model_index);
     if (batch == nullptr || pose.model_index >= models.size()) {
-      continue;
+      return;
     }
     const std::span<const glm::mat4> nodes = pose.group.has_value()
                                                  ? PoseOf(*batch, clock, *pose.group).nodes
                                                  : std::span<const glm::mat4>();
-    EmitVeiledPose(pose, models[pose.model_index], nodes, view_projection, vertices, prims);
+    EmitVeiledPose(pose, models[pose.model_index], nodes, view_projection, vertices, prims,
+                   only_textures);
+  };
+  for (const VeiledPose& pose : veiled) {
+    emit(pose, {});
+  }
+  // Les faces mêlées des poses pleines, que la passe opaque a sautées.
+  for (const Batch& batch : batches_) {
+    if (batch.model_index >= models.size()) {
+      continue;
+    }
+    for (const VeiledPose& pose :
+         BlendedPoses(models[batch.model_index], batch.model_index, veiled)) {
+      emit(pose, batch.blended);
+    }
   }
   if (prims.empty()) {
     return;

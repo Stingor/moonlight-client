@@ -129,9 +129,12 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   model_clock_.Advance(stage_->scene.models, now_ms);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());
   ground_unit_models_.SetTextureFilter(settings_->options().graphics().decor_filter());
-  if (!ro::render::GreyWorldHidesModels(grey_world)) {
-    models_.Draw(camera_, pieces_.night_light.light(), aspect_ratio_, ro::render::ModelStages(),
-                 &model_clock_, fog, pieces_.decor_veil.opacities());
+  // LES FACES À TEXTURE MÊLÉE attendent la passe translucide, plus bas.
+  const bool models_shown = !ro::render::GreyWorldHidesModels(grey_world);
+  if (models_shown) {
+    models_.Draw(camera_, pieces_.night_light.light(), aspect_ratio_,
+                 ro::render::ModelStages{.blended_apart = true}, &model_clock_, fog,
+                 pieces_.decor_veil.opacities());
   }
   // Les unités posées au sol : ce sont des modèles, et elles ne se téléversent
   // que lorsque l'ensemble posé a bougé. Leur horloge à elles les tient figées
@@ -232,6 +235,10 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (!pieces_.wardrobe.has_value()) {
     water_.Draw(camera_, aspect_ratio_, now_ms, fog);
     DrawMapEffects();
+    if (models_shown) {
+      pieces_.decor_veil.Draw(models_, camera_, *stage_, pieces_.night_light.light(), aspect_ratio_,
+                              &model_clock_, fog);
+    }
     present_scene();
     ComposeCursor(nullptr, hovered_cell, now_ms);
     return {};
@@ -427,9 +434,12 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
     aim_.shake.Request(*quake);
   }
   SettleActorEffects(world_, effects_->TakeActorEffects());
-  // LE DÉCOR VOILÉ DEVANT LE JOUEUR, sur tout ce qui est peint derrière lui.
-  pieces_.decor_veil.Draw(models_, camera_, *stage_, pieces_.night_light.light(), aspect_ratio_,
-                          &model_clock_, fog);
+  // LE DÉCOR VOILÉ DEVANT LE JOUEUR, et les faces mêlées du décor, sur tout ce
+  // qui est peint derrière.
+  if (models_shown) {
+    pieces_.decor_veil.Draw(models_, camera_, *stage_, pieces_.night_light.light(), aspect_ratio_,
+                            &model_clock_, fog);
+  }
 
   // LA FIN DU MONDE PEINT : terrain, décor, personnages, effets. Ce qui suit se
   // pose PAR-DESSUS, hors du post-traitement, sans épreuve de profondeur.

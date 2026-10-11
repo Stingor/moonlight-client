@@ -52,6 +52,10 @@ class DecorVeilView {
   }
 
   // LA PASSE TRANSLUCIDE, par-dessus les personnages et les effets.
+  //
+  // ⚠ ELLE SE DESSINE MÊME L'OPTION ÉTEINTE, sans pose voilée : elle porte aussi
+  // les faces à texture mêlée que la passe opaque saute — voir
+  // `ModelStages::blended_apart`.
   void Draw(const ro::render::ModelRenderer& models, const ro::render::Camera& camera,
             const MapStage& stage, const ro::render::SceneLight& light, float aspect_ratio,
             const ro::render::ModelClock* clock, const ro::render::SceneFog& fog) const;

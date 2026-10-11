@@ -13,7 +13,9 @@
 
 namespace ro::render {
 
-// LA PASSE DES POSES VOILÉES, préparée comme le client prépare la sienne.
+// LA PASSE DES POSES VOILÉES, préparée comme le client prépare la sienne. Elle
+// porte aussi les faces à texture mêlée des poses pleines : voir
+// `BlendedTextures`.
 //
 // Il ne dessine pas une pose voilée d'un bloc : il émet, suite de faces par
 // suite de faces, les triangles qui passent son tri — une face simple tournée
@@ -46,9 +48,33 @@ struct VeiledPrim {
 // normale par la seule pose, comme au dessin opaque — dans `vertices`.
 // `node_poses` porte les matrices des nœuds d'une pose animée, et rien pour une
 // figée.
+//
+// `only_textures`, une entrée par texture du modèle, restreint l'émission aux
+// suites dont la texture y est marquée ; vide, toutes s'émettent.
 void EmitVeiledPose(const VeiledPose& pose, const ModelInstances& model,
                     std::span<const glm::mat4> node_poses, const glm::mat4& view_projection,
-                    std::vector<ModelVertex>& vertices, std::vector<VeiledPrim>& prims);
+                    std::vector<ModelVertex>& vertices, std::vector<VeiledPrim>& prims,
+                    std::span<const std::uint8_t> only_textures = {});
+
+// LES TEXTURES QUE LE JEU MÊLE AU FOND, une entrée par texture du modèle.
+//
+// Le jeu range une face du décor dans sa file translucide dès que sa texture
+// est une TGA, même sur une pose pleine : elle s'y peint SOURCE ALPHA sur
+// INVERSE DE LA SOURCE ALPHA, triée avec les poses voilées, et son alpha voile
+// ce qui est derrière. Une BMP, elle, reste dans la file opaque et se découpe.
+// Peinte opaque, une plaque de verre à texture TGA cacherait ce qu'elle doit
+// laisser voir.
+[[nodiscard]] std::vector<std::uint8_t> BlendedTextures(const ModelInstances& model);
+
+// Les poses PLEINES d'un modèle dont des faces passent par la file translucide :
+// toutes celles qui ne sont pas dans `veiled` — une pose voilée y passe déjà
+// tout entière. Vide pour un modèle sans texture mêlée.
+//
+// ⚠ À CHEVAL SUR LA VUE, toutes : rien ne dit ici lesquelles la vue coupe, et
+// écarter les faces entièrement hors de l'écran ne retire rien de visible.
+[[nodiscard]] std::vector<VeiledPose> BlendedPoses(const ModelInstances& model,
+                                                   std::size_t model_index,
+                                                   std::span<const VeiledPose> veiled);
 
 // La plus lointaine d'abord ; à égalité, dans l'ordre d'émission.
 void SortVeiledPrims(std::vector<VeiledPrim>& prims);
