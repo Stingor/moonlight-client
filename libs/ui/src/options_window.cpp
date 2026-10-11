@@ -671,6 +671,16 @@ struct SettingsWindowWords {
       AskModal(kRestorePageBoxId);
     }
   }
+  // FERMER, au bout de la même ligne, du côté de la poignée de redimension :
+  // la place qu'il tient dans les autres fenêtres.
+  const char* const close = core::Tr("Fermer");
+  const float close_width = SkinButtonWidth(close, art);
+  ImGui::SameLine();
+  ImGui::SetCursorPosX(
+      std::max(ImGui::GetCursorPosX(), ImGui::GetContentRegionMax().x - close_width));
+  if (SkinButton(close, art, ImVec2(close_width, 0.0F))) {
+    state.open = false;
+  }
   if (DrawModalBox(kRestorePageBoxId,
                    core::Tr("Rendre aux réglages de cette page leur valeur d'origine ?"),
                    core::Tr("Oui"), core::Tr("Non"), art) == ModalAnswer::kYes) {
