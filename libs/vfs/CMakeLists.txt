@@ -41,6 +41,7 @@ add_library(ro_vfs STATIC
     src/monster_size_effects.cpp
     src/monster_words.cpp
     src/res_name_table.cpp
+    src/skill_tree_rules.cpp
     src/skill_words.cpp
     src/status_table.cpp
     src/talkbox_words.cpp

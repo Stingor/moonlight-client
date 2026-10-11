@@ -13,23 +13,54 @@
 
 namespace ro::sim {
 
-// L'ARBRE DES COMPÉTENCES : LA FORME, QUE LE SERVEUR N'ENVOIE JAMAIS.
+// L'ARBRE DES COMPÉTENCES : CE QUE LE SERVEUR N'ENVOIE JAMAIS.
 //
 // ⚠ C'EST LA MOITIÉ MANQUANTE DU GRIMOIRE. Le serveur n'annonce que ce que le
-// personnage sait DÉJÀ — une ligne par compétence apprise. Les cases de la
-// grille, les niveaux maximaux, les prérequis et le nom affiché sont des tables
-// du CLIENT, en Lua, et rien ne les déduit du réseau. Le grimoire est donc le
-// croisement des deux : cet arbre pour la forme, `sim::SkillBook` pour l'état.
+// personnage sait DÉJÀ — une ligne par compétence apprise. Le reste vient de
+// deux sources, et chacune a son domaine :
 //
-// ⚠ ELLE NE LIT AUCUN FICHIER. On lui remet des tables DÉJÀ évaluées, et elle
-// n'en garde que la forme de l'arbre : `sim` ne connaît pas le VFS, et l'arbre
-// n'a pas à savoir d'où viennent ses octets. Qui les lit trouvera
-// `vfs::ReadLuaChain` et la liste de fichiers ci-dessous.
+//   - les RÈGLES, ce qu'un métier peut apprendre — rang maximal, prérequis —
+//     viennent des bases du serveur (`data\yaml_files\skill_trees.yml`) et
+//     arrivent par `UseServerRules` ;
+//   - la FORME — cases de la grille, onglets, nom affiché, coût et zone par
+//     rang — vient des tables Lua de l'installation.
+//
+// Le grimoire croise cet arbre et `sim::SkillBook`, l'état.
+//
+// ⚠ ELLE NE LIT AUCUN FICHIER. On lui remet des tables DÉJÀ évaluées et des
+// règles déjà lues : `sim` ne connaît pas le VFS, et l'arbre n'a pas à savoir
+// d'où viennent ses octets. Qui les lit trouvera `vfs::ReadLuaChain`, la liste
+// de fichiers ci-dessous et `vfs::SkillTreeRules`.
 
 // Un PRÉREQUIS : la compétence réclamée et le rang qu'il en faut.
 struct SkillRequirement {
   std::uint16_t skill_id = 0;
   std::uint16_t level = 0;
+};
+
+// CE QUE LE SERVEUR PERMET À UN MÉTIER d'une compétence, héritage compris.
+struct SkillRule {
+  std::uint16_t skill_id = 0;
+  std::uint16_t max_level = 0;
+  // ⚠ LA LISTE DES PRÉREQUIS N'EST PAS UNE FERMETURE TRANSITIVE, et elle porte
+  // en plus des RACCOURCIS : une compétence peut réclamer A et B alors que B
+  // réclame déjà A. Qui monte une chaîne doit donc la remonter lui-même, et qui
+  // la dessine doit écarter l'arête redondante.
+  std::vector<SkillRequirement> needs;
+  std::uint32_t base_level = 0;
+  std::uint32_t job_level = 0;
+  // Faux quand le serveur ne l'accorde pas contre des points à qui ne l'a pas
+  // déjà : compétence de quête, de noces ou d'esprit. Une fois apprise, elle
+  // monte comme les autres.
+  bool by_points = true;
+};
+
+// Les règles du serveur, pour tous les métiers et pour la guilde.
+struct SkillRules {
+  std::unordered_map<std::uint32_t, std::vector<SkillRule>> by_job;
+  std::vector<SkillRule> guild;
+  // Le serveur ne vérifie ni prérequis ni niveau requis : `player_skillfree`.
+  bool skill_free = false;
 };
 
 // Ce que les tables du client disent d'une compétence.
@@ -58,7 +89,6 @@ struct SkillNode {
   std::string idname;
   // Le libellé affiché, dans la langue du client.
   std::string display_name;
-  std::uint16_t max_level = 0;
   // Le coût et la portée PAR RANG : le rang n vaut l'entrée n-1. Les tables en
   // donnent une par niveau maximal, et une compétence sans coût n'en a aucune.
   std::vector<std::uint16_t> sp_by_level;
@@ -66,12 +96,6 @@ struct SkillNode {
   // La zone PAR RANG, même convention que les deux précédentes. Vide pour qui
   // n'en déclare aucune — l'immense majorité.
   std::vector<SkillScaleCells> scale_by_level;
-  std::vector<SkillRequirement> needs;
-  // ⚠ LA LISTE DES PRÉREQUIS N'EST PAS UNE FERMETURE TRANSITIVE, et elle porte
-  // en plus des RACCOURCIS : une compétence peut réclamer A et B alors que B
-  // réclame déjà A. Qui monte une chaîne doit donc la remonter lui-même, et qui
-  // la dessine doit écarter l'arête redondante.
-  //
   // Vrai quand l'effet dépend du rang lancé — c'est ce qui autorise à lancer
   // une compétence en dessous du rang appris.
   bool level_matters = false;
@@ -110,7 +134,9 @@ inline constexpr int kSkillGridColumns = 7;
 //   jobinheritlist : `JOBID`, puis `JOB_INHERIT_LIST` — de quel métier chaque
 //                    métier descend ;
 //   skillid        : `SKID`, l'identifiant de chaque compétence ;
-//   skillinfolist  : `SKILL_INFO_LIST`, la fiche de chacune ;
+//   skillinfolist  : `SKILL_INFO_LIST`, la fiche de chacune — nom, coût,
+//                    portée et zone par rang. Son rang maximal et ses
+//                    prérequis ne sont PAS lus : ce sont les règles du serveur ;
 //   skilltreeview  : `SKILL_TREEVIEW_FOR_JOB`, la grille de chaque métier ;
 //   skilldescript  : `SKILL_DESCRIPT`, ce que chaque compétence FAIT.
 //
@@ -226,6 +252,33 @@ class SkillTree {
   // fichiers pour que l'arbre se vérifie sans VFS ni archive.
   [[nodiscard]] static core::Result<SkillTree> FromGlobals(const formats::LuaTable& globals);
 
+  // ── Les règles du serveur ───────────────────────────────────────────────
+  //
+  // 🔴 SANS ELLES, RIEN NE SE MONTE DEPUIS LA FENÊTRE : aucun rang maximal
+  // n'est connu. La grille se montre quand même, entière, et le serveur reste
+  // seul juge d'une montée.
+  void UseServerRules(SkillRules rules);
+  [[nodiscard]] bool has_server_rules() const noexcept { return has_rules_; }
+  // Faux sous `player_skillfree` : les prérequis ne bloquent rien.
+  [[nodiscard]] bool prerequisites_enforced() const noexcept { return !rules_.skill_free; }
+
+  // La règle de cette compétence pour ce métier, ou nullptr quand le serveur ne
+  // la lui donne pas. ⚠ LE MÉTIER EST CELUI DU PERSONNAGE, pas celui dont la
+  // grille porte la case : l'arbre du serveur contient déjà l'héritage, et un
+  // métier peut y relever ou y retirer ce qu'il hérite.
+  [[nodiscard]] const SkillRule* RuleOf(std::uint32_t job, std::uint16_t skill_id) const;
+  // Toutes ses règles, par compétence croissante.
+  [[nodiscard]] std::span<const SkillRule> RulesOfJob(std::uint32_t job) const;
+  // Le rang maximal, 0 quand le serveur ne la lui donne pas.
+  [[nodiscard]] std::uint16_t MaxLevelOf(std::uint32_t job, std::uint16_t skill_id) const;
+  // Les prérequis que le serveur VÉRIFIE : aucun sous `player_skillfree`, même
+  // quand sa base en déclare. Les montrer promettrait un verrou qui n'existe pas.
+  [[nodiscard]] std::span<const SkillRequirement> NeedsOf(std::uint32_t job,
+                                                          std::uint16_t skill_id) const;
+  // L'arbre de la guilde, par compétence croissante. `player_skillfree` ne le
+  // touche pas : le serveur y vérifie toujours les prérequis.
+  [[nodiscard]] std::span<const SkillRule> GuildRules() const noexcept { return rules_.guild; }
+
  private:
   std::vector<SkillNode> nodes_;
   std::unordered_map<std::uint16_t, std::size_t> slot_by_skill_;
@@ -237,6 +290,9 @@ class SkillTree {
   std::unordered_map<std::uint32_t, std::uint32_t> origin_by_job_;
   // Les noms d'onglets, par métier qui s'en est donné.
   std::unordered_map<std::uint32_t, std::vector<std::string>> tab_names_by_job_;
+  // Les règles, chaque liste rangée par compétence.
+  SkillRules rules_;
+  bool has_rules_ = false;
 };
 
 }  // namespace ro::sim

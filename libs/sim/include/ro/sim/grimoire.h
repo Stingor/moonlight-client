@@ -11,13 +11,18 @@
 
 namespace ro::sim {
 
-// LE GRIMOIRE : L'ARBRE DU CLIENT ET CE QUE LE SERVEUR DIT, FUSIONNÉS.
+// LE GRIMOIRE : L'ARBRE ET CE QUE LE SERVEUR DIT, FUSIONNÉS.
 //
-// Ni l'un ni l'autre ne suffit. L'arbre donne la case, le niveau maximal, les
-// prérequis et le nom ; le serveur donne le rang appris, le coût et la portée au
-// rang appris. Une compétence peut n'être que dans l'un des deux : une case
-// jamais apprise n'a pas de ligne serveur, et le serveur accorde des compétences
-// qu'aucune grille ne place.
+// Ni l'un ni l'autre ne suffit. L'arbre donne la case et le nom (tables du
+// client), le rang maximal et les prérequis (règles du serveur) ; le livre donne
+// le rang appris, le coût et la portée au rang appris. Une compétence peut
+// n'être que dans l'un des deux : une case jamais apprise n'a pas de ligne au
+// livre, et le serveur accorde des compétences qu'aucune grille ne place.
+//
+// 🔴 LES LIGNES SUIVENT LE SERVEUR. Une case que la grille porte mais que le
+// serveur ne donne pas au métier ne se montre pas — elle ne s'apprendrait
+// jamais — sauf si le personnage la sait déjà. Une compétence que le serveur
+// donne contre des points et qu'aucune grille ne place entre hors grille.
 //
 // ⚠ RIEN N'EST ENVOYÉ D'ICI. Réserver un point ne fait que le NOTER ; c'est
 // « Appliquer » qui parle, et le serveur revalide chaque montée de toute façon.
@@ -29,7 +34,7 @@ namespace ro::sim {
 // qui seule connaît sa langue.
 enum class ReserveOutcome : std::uint8_t {
   kReserved,
-  // La compétence n'est dans aucune table du client.
+  // Le serveur ne donne pas cette compétence au métier.
   kUnknownSkill,
   // Plus un seul point libre, réservations déduites.
   kNoPointLeft,
@@ -42,6 +47,9 @@ enum class ReserveOutcome : std::uint8_t {
   // le joueur voit où elle s'arrête. Un refus qui déferait tout n'avancerait
   // rien et ne dirait pas où ça bloque.
   kNotEnoughForPrerequisites,
+  // Pas encore apprise, et le serveur ne l'accorde pas contre des points :
+  // compétence de quête, de noces ou d'esprit.
+  kNotByPoints,
 };
 
 // Une ligne du grimoire.
@@ -65,9 +73,11 @@ struct GrimoireEntry {
   std::uint16_t range_cells = 0;
   std::uint16_t targeting = 0;
   // La fiche des tables du client. NUL pour une compétence que le serveur
-  // accorde et que le client ne connaît pas : il n'y a alors ni nom, ni case,
-  // ni rang maximal.
+  // accorde et que le client ne connaît pas : il n'y a alors ni nom ni case.
   const SkillNode* node = nullptr;
+  // La règle du serveur pour le métier du personnage : rang maximal,
+  // prérequis. NUL quand le serveur ne la lui donne pas.
+  const SkillRule* rule = nullptr;
 
   // Le rang que le joueur VERRA : ce qu'il sait, ou ce qu'il a réservé.
   [[nodiscard]] std::uint16_t effective_level() const noexcept {
@@ -86,7 +96,7 @@ class Grimoire {
   // pour ce qui est appris, et le nombre de points libres.
   //
   // ⚠ LES RÉSERVATIONS SURVIVENT, sauf celles devenues sans objet — compétence
-  // absente de l'arbre après un changement de métier, ou rang déjà atteint par
+  // que le serveur ne donne plus au métier, ou rang déjà atteint par
   // le serveur. Sans ce tri, une réservation périmée continuerait de compter des
   // points pour rien.
   void Refresh(std::uint32_t job, const SkillBook& book, std::int64_t skill_points);
@@ -126,7 +136,12 @@ class Grimoire {
   [[nodiscard]] std::uint16_t LearnedLevelOf(std::uint16_t skill_id) const;
   [[nodiscard]] std::uint16_t ReservedLevelOf(std::uint16_t skill_id) const;
   // Pose ou relève une réservation, et rend ce qu'elle a réellement coûté.
-  [[nodiscard]] int ReserveUpTo(const SkillNode& node, int wanted_level, int& points_left);
+  [[nodiscard]] int ReserveUpTo(std::uint16_t skill_id, int max_level, int wanted_level,
+                                int& points_left);
+  // Le rang jusqu'où le joueur peut monter cette compétence par des points, au
+  // métier courant : 0 quand le serveur ne la lui donne pas, ou ne l'accorde
+  // pas contre des points à qui ne l'a pas encore.
+  [[nodiscard]] int ReservableMax(std::uint16_t skill_id) const;
   // La ligne d'une compétence, créée si elle n'en avait pas encore.
   [[nodiscard]] GrimoireEntry& RowFor(std::uint16_t skill_id, std::uint32_t job,
                                       std::uint16_t position, bool in_grid);
@@ -141,6 +156,8 @@ class Grimoire {
   // serveur.
   std::vector<std::pair<std::uint16_t, std::uint16_t>> reservations_;
   std::int64_t skill_points_ = 0;
+  // Le métier du dernier rafraîchissement : celui dont les règles s'appliquent.
+  std::uint32_t job_ = 0;
 };
 
 }  // namespace ro::sim

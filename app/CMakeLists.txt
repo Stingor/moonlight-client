@@ -278,6 +278,18 @@ target_link_libraries(moonclient_skillrefusal
 
 target_include_directories(moonclient_skillrefusal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LES RÈGLES DES ARBRES DE COMPÉTENCES, lues dans `skill_trees.yml` et remises à
+# l'arbre. En bibliothèque parce que le client et `roc-cli skill` montent le
+# même arbre : deux conversions finiraient par diverger.
+add_library(moonclient_skillrules STATIC
+    game/skill_rules.cpp)
+
+target_link_libraries(moonclient_skillrules
+    PUBLIC ro_core ro_sim ro_vfs
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_skillrules PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LA BARRE DE SAISIE VUE DE LA BOUCLE : où part la ligne, ce qu'il en reste, et
 # la couleur de chaque destination — la même table que celle du fil. En
 # bibliothèque pour que le sélecteur se juge sur un banc, sans fenêtre : un
@@ -1391,6 +1403,7 @@ add_executable(moonclient
     shell/login_settings.cpp
     patcher/patch_stage.cpp
     game/game_pieces.cpp
+    game/skill_tree_load.cpp
     game/skin_reload.cpp
     world/ground_unit_view.cpp
     world/item_drops.cpp
@@ -1588,7 +1601,7 @@ add_executable(moonclient
     game/window_events.cpp)
 
 target_link_libraries(moonclient
-    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_statuses moonclient_titles
+    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net

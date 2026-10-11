@@ -77,12 +77,23 @@ void Grimoire::CancelReservations() {
 
 void Grimoire::Refresh(std::uint32_t job, const SkillBook& book, std::int64_t skill_points) {
   skill_points_ = skill_points > 0 ? skill_points : 0;
+  job_ = job;
   entries_.clear();
   row_by_skill_.clear();
 
   // Les grilles de la chaîne, du plus ancien métier au plus récent.
+  //
+  // ⚠ UNE CASE QUE LE SERVEUR NE DONNE PAS AU MÉTIER SE TAIT : la grille de
+  // l'installation en montre que le personnage n'apprendra jamais. Sauf si le
+  // livre la porte — ce qui est su se montre toujours. Sans règles, rien ne se
+  // tait : la grille est tout ce qu'on a.
+  const bool follows_server = tree_->has_server_rules();
   for (const std::uint32_t ancestor : tree_->InheritanceOfJob(job)) {
     for (const SkillSlot& slot : tree_->SlotsOfJob(ancestor)) {
+      if (follows_server && tree_->RuleOf(job, slot.skill_id) == nullptr &&
+          book.Find(slot.skill_id) == nullptr) {
+        continue;
+      }
       (void)RowFor(slot.skill_id, ancestor, slot.position, true);
     }
   }
@@ -98,13 +109,21 @@ void Grimoire::Refresh(std::uint32_t job, const SkillBook& book, std::int64_t sk
     entry.targeting = known.targeting;
   }
 
+  // Ce que le serveur donne contre des points et qu'aucune grille ne place :
+  // hors grille, mais visible — sinon le joueur ne pourrait pas l'apprendre.
+  for (const SkillRule& rule : tree_->RulesOfJob(job)) {
+    if (rule.by_points) {
+      (void)RowFor(rule.skill_id, 0, 0, false);
+    }
+  }
+
   // ── Le tri des réservations ──────────────────────────────────────────────
   // Une réservation sans objet — compétence absente de l'arbre, ou rang déjà
   // atteint par le serveur — continuerait de compter des points pour rien.
   std::vector<std::pair<std::uint16_t, std::uint16_t>> kept;
   kept.reserve(reservations_.size());
   for (const auto& [skill_id, level] : reservations_) {
-    if (tree_->Find(skill_id) == nullptr) {
+    if (tree_->RuleOf(job, skill_id) == nullptr) {
       continue;
     }
     if (level <= LearnedLevelOf(skill_id)) {
@@ -130,7 +149,8 @@ GrimoireEntry& Grimoire::RowFor(std::uint16_t skill_id, std::uint32_t job, std::
                                    .job = job,
                                    .position = position,
                                    .in_grid = in_grid,
-                                   .node = tree_->Find(skill_id)});
+                                   .node = tree_->Find(skill_id),
+                                   .rule = tree_->RuleOf(job_, skill_id)});
   return entries_.back();
 }
 
@@ -144,9 +164,10 @@ void Grimoire::MarkReservedRows() {
   }
 }
 
-int Grimoire::ReserveUpTo(const SkillNode& node, int wanted_level, int& points_left) {
-  const int current = std::max<int>(LearnedLevelOf(node.id), ReservedLevelOf(node.id));
-  const int reachable = std::min<int>(wanted_level, node.max_level);
+int Grimoire::ReserveUpTo(std::uint16_t skill_id, int max_level, int wanted_level,
+                          int& points_left) {
+  const int current = std::max<int>(LearnedLevelOf(skill_id), ReservedLevelOf(skill_id));
+  const int reachable = std::min(wanted_level, max_level);
   if (reachable <= current || points_left <= 0) {
     return 0;
   }
@@ -155,24 +176,35 @@ int Grimoire::ReserveUpTo(const SkillNode& node, int wanted_level, int& points_l
     return 0;
   }
   const auto level = static_cast<std::uint16_t>(current + taken);
-  for (auto& [skill_id, reserved] : reservations_) {
-    if (skill_id == node.id) {
+  for (auto& [reserved_id, reserved] : reservations_) {
+    if (reserved_id == skill_id) {
       reserved = level;
       points_left -= taken;
       return taken;
     }
   }
-  reservations_.emplace_back(node.id, level);
+  reservations_.emplace_back(skill_id, level);
   points_left -= taken;
   return taken;
 }
 
+int Grimoire::ReservableMax(std::uint16_t skill_id) const {
+  const SkillRule* rule = tree_->RuleOf(job_, skill_id);
+  if (rule == nullptr || (!rule->by_points && LearnedLevelOf(skill_id) == 0)) {
+    return 0;
+  }
+  return rule->max_level;
+}
+
 ReserveOutcome Grimoire::Reserve(std::uint16_t skill_id, bool up_to_max) {
-  // ⚠ CHERCHÉE DANS TOUT L'ARBRE, pas dans les lignes : un prérequis vit souvent
-  // dans la grille d'un autre métier que celui qu'on regarde.
-  const SkillNode* target = tree_->Find(skill_id);
+  // ⚠ CHERCHÉE DANS LES RÈGLES DU MÉTIER, pas dans les lignes : un prérequis vit
+  // souvent dans la grille d'un autre métier que celui qu'on regarde.
+  const SkillRule* target = tree_->RuleOf(job_, skill_id);
   if (target == nullptr) {
     return ReserveOutcome::kUnknownSkill;
+  }
+  if (ReservableMax(skill_id) == 0) {
+    return ReserveOutcome::kNotByPoints;
   }
   int points_left = this->points_left();
   if (points_left <= 0) {
@@ -180,8 +212,10 @@ ReserveOutcome Grimoire::Reserve(std::uint16_t skill_id, bool up_to_max) {
   }
 
   // ── Toute la chaîne de prérequis, en largeur ─────────────────────────────
+  // Vide sous `player_skillfree` : le serveur n'en vérifie aucun, et les payer
+  // dépenserait des points pour rien.
   std::vector<ChainLink> chain;
-  for (const SkillRequirement& need : target->needs) {
+  for (const SkillRequirement& need : tree_->NeedsOf(job_, skill_id)) {
     PushLink(chain, need.skill_id, need.level, 1);
   }
   // `chain` grandit pendant la boucle : c'est le parcours lui-même.
@@ -189,11 +223,7 @@ ReserveOutcome Grimoire::Reserve(std::uint16_t skill_id, bool up_to_max) {
     if (chain[rank].depth >= kDeepestPrerequisiteChain) {
       continue;
     }
-    const SkillNode* node = tree_->Find(chain[rank].skill_id);
-    if (node == nullptr) {
-      continue;
-    }
-    for (const SkillRequirement& need : node->needs) {
+    for (const SkillRequirement& need : tree_->NeedsOf(job_, chain[rank].skill_id)) {
       PushLink(chain, need.skill_id, need.level, chain[rank].depth + 1);
     }
   }
@@ -204,12 +234,8 @@ ReserveOutcome Grimoire::Reserve(std::uint16_t skill_id, bool up_to_max) {
   }
   for (int depth = deepest; depth >= 1; --depth) {
     for (const ChainLink& link : chain) {
-      if (link.depth != depth) {
-        continue;
-      }
-      const SkillNode* node = tree_->Find(link.skill_id);
-      if (node != nullptr) {
-        (void)ReserveUpTo(*node, link.level, points_left);
+      if (link.depth == depth) {
+        (void)ReserveUpTo(link.skill_id, ReservableMax(link.skill_id), link.level, points_left);
       }
     }
   }
@@ -220,13 +246,13 @@ ReserveOutcome Grimoire::Reserve(std::uint16_t skill_id, bool up_to_max) {
 
   // ── La compétence demandée ───────────────────────────────────────────────
   const int current = std::max<int>(LearnedLevelOf(skill_id), ReservedLevelOf(skill_id));
-  if (target->max_level == 0 || current >= target->max_level) {
+  if (current >= target->max_level) {
     return ReserveOutcome::kAlreadyAtMax;
   }
   // `ReserveUpTo` borne déjà au rang maximal ET aux points restants : viser le
   // maximum revient à demander tout ce qui reste, sans boucler.
   const int wanted = up_to_max ? target->max_level : current + 1;
-  if (ReserveUpTo(*target, wanted, points_left) == 0) {
+  if (ReserveUpTo(skill_id, target->max_level, wanted, points_left) == 0) {
     return ReserveOutcome::kNotEnoughForPrerequisites;
   }
 

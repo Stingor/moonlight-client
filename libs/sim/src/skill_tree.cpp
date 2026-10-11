@@ -1,5 +1,5 @@
 // La LECTURE de l'arbre des compétences : quatre tables du client, enchaînées,
-// dont on ne garde que la forme de l'arbre.
+// dont on ne garde que la forme de l'arbre, et les règles du serveur.
 
 #include "ro/sim/skill_tree.h"
 
@@ -10,17 +10,11 @@
 namespace ro::sim {
 namespace {
 
-// Les champs d'une fiche, tels que `skillinfolist` les nomme.
+// Les champs d'une fiche, tels que `skillinfolist` les nomme. Son rang maximal
+// et ses prérequis ne sont pas lus : ce sont les règles du serveur.
 constexpr std::string_view kFieldName = "SkillName";
-constexpr std::string_view kFieldMaxLevel = "MaxLv";
 constexpr std::string_view kFieldSpAmount = "SpAmount";
 constexpr std::string_view kFieldAttackRange = "AttackRange";
-constexpr std::string_view kFieldNeedList = "_NeedSkillList";
-// ⚠ ET LA MÊME LISTE S'ÉCRIT PARFOIS SANS SON TIRET BAS : vingt-sept fiches de
-// cette installation le font, dont celle de Heal. Ne chercher que la première
-// orthographe rendrait leurs prérequis invisibles — aucune flèche, aucune ligne
-// dans l'infobulle, et rien qui dise pourquoi.
-constexpr std::string_view kFieldNeedListPlain = "NeedSkillList";
 // ⚠ ORTHOGRAPHE DU CLIENT, faute comprise : « bSeperateLv ». La corriger ici,
 // c'est ne plus rien trouver.
 constexpr std::string_view kFieldSeparateLevel = "bSeperateLv";
@@ -33,9 +27,6 @@ constexpr std::string_view kScaleY = "y";
 
 // Le nom interne est la PREMIÈRE entrée numérotée de la fiche, sans clé.
 constexpr double kIdNameIndex = 1.0;
-// Un prérequis est un couple { compétence, rang }.
-constexpr double kNeedSkillIndex = 1.0;
-constexpr double kNeedLevelIndex = 2.0;
 
 // Une chaîne d'héritage plus longue que cela n'existe pas — la plus profonde en
 // compte six. Le plafond n'est pas là pour elle mais pour un cycle dans les
@@ -100,25 +91,14 @@ constexpr std::size_t kLongestInheritance = 16;
   return levels;
 }
 
-[[nodiscard]] std::vector<SkillRequirement> NeedsOf(const formats::LuaValue* value) {
-  std::vector<SkillRequirement> needs;
-  const formats::LuaTable* table = TableOf(value);
-  if (table == nullptr) {
-    return needs;
-  }
-  for (const auto& [rank, entry] : table->by_index) {
-    const formats::LuaTable* pair = TableOf(&entry);
-    if (pair == nullptr) {
-      continue;
-    }
-    const std::uint16_t skill_id = NumberOr(pair->Find(kNeedSkillIndex), 0);
-    if (skill_id == 0) {
-      continue;
-    }
-    needs.push_back(
-        SkillRequirement{.skill_id = skill_id, .level = NumberOr(pair->Find(kNeedLevelIndex), 1)});
-  }
-  return needs;
+// La règle d'une compétence dans une liste rangée par compétence, ou nullptr.
+[[nodiscard]] const SkillRule* RuleIn(std::span<const SkillRule> rules, std::uint16_t skill_id) {
+  const auto found = std::ranges::lower_bound(rules, skill_id, {}, &SkillRule::skill_id);
+  return found == rules.end() || found->skill_id != skill_id ? nullptr : &*found;
+}
+
+void SortBySkill(std::vector<SkillRule>& rules) {
+  std::ranges::sort(rules, {}, &SkillRule::skill_id);
 }
 
 // ── Le classement des métiers en onglets ────────────────────────────────────
@@ -285,6 +265,38 @@ std::span<const std::string> SkillTree::TabNamesOfJob(std::uint32_t job) const {
   return {};
 }
 
+void SkillTree::UseServerRules(SkillRules rules) {
+  for (auto& [job, job_rules] : rules.by_job) {
+    SortBySkill(job_rules);
+  }
+  SortBySkill(rules.guild);
+  rules_ = std::move(rules);
+  has_rules_ = true;
+}
+
+std::span<const SkillRule> SkillTree::RulesOfJob(std::uint32_t job) const {
+  const auto found = rules_.by_job.find(job);
+  return found == rules_.by_job.end() ? std::span<const SkillRule>{} : found->second;
+}
+
+const SkillRule* SkillTree::RuleOf(std::uint32_t job, std::uint16_t skill_id) const {
+  return RuleIn(RulesOfJob(job), skill_id);
+}
+
+std::uint16_t SkillTree::MaxLevelOf(std::uint32_t job, std::uint16_t skill_id) const {
+  const SkillRule* rule = RuleOf(job, skill_id);
+  return rule != nullptr ? rule->max_level : 0;
+}
+
+std::span<const SkillRequirement> SkillTree::NeedsOf(std::uint32_t job,
+                                                     std::uint16_t skill_id) const {
+  const SkillRule* rule = RuleOf(job, skill_id);
+  if (rule == nullptr || !prerequisites_enforced()) {
+    return {};
+  }
+  return rule->needs;
+}
+
 core::Result<SkillTree> SkillTree::FromGlobals(const formats::LuaTable& globals) {
   const formats::LuaTable* infos = TableOf(globals.Find(kSkillInfoListGlobal));
   if (infos == nullptr) {
@@ -309,12 +321,9 @@ core::Result<SkillTree> SkillTree::FromGlobals(const formats::LuaTable& globals)
     if (display != nullptr && display->kind == formats::LuaValue::Kind::kString) {
       node.display_name = display->text;
     }
-    node.max_level = NumberOr(skill_table->Find(kFieldMaxLevel), 0);
     node.sp_by_level = NumbersByLevel(skill_table->Find(kFieldSpAmount));
     node.range_cells_by_level = NumbersByLevel(skill_table->Find(kFieldAttackRange));
     node.scale_by_level = ScaleByLevel(skill_table->Find(kFieldSkillScale));
-    const formats::LuaValue* needs = skill_table->Find(kFieldNeedList);
-    node.needs = NeedsOf(needs != nullptr ? needs : skill_table->Find(kFieldNeedListPlain));
     // 🔴 LE DÉFAUT N'EST PAS « FAUX », ET C'EST LE CLIENT QUI LE DIT. Sa fonction
     // `IsLevelUseSkill` vit dans `skillinfo_f.lub` ; son bytecode répond en TROIS
     // temps, pas en deux :

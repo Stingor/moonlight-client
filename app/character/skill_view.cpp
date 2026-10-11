@@ -101,13 +101,10 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
   };
   std::vector<Bounds> bounds;
 
+  // Les prérequis que le serveur vérifie pour le métier du personnage.
   const auto add_needs = [&](std::uint16_t skill_id) -> std::pair<std::size_t, std::size_t> {
-    const ro::sim::SkillNode* node = tree.Find(skill_id);
-    if (node == nullptr) {
-      return {needs_.size(), 0};
-    }
     const std::size_t at = needs_.size();
-    for (const ro::sim::SkillRequirement& need : node->needs) {
+    for (const ro::sim::SkillRequirement& need : tree.NeedsOf(job, skill_id)) {
       needs_.push_back(ro::ui::SkillNeedView{.skill_id = need.skill_id, .level = need.level});
     }
     return {at, needs_.size() - at};
@@ -136,6 +133,12 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
           continue;
         }
         for (const ro::sim::SkillSlot& slot : tree.SlotsOfJob(step.job)) {
+          // ⚠ LE GRIMOIRE DÉCIDE DE CE QUI SE MONTRE : une case que le serveur
+          // ne donne pas au métier n'y a pas de ligne de grille.
+          const ro::sim::GrimoireEntry* row = grimoire.Find(slot.skill_id);
+          if (row == nullptr || !row->in_grid) {
+            continue;
+          }
           // Une compétence peut être dans deux grilles de la chaîne : on garde
           // la PREMIÈRE, celle du tronc. Deux cases pour la même compétence lui
           // donneraient deux places et deux fois le même identifiant.
@@ -212,7 +215,11 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
     const ro::sim::SkillNode* node = tree.Find(one.skill_id);
     const int learned = entry != nullptr ? entry->learned : 0;
     const int reserved = entry != nullptr ? entry->reserved : 0;
-    const int max_level = node != nullptr ? node->max_level : 0;
+    const ro::sim::SkillRule* rule = tree.RuleOf(job, one.skill_id);
+    const int max_level = rule != nullptr ? rule->max_level : 0;
+    // Une compétence que le serveur n'accorde pas contre des points ne se
+    // monte qu'une fois sue.
+    const bool by_points = rule != nullptr && (rule->by_points || learned > 0);
     const ro::sim::KnownSkill* known = book.Find(one.skill_id);
     const ro::render::IconTexture& icon =
         icons.Get(one.skill_id, node != nullptr ? node->idname : std::string_view());
@@ -230,7 +237,7 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
         .reserved = reserved,
         .max_level = max_level,
         .raisable =
-            max_level > 0 && std::max(learned, reserved) < max_level && grimoire.points_left() > 0,
+            by_points && std::max(learned, reserved) < max_level && grimoire.points_left() > 0,
         .needs = std::span(needs_).subspan(one.needs_at, one.needs_count),
         // ⚠ LE TEMPS D'ATTENTE SE LIT DANS LE LIVRE DU SERVEUR, jamais dans
         // l'arbre : c'est un fait de la partie, pas une propriété de la

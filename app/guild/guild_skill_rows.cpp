@@ -1,10 +1,10 @@
-// Les compétences de guilde de l'onglet : l'arbre de l'installation croisé
+// Les compétences de guilde de l'onglet : l'arbre de guilde du serveur croisé
 // avec ce que le serveur envoie.
 //
-// 🔴 LE SERVEUR TAIT DEUX CHOSES : le niveau maximal, et les compétences dont
-// les prérequis manquent — elles n'arrivent jamais. L'arbre de l'installation
-// comble ce trou ; il est purement informatif, et le serveur reste seul juge
-// d'une montée.
+// 🔴 LE PAQUET TAIT DEUX CHOSES : le niveau maximal, et les compétences dont
+// les prérequis manquent — elles n'arrivent jamais. L'arbre de guilde que les
+// bases du serveur exportent comble ce trou ; il est purement informatif, et le
+// serveur reste seul juge d'une montée.
 
 #include <algorithm>
 #include <array>
@@ -13,7 +13,6 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
-#include "ro/formats/lua_table.h"
 #include "ro/sim/world.h"
 
 #include "guild/guild_panel.h"
@@ -21,15 +20,6 @@
 namespace moonclient {
 namespace {
 
-// L'arbre des compétences de guilde, dans l'installation.
-constexpr std::string_view kGuildTreeFile =
-    "data\\luafiles514\\lua files\\skillinfoz\\skilltreeguild.lub";
-// Le nom que le fichier donne à sa table, et celui que le lecteur d'arbre
-// attend : c'est la même forme de fiche.
-constexpr std::string_view kGuildTreeGlobal = "GUILD_SKILL_TREE";
-constexpr std::string_view kSkillListGlobal = "SKILL_INFO_LIST";
-// Les compétences de guilde s'étendent sur cette plage de numéros.
-constexpr std::uint16_t kGuildSkillSpan = 100;
 // Le libellé que les tables du client donnent à une compétence qu'elles ne
 // nomment pas.
 constexpr std::string_view kUnknownSkillLabel = "Unknown-Skill";
@@ -40,38 +30,23 @@ constexpr std::int32_t kSelfTargetedInf = 0x04;
 }  // namespace
 
 void GuildPanel::EnsureGuildTree() {
-  if (guild_tree_tried_ || pieces_.vfs == nullptr) {
+  if (guild_tree_tried_ || pieces_.skills == nullptr) {
     return;
   }
   guild_tree_tried_ = true;
-  auto bytes = pieces_.vfs->Read(kGuildTreeFile);
-  if (!bytes) {
-    ro::core::LogWarning("arbre de guilde : {} — l'onglet se limitera à ce que le serveur envoie",
-                         ro::core::Describe(bytes.error()));
-    return;
-  }
-  auto globals = ro::formats::ReadLuaFile(*bytes);
-  if (!globals || !ro::formats::AliasGlobal(*globals, kGuildTreeGlobal, kSkillListGlobal)) {
-    ro::core::LogWarning("arbre de guilde : table illisible");
-    return;
-  }
-  auto tree = ro::sim::SkillTree::FromGlobals(*globals);
-  if (!tree) {
-    ro::core::LogWarning("arbre de guilde : {}", ro::core::Describe(tree.error()));
-    return;
-  }
-  for (std::uint16_t id = ro::sim::kFirstGuildSkill;
-       id < ro::sim::kFirstGuildSkill + kGuildSkillSpan; ++id) {
-    const ro::sim::SkillNode* node = tree->Find(id);
-    if (node == nullptr) {
-      continue;
-    }
-    guild_nodes_.push_back(GuildTreeNode{.id = id,
-                                         .max_level = node->max_level,
-                                         .idname = node->idname,
-                                         .label = node->display_name,
-                                         .needs = node->needs,
+  for (const ro::sim::SkillRule& rule : pieces_.skills->GuildRules()) {
+    const ro::sim::SkillNode* node = pieces_.skills->Find(rule.skill_id);
+    guild_nodes_.push_back(GuildTreeNode{.id = rule.skill_id,
+                                         .max_level = rule.max_level,
+                                         .idname = node != nullptr ? node->idname : std::string(),
+                                         .needs = rule.needs,
                                          .depth = 0});
+  }
+  if (guild_nodes_.empty()) {
+    ro::core::LogWarning(
+        "arbre de guilde : absent des règles du serveur — l'onglet se limitera à ce que le "
+        "serveur envoie");
+    return;
   }
   // LA PROFONDEUR : un de plus que le prérequis le plus profond. Par passes
   // successives — l'ordre des fiches est arbitraire — et bornées par leur
@@ -107,22 +82,19 @@ void GuildPanel::RefreshSkills(const ro::sim::GuildBook& book, const ro::sim::Wo
   view_.skill_points = book.skill_points();
   view_.skill_tree_known = !guild_nodes_.empty();
 
-  // LE LIBELLÉ : d'abord la table du client, puis l'arbre de guilde — seule
-  // source pour une verrouillée —, enfin le nom technique du paquet.
+  // LE LIBELLÉ : d'abord la table du client — seule source pour une
+  // verrouillée —, puis le nom technique du paquet.
   const auto node_of = [this](std::uint16_t id) -> const GuildTreeNode* {
     const auto found = std::ranges::find(guild_nodes_, id, &GuildTreeNode::id);
     return found == guild_nodes_.end() ? nullptr : &*found;
   };
-  const auto label_of = [this, &node_of, &book](std::uint16_t id) -> std::string_view {
+  const auto label_of = [this, &book](std::uint16_t id) -> std::string_view {
     if (pieces_.skills != nullptr) {
       const ro::sim::SkillNode* node = pieces_.skills->Find(id);
       if (node != nullptr && !node->display_name.empty() &&
           node->display_name != kUnknownSkillLabel) {
         return node->display_name;
       }
-    }
-    if (const GuildTreeNode* node = node_of(id); node != nullptr && !node->label.empty()) {
-      return node->label;
     }
     const ro::sim::GuildSkill* live = book.FindSkill(id);
     return live != nullptr ? std::string_view(live->name) : std::string_view();

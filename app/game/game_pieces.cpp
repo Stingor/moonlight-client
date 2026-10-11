@@ -31,9 +31,9 @@
 #include "ro/vfs/card_item_list.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/job_names.h"
-#include "ro/vfs/lua_chain.h"
 #include "ro/vfs/status_table.h"
 
+#include "game/skill_tree_load.h"
 #include "game/skin_reload.h"
 #include "quest/quest_rules.h"
 #include "world/overlay_view.h"
@@ -388,47 +388,6 @@ void LoadStatusTable(ro::vfs::Vfs& vfs, GamePieces& pieces) {
 // icône, sans qu'aucun message ne le dise.
 void OpenStatusIcons(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.status_icons.emplace(vfs, pieces.status_table);
-}
-
-// L'ARBRE DES COMPÉTENCES ET LEURS DESCRIPTIONS. Cinq tables du client, évaluées
-// À LA SUITE : les trois dernières écrivent des clés que seules les deux
-// premières savent résoudre. Sans l'arbre, la fiche de personnage n'a pas de
-// grimoire à montrer ; sans les descriptions, elle le montre muet.
-//
-// ⚠ LES DEUX SE LISENT SÉPARÉMENT MAIS ÉCHOUENT SÉPARÉMENT AUSSI : une table de
-// descriptions absente ne doit pas coûter l'arbre. C'est la même tolérance que
-// pour l'habillage — ce qui manque ne se montre pas, le reste tient.
-void LoadSkillTree(ro::vfs::Vfs& vfs, GamePieces& pieces) {
-  pieces.skill_icons.emplace(vfs);
-  auto globals = ro::vfs::ReadLuaChain(vfs, ro::sim::kSkillLuaFiles);
-  if (!globals) {
-    // ⚠ CET ÉCHEC-CI COÛTE AUSSI LES DESCRIPTIONS : la fonction retourne avant
-    // de les lire.
-    ro::core::LogWarning(
-        "arbre des compétences : tables illisibles ({}) — le grimoire et les "
-        "descriptions resteront vides",
-        ro::core::Describe(globals.error()));
-    return;
-  }
-  auto tree = ro::sim::SkillTree::FromGlobals(*globals);
-  if (!tree) {
-    ro::core::LogWarning(
-        "arbre des compétences : construction impossible ({}) — le grimoire "
-        "restera vide",
-        ro::core::Describe(tree.error()));
-    return;
-  }
-  ro::core::LogInfo("arbre des compétences : {} fiche(s)", tree->node_count());
-  pieces.skill_tree = std::move(*tree);
-
-  auto words = ro::vfs::SkillWords::FromGlobals(*globals);
-  if (!words) {
-    ro::core::LogWarning("descriptions de compétences : {} — le grimoire s'affichera muet",
-                         ro::core::Describe(words.error()));
-    return;
-  }
-  ro::core::LogInfo("descriptions de compétences : {} fiche(s)", words->skill_count());
-  pieces.skill_words = std::move(*words);
 }
 
 // LES LIBELLÉS DES TITRES. Une table, et elle se lit seule : elle n'indexe rien

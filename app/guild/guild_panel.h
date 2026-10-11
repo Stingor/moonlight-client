@@ -158,14 +158,13 @@ class GuildPanel {
   std::string my_position_;
   std::string invitation_;
 
-  // LES COMPÉTENCES DE GUILDE que l'arbre de l'installation connaît, rangées par
-  // palier de prérequis. ⚠ VIDE QUAND IL MANQUE : l'onglet se limite alors à ce
-  // que le serveur envoie — ni niveau maximal, ni verrouillées.
+  // LES COMPÉTENCES DE GUILDE que l'arbre de guilde du serveur connaît, rangées
+  // par palier de prérequis. ⚠ VIDE QUAND IL MANQUE : l'onglet se limite alors à
+  // ce que le serveur envoie — ni niveau maximal, ni verrouillées.
   struct GuildTreeNode {
     std::uint16_t id = 0;
     std::uint16_t max_level = 0;
     std::string idname;
-    std::string label;
     std::vector<ro::sim::SkillRequirement> needs;
     int depth = 0;
   };

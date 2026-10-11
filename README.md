@@ -116,6 +116,10 @@ tête d'où elle vient et comment la régénérer.
   (et de ses bases d'objets, de monstres et de cartes). Les textes des succès
   restent lus dans le `achievements.lub` de l'installation du joueur ; ils ne
   sont pas versés au dépôt.
+- `skill_trees.yml` est exporté des arbres de compétences des métiers et de la
+  guilde du serveur Moonlight (et de ses bases de compétences et de métiers).
+  La disposition de la fenêtre — cases, onglets — reste lue dans les tables de
+  l'installation du joueur ; elle n'est pas versée au dépôt.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 
