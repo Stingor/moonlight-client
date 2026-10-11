@@ -2,12 +2,15 @@
 
 #include <array>
 #include <cstdint>
+#include <map>
 #include <optional>
 #include <set>
 #include <span>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include <glm/glm.hpp>
 
 #include "ro/audio/ambient_sound.h"
 #include "ro/audio/audio_engine.h"
@@ -66,6 +69,10 @@ struct SoundStage {
   const EffectsInPlay* effects = nullptr;
   // CE QUE LE JOUEUR A TU parmi les sons des images. Vide : tout s'entend.
   SpriteSoundMutes mutes;
+  // OÙ LA TÊTE DE CHAQUE ACTEUR EST PASSÉE à cette image, que les effets de
+  // chapeau attachés à la tête suivent : voir `ComposedScene::head_shifts`. Nul,
+  // aucune tête ne bouge.
+  const std::map<std::uint32_t, glm::vec2>* head_shifts = nullptr;
 };
 
 // UN EFFET QUI VIENT D'ÊTRE LANCÉ, et l'endroit du monde où il sonne.

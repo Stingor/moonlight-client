@@ -166,7 +166,9 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                          &planner_,
                          now_ms,
                          peopled ? wardrobe : nullptr,
-                         &effects_->in_play()};
+                         &effects_->in_play(),
+                         {},
+                         peopled ? &actors_.head_shifts : nullptr};
   if (audio->sound_audible()) {
     sounds_->HearMapAmbience(scene);
   }

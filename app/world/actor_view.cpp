@@ -16,6 +16,7 @@
 #include "ro/render/effect_frame.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/monster_skill_motion.h"
+#include "ro/render/shown_job.h"
 #include "ro/render/skill_damage_timing.h"
 #include "ro/render/skill_held_pose.h"
 #include "ro/render/skill_use_motion.h"
@@ -144,6 +145,27 @@ void FillOngoingAction(ro::render::ActorWardrobe& wardrobe, const ro::sim::World
                                ChanceTenthAt(use.started_ms),
                                attacker.status_effects.contains(ro::sim::kEfstSoulAttack)));
   }
+}
+
+// DE COMBIEN LA TÊTE COMPOSÉE S'EST DÉPLACÉE depuis sa place de repos, que le
+// client mesure sur le corps À PIED du même acteur : une monture relève donc
+// la tête, et ce qu'elle porte avec. Rien sans tête.
+std::optional<glm::vec2> HeadShiftOf(ro::render::ActorWardrobe& wardrobe,
+                                     const ro::render::ActorOutfit& outfit,
+                                     const ro::render::ActorLook& look,
+                                     const ro::render::ComposedActor& composed) {
+  if (!composed.head_place.has_value()) {
+    return std::nullopt;
+  }
+  ro::render::ActorLook on_foot = look;
+  on_foot.job = ro::render::FootJobOf(look.job);
+  on_foot.cash_mount = false;
+  const ro::render::ActorOutfit* foot = wardrobe.OutfitFor(on_foot);
+  const std::optional<glm::vec2> rest = outfit.HeadRestingPlace(foot != nullptr ? *foot : outfit);
+  if (!rest.has_value()) {
+    return std::nullopt;
+  }
+  return *composed.head_place - *rest;
 }
 
 }  // namespace
@@ -466,6 +488,10 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     const ro::render::ComposedActor& composed = outfit->Composed(
         played.animation, facing, played.elapsed_ms, played.loops, played.held_frame);
     frozen_poses.NoteShown(id, {played.animation, facing, composed.frame_index});
+    if (const std::optional<glm::vec2> head_shift = HeadShiftOf(*wardrobe, *outfit, look, composed);
+        head_shift.has_value() && scene_id != 0) {
+      scene.head_shifts[id] = *head_shift;
+    }
     if (composed.quads.empty()) {
       ++census.without_image;
     }

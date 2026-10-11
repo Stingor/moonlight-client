@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <optional>
 #include <span>
 #include <vector>
@@ -554,12 +555,18 @@ struct ComposedScene {
   // changement de carte les vide.
   std::vector<ro::sim::FadingActor> corpses;
 
+  // DE COMBIEN LA TÊTE DE CHAQUE ACTEUR COMPOSÉ S'EST DÉPLACÉE depuis sa place
+  // de repos, en pixels de sprite : ce que suivent les effets de chapeau
+  // attachés à la tête. Voir `ro::render::HatEffectBearer::head_shift_pixels`.
+  std::map<std::uint32_t, glm::vec2> head_shifts;
+
   void Clear() {
     drawn.clear();
     ids.clear();
     behind.clear();
     front.clear();
     vanished.clear();
+    head_shifts.clear();
     ground_units = {};
     player_gesture.reset();
   }

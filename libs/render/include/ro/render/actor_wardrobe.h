@@ -75,6 +75,11 @@ class ActorOutfit {
   // demi-hauteur de son image. Vide sans corps, action, image ni calque.
   [[nodiscard]] std::optional<float> BodyFirstLayerY() const;
 
+  // LA PLACE DE REPOS DE SA TÊTE : celle de la première image de l'attente, posée
+  // sur le corps de `foot` — la tenue du même acteur à pied, voir `FootJobOf`.
+  // Vide sans tête ni corps. Voir `HeadPlace`.
+  [[nodiscard]] std::optional<glm::vec2> HeadRestingPlace(const ActorOutfit& foot) const;
+
   // La durée d'un tour de l'animation, et celle d'une de ses images, en
   // millisecondes ; zéro si le .act du corps ne la porte pas.
   [[nodiscard]] float AnimationDurationMs(std::size_t animation) const;

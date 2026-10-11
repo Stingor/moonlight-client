@@ -32,6 +32,7 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/vfs.h"
 
+#include "effects/effect_actor_view.h"
 #include "effects/effect_class_view.h"
 #include "effects/effect_draw_gate.h"
 #include "effects/effect_map_memory.h"
@@ -495,18 +496,7 @@ class EffectsInPlay {
     return laid_lots_;
   }
 
-  // CE QUE LES EFFETS DEMANDENT À LA VUE DES ACTEURS, qui vit hors de cette
-  // bibliothèque : l'allure d'un acteur (`ro::render::NamedEffectPaceOf`), la
-  // direction de son sprite, et s'il bronche. Vides, rien ne se lit.
-  struct NamedActorView {
-    std::function<std::optional<ro::render::NamedEffectPaceOf>(
-        const ro::sim::Actor& actor, std::uint16_t skill_id,
-        std::optional<std::uint32_t> attack_motion_ms)>
-        pace_of;
-    std::function<std::optional<std::size_t>(const ro::sim::Actor& actor, std::uint32_t now_ms)>
-        sprite_direction_of;
-    std::function<bool(const ro::sim::Actor& actor, std::uint32_t now_ms)> flinches_at;
-  };
+  using NamedActorView = EffectActorView;
   // LA VUE DE CETTE IMAGE, à poser avant les semis : un angle à l'écran ne se
   // mesure qu'avec elle, et un effet couché tourne avec son cap.
   void SeeScene(const ro::render::Camera& camera, NamedActorView actor_view) {

@@ -318,7 +318,7 @@ std::span<const ro::render::DrawnEffect> EffectsInPlay::Drawn(std::uint32_t now_
         const ro::sim::FractionalCell cell =
             ro::sim::InterpolatedCell(*carrier, planner.PathFor(*carrier), now_ms);
         const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
-        ReseatHatStr(playing, *carrier, now_ms);
+        ReseatHatStr(playing, *carrier, actor_view_.HeadShiftOf(carrier->id), now_ms);
         playing.ground_position =
             glm::vec3(ground[0], ground[1], ground[2]) + ViewOffsetInWorld(playing.view_offset);
       } else if (playing.holds_last_frame ||

@@ -65,6 +65,13 @@ struct ShownBodyStates {
 [[nodiscard]] std::uint32_t ShownJobFor(std::uint32_t job_id, std::uint32_t option,
                                         ShownBodyStates states = {}) noexcept;
 
+// LE MÉTIER À PIED D'UN CORPS MONTÉ : le plus petit métier dont ce corps est la
+// monture — Peco ou griffon, dragon, loup, Madogear, monture du shop. Un corps
+// qui n'est la monture de rien se rend tel quel, et le vol de l'union n'en est
+// pas une : ce corps-là reste le sien. C'est sur ce corps que le client mesure la
+// place de repos de la tête.
+[[nodiscard]] std::uint32_t FootJobOf(std::uint32_t shown_job) noexcept;
+
 // VRAI POUR UN CORPS DE COSTUME : il ne dit plus rien du métier.
 [[nodiscard]] bool IsCostumeJob(std::uint32_t shown_job) noexcept;
 

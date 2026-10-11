@@ -32,6 +32,10 @@ namespace ro::render {
 // ⚠ LE CLIENT RENONCE quand la hauteur ET le décalage à droite sont tous deux
 // négatifs : aucun déplacement, et c'est le relèvement ordinaire qui revient.
 //
+// 🔴 UNE FICHE QUI SUIT LA TÊTE la suit pour de bon : à l'ancre s'ajoute le
+// déplacement de la tête depuis sa place de repos — assis, en frappant, en
+// selle —, fois la même échelle. Le renoncement ne l'efface pas.
+//
 // Voir `docs/classes-du-gestionnaire-d-effets.md`, § « L'ancre d'un chapeau ».
 
 // La hauteur que le client retranche à la base, pour tout identifiant qui n'a
@@ -73,6 +77,11 @@ struct HatEffectBearer {
   // MONTÉ SUR UNE MONTURE DU SHOP — l'état « toutes montures ». Elle remplace
   // la classe de taille du métier dans la base.
   bool cash_mount = false;
+  // DE COMBIEN SA TÊTE S'EST DÉPLACÉE depuis sa place de repos, en pixels de
+  // sprite, l'ordonnée vers le BAS : voir `HeadPlace` et
+  // `ActorOutfit::HeadRestingPlace`. Une fiche qui suit la tête le suit ; nul
+  // pour qui n'a pas de tête.
+  glm::vec2 head_shift_pixels{0.0F};
 };
 
 // CE QUE L'ANCRE LIT DE SA FICHE ET DE SON FICHIER, figé quand le `.str`

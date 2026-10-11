@@ -9,6 +9,8 @@
 #include <span>
 #include <utility>
 
+#include "client_tables.h"
+
 namespace ro::render {
 namespace {
 
@@ -122,6 +124,29 @@ std::uint32_t ShownJobFor(std::uint32_t job_id, std::uint32_t option,
     }
   }
   return job_id;
+}
+
+std::uint32_t FootJobOf(std::uint32_t shown_job) noexcept {
+  std::optional<std::uint32_t> lowest;
+  const auto keep = [&lowest](std::uint32_t foot_job) {
+    lowest = lowest.has_value() ? std::min(*lowest, foot_job) : foot_job;
+  };
+  const std::array<std::span<const Mount>, 8> mount_tables = {
+      kPecoMounts,       kGreenDragonMounts, kBlackDragonMounts, kWhiteDragonMounts,
+      kBlueDragonMounts, kRedDragonMounts,   kWolfMounts,        kMadogearMounts};
+  for (const std::span<const Mount> mounts : mount_tables) {
+    for (const Mount& mount : mounts) {
+      if (mount.shown == shown_job) {
+        keep(mount.job);
+      }
+    }
+  }
+  for (const client_tables::CashMountClass& mount : client_tables::kCashMountClasses) {
+    if (mount.mounted == shown_job) {
+      keep(mount.job);
+    }
+  }
+  return lowest.value_or(shown_job);
 }
 
 bool IsCostumeJob(std::uint32_t shown_job) noexcept {

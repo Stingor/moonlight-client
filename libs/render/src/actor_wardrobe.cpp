@@ -210,6 +210,16 @@ std::size_t ActorOutfit::AttackSoundFrame(std::size_t animation) const {
                                       BoundedActionIndex(animation_of_body, played, 0));
 }
 
+std::optional<glm::vec2> ActorOutfit::HeadRestingPlace(const ActorOutfit& foot) const {
+  const auto head = std::ranges::find_if(pieces_, [](const ActorPiece& piece) {
+    return piece.is_head && piece.sprite != nullptr && piece.animation != nullptr;
+  });
+  if (head == pieces_.end() || foot.pieces_.empty() || foot.pieces_.front().animation == nullptr) {
+    return std::nullopt;
+  }
+  return HeadPlace(*foot.pieces_.front().animation, 0, 0, *head->sprite, *head->animation, 0, 0);
+}
+
 std::optional<float> ActorOutfit::BodyFirstLayerY() const {
   if (pieces_.empty() || pieces_.front().animation == nullptr) {
     return std::nullopt;

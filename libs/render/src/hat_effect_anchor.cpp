@@ -6,6 +6,7 @@
 
 #include "ro/render/actor_scale.h"
 #include "ro/render/effect_renderer.h"
+#include "ro/render/sprite_billboard.h"
 #include "ro/render/sprite_catalog.h"
 
 namespace ro::render {
@@ -107,6 +108,9 @@ HatEffectAnchor HatAnchorFor(const HatAnchorRecipe& recipe, const HatEffectBeare
     body_scale *= bearer.shrink_scale;
   }
   HatEffectAnchor anchor = Anchor(height, recipe.right_units, body_scale);
+  if (recipe.attached_head) {
+    anchor.view_offset += bearer.head_shift_pixels * body_scale / kSpritePixelsPerWorldUnit;
+  }
   anchor.scale = recipe.adjust_size_when_shrunk ? bearer.shrink_scale : 1.0F;
   return anchor;
 }

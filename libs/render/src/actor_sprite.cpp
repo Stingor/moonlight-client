@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <ranges>
@@ -383,6 +384,55 @@ std::optional<std::size_t> AlternateFrame(const formats::ActAnimation& reference
   return frame_index * multiple + step % multiple;
 }
 
+namespace {
+
+// LE COIN D'UN CALQUE, tel que le client le garde en mémoire : le fichier en
+// donne le CENTRE, son chargeur retranche la demi-image arrondie au-dessus,
+// grandie de l'échelle du calque, puis divise par cette échelle et tronque.
+float LayerCorner(float center, std::int32_t extent, float layer_scale) {
+  const std::int32_t half_up = extent / 2 + extent % 2;
+  if (layer_scale == 0.0F) {
+    return center;
+  }
+  return std::trunc((center - static_cast<float>(half_up) * layer_scale) / layer_scale);
+}
+
+}  // namespace
+
+std::optional<glm::vec2> HeadPlace(const formats::ActAnimation& body, std::size_t body_action,
+                                   std::size_t body_frame, const formats::SprSprite& head_sprite,
+                                   const formats::ActAnimation& head, std::size_t head_action,
+                                   std::size_t head_frame) {
+  const std::span<const formats::ActAction> actions = head.actions();
+  if (head_action >= actions.size() || head_frame >= actions[head_action].frames.size()) {
+    return std::nullopt;
+  }
+  const std::vector<formats::ActLayer>& layers = actions[head_action].frames[head_frame].layers;
+  if (layers.size() <= kHeadLayerRank || layers[kHeadLayerRank].frame_index < 0) {
+    return std::nullopt;
+  }
+  const formats::ActLayer& layer = layers[kHeadLayerRank];
+  const auto image = static_cast<std::size_t>(layer.frame_index);
+  // À partir de la 2.5, le chargeur prend les dimensions que le fichier DÉCLARE ;
+  // avant, celles de l'image du `.spr`.
+  std::int32_t width = 0;
+  std::int32_t height = 0;
+  if (layer.declared_width.has_value() && layer.declared_height.has_value()) {
+    width = *layer.declared_width;
+    height = *layer.declared_height;
+  } else if (layer.section == 0 && image < head_sprite.indexed_frames().size()) {
+    width = head_sprite.indexed_frames()[image].width;
+    height = head_sprite.indexed_frames()[image].height;
+  } else if (layer.section != 0 && image < head_sprite.bgra_frames().size()) {
+    width = head_sprite.bgra_frames()[image].width;
+    height = head_sprite.bgra_frames()[image].height;
+  }
+  return glm::vec2(LayerCorner(layer.offset_x, width, layer.scale_x),
+                   LayerCorner(layer.offset_y, height, layer.scale_y)) +
+         AttachOffset(FrameAnchor(body, body_action, body_frame),
+                      FrameAnchor(head, head_action, head_frame));
+}
+
 ComposedActor ComposeActor(const ActorPiece& body, std::span<const ActorPiece> attachments,
                            std::size_t action_index, std::size_t frame_index, bool garment_behind,
                            std::span<const std::size_t> attachment_frames) {
@@ -443,6 +493,8 @@ ComposedActor ComposeActor(const ActorPiece& body, std::span<const ActorPiece> a
       head_offset = offset;
       head_anchor = anchor;
       head_seen = true;
+      composed.head_place = HeadPlace(*body.animation, body_action, body_frame, *piece.sprite,
+                                      *piece.animation, action, frame);
     }
 
     for (SpriteQuad& quad : quads) {

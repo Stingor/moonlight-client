@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 #include "ro/formats/act.h"
 #include "ro/formats/palette.h"
 #include "ro/formats/spr.h"
@@ -145,7 +147,28 @@ struct ComposedActor {
   // sauf elle. Plus courte que `quads` pour ce qui n'est pas un acteur composé
   // de pièces : un quad sans partie compte alors pour le corps.
   std::vector<ActorPart> parts;
+  // LA PLACE DE LA TÊTE à cette image, en pixels de sprite autour des pieds :
+  // voir `HeadPlace`. Vide sans tête.
+  std::optional<glm::vec2> head_place;
 };
+
+// LE CALQUE QUI EST LA TÊTE dans une image du `.act` de tête : le premier est un
+// calque vide, le second porte l'image.
+inline constexpr std::size_t kHeadLayerRank = 1;
+
+// OÙ LA TÊTE SE POSE : le COIN de son calque de tête — le fichier en donne le
+// centre, le client en retranche la demi-image —, plus ce que son point
+// d'attache la déplace pour rejoindre celui du corps. C'est ce que le client
+// retient pour les effets de chapeau qui suivent la tête, en comparant la place
+// de chaque image à celle de la première image de l'attente.
+//
+// Vide quand l'image n'a pas ce calque, ou que ce calque est vide : le client
+// ne la pose alors pas.
+[[nodiscard]] std::optional<glm::vec2> HeadPlace(const formats::ActAnimation& body,
+                                                 std::size_t body_action, std::size_t body_frame,
+                                                 const formats::SprSprite& head_sprite,
+                                                 const formats::ActAnimation& head,
+                                                 std::size_t head_action, std::size_t head_frame);
 
 // La partie du quad de ce rang : voir `ComposedActor::parts`.
 [[nodiscard]] ActorPart PartOfQuad(const ComposedActor& composed, std::size_t index) noexcept;
