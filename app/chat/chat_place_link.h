@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 
+#include "ro/ui/navigation_window.h"
 #include "ro/vfs/map_display_names.h"
 
 namespace moonclient {
@@ -78,5 +79,11 @@ struct PlaceLink {
 // destination reste écrite.
 [[nodiscard]] std::string PlaceDestinationLine(const PlaceLink& link,
                                                const ro::vfs::MapDisplayNames* names);
+
+// L'INFOBULLE D'UN LIEU, sans son plan : le nom lisible chez le lecteur — vide
+// quand la table ne le connaît pas, et l'infobulle montre alors le nom
+// interne —, la carte et la case. Le plan est une texture : `app` l'ajoute.
+[[nodiscard]] ro::ui::NavigationPlaceTip PlaceTipText(const PlaceLink& link,
+                                                      const ro::vfs::MapDisplayNames* names);
 
 }  // namespace moonclient

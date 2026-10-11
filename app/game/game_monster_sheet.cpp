@@ -18,6 +18,7 @@
 
 #include "chat/chat_view.h"
 #include "game/game.h"
+#include "game/map_plan_tip.h"
 
 namespace moonclient {
 namespace {
@@ -69,11 +70,20 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
     windows_.skill_description.place_at_mouse = true;
     windows_.skill_description.raise = true;
   }
-  if (!answer.follow_map.empty()) {
-    FollowDescriptionLink(
-        ro::ui::DescriptionWindowAction{.followed = answer.follow_map,
-                                        .followed_kind = ro::ui::RichLinkKind::kPlace},
-        now_ms);
+  // ── UNE CARTE D'APPARITION, avec les gestes de tout lieu ──────────────────
+  //
+  // Le clic guide vers la carte ENTIÈRE — la fiche ne dit pas où, sur elle, le
+  // monstre se tient ; le trajet se lit sur la minimap et au sol. Le Maj+clic
+  // pose le `<NAVIL>` de la carte dans la saisie, et le survol emprunte
+  // l'infobulle d'un lien de lieu : nom lisible et plan.
+  if (!answer.guide_map.empty()) {
+    navi_.GuideToPlace(answer.guide_map, 0, 0);
+  }
+  if (!answer.link_map.empty()) {
+    PostChatLink(PlaceLink{.map = answer.link_map});
+  }
+  if (!answer.hovered_map.empty()) {
+    windows_.navigation.place_tip = PlaceTipOf(PlaceLink{.map = answer.hovered_map}, pieces_);
   }
 
   // ── LES GESTES SUR UN BUTIN, les mêmes que partout où un objet se montre ──

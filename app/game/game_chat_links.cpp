@@ -31,45 +31,12 @@
 #include "chat/chat_mention_piece.h"
 #include "chat/chat_setting_link.h"
 #include "game/game.h"
+#include "game/map_plan_tip.h"
 #include "game/setting_destination_open.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
 namespace {
-
-constexpr std::string_view kMapPlanFolder = "map\\";
-constexpr std::string_view kMapPlanExtension = ".bmp";
-constexpr std::string_view kMapGridExtension = ".gat";
-
-// LE PLAN D'UNE CARTE, celui que le radar montre ; vide quand il manque.
-[[nodiscard]] ro::ui::SkinImage MapPlanOf(std::string_view map, GamePieces& pieces) {
-  if (!pieces.game_images.has_value() || map.empty()) {
-    return {};
-  }
-  std::string path(ro::render::kSkinRoot);
-  path += kMapPlanFolder;
-  path += map;
-  path += kMapPlanExtension;
-  const ro::render::IconTexture& plan = pieces.game_images->GetOurs(path);
-  if (!plan.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(plan.texture.name()),
-                           .width = static_cast<float>(plan.width_px),
-                           .height = static_cast<float>(plan.height_px)};
-}
-
-// L'INFOBULLE D'UN LIEU : son nom lisible, et le plan que le radar montre.
-[[nodiscard]] ro::ui::NavigationPlaceTip PlaceTipOf(const PlaceLink& place, GamePieces& pieces) {
-  ro::ui::NavigationPlaceTip tip{.map_name = place.map, .x = place.x, .y = place.y};
-  if (pieces.map_display_names.has_value()) {
-    tip.label = std::string(
-        pieces.map_display_names->DisplayNameOf(place.map + std::string(kMapGridExtension))
-            .value_or(std::string_view()));
-  }
-  tip.map_image = MapPlanOf(place.map, pieces);
-  return tip;
-}
 
 // LA CLASSE DE SPRITE D'UN PNJ que les données de navigation placent sur cette
 // carte sous ce nom ; zéro quand elles ne le connaissent pas. ⚠ LA PARTIE

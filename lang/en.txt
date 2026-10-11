@@ -12640,9 +12640,6 @@ tr: Chance that one of its attacks actually reaches you, perfect dodge deducted.
 fr: Change de cible en chasse
 tr: Switches target while hunting
 
-fr: Clic sur une carte : sa destination dans la conversation.
-tr: Click a map: its destination in the chat.
-
 fr: Clic sur un skill : sa description (fenêtre du client).
 tr: Click a skill: its description (the client's window).
 
@@ -16098,3 +16095,6 @@ tr: [Taekwon Mission] Target Monster: %s (%d%%)
 
 fr: [Taming Mission] Monstre cible : %s
 tr: [Taming Mission] Target Monster: %s
+
+fr: Clic sur une carte : le guidage · Maj+clic : son lien dans le chat
+tr: Click a map: guidance · Shift+click: its link in chat

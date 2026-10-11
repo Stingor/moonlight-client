@@ -124,4 +124,10 @@ std::string PlaceDestinationLine(const PlaceLink& link, const ro::vfs::MapDispla
   return line;
 }
 
+ro::ui::NavigationPlaceTip PlaceTipText(const PlaceLink& link,
+                                        const ro::vfs::MapDisplayNames* names) {
+  return ro::ui::NavigationPlaceTip{
+      .label = PlaceShownName(names, link.map), .map_name = link.map, .x = link.x, .y = link.y};
+}
+
 }  // namespace moonclient

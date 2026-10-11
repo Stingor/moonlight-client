@@ -254,12 +254,20 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
       // LE NOM QU'ON LIT, PUIS LE NOM INTERNE entre parenthèses : le premier
       // dit où c'est, le second sert dans une commande et entre joueurs. La
       // colonne trie sur ce qu'elle montre.
+      //
+      // LES TROIS GESTES D'UN LIEU, ceux de tout lien de lieu du client : le
+      // clic guide vers la carte entière, le Maj+clic pose son lien dans la
+      // saisie, le survol demande son infobulle — nom lisible et plan —, que
+      // `app` compose.
       ImGui::PushID(rank);
       Colored(LinkColor(), spawn.label.c_str());
       const bool hovered = ImGui::IsItemHovered();
       DecorateLink(hovered);
+      if (hovered) {
+        answer.hovered_map = spawn.map_name;
+      }
       if (LinkReleased(hovered, false)) {
-        answer.follow_map = spawn.map_name;
+        (ImGui::GetIO().KeyShift ? answer.link_map : answer.guide_map) = spawn.map_name;
       }
       ImGui::PopID();
       ImGui::TableNextColumn();
@@ -268,7 +276,7 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
     PaintWindowScrollbar(art);
     ImGui::EndTable();
   }
-  Label(core::Tr("Clic sur une carte : sa destination dans la conversation."));
+  Label(core::Tr("Clic sur une carte : le guidage · Maj+clic : son lien dans le chat"));
   Label(core::Tr("Les spawns d'instance et les invocations de script ne sont pas comptés."));
 }
 

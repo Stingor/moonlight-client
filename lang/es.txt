@@ -12640,9 +12640,6 @@ tr: Probabilidad de que uno de sus ataques te alcance de verdad, descontada la e
 fr: Change de cible en chasse
 tr: Cambia de objetivo mientras caza
 
-fr: Clic sur une carte : sa destination dans la conversation.
-tr: Clic en un mapa: su destino en el chat.
-
 fr: Clic sur un skill : sa description (fenêtre du client).
 tr: Haz clic en una habilidad: su descripción (la ventana del cliente).
 
@@ -16098,3 +16095,6 @@ tr: [Taekwon Mission] Monstruo objetivo: %s (%d%%)
 
 fr: [Taming Mission] Monstre cible : %s
 tr: [Taming Mission] Monstruo objetivo: %s
+
+fr: Clic sur une carte : le guidage · Maj+clic : son lien dans le chat
+tr: Clic en un mapa: la guía · Mayús+clic: su enlace en el chat

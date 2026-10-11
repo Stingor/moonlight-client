@@ -55,7 +55,7 @@ struct MonsterSheetDropView {
 };
 
 struct MonsterSheetSpawnView {
-  // Le nom interne, celui que le lien suit.
+  // Le nom interne, celui que les trois gestes de la ligne emportent.
   std::string map_name;
   // Ce que la ligne écrit : « Nom affiché (fichier) », ou le nom interne seul
   // quand l'installation ne nomme pas la carte.
@@ -230,8 +230,12 @@ struct MonsterSheetAnswer {
   std::uint32_t open_monster = 0;
   // La description de cette compétence, dans la fenêtre des compétences.
   std::uint16_t describe_skill = 0;
-  // Cette carte d'apparition a été cliquée.
-  std::string follow_map;
+  // LES GESTES SUR UNE CARTE D'APPARITION, par son nom interne : le clic y
+  // guide, le Maj+clic pose son lien de lieu dans la saisie, le survol demande
+  // son infobulle.
+  std::string guide_map;
+  std::string link_map;
+  std::string hovered_map;
   // Poser le monstre dans la barre de chat.
   bool post_link = false;
 };

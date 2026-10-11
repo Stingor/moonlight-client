@@ -1336,6 +1336,7 @@ add_executable(moonclient
     effects/effect_layers.cpp
     effects/effect_hit_view.cpp
     game/game_chat_links.cpp
+    game/map_plan_tip.cpp
     game/client_shell.cpp
     shell/backdrop_effects.cpp
     shell/backdrop_scene.cpp
