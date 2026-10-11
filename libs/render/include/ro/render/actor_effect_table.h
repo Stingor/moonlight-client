@@ -397,6 +397,10 @@ struct ActorBodyPose {
   // tête : le corps fait un tour complet, la tête passe dessous à mi-course.
   // Il REMPLACE l'angle du calque, et retombe à zéro le tour fini.
   float layer_spin_degrees = 0.0F;
+  // LE VOILE ROUGE EST LEVÉ — le bit `0x40000`. Il ne teint pas seulement : il
+  // tient en l'air le corps de qui vole, quoi qu'il fasse. Voir
+  // `ro::render::UnionHoverPostureOf`.
+  bool red_veiled = false;
 };
 
 // LES CALQUES QUE LE CLIENT TRAITE COMME LE CORPS dans ce que les effets font à

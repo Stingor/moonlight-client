@@ -401,7 +401,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
                          pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
                          effects_.has_value() ? &*effects_ : nullptr,
                          settings_->options().pages().sprite_sounds.mutes(),
-                         &scene_actors_.head_shifts};
+                         &scene_actors_.head_shifts,
+                         &scene_actors_.hover_pixels};
   if (audio_.sound_audible()) {
     actor_sounds_->Hear(scene, scene_actors_.drawn, scene_actors_.ids);
     actor_sounds_->HearMapAmbience(scene);

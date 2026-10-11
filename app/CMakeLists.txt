@@ -85,7 +85,8 @@ target_include_directories(moonclient_effect_nodes PUBLIC ${CMAKE_CURRENT_SOURCE
 add_library(moonclient_stage STATIC
     world/decor_veil_view.cpp
     world/night_light_view.cpp
-    world/map_stage.cpp)
+    world/map_stage.cpp
+    world/union_hovers.cpp)
 
 target_link_libraries(moonclient_stage
     PUBLIC ro_core ro_formats ro_render ro_render_gl ro_sim ro_vfs

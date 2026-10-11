@@ -55,6 +55,9 @@ class SpriteEffect final : public EffectClassInstance {
     // Le repère du client : ce qui monte a l'ordonnée qui descend.
     sprite_.position = position_ - glm::vec3{0.0F, lift, 0.0F};
     sprite_.owner_scale = tick.owner_shrink_scale;
+    if (recipe_.floats_with_bearer) {
+      sprite_.screen_lift_pixels = tick.owner_hover_pixels;
+    }
     AdvanceSpriteFrame(sprite_, tick);
   }
 

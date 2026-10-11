@@ -63,6 +63,10 @@ inline constexpr std::uint32_t kPressedBody = 0x20;
 // fois, en addition, une image sur deux.
 //
 // ⚠ LA CAPE SUIT LE PREMIER : voir `kBodyAndHeadwearParts`.
+// LE VOILE ROUGE, que `actor_effect_veils.cpp` peint : la pose n'en retient que
+// ce qu'il fait à la lévitation.
+inline constexpr std::uint32_t kRedVeil = 0x40000;
+
 inline constexpr std::uint32_t kGlowingBody = 0x1;
 inline constexpr std::uint32_t kGlowingWeapon = 0x2;
 inline constexpr std::uint32_t kDoubledWeapon = 0x4;
@@ -207,6 +211,9 @@ ActorBodyPose BodyPoseAfterEffects(std::span<const ActorEffectPlay> played) {
           pose.height_scale = kPressedHeld;
         }
       }
+    }
+    if ((raised & kRedVeil) != 0) {
+      pose.red_veiled = true;
     }
     if ((raised & kGlowingBody) != 0) {
       pose.additive_parts = static_cast<ActorPartSet>(pose.additive_parts | kBodyAndHeadwearParts);

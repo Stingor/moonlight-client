@@ -36,6 +36,7 @@
 #include "world/frozen_poses.h"
 #include "world/item_drops.h"
 #include "world/map_stage.h"
+#include "world/union_hovers.h"
 
 // Ce qu'un acteur MONTRE : la traduction de ce que le serveur en a dit —
 // apparence, posture, marche, coups — vers ce que la garde-robe habille et
@@ -559,6 +560,12 @@ struct ComposedScene {
   // de repos, en pixels de sprite : ce que suivent les effets de chapeau
   // attachés à la tête. Voir `ro::render::HatEffectBearer::head_shift_pixels`.
   std::map<std::uint32_t, glm::vec2> head_shifts;
+  // DE COMBIEN FLOTTE CHAQUE ACTEUR COMPOSÉ qui vole, en pixels de sprite vers
+  // le haut : ce que les effets qui lui sont attachés retranchent avec lui.
+  // Absent, il ne flotte pas. Voir `UnionHovers`.
+  std::map<std::uint32_t, float> hover_pixels;
+  // LA LÉVITATION DE CHACUN, d'une image à l'autre. `Clear` n'y touche pas.
+  UnionHovers union_hovers;
 
   void Clear() {
     drawn.clear();
@@ -567,6 +574,7 @@ struct ComposedScene {
     front.clear();
     vanished.clear();
     head_shifts.clear();
+    hover_pixels.clear();
     ground_units = {};
     player_gesture.reset();
   }

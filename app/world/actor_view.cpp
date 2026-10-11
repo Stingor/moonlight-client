@@ -502,6 +502,14 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       ++census.hidden;
       return;
     }
+    // LA LÉVITATION DU VOL DE L'UNION : le corps et les copies qu'un effet pose
+    // autour de lui montent à l'écran, son ombre et son emprise restent au sol.
+    const float hover_pixels =
+        scene.union_hovers.PixelsOf(actor, played.motion, pose.red_veiled, composed, now_ms);
+    if (hover_pixels != 0.0F && scene_id != 0) {
+      scene.hover_pixels[id] = hover_pixels;
+    }
+    const glm::vec2 hover_offset(0.0F, hover_pixels);
     // LA TRAÎNÉE RÉÉCRIT LA COULEUR DU CORPS à chaque tic, et donne la sienne à
     // ses copies : voir `ro/render/afterimage_blur.h`. ⚠ À SON RANG dans la
     // liste de l'acteur : ce qui teint après elle la recouvre, ce qui teint
@@ -577,7 +585,8 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       std::vector<ro::render::DrawnActor>& layer = in_front ? scene.front : scene.behind;
       layer.push_back(ro::render::DrawnActor{
           &composed, nullptr, feet, halos[copy_rank].tint, 0.0F, scale * halos[copy_rank].scale,
-          glm::vec2(halos[copy_rank].offset_pixels[0], halos[copy_rank].offset_pixels[1])});
+          glm::vec2(halos[copy_rank].offset_pixels[0], halos[copy_rank].offset_pixels[1]) +
+              hover_offset});
       // Un halo se range dans un seau à mélange propre, hors du brouillard.
       layer.back().fogged = false;
       if (in_front) {
@@ -609,6 +618,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
           ro::render::DrawnActor{&composed, nullptr, feet, veils[copy_rank].tint, 0.0F, scale});
       scene.front.back().fogged = false;
       scene.front.back().depth_bias = kVeilDepthBias;
+      scene.front.back().screen_offset_pixels = hover_offset;
       CopyLayers(veils[copy_rank], scene.front.back());
       swing_layers(scene.front.back());
     }
@@ -625,7 +635,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
                                 tint,
                                 PickBiasOf(actor),
                                 scale,
-                                BodyJitter(id, now_ms, pose.jitter_pixels),
+                                BodyJitter(id, now_ms, pose.jitter_pixels) + hover_offset,
                                 pose.height_scale};
     swing_layers(body);
     BlendLayers(pose, weapon_echo_frame, body);
@@ -655,6 +665,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     const std::uint32_t since = now_ms > corpse.since_ms ? now_ms - corpse.since_ms : 0;
     compose(corpse.actor, 0, ro::render::VanishAlphaAt(kAgonyOver, since, scene.corpse_fade_ms));
   }
+  scene.union_hovers.ForgetUnseen();
   census.drawn = scene.drawn.size();
   return census;
 }

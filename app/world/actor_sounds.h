@@ -73,6 +73,9 @@ struct SoundStage {
   // chapeau attachés à la tête suivent : voir `ComposedScene::head_shifts`. Nul,
   // aucune tête ne bouge.
   const std::map<std::uint32_t, glm::vec2>* head_shifts = nullptr;
+  // DE COMBIEN FLOTTE CHAQUE ACTEUR QUI VOLE, que ses effets attachés suivent :
+  // voir `ComposedScene::hover_pixels`. Nul, personne ne flotte.
+  const std::map<std::uint32_t, float>* hover_pixels = nullptr;
 };
 
 // UN EFFET QUI VIENT D'ÊTRE LANCÉ, et l'endroit du monde où il sonne.

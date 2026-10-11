@@ -37,6 +37,19 @@ struct EffectActorView {
     const auto found = head_shifts->find(actor_id);
     return found != head_shifts->end() ? found->second : glm::vec2(0.0F);
   }
+
+  // DE COMBIEN FLOTTE chaque acteur qui vole, en pixels de sprite vers le
+  // haut : voir `ComposedScene::hover_pixels`. Nul, personne ne flotte.
+  const std::map<std::uint32_t, float>* hover_pixels = nullptr;
+
+  // Celle de cet acteur ; zéro s'il ne flotte pas à cette image.
+  [[nodiscard]] float HoverOf(std::uint32_t actor_id) const {
+    if (hover_pixels == nullptr) {
+      return 0.0F;
+    }
+    const auto found = hover_pixels->find(actor_id);
+    return found != hover_pixels->end() ? found->second : 0.0F;
+  }
 };
 
 }  // namespace moonclient

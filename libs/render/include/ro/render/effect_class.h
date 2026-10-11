@@ -134,6 +134,10 @@ struct EffectClassTick {
   // DE COMBIEN LE CORPS DU PORTEUR EST RAPETISSÉ à cet instant, de un à un
   // demi : un sprite posé sur lui rapetisse avec lui. Un sans porteur.
   float owner_shrink_scale = 1.0F;
+  // DE COMBIEN LE CORPS DU PORTEUR FLOTTE à cet instant, en pixels de sprite
+  // vers le haut — la lévitation du vol de l'union, `ro::render::UnionHover`.
+  // Zéro sans porteur, ou pour qui ne vole pas.
+  float owner_hover_pixels = 0.0F;
 };
 
 // UN `.str` À PEINDRE.
@@ -185,6 +189,9 @@ struct EffectClassSpriteDraw {
   // distance à l'œil, en unités du monde à la puissance moins un : un sprite
   // posé au même endroit qu'un corps passe ainsi devant lui. Zéro pour aucun.
   float depth_bias = 0.0F;
+  // DE COMBIEN LE SPRITE MONTE À L'ÉCRAN, en pixels de sprite, sans que sa
+  // place dans le monde bouge : voir `DrawnActor::screen_offset_pixels`.
+  float screen_lift_pixels = 0.0F;
 };
 
 // UN QUAD D'ÉCRAN À PEINDRE : ses coins sont déjà des PIXELS, rien ne les

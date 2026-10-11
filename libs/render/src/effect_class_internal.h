@@ -112,6 +112,8 @@ struct SpriteParticle {
   // L'échelle que le porteur impose en plus de la sienne : voir
   // `EffectClassTick::owner_shrink_scale`.
   float owner_scale = 1.0F;
+  // Voir `EffectClassSpriteDraw::screen_lift_pixels`.
+  float screen_lift_pixels = 0.0F;
 };
 
 // L'image suivante d'un sprite, selon sa période et son mode de lecture ; un

@@ -502,6 +502,7 @@ class EffectsInPlay {
   void SeeScene(const ro::render::Camera& camera, NamedActorView actor_view) {
     camera_ = camera;
     actor_view_ = std::move(actor_view);
+    classes_.NoticeHovers(actor_view_.hover_pixels);
   }
 
   [[nodiscard]] std::size_t playing() const noexcept { return per_map_.playing.size(); }

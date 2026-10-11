@@ -75,6 +75,11 @@ class EffectClassesInPlay {
   // LA PORTE DE DESSIN DE L'IMAGE : une instance dont le porteur est caché vit,
   // mais ne se dessine pas. Voir `EffectDrawGate`.
   void NoticeDrawGate(const EffectDrawGate& gate) { draw_gate_ = gate; }
+  // DE COMBIEN FLOTTE CHAQUE PORTEUR QUI VOLE à cette image : voir
+  // `ComposedScene::hover_pixels`. Nul, personne ne flotte.
+  void NoticeHovers(const std::map<std::uint32_t, float>* hover_pixels) {
+    hover_pixels_ = hover_pixels;
+  }
 
   // Fait battre toutes les instances jusqu'à `now_ms`, puis compose ce qu'elles
   // montrent.
@@ -147,6 +152,7 @@ class EffectClassesInPlay {
   ro::render::EffectCatalog* catalog_ = nullptr;
   ro::vfs::Vfs* vfs_ = nullptr;
   EffectDrawGate draw_gate_;
+  const std::map<std::uint32_t, float>* hover_pixels_ = nullptr;
   std::optional<ro::render::Camera> camera_;
   float viewport_width_ = 0.0F;
   float viewport_height_ = 0.0F;

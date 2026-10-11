@@ -558,6 +558,7 @@ add_library(ro_render STATIC
     src/vanish_fade.cpp
     src/afterimage_blur.cpp
     src/tint_recovery_clock.cpp
+    src/union_hover.cpp
     src/water_plane.cpp
     src/window_fit.cpp)
 add_library(ro::render ALIAS ro_render)

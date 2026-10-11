@@ -61,6 +61,7 @@ void DrawSprite(const SpriteParticle& particle, EffectClassOutput& output) {
   draw.additive = EffectSpriteIsAdditive(particle.render_word);
   draw.render_word = particle.render_word;
   draw.depth_bias = particle.depth_bias;
+  draw.screen_lift_pixels = particle.screen_lift_pixels;
   output.sprites.push_back(draw);
 }
 

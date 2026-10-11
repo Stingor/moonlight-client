@@ -263,6 +263,7 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
   // effets.
   EffectsInPlay::NamedActorView actor_view;
   actor_view.head_shifts = scene.head_shifts;
+  actor_view.hover_pixels = scene.hover_pixels;
   if (scene.wardrobe != nullptr) {
     ro::render::ActorWardrobe* garde_robe = scene.wardrobe;
     actor_view.pace_of = [garde_robe, &scene](const ro::sim::Actor& actor, std::uint16_t skill_id,

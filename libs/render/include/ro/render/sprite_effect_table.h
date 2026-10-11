@@ -64,6 +64,10 @@ struct SpriteEffectRecipe {
   float lift_units = 0.0F;
   float doram_lift_units = 0.0F;
   bool adds_job_lift = false;
+  // LE SPRITE MONTE AVEC LE CORPS DE SON PORTEUR quand celui-ci vole : voir
+  // `EffectClassTick::owner_hover_pixels`. Seul le décor de Digital Space le
+  // fait ; les trente-sept autres restent où leur recette les pose.
+  bool floats_with_bearer = false;
 };
 
 // La recette d'un identifiant, ou rien.

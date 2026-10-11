@@ -234,6 +234,13 @@ void EffectClassesInPlay::Advance(const ro::sim::World& world, const MapStage& s
       tick.owner_body_degrees.reset();
       tick.owner_job.reset();
       tick.owner_shrink_scale = 1.0F;
+      tick.owner_hover_pixels = 0.0F;
+      if (hover_pixels_ != nullptr) {
+        if (const auto hover = hover_pixels_->find(living.owner_id);
+            hover != hover_pixels_->end()) {
+          tick.owner_hover_pixels = hover->second;
+        }
+      }
       if (const ro::sim::Actor* owner = world.Find(living.owner_id); owner != nullptr) {
         const std::uint8_t facing =
             ro::sim::FacingAt(*owner, planner.PathFor(*owner), last_tick_ms_);
@@ -418,6 +425,7 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
     drawn.ground_position = sprite.ground_position;
     drawn.tint = sprite.tint;
     drawn.depth_bias = sprite.depth_bias;
+    drawn.screen_offset_pixels = glm::vec2(0.0F, sprite.screen_lift_pixels);
     SpriteBatch bucket;
     bucket.additive = sprite.additive;
     if (sprite.render_word.has_value()) {
