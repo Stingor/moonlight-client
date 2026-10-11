@@ -309,9 +309,13 @@ struct ChatWindowAction {
   // coup, et distinguer celui qui a bougé n'apprendrait rien à l'appelant.
   bool tuned_look = false;
   ChatTabLook look;
-  // L'émoticone qu'il vient de choisir dans la grille, ou moins de zéro. ⚠ ELLE
-  // S'ENVOIE, ELLE NE S'ÉCRIT PAS : voir `ChatStripAction::chose_emotion`.
+  // L'émoticone sans nom de chat qu'il vient de choisir dans la grille, à
+  // envoyer en geste du jeu, ou moins de zéro : voir
+  // `ChatStripAction::chose_emotion`.
   int chose_emotion = -1;
+  // La ligne `:nom:` d'une émoticone cliquée, à envoyer telle quelle par le
+  // mode d'envoi armé. Vide sinon : voir `ChatStripAction::sent_emote_token`.
+  std::string sent_emote;
   // L'emoji pioché, à insérer dans la saisie.
   std::string_view chose_emoji;
   // La palette s'est refermée après une pioche : le clavier revient au champ.

@@ -92,8 +92,8 @@ struct WhisperWindowAction {
   bool focused = false;
   // Un geste sur une pastille de SA saisie.
   ChatLinkAsk input_link;
-  // ⚠ TOUJOURS MOINS DE ZÉRO : la palette de la 1:1 écrit le `:nom:` au lieu
-  // d'envoyer l'émotion, que le correspondant ne verrait pas.
+  // ⚠ TOUJOURS MOINS DE ZÉRO : la palette de la 1:1 envoie le `:nom:` dans
+  // `said` au lieu de l'émotion du jeu, que le correspondant ne verrait pas.
   int chose_emotion = -1;
   // Sa saisie a le clavier : c'est la dernière active.
   bool input_active = false;

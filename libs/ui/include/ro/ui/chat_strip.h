@@ -159,13 +159,17 @@ struct ChatStripAction {
   // Il veut régler celui-là — clic droit. C'est l'onglet DÉSIGNÉ, pas l'onglet
   // montré : on règle celui qu'on vise.
   int configure = -1;
-  // L'émoticone qu'il vient de choisir dans la grille, ou moins de zéro.
-  //
-  // ⚠ ELLE S'ENVOIE, ELLE NE S'ÉCRIT PAS. Le client fait de même : une
-  // émoticone est un GESTE, pas du texte. Sa commande — `/!`, `/ho` — ne part
-  // d'ailleurs que seule sur sa ligne : l'insérer dans une phrase l'enverrait
-  // en toutes lettres.
+  // L'émoticone SANS NOM DE CHAT qu'il vient de choisir dans la grille, ou moins
+  // de zéro : faute de `:nom:` à écrire, elle part en GESTE du jeu, au-dessus de
+  // la tête.
   int chose_emotion = -1;
+  // Le `:nom:` d'une émoticone cliquée, à ENVOYER TOUT DE SUITE, seul sur sa
+  // ligne. Vide sinon.
+  //
+  // 🔴 SEUL SUR SA LIGNE, sans passer par la saisie : le relais Discord ne
+  // remplace le `:nom:` par son image que s'il est TOUT le message. Ce que le
+  // joueur avait tapé reste dans la saisie, intact.
+  std::string_view sent_emote_token;
   // La palette vient de se refermer après une pioche : le clavier revient à la
   // saisie, comme après un envoi.
   bool give_back_keyboard = false;
@@ -182,9 +186,8 @@ struct ChatStripAction {
   // puisse correspondre à son geste ; c'est à l'appelant de faire la conversion.
   int moved_from = -1;
   int moved_to = -1;
-  // Maj + clic sur une émoticone — ou clic, quand la palette écrit (voir
-  // `ChatEmoteClick`) : son nom `:nom:` à ÉCRIRE dans la saisie, au lieu de
-  // l'envoyer. Vide sinon.
+  // Maj + clic sur une émoticone : son nom `:nom:` à ÉCRIRE dans la saisie, au
+  // lieu de l'envoyer. Vide sinon.
   std::string_view chose_emote_token;
 };
 
@@ -292,13 +295,15 @@ void PaintEmotion(ImDrawList* into, const ChatEmotion& emotion, ImVec2 corner, f
 // une conversation 1:1. Chacune garde son `state`, et dit ce que fait le clic.
 //
 // ⚠ DANS UN BLOC DÉSACTIVÉ, le bouton se grise et ne s'ouvre plus.
+//
+// Partout, le clic ENVOIE le `:nom:` de l'émoticone et Maj + clic l'ÉCRIT dans
+// la saisie. Ce que dit le choix, c'est le sort de celles qui n'ont pas de nom.
 enum class ChatEmoteClick : std::uint8_t {
-  // Le clic ENVOIE l'émotion du jeu ; Maj + clic écrit son `:nom:`.
+  // Sans nom, le clic l'envoie en geste du jeu, au-dessus de la tête.
   kSend,
-  // Le clic ÉCRIT son `:nom:` : dans une conversation 1:1, une émotion du jeu
-  // ne serait vue que des voisins, jamais du correspondant. Celles qui n'ont
-  // pas de nom sont grisées.
-  kWrite,
+  // Sans nom, elle est grisée : dans une conversation 1:1, un geste du jeu ne
+  // serait vu que des voisins, jamais du correspondant.
+  kTokenOnly,
 };
 void DrawChatEmotePicker(ChatStripState& state, ImVec2 at, float side, ImU32 tab_color,
                          std::span<const ChatEmotion> emotions,

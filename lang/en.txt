@@ -2551,6 +2551,9 @@ tr: Not enough saved point.
 fr: Pas de nom :nom: : elle ne s'écrit pas dans la saisie.
 tr: No :name: for this one: it cannot be written in the input.
 
+fr: Pas de nom :nom: : elle part en geste, au-dessus de la tête.
+tr: No :name: for this one: it is sent as a gesture above your head.
+
 fr: Pas sur vous-même.
 tr: Not on yourself.
 

@@ -206,9 +206,9 @@ void EmotionTooltip(const ChatEmotion& shown, ChatEmoteClick click) {
     // ⚠ SANS NOM DE CHAT, ELLE NE S'ÉCRIT PAS, et l'infobulle le dit : le
     // Maj+clic ou le clic de la 1:1 ne feraient sinon rien sans explication.
     SkinTooltipFormat(":%.*s:\n%s", static_cast<int>(shown.name.size()), shown.name.data(),
-                      core::Tr("Pas de nom :nom: : elle ne s'écrit pas dans la saisie."));
-  } else if (click == ChatEmoteClick::kWrite) {
-    SkinTooltipFormat(":%.*s:", static_cast<int>(shown.chat_token.size()), shown.chat_token.data());
+                      click == ChatEmoteClick::kSend
+                          ? core::Tr("Pas de nom :nom: : elle part en geste, au-dessus de la tête.")
+                          : core::Tr("Pas de nom :nom: : elle ne s'écrit pas dans la saisie."));
   } else {
     // LE NOM QUI S'ÉCRIRA, et non celui du catalogue : c'est lui que Discord et
     // les autres clients liront.
@@ -223,13 +223,14 @@ void EmotionTooltip(const ChatEmotion& shown, ChatEmoteClick click) {
 
 // L'ONGLET DES ÉMOTICONES.
 //
-// `kSend` : un clic ENVOIE, et referme. ⚠ MAJ + CLIC L'ÉCRIT AU LIEU DE
-// L'ENVOYER — son nom `:nom:`, que Discord et les autres clients savent montrer
-// — et la palette RESTE OUVERTE, comme pour un emoji : c'est du texte qu'on pose
-// dans une phrase. Sans nom, le Maj+clic ne fait rien : envoyer serait le
-// contraire de ce qu'il demande.
+// Un clic ENVOIE son `:nom:` au chat, seul sur sa ligne, et referme : le fil le
+// peint en image chez tous ceux qui le lisent, Discord compris. ⚠ MAJ + CLIC
+// L'ÉCRIT AU LIEU DE L'ENVOYER, et la palette RESTE OUVERTE, comme pour un
+// emoji : c'est du texte qu'on pose dans une phrase. Sans nom, le Maj+clic ne
+// fait rien : envoyer serait le contraire de ce qu'il demande.
 //
-// `kWrite` : tout clic ÉCRIT, et celles qui n'ont pas de nom sont grisées.
+// Sans nom, le simple clic suit `click` : geste du jeu (`kSend`), ou case
+// grisée (`kTokenOnly`).
 void DrawEmotionTab(std::span<const ChatEmotion> emotions, ChatEmoteClick click,
                     ChatStripAction* asked, bool* picked) {
   const float cell = EmotionCellSide();
@@ -246,7 +247,7 @@ void DrawEmotionTab(std::span<const ChatEmotion> emotions, ChatEmoteClick click,
     }
     ImGui::PushID(shown.id);
     const bool writable = !shown.chat_token.empty();
-    const bool greyed = click == ChatEmoteClick::kWrite && !writable;
+    const bool greyed = click == ChatEmoteClick::kTokenOnly && !writable;
     const ImVec2 corner = ImGui::GetCursorScreenPos();
     ImGui::BeginDisabled(greyed);
     const bool chosen = ImGui::InvisibleButton("##emote", ImVec2(cell, cell));
@@ -260,13 +261,16 @@ void DrawEmotionTab(std::span<const ChatEmotion> emotions, ChatEmoteClick click,
       grid->AddRect(corner, far, HoveredCellEdge());
       EmotionTooltip(shown, click);
     }
-    const bool writes = click == ChatEmoteClick::kWrite || ImGui::GetIO().KeyShift;
-    if (chosen && writes) {
-      if (writable) {
-        asked->chose_emote_token = shown.chat_token;
-        *picked = true;
-      }
-    } else if (chosen) {
+    if (chosen && writable && ImGui::GetIO().KeyShift) {
+      asked->chose_emote_token = shown.chat_token;
+      *picked = true;
+    } else if (chosen && writable) {
+      asked->sent_emote_token = shown.chat_token;
+      // C'est un envoi, pas une pioche : la palette se referme, et le clavier
+      // revient à la saisie comme après une ligne validée.
+      *picked = true;
+      ImGui::CloseCurrentPopup();
+    } else if (chosen && !ImGui::GetIO().KeyShift) {
       // 🔴 LE NUMÉRO, PAS LE RANG. La grille saute ce que le jeu se
       // réserve ; prendre la position de la case ferait envoyer la voisine.
       asked->chose_emotion = shown.id;

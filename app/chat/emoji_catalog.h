@@ -3,6 +3,8 @@
 #include <span>
 #include <string_view>
 
+#include "ro/ui/chat_strip.h"
+
 namespace moonclient {
 
 // LA PALETTE D'EMOJI UNICODE.
@@ -21,16 +23,20 @@ namespace moonclient {
 // distincts au clic — l'émoticone S'ENVOIE seule, l'emoji S'INSÈRE dans la
 // phrase qu'on est en train d'écrire.
 
-// Un groupe montré d'un bloc, avec son intertitre.
+// Un groupe montré d'un bloc, avec son intertitre DÉJÀ TRADUIT.
 //
-// ⚠ `label` EST EN FRANÇAIS NU : c'est l'appelant qui le traduit au moment de
-// l'afficher. L'envelopper ici le traduirait DEUX fois, et le catalogue se
-// remplirait de textes déjà traduits dont on chercherait longtemps l'origine.
+// ⚠ `label` NE VIT QUE JUSQU'AU PROCHAIN CHANGEMENT DE LANGUE : c'est le
+// pointeur que rend `Tr`, et il appartient au catalogue.
 struct EmojiCategory {
   std::string_view label;
   std::span<const std::string_view> items;
 };
 
 [[nodiscard]] std::span<const EmojiCategory> EmojiCategories();
+
+// Reprend les intertitres de groupes remplis par `EmojiCategories()`, dans le
+// même ordre. À appeler à chaque image : gardé d'une image à l'autre, un
+// intertitre pointerait dans un catalogue de langue déjà remplacé.
+void RelabelEmojiGroups(std::span<ro::ui::ChatEmojiGroup> groups);
 
 }  // namespace moonclient

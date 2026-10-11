@@ -297,6 +297,20 @@ void Game::SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms) 
       chat_preview_.NoteWhisper(ro::net::ReadChatIntent(*ask.asked.said, armed_chat_).recipient);
     }
   }
+  // L'ÉMOTICONE CLIQUÉE part en `:nom:`, seule sur sa ligne, par le mode armé.
+  // ⚠ SANS LES LIENS POSÉS : ils appartiennent à la phrase qui attend dans la
+  // saisie, et régler celle-ci les effacerait.
+  for (const UiStage::ChatWindowAsk& ask : answers.chat) {
+    if (ask.asked.sent_emote.empty()) {
+      continue;
+    }
+    SettledChatLine settled =
+        SettleChatLine(ask.asked.sent_emote, windows_.chat.main.input, nullptr,
+                       WireSpeakerOf(world_, chat_preview_), armed_chat_);
+    if (settled.outgoing.has_value()) {
+      SubmitChat(*chat_dispatch_, *settled.outgoing, now_ms);
+    }
+  }
 }
 
 void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_ms) {
@@ -337,9 +351,8 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
     // ⚠ LE MODE S'ARME APRÈS L'ENVOI, et jamais avant : choisir une destination
     // ne doit pas changer où part la phrase qu'on vient de valider dans la même
     // image.
-    // L'émoticone choisie part TOUT DE SUITE, sans passer par la saisie : c'est
-    // un geste, pas du texte — et sa commande ne partirait pas insérée dans une
-    // phrase (`EmotionCommand` ne reconnaît qu'une ligne entière).
+    // L'émoticone SANS NOM DE CHAT part TOUT DE SUITE en geste du jeu : elle
+    // n'a pas de `:nom:` que le fil saurait peindre.
     if (ask.asked.chose_emotion >= 0 && link_.is_open()) {
       ReportRefusal(
           ro::net::RequestEmotion(link_, static_cast<std::uint16_t>(ask.asked.chose_emotion)));

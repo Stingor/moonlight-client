@@ -323,6 +323,9 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
   }
   // L'émoticone choisie remonte telle quelle : `ui` ne sait pas l'envoyer.
   asked.chose_emotion = strip.chose_emotion;
+  if (!strip.sent_emote_token.empty()) {
+    asked.sent_emote = EmoteTokenText(strip.sent_emote_token);
+  }
   if (strip.toggled_search) {
     state.searching = !state.searching;
     // Replier la recherche rend le fil à son allure : laisser le texte nu

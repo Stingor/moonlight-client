@@ -78,13 +78,20 @@ void ReloadField(ImGuiID field) {
   }
 }
 
-// CE QUE LA PALETTE A RENDU : l'emoji et le `:nom:` s'écrivent dans la saisie,
-// et le clavier revient au champ quand elle se referme.
+// CE QUE LA PALETTE A RENDU : le `:nom:` cliqué part au correspondant, l'emoji et
+// le `:nom:` pris au Maj+clic s'écrivent dans la saisie, et le clavier revient
+// au champ quand elle se referme.
 //
 // 🔴 RIEN NE PART COMME ÉMOTION DU JEU : celle-ci se joue au-dessus de la tête,
-// sur la carte, et seuls les voisins la verraient — jamais le correspondant.
-// La palette de la 1:1 écrit donc le `:nom:` (voir `ChatEmoteClick::kWrite`).
-void TakePicked(WhisperWindowState& state, const ChatStripAction& picked) {
+// sur la carte, et seuls les voisins la verraient — jamais le correspondant
+// (voir `ChatEmoteClick::kTokenOnly`).
+void TakePicked(WhisperWindowState& state, const ChatStripAction& picked,
+                WhisperWindowAction& action) {
+  // ⚠ PAS SI UNE LIGNE PART DÉJÀ À CETTE IMAGE : Entrée et le clic ne tombent
+  // pas dans la même, mais la phrase tapée passerait avant tout.
+  if (!picked.sent_emote_token.empty() && !action.said.has_value()) {
+    action.said = EmoteTokenText(picked.sent_emote_token);
+  }
   if (!picked.chose_emoji.empty()) {
     static_cast<void>(AppendPickedToChatInput(state.input, picked.chose_emoji));
   }
@@ -153,8 +160,9 @@ void DrawInputRow(WhisperWindowState& state, const WhisperWindowView& view,
   if (picker) {
     ChatStripAction picked;
     DrawChatEmotePicker(state.picker, ImVec2(field_at.x + field_width + spacing, field_at.y), side,
-                        kChatTabColor, view.emotions, view.emojis, &picked, ChatEmoteClick::kWrite);
-    TakePicked(state, picked);
+                        kChatTabColor, view.emotions, view.emojis, &picked,
+                        ChatEmoteClick::kTokenOnly);
+    TakePicked(state, picked, action);
   }
 }
 

@@ -2551,6 +2551,9 @@ tr: No hay suficientes puntos de conservación.
 fr: Pas de nom :nom: : elle ne s'écrit pas dans la saisie.
 tr: Sin nombre :nombre:: no se puede escribir en el campo.
 
+fr: Pas de nom :nom: : elle part en geste, au-dessus de la tête.
+tr: Sin nombre :nombre:: se envía como gesto sobre tu cabeza.
+
 fr: Pas sur vous-même.
 tr: No sobre ti mismo.
 

@@ -28,6 +28,7 @@
 #include "character/staff_view.h"
 #include "character/stat_bar_values.h"
 #include "chat/chat_setting_link.h"
+#include "chat/emoji_catalog.h"
 #include "game/battleground_stage.h"
 #include "game/bug_report_context.h"
 #include "game/connected_session.h"
@@ -542,6 +543,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // compétence des deux compagnons.
   companion_tabs.homunculus.staff_allowed = Rights().staff_tools;
   companion_tabs.mercenary.staff_allowed = Rights().staff_tools;
+  RelabelEmojiGroups(emojis_);
   ListUnlockedHudShown(settings_->options(), windows_, windows_.unlocked_hud);
   interface_->SetSkinLook(settings_->options().pages().skin_look.look());
   const UiStage::Answers answers = interface_->Draw(

@@ -267,4 +267,11 @@ std::span<const EmojiCategory> EmojiCategories() {
   return shown;
 }
 
+void RelabelEmojiGroups(std::span<ro::ui::ChatEmojiGroup> groups) {
+  const std::span<const EmojiCategory> categories = EmojiCategories();
+  for (std::size_t group = 0; group < groups.size() && group < categories.size(); ++group) {
+    groups[group].label = categories[group].label;
+  }
+}
+
 }  // namespace moonclient
