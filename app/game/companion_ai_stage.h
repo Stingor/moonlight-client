@@ -26,6 +26,7 @@
 #include "ro/ui/companion_tactic_window.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/job_names.h"
+#include "ro/vfs/monster_list.h"
 #include "ro/vfs/status_table.h"
 
 #include "game/companion_ai_editor.h"
@@ -72,6 +73,9 @@ struct CompanionAiWindowBooks {
   const ro::vfs::StatusTable* statuses = nullptr;
   const ro::vfs::ItemWords* words = nullptr;
   const ro::sim::MonsterSheetBook* monster_sheets = nullptr;
+  // Les monstres que le serveur connaît, que la liste « Monstre de la cible »
+  // propose après ceux des tactiques et ceux en vue.
+  const ro::vfs::MonsterList* monster_list = nullptr;
   // Les noms des classes de joueur, que les conduites désignent.
   const ro::vfs::JobNames* job_names = nullptr;
 };
@@ -377,6 +381,10 @@ class CompanionAiStage {
   // table qui les a donnés.
   std::vector<std::uint16_t> status_ids_;
   std::size_t status_table_size_ = 0;
+  // Les monstres de la table du serveur, par nom, et la table qui les a donnés.
+  std::vector<std::uint16_t> listed_monsters_;
+  const ro::vfs::MonsterListEntry* listed_from_ = nullptr;
+  std::size_t listed_count_ = 0;
   std::string window_companion_name_;
   // L'EN-TÊTE DES PROFILS ET L'ONGLET « JOUEURS », refaits à chaque image ; les
   // sources d'import, quand elles sont périmées.

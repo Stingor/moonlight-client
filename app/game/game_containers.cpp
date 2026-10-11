@@ -79,6 +79,7 @@ void Game::StageContainers() {
           .statuses = &pieces_.status_table,
           .words = &pieces_.item_words,
           .monster_sheets = monster_sheet_.has_value() ? &monster_sheet_->book() : nullptr,
+          .monster_list = &pieces_.monster_list,
           .job_names = &pieces_.job_names},
       windows_.companion_ai, windows_.companion_ai_view);
   // Le droit du staff, relu à chaque image : l'identifiant d'un skill au survol.

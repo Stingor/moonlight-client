@@ -4,11 +4,15 @@
 
 #include <algorithm>
 #include <cstring>
+#include <span>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 #include <imgui.h>
 
+#include "ro/core/case_fold.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -36,6 +40,15 @@ constexpr int kTypedFastStep = 10;
 // La largeur des listes de l'éditeur, en pixels de police.
 constexpr float kComboPixels = 220.0F;
 constexpr float kNumberPixels = 140.0F;
+// À partir de ce nombre de choix, une liste s'ouvre sur sa recherche.
+constexpr std::size_t kSearchedChoicesLeast = 16;
+// La largeur d'une liste à recherche, en pixels de police : un nom et ce qui
+// aide à le choisir.
+constexpr float kSearchedListPixels = 380.0F;
+// Les lignes visibles d'une liste à recherche, et la demi-ligne qui montre
+// qu'elle continue.
+constexpr std::size_t kSearchedRowsShown = 14;
+constexpr float kSearchedRowsMargin = 0.5F;
 
 [[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
@@ -155,28 +168,88 @@ void FitRuleAction(RuleFields& rule, const RuleActionKind& kind, const RuleVocab
   rule.step_cells = kind.needs_step ? std::clamp(rule.step_cells, 1, vocabulary.step_most) : 0;
 }
 
+bool RuleChoiceMatches(const RuleChoice& choice, std::string_view typed) {
+  if (typed.empty()) {
+    return true;
+  }
+  const std::string needle = core::CaseFolded(typed);
+  return core::CaseFolded(choice.label).find(needle) != std::string::npos ||
+         std::to_string(choice.value).find(needle) != std::string::npos;
+}
+
 }  // namespace ro::ui
 
 namespace ro::ui::companion_ai_parts {
 namespace {
 
+// UN CHOIX DE LA LISTE OUVERTE, et ce qui aide à le choisir en retrait. Rend
+// vrai quand il vient d'être pris.
+[[nodiscard]] bool ChoiceRow(const RuleChoice& one, std::size_t index, int* value) {
+  bool changed = false;
+  ImGui::PushID(static_cast<int>(index));
+  if (ImGui::Selectable(one.label.c_str(), one.value == *value) && one.value != *value) {
+    *value = one.value;
+    changed = true;
+  }
+  if (!one.detail.empty()) {
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", one.detail.c_str());
+  }
+  ImGui::PopID();
+  return changed;
+}
+
 // UNE LISTE DE CHOIX. Rend vrai quand la valeur a changé.
+//
+// UNE LONGUE LISTE S'OUVRE SUR UN CHAMP DE RECHERCHE, vidé à chaque ouverture,
+// et ne dessine que les lignes visibles : celle des monstres du serveur en
+// compte des milliers. `filter` vide : pas de recherche.
 [[nodiscard]] bool ChoiceCombo(const char* id, int* value, std::span<const RuleChoice> choices,
-                               const SkinArt& art) {
+                               const SkinArt& art, std::span<char> filter = {}) {
   bool changed = false;
   ImGui::SetNextItemWidth(Px(kComboPixels));
-  if (BeginSkinCombo(id, LabelOf(choices, *value), art)) {
+  if (!BeginSkinCombo(id, LabelOf(choices, *value), art)) {
+    return false;
+  }
+  if (filter.empty() || choices.size() < kSearchedChoicesLeast) {
     for (std::size_t index = 0; index < choices.size(); ++index) {
-      const RuleChoice& one = choices[index];
-      ImGui::PushID(static_cast<int>(index));
-      if (ImGui::Selectable(one.label.c_str(), one.value == *value) && one.value != *value) {
-        *value = one.value;
-        changed = true;
-      }
-      ImGui::PopID();
+      changed |= ChoiceRow(choices[index], index, value);
     }
     EndSkinCombo();
+    return changed;
   }
+  if (ImGui::IsWindowAppearing()) {
+    filter.front() = '\0';
+    ImGui::SetKeyboardFocusHere();
+  }
+  ImGui::SetNextItemWidth(Px(kSearchedListPixels));
+  ImGui::InputTextWithHint("##recherche", core::Tr("Rechercher..."), filter.data(), filter.size());
+  const std::string_view typed(filter.data());
+  std::vector<std::size_t> kept;
+  kept.reserve(choices.size());
+  for (std::size_t index = 0; index < choices.size(); ++index) {
+    if (RuleChoiceMatches(choices[index], typed)) {
+      kept.push_back(index);
+    }
+  }
+  const float rows_shown =
+      static_cast<float>(std::min(kept.size(), kSearchedRowsShown)) + kSearchedRowsMargin;
+  if (ImGui::BeginChild("##choix", ImVec2(Px(kSearchedListPixels),
+                                          rows_shown * ImGui::GetTextLineHeightWithSpacing()))) {
+    ImGuiListClipper clipper;
+    clipper.Begin(static_cast<int>(kept.size()));
+    while (clipper.Step()) {
+      for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row) {
+        const std::size_t index = kept[static_cast<std::size_t>(row)];
+        if (ChoiceRow(choices[index], index, value)) {
+          changed = true;
+          ImGui::CloseCurrentPopup();
+        }
+      }
+    }
+  }
+  ImGui::EndChild();
+  EndSkinCombo();
   return changed;
 }
 
@@ -196,7 +269,7 @@ namespace {
 }
 
 [[nodiscard]] bool DrawCondition(RuleConditionFields& condition, const RuleVocabulary& vocabulary,
-                                 const SkinArt& art) {
+                                 const SkinArt& art, std::span<char> filter) {
   bool changed = false;
   const RuleConditionKind* kind = KindOf(condition, vocabulary);
   ImGui::SetNextItemWidth(Px(kComboPixels));
@@ -226,7 +299,7 @@ namespace {
   }
   if (kind->list != RuleListField::kNone) {
     int* listed = kind->list == RuleListField::kId ? &condition.id : &condition.choice;
-    changed |= ChoiceCombo("##list", listed, kind->choices, art);
+    changed |= ChoiceCombo("##list", listed, kind->choices, art, filter);
   }
   for (std::size_t index = 0; index < kind->numbers.size(); ++index) {
     const RuleNumberSlot& slot = kind->numbers[index];
@@ -317,7 +390,7 @@ namespace {
 
 // L'ÉDITEUR D'UNE RÈGLE DÉPLIÉE. Rend vrai quand elle a changé.
 [[nodiscard]] bool DrawRuleEditor(RuleFields& rule, const RuleVocabulary& vocabulary,
-                                  const SkinArt& art) {
+                                  const SkinArt& art, std::span<char> filter) {
   bool changed = false;
   ImGui::SeparatorText(core::Tr("Si"));
   std::size_t removed = rule.conditions.size();
@@ -326,7 +399,7 @@ namespace {
     if (index > 0) {
       ImGui::TextDisabled("%s", core::Tr("et"));
     }
-    changed |= DrawCondition(rule.conditions[index], vocabulary, art);
+    changed |= DrawCondition(rule.conditions[index], vocabulary, art, filter);
     if (rule.conditions.size() > 1 && SkinSmallButton(core::Tr("Retirer la condition"), art)) {
       removed = index;
     }
@@ -417,7 +490,7 @@ void DrawRulesSection(CompanionAiWindowState& state, const CompanionAiView& view
     if (state.expanded_rule == static_cast<int>(index)) {
       ImGui::Indent();
       RuleFields fields = row.fields;
-      if (DrawRuleEditor(fields, view.vocabulary, art)) {
+      if (DrawRuleEditor(fields, view.vocabulary, art, state.list_filter)) {
         action.verb = CompanionAiVerb::kEditRule;
         action.index = index;
         action.rule = std::move(fields);

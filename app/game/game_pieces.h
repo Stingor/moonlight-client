@@ -35,6 +35,7 @@
 #include "ro/vfs/job_names.h"
 #include "ro/vfs/kafra_move_maps.h"
 #include "ro/vfs/map_display_names.h"
+#include "ro/vfs/monster_list.h"
 #include "ro/vfs/package_items.h"
 #include "ro/vfs/random_option_names.h"
 #include "ro/vfs/skill_words.h"
@@ -382,6 +383,9 @@ struct GamePieces {
   // « @item » du staff ; le poids et le drapeau de buying store, qui laissent
   // les commerces refuser avant le serveur. Inconnue quand la table manque.
   ro::vfs::ItemProperties item_properties;
+  // LES MONSTRES QUE LE SERVEUR CONNAÎT, que la liste « Monstre de la cible »
+  // de l'IA des compagnons propose. Inconnue quand la table manque.
+  ro::vfs::MonsterList monster_list;
   // LES LIBELLÉS DES OPTIONS ALÉATOIRES, que la description écrit sous l'objet.
   ro::vfs::RandomOptionNames random_option_names;
   // LES ITEMS QUI SONT DES LIVRES, que « Lire » ouvre.

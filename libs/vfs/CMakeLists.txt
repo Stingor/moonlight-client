@@ -36,6 +36,7 @@ add_library(ro_vfs STATIC
     src/pet_tables.cpp
     src/random_option_names.cpp
     src/books.cpp
+    src/monster_list.cpp
     src/monster_size_effects.cpp
     src/monster_words.cpp
     src/res_name_table.cpp

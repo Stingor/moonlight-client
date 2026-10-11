@@ -348,6 +348,7 @@ add_library(moonclient_companionai STATIC
     game/companion_ai_window_compose.cpp
     game/companion_ai_profile_yaml.cpp
     game/companion_ai_settings_yaml.cpp
+    game/companion_rule_monsters.cpp
     game/companion_rule_words.cpp
     game/companion_tactic_fields.cpp
     game/companion_target_marks.cpp)

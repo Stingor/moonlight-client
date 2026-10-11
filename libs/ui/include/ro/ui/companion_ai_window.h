@@ -43,6 +43,9 @@ inline constexpr int kCompanionAiRuleDelayMostMs = 3600000;
 inline constexpr int kCompanionAiPerTargetMost = 99;
 // Un nom de personnage du serveur et son terminateur.
 inline constexpr std::size_t kCompanionAiFriendNameBytes = 24;
+// Ce qu'on tape pour chercher dans une longue liste d'une règle, terminateur
+// compris.
+inline constexpr std::size_t kCompanionAiListFilterBytes = 64;
 
 // LES RANGS DES LISTES DE LA FENÊTRE, dans l'ordre où `app` les numérote.
 inline constexpr int kTacticRankChoices = 7;
@@ -137,6 +140,9 @@ struct TacticRowView {
 struct RuleChoice {
   int value = 0;
   std::string label;
+  // Ce qui aide à choisir, déjà traduit, montré en retrait après le libellé :
+  // le niveau, la race, l'élément d'un monstre… Vide sans rien.
+  std::string detail;
 };
 
 // LE CHAMP NUMÉRIQUE QU'UNE CONDITION REMPLIT.
@@ -405,6 +411,9 @@ struct CompanionAiWindowState {
   int import_choice = 0;
   int expanded_conduct = -1;
   int conduct_job_choice = 0;
+  // CE QU'ON CHERCHE dans la liste d'une règle ouverte : une seule s'ouvre à la
+  // fois, et chacune repart d'un champ vide.
+  std::array<char, kCompanionAiListFilterBytes> list_filter{};
 };
 
 // LE COMPAGNON DE L'ONGLET CHANGE, ou la fenêtre se ferme : tout ce qui est
@@ -488,6 +497,11 @@ void FitRuleCondition(RuleConditionFields& condition, const RuleConditionKind& k
 // L'ACTION RAMENÉE DANS SA SORTE : un skill possédé et un niveau appris, une
 // cible d'action permise (la première, sans cible), un pas dans ses bornes.
 void FitRuleAction(RuleFields& rule, const RuleActionKind& kind, const RuleVocabulary& vocabulary);
+
+// UN CHOIX QUE LA RECHERCHE GARDE : son libellé contient le texte tapé, à la
+// casse près, ou son identifiant l'écrit — « 103 » trouve 1039 comme 21039.
+// Rien de tapé garde tout.
+[[nodiscard]] bool RuleChoiceMatches(const RuleChoice& choice, std::string_view typed);
 
 // UN NOM DE PERSONNAGE TAPÉ, sans les espaces qui l'entourent ; vide s'il n'en
 // reste rien.

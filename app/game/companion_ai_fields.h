@@ -55,6 +55,9 @@ struct RuleNames {
   std::function<std::string(std::uint16_t)> skill;
   std::function<std::string(std::uint16_t)> status;
   std::function<std::string(std::uint16_t)> monster;
+  // Ce qui aide à choisir un monstre dans une liste, vide quand on n'en sait
+  // rien ; nul, aucune liste ne le dit.
+  std::function<std::string(std::uint16_t)> monster_detail;
   std::function<std::string(int)> race;
   std::function<std::string(int)> element;
   std::function<std::string(int)> size;

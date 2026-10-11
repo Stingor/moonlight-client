@@ -436,8 +436,15 @@ bool RuleVocabularyStore::Build(std::span<const RuleSkillFact> skills,
     AddNamed(statuses_, seen_statuses, status, names.status);
   }
   monsters_.clear();
-  for (const std::uint16_t monster : monsters) {
+  const auto add_monster = [this, &seen_monsters, &names](std::uint16_t monster) {
+    const std::size_t before = monsters_.size();
     AddNamed(monsters_, seen_monsters, monster, names.monster);
+    if (monsters_.size() > before && names.monster_detail) {
+      monsters_.back().detail = names.monster_detail(monster);
+    }
+  };
+  for (const std::uint16_t monster : monsters) {
+    add_monster(monster);
   }
   cast_skills_.clear();
   skills_.clear();
@@ -461,7 +468,7 @@ bool RuleVocabularyStore::Build(std::span<const RuleSkillFact> skills,
       if (condition.predicate == RulePredicate::kHasStatus) {
         AddNamed(statuses_, seen_statuses, condition.id, names.status);
       } else if (condition.predicate == RulePredicate::kMonsterJob) {
-        AddNamed(monsters_, seen_monsters, condition.id, names.monster);
+        add_monster(condition.id);
       } else if (condition.predicate == RulePredicate::kCastWithin) {
         AddNamed(cast_skills_, seen_skills, condition.id, names.skill);
       }

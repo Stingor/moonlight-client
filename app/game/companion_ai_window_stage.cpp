@@ -8,6 +8,7 @@
 #include <limits>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -22,6 +23,7 @@
 #include "game/companion_ai_editor.h"
 #include "game/companion_ai_names.h"
 #include "game/companion_ai_stage.h"
+#include "game/companion_rule_monsters.h"
 #include "game/companion_tactic_fields.h"
 #include "game/homunculus_stage.h"
 #include "game/mercenary_stage.h"
@@ -72,9 +74,10 @@ struct OwnSkill {
 }
 
 // LE NOM D'UNE CLASSE DE MONSTRE : celui d'un exemplaire en vue, sinon celui de
-// sa fiche, sinon son numéro.
+// sa fiche, sinon celui de la table du serveur, sinon son numéro.
 [[nodiscard]] std::string MonsterName(const std::map<std::uint16_t, std::string>& visible,
-                                      const ro::sim::MonsterSheetBook* sheets, std::uint16_t job) {
+                                      const ro::sim::MonsterSheetBook* sheets,
+                                      const ro::vfs::MonsterList* listed, std::uint16_t job) {
   if (const auto seen = visible.find(job); seen != visible.end()) {
     return seen->second;
   }
@@ -82,6 +85,12 @@ struct OwnSkill {
     if (const ro::sim::MonsterSheet* sheet = sheets->Find(job);
         sheet != nullptr && !sheet->name.empty()) {
       return sheet->name;
+    }
+  }
+  if (listed != nullptr) {
+    if (const ro::vfs::MonsterListEntry* entry = listed->Find(job);
+        entry != nullptr && !entry->name.empty()) {
+      return entry->name;
     }
   }
   std::array<char, kNameBytes> name{};
@@ -173,7 +182,12 @@ void CompanionAiStage::StageAiWindow(const HomunculusStage& homunculus,
     return named.empty() ? std::to_string(status) : std::string(named);
   };
   names.monster = [this, &books](std::uint16_t monster_job) {
-    return MonsterName(visible_monsters_, books.monster_sheets, monster_job);
+    return MonsterName(visible_monsters_, books.monster_sheets, books.monster_list, monster_job);
+  };
+  names.monster_detail = [&books, &names](std::uint16_t monster_job) {
+    const ro::vfs::MonsterListEntry* entry =
+        books.monster_list != nullptr ? books.monster_list->Find(monster_job) : nullptr;
+    return entry != nullptr ? MonsterListDetail(*entry, names) : std::string();
   };
   if (books.words != nullptr) {
     names.race = [&books](int race) {
@@ -247,6 +261,18 @@ void CompanionAiStage::StageAiWindow(const HomunculusStage& homunculus,
       monster_jobs.push_back(monster_job);
     }
   }
+  // Puis tous ceux que le serveur connaît, par nom, triés une fois par table ;
+  // le vocabulaire écarte ceux déjà proposés.
+  const std::span<const ro::vfs::MonsterListEntry> listed =
+      books.monster_list != nullptr ? books.monster_list->entries()
+                                    : std::span<const ro::vfs::MonsterListEntry>();
+  if (listed.data() != listed_from_ || listed.size() != listed_count_) {
+    listed_from_ = listed.data();
+    listed_count_ = listed.size();
+    listed_monsters_ = books.monster_list != nullptr ? MonstersByName(*books.monster_list)
+                                                     : std::vector<std::uint16_t>();
+  }
+  monster_jobs.insert(monster_jobs.end(), listed_monsters_.begin(), listed_monsters_.end());
 
   // ── RÈGLES ──
   std::vector<RuleSkillFact> rule_skills;

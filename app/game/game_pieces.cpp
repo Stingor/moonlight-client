@@ -81,6 +81,18 @@ void LoadItemProperties(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.item_properties = std::move(*properties);
 }
 
+// LES MONSTRES DU SERVEUR. Absente ou illisible, la table reste inconnue : les
+// listes de monstres ne proposent que ceux que le client a vus.
+void LoadMonsterList(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  auto monsters = ro::vfs::ReadMonsterList(vfs);
+  if (!monsters) {
+    ro::core::LogWarning("liste des monstres : {} — seuls les monstres vus seront proposés",
+                         ro::core::Describe(monsters.error()));
+    return;
+  }
+  pieces.monster_list = std::move(*monsters);
+}
+
 // LES LIBELLÉS DES OPTIONS ALÉATOIRES. Absents, une option s'écrit par son
 // numéro et sa valeur.
 void LoadRandomOptionNames(ro::vfs::Vfs& vfs, GamePieces& pieces) {
@@ -692,6 +704,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   LoadItemWords(vfs, pieces);
   LoadPackageItems(vfs, pieces);
   LoadItemProperties(vfs, pieces);
+  LoadMonsterList(vfs, pieces);
   LoadRandomOptionNames(vfs, pieces);
   LoadBooks(vfs, pieces);
   // ⚠ APRÈS LES MOTS ET LA GARDE-ROBE : il les DÉSIGNE tous les deux.
