@@ -31,6 +31,7 @@
 #include "game/game.h"
 #include "world/blocked_npcs.h"
 #include "world/click_action.h"
+#include "world/follow_action.h"
 #include "world/overlay_view.h"
 
 namespace moonclient {
@@ -291,6 +292,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   facts.friends_full = friends_.full();
   facts.whisper_blocked = pieces_.whispers.blocks().Blocks(actor.name);
   facts.dealing = pieces_.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
+  facts.followed = world_mouse_.follow.followed_id == actor.id;
   facts.npc_blocked = page.blocked().Has(actor.id);
   facts.pet_has_accessory = pieces_.pet.has_accessory();
   if (const char* refusal = pieces_.pet.FeedRefusal(); refusal != nullptr) {
@@ -462,6 +464,15 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
         item_description_->SetAutoloot(link_, menu_target_.item_id,
                                        verb == EntityVerb::kAutolootAdd);
       }
+      return;
+    case EntityVerb::kFollow:
+      // La même garde de poids que Maj + clic droit : voir `StartFollowing`.
+      if (actor != nullptr) {
+        static_cast<void>(StartFollowing(world_mouse_.follow, world_, *actor, now_ms));
+      }
+      return;
+    case EntityVerb::kUnfollow:
+      StopFollowing(world_mouse_.follow, world_, FollowEnd::kLetGo, now_ms);
       return;
     case EntityVerb::kWhisperWindow:
       // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant, et prend

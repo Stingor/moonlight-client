@@ -63,6 +63,7 @@
 #include "items/warp_memo_report.h"
 #include "world/attack_intent.h"
 #include "world/click_action.h"
+#include "world/follow_action.h"
 #include "world/monster_auras.h"
 
 namespace moonclient {
@@ -611,6 +612,19 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // Voir `ro/sim/pending_action.h`.
   if (link_.is_open()) {
     grimoire_.AdvancePending(link_, world_, planner_, PlannedMapOf(*stage_), now_ms);
+    // LE SUIVI D'UN JOUEUR, au même tour : voir `world/follow_rules.h`.
+    TickFollow(world_mouse_.follow,
+               {.link = &link_,
+                .world = &world_,
+                .planner = &planner_,
+                .walk = PlannedMapOf(*stage_),
+                .walk_clock = &grimoire_.approach_clock(),
+                .deferred_walk = &world_mouse_.deferred_walk,
+                .player_gesture = scene_actors_.player_gesture,
+                .entity_menu = &windows_.entity_menu.state,
+                .in_chat_room = pieces_.chat_rooms.room().in_room(),
+                .left_held = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_LMASK) != 0,
+                .now_ms = now_ms});
   }
   // L'IA DES COMPAGNONS, après le changement de carte qu'elle doit voir.
   const CompanionAiBooks companion_books{

@@ -22,6 +22,7 @@
 #include "world/click_rules.h"
 #include "world/deferred_walk.h"
 #include "world/entity_menu.h"
+#include "world/follow_rules.h"
 #include "world/map_stage.h"
 #include "world/mouse_engagement.h"
 #include "world/overlay_view.h"
@@ -85,6 +86,19 @@ inline constexpr std::uint32_t kTurnRepeatMs = 100;
 // Écrit la raison d'une demande qui n'a pas pu partir. Il n'y en a qu'une :
 // une disposition de paquet qui ne s'accorde plus avec le serveur.
 void ReportRefusal(const ro::core::Result<void>& sent);
+
+// LA GARDE DE POIDS, jouée : au-delà de 90 % du poids maximum, la conversation
+// dit le refus, et l'ordre d'action sur une entité — attaque, compétence
+// visée, suivi — est abandonné. `skill_id` : la compétence armée, zéro pour les
+// autres. Rend vrai si l'ordre part. Voir `WeightGuardOf`.
+[[nodiscard]] bool PassesWeightGuard(ro::sim::World& world, std::uint16_t skill_id,
+                                     std::uint32_t now_ms);
+
+// UNE COMPÉTENCE VISÉE SUR UNE ENTITÉ PART-ELLE ? La garde de poids, puis la
+// posture du personnage (`TakesSkillOrder`). Refusée, rien ne part : à
+// l'appelant de désarmer la visée, comme après un lancer.
+[[nodiscard]] bool SkillOnActorPasses(ro::sim::World& world, std::uint16_t skill_id,
+                                      std::uint32_t now_ms);
 
 // Vrai si un acteur PREND le clic ; faux s'il le laisse descendre au SOL.
 //
@@ -301,6 +315,8 @@ struct WorldMouse {
   std::optional<glm::vec2> right_pressed_at;
   // Le double-clic du bouton gauche : voir `DoubleClickClock`.
   DoubleClickClock double_click;
+  // Le joueur que le personnage suit : voir `world/follow_rules.h`.
+  FollowState follow;
 };
 
 // Ce qu'un clic gauche déclenche, dans l'ordre où le jeu tranche.

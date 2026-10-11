@@ -73,7 +73,12 @@ void Game::AdvanceTargeting(std::uint32_t now_ms) {
   if (clicked != 0 && settings.enabled && settings.proxy_click) {
     if (const ro::sim::Actor* target = world_.Find(clicked); target != nullptr) {
       if (grimoire_.aim() == SkillAim::kTarget) {
-        static_cast<void>(grimoire_.ReleaseOnActor(*target));
+        // Refusée, la visée se désarme sans rien lancer : voir `SkillOnActorPasses`.
+        if (SkillOnActorPasses(world_, grimoire_.armed()->id, now_ms)) {
+          static_cast<void>(grimoire_.ReleaseOnActor(*target));
+        } else {
+          grimoire_.Disarm();
+        }
       } else if (grimoire_.aim() == SkillAim::kNothing) {
         // Sur un cadre, un seul clic attaque : la cible est déjà désignée, il
         // n'y a aucune ambiguïté à lever.
@@ -124,6 +129,9 @@ void Game::EngageTargetAttack(const ro::sim::Actor& target, bool continuous, std
   // aussitôt, et laisse partir le coup — une fois, ou sans fin.
   targeting_.NoteExplicitAttack(target.id, !continuous);
   if (targeting_.SuppressClickEngage(/*skill_armed=*/false)) {
+    return;
+  }
+  if (!PassesWeightGuard(world_, 0, now_ms)) {
     return;
   }
   pickup_.reset();
@@ -272,8 +280,10 @@ void Game::DrawSelectionMarker(std::uint32_t now_ms) {
     SkipSettle(engagement, PointerPx{mouse_.x, mouse_.y});
   }
   if (!route.frozen) {
-    PlaceSelectionMarker(UnderTargetingMode(NativeMarkerCall(engagement, world_), hud_marked),
-                         now_ms);
+    PlaceSelectionMarker(
+        UnderTargetingMode(NativeMarkerCall(engagement, world_, world_mouse_.follow.followed_id),
+                           hud_marked),
+        now_ms);
   }
   if (!marker_epoch_ms_.has_value()) {
     marker_epoch_ms_ = now_ms;

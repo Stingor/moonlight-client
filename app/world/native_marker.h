@@ -45,8 +45,13 @@ struct MarkerCall {
 
 // La décision de l'image. Non engagé : cacher. L'entité introuvable : garder.
 // Sinon, ce qu'elle en fait.
+//
+// 🔴 UN SUIVI EN COURS (`followed_id`, zéro pour aucun) PASSE AVANT
+// L'ENGAGEMENT, qu'il ne regarde pas : le joueur suivi hors de vue, garder ;
+// en vue, ce qu'il en fait — voir `world/follow_rules.h`.
 [[nodiscard]] MarkerCall NativeMarkerCall(const MouseEngagement& engagement,
-                                          const ro::sim::World& world);
+                                          const ro::sim::World& world,
+                                          std::uint32_t followed_id = 0);
 
 // Sous le mode Ciblage, CACHER devient MONTRER au-dessus de la cible du HUD
 // quand il y en a une. Montrer et garder ne changent pas : une entité engagée

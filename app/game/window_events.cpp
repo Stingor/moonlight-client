@@ -15,6 +15,7 @@
 #include "input/key_gate.h"
 #include "world/click_action.h"
 #include "world/entity_menu.h"
+#include "world/follow_action.h"
 #include "world/signboard_pick.h"
 
 namespace moonclient {
@@ -376,6 +377,8 @@ void OnLeftButtonDown(const EventRouting& to, const SDL_MouseButtonEvent& button
   // LE DOUBLE-CLIC SE RECONNAÎT ICI, à chaque appui, fenêtre ou monde : voir
   // `DoubleClickClock`.
   const bool second_of_double = to.world_mouse->double_click.NotePress(to.now_ms);
+  // TOUT APPUI GAUCHE ARRÊTE LE SUIVI, fenêtre ou monde : le tic le lira.
+  to.world_mouse->follow.left_pressed = to.world_mouse->follow.active();
   // 🔴 TOUT APPUI GAUCHE COMPTE POUR L'ENGAGEMENT, celui qui tombe sur une
   // fenêtre compris : continu, il le fait retomber, et cliquer la barre de
   // raccourcis éteint la flèche.
@@ -387,6 +390,28 @@ void OnLeftButtonDown(const EventRouting& to, const SDL_MouseButtonEvent& button
   // et chaque pas de la durée du clic.
   if (!over_interface) {
     OnLeftPress(to, button, second_of_double);
+  }
+}
+
+// MAJ + APPUI DU BOUTON DROIT SUR UN AUTRE JOUEUR : le suivi commence — voir
+// `world/follow_rules.h`. Sur tout le reste, l'appui ne fait rien de plus — et
+// la souris figée ne suit personne.
+void OnShiftRightPress(const EventRouting& to, const SDL_MouseButtonEvent& button) {
+  if (!to.link->is_open() || to.scene_actors == nullptr ||
+      !WorldTakesClicks(
+          MouseRouteOf(*to.world, *to.grimoire, to.world_mouse->engagement, to.now_ms))) {
+    return;
+  }
+  const WindowPixels window = PointerSpaceOf(*to.gl);
+  const std::optional<std::size_t> picked =
+      ro::render::PickActor(*to.camera, *to.aspect_ratio, to.scene_actors->drawn, button.x,
+                            button.y, window.width, window.height);
+  if (!picked.has_value() || *picked >= to.scene_actors->ids.size()) {
+    return;
+  }
+  const ro::sim::Actor* hovered = to.world->Find(to.scene_actors->ids[*picked]);
+  if (hovered != nullptr && CanFollow(*hovered, to.world->player_id())) {
+    static_cast<void>(StartFollowing(to.world_mouse->follow, *to.world, *hovered, to.now_ms));
   }
 }
 
@@ -603,6 +628,9 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
           to.companion_ai->Disarm();
         }
         to.world_mouse->right_pressed_at = glm::vec2{event.button.x, event.button.y};
+        if ((SDL_GetModState() & SDL_KMOD_SHIFT) != 0) {
+          OnShiftRightPress(to, event.button);
+        }
       }
       // LE BOUTON DROIT SUR UNE ENSEIGNE : elle prend l'appui comme une fenêtre,
       // et le glissé qui suit ne tourne pas la caméra. SOUS `/shopping`, celle

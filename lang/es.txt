@@ -215,6 +215,9 @@ tr: %s de daño recibido
 fr: %s est dans les favoris, que l'échange ne prend pas.
 tr: %s está en favoritos, que el intercambio no toma.
 
+fr: %s est hors de vue : suivi arrêté.
+tr: %s está fuera de vista: seguimiento detenido.
+
 fr: %s est porté : ôtez-le d'abord.
 tr: %s está equipado: quítalo primero.
 
@@ -232,6 +235,9 @@ tr: %s el %s
 
 fr: %s n'a pas pu être expulsé : le serveur le protège.
 tr: No se pudo expulsar a %s: el servidor lo protege.
+
+fr: %s n'est pas en vue.
+tr: %s no está a la vista.
 
 fr: %s non lancé depuis %d s
 tr: %s sin lanzar desde hace %d s
@@ -2104,6 +2110,9 @@ tr: Imágenes y emotes
 fr: Importer…
 tr: Importar…
 
+fr: Impossible d'attaquer ou d'employer un skill quand votre poids dépasse 90 %.
+tr: No puedes atacar ni usar skills cuando tu peso supera el 90 %.
+
 fr: Impossible d'invoquer davantage de sphères.
 tr: No se pueden invocar más esferas.
 
@@ -2472,6 +2481,9 @@ tr: No se puede acumular a esta distancia.
 
 fr: Ne peut plus être utilisé.
 tr: Ya no se puede usar.
+
+fr: Ne plus le suivre
+tr: Dejar de seguirlo
 
 fr: Niveau de skill insuffisant pour rejoindre un groupe.
 tr: Nivel de skill insuficiente para unirse a un grupo.
@@ -3820,6 +3832,9 @@ tr: Sonido al ser mencionado
 fr: Suite : %s
 tr: Siguiente: %s
 
+fr: Suivre
+tr: Seguir
+
 fr: Survoler un lien d'image en montre le contenu, sans ouvrir le navigateur.\n\nLes images ne sont chargées que depuis des hébergeurs connus (Discord, imgur, le site Moonlight), depuis vos sites autorisés, et pour les adresses que vous avez choisi d'afficher une fois. Sur les hébergeurs connus, celui qui a posté le lien ne peut pas savoir qui l'a regardé. Un lien vers n'importe quel autre site reste un lien ordinaire, à ouvrir soi-même.
 tr: Pasar el ratón sobre un enlace de imagen muestra su contenido, sin abrir el navegador.\n\nLas imágenes solo se cargan desde alojamientos conocidos (Discord, imgur, el sitio de Moonlight), desde tus sitios permitidos, y para las direcciones que elegiste mostrar una vez. En los alojamientos conocidos, quien publicó el enlace no puede saber quién lo ha mirado. Un enlace a cualquier otro sitio sigue siendo un enlace normal, que abres tú mismo.
 
@@ -3843,6 +3858,18 @@ tr: Una línea que te nombra — el nombre de tu personaje, o una de tus palabra
 
 fr: Vos sites autorisés :
 tr: Tus sitios permitidos:
+
+fr: Votre personnage marche derrière lui. Un clic gauche arrête le suivi.
+tr: Tu personaje camina tras él. Un clic izquierdo detiene el seguimiento.
+
+fr: Vous ne suivez personne.
+tr: No sigues a nadie.
+
+fr: Vous ne suivez plus %s.
+tr: Ya no sigues a %s.
+
+fr: Vous suivez %s.
+tr: Sigues a %s.
 
 fr: ce site
 tr: este sitio

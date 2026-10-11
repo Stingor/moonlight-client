@@ -232,6 +232,10 @@ enum class EntityVerb : int {
   // une seule des deux, selon la liste que le serveur tient.
   kAutolootAdd,
   kAutolootRemove,
+  // « SUIVRE » ce joueur, ou « NE PLUS SUIVRE » celui qu'on suit : une seule
+  // des deux. Voir `world/follow_rules.h`.
+  kFollow,
+  kUnfollow,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -253,7 +257,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kAutolootRemove) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kUnfollow) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==
@@ -342,6 +346,8 @@ struct EntityMenuFacts {
   // Un échange est ouvert, ou une proposition attend : on n'en propose pas un
   // second.
   bool dealing = false;
+  // Le personnage suit déjà ce joueur.
+  bool followed = false;
   // Ce qui grise « Envoyer un courrier », DÉJÀ TRADUIT ; vide quand il est
   // offert.
   std::string mail_refusal;

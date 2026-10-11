@@ -4,6 +4,7 @@
 
 #include "ro/sim/world.h"
 
+#include "world/follow_rules.h"
 #include "world/targeting.h"
 
 namespace moonclient {
@@ -32,7 +33,12 @@ MarkerCall MarkerOver(const ro::sim::Actor& actor) {
   return {MarkerOrder::kHide, nullptr};
 }
 
-MarkerCall NativeMarkerCall(const MouseEngagement& engagement, const ro::sim::World& world) {
+MarkerCall NativeMarkerCall(const MouseEngagement& engagement, const ro::sim::World& world,
+                            std::uint32_t followed_id) {
+  if (followed_id != 0) {
+    const ro::sim::Actor* followed = FollowedPlayer(world, followed_id);
+    return followed != nullptr ? MarkerOver(*followed) : MarkerCall{};
+  }
   if (!engagement.engaged) {
     return {MarkerOrder::kHide, nullptr};
   }

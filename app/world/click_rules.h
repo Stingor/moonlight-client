@@ -46,6 +46,51 @@ namespace moonclient {
 // lève encore la flèche, mais aucun coup ne s'arme.
 [[nodiscard]] bool TakesAttackOrder(const ro::sim::Actor& self);
 
+// Les compétences qu'un personnage CACHÉ lance encore sur une entité, aux noms
+// de la table des compétences du serveur.
+inline constexpr std::uint16_t kGrimtoothSkillId = 137;    // AS_GRIMTOOTH
+inline constexpr std::uint16_t kBackStabSkillId = 212;     // RG_BACKSTAP
+inline constexpr std::uint16_t kShadowLeapSkillId = 529;   // NJ_SHADOWJUMP
+inline constexpr std::uint16_t kShadowSlashSkillId = 530;  // NJ_KIRIKAGE
+inline constexpr std::uint16_t kDarkSlashSkillId = 592;    // DE_SLASH
+
+// ASSIS, LE PERSONNAGE NE PREND PAS L'ORDRE D'UNE COMPÉTENCE VISÉE SUR UNE
+// ENTITÉ ; CACHÉ (Hiding), il ne prend que celles qui se lancent depuis
+// l'ombre — voir les cinq identifiants ci-dessus. Le Cloaking n'est pas le
+// Hiding. Le refus est muet : rien ne part, et la visée se désarme.
+[[nodiscard]] bool TakesSkillOrder(const ro::sim::Actor& self, std::uint16_t skill_id);
+
+// ── LA GARDE DE POIDS ───────────────────────────────────────────────────────
+//
+// À partir de cette part du poids maximum, en pour cent, le personnage ne
+// prend plus d'ordre d'action sur une entité : ni attaque, ni compétence
+// visée, ni suivi d'un joueur.
+inline constexpr std::int64_t kOverweightActionPercent = 90;
+
+// La compétence armée que la garde ne regarde pas du tout. La table du serveur
+// y range GD_APPROVAL.
+inline constexpr std::uint16_t kWeightUnguardedSkillId = 10000;
+// La compétence armée que la garde laisse partir APRÈS avoir écrit son refus.
+inline constexpr std::uint16_t kWeightWarnedSkillId = 40000;
+
+enum class WeightVerdict : std::uint8_t {
+  // Rien à dire, l'action part.
+  kPasses,
+  // Le refus s'écrit, et l'action part quand même.
+  kWarnsAndPasses,
+  // Le refus s'écrit, et l'action est abandonnée.
+  kRefuses,
+};
+
+// CE QUE LA GARDE DE POIDS FAIT D'UN ORDRE. `skill_id` est la compétence armée,
+// zéro pour une attaque ordinaire ou un suivi.
+//
+// La part se compte en ENTIERS, comme le serveur : cent fois le poids, divisé
+// par le poids maximum ramené à un s'il est plus petit. Un poids que le serveur
+// n'a pas encore dit, négatif, passe.
+[[nodiscard]] WeightVerdict WeightGuardOf(std::int64_t weight, std::int64_t max_weight,
+                                          std::uint16_t skill_id);
+
 // UN CLIC QUI PARLE À UN PNJ : ni un portail, qui se franchit en marchant, ni un
 // compagnon — pet, homoncule, mercenaire, élémentaire —, qui ne parle pas.
 [[nodiscard]] bool ClickContactsNpc(const ro::sim::Actor& npc);

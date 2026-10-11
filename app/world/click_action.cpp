@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 
+#include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/action.h"
 #include "ro/net/movement.h"
@@ -13,7 +14,9 @@
 #include "ro/render/actor_pick.h"
 #include "ro/render/ground_pick.h"
 #include "ro/render/map_scene.h"
+#include "ro/sim/chat_line.h"
 #include "ro/sim/movement.h"
+#include "ro/sim/player_status.h"
 #include "ro/sim/skill_book.h"
 #include "ro/sim/world.h"
 
@@ -81,6 +84,26 @@ void ReportRefusal(const ro::core::Result<void>& sent) {
     ro::core::LogWarning("demande au serveur non émise : {} — le geste restera sans effet",
                          ro::core::Describe(sent.error()));
   }
+}
+
+bool PassesWeightGuard(ro::sim::World& world, std::uint16_t skill_id, std::uint32_t now_ms) {
+  const ro::sim::PlayerStatus& status = world.player_status();
+  const WeightVerdict verdict = WeightGuardOf(status.weight, status.max_weight, skill_id);
+  if (verdict != WeightVerdict::kPasses) {
+    world.RecordChat(ro::sim::ChatKind::kServer, 0,
+                     ro::core::Tr("Impossible d'attaquer ou d'employer un skill quand votre "
+                                  "poids dépasse 90 %."),
+                     now_ms);
+  }
+  return verdict != WeightVerdict::kRefuses;
+}
+
+bool SkillOnActorPasses(ro::sim::World& world, std::uint16_t skill_id, std::uint32_t now_ms) {
+  if (!PassesWeightGuard(world, skill_id, now_ms)) {
+    return false;
+  }
+  const ro::sim::Actor* self = world.player();
+  return self == nullptr || TakesSkillOrder(*self, skill_id);
 }
 
 bool ActorTakesClick(const ro::sim::Actor& actor, VersusGate versus) {
@@ -345,6 +368,15 @@ HeldClick LeftClick(const WorldClick& scene, glm::vec2 mouse_px, const ClickInte
         target->id != scene.world->player_id() && ActorTakesClick(*target, scene.versus);
     // La compétence ARMÉE d'abord, et sur N'IMPORTE QUI : c'est une visée, et
     // un soin se lance justement sur un autre joueur ou sur soi-même.
+    //
+    // Refusée — trop chargé, assis, caché —, rien ne part, et la visée se
+    // désarme comme après un lancer.
+    if (const ro::sim::KnownSkill* aimed = scene.skills->armed();
+        aimed != nullptr && aim == SkillAim::kTarget &&
+        !SkillOnActorPasses(*scene.world, aimed->id, scene.now_ms)) {
+      scene.skills->Disarm();
+      return HeldClick::kNothing;
+    }
     if (scene.skills->ReleaseOnActor(*target)) {
       if (SkillEngages(*target)) {
         Engage(scene, *target);
@@ -375,6 +407,10 @@ HeldClick LeftClick(const WorldClick& scene, glm::vec2 mouse_px, const ClickInte
       // « Le clic cible sans attaquer » : la cible est prise, rien ne s'arme.
       if (scene.targeting != nullptr && attacks &&
           scene.targeting->SuppressClickEngage(/*skill_armed=*/false)) {
+        return HeldClick::kNothing;
+      }
+      // Trop chargé, la conversation le dit et le coup ne s'arme pas.
+      if (attacks && !PassesWeightGuard(*scene.world, 0, scene.now_ms)) {
         return HeldClick::kNothing;
       }
       ReportRefusal(

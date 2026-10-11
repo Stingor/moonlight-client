@@ -40,6 +40,7 @@
 #include "game/chat_room_stage.h"
 #include "items/warp_memo_report.h"
 #include "world/click_action.h"
+#include "world/follow_action.h"
 #include "world/navi_session.h"
 
 namespace moonclient {
@@ -687,6 +688,11 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     return;
   }
   if (RunAnnounceCommand(to, line, said_ms)) {
+    return;
+  }
+  // `/follow` n'est pas du client d'origine : sans cette prise, elle partirait
+  // au serveur en parole publique.
+  if (to.follow != nullptr && RunFollowCommand(*to.follow, *to.world, line, said_ms)) {
     return;
   }
   if (RunWhisperBlockCommand(to, line, said_ms)) {

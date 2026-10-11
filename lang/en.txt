@@ -215,6 +215,9 @@ tr: %s damage taken
 fr: %s est dans les favoris, que l'échange ne prend pas.
 tr: %s is in your favorites, which the exchange does not take.
 
+fr: %s est hors de vue : suivi arrêté.
+tr: %s is out of sight: no longer following.
+
 fr: %s est porté : ôtez-le d'abord.
 tr: %s is equipped: unequip it first.
 
@@ -232,6 +235,9 @@ tr: %s on %s
 
 fr: %s n'a pas pu être expulsé : le serveur le protège.
 tr: %s could not be kicked: the server protects them.
+
+fr: %s n'est pas en vue.
+tr: %s is not in sight.
 
 fr: %s non lancé depuis %d s
 tr: %s not cast for %d s
@@ -2104,6 +2110,9 @@ tr: Images and emotes
 fr: Importer…
 tr: Import…
 
+fr: Impossible d'attaquer ou d'employer un skill quand votre poids dépasse 90 %.
+tr: Attacks and skills cannot be used when your Weight is over 90%.
+
 fr: Impossible d'invoquer davantage de sphères.
 tr: Cannot summon spheres anymore.
 
@@ -2472,6 +2481,9 @@ tr: Cannot be duplicated within a certain distance.
 
 fr: Ne peut plus être utilisé.
 tr: Cannot be used anymore.
+
+fr: Ne plus le suivre
+tr: Unfollow
 
 fr: Niveau de skill insuffisant pour rejoindre un groupe.
 tr: Insufficient Skill Level for joining a Party
@@ -3820,6 +3832,9 @@ tr: Sound on mention
 fr: Suite : %s
 tr: Next: %s
 
+fr: Suivre
+tr: Follow
+
 fr: Survoler un lien d'image en montre le contenu, sans ouvrir le navigateur.\n\nLes images ne sont chargées que depuis des hébergeurs connus (Discord, imgur, le site Moonlight), depuis vos sites autorisés, et pour les adresses que vous avez choisi d'afficher une fois. Sur les hébergeurs connus, celui qui a posté le lien ne peut pas savoir qui l'a regardé. Un lien vers n'importe quel autre site reste un lien ordinaire, à ouvrir soi-même.
 tr: Hovering an image link shows its content, without opening the browser.\n\nImages are only loaded from known hosts (Discord, imgur, the Moonlight site), from your allowed sites, and for the addresses you chose to show once. On the known hosts, whoever posted the link cannot know who looked at it. A link to any other site stays an ordinary link, to open yourself.
 
@@ -3843,6 +3858,18 @@ tr: A line that names you — your character's name, or one of your keywords —
 
 fr: Vos sites autorisés :
 tr: Your allowed sites:
+
+fr: Votre personnage marche derrière lui. Un clic gauche arrête le suivi.
+tr: Your character walks after them. A left click stops following.
+
+fr: Vous ne suivez personne.
+tr: You are not following anyone.
+
+fr: Vous ne suivez plus %s.
+tr: You are no longer following %s.
+
+fr: Vous suivez %s.
+tr: You are following %s.
 
 fr: ce site
 tr: this site

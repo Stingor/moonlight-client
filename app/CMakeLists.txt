@@ -706,12 +706,13 @@ target_include_directories(moonclient_visibility PUBLIC ${CMAKE_CURRENT_SOURCE_D
 
 # LE MODE CIBLAGE : ce qui décide quand la désignation change, ce que le clic
 # veut dire sous lui, et ce que le HUD sait de la cible. Et la flèche du jeu, que
-# le mode détourne : l'engagement de la souris qui la gouverne, et la décision de
-# chaque image. En bibliothèque parce que ces règles ne connaissent que `sim`, et
+# le mode détourne : l'engagement de la souris qui la gouverne, la décision de
+# chaque image, et le suivi d'un joueur qui passe avant. En bibliothèque parce que ces règles ne connaissent que `sim`, et
 # qu'une règle qui vit dans l'exécutable ne s'éprouve pas.
 add_library(moonclient_targeting STATIC
     world/deferred_walk.cpp
     world/click_rules.cpp
+    world/follow_rules.cpp
     world/mouse_engagement.cpp
     world/native_marker.cpp
     world/target_facts.cpp
@@ -1337,6 +1338,7 @@ add_executable(moonclient
     items/description_view.cpp
     world/attack_intent.cpp
     world/click_action.cpp
+    world/follow_action.cpp
     effects/effect_bench_view.cpp
     chat/emoji_catalog.cpp
     chat/emotion_catalog.cpp

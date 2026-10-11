@@ -148,6 +148,11 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
       if (target == nullptr) {
         return false;
       }
+      // Refusé — trop chargé, assis, caché —, rien ne part ; rendre vrai
+      // désarme la visée comme après un lancer : voir `SkillOnActorPasses`.
+      if (!SkillOnActorPasses(game_.world_, skill.id, now_ms_)) {
+        return true;
+      }
       // Comme un clic : le personnage n'a qu'une action en attente, et le sort
       // remplace l'attaque ou le ramassage d'avant.
       game_.pickup_.reset();

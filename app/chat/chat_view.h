@@ -51,6 +51,7 @@ namespace moonclient {
 class ChatLinePreviewMaker;
 class ChatRoomStage;
 class ChatTabsView;
+struct FollowState;
 class NaviSession;
 
 // L'émoticône qu'une ligne demande, ou rien si elle n'en demande aucune.
@@ -143,6 +144,9 @@ struct ChatDispatch {
   // LA BARRE, qui suit le canal où une commande partie a lié la parole
   // publique : sa place en dépend. Nul : rien ne se suit.
   ChatLinePreviewMaker* line_preview = nullptr;
+  // LE SUIVI D'UN JOUEUR, que `/follow` commence ou arrête. Nul : la commande
+  // part au serveur comme une parole.
+  FollowState* follow = nullptr;
 };
 
 // LA COMMANDE QUI COLLE LA CAMÉRA AU PERSONNAGE, ou la laisse le rattraper.

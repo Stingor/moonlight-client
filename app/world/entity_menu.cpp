@@ -243,6 +243,13 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   if (facts.dealing) {
     Composer::Disable(deal, Tr("Un échange est déjà en cours."));
   }
+  // LE SUIVI : une ligne OU l'autre, selon qu'on le suit déjà.
+  if (facts.followed) {
+    menu.Add(Tr("Ne plus le suivre"), EntityVerb::kUnfollow);
+  } else {
+    menu.Add(Tr("Suivre"), EntityVerb::kFollow,
+             Tr("Votre personnage marche derrière lui. Un clic gauche arrête le suivi."));
+  }
   // Une ligne OU l'autre : « ajouter » grisé à côté de « retirer » n'apprendrait
   // rien de plus.
   if (facts.target_is_friend) {
