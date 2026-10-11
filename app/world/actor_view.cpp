@@ -545,12 +545,19 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     const std::size_t count =
         ro::render::BodyCopiesAfterEffects(played_effects, body_pixels, halos);
     for (std::size_t copy_rank = 0; copy_rank < count; ++copy_rank) {
-      scene.behind.push_back(ro::render::DrawnActor{
+      // ⚠ UN CONTOUR PASSE DEVANT LE CORPS, comme un voile et du même pas : voir
+      // `ActorBodyCopy::in_front`. Les autres copies restent derrière lui.
+      const bool in_front = halos[copy_rank].in_front;
+      std::vector<ro::render::DrawnActor>& layer = in_front ? scene.front : scene.behind;
+      layer.push_back(ro::render::DrawnActor{
           &composed, nullptr, feet, halos[copy_rank].tint, 0.0F, scale * halos[copy_rank].scale,
           glm::vec2(halos[copy_rank].offset_pixels[0], halos[copy_rank].offset_pixels[1])});
       // Un halo se range dans un seau à mélange propre, hors du brouillard.
-      scene.behind.back().fogged = false;
-      CopyLayers(halos[copy_rank], scene.behind.back());
+      layer.back().fogged = false;
+      if (in_front) {
+        layer.back().depth_bias = kVeilDepthBias;
+      }
+      CopyLayers(halos[copy_rank], layer.back());
     }
     // LES VOILES ENSUITE, par-dessus le corps : même sprite, même taille, une
     // couleur et une transparence en plus.

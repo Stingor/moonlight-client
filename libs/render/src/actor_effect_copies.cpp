@@ -145,9 +145,10 @@ std::size_t BodyCopiesAfterEffects(std::span<const ActorEffectPlay> played,
   std::size_t written = 0;
   const auto ajouter = [&](float scale, std::array<std::uint8_t, 4> tint,
                            std::array<float, 2> offset_pixels = {0.0F, 0.0F},
-                           ActorPartSet parts = kAllActorParts, bool additive = false) {
+                           ActorPartSet parts = kAllActorParts, bool additive = false,
+                           bool in_front = false) {
     if (written < out.size()) {
-      out[written++] = ActorBodyCopy{scale, tint, offset_pixels, parts, additive};
+      out[written++] = ActorBodyCopy{scale, tint, offset_pixels, parts, additive, in_front};
     }
   };
   // ⚠ LES GARDES LISENT LE MOT DE RENDU ENTIER, pas les bits d'un seul effet :
@@ -225,9 +226,12 @@ std::size_t BodyCopiesAfterEffects(std::span<const ActorEffectPlay> played,
       alpha = static_cast<std::uint8_t>(std::clamp<std::int32_t>(
           ValueAt(*write, play.age_ticks, change->life_ticks), 0, kOpaque));
     }
+    // ⚠ DEVANT LE CORPS : le client avance leur profondeur au lieu de la
+    // reculer, et leur addition teint le corps entier. Peints derrière lui, on
+    // n'en voyait que le pourtour.
     for (std::size_t copie = 1; copie <= kOutlineCopies; ++copie) {
       ajouter(1.0F + static_cast<float>(copie) * kOutlineScaleStep,
-              {color[0], color[1], color[2], alpha}, {0.0F, 0.0F}, kAllActorParts, true);
+              {color[0], color[1], color[2], alpha}, {0.0F, 0.0F}, kAllActorParts, true, true);
     }
   }
   return written;

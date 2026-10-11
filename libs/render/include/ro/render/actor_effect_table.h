@@ -531,6 +531,10 @@ struct ActorBodyCopy {
   // LA COPIE S'AJOUTE au décor au lieu de le recouvrir. Voir
   // `ActorBodyPose::additive_parts` pour ce que ce mélange veut dire.
   bool additive = false;
+  // 🔴 LA COPIE PASSE DEVANT LE CORPS, et non derrière. Le client avance la
+  // profondeur des contours d'un cheveu, si bien qu'ils teignent le corps
+  // entier ; la lueur qui respire, elle, recule et ne se voit qu'autour de lui.
+  bool in_front = false;
 };
 
 // Combien de copies un acteur peut porter à la fois. QUATRE par bit au plus —
