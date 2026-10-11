@@ -163,16 +163,18 @@ struct DescriptionOddsRow {
   std::uint32_t id = 0;
   // Un MONSTRE qu'une branche invoque, ou un objet.
   bool monster = false;
-  // Le libellé de la table, en UTF-8.
+  // Le nom de l'objet ou du monstre, en UTF-8.
   std::string_view name;
   // L'icône de l'objet ; vide pour un monstre.
   SkinImage icon;
   // La chance, en pour-cent, et le tirage d'où elle vient : `weight` sur
-  // `total`. Le groupe zéro est le lot GARANTI.
+  // `total`, dans le tirage de rang `group`.
   double percent = 0.0;
   int weight = 0;
   int total = 0;
   int group = 0;
+  // Le tirage rend toutes ses entrées : ni poids ni total.
+  bool guaranteed = false;
 };
 
 // ── LES ONGLETS DU SERVEUR ─────────────────────────────────────────────────

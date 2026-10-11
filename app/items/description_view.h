@@ -20,6 +20,7 @@
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/item_words.h"
+#include "ro/vfs/monster_list.h"
 #include "ro/vfs/package_items.h"
 #include "ro/vfs/random_option_names.h"
 
@@ -91,6 +92,9 @@ class DescriptionView {
   // LA TABLE DE TIRAGE DES CONTENEURS, pour l'onglet « Probabilités ». ⚠ LA
   // FENÊTRE SEULEMENT : l'aperçu au survol n'a pas d'onglets.
   void SeePackages(const ro::vfs::PackageItems* packages) noexcept { packages_ = packages; }
+  // Les monstres du serveur, qui nomment ceux qu'une branche invoque. Absents,
+  // un monstre de la table s'écrit par son numéro seul.
+  void SeeMonsters(const ro::vfs::MonsterList* monsters) noexcept { monsters_ = monsters; }
   // Les libellés des options aléatoires. Absents, une option s'écrit par son
   // numéro.
   void SeeRandomOptions(const ro::vfs::RandomOptionNames* names) noexcept { option_names_ = names; }
@@ -186,7 +190,11 @@ class DescriptionView {
   std::string craft_tip_;
   std::string vote_shop_label_;
   const ro::vfs::PackageItems* packages_ = nullptr;
+  const ro::vfs::MonsterList* monsters_ = nullptr;
   void RefreshOdds(std::uint32_t item_id);
+  // Le nom d'une entrée de la table : l'objet dans la table des items, le
+  // monstre dans celle du serveur. Vide quand ni l'une ni l'autre ne le sait.
+  [[nodiscard]] std::string PackageEntryName(const ro::vfs::PackageEntry& entry) const;
   // Les lignes de la table et leurs libellés, refaits au changement d'objet
   // seulement. ⚠ LES LIGNES DÉSIGNENT LES LIBELLÉS : ceux-ci ne bougent plus
   // une fois les lignes posées.

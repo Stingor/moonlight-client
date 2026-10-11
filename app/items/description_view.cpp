@@ -1,6 +1,8 @@
 #include "items/description_view.h"
 
 #include <algorithm>
+#include <cstdint>
+#include <limits>
 #include <utility>
 
 #include "ro/net/item_facts.h"
@@ -325,6 +327,21 @@ void DescriptionView::ComposeInstance(const ro::sim::InventoryItem& held) {
   view_.options = options_;
 }
 
+std::string DescriptionView::PackageEntryName(const ro::vfs::PackageEntry& entry) const {
+  if (entry.is_monster) {
+    if (monsters_ == nullptr || entry.id > std::numeric_limits<std::uint16_t>::max()) {
+      return {};
+    }
+    const ro::vfs::MonsterListEntry* known = monsters_->Find(static_cast<std::uint16_t>(entry.id));
+    return known != nullptr ? known->name : std::string();
+  }
+  if (items_ == nullptr) {
+    return {};
+  }
+  const ro::vfs::ItemEntry* known = items_->Find(entry.id);
+  return known != nullptr ? known->name : std::string();
+}
+
 void DescriptionView::RefreshOdds(std::uint32_t item_id) {
   odds_.clear();
   odds_names_.clear();
@@ -344,22 +361,16 @@ void DescriptionView::RefreshOdds(std::uint32_t item_id) {
   odds_.reserve(count);
   for (const ro::vfs::PackageGroup& group : table->groups) {
     for (const ro::vfs::PackageEntry& entry : group.entries) {
-      // Le libellé de la table, ou le nom de l'objet quand elle n'en porte pas.
-      std::string name = entry.name;
-      if (name.empty() && !entry.is_monster && items_ != nullptr) {
-        if (const ro::vfs::ItemEntry* known = items_->Find(entry.id); known != nullptr) {
-          name = known->name;
-        }
-      }
-      odds_names_.push_back(std::move(name));
+      odds_names_.push_back(PackageEntryName(entry));
       ro::ui::DescriptionOddsRow row{
           .id = entry.id,
           .monster = entry.is_monster,
           .name = odds_names_.back(),
-          .percent = ro::vfs::PackagePercent(group.id, entry.weight, group.total),
+          .percent = ro::vfs::PackagePercent(group.guaranteed, entry.weight, group.total),
           .weight = entry.weight,
           .total = group.total,
-          .group = group.id};
+          .group = group.id,
+          .guaranteed = group.guaranteed};
       if (!entry.is_monster && icons_ != nullptr) {
         const ro::render::IconTexture& icon = icons_->Get(entry.id);
         if (icon.usable()) {

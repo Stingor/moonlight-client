@@ -443,7 +443,7 @@ void CardAlbumView::BuildSources(const CardAlbumPieces& pieces) {
         ro::ui::CardAlbumSourceMark& mark = chances[entry.id];
         const bool first = !mark.present;
         mark.present = true;
-        mark.percent += ro::vfs::PackagePercent(group.id, entry.weight, group.total);
+        mark.percent += ro::vfs::PackagePercent(group.guaranteed, entry.weight, group.total);
         mark.weight += entry.weight;
         // Le dénominateur ne se cite que s'il est UNIQUE.
         mark.total = first ? group.total : (mark.total == group.total ? mark.total : 0);

@@ -398,6 +398,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // L'équipement d'un autre joueur se décrit et se survole comme le nôtre.
   item_description_->SeeViewedEquipment(&inspected_);
   item_description_->SeePackages(&pieces_.package_items);
+  item_description_->SeeMonsters(&pieces_.monster_list);
   item_description_->SeeRandomOptions(&pieces_.random_option_names);
   description_preview_->SeeViewedEquipment(&inspected_);
   description_preview_->SeeRandomOptions(&pieces_.random_option_names);

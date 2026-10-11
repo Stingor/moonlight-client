@@ -12,16 +12,18 @@ namespace moonclient {
 // membre du staff veut y ajouter ou en retirer, et rien d'autre.
 //
 // La vérité est SERVEUR : sa base de groupes d'objets (les groupes de l'Old et
-// du Mystical Card Album). Le `packageitem.lub` que le client lit — et d'où
-// l'album tire ses macarons — en est ENGENDRÉ : c'est un fichier d'affichage.
-// D'où la règle : on n'édite JAMAIS ce fichier-là. Une carte ajoutée à lui seul
-// ferait promettre au client une carte que l'album ne donnera jamais, et
-// l'édition serait écrasée sans un mot à la régénération suivante.
+// du Mystical Card Album). La table `item_groups.yml` que ce client lit — et
+// d'où l'album tire ses macarons — en est EXPORTÉE, comme le `packageitem.lub`
+// du client d'origine en est engendré : ce sont des fichiers d'affichage. D'où
+// la règle : on n'édite JAMAIS l'un d'eux. Une carte ajoutée là seulement ferait
+// promettre une carte que l'album ne donnera jamais, et l'édition serait
+// écrasée sans un mot à la régénération suivante.
 //
 // Le geste du staff pose donc une INTENTION ici ; le script
 // `apply_card_album_delta.py` du dépôt des données du client la porte dans la
-// base du serveur, puis régénère le fichier d'affichage. Le sens de la
-// synchronisation reste serveur → client.
+// base du serveur, puis régénère le `.lub` ; `item_groups.yml` se régénère par
+// `scripts/yaml_tables/item_groups.py`. Le sens de la synchronisation reste
+// serveur → client.
 //
 // ⚠ `savedata\card_album_delta.yml` : son nom, sa clé racine et ses champs sont
 // un contrat, le script le lit tel quel.

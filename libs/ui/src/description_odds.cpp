@@ -230,7 +230,7 @@ void DrawOddsTab(DescriptionWindowState& state, const DescriptionView& view,
         }
         if (view.odds_many_groups) {
           ImGui::TableNextColumn();
-          if (row.group == 0) {
+          if (row.guaranteed) {
             ImGui::TextDisabled("%s", core::Tr("garanti"));
           } else {
             ImGui::Text("%d", row.group);

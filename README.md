@@ -110,6 +110,8 @@ tête d'où elle vient et comment la régénérer.
   partie de ce projet.
 - `item_properties.yml`, `monster_list.yml` et `pets.yml` sont exportés des
   bases d'objets, de monstres et de familiers du serveur Moonlight.
+- `item_groups.yml` est exporté des bases d'objets, de groupes d'objets et
+  d'invocations du serveur Moonlight.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 

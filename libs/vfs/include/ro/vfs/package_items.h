@@ -1,8 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <span>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
@@ -12,36 +10,44 @@
 
 namespace ro::vfs {
 
-// CE QUE REND UN CONTENEUR : boîte, album d'objets, branche.
+// CE QUE REND UN CONTENEUR : boîte, album d'objets, sac, branche.
 //
-// Le client en porte la table dans `packageitem.lub`, en clair : une table
-// globale `tbl` indexée par l'objet conteneur, dont chaque entrée
-// `{ id, prob, name, group }` est un tirage possible. Sa fonction `main` la
-// verse dans la base du jeu ; on en reproduit ici l'effet, sans l'exécuter :
+// `data\yaml_files\item_groups.yml` est exporté des bases du serveur par
+// `scripts/yaml_tables/item_groups.py`, qui y résout le script de chaque
+// conteneur contre ses groupes d'items et d'invocation :
 //
-//   · `group = 99` désigne un MONSTRE (une branche en invoque), rangé au
-//     groupe 6 ;
-//   · tout autre groupe désigne un OBJET, rangé à son groupe.
+//     version: 1
+//     packages: {
+//       603: [
+//         {rolls: 1, guaranteed: false, monsters: false, total: 9172,
+//          entries: [[501, 12, 1], …]}
+//       ],
+//       …
+//     }
 //
-// Chaque groupe est un tirage : ses entrées se partagent la SOMME de leurs
-// poids — c'est la règle du serveur, dont le `Rate` de chaque entrée est la
-// source de ces poids. Le groupe 0 est le lot GARANTI.
-//
-// ⚠ C'EST UN FICHIER D'AFFICHAGE. La vérité est la base de groupes du serveur,
-// dont ce fichier est engendré : un écart entre les deux se corrige là-bas.
+// Un conteneur rend un ou plusieurs TIRAGES. Un tirage garanti rend toutes ses
+// entrées ; un tirage au sort en rend UNE, chacune avec la chance poids / total.
+// Le total peut dépasser la somme des poids : une entrée qui ne rend rien y
+// garde sa part.
 
 struct PackageEntry {
+  // Un item, ou un monstre invoqué quand `is_monster`.
   std::uint32_t id = 0;
   bool is_monster = false;
+  // Le poids de l'entrée dans son tirage ; nul dans un tirage garanti.
   int weight = 0;
-  // Le libellé que la table donne, en UTF-8 — celui que la fenêtre de
-  // probabilités du client affiche. Vide quand la table n'en porte pas.
-  std::string name;
+  // Combien d'exemplaires sortent.
+  int amount = 0;
 };
 
 struct PackageGroup {
+  // Le rang du tirage dans le conteneur, à partir de 1.
   int id = 0;
-  // La somme des poids du groupe : le dénominateur du tirage.
+  // Toutes les entrées sortent : ni poids ni total.
+  bool guaranteed = false;
+  // Combien de fois le conteneur répète ce tirage.
+  int rolls = 1;
+  // Le dénominateur du tirage.
   int total = 0;
   std::vector<PackageEntry> entries;
 };
@@ -50,12 +56,6 @@ struct PackageTable {
   std::vector<PackageGroup> groups;
 };
 
-// Le lot garanti : aucun tirage, tout sort.
-inline constexpr int kGuaranteedPackageGroup = 0;
-// Le groupe qu'on donne à un monstre, et celui qui le désigne dans le fichier.
-inline constexpr int kMonsterPackageGroup = 6;
-inline constexpr int kMonsterPackageMarker = 99;
-
 struct PackageItems {
   std::unordered_map<std::uint32_t, PackageTable> by_package;
 
@@ -63,15 +63,14 @@ struct PackageItems {
   [[nodiscard]] bool empty() const noexcept { return by_package.empty(); }
 };
 
-inline constexpr std::string_view kPackageItemsPath =
-    "data\\luafiles514\\lua files\\probabilityinfo\\packageitem.lub";
+inline constexpr std::string_view kPackageItemsPath = "data\\yaml_files\\item_groups.yml";
 
 // La chance d'une entrée, en POUR-CENT, arrondie comme le client l'affiche : au
-// dix-millième de pour-cent, par le demi supérieur. Le lot garanti vaut 100.
-[[nodiscard]] double PackagePercent(int group_id, int weight, int total);
+// dix-millième de pour-cent, par le demi supérieur. Un tirage garanti vaut 100.
+[[nodiscard]] double PackagePercent(bool guaranteed, int weight, int total);
 
-// Lit la table depuis ses octets — compilés ou en clair.
-[[nodiscard]] core::Result<PackageItems> ParsePackageItems(std::span<const std::uint8_t> bytes);
+// Lit la table depuis son texte YAML. Un texte refusé ne rend rien de partiel.
+[[nodiscard]] core::Result<PackageItems> ParsePackageItems(std::string_view yaml_text);
 
 // Lit la table de l'installation. ABSENTE, elle rend une table vide plutôt
 // qu'une erreur : les fenêtres qui s'en servent se taisent alors, faute de
