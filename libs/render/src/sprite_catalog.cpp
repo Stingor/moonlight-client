@@ -350,7 +350,7 @@ std::string_view ShieldName(std::uint32_t form) {
   return form < names.size() ? names[form] : names.front();
 }
 
-// Sur une monture de trésorerie comme dans un Madogear, les mains se vident.
+// Sur une monture cash-shop comme dans un Madogear, les mains se vident.
 bool HoldsNothing(const ActorLook& look) {
   return !look.player || look.cash_mount || IsMadogearJob(look.job) ||
          (look.weapon == 0 && look.shield == 0);

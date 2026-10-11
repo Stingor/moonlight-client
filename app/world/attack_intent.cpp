@@ -4,8 +4,10 @@
 #include <cstdint>
 #include <limits>
 
+#include "ro/core/i18n.h"
 #include "ro/net/action.h"
 #include "ro/net/movement.h"
+#include "ro/sim/chat_line.h"
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
 
@@ -13,6 +15,12 @@
 #include "world/click_rules.h"
 
 namespace moonclient {
+namespace {
+
+// Le refus d'attaquer sur une monture s'écrit en rouge, en `0xRRGGBB`.
+constexpr std::uint32_t kRidingRefusalColor = 0xFF0000;
+
+}  // namespace
 
 std::uint16_t AttackRangeCells(const ro::sim::World& world) {
   const std::int64_t told = world.player_status().attack_range;
@@ -94,6 +102,13 @@ bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world, ro::sim::Wa
       const int action =
           targeting != nullptr ? targeting->FilterBasicAttack(target_id, asked) : asked;
       if (action == kAttackDropped) {
+        break;
+      }
+      if (const ro::sim::Actor* self = world.player();
+          self != nullptr && RidingWithholdsAttack(*self)) {
+        world.RecordChat(ro::sim::ChatKind::kServer, 0,
+                         ro::core::Tr("Impossible d'attaquer sur une monture."), now_ms,
+                         kRidingRefusalColor);
         break;
       }
       ReportRefusal(ro::net::RequestAttack(link, target_id, action != kAttackActionOnce));

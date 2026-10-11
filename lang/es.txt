@@ -2113,6 +2113,9 @@ tr: Importar…
 fr: Impossible d'attaquer ou d'employer un skill quand votre poids dépasse 90 %.
 tr: No puedes atacar ni usar skills cuando tu peso supera el 90 %.
 
+fr: Impossible d'attaquer sur une monture.
+tr: No puedes atacar mientras vas montado.
+
 fr: Impossible d'invoquer davantage de sphères.
 tr: No se pueden invocar más esferas.
 

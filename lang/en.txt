@@ -2113,6 +2113,9 @@ tr: Import…
 fr: Impossible d'attaquer ou d'employer un skill quand votre poids dépasse 90 %.
 tr: Attacks and skills cannot be used when your Weight is over 90%.
 
+fr: Impossible d'attaquer sur une monture.
+tr: Unable to attack while riding.
+
 fr: Impossible d'invoquer davantage de sphères.
 tr: Cannot summon spheres anymore.
 

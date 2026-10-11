@@ -46,6 +46,13 @@ namespace moonclient {
 // lève encore la flèche, mais aucun coup ne s'arme.
 [[nodiscard]] bool TakesAttackOrder(const ro::sim::Actor& self);
 
+// MONTÉ SUR UNE MONTURE DE TRÉSORERIE (l'état `kStatusAllRiding`), LE COUP NE
+// PART PAS : à l'instant d'envoyer l'attaque, d'un coup comme sans relâche, le
+// message « Unable to attack while riding. » s'écrit en rouge à la place.
+// L'approche, l'engagement et la flèche ont eu lieu. Le serveur, lui, ne
+// refuse que les skills sous cet état.
+[[nodiscard]] bool RidingWithholdsAttack(const ro::sim::Actor& self);
+
 // Les compétences qu'un personnage CACHÉ lance encore sur une entité, aux noms
 // de la table des compétences du serveur.
 inline constexpr std::uint16_t kGrimtoothSkillId = 137;    // AS_GRIMTOOTH

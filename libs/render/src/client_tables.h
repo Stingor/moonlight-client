@@ -37,7 +37,7 @@ extern const std::array<WeaponSpriteClass, 320> kWeaponSpriteClasses;
 inline constexpr std::string_view kDefaultWeaponSpriteClass = "초보자";
 
 // La classe MONTÉE d'un métier joueur : celle dont il prend le corps sur une
-// monture de trésorerie. Triés par métier ; un métier absent garde le sien.
+// monture cash-shop. Triés par métier ; un métier absent garde le sien.
 struct CashMountClass {
   std::uint32_t job;
   std::uint32_t mounted;

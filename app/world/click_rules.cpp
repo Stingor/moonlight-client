@@ -21,6 +21,10 @@ bool TakesAttackOrder(const ro::sim::Actor& self) {
   return self.posture != ro::sim::Posture::kSitting && (self.option & ro::sim::kOptionHide) == 0;
 }
 
+bool RidingWithholdsAttack(const ro::sim::Actor& self) {
+  return self.status_effects.contains(ro::sim::kStatusAllRiding);
+}
+
 bool TakesSkillOrder(const ro::sim::Actor& self, std::uint16_t skill_id) {
   if (self.posture == ro::sim::Posture::kSitting) {
     return false;

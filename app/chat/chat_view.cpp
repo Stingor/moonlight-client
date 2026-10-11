@@ -15,6 +15,7 @@
 #include "ro/core/text.h"
 #include "ro/net/action.h"
 #include "ro/net/chat_target.h"
+#include "ro/net/player_config.h"
 #include "ro/net/rank_notices.h"
 #include "ro/net/staff_requests.h"
 #include "ro/net/warp_memo.h"
@@ -36,6 +37,7 @@
 #include "chat/native_slash_commands.h"
 #include "chat/navigation_command.h"
 #include "chat/rank_command.h"
+#include "chat/show_equipment_command.h"
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
 #include "items/warp_memo_report.h"
@@ -613,6 +615,15 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
                            ro::core::Tr("Le serveur n'a pas encore dit si l'appel d'urgence "
                                         "vous atteint : réessayez une fois en jeu. (/call)"),
                            said_ms);
+    }
+    return;
+  }
+  // « MONTRER MON ÉQUIPEMENT » : la même demande que la case de la fiche, et
+  // la réponse s'écrit à l'écho. Voir `show_equipment_command.h`.
+  if (IsShowEquipmentCommand(line) && to.own_config != nullptr) {
+    if (to.link->is_open()) {
+      ReportRefusal(ro::net::RequestShowEquipment(
+          *to.link, EquipmentShownAsked(to.own_config->equipment_shown())));
     }
     return;
   }

@@ -242,7 +242,8 @@ add_library(moonclient_chatlinks STATIC
     chat/navigation_command.cpp
     chat/staff_item_command.cpp
     chat/announce_command.cpp
-    chat/whisper_block_command.cpp)
+    chat/whisper_block_command.cpp
+    chat/show_equipment_command.cpp)
 
 # ⚠ `ro_sim` EST PUBLIC : une ligne de conversation porte deux
 # espèces de balise, et celle d'un STYLE se lit — donc se valide — avec
@@ -251,7 +252,7 @@ add_library(moonclient_chatlinks STATIC
 # `ro/net/discord_relay.h`, et rien de `net` ne paraît dans les en-têtes d'ici.
 target_link_libraries(moonclient_chatlinks
     PUBLIC ro_sim ro_ui ro_vfs moonclient_itemfacts moonclient_settinglinks
-    PRIVATE ro_net ro_warnings)
+    PRIVATE ro_core ro_net ro_warnings)
 
 target_include_directories(moonclient_chatlinks PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

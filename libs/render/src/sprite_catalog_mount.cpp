@@ -1,9 +1,9 @@
-// LE CORPS D'UN JOUEUR MONTÉ : sur une monture de trésorerie, et dans la
+// LE CORPS D'UN JOUEUR MONTÉ : sur une monture cash-shop, et dans la
 // combinaison de Madogear.
 //
 // Le métier montré (`ro/render/shown_job.h`) a déjà choisi le Peco, le dragon,
 // le loup ou la machine. Il reste deux cas que le métier ne dit pas : la
-// monture de trésorerie, un état qui prête au joueur la classe montée de son
+// monture cash-shop, un état qui prête au joueur la classe montée de son
 // métier, et la combinaison, qui habille le corps du Madogear d'une armure.
 
 #include <algorithm>

@@ -11,7 +11,7 @@
 //   · et les deux tables Doram.
 //
 // Et une table qu'il porte en CODE : la classe MONTÉE de chaque métier joueur,
-// celle dont il prend le corps sur une monture de trésorerie.
+// celle dont il prend le corps sur une monture cash-shop.
 //
 // ⚠ Fichier ENGENDRÉ par scripts/gen_client_tables.py depuis
 // scripts/client_tables.json, pas écrit à la main : un nom qui semble fautif

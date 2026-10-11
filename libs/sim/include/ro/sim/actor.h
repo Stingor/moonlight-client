@@ -106,7 +106,7 @@ struct Appearance {
 // monture. Sur le JOUEUR, sa durée aussi : voir `ActiveStatus`, et
 // `player_statuses()`.
 
-// Monté sur une monture de trésorerie : EFST_ALL_RIDING.
+// Monté sur une monture cash-shop : EFST_ALL_RIDING.
 inline constexpr StatusEffectId kStatusAllRiding = 613;
 // Le second costume d'été : EFST_DRESS_UP.
 inline constexpr StatusEffectId kStatusDressUp = 856;

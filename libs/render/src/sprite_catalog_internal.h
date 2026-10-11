@@ -105,7 +105,7 @@ void AppendMercenaryPieces(std::uint32_t job, std::vector<ActorPieceFiles>& file
 [[nodiscard]] std::string_view PlayerBodyName(std::uint32_t job);
 
 // Le métier dont un joueur prend le CORPS : le sien, ou sa classe montée sur
-// une monture de trésorerie.
+// une monture cash-shop.
 [[nodiscard]] std::uint32_t BodyJob(const ActorLook& look);
 
 // LE NOM D'UN FICHIER DE MADOGEAR SOUS LA COMBINAISON : l'armure au lieu de la

@@ -59,7 +59,7 @@ struct ActorLook {
   std::uint32_t shield = 0;
   // La cape : un identifiant de robe, zéro pour rien.
   std::uint16_t robe = 0;
-  // Monté sur une monture de trésorerie : le corps devient celui de la
+  // Monté sur une monture cash-shop : le corps devient celui de la
   // monture, la cape le suit, et les mains se vident. C'est un ÉTAT que le
   // serveur pose et retire, pas un champ de l'apparence.
   bool cash_mount = false;

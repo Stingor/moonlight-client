@@ -19,6 +19,7 @@
 #include "ro/render/font_atlas.h"
 #include "ro/render/screen_overlay.h"
 #include "ro/render/sprite_renderer.h"
+#include "ro/sim/player_config.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/whisper.h"
 #include "ro/sim/whisper_blocks.h"
@@ -147,6 +148,9 @@ struct ChatDispatch {
   // LE SUIVI D'UN JOUEUR, que `/follow` commence ou arrête. Nul : la commande
   // part au serveur comme une parole.
   FollowState* follow = nullptr;
+  // LES RÉGLAGES QUE LE SERVEUR A DITS, en lecture : `/eqopen` demande
+  // l'inverse de l'état de l'équipement. Nul : la commande se tait.
+  const ro::sim::PlayerConfig* own_config = nullptr;
 };
 
 // LA COMMANDE QUI COLLE LA CAMÉRA AU PERSONNAGE, ou la laisse le rattraper.
