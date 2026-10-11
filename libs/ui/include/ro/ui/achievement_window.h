@@ -47,6 +47,11 @@ inline constexpr int kAchievementTabCount = 8;
 inline constexpr int kAchievementWholeTab = -1;
 // Les catégories du résumé : les six onglets qui suivent « Tous ».
 inline constexpr std::size_t kAchievementCategoryCount = 6;
+// LA FORME DE L'ARBRE : combien de sous-onglets chaque onglet range, dans
+// l'ordre des onglets. Un sous-onglet est le numéro de sous-catégorie du
+// catalogue, compté à partir de zéro.
+inline constexpr std::array<int, kAchievementTabCount> kAchievementSubtabCounts = {0, 0, 3, 6,
+                                                                                   2, 2, 3, 0};
 
 // L'onglet d'une catégorie du catalogue — 1 pour la première —, et
 // l'inverse. Hors des catégories, l'onglet rendu n'en est aucun.
@@ -284,6 +289,13 @@ struct AchievementWindowState {
   bool bug_report = false;
 };
 
+// UNE PLACE DANS L'ARBRE : un onglet, et l'un de ses sous-onglets ou
+// `kAchievementWholeTab` pour l'onglet entier.
+struct AchievementTabHit {
+  int tab = kAchievementSummaryTab;
+  int subtab = kAchievementWholeTab;
+};
+
 // CE QUE LE JOUEUR A DEMANDÉ À CETTE IMAGE.
 struct AchievementAction {
   // L'onglet a changé — clic dans l'arbre ou sur un filtre : `app` remet la
@@ -309,14 +321,21 @@ struct AchievementAction {
   // « Signaler un bug » : `app` joint ce que la fenêtre montre — le succès
   // choisi, sinon l'onglet ou le résumé.
   bool report_bug = false;
-  // L'ONGLET dont il veut poser le lien dans le chat — Maj + clic sur sa racine.
-  std::optional<int> link_tab;
+  // L'ONGLET OU LE SOUS-ONGLET dont il veut poser le lien dans le chat — Maj +
+  // clic sur sa racine ou sur sa sous-ligne.
+  std::optional<AchievementTabHit> link_tab;
 };
 
 // LE MODE LISTE : la liste et le détail plutôt que le résumé, et le bandeau
 // complet — filtres, trophée, titre et compte. Il vaut sur un onglet de
 // catégorie, et sur le résumé dès qu'une recherche est en cours.
 [[nodiscard]] bool AchievementListMode(const AchievementView& view);
+
+// OUVRE LA FENÊTRE SUR CETTE PLACE DE L'ARBRE, comme un lien qu'on suit : la
+// recherche quittée, la liste en haut, et le sous-onglet visible dans sa bande.
+// ⚠ L'APPELANT SIGNALE LE CHANGEMENT D'ONGLET à l'étage, qui remet alors la
+// sélection sur la première rangée.
+void OpenAchievementTab(AchievementWindowState& state, AchievementTabHit place);
 
 [[nodiscard]] AchievementAction DrawAchievementWindow(AchievementWindowState& state,
                                                       const AchievementView& view,
@@ -343,11 +362,6 @@ inline constexpr int kAchievementWheelRows = 3;
 // La bannière se coupe à ce nombre de caractères par ligne.
 inline constexpr std::size_t kAchievementBannerLineChars = 72;
 
-struct AchievementTabHit {
-  int tab = kAchievementSummaryTab;
-  int subtab = kAchievementWholeTab;
-};
-
 // Le haut d'une racine : les racines sous la racine choisie descendent de la
 // bande de ses sous-lignes montrées.
 [[nodiscard]] float AchievementTabTop(int tab, int chosen_tab, int chosen_subtab_count);
@@ -361,6 +375,9 @@ struct AchievementTabHit {
 
 // La plus grande valeur que prend un défilement : nul quand tout tient.
 [[nodiscard]] int AchievementSubtabScrollRange(int subtab_count);
+// Le défilement des sous-lignes qui montre ce sous-onglet dans la bande : en
+// bas de la bande quand il ne tient pas dans la première page, nul sinon.
+[[nodiscard]] int AchievementSubtabScrollShowing(int subtab, int subtab_count);
 [[nodiscard]] int AchievementListScrollRange(std::size_t row_count);
 [[nodiscard]] int ClampAchievementScroll(int scroll, int range);
 

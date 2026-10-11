@@ -38,12 +38,12 @@ constexpr std::string_view kBitmapExtension = ".bmp";
 constexpr std::string_view kRadioOn = "radiobtn_on.bmp";
 constexpr std::string_view kRadioOff = "radiobtn_off.bmp";
 
-// Le premier mot d'onglet, et le nombre de sous-onglets de chacun, dans
-// l'ordre de l'arbre et de `AchievementWord`. ⚠ « TOUS » N'A PAS DE MOT dans
-// la table du jeu : son libellé est à nous, et il ne consomme aucun mot.
+// Le premier mot d'onglet ; chaque onglet consomme ensuite un mot par
+// sous-onglet, dans l'ordre de l'arbre (`kAchievementSubtabCounts`) et de
+// `AchievementWord`. ⚠ « TOUS » N'A PAS DE MOT dans la table du jeu : son
+// libellé est à nous, et il ne consomme aucun mot.
 constexpr AchievementWord kFirstTabWord = AchievementWord::kTabSummary;
-constexpr std::array<std::size_t, ro::ui::kAchievementTabCount> kSubtabCounts = {0, 0, 3, 6,
-                                                                                 2, 2, 3, 0};
+constexpr const auto& kSubtabCounts = ro::ui::kAchievementSubtabCounts;
 
 // Une réclamation sans réponse au bout de ce temps se tient pour close.
 constexpr std::uint32_t kClaimSilenceMs = 10000;
@@ -71,16 +71,15 @@ constexpr int kVisibleRows = 5;
 // Combien de sous-onglets l'arbre range sous cet onglet.
 [[nodiscard]] int SubtabCountOf(int tab) {
   return tab >= 0 && static_cast<std::size_t>(tab) < kSubtabCounts.size()
-             ? static_cast<int>(kSubtabCounts[static_cast<std::size_t>(tab)])
+             ? kSubtabCounts[static_cast<std::size_t>(tab)]
              : 0;
 }
 
 // LE SOUS-ONGLET CHOISI SE MONTRE : le défilement d'un autre onglet laisserait
 // une bande vide, où un clic choisirait un sous-onglet absent.
 void ShowSubtab(ro::ui::AchievementWindowState& state) {
-  state.subtab_scroll = ro::ui::ClampAchievementScroll(
-      state.subtab - (ro::ui::kAchievementTabSubShown - 1),
-      ro::ui::AchievementSubtabScrollRange(SubtabCountOf(state.tab)));
+  state.subtab_scroll =
+      ro::ui::AchievementSubtabScrollShowing(state.subtab, SubtabCountOf(state.tab));
 }
 
 }  // namespace
@@ -530,7 +529,7 @@ void AchievementStage::ComposeWords() {
                           ? std::string_view(ro::core::Tr("Tous"))
                           : Word(static_cast<AchievementWord>(rank++));
     subtab_words_[tab].clear();
-    for (std::size_t sub = 0; sub < kSubtabCounts[tab]; ++sub) {
+    for (int sub = 0; sub < kSubtabCounts[tab]; ++sub) {
       subtab_words_[tab].push_back(Word(static_cast<AchievementWord>(rank++)));
     }
     words.subtabs[tab] = subtab_words_[tab];

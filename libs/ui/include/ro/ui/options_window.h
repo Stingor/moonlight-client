@@ -226,9 +226,22 @@ struct OptionRowView {
   bool warning = false;
 };
 
+// LES ONGLETS QU'UNE PAGE DESSINE ELLE-MÊME, entre le panneau et elle : ce que
+// le panneau lui demande, et ce qu'elle lui rend. Un rang d'onglet est celui
+// que la page donne à ses onglets ; le panneau ne sait pas ce qu'il désigne.
+struct OptionBodyTabs {
+  // L'onglet à ouvrir — un lien qu'on suit —, ou moins un. Une image, pas plus :
+  // voir `OptionsWindowState::section_tab_wanted`.
+  int wanted = -1;
+  // Le Maj + clic d'un onglet pose son lien dans le chat.
+  bool offers_links = false;
+  // RENDU PAR LA PAGE : l'onglet dont on veut le lien, ou moins un.
+  int link = -1;
+};
+
 // CE QU'UNE PAGE DESSINE ELLE-MÊME, sous ses rangées. Voir
 // `OptionSectionView::body`.
-using OptionSectionBody = std::function<void(const SkinArt& art)>;
+using OptionSectionBody = std::function<void(const SkinArt& art, OptionBodyTabs& tabs)>;
 
 // Une section : son titre, et ses lignes. Les sections rangent la fenêtre —
 // sept réglages en vrac se cherchent déjà.

@@ -11,6 +11,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/chat_link_offer.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -173,16 +174,33 @@ CommandsPageAction DrawCommandsPage(const CommandsPageView& view, CommandsPageSt
   }
   ImGui::BeginDisabled(!view.told);
   if (BeginSkinTabBar("CommandsSettingsTabs", art)) {
-    if (ImGui::BeginTabItem(core::Tr("Général"))) {
+    // ⚠ LA LANGUETTE AVANT SON CONTENU : voir `OfferChatLink`. Un onglet demandé
+    // s'impose une seule fois, sans quoi le clic sur l'autre serait annulé.
+    const auto tab_item = [&](const char* label, CommandsTab tab) {
+      const ImGuiTabItemFlags flags =
+          state.tab_wanted == tab ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None;
+      const bool opened = ImGui::BeginTabItem(label, nullptr, flags);
+      if (OfferChatLink(view.offers_links)) {
+        asked.link_tab = tab;
+      }
+      if (opened) {
+        state.tab = tab;
+      }
+      return opened;
+    };
+    if (tab_item(core::Tr("Général"), CommandsTab::kGeneral)) {
       DrawGeneralTab(view, art, asked);
       ImGui::EndTabItem();
     }
-    if (ImGui::BeginTabItem(core::Tr("Autoloots"))) {
+    if (tab_item(core::Tr("Autoloots"), CommandsTab::kAutoloot)) {
       commands_page::DrawAutolootTab(view, state, art, asked);
       ImGui::EndTabItem();
     }
     EndSkinTabBar();
   }
+  // ⚠ CONSOMMÉ QUOI QU'IL ARRIVE : une demande qui survivrait rouvrirait son
+  // onglet à chaque image.
+  state.tab_wanted.reset();
   ImGui::EndDisabled();
   return asked;
 }

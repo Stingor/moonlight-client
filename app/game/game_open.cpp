@@ -68,10 +68,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     windows_.view_equip.state.compare = settings_->options().view_equip().compare;
   });
   settings_->options().pages().profiles_body =
-      [layouts = shell_.layouts().Body(),
-       settings = settings_->profiles().Body()](const ro::ui::SkinArt& art) {
-        layouts(art);
-        settings(art);
+      [layouts = shell_.layouts().Body(), settings = settings_->profiles().Body()](
+          const ro::ui::SkinArt& art, ro::ui::OptionBodyTabs& tabs) {
+        layouts(art, tabs);
+        settings(art, tabs);
       };
   // « VOIR L'ÉQUIPEMENT » AUSSI, pour la même raison, avec ses deux cases
   // retenues : elles ne se relisent qu'ici, et la fenêtre les porte ensuite.

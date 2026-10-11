@@ -148,7 +148,7 @@ class ProfileKeeper {
 
   // Le corps de la page. ⚠ IL RETIENT `this` : ceci doit survivre au panneau.
   [[nodiscard]] ro::ui::OptionSectionBody Body() {
-    return [this](const ro::ui::SkinArt& art) {
+    return [this](const ro::ui::SkinArt& art, ro::ui::OptionBodyTabs&) {
       ro::ui::ProfilesPageView view = view_;
       const ProfileFamilyText text = text_();
       view.title = text.title;

@@ -504,10 +504,6 @@ void DrawSection(const OptionSectionView& section, OptionsWindowState& state, co
       ImGui::EndTabBar();
     }
     ImGui::PopID();
-    // ⚠ CONSOMMÉ QUOI QU'IL ARRIVE, y compris si le rang demandé n'existe pas :
-    // une demande qui survivrait rouvrirait sa page à chaque image, et l'on
-    // serait bloqué dessus — le défaut même qu'on vient de corriger.
-    state.section_tab_wanted = -1;
   }
   // ⚠ SOUS L'IDENTITÉ DE LA PAGE : les colonnes mesurées se rangent par page,
   // et une autre page ne prête pas la sienne.
@@ -517,12 +513,25 @@ void DrawSection(const OptionSectionView& section, OptionsWindowState& state, co
   ImGui::PopID();
   ImGui::PopID();
   if (section.body) {
+    // LES ONGLETS QUE LA PAGE DESSINE ELLE-MÊME reçoivent la demande, quand la
+    // section n'en porte pas qui l'auraient déjà prise, et rendent leur lien
+    // comme ceux de la section.
+    OptionBodyTabs tabs{.wanted = section.tabs.empty() ? state.section_tab_wanted : -1,
+                        .offers_links = offers_links};
     ImGui::PushID(state.section);
     ImGui::BeginDisabled(covered);
-    section.body(art);
+    section.body(art, tabs);
     ImGui::EndDisabled();
     ImGui::PopID();
+    if (tabs.link >= 0) {
+      asked->link_section = state.section;
+      asked->link_tab = tabs.link;
+    }
   }
+  // ⚠ CONSOMMÉ QUOI QU'IL ARRIVE, y compris si le rang demandé n'existe pas :
+  // une demande qui survivrait rouvrirait sa page à chaque image, et l'on
+  // serait bloqué dessus.
+  state.section_tab_wanted = -1;
   if (pinned) {
     PaintWindowScrollbar(art);
     ImGui::EndChild();

@@ -10,6 +10,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/achievement_window.h"
 #include "ro/ui/character_window.h"
+#include "ro/ui/commands_page.h"
 #include "ro/ui/hotkey_window.h"
 #include "ro/ui/party_friend_window.h"
 #include "ro/ui/shortcut_bar.h"
@@ -56,6 +57,14 @@ template <typename Tab>
   return SettingDestination{.key = key, .label = label, .kind = kind, .tab = static_cast<int>(tab)};
 }
 
+// UN SOUS-ONGLET DES SUCCÈS : la sous-catégorie, par son rang sous son onglet.
+[[nodiscard]] constexpr SettingDestination AchievementSubtab(std::string_view key,
+                                                             const char* label, int tab,
+                                                             int subtab) {
+  return SettingDestination{
+      .key = key, .label = label, .kind = Kind::kAchievements, .tab = tab, .subtab = subtab};
+}
+
 // LES ONGLETS DES CATÉGORIES DE SUCCÈS. ⚠ LE NUMÉRO EST CELUI DE LA CATÉGORIE
 // DANS LE CATALOGUE, compté à partir de un, dans l'ordre de l'arbre.
 constexpr int kAchievementGeneralTab = ro::ui::AchievementTabOfMajor(1);
@@ -66,6 +75,7 @@ constexpr int kAchievementMemorialTab = ro::ui::AchievementTabOfMajor(5);
 constexpr int kAchievementFeatTab = ro::ui::AchievementTabOfMajor(6);
 
 using ro::ui::CharacterTab;
+using ro::ui::CommandsTab;
 using ro::ui::PartyFriendTab;
 using ro::ui::StatBar;
 
@@ -156,6 +166,10 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     Page("skills", TrText("Personnage"), OptionSection::kCharacter),
     Page("pet", TrText("Fiche de pet"), OptionSection::kPet),
     Page("commands", TrText("Commands Settings"), OptionSection::kCommands),
+    // Les onglets que la page dessine elle-même.
+    PageTab("commands_general", TrText("Général"), OptionSection::kCommands, CommandsTab::kGeneral),
+    PageTab("commands_autoloot", TrText("Autoloots"), OptionSection::kCommands,
+            CommandsTab::kAutoloot),
 
     // ── LES ONGLETS DE LA FICHE DU PERSONNAGE ──
     WindowTab("sheet_equipment", TrText("Équipement"), Kind::kSheet, CharacterTab::kEquipment),
@@ -181,6 +195,35 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
               kAchievementMemorialTab),
     WindowTab("achievements_feat", TrText("Exploit"), Kind::kAchievements, kAchievementFeatTab),
 
+    // ── LES SOUS-ONGLETS DES SUCCÈS ── catégorie › sous-catégorie, dans l'ordre
+    // de l'arbre. Les libellés sont ceux de l'arbre.
+    AchievementSubtab("achievements_general_character", TrText("Personnage"),
+                      kAchievementGeneralTab, 0),
+    AchievementSubtab("achievements_general_action", TrText("Action"), kAchievementGeneralTab, 1),
+    AchievementSubtab("achievements_general_other", TrText("Autre"), kAchievementGeneralTab, 2),
+    AchievementSubtab("achievements_adventure_rune_midgarts", TrText("Rune Midgarts"),
+                      kAchievementAdventureTab, 0),
+    AchievementSubtab("achievements_adventure_schwarzwald", TrText("Schwartzvald"),
+                      kAchievementAdventureTab, 1),
+    AchievementSubtab("achievements_adventure_arunafeltz", TrText("Arunafeltz"),
+                      kAchievementAdventureTab, 2),
+    AchievementSubtab("achievements_adventure_new_world", TrText("Nouveau Monde"),
+                      kAchievementAdventureTab, 3),
+    AchievementSubtab("achievements_adventure_localizing", TrText("Localisation"),
+                      kAchievementAdventureTab, 4),
+    AchievementSubtab("achievements_adventure_dungeon", TrText("Donjon"), kAchievementAdventureTab,
+                      5),
+    AchievementSubtab("achievements_battle_pvp", TrText("Duel"), kAchievementBattleTab, 0),
+    AchievementSubtab("achievements_battle_training", TrText("Entraînement"), kAchievementBattleTab,
+                      1),
+    AchievementSubtab("achievements_quest_episode", TrText("Épisode"), kAchievementQuestTab, 0),
+    AchievementSubtab("achievements_quest_general", TrText("Général"), kAchievementQuestTab, 1),
+    AchievementSubtab("achievements_memorial_midgard", TrText("Midgard"), kAchievementMemorialTab,
+                      0),
+    AchievementSubtab("achievements_memorial_new_world", TrText("Nouveau Monde"),
+                      kAchievementMemorialTab, 1),
+    AchievementSubtab("achievements_memorial_other", TrText("Autre"), kAchievementMemorialTab, 2),
+
     // ── LES ONGLETS DE GROUPE / AMIS ──
     WindowTab("party_window_party", TrText("Groupe"), Kind::kPartyFriend, PartyFriendTab::kParty),
     WindowTab("party_window_friends", TrText("Amis"), Kind::kPartyFriend, PartyFriendTab::kFriends),
@@ -203,6 +246,40 @@ static_assert(kEntityPageTabCount == 7);
 static_assert(static_cast<std::size_t>(DamageTab::kCount) == 3);
 static_assert(kHotkeyTabCount == 6);
 static_assert(ro::ui::kAchievementTabCount == kAchievementFeatTab + 1);
+static_assert(ro::ui::kCommandsTabCount == 2);
+
+// CHAQUE SOUS-ONGLET DE L'ARBRE A UNE CLÉ ET UNE SEULE, et aucune clé ne
+// désigne un sous-onglet que l'arbre n'a pas.
+[[nodiscard]] constexpr bool SubtabsMatchTree() {
+  for (const SettingDestination& destination : kDestinations) {
+    if (destination.subtab == kNoSettingTab) {
+      continue;
+    }
+    if (destination.kind != Kind::kAchievements || destination.tab < 0 ||
+        destination.tab >= ro::ui::kAchievementTabCount || destination.subtab < 0 ||
+        destination.subtab >=
+            ro::ui::kAchievementSubtabCounts[static_cast<std::size_t>(destination.tab)]) {
+      return false;
+    }
+  }
+  for (int tab = 0; tab < ro::ui::kAchievementTabCount; ++tab) {
+    for (int subtab = 0; subtab < ro::ui::kAchievementSubtabCounts[static_cast<std::size_t>(tab)];
+         ++subtab) {
+      int keys = 0;
+      for (const SettingDestination& destination : kDestinations) {
+        if (destination.kind == Kind::kAchievements && destination.tab == tab &&
+            destination.subtab == subtab) {
+          ++keys;
+        }
+      }
+      if (keys != 1) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+static_assert(SubtabsMatchTree());
 
 }  // namespace
 

@@ -153,8 +153,16 @@ void CommandsPage::NoteDescribed(std::uint32_t item_id) {
 }
 
 ro::ui::OptionSectionBody CommandsPage::Body() {
-  return
-      [this](const ro::ui::SkinArt& art) { asked_ = ro::ui::DrawCommandsPage(view_, state_, art); };
+  return [this](const ro::ui::SkinArt& art, ro::ui::OptionBodyTabs& tabs) {
+    if (tabs.wanted >= 0 && tabs.wanted < ro::ui::kCommandsTabCount) {
+      state_.tab_wanted = static_cast<ro::ui::CommandsTab>(tabs.wanted);
+    }
+    view_.offers_links = tabs.offers_links;
+    asked_ = ro::ui::DrawCommandsPage(view_, state_, art);
+    if (asked_.link_tab.has_value()) {
+      tabs.link = static_cast<int>(*asked_.link_tab);
+    }
+  };
 }
 
 void CommandsPage::FollowPresetAnnounce() {

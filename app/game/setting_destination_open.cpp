@@ -1,6 +1,7 @@
 #include "game/setting_destination_open.h"
 
 #include <algorithm>
+#include <optional>
 
 #include "ro/ui/achievement_window.h"
 #include "ro/ui/character_window.h"
@@ -32,16 +33,15 @@ void OpenSettingDestination(const SettingDestination& destination, UiStage::Wind
       return;
     }
     case SettingDestinationKind::kAchievements: {
-      ro::ui::AchievementWindowState& state = windows.achievements.window;
       // ⚠ UN ONGLET CHOISI QUITTE LA RECHERCHE, comme un clic dans l'arbre, et la
       // sélection revient sur sa première rangée : c'est le changement d'onglet
       // que l'étage lit à l'image suivante.
-      state.search.fill('\0');
-      state.open = true;
-      state.tab = destination.tab;
-      state.subtab = ro::ui::kAchievementWholeTab;
-      state.subtab_scroll = 0;
-      state.list_scroll = 0;
+      ro::ui::OpenAchievementTab(
+          windows.achievements.window,
+          ro::ui::AchievementTabHit{.tab = destination.tab,
+                                    .subtab = destination.subtab == kNoSettingTab
+                                                  ? ro::ui::kAchievementWholeTab
+                                                  : destination.subtab});
       windows.achievements.news_lit = false;
       windows.achievements.answer.tab_changed = true;
       return;
@@ -78,9 +78,18 @@ const SettingDestination* AskedSettingLink(const UiStage::Answers& answers,
     return SettingDestinationOf(Kind::kSheet, OptionSection::kCount,
                                 static_cast<int>(*answers.character.link_tab));
   }
-  if (windows.achievements.answer.link_tab.has_value()) {
-    return SettingDestinationOf(Kind::kAchievements, OptionSection::kCount,
-                                *windows.achievements.answer.link_tab);
+  if (const std::optional<ro::ui::AchievementTabHit>& place = windows.achievements.answer.link_tab;
+      place.has_value()) {
+    // ⚠ UN SOUS-ONGLET SANS CLÉ RETOMBE SUR SON ONGLET, comme un onglet de page
+    // sur sa page.
+    const SettingDestination* const subtab =
+        place->subtab == ro::ui::kAchievementWholeTab
+            ? nullptr
+            : SettingDestinationOf(Kind::kAchievements, OptionSection::kCount, place->tab,
+                                   place->subtab);
+    return subtab != nullptr
+               ? subtab
+               : SettingDestinationOf(Kind::kAchievements, OptionSection::kCount, place->tab);
   }
   if (windows.party.answer.link_tab.has_value()) {
     return SettingDestinationOf(Kind::kPartyFriend, OptionSection::kCount,

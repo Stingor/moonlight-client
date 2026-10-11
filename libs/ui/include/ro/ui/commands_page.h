@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <string>
 
@@ -21,6 +22,14 @@ namespace ro::ui {
 // ⚠ DEUX ONGLETS, « Général » et « Autoloots », et c'est la page qui les dessine :
 // les listes repliables, la liste de ramassage et ses presets ne sont pas des
 // rangées de réglage.
+
+// LES DEUX ONGLETS, dans l'ordre où la page les dessine. ⚠ LE RANG EST CELUI
+// QU'UN LIEN DE RÉGLAGE DÉSIGNE : un onglet s'ajoute en fin.
+enum class CommandsTab : std::uint8_t {
+  kGeneral = 0,
+  kAutoloot = 1,
+};
+inline constexpr int kCommandsTabCount = 2;
 
 // Un item de la liste de ramassage.
 struct CommandsAutolootEntry {
@@ -87,6 +96,10 @@ struct CommandsPageView {
   // zéro pour aucun.
   std::uint32_t last_viewed_item = 0;
   const char* last_viewed_name = nullptr;
+
+  // Le Maj + clic d'un onglet pose son lien dans le chat. Faux là où il n'y a
+  // pas de chat.
+  bool offers_links = false;
 };
 
 // CE QUE LA PAGE RETIENT D'UNE IMAGE À L'AUTRE : ce qu'on tape, et le preset
@@ -101,6 +114,11 @@ struct CommandsPageState {
   bool rename_open = false;
   // Le preset choisi dans la liste déroulante, qui peut n'être pas le chargé.
   std::uint8_t selected_preset = 0;
+  // L'ONGLET OUVERT, relevé à chaque image : c'est ImGui qui le tient.
+  CommandsTab tab = CommandsTab::kGeneral;
+  // L'ONGLET QU'ON DEMANDE D'OUVRIR — un lien qu'on suit —, consommé à l'image
+  // qui l'applique. Voir `OptionsWindowState::section_tab_wanted`.
+  std::optional<CommandsTab> tab_wanted;
 };
 
 // Le réglage qu'une case, une liste ou un curseur vient de changer.
@@ -154,6 +172,10 @@ struct CommandsPageAction {
   CommandsPresetGesture preset = CommandsPresetGesture::kNone;
   std::uint8_t preset_slot = 0;
   std::string preset_name;
+
+  // L'ONGLET dont on veut poser le lien dans le chat — Maj + clic sur sa
+  // languette, qui le sélectionne au passage.
+  std::optional<CommandsTab> link_tab;
 };
 
 [[nodiscard]] CommandsPageAction DrawCommandsPage(const CommandsPageView& view,

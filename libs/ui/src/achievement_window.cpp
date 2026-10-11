@@ -191,10 +191,10 @@ void TreeInput(const Painter& paint, AchievementWindowState& state, const Achiev
   // ⚠ L'ARBRE S'ARRÊTE À SA PORTÉE : plus bas, la recherche et le tri ont la
   // souris, et un rectangle soumis avant eux la leur prendrait.
   const paint_kit::HitResult hit = paint.Hit("##arbre", 0.0F, 0.0F, kTreeWidth, kTreeReach);
-  // MAJ + CLIC SUR UNE RACINE : le lien de l'onglet dans le chat, et l'onglet
-  // choisi au passage. ⚠ LU SUR LA GÉOMÉTRIE, AVANT LA GARDE DU SURVOL : une
-  // saisie de chat qui tient le clavier rend l'arbre muet — voir
-  // `chat_link_offer.h`.
+  // MAJ + CLIC SUR UNE RACINE OU UNE SOUS-LIGNE : le lien de ce qu'elle désigne
+  // dans le chat, et elle choisie au passage. ⚠ LU SUR LA GÉOMÉTRIE, AVANT LA
+  // GARDE DU SURVOL : une saisie de chat qui tient le clavier rend l'arbre
+  // muet — voir `chat_link_offer.h`.
   const bool shift_clicked = ShiftClickedLastItem();
   const bool tip_hovered = HoveredForLinkTooltip();
   if (!hit.hovered && !hit.pressed && !shift_clicked && !tip_hovered) {
@@ -202,16 +202,15 @@ void TreeInput(const Painter& paint, AchievementWindowState& state, const Achiev
   }
   const std::optional<AchievementTabHit> touched = HitAchievementTab(
       hit.mouse.y, state.tab, subtab_count, state.subtab_scroll, kAchievementTabCount);
-  const bool on_root = touched.has_value() && touched->subtab == kAchievementWholeTab;
-  if (on_root && shift_clicked) {
-    action.link_tab = touched->tab;
-  } else if (on_root && tip_hovered) {
+  if (touched.has_value() && shift_clicked) {
+    action.link_tab = touched;
+  } else if (touched.has_value() && tip_hovered) {
     SkinTooltipFormat("%s", ChatLinkGestureHint());
   }
   // ⚠ LE DERNIER SURVOL RESTE : rien ne l'éteint quand la souris s'en va.
   state.hovered_tab = touched.has_value() ? touched->tab : kAchievementNothingHovered;
   state.hovered_subtab = touched.has_value() ? touched->subtab : kAchievementNothingHovered;
-  if ((hit.pressed || (on_root && shift_clicked)) && touched.has_value()) {
+  if ((hit.pressed || shift_clicked) && touched.has_value()) {
     // CHOISIR UN ONGLET QUITTE LA RECHERCHE : sinon la liste resterait celle
     // des résultats, et le clic ne montrerait rien.
     state.search.fill('\0');
@@ -462,6 +461,25 @@ std::optional<AchievementTabHit> HitAchievementTab(float y, int chosen_tab, int 
 
 int AchievementSubtabScrollRange(int subtab_count) {
   return std::max(0, subtab_count - kAchievementTabSubShown);
+}
+
+int AchievementSubtabScrollShowing(int subtab, int subtab_count) {
+  return ClampAchievementScroll(subtab - (kAchievementTabSubShown - 1),
+                                AchievementSubtabScrollRange(subtab_count));
+}
+
+void OpenAchievementTab(AchievementWindowState& state, AchievementTabHit place) {
+  const int tab = std::clamp(place.tab, 0, kAchievementTabCount - 1);
+  const int subtab_count = kAchievementSubtabCounts[static_cast<std::size_t>(tab)];
+  // ⚠ UN SOUS-ONGLET QUE L'ONGLET N'A PAS rend l'onglet entier.
+  const int subtab =
+      place.subtab >= 0 && place.subtab < subtab_count ? place.subtab : kAchievementWholeTab;
+  state.search.fill('\0');
+  state.open = true;
+  state.tab = tab;
+  state.subtab = subtab;
+  state.subtab_scroll = AchievementSubtabScrollShowing(subtab, subtab_count);
+  state.list_scroll = 0;
 }
 
 int AchievementListScrollRange(std::size_t row_count) {

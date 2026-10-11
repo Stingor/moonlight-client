@@ -61,6 +61,10 @@ struct SettingDestination {
   // L'onglet, par son rang dans la fenêtre ou dans la page ; `kNoSettingTab`
   // pour une page entière.
   int tab = kNoSettingTab;
+  // Le sous-onglet de cet onglet — une sous-catégorie des succès —, ou
+  // `kNoSettingTab` pour l'onglet entier. Le libellé est alors celui du
+  // sous-onglet seul : l'onglet qui le porte se nomme par sa propre entrée.
+  int subtab = kNoSettingTab;
   // Un numéro posé après le libellé — « Barre 3 » —, ou zéro.
   int ordinal = 0;
 };
@@ -83,9 +87,11 @@ struct SettingReach {
 [[nodiscard]] const SettingDestination* FindSettingDestination(std::string_view key);
 
 // LA CLÉ QU'UN MAJ+CLIC POSE pour cette page et cet onglet, ou pour cet onglet
-// de fenêtre : la première de la table. Nul quand aucune ne les désigne.
+// de fenêtre et ce sous-onglet : la première de la table. Nul quand aucune ne
+// les désigne.
 [[nodiscard]] const SettingDestination* SettingDestinationOf(SettingDestinationKind kind,
-                                                             OptionSection section, int tab);
+                                                             OptionSection section, int tab,
+                                                             int subtab = kNoSettingTab);
 
 // LA DESTINATION EST-ELLE OFFERTE À CE LECTEUR ? Un onglet d'homoncule sans
 // homoncule ne mène nulle part : la fiche ne le montre pas.

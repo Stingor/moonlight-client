@@ -76,6 +76,15 @@ template <typename Word>
   std::string path;
   if (const char* const window = WindowTitleOf(destination.kind); window != nullptr) {
     path = word(window);
+    // UN SOUS-ONGLET NOMME SON ONGLET entre la fenêtre et lui.
+    if (destination.subtab != kNoSettingTab) {
+      if (const SettingDestination* const tab =
+              SettingDestinationOf(destination.kind, destination.section, destination.tab);
+          tab != nullptr) {
+        path += kPathStep;
+        path += Leaf(*tab, word);
+      }
+    }
   } else if (destination.tab != kNoSettingTab) {
     if (const SettingDestination* const page = PageOf(destination.section);
         page != nullptr && page != &destination) {
@@ -107,10 +116,10 @@ const SettingDestination* FindSettingDestination(std::string_view key) {
 }
 
 const SettingDestination* SettingDestinationOf(SettingDestinationKind kind, OptionSection section,
-                                               int tab) {
+                                               int tab, int subtab) {
   for (const SettingDestination& destination : SettingDestinations()) {
     // ⚠ LA PAGE NE DÉPARTAGE QUE LES PAGES : un onglet de fenêtre porte `kCount`.
-    if (destination.kind == kind && destination.tab == tab &&
+    if (destination.kind == kind && destination.tab == tab && destination.subtab == subtab &&
         (kind != SettingDestinationKind::kOptions || destination.section == section)) {
       return &destination;
     }
