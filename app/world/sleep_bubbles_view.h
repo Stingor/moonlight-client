@@ -9,9 +9,12 @@
 #include "ro/render/sprite_renderer.h"
 #include "ro/sim/world_fwd.h"
 
+#include "game/companion_target_marks.h"
+
 // LES SPRITES-ENFANTS QUI TIENNENT SUR UN ACTEUR TANT QU'UN ÉTAT DURE : les
 // bulles du sommeil, les points de suspension du silence, les étoiles de
-// l'étourdissement et le bloc de glace du gel. Tous suivent la même tenue — voir
+// l'étourdissement, le bloc de glace du gel et le marqueur de cible des
+// compagnons. Tous suivent la même tenue — voir
 // `ro::render::ComposeHeldChildSprite`.
 namespace moonclient {
 
@@ -74,6 +77,29 @@ class StunStars {
  private:
   const ro::formats::SprSprite* sprite_ = nullptr;
   const ro::formats::ActAnimation* animation_ = nullptr;
+  std::vector<ro::render::ComposedActor> frames_;
+  std::vector<ro::render::DrawnActor> shown_;
+};
+
+// LE MARQUEUR DE CIBLE DES COMPAGNONS au-dessus des acteurs dessinés que leur
+// geste d'attaque a marqués — voir `ro/render/companion_target_mark.h`. Même
+// contrat que `SleepBubbles` ; le sprite est celui du curseur, et
+// `marked_ids` vient de `CompanionAiStage::target_marks`.
+class CompanionTargetMarks {
+ public:
+  CompanionTargetMarks(const ro::formats::SprSprite* sprite,
+                       const ro::formats::ActAnimation* animation)
+      : sprite_(sprite), animation_(animation) {}
+
+  [[nodiscard]] std::span<const ro::render::DrawnActor> Drawn(
+      std::uint32_t now_ms, std::span<const std::uint32_t> marked_ids,
+      std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
+      const ro::sim::World& world, bool translucent);
+
+ private:
+  const ro::formats::SprSprite* sprite_ = nullptr;
+  const ro::formats::ActAnimation* animation_ = nullptr;
+  CompanionTargetMarkClock clock_;
   std::vector<ro::render::ComposedActor> frames_;
   std::vector<ro::render::DrawnActor> shown_;
 };

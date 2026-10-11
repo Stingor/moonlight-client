@@ -84,14 +84,14 @@ AttackPress AttackDesignation::Press(std::uint32_t actor_id, bool reserve,
     return AttackPress::kIgnored;
   }
   if (reserve) {
-    designated_id_ = 0;
     return AttackPress::kReserveAttack;
   }
-  if (designated_id_ != actor_id) {
-    designated_id_ = actor_id;
+  if (!armed_ || marked_id_ != actor_id) {
+    marked_id_ = actor_id;
+    armed_ = true;
     return AttackPress::kDesignated;
   }
-  designated_id_ = 0;
+  armed_ = false;
   return AttackPress::kAttack;
 }
 

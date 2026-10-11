@@ -435,8 +435,9 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // pose PAR-DESSUS, hors du post-traitement, sans épreuve de profondeur.
   present_scene();
 
-  // LES BULLES DU SOMMEIL, LES POINTS DU SILENCE, LES ÉTOILES DE L'ÉTOURDI ET
-  // LES MARQUES DE QUÊTE, en avant de toute la scène.
+  // LES BULLES DU SOMMEIL, LES POINTS DU SILENCE, LES ÉTOILES DE L'ÉTOURDI, LES
+  // MARQUES DE QUÊTE ET LE MARQUEUR DE CIBLE DES COMPAGNONS, en avant de toute
+  // la scène.
   for (const std::span<const ro::render::DrawnActor> held :
        DrawnHeldChildSprites(pieces_, now_ms, scene_actors_.drawn, scene_actors_.ids, world_,
                              settings_->options().graphics().summon_translucent())) {

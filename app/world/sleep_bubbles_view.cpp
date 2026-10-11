@@ -1,10 +1,13 @@
 #include "world/sleep_bubbles_view.h"
 
 #include <cstddef>
+#include <functional>
 #include <optional>
 #include <utility>
+#include <vector>
 
 #include "ro/render/ailment_sprites.h"
+#include "ro/render/companion_target_mark.h"
 #include "ro/render/silence_dots.h"
 #include "ro/render/sleep_bubbles.h"
 #include "ro/render/sprite_frame.h"
@@ -12,13 +15,14 @@
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "world/actor_view.h"
 #include "world/hit_popup_rules.h"
 
 namespace moonclient {
 namespace {
 
 // DEPUIS QUAND L'ÉTAT TIENT UN ACTEUR, ou rien quand il ne le tient pas.
-using HeldSince = std::optional<std::uint32_t> (*)(const ro::sim::Actor& actor);
+using HeldSince = std::function<std::optional<std::uint32_t>(const ro::sim::Actor& actor)>;
 
 // CE QUE L'ÉTAT FAIT PARAÎTRE, ET OÙ : l'action jouée, sa hauteur au-dessus des
 // pieds, et son avance vers la caméra — nulle pour ce qui se peint en avant de
@@ -33,7 +37,7 @@ struct HeldLook {
 // `look.action_index` à son âge, `look.rise_units` au-dessus de ses pieds.
 std::span<const ro::render::DrawnActor> DrawHeld(
     const ro::formats::SprSprite* sprite, const ro::formats::ActAnimation* animation,
-    const HeldLook& look, HeldSince held_since, std::uint32_t now_ms,
+    const HeldLook& look, const HeldSince& held_since, std::uint32_t now_ms,
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
     const ro::sim::World& world, bool translucent, std::vector<ro::render::ComposedActor>& frames,
     std::vector<ro::render::DrawnActor>& shown) {
@@ -166,6 +170,28 @@ std::span<const ro::render::DrawnActor> StunStars::Drawn(
   return DrawHeld(sprite_, animation_,
                   HeldLook{ro::render::kStunStarsAction, ro::render::kStunStarsRiseUnits, 0.0F},
                   &StunnedSince, now_ms, drawn, ids, world, translucent, frames_, shown_);
+}
+
+std::span<const ro::render::DrawnActor> CompanionTargetMarks::Drawn(
+    std::uint32_t now_ms, std::span<const std::uint32_t> marked_ids,
+    std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
+    const ro::sim::World& world, bool translucent) {
+  // L'ANNEAU NAÎT SUR UN ACTEUR PRÉSENT, même hors de l'écran, et seulement sur
+  // une créature : un joueur marqué n'en porte pas.
+  std::vector<std::uint32_t> bearer_ids;
+  for (const std::uint32_t marked_id : marked_ids) {
+    const ro::sim::Actor* actor = world.Find(marked_id);
+    if (actor != nullptr && !ComposedAsPlayer(*actor)) {
+      bearer_ids.push_back(marked_id);
+    }
+  }
+  clock_.Update(bearer_ids, now_ms);
+  return DrawHeld(
+      sprite_, animation_,
+      HeldLook{ro::render::kCompanionTargetMarkAction, ro::render::kCompanionTargetMarkRiseUnits,
+               0.0F},
+      [this](const ro::sim::Actor& actor) { return clock_.MarkedSince(actor.id); }, now_ms, drawn,
+      ids, world, translucent, frames_, shown_);
 }
 
 std::span<const ro::render::DrawnActor> FrozenIce::Drawn(

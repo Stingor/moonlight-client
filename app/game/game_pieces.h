@@ -215,6 +215,8 @@ struct GamePieces {
   std::vector<ro::render::LoadedActorSprite> cursor_sprites;
   CursorSprite cursor;
   ro::render::OverlayRenderer overlay;
+  // Le marqueur de cible des compagnons : l'anneau du même fichier.
+  std::optional<CompanionTargetMarks> companion_target_marks;
 
   // LES DEUX FONTES DE CHIFFRES DU CLASSEMENT PVP : le compteur doré du coin
   // bas-droit, et le chronomètre du premier. ⚠ DEUX FICHIERS ET NON UN — le
@@ -537,9 +539,10 @@ void FollowQuestLanguage(ro::vfs::Vfs& vfs, GamePieces& pieces);
 [[nodiscard]] const ro::render::FontAtlas* EnsureNameFont(GamePieces& pieces, float pixels);
 
 // LES SPRITES-ENFANTS QUI TIENNENT au-dessus des acteurs dessinés — bulles du
-// sommeil, points du silence, étoiles de l'étourdi, marques de quête —, un lot
-// par sorte, les lots vides écartés. Voir `SleepBubbles`, `SilenceDots`,
-// `StunStars` et `QuestMarkerSprites`.
+// sommeil, points du silence, étoiles de l'étourdi, marques de quête, marqueur
+// de cible des compagnons —, un lot par sorte, les lots vides écartés. Voir
+// `SleepBubbles`, `SilenceDots`, `StunStars`, `QuestMarkerSprites` et
+// `CompanionTargetMarks`.
 [[nodiscard]] std::vector<std::span<const ro::render::DrawnActor>> DrawnHeldChildSprites(
     GamePieces& pieces, std::uint32_t now_ms, std::span<const ro::render::DrawnActor> drawn,
     std::span<const std::uint32_t> ids, const ro::sim::World& world, bool translucent);

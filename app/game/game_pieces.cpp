@@ -221,6 +221,8 @@ void LoadCursor(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.cursor_sprites = std::move(*loaded);
   pieces.cursor =
       CursorSprite{&pieces.cursor_sprites.front().sprite, &pieces.cursor_sprites.front().animation};
+  pieces.companion_target_marks.emplace(&pieces.cursor_sprites.front().sprite,
+                                        &pieces.cursor_sprites.front().animation);
   pieces.overlay = std::move(*renderer);
   // Cacher celui du système est le COROLLAIRE d'avoir le nôtre, et non une
   // décision à part : les séparer laisserait les deux flèches à l'écran le
@@ -738,6 +740,10 @@ std::vector<std::span<const ro::render::DrawnActor>> DrawnHeldChildSprites(
   }
   if (pieces.quest_markers.has_value()) {
     keep(pieces.quest_markers->Drawn(now_ms, drawn, ids, world, translucent));
+  }
+  if (pieces.companion_target_marks.has_value()) {
+    keep(pieces.companion_target_marks->Drawn(now_ms, pieces.companion_ai.target_marks(), drawn,
+                                              ids, world, translucent));
   }
   return lots;
 }

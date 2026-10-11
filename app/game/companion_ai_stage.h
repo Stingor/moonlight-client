@@ -145,6 +145,10 @@ class CompanionAiStage {
                                 bool reserve, bool second_of_double);
   CompanionGesture PressOnGround(ro::sim::AiCompanion companion, ro::sim::CellPosition cell,
                                  bool reserve, bool second_of_double);
+  // LES ACTEURS QUI PORTENT LE MARQUEUR DE CIBLE : la marque de chaque compagnon
+  // présent, voir `ro::sim::AttackDesignation`. Un compagnon absent ne montre
+  // pas la sienne, mais la garde pour son retour.
+  [[nodiscard]] std::vector<std::uint32_t> target_marks() const;
 
   // « EN ATTENTE », en bascule, et ce qu'elle dit dans la conversation. Rend
   // faux sans compagnon.

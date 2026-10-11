@@ -204,7 +204,6 @@ bool CompanionAiStage::Advance(ro::net::Connection& link, ro::sim::World& world,
     Follow(slot, facts[index], now_ms);
     if (new_map) {
       slot.brain.ForgetMap(slot.settings.standby_kept_across_maps, arrived_ms_.value_or(now_ms));
-      slot.designation.Clear();
       slot.statuses.Forget();
     }
     if (facts[index].active && slot.followed.job.has_value()) {
@@ -252,6 +251,17 @@ bool CompanionAiStage::present(AiCompanion companion) const noexcept {
   return SlotOf(companion).actor_id != 0;
 }
 
+std::vector<std::uint32_t> CompanionAiStage::target_marks() const {
+  std::vector<std::uint32_t> marks;
+  for (const Slot& slot : slots_) {
+    const std::uint32_t marked_id = slot.designation.marked_id();
+    if (slot.actor_id != 0 && marked_id != 0) {
+      marks.push_back(marked_id);
+    }
+  }
+  return marks;
+}
+
 CompanionGesture CompanionAiStage::PressOnActor(AiCompanion companion, std::uint32_t actor_id,
                                                 bool reserve, bool second_of_double) {
   Slot& slot = SlotOf(companion);
@@ -280,11 +290,11 @@ CompanionGesture CompanionAiStage::PressOnGround(AiCompanion companion, ro::sim:
   if (slot.actor_id == 0 || second_of_double) {
     return CompanionGesture::kIgnored;
   }
-  slot.designation.Clear();
   const ro::sim::DirectOrder order{.kind = ro::sim::DirectOrder::Kind::kMove, .cell = cell};
   if (reserve) {
     return slot.brain.Reserve(order) ? CompanionGesture::kReserved : CompanionGesture::kIgnored;
   }
+  slot.designation.Clear();
   slot.brain.Command(order);
   return CompanionGesture::kCommanded;
 }
@@ -296,7 +306,6 @@ bool CompanionAiStage::ToggleStandby(AiCompanion companion, ro::sim::World& worl
     return false;
   }
   slot.brain.ToggleStandby();
-  slot.designation.Clear();
   const bool homunculus = companion == AiCompanion::kHomunculus;
   const char* said = nullptr;
   if (slot.brain.standby()) {
@@ -353,7 +362,6 @@ void CompanionAiStage::Follow(Slot& slot, const ro::sim::CompanionFacts& facts,
                               std::uint32_t now_ms) {
   slot.actor_id = facts.active ? facts.actor_id : 0;
   if (slot.actor_id == 0) {
-    slot.designation.Clear();
     return;
   }
   // UN AUTRE COMPAGNON n'hérite de rien, voir `FollowCompanion` ; son profil

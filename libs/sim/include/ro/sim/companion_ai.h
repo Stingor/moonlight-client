@@ -272,12 +272,18 @@ struct DecidingRule {
 // LE GESTE D'ATTAQUE EN DEUX APPUIS : le premier appui sur un acteur le
 // désigne, un second appui séparé sur le même acteur l'attaque. La désignation
 // n'expire pas ; un appui sur un autre acteur la déplace.
+//
+// LA MARQUE est l'acteur que le dernier premier appui a désigné, et qui porte le
+// marqueur de cible. ⚠ ELLE SURVIT AU SECOND APPUI : l'attaque partie, la cible
+// reste marquée. Seul un ordre de marche l'efface — ni l'ordre réservé, ni
+// l'attente, ni le changement de carte, ni l'absence du compagnon.
 enum class AttackPress : std::uint8_t {
   // Le second appui d'un double-clic : il ne compte pas.
   kIgnored,
   kDesignated,
   kAttack,
-  // Avec Maj : l'attaque part tout de suite dans la file réservée.
+  // Avec Maj : l'attaque part tout de suite dans la file réservée, sans
+  // toucher ni à la désignation ni à la marque.
   kReserveAttack,
 };
 
@@ -285,12 +291,19 @@ class AttackDesignation {
  public:
   [[nodiscard]] AttackPress Press(std::uint32_t actor_id, bool reserve,
                                   bool second_of_double) noexcept;
-  // Un ordre au sol, l'attente, un autre compagnon : la désignation s'éteint.
-  void Clear() noexcept { designated_id_ = 0; }
-  [[nodiscard]] std::uint32_t designated_id() const noexcept { return designated_id_; }
+  // Un ordre de marche : la désignation et la marque s'éteignent.
+  void Clear() noexcept {
+    marked_id_ = 0;
+    armed_ = false;
+  }
+  // L'acteur qu'un second appui attaquerait, ou zéro.
+  [[nodiscard]] std::uint32_t designated_id() const noexcept { return armed_ ? marked_id_ : 0; }
+  // L'acteur qui porte le marqueur de cible, ou zéro.
+  [[nodiscard]] std::uint32_t marked_id() const noexcept { return marked_id_; }
 
  private:
-  std::uint32_t designated_id_ = 0;
+  std::uint32_t marked_id_ = 0;
+  bool armed_ = false;
 };
 
 // L'IA D'UN COMPAGNON : une instance par compagnon.

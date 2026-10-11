@@ -349,7 +349,8 @@ add_library(moonclient_companionai STATIC
     game/companion_ai_profile_yaml.cpp
     game/companion_ai_settings_yaml.cpp
     game/companion_rule_words.cpp
-    game/companion_tactic_fields.cpp)
+    game/companion_tactic_fields.cpp
+    game/companion_target_marks.cpp)
 
 target_link_libraries(moonclient_companionai
     PUBLIC ro_core ro_sim ro_ui
