@@ -72,6 +72,7 @@ inline constexpr ChatTypeMask kFedChatTypes =
     MaskOf(ro::sim::ChatType::kExperience) | MaskOf(ro::sim::ChatType::kClanChat) |
     MaskOf(ro::sim::ChatType::kCall) | MaskOf(ro::sim::ChatType::kBroadcast) |
     MaskOf(ro::sim::ChatType::kBattlefield) | MaskOf(ro::sim::ChatType::kDiscord) |
+    MaskOf(ro::sim::ChatType::kQuestInfo) | MaskOf(ro::sim::ChatType::kRepaymentExp) |
     MaskOf(ro::sim::ChatType::kSkillUse);
 
 [[nodiscard]] constexpr bool IsFedChatType(ro::sim::ChatType type) {

@@ -43,8 +43,14 @@ struct QuestFrameResult {
   bool replaced = false;
   // La quête que 0x09F9 vient d'ajouter.
   std::optional<std::uint32_t> added;
-  // La quête que 0x02B4 vient de retirer.
+  // Sur 0x09F9, la quête était DÉJÀ au journal : le serveur renvoie l'ajout
+  // quand il change son état, et ce n'est pas une quête reçue.
+  bool added_was_listed = false;
+  // La quête que 0x02B4 vient de retirer du journal.
   std::optional<std::uint32_t> removed;
+  // LA QUÊTE QUE 0x02B4 NOMME, au journal ou non : le client d'origine annonce
+  // le retrait dans les deux cas, sous un titre vide quand il ne la tenait pas.
+  std::optional<std::uint32_t> deleted;
   // Sur 0x02B4, la raison que 0x0F3B a dite juste avant ; rien si elle ne l'a
   // pas été. Prise même quand la quête n'était plus au journal.
   std::optional<sim::QuestEnding> ending;
@@ -52,6 +58,10 @@ struct QuestFrameResult {
   std::optional<std::uint32_t> toggled;
   // 0x09FA : seulement les comptes qui ont augmenté.
   std::vector<QuestProgress> progressed;
+  // 0x09FA : CHAQUE CHASSE QUE LA TRAME REDIT et que le journal connaît, qu'elle
+  // ait bougé ou non. Le serveur les redit toutes à chaque coup, et le client
+  // d'origine écrit une ligne pour chacune.
+  std::vector<QuestProgress> reported;
 };
 
 [[nodiscard]] QuestFrameResult ApplyQuestFrame(const Frame& frame, sim::QuestLog& log);

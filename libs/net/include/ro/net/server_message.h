@@ -20,7 +20,10 @@ namespace ro::net {
 //   ZC 0x07E2 [op][msg:2][valeur:4]       en jaune, la valeur dans le gabarit
 //   ZC 0x07E6 [op][skill:2][msg:4]        en lavande, « [compétence] message »
 //
-// Chaque message devient une ligne `kServer` de la conversation.
+// Chaque message devient une ligne `kServer` de la conversation. Sa case est la
+// générale, sauf l'issue d'une compétence (« échecs de compétence ») et, par
+// 0x0291 seulement, les plafonds du tribut d'expérience à la guilde (« EXP de
+// contribution »).
 //
 // ⚠ UN NUMÉRO QUE LA TABLE NE PORTE PAS N'ÉCRIT RIEN : la trame est `kIgnored`
 // et le journal le dit. Inventer un texte ferait lire au joueur une phrase que

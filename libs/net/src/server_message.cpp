@@ -39,6 +39,21 @@ constexpr std::uint32_t kSkillMessageColor = 0xCDCDFF;
 // lirait jamais au-delà de ses arguments.
 constexpr std::string_view kValueHole = "%d";
 
+// LA CASE D'UN MESSAGE : l'issue d'une compétence sous « échecs de
+// compétence », un plafond du tribut à la guilde sous « EXP de contribution »
+// — mais seulement par `ZC_MSG`, le seul paquet que le client d'origine trie
+// ainsi —, le reste sous la case générale.
+[[nodiscard]] sim::ChatType TypeOf(std::uint16_t opcode, std::uint32_t message_id) {
+  if (opcode == proto::ZcMsgSkill::kOpcode) {
+    return sim::ChatType::kSkillFailure;
+  }
+  if (opcode == proto::ZcMsg::kOpcode && message_id <= std::numeric_limits<std::uint16_t>::max() &&
+      ServerMessageIsGuildExpTribute(static_cast<std::uint16_t>(message_id))) {
+    return sim::ChatType::kRepaymentExp;
+  }
+  return sim::ChatType::kPublic;
+}
+
 // Écrit la ligne. Un numéro absent de la table n'écrit rien, et le journal le
 // dit.
 FrameOutcome Say(sim::World& world, std::uint16_t opcode, std::uint32_t message_id,
@@ -60,11 +75,8 @@ FrameOutcome Say(sim::World& world, std::uint16_t opcode, std::uint32_t message_
       line.replace(hole, kValueHole.size(), std::to_string(*value));
     }
   }
-  // L'issue d'une compétence se range sous « échecs de compétence », le reste
-  // sous la case générale.
-  const sim::ChatType type =
-      opcode == proto::ZcMsgSkill::kOpcode ? sim::ChatType::kSkillFailure : sim::ChatType::kPublic;
-  world.RecordChat(sim::ChatKind::kServer, type, 0, std::move(line), now_ms, color);
+  world.RecordChat(sim::ChatKind::kServer, TypeOf(opcode, message_id), 0, std::move(line), now_ms,
+                   color);
   return FrameOutcome::kApplied;
 }
 

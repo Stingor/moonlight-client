@@ -35,6 +35,19 @@ inline constexpr std::string_view kQuestOtherCategory = "etc";
 // sorte » —, ou la description du serveur telle quelle si elle ne se lit pas.
 [[nodiscard]] std::string HuntTargetName(const ro::sim::QuestHunt& hunt);
 
+// LES LIGNES QUE LES QUÊTES ÉCRIVENT DANS LA CONVERSATION, sous la case
+// « Informations de quête », celles du client d'origine.
+//
+// Une quête reçue ne se nomme pas : « Vous avez reçu une nouvelle quête. »
+[[nodiscard]] std::string QuestReceivedLine();
+// « La quête [titre] a été supprimée. », pour un achèvement comme pour un
+// abandon. Le titre peut être vide : le client d'origine l'écrit quand même.
+[[nodiscard]] std::string QuestDeletedLine(std::string_view title);
+// « Quête [titre] : vaincre [cible], progression (4/10). » — une ligne par
+// chasse que le serveur redit. VIDE quand la quête n'a pas de titre : le client
+// d'origine se tait alors.
+[[nodiscard]] std::string QuestHuntLine(std::string_view title, const ro::sim::QuestHunt& hunt);
+
 // « Poring Lv.1~Lv.10 », « Poring Lv.5 », « Poring » : ce que la chasse vise,
 // puis la tranche de niveaux que le serveur borne.
 [[nodiscard]] std::string HuntLabel(const ro::sim::QuestHunt& hunt);

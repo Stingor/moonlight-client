@@ -15,4 +15,8 @@ namespace ro::net {
 // paquet demande.
 [[nodiscard]] bool ServerMessageIsRed(std::uint16_t message_id);
 
+// Vrai pour un plafond du tribut d'expérience à la guilde, que `ZC_MSG` range
+// sous la case « EXP de contribution ».
+[[nodiscard]] bool ServerMessageIsGuildExpTribute(std::uint16_t message_id);
+
 }  // namespace ro::net

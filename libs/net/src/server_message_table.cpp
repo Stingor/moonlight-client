@@ -68,6 +68,10 @@ constexpr std::array kServerMessages = {
     ServerMessageEntry{3022, TrText("La limite de possession dépasse 70 %, ou il reste moins de 10 "
                                     "emplacements libres dans l'inventory.")},
     ServerMessageEntry{3474, TrText("Aucun événement de contrôle de présence n'est en cours.")},
+    ServerMessageEntry{3475, TrText("L'expérience de la guilde est au maximum : vous ne pouvez "
+                                    "plus accumuler d'expérience de guilde.")},
+    ServerMessageEntry{3476, TrText("L'expérience du personnage est au maximum : vous ne pouvez "
+                                    "plus accumuler d'expérience de guilde.")},
     ServerMessageEntry{3826, TrText("Le total des items à vendre dépasse la quantité de zeny que "
                                     "vous pouvez posséder. \nVeuillez corriger la quantité et le "
                                     "prix.")},
@@ -78,6 +82,11 @@ constexpr std::array kServerMessages = {
 // Certains n'ont pas de texte dans la table : la couleur ne dépend pas d'elle.
 constexpr std::array<std::uint16_t, 7> kRedMessageIds = {52, 220, 1221, 1222, 1879, 1880, 2182};
 
+// LES PLAFONDS DU TRIBUT D'EXPÉRIENCE À LA GUILDE : celle de la guilde est
+// pleine, ou celle du personnage. Le client d'origine les range sous la case
+// « EXP de contribution ».
+constexpr std::array<std::uint16_t, 2> kGuildExpTributeMessageIds = {3475, 3476};
+
 [[nodiscard]] constexpr bool SortedWithoutDuplicate() {
   for (std::size_t index = 1; index < kServerMessages.size(); ++index) {
     if (kServerMessages[index - 1].message_id >= kServerMessages[index].message_id) {
@@ -85,7 +94,9 @@ constexpr std::array<std::uint16_t, 7> kRedMessageIds = {52, 220, 1221, 1222, 18
     }
   }
   return std::ranges::is_sorted(kRedMessageIds) &&
-         std::ranges::adjacent_find(kRedMessageIds) == kRedMessageIds.end();
+         std::ranges::adjacent_find(kRedMessageIds) == kRedMessageIds.end() &&
+         std::ranges::is_sorted(kGuildExpTributeMessageIds) &&
+         std::ranges::adjacent_find(kGuildExpTributeMessageIds) == kGuildExpTributeMessageIds.end();
 }
 static_assert(SortedWithoutDuplicate(), "les tables de messages se cherchent par dichotomie");
 
@@ -104,6 +115,10 @@ const char* ServerMessageFrench(std::uint16_t message_id) {
 
 bool ServerMessageIsRed(std::uint16_t message_id) {
   return std::ranges::binary_search(kRedMessageIds, message_id);
+}
+
+bool ServerMessageIsGuildExpTribute(std::uint16_t message_id) {
+  return std::ranges::binary_search(kGuildExpTributeMessageIds, message_id);
 }
 
 }  // namespace ro::net

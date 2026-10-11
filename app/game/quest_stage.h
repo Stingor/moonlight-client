@@ -131,7 +131,8 @@ class QuestStage {
   void NoteArrival(std::uint32_t quest_id, std::int64_t now_unix_s, bool auto_track);
   void NoteDeparture(std::uint32_t quest_id, std::int64_t now_unix_s,
                      std::optional<ro::sim::QuestEnding> ending);
-  // La ligne de conversation d'une quête qui sort du journal, selon sa raison.
+  // La ligne de conversation d'une quête qui sort du journal, selon la raison
+  // que le serveur a dite ; sans raison, celle du client d'origine.
   [[nodiscard]] std::string DepartureLine(std::uint32_t quest_id,
                                           const std::optional<ro::sim::QuestEnding>& ending) const;
   void PruneToJournal();
@@ -141,6 +142,9 @@ class QuestStage {
                      std::uint32_t now_ms);
   [[nodiscard]] ro::ui::QuestTab TabOf(const ro::sim::QuestRecord& quest) const;
   [[nodiscard]] std::string TitleOf(std::uint32_t quest_id) const;
+  // Le titre que le catalogue donne, VIDE s'il n'en donne pas : les lignes du
+  // client d'origine n'ont pas de nom de repli.
+  [[nodiscard]] std::string CatalogTitle(std::uint32_t quest_id) const;
   void LoadArt();
   [[nodiscard]] ro::ui::SkinImage ImageAt(std::string_view leaf) const;
   // Une pièce peinte sur du blanc, avec sa variante pour un papier sombre.

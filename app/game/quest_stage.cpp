@@ -203,10 +203,10 @@ void QuestStage::NoteDeparture(std::uint32_t quest_id, std::int64_t now_unix_s,
 
 std::string QuestStage::DepartureLine(std::uint32_t quest_id,
                                       const std::optional<ro::sim::QuestEnding>& ending) const {
-  const std::string title = TitleOf(quest_id);
   if (!ending.has_value()) {
-    return QuestFill(ro::core::Tr("Quête « {} » retirée du journal."), {title});
+    return QuestDeletedLine(CatalogTitle(quest_id));
   }
+  const std::string title = TitleOf(quest_id);
   switch (ending->reason) {
     case ro::sim::QuestEndReason::kCompleted:
       return QuestFill(ro::core::Tr("Quête « {} » achevée."), {title});
@@ -221,13 +221,17 @@ std::string QuestStage::DepartureLine(std::uint32_t quest_id,
     case ro::sim::QuestEndReason::kRetired:
       break;
   }
-  return QuestFill(ro::core::Tr("Quête « {} » retirée du journal."), {title});
+  return QuestDeletedLine(CatalogTitle(quest_id));
+}
+
+std::string QuestStage::CatalogTitle(std::uint32_t quest_id) const {
+  const QuestInfo* info = catalog_ != nullptr ? catalog_->Find(quest_id) : nullptr;
+  return info != nullptr ? info->title : std::string();
 }
 
 std::string QuestStage::TitleOf(std::uint32_t quest_id) const {
-  if (const QuestInfo* info = catalog_ != nullptr ? catalog_->Find(quest_id) : nullptr;
-      info != nullptr && !info->title.empty()) {
-    return info->title;
+  if (std::string title = CatalogTitle(quest_id); !title.empty()) {
+    return title;
   }
   return QuestFill(ro::core::Tr("Quête {}"), {std::to_string(quest_id)});
 }
@@ -239,10 +243,10 @@ void QuestStage::SayProgress(const ro::sim::QuestRecord& quest, std::size_t hunt
   if (hunt_rank >= quest.hunts.size()) {
     return;
   }
-  const ro::sim::QuestHunt& hunt = quest.hunts[hunt_rank];
-  std::string line = QuestFill(ro::core::Tr("[{}] {} : {} / {}"),
-                               {TitleOf(quest.quest_id), HuntTargetName(hunt),
-                                std::to_string(hunt.killed), std::to_string(hunt.total)});
+  std::string line = QuestHuntLine(CatalogTitle(quest.quest_id), quest.hunts[hunt_rank]);
+  if (line.empty()) {
+    return;
+  }
   world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kQuestInfo, 0, std::move(line),
                    now_ms, kQuestChatColor);
 }
@@ -285,6 +289,12 @@ ro::ui::QuestTab QuestStage::TabOf(const ro::sim::QuestRecord& quest) const {
 ro::net::FrameOutcome QuestStage::ApplyFrame(const ro::net::Frame& frame, QuestWindows& windows,
                                              ro::sim::World& world, std::uint32_t now_ms) {
   const ro::net::QuestFrameResult result = ro::net::ApplyQuestFrame(frame, log_);
+  // UN RETRAIT D'UNE QUÊTE QUE LE JOURNAL NE TENAIT PAS s'annonce quand même,
+  // sous un titre vide, comme au client d'origine.
+  if (result.deleted.has_value() && !result.removed.has_value()) {
+    world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kQuestInfo, 0,
+                     QuestDeletedLine({}), now_ms, kQuestChatColor);
+  }
   if (result.outcome != ro::net::FrameOutcome::kApplied) {
     return result.outcome;
   }
@@ -310,15 +320,12 @@ ro::net::FrameOutcome QuestStage::ApplyFrame(const ro::net::Frame& frame, QuestW
     // UNE QUÊTE REÇUE EN JEU est une vraie nouvelle, même au premier passage :
     // un journal vide n'envoie jamais sa liste.
     first_journal_pending_ = false;
-    // UNE QUÊTE DÉJÀ CONNUE n'est pas une nouvelle : le serveur renvoie l'ajout
-    // quand il change son état.
-    const RememberedQuests* kept = memory_.Of(character_);
-    const bool known = kept != nullptr && kept->received_unix_s.contains(*result.added);
     arrive(*result.added);
-    if (!known) {
+    // UNE QUÊTE DÉJÀ AU JOURNAL n'est pas une nouvelle : le serveur renvoie
+    // l'ajout quand il change son état.
+    if (!result.added_was_listed) {
       world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kQuestInfo, 0,
-                       QuestFill(ro::core::Tr("Nouvelle quête : {}."), {TitleOf(*result.added)}),
-                       now_ms, kQuestChatColor);
+                       QuestReceivedLine(), now_ms, kQuestChatColor);
       windows.news_lit = true;
     }
   }
@@ -327,10 +334,12 @@ ro::net::FrameOutcome QuestStage::ApplyFrame(const ro::net::Frame& frame, QuestW
                      DepartureLine(*result.removed, result.ending), now_ms, kQuestChatColor);
     NoteDeparture(*result.removed, now_unix_s, result.ending);
   }
-  for (const ro::net::QuestProgress& progress : result.progressed) {
-    if (const ro::sim::QuestRecord* quest = log_.Find(progress.quest_id); quest != nullptr) {
-      SayProgress(*quest, progress.hunt_rank, world, now_ms);
+  for (const ro::net::QuestProgress& said : result.reported) {
+    if (const ro::sim::QuestRecord* quest = log_.Find(said.quest_id); quest != nullptr) {
+      SayProgress(*quest, said.hunt_rank, world, now_ms);
     }
+  }
+  for (const ro::net::QuestProgress& progress : result.progressed) {
     std::erase_if(flash_until_ms_,
                   [&progress](const auto& flash) { return flash.first == progress.quest_id; });
     flash_until_ms_.emplace_back(progress.quest_id, now_ms + kQuestFlashMs);

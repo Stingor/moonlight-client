@@ -232,6 +232,21 @@ std::string HuntTargetName(const QuestHunt& hunt) {
   return hunt.mob_id == 0 ? GenericHuntName(hunt.mob_name) : hunt.mob_name;
 }
 
+std::string QuestReceivedLine() { return ro::core::Tr("Vous avez reçu une nouvelle quête."); }
+
+std::string QuestDeletedLine(std::string_view title) {
+  return QuestFill(ro::core::Tr("La quête [{}] a été supprimée."), {title});
+}
+
+std::string QuestHuntLine(std::string_view title, const QuestHunt& hunt) {
+  if (title.empty()) {
+    return {};
+  }
+  return QuestFill(
+      ro::core::Tr("Quête [{}] : vaincre [{}], progression ({}/{})."),
+      {title, HuntTargetName(hunt), std::to_string(hunt.killed), std::to_string(hunt.total)});
+}
+
 std::string HuntLabel(const QuestHunt& hunt) {
   std::string label = HuntTargetName(hunt);
   const bool has_min = hunt.level_min > 0;

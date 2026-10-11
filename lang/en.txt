@@ -9550,9 +9550,6 @@ tr: Food
 fr: Nouvel onglet
 tr: New tab
 
-fr: Nouvelle quête : {}.
-tr: New quest: {}.
-
 fr: Novice / 1re classe
 tr: Novice / 1st class
 
@@ -14632,9 +14629,6 @@ tr: Amount outside the stack.
 fr: Quête {}
 tr: Quest {}
 
-fr: Quête « {} » retirée du journal.
-tr: Quest "{}" removed from the log.
-
 fr: Récentes
 tr: Recent
 
@@ -15751,9 +15745,6 @@ tr: While an interface element is unlocked, a notice names it and offers to lock
 fr: Pose de l'interface
 tr: Interface layout
 
-fr: [{}] {} : {} / {}
-tr: [{}] {}: {} / {}
-
 fr: {} j {} h
 tr: {} d {} h
 
@@ -16305,3 +16296,18 @@ tr: %s was not sent: %s
 
 fr: %s : l'approche n'est pas partie : %s
 tr: %s: the approach was not sent: %s
+
+fr: Vous avez reçu une nouvelle quête.
+tr: You have received a new quest.
+
+fr: La quête [{}] a été supprimée.
+tr: [{}] quest was deleted.
+
+fr: Quête [{}] : vaincre [{}], progression ({}/{}).
+tr: [{}] quest - defeating [{}] progress ({}/{}).
+
+fr: L'expérience de la guilde est au maximum : vous ne pouvez plus accumuler d'expérience de guilde.
+tr: Guild experience reaches max, You can no longer accumulate Guild EXP
+
+fr: L'expérience du personnage est au maximum : vous ne pouvez plus accumuler d'expérience de guilde.
+tr: Character experience reaches max, You can no longer accumulate Guild EXP

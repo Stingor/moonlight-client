@@ -99,6 +99,7 @@ QuestFrameResult ApplyQuestFrame(const Frame& frame, sim::QuestLog& log) {
         result.outcome = FrameOutcome::kUndecodable;
         return result;
       }
+      result.added_was_listed = log.Find(added->quest_id) != nullptr;
       log.Add(QuestOf(*added));
       result.added = added->quest_id;
       result.outcome = FrameOutcome::kApplied;
@@ -135,12 +136,23 @@ QuestFrameResult ApplyQuestFrame(const Frame& frame, sim::QuestLog& log) {
         return result;
       }
       for (const proto::QuestHuntCount& entry : progress->entries) {
-        if (log.UpdateHunt(entry.quest_id, entry.hunt_id, entry.total, entry.killed)) {
-          const sim::QuestRecord* quest = log.Find(entry.quest_id);
-          result.progressed.push_back(QuestProgress{.quest_id = entry.quest_id,
-                                                    .hunt_rank = RankOf(*quest, entry.hunt_id),
-                                                    .killed = entry.killed,
-                                                    .total = entry.total});
+        const bool progressed =
+            log.UpdateHunt(entry.quest_id, entry.hunt_id, entry.total, entry.killed);
+        const sim::QuestRecord* quest = log.Find(entry.quest_id);
+        if (quest == nullptr) {
+          continue;
+        }
+        const std::size_t rank = RankOf(*quest, entry.hunt_id);
+        if (rank >= quest->hunts.size()) {
+          continue;
+        }
+        const QuestProgress said{.quest_id = entry.quest_id,
+                                 .hunt_rank = rank,
+                                 .killed = entry.killed,
+                                 .total = entry.total};
+        result.reported.push_back(said);
+        if (progressed) {
+          result.progressed.push_back(said);
         }
       }
       result.outcome = FrameOutcome::kApplied;
@@ -156,6 +168,7 @@ QuestFrameResult ApplyQuestFrame(const Frame& frame, sim::QuestLog& log) {
       // 🔴 LA RAISON SE PREND MÊME QUAND LE RETRAIT N'ABOUTIT PAS : elle ne vaut
       // que pour ce retrait-ci, et ne doit pas habiller le suivant.
       result.ending = log.TakeEnding(removed->quest_id);
+      result.deleted = removed->quest_id;
       if (log.Remove(removed->quest_id)) {
         result.removed = removed->quest_id;
         result.outcome = FrameOutcome::kApplied;

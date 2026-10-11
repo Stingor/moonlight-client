@@ -9550,9 +9550,6 @@ tr: Comida
 fr: Nouvel onglet
 tr: Nueva pestaña
 
-fr: Nouvelle quête : {}.
-tr: Nueva misión: {}.
-
 fr: Novice / 1re classe
 tr: Novice / 1.ª clase
 
@@ -14632,9 +14629,6 @@ tr: Cantidad fuera de la pila.
 fr: Quête {}
 tr: Misión {}
 
-fr: Quête « {} » retirée du journal.
-tr: Misión «{}» retirada del diario.
-
 fr: Récentes
 tr: Recientes
 
@@ -15751,9 +15745,6 @@ tr: Mientras un elemento de la interfaz está desbloqueado, un aviso lo nombra y
 fr: Pose de l'interface
 tr: Colocación de la interfaz
 
-fr: [{}] {} : {} / {}
-tr: [{}] {}: {} / {}
-
 fr: {} j {} h
 tr: {} d {} h
 
@@ -16305,3 +16296,18 @@ tr: %s no se envió: %s
 
 fr: %s : l'approche n'est pas partie : %s
 tr: %s: el acercamiento no se envió: %s
+
+fr: Vous avez reçu une nouvelle quête.
+tr: Has recibido una nueva misión.
+
+fr: La quête [{}] a été supprimée.
+tr: La misión [{}] ha sido eliminada.
+
+fr: Quête [{}] : vaincre [{}], progression ({}/{}).
+tr: Misión [{}]: derrotar a [{}], progreso ({}/{}).
+
+fr: L'expérience de la guilde est au maximum : vous ne pouvez plus accumuler d'expérience de guilde.
+tr: La experiencia de la guild está al máximo: ya no puedes acumular experiencia de guild.
+
+fr: L'expérience du personnage est au maximum : vous ne pouvez plus accumuler d'expérience de guilde.
+tr: La experiencia del personaje está al máximo: ya no puedes acumular experiencia de guild.
