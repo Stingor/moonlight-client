@@ -16281,3 +16281,24 @@ tr: Screen
 
 fr: Le moniteur où le jeu s'affiche. La fenêtre s'y porte aussitôt, centrée, et le plein écran s'y fait. Au lancement, un écran débranché laisse place au principal.
 tr: The monitor the game is shown on. The window moves there at once, centred, and fullscreen happens there. At launch, an unplugged screen gives way to the primary one.
+
+fr: Mes skills (visée et lancer)
+tr: My skills (aiming and casting)
+
+fr: %s : choisissez une cible.
+tr: %s: choose a target.
+
+fr: %s : choisissez une case.
+tr: %s: choose a cell.
+
+fr: %s : choisissez un piège.
+tr: %s: choose a trap.
+
+fr: %s lancé.
+tr: %s cast.
+
+fr: %s n'est pas parti : %s
+tr: %s was not sent: %s
+
+fr: %s : l'approche n'est pas partie : %s
+tr: %s: the approach was not sent: %s

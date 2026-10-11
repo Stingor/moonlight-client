@@ -17,9 +17,9 @@ using ro::sim::ChatType;
 // Les étiquettes du diagnostic, une par numéro. ⚠ ÉCRITES ICI ET NON
 // COMPOSÉES : la ligne les garde par vue, sans copie, le temps de l'image.
 constexpr std::array<std::string_view, ro::sim::kChatTypeCount> kTypeTags = {
-    "t00", "t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08",
-    "t09", "t10", "t11", "t12", "t13", "t14", "t15", "t16", "t17",
-    "t18", "t19", "t20", "t21", "t22", "t23", "t24", "t25", "t26"};
+    "t00", "t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09",
+    "t10", "t11", "t12", "t13", "t14", "t15", "t16", "t17", "t18", "t19",
+    "t20", "t21", "t22", "t23", "t24", "t25", "t26", "t27"};
 
 // Le premier numéro d'un onglet neuf, et le dernier qu'on essaie : au-delà,
 // le plafond des onglets est atteint depuis longtemps.
@@ -87,11 +87,12 @@ ChatTabs::ChatTabs() {
   // ⚠ UN SEUL ONGLET AU DÉPART, ET IL MONTRE TOUT — c'est ce que fait le client.
   // En poser quatre d'avance déciderait à la place du joueur de la façon dont il
   // range sa conversation.
-  tabs_.push_back(ChatTab{.name = std::string(ro::core::Tr("Tout")), .accepted = EveryChatType()});
+  tabs_.push_back(
+      ChatTab{.name = std::string(ro::core::Tr("Tout")), .accepted = kDefaultChatTypes});
 }
 
 std::size_t ChatTabs::Add(std::string name) {
-  tabs_.push_back(ChatTab{.name = std::move(name), .accepted = EveryChatType()});
+  tabs_.push_back(ChatTab{.name = std::move(name), .accepted = kDefaultChatTypes});
   ++revision_;
   return tabs_.size() - 1;
 }

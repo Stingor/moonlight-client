@@ -43,7 +43,7 @@ void DrawFilterMenu(std::span<const ChatTypeToggle> types, bool diagnostic, cons
   if (!ImGui::BeginMenu(menu_label.data())) {
     return;
   }
-  // ⚠ LES DEUX BLOCS D'ABORD : à vingt-sept cases, aller les cocher une à une
+  // ⚠ LES DEUX BLOCS D'ABORD : à vingt-huit cases, aller les cocher une à une
   // pour n'en garder qu'une est le geste qu'on fait le plus souvent.
   if (SkinSmallButton(core::Tr("Tout cocher"), art)) {
     asked->set_every_type = true;

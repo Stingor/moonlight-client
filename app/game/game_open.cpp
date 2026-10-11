@@ -360,6 +360,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   settings_->RestoreChatMacros(windows_);
   sheet_.emplace(pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
                  pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr);
+  grimoire_.UseSkillTree(pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr);
   bag_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
                &pieces_.item_words,
                pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);

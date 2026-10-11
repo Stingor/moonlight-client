@@ -7,7 +7,7 @@
 
 namespace moonclient {
 
-// LES LIBELLÉS DES VINGT-SEPT CASES DE FILTRE, dans l'ordre des numéros.
+// LES LIBELLÉS DES VINGT-HUIT CASES DE FILTRE, dans l'ordre des numéros.
 //
 // Le français est celui de la traduction communautaire du client, l'anglais le
 // libellé d'origine : c'est ce que les joueurs ont sous les yeux depuis des
@@ -44,6 +44,7 @@ inline constexpr std::array<const char*, ro::sim::kChatTypeCount> kChatTypeLabel
     ro::core::TrText("Attributs d'équipement"),
     ro::core::TrText("Annonces du serveur"),
     ro::core::TrText("Discord"),
+    ro::core::TrText("Mes skills (visée et lancer)"),
 };
 
 }  // namespace moonclient

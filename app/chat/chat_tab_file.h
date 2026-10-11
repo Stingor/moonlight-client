@@ -16,7 +16,7 @@ namespace moonclient {
 // `ChatWndInfo_U.lua`, pas avec ses options.
 //
 // ⚠ CLÉS ANGLAISES (ADR 0093) : `tabs`, puis par onglet `name`, `filter` — les
-// vingt-sept cases des types, vrai ou faux, dans l'ordre des numéros —,
+// vingt-huit cases des types, vrai ou faux, dans l'ordre des numéros —,
 // `window`, `locked`, `content` et `look`.
 inline constexpr std::string_view kChatTabFileName = "chat_tabs.yml";
 

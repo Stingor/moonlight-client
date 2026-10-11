@@ -257,8 +257,11 @@ target_include_directories(moonclient_chatlinks PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 
 # LES REFUS DE COMPETENCE DANS LA CONVERSATION, en bibliotheque pour que leurs
 # phrases s'essaient sur un banc : un motif mal range dit au joueur autre chose
-# que ce que le serveur a refuse, et cela ne se voit qu'en jeu.
+# que ce que le serveur a refuse, et cela ne se voit qu'en jeu. Les lignes
+# d'armement et de lancer du grimoire y vivent aussi : leur nom affiche et leur
+# case de filtre se jugent de la meme facon.
 add_library(moonclient_skillrefusal STATIC
+    character/skill_cast_lines.cpp
     world/skill_refusal_report.cpp
     world/skill_refusal_texts.cpp
     world/twilight_shortfall.cpp)

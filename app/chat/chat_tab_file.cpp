@@ -38,7 +38,7 @@ constexpr const char* kLookBodyField = "body";
 constexpr const char* kFileHeader =
     "# Les onglets de la conversation.\n"
     "#\n"
-    "# Un onglet porte un nom (« name ») et ses filtres (« filter ») : vingt-sept\n"
+    "# Un onglet porte un nom (« name ») et ses filtres (« filter ») : vingt-huit\n"
     "# cases, vrai ou faux, dans l'ordre des types du client d'origine — public,\n"
     "# chat public, message privé, chat de groupe, chat de guilde, chat\n"
     "# d'alliance, objets ramassés/lâchés, équipement mis/retiré, altérations\n"
@@ -47,8 +47,10 @@ constexpr const char* kFileHeader =
     "# informations WOE, recherche de groupe, combat, combat du groupe,\n"
     "# expérience, quête, champ de bataille, chat du clan, messages d'appel, EXP\n"
     "# de contribution, attributs d'équipement —, une vingt-sixième pour les\n"
-    "# annonces du serveur et une vingt-septième pour le relai Discord. Une case\n"
-    "# absente est décochée, sauf la dernière, qui suit alors le chat public.\n"
+    "# annonces du serveur, une vingt-septième pour le relai Discord et une\n"
+    "# vingt-huitième pour l'armement et le lancer de ses propres skills. Une case\n"
+    "# absente est décochée, sauf celle du relai Discord, qui suit alors le chat\n"
+    "# public.\n"
     "#\n"
     "# Une liste vide laisse les onglets d'origine : une conversation sans onglet\n"
     "# n'aurait nulle part où s'écrire.\n"
@@ -65,13 +67,18 @@ constexpr const char* kFileHeader =
     "# « content: damage_meter » marque l'onglet où le compteur de dégâts est\n"
     "# rangé ; il n'a pas de filtres. Absent, l'onglet montre le fil.\n";
 
-// Les cases lues d'une liste. Au-delà de la vingt-septième, ce qu'une version
-// plus récente aurait ajouté est ignoré ; en deçà, ce qui manque est décoché.
+// Les cases lues d'une liste. Au-delà de la dernière case connue, ce qu'une
+// version plus récente aurait ajouté est ignoré ; en deçà, ce qui manque est
+// décoché.
 //
 // ⚠ SAUF LE RELAI DISCORD, VENU APRÈS LES AUTRES : une liste qui s'arrête
 // avant sa case a été écrite sans lui, et il y prend la valeur du chat public,
 // dont il est la suite. Sans cela, l'onglet « Tout » d'un fichier d'avant
 // cacherait le relai sans que le joueur l'ait jamais décoché.
+//
+// ⚠ « MES SKILLS (VISÉE ET LANCER) », VENUE APRÈS LUI, RESTE DÉCOCHÉE quand
+// elle manque : c'est aussi son état d'un onglet neuf — voir
+// `kDefaultChatTypes`.
 [[nodiscard]] ChatTypeMask FilterOf(const YAML::Node& listed) {
   ChatTypeMask accepted = 0;
   if (!listed || !listed.IsSequence()) {
@@ -171,12 +178,12 @@ bool SaveChatTabs(const std::filesystem::path& client_root, const ChatTabs& from
   for (const ChatTab& tab : from.tabs()) {
     out << YAML::BeginMap;
     out << YAML::Key << kNameField << YAML::Value << tab.name;
-    // ⚠ LE COMPTEUR N'A PAS DE FILTRES : il ne montre aucune ligne, et vingt-sept
+    // ⚠ LE COMPTEUR N'A PAS DE FILTRES : il ne montre aucune ligne, et des
     // cases décochées sur lui feraient croire qu'il en filtre.
     if (tab.content == ChatTabContent::kDamageMeter) {
       out << YAML::Key << kContentField << YAML::Value << kMeterContent;
     } else {
-      // ⚠ LES VINGT-SEPT CASES, TOUJOURS, dans l'ordre des numéros : une liste
+      // ⚠ TOUTES LES CASES, TOUJOURS, dans l'ordre des numéros : une liste
       // qui sauterait les cases décochées ne dirait plus à quel type chacune
       // répond.
       out << YAML::Key << kFilterField << YAML::Value << YAML::Flow << YAML::BeginSeq;

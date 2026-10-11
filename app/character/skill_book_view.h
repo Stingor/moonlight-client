@@ -16,6 +16,7 @@
 #include "ro/sim/actor.h"
 #include "ro/sim/pending_action.h"
 #include "ro/sim/skill_book.h"
+#include "ro/sim/skill_tree.h"
 #include "ro/sim/walk_map.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
@@ -60,6 +61,10 @@ class SkillBookPanel {
   [[nodiscard]] const ro::sim::KnownSkill* armed() const;
 
   void Disarm() { armed_.reset(); }
+
+  // Les tables du client, d'où vient le NOM AFFICHÉ qu'écrivent les lignes du
+  // grimoire. Nul tant qu'elles manquent : le nom interne les remplace.
+  void UseSkillTree(const ro::sim::SkillTree* tree) noexcept { tree_ = tree; }
 
   // La molette. Vrai si le grimoire l'a PRISE : la caméra ne doit alors pas
   // reculer derrière lui.
@@ -222,6 +227,10 @@ class SkillBookPanel {
   // Inscrit `skill` sur l'entité ou l'unité `target_id` : la poursuite commune.
   void CastOnId(const ro::sim::KnownSkill& skill, std::uint32_t target_id);
 
+  // Le nom que la conversation écrit : voir `SkillShownName`.
+  [[nodiscard]] std::string ShownName(const ro::sim::KnownSkill& skill) const;
+
+  const ro::sim::SkillTree* tree_ = nullptr;
   bool open_ = false;
   // Une COPIE, et non un pointeur dans le grimoire : le serveur peut mettre à
   // jour une compétence entre le choix et le clic sur la cible, et le tableau

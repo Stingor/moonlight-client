@@ -22,7 +22,7 @@ class WhisperDesk;
 // `ChatWndInfo_U.lua`, et c'est ce qui fait qu'un joueur peut se tailler un
 // onglet « commerce » que personne n'avait prévu.
 //
-// ⚠ LE FILTRE EST UN MASQUE DE TYPES — les vingt-sept cases de
+// ⚠ LE FILTRE EST UN MASQUE DE TYPES — les vingt-huit cases de
 // `ro::sim::ChatType`, dans l'ordre du client d'origine —, et le type est la
 // seule chose qui décide. Le genre d'une ligne règle son allure, pas sa case.
 //
@@ -40,10 +40,19 @@ static_assert(ro::sim::kChatTypeCount <= sizeof(ChatTypeMask) * 8,
   return ChatTypeMask{1} << static_cast<std::uint8_t>(type);
 }
 
-// Tous les types à la fois — ce que montre un onglet qui ne filtre rien.
+// Tous les types à la fois — ce que coche « Tout cocher ».
 [[nodiscard]] constexpr ChatTypeMask EveryChatType() {
   return (ChatTypeMask{1} << ro::sim::kChatTypeCount) - 1;
 }
+
+// CE QU'UN ONGLET NEUF ACCEPTE : tout, sauf « Mes skills (visée et lancer) ».
+//
+// ⚠ CETTE CASE-LÀ EST DÉCOCHÉE D'OFFICE : chaque sort armé ou lancé y écrit une
+// ligne, et un combat noierait le fil. Le joueur qui veut ce journal la coche.
+// Un fichier d'onglets écrit avant elle la relit décochée, pour la même raison
+// — voir `chat/chat_tab_file.cpp`.
+inline constexpr ChatTypeMask kDefaultChatTypes =
+    EveryChatType() & ~MaskOf(ro::sim::ChatType::kSkillUse);
 
 // LES TYPES QU'UN MESSAGE ALIMENTE AUJOURD'HUI.
 //
@@ -61,7 +70,7 @@ inline constexpr ChatTypeMask kFedChatTypes =
     MaskOf(ro::sim::ChatType::kPartyBattle) | MaskOf(ro::sim::ChatType::kExperience) |
     MaskOf(ro::sim::ChatType::kClanChat) | MaskOf(ro::sim::ChatType::kCall) |
     MaskOf(ro::sim::ChatType::kBroadcast) | MaskOf(ro::sim::ChatType::kBattlefield) |
-    MaskOf(ro::sim::ChatType::kDiscord);
+    MaskOf(ro::sim::ChatType::kDiscord) | MaskOf(ro::sim::ChatType::kSkillUse);
 
 [[nodiscard]] constexpr bool IsFedChatType(ro::sim::ChatType type) {
   return (kFedChatTypes & MaskOf(type)) != 0;
@@ -193,13 +202,13 @@ struct ChatTab {
 // retire pas.
 class ChatTabs {
  public:
-  // Part avec l'onglet du client : un seul, qui montre tout.
+  // Part avec l'onglet du client : un seul, qui accepte `kDefaultChatTypes`.
   ChatTabs();
 
   [[nodiscard]] std::span<const ChatTab> tabs() const noexcept { return tabs_; }
   [[nodiscard]] std::size_t count() const noexcept { return tabs_.size(); }
 
-  // Ajoute un onglet qui montre tout, et rend son rang.
+  // Ajoute un onglet qui accepte `kDefaultChatTypes`, et rend son rang.
   std::size_t Add(std::string name);
   void Rename(std::size_t rank, std::string name);
   // Sans effet sur le dernier onglet DE FIL : voir l'en-tête — le compteur ne

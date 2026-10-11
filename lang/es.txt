@@ -16281,3 +16281,24 @@ tr: Pantalla
 
 fr: Le moniteur où le jeu s'affiche. La fenêtre s'y porte aussitôt, centrée, et le plein écran s'y fait. Au lancement, un écran débranché laisse place au principal.
 tr: El monitor donde se muestra el juego. La ventana se lleva allí al instante, centrada, y la pantalla completa se hace en él. Al iniciar, una pantalla desconectada deja paso a la principal.
+
+fr: Mes skills (visée et lancer)
+tr: Mis skills (apuntar y lanzar)
+
+fr: %s : choisissez une cible.
+tr: %s: elige un objetivo.
+
+fr: %s : choisissez une case.
+tr: %s: elige una casilla.
+
+fr: %s : choisissez un piège.
+tr: %s: elige una trampa.
+
+fr: %s lancé.
+tr: %s lanzado.
+
+fr: %s n'est pas parti : %s
+tr: %s no se envió: %s
+
+fr: %s : l'approche n'est pas partie : %s
+tr: %s: el acercamiento no se envió: %s

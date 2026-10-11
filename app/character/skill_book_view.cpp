@@ -15,6 +15,7 @@
 #include "ro/sim/walk_map.h"
 #include "ro/sim/world.h"
 
+#include "character/skill_cast_lines.h"
 #include "world/actor_carts.h"
 
 namespace moonclient {
@@ -28,30 +29,29 @@ void Say(ro::sim::World& world, std::string text, std::uint32_t now_ms) {
   world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), now_ms);
 }
 
-// Le nom d'une compétence, entre guillemets, tel qu'il s'écrit dans une phrase.
-std::string Named(const KnownSkill& skill) {
-  return "« " + (skill.name.empty() ? std::to_string(skill.id) : skill.name) + " »";
-}
+// Le nom affiché d'un skill, entre guillemets, tel qu'il s'écrit dans une
+// phrase.
+std::string Named(const std::string& shown_name) { return "« " + shown_name + " »"; }
 
 // Envoie, et dit ce qui s'est passé. Une demande qui ne part pas n'a qu'une
 // cause — une disposition de paquet qui ne s'accorde plus avec le serveur — et
 // elle doit se lire, pas se deviner.
-void Sent(ro::sim::World& world, const ro::core::Result<void>& sent, const KnownSkill& skill,
+//
+// ⚠ LE LANCER VA DANS « MES SKILLS », L'ÉCHEC NON : voir `skill_cast_lines.h`.
+void Sent(ro::sim::World& world, const ro::core::Result<void>& sent, const std::string& shown_name,
           std::uint32_t now_ms) {
   if (sent) {
-    Say(world, Named(skill) + " lancé", now_ms);
+    RecordSkillUse(world, SkillLaunchedLine(shown_name), now_ms);
     return;
   }
-  Say(world, Named(skill) + " n'est pas partie : " + ro::core::Describe(sent.error()), now_ms);
+  Say(world, SkillNotSentLine(shown_name, sent.error()), now_ms);
 }
 
 // Une MARCHE d'approche qui ne part pas. Muette quand elle part : on la voit.
-void Refused(ro::sim::World& world, const ro::core::Result<void>& sent, const KnownSkill& skill,
-             std::uint32_t now_ms) {
+void Refused(ro::sim::World& world, const ro::core::Result<void>& sent,
+             const std::string& shown_name, std::uint32_t now_ms) {
   if (!sent) {
-    Say(world,
-        Named(skill) + " : l'approche n'est pas partie : " + ro::core::Describe(sent.error()),
-        now_ms);
+    Say(world, SkillApproachNotSentLine(shown_name, sent.error()), now_ms);
   }
 }
 
@@ -167,12 +167,12 @@ void SkillBookPanel::ChooseSkill(ro::net::Connection& link, ro::sim::World& worl
                                  const KnownSkill& chosen, std::uint32_t now_ms) {
   if (armed_.has_value() && armed_->id == chosen.id) {
     // La même compétence une seconde fois : on renonce.
-    Say(world, Named(chosen) + " : abandonnée", now_ms);
+    Say(world, Named(ShownName(chosen)) + " : abandonnée", now_ms);
     Disarm();
     return;
   }
   if (ro::sim::SkillIsPassive(chosen)) {
-    Say(world, Named(chosen) + " est passive : rien à lancer", now_ms);
+    Say(world, Named(ShownName(chosen)) + " est passive : rien à lancer", now_ms);
     Disarm();
     return;
   }
@@ -203,15 +203,16 @@ void SkillBookPanel::ChooseSkill(ro::net::Connection& link, ro::sim::World& worl
     if (sent) {
       ++entity_casts_;
     }
-    Sent(world, sent, chosen, now_ms);
+    Sent(world, sent, ShownName(chosen), now_ms);
     return;
   }
   armed_ = chosen;
   ++arms_;
-  const char* asked = ro::sim::SkillNeedsGround(chosen)   ? " : désignez une case"
-                      : ro::sim::SkillTargetsTrap(chosen) ? " : désignez un piège"
-                                                          : " : désignez une cible";
-  Say(world, Named(chosen) + asked, now_ms);
+  RecordSkillUse(world, SkillArmedLine(ShownName(chosen), chosen), now_ms);
+}
+
+std::string SkillBookPanel::ShownName(const KnownSkill& skill) const {
+  return SkillShownName(tree_ != nullptr ? tree_->Find(skill.id) : nullptr, skill);
 }
 
 bool SkillBookPanel::ReleaseOnActor(const ro::sim::Actor& target) {
@@ -271,7 +272,7 @@ void SkillBookPanel::AdvancePending(ro::net::Connection& link, ro::sim::World& w
     case ro::sim::PendingStep::kWait:
       return;
     case ro::sim::PendingStep::kApproach:
-      Refused(world, ro::net::RequestMove(link, move.toward), *pending_skill_, now_ms);
+      Refused(world, ro::net::RequestMove(link, move.toward), ShownName(*pending_skill_), now_ms);
       return;
     case ro::sim::PendingStep::kRelease: {
       const KnownSkill chosen = *pending_skill_;
@@ -279,8 +280,8 @@ void SkillBookPanel::AdvancePending(ro::net::Connection& link, ro::sim::World& w
       const std::optional<ro::sim::CellPosition> cell = pending_->ground_cell;
       CancelPending();
       if (cell.has_value()) {
-        Sent(world, ro::net::RequestSkillOnGround(link, chosen.id, chosen.level, *cell), chosen,
-             now_ms);
+        Sent(world, ro::net::RequestSkillOnGround(link, chosen.id, chosen.level, *cell),
+             ShownName(chosen), now_ms);
         return;
       }
       const ro::core::Result<void> sent =
@@ -289,13 +290,13 @@ void SkillBookPanel::AdvancePending(ro::net::Connection& link, ro::sim::World& w
         launched_target_ = target_id;
         ++entity_casts_;
       }
-      Sent(world, sent, chosen, now_ms);
+      Sent(world, sent, ShownName(chosen), now_ms);
       return;
     }
     case ro::sim::PendingStep::kGiveUp: {
       const KnownSkill abandoned = *pending_skill_;
       CancelPending();
-      Say(world, Named(abandoned) + " : la cible n'est plus là", now_ms);
+      Say(world, Named(ShownName(abandoned)) + " : la cible n'est plus là", now_ms);
       return;
     }
   }
@@ -311,7 +312,7 @@ bool SkillBookPanel::ReleaseOnGround(ro::sim::World& world, ro::sim::CellPositio
       // comme dans le jeu : le clic sert à renoncer, pas à marcher.
       const KnownSkill abandoned = *armed_;
       Disarm();
-      Say(world, Named(abandoned) + " : abandonnée", now_ms);
+      Say(world, Named(ShownName(abandoned)) + " : abandonnée", now_ms);
       return true;
     }
     case SkillAim::kTrap:

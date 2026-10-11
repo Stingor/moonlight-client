@@ -73,7 +73,8 @@ enum class ChatKind : std::uint8_t {
 // ligne SE MONTRE — sa couleur, sa bulle, l'en-tête d'un chuchotement ; le type
 // dit dans quelle CASE le joueur la range. Ce sont les vingt-cinq cases du
 // client d'origine, dans son ordre et avec ses numéros, plus une vingt-sixième
-// pour les annonces et une vingt-septième pour le relai Discord : les joueurs
+// pour les annonces, une vingt-septième pour le relai Discord et une
+// vingt-huitième pour l'armement et le lancer de ses propres skills : les joueurs
 // connaissent cette liste, et un onglet qui ne la reprendrait pas les
 // obligerait à réapprendre où va chaque message.
 //
@@ -110,8 +111,13 @@ enum class ChatType : std::uint8_t {
   kBroadcast = 25,
   // CE QUI SE DIT SUR LE CANAL DISCORD DU SERVEUR, relayé dans le jeu.
   kDiscord = 26,
+  // CE QUE LE GRIMOIRE ÉCRIT QUAND LE JOUEUR ARME OU LANCE UN SKILL : « Nom :
+  // choisissez une cible. », « Nom lancé. ». Une ligne par sort, d'où sa case
+  // à part, que les onglets laissent DÉCOCHÉE D'OFFICE. L'échec d'envoi n'y
+  // va pas : il garde la case d'un message du serveur.
+  kSkillUse = 27,
 };
-inline constexpr std::size_t kChatTypeCount = 27;
+inline constexpr std::size_t kChatTypeCount = 28;
 
 // LE TYPE QU'UNE LIGNE PREND QUAND SON AUTEUR N'EN DIT PAS DAVANTAGE.
 //
