@@ -149,6 +149,13 @@ void NoteDeed(MouseEngagement& engagement, PlayerDeed deed, std::uint32_t target
 // L'action s'achève, et l'engagement retombe avec elle.
 void EndDeed(MouseEngagement& engagement);
 
+// LE SKILL QU'UNE IA DE COMPAGNON LANCE fait retomber l'engagement, sans
+// achever l'action du personnage : sur une case (`target_id` nul), sur le
+// personnage, sur une entité hors de vue comme sur une entité visible. Une
+// entité cachée — Hiding, Cloaking, `@hide` — ne reçoit pas le skill, et rien
+// ne retombe. L'ordre direct du joueur passe par l'IA : il suit la même règle.
+[[nodiscard]] bool CompanionSkillDisengages(std::uint32_t target_id, const ro::sim::World& world);
+
 // Une attaque vient de partir vers sa cible.
 void NoteStrike(MouseEngagement& engagement, std::uint32_t target_id);
 

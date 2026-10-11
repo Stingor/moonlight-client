@@ -640,7 +640,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
                         : world_.player() != nullptr ? world_.player()->guild_id
                                                      : 0};
   if (pieces_.companion_ai.Advance(link_, world_, pieces_.homunculus, pieces_.mercenary,
-                                   companion_books, grimoire_.armed() != nullptr, now_ms)) {
+                                   companion_books, grimoire_.armed() != nullptr,
+                                   world_mouse_.engagement, now_ms)) {
     grimoire_.Disarm();
   }
   if (const std::uint32_t wanted = pieces_.companion_ai.TakeWantedMonsterSheet();

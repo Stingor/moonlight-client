@@ -3,6 +3,7 @@
 #include "ro/sim/world.h"
 
 #include "world/native_marker.h"
+#include "world/targeting.h"
 
 namespace moonclient {
 namespace {
@@ -117,6 +118,14 @@ void NoteDeed(MouseEngagement& engagement, PlayerDeed deed, std::uint32_t target
 void EndDeed(MouseEngagement& engagement) {
   engagement.action = PlayerAction();
   Disengage(engagement);
+}
+
+bool CompanionSkillDisengages(std::uint32_t target_id, const ro::sim::World& world) {
+  if (target_id == 0 || target_id == world.player_id()) {
+    return true;
+  }
+  const ro::sim::Actor* target = world.Find(target_id);
+  return target == nullptr || !TargetIsConcealed(*target);
 }
 
 void NoteStrike(MouseEngagement& engagement, std::uint32_t target_id) {

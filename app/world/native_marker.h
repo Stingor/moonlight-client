@@ -41,6 +41,12 @@ struct MarkerCall {
 // Ce qu'une entité trouvée fait de la flèche. Un portail la refuse, quelle que
 // soit son espèce. Ce qui n'a pas un sprite de joueur la reçoit sans autre
 // examen, caché ou non ; ce qui en a un la refuse s'il est caché.
+//
+// ⚠ AUCUN DROIT NE LA RAMÈNE SUR UN JOUEUR CACHÉ, staff compris. Le serveur
+// annonce l'option `@hide` à tous de la même façon, sans permission qui voie à
+// travers, et le client d'origine ne garde sa flèche pour aucun compte : sa
+// liste d'administrateurs ne joue que sur l'AFFICHAGE d'un joueur sous Hiding
+// ou Cloaking — jamais sous `@hide`, jamais sur la flèche.
 [[nodiscard]] MarkerCall MarkerOver(const ro::sim::Actor& actor);
 
 // La décision de l'image. Non engagé : cacher. L'entité introuvable : garder.

@@ -14,6 +14,7 @@
 
 #include "game/homunculus_stage.h"
 #include "game/mercenary_stage.h"
+#include "world/mouse_engagement.h"
 
 namespace moonclient {
 namespace {
@@ -156,7 +157,7 @@ void Send(ro::net::Connection& link, std::uint32_t companion_id,
 bool CompanionAiStage::Advance(ro::net::Connection& link, ro::sim::World& world,
                                HomunculusStage& homunculus, MercenaryStage& mercenary,
                                const CompanionAiBooks& books, bool grimoire_armed,
-                               std::uint32_t now_ms) {
+                               MouseEngagement& engagement, std::uint32_t now_ms) {
   // UN SEUL ARMEMENT À LA FOIS : le grimoire qui vient de s'armer désarme le
   // skill de compagnon ; celui-ci, en s'armant, demande à l'appelant de désarmer
   // le grimoire.
@@ -234,6 +235,10 @@ bool CompanionAiStage::Advance(ro::net::Connection& link, ro::sim::World& world,
         slot.brain.Tick(world, facts[index], slot.settings, now_ms);
     if (order.has_value() && link.is_open()) {
       Send(link, facts[index].actor_id, *order);
+      if (order->kind == ro::sim::CompanionOrder::Kind::kSkill &&
+          CompanionSkillDisengages(order->target_id, world)) {
+        Disengage(engagement);
+      }
     }
     slot.trace.Note(index == kHomunculusSlot ? "homoncule" : "mercenaire", world, facts[index],
                     slot.brain, order, now_ms);

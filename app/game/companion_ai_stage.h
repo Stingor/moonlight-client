@@ -44,6 +44,7 @@ namespace moonclient {
 
 class HomunculusStage;
 class MercenaryStage;
+struct MouseEngagement;
 
 // CE QU'UN GESTE D'ORDRE DIRECT A FAIT.
 enum class CompanionGesture : std::uint8_t {
@@ -103,10 +104,13 @@ class CompanionAiStage {
   // UN SEUL ARMEMENT À LA FOIS, avec le grimoire du joueur : `grimoire_armed`
   // qui vient de passer à vrai désarme le skill de compagnon. Rend vrai quand un
   // skill de compagnon vient de s'armer : l'appelant désarme alors le grimoire.
+  //
+  // Un skill que l'IA lance fait retomber l'engagement de la souris, voir
+  // `CompanionSkillDisengages`.
   [[nodiscard]] bool Advance(ro::net::Connection& link, ro::sim::World& world,
                              HomunculusStage& homunculus, MercenaryStage& mercenary,
                              const CompanionAiBooks& books, bool grimoire_armed,
-                             std::uint32_t now_ms);
+                             MouseEngagement& engagement, std::uint32_t now_ms);
   // LA FICHE DE MONSTRE qu'une règle a voulu lire sans l'avoir, à demander au
   // serveur ; zéro sans demande. Elle se consomme.
   [[nodiscard]] std::uint32_t TakeWantedMonsterSheet() noexcept {
