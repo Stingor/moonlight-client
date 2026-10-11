@@ -12,6 +12,7 @@
 #include "ro/render/actor_effect_table.h"
 #include "ro/render/actor_scale.h"
 #include "ro/render/afterimage_blur.h"
+#include "ro/render/ailment_sprites.h"
 #include "ro/render/effect_frame.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/monster_skill_motion.h"
@@ -56,6 +57,11 @@ constexpr float kCorpsePickBias = 1.0e6F;
 // L'ALPHA D'UNE PLANTE D'HALLUCINATION, que son propre gestionnaire de messages
 // pose : cent quatre-vingts, et non la pleine opacité.
 constexpr std::uint8_t kHallucinationAlpha = 180;
+
+// 🔴 UN VOILE PASSE D'UN CALQUE DEVANT LE CORPS QU'IL COUVRE. Il en reprend les
+// quads, donc leur profondeur exacte, et le corps vient d'écrire sa silhouette :
+// à profondeur égale, l'épreuve le rejetait partout où il devait se voir.
+constexpr float kVeilDepthBias = ro::render::kLayerDepthStep;
 
 // L'ARME DOUBLÉE PARAÎT UNE IMAGE SUR DEUX.
 constexpr std::uint32_t kWeaponEchoPeriodFrames = 2;
@@ -569,6 +575,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       scene.front.push_back(
           ro::render::DrawnActor{&composed, nullptr, feet, veils[copy_rank].tint, 0.0F, scale});
       scene.front.back().fogged = false;
+      scene.front.back().depth_bias = kVeilDepthBias;
       CopyLayers(veils[copy_rank], scene.front.back());
       swing_layers(scene.front.back());
     }
