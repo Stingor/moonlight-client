@@ -3,11 +3,14 @@
 #include "ro/vfs/pet_tables.h"
 
 #include <array>
+#include <expected>
 #include <limits>
 #include <optional>
+#include <utility>
+
+#include <yaml-cpp/yaml.h>
 
 #include "ro/core/log.h"
-#include "ro/formats/lua_calls.h"
 #include "ro/vfs/encoding.h"
 #include "ro/vfs/lua_chain.h"
 
@@ -16,27 +19,18 @@ namespace {
 
 using formats::LuaValue;
 
-constexpr std::string_view kEggClassGlobal = "PetEggItemID_PetJobID";
-constexpr std::string_view kFoodGlobal = "PetFoodTable";
 constexpr std::string_view kSpeciesGlobal = "PetStringTable";
 // Les .act d'accessoire : la table coréenne fait foi, l'anglaise complète.
 constexpr std::array<std::string_view, 2> kAccessoryActGlobals = {"PetAccActNameTable",
                                                                   "PetAccActNameTable_Eng"};
 
-constexpr std::string_view kEvolutionFunction = "main";
-constexpr std::string_view kRecipeCall = "InsertEvolutionRecipeLGU";
-constexpr std::string_view kAutoFeedCall = "InsertPetAutoFeeding";
-// Œuf source, œuf cible, item, quantité.
-constexpr std::size_t kRecipeArguments = 4;
+constexpr int kSupportedVersion = 1;
+// Un matériau s'écrit [item, quantité].
+constexpr std::size_t kMaterialItemField = 0;
+constexpr std::size_t kMaterialAmountField = 1;
+constexpr std::size_t kMaterialFieldCount = 2;
 
 constexpr std::uint32_t kAnyId = std::numeric_limits<std::uint32_t>::max();
-
-[[nodiscard]] std::optional<std::uint32_t> WholeId(const LuaValue& value) {
-  if (value.kind != LuaValue::Kind::kNumber) {
-    return std::nullopt;
-  }
-  return formats::LuaWholeNumber(value.number, kAnyId);
-}
 
 [[nodiscard]] const formats::LuaTable* TableNamed(const formats::LuaTable& globals,
                                                   std::string_view name) {
@@ -45,21 +39,6 @@ constexpr std::uint32_t kAnyId = std::numeric_limits<std::uint32_t>::max();
     return nullptr;
   }
   return value->table.get();
-}
-
-// Une table `[identifiant] = identifiant`, entrées illisibles sautées.
-void FillIdMap(const formats::LuaTable* table,
-               std::unordered_map<std::uint32_t, std::uint32_t>& into) {
-  if (table == nullptr) {
-    return;
-  }
-  for (const auto& [key, value] : table->by_index) {
-    const std::optional<std::uint32_t> from = formats::LuaWholeNumber(key, kAnyId);
-    const std::optional<std::uint32_t> to = WholeId(value);
-    if (from.has_value() && to.has_value()) {
-      into[*from] = *to;
-    }
-  }
 }
 
 // Une table `[identifiant] = "nom"`, dans la page de codes du client. Un
@@ -75,6 +54,45 @@ void FillNameMap(const formats::LuaTable* table,
       into.try_emplace(*id, Cp949ToUtf8Lossy(value.text));
     }
   }
+}
+
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData, "table des familiers : " + std::move(detail)};
+}
+
+// Un champ obligatoire d'une table YAML, absent : une exception, comme yaml-cpp
+// signale un champ qui n'entre pas dans son type.
+[[nodiscard]] YAML::Node Required(const YAML::Node& map, const char* key) {
+  YAML::Node value = map[key];
+  if (!value) {
+    throw YAML::KeyNotFound(map.Mark(), std::string(key));
+  }
+  return value;
+}
+
+[[nodiscard]] PetEvolutionRecipe ParseEvolution(const YAML::Node& node) {
+  if (!node.IsMap()) {
+    throw YAML::RepresentationException(node.Mark(), "une évolution n'est pas une table");
+  }
+  PetEvolutionRecipe recipe{.target_egg_id = Required(node, "egg").as<std::uint32_t>(),
+                            .materials = {}};
+  if (recipe.target_egg_id == 0) {
+    throw YAML::RepresentationException(node.Mark(), "une évolution sans œuf cible");
+  }
+  const YAML::Node materials = Required(node, "materials");
+  if (!materials.IsSequence()) {
+    throw YAML::RepresentationException(materials.Mark(), "« materials » n'est pas une liste");
+  }
+  for (const YAML::Node& material : materials) {
+    if (!material.IsSequence() || material.size() != kMaterialFieldCount) {
+      throw YAML::RepresentationException(material.Mark(),
+                                          "un matériau n'est pas une paire [item, quantité]");
+    }
+    recipe.materials.push_back(
+        PetEvolutionMaterial{.item_id = material[kMaterialItemField].as<std::uint32_t>(),
+                             .amount = material[kMaterialAmountField].as<std::uint32_t>()});
+  }
+  return recipe;
 }
 
 }  // namespace
@@ -119,48 +137,64 @@ const PetEvolutionRecipe* PetTables::RecipeOf(std::uint32_t source_egg_id,
 }
 
 void FillPetInfo(const formats::LuaTable& globals, PetTables& tables) {
-  FillIdMap(TableNamed(globals, kEggClassGlobal), tables.class_by_egg);
-  FillIdMap(TableNamed(globals, kFoodGlobal), tables.food_by_class);
   FillNameMap(TableNamed(globals, kSpeciesGlobal), tables.species_by_class);
   for (const std::string_view global : kAccessoryActGlobals) {
     FillNameMap(TableNamed(globals, global), tables.accessory_act_by_item);
   }
 }
 
-void FillPetEvolutions(std::span<const formats::LuaCall> calls, PetTables& tables) {
-  for (const formats::LuaCall& call : calls) {
-    if (call.name == kAutoFeedCall && call.arguments.size() == 1) {
-      if (const std::optional<std::uint32_t> egg = WholeId(call.arguments[0]); egg.has_value()) {
-        tables.auto_feed_eggs.insert(*egg);
+core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& tables) {
+  // Tout se lit à part, et n'entre dans `tables` qu'une fois le texte accepté.
+  PetTables read;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    }
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
+    }
+    const YAML::Node pets = whole["pets"];
+    if (!pets || !pets.IsMap()) {
+      return std::unexpected(Refused("« pets » n'est pas une table"));
+    }
+    for (const auto& pair : pets) {
+      const YAML::Node& pet = pair.second;
+      if (!pet.IsMap()) {
+        return std::unexpected(Refused("un familier n'est pas une table"));
       }
-      continue;
-    }
-    if (call.name != kRecipeCall || call.arguments.size() != kRecipeArguments) {
-      continue;
-    }
-    const std::optional<std::uint32_t> source = WholeId(call.arguments[0]);
-    const std::optional<std::uint32_t> target = WholeId(call.arguments[1]);
-    const std::optional<std::uint32_t> item = WholeId(call.arguments[2]);
-    const std::optional<std::uint32_t> amount = WholeId(call.arguments[3]);
-    // Une quantité nulle est refusée par le client, comme un argument non entier.
-    if (!source.has_value() || !target.has_value() || !item.has_value() || !amount.has_value() ||
-        *amount == 0) {
-      continue;
-    }
-    // UNE RECETTE PAR APPEL ET PAR MATÉRIAU : les appels d'un même couple
-    // s'additionnent sous la même recette.
-    std::vector<PetEvolutionRecipe>& recipes = tables.recipes_by_egg[*source];
-    PetEvolutionRecipe* recipe = nullptr;
-    for (PetEvolutionRecipe& known : recipes) {
-      if (known.target_egg_id == *target) {
-        recipe = &known;
+      const auto pet_class = pair.first.as<std::uint32_t>();
+      const auto egg = Required(pet, "egg").as<std::uint32_t>();
+      if (pet_class == 0 || egg == 0) {
+        return std::unexpected(Refused("une classe ou un œuf nul"));
+      }
+      read.food_by_class[pet_class] = Required(pet, "food").as<std::uint32_t>();
+      // UN ŒUF PARTAGÉ sort la plus petite classe, quel que soit l'ordre du texte.
+      const auto [known, inserted] = read.class_by_egg.try_emplace(egg, pet_class);
+      if (!inserted && pet_class < known->second) {
+        known->second = pet_class;
+      }
+      if (Required(pet, "auto_feed").as<bool>()) {
+        read.auto_feed_eggs.insert(egg);
+      }
+      const YAML::Node evolutions = Required(pet, "evolutions");
+      if (!evolutions.IsSequence()) {
+        return std::unexpected(Refused("« evolutions » n'est pas une liste"));
+      }
+      for (const YAML::Node& evolution : evolutions) {
+        read.recipes_by_egg[egg].push_back(ParseEvolution(evolution));
       }
     }
-    if (recipe == nullptr) {
-      recipe = &recipes.emplace_back(PetEvolutionRecipe{.target_egg_id = *target, .materials = {}});
-    }
-    recipe->materials.push_back(PetEvolutionMaterial{.item_id = *item, .amount = *amount});
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
   }
+  tables.class_by_egg = std::move(read.class_by_egg);
+  tables.food_by_class = std::move(read.food_by_class);
+  tables.recipes_by_egg = std::move(read.recipes_by_egg);
+  tables.auto_feed_eggs = std::move(read.auto_feed_eggs);
+  return {};
 }
 
 PetTables ReadPetTables(Vfs& vfs) {
@@ -169,26 +203,21 @@ PetTables ReadPetTables(Vfs& vfs) {
   if (globals) {
     FillPetInfo(*globals, tables);
   } else {
-    core::LogWarning("tables du familier : {} — la fiche se montrera sans espèce ni nourriture",
+    core::LogWarning("tables du familier : {} — la fiche se montrera sans nom d'espèce",
                      core::Describe(globals.error()));
   }
-  // ⚠ LES DEUX FICHIERS ÉCHOUENT SÉPARÉMENT : une table d'évolution illisible
-  // ne coûte pas les espèces ni la nourriture.
-  auto bytes = vfs.Read(kPetEvolutionPath);
+  // ⚠ LES DEUX SOURCES ÉCHOUENT SÉPARÉMENT : une table du serveur illisible ne
+  // coûte pas les espèces ni les accessoires.
+  auto bytes = vfs.Read(std::string(kPetDatabasePath));
   if (!bytes) {
-    core::LogWarning("évolutions du familier : {} absent — ni évolution ni auto-alimentation",
-                     kPetEvolutionPath);
+    core::LogWarning("table des familiers : {} absente — ni nourriture ni évolution",
+                     kPetDatabasePath);
     return tables;
   }
-  auto calls = formats::ReadLuaFunctionCalls(*bytes, kEvolutionFunction);
-  if (!calls) {
-    core::LogWarning(
-        "évolutions du familier : {} illisible ({}) — ni évolution ni "
-        "auto-alimentation",
-        kPetEvolutionPath, core::Describe(calls.error()));
-    return tables;
+  const std::string_view text(reinterpret_cast<const char*>(bytes->data()), bytes->size());
+  if (auto parsed = ParsePetDatabase(text, tables); !parsed) {
+    core::LogWarning("{} — ni nourriture ni évolution", core::Describe(parsed.error()));
   }
-  FillPetEvolutions(*calls, tables);
   return tables;
 }
 

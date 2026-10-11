@@ -15,28 +15,35 @@
 
 namespace ro::vfs {
 
-// LES TABLES DU FAMILIER, telles que l'installation les porte.
+// LES TABLES DU FAMILIER.
 //
 // Le serveur ne dit d'un familier que sa classe — un identifiant de monstre. Ce
 // qui relie cette classe à son œuf, à sa nourriture, à son nom d'espèce, et ce
-// que l'œuf peut devenir, vit côté client dans deux fichiers :
+// que l'œuf peut devenir, se lit dans deux sources :
+//
+//   * `data\yaml_files\pets.yml`, exporté de la pet_db du serveur par
+//     `scripts/yaml_tables/pets.py` : l'œuf, la nourriture, le droit à
+//     l'auto-alimentation et les évolutions de chaque familier. C'est la table
+//     avec laquelle le serveur juge une évolution ;
+//
+//         version: 1
+//         pets: {
+//           1002: {egg: 9001, food: 531, auto_feed: false,
+//                  evolutions: [{egg: 9069, materials: [[610, 10], [619, 3]]}]},
+//           …
+//         }
 //
 //   * `petinfo.lub`, qui indexe ses tables par les constantes de métier : il se
-//     lit APRÈS `npcidentity` et `jobidentity`, dans le même état ;
-//   * `SystemEN\PetEvolution.lub`, dont la donnée est une suite d'APPELS dans sa
-//     fonction `main` : une recette par matériau, d'un œuf vers un œuf, et la
-//     liste des œufs qui ont droit à l'auto-alimentation. C'est la table
-//     traduite que le client lit ; elle est livrée en clair.
-//
-// ⚠ CE SONT LES TABLES DU CLIENT. Le serveur revalide l'évolution avec les
-// siennes : une divergence donne une recette affichée qui échoue.
+//     lit APRÈS `npcidentity` et `jobidentity`, dans le même état. Il ne donne
+//     plus que ce que le serveur ignore : le nom de l'espèce et le .act d'un
+//     accessoire.
 
 inline constexpr std::array<std::string_view, 3> kPetInfoChain = {
     "data\\luafiles514\\lua files\\datainfo\\npcidentity.lub",
     "data\\luafiles514\\lua files\\datainfo\\jobidentity.lub",
     "data\\luafiles514\\lua files\\datainfo\\petinfo.lub",
 };
-inline constexpr std::string_view kPetEvolutionPath = "SystemEN\\PetEvolution.lub";
+inline constexpr std::string_view kPetDatabasePath = "data\\yaml_files\\pets.yml";
 
 // Un matériau d'une recette : l'item, et combien il en faut.
 struct PetEvolutionMaterial {
@@ -51,13 +58,14 @@ struct PetEvolutionRecipe {
 };
 
 struct PetTables {
-  // L'œuf → la classe du familier qui en sort.
+  // L'œuf → la classe du familier qui en sort. Un œuf que deux familiers
+  // partagent sort la plus petite classe.
   std::unordered_map<std::uint32_t, std::uint32_t> class_by_egg;
   // La classe → l'item qui la nourrit.
   std::unordered_map<std::uint32_t, std::uint32_t> food_by_class;
   // La classe → le nom de l'espèce, en UTF-8.
   std::unordered_map<std::uint32_t, std::string> species_by_class;
-  // L'œuf SOURCE → ses évolutions, dans l'ordre du fichier.
+  // L'œuf SOURCE → ses évolutions, et leurs matériaux, dans l'ordre du fichier.
   std::unordered_map<std::uint32_t, std::vector<PetEvolutionRecipe>> recipes_by_egg;
   // Les œufs dont le familier peut être nourri par le serveur.
   std::unordered_set<std::uint32_t> auto_feed_eggs;
@@ -91,17 +99,21 @@ struct PetTables {
   [[nodiscard]] std::string_view AccessoryActOf(std::uint32_t item_id) const;
 };
 
-// Remplit les tables de `petinfo` depuis ses globales déjà évaluées.
+// Remplit les espèces et les .act d'accessoire depuis les globales de
+// `petinfo`, déjà évaluées.
 void FillPetInfo(const formats::LuaTable& globals, PetTables& tables);
 
-// Remplit les recettes et la liste d'auto-alimentation depuis les appels de la
-// fonction `main`. Un appel d'un autre nom, ou dont les arguments ne sont pas
-// des identifiants entiers, est ignoré : le client le refuserait aussi.
-void FillPetEvolutions(std::span<const formats::LuaCall> calls, PetTables& tables);
+// Remplit l'œuf, la nourriture, l'auto-alimentation et les évolutions depuis le
+// texte de `pets.yml`. Refuse un texte qui n'est pas du YAML, dont `version`
+// n'est pas 1, dont `pets` n'est pas une table, ou dont un familier n'a pas ses
+// quatre champs, une classe ou un œuf nul, une évolution sans œuf cible ou un
+// matériau qui n'est pas une paire [item, quantité]. REFUSÉ, il ne touche pas
+// `tables`.
+[[nodiscard]] core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& tables);
 
-// Lit les deux fichiers. ABSENT OU ILLISIBLE, chacun laisse ses tables vides et
+// Lit les deux sources. ABSENTE OU ILLISIBLE, chacune laisse ses tables vides et
 // le dit au journal, sans coûter l'autre : la fiche du familier se montre alors
-// sans évolution, ou sans nom d'espèce.
+// sans nourriture ni évolution, ou sans nom d'espèce.
 [[nodiscard]] PetTables ReadPetTables(Vfs& vfs);
 
 }  // namespace ro::vfs

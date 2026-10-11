@@ -108,8 +108,8 @@ tête d'où elle vient et comment la régénérer.
   [ROenglishRE](https://github.com/llchrisll/ROenglishRE), dont la licence en
   permet la distribution et la modification ; ils ne sont pas revendiqués comme
   partie de ce projet.
-- `item_properties.yml` et `monster_list.yml` sont exportés des bases d'objets
-  et de monstres du serveur Moonlight.
+- `item_properties.yml`, `monster_list.yml` et `pets.yml` sont exportés des
+  bases d'objets, de monstres et de familiers du serveur Moonlight.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 
