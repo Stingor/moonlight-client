@@ -656,9 +656,9 @@ void AchievementStage::ComposeDetail(const AchievementInfo& info) {
           .kind = ro::ui::AchievementRewardKind::kTitle,
           .tooltip = titles_ != nullptr ? titles_->Find(*info.reward_title) : std::string_view()});
     }
-    if (AchievementInfo::Grants(info.reward_buff)) {
+    if (info.reward_script) {
       buff_tooltip_.clear();
-      if (statuses_ != nullptr) {
+      if (statuses_ != nullptr && AchievementInfo::Grants(info.reward_buff)) {
         if (const ro::vfs::StatusInfo* status =
                 statuses_->Find(static_cast<std::uint32_t>(*info.reward_buff));
             status != nullptr) {

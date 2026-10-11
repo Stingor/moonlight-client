@@ -10,6 +10,7 @@ find_package(yaml-cpp CONFIG REQUIRED)
 
 add_library(ro_vfs STATIC
     src/achievement_catalog.cpp
+    src/achievement_database.cpp
     src/achievement_titles.cpp
     src/achievement_words.cpp
     src/battle_words.cpp

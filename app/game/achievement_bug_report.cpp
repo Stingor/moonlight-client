@@ -61,10 +61,11 @@ constexpr std::size_t kLabelBytes = 192;
                                          const ro::sim::AchievementBook& book) {
   std::string fields = std::format(
       R"("achievement":{{"achievement_id":{},"name":"{}","group":"{}","major":{},"minor":{},)"
-      R"("score":{},"counted":{},"reward":{{"item":{},"title":{},"buff":{}}},"objectives":[)",
+      R"("score":{},"counted":{},"reward":{{"item":{},"title":{},"script":{},"buff":{}}},)"
+      R"("objectives":[)",
       info.achievement_id, JsonEscaped(info.name), JsonEscaped(info.group), info.major, info.minor,
       info.score, Flag(info.gauge == ro::vfs::AchievementGauge::kCounts), Reward(info.reward_item),
-      Reward(info.reward_title), Reward(info.reward_buff));
+      Reward(info.reward_title), Flag(info.reward_script), Reward(info.reward_buff));
   const ro::sim::AchievementProgress* progress = book.Find(info.achievement_id);
   const std::size_t shown = std::min(info.objectives.size(), ro::sim::kAchievementCounterCount);
   for (std::size_t index = 0; index < shown; ++index) {

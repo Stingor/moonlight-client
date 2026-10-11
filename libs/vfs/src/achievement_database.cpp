@@ -1,0 +1,138 @@
+// Voir l'en-tête.
+
+#include "ro/vfs/achievement_database.h"
+
+#include <algorithm>
+#include <expected>
+#include <utility>
+
+#include <yaml-cpp/yaml.h>
+
+namespace ro::vfs {
+namespace {
+
+constexpr int kSupportedVersion = 1;
+// Un objectif s'écrit [numéro, compte].
+constexpr std::size_t kTargetIndexField = 0;
+constexpr std::size_t kTargetCountField = 1;
+constexpr std::size_t kTargetFieldCount = 2;
+constexpr std::int64_t kMostCount = std::numeric_limits<std::uint32_t>::max();
+
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData, "table des succès : " + std::move(detail)};
+}
+
+// Un champ obligatoire d'une table YAML, absent : une exception, comme yaml-cpp
+// signale un champ qui n'entre pas dans son type.
+[[nodiscard]] YAML::Node Required(const YAML::Node& map, const char* key) {
+  YAML::Node value = map[key];
+  if (!value) {
+    throw YAML::KeyNotFound(map.Mark(), std::string(key));
+  }
+  return value;
+}
+
+// Un entier entre `least` et `most`, ou une exception.
+[[nodiscard]] std::int64_t Whole(const YAML::Node& node, std::int64_t least, std::int64_t most) {
+  const auto value = node.as<std::int64_t>();
+  if (value < least || value > most) {
+    throw YAML::RepresentationException(node.Mark(), "un nombre hors de ses bornes");
+  }
+  return value;
+}
+
+[[nodiscard]] std::int32_t Number(const YAML::Node& node) {
+  return static_cast<std::int32_t>(Whole(node, 0, kMostAchievementNumber));
+}
+
+[[nodiscard]] YAML::Node Sequence(const YAML::Node& map, const char* key) {
+  YAML::Node list = Required(map, key);
+  if (!list.IsSequence()) {
+    throw YAML::RepresentationException(list.Mark(), std::string(key) + " n'est pas une liste");
+  }
+  return list;
+}
+
+void ReadTargets(const YAML::Node& entry, ServerAchievement& read) {
+  for (const YAML::Node& target : Sequence(entry, "targets")) {
+    if (!target.IsSequence() || target.size() != kTargetFieldCount) {
+      throw YAML::RepresentationException(target.Mark(),
+                                          "un objectif n'est pas une paire [numéro, compte]");
+    }
+    const auto index = static_cast<std::size_t>(
+        Whole(target[kTargetIndexField], 0, kAchievementObjectiveCount - 1));
+    read.targets[index] =
+        static_cast<std::uint32_t>(Whole(target[kTargetCountField], 0, kMostCount));
+  }
+}
+
+[[nodiscard]] ServerAchievement ReadEntry(std::uint32_t achievement_id, const YAML::Node& entry) {
+  if (!entry.IsMap()) {
+    throw YAML::RepresentationException(entry.Mark(), "un succès n'est pas une table");
+  }
+  ServerAchievement read{.achievement_id = achievement_id,
+                         .name = Required(entry, "name").as<std::string>(),
+                         .score = Number(Required(entry, "score"))};
+  ReadTargets(entry, read);
+  const YAML::Node reward = Required(entry, "reward");
+  if (!reward.IsMap()) {
+    throw YAML::RepresentationException(reward.Mark(), "« reward » n'est pas une table");
+  }
+  read.reward_item = Number(Required(reward, "item"));
+  read.reward_title = Number(Required(reward, "title"));
+  read.reward_script = Required(reward, "script").as<bool>();
+  for (const YAML::Node& needed : Sequence(entry, "dependents")) {
+    read.dependents.push_back(static_cast<std::uint32_t>(Number(needed)));
+  }
+  return read;
+}
+
+}  // namespace
+
+core::Result<AchievementDatabase> AchievementDatabase::Load(Vfs& vfs) {
+  auto bytes = vfs.Read(std::string(kAchievementDatabasePath));
+  if (!bytes) {
+    return std::unexpected(bytes.error());
+  }
+  const std::string_view text(reinterpret_cast<const char*>(bytes->data()), bytes->size());
+  return Parse(text);
+}
+
+core::Result<AchievementDatabase> AchievementDatabase::Parse(std::string_view yaml_text) {
+  AchievementDatabase loaded;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    }
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
+    }
+    const YAML::Node achievements = whole["achievements"];
+    if (!achievements || !achievements.IsMap()) {
+      return std::unexpected(Refused("« achievements » n'est pas une table"));
+    }
+    for (const auto& pair : achievements) {
+      const auto achievement_id =
+          static_cast<std::uint32_t>(Whole(pair.first, 0, kMostAchievementNumber));
+      loaded.entries_.push_back(ReadEntry(achievement_id, pair.second));
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
+  }
+  std::ranges::sort(loaded.entries_, {}, &ServerAchievement::achievement_id);
+  return loaded;
+}
+
+const ServerAchievement* AchievementDatabase::Find(std::uint32_t achievement_id) const {
+  const auto found =
+      std::ranges::lower_bound(entries_, achievement_id, {}, &ServerAchievement::achievement_id);
+  if (found == entries_.end() || found->achievement_id != achievement_id) {
+    return nullptr;
+  }
+  return &*found;
+}
+
+}  // namespace ro::vfs

@@ -26,6 +26,7 @@
 #include "ro/render/pvp_hud.h"
 #include "ro/render/sleep_bubbles.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/vfs/achievement_database.h"
 #include "ro/vfs/card_illustrations.h"
 #include "ro/vfs/card_item_list.h"
 #include "ro/vfs/item_words.h"
@@ -442,31 +443,30 @@ void LoadTitles(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.titles = std::move(*titles);
 }
 
-// LE TITRE QUE RÉCOMPENSE CHAQUE SUCCÈS. ⚠ SON ABSENCE NE COUPE RIEN D'AUTRE :
-// les étiquettes de nom ne s'en servent pas, seul l'onglet de la fiche reste
-// vide.
-void LoadAchievementTitles(ro::vfs::Vfs& vfs, GamePieces& pieces) {
-  auto rewards = ro::vfs::AchievementTitles::Load(vfs);
-  if (!rewards) {
-    ro::core::LogWarning("succès : {} — la fiche ne proposera aucun titre",
-                         ro::core::Describe(rewards.error()));
+// LES SUCCÈS : la base du serveur donne le titre que chacun récompense, et le
+// catalogue de la fenêtre, joint à la table du client. ⚠ LEUR ABSENCE NE COUPE
+// RIEN D'AUTRE : la fenêtre reste vide et la fiche sans titre, la progression
+// se tient quand même.
+void LoadAchievements(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  auto database = ro::vfs::AchievementDatabase::Load(vfs);
+  if (!database) {
+    ro::core::LogWarning("succès : {} — ni fenêtre des succès ni titre en récompense",
+                         ro::core::Describe(database.error()));
     return;
   }
-  ro::core::LogInfo("succès : {} titre(s) en récompense", rewards->entries().size());
-  pieces.achievement_titles = std::move(*rewards);
-}
-
-// LE CATALOGUE DES SUCCÈS. ⚠ SON ABSENCE NE COUPE RIEN D'AUTRE : la fenêtre
-// des succès reste vide, la progression se tient quand même.
-void LoadAchievementCatalog(ro::vfs::Vfs& vfs, GamePieces& pieces) {
-  auto catalog = ro::vfs::AchievementCatalog::Load(vfs);
+  pieces.achievement_titles = ro::vfs::AchievementTitles::Of(*database);
+  ro::core::LogInfo("succès : {} au serveur, {} titre(s) en récompense", database->entries().size(),
+                    pieces.achievement_titles->entries().size());
+  auto catalog = ro::vfs::AchievementCatalog::Load(vfs, *database);
   if (!catalog) {
     ro::core::LogWarning("succès : {} — la fenêtre des succès restera vide",
                          ro::core::Describe(catalog.error()));
     return;
   }
-  ro::core::LogInfo("succès : {} au catalogue, {} entrée(s) écartée(s)", catalog->entries().size(),
-                    catalog->skipped());
+  ro::core::LogInfo(
+      "succès : {} au catalogue, {} entrée(s) écartée(s), {} inconnue(s) du serveur, {} sans texte",
+      catalog->entries().size(), catalog->skipped(), catalog->unknown_to_server(),
+      catalog->without_texts());
   pieces.achievement_catalog = std::move(*catalog);
 }
 
@@ -693,8 +693,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   LoadSkillTree(vfs, pieces);
   LoadJobNames(vfs, pieces);
   LoadTitles(vfs, pieces);
-  LoadAchievementTitles(vfs, pieces);
-  LoadAchievementCatalog(vfs, pieces);
+  LoadAchievements(vfs, pieces);
   pieces.quest_language = ro::core::CurrentLanguage();
   LoadQuestCatalog(vfs, pieces);
   LoadRecommendedCatalog(vfs, pieces);

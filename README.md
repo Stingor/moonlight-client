@@ -112,6 +112,10 @@ tête d'où elle vient et comment la régénérer.
   bases d'objets, de monstres et de familiers du serveur Moonlight.
 - `item_groups.yml` est exporté des bases d'objets, de groupes d'objets et
   d'invocations du serveur Moonlight.
+- `achievements.yml` est exporté de la base des succès du serveur Moonlight
+  (et de ses bases d'objets, de monstres et de cartes). Les textes des succès
+  restent lus dans le `achievements.lub` de l'installation du joueur ; ils ne
+  sont pas versés au dépôt.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 
