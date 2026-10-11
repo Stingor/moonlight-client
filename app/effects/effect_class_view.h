@@ -179,9 +179,10 @@ class EffectClassesInPlay {
 
 // LA NAISSANCE D'UNE CLASSE PAR L'ÉTAPE D'UNE SUITE : le porteur et la place
 // que l'étape désigne, la cible pour acteur lié, et le niveau que le paquet de
-// la compétence annonce — que seules les classes qui le reçoivent lisent. Faux
-// quand aucune classe portée ne répond à l'effet de l'étape.
-bool SpawnSkillClass(EffectClassesInPlay& classes, const ro::sim::World& world,
+// la compétence annonce — que seules les classes qui le reçoivent lisent. Rend
+// la place où la classe naît, d'où part son bruit ; rien quand aucune classe
+// portée ne répond à l'effet de l'étape, ou qu'elle refuse de naître.
+std::optional<glm::vec3> SpawnSkillClass(EffectClassesInPlay& classes, const ro::sim::World& world,
                      const MapStage& stage, ro::sim::WalkPlanner& planner,
                      const ro::sim::Actor& target, std::uint32_t caster_id,
                      std::uint32_t started_ms, const ro::render::SkillSuiteStep& step,

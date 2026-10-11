@@ -46,9 +46,13 @@ void EffectsInPlay::PlaySkillEffect(const ro::sim::World& world, const MapStage&
           static_cast<std::uint32_t>(ro::render::SkillSuiteCadenceDelayMs(allure->cadence_steps));
     }
   }
-  // UNE CLASSE INSCRITE passe devant le fichier et le patron.
-  if (SpawnSkillClass(classes_, world, stage, planner, target, caster_id, started_ms, step,
-                      delay_ms, skill_level)) {
+  // UNE CLASSE INSCRITE passe devant le fichier et le patron. Elle sonne comme
+  // eux, de la place où elle naît : le flacon d'Acid Terror, les lancers du
+  // ninja.
+  if (const std::optional<glm::vec3> born_at =
+          SpawnSkillClass(classes_, world, stage, planner, target, caster_id, started_ms, step,
+                          delay_ms, skill_level)) {
+    NoteLaunched(effect, {born_at->x, born_at->y, born_at->z}, target.id);
     return;
   }
   const std::string file = effect != 0 ? AskedEffectFile(effect, started_ms) : std::string();

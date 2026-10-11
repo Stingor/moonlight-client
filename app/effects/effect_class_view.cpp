@@ -500,14 +500,15 @@ void EffectClassesInPlay::Forget() {
   clock_started_ = false;
 }
 
-bool SpawnSkillClass(EffectClassesInPlay& classes, const ro::sim::World& world,
-                     const MapStage& stage, ro::sim::WalkPlanner& planner,
-                     const ro::sim::Actor& target, std::uint32_t caster_id,
-                     std::uint32_t started_ms, const ro::render::SkillSuiteStep& step,
-                     std::uint32_t delay_ms, std::int32_t skill_level) {
+std::optional<glm::vec3> SpawnSkillClass(EffectClassesInPlay& classes, const ro::sim::World& world,
+                                         const MapStage& stage, ro::sim::WalkPlanner& planner,
+                                         const ro::sim::Actor& target, std::uint32_t caster_id,
+                                         std::uint32_t started_ms,
+                                         const ro::render::SkillSuiteStep& step,
+                                         std::uint32_t delay_ms, std::int32_t skill_level) {
   using Carrier = ro::render::SkillSuiteCarrier;
   if (!ro::render::IsPortedEffectClass(step.effect_id)) {
-    return false;
+    return std::nullopt;
   }
   const std::optional<glm::vec3> aimed = GroundOf(target.id, world, stage, planner, started_ms);
   const std::optional<glm::vec3> caster = GroundOf(caster_id, world, stage, planner, started_ms);
@@ -548,7 +549,10 @@ bool SpawnSkillClass(EffectClassesInPlay& classes, const ro::sim::World& world,
   if (ro::render::EffectClassBornAtCaster(step.effect_id) && caster.has_value()) {
     birth.ground_position = *caster;
   }
-  return classes.Spawn(birth, started_ms);
+  if (!classes.Spawn(birth, started_ms)) {
+    return std::nullopt;
+  }
+  return birth.ground_position;
 }
 
 }  // namespace moonclient
