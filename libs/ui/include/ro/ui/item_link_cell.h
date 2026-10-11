@@ -29,6 +29,9 @@ namespace ro::ui {
 struct ItemLinkMenu {
   // Un clic droit l'a demandé ; il s'ouvre au prochain `DrawItemLinkMenu`.
   bool armed = false;
+  // Ctrl + clic droit : le prochain `DrawItemLinkMenu` rend la description,
+  // sans ouvrir le menu.
+  bool describe_at_once = false;
   ChatLinkKind kind = ChatLinkKind::kItem;
   std::uint32_t item_id = 0;
   std::uint32_t token = 0;

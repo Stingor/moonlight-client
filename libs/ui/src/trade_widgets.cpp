@@ -117,14 +117,18 @@ void AddLastItemGesture(TradeItemGesture& gesture) {
     return;
   }
   gesture.hovered = true;
-  gesture.menu |= ImGui::IsMouseReleased(ImGuiMouseButton_Right);
+  const bool right_released = ImGui::IsMouseReleased(ImGuiMouseButton_Right);
+  const bool ctrl_held = ImGui::GetIO().KeyCtrl;
+  gesture.menu |= right_released && !ctrl_held;
+  gesture.describe |= right_released && ctrl_held;
   gesture.repost |= ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::GetIO().KeyShift;
 }
 
 bool NoteTradeItemLink(const TradeItemGesture& gesture, const TradeItemView& item,
                        std::uint32_t token, ItemLinkMenu& menu) {
-  if (gesture.menu) {
-    menu.armed = true;
+  if (gesture.menu || gesture.describe) {
+    menu.armed = gesture.menu;
+    menu.describe_at_once = gesture.describe;
     menu.kind = ChatLinkKind::kItem;
     menu.item_id = item.item_id;
     menu.token = token;

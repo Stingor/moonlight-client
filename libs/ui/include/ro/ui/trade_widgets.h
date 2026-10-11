@@ -47,15 +47,19 @@ struct TradeItemView {
 //
 // 🔴 UN ITEM DE COMMERCE SE MANIE COMME UNE CELLULE D'OBJET (`DrawItemLinkCell`) :
 // Maj + clic gauche repose son lien dans la saisie, le clic droit ouvre LE menu
-// des objets. Le clic gauche simple reste aux actions de la ligne — panier,
-// glisser, double-clic. Les deux clics se lisent au relâchement : partie de
-// l'enfoncement, la fenêtre qu'ils ouvrent naîtrait derrière le commerce.
+// des objets, Ctrl + clic droit la description sans passer par lui — le geste
+// de tous les items du client. Le clic gauche simple reste aux actions de la
+// ligne — panier, glisser, double-clic. Les clics se lisent au relâchement :
+// partie de l'enfoncement, la fenêtre qu'ils ouvrent naîtrait derrière le
+// commerce.
 struct TradeItemGesture {
   bool hovered = false;
   // Maj + clic gauche : le lien dans la saisie.
   bool repost = false;
   // Le clic droit : le menu.
   bool menu = false;
+  // Ctrl + clic droit : la description.
+  bool describe = false;
 };
 
 // L'icône et le nom, sur la ligne courante. Le nom d'un objet cassé porte

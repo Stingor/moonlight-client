@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <utility>
 
 namespace ro::ui {
 namespace {
@@ -110,6 +111,12 @@ ChatLinkGesture DrawItemLinkCell(const ItemLinkCell& cell, ItemLinkMenu& menu, C
 
 void DrawItemLinkMenu(const char* popup_id, ItemLinkMenu& menu, ChatLinkAsk& asked,
                       std::span<const VoteShopOffer> vote_shop) {
+  if (std::exchange(menu.describe_at_once, false)) {
+    asked.gesture = ChatLinkGesture::kDescribe;
+    asked.kind = menu.kind;
+    asked.item_id = menu.item_id;
+    asked.token = menu.token;
+  }
   if (menu.armed) {
     menu.armed = false;
     ImGui::OpenPopup(popup_id);

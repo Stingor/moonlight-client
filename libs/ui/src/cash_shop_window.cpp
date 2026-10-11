@@ -388,11 +388,13 @@ void NoteCardGestures(const CashShopCard& card, bool card_hovered, bool button_h
     action.item.hovered_kind = ChatLinkKind::kItem;
     action.item.hovering = true;
   }
+  const bool right_released = ImGui::IsMouseReleased(ImGuiMouseButton_Right);
   const TradeItemGesture gesture{.hovered = true,
                                  .repost = !button_hovered &&
                                            ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
                                            ImGui::GetIO().KeyShift,
-                                 .menu = ImGui::IsMouseReleased(ImGuiMouseButton_Right)};
+                                 .menu = right_released && !ImGui::GetIO().KeyCtrl,
+                                 .describe = right_released && ImGui::GetIO().KeyCtrl};
   if (NoteTradeItemLink(gesture, TradeItemView{.item_id = card.item_id, .name = card.name}, 0,
                         menu)) {
     action.item.gesture = ChatLinkGesture::kRepost;
