@@ -721,6 +721,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   pages_.pet.Compose();
   sections_[Rank(OptionSection::kPet)] =
       ro::ui::OptionSectionView{.title = Tr("Fiche de pet"), .rows = pages_.pet.rows()};
+  pages_.quest_tracker.Compose();
+  sections_[Rank(OptionSection::kQuestTracker)] = ro::ui::OptionSectionView{
+      .title = Tr("Quêtes et suivi"), .rows = pages_.quest_tracker.rows()};
   // ⚠ AUCUNE RANGÉE : la page se dessine elle-même. Voir `options/commands_page.h`.
   sections_[Rank(OptionSection::kCommands)] = ro::ui::OptionSectionView{
       .title = Tr("Commands Settings"), .group = Tr("Server"), .body = pages_.commands_body};

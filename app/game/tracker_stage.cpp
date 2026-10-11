@@ -69,6 +69,9 @@ void TrackerStage::FollowPanel(std::size_t panel, TrackerWindows& tracker, Quest
     memory_.places[panel] = *asked.moved;
     Save();
   }
+  if (asked.hide) {
+    tracker.shown_asked = false;
+  }
 }
 
 void TrackerStage::Advance(TrackerWindows& tracker, QuestStage& quests, QuestWindows& quest_windows,

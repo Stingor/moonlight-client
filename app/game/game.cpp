@@ -224,6 +224,8 @@ void Game::Close() {
   pieces_.companion_ai.Leave(static_cast<std::uint32_t>(SDL_GetTicks()));
   // La minimap quitte le panneau d'options : ses réglages vivent avec la partie.
   settings_->options().pages().minimap_panel.Entrust(nullptr);
+  // Le suivi des quêtes aussi : ses réglages vivent avec la partie.
+  settings_->options().pages().quest_tracker.Entrust(nullptr);
   // Le pseudo et la carte quittent le titre avec la partie.
   gl_->SetTitle(WindowTitle());
 }

@@ -150,6 +150,8 @@ struct TrackerPanelAction {
   // Le joueur l'a traîné ici.
   std::optional<TrackerPlace> moved;
   bool reset_place = false;
+  // « Masquer le suivi » : les deux panneaux quittent l'écran.
+  bool hide = false;
 };
 
 // UN PANNEAU. `window_id` est sa clé ImGui ; `first_top` décale sa place
@@ -173,5 +175,14 @@ struct TrackerSettingsAnswer {
 };
 [[nodiscard]] TrackerSettingsAnswer DrawTrackerSettingsItems(const TrackerLook& look,
                                                              const SkinArt& skin);
+
+// LA PAGE DU SUIVI DANS LES OPTIONS : la case qui le montre, puis les mêmes
+// réglages. `shown` dit si le joueur veut le suivi à l'écran.
+struct TrackerOptionsAnswer {
+  std::optional<bool> shown;
+  TrackerSettingsAnswer settings;
+};
+[[nodiscard]] TrackerOptionsAnswer DrawTrackerOptions(bool shown, const TrackerLook& look,
+                                                      const SkinArt& skin);
 
 }  // namespace ro::ui

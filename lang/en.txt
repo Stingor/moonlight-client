@@ -13781,6 +13781,18 @@ tr: Minimap
 fr: Les réglages de la minimap s'ouvrent en jeu.
 tr: The minimap settings open in game.
 
+fr: Les réglages du suivi des quêtes s'ouvrent en jeu.
+tr: The quest tracker settings open in game.
+
+fr: Quêtes et suivi
+tr: Quests and tracker
+
+fr: Masquer le suivi
+tr: Hide tracker
+
+fr: Il revient par la case « Montrer le suivi » du journal des quêtes, ou par la page « Quêtes et suivi » des options.
+tr: It comes back through the « Show tracker » box of the quest log, or through the « Quests and tracker » page of the options.
+
 fr: Skin
 tr: Skin
 

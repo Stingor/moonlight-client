@@ -461,6 +461,13 @@ void DrawPanelMenus(std::span<const TrackerSection> sections, const TrackerLook&
     const TrackerSettingsAnswer answer = DrawTrackerSettingsItems(look, skin);
     action.look = answer.look;
     action.reset_place = answer.reset_place;
+    ImGui::Separator();
+    if (ImGui::Selectable(core::Tr("Masquer le suivi"))) {
+      action.hide = true;
+    }
+    SkinTooltip(
+        core::Tr("Il revient par la case « Montrer le suivi » du journal des quêtes, ou "
+                 "par la page « Quêtes et suivi » des options."));
     EndSkinPopup();
   }
   if (BeginSkinPopup(kEntryMenuId)) {
@@ -546,6 +553,17 @@ TrackerSettingsAnswer DrawTrackerSettingsItems(const TrackerLook& look, const Sk
   if (changed != look) {
     answer.look = changed;
   }
+  return answer;
+}
+
+TrackerOptionsAnswer DrawTrackerOptions(bool shown, const TrackerLook& look, const SkinArt& skin) {
+  TrackerOptionsAnswer answer;
+  if (SkinCheckBox(core::Tr("Montrer le suivi"), &shown, skin)) {
+    answer.shown = shown;
+  }
+  SkinTooltip(core::Tr("Le panneau des quêtes et des succès suivis, sur le jeu"));
+  ImGui::Separator();
+  answer.settings = DrawTrackerSettingsItems(look, skin);
   return answer;
 }
 

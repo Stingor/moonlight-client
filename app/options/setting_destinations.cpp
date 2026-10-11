@@ -165,6 +165,7 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     // Le grimoire : la page du personnage chez nous.
     Page("skills", TrText("Personnage"), OptionSection::kCharacter),
     Page("pet", TrText("Fiche de pet"), OptionSection::kPet),
+    Page("quest_tracker", TrText("Quêtes et suivi"), OptionSection::kQuestTracker),
     Page("commands", TrText("Commands Settings"), OptionSection::kCommands),
     // Les onglets que la page dessine elle-même.
     PageTab("commands_general", TrText("Général"), OptionSection::kCommands, CommandsTab::kGeneral),

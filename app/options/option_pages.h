@@ -32,6 +32,7 @@
 #include "options/option_sections.h"
 #include "options/pet_options.h"
 #include "options/pick_precision_options.h"
+#include "options/quest_tracker_options.h"
 #include "options/quick_cast_options.h"
 #include "options/shop_options.h"
 #include "options/skill_view_options.h"
@@ -110,6 +111,7 @@ struct OptionPages {
   MvpTrackerOptions mvp_tracker;
   BattlegroundOptions battleground;
   PetOptions pet;
+  QuestTrackerOptions quest_tracker;
   // ⚠ SANS DÉCLARATION AU FICHIER : c'est le serveur qui tient ce réglage.
   CallOptions call;
   // Les liens, les images et les mentions du chat.

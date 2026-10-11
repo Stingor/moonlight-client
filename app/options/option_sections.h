@@ -113,6 +113,10 @@ enum class OptionSection : std::size_t {
   // LA FICHE DU PET. ⚠ CONTRE LE PERSONNAGE : ses deux autres compagnons,
   // l'homoncule et le mercenaire, sont des onglets de sa fiche.
   kPet,
+  // LE JOURNAL DES QUÊTES ET SON PANNEAU DE SUIVI. ⚠ EN FIN D'INTERFACE : le
+  // panneau sert aussi les succès, et n'appartient à aucune fenêtre d'au-dessus.
+  // Ses réglages vivent dans `suivi.yml` — voir `QuestTrackerOptions`.
+  kQuestTracker,
   // LES RÉGLAGES QUE LE SERVEUR TIENT POUR LE PERSONNAGE — `@showexp`, `@noks`,
   // `@autoloot` et les leurs. ⚠ UNE FAMILLE À PART, « Server » : ils ne règlent
   // ni le programme ni une fenêtre, et vivent dans les registres du personnage.

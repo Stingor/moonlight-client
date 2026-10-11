@@ -1554,6 +1554,7 @@ add_executable(moonclient
     options/map_sign_options.cpp
     options/window_title_options.cpp
     options/minimap_panel_options.cpp
+    options/quest_tracker_options.cpp
     options/skin_options.cpp
     options/cast_bar_options.cpp
     options/pick_precision_options.cpp

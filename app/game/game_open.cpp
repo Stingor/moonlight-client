@@ -18,6 +18,7 @@
 #include "ro/render/map_scene.h"
 #include "ro/ui/chat_emote_names.h"
 #include "ro/ui/minimap_window.h"
+#include "ro/ui/tracker_panel.h"
 
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
@@ -498,6 +499,21 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.tracker.SeeSaveRoot(client_root_);
   pieces_.tracker.StartSession();
   windows_.tracker = TrackerWindows{};
+  // LE SUIVI AU PANNEAU D'OPTIONS : ses demandes passent là où passent celles du
+  // journal, et l'étage du suivi les écrit. Repris à la fin de la partie.
+  settings_->options().pages().quest_tracker.Entrust([this](const ro::ui::SkinArt& art) {
+    TrackerWindows& tracker = windows_.tracker;
+    const ro::ui::TrackerOptionsAnswer answer =
+        ro::ui::DrawTrackerOptions(tracker.shown, tracker.look, art);
+    if (answer.shown.has_value()) {
+      tracker.shown_asked = answer.shown;
+    }
+    const bool settled = answer.settings.look.has_value() || answer.settings.reset_place;
+    if (settled) {
+      tracker.settings_asked = answer.settings;
+    }
+    return answer.shown.has_value() || settled;
+  });
   // LE CARNET DE CHASSE MVP : ses sprites, ses images, les noms lisibles des
   // cartes, et ses lignes détachées.
   pieces_.mvp_tracker.See(MvpTrackerPieces{

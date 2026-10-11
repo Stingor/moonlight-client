@@ -132,7 +132,8 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
          party.Change(asked) || cast_bars.Change(asked) || pick_precision.Change(asked) ||
          damage_meter.Change(asked) || shops.Change(asked) || whispers.Change(asked) ||
          grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
-         battleground.Change(asked) || pet.Change(asked) || chat_web.Change(asked);
+         battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
+         chat_web.Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {

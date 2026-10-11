@@ -13769,6 +13769,18 @@ tr: Minimapa
 fr: Les réglages de la minimap s'ouvrent en jeu.
 tr: Los ajustes del minimapa se abren en el juego.
 
+fr: Les réglages du suivi des quêtes s'ouvrent en jeu.
+tr: Los ajustes del seguimiento de misiones se abren en el juego.
+
+fr: Quêtes et suivi
+tr: Misiones y seguimiento
+
+fr: Masquer le suivi
+tr: Ocultar el seguimiento
+
+fr: Il revient par la case « Montrer le suivi » du journal des quêtes, ou par la page « Quêtes et suivi » des options.
+tr: Vuelve con la casilla « Mostrar el seguimiento » del diario de misiones, o con la página « Misiones y seguimiento » de las opciones.
+
 fr: Skin
 tr: Skin
 
