@@ -702,6 +702,14 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     SaveChatAndSay(*to.chat_tabs, to.chat_rooms, /*tabs_too=*/true, *to.world, said_ms);
     return;
   }
+  // LE TABLEAU DES CLASSEMENTS. ⚠ LA LIGNE SE PREND MÊME SANS TABLEAU : une
+  // commande de ce client ne se dit jamais en public.
+  if (IsRankingBoardCommand(line)) {
+    if (to.ranking_board_asked != nullptr) {
+      *to.ranking_board_asked = true;
+    }
+    return;
+  }
   // LES CLASSEMENTS : la réponse s'écrit quand elle arrive, ses noms avec —
   // voir `RankNotices`.
   if (const std::optional<ro::net::RankKind> rank = ReadRankCommand(line); rank.has_value()) {

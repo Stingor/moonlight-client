@@ -136,7 +136,7 @@ RankingWindowAction DrawRankingWindow(RankingWindowState& state, const RankingVi
   DrawTabs(state, art, action);
   // ⚠ LES LIGNES D'UN AUTRE CLASSEMENT NE SE MONTRENT PAS sous l'onglet choisi :
   // la réponse à la demande n'est pas encore là.
-  if (view.waiting_names || view.tab != state.tab) {
+  if (view.awaiting_list || view.waiting_names || view.tab != state.tab) {
     ImGui::TextUnformatted(core::Tr("Récupération du classement…"));
   } else {
     DrawTable(view);

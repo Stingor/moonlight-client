@@ -615,6 +615,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .inventory_window = &windows_.inventory.open,
       .macro_window = &windows_.macros.open,
       .craft_atlas = &windows_.craft_atlas.state,
+      .ranking_board_asked = &windows_.ranking_board.open_asked,
       .navi = &navi_,
       .navigation = &windows_.navigation.state,
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,

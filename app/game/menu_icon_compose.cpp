@@ -75,6 +75,7 @@ std::optional<GameAction> ActionOfMenuCommand(MenuCommand command) {
     case MenuCommand::kReputation:
     case MenuCommand::kAdventureGuide:
     case MenuCommand::kProbability:
+    case MenuCommand::kRankingBoard:
       break;
     case MenuCommand::kCardAlbum:
       return GameAction::kOpenCardAlbum;
@@ -106,8 +107,11 @@ bool MenuCommandPorted(MenuCommand command) {
   // une fenêtre : le menu d'Échap les ouvre déjà.
   // LE CHAMP DE BATAILLE NON PLUS : son icône rouvre la fenêtre de la file, ou
   // la liste, selon qu'on est en file.
+  // LE TABLEAU DES CLASSEMENTS NON PLUS : il n'a pas de touche, `/ranking` et
+  // son icône l'ouvrent.
   return ActionOfMenuCommand(command).has_value() || command == MenuCommand::kOption ||
-         command == MenuCommand::kShortcut || command == MenuCommand::kBattleground;
+         command == MenuCommand::kShortcut || command == MenuCommand::kBattleground ||
+         command == MenuCommand::kRankingBoard;
 }
 
 void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameImages* images,

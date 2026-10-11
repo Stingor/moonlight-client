@@ -59,6 +59,8 @@ struct RankingView {
   std::uint32_t own_points = 0;
   // Des noms manquent encore, et le délai de leur attente n'est pas passé.
   bool waiting_names = false;
+  // Le classement de cet onglet n'est encore jamais arrivé : `rows` est vide.
+  bool awaiting_list = false;
 };
 
 // L'onglet qu'ImGui montre, avant toute image.

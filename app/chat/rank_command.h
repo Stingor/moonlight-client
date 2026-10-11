@@ -12,4 +12,10 @@ namespace moonclient {
 // casse latine.
 [[nodiscard]] std::optional<ro::net::RankKind> ReadRankCommand(std::string_view line);
 
+// `/ranking` : ouvre le tableau des classements. ⚠ UNE COMMANDE DE CE CLIENT,
+// que le client d'origine n'a pas : elle ne part jamais au serveur. La ligne
+// entière compte, sans la casse latine.
+inline constexpr std::string_view kRankingBoardCommand = "/ranking";
+[[nodiscard]] bool IsRankingBoardCommand(std::string_view line);
+
 }  // namespace moonclient

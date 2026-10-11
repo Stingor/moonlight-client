@@ -1,4 +1,4 @@
-// Les trois commandes de classement. Voir l'en-tête.
+// Les commandes de classement et celle du tableau. Voir l'en-tête.
 
 #include "chat/rank_command.h"
 
@@ -25,6 +25,10 @@ std::optional<ro::net::RankKind> ReadRankCommand(std::string_view line) {
     }
   }
   return std::nullopt;
+}
+
+bool IsRankingBoardCommand(std::string_view line) {
+  return ro::core::EqualsFolded(line, kRankingBoardCommand);
 }
 
 }  // namespace moonclient
