@@ -14,12 +14,11 @@ namespace ro::net {
 // ── LES TRAMES DU FAMILIER ─────────────────────────────────────────────────
 //
 // La fiche, les changements d'état, la liste d'éclosion, le résultat d'une
-// évolution — et, dans l'écho des réglages, l'auto-alimentation, que le lecteur
-// des réglages du personnage laisse passer.
+// évolution, l'accusé d'un repas — et, dans l'écho des réglages,
+// l'auto-alimentation, que le lecteur des réglages du personnage laisse passer.
 //
-// ⚠ LE REPAS (`ZC_FEED_PET`) RESTE NON TRAITÉ, comme le spectacle d'un
-// familier : rien ici ne les lit encore. L'apparence passe par
-// `ApplyPetAccessoryLook`.
+// ⚠ LE SPECTACLE D'UN FAMILIER RESTE NON TRAITÉ : rien ici ne le lit encore.
+// L'apparence passe par `ApplyPetAccessoryLook`.
 [[nodiscard]] FrameOutcome ApplyPetFrame(const Frame& frame, sim::Pet& pet);
 
 // L'ACCESSOIRE D'UN PET, le nôtre comme celui d'un voisin : le changement

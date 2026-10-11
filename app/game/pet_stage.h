@@ -30,8 +30,8 @@ struct GamePieces;
 class PetStage {
  public:
   // Lit une trame du serveur ; `kUnhandled` si elle ne le regarde pas. Le
-  // résultat d'une évolution et l'écho de l'auto-alimentation s'écrivent dans
-  // la conversation.
+  // résultat d'une évolution, l'accusé d'un repas et l'écho de
+  // l'auto-alimentation s'écrivent dans la conversation.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  std::uint32_t now_ms);
 

@@ -16311,3 +16311,6 @@ tr: Guild experience reaches max, You can no longer accumulate Guild EXP
 
 fr: L'expérience du personnage est au maximum : vous ne pouvez plus accumuler d'expérience de guilde.
 tr: Character experience reaches max, You can no longer accumulate Guild EXP
+
+fr: Votre pet a été nourri. %s (il en reste %d)
+tr: Your pet has been fed. %s (%d) remaining

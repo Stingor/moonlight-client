@@ -122,6 +122,14 @@ struct PetProperty {
   std::uint32_t pet_class = 0;
 };
 
+// L'ACCUSÉ D'UN REPAS : nourri ou non, et la nourriture en cause.
+struct PetFeeding {
+  bool fed = false;
+  std::uint32_t food_item_id = 0;
+
+  friend bool operator==(const PetFeeding&, const PetFeeding&) = default;
+};
+
 class Pet {
  public:
   // ── CE QUE LE SERVEUR DIT ─────────────────────────────────────────────────
@@ -134,6 +142,9 @@ class Pet {
   void AnnounceAutoFeed(bool enabled);
   // Le résultat d'une évolution, tel que le serveur le numérote.
   void AnnounceEvolution(std::uint32_t result) { evolution_result_ = result; }
+  // L'accusé d'un repas. ⚠ LA FAIM N'Y EST PAS : le changement d'état qui le
+  // précède l'a déjà dite.
+  void AnnounceFeeding(const PetFeeding& feeding) { feeding_ = feeding; }
   // La liste d'éclosion : les cases du sac qui portent un œuf.
   void OfferEggs(std::vector<std::uint16_t> client_slots);
 
@@ -159,6 +170,9 @@ class Pet {
   [[nodiscard]] bool TakeSheetWanted() noexcept;
   [[nodiscard]] std::optional<std::uint32_t> TakeEvolutionResult() noexcept;
   [[nodiscard]] std::optional<bool> TakeAutoFeedEcho() noexcept;
+  [[nodiscard]] std::optional<PetFeeding> TakeFeeding() noexcept {
+    return std::exchange(feeding_, std::nullopt);
+  }
   // La liste d'éclosion vient d'arriver.
   [[nodiscard]] bool TakeEggOfferOpened() noexcept;
 
@@ -229,6 +243,7 @@ class Pet {
 
   std::optional<std::uint32_t> evolution_result_;
   std::optional<bool> auto_feed_echo_;
+  std::optional<PetFeeding> feeding_;
 
   bool eggs_offered_ = false;
   bool egg_offer_opened_ = false;

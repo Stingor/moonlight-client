@@ -16311,3 +16311,6 @@ tr: La experiencia de la guild está al máximo: ya no puedes acumular experienc
 
 fr: L'expérience du personnage est au maximum : vous ne pouvez plus accumuler d'expérience de guilde.
 tr: La experiencia del personaje está al máximo: ya no puedes acumular experiencia de guild.
+
+fr: Votre pet a été nourri. %s (il en reste %d)
+tr: Tu mascota ha sido alimentada. %s (quedan %d)

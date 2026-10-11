@@ -59,6 +59,12 @@ FrameOutcome ApplyPetFrame(const Frame& frame, sim::Pet& pet) {
                    ? FrameOutcome::kApplied
                    : FrameOutcome::kUnhandled;
       });
+    case proto::ZcFeedPet::kOpcode:
+      return Decoded<proto::ZcFeedPet>(frame, [&pet](const auto& packet) {
+        pet.AnnounceFeeding(
+            sim::PetFeeding{.fed = packet.result != 0, .food_item_id = packet.itemId});
+        return FrameOutcome::kApplied;
+      });
     case proto::PetEggList::kOpcode: {
       auto list = proto::DecodePetEggList(frame.bytes);
       if (!list) {

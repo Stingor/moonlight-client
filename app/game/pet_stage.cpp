@@ -23,8 +23,12 @@ namespace {
 // nourriture », et celle des deux refus que la fiche opposait.
 constexpr std::uint32_t kNoFoodColor = 0xF51E1E;
 constexpr std::uint32_t kRefusalColor = 0xFF0000;
+// Celle de l'accusé d'un repas pris.
+constexpr std::uint32_t kFedColor = 0x64FFFF;
 // Assez pour la fin de la ligne d'alerte de faim, dans toutes les langues.
 constexpr std::size_t kHungerLineBytes = 96;
+// Assez pour une ligne de repas et le nom ou le lien de sa nourriture.
+constexpr std::size_t kFoodLineBytes = 192;
 // Les lignes que le jeu écrit sans couleur particulière.
 constexpr std::uint32_t kPlainColor = 0;
 
@@ -36,6 +40,38 @@ constexpr std::uint32_t kPlainColor = 0;
 [[nodiscard]] const char* TradeRefusal() {
   return ro::core::Tr(
       "Échec du nourrissage : le pet est dans un état où il ne peut pas être nourri.");
+}
+
+// LA NOURRITURE QUI MANQUE, en lien d'item : la conversation la montre sous son
+// nom, et il se clique comme tout autre lien.
+[[nodiscard]] std::string NoFoodLine(const ro::vfs::ItemTable* items, std::uint32_t food_item_id) {
+  const ro::vfs::ItemEntry* entry = items != nullptr ? items->Find(food_item_id) : nullptr;
+  const std::string food_link =
+      ro::vfs::BuildItemLink(ro::vfs::ItemLink{.item_id = food_item_id},
+                             entry != nullptr ? entry->card_slots : std::uint8_t{0});
+  std::array<char, kFoodLineBytes> line = {};
+  std::snprintf(line.data(), line.size(),
+                ro::core::Tr("La nourriture du pet [%s] n'est pas disponible."), food_link.c_str());
+  return line.data();
+}
+
+// L'ACCUSÉ D'UN REPAS. Pris, il nomme la nourriture en clair et compte ce
+// qu'il en reste — ⚠ le serveur l'a déjà retirée du sac avant d'accuser. Refusé,
+// il dit la même ligne que la garde du client.
+[[nodiscard]] std::string FeedingLine(const ro::vfs::ItemTable* items,
+                                      const ro::sim::PetFeeding& feeding,
+                                      const ro::sim::Inventory& bag) {
+  if (!feeding.fed) {
+    return NoFoodLine(items, feeding.food_item_id);
+  }
+  const ro::vfs::ItemEntry* entry = items != nullptr ? items->Find(feeding.food_item_id) : nullptr;
+  const std::string food_name =
+      entry != nullptr && !entry->name.empty() ? entry->name : std::to_string(feeding.food_item_id);
+  std::array<char, kFoodLineBytes> line = {};
+  std::snprintf(line.data(), line.size(),
+                ro::core::Tr("Votre pet a été nourri. %s (il en reste %d)"), food_name.c_str(),
+                static_cast<int>(ro::sim::CountInBag(bag, feeding.food_item_id)));
+  return line.data();
 }
 
 [[nodiscard]] ro::ui::SkinImage IconOf(GamePieces& pieces, std::uint32_t item_id) {
@@ -150,6 +186,10 @@ ro::net::FrameOutcome PetStage::ApplyFrame(const ro::net::Frame& frame, ro::sim:
     if (const char* text = EvolutionResultText(*result); text != nullptr) {
       Say(world, text, kPlainColor);
     }
+  }
+  if (const std::optional<ro::sim::PetFeeding> feeding = pet_.TakeFeeding()) {
+    Say(world, FeedingLine(items_, *feeding, world.inventory()),
+        feeding->fed ? kFedColor : kNoFoodColor);
   }
   if (const std::optional<bool> fed = pet_.TakeAutoFeedEcho()) {
     Say(world,
@@ -391,16 +431,7 @@ void PetStage::FeedIfFood(ro::net::Connection& link, ro::sim::World& world) {
   // sac. ⚠ SANS TABLE, la nourriture est inconnue : le serveur tranchera.
   const std::uint32_t food = tables_.has_value() ? tables_->FoodOf(pet_.pet_class()) : 0;
   if (food != 0 && ro::sim::CountInBag(world.inventory(), food) <= 0) {
-    // Le refus nomme la nourriture qui manque, en lien d'item : la conversation
-    // le montre sous son nom, et il se clique comme tout autre lien.
-    const ro::vfs::ItemEntry* entry = items_ != nullptr ? items_->Find(food) : nullptr;
-    const std::string food_link = ro::vfs::BuildItemLink(
-        ro::vfs::ItemLink{.item_id = food}, entry != nullptr ? entry->card_slots : std::uint8_t{0});
-    std::array<char, 192> line = {};
-    std::snprintf(line.data(), line.size(),
-                  ro::core::Tr("La nourriture du pet [%s] n'est pas disponible."),
-                  food_link.c_str());
-    Say(world, line.data(), kNoFoodColor);
+    Say(world, NoFoodLine(items_, food), kNoFoodColor);
     return;
   }
   Command(link, ro::proto::PetCommand::kFeed);
