@@ -221,6 +221,12 @@ void BuildItemCells(const ro::sim::Inventory& holder, const ItemCellsAsk& ask,
                                            const ro::vfs::ItemTable& items,
                                            const ro::vfs::ItemWords& words);
 
+// LE NOM DE BASE D'UN ITEM PAR SON SEUL IDENTIFIANT, sans affinage ni
+// emplacements : celui qu'un message du serveur écrit quand il ne désigne
+// qu'un numéro. Vide sans table, ou pour un item qu'elle ignore.
+[[nodiscard]] std::function<std::string(std::uint32_t item_id)> ItemBaseNames(
+    const ro::vfs::ItemTable* items);
+
 // LA BALISE DE CHAT D'UN OBJET DU SAC : l'autre pont, dans l'autre sens.
 //
 // ⚠ ELLE PORTE L'OBJET DE QUELQU'UN, pas une entrée de catalogue : raffinement,

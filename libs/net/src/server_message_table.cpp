@@ -1,7 +1,8 @@
 // La table des messages par numéro. Voir `ro/net/server_message.h`.
 //
-// ⚠ AUCUN TEXTE NE PASSE PAR printf : le seul gabarit, celui qui porte `%d`,
-// se remplit par substitution. Un `%` littéral s'écrit donc tel quel.
+// ⚠ AUCUN TEXTE NE PASSE PAR printf : les deux gabarits, celui qui porte `%d`
+// et celui qui porte `%s`, se remplissent par substitution. Un `%` littéral
+// s'écrit donc tel quel.
 
 #include "server_message_table.h"
 
@@ -67,6 +68,7 @@ constexpr std::array kServerMessages = {
     ServerMessageEntry{3015, TrText("Cet item est enregistré pour l'échange d'équipement.")},
     ServerMessageEntry{3022, TrText("La limite de possession dépasse 70 %, ou il reste moins de 10 "
                                     "emplacements libres dans l'inventory.")},
+    ServerMessageEntry{3278, TrText("%s ne peut pas être utilisé sur cette carte.")},
     ServerMessageEntry{3474, TrText("Aucun événement de contrôle de présence n'est en cours.")},
     ServerMessageEntry{3475, TrText("L'expérience de la guilde est au maximum : vous ne pouvez "
                                     "plus accumuler d'expérience de guilde.")},

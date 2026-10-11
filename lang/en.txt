@@ -239,6 +239,9 @@ tr: %s could not be kicked: the server protects them.
 fr: %s n'est pas en vue.
 tr: %s is not in sight.
 
+fr: %s ne peut pas être utilisé sur cette carte.
+tr: %s can't be used in this map.
+
 fr: %s non lancé depuis %d s
 tr: %s not cast for %d s
 

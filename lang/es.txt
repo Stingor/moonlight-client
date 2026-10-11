@@ -239,6 +239,9 @@ tr: No se pudo expulsar a %s: el servidor lo protege.
 fr: %s n'est pas en vue.
 tr: %s no está a la vista.
 
+fr: %s ne peut pas être utilisé sur cette carte.
+tr: %s no se puede usar en este mapa.
+
 fr: %s non lancé depuis %d s
 tr: %s sin lanzar desde hace %d s
 

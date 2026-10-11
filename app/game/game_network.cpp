@@ -183,7 +183,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
     // ET LES MESSAGES PAR NUMÉRO, qui s'écrivent dans la conversation.
     const ro::net::FrameOutcome said = ro::net::ApplyServerMessageFrame(
-        received, world_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr, now_ms);
+        received, world_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr, now_ms,
+        ItemBaseNames(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr));
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = said;
     }

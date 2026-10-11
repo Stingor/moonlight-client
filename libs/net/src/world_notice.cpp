@@ -1,7 +1,11 @@
 #include "ro/net/world_notice.h"
 
+#include <algorithm>
+#include <charconv>
+#include <cstddef>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <utility>
 
 #include "ro/core/text.h"
@@ -39,40 +43,156 @@ constexpr std::uint32_t kOwnPartySpeechColor = 0xFFC800;
 // session décidée par le serveur, sans plus de précision (`BAN_UNFAIR`).
 constexpr std::uint8_t kUnreadEvictionCode = 0;
 
-// Les étiquettes qu'une annonce peut porter DEVANT son texte.
+// Les étiquettes qu'une annonce `ZC_BROADCAST` peut porter DEVANT son texte.
 //
 // ⚠ CE NE SONT PAS DES MOTS DU MESSAGE, et aucun champ ne les annonce : ce sont
-// QUATRE OCTETS posés en tête, que le client lit comme un code. `clif_broadcast`
-// écrit « blue » pour faire peindre en bleu et « ssss » pour dire « annonce de
-// guerre d'Émpérium ». Les laisser passer ferait lire « blueLe serveur
-// redémarre ».
+// QUATRE OCTETS posés en tête, que le client lit comme un code, SANS ÉGARD À LA
+// CASSE (« BLUE » vaut « blue »). Les laisser passer ferait lire « blueLe
+// serveur redémarre ».
 //
-// LE CLIENT EN CONNAÎT QUATRE, CE SERVEUR N'EN ÉMET QUE DEUX. Les quatre
-// étiquettes sont « tool », « micc », « ssss » et « blue ».
-// Les deux premières — l'annonce par objet et celle à la voix — ne sont dans
-// AUCUNE source du serveur : les découper ici couperait quatre lettres à un
-// message que personne n'envoie. Si elles paraissent un jour, elles se verront
-// à l'écran, et c'est ici qu'on les ajoutera.
+//   « tool » + RRGGBB (six chiffres hexadécimaux) + texte   dans cette couleur
+//   « micc » + nom (24 octets) + RRGGBB + texte             la voix d'un joueur
+//   « blue », ou « 블루 » en CP949, + texte                  en cyan
+//   « ssss » + texte                                         l'annonce de siège
+//
+// Ce serveur n'émet que « blue » et « ssss » ; les deux autres se lisent pareil
+// le jour où un script les écrit.
+constexpr std::size_t kBroadcastTagSize = 4;
+constexpr std::string_view kBroadcastToolTag = "tool";
+constexpr std::string_view kBroadcastMiccTag = "micc";
 constexpr std::string_view kBroadcastBlueTag = "blue";
+constexpr std::string_view kBroadcastBlueKoreanTag = "\xBA\xED\xB7\xE7";
 constexpr std::string_view kBroadcastWoeTag = "ssss";
 
-// Une annonce lue : son texte sans étiquette, et sa case.
+// La couleur écrite en texte : six chiffres hexadécimaux, RRGGBB.
+constexpr std::size_t kTagColorDigits = 6;
+constexpr int kHexadecimalBase = 16;
+// Le nom de qui parle par « micc », zéro final compris s'il est plus court.
+constexpr std::size_t kMiccNameSize = 24;
+// ⚠ LE TEXTE D'UN « micc » TIENT EN MOINS DE 362 OCTETS : au-delà, l'annonce
+// entière se tait.
+constexpr std::size_t kMiccLongestText = 361;
+// Ce qu'une annonce garde de sa charge utile : le reste est coupé.
+constexpr std::size_t kLongestBroadcastPayload = 1023;
+
+// LES COULEURS D'UNE ANNONCE, en 0xRRGGBB : du jaune, sauf « blue » en cyan et
+// la couleur que « tool » ou « micc » écrivent.
+constexpr std::uint32_t kAnnouncementYellow = 0xFFFF00;
+constexpr std::uint32_t kAnnouncementCyan = 0x00FFFF;
+// `ZC_BROADCAST2` porte sa couleur à l'endroit, sur les trois octets bas.
+constexpr std::uint32_t kRgbMask = 0xFFFFFF;
+
+// Une annonce lue : son texte sans étiquette, sa case et sa couleur. Une
+// annonce qui ne se montre pas a un texte vide et `shown` faux.
 struct Announcement {
-  std::string_view text;
+  std::string text;
   sim::ChatType type = sim::ChatType::kBroadcast;
+  std::uint32_t color = kAnnouncementYellow;
+  bool shown = true;
 };
 
-// ⚠ L'ANNONCE DE SIÈGE A SA CASE, « Informations WOE » : le client d'origine
-// range sous elle ce que « ssss » annonce, et sous la case des annonces tout le
-// reste.
-Announcement ReadAnnouncement(std::string_view message) {
-  if (message.starts_with(kBroadcastWoeTag)) {
-    return {.text = message.substr(kBroadcastWoeTag.size()), .type = sim::ChatType::kSiegeInfo};
+// Les octets jusqu'au premier zéro, comme le client lit une chaîne.
+[[nodiscard]] std::string_view UpToNul(std::string_view bytes) {
+  return bytes.substr(0, bytes.find('\0'));
+}
+
+// Les chiffres hexadécimaux de TÊTE, comme une lecture `%lx` ; `fallback` s'il
+// n'y en a aucun.
+[[nodiscard]] std::uint32_t HexColor(std::string_view digits, std::uint32_t fallback) {
+  std::uint32_t value = 0;
+  const auto [end, error] =
+      std::from_chars(digits.data(), digits.data() + digits.size(), value, kHexadecimalBase);
+  static_cast<void>(end);
+  return error == std::errc{} ? value : fallback;
+}
+
+// LE NOM SUFFIXÉ D'UN « # » SE REPLIE : ce qui précède le premier « # », puis
+// tout depuis le premier « : », deux-points compris. « Nom#Tag: texte » devient
+// « Nom: texte » ; ce qui sépare le « # » du « : », espaces comprises, se perd.
+// Un « # » en tête, ou aucun, laisse le texte entier.
+//
+// ⚠ LE PREMIER « : » EST CHERCHÉ DANS TOUT LE TEXTE, avant le « # » compris :
+// « a:b#c » devient « a:b:b#c », et c'est ce que le joueur voit aussi chez le
+// client d'origine.
+[[nodiscard]] std::string FoldHashName(std::string_view message) {
+  const std::size_t hash = message.find('#');
+  if (hash == std::string_view::npos || hash == 0) {
+    return std::string(message);
   }
-  if (message.starts_with(kBroadcastBlueTag)) {
-    return {.text = message.substr(kBroadcastBlueTag.size())};
+  std::string folded(message.substr(0, hash));
+  if (const std::size_t colon = message.find(':'); colon != std::string_view::npos && colon > 0) {
+    folded += message.substr(colon);
   }
-  return {.text = message};
+  return folded;
+}
+
+// L'étiquette de tête, en minuscules ASCII ; vide sous quatre octets.
+[[nodiscard]] std::string TagOf(std::string_view message) {
+  if (message.size() < kBroadcastTagSize) {
+    return {};
+  }
+  std::string tag(message.substr(0, kBroadcastTagSize));
+  for (char& letter : tag) {
+    if (letter >= 'A' && letter <= 'Z') {
+      letter = static_cast<char>(letter - 'A' + 'a');
+    }
+  }
+  return tag;
+}
+
+// « micc » : le nom, la couleur, puis le texte. Le texte se lit dans la charge
+// BRUTE, parce que le nom s'arrête à son zéro et que la suite reste à lire.
+//
+// ⚠ NI LA LISTE DES NOMS IGNORÉS NI LES MOTS INTERDITS NE S'APPLIQUENT ICI :
+// voir TODO.txt.
+[[nodiscard]] Announcement ReadVoiceAnnouncement(std::string_view payload) {
+  const std::size_t color_at = kBroadcastTagSize + kMiccNameSize;
+  const std::size_t text_at = color_at + kTagColorDigits;
+  if (payload.size() < text_at) {
+    return {.shown = false};
+  }
+  const std::string_view text = UpToNul(payload.substr(text_at));
+  if (text.size() > kMiccLongestText) {
+    return {.shown = false};
+  }
+  return {.text = std::string(text),
+          .type = sim::ChatType::kPublic,
+          .color = HexColor(payload.substr(color_at, kTagColorDigits), kAnnouncementYellow)};
+}
+
+// ⚠ L'ANNONCE DE SIÈGE A SA CASE, « Informations WOE », et la voix d'un joueur
+// la case générale ; tout le reste va sous la case des annonces. `message` est
+// le texte jusqu'à son zéro, `payload` la charge entière.
+[[nodiscard]] Announcement ReadAnnouncement(std::string_view message, std::string_view payload) {
+  const std::string tag = TagOf(message);
+  const std::string_view after_tag =
+      message.size() < kBroadcastTagSize ? std::string_view{} : message.substr(kBroadcastTagSize);
+  if (tag == kBroadcastToolTag) {
+    const std::size_t text_at = std::min(after_tag.size(), kTagColorDigits);
+    return {.text = std::string(after_tag.substr(text_at)),
+            .color = HexColor(after_tag.substr(0, kTagColorDigits), kAnnouncementYellow)};
+  }
+  if (tag == kBroadcastBlueTag || tag == kBroadcastBlueKoreanTag) {
+    return {.text = std::string(after_tag), .color = kAnnouncementCyan};
+  }
+  if (tag == kBroadcastMiccTag) {
+    return ReadVoiceAnnouncement(payload.substr(0, kLongestBroadcastPayload));
+  }
+  if (tag == kBroadcastWoeTag) {
+    return {.text = std::string(after_tag), .type = sim::ChatType::kSiegeInfo};
+  }
+  return {.text = FoldHashName(message)};
+}
+
+// La charge d'une trame à longueur variable : ce qui suit l'opcode et la
+// longueur.
+[[nodiscard]] std::string_view PayloadOf(const Frame& frame) {
+  constexpr std::size_t kVariableHeaderSize = 4;
+  if (frame.bytes.size() < kVariableHeaderSize) {
+    return {};
+  }
+  return {reinterpret_cast<const char*>(frame.bytes.data()) + kVariableHeaderSize,
+          frame.bytes.size() - kVariableHeaderSize};
 }
 
 }  // namespace
@@ -138,27 +258,32 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
       });
 
     case proto::ZcBroadcast::kOpcode:
-      return Decoded<proto::ZcBroadcast>(frame, [&world, now_ms](const auto& packet) {
+      return Decoded<proto::ZcBroadcast>(frame, [&frame, &world, now_ms](const auto& packet) {
         // UNE ANNONCE DU SERVEUR. Elle ne vient de personne : l'orateur est
         // ZÉRO, comme pour les réponses de commande, et rien ne paraît donc
         // au-dessus d'une tête.
-        const Announcement announcement = ReadAnnouncement(packet.message);
+        const Announcement announcement = ReadAnnouncement(packet.message, PayloadOf(frame));
+        if (!announcement.shown) {
+          return FrameOutcome::kIgnored;
+        }
         world.RecordChat(sim::ChatKind::kAnnouncement, announcement.type, 0,
-                         core::Utf8FromWire(announcement.text), now_ms);
+                         core::Utf8FromWire(announcement.text), now_ms, announcement.color);
         return FrameOutcome::kApplied;
       });
 
     case proto::ZcBroadcast2::kOpcode:
       return Decoded<proto::ZcBroadcast2>(frame, [&world, now_ms](const auto& packet) {
         // LA MÊME ANNONCE, HABILLÉE : couleur, police, taille, hauteur à l'écran.
-        // Rien à retirer en tête ici — la couleur est un CHAMP, et c'est
-        // précisément pourquoi ce second paquet existe.
+        // Aucune étiquette en tête ici — la couleur est un CHAMP, et c'est
+        // précisément pourquoi ce second paquet existe. Le nom suffixé d'un
+        // « # » s'y replie comme dans une annonce sans étiquette.
         //
         // ⚠ DE CE CHAMP, ON NE PREND QUE LA COULEUR. La police, la taille et la
         // hauteur à l'écran décrivent la bannière que le client d'origine fait
         // glisser en haut de l'écran, pas la ligne du fil.
-        world.RecordChat(sim::ChatKind::kAnnouncement, 0, core::Utf8FromWire(packet.message),
-                         now_ms, packet.fontColor);
+        world.RecordChat(sim::ChatKind::kAnnouncement, 0,
+                         core::Utf8FromWire(FoldHashName(packet.message)), now_ms,
+                         packet.fontColor & kRgbMask);
         return FrameOutcome::kApplied;
       });
 

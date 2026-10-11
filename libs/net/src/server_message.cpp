@@ -38,6 +38,28 @@ constexpr std::uint32_t kSkillMessageColor = 0xCDCDFF;
 // traduction qui changerait ses spécifications écrirait de travers, elle ne
 // lirait jamais au-delà de ses arguments.
 constexpr std::string_view kValueHole = "%d";
+// Et celui d'un nom d'item.
+constexpr std::string_view kNameHole = "%s";
+
+// LE MESSAGE QUI NOMME UN ITEM interdit sur la carte : sa valeur est
+// l'identifiant de l'item, et non un nombre à écrire.
+constexpr std::uint16_t kItemBannedOnMapMessage = 3278;
+// Le nom d'un item que la table ne connaît pas : une espace, et non le numéro.
+constexpr std::string_view kUnknownItemName = " ";
+
+// Ce qu'un gabarit reçoit : un nombre, ou un nom.
+struct TemplateFill {
+  std::optional<std::int32_t> value;
+  std::optional<std::string> name;
+};
+
+// Remplit le PREMIER trou de ce genre, au-delà du préfixe.
+void FillHole(std::string& line, std::size_t from, std::string_view hole, std::string_view filler) {
+  const std::size_t at = line.find(hole, from);
+  if (at != std::string::npos) {
+    line.replace(at, hole.size(), filler);
+  }
+}
 
 // LA CASE D'UN MESSAGE : l'issue d'une compétence sous « échecs de
 // compétence », un plafond du tribut à la guilde sous « EXP de contribution »
@@ -58,7 +80,7 @@ constexpr std::string_view kValueHole = "%d";
 // dit.
 FrameOutcome Say(sim::World& world, std::uint16_t opcode, std::uint32_t message_id,
                  std::string_view prefix, std::uint32_t color, std::uint32_t now_ms,
-                 std::optional<std::int32_t> value = std::nullopt) {
+                 const TemplateFill& fill = {}) {
   const char* french = message_id <= std::numeric_limits<std::uint16_t>::max()
                            ? ServerMessageFrench(static_cast<std::uint16_t>(message_id))
                            : nullptr;
@@ -69,11 +91,11 @@ FrameOutcome Say(sim::World& world, std::uint16_t opcode, std::uint32_t message_
   }
   std::string line(prefix);
   line += core::Tr(french);
-  if (value.has_value()) {
-    const std::size_t hole = line.find(kValueHole, prefix.size());
-    if (hole != std::string::npos) {
-      line.replace(hole, kValueHole.size(), std::to_string(*value));
-    }
+  if (fill.value.has_value()) {
+    FillHole(line, prefix.size(), kValueHole, std::to_string(*fill.value));
+  }
+  if (fill.name.has_value()) {
+    FillHole(line, prefix.size(), kNameHole, *fill.name);
   }
   world.RecordChat(sim::ChatKind::kServer, TypeOf(opcode, message_id), 0, std::move(line), now_ms,
                    color);
@@ -105,7 +127,8 @@ FrameOutcome Say(sim::World& world, std::uint16_t opcode, std::uint32_t message_
 }  // namespace
 
 FrameOutcome ApplyServerMessageFrame(const Frame& frame, sim::World& world,
-                                     const sim::SkillTree* skills, std::uint32_t now_ms) {
+                                     const sim::SkillTree* skills, std::uint32_t now_ms,
+                                     const ItemNameLookup& item_names) {
   switch (frame.opcode) {
     case proto::ZcMsg::kOpcode:
       return Decoded<proto::ZcMsg>(frame, [&](const proto::ZcMsg& packet) {
@@ -119,8 +142,17 @@ FrameOutcome ApplyServerMessageFrame(const Frame& frame, sim::World& world,
       });
     case proto::ZcMsgValue::kOpcode:
       return Decoded<proto::ZcMsgValue>(frame, [&](const proto::ZcMsgValue& packet) {
+        if (packet.message == kItemBannedOnMapMessage) {
+          std::string name =
+              item_names ? item_names(static_cast<std::uint32_t>(packet.value)) : std::string{};
+          if (name.empty()) {
+            name = kUnknownItemName;
+          }
+          return Say(world, frame.opcode, packet.message, {}, kValueMessageColor, now_ms,
+                     {.name = std::move(name)});
+        }
         return Say(world, frame.opcode, packet.message, {}, kValueMessageColor, now_ms,
-                   packet.value);
+                   {.value = packet.value});
       });
     case proto::ZcMsgSkill::kOpcode:
       return Decoded<proto::ZcMsgSkill>(frame, [&](const proto::ZcMsgSkill& packet) {

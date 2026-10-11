@@ -183,6 +183,13 @@ std::string ReportedItemName(const InventoryItem& item, const CreatorNames& crea
   return name;
 }
 
+std::function<std::string(std::uint32_t item_id)> ItemBaseNames(const ro::vfs::ItemTable* items) {
+  return [items](std::uint32_t item_id) {
+    const ro::vfs::ItemEntry* entry = items != nullptr ? items->Find(item_id) : nullptr;
+    return entry != nullptr ? entry->name : std::string{};
+  };
+}
+
 ro::vfs::ItemLink ItemLinkOf(const InventoryItem& item) {
   static_assert(ro::sim::kItemOptionSlots == ro::vfs::kItemLinkOptionSlots,
                 "le fil porte cinq options des deux côtés de la frontière");
