@@ -436,6 +436,9 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.mail.StartSession();
   // NI LA DEMANDE D'ADOPTION REÇUE.
   pieces_.adoption.StartSession();
+  // NI L'ENTITÉ QUE LE STAFF INSPECTAIT : ses identifiants étaient ceux d'une
+  // autre partie.
+  pieces_.entity_inspector = EntityInspector{};
   windows_.mail = MailWindows{};
   // LES SALONS : on n'est dans aucun. ⚠ LA SAISIE DU FORMULAIRE SURVIT, elle
   // n'appartient pas au personnage.

@@ -16818,3 +16818,33 @@ tr: When the battle is finished your character will be returned to the current s
 
 fr: 5. Les récompenses se consultent et se choisissent dans la salle d'attente de l'arène.
 tr: 5. You can view and choose rewards in the arena waiting room.
+
+fr: %s — %s — identifiant %u
+tr: %s — %s — ID %u
+
+fr: Ce que le serveur sait de cette entité : d'où vient un NPC, quel spawn a posé un monstre, à qui un item au sol est réservé, le compte et l'état d'un joueur.\nLe serveur revérifie le droit du staff avant de répondre.
+tr: What the server knows about this entity: where an NPC comes from, which spawn placed a monster, who a ground item is reserved for, a player's account and state.\nThe server checks staff rights again before answering.
+
+fr: Le serveur a refusé : ce compte n'est pas staff.
+tr: The server refused: this account is not staff.
+
+fr: Le serveur de carte ne connaît peut-être pas encore ce paquet : il attend un redémarrage.
+tr: The map server may not know this packet yet: it is waiting for a restart.
+
+fr: Le serveur n'a rien à dire sur cette entité.
+tr: The server has nothing to say about this entity.
+
+fr: Le serveur ne connaît aucune entité sous cet identifiant : elle vient de mourir ou de disparaître.
+tr: The server knows no entity under this ID: it has just died or vanished.
+
+fr: Pas de réponse du serveur.
+tr: No answer from the server.
+
+fr: Propriétés
+tr: Properties
+
+fr: Propriétés…
+tr: Properties…
+
+fr: Redemander
+tr: Ask again

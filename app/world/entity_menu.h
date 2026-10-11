@@ -236,6 +236,9 @@ enum class EntityVerb : int {
   // des deux. Voir `world/follow_rules.h`.
   kFollow,
   kUnfollow,
+  // « PROPRIÉTÉS… », au staff : ce que le serveur sait de l'entité, dans
+  // l'inspecteur. Voir `world/entity_inspector.h`.
+  kInspect,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -257,7 +260,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kUnfollow) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kInspect) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==

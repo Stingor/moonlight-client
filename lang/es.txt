@@ -16818,3 +16818,33 @@ tr: Al terminar la batalla, tu personaje vuelve al lugar donde estaba o, si no e
 
 fr: 5. Les récompenses se consultent et se choisissent dans la salle d'attente de l'arène.
 tr: 5. Las recompensas se consultan y se eligen en la sala de espera de la arena.
+
+fr: %s — %s — identifiant %u
+tr: %s — %s — ID %u
+
+fr: Ce que le serveur sait de cette entité : d'où vient un NPC, quel spawn a posé un monstre, à qui un item au sol est réservé, le compte et l'état d'un joueur.\nLe serveur revérifie le droit du staff avant de répondre.
+tr: Lo que el servidor sabe de esta entidad: de dónde viene un NPC, qué spawn colocó un monstruo, a quién está reservado un item en el suelo, la cuenta y el estado de un jugador.\nEl servidor vuelve a comprobar el permiso de staff antes de responder.
+
+fr: Le serveur a refusé : ce compte n'est pas staff.
+tr: El servidor se negó: esta cuenta no es staff.
+
+fr: Le serveur de carte ne connaît peut-être pas encore ce paquet : il attend un redémarrage.
+tr: Puede que el servidor de mapa aún no conozca este paquete: espera un reinicio.
+
+fr: Le serveur n'a rien à dire sur cette entité.
+tr: El servidor no tiene nada que decir de esta entidad.
+
+fr: Le serveur ne connaît aucune entité sous cet identifiant : elle vient de mourir ou de disparaître.
+tr: El servidor no conoce ninguna entidad con este ID: acaba de morir o de desaparecer.
+
+fr: Pas de réponse du serveur.
+tr: Sin respuesta del servidor.
+
+fr: Propriétés
+tr: Propiedades
+
+fr: Propriétés…
+tr: Propiedades…
+
+fr: Redemander
+tr: Volver a pedir

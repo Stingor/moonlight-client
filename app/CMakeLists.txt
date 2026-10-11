@@ -833,12 +833,13 @@ target_include_directories(moonclient_spritesounds PUBLIC ${CMAKE_CURRENT_SOURCE
 add_library(moonclient_entitymenu STATIC
     options/context_menu_options.cpp
     world/blocked_npcs.cpp
+    world/entity_inspector.cpp
     world/entity_menu.cpp
     world/entity_menu_tactics.cpp)
 # ⚠ LES LIENS DU CHAT EN PRIVÉ : « Linker ce NPC » ne s'offre que pour un nom
 # que la balise `<NAVS>` peut porter, et cette règle est la leur.
 target_link_libraries(moonclient_entitymenu
-    PUBLIC ro_sim ro_ui moonclient_settings
+    PUBLIC ro_net ro_sim ro_ui moonclient_settings
     PRIVATE moonclient_chatlinks yaml-cpp::yaml-cpp ro_warnings)
 target_include_directories(moonclient_entitymenu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

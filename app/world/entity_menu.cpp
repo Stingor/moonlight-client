@@ -423,6 +423,13 @@ void AddGroundItem(Composer& menu, const EntityMenuFacts& facts) {
 
 void AddStaff(Composer& menu, const EntityMenuFacts& facts) {
   menu.EnterStaff();
+  // L'INSPECTEUR EN PREMIER, sur toute famille : c'est lui qu'on ouvre quand on
+  // ne sait pas encore ce qu'on regarde, et les cibles inattendues sont celles
+  // qui le méritent.
+  menu.Add(Tr("Propriétés…"), EntityVerb::kInspect,
+           Tr("Ce que le serveur sait de cette entité : d'où vient un NPC, quel spawn a posé un "
+              "monstre, à qui un item au sol est réservé, le compte et l'état d'un joueur.\n"
+              "Le serveur revérifie le droit du staff avant de répondre."));
   // L'identifiant seul, puis l'identité brute : ce qu'on va chercher quand une
   // entité se comporte mal. Un identifiant nu ne dit rien à un joueur : ces
   // lignes vivent ici, et nulle part ailleurs.

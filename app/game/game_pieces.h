@@ -82,6 +82,7 @@
 #include "world/battle_log.h"
 #include "world/damage_path_sample.h"
 #include "world/decor_veil_view.h"
+#include "world/entity_inspector.h"
 #include "world/entity_sample.h"
 #include "world/frozen_poses.h"
 #include "world/grey_world_view.h"
@@ -160,6 +161,8 @@ struct GamePieces {
   PetStage pet;
   // L'ADOPTION : la demande qu'un couple nous adresse, et les refus du serveur.
   AdoptionStage adoption;
+  // « PROPRIÉTÉS… » DU STAFF : ce que le serveur sait d'une entité désignée.
+  EntityInspector entity_inspector;
   HomunculusStage homunculus;
   MercenaryStage mercenary;
   // L'IA DE CES DEUX DERNIERS : voir `CompanionAiStage`.

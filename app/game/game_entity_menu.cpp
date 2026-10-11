@@ -128,6 +128,12 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
     menu_gestures_.ask.reset();
     return;
   }
+  // L'INSPECTEUR DU STAFF : sa fenêtre, puis la demande qu'elle attend.
+  windows_.entity_inspector.view = &pieces_.entity_inspector.view();
+  pieces_.entity_inspector.Advance(windows_.entity_inspector.state,
+                                   std::exchange(windows_.entity_inspector.answer, {}),
+                                   world_.map_name(), now_ms);
+  pieces_.entity_inspector.SendRequest(link_);
 
   // ── CE QUE LE MENU A RENDU À L'IMAGE PRÉCÉDENTE ───────────────────────────
   //
@@ -565,6 +571,16 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       std::snprintf(line.data(), line.size(), Tr("%s | AID %u (0x%08X) | job %u"),
                     name.empty() ? Tr("(nom inconnu)") : name.c_str(), id, id, shown);
       SDL_SetClipboardText(line.data());
+      return;
+    }
+    case EntityVerb::kInspect: {
+      // En tête de la fenêtre : la famille, le nom, et l'identifiant demandé.
+      std::array<char, kLineBytes> subject{};
+      std::snprintf(subject.data(), subject.size(), Tr("%s — %s — identifiant %u"),
+                    EntityFamilyLabel(menu_target_.family),
+                    name.empty() ? Tr("(nom inconnu)") : name.c_str(), id);
+      pieces_.entity_inspector.Open(windows_.entity_inspector.state, id, subject.data(),
+                                    world_.map_name(), now_ms);
       return;
     }
     // ── L'OUTILLAGE DU STAFF ───────────────────────────────────────────────

@@ -140,6 +140,7 @@ add_library(ro_ui STATIC
     src/world_map_marks.cpp
     src/world_map_window.cpp
     src/modal_box.cpp
+    src/entity_inspector_window.cpp
     src/monster_sheet_preview.cpp
     src/monster_sheet_tables.cpp
     src/monster_sheet_window.cpp
