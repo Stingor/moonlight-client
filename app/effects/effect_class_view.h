@@ -183,9 +183,10 @@ class EffectClassesInPlay {
 // la place où la classe naît, d'où part son bruit ; rien quand aucune classe
 // portée ne répond à l'effet de l'étape, ou qu'elle refuse de naître.
 std::optional<glm::vec3> SpawnSkillClass(EffectClassesInPlay& classes, const ro::sim::World& world,
-                     const MapStage& stage, ro::sim::WalkPlanner& planner,
-                     const ro::sim::Actor& target, std::uint32_t caster_id,
-                     std::uint32_t started_ms, const ro::render::SkillSuiteStep& step,
-                     std::uint32_t delay_ms, std::int32_t skill_level);
+                                         const MapStage& stage, ro::sim::WalkPlanner& planner,
+                                         const ro::sim::Actor& target, std::uint32_t caster_id,
+                                         std::uint32_t started_ms,
+                                         const ro::render::SkillSuiteStep& step,
+                                         std::uint32_t delay_ms, std::int32_t skill_level);
 
 }  // namespace moonclient
