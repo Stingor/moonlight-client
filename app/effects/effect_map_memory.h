@@ -264,6 +264,9 @@ struct EffectMapMemory {
   // Les compétences SANS DÉGÂTS déjà jouées, TOUTES : le serveur en envoie
   // souvent deux d'affilée sur la même cible — voir `ro::sim::SupportLog`.
   ro::sim::SupportCursor supports;
+  // Les états POSÉS ET LEVÉS déjà lus, dans l'ordre des paquets — voir
+  // `ro::sim::StateArrivalLog`.
+  ro::sim::StateArrivalCursor state_arrivals;
   // Les UNITÉS au sol déjà vues : leur effet ne se joue qu'à la pose, et une
   // unité vit bien plus longtemps qu'un effet.
   std::unordered_map<std::uint32_t, std::uint32_t> placed;

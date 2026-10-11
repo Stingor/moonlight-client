@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "ro/sim/combat_notice.h"
+#include "ro/sim/status_effects.h"
 
 namespace ro::sim {
 
@@ -123,6 +124,69 @@ class SupportCursor {
       seen_serial_ = 0;
     }
     const std::span<const RecordedSupport> fresh = log.Since(seen_serial_);
+    seen_serial_ = log.last_serial();
+    return fresh;
+  }
+
+ private:
+  std::uint64_t seen_serial_ = 0;
+};
+
+// UN ÉTAT POSÉ OU LEVÉ, sur qui, et son rang dans l'ordre d'arrivée.
+struct StateArrival {
+  std::uint64_t serial = 0;
+  std::uint32_t actor_id = 0;
+  StatusEffectId state = 0;
+  bool active = false;
+};
+
+// LES ÉTATS POSÉS ET LEVÉS, DANS L'ORDRE DES PAQUETS.
+//
+// 🔴 `Actor::status_effects` NE DIT QUE CE QUI TIENT. Un état posé puis levé
+// dans la même rafale n'y laisse aucune trace : le rebond d'un coureur contre
+// un mur arrive ainsi, et ses deux gestes se perdaient. Et la liste ne se relit
+// qu'après les compétences de l'image, quand le serveur pose l'état AVANT
+// d'annoncer la compétence qui le pose. Chaque arrivée a ici son numéro.
+//
+// ⚠ LE JOURNAL EST BORNÉ, comme celui des compétences sans dégâts.
+class StateArrivalLog {
+ public:
+  void Record(std::uint32_t actor_id, StatusEffectId state, bool active) {
+    if (arrivals_.size() >= kKeptArrivals * 2) {
+      arrivals_.erase(arrivals_.begin(), arrivals_.begin() + static_cast<std::ptrdiff_t>(
+                                                                 arrivals_.size() - kKeptArrivals));
+    }
+    arrivals_.push_back(
+        {.serial = next_serial_, .actor_id = actor_id, .state = state, .active = active});
+    ++next_serial_;
+  }
+  // Les numéros continuent : un curseur déjà avancé ne revoit rien.
+  void Clear() noexcept { arrivals_.clear(); }
+
+  // Les arrivées dont le numéro dépasse `serial`, dans l'ordre.
+  [[nodiscard]] std::span<const StateArrival> Since(std::uint64_t serial) const {
+    const auto first = std::ranges::upper_bound(
+        arrivals_, serial, {}, [](const StateArrival& kept) { return kept.serial; });
+    return {first, arrivals_.end()};
+  }
+  [[nodiscard]] std::uint64_t last_serial() const noexcept { return next_serial_ - 1; }
+
+ private:
+  static constexpr std::size_t kKeptArrivals = 256;
+
+  std::vector<StateArrival> arrivals_;
+  std::uint64_t next_serial_ = 1;
+};
+
+// CE QU'UN LECTEUR A DÉJÀ VU du journal des états. Un journal neuf repart à
+// un, et le curseur avec lui : voir `SupportCursor::Take`.
+class StateArrivalCursor {
+ public:
+  [[nodiscard]] std::span<const StateArrival> Take(const StateArrivalLog& log) {
+    if (seen_serial_ > log.last_serial()) {
+      seen_serial_ = 0;
+    }
+    const std::span<const StateArrival> fresh = log.Since(seen_serial_);
     seen_serial_ = log.last_serial();
     return fresh;
   }

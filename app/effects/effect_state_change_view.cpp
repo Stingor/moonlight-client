@@ -11,6 +11,7 @@
 
 #include <array>
 #include <optional>
+#include <span>
 #include <string_view>
 
 #include <glm/vec3.hpp>
@@ -22,9 +23,11 @@
 #include "ro/render/pvp_rank_tint.h"
 #include "ro/render/silence_dots.h"
 #include "ro/render/skill_suite_table.h"
+#include "ro/render/state_effect.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "effects/effect_actor_change.h"
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
 #include "world/map_stage.h"
@@ -33,6 +36,43 @@ namespace moonclient {
 
 void EffectsInPlay::NoticeStateChanges(const ro::sim::World& world, const MapStage& stage,
                                        ro::sim::WalkPlanner& planner, std::uint32_t now_ms) {
+  // LES GESTES GARDÉS, À CHAQUE PAQUET ET DANS SON ORDRE, à la pose comme à la
+  // levée : un effet ne naît, ou ne se retire, que sur qui porte l'effet qu'il
+  // exige — à cet instant, et non en fin d'image. La course pose son état
+  // AVANT que sa compétence soit annoncée, et c'est pourquoi ce passage
+  // précède celui des compétences ; le rebond contre un mur pose puis lève le
+  // sien dans la même rafale, et joue ses gestes deux fois, bruit compris.
+  for (const ro::sim::StateArrival& arrival :
+       per_map_.state_arrivals.Take(world.state_arrivals())) {
+    const std::span<const ro::render::StateGuardedGesture> gestures =
+        ro::render::StateGuardedGesturesFor(arrival.state);
+    const ro::sim::Actor* bearer = world.Find(arrival.actor_id);
+    if (gestures.empty() || bearer == nullptr) {
+      continue;
+    }
+    const ro::sim::FractionalCell cell =
+        ro::sim::InterpolatedCell(*bearer, planner.PathFor(*bearer), now_ms);
+    const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+    for (const ro::render::StateGuardedGesture& gesture : gestures) {
+      if (gesture.carried_effect_id != 0 && !Carries(gesture.carried_effect_id, bearer->id)) {
+        continue;
+      }
+      if (QueueActorChange(per_map_, actor_effects_to_record_, gesture.effect_id, bearer->id,
+                           ground, now_ms, arrival.state, gesture.withdraws)) {
+        continue;
+      }
+      if (gesture.withdraws) {
+        StopById(gesture.effect_id, bearer->id);
+        continue;
+      }
+      static_cast<void>(
+          PlayStateEffect(gesture.effect_id, bearer->id, std::nullopt, ground, now_ms, false));
+    }
+    if (const std::string_view sound = ro::render::StateSoundFor(arrival.state); !sound.empty()) {
+      per_map_.just_sown_named_sounds.push_back(
+          SownNamedSound{sound, ro::sim::StandingCell(*bearer)});
+    }
+  }
   std::erase_if(per_map_.seen_state_counts,
                 [&world](const auto& entry) { return !world.actors().contains(entry.first); });
   for (const auto& [id, actor] : world.actors()) {

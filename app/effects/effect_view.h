@@ -159,7 +159,7 @@ class EffectsInPlay {
   void NoticeOptionEffects(const ro::sim::World& world, const MapStage& stage,
                            ro::sim::WalkPlanner& planner, std::uint32_t now_ms);
 
-  // Ce qu'un changement d'état reçu en direct montre une fois : Hiding, le silence.
+  // Ce qu'un état reçu en direct montre une fois : Hiding, le silence, la course.
   void NoticeStateChanges(const ro::sim::World& world, const MapStage& stage,
                           ro::sim::WalkPlanner& planner, std::uint32_t now_ms);
 

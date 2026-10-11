@@ -325,8 +325,6 @@ void MarkCarried(EffectMapMemory& memory, std::uint32_t effect_id, std::uint32_t
                           : std::nullopt);
 }
 
-namespace {
-
 bool QueueActorChange(EffectMapMemory& memory,
                       std::vector<EffectsInPlay::ActorEffectToRecord>& queue,
                       std::uint32_t effect_id, std::uint32_t actor_id,
@@ -358,6 +356,8 @@ bool QueueActorChange(EffectMapMemory& memory,
   memory.noticed.insert_or_assign(key, now_ms);
   return true;
 }
+
+namespace {
 
 // LES EFFETS D'ACTEUR QU'UN ÉTAT A POSÉS ET QUI ONT FINI LEUR VIE partent de
 // leur porteur, même si l'état tient encore. Seule l'instance que l'état a
@@ -613,34 +613,12 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
                           entry.effect_param >= 0 ? std::optional{entry.effect_param} : state_value,
                           ground, now_ms, entry.endless));
     };
-    // LES GESTES GARDÉS, à la pose comme à la levée : un effet ne naît, ou ne
-    // se retire, que sur qui porte l'effet qu'il exige.
-    const auto play_guarded = [&](ro::sim::StatusEffectId state) {
-      for (const ro::render::StateGuardedGesture& gesture :
-           ro::render::StateGuardedGesturesFor(state)) {
-        if (gesture.carried_effect_id != 0 && !Carries(gesture.carried_effect_id, id) &&
-            std::ranges::none_of(actor.effects, [&gesture](const ro::sim::PlayedEffect& played) {
-              return played.id == gesture.carried_effect_id;
-            })) {
-          continue;
-        }
-        if (QueueActorChange(per_map_, actor_effects_to_record_, gesture.effect_id, id, ground,
-                             now_ms, state, gesture.withdraws)) {
-          continue;
-        }
-        if (gesture.withdraws) {
-          StopById(gesture.effect_id, id);
-          continue;
-        }
-        static_cast<void>(
-            PlayStateEffect(gesture.effect_id, id, std::nullopt, ground, now_ms, false));
-      }
-    };
+    // ⚠ LES GESTES GARDÉS ET LEUR BRUIT ne sont pas ici : ils dépendent de
+    // l'ordre des paquets, que cette liste perd. Voir `NoticeStateChanges`.
     for (const ro::sim::StatusEffectId state : shown_states) {
       if (seen_states.contains(state)) {
         continue;
       }
-      play_guarded(state);
       const std::optional<std::int32_t> state_value =
           actor.status_values.contains(state) ? std::optional{actor.status_values.at(state)}
                                               : std::nullopt;
@@ -696,10 +674,12 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
         static_cast<void>(
             PlayStateEffect(entry.effect_id, id, state_value, ground, now_ms, entry.endless));
       }
-      // LE SON DU CHANGEMENT D'ÉTAT. Trois états en portent un, et il passe par
+      // LE SON DU CHANGEMENT D'ÉTAT. Quatre états en portent un, et il passe par
       // le même canal que les sons des effets nommés : `app` les entend après
-      // coup, parce que le rendu ne connaît pas l'audio.
-      if (const std::string_view sound = ro::render::StateSoundFor(state); !sound.empty()) {
+      // coup, parce que le rendu ne connaît pas l'audio. Un état à gestes gardés
+      // sonne avec eux : voir `NoticeStateChanges`.
+      if (const std::string_view sound = ro::render::StateSoundFor(state);
+          !sound.empty() && ro::render::StateGuardedGesturesFor(state).empty()) {
         per_map_.just_sown_named_sounds.push_back(SownNamedSound{sound, posed_cell});
       }
       PlayRebuildStateEffects(state, id, state_value, first_time && id == world.player_id(), ground,
@@ -717,7 +697,6 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
         }
         PlayNamedEntry(entry.name, entry.verb, id, false, posed_cell, entry.anchor, false, now_ms);
       }
-      play_guarded(state);
       // 🔴 CE QUE LA LEVÉE EMPORTE. Le client retire par deux voies — l'appel
       // direct, ou le message 109 envoyé à l'acteur —, dans la branche « non
       // posé » ou sans garde du tout : un retrait sans garde tombe aussi à la
@@ -770,7 +749,8 @@ void EffectsInPlay::NoticeStateEffects(const ro::sim::World& world, const MapSta
         static_cast<void>(
             PlayStateEffect(entry.effect_id, id, std::nullopt, ground, now_ms, false));
       }
-      if (const std::string_view sound = ro::render::StateSoundFor(state); !sound.empty()) {
+      if (const std::string_view sound = ro::render::StateSoundFor(state);
+          !sound.empty() && ro::render::StateGuardedGesturesFor(state).empty()) {
         per_map_.just_sown_named_sounds.push_back(SownNamedSound{sound, posed_cell});
       }
     }

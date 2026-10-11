@@ -42,6 +42,7 @@ void World::EnterMap(std::string map_name, std::uint16_t x, std::uint16_t y) {
   skill_units_.clear();
   strikes_.Clear();
   supports_.Clear();
+  state_arrivals_.Clear();
   unseen_ground_skills_.Clear();
   // 🔴 LE CHAMP DE BATAILLE NE S'OUBLIE QU'AVEC SA CARTE. Une réapparition sur
   // la même garde coéquipiers et score : le serveur ne redit un coéquipier que
@@ -351,6 +352,7 @@ bool World::SetStatusEffect(std::uint32_t id, StatusEffectId effect, bool active
   if (since_ms.has_value()) {
     NoteStatusSleep(found->second, effect, active, *since_ms);
   }
+  state_arrivals_.Record(id, effect, active);
   return true;
 }
 
@@ -736,6 +738,7 @@ void World::Clear() {
   skill_units_.clear();
   strikes_.Clear();
   supports_.Clear();
+  state_arrivals_.Clear();
   unseen_ground_skills_.Clear();
   // ⚠ LA DÉSIGNATION NE SURVIT PAS, elle : elle nomme un acteur, et il n'y en a
   // plus. C'est ce qui la sépare de l'identifiant du joueur, juste en dessous.

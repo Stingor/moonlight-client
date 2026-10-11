@@ -297,6 +297,10 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
                              effects.MinimalEffects());
   effects.NoticeEffectRemovals(*scene.world);
   effects.Notice(*scene.world, *scene.stage, *scene.planner);
+  // Ce qu'un changement d'état reçu en direct montre une fois, AVANT les
+  // compétences : le serveur pose l'état d'une compétence avant de l'annoncer,
+  // et l'annonce lit ce que l'état a posé.
+  effects.NoticeStateChanges(*scene.world, *scene.stage, *scene.planner, scene.now_ms);
   effects.NoticeSkills(*scene.world, *scene.stage, *scene.planner, scene.now_ms);
   // Et l'IMPACT de chaque frappe sur ce qu'elle touche, qui ne part pas au
   // geste mais avec le chiffre des dégâts : le client en pose un par message.
@@ -310,8 +314,6 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
   // Les TRAITS DE DEVOTION, qu'une liste de protégés retend : après le suivi des
   // porteurs, qui vient d'éteindre ceux dont la cible est partie.
   effects.NoticeDevotionLinks(*scene.world, *scene.stage, *scene.planner, scene.now_ms);
-  // Ce qu'un changement d'état montre UNE fois : Hiding, le silence.
-  effects.NoticeStateChanges(*scene.world, *scene.stage, *scene.planner, scene.now_ms);
   // Et les états NOMMÉS, qui ne s'entretiennent PAS : ils jouent aux deux
   // instants où l'état change, et c'est la donnée qui les fait durer ensuite.
   // Trente-huit états de quatrième classe n'ont que ce chemin-là.

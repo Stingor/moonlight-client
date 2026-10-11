@@ -107,17 +107,16 @@ class World {
   // part, par le paramètre SP_SPEED.
   bool SetSpeed(std::uint32_t id, std::uint16_t ms_per_cell);
 
-  // Pose ou retire un état. Rend faux si personne ne portait cet identifiant.
-  //
-  // `value` est ce que le serveur annonce avec l'état — le `val1` du paquet
-  // 0x043F —, `second_value` son `val2`. Elles ne sont RETENUES que pour les
-  // états qui en montrent quelque chose, et le monde ne sait pas lesquels :
-  // c'est l'appelant qui le dit, en ne les passant que pour eux. `since_ms`
-  // date la pose : voir `Actor::status_since_ms`.
+  // Pose ou retire un état, et l'inscrit au journal `state_arrivals()`. Faux
+  // pour un inconnu. `value` est le `val1` du paquet 0x043F, `second_value` son
+  // `val2` : RETENUES pour les seuls états qui en montrent quelque chose, que
+  // l'appelant désigne en ne les passant que pour eux. `since_ms` date la
+  // pose : voir `Actor::status_since_ms`.
   bool SetStatusEffect(std::uint32_t id, StatusEffectId effect, bool active,
                        std::optional<std::int32_t> value = std::nullopt,
                        std::optional<std::int32_t> second_value = std::nullopt,
                        std::optional<std::uint32_t> since_ms = std::nullopt);
+  [[nodiscard]] const StateArrivalLog& state_arrivals() const noexcept { return state_arrivals_; }
   // Pose ou retire un effet de chapeau. Faux pour un acteur inconnu.
   bool SetHatEffect(std::uint32_t id, HatEffectId effect, bool active);
 
@@ -779,6 +778,7 @@ class World {
   DamageMeter damage_meter_;
   StrikeLog strikes_;
   SupportLog supports_;
+  StateArrivalLog state_arrivals_;
   UnseenGroundSkillLog unseen_ground_skills_;
   std::uint32_t selected_id_ = 0;
   TargetDetail target_detail_;

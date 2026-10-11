@@ -1,8 +1,10 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <optional>
+#include <vector>
 
 #include "ro/render/actor_effect_table.h"
 #include "ro/render/effect_class.h"
@@ -10,6 +12,10 @@
 #include "ro/render/effect_frame.h"
 #include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/effect_table.h"
+#include "ro/sim/status_effects.h"
+
+#include "effects/effect_map_memory.h"
+#include "effects/effect_view.h"
 
 namespace moonclient {
 
@@ -43,5 +49,14 @@ namespace moonclient {
   return static_cast<std::uint64_t>(life_ticks) *
          static_cast<std::uint64_t>(ro::render::kEffectTickMs);
 }
+
+// POSE OU RETIRE SUR SON PORTEUR un effet qui ne fait que le changer, et le
+// marque porté ou non sur-le-champ ; son bruit part à la pose. Faux pour un
+// effet qui se dessine : à l'appelant de le jouer ou de le couper.
+bool QueueActorChange(EffectMapMemory& memory,
+                      std::vector<EffectsInPlay::ActorEffectToRecord>& queue,
+                      std::uint32_t effect_id, std::uint32_t actor_id,
+                      const std::array<float, 3>& ground, std::uint32_t now_ms,
+                      ro::sim::StatusEffectId state, bool withdrawn);
 
 }  // namespace moonclient
