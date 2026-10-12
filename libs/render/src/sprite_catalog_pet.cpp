@@ -37,7 +37,7 @@ std::string PetAccessoryAnimationPath(const SpriteCatalog& catalog, const ActorL
     return {};
   }
   std::optional<std::string> name =
-      catalog_internal::TableName(catalog, kPetAccessoryActTableGlobal, look.pet_accessory);
+      catalog_internal::TableName(catalog.tables.pet_accessory_acts, look.pet_accessory);
   if (!name.has_value() || name->empty()) {
     return {};
   }

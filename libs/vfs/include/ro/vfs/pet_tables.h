@@ -34,6 +34,8 @@ namespace ro::vfs {
 //   * `data\yaml_files\pet_info.yml`, que `scripts/yaml_tables/pet_info.py`
 //     tire des tables de l'installation pour les familiers du serveur : ce
 //     que le serveur ignore, le nom de l'espèce et le .act d'un accessoire.
+//     Le catalogue des sprites en lit aussi les .act (`ParsePetInfo`), pour
+//     habiller un familier paré.
 //
 //         version: 1
 //         species: {1002: "Poring", …}

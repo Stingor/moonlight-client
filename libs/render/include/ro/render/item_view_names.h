@@ -20,20 +20,14 @@ namespace ro::render {
 
 enum class ViewedPiece : std::uint8_t {
   kNothing,   // l'apparence ne se dessine pas : rien à lire
-  kWeapon,    // une classe d'arme : `kWeaponNameTableGlobal`
-  kHeadgear,  // un accessoire de tête : `kAccessoryNameTableGlobal`
+  kWeapon,    // une classe d'arme : weapon_sprites.yml
+  kHeadgear,  // un accessoire de tête : headgear_sprites.yml
   kShield,    // une forme de bouclier
-  kGarment,   // ce qui se porte au dos, robe ou ailes : `kRobeNameTableGlobal`
+  kGarment,   // ce qui se porte au dos, robe ou ailes : garment_sprites.yml
 };
 
-// Les tables qui donnent un NOM SYMBOLIQUE à chaque numéro, à côté de celles
-// qui nomment les sprites.
-inline constexpr std::string_view kWeaponIdsGlobal = "Weapon_IDs";
-inline constexpr std::string_view kAccessoryIdsGlobal = "ACCESSORY_IDs";
-inline constexpr std::string_view kRobeIdsGlobal = "SPRITE_ROBE_IDs";
-
 struct ViewMeaning {
-  // Le nom que la table des identifiants donne au numéro —
+  // Le nom symbolique que la table donne au numéro —
   // `WEAPONTYPE_SHORTSWORD`, `ACCESSORY_GOGGLE`… —, ou vide : une forme de
   // bouclier n'en a jamais.
   std::string symbol;
@@ -44,8 +38,9 @@ struct ViewMeaning {
   [[nodiscard]] bool operator==(const ViewMeaning& other) const = default;
 };
 
-// nullopt pour `kNothing`, et pour un numéro qu'aucune des deux tables ne
-// nomme : une apparence inconnue n'est pas une erreur, elle se dit telle.
+// nullopt pour `kNothing`, et pour un numéro dont la table ne donne ni nom
+// symbolique ni sprite : une apparence inconnue n'est pas une erreur, elle se
+// dit telle.
 [[nodiscard]] std::optional<ViewMeaning> DescribeItemView(const SpriteCatalog& catalog,
                                                           ViewedPiece piece, std::uint16_t view_id);
 

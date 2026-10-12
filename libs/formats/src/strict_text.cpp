@@ -1,15 +1,18 @@
 // La forme stricte des grosses tables YAML. Voir l'en-tête.
 
-#include "strict_text.h"
+#include "ro/formats/strict_text.h"
 
 #include <algorithm>
+#include <charconv>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
-namespace ro::vfs {
+namespace ro::formats {
 namespace {
 
 constexpr std::string_view kTrueWord = "true";
@@ -96,6 +99,11 @@ bool StrictText::Take(char expected) {
   return false;
 }
 
+bool StrictText::Comes(char expected) {
+  SkipBlank();
+  return at_ < text_.size() && text_[at_] == expected;
+}
+
 bool StrictText::ReadKey(std::string_view& key) {
   SkipBlank();
   const std::size_t start = at_;
@@ -119,6 +127,26 @@ bool StrictText::ReadWhole(std::uint32_t most, std::uint32_t& value) {
   }
   value = static_cast<std::uint32_t>(read);
   return at_ > start;
+}
+
+bool StrictText::ReadNumber(double& value) {
+  SkipBlank();
+  std::size_t end = at_;
+  const auto number_part = [](char c) {
+    return (c >= '0' && c <= '9') || c == '-' || c == '+' || c == '.' || c == 'e' || c == 'E';
+  };
+  while (end < text_.size() && number_part(text_[end])) {
+    ++end;
+  }
+  double read = 0.0;
+  const char* const stop = text_.data() + end;
+  const auto [parsed_end, error] = std::from_chars(text_.data() + at_, stop, read);
+  if (end == at_ || error != std::errc() || parsed_end != stop || !std::isfinite(read)) {
+    return false;
+  }
+  value = read;
+  at_ = end;
+  return true;
 }
 
 bool StrictText::ReadBoolean(bool& value) {
@@ -263,4 +291,4 @@ bool StrictText::ReadCodePoint(std::string& text) {
   return true;
 }
 
-}  // namespace ro::vfs
+}  // namespace ro::formats

@@ -553,6 +553,7 @@ add_library(ro_render STATIC
     src/sprite_catalog_mount.cpp
     src/sprite_catalog_palette.cpp
     src/sprite_catalog_pet.cpp
+    src/sprite_tables.cpp
     src/item_view_names.cpp
     src/shown_job.cpp
     src/sprite_frame.cpp

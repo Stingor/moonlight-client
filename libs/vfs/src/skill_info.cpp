@@ -9,10 +9,12 @@
 #include <utility>
 #include <vector>
 
-#include "strict_text.h"
+#include "ro/formats/strict_text.h"
 
 namespace ro::vfs {
 namespace {
+
+using formats::StrictText;
 
 constexpr std::string_view kFileLabel = "skill_info.yml";
 constexpr std::string_view kVersionKey = "version";

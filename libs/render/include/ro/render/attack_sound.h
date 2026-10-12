@@ -37,9 +37,8 @@ inline constexpr std::array<std::string_view, 4> kEnemyHitSounds = {
 inline constexpr std::array<std::string_view, 4> kFistHitSounds = {
     "_hit_fist1.wav", "_hit_fist2.wav", "_hit_fist3.wav", "_hit_fist4.wav"};
 
-// La table du client qui nomme le bruit de chaque classe d'arme. Elle est dans
-// weapontable.lub, que le catalogue des sprites évalue déjà.
-inline constexpr std::string_view kWeaponHitTableGlobal = "WeaponHitWaveNameTable";
+// Le bruit de chaque classe d'arme est le `hit_sound` de weapon_sprites.yml,
+// que le catalogue des sprites lit déjà (`SpriteTables::weapon_hit_sounds`).
 
 // ── LE BRUIT D'UN JOUEUR QU'ON FRAPPE ───────────────────────────────────────
 //
@@ -79,7 +78,7 @@ inline constexpr std::uint32_t kBareHandsWeapon = 0;
 // 🔴 DEUX TRADUCTIONS SÉPARENT L'APPARENCE DE LA TABLE, et les sauter rend le
 // coup MUET. Ce que le serveur envoie est l'IDENTIFIANT DE L'OBJET ; le client
 // en tire la classe d'arme, puis le SEAU d'animation de cette classe, et c'est
-// par ce seau qu'il indexe `WeaponHitWaveNameTable` — trente entrées, là où un
+// par ce seau qu'il indexe sa table des bruits — trente entrées, là où un
 // bâton porte l'objet 1601.
 //
 // `draw` choisit parmi les quatre bruits d'un même jeu : le client y tire au

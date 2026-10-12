@@ -4,12 +4,9 @@
 // seul : il ne lit qu'une table du client et ne compose aucun chemin.
 
 #include <cstdint>
-#include <optional>
 
 #include "ro/render/shown_job.h"
 #include "ro/render/sprite_catalog.h"
-
-#include "sprite_catalog_internal.h"
 
 namespace ro::render {
 
@@ -29,14 +26,12 @@ float ShadowScaleFor(const SpriteCatalog& catalog, const ActorLook& look) {
   }
   // Le rayon d'abord : il ne concerne que les plus grandes créatures, et il
   // l'emporte quand il est là.
-  if (const std::optional<double> radius =
-          catalog_internal::TableNumber(catalog, kNpcRadiusTableGlobal, look.job);
-      radius.has_value() && *radius != 0.0) {
+  if (const double* radius = FindSpriteEntry(catalog.tables.class_radii, look.job);
+      radius != nullptr && *radius != 0.0) {
     return 2.0F * static_cast<float>(*radius) + 1.0F;
   }
-  if (const std::optional<double> factor =
-          catalog_internal::TableNumber(catalog, kShadowFactorTableGlobal, look.job);
-      factor.has_value()) {
+  if (const double* factor = FindSpriteEntry(catalog.tables.class_shadows, look.job);
+      factor != nullptr) {
     return static_cast<float>(*factor);
   }
   return 1.0F;

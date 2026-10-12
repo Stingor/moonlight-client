@@ -9,10 +9,12 @@
 #include <string>
 #include <utility>
 
-#include "strict_text.h"
+#include "ro/formats/strict_text.h"
 
 namespace ro::vfs {
 namespace {
+
+using formats::StrictText;
 
 // Le nom de la table dans les refus.
 constexpr std::string_view kFileLabel = "item_info.yml";

@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <ranges>
 
-#include "ro/formats/lua_table.h"
 #include "ro/render/class_hit_sound_table.h"
 
 #include "sprite_catalog_internal.h"
@@ -45,15 +44,8 @@ std::string WeaponHitSound(const SpriteCatalog& catalog, std::int32_t weapon_ite
   if (bucket == kBareHandsWeapon) {
     return OneOf(kFistHitSounds, draw);
   }
-  const formats::LuaValue* table = catalog.globals.Find(std::string(kWeaponHitTableGlobal));
-  if (table == nullptr || table->kind != formats::LuaValue::Kind::kTable || !table->table) {
-    return {};
-  }
-  const formats::LuaValue* sound = table->table->Find(static_cast<double>(bucket));
-  if (sound == nullptr || sound->kind != formats::LuaValue::Kind::kString) {
-    return {};
-  }
-  return sound->text;
+  const std::string* sound = FindSpriteEntry(catalog.tables.weapon_hit_sounds, bucket);
+  return sound != nullptr ? *sound : std::string();
 }
 
 bool ClassHasHitSound(std::int32_t job) noexcept {

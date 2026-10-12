@@ -44,7 +44,6 @@ using catalog_internal::kTwoHandSpearClass;
 using catalog_internal::PlayerBodyName;
 using catalog_internal::SexToken;
 using catalog_internal::TableName;
-using catalog_internal::TableNumber;
 using catalog_internal::WeaponClassOf;
 using catalog_internal::WeaponFamilyClass;
 using catalog_internal::WearsAlternateOutfit;
@@ -104,10 +103,10 @@ bool Listed(const std::array<std::uint32_t, N>& values, std::uint32_t value) {
   return std::ranges::find(values, value) != values.end();
 }
 
-// Les classes que le client nomme d'après sa table Lua, par plages. Hors de ces plages, le nom
-// reste celui dont la table est remplie d'avance : un Poring. C'est pour cela qu'un monstre inconnu
-// du client apparaît en Poring.
-constexpr std::array<ClassRange, 5> kLuaNamedClasses = {
+// Les classes que le client nomme d'après sa table des sprites, par plages. Hors de ces plages, le
+// nom reste celui dont la table est remplie d'avance : un Poring. C'est pour cela qu'un monstre
+// inconnu du client apparaît en Poring.
+constexpr std::array<ClassRange, 5> kTableNamedClasses = {
     {{45, 125}, {400, 999}, {1001, 3998}, {10000, 19998}, {20021, 31999}}};
 constexpr std::string_view kUnknownClassName = "Poring";
 
@@ -249,9 +248,9 @@ std::string NonPlayerName(const SpriteCatalog& catalog, std::uint32_t job) {
       return std::string(mercenaries.name);
     }
   }
-  for (const ClassRange& range : kLuaNamedClasses) {
+  for (const ClassRange& range : kTableNamedClasses) {
     if (Within(range, job)) {
-      if (auto name = TableName(catalog, kJobNameTableGlobal, job); name.has_value()) {
+      if (auto name = TableName(catalog.tables.class_sprites, job); name.has_value()) {
         return std::move(*name);
       }
       break;
@@ -312,7 +311,7 @@ std::string WeaponNameOfClass(const SpriteCatalog& catalog, int weapon_class) {
   if (weapon_class <= 0) {
     return {};
   }
-  return TableName(catalog, kWeaponNameTableGlobal, static_cast<std::uint32_t>(weapon_class))
+  return TableName(catalog.tables.weapon_sprites, static_cast<std::uint32_t>(weapon_class))
       .value_or(std::string());
 }
 
@@ -472,7 +471,7 @@ std::string HeadSpritePath(const ActorLook& look) {
 
 std::vector<std::string> HeadgearSpritePaths(const SpriteCatalog& catalog, const ActorLook& look,
                                              std::uint16_t accessory) {
-  const std::optional<std::string> name = TableName(catalog, kAccessoryNameTableGlobal, accessory);
+  const std::optional<std::string> name = TableName(catalog.tables.headgear_sprites, accessory);
   if (!name.has_value()) {
     return {};
   }
@@ -730,8 +729,8 @@ std::uint32_t DualWieldClass(std::uint32_t right, std::uint32_t left) {
 }
 
 std::uint32_t WeaponFamilyClass(const SpriteCatalog& catalog, std::uint32_t weapon_class) {
-  const std::optional<double> family = TableNumber(catalog, kExpansionWeaponsGlobal, weapon_class);
-  return family.has_value() ? static_cast<std::uint32_t>(*family) : weapon_class;
+  const std::uint32_t* family = FindSpriteEntry(catalog.tables.weapon_families, weapon_class);
+  return family != nullptr ? *family : weapon_class;
 }
 
 std::string Join(std::initializer_list<std::string_view> parts) {
@@ -751,34 +750,13 @@ std::string_view PlayerBodyName(std::uint32_t job) {
   return found->name;
 }
 
-std::optional<std::string> TableName(const SpriteCatalog& catalog, std::string_view table_name,
+std::optional<std::string> TableName(const std::unordered_map<std::uint32_t, std::string>& table,
                                      std::uint32_t id) {
-  const formats::LuaValue* table = catalog.globals.Find(table_name);
-  if (table == nullptr || table->table == nullptr) {
+  const std::string* name = FindSpriteEntry(table, id);
+  if (name == nullptr) {
     return std::nullopt;
   }
-  const formats::LuaValue* entry = table->table->Find(static_cast<double>(id));
-  if (entry == nullptr || entry->kind != formats::LuaValue::Kind::kString) {
-    return std::nullopt;
-  }
-  auto utf8 = vfs::Cp949ToUtf8(entry->text);
-  if (!utf8) {
-    return std::nullopt;
-  }
-  return std::move(*utf8);
-}
-
-std::optional<double> TableNumber(const SpriteCatalog& catalog, std::string_view table_name,
-                                  std::uint32_t id) {
-  const formats::LuaValue* table = catalog.globals.Find(table_name);
-  if (table == nullptr || table->table == nullptr) {
-    return std::nullopt;
-  }
-  const formats::LuaValue* entry = table->table->Find(static_cast<double>(id));
-  if (entry == nullptr || entry->kind != formats::LuaValue::Kind::kNumber) {
-    return std::nullopt;
-  }
-  return entry->number;
+  return *name;
 }
 
 }  // namespace catalog_internal

@@ -9,10 +9,10 @@
 #include <vector>
 
 #include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
 #include "ro/formats/monster_skill_info.h"
 #include "ro/render/actor_layers.h"
 #include "ro/render/body_sprite_key.h"
+#include "ro/render/sprite_tables.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/vfs.h"
 
@@ -24,9 +24,10 @@ namespace ro::render {
 // une coiffure, un accessoire, un objet tenu, une robe — et c'est le client qui
 // les traduit, avec trois sources que ce module reproduit :
 //
-//   - ses tables de données, des .lub : le nom d'un monstre, d'un PNJ, d'un
-//     accessoire, d'une arme, d'une cape ; et, pour la cape, de quel côté du
-//     corps elle passe, image par image ;
+//   - ses tables de données, converties sous data\yaml_files\ (voir
+//     `sprite_tables.h`) : le nom d'un monstre, d'un PNJ, d'un accessoire,
+//     d'une arme, d'une cape ; et, pour la cape, de quel côté du corps elle
+//     passe, image par image ;
 //   - sa table des objets : la classe d'une arme, la forme d'un bouclier ;
 //   - son exécutable : le nom de corps d'un métier joueur, le numéro de
 //     fichier d'une coiffure, le dossier de ses armes. Voir client_tables.cpp.
@@ -96,10 +97,10 @@ struct ActorLook {
   std::uint16_t pet_accessory = 0;
 };
 
-// Les tables du client, dans l'état où il les laisse après les avoir évaluées
-// dans SON ordre : jobName lit les identifiants que NPCIdentity a nommés.
+// Ce qui traduit une apparence en fichiers.
 struct SpriteCatalog {
-  formats::LuaTable globals;
+  // LES TABLES DE SPRITES — voir `ro/render/sprite_tables.h`.
+  SpriteTables tables;
   // LA TABLE DES OBJETS, entière — voir `ro/vfs/item_table.h`. Le renderer n'en
   // lit que deux nombres, l'apparence et le nom de ressource ; l'interface, qui
   // la reçoit par le même chemin, en lit le texte. Treize méga-octets ne se
@@ -120,69 +121,10 @@ inline constexpr std::string_view kMonsterSkillInfoFile = "data\\monsterskillinf
 // nomme son sprite, et sous lequel la table des gestes la range.
 [[nodiscard]] std::string NonPlayerResourceName(const SpriteCatalog& catalog, std::uint32_t job);
 
-// Les fichiers que le client évalue, dans son ordre : ceux qui nomment des sprites, et la liste
-// d'héritage des métiers parce qu'elle nomme JOBID, dont les tables de couches des capes se
-// servent. Le client évalue entre eux des fichiers de fonctions (_f) et ses
-// anciennes tables de couches, que sa passe actuelle ne lit plus. Un fichier
-// absent se saute, comme chez lui ; un fichier illisible refuse le catalogue :
-// mieux vaut le savoir qu'habiller tout le monde en Poring.
-inline constexpr std::array<std::string_view, 18> kSpriteCatalogFiles = {
-    "data\\luafiles514\\lua files\\datainfo\\npcidentity.lub",
-    "data\\luafiles514\\lua files\\datainfo\\jobidentity.lub",
-    "data\\luafiles514\\lua files\\datainfo\\npclocationradius.lub",
-    "data\\luafiles514\\lua files\\datainfo\\shadowtable.lub",
-    "data\\luafiles514\\lua files\\datainfo\\jobname.lub",
-    "data\\luafiles514\\lua files\\datainfo\\accessoryid.lub",
-    "data\\luafiles514\\lua files\\datainfo\\accname.lub",
-    "data\\luafiles514\\lua files\\skillinfoz\\jobinheritlist.lub",
-    "data\\luafiles514\\lua files\\datainfo\\spriterobeid.lub",
-    "data\\luafiles514\\lua files\\datainfo\\spriterobename.lub",
-    "data\\luafiles514\\lua files\\spreditinfo\\2dlayerdir_f.lub",
-    "data\\luafiles514\\lua files\\spreditinfo\\_new_2dlayerdir_f.lub",
-    "data\\luafiles514\\lua files\\spreditinfo\\_new_biglayerdir_male.lub",
-    "data\\luafiles514\\lua files\\spreditinfo\\_new_biglayerdir_female.lub",
-    "data\\luafiles514\\lua files\\spreditinfo\\_new_smalllayerdir_male.lub",
-    "data\\luafiles514\\lua files\\spreditinfo\\_new_smalllayerdir_female.lub",
-    "data\\luafiles514\\lua files\\datainfo\\weapontable.lub",
-    "data\\luafiles514\\lua files\\datainfo\\petinfo.lub",
-};
-inline constexpr std::string_view kJobNameTableGlobal = "JobNameTable";
-// Le rayon qu'une classe occupe au sol, en cellules. Huit classes seulement y
-// figurent — les grands monstres —, et c'est ce rayon qui grandit leur ombre.
-inline constexpr std::string_view kNpcRadiusTableGlobal = "NpcLocationRadius";
-
-// Le facteur d'ombre d'une classe, quand le rayon ne dit rien : mille deux cent
-// quatre-vingt-huit classes y figurent, de zéro — un portail n'a pas d'ombre —
-// à deux pour les plus grosses créatures. C'est CETTE table qui donne à chaque
-// monstre son ombre, et l'ignorer les fait toutes de la même taille.
-inline constexpr std::string_view kShadowFactorTableGlobal = "ShadowFactorTable";
-inline constexpr std::string_view kAccessoryNameTableGlobal = "AccNameTable";
-inline constexpr std::string_view kWeaponNameTableGlobal = "WeaponNameTable";
-inline constexpr std::string_view kExpansionWeaponsGlobal = "Expansion_Weapon_IDs";
-inline constexpr std::string_view kRobeNameTableGlobal = "RobeNameTable";
-
-// Les tables de couches des capes : par robe, sa taille — la grande quand rien
-// n'est dit — ; par métier, celui dont il prend la table ; puis, par taille et
-// par sexe, la table elle-même, qui liste par métier et par action les images
-// où la cape passe derrière le corps.
-inline constexpr std::string_view kLayerSizeTypeListGlobal = "LayerSizeTypeList";
-inline constexpr double kSmallLayerSizeType = 1;
-inline constexpr std::string_view kLayerJobInheritanceGlobal = "LAYER_ALL_TABLE_LIST";
-struct LayerTableGlobals {
-  std::string_view female;
-  std::string_view male;
-};
-inline constexpr LayerTableGlobals kBigLayerTableGlobals = {"_New_BigLayerDir_F",
-                                                            "_New_BigLayerDir_M"};
-inline constexpr LayerTableGlobals kSmallLayerTableGlobals = {"_New_SmallLayerDir_F",
-                                                              "_New_SmallLayerDir_M"};
-
+// Lit les tables de sprites, la table des objets et les gestes de créature.
+// Un fichier absent laisse sa table vide ; un fichier illisible refuse le
+// catalogue, en se nommant.
 [[nodiscard]] core::Result<SpriteCatalog> LoadSpriteCatalog(vfs::Vfs& vfs);
-
-// Les seules tables Lua du catalogue — `kSpriteCatalogFiles`, dans leur ordre —,
-// sans la table des objets ni les gestes de créature : ce dont a besoin qui
-// nomme une apparence sans habiller d'acteur (voir `item_view_names.h`).
-[[nodiscard]] core::Result<formats::LuaTable> ReadSpriteCatalogGlobals(vfs::Vfs& vfs);
 
 // Une pièce à charger.
 struct ActorPieceFiles {
@@ -253,12 +195,9 @@ inline constexpr std::string_view kShadowSpritePath = "data\\sprite\\shadow";
                                                            const ActorLook& look,
                                                            std::uint16_t accessory);
 
-// La table qui nomme, par accessoire de pet, le .act de son corps paré.
-inline constexpr std::string_view kPetAccessoryActTableGlobal = "PetAccActNameTable";
-
 // LE .ACT DU CORPS D'UN PET PARÉ, sans extension, à côté de `body_path` : celui
-// que nomme `kPetAccessoryActTableGlobal`. Le .spr reste celui de l'espèce, qui
-// porte déjà les images de l'accessoire.
+// que `SpriteTables::pet_accessory_acts` nomme pour l'accessoire. Le .spr reste
+// celui de l'espèce, qui porte déjà les images de l'accessoire.
 //
 // Vide quand l'acteur n'est pas un pet paré, ou que la table ne connaît pas
 // l'accessoire : le corps garde alors son propre .act.

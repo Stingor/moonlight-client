@@ -167,6 +167,13 @@ tête d'où elle vient et comment la régénérer.
 - `hat_effects.yml` et les tables de `map_effects/` sont tirés des tables
   d'effets de chapeau et d'effets de carte que livre le client ; elles ne
   sont pas revendiquées comme partie de ce projet.
+- `class_sprites.yml`, `headgear_sprites.yml`, `weapon_sprites.yml`,
+  `garment_sprites.yml` et `garment_layers.yml` sont tirés des tables de
+  sprites que livre le client — noms de fichiers, ombres, bruits d'arme,
+  calques des capes —, pour la plupart dans leur traduction
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE), les autres tables
+  de Gravity ; les identifiants que tient le serveur Moonlight prennent sa
+  valeur. Elles ne sont pas revendiquées comme partie de ce projet.
 
 Ragnarok Online est une marque de Gravity Co., Ltd. Ce projet n'est ni
 affilié à Gravity ni approuvé par elle.

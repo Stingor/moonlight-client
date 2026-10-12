@@ -47,6 +47,7 @@ add_library(ro_formats STATIC
     src/spr.cpp
     src/stb_image_impl.cpp
     src/str.cpp
+    src/strict_text.cpp
     src/tga.cpp
     src/thor.cpp
     src/water_field.cpp

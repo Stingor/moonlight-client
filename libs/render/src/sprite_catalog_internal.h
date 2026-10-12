@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include "ro/render/sprite_catalog.h"
@@ -30,8 +31,8 @@ inline constexpr std::string_view kFemaleToken = "여";
 inline constexpr std::string_view kHeadFolder = "머리통";
 inline constexpr std::string_view kHeadgearFolder = "악세사리";
 
-// Les classes d'arme du client, par leur rang dans WeaponNameTable
-// (weapontable.lub) ; au-delà de vingt-quatre, les couples de deux armes.
+// Les classes d'arme du client, par leur rang dans weapon_sprites.yml ;
+// au-delà de vingt-quatre, les couples de deux armes.
 inline constexpr std::uint32_t kFistsClass = 0;
 inline constexpr std::uint32_t kDaggerClass = 1;
 inline constexpr std::uint32_t kSwordClass = 2;
@@ -90,8 +91,8 @@ void AppendMercenaryPieces(std::uint32_t job, std::vector<ActorPieceFiles>& file
 // Le couple de deux armes en main, ou l'arme seule.
 [[nodiscard]] std::uint32_t DualWieldClass(std::uint32_t right, std::uint32_t left);
 
-// La famille d'une classe d'arme (GetRealWeaponId) : elle-même, sauf pour une
-// classe étendue, que Expansion_Weapon_IDs ramène à la sienne.
+// La famille d'une classe d'arme : elle-même, sauf pour une classe étendue,
+// que sa `family` de weapon_sprites.yml ramène à la sienne.
 [[nodiscard]] std::uint32_t WeaponFamilyClass(const SpriteCatalog& catalog,
                                               std::uint32_t weapon_class);
 
@@ -142,11 +143,8 @@ void AppendMercenaryPieces(std::uint32_t job, std::vector<ActorPieceFiles>& file
 // combinaison s'il la porte.
 [[nodiscard]] std::string_view ShownBodyName(const ActorLook& look);
 
-// Ce qu'une table du client donne à un identifiant : un nom, en UTF-8, ou un
-// nombre. nullopt si la table ou l'entrée manque, ou n'est pas de ce type.
-[[nodiscard]] std::optional<std::string> TableName(const SpriteCatalog& catalog,
-                                                   std::string_view table_name, std::uint32_t id);
-[[nodiscard]] std::optional<double> TableNumber(const SpriteCatalog& catalog,
-                                                std::string_view table_name, std::uint32_t id);
+// Le nom qu'une table de sprites donne à un identifiant, ou nullopt.
+[[nodiscard]] std::optional<std::string> TableName(
+    const std::unordered_map<std::uint32_t, std::string>& table, std::uint32_t id);
 
 }  // namespace ro::render::catalog_internal

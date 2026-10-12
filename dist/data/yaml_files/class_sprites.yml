@@ -1,0 +1,5501 @@
+# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
+# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
+# This file can be distributed, used and modified freely
+# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
+#
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le sprite, le rayon au sol et l'ombre de chaque classe de PNJ et de monstre
+#
+#  Tirés de data\luafiles514\lua files\datainfo\ (npcidentity, jobidentity,
+#  jobname, npclocationradius, shadowtable) que livre moonlight.grf, traduction
+#  ROenglishRE : ce dépôt ne les revendique pas comme siens. Les identifiants
+#  que tient le serveur Moonlight (mode Prerenewal) — classes de PNJ de
+#  e_job_types, métiers, monstres de sa mob_db — prennent sa valeur.
+#
+#  Fichier produit par scripts/yaml_tables/sprite_tables.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/sprite_tables.py --serveur <dépôt moonlight> \
+#          --client <installation> --sortie dist/data/yaml_files
+#
+#  classes : classe -> sprite (le nom du fichier, sans dossier ; « .gr2 » y
+#    désigne un modèle 3D), radius (le rayon au sol en cellules, qui fait
+#    l'ombre des plus grandes créatures), shadow (le facteur d'ombre, zéro
+#    pour aucune). Un champ absent : la table du client ne le donnait pas.
+#
+#  Lu par moonclient (ro/render/sprite_tables.h).
+#  Absent, toute créature est un Poring, et toutes les ombres se valent.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+classes:
+  13: {shadow: 1.5}
+  21: {shadow: 1.5}
+  45: {sprite: "1_ETC_01", shadow: 0}
+  46: {sprite: "1_ETC_01"}
+  47: {sprite: "1_M_01"}
+  48: {sprite: "1_M_02"}
+  49: {sprite: "1_M_03"}
+  50: {sprite: "1_M_04"}
+  51: {sprite: "1_M_BARD"}
+  52: {sprite: "1_M_HOF"}
+  53: {sprite: "1_M_INNKEEPER"}
+  54: {sprite: "1_M_JOBGUIDER"}
+  55: {sprite: "1_M_JOBTESTER"}
+  56: {sprite: "1_M_KNIGHTMASTER"}
+  57: {sprite: "1_M_LIBRARYMASTER"}
+  58: {sprite: "1_M_MERCHANT"}
+  59: {sprite: "1_M_ORIENT01"}
+  60: {sprite: "1_M_PASTOR"}
+  61: {sprite: "1_M_PUBMASTER"}
+  62: {sprite: "1_M_SIZ"}
+  63: {sprite: "1_M_SMITH"}
+  64: {sprite: "1_M_WIZARD"}
+  65: {sprite: "1_M_YOUNGKNIGHT"}
+  66: {sprite: "1_F_01"}
+  67: {sprite: "1_F_02"}
+  68: {sprite: "1_F_03"}
+  69: {sprite: "1_F_04"}
+  70: {sprite: "1_F_GYPSY"}
+  71: {sprite: "1_F_LIBRARYGIRL"}
+  72: {sprite: "1_F_MARIA"}
+  73: {sprite: "1_F_MERCHANT_01"}
+  74: {sprite: "1_F_MERCHANT_02"}
+  75: {sprite: "1_F_ORIENT_01"}
+  76: {sprite: "1_F_ORIENT_02"}
+  77: {sprite: "1_F_ORIENT_03"}
+  78: {sprite: "1_F_ORIENT_04"}
+  79: {sprite: "1_F_PRIEST"}
+  80: {sprite: "1_F_PUBGIRL"}
+  81: {sprite: "4_DOG01"}
+  82: {sprite: "4_KID01"}
+  83: {sprite: "4_M_01"}
+  84: {sprite: "4_M_02"}
+  85: {sprite: "4_M_03"}
+  86: {sprite: "4_M_04"}
+  87: {sprite: "4_M_BARBER"}
+  88: {sprite: "4_M_ORIENT01"}
+  89: {sprite: "4_M_ORIENT02"}
+  90: {sprite: "4_F_01"}
+  91: {sprite: "4_F_02"}
+  92: {sprite: "4_F_03"}
+  93: {sprite: "4_F_04"}
+  94: {sprite: "4_F_MAID"}
+  95: {sprite: "4_F_SISTER"}
+  96: {sprite: "4W_KID"}
+  97: {sprite: "4W_M_01"}
+  98: {sprite: "4W_M_02"}
+  99: {sprite: "4W_M_03"}
+  100: {sprite: "4W_SAILOR"}
+  101: {sprite: "4W_F_01"}
+  102: {sprite: "8_F"}
+  103: {sprite: "8_F_GRANDMOTHER"}
+  104: {sprite: "1_ETC_01"}
+  105: {sprite: "8W_SOLDIER"}
+  106: {sprite: "1_M_MOC_LORD"}
+  107: {sprite: "1_M_PAY_ELDER"}
+  108: {sprite: "1_M_PRON_KING"}
+  109: {sprite: "4_M_MANAGER"}
+  110: {sprite: "4_M_MINISTER"}
+  111: {sprite: "1_ETC_01", shadow: 0}
+  112: {sprite: "4_F_KAFRA6"}
+  113: {sprite: "4_F_KAFRA5"}
+  114: {sprite: "4_F_KAFRA4"}
+  115: {sprite: "4_F_KAFRA3"}
+  116: {sprite: "4_F_KAFRA2"}
+  117: {sprite: "4_F_KAFRA1"}
+  118: {sprite: "2_M_THIEFMASTER"}
+  119: {sprite: "2_M_SWORDMASTER"}
+  120: {sprite: "2_M_PHARMACIST"}
+  121: {sprite: "2_M_MOLGENSTEIN"}
+  122: {sprite: "2_M_DYEINGER"}
+  123: {sprite: "2_F_MAGICMASTER"}
+  124: {sprite: "4_F_TELEPORTER"}
+  125: {sprite: "4_M_TELEPORTER"}
+  400: {sprite: "Poring"}
+  401: {sprite: "4_M_MUT2"}
+  402: {sprite: "4_M_SCIENCE"}
+  403: {sprite: "4_F_VALKYRIE2"}
+  404: {sprite: "4_M_UNCLEKNIGHT"}
+  405: {sprite: "4_M_YOUNGKNIGHT"}
+  406: {sprite: "2_MONEMUS"}
+  407: {sprite: "4_M_ATEIL"}
+  408: {sprite: "4_F_ANNIVERSARY"}
+  409: {sprite: "4_M_GREATPO"}
+  410: {sprite: "4_M_NOVELIST"}
+  411: {sprite: "4_M_CHAMPSOUL"}
+  412: {sprite: "4_M_OLDFRIAR"}
+  413: {sprite: "4_M_CRU_SOLD"}
+  414: {sprite: "4_M_CRU_KNT"}
+  415: {sprite: "4_M_CRU_HEAD"}
+  416: {sprite: "4_M_CRU_CRUA"}
+  417: {sprite: "4_M_KY_SOLD"}
+  418: {sprite: "4_M_KY_KNT"}
+  419: {sprite: "4_M_KY_HEAD"}
+  420: {sprite: "4_M_KY_KIYOM"}
+  421: {sprite: "4_M_BOSSCAT"}
+  422: {sprite: "4_M_BABYCAT"}
+  423: {sprite: "4W_F_KAFRA2"}
+  424: {sprite: "4_F_MUNAK"}
+  425: {sprite: "4_M_BONGUN"}
+  426: {sprite: "4_BEAR"}
+  427: {sprite: "4_BLUEWOLF"}
+  428: {sprite: "4_PECOPECO"}
+  429: {sprite: "4_M_JP_MID"}
+  430: {sprite: "4_M_JP_RUN"}
+  431: {sprite: "4_ORCLADY"}
+  432: {sprite: "4_ORCLADY2"}
+  433: {sprite: "4_ORCWARRIOR"}
+  434: {sprite: "4_ORCWARRIOR2"}
+  435: {sprite: "4_F_FAIRY"}
+  436: {sprite: "4_F_FAIRYKID"}
+  437: {sprite: "4_F_FAIRYKID2"}
+  438: {sprite: "4_F_FAIRYKID3"}
+  439: {sprite: "4_F_FAIRYKID4"}
+  440: {sprite: "4_F_FAIRYKID5"}
+  441: {sprite: "4_F_FAIRYKID6"}
+  442: {sprite: "4_M_FAIRYKID"}
+  443: {sprite: "4_M_FAIRYKID2"}
+  444: {sprite: "4_M_FAIRYKID3"}
+  445: {sprite: "4_M_FAIRYKID4"}
+  446: {sprite: "4_M_FAIRYKID5"}
+  447: {sprite: "4_M_FAIRYSOLDIER"}
+  448: {sprite: "4_M_TUFFOLD"}
+  449: {sprite: "4_MAN_BENKUNI"}
+  450: {sprite: "4_MAN_GALTUN"}
+  451: {sprite: "4_MAN_JERUTOO"}
+  452: {sprite: "4_MAN_LAVAIL"}
+  453: {sprite: "4_MAN_NITT"}
+  454: {sprite: "4_MAN_PIOM"}
+  455: {sprite: "4_MAN_PIOM2"}
+  456: {sprite: "4_M_DSTMAN"}
+  457: {sprite: "4_M_DSTMANDEAD"}
+  458: {sprite: "4_BABYLEOPARD"}
+  459: {sprite: "4_M_REDSWORD"}
+  460: {sprite: "4_MAN_PIOM3"}
+  461: {sprite: "4_M_FAIRYSOLDIER2"}
+  462: {sprite: "4_F_FAIRYSOLDIER"}
+  463: {sprite: "4_DRAGON_EGG"}
+  464: {sprite: "4_MIMIC"}
+  465: {sprite: "4_F_FAIRY1"}
+  466: {sprite: "4_F_GUILLOTINE"}
+  467: {sprite: "4_M_GUILLOTINE"}
+  468: {sprite: "4_M_KNIGHT_BLACK"}
+  469: {sprite: "4_M_KNIGHT_GOLD"}
+  470: {sprite: "4_M_KNIGHT_SILVER"}
+  471: {sprite: "4_SKULL_MUD"}
+  472: {sprite: "4_M_BRZ_INDIAN"}
+  473: {sprite: "4_F_BRZ_INDIAN"}
+  474: {sprite: "4_F_BRZ_INDOLD"}
+  475: {sprite: "4_M_BRZ_JACI"}
+  476: {sprite: "4_M_BRZ_MAN1"}
+  477: {sprite: "4_M_BRZ_MAN2"}
+  478: {sprite: "4_F_BRZ_WOMAN"}
+  479: {sprite: "4_M_MINSTREL"}
+  480: {sprite: "4_M_MINSTREL1"}
+  481: {sprite: "4_M_SHADOWCHASER"}
+  482: {sprite: "4_F_SHADOWCHASER"}
+  483: {sprite: "4_M_SURA"}
+  484: {sprite: "4_F_SURA"}
+  485: {sprite: "4_F_WANDERER"}
+  486: {sprite: "4_M_BARD"}
+  487: {sprite: "1_FLAG_NOFEAR"}
+  488: {sprite: "4_M_NOFEARGUY"}
+  489: {sprite: "4_MAN_PIOM6"}
+  490: {sprite: "4_MAN_PIOM4"}
+  491: {sprite: "4_MAN_PIOM5"}
+  492: {sprite: "4_MAN_GALTUN1"}
+  493: {sprite: "4_HUMAN_GERUTOO"}
+  494: {sprite: "4_M_ROKI"}
+  495: {sprite: "4_M_MERCAT1"}
+  496: {sprite: "4_M_MERCAT2"}
+  497: {sprite: "4_M_CATMAN1"}
+  498: {sprite: "4_M_CATMAN2"}
+  499: {sprite: "4_F_BRZ_WOMAN2"}
+  500: {sprite: "4_M_JP_DISH"}
+  501: {sprite: "4_F_JP_NOAH"}
+  502: {sprite: "4_F_JP_OZ"}
+  503: {sprite: "4_F_JP_CHROME"}
+  504: {sprite: "4_F_JP_RINNE"}
+  505: {sprite: "4_WHITETIGER"}
+  506: {sprite: "4_VENDING_MACHINE"}
+  507: {sprite: "4_MISTY"}
+  508: {sprite: "4_NECORING"}
+  509: {sprite: "4_ELEPHANT"}
+  510: {sprite: "4_F_NYDHOG"}
+  511: {sprite: "4_F_NYDHOG2"}
+  512: {sprite: "4_M_ROKI2"}
+  513: {sprite: "4_M_DOGTRAVELER"}
+  514: {sprite: "4_M_DOGTRAVELER2"}
+  515: {sprite: "4_F_DOGTRAVELER"}
+  516: {sprite: "4_M_RAFLE_GR"}
+  517: {sprite: "4_M_RAFLE_OLD"}
+  518: {sprite: "4_F_RAFLE_PK"}
+  519: {sprite: "4_M_LYINGDOG"}
+  520: {sprite: "4_F_MORAFINE1"}
+  521: {sprite: "4_F_MORAFINE2"}
+  522: {sprite: "4_M_RAFLE_OR"}
+  523: {sprite: "4_F_RAFLE_YE"}
+  524: {sprite: "4_M_RAFLE_VI"}
+  525: {sprite: "4_F_RAFLE_VI"}
+  526: {sprite: "4_M_ARDHA"}
+  527: {sprite: "4_CREEPER"}
+  528: {sprite: "JP_RUFAKU"}
+  529: {sprite: "JP_SUPIKA"}
+  530: {sprite: "JP_SABIKU"}
+  531: {sprite: "JP_ARUGORU"}
+  532: {sprite: "JP_ARUNA"}
+  533: {sprite: "JP_AIRI"}
+  534: {sprite: "4_M_DEWOLDMAN"}
+  535: {sprite: "4_M_DEWOLDWOMAN"}
+  536: {sprite: "4_M_DEWMAN"}
+  537: {sprite: "4_M_DEWWOMAN"}
+  538: {sprite: "4_M_DEWBOY"}
+  539: {sprite: "4_M_DEWGIRL"}
+  540: {sprite: "4_M_DEWZATICHIEF"}
+  541: {sprite: "4_M_DEWZATIMAN"}
+  542: {sprite: "4_M_ALCHE_E"}
+  543: {sprite: "4_MASK_SMOKEY"}
+  544: {sprite: "4_CAT_SAILOR1"}
+  545: {sprite: "4_CAT_SAILOR2"}
+  546: {sprite: "4_CAT_SAILOR3"}
+  547: {sprite: "4_CAT_SAILOR4"}
+  548: {sprite: "4_CAT_CHEF"}
+  549: {sprite: "4_CAT_MERMASTER"}
+  550: {sprite: "4_CRACK"}
+  551: {sprite: "4_ASTER"}
+  552: {sprite: "4_F_STARFISHGIRL"}
+  553: {sprite: "4_CAT_DOWN"}
+  554: {sprite: "4_CAT_REST"}
+  555: {sprite: "4_CAT_3COLOR"}
+  556: {sprite: "4_CAT_ADMIRAL"}
+  557: {sprite: "4_SOIL"}
+  558: {sprite: "4_F_ALCHE_A"}
+  559: {sprite: "4_CAT_ADV1"}
+  560: {sprite: "4_CAT_ADV2"}
+  561: {sprite: "4_CAT_SAILOR5"}
+  562: {sprite: "2_DROP_MACHINE"}
+  563: {sprite: "2_SLOT_MACHINE"}
+  564: {sprite: "2_VENDING_MACHINE1"}
+  565: {sprite: "MOB_TOMB"}
+  566: {sprite: "MYSTCASE"}
+  567: {sprite: "4_M_SIT_NOVICE"}
+  568: {sprite: "4_OCTOPUS_LEG"}
+  569: {sprite: "4_F_NURSE"}
+  570: {sprite: "4_MAL_SOLDIER"}
+  571: {sprite: "4_MAL_CAPTAIN"}
+  572: {sprite: "4_MAL_BUDIDAI"}
+  573: {sprite: "4_M_MAYOR"}
+  574: {sprite: "4_M_BARYO_OLD"}
+  575: {sprite: "4_F_BARYO_OLD"}
+  576: {sprite: "4_F_BARYO_GIRL"}
+  577: {sprite: "4_M_BARYO_BOY"}
+  578: {sprite: "4_M_BARYO_MAN"}
+  579: {sprite: "4_F_BARYO_WOMAN"}
+  580: {sprite: "4_BARYO_CHIEF"}
+  581: {sprite: "4_MAL_KAFRA"}
+  582: {sprite: "4_M_MALAYA"}
+  583: {sprite: "4_F_MALAYA"}
+  584: {sprite: "4_F_PATIENT"}
+  585: {sprite: "4_M_PATIENT"}
+  586: {sprite: "4_F_KR_TIGER"}
+  587: {sprite: "4_M_KR_BOY"}
+  588: {sprite: "4_M_KAGE_OLD"}
+  589: {sprite: "4_WHIKEBAIN"}
+  590: {sprite: "4_EREND"}
+  591: {sprite: "4_RAWREL"}
+  592: {sprite: "4_ARMAIA"}
+  593: {sprite: "4_KAVAC"}
+  594: {sprite: "4_YGNIZEM"}
+  595: {sprite: "4_EREMES"}
+  596: {sprite: "4_MAGALETA"}
+  597: {sprite: "4_KATRINN"}
+  598: {sprite: "4_SHECIL"}
+  599: {sprite: "4_SEYREN"}
+  600: {sprite: "4_HARWORD"}
+  601: {sprite: "4_F_JP_CYNTHIA"}
+  602: {sprite: "4_M_JP_GUSTON"}
+  603: {sprite: "4_M_JP_BERKUT"}
+  604: {sprite: "4_F_JP_DARK_ADELAIDE"}
+  605: {sprite: "4_M_JP_DARK_DARIUS"}
+  606: {sprite: "4_M_JP_JESTER"}
+  607: {sprite: "XMAS_SMOKEY_B"}
+  608: {sprite: "XMAS_SMOKEY_R"}
+  609: {sprite: "XMAS_SMOKEY_Y"}
+  610: {sprite: "4_f_clockdoll"}
+  611: {sprite: "4_f_fairy2"}
+  612: {sprite: "4_f_pinkwoman"}
+  613: {sprite: "4_fairydeadleaf"}
+  614: {sprite: "4_frog"}
+  615: {sprite: "4_m_blackman"}
+  616: {sprite: "4_m_blueman"}
+  617: {sprite: "4_m_fairyang"}
+  618: {sprite: "4_m_fairyavant"}
+  619: {sprite: "4_m_fairyfreak"}
+  620: {sprite: "4_m_fairykid6"}
+  621: {sprite: "4_m_fairyscholar"}
+  622: {sprite: "4_m_fairyscholar_dirty"}
+  623: {sprite: "4_m_fariy_hisie"}
+  624: {sprite: "4_m_fariyking"}
+  625: {sprite: "4_m_newoz"}
+  626: {sprite: "4_m_oliver"}
+  627: {sprite: "4_m_professorworm"}
+  628: {sprite: "4_m_redman"}
+  629: {sprite: "4_F_GELKA"}
+  630: {sprite: "4_M_ROTERT"}
+  631: {sprite: "4_BLACKDRAGON"}
+  632: {sprite: "4_M_GUNSLINGER"}
+  633: {sprite: "4_F_GUNSLINGER"}
+  634: {sprite: "4_M_ARCHER"}
+  635: {sprite: "4_M_SWORDMAN"}
+  636: {sprite: "4_M_NINJA_RED"}
+  637: {sprite: "4_M_NINJA_BLUE"}
+  638: {sprite: "4_M_THIEF_RUMIN"}
+  639: {sprite: "4_M_NOV_RUMIN"}
+  640: {sprite: "4_F_MAYSEL"}
+  641: {sprite: "4_F_ACOLYTE"}
+  642: {sprite: "4_M_NOV_HUNT"}
+  643: {sprite: "4_F_GENETIC"}
+  644: {sprite: "4_F_TAEKWON"}
+  645: {sprite: "4_F_SWORDMAN"}
+  646: {sprite: "4_F_IU"}
+  647: {sprite: "4_M_RAGI"}
+  648: {sprite: "4_M_MELODY"}
+  649: {sprite: "4_TRACE"}
+  650: {sprite: "4_F_HIMEL"}
+  651: {sprite: "4_LEVITATEMAN"}
+  652: {sprite: "4_M_HEINRICH"}
+  653: {sprite: "4_M_ROYALGUARD"}
+  654: {sprite: "4_M_BARMUND"}
+  655: {sprite: "4_F_KHALITZBURG"}
+  656: {sprite: "4_F_HIMEL2"}
+  657: {sprite: "4_WHITEKNIGHT"}
+  658: {sprite: "4_coco"}
+  659: {sprite: "4_m_aladdin"}
+  660: {sprite: "4_m_genie"}
+  661: {sprite: "4_f_genie"}
+  662: {sprite: "4_jp_mid_swim"}
+  663: {sprite: "4_jp_rune_swim"}
+  664: {sprite: "4_f_fenrir"}
+  665: {sprite: "4_f_geffen_fay"}
+  666: {sprite: "4_f_iris"}
+  667: {sprite: "4_f_lucile"}
+  668: {sprite: "4_f_sarah_baby"}
+  669: {sprite: "4_geffen_01"}
+  670: {sprite: "4_geffen_02"}
+  671: {sprite: "4_geffen_03"}
+  672: {sprite: "4_geffen_04"}
+  673: {sprite: "4_geffen_05"}
+  674: {sprite: "4_geffen_06"}
+  675: {sprite: "4_geffen_07"}
+  676: {sprite: "4_geffen_08"}
+  677: {sprite: "4_geffen_09"}
+  678: {sprite: "4_geffen_10"}
+  679: {sprite: "4_geffen_11"}
+  680: {sprite: "4_geffen_12"}
+  681: {sprite: "4_geffen_13"}
+  682: {sprite: "4_geffen_14"}
+  683: {sprite: "4_m_chaos"}
+  684: {sprite: "4_m_chief_irin"}
+  685: {sprite: "4_m_sakray"}
+  686: {sprite: "4_m_sakrayroyal"}
+  687: {sprite: "4_tower_01"}
+  688: {sprite: "4_tower_02"}
+  689: {sprite: "4_tower_03"}
+  690: {sprite: "4_tower_04"}
+  691: {sprite: "4_tower_05"}
+  692: {sprite: "4_tower_06"}
+  693: {sprite: "4_tower_07"}
+  694: {sprite: "4_tower_08"}
+  695: {sprite: "4_tower_09"}
+  696: {sprite: "4_tower_10"}
+  697: {sprite: "4_tower_11"}
+  698: {sprite: "4_tower_12"}
+  699: {sprite: "4_tower_13"}
+  700: {sprite: "8_F_GIRL"}
+  701: {sprite: "4_F_GODEMOM"}
+  702: {sprite: "4_F_GON"}
+  703: {sprite: "4_F_KID2"}
+  704: {sprite: "4_M_BIBI"}
+  705: {sprite: "4_M_GEF_SOLDIER"}
+  706: {sprite: "4_M_KID1"}
+  707: {sprite: "4_M_MOC_SOLDIER"}
+  708: {sprite: "4_M_PAY_SOLDIER"}
+  709: {sprite: "4_M_SEAMAN"}
+  710: {sprite: "4_M_SNOWMAN"}
+  711: {sprite: "4_F_05"}
+  712: {sprite: "4_M_05"}
+  713: {sprite: "4_M_06"}
+  714: {sprite: "4_F_06"}
+  715: {sprite: "4_M_PIERROT"}
+  716: {sprite: "4_M_KID2"}
+  717: {sprite: "4_F_KID3"}
+  718: {sprite: "4_M_SANTA"}
+  719: {sprite: "4_F_NACORURI"}
+  720: {sprite: "4_F_SHAMAN"}
+  721: {sprite: "4_F_KAFRA7"}
+  722: {sprite: "Guildflag90_1.gr2"}
+  723: {sprite: "1_SHADOW_NPC"}
+  724: {sprite: "4_F_07"}
+  725: {sprite: "4_F_JOB_ASSASSIN"}
+  726: {sprite: "4_F_JOB_BLACKSMITH"}
+  727: {sprite: "4_F_JOB_HUNTER"}
+  728: {sprite: "4_F_JOB_KNIGHT"}
+  729: {sprite: "4_F_NOVICE"}
+  730: {sprite: "4_M_JOB_ASSASSIN"}
+  731: {sprite: "4_M_JOB_BLACKSMITH"}
+  732: {sprite: "4_M_JOB_HUNTER"}
+  733: {sprite: "4_M_JOB_KNIGHT1"}
+  734: {sprite: "4_M_JOB_KNIGHT2"}
+  735: {sprite: "4_M_JOB_WIZARD"}
+  736: {sprite: "4_BAPHOMET"}
+  737: {sprite: "4_DARKLORD"}
+  738: {sprite: "4_DEVIRUCHI"}
+  739: {sprite: "8_DOPPEL"}
+  740: {sprite: "2_M_ALCHE"}
+  741: {sprite: "2_M_BARD_ORIENT"}
+  742: {sprite: "2_M_SAGE_B"}
+  743: {sprite: "2_M_SAGE_OLD"}
+  744: {sprite: "4_F_ALCHE"}
+  745: {sprite: "4_F_CRU"}
+  746: {sprite: "4_F_MONK"}
+  747: {sprite: "4_F_ROGUE"}
+  748: {sprite: "4_M_ALCHE_A"}
+  749: {sprite: "4_M_ALCHE_B"}
+  750: {sprite: "4_M_ALCHE_C"}
+  751: {sprite: "4_M_CRU"}
+  752: {sprite: "4_M_CRU_OLD"}
+  753: {sprite: "4_M_MONK"}
+  754: {sprite: "4_M_SAGE_A"}
+  755: {sprite: "4_M_SAGE_C"}
+  756: {sprite: "4_F_SON"}
+  757: {sprite: "4_F_JPN2"}
+  758: {sprite: "4_F_JPN"}
+  759: {sprite: "4_F_JPNCHIBI"}
+  760: {sprite: "4_F_JPNOBA2"}
+  761: {sprite: "4_F_JPNOBA"}
+  762: {sprite: "4_M_JPN2"}
+  763: {sprite: "4_M_JPN"}
+  764: {sprite: "4_M_JPNCHIBI"}
+  765: {sprite: "4_M_JPNOJI2"}
+  766: {sprite: "4_M_JPNOJI"}
+  767: {sprite: "8_M_JPNSOLDIER"}
+  768: {sprite: "8_M_JPNMASTER"}
+  769: {sprite: "4_F_JPNMU"}
+  770: {sprite: "4_F_TWGIRL"}
+  771: {sprite: "4_F_TWGRANDMOM"}
+  772: {sprite: "4_F_TWMASKGIRL"}
+  773: {sprite: "4_F_TWMIDWOMAN"}
+  774: {sprite: "4_M_TWBOY"}
+  775: {sprite: "4_M_TWMASKMAN"}
+  776: {sprite: "4_M_TWMIDMAN"}
+  777: {sprite: "4_M_TWOLDMAN"}
+  778: {sprite: "4_M_TWTEAMAN"}
+  779: {sprite: "4_M_YOYOROGUE"}
+  780: {sprite: "8_M_TWSOLDIER"}
+  781: {sprite: "4_F_UMGIRL"}
+  782: {sprite: "4_F_UMOLDWOMAN"}
+  783: {sprite: "4_F_UMWOMAN"}
+  784: {sprite: "4_M_UMCHIEF"}
+  785: {sprite: "4_M_UMDANCEKID2"}
+  786: {sprite: "4_M_UMDANCEKID"}
+  787: {sprite: "4_M_UMKID"}
+  788: {sprite: "4_M_UMOLDMAN"}
+  789: {sprite: "4_M_UMSOLDIER"}
+  790: {sprite: "4_M_SALVATION"}
+  791: {sprite: "4_F_NFDEADKAFRA"}
+  792: {sprite: "4_F_NFDEADMGCIAN"}
+  793: {sprite: "4_F_NFLOSTGIRL"}
+  794: {sprite: "4_M_NFDEADMAN2"}
+  795: {sprite: "4_M_NFDEADMAN"}
+  796: {sprite: "4_M_NFDEADSWDMAN"}
+  797: {sprite: "4_M_NFLOSTMAN"}
+  798: {sprite: "4_M_NFMAN"}
+  799: {sprite: "4_NFBAT"}
+  800: {sprite: "4_NFCOCK"}
+  801: {sprite: "4_NFCOFFIN"}
+  802: {sprite: "4_NFWISP"}
+  803: {sprite: "1_F_SIGNZISK"}
+  804: {sprite: "1_M_SIGN1"}
+  805: {sprite: "1_M_SIGNALCHE"}
+  806: {sprite: "1_M_SIGNART"}
+  807: {sprite: "1_M_SIGNMCNT"}
+  808: {sprite: "1_M_SIGNMONK2"}
+  809: {sprite: "1_M_SIGNMONK"}
+  810: {sprite: "1_M_SIGNROGUE"}
+  811: {sprite: "4_F_VALKYRIE"}
+  812: {sprite: "TW_TOWER"}
+  813: {sprite: "2_M_OLDBLSMITH"}
+  814: {sprite: "4_F_CHNDOCTOR"}
+  815: {sprite: "4_F_CHNDRESS1"}
+  816: {sprite: "4_F_CHNDRESS2"}
+  817: {sprite: "4_F_CHNDRESS3"}
+  818: {sprite: "4_F_CHNWOMAN"}
+  819: {sprite: "4_M_CHN8GUEK"}
+  820: {sprite: "4_M_CHNCOOK"}
+  821: {sprite: "4_M_CHNGENERL"}
+  822: {sprite: "4_M_CHNMAN"}
+  823: {sprite: "4_M_CHNMONK"}
+  824: {sprite: "4_M_CHNOLD"}
+  825: {sprite: "4_M_CHNSOLDIER"}
+  826: {sprite: "4_M_DWARF"}
+  827: {sprite: "4_M_GRANDMONK"}
+  828: {sprite: "4_M_ROGUE"}
+  829: {sprite: "4_M_DOMINO"}
+  830: {sprite: "4_F_DOMINO"}
+  831: {sprite: "4_F_ZONDAGIRL"}
+  832: {sprite: "4_M_REIDIN_KURS"}
+  833: {sprite: "4_M_ZONDAOYAJI"}
+  834: {sprite: "4_M_BUDDHIST"}
+  835: {sprite: "2_BOARD1"}
+  836: {sprite: "2_BOARD2"}
+  837: {sprite: "2_BULLETIN_BOARD"}
+  838: {sprite: "4_F_THAIAYO"}
+  839: {sprite: "4_F_THAIGIRL"}
+  840: {sprite: "4_F_THAISHAMAN"}
+  841: {sprite: "4_M_THAIAYO"}
+  842: {sprite: "4_M_THAIOLD"}
+  843: {sprite: "4_M_THAIONGBAK"}
+  844: {sprite: "CLEAR_NPC"}
+  845: {sprite: "4_F_RACING"}
+  846: {sprite: "4_F_EINOLD"}
+  847: {sprite: "4_M_EINOLD"}
+  848: {sprite: "4_M_EINMINER"}
+  849: {sprite: "4_M_DIEMAN"}
+  850: {sprite: "4_F_EINWOMAN"}
+  851: {sprite: "4_M_REPAIR"}
+  852: {sprite: "4_M_EIN_SOLDIER"}
+  853: {sprite: "4_M_YURI"}
+  854: {sprite: "4_M_EINMAN2"}
+  855: {sprite: "4_M_EINMAN"}
+  856: {sprite: "2_F_SIGN1"}
+  857: {sprite: "4_BOARD3"}
+  858: {sprite: "4_BULLETIN_BOARD2"}
+  859: {sprite: "4_F_AGENTKAFRA"}
+  860: {sprite: "4_F_KAFRA8"}
+  861: {sprite: "4_F_KAFRA9"}
+  862: {sprite: "4_F_LGTGIRL"}
+  863: {sprite: "4_F_LGTGRAND"}
+  864: {sprite: "4_F_OPERATION"}
+  865: {sprite: "4_LGTSCIENCE"}
+  866: {sprite: "4_M_LGTGRAND"}
+  867: {sprite: "4_M_LGTGUARD2"}
+  868: {sprite: "4_M_LGTGUARD"}
+  869: {sprite: "4_M_LGTMAN"}
+  870: {sprite: "4_M_LGTPOOR"}
+  871: {sprite: "4_M_OPERATION"}
+  872: {sprite: "4_M_PRESIDENT"}
+  873: {sprite: "4_M_REINDEER"}
+  874: {sprite: "4_M_ZONDAMAN"}
+  875: {sprite: "4_M_PECOKNIGHT"}
+  876: {sprite: "4_CAT"}
+  877: {sprite: "4_F_YUNYANG"}
+  878: {sprite: "4_M_OILMAN"}
+  879: {sprite: "4_F_CAPEGIRL"}
+  880: {sprite: "4_M_MASKMAN"}
+  881: {sprite: "4_M_SITDOWN"}
+  882: {sprite: "4_F_SITDOWN"}
+  883: {sprite: "4_M_ALCHE_D"}
+  884: {sprite: "4_M_ACROSS"}
+  885: {sprite: "4_F_ACROSS"}
+  886: {sprite: "4_COOK"}
+  887: {sprite: "4_M_LIEMAN"}
+  888: {sprite: "2_POSTBOX"}
+  889: {sprite: "4_BULL"}
+  890: {sprite: "4_LAM"}
+  891: {sprite: "4_F_HUGIRL"}
+  892: {sprite: "4_F_HUGRANMA"}
+  893: {sprite: "4_F_HUWOMAN"}
+  894: {sprite: "4_F_KHELLISIA"}
+  895: {sprite: "4_F_KHELLY"}
+  896: {sprite: "4_M_HUBOY"}
+  897: {sprite: "4_M_HUGRANFA"}
+  898: {sprite: "4_M_HUMAN_01"}
+  899: {sprite: "4_M_HUMAN_02"}
+  900: {sprite: "4_M_HUMERCHANT"}
+  901: {sprite: "4_M_HUOLDARMY"}
+  902: {sprite: "4_M_KHKIEL"}
+  903: {sprite: "4_M_KHKYEL"}
+  904: {sprite: "4_M_KHMAN"}
+  905: {sprite: "4_F_KHWOMAN"}
+  906: {sprite: "4_F_KHGIRL"}
+  907: {sprite: "4_M_KHBOY"}
+  908: {sprite: "4_M_PHILMAN"}
+  909: {sprite: "4_PORING"}
+  910: {sprite: "2_COLAVEND"}
+  911: {sprite: "4_F_SOCCER"}
+  912: {sprite: "4_M_SOCCER7"}
+  913: {sprite: "4_M_SOCCER9"}
+  914: {sprite: "4_F_CHILD"}
+  915: {sprite: "4_F_MADAME"}
+  916: {sprite: "4_F_MASK1"}
+  917: {sprite: "4_F_MASK"}
+  918: {sprite: "4_F_RACHOLD"}
+  919: {sprite: "4_F_SHABBY"}
+  920: {sprite: "4_F_TRAINEE"}
+  921: {sprite: "4_M_CHILD1"}
+  922: {sprite: "4_M_CHILD"}
+  923: {sprite: "4_M_DOCTOR"}
+  924: {sprite: "4_M_FROZEN1"}
+  925: {sprite: "4_M_FROZEN"}
+  926: {sprite: "4_M_MASK1"}
+  927: {sprite: "4_M_MASK"}
+  928: {sprite: "4_M_MIDDLE1"}
+  929: {sprite: "4_M_MIDDLE"}
+  930: {sprite: "4_M_RACHMAN2"}
+  931: {sprite: "4_M_RACHMAN1"}
+  932: {sprite: "4_M_RACHOLD1"}
+  933: {sprite: "4_M_RACHOLD"}
+  934: {sprite: "4_M_RASWORD"}
+  935: {sprite: "4_M_TRAINEE"}
+  936: {sprite: "4_F_ARUNA_POP"}
+  937: {sprite: "4_M_ARUNA_NFM1"}
+  938: {sprite: "4_DST_CAMEL"}
+  939: {sprite: "4_DST_SOLDIER"}
+  940: {sprite: "4_F_DESERT"}
+  941: {sprite: "4_F_DST_CHILD"}
+  942: {sprite: "4_F_DST_GRAND"}
+  943: {sprite: "4_M_DESERT"}
+  944: {sprite: "4_M_DST_CHILD"}
+  945: {sprite: "4_M_DST_GRAND"}
+  946: {sprite: "4_M_DST_MASTER"}
+  947: {sprite: "4_M_DST_TOUGH"}
+  948: {sprite: "4_ANGELING"}
+  949: {sprite: "4_ARCHANGELING"}
+  950: {sprite: "4_GHOSTRING"}
+  951: {sprite: "4_F_EDEN_MASTER"}
+  952: {sprite: "4_F_EDEN_OFFICER"}
+  953: {sprite: "4_M_EDEN_GUARDER"}
+  954: {sprite: "4_M_PATRICK"}
+  955: {sprite: "4_DONKEY"}
+  956: {sprite: "4_M_TRISTAN"}
+  957: {sprite: "4_WHITE_COW"}
+  958: {sprite: "4_F_RUSCHILD"}
+  959: {sprite: "4_F_RUSWOMAN1"}
+  960: {sprite: "4_F_RUSWOMAN2"}
+  961: {sprite: "4_F_RUSWOMAN3"}
+  962: {sprite: "4_M_RUSCHILD"}
+  963: {sprite: "4_M_GUSLIMAN"}
+  964: {sprite: "4_M_RUSBALD"}
+  965: {sprite: "4_M_RUSKING"}
+  966: {sprite: "4_M_RUSKNIGHT"}
+  967: {sprite: "4_M_RUSMAN1"}
+  968: {sprite: "4_M_RUSMAN2"}
+  969: {sprite: "4_M_DRAKE"}
+  970: {sprite: "4_F_BABAYAGA"}
+  971: {sprite: "4_F_RUSGREEN"}
+  972: {sprite: "4_RUS_DWOLF"}
+  973: {sprite: "1_FLAG_LION"}
+  974: {sprite: "1_FLAG_EAGLE"}
+  975: {sprite: "4_M_MIKID"}
+  976: {sprite: "4_BLUE_FLOWER"}
+  977: {sprite: "4_RED_FLOWER"}
+  978: {sprite: "4_YELL_FLOWER"}
+  979: {sprite: "4_F_CAVE1"}
+  980: {sprite: "4_F_MUT1"}
+  981: {sprite: "4_F_MUT2"}
+  982: {sprite: "4_F_SCIENCE"}
+  983: {sprite: "4_M_1STPRIN1"}
+  984: {sprite: "4_M_1STPRIN2"}
+  985: {sprite: "4_M_2NDPRIN1"}
+  986: {sprite: "4_M_2NDPRIN2"}
+  987: {sprite: "4_M_3RDPRIN1"}
+  988: {sprite: "4_M_3RDPRIN2"}
+  989: {sprite: "4_M_4THPRIN1"}
+  990: {sprite: "4_M_4THPRIN2"}
+  991: {sprite: "4_M_5THPRIN1"}
+  992: {sprite: "4_M_5THPRIN2"}
+  993: {sprite: "4_M_6THPRIN1"}
+  994: {sprite: "4_M_6THPRIN2"}
+  995: {sprite: "4_M_CASMAN1"}
+  996: {sprite: "4_M_CAVE1"}
+  997: {sprite: "4_M_MOCASS1"}
+  998: {sprite: "4_M_MOCASS2"}
+  999: {sprite: "4_M_MUT1"}
+  1001: {sprite: "Scorpion"}
+  1002: {sprite: "Poring"}
+  1003: {sprite: "Thief_bug_egg"}
+  1004: {sprite: "Hornet", shadow: 0.5}
+  1005: {sprite: "Farmiliar", shadow: 0.5}
+  1006: {sprite: "Thief_bug_larva"}
+  1007: {sprite: "Fabre", shadow: 0.5}
+  1008: {sprite: "Pupa", shadow: 0.3}
+  1009: {sprite: "Condor", shadow: 0.7}
+  1010: {sprite: "Wilow"}
+  1011: {sprite: "Chocho", shadow: 0.5}
+  1012: {sprite: "Roda_frog"}
+  1013: {sprite: "Wolf", shadow: 1.2}
+  1014: {sprite: "Spore"}
+  1015: {sprite: "Zombie"}
+  1016: {sprite: "Skel_archer"}
+  1017: {sprite: "Thief_bug_female"}
+  1018: {sprite: "Creamy", shadow: 0.7}
+  1019: {sprite: "Pecopeco", shadow: 1.2}
+  1020: {sprite: "Mandragora", shadow: 0}
+  1021: {sprite: "Thief_bug_male"}
+  1022: {sprite: "Were_wolf"}
+  1023: {sprite: "Ork_warrior"}
+  1024: {sprite: "Worm_tail"}
+  1025: {sprite: "Snake", shadow: 0}
+  1026: {sprite: "Munak"}
+  1027: {sprite: "Raptice"}
+  1028: {sprite: "Skel_soldier"}
+  1029: {sprite: "Isis"}
+  1030: {sprite: "Anacondaq", shadow: 0}
+  1031: {sprite: "Poporing"}
+  1032: {sprite: "Vorit"}
+  1033: {sprite: "Elder_wilow"}
+  1034: {sprite: "Thara_frog"}
+  1035: {sprite: "Hunter_fly", shadow: 0.5}
+  1036: {sprite: "Ghoul"}
+  1037: {sprite: "Side_winder", shadow: 0}
+  1038: {sprite: "Osiris"}
+  1039: {sprite: "Baphomet", shadow: 1.2}
+  1040: {sprite: "Golem", shadow: 2}
+  1041: {sprite: "Mummy"}
+  1042: {sprite: "Steel_chocho", shadow: 0.5}
+  1043: {sprite: "Seahores"}
+  1044: {sprite: "Obeaune"}
+  1045: {sprite: "Marc"}
+  1046: {sprite: "Doppelganger", shadow: 0}
+  1047: {sprite: "Peco_egg", shadow: 0.2}
+  1048: {sprite: "Thief_bug_egg", shadow: 0.2}
+  1049: {sprite: "Picky", shadow: 0.3}
+  1050: {sprite: "Picky_", shadow: 0.3}
+  1051: {sprite: "Thief_bug_larva", shadow: 0.3}
+  1052: {sprite: "Rocker"}
+  1053: {sprite: "Thief_bug_female"}
+  1054: {sprite: "Thief_bug_male"}
+  1055: {sprite: "Muka"}
+  1056: {sprite: "Smokie", shadow: 0.7}
+  1057: {sprite: "Yoyo", shadow: 0.7}
+  1058: {sprite: "Metaller"}
+  1059: {sprite: "Mistress"}
+  1060: {sprite: "Bigfoot"}
+  1061: {sprite: "Nightmare", shadow: 1.5}
+  1062: {sprite: "Poring_"}
+  1063: {sprite: "Lunatic", shadow: 0.5}
+  1064: {sprite: "MEGALODON"}
+  1065: {sprite: "STROUF"}
+  1066: {sprite: "VADON"}
+  1067: {sprite: "CORNUTUS"}
+  1068: {sprite: "HYDRA"}
+  1069: {sprite: "SWORD_FISH", shadow: 1.2}
+  1070: {sprite: "KUKRE", shadow: 0.3}
+  1071: {sprite: "PIRATE_SKEL"}
+  1072: {sprite: "KAHO", shadow: 0.5}
+  1073: {sprite: "CRAB"}
+  1074: {sprite: "SHELLFISH", shadow: 0.5}
+  1075: {sprite: "TURTLE"}
+  1076: {sprite: "SKELETON"}
+  1077: {sprite: "POISON_SPORE"}
+  1078: {sprite: "RED_PLANT", shadow: 0}
+  1079: {sprite: "BLUE_PLANT", shadow: 0}
+  1080: {sprite: "GREEN_PLANT", shadow: 0}
+  1081: {sprite: "YELLOW_PLANT", shadow: 0}
+  1082: {sprite: "WHITE_PLANT", shadow: 0}
+  1083: {sprite: "SHINING_PLANT", shadow: 0}
+  1084: {sprite: "BLACK_MUSHROOM", shadow: 0}
+  1085: {sprite: "RED_MUSHROOM", shadow: 0}
+  1086: {sprite: "GOLDEN_BUG"}
+  1087: {sprite: "ORK_HERO", shadow: 1.2}
+  1088: {sprite: "VOCAL"}
+  1089: {sprite: "TOAD", shadow: 1.5}
+  1090: {sprite: "MASTERING", shadow: 1.2}
+  1091: {sprite: "DRAGON_FLY", shadow: 0.5}
+  1092: {sprite: "VAGABOND_WOLF", shadow: 1.2}
+  1093: {sprite: "ECLIPSE"}
+  1094: {sprite: "AMBERNITE", shadow: 0.7}
+  1095: {sprite: "ANDRE", shadow: 0.5}
+  1096: {sprite: "ANGELING"}
+  1097: {sprite: "ANT_EGG", shadow: 0.2}
+  1098: {sprite: "ANUBIS", shadow: 2}
+  1099: {sprite: "ARGIOPE"}
+  1100: {sprite: "ARGOS"}
+  1101: {sprite: "BAPHOMET_", shadow: 0.5}
+  1102: {sprite: "BATHORY", shadow: 1.2}
+  1103: {sprite: "CARAMEL", shadow: 0.3}
+  1104: {sprite: "COCO", shadow: 0.7}
+  1105: {sprite: "DENIRO", shadow: 0.7}
+  1106: {sprite: "DESERT_WOLF", shadow: 1.2}
+  1107: {sprite: "DESERT_WOLF_B", shadow: 0.7}
+  1108: {sprite: "DEVIACE", shadow: 0.7}
+  1109: {sprite: "DEVIRUCHI", shadow: 0.7}
+  1110: {sprite: "DOKEBI", shadow: 0.7}
+  1111: {sprite: "DRAINLIAR", shadow: 0.5}
+  1112: {sprite: "DRAKE"}
+  1113: {sprite: "DROPS"}
+  1114: {sprite: "DUSTINESS", shadow: 0.5}
+  1115: {sprite: "EDDGA", shadow: 1.2}
+  1116: {sprite: "EGGYRA"}
+  1117: {sprite: "EVIL_DRUID"}
+  1118: {sprite: "FLORA"}
+  1119: {sprite: "FRILLDORA"}
+  1120: {sprite: "GHOSTRING"}
+  1121: {sprite: "GIEARTH", shadow: 0.7}
+  1122: {sprite: "GOBLIN_1"}
+  1123: {sprite: "GOBLIN_2"}
+  1124: {sprite: "GOBLIN_3"}
+  1125: {sprite: "GOBLIN_4"}
+  1126: {sprite: "GOBLIN_5"}
+  1127: {sprite: "HODE", shadow: 0}
+  1128: {sprite: "HORN"}
+  1129: {sprite: "HORONG", shadow: 0.5}
+  1130: {sprite: "JAKK"}
+  1131: {sprite: "JOKER", shadow: 0}
+  1132: {sprite: "KHALITZBURG"}
+  1133: {sprite: "KOBOLD_1"}
+  1134: {sprite: "KOBOLD_2"}
+  1135: {sprite: "KOBOLD_3"}
+  1136: {sprite: "KOBOLD_4"}
+  1137: {sprite: "KOBOLD_5"}
+  1138: {sprite: "MAGNOLIA", shadow: 0}
+  1139: {sprite: "MANTIS", shadow: 0.5}
+  1140: {sprite: "MARDUK", shadow: 1.2}
+  1141: {sprite: "MARINA", shadow: 0.5}
+  1142: {sprite: "MARINE_SPHERE", shadow: 0.5}
+  1143: {sprite: "MARIONETTE", shadow: 0.5}
+  1144: {sprite: "MARSE"}
+  1145: {sprite: "MARTIN", shadow: 0.5}
+  1146: {sprite: "MATYR"}
+  1147: {sprite: "MAYA", shadow: 1.5}
+  1148: {sprite: "MEDUSA"}
+  1149: {sprite: "MINOROUS", shadow: 1.5}
+  1150: {sprite: "MOONLIGHT"}
+  1151: {sprite: "MYST"}
+  1152: {sprite: "ORC_SKELETON"}
+  1153: {sprite: "ORC_ZOMBIE"}
+  1154: {sprite: "PASANA"}
+  1155: {sprite: "PETIT", shadow: 0.5}
+  1156: {sprite: "PETIT_", shadow: 0.5}
+  1157: {sprite: "PHARAOH"}
+  1158: {sprite: "PHEN", shadow: 0.7}
+  1159: {sprite: "PHREEONI", shadow: 1.2}
+  1160: {sprite: "PIERE", shadow: 0.7}
+  1161: {sprite: "PLANKTON", shadow: 0.5}
+  1162: {sprite: "RAFFLESIA", shadow: 0.5}
+  1163: {sprite: "RAYDRIC"}
+  1164: {sprite: "REQUIEM"}
+  1165: {sprite: "SAND_MAN"}
+  1166: {sprite: "SAVAGE"}
+  1167: {sprite: "SAVAGE_BABE", shadow: 0.5}
+  1168: {sprite: "Pupa"}
+  1169: {sprite: "SKEL_WORKER"}
+  1170: {sprite: "SOHEE", shadow: 0.7}
+  1171: {sprite: "SOLDIER_ANDRE"}
+  1172: {sprite: "SOLDIER_DENIRO"}
+  1173: {sprite: "SOLDIER_PIERE"}
+  1174: {sprite: "STAINER", shadow: 0.5}
+  1175: {sprite: "TAROU", shadow: 0.5}
+  1176: {sprite: "VITATA", shadow: 0.7}
+  1177: {sprite: "ZENORC"}
+  1178: {sprite: "ZEROM"}
+  1179: {sprite: "WHISPER"}
+  1180: {sprite: "NINE_TAIL"}
+  1181: {sprite: "dragon_5.gr2"}
+  1182: {sprite: "RED_MUSHROOM", shadow: 0}
+  1183: {sprite: "CHOCHO", shadow: 0.5}
+  1184: {sprite: "FABRE", shadow: 0.5}
+  1185: {sprite: "WHISPER"}
+  1186: {sprite: "WHISPER_BOSS", shadow: 2}
+  1187: {sprite: "SWITCH"}
+  1188: {sprite: "BON_GUN"}
+  1189: {sprite: "ORC_ARCHER"}
+  1190: {sprite: "ORC_LORD", shadow: 1.2}
+  1191: {sprite: "MIMIC"}
+  1192: {sprite: "WRAITH", shadow: 1.5}
+  1193: {sprite: "ALARM", shadow: 2}
+  1194: {sprite: "ARCLOUSE", shadow: 0.5}
+  1195: {sprite: "RIDEWORD", shadow: 0.5}
+  1196: {sprite: "SKEL_PRISONER"}
+  1197: {sprite: "ZOMBIE_PRISONER"}
+  1198: {sprite: "DARK_PRIEST"}
+  1199: {sprite: "PUNK", shadow: 0.5}
+  1200: {sprite: "ZHERLTHSH"}
+  1201: {sprite: "RYBIO", shadow: 1.2}
+  1202: {sprite: "PHENDARK", shadow: 1.5}
+  1203: {sprite: "MYSTELTAINN", shadow: 0.5}
+  1204: {sprite: "TIRFING", shadow: 0.5}
+  1205: {sprite: "EXECUTIONER"}
+  1206: {sprite: "ANOLIAN"}
+  1207: {sprite: "STING"}
+  1208: {sprite: "WANDER_MAN", shadow: 1.2}
+  1209: {sprite: "CRAMP", shadow: 0.7}
+  1210: {sprite: "Poring"}
+  1211: {sprite: "BRILIGHT", shadow: 0.5}
+  1212: {sprite: "IRON_FIST"}
+  1213: {sprite: "HIGH_ORC"}
+  1214: {sprite: "CHOCO", shadow: 0.7}
+  1215: {sprite: "STEM_WORM"}
+  1216: {sprite: "PENOMENA"}
+  1217: {sprite: "Poring"}
+  1218: {sprite: "Poring"}
+  1219: {sprite: "knight_of_abyss", shadow: 5}
+  1220: {sprite: "desert_wolf"}
+  1221: {sprite: "savage"}
+  1222: {sprite: "high_orc"}
+  1223: {sprite: "orc_warrior"}
+  1224: {sprite: "poison_spore"}
+  1225: {sprite: "choco"}
+  1226: {sprite: "kobold_1"}
+  1227: {sprite: "goblin_1"}
+  1228: {sprite: "phen"}
+  1229: {sprite: "fabre"}
+  1230: {sprite: "pupa"}
+  1231: {sprite: "creamy"}
+  1232: {sprite: "peco_egg"}
+  1233: {sprite: "pecopeco"}
+  1234: {sprite: "yoyo"}
+  1235: {sprite: "ork_warrior"}
+  1236: {sprite: "ant_egg"}
+  1237: {sprite: "andre"}
+  1238: {sprite: "picky"}
+  1239: {sprite: "deniro"}
+  1240: {sprite: "picky"}
+  1241: {sprite: "picky_"}
+  1242: {sprite: "MARIN"}
+  1243: {sprite: "SASQUATCH"}
+  1244: {sprite: "JAKK_XMAS"}
+  1245: {sprite: "GOBLINE_XMAS"}
+  1246: {sprite: "COOKIE_XMAS"}
+  1247: {sprite: "ANTONIO"}
+  1248: {sprite: "CRUISER", shadow: 0.7}
+  1249: {sprite: "MYSTCASE", shadow: 1.2}
+  1250: {sprite: "CHEPET", shadow: 0.5}
+  1251: {sprite: "KNIGHT_OF_WINDSTORM"}
+  1252: {sprite: "GARM", shadow: 2}
+  1253: {sprite: "Gargoyle"}
+  1254: {sprite: "Raggler", shadow: 0.7}
+  1255: {sprite: "Neraid", shadow: 0.5}
+  1256: {sprite: "Pest", shadow: 0.5}
+  1257: {sprite: "Injustice"}
+  1258: {sprite: "Goblin_Archer"}
+  1259: {sprite: "Gryphon"}
+  1260: {sprite: "Dark_Frame"}
+  1261: {sprite: "Wild_Rose", shadow: 0.7}
+  1262: {sprite: "Mutant_Dragon", shadow: 1.2}
+  1263: {sprite: "Wind_Ghost"}
+  1264: {sprite: "Merman"}
+  1265: {sprite: "Cookie"}
+  1266: {sprite: "Aster", shadow: 0}
+  1267: {sprite: "Carat"}
+  1268: {sprite: "Bloody_Knight", shadow: 2}
+  1269: {sprite: "Clock"}
+  1270: {sprite: "C_Tower_Manager", shadow: 1.5}
+  1271: {sprite: "Alligator"}
+  1272: {sprite: "Dark_Lord", shadow: 1.5}
+  1273: {sprite: "Orc_Lady"}
+  1274: {sprite: "Megalith", shadow: 1.2}
+  1275: {sprite: "Alice"}
+  1276: {sprite: "Raydric_Archer"}
+  1277: {sprite: "Greatest_General", shadow: 0.5}
+  1278: {sprite: "Stalactic_Golem", shadow: 2}
+  1279: {sprite: "Tri_Joint", shadow: 0.5}
+  1280: {sprite: "Steam_Goblin"}
+  1281: {sprite: "SageWorm", shadow: 0.5}
+  1282: {sprite: "Kobold_Archer"}
+  1283: {sprite: "Chimera", shadow: 2}
+  1284: {sprite: "Hugeling90_6.gr2"}
+  1285: {sprite: "Aguardian90_8.gr2"}
+  1286: {sprite: "Kguardian90_7.gr2"}
+  1287: {sprite: "Sguardian90_9.gr2"}
+  1288: {sprite: "Empelium90_0.gr2"}
+  1289: {sprite: "maya_puple", shadow: 1.5}
+  1290: {sprite: "SKELETON_GENERAL"}
+  1291: {sprite: "WRAITH_DEAD", shadow: 1.5}
+  1292: {sprite: "MINI_DEMON", shadow: 0.7}
+  1293: {sprite: "CREMY_FEAR", shadow: 0.7}
+  1294: {sprite: "KILLER_MANTIS"}
+  1295: {sprite: "OWL_BARON", shadow: 1.2}
+  1296: {sprite: "KOBOLT_LEADER"}
+  1297: {sprite: "ANCIENT_MUMMY"}
+  1298: {sprite: "ZOMBIE_MASTER"}
+  1299: {sprite: "GOBLIN_LEADER"}
+  1300: {sprite: "CATERPILLAR", shadow: 0.5}
+  1301: {sprite: "AM_MUT", shadow: 0.7}
+  1302: {sprite: "DARK_ILLUSION", shadow: 0}
+  1303: {sprite: "GIANT_HONET"}
+  1304: {sprite: "GIANT_SPIDER"}
+  1305: {sprite: "ANCIENT_WORM"}
+  1306: {sprite: "LEIB_OLMAI"}
+  1307: {sprite: "CAT_O_NINE_TAIL"}
+  1308: {sprite: "PANZER_GOBLIN"}
+  1309: {sprite: "GAJOMART", shadow: 0.5}
+  1310: {sprite: "MAJORUROS", shadow: 1.5}
+  1311: {sprite: "GULLINBURSTI"}
+  1312: {sprite: "TURTLE_GENERAL", shadow: 1.5}
+  1313: {sprite: "MOBSTER"}
+  1314: {sprite: "PERMETER"}
+  1315: {sprite: "ASSULTER"}
+  1316: {sprite: "SOLIDER"}
+  1317: {sprite: "FUR_SEAL"}
+  1318: {sprite: "HEATER"}
+  1319: {sprite: "FREEZER"}
+  1320: {sprite: "OWL_DUKE", shadow: 1.2}
+  1321: {sprite: "DRAGON_TAIL"}
+  1322: {sprite: "SPRING_RABBIT"}
+  1323: {sprite: "SEE_OTTER"}
+  1324: {sprite: "TREASUREBOX_2.gr2"}
+  1325: {sprite: "TREASUREBOX_2.gr2"}
+  1326: {sprite: "TREASUREBOX_2.gr2"}
+  1327: {sprite: "TREASUREBOX_2.gr2"}
+  1328: {sprite: "TREASUREBOX_2.gr2"}
+  1329: {sprite: "TREASUREBOX_2.gr2"}
+  1330: {sprite: "TREASUREBOX_2.gr2"}
+  1331: {sprite: "TREASUREBOX_2.gr2"}
+  1332: {sprite: "TREASUREBOX_2.gr2"}
+  1333: {sprite: "TREASUREBOX_2.gr2"}
+  1334: {sprite: "TREASUREBOX_2.gr2"}
+  1335: {sprite: "TREASUREBOX_2.gr2"}
+  1336: {sprite: "TREASUREBOX_2.gr2"}
+  1337: {sprite: "TREASUREBOX_2.gr2"}
+  1338: {sprite: "TREASUREBOX_2.gr2"}
+  1339: {sprite: "TREASUREBOX_2.gr2"}
+  1340: {sprite: "TREASUREBOX_2.gr2"}
+  1341: {sprite: "TREASUREBOX_2.gr2"}
+  1342: {sprite: "TREASUREBOX_2.gr2"}
+  1343: {sprite: "TREASUREBOX_2.gr2"}
+  1344: {sprite: "TREASUREBOX_2.gr2"}
+  1345: {sprite: "TREASUREBOX_2.gr2"}
+  1346: {sprite: "TREASUREBOX_2.gr2"}
+  1347: {sprite: "TREASUREBOX_2.gr2"}
+  1348: {sprite: "TREASUREBOX_2.gr2"}
+  1349: {sprite: "TREASUREBOX_2.gr2"}
+  1350: {sprite: "TREASUREBOX_2.gr2"}
+  1351: {sprite: "TREASUREBOX_2.gr2"}
+  1352: {sprite: "TREASUREBOX_2.gr2"}
+  1353: {sprite: "TREASUREBOX_2.gr2"}
+  1354: {sprite: "TREASUREBOX_2.gr2"}
+  1355: {sprite: "TREASUREBOX_2.gr2"}
+  1356: {sprite: "TREASUREBOX_2.gr2"}
+  1357: {sprite: "TREASUREBOX_2.gr2"}
+  1358: {sprite: "TREASUREBOX_2.gr2"}
+  1359: {sprite: "TREASUREBOX_2.gr2"}
+  1360: {sprite: "TREASUREBOX_2.gr2"}
+  1361: {sprite: "TREASUREBOX_2.gr2"}
+  1362: {sprite: "TREASUREBOX_2.gr2"}
+  1363: {sprite: "TREASUREBOX_2.gr2"}
+  1364: {sprite: "G_ASSULTER"}
+  1365: {sprite: "APOCALIPS", shadow: 2}
+  1366: {sprite: "LAVA_GOLEM"}
+  1367: {sprite: "BLAZZER"}
+  1368: {sprite: "GEOGRAPHER", shadow: 0.5}
+  1369: {sprite: "GRAND_PECO"}
+  1370: {sprite: "SUCCUBUS"}
+  1371: {sprite: "FAKE_ANGEL", shadow: 0.5}
+  1372: {sprite: "GOAT", shadow: 1.2}
+  1373: {sprite: "LORD_OF_DEATH", shadow: 2}
+  1374: {sprite: "INCUBUS"}
+  1375: {sprite: "THE_PAPER", shadow: 0.5}
+  1376: {sprite: "HARPY"}
+  1377: {sprite: "ELDER"}
+  1378: {sprite: "DEMON_PUNGUS", shadow: 0.5}
+  1379: {sprite: "NIGHTMARE_TERROR", shadow: 1.5}
+  1380: {sprite: "DRILLER"}
+  1381: {sprite: "GRIZZLY"}
+  1382: {sprite: "DIABOLIC", shadow: 0.7}
+  1383: {sprite: "EXPLOSION", shadow: 0.5}
+  1384: {sprite: "DELETER", shadow: 0.7}
+  1385: {sprite: "DELETER_", shadow: 0.7}
+  1386: {sprite: "SLEEPER"}
+  1387: {sprite: "GIG"}
+  1388: {sprite: "ARCHANGELING"}
+  1389: {sprite: "DRACULA", shadow: 0}
+  1390: {sprite: "VIOLY"}
+  1391: {sprite: "GALAPAGO"}
+  1392: {sprite: "ROTAR_ZAIRO"}
+  1393: {sprite: "G_MUMMY"}
+  1394: {sprite: "G_ZOMBIE"}
+  1395: {sprite: "CRYSTAL_1", shadow: 0.5}
+  1396: {sprite: "CRYSTAL_2", shadow: 0.5}
+  1397: {sprite: "CRYSTAL_3", shadow: 0.5}
+  1398: {sprite: "CRYSTAL_4", shadow: 0.5}
+  1399: {sprite: "EVENT_BAPHO"}
+  1400: {sprite: "KARAKASA"}
+  1401: {sprite: "SHINOBI", shadow: 0}
+  1402: {sprite: "POISON_TOAD", shadow: 0.7}
+  1403: {sprite: "ANTIQUE_FIRELOCK"}
+  1404: {sprite: "MIYABI_NINGYO"}
+  1405: {sprite: "TENGU", shadow: 1.2}
+  1406: {sprite: "KAPHA"}
+  1407: {sprite: "DOKEBI_"}
+  1408: {sprite: "BLOOD_BUTTERFLY", shadow: 1.2}
+  1409: {sprite: "RICE_CAKE_BOY"}
+  1410: {sprite: "LIVE_PEACH_TREE", shadow: 1.5}
+  1411: {sprite: "PEACH_TREE_BULLET"}
+  1412: {sprite: "EVIL_CLOUD_HERMIT", shadow: 2}
+  1413: {sprite: "WILD_GINSENG", shadow: 0.5}
+  1414: {sprite: "GINSENG_BULLET"}
+  1415: {sprite: "BABY_LEOPARD"}
+  1416: {sprite: "WICKED_NYMPH"}
+  1417: {sprite: "ZIPPER_BEAR"}
+  1418: {sprite: "DARK_SNAKE_LORD", shadow: 2}
+  1419: {sprite: "FARMILIAR"}
+  1420: {sprite: "Skel_archer"}
+  1421: {sprite: "ISIS"}
+  1422: {sprite: "HUNTER_FLY"}
+  1423: {sprite: "GHOUL"}
+  1424: {sprite: "SIDE_WINDER"}
+  1425: {sprite: "OBEAUNE"}
+  1426: {sprite: "MARC"}
+  1427: {sprite: "NIGHTMARE"}
+  1428: {sprite: "POISON_SPORE"}
+  1429: {sprite: "ARGIOPE"}
+  1430: {sprite: "ARGOS"}
+  1431: {sprite: "BAPHOMET_"}
+  1432: {sprite: "DESERT_WOLF"}
+  1433: {sprite: "DEVIRUCHI"}
+  1434: {sprite: "DRAINLIAR"}
+  1435: {sprite: "EVIL_DRUID"}
+  1436: {sprite: "JAKK"}
+  1437: {sprite: "JOKER"}
+  1438: {sprite: "KHALITZBURG"}
+  1439: {sprite: "HIGH_ORC"}
+  1440: {sprite: "STEM_WORM"}
+  1441: {sprite: "PENOMENA"}
+  1442: {sprite: "SASQUATCH"}
+  1443: {sprite: "CRUISER"}
+  1444: {sprite: "CHEPET"}
+  1445: {sprite: "RAGGLER"}
+  1446: {sprite: "INJUSTICE"}
+  1447: {sprite: "GRYPHON"}
+  1448: {sprite: "DARK_FRAME"}
+  1449: {sprite: "MUTANT_DRAGON"}
+  1450: {sprite: "WIND_GHOST"}
+  1451: {sprite: "MERMAN"}
+  1452: {sprite: "ORC_LADY"}
+  1453: {sprite: "RAYDRIC_ARCHER"}
+  1454: {sprite: "TRI_JOINT"}
+  1455: {sprite: "KOBOLD_ARCHER"}
+  1456: {sprite: "CHIMERA"}
+  1457: {sprite: "MANTIS"}
+  1458: {sprite: "MARDUK"}
+  1459: {sprite: "MARIONETTE"}
+  1460: {sprite: "MATYR"}
+  1461: {sprite: "MINOROUS"}
+  1462: {sprite: "ORC_SKELETON"}
+  1463: {sprite: "ORC_ZOMBIE"}
+  1464: {sprite: "PASANA"}
+  1465: {sprite: "PETIT"}
+  1466: {sprite: "PETIT_"}
+  1467: {sprite: "RAYDRIC"}
+  1468: {sprite: "REQUIEM"}
+  1469: {sprite: "SKEL_WORKER"}
+  1470: {sprite: "ZEROM"}
+  1471: {sprite: "NINE_TAIL"}
+  1472: {sprite: "BON_GUN"}
+  1473: {sprite: "ORC_ARCHER"}
+  1474: {sprite: "MIMIC"}
+  1475: {sprite: "WRAITH"}
+  1476: {sprite: "ALARM"}
+  1477: {sprite: "ARCLOUSE"}
+  1478: {sprite: "RIDEWORD"}
+  1479: {sprite: "SKEL_PRISONER"}
+  1480: {sprite: "ZOMBIE_PRISONER"}
+  1481: {sprite: "PUNK"}
+  1482: {sprite: "ZHERLTHSH"}
+  1483: {sprite: "RYBIO"}
+  1484: {sprite: "PHENDARK"}
+  1485: {sprite: "MYSTELTAINN"}
+  1486: {sprite: "TIRFING"}
+  1487: {sprite: "EXECUTIONER"}
+  1488: {sprite: "ANOLIAN"}
+  1489: {sprite: "STING"}
+  1490: {sprite: "WANDER_MAN"}
+  1491: {sprite: "DOKEBI"}
+  1492: {sprite: "INCANTATION_SAMURAI", shadow: 2}
+  1493: {sprite: "DRYAD"}
+  1494: {sprite: "KIND_OF_BEETLE"}
+  1495: {sprite: "STONE_SHOOTER"}
+  1496: {sprite: "STONE_SHOOTER_BULLET"}
+  1497: {sprite: "WOODEN_GOLEM", shadow: 2}
+  1498: {sprite: "WOOTAN_SHOOTER", shadow: 1.5}
+  1499: {sprite: "WOOTAN_FIGHTER", shadow: 1.5}
+  1500: {sprite: "PARASITE"}
+  1501: {sprite: "PARASITE_BULLET"}
+  1502: {sprite: "Poring"}
+  1503: {sprite: "GIBBET"}
+  1504: {sprite: "DULLAHAN"}
+  1505: {sprite: "LOLI_RURI"}
+  1506: {sprite: "DISGUISE"}
+  1507: {sprite: "BLOODY_MURDERER", shadow: 2}
+  1508: {sprite: "QUVE", shadow: 0.5}
+  1509: {sprite: "LUDE", shadow: 0.5}
+  1510: {sprite: "HYLOZOIST", shadow: 0.5}
+  1511: {sprite: "AMON_RA"}
+  1512: {sprite: "HYEGUN"}
+  1513: {sprite: "CIVIL_SERVANT"}
+  1514: {sprite: "DANCING_DRAGON"}
+  1515: {sprite: "GARM_BABY"}
+  1516: {sprite: "INCREASE_SOIL", shadow: 0}
+  1517: {sprite: "LI_ME_MANG_RYANG"}
+  1518: {sprite: "BACSOJIN"}
+  1519: {sprite: "CHUNG_E", shadow: 0.7}
+  1520: {sprite: "BOILED_RICE"}
+  1521: {sprite: "Alice"}
+  1522: {sprite: "ANCIENT_MUMMY"}
+  1523: {sprite: "ANTIQUE_FIRELOCK"}
+  1524: {sprite: "BABY_LEOPARD"}
+  1525: {sprite: "BATHORY"}
+  1526: {sprite: "BLOOD_BUTTERFLY"}
+  1527: {sprite: "C_TOWER_MANAGER"}
+  1528: {sprite: "CLOCK"}
+  1529: {sprite: "DARK_SNAKE_LORD"}
+  1530: {sprite: "DRACULA"}
+  1531: {sprite: "EVIL_CLOUD_HERMIT"}
+  1532: {sprite: "EXPLOSION"}
+  1533: {sprite: "FUR_SEAL"}
+  1534: {sprite: "GOBLIN_1"}
+  1535: {sprite: "GOBLIN_2"}
+  1536: {sprite: "GOBLIN_3"}
+  1537: {sprite: "GOBLIN_4"}
+  1538: {sprite: "GOBLIN_5"}
+  1539: {sprite: "GOBLIN_LEADER"}
+  1540: {sprite: "GOLEM"}
+  1541: {sprite: "GREATEST_GENERAL"}
+  1542: {sprite: "INCANTATION_SAMURAI"}
+  1543: {sprite: "KAPHA"}
+  1544: {sprite: "KARAKASA"}
+  1545: {sprite: "KOBOLD_1"}
+  1546: {sprite: "KOBOLD_2"}
+  1547: {sprite: "KOBOLD_3"}
+  1548: {sprite: "KOBOLT_LEADER"}
+  1549: {sprite: "LAVA_GOLEM"}
+  1550: {sprite: "LIVE_PEACH_TREE"}
+  1551: {sprite: "MARSE"}
+  1552: {sprite: "MIYABI_NINGYO"}
+  1553: {sprite: "MYST"}
+  1554: {sprite: "NIGHTMARE_TERROR"}
+  1555: {sprite: "PARASITE"}
+  1556: {sprite: "POISON_TOAD"}
+  1557: {sprite: "ROTAR_ZAIRO"}
+  1558: {sprite: "SAND_MAN"}
+  1559: {sprite: "SCORPION"}
+  1560: {sprite: "SHINOBI"}
+  1561: {sprite: "SMOKIE"}
+  1562: {sprite: "Skel_soldier"}
+  1563: {sprite: "TENGU"}
+  1564: {sprite: "WICKED_NYMPH"}
+  1565: {sprite: "WILD_GINSENG"}
+  1566: {sprite: "WRAITH_DEAD"}
+  1567: {sprite: "ANCIENT_WORM"}
+  1568: {sprite: "ANGELING"}
+  1569: {sprite: "BLOODY_KNIGHT"}
+  1570: {sprite: "CRAMP"}
+  1571: {sprite: "DEVIACE"}
+  1572: {sprite: "DROPS"}
+  1573: {sprite: "ELDER"}
+  1574: {sprite: "ELDER_WILOW"}
+  1575: {sprite: "FLORA"}
+  1576: {sprite: "GHOSTRING"}
+  1577: {sprite: "GOBLIN_ARCHER"}
+  1578: {sprite: "HORONG"}
+  1579: {sprite: "HYDRA"}
+  1580: {sprite: "INCUBUS"}
+  1581: {sprite: "VOCAL"}
+  1582: {sprite: "DEVILING"}
+  1583: {sprite: "TAO_GUNKA"}
+  1584: {sprite: "TAMRUAN", shadow: 1.2}
+  1585: {sprite: "MIME_MONKEY"}
+  1586: {sprite: "LEAF_CAT", shadow: 0.5}
+  1587: {sprite: "KRABEN", shadow: 0.5}
+  1588: {sprite: "ORC_XMAS"}
+  1589: {sprite: "Mandragora"}
+  1590: {sprite: "GEOGRAPHER"}
+  1591: {sprite: "Lunatic"}
+  1592: {sprite: "MOBSTER"}
+  1593: {sprite: "ANCIENT_MUMMY"}
+  1594: {sprite: "FREEZER"}
+  1595: {sprite: "MARIN"}
+  1596: {sprite: "TAMRUAN"}
+  1597: {sprite: "Gargoyle"}
+  1598: {sprite: "BLAZZER"}
+  1599: {sprite: "WHISPER_BOSS"}
+  1600: {sprite: "HEATER"}
+  1601: {sprite: "PERMETER"}
+  1602: {sprite: "SOLIDER"}
+  1603: {sprite: "BIGFOOT"}
+  1604: {sprite: "GIANT_HONET"}
+  1605: {sprite: "DARK_ILLUSION"}
+  1606: {sprite: "GARM_BABY"}
+  1607: {sprite: "GOBLINE_XMAS"}
+  1608: {sprite: "Thief_bug_male"}
+  1609: {sprite: "DANCING_DRAGON"}
+  1610: {sprite: "Munak"}
+  1611: {sprite: "BON_GUN"}
+  1612: {sprite: "HYEGUN"}
+  1613: {sprite: "METALING"}
+  1614: {sprite: "MINERAL", shadow: 0.5}
+  1615: {sprite: "OBSIDIAN", shadow: 0.5}
+  1616: {sprite: "PITMAN"}
+  1617: {sprite: "WASTE_STOVE", shadow: 1.5}
+  1618: {sprite: "UNGOLIANT", shadow: 1.5}
+  1619: {sprite: "PORCELLIO", shadow: 0.3}
+  1620: {sprite: "NOXIOUS", shadow: 0}
+  1621: {sprite: "VENOMOUS", shadow: 0}
+  1622: {sprite: "TEDDY_BEAR", shadow: 0.3}
+  1623: {sprite: "RSX_0806", shadow: 2}
+  1624: {sprite: "WASTE_STOVE"}
+  1625: {sprite: "PORCELLIO"}
+  1626: {sprite: "DARK_PRIEST"}
+  1627: {sprite: "ANOPHELES", shadow: 0.3}
+  1628: {sprite: "MOLE", shadow: 0.5}
+  1629: {sprite: "HILL_WIND"}
+  1630: {sprite: "BACSOJIN"}
+  1631: {sprite: "CHUNG_E", shadow: 0.7}
+  1632: {sprite: "GREMLIN"}
+  1633: {sprite: "BEHOLDER", shadow: 0.5}
+  1634: {sprite: "SEYREN"}
+  1635: {sprite: "EREMES"}
+  1636: {sprite: "HARWORD"}
+  1637: {sprite: "MAGALETA"}
+  1638: {sprite: "SHECIL"}
+  1639: {sprite: "KATRINN"}
+  1640: {sprite: "SEYREN"}
+  1641: {sprite: "EREMES"}
+  1642: {sprite: "HARWORD"}
+  1643: {sprite: "MAGALETA"}
+  1644: {sprite: "SHECIL"}
+  1645: {sprite: "KATRINN"}
+  1646: {sprite: "SEYREN"}
+  1647: {sprite: "EREMES"}
+  1648: {sprite: "HARWORD"}
+  1649: {sprite: "MAGALETA"}
+  1650: {sprite: "SHECIL"}
+  1651: {sprite: "KATRINN"}
+  1652: {sprite: "YGNIZEM"}
+  1653: {sprite: "WHIKEBAIN"}
+  1654: {sprite: "ARMAIA"}
+  1655: {sprite: "EREND"}
+  1656: {sprite: "KAVAC"}
+  1657: {sprite: "RAWREL"}
+  1658: {sprite: "YGNIZEM"}
+  1659: {sprite: "WHIKEBAIN"}
+  1660: {sprite: "ARMAIA"}
+  1661: {sprite: "EREND"}
+  1662: {sprite: "KAVAC"}
+  1663: {sprite: "RAWREL"}
+  1664: {sprite: "POTON_CANON", shadow: 0.5}
+  1665: {sprite: "POTON_CANON_1", shadow: 0.5}
+  1666: {sprite: "POTON_CANON_2", shadow: 0.5}
+  1667: {sprite: "POTON_CANON_3", shadow: 0.5}
+  1668: {sprite: "ARCHDAM"}
+  1669: {sprite: "DIMIK"}
+  1670: {sprite: "DIMIK_1"}
+  1671: {sprite: "DIMIK_2"}
+  1672: {sprite: "DIMIK_3"}
+  1673: {sprite: "DIMIK_4"}
+  1674: {sprite: "MONEMUS"}
+  1675: {sprite: "VENATU"}
+  1676: {sprite: "VENATU_1"}
+  1677: {sprite: "VENATU_2"}
+  1678: {sprite: "VENATU_3"}
+  1679: {sprite: "VENATU_4"}
+  1680: {sprite: "HILL_WIND_1"}
+  1681: {sprite: "GEMINI"}
+  1682: {sprite: "REMOVAL"}
+  1683: {sprite: "POTON_CANON"}
+  1684: {sprite: "ARCHDAM"}
+  1685: {sprite: "APOCALIPS_H", shadow: 2}
+  1686: {sprite: "ORC_BABY", shadow: 0.5}
+  1687: {sprite: "GREEN_IGUANA"}
+  1688: {sprite: "LADY_TANEE"}
+  1689: {sprite: "G_BACSOJIN"}
+  1690: {sprite: "G_SPRING_RABBIT"}
+  1691: {sprite: "KRABEN"}
+  1692: {sprite: "BREEZE", shadow: 0.5}
+  1693: {sprite: "PLASMA_Y", shadow: 0.7}
+  1694: {sprite: "PLASMA_R", shadow: 0.7}
+  1695: {sprite: "PLASMA_G", shadow: 0.7}
+  1696: {sprite: "PLASMA_P", shadow: 0.7}
+  1697: {sprite: "PLASMA_B", shadow: 0.7}
+  1698: {sprite: "DEATHWORD"}
+  1699: {sprite: "ANCIENT_MIMIC"}
+  1700: {sprite: "OBSERVATION"}
+  1701: {sprite: "SHELTER"}
+  1702: {sprite: "RETRIBUTION", shadow: 1.2}
+  1703: {sprite: "SOLACE", shadow: 0.5}
+  1704: {sprite: "THA_ODIUM", shadow: 1.5}
+  1705: {sprite: "THA_DESPERO", shadow: 0.7}
+  1706: {sprite: "THA_MAERO"}
+  1707: {sprite: "THA_DOLOR", shadow: 0.5}
+  1708: {sprite: "THANATOS", shadow: 1.2}
+  1709: {sprite: "THA_ODIUM"}
+  1710: {sprite: "THA_DESPERO"}
+  1711: {sprite: "THA_MAERO"}
+  1712: {sprite: "THA_DOLOR"}
+  1713: {sprite: "ACIDUS", shadow: 2}
+  1714: {sprite: "FERUS", shadow: 1.2}
+  1715: {sprite: "NOVUS", shadow: 0.7}
+  1716: {sprite: "ACIDUS_", shadow: 2}
+  1717: {sprite: "FERUS_", shadow: 1.2}
+  1718: {sprite: "NOVUS_", shadow: 0.7}
+  1719: {sprite: "DETALE", shadow: 2}
+  1720: {sprite: "HYDRO", shadow: 1.2}
+  1721: {sprite: "DRAGON_EGG"}
+  1722: {sprite: "JAKK"}
+  1723: {sprite: "SHECIL"}
+  1724: {sprite: "POTON_CANON"}
+  1725: {sprite: "Poring"}
+  1726: {sprite: "Lunatic"}
+  1727: {sprite: "SAVAGE_BABE"}
+  1728: {sprite: "DESERT_WOLF_B"}
+  1729: {sprite: "BAPHOMET_", shadow: 0.5}
+  1730: {sprite: "DEVIRUCHI"}
+  1731: {sprite: "DOPPELGANGER"}
+  1732: {sprite: "TREASUREBOX_2.gr2"}
+  1733: {sprite: "KIEL"}
+  1734: {sprite: "KIEL_"}
+  1735: {sprite: "ALICEL"}
+  1736: {sprite: "ALIOT"}
+  1737: {sprite: "ALIZA"}
+  1738: {sprite: "CONSTANT", shadow: 0.5}
+  1739: {sprite: "ALICEL"}
+  1740: {sprite: "ALIOT"}
+  1741: {sprite: "COOKIE_XMAS"}
+  1742: {sprite: "Carat"}
+  1743: {sprite: "MYSTCASE"}
+  1744: {sprite: "Wild_Rose"}
+  1745: {sprite: "CONSTANT"}
+  1746: {sprite: "ALIZA"}
+  1747: {sprite: "Snake"}
+  1748: {sprite: "Anacondaq"}
+  1749: {sprite: "Medusa"}
+  1750: {sprite: "RED_PLANT"}
+  1751: {sprite: "RANDGRIS"}
+  1752: {sprite: "SKOGUL"}
+  1753: {sprite: "FRUS"}
+  1754: {sprite: "SKEGGIOLD"}
+  1755: {sprite: "SKEGGIOLD_"}
+  1756: {sprite: "HYDRO"}
+  1757: {sprite: "ACIDUS"}
+  1758: {sprite: "FERUS"}
+  1759: {sprite: "ACIDUS_"}
+  1760: {sprite: "FERUS_"}
+  1761: {sprite: "SKOGUL"}
+  1762: {sprite: "FRUS"}
+  1763: {sprite: "SKEGGIOLD"}
+  1764: {sprite: "SKEGGIOLD_"}
+  1765: {sprite: "G_RANDGRIS"}
+  1766: {sprite: "EM_ANGELING"}
+  1767: {sprite: "EM_DEVILING"}
+  1768: {sprite: "GLOOMUNDERNIGHT", shadow: 2}
+  1769: {sprite: "AGAV"}
+  1770: {sprite: "ECHIO"}
+  1771: {sprite: "VANBERK"}
+  1772: {sprite: "ISILLA"}
+  1773: {sprite: "HODREMLIN"}
+  1774: {sprite: "SEEKER"}
+  1775: {sprite: "SNOWIER", shadow: 2}
+  1776: {sprite: "SIROMA"}
+  1777: {sprite: "ICE_TITAN", shadow: 2}
+  1778: {sprite: "GAZETI", shadow: 2}
+  1779: {sprite: "KTULLANUX", shadow: 1.5}
+  1780: {sprite: "MUSCIPULAR", shadow: 0.5}
+  1781: {sprite: "DROSERA", shadow: 0.7}
+  1782: {sprite: "ROWEEN", shadow: 0.5}
+  1783: {sprite: "GALION"}
+  1784: {sprite: "STAPO"}
+  1785: {sprite: "ATROS", shadow: 2}
+  1786: {sprite: "AGAV"}
+  1787: {sprite: "ECHIO"}
+  1788: {sprite: "ICE_TITAN"}
+  1789: {sprite: "ICEICLE", shadow: 0}
+  1790: {sprite: "RAFFLESIA"}
+  1791: {sprite: "GALION"}
+  1792: {sprite: "SOCCER_BALL", shadow: 0}
+  1793: {sprite: "MEGALITH"}
+  1794: {sprite: "ROWEEN"}
+  1795: {sprite: "BLOODY_KNIGHT", shadow: 2}
+  1796: {sprite: "AUNOE"}
+  1797: {sprite: "FANAT"}
+  1798: {sprite: "TREASUREBOX_2.gr2"}
+  1799: {sprite: "SEYREN"}
+  1800: {sprite: "EREMES"}
+  1801: {sprite: "HARWORD"}
+  1802: {sprite: "MAGALETA"}
+  1803: {sprite: "SHECIL"}
+  1804: {sprite: "KATRINN"}
+  1805: {sprite: "SEYREN"}
+  1806: {sprite: "EREMES"}
+  1807: {sprite: "HARWORD"}
+  1808: {sprite: "MAGALETA"}
+  1809: {sprite: "SHECIL"}
+  1810: {sprite: "KATRINN"}
+  1811: {sprite: "SMOKIE"}
+  1812: {sprite: "LUDE"}
+  1813: {sprite: "HYDRO"}
+  1814: {sprite: "MOONLIGHT"}
+  1815: {sprite: "EVENT_RICECAKE"}
+  1816: {sprite: "EVENT_GOURD"}
+  1817: {sprite: "DETALE"}
+  1818: {sprite: "ALARM"}
+  1819: {sprite: "BATHORY"}
+  1820: {sprite: "BIGFOOT"}
+  1821: {sprite: "DESERT_WOLF"}
+  1822: {sprite: "DEVIRUCHI"}
+  1823: {sprite: "FREEZER"}
+  1824: {sprite: "GARM_BABY"}
+  1825: {sprite: "GOBLINE_XMAS"}
+  1826: {sprite: "MYST"}
+  1827: {sprite: "SASQUATCH"}
+  1828: {sprite: "GULLINBURSTI"}
+  1829: {sprite: "Kguardian90_7.gr2"}
+  1830: {sprite: "Aguardian90_8.gr2"}
+  1831: {sprite: "SALAMANDER", shadow: 1.2}
+  1832: {sprite: "IFRIT", shadow: 1.2}
+  1833: {sprite: "KASA"}
+  1834: {sprite: "SALAMANDER"}
+  1835: {sprite: "KASA"}
+  1836: {sprite: "MAGMARING"}
+  1837: {sprite: "IMP"}
+  1838: {sprite: "KNOCKER"}
+  1839: {sprite: "BYORGUE"}
+  1840: {sprite: "GOLDEN_SAVAGE"}
+  1841: {sprite: "Snake"}
+  1842: {sprite: "Anacondaq"}
+  1843: {sprite: "SIDE_WINDER"}
+  1844: {sprite: "ISIS"}
+  1845: {sprite: "TREASUREBOX_2.gr2"}
+  1846: {sprite: "Empelium90_0.gr2"}
+  1847: {sprite: "Poring"}
+  1848: {sprite: "Baphomet"}
+  1849: {sprite: "Osiris"}
+  1850: {sprite: "ORK_HERO"}
+  1851: {sprite: "MOBSTER"}
+  1852: {sprite: "EM_ANGELING"}
+  1853: {sprite: "EM_DEVILING"}
+  1854: {sprite: "Muka"}
+  1855: {sprite: "POISON_SPORE"}
+  1856: {sprite: "MAGNOLIA"}
+  1857: {sprite: "MARIN"}
+  1858: {sprite: "PLANKTON"}
+  1859: {sprite: "Mandragora"}
+  1860: {sprite: "COCO"}
+  1861: {sprite: "CHOCO"}
+  1862: {sprite: "MARTIN"}
+  1863: {sprite: "G_SPRING_RABBIT"}
+  1864: {sprite: "ZOMBIE_SLAUGHTER"}
+  1865: {sprite: "RAGGED_ZOMBIE"}
+  1866: {sprite: "HELL_POODLE", shadow: 1.2}
+  1867: {sprite: "BANSHEE"}
+  1868: {sprite: "BANSHEE"}
+  1869: {sprite: "FLAME_SKULL"}
+  1870: {sprite: "NECROMANCER", shadow: 1.2}
+  1871: {sprite: "FALLINGBISHOP"}
+  1872: {sprite: "HUNTER_FLY"}
+  1873: {sprite: "DRAGON_FLY", shadow: 2}
+  1874: {sprite: "BEELZEBUB_", shadow: 2}
+  1875: {sprite: "TRISTAN_3RD", shadow: 1.2}
+  1876: {sprite: "LORD_OF_DEATH"}
+  1877: {sprite: "CRYSTAL_4", shadow: 0.5}
+  1878: {sprite: "SHINING_PLANT"}
+  1879: {sprite: "ECLIPSE_P"}
+  1880: {sprite: "WOOD_GOBLIN"}
+  1881: {sprite: "LES"}
+  1882: {sprite: "VAVAYAGA", shadow: 0}
+  1883: {sprite: "UZHAS"}
+  1884: {sprite: "MAVKA"}
+  1885: {sprite: "GOPINICH", shadow: 2}
+  1886: {sprite: "MAVKA"}
+  1887: {sprite: "FREEZER"}
+  1888: {sprite: "GARM_BABY"}
+  1889: {sprite: "GARM", shadow: 2}
+  1890: {sprite: "GOPINICH"}
+  1891: {sprite: "G_RANDGRIS"}
+  1892: {sprite: "LOLI_RURI"}
+  1893: {sprite: "knight_of_abyss"}
+  1894: {sprite: "POURING"}
+  1895: {sprite: "SEYREN"}
+  1896: {sprite: "KATRINN"}
+  1897: {sprite: "Baphomet"}
+  1898: {sprite: "Zombie"}
+  1899: {sprite: "Kguardian90_7.gr2"}
+  1900: {sprite: "Aguardian90_8.gr2"}
+  1901: {sprite: "Condor"}
+  1902: {sprite: "TREASUREBOX_2.gr2"}
+  1903: {sprite: "TREASUREBOX_2.gr2"}
+  1904: {sprite: "BOMBPORING"}
+  1905: {sprite: "BARRICADE"}
+  1906: {sprite: "BARRICADE"}
+  1907: {sprite: "s_empel_1"}
+  1908: {sprite: "s_empel_2"}
+  1909: {sprite: "OBJ_A"}
+  1910: {sprite: "OBJ_B"}
+  1911: {sprite: "OBJ_NEUTRAL"}
+  1912: {sprite: "OBJ_FLAG_A"}
+  1913: {sprite: "OBJ_FLAG_B"}
+  1914: {sprite: "OBJ_A2"}
+  1915: {sprite: "OBJ_B2"}
+  1916: {sprite: "MOROCC", shadow: 2}
+  1917: {sprite: "MOROCC", shadow: 2}
+  1918: {sprite: "MOROCC_1"}
+  1919: {sprite: "MOROCC_2"}
+  1920: {sprite: "MOROCC_3"}
+  1921: {sprite: "MOROCC_4"}
+  1922: {sprite: "MOROCC_1"}
+  1923: {sprite: "MOROCC_2"}
+  1924: {sprite: "MOROCC_3"}
+  1925: {sprite: "MOROCC_4"}
+  1926: {sprite: "JAKK"}
+  1927: {sprite: "WHISPER"}
+  1928: {sprite: "DEVIRUCHI", shadow: 0.7}
+  1929: {sprite: "BAPHOMET_I", shadow: 2}
+  1930: {sprite: "PIAMETTE"}
+  1931: {sprite: "WISH_MAIDEN"}
+  1932: {sprite: "GARDEN_KEEPER"}
+  1933: {sprite: "GARDEN_WATCHER"}
+  1934: {sprite: "BLUE_FLOWER", shadow: 0}
+  1935: {sprite: "RED_FLOWER", shadow: 0}
+  1936: {sprite: "YELL_FLOWER", shadow: 0}
+  1937: {sprite: "CONSTANT"}
+  1938: {sprite: "TREASUREBOX_2.gr2"}
+  1939: {sprite: "TREASUREBOX_2.gr2"}
+  1940: {sprite: "TREASUREBOX_2.gr2"}
+  1941: {sprite: "TREASUREBOX_2.gr2"}
+  1942: {sprite: "TREASUREBOX_2.gr2"}
+  1943: {sprite: "TREASUREBOX_2.gr2"}
+  1944: {sprite: "TREASUREBOX_2.gr2"}
+  1945: {sprite: "TREASUREBOX_2.gr2"}
+  1946: {sprite: "TREASUREBOX_2.gr2"}
+  1947: {sprite: "PIAMETTE"}
+  1948: {sprite: "Poring"}
+  1949: {sprite: "Kguardian90_7.gr2"}
+  1950: {sprite: "Aguardian90_8.gr2"}
+  1951: {sprite: "CRYSTAL_1", shadow: 0.5}
+  1952: {sprite: "CRYSTAL_2", shadow: 0.5}
+  1953: {sprite: "CRYSTAL_3", shadow: 0.5}
+  1954: {sprite: "CRYSTAL_4", shadow: 0.5}
+  1955: {sprite: "TREASUREBOX_2.gr2"}
+  1956: {sprite: "NAGHT_SIEGER", shadow: 2}
+  1957: {sprite: "ENTWEIHEN"}
+  1958: {sprite: "G_ENTWEIHEN"}
+  1959: {sprite: "G_ENTWEIHEN"}
+  1960: {sprite: "G_ENTWEIHEN"}
+  1961: {sprite: "G_ENTWEIHEN"}
+  1962: {sprite: "ANTONIO"}
+  1963: {sprite: "새해인형"}
+  1964: {sprite: "Nightmare", shadow: 1.5}
+  1965: {sprite: "Wild_Rose"}
+  1966: {sprite: "DOPPELGANGER"}
+  1967: {sprite: "YGNIZEM"}
+  1968: {sprite: "STROUF"}
+  1969: {sprite: "MARC"}
+  1970: {sprite: "OBEAUNE"}
+  1971: {sprite: "VADON"}
+  1972: {sprite: "MARINA"}
+  1973: {sprite: "Poring"}
+  1974: {sprite: "BANSHEE_MASTER"}
+  1975: {sprite: "BEHOLDER_MASTER", shadow: 2}
+  1976: {sprite: "COBALT_MINERAL", shadow: 0.7}
+  1977: {sprite: "HEAVY_METALING"}
+  1978: {sprite: "HELL_APOCALIPS", shadow: 2}
+  1979: {sprite: "ZAKUDAM"}
+  1980: {sprite: "KUBLIN"}
+  1981: {sprite: "HIGH_ORC"}
+  1982: {sprite: "ORC_ARCHER"}
+  1983: {sprite: "ORC_SKELETON"}
+  1984: {sprite: "ORC_LADY"}
+  1985: {sprite: "DANDELION"}
+  1986: {sprite: "TATACHO", shadow: 0.5}
+  1987: {sprite: "CENTIPEDE"}
+  1988: {sprite: "NEPENTHES"}
+  1989: {sprite: "HILLSRION"}
+  1990: {sprite: "HARDROCK_MOMMOTH", shadow: 2}
+  1991: {sprite: "TENDRILRION", shadow: 2}
+  1992: {sprite: "CORNUS", shadow: 1.5}
+  1993: {sprite: "NAGA", shadow: 1.5}
+  1994: {sprite: "LUCIOLA_VESPA"}
+  1995: {sprite: "PINGUICULA"}
+  1996: {sprite: "BACSOJIN"}
+  1997: {sprite: "TATACHO"}
+  1998: {sprite: "HILLSRION"}
+  1999: {sprite: "CENTIPEDE_LARVA", shadow: 0.5}
+  2000: {sprite: "M_GAMEMASTER"}
+  2001: {sprite: "F_GAMEMASTER"}
+  2002: {sprite: "G_SPRING_RABBIT"}
+  2003: {sprite: "BACSOJIN"}
+  2004: {sprite: "WICKED_NYMPH"}
+  2005: {sprite: "PLASMA_B"}
+  2006: {sprite: "PLASMA_P"}
+  2007: {sprite: "PLASMA_R"}
+  2008: {sprite: "BLOODY_KNIGHT", shadow: 2}
+  2009: {sprite: "GOAT", shadow: 2}
+  2010: {sprite: "MAJORUROS"}
+  2011: {sprite: "Ghoul"}
+  2012: {sprite: "Zombie"}
+  2013: {sprite: "DRACO", shadow: 0.7}
+  2014: {sprite: "DRACO_EGG"}
+  2015: {sprite: "PINGUICULA_D"}
+  2016: {sprite: "AQUA_ELEMENTAL"}
+  2017: {sprite: "RATA"}
+  2018: {sprite: "DUNEYRR", shadow: 2}
+  2019: {sprite: "ANCIENT_TREE", shadow: 2}
+  2020: {sprite: "RHYNCHO", shadow: 0.5}
+  2021: {sprite: "PHYLLA", shadow: 0.7}
+  2022: {sprite: "S_NYDHOG"}
+  2023: {sprite: "DARK_SHADOW"}
+  2024: {sprite: "BRADIUM_GOLEM", shadow: 2}
+  2025: {sprite: "MYSTCASE", shadow: 1.2}
+  2026: {sprite: "DANDELION"}
+  2027: {sprite: "DARK_SHADOW"}
+  2028: {sprite: "E_MINOROUS"}
+  2029: {sprite: "MINOROUS"}
+  2030: {sprite: "FALLINGBISHOP"}
+  2031: {sprite: "dandelion"}
+  2032: {sprite: "BAPHOMET_", shadow: 0.5}
+  2033: {sprite: "YELLOW_PLANT"}
+  2034: {sprite: "DESERT_WOLF_B"}
+  2035: {sprite: "NIHILITY_ZEM"}
+  2036: {sprite: "RANDGRIS"}
+  2037: {sprite: "RANDGRIS"}
+  2038: {sprite: "RANDGRIS"}
+  2039: {sprite: "EXECUTIONER"}
+  2040: {sprite: "TIRFING", shadow: 0.5}
+  2041: {sprite: "MYSTELTAINN", shadow: 0.5}
+  2042: {sprite: "미케닉_로봇_물리", shadow: 0.5}
+  2043: {sprite: "미케닉_로봇_마법"}
+  2044: {sprite: "미케닉_로봇_마법"}
+  2045: {sprite: "미케닉_로봇_마법"}
+  2046: {sprite: "미케닉_로봇_마법"}
+  2047: {sprite: "NAGA", shadow: 1.5}
+  2048: {sprite: "PINGUICULA_D"}
+  2049: {sprite: "BRADIUM_GOLEM", shadow: 2}
+  2050: {sprite: "AQUA_ELEMENTAL"}
+  2051: {sprite: "Baphomet"}
+  2052: {sprite: "Dark_Lord"}
+  2053: {sprite: "DIMIK"}
+  2054: {sprite: "BATHORY"}
+  2055: {sprite: "INCUBUS"}
+  2056: {sprite: "ZHERLTHSH"}
+  2057: {sprite: "CRAMP"}
+  2058: {sprite: "MIMIC"}
+  2059: {sprite: "DISGUISE"}
+  2060: {sprite: "ALICE"}
+  2061: {sprite: "STAPO"}
+  2062: {sprite: "POPORING"}
+  2063: {sprite: "DROPS"}
+  2064: {sprite: "MAGMARING"}
+  2065: {sprite: "METALING"}
+  2066: {sprite: "ANOPHELES"}
+  2067: {sprite: "ANOPHELES"}
+  2068: {sprite: "BOITATA", shadow: 2}
+  2069: {sprite: "IARA"}
+  2070: {sprite: "PIRANHA"}
+  2071: {sprite: "HEADLESS_MULE", shadow: 1.5}
+  2072: {sprite: "JAGUAR"}
+  2073: {sprite: "TOUCAN"}
+  2074: {sprite: "CURUPIRA"}
+  2075: {sprite: "E_VADON_X", radius: 2}
+  2076: {sprite: "WIND_GHOST"}
+  2077: {sprite: "SKOGUL"}
+  2078: {sprite: "SUCCUBUS"}
+  2079: {sprite: "CRYSTAL_H", shadow: 2}
+  2080: {sprite: "CRYSTAL_L", shadow: 2}
+  2081: {sprite: "HYDRA"}
+  2082: {sprite: "PIRANHA"}
+  2083: {sprite: "HORN_SCARABA"}
+  2084: {sprite: "HORN_SCARABA2"}
+  2085: {sprite: "ANTLER_SCARABA"}
+  2086: {sprite: "RAKE_SCARABA"}
+  2087: {sprite: "QUEEN_SCARABA", shadow: 1.2}
+  2088: {sprite: "HORN_SCARABA_EGG"}
+  2089: {sprite: "HORN_SCARABA2_EGG"}
+  2090: {sprite: "ANTLER_SCARABA_EGG", shadow: 0.7}
+  2091: {sprite: "RAKE_SCARABA_EGG"}
+  2092: {sprite: "DOLOMEDES", shadow: 1.5}
+  2093: {sprite: "BOTARING"}
+  2094: {sprite: "ORK_HERO"}
+  2095: {sprite: "EDDGA"}
+  2096: {sprite: "Osiris"}
+  2097: {sprite: "DRACULA"}
+  2098: {sprite: "DOPPELGANGER"}
+  2099: {sprite: "Mistress"}
+  2100: {sprite: "BAPHOMET"}
+  2101: {sprite: "LORD_OF_DEATH"}
+  2102: {sprite: "Dark_Lord"}
+  2103: {sprite: "KTULLANUX"}
+  2104: {sprite: "DARK_SNAKE_LORD"}
+  2105: {sprite: "TURTLE_GENERAL"}
+  2106: {sprite: "APOCALIPS_H"}
+  2107: {sprite: "FALLINGBISHOP"}
+  2108: {sprite: "GLOOMUNDERNIGHT"}
+  2109: {sprite: "RANDGRIS"}
+  2110: {sprite: "IFRIT"}
+  2111: {sprite: "HARWORD"}
+  2112: {sprite: "SEYREN"}
+  2113: {sprite: "EREMES"}
+  2114: {sprite: "EL_AGNI_S"}
+  2115: {sprite: "EL_AGNI_M"}
+  2116: {sprite: "EL_AGNI_L"}
+  2117: {sprite: "EL_AQUA_S"}
+  2118: {sprite: "EL_AQUA_M"}
+  2119: {sprite: "EL_AQUA_L"}
+  2120: {sprite: "EL_VENTUS_S"}
+  2121: {sprite: "EL_VENTUS_M"}
+  2122: {sprite: "EL_VENTUS_L"}
+  2123: {sprite: "EL_TERA_S"}
+  2124: {sprite: "EL_TERA_M"}
+  2125: {sprite: "EL_TERA_L"}
+  2131: {sprite: "LOST_DRAGON", shadow: 2}
+  2132: {sprite: "POM_SPIDER", shadow: 1.2}
+  2133: {sprite: "ANGRA_MANTIS"}
+  2134: {sprite: "PARUS", shadow: 0.5}
+  2135: {sprite: "CREEPER", shadow: 0.7}
+  2136: {sprite: "LITTLE_FATUM"}
+  2137: {sprite: "MIMING", shadow: 0.5}
+  2138: {sprite: "NYDHOG_MEMORY1_1", shadow: 0.5}
+  2139: {sprite: "NYDHOG_MEMORY1_2", shadow: 0.5}
+  2140: {sprite: "NYDHOG_MEMORY1_1", shadow: 0.5}
+  2141: {sprite: "NYDHOG_MEMORY1_2", shadow: 0.5}
+  2142: {sprite: "NYDHOG_MEMORY1_1", shadow: 0.5}
+  2143: {sprite: "NYDHOG_MEMORY1_2", shadow: 0.5}
+  2144: {sprite: "ANTLER_SCARABA"}
+  2145: {sprite: "RAKE_SCARABA"}
+  2146: {sprite: "S_NYDHOG"}
+  2147: {sprite: "WHITE_PLANT"}
+  2148: {sprite: "BLUE_PLANT"}
+  2149: {sprite: "SAVAGE_BABE"}
+  2150: {sprite: "WATERMELON"}
+  2151: {sprite: "ALNOLDI"}
+  2152: {sprite: "COMODO", shadow: 1.5}
+  2153: {sprite: "CENDRAWASIH", shadow: 0.5}
+  2154: {sprite: "BANASPATY"}
+  2155: {sprite: "BUTOIJO", shadow: 1.2}
+  2156: {sprite: "LEAK"}
+  2157: {sprite: "BANASPATY"}
+  2158: {sprite: "HORNET"}
+  2159: {sprite: "GIANT_HORNET"}
+  2160: {sprite: "LUCIOLA_VESPA"}
+  2161: {sprite: "I_HORN_SCARABA"}
+  2162: {sprite: "I_HORN_SCARABA2"}
+  2163: {sprite: "I_ANTLER_SCARABA"}
+  2164: {sprite: "I_RAKE_SCARABA"}
+  2165: {sprite: "I_QUEEN_SCARABA"}
+  2166: {sprite: "I_HORN_SCARABA_EGG"}
+  2167: {sprite: "I_HORN_SCARABA2_EGG"}
+  2168: {sprite: "I_ANTLER_SCARABA_EGG"}
+  2169: {sprite: "I_RAKE_SCARABA_EGG"}
+  2170: {sprite: "I_ANTLER_SCARABA"}
+  2171: {sprite: "I_RAKE_SCARABA"}
+  2172: {sprite: "I_HORN_SCARABA"}
+  2173: {sprite: "I_HORN_SCARABA2"}
+  2174: {sprite: "VADON"}
+  2175: {sprite: "MARSE"}
+  2176: {sprite: "CRAB"}
+  2177: {sprite: "CORNUTUS"}
+  2178: {sprite: "SHELLFISH"}
+  2179: {sprite: "KUKRE"}
+  2180: {sprite: "STROUF"}
+  2181: {sprite: "SWORD_FISH"}
+  2182: {sprite: "MARC"}
+  2183: {sprite: "ANOLIAN"}
+  2184: {sprite: "OBEAUNE"}
+  2185: {sprite: "KAPHA"}
+  2186: {sprite: "COELACANTH_N", shadow: 2}
+  2187: {sprite: "COELACANTH_N", shadow: 2}
+  2188: {sprite: "COELACANTH_N", shadow: 2}
+  2189: {sprite: "COELACANTH_H", shadow: 2}
+  2190: {sprite: "COELACANTH_H", shadow: 2}
+  2191: {sprite: "MD_SEAWEED"}
+  2192: {sprite: "MD_OCTOPUS"}
+  2193: {sprite: "MD_OCTOPUS_LEG"}
+  2194: {sprite: "MD_GIANT_OCTOPUS"}
+  2195: {sprite: "KUKRE"}
+  2196: {sprite: "STROUF"}
+  2197: {sprite: "RED_ERUMA"}
+  2198: {sprite: "KING_DRAMOH", shadow: 1.5}
+  2199: {sprite: "SIORAVA"}
+  2200: {sprite: "J_TAINI"}
+  2201: {sprite: "SROPHO", shadow: 0.5}
+  2202: {sprite: "KRAKEN", shadow: 1.5}
+  2203: {sprite: "POT_DOFLE", shadow: 0.5}
+  2204: {sprite: "SEDORA"}
+  2205: {sprite: "TACNU"}
+  2206: {sprite: "KRAKEN_LEG"}
+  2207: {sprite: "RACARCH"}
+  2208: {sprite: "WILD_RIDER"}
+  2209: {sprite: "THIEF_BUG"}
+  2210: {sprite: "XMAS_LUNATIC"}
+  2211: {sprite: "TEDDY_BEAR"}
+  2212: {sprite: "KNIGHT_OF_WINDSTORM"}
+  2213: {sprite: "WANDER_MAN"}
+  2214: {sprite: "WICKED_NYMPH"}
+  2215: {sprite: "KASA"}
+  2216: {sprite: "SALAMANDER"}
+  2217: {sprite: "TEDDY_BEAR"}
+  2218: {sprite: "MD_OCTOPUS_LEG"}
+  2219: {sprite: "MD_GIANT_OCTOPUS"}
+  2220: {sprite: "quve"}
+  2221: {sprite: "RANDEL"}
+  2222: {sprite: "FLAMEL"}
+  2223: {sprite: "CELIA"}
+  2224: {sprite: "CHEN"}
+  2225: {sprite: "GERTIE"}
+  2226: {sprite: "ALPHOCCIO"}
+  2227: {sprite: "TRENTINI"}
+  2228: {sprite: "RANDEL"}
+  2229: {sprite: "FLAMEL"}
+  2230: {sprite: "CELIA"}
+  2231: {sprite: "CHEN"}
+  2232: {sprite: "GERTIE"}
+  2233: {sprite: "ALPHOCCIO"}
+  2234: {sprite: "TRENTINI"}
+  2235: {sprite: "RANDEL"}
+  2236: {sprite: "FLAMEL"}
+  2237: {sprite: "CELIA"}
+  2238: {sprite: "CHEN"}
+  2239: {sprite: "GERTIE"}
+  2240: {sprite: "ALPHOCCIO"}
+  2241: {sprite: "TRENTINI"}
+  2242: {sprite: "DESERT_WOLF"}
+  2243: {sprite: "DESERT_WOLF_B"}
+  2244: {sprite: "CHEN"}
+  2245: {sprite: "8W_SOLDIER"}
+  2246: {sprite: "WOOTAN_FIGHTER", shadow: 1.5}
+  2247: {sprite: "INCREASE_SOIL", shadow: 0}
+  2248: {sprite: "GOLDPORING"}
+  2249: {sprite: "PYURIEL"}
+  2250: {sprite: "LORA"}
+  2251: {sprite: "GIOIA", radius: 1}
+  2252: {sprite: "ELVIRA", shadow: 0.7}
+  2253: {sprite: "DAEHYON", radius: 1, shadow: 1.5}
+  2254: {sprite: "SOHEON"}
+  2255: {sprite: "KADES", radius: 1, shadow: 2}
+  2256: {sprite: "RUDO", shadow: 0.5}
+  2257: {sprite: "PIAMETTE"}
+  2258: {sprite: "PIAMETTE"}
+  2259: {sprite: "GARDEN_KEEPER"}
+  2260: {sprite: "GARDEN_KEEPER"}
+  2261: {sprite: "GARDEN_WATCHER"}
+  2262: {sprite: "GARDEN_WATCHER"}
+  2263: {sprite: "WISH_MAIDEN"}
+  2264: {sprite: "ARMAIA"}
+  2265: {sprite: "ARMAIA"}
+  2266: {sprite: "EREND"}
+  2267: {sprite: "EREND"}
+  2268: {sprite: "KAVAC"}
+  2269: {sprite: "KAVAC"}
+  2270: {sprite: "RAWREL"}
+  2271: {sprite: "RAWREL"}
+  2272: {sprite: "WHIKEBAIN"}
+  2273: {sprite: "WHIKEBAIN"}
+  2274: {sprite: "YGNIZEM"}
+  2275: {sprite: "YGNIZEM"}
+  2276: {sprite: "DOPPELGANGER"}
+  2277: {sprite: "LORA"}
+  2278: {sprite: "ELVIRA"}
+  2279: {sprite: "SOHEON"}
+  2280: {sprite: "RUDO"}
+  2281: {sprite: "DARK_SHADOW"}
+  2282: {sprite: "DARK_FRAME"}
+  2283: {sprite: "DARK_PRIEST"}
+  2284: {sprite: "KOBOLD_1"}
+  2285: {sprite: "KOBOLD_2"}
+  2286: {sprite: "KOBOLD_3"}
+  2287: {sprite: "KOBOLD_ARCHER"}
+  2288: {sprite: "TREASUREBOX_2.gr2"}
+  2289: {sprite: "FABRE"}
+  2290: {sprite: "THIEF_BUG"}
+  2291: {sprite: "HORNET"}
+  2292: {sprite: "HORN"}
+  2293: {sprite: "KIND_OF_BEETLE"}
+  2294: {sprite: "ARGIOPE"}
+  2295: {sprite: "GIANT_SPIDER"}
+  2296: {sprite: "KILLER_MANTIS"}
+  2297: {sprite: "GIANT_HONET"}
+  2298: {sprite: "DRAGON_TAIL"}
+  2299: {sprite: "STAINER"}
+  2300: {sprite: "CHOCHO"}
+  2301: {sprite: "STEEL_CHOCHO"}
+  2302: {sprite: "HUNTER_FLY"}
+  2303: {sprite: "MAYA"}
+  2304: {sprite: "QUEEN_SCARABA"}
+  2305: {sprite: "UNGOLIANT"}
+  2306: {sprite: "GOLDEN_BUG"}
+  2307: {sprite: "MISTRESS"}
+  2308: {sprite: "SHINOBI"}
+  2309: {sprite: "BUNGISNGIS", shadow: 2}
+  2310: {sprite: "ENGKANTO"}
+  2311: {sprite: "MANANANGGAL"}
+  2312: {sprite: "MANGKUKULAM"}
+  2313: {sprite: "TIKBALANG", shadow: 1.5}
+  2314: {sprite: "TIYANAK", shadow: 0.5}
+  2315: {sprite: "WAKWAK"}
+  2316: {sprite: "JEJELING"}
+  2317: {sprite: "BANGUNGOT", shadow: 2}
+  2318: {sprite: "BANGUNGOT", shadow: 2}
+  2319: {sprite: "BUWAYA", shadow: 1.5}
+  2320: {sprite: "BAKONAWA"}
+  2321: {sprite: "BAKONAWA"}
+  2322: {sprite: "BAKONAWA"}
+  2323: {sprite: "BOMBPORING"}
+  2324: {sprite: "PENOMENA"}
+  2325: {sprite: "BAPHOMET_"}
+  2326: {sprite: "GALAPAGO"}
+  2327: {sprite: "ELDER_WILOW", shadow: 2}
+  2328: {sprite: "ANOPHELES"}
+  2329: {sprite: "ANT_EGG", shadow: 0.5}
+  2330: {sprite: "DRACO", shadow: 0.5}
+  2331: {sprite: "MD_SEAWEED"}
+  2332: {sprite: "BUWAYA", shadow: 1.5}
+  2333: {sprite: "ANOPHELES", shadow: 0}
+  2334: {sprite: "WAKWAK"}
+  2335: {sprite: "TREASUREBOX_2.gr2"}
+  2336: {sprite: "DOMOVOI"}
+  2337: {sprite: "INVISIBLE", shadow: 0}
+  2338: {sprite: "MANANANGGAL"}
+  2339: {sprite: "MANGKUKULAM"}
+  2340: {sprite: "TIYANAK"}
+  2341: {sprite: "WISH_MAIDEN"}
+  2342: {sprite: "DIABOLIC"}
+  2343: {sprite: "INVISIBLE", shadow: 0}
+  2344: {sprite: "WISH_MAIDEN"}
+  2345: {sprite: "ZHERLTHSH"}
+  2346: {sprite: "KTULLANUX"}
+  2347: {sprite: "EDDGA"}
+  2348: {sprite: "CIVIL_SERVANT"}
+  2349: {sprite: "LOLI_RURI"}
+  2350: {sprite: "SEDORA"}
+  2351: {sprite: "CHEPET"}
+  2352: {sprite: "E_RSX_0805", radius: 2}
+  2353: {sprite: "N_MINOROUS"}
+  2354: {sprite: "N_MUMMY"}
+  2355: {sprite: "N_VORIT"}
+  2356: {sprite: "N_MIMIC"}
+  2357: {sprite: "N_MIMIC"}
+  2358: {sprite: "N_ARCLOUSE"}
+  2359: {sprite: "N_ARCLOUSE"}
+  2360: {sprite: "N_ANCIENT_MUMMY"}
+  2361: {sprite: "N_ANCIENT_MUMMY"}
+  2362: {sprite: "N_AMON_RA"}
+  2363: {sprite: "MENBLATT"}
+  2364: {sprite: "PETAL", shadow: 0}
+  2365: {sprite: "CENERE", shadow: 0}
+  2366: {sprite: "ANTIQUE_BOOK"}
+  2367: {sprite: "LICHTERN_B", shadow: 0.5}
+  2368: {sprite: "LICHTERN_Y", shadow: 0.5}
+  2369: {sprite: "LICHTERN_R", shadow: 0.5}
+  2370: {sprite: "LICHTERN_G", shadow: 0.5}
+  2371: {sprite: "FAITHFUL_MANAGER", shadow: 2}
+  2372: {sprite: "SOIL"}
+  2373: {sprite: "ROCK"}
+  2374: {sprite: "THICKET"}
+  2375: {sprite: "MOROCC_4"}
+  2376: {sprite: "MOROCC_2"}
+  2377: {sprite: "NOVUS_"}
+  2378: {sprite: "ANTLER_SCARABA"}
+  2379: {sprite: "XMAS_SMOKEY_SOCK"}
+  2380: {sprite: "XMAS_SMOKEY_GIFT"}
+  2381: {sprite: "VADON"}
+  2382: {sprite: "E_VADON_X", radius: 2}
+  2383: {sprite: "VADON"}
+  2384: {sprite: "KRAKEN_LEG"}
+  2385: {sprite: "KRAKEN_LEG"}
+  2386: {sprite: "KRAKEN_LEG"}
+  2387: {sprite: "KRAKEN_LEG"}
+  2388: {sprite: "KRAKEN_LEG"}
+  2389: {sprite: "KRAKEN_LEG"}
+  2390: {sprite: "KRAKEN_LEG"}
+  2391: {sprite: "KRAKEN_LEG"}
+  2392: {sprite: "KRAKEN_LEG"}
+  2393: {sprite: "KRAKEN_LEG"}
+  2394: {sprite: "MERMAN_SE"}
+  2395: {sprite: "SEIREN"}
+  2396: {sprite: "POSEIDON"}
+  2397: {sprite: "KRAKEN_BABY"}
+  2398: {sprite: "LITTLE_PORING", shadow: 0.5}
+  2399: {sprite: "MINI_DEMON"}
+  2400: {sprite: "DIABOLIC"}
+  2401: {sprite: "PORING"}
+  2402: {sprite: "POPORING"}
+  2403: {sprite: "POPORING"}
+  2404: {sprite: "DEAD_PLANKTON", shadow: 0.7}
+  2405: {sprite: "WEAK_SKELETON"}
+  2406: {sprite: "WEAK_SKEL_SOLDIER"}
+  2407: {sprite: "SAILOR_SKELETON"}
+  2408: {sprite: "PECO_EGG", shadow: 0.5}
+  2409: {sprite: "HORN_SCARABA_EGG", shadow: 0.5}
+  2410: {sprite: "HORN_SCARABA2_EGG", shadow: 0.5}
+  2411: {sprite: "DRAGON_EGG"}
+  2412: {sprite: "RANDGRIS"}
+  2413: {sprite: "ANT_EGG", shadow: 0.5}
+  2414: {sprite: "RIDEWORD", shadow: 0.5}
+  2415: {sprite: "L_SEYREN"}
+  2416: {sprite: "L_EREMES"}
+  2417: {sprite: "L_HARWORD"}
+  2418: {sprite: "L_SHECIL"}
+  2419: {sprite: "L_KATRINN"}
+  2420: {sprite: "L_MAGALETA"}
+  2421: {sprite: "L_YGNIZEM"}
+  2422: {sprite: "L_WHIKEBAIN"}
+  2423: {sprite: "L_ARMAIA"}
+  2424: {sprite: "L_KAVAC"}
+  2425: {sprite: "L_DANCER"}
+  2426: {sprite: "L_RAWREL"}
+  2427: {sprite: "L_EREND"}
+  2428: {sprite: "L_SEYREN"}
+  2429: {sprite: "L_EREMES"}
+  2430: {sprite: "L_HARWORD"}
+  2431: {sprite: "L_SHECIL"}
+  2432: {sprite: "L_KATRINN"}
+  2433: {sprite: "L_MAGALETA"}
+  2434: {sprite: "L_YGNIZEM"}
+  2435: {sprite: "L_WHIKEBAIN"}
+  2436: {sprite: "L_ARMAIA"}
+  2437: {sprite: "L_KAVAC"}
+  2438: {sprite: "L_DANCER"}
+  2439: {sprite: "L_RAWREL"}
+  2440: {sprite: "L_EREND"}
+  2441: {sprite: "B_NOVICE"}
+  2442: {sprite: "B_SUPERNOVICE"}
+  2443: {sprite: "AIRA"}
+  2444: {sprite: "KULUNA"}
+  2445: {sprite: "MALLINA"}
+  2446: {sprite: "EZELLA"}
+  2447: {sprite: "LUNE"}
+  2448: {sprite: "MORIN"}
+  2449: {sprite: "NASARIN"}
+  2450: {sprite: "MASTERING"}
+  2451: {sprite: "ORC_BABY", shadow: 0.5}
+  2452: {sprite: "TREASUREBOX_2.gr2"}
+  2453: {sprite: "TREASUREBOX_2.gr2"}
+  2454: {sprite: "TREASUREBOX_2.gr2"}
+  2455: {sprite: "TREASUREBOX_2.gr2"}
+  2456: {sprite: "TREASUREBOX_2.gr2"}
+  2457: {sprite: "TREASUREBOX_2.gr2"}
+  2458: {sprite: "TREASUREBOX_2.gr2"}
+  2459: {sprite: "TREASUREBOX_2.gr2"}
+  2460: {sprite: "TREASUREBOX_2.gr2"}
+  2461: {sprite: "TREASUREBOX_2.gr2"}
+  2462: {sprite: "TREASUREBOX_2.gr2"}
+  2463: {sprite: "BOMBPORING"}
+  2464: {sprite: "zombie"}
+  2465: {sprite: "wraith"}
+  2466: {sprite: "ghoul"}
+  2467: {sprite: "arclouse"}
+  2468: {sprite: "raydric"}
+  2469: {sprite: "raydric_archer"}
+  2470: {sprite: "knight_of_abyss"}
+  2471: {sprite: "khalitzburg"}
+  2472: {sprite: "bloody_knight"}
+  2473: {sprite: "MG_M_UNDEAD_KNIGHT"}
+  2474: {sprite: "MG_F_UNDEAD_KNIGHT"}
+  2475: {sprite: "MG_CORRUPTION_ROOT", radius: 1, shadow: 2}
+  2476: {sprite: "MG_AMDARAIS", radius: 1, shadow: 2}
+  2477: {sprite: "wander_man"}
+  2478: {sprite: "rideword"}
+  2479: {sprite: "mimic"}
+  2480: {sprite: "evil_druid"}
+  2481: {sprite: "wraith"}
+  2482: {sprite: "khalitzburg"}
+  2483: {sprite: "BAPHOMET"}
+  2484: {sprite: "BAPHOMET_"}
+  2485: {sprite: "CHIMERA"}
+  2486: {sprite: "ISIS"}
+  2487: {sprite: "PASANA"}
+  2488: {sprite: "OSIRIS"}
+  2489: {sprite: "GM_WOMAN"}
+  2490: {sprite: "GM_SAY"}
+  2491: {sprite: "GM_SMOKIE"}
+  2492: {sprite: "GM_PHOENIX"}
+  2493: {sprite: "GM_MEN"}
+  2494: {sprite: "GM_HINALLE"}
+  2495: {sprite: "INVISIBLE", shadow: 0}
+  2496: {sprite: "UZHAS"}
+  2497: {sprite: "DOKEBI"}
+  2498: {sprite: "WISH_MAIDEN"}
+  2499: {sprite: "poring"}
+  2500: {sprite: "megalodon"}
+  2501: {sprite: "aster"}
+  2502: {sprite: "crab"}
+  2503: {sprite: "shellfish"}
+  2504: {sprite: "coelacanth_n"}
+  2505: {sprite: "red_eruma"}
+  2506: {sprite: "king_dramoh"}
+  2507: {sprite: "cornutus"}
+  2508: {sprite: "penomena"}
+  2509: {sprite: "kraken_leg"}
+  2510: {sprite: "watermelon"}
+  2511: {sprite: "watermelon"}
+  2512: {sprite: "watermelon"}
+  2513: {sprite: "watermelon"}
+  2514: {sprite: "watermelon"}
+  2515: {sprite: "watermelon"}
+  2516: {sprite: "watermelon"}
+  2517: {sprite: "watermelon"}
+  2518: {sprite: "watermelon"}
+  2519: {sprite: "watermelon"}
+  2520: {sprite: "watermelon"}
+  2521: {sprite: "watermelon"}
+  2522: {sprite: "watermelon"}
+  2523: {sprite: "watermelon"}
+  2524: {sprite: "watermelon"}
+  2525: {sprite: "watermelon"}
+  2526: {sprite: "BANDIT"}
+  2527: {sprite: "ANOPHELES"}
+  2528: {sprite: "FACEWORM"}
+  2529: {sprite: "FACEWORM_QUEEN", shadow: 2}
+  2530: {sprite: "FACEWORM_DARK"}
+  2531: {sprite: "VENOM_BUG"}
+  2532: {sprite: "FACEWORM_QUEEN_R", shadow: 2}
+  2533: {sprite: "FACEWORM_QUEEN_G", shadow: 2}
+  2534: {sprite: "FACEWORM_QUEEN_B", shadow: 2}
+  2535: {sprite: "FACEWORM_QUEEN_Y", shadow: 2}
+  2536: {sprite: "INVISIBLE", shadow: 0}
+  2537: {sprite: "INVISIBLE", shadow: 0}
+  2538: {sprite: "KING_PORING"}
+  2539: {sprite: "INVISIBLE", shadow: 0}
+  2540: {sprite: "FACEWORM_EGG"}
+  2541: {sprite: "FACEWORM_LARVA"}
+  2542: {sprite: "IRENE_ELDER"}
+  2543: {sprite: "PAYONSOLDIER"}
+  2544: {sprite: "PAYONSOLDIER2"}
+  2545: {sprite: "WOLF"}
+  2546: {sprite: "DESERT_WOLF"}
+  2547: {sprite: "GARM_BABY"}
+  2548: {sprite: "HILLSRION"}
+  2549: {sprite: "GEFFEN_MAGE_1"}
+  2550: {sprite: "GEFFEN_MAGE_2"}
+  2551: {sprite: "GEFFEN_MAGE_3_1"}
+  2552: {sprite: "GEFFEN_MAGE_3_2"}
+  2553: {sprite: "GEFFEN_MAGE_3_3"}
+  2554: {sprite: "GEFFEN_MAGE_4"}
+  2555: {sprite: "GEFFEN_MAGE_5"}
+  2556: {sprite: "GEFFEN_MAGE_6"}
+  2557: {sprite: "GEFFEN_MAGE_7"}
+  2558: {sprite: "GEFFEN_MAGE_8"}
+  2559: {sprite: "GEFFEN_MAGE_9"}
+  2560: {sprite: "GEFFEN_MAGE_10"}
+  2561: {sprite: "GEFFEN_MAGE_11"}
+  2562: {sprite: "GEFFEN_MAGE_12"}
+  2563: {sprite: "FEI_KANABIAN"}
+  2564: {sprite: "FENRIR"}
+  2565: {sprite: "GOLEM"}
+  2566: {sprite: "STAPO"}
+  2567: {sprite: "GEFFEN_MAGE_3_2"}
+  2568: {sprite: "GEFFEN_MAGE_3_3"}
+  2569: {sprite: "ANOPHELES", shadow: 0.3}
+  2570: {sprite: "BREEZE", shadow: 0.5}
+  2571: {sprite: "BUTOIJO", shadow: 1.2}
+  2572: {sprite: "CARAMEL", shadow: 0.3}
+  2573: {sprite: "CHOCHO", shadow: 0.5}
+  2574: {sprite: "CIVIL_SERVANT"}
+  2575: {sprite: "COCO", shadow: 0.7}
+  2576: {sprite: "CREAMY", shadow: 0.7}
+  2577: {sprite: "FABRE", shadow: 0.5}
+  2578: {sprite: "HORN"}
+  2579: {sprite: "HYLOZOIST", shadow: 0.5}
+  2580: {sprite: "KAHO", shadow: 0.5}
+  2581: {sprite: "LUDE", shadow: 0.5}
+  2582: {sprite: "LUNATIC", shadow: 0.5}
+  2583: {sprite: "MARTIN", shadow: 0.5}
+  2584: {sprite: "MINERAL", shadow: 0.5}
+  2585: {sprite: "MOLE", shadow: 0.5}
+  2586: {sprite: "NERAID", shadow: 0.5}
+  2587: {sprite: "OBSIDIAN", shadow: 0.5}
+  2588: {sprite: "PITMAN"}
+  2589: {sprite: "POPORING"}
+  2590: {sprite: "ROCKER"}
+  2591: {sprite: "SAVAGE"}
+  2592: {sprite: "SIORAVA"}
+  2593: {sprite: "SIROMA"}
+  2594: {sprite: "SNOWIER", shadow: 2}
+  2595: {sprite: "STAINER", shadow: 0.5}
+  2596: {sprite: "STAPO"}
+  2597: {sprite: "STEEL_CHOCHO", shadow: 0.5}
+  2598: {sprite: "UNGOLIANT", shadow: 1.5}
+  2599: {sprite: "WILD_RIDER"}
+  2600: {sprite: "WOLF", shadow: 1.2}
+  2601: {sprite: "YOYO", shadow: 0.7}
+  2602: {sprite: "ZIPPER_BEAR"}
+  2603: {sprite: "ZOMBIE_SLAUGHTER", shadow: 1.2}
+  2604: {sprite: "ZOMBIE_PRISONER", shadow: 1.2}
+  2605: {sprite: "ZOMBIE_MASTER", shadow: 1.2}
+  2606: {sprite: "ZOMBIE", shadow: 1.2}
+  2607: {sprite: "ZAKUDAM", shadow: 1.2}
+  2608: {sprite: "YOYO", shadow: 0.84}
+  2609: {sprite: "YOYO", shadow: 0.84}
+  2610: {sprite: "WORM_TAIL", shadow: 1.2}
+  2611: {sprite: "WOOTAN_FIGHTER", shadow: 1.8}
+  2612: {sprite: "WOOD_GOBLIN", shadow: 1.2}
+  2613: {sprite: "WOLF", shadow: 1.44}
+  2614: {sprite: "WIND_GHOST", shadow: 1.2}
+  2615: {sprite: "WILOW", shadow: 1.2}
+  2616: {sprite: "WILD_ROSE", shadow: 0.84}
+  2617: {sprite: "WICKED_NYMPH", shadow: 1.2}
+  2618: {sprite: "WHISPER", shadow: 1.2}
+  2619: {sprite: "WEAK_SKELETON", shadow: 1.2}
+  2620: {sprite: "WANDER_MAN", shadow: 1.44}
+  2621: {sprite: "VIOLY", shadow: 1.2}
+  2622: {sprite: "VIOLY", shadow: 1.2}
+  2623: {sprite: "VIOLY", shadow: 1.2}
+  2624: {sprite: "VENOMOUS", shadow: 0}
+  2625: {sprite: "VENATU_1", shadow: 1.2}
+  2626: {sprite: "VAVAYAGA", shadow: 0}
+  2627: {sprite: "VANBERK", shadow: 1.2}
+  2628: {sprite: "VADON", shadow: 1.2}
+  2629: {sprite: "UNGOLIANT", shadow: 1.8}
+  2630: {sprite: "TOUCAN", shadow: 1.2}
+  2631: {sprite: "TIYANAK", shadow: 0.6}
+  2632: {sprite: "THIEF_BUG", shadow: 0.36}
+  2633: {sprite: "THIEF_BUG", shadow: 0.36}
+  2634: {sprite: "THIEF_BUG", shadow: 0.36}
+  2635: {sprite: "THARA_FROG", shadow: 1.2}
+  2636: {sprite: "TEDDY_BEAR", shadow: 0.36}
+  2637: {sprite: "TATACHO", shadow: 0.6}
+  2638: {sprite: "TAROU", shadow: 0.6}
+  2639: {sprite: "TAMRUAN", shadow: 1.44}
+  2640: {sprite: "STING", shadow: 1.2}
+  2641: {sprite: "STEM_WORM", shadow: 1.2}
+  2642: {sprite: "STEEL_CHOCHO", shadow: 0.6}
+  2643: {sprite: "STAPO", shadow: 1.2}
+  2644: {sprite: "STALACTIC_GOLEM", shadow: 2.4}
+  2645: {sprite: "STAINER", shadow: 0.6}
+  2646: {sprite: "SPORE", shadow: 1.2}
+  2647: {sprite: "SOLIDER", shadow: 1.2}
+  2648: {sprite: "SKEL_SOLDIER", shadow: 1.2}
+  2649: {sprite: "SKEL_SOLDIER", shadow: 1.2}
+  2650: {sprite: "SOLACE", shadow: 0.6}
+  2651: {sprite: "SOHEE", shadow: 0.84}
+  2652: {sprite: "SNOWIER", shadow: 2.4}
+  2653: {sprite: "SNAKE", shadow: 0}
+  2654: {sprite: "SMOKIE", shadow: 0.84}
+  2655: {sprite: "SLEEPER", shadow: 1.2}
+  2656: {sprite: "SLEEPER", shadow: 1.2}
+  2657: {sprite: "SKOGUL", shadow: 1.2}
+  2658: {sprite: "SKELETON_GENERAL", shadow: 1.2}
+  2659: {sprite: "SKELETON_GENERAL", shadow: 1.2}
+  2660: {sprite: "SKEL_WORKER", shadow: 1.2}
+  2661: {sprite: "SIROMA", shadow: 1.2}
+  2662: {sprite: "SIDE_WINDER", shadow: 0}
+  2663: {sprite: "SIDE_WINDER", shadow: 0}
+  2664: {sprite: "SHINOBI", shadow: 0}
+  2665: {sprite: "SHELTER", shadow: 1.2}
+  2666: {sprite: "SHELLFISH", shadow: 0.6}
+  2667: {sprite: "SHECIL", shadow: 1.2}
+  2668: {sprite: "SEE_OTTER", shadow: 1.2}
+  2669: {sprite: "SEDORA", shadow: 1.2}
+  2670: {sprite: "SCORPION", shadow: 1.2}
+  2671: {sprite: "SAVAGE_BABE", shadow: 0.6}
+  2672: {sprite: "SAVAGE", shadow: 1.2}
+  2673: {sprite: "SAVAGE", shadow: 1.2}
+  2674: {sprite: "SAND_MAN", shadow: 1.2}
+  2675: {sprite: "SALAMANDER", shadow: 1.44}
+  2676: {sprite: "SAILOR_SKELETON", shadow: 1.2}
+  2677: {sprite: "ROWEEN", shadow: 0.6}
+  2678: {sprite: "RODA_FROG", shadow: 1.2}
+  2679: {sprite: "RODA_FROG", shadow: 1.2}
+  2680: {sprite: "ROCKER", shadow: 1.2}
+  2681: {sprite: "RIDEWORD", shadow: 0.6}
+  2682: {sprite: "RIDEWORD", shadow: 0.6}
+  2683: {sprite: "RICE_CAKE_BOY", shadow: 1.2}
+  2684: {sprite: "RETRIBUTION", shadow: 1.44}
+  2685: {sprite: "RETRIBUTION", shadow: 1.44}
+  2686: {sprite: "RETRIBUTION", shadow: 1.44}
+  2687: {sprite: "REQUIEM", shadow: 1.2}
+  2688: {sprite: "REMOVAL", shadow: 1.2}
+  2689: {sprite: "RED_ERUMA", shadow: 1.2}
+  2690: {sprite: "RAYDRIC", shadow: 1.2}
+  2691: {sprite: "RAYDRIC", shadow: 1.2}
+  2692: {sprite: "RAWREL", shadow: 1.2}
+  2693: {sprite: "RAKE_SCARABA", shadow: 1.2}
+  2694: {sprite: "RAGGLER", shadow: 0.84}
+  2695: {sprite: "RAFFLESIA", shadow: 0.6}
+  2696: {sprite: "PORING", shadow: 1.2}
+  2697: {sprite: "PORING", shadow: 1.2}
+  2698: {sprite: "PORING", shadow: 1.2}
+  2699: {sprite: "PORING", shadow: 1.2}
+  2700: {sprite: "PORCELLIO", shadow: 0.36}
+  2701: {sprite: "POPORING", shadow: 1.2}
+  2702: {sprite: "POPORING", shadow: 1.2}
+  2703: {sprite: "POPORING", shadow: 1.2}
+  2704: {sprite: "POISON_TOAD", shadow: 0.84}
+  2705: {sprite: "POISON_SPORE", shadow: 1.2}
+  2706: {sprite: "PLASMA_Y", shadow: 0.84}
+  2707: {sprite: "PLANKTON", shadow: 0.6}
+  2708: {sprite: "PITMAN", shadow: 1.2}
+  2709: {sprite: "PIRANHA", shadow: 1.2}
+  2710: {sprite: "PINGUICULA_D", shadow: 1.2}
+  2711: {sprite: "PINGUICULA", shadow: 1.2}
+  2712: {sprite: "PICKY_", shadow: 0.36}
+  2713: {sprite: "PHEN", shadow: 0.84}
+  2714: {sprite: "PETIT", shadow: 0.6}
+  2715: {sprite: "PETIT", shadow: 0.6}
+  2716: {sprite: "PENOMENA", shadow: 1.2}
+  2717: {sprite: "PENOMENA", shadow: 1.2}
+  2718: {sprite: "PECOPECO", shadow: 1.44}
+  2719: {sprite: "PASANA", shadow: 1.2}
+  2720: {sprite: "PARASITE", shadow: 1.2}
+  2721: {sprite: "OWL_DUKE", shadow: 1.44}
+  2722: {sprite: "ORK_WARRIOR", shadow: 1.2}
+  2723: {sprite: "ORC_ZOMBIE", shadow: 1.2}
+  2724: {sprite: "ORC_SKELETON", shadow: 1.2}
+  2725: {sprite: "ORC_LADY", shadow: 1.2}
+  2726: {sprite: "OBSERVATION", shadow: 1.2}
+  2727: {sprite: "NOXIOUS", shadow: 0}
+  2728: {sprite: "NOVUS", shadow: 0.84}
+  2729: {sprite: "NOVUS", shadow: 0.84}
+  2730: {sprite: "NOVUS", shadow: 0.84}
+  2731: {sprite: "NOVUS", shadow: 0.84}
+  2732: {sprite: "NIGHTMARE_TERROR", shadow: 1.8}
+  2733: {sprite: "WRAITH_DEAD", shadow: 1.2}
+  2734: {sprite: "WANDER_MAN", shadow: 1.2}
+  2735: {sprite: "NEPENTHES", shadow: 1.2}
+  2736: {sprite: "NECROMANCER", shadow: 1.44}
+  2737: {sprite: "MYSTCASE", shadow: 1.44}
+  2738: {sprite: "MUSCIPULAR", shadow: 0.6}
+  2739: {sprite: "MUMMY", shadow: 1.2}
+  2740: {sprite: "MUMMY", shadow: 1.2}
+  2741: {sprite: "MUKA", shadow: 1.2}
+  2742: {sprite: "MOROCC_1", shadow: 1.2}
+  2743: {sprite: "MOROCC_1", shadow: 1.2}
+  2744: {sprite: "MOROCC_1", shadow: 1.2}
+  2745: {sprite: "MOLE", shadow: 0.6}
+  2746: {sprite: "MIYABI_NINGYO", shadow: 1.2}
+  2747: {sprite: "MINOROUS", shadow: 1.8}
+  2748: {sprite: "MINOROUS", shadow: 1.8}
+  2749: {sprite: "MINOROUS", shadow: 1.8}
+  2750: {sprite: "MINERAL", shadow: 0.6}
+  2751: {sprite: "MIMING", shadow: 0.6}
+  2752: {sprite: "MIMIC", shadow: 1.2}
+  2753: {sprite: "MIMIC", shadow: 1.2}
+  2754: {sprite: "METALLER", shadow: 1.2}
+  2755: {sprite: "METALING", shadow: 1.2}
+  2756: {sprite: "METALING", shadow: 1.2}
+  2757: {sprite: "MERMAN", shadow: 1.2}
+  2758: {sprite: "MENBLATT", shadow: 1.2}
+  2759: {sprite: "MEDUSA", shadow: 1.2}
+  2760: {sprite: "MARTIN", shadow: 0.6}
+  2761: {sprite: "MARIONETTE", shadow: 0.6}
+  2762: {sprite: "MARIN", shadow: 1.2}
+  2763: {sprite: "MARDUK", shadow: 1.44}
+  2764: {sprite: "MANTIS", shadow: 0.6}
+  2765: {sprite: "MANDRAGORA", shadow: 0}
+  2766: {sprite: "MANANANGGAL", shadow: 1.2}
+  2767: {sprite: "MAJORUROS", shadow: 1.8}
+  2768: {sprite: "MAGNOLIA", shadow: 0}
+  2769: {sprite: "MAGMARING", shadow: 1.2}
+  2770: {sprite: "LUNATIC", shadow: 0.6}
+  2771: {sprite: "LUNATIC", shadow: 0.6}
+  2772: {sprite: "LUDE", shadow: 0.6}
+  2773: {sprite: "LUCIOLA_VESPA", shadow: 1.2}
+  2774: {sprite: "LOLI_RURI", shadow: 1.2}
+  2775: {sprite: "LIVE_PEACH_TREE", shadow: 1.8}
+  2776: {sprite: "LITTLE_PORING", shadow: 0.6}
+  2777: {sprite: "LITTLE_FATUM", shadow: 1.2}
+  2778: {sprite: "LI_ME_MANG_RYANG", shadow: 1.2}
+  2779: {sprite: "LES", shadow: 1.2}
+  2780: {sprite: "LEIB_OLMAI", shadow: 1.2}
+  2781: {sprite: "LEAF_CAT", shadow: 0.6}
+  2782: {sprite: "L_WHIKEBAIN", shadow: 1.2}
+  2783: {sprite: "L_EREMES", shadow: 1.2}
+  2784: {sprite: "KOBOLD_ARCHER", shadow: 1.2}
+  2785: {sprite: "KOBOLD_1", shadow: 1.2}
+  2786: {sprite: "KNOCKER", shadow: 1.2}
+  2787: {sprite: "KIND_OF_BEETLE", shadow: 1.2}
+  2788: {sprite: "KASA", shadow: 1.2}
+  2789: {sprite: "KARAKASA", shadow: 1.2}
+  2790: {sprite: "ISIS", shadow: 1.2}
+  2791: {sprite: "ISILLA", shadow: 1.2}
+  2792: {sprite: "INJUSTICE", shadow: 1.2}
+  2793: {sprite: "INCREASE_SOIL", shadow: 0}
+  2794: {sprite: "ICE_TITAN", shadow: 2.4}
+  2795: {sprite: "IARA", shadow: 1.2}
+  2796: {sprite: "HYEGUN", shadow: 1.2}
+  2797: {sprite: "HUNTER_FLY", shadow: 0.6}
+  2798: {sprite: "HORNET", shadow: 0.6}
+  2799: {sprite: "HORN_SCARABA", shadow: 1.2}
+  2800: {sprite: "HORN", shadow: 1.2}
+  2801: {sprite: "HODREMLIN", shadow: 1.2}
+  2802: {sprite: "HODE", shadow: 0}
+  2803: {sprite: "HILL_WIND_1", shadow: 1.2}
+  2804: {sprite: "HILL_WIND_1", shadow: 1.2}
+  2805: {sprite: "HIGH_ORC", shadow: 1.2}
+  2806: {sprite: "HARPY", shadow: 1.2}
+  2807: {sprite: "HARPY", shadow: 1.2}
+  2808: {sprite: "GREEN_IGUANA", shadow: 1.2}
+  2809: {sprite: "GREATEST_GENERAL", shadow: 0.6}
+  2810: {sprite: "GRAND_PECO", shadow: 1.2}
+  2811: {sprite: "GRAND_PECO", shadow: 1.2}
+  2812: {sprite: "GOLEM", shadow: 2.4}
+  2813: {sprite: "GOBLIN_1", shadow: 1.2}
+  2814: {sprite: "GOBLIN_1", shadow: 1.2}
+  2815: {sprite: "GOAT", shadow: 1.44}
+  2816: {sprite: "GOAT", shadow: 1.44}
+  2817: {sprite: "KOBOLD_2", shadow: 1.2}
+  2818: {sprite: "KOBOLD_2", shadow: 1.2}
+  2819: {sprite: "DARK_SHADOW", shadow: 1.2}
+  2820: {sprite: "DARK_SHADOW", shadow: 1.2}
+  2821: {sprite: "GIANT_HONET", shadow: 1.2}
+  2822: {sprite: "GHOUL", shadow: 1.2}
+  2823: {sprite: "GHOUL", shadow: 1.2}
+  2824: {sprite: "GEOGRAPHER", shadow: 0.6}
+  2825: {sprite: "GEOGRAPHER", shadow: 0.6}
+  2826: {sprite: "GARGOYLE", shadow: 1.2}
+  2827: {sprite: "GARGOYLE", shadow: 1.2}
+  2828: {sprite: "GALION", shadow: 1.2}
+  2829: {sprite: "FUR_SEAL", shadow: 1.2}
+  2830: {sprite: "FREEZER", shadow: 1.2}
+  2831: {sprite: "FREEZER", shadow: 1.2}
+  2832: {sprite: "FERUS_", shadow: 1.44}
+  2833: {sprite: "FARMILIAR", shadow: 0.6}
+  2834: {sprite: "FAKE_ANGEL", shadow: 0.6}
+  2835: {sprite: "FABRE", shadow: 0.6}
+  2836: {sprite: "FABRE", shadow: 0.6}
+  2837: {sprite: "EXPLOSION", shadow: 0.6}
+  2838: {sprite: "EVIL_DRUID", shadow: 1.2}
+  2839: {sprite: "ELDER_WILOW", shadow: 1.2}
+  2840: {sprite: "ELDER_WILOW", shadow: 1.2}
+  2841: {sprite: "ECHIO", shadow: 1.2}
+  2842: {sprite: "DUSTINESS", shadow: 0.6}
+  2843: {sprite: "DRYAD", shadow: 1.2}
+  2844: {sprite: "DROSERA", shadow: 0.84}
+  2845: {sprite: "DROPS", shadow: 1.2}
+  2846: {sprite: "DRILLER", shadow: 1.2}
+  2847: {sprite: "DRAINLIAR", shadow: 0.6}
+  2848: {sprite: "DRAGON_TAIL", shadow: 1.2}
+  2849: {sprite: "DRACO", shadow: 0.84}
+  2850: {sprite: "DOLOMEDES", shadow: 1.8}
+  2851: {sprite: "DOKEBI", shadow: 0.84}
+  2852: {sprite: "DISGUISE", shadow: 1.2}
+  2853: {sprite: "DIMIK_1", shadow: 1.2}
+  2854: {sprite: "DEVIRUCHI", shadow: 0.84}
+  2855: {sprite: "DESERT_WOLF_B", shadow: 0.84}
+  2856: {sprite: "DESERT_WOLF_B", shadow: 0.84}
+  2857: {sprite: "DENIRO", shadow: 0.84}
+  2858: {sprite: "DEATHWORD", shadow: 1.2}
+  2859: {sprite: "DEATHWORD", shadow: 1.2}
+  2860: {sprite: "DEATHWORD", shadow: 1.2}
+  2861: {sprite: "DARK_PRIEST", shadow: 1.2}
+  2862: {sprite: "DANCING_DRAGON", shadow: 1.2}
+  2863: {sprite: "CREAMY", shadow: 0.84}
+  2864: {sprite: "CORNUTUS", shadow: 1.2}
+  2865: {sprite: "COOKIE", shadow: 1.2}
+  2866: {sprite: "CONSTANT", shadow: 0.6}
+  2867: {sprite: "COMODO", shadow: 1.8}
+  2868: {sprite: "COCO", shadow: 0.84}
+  2869: {sprite: "COCO", shadow: 0.84}
+  2870: {sprite: "CLOCK", shadow: 1.2}
+  2871: {sprite: "CLOCK", shadow: 1.2}
+  2872: {sprite: "CHOCHO", shadow: 0.6}
+  2873: {sprite: "CENTIPEDE", shadow: 1.2}
+  2874: {sprite: "CENERE", shadow: 0}
+  2875: {sprite: "CELIA", shadow: 1.2}
+  2876: {sprite: "CATERPILLAR", shadow: 0.6}
+  2877: {sprite: "CARAT", shadow: 1.2}
+  2878: {sprite: "CARAMEL", shadow: 0.36}
+  2879: {sprite: "BUNGISNGIS", shadow: 2.4}
+  2880: {sprite: "BREEZE", shadow: 0.6}
+  2881: {sprite: "BREEZE", shadow: 0.6}
+  2882: {sprite: "BRADIUM_GOLEM", shadow: 2.4}
+  2883: {sprite: "BLOOD_BUTTERFLY", shadow: 1.44}
+  2884: {sprite: "BIGFOOT", shadow: 1.2}
+  2885: {sprite: "BATHORY", shadow: 1.44}
+  2886: {sprite: "BANSHEE_MASTER", shadow: 1.2}
+  2887: {sprite: "BANSHEE", shadow: 1.2}
+  2888: {sprite: "BANASPATY", shadow: 1.2}
+  2889: {sprite: "ASSULTER", shadow: 1.2}
+  2890: {sprite: "ARGOS", shadow: 1.2}
+  2891: {sprite: "ARGIOPE", shadow: 1.2}
+  2892: {sprite: "ARGIOPE", shadow: 1.2}
+  2893: {sprite: "ARCLOUSE", shadow: 0.6}
+  2894: {sprite: "ARCLOUSE", shadow: 0.6}
+  2895: {sprite: "APOCALIPS", shadow: 2.4}
+  2896: {sprite: "ANTLER_SCARABA", shadow: 1.2}
+  2897: {sprite: "ANTIQUE_BOOK", shadow: 1.2}
+  2898: {sprite: "ANTIQUE_BOOK", shadow: 1.2}
+  2899: {sprite: "ANOLIAN", shadow: 1.2}
+  2900: {sprite: "ANGRA_MANTIS", shadow: 1.2}
+  2901: {sprite: "ANGRA_MANTIS", shadow: 1.2}
+  2902: {sprite: "ANDRE", shadow: 0.6}
+  2903: {sprite: "ANCIENT_MIMIC", shadow: 1.2}
+  2904: {sprite: "ANACONDAQ", shadow: 0}
+  2905: {sprite: "AMBERNITE", shadow: 0.84}
+  2906: {sprite: "ALNOLDI", shadow: 1.2}
+  2907: {sprite: "ALLIGATOR", shadow: 1.2}
+  2908: {sprite: "ALIZA", shadow: 1.2}
+  2909: {sprite: "ALICEL", shadow: 1.2}
+  2910: {sprite: "ALARM", shadow: 2.4}
+  2911: {sprite: "AGAV", shadow: 1.2}
+  2912: {sprite: "ACIDUS_", shadow: 2.4}
+  2913: {sprite: "ACIDUS_", shadow: 2.4}
+  2914: {sprite: "GEFFEN_MAGE_3_1"}
+  2915: {sprite: "INVISIBLE", shadow: 0}
+  2916: {sprite: "BIG_BEN"}
+  2917: {sprite: "BIG_BELL"}
+  2918: {sprite: "TIME_KEEPER"}
+  2919: {sprite: "NEO_PUNK"}
+  2920: {sprite: "ARC_ELDER"}
+  2921: {sprite: "OWL_VISCOUNT"}
+  2922: {sprite: "OWL_VISCOUNT"}
+  2923: {sprite: "OWL_MARQUEES"}
+  2924: {sprite: "ELDER_WILOW"}
+  2925: {sprite: "WILOW"}
+  2926: {sprite: "HARPY"}
+  2927: {sprite: "MINERAL"}
+  2928: {sprite: "GIBBET"}
+  2929: {sprite: "PLASMA_G"}
+  2930: {sprite: "SOLACE"}
+  2931: {sprite: "METALING"}
+  2932: {sprite: "POPORING"}
+  2933: {sprite: "DEVILING"}
+  2934: {sprite: "ARCHANGELING"}
+  2935: {sprite: "EVIL_CLOUD_HERMIT"}
+  2936: {sprite: "GHOSTRING"}
+  2937: {sprite: "M_LOKI"}
+  2938: {sprite: "MM_MAGIC_SEAL"}
+  2939: {sprite: "MM_EVIL_SHADOW1"}
+  2940: {sprite: "MM_EVIL_SHADOW2"}
+  2941: {sprite: "MM_EVIL_SHADOW3"}
+  2942: {sprite: "MM_EVIL_FANATICS"}
+  2943: {sprite: "MM_ICE_MINE"}
+  2944: {sprite: "HORNET"}
+  2945: {sprite: "MUMMY"}
+  2946: {sprite: "ANUBIS"}
+  2947: {sprite: "EGGYRA"}
+  2948: {sprite: "RAGGED_ZOMBIE"}
+  2949: {sprite: "BLOODY_MURDERER"}
+  2950: {sprite: "DARK_FRAME"}
+  2951: {sprite: "FLAME_SKULL"}
+  2952: {sprite: "WIND_GHOST"}
+  2953: {sprite: "ZOMBIE_PRISONER"}
+  2954: {sprite: "SKEL_PRISONER"}
+  2955: {sprite: "GHOUL"}
+  2956: {sprite: "KHALITZBURG"}
+  2957: {sprite: "DULLAHAN"}
+  2958: {sprite: "SKOGUL"}
+  2959: {sprite: "TORTUROUS_REDEEMER"}
+  2960: {sprite: "MM_FLAMECROSS"}
+  2961: {sprite: "TORTUROUS_REDEEMER"}
+  2962: {sprite: "DEVILING"}
+  2963: {sprite: "WOODIE"}
+  2964: {sprite: "RED_PLANT"}
+  2965: {sprite: "APOCALIPS_H"}
+  2966: {sprite: "EREMES"}
+  2967: {sprite: "HARWORD"}
+  2968: {sprite: "SEYREN"}
+  2969: {sprite: "BAPHOMET"}
+  2970: {sprite: "Dark_Lord"}
+  2971: {sprite: "DARK_SNAKE_LORD"}
+  2972: {sprite: "DOPPELGANGER"}
+  2973: {sprite: "DRACULA"}
+  2974: {sprite: "EDDGA"}
+  2975: {sprite: "FALLINGBISHOP"}
+  2976: {sprite: "GLOOMUNDERNIGHT"}
+  2977: {sprite: "IFRIT"}
+  2978: {sprite: "KTULLANUX"}
+  2979: {sprite: "LORD_OF_DEATH"}
+  2980: {sprite: "Mistress"}
+  2981: {sprite: "ORK_HERO"}
+  2982: {sprite: "Osiris"}
+  2983: {sprite: "RANDGRIS"}
+  2984: {sprite: "TURTLE_GENERAL"}
+  2985: {sprite: "E_MYSTERIOUS_BUG"}
+  2986: {sprite: "XMAS_SMOKEY_GIFT"}
+  2987: {sprite: "XM_TREE"}
+  2988: {sprite: "ANTONIO"}
+  2989: {sprite: "XM_COOKIE"}
+  2990: {sprite: "XM_CRUISER"}
+  2991: {sprite: "XM_MYSTCASE"}
+  2992: {sprite: "XM_LUDE"}
+  2993: {sprite: "XM_HYLOZOIST"}
+  2994: {sprite: "XM_MARIONETTE"}
+  2995: {sprite: "XM_TEDDY_BEAR"}
+  2996: {sprite: "XM_CELINE_KIMI"}
+  2997: {sprite: "XM_CELINE_KIMI"}
+  2998: {sprite: "EP14_MORS_EVENT"}
+  2999: {sprite: "EP14_MORS_BOSSA"}
+  3000: {sprite: "EP14_MORS_BOSSB"}
+  3001: {sprite: "EP14_MORS_MOB1"}
+  3002: {sprite: "EP14_MORS_MOB2"}
+  3003: {sprite: "EP14_MORS_MOB3"}
+  3004: {sprite: "EP14_MORS_MOB4"}
+  3005: {sprite: "EP14_MORS_MOB5"}
+  3006: {sprite: "EP14_MORS_MOB6"}
+  3007: {sprite: "EP14_MORS_DUMMY"}
+  3008: {sprite: "DEAD_PLANKTON"}
+  3009: {sprite: "EP14_3_DEATH_BOSS"}
+  3010: {sprite: "EP14_3_DEATH_A_MOB1"}
+  3011: {sprite: "EP14_3_DEATH_A_MOB2"}
+  3012: {sprite: "EP14_3_DEATH_A_MOB3"}
+  3013: {sprite: "EP14_3_DEATH_B_MOB1"}
+  3014: {sprite: "EP14_3_DEATH_B_MOB2"}
+  3015: {sprite: "EP14_3_DEATH_B_MOB3"}
+  3016: {sprite: "EP14_3_DEATH_C_MOB1"}
+  3017: {sprite: "EP14_3_DEATH_C_MOB2"}
+  3018: {sprite: "EP14_3_DEATH_C_MOB3"}
+  3019: {sprite: "CELINE_KIMI"}
+  3020: {sprite: "FIRE_CONDOR"}
+  3021: {sprite: "FIRE_SAND_MAN"}
+  3022: {sprite: "FIRE_FRILLDORA"}
+  3023: {sprite: "FIRE_GOLEM"}
+  3024: {sprite: "14_3_MERCENARY_A"}
+  3025: {sprite: "14_3_MERCENARY_B"}
+  3026: {sprite: "FIREPIT"}
+  3027: {sprite: "FULBUK"}
+  3028: {sprite: "SONIA"}
+  3029: {sprite: "GRIM_REAPER_ANKOU"}
+  3030: {sprite: "STANDING_SOUL"}
+  3031: {sprite: "MUTANT_NECROMANCER"}
+  3032: {sprite: "MUTANT_GHOUL"}
+  3033: {sprite: "MUTANT_OSIRIS"}
+  3034: {sprite: "MUTANT_ARCHER_SKELETON"}
+  3035: {sprite: "MUTANT_WRAITH_DEAD"}
+  3036: {sprite: "MUTANT_VERIT"}
+  3037: {sprite: "MUTANT_LUDE"}
+  3038: {sprite: "INVISIBLE", shadow: 0}
+  3039: {sprite: "MOROCC_1", shadow: 1.5}
+  3040: {sprite: "MOROCC_2", shadow: 1.5}
+  3041: {sprite: "MOROCC_4", shadow: 1.5}
+  3042: {sprite: "WATERMELON"}
+  3043: {sprite: "WATERMELON"}
+  3044: {sprite: "WATERMELON"}
+  3045: {sprite: "WATERMELON"}
+  3046: {sprite: "WATERMELON"}
+  3047: {sprite: "WATERMELON"}
+  3048: {sprite: "WATERMELON"}
+  3049: {sprite: "WATERMELON"}
+  3050: {sprite: "WATERMELON"}
+  3051: {sprite: "WATERMELON"}
+  3052: {sprite: "WATERMELON"}
+  3053: {sprite: "WATERMELON"}
+  3054: {sprite: "WATERMELON"}
+  3055: {sprite: "WATERMELON"}
+  3056: {sprite: "WATERMELON"}
+  3057: {sprite: "WATERMELON"}
+  3058: {sprite: "WATERMELON"}
+  3059: {sprite: "anacondaq"}
+  3060: {sprite: "md_giant_octopus"}
+  3061: {sprite: "E_ANGRY_MIMIC"}
+  3062: {sprite: "giant_deviruchi"}
+  3063: {sprite: "deviruchi_w"}
+  3064: {sprite: "giant_deviruchi_w"}
+  3065: {sprite: "MM_ICE_MINE"}
+  3066: {sprite: "SNAKE_NEWYEAR"}
+  3067: {sprite: "ORC_LADY"}
+  3068: {sprite: "E_PYTHON_SKIN"}
+  3069: {sprite: "PERE1"}
+  3070: {sprite: "PERE2"}
+  3071: {sprite: "PERE3"}
+  3072: {sprite: "PERE4"}
+  3073: {sprite: "GRAND_PERE"}
+  3074: {sprite: "TIMEHOLDER"}
+  3075: {sprite: "TREASUREBOX_2.gr2"}
+  3076: {sprite: "EM_ANGELING"}
+  3077: {sprite: "EM_DEVILING"}
+  3078: {sprite: "FAKE_ANGEL"}
+  3079: {sprite: "CORNUS"}
+  3080: {sprite: "SOLACE"}
+  3081: {sprite: "SHELTER"}
+  3082: {sprite: "SKEGGIOLD"}
+  3083: {sprite: "SKEGGIOLD_"}
+  3084: {sprite: "RUDO"}
+  3085: {sprite: "WISH_MAIDEN"}
+  3086: {sprite: "PAYONSOLDIER"}
+  3087: {sprite: "LOST_DRAGON"}
+  3088: {sprite: "DOLOMEDES"}
+  3089: {sprite: "KASA"}
+  3090: {sprite: "SALAMANDER"}
+  3091: {sprite: "MM_BRINARANEA"}
+  3092: {sprite: "MM_MUSPELLSKOLL"}
+  3093: {sprite: "PLASMA_P"}
+  3094: {sprite: "PLASMA_R"}
+  3095: {sprite: "ANOPHELES"}
+  3096: {sprite: "MM_MOROCC_KID"}
+  3097: {sprite: "MM_MOROCC_ADT"}
+  3098: {sprite: "MOROCC"}
+  3099: {sprite: "MOROCC"}
+  3100: {sprite: "MM_MANA_K"}
+  3101: {sprite: "MM_MANA_W"}
+  3102: {sprite: "MM_MANA_R"}
+  3103: {sprite: "MM_MANA_Y"}
+  3104: {sprite: "MM_MANA_B"}
+  3105: {sprite: "MOROCC_1", shadow: 1.5}
+  3106: {sprite: "MOROCC_4", shadow: 1.5}
+  3107: {sprite: "E_EASTER_BUNNY"}
+  3108: {sprite: "JITTERBUG1"}
+  3109: {sprite: "JITTERBUG2"}
+  3110: {sprite: "CRYSTAL_L"}
+  3111: {sprite: "CRYSTAL_3"}
+  3112: {sprite: "ANGELING"}
+  3113: {sprite: "CHOCHO"}
+  3114: {sprite: "ANOPHELES"}
+  3115: {sprite: "CRYSTAL_L"}
+  3116: {sprite: "CRYSTAL_3"}
+  3117: {sprite: "ANGELING"}
+  3118: {sprite: "CHOCHO"}
+  3119: {sprite: "ANOPHELES"}
+  3120: {sprite: "ISIS"}
+  3121: {sprite: "BYORGUE"}
+  3122: {sprite: "APOCALIPS"}
+  3123: {sprite: "APOCALIPS"}
+  3124: {sprite: "CHARLESTON3"}
+  3125: {sprite: "STEP"}
+  3126: {sprite: "ROCK_STEP"}
+  3127: {sprite: "KICK_STEP"}
+  3128: {sprite: "KICK_AND_KICK"}
+  3129: {sprite: "ORC_ZOMBIE"}
+  3130: {sprite: "ORC_ARCHER"}
+  3131: {sprite: "ORC_BABY"}
+  3132: {sprite: "ORC_LADY"}
+  3133: {sprite: "ZENORC"}
+  3134: {sprite: "Steam_Goblin"}
+  3135: {sprite: "ORC_LORD"}
+  3136: {sprite: "ORK_HERO"}
+  3137: {sprite: "HIGH_ORC"}
+  3138: {sprite: "Ork_warrior"}
+  3139: {sprite: "zombie"}
+  3140: {sprite: "wraith"}
+  3141: {sprite: "ghoul"}
+  3142: {sprite: "arclouse"}
+  3143: {sprite: "raydric"}
+  3144: {sprite: "raydric_archer"}
+  3145: {sprite: "knight_of_abyss"}
+  3146: {sprite: "khalitzburg"}
+  3147: {sprite: "bloody_knight"}
+  3148: {sprite: "MG_M_UNDEAD_KNIGHT"}
+  3149: {sprite: "MG_F_UNDEAD_KNIGHT"}
+  3150: {sprite: "MG_AMDARAIS_H"}
+  3151: {sprite: "MG_CORRUPTION_ROOT_H"}
+  3152: {sprite: "khalitzburg"}
+  3153: {sprite: "EXCAVATOR_ROBOT"}
+  3154: {sprite: "RECON_ROBOT"}
+  3155: {sprite: "REPAIR_ROBOT"}
+  3156: {sprite: "EXPLORATION_ROVER"}
+  3157: {sprite: "MOBSTER"}
+  3158: {sprite: "MOBSTER"}
+  3159: {sprite: "ANOPHELES"}
+  3160: {sprite: "BOILED_RICE"}
+  3161: {sprite: "CONSTANT"}
+  3162: {sprite: "ELEPHANT"}
+  3163: {sprite: "GORILLA"}
+  3164: {sprite: "LION"}
+  3165: {sprite: "RHINO"}
+  3166: {sprite: "GHOSTRING"}
+  3167: {sprite: "E_POPORING_CRO"}
+  3168: {sprite: "POURING"}
+  3169: {sprite: "L_SHECIL"}
+  3170: {sprite: "SHECIL"}
+  3171: {sprite: "MONEMUS"}
+  3172: {sprite: "MONEMUS"}
+  3173: {sprite: "EVENT_FIREFOX"}
+  3174: {sprite: "HELL_FLY"}
+  3175: {sprite: "ROTAR_ZAIRO"}
+  3176: {sprite: "GREMLIN"}
+  3177: {sprite: "BEHOLDER"}
+  3178: {sprite: "ACIDUS"}
+  3179: {sprite: "ACIDUS_"}
+  3180: {sprite: "S_NYDHOG"}
+  3181: {sprite: "FELOCK"}
+  3182: {sprite: "ROTAR_ZAIRO"}
+  3183: {sprite: "GREMLIN"}
+  3184: {sprite: "BEHOLDER"}
+  3185: {sprite: "ACIDUS"}
+  3186: {sprite: "ACIDUS_"}
+  3187: {sprite: "S_NYDHOG"}
+  3188: {sprite: "FELOCK"}
+  3189: {sprite: "VAGABOND_WOLF"}
+  3190: {sprite: "MM_SARAH"}
+  3191: {sprite: "MM_M_GIGAN"}
+  3192: {sprite: "MM_M_GIGAN"}
+  3193: {sprite: "MM_M_GIGAN"}
+  3194: {sprite: "MM_L_GIGAN"}
+  3195: {sprite: "MM_L_GIGAN"}
+  3196: {sprite: "MM_L_GIGAN"}
+  3197: {sprite: "MM_M_GARGOYLE"}
+  3198: {sprite: "MM_M_GALION"}
+  3199: {sprite: "MM_M_MUTANT_DRAGON"}
+  3200: {sprite: "MM_M_CHIMERA"}
+  3201: {sprite: "LUCKYCASE"}
+  3202: {sprite: "JAKK"}
+  3203: {sprite: "JAKK"}
+  3204: {sprite: "PIXY_PINK_PORING"}
+  3205: {sprite: "PIXY_BLUE_PORING"}
+  3206: {sprite: "LITTLE_GOLDPORING"}
+  3207: {sprite: "AQUA_ELEMENTAL"}
+  3208: {sprite: "V_EREMES"}
+  3209: {sprite: "V_MAGALETA"}
+  3210: {sprite: "V_KATRINN"}
+  3211: {sprite: "V_SHECIL"}
+  3212: {sprite: "V_HARWORD"}
+  3213: {sprite: "V_SEYREN"}
+  3214: {sprite: "V_EREMES"}
+  3215: {sprite: "V_MAGALETA"}
+  3216: {sprite: "V_KATRINN"}
+  3217: {sprite: "V_SHECIL"}
+  3218: {sprite: "V_HARWORD"}
+  3219: {sprite: "V_SEYREN"}
+  3220: {sprite: "V_EREMES"}
+  3221: {sprite: "V_MAGALETA"}
+  3222: {sprite: "V_SHECIL"}
+  3223: {sprite: "V_HARWORD"}
+  3224: {sprite: "V_KATRINN"}
+  3225: {sprite: "V_SEYREN"}
+  3226: {sprite: "V_RANDEL"}
+  3227: {sprite: "V_FLAMEL"}
+  3228: {sprite: "V_CELIA"}
+  3229: {sprite: "V_CHEN"}
+  3230: {sprite: "V_GERTIE"}
+  3231: {sprite: "V_ALPHOCCIO"}
+  3232: {sprite: "V_TRENTINI"}
+  3233: {sprite: "V_RANDEL"}
+  3234: {sprite: "V_FLAMEL"}
+  3235: {sprite: "V_CELIA"}
+  3236: {sprite: "V_CHEN"}
+  3237: {sprite: "V_GERTIE"}
+  3238: {sprite: "V_ALPHOCCIO"}
+  3239: {sprite: "V_TRENTINI"}
+  3240: {sprite: "V_RANDEL"}
+  3241: {sprite: "V_FLAMEL"}
+  3242: {sprite: "V_CELIA"}
+  3243: {sprite: "V_CHEN"}
+  3244: {sprite: "V_GERTIE"}
+  3245: {sprite: "V_ALPHOCCIO"}
+  3246: {sprite: "V_TRENTINI"}
+  3247: {sprite: "CENERE_G"}
+  3248: {sprite: "REPAIR_ROBOT_T"}
+  3249: {sprite: "EXPLORATION_ROVER_T"}
+  3250: {sprite: "SCR_MT_ROBOTS"}
+  3251: {sprite: "GC109"}
+  3252: {sprite: "DR815"}
+  3253: {sprite: "SYS_MSG"}
+  3254: {sprite: "T_W_O"}
+  3255: {sprite: "GHOUL_H"}
+  3256: {sprite: "ZOMBIE_H"}
+  3257: {sprite: "MALE_PORING"}
+  3258: {sprite: "FEMALE_PORING"}
+  3259: {sprite: "FANTASTIC_B_UNICORN"}
+  3260: {sprite: "LITTLE_BLUE_UNICORN"}
+  3261: {sprite: "BLUE_UNICORN"}
+  3262: {sprite: "PORING"}
+  3263: {sprite: "POPORING"}
+  3264: {sprite: "DROPS"}
+  3265: {sprite: "GOLDPORING"}
+  3266: {sprite: "MARIN"}
+  3267: {sprite: "COELACANTH_N"}
+  3268: {sprite: "COELACANTH_N"}
+  3269: {sprite: "COELACANTH_N"}
+  3270: {sprite: "COELACANTH_N"}
+  3271: {sprite: "MEGALODON"}
+  3272: {sprite: "MH_SASQUATCH"}
+  3273: {sprite: "MH_BAKONAWA"}
+  3274: {sprite: "MH_BACSOJIN"}
+  3275: {sprite: "HUNTER_FLY"}
+  3276: {sprite: "DIMIK"}
+  3277: {sprite: "DIMIK_2"}
+  3278: {sprite: "DIMIK_4"}
+  3279: {sprite: "DIMIK_1"}
+  3280: {sprite: "DIMIK_3"}
+  3281: {sprite: "COELACANTH_H"}
+  3282: {sprite: "COELACANTH_H"}
+  3283: {sprite: "COELACANTH_H"}
+  3284: {sprite: "COELACANTH_H"}
+  3285: {sprite: "MH_MEGALODON"}
+  3286: {sprite: "MH_GLOOMUNDERNIGHT"}
+  3287: {sprite: "MH_ATROS"}
+  3288: {sprite: "MH_LADY_TANEE"}
+  3289: {sprite: "HUNTER_FLY"}
+  3290: {sprite: "CHOCO"}
+  3291: {sprite: "TREASUREBOX_2.gr2"}
+  3292: {sprite: "ANOPHELES", shadow: 0.3}
+  3293: {sprite: "EVENT_GOURD"}
+  3294: {sprite: "HEYDRICH"}
+  3295: {sprite: "MOBSTER"}
+  3296: {sprite: "PORING"}
+  3297: {sprite: "PAD_LEVIATHAN"}
+  3298: {sprite: "PAD_FAFNIR"}
+  3299: {sprite: "PAD_IFRIT"}
+  3300: {sprite: "PAD_HORAI"}
+  3301: {sprite: "PAD_SHANGRILA"}
+  3302: {sprite: "PAD_NIRAIKANAI"}
+  3303: {sprite: "PAD_HELHEIM"}
+  3304: {sprite: "PAD_MUSPELHEIM"}
+  3305: {sprite: "PAD_ZAEROG"}
+  3306: {sprite: "PAD_TAMADORA"}
+  3307: {sprite: "PAD_TAMADORABABY"}
+  3308: {sprite: "Empelium90_0.gr2"}
+  3309: {sprite: "OBJ_A2"}
+  3310: {sprite: "OBJ_B2"}
+  3311: {sprite: "OBJ_NEUTRAL"}
+  3312: {sprite: "MANDRAGORA"}
+  3313: {sprite: "NEPENTHES"}
+  3314: {sprite: "SMOKIE"}
+  3315: {sprite: "PAD_KINGGOLD"}
+  3316: {sprite: "PAD_KINGMETAL"}
+  3317: {sprite: "RUBYLIT"}
+  3318: {sprite: "SAPPHILIT"}
+  3319: {sprite: "EMELIT"}
+  3320: {sprite: "TOPALIT"}
+  3321: {sprite: "AMELIT"}
+  3322: {sprite: "METAL_DRAGON"}
+  3323: {sprite: "M_FLAME_KNIGHT"}
+  3324: {sprite: "M_ICE_KNIGHT"}
+  3325: {sprite: "M_STONE_KNIGHT"}
+  3326: {sprite: "M_LIGHT_KNIGHT"}
+  3327: {sprite: "M_DARK_KNIGHT"}
+  3328: {sprite: "CHAOS_DEVIL_DRAGON"}
+  3329: {sprite: "ECHIDNA"}
+  3330: {sprite: "SIREN"}
+  3331: {sprite: "LILITH"}
+  3332: {sprite: "HERA"}
+  3333: {sprite: "RUBYLIT"}
+  3334: {sprite: "SAPPHILIT"}
+  3335: {sprite: "EMELIT"}
+  3336: {sprite: "TOPALIT"}
+  3337: {sprite: "AMELIT"}
+  3338: {sprite: "METAL_DRAGON"}
+  3339: {sprite: "M_FLAME_KNIGHT"}
+  3340: {sprite: "M_ICE_KNIGHT"}
+  3341: {sprite: "M_STONE_KNIGHT"}
+  3342: {sprite: "M_LIGHT_KNIGHT"}
+  3343: {sprite: "M_DARK_KNIGHT"}
+  3344: {sprite: "CHAOS_DEVIL_DRAGON"}
+  3345: {sprite: "ECHIDNA"}
+  3346: {sprite: "SIREN"}
+  3347: {sprite: "LILITH"}
+  3348: {sprite: "HERA"}
+  3349: {sprite: "MYTHLIT"}
+  3350: {sprite: "TYRRA"}
+  3351: {sprite: "TYRANNOS"}
+  3352: {sprite: "PLESSIE"}
+  3353: {sprite: "PLESIOS"}
+  3354: {sprite: "BRACHY"}
+  3355: {sprite: "BRACHYS"}
+  3356: {sprite: "DENIRO"}
+  3357: {sprite: "VITATA"}
+  3358: {sprite: "ANDRE"}
+  3359: {sprite: "HORN_SCARABA"}
+  3360: {sprite: "HORN_SCARABA2"}
+  3361: {sprite: "RAKE_SCARABA"}
+  3362: {sprite: "I_HORN_SCARABA"}
+  3363: {sprite: "I_HORN_SCARABA2"}
+  3364: {sprite: "I_ANTLER_SCARABA"}
+  3365: {sprite: "I_RAKE_SCARABA"}
+  3366: {sprite: "MH_I_HORN_SCARABA"}
+  3367: {sprite: "MH_I_HORN_SCARABA2"}
+  3368: {sprite: "MH_I_ANTLER_SCARABA"}
+  3369: {sprite: "MH_I_RAKE_SCARABA"}
+  3370: {sprite: "MH_QUEEN_SCARABA"}
+  3371: {sprite: "MH_COELACANTH_Y_A1"}
+  3372: {sprite: "MH_COELACANTH_Y_A2"}
+  3373: {sprite: "MH_COELACANTH_Y_A3"}
+  3374: {sprite: "MH_COELACANTH_Y_A4"}
+  3375: {sprite: "MH_E_MEGALODON3"}
+  3376: {sprite: "MH_NAGHT_SIEGER"}
+  3377: {sprite: "MH_IFRIT"}
+  3378: {sprite: "MH_PHYLLA"}
+  3379: {sprite: "MH_BOMBPORING"}
+  3380: {sprite: "ANGLERFISH"}
+  3381: {sprite: "QUVE"}
+  3382: {sprite: "WHISPER"}
+  3384: {sprite: "Poring"}
+  3385: {sprite: "LUNATIC"}
+  3386: {sprite: "FABRE"}
+  3387: {sprite: "PICKY"}
+  3388: {sprite: "CONDOR"}
+  3389: {sprite: "WILOW"}
+  3390: {sprite: "SPORE"}
+  3391: {sprite: "POPORING"}
+  3392: {sprite: "SMOKIE"}
+  3393: {sprite: "DOKEBI"}
+  3394: {sprite: "BIGFOOT"}
+  3395: {sprite: "WORM_TAIL"}
+  3396: {sprite: "WOLF"}
+  3397: {sprite: "SNAKE"}
+  3398: {sprite: "ANACONDAQ"}
+  3399: {sprite: "MARIN"}
+  3400: {sprite: "MUKA"}
+  3401: {sprite: "PECOPECO"}
+  3402: {sprite: "DENIRO"}
+  3403: {sprite: "PIERE"}
+  3404: {sprite: "ANDRE"}
+  3405: {sprite: "GOLEM"}
+  3406: {sprite: "SCORPION"}
+  3407: {sprite: "CHOCHO"}
+  3408: {sprite: "METALLER"}
+  3409: {sprite: "SAND_MAN"}
+  3410: {sprite: "RAGGLER"}
+  3411: {sprite: "DRAGON_TAIL"}
+  3412: {sprite: "GREEN_IGUANA"}
+  3413: {sprite: "SEE_OTTER"}
+  3414: {sprite: "GALAPAGO"}
+  3415: {sprite: "FUR_SEAL"}
+  3416: {sprite: "ALLIGATOR"}
+  3417: {sprite: "MEGALODON"}
+  3418: {sprite: "TRI_JOINT"}
+  3419: {sprite: "MEGALITH"}
+  3420: {sprite: "DRYAD"}
+  3421: {sprite: "TOAD"}
+  3422: {sprite: "VAGABOND_WOLF"}
+  3423: {sprite: "VOCAL"}
+  3424: {sprite: "ECLIPSE"}
+  3425: {sprite: "CHIMERA"}
+  3426: {sprite: "EDDGA"}
+  3427: {sprite: "OSIRIS"}
+  3428: {sprite: "PHREEONI"}
+  3429: {sprite: "ORK_HERO"}
+  3430: {sprite: "TAO_GUNKA"}
+  3431: {sprite: "RODA_FROG"}
+  3432: {sprite: "WOLF"}
+  3433: {sprite: "ROCKER"}
+  3434: {sprite: "LUNATIC"}
+  3435: {sprite: "GARGOYLE"}
+  3436: {sprite: "BIGFOOT"}
+  3437: {sprite: "ANCIENT_MUMMY"}
+  3438: {sprite: "SAND_MAN"}
+  3439: {sprite: "HIGH_ORC"}
+  3440: {sprite: "MEGALITH"}
+  3441: {sprite: "BEELZEBUB_"}
+  3442: {sprite: "FROZENWOLF"}
+  3443: {sprite: "TAFFY"}
+  3444: {sprite: "WATCHER"}
+  3445: {sprite: "P_ARCHER_SKELETON"}
+  3446: {sprite: "P_SKELETON"}
+  3447: {sprite: "P_SOLDIER_SKELETON"}
+  3448: {sprite: "P_AMDARAIS"}
+  3449: {sprite: "G_P_AMDARAIS"}
+  3450: {sprite: "BIJOU"}
+  3451: {sprite: "IMMOTAL_CORPS"}
+  3452: {sprite: "ZOMBIE_GUARD"}
+  3453: {sprite: "AMISTR"}
+  3454: {sprite: "HEART_HUNTER_N"}
+  3455: {sprite: "GLASS_PLATE"}
+  3456: {sprite: "WATERMELON"}
+  3457: {sprite: "WATERMELON"}
+  3458: {sprite: "WATERMELON"}
+  3459: {sprite: "WATERMELON"}
+  3460: {sprite: "WATERMELON"}
+  3461: {sprite: "WATERMELON"}
+  3462: {sprite: "WATERMELON"}
+  3463: {sprite: "WATERMELON"}
+  3464: {sprite: "WATERMELON"}
+  3465: {sprite: "WATERMELON"}
+  3466: {sprite: "WATERMELON"}
+  3467: {sprite: "WATERMELON"}
+  3468: {sprite: "WATERMELON"}
+  3469: {sprite: "WATERMELON"}
+  3470: {sprite: "WATERMELON"}
+  3471: {sprite: "WATERMELON"}
+  3472: {sprite: "WATERMELON"}
+  3473: {sprite: "AS_RAGGED_GOLEM"}
+  3474: {sprite: "AS_BLOODY_KNIGHT"}
+  3475: {sprite: "AS_WIND_GHOST"}
+  3476: {sprite: "ZOMBIE"}
+  3477: {sprite: "IMMOTAL_CORPS"}
+  3478: {sprite: "ZOMBIE_SLAUGHTER"}
+  3479: {sprite: "ZOMBIE_MASTER"}
+  3480: {sprite: "RAGGED_ZOMBIE"}
+  3481: {sprite: "MM_EVIL_SHADOW1"}
+  3482: {sprite: "MM_EVIL_SHADOW2"}
+  3483: {sprite: "MM_EVIL_SHADOW3"}
+  3484: {sprite: "AS_RAGGED_GOLEM"}
+  3485: {sprite: "RAGGED_ZOMBIE"}
+  3486: {sprite: "G_SPRING_RABBIT"}
+  3487: {sprite: "IMMOTAL_CORPS"}
+  3488: {sprite: "IMMOTAL_CORPS2"}
+  3489: {sprite: "IMMOTAL_CORPS3"}
+  3490: {sprite: "IMMOTAL_CORPS2", shadow: 3}
+  3492: {sprite: "MOBSTER"}
+  3494: {sprite: "GOLDPORING"}
+  3495: {sprite: "DR_EGGRING"}
+  3496: {sprite: "DR_LUNATIC"}
+  3497: {sprite: "DR_FABRE"}
+  3498: {sprite: "DR_HORNET"}
+  3499: {sprite: "DR_RODA_FROG"}
+  3500: {sprite: "DR_DESERT_WOLF_B"}
+  3501: {sprite: "DR_SPORE"}
+  3502: {sprite: "DR_BASILISK1"}
+  3503: {sprite: "DR_BASILISK2"}
+  3504: {sprite: "DR_BASILISK3"}
+  3505: {sprite: "DR_BIG_EGGRING"}
+  3506: {sprite: "DR_MANDRAGORA"}
+  3507: {sprite: "DR_POM_SPIDER"}
+  3508: {sprite: "DR_EGGRING"}
+  3509: {sprite: "lunatic"}
+  3510: {sprite: "POPE_GUARD"}
+  3511: {sprite: "AUNOE"}
+  3512: {sprite: "FANAT"}
+  3513: {sprite: "HELL_POODLE"}
+  3514: {sprite: "POPE_BISHOP"}
+  3515: {sprite: "ICEICLE"}
+  3516: {sprite: "POPE_LUWMIN"}
+  3517: {sprite: "ICE_TITAN"}
+  3518: {sprite: "POPE_GUARD"}
+  3519: {sprite: "AUNOE"}
+  3520: {sprite: "FANAT"}
+  3521: {sprite: "HELL_POODLE"}
+  3522: {sprite: "POPE_BISHOP"}
+  3523: {sprite: "ICEICLE"}
+  3524: {sprite: "POPE_LUWMIN"}
+  3525: {sprite: "ICE_TITAN"}
+  3526: {sprite: "KTULLANUX"}
+  3527: {sprite: "MER_POPE_NORMAL"}
+  3528: {sprite: "MER_POPE_CASUAL"}
+  3529: {sprite: "Pupa"}
+  3530: {sprite: "Pupa"}
+  3531: {sprite: "Pupa"}
+  3532: {sprite: "Pupa"}
+  3533: {sprite: "Pupa"}
+  3534: {sprite: "Pupa"}
+  3535: {sprite: "Pupa"}
+  3536: {sprite: "Pupa"}
+  3537: {sprite: "Pupa"}
+  3538: {sprite: "Pupa"}
+  3539: {sprite: "fabre"}
+  3540: {sprite: "fabre"}
+  3541: {sprite: "fabre"}
+  3542: {sprite: "fabre"}
+  3543: {sprite: "fabre"}
+  3544: {sprite: "fabre"}
+  3545: {sprite: "fabre"}
+  3546: {sprite: "fabre"}
+  3547: {sprite: "fabre"}
+  3548: {sprite: "fabre"}
+  3549: {sprite: "chocho"}
+  3550: {sprite: "chocho"}
+  3551: {sprite: "chocho"}
+  3569: {sprite: "MER_POPE_NORMAL"}
+  3570: {sprite: "MER_POPE_CASUAL"}
+  3621: {sprite: "ep16_2_mm_cutie"}
+  3622: {sprite: "ep16_2_mm_s_guards"}
+  3623: {sprite: "plasma_r"}
+  3624: {sprite: "plasma_g"}
+  3625: {sprite: "plasma_b"}
+  3626: {sprite: "heart_hunter_n"}
+  3627: {sprite: "heart_hunter_n"}
+  3628: {sprite: "ep16_2_h_hunter_ev"}
+  3629: {sprite: "ep16_2_broken_gun"}
+  3630: {sprite: "ep16_2_e_bolkoba"}
+  3631: {sprite: "ep16_2_human_kimera"}
+  3632: {sprite: "ep16_2_matter_kimera"}
+  3633: {sprite: "ep16_2_venom_kimera"}
+  3634: {sprite: "MYSTCASE", shadow: 5}
+  3635: {sprite: "KOBOLD_1"}
+  3636: {sprite: "LITTLE_ISIS"}
+  3637: {sprite: "SKELETON"}
+  3638: {sprite: "SKELETON"}
+  3639: {sprite: "SKELETON"}
+  3640: {sprite: "SKELETON"}
+  3641: {sprite: "SKELETON"}
+  3642: {sprite: "SKELETON"}
+  3643: {sprite: "FARMILIAR"}
+  3644: {sprite: "FARMILIAR"}
+  3645: {sprite: "FARMILIAR"}
+  3646: {sprite: "FARMILIAR"}
+  3647: {sprite: "FARMILIAR"}
+  3648: {sprite: "FARMILIAR"}
+  3649: {sprite: "ZOMBIE"}
+  3650: {sprite: "ZOMBIE"}
+  3651: {sprite: "ZOMBIE"}
+  3652: {sprite: "ZOMBIE"}
+  3653: {sprite: "ZOMBIE"}
+  3654: {sprite: "ZOMBIE"}
+  3656: {sprite: "THE_PAPER"}
+  3657: {sprite: "THE_PAPER"}
+  3658: {sprite: "ABYSS_ARTHUR"}
+  3659: {sprite: "ABYSS_ARTHUR"}
+  3660: {sprite: "Nightmare"}
+  3661: {sprite: "Nightmare"}
+  3662: {sprite: "JAKK"}
+  3663: {sprite: "JAKK"}
+  3664: {sprite: "ghoul"}
+  3665: {sprite: "ghoul"}
+  3666: {sprite: "DRAINLIAR"}
+  3667: {sprite: "DRAINLIAR"}
+  3668: {sprite: "KIEL_"}
+  3669: {sprite: "DIABOLIC2"}
+  3670: {sprite: "DELETER_2"}
+  3721: {sprite: "poring"}
+  3722: {sprite: "poporing"}
+  3723: {sprite: "drops"}
+  3724: {sprite: "lunatic"}
+  3725: {sprite: "wilow"}
+  3726: {sprite: "picky"}
+  3727: {sprite: "picky_"}
+  3728: {sprite: "zombie"}
+  3729: {sprite: "poison_spore"}
+  3731: {sprite: "SCATLETON"}
+  3734: {sprite: "ORC_XMAS"}
+  3735: {sprite: "Poring_"}
+  3736: {sprite: "cowraiders1"}
+  3737: {sprite: "cowraiders2"}
+  3738: {sprite: "cowraiders3"}
+  3739: {sprite: "coyote"}
+  3740: {sprite: "gaster"}
+  3741: {sprite: "mechaspider"}
+  3742: {sprite: "purplestone"}
+  3743: {sprite: "seaanemone"}
+  3744: {sprite: "g_cowraiders1"}
+  3745: {sprite: "g_cowraiders2"}
+  3746: {sprite: "g_cowraiders3"}
+  3747: {sprite: "e_cowraiders1"}
+  3748: {sprite: "e_cowraiders2"}
+  3749: {sprite: "e_cowraiders3"}
+  3750: {sprite: "ILL_DRAINLIAR"}
+  3751: {sprite: "ILL_ZOMBIE_C"}
+  3752: {sprite: "ILL_ZOMBIE"}
+  3753: {sprite: "ILL_GHOUL"}
+  3754: {sprite: "ILL_NIGHTMARE"}
+  3755: {sprite: "ILL_BLACK_MUSHROOM"}
+  3756: {sprite: "ILL_BOMI"}
+  3757: {sprite: "ILL_DRACULA"}
+  3758: {sprite: "ILL_MOONLIGHT"}
+  3759: {sprite: "ILL_NINE_TAIL"}
+  3760: {sprite: "ILL_MUNAK"}
+  3761: {sprite: "ILL_BON_GUN"}
+  3762: {sprite: "ILL_SOHEE"}
+  3763: {sprite: "ILL_ARCHER_SKELETON"}
+  3764: {sprite: "ILL_HIGHWIZARD"}
+  3765: {sprite: "ILL_FURY_HERO"}
+  3787: {sprite: "ARCLOUSE"}
+  3788: {sprite: "CRAMP"}
+  3789: {sprite: "escaped_letter"}
+  3790: {sprite: "sweets_drops"}
+  3792: {sprite: "ILL_GAZETI"}
+  3793: {sprite: "ILL_SNOWIER"}
+  3794: {sprite: "ILL_ICE_TITAN"}
+  3795: {sprite: "ILL_ICEICLE"}
+  3796: {sprite: "ILL_KTULLANUX"}
+  3797: {sprite: "ILL_FROZEN_KN"}
+  3798: {sprite: "ILL_FROZEN_GC"}
+  3799: {sprite: "ILL_ASSULTER"}
+  3800: {sprite: "ILL_PERMETER"}
+  3801: {sprite: "ILL_FREEZER"}
+  3802: {sprite: "ILL_SOLIDER"}
+  3803: {sprite: "ILL_HEATER"}
+  3804: {sprite: "ILL_TURTLE_GENERAL"}
+  3805: {sprite: "e_happy_egg"}
+  3806: {sprite: "e_strange_egg"}
+  3807: {sprite: "e_lunatic_clover"}
+  3808: {sprite: "e_poporing_clover"}
+  3809: {sprite: "fatal_bug"}
+  3810: {sprite: "KING_PORING"}
+  3811: {sprite: "GOLDPORING"}
+  3812: {sprite: "PORING"}
+  3813: {sprite: "DROPS"}
+  3814: {sprite: "POPORING"}
+  3815: {sprite: "PORING"}
+  3816: {sprite: "MARIN"}
+  3817: {sprite: "DALCOM"}
+  3818: {sprite: "DALCOM"}
+  3819: {sprite: "E_MAGIC_PLANT"}
+  3820: {sprite: "MILD_IMP"}
+  3821: {sprite: "MILD_EXPLOSION"}
+  3822: {sprite: "E_PICKY"}
+  3823: {sprite: "E_IMP"}
+  3824: {sprite: "E_EXPLOSION"}
+  3825: {sprite: "E_SALAMANDER"}
+  3826: {sprite: "seyren"}
+  3877: {sprite: "e_nyailo"}
+  3878: {sprite: "soil"}
+  3879: {sprite: "hode"}
+  3880: {sprite: "breeze"}
+  3881: {sprite: "watermelon"}
+  3882: {sprite: "e_nyailo"}
+  3883: {sprite: "kraken_leg"}
+  3884: {sprite: "mimic"}
+  3885: {sprite: "ancient_mimic"}
+  3886: {sprite: "buwaya"}
+  3887: {sprite: "aqua_elemental"}
+  3896: {sprite: "ILL_ASSULTER"}
+  3897: {sprite: "ORC_SKELETON"}
+  3898: {sprite: "ORC_ZOMBIE"}
+  3899: {sprite: "HIGH_ORC"}
+  3900: {sprite: "ORC_ARCHER"}
+  3901: {sprite: "ORK_HERO"}
+  3902: {sprite: "ORC_LORD"}
+  3903: {sprite: "BLUE_FLOWER"}
+  3910: {sprite: "s_empel_1"}
+  3911: {sprite: "gibbet"}
+  3912: {sprite: "loli_ruri"}
+  3913: {sprite: "dullahan"}
+  3914: {sprite: "bloody_murderer"}
+  3915: {sprite: "s_empel_1"}
+  3955: {sprite: "savage"}
+  3956: {sprite: "elder_wilow"}
+  3969: {sprite: "red_mushroom"}
+  3970: {sprite: "black_mushroom"}
+  3971: {sprite: "SKELION"}
+  4014: {shadow: 1.5}
+  4022: {shadow: 1.5}
+  4023: {shadow: 0.75}
+  4024: {shadow: 0.75}
+  4025: {shadow: 0.75}
+  4026: {shadow: 0.75}
+  4027: {shadow: 0.75}
+  4028: {shadow: 0.75}
+  4029: {shadow: 0.75}
+  4030: {shadow: 0.82}
+  4031: {shadow: 0.82}
+  4032: {shadow: 0.82}
+  4033: {shadow: 0.82}
+  4034: {shadow: 0.82}
+  4035: {shadow: 0.82}
+  4037: {shadow: 0.82}
+  4038: {shadow: 0.82}
+  4040: {shadow: 0.82}
+  4041: {shadow: 0.82}
+  4042: {shadow: 0.82}
+  4043: {shadow: 0.82}
+  4045: {shadow: 0.75}
+  4080: {shadow: 1.5}
+  4081: {shadow: 1.5}
+  4082: {shadow: 1.5}
+  4083: {shadow: 1.5}
+  4084: {shadow: 2}
+  4085: {shadow: 2}
+  4086: {shadow: 2}
+  4087: {shadow: 2}
+  4096: {shadow: 0.82}
+  4097: {shadow: 0.82}
+  4098: {shadow: 0.82}
+  4099: {shadow: 0.82}
+  4100: {shadow: 0.82}
+  4101: {shadow: 0.82}
+  4102: {shadow: 0.82}
+  4103: {shadow: 0.82}
+  4104: {shadow: 0.82}
+  4105: {shadow: 0.82}
+  4106: {shadow: 0.82}
+  4107: {shadow: 0.82}
+  4108: {shadow: 0.82}
+  4111: {shadow: 1.5}
+  4112: {shadow: 1.5}
+  4114: {shadow: 2}
+  4115: {shadow: 2}
+  4116: {shadow: 2}
+  4117: {shadow: 2}
+  4118: {shadow: 2}
+  4119: {shadow: 2}
+  4120: {shadow: 2}
+  4121: {shadow: 2}
+  4122: {shadow: 1.5}
+  4123: {shadow: 2}
+  4124: {shadow: 2}
+  4125: {shadow: 1.5}
+  4126: {shadow: 1.5}
+  4127: {shadow: 1.5}
+  4128: {shadow: 2}
+  4129: {shadow: 1.5}
+  4130: {shadow: 2}
+  4131: {shadow: 2}
+  4132: {shadow: 2}
+  4133: {shadow: 2}
+  4134: {shadow: 2}
+  4135: {shadow: 2}
+  4136: {shadow: 2}
+  4137: {shadow: 2}
+  4138: {shadow: 2}
+  4139: {shadow: 1.5}
+  4140: {shadow: 2}
+  4141: {shadow: 2}
+  4142: {shadow: 2}
+  4143: {shadow: 2}
+  4144: {shadow: 2}
+  4145: {shadow: 2}
+  4146: {shadow: 2}
+  4147: {shadow: 1.5}
+  4148: {shadow: 1.5}
+  4149: {shadow: 1.5}
+  4150: {shadow: 1.5}
+  4151: {shadow: 1.5}
+  4152: {shadow: 1.5}
+  4153: {shadow: 1.5}
+  4154: {shadow: 1.5}
+  4155: {shadow: 2}
+  4156: {shadow: 1.5}
+  4157: {shadow: 1.5}
+  4158: {shadow: 1.5}
+  4159: {shadow: 1.5}
+  4160: {shadow: 1.5}
+  4161: {shadow: 1.12}
+  4162: {shadow: 1.12}
+  4163: {shadow: 1.5}
+  4164: {shadow: 1.12}
+  4165: {shadow: 1.5}
+  4166: {shadow: 1.12}
+  4167: {shadow: 1.5}
+  4168: {shadow: 1.5}
+  4169: {shadow: 1.5}
+  4170: {shadow: 1.12}
+  4171: {shadow: 1.12}
+  4172: {shadow: 1.5}
+  4173: {shadow: 1.5}
+  4174: {shadow: 1.12}
+  4175: {shadow: 1.5}
+  4176: {shadow: 1.5}
+  4177: {shadow: 1.12}
+  4178: {shadow: 1.12}
+  4179: {shadow: 1.12}
+  4180: {shadow: 1.5}
+  4181: {shadow: 1.5}
+  4182: {shadow: 1.5}
+  4183: {shadow: 2}
+  4184: {shadow: 2}
+  4185: {shadow: 2}
+  4186: {shadow: 1.5}
+  4187: {shadow: 1.5}
+  4188: {shadow: 2}
+  4189: {shadow: 2}
+  4190: {shadow: 1}
+  4191: {shadow: 1}
+  4192: {shadow: 2}
+  4193: {shadow: 1.5}
+  4194: {shadow: 1.12}
+  4195: {shadow: 1.5}
+  4196: {shadow: 1.5}
+  4197: {shadow: 2}
+  4198: {shadow: 1.5}
+  4199: {shadow: 2}
+  4200: {shadow: 2}
+  4201: {shadow: 2}
+  4202: {shadow: 2}
+  4203: {shadow: 2}
+  4204: {shadow: 2}
+  4205: {shadow: 1.5}
+  4206: {shadow: 1.12}
+  4207: {shadow: 1.5}
+  4208: {shadow: 1.5}
+  4209: {shadow: 1.5}
+  4210: {shadow: 1.5}
+  4213: {shadow: 2}
+  4214: {shadow: 2}
+  4215: {shadow: 1}
+  4216: {shadow: 2}
+  4217: {shadow: 1}
+  4218: {shadow: 1}
+  4219: {shadow: 1.5}
+  4220: {shadow: 0.82}
+  4221: {shadow: 1.23}
+  4222: {shadow: 0.82}
+  4223: {shadow: 0.82}
+  4224: {shadow: 0.82}
+  4225: {shadow: 0.82}
+  4226: {shadow: 0.82}
+  4227: {shadow: 0.82}
+  4228: {shadow: 0.82}
+  4229: {shadow: 0.82}
+  4230: {shadow: 1.5}
+  4231: {shadow: 1.5}
+  4232: {shadow: 1.5}
+  4233: {shadow: 1.5}
+  4234: {shadow: 1.5}
+  4235: {shadow: 1.5}
+  4236: {shadow: 1.5}
+  4237: {shadow: 1.5}
+  4238: {shadow: 0.82}
+  4241: {shadow: 0.82}
+  4242: {shadow: 0.82}
+  4245: {shadow: 2}
+  4246: {shadow: 2}
+  4247: {shadow: 1.5}
+  4248: {shadow: 1.5}
+  4265: {shadow: 2}
+  4266: {shadow: 2}
+  4267: {shadow: 2}
+  4268: {shadow: 2}
+  4269: {shadow: 1.5}
+  4270: {shadow: 1.5}
+  4271: {shadow: 2}
+  4272: {shadow: 2}
+  4273: {shadow: 2}
+  4274: {shadow: 2}
+  4275: {shadow: 1.5}
+  4276: {shadow: 1.5}
+  4277: {shadow: 1.5}
+  4278: {shadow: 1.5}
+  4279: {shadow: 2}
+  4280: {shadow: 2}
+  4281: {shadow: 2}
+  4309: {shadow: 2}
+  4310: {shadow: 2}
+  4311: {shadow: 2}
+  4312: {shadow: 2}
+  4313: {shadow: 2}
+  4314: {shadow: 2}
+  4315: {shadow: 1.5}
+  6001: {sprite: "LIF"}
+  6002: {sprite: "AMISTR"}
+  6003: {sprite: "FILIR", shadow: 0.5}
+  6004: {sprite: "VANILMIRTH", shadow: 0.5}
+  6005: {sprite: "LIF2", shadow: 0.5}
+  6006: {sprite: "AMISTR2", shadow: 0.7}
+  6007: {sprite: "FILIR2", shadow: 0.5}
+  6008: {sprite: "VANILMIRTH2", shadow: 0.5}
+  6009: {sprite: "LIF_H"}
+  6010: {sprite: "AMISTR_H", shadow: 1.2}
+  6011: {sprite: "FILIR_H"}
+  6012: {sprite: "VANILMIRTH_H", shadow: 0}
+  6013: {sprite: "LIF_H2"}
+  6014: {sprite: "AMISTR_H2"}
+  6015: {sprite: "FILIR_H2", shadow: 1.2}
+  6016: {sprite: "VANILMIRTH_H2", shadow: 1.2}
+  6017: {sprite: "여\\활용병"}
+  6018: {sprite: "여\\활용병"}
+  6019: {sprite: "여\\활용병"}
+  6020: {sprite: "여\\활용병"}
+  6021: {sprite: "여\\활용병"}
+  6022: {sprite: "여\\활용병"}
+  6023: {sprite: "여\\활용병"}
+  6024: {sprite: "여\\활용병"}
+  6025: {sprite: "여\\활용병"}
+  6026: {sprite: "여\\활용병"}
+  6027: {sprite: "남\\창용병"}
+  6028: {sprite: "남\\창용병"}
+  6029: {sprite: "남\\창용병"}
+  6030: {sprite: "남\\창용병"}
+  6031: {sprite: "남\\창용병"}
+  6032: {sprite: "남\\창용병"}
+  6033: {sprite: "남\\창용병"}
+  6034: {sprite: "남\\창용병"}
+  6035: {sprite: "남\\창용병"}
+  6036: {sprite: "남\\창용병"}
+  6037: {sprite: "남\\검용병"}
+  6038: {sprite: "남\\검용병"}
+  6039: {sprite: "남\\검용병"}
+  6040: {sprite: "남\\검용병"}
+  6041: {sprite: "남\\검용병"}
+  6042: {sprite: "남\\검용병"}
+  6043: {sprite: "남\\검용병"}
+  6044: {sprite: "남\\검용병"}
+  6045: {sprite: "남\\검용병"}
+  6046: {sprite: "남\\검용병"}
+  6048: {sprite: "MER_EIRA"}
+  6049: {sprite: "MER_BAYERI", shadow: 1.2}
+  6050: {sprite: "MER_SERA"}
+  6051: {sprite: "MER_DIETER", shadow: 1.2}
+  6052: {sprite: "MER_ELEANOR"}
+  10001: {sprite: "4_tower_14"}
+  10002: {sprite: "4_tower_15"}
+  10003: {sprite: "4_tower_16"}
+  10004: {sprite: "4_tower_17"}
+  10005: {sprite: "4_treasure_box"}
+  10006: {sprite: "academy_master"}
+  10007: {sprite: "portal"}
+  10008: {sprite: "thanatos_battle"}
+  10009: {sprite: "thanatos_keep"}
+  10010: {sprite: "4_F_LYDIA"}
+  10011: {sprite: "4_LUDE"}
+  10012: {sprite: "4_ALIZA"}
+  10013: {sprite: "4_ALICE"}
+  10014: {sprite: "4_ARCHER_SKEL"}
+  10015: {sprite: "4_JACK"}
+  10016: {sprite: "4_SOLDIER_SKEL"}
+  10017: {sprite: "4_LOLI_RURI"}
+  10018: {sprite: "4_M_SAKRAY_TIED"}
+  10019: {sprite: "4_M_ANTONIO"}
+  10020: {sprite: "4_M_COOKIE"}
+  10021: {sprite: "4_M_BELIEVER01"}
+  10022: {sprite: "4_F_BELIEVER01"}
+  10023: {sprite: "4_M_BELIEVER02"}
+  10024: {sprite: "4_ROPEPILE"}
+  10025: {sprite: "4_BRICKPILE"}
+  10026: {sprite: "4_WOODPILE"}
+  10027: {sprite: "4_M_TAMARIN"}
+  10028: {sprite: "4_M_DEATH"}
+  10029: {sprite: "4_GHOST_STAND"}
+  10030: {sprite: "4_GHOST_COLLAPSE"}
+  10031: {sprite: "4_COOKIEHOUSE"}
+  10032: {sprite: "4_F_SKULL06GIRL"}
+  10033: {sprite: "4_NONMYSTCASE"}
+  10034: {sprite: "4_F_KIMI"}
+  10035: {sprite: "4_m_frozen_gc"}
+  10036: {sprite: "4_m_frozen_kn"}
+  10037: {sprite: "4_snake_lord"}
+  10038: {sprite: "4_f_mocboy"}
+  10039: {sprite: "4_f_runain"}
+  10040: {sprite: "4_m_roel"}
+  10041: {sprite: "4_f_shalosh"}
+  10042: {sprite: "4_energy_red"}
+  10043: {sprite: "4_energy_blue"}
+  10044: {sprite: "4_energy_yellow"}
+  10045: {sprite: "4_energy_black"}
+  10046: {sprite: "4_energy_white"}
+  10047: {sprite: "4_f_pere01"}
+  10048: {sprite: "4_jitterbug"}
+  10049: {sprite: "4_SEA_OTTER"}
+  10050: {sprite: "4_GALAPAGO"}
+  10051: {sprite: "4_DESERTWOLF_B"}
+  10052: {sprite: "4_BB_PORING"}
+  10053: {sprite: "4_f_charleston01"}
+  10054: {sprite: "4_f_charleston02"}
+  10055: {sprite: "4_f_charleston03"}
+  10056: {sprite: "4_M_IAN"}
+  10057: {sprite: "4_M_OLDSCHOLAR"}
+  10058: {sprite: "4_F_LAPERM"}
+  10059: {sprite: "4_M_DEBON"}
+  10060: {sprite: "4_M_BIRMAN"}
+  10061: {sprite: "4_F_SHAM"}
+  10062: {sprite: "4_M_REBELLION"}
+  10063: {sprite: "4_F_REBELLION"}
+  10064: {sprite: "4_CHN_SHAOTH"}
+  10065: {sprite: "4_SHOAL"}
+  10066: {sprite: "4_F_SARAH"}
+  10067: {sprite: "4_GIGANTES_BIG"}
+  10068: {sprite: "4_GIGANTES"}
+  10069: {sprite: "4_GIGANTES_SMALL"}
+  10070: {sprite: "4_GARGOYLE_STATUE"}
+  10071: {sprite: "4_AIRA"}
+  10072: {sprite: "4_EZELLA"}
+  10073: {sprite: "4_KULUNA"}
+  10074: {sprite: "4_LUNE"}
+  10075: {sprite: "4_MALLINA"}
+  10076: {sprite: "4_MORIN"}
+  10077: {sprite: "4_NASARIN"}
+  10078: {sprite: "4_F_BERRYTEA"}
+  10079: {sprite: "4_F_FRUIT"}
+  10080: {sprite: "4_SCR_MT_ROBOTS"}
+  10081: {sprite: "4_MACHINE_DEVICE"}
+  10082: {sprite: "4_GC109"}
+  10083: {sprite: "4_SYS_MSG"}
+  10084: {sprite: "4_M_TATIO"}
+  10085: {sprite: "4_M_REKENBER"}
+  10086: {sprite: "4_XMAS_CAT1"}
+  10087: {sprite: "4_XMAS_CAT2"}
+  10088: {sprite: "4_XMAS_CAT3"}
+  10089: {sprite: "4_XMAS_CAT4"}
+  10090: {sprite: "4_XMAS_CAT5"}
+  10091: {sprite: "4_XMAS_CAT6"}
+  10092: {sprite: "4_M_DEATH2"}
+  10093: {sprite: "4_S_KADOMATSU"}
+  10094: {sprite: "4_B_KADOMATSU"}
+  10095: {sprite: "4_F_08"}
+  10096: {sprite: "4_F_08_STATUE"}
+  10097: {sprite: "4_M_DARKPRIEST"}
+  10098: {sprite: "4_JP_GARM_H"}
+  10099: {sprite: "4_JP_MEDUSA_H"}
+  10100: {sprite: "4_CHN_GVG_01"}
+  10101: {sprite: "4_SPRING_RABBIT"}
+  10102: {sprite: "4_PD_TYRA"}
+  10103: {sprite: "4_PD_TYRANOS"}
+  10104: {sprite: "4_PD_PLESI"}
+  10105: {sprite: "4_PD_PLESIO"}
+  10106: {sprite: "4_PD_BRACHI"}
+  10107: {sprite: "4_PD_BRACHIOS"}
+  10108: {sprite: "4_PD_GOLDDRAGON"}
+  10109: {sprite: "4_PD_ZAEROG"}
+  10110: {sprite: "4_PD_TAMADORA"}
+  10111: {sprite: "4_JP_EDGA_H"}
+  10112: {sprite: "4_JP_BRAGOLEM_H"}
+  10113: {sprite: "4_EL_AQUA"}
+  10114: {sprite: "4_EP16_NIHIL"}
+  10115: {sprite: "4_EP16_SPICA"}
+  10116: {sprite: "4_EP16_SKIA"}
+  10117: {sprite: "4_EP16_PETER"}
+  10118: {sprite: "4_EP16_CRUX"}
+  10119: {sprite: "4_EP16_GRANZ"}
+  10120: {sprite: "4_EP16_STOLZ"}
+  10121: {sprite: "4_EP16_EGEO"}
+  10122: {sprite: "4_EP16_COOK"}
+  10123: {sprite: "4_EP16_MARK"}
+  10124: {sprite: "4_EP16_TAMARIN"}
+  10125: {sprite: "4_EP16_POE"}
+  10126: {sprite: "4_EP16_ISAAC"}
+  10127: {sprite: "4_EP16_HELMUT"}
+  10128: {sprite: "4_EP16_WOLF"}
+  10129: {sprite: "4_EP16_MEYER"}
+  10130: {sprite: "4_EP16_AGNES"}
+  10131: {sprite: "4_EP16_FOOD"}
+  10132: {sprite: "4_EP16_LOUVIERE"}
+  10133: {sprite: "4_EP16_MAX"}
+  10134: {sprite: "4_EP16_SPIEGEL"}
+  10135: {sprite: "4_MOONLIGHT"}
+  10136: {sprite: "4_MISTRESS"}
+  10137: {sprite: "4_DRACULA"}
+  10138: {sprite: "4_STORMKNIGHT"}
+  10139: {sprite: "4_TATTER"}
+  10140: {sprite: "4_AS_RAGGED_GOLEM"}
+  10141: {sprite: "4_AS_BLOODY_KNIGHT"}
+  10142: {sprite: "4_AS_WIND_GHOST"}
+  10143: {sprite: "4_F_BIJOU"}
+  10144: {sprite: "4_EP16_COOK2"}
+  10145: {sprite: "4_SERVICE_30_M_01"}
+  10146: {sprite: "4_SERVICE_30_F_01"}
+  10147: {sprite: "4_SCR_AT_ROBOTS"}
+  10148: {sprite: "4_F_RANGER"}
+  10149: {sprite: "4_WAG"}
+  10150: {sprite: "4_NPC_TRAP"}
+  10151: {sprite: "4_raggler"}
+  10152: {sprite: "4_dr_pepe"}
+  10153: {sprite: "4_dr_gamberi"}
+  10154: {sprite: "4_dr_aglio"}
+  10155: {sprite: "4_dr_olio"}
+  10156: {sprite: "4_dr_stelo"}
+  10157: {sprite: "4_dr_tortel"}
+  10158: {sprite: "4_basil_slave"}
+  10159: {sprite: "4_dou_jindo"}
+  10160: {sprite: "4_dou_siba"}
+  10161: {sprite: "4_tarutupi"}
+  10162: {sprite: "4_dr_soldier"}
+  10163: {sprite: "4_dr_m_01"}
+  10164: {sprite: "4_dr_m_02"}
+  10165: {sprite: "4_dr_f_01"}
+  10166: {sprite: "4_dr_f_02"}
+  10167: {sprite: "4_dr_kid_01"}
+  10172: {sprite: "4_cenere"}
+  10173: {sprite: "4_f_aruna_pop2"}
+  10174: {sprite: "4_jack_head"}
+  10175: {sprite: "4_injustice"}
+  10176: {sprite: "4_bloodyman"}
+  10177: {sprite: "4_gibbet"}
+  10178: {sprite: "4_dullahan"}
+  10179: {sprite: "4_m_lazy"}
+  10180: {sprite: "4_m_gony"}
+  10181: {sprite: "4_m_rookie"}
+  10182: {sprite: "4_m_philofontes"}
+  10183: {sprite: "4_f_estloveloy"}
+  10184: {sprite: "4_f_leedsh"}
+  10185: {sprite: "4_f_diene"}
+  10186: {sprite: "4_f_coatneis"}
+  10187: {sprite: "4_m_rupert"}
+  10188: {sprite: "4_m_fallengony"}
+  10189: {sprite: "4_m_eisen"}
+  10190: {sprite: "4_f_deadevil"}
+  10191: {sprite: "4_f_hunter_evil"}
+  10192: {sprite: "4_f_elena"}
+  10193: {sprite: "4_f_anya"}
+  10194: {sprite: "4_m_seiren_uc"}
+  10195: {sprite: "4_m_gunslinger2"}
+  10196: {sprite: "4_m_gunslinger3"}
+  10197: {sprite: "4_m_rebellion2"}
+  10198: {sprite: "4_m_rebellion3"}
+  10199: {sprite: "4_f_gunslinger2"}
+  10200: {sprite: "4_f_gunslinger3"}
+  10201: {sprite: "4_f_rebellion2"}
+  10202: {sprite: "4_f_rebellion3"}
+  10203: {sprite: "4_m_ilya"}
+  10205: {sprite: "4_elder"}
+  10206: {sprite: "4_lunatic"}
+  10207: {sprite: "4_f_novice2"}
+  10209: {sprite: "4_f_premi"}
+  10210: {sprite: "4_m_costell"}
+  10211: {sprite: "4_m_yattwarp"}
+  10212: {sprite: "4_m_evokascudi"}
+  10213: {sprite: "4_m_johnnyjames"}
+  10214: {sprite: "4_m_albertford"}
+  10215: {sprite: "4_m_seanmccurdy"}
+  10217: {sprite: "4_m_cactusman1"}
+  10218: {sprite: "4_m_cactusman2"}
+  10219: {sprite: "4_m_cactusman3"}
+  10220: {sprite: "4_m_cactuslady"}
+  10222: {sprite: "4_m_cactuschild"}
+  10223: {sprite: "4_king"}
+  10224: {sprite: "4_f_bomi"}
+  10225: {sprite: "4_m_cactuschief"}
+  10226: {sprite: "4_f_cactuschild2"}
+  10227: {sprite: "4_f_cactuslady2"}
+  10228: {sprite: "4_f_cactuslady3"}
+  10229: {sprite: "4_m_cactus"}
+  10230: {sprite: "4_m_cowraiders1"}
+  10231: {sprite: "4_m_cowraiders2"}
+  10232: {sprite: "4_m_cowraiders3"}
+  10234: {sprite: "4_m_poorscholar"}
+  10235: {sprite: "4_m_pepperroti"}
+  10237: {sprite: "4_PURPLE_WARP"}
+  10238: {sprite: "4_F_NARIN"}
+  10239: {sprite: "4_M_URGENT_MAN"}
+  10240: {sprite: "4_M_KEEN_SOLDIER"}
+  10241: {sprite: "4_F_SLOPPY_WOMAN"}
+  10242: {sprite: "4_f_drkafra01"}
+  10243: {sprite: "4_m_drzonda01"}
+  10244: {sprite: "4_m_swd_reno"}
+  10245: {sprite: "4_m_kng_reno"}
+  10246: {sprite: "4_m_ac_rumin"}
+  10247: {sprite: "4_m_highwizard"}
+  10248: {sprite: "4_system_box"}
+  10249: {sprite: "4_steelbox"}
+  10250: {sprite: "4_woodbox"}
+  10251: {sprite: "4_m_popfesta"}
+  10252: {sprite: "4_bonfire"}
+  10253: {sprite: "clear_npc"}
+  10256: {sprite: "DUCKLING"}
+  10271: {sprite: "4_SCATLETON"}
+  10280: {sprite: "4_JJAK"}
+  10281: {sprite: "4_M_SNOWMAN_B"}
+  10282: {sprite: "4_M_SNOWMAN_R"}
+  10283: {sprite: "4_M_SNOWMAN_G"}
+  10285: {sprite: "4_hen"}
+  10286: {sprite: "4_f_dangdang"}
+  10287: {sprite: "4_m_dangdang"}
+  10288: {sprite: "4_f_dangdang1"}
+  10289: {sprite: "4_leafcat"}
+  10290: {sprite: "4_teddy_bear"}
+  10291: {sprite: "4_teddy_bear_em"}
+  10292: {sprite: "4_teddy_bear_w"}
+  10293: {sprite: "4_teddy_bear_b"}
+  10294: {sprite: "4_teddy_bear_b_l"}
+  10295: {sprite: "4_m_soulreaper"}
+  10296: {sprite: "4_f_se_sun"}
+  10297: {sprite: "4_m_se_moon"}
+  10298: {sprite: "4_m_se_star"}
+  10299: {sprite: "4_ep17_kaya"}
+  10300: {sprite: "4_ep17_as"}
+  10301: {sprite: "4_ep17_elyumina"}
+  10302: {sprite: "4_ep17_morning"}
+  10303: {sprite: "4_ep17_miguel"}
+  10304: {sprite: "4_ep17_nihil_k"}
+  10305: {sprite: "4_ep17_miguel_d"}
+  10306: {sprite: "4_ed_schmidt"}
+  10307: {sprite: "4_ed_oscar"}
+  10308: {sprite: "4_ed_orb"}
+  10309: {sprite: "4_ed_fence"}
+  10310: {sprite: "4_m_andrea"}
+  10311: {sprite: "4_m_andrea_d"}
+  10312: {sprite: "4_f_anes"}
+  10313: {sprite: "4_f_anes_d"}
+  10314: {sprite: "4_m_silvano"}
+  10315: {sprite: "4_m_silvano_d"}
+  10316: {sprite: "4_f_cecilia"}
+  10317: {sprite: "4_f_cecilia_d"}
+  10318: {sprite: "4_m_md_seyren"}
+  10319: {sprite: "4_m_md_eremes"}
+  10320: {sprite: "4_m_md_harword"}
+  10321: {sprite: "4_f_md_magaleta"}
+  10322: {sprite: "4_f_md_shecil"}
+  10323: {sprite: "4_f_md_katrinn"}
+  10324: {sprite: "4_m_md_seyren_h"}
+  10325: {sprite: "4_m_md_eremes_h"}
+  10326: {sprite: "4_m_md_harword_h"}
+  10327: {sprite: "4_f_md_magaleta_h"}
+  10328: {sprite: "4_f_md_shecil_h"}
+  10329: {sprite: "4_f_md_katrinn_h"}
+  10330: {sprite: "4_m_md_seyren_d"}
+  10331: {sprite: "4_m_md_eremes_d"}
+  10332: {sprite: "4_m_md_harword_d"}
+  10333: {sprite: "4_f_md_magaleta_d"}
+  10334: {sprite: "4_f_md_shecil_d"}
+  10335: {sprite: "4_f_md_katrinn_d"}
+  10336: {sprite: "4_f_md_ygnizem"}
+  10337: {sprite: "4_f_erene"}
+  10341: {sprite: "4_pigocto"}
+  10344: {sprite: "4_ep17_master_a"}
+  10345: {sprite: "4_ep17_basic_b"}
+  10346: {sprite: "4_ep17_guard_b"}
+  10347: {sprite: "4_ep17_basic_b_ng"}
+  10348: {sprite: "4_ep17_guard_b_ng"}
+  10349: {sprite: "4_ep17_sweety"}
+  10350: {sprite: "4_ep17_boy_a"}
+  10351: {sprite: "4_ep17_boy_b"}
+  10352: {sprite: "4_ep17_tamarin"}
+  10353: {sprite: "4_ep17_scissore"}
+  10354: {sprite: "4_ep17_tablet"}
+  10355: {sprite: "4_ep17_buckets"}
+  10356: {sprite: "4_ep17_cleaner"}
+  10357: {sprite: "4_ep17_basket"}
+  10358: {sprite: "4_ep17_brokenbeta"}
+  10359: {sprite: "4_ep17_cleaner_w"}
+  10360: {sprite: "4_ep17_mermaid"}
+  10364: {sprite: "4_4job_silla"}
+  10365: {sprite: "4_4job_maggi"}
+  10366: {sprite: "4_4job_robin"}
+  10367: {sprite: "4_4job_robin_drunk"}
+  10368: {sprite: "4_4job_leticia"}
+  10369: {sprite: "4_4job_serang"}
+  10370: {sprite: "4_4job_einhar"}
+  10371: {sprite: "4_4job_sealstone"}
+  10372: {sprite: "4_4job_phantombook1"}
+  10373: {sprite: "4_4job_phantombook2"}
+  10374: {sprite: "4_4job_phantombook3"}
+  10375: {sprite: "4_vending_machine"}
+  10376: {sprite: "4_ep18_maram"}
+  10377: {sprite: "4_ep18_miriam"}
+  10378: {sprite: "4_ep18_suad"}
+  10379: {sprite: "4_ep18_imril"}
+  10380: {sprite: "4_ep18_merchant"}
+  10381: {sprite: "4_ep18_tamarin"}
+  10382: {sprite: "4_ep18_dew"}
+  10383: {sprite: "4_ep18_mark"}
+  10384: {sprite: "4_ep18_alf"}
+  10385: {sprite: "4_ep18_shulang"}
+  10386: {sprite: "4_ep18_bagot"}
+  10387: {sprite: "4_ep18_demifreya"}
+  10388: {sprite: "4_ep18_kamil"}
+  10389: {sprite: "4_ep18_hazar"}
+  10390: {sprite: "4_ep18_wagon"}
+  10391: {sprite: "4_ep18_papers"}
+  10392: {sprite: "4_ep18_halfflower"}
+  10393: {sprite: "4_ep18_gw_old01"}
+  10394: {sprite: "4_ep18_gw_old02"}
+  10395: {sprite: "4_ep18_gw_middle01"}
+  10396: {sprite: "4_ep18_gw_middle02"}
+  10397: {sprite: "4_ep18_gw_man01"}
+  10398: {sprite: "4_ep18_gw_man02"}
+  10399: {sprite: "4_ep18_gw_woman01"}
+  10400: {sprite: "4_ep18_gw_woman02"}
+  10401: {sprite: "4_ep18_gw_child01"}
+  10402: {sprite: "4_ep18_gw_child02"}
+  10403: {sprite: "4_star_rainbow_box"}
+  10404: {sprite: "4_star_navy_box"}
+  10405: {sprite: "4_star_navy_box"}
+  10406: {sprite: "4_star_navy_box"}
+  10407: {sprite: "4_star_navy_box"}
+  10408: {sprite: "4_star_navy_box"}
+  10409: {sprite: "4_star_navy_box"}
+  10410: {sprite: "4_star_navy_box"}
+  10411: {sprite: "4_star_navy_box"}
+  10412: {sprite: "4_star_navy_box"}
+  10413: {sprite: "4_star_navy_box"}
+  10414: {sprite: "4_star_rainbow_box"}
+  10415: {sprite: "4_star_rainbow_box"}
+  10416: {sprite: "4_4job_maura"}
+  10417: {sprite: "4_treasure_box"}
+  10418: {sprite: "4_treasure_box"}
+  10419: {sprite: "4_treasure_box"}
+  10420: {sprite: "4_treasure_box"}
+  10421: {sprite: "4_treasure_box"}
+  10422: {sprite: "4_treasure_box"}
+  10423: {sprite: "4_treasure_box"}
+  10424: {sprite: "4_treasure_box"}
+  10425: {sprite: "4_treasure_box"}
+  10426: {sprite: "4_treasure_box"}
+  10427: {sprite: "4_treasure_box"}
+  10428: {sprite: "4_point_red"}
+  10429: {sprite: "4_point_blue"}
+  10430: {sprite: "4_point_yellow"}
+  10431: {sprite: "4_point_black"}
+  10432: {sprite: "4_point_white"}
+  10433: {sprite: "4_exjob_gerhold"}
+  10434: {sprite: "4_exjob_ninja"}
+  10435: {sprite: "4_exjob_master_j"}
+  10436: {sprite: "4_exjob_mr_seo"}
+  10437: {sprite: "4_exjob_happy_cloud"}
+  10438: {sprite: "4_exjob_star"}
+  10439: {sprite: "4_exjob_chul_ho"}
+  10440: {sprite: "4_exjob_ki_sul"}
+  10441: {sprite: "4_exjob_hyun_rok"}
+  10442: {sprite: "1_journey_stone_d"}
+  10443: {sprite: "1_journey_stone_f"}
+  10451: {sprite: "4_ep19_zoryara"}
+  10452: {sprite: "4_ep19_moryara"}
+  10453: {sprite: "4_ep19_lunch"}
+  10454: {sprite: "4_ep19_lazy"}
+  10455: {sprite: "4_ep19_juncea"}
+  10456: {sprite: "4_ep19_juncea_m"}
+  10457: {sprite: "4_ep19_juncea_d"}
+  10458: {sprite: "4_ep19_friederike"}
+  10459: {sprite: "4_ep19_suitcase"}
+  10460: {sprite: "4_ep19_healrock"}
+  10461: {sprite: "4_ep19_iwin"}
+  10462: {sprite: "4_ep19_iwin_diver"}
+  10463: {sprite: "4_ep19_tamarin"}
+  10464: {sprite: "4_ep19_leon"}
+  10465: {sprite: "4_ep19_aurelie"}
+  10466: {sprite: "4_ep19_lasgand"}
+  10467: {sprite: "4_ep19_voglinde"}
+  10468: {sprite: "4_ep19_vellgunde"}
+  10469: {sprite: "4_ep19_lehar"}
+  10470: {sprite: "4_ep19_rgan_r1"}
+  10471: {sprite: "4_ep19_rgan_r2"}
+  10472: {sprite: "4_ep19_rgan_r3"}
+  10473: {sprite: "4_ep19_rgan_sr1"}
+  10474: {sprite: "4_ep19_rgan_sr2"}
+  10475: {sprite: "4_ep19_rgan_sr3"}
+  10476: {sprite: "1_ragfes_01"}
+  10477: {sprite: "1_ragfes_01_m"}
+  10478: {sprite: "4_ragfes_02"}
+  10479: {sprite: "4_ragfes_02_m"}
+  10480: {sprite: "4_ragfes_03"}
+  10481: {sprite: "4_ragfes_03_m"}
+  10482: {sprite: "4_ragfes_04"}
+  10483: {sprite: "4_ragfes_04_m"}
+  10484: {sprite: "4_ragfes_05"}
+  10485: {sprite: "4_ragfes_05_m"}
+  10486: {sprite: "4_ragfes_06"}
+  10487: {sprite: "4_ragfes_06_m"}
+  10488: {sprite: "4_ragfes_07"}
+  10489: {sprite: "4_ragfes_07_m"}
+  10490: {sprite: "4_ragfes_08"}
+  10491: {sprite: "4_ragfes_08_m"}
+  10492: {sprite: "4_ragfes_09"}
+  10493: {sprite: "4_ragfes_09_m"}
+  10494: {sprite: "4_ragfes_10"}
+  10495: {sprite: "4_ragfes_10_m"}
+  10496: {sprite: "4_ragfes_11"}
+  10497: {sprite: "4_ragfes_11_m"}
+  10498: {sprite: "4_ragfes_12"}
+  10499: {sprite: "4_ragfes_12_m"}
+  10500: {sprite: "4_ragfes_13"}
+  10501: {sprite: "4_ragfes_13_m"}
+  10502: {sprite: "4_ragfes_14"}
+  10503: {sprite: "4_ragfes_14_m"}
+  10504: {sprite: "4_ragfes_15"}
+  10505: {sprite: "4_ragfes_15_m"}
+  10506: {sprite: "4_ragfes_16"}
+  10507: {sprite: "4_ragfes_16_m"}
+  10508: {sprite: "4_exjob_ninja2"}
+  10509: {sprite: "4_vr_book_fairy"}
+  10515: {sprite: "4_vr_book_red"}
+  10516: {sprite: "4_vr_book_blue"}
+  10517: {sprite: "4_vr_book_yellow"}
+  10518: {sprite: "4_vr_book_green"}
+  10519: {sprite: "4_vr_book_white"}
+  10520: {sprite: "4_vr_ygnizem"}
+  10526: {sprite: "4_VR_SWORDMAN_DEAD"}
+  10527: {sprite: "invisible", shadow: 0}
+  10528: {sprite: "4_cs_rigel"}
+  10529: {sprite: "4_m_nillem"}
+  10530: {sprite: "4_larva_red"}
+  10531: {sprite: "4_larva_yellow"}
+  10532: {sprite: "4_larva_black"}
+  10533: {sprite: "4_larva_violet"}
+  10534: {sprite: "4_hero_sausage"}
+  10535: {sprite: "4_princess_sausage"}
+  10536: {sprite: "4_EP20_LASGAND"}
+  10537: {sprite: "4_EP20_NYAR"}
+  10538: {sprite: "4_EP20_DEVICE_BLUE"}
+  10539: {sprite: "4_EP20_DEVICE_RED"}
+  10540: {sprite: "4_EP20_DEVICE_BLACK"}
+  10545: {sprite: "4_gacha_machine"}
+  10546: {sprite: "4_VR_CHAO", shadow: 0.2}
+  10547: {sprite: "4_RUNESTONE"}
+  10548: {sprite: "4_EM_ARDOR"}
+  10549: {sprite: "4_EM_DILUVIO"}
+  10550: {sprite: "4_EM_PROCELLA"}
+  10551: {sprite: "4_EM_TERREMOTUS"}
+  10552: {sprite: "4_EM_SERPENS"}
+  10553: {sprite: "4_SNOWDOG"}
+  10554: {sprite: "1_shadow_red", shadow: 0}
+  10555: {sprite: "1_shadow_orange", shadow: 0}
+  10556: {sprite: "1_shadow_yellow", shadow: 0}
+  10557: {sprite: "1_shadow_green", shadow: 0}
+  10558: {sprite: "1_shadow_blue", shadow: 0}
+  10559: {sprite: "1_shadow_indigo", shadow: 0}
+  10560: {sprite: "1_shadow_violet", shadow: 0}
+  10561: {sprite: "4_evt_lammir"}
+  10562: {sprite: "4_evt_sulki"}
+  10563: {sprite: "4_evt_kkat"}
+  10564: {sprite: "4_ep21_soldier_a"}
+  10565: {sprite: "4_ep21_soldier_b"}
+  10566: {sprite: "4_ep21_m_worker_a"}
+  10567: {sprite: "4_ep21_m_worker_b"}
+  10568: {sprite: "4_ep21_f_worker_a"}
+  10569: {sprite: "4_ep21_f_worker_b"}
+  10570: {sprite: "4_ep21_worker_kid_a"}
+  10571: {sprite: "4_ep21_worker_kid_b"}
+  10572: {sprite: "4_ep21_tan"}
+  10573: {sprite: "4_ep21_tris"}
+  10574: {sprite: "4_ep21_nadoyo"}
+  10575: {sprite: "4_ep21_reinhardt"}
+  10576: {sprite: "4_ep21_wilhelm"}
+  10577: {sprite: "4_ep21_maristella"}
+  10578: {sprite: "4_ep21_yohan"}
+  10579: {sprite: "4_ep21_richard"}
+  10580: {sprite: "4_ep21_valdaris"}
+  10581: {sprite: "4_ep21_gunter"}
+  10582: {sprite: "4_ep21_galaxia_a"}
+  10583: {sprite: "4_ep21_galaxia_b"}
+  10584: {sprite: "4_ep21_ivan"}
+  10585: {sprite: "4_ep21_lalaila"}
+  10586: {sprite: "4_ep21_ilse"}
+  10587: {sprite: "4_ep21_howell"}
+  10588: {sprite: "4_ep21_epesto"}
+  10589: {sprite: "4_ep21_heine_tab"}
+  10590: {sprite: "4_ep21_iana"}
+  10591: {sprite: "4_ep21_lee"}
+  10592: {sprite: "4_ep21_aurelie"}
+  10593: {sprite: "4_ep21_howell_s"}
+  10594: {sprite: "4_ep21_tan_s"}
+  10595: {sprite: "4_M_VACATION_MARAM"}
+  10596: {sprite: "4_CLB_SS_FC", shadow: 0.7}
+  10597: {sprite: "4_CLB_SS_TZ", shadow: 0.6}
+  10598: {sprite: "4_CLB_SS_AJ", shadow: 0.7}
+  10599: {sprite: "4_CLB_SS_LK", shadow: 1}
+  10600: {sprite: "4_SMART_ANDRE", shadow: 0.5}
+  10601: {sprite: "4_Alexsander"}
+  10602: {sprite: "4_Kasandra"}
+  10603: {sprite: "4_CLB_KP_P1"}
+  10604: {sprite: "4_CH1_LITHIU"}
+  10605: {sprite: "4_CH1_GRAY_VALKYRIE"}
+  10606: {sprite: "4_CH1_DELEGACY01"}
+  10607: {sprite: "4_CLB_KP_SF"}
+  10608: {sprite: "4_CLB_KP_ZH"}
+  10609: {sprite: "4_CH1_DELEGACY02"}
+  10610: {sprite: "4_CH1_DELEGACY03"}
+  10611: {sprite: "4_CH1_DELEGACY04"}
+  10612: {sprite: "4_CH1_YUP"}
+  10613: {sprite: "4_CH1_KAL"}
+  10614: {sprite: "4_M_PATIENT01"}
+  10615: {sprite: "4_F_PATIENT01"}
+  10616: {sprite: "4_M_PATIENT02"}
+  10617: {sprite: "4_F_PATIENT02"}
+  10618: {sprite: "4_PATIEN_KID"}
+  10619: {sprite: "4_CH1_NEUMANN"}
+  10620: {sprite: "4_CH1_BRANCH"}
+  10621: {sprite: "4_hm_uzagi"}
+  10622: {sprite: "4_hm_tarong"}
+  10623: {sprite: "4_hm_chubby"}
+  10624: {sprite: "4_hm_noni"}
+  10625: {sprite: "4_hm_lolbby"}
+  10626: {sprite: "4_hm_yobby"}
+  10627: {sprite: "4_hm_munch"}
+  10628: {sprite: "4_F_VACATION_MIRIAM"}
+  10629: {sprite: "1_CLB_DT_HICCUP"}
+  10630: {sprite: "1_CLB_DT_ASTRID"}
+  10631: {sprite: "1_CLB_DT_RUFFNUT"}
+  10632: {sprite: "1_CLB_DT_TUFFNUT"}
+  10633: {sprite: "1_CLB_DT_TOOTHLESS"}
+  10634: {sprite: "1_CLB_DT_STORMFLY"}
+  10635: {sprite: "1_CLB_DT_BARF_BELCH"}
+  10636: {sprite: "4_point_purple"}
+  20061: {sprite: "BAPHOMET_I"}
+  20062: {sprite: "BAPHOMET_"}
+  20063: {sprite: "VAGABOND_WOLF"}
+  20064: {sprite: "ECLIPSE"}
+  20065: {sprite: "VOCAL"}
+  20066: {sprite: "UNGOLIANT"}
+  20067: {sprite: "GEOGRAPHER"}
+  20068: {sprite: "MANTIS"}
+  20069: {sprite: "GRIZZLY"}
+  20070: {sprite: "KIND_OF_BEETLE"}
+  20071: {sprite: "Bigfoot"}
+  20072: {sprite: "COCO"}
+  20073: {sprite: "SIROMA"}
+  20074: {sprite: "MYSTCASE"}
+  20075: {sprite: "PORING_"}
+  20112: {sprite: "invisible"}
+  20118: {sprite: "goblin_king"}
+  20119: {sprite: "leaf_cat"}
+  20157: {sprite: "L_MAGALETA"}
+  20158: {sprite: "L_YGNIZEM"}
+  20159: {sprite: "L_WHIKEBAIN"}
+  20160: {sprite: "L_ARMAIA"}
+  20163: {sprite: "L_RAWREL"}
+  20164: {sprite: "L_EREND"}
+  20175: {sprite: "extra_joker"}
+  20176: {sprite: "ERZSEBET"}
+  20177: {sprite: "JENIFFER"}
+  20178: {sprite: "GENERAL_ORC"}
+  20179: {sprite: "SIEGLOUSE"}
+  20181: {sprite: "amon_ra"}
+  20182: {sprite: "baphomet"}
+  20183: {sprite: "dark_lord"}
+  20184: {sprite: "doppelganger"}
+  20185: {sprite: "dracula"}
+  20186: {sprite: "drake"}
+  20187: {sprite: "eddga"}
+  20188: {sprite: "garm"}
+  20189: {sprite: "golden_bug"}
+  20190: {sprite: "knight_of_windstorm"}
+  20191: {sprite: "maya"}
+  20192: {sprite: "mistress"}
+  20193: {sprite: "moonlight"}
+  20194: {sprite: "orc_lord"}
+  20195: {sprite: "ork_hero"}
+  20196: {sprite: "osiris"}
+  20197: {sprite: "pharaoh"}
+  20198: {sprite: "phreeoni"}
+  20199: {sprite: "tao_gunka"}
+  20200: {sprite: "turtle_general"}
+  20201: {sprite: "seyren"}
+  20202: {sprite: "harword"}
+  20203: {sprite: "eremes"}
+  20204: {sprite: "katrinn"}
+  20205: {sprite: "magaleta"}
+  20206: {sprite: "lord_of_death"}
+  20207: {sprite: "entweihen"}
+  20208: {sprite: "naght_sieger"}
+  20209: {sprite: "detale"}
+  20210: {sprite: "thanatos"}
+  20211: {sprite: "apocalips_h"}
+  20212: {sprite: "kiel_"}
+  20213: {sprite: "randgris"}
+  20214: {sprite: "rsx_0806"}
+  20215: {sprite: "ygnizem"}
+  20216: {sprite: "atros"}
+  20217: {sprite: "beelzebub_"}
+  20218: {sprite: "fallingbishop"}
+  20219: {sprite: "gloomundernight"}
+  20220: {sprite: "ifrit"}
+  20221: {sprite: "ktullanux"}
+  20222: {sprite: "ep16_2_h_hunter_ev"}
+  20223: {sprite: "ep16_2_mm_cutie"}
+  20224: {sprite: "ep16_2_venom_kimera"}
+  20225: {sprite: "shecil"}
+  20226: {sprite: "randel"}
+  20227: {sprite: "flamel"}
+  20228: {sprite: "trentini"}
+  20229: {sprite: "charleston3"}
+  20230: {sprite: "grand_pere"}
+  20231: {sprite: "s_nydhog"}
+  20232: {sprite: "queen_scaraba"}
+  20233: {sprite: "kraken"}
+  20234: {sprite: "timeholder"}
+  20235: {sprite: "incantation_samurai"}
+  20236: {sprite: "bacsojin"}
+  20237: {sprite: "dark_snake_lord"}
+  20238: {sprite: "lady_tanee"}
+  20239: {sprite: "gopinich"}
+  20240: {sprite: "leak"}
+  20241: {sprite: "mechaspider"}
+  20242: {sprite: "pyuriel"}
+  20243: {sprite: "kades"}
+  20244: {sprite: "gioia"}
+  20245: {sprite: "daehyon"}
+  20246: {sprite: "celia"}
+  20247: {sprite: "chen"}
+  20248: {sprite: "alphoccio"}
+  20249: {sprite: "gertie"}
+  20250: {sprite: "g_entweihen"}
+  20251: {sprite: "g_entweihen"}
+  20252: {sprite: "g_entweihen"}
+  20253: {sprite: "g_entweihen"}
+  20254: {sprite: "mimic"}
+  20255: {sprite: "teddy_bear_r"}
+  20256: {sprite: "teddy_bear_y"}
+  20257: {sprite: "teddy_bear_g"}
+  20258: {sprite: "teddy_bear_w"}
+  20259: {sprite: "teddy_bear_b"}
+  20260: {sprite: "teddy_bear_s"}
+  20261: {sprite: "pitman_il"}
+  20262: {sprite: "mineral_il"}
+  20263: {sprite: "obsidian_il"}
+  20264: {sprite: "teddy_bear_r"}
+  20265: {sprite: "teddy_bear_y"}
+  20266: {sprite: "teddy_bear_g"}
+  20267: {sprite: "teddy_bear_w"}
+  20268: {sprite: "teddy_bear_b"}
+  20269: {sprite: "guild_skill_flag"}
+  20270: {sprite: "ill_tri_joint"}
+  20271: {sprite: "ill_stalactic_golem"}
+  20272: {sprite: "ill_megalith"}
+  20273: {sprite: "ill_tao_gunka"}
+  20274: {sprite: "ill_stone_shooter"}
+  20275: {sprite: "ill_wootan_shooter"}
+  20276: {sprite: "ill_wootan_fighter"}
+  20277: {sprite: "ill_wootan_defender"}
+  20278: {sprite: "ill_megalith"}
+  20279: {sprite: "ill_wootan_shooter"}
+  20280: {sprite: "ill_wootan_fighter"}
+  20281: {sprite: "aster"}
+  20332: {sprite: "pecopeco"}
+  20340: {sprite: "md_el_a17t"}
+  20341: {sprite: "XM_HYLOZOIST"}
+  20342: {sprite: "md_e_ea2s"}
+  20343: {sprite: "venenum"}
+  20344: {sprite: "VENOM_BUG"}
+  20345: {sprite: "CONSTANT"}
+  20346: {sprite: "md_miguel"}
+  20347: {sprite: "md_miguel_g"}
+  20348: {sprite: "caput"}
+  20349: {sprite: "dolor"}
+  20350: {sprite: "bellare"}
+  20351: {sprite: "INVISIBLE"}
+  20352: {sprite: "gaster"}
+  20353: {sprite: "dolor"}
+  20354: {sprite: "gaster"}
+  20355: {sprite: "bellare"}
+  20356: {sprite: "bellare2"}
+  20357: {sprite: "sanare"}
+  20358: {sprite: "sanare2"}
+  20359: {sprite: "plaga"}
+  20360: {sprite: "plaga2"}
+  20361: {sprite: "dolor"}
+  20362: {sprite: "dolor2"}
+  20363: {sprite: "venenum"}
+  20364: {sprite: "venenum2"}
+  20365: {sprite: "caput"}
+  20366: {sprite: "caput2"}
+  20367: {sprite: "raydric_mj"}
+  20368: {sprite: "raydric_archer_mj"}
+  20369: {sprite: "gargoyle_mj"}
+  20370: {sprite: "sting_mj"}
+  20371: {sprite: "ragged_zombie_mj"}
+  20372: {sprite: "blazzer_mj"}
+  20373: {sprite: "nightmare_terror_mj"}
+  20374: {sprite: "deleter1_mj"}
+  20375: {sprite: "deleter2_mj"}
+  20376: {sprite: "explosion_mj"}
+  20377: {sprite: "kaho_mj"}
+  20378: {sprite: "lava_golem_mj"}
+  20379: {sprite: "ice_ghost"}
+  20380: {sprite: "flame_ghost"}
+  20381: {sprite: "ep17_1_r4885_bestia"}
+  20382: {sprite: "caput2"}
+  20385: {sprite: "md_gh_king_schmidt"}
+  20386: {sprite: "md_gh_king_schmidt"}
+  20387: {sprite: "md_gh_king_schmidt"}
+  20388: {sprite: "md_gh_khalitzburg"}
+  20389: {sprite: "md_gh_khalitzburg"}
+  20390: {sprite: "md_gh_whiteknight", shadow: 2}
+  20391: {sprite: "md_gh_whiteknight", shadow: 2}
+  20392: {sprite: "ALICE"}
+  20393: {sprite: "MG_CORRUPTION_ROOT"}
+  20394: {sprite: "bloody_knight"}
+  20419: {sprite: "muspellskoll_mj"}
+  20420: {sprite: "wander_man_mj"}
+  20421: {sprite: "brinaranea_mj"}
+  20422: {sprite: "dark_lord_mj"}
+  20423: {sprite: "bacsojin"}
+  20424: {sprite: "moonlight"}
+  20425: {sprite: "phreeoni"}
+  20426: {sprite: "INVISIBLE"}
+  20516: {sprite: "BONE_FERUS"}
+  20517: {sprite: "BONE_ACIDUS"}
+  20518: {sprite: "LUDE"}
+  20519: {sprite: "JAKK"}
+  20520: {sprite: "ill_baphomet", shadow: 2}
+  20521: {sprite: "ill_andrea"}
+  20522: {sprite: "ill_anes"}
+  20523: {sprite: "ill_silvano"}
+  20524: {sprite: "ill_cecilia"}
+  20525: {sprite: "ill_baphomet_j"}
+  20526: {sprite: "ill_side_winder"}
+  20527: {sprite: "ill_hunter_fly", shadow: 0.8}
+  20528: {sprite: "ill_mantis"}
+  20529: {sprite: "ill_ghostring"}
+  20530: {sprite: "ill_killer_mantis"}
+  20531: {sprite: "ill_poporing"}
+  20532: {sprite: "ill_stem_worm"}
+  20533: {sprite: "ill_baphomet_j"}
+  20534: {sprite: "REGINLEIF"}
+  20535: {sprite: "INGRID"}
+  20536: {sprite: "md_ed_b_ygnizem"}
+  20537: {sprite: "ygnizem"}
+  20538: {sprite: "EREND"}
+  20539: {sprite: "ARMAIA"}
+  20540: {sprite: "md_ed_eremes"}
+  20541: {sprite: "md_ed_lgthighguard"}
+  20542: {sprite: "md_ed_lgtguard"}
+  20543: {sprite: "md_ed_m_science"}
+  20558: {sprite: "MINERAL_R_MJ"}
+  20559: {sprite: "MINERAL_P_MJ"}
+  20560: {sprite: "MINERAL_G_MJ"}
+  20561: {sprite: "MINERAL_W_MJ"}
+  20562: {sprite: "invisible", shadow: 0}
+  20569: {sprite: "SAVAGE_BABE"}
+  20570: {sprite: "SAECOM"}
+  20571: {sprite: "ORK_HERO2"}
+  20572: {sprite: "c_himel"}
+  20573: {sprite: "c_amdarais", shadow: 3.5}
+  20574: {sprite: "c_whiteknight", shadow: 2.5}
+  20575: {sprite: "c_corruption", shadow: 1.5}
+  20576: {sprite: "c_khalitzburg"}
+  20577: {sprite: "c_raydric"}
+  20578: {sprite: "c_raydric_archer"}
+  20579: {sprite: "c_zombie"}
+  20580: {sprite: "c_zombie"}
+  20581: {sprite: "G_ENTWEIHEN"}
+  20582: {sprite: "invisible", shadow: 0}
+  20583: {sprite: "c_whiteknight", shadow: 2.5}
+  20584: {sprite: "c_khalitzburg"}
+  20585: {sprite: "c_raydric_archer"}
+  20589: {sprite: "MD_SEAWEED"}
+  20591: {sprite: "PAPARE"}
+  20592: {sprite: "POISONOUS_Z"}
+  20593: {sprite: "TOXIOUS_Z"}
+  20594: {sprite: "MINERAL_G_MJ"}
+  20595: {sprite: "MINERAL_R_MJ"}
+  20596: {sprite: "MINERAL_W_MJ"}
+  20597: {sprite: "MINERAL_P_MJ"}
+  20598: {sprite: "JEWELIANT_MJ"}
+  20599: {sprite: "JEWELIANT_MJ"}
+  20600: {sprite: "JEWEL_MJ"}
+  20601: {sprite: "JUNGOLIANTD1_MJ"}
+  20602: {sprite: "PORCELLIO_MJ"}
+  20603: {sprite: "ABYSSMAN_MJ"}
+  20604: {sprite: "ANGELGOLT"}
+  20605: {sprite: "ANGELGOLT2"}
+  20606: {sprite: "HOLY_FRUS"}
+  20607: {sprite: "HOLY_SKOGUL"}
+  20608: {sprite: "PLASMA_ARCH"}
+  20609: {sprite: "PLASMA_SPT"}
+  20610: {sprite: "REGINLEIF"}
+  20611: {sprite: "INGRID"}
+  20612: {sprite: "FERUS_P"}
+  20613: {sprite: "TREASURE_MIMIC"}
+  20614: {sprite: "ACIDUS_B"}
+  20615: {sprite: "ACIDUS_S"}
+  20616: {sprite: "BONE_FERUS"}
+  20617: {sprite: "BONE_ACIDUS"}
+  20618: {sprite: "BONE_DETALE"}
+  20619: {sprite: "gloomundernight2", shadow: 2}
+  20620: {sprite: "redpepper"}
+  20621: {sprite: "redpepper"}
+  20622: {sprite: "assistant"}
+  20623: {sprite: "assistant"}
+  20624: {sprite: "dry_rafflesia"}
+  20625: {sprite: "dry_rafflesia"}
+  20626: {sprite: "ALNOLDI"}
+  20627: {sprite: "ALNOLDI"}
+  20628: {sprite: "alpha_master"}
+  20629: {sprite: "beta_basic"}
+  20630: {sprite: "beta_basic_ng"}
+  20631: {sprite: "beta_scissore_ng"}
+  20632: {sprite: "beta_scissore_ng"}
+  20633: {sprite: "beta_cleaner_a"}
+  20634: {sprite: "beta_cleaner_b"}
+  20635: {sprite: "beta_baths_a"}
+  20636: {sprite: "beta_baths_b"}
+  20637: {sprite: "beta_itemkeeper"}
+  20638: {sprite: "beta_guards"}
+  20639: {sprite: "beta_guards_ng"}
+  20640: {sprite: "omega_cleaner"}
+  20641: {sprite: "omega_cleaner"}
+  20642: {sprite: "sweety"}
+  20643: {sprite: "ep17_2_phen"}
+  20644: {sprite: "ep17_2_marc"}
+  20645: {sprite: "ep17_2_sword_fish"}
+  20646: {sprite: "ep17_2_piranha"}
+  20647: {sprite: "bath_mermaid"}
+  20648: {sprite: "pitaya_boss"}
+  20649: {sprite: "pitaya_r"}
+  20650: {sprite: "pitaya_y"}
+  20651: {sprite: "pitaya_b"}
+  20652: {sprite: "pitaya_v"}
+  20653: {sprite: "pitaya_g"}
+  20654: {sprite: "pitaya_r"}
+  20655: {sprite: "pitaya_y"}
+  20656: {sprite: "pitaya_b"}
+  20657: {sprite: "pitaya_v"}
+  20658: {sprite: "pitaya_g"}
+  20659: {sprite: "pitaya_boss"}
+  20660: {sprite: "pitaya_r"}
+  20661: {sprite: "pitaya_y"}
+  20662: {sprite: "pitaya_b"}
+  20663: {sprite: "pitaya_v"}
+  20664: {sprite: "pitaya_g"}
+  20665: {sprite: "verporta"}
+  20666: {sprite: "verporte"}
+  20667: {sprite: "silva_papilia"}
+  20668: {sprite: "gran_papilia"}
+  20669: {sprite: "papila"}
+  20670: {sprite: "papila"}
+  20671: {sprite: "papila_ruba"}
+  20672: {sprite: "papila_ruba"}
+  20673: {sprite: "papila_ruba"}
+  20674: {sprite: "papila_cae"}
+  20675: {sprite: "papila_cae"}
+  20676: {sprite: "papila_cae"}
+  20677: {sprite: "aries"}
+  20678: {sprite: "aries_h"}
+  20679: {sprite: "ep17_2_guardian_parts"}
+  20680: {sprite: "heart_hunter_n"}
+  20681: {sprite: "heart_hunter_n"}
+  20682: {sprite: "heart_hunter_n"}
+  20683: {sprite: "bookworm"}
+  20684: {sprite: "roaming_splbook"}
+  20685: {sprite: "ep17_2_venenum"}
+  20686: {sprite: "ep17_2_cramp"}
+  20687: {sprite: "ep17_2_waterfall"}
+  20688: {sprite: "ep17_2_vellare"}
+  20689: {sprite: "dolor2"}
+  20690: {sprite: "plasma_r"}
+  20691: {sprite: "plaga2"}
+  20692: {sprite: "ep17_2_sanare"}
+  20693: {sprite: "plasma_r"}
+  20694: {sprite: "plasma_r"}
+  20695: {sprite: "E_GARLING", shadow: 1.2}
+  20696: {sprite: "child_admin1"}
+  20697: {sprite: "child_admin2"}
+  20698: {sprite: "assistant"}
+  20699: {sprite: "ep17_2_vellare"}
+  20700: {sprite: "beta_scissore_ng"}
+  20773: {sprite: "EMPATHIZER"}
+  20774: {sprite: "HAPPY_GIVER"}
+  20775: {sprite: "THA_ANGER", shadow: 1.5}
+  20776: {sprite: "THA_HORROR"}
+  20777: {sprite: "THA_RESENT"}
+  20778: {sprite: "THA_REGRET"}
+  20779: {sprite: "VOID_MIMIC"}
+  20780: {sprite: "BOOK_OF_DEATH"}
+  20781: {sprite: "ELDEST"}
+  20782: {sprite: "CROW_DUKE"}
+  20783: {sprite: "CROW_BARON"}
+  20784: {sprite: "MD_THANATOS", shadow: 2}
+  20785: {sprite: "MD_BROKEN_THANATOS", shadow: 2}
+  20786: {sprite: "barricade"}
+  20787: {sprite: "EMPATHIZER"}
+  20788: {sprite: "HAPPY_GIVER"}
+  20789: {sprite: "retribution"}
+  20790: {sprite: "shelter"}
+  20791: {sprite: "solace"}
+  20792: {sprite: "THA_ANGER", shadow: 1.5}
+  20793: {sprite: "THA_HORROR"}
+  20794: {sprite: "THA_RESENT"}
+  20795: {sprite: "THA_REGRET"}
+  20796: {sprite: "tha_odium"}
+  20797: {sprite: "tha_despero"}
+  20798: {sprite: "tha_maero"}
+  20799: {sprite: "tha_dolor"}
+  20800: {sprite: "observation"}
+  20801: {sprite: "ILL_SROPHO"}
+  20802: {sprite: "ILL_OBEAUNE"}
+  20803: {sprite: "ILL_DEVIACE"}
+  20804: {sprite: "ILL_MARSE"}
+  20805: {sprite: "ILL_MERMAN"}
+  20806: {sprite: "ILL_SEDORA"}
+  20807: {sprite: "ILL_SWORD_FISH"}
+  20808: {sprite: "ILL_STROUF"}
+  20809: {sprite: "ILL_PHEN"}
+  20810: {sprite: "ILL_KING_DRAMOH"}
+  20811: {sprite: "ILL_KRAKEN"}
+  20812: {sprite: "c_himel"}
+  20813: {sprite: "c_amdarais", shadow: 3.5}
+  20816: {sprite: "ELEMETAL_MASTER_S1", shadow: 2}
+  20817: {sprite: "ELEMETAL_MASTER_S3", shadow: 2}
+  20818: {sprite: "ELEMETAL_MASTER_S5", shadow: 2}
+  20819: {sprite: "ELEMETAL_MASTER_S4", shadow: 2}
+  20820: {sprite: "ELEMETAL_MASTER_S2", shadow: 2}
+  20821: {sprite: "4JOB_VOID", shadow: 1.5}
+  20822: {sprite: "4JOB_WRAITH", shadow: 1.5}
+  20823: {sprite: "4JOB_KINGS_NIGHT", shadow: 1.5}
+  20824: {sprite: "4JOB_AGONY_NIGHT", shadow: 1.5}
+  20825: {sprite: "4JOB_DEVOTION_NIGHT", shadow: 1.5}
+  20826: {sprite: "4JOB_ARMED_NIGHT", shadow: 1.5}
+  20827: {sprite: "4JOB_DOOMK", shadow: 1.5}
+  20828: {sprite: "4JOB_VERKHASEL", shadow: 1.5}
+  20829: {sprite: "baphomet", shadow: 1.5}
+  20830: {sprite: "매", shadow: 1.5}
+  20831: {sprite: "매2", shadow: 1.5}
+  20832: {sprite: "OWL", shadow: 1.5}
+  20833: {sprite: "워그", shadow: 1.5}
+  20834: {sprite: "MEISTER_ABR2", shadow: 1}
+  20835: {sprite: "MEISTER_ABR1", shadow: 1}
+  20836: {sprite: "MEISTER_ABR4", shadow: 1}
+  20837: {sprite: "MEISTER_ABR3", shadow: 1.5}
+  20843: {sprite: "ILL_ABYSMAL_WITCH"}
+  20844: {sprite: "PRAY_GIVER"}
+  20845: {sprite: "SMILE_GIVER"}
+  20846: {sprite: "invisible", shadow: 0}
+  20847: {sprite: "invisible", shadow: 0}
+  20848: {sprite: "SUMMON_WOODENWARRIOR", shadow: 1.5}
+  20849: {sprite: "SUMMON_WOODEN_FAIRY", shadow: 1}
+  20850: {sprite: "SUMMON_CREEPER", shadow: 1}
+  20851: {sprite: "SUMMON_HELLTREE", shadow: 1.5}
+  20856: {sprite: "GEFFEN_MAGE_1"}
+  20857: {sprite: "GEFFEN_MAGE_2"}
+  20858: {sprite: "GEFFEN_MAGE_3_1"}
+  20859: {sprite: "GEFFEN_MAGE_3_2"}
+  20860: {sprite: "GEFFEN_MAGE_3_3"}
+  20861: {sprite: "GEFFEN_MAGE_4"}
+  20862: {sprite: "GEFFEN_MAGE_5"}
+  20863: {sprite: "GEFFEN_MAGE_6"}
+  20864: {sprite: "GEFFEN_MAGE_7"}
+  20865: {sprite: "GEFFEN_MAGE_8"}
+  20866: {sprite: "GEFFEN_MAGE_9"}
+  20867: {sprite: "GEFFEN_MAGE_10"}
+  20868: {sprite: "GEFFEN_MAGE_11"}
+  20869: {sprite: "GEFFEN_MAGE_12"}
+  20870: {sprite: "FEI_KANABIAN"}
+  20871: {sprite: "GOLEM"}
+  20872: {sprite: "FENRIR"}
+  20873: {sprite: "war_nut"}
+  20875: {sprite: "DETALE", shadow: 1.5}
+  20876: {sprite: "ACIDUS", shadow: 1.5}
+  20877: {sprite: "ILL_SROPHO"}
+  20878: {sprite: "ILL_OBEAUNE"}
+  20879: {sprite: "ILL_DEVIACE"}
+  20880: {sprite: "ILL_MARSE"}
+  20881: {sprite: "ILL_MERMAN"}
+  20882: {sprite: "ILL_SEDORA"}
+  20883: {sprite: "ILL_SWORD_FISH"}
+  20884: {sprite: "ILL_STROUF"}
+  20885: {sprite: "ILL_PHEN"}
+  20886: {sprite: "MD_Airboat_Tree", shadow: 1.5}
+  20887: {sprite: "MD_Airboat_Poring", shadow: 1.2}
+  20888: {sprite: "MD_Airboat_Worm", shadow: 2}
+  20889: {sprite: "MD_Airboat_LEECH", shadow: 1.5}
+  20890: {sprite: "MD_Airboat_Mos", shadow: 1.5}
+  20891: {sprite: "MD_Airboat_Boss", shadow: 3.5}
+  20892: {sprite: "MD_SAKRAY", shadow: 1.2}
+  20893: {sprite: "MD_TIARA", shadow: 1.2}
+  20894: {sprite: "KHALITZBURG", shadow: 1.5}
+  20895: {sprite: "RAYDRIC", shadow: 1.2}
+  20896: {sprite: "RAYDRIC_ARCHER", shadow: 1.2}
+  20897: {sprite: "MD_UNDEAD_WIZARD", shadow: 1.5}
+  20898: {sprite: "MD_UNDEAD_MAGICIAN", shadow: 1.5}
+  20899: {sprite: "MD_UNDEAD_NOBLE", shadow: 1.5}
+  20900: {sprite: "ZOMBIE", shadow: 1.2}
+  20920: {sprite: "chimera_lava", shadow: 1}
+  20921: {sprite: "chimera_fulgor", shadow: 1.2}
+  20922: {sprite: "chimera_napeo", shadow: 1}
+  20923: {sprite: "chimera_galensis", shadow: 1}
+  20924: {sprite: "chimera_amitera", shadow: 1}
+  20925: {sprite: "chimera_litus", shadow: 1}
+  20926: {sprite: "chimera_fillia", shadow: 1}
+  20927: {sprite: "chimera_vanilaqus", shadow: 1}
+  20928: {sprite: "chimera_theone", shadow: 2}
+  20929: {sprite: "giant_caput", shadow: 1.5}
+  20930: {sprite: "dolorian", shadow: 1}
+  20931: {sprite: "plagarion", shadow: 1.2}
+  20932: {sprite: "deadre", shadow: 1}
+  20933: {sprite: "venedi", shadow: 1}
+  20934: {sprite: "r001_bestia", shadow: 2.3}
+  20935: {sprite: "gan_ceann", shadow: 1.2}
+  20936: {sprite: "disguiser", shadow: 1}
+  20937: {sprite: "brutal_murderer", shadow: 1.2}
+  20938: {sprite: "ghost_cube", shadow: 1}
+  20939: {sprite: "lude_gal", shadow: 1}
+  20940: {sprite: "bluemoon_loli_ruri", shadow: 1.2}
+  20941: {sprite: "grote", shadow: 1.2}
+  20942: {sprite: "pierrotzoist", shadow: 1}
+  20943: {sprite: "death_witch", shadow: 1.2}
+  20994: {sprite: "BETELGEUSE"}
+  20995: {sprite: "DEADSOUL", shadow: 0}
+  20996: {sprite: "NAGHT_SIEGER", shadow: 2}
+  20997: {sprite: "G_ENTWEIHEN"}
+  20998: {sprite: "JAKK"}
+  20999: {sprite: "STONE_SHOOTER"}
+  21000: {sprite: "GRIZZLY"}
+  21001: {sprite: "STALACTIC_GOLEM", shadow: 2}
+  21002: {sprite: "CHIMERA", shadow: 2}
+  21003: {sprite: "KARAKASA"}
+  21004: {sprite: "RIDEWORD"}
+  21005: {sprite: "PARASITE"}
+  21006: {sprite: "WRAITH", shadow: 1.5}
+  21007: {sprite: "PETIT_"}
+  21008: {sprite: "WIND_GHOST"}
+  21009: {sprite: "CLOCK"}
+  21010: {sprite: "raydric_archer"}
+  21011: {sprite: "INCREASE_SOIL", shadow: 2}
+  21012: {sprite: "PENOMENA"}
+  21013: {sprite: "PETIT"}
+  21014: {sprite: "ALARM", shadow: 2}
+  21015: {sprite: "ZOMBIE_PRISONER"}
+  21016: {sprite: "MARIONETTE"}
+  21017: {sprite: "PERMETER"}
+  21018: {sprite: "SKEL_PRISONER"}
+  21019: {sprite: "OWL_DUKE", shadow: 1.2}
+  21020: {sprite: "DEVIRUCHI", shadow: 0.7}
+  21021: {sprite: "BLOOD_BUTTERFLY", shadow: 1.2}
+  21022: {sprite: "STAPO"}
+  21023: {sprite: "EVIL_CLOUD_HERMIT", shadow: 2}
+  21024: {sprite: "THE_PAPER"}
+  21025: {sprite: "TENGU", shadow: 1.2}
+  21026: {sprite: "Alice"}
+  21027: {sprite: "Anacondaq", shadow: 0}
+  21028: {sprite: "Gargoyle"}
+  21029: {sprite: "Carat"}
+  21030: {sprite: "STING"}
+  21031: {sprite: "Gryphon"}
+  21032: {sprite: "GIBBET"}
+  21033: {sprite: "NIGHTMARE_TERROR", shadow: 1.5}
+  21034: {sprite: "ANOLIAN"}
+  21035: {sprite: "BLOODY_MURDERER", shadow: 2}
+  21036: {sprite: "ALIOT"}
+  21037: {sprite: "VENATU"}
+  21038: {sprite: "DEATHWORD"}
+  21039: {sprite: "PLASMA_B"}
+  21040: {sprite: "DIMIK"}
+  21041: {sprite: "MINI_DEMON"}
+  21042: {sprite: "LEIB_OLMAI"}
+  21043: {sprite: "WANDER_MAN"}
+  21044: {sprite: "RETRIBUTION"}
+  21045: {sprite: "FLAME_SKULL", shadow: 0}
+  21046: {sprite: "knight_of_abyss", shadow: 5}
+  21047: {sprite: "BANSHEE"}
+  21048: {sprite: "chimera_lava", shadow: 1}
+  21049: {sprite: "chimera_fulgor", shadow: 1.2}
+  21050: {sprite: "chimera_napeo", shadow: 1}
+  21051: {sprite: "chimera_galensis", shadow: 1}
+  21052: {sprite: "disguiser", shadow: 1}
+  21053: {sprite: "bluemoon_loli_ruri", shadow: 1.2}
+  21054: {sprite: "grote", shadow: 1.2}
+  21055: {sprite: "pierrotzoist", shadow: 1}
+  21056: {sprite: "giant_caput", shadow: 1.5}
+  21057: {sprite: "dolorian", shadow: 1}
+  21058: {sprite: "plagarion", shadow: 1.2}
+  21059: {sprite: "deadre", shadow: 1}
+  21060: {sprite: "venedi", shadow: 1}
+  21061: {sprite: "MD_Airboat_Boss", shadow: 3.5}
+  21062: {sprite: "MD_Airboat_Boss", shadow: 3.5}
+  21063: {sprite: "MD_Airboat_Boss", shadow: 3.5}
+  21064: {sprite: "BARRICADE"}
+  21065: {sprite: "BARRICADE"}
+  21066: {sprite: "BARRICADE"}
+  21067: {sprite: "s_empel_2"}
+  21068: {sprite: "s_empel_2"}
+  21069: {sprite: "s_empel_2"}
+  21070: {sprite: "s_empel_2"}
+  21071: {sprite: "s_empel_2"}
+  21072: {sprite: "s_empel_2"}
+  21073: {sprite: "s_empel_2"}
+  21074: {sprite: "s_empel_2"}
+  21075: {sprite: "s_empel_2"}
+  21076: {sprite: "s_empel_2"}
+  21077: {sprite: "s_empel_1"}
+  21078: {sprite: "s_empel_1"}
+  21079: {sprite: "s_empel_1"}
+  21080: {sprite: "s_empel_1"}
+  21081: {sprite: "s_empel_1"}
+  21082: {sprite: "s_empel_1"}
+  21083: {sprite: "s_empel_1"}
+  21084: {sprite: "s_empel_1"}
+  21085: {sprite: "s_empel_1"}
+  21086: {sprite: "s_empel_1"}
+  21089: {sprite: "DUCKLING"}
+  21290: {sprite: "pet_kiel"}
+  21292: {sprite: "ep18_armed_villager01", shadow: 1}
+  21293: {sprite: "ep18_armed_villager02", shadow: 1}
+  21294: {sprite: "ep18_armed_villager03", shadow: 1}
+  21295: {sprite: "ep18_ash_toad", shadow: 1.3}
+  21296: {sprite: "ep18_rakehand", shadow: 0.3}
+  21297: {sprite: "ep18_spark", shadow: 0.3}
+  21298: {sprite: "ep18_hot_molar", shadow: 1.3}
+  21299: {sprite: "ep18_volcaring", shadow: 1.2}
+  21300: {sprite: "ep18_lava_toad", shadow: 1.3}
+  21301: {sprite: "ep18_burning_fang", shadow: 2}
+  21302: {sprite: "ep18_ashhopper", shadow: 1}
+  21303: {sprite: "ep18_ashring", shadow: 0.3}
+  21304: {sprite: "ep18_grey_wolf", shadow: 1.2}
+  21305: {sprite: "ep18_tumble_ring", shadow: 0.3}
+  21306: {sprite: "ep18_firewind_kite", shadow: 0.7}
+  21307: {sprite: "ep18_phantom_wolf", shadow: 1}
+  21308: {sprite: "ep18_md_hearthunter_a", shadow: 1}
+  21309: {sprite: "ep18_md_thor_guard", shadow: 1}
+  21310: {sprite: "ep18_md_guard_a", shadow: 1}
+  21311: {sprite: "ep18_md_guard_b", shadow: 1}
+  21312: {sprite: "ep18_md_hearthunter_r", shadow: 1}
+  21313: {sprite: "ep18_md_hearthunter_f", shadow: 1}
+  21314: {sprite: "ep18_md_schulang", shadow: 1.3}
+  21315: {sprite: "ep18_md_demi_freyja", shadow: 1}
+  21316: {sprite: "ep18_md_schulang", shadow: 1.3}
+  21317: {sprite: "ep18_md_demi_freyja", shadow: 1}
+  21318: {sprite: "ep18_md_sanare_r", shadow: 1}
+  21319: {sprite: "ep18_md_hearthunter_r2", shadow: 1}
+  21320: {sprite: "ep18_npc_maram", shadow: 1}
+  21321: {sprite: "ep18_npc_miriam", shadow: 1}
+  21322: {sprite: "ep18_npc_suad", shadow: 1}
+  21323: {sprite: "ep18_grey_goat", shadow: 1.2}
+  21324: {sprite: "ep18_grey_wolf_baby", shadow: 0.7}
+  21325: {sprite: "mastering"}
+  21326: {sprite: "VAGABOND_WOLF"}
+  21327: {sprite: "VOCAL"}
+  21328: {sprite: "golden_bug"}
+  21329: {sprite: "mistress"}
+  21330: {sprite: "MAYA"}
+  21331: {sprite: "phreeoni", shadow: 1.2}
+  21332: {sprite: "DRAKE"}
+  21333: {sprite: "MOONLIGHT"}
+  21334: {sprite: "BACSOJIN"}
+  21335: {sprite: "GOBLIN_LEADER"}
+  21336: {sprite: "KOBOLT_LEADER"}
+  21337: {sprite: "TURTLE_GENERAL", shadow: 1.5}
+  21338: {sprite: "incantation_samurai", shadow: 2}
+  21339: {sprite: "TOAD"}
+  21340: {sprite: "OSIRIS"}
+  21341: {sprite: "PHARAOH"}
+  21342: {sprite: "amon_ra"}
+  21343: {sprite: "DARK_SNAKE_LORD", shadow: 2}
+  21344: {sprite: "ARCHANGELING"}
+  21345: {sprite: "DEVILING"}
+  21346: {sprite: "ANGELING"}
+  21347: {sprite: "GHOSTRING", shadow: 0}
+  21348: {sprite: "YGNIZEM"}
+  21349: {sprite: "Doppelganger"}
+  21350: {sprite: "atros", shadow: 2}
+  21351: {sprite: "ork_hero", shadow: 1.2}
+  21352: {sprite: "orc_lord", shadow: 1.2}
+  21353: {sprite: "baphomet", shadow: 1.2}
+  21354: {sprite: "Dark_Lord", shadow: 1.5}
+  21355: {sprite: "FALLINGBISHOP"}
+  21356: {sprite: "IFRIT", shadow: 1.2}
+  21357: {sprite: "RANDGRIS"}
+  21358: {sprite: "DRAGON_FLY", shadow: 2}
+  21359: {sprite: "beelzebub_", shadow: 2}
+  21360: {sprite: "ep18_md_schulang"}
+  21361: {sprite: "ep18_md_demi_freyja"}
+  21377: {sprite: "ep18_md_sanare_r", shadow: 1}
+  21378: {sprite: "ep18_md_hearthunter_r2", shadow: 1}
+  21379: {sprite: "ep18_lava_toad", shadow: 1.3}
+  21380: {sprite: "ep18_hot_molar", shadow: 1.3}
+  21381: {sprite: "ep18_volcaring", shadow: 1.2}
+  21382: {sprite: "E_CHEAP_RAT"}
+  21384: {sprite: "sweets_drops"}
+  21386: {sprite: "ILL_ANDRE", shadow: 0.5}
+  21387: {sprite: "ILL_SOLDIER_ANDR", shadow: 0.7}
+  21388: {sprite: "ILL_ANDRE_LARVA", shadow: 0.3}
+  21389: {sprite: "ILL_DENIRO", shadow: 0.5}
+  21390: {sprite: "ILL_PIERE", shadow: 0.5}
+  21391: {sprite: "ILL_ANT_EGG", shadow: 0.2}
+  21392: {sprite: "ILL_GIEARTH", shadow: 0.7}
+  21393: {sprite: "ILL_FARMILIAR", shadow: 0.5}
+  21394: {sprite: "ILL_VITATA", shadow: 0.7}
+  21395: {sprite: "ILL_MAYA", shadow: 1.5}
+  21431: {sprite: "ILL_ANDRE", shadow: 0.5}
+  21432: {sprite: "ILL_DENIRO", shadow: 0.5}
+  21433: {sprite: "ILL_PIERE", shadow: 0.5}
+  21435: {sprite: "ILL_VITATA", shadow: 0.7}
+  21439: {sprite: "MD_OTARGET"}
+  21440: {sprite: "MD_XTARGET"}
+  21441: {sprite: "MD_HLGR_HEARTHUNTER"}
+  21442: {sprite: "MD_HLGR_BELLARE"}
+  21443: {sprite: "MD_HLGR_SANARE"}
+  21444: {sprite: "MD_NINJA_GHOST"}
+  21445: {sprite: "MD_HAPPY_CLOUD"}
+  21446: {sprite: "MD_MR_SEO"}
+  21447: {sprite: "desert_wolf_b"}
+  21448: {sprite: "NINE_TAIL"}
+  21449: {sprite: "EDDGA"}
+  21502: {sprite: "baphomet2", shadow: 1.2}
+  21513: {sprite: "EP19_NPC_IWIN"}
+  21514: {sprite: "EP19_NPC_IWIN_SN"}
+  21515: {sprite: "EP19_NPC_IWIN_SY"}
+  21516: {sprite: "EP19_NPC_IWIN_SB"}
+  21517: {sprite: "EP19_NPC_IWIN_SG"}
+  21518: {sprite: "EP19_NPC_IWIN_SR"}
+  21519: {sprite: "EP19_NPC_LEHAR"}
+  21520: {sprite: "EP19_LIMACINA", shadow: 1}
+  21521: {sprite: "EP19_UNFROST_FLOWER", shadow: 1}
+  21522: {sprite: "EP19_CALMARING", shadow: 1}
+  21523: {sprite: "EP19_ICE_STRAW", shadow: 1}
+  21524: {sprite: "EP19_SHINING_SEAWEED", shadow: 1}
+  21525: {sprite: "EP19_ICE_GANGU", shadow: 1}
+  21526: {sprite: "EP19_RGAN_A", shadow: 1}
+  21527: {sprite: "EP19_RGAN_B", shadow: 1}
+  21528: {sprite: "EP19_RGAN_C", shadow: 1}
+  21529: {sprite: "EP19_RGAN_D", shadow: 1}
+  21530: {sprite: "EP19_RGAN_E", shadow: 1}
+  21531: {sprite: "EP19_MD_AQUILA", shadow: 1}
+  21532: {sprite: "EP19_MD_JUNCEA", shadow: 2}
+  21533: {sprite: "EP19_MD_JUNCEA_S", shadow: 2}
+  21534: {sprite: "EP19_MD_RGAN_E", shadow: 1}
+  21535: {sprite: "EP19_MD_RGAN_D", shadow: 1}
+  21536: {sprite: "EP19_MD_HEARTHUNTER_AT", shadow: 1}
+  21537: {sprite: "EP19_LIMACINA_BOSS", shadow: 2}
+  21538: {sprite: "EP19_WASTED_RGAN_A", shadow: 1}
+  21539: {sprite: "EP19_WASTED_RGAN_C", shadow: 1}
+  21540: {sprite: "EP19_CAVE_CALMARING", shadow: 1}
+  21541: {sprite: "EP19_CAVE_FLOWER", shadow: 1}
+  21542: {sprite: "EP19_HALLUCIGENIA", shadow: 1}
+  21543: {sprite: "EP19_HALLUCIGENIA_BABY", shadow: 1}
+  21544: {sprite: "EP19_ONE_EYE_DOLLOCARIS", shadow: 1}
+  21545: {sprite: "EP19_DOLLOCARIS", shadow: 1}
+  21546: {sprite: "MD_COMMON"}
+  21547: {sprite: "INCREASE_SOIL"}
+  21548: {sprite: "CORNUS"}
+  21549: {sprite: "PINGUICULA"}
+  21550: {sprite: "HUNTER_FLY"}
+  21551: {sprite: "eco_rocker"}
+  21552: {sprite: "SAVAGE"}
+  21553: {sprite: "ECO_FLORA"}
+  21554: {sprite: "ECO_HILL_WIND"}
+  21555: {sprite: "ECO_MISTRESS"}
+  21556: {sprite: "ECO_EXPLOSION"}
+  21557: {sprite: "ECO_DELETER"}
+  21558: {sprite: "JAKK"}
+  21559: {sprite: "ECO_LAVA_GOLEM"}
+  21560: {sprite: "eco_majoruros"}
+  21561: {sprite: "HYDRO"}
+  21562: {sprite: "ACIDUS_B"}
+  21563: {sprite: "DETALE"}
+  21564: {sprite: "ICE_TITAN"}
+  21565: {sprite: "SIROMA"}
+  21566: {sprite: "eco_snowier"}
+  21567: {sprite: "CENTIPEDE"}
+  21568: {sprite: "aqua_elemental"}
+  21569: {sprite: "ECO_ANGELGOLT"}
+  21570: {sprite: "RHYNCHO"}
+  21571: {sprite: "KTULLANUX"}
+  21572: {sprite: "ANCIENT_MUMMY"}
+  21573: {sprite: "eco_lude"}
+  21574: {sprite: "RAGGED_ZOMBIE"}
+  21575: {sprite: "WRAITH"}
+  21576: {sprite: "FLAME_SKULL"}
+  21577: {sprite: "BANSHEE"}
+  21578: {sprite: "ECO_KNIGHT_OF_ABYSS"}
+  21579: {sprite: "LORD_OF_DEATH"}
+  21580: {sprite: "BIJOU"}
+  21587: {sprite: "EDDGA"}
+  21588: {sprite: "EP19_MD_AQUILA", shadow: 2}
+  21589: {sprite: "EP19_LIMACINA", shadow: 1}
+  21590: {sprite: "EP19_MD_RGAN_E", shadow: 1.5}
+  21598: {sprite: "EVENT_RICECAKE"}
+  21599: {sprite: "EP19_MD_HEARTHUNTER_AT"}
+  21600: {sprite: "EP19_MD_RGAN_E"}
+  21601: {sprite: "EP19_MD_RGAN_D"}
+  21616: {sprite: "VR_BOOK_FAIRY"}
+  21617: {sprite: "VR_UNKOWN_MAN"}
+  21618: {sprite: "VR_LADY"}
+  21619: {sprite: "VR_KNIGHT_SILVER"}
+  21620: {sprite: "VR_ELYUMINA"}
+  21621: {sprite: "VR_MD_HHA_RKNT"}
+  21622: {sprite: "VR_MD_HHA_RYGD"}
+  21623: {sprite: "VR_MD_HHA_ACBS"}
+  21624: {sprite: "VR_MD_HHA_RNGR"}
+  21625: {sprite: "VR_MD_HHA_GX"}
+  21626: {sprite: "VR_MD_HHA_SC"}
+  21627: {sprite: "VR_MD_HHA_WR"}
+  21628: {sprite: "GEFFEN_MAGE_1"}
+  21629: {sprite: "GEFFEN_MAGE_1"}
+  21630: {sprite: "WILD_ROSE3"}
+  21631: {sprite: "BLUEMOON_LOLI_RURI2"}
+  21632: {sprite: "FARMILIAR2"}
+  21633: {sprite: "VR_AGNES"}
+  21634: {sprite: "invisible"}
+  21635: {sprite: "invisible"}
+  21636: {sprite: "invisible"}
+  21637: {sprite: "invisible"}
+  21638: {sprite: "invisible"}
+  21639: {sprite: "invisible"}
+  21650: {sprite: "CWHITEKNIGHT", shadow: 2.5}
+  21651: {sprite: "KNIGHT_OF_ABYSS2", shadow: 2.5}
+  21652: {sprite: "GH_WHITEKNIGHT", shadow: 2.5}
+  21653: {sprite: "EDDGA3", shadow: 1.2}
+  21809: {sprite: "invisible"}
+  21810: {sprite: "invisible"}
+  21811: {sprite: "invisible"}
+  21812: {sprite: "invisible"}
+  21813: {sprite: "invisible"}
+  21814: {sprite: "invisible"}
+  21815: {sprite: "BONE_DETALE"}
+  21816: {sprite: "INGRID"}
+  21817: {sprite: "gran_papilia"}
+  21818: {sprite: "pitaya_boss"}
+  21819: {sprite: "silva_papilia"}
+  21820: {sprite: "sweety"}
+  21821: {sprite: "c_amdarais"}
+  21822: {sprite: "c_himel"}
+  21823: {sprite: "ILL_ABYSMAL_WITCH"}
+  21824: {sprite: "death_witch"}
+  21825: {sprite: "r001_bestia"}
+  21826: {sprite: "MD_SAKRAY"}
+  21827: {sprite: "MD_TIARA"}
+  21828: {sprite: "MD_Airboat_Boss"}
+  21829: {sprite: "BETELGEUSE"}
+  21830: {sprite: "ep18_burning_fang"}
+  21831: {sprite: "ep18_md_demi_freyja"}
+  21832: {sprite: "ep18_md_schulang"}
+  21833: {sprite: "EP19_LIMACINA_BOSS"}
+  21834: {sprite: "EP19_MD_JUNCEA"}
+  21835: {sprite: "VR_MD_HHA_RKNT"}
+  21836: {sprite: "VR_MD_HHA_RYGD"}
+  21837: {sprite: "VR_MD_HHA_ACBS"}
+  21838: {sprite: "VR_MD_HHA_RNGR"}
+  21839: {sprite: "VR_MD_HHA_GX"}
+  21840: {sprite: "VR_MD_HHA_SC"}
+  21841: {sprite: "VR_MD_HHA_WR"}
+  21842: {sprite: "E_PORING_20"}
+  21853: {sprite: "purplestone", shadow: 1.2}
+  21854: {sprite: "purplestone", shadow: 1.2}
+  21855: {sprite: "HEROS_DRAGON_1"}
+  21856: {sprite: "HEROS_DRAGON_2"}
+  21857: {sprite: "HEROS_DRAGON_3"}
+  21858: {sprite: "HEROS_DRAGON_4"}
+  21859: {sprite: "MASTERING"}
+  21860: {sprite: "CRAB"}
+  21861: {sprite: "SHELLFISH"}
+  21862: {sprite: "VR_MD_SWORDMAN"}
+  21863: {sprite: "VR_MARLBRON"}
+  21866: {sprite: "HEROS_IN_ORB_1"}
+  21867: {sprite: "HEROS_IN_ORB_2"}
+  21868: {sprite: "HEROS_IN_ORB_3"}
+  21869: {sprite: "HEROS_IN_ORB_4"}
+  21870: {sprite: "Doppelganger"}
+  21887: {sprite: "HEROS_OUT_ORB"}
+  21888: {sprite: "DEVILING"}
+  21889: {sprite: "WOLF"}
+  21890: {sprite: "WILD_GINSENG"}
+  21891: {sprite: "POTON_CANON"}
+  21892: {sprite: "POTON_CANON_1"}
+  21893: {sprite: "POTON_CANON_2"}
+  21894: {sprite: "POTON_CANON_3"}
+  21895: {sprite: "RED_PLANT", shadow: 0.5}
+  21896: {sprite: "YELLOW_PLANT", shadow: 0.5}
+  21897: {sprite: "BLUE_PLANT", shadow: 0.5}
+  21898: {sprite: "WHITE_PLANT", shadow: 0.5}
+  21899: {sprite: "FERUS", shadow: 1.5}
+  21900: {sprite: "FERUS_", shadow: 1.5}
+  21901: {sprite: "FERUS_P", shadow: 1.5}
+  21902: {sprite: "GARDEN_WATCHER"}
+  21903: {sprite: "GARDEN_KEEPER"}
+  21904: {sprite: "HEROS_DRAGON_1", shadow: 2}
+  21905: {sprite: "FERUS", shadow: 1.5}
+  21906: {sprite: "FERUS_", shadow: 1.5}
+  21907: {sprite: "FERUS_P", shadow: 1.5}
+  21908: {sprite: "Wild_Rose"}
+  21910: {sprite: "VR_MD_LZ"}
+  21911: {sprite: "2210_EV_SPIDING"}
+  21912: {sprite: "MD_SEWER_THIEF_BUG"}
+  21913: {sprite: "MD_SEWER_CHONCHON"}
+  21914: {sprite: "MD_SEWER_AMBERNITE"}
+  21915: {sprite: "MD_SEWER_BEETLE"}
+  21916: {sprite: "MD_SEWER_ARCLOUSE"}
+  21917: {sprite: "MD_SEWER_ARGIOPE"}
+  21918: {sprite: "MD_SEWER_CAVE_FLOWER"}
+  21919: {sprite: "LARVA_VIOLET"}
+  21920: {sprite: "rudo"}
+  21921: {sprite: "archangeling"}
+  21922: {sprite: "fake_angel"}
+  21923: {sprite: "plasma_p"}
+  21924: {sprite: "solace"}
+  21925: {sprite: "anopheles"}
+  21926: {sprite: "gryphon"}
+  21927: {sprite: "randgris"}
+  21928: {sprite: "comodo"}
+  21929: {sprite: "poison_toad"}
+  21930: {sprite: "side_winder"}
+  21931: {sprite: "cramp"}
+  21932: {sprite: "kukre"}
+  21933: {sprite: "nepenthes"}
+  21934: {sprite: "angra_mantis"}
+  21935: {sprite: "ep16_2_venom_kimera"}
+  21936: {sprite: "nightmare"}
+  21937: {sprite: "whisper"}
+  21938: {sprite: "marionette"}
+  21939: {sprite: "noxious"}
+  21940: {sprite: "the_paper"}
+  21941: {sprite: "gajomart"}
+  21942: {sprite: "tha_odium"}
+  21943: {sprite: "gloomundernight"}
+  21944: {sprite: "E_PORING_2023"}
+  21945: {sprite: "E_LUNATIC_2023"}
+  21946: {sprite: "BURNING_KNIGHT", shadow: 1.8}
+  21947: {sprite: "DEDSERA", shadow: 0.84}
+  21948: {sprite: "HARDROCK_TITAN", shadow: 2.4}
+  21949: {sprite: "DEADWEEN", shadow: 0.6}
+  21950: {sprite: "GAIA_POL", shadow: 1.5}
+  21951: {sprite: "PUNCH_BUG", shadow: 1.2}
+  21952: {sprite: "AFERDE", shadow: 1.2}
+  21953: {sprite: "DISPOL", shadow: 0.5}
+  21954: {sprite: "TIMBERS", shadow: 1.2}
+  21955: {sprite: "RENIRE", shadow: 0.6}
+  21956: {sprite: "BURNING_KNIGHT", shadow: 1.5}
+  21957: {sprite: "TIMBERS", shadow: 1.2}
+  21964: {sprite: "2301_EV_RICE_FLOUR"}
+  21965: {sprite: "EP20_COPO", shadow: 0.3}
+  21966: {sprite: "EP20_ICEWIND1", shadow: 1.4}
+  21967: {sprite: "EP20_ICEWIND2", shadow: 1.4}
+  21968: {sprite: "EP20_EGGCOPO", shadow: 0.3}
+  21969: {sprite: "EP20_RABBIT_ICESLUG", shadow: 0.8}
+  21970: {sprite: "EP20_MELIBE_ICESLUG", shadow: 0.6}
+  21971: {sprite: "EP20_ICEBEAR"}
+  21972: {sprite: "EP20_JORMUNGUARD1"}
+  21973: {sprite: "EP20_JORMUNGUARD2"}
+  21974: {sprite: "EP20_FAKE_IWIN_SN"}
+  21975: {sprite: "EP20_FAKE_IWIN_SY"}
+  21976: {sprite: "EP20_FAKE_IWIN_SB"}
+  21977: {sprite: "EP20_FAKE_IWIN_SG"}
+  21978: {sprite: "EP20_FAKE_IWIN_SR"}
+  21979: {sprite: "EP20_DEMIGOD_LASGAND", shadow: 1.2}
+  21980: {sprite: "EP20_BOSS_CLANER", shadow: 1.5}
+  21981: {sprite: "EP20_DEMIGOD_LASGAND", shadow: 1.2}
+  21982: {sprite: "MD_EP20_FALLENANGEL", shadow: 1.5}
+  21983: {sprite: "EP20_ANGEL_ICESLUG"}
+  21984: {sprite: "EP20_ICEEGG", shadow: 0.2}
+  21985: {sprite: "EP20_RGAN_WARLOCK"}
+  21986: {sprite: "EP20_RGAN_HEALER"}
+  21987: {sprite: "EP20_JORGAN_WARLOCK"}
+  21988: {sprite: "EP20_JORGAN_HEALER"}
+  21989: {sprite: "EP20_JORGAN_GUARDIAN"}
+  21990: {sprite: "EP20_JORGAN_CLEANER", shadow: 1.4}
+  21991: {sprite: "EP20_JORMUNGUARD1"}
+  21992: {sprite: "EP20_JORMUNGUARD2"}
+  21993: {sprite: "EP20_JORGAN_WARLOCK"}
+  21994: {sprite: "EP19_MD_HEARTHUNTER_AT"}
+  21995: {sprite: "EP20_NPC_COCOPO", shadow: 0.7}
+  21996: {sprite: "EP20_SNOW_ANGEL"}
+  21997: {sprite: "EP20_JORMUNGUARD1"}
+  21998: {sprite: "EP20_JORMUNGUARD2"}
+  21999: {sprite: "EP20_JORGAN_CLEANER", shadow: 1.4}
+  22000: {sprite: "EP20_ANGEL_ICESLUG"}
+  22001: {sprite: "EP20_RGAN_WARLOCK"}
+  22002: {sprite: "EP20_JORGAN_HEALER"}
+  22003: {sprite: "EP20_JORGAN_GUARDIAN"}
+  22004: {sprite: "purplestone"}
+  22005: {sprite: "purplestone"}
+  22006: {sprite: "EP20_NYAR", shadow: 0.7}
+  22007: {sprite: "EP20_LASGAND"}
+  22140: {sprite: "bio_anolian"}
+  22141: {sprite: "bio_skel_archer"}
+  22142: {sprite: "bio_dragon_tail"}
+  22143: {sprite: "bio_lava_toad"}
+  22144: {sprite: "bio_little_fatum"}
+  22145: {sprite: "bio_sting"}
+  22146: {sprite: "bio_empathizer"}
+  22147: {sprite: "bio_fire_frilldora"}
+  22148: {sprite: "bio_holy_frus"}
+  22149: {sprite: "bio_holy_skogul"}
+  22150: {sprite: "bio_kapha"}
+  22151: {sprite: "bio_skel_soldier"}
+  22152: {sprite: "bio_pinguicula_d"}
+  22153: {sprite: "bio_pom_spider"}
+  22154: {sprite: "bio_pray_giver"}
+  22155: {sprite: "bio_wood_goblin"}
+  22156: {sprite: "RHYNCHO"}
+  22157: {sprite: "STAPO"}
+  22158: {sprite: "ICE_TITAN"}
+  22159: {sprite: "Obeaune"}
+  22160: {sprite: "WILOW"}
+  22161: {sprite: "VR_MD_TILBY"}
+  22162: {sprite: "VR_MD_POPE"}
+  22163: {sprite: "VR_MD_TILBY2"}
+  22164: {sprite: "VR_MD_RAINBOW"}
+  22166: {sprite: "HEADSTONE1"}
+  22167: {sprite: "HEADSTONE2"}
+  22168: {sprite: "HEADSTONE3"}
+  22169: {sprite: "HEADSTONE4"}
+  22170: {sprite: "HEADSTONE0"}
+  22171: {sprite: "MD_COMMON"}
+  22174: {sprite: "MD_PRI_RIGEL", shadow: 1.5}
+  22175: {sprite: "MD_PRI_RIGEL_AC", shadow: 1.5}
+  22176: {sprite: "MD_PRI_RIGEL_ACS", shadow: 1.5}
+  22177: {sprite: "MD_PRI_DRAGON_1", shadow: 1.7}
+  22178: {sprite: "MD_PRI_DRAGON_2", shadow: 2}
+  22179: {sprite: "MD_PRI_DRAGON_3", shadow: 1.7}
+  22180: {sprite: "MD_PRI_DRAGON_4", shadow: 2}
+  22181: {sprite: "MD_COMMON"}
+  22182: {sprite: "MD_COMMON"}
+  22183: {sprite: "INVISIBLE", shadow: 0}
+  22184: {sprite: "INVISIBLE", shadow: 0}
+  22185: {sprite: "DARK_LORD2"}
+  22186: {sprite: "THIEF_BUG", shadow: 0.3}
+  22187: {sprite: "ANOPHELES", shadow: 0.3}
+  22188: {sprite: "TAROU", shadow: 0.5}
+  22189: {sprite: "CRAMP", shadow: 0.7}
+  22192: {sprite: "SPIRIT_G_LAND_S", shadow: 0.8}
+  22193: {sprite: "SPIRIT_G_LAND_M"}
+  22194: {sprite: "SPIRIT_G_LAND_L", shadow: 1.2}
+  22195: {sprite: "SPIRIT_G_LAND_L", shadow: 1.4}
+  22196: {sprite: "SPIRIT_B_FLAME_S", shadow: 0.8}
+  22197: {sprite: "SPIRIT_B_FLAME_M"}
+  22198: {sprite: "SPIRIT_B_FLAME_L", shadow: 1.2}
+  22199: {sprite: "SPIRIT_B_FLAME_L", shadow: 1.4}
+  22200: {sprite: "SPIRIT_S_WIND_S", shadow: 0.8}
+  22201: {sprite: "SPIRIT_S_WIND_M"}
+  22202: {sprite: "SPIRIT_S_WIND_L", shadow: 1.2}
+  22203: {sprite: "SPIRIT_S_WIND_L", shadow: 1.4}
+  22204: {sprite: "SPIRIT_I_WATER_S", shadow: 0.8}
+  22205: {sprite: "SPIRIT_I_WATER_M"}
+  22206: {sprite: "SPIRIT_I_WATER_L", shadow: 1.2}
+  22207: {sprite: "SPIRIT_I_WATER_L", shadow: 1.4}
+  22208: {sprite: "SPIRIT_C_LAND_S", shadow: 0.8}
+  22209: {sprite: "SPIRIT_C_LAND_M"}
+  22210: {sprite: "SPIRIT_C_LAND_L", shadow: 1.2}
+  22211: {sprite: "SPIRIT_C_LAND_L", shadow: 1.4}
+  22212: {sprite: "SPIRIT_C_FLAME_S", shadow: 0.8}
+  22213: {sprite: "SPIRIT_C_FLAME_M"}
+  22214: {sprite: "SPIRIT_C_FLAME_L", shadow: 1.2}
+  22215: {sprite: "SPIRIT_C_FLAME_L", shadow: 1.4}
+  22216: {sprite: "SPIRIT_H_WATER_S", shadow: 0.8}
+  22217: {sprite: "SPIRIT_H_WATER_M"}
+  22218: {sprite: "SPIRIT_H_WATER_L", shadow: 1.2}
+  22219: {sprite: "SPIRIT_H_WATER_L", shadow: 1.4}
+  22220: {sprite: "SPIRIT_D_WIND_S", shadow: 0.8}
+  22221: {sprite: "SPIRIT_D_WIND_M"}
+  22222: {sprite: "SPIRIT_D_WIND_L", shadow: 1.2}
+  22223: {sprite: "SPIRIT_D_WIND_L", shadow: 1.4}
+  22224: {sprite: "SPIRIT_R_FLAME_S", shadow: 0.8}
+  22225: {sprite: "SPIRIT_R_FLAME_M"}
+  22226: {sprite: "SPIRIT_R_FLAME_L", shadow: 1.2}
+  22227: {sprite: "SPIRIT_R_FLAME_L", shadow: 1.4}
+  22228: {sprite: "SPIRIT_F_LAND_S", shadow: 0.8}
+  22229: {sprite: "SPIRIT_F_LAND_M"}
+  22230: {sprite: "SPIRIT_F_LAND_L", shadow: 1.2}
+  22231: {sprite: "SPIRIT_F_LAND_L", shadow: 1.4}
+  22232: {sprite: "SPIRIT_C_WATER_S", shadow: 0.8}
+  22233: {sprite: "SPIRIT_C_WATER_M"}
+  22234: {sprite: "SPIRIT_C_WATER_L", shadow: 1.2}
+  22235: {sprite: "SPIRIT_C_WATER_L", shadow: 1.4}
+  22236: {sprite: "SPIRIT_C_WIND_S", shadow: 0.8}
+  22237: {sprite: "SPIRIT_C_WIND_M"}
+  22238: {sprite: "SPIRIT_C_WIND_L", shadow: 1.2}
+  22239: {sprite: "SPIRIT_C_WIND_L", shadow: 1.4}
+  22240: {sprite: "VR_SONIC_WALK", shadow: 0.7}
+  22241: {sprite: "VR_SONIC_SPIN", shadow: 0.7}
+  22242: {sprite: "VR_TALES"}
+  22243: {sprite: "VR_MD_METALSONIC", shadow: 0.7}
+  22244: {sprite: "VR_MD_KNUCKLES", shadow: 0.7}
+  22245: {sprite: "VR_MD_DREGG1"}
+  22246: {sprite: "VR_MD_DREGG2"}
+  22247: {sprite: "VR_MD_MEGALITH_SONIC", shadow: 1.4}
+  22248: {sprite: "VR_MD_SPORE_SONIC", shadow: 0.6}
+  22249: {sprite: "VR_MD_SAVAGE_SONIC", shadow: 1.1}
+  22250: {sprite: "VR_MD_ANGELING_SONIC", shadow: 0.8}
+  22251: {sprite: "VR_MD_HEATER_SONIC"}
+  22252: {sprite: "bio_duneyrr", shadow: 2}
+  22253: {sprite: "bio_naga", shadow: 1.5}
+  22254: {sprite: "bio_ancient_tree", shadow: 2}
+  22255: {sprite: "bio_dollocaris"}
+  22256: {sprite: "bio_gargoyle_mj"}
+  22257: {sprite: "bio_flame_ghost"}
+  22258: {sprite: "bio_acidus_", shadow: 2}
+  22259: {sprite: "bio_morocc_1", shadow: 1.5}
+  22260: {sprite: "bio_salamander", shadow: 1.2}
+  22261: {sprite: "bio_moskillo"}
+  22262: {sprite: "mh_sasquatch"}
+  22263: {sprite: "golden_savage"}
+  22297: {sprite: "2401_EV_DRAGORING"}
+  22298: {sprite: "2401_EV_IMOOGI", shadow: 0}
+  22299: {sprite: "VR_CHAO", shadow: 0.2}
+  22300: {sprite: "EP21_NPC_SERPENT"}
+  22301: {sprite: "EP21_NPC_TRIS"}
+  22302: {sprite: "EP21_NPC_TAN"}
+  22303: {sprite: "EP21_NPC_NADOYO"}
+  22304: {sprite: "EP21_NPC_REINHARDT"}
+  22305: {sprite: "EP21_NPC_WILHELM"}
+  22306: {sprite: "EP21_NPC_MARISTELLA"}
+  22307: {sprite: "EP21_NPC_YOHAN"}
+  22308: {sprite: "EP21_NPC_RICHARD"}
+  22309: {sprite: "EP21_NPC_EIBA"}
+  22310: {sprite: "EP21_NPC_GUNTER"}
+  22311: {sprite: "EP21_NPC_IVAN"}
+  22312: {sprite: "EP21_NPC_GALAXIA"}
+  22313: {sprite: "EP21_SEAWIND"}
+  22314: {sprite: "EP21_SCALLEG"}
+  22315: {sprite: "EP21_VELELLING"}
+  22316: {sprite: "EP21_LETTERSTER"}
+  22317: {sprite: "EP21_ROCKSTRIKER"}
+  22318: {sprite: "EP21_ICESEAHORSE"}
+  22319: {sprite: "EP21_SKIPSKIPPER"}
+  22320: {sprite: "EP21_CLIOLIMA"}
+  22321: {sprite: "EP21_YORKER_A"}
+  22322: {sprite: "EP21_YORKER_B"}
+  22323: {sprite: "EP21_YOSTER_A"}
+  22324: {sprite: "EP21_YOSTER_B"}
+  22325: {sprite: "EP21_YOSTER_C"}
+  22326: {sprite: "EP21_YOSTER_D"}
+  22327: {sprite: "EP21_YOSTER_E"}
+  22353: {sprite: "EP21_YORMI_A"}
+  22354: {sprite: "EP21_YORMI_B"}
+  22355: {sprite: "EP21_YORDOS_A"}
+  22356: {sprite: "EP21_YORDOS_B"}
+  22357: {sprite: "EP21_YORDOS_C"}
+  22358: {sprite: "EP21_YOSCOPUS_A"}
+  22359: {sprite: "EP21_YOSCOPUS_B"}
+  22360: {sprite: "EP21_YORTUS_A"}
+  22361: {sprite: "EP21_YORTUS_B"}
+  22362: {sprite: "EP21_ICEHORN", shadow: 1.4}
+  22363: {sprite: "EP21_B_YORTUS_A", shadow: 1.2}
+  22364: {sprite: "EP21_B_YORTUS_B", shadow: 1.2}
+  22365: {sprite: "EP21_ICESEAHORSE"}
+  22366: {sprite: "EP21_YORDOS_A"}
+  22367: {sprite: "EP21_YORDOS_B"}
+  22368: {sprite: "EP21_YORDOS_C"}
+  22369: {sprite: "EP21_MD_SAILOR"}
+  22370: {sprite: "EP21_MD_CAPTAIN", shadow: 1.2}
+  22371: {sprite: "EP21_YOR_TAN", shadow: 1.2}
+  22372: {sprite: "EP21_MD_CAPTAIN"}
+  22373: {sprite: "EP21_YOR_TAN"}
+  22374: {sprite: "purplestone", shadow: 1.2}
+  22378: {sprite: "MD_Airboat_Boss"}
+  22379: {sprite: "EV_NPC_VACATION_POPE"}
+  22380: {sprite: "E_WATER_M_RING"}
+  22381: {sprite: "CLB_SS_FC", shadow: 0.7}
+  22382: {sprite: "CLB_SS_TZ", shadow: 0.6}
+  22383: {sprite: "VIOLEN"}
+  22384: {sprite: "VIOLEN", shadow: 1.2}
+  22385: {sprite: "SPIDING"}
+  22386: {sprite: "SPIDING", shadow: 1.2}
+  22387: {sprite: "GARLING"}
+  22388: {sprite: "GARLING", shadow: 1.2}
+  22389: {sprite: "JACKONETTE"}
+  22390: {sprite: "JACKONETTE", shadow: 1.2}
+  22391: {sprite: "LIAMETTE"}
+  22392: {sprite: "LIAMETTE", shadow: 1.2}
+  22393: {sprite: "LIAMETTE"}
+  22394: {sprite: "NIGHTMARE_PIAMETTE", shadow: 1.5}
+  22395: {sprite: "MEDJED"}
+  22396: {sprite: "MEDJED", shadow: 1.2}
+  22397: {sprite: "MEDJAY"}
+  22398: {sprite: "MEDJAY", shadow: 1.2}
+  22399: {sprite: "OPHOIS", shadow: 2}
+  22400: {sprite: "OPHOIS", shadow: 2.2}
+  22401: {sprite: "HEKA", shadow: 1.2}
+  22402: {sprite: "HEKA", shadow: 1.4}
+  22403: {sprite: "OPHOIS", shadow: 2}
+  22404: {sprite: "GUIDE_OF_DEAD", shadow: 2}
+  22405: {sprite: "MISTRESS2"}
+  22406: {sprite: "GIANT_HONET"}
+  22408: {sprite: "E_SMART_ANDRE", shadow: 0.5}
+  22409: {sprite: "E_RE_PINE"}
+  22410: {sprite: "EP21_YOR_TAN"}
+  22411: {sprite: "purplestone"}
+  22412: {sprite: "EP21_YORTUS_A_H"}
+  22413: {sprite: "EP21_YORTUS_B_H"}
+  22414: {sprite: "EP21_YORDOS_C_H"}
+  22415: {sprite: "EP21_YORDOS_B_H"}
+  22416: {sprite: "EP21_YORDOS_A_H"}
+  22417: {sprite: "EP21_YORMI_A_H"}
+  22418: {sprite: "EP21_YORMI_B_H"}
+  22419: {sprite: "EP21_YOSCOPUS_A_H"}
+  22420: {sprite: "EP21_YOSCOPUS_B_H"}
+  22421: {sprite: "EP21_B_YORTUS_A_H"}
+  22422: {sprite: "EP21_B_YORTUS_B_H"}
+  22423: {sprite: "2501_EV_MATJALAL", shadow: 1}
+  22424: {sprite: "2501_EV_ACARI", shadow: 0.5}
+  22425: {sprite: "E_Leader_Sheep"}
+  22426: {sprite: "golden_savage"}
+  22427: {sprite: "MANDURING"}
+  22429: {sprite: "KINGMANDURING"}
+  22430: {sprite: "CRUISER", shadow: 0.7}
+  22431: {sprite: "TATSI"}
+  22432: {sprite: "TATSI"}
+  22433: {sprite: "TATSI"}
+  22434: {sprite: "GUERRERO"}
+  22435: {sprite: "HANOM"}
+  22436: {sprite: "SIRENA"}
+  22437: {sprite: "DIOSA"}
+  22438: {sprite: "PESKA"}
+  22439: {sprite: "GUERRERO"}
+  22440: {sprite: "HANOM"}
+  22441: {sprite: "SIRENA"}
+  22442: {sprite: "DIOSA"}
+  22443: {sprite: "CH1_YGGRING"}
+  22444: {sprite: "CH1_LEAFEING"}
+  22445: {sprite: "CH1_CHARCOARING"}
+  22446: {sprite: "CH1_VULRING"}
+  22447: {sprite: "CH1_FIRELOOP", shadow: 0.7}
+  22448: {sprite: "CH1_FIRAFFLESIA"}
+  22449: {sprite: "CH1_VOLIMPET"}
+  22450: {sprite: "CH1_FIRE_FLOWER"}
+  22451: {sprite: "CH1_PEEPING", shadow: 0.7}
+  22452: {sprite: "CH1_SILK_FROG"}
+  22453: {sprite: "CH1_SILK_SNAIL"}
+  22454: {sprite: "CH1_EX_ROBOT"}
+  22455: {sprite: "CH1_REPAIR_ROBOT"}
+  22456: {sprite: "CH1_DIMIC_1"}
+  22457: {sprite: "CH1_DIMIC_2"}
+  22458: {sprite: "CH1_DIMIC_3"}
+  22459: {sprite: "CH1_DIMIC_4"}
+  22460: {sprite: "CH1_IMMORTAL_CORPS1"}
+  22461: {sprite: "CH1_IMMORTAL_CORPS2"}
+  22462: {sprite: "CH1_IMMORTAL_CORPS3"}
+  22463: {sprite: "CH1_NYAISE", shadow: 0.7}
+  22464: {sprite: "CH1_SHADOW_JAILER"}
+  22465: {sprite: "CH1_TULIP"}
+  22466: {sprite: "CH1_CALENDULA"}
+  22467: {sprite: "CH1_SCABIOSA"}
+  22468: {sprite: "CH1_LOBELIA"}
+  22469: {sprite: "CH1_MYOSOTIS"}
+  22470: {sprite: "CH1_ANEMONE"}
+  22471: {sprite: "CH1_SKOGL"}
+  22472: {sprite: "CH1_FRUS"}
+  22473: {sprite: "CH1_LISTENER"}
+  22474: {sprite: "CH1_IMMORTAL_OFFICER1", shadow: 1.5}
+  22475: {sprite: "CH1_IMMORTAL_OFFICER2", shadow: 1.5}
+  22476: {sprite: "CH1_TOXIT"}
+  22477: {sprite: "CH1_TOXIT", shadow: 1.2}
+  22478: {sprite: "CH1_LUNARINA", shadow: 1.5}
+  22479: {sprite: "CH1_LUNARINA", shadow: 1.8}
+  22480: {sprite: "CH1_BLOODY_SLASHER", shadow: 0.7}
+  22481: {sprite: "CH1_BLOODY_SLASHER"}
+  22482: {sprite: "CH1_SHADIEST", shadow: 0.7}
+  22483: {sprite: "CH1_SHADIEST"}
+  22484: {sprite: "CH1_SUCCUBUS"}
+  22485: {sprite: "CH1_SUCCUBUS", shadow: 1.2}
+  22486: {sprite: "CH1_INCCUBUS"}
+  22487: {sprite: "CH1_INCCUBUS", shadow: 1.2}
+  22488: {sprite: "CH1_ABYSS_KNIGHT", shadow: 2.5}
+  22489: {sprite: "CH1_ABYSS_KNIGHT", shadow: 3}
+  22490: {sprite: "CH1_FIRELOOP", shadow: 0.7}
+  22491: {sprite: "CH1_VOLIMPET"}
+  22492: {sprite: "CH1_MYOSOTIS"}
+  22493: {sprite: "CH1_ANEMONE"}
+  22494: {sprite: "CH1_BULGASARI"}
+  22495: {sprite: "CH1_GLUTTO"}
+  22496: {sprite: "CH1_MD_HEMEL_N"}
+  22497: {sprite: "CH1_MD_HEMEL"}
+  22498: {sprite: "CH1_MD_AMDARAIS", shadow: 3}
+  22499: {sprite: "CH1_MD_VESSEL"}
+  22504: {sprite: "C_TOWER_MANAGER"}
+  22505: {sprite: "ANGELGOLT"}
+  23000: {sprite: "DARK_ILLUSION2"}
+  23001: {sprite: "MD_RIGEL"}
+  23002: {sprite: "20TH_EVENT_HEMEL"}
+  23003: {sprite: "20TH_EVENT_LOLI_RURI"}
+  23004: {sprite: "20TH_EVENT_GIBBET"}
+  23005: {sprite: "20TH_EVENT_HYLOZOIST"}
+  23006: {sprite: "20TH_EVENT_MURDERER"}
+  23007: {sprite: "20TH_EVENT_CORPS"}
+  23008: {sprite: "20TH_EVENT_CO_CMDER"}
+  23060: {sprite: "EP20_ARMOERDCOPO", shadow: 0.3}

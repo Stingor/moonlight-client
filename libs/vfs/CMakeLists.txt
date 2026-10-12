@@ -26,7 +26,6 @@ add_library(ro_vfs STATIC
     src/item_link.cpp
     src/item_name.cpp
     src/item_info_text.cpp
-    src/strict_text.cpp
     src/item_properties.cpp
     src/item_stacking.cpp
     src/item_table.cpp

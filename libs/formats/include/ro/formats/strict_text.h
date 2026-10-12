@@ -8,17 +8,20 @@
 
 #include "ro/core/error.h"
 
-namespace ro::vfs {
+namespace ro::formats {
 
 // ── LA FORME STRICTE DES GROSSES TABLES YAML ────────────────────────────────
 //
-// `item_info.yml` et `skill_info.yml` pèsent plusieurs méga-octets : un
-// analyseur YAML général les lit en secondes, ce curseur-ci en une fraction. Il
-// ne connaît que la forme que leurs scripts écrivent, qui reste du YAML valide :
+// `item_info.yml`, `skill_info.yml` et les tables de sprites se lisent au
+// démarrage, et pèsent de quelques centaines de kilo-octets à plusieurs
+// méga-octets : un analyseur YAML général les lit en secondes, ce curseur-ci en
+// une fraction. Il ne connaît que la forme que leurs scripts écrivent, qui reste
+// du YAML valide :
 //
 //   · des commentaires `#` et des blancs, fins de ligne comprises ;
 //   · des noms de champ en minuscules et soulignés ;
-//   · des entiers sans signe, les mots `true` et `false` ;
+//   · des entiers sans signe, des nombres à la JSON, les mots `true` et
+//     `false` ;
 //   · des textes entre guillemets doubles aux échappements de JSON (`\"`,
 //     `\\`, `\/`, `\b`, `\f`, `\n`, `\r`, `\t`, `\uXXXX`), sur une seule ligne ;
 //   · des suites `[…]` de textes ou d'entiers.
@@ -26,8 +29,10 @@ namespace ro::vfs {
 // Ce que la table assemble — accolades, deux-points, virgules —, c'est au
 // lecteur de chaque table de le demander par `Take`.
 //
-// ⚠ PRIVÉ À `vfs` : cet en-tête vit dans `src/`. Ce n'est pas une bibliothèque
-// de texte, c'est le peu que ces lecteurs partagent.
+// Il vit dans `formats` parce qu'il ne lit que des octets : `vfs` (la table des
+// objets, les fiches de compétence) et `render` (les tables de sprites) le
+// partagent sans dépendre l'un de l'autre. Ce n'est pas une bibliothèque de
+// texte, c'est le peu que ces lecteurs partagent.
 class StrictText {
  public:
   // `file_label` nomme la table dans les refus : « skill_info.yml ».
@@ -43,12 +48,18 @@ class StrictText {
 
   // Le caractère attendu, après les blancs.
   [[nodiscard]] bool Take(char expected);
+  // Vrai quand ce caractère vient, après les blancs, sans le franchir : de quoi
+  // choisir la forme d'une valeur avant de la lire.
+  [[nodiscard]] bool Comes(char expected);
 
   // Un nom de champ : des minuscules et des soulignés.
   [[nodiscard]] bool ReadKey(std::string_view& key);
 
   // Un entier sans signe, au plus `most`.
   [[nodiscard]] bool ReadWhole(std::uint32_t most, std::uint32_t& value);
+
+  // Un nombre à la JSON — signe, chiffres, partie décimale, exposant —, fini.
+  [[nodiscard]] bool ReadNumber(double& value);
 
   // `true` ou `false`.
   [[nodiscard]] bool ReadBoolean(bool& value);
@@ -75,4 +86,4 @@ class StrictText {
   std::size_t at_ = 0;
 };
 
-}  // namespace ro::vfs
+}  // namespace ro::formats
