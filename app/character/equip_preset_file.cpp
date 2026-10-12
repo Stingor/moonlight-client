@@ -10,8 +10,10 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -166,14 +168,15 @@ struct FileRead {
     return {};
   }
   try {
-    const YAML::Node base = YAML::LoadFile(path.string());
+    const YAML::Node base = LoadYamlFile(path);
     // Une racine qui n'est pas une table n'a pas de champs : l'indexer lèverait.
     if (!base || !base.IsMap()) {
       return FileRead{.state = FileState::kRead};
     }
     return FileRead{.state = FileState::kRead, .presets = ReadList(base[kPresetsField])};
   } catch (const YAML::Exception& broken) {
-    ro::core::LogWarning("presets d'équipement : {} illisible ({})", path.string(), broken.what());
+    ro::core::LogWarning("presets d'équipement : {} illisible ({})", ro::core::Utf8FromPath(path),
+                         broken.what());
     return FileRead{.state = FileState::kBroken};
   }
 }
@@ -225,7 +228,7 @@ bool SaveEquipPresets(const std::filesystem::path& client_root, std::uint32_t ch
     ro::core::LogWarning(
         "presets d'équipement : {} n'est pas réécrit tant qu'il reste illisible — il porte "
         "ceux des autres personnages",
-        EquipPresetFilePath(client_root).string());
+        ro::core::Utf8FromPath(EquipPresetFilePath(client_root)));
     return false;
   }
   // Ses presets prennent la place du premier des anciens : un personnage ne

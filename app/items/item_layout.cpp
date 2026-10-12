@@ -13,14 +13,14 @@ int ItemLayout::CellOf(std::uint32_t item_id) const {
 }
 
 void ItemLayout::Put(std::uint32_t item_id, int cell) {
-  if (item_id == 0 || cell < 0) {
+  if (item_id == 0 || cell < 0 || cell >= kFarthestCell) {
     return;
   }
   places_[item_id] = cell;
 }
 
 void ItemLayout::Place(std::uint32_t item_id, int cell, std::uint32_t sitting_there) {
-  if (item_id == 0 || cell < 0) {
+  if (item_id == 0 || cell < 0 || cell >= kFarthestCell) {
     return;
   }
   const int leaving = CellOf(item_id);

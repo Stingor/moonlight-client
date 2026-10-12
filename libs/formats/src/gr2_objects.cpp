@@ -261,7 +261,11 @@ std::vector<Gr2Object> Gr2File::Array(const Gr2Object& object, std::string_view 
   }
   const bool references = member->kind == Gr2Kind::kArrayOfReferences;
   const std::uint32_t stride = references ? kRealBytes : SizeOf(member->type);
-  if (!memory_.Holds(first, std::uint64_t{stride} * static_cast<std::uint32_t>(count))) {
+  // ⚠ UN PAS NUL TIENT TOUJOURS DANS LA MÉMOIRE — un type sans membre, ou qui
+  // se contient lui-même —, et le compte, lu du fichier, partirait tel quel
+  // en réservation : des gigaoctets pour un fichier de quelques octets.
+  if (stride == 0 ||
+      !memory_.Holds(first, std::uint64_t{stride} * static_cast<std::uint32_t>(count))) {
     memory_.Invalidate();
     return items;
   }
@@ -286,8 +290,10 @@ Gr2VariantArray Gr2File::VariantArray(const Gr2Object& object, std::string_view 
   const std::uint32_t at = object.address + member->offset;
   Gr2VariantArray array{memory_.U32(at), memory_.U32(at + kVariantCountField),
                         memory_.U32(at + kVariantPointerField)};
-  if (array.type == 0 || array.address == 0 ||
-      !memory_.Holds(array.address, std::uint64_t{SizeOf(array.type)} * array.count)) {
+  // Un pas nul, voir `Array`.
+  const std::uint32_t stride = array.type == 0 ? 0 : SizeOf(array.type);
+  if (array.type == 0 || array.address == 0 || (stride == 0 && array.count != 0) ||
+      !memory_.Holds(array.address, std::uint64_t{stride} * array.count)) {
     return {};
   }
   return array;

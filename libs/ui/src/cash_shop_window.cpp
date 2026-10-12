@@ -272,8 +272,9 @@ void DrawFilters(CashShopWindowState& state, std::span<const CashShopCard> cards
     if (!SlotMatches(card, state.slot)) {
       continue;
     }
-    const std::string name(card.name);
-    if (state.filter.PassFilter(name.c_str())) {
+    // ⚠ PAR SES BORNES, sans copie : la liste se refiltre à chaque image, et
+    // un onglet compte des milliers de cartes.
+    if (state.filter.PassFilter(card.name.data(), card.name.data() + card.name.size())) {
       shown.push_back(&card);
     }
   }

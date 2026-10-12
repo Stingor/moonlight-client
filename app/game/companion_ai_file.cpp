@@ -14,6 +14,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/companion_ai_yaml.h"
 #include "game/save_folder.h"
@@ -585,17 +586,18 @@ CompanionAiFileRead LoadCompanionAi(const std::filesystem::path& client_root) {
   const std::filesystem::path path = CompanionAiFilePath(client_root);
   const std::optional<std::string> text = ReadWhole(path);
   if (!text.has_value()) {
-    ro::core::LogWarning("IA des compagnons : {} ne s'ouvre pas", path.string());
+    ro::core::LogWarning("IA des compagnons : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return CompanionAiFileRead{.unreadable = true};
   }
   CompanionAiFileRead read = ParseCompanionAi(*text);
   if (read.unreadable) {
-    ro::core::LogWarning("IA des compagnons : {} illisible, il ne sera pas réécrit", path.string());
+    ro::core::LogWarning("IA des compagnons : {} illisible, il ne sera pas réécrit",
+                         ro::core::Utf8FromPath(path));
   }
   if (read.unknown_version) {
     ro::core::LogWarning(
         "IA des compagnons : {} porte une version inconnue, il n'est ni relu ni réécrit",
-        path.string());
+        ro::core::Utf8FromPath(path));
   }
   for (const std::string& why : read.rejected) {
     ro::core::LogWarning(
@@ -617,7 +619,7 @@ std::optional<CompanionAiFileRead> SaveCompanionAiEdits(const std::filesystem::p
     ro::core::LogWarning(
         "IA des compagnons : {} n'est pas réécrit (illisible, ou d'une version inconnue) ; les "
         "modifications ne valent que pour cette session",
-        path.string());
+        ro::core::Utf8FromPath(path));
     return std::nullopt;
   }
   if (const ro::core::Result<void> written = ro::core::WriteFileAtomically(path, *merged);

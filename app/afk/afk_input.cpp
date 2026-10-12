@@ -41,6 +41,13 @@ std::uint32_t AfkIdle::MaskOf(std::uint8_t button) noexcept {
   // ⚠ LES BOUTONS LATÉRAUX COMPTENT AUSSI : un pouce sur le bouton « précédent »
   // repousse l'endormissement comme un autre clic. Ils arrivent dans le même
   // événement ; les écarter serait un trou qu'il faudrait écrire exprès.
+  //
+  // ⚠ MAIS PAS AU-DELÀ DU MASQUE : SDL numérote les boutons d'une souris de
+  // jeu sans plafond, et un décalage de 32 bits ou plus est indéfini.
+  constexpr std::uint8_t kMaskBits = 32;
+  if (button > kMaskBits) {
+    return 0;
+  }
   return 1U << (button - 1U);
 }
 

@@ -12,6 +12,8 @@
 #include "ro/core/log.h"
 #include "ro/sim/style_code.h"
 
+#include "game/yaml_load.h"
+
 namespace moonclient {
 namespace {
 
@@ -68,7 +70,7 @@ constexpr const char* kDraftsHeader =
     return std::nullopt;  // première partie : rien n'a encore été rangé
   }
   try {
-    YAML::Node whole = YAML::LoadFile(path.string());
+    YAML::Node whole = LoadYamlFile(path);
     // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
     // chez l'appelant, hors de ce `try`.
     if (!whole.IsMap()) {

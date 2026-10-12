@@ -6,6 +6,7 @@
 #include <string>
 
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "web/json_value.h"
 
@@ -44,7 +45,7 @@ std::optional<std::uint64_t> ReadLastAppliedPatch(const std::filesystem::path& i
   const std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
   auto index = ParsePatcherState(text);
   if (!index) {
-    ro::core::LogWarning("patcher : {} illisible ({})", state_path.string(),
+    ro::core::LogWarning("patcher : {} illisible ({})", ro::core::Utf8FromPath(state_path),
                          ro::core::Describe(index.error()));
     return std::nullopt;
   }

@@ -12,6 +12,7 @@
 #include "ro/core/log.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -115,7 +116,7 @@ void LoadChatTabs(const std::filesystem::path& client_root, ChatTabs& into) {
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
     // fichier abîmé ne doit pas empêcher de jouer.

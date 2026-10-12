@@ -22,6 +22,7 @@
 #include "ro/core/error.h"
 #include "ro/core/log.h"
 #include "ro/core/program_arguments.h"
+#include "ro/core/utf8_path.h"
 #include "ro/net/connection.h"
 #include "ro/sim/world.h"
 
@@ -71,7 +72,10 @@ int ReportError(const ro::core::Error& error) {
           ro::core::ErrorCode::kIoFailure,
           std::string("impossible de savoir où se trouve l'exécutable : ") + SDL_GetError());
     }
-    launch.install_folder = std::filesystem::path(base);
+    // ⚠ SDL REND DE L'UTF-8 : lu comme un `char*` ordinaire, un dossier
+    // « Ragnarök » s'abîmerait en page ANSI et la configuration deviendrait
+    // introuvable.
+    launch.install_folder = ro::core::PathFromUtf8(base);
   }
   if (launch.archive_folder.empty()) {
     launch.archive_folder = launch.install_folder;
@@ -82,7 +86,7 @@ int ReportError(const ro::core::Error& error) {
   auto source = ro::core::FileByteSource::Open(path);
   if (!source) {
     return ro::core::Fail(ro::core::ErrorCode::kNotFound,
-                          "pas de configuration : " + path.string() +
+                          "pas de configuration : " + ro::core::Utf8FromPath(path) +
                               " — cet exécutable doit vivre DANS le dossier du jeu, à côté de"
                               " son moonclient.yml");
   }

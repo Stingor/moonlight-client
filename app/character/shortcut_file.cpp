@@ -12,6 +12,7 @@
 #include "ro/core/log.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -61,7 +62,7 @@ constexpr const char* kFileHeader =
     return YAML::Node(YAML::NodeType::Map);
   }
   try {
-    YAML::Node whole = YAML::LoadFile(path.string());
+    YAML::Node whole = LoadYamlFile(path);
     return whole.IsMap() ? whole : YAML::Node(YAML::NodeType::Map);
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : la

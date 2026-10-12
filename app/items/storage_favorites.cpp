@@ -9,6 +9,8 @@
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
 
+#include "game/yaml_load.h"
+
 namespace moonclient {
 namespace {
 
@@ -58,7 +60,7 @@ void LoadStorageFavorites(const std::filesystem::path& client_root, StorageFavor
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
     // fichier abîmé ne doit pas empêcher de jouer.

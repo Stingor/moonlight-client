@@ -14,6 +14,7 @@
 
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
+#include "ro/core/utf8_path.h"
 
 namespace moonclient {
 namespace {
@@ -55,8 +56,8 @@ constexpr std::array<std::string_view, 2> kUserFontFolders = {".local/share/font
         if (entry->is_regular_file(code)) {
           // ⚠ LE PREMIER TROUVÉ GARDE LE NOM : les dossiers du système passent
           // avant ceux de l'utilisateur.
-          found.emplace(ro::core::AsciiLower(entry->path().filename().string()),
-                        entry->path().string());
+          found.emplace(ro::core::AsciiLower(ro::core::Utf8FromPath(entry->path().filename())),
+                        ro::core::Utf8FromPath(entry->path()));
         }
       }
     }

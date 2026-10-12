@@ -89,8 +89,6 @@ struct MvpTrackerContext {
   std::string_view own_name;
 };
 
-// La mémoire des alertes déjà sonnées : une sonnerie par OBSERVATION.
-inline constexpr std::size_t kMvpMostFiredAlerts = 32;
 // Plus vieille qu'une heure après l'ouverture de sa fenêtre, une échéance n'est
 // plus une nouvelle.
 inline constexpr std::int64_t kMvpAlertStaleS = 3600;
@@ -301,13 +299,19 @@ class MvpTrackerStage {
   bool snapshot_reply_open_ = false;
   bool after_reply_group_ = false;
   bool handshake_invite_due_ = true;
-  // LES ALERTES déjà sonnées, par créneau et par observation.
+  // LES ALERTES déjà sonnées, par créneau et par observation : une sonnerie
+  // par OBSERVATION.
+  //
+  // 🔴 SANS PLAFOND FIXE, et c'est ce qui l'empêche de sonner en boucle. Une
+  // mémoire pleine qui oubliait la plus ancienne la faisait re-sonner à
+  // l'image suivante dès que plus de favoris qu'elle n'en tenait étaient en
+  // fenêtre — rien ne borne leur nombre. Une entrée ne part que quand son
+  // alerte n'a plus lieu d'être ; il en reste donc au plus une par favori.
   struct FiredAlert {
     std::uint16_t slot_id = 0;
     std::int64_t reported_at_s = 0;
   };
-  std::array<FiredAlert, kMvpMostFiredAlerts> fired_{};
-  std::size_t fired_count_ = 0;
+  std::vector<FiredAlert> fired_;
   // LES ALERTES ALLUMÉES, la plus ancienne en tête.
   struct LitAlert {
     std::uint16_t slot_id = 0;

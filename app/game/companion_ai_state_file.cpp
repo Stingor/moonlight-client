@@ -16,6 +16,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/companion_ai_yaml.h"
 #include "game/save_folder.h"
@@ -331,7 +332,7 @@ CompanionStateRead LoadCompanionState(const std::filesystem::path& client_root) 
   const std::filesystem::path path = CompanionStatePath(client_root);
   const std::optional<std::string> text = ReadWhole(path);
   if (!text.has_value()) {
-    ro::core::LogWarning("IA des compagnons : {} ne s'ouvre pas", path.string());
+    ro::core::LogWarning("IA des compagnons : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return CompanionStateRead{.unreadable = true};
   }
   CompanionStateRead read = ParseCompanionState(*text);
@@ -339,7 +340,7 @@ CompanionStateRead LoadCompanionState(const std::filesystem::path& client_root) 
     ro::core::LogWarning(
         "IA des compagnons : {} n'est ni relu ni réécrit (illisible, ou d'une "
         "version inconnue)",
-        path.string());
+        ro::core::Utf8FromPath(path));
   }
   return read;
 }
@@ -361,7 +362,8 @@ StateWrite SaveCompanionState(const std::filesystem::path& client_root, const Ch
     if (!SetAside(path)) {
       return StateWrite::kFailed;
     }
-    ro::core::LogWarning("IA des compagnons : {} illisible, mis de côté et refait", path.string());
+    ro::core::LogWarning("IA des compagnons : {} illisible, mis de côté et refait",
+                         ro::core::Utf8FromPath(path));
     merged = MergeCompanionState("", key, companions);
   }
   if (!merged.has_value() || !ro::core::WriteFileAtomically(path, *merged)) {

@@ -9,6 +9,7 @@
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/core/sha256.h"
+#include "ro/core/utf8_path.h"
 #include "ro/formats/thor.h"
 
 #include "patcher/patch_apply.h"
@@ -55,7 +56,7 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
 [[nodiscard]] Result<std::string> Sha256OfFile(const std::filesystem::path& path) {
   std::ifstream file(path, std::ios::binary);
   if (!file) {
-    return Fail(ErrorCode::kIoFailure, "impossible de relire " + path.string());
+    return Fail(ErrorCode::kIoFailure, "impossible de relire " + ro::core::Utf8FromPath(path));
   }
   ro::core::Sha256 hasher;
   std::array<char, kHashChunkBytes> chunk{};
@@ -65,7 +66,7 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
     hasher.Update(std::span(reinterpret_cast<const std::uint8_t*>(chunk.data()), read));
   }
   if (file.bad()) {
-    return Fail(ErrorCode::kIoFailure, "lecture interrompue de " + path.string());
+    return Fail(ErrorCode::kIoFailure, "lecture interrompue de " + ro::core::Utf8FromPath(path));
   }
   return ro::core::Sha256::ToHex(hasher.Finish());
 }

@@ -14,6 +14,7 @@
 #include "ro/core/log.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -129,7 +130,7 @@ void LoadNaviPrefs(const std::filesystem::path& client_root, NaviPrefs& into) {
   if (!std::filesystem::exists(path, missing)) return;
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape : un fichier abîmé ne doit pas empêcher
     // de jouer.

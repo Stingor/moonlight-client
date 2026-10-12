@@ -50,6 +50,13 @@ class MercenaryStage {
   // celle déjà reçue.
   void RequestInfo(ro::net::Connection& link);
 
+  // UNE PARTIE NEUVE : le mercenaire du personnage d'avant est oublié.
+  //
+  // ⚠ L'ENTRÉE SUR UNE CARTE NE SUFFIT PAS : le nouveau monde repart de zéro
+  // entrée, et un personnage qui n'avait jamais changé de carte en comptait
+  // zéro aussi — l'onglet de l'un restait affiché pour l'autre.
+  void StartSession();
+
   // UNE COMPÉTENCE DU MERCENAIRE EST-ELLE CELLE-CI ? Pour la barre de
   // raccourcis, qui doit savoir à qui adresser une case.
   [[nodiscard]] const ro::sim::MercenarySkill* FindSkill(std::uint16_t skill_id) const {

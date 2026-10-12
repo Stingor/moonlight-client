@@ -658,6 +658,13 @@ void Game::ForgetWhatPlayed() {
   targeting_.Forget();
   // Le cercle et les relances de Quick cast visaient l'ancienne carte.
   quick_cast_.Forget();
+  // ⚠ LE SORT EN ATTENTE AUSSI, et c'est le sort AU SOL qui l'exige : une
+  // action sur un acteur tombe d'elle-même quand il disparaît, une action sur
+  // une case ne tombe jamais — le personnage repartirait vers les mêmes
+  // coordonnées, sur la carte où il vient d'arriver, et y poserait le sort.
+  // Le curseur armé vise la même carte révolue.
+  grimoire_.CancelPending();
+  grimoire_.Disarm();
   // LA FLÈCHE RENAÎT CACHÉE, et son animation repart, même carte comprise.
   // L'engagement, lui, ne tombe que sur une AUTRE carte : le nom annoncé est
   // déjà le nouveau, celui qu'on a tenté de charger encore l'ancien.

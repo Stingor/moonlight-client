@@ -28,6 +28,12 @@ class ItemLayout {
   // « Cet objet n'a pas de case à lui » : il remplit alors les trous, dans
   // l'ordre où le serveur l'a listé.
   static constexpr int kNowhere = -1;
+  // LA PLUS LOINTAINE CASE ADMISE, exclue. Bien au-delà de tout sac.
+  //
+  // 🔴 LA GRILLE S'ÉTEND JUSQU'À LA CASE LA PLUS LOINTAINE, à chaque image : une
+  // case « 2000000000 » écrite à la main dans le fichier demandait autant de
+  // cases vides, et le sac plantait à l'ouverture.
+  static constexpr int kFarthestCell = 4096;
 
   [[nodiscard]] int CellOf(std::uint32_t item_id) const;
 
@@ -50,7 +56,8 @@ class ItemLayout {
   // démarrage, et le diff aurait été illisible.
   [[nodiscard]] const std::map<std::uint32_t, int>& places() const noexcept { return places_; }
 
-  // La forme brute, pour la lecture du fichier. Une case négative est ignorée.
+  // La forme brute, pour la lecture du fichier. Une case négative, ou au-delà
+  // de `kFarthestCell`, est ignorée.
   void Put(std::uint32_t item_id, int cell);
 
  private:

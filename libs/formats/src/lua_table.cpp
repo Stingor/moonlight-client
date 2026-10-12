@@ -34,6 +34,10 @@ constexpr std::uint8_t kConstantNil = 0;
 constexpr std::uint8_t kConstantBoolean = 1;
 constexpr std::uint8_t kConstantNumber = 3;
 constexpr std::uint8_t kConstantString = 4;
+// LE PLUS PETIT PROTOTYPE SUR LE FIL : la longueur de son nom de source, ses
+// deux lignes, ses quatre octets d'en-tête et ses six comptes. C'est ce qui
+// borne le nombre de prototypes annoncé par ce qui reste à lire.
+constexpr std::size_t kSmallestPrototypeBytes = 40;
 
 using lua_internal::ArgA;
 using lua_internal::ArgB;
@@ -89,10 +93,12 @@ bool ReadPrototype(ByteReader& reader, Prototype& out, int depth) {
   }
 
   const std::uint32_t constants = reader.U32();
+  // ⚠ RIEN DE RÉSERVÉ SUR LA FOI DU COMPTE : une constante nulle tient en un
+  // octet sur le fil et en plusieurs dizaines en mémoire, et un compte gonflé
+  // demanderait des centaines de mégaoctets avant le premier échec de lecture.
   if (!reader.ok() || constants > reader.remaining()) {
     return false;
   }
-  out.constants.reserve(constants);
   for (std::uint32_t index = 0; index < constants; ++index) {
     LuaValue value;
     switch (reader.U8()) {
@@ -117,7 +123,7 @@ bool ReadPrototype(ByteReader& reader, Prototype& out, int depth) {
   }
 
   const std::uint32_t protos = reader.U32();
-  if (!reader.ok() || protos > reader.remaining()) {
+  if (!reader.ok() || protos > reader.remaining() / kSmallestPrototypeBytes) {
     return false;
   }
   out.protos.resize(protos);

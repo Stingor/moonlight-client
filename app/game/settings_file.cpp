@@ -13,6 +13,9 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
+
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -38,7 +41,7 @@ constexpr std::string_view kFileHeader =
     return YAML::Node(YAML::NodeType::Map);
   }
   try {
-    YAML::Node whole = YAML::LoadFile(path.string());
+    YAML::Node whole = LoadYamlFile(path);
     return whole.IsMap() ? whole : YAML::Node(YAML::NodeType::Map);
   } catch (const YAML::Exception& failed) {
     // ⚠ LA SEULE EXCEPTION QU'ON ATTRAPE, et elle vient d'une bibliothèque qui
@@ -51,7 +54,7 @@ constexpr std::string_view kFileHeader =
     ro::core::LogWarning(
         "réglages : {} illisible ({}) — les valeurs par défaut s'appliquent, et le fichier ne "
         "sera pas réécrit de la partie",
-        path.string(), failed.what());
+        ro::core::Utf8FromPath(path), failed.what());
     if (broken != nullptr) {
       *broken = true;
     }
@@ -381,7 +384,7 @@ void SettingsFile::Flush() {
   restart_ = false;
   if (load_failed_) {
     ro::core::LogWarning("réglages : écriture refusée, la dernière lecture de {} avait échoué",
-                         path_.string());
+                         ro::core::Utf8FromPath(path_));
     return;
   }
   Write();

@@ -11,6 +11,8 @@
 #include "ro/core/log.h"
 #include "ro/sim/achievement_book.h"
 
+#include "game/yaml_load.h"
+
 namespace moonclient {
 namespace {
 
@@ -104,7 +106,7 @@ void LoadAchievementMemory(const std::filesystem::path& client_root, Achievement
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     ro::core::LogWarning("succès : fichier illisible ({}) — les défauts s'appliquent",
                          broken.what());

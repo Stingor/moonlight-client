@@ -16,9 +16,13 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <system_error>
+
+#include <SDL3/SDL.h>
 
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
+#include "ro/core/utf8_path.h"
 // ⚠ POUR LE NOMBRE DE DIRECTIONS D'UN .ACT : c'est lui qui borne la direction
 // relue du fichier, et le redéclarer ici en ferait une seconde vérité.
 #include "ro/render/actor_layers.h"
@@ -31,8 +35,22 @@ namespace {
 
 // Le catalogue d'une langue, à côté du jeu. ⚠ CE SONT NOS TEXTES et non ceux de
 // l'installation du joueur : ils se versionnent avec le code qui les demande.
+//
+// 🔴 À CÔTÉ DE L'EXÉCUTABLE D'ABORD, et non sous le dossier courant : les deux
+// diffèrent dès qu'un raccourci change le dossier de départ, et le joueur
+// anglophone retombait alors en français sans rien en voir. Le dossier
+// courant reste le repli : c'est là qu'un exe de développement, bâti loin de
+// ses catalogues, les trouve.
 [[nodiscard]] std::filesystem::path CataloguePath(std::string_view code) {
-  return std::filesystem::path("lang") / (std::string(code) + ".txt");
+  const std::filesystem::path file = std::filesystem::path("lang") / (std::string(code) + ".txt");
+  if (const char* base = SDL_GetBasePath(); base != nullptr) {
+    std::filesystem::path beside = ro::core::PathFromUtf8(base) / file;
+    std::error_code missing;
+    if (std::filesystem::exists(beside, missing)) {
+      return beside;
+    }
+  }
+  return file;
 }
 
 }  // namespace

@@ -8,6 +8,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/profile_yaml.h"
 #include "game/save_folder.h"
@@ -109,13 +110,13 @@ bool LoadSettingsProfiles(const std::filesystem::path& client_root, SettingsProf
   const std::filesystem::path path = SettingsProfilePath(client_root);
   const std::optional<std::string> text = ReadProfileFile(path);
   if (!text.has_value()) {
-    ro::core::LogWarning("profils de réglages : {} ne s'ouvre pas", path.string());
+    ro::core::LogWarning("profils de réglages : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return false;
   }
   if (!ReadSettingsProfiles(*text, into)) {
     ro::core::LogWarning(
         "profils de réglages : {} illisible ou d'une version inconnue, il ne sera pas réécrit",
-        path.string());
+        ro::core::Utf8FromPath(path));
     return false;
   }
   return true;

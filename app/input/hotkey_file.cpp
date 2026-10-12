@@ -9,6 +9,8 @@
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
 
+#include "game/yaml_load.h"
+
 namespace moonclient {
 namespace {
 
@@ -58,7 +60,7 @@ void LoadHotkeys(const std::filesystem::path& client_root, Hotkeys& into) {
   }
   YAML::Node file;
   try {
-    file = YAML::LoadFile(path.string());
+    file = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     // ⚠ LA SEULE EXCEPTION QU'ON ATTRAPE DE TOUT LE PROGRAMME, et elle vient
     // d'une bibliothèque qui n'offre pas d'autre voie. Un fichier de réglages

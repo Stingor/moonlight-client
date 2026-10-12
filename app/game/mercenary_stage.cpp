@@ -222,6 +222,13 @@ std::uint32_t MercenaryStage::own_mercenary_id() const noexcept {
   return book_.present() ? book_.profile().actor_id : 0;
 }
 
+void MercenaryStage::StartSession() {
+  book_ = ro::sim::MercenaryBook{};
+  seen_map_entries_ = 0;
+  seen_job_ = 0;
+  aim_request_.reset();
+}
+
 void MercenaryStage::RequestInfo(ro::net::Connection& link) {
   if (book_.present()) {
     Complain(ro::net::RequestMercenaryInfo(link), "demande de fiche");

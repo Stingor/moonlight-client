@@ -8,8 +8,10 @@
 
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -58,7 +60,7 @@ void CardAlbumDelta::Load() {
   }
   YAML::Node root;
   try {
-    root = YAML::LoadFile(path_.string());
+    root = LoadYamlFile(path_);
   } catch (const YAML::Exception& broken) {
     // Un document abîmé se traite comme un fichier absent : repartir de rien
     // vaut mieux qu'appliquer la moitié d'une intention.
@@ -108,8 +110,8 @@ bool CardAlbumDelta::Flush() const {
   std::filesystem::create_directories(path_.parent_path(), ignored);
   const std::string text = std::string(kHeader) + out.c_str() + "\n";
   if (auto written = ro::core::WriteFileAtomically(path_, text); !written) {
-    ro::core::LogWarning("album : bon de travail non écrit ({}) : {}", path_.string(),
-                         written.error().detail);
+    ro::core::LogWarning("album : bon de travail non écrit ({}) : {}",
+                         ro::core::Utf8FromPath(path_), written.error().detail);
     return false;
   }
   return true;

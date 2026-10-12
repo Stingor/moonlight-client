@@ -9,6 +9,8 @@
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
 
+#include "game/yaml_load.h"
+
 namespace moonclient {
 namespace {
 
@@ -53,7 +55,7 @@ void LoadChatRoomMemory(const std::filesystem::path& client_root, ChatRoomMemory
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     ro::core::LogWarning("salons : fichier illisible ({}) — les défauts s'appliquent",
                          broken.what());

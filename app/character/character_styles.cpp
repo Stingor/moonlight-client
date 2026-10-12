@@ -15,6 +15,7 @@
 #include "ro/sim/style_code.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -60,7 +61,7 @@ struct Written {
     if (!std::filesystem::exists(path, missing)) {
       return YAML::Node(YAML::NodeType::Map);
     }
-    YAML::Node whole = YAML::LoadFile(path.string());
+    YAML::Node whole = LoadYamlFile(path);
     // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
     // chez l'appelant, hors de ce `try`.
     return whole.IsMap() ? whole : YAML::Node(YAML::NodeType::Map);

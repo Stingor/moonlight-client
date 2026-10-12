@@ -10,8 +10,10 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -78,13 +80,14 @@ struct FileRead {
     return {};
   }
   try {
-    const YAML::Node whole = YAML::LoadFile(path.string());
+    const YAML::Node whole = LoadYamlFile(path);
     if (!whole.IsMap()) {
       return FileRead{.state = FileState::kRead};
     }
     return FileRead{.state = FileState::kRead, .bookmarks = ReadList(whole[kBookmarksField])};
   } catch (const YAML::Exception& broken) {
-    ro::core::LogWarning("signets des livres : {} illisible ({})", path.string(), broken.what());
+    ro::core::LogWarning("signets des livres : {} illisible ({})", ro::core::Utf8FromPath(path),
+                         broken.what());
     return FileRead{.state = FileState::kBroken};
   }
 }
@@ -119,7 +122,7 @@ bool SaveBookBookmarks(const std::filesystem::path& client_root, std::uint32_t c
     ro::core::LogWarning(
         "signets des livres : {} n'est pas réécrit tant qu'il reste illisible — il porte "
         "ceux des autres personnages",
-        BookBookmarkFilePath(client_root).string());
+        ro::core::Utf8FromPath(BookBookmarkFilePath(client_root)));
     return false;
   }
   // Les siens par livre croissant : le fichier ne se rebat pas d'une écriture à

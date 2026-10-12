@@ -9,6 +9,7 @@
 #include "ro/core/file_write.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/profile_yaml.h"
 #include "game/save_folder.h"
@@ -28,13 +29,14 @@ void SkinLookPort::Pose(const SettingsValues& profile) {
 bool SkinLookPort::Load(SettingsProfileBook& into) {
   const std::optional<std::string> text = ReadProfileFile(profile_path_);
   if (!text.has_value()) {
-    ro::core::LogWarning("profils d'habillage : {} ne s'ouvre pas", profile_path_.string());
+    ro::core::LogWarning("profils d'habillage : {} ne s'ouvre pas",
+                         ro::core::Utf8FromPath(profile_path_));
     return false;
   }
   if (!ReadSettingsProfiles(*text, into)) {
     ro::core::LogWarning(
         "profils d'habillage : {} illisible ou d'une version inconnue, il ne sera pas réécrit",
-        profile_path_.string());
+        ro::core::Utf8FromPath(profile_path_));
     return false;
   }
   return true;

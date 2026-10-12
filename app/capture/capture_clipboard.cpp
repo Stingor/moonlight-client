@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 #include "ro/formats/gif.h"
 
 #if defined(_WIN32)
@@ -160,7 +161,7 @@ bool PutAnimationOnClipboard(std::span<const std::uint8_t> gif) {
       ro::core::LogError(
           "porteur de presse-papier impossible à écrire : {} — l'animation ne "
           "sera pas copiée",
-          carrier.string());
+          ro::core::Utf8FromPath(carrier));
       return false;
     }
     out.write(reinterpret_cast<const char*>(gif.data()), static_cast<std::streamsize>(gif.size()));

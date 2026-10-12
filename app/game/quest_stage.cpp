@@ -139,8 +139,16 @@ void QuestStage::Remember(const QuestWindows& windows) {
   mine.group_by_category = state.group_by_category;
   // ⚠ RELU AVANT D'ÉCRIRE : un autre client, sur la même installation, a pu
   // retenir ses propres quêtes depuis ; on n'écrit que sa propre part.
-  memory_ = QuestMemory{};
-  LoadQuestMemory(client_root_, memory_);
+  //
+  // ⚠ ET RIEN SI LA RELECTURE ÉCHOUE : le fichier abîmé — ou tenu un instant
+  // par un antivirus — porte la part des AUTRES personnages, qu'une écriture
+  // depuis une mémoire vide effacerait toutes.
+  QuestMemory reread;
+  if (!LoadQuestMemory(client_root_, reread)) {
+    memory_.Remember(std::move(mine));
+    return;
+  }
+  memory_ = std::move(reread);
   memory_.Remember(std::move(mine));
   static_cast<void>(SaveQuestMemory(client_root_, memory_));
 }

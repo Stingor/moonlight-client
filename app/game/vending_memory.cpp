@@ -10,6 +10,8 @@
 #include "ro/core/log.h"
 #include "ro/sim/vending.h"
 
+#include "game/yaml_load.h"
+
 namespace moonclient {
 namespace {
 
@@ -96,7 +98,7 @@ void LoadVendingMemory(const std::filesystem::path& client_root, VendingMemory& 
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     ro::core::LogWarning("échoppes : fichier illisible ({}) — les défauts s'appliquent",
                          broken.what());

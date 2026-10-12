@@ -1,6 +1,8 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/utf8_path.h"
+
 #include "patcher/install_lock.h"
 
 // clang-format off
@@ -20,9 +22,9 @@ ro::core::Result<InstallLock> InstallLock::Take(const std::filesystem::path& roo
       return ro::core::Fail(ro::core::ErrorCode::kIoFailure,
                             "un autre client met déjà ce dossier à jour");
     }
-    return ro::core::Fail(ro::core::ErrorCode::kIoFailure, "impossible de verrouiller " +
-                                                               lock_path.string() + " (erreur " +
-                                                               std::to_string(code) + ")");
+    return ro::core::Fail(ro::core::ErrorCode::kIoFailure,
+                          "impossible de verrouiller " + ro::core::Utf8FromPath(lock_path) +
+                              " (erreur " + std::to_string(code) + ")");
   }
   return InstallLock(reinterpret_cast<std::intptr_t>(handle));
 }

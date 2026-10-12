@@ -15,6 +15,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/save_folder.h"
 
@@ -189,24 +190,24 @@ std::filesystem::path QuestMemoryPath(const std::filesystem::path& client_root) 
   return client_root / kSaveFolder / kQuestMemoryFileName;
 }
 
-void ParseQuestMemory(std::string_view text, QuestMemory& into) {
+bool ParseQuestMemory(std::string_view text, QuestMemory& into) {
   YAML::Node whole;
   try {
     whole = YAML::Load(std::string(text));
   } catch (const YAML::Exception& broken) {
     ro::core::LogWarning("quêtes : fichier illisible ({}) — les défauts s'appliquent",
                          broken.what());
-    return;
+    return false;
   }
   // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lèverait
-  // hors du `try`.
+  // hors du `try`. Un fichier VIDE, lui, est lisible : il ne retient rien.
   if (!whole.IsMap()) {
-    return;
+    return whole.IsNull();
   }
   try {
     const YAML::Node listed = whole[kCharactersField];
     if (!listed || !listed.IsSequence()) {
-      return;
+      return !listed;
     }
     for (const YAML::Node& entry : listed) {
       if (!entry.IsMap()) {
@@ -220,7 +221,9 @@ void ParseQuestMemory(std::string_view text, QuestMemory& into) {
   } catch (const YAML::Exception& broken) {
     // Un champ d'un autre type : ce qui a été lu reste, le reste aux défauts.
     ro::core::LogWarning("quêtes : champ illisible ({})", broken.what());
+    return false;
   }
+  return true;
 }
 
 std::string QuestMemoryText(const QuestMemory& from) {
@@ -270,19 +273,20 @@ std::string QuestMemoryText(const QuestMemory& from) {
   return std::string(kFileHeader) + out.c_str() + "\n";
 }
 
-void LoadQuestMemory(const std::filesystem::path& client_root, QuestMemory& into) {
+bool LoadQuestMemory(const std::filesystem::path& client_root, QuestMemory& into) {
   const std::filesystem::path path = QuestMemoryPath(client_root);
   std::error_code missing;
   if (!std::filesystem::exists(path, missing)) {
-    return;
+    return true;
   }
   std::ifstream file(path, std::ios::binary);
   if (!file) {
-    ro::core::LogWarning("quêtes : {} ne s'ouvre pas — les défauts s'appliquent", path.string());
-    return;
+    ro::core::LogWarning("quêtes : {} ne s'ouvre pas — les défauts s'appliquent",
+                         ro::core::Utf8FromPath(path));
+    return false;
   }
   const std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-  ParseQuestMemory(text, into);
+  return ParseQuestMemory(text, into);
 }
 
 bool SaveQuestMemory(const std::filesystem::path& client_root, const QuestMemory& from) {

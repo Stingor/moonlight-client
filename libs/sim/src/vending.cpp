@@ -144,7 +144,12 @@ void Vending::EndVisit(VendingVisitEnd why) noexcept {
     purchase_pending_ = false;
     return;
   }
-  if (purchase_pending_) {
+  // ⚠ PAS QUAND LE VENDEUR EST PARTI : le serveur répond dans l'ordre, et une
+  // liste encore attendue à l'arrivée de son départ ne viendra plus — il
+  // n'en répond pas pour une enseigne absente. Posé quand même, le marqueur
+  // survivait, et avalait la première liste de la prochaine échoppe de ce
+  // compte : rien ne s'ouvrait au premier clic.
+  if (purchase_pending_ && why != VendingVisitEnd::kVendorGone) {
     stale_refresh_aid_ = vendor_aid_;
   }
   visiting_ = false;

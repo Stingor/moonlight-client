@@ -14,6 +14,7 @@
 #include "ro/core/byte_source.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 #include "ro/formats/image.h"
 #include "ro/render/gl_texture.h"
 #include "ro/render/icon_texture.h"
@@ -107,7 +108,7 @@ struct PatchScreenText {
   if (!bytes) {
     return backdrop;
   }
-  auto image = ro::formats::DecodeImage(path->filename().string(), *bytes);
+  auto image = ro::formats::DecodeImage(ro::core::Utf8FromPath(path->filename()), *bytes);
   if (!image) {
     ro::core::LogWarning("skin : {} illisible ({})", path->string(),
                          ro::core::Describe(image.error()));

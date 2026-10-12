@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 namespace moonclient {
 namespace {
@@ -108,7 +109,7 @@ void MapMusic::Follow(ro::audio::AudioEngine& audio, const std::string& map_name
       file.empty() ? std::vector<std::uint8_t>() : ReadFromDisk(file);
   if (bytes.empty()) {
     ro::core::LogWarning("musique : fichier absent — {}",
-                         (client_root_ / std::filesystem::path(track)).string());
+                         ro::core::Utf8FromPath((client_root_ / std::filesystem::path(track))));
     audio.StopMusic();
     return;
   }

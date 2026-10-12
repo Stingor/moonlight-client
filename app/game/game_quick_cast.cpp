@@ -138,6 +138,10 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
     }
 
     bool CastOnGround(const ro::sim::KnownSkill& skill, ro::sim::CellPosition where) override {
+      // ⚠ COMME SUR UN ACTEUR : l'attaque ou le ramassage d'avant tombe, sans
+      // quoi deux poursuites enverraient chacune leur marche, vers deux cases.
+      game_.pickup_.reset();
+      game_.attack_.reset();
       game_.grimoire_.CastOnGround(skill, where);
       // Comme un clic : un sort au sol qui part achève l'action du personnage.
       EndDeed(game_.world_mouse_.engagement);

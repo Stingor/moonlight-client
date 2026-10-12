@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 namespace moonclient {
 namespace {
@@ -19,8 +20,9 @@ std::filesystem::path FileOfLink(const std::filesystem::path& first_file, std::s
     return first_file;
   }
   std::filesystem::path numbered = first_file;
-  numbered.replace_filename(first_file.stem().string() + "." + std::to_string(rank) +
-                            first_file.extension().string());
+  numbered.replace_filename(ro::core::PathFromUtf8(ro::core::Utf8FromPath(first_file.stem()) + "." +
+                                                   std::to_string(rank) +
+                                                   ro::core::Utf8FromPath(first_file.extension())));
   return numbered;
 }
 
@@ -44,12 +46,12 @@ ro::net::ReceiveObserver ZoneStreamCapture::ObserveNewLink() {
       const std::filesystem::path file = FileOfLink(shared->first_file, shared->links_opened);
       link->sink.open(file, std::ios::binary | std::ios::trunc);
       if (link->sink.is_open()) {
-        ro::core::LogInfo("capture du flux de zone dans {}", file.string());
+        ro::core::LogInfo("capture du flux de zone dans {}", ro::core::Utf8FromPath(file));
       } else {
         ro::core::LogWarning(
             "capture du flux : {} ne s'ouvre pas — cette liaison ne sera pas "
             "gardée",
-            file.string());
+            ro::core::Utf8FromPath(file));
       }
     }
     if (!link->sink.is_open()) {

@@ -7,6 +7,9 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/text.h"
+
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -45,7 +48,7 @@ const StorageTabName* StorageTabNames::Of(std::uint8_t storage_id) const {
 
 void StorageTabNames::Name(std::uint8_t storage_id, std::string_view name) {
   StorageTabName told = Of(storage_id) == nullptr ? StorageTabName{} : *Of(storage_id);
-  told.name = std::string(name.substr(0, std::min(name.size(), kLongestName)));
+  told.name = std::string(ro::core::WithoutDanglingUtf8(name.substr(0, kLongestName)));
   told_[storage_id] = std::move(told);
   Forget(storage_id);
 }
@@ -58,7 +61,11 @@ void StorageTabNames::Decorate(std::uint8_t storage_id, std::uint32_t item_id) {
 }
 
 void StorageTabNames::Put(std::uint8_t storage_id, StorageTabName told) {
-  told.name = told.name.substr(0, std::min(told.name.size(), kLongestName));
+  // ⚠ À LA FRONTIÈRE D'UN CARACTÈRE : un nom corrigé à la main peut porter un
+  // accent juste à la coupe, et l'onglet montrerait un glyphe abîmé — que
+  // l'écriture suivante graverait dans le fichier.
+  told.name = std::string(
+      ro::core::WithoutDanglingUtf8(std::string_view(told.name).substr(0, kLongestName)));
   told_[storage_id] = std::move(told);
   Forget(storage_id);
 }
@@ -81,7 +88,7 @@ void LoadStorageTabNames(const std::filesystem::path& client_root, StorageTabNam
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape : un fichier abîmé ne doit pas empêcher
     // de jouer.

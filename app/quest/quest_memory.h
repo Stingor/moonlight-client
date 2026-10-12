@@ -68,11 +68,17 @@ struct QuestMemory {
 [[nodiscard]] std::filesystem::path QuestMemoryPath(const std::filesystem::path& client_root);
 
 // Un fichier absent ou illisible laisse `into` tel quel : les défauts valent.
-void LoadQuestMemory(const std::filesystem::path& client_root, QuestMemory& into);
+//
+// 🔴 FAUX QUAND LE FICHIER EXISTE ET NE SE LIT PAS, et l'appelant doit alors
+// renoncer à l'écrire : le fichier porte les quêtes de TOUS les personnages,
+// et le réécrire depuis une lecture ratée n'y laisserait que celui du moment.
+// Absent, il est lisible : il n'y a rien à perdre.
+bool LoadQuestMemory(const std::filesystem::path& client_root, QuestMemory& into);
 bool SaveQuestMemory(const std::filesystem::path& client_root, const QuestMemory& from);
 
-// Lecture et écriture du TEXTE, pour les essais.
-void ParseQuestMemory(std::string_view text, QuestMemory& into);
+// Lecture et écriture du TEXTE, pour les essais. Même verdict que
+// `LoadQuestMemory`.
+bool ParseQuestMemory(std::string_view text, QuestMemory& into);
 [[nodiscard]] std::string QuestMemoryText(const QuestMemory& from);
 
 }  // namespace moonclient

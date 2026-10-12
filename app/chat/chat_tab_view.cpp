@@ -544,10 +544,18 @@ void ChatTabsView::Apply(std::uint32_t group, const ro::ui::ChatWindowAction& as
     const std::size_t to =
         asked.moved_to >= static_cast<int>(ranks.size()) ? ranks.back() + 1 : real(asked.moved_to);
     if (from != kNoTab && to != kNoTab) {
-      const bool was_shown = state.tab == asked.moved_from;
       tabs_.Move(from, to);
-      if (was_shown) {
-        state.tab = asked.moved_to > asked.moved_from ? asked.moved_to - 1 : asked.moved_to;
+      // ⚠ CE QUI SE TROUVAIT ENTRE LES DEUX PLACES GLISSE D'UN RANG, l'onglet
+      // montré compris : ne recaler que celui qu'on déplace faisait passer la
+      // vue à son voisin dès qu'on rangeait un AUTRE onglet par-dessus lui.
+      const int moved_from = asked.moved_from;
+      const int moved_to = asked.moved_to;
+      if (state.tab == moved_from) {
+        state.tab = moved_to > moved_from ? moved_to - 1 : moved_to;
+      } else if (moved_from < moved_to && state.tab > moved_from && state.tab < moved_to) {
+        --state.tab;
+      } else if (moved_to < moved_from && state.tab >= moved_to && state.tab < moved_from) {
+        ++state.tab;
       }
     }
   }

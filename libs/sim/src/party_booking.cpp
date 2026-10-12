@@ -85,8 +85,12 @@ std::span<const std::int16_t> PartyBookingJobsOf(PartyBookingJobFamily family) {
 }
 
 bool PartyBookingAdMatches(const PartyBookingAd& ad, const PartyBookingCriteria& criteria) {
+  // ⚠ LE NIVEAU CHERCHÉ EST CELUI DU PERSONNAGE, et une annonce vaut jusqu'à
+  // quinze niveaux AU-DESSUS du sien : elle répond donc si son niveau tombe
+  // dans les quinze niveaux EN DESSOUS de celui qu'on cherche. C'est la
+  // fenêtre de `party_booking_search` côté serveur.
   if (criteria.level > 0 &&
-      (ad.level < criteria.level || int{ad.level} > criteria.level + kPartyBookingLevelSpan)) {
+      (ad.level > criteria.level || int{ad.level} < criteria.level - kPartyBookingLevelSpan)) {
     return false;
   }
   if (criteria.map_code != kPartyBookingAnyMap && ad.map_code != criteria.map_code) {

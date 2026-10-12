@@ -239,16 +239,18 @@ void WebLogin::Digest(const WebReply& reply, std::uint32_t now_ms) {
       browser_url_ = origin_ + std::string(path);
       // ⚠ LES DEUX DURÉES DU SITE SE BORNENT AVANT D'ÊTRE MULTIPLIÉES : une
       // valeur négative ou immense débordait les 32 bits en millisecondes.
-      const std::int64_t every_s = body->WholeAt("poll_interval", kDiscordPollMs / kWebMsPerSecond);
+      const std::int64_t every_s =
+          std::clamp<std::int64_t>(body->WholeAt("poll_interval", kDiscordPollMs / kWebMsPerSecond),
+                                   0, kDiscordPollCeilingMs / kWebMsPerSecond);
       discord_every_ms_ = static_cast<std::uint32_t>(std::clamp<std::int64_t>(
           every_s * kWebMsPerSecond, kDiscordPollFloorMs, kDiscordPollCeilingMs));
       // 🔴 UNE DURÉE DE VIE ABSENTE OU NULLE VEUT DIRE « SANS LIMITE », et non
       // « expirée » : `until = now` faisait échouer la connexion au tour suivant.
-      const std::int64_t life_s = body->WholeAt("ttl", 0);
+      const std::int64_t life_s =
+          std::min<std::int64_t>(body->WholeAt("ttl", 0), kDiscordLifeCeilingMs / kWebMsPerSecond);
       discord_until_ms_ = 0;
       if (life_s > 0) {
-        discord_until_ms_ = now_ms + static_cast<std::uint32_t>(std::min<std::int64_t>(
-                                         life_s * kWebMsPerSecond, kDiscordLifeCeilingMs));
+        discord_until_ms_ = now_ms + static_cast<std::uint32_t>(life_s * kWebMsPerSecond);
       }
       awaiting_ = Awaiting::kNothing;
       discord_next_ms_ = now_ms + discord_every_ms_;

@@ -13,6 +13,7 @@
 #include "ro/core/log.h"
 #include "ro/sim/world.h"
 
+#include "game/yaml_load.h"
 #include "world/entity_menu.h"
 
 namespace moonclient {
@@ -105,7 +106,7 @@ void LoadBlockedNpcs(const std::filesystem::path& client_root, BlockedNpcs& into
   }
   YAML::Node whole;
   try {
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
     // fichier abîmé ne doit pas empêcher de jouer.

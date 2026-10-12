@@ -204,6 +204,16 @@ void PetStage::Say(ro::sim::World& world, std::string text, std::uint32_t color)
   world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), last_now_ms_, color);
 }
 
+void PetStage::StartSession() {
+  pet_ = ro::sim::Pet{};
+  sprite_.reset();
+  source_sprite_.reset();
+  target_sprite_.reset();
+  force_open_ = false;
+  hunger_alarm_ = ro::sim::HungerAlarm{};
+  hunger_notice_.reset();
+}
+
 void PetStage::LoadTables(ro::vfs::Vfs& vfs) {
   if (tables_tried_) {
     return;

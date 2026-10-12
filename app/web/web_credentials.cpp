@@ -11,6 +11,7 @@
 #include "ro/core/log.h"
 
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient::web {
 namespace {
@@ -109,7 +110,7 @@ WebCredentials LoadWebCredentials(const std::filesystem::path& client_root, Secr
     if (!std::filesystem::exists(path, quietly)) {
       return found;
     }
-    whole = YAML::LoadFile(path.string());
+    whole = LoadYamlFile(path);
   } catch (const std::exception& trouble) {
     // ⚠ UN FICHIER ILLISIBLE N'EMPÊCHE PAS DE JOUER : on repart d'une mémoire
     // vide, et la prochaine connexion la réécrit proprement.

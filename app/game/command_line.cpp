@@ -3,6 +3,7 @@
 #include <cstdio>
 
 #include "ro/core/build_flavor.h"
+#include "ro/core/utf8_path.h"
 
 namespace moonclient {
 namespace {
@@ -26,7 +27,8 @@ constexpr int kUsageExitCode = 2;
     if (index + 1 >= args.size() || args[index + 1].empty()) {
       return false;
     }
-    const std::filesystem::path value(args[index + 1]);
+    // Les arguments arrivent en UTF-8 : voir `ProgramArguments`.
+    const std::filesystem::path value = ro::core::PathFromUtf8(args[index + 1]);
     if (args[index] == kFolderMarker) {
       launch.install_folder = value;
     } else if (args[index] == kArchivesMarker) {

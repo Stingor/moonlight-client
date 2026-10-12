@@ -67,8 +67,7 @@ void MvpTrackerStage::StartSession(MvpTrackerWindows& windows) {
   after_reply_group_ = false;
   handshake_invite_due_ = true;
   // Une alerte déjà sonnée re-sonne pour le personnage suivant.
-  fired_ = {};
-  fired_count_ = 0;
+  fired_.clear();
   lit_alerts_.clear();
   alert_sound_ = false;
   facts_kept_.clear();
@@ -482,6 +481,16 @@ bool MvpTrackerStage::ApplyAnswer(const ro::ui::MvpTrackerAction& answer,
 void MvpTrackerStage::DetectAlerts(const MvpTrackerSettings& hunt, std::int64_t server_now_s,
                                    std::uint32_t now_ms) {
   const std::int64_t lead_s = static_cast<std::int64_t>(hunt.alert_lead_min) * kSecondsPerMinute;
+  // Une sonnerie s'oublie quand son alerte n'a plus lieu d'être : fenêtre
+  // passée, créneau disparu, ou observation remplacée par une plus fraîche —
+  // qui sonnera pour son compte.
+  std::erase_if(fired_, [&](const FiredAlert& fired) {
+    const std::optional<ro::sim::MvpWindow> window = book_.WindowOf(fired.slot_id);
+    const ro::sim::MvpObservation* observation = book_.FindObservation(fired.slot_id);
+    return !window.has_value() || observation == nullptr ||
+           observation->reported_at_s != fired.reported_at_s ||
+           server_now_s > window->from_s + kMvpAlertStaleS;
+  });
   for (const std::uint16_t slot_id : book_.favorites()) {
     const std::optional<ro::sim::MvpWindow> window = book_.WindowOf(slot_id);
     // Pas encore dans le préavis, ou trop vieux pour être une nouvelle.
@@ -495,20 +504,12 @@ void MvpTrackerStage::DetectAlerts(const MvpTrackerSettings& hunt, std::int64_t 
     }
     // 🔴 UNE SONNERIE PAR OBSERVATION : une observation plus fraîche — un miroir
     // qui précise un kill — a le droit de re-sonner, la même non.
-    const auto fired_end = fired_.begin() + static_cast<std::ptrdiff_t>(fired_count_);
-    if (std::any_of(fired_.begin(), fired_end, [&](const FiredAlert& fired) {
+    if (std::ranges::any_of(fired_, [&](const FiredAlert& fired) {
           return fired.slot_id == slot_id && fired.reported_at_s == observation->reported_at_s;
         })) {
       continue;
     }
-    // Pleine, la mémoire oublie la plus ancienne : l'alerte ne vit qu'une heure.
-    if (fired_count_ == fired_.size()) {
-      std::shift_left(fired_.begin(), fired_.end(), 1);
-      --fired_count_;
-    }
-    fired_[fired_count_] =
-        FiredAlert{.slot_id = slot_id, .reported_at_s = observation->reported_at_s};
-    ++fired_count_;
+    fired_.push_back(FiredAlert{.slot_id = slot_id, .reported_at_s = observation->reported_at_s});
     // LES ALERTES S'EMPILENT : deux favoris qui entrent ensemble se montrent
     // tous deux. Déjà allumé, le créneau se rallume EN QUEUE, comme la plus
     // récente qu'il est devenu ; au-delà de la pile, la plus ancienne sort.

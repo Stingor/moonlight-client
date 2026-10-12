@@ -438,6 +438,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.mail.StartSession();
   // NI LA DEMANDE D'ADOPTION REÇUE.
   pieces_.adoption.StartSession();
+  // NI LE FAMILIER, NI LE MERCENAIRE du personnage d'avant, ni la fiche
+  // ouverte sur l'un d'eux.
+  pieces_.pet.StartSession();
+  windows_.pet = ro::ui::PetWindowState{};
+  pieces_.mercenary.StartSession();
   // NI L'ENTITÉ, NI LE JOUEUR QUE LE STAFF CONSULTAIT, NI CELUI QU'ON
   // SIGNALAIT : leurs identifiants étaient ceux d'une autre partie.
   pieces_.entity_inspector = EntityInspector{};

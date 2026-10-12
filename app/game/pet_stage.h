@@ -49,6 +49,18 @@ class PetStage {
              ro::ui::PetWindowState& window, ro::net::Connection& link, ro::sim::World& world,
              std::uint32_t now_ms);
 
+  // UNE PARTIE NEUVE : le familier du personnage d'avant est oublié.
+  //
+  // 🔴 L'ÉTAGE SURVIT À LA PARTIE — il appartient à la coquille —, et rien
+  // d'autre ne l'efface : le compteur d'entrées sur une carte repart de zéro
+  // avec le nouveau monde, et le familier, croyant attendre son retour, ne
+  // partait jamais. La fiche et la touche montraient alors celui d'un autre
+  // personnage, et « nourrir » parlait au serveur d'un familier absent.
+  //
+  // ⚠ LES TABLES RESTENT : elles viennent de l'installation, pas du
+  // personnage.
+  void StartSession();
+
   // ── CE QUE LE MENU D'ENTITÉ DEMANDE ─────────────────────────────────────
 
   // L'acteur de MON familier ; zéro quand aucun n'est sorti ou qu'il est parti.

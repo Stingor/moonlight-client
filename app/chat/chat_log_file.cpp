@@ -7,6 +7,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 namespace moonclient {
 namespace {
@@ -38,15 +39,18 @@ constexpr unsigned char kFirstPrintable = 0x20;
   // Rotation à la manière du client : le nom simple, puis `_001`, `_002`… Deux
   // `/savechat` d'affilée ne doivent pas s'écraser l'un l'autre — c'est
   // typiquement ce qu'on fait avant et après un évènement.
+  // ⚠ LE NOM D'ONGLET OU DE SALON EST EN UTF-8 : passé tel quel au chemin, il
+  // serait lu dans la page ANSI et « Général » deviendrait « GÃ©nÃ©ral ».
   std::filesystem::path path =
-      folder / (std::string(kChatDumpPrefix) + std::string(stem) + std::string(kChatLogSuffix));
+      folder / ro::core::PathFromUtf8(std::string(kChatDumpPrefix) + std::string(stem) +
+                                      std::string(kChatLogSuffix));
   std::error_code missing;
   for (int rank = 1; rank < kLargestChatDumpRotation && std::filesystem::exists(path, missing);
        ++rank) {
     std::array<char, 16> suffix{};
     std::snprintf(suffix.data(), suffix.size(), "_%03d", rank);
-    path = folder / (std::string(kChatDumpPrefix) + std::string(stem) + suffix.data() +
-                     std::string(kChatLogSuffix));
+    path = folder / ro::core::PathFromUtf8(std::string(kChatDumpPrefix) + std::string(stem) +
+                                           suffix.data() + std::string(kChatLogSuffix));
   }
   return path;
 }
@@ -73,7 +77,8 @@ void WriteDump(ChatLogDump& done, std::string_view stem, std::string_view conten
   if (ro::core::WriteFileAtomically(path, content).has_value()) {
     ++done.files;
   } else {
-    ro::core::LogWarning("journal de conversation : {} n'a pas pu être écrit", path.string());
+    ro::core::LogWarning("journal de conversation : {} n'a pas pu être écrit",
+                         ro::core::Utf8FromPath(path));
   }
 }
 
@@ -180,7 +185,7 @@ bool ChatLogWriter::Begin() {
     ro::core::LogWarning(
         "journal de conversation : {} ne s'ouvre pas — la conversation de cette partie ne sera "
         "pas conservée",
-        path.string());
+        ro::core::Utf8FromPath(path));
     serving_ = false;
     return false;
   }
@@ -191,7 +196,7 @@ bool ChatLogWriter::Begin() {
   if (!mark_.empty()) {
     file_ << mark_ << kLineEnd;
   }
-  ro::core::LogInfo("journal de conversation : ouvert dans {}", path_.string());
+  ro::core::LogInfo("journal de conversation : ouvert dans {}", ro::core::Utf8FromPath(path_));
   return true;
 }
 

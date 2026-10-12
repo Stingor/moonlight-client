@@ -9,6 +9,7 @@
 #include <imgui.h>
 
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 #include "ro/core/web_address.h"
 #include "ro/render/emotion.h"
 #include "ro/ui/chat_emote_names.h"
@@ -400,8 +401,8 @@ void ChatWebStage::Answer(ro::ui::ChatWindows& chat, const std::filesystem::path
       std::error_code failed;
       std::filesystem::create_directories(folder, failed);
       if (failed) {
-        ro::core::LogWarning("chat : le dossier {} n'a pas pu se créer — {}", folder.string(),
-                             failed.message());
+        ro::core::LogWarning("chat : le dossier {} n'a pas pu se créer — {}",
+                             ro::core::Utf8FromPath(folder), failed.message());
       }
       cache_.RequestSave(viewer.url, folder);
       break;

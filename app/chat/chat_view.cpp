@@ -13,6 +13,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/core/text.h"
+#include "ro/core/utf8_path.h"
 #include "ro/net/action.h"
 #include "ro/net/chat_target.h"
 #include "ro/net/player_config.h"
@@ -495,12 +496,12 @@ void SaveChatAndSay(const ChatTabsView& tabs, const ChatRoomStage* rooms, bool t
   // « … is Saved. » sans jamais nommer l'endroit, et sa commande est MUETTE
   // quand l'écriture échoue — on a assez souffert de commandes qui ne disent
   // rien pour ne pas en fabriquer une de plus.
-  world.RecordChat(
-      ro::sim::ChatKind::kServer, 0,
-      done.files > 0
-          ? std::format("journal : {} fichier(s) dans {}", done.files, done.folder.string())
-          : std::string("journal : rien à enregistrer, aucun fil ne montre de ligne"),
-      said_ms);
+  world.RecordChat(ro::sim::ChatKind::kServer, 0,
+                   done.files > 0
+                       ? std::format("journal : {} fichier(s) dans {}", done.files,
+                                     ro::core::Utf8FromPath(done.folder))
+                       : std::string("journal : rien à enregistrer, aucun fil ne montre de ligne"),
+                   said_ms);
 }
 
 void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms) {

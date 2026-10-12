@@ -15,6 +15,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/save_folder.h"
 
@@ -134,13 +135,15 @@ bool LoadMvpLines(const std::filesystem::path& client_root, std::vector<MvpPinne
   }
   std::ifstream file(path, std::ios::binary);
   if (!file) {
-    ro::core::LogWarning("carnet MVP : {} ne s'ouvre pas, il ne sera pas réécrit", path.string());
+    ro::core::LogWarning("carnet MVP : {} ne s'ouvre pas, il ne sera pas réécrit",
+                         ro::core::Utf8FromPath(path));
     return false;
   }
   std::ostringstream text;
   text << file.rdbuf();
   if (!ReadMvpLines(text.str(), into)) {
-    ro::core::LogWarning("carnet MVP : {} illisible, il ne sera pas réécrit", path.string());
+    ro::core::LogWarning("carnet MVP : {} illisible, il ne sera pas réécrit",
+                         ro::core::Utf8FromPath(path));
     return false;
   }
   return true;

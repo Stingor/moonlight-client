@@ -10,6 +10,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #include "game/save_folder.h"
 
@@ -114,7 +115,8 @@ void LoadTrackerMemory(const std::filesystem::path& client_root, TrackerMemory& 
   }
   std::ifstream file(path, std::ios::binary);
   if (!file) {
-    ro::core::LogWarning("suivi : {} ne s'ouvre pas — les défauts s'appliquent", path.string());
+    ro::core::LogWarning("suivi : {} ne s'ouvre pas — les défauts s'appliquent",
+                         ro::core::Utf8FromPath(path));
     return;
   }
   const std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
