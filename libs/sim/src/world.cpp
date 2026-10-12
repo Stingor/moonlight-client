@@ -80,7 +80,7 @@ void World::EnterMap(std::string map_name, std::uint16_t x, std::uint16_t y) {
   // suffit donc pas — mais ce qu'il reste à dire au serveur n'est pas l'affaire
   // du monde. Voir `net::NpcFarewellDue`, qui se lit AVANT d'appliquer la
   // trame.
-  npc_dialog_.reset();
+  CloseNpcDialog();
   // LES MARQUES DE QUÊTE appartiennent à la carte quittée : le serveur redit
   // celles de la nouvelle une fois le chargement confirmé.
   quest_markers_.Clear();
@@ -646,18 +646,6 @@ void World::RecordChat(ChatKind kind, ChatType type, std::uint32_t speaker_id, s
                                  .said_ms = said_ms,
                                  .color = color,
                                  .author = std::move(author)});
-}
-
-Inventory& World::HolderFor(ItemHolder holder) noexcept {
-  switch (holder) {
-    case ItemHolder::kCart:
-      return cart_;
-    case ItemHolder::kStorage:
-      return storage_;
-    case ItemHolder::kInventory:
-      break;
-  }
-  return inventory_;
 }
 
 void World::PlaceSkillUnit(const SkillUnit& unit) { skill_units_[unit.id] = unit; }

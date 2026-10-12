@@ -107,6 +107,7 @@ add_library(ro_sim STATIC
     src/world_combo.cpp
     src/world_blade_stop.cpp
     src/world_glide.cpp
+    src/world_holdings.cpp
     src/world_devotion.cpp
     src/world_effect_list.cpp
     src/world_facing.cpp
@@ -118,7 +119,6 @@ add_library(ro_sim STATIC
     src/npc_shop_cart.cpp
     src/world_pvp_rings.cpp
     src/world_skill_unit_speech.cpp
-    src/world_storage.cpp
     src/world_support.cpp)
 add_library(ro::sim ALIAS ro_sim)
 

@@ -18,9 +18,9 @@ namespace ro::sim {
 // l'écran longtemps après que le serveur l'avait levé, que sa durée se soit
 // achevée ou que son compte de coups se soit épuisé.
 //
-// ⚠ ELLE NE VIT PAS DANS `World` — qui touche son plafond —, et elle n'a pas à y
-// vivre : elle ne lit que ce que le monde expose déjà. Une question SUR le monde
-// n'est pas une pièce DU monde.
+// ⚠ ELLE NE VIT PAS DANS `World`, et elle n'a pas à y vivre : elle ne lit que ce
+// que le monde expose déjà. Une question SUR le monde n'est pas une pièce DU
+// monde.
 [[nodiscard]] bool WorldHolds(const World& world, std::uint32_t id) noexcept;
 
 }  // namespace ro::sim

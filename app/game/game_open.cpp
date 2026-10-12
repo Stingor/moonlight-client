@@ -29,8 +29,8 @@
 
 namespace moonclient {
 
-Game::Game(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
-           const ro::net::ZoneTicket& ticket)
+GameFoundation::GameFoundation(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
+                               const ro::net::ZoneTicket& ticket)
     : shell_(shell),
       client_root_(shell.client_root()),
       vfs_(&shell.vfs()),
@@ -44,7 +44,11 @@ Game::Game(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
       world_(std::move(world)),
       ticket_(ticket),
       targeting_(shell.settings().options().targeting().settings()),
-      quick_cast_(shell.settings().options().quick_cast().look()),
+      quick_cast_(shell.settings().options().quick_cast().look()) {}
+
+Game::Game(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
+           const ro::net::ZoneTicket& ticket)
+    : GameFoundation(shell, std::move(link), std::move(world), ticket),
       music_(shell.music()),
       card_album_(shell.client_root()) {}
 

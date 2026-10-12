@@ -1,22 +1,15 @@
+#include "ro/sim/world_npc_dialog.h"
+
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ro/sim/world.h"
-
-// CE QUE LE MONDE FAIT D'UN DIALOGUE DE PNJ.
-//
-// Neuf méthodes qui ne touchent qu'à `npc_dialog_` : elles ne regardent aucun
-// acteur, ne déplacent rien et ne lisent aucune case. C'est la frontière la plus
-// nette du monde, et c'est pourquoi la coupure passe ici.
-//
-// ⚠ SORTIES DE `world.cpp` LE JOUR OÙ IL A CRÉVÉ SON PLAFOND. La coupure suit
-// ce que les méthodes TOUCHENT, pas leur taille — voir `ro/sim/npc_dialog.h`,
-// qui porte le modèle qu'elles manipulent.
+// CE QUE LE MONDE FAIT D'UN DIALOGUE DE PNJ : voir `WorldNpcDialog`. Ces
+// méthodes ne touchent qu'à `npc_dialog_`.
 
 namespace ro::sim {
 
-void World::SayNpcDialog(std::uint32_t npc_id, std::string line, std::uint32_t now_ms) {
+void WorldNpcDialog::SayNpcDialog(std::uint32_t npc_id, std::string line, std::uint32_t now_ms) {
   if (!npc_dialog_.has_value() || npc_dialog_->npc_id != npc_id) {
     npc_dialog_ = NpcDialog{};
     npc_dialog_->npc_id = npc_id;
@@ -42,7 +35,7 @@ void World::SayNpcDialog(std::uint32_t npc_id, std::string line, std::uint32_t n
   }
 }
 
-bool World::PromptNpcDialog(std::uint32_t npc_id, NpcPrompt prompt, std::uint32_t now_ms) {
+bool WorldNpcDialog::PromptNpcDialog(std::uint32_t npc_id, NpcPrompt prompt, std::uint32_t now_ms) {
   if (!npc_dialog_.has_value() || npc_dialog_->npc_id != npc_id) {
     return false;
   }
@@ -61,8 +54,8 @@ bool World::PromptNpcDialog(std::uint32_t npc_id, NpcPrompt prompt, std::uint32_
   return true;
 }
 
-void World::OfferNpcMenu(std::uint32_t npc_id, std::vector<NpcMenuOption> options,
-                         std::uint32_t now_ms) {
+void WorldNpcDialog::OfferNpcMenu(std::uint32_t npc_id, std::vector<NpcMenuOption> options,
+                                  std::uint32_t now_ms) {
   if (!npc_dialog_.has_value() || npc_dialog_->npc_id != npc_id) {
     npc_dialog_ = NpcDialog{};
     npc_dialog_->npc_id = npc_id;
@@ -78,7 +71,7 @@ void World::OfferNpcMenu(std::uint32_t npc_id, std::vector<NpcMenuOption> option
   dialog.menu_answered = false;
 }
 
-bool World::ClearNpcDialogText(std::uint32_t npc_id, std::uint32_t now_ms) {
+bool WorldNpcDialog::ClearNpcDialogText(std::uint32_t npc_id, std::uint32_t now_ms) {
   if (!npc_dialog_.has_value() || npc_dialog_->npc_id != npc_id) {
     return false;
   }
@@ -87,7 +80,7 @@ bool World::ClearNpcDialogText(std::uint32_t npc_id, std::uint32_t now_ms) {
   return true;
 }
 
-bool World::CommitNpcPageIfIdle(std::uint32_t now_ms) {
+bool WorldNpcDialog::CommitNpcPageIfIdle(std::uint32_t now_ms) {
   if (!npc_dialog_.has_value() || npc_dialog_->pending_lines.empty()) {
     return false;
   }
@@ -97,7 +90,7 @@ bool World::CommitNpcPageIfIdle(std::uint32_t now_ms) {
   return npc_dialog_->CommitPage();
 }
 
-void World::AdvanceNpcDialog() {
+void WorldNpcDialog::AdvanceNpcDialog() {
   if (!npc_dialog_.has_value()) {
     return;
   }
@@ -105,7 +98,7 @@ void World::AdvanceNpcDialog() {
   npc_dialog_->awaiting_reply = true;
 }
 
-void World::AnswerNpcMenu() {
+void WorldNpcDialog::AnswerNpcMenu() {
   if (!npc_dialog_.has_value()) {
     return;
   }
@@ -116,13 +109,13 @@ void World::AnswerNpcMenu() {
   npc_dialog_->clear_on_next_line = true;
 }
 
-void World::SubmitNpcInput() {
+void WorldNpcDialog::SubmitNpcInput() {
   if (!npc_dialog_.has_value()) {
     return;
   }
   npc_dialog_->awaiting_reply = true;
 }
 
-void World::CloseNpcDialog() { npc_dialog_.reset(); }
+void WorldNpcDialog::CloseNpcDialog() { npc_dialog_.reset(); }
 
 }  // namespace ro::sim

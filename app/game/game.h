@@ -12,7 +12,6 @@
 
 #include <glm/glm.hpp>
 
-#include "ro/audio/audio_engine.h"
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/frame_tally.h"
@@ -21,21 +20,12 @@
 #include "ro/net/zone_move.h"
 #include "ro/render/camera.h"
 #include "ro/render/effect_catalog.h"
-#include "ro/render/effect_renderer.h"
 #include "ro/render/gl_context.h"
-#include "ro/render/map_effects.h"
-#include "ro/render/model_renderer.h"
-#include "ro/render/scene_post_process.h"
 #include "ro/render/screen_tint.h"
-#include "ro/render/sprite_renderer.h"
-#include "ro/render/terrain_renderer.h"
-#include "ro/render/water_renderer.h"
 #include "ro/sim/character_ledger.h"
-#include "ro/sim/party_roster.h"
 #include "ro/sim/pending_action.h"
 #include "ro/sim/pickup_intent.h"
 #include "ro/sim/player_config.h"
-#include "ro/sim/sight_purge.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world.h"
 #include "ro/vfs/vfs.h"
@@ -49,7 +39,6 @@
 #include "character/skill_description_view.h"
 #include "character/skill_facts_asker.h"
 #include "character/skill_view.h"
-#include "character/staff_view.h"
 #include "character/status_view.h"
 #include "character/style_preview.h"
 #include "character/style_view.h"
@@ -62,8 +51,11 @@
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
 #include "game/client_shell.h"
+#include "game/game_foundation.h"
 #include "game/game_pieces.h"
+#include "game/game_rendering.h"
 #include "game/game_settings.h"
+#include "game/game_ui_buffers.h"
 #include "game/ui_stage.h"
 #include "guild/guild_emblems.h"
 #include "guild/guild_panel.h"
@@ -95,13 +87,8 @@
 #include "world/monster_sheet.h"
 #include "world/name_card_asker.h"
 #include "world/native_marker.h"
-#include "world/navi_session.h"
 #include "world/npc_talk_view.h"
-#include "world/quick_cast.h"
-#include "world/selection_marker.h"
 #include "world/skill_area_view.h"
-#include "world/target_hud_view.h"
-#include "world/targeting.h"
 
 // ⚠ DÉCLARÉ PLUTÔT QU'INCLUS, comme derrière `ro::render::GlContext` : cet
 // en-tête est tiré partout, et SDL n'y sert qu'au compteur d'inactivité.
@@ -126,7 +113,14 @@ namespace moonclient {
 //
 // ⚠ ELLE NE SE DÉPLACE NI NE SE COPIE : elle garde l'adresse de ce que la
 // coquille contient, et se construit là où elle vivra.
-class Game : public Screen {
+//
+// ⚠ TROIS BASES PORTENT UNE PART DE SES CHAMPS, ET C'EST ENCORE L'ORDRE : une
+// base se construit avant tout membre et se détruit après. Le socle
+// (`GameFoundation`) vient le premier et part le dernier ; les tampons que
+// l'interface désigne (`GameUiBuffers`) et les renderers (`GameRendering`)
+// survivent à tout ce qui les vise. Leurs champs gardent leur nom — `world_`,
+// `sprites_` — et la partie les lit comme les siens.
+class Game : public Screen, private GameFoundation, private GameUiBuffers, private GameRendering {
  public:
   // ⚠ LA COQUILLE DOIT ÊTRE OUVERTE : la partie prend l'adresse de ce qu'elle
   // contient, et un `ClientShell` dont `Open` n'a pas réussi n'a ni fenêtre, ni
@@ -175,6 +169,11 @@ class Game : public Screen {
   // dans une fonction avec quarante variables locales.
   void PumpEvents(std::uint32_t now_ms);
   [[nodiscard]] ro::core::Result<void> PumpNetwork(std::uint32_t now_ms);
+  // CE QUI VIT HORS DU MONDE LIT LA TRAME APRÈS LUI, et rend l'issue retenue :
+  // voir `game_frame_beyond_world.cpp`.
+  [[nodiscard]] ro::net::FrameOutcome ApplyFrameBeyondWorld(const ro::net::Frame& received,
+                                                            ro::net::FrameOutcome outcome,
+                                                            std::uint32_t now_ms);
   // LE PASSAGE D'UN SERVEUR DE ZONE À UN AUTRE : l'ancienne liaison se ferme,
   // la nouvelle s'ouvre sans bloquer, et prend sa place une fois acceptée.
   void StartZoneMove(const ro::net::CharacterPhase::Handoff& handoff, std::uint32_t now_ms);
@@ -402,78 +401,6 @@ class Game : public Screen {
   // désigne.
   [[nodiscard]] ro::ui::AfkClockView AfkClock(std::uint32_t now_ms);
 
-  // ── CE QUE LA COQUILLE POSSÈDE, ET QUE LA PARTIE NE FAIT QUE TENIR ─────────
-  //
-  // 🔴 DES POIGNÉES, PAS DES MEMBRES. La fenêtre, les archives, les réglages,
-  // l'interface et les accessoires appartiennent désormais à `ClientShell` :
-  // ils existent avant la partie et lui survivent, ce qui est la condition pour
-  // qu'un écran de connexion puisse se dessiner sans carte.
-  //
-  // ⚠ ELLES GARDENT LEUR NOM ET LEUR FORME D'ACCÈS — `gl_->`, `*vfs_`,
-  // `windows_.`, `settings_->` — et ce n'est pas une coquetterie : c'est ce qui
-  // rend le changement de PROPRIÉTAIRE lisible dans le diff, au lieu de le
-  // noyer sous cinq cents réécritures d'appel.
-  //
-  // ⚠ ELLES SONT VALIDES PARCE QUE LA COQUILLE EST OUVERTE AVANT : une partie
-  // se construit après `ClientShell::OpenArchives`, jamais avant.
-  ClientShell& shell_;
-  // Une COPIE, parce que c'est un chemin : le partager n'apporterait rien.
-  std::filesystem::path client_root_;
-  ro::vfs::Vfs* vfs_;
-  ro::render::GlContext* gl_;
-  GameSettings* settings_;
-  UiStage::Windows& windows_;
-  UiStage* interface_;
-  GamePieces& pieces_;
-  ro::audio::AudioEngine& audio_;
-
-  // ── CE QUI NE CHANGE PAS DE LA PARTIE ──────────────────────────────────────
-  ro::net::Connection link_;
-  ro::sim::World world_;
-  ro::sim::SightPurge sight_purge_;  // les restes hors de la vue du serveur
-  // ⚠ HORS DU MONDE, et aussi durables que la partie : les titres du personnage
-  // (`ro/sim/title_book.h`), la guilde (`ro/sim/guild.h`), le groupe et les amis
-  // (`ro/sim/party_roster.h`), la navigation et la minimap (`world/navi_session.h`).
-  ro::sim::TitleBook titles_;
-  ro::sim::GuildBook guild_book_;
-  ro::sim::PartyRoster party_;
-  ro::sim::FriendList friends_;
-  NaviSession navi_;
-  // DE QUOI RENTRER SUR UN AUTRE SERVEUR DE ZONE, et l'entrée en cours quand
-  // le serveur en a désigné un. Voir `ro::net::ServerMoveOf`.
-  ro::net::ZoneTicket ticket_;
-  // ── LE MODE CIBLAGE ────────────────────────────────────────────────────────
-  // Voir `world/targeting.h`. Ses réglages vivent dans les options ; la vue du
-  // HUD et la flèche se recomposent à chaque image.
-  Targeting targeting_;
-  QuickCast quick_cast_;  // ses réglages vivent dans les options
-  std::optional<TargetHudView> target_hud_;
-  SelectionMarker selection_marker_;
-  MarkerPose marker_pose_;
-  // L'entrée sur la carte : l'animation de la flèche compte depuis elle. Vide
-  // jusqu'au premier dessin qui la suit.
-  std::optional<std::uint32_t> marker_epoch_ms_;
-  // La mort cache la flèche une fois, au moment où elle survient.
-  bool player_was_dead_ = false;
-  // La souris était sur un cadre qui agit, à l'image précédente : le curseur
-  // prend l'épée.
-  bool target_hud_hovered_ = false;
-  // ── LE MENU DU CLIC DROIT ──────────────────────────────────────────────────
-  // Ce que les gestes du monde lui laissent, la cible relevée à l'ouverture, et
-  // ce qu'il montre. ⚠ LA VUE VIT ICI parce que l'étage d'interface la désigne.
-  EntityMenuGestures menu_gestures_;
-  EntityMenuFacts menu_target_;
-  ro::ui::EntityMenuView menu_view_;
-  // L'instant de la demande d'ouverture. ⚠ ELLE PÉRIT : l'interface peut ne pas
-  // être dessinée — la veille la cache —, et un menu qui surgirait au réveil
-  // viserait une entité cliquée il y a longtemps.
-  std::uint32_t menu_asked_ms_ = 0;
-  std::optional<ro::net::MapPhase> moving_;
-  // CE QUE LE VOLET DU STAFF TIENT LE TEMPS DE LA PARTIE : la liste des classes,
-  // composée une fois, et ce qu'on sait avoir basculé chez le serveur. ⚠ À LA
-  // PARTIE ET NON À LA FENÊTRE : le serveur oublie ses bascules à la déconnexion.
-  StaffSession staff_;
-
   // ── LA CARTE ───────────────────────────────────────────────────────────────
   // ⚠ FACULTATIVE, PARCE QU'UNE CARTE NE SE CONSTRUIT PAS À VIDE : elle porte
   // un terrain, un atlas et un maillage qui n'ont pas d'état neutre. Elle est
@@ -488,74 +415,6 @@ class Game : public Screen {
   ro::sim::WalkPlanner planner_{nullptr};
   std::array<float, 4> background_{};
   std::string attempted_map_;
-
-  // ── LA FENÊTRE ET L'INTERFACE ──────────────────────────────────────────────
-  // ⚠ AVANT L'INTERFACE : voir l'ordre de destruction, en tête.
-  // CE QUE LA BARRE DE SAISIE A ARMÉ : le mode du sélecteur, et le destinataire
-  // de la box « Pseudo ».
-  //
-  // ⚠ REFAIT À CHAQUE IMAGE, et sa vue regarde le tampon de la barre — dont
-  // l'adresse ne bouge pas de la partie, mais dont le CONTENU change à chaque
-  // frappe. Le composer une fois pour toutes figerait le destinataire au nom
-  // qu'il portait au démarrage.
-  //
-  // ⚠ IL NE SURVIT PAS À LA PARTIE, comme dans le client : c'est un état de
-  // session, pas un réglage. Retrouver sa guilde armée après une reconnexion
-  // ferait partir la première phrase ailleurs qu'on ne l'attend.
-  ro::net::ChatArming armed_chat_;
-  // LE NOM DU CANAL ARMÉ, et il vit ICI parce que `ChatArming` n'en porte
-  // qu'une VUE. La liste que le sélecteur propose est refaite à chaque image ;
-  // y laisser pointer l'armement le ferait pendre dès l'image suivante.
-  std::string armed_channel_;
-  // LES ÉMOTICÔNES PROPOSÉES, composées UNE FOIS à l'entrée en jeu, en trois
-  // tableaux qui se pointent l'un l'autre : les couches bout à bout, les images
-  // qui les découpent, les émoticones qui découpent les images. ⚠ PAS À CHAQUE
-  // IMAGE : la grille les montre TOUTES dès qu'elle s'ouvre, et les redemander
-  // soixante fois par seconde coûterait une centaine de recherches.
-  //
-  // 🔴 AUCUN NE DOIT PLUS BOUGER UNE FOIS REMPLI : les vues pointent dedans, et
-  // une réallocation les laisserait toutes pendantes. C'est pourquoi la place se
-  // réserve avant de remplir.
-  std::vector<ro::ui::ChatEmotionLayer> emotion_layers_;
-  std::vector<ro::ui::ChatEmotionFrame> emotion_frames_;
-  std::vector<ro::ui::ChatEmotion> emotions_;
-  // Les groupes d'emoji, intertitres TRADUITS. ⚠ VIDE SANS POLICE D'EMOJI :
-  // l'onglet ne s'ouvre alors pas du tout, plutôt que sur des losanges.
-  std::vector<ro::ui::ChatEmojiGroup> emojis_;
-  // Les bulles de parole projetées à l'écran, récoltées comme les barres.
-  std::vector<ro::ui::ChatBubbleView> chat_bubbles_;
-  // LA POIGNÉE DU BANDEAU D'OBTENTION : sa largeur, relue d'une image sur la
-  // suivante pour la centrer, et l'ordre de la replacer quand un réglage
-  // vient de la déplacer sous elle.
-  ro::ui::ItemObtainAnchorGrip toast_grip_;
-  // LES PHRASES DE BULLE DONT UNE BALISE A ETE TRADUITE. Voir chat_view.h : les
-  // vues ci-dessus pointent dedans, et une file ne les deplace jamais.
-  std::deque<DecoratedChatLine> bubble_texts_;
-  // LES BARRES DES ENTITÉS — vie, magie et incantation —, projetées à l'écran :
-  // récoltées par les calques, peintes par l'étage d'interface, comme les bulles.
-  std::vector<ro::ui::EntityBarView> entity_bars_;
-  std::vector<ro::ui::CastBarView> cast_bars_;
-
-  // ── LE RENDU ───────────────────────────────────────────────────────────────
-  ro::render::TerrainRenderer terrain_;
-  // LE MONDE PEINT À PART, repeint à travers la page « Graphics ».
-  ro::render::ScenePostProcess scene_post_;
-  // LA NAPPE D'EAU. Vide sur une carte qui n'en a pas, et elle ne dessine alors
-  // rien : la plupart des souterrains sont dans ce cas.
-  ro::render::WaterRenderer water_;
-  // LES CHEMINÉES (44), LES ÉMETTEURS (974) ET LES ANNEAUX DE VENT (2343) de la
-  // carte. Ils ne repartent qu'avec la scène, comme l'horloge des modèles.
-  ro::render::MapEffects map_effects_;
-  // Leurs lots pour le renderer d'effets, réemployés d'image en image.
-  std::vector<ro::render::DrawnWorldQuads> map_effect_quads_;
-  // L'HORLOGE DES MODÈLES ANIMÉS — fontaines, moulins, enseignes. Elle part à la
-  // première image de chaque carte et s'efface avec le reste, au changement de
-  // carte : voir `ForgetWhatPlayed`.
-  ro::render::ModelClock model_clock_;
-  ro::render::ModelRenderer models_;
-  ro::render::ModelRenderer ground_unit_models_;
-  ro::render::SpriteRenderer sprites_;
-  ro::render::EffectRenderer effect_renderer_;
 
   // ── LES EFFETS, LE SON, LE SOL ─────────────────────────────────────────────
   std::optional<ro::render::EffectCatalog> effect_catalog_;
@@ -600,10 +459,7 @@ class Game : public Screen {
   // « ESSAYER MAINTENANT », armé par la page de réglages. ⚠ CONSOMMÉ À L'IMAGE
   // SUIVANTE : laissé en place, la veille se relancerait à chaque image.
   bool afk_requested_ = false;
-  // Les deux lignes de l'horloge. ⚠ DANS DES TAMPONS QUI SURVIVENT AU DESSIN :
-  // la vue n'en garde qu'un pointeur.
-  std::string afk_clock_text_;
-  std::string afk_away_text_;
+  // Les deux lignes de son horloge vivent dans `GameUiBuffers`.
 
   // ── CE QUE L'IMAGE COMPOSE ─────────────────────────────────────────────────
   ComposedScene scene_actors_;
@@ -698,12 +554,8 @@ class Game : public Screen {
   // ── CE QU'ON A DÉJÀ DEMANDÉ AU SERVEUR, ET QUAND ──────────────────────────
   // Les chiffres des onglets techniques d'une compétence, sans harceler.
   SkillFactsAsker skill_facts_;
-  // LES LIENS POSÉS DANS LA SAISIE ET PAS ENCORE PARTIS. ⚠ LE JOUEUR VOIT LE
-  // NOM, LA LIGNE PORTE LA BALISE : voir `chat_item_link.h`.
-  std::vector<PendingChatLink> pending_links_;
-  // CE QUE LA RANGÉE DE SAISIE DOIT PEINDRE, refait à chaque image en regard de
-  // `pending_links_` : les libellés pointent dedans, et le jeton est le rang.
-  std::vector<ro::ui::ChatInputLink> input_links_;
+  // ── LES LIENS DE LA SAISIE : les liens en attente et leurs libellés vivent
+  // dans `GameUiBuffers`, parce que la rangée de saisie pointe dedans.
   // Pose le lien de cette place dans la saisie ; sans effet si l'objet n'y est plus.
   void PostItemLink(const ro::sim::Inventory& holder, std::uint16_t client_slot);
   // Pose une balise DÉJÀ COMPOSÉE : c'est ce que fait le Maj+clic sur un lien

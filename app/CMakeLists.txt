@@ -1472,6 +1472,7 @@ add_executable(moonclient
     game/game_cursor.cpp
     game/game_entity_menu.cpp
     game/game_network.cpp
+    game/game_frame_beyond_world.cpp
     game/handshake_pump.cpp
     game/game_zone_move.cpp
     game/game_view_equip.cpp

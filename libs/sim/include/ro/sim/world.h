@@ -12,19 +12,13 @@
 #include <vector>
 
 #include "ro/sim/actor.h"
-#include "ro/sim/bank.h"
 #include "ro/sim/battlefield.h"
-#include "ro/sim/card_composition.h"
 #include "ro/sim/chat_channel.h"
 #include "ro/sim/chat_line.h"
-#include "ro/sim/companion.h"
-#include "ro/sim/craft_session.h"
 #include "ro/sim/damage_meter.h"
 #include "ro/sim/departures.h"
 #include "ro/sim/ground_skill_log.h"
-#include "ro/sim/inventory.h"
 #include "ro/sim/map_mode.h"
-#include "ro/sim/npc_dialog.h"
 #include "ro/sim/packed_position.h"
 #include "ro/sim/player_bonuses.h"
 #include "ro/sim/player_status.h"
@@ -32,16 +26,13 @@
 #include "ro/sim/quest_markers.h"
 #include "ro/sim/server_clock.h"
 #include "ro/sim/session_settings.h"
-#include "ro/sim/skill_book.h"
-#include "ro/sim/skill_facts.h"
 #include "ro/sim/status_effects.h"
-#include "ro/sim/storage_facts.h"
-#include "ro/sim/storage_shelf.h"
 #include "ro/sim/strike_log.h"
 #include "ro/sim/style.h"
 #include "ro/sim/target_detail.h"
 #include "ro/sim/walk_map.h"
-#include "ro/sim/warp_menu.h"
+#include "ro/sim/world_holdings.h"
+#include "ro/sim/world_npc_dialog.h"
 
 namespace ro::sim {
 
@@ -56,7 +47,11 @@ namespace ro::sim {
 //
 // Pas le protocole : c'est ro_net qui traduit les trames en appels d'ici. Un
 // essai peut donc bâtir un monde à la main, sans socket ni paquet.
-class World {
+//
+// Deux parts qui ne regardent aucun acteur vivent dans ses bases : ce que le
+// personnage TIENT (`WorldHoldings`) et le dialogue de PNJ en cours
+// (`WorldNpcDialog`).
+class World : public WorldHoldings, public WorldNpcDialog {
  public:
   // Fait entrer un acteur, ou REMPLACE celui qui portait déjà cet identifiant.
   //
@@ -119,74 +114,6 @@ class World {
   [[nodiscard]] const StateArrivalLog& state_arrivals() const noexcept { return state_arrivals_; }
   // Pose ou retire un effet de chapeau. Faux pour un acteur inconnu.
   bool SetHatEffect(std::uint32_t id, HatEffectId effect, bool active);
-
-  // LE DIALOGUE EN COURS, s'il y en a un. Il n'appartient à aucun acteur : le
-  // PNJ peut disparaître de la vue sans que sa fenêtre se ferme, et le serveur
-  // en ouvre même au nom d'un PNJ FEINT qui n'est nulle part.
-  [[nodiscard]] const std::optional<NpcDialog>& npc_dialog() const noexcept { return npc_dialog_; }
-
-  // Ce que le PNJ dit de plus. Ouvre le dialogue s'il n'y en avait pas.
-  //
-  // ⚠ LA LIGNE NE S'AFFICHE PAS TOUT DE SUITE : elle rejoint la page en
-  // RÉCEPTION, publiée d'un seul tenant par le paquet qui la termine. Voir
-  // `NpcDialog::pending_lines`.
-  //
-  // ⚠ UN AUTRE PNJ REMPLACE LE PRÉCÉDENT. Deux dialogues ne coexistent pas : le
-  // serveur n'en tient qu'un par joueur, et en garder deux montrerait une
-  // fenêtre que plus rien ne ferme.
-  void SayNpcDialog(std::uint32_t npc_id, std::string line, std::uint32_t now_ms);
-
-  // Ce que le dialogue attend désormais, et la PUBLICATION de la page reçue :
-  // le paquet qui pose un bouton est celui qui la termine. Rend faux s'il n'y a
-  // rien à quoi l'attacher — le serveur envoie « fermer » à la fin d'un script
-  // même quand rien n'est ouvert, et ce n'est pas une anomalie.
-  bool PromptNpcDialog(std::uint32_t npc_id, NpcPrompt prompt, std::uint32_t now_ms);
-
-  // Un menu de choix. Il OUVRE un dialogue au besoin — un script peut appeler
-  // `select` sans avoir rien dit — et PUBLIE la page, comme tout terminateur.
-  void OfferNpcMenu(std::uint32_t npc_id, std::vector<NpcMenuOption> options, std::uint32_t now_ms);
-
-  // Le `clear` d'un script : la prochaine ligne remplacera la page.
-  //
-  // 🔴 IL NE PUBLIE RIEN, ET SURTOUT PAS. `clear` est le PREMIER paquet de la
-  // réponse du serveur : y publier ferait tomber le menu de la page précédente à
-  // cet instant, le texte s'étalerait dans la place libérée pendant toute la
-  // rafale, puis se ferait raboter à l'arrivée du nouveau menu. Deux
-  // réarrangements au lieu de zéro.
-  //
-  // ⚠ ET IL N'EFFACE PAS NON PLUS TOUT DE SUITE : vider ici laisse la fenêtre
-  // sans texte ni bouton le temps que le `mes` suivant arrive — un clignotement
-  // à chaque écran un peu bavard. Écart assumé avec le client officiel, qui vide
-  // aussitôt : un `clear` non suivi d'un `mes` est introuvable dans les scripts,
-  // et l'ancienne page est de toute façon plus lisible qu'un cadre vide.
-  //
-  // Rend faux si le paquet ne désigne pas le dialogue en cours.
-  bool ClearNpcDialogText(std::uint32_t npc_id, std::uint32_t now_ms);
-
-  // LE FILET DE LA MISE EN ATTENTE : une page dont le terminateur n'arrive
-  // jamais finit par s'afficher — un script qui écrit puis dort, ou qui s'arrête
-  // sur `end`. Rend vrai s'il a publié quelque chose. Voir `kNpcPageIdleMs`.
-  bool CommitNpcPageIfIdle(std::uint32_t now_ms);
-
-  // Le joueur a cliqué « suivant » : la prochaine page remplacera celle-ci, et
-  // en attendant la réponse la page reste affichée, INERTE.
-  void AdvanceNpcDialog();
-
-  // Le joueur a répondu au menu. La liste RESTE affichée, inerte, jusqu'à ce que
-  // la réponse arrive : la vider tout de suite escamote la question et fait
-  // sauter le pied de fenêtre. Une seconde réponse à la même liste est dès lors
-  // impossible — voir `NpcDialog::menu_answered`.
-  void AnswerNpcMenu();
-
-  // Le joueur a soumis une saisie. Le champ reste en place, inerte.
-  //
-  // ⚠ IL N'ARME PAS L'EFFACEMENT, contrairement au « suivant » : le serveur ne
-  // documente cet effacement qu'au-dessus de ZC_WAIT_DIALOG, et l'armer ici
-  // ferait disparaître la question à laquelle on vient de répondre.
-  void SubmitNpcInput();
-
-  // Le dialogue se ferme, quelle qu'en soit la raison.
-  void CloseNpcDialog();
 
   // Pose l'enseigne d'un acteur, en remplaçant celle qu'il avait. Faux pour un inconnu.
   bool SetSignboard(std::uint32_t id, Signboard board);
@@ -399,117 +326,11 @@ class World {
   [[nodiscard]] const SessionSettings& session() const noexcept { return session_; }
   [[nodiscard]] std::uint8_t group_level() const noexcept { return session_.group_level; }
 
-  // Le GRIMOIRE du joueur : ce qu'il sait lancer. Il ne suit pas la carte, et
-  // Clear ne l'efface pas : ce que l'on sait ne s'oublie pas en changeant de
-  // carte. Le serveur le redit à chaque entrée, mais plus tard que la carte
-  // elle-même, et le vider laisserait un grimoire blanc entre les deux annonces.
-  //
-  // Ouvert en écriture, comme la conversation ne l'est pas : c'est ro_net qui
-  // le remplit, à partir de paquets dont le monde ne sait rien.
-  [[nodiscard]] const SkillBook& skill_book() const noexcept { return skill_book_; }
-  [[nodiscard]] SkillBook& skill_book() noexcept { return skill_book_; }
-
-  // LE SAC, LA CHARRETTE ET LE COFFRE, pour les mêmes raisons que le grimoire :
-  // ouverts en écriture parce que c'est ro_net qui les remplit, et non effacés
-  // par Clear parce qu'ils ne suivent pas la carte.
-  //
-  // ⚠ TROIS CONTENANTS SÉPARÉS, et pas un seul indexé : le serveur les envoie
-  // par les mêmes paquets, et les mêmes numéros de case s'y répètent. Les mêler
-  // ferait qu'une potion du coffre écrase celle du sac.
-  //
-  // Le coffre est une SESSION : il se vide quand le serveur le ferme, alors que
-  // les deux autres durent autant que le personnage.
-  [[nodiscard]] const Inventory& inventory() const noexcept { return inventory_; }
-  [[nodiscard]] Inventory& inventory() noexcept { return inventory_; }
-  [[nodiscard]] const Inventory& cart() const noexcept { return cart_; }
-  [[nodiscard]] Inventory& cart() noexcept { return cart_; }
-  [[nodiscard]] const Inventory& storage() const noexcept { return storage_; }
-  [[nodiscard]] Inventory& storage() noexcept { return storage_; }
-  [[nodiscard]] const CardComposition& composition() const noexcept { return composition_; }
-  [[nodiscard]] CardComposition& composition() noexcept { return composition_; }
-  [[nodiscard]] WarpMenu& warp_menu() noexcept { return warp_menu_; }
-  // L'ATELIER : listes de fabrication et d'affinage — voir `CraftSession`.
-  [[nodiscard]] const CraftSession& craft() const noexcept { return craft_; }
-  [[nodiscard]] CraftSession& craft() noexcept { return craft_; }
-
-  // ── LE COFFRE EST UNE SESSION, PAS UN CONTENANT QUI DORT ──────────────────
-  //
-  // 🔴 ET CET ÉTAT DÉBORDE DE SA PROPRE FENÊTRE : tant qu'un coffre est ouvert,
-  // le serveur REFUSE les échanges entre le sac et la charrette
-  // (`sd->state.storage_flag`), et il les refuse SANS RIEN DIRE. Qui ne suit pas
-  // l'ouverture propose des gestes qui échouent en silence.
-  //
-  // Le contenu ne suffit pas à la deviner : un coffre ouvert et vide et un
-  // coffre fermé ont tous deux zéro objet.
-  [[nodiscard]] bool storage_open() const noexcept { return storage_open_; }
-
-  // Le serveur vient d'ouvrir un coffre. Le nom qu'il en donne est déjà dans le
-  // contenant : c'est la seule chose qui sépare le stockage personnel de celui
-  // de la guilde.
-  void OpenStorage() noexcept { storage_open_ = true; }
-
-  // La session est finie : le contenu s'en va avec elle.
-  //
-  // ⚠ ON VIDE, et ce n'est pas ce qu'on fait d'une charrette : le coffre existe
-  // toujours, mais son contenu ne nous est plus annoncé. Le garder afficherait
-  // une liste qui ne bouge plus et que rien ne corrige — pire qu'un coffre vide.
-  void CloseStorage();
-
-  // ── LA BANQUE : un coffre à zeny, au compte — voir `BankSession` ──────────
-  [[nodiscard]] BankSession& bank() noexcept { return bank_; }
-  [[nodiscard]] const BankSession& bank() const noexcept { return bank_; }
-
-  // CE QUE LE PERSONNAGE PEUT APPELER : chariot, monture, faucon.
-  //
-  // ⚠ IL NE SUIT PAS LA CARTE. Le serveur le pousse au login vérifié, puis à
-  // chaque changement — c'est-à-dire aussi quand une Kafra pose le chariot, les
-  // scripts passant par les mêmes poseurs. Le vider en changeant de carte
-  // laisserait la fiche sans ses cases jusqu'au prochain geste.
-  void TellCompanions(CompanionState told) { companions_ = told; }
-  [[nodiscard]] const CompanionState& companions() const noexcept { return companions_; }
-
-  // ── LES COFFRES QUE CE PERSONNAGE PEUT OUVRIR ──────────────────────────────
-  //
-  // 🔴 LA LISTE ET L'OUVERT ARRIVENT ENSEMBLE, dans la même trame, et c'est ce qui les garde
-  // d'accord. Le serveur la renvoie À CHAQUE OUVERTURE, avec le numéro du coffre qu'il vient
-  // d'ouvrir : les poser séparément laisserait un onglet marqué sur un autre coffre.
-  //
-  // ⚠ `open_storage_id()` NE REMPLACE PAS `storage_open()` : le premier dit LEQUEL, le
-  // second QU'IL Y EN A UN, et c'est lui qui décide de ce que le serveur refuse en silence.
-  // Sans cette liste, le client sait donc quand même refermer.
-  // CE QUE LE SERVEUR DIT DES OBJETS DU COFFRE — prix de revente, sous-type,
-  // emplacement. ⚠ IL EST SEUL À LES CONNAÎTRE : ils vivent dans sa base, et la
-  // table de l'installation n'en porte aucun. Voir `ro/sim/storage_facts.h`.
-  void TellStorageFacts(std::vector<StorageItemFacts> told) {
-    storage_facts_.Tell(std::move(told));
-  }
-  [[nodiscard]] const StorageFacts& storage_facts() const noexcept { return storage_facts_; }
-
   // LES COULEURS QUE LES JOUEURS ONT COMPOSÉES. ⚠ À PART DES ACTEURS : un lot
   // arrive à l'entrée sur une carte peuplée, et il peut décrire un joueur dont
   // l'acteur n'existe pas encore chez nous. Voir `ro/sim/style.h`.
   [[nodiscard]] const StyleBook& styles() const noexcept { return styles_; }
   [[nodiscard]] StyleBook& styles() noexcept { return styles_; }
-
-  // CE QUE LE SERVEUR SEUL SAIT D'UNE COMPÉTENCE : son cast, ses dégâts.
-  //
-  // ⚠ ILS SE DEMANDENT, ILS N'ARRIVENT PAS SEULS — voir `ro/net/skill_facts.h`.
-  // Une fenêtre qui les montre doit savoir se dessiner sans eux.
-  void TellSkillCastFacts(std::uint32_t skill_id, std::vector<SkillCastFacts> levels) {
-    skill_facts_.TellCast(skill_id, std::move(levels));
-  }
-  void TellSkillDamageFacts(SkillDamageFacts told) { skill_facts_.TellDamage(std::move(told)); }
-  [[nodiscard]] const SkillFacts& skill_facts() const noexcept { return skill_facts_; }
-
-  void TellStorages(std::vector<StorageShelf> shelves, std::uint8_t open_id);
-  [[nodiscard]] std::span<const StorageShelf> storage_shelves() const noexcept {
-    return storage_shelves_;
-  }
-  [[nodiscard]] std::uint8_t open_storage_id() const noexcept { return open_storage_id_; }
-
-  // Le contenant que désigne un tenant, pour du code qui n'en connaît pas le nom
-  // — typiquement le décodeur, qui lit lequel dans le paquet.
-  [[nodiscard]] Inventory& HolderFor(ItemHolder holder) noexcept;
 
   // Pose une unité au sol, ou remplace celle qui portait cet identifiant.
   void PlaceSkillUnit(const SkillUnit& unit);
@@ -746,24 +567,9 @@ class World {
   // le rang de la dernière.
   std::uint64_t chat_lines_seen_ = 0;
   int kept_per_kind_ = kChatLinesKeptPerKind;
-  std::optional<NpcDialog> npc_dialog_;
-  SkillBook skill_book_;
-  Inventory inventory_;
-  Inventory cart_;
-  Inventory storage_;
-  CardComposition composition_;
-  WarpMenu warp_menu_;
-  CraftSession craft_;
-  // ⚠ ELLE SURVIT À LA FERMETURE D'UN COFFRE ET AU CHANGEMENT DE CARTE : le serveur ne la
-  // repousse qu'au login et à chaque ouverture, et la vider priverait la fenêtre de ses onglets.
-  CompanionState companions_;
-  std::vector<StorageShelf> storage_shelves_;
-  StorageFacts storage_facts_;
   StyleBook styles_;
   QuestMarkers quest_markers_;
   Battlefield battlefield_;
-  SkillFacts skill_facts_;
-  std::uint8_t open_storage_id_ = kNoStorageOpen;
   std::vector<ChatChannel> chat_channels_;
   std::string player_name_;
   SessionSettings session_;
@@ -791,10 +597,6 @@ class World {
   std::uint16_t map_type_ = 0;
   PvpStanding pvp_standing_;
   ServerClock server_clock_;
-  bool storage_open_ = false;
-  // ⚠ LE SOLDE SURVIT À LA FERMETURE DE LA FENÊTRE : d'autres écrans le lisent, et il n'est
-  // redit qu'à la réouverture.
-  BankSession bank_;
 };
 
 }  // namespace ro::sim
