@@ -33,9 +33,10 @@ bool GameOnlyKey(SDL_Keycode key, SDL_Keymod held) {
   if (key == SDLK_INSERT) {
     return true;
   }
-  // ⚠ ALT SANS CTRL : voir l'en-tête — AltGr d'un clavier français vaut Ctrl+Alt
-  // et écrit des caractères, il ne déclenche pas de raccourci.
-  return (held & SDL_KMOD_ALT) != 0 && (held & SDL_KMOD_CTRL) == 0;
+  // ⚠ ALT GAUCHE, SANS CTRL NI MODE NI ALT DROIT : tout le reste est AltGr, qui
+  // écrit des caractères — voir l'en-tête.
+  constexpr SDL_Keymod kAltGrForms = SDL_KMOD_RALT | SDL_KMOD_CTRL | SDL_KMOD_MODE;
+  return (held & SDL_KMOD_LALT) != 0 && (held & kAltGrForms) == 0;
 }
 
 bool FunctionKey(SDL_Keycode key) { return key >= SDLK_F1 && key <= SDLK_F12; }

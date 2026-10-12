@@ -26,10 +26,20 @@ namespace moonclient {
 //     touche ne lui sert donc à rien — et l'avaler empêcherait de s'asseoir
 //     tant que la conversation a le clavier, c'est-à-dire précisément quand on
 //     discute assis ;
-//   - LES COMBINAISONS AVEC ALT, qui sont les raccourcis de fenêtres du jeu.
+//   - LES COMBINAISONS AVEC ALT GAUCHE, qui sont les raccourcis de fenêtres et
+//     les macros de conversation du jeu.
 //
-// ⚠ ALT **SANS** CTRL, et c'est un clavier français qui l'impose : AltGr y vaut
-// Ctrl+Alt et sert à écrire @ # [ ] { } \ | €. Ces frappes-là sont de la SAISIE.
+// 🔴 ALTGR EST DE LA SAISIE, PAS UN ALT : sur un clavier français il écrit
+// @ # [ ] { } \ | €, et l'arobase (AltGr+à) se lirait Alt+0 — une macro de
+// conversation partirait au milieu de la phrase. AltGr arrive sous trois
+// formes, et aucune ne compte comme Alt :
+//   - Alt DROIT seul : SDL, sous Windows, jette le faux Ctrl gauche qu'AltGr
+//     envoie avant lui ;
+//   - Ctrl+Alt, quand ce faux Ctrl passe quand même ;
+//   - MODE, la touche de sélection de niveau des claviers sous X11.
+// Le prix : sur un clavier sans AltGr, Alt droit ne sert de raccourci qu'hors
+// saisie. Alt gauche reste la touche des raccourcis partout.
+//
 // Ctrl seul reste avalé de toute façon — c'est copier, coller, tout
 // sélectionner.
 //
