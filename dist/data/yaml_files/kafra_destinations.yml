@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le service de téléportation des Kafra
+#
+#  Tiré des scripts de PNJ du serveur Moonlight, ceux que moon/scripts_moon.conf fait charger :
+#  les Kafra (F_Kafra, F_KafSet, F_KafTele), le Cool Event Corp.
+#  (F_CoolEventCorp) et les Kafra à menu propre (châteaux). Le commentaire qui
+#  précède chaque carte nomme les PNJ et leurs fichiers.
+#
+#  Fichier produit par scripts/yaml_tables/kafra_destinations.py. Ne pas éditer
+#  à la main :
+#      python scripts/yaml_tables/kafra_destinations.py --serveur <dépôt moonlight> \
+#          --client <dossier client> --sortie dist/data/yaml_files/kafra_destinations.yml
+#
+#  towns : carte où se tient le PNJ -> cartes où il envoie, dans l'ordre du menu.
+#
+#  Lu par moonclient (ro/vfs/kafra_move_maps.h) : la carte du monde dessine une
+#  Kafra et ses destinations au survol d'une ville.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+towns:
+  # Kafra (moon/rathena/guild2/agit_main_se.txt)
+  arug_cas01: [rachel]
+  # Kafra (moon/rathena/guild2/agit_main_se.txt)
+  arug_cas02: [rachel]
+  # Cool Event Corp. Staff (moon/rathena/kafras/cool_event_corp.txt)
+  rachel: [veins]
+  # Kafra (moon/rathena/guild2/agit_main_se.txt)
+  schg_cas01: [rachel]
+  # Kafra (moon/rathena/guild2/agit_main_se.txt)
+  schg_cas02: [rachel]
+  # Cool Event Corp. Staff (moon/rathena/kafras/cool_event_corp.txt)
+  veins: [rachel]
