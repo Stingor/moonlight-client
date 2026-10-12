@@ -465,8 +465,11 @@ void SendLine(const ChatDispatch& to, const std::string& line, std::uint32_t sai
   const ro::core::Result<void> sent = ro::net::SendChat(*to.link, to.world->player_name(), intent,
                                                         to.world->map_mode().battlefield);
   if (sent && to.whispers != nullptr) {
-    static_cast<void>(
-        ro::net::NoteWhisperSent(*to.whispers, intent, said_ms, to.world->player_statuses()));
+    static_cast<void>(ro::net::NoteWhisperSent(
+        *to.whispers, intent, said_ms,
+        ro::net::WhisperNoting{.muted = ro::sim::CannotChat(to.world->player_statuses(),
+                                                            to.world->player_status().manner),
+                               .channels = to.world->chat_channels()}));
   }
   // ⚠ LE LIEN D'UN CANAL SE SUIT ICI, où passe TOUTE ligne partie au serveur —
   // tapée ou envoyée par une macro —, et quelle que soit sa destination : le

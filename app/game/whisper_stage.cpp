@@ -399,8 +399,11 @@ void WhisperStage::Send(std::string_view peer, std::string text, const WhisperCo
   const ro::core::Result<void> sent =
       ro::net::SendChat(context.link, context.world.player_name(), intent);
   if (sent) {
-    static_cast<void>(
-        ro::net::NoteWhisperSent(outbox_, intent, context.now_ms, context.world.player_statuses()));
+    static_cast<void>(ro::net::NoteWhisperSent(
+        outbox_, intent, context.now_ms,
+        ro::net::WhisperNoting{.muted = ro::sim::CannotChat(context.world.player_statuses(),
+                                                            context.world.player_status().manner),
+                               .channels = context.world.chat_channels()}));
   }
   ReportRefusal(sent);
 }

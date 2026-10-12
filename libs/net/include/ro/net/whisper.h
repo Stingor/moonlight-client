@@ -6,9 +6,9 @@
 
 #include "ro/net/chat_target.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/chat_channel.h"
 #include "ro/sim/friend_list.h"
 #include "ro/sim/guild.h"
-#include "ro/sim/status_effects.h"
 #include "ro/sim/whisper.h"
 #include "ro/sim/world_fwd.h"
 
@@ -52,17 +52,25 @@ struct WhisperCircle {
 // (« #nom », qui passe par le même paquet), ni un message à un PNJ qui existe
 // (« NPC:nom »), ni une COMMANDE (« @… », « #… »), ni un texte trop long.
 //
-// ⚠ UN JOUEUR MUET NE SE NOTE PAS NON PLUS : sous un état qui coupe la parole
-// (`player_statuses`), le serveur jette le message sans accusé, et l'envoi
-// noté aurait pris l'accusé du suivant — l'écho et le refus passaient alors à
-// un autre destinataire.
+// ⚠ UN JOUEUR MUET NE SE NOTE PAS NON PLUS (`muted`, voir
+// `sim::CannotChat`) : le serveur jette alors le message sans accusé, et
+// l'envoi noté aurait pris l'accusé du suivant — l'écho et le refus passaient
+// à un autre destinataire.
+//
+// 🔴 ET UN « #nom » N'EST UN CANAL QUE SI LE SERVEUR LE PREND POUR TEL : un
+// canal qu'il n'a pas annoncé, ou où le joueur n'a pas le droit d'écrire,
+// retombe en chuchotement ordinaire, accusé « absent ». Celui-là se note.
+// Sans liste annoncée (`channels` vide), tout « #nom » reste un canal.
 //
 // ⚠ CE QUI NE SE VOIT PAS D'ICI attend son oubli : un PNJ qui n'existe pas (le
-// serveur accuse alors « absent »), le mutisme de bonnes manières — il ne
-// porte pas d'icône —, une ligne envoyée plus vite que le délai de parole du
-// serveur, et un « #canal » inexistant, que le serveur reprend comme un
-// chuchotement et accuse « absent » sans qu'on l'ait noté.
+// serveur accuse alors « absent »), une ligne envoyée plus vite que le délai
+// de parole du serveur, et le canal d'alliance hors guilde.
+struct WhisperNoting {
+  bool muted = false;
+  // Les canaux que le serveur a annoncés, droits appliqués.
+  std::span<const sim::ChatChannel> channels;
+};
 bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::uint32_t sent_ms,
-                     std::span<const sim::ActiveStatus> player_statuses = {});
+                     const WhisperNoting& noting = {});
 
 }  // namespace ro::net

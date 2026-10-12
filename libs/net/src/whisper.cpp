@@ -6,6 +6,7 @@
 #include <string_view>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/core/text.h"
 #include "ro/proto/chat_limits.h"
 #include "ro/proto/manual_packets.h"
@@ -148,21 +149,27 @@ FrameOutcome ApplyWhisperFrame(const Frame& frame, sim::World& world, const Whis
 }
 
 bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::uint32_t sent_ms,
-                     std::span<const sim::ActiveStatus> player_statuses) {
+                     const WhisperNoting& noting) {
   if (intent.target != ChatTarget::kWhisper || intent.recipient.empty() || intent.text.empty()) {
     return false;
   }
   // MUET : le serveur jette la ligne sans un mot, donc sans accusé.
-  const bool muted = std::ranges::any_of(player_statuses, [](const sim::ActiveStatus& status) {
-    return status.effect == sim::kEfstBerserk || status.effect == sim::kEfstDeepSleep ||
-           status.effect == sim::kEfstSaturdayNightFever;
-  });
-  if (muted) {
+  if (noting.muted) {
     return false;
   }
-  // UN CANAL : « /w #nom » et la case « Pseudo » y mènent aussi.
+  // UN CANAL : « /w #nom » et la case « Pseudo » y mènent aussi — s'il en est
+  // un pour le serveur. Le canal d'alliance n'y existe qu'en guilde, que
+  // cette couche ne connaît pas : il reste un canal.
   if (intent.recipient.front() == sim::kChannelPrefix) {
-    return false;
+    const std::string_view name = std::string_view(intent.recipient).substr(1);
+    const bool taken =
+        noting.channels.empty() ||
+        std::ranges::any_of(noting.channels, [name](const sim::ChatChannel& one) {
+          return core::AsciiEqualsFolded(one.name, name) && (one.can_write || one.guild_only);
+        });
+    if (taken) {
+      return false;
+    }
   }
   if (intent.recipient.size() >= kShortestNpcWhisperTarget &&
       StartsWithNoCase(intent.recipient, kNpcWhisperPrefix)) {

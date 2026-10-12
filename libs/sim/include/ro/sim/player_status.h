@@ -149,6 +149,12 @@ struct PlayerStatus {
   // ⚠ DEUX DE CES VALEURS ARRIVENT DÉJÀ DIVISÉES PAR DIX, et c'est mesuré :
   // `SP_FLEE2` envoie `flee2/10`, `SP_CRITICAL` envoie `cri/10`. Les rediviser
   // à l'affichage montrerait un dixième de la vraie valeur.
+
+  // LES BONNES MANIÈRES, SP_MANNER. Rien ne les affiche, mais un compte
+  // NÉGATIF coupe la parole : le serveur pose alors `SC_NOCHAT`, qui n'a pas
+  // d'icône. ⚠ ZÉRO ET NON « INCONNU » PAR DÉFAUT : le serveur ne l'annonce
+  // qu'une fois négatif, et un défaut négatif rendrait muet tout le monde.
+  std::int64_t manner = 0;
 };
 
 // LA VITESSE D'ATTAQUE TELLE QUE LE JEU LA MONTRE, dérivée du délai de motion.

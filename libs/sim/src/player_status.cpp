@@ -134,12 +134,16 @@ ParameterOutcome ApplyParameter(PlayerStatus& status, std::uint16_t parameter, s
     case ServerParameter::kSpeed:
       return ParameterOutcome::kUnknown;
 
-    // RECONNUS, ET DÉLIBÉRÉMENT PAS GARDÉS. Le client n'en montre rien : le
-    // karma et la politesse ne s'affichent nulle part, tandis que le sexe et le
-    // métier arrivent déjà avec l'APPARENCE de l'acteur — c'est elle qui décide
-    // du sprite, et les garder ici en dédoublerait la vérité.
-    case ServerParameter::kKarma:
+    // Gardées sans être montrées : voir `PlayerStatus::manner`.
     case ServerParameter::kManner:
+      status.manner = value;
+      return ParameterOutcome::kStored;
+
+    // RECONNUS, ET DÉLIBÉRÉMENT PAS GARDÉS. Le client n'en montre rien : le
+    // karma ne s'affiche nulle part, tandis que le sexe et le métier arrivent
+    // déjà avec l'APPARENCE de l'acteur — c'est elle qui décide du sprite, et
+    // les garder ici en dédoublerait la vérité.
+    case ServerParameter::kKarma:
     case ServerParameter::kSex:
     case ServerParameter::kClass:
       return ParameterOutcome::kKnownButUnused;

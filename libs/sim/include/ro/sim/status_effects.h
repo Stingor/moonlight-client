@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <set>
+#include <span>
 #include <vector>
 
 namespace ro::sim {
@@ -51,6 +52,26 @@ inline constexpr StatusEffectId kEfstDeepSleep = 435;
 // alors le message SANS L'ACCUSER — voir `ro::net::NoteWhisperSent`.
 inline constexpr StatusEffectId kEfstBerserk = 107;
 inline constexpr StatusEffectId kEfstSaturdayNightFever = 448;
+
+// LE JOUEUR PEUT-IL PARLER ? Non sous un des trois états ci-dessus, ni quand
+// ses bonnes manières sont négatives (`PlayerStatus::manner`) : le serveur
+// pose alors `SC_NOCHAT`, qui ne porte pas d'icône, et coupe la parole tant que
+// `manner_system` en garde le bit — c'est le cas sur ce serveur.
+//
+// ⚠ RESTE INVISIBLE ICI le délai de parole du serveur (`min_chat_delay`).
+[[nodiscard]] constexpr bool CannotChat(std::span<const ActiveStatus> statuses,
+                                        std::int64_t manner) noexcept {
+  if (manner < 0) {
+    return true;
+  }
+  for (const ActiveStatus& status : statuses) {
+    if (status.effect == kEfstBerserk || status.effect == kEfstDeepSleep ||
+        status.effect == kEfstSaturdayNightFever) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // L'AVEUGLEMENT PROFOND (EFST_HANDICAPSTATE_DEEPBLIND) : il pose lui-même le noir
 // du joueur aveuglé, et ce noir survit à la fin de l'aveuglement ordinaire.
