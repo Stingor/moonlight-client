@@ -35,6 +35,7 @@ add_library(ro_vfs STATIC
     src/navi_library.cpp
     src/package_items.cpp
     src/pet_tables.cpp
+    src/pet_talk_table.cpp
     src/random_option_names.cpp
     src/books.cpp
     src/monster_list.cpp

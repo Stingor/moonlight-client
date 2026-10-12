@@ -2,6 +2,7 @@
 
 #include "ro/net/pet_frames.h"
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -97,6 +98,30 @@ FrameOutcome ApplyPetFrame(const Frame& frame, sim::Pet& pet) {
   }
 }
 
+std::optional<PetActNotice> ReadPetAct(const Frame& frame) {
+  if (frame.opcode != proto::ZcPetAct::kOpcode) {
+    return std::nullopt;
+  }
+  proto::ZcPetAct packet;
+  if (!proto::Decode(frame.bytes, packet)) {
+    return std::nullopt;
+  }
+  return PetActNotice{.actor_id = packet.GID, .code = packet.data};
+}
+
+std::optional<PetPerformanceNotice> ReadPetPerformance(const Frame& frame) {
+  if (frame.opcode != proto::ZcChangestatePet::kOpcode) {
+    return std::nullopt;
+  }
+  proto::ZcChangestatePet packet;
+  if (!proto::Decode(frame.bytes, packet) ||
+      packet.type != static_cast<std::int8_t>(sim::PetStateChange::kPerformance)) {
+    return std::nullopt;
+  }
+  return PetPerformanceNotice{.actor_id = static_cast<std::uint32_t>(packet.GID),
+                              .performance = packet.data};
+}
+
 bool ApplyPetAccessoryLook(const Frame& frame, sim::World& world) {
   if (frame.opcode != proto::ZcChangestatePet::kOpcode) {
     return false;
@@ -136,6 +161,10 @@ core::Result<void> RequestPetEvolution(Connection& link, std::uint32_t target_eg
 core::Result<void> RequestPetAutoFeed(Connection& link, bool enabled) {
   return Sent(link, proto::Encode(proto::ConfigRequest{.type = proto::ConfigType::kPetAutofeed,
                                                        .value = enabled ? 1U : 0U}));
+}
+
+core::Result<void> RequestPetAct(Connection& link, std::int32_t code) {
+  return Sent(link, proto::Encode(proto::PetActRequest{.data = code}));
 }
 
 }  // namespace ro::net

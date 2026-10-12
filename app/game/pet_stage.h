@@ -21,6 +21,7 @@
 #include "ro/vfs/pet_tables.h"
 #include "ro/vfs/vfs.h"
 
+#include "game/pet_talk_stage.h"
 #include "world/item_obtain_toast.h"
 #include "world/monster_sprite.h"
 
@@ -32,7 +33,8 @@ class PetStage {
  public:
   // Lit une trame du serveur ; `kUnhandled` si elle ne le regarde pas. Le
   // résultat d'une évolution, l'accusé d'un repas et l'écho de
-  // l'auto-alimentation s'écrivent dans la conversation.
+  // l'auto-alimentation s'écrivent dans la conversation ; la parole de tout
+  // familier en vue, au-dessus de sa tête et dans la conversation.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  std::uint32_t now_ms);
 
@@ -138,6 +140,8 @@ class PetStage {
   bool force_open_ = false;
   ro::sim::HungerAlarm hunger_alarm_;
   std::optional<ToastNotice> hunger_notice_;
+  // Ce que disent les familiers, et ce que le nôtre doit dire.
+  PetTalkStage talk_;
 };
 
 }  // namespace moonclient

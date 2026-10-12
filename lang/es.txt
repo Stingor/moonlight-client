@@ -6371,6 +6371,9 @@ tr: [PNJ: %s]
 fr: [Paint Brush] est requis.
 tr: Se requiere [Paint Brush].
 
+fr: [Pet] %s :
+tr: [Pet] %s :
+
 fr: [Shuriken] doit être équipé.
 tr: Debes equipar [Shuriken].
 

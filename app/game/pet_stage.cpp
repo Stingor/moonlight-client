@@ -181,6 +181,14 @@ ro::net::FrameOutcome PetStage::ApplyFrame(const ro::net::Frame& frame, ro::sim:
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = ro::net::FrameOutcome::kApplied;
   }
+  // LE SPECTACLE ET LA PAROLE, de notre familier comme d'un voisin.
+  if (talk_.NotePerformance(frame, pet_, world) && outcome == ro::net::FrameOutcome::kUnhandled) {
+    outcome = ro::net::FrameOutcome::kIgnored;
+  }
+  if (const ro::net::FrameOutcome heard = talk_.Hear(frame, pet_, world, now_ms);
+      outcome == ro::net::FrameOutcome::kUnhandled) {
+    outcome = heard;
+  }
   if (pet_.TakeLowIntimacyWarning()) {
     force_open_ = true;
   }
@@ -190,6 +198,10 @@ ro::net::FrameOutcome PetStage::ApplyFrame(const ro::net::Frame& frame, ro::sim:
     }
   }
   if (const std::optional<ro::sim::PetFeeding> feeding = pet_.TakeFeeding()) {
+    // LE REPAS PRIS fait parler le familier : sa réplique, puis son émoticône.
+    if (feeding->fed) {
+      talk_.NoteFed(pet_, world);
+    }
     Say(world, FeedingLine(items_, *feeding, world.inventory()),
         feeding->fed ? kFedColor : kNoFoodColor);
   }
@@ -214,9 +226,11 @@ void PetStage::StartSession() {
   force_open_ = false;
   hunger_alarm_ = ro::sim::HungerAlarm{};
   hunger_notice_.reset();
+  talk_.StartSession();
 }
 
 void PetStage::LoadTables(ro::vfs::Vfs& vfs) {
+  talk_.LoadTable(vfs);
   if (tables_tried_) {
     return;
   }
@@ -455,6 +469,8 @@ void PetStage::Apply(const ro::ui::PetWindowAction& asked,
   last_now_ms_ = now_ms;
   const std::uint32_t pet_id = pet_.announced_actor_id();
   pet_.ObservePresence(pet_id != 0 && world.Find(pet_id) != nullptr, world.map_entries(), now_ms);
+  talk_.Observe(pet_, world, now_ms);
+  talk_.Flush(link);
   if (pet_.TakeSheetWanted()) {
     Command(link, ro::proto::PetCommand::kStatus);
   }

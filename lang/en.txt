@@ -6371,6 +6371,9 @@ tr: [NPC: %s]
 fr: [Paint Brush] est requis.
 tr: [Paint Brush] is required.
 
+fr: [Pet] %s :
+tr: [Pet] %s :
+
 fr: [Shuriken] doit être équipé.
 tr: [Shuriken] must be equipped.
 

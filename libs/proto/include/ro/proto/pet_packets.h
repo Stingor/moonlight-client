@@ -14,7 +14,7 @@ namespace ro::proto {
 //
 // La fiche (`ZcPropertyPet`), le repas (`ZcFeedPet`) et les changements d'état
 // (`ZcChangestatePet`) sont engendrés dans `map_packets.h`. Restent ici ceux que
-// le serveur écrit à la main, et les quatre demandes du client.
+// le serveur écrit à la main, et les cinq demandes du client.
 
 // LA LISTE D'ÉCLOSION : les œufs du sac, désignés par leur case vue du client.
 // Un en-tête de quatre octets, puis deux octets par œuf.
@@ -107,11 +107,22 @@ struct PetEvolutionRequest {
   std::uint32_t target_egg_id = 0;
 };
 
+// CE QUE LE FAMILIER DIT OU MONTRE : un entier que le client du maître
+// compose et que le serveur renvoie tel quel à tous ceux qui voient le
+// familier. Voir `ro/sim/pet_talk.h`.
+struct PetActRequest {
+  static constexpr std::uint16_t kOpcode = 0x01A9;
+  static constexpr std::size_t kWireSize = 6;
+
+  std::int32_t data = 0;
+};
+
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PetCommandRequest& request);
 // ⚠ REFUSE un nom vide, ou plus long que le champ : le tronquer pourrait couper
 // un caractère en deux.
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PetRenameRequest& request);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PetEggChoice& choice);
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PetEvolutionRequest& request);
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> Encode(const PetActRequest& request);
 
 }  // namespace ro::proto

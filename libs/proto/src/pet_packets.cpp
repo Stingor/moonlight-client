@@ -27,6 +27,8 @@ constexpr std::array<std::uint16_t, 1> kEggChoiceOffsets = {2};
 // La longueur, puis l'œuf cible.
 constexpr std::string_view kEvolutionHandler = "clif_parse_pet_evolution";
 constexpr std::array<std::uint16_t, 2> kEvolutionOffsets = {2, 4};
+constexpr std::string_view kActHandler = "clif_parse_SendEmotion";
+constexpr std::array<std::uint16_t, 1> kActOffsets = {2};
 
 // La disposition écrite ici est-elle celle que le serveur déclare, longueur
 // comprise ? Un paquet variable se déclare `kVariableLength`.
@@ -151,6 +153,18 @@ core::Result<std::vector<std::uint8_t>> Encode(const PetEvolutionRequest& reques
   writer.U16(PetEvolutionRequest::kOpcode);
   writer.U16(static_cast<std::uint16_t>(PetEvolutionRequest::kWireSize));
   writer.U32(request.target_egg_id);
+  return frame;
+}
+
+core::Result<std::vector<std::uint8_t>> Encode(const PetActRequest& request) {
+  if (!LayoutHolds(PetActRequest::kOpcode, kActHandler, kActOffsets,
+                   static_cast<std::int16_t>(PetActRequest::kWireSize))) {
+    return LayoutChanged("la parole du familier");
+  }
+  std::vector<std::uint8_t> frame;
+  ByteWriter writer(frame);
+  writer.U16(PetActRequest::kOpcode);
+  writer.U32(static_cast<std::uint32_t>(request.data));
   return frame;
 }
 
