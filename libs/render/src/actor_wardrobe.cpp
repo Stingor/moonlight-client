@@ -250,12 +250,12 @@ std::optional<float> ActorOutfit::BodyFirstLayerY() const {
 bool ActorLookOrder::operator()(const ActorLook& left, const ActorLook& right) const noexcept {
   return std::tie(left.player, left.item, left.job, left.sex, left.hair, left.body_style,
                   left.headgears, left.weapon, left.shield, left.robe, left.cash_mount,
-                  left.hair_palette, left.body_palette, left.style, left.orc_head,
-                  left.madogear_suit, left.pet_accessory) <
+                  left.hair_palette, left.body_palette, left.body_palette_names_file, left.style,
+                  left.orc_head, left.madogear_suit, left.pet_accessory) <
          std::tie(right.player, right.item, right.job, right.sex, right.hair, right.body_style,
                   right.headgears, right.weapon, right.shield, right.robe, right.cash_mount,
-                  right.hair_palette, right.body_palette, right.style, right.orc_head,
-                  right.madogear_suit, right.pet_accessory);
+                  right.hair_palette, right.body_palette, right.body_palette_names_file,
+                  right.style, right.orc_head, right.madogear_suit, right.pet_accessory);
 }
 
 ActorWardrobe::ActorWardrobe(vfs::Vfs& vfs, SpriteCatalog catalog)
@@ -539,6 +539,8 @@ ActorOutfit* ActorWardrobe::BodySwatch(const ActorLook& look, std::int16_t palet
   ActorLook official_look;
   official_look.job = look.job;
   official_look.body_palette = palette;
+  // La vignette n montre body_<n>.pal : c'est ce que la recette choisira.
+  official_look.body_palette_names_file = true;
   const std::string palette_path = BodyPalettePath(official_look);
   const formats::Palette* official = palette_path.empty() ? nullptr : Palette(palette_path);
   if (palette > 0 && official == nullptr) {

@@ -602,7 +602,7 @@ std::string BodyPalettePath(const ActorLook& look) {
   if (look.body_palette <= 0) {
     return {};
   }
-  const std::string number = std::to_string(look.body_palette);
+  const std::string number = std::to_string(catalog_internal::BodyPaletteFileNumber(look));
   // Une tenue alternative cherche sa palette dans son dossier, suffixée de son
   // numéro chez l'humain ; l'installation n'en porte aucune, et rien ne se teint.
   const std::string outfit = std::to_string(kAlternateOutfitNumber);

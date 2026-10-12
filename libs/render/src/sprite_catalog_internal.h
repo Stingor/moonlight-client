@@ -108,6 +108,20 @@ void AppendMercenaryPieces(std::uint32_t job, std::vector<ActorPieceFiles>& file
 // alors dans le dossier des costumes.
 [[nodiscard]] bool WearsAlternateOutfit(const ActorLook& look);
 
+// LE FICHIER QUE LE CLIENT LIT POUR UNE COULEUR DE VÊTEMENT : le n de
+// body_<n>.pal. Pour une couleur positive seulement — zéro ne charge rien.
+//
+// 🔴 CE N'EST PAS TOUJOURS LA COULEUR. À partir de 2, ou en tenue alternative,
+// elle nomme son fichier. En dessous, le client lit body_1.pal pour une classe
+// transcendante de première classe et body_0.pal pour toutes les autres : un
+// Assassin Cross de couleur 1 porte body_0.pal, copie de la palette de son
+// sprite, et non le bleu de body_1.pal.
+//
+// ⚠ LA CLASSE EST `look.job`, celle que le joueur montre, et non le corps
+// emprunté de `BodyClass` : le client tranche le numéro avant de résoudre le
+// corps. Une recette de style (`body_palette_names_file`) échappe à la règle.
+[[nodiscard]] std::int16_t BodyPaletteFileNumber(const ActorLook& look);
+
 // LE MÉTIER DONT UN JOUEUR EMPRUNTE LE CORPS, hors monture cash-shop : celui de
 // son style de corps, que le styliste du serveur peut poser sur n'importe quel
 // métier. Une tenue alternative y prête le métier qu'elle habille, et la

@@ -66,6 +66,10 @@ struct ActorLook {
   // Zéro = la palette du .spr.
   std::int16_t hair_palette = 0;
   std::int16_t body_palette = 0;
+  // Faux : `body_palette` est la couleur de vêtement du serveur, que le client
+  // traduit en numéro de fichier (voir `BodyPalettePath`). Vrai : elle nomme
+  // body_<n>.pal tel quel, comme le fait une recette de style.
+  bool body_palette_names_file = false;
   // LE STYLE : l'identifiant d'une recette de couleurs que la garde-robe
   // connaît, ou zéro pour l'apparence native. Voir `ActorWardrobe::SetStyle`.
   //

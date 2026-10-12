@@ -39,6 +39,7 @@ ro::sim::StyleRecipe ToWire(const ro::render::PaletteRecipe& recipe) {
 void Impose(const ro::render::PaletteRecipe& recipe, ro::render::ActorLook& look) {
   if (recipe.body_palette > 0) {
     look.body_palette = recipe.body_palette;
+    look.body_palette_names_file = true;
   }
   if (recipe.hair_palette > 0) {
     look.hair_palette = recipe.hair_palette;
