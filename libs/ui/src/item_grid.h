@@ -353,6 +353,18 @@ struct AmountAnswer {
 // ⚠ À APPELER DEDANS, entre `BeginChild` et `EndChild`.
 [[nodiscard]] float GridScrollbarGutter();
 
+// Les drapeaux de l'enfant « grille ».
+//
+// 🔴 TAILLE VERROUILLÉE, LA GOUTTIÈRE EST TOUJOURS RÉSERVÉE. Le calage court à
+// chaque image, verrou ou non — `NoResize` ne retire que la poignée —, et une
+// gouttière qui paraît au premier objet qui déborde élargirait la fenêtre de sa largeur : elle
+// quitterait le bord d'écran où le joueur l'a collée. Réservée, elle laisse le
+// chrome constant, et la fenêtre ne bouge qu'une fois, au verrouillage.
+//
+// ⚠ DÉVERROUILLÉE, ELLE NE PARAÎT QUE SI ELLE SERT : le joueur retaille alors
+// lui-même, et une gouttière vide lui volerait une colonne pour rien.
+[[nodiscard]] ImGuiWindowFlags GridScrollFlags(bool size_locked);
+
 // Cale la taille demandée sur un nombre ENTIER de cases, dans les deux sens.
 //
 // ⚠ SON `UserData` EST UN `const ImVec2*` : le chrome de la fenêtre, mesuré à

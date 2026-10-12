@@ -764,6 +764,10 @@ float GridScrollbarGutter() {
   return here == nullptr ? 0.0F : here->ScrollbarSizes.x;
 }
 
+ImGuiWindowFlags GridScrollFlags(bool size_locked) {
+  return size_locked ? ImGuiWindowFlags_AlwaysVerticalScrollbar : ImGuiWindowFlags_None;
+}
+
 void SnapToCells(ImGuiSizeCallbackData* asked) {
   const auto* chrome = static_cast<const ImVec2*>(asked->UserData);
   if (chrome == nullptr) {

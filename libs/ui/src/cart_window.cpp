@@ -254,8 +254,9 @@ CartWindowAction DrawCartWindow(CartWindowState& state, const CartWindowView& vi
   // pixel autour des cases, qui sépare le fond pavé du corps de la fenêtre. Sans
   // elle la grille flotte, et surtout le pont de l'onglet actif n'a plus rien à
   // manger — les sept onglets paraissent alors tous fermés.
-  const bool grid_open = ImGui::BeginChild("grille", ImVec2(0.0F, -footer_height),
-                                           ImGuiChildFlags_Borders, ImGuiWindowFlags_None);
+  const bool grid_open =
+      ImGui::BeginChild("grille", ImVec2(0.0F, -footer_height), ImGuiChildFlags_Borders,
+                        GridScrollFlags(state.size_locked));
   // ⚠ DEDANS, ET AVANT LE DEMI-TOUR : une grille entièrement rognée ne dessine
   // rien mais garde sa gouttière, et un chrome mesuré sans elle ferait sauter la
   // fenêtre d'une case à l'image suivante.

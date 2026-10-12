@@ -345,16 +345,15 @@ InventoryWindowAction DrawInventoryWindow(InventoryWindowState& state,
   const ImVec2 menu_spacing = ImGui::GetStyle().ItemSpacing;
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(kCellGapPixels, kCellGapPixels));
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0F, 0.0F));
-  // 🔴 L'ASCENSEUR NE PARAÎT QUE S'IL SERT. Forcé, il réserverait sa gouttière
-  // même sur une grille à moitié vide, sa poignée remplirait toute la piste et
-  // recouvrirait la flèche du haut — un ascenseur qui ne peut rien faire défiler
-  // n'annonce rien, il occupe.
+  // 🔴 L'ASCENSEUR NE PARAÎT QUE S'IL SERT, SAUF TAILLE VERROUILLÉE : voir
+  // `GridScrollFlags`.
   // 🔴 LA GRILLE PORTE UNE BORDURE, et c'est le dessin du client : un liseré d'un
   // pixel autour des cases, qui sépare le fond pavé du corps de la fenêtre. Sans
   // elle la grille flotte, et surtout le pont de l'onglet actif n'a plus rien à
   // manger — les sept onglets paraissent alors tous fermés.
-  const bool grid_open = ImGui::BeginChild("grille", ImVec2(0.0F, -footer_height),
-                                           ImGuiChildFlags_Borders, ImGuiWindowFlags_None);
+  const bool grid_open =
+      ImGui::BeginChild("grille", ImVec2(0.0F, -footer_height), ImGuiChildFlags_Borders,
+                        GridScrollFlags(state.size_locked));
   // ⚠ DEDANS, ET AVANT LE DEMI-TOUR : une grille entièrement rognée ne dessine
   // rien mais garde sa gouttière, et un chrome mesuré sans elle ferait sauter la
   // fenêtre d'une case à l'image suivante.
