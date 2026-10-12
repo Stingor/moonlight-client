@@ -229,22 +229,19 @@ class NaviData {
   // Depuis la sortie de `link_id`, la marche jusqu'à chaque liaison sortante de
   // la carte d'arrivée. Vide si la table n'en dit rien.
   [[nodiscard]] std::span<const NaviPassRun> PassesAfter(std::uint32_t link_id) const;
-  // Pour un PNJ, la marche depuis chaque liaison qui entre sur sa carte.
-  [[nodiscard]] std::span<const NaviNpcPassRun> PassesToNpc(std::uint32_t npc_id) const;
 
   // Reconstruit les index. Chaque lecteur d'une table d'objets l'appelle en
   // finissant : la table des cartes doit être indexée pour que les suivantes y
   // résolvent leurs noms.
   void BuildIndexes();
 
-  // Les tables brutes de distances, remplies par les lecteurs.
+  // La table brute des distances entre liaisons, remplie par son lecteur.
+  // Celle des distances aux PNJ n'en fait pas partie : elle se lit à la demande
+  // (`NaviNpcDistanceFile`).
   std::vector<NaviPassRun> link_passes;
   std::unordered_map<std::uint32_t, NaviPassSpan> link_pass_spans;
-  std::vector<NaviNpcPassRun> npc_passes;
-  std::unordered_map<std::uint32_t, NaviPassSpan> npc_pass_spans;
-  // Comment chacune des deux tables écrit ses longueurs ; posé par son lecteur.
+  // Comment cette table écrit ses longueurs ; posé par son lecteur.
   NaviSteps link_steps = NaviSteps::kExact;
-  NaviSteps npc_steps = NaviSteps::kExact;
 
  private:
   std::unordered_map<std::string, NaviMapIndex> map_by_lower_name_;
@@ -262,8 +259,8 @@ class NaviData {
   std::vector<std::vector<std::uint32_t>> spawns_on_;
 };
 
-// Les six lecteurs. La table des cartes d'abord : les autres résolvent leurs noms
-// de carte contre elle, d'où leur `NaviData&`.
+// Les lecteurs des cinq tables qu'on lit d'un bloc. La table des cartes d'abord :
+// les autres résolvent leurs noms de carte contre elle, d'où leur `NaviData&`.
 //
 // Chacun échoue si le fichier ne suit pas sa grammaire, et laisse alors `data`
 // tel qu'il l'a trouvé pour SA table.
@@ -274,7 +271,5 @@ class NaviData {
 [[nodiscard]] core::Result<void> ReadNaviLinks(std::span<const std::uint8_t> bytes, NaviData& data);
 [[nodiscard]] core::Result<void> ReadNaviLinkDistances(std::span<const std::uint8_t> bytes,
                                                        NaviData& data);
-[[nodiscard]] core::Result<void> ReadNaviNpcDistances(std::span<const std::uint8_t> bytes,
-                                                      NaviData& data);
 
 }  // namespace ro::formats

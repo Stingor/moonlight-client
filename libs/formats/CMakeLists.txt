@@ -36,6 +36,7 @@ add_library(ro_formats STATIC
     src/lua_calls.cpp
     src/monster_skill_info.cpp
     src/named_effects.cpp
+    src/navi_npc_distances.cpp
     src/navi_tables.cpp
     src/grf.cpp
     src/grf_merge.cpp

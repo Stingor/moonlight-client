@@ -46,25 +46,30 @@ constexpr std::uint32_t kNoPrevious = std::numeric_limits<std::uint32_t>::max();
   return goal;
 }
 
-// Pour un PNJ visé, la marche depuis chaque liaison qui entre sur sa carte.
-[[nodiscard]] std::unordered_map<std::uint32_t, std::uint32_t> NpcLegs(const NaviData& data,
-                                                                       const NaviGoal& goal) {
+}  // namespace
+
+NaviGoalCost NaviTableGoalCost(const NaviData& data, const formats::NaviNpcDistances& table,
+                               std::uint32_t npc_id) {
+  const formats::NaviNpc* npc = data.FindNpc(npc_id);
+  if (npc == nullptr) return {};
   std::unordered_map<std::uint32_t, std::uint32_t> legs;
-  if (goal.kind != NaviGoalKind::kNpc) return legs;
-  for (const formats::NaviNpcPassRun& run : data.PassesToNpc(goal.npc_id)) {
+  for (const formats::NaviNpcPassRun& run : table.PassesTo(npc_id)) {
     for (std::uint32_t offset = 0; offset < run.link_count; ++offset) {
       const std::uint32_t link_id = run.first_link_id + offset;
       const NaviLink* link = data.FindLink(link_id);
       if (link == nullptr) continue;
       legs.emplace(link_id, StepsToCost(formats::NaviExactSteps(
-                                data.npc_steps, run.distance_cells, link->dest_cell_x,
-                                link->dest_cell_y, goal.cell_x, goal.cell_y)));
+                                table.steps, run.distance_cells, link->dest_cell_x,
+                                link->dest_cell_y, npc->cell_x, npc->cell_y)));
     }
   }
-  return legs;
+  if (legs.empty()) return {};
+  return [legs = std::move(legs)](const NaviLink& link) -> std::optional<std::uint32_t> {
+    const auto found = legs.find(link.link_id);
+    if (found == legs.end()) return std::nullopt;
+    return found->second;
+  };
 }
-
-}  // namespace
 
 bool NaviLinkAllowed(const NaviLink& link, const NaviRouteOptions& options) noexcept {
   switch (link.kind) {
@@ -85,7 +90,8 @@ std::uint32_t NaviHopCost(const NaviLink& link) noexcept {
 
 std::optional<NaviRoute> PlanNaviRoute(const NaviData& data, const NaviStart& start,
                                        const NaviGoal& wanted, const NaviRouteOptions& options,
-                                       const NaviStartCost& start_cost) {
+                                       const NaviStartCost& start_cost,
+                                       const NaviGoalCost& goal_cost) {
   if (start.map >= data.maps.size()) return std::nullopt;
   const NaviGoal goal = Resolved(data, wanted);
   if (goal.map >= data.maps.size()) return std::nullopt;
@@ -94,20 +100,13 @@ std::optional<NaviRoute> PlanNaviRoute(const NaviData& data, const NaviStart& st
     if (start_cost) return start_cost(x, y);
     return OctileCost(start.cell_x, start.cell_y, x, y);
   };
-  const std::unordered_map<std::uint32_t, std::uint32_t> npc_legs = NpcLegs(data, goal);
-  // Ce qu'il reste à marcher une fois sorti d'une liaison sur la carte visée.
-  const auto leg_after = [&](const NaviLink& link) -> std::uint32_t {
-    switch (goal.kind) {
-      case NaviGoalKind::kMap:
-        return 0;
-      case NaviGoalKind::kNpc:
-        if (const auto found = npc_legs.find(link.link_id); found != npc_legs.end())
-          return found->second;
-        [[fallthrough]];
-      case NaviGoalKind::kCell:
-        return OctileCost(link.dest_cell_x, link.dest_cell_y, goal.cell_x, goal.cell_y);
-    }
-    return 0;
+  // Ce qu'il reste à marcher une fois sorti d'une liaison sur la carte visée ;
+  // rien quand cette sortie ne mène pas à la destination, ou que rien ne dit
+  // la marche jusqu'à elle.
+  const auto leg_after = [&](const NaviLink& link) -> std::optional<std::uint32_t> {
+    if (goal.kind == NaviGoalKind::kMap) return 0;
+    if (goal_cost) return goal_cost(link);
+    return std::nullopt;
   };
 
   // Les nœuds : une liaison par rang, et un nœud de plus pour l'ARRIVÉE. Le coût
@@ -148,7 +147,9 @@ std::optional<NaviRoute> PlanNaviRoute(const NaviData& data, const NaviStart& st
 
     const NaviLink& link = data.links[node];
     const std::uint32_t arrived = Saturating(at_cost, NaviHopCost(link));
-    if (link.dest_map == goal.map) offer(goal_node, Saturating(arrived, leg_after(link)), node);
+    if (link.dest_map == goal.map) {
+      if (const auto leg = leg_after(link)) offer(goal_node, Saturating(arrived, *leg), node);
+    }
     for (const formats::NaviPassRun& run : data.PassesAfter(link.link_id)) {
       for (std::uint32_t offset = 0; offset < run.link_count; ++offset) {
         const auto next = data.LinkSlot(run.first_link_id + offset);

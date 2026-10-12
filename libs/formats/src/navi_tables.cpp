@@ -12,9 +12,21 @@
 #include "ro/core/ascii.h"
 #include "ro/core/text.h"
 
+#include "navi_cursor.h"
+
 namespace ro::formats {
 
 namespace {
+
+using navi_internal::Broken;
+using navi_internal::ClosedAtEnd;
+using navi_internal::Cursor;
+using navi_internal::ForEachEntry;
+using navi_internal::Narrow;
+using navi_internal::NextInteger;
+using navi_internal::NextString;
+using navi_internal::OpenTable;
+using navi_internal::StepsOf;
 
 // Le décalage et les masques des statistiques empaquetées d'une apparition.
 constexpr std::uint32_t kElementShift = 16;
@@ -26,164 +38,14 @@ constexpr std::uint32_t kByteMask = 0xFF;
 constexpr std::uint32_t kAmountShift = 16;
 constexpr std::uint32_t kSpriteMask = 0xFFFF;
 
-// Les marqueurs de fin d'une liste de distances : `{"NULL", 0, 0}` entre
-// liaisons, `{"", 0, 0}` vers les PNJ.
+// Le marqueur de fin d'une liste de distances entre liaisons, et l'étiquette
+// d'une passe.
 constexpr std::string_view kLinkPassEnd = "NULL";
 constexpr std::string_view kLinkPassTag = "E";
-
-// ── Le curseur ───────────────────────────────────────────────────────────────
-//
-// Un lecteur de la grammaire commune aux six tables : des accolades, des
-// virgules, des chaînes entre guillemets doubles, des entiers, et des
-// commentaires `--` jusqu'à la fin de la ligne.
-class Cursor {
- public:
-  explicit Cursor(std::span<const std::uint8_t> bytes)
-      : text_(reinterpret_cast<const char*>(bytes.data()), bytes.size()) {}
-
-  void SkipBlanks() {
-    while (at_ < text_.size()) {
-      const char c = text_[at_];
-      if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
-        ++at_;
-      } else if (c == '-' && at_ + 1 < text_.size() && text_[at_ + 1] == '-') {
-        while (at_ < text_.size() && text_[at_] != '\n') ++at_;
-      } else {
-        return;
-      }
-    }
-  }
-
-  [[nodiscard]] bool AtEnd() {
-    SkipBlanks();
-    return at_ >= text_.size();
-  }
-
-  [[nodiscard]] bool Peek(char wanted) {
-    SkipBlanks();
-    return at_ < text_.size() && text_[at_] == wanted;
-  }
-
-  [[nodiscard]] bool Take(char wanted) {
-    if (!Peek(wanted)) return false;
-    ++at_;
-    return true;
-  }
-
-  // Une virgule entre deux éléments est facultative avant une accolade fermante :
-  // Lua l'accepte en fin de liste, et le serveur l'écrit.
-  void TakeOptionalComma() { (void)Take(','); }
-
-  [[nodiscard]] std::optional<std::string_view> Name() {
-    SkipBlanks();
-    const std::size_t start = at_;
-    while (at_ < text_.size()) {
-      const char c = text_[at_];
-      const bool word =
-          (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
-      if (!word) break;
-      ++at_;
-    }
-    if (at_ == start) return std::nullopt;
-    return text_.substr(start, at_ - start);
-  }
-
-  // Une chaîne entre guillemets doubles. Les échappements usuels sont défaits ;
-  // le serveur n'en écrit pas, mais un nom de PNJ peut porter un guillemet.
-  [[nodiscard]] std::optional<std::string> String() {
-    if (!Take('"')) return std::nullopt;
-    std::string out;
-    while (at_ < text_.size()) {
-      const char c = text_[at_++];
-      if (c == '"') return out;
-      if (c == '\\' && at_ < text_.size()) {
-        const char escaped = text_[at_++];
-        out.push_back(escaped == 'n' ? '\n' : escaped == 't' ? '\t' : escaped);
-        continue;
-      }
-      if (c == '\n') return std::nullopt;
-      out.push_back(c);
-    }
-    return std::nullopt;
-  }
-
-  [[nodiscard]] std::optional<std::int64_t> Integer() {
-    SkipBlanks();
-    bool negative = false;
-    if (at_ < text_.size() && text_[at_] == '-') {
-      negative = true;
-      ++at_;
-    }
-    const std::size_t start = at_;
-    std::int64_t value = 0;
-    constexpr std::int64_t kCeiling = std::numeric_limits<std::int32_t>::max();
-    while (at_ < text_.size() && text_[at_] >= '0' && text_[at_] <= '9') {
-      value = value * 10 + (text_[at_] - '0');
-      if (value > kCeiling) return std::nullopt;
-      ++at_;
-    }
-    if (at_ == start) return std::nullopt;
-    return negative ? -value : value;
-  }
-
-  [[nodiscard]] std::size_t offset() const noexcept { return at_; }
-
- private:
-  std::string_view text_;
-  std::size_t at_ = 0;
-};
-
-[[nodiscard]] std::unexpected<core::Error> Broken(std::string_view table, const Cursor& cursor,
-                                                  std::string_view what) {
-  return core::Fail(core::ErrorCode::kCorruptData, std::string(table) + " : " + std::string(what) +
-                                                       " à l'octet " +
-                                                       std::to_string(cursor.offset()));
-}
-
-// `Nom = {` — l'en-tête de chaque fichier.
-[[nodiscard]] bool OpenTable(Cursor& cursor, std::string_view expected_name) {
-  const auto name = cursor.Name();
-  return name && *name == expected_name && cursor.Take('=') && cursor.Take('{');
-}
-
-// Une valeur bornée à un type étroit. Hors bornes, la ligne est illisible.
-template <typename T>
-[[nodiscard]] std::optional<T> Narrow(std::optional<std::int64_t> value) {
-  if (!value || *value < std::numeric_limits<T>::min() || *value > std::numeric_limits<T>::max())
-    return std::nullopt;
-  return static_cast<T>(*value);
-}
-
-// Lit `, <entier>` : la virgule qui SÉPARE un champ du précédent.
-[[nodiscard]] std::optional<std::int64_t> NextInteger(Cursor& cursor) {
-  if (!cursor.Take(',')) return std::nullopt;
-  return cursor.Integer();
-}
-
-[[nodiscard]] std::optional<std::string> NextString(Cursor& cursor) {
-  if (!cursor.Take(',')) return std::nullopt;
-  return cursor.String();
-}
 
 // Les libellés sont écrits dans l'encodage des scripts du serveur. Le fil sait
 // déjà reconnaître l'UTF-8 du 1252 ; on s'en remet à lui.
 [[nodiscard]] std::string Readable(const std::string& raw) { return core::Utf8FromWire(raw); }
-
-// Parcourt une liste `{ {…}, {…}, … }` et confie chaque entrée à `read_entry`,
-// qui lit ce qu'il y a ENTRE ses accolades. Rend faux au premier accroc.
-template <typename ReadEntry>
-[[nodiscard]] bool ForEachEntry(Cursor& cursor, ReadEntry&& read_entry) {
-  while (!cursor.Peek('}')) {
-    if (!cursor.Take('{')) return false;
-    if (!read_entry()) return false;
-    if (!cursor.Take('}')) return false;
-    cursor.TakeOptionalComma();
-  }
-  return cursor.Take('}');
-}
-
-// Un fichier lu entièrement : la table fermée, et rien derrière.
-[[nodiscard]] bool ClosedAtEnd(Cursor& cursor) { return cursor.AtEnd(); }
 
 // Un lecteur qui écrit dans une COPIE, rendue à `data` seulement s'il réussit :
 // un fichier refusé ne laisse pas une table à moitié remplie.
@@ -381,27 +243,16 @@ core::Result<void> ReadNaviLinks(std::span<const std::uint8_t> bytes, NaviData& 
   return result;
 }
 
-// ── Les deux tables de distances ─────────────────────────────────────────────
+// ── La table des distances entre liaisons ────────────────────────────────────
 //
-// Même charpente pour les deux : par carte, `"<carte>", <compte>, { … }`, et dans
-// les accolades une entrée par propriétaire — `{ <id>, {…}, {…}, <fin> }`.
-// Seules la forme d'une ligne et son marqueur de fin diffèrent.
-//
-// La ligne de format, quand elle est là, est la PREMIÈRE du fichier. C'est un
-// commentaire Lua : le curseur la saute comme les autres.
+// Par carte, `"<carte>", <compte>, { … }`, et dans les accolades une entrée par
+// liaison entrante — `{ <id>, {…}, {…}, {"NULL", 0, 0} }`. La table des
+// distances aux PNJ suit la même charpente ; elle se lit à part, à la demande
+// (`navi_npc_distances.h`).
 
 namespace {
 
-constexpr std::string_view kFormatLine = "-- navi_format:";
 constexpr std::int32_t kStepsWrap = 256;
-
-[[nodiscard]] NaviSteps StepsOf(std::span<const std::uint8_t> bytes) {
-  const std::string_view text(reinterpret_cast<const char*>(bytes.data()), bytes.size());
-  if (!text.starts_with(kFormatLine)) return NaviSteps::kModulo256;
-  Cursor cursor(bytes.subspan(kFormatLine.size()));
-  const std::optional<std::int64_t> format = cursor.Integer();
-  return format && *format >= kNaviExactStepsFormat ? NaviSteps::kExact : NaviSteps::kModulo256;
-}
 
 }  // namespace
 
@@ -468,54 +319,6 @@ core::Result<void> ReadNaviLinkDistances(std::span<const std::uint8_t> bytes, Na
   return {};
 }
 
-core::Result<void> ReadNaviNpcDistances(std::span<const std::uint8_t> bytes, NaviData& data) {
-  constexpr std::string_view kTable = "Navi_NpcDistance";
-  Cursor cursor(bytes);
-  if (!OpenTable(cursor, kTable)) return Broken(kTable, cursor, "en-tête attendu");
-
-  std::vector<NaviNpcPassRun> runs;
-  std::unordered_map<std::uint32_t, NaviPassSpan> spans;
-  while (!cursor.Peek('}')) {
-    const auto map = cursor.String();
-    const auto declared = NextInteger(cursor);
-    if (!map || !declared || !cursor.Take(',') || !cursor.Take('{'))
-      return Broken(kTable, cursor, "carte illisible");
-    const bool read = ForEachEntry(cursor, [&] {
-      const auto owner = Narrow<std::uint32_t>(cursor.Integer());
-      if (!owner) return false;
-      NaviPassSpan span{static_cast<std::uint32_t>(runs.size()), 0};
-      while (true) {
-        if (!cursor.Take(',') || !cursor.Take('{')) return false;
-        const auto from = cursor.String();
-        const auto first = Narrow<std::uint32_t>(NextInteger(cursor));
-        const auto distance = Narrow<std::int32_t>(NextInteger(cursor));
-        if (!from || !first || !distance) return false;
-        std::uint32_t count = 1;
-        if (cursor.Peek(',')) {
-          const auto length = Narrow<std::uint32_t>(NextInteger(cursor));
-          if (!length || *length == 0) return false;
-          count = *length;
-        }
-        if (!cursor.Take('}')) return false;
-        if (from->empty()) break;
-        runs.push_back({data.FindMap(*from), *first, count, *distance});
-        ++span.count;
-      }
-      cursor.TakeOptionalComma();
-      spans[*owner] = span;
-      return true;
-    });
-    if (!read) return Broken(kTable, cursor, "entrée illisible");
-    cursor.TakeOptionalComma();
-  }
-  if (!cursor.Take('}') || !ClosedAtEnd(cursor)) return Broken(kTable, cursor, "fin attendue");
-
-  data.npc_passes = std::move(runs);
-  data.npc_pass_spans = std::move(spans);
-  data.npc_steps = StepsOf(bytes);
-  return {};
-}
-
 // ── Index ────────────────────────────────────────────────────────────────────
 
 NaviMapIndex NaviData::FindMap(std::string_view internal_name) const {
@@ -570,13 +373,6 @@ std::span<const NaviPassRun> NaviData::PassesAfter(std::uint32_t link_id) const 
   const auto found = link_pass_spans.find(link_id);
   if (found == link_pass_spans.end()) return {};
   return std::span<const NaviPassRun>(link_passes)
-      .subspan(found->second.first, found->second.count);
-}
-
-std::span<const NaviNpcPassRun> NaviData::PassesToNpc(std::uint32_t npc_id) const {
-  const auto found = npc_pass_spans.find(npc_id);
-  if (found == npc_pass_spans.end()) return {};
-  return std::span<const NaviNpcPassRun>(npc_passes)
       .subspan(found->second.first, found->second.count);
 }
 

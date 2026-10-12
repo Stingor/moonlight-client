@@ -24,14 +24,14 @@ struct Table {
 };
 
 // Dans l'ordre où elles se résolvent : les cartes d'abord, les liaisons avant
-// leurs distances.
+// leurs distances. La table des distances aux PNJ n'en est pas : voir
+// `LoadNaviNpcDistanceFile`.
 constexpr Table kTables[] = {
     {formats::kNaviMapTableFile, &formats::ReadNaviMaps, true},
     {formats::kNaviNpcTableFile, &formats::ReadNaviNpcs, false},
     {formats::kNaviMobTableFile, &formats::ReadNaviSpawns, false},
     {formats::kNaviLinkTableFile, &formats::ReadNaviLinks, false},
     {formats::kNaviLinkDistanceTableFile, &formats::ReadNaviLinkDistances, false},
-    {formats::kNaviNpcDistanceTableFile, &formats::ReadNaviNpcDistances, false},
 };
 
 [[nodiscard]] std::uint32_t MillisecondsSince(std::chrono::steady_clock::time_point start) {
@@ -65,6 +65,14 @@ core::Result<formats::NaviData> LoadNaviData(Vfs& vfs, NaviLoadReport& report) {
     }
   }
   return data;
+}
+
+core::Result<formats::NaviNpcDistanceFile> LoadNaviNpcDistanceFile(Vfs& vfs) {
+  const std::string path =
+      std::string(formats::kNaviTableDirectory) + std::string(formats::kNaviNpcDistanceTableFile);
+  auto bytes = vfs.Read(path);
+  if (!bytes) return std::unexpected(bytes.error());
+  return formats::NaviNpcDistanceFile::Index(std::move(*bytes));
 }
 
 }  // namespace ro::vfs

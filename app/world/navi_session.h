@@ -19,6 +19,7 @@
 #include "world/minimap_compose.h"
 #include "world/monster_sprite.h"
 #include "world/navi_file.h"
+#include "world/navi_goal_terrain.h"
 #include "world/navi_trail_view.h"
 #include "world/navigation_compose.h"
 #include "world/world_map_compose.h"
@@ -78,6 +79,11 @@ class NaviSession {
   // ordinaire ; un client d'essai lit les archives d'une installation dont il
   // ne doit pas réécrire les réglages.
   void Open(const std::filesystem::path& client_root, const ro::vfs::MountOptions& mount);
+  // L'archive de la partie, lue sur le fil de rendu quand le guidage calcule
+  // un itinéraire : la grille de la carte visée, et au besoin la table des
+  // distances aux PNJ. Nulle : une case ou un PNJ d'une autre carte n'a pas
+  // d'itinéraire.
+  void UseArchive(ro::vfs::Vfs* vfs);
   // Adopte les tables quand le fil les a lues. À chaque image, sans coût tant
   // que rien n'est prêt. `here_map` est la carte où l'on se tient : la
   // recherche retenue en attendant les tables y met ses résultats en tête.
@@ -129,6 +135,8 @@ class NaviSession {
   std::future<Loaded> pending_;
   std::shared_ptr<const ro::formats::NaviData> data_;
   std::optional<ro::vfs::TownInfo> towns_;
+  // ⚠ LE GUIDAGE EN GARDE L'ADRESSE : la session ne se copie ni ne se déplace.
+  NaviGoalLoader goal_terrain_;
 };
 
 }  // namespace moonclient

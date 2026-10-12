@@ -135,8 +135,40 @@ void NaviGuide::Plan(formats::NaviMapIndex here, const WalkMap* walk, CellPositi
       return from_player.CostFrom(target->x, target->y);
     };
   }
+  // L'arrivée se mesure sur la grille de la carte visée : une seule inondation
+  // depuis la destination répond pour toutes les liaisons qui y entrent.
+  WalkField toward_goal;
+  NaviGoalCost goal_cost;
+  if (goal.kind != NaviGoalKind::kMap) {
+    if (goal.kind == NaviGoalKind::kNpc) {
+      const formats::NaviNpc* npc = data_->FindNpc(request_.npc_id);
+      goal.cell_x = npc->cell_x;
+      goal.cell_y = npc->cell_y;
+    }
+    const std::string_view goal_name = data_->maps[goal.map].name;
+    const WalkMap* goal_walk = goal.map == here && walk != nullptr ? walk
+                               : goal_terrain_ != nullptr ? goal_terrain_->GridOf(goal_name)
+                                                          : nullptr;
+    if (goal_walk != nullptr) {
+      if (const auto target = Reachable(*goal_walk, goal.cell_x, goal.cell_y)) {
+        const std::array<CellPosition, 1> sources{*target};
+        toward_goal = WalkField::Flood(*goal_walk, sources);
+        goal_cost = [&toward_goal,
+                     goal_walk](const formats::NaviLink& link) -> std::optional<std::uint32_t> {
+          const auto exit = Reachable(*goal_walk, link.dest_cell_x, link.dest_cell_y);
+          if (!exit) return std::nullopt;
+          return toward_goal.CostFrom(exit->x, exit->y);
+        };
+      }
+    }
+    if (!goal_cost && goal.kind == NaviGoalKind::kNpc && goal_terrain_ != nullptr) {
+      if (const formats::NaviNpcDistances* table = goal_terrain_->NpcDistancesOn(*data_, goal_name))
+        goal_cost = NaviTableGoalCost(*data_, *table, request_.npc_id);
+    }
+  }
+
   const NaviStart start{here, player.x, player.y};
-  const auto route = PlanNaviRoute(*data_, start, goal, request_.options, start_cost);
+  const auto route = PlanNaviRoute(*data_, start, goal, request_.options, start_cost, goal_cost);
   if (!route) {
     status_ = NaviGuideStatus::kNoRoute;
     return;

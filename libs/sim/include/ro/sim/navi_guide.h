@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/formats/navi_npc_distances.h"
 #include "ro/formats/navi_tables.h"
 #include "ro/sim/navi_route.h"
 #include "ro/sim/packed_position.h"
@@ -53,6 +54,26 @@ struct NaviGuideRequest {
   NaviRouteOptions options;
 };
 
+// CE QUE LE GUIDAGE SAIT DE LA CARTE VISÉE quand ce n'est pas celle du joueur.
+// L'application le fournit : lire une grille ou une table demande l'archive.
+//
+// La marche jusqu'à une case ou un PNJ se mesure d'abord sur la GRILLE de la
+// carte visée : une inondation depuis la destination donne d'un coup la marche
+// depuis chaque arrivée de liaison. La table des distances aux PNJ n'est que le
+// repli d'une carte sans grille lisible. Sans l'une ni l'autre, la destination
+// n'a pas d'itinéraire, comme une liste vide dans la table.
+class NaviGoalTerrain {
+ public:
+  virtual ~NaviGoalTerrain() = default;
+  // La grille de marche d'une carte, nulle si elle ne se lit pas. Le pointeur
+  // vaut jusqu'à l'appel suivant.
+  [[nodiscard]] virtual const WalkMap* GridOf(std::string_view map_name) = 0;
+  // Les distances précalculées vers les PNJ d'une carte, nulles si la table
+  // manque. Le pointeur vaut jusqu'à l'appel suivant.
+  [[nodiscard]] virtual const formats::NaviNpcDistances* NpcDistancesOn(
+      const formats::NaviData& data, std::string_view map_name) = 0;
+};
+
 // Une étape : une liaison à franchir.
 struct NaviGuideStep {
   std::uint32_t link_id = 0;
@@ -72,6 +93,9 @@ inline constexpr std::int32_t kNaviTargetRing = 4;
 class NaviGuide {
  public:
   void SetData(std::shared_ptr<const formats::NaviData> data);
+  // Nul : une case ou un PNJ d'une autre carte que celle du joueur n'a pas
+  // d'itinéraire.
+  void SetGoalTerrain(NaviGoalTerrain* terrain) noexcept { goal_terrain_ = terrain; }
   [[nodiscard]] const formats::NaviData* data() const noexcept { return data_.get(); }
 
   void Request(NaviGuideRequest request);
@@ -108,6 +132,7 @@ class NaviGuide {
   void Trace(CellPosition player);
 
   std::shared_ptr<const formats::NaviData> data_;
+  NaviGoalTerrain* goal_terrain_ = nullptr;
   NaviGuideRequest request_;
   NaviGuideStatus status_ = NaviGuideStatus::kIdle;
   formats::NaviMapIndex goal_map_ = formats::kNoNaviMap;

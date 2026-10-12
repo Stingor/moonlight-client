@@ -587,6 +587,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LA NAVIGATION : les préférences du joueur, puis les tables du graphe, lues
   // en arrière-plan.
   navi_.Open(shell_.client_root(), shell_.mount_options());
+  navi_.UseArchive(vfs_);
   if (pieces_.wardrobe.has_value()) navi_.preview_sprite.emplace(*pieces_.wardrobe, vfs_);
   // L'ATLAS DES RECETTES : son livre se lit ici, une fois par partie, et sa
   // page de réglages dit ce qu'il contient — ou qu'il manque.

@@ -938,6 +938,7 @@ add_library(moonclient_navigation STATIC
     world/world_map_routes.cpp
     world/navi_bug_report.cpp
     world/navi_file.cpp
+    world/navi_goal_terrain.cpp
     world/navi_session.cpp
     world/navi_trail_view.cpp
     world/navigation_compose.cpp)
