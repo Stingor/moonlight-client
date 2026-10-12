@@ -10,7 +10,7 @@
 
 #include <glm/glm.hpp>
 
-#include "ro/formats/lua_table.h"
+#include "ro/core/error.h"
 #include "ro/vfs/vfs.h"
 
 namespace ro::render {
@@ -21,7 +21,7 @@ namespace ro::render {
 // moteur d'effets qui le joue. Le client parcourt les objets dans l'ordre du
 // fichier et, pour tout numéro que le gestionnaire d'effets connaît, fait
 // naître l'effet à la PLACE de l'objet — sans lui passer ni sa vitesse ni ses
-// quatre paramètres. Il charge ENSUITE la table `effecttool\<carte>.lub`, qui
+// quatre paramètres. Il charge ENSUITE la table des effets de la carte, qui
 // règle les effets déjà créés.
 //
 // Trois de ces classes posent le décor des cartes — la fumée de cheminée,
@@ -53,8 +53,8 @@ inline constexpr std::int32_t kMapEz2StrEffect = 1412;
 //
 // 🔴 L'ENTRÉE DE CLÉ k RÈGLE LE k-IÈME OBJET 974 DU RSW, et rien d'autre. Une
 // entrée ne s'applique donc jamais à tous les points de la carte — et le champ `pos` de
-// la table n'est PAS lu : sa ligne est en commentaire dans le lecteur Lua du
-// client. La place est celle de l'objet.
+// la table d'origine n'est PAS lu : sa ligne est en commentaire dans le lecteur
+// Lua du client, et la conversion ne l'écrit pas. La place est celle de l'objet.
 //
 // Les valeurs par défaut sont celles du client : c'est ce que garde un objet 974 que la table ne
 // règle pas.
@@ -80,7 +80,7 @@ struct MapEmitterSetting {
   std::array<float, 2> life{5.0F, 10.0F};
   std::array<float, 2> scale{1.0F, 1.0F};
   float speed = 1.0F;
-  // Relatif au dossier des textures, tel que la table l'écrit : octets CP949.
+  // Relatif au dossier des textures, en octets CP949 comme les noms du RSW.
   std::string texture = "smoke2.bmp";
   // Les facteurs de mélange, dans la numérotation de Direct3D.
   std::int32_t blend_source = 5;
@@ -128,16 +128,17 @@ struct MapWindSetting {
 struct MapEffectTable {
   // Vrai quand le fichier existe et se lit.
   bool present = false;
-  // `_<carte>_effect_version`, zéro quand la globale manque. Sous deux, seul
-  // l'ancien lecteur passe, qui ne connaît que les émetteurs ; au-delà de deux,
-  // le client ne lit RIEN.
+  // La version que la table d'origine déclarait, zéro quand elle n'en
+  // déclarait pas. Sous deux, seul l'ancien lecteur passait, qui ne connaît que
+  // les émetteurs ; au-delà de deux, le client ne lit RIEN. La conversion a
+  // déjà appliqué cette règle : la version ne se garde que pour le relevé.
   std::uint32_t version = 0;
   std::map<std::int32_t, MapEmitterSetting> emitters;
   std::map<std::int32_t, MapWindSetting> winds;
   // LES ENTRÉES QUE LE LECTEUR DU CLIENT REFUSERAIT : un champ obligatoire
   // absent. Le client lève alors une erreur Lua qui interrompt TOUTE la lecture,
-  // dans un ordre de parcours que nous ne reproduisons pas ; nous gardons les
-  // champs lus avant la faute et passons aux entrées suivantes. Compter ces
+  // dans un ordre de parcours que nous ne reproduisons pas ; la conversion garde
+  // les champs lus avant la faute et passe aux entrées suivantes. Compter ces
   // entrées dit si l'écart peut se voir — aucune table de l'installation n'en a.
   std::size_t malformed_emitters = 0;
   std::size_t malformed_winds = 0;
@@ -145,22 +146,28 @@ struct MapEffectTable {
   std::map<std::string, std::size_t> other_tables;
 };
 
-// Où le client range la table d'une carte.
-[[nodiscard]] std::string MapEffectToolPath(std::string_view map_name);
-
-// Le nom d'une globale de la table : `_<carte>_<famille>`, privé de son premier
-// `@` — celle de `1@adv` est `_1adv_emitterInfo`.
-[[nodiscard]] std::string MapEffectToolGlobal(std::string_view map_name, std::string_view family);
-
-// Lit la table dans les globales déjà décodées.
-[[nodiscard]] MapEffectTable ReadMapEffectTable(const formats::LuaTable& globals,
-                                                std::string_view map_name);
-
-// Les globales du fichier de la carte, ou rien quand il n'existe pas.
+// LA TABLE D'UNE CARTE SE LIT DANS SON FICHIER,
+// `data\yaml_files\map_effects\<carte>.yml`, que
+// `scripts/yaml_tables/map_effects.py` tire de la table `effecttool` de
+// l'installation. Un fichier par carte : le client ne lit que
+// celle où il entre.
 //
-// ⚠ `ReadLuaFile` ET NON `ReadLuaChunk` : ces tables sont livrées tantôt
-// compilées, tantôt en clair.
-[[nodiscard]] std::optional<formats::LuaTable> LoadMapEffectToolGlobals(vfs::Vfs& vfs,
-                                                                        std::string_view map_name);
+//     version: 1
+//     table_version: 2
+//     emitters:
+//       0: {max_count: 20, first_direction: [-3, -5, -3], texture: 'effect\smoke1.bmp'}
+//     winds: {}
+//     other_tables: {magicfloorInfo: 3}
+//
+// Un champ absent garde la valeur par défaut de son réglage.
+[[nodiscard]] std::string MapEffectTablePath(std::string_view map_name);
+
+// Le texte d'une table. Refuse un texte qui n'est pas du YAML, dont `version`
+// n'est pas 1, ou dont un réglage porte un champ inconnu ou mal formé.
+[[nodiscard]] core::Result<MapEffectTable> ParseMapEffectTable(std::string_view yaml_text);
+
+// La table de la carte. ABSENTE, elle n'est pas présente et rien ne se règle ;
+// ILLISIBLE, le journal le dit et rien ne se règle non plus.
+[[nodiscard]] MapEffectTable LoadMapEffectTable(vfs::Vfs& vfs, std::string_view map_name);
 
 }  // namespace ro::render

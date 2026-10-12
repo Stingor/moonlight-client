@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte starhall
+#
+#  Tiré de data\luafiles514\lua files\effecttool\starhall.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 2
+emitters:
+  0: {max_count: 10, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [50, 40, 10], color: [100, 80, 70, 70], rate: [3, 5], size: [30, 30], life: [3, 4], texture: 'effect\star01_a.bmp', speed: 0.1, blend_source: 9, blend_destination: 2, depth_tested: true, flat: true, rotation_degrees: [90, 0, 0]}
+  1: {max_count: 10, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [50, 40, 50], color: [100, 80, 70, 70], rate: [3, 5], size: [30, 30], life: [3, 4], texture: 'effect\star_y_01.bmp', speed: 0.1, blend_source: 9, blend_destination: 2, depth_tested: true, flat: true, rotation_degrees: [90, 0, 0]}
+  2: {max_count: 5, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 25, 15, 50], rate: [1, 3], size: [30, 30], life: [3, 4], texture: 'effect\a-2.bmp', speed: 0, blend_source: 9, blend_destination: 2, depth_tested: true, flat: true, rotation_degrees: [90, 0, 0], eternal: true}
+  3: {max_count: 6, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [25, 20, 15, 50], rate: [2, 5], size: [100, 100], life: [5, 9], texture: 'effect\water_light_03.bmp', speed: 0, blend_source: 7, blend_destination: 2, depth_tested: true, flat: true, rotation_degrees: [-40, 0, -40]}
+  4: {max_count: 50, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [1, 1, 1], color: [100, 105, 100, 255], rate: [1, 3], size: [15, 25], life: [2, 3], texture: 'effect\star02_1.bmp', speed: 0.1, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0]}
+winds: {}
+other_tables: {}

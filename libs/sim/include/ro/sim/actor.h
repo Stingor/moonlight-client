@@ -119,9 +119,9 @@ inline constexpr std::int32_t kMadogearSuitValue = 2;
 // fait paraître autour de celui qui le porte.
 //
 // ⚠ CE N'EST PAS UN ÉTAT, et les deux numérotations n'ont rien à voir. Un état
-// est un EFST de `src/map/status.hpp` ; celui-ci est un rang dans `HatEFID`,
-// une table LUA de l'installation, et c'est elle — et non le code du client — qui
-// dit ce qu'il montre. Les confondre ferait jouer l'effet d'un état homonyme.
+// est un EFST de `src/map/status.hpp` ; celui-ci est un numéro de la table des
+// effets de chapeau, `hat_effects.yml`, et c'est elle — et non le code du
+// client — qui dit ce qu'il montre. Les confondre ferait jouer l'effet d'un état homonyme.
 // Voir `ro/render/hat_effect_table.h`.
 using HatEffectId = std::uint16_t;
 

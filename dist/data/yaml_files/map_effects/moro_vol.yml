@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte moro_vol
+#
+#  Tiré de data\luafiles514\lua files\effecttool\moro_vol.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 0
+emitters:
+  0: {max_count: 20, first_direction: [2, 0, -5], second_direction: [2, 0, -5], gravity: [-0.4, -0.1, 0.2], radius: [50, 1, 50], color: [55, 75, 35, 150], rate: [5, 8], size: [10, 30], life: [2, 8], texture: 'smoke2.bmp', speed: 1.5, blend_source: 5, blend_destination: 2, depth_tested: true}
+  1: {max_count: 20, first_direction: [2, 0, -5], second_direction: [2, 0, -5], gravity: [-0.4, -0.1, 0.2], radius: [50, 1, 50], color: [55, 75, 35, 150], rate: [5, 8], size: [10, 30], life: [2, 10], texture: 'smoke2.bmp', speed: 1.5, blend_source: 5, blend_destination: 2, depth_tested: true}
+winds: {}
+other_tables: {}

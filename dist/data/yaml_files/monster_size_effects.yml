@@ -1,0 +1,862 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  L'échelle et les effets d'office de certains monstres
+#
+#  Tiré de SystemEN\monster_size_effect.lub, tel que le client d'origine le
+#  trouve sur le disque de son installation : la traduction ROenglishRE
+#  (https://github.com/llchrisll/ROenglishRE, travaux de zackdreaver poursuivis
+#  par llchrisll) de la table de Gravity. Sa licence en permet la distribution
+#  et la modification ; ce dépôt ne la revendique pas comme sienne.
+#
+#  Fichier produit par scripts/yaml_tables/monster_size_effects.py. Ne pas
+#  éditer à la main :
+#      python scripts/yaml_tables/monster_size_effects.py --client <dossier client> \
+#          --serveur <moonlight> --sortie dist/data/yaml_files/monster_size_effects.yml
+#
+#  monsters : classe du monstre -> size, le facteur du sprite (ombre comprise ;
+#    zéro ou moins ne change rien), et effects, les identifiants d'effet qui
+#    s'attachent au monstre à son apparition, dans l'ordre de la table. Le
+#    commentaire nomme chaque effet par sa constante EF_.
+#
+#  Lu par moonclient (ro/vfs/monster_size_effects.h). Absent, aucun monstre
+#  n'est grandi ni paré.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+monsters:
+  1038: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1039: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1046: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1059: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1086: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1087: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1112: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1115: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1136: {size: 1.5, effects: [1048, 418]}  # EF_WL_TELEKINESIS_INTENSE, EF_DOUBLEGUMGANG
+  1137: {size: 1.5, effects: [946, 1035]}  # EF_YELLOWFLY3, EF_STRANGELIGHTS
+  1147: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1150: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1157: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1159: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1190: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1251: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1252: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1272: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1288: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1312: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1373: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1389: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1399: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1418: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1492: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1502: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1511: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1518: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1583: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1623: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1630: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1646: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1647: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1648: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1649: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1650: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1651: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1658: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1685: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1688: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1708: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1719: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1734: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1751: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1766: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1767: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1768: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1779: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1785: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1813: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1817: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1832: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1871: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1874: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1876: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1885: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1907: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1908: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1917: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1929: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1956: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1957: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  1980: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2022: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2052: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2068: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2075: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2080: {size: 0.6, effects: []}
+  2087: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2094: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2095: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2096: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2097: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2098: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2099: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2100: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2101: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2102: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2103: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2104: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2105: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2106: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2107: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2108: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2109: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2110: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2111: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2112: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2113: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2131: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2156: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2165: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2187: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2188: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2189: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2190: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2194: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2202: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2209: {size: 1.5, effects: [768]}  # EF_PURPLEBODY
+  2212: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2235: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2236: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2237: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2238: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2239: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2240: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2241: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2249: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2251: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2253: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2255: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2306: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2319: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2341: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2352: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2362: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2441: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2442: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2443: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2444: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2445: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2446: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2447: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2448: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2449: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2475: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2476: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2483: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2529: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2530: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2532: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2533: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2534: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2535: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2538: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2564: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2603: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2604: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2605: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2606: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2607: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2608: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2609: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2610: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2611: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2612: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2613: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2614: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2615: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2616: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2617: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2618: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2619: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2620: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2621: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2622: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2623: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2624: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2625: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2626: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2627: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2628: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2629: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2630: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2631: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2632: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2633: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2634: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2635: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2636: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2637: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2638: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2639: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2640: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2641: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2642: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2643: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2644: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2645: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2646: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2647: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2648: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2649: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2650: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2651: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2652: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2653: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2654: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2655: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2656: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2657: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2658: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2659: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2660: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2661: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2662: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2663: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2664: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2665: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2666: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2667: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2668: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2669: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2670: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2671: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2672: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2673: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2674: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2675: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2676: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2677: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2678: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2679: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2680: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2681: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2682: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2683: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2684: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2685: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2686: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2687: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2688: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2689: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2690: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2691: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2692: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2693: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2694: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2695: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2696: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2697: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2698: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2699: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2700: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2701: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2702: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2703: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2704: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2705: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2706: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2707: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2708: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2709: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2710: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2711: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2712: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2713: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2714: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2715: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2716: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2717: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2718: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2719: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2720: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2721: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2722: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2723: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2724: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2725: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2726: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2727: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2728: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2729: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2730: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2731: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2732: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2733: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2734: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2735: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2736: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2737: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2738: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2739: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2740: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2741: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2742: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2743: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2744: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2745: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2746: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2747: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2748: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2749: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2750: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2751: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2752: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2753: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2754: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2755: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2756: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2757: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2758: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2759: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2760: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2761: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2762: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2763: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2764: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2765: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2766: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2767: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2768: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2769: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2770: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2771: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2772: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2773: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2774: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2775: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2776: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2777: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2778: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2779: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2780: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2781: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2782: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2783: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2784: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2785: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2786: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2787: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2788: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2789: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2790: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2791: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2792: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2793: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2794: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2795: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2796: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2797: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2798: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2799: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2800: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2801: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2802: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2803: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2804: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2805: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2806: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2807: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2808: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2809: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2810: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2811: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2812: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2813: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2814: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2815: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2816: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2817: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2818: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2819: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2820: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2821: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2822: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2823: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2824: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2825: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2826: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2827: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2828: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2829: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2830: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2831: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2832: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2833: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2834: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2835: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2836: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2837: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2838: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2839: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2840: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2841: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2842: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2843: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2844: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2845: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2846: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2847: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2848: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2849: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2850: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2851: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2852: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2853: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2854: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2855: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2856: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2857: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2858: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2859: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2860: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2861: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2862: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2863: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2864: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2865: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2866: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2867: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2868: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2869: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2870: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2871: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2872: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2873: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2874: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2875: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2876: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2877: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2878: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2879: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2880: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2881: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2882: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2883: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2884: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2885: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2886: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2887: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2888: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2889: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2890: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2891: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2892: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2893: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2894: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2895: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2896: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2897: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2898: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2899: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2900: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2901: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2902: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2903: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2904: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2905: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2906: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2907: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2908: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2909: {size: 1.2, effects: [544]}  # EF_REDLIGHTBODY
+  2910: {size: 1.2, effects: [620]}  # EF_BOTTOM_SUITON
+  2911: {size: 1.2, effects: [240]}  # EF_BOTTOM_DE
+  2912: {size: 1.2, effects: [679]}  # EF_GREEN99_5
+  2913: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  2942: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2988: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2996: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  2999: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3000: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3029: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3039: {size: 1.3, effects: [544]}  # EF_REDLIGHTBODY
+  3040: {size: 1.4, effects: [679]}  # EF_GREEN99_5
+  3041: {size: 1.5, effects: [240]}  # EF_BOTTOM_DE
+  3073: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3074: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3097: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3105: {size: 1.5, effects: [544]}  # EF_REDLIGHTBODY
+  3106: {size: 1.5, effects: [544]}  # EF_REDLIGHTBODY
+  3124: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3173: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3181: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3190: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3191: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3192: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3194: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3195: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3214: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3215: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3216: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3217: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3218: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3219: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3220: {size: 1, effects: [203]}  # EF_GUMGANG
+  3221: {size: 1, effects: [203]}  # EF_GUMGANG
+  3222: {size: 1, effects: [203]}  # EF_GUMGANG
+  3223: {size: 1, effects: [203]}  # EF_GUMGANG
+  3224: {size: 1, effects: [203]}  # EF_GUMGANG
+  3225: {size: 1, effects: [203]}  # EF_GUMGANG
+  3233: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3234: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3235: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3236: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3237: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3238: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3239: {size: 1, effects: [485]}  # EF_DOUBLEGUMGANG2
+  3240: {size: 1, effects: [203]}  # EF_GUMGANG
+  3241: {size: 1, effects: [203]}  # EF_GUMGANG
+  3242: {size: 1, effects: [203]}  # EF_GUMGANG
+  3243: {size: 1, effects: [203]}  # EF_GUMGANG
+  3244: {size: 1, effects: [203]}  # EF_GUMGANG
+  3245: {size: 1, effects: [203]}  # EF_GUMGANG
+  3246: {size: 1, effects: [203]}  # EF_GUMGANG
+  3254: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3259: {size: 1, effects: [486]}  # EF_DOUBLEGUMGANG3
+  3260: {size: 1, effects: [486]}  # EF_DOUBLEGUMGANG3
+  3292: {size: 1, effects: [486]}  # EF_DOUBLEGUMGANG3
+  3293: {size: 2, effects: []}
+  3421: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3422: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3423: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3424: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3425: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3426: {size: 1.2, effects: [1065]}  # EF_WHITEBODY
+  3427: {size: 1.2, effects: [1065]}  # EF_WHITEBODY
+  3428: {size: 1.2, effects: [1065]}  # EF_WHITEBODY
+  3429: {size: 1.2, effects: [1065]}  # EF_WHITEBODY
+  3430: {size: 1.2, effects: [1065]}  # EF_WHITEBODY
+  3445: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3446: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3447: {size: 1.2, effects: [1003]}  # EF_BLUELIGHTBODY
+  3448: {size: 1.5, effects: [544]}  # EF_REDLIGHTBODY
+  3450: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3473: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3474: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3490: {size: 1.5, effects: [544]}  # EF_REDLIGHTBODY
+  3505: {size: 1.5, effects: [486]}  # EF_DOUBLEGUMGANG3
+  3621: {size: 1, effects: [203]}  # EF_GUMGANG
+  3626: {size: 2, effects: []}
+  3628: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3633: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3634: {size: 2.5, effects: []}
+  3636: {size: 0.7, effects: [783]}  # EF_BOTTOM_BARRIER
+  3657: {size: 2, effects: []}
+  3658: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3659: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3731: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3741: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3751: {size: 1.2, effects: []}
+  3757: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3758: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3796: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3799: {size: 0.67, effects: []}
+  3800: {size: 0.67, effects: []}
+  3801: {size: 0.67, effects: []}
+  3802: {size: 0.67, effects: []}
+  3803: {size: 0.67, effects: []}
+  3804: {size: 2, effects: []}
+  3809: {size: 0.5, effects: []}
+  3810: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  3811: {size: 2.5, effects: []}
+  3812: {size: 2.5, effects: []}
+  3818: {size: 1.5, effects: []}
+  3896: {size: 0.67, effects: []}
+  3897: {size: 1, effects: [1003]}  # EF_BLUELIGHTBODY
+  3898: {size: 1, effects: [1003]}  # EF_BLUELIGHTBODY
+  3899: {size: 1, effects: [1003]}  # EF_BLUELIGHTBODY
+  3900: {size: 1, effects: [1003]}  # EF_BLUELIGHTBODY
+  3901: {size: 1.3, effects: [1003]}  # EF_BLUELIGHTBODY
+  3902: {size: 1.3, effects: [1003]}  # EF_BLUELIGHTBODY
+  3910: {size: 1.8, effects: [1025]}  # EF_MAGIC_FLOOR
+  3911: {size: 1, effects: [963]}  # EF_GRAYBODY
+  3912: {size: 1, effects: [963]}  # EF_GRAYBODY
+  3913: {size: 1, effects: [963]}  # EF_GRAYBODY
+  3914: {size: 1, effects: [963]}  # EF_GRAYBODY
+  3915: {size: 1.8, effects: [695]}  # EF_GLOW4
+  3969: {size: 2.5, effects: []}
+  3970: {size: 2.5, effects: [98]}  # EF_HASTEUP
+  3971: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  10403: {size: 0.7, effects: []}
+  10404: {size: 0.5, effects: []}
+  10405: {size: 0.6, effects: []}
+  10406: {size: 0.5, effects: []}
+  10407: {size: 0.6, effects: []}
+  10408: {size: 0.5, effects: []}
+  10409: {size: 0.6, effects: []}
+  10410: {size: 0.5, effects: []}
+  10411: {size: 0.6, effects: []}
+  10412: {size: 0.5, effects: []}
+  10413: {size: 0.6, effects: []}
+  10414: {size: 0.5, effects: []}
+  10415: {size: 0.6, effects: []}
+  10428: {size: 0.3, effects: []}
+  10429: {size: 0.3, effects: []}
+  10430: {size: 0.3, effects: []}
+  10431: {size: 0.3, effects: []}
+  10432: {size: 0.3, effects: []}
+  10527: {size: 1, effects: [2389]}  # EF_NPC_GATE_SKYBLUE
+  20062: {size: 2, effects: []}
+  20063: {size: 2, effects: [544, 418]}  # EF_REDLIGHTBODY, EF_DOUBLEGUMGANG
+  20064: {size: 2, effects: [1003, 203]}  # EF_BLUELIGHTBODY, EF_GUMGANG
+  20065: {size: 2, effects: [544, 418]}  # EF_REDLIGHTBODY, EF_DOUBLEGUMGANG
+  20066: {size: 1.5, effects: [1003, 203]}  # EF_BLUELIGHTBODY, EF_GUMGANG
+  20112: {size: 1, effects: [822]}  # EF_BOTTOM_MANHOLE
+  20118: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20271: {size: 0.7, effects: []}
+  20273: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20277: {size: 1.5, effects: []}
+  20340: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20341: {size: 1.4, effects: [1003, 419]}  # EF_BLUELIGHTBODY, EF_REFLECTBODY
+  20342: {size: 0.7, effects: []}
+  20343: {size: 0.7, effects: []}
+  20344: {size: 1.5, effects: []}
+  20345: {size: 1.5, effects: []}
+  20346: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20351: {size: 1, effects: [829]}  # EF_BOTTOM_BLOODYLUST
+  20353: {size: 1.3, effects: []}
+  20355: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20356: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20381: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20386: {size: 1, effects: [394]}  # EF_SPHEREWIND2
+  20387: {size: 1, effects: [394]}  # EF_SPHEREWIND2
+  20389: {size: 1, effects: [368]}  # EF_REDBODY
+  20391: {size: 1, effects: [368]}  # EF_REDBODY
+  20392: {size: 1, effects: [419]}  # EF_REFLECTBODY
+  20393: {size: 1, effects: [419]}  # EF_REFLECTBODY
+  20394: {size: 1, effects: [419]}  # EF_REFLECTBODY
+  20419: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20421: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20422: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20426: {size: 1, effects: [696]}  # EF_TORCH_PURPLE
+  20519: {size: 1.7, effects: []}
+  20520: {size: 1.5, effects: []}
+  20573: {size: 1, effects: [1419]}  # EF_AMDARAIS_EFFECT
+  20580: {size: 1, effects: [1003]}  # EF_BLUELIGHTBODY
+  20601: {size: 1.2, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20610: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20611: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20618: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20620: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20621: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20642: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20647: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20648: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20659: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20667: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20668: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20690: {size: 1, effects: [1614, 1615]}  # EF_RED_WAVE1, EF_RED_WAVE2
+  20693: {size: 1, effects: [1611, 1612]}  # EF_BLUE_WAVE1, EF_BLUE_WAVE2
+  20694: {size: 1.3, effects: [1614, 1615]}  # EF_RED_WAVE1, EF_RED_WAVE2
+  20785: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20811: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20813: {size: 1, effects: [1419]}  # EF_AMDARAIS_EFFECT
+  20843: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20846: {size: 1, effects: [674]}  # EF_BOTTOM_EVILLAND
+  20847: {size: 1, effects: [650]}  # EF_MAP_MAGICZONE
+  20928: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20934: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  20943: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21301: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21313: {size: 1.7, effects: [655, 485, 485, 485]}  # EF_UNDEADBODY, EF_DOUBLEGUMGANG2, EF_DOUBLEGUMGANG2, EF_DOUBLEGUMGANG2
+  21314: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21316: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21317: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21319: {size: 1.3, effects: []}
+  21360: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21361: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21384: {size: 1.9, effects: []}
+  21395: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21531: {size: 1.7, effects: []}
+  21537: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21548: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21549: {size: 1, effects: [2364]}  # MAGIC_CIRCLE_PLANT
+  21550: {size: 1, effects: [2362]}  # MAGIC_CIRCLE_INSECT
+  21551: {size: 1, effects: [2362]}  # MAGIC_CIRCLE_INSECT
+  21552: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21553: {size: 1, effects: [2364]}  # MAGIC_CIRCLE_PLANT
+  21554: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21555: {size: 1, effects: [2362]}  # MAGIC_CIRCLE_INSECT
+  21556: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21557: {size: 1, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  21558: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21559: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21560: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21561: {size: 1, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  21562: {size: 1, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  21563: {size: 1, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  21564: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21565: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21566: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21567: {size: 1, effects: [2362]}  # MAGIC_CIRCLE_INSECT
+  21568: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21569: {size: 1, effects: [2356]}  # MAGIC_CIRCLE_ANGEL
+  21570: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21571: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21572: {size: 1, effects: [2365]}  # MAGIC_CIRCLE_UNDEAD
+  21573: {size: 1, effects: [2365]}  # MAGIC_CIRCLE_UNDEAD
+  21574: {size: 1, effects: [2365]}  # MAGIC_CIRCLE_UNDEAD
+  21575: {size: 1, effects: [2365]}  # MAGIC_CIRCLE_UNDEAD
+  21576: {size: 1, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  21577: {size: 1, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  21578: {size: 1, effects: [2361]}  # MAGIC_CIRCLE_HUMAN
+  21579: {size: 1, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  21588: {size: 2.5, effects: []}
+  21590: {size: 1.4, effects: [544]}  # EF_REDLIGHTBODY
+  21634: {size: 1, effects: [2379]}  # EF_NPC_GATE_GREEN
+  21635: {size: 1, effects: [2380]}  # EF_NPC_GATE_PURPLE
+  21636: {size: 1, effects: [2381]}  # EF_NPC_GATE_RED
+  21637: {size: 1, effects: [2376]}  # EF_20TH_CRYSTAL_S
+  21638: {size: 1, effects: [2377]}  # EF_20TH_CRYSTAL_M
+  21639: {size: 1, effects: [2378]}  # EF_20TH_CRYSTAL_L
+  21651: {size: 0.8, effects: []}
+  21809: {size: 1, effects: [2383]}  # EF_NPC_GATE_GREEN_M
+  21810: {size: 1, effects: [2386]}  # EF_NPC_GATE_GREEN_S
+  21811: {size: 1, effects: [2384]}  # EF_NPC_GATE_PURPLE_M
+  21812: {size: 1, effects: [2387]}  # EF_NPC_GATE_PURPLE_S
+  21813: {size: 1, effects: [2385]}  # EF_NPC_GATE_RED_M
+  21814: {size: 1, effects: [2388]}  # EF_NPC_GATE_RED_S
+  21853: {size: 1.2, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  21854: {size: 1.2, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  21889: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21890: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21891: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21892: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21893: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21894: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21895: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  21896: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  21897: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  21898: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  21899: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21900: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21901: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21902: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21903: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21904: {size: 1, effects: [1616]}  # EF_RED_WAVE3
+  21905: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21906: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21907: {size: 1, effects: [1614]}  # EF_RED_WAVE1
+  21920: {size: 1, effects: [2356]}  # MAGIC_CIRCLE_ANGEL
+  21921: {size: 1, effects: [2356]}  # MAGIC_CIRCLE_ANGEL
+  21922: {size: 1, effects: [2356]}  # MAGIC_CIRCLE_ANGEL
+  21923: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21924: {size: 1, effects: [2356]}  # MAGIC_CIRCLE_ANGEL
+  21925: {size: 1, effects: [2362]}  # MAGIC_CIRCLE_INSECT
+  21926: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21927: {size: 1, effects: [2356]}  # MAGIC_CIRCLE_ANGEL
+  21928: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21929: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21930: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21931: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21932: {size: 1, effects: [2360]}  # MAGIC_CIRCLE_FISH
+  21933: {size: 1, effects: [2364]}  # MAGIC_CIRCLE_PLANT
+  21934: {size: 1, effects: [2362]}  # MAGIC_CIRCLE_INSECT
+  21935: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21936: {size: 1, effects: [2357]}  # MAGIC_CIRCLE_ANIMAL
+  21937: {size: 1, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  21938: {size: 1, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  21939: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21940: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21941: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21942: {size: 1, effects: [2365]}  # MAGIC_CIRCLE_UNDEAD
+  21943: {size: 1, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  21950: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21955: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21980: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  21996: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22004: {size: 1.2, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  22005: {size: 1.2, effects: [2358]}  # MAGIC_CIRCLE_DEVIL
+  22140: {size: 1, effects: [2360, 1618]}  # MAGIC_CIRCLE_FISH, EF_BLACK_BUBBLE2
+  22141: {size: 1, effects: [2365, 1618]}  # MAGIC_CIRCLE_UNDEAD, EF_BLACK_BUBBLE2
+  22142: {size: 1, effects: [2362, 1618]}  # MAGIC_CIRCLE_INSECT, EF_BLACK_BUBBLE2
+  22143: {size: 1, effects: [2357, 1618]}  # MAGIC_CIRCLE_ANIMAL, EF_BLACK_BUBBLE2
+  22144: {size: 1, effects: [2361, 1618]}  # MAGIC_CIRCLE_HUMAN, EF_BLACK_BUBBLE2
+  22145: {size: 1, effects: [2363, 1618]}  # MAGIC_CIRCLE_NOTHING, EF_BLACK_BUBBLE2
+  22146: {size: 1, effects: [2356, 1618]}  # MAGIC_CIRCLE_ANGEL, EF_BLACK_BUBBLE2
+  22147: {size: 1, effects: [2357, 1618]}  # MAGIC_CIRCLE_ANIMAL, EF_BLACK_BUBBLE2
+  22148: {size: 1, effects: [2356, 1618]}  # MAGIC_CIRCLE_ANGEL, EF_BLACK_BUBBLE2
+  22149: {size: 1, effects: [2356, 1618]}  # MAGIC_CIRCLE_ANGEL, EF_BLACK_BUBBLE2
+  22150: {size: 1, effects: [2360, 1618]}  # MAGIC_CIRCLE_FISH, EF_BLACK_BUBBLE2
+  22151: {size: 1, effects: [2365, 1618]}  # MAGIC_CIRCLE_UNDEAD, EF_BLACK_BUBBLE2
+  22152: {size: 1, effects: [2364, 1618]}  # MAGIC_CIRCLE_PLANT, EF_BLACK_BUBBLE2
+  22153: {size: 1, effects: [2362, 1618]}  # MAGIC_CIRCLE_INSECT, EF_BLACK_BUBBLE2
+  22154: {size: 1, effects: [2356, 1618]}  # MAGIC_CIRCLE_ANGEL, EF_BLACK_BUBBLE2
+  22155: {size: 1, effects: [2364, 1618]}  # MAGIC_CIRCLE_PLANT, EF_BLACK_BUBBLE2
+  22183: {size: 1, effects: [2402]}  # EF_GLOW_ORANGE
+  22184: {size: 1, effects: [2401]}  # EF_RECT_UP_ORANGE
+  22195: {size: 1.4, effects: []}
+  22199: {size: 1.4, effects: []}
+  22200: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22201: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22202: {size: 1, effects: [1618]}  # EF_BLACK_BUBBLE2
+  22203: {size: 1.4, effects: [1619]}  # EF_BLACK_BUBBLE3
+  22204: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22205: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22206: {size: 1, effects: [1618]}  # EF_BLACK_BUBBLE2
+  22207: {size: 1.4, effects: [1619]}  # EF_BLACK_BUBBLE3
+  22211: {size: 1.4, effects: []}
+  22215: {size: 1.4, effects: []}
+  22219: {size: 1.4, effects: []}
+  22223: {size: 1.4, effects: []}
+  22224: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22225: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22226: {size: 1, effects: [1618]}  # EF_BLACK_BUBBLE2
+  22227: {size: 1.4, effects: [1619]}  # EF_BLACK_BUBBLE3
+  22228: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22229: {size: 1, effects: [1617]}  # EF_BLACK_BUBBLE1
+  22230: {size: 1, effects: [1618]}  # EF_BLACK_BUBBLE2
+  22231: {size: 1.4, effects: [1619]}  # EF_BLACK_BUBBLE3
+  22235: {size: 1.4, effects: []}
+  22239: {size: 1.4, effects: []}
+  22252: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22253: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22254: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22255: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22256: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22257: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22258: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22259: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22260: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22261: {size: 1, effects: [1612, 1618]}  # EF_BLUE_WAVE2, EF_BLACK_BUBBLE2
+  22362: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22363: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22364: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22374: {size: 1.2, effects: [2359]}  # MAGIC_CIRCLE_DRAGON
+  22384: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22386: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22388: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22390: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22392: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22394: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22396: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22398: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22400: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22402: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22404: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22411: {size: 1.5, effects: [2363]}  # MAGIC_CIRCLE_NOTHING
+  22421: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22422: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22433: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22438: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22439: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22440: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22441: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22442: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22477: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22479: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22481: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22483: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22485: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22487: {size: 1.3, effects: [203]}  # EF_GUMGANG
+  22488: {size: 1.1, effects: []}
+  22489: {size: 1.4, effects: [203]}  # EF_GUMGANG
+  22494: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  22495: {size: 1, effects: [678, 679, 680]}  # EF_GREEN99_3, EF_GREEN99_5, EF_GREEN99_6
+  23000: {size: 0.7, effects: []}

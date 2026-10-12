@@ -253,9 +253,7 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
     scene.models = LoadSceneModels(vfs, scene.rsw, scene.gnd, scene);
   }
   // LA TABLE DES EFFETS DE LA CARTE.
-  if (const std::optional<formats::LuaTable> globals = LoadMapEffectToolGlobals(vfs, map_name)) {
-    scene.effect_table = ReadMapEffectTable(*globals, map_name);
-  }
+  scene.effect_table = LoadMapEffectTable(vfs, map_name);
   // Le sprite des cheminées, seulement pour une carte qui en a.
   if (std::ranges::any_of(scene.rsw.effects(), [](const formats::RswEffect& object) {
         return object.number == kMapChimneySmokeEffect;

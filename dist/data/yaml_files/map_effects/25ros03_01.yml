@@ -1,0 +1,25 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte 25ros03_01
+#
+#  Tiré de data\luafiles514\lua files\effecttool\25ros03_01.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 2
+emitters:
+  0: {max_count: 8, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 50], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 20], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.2, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+  1: {max_count: 4, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 50], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 20], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.1, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+  2: {max_count: 6, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 50], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 20], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.1, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+  3: {max_count: 6, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 150], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 23], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.2, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+  4: {max_count: 6, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 50], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 20], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.1, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+  5: {max_count: 5, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 50], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 20], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.1, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+  6: {max_count: 5, first_direction: [0, 0, 0], second_direction: [0, 0, 0], gravity: [0, -1, 0], radius: [150, 0, 50], color: [40, 40, 40, 50], rate: [2, 15], size: [15, 25], life: [2, 10], texture: 'effect\star02_1.bmp', speed: 0.2, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [0, 0, 0], scale: [2, 2]}
+winds: {}
+other_tables: {}

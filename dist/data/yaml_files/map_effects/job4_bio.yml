@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte job4_bio
+#
+#  Tiré de data\luafiles514\lua files\effecttool\job4_bio.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 2
+emitters:
+  0: {max_count: 10, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0, 0, 0], radius: [0, 0, 0], color: [70, 50, 40, 30], rate: [1, 3], size: [10, 20], life: [2, 5], texture: 'effect\star02_1.bmp', speed: 0.3, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [90, 0, 0]}
+  1: {max_count: 10, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0, 0, 0], radius: [0, 0, 0], color: [70, 50, 40, 30], rate: [1, 3], size: [10, 20], life: [2, 5], texture: 'effect\star02_1.bmp', speed: 0.3, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [90, 0, 0]}
+  2: {max_count: 10, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0, 0, 0], radius: [0, 0, 0], color: [70, 50, 40, 30], rate: [1, 3], size: [10, 20], life: [2, 5], texture: 'effect\star02_1.bmp', speed: 0.3, blend_source: 5, blend_destination: 2, depth_tested: true, flat: false, rotation_degrees: [90, 0, 0]}
+winds: {}
+other_tables: {}

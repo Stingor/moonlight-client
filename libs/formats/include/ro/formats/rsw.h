@@ -108,9 +108,9 @@ struct RswModel {
 //
 // ⚠ SON NUMÉRO N'EST PAS UN IDENTIFIANT D'EFFET. Les 152 objets de prontera
 // portent tous le 44, et aucun effet de ce numéro ne dessine quoi que ce soit :
-// c'est un RENVOI vers la table d'émetteurs de la carte, que le client range
-// dans `data\luafiles514\lua files\effecttool\<carte>.lub` — laquelle porte la
-// texture, la cadence, la gravité et la durée de vie des particules.
+// c'est un RENVOI vers la table d'émetteurs de la carte,
+// `data\yaml_files\map_effects\<carte>.yml` — laquelle porte la texture, la
+// cadence, la gravité et la durée de vie des particules.
 struct RswEffect {
   // Octets CP949 bruts, comme tout nom qu'un format RO cite.
   std::string name;

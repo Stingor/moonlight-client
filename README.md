@@ -77,7 +77,7 @@ Dans le dossier d'une installation du jeu, à côté des archives :
 | `Moonlight-Destiny.exe` (`Moonlight-Destiny` sous Linux) | la construction |
 | `moonclient.yml` | `dist/moonclient.yml` — le serveur auquel se connecter |
 | `lang/en.txt`, `lang/es.txt` | `lang/` — l'interface en anglais et en espagnol |
-| `data/yaml_files/*.yml` | `dist/data/yaml_files/` — si l'installation ne les a pas déjà |
+| `data/yaml_files/` | `dist/data/yaml_files/`, sous-dossiers compris — si l'installation ne les a pas déjà |
 
 ## Organisation
 
@@ -155,6 +155,14 @@ tête d'où elle vient et comment la régénérer.
   [ROenglishRE](https://github.com/llchrisll/ROenglishRE) ; ces textes ne sont
   pas revendiqués comme partie de ce projet. Un familier que ce fichier ne
   nomme pas prend le nom de son monstre dans la base du serveur.
+- `monster_size_effects.yml` est tiré du fichier `monster_size_effect.lub`
+  que livre le client, dans sa traduction
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE), dont la licence en
+  permet la distribution et la modification ; il n'est pas revendiqué comme
+  partie de ce projet.
+- `hat_effects.yml` et les tables de `map_effects/` sont tirés des tables
+  d'effets de chapeau et d'effets de carte que livre le client ; elles ne
+  sont pas revendiquées comme partie de ce projet.
 
 Ragnarok Online est une marque de Gravity Co., Ltd. Ce projet n'est ni
 affilié à Gravity ni approuvé par elle.

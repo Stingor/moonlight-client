@@ -6,35 +6,30 @@
 #include <vector>
 
 #include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
 #include "ro/vfs/vfs.h"
 
 namespace ro::vfs {
 
 // LA TAILLE ET LES EFFETS QUE CERTAINS MONSTRES PORTENT D'OFFICE.
 //
-// Le serveur n'en dit rien : c'est une table de l'installation qui grandit tel
-// monstre d'un cinquième et l'entoure de telle aura, par son numéro de classe.
+// Le serveur n'en dit rien : c'est une table qui grandit tel monstre d'un
+// cinquième et l'entoure de telle aura, par son numéro de classe. Elle se lit
+// dans `data\yaml_files\monster_size_effects.yml`, que
+// `scripts/yaml_tables/monster_size_effects.py` tire de la table traduite de
+// l'installation :
 //
-//   tbl = {
-//     [1002] = { MonsterSize = 1.2, MonsterEff = { EFFECT.EF_GREEN99_5 } },
-//   }
+//     version: 1
+//     monsters:
+//       1002: {size: 1.2, effects: [892]}
 //
 // Le client en tire deux choses :
 //
 //   * la TAILLE multiplie le sprite du monstre, ombre comprise. Un pour sa
-//     taille d'origine ; zéro ne change rien.
-//   * les EFFETS s'attachent au monstre à son apparition, et le quittent quand
-//     il se cache. Un effet négatif (`EF_NONE`) n'en est pas un ; un
-//     `MonsterEff` qui n'est pas une liste n'en pose aucun.
-//
-// ⚠ LE FICHIER TRADUIT, comme les autres tables du client patché : c'est lui
-// que le client lit, et l'installation n'a plus de dossier `System\`.
-inline constexpr std::string_view kMonsterSizeEffectPath = "SystemEN\\monster_size_effect.lub";
-
-inline constexpr std::string_view kMonsterSizeEffectGlobal = "tbl";
-inline constexpr std::string_view kMonsterSizeField = "MonsterSize";
-inline constexpr std::string_view kMonsterEffectField = "MonsterEff";
+//     taille d'origine ; zéro ou moins ne change rien.
+//   * les EFFETS s'attachent au monstre à son apparition, dans l'ordre de la
+//     liste, et le quittent quand il se cache.
+inline constexpr std::string_view kMonsterSizeEffectPath =
+    "data\\yaml_files\\monster_size_effects.yml";
 
 class MonsterSizeEffects {
  public:
@@ -44,13 +39,14 @@ class MonsterSizeEffects {
     std::vector<std::uint32_t> effect_ids;
   };
 
-  // Lit la table de l'installation. Absente, elle n'est pas une faute pour
-  // l'appelant : aucun monstre n'est alors grandi ni paré.
+  // Lit la table. Absente, elle n'est pas une faute pour l'appelant : aucun
+  // monstre n'est alors grandi ni paré.
   [[nodiscard]] static core::Result<MonsterSizeEffects> Load(Vfs& vfs);
 
-  // La MÊME lecture, à partir de globales déjà lues — la moitié qui se met sous
-  // test, aucun asset du jeu n'étant versé au dépôt.
-  [[nodiscard]] static core::Result<MonsterSizeEffects> Parse(const formats::LuaTable& globals);
+  // Le texte de la table. Refuse un texte qui n'est pas du YAML, dont `version`
+  // n'est pas 1, ou dont une entrée n'a pas la forme attendue : une classe
+  // entière, une taille numérique, une liste d'identifiants entiers.
+  [[nodiscard]] static core::Result<MonsterSizeEffects> Parse(std::string_view yaml_text);
 
   // Ce que la table dit de cette classe, ou rien.
   [[nodiscard]] const Entry* For(std::uint32_t monster_id) const;

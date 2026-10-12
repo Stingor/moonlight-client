@@ -223,7 +223,7 @@ class EffectsInPlay {
 
   // Les effets de CHAPEAU que les acteurs portent : un costume, une monture,
   // une aura d'événement. ⚠ NI UN ÉTAT NI UN EFFET D'OPTION : ce numéro est un
-  // rang dans `HatEFID`, une table LUA de l'installation, et le confondre ferait
+  // numéro de la table des effets de chapeau, `hat_effects.yml`, et le confondre ferait
   // jouer l'effet d'un état homonyme. Comme les effets d'option, ils ne
   // s'annoncent qu'une fois : le compte du temps les fait durer tant que le
   // costume est porté.

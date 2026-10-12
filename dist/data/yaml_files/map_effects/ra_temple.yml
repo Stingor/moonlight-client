@@ -1,0 +1,18 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte ra_temple
+#
+#  Tiré de data\luafiles514\lua files\effecttool\ra_temple.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 2
+emitters: {}
+winds: {}
+other_tables: {}

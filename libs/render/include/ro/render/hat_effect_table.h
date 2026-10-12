@@ -7,17 +7,26 @@
 #include <vector>
 
 #include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
 #include "ro/vfs/vfs.h"
 
 namespace ro::render {
 
-// LES EFFETS DE CHAPEAU, et ils vivent dans les DONNÉES de l'installation.
+// LES EFFETS DE CHAPEAU, et ils vivent dans les DONNÉES.
 //
 // Un chapeau, une monture, une aura d'événement : le serveur annonce un numéro
-// d'effet de chapeau, et le client va chercher ce qu'il montre dans deux tables
-// Lua de l'installation. C'est la seconde famille à vivre dans les données, après
-// les effets NOMMÉS — voir ADR 0027.
+// d'effet de chapeau, et le client va chercher ce qu'il montre dans une table de
+// données. C'est la seconde famille à vivre dans les données, après les effets
+// NOMMÉS — voir ADR 0027. La table se lit dans `data\yaml_files\hat_effects.yml`,
+// que `scripts/yaml_tables/hat_effects.py` tire des deux tables de l'installation
+// (les noms `HatEFID`, puis les fiches `hatEffectTable`) :
+//
+//     version: 1
+//     hat_effects:
+//       1: {name: 'HAT_EF_BLOSSOM_FLUTTERING', file: 'efst_blossom_fluttering\sakura.str',
+//           offset: -4, offset_x: 1, adjust_position_when_shrunk: true}
+//       5: {name: 'HAT_EF_CLOCKING', effect_id: 120}
+//
+// Un champ absent vaut vide, zéro ou faux.
 //
 // ⚠ ELLE NE DEMANDE AUCUNE MACHINERIE DE DESSIN NOUVELLE. Un exemple isolé
 // (`HAT_EF_Digital_Space`, identifiant 1240, qui ne passe ni par un `.str` ni
@@ -33,15 +42,9 @@ namespace ro::render {
 // autres sont hors du dénominateur du juge — ni cas du répartiteur, ni fichier
 // — et ce qui les résout reste à lire.
 
-// Les deux fichiers, dans l'ordre où ils se lisent : le second nomme ses clés
-// par le premier, et se lit seul rendrait des clés nulles.
-inline constexpr std::string_view kHatEffectIdsPath =
-    "data\\luafiles514\\lua files\\hateffectinfo\\hateffectids.lub";
-inline constexpr std::string_view kHatEffectInfoPath =
-    "data\\luafiles514\\lua files\\hateffectinfo\\hateffectinfo.lub";
-// La globale sous laquelle la seconde range ses fiches, indexées par le NUMÉRO
-// d'effet de chapeau — celui que `HatEFID` nomme et que le serveur envoie.
-inline constexpr std::string_view kHatEffectTableGlobal = "hatEffectTable";
+// Les fiches y sont rangées par le NUMÉRO d'effet de chapeau — celui que le
+// serveur envoie.
+inline constexpr std::string_view kHatEffectTablePath = "data\\yaml_files\\hat_effects.yml";
 
 // LE TROISIÈME RÉSOLVEUR, et il vit dans les données.
 //
@@ -57,9 +60,11 @@ inline constexpr std::uint32_t kHatEffectIdBase = 2442;
 // Ce qu'une fiche décrit.
 struct HatEffect {
   std::uint16_t hat_effect_id = 0;
+  // La constante `HAT_EF_` du client qui porte ce numéro.
+  std::string name;
 
-  // resourceFileName, relatif au dossier des effets. Vide quand la fiche
-  // désigne son effet par un identifiant.
+  // resourceFileName, relatif au dossier des effets, en CP949 comme tout chemin
+  // du VFS. Vide quand la fiche désigne son effet par un identifiant.
   std::string file;
   // hatEffectID : un identifiant d'effet ordinaire, celui des deux tables de
   // fichiers du client et du répartiteur procédural, ou une classe du
@@ -82,7 +87,8 @@ struct HatEffect {
   bool adjust_size_when_shrunk = false;
   // isRenderBeforeCharacter : le `.str` passe dans la file du sol, AVANT les
   // corps. Faux sur une fiche sans `hatEffectPos`, quoi qu'elle écrive : le
-  // client ne consulte le drapeau que si le décalage est nommé.
+  // client ne consulte le drapeau que si le décalage est nommé, et la
+  // conversion l'a déjà résolu.
   bool render_before_character = false;
   bool ignore_riding = false;
   bool attached_head = false;
@@ -94,16 +100,14 @@ struct HatEffect {
 // La table entière, triée par numéro d'effet de chapeau.
 class HatEffectTable {
  public:
-  // Lit les deux fichiers dans l'ordre, comme le client. L'échec dit lequel.
+  // Lit la table. L'échec dit pourquoi.
   [[nodiscard]] static core::Result<HatEffectTable> Load(vfs::Vfs& vfs);
 
-  // La MEME lecture, à partir de globales déjà lues.
-  //
-  // Séparée de `Load` parce que c'est la seule moitié qui se met sous test : un
-  // essai n'a pas d'installation, et aucun asset du jeu n'est versé au dépôt.
-  // Il lui suffit de trois lignes de Lua en clair, que le lecteur accepte au
-  // même titre que le bytecode.
-  [[nodiscard]] static core::Result<HatEffectTable> Parse(const formats::LuaTable& globals);
+  // Le texte de la table. Refuse un texte qui n'est pas du YAML, dont
+  // `version` n'est pas 1, sans `hat_effects`, ou dont une fiche n'a pas la
+  // forme attendue : une table rend alors une ERREUR, jamais une table vide,
+  // qui se lirait « aucun effet de chapeau » et se découvrirait en jeu.
+  [[nodiscard]] static core::Result<HatEffectTable> Parse(std::string_view yaml_text);
 
   // Nul si ce numéro n'a pas de fiche. C'est un cas NORMAL : `HatEFID` nomme
   // 292 effets et la table n'en décrit que 259.

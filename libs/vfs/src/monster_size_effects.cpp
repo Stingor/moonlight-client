@@ -4,80 +4,70 @@
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
-#include <optional>
+#include <expected>
 #include <string>
 #include <utility>
+
+#include <yaml-cpp/yaml.h>
 
 namespace ro::vfs {
 namespace {
 
-// Un numéro de classe ou d'effet voyage en trente-deux bits signés.
-constexpr std::uint32_t kMostNumber =
-    static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max());
+constexpr int kSupportedVersion = 1;
 
-// Les effets d'une entrée, dans l'ordre de la table. ⚠ UN NOMBRE N'EST PAS UNE
-// LISTE : le client ne pose alors aucun effet, et `EF_NONE` vaut moins un.
-[[nodiscard]] std::vector<std::uint32_t> EffectsOf(const formats::LuaTable& entry) {
-  std::vector<std::uint32_t> effects;
-  const formats::LuaValue* list = entry.Find(kMonsterEffectField);
-  if (list == nullptr || list->kind != formats::LuaValue::Kind::kTable || list->table == nullptr) {
-    return effects;
-  }
-  for (const auto& [index, value] : list->table->by_index) {
-    if (value.kind != formats::LuaValue::Kind::kNumber) {
-      continue;
-    }
-    if (const std::optional<std::uint32_t> effect =
-            formats::LuaWholeNumber(value.number, kMostNumber);
-        effect.has_value()) {
-      effects.push_back(*effect);
-    }
-  }
-  return effects;
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData,
+                     std::string(kMonsterSizeEffectPath) + " : " + std::move(detail)};
 }
 
 }  // namespace
 
 core::Result<MonsterSizeEffects> MonsterSizeEffects::Load(Vfs& vfs) {
-  auto bytes = vfs.Read(kMonsterSizeEffectPath);
+  auto bytes = vfs.Read(std::string(kMonsterSizeEffectPath));
   if (!bytes) {
     return std::unexpected(bytes.error());
   }
-  // ⚠ LE FICHIER SE TERMINE PAR `main`, qui déclare chaque entrée au client. Le
-  // lecteur la saute : la donnée est dans la table.
-  auto read = formats::ReadLuaFile(*bytes, formats::LuaTable{});
-  if (!read) {
-    return std::unexpected(read.error());
-  }
-  return Parse(*read);
+  return Parse(std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
 }
 
-core::Result<MonsterSizeEffects> MonsterSizeEffects::Parse(const formats::LuaTable& globals) {
-  const formats::LuaValue* table = globals.Find(kMonsterSizeEffectGlobal);
-  if (table == nullptr || table->kind != formats::LuaValue::Kind::kTable ||
-      table->table == nullptr) {
-    return core::Fail(core::ErrorCode::kCorruptData, std::string(kMonsterSizeEffectGlobal) +
-                                                         " n'est pas une table dans " +
-                                                         std::string(kMonsterSizeEffectPath));
-  }
+core::Result<MonsterSizeEffects> MonsterSizeEffects::Parse(std::string_view yaml_text) {
   MonsterSizeEffects loaded;
-  for (const auto& [index, value] : table->table->by_index) {
-    const std::optional<std::uint32_t> monster_id = formats::LuaWholeNumber(index, kMostNumber);
-    if (!monster_id.has_value() || value.kind != formats::LuaValue::Kind::kTable ||
-        value.table == nullptr) {
-      continue;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
     }
-    // ⚠ LA TAILLE EST EXIGÉE, comme chez le client, qui refuse l'entrée sans
-    // elle avant même de lire ses effets.
-    const formats::LuaValue* size = value.table->Find(kMonsterSizeField);
-    if (size == nullptr || size->kind != formats::LuaValue::Kind::kNumber ||
-        !std::isfinite(size->number)) {
-      continue;
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
     }
-    loaded.entries_.push_back(Entry{.monster_id = *monster_id,
-                                    .size = static_cast<float>(size->number),
-                                    .effect_ids = EffectsOf(*value.table)});
+    const YAML::Node monsters = whole["monsters"];
+    if (!monsters || !monsters.IsMap()) {
+      return std::unexpected(Refused("« monsters » n'est pas une table"));
+    }
+    for (const auto& pair : monsters) {
+      const YAML::Node& entry = pair.second;
+      if (!entry.IsMap()) {
+        return std::unexpected(Refused("entrée mal formée : " + pair.first.as<std::string>()));
+      }
+      const YAML::Node size = entry["size"];
+      const YAML::Node effects = entry["effects"];
+      if (!size || !size.IsScalar() || !effects || !effects.IsSequence()) {
+        return std::unexpected(Refused("entrée mal formée : " + pair.first.as<std::string>()));
+      }
+      Entry read{
+          .monster_id = pair.first.as<std::uint32_t>(), .size = size.as<float>(), .effect_ids = {}};
+      if (!std::isfinite(read.size)) {
+        return std::unexpected(Refused("taille non finie : " + pair.first.as<std::string>()));
+      }
+      for (const YAML::Node& effect : effects) {
+        read.effect_ids.push_back(effect.as<std::uint32_t>());
+      }
+      loaded.entries_.push_back(std::move(read));
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
   }
   std::ranges::sort(loaded.entries_, {}, &Entry::monster_id);
   return loaded;

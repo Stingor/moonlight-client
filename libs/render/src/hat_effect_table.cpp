@@ -1,101 +1,103 @@
 #include "ro/render/hat_effect_table.h"
 
 #include <algorithm>
+#include <expected>
+#include <string>
 #include <utility>
 
-#include "ro/formats/lua_table.h"
+#include <yaml-cpp/yaml.h>
+
+#include "ro/vfs/encoding.h"
 
 namespace ro::render {
 namespace {
 
-// Les noms des champs, tels que la table les écrit.
-constexpr std::string_view kFile = "resourceFileName";
-constexpr std::string_view kEffectId = "hatEffectID";
-constexpr std::string_view kOffset = "hatEffectPos";
-constexpr std::string_view kOffsetX = "hatEffectPosX";
-constexpr std::string_view kAdjustPosition = "isAdjustPositionWhenShrinkState";
-constexpr std::string_view kAdjustSize = "isAdjustSizeWhenShrinkState";
-constexpr std::string_view kRenderBefore = "isRenderBeforeCharacter";
-constexpr std::string_view kIgnoreRiding = "isIgnoreRiding";
-constexpr std::string_view kAttachedHead = "isAttachedHead";
-constexpr std::string_view kEffectPair = "isEffectPair";
+constexpr int kSupportedVersion = 1;
 
-[[nodiscard]] float Number(const formats::LuaTable& record, std::string_view field) {
-  const formats::LuaValue* value = record.Find(field);
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kNumber) {
-    return 0.0F;
-  }
-  return static_cast<float>(value->number);
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData,
+                     std::string(kHatEffectTablePath) + " : " + std::move(detail)};
 }
 
-// ⚠ UN DRAPEAU ABSENT VAUT FAUX, et c'est ainsi que la table est écrite : aucune
-// fiche ne porte `false`, elles omettent le champ. Le lire autrement rendrait
-// 259 fiches toutes pareilles.
-[[nodiscard]] bool Flag(const formats::LuaTable& record, std::string_view field) {
-  const formats::LuaValue* value = record.Find(field);
-  return value != nullptr && value->kind == formats::LuaValue::Kind::kBoolean && value->boolean;
+// Un drapeau ABSENT vaut faux : la table n'écrit que ceux qui sont vrais.
+[[nodiscard]] bool Flag(const YAML::Node& record, const char* field) {
+  const YAML::Node value = record[field];
+  return value && value.as<bool>();
 }
 
-[[nodiscard]] std::string Text(const formats::LuaTable& record, std::string_view field) {
-  const formats::LuaValue* value = record.Find(field);
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kString) {
-    return {};
+[[nodiscard]] float Number(const YAML::Node& record, const char* field) {
+  const YAML::Node value = record[field];
+  return value ? value.as<float>() : 0.0F;
+}
+
+// Une fiche. Une exception de yaml-cpp, ou un refus.
+[[nodiscard]] core::Result<HatEffect> ParseRecord(const YAML::Node& key, const YAML::Node& record) {
+  if (!record.IsMap()) {
+    return std::unexpected(Refused("fiche mal formée : " + key.as<std::string>()));
   }
-  return value->text;
+  HatEffect effect;
+  effect.hat_effect_id = key.as<std::uint16_t>();
+  if (const YAML::Node name = record["name"]; name) {
+    effect.name = name.as<std::string>();
+  }
+  if (const YAML::Node file = record["file"]; file) {
+    // Le YAML est en UTF-8, le VFS cherche ses chemins en CP949.
+    auto path = vfs::Utf8ToCp949(file.as<std::string>());
+    if (!path) {
+      return std::unexpected(Refused("fichier illisible : " + key.as<std::string>()));
+    }
+    effect.file = std::move(*path);
+  }
+  if (const YAML::Node effect_id = record["effect_id"]; effect_id) {
+    effect.effect_id = effect_id.as<std::uint32_t>();
+  }
+  effect.offset = Number(record, "offset");
+  effect.offset_x = Number(record, "offset_x");
+  effect.adjust_position_when_shrunk = Flag(record, "adjust_position_when_shrunk");
+  effect.adjust_size_when_shrunk = Flag(record, "adjust_size_when_shrunk");
+  effect.render_before_character = Flag(record, "render_before_character");
+  effect.ignore_riding = Flag(record, "ignore_riding");
+  effect.attached_head = Flag(record, "attached_head");
+  effect.effect_pair = Flag(record, "effect_pair");
+  return effect;
 }
 
 }  // namespace
 
 core::Result<HatEffectTable> HatEffectTable::Load(vfs::Vfs& vfs) {
-  formats::LuaTable globals;
-  // ⚠ L'ORDRE COMPTE, et il n'est pas une commodité : la seconde table indexe
-  // ses fiches par `HatEFID.QUELQUE_CHOSE`, que la première nomme. Lue seule,
-  // elle rend des clés nulles — et le lecteur le REFUSE plutôt que de deviner.
-  for (const std::string_view path : {kHatEffectIdsPath, kHatEffectInfoPath}) {
-    auto bytes = vfs.Read(path);
-    if (!bytes) {
-      return std::unexpected(bytes.error());
-    }
-    auto read = formats::ReadLuaFile(*bytes, std::move(globals));
-    if (!read) {
-      return std::unexpected(read.error());
-    }
-    globals = std::move(*read);
+  auto bytes = vfs.Read(std::string(kHatEffectTablePath));
+  if (!bytes) {
+    return std::unexpected(bytes.error());
   }
-  return Parse(globals);
+  return Parse(std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
 }
 
-core::Result<HatEffectTable> HatEffectTable::Parse(const formats::LuaTable& globals) {
-  const formats::LuaValue* table = globals.Find(kHatEffectTableGlobal);
-  if (table == nullptr || table->kind != formats::LuaValue::Kind::kTable ||
-      table->table == nullptr) {
-    return core::Fail(core::ErrorCode::kCorruptData, std::string(kHatEffectTableGlobal) +
-                                                         " n'est pas une table dans " +
-                                                         std::string(kHatEffectInfoPath));
-  }
-
+core::Result<HatEffectTable> HatEffectTable::Parse(std::string_view yaml_text) {
   HatEffectTable loaded;
-  loaded.entries_.reserve(table->table->by_index.size());
-  for (const auto& [index, value] : table->table->by_index) {
-    if (value.kind != formats::LuaValue::Kind::kTable || value.table == nullptr) {
-      continue;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
     }
-    const formats::LuaTable& record = *value.table;
-    HatEffect effect;
-    effect.hat_effect_id = static_cast<std::uint16_t>(index);
-    effect.file = Text(record, kFile);
-    effect.effect_id = static_cast<std::uint32_t>(Number(record, kEffectId));
-    effect.offset = Number(record, kOffset);
-    effect.offset_x = Number(record, kOffsetX);
-    effect.adjust_position_when_shrunk = Flag(record, kAdjustPosition);
-    effect.adjust_size_when_shrunk = Flag(record, kAdjustSize);
-    // ⚠ SANS DÉCALAGE VERTICAL, LE DRAPEAU NE COMPTE PAS : le client ne le lit
-    // que sur une fiche qui nomme `hatEffectPos`, et répond faux pour les autres.
-    effect.render_before_character = Flag(record, kRenderBefore) && record.Find(kOffset) != nullptr;
-    effect.ignore_riding = Flag(record, kIgnoreRiding);
-    effect.attached_head = Flag(record, kAttachedHead);
-    effect.effect_pair = Flag(record, kEffectPair);
-    loaded.entries_.push_back(std::move(effect));
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
+    }
+    const YAML::Node records = whole["hat_effects"];
+    if (!records || !records.IsMap()) {
+      return std::unexpected(Refused("« hat_effects » n'est pas une table"));
+    }
+    loaded.entries_.reserve(records.size());
+    for (const auto& pair : records) {
+      core::Result<HatEffect> effect = ParseRecord(pair.first, pair.second);
+      if (!effect) {
+        return std::unexpected(effect.error());
+      }
+      loaded.entries_.push_back(std::move(*effect));
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
   }
   std::ranges::sort(loaded.entries_, {}, &HatEffect::hat_effect_id);
   return loaded;

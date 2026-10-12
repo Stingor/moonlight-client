@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte 1@tnm3
+#
+#  Tiré de data\luafiles514\lua files\effecttool\1@tnm3.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 0
+emitters:
+  0: {max_count: 40, first_direction: [-2, 2, 0], second_direction: [2, -1, 2], gravity: [0.7, -3, 1], radius: [-1, 2, -1], color: [95, 75, 50, 150], rate: [20, 100], size: [5, 10], life: [5, 7], texture: 'smoke2.bmp', speed: 1, blend_source: 5, blend_destination: 2}
+  1: {max_count: 40, first_direction: [-2, 2, 0], second_direction: [2, -1, 2], gravity: [0.7, -3, 1], radius: [-1, 2, -1], color: [95, 75, 50, 150], rate: [20, 100], size: [5, 10], life: [5, 7], texture: 'smoke2.bmp', speed: 1, blend_source: 5, blend_destination: 2}
+winds: {}
+other_tables: {}

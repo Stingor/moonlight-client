@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les effets posés sur la carte 1@mir
+#
+#  Tiré de data\luafiles514\lua files\effecttool\1@mir.lub, tel que le
+#  livre moonlight.grf : une table de Gravity, que ce dépôt ne revendique pas comme
+#  sienne. Valeurs déjà converties comme le client d'origine les lit ; un champ
+#  absent garde la valeur par défaut du client (ro/render/map_effect_table.h).
+#
+#  Fichier produit par scripts/yaml_tables/map_effects.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/map_effects.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/map_effects
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+table_version: 2
+emitters:
+  0: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 50, 70, 75], rate: [5, 10], size: [3, 3], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  1: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 50, 80, 200], rate: [5, 10], size: [3, 3], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  2: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  3: {max_count: 5, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [160, 130, 100, 200], rate: [1, 20], size: [10, 30], life: [2, 10], texture: 'effect\13 copy.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  4: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 50, 80, 200], rate: [5, 10], size: [3, 3], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  5: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 50, 80, 200], rate: [5, 10], size: [3, 3], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  6: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 50, 80, 200], rate: [5, 10], size: [3, 3], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  7: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [30, 50, 70, 75], rate: [5, 10], size: [3, 3], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  8: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  9: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  10: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  11: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  12: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  13: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  14: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [5, 5], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  15: {max_count: 15, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [6, 6], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+  16: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [30, 35], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 9, blend_destination: 2, depth_tested: true}
+  17: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [25, 30], life: [3, 3], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 9, blend_destination: 2, depth_tested: true}
+  18: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [20, 80, 60, 75], rate: [2, 2], size: [30, 35], life: [2, 2], texture: 'effect\smoke2.bmp', speed: 0, blend_source: 9, blend_destination: 2, depth_tested: true}
+  19: {max_count: 20, first_direction: [-3, -5, -3], second_direction: [5, 0, 5], gravity: [0.7, -2, 0.7], radius: [0, 0, 0], color: [60, 50, 70, 200], rate: [5, 10], size: [20, 25], life: [2, 2], texture: 'effect\freeze.bmp', speed: 0, blend_source: 5, blend_destination: 2, depth_tested: true}
+winds: {}
+other_tables: {}
