@@ -9,6 +9,7 @@
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 
+#include "ro/core/log.h"
 #include "ro/render/window_fit.h"
 
 namespace ro::render {
@@ -128,6 +129,11 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
   if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
     return Fail(ErrorCode::kIoFailure, std::string("SDL_InitSubSystem : ") + SDL_GetError());
   }
+  if (visible) {
+    const char* driver = SDL_GetCurrentVideoDriver();
+    core::LogInfo("vidéo : pilote SDL {}, {} écran(s)", driver == nullptr ? "(aucun)" : driver,
+                  DisplayIds().size());
+  }
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, kGlMajorVersion);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kGlMinorVersion);
@@ -174,13 +180,33 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
     return Fail(ErrorCode::kIoFailure, std::string("SDL_CreateWindow : ") + SDL_GetError());
   }
 
+  // ⚠ LA LIGNE AVANT L'APPEL, et non après : c'est dans le pilote graphique que
+  // tombent les fermetures sans rapport, et le journal doit alors s'arrêter sur
+  // ce qu'on lui demandait.
+  if (visible) {
+    core::LogInfo("vidéo : fenêtre {}×{} posée, contexte OpenGL {}.{} core demandé", asked.width,
+                  asked.height, kGlMajorVersion, kGlMinorVersion);
+  }
   context->context_ = SDL_GL_CreateContext(context->window_);
   if (context->context_ == nullptr) {
-    return Fail(ErrorCode::kIoFailure, std::string("SDL_GL_CreateContext : ") + SDL_GetError());
+    return Fail(ErrorCode::kIoFailure,
+                std::string("SDL_GL_CreateContext : ") + SDL_GetError() +
+                    " — pilote graphique absent, trop ancien, ou sans OpenGL 3.3");
   }
 
   if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress)) == 0) {
     return Fail(ErrorCode::kIoFailure, "chargement des fonctions OpenGL impossible");
+  }
+  if (visible) {
+    // QUELLE CARTE A RÉPONDU : sur un portable à deux cartes, la puce intégrée
+    // répond souvent à la place de l'autre, et c'est d'elle que viennent les
+    // pannes.
+    const auto text_of = [](GLenum name) {
+      const auto* text = reinterpret_cast<const char*>(glGetString(name));
+      return std::string(text == nullptr ? "(inconnu)" : text);
+    };
+    core::LogInfo("vidéo : {} — {} — OpenGL {}", text_of(GL_VENDOR), text_of(GL_RENDERER),
+                  text_of(GL_VERSION));
   }
   // Un contexte 3.3 core demandé peut être honoré par un pilote qui rend moins :
   // mieux vaut le constater ici que sur un shader qui refuse de compiler.

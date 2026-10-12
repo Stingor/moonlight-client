@@ -1,6 +1,7 @@
 #include "patcher/patch_run.h"
 
 #include <array>
+#include <chrono>
 #include <fstream>
 #include <string_view>
 #include <system_error>
@@ -38,11 +39,15 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
   for (const PatchMirror& mirror : config.mirrors) {
     auto text = fetcher.FetchText(mirror.list_url, kPatchListLimitBytes, stop);
     if (!text) {
+      ro::core::LogWarning("patcher : miroir {} injoignable ({}) — {}", mirror.name,
+                           mirror.list_url, ro::core::Describe(text.error()));
       failures += "\n  " + mirror.name + " : " + ro::core::Describe(text.error());
       continue;
     }
     auto patches = ParsePatchList(*text);
     if (!patches) {
+      ro::core::LogWarning("patcher : liste du miroir {} illisible — {}", mirror.name,
+                           ro::core::Describe(patches.error()));
       failures += "\n  " + mirror.name + " : " + ro::core::Describe(patches.error());
       continue;
     }
@@ -90,6 +95,9 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
   progress.phase = PatchPhase::kDownloading;
   progress.download = FetchProgress{};
   board.Publish(progress);
+  ro::core::LogInfo("patcher : téléchargement de {} (index {}, {}/{})", patch.archive_name,
+                    patch.patch_index, progress.patch_number, progress.patch_count);
+  const auto download_started = std::chrono::steady_clock::now();
   auto fetched = fetcher.FetchToFile(
       archive_url + patch.archive_name, local_path, kArchiveLimitBytes,
       [&](const FetchProgress& download) {
@@ -100,6 +108,11 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
   if (!fetched) {
     return std::unexpected(fetched.error());
   }
+  ro::core::LogInfo("patcher : {} reçu, {} octet(s) en {} ms", patch.archive_name,
+                    progress.download.received_bytes,
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - download_started)
+                        .count());
 
   // Le fichier téléchargé ne survit pas à ce patch, quelle qu'en soit l'issue.
   struct Discard {
@@ -124,6 +137,8 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
 
   progress.phase = PatchPhase::kApplying;
   board.Publish(progress);
+  ro::core::LogInfo("patcher : application de {} ({})", patch.archive_name,
+                    patch.sha256_hex.empty() ? "sans empreinte" : "empreinte vérifiée");
   auto archive = ro::formats::ThorArchive::OpenFile(local_path);
   if (!archive) {
     return Fail(archive.error().code, patch.archive_name + " : " + archive.error().detail);
@@ -148,6 +163,11 @@ Result<PatchRunOutcome> RunPatches(const PatchRunSettings& settings, PatchFetche
   const auto fail = [&](const ro::core::Error& error) -> Result<PatchRunOutcome> {
     progress.phase = stop.stop_requested() ? PatchPhase::kStopped : PatchPhase::kFailed;
     progress.failure = ro::core::Describe(error);
+    // ⚠ ICI ET NON À L'ÉCRAN SEULEMENT : le joueur peut fermer la fenêtre sur
+    // l'échec, et c'est alors la seule trace de ce qui a échoué.
+    ro::core::LogError("patcher : {} — {}",
+                       stop.stop_requested() ? "interrompu" : "la mise à jour échoue",
+                       progress.failure);
     board.Publish(progress);
     return std::unexpected(error);
   };
@@ -161,6 +181,8 @@ Result<PatchRunOutcome> RunPatches(const PatchRunSettings& settings, PatchFetche
   }
   const std::vector<PatchEntry> pending =
       PendingPatches(*patches, ReadLastAppliedPatch(settings.install_root));
+  ro::core::LogInfo("patcher : {} patch(s) à appliquer sur {} listé(s)", pending.size(),
+                    patches->size());
 
   PatchTarget target{settings.install_root, settings.config.default_grf, settings.config.create_grf,
                      settings.running_executable};

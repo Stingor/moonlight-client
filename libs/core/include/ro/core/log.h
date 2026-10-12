@@ -7,11 +7,13 @@
 #include <optional>
 #include <source_location>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "ro/core/build_flavor.h"
+#include "ro/core/error.h"
 
 namespace ro::core {
 
@@ -19,7 +21,27 @@ namespace ro::core {
 // donné, et la MÉMOIRE — voir `RecentLogLines`. Appelée une fois au démarrage ;
 // sans appel, l'écriture se fait sur la console avec les réglages par défaut,
 // ce qui convient aux tests.
-void InitLogging(const std::filesystem::path& file_path = {});
+//
+// Rend une erreur si le FICHIER ne s'ouvre pas en écriture. La console et la
+// mémoire sont posées quand même : le client continue, mais personne ne lira
+// ce qu'il dit, et c'est à l'appelant de le faire savoir au joueur.
+//
+// 🔴 LE JOURNAL DU LANCEMENT PRÉCÉDENT N'EST PAS ÉCRASÉ : il est mis de côté
+// sous `<nom>.precedent<ext>`, puis relu. S'il ne finit ni par la ligne que
+// pose `EndLogFile`, ni par un plantage rapporté, le nouveau journal le dit en
+// alerte, avec sa dernière ligne. C'est la seule trace d'un processus tué de
+// l'extérieur — antivirus, gestionnaire des tâches — que rien d'autre ne voit
+// mourir, et le joueur qui relançait l'effaçait.
+[[nodiscard]] Result<void> InitLogging(const std::filesystem::path& file_path = {});
+
+// Écrit la ligne de FIN, `why` disant pourquoi, puis ferme le fichier ; la
+// console et la mémoire continuent.
+//
+// ⚠ UN JOURNAL SANS CETTE LIGNE EST CELUI D'UN PROCESSUS MORT SANS PRÉVENIR :
+// c'est ce que relit `InitLogging` au lancement suivant. Elle se pose donc sur
+// TOUTE sortie voulue — et avant une relance, qui rouvre le même fichier depuis
+// un autre processus : deux processus qui y écrivent ensemble s'écrasent.
+void EndLogFile(std::string_view why);
 
 // La gravité d'une ligne.
 //

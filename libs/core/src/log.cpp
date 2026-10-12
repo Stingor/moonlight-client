@@ -3,18 +3,25 @@
 #include <algorithm>
 #include <chrono>
 #include <deque>
+#include <exception>
+#include <format>
+#include <fstream>
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <string_view>
+#include <system_error>
 #include <utility>
 #include <vector>
 
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/dist_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include "ro/core/build_stamp.h"
 #include "ro/core/console.h"
+#include "ro/core/utf8_path.h"
 
 namespace ro::core {
 namespace {
@@ -60,6 +67,101 @@ struct Memory {
   return spdlog::level::info;
 }
 
+// La ligne qui clôt un journal : voir `EndLogFile`. Sa formulation est relue au
+// lancement suivant, donc elle ne change pas sans que la relecture suive.
+constexpr std::string_view kSessionEndMarker = "journal fermé proprement";
+// Ce que le filet écrit sur un plantage : voir `crash_report.cpp`.
+constexpr std::string_view kCrashMarker = "PLANTAGE";
+// `moonclient.log` devient `moonclient.precedent.log`.
+constexpr std::string_view kPreviousLogInfix = ".precedent";
+// Ce qu'on relit de la fin du journal précédent : la ligne de fin y est la
+// dernière, et la dernière ligne utile se tient juste avant.
+constexpr std::uintmax_t kPreviousTailBytes = 4096;
+
+// LA PORTE DU FICHIER : un puits qui en contient un autre, ou aucun.
+//
+// C'est elle que tient le logger, et non le fichier lui-même : la fermer, c'est
+// vider la porte, sous son verrou, sans toucher à la liste des puits du logger.
+[[nodiscard]] const std::shared_ptr<spdlog::sinks::dist_sink_mt>& FileGate() {
+  static const auto gate = std::make_shared<spdlog::sinks::dist_sink_mt>();
+  return gate;
+}
+
+enum class PreviousLogAside : std::uint8_t {
+  kNone,   // aucun journal précédent
+  kMoved,  // mis de côté, à relire
+  kInUse,  // tenu ouvert par un autre processus : il sera écrasé
+};
+
+struct PreviousLog {
+  PreviousLogAside aside = PreviousLogAside::kNone;
+  std::filesystem::path path;
+};
+
+[[nodiscard]] PreviousLog SetPreviousLogAside(const std::filesystem::path& file_path) {
+  PreviousLog previous;
+  std::error_code failed;
+  if (!std::filesystem::exists(file_path, failed)) {
+    return previous;
+  }
+  previous.path = file_path;
+  previous.path.replace_extension();
+  previous.path += kPreviousLogInfix;
+  previous.path += file_path.extension();
+  // L'avant-dernier s'efface d'abord : `rename` ne remplace pas partout.
+  std::filesystem::remove(previous.path, failed);
+  std::filesystem::rename(file_path, previous.path, failed);
+  previous.aside = failed ? PreviousLogAside::kInUse : PreviousLogAside::kMoved;
+  return previous;
+}
+
+// La dernière ligne non vide d'un texte, sans son retour chariot.
+[[nodiscard]] std::string_view LastLine(std::string_view text) {
+  while (!text.empty() && (text.back() == '\n' || text.back() == '\r')) {
+    text.remove_suffix(1);
+  }
+  const std::size_t start = text.rfind('\n');
+  return start == std::string_view::npos ? text : text.substr(start + 1);
+}
+
+// Dit au journal neuf comment le précédent s'est terminé, quand ce n'est pas
+// par une sortie voulue.
+void ReviewPreviousLog(const std::filesystem::path& previous) {
+  const std::string shown = Utf8FromPath(previous.filename());
+  std::error_code failed;
+  const std::uintmax_t size_bytes = std::filesystem::file_size(previous, failed);
+  if (failed) {
+    return;
+  }
+  if (size_bytes == 0) {
+    LogWarning(
+        "lancement précédent : son journal ({}) est VIDE — le processus est mort avant sa première "
+        "ligne, ou le dossier laissait créer le fichier sans y écrire (antivirus, dossier protégé)",
+        shown);
+    return;
+  }
+  std::ifstream file(previous, std::ios::binary);
+  const std::uintmax_t start_byte =
+      size_bytes > kPreviousTailBytes ? size_bytes - kPreviousTailBytes : 0;
+  file.seekg(static_cast<std::streamoff>(start_byte));
+  std::string tail(static_cast<std::size_t>(size_bytes - start_byte), '\0');
+  file.read(tail.data(), static_cast<std::streamsize>(tail.size()));
+  tail.resize(static_cast<std::size_t>(file.gcount()));
+  if (tail.find(kSessionEndMarker) != std::string::npos) {
+    return;
+  }
+  if (tail.find(kCrashMarker) != std::string::npos) {
+    LogWarning("lancement précédent : il a planté — son rapport plantage-*.txt et {} sont à côté",
+               shown);
+    return;
+  }
+  LogWarning(
+      "lancement précédent : arrêté SANS PRÉVENIR, ni fin ni plantage rapporté — tué de "
+      "l'extérieur (antivirus, gestionnaire des tâches, arrêt de Windows) ou faute que le filet ne "
+      "voit pas. Sa dernière ligne, dans {} : « {} »",
+      shown, LastLine(tail));
+}
+
 }  // namespace
 
 std::string_view ToString(LogLevel level) noexcept {
@@ -76,18 +178,34 @@ std::string_view ToString(LogLevel level) noexcept {
   return "info";
 }
 
-void InitLogging(const std::filesystem::path& file_path) {
+Result<void> InitLogging(const std::filesystem::path& file_path) {
   // ⚠ AVANT LE PREMIER PUITS, ET C'EST ICI QUE CELA VA : ce journal POSSÈDE la
   // console, c'est lui qui y écrit du français, et une console qui décode nos
   // octets dans une autre page rend sa moitié affichée illisible. Voir
   // `UseUtf8Console`.
   UseUtf8Console();
 
+  Result<void> opened;
+  PreviousLog previous;
   std::vector<spdlog::sink_ptr> sinks;
-  sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+  // 🔴 LE FICHIER EN PREMIER : les puits s'appellent dans l'ordre, et c'est lui
+  // qui doit tenir une ligne si la console, derrière, ne rend pas la main.
+  sinks.push_back(FileGate());
   if (!file_path.empty()) {
-    sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(file_path.string(), true));
+    previous = SetPreviousLogAside(file_path);
+    // ⚠ spdlog SIGNALE PAR EXCEPTION un fichier qu'il ne peut ouvrir. Laissée
+    // filer, elle tuait le client avant sa première ligne et avant toute boîte.
+    try {
+      FileGate()->set_sinks(
+          {std::make_shared<spdlog::sinks::basic_file_sink_mt>(file_path.string(), true)});
+    } catch (const std::exception& problem) {
+      opened =
+          Fail(ErrorCode::kIoFailure,
+               std::format("{} ne s'ouvre pas en écriture : {}",
+                           Utf8FromPath(std::filesystem::absolute(file_path)), problem.what()));
+    }
   }
+  sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 
   auto logger = std::make_shared<spdlog::logger>("moonclient", sinks.begin(), sinks.end());
   // `%s:%#` est le fichier et la ligne qui ont écrit. Le motif ne les portait
@@ -115,6 +233,30 @@ void InitLogging(const std::filesystem::path& file_path) {
   // quelle version il jouait oblige à le lui redemander, souvent des jours plus
   // tard, et parfois à chercher une panne déjà corrigée.
   LogInfo("moonclient {} — revision {} (arbre {})", kBuildVersion, kBuildCommit, kBuildTree);
+  if (!opened) {
+    LogError("journal : {} — rien de ce qui suit n'atteint le disque", Describe(opened.error()));
+  }
+  switch (previous.aside) {
+    case PreviousLogAside::kNone:
+      break;
+    case PreviousLogAside::kMoved:
+      ReviewPreviousLog(previous.path);
+      break;
+    case PreviousLogAside::kInUse:
+      LogWarning(
+          "journal : le précédent est encore tenu ouvert — un autre client tourne-t-il déjà dans "
+          "ce dossier ? Ce journal-ci l'écrase");
+      break;
+  }
+  return opened;
+}
+
+void EndLogFile(std::string_view why) {
+  LogInfo("{} : {}", kSessionEndMarker, why);
+  // ⚠ PAR LA PORTE, ET NON EN RETIRANT LE PUITS DU LOGGER : un autre fil peut
+  // écrire au même instant, et la liste des puits d'un logger ne se modifie pas
+  // sous ses pieds. La porte, elle, se vide sous son propre verrou.
+  FileGate()->set_sinks({});
 }
 
 void WriteLog(LogLevel level, const std::source_location& where, std::string text) {

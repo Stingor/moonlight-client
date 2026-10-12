@@ -17,6 +17,7 @@
 #include <SDL3/SDL.h>
 
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 #include "ro/ui/system_fonts.h"
 
 #include "game/game.h"
@@ -78,6 +79,7 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   // ⚠ ET LA TAILLE : ouvrir à la taille d'usine pour redimensionner ensuite se
   // voit — la fenêtre naît petite et saute. Lire ce fichier ne demande rien de
   // graphique.
+  ro::core::LogInfo("démarrage : lecture des réglages");
   settings_.emplace(client_root_);
   // LES SKINS INSTALLÉS, pour la liste des options et pour le choix lu ici.
   settings_->options().pages().skin.SeeInstalled(InstalledSkins(client_root_));
@@ -118,6 +120,11 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
 
   // L'INTERFACE, aussitôt après : elle est ce qui décide, à chaque événement,
   // si le geste revient au jeu ou à une fenêtre.
+  //
+  // ⚠ CHAQUE ÉTAPE SE DIT AVANT DE COMMENCER : `ReportStage` ne parle qu'à la
+  // fin, et un client qui meurt en route laisserait le journal sur l'étape
+  // PRÉCÉDENTE, réussie.
+  ro::core::LogInfo("démarrage : interface");
   auto opened =
       UiStage::Open(gl_->window(), windows_, settings_->options().font_family(),
                     client_root_ / ro::ui::kLooseFontFolder, InterfaceSettingsFile(client_root_));
@@ -135,6 +142,8 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
 }
 
 ro::core::Result<void> ClientShell::OpenArchives() {
+  ro::core::LogInfo("démarrage : montage des archives depuis {}",
+                    ro::core::Utf8FromPath(archive_root_));
   auto vfs = ro::vfs::Vfs::Mount(mount_options());
   if (!vfs) {
     return std::unexpected(vfs.error());
@@ -153,6 +162,7 @@ ro::core::Result<void> ClientShell::OpenArchives() {
 
   // Le SON. Une machine sans carte son ne doit pas empêcher de jouer : on le
   // dit une fois, et on continue en silence.
+  ro::core::LogInfo("démarrage : son");
   audio_ = OpenAudio();
   // ⚠ AVEC LE SON ET NON AVEC LA PARTIE : l'écran de connexion montre une
   // ville, et il lui faut sa musique. Voir `ClientShell::music`.

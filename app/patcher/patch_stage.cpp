@@ -24,6 +24,7 @@
 #include "game/client_shell.h"
 #include "patcher/http_patch_fetcher.h"
 #include "patcher/install_lock.h"
+#include "patcher/patcher_state.h"
 #include "patcher/relaunch.h"
 #include "shell/skin_folder.h"
 
@@ -150,6 +151,8 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
     if (auto taken = InstallLock::Take(settings.install_root); taken) {
       lock.emplace(std::move(*taken));
     } else {
+      ro::core::LogWarning("patcher : verrou du dossier refusé — {}",
+                           ro::core::Describe(taken.error()));
       PatchProgress refused;
       refused.phase = PatchPhase::kFailed;
       refused.failure = ro::core::Describe(taken.error());
@@ -176,12 +179,15 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
         quit_asked = quit_asked || event.type == SDL_EVENT_QUIT;
       }
       if (quit_asked) {
+        ro::core::LogInfo("patcher : fenêtre fermée par le joueur pendant la mise à jour");
         return PatchStageEnd::kQuit;
       }
       const bool finished = result.done.load(std::memory_order_acquire);
       const PatchProgress progress = board.Snapshot();
       if (finished && progress.phase == PatchPhase::kDone && result.outcome.has_value() &&
           result.outcome->has_value()) {
+        ro::core::LogInfo("patcher : à jour, {} patch(s) appliqué(s)",
+                          (*result.outcome)->applied_patches);
         return (*result.outcome)->executable_replaced ? PatchStageEnd::kRestart
                                                       : PatchStageEnd::kUpToDate;
       }
@@ -194,6 +200,7 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
       const ro::ui::PatchScreenAnswers answers = shell.interface().DrawPatchOnly(view);
       shell.gl().SwapBuffers();
       if (finished && answers.quit) {
+        ro::core::LogInfo("patcher : le joueur quitte après l'échec ({})", progress.failure);
         return PatchStageEnd::kQuit;
       }
       if (finished && answers.play_anyway) {
@@ -201,6 +208,7 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
         return PatchStageEnd::kPlayOutdated;
       }
       if (finished && answers.retry) {
+        ro::core::LogInfo("patcher : le joueur réessaie après l'échec ({})", progress.failure);
         break;
       }
       const auto spent_ms = static_cast<std::uint32_t>(SDL_GetTicks()) - frame_started_ms;
@@ -220,11 +228,18 @@ ro::core::Result<PatchStageEnd> UpdateInstall(ClientShell& shell, const PatcherC
   settings.config = config;
   settings.install_root = shell.client_root();
   settings.running_executable = std::move(*executable);
+  const std::optional<std::uint64_t> last_applied = ReadLastAppliedPatch(settings.install_root);
+  ro::core::LogInfo(
+      "patcher : recherche des mises à jour ({} miroir(s), dernier index appliqué {})",
+      config.mirrors.size(), last_applied.has_value() ? std::to_string(*last_applied) : "aucun");
   auto ended = RunPatchStage(shell, settings);
   if (!ended || *ended != PatchStageEnd::kRestart) {
     return ended;
   }
-  ro::core::LogInfo("patcher : l'exécutable a changé, le client se relance");
+  // 🔴 LE JOURNAL SE FERME AVANT LA RELANCE : le nouveau processus rouvre le
+  // même fichier, et deux processus qui y écrivent ensemble s'écrasent l'un
+  // l'autre.
+  ro::core::EndLogFile("l'exécutable a changé, le client se relance");
   if (auto relaunched = RelaunchSelf(); !relaunched) {
     return std::unexpected(relaunched.error());
   }

@@ -22,6 +22,7 @@ add_library(ro_core STATIC
     src/program_arguments.cpp
     src/search_key.cpp
     src/sha256.cpp
+    src/startup_report.cpp
     src/text.cpp
     src/web_address.cpp
     src/web_preview_policy.cpp

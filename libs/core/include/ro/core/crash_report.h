@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <string_view>
 
 namespace ro::core {
 
@@ -27,9 +28,23 @@ namespace ro::core {
 // pas, et c'est souvent ce qui explique le reste : la faute dit OÙ, le journal
 // dit CE QU'ON FAISAIT.
 //
-// À appeler UNE FOIS, aussitôt après `InitLogging` : un plantage survenu entre
-// les deux serait muet.
+// CE QU'IL VOIT, sous Windows : les fautes matérielles, le tas corrompu, les
+// paramètres que le runtime C refuse, l'appel d'une fonction virtuelle pure,
+// `abort` et l'exception C++ non rattrapée. Ce qu'il NE VOIT PAS : un processus
+// tué de l'extérieur — c'est la ligne de fin du journal qui le trahit, voir
+// `EndLogFile`.
+//
+// À appeler UNE FOIS, et AVANT `InitLogging` : ouvrir le journal peut déjà
+// échouer, et le rapport n'a besoin que de son dossier. Sans journal, il le dit
+// sur la console.
 void InstallCrashReporter(std::filesystem::path folder);
+
+// REPOSE le filtre, et dit au journal si quelqu'un l'avait remplacé.
+//
+// ⚠ UN MODULE CHARGÉ APRÈS COUP PEUT PRENDRE LA PLACE DU FILET — un pilote
+// graphique, une surcouche injectée — et une faute ne passe plus alors par
+// lui. `moment` dit ce qui venait d'être chargé.
+void RearmCrashReporter(std::string_view moment);
 
 // Le nom d'une faute, tel que le système la numérote.
 //

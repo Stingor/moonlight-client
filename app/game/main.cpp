@@ -9,9 +9,11 @@
 // partie, pas au démarrage du programme.
 
 #include <filesystem>
+#include <format>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -22,6 +24,7 @@
 #include "ro/core/error.h"
 #include "ro/core/log.h"
 #include "ro/core/program_arguments.h"
+#include "ro/core/startup_report.h"
 #include "ro/core/utf8_path.h"
 #include "ro/net/connection.h"
 #include "ro/sim/world.h"
@@ -37,6 +40,7 @@ namespace {
 
 // Le titre de la boîte qui dit pourquoi le client s'arrête.
 constexpr const char* kStopTitle = "Moonlight-Destiny";
+constexpr const char* kLogFileName = "moonclient.log";
 
 int ReportError(const ro::core::Error& error) {
   // ⚠ CE QU'AUCUNE AUTRE LIGNE NE DIRA : le processus s'arrête ici. Le préfixe
@@ -111,6 +115,9 @@ int ReportError(const ro::core::Error& error) {
   // distinguerait l'un de l'autre.
   ro::core::LogInfo("serveur : {} — {}:{} (sur {} déclaré(s))", server.name, server.address,
                     server.port, config->servers.size());
+  ro::core::LogInfo("installation : {} — {} archive(s) déclarée(s), lues dans {}",
+                    ro::core::Utf8FromPath(launch.install_folder), launch.archives.size(),
+                    ro::core::Utf8FromPath(launch.archive_folder));
   return {};
 }
 
@@ -171,28 +178,23 @@ int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
   }
 }
 
-}  // namespace
+// Un dossier qui refuse l'écriture n'arrête pas le client, mais le joueur doit
+// le savoir : ni ses réglages, ni le patch, ni un rapport de plantage n'y
+// survivront.
+void WarnUnwritable(const ro::core::Error& error) {
+  const std::string why = ro::core::Describe(error);
+  ro::core::LogError("installation : {} — réglages, patch et rapports seront perdus", why);
+  const std::string shown =
+      "Le dossier du jeu refuse l'écriture :\n\n" + why +
+      "\n\nLe jeu risque de se fermer ou de ne rien enregistrer. Causes habituelles : le jeu est"
+      " installé dans Program Files, ou un antivirus (protection contre les rançongiciels) bloque"
+      " Moonlight-Destiny.exe. Déplacez le dossier du jeu (par exemple C:\\Jeux) ou autorisez"
+      " l'exécutable dans l'antivirus.";
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, kStopTitle, shown.c_str(), nullptr);
+}
 
-int main(int argc, char** argv) {
-  // Le journal AVANT tout le reste : ce qui échoue pendant la lecture des
-  // arguments doit se dire comme le reste, et au même endroit.
-  //
-  // ⚠ ET IL VA DANS UN FICHIER, pas seulement sur la console. Une console se
-  // ferme avec la fenêtre, défile, ou n'existe pas selon la façon dont le client
-  // a été lancé — si bien qu'« aucune ligne » ne distingue pas un client muet
-  // d'un journal que personne n'a lu. Le fichier est dans le dossier courant —
-  // celui de l'exécutable sur un double-clic —, et il répond quand la console
-  // ne répond plus.
-  ro::core::InitLogging("moonclient.log");
-  // LE FILET, AUSSITÔT APRÈS : ce qu'il écrit passe par le journal, donc il n'a
-  // rien à dire tant que celui-ci n'existe pas. Un plantage survenu entre les
-  // deux lignes serait muet, et c'est deux lignes.
-  //
-  // LE DOSSIER DES RAPPORTS est celui d'où l'on lance, à côté du journal : un
-  // joueur qui signale une panne trouve les deux ensemble, sans avoir à chercher
-  // dans les dossiers cachés du système.
-  ro::core::InstallCrashReporter(std::filesystem::current_path());
-
+// LE CLIENT, du dossier d'installation à la fermeture de la partie.
+int Run(int argc, char** argv) {
   const std::vector<std::string> owned = ro::core::ProgramArguments(argc, argv);
   const std::vector<std::string_view> args(owned.begin(), owned.end());
   std::optional<moonclient::Launch> launch = moonclient::ParseLaunch(args);
@@ -201,6 +203,9 @@ int main(int argc, char** argv) {
   }
   if (auto resolved = ResolveInstall(*launch); !resolved) {
     return ReportError(resolved.error());
+  }
+  if (auto writable = ro::core::ProbeWritableFolder(launch->install_folder); !writable) {
+    WarnUnwritable(writable.error());
   }
   moonclient::ClientShell shell(launch->install_folder, launch->archive_folder, launch->archives,
                                 launch->web);
@@ -211,6 +216,10 @@ int main(int argc, char** argv) {
       !opened) {
     return ReportError(opened.error());
   }
+  // ⚠ LE PILOTE GRAPHIQUE ET LES SURCOUCHES SE CHARGENT AVEC LA FENÊTRE : c'est
+  // après elle qu'ils se voient, et qu'ils ont pu prendre la place du filet.
+  ro::core::RearmCrashReporter("avec la fenêtre");
+  ro::core::LogForeignModules("après la fenêtre");
   // 🔴 LE PATCH PASSE ENTRE LA FENÊTRE ET LES ARCHIVES : il les réécrit.
   if (launch->patcher.has_value()) {
     auto ended = moonclient::patcher::UpdateInstall(shell, *launch->patcher);
@@ -221,9 +230,49 @@ int main(int argc, char** argv) {
         *ended == moonclient::patcher::PatchStageEnd::kRestart) {
       return 0;
     }
+  } else {
+    ro::core::LogInfo("démarrage : pas de patcheur déclaré dans moonclient.yml");
   }
   if (auto archived = shell.OpenArchives(); !archived) {
     return ReportError(archived.error());
   }
+  ro::core::LogInfo("démarrage : terminé, écran de connexion");
   return Connect(shell, *launch);
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+  // LE FILET D'ABORD, avant même le journal : ouvrir celui-ci peut déjà
+  // échouer, et le rapport n'a besoin que de son dossier.
+  //
+  // LE DOSSIER DES RAPPORTS est celui d'où l'on lance, à côté du journal : un
+  // joueur qui signale une panne trouve les deux ensemble, sans avoir à chercher
+  // dans les dossiers cachés du système.
+  std::error_code no_folder;
+  ro::core::InstallCrashReporter(std::filesystem::current_path(no_folder));
+  // Le journal AVANT tout le reste : ce qui échoue pendant la lecture des
+  // arguments doit se dire comme le reste, et au même endroit.
+  //
+  // ⚠ ET IL VA DANS UN FICHIER, pas seulement sur la console. Une console se
+  // ferme avec la fenêtre, défile, ou n'existe pas selon la façon dont le client
+  // a été lancé — si bien qu'« aucune ligne » ne distingue pas un client muet
+  // d'un journal que personne n'a lu. Le fichier est dans le dossier courant —
+  // celui de l'exécutable sur un double-clic —, et il répond quand la console
+  // ne répond plus.
+  if (auto logged = ro::core::InitLogging(kLogFileName); !logged) {
+    // Le seul endroit où le dire est l'écran : le journal est justement ce qui
+    // manque.
+    const std::string shown = "Le journal ne peut pas s'écrire :\n\n" +
+                              ro::core::Describe(logged.error()) +
+                              "\n\nSi le jeu se ferme, déplacez son dossier hors de Program Files"
+                              " ou autorisez Moonlight-Destiny.exe dans l'antivirus.";
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, kStopTitle, shown.c_str(), nullptr);
+  }
+  ro::core::LogMachine();
+  ro::core::LogForeignModules("au démarrage");
+
+  const int exit_code = Run(argc, argv);
+  ro::core::EndLogFile(std::format("le client se ferme (code {})", exit_code));
+  return exit_code;
 }

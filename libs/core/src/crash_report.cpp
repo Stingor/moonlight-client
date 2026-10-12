@@ -1,7 +1,9 @@
 #include "ro/core/crash_report.h"
 
+#include <atomic>
 #include <chrono>
 #include <csignal>
+#include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <format>
@@ -9,6 +11,7 @@
 #include <optional>
 #include <stacktrace>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "ro/core/build_stamp.h"
@@ -261,7 +264,22 @@ void WriteDump(const std::string& stamp, EXCEPTION_POINTERS* report) {
   CloseHandle(file);
 }
 
+// Deux fautes que le système nomme sans que `windows.h` ne les définisse : elles
+// vivent dans `ntstatus.h`, qui ne s'inclut pas à côté de lui sans conflits.
+constexpr DWORD kHeapCorruptionCode = 0xC0000374;
+constexpr DWORD kStackBufferOverrunCode = 0xC0000409;
+
+// ⚠ UN SEUL RAPPORT PAR PROCESSUS : la veille et le filtre voient la même
+// faute, l'une avant l'autre.
+std::atomic<bool>& AlreadyReported() {
+  static std::atomic<bool> reported{false};
+  return reported;
+}
+
 LONG WINAPI ReportException(EXCEPTION_POINTERS* report) {
+  if (AlreadyReported().exchange(true)) {
+    return EXCEPTION_EXECUTE_HANDLER;
+  }
   const EXCEPTION_RECORD& fault = *report->ExceptionRecord;
   std::string detail =
       std::format("adresse : {:#x}\n", reinterpret_cast<std::uintptr_t>(fault.ExceptionAddress));
@@ -286,6 +304,38 @@ LONG WINAPI ReportException(EXCEPTION_POINTERS* report) {
   return EXCEPTION_EXECUTE_HANDLER;
 }
 
+// LA VEILLE, pour la faute que le filtre ne voit pas.
+//
+// ⚠ UN TAS CORROMPU NE PASSE PAS PAR LE FILTRE : le système lève la faute puis
+// tue le processus lui-même, et le client disparaissait sans rapport. Une
+// veille la voit PASSER, avant tout gestionnaire ; elle écrit le rapport et
+// laisse la faute suivre son cours.
+//
+// Elle ne retient que ces fautes-là : une veille voit aussi chaque exception
+// C++ levée puis rattrapée, qui n'est pas une panne.
+LONG WINAPI WatchFatalFaults(EXCEPTION_POINTERS* report) {
+  const DWORD code = report->ExceptionRecord->ExceptionCode;
+  if (code == kHeapCorruptionCode || code == kStackBufferOverrunCode) {
+    ReportException(report);
+  }
+  return EXCEPTION_CONTINUE_SEARCH;
+}
+
+// Un paramètre que le runtime C refuse — un format faux, un flux nul. Sans ce
+// gestionnaire, il termine le processus sans passer par aucun filtre.
+void ReportInvalidParameter(const wchar_t* /*expression*/, const wchar_t* /*function*/,
+                            const wchar_t* /*file*/, unsigned int /*line*/,
+                            std::uintptr_t /*reserved*/) {
+  WriteReport(NowStamp(), "parametre invalide refuse par le runtime C", {});
+  std::_Exit(EXIT_FAILURE);
+}
+
+// Une fonction virtuelle pure appelée, typiquement depuis un destructeur.
+void ReportPureCall() {
+  WriteReport(NowStamp(), "appel d'une fonction virtuelle pure", {});
+  std::_Exit(EXIT_FAILURE);
+}
+
 #endif
 
 }  // namespace
@@ -307,6 +357,10 @@ std::string DescribeFault(unsigned long code) {
       return "page illisible";
     case EXCEPTION_PRIV_INSTRUCTION:
       return "instruction privilegiee";
+    case kHeapCorruptionCode:
+      return "tas corrompu";
+    case kStackBufferOverrunCode:
+      return "debordement de tampon detecte";
 #endif
     default:
       return std::format("faute {:#x}", code);
@@ -331,6 +385,11 @@ void InstallCrashReporter(std::filesystem::path folder) {
   //
   // On laisse donc les fautes matérielles au filtre, qui a tout.
   SetUnhandledExceptionFilter(ReportException);
+  // En DERNIER parmi les veilles : celles qu'un module tiers poserait passent
+  // avant, et peuvent encore rattraper ce qu'elles ont levé.
+  AddVectoredExceptionHandler(0, WatchFatalFaults);
+  _set_invalid_parameter_handler(ReportInvalidParameter);
+  _set_purecall_handler(ReportPureCall);
   // `abort` reste un signal, et aucune exception structurée ne le couvre :
   // c'est par là qu'une assertion violée passe.
   std::signal(SIGABRT, ReportSignal);
@@ -340,6 +399,20 @@ void InstallCrashReporter(std::filesystem::path folder) {
   }
 #endif
   std::set_terminate(ReportTerminate);
+}
+
+void RearmCrashReporter(std::string_view moment) {
+#if defined(_WIN32)
+  const LPTOP_LEVEL_EXCEPTION_FILTER previous = SetUnhandledExceptionFilter(ReportException);
+  if (previous != ReportException) {
+    LogWarning(
+        "filet à plantages : un module chargé {} l'avait remplacé — il est reposé, mais ce module "
+        "(voir les modules étrangers) peut fermer le client sans rapport",
+        moment);
+  }
+#else
+  static_cast<void>(moment);
+#endif
 }
 
 }  // namespace ro::core
