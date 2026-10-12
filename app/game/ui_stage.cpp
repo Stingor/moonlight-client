@@ -431,6 +431,11 @@ UiStage::Answers UiStage::Draw(
     ro::ui::DrawTargetHud(*windows.target_hud.view, grid, *windows.target_hud.look, hud_grip_,
                           windows.target_hud.answer);
   }
+  // LE PORTRAIT DE STATUT, cadres libres comme le HUD de cible.
+  if (windows.status_portrait.view != nullptr && windows.status_portrait.look != nullptr) {
+    ro::ui::DrawStatusPortrait(*windows.status_portrait.view, grid, *windows.status_portrait.look,
+                               hud_grip_, windows.status_portrait.answer);
+  }
   // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, après le HUD dont un cadre l'ouvre.
   // ⚠ À CHAQUE IMAGE, MÊME FERMÉ : sa question se pose une fois le menu
   // refermé, et une boîte qu'on cesse de dessiner disparaît sans réponse.

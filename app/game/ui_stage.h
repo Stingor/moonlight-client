@@ -80,7 +80,6 @@
 #include "ro/ui/storage_window.h"
 #include "ro/ui/style_preview.h"
 #include "ro/ui/talkbox_window.h"
-#include "ro/ui/target_hud.h"
 #include "ro/ui/ui_context.h"
 #include "ro/ui/view_equip_window.h"
 #include "ro/ui/warp_list_window.h"
@@ -91,6 +90,7 @@
 #include "game/achievement_stage.h"
 #include "game/battleground_stage.h"
 #include "game/chat_room_stage.h"
+#include "game/hud_rounds.h"
 #include "game/mail_stage.h"
 #include "game/navigation_windows.h"
 #include "game/over_world_paint.h"
@@ -297,14 +297,9 @@ class UiStage {
     // lignes de la fenêtre de configuration — ils descendent ici, remplis
     // seulement quand la fenêtre est ouverte.
     std::array<std::string, ro::ui::kChatMacroCount> macro_keys;
-    // LE HUD DE CIBLE : sa vue et son allure descendent d'`app` à chaque image,
-    // sa réponse remonte à la suivante. Vue nulle, rien ne se dessine.
-    struct TargetHud {
-      const ro::ui::TargetView* view = nullptr;
-      ro::ui::TargetHudLook* look = nullptr;
-      ro::ui::TargetHudAnswer answer;
-    };
-    TargetHud target_hud;
+    // LE HUD DE CIBLE ET LE PORTRAIT DE STATUT : voir `game/hud_rounds.h`.
+    TargetHudRound target_hud;
+    StatusPortraitRound status_portrait;
     // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, même aller-retour : sa vue descend
     // d'`app` à l'ouverture, sa réponse remonte à l'image suivante.
     struct EntityMenu {

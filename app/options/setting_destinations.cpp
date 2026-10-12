@@ -146,7 +146,7 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     ShortcutBar("skill_bar_6", 5),
     ShortcutBar("skill_bar_7", 6),
     ShortcutBar("skill_bar_8", 7),
-    Page("stat_bars", TrText("Jauges"), OptionSection::kStatBars),
+    Page("stat_bars", TrText("Basic Info"), OptionSection::kStatBars),
     PageTab("stat_bars_hp", TrText("Vie"), OptionSection::kStatBars, StatBar::kHealth),
     PageTab("stat_bars_sp", TrText("Magie"), OptionSection::kStatBars, StatBar::kMagic),
     PageTab("stat_bars_base_exp", TrText("Exp. base"), OptionSection::kStatBars, StatBar::kBaseExp),

@@ -581,7 +581,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   CopyTabsForSearch(searching, static_cast<std::size_t>(DamageTab::kCount), pages_.damage_search,
                     damage_rows_, [this](int tab) { ComposeDamageRows(tab); });
   ComposeDamageRows(shown_bar);
-  CopyTabsForSearch(searching, ro::ui::kStatBarCount, pages_.stat_bar_search, stat_bar_rows_,
+  CopyTabsForSearch(searching, kBasicInfoTabCount, pages_.stat_bar_search, stat_bar_rows_,
                     [this](int tab) { BuildStatBarRows(tab); });
   BuildStatBarRows(shown_bar);
   // ⚠ LES NOMS ET LA ZONE CLIQUABLE SE COMPOSENT AVEC LES BARRES, dans la même
@@ -704,7 +704,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                                 .tabs = shortcut_tabs_,
                                 .searched_tabs = pages_.shortcut_search.tabs()};
   sections_[Rank(OptionSection::kStatBars)] =
-      ro::ui::OptionSectionView{.title = Tr("Jauges"),
+      ro::ui::OptionSectionView{.title = Tr("Basic Info"),
                                 .rows = stat_bar_rows_,
                                 .shared_rows = stat_bar_shared_rows_,
                                 .tabs = stat_bar_tabs_,

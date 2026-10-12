@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <vector>
 
 #include "ro/render/sprite_frame.h"
 
@@ -211,12 +213,31 @@ formats::Image DrawVignette(const ComposedActor& actor, const VignetteBox& box,
   // agrandira l'image entière. ⚠ AU MOINS UN PIXEL DE CÔTÉ : une boîte plus
   // petite que l'échelle donnerait un canevas nul, donc une vignette vide là
   // où l'on attend une silhouette minuscule.
-  const auto width = std::max(
-      1, static_cast<std::int32_t>(std::lround(static_cast<float>(box.width) / framing.scale)));
-  const auto height = std::max(
-      1, static_cast<std::int32_t>(std::lround(static_cast<float>(box.height) / framing.scale)));
+  //
+  // 🔴 SAUF QUAND LE CANEVAS DÉPASSERAIT `kVignetteLargestCanvasPx` : une
+  // grande boîte sous une petite échelle demanderait des dizaines de milliers
+  // de pixels de côté. L'échelle du CANEVAS a alors un plancher, et les quads
+  // rétrécissent d'autant : la silhouette tombe au même endroit de la boîte,
+  // seulement rendue plus grossièrement.
+  const auto box_width = static_cast<float>(box.width);
+  const auto box_height = static_cast<float>(box.height);
+  const float canvas_scale =
+      std::max(framing.scale, std::max(box_width, box_height) / kVignetteLargestCanvasPx);
+  const float shrink = framing.scale / canvas_scale;
+  const auto width = std::clamp(static_cast<std::int32_t>(std::lround(box_width / canvas_scale)), 1,
+                                static_cast<std::int32_t>(kVignetteLargestCanvasPx));
+  const auto height = std::clamp(static_cast<std::int32_t>(std::lround(box_height / canvas_scale)),
+                                 1, static_cast<std::int32_t>(kVignetteLargestCanvasPx));
+  std::vector<SpriteQuad> quads = actor.quads;
+  if (shrink < 1.0F) {
+    for (SpriteQuad& quad : quads) {
+      for (glm::vec2& corner : quad.corners) {
+        corner *= shrink;
+      }
+    }
+  }
   SpriteCanvas canvas(width, height);
-  canvas.Draw(actor.quads, ResolveImages(actor), framing.origin / framing.scale);
+  canvas.Draw(quads, ResolveImages(actor), framing.origin / canvas_scale);
   return canvas.image();
 }
 

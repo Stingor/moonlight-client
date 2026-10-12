@@ -40,6 +40,10 @@ namespace {
   });
 }
 
+[[nodiscard]] bool SameFraming(const VignetteFraming& left, const VignetteFraming& right) {
+  return left.scale == right.scale && left.origin == right.origin;
+}
+
 }  // namespace
 
 const IconTexture& ActorVignette::Get(const Pose& pose) {
@@ -69,9 +73,10 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
     span_ = centered ? MeasureDirectionSpan(*outfit, pose.animation, pose.direction)
                      : MeasureOutfitSpan(*outfit, pose.animation);
   }
-  if (!same_span || !SameBox(pose.box, box_)) {
+  if (!same_span || !SameBox(pose.box, box_) || aimed_) {
     framing_ = FrameVignette(span_, pose.box);
   }
+  aimed_ = pose.aim.has_value();
 
   // ⚠ LE CORPS TIENT SON IMAGE ZÉRO quand la pose est figée, et le temps écoulé
   // continue de courir pour ce qu'il porte : c'est ce qui fait vivre une coiffe
@@ -87,16 +92,25 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
   // LES BORNES DE CE QUI EST PEINT, relevées à chaque image : elles bougent
   // avec l'animation, même quand la texture n'a pas à être refaite.
   std::vector<SpriteQuad> painted;
+  std::vector<ActorPart> painted_parts;
   for (std::size_t index = 0; index < composed.quads.size(); ++index) {
     if (index < composed.sources.size() && HasImage(composed.sources[index])) {
       painted.push_back(composed.quads[index]);
+      painted_parts.push_back(PartOfQuad(composed, index));
     }
   }
   drawn_bounds_ = ComputeBounds(painted);
+  // LE PORTRAIT SE CADRE SUR CE QUI EST PEINT, à chaque image.
+  if (pose.aim.has_value()) {
+    framing_ = FramePortrait(
+        MeasurePortraitBoxes(painted, painted_parts), *pose.aim,
+        glm::vec2(static_cast<float>(pose.box.width), static_cast<float>(pose.box.height)));
+  }
 
   const bool unchanged = same_outfit && SameBox(pose.box, box_) && pose.direction == direction_ &&
                          !drawn_.empty() && composed.sources == drawn_ &&
-                         SameQuads(composed.quads, drawn_quads_);
+                         SameQuads(composed.quads, drawn_quads_) &&
+                         SameFraming(framing_, drawn_framing_);
   if (unchanged) {
     return texture_;
   }
@@ -107,6 +121,7 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
   box_ = pose.box;
   drawn_ = composed.sources;
   drawn_quads_ = composed.quads;
+  drawn_framing_ = framing_;
 
   const formats::Image image = DrawVignette(composed, pose.box, framing_);
   if (image.empty()) {

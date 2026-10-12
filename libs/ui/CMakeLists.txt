@@ -233,6 +233,8 @@ add_library(ro_ui STATIC
     src/entity_menu.cpp
     src/store_search_window.cpp
     src/target_hud.cpp
+    src/hud_caption.cpp
+    src/status_portrait.cpp
     src/trade_widgets.cpp
     src/vending_setup_window.cpp
     src/vending_shop_window.cpp

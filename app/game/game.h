@@ -190,6 +190,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // cible revalidée, les redemandes au serveur, la vue du HUD. Voir
   // `game_targeting.cpp`.
   void AdvanceTargeting(std::uint32_t now_ms);
+  // LE PORTRAIT DE STATUT, à chaque image, avec le HUD de cible : la géométrie
+  // déplacée à l'image précédente, puis la vue recomposée.
+  void AdvanceStatusPortrait(std::uint32_t now_ms);
   // Les monstres qu'un cyclage peut prendre, relevés dans la scène composée.
   void NoteScreenTargets();
   // LA FLÈCHE DU JEU, à chaque image : ce que l'action du personnage et la

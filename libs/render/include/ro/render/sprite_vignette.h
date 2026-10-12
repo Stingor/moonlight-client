@@ -153,6 +153,11 @@ struct VignetteFraming {
 // l'enveloppe entière, et ignore l'échelle imposée comme le plancher.
 [[nodiscard]] VignetteFraming FrameVignette(const OutfitSpan& span, const VignetteBox& box);
 
+// LE PLUS GRAND CÔTÉ D'UN CANEVAS DE VIGNETTE, en pixels. Une vignette est une
+// case d'interface : rien ne demande davantage, et une boîte démesurée sous une
+// petite échelle n'allouerait plus une image mais des centaines de mégaoctets.
+inline constexpr float kVignetteLargestCanvasPx = 1024.0F;
+
 // Écrase les calques d'un acteur composé dans une image qui couvre la boîte.
 //
 // 🔴 L'IMAGE EST EN PIXELS DE SPRITE, PAS EN PIXELS D'ÉCRAN, et c'est ce qui
@@ -166,6 +171,9 @@ struct VignetteFraming {
 // La taille rendue est donc celle de la boîte DIVISÉE par l'échelle du
 // cadrage. Ce qui en sort est coupé, comme le ferait un rectangle de découpe :
 // c'est ce que le plancher de stature rend possible.
+//
+// ⚠ LE CANEVAS NE DÉPASSE JAMAIS `kVignetteLargestCanvasPx` DE CÔTÉ : au-delà,
+// l'image est rendue plus grossièrement, la silhouette au même endroit.
 //
 // Rend une image vide quand la boîte ou le cadrage ne tiennent pas debout.
 [[nodiscard]] formats::Image DrawVignette(const ComposedActor& actor, const VignetteBox& box,

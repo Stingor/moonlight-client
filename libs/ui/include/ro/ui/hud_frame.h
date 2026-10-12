@@ -93,8 +93,13 @@ struct HudSiblings {
   std::span<const bool> shown;
   // La place de CE cadre dans le groupe. -1 quand il n'en a pas.
   int mine = -1;
+  // LES FRÈRES QUI SE DÉPLACENT, comptés en tête de `frames` ; -1 pour tous.
+  // Ceux qui suivent appartiennent à un AUTRE HUD : ils prêtent leurs bords à
+  // l'aimant, mais un bloc CTRL ne les emporte pas, ni ne passe par eux.
+  int movable = -1;
 
   [[nodiscard]] bool Shown(int rank) const;
+  [[nodiscard]] bool Movable(int rank) const;
 };
 
 // Ce que le joueur est en train de faire à UN cadre.

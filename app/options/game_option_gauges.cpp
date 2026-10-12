@@ -13,9 +13,14 @@
 // 🔴 CE QUI RESTE AU-DESSUS DES ONGLETS N'EST PAS « CE QUI SE RESSEMBLE », C'EST
 // « CE QUI NE PEUT PAS DIFFÉRER » : le verrou, l'aimantation et le repère de
 // pose décrivent le GESTE, et il n'y a qu'une souris.
+//
+// LE PORTRAIT DE STATUT FERME LA RANGÉE D'ONGLETS. Il a ses réglages à lui —
+// voir `StatusPortraitOptions` — et aucun de ceux des jauges ne le gouverne :
+// sur son onglet, les réglages communs se retirent.
 
 #include <algorithm>
 #include <cstddef>
+#include <span>
 #include <vector>
 
 #include "ro/core/i18n.h"
@@ -104,10 +109,11 @@ void GameOptions::BuildStatBarShared() {
   // LES ONGLETS. ⚠ REFAITS À CHAQUE IMAGE comme tout le reste : ces noms se
   // traduisent, et un nom mis en cache resterait dans la langue d'avant.
   stat_bar_tabs_.clear();
-  stat_bar_tabs_.reserve(ro::ui::kStatBarCount);
+  stat_bar_tabs_.reserve(kBasicInfoTabCount);
   for (std::size_t bar = 0; bar < ro::ui::kStatBarCount; ++bar) {
     stat_bar_tabs_.push_back(StatBarLabel(bar));
   }
+  stat_bar_tabs_.push_back(Tr("Portrait"));
 }
 
 // LES DIX-HUIT RÉGLAGES D'UNE JAUGE.
@@ -118,6 +124,13 @@ void GameOptions::BuildStatBarShared() {
 // forme-là », et OÙ il est.
 void GameOptions::BuildStatBarRows(int shown_bar) {
   BuildStatBarShared();
+  if (shown_bar == static_cast<int>(kPortraitTab)) {
+    stat_bar_shared_rows_.clear();
+    pages_.portrait.Compose();
+    const std::span<const OptionRowView> portrait = pages_.portrait.rows();
+    stat_bar_rows_.assign(portrait.begin(), portrait.end());
+    return;
+  }
 
   const bool bars_off = !stat_bars_.shown;
   stat_bar_rows_.clear();

@@ -831,6 +831,9 @@ tr: Mostrar el nivel
 fr: Afficher le nom détaillé du lieu
 tr: Mostrar el nombre completo del lugar
 
+fr: Afficher le portrait et les étiquettes
+tr: Mostrar el retrato y las etiquetas
+
 fr: Afficher les enseignes des échoppes
 tr: Mostrar los letreros de las tiendas
 
@@ -840,11 +843,17 @@ tr: Mostrar «mapa,x,y»
 fr: Agrandir l'image
 tr: Ampliar la imagen
 
+fr: Agrandit autour de la tête, ou du personnage entier.
+tr: Amplía alrededor de la cabeza, o del personaje entero.
+
 fr: Aide
 tr: Ayuda
 
 fr: Aider le maître
 tr: Ayudar al amo
+
+fr: Aimanter
+tr: Imantar
 
 fr: Aimanter entre eux
 tr: Ajustar entre si
@@ -927,6 +936,9 @@ tr: Anclada en el lado equivocado, la fila RETROCEDE cuando un estado desaparece
 fr: Ange
 tr: Ángel
 
+fr: Animation
+tr: Animación
+
 fr: Animer les sprites
 tr: Animar los sprites
 
@@ -992,6 +1004,12 @@ tr: Armado al nivel %d
 
 fr: Arrive :
 tr: Recibes:
+
+fr: Arrière-Droite
+tr: Atrás-derecha
+
+fr: Arrière-Gauche
+tr: Atrás-izquierda
 
 fr: Arrête le refine automatique tout de suite, et décoche le réglage. Une tentative DÉJÀ envoyée ira à son terme : le serveur a l'arme, elle ne se reprend pas. Rien ne repartira ensuite.
 tr: Detiene el refine automático de inmediato y desmarca el ajuste. Un intento YA enviado llegará hasta el final: el servidor tiene el arma y no se puede retirar. Después no volverá a arrancar nada.
@@ -1305,6 +1323,12 @@ tr: Base level %d como máximo
 fr: Base level %d à %d
 tr: Base level %d a %d
 
+fr: Base seule (99)
+tr: Solo Base (99)
+
+fr: Basic Info
+tr: Basic Info
+
 fr: Blanc = la flèche du jeu telle quelle.\nToute autre couleur la teinte.
 tr: Blanco = la flecha del juego tal cual.\nCualquier otro color la tiñe.
 
@@ -1346,6 +1370,12 @@ tr: Es el daño ANTES de la defensa del objetivo.
 
 fr: C'est votre propre guilde.
 tr: Esa es tu propia guild.
+
+fr: Cadre la tête et ses coiffes ; le corps sort du cadre et la cape est masquée.\nDécocher pour le personnage entier.
+tr: Encuadra la cabeza y sus headgears; el cuerpo sale del marco y el garment se oculta.\nDesmárcalo para ver el personaje entero.
+
+fr: Cape / garment
+tr: Garment
 
 fr: Ce joueur est protégé contre les signalements.
 tr: Este jugador está protegido contra las denuncias.
@@ -1903,6 +1933,9 @@ tr: Copiar la línea
 fr: Copier le texte seul
 tr: Copiar solo el texto
 
+fr: Couleurs, arrondis et taille du texte
+tr: Colores, redondeo y tamaño del texto
+
 fr: Coéquipiers sur la minimap
 tr: Compañeros en el minimapa
 
@@ -1936,6 +1969,9 @@ tr: Debes equipar Kunai para usar este skill.
 fr: Dire
 tr: Decir
 
+fr: Direction
+tr: Dirección
+
 fr: Discord
 tr: Discord
 
@@ -1948,8 +1984,17 @@ tr: Solo disponible con el estilo de combate Grappler.
 fr: Dissoudre le groupe ? Tous ses membres en sortiront, et ses invitations seront annulées.
 tr: ¿Disolver el grupo? Todos sus miembros saldrán de él y sus invitaciones se anularán.
 
+fr: Dos
+tr: De espaldas
+
+fr: Droite
+tr: Derecha
+
 fr: Dupliquer##profile
 tr: Duplicar##profile
+
+fr: Décalage horizontal
+tr: Desplazamiento horizontal
 
 fr: Décoché, les échecs sans motif précis et les délais de réutilisation ne s'écrivent plus dans la discussion.
 tr: Desmarcado, los fallos sin motivo concreto y los tiempos de reutilización ya no se escriben en el chat.
@@ -1987,6 +2032,9 @@ tr: En último lugar
 fr: En file : %s
 tr: En cola: %s
 
+fr: En tailles du cadre : 0 laisse le personnage centré. Le zoom reste centré.
+tr: En tamaños del marco: 0 deja el personaje centrado. El zoom sigue centrado.
+
 fr: Enregistre l'état présent sous ce nom, et le pose. Un nom déjà pris remplace ce profil.
 tr: Guarda el estado actual con este nombre y lo aplica. Un nombre ya usado reemplaza ese perfil.
 
@@ -2010,6 +2058,9 @@ tr: Error de base de datos: no se cambió nada.
 
 fr: Exclure
 tr: Expulsar
+
+fr: Face
+tr: De frente
 
 fr: Faire clignoter la barre des tâches
 tr: Hacer parpadear la barra de tareas
@@ -2046,6 +2097,12 @@ tr: Filtrar: nombre o mapa
 
 fr: Format
 tr: Formato
+
+fr: Format du niveau
+tr: Formato del nivel
+
+fr: Gauche
+tr: Izquierda
 
 fr: Glisser hors du carnet pour détacher la ligne.
 tr: Arrastra fuera del cuaderno para separar la fila.
@@ -2194,6 +2251,9 @@ tr: Invitar a mi cuaderno MVP
 fr: Jamais visés d'eux-mêmes : le maître, ses amis, son groupe, et sa guilde là où la carte l'épargne (WoE, donjon GvG).
 tr: Nunca atacados por iniciativa propia: el amo, sus amigos, su grupo, y su guild donde el mapa la protege (WoE, mazmorra GvG).
 
+fr: Joue les images de la pose. Décoché, la pose reste figée sur sa première image.
+tr: Reproduce los fotogramas de la pose. Desmarcado, la pose se queda fija en su primer fotograma.
+
 fr: Joueur signalé : %s
 tr: Jugador denunciado: %s
 
@@ -2302,6 +2362,9 @@ tr: El nombre del sitio contiene caracteres no latinos: puede imitar otro sitio.
 fr: Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.
 tr: Has superado el número de denuncias del día: ya no puedes denunciar.
 
+fr: Le portrait du personnage, son pseudo, sa classe et son niveau : quatre cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
+tr: El retrato del personaje, su nombre, su clase y su nivel: cuatro marcos independientes que mueves, redimensionas y coloreas cada uno a tu gusto.
+
 fr: Le serveur a refusé l'annulation : vous restez en file.
 tr: El servidor rechazó la cancelación: sigues en la cola.
 
@@ -2346,6 +2409,9 @@ tr: Los SP de la invocación no bastan.
 
 fr: Les SP du partenaire sont insuffisants, ou son skill est désactivé.
 tr: Los SP del compañero son insuficientes, o su skill está desactivado.
+
+fr: Les bords d'un cadre qu'on déplace s'alignent sur ceux des autres. Deux cadres qui se touchent partent ensemble au CTRL.
+tr: Los bordes del marco que mueves se alinean con los de los demás. Dos marcos que se tocan se mueven juntos con CTRL.
 
 fr: Les bruitages du jeu sont coupés : la case « Bruitages » les rallume.
 tr: Los efectos de sonido del juego están desactivados: la casilla "Efectos de sonido" los vuelve a activar.
@@ -2475,6 +2541,9 @@ tr: Muestra en la tabla el retardo habitual de reaparición, la regla del script
 
 fr: Montre en vignettes, dans le fil, les images que le relai Discord dépose sur le site du serveur, et les emotes de Discord.\n\nToute autre adresse d'image reste un lien, dont l'aperçu se règle à part. Décoché, rien n'est téléchargé. Les emotes du jeu ont leur propre case.
 tr: Muestra en miniatura, en el chat, las imágenes que el relé de Discord deja en el sitio del servidor, y los emotes de Discord.\n\nCualquier otra dirección de imagen sigue siendo un enlace, cuya vista previa se ajusta aparte. Desmarcada, no se descarga nada. Los emotes del juego tienen su propia casilla.
+
+fr: Montre la cape équipée — en personnage entier seulement.
+tr: Muestra el garment equipado — solo con el personaje entero.
 
 fr: Mort à %s
 tr: Muerto a las %s
@@ -2629,6 +2698,12 @@ tr: Perfil actual: %s
 fr: Profil édité :
 tr: Perfil editado:
 
+fr: Profil-Droite
+tr: Frente-derecha
+
+fr: Profil-Gauche
+tr: Frente-izquierda
+
 fr: Profils de disposition
 tr: Perfiles de disposición
 
@@ -2701,8 +2776,26 @@ tr: Rechazado por el servidor (código %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Devuelve este perfil a los ajustes de origen del cliente.
 
+fr: Repose les quatre cadres à leur place d'origine. Les couleurs et les interrupteurs ne bougent pas.
+tr: Devuelve los cuatro marcos a su sitio original. Los colores y los interruptores no cambian.
+
+fr: Tête seule
+tr: Solo la cabeza
+
 fr: Un nom qui contient des mots interdits ne peut pas être enregistré.
 tr: No se puede registrar un nombre que contiene palabras prohibidas.
+
+fr: Un trait d'un pixel autour de chaque cadre.
+tr: Una línea de un píxel alrededor de cada marco.
+
+fr: Verrouiller le portrait
+tr: Bloquear el retrato
+
+fr: Verrouillé : les cadres ne bougent plus et laissent passer les clics au jeu.\nDéverrouillé : glisser pour déplacer, tirer un bord ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent.
+tr: Bloqueado: los marcos ya no se mueven y dejan pasar los clics al juego.\nDesbloqueado: arrastra para mover, tira de un borde o de una esquina para redimensionar. CTRL mueve en bloque los marcos que se tocan.
+
+fr: Zoom
+tr: Zoom
 
 fr: Écraser##profile
 tr: Sobrescribir##profile

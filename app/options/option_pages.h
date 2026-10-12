@@ -41,6 +41,7 @@
 #include "options/skin_look_options.h"
 #include "options/skin_options.h"
 #include "options/sprite_sound_options.h"
+#include "options/status_portrait_options.h"
 #include "options/talk_filter_options.h"
 #include "options/target_options.h"
 #include "options/view_equip_memory.h"
@@ -75,6 +76,8 @@ static_assert(kBattlegroundRowBase + static_cast<int>(BattlegroundRow::kCount) <
               "la plage du pet chevauche celle du champ de bataille");
 static_assert(kSkinLookRowBase + static_cast<int>(SkinLookRow::kCount) <= kChatWebRowBase,
               "la plage des liens du chat chevauche celle de l'habillage");
+static_assert(kTalkFilterRowBase + static_cast<int>(TalkFilterRow::kCount) <= kPortraitRowBase,
+              "la plage du portrait chevauche celle de la parole tue");
 
 // LES PAGES DE RÉGLAGES QUI TIENNENT LEUR PROPRE CLASSE — leurs réglages, leurs
 // lignes, leurs listes.
@@ -84,6 +87,8 @@ static_assert(kSkinLookRowBase + static_cast<int>(SkinLookRow::kCount) <= kChatW
 struct OptionPages {
   AfkOptions afk;
   TargetOptions targeting;
+  // L'onglet « Portrait » de la page « Basic Info ».
+  StatusPortraitOptions portrait;
   ContextMenuOptions context_menu;
   ViewEquipMemory view_equip;
   GraphicsOptions graphics;

@@ -28,6 +28,7 @@
 #include "world/navi_session.h"
 #include "world/quick_cast.h"
 #include "world/selection_marker.h"
+#include "world/status_portrait_view.h"
 #include "world/target_hud_view.h"
 #include "world/targeting.h"
 
@@ -93,6 +94,8 @@ class GameFoundation {
   Targeting targeting_;
   QuickCast quick_cast_;  // ses réglages vivent dans les options
   std::optional<TargetHudView> target_hud_;
+  // LE PORTRAIT DE STATUT DU JOUEUR : sa vue se recompose à chaque image.
+  std::optional<PortraitHudView> status_portrait_;
   SelectionMarker selection_marker_;
   MarkerPose marker_pose_;
   // L'entrée sur la carte : l'animation de la flèche compte depuis elle. Vide

@@ -8,6 +8,7 @@
 #include "options/damage_meter_options.h"
 #include "options/game_option_ids.h"
 #include "options/menu_icons_options.h"
+#include "options/status_portrait_options.h"
 #include "options/target_options.h"
 #include "party/party_options.h"
 
@@ -29,8 +30,13 @@ void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
   if (options.status_bar().shown && !options.status_bar().locked) {
     into.push_back(ro::core::Tr("États"));
   }
-  if (options.stat_bars().shown && !options.stat_bars().locked) {
-    into.push_back(ro::core::Tr("Jauges"));
+  // LES JAUGES ET LE PORTRAIT partagent la page « Basic Info », et l'avis la
+  // nomme une fois. Le portrait n'a de vue qu'en jeu.
+  const ro::ui::StatusPortraitLook& portrait = options.pages().portrait.look();
+  const bool portrait_unlocked =
+      windows.status_portrait.view != nullptr && portrait.shown && !portrait.locked;
+  if ((options.stat_bars().shown && !options.stat_bars().locked) || portrait_unlocked) {
+    into.push_back(ro::core::Tr("Basic Info"));
   }
   // Déverrouillés, les deux cadres PvP s'ouvrent partout, hors PvP compris.
   if (!options.pvp_hud().locked) {
@@ -95,6 +101,9 @@ void LockWholeHud(GameSettings& settings, const OptionTargets& to, std::uint32_t
   }
   if (!pages.targeting.look().locked) {
     settings.SetRowSwitch(TargetRowId(TargetRow::kLocked), true, to, now_ms);
+  }
+  if (!pages.portrait.look().locked) {
+    settings.SetRowSwitch(PortraitRowId(PortraitRow::kLocked), true, to, now_ms);
   }
   if (!pages.party.grid().locked) {
     settings.SetRowSwitch(PartyGridRowId(PartyGridRow::kLocked), true, to, now_ms);

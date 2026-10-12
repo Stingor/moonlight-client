@@ -7,11 +7,11 @@
 #include <cfloat>
 #include <cmath>
 #include <cstdio>
-#include <cstring>
 #include <string>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/gauge_fill.h"
+#include "ro/ui/hud_caption.h"
 #include "ro/ui/status_bar.h"
 
 namespace ro::ui {
@@ -32,17 +32,7 @@ constexpr std::array<const char*, kTargetPartCount> kPartIds = {
 // Ce dont le contenu d'un cadre se retire de ses bords.
 constexpr float kInnerPadding = 3.0F;
 
-// L'ombre d'un texte de cadre, en part de sa taille, et jamais moins d'un pixel.
-constexpr float kShadowShare = 0.08F;
-constexpr float kLeastShadow = 1.0F;
-constexpr ImU32 kCaptionShadow = IM_COL32(0, 0, 0, 200);
 constexpr ImU32 kCaptionColor = IM_COL32_WHITE;
-
-// Un texte trop long pour son cadre se tronque, sans toucher le bord.
-constexpr float kTextMargin = 4.0F;
-constexpr std::size_t kClippedRoom = 512;
-// Trois points ASCII : l'ellipse typographique n'a pas de glyphe dans la police.
-constexpr char kEllipsis[] = "...";
 
 // La réserve de magie qu'un monstre n'a pas : le serveur écrit 1 faute de
 // pouvoir écrire 0.
@@ -56,36 +46,6 @@ constexpr float kSocialTextShare = 0.85F;
 constexpr float kLevelRoom = 8.0F;
 
 constexpr float kPercent = 100.0F;
-
-// Texte CENTRÉ, mesuré à la taille de dessin, tronqué s'il déborde.
-void PaintCentered(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const char* text,
-                   ImU32 color, float pixels) {
-  ImFont* font = ImGui::GetFont();
-  if (font == nullptr || text == nullptr || text[0] == '\0') {
-    return;
-  }
-  ImVec2 size = font->CalcTextSizeA(pixels, FLT_MAX, 0.0F, text);
-  std::array<char, kClippedRoom> clipped{};
-  const float room = (bottom_right.x - top_left.x) - kTextMargin;
-  if (room > 0.0F && size.x > room) {
-    const float ellipsis_width = font->CalcTextSizeA(pixels, FLT_MAX, 0.0F, kEllipsis).x;
-    const char* remaining = nullptr;
-    // ImGui coupe sur une frontière de caractère : pas de demi-glyphe UTF-8.
-    font->CalcTextSizeA(pixels, std::max(0.0F, room - ellipsis_width), 0.0F, text, nullptr,
-                        &remaining);
-    std::size_t kept = remaining != nullptr ? static_cast<std::size_t>(remaining - text) : 0;
-    kept = std::min(kept, clipped.size() - sizeof(kEllipsis));
-    std::memcpy(clipped.data(), text, kept);
-    std::memcpy(clipped.data() + kept, kEllipsis, sizeof(kEllipsis));
-    text = clipped.data();
-    size = font->CalcTextSizeA(pixels, FLT_MAX, 0.0F, text);
-  }
-  const ImVec2 at((top_left.x + bottom_right.x - size.x) * 0.5F,
-                  (top_left.y + bottom_right.y - size.y) * 0.5F);
-  const float shadow = std::max(kLeastShadow, std::floor(pixels * kShadowShare));
-  into.AddText(font, pixels, ImVec2(at.x + shadow, at.y + shadow), kCaptionShadow, text);
-  into.AddText(font, pixels, at, color, text);
-}
 
 [[nodiscard]] ImU32 Dimmed(ImU32 color, float share) {
   const ImVec4 lit = ImGui::ColorConvertU32ToFloat4(color);
@@ -127,14 +87,14 @@ void PaintName(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const Tar
 
   const std::string name =
       target.name.empty() ? std::string(core::Tr("(nom inconnu)")) : std::string(target.name);
-  PaintCentered(into, top_left, ImVec2(name_right, split), name.c_str(), ink, pixels);
+  PaintHudCaption(into, top_left, ImVec2(name_right, split), name.c_str(), ink, pixels);
   if (two_lines) {
-    PaintCentered(into, ImVec2(top_left.x, split), bottom_right, social.c_str(),
-                  Dimmed(ink, kSocialDimming), pixels * kSocialTextShare);
+    PaintHudCaption(into, ImVec2(top_left.x, split), bottom_right, social.c_str(),
+                    Dimmed(ink, kSocialDimming), pixels * kSocialTextShare);
   }
   if (level[0] != '\0') {
-    PaintCentered(into, ImVec2(name_right, top_left.y), ImVec2(bottom_right.x, split), level.data(),
-                  ink, pixels);
+    PaintHudCaption(into, ImVec2(name_right, top_left.y), ImVec2(bottom_right.x, split),
+                    level.data(), ink, pixels);
   }
 }
 
@@ -155,7 +115,7 @@ void PaintGauge(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const Ta
   const std::string caption = GaugeCaption(known, now, full, GaugeTextOf(look.gauge_text),
                                            GaugeNumbersAllowed(target, is_magic, known), is_magic);
   if (!caption.empty()) {
-    PaintCentered(into, top_left, bottom_right, caption.c_str(), kCaptionColor, pixels);
+    PaintHudCaption(into, top_left, bottom_right, caption.c_str(), kCaptionColor, pixels);
   }
 }
 
@@ -196,7 +156,7 @@ void PaintPortrait(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const
   }
   if (target.model) {
     // Ces classes n'ont aucun sprite : le dire vaut mieux qu'un cadre vide.
-    PaintCentered(into, top_left, bottom_right, core::Tr("(modèle 3D)"), ink, pixels);
+    PaintHudCaption(into, top_left, bottom_right, core::Tr("(modèle 3D)"), ink, pixels);
   }
 }
 
@@ -360,7 +320,7 @@ void DrawTargetHud(const TargetView& target, const AlignGrid& grid, TargetHudLoo
           case TargetPart::kKind:
             if (target.present) {
               const std::string species(target.species);
-              PaintCentered(*into, top_left, bottom_right, species.c_str(), ink, pixels);
+              PaintHudCaption(*into, top_left, bottom_right, species.c_str(), ink, pixels);
             }
             break;
           case TargetPart::kStatuses:

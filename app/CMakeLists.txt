@@ -683,6 +683,17 @@ target_link_libraries(moonclient_battlefield
 
 target_include_directories(moonclient_battlefield PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# L'ONGLET « PORTRAIT » DE LA PAGE « BASIC INFO », en bibliothèque : ses bornes
+# et sa plage d'identifiants se vérifient sur un banc.
+add_library(moonclient_portraitoptions STATIC
+    options/status_portrait_options.cpp)
+
+target_link_libraries(moonclient_portraitoptions
+    PUBLIC ro_core ro_ui moonclient_settings
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_portraitoptions PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LA PAGE « GRAPHICS » ET CE QU'ELLE DEMANDE À UNE SCÈNE DE CARTE, en
 # bibliothèque : la partie et la ville de fond de l'écran de connexion lisent
 # les mêmes réglages par les mêmes fonctions, et un étage oublié par l'une ne se
@@ -1476,6 +1487,7 @@ add_executable(moonclient
     world/screen_overlays.cpp
     world/selection_marker.cpp
     world/target_hud_view.cpp
+    world/status_portrait_view.cpp
     game/game.cpp
     game/game_afk.cpp
     game/game_description.cpp
@@ -1638,6 +1650,7 @@ target_link_libraries(moonclient
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
+            moonclient_portraitoptions
             moonclient_seatlayout moonclient_settings moonclient_settinglinks ro_audio ro_core ro_formats
             ro_net ro_sim ro_vfs
             ro_render ro_render_gl ro_ui ro_ui_gl SDL3::SDL3 yaml-cpp::yaml-cpp

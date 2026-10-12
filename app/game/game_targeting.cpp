@@ -1,6 +1,7 @@
 // LE MODE CIBLAGE, étape par étape de l'image : ce que les gestes ont laissé,
 // la cible revalidée, ce qu'on redemande au serveur, et ce que le HUD montre.
-// Et la flèche du jeu, que le mode détourne.
+// Et la flèche du jeu, que le mode détourne. Le portrait de statut, autre HUD
+// de cadres libres, se recompose avec lui.
 
 #include <algorithm>
 #include <array>
@@ -10,6 +11,7 @@
 #include <vector>
 
 #include <SDL3/SDL.h>
+#include <imgui.h>
 
 #include "ro/net/actor_name.h"
 #include "ro/net/target_info.h"
@@ -32,7 +34,24 @@ constexpr int kCellsPerCube =
 
 }  // namespace
 
+void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
+  StatusPortraitOptions& options = settings_->options().pages().portrait;
+  windows_.status_portrait.look = &options.look();
+  // Un cadre déplacé s'écrit, une fois : `Touch` arme l'anti-rebond du fichier.
+  if (std::exchange(windows_.status_portrait.answer, {}).moved) {
+    settings_->file().Touch();
+  }
+  if (!link_.is_open() || !status_portrait_.has_value()) {
+    windows_.status_portrait.view = nullptr;
+    return;
+  }
+  status_portrait_->Refresh(world_, options, settings_->options().stat_bars(), styles_, now_ms,
+                            ImGui::GetIO().DisplaySize);
+  windows_.status_portrait.view = &status_portrait_->view();
+}
+
 void Game::AdvanceTargeting(std::uint32_t now_ms) {
+  AdvanceStatusPortrait(now_ms);
   TargetOptions& options = settings_->options().targeting();
   windows_.target_hud.look = &options.look();
   if (!link_.is_open()) {

@@ -66,6 +66,8 @@ bool HudSiblings::Shown(int rank) const {
   return rank < static_cast<int>(shown.size()) && shown[static_cast<std::size_t>(rank)];
 }
 
+bool HudSiblings::Movable(int rank) const { return movable < 0 || rank < movable; }
+
 bool HudGrip::Holds(const char* id) const { return id != nullptr && !held.empty() && held == id; }
 
 int HudEdgesAt(const HudRect& rect, ImVec2 mouse) {
@@ -138,7 +140,7 @@ std::uint32_t TouchingFrames(const HudSiblings& siblings, int seed) {
       }
       for (int outside = 0; outside < count; ++outside) {
         const std::uint32_t bit = 1U << static_cast<unsigned>(outside);
-        if ((block & bit) != 0 || !siblings.Shown(outside)) {
+        if ((block & bit) != 0 || !siblings.Shown(outside) || !siblings.Movable(outside)) {
           continue;
         }
         if (touching(siblings.frames[static_cast<std::size_t>(inside)],
@@ -244,13 +246,17 @@ HudRect HudOnScreen(const HudRect& stored, ImVec2 screen) {
                           .height = stored.height};
   const ScreenRect at = RectFromPlace(place, screen.x, screen.y, 1.0F);
   // DANS L'ÉCRAN, pour tous ceux qui montrent le cadre : la place retenue, elle,
-  // ne change pas. Un cadre plus large que l'écran se colle au bord de départ.
-  const float most_x = std::max(screen.x - stored.width, 0.0F);
-  const float most_y = std::max(screen.y - stored.height, 0.0F);
+  // ne change pas. Un cadre plus large que l'écran se colle au bord de départ,
+  // et ne se montre pas plus grand que lui — une taille relue d'un fichier
+  // édité à la main ne doit pas commander une surface démesurée.
+  const float width = std::min(stored.width, screen.x);
+  const float height = std::min(stored.height, screen.y);
+  const float most_x = std::max(screen.x - width, 0.0F);
+  const float most_y = std::max(screen.y - height, 0.0F);
   return HudRect{.x = Rounded(std::clamp(at.x_px, 0.0F, most_x)),
                  .y = Rounded(std::clamp(at.y_px, 0.0F, most_y)),
-                 .width = stored.width,
-                 .height = stored.height};
+                 .width = width,
+                 .height = height};
 }
 
 HudRect HudAnchored(const HudRect& on_screen, ImVec2 screen) {
@@ -303,7 +309,8 @@ bool BeginHudFrame(const char* id, HudRect& stored, const HudFrameLook& look,
   }
   const HudSiblings siblings{.frames = std::span<HudRect>(beside.data(), sibling_count),
                              .shown = stored_siblings.shown,
-                             .mine = stored_siblings.mine};
+                             .mine = stored_siblings.mine,
+                             .movable = stored_siblings.movable};
   bool gestured = false;
 
   // ⚠ RÉ-ÉPINGLÉE À CHAQUE IMAGE sur la géométrie mémorisée : c'est ce qui garde

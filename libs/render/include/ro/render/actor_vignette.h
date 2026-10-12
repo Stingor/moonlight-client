@@ -7,6 +7,7 @@
 #include "ro/render/actor_sprite.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/icon_texture.h"
+#include "ro/render/portrait_framing.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/render/sprite_vignette.h"
@@ -51,6 +52,10 @@ class ActorVignette {
     // ⚠ PARTAGÉE PAR LE CORPS ET LA TÊTE, comme en jeu — c'est aussi par elle
     // que la tête se tourne. À l'appelant de la borner au nombre d'images.
     std::optional<std::size_t> held_frame;
+    // LE CADRAGE DE PORTRAIT, ou rien pour la vignette en pied. Présent, il
+    // remplace celui de la boîte : la vignette se recadre à CHAQUE IMAGE sur
+    // ce qu'elle peint de la tête et du corps. Voir `portrait_framing.h`.
+    std::optional<PortraitAim> aim;
   };
 
   // La vignette de cette pose. Inutilisable tant que la tenue n'a pas de corps
@@ -104,6 +109,12 @@ class ActorVignette {
   // qui n'en mesure qu'une — jamais à chaque image.
   OutfitSpan span_;
   VignetteFraming framing_;
+  // Le cadrage de la texture déjà téléversée : un portrait se recadre sans que
+  // ses calques changent.
+  VignetteFraming drawn_framing_;
+  // Le dernier `Get` cadrait-il un portrait ? Le cadrage en pied se refait
+  // alors au suivant, même boîte et même tenue.
+  bool aimed_ = false;
   SpriteBounds drawn_bounds_;
   const ComposedActor* composed_ = nullptr;
   float animation_duration_ms_ = 0.0F;

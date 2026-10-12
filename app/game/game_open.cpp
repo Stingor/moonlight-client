@@ -649,6 +649,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   target_hud_.emplace(
       &pieces_.status_table, pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr,
       pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, pieces_.item_words);
+  status_portrait_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+                           pieces_.job_names);
   shortcuts_.emplace(client_root_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
                      pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr);
   // La table des objets et leurs icônes arrivent avec les accessoires, après

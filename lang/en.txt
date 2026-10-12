@@ -831,6 +831,9 @@ tr: Show the level
 fr: Afficher le nom détaillé du lieu
 tr: Show the full place name
 
+fr: Afficher le portrait et les étiquettes
+tr: Show the portrait and labels
+
 fr: Afficher les enseignes des échoppes
 tr: Show shop signs
 
@@ -840,11 +843,17 @@ tr: Show “map,x,y”
 fr: Agrandir l'image
 tr: Enlarge image
 
+fr: Agrandit autour de la tête, ou du personnage entier.
+tr: Enlarges around the head, or around the whole character.
+
 fr: Aide
 tr: Help
 
 fr: Aider le maître
 tr: Assist the owner
+
+fr: Aimanter
+tr: Snap
 
 fr: Aimanter entre eux
 tr: Snap to each other
@@ -927,6 +936,9 @@ tr: Anchored on the wrong side, the row MOVES BACK when a status drops and every
 fr: Ange
 tr: Angel
 
+fr: Animation
+tr: Animation
+
 fr: Animer les sprites
 tr: Animate the sprites
 
@@ -992,6 +1004,12 @@ tr: Armed at level %d
 
 fr: Arrive :
 tr: You receive:
+
+fr: Arrière-Droite
+tr: Back-right
+
+fr: Arrière-Gauche
+tr: Back-left
 
 fr: Arrête le refine automatique tout de suite, et décoche le réglage. Une tentative DÉJÀ envoyée ira à son terme : le serveur a l'arme, elle ne se reprend pas. Rien ne repartira ensuite.
 tr: Stops the automatic refine right away, and unchecks the setting. An attempt ALREADY sent will run to its end: the server has the weapon, it cannot be taken back. Nothing will start again afterwards.
@@ -1305,6 +1323,12 @@ tr: Base level %d at most
 fr: Base level %d à %d
 tr: Base level %d to %d
 
+fr: Base seule (99)
+tr: Base only (99)
+
+fr: Basic Info
+tr: Basic Info
+
 fr: Blanc = la flèche du jeu telle quelle.\nToute autre couleur la teinte.
 tr: White = the game's arrow as is.\nAny other colour tints it.
 
@@ -1346,6 +1370,12 @@ tr: This is the damage BEFORE the target's defense.
 
 fr: C'est votre propre guilde.
 tr: That is your own guild.
+
+fr: Cadre la tête et ses coiffes ; le corps sort du cadre et la cape est masquée.\nDécocher pour le personnage entier.
+tr: Frames the head and its headgears; the body leaves the frame and the garment is hidden.\nUntick for the whole character.
+
+fr: Cape / garment
+tr: Garment
 
 fr: Ce joueur est protégé contre les signalements.
 tr: The target is under report protection.
@@ -1903,6 +1933,9 @@ tr: Copy line
 fr: Copier le texte seul
 tr: Copy text only
 
+fr: Couleurs, arrondis et taille du texte
+tr: Colours, rounding and text size
+
 fr: Coéquipiers sur la minimap
 tr: Teammates on the minimap
 
@@ -1936,6 +1969,9 @@ tr: Kunai must be equipped to use this skill.
 fr: Dire
 tr: Say
 
+fr: Direction
+tr: Direction
+
 fr: Discord
 tr: Discord
 
@@ -1948,8 +1984,17 @@ tr: This is only available on style change for novice.
 fr: Dissoudre le groupe ? Tous ses membres en sortiront, et ses invitations seront annulées.
 tr: Disband the group? All its members will leave it, and its invitations will be cancelled.
 
+fr: Dos
+tr: Back
+
+fr: Droite
+tr: Right
+
 fr: Dupliquer##profile
 tr: Duplicate##profile
+
+fr: Décalage horizontal
+tr: Horizontal offset
 
 fr: Décoché, les échecs sans motif précis et les délais de réutilisation ne s'écrivent plus dans la discussion.
 tr: Unticked, failures without a specific reason and cooldown delays are no longer written in the chat.
@@ -1987,6 +2032,9 @@ tr: Last
 fr: En file : %s
 tr: Queued: %s
 
+fr: En tailles du cadre : 0 laisse le personnage centré. Le zoom reste centré.
+tr: In frame sizes: 0 keeps the character centred. The zoom stays centred.
+
 fr: Enregistre l'état présent sous ce nom, et le pose. Un nom déjà pris remplace ce profil.
 tr: Saves the current state under this name and applies it. A name already in use replaces that profile.
 
@@ -2010,6 +2058,9 @@ tr: Database error: nothing was changed.
 
 fr: Exclure
 tr: Remove
+
+fr: Face
+tr: Front
 
 fr: Faire clignoter la barre des tâches
 tr: Flash the taskbar
@@ -2046,6 +2097,12 @@ tr: Filter: name or map
 
 fr: Format
 tr: Format
+
+fr: Format du niveau
+tr: Level format
+
+fr: Gauche
+tr: Left
 
 fr: Glisser hors du carnet pour détacher la ligne.
 tr: Drag out of the log to detach the row.
@@ -2194,6 +2251,9 @@ tr: Invite to my MVP log
 fr: Jamais visés d'eux-mêmes : le maître, ses amis, son groupe, et sa guilde là où la carte l'épargne (WoE, donjon GvG).
 tr: Never targeted on its own: the owner, their friends, their party, and their guild where the map spares it (WoE, GvG dungeon).
 
+fr: Joue les images de la pose. Décoché, la pose reste figée sur sa première image.
+tr: Plays the frames of the pose. Unticked, the pose stays frozen on its first frame.
+
 fr: Joueur signalé : %s
 tr: Reported player: %s
 
@@ -2302,6 +2362,9 @@ tr: The site name contains non-Latin characters: it can imitate another site.
 fr: Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.
 tr: If you have exceeded the number of daily reports, you will no longer be able to report.
 
+fr: Le portrait du personnage, son pseudo, sa classe et son niveau : quatre cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
+tr: The character's portrait, name, class and level: four independent frames, each one moved, resized and coloured to your liking.
+
 fr: Le serveur a refusé l'annulation : vous restez en file.
 tr: The server refused the cancellation: you stay in the queue.
 
@@ -2346,6 +2409,9 @@ tr: The summon's SP is not enough.
 
 fr: Les SP du partenaire sont insuffisants, ou son skill est désactivé.
 tr: Partner's SP is insufficient or skill is disabled.
+
+fr: Les bords d'un cadre qu'on déplace s'alignent sur ceux des autres. Deux cadres qui se touchent partent ensemble au CTRL.
+tr: The edges of a frame being moved line up with those of the others. Two frames that touch move together with CTRL.
 
 fr: Les bruitages du jeu sont coupés : la case « Bruitages » les rallume.
 tr: The game's sound effects are off: the "Sound effects" box turns them back on.
@@ -2475,6 +2541,9 @@ tr: Shows the usual respawn delay, the spawn script's rule, in the table. Right-
 
 fr: Montre en vignettes, dans le fil, les images que le relai Discord dépose sur le site du serveur, et les emotes de Discord.\n\nToute autre adresse d'image reste un lien, dont l'aperçu se règle à part. Décoché, rien n'est téléchargé. Les emotes du jeu ont leur propre case.
 tr: Shows as thumbnails, in the chat, the images the Discord relay places on the server's site, and Discord's emotes.\n\nAny other image address stays a link, whose preview has its own setting. Unchecked, nothing is downloaded. The game's emotes have their own box.
+
+fr: Montre la cape équipée — en personnage entier seulement.
+tr: Shows the equipped garment — whole character only.
 
 fr: Mort à %s
 tr: Died at %s
@@ -2629,6 +2698,12 @@ tr: Current profile: %s
 fr: Profil édité :
 tr: Edited profile:
 
+fr: Profil-Droite
+tr: Front-right
+
+fr: Profil-Gauche
+tr: Front-left
+
 fr: Profils de disposition
 tr: Layout profiles
 
@@ -2701,8 +2776,26 @@ tr: Refused by the server (code %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Resets this profile to the client's original settings.
 
+fr: Repose les quatre cadres à leur place d'origine. Les couleurs et les interrupteurs ne bougent pas.
+tr: Puts the four frames back in their original place. Colours and switches do not change.
+
+fr: Tête seule
+tr: Head only
+
 fr: Un nom qui contient des mots interdits ne peut pas être enregistré.
 tr: Names with bad words can not be registered.
+
+fr: Un trait d'un pixel autour de chaque cadre.
+tr: A one-pixel line around each frame.
+
+fr: Verrouiller le portrait
+tr: Lock the portrait
+
+fr: Verrouillé : les cadres ne bougent plus et laissent passer les clics au jeu.\nDéverrouillé : glisser pour déplacer, tirer un bord ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent.
+tr: Locked: the frames no longer move and let clicks through to the game.\nUnlocked: drag to move, pull an edge or a corner to resize. CTRL moves frames that touch as one block.
+
+fr: Zoom
+tr: Zoom
 
 fr: Écraser##profile
 tr: Overwrite##profile
