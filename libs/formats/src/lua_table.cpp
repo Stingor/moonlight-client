@@ -236,8 +236,8 @@ using lua_internal::SetByName;
 // un même état, et le second lit ce que le premier a nommé.
 class Evaluator {
  public:
-  Evaluator(const Prototype& prototype, LuaTable globals, UnnamedKey unnamed)
-      : prototype_(prototype), globals_(std::move(globals)), unnamed_(unnamed) {}
+  Evaluator(const Prototype& prototype, LuaTable globals)
+      : prototype_(prototype), globals_(std::move(globals)) {}
 
   [[nodiscard]] core::Result<LuaTable> Run() {
     registers_.assign(prototype_.max_stack, LuaValue{});
@@ -329,11 +329,6 @@ class Evaluator {
             return std::unexpected(OutOfRange());
           }
           const LuaValue key = Slot(ArgB(word));
-          // UNE CLÉ NULLE SAUTE SON ENTRÉE si l'appelant l'a demandé, comme en
-          // clair : voir `UnnamedKey`.
-          if (key.kind == LuaValue::Kind::kNil && unnamed_ == UnnamedKey::kSkipEntry) {
-            break;
-          }
           if (!Assign(*target.table, key, Slot(ArgC(word)))) {
             return std::unexpected(Refuse(ErrorCode::kCorruptData,
                                           "clé de table d'un type que l'on ne sait pas retrouver"));
@@ -458,7 +453,6 @@ class Evaluator {
 
   const Prototype& prototype_;
   LuaTable globals_;
-  UnnamedKey unnamed_ = UnnamedKey::kRefuse;
   std::vector<LuaValue> registers_;
   bool registers_valid_ = true;
 };
@@ -493,13 +487,12 @@ const LuaValue* LuaTable::Find(double index) const {
   return found != slot_by_index.end() ? &by_index[found->second].second : nullptr;
 }
 
-core::Result<LuaTable> ReadLuaChunk(std::span<const std::uint8_t> bytes, LuaTable globals,
-                                    UnnamedKey unnamed) {
+core::Result<LuaTable> ReadLuaChunk(std::span<const std::uint8_t> bytes, LuaTable globals) {
   core::Result<Prototype> main = lua_internal::ReadCompiledMain(bytes);
   if (!main) {
     return std::unexpected(main.error());
   }
-  Evaluator evaluator(*main, std::move(globals), unnamed);
+  Evaluator evaluator(*main, std::move(globals));
   return evaluator.Run();
 }
 
@@ -543,18 +536,17 @@ core::Result<Prototype> ReadCompiledMain(std::span<const std::uint8_t> bytes) {
 
 }  // namespace lua_internal
 
-core::Result<LuaTable> ReadLuaFile(std::span<const std::uint8_t> bytes, LuaTable globals,
-                                   UnnamedKey unnamed) {
+core::Result<LuaTable> ReadLuaFile(std::span<const std::uint8_t> bytes, LuaTable globals) {
   // La signature d'un chunk ne peut pas ouvrir un fichier en clair : 0x1B n'est
   // pas un caractère que Lua accepte en tête d'un source. C'est le même
   // discriminant que celui du client, qui charge les deux formes sans le dire.
   const bool compiled = bytes.size() >= kSignature.size() &&
                         std::equal(kSignature.begin(), kSignature.end(), bytes.begin());
   if (compiled) {
-    return ReadLuaChunk(bytes, std::move(globals), unnamed);
+    return ReadLuaChunk(bytes, std::move(globals));
   }
   return ReadLuaSource(std::string_view(reinterpret_cast<const char*>(bytes.data()), bytes.size()),
-                       std::move(globals), unnamed);
+                       std::move(globals));
 }
 
 }  // namespace ro::formats

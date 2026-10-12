@@ -44,8 +44,8 @@ constexpr std::array<std::string_view, 13> kBinaryOperators = {
 // Évalue les instructions, dans les globales données.
 class Parser {
  public:
-  Parser(std::string_view source, LuaTable globals, UnnamedKey unnamed)
-      : lexer_(source), globals_(std::move(globals)), unnamed_(unnamed) {}
+  Parser(std::string_view source, LuaTable globals)
+      : lexer_(source), globals_(std::move(globals)) {}
 
   [[nodiscard]] core::Result<LuaTable> Run() {
     if (!Advance()) {
@@ -170,14 +170,10 @@ class Parser {
       return false;
     }
     if (key.is_nil()) {
-      // ⚠ MÊME RÈGLE QUE DANS UN CONSTRUCTEUR, et par le même interrupteur : une
-      // clé que rien n'a nommée se saute ou refuse le fichier, selon ce que
-      // l'appelant a demandé. Voir `UnnamedKey`.
-      if (unnamed_ != UnnamedKey::kSkipEntry) {
-        return FailAt(key_line, ErrorCode::kCorruptData,
-                      "clé nulle : un identifiant que rien n'a nommé");
-      }
-      return true;
+      // ⚠ MÊME RÈGLE QUE DANS UN CONSTRUCTEUR : une clé que rien n'a nommée
+      // refuse le fichier.
+      return FailAt(key_line, ErrorCode::kCorruptData,
+                    "clé nulle : un identifiant que rien n'a nommé");
     }
     LuaValue* target = lua_internal::FindMutable(globals_, name);
     if (target == nullptr || target->kind != LuaValue::Kind::kTable || target->table == nullptr) {
@@ -448,15 +444,10 @@ class Parser {
           return false;
         }
         if (key.is_nil()) {
-          // ⚠ SAUTÉE, PAS RECRACHÉE : on ne sort PAS de l'itération, on se
-          // contente de ne rien poser. La fin de boucle consomme le séparateur
-          // qui suit, et sans elle la table se casserait une entrée plus loin —
-          // sur une virgule que plus personne n'attend.
-          if (unnamed_ != UnnamedKey::kSkipEntry) {
-            return FailAt(key_line, ErrorCode::kCorruptData,
-                          "clé de table nulle : un identifiant que rien n'a nommé");
-          }
-        } else if (!Assign(*table, key, std::move(value))) {
+          return FailAt(key_line, ErrorCode::kCorruptData,
+                        "clé de table nulle : un identifiant que rien n'a nommé");
+        }
+        if (!Assign(*table, key, std::move(value))) {
           return Fail(ErrorCode::kCorruptData,
                       "clé de table d'un type que l'on ne sait pas retrouver");
         }
@@ -510,15 +501,13 @@ class Parser {
   Lexer lexer_;
   Token current_;
   LuaTable globals_;
-  UnnamedKey unnamed_ = UnnamedKey::kRefuse;
   Error error_;
 };
 
 }  // namespace
 
-core::Result<LuaTable> ReadLuaSource(std::string_view source, LuaTable globals,
-                                     UnnamedKey unnamed) {
-  Parser parser(source, std::move(globals), unnamed);
+core::Result<LuaTable> ReadLuaSource(std::string_view source, LuaTable globals) {
+  Parser parser(source, std::move(globals));
   return parser.Run();
 }
 

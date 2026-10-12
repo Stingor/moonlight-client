@@ -145,25 +145,10 @@ struct LuaTable {
 // elle-même ferait tourner la lecture sans fin.
 inline constexpr int kMaxLuaTableDepth = 32;
 
-// CE QU'ON FAIT D'UNE CLÉ QUE RIEN N'A NOMMÉE.
-//
-// 🔴 REFUSER EST LE DÉFAUT, et il le reste : dans une table d'objets ou un arbre
-// de compétences, une clé nulle veut dire que le fichier précédent n'a pas été lu
-// — laisser passer donnerait une table à trous que personne ne verrait.
-//
-// ⚠ UN SEUL CAS DEMANDE L'AUTRE, et il est mesuré : `efstids.lub` décrit plus de
-// statuts que les tables qui les nomment et les dessinent, et une installation
-// dépareillée ferait sinon tomber tous les statuts pour une constante manquante.
-//
-// ⚠ LE CHOIX VAUT POUR LES DEUX FORMES, compilée comme en clair : « même
-// contrat, même résultat ». Un fichier compilé refusait sinon en entier ce que
-// sa version en clair aurait lu.
-enum class UnnamedKey : std::uint8_t {
-  // La clé nulle refuse le fichier.
-  kRefuse,
-  // La clé nulle saute son entrée, et la lecture continue.
-  kSkipEntry,
-};
+// 🔴 UNE CLÉ QUE RIEN N'A NOMMÉE REFUSE LE FICHIER, compilé comme en clair :
+// dans une table d'objets ou un arbre de compétences, une clé nulle veut dire
+// que le fichier précédent n'a pas été lu — laisser passer donnerait une table
+// à trous que personne ne verrait.
 
 // Évalue un chunk Lua 5.1 compilé qui ne fait que construire des tables.
 //
@@ -174,8 +159,7 @@ enum class UnnamedKey : std::uint8_t {
 // de ces conditions ne se rattrape en devinant : un fichier qu'on ne comprend pas
 // entièrement se refuse, sinon il se lit à moitié et personne ne le sait.
 [[nodiscard]] core::Result<LuaTable> ReadLuaChunk(std::span<const std::uint8_t> bytes,
-                                                  LuaTable globals = {},
-                                                  UnnamedKey unnamed = UnnamedKey::kRefuse);
+                                                  LuaTable globals = {});
 
 // Évalue un source Lua en clair qui ne fait que construire des tables.
 //
@@ -187,8 +171,7 @@ enum class UnnamedKey : std::uint8_t {
 //
 // L'erreur porte le numéro de ligne : un fichier de cinq mille entrées ne se
 // relit pas en entier pour trouver une virgule.
-[[nodiscard]] core::Result<LuaTable> ReadLuaSource(std::string_view source, LuaTable globals = {},
-                                                   UnnamedKey unnamed = UnnamedKey::kRefuse);
+[[nodiscard]] core::Result<LuaTable> ReadLuaSource(std::string_view source, LuaTable globals = {});
 
 // Lit un fichier de tables, compilé ou en clair, selon sa signature.
 //
@@ -196,7 +179,6 @@ enum class UnnamedKey : std::uint8_t {
 // d'avance sous quelle forme un serveur livre ses tables, et le client non
 // plus.
 [[nodiscard]] core::Result<LuaTable> ReadLuaFile(std::span<const std::uint8_t> bytes,
-                                                 LuaTable globals = {},
-                                                 UnnamedKey unnamed = UnnamedKey::kRefuse);
+                                                 LuaTable globals = {});
 
 }  // namespace ro::formats
