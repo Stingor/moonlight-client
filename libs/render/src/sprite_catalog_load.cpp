@@ -32,8 +32,8 @@ core::Result<SpriteCatalog> LoadSpriteCatalog(vfs::Vfs& vfs) {
   }
 
   // La table des objets se lit À PART, et par `vfs` — voir
-  // `ro/vfs/item_table.h`. Elle pèse des dizaines de milliers d'entrées, et la
-  // mêler aux globales du catalogue les ferait porter tout ce poids pour rien.
+  // `ro/vfs/item_table.h`. Elle n'est pas du Lua, et ses dizaines de milliers
+  // d'entrées n'ont rien à faire parmi les globales du catalogue.
   auto items = vfs::ReadItemTable(vfs);
   if (!items) {
     return std::unexpected(items.error());

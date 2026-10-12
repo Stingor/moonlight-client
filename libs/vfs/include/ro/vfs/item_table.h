@@ -16,8 +16,7 @@ namespace ro::vfs {
 //
 // Le fil ne porte qu'un identifiant. Le nom, l'apparence, la description, le
 // nombre d'emplacements de carte : rien de tout cela ne vient du serveur, et
-// c'est cette table de l'installation qui les donne. Sans elle, un sac n'affiche
-// que des numéros.
+// c'est cette table qui les donne. Sans elle, un sac n'affiche que des numéros.
 //
 // ⚠ ELLE VIT DANS `vfs` ET NON DANS `render`. Le catalogue de sprites n'en
 // lisait que deux nombres, ce qui suffisait tant qu'on ne dessinait que des
@@ -29,19 +28,15 @@ namespace ro::vfs {
 struct ItemEntry {
   // Le nom affiché, en UTF-8.
   //
-  // ⚠ TRANSCODÉ EN TOLÉRANT, et c'est mesuré : sur 27 208 noms, dix-neuf
-  // portent des octets hauts, et ces dix-neuf-là mêlent deux encodages — des
-  // résidus de fusion de sources. Les refuser strictement ferait perdre la table
-  // entière, et un point d'interrogation au milieu de dix-neuf lignes est le
-  // bon prix. ⚠ LA RECHERCHE D'ÉCHOPPES COMPARE PAR CE NOM : un de ces
-  // dix-neuf ne se retrouve qu'en tapant ce point d'interrogation.
+  // ⚠ LA RECHERCHE D'ÉCHOPPES COMPARE PAR CE NOM : un nom de la table qui mêle
+  // du coréen à l'anglais ne se retrouve qu'en tapant ce coréen.
   std::string name;
 
   // Le nom de RESSOURCE : celui du fichier, dans l'archive.
   //
-  // ⚠ IL RESTE EN CP949, tel quel. C'est un chemin d'archive, et les archives
-  // sont indexées dans cet encodage : le transcoder ferait chercher un fichier
-  // qui n'existe nulle part.
+  // ⚠ IL EST EN CP949. C'est un chemin d'archive, et les archives sont indexées
+  // dans cet encodage : en UTF-8, il ferait chercher un fichier qui n'existe
+  // nulle part.
   std::string resource;
 
   // La description, une entrée par ligne, en UTF-8.
@@ -53,7 +48,7 @@ struct ItemEntry {
   std::vector<std::string> description;
 
   // L'APPARENCE que l'objet donne quand on le porte — la classe d'une arme, la
-  // forme d'un bouclier. La table d'origine la nomme `ClassNum`.
+  // forme d'un bouclier.
   std::uint16_t view_id = 0;
 
   // Combien de cartes l'objet peut recevoir. C'est ce nombre qui compose le
@@ -91,26 +86,39 @@ class ItemTable {
   std::unordered_map<std::uint32_t, ItemEntry> by_id_;
 };
 
-// Où le client de ce serveur range sa table, et le nom de la globale qu'elle
-// pose. ⚠ HORS DES ARCHIVES : c'est un fichier du dossier de jeu, que le client
-// évalue par un script à lui.
-inline constexpr std::string_view kItemTablePath = "SystemEN\\itemInfoMerged.lua";
-inline constexpr std::string_view kItemTableGlobal = "tbl";
+// LA TABLE : `data\yaml_files\item_info.yml`, que `scripts/yaml_tables/item_info.py`
+// tire de la table des objets de l'installation et de l'item_db du serveur. Une
+// ligne par objet (coupée ici pour la lecture), ses champs tous facultatifs :
+//
+//     version: 1
+//     items: {
+//       1201: {name: "Knife", resource: "나이프", slots: 3, view: 1,
+//              description: ["Une lame courte.#", "^0000CCPoids :^000000 40"]},
+//     }
+//
+// `costume` (booléen) et `effect` (l'effet de l'objet au sol, que ce client ne
+// montre pas encore) complètent la liste. Le texte est en UTF-8, la ressource
+// comprise : le lecteur la retranscode en CP949, l'encodage des archives.
+//
+// ⚠ C'EST DU YAML, MAIS LU SANS BIBLIOTHÈQUE YAML : la table pèse une douzaine
+// de méga-octets, qu'un analyseur général lit en secondes. Le lecteur n'accepte
+// que cette forme — une ligne par objet, des textes entre guillemets doubles aux
+// échappements de JSON — et refuse le reste plutôt que de le lire de travers.
+inline constexpr std::string_view kItemInfoPath = "data\\yaml_files\\item_info.yml";
 
 // ── CE QUE LE SCRIPT DE CHARGEMENT AJOUTE, ET QUE NOUS DEVONS AJOUTER AUSSI ──
 //
 // 🔴 LA TABLE N'EST PAS LA DESCRIPTION. Le client ne l'affiche pas telle quelle :
-// il l'évalue par un SCRIPT — `SystemEN\itemInfo.lua` —, et ce script ajoute
+// le script de chargement de l'installation — `SystemEN\itemInfo.lua` — ajoute
 // trois lignes AVANT le texte de l'objet :
 //
 //     AddItemIdentifiedDesc(id, URL_PREFIX .. id .. URL_MID .. id .. URL_SUFFIX)
 //     if DESC.ViewID > 0 then AddItemIdentifiedDesc(id, "ViewID : " .. ViewID) end
 //     AddItemIdentifiedDesc(id, " ")
 //
-// ⚠ NOUS NE LISONS PAS CE SCRIPT — seulement la table de données qu'il requiert.
-// Les règles qu'il porte se recopient donc ICI, où elles sont vérifiables, et
-// c'est la seule raison pour laquelle le lien de base de données et le numéro
-// d'apparence apparaissent dans une description : ils ne sont dans AUCUNE donnée.
+// Ses règles se recopient ICI, où elles sont vérifiables, et c'est la seule
+// raison pour laquelle le lien de base de données et le numéro d'apparence
+// apparaissent dans une description : ils ne sont dans AUCUNE donnée.
 //
 // ⚠ L'ADRESSE EST CELLE DE CE SERVEUR-LÀ. Elle vit dans son dossier de jeu, et
 // c'est lui qui la choisit ; la recopier ici est un emprunt assumé, pas une
@@ -135,5 +143,10 @@ inline constexpr std::string_view kDescriptionGap = " ";
 // se joue sans, en montrant des numéros là où il montrerait des noms. Une table
 // ILLISIBLE, elle, est une erreur — mieux vaut le savoir que jouer aveugle.
 [[nodiscard]] core::Result<ItemTable> ReadItemTable(Vfs& vfs);
+
+// Le texte d'`item_info.yml`. Refuse un texte qui n'a pas la forme que le
+// script écrit (voir plus haut), dont `version` n'est pas 1, ou dont une
+// ressource n'existe pas en CP949.
+[[nodiscard]] core::Result<ItemTable> ParseItemTable(std::string_view yaml_text);
 
 }  // namespace ro::vfs

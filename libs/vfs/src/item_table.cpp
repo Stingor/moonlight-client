@@ -1,54 +1,20 @@
 #include "ro/vfs/item_table.h"
 
 #include <cstdint>
-#include <iterator>
-#include <limits>
-#include <optional>
+#include <expected>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ro/formats/lua_table.h"
 #include "ro/vfs/encoding.h"
+
+#include "item_info_text.h"
 
 namespace ro::vfs {
 namespace {
 
-// Les champs de la table, aux noms que le client leur donne.
-//
-// ⚠ `ViewID` EST CE QUE LA TABLE D'ORIGINE NOMME `ClassNum`. Le fichier fusionné
-// de ce serveur l'a renommé ; chercher `ClassNum` ne rendrait rien.
-constexpr std::string_view kNameField = "Name";
-constexpr std::string_view kResourceField = "Res";
-constexpr std::string_view kDescriptionField = "Desc";
-constexpr std::string_view kViewField = "ViewID";
-constexpr std::string_view kSlotField = "Slot";
-constexpr std::string_view kCostumeField = "costume";
-
-[[nodiscard]] const formats::LuaValue* FieldOf(const formats::LuaTable& entry,
-                                               std::string_view name) {
-  return entry.Find(name);
-}
-
-[[nodiscard]] std::string TextOf(const formats::LuaTable& entry, std::string_view name) {
-  const formats::LuaValue* value = FieldOf(entry, name);
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kString) {
-    return {};
-  }
-  return value->text;
-}
-
-[[nodiscard]] double NumberOf(const formats::LuaTable& entry, std::string_view name) {
-  const formats::LuaValue* value = FieldOf(entry, name);
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kNumber) {
-    return 0.0;
-  }
-  return value->number;
-}
-
-[[nodiscard]] bool FlagOf(const formats::LuaTable& entry, std::string_view name) {
-  const formats::LuaValue* value = FieldOf(entry, name);
-  return value != nullptr && value->kind == formats::LuaValue::Kind::kBoolean && value->boolean;
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData, "table des objets : " + std::move(detail)};
 }
 
 // LE TRAIT DE SÉPARATION DU CLIENT : vingt-quatre soulignés, ni plus ni moins.
@@ -73,24 +39,12 @@ constexpr std::string_view kDescriptionRule = "________________________";
 //
 // La ligne perd donc son dernier caractère, et une ligne de soulignés la suit.
 //
-// ⚠ ICI ET NON AU RENDU, parce que c'est ici que le client le fait : ce module
-// rend les lignes que sa fonction d'ajout aurait produites, et tout ce qui les
-// affiche — fenêtre, aperçu, infobulle — les reçoit déjà justes. Laissé au
-// rendu, chaque afficheur aurait sa version de la règle, et l'un d'eux
-// l'oublierait.
-[[nodiscard]] std::vector<std::string> LinesOf(const formats::LuaTable& entry) {
-  std::vector<std::string> lines;
-  const formats::LuaValue* value = FieldOf(entry, kDescriptionField);
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kTable ||
-      value->table == nullptr) {
-    return lines;
-  }
-  lines.reserve(value->table->by_index.size());
-  for (const auto& [rank, line] : value->table->by_index) {
-    if (line.kind != formats::LuaValue::Kind::kString) {
-      continue;
-    }
-    std::string shown = Cp949ToUtf8Lossy(line.text);
+// ⚠ ICI ET NON AU RENDU : ce module rend les lignes que la fonction d'ajout du
+// client aurait produites, et tout ce qui les affiche — fenêtre, aperçu,
+// infobulle — les reçoit déjà justes. Laissé au rendu, chaque afficheur aurait
+// sa version de la règle, et l'un d'eux l'oublierait.
+void AppendLines(std::vector<std::string>&& told, std::vector<std::string>& lines) {
+  for (std::string& shown : told) {
     // ⚠ EN DERNIÈRE POSITION SEULEMENT : un « # » au milieu d'une phrase est un
     // dièse, et le script du client ne regarde lui aussi que le dernier
     // caractère.
@@ -103,7 +57,6 @@ constexpr std::string_view kDescriptionRule = "________________________";
       lines.emplace_back(kDescriptionRule);
     }
   }
-  return lines;
 }
 
 // LES TROIS LIGNES QUE LE SCRIPT DE CHARGEMENT POSE EN TÊTE. Voir l'en-tête.
@@ -124,6 +77,29 @@ constexpr std::string_view kDescriptionRule = "________________________";
   }
   lines.emplace_back(kDescriptionGap);
   return lines;
+}
+
+// L'objet tel que le client le montre, ou la raison de son refus.
+[[nodiscard]] core::Result<ItemEntry> Described(ItemInfoRecord&& record) {
+  // ⚠ L'ALLER-RETOUR SE VÉRIFIE : un caractère que le CP949 n'a pas peut se
+  // remplacer en silence par un caractère de repli, et la ressource désignerait
+  // alors un autre fichier.
+  auto archived = Utf8ToCp949(record.resource);
+  const auto back = archived ? Cp949ToUtf8(*archived) : archived;
+  if (!back || *back != record.resource) {
+    return std::unexpected(
+        Refused("objet " + std::to_string(record.item_id) + " : ressource intraduisible en CP949"));
+  }
+  ItemEntry described;
+  described.name = std::move(record.name);
+  described.resource = std::move(*archived);
+  described.view_id = record.view;
+  described.card_slots = record.slots;
+  described.costume = record.costume;
+  // ⚠ LES TROIS LIGNES DU SCRIPT AVANT CELLES DE LA TABLE : voir l'en-tête.
+  described.description = HeaderLines(record.item_id, record.view);
+  AppendLines(std::move(record.description), described.description);
+  return described;
 }
 
 }  // namespace
@@ -149,58 +125,33 @@ std::string ItemDatabaseUrl(std::uint32_t item_id) {
   return std::string(kDatabasePageUrl) + std::to_string(item_id);
 }
 
-core::Result<ItemTable> ReadItemTable(Vfs& vfs) {
+core::Result<ItemTable> ParseItemTable(std::string_view yaml_text) {
   ItemTable table;
-  auto bytes = vfs.Read(std::string(kItemTablePath));
+  auto read = ReadItemInfoText(yaml_text, [&table](ItemInfoRecord&& record) -> core::Result<void> {
+    const std::uint32_t item_id = record.item_id;
+    auto described = Described(std::move(record));
+    if (!described) {
+      return std::unexpected(described.error());
+    }
+    table.Put(item_id, std::move(*described));
+    return {};
+  });
+  if (!read) {
+    return std::unexpected(read.error());
+  }
+  return table;
+}
+
+core::Result<ItemTable> ReadItemTable(Vfs& vfs) {
+  auto bytes = vfs.Read(std::string(kItemInfoPath));
   if (!bytes) {
     if (bytes.error().code == core::ErrorCode::kNotFound) {
-      return table;
+      return ItemTable{};
     }
     return std::unexpected(bytes.error());
   }
-
-  // ⚠ ÉVALUÉE SEULE, sans les globales du catalogue de sprites : elle porte des
-  // dizaines de milliers d'entrées, et les mêler ferait porter ce poids à tout
-  // ce qui lit une autre table.
-  auto chunk = formats::ReadLuaFile(*bytes);
-  if (!chunk) {
-    return std::unexpected(core::Error{chunk.error().code,
-                                       std::string(kItemTablePath) + " : " + chunk.error().detail});
-  }
-
-  const formats::LuaValue* items = chunk->Find(kItemTableGlobal);
-  if (items == nullptr || items->table == nullptr) {
-    return table;
-  }
-  for (const auto& [key, entry] : items->table->by_index) {
-    const std::optional<std::uint32_t> item_id =
-        formats::LuaWholeNumber(key, std::numeric_limits<std::uint32_t>::max());
-    if (!item_id.has_value() || entry.kind != formats::LuaValue::Kind::kTable ||
-        entry.table == nullptr) {
-      continue;
-    }
-    ItemEntry described;
-    described.name = Cp949ToUtf8Lossy(TextOf(*entry.table, kNameField));
-    described.resource = TextOf(*entry.table, kResourceField);
-    if (const std::optional<std::uint32_t> view = formats::LuaWholeNumber(
-            NumberOf(*entry.table, kViewField), std::numeric_limits<std::uint16_t>::max())) {
-      described.view_id = static_cast<std::uint16_t>(*view);
-    }
-    // ⚠ LES TROIS LIGNES DU SCRIPT AVANT CELLES DE LA TABLE : voir l'en-tête.
-    // C'est le seul endroit qui connaisse à la fois l'identifiant, l'apparence
-    // et le texte.
-    described.description = HeaderLines(*item_id, described.view_id);
-    std::vector<std::string> told = LinesOf(*entry.table);
-    described.description.insert(described.description.end(), std::make_move_iterator(told.begin()),
-                                 std::make_move_iterator(told.end()));
-    if (const std::optional<std::uint32_t> slots = formats::LuaWholeNumber(
-            NumberOf(*entry.table, kSlotField), std::numeric_limits<std::uint8_t>::max())) {
-      described.card_slots = static_cast<std::uint8_t>(*slots);
-    }
-    described.costume = FlagOf(*entry.table, kCostumeField);
-    table.Put(*item_id, std::move(described));
-  }
-  return table;
+  const std::string_view text(reinterpret_cast<const char*>(bytes->data()), bytes->size());
+  return ParseItemTable(text);
 }
 
 }  // namespace ro::vfs

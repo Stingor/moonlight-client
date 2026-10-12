@@ -126,6 +126,12 @@ tête d'où elle vient et comment la régénérer.
   du serveur Moonlight, et ses libellés aux traductions
   [ROenglishRE](https://github.com/llchrisll/ROenglishRE) que livre le client ;
   ces libellés ne sont pas revendiqués comme partie de ce projet.
+- `item_info.yml` prend les noms, les icônes et les descriptions des objets à
+  la table de l'installation, traduite par
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) et complétée des
+  objets de Moonlight ; ces textes ne sont pas revendiqués comme partie de ce
+  projet. Les objets que seule la base d'objets du serveur Moonlight connaît
+  prennent leur nom à elle.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 
