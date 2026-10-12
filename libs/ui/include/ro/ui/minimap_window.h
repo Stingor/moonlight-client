@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 
+#include "ro/ui/minimap_settings.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/wheel_gate.h"
 
@@ -62,12 +63,6 @@ inline constexpr float kMinimapLeastSide = 128.0F;
 // La part de l'écran que la fenêtre ne dépasse jamais, sur les deux axes.
 inline constexpr float kMinimapScreenShare = 0.9F;
 
-// Bornes et pas du zoom, ceux des boutons + et − du radar du jeu : le joueur
-// retrouve l'amplitude qu'il connaît.
-inline constexpr float kMinimapZoomLeast = 1.0F;
-inline constexpr float kMinimapZoomMost = 4.0F;
-inline constexpr float kMinimapZoomStep = 4.0F / 3.0F;
-
 // Plafond de marqueurs du joueur par carte : au-delà, la carte et la liste du
 // menu deviennent illisibles.
 inline constexpr int kMinimapMemoCap = 32;
@@ -77,55 +72,8 @@ inline constexpr std::size_t kMinimapMemoNameBytes = 64;
 // Les trois faces du bouton de réglages : normal, survolé, enfoncé.
 inline constexpr std::size_t kMinimapButtonFaceCount = 3;
 
-// La position d'une minimap que le joueur n'a jamais glissée.
-inline constexpr int kMinimapUnplaced = -1;
 // Ce dont la minimap jamais glissée se décolle des bords haut et droit.
 inline constexpr float kMinimapScreenMargin = 8.0F;
-
-// LES RÉGLAGES PERSISTÉS. Des scalaires nus, pour que l'appelant les écrive
-// sans rien savoir de la fenêtre.
-struct MinimapSettings {
-  // La position de la fenêtre. Elle n'a pas de réglage numérique : on la glisse,
-  // et le glissement se retient ici.
-  //
-  // ⚠ `kMinimapUnplaced` TANT QUE LE JOUEUR NE L'A PAS GLISSÉE : elle se tient alors
-  // au coin haut-droit, calculé à chaque image contre l'écran du moment — le coin
-  // haut-gauche est celui des icônes de menu. Un coin écrit dans le fichier
-  // serait celui d'UNE taille d'écran. Une place qui ne tient plus dans l'écran
-  // s'y montre ramenée, sans être réécrite.
-  int pos_x = kMinimapUnplaced;
-  int pos_y = kMinimapUnplaced;
-  // Le côté de la ZONE DE CARTE, en pixels — pas la taille de la fenêtre.
-  // Réglé à la poignée, jamais par un curseur. Un écran trop petit le montre
-  // rabattu, sans le réécrire.
-  int side_px = 220;
-  // La souris traverse la fenêtre ; elle cesse alors aussi d'être déplaçable et
-  // redimensionnable — trois faces du même choix.
-  bool click_through = false;
-  // 1 = la carte entière ; au-delà on ne voit que 1/zoom, centré sur le joueur.
-  float zoom = kMinimapZoomLeast;
-  int backdrop_percent = 70;
-  int map_percent = 100;
-  // Filtrage LINÉAIRE de l'image de carte, qui est très agrandie.
-  bool smooth = true;
-  // La demi-étendue de la flèche du joueur, en pixels, et sa teinte — blanc
-  // laisse l'art tel quel.
-  int arrow_half_px = 9;
-  ImU32 arrow_tint = IM_COL32(255, 255, 255, 255);
-  bool show_coords = true;
-  // Le nom LISIBLE du lieu, replié sur la largeur de la carte.
-  bool show_map_name = true;
-  bool show_party = true;
-  bool show_guild = true;
-  bool show_quests = true;
-  bool show_town = true;
-  // Les sorties de la carte, à part des PNJ : on ne cherche pas l'une comme
-  // on cherche l'autre.
-  bool show_portals = true;
-  bool show_viewpoints = true;
-  bool show_boss = true;
-  bool show_route = true;
-};
 
 // Une cellule de la carte.
 struct MinimapCell {

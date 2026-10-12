@@ -103,12 +103,8 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
   if (!world_asked.guide_to.empty()) navi_.GuideToPlace(world_asked.guide_to, 0, 0);
   if (!world_asked.warp_to.empty())
     SendStaffWarp(PlaceLink{.map = world_asked.warp_to}, Rights(), link_, world_);
-  // ⚠ LE PANNEAU D'OPTIONS RÈGLE LA MÊME MINIMAP : son geste fini s'écrit ici
-  // aussi. Voir `MinimapPanelOptions`.
-  if (mini.settings_changed ||
-      settings_->options().pages().minimap_panel.TakeSave(ImGui::IsAnyItemActive())) {
-    navi_.SavePrefs();
-  }
+  // ⚠ LES RÉGLAGES DE LA MINIMAP NE S'ÉCRIVENT PAS ICI : ils sont au profil de
+  // disposition, dont le gardien relève lui-même chaque changement.
 
   // ── Ce que la navigation a rendu ───────────────────────────────────────────
   const ro::formats::NaviMapIndex here_index =
@@ -261,8 +257,9 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     here_label = pieces_.map_display_names->DisplayNameOf(here + std::string(kGatExtension))
                      .value_or(std::string_view());
 
-  minimap.settings = &navi_.prefs.minimap;
-  if (navi_.prefs.minimap_shown && !here.empty()) {
+  ro::ui::MinimapLayout& minimap_layout = shell_.layouts().minimap();
+  minimap.settings = &minimap_layout.settings;
+  if (minimap_layout.shown && !here.empty()) {
     MinimapSources sources;
     sources.world = &world_;
     sources.now_ms = now_ms;
@@ -275,7 +272,7 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     sources.guild = &guild_book_;
     sources.viewpoints = &navi_.guidance.viewpoints;
     sources.boss = navi_.guidance.boss;
-    sources.guide = navi_.prefs.minimap.show_route ? &navi_.guide : nullptr;
+    sources.guide = minimap_layout.settings.show_route ? &navi_.guide : nullptr;
     sources.memos = navi_.MemosOn(here);
     sources.store_search = &pieces_.trade.store_search().search();
     // LES TOMBES DU CARNET DE CHASSE, que son interrupteur et son réglage

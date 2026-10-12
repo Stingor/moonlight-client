@@ -11,6 +11,7 @@
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
 
+#include "game/minimap_layout_yaml.h"
 #include "game/profile_yaml.h"
 #include "game/save_folder.h"
 
@@ -26,6 +27,7 @@ constexpr const char* kOffsetField = "offset";
 constexpr const char* kSizeField = "size";
 constexpr const char* kCollapsedField = "collapsed";
 constexpr const char* kTogglesField = "toggles";
+constexpr const char* kMinimapField = "minimap";
 
 // Les mots d'une ancre, dans l'ordre de `AnchorSide`.
 constexpr std::array<const char*, 3> kSideWords = {"start", "center", "end"};
@@ -38,6 +40,8 @@ constexpr const char* kFileHeader =
     "# ou end, en largeur puis en hauteur — et « offset » en est la distance, en\n"
     "# pixels d'interface : divisés par l'échelle de l'interface. « size » de même.\n"
     "# « toggles » : les fenêtres ouvertes et épinglées.\n"
+    "# « minimap » : sa place, sa taille, ses réglages, et si elle est affichée.\n"
+    "# Un profil sans « minimap » reprend celle de navigation.yml.\n"
     "# Sous « characters », le profil que chaque personnage pose en entrant en jeu ;\n"
     "# sans fiche, c'est « Default ».\n";
 
@@ -126,6 +130,17 @@ constexpr const char* kFileHeader =
       }
     }
   }
+  // ⚠ UNE MINIMAP ILLISIBLE N'EMPORTE PAS LE PROFIL : il hérite alors, comme
+  // un profil écrit avant qu'elle n'y entre.
+  if (const YAML::Node minimap = entry[kMinimapField]; minimap && minimap.IsMap()) {
+    ro::ui::MinimapLayout read;
+    try {
+      ReadMinimapLayout(minimap, read);
+      named.profile.minimap = read;
+    } catch (const YAML::Exception&) {
+      named.profile.minimap.reset();
+    }
+  }
   return named;
 }
 
@@ -168,6 +183,10 @@ std::string WriteUiLayouts(const UiLayoutBook& book) {
       out << YAML::Key << name << YAML::Value << on;
     }
     out << YAML::EndMap;
+    if (named.profile.minimap.has_value()) {
+      out << YAML::Key << kMinimapField << YAML::Value;
+      WriteMinimapLayout(out, *named.profile.minimap);
+    }
     out << YAML::EndMap;
   }
   out << YAML::EndSeq;

@@ -494,10 +494,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr, &pieces_.item_words,
       pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
   pieces_.quests.SeeSaveRoot(client_root_);
-  // LES RÉGLAGES DE LA MINIMAP AU PANNEAU D'OPTIONS : ceux que la partie tient,
-  // par le dessin du sous-menu de la minimap. Repris à la fin de la partie.
+  // LES RÉGLAGES DE LA MINIMAP AU PANNEAU D'OPTIONS : ceux du profil de
+  // disposition, par le dessin du sous-menu de la minimap. Repris à la fin de la
+  // partie.
   settings_->options().pages().minimap_panel.Entrust([this](const ro::ui::SkinArt& art) {
-    return ro::ui::DrawMinimapSettings(navi_.prefs.minimap, art);
+    return ro::ui::DrawMinimapSettings(shell_.layouts().minimap().settings, art);
   });
   pieces_.quests.StartSession();
   windows_.quests = QuestWindows{};

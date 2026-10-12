@@ -572,6 +572,7 @@ target_include_directories(moonclient_quests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # un aller-retour infidèle perdrait la place de toutes les fenêtres, ou les
 # réglages d'un personnage, sans un mot.
 add_library(moonclient_profiles STATIC
+    game/minimap_layout_yaml.cpp
     game/profile_yaml.cpp
     game/settings_profile_file.cpp
     game/settings_profile_port.cpp
@@ -944,7 +945,7 @@ add_library(moonclient_navigation STATIC
 target_link_libraries(moonclient_navigation
     PUBLIC ro_core ro_formats ro_render ro_sim ro_ui ro_vfs moonclient_bugreport
            moonclient_monstersheet
-    PRIVATE yaml-cpp::yaml-cpp ro_warnings)
+    PRIVATE moonclient_profiles yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_navigation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -2,8 +2,11 @@
 
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <unordered_map>
+
+#include "ro/ui/minimap_settings.h"
 
 struct ImGuiWindow;
 
@@ -71,9 +74,15 @@ struct ScreenRect {
 // ⚠ LA CLÉ D'UNE PLACE EST CE QU'IMGUI HACHE du nom de la fenêtre : la partie
 // après « ### » quand le nom en porte, le nom entier sinon. Un titre traduit
 // autrement garde donc sa place.
+//
+// ⚠ LA MINIMAP A SA SECTION À ELLE : elle n'est pas posée par `WindowPlacer`
+// — sa zone de carte reste carrée, et son coin par défaut se calcule contre
+// l'écran du moment. Absente, c'est l'appelant qui décide de ce dont elle
+// hérite.
 struct LayoutProfile {
   std::map<std::string, WindowPlace> places;
   std::map<std::string, bool> toggles;
+  std::optional<MinimapLayout> minimap;
 
   [[nodiscard]] friend bool operator==(const LayoutProfile&, const LayoutProfile&) = default;
 };

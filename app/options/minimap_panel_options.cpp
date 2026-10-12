@@ -21,20 +21,8 @@ void MinimapPanelOptions::Compose() {
   rows_.back().panel = draw_;
 }
 
-bool MinimapPanelOptions::Change(const ro::ui::OptionsWindowAction& asked) {
-  if (asked.changed != kMinimapPanelRowBase + static_cast<int>(MinimapPanelRow::kPanel)) {
-    return false;
-  }
-  save_pending_ = true;
-  return true;
-}
-
-bool MinimapPanelOptions::TakeSave(bool gesture_held) noexcept {
-  if (!save_pending_ || gesture_held) {
-    return false;
-  }
-  save_pending_ = false;
-  return true;
+bool MinimapPanelOptions::Change(const ro::ui::OptionsWindowAction& asked) const noexcept {
+  return asked.changed == kMinimapPanelRowBase + static_cast<int>(MinimapPanelRow::kPanel);
 }
 
 }  // namespace moonclient

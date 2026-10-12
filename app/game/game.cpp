@@ -283,7 +283,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .craft_atlas = &windows_.craft_atlas.state,
                 .navigation = &windows_.navigation.state,
                 .world_map = &windows_.navigation.world_map,
-                .minimap_shown = &navi_.prefs.minimap_shown,
+                .minimap_shown = &shell_.layouts().minimap().shown,
                 .mvp_tracker = &pieces_.mvp_tracker,
                 .bug_report = &windows_.bug_report,
                 .recorder = &recorder_,

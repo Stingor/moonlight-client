@@ -16,12 +16,19 @@ std::uint64_t LayoutPort::Revision() {
     seen_toggles_ = std::move(toggles);
     ++toggle_revision_;
   }
-  return ui_->layout_revision() + toggle_revision_;
+  return ui_->layout_revision() + toggle_revision_ + minimap_.Revision();
 }
 
-ro::ui::LayoutProfile LayoutPort::Capture() { return ui_->CurrentLayout(); }
+ro::ui::LayoutProfile LayoutPort::Capture() {
+  ro::ui::LayoutProfile layout = ui_->CurrentLayout();
+  minimap_.Capture(layout);
+  return layout;
+}
 
-void LayoutPort::Pose(const ro::ui::LayoutProfile& profile) { ui_->UseLayout(profile); }
+void LayoutPort::Pose(const ro::ui::LayoutProfile& profile) {
+  ui_->UseLayout(profile);
+  minimap_.Pose(profile);
+}
 
 bool LayoutPort::Load(UiLayoutBook& into) {
   std::error_code failed;
@@ -30,7 +37,11 @@ bool LayoutPort::Load(UiLayoutBook& into) {
     return false;
   }
   if (fresh && into.Find(kDefaultProfileName) == nullptr) {
-    into.Put(kDefaultProfileName, FactoryLayout());
+    // La minimap d'un joueur qui la réglait déjà avant les profils est dans
+    // `navigation.yml` : le premier « Default » en hérite.
+    ro::ui::LayoutProfile first = FactoryLayout();
+    first.minimap.reset();
+    into.Put(kDefaultProfileName, first);
   }
   return true;
 }

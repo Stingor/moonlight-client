@@ -98,6 +98,7 @@ ro::ui::LayoutProfile FactoryLayout() {
   for (const FactoryToggle& toggle : kFactoryToggles) {
     profile.toggles.emplace(toggle.key, toggle.on);
   }
+  profile.minimap = ro::ui::MinimapLayout{};
   return profile;
 }
 

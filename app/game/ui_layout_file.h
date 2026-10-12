@@ -18,6 +18,10 @@ namespace moonclient {
 //
 // ⚠ LE FORMAT EST VERSIONNÉ : un fichier d'une version inconnue ne se relit
 // pas, et ne s'écrase pas.
+//
+// ⚠ LA SECTION « minimap » D'UN PROFIL EST FACULTATIVE, et n'a pas changé la
+// version : un fichier qui n'en a pas se lit, ses profils héritant alors de
+// `navigation.yml` ; un client qui ne la connaît pas la saute.
 
 inline constexpr int kUiLayoutFileVersion = 1;
 inline constexpr std::string_view kUiLayoutFileName = "ui_layouts.yml";
