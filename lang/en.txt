@@ -17156,9 +17156,6 @@ tr: The server could not read its command log: its console says why.
 fr: Aucun blocage de chat consigné pour ce personnage.
 tr: No chat ban recorded for this character.
 
-fr: Votre rang ne peut pas inviter dans la guilde.
-tr: Your rank cannot invite into the guild.
-
 fr: Options : page %d
 tr: Options: page %d
 
@@ -17224,6 +17221,9 @@ tr: Mail: writing to %s
 
 fr: Courrier : écriture
 tr: Mail: writing
+
+fr: Votre rang ne peut pas inviter dans la guilde.
+tr: Your rank cannot invite into the guild.
 
 fr: Vous avez quitté la guilde.
 tr: You left the guild.

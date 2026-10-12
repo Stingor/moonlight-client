@@ -17156,9 +17156,6 @@ tr: El servidor no pudo leer su registro de comandos: su consola dice por qué.
 fr: Aucun blocage de chat consigné pour ce personnage.
 tr: Ningún chat ban registrado para este personaje.
 
-fr: Votre rang ne peut pas inviter dans la guilde.
-tr: Tu rango no puede invitar a la guild.
-
 fr: Options : page %d
 tr: Opciones: página %d
 
@@ -17224,6 +17221,9 @@ tr: Correo: redactando a %s
 
 fr: Courrier : écriture
 tr: Correo: redactando
+
+fr: Votre rang ne peut pas inviter dans la guilde.
+tr: Tu rango no puede invitar a la guild.
 
 fr: Vous avez quitté la guilde.
 tr: Has abandonado la guild.
