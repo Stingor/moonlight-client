@@ -112,10 +112,12 @@ tête d'où elle vient et comment la régénérer.
   bases d'objets, de monstres et de familiers du serveur Moonlight.
 - `item_groups.yml` est exporté des bases d'objets, de groupes d'objets et
   d'invocations du serveur Moonlight.
-- `achievements.yml` est exporté de la base des succès du serveur Moonlight
-  (et de ses bases d'objets, de monstres et de cartes). Les textes des succès
-  restent lus dans le `achievements.lub` de l'installation du joueur ; ils ne
-  sont pas versés au dépôt.
+- `achievements.yml` prend sa liste des succès à la base des succès du serveur
+  Moonlight (et à ses bases d'objets, de monstres et de cartes), et ses textes
+  au fichier `achievements.lub` que livre le client : les traductions
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) des textes de
+  Gravity, et ceux des succès propres au serveur. Ces textes ne sont pas
+  revendiqués comme partie de ce projet.
 - `skill_trees.yml` est exporté des arbres de compétences des métiers et de la
   guilde du serveur Moonlight (et de ses bases de compétences et de métiers).
   La disposition de la fenêtre — cases, onglets — reste lue dans les tables de

@@ -3,7 +3,11 @@
 #include "ro/vfs/achievement_database.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <expected>
+#include <limits>
+#include <string>
+#include <string_view>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
@@ -17,6 +21,9 @@ constexpr std::size_t kTargetIndexField = 0;
 constexpr std::size_t kTargetCountField = 1;
 constexpr std::size_t kTargetFieldCount = 2;
 constexpr std::int64_t kMostCount = std::numeric_limits<std::uint32_t>::max();
+// La jauge, telle qu'écrite.
+constexpr std::string_view kBulletsGauge = "bullets";
+constexpr std::string_view kCountsGauge = "counts";
 
 core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData, "table des succès : " + std::move(detail)};
@@ -66,6 +73,51 @@ void ReadTargets(const YAML::Node& entry, ServerAchievement& read) {
   }
 }
 
+[[nodiscard]] AchievementGauge Gauge(const YAML::Node& node) {
+  const auto written = node.as<std::string>();
+  if (written == kBulletsGauge) {
+    return AchievementGauge::kBullets;
+  }
+  if (written == kCountsGauge) {
+    return AchievementGauge::kCounts;
+  }
+  throw YAML::RepresentationException(node.Mark(), "une jauge ni « bullets » ni « counts »");
+}
+
+[[nodiscard]] std::uint8_t TabNumber(const YAML::Node& node) {
+  return static_cast<std::uint8_t>(Whole(node, 0, std::numeric_limits<std::uint8_t>::max()));
+}
+
+[[nodiscard]] AchievementWindow ReadWindow(const YAML::Node& node) {
+  if (!node.IsMap()) {
+    throw YAML::RepresentationException(node.Mark(), "« window » n'est pas une table");
+  }
+  AchievementWindow read{.summary = Required(node, "summary").as<std::string>(),
+                         .details = Required(node, "details").as<std::string>(),
+                         .gauge = Gauge(Required(node, "gauge")),
+                         .group = Required(node, "group").as<std::string>(),
+                         .major = TabNumber(Required(node, "major")),
+                         .minor = TabNumber(Required(node, "minor"))};
+  const YAML::Node objectives = Sequence(node, "objectives");
+  if (objectives.size() > kAchievementObjectiveCount) {
+    throw YAML::RepresentationException(objectives.Mark(), "plus de dix objectifs");
+  }
+  for (const YAML::Node& objective : objectives) {
+    if (!objective.IsMap()) {
+      throw YAML::RepresentationException(objective.Mark(), "un objectif n'est pas une table");
+    }
+    AchievementLine line{.text = Required(objective, "text").as<std::string>()};
+    if (const YAML::Node shortcut = objective["shortcut"]) {
+      line.shortcut = static_cast<std::uint32_t>(Number(shortcut));
+    }
+    read.lines.push_back(std::move(line));
+  }
+  if (const YAML::Node buff = node["buff"]) {
+    read.buff = Number(buff);
+  }
+  return read;
+}
+
 [[nodiscard]] ServerAchievement ReadEntry(std::uint32_t achievement_id, const YAML::Node& entry) {
   if (!entry.IsMap()) {
     throw YAML::RepresentationException(entry.Mark(), "un succès n'est pas une table");
@@ -83,6 +135,9 @@ void ReadTargets(const YAML::Node& entry, ServerAchievement& read) {
   read.reward_script = Required(reward, "script").as<bool>();
   for (const YAML::Node& needed : Sequence(entry, "dependents")) {
     read.dependents.push_back(static_cast<std::uint32_t>(Number(needed)));
+  }
+  if (const YAML::Node window = entry["window"]) {
+    read.window = ReadWindow(window);
   }
   return read;
 }

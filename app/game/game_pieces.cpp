@@ -400,8 +400,8 @@ void LoadTitles(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.titles = std::move(*titles);
 }
 
-// LES SUCCÈS : la base du serveur donne le titre que chacun récompense, et le
-// catalogue de la fenêtre, joint à la table du client. ⚠ LEUR ABSENCE NE COUPE
+// LES SUCCÈS : la base donne le titre que chacun récompense, et le catalogue de
+// la fenêtre, tiré des succès qui y ont leur fenêtre. ⚠ LEUR ABSENCE NE COUPE
 // RIEN D'AUTRE : la fenêtre reste vide et la fiche sans titre, la progression
 // se tient quand même.
 void LoadAchievements(ro::vfs::Vfs& vfs, GamePieces& pieces) {
@@ -414,17 +414,10 @@ void LoadAchievements(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.achievement_titles = ro::vfs::AchievementTitles::Of(*database);
   ro::core::LogInfo("succès : {} au serveur, {} titre(s) en récompense", database->entries().size(),
                     pieces.achievement_titles->entries().size());
-  auto catalog = ro::vfs::AchievementCatalog::Load(vfs, *database);
-  if (!catalog) {
-    ro::core::LogWarning("succès : {} — la fenêtre des succès restera vide",
-                         ro::core::Describe(catalog.error()));
-    return;
-  }
-  ro::core::LogInfo(
-      "succès : {} au catalogue, {} entrée(s) écartée(s), {} inconnue(s) du serveur, {} sans texte",
-      catalog->entries().size(), catalog->skipped(), catalog->unknown_to_server(),
-      catalog->without_texts());
-  pieces.achievement_catalog = std::move(*catalog);
+  ro::vfs::AchievementCatalog catalog = ro::vfs::AchievementCatalog::Of(*database);
+  ro::core::LogInfo("succès : {} au catalogue, {} sans texte", catalog.entries().size(),
+                    catalog.without_texts());
+  pieces.achievement_catalog = std::move(catalog);
 }
 
 // LE CATALOGUE DES QUÊTES, notre propre table YAML. ⚠ AUCUN REPLI SUR LES
