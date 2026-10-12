@@ -149,6 +149,61 @@ void Shrink(float& low, float& high, float share) {
 constexpr float kGroundUnitHalfWidthSpritePixels = 2.0F;
 constexpr float kGroundUnitHeightSpritePixels = 2.0F;
 
+// L'emprise des calques peints dont la partie est dans `counted_parts`. Rien si
+// aucun ne l'est, ou si un coin passe derrière l'œil.
+std::optional<ScreenRect> PaintedPartsScreenBounds(const Camera& camera, float aspect_ratio,
+                                                   const DrawnActor& drawn,
+                                                   ActorPartSet counted_parts, float viewport_width,
+                                                   float viewport_height) {
+  if (drawn.actor == nullptr || drawn.actor->quads.empty()) {
+    return std::nullopt;
+  }
+  const BillboardBasis basis = MakeBillboardBasis(camera);
+  ScreenRect rect;
+  rect.min = glm::vec2{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
+  rect.max = glm::vec2{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
+  bool any_drawn = false;
+  for (std::size_t index = 0; index < drawn.actor->quads.size(); ++index) {
+    // ⚠ SEUL CE QUI EST PEINT COMPTE, et c'est la règle du client : il
+    // n'accumule son rectangle que sur les calques qu'il a réellement soumis.
+    // Un calque dont l'image n'existe pas — une pièce absente, une image de
+    // taille nulle — porte quand même le décalage de son .act, et le compter
+    // étire l'emprise jusque-là sur du vide.
+    if (index >= drawn.actor->sources.size() || !HasImage(drawn.actor->sources[index])) {
+      continue;
+    }
+    if ((counted_parts & PartBit(PartOfQuad(*drawn.actor, index))) == 0) {
+      continue;
+    }
+    SpriteQuad quad = drawn.actor->quads[index];
+    // Le rectangle suit ce qui est DESSINÉ : un corps rapetissé s'attrape
+    // petit, un corps agrandi s'attrape grand.
+    for (glm::vec2& corner : quad.corners) {
+      corner *= drawn.scale;
+    }
+    any_drawn = true;
+    const std::array<glm::vec3, 4> corners = BillboardCorners(quad, drawn.ground_position, basis);
+    for (const glm::vec3& corner : corners) {
+      const std::optional<glm::vec2> projected =
+          ProjectToScreen(camera, aspect_ratio, corner, viewport_width, viewport_height);
+      if (!projected.has_value()) {
+        return std::nullopt;
+      }
+      rect.min = glm::min(rect.min, *projected);
+      rect.max = glm::max(rect.max, *projected);
+    }
+  }
+  // Aucun calque compté : l'acteur n'occupe RIEN, et rendre le rectangle
+  // sentinelle — infini à l'envers — le rendrait attrapable partout.
+  if (!any_drawn) {
+    return std::nullopt;
+  }
+  return rect;
+}
+
+// Ce qui porte une parole : le corps et la tête, sans rien de ce qu'on enfile.
+constexpr ActorPartSet kSpeakerParts = PartBit(ActorPart::kBody) | PartBit(ActorPart::kHead);
+
 }  // namespace
 
 float PickFloorPixels(float factor, float viewport_width, int shift) {
@@ -206,47 +261,23 @@ std::optional<ScreenRect> ActorScreenBounds(const Camera& camera, float aspect_r
   if (drawn.model_pick_side > 0.0F) {
     return ModelScreenBounds(camera, aspect_ratio, drawn, viewport_width, viewport_height);
   }
-  if (drawn.actor == nullptr || drawn.actor->quads.empty()) {
-    return std::nullopt;
+  return PaintedPartsScreenBounds(camera, aspect_ratio, drawn, kAllActorParts, viewport_width,
+                                  viewport_height);
+}
+
+std::optional<ScreenRect> ActorSpeakerScreenBounds(const Camera& camera, float aspect_ratio,
+                                                   const DrawnActor& drawn, float viewport_width,
+                                                   float viewport_height) {
+  if (drawn.model_pick_side > 0.0F) {
+    return ModelScreenBounds(camera, aspect_ratio, drawn, viewport_width, viewport_height);
   }
-  const BillboardBasis basis = MakeBillboardBasis(camera);
-  ScreenRect rect;
-  rect.min = glm::vec2{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
-  rect.max = glm::vec2{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
-  bool any_drawn = false;
-  for (std::size_t index = 0; index < drawn.actor->quads.size(); ++index) {
-    // ⚠ SEUL CE QUI EST PEINT COMPTE, et c'est la règle du client : il
-    // n'accumule son rectangle que sur les calques qu'il a réellement soumis.
-    // Un calque dont l'image n'existe pas — une pièce absente, une image de
-    // taille nulle — porte quand même le décalage de son .act, et le compter
-    // étire l'emprise jusque-là sur du vide.
-    if (index >= drawn.actor->sources.size() || !HasImage(drawn.actor->sources[index])) {
-      continue;
-    }
-    SpriteQuad quad = drawn.actor->quads[index];
-    // Le rectangle suit ce qui est DESSINÉ : un corps rapetissé s'attrape
-    // petit, un corps agrandi s'attrape grand.
-    for (glm::vec2& corner : quad.corners) {
-      corner *= drawn.scale;
-    }
-    any_drawn = true;
-    const std::array<glm::vec3, 4> corners = BillboardCorners(quad, drawn.ground_position, basis);
-    for (const glm::vec3& corner : corners) {
-      const std::optional<glm::vec2> projected =
-          ProjectToScreen(camera, aspect_ratio, corner, viewport_width, viewport_height);
-      if (!projected.has_value()) {
-        return std::nullopt;
-      }
-      rect.min = glm::min(rect.min, *projected);
-      rect.max = glm::max(rect.max, *projected);
-    }
+  std::optional<ScreenRect> speaker = PaintedPartsScreenBounds(
+      camera, aspect_ratio, drawn, kSpeakerParts, viewport_width, viewport_height);
+  if (speaker.has_value()) {
+    return speaker;
   }
-  // Aucun calque peint : l'acteur n'occupe RIEN, et rendre le rectangle
-  // sentinelle — infini à l'envers — le rendrait attrapable partout.
-  if (!any_drawn) {
-    return std::nullopt;
-  }
-  return rect;
+  return PaintedPartsScreenBounds(camera, aspect_ratio, drawn, kAllActorParts, viewport_width,
+                                  viewport_height);
 }
 
 std::optional<float> ActorSpriteScreenScale(const Camera& camera, float aspect_ratio,

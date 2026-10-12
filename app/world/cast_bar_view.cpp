@@ -81,7 +81,7 @@ std::vector<ro::ui::CastBarView> CastBarsOnScreen(
     }
     // LE HAUT DU SPRITE, celui d'où la bulle de parole monte : la barre du
     // client partage son ancrage et descend de là.
-    const std::optional<ro::render::ScreenRect> bounds = ro::render::ActorScreenBounds(
+    const std::optional<ro::render::ScreenRect> bounds = ro::render::ActorSpeakerScreenBounds(
         camera, aspect_ratio, drawn[index], viewport_width, viewport_height);
     ro::ui::CastBarView bar;
     bar.head = ImVec2(feet->x, bounds.has_value() ? bounds->min.y : feet->y);

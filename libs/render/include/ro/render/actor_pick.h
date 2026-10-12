@@ -51,6 +51,22 @@ struct ScreenRect {
                                                           float viewport_width,
                                                           float viewport_height);
 
+// LE RECTANGLE DE CELUI QUI PARLE : celui d'`ActorScreenBounds`, mais sur le
+// corps et la tête seuls. C'est de son haut que montent la bulle de parole et la
+// barre d'incantation.
+//
+// 🔴 COIFFES, CAPE ET ARMES N'Y COMPTENT PAS. Une coiffe ou une cape animée
+// joue ses propres images, à sa propre cadence, et une arme se lève à chaque
+// coup : leur haut change d'une image à l'autre, et la bulle qui le suivrait
+// sautillerait au rythme du costume.
+//
+// Sans corps ni tête peints, c'est l'emprise entière.
+[[nodiscard]] std::optional<ScreenRect> ActorSpeakerScreenBounds(const Camera& camera,
+                                                                 float aspect_ratio,
+                                                                 const DrawnActor& drawn,
+                                                                 float viewport_width,
+                                                                 float viewport_height);
+
 // COMBIEN DE PIXELS D'ÉCRAN FAIT UN PIXEL DE SON SPRITE, là où il se tient :
 // la hauteur de ce qui est dessiné, rapportée à sa hauteur en pixels de sprite.
 // Sans la taille du corps (`DrawnActor::scale`) : c'est l'échelle de la caméra

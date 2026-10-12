@@ -247,13 +247,13 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
     if (elapsed_ms >= ro::ui::ChatBubbleLongestLifeMs(look)) {
       continue;
     }
-    const std::optional<ro::render::ScreenRect> bounds = ro::render::ActorScreenBounds(
+    const std::optional<ro::render::ScreenRect> bounds = ro::render::ActorSpeakerScreenBounds(
         camera, aspect_ratio, drawn[index], viewport_width, viewport_height);
     if (!bounds.has_value()) {
       continue;
     }
-    // Le MILIEU DU HAUT de ce que l'acteur occupe : c'est de là que la bulle
-    // monte, et c'est tout ce que `ui` a besoin de savoir du monde.
+    // Le MILIEU DU HAUT du corps et de la tête : c'est de là que la bulle monte,
+    // et c'est tout ce que `ui` a besoin de savoir du monde.
     ro::ui::ChatBubbleView bubble{
         .head = ImVec2((bounds->min.x + bounds->max.x) * 0.5F, bounds->min.y),
         .text = said,
