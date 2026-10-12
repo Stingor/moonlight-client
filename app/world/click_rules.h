@@ -122,6 +122,9 @@ inline constexpr std::uint32_t kDoubleClickMs = 500;
 // aller-retour au même point ne compte pas. Il n'y a pas de tolérance.
 //
 // Un troisième appui ne fait pas un second double avec le deuxième.
+//
+// ⚠ CE N'EST PAS LA RÈGLE DU SYSTÈME : le délai et la tolérance de mouvement
+// réglés dans Windows n'y entrent pas.
 class DoubleClickClock {
  public:
   // La souris a bougé.
@@ -133,6 +136,30 @@ class DoubleClickClock {
  private:
   bool armed_ = false;
   std::uint32_t pressed_ms_ = 0;
+};
+
+// Les boutons qui suivent `DoubleClickClock`.
+enum class ClickButton : std::uint8_t { kLeft, kRight };
+
+// LE GAUCHE ET LE DROIT SUIVENT LA MÊME RÈGLE, chacun son horloge : un appui
+// gauche ne fait pas double avec un appui droit. Le mouvement, lui, les défait
+// tous les deux. Chaque appui compte, qu'il tombe sur une fenêtre ou sur le
+// monde.
+class DoubleClickClocks {
+ public:
+  void NoteMotion() noexcept {
+    left_.NoteMotion();
+    right_.NoteMotion();
+  }
+
+  // Un appui du bouton. Rend vrai s'il est le second d'un double-clic.
+  [[nodiscard]] bool NotePress(ClickButton button, std::uint32_t now_ms) noexcept {
+    return (button == ClickButton::kLeft ? left_ : right_).NotePress(now_ms);
+  }
+
+ private:
+  DoubleClickClock left_;
+  DoubleClickClock right_;
 };
 
 }  // namespace moonclient

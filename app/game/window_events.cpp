@@ -196,6 +196,21 @@ void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_i
   return std::nullopt;
 }
 
+// L'APPUI COMPLÈTE UN DOUBLE-CLIC. Le gauche et le droit suivent la règle du
+// jeu, `DoubleClickClocks` ; le bouton du milieu, que le jeu ne lit pas, garde
+// celle du système.
+//
+// ⚠ UN SEUL APPEL PAR APPUI : chaque appel avance l'horloge du bouton.
+[[nodiscard]] bool SecondOfDouble(const EventRouting& to, const SDL_MouseButtonEvent& button) {
+  if (button.button == SDL_BUTTON_LEFT) {
+    return to.world_mouse->double_click.NotePress(ClickButton::kLeft, to.now_ms);
+  }
+  if (button.button == SDL_BUTTON_RIGHT) {
+    return to.world_mouse->double_click.NotePress(ClickButton::kRight, to.now_ms);
+  }
+  return button.clicks >= 2;
+}
+
 [[nodiscard]] std::optional<MouseGesture> DoubleClickOf(std::uint8_t button) {
   if (button == SDL_BUTTON_RIGHT) {
     return MouseGesture::kRightDoubleClick;
@@ -371,12 +386,10 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   to.world_mouse->held_since_ms = to.now_ms;
 }
 
-// TOUT APPUI GAUCHE, fenêtres comprises.
+// TOUT APPUI GAUCHE, fenêtres comprises. `second_of_double` : voir
+// `SecondOfDouble`.
 void OnLeftButtonDown(const EventRouting& to, const SDL_MouseButtonEvent& button,
-                      bool over_interface) {
-  // LE DOUBLE-CLIC SE RECONNAÎT ICI, à chaque appui, fenêtre ou monde : voir
-  // `DoubleClickClock`.
-  const bool second_of_double = to.world_mouse->double_click.NotePress(to.now_ms);
+                      bool over_interface, bool second_of_double) {
   // TOUT APPUI GAUCHE ARRÊTE LE SUIVI, fenêtre ou monde : le tic le lira.
   to.world_mouse->follow.left_pressed = to.world_mouse->follow.active();
   // 🔴 TOUT APPUI GAUCHE COMPTE POUR L'ENGAGEMENT, celui qui tombe sur une
@@ -444,7 +457,8 @@ void OnRightRelease(const EventRouting& to, const SDL_MouseButtonEvent& button,
   if (clicked && world_takes_clicks && to.companion_ai != nullptr &&
       CompanionRightRelease(*to.companion_ai, CompanionPointerOf(to, released_at),
                             OrderedBy(to, MouseGesture::kRightClick, modifiers),
-                            (modifiers & SDL_KMOD_SHIFT) != 0, button.clicks >= 2)) {
+                            (modifiers & SDL_KMOD_SHIFT) != 0,
+                            to.world_mouse->right_press_doubled)) {
     return;
   }
   const WindowPixels window = PointerSpaceOf(*to.gl);
@@ -585,22 +599,26 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       if (event.button.button == SDL_BUTTON_RIGHT) {
         to.world_mouse->right_on_signboard = false;
         to.world_mouse->right_pressed_at.reset();
+        to.world_mouse->right_press_doubled = false;
       }
       break;
 
-    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+      // LE DOUBLE-CLIC SE RECONNAÎT AVANT TOUT, à chaque appui, fenêtre ou
+      // monde, et même quand la capture d'un raccourci prend l'appui.
+      const bool second_of_double = SecondOfDouble(to, event.button);
       // La capture passe avant le laissez-passer : la souris est encore sur la
       // fenêtre de configuration.
       // UN CLIC SIMPLE, pour une liaison d'ordre aux compagnons : seule une action
       // de clic sur le monde le prend, toute autre le laisse passer.
-      if (event.button.clicks < 2) {
+      if (!second_of_double) {
         if (const std::optional<MouseGesture> gesture = ClickOf(event.button.button);
             gesture.has_value() &&
             CaptureGesture(to.hotkeys, to.bindings, *gesture, SDL_GetModState())) {
           break;
         }
       }
-      if (event.button.clicks >= 2) {
+      if (second_of_double) {
         if (const std::optional<MouseGesture> gesture = DoubleClickOf(event.button.button);
             gesture.has_value()) {
           if (CaptureGesture(to.hotkeys, to.bindings, *gesture, SDL_GetModState())) {
@@ -628,6 +646,7 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
           to.companion_ai->Disarm();
         }
         to.world_mouse->right_pressed_at = glm::vec2{event.button.x, event.button.y};
+        to.world_mouse->right_press_doubled = second_of_double;
         if ((SDL_GetModState() & SDL_KMOD_SHIFT) != 0) {
           OnShiftRightPress(to, event.button);
         }
@@ -644,9 +663,10 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
         }
       }
       if (event.button.button == SDL_BUTTON_LEFT) {
-        OnLeftButtonDown(to, event.button, gate.mouse_to_ui);
+        OnLeftButtonDown(to, event.button, gate.mouse_to_ui, second_of_double);
       }
       break;
+    }
 
     case SDL_EVENT_MOUSE_MOTION:
       // La position se suit MÊME au-dessus d'une fenêtre : c'est elle qui place

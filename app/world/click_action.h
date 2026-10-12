@@ -313,8 +313,11 @@ struct WorldMouse {
   // OÙ LE BOUTON DROIT S'EST ENFONCÉ dans le monde, jusqu'à son relâchement :
   // un relâchement loin de là clôt un glissé de caméra, pas un clic.
   std::optional<glm::vec2> right_pressed_at;
-  // Le double-clic du bouton gauche : voir `DoubleClickClock`.
-  DoubleClickClock double_click;
+  // L'appui droit enfoncé dans le monde était le second d'un double-clic :
+  // son relâchement ne donne pas d'ordre aux compagnons.
+  bool right_press_doubled = false;
+  // Le double-clic des boutons gauche et droit : voir `DoubleClickClocks`.
+  DoubleClickClocks double_click;
   // Le joueur que le personnage suit : voir `world/follow_rules.h`.
   FollowState follow;
 };
