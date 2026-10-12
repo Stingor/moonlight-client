@@ -17,11 +17,9 @@
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_palette.h"
-#include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
-#include "achievement_paint.h"
 #include "quest_window_parts.h"
 
 namespace ro::ui {
@@ -40,7 +38,6 @@ constexpr float kPaneGap = 6.0F;
 // Les actions de la barre de titre, dans leur ordre de pose.
 constexpr int kBugReportRank = 0;
 
-constexpr const char* kSettingsPopupId = "##quetes_reglages_suivi";
 // 🔴 OUVERTES AU NIVEAU DE LA FENÊTRE, là où elles se dessinent : voir
 // `PaneRequests`.
 constexpr const char* kForgetAllId = "##quetes_tout_oublier";
@@ -124,22 +121,6 @@ void DrawTabs(QuestWindowState& state, const QuestWindowView& view, const SkinAr
   EndSkinTabBar();
 }
 
-// LES RÉGLAGES DU SUIVI, sous la puce de la barre de titre.
-void DrawTrackerSettings(const QuestWindowView& view, const SkinArt& skin,
-                         QuestWindowAction& action) {
-  if (TitleBulletClicked()) {
-    ImGui::OpenPopup(kSettingsPopupId);
-  }
-  achievement::PushSettingsMenuFrame();
-  if (BeginSkinPopup(kSettingsPopupId)) {
-    ImGui::TextDisabled("%s", core::Tr("Panneau de suivi"));
-    ImGui::Separator();
-    action.tracker_settings = DrawTrackerSettingsItems(view.tracker_look, skin);
-    EndSkinPopup();
-  }
-  achievement::PopSettingsMenuFrame();
-}
-
 // LE PIED : la case du suivi à gauche, « Fermer » à droite, sur une même
 // rangée de la hauteur d'un bouton.
 void DrawFooter(QuestWindowState& state, const QuestWindowView& view, const SkinArt& skin,
@@ -183,7 +164,7 @@ void DrawRewardMenu(QuestWindowState& state, QuestWindowAction& action) {
 
 void DrawBody(QuestWindowState& state, const QuestWindowView& view, const QuestArt& art,
               const SkinArt& skin, QuestWindowAction& action) {
-  DrawTrackerSettings(view, skin, action);
+  action.open_settings = TitleBulletClicked();
   DrawTabs(state, view, skin);
   PaneRequests requests{.reward_menu = state.reward_menu};
   const float panes_height =

@@ -13,7 +13,6 @@
 #include "ro/ui/item_link_cell.h"
 #include "ro/ui/rich_text.h"
 #include "ro/ui/skin_art.h"
-#include "ro/ui/tracker_panel.h"
 
 namespace ro::ui {
 
@@ -231,8 +230,6 @@ struct QuestWindowView {
   std::string_view catalog_problem;
   // Le panneau de suivi se montre (la case du pied de fenêtre).
   bool tracker_shown = false;
-  // Les réglages du suivi, sous la puce de la barre de titre.
-  TrackerLook tracker_look;
 };
 
 struct QuestWindowState {
@@ -287,8 +284,8 @@ struct QuestWindowAction {
   bool forget_all = false;
   // La case « Montrer le suivi » a changé.
   std::optional<bool> show_tracker;
-  // Un réglage du suivi changé sous la puce.
-  TrackerSettingsAnswer tracker_settings;
+  // La puce de la barre de titre : la page des réglages du journal et du suivi.
+  bool open_settings = false;
   // Le joueur a demandé le rapport de bug depuis la barre de titre.
   bool report_bug = false;
 };

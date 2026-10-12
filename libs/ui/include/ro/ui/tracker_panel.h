@@ -49,7 +49,7 @@ struct TrackerLook {
   // Le panneau ne se traîne plus.
   bool locked = false;
   // Les clics le traversent et vont au jeu. ⚠ SON MENU NE S'OUVRE PLUS : il ne
-  // se règle alors que depuis la puce de la fenêtre des quêtes ou des succès.
+  // se règle alors que depuis la page des options, ou la puce des succès.
   bool click_through = false;
   // Les succès dans leur propre panneau.
   bool split = false;
@@ -167,8 +167,8 @@ struct TrackerPanelAction {
                                        std::span<const TrackerSection> sections);
 
 // LES RÉGLAGES DU SUIVI, en éléments de menu : le panneau les montre sous son
-// clic droit, les fenêtres des quêtes et des succès sous leur puce. Rend le
-// réglage changé, ou rien.
+// clic droit, la fenêtre des succès sous sa puce, et la page « Quêtes et suivi »
+// des options. Rend le réglage changé, ou rien.
 struct TrackerSettingsAnswer {
   std::optional<TrackerLook> look;
   bool reset_place = false;

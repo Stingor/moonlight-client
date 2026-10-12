@@ -67,6 +67,7 @@ void QuestStage::StartSession() {
   pending_waits_.clear();
   guide_.reset();
   monster_ = 0;
+  settings_asked_ = false;
   item_gesture_ = {};
   address_.clear();
   bug_report_.reset();
@@ -368,6 +369,8 @@ std::optional<ro::ui::RichPlace> QuestStage::TakeGuide() noexcept {
 
 std::uint32_t QuestStage::TakeMonster() noexcept { return std::exchange(monster_, 0); }
 
+bool QuestStage::TakeSettings() noexcept { return std::exchange(settings_asked_, false); }
+
 ro::ui::ChatLinkAsk QuestStage::TakeItemGesture() noexcept {
   return std::exchange(item_gesture_, {});
 }
@@ -516,9 +519,7 @@ void QuestStage::Follow(QuestWindows& windows, TrackerWindows& tracker, ro::net:
   if (answer.show_tracker.has_value()) {
     tracker.shown_asked = answer.show_tracker;
   }
-  if (answer.tracker_settings.look.has_value() || answer.tracker_settings.reset_place) {
-    tracker.settings_asked = answer.tracker_settings;
-  }
+  settings_asked_ = settings_asked_ || answer.open_settings;
   if (std::exchange(remember_asked_, false) || (was_open_ && !state.open)) {
     Remember(windows);
   }
@@ -551,7 +552,6 @@ void QuestStage::Advance(QuestWindows& windows, TrackerWindows& tracker, ro::net
   if (windows.window.open) {
     ComposeWindow(windows, now_unix_s);
     view_.tracker_shown = tracker.shown;
-    view_.tracker_look = tracker.look;
     windows.view = &view_;
   }
 }

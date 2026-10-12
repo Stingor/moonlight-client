@@ -9254,8 +9254,8 @@ tr: A gauge being dragged snaps its edges to the others. Two touching gauges mov
 fr: Les buffs et les altérations en cours, avec leur durée. Éteinte, rien ne les montre : ce client n'a pas d'autre barre.
 tr: The buffs and ailments you are under, with their duration. Turned off, nothing shows them: this client has no other bar.
 
-fr: Les clics vont au jeu. Le panneau ne se règle plus alors que depuis la puce des fenêtres des quêtes et des succès.
-tr: Clicks go to the game. The panel can then only be adjusted from the bullet of the quest and achievement windows.
+fr: Les clics vont au jeu. Le panneau ne se règle plus alors que depuis la page « Quêtes et suivi » des options, ou la puce des succès.
+tr: Clicks go to the game. The panel can then only be set from the « Quests and tracker » page of the options, or the achievements bullet.
 
 fr: Les couleurs, les tailles et le cadre — pas la position, ni ce que chaque barre montre.
 tr: Colours, sizes and border - not the position, nor what each bar shows.

@@ -36,6 +36,9 @@ void Game::AdvanceQuests(std::uint32_t now_ms) {
       monster != 0 && monster_sheet_.has_value()) {
     monster_sheet_->Open(windows_.monster_sheet.state, monster, /*by_view=*/false);
   }
+  if (pieces_.quests.TakeSettings()) {
+    GameSettings::OpenOptionsAt(windows_, OptionSection::kQuestTracker);
+  }
   // UNE RÉCOMPENSE se décrit, se relaie et s'interroge comme un butin.
   FollowCatalogItem(pieces_.quests.TakeItemGesture(), now_ms);
   if (std::optional<BugReportContext> report = pieces_.quests.TakeBugReport(); report.has_value()) {

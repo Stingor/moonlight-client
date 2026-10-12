@@ -62,7 +62,7 @@ struct TrackerWindows {
   // Le joueur veut le suivi à l'écran (la case « Montrer le suivi »).
   bool shown = true;
   // CE QUE LES FENÊTRES DEMANDENT AU SUIVI, consommé par son étage : la case,
-  // et les réglages pris sous la puce des quêtes ou des succès.
+  // et les réglages pris sous la puce des succès ou dans les options.
   std::optional<bool> shown_asked;
   std::optional<ro::ui::TrackerSettingsAnswer> settings_asked;
 };
@@ -100,6 +100,8 @@ class QuestStage {
   // CE QUE LA FENÊTRE OU LE PANNEAU DEMANDE AILLEURS — une fois chacun.
   [[nodiscard]] std::optional<ro::ui::RichPlace> TakeGuide() noexcept;
   [[nodiscard]] std::uint32_t TakeMonster() noexcept;
+  // La puce du journal : la page « Quêtes et suivi » des options.
+  [[nodiscard]] bool TakeSettings() noexcept;
   [[nodiscard]] ro::ui::ChatLinkAsk TakeItemGesture() noexcept;
   [[nodiscard]] std::string TakeAddress() noexcept;
   [[nodiscard]] std::optional<BugReportContext> TakeBugReport() noexcept;
@@ -196,6 +198,7 @@ class QuestStage {
 
   std::optional<ro::ui::RichPlace> guide_;
   std::uint32_t monster_ = 0;
+  bool settings_asked_ = false;
   ro::ui::ChatLinkAsk item_gesture_;
   std::string address_;
   std::optional<BugReportContext> bug_report_;

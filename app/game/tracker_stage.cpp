@@ -79,7 +79,7 @@ void TrackerStage::Advance(TrackerWindows& tracker, QuestStage& quests, QuestWin
   for (std::size_t panel = 0; panel < kTrackerPanelCount; ++panel) {
     FollowPanel(panel, tracker, quests, quest_windows, achievement_windows);
   }
-  // LA PUCE DES SUCCÈS RÈGLE LE MÊME SUIVI que celle des quêtes.
+  // LA PUCE DES SUCCÈS RÈGLE LE MÊME SUIVI que la page des options.
   if (std::optional<ro::ui::TrackerSettingsAnswer> asked =
           std::exchange(achievement_windows.tracker_settings, std::nullopt);
       asked.has_value()) {

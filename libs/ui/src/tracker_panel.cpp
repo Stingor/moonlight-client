@@ -532,8 +532,8 @@ TrackerSettingsAnswer DrawTrackerSettingsItems(const TrackerLook& look, const Sk
   static_cast<void>(
       SkinCheckBox(core::Tr("Laisser passer les clics"), &changed.click_through, skin));
   SkinTooltip(
-      core::Tr("Les clics vont au jeu. Le panneau ne se règle plus alors que depuis la puce "
-               "des fenêtres des quêtes et des succès."));
+      core::Tr("Les clics vont au jeu. Le panneau ne se règle plus alors que depuis la page "
+               "« Quêtes et suivi » des options, ou la puce des succès."));
   static_cast<void>(SkinCheckBox(core::Tr("Succès dans un panneau à part"), &changed.split, skin));
   ImGui::Separator();
   static_cast<void>(

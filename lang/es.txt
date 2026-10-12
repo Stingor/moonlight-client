@@ -9254,8 +9254,8 @@ tr: Los bordes de una barra que arrastras se alinean con los de las demás. Dos 
 fr: Les buffs et les altérations en cours, avec leur durée. Éteinte, rien ne les montre : ce client n'a pas d'autre barre.
 tr: Los buffs y alteraciones activos, con su duración. Desactivada, nada los muestra: este cliente no tiene otra barra.
 
-fr: Les clics vont au jeu. Le panneau ne se règle plus alors que depuis la puce des fenêtres des quêtes et des succès.
-tr: Los clics van al juego. El panel solo se ajusta entonces desde la viñeta de las ventanas de misiones y logros.
+fr: Les clics vont au jeu. Le panneau ne se règle plus alors que depuis la page « Quêtes et suivi » des options, ou la puce des succès.
+tr: Los clics van al juego. El panel solo se ajusta entonces desde la página « Misiones y seguimiento » de las opciones, o la viñeta de los logros.
 
 fr: Les couleurs, les tailles et le cadre — pas la position, ni ce que chaque barre montre.
 tr: Los colores, los tamaños y el marco — no la posición, ni lo que muestra cada barra.
