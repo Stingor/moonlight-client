@@ -209,7 +209,17 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
                                           world_, &described_slot);
     described_holder = ro::ui::ItemHolder::kInventory;
   }
-  if (described != 0) {
+  // ⚠ REDEMANDER L'OBJET QU'ELLE MONTRE LA FERME : le même clic droit ouvre et
+  // referme, sans aller chercher la croix. Le même OBJET, c'est la même place
+  // dans le même contenant — deux exemplaires d'un identifiant diffèrent par
+  // leur raffinement et leurs cartes.
+  const bool same_item = windows_.description.open && described != 0 &&
+                         windows_.description.item_id == described &&
+                         windows_.description.from_slot == described_slot &&
+                         windows_.description.from_holder == described_holder;
+  if (same_item) {
+    windows_.description.open = false;
+  } else if (described != 0) {
     windows_.description.item_id = described;
     windows_.description.from_slot = described_slot;
     windows_.description.from_holder = described_holder;
