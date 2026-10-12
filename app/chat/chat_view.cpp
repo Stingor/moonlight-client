@@ -39,6 +39,7 @@
 #include "chat/navigation_command.h"
 #include "chat/rank_command.h"
 #include "chat/show_equipment_command.h"
+#include "chat/talk_filter_command.h"
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
 #include "items/warp_memo_report.h"
@@ -615,6 +616,13 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
                                : ro::core::Tr("Les messages d'échec de skill ne seront plus "
                                               "affichés. [Affichage OFF]"),
                          said_ms, kSettingEchoColor);
+    return;
+  }
+  if (const std::optional<TalkFilterRow> talk = ReadTalkFilterCommand(line);
+      talk.has_value() && to.options != nullptr) {
+    to.world->RecordChat(ro::sim::ChatKind::kServer, 0,
+                         ToggleTalkFilter(*talk, *to.options, to.option_targets, said_ms), said_ms,
+                         kSettingEchoColor);
     return;
   }
   if (line == kCallCommand && to.options != nullptr) {

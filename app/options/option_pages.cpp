@@ -69,6 +69,8 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kDamageMeter, damage_meter);
   into.Section("Les échoppes des autres");
   DeclareOn(into, OptionSection::kGameplay, shops);
+  into.Section("La parole tue dans la conversation");
+  DeclareOn(into, OptionSection::kChat, talk_filter);
   into.Section("Les conversations 1:1");
   DeclareOn(into, OptionSection::kChat, whispers);
   into.Section("Les liens et les images du chat");
@@ -133,10 +135,11 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
          damage_meter.Change(asked) || shops.Change(asked) || whispers.Change(asked) ||
          grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
          battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
-         chat_web.Change(asked);
+         chat_web.Change(asked) || talk_filter.Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {
+  talk_filter.ComposeInto(rows);
   whispers.ComposeInto(rows);
   chat_web.ComposeInto(rows);
 }

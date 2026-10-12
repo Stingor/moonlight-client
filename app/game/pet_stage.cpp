@@ -189,6 +189,8 @@ ro::net::FrameOutcome PetStage::ApplyFrame(const ro::net::Frame& frame, ro::sim:
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = heard;
   }
+  // LA VIE DU MAÎTRE REDITE : le monde l'a lue, le familier la juge.
+  talk_.NoteOwnerHealth(frame, pet_, world, now_ms);
   if (pet_.TakeLowIntimacyWarning()) {
     force_open_ = true;
   }

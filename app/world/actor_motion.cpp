@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <vector>
 
 #include "ro/render/actor_effect_table.h"
 #include "ro/render/ailment_sprites.h"
@@ -285,6 +286,26 @@ PlayedMotion MotionAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World&
                       const ReadableMotion& readable) {
   return ComposedMotionAt(wardrobe, world, actor, outfit, path, now_ms, looping_elapsed_ms,
                           played_effects, true, readable);
+}
+
+bool PlayerRestsAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
+                   ro::sim::WalkPlanner& planner, std::uint32_t now_ms) {
+  const ro::sim::Actor* player = world.player();
+  if (player == nullptr) {
+    return false;
+  }
+  const ro::sim::Actor& actor = *player;
+  const ro::sim::WalkPath& path = planner.PathFor(actor);
+  ro::render::ActorOutfit* outfit =
+      wardrobe != nullptr ? wardrobe->OutfitFor(LookOf(actor)) : nullptr;
+  if (outfit == nullptr) {
+    return actor.posture == ro::sim::Posture::kStanding && !ro::sim::IsWalking(actor, path, now_ms);
+  }
+  std::vector<ro::render::ActorEffectPlay> played;
+  PlayedEffectsOf(actor, now_ms, played);
+  const ro::render::Motion motion =
+      MotionAt(wardrobe, world, actor, *outfit, path, now_ms, 0.0F, played).motion;
+  return motion == ro::render::Motion::kIdle || motion == ro::render::Motion::kReady;
 }
 
 }  // namespace moonclient

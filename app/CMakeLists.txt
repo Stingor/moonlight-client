@@ -1391,6 +1391,7 @@ add_executable(moonclient
     chat/chat_room_lines.cpp
     chat/chat_whisper_lines.cpp
     chat/chat_view.cpp
+    chat/talk_filter_command.cpp
     chat/dev_commands.cpp
     chat/native_slash_commands.cpp
     items/description_view.cpp
@@ -1566,6 +1567,7 @@ add_executable(moonclient
     options/pick_precision_options.cpp
     options/damage_meter_options.cpp
     options/shop_options.cpp
+    options/talk_filter_options.cpp
     options/whisper_options.cpp
     options/grey_world_options.cpp
     game/bug_report_route.cpp

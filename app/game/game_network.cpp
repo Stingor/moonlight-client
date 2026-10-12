@@ -102,6 +102,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // de lui-même, une minute plus tard.
     const std::uint32_t entries_before = world_.map_entries();
     const std::optional<ro::net::NpcFarewell> farewell = ro::net::NpcFarewellDue(world_);
+    // LE COUP DU MAÎTRE SE JUGE AUSSI SUR L'ÉTAT D'AVANT : voir `PetStage::NoteBeforeWorld`.
+    const auto owner_rests = [&] {
+      return PlayerRestsAt(pieces_.wardrobe ? &*pieces_.wardrobe : nullptr, world_, planner_,
+                           now_ms);
+    };
+    pieces_.pet.NoteBeforeWorld(received, world_, owner_rests, now_ms);
     // 🔴 EN SALON, LA PAROLE REVIENT AU SALON, et le monde ne l'écrit pas : le
     // serveur ne nous fait plus entendre la carte.
     const ro::sim::BannedWords* banned = &pieces_.banned_words;
@@ -138,22 +144,21 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       outcome = guilded;
     }
     // LE GROUPE, de même, reconnu par le compte joué ; l'horloge date le PS d'un
-    // membre. Et LES AMIS, dans la même passe.
+    // membre.
     const ro::net::FrameOutcome grouped =
         ro::net::ApplyPartyFrame(received, party_, world_.player_id(), now_ms, banned);
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = grouped;
     }
-    const ro::net::FrameOutcome befriended = ro::net::ApplyFriendFrame(received, friends_);
-    if (outcome == ro::net::FrameOutcome::kUnhandled) {
-      outcome = befriended;
-    }
-    // CE QU'UN SCRIPT MONTRE SUR LA CARTE (repères, navigation à prendre), le
-    // boss d'un Convex Mirror, les nouvelles d'objets (ramassage d'un membre,
-    // pièce abîmée), l'issue d'une alliance ou d'une hostilité, l'adoption, les
-    // fiches du staff, l'accusé d'un signalement et la ligne d'un état.
+    // LES AMIS ; CE QU'UN SCRIPT MONTRE SUR LA CARTE (repères, navigation à
+    // prendre), le boss d'un Convex Mirror, les nouvelles d'objets (ramassage
+    // d'un membre, pièce abîmée), l'issue d'une alliance ou d'une hostilité,
+    // l'adoption, les fiches du staff, l'accusé d'un signalement, la ligne d'un
+    // état, et l'équipement montré par un autre joueur, avec son refus.
     for (const ro::net::FrameOutcome told :
-         {ro::net::ApplyMapGuidanceFrame(received, navi_.guidance, now_ms),
+         {ro::net::ApplyFriendFrame(received, friends_),
+          ro::net::ApplyViewEquipFrame(received, inspected_),
+          ro::net::ApplyMapGuidanceFrame(received, navi_.guidance, now_ms),
           ro::net::ApplyBossInfoFrame(received, navi_.guidance, world_, now_ms),
           ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms),
           ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms),
@@ -175,11 +180,6 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       if (outcome == ro::net::FrameOutcome::kUnhandled) {
         outcome = stated;
       }
-    }
-    // ET L'ÉQUIPEMENT MONTRÉ PAR UN AUTRE JOUEUR, avec son refus.
-    const ro::net::FrameOutcome inspected = ro::net::ApplyViewEquipFrame(received, inspected_);
-    if (outcome == ro::net::FrameOutcome::kUnhandled) {
-      outcome = inspected;
     }
     // ET LES MESSAGES PAR NUMÉRO, qui s'écrivent dans la conversation.
     const ro::net::FrameOutcome said = ro::net::ApplyServerMessageFrame(

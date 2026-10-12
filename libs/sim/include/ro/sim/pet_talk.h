@@ -106,6 +106,34 @@ inline constexpr std::int64_t kPetDangerHealthBelowPercent = 25;
 // Le familier arrêté parle au plus une fois, passé ce délai de repos.
 inline constexpr std::uint32_t kPetStandAfterMs = 3000;
 
+// LES ACTIONS DU PAQUET DES COUPS qui n'en sont pas : ramasser, s'asseoir, se
+// relever. Elles n'ouvrent pas de chasse.
+inline constexpr std::uint8_t kOwnerPickUpAction = 1;
+inline constexpr std::uint8_t kOwnerSitDownAction = 2;
+inline constexpr std::uint8_t kOwnerStandUpAction = 3;
+
+// 🔴 LA CHASSE SE JUGE SUR CE QU'ÉTAIT LE MAÎTRE AVANT SON COUP, et non à chaque
+// coup : il faut qu'il se tienne AU REPOS — debout, ni en marche, ni en plein
+// geste — et que la cible de ce coup ne soit pas celle qu'il a MÉMORISÉE.
+//
+// Son acteur mémorise la cible de chacun de ses coups, quelle qu'en soit
+// l'action — ramasser et s'asseoir compris —, celle de chacun de ses coups de
+// compétence et celle de chacune de ses incantations qui vise quelqu'un. Frapper
+// encore la même cible ne fait donc rien dire ; en changer, revenu au repos, si.
+// L'entrée sur une carte oublie la cible.
+class PetHuntWatch {
+ public:
+  // Un coup du maître : vrai quand il ouvre une chasse. La cible est mémorisée
+  // dans tous les cas.
+  [[nodiscard]] bool Strike(bool at_rest, std::uint32_t target_id, std::uint8_t action) noexcept;
+  // Un coup de compétence, ou une incantation qui vise quelqu'un.
+  void Remember(std::uint32_t target_id) noexcept { remembered_target_id_ = target_id; }
+  void Forget() noexcept { remembered_target_id_ = 0; }
+
+ private:
+  std::uint32_t remembered_target_id_ = 0;
+};
+
 // CE QUE LE CLIENT DU MAÎTRE FAIT DIRE À SON FAMILIER, et quand.
 //
 // Chaque méthode rend les entiers à envoyer, dans l'ordre — la réplique, puis
@@ -128,12 +156,13 @@ class PetChatter {
   // client — que tous liront comme le repas d'un Poring affamé.
   [[nodiscard]] std::vector<std::int32_t> Performed(const Pet& pet, std::int32_t performance) const;
 
-  // Le maître engage une cible : un tirage, et un silence depuis la dernière
-  // réplique de chasse ou de danger.
+  // Le maître ouvre une chasse — voir `PetHuntWatch` : un tirage, et un silence
+  // depuis la dernière réplique de chasse ou de danger.
   [[nodiscard]] std::vector<std::int32_t> OwnerEngaged(const Pet& pet, std::uint32_t now_ms,
                                                        int roll_percent);
-  // La vie du maître vient d'être redite : sous le seuil, un tirage et un
-  // silence plus court.
+  // 🔴 LA VIE DU MAÎTRE VIENT D'ÊTRE REDITE par le paquet de paramètre qui la
+  // porte — à CHAQUE paquet, que la valeur ait changé ou non : sous le seuil, un
+  // tirage et un silence plus court.
   [[nodiscard]] std::vector<std::int32_t> OwnerHurt(const Pet& pet, std::int64_t health,
                                                     std::int64_t max_health, std::uint32_t now_ms,
                                                     int roll_percent);

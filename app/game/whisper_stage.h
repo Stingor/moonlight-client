@@ -20,6 +20,7 @@
 #include "ro/sim/friend_list.h"
 #include "ro/sim/guild.h"
 #include "ro/sim/party_roster.h"
+#include "ro/sim/talk_mute.h"
 #include "ro/sim/whisper.h"
 #include "ro/sim/whisper_blocks.h"
 #include "ro/sim/world.h"
@@ -102,6 +103,8 @@ class WhisperStage {
   // LES MOTS INTERDITS DE L'INSTALLATION : masqués dans ce qui arrive, et dans
   // ce qui part d'une conversation 1:1. Nuls : rien ne se masque.
   void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
+  // `/notalkmsg` ET `/notalkmsg2` : voir `ro::sim::TalkMute`. Nuls : rien ne se tait.
+  void SeeTalkMute(const ro::sim::TalkMute* mute) noexcept { talk_mute_ = mute; }
 
   // « CHUCHOTER DANS UNE FENÊTRE… » : ouvre ou ramène, et donne le clavier.
   void Open(std::string_view peer);
@@ -151,6 +154,7 @@ class WhisperStage {
   ro::sim::WhisperOutbox outbox_;
   ro::sim::WhisperBlockList blocks_;
   const ro::sim::BannedWords* banned_ = nullptr;
+  const ro::sim::TalkMute* talk_mute_ = nullptr;
   // ⚠ LE TRANSPORT AVANT LA MÉMOIRE QUI LE REGARDE : elle meurt la première.
   std::unique_ptr<web::HttpTransport> blocks_transport_;
   std::optional<WhisperBlockMemory> block_memory_;

@@ -18,6 +18,16 @@ namespace {
 // Un tirage du client, en pour cent.
 constexpr unsigned kPercent = 100;
 
+// LES DÉGÂTS QUI ANNULENT UN COUP : le client ne lit pas le paquet qui les
+// porte — ni chasse, ni cible mémorisée.
+constexpr std::int32_t kVoidStrikeDamage = -30000;
+
+// UN COUP DE COMPÉTENCE dont le client ne fait rien quand il vise son propre
+// lanceur : la ruée du loup (RA_WUGDASH).
+constexpr std::uint16_t kSelfIgnoredSkill = 2242;
+
+[[nodiscard]] std::uint32_t AsId(std::int32_t id) { return static_cast<std::uint32_t>(id); }
+
 }  // namespace
 
 void PetTalkStage::LoadTable(ro::vfs::Vfs& vfs) {
@@ -30,6 +40,8 @@ void PetTalkStage::StartSession() {
   chatter_.Reset();
   pending_.clear();
   owner_.reset();
+  hunt_.Forget();
+  hunt_map_entries_ = 0;
 }
 
 int PetTalkStage::Roll() { return static_cast<int>(draw_() % kPercent); }
@@ -82,11 +94,80 @@ void PetTalkStage::ShowLine(const ro::sim::PetLineHeard& heard, std::uint32_t ac
     return;
   }
   std::string text = ro::sim::PetLineShown(speaker->name, lines[draw_() % lines.size()]);
+  if (talk_mute_ != nullptr && talk_mute_->hides_talk()) {
+    world.ShowSpeech(actor_id, std::move(text), now_ms);
+    return;
+  }
   world.RecordChat(ro::sim::ChatKind::kPublic, ro::sim::ChatType::kPublicChat, actor_id,
                    std::move(text), now_ms, kPetLineColor);
 }
 
 // ── CE QUE NOTRE FAMILIER DOIT DIRE ─────────────────────────────────────────
+
+void PetTalkStage::NoteBeforeWorld(const ro::net::Frame& frame, const ro::sim::Pet& pet,
+                                   const ro::sim::World& world,
+                                   const std::function<bool()>& owner_at_rest,
+                                   std::uint32_t now_ms) {
+  const std::uint32_t owner_id = world.player_id();
+  if (owner_id == 0) {
+    return;
+  }
+  if (world.map_entries() != hunt_map_entries_) {
+    hunt_map_entries_ = world.map_entries();
+    hunt_.Forget();
+  }
+  switch (frame.opcode) {
+    case ro::proto::ZcNotifyAct::kOpcode: {
+      ro::proto::ZcNotifyAct packet;
+      if (!ro::proto::Decode(frame.bytes, packet) || AsId(packet.srcID) != owner_id ||
+          packet.damage == kVoidStrikeDamage) {
+        return;
+      }
+      if (hunt_.Strike(owner_at_rest(), AsId(packet.targetID), packet.type) && pet.known() &&
+          world.Find(pet.actor_id()) != nullptr) {
+        Queue(chatter_.OwnerEngaged(pet, now_ms, Roll()));
+      }
+      return;
+    }
+    case ro::proto::ZcNotifySkill::kOpcode: {
+      ro::proto::ZcNotifySkill packet;
+      if (ro::proto::Decode(frame.bytes, packet) && packet.AID == owner_id &&
+          !(packet.SKID == kSelfIgnoredSkill && packet.targetID == owner_id)) {
+        hunt_.Remember(packet.targetID);
+      }
+      return;
+    }
+    case ro::proto::ZcUseskillAck::kOpcode: {
+      // UNE INCANTATION QUI VISE QUELQU'UN ; une compétence instantanée ne
+      // mémorise rien.
+      ro::proto::ZcUseskillAck packet;
+      if (ro::proto::Decode(frame.bytes, packet) && packet.srcId == owner_id && packet.dstId != 0 &&
+          packet.delayTime != 0) {
+        hunt_.Remember(packet.dstId);
+      }
+      return;
+    }
+    default:
+      return;
+  }
+}
+
+void PetTalkStage::NoteOwnerHealth(const ro::net::Frame& frame, const ro::sim::Pet& pet,
+                                   const ro::sim::World& world, std::uint32_t now_ms) {
+  if (frame.opcode != ro::proto::ZcParChange::kOpcode) {
+    return;
+  }
+  ro::proto::ZcParChange packet;
+  if (!ro::proto::Decode(frame.bytes, packet) ||
+      packet.varID != static_cast<std::uint16_t>(ro::sim::ServerParameter::kHp)) {
+    return;
+  }
+  const ro::sim::Actor* owner = world.player();
+  if (owner == nullptr || !pet.known() || world.Find(pet.actor_id()) == nullptr) {
+    return;
+  }
+  Queue(chatter_.OwnerHurt(pet, packet.count, owner->max_health, now_ms, Roll()));
+}
 
 void PetTalkStage::NoteFed(const ro::sim::Pet& pet, const ro::sim::World& world) {
   if (pet.known() && world.Find(pet.actor_id()) != nullptr) {
@@ -113,10 +194,6 @@ void PetTalkStage::Observe(const ro::sim::Pet& pet, const ro::sim::World& world,
     return;
   }
   OwnerSeen now{
-      .strike_ms = owner->attack.has_value() && owner->attack->attacker == owner->id
-                       ? std::optional<std::uint32_t>(owner->attack->started_ms)
-                       : std::nullopt,
-      .health = owner->health,
       .dead = owner->posture == ro::sim::Posture::kDead,
       .base_level = world.player_status().base_level,
   };
@@ -127,12 +204,6 @@ void PetTalkStage::Observe(const ro::sim::Pet& pet, const ro::sim::World& world,
   // maître est noté, pour ne pas le lui faire dire à son retour.
   if (shown == nullptr) {
     return;
-  }
-  if (now.strike_ms.has_value() && now.strike_ms != before.strike_ms) {
-    Queue(chatter_.OwnerEngaged(pet, now_ms, Roll()));
-  }
-  if (now.health != before.health && now.health != ro::sim::kUnknownHealth) {
-    Queue(chatter_.OwnerHurt(pet, now.health, owner->max_health, now_ms, Roll()));
   }
   if (now.dead && !before.dead) {
     Queue(chatter_.OwnerDied(pet));

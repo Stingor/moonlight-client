@@ -352,6 +352,8 @@ class World {
                   std::uint32_t color = 0) {
     RecordChat(kind, DefaultChatType(kind), speaker_id, std::move(text), said_ms, color);
   }
+  // LA BULLE SANS LA LIGNE : ce que `TalkMute` laisse d'une parole. Rien d'un inconnu.
+  void ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms);
   // Un CHUCHOTEMENT, reçu, renvoyé en écho ou refusé : il nomme l'autre.
   void RecordWhisper(WhisperFacts facts, std::string text, std::uint32_t said_ms);
 
@@ -397,12 +399,10 @@ class World {
   [[nodiscard]] const SessionSettings& session() const noexcept { return session_; }
   [[nodiscard]] std::uint8_t group_level() const noexcept { return session_.group_level; }
 
-  // Le GRIMOIRE du joueur : ce qu'il sait lancer.
-  //
-  // Il ne suit pas la carte, et Clear ne l'efface pas : ce que l'on sait ne
-  // s'oublie pas en changeant de carte. Le serveur le redit à chaque entrée,
-  // mais plus tard que la carte elle-même, et le vider laisserait un grimoire
-  // blanc entre les deux annonces.
+  // Le GRIMOIRE du joueur : ce qu'il sait lancer. Il ne suit pas la carte, et
+  // Clear ne l'efface pas : ce que l'on sait ne s'oublie pas en changeant de
+  // carte. Le serveur le redit à chaque entrée, mais plus tard que la carte
+  // elle-même, et le vider laisserait un grimoire blanc entre les deux annonces.
   //
   // Ouvert en écriture, comme la conversation ne l'est pas : c'est ro_net qui
   // le remplit, à partir de paquets dont le monde ne sait rien.

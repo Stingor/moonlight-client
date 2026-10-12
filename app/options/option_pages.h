@@ -39,6 +39,7 @@
 #include "options/skin_look_options.h"
 #include "options/skin_options.h"
 #include "options/sprite_sound_options.h"
+#include "options/talk_filter_options.h"
 #include "options/target_options.h"
 #include "options/view_equip_memory.h"
 #include "options/weapon_refine_options.h"
@@ -116,6 +117,8 @@ struct OptionPages {
   CallOptions call;
   // Les liens, les images et les mentions du chat.
   ChatWebOptions chat_web;
+  // `/notalkmsg` et `/notalkmsg2`.
+  TalkFilterOptions talk_filter;
   // L'ENTITÉ DU CADRE D'ESSAI des barres d'entité, composée par la partie avant
   // la page — voir `world/entity_sample.h`. ⚠ PAS UN RÉGLAGE : une vignette.
   ro::ui::EntitySample entity_sample;
@@ -149,8 +152,8 @@ struct OptionPages {
   // ligne était l'une des leurs, et qu'il ne reste qu'à enregistrer.
   [[nodiscard]] bool ChangeSetting(const ro::ui::OptionsWindowAction& asked);
 
-  // CE QUE LA SECTION CONVERSATION PORTE APRÈS SES RÉGLAGES À ELLE : les
-  // conversations 1:1, le relai Discord, puis les liens et les images.
+  // CE QUE LA SECTION CONVERSATION PORTE APRÈS SES RÉGLAGES À ELLE : la parole
+  // tue, les conversations 1:1, le relai Discord, puis les liens et les images.
   void ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows);
   // LES PAGES DONT LE RÉGLAGE EST TENU PAR LE SERVEUR : vrai quand la ligne
   // était l'une des leurs. Rien à écrire : le geste est une demande.

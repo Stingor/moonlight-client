@@ -225,6 +225,14 @@ std::vector<std::int32_t> PetChatter::Performed(const Pet& pet, std::int32_t per
   return {code};
 }
 
+bool PetHuntWatch::Strike(bool at_rest, std::uint32_t target_id, std::uint8_t action) noexcept {
+  const bool gesture = action == kOwnerPickUpAction || action == kOwnerSitDownAction ||
+                       action == kOwnerStandUpAction;
+  const bool hunts = at_rest && !gesture && target_id != remembered_target_id_;
+  remembered_target_id_ = target_id;
+  return hunts;
+}
+
 bool PetChatter::QuietFor(std::uint32_t quiet_ms, std::uint32_t now_ms) {
   if (last_spoken_ms_.has_value() && now_ms - *last_spoken_ms_ < quiet_ms) {
     return false;

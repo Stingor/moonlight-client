@@ -17242,3 +17242,27 @@ tr: %s has been expelled from the guild.
 
 fr: Motif de l'expulsion : %s
 tr: Expulsion Reason: %s
+
+fr: Taire la parole des autres dans la conversation
+tr: Hide other players' chat in the chat window
+
+fr: La parole publique des autres joueurs, celle du champ de bataille et les répliques des pets n'entrent plus dans la conversation. Leur bulle reste au-dessus de leur tête.
+tr: Other players' public chat, battleground chat and pet lines no longer enter the chat window. Their speech bubble still shows above their head.
+
+fr: Taire aussi la guilde et le clan
+tr: Also hide guild and clan chat
+
+fr: Comme la case précédente, et la parole de guilde et celle du clan se taisent aussi. Ni le groupe, ni les chuchotements ne sont touchés.
+tr: Like the previous box, and guild and clan chat are hidden too. Party chat and whispers are not affected.
+
+fr: La parole est masquée, celle de la guilde comprise. [/nm2 OFF]
+tr: Hide chat messages (including guild chat). [/nm2 OFF]
+
+fr: La parole est affichée. [/nm2 ON]
+tr: Show chat messages. [/nm2 ON]
+
+fr: La parole ne s'affichera plus dans la fenêtre de conversation. [Affichage OFF]
+tr: Chat content will not be displayed in the chat window. [Display OFF]
+
+fr: La parole s'affichera dans la fenêtre de conversation. [Affichage ON]
+tr: Chat content will be displayed in the chat window. [Display ON]

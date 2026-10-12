@@ -244,7 +244,8 @@ ro::net::FrameOutcome WhisperStage::ApplyFrame(const ro::net::Frame& frame, ro::
   if (announced != ro::net::FrameOutcome::kUnhandled) {
     return announced;
   }
-  return ro::net::ApplySpokenFrame(frame, world, banned_, now_ms);
+  return ro::net::ApplySpokenFrame(frame, world, banned_, now_ms,
+                                   talk_mute_ != nullptr ? *talk_mute_ : ro::sim::TalkMute{});
 }
 
 void WhisperStage::Open(std::string_view peer) {

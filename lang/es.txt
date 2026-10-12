@@ -17242,3 +17242,27 @@ tr: %s ha sido expulsado de la guild.
 
 fr: Motif de l'expulsion : %s
 tr: Motivo de la expulsión: %s
+
+fr: Taire la parole des autres dans la conversation
+tr: Ocultar en el chat lo que dicen los demás
+
+fr: La parole publique des autres joueurs, celle du champ de bataille et les répliques des pets n'entrent plus dans la conversation. Leur bulle reste au-dessus de leur tête.
+tr: El chat público de los demás jugadores, el del campo de batalla y las frases de las mascotas ya no entran en el chat. Su globo de texto sigue sobre su cabeza.
+
+fr: Taire aussi la guilde et le clan
+tr: Ocultar también la guild y el clan
+
+fr: Comme la case précédente, et la parole de guilde et celle du clan se taisent aussi. Ni le groupe, ni les chuchotements ne sont touchés.
+tr: Como la casilla anterior, y además se ocultan el chat de la guild y el del clan. Ni el grupo ni los susurros se ven afectados.
+
+fr: La parole est masquée, celle de la guilde comprise. [/nm2 OFF]
+tr: Mensajes de chat ocultos, incluido el de la guild. [/nm2 OFF]
+
+fr: La parole est affichée. [/nm2 ON]
+tr: Mensajes de chat visibles. [/nm2 ON]
+
+fr: La parole ne s'affichera plus dans la fenêtre de conversation. [Affichage OFF]
+tr: Los mensajes de chat no se mostrarán en la ventana de chat. [Mostrar OFF]
+
+fr: La parole s'affichera dans la fenêtre de conversation. [Affichage ON]
+tr: Los mensajes de chat se mostrarán en la ventana de chat. [Mostrar ON]

@@ -14,6 +14,7 @@
 #include "ro/sim/entry_queue.h"
 #include "ro/sim/guild.h"
 #include "ro/sim/party_roster.h"
+#include "ro/sim/talk_mute.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/entry_queue_window.h"
 #include "ro/ui/skin_art.h"
@@ -94,6 +95,8 @@ class BattlegroundStage {
                                                  std::uint32_t now_ms);
   // Les mots interdits de l'installation. Nuls : rien ne se masque.
   void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
+  // `/notalkmsg` ET `/notalkmsg2` : voir `ro::sim::TalkMute`. Nuls : rien ne se tait.
+  void SeeTalkMute(const ro::sim::TalkMute* mute) noexcept { talk_mute_ = mute; }
 
   // À CHAQUE IMAGE : la table des terrains, la réponse des fenêtres, les
   // transitions de la file, l'effectif redemandé, la vue.
@@ -118,6 +121,7 @@ class BattlegroundStage {
 
  private:
   const ro::sim::BannedWords* banned_ = nullptr;
+  const ro::sim::TalkMute* talk_mute_ = nullptr;
   // La table se lit une fois, à la première avancée qui a de quoi la lire ;
   // un échec se dit une fois.
   void EnsureTable(ro::vfs::Vfs* vfs);

@@ -438,6 +438,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.pet.SeeBannedWords(&pieces_.banned_words);
   pieces_.talkbox.SeeBannedWords(&pieces_.banned_words);
   pieces_.battleground.SeeBannedWords(&pieces_.banned_words);
+  // `/notalkmsg` ET `/notalkmsg2`, lus à chaque parole : un réglage basculé vaut aussitôt.
+  const ro::sim::TalkMute* talk_mute = &settings_->options().pages().talk_filter.mute();
+  pieces_.whispers.SeeTalkMute(talk_mute);
+  pieces_.battleground.SeeTalkMute(talk_mute);
+  pieces_.pet.SeeTalkMute(talk_mute);
   pieces_.trade.deal().SeeApproachClock(&grimoire_.approach_clock());
   pieces_.trade.store_search().SeeCards(
       {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});

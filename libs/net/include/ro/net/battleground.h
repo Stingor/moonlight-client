@@ -8,6 +8,7 @@
 #include "ro/net/world_update.h"
 #include "ro/sim/banned_words.h"
 #include "ro/sim/entry_queue.h"
+#include "ro/sim/talk_mute.h"
 #include "ro/sim/world_fwd.h"
 
 namespace ro::net {
@@ -26,10 +27,11 @@ namespace ro::net {
 // `ZC 0x02DC` (la parole, écrite dans la conversation avec sa bulle), `0x02DD`
 // (les camps), `0x02DE` (le score), `0x02DF` (les coéquipiers, nous exceptés)
 // et `0x0A0E` (la vie d'un coéquipier en vue). Les mots de `banned` se masquent
-// dans la parole ; nul, rien ne se masque.
+// dans la parole ; nul, rien ne se masque. `mute` en tait la ligne, pas la
+// bulle : voir `sim::TalkMute`.
 [[nodiscard]] FrameOutcome ApplyBattlefieldFrame(const Frame& frame, sim::World& world,
                                                  const sim::BannedWords* banned,
-                                                 std::uint32_t now_ms);
+                                                 std::uint32_t now_ms, sim::TalkMute mute = {});
 
 // ── LES VERBES ──────────────────────────────────────────────────────────────
 //

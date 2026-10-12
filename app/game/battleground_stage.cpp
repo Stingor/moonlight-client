@@ -101,7 +101,8 @@ ro::net::FrameOutcome BattlegroundStage::ApplyFrame(const ro::net::Frame& frame,
       queued != ro::net::FrameOutcome::kUnhandled) {
     return queued;
   }
-  return ro::net::ApplyBattlefieldFrame(frame, world, banned_, now_ms);
+  return ro::net::ApplyBattlefieldFrame(frame, world, banned_, now_ms,
+                                        talk_mute_ != nullptr ? *talk_mute_ : ro::sim::TalkMute{});
 }
 
 void BattlegroundStage::Advance(BattlegroundWindows& windows, const BattlegroundContext& context) {

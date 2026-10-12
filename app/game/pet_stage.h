@@ -4,6 +4,7 @@
 // ses deux fenêtres montrent, et ce que leurs gestes deviennent sur le fil.
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 #include <utility>
@@ -54,6 +55,14 @@ class PetStage {
   // Les mots interdits de l'installation : un nouveau nom qui en porte un ne
   // part pas, et le refus s'écrit dans la fenêtre.
   void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
+  // `/notalkmsg` ET `/notalkmsg2` taisent la ligne d'une réplique, pas sa bulle.
+  void SeeTalkMute(const ro::sim::TalkMute* mute) noexcept { talk_.SeeTalkMute(mute); }
+  // LE COUP DU MAÎTRE, lu AVANT que le monde n'applique la trame : voir
+  // `PetTalkStage::NoteBeforeWorld`.
+  void NoteBeforeWorld(const ro::net::Frame& frame, const ro::sim::World& world,
+                       const std::function<bool()>& owner_at_rest, std::uint32_t now_ms) {
+    talk_.NoteBeforeWorld(frame, pet_, world, owner_at_rest, now_ms);
+  }
 
   // UNE PARTIE NEUVE : le familier du personnage d'avant est oublié.
   //

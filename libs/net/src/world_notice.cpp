@@ -255,7 +255,7 @@ FrameOutcome ApplyBroadcastFrame(const Frame& frame, sim::World& world,
 }
 
 FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world, const sim::BannedWords* banned,
-                              std::uint32_t now_ms) {
+                              std::uint32_t now_ms, sim::TalkMute mute) {
   const auto masked = [banned](std::string text) {
     return sim::BannedWords::MaskWith(banned, text);
   };
@@ -265,6 +265,10 @@ FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world, const sim::
         // Ce que quelqu'un d'AUTRE a dit. Le serveur écrit le nom devant, et le
         // garder rend la conversation lisible sans table de noms.
         AuthoredText said = ReadAuthoredText(frame, packet.Message);
+        if (mute.hides_talk()) {
+          world.ShowSpeech(packet.GID, masked(std::move(said.text)), now_ms);
+          return FrameOutcome::kApplied;
+        }
         world.RecordChat(sim::ChatKind::kPublic, sim::ChatType::kPublicChat, packet.GID,
                          masked(std::move(said.text)), now_ms, 0, std::move(said.author));
         return FrameOutcome::kApplied;
@@ -311,6 +315,9 @@ FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world, const sim::
         //
         // ⚠ L'ORATEUR RESTE ZÉRO MÊME QUAND L'AUTEUR EST CONNU : la parole de
         // guilde ne met pas de bulle au-dessus d'une tête.
+        if (mute.hides_guild()) {
+          return FrameOutcome::kApplied;
+        }
         AuthoredText said = ReadAuthoredText(frame, packet.message);
         world.RecordChat(sim::ChatKind::kGuild, sim::ChatType::kGuildChat, 0,
                          masked(std::move(said.text)), now_ms, 0, std::move(said.author));
@@ -329,6 +336,9 @@ FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world, const sim::
         // pas, et comme il est aussi dans le message nous ne le remplissons
         // pas » (clif_clan_message). L'auteur est donc dans le texte, ou dans
         // la trame qui le précède, comme pour la guilde.
+        if (mute.hides_guild()) {
+          return FrameOutcome::kApplied;
+        }
         AuthoredText said = ReadAuthoredText(frame, packet.Message);
         world.RecordChat(sim::ChatKind::kClan, sim::ChatType::kClanChat, 0,
                          masked(std::move(said.text)), now_ms, 0, std::move(said.author));

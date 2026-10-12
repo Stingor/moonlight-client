@@ -8,6 +8,7 @@
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
 #include "ro/sim/banned_words.h"
+#include "ro/sim/talk_mute.h"
 #include "ro/sim/world_fwd.h"
 
 namespace ro::net {
@@ -56,8 +57,12 @@ struct BroadcastFilter {
 //
 // ⚠ LE CHUCHOTEMENT N'EN EST PAS : il paraît tel quel dans la conversation, et
 // seule sa fenêtre 1:1 le masque.
+//
+// `mute` tait la ligne de la parole publique des autres — sa bulle reste —, de
+// la guilde et du clan : voir `sim::TalkMute`.
 [[nodiscard]] FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world,
-                                            const sim::BannedWords* banned, std::uint32_t now_ms);
+                                            const sim::BannedWords* banned, std::uint32_t now_ms,
+                                            sim::TalkMute mute = {});
 
 // LE MOTIF D'UNE ÉVICTION (`SC_NOTIFY_BAN`), ou rien si cette trame n'en est pas
 // une. Le serveur coupe la liaison aussitôt après : c'est à `app` de fermer le

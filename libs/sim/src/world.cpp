@@ -605,13 +605,17 @@ void World::RecordWhisper(WhisperFacts facts, std::string text, std::uint32_t sa
   chat_lines_.back().whisper = std::move(facts);
 }
 
+void World::ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms) {
+  if (const auto found = actors_.find(speaker_id); found != actors_.end()) {
+    found->second.chat_text = std::move(text);
+    found->second.chat_since_ms = said_ms;
+  }
+}
+
 void World::RecordChat(ChatKind kind, ChatType type, std::uint32_t speaker_id, std::string text,
                        std::uint32_t said_ms, std::uint32_t color,
                        std::optional<ChatAuthor> author) {
-  if (const auto found = actors_.find(speaker_id); found != actors_.end()) {
-    found->second.chat_text = text;
-    found->second.chat_since_ms = said_ms;
-  }
+  ShowSpeech(speaker_id, text, said_ms);
   // ÉVICTION PAR GENRE : les plus anciennes de CE genre-là s'en vont.
   //
   // ⚠ DEUX AU PLUS PAR LIGNE ARRIVÉE quand la borne est dépassée, et non une :
