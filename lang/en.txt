@@ -17224,3 +17224,21 @@ tr: Mail: writing to %s
 
 fr: Courrier : écriture
 tr: Mail: writing
+
+fr: Vous avez quitté la guilde.
+tr: You left the guild.
+
+fr: Vous avez été expulsé de la guilde.
+tr: You have been expelled from the Guild.
+
+fr: %s a quitté la guilde.
+tr: %s has left the guild.
+
+fr: Motif du départ : %s
+tr: Withdrawal Reason: %s
+
+fr: %s a été expulsé de la guilde.
+tr: %s has been expelled from the guild.
+
+fr: Motif de l'expulsion : %s
+tr: Expulsion Reason: %s

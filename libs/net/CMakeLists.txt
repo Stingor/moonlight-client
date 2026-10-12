@@ -48,6 +48,7 @@ add_library(ro_net STATIC
     src/equip_attributes.cpp
     src/frame_tally.cpp
     src/guild.cpp
+    src/guild_departures.cpp
     src/guild_relation_answer.cpp
     src/guild_requests.cpp
     src/inventory.cpp

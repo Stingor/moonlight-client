@@ -24,7 +24,8 @@ namespace ro::net {
 //
 // ⚠ `own_char_id` EST LE PERSONNAGE JOUÉ. Le départ et l'expulsion d'un membre
 // sont rediffusés à toute la guilde sous le numéro du personnage concerné :
-// quand c'est le nôtre, c'est NOUS qui partons, et le carnet se vide.
+// quand c'est le nôtre, c'est NOUS qui partons, et le carnet se vide. Chaque
+// départ s'y note, pour `SayGuildDepartures`.
 //
 // LES MOTS INTERDITS de `banned` se masquent dans ce que le client d'origine
 // masque : le nom de la guilde, son avis, les noms de ses postes, ceux des
@@ -128,6 +129,19 @@ struct GuildPositionEdit {
 // nomme tous plutôt que d'en affirmer un. Un numéro inconnu n'écrit rien.
 [[nodiscard]] FrameOutcome ApplyGuildRelationAnswerFrame(const Frame& frame, sim::World& world,
                                                          std::uint32_t now_ms);
+
+// ── LE DÉPART ET L'EXPULSION D'UN MEMBRE ────────────────────────────────────
+//
+// Les départs que `ApplyGuildFrame` a notés dans le carnet, écrits dans la
+// conversation sur la case « guilde », puis oubliés. Rend VRAI quand l'un
+// d'eux était le nôtre : l'appelant ferme alors la fenêtre de guilde.
+//
+// Un autre membre : « Untel a quitté la guilde. » puis le motif, en jaune ; le
+// motif se masque, sur la ligne entière, quand on tient la liste des mots
+// interdits. Le nôtre : le seul constat, en rouge, et le personnage joué perd
+// sa guilde sur-le-champ.
+[[nodiscard]] bool SayGuildDepartures(sim::GuildBook& guild, sim::World& world,
+                                      const sim::BannedWords* banned, std::uint32_t now_ms);
 
 // L'IMAGE DE L'EMBLÈME PAR LE FIL — le chemin historique. Le serveur ne répond
 // que s'il en garde une.

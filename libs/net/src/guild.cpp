@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/i18n.h"
 #include "ro/core/text.h"
 #include "ro/proto/guild_packets.h"
 #include "ro/proto/map_packets.h"
@@ -68,13 +69,27 @@ template <typename Packet>
   return relation == 0 ? sim::GuildRelationKind::kAlly : sim::GuildRelationKind::kEnemy;
 }
 
-// Le départ comme l'expulsion : c'est nous, ou c'est un autre.
-FrameOutcome MemberGone(sim::GuildBook& guild, std::uint32_t char_id, std::uint32_t own_char_id) {
-  if (char_id == own_char_id) {
+// Le départ comme l'expulsion : c'est nous, ou c'est un autre. Dans les deux
+// cas, la conversation l'écrira.
+//
+// ⚠ UN EXPULSÉ ENTRE DANS LA LISTE DES EXPULSIONS, sous son nom et son motif.
+FrameOutcome MemberGone(sim::GuildBook& guild, std::uint32_t char_id, std::string_view reason,
+                        bool expelled, std::uint32_t own_char_id) {
+  sim::GuildDeparture departure{.char_id = char_id,
+                                .reason = Phrase(reason),
+                                .expelled = expelled,
+                                .own = char_id == own_char_id};
+  if (departure.own) {
     guild.Leave();
   } else {
+    const sim::GuildMember* member = guild.FindMember(char_id);
+    departure.name = member != nullptr ? member->name : std::string(core::Tr("Sans nom"));
     guild.RemoveMember(char_id);
+    if (expelled) {
+      guild.AddBan({static_cast<std::int32_t>(char_id), departure.name, departure.reason});
+    }
   }
+  guild.TellDeparture(std::move(departure));
   return FrameOutcome::kApplied;
 }
 
@@ -280,12 +295,12 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
 
     case proto::kGuildMemberLeftOpcode:
       return Decoded<proto::ZcAckLeaveGuild2>(frame, [&guild, own_char_id](const auto& packet) {
-        return MemberGone(guild, packet.GID, own_char_id);
+        return MemberGone(guild, packet.GID, packet.reason, false, own_char_id);
       });
 
     case proto::kGuildMemberExpelledOpcode:
       return Decoded<proto::ZcAckBanGuild3>(frame, [&guild, own_char_id](const auto& packet) {
-        return MemberGone(guild, packet.GID, own_char_id);
+        return MemberGone(guild, packet.GID, packet.reason, true, own_char_id);
       });
 
     case proto::ZcAckDisorganizeGuildResult::kOpcode:

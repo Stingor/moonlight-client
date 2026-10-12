@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <optional>
 
+#include "ro/net/guild.h"
+
 #include "character/equip_slot_map.h"
 #include "character/staff_view.h"
 #include "game/game.h"
@@ -15,6 +17,13 @@
 namespace moonclient {
 
 void Game::StageCharacterSheet(std::uint32_t now_ms) {
+  // LES DÉPARTS DE LA GUILDE S'ÉCRIVENT DANS LA CONVERSATION, même l'écran de
+  // veille levé. Le nôtre ferme la fenêtre de guilde : la fiche, quand c'est
+  // elle qu'elle montre.
+  if (ro::net::SayGuildDepartures(guild_book_, world_, &pieces_.banned_words, now_ms) &&
+      windows_.character.tab == ro::ui::CharacterTab::kGuild) {
+    windows_.character.open = false;
+  }
   // LA FICHE SE REFAIT AVANT LE DESSIN : l'onglet ouvert décide des
   // emplacements cherchés, et il a pu changer à l'image précédente.
   character_->Refresh(windows_.character.open, world_,

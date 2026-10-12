@@ -17224,3 +17224,21 @@ tr: Correo: redactando a %s
 
 fr: Courrier : écriture
 tr: Correo: redactando
+
+fr: Vous avez quitté la guilde.
+tr: Has abandonado la guild.
+
+fr: Vous avez été expulsé de la guilde.
+tr: Has sido expulsado de la guild.
+
+fr: %s a quitté la guilde.
+tr: %s ha abandonado la guild.
+
+fr: Motif du départ : %s
+tr: Motivo de la salida: %s
+
+fr: %s a été expulsé de la guilde.
+tr: %s ha sido expulsado de la guild.
+
+fr: Motif de l'expulsion : %s
+tr: Motivo de la expulsión: %s

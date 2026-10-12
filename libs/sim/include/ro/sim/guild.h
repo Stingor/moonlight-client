@@ -200,6 +200,23 @@ struct GuildAllianceOffer {
   std::string guild_name;
 };
 
+// UN MEMBRE QUI QUITTE LA GUILDE OU EN EST EXPULSÉ, en attente d'être écrit
+// dans la conversation.
+//
+// ⚠ LE NOM SE RELÈVE DANS LA LISTE DES MEMBRES AVANT QU'IL N'EN SORTE : le
+// serveur ne nomme que le personnage. « Sans nom » quand la liste ne le
+// connaissait pas.
+struct GuildDeparture {
+  std::uint32_t char_id = 0;
+  std::string name;
+  // Tel que le serveur l'écrit : c'est la ligne entière qui se masque.
+  std::string reason;
+  bool expelled = false;
+  // C'est le personnage joué qui part : seul le constat s'écrit, sans nom ni
+  // motif.
+  bool own = false;
+};
+
 class GuildBook {
  public:
   // ── L'APPARTENANCE ──────────────────────────────────────────────────────
@@ -308,6 +325,17 @@ class GuildBook {
   [[nodiscard]] std::span<const GuildBan> bans() const noexcept { return bans_; }
   [[nodiscard]] bool bans_known() const noexcept { return bans_known_; }
   void ReplaceBans(std::vector<GuildBan> bans);
+  // UNE EXPULSION ANNONCÉE s'ajoute en fin de liste, que la liste soit déjà
+  // reçue ou non : celle que le serveur enverra ensuite la remplace.
+  void AddBan(GuildBan ban) { bans_.push_back(std::move(ban)); }
+
+  // ── LES DÉPARTS À ÉCRIRE ────────────────────────────────────────────────
+  //
+  // ⚠ QUITTER NE LES EFFACE PAS : notre propre départ s'y inscrit après.
+  void TellDeparture(GuildDeparture departure) { departures_.push_back(std::move(departure)); }
+  [[nodiscard]] std::vector<GuildDeparture> TakeDepartures() {
+    return std::exchange(departures_, {});
+  }
 
   // ── LA CRÉATION ─────────────────────────────────────────────────────────
   //
@@ -390,6 +418,7 @@ class GuildBook {
   std::optional<GuildInviteAnswer> invite_answer_;
   std::uint64_t invite_answer_seq_ = 0;
   std::optional<GuildAllianceOffer> alliance_offer_;
+  std::vector<GuildDeparture> departures_;
 };
 
 }  // namespace ro::sim
