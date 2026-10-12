@@ -108,9 +108,12 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
   windows_.description.text_select = text_select;
   windows_.skill_description.text_select = text_select;
   // LE LIVRE : sa fenêtre s'ouvre où les descriptions s'ouvrent, et la
-  // récitation avance à chaque image.
+  // récitation avance à chaque image. Une ligne dite rouvre la conversation
+  // si le joueur l'avait fermée : c'est là qu'elle s'écrit.
   BookReader& books = item_description_->books();
-  books.Tick(link_, world_, now_ms);
+  if (books.Tick(world_, windows_.book, now_ms)) {
+    windows_.chat.main.open = true;
+  }
   windows_.book.placement = placement;
   windows_.book_view = &books.view();
   windows_.book_recital = books.recital_line();

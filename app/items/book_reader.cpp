@@ -4,18 +4,21 @@
 #include <utility>
 
 #include "ro/core/log.h"
-#include "ro/net/chat_target.h"
+#include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
 
 namespace moonclient {
 namespace {
 
-// La cadence du client : une ligne toutes les quatre secondes, la première tout
-// de suite.
+// La cadence du client : une ligne quand PLUS de quatre secondes ont passé
+// depuis la précédente, la première dès l'image suivante.
 constexpr std::uint32_t kRecitalStepMs = 4000;
-// Ce qu'une ligne dite peut porter de caractères. ⚠ LE CLIENT DIT LES LIGNES
-// REPLIÉES À LA LARGEUR DE SA FENÊTRE, jamais une phrase entière : une ligne de
-// livre dépasse souvent ce que la conversation accepte.
+// LA LIGNE DITE, dans la conversation : un rose pâle, sans orateur ni nom, dans
+// la case générale — celle des lignes que le client écrit lui-même.
+constexpr std::uint32_t kRecitalChatColor = 0xFFE4E1;
+// 🔴 LE CLIENT DIT LES LIGNES QUE SA FENÊTRE MONTRE, repliées en pixels à sa
+// largeur, jamais une phrase entière. Ce repli en caractères n'est qu'un SECOURS,
+// tant que la fenêtre n'a jamais été dessinée : aucune largeur n'est mesurée.
 constexpr std::size_t kRecitalLineChars = 70;
 // Une ligne faite d'une espace est une ligne vide.
 constexpr std::string_view kBlankLine = " ";
@@ -110,30 +113,46 @@ int BookReader::StartPage(std::uint32_t item_id, bool first_page) const {
   return kept != bookmarks_.end() ? kept->second : 1;
 }
 
+void BookReader::StopRecital() noexcept {
+  reciting_ = false;
+  recital_line_.clear();
+}
+
 void BookReader::Open(std::uint32_t item_id, ro::ui::BookWindowState& window, bool first_page) {
+  // LE MÊME LIVRE, DÉJÀ SOUS LES YEUX : le bouton ne fait rien.
+  if (!reciting_ && window.open && window.item_id == item_id) {
+    return;
+  }
+  const bool same_recital = reciting_ && loaded_ == item_id;
   if (!Load(item_id)) {
     return;
   }
-  reciting_ = false;
-  recital_line_.clear();
+  StopRecital();
   window.open = true;
   window.raise = true;
   window.place_at_mouse = true;
   window.item_id = item_id;
-  window.page = StartPage(item_id, first_page);
+  window.page = same_recital ? recital_page_ : StartPage(item_id, first_page);
 }
 
 void BookReader::StartRecital(std::uint32_t item_id, ro::ui::BookWindowState& window,
                               bool first_page, std::uint32_t now_ms) {
+  if (reciting_) {
+    StopRecital();
+    return;
+  }
+  // Le livre ouvert se récite depuis sa page.
+  const bool from_window = window.open && window.item_id == item_id;
   if (!Load(item_id)) {
     return;
   }
+  recital_page_ = from_window ? window.page : StartPage(item_id, first_page);
   window.open = false;
   recital_ = RecitalLines(book_.lines);
-  const auto page = static_cast<std::size_t>(StartPage(item_id, first_page));
-  next_ = std::min((page - 1) * ro::ui::kBookLinesPerPage, recital_.size());
-  reciting_ = !recital_.empty();
-  // ⚠ LA PREMIÈRE LIGNE PART TOUT DE SUITE : l'horloge part déjà échue.
+  const auto page = static_cast<std::size_t>(std::max(recital_page_, 1));
+  next_ = (page - 1) * ro::ui::kBookLinesPerPage;
+  reciting_ = !book_.lines.empty();
+  // ⚠ LA PREMIÈRE LIGNE PART À L'IMAGE SUIVANTE : l'horloge part déjà échue.
   said_at_ms_ = now_ms - kRecitalStepMs;
   recital_line_.clear();
 }
@@ -156,31 +175,48 @@ void BookReader::NoteLeaving(const ro::ui::BookWindowState& window) {
   if (window.open) {
     NoteClosed(window.item_id, window.page);
   }
+  StopRecital();
 }
 
-void BookReader::Tick(ro::net::Connection& link, const ro::sim::World& world,
-                      std::uint32_t now_ms) {
-  if (!reciting_ || now_ms - said_at_ms_ < kRecitalStepMs) {
-    return;
+const std::vector<std::string>* BookReader::RecitalRows(
+    const ro::ui::BookWindowState& window) const noexcept {
+  if (window.rows_for == loaded_ && !window.rows.empty()) {
+    return &window.rows;
   }
-  if (next_ >= recital_.size()) {
-    reciting_ = false;
-    recital_line_.clear();
-    return;
+  // Une largeur déjà mesurée : la fenêtre replie ce livre à sa prochaine image.
+  if (window.rows_width > 0.0F) {
+    return nullptr;
+  }
+  return &recital_;
+}
+
+bool BookReader::Tick(ro::sim::World& world, const ro::ui::BookWindowState& window,
+                      std::uint32_t now_ms) {
+  if (!reciting_ || now_ms - said_at_ms_ <= kRecitalStepMs) {
+    return false;
+  }
+  const std::vector<std::string>* const rows = RecitalRows(window);
+  if (rows == nullptr) {
+    return false;
+  }
+  if (next_ >= rows->size()) {
+    StopRecital();
+    return false;
   }
   // UNE LIGNE VIDE SE SAUTE, une seule par tour — comme le client.
-  if ((recital_[next_].empty() || recital_[next_] == kBlankLine) && next_ + 1 < recital_.size()) {
+  const auto blank = [](const std::string& plain) { return plain.empty() || plain == kBlankLine; };
+  if (blank(ro::ui::BookLinePlain((*rows)[next_])) && next_ + 1 < rows->size()) {
     ++next_;
   }
-  recital_line_ = recital_[next_];
-  if (!recital_line_.empty() && link.is_open()) {
-    const ro::net::ChatIntent said{.target = ro::net::ChatTarget::kPublic, .text = recital_line_};
-    if (const auto sent = ro::net::SendChat(link, world.player_name(), said); !sent) {
-      ro::core::LogWarning("lecture à voix haute : {}", ro::core::Describe(sent.error()));
-    }
-  }
+  recital_line_ = ro::ui::BookLinePlain((*rows)[next_]);
   ++next_;
   said_at_ms_ = now_ms;
+  // 🔴 POUR LE SEUL LECTEUR : rien ne part au serveur, aucune tête ne parle.
+  if (!recital_line_.empty()) {
+    world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kPublic, 0, recital_line_,
+                     now_ms, kRecitalChatColor);
+  }
+  return true;
 }
 
 }  // namespace moonclient

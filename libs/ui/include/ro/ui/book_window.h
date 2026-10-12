@@ -35,7 +35,9 @@ struct BookWindowState {
 
   // LES LIGNES REPLIÉES, et ce pour quoi elles valent : le livre et la largeur.
   // ⚠ REFAITES SEULEMENT QUAND L'UN DES DEUX CHANGE : mesurer chaque mot à
-  // chaque image coûterait pour un texte qui ne bouge pas.
+  // chaque image coûterait pour un texte qui ne bouge pas. Fenêtre fermée, le
+  // livre désigné se replie encore à la dernière largeur : la lecture à voix
+  // haute dit ces lignes-là, comme la fenêtre les montre.
   std::vector<std::string> rows;
   std::uint32_t rows_for = 0;
   float rows_width = 0.0F;

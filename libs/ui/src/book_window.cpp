@@ -30,13 +30,17 @@ constexpr char kColorMark = '^';
 constexpr std::size_t kColorTokenLength = 7;
 constexpr std::string_view kDefaultInk = "^000000";
 
-// LA BULLE : en haut de l'écran, centrée, comme le client la pose.
+// LA BULLE : en haut de l'écran, centrée, comme le client la pose. ⚠ SANS
+// FOND : un liseré gris aux coins coupés sur le décor, et le texte rose pâle
+// porte une ombre noire décalée d'un pixel.
 constexpr float kRecitalTopPixels = 81.0F;
-constexpr float kRecitalWidestPixels = 420.0F;
-constexpr float kRecitalPaddingPixels = 10.0F;
-constexpr float kRecitalRounding = 8.0F;
-constexpr ImU32 kRecitalFill = IM_COL32(0, 0, 0, 150);
-constexpr ImU32 kRecitalInk = IM_COL32(255, 255, 255, 255);
+constexpr float kRecitalPaddingXPixels = 6.0F;
+constexpr float kRecitalPaddingYPixels = 4.0F;
+constexpr float kRecitalRounding = 3.0F;
+constexpr float kRecitalShadowPixels = 1.0F;
+constexpr ImU32 kRecitalBorder = IM_COL32(0x5C, 0x5C, 0x5C, 255);
+constexpr ImU32 kRecitalInk = IM_COL32(0xFF, 0xE4, 0xE1, 255);
+constexpr ImU32 kRecitalShadow = IM_COL32(0, 0, 0, 255);
 
 [[nodiscard]] bool IsHex(char letter) {
   return (letter >= '0' && letter <= '9') || (letter >= 'a' && letter <= 'f') ||
@@ -123,6 +127,12 @@ BookWindowAction DrawBookWindow(BookWindowState& state, const BookView& view, co
   BookWindowAction action;
   if (!state.open || view.item_id == 0) {
     state.was_open = false;
+    // FERMÉE, ELLE REPLIE QUAND MÊME le livre désigné, à la dernière largeur
+    // mesurée : la lecture à voix haute dit ces lignes-là, fenêtre cachée.
+    if (view.item_id != 0 && state.rows_width > 0.0F && state.rows_for != view.item_id) {
+      state.rows = WrapBookLines(view.lines, state.rows_width);
+      state.rows_for = view.item_id;
+    }
     return action;
   }
   PlaceDescription(state.place_at_mouse, state.was_open, state.placement);
@@ -221,16 +231,17 @@ void DrawBookRecital(std::string_view line) {
   ImDrawList* const into = ImGui::GetForegroundDrawList();
   ImFont* const font = ImGui::GetFont();
   const float size = ImGui::GetFontSize();
-  const ImVec2 extent =
-      font->CalcTextSizeA(size, FLT_MAX, kRecitalWidestPixels, shown.c_str(), nullptr);
+  const ImVec2 extent = font->CalcTextSizeA(size, FLT_MAX, 0.0F, shown.c_str(), nullptr);
   const ImVec2 screen = ImGui::GetMainViewport()->Size;
-  const ImVec2 top_left((screen.x - extent.x) * 0.5F - kRecitalPaddingPixels, kRecitalTopPixels);
-  const ImVec2 bottom_right(top_left.x + extent.x + 2.0F * kRecitalPaddingPixels,
-                            top_left.y + extent.y + 2.0F * kRecitalPaddingPixels);
-  into->AddRectFilled(top_left, bottom_right, kRecitalFill, kRecitalRounding);
-  into->AddText(font, size,
-                ImVec2(top_left.x + kRecitalPaddingPixels, top_left.y + kRecitalPaddingPixels),
-                kRecitalInk, shown.c_str(), nullptr, kRecitalWidestPixels);
+  const float width = extent.x + 2.0F * kRecitalPaddingXPixels;
+  const ImVec2 top_left(std::floor((screen.x - width) * 0.5F), kRecitalTopPixels);
+  const ImVec2 bottom_right(top_left.x + width,
+                            top_left.y + extent.y + 2.0F * kRecitalPaddingYPixels);
+  into->AddRect(top_left, bottom_right, kRecitalBorder, kRecitalRounding);
+  const ImVec2 ink(top_left.x + kRecitalPaddingXPixels, top_left.y + kRecitalPaddingYPixels);
+  into->AddText(font, size, ImVec2(ink.x + kRecitalShadowPixels, ink.y + kRecitalShadowPixels),
+                kRecitalShadow, shown.c_str());
+  into->AddText(font, size, ink, kRecitalInk, shown.c_str());
 }
 
 }  // namespace ro::ui
