@@ -13,6 +13,7 @@
 
 namespace ro::render {
 
+using catalog_internal::BodyClass;
 using catalog_internal::DualWieldClass;
 using catalog_internal::IsDoram;
 using catalog_internal::Join;
@@ -46,6 +47,7 @@ using catalog_internal::TableName;
 using catalog_internal::TableNumber;
 using catalog_internal::WeaponClassOf;
 using catalog_internal::WeaponFamilyClass;
+using catalog_internal::WearsAlternateOutfit;
 
 namespace {
 
@@ -352,20 +354,9 @@ std::string_view ShieldName(std::uint32_t form) {
 
 // Sur une monture cash-shop comme dans un Madogear, les mains se vident.
 bool HoldsNothing(const ActorLook& look) {
-  return !look.player || look.cash_mount || IsMadogearJob(look.job) ||
+  return !look.player || look.cash_mount || IsMadogearJob(BodyClass(look)) ||
          (look.weapon == 0 && look.shield == 0);
 }
-
-// La plage des classes de TENUE ALTERNATIVE.
-//
-// Le style de corps qu'annonce le serveur n'est pas un numéro de costume :
-// c'est une CLASSE — celle de la tenue alternative —, et le serveur y met la
-// classe du personnage lui-même quand il n'en porte aucune. Le client ne
-// cherche le dossier des costumes que dans cette plage : dix-huit valeurs à
-// partir de 4332, et tout le reste prend le corps ordinaire. Lire n'importe quel style non nul
-// comme un costume fait chercher un fichier qui n'existe pas, et l'acteur disparaît.
-constexpr std::uint16_t kFirstAlternateOutfitClass = 4332;
-constexpr std::uint16_t kAlternateOutfitClassCount = 18;
 
 // Le numéro que portent le dossier et le nom d'une tenue alternative. Le client
 // n'en connaît qu'un pour un corps d'acteur : les dossiers costume_2 à
@@ -388,11 +379,6 @@ constexpr int kAlternateOutfitNumber = 1;
 //
 // Le serveur donne cette classe à tous ses warps (JT_WARPNPC, src/map/npc.hpp).
 constexpr std::uint32_t kWarpClass = 45;
-
-bool WearsAlternateOutfit(const ActorLook& look) {
-  return look.body_style >= kFirstAlternateOutfitClass &&
-         look.body_style < kFirstAlternateOutfitClass + kAlternateOutfitClassCount;
-}
 
 }  // namespace
 
@@ -433,8 +419,8 @@ std::optional<std::string> BodySpritePath(const SpriteCatalog& catalog, const Ac
   if (look.player) {
     const std::string_view sex = SexToken(look.sex);
     const std::string_view name = catalog_internal::ShownBodyName(look);
-    std::string path = Join(
-        {kSpriteRoot, RaceFolder(look.job), kSeparator, kBodyFolder, kSeparator, sex, kSeparator});
+    std::string path = Join({kSpriteRoot, RaceFolder(BodyClass(look)), kSeparator, kBodyFolder,
+                             kSeparator, sex, kSeparator});
     if (WearsAlternateOutfit(look)) {
       const std::string number = std::to_string(kAlternateOutfitNumber);
       path += Join({kCostumeFolderPrefix, number, kSeparator, name, "_", sex, "_", number});
@@ -468,9 +454,9 @@ std::vector<std::string> BodySpritePaths(const SpriteCatalog& catalog, const Act
   std::vector<std::string> candidates{std::move(*path)};
   if (WearsAlternateOutfit(look)) {
     // Une tenue alternative que l'installation n'a pas ne doit pas effacer son
-    // porteur : le corps ordinaire prend le relais.
+    // porteur : le corps ordinaire du métier qu'elle habille prend le relais.
     ActorLook ordinary = look;
-    ordinary.body_style = 0;
+    ordinary.body_style = static_cast<std::uint16_t>(BodyClass(look));
     if (std::optional<std::string> plain = BodySpritePath(catalog, ordinary); plain.has_value()) {
       candidates.push_back(std::move(*plain));
     }
@@ -505,7 +491,7 @@ std::vector<std::string> WeaponSpritePaths(const SpriteCatalog& catalog, const A
   if (HoldsNothing(look)) {
     return {};
   }
-  const client_tables::WeaponSpriteClass sprite_class = WeaponSpriteClassOf(look.job);
+  const client_tables::WeaponSpriteClass sprite_class = WeaponSpriteClassOf(BodyClass(look));
   std::vector<std::string> candidates;
 
   // La main gauche tient une arme : le couple se dessine en une pièce, nommée
@@ -529,7 +515,8 @@ std::vector<std::string> WeaponSpritePaths(const SpriteCatalog& catalog, const A
   const int weapon_class = WeaponClassOf(catalog, look.weapon);
   const std::string own_name = WeaponNameOfClass(catalog, weapon_class);
   if (!own_name.empty()) {
-    candidates.push_back(HeldPath(RaceFolder(look.job), sprite_class, look.sex, own_name, {}));
+    candidates.push_back(
+        HeldPath(RaceFolder(BodyClass(look)), sprite_class, look.sex, own_name, {}));
   }
   const bool knuckle_less = weapon_class == static_cast<int>(kKnuckleClass) &&
                             (Listed(kKnuckleLessJobs, look.job) || look.job == kCardinal);
@@ -546,15 +533,15 @@ std::vector<std::string> WeaponSpritePaths(const SpriteCatalog& catalog, const A
 
 std::vector<std::string> WeaponTrailPaths(const SpriteCatalog& catalog, const ActorLook& look) {
   // LE MADOGEAR PORTE LA LUEUR DE SA MACHINE, arme en main ou non.
-  if (look.player && !look.cash_mount && IsMadogearJob(look.job)) {
-    client_tables::WeaponSpriteClass machine = WeaponSpriteClassOf(look.job);
+  if (look.player && !look.cash_mount && IsMadogearJob(BodyClass(look))) {
+    client_tables::WeaponSpriteClass machine = WeaponSpriteClassOf(BodyClass(look));
     machine.prefix = catalog_internal::MadogearSuitName(machine.prefix, look.madogear_suit);
     return {HeldPath(kHumanRace, machine, look.sex, {}, kWeaponTrailSuffix)};
   }
   if (HoldsNothing(look)) {
     return {};
   }
-  const client_tables::WeaponSpriteClass sprite_class = WeaponSpriteClassOf(look.job);
+  const client_tables::WeaponSpriteClass sprite_class = WeaponSpriteClassOf(BodyClass(look));
   std::vector<std::string> candidates;
 
   if (WeaponClassOf(catalog, look.shield) > 0) {
@@ -593,7 +580,7 @@ std::vector<std::string> ShieldSpritePaths(const SpriteCatalog& catalog, const A
   if (HoldsNothing(look) || look.shield == 0 || WeaponClassOf(catalog, look.shield) > 0) {
     return {};
   }
-  const client_tables::WeaponSpriteClass sprite_class = WeaponSpriteClassOf(look.job);
+  const client_tables::WeaponSpriteClass sprite_class = WeaponSpriteClassOf(BodyClass(look));
   const std::string_view sex = SexToken(look.sex);
   const std::string stem = Join({kSpriteRoot, kShieldFolder, kSeparator, sprite_class.folder,
                                  kSeparator, sprite_class.prefix, "_", sex});

@@ -104,8 +104,19 @@ void AppendMercenaryPieces(std::uint32_t job, std::vector<ActorPieceFiles>& file
 // novice pour un métier qu'il ne nomme pas.
 [[nodiscard]] std::string_view PlayerBodyName(std::uint32_t job);
 
-// Le métier dont un joueur prend le CORPS : le sien, ou sa classe montée sur
-// une monture cash-shop.
+// VRAI QUAND LE STYLE DE CORPS EST UNE TENUE ALTERNATIVE : le corps se cherche
+// alors dans le dossier des costumes.
+[[nodiscard]] bool WearsAlternateOutfit(const ActorLook& look);
+
+// LE MÉTIER DONT UN JOUEUR EMPRUNTE LE CORPS, hors monture cash-shop : celui de
+// son style de corps, que le styliste du serveur peut poser sur n'importe quel
+// métier. Une tenue alternative y prête le métier qu'elle habille, et la
+// monture du métier montré passe au corps emprunté. Le corps, la cape, l'arme
+// et le bouclier se lisent sur lui ; la tête et le numéro de palette, non.
+[[nodiscard]] std::uint32_t BodyClass(const ActorLook& look);
+
+// Le métier dont un joueur prend le CORPS : `BodyClass`, ou sa classe montée
+// sur une monture cash-shop.
 [[nodiscard]] std::uint32_t BodyJob(const ActorLook& look);
 
 // LE NOM D'UN FICHIER DE MADOGEAR SOUS LA COMBINAISON : l'armure au lieu de la
