@@ -288,13 +288,9 @@ PlayedMotion MotionAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World&
                           played_effects, true, readable);
 }
 
-bool PlayerRestsAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
-                   ro::sim::WalkPlanner& planner, std::uint32_t now_ms) {
-  const ro::sim::Actor* player = world.player();
-  if (player == nullptr) {
-    return false;
-  }
-  const ro::sim::Actor& actor = *player;
+bool ActorRestsAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
+                  ro::sim::WalkPlanner& planner, const ro::sim::Actor& actor,
+                  std::uint32_t now_ms) {
   const ro::sim::WalkPath& path = planner.PathFor(actor);
   ro::render::ActorOutfit* outfit =
       wardrobe != nullptr ? wardrobe->OutfitFor(LookOf(actor)) : nullptr;

@@ -655,6 +655,18 @@ target_link_libraries(moonclient_battleground
 
 target_include_directories(moonclient_battleground PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# CE QUE DISENT LES MONSTRES QUAND ILS FRAPPENT, en bibliothèque : la cible
+# mémorisée par acteur, la ligne et sa bulle, `/notalkmsg` qui tait la ligne
+# se vérifient sur un banc, trame par trame.
+add_library(moonclient_monstertalk STATIC
+    game/monster_talk_stage.cpp)
+
+target_link_libraries(moonclient_monstertalk
+    PUBLIC ro_net ro_proto ro_render ro_sim ro_vfs
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_monstertalk PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # CE QUE LE COMBAT DU CHAMP DE BATAILLE MONTRE, et sa page de réglages. En
 # bibliothèque parce que ces règles ne connaissent que `sim` et `render` : la
 # marque d'un ennemi caché, le score d'un camp inconnu ne se voient pas en
@@ -1622,7 +1634,7 @@ add_executable(moonclient
 
 target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_statuses moonclient_titles
-            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
+            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
             moonclient_seatlayout moonclient_settings moonclient_settinglinks ro_audio ro_core ro_formats

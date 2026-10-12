@@ -49,6 +49,7 @@ add_library(ro_sim STATIC
     src/pet_egg.cpp
     src/pet.cpp
     src/pet_talk.cpp
+    src/monster_talk.cpp
     src/homunculus.cpp
     src/mercenary.cpp
     src/companion_ai.cpp

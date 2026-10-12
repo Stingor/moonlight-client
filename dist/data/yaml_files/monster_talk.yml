@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Ce que disent les monstres quand ils frappent
+#
+#  Tiré de data\MonsterTalkTable.xml, tel que le livre moonlight.grf. Les
+#  répliques sont celles du jeu ; ce dépôt ne les revendique pas comme siennes.
+#  Une table vide veut dire que le fichier de l'installation n'en porte aucune :
+#  aucun monstre ne parle alors.
+#
+#  Fichier produit par scripts/yaml_tables/monster_talk.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/monster_talk.py --client <dossier client> \
+#          --sortie dist/data/yaml_files/monster_talk.yml
+#
+#  species : espèce (nom de ressource de la classe, en minuscules) -> occasion
+#    (attack) -> les répliques, dont le client tire une au sort. Chacune a perdu
+#    la tabulation qui l'ouvrait et celle qui la fermait.
+#
+#  Lu par moonclient (ro/vfs/monster_talk_table.h). Absent, les monstres se
+#  taisent.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+species: {}

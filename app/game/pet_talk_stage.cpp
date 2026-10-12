@@ -18,14 +18,6 @@ namespace {
 // Un tirage du client, en pour cent.
 constexpr unsigned kPercent = 100;
 
-// LES DÉGÂTS QUI ANNULENT UN COUP : le client ne lit pas le paquet qui les
-// porte — ni chasse, ni cible mémorisée.
-constexpr std::int32_t kVoidStrikeDamage = -30000;
-
-// UN COUP DE COMPÉTENCE dont le client ne fait rien quand il vise son propre
-// lanceur : la ruée du loup (RA_WUGDASH).
-constexpr std::uint16_t kSelfIgnoredSkill = 2242;
-
 [[nodiscard]] std::uint32_t AsId(std::int32_t id) { return static_cast<std::uint32_t>(id); }
 
 }  // namespace
@@ -120,7 +112,7 @@ void PetTalkStage::NoteBeforeWorld(const ro::net::Frame& frame, const ro::sim::P
     case ro::proto::ZcNotifyAct::kOpcode: {
       ro::proto::ZcNotifyAct packet;
       if (!ro::proto::Decode(frame.bytes, packet) || AsId(packet.srcID) != owner_id ||
-          packet.damage == kVoidStrikeDamage) {
+          packet.damage == ro::sim::kVoidStrikeDamage) {
         return;
       }
       if (hunt_.Strike(owner_at_rest(), AsId(packet.targetID), packet.type) && pet.known() &&
@@ -132,7 +124,7 @@ void PetTalkStage::NoteBeforeWorld(const ro::net::Frame& frame, const ro::sim::P
     case ro::proto::ZcNotifySkill::kOpcode: {
       ro::proto::ZcNotifySkill packet;
       if (ro::proto::Decode(frame.bytes, packet) && packet.AID == owner_id &&
-          !(packet.SKID == kSelfIgnoredSkill && packet.targetID == owner_id)) {
+          !(packet.SKID == ro::sim::kSelfIgnoredStrikeSkill && packet.targetID == owner_id)) {
         hunt_.Remember(packet.targetID);
       }
       return;

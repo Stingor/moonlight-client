@@ -172,12 +172,13 @@ struct ReadableMotion {
                                     std::span<const ro::render::ActorEffectPlay> played_effects,
                                     const ReadableMotion& readable = {});
 
-// 🔴 LE JOUEUR SE TIENT AU REPOS À CET INSTANT : ce que `MotionAt` lui fait jouer
+// 🔴 L'ACTEUR SE TIENT AU REPOS À CET INSTANT : ce que `MotionAt` lui fait jouer
 // est l'attente ou la garde — ni marche, ni assise, ni coup, ni blessure, ni
-// incantation, ni ramassage. Sans garde-robe, les coups ne se jouent pas : il
-// suffit alors qu'il soit debout et immobile. Faux sans joueur.
-[[nodiscard]] bool PlayerRestsAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
-                                 ro::sim::WalkPlanner& planner, std::uint32_t now_ms);
+// incantation, ni ramassage. Sans garde-robe, ou sans tenue pour son allure,
+// les coups ne se jouent pas : il suffit alors qu'il soit debout et immobile.
+[[nodiscard]] bool ActorRestsAt(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
+                                ro::sim::WalkPlanner& planner, const ro::sim::Actor& actor,
+                                std::uint32_t now_ms);
 
 // L'INCANTATION ORDINAIRE D'UN JOUEUR, ÉTALÉE SUR SA BARRE, quand le joueur le
 // demande (`ReadableMotion::cast_spans_bar`) : son geste se déroule une fois, du

@@ -22,6 +22,7 @@
 #include "ro/vfs/pet_tables.h"
 #include "ro/vfs/vfs.h"
 
+#include "game/monster_talk_stage.h"
 #include "game/pet_talk_stage.h"
 #include "world/item_obtain_toast.h"
 #include "world/monster_sprite.h"
@@ -55,14 +56,19 @@ class PetStage {
   // Les mots interdits de l'installation : un nouveau nom qui en porte un ne
   // part pas, et le refus s'écrit dans la fenêtre.
   void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
-  // `/notalkmsg` ET `/notalkmsg2` taisent la ligne d'une réplique, pas sa bulle.
-  void SeeTalkMute(const ro::sim::TalkMute* mute) noexcept { talk_.SeeTalkMute(mute); }
-  // LE COUP DU MAÎTRE, lu AVANT que le monde n'applique la trame : voir
-  // `PetTalkStage::NoteBeforeWorld`.
-  void NoteBeforeWorld(const ro::net::Frame& frame, const ro::sim::World& world,
-                       const std::function<bool()>& owner_at_rest, std::uint32_t now_ms) {
-    talk_.NoteBeforeWorld(frame, pet_, world, owner_at_rest, now_ms);
+  // `/notalkmsg` ET `/notalkmsg2` taisent la ligne d'une réplique — d'un
+  // familier comme d'un monstre —, pas sa bulle.
+  void SeeTalkMute(const ro::sim::TalkMute* mute) noexcept {
+    talk_.SeeTalkMute(mute);
+    monster_talk_.SeeTalkMute(mute);
   }
+  // LES COUPS, lus AVANT que le monde n'applique la trame : celui du maître
+  // fait parler son familier (`PetTalkStage::NoteBeforeWorld`), celui d'un
+  // autre le fait parler lui-même (`MonsterTalkStage::NoteBeforeWorld`).
+  // `at_rest` dit si un acteur se tient au repos.
+  void NoteBeforeWorld(const ro::net::Frame& frame, ro::sim::World& world,
+                       const std::function<bool(const ro::sim::Actor&)>& at_rest,
+                       std::uint32_t now_ms);
 
   // UNE PARTIE NEUVE : le familier du personnage d'avant est oublié.
   //
@@ -151,6 +157,10 @@ class PetStage {
   std::optional<ToastNotice> hunger_notice_;
   // Ce que disent les familiers, et ce que le nôtre doit dire.
   PetTalkStage talk_;
+  // Ce que disent les monstres quand ils frappent : le client d'origine charge
+  // leur table avec celle des familiers, et les lit sur l'autre branche du même
+  // paquet des coups.
+  MonsterTalkStage monster_talk_;
 };
 
 }  // namespace moonclient

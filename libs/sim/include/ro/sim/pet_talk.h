@@ -112,6 +112,13 @@ inline constexpr std::uint8_t kOwnerPickUpAction = 1;
 inline constexpr std::uint8_t kOwnerSitDownAction = 2;
 inline constexpr std::uint8_t kOwnerStandUpAction = 3;
 
+// LES DÉGÂTS QUI ANNULENT UN COUP : le client ne lit pas le paquet qui les
+// porte — ni parole, ni cible mémorisée.
+inline constexpr std::int32_t kVoidStrikeDamage = -30000;
+// UN COUP DE COMPÉTENCE dont le client ne fait rien quand il vise son propre
+// lanceur : la ruée du loup (RA_WUGDASH). Aucune cible ne se mémorise.
+inline constexpr std::uint16_t kSelfIgnoredStrikeSkill = 2242;
+
 // 🔴 LA CHASSE SE JUGE SUR CE QU'ÉTAIT LE MAÎTRE AVANT SON COUP, et non à chaque
 // coup : il faut qu'il se tienne AU REPOS — debout, ni en marche, ni en plein
 // geste — et que la cible de ce coup ne soit pas celle qu'il a MÉMORISÉE.

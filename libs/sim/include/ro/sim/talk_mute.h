@@ -7,8 +7,8 @@ namespace ro::sim {
 // Les deux bascules du jeu, sous leurs commandes :
 //
 //   · `/notalkmsg` (ou `/nm`) : la parole publique des autres, celle du champ de
-//     bataille et les répliques des familiers n'entrent plus dans la
-//     conversation ;
+//     bataille et les répliques des familiers et des monstres n'entrent plus
+//     dans la conversation ;
 //   · `/notalkmsg2` (ou `/nm2`) : les mêmes, plus la parole de guilde et celle
 //     du clan.
 //
@@ -21,7 +21,8 @@ struct TalkMute {
   bool talk_hidden = false;
   bool talk_and_guild_hidden = false;
 
-  // La parole publique, celle du champ de bataille, les répliques des familiers.
+  // La parole publique, celle du champ de bataille, les répliques des familiers
+  // et des monstres.
   [[nodiscard]] bool hides_talk() const noexcept { return talk_hidden || talk_and_guild_hidden; }
   // La parole de guilde et celle du clan.
   [[nodiscard]] bool hides_guild() const noexcept { return talk_and_guild_hidden; }

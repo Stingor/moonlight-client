@@ -229,10 +229,23 @@ void PetStage::StartSession() {
   hunger_alarm_ = ro::sim::HungerAlarm{};
   hunger_notice_.reset();
   talk_.StartSession();
+  monster_talk_.StartSession();
+}
+
+void PetStage::NoteBeforeWorld(const ro::net::Frame& frame, ro::sim::World& world,
+                               const std::function<bool(const ro::sim::Actor&)>& at_rest,
+                               std::uint32_t now_ms) {
+  const auto owner_at_rest = [&] {
+    const ro::sim::Actor* owner = world.player();
+    return owner != nullptr && at_rest(*owner);
+  };
+  talk_.NoteBeforeWorld(frame, pet_, world, owner_at_rest, now_ms);
+  monster_talk_.NoteBeforeWorld(frame, world, at_rest, now_ms);
 }
 
 void PetStage::LoadTables(ro::vfs::Vfs& vfs) {
   talk_.LoadTable(vfs);
+  monster_talk_.LoadTable(vfs);
   if (tables_tried_) {
     return;
   }
@@ -248,6 +261,7 @@ void PetStage::Stage(ro::vfs::Vfs& vfs, const ro::sim::World& world, GamePieces&
                      ro::ui::PetHatchWindowState& hatch, ro::ui::PetHatchWindowView& hatch_view) {
   LoadTables(vfs);
   items_ = pieces.wardrobe.has_value() ? &pieces.wardrobe->catalog().items : nullptr;
+  monster_talk_.SeeCatalog(pieces.wardrobe.has_value() ? &pieces.wardrobe->catalog() : nullptr);
   mail_writing_ = pieces.mail.writing();
   trading_ = pieces.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
   if (pieces.wardrobe.has_value() && !sprite_.has_value()) {

@@ -76,12 +76,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // de lui-même, une minute plus tard.
     const std::uint32_t entries_before = world_.map_entries();
     const std::optional<ro::net::NpcFarewell> farewell = ro::net::NpcFarewellDue(world_);
-    // LE COUP DU MAÎTRE SE JUGE AUSSI SUR L'ÉTAT D'AVANT : voir `PetStage::NoteBeforeWorld`.
-    const auto owner_rests = [&] {
-      return PlayerRestsAt(pieces_.wardrobe ? &*pieces_.wardrobe : nullptr, world_, planner_,
-                           now_ms);
+    // UN COUP SE JUGE AUSSI SUR L'ÉTAT D'AVANT : voir `PetStage::NoteBeforeWorld`.
+    const auto rests = [&](const ro::sim::Actor& actor) {
+      return ActorRestsAt(pieces_.wardrobe ? &*pieces_.wardrobe : nullptr, world_, planner_, actor,
+                          now_ms);
     };
-    pieces_.pet.NoteBeforeWorld(received, world_, owner_rests, now_ms);
+    pieces_.pet.NoteBeforeWorld(received, world_, rests, now_ms);
     // 🔴 EN SALON, LA PAROLE REVIENT AU SALON, et le monde ne l'écrit pas : le
     // serveur ne nous fait plus entendre la carte.
     ro::net::FrameOutcome outcome = pieces_.chat_rooms.ClaimLine(received, world_, now_ms);
