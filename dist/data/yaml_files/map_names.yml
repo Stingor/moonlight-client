@@ -1,0 +1,5162 @@
+# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
+# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
+# This file can be distributed, used and modified freely
+# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
+#
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le nom lisible des cartes, et leur bandeau d'arrivée
+#
+#  La liste des cartes est celle de db/map_index.yml du serveur Moonlight et
+#  de ses imports. Les noms et les bandeaux viennent de SystemEN\mapInfo.lub
+#  de l'installation, traduction ROenglishRE (mention ci-dessus) ; une carte
+#  que cette table ne nomme pas prend le `Name` du serveur.
+#
+#  Fichier produit par scripts/yaml_tables/map_names.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/map_names.py --serveur <dépôt moonlight> \
+#          --client <dossier client> --sortie dist/data/yaml_files/map_names.yml
+#
+#  maps : carte (son nom au serveur, sans extension) ->
+#    name       : le nom montré au joueur ;
+#    announced  : vrai quand le jeu montre le bandeau à l'arrivée ;
+#    subtitle, title : les deux lignes du bandeau ;
+#    background : son image de fond, sans dossier ni extension.
+#  Un champ absent est vide (announced : faux). Une carte absente n'a pas de nom.
+#
+#  Lu par moonclient (ro/vfs/map_display_names.h). Absent, les cartes se
+#  montrent par leur nom de fichier.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+maps:
+  06guild_01:
+    name: Guild Arena
+  06guild_02:
+    name: Guild Arena
+  06guild_03:
+    name: Guild Arena
+  06guild_04:
+    name: Guild Arena
+  06guild_05:
+    name: Guild Arena
+  06guild_06:
+    name: Guild Arena
+  06guild_07:
+    name: Guild Arena
+  06guild_08:
+    name: Guild Arena
+  06guild_r:
+    name: Guild Arena Waiting Room
+  1@20cn1:
+    name: Canyon Exploration
+    announced: true
+    title: Canyon Exploration
+    background: noname_s2
+  1@20cn2:
+    name: Canyon Exploration
+    announced: true
+    title: Canyon Exploration
+    background: noname_s2
+  1@4cdn:
+    name: Cave of the Last Ordeal Vision
+    announced: true
+    title: Cave of the Last Ordeal Vision
+    background: field2_s2
+  1@4drk:
+    name: Dragon's Trail
+    announced: true
+    title: Dragon's Trail
+    background: field2_s2
+  1@4igd:
+    name: The Battlefield of Justice
+    announced: true
+    title: The Battlefield of Justice
+    background: field2_s2
+  1@4inq:
+    name: Monastery Basement
+    announced: true
+    title: Monastery Basement
+    background: field2_s2
+  1@4mag:
+    name: Magic Fountain
+    announced: true
+    title: Magic Fountain
+    background: field2_s2
+  1@4mst:
+    name: Euperos Central VT
+    announced: true
+    title: Euperos Central VT
+    background: field2_s2
+  1@4sac:
+    name: Shadow Mension
+    announced: true
+    title: Shadow Mension
+    background: field2_s2
+  1@4tro:
+    name: Kvashir's Ship
+    announced: true
+    title: Kvashir's Ship
+    background: field2_s2
+  1@4win:
+    name: Luluca Deep Forest
+    announced: true
+    title: Luluca Deep Forest
+    background: field2_s2
+  1@adv:
+    name: High Priest Villa
+    announced: true
+    title: High Priest Villa
+    background: noname_s2
+  1@advs:
+    name: Deception Villa
+    announced: true
+    title: Deception Villa
+    background: noname_s2
+  1@air1:
+    name: Airship
+    title: Airship
+    background: dungeon_s2
+  1@air2:
+    name: Airship
+    title: Airship
+    background: dungeon_s2
+  1@ba_go:
+    name: Garden of Time - Hall of Life
+    announced: true
+    subtitle: Garden of Time
+    title: Hall of Life
+    background: dungeon
+  1@bamn:
+    name: Twilight Garden
+    title: Twilight Garden
+    background: dungeon_s2
+  1@bamq:
+    name: Unfair Dock
+    title: Unfair Dock
+    background: dungeon_s2
+  1@begi:
+    name: Poring Village
+    title: Poring Village
+    background: dungeon_s2
+  1@cash:
+    name: Octopus Cave
+    title: Octopus Cave
+    background: dungeon_s2
+  1@cata:
+    name: Catacombs
+    title: Catacombs
+    background: dungeon_s2
+  1@ch1a:
+    name: Ominous Dark Whisper
+    announced: true
+    subtitle: Second World
+    title: Ominous Dark Whisper
+    background: dungeon
+  1@ch1b:
+    name: Recreated Dark Whisper
+    announced: true
+    subtitle: Second World
+    title: Recreated Dark Whisper
+    background: dungeon
+  1@ch_t:
+    name: Constellation Tower
+    announced: true
+    title: Constellation Tower
+    background: noname_s2
+  1@ch_u:
+    name: Sunken Tower
+    announced: true
+    subtitle: Old Endless Tower Erosion
+    title: Sunken Tower
+    background: noname
+  1@cor:
+    name: Cor Memorial
+    title: Cor
+    background: dungeon_s2
+  1@crd:
+    name: Volcano Island Corodo
+    title: Volcano Island Corodo
+    background: dungeon_s2
+  1@def01:
+    name: Wave Dungeon - Forest
+    subtitle: Wave Dungeon
+    title: Forest
+    background: dungeon
+  1@def02:
+    name: Wave Dungeon - Sky
+    subtitle: Wave Dungeon
+    title: Sky
+    background: dungeon
+  1@def03:
+    name: Wave Dungeon - Lava
+    subtitle: Wave Dungeon
+    title: Lava
+    background: dungeon
+  1@dime:
+    name: Beyond the Dimension Wall
+    announced: true
+    title: Beyond the Dimension Wall
+    background: dungeon_s2
+  1@drdo:
+    name: Legend of Dorado
+    title: Legend of Dorado
+    background: dungeon_s2
+  1@dth1:
+    name: Bios Island
+    title: Bios Island
+    background: field_s2
+  1@dth2:
+    name: Bios Island
+    title: Bios Island
+    background: dungeon_s2
+  1@dth3:
+    name: Bios Island
+    title: Bios Island
+    background: dungeon_s2
+  1@ecl:
+    name: Eclage Interior
+  1@eom:
+    name: Shrine of Demon God
+    title: Shrine of Demon God
+    background: dungeon_s2
+  1@ep21a:
+    name: Secret Altar
+    announced: true
+    title: Secret Altar
+    background: noname_s2
+  1@ep21b:
+    name: Snake's Resting Place
+    announced: true
+    title: Snake's Resting Place
+    background: dungeon_s2
+  1@ep21c:
+    name: Snake's Resting Place
+    announced: true
+    title: Snake's Resting Place
+    background: dungeon_s2
+  1@exds:
+    name: Foot of Mt. Mumyeong
+    announced: true
+    title: Foot of Mt. Mumyeong
+    background: field2_s2
+  1@exhn:
+    name: Novice's Memory
+    announced: true
+    title: Novice's Memory
+    background: field2_s2
+  1@exnw:
+    name: Clana Nemieri
+    announced: true
+    title: Clana Nemieri
+    background: field2_s2
+  1@exse:
+    name: Galactic Celestial Branch
+    announced: true
+    title: Galactic Celestial Branch
+    background: field2_s2
+  1@exsh:
+    name: Deep Forest
+    announced: true
+    title: Deep Forest
+    background: field2_s2
+  1@exsr:
+    name: Inner World
+    announced: true
+    title: Inner World
+    background: field2_s2
+  1@f_lake:
+    name: Garden of Time - Lake of Fire
+    announced: true
+    subtitle: Garden of Time
+    title: Lake of Fire
+    background: dungeon
+  1@face:
+    name: Faceworm's Nest
+    title: Faceworm's Nest
+    background: dungeon_s2
+  1@ffp:
+    name: Remnant Hideout
+    title: Remnant Hideout
+    background: dungeon_s2
+  1@ge_sn:
+    name: Geffen Night Arena
+    announced: true
+    title: Geffen Night Arena
+    background: dungeon_s2
+  1@ge_st:
+    name: Geffen Magic Tournament
+    title: Geffen Magic Tournament
+    background: dungeon_s2
+  1@gef:
+    name: Geffen Magic Tournament
+    title: Geffen Magic Tournament
+    background: dungeon_s2
+  1@gef_in:
+    name: Geffen Magic Tournament
+  1@ghg:
+    name: Orthos Aqua
+    subtitle: Floating Garden
+    title: Orthos Aqua
+    background: dungeon
+  1@gl_he:
+    name: Contaminated Dimension
+    subtitle: Glastheim
+    title: Contaminated Dimension
+    background: dungeon
+  1@gl_he2:
+    name: Event Mode Incomplete Dimensions
+    subtitle: Event Mode
+    title: Incomplete Dimensions
+    background: dungeon
+  1@gl_k:
+    name: Old Glastheim Chivalry F1
+    subtitle: Old Glastheim
+    title: Chivalry F1
+    background: dungeon
+  1@gl_k2:
+    name: Old Glastheim Chivalry F1
+    subtitle: Old Glastheim
+    title: Chivalry F1
+    background: dungeon
+  1@gl_kh:
+    name: Old Glastheim Chivalry F2
+    subtitle: Old Glastheim
+    title: Chivalry F1
+    background: dungeon
+  1@gl_prq:
+    name: The Fall of Glastheim
+    title: The Fall of Glastheim
+    background: dungeon_s2
+  1@glast:
+    name: Past Glastheim
+    title: Past Glastheim
+    background: dungeon_s2
+  1@gol1:
+    name: Biological Experiment Center
+    subtitle: Expedition
+    title: Biological Experiment Center
+    background: dungeon
+  1@gol2:
+    name: Body Storage
+    subtitle: Expedition
+    title: Body Storage
+    background: dungeon
+  1@halo:
+    name: Halloween Festival
+    title: Halloween Festival
+    background: noname_s2
+  1@herbs:
+    name: Hidden Flower Garden
+    title: Hidden Flower Garden
+    background: dungeon_s2
+  1@infi:
+    name: Infinite Space
+    title: Infinite Space
+    background: dungeon_s2
+  1@iwp:
+    name: Frozen Scale Hill
+    announced: true
+    title: Frozen Scale Hill
+    background: field2_s2
+  1@jorchs:
+    name: Confused Snake's Nest
+    announced: true
+    title: Confused Snake's Nest
+    background: noname_s2
+  1@jorlab:
+    name: Bagot Lab
+    announced: true
+    title: Bagot Lab
+    background: noname_s2
+  1@jtb:
+    name: Dream and Shadow
+    title: Dream and Shadow
+    background: dungeon_s2
+  1@lab:
+    name: Central Laboratory
+    title: Central Laboratory
+    background: dungeon_s2
+  1@lhz:
+    name: Wolfchev's Lab
+    title: Wolfchev's Lab
+    background: dungeon_s2
+  1@lost:
+    name: Farm of Forgotten Time
+    subtitle: Lost Valley
+    title: Farm of Forgotten Time
+    background: dungeon
+  1@ma_b:
+    name: Bakonawa Hideout
+    title: Bakonawa Hideout
+    background: dungeon_s2
+  1@ma_c:
+    name: Buwaya Cave
+    title: Buwaya Cave
+    background: dungeon_s2
+  1@ma_h:
+    name: Bangungot Hospital F2
+    title: Bangungot Hospital F2
+    background: dungeon_s2
+  1@mcd:
+    name: Charleston Factory
+    title: Charleston Factory
+    background: dungeon_s2
+  1@md_gef:
+    name: Friday Memorial
+    title: Friday Memorial
+    background: dungeon
+  1@md_pay:
+    name: Weekend Memorial
+    title: Weekend Memorial
+    background: dungeon_s2
+  1@mdtem:
+    name: Shrine of the Serene Order
+    announced: true
+    title: Shrine of the Serene Order
+    background: dungeon_s2
+  1@mir:
+    name: Ritual Room
+    title: Ritual Room
+    background: noname_s2
+  1@mist:
+    name: The Hazy Maze Forest
+    title: The Hazy Maze Forest
+    background: dungeon_s2
+  1@mjo1:
+    name: Mjolnir Mountains - Airplane Crash Site
+    announced: true
+    subtitle: Mjolnir Mountains
+    title: Airplane Crash Site
+    background: field_s2
+  1@mjo2:
+    name: Mjolnir Mountains - Forgotten Cavity
+    announced: true
+    subtitle: Mjolnir Mountains
+    title: Forgotten Cavity
+    background: dungeon
+  1@nyd:
+    name: Nidhoggr's Nest
+    title: Nidhoggr's Nest
+    background: dungeon_s2
+  1@nyr:
+    name: Sanctuary Sesrumnir Garden
+    announced: true
+    title: Sanctuary Sesrumnir Garden
+    background: noname_s2
+  1@orcs:
+    name: Orc Underground Cave
+    title: Orc Underground Cave
+    background: dungeon_s2
+  1@os_a:
+    name: Occupied Battle
+    title: Occupied Battle
+    background: dungeon_s2
+  1@os_b:
+    name: Sealed OS
+    title: Sealed OS
+    background: dungeon_s2
+  1@oz:
+    name: Oz's Labyrinth
+    announced: true
+    title: Oz's Labyrinth
+    background: dungeon_s2
+  1@pop1:
+    name: Pope's Office
+    subtitle: Half Moon in the Daylight
+    title: Pope's Office
+    background: dungeon
+  1@pop2:
+    name: Way Back Home
+    subtitle: Half Moon in the Daylight
+    title: Way Back Home
+    background: dungeon
+  1@pop3:
+    name: Sky Garden
+    subtitle: Half Moon in the Daylight
+    title: Sky Garden
+    background: dungeon
+  1@pump:
+    name: Culvert
+    title: Culvert
+    background: dungeon_s2
+  1@rev:
+    name: Morse Cave
+    title: Morse Cave
+    background: dungeon_s2
+  1@rgsr:
+    name: Regenschirm
+    subtitle: Corporate Research Institute
+    title: Regenschirm
+    background: dungeon
+  1@sara:
+    name: Sara's Memory
+    title: Sara's Memory
+    background: dungeon_s2
+  1@slug:
+    name: Sticky Sea
+    announced: true
+    title: Sticky Sea
+    background: noname_s2
+  1@slw:
+    name: Werner Research Institute
+    subtitle: Werner Research Institute
+    title: Central Room
+    background: dungeon
+  1@soul:
+    name: Soul Passage
+  1@spa:
+    name: Ghost Palace
+    title: Ghost Palace
+    background: dungeon_s2
+  1@spa2:
+    name: Tomb of Regret
+    announced: true
+    title: Tomb of Regret
+    background: dungeon_s2
+  1@sthb:
+    name: Air Fortress - Inside
+    title: Air Fortress - Inside
+    background: dungeon_s2
+  1@sthc:
+    name: Air Fortress - Secret Chamber
+    title: Air Fortress - Secret Chamber
+    background: dungeon_s2
+  1@sthd:
+    name: Air Fortress - Top Floor
+    title: Air Fortress - Top Floor
+    background: dungeon_s2
+  1@swat:
+    name: Heart Hunter Military Base
+    title: Heart Hunter Military Base
+    background: dungeon_s2
+  1@tcamp:
+    name: Thor Volcano Military Base
+    announced: true
+    title: Thor Volcano Military Base
+    background: noname_s2
+  1@thts:
+    name: Thanatos Tower
+    subtitle: Thanatos Memory
+    title: Thanatos Tower
+    background: dungeon
+  1@tnm1:
+    name: Demon's Tower - Upper floor
+    title: Demon's Tower - Upper floor
+    background: dungeon_s2
+  1@tnm2:
+    name: Demon's Tower - Top floor
+    title: Demon's Tower - Top floor
+    background: dungeon_s2
+  1@tnm3:
+    name: Morroc Castle - Basement
+    title: Morroc Castle - Basement
+    background: dungeon_s2
+  1@tower:
+    name: Endless Tower
+    title: Endless Tower
+    background: dungeon_s2
+  1@tre:
+    name: Suspicious Shipwreck
+    title: Suspicious Shipwreck
+    background: dungeon_s2
+  1@twas:
+    name: Separated Sanctuary
+    announced: true
+    title: Separated Sanctuary
+    background: noname_s2
+  1@twbs:
+    name: Separated Sanctuary
+    announced: true
+    title: Separated Sanctuary
+    background: noname_s2
+  1@twbs2:
+    name: Separate Sanctuary
+    announced: true
+    title: Separate Sanctuary
+    background: noname_s2
+  1@twig:
+    name: Twig's Nest
+    announced: true
+    title: Twig's Nest
+    background: noname_s2
+  1@twsd:
+    name: Drift Ice Zone
+    announced: true
+    title: Drift Ice Zone
+    background: noname_s2
+  1@uns:
+    name: The Last room
+    title: The Last room
+    background: dungeon_s2
+  1@vrac1:
+    name: Fantasy Series - Academy 1st Floor
+    announced: true
+    subtitle: Fantasy Series
+    title: Critura Academy 1st Floor
+    background: village
+  1@vrac2:
+    name: Fantasy Series - Academy 2nd Floor
+    announced: true
+    subtitle: Fantasy Series
+    title: Critura Academy 2nd Floor
+    background: village
+  1@vrcas:
+    name: Fantasy Series-Lilium Palace
+    announced: true
+    subtitle: Fantasy Series-001
+    title: Lilium Palace
+    background: village
+  1@vrclo:
+    name: Fantasy Series - Mirror Monastery
+    announced: true
+    subtitle: Fantasy Series-005
+    title: Mirror Monastery
+    background: noname
+  1@vrev:
+    name: Fantasy Series-Amicitia's Secret Lab
+    announced: true
+    subtitle: Fantasy Series-003
+    title: Amicitia's Secret Lab
+    background: dungeon
+  1@vrgen:
+    name: Fantasy Series-Genetic Labs
+    announced: true
+    subtitle: Fantasy Series-004
+    title: Genetic Labs
+    background: noname
+  1@vrhha:
+    name: Fantasy Series - Heart Hunter Training Center
+    announced: true
+    subtitle: Fantasy Series-008
+    title: Heart Hunter Training Center
+    background: noname
+  1@vrpo:
+    name: Fantasy Series - Poring Terra
+    announced: true
+    subtitle: Fantasy Series-007
+    title: Poring Terra
+    background: noname
+  1@vrpop:
+    name: Fantasy Series - Rainbow Road
+    announced: true
+    subtitle: Fantasy Series-012
+    title: Rainbow Road
+    background: field
+  1@vrsn:
+    name: Dr. Eggman's Secret Base
+    announced: true
+    subtitle: Fantasy Series - Sonic
+    title: Dr. Eggman's Secret Base
+    background: noname
+  1@whl:
+    name: Inside Unprocessed Wile (1)
+    announced: true
+    subtitle: Varmundt's Aircraft Collection No.3
+    title: Inside Unprocessed Wile (1)
+    background: noname
+  1@wtgs:
+    name: Unidentified Ghost Ship
+    announced: true
+    title: Unidentified Ghost Ship
+    background: dungeon_s2
+  1@xm_d:
+    name: Horror Toy Factory
+    title: Horror Toy Factory
+    background: dungeon_s2
+  1@xm_d2:
+    name: Horror Toy Factory
+    title: Horror Toy Factory
+    background: dungeon_s2
+  2025arena1:
+    name: Arena Forgotten GlastHeim
+    announced: true
+    subtitle: Arena
+    title: Forgotten GlastHeim
+    background: noname
+  2025arena2:
+    name: Arena NiflHeim, Banquet hall for the dead
+    announced: true
+    subtitle: Arena
+    title: Banquet hall for the dead
+    background: noname
+  2025arena3:
+    name: Arena Nightfall of Brazilis
+    announced: true
+    subtitle: Arena
+    title: Nightfall of Brazilis
+    background: noname
+  2025arena4:
+    name: Arena Sunset of Ayothaya
+    announced: true
+    subtitle: Arena
+    title: Sunset of Ayothaya
+    background: noname
+  2025arena5:
+    name: Arena Somatology Laboratory
+    announced: true
+    subtitle: Arena
+    title: Somatology Laboratory
+    background: noname
+  25ros03_01:
+    name: Arena Nightmare Toy Factory
+    announced: true
+    subtitle: Arena
+    title: Nightmare Toy Factory
+    background: noname
+  2@cata:
+    name: Sealed Shrine
+    title: Sealed Shrine
+    background: dungeon_s2
+  2@ch_t:
+    name: Constellation Tower
+    announced: true
+    title: Constellation Tower
+    background: noname_s2
+  2@exds:
+    name: Foot of Mt. Mumyeong
+    announced: true
+    title: Foot of Mt. Mumyeong
+    background: field2_s2
+  2@gl_k:
+    name: Old Glastheim Chivalry F2
+    subtitle: Old Glastheim
+    title: Chivalry F2
+    background: dungeon
+  2@gl_k2:
+    name: Old Glastheim Chivalry F1
+    subtitle: Old Glastheim
+    title: Chivalry F1
+    background: dungeon
+  2@gl_kh:
+    name: Old Glastheim Chivalry F2
+    subtitle: Old Glastheim
+    title: Chivalry F2
+    background: dungeon
+  2@mdtem:
+    name: Silent Prayer Room
+    announced: true
+    title: Silent Prayer Room
+    background: dungeon_s2
+  2@mir:
+    name: Ritual Room
+    title: Ritual Room
+    background: noname
+  2@nyd:
+    name: Nidhoggr's Nest
+    title: Nidhoggr's Nest
+    background: dungeon_s2
+  2@nyr:
+    name: Sanctuary Sesrumnir Heart Storage
+    announced: true
+    subtitle: Sanctuary Sesrumnir
+    title: Heart Storage
+    background: noname
+  2@orcs:
+    name: Orc Underground Cave
+    title: Orc Underground Cave
+    background: dungeon_s2
+  2@pump:
+    name: Culvert
+    title: Culvert
+    background: dungeon_s2
+  2@thts:
+    name: Angel's Warning
+    subtitle: Thanatos Memory
+    title: Angel's Warning
+    background: dungeon
+  2@tower:
+    name: Endless Tower
+    title: Endless Tower
+    background: dungeon_s2
+  2@vrclo:
+    name: Fantasy Series - All those moments
+    announced: true
+    subtitle: Fantasy Series-005
+    title: All those moments
+    background: noname
+  2@vrpop:
+    name: Fantasy Series - Rainbow Road
+    announced: true
+    subtitle: Fantasy Series-012
+    title: Rainbow Road
+    background: field
+  3@ch_t:
+    name: Constellation Tower
+    announced: true
+    title: Constellation Tower
+    background: noname_s2
+  3@thts:
+    name: Hateful Memories
+    subtitle: Thanatos Memory
+    title: Hateful Memories
+    background: dungeon
+  3@tower:
+    name: Endless Tower
+    title: Endless Tower
+    background: dungeon_s2
+  3@vrpop:
+    name: Fantasy Series - Rainbow Lake
+    announced: true
+    subtitle: Fantasy Series-012
+    title: Rainbow Lake
+    background: field
+  4@thts:
+    name: Memory of Agony
+    subtitle: Thanatos Memory
+    title: Memory of Agony
+    background: dungeon
+  4@tower:
+    name: Endless Tower
+    title: Endless Tower
+    background: dungeon_s2
+  5@thts:
+    name: Memory of Sadness
+    subtitle: Thanatos Memory
+    title: Memory of Sadness
+    background: dungeon
+  5@tower:
+    name: Endless Tower
+    title: Endless Tower
+    background: dungeon_s2
+  6@thts:
+    name: Memory of Despair
+    subtitle: Thanatos Memory
+    title: Memory of Despair
+    background: dungeon
+  6@tower:
+    name: Endless Tower (Unknown Area)
+  7@thts:
+    name: Memories of Anger
+    subtitle: Thanatos Memory
+    title: Memories of Anger
+    background: dungeon
+  8@thts:
+    name: Thanatos Tower
+    subtitle: Thanatos Memory
+    title: Magician Thanatos' Memory
+    background: dungeon
+  abbey01:
+    name: Cursed Abbey Dungeon B1
+    subtitle: Nameless Island
+    title: Cursed Abbey Dungeon B1
+    background: dungeon
+  abbey02:
+    name: Cursed Abbey Dungeon B2
+    subtitle: Nameless Island
+    title: Cursed Abbey Dungeon B2
+    background: dungeon
+  abbey03:
+    name: Cursed Abbey Dungeon B3
+    subtitle: Nameless Island
+    title: Cursed Abbey Dungeon B3
+    background: dungeon
+  abyss_01:
+    name: Abyss Lake Underground Cave 1F
+    subtitle: Abyss Lake
+    title: Underground Cave 1F
+    background: dungeon
+  abyss_02:
+    name: Abyss Lake Underground Cave 2F
+    subtitle: Abyss Lake
+    title: Underground Cave 2F
+    background: dungeon
+  abyss_03:
+    name: Abyss Lake Underground Cave 3F
+    subtitle: Abyss Lake
+    title: Underground Cave 3F
+    background: dungeon
+  abyss_04:
+    name: Abyss Lake Underground Cave 4F
+    subtitle: Abyss Lake
+    title: Underground Cave 4F
+    background: dungeon
+  air_if:
+    name: Inside the Aircraft Ifho
+    announced: true
+    title: Inside the Aircraft Ifho
+    background: noname_s2
+  airplane:
+    name: Airship
+    title: Airship
+    background: noname_s2
+  airplane_01:
+    name: Airship
+    title: Airship
+    background: noname_s2
+  airport:
+    name: Airport
+    title: Airport
+    background: noname_s2
+  alb2trea:
+    name: Alberta Island
+    subtitle: Alberta
+    title: Alberta Island
+    background: field
+  alb_ship:
+    name: Alberta Ship
+  alberta:
+    name: Port City Alberta
+    subtitle: Port City of Rune-Midgarts Kingdom
+    title: Alberta
+    background: village
+  alberta_in:
+    name: Inside Alberta
+  alde_alche:
+    name: Alchemist Realm
+  alde_dun01:
+    name: Clock Tower B1
+    subtitle: Aldebaran
+    title: Clock Tower B1
+    background: dungeon
+  alde_dun02:
+    name: Clock Tower B2
+    subtitle: Aldebaran
+    title: Clock Tower B2
+    background: dungeon
+  alde_dun03:
+    name: Clock Tower B3
+    subtitle: Aldebaran
+    title: Clock Tower B3
+    background: dungeon
+  alde_dun04:
+    name: Clock Tower B4
+    subtitle: Aldebaran
+    title: Clock Tower B4
+    background: dungeon
+  alde_gld:
+    name: Luina, the satellite of Aldebaran
+    subtitle: Satellite of Aldebaran
+    title: Luina
+    background: siege
+  aldeba_in:
+    name: Inside Aldebaran
+  aldebaran:
+    name: Border City Aldebaran
+    subtitle: Border City in the Rune-Midgarts Kingdom
+    title: Aldebaran
+    background: village
+  aldeg_cas01:
+    name: Neuschwanstein Castle
+    subtitle: Luina
+    title: Neuschwanstein Castle
+    background: siege
+  aldeg_cas02:
+    name: Hohenschwangau Castle
+    subtitle: Luina
+    title: Hohenschwangau Castle
+    background: siege
+  aldeg_cas03:
+    name: Nuernberg Castle
+    subtitle: Luina
+    title: Nuernberg Castle
+    background: siege
+  aldeg_cas04:
+    name: Wuerzburg Castle
+    subtitle: Luina
+    title: Wuerzburg Castle
+    background: siege
+  aldeg_cas05:
+    name: Rothenburg Castle
+    subtitle: Luina
+    title: Rothenburg Castle
+    background: siege
+  ama_dun01:
+    name: Tatami Maze
+    title: Tatami Maze
+    background: dungeon_s2
+  ama_dun02:
+    name: Battle Field in the Underground Forest
+    title: Battle Field in the Underground Forest
+    background: dungeon_s2
+  ama_dun03:
+    name: Amatsu Underground Shrine
+    title: Amatsu Underground Shrine
+    background: dungeon_s2
+  ama_fild01:
+    name: Amatsu Field
+    title: Amatsu Field
+    background: field_s2
+  ama_in01:
+    name: Inside Amatsu
+  ama_in02:
+    name: Inside Himezi Castle
+  ama_test:
+    name: Momotaro Experience Place
+    title: Momotaro Experience Place
+    background: noname_s2
+  amatsu:
+    name: Amatsu, the Land of Destiny
+    subtitle: Land of Destiny
+    title: Amatsu
+    background: village
+  amicitia1:
+    name: Abandoned Lab Amicitia
+    announced: true
+    subtitle: Abandoned Lab Amicitia
+    title: 1st Floor - Comprehensive Lab
+    background: dungeon
+  amicitia2:
+    name: Abandoned Lab Amicitia
+    announced: true
+    subtitle: Abandoned Lab Amicitia
+    title: 2nd Floor - Intensive Culture Room
+    background: dungeon
+  ant_d02_i:
+    name: Garden of Awareness
+    announced: true
+    subtitle: Illusion
+    title: Garden of Awareness
+    background: dungeon
+  anthell01:
+    name: Ant Hell Dungeon F1
+    subtitle: Sograt Desert
+    title: Ant Hell Dungeon F1
+    background: dungeon
+  anthell02:
+    name: Ant Hell Dungeon F2
+    subtitle: Sograt Desert
+    title: Ant Hell Dungeon F2
+    background: dungeon
+  arena_room:
+    name: Waiting room
+    title: Waiting room
+    background: noname_s2
+  aru_gld:
+    name: Valfreyja
+    subtitle: Rachel
+    title: Valfreyja
+    background: siege
+  arug_cas01:
+    name: Mardol Castle
+    subtitle: Valfreyja
+    title: Mardol Castle
+    background: siege
+  arug_cas02:
+    name: Cyr Castle
+    subtitle: Valfreyja
+    title: Cyr Castle
+    background: siege
+  arug_cas03:
+    name: Horn Castle
+    subtitle: Valfreyja
+    title: Horn Castle
+    background: siege
+  arug_cas04:
+    name: Gefn Castle
+    subtitle: Valfreyja
+    title: Gefn Castle
+    background: siege
+  arug_cas05:
+    name: Banadis Castle
+    subtitle: Valfreyja
+    title: Banadis Castle
+    background: siege
+  arug_dun01:
+    name: Arunafeltz Guild Dungeon
+    subtitle: Arunafeltz
+    title: Guild Dungeon
+    background: dungeon
+  arug_que01:
+    name: Morestone Prairie
+    title: Morestone Prairie
+    background: noname_s2
+  auction_01:
+    name: Auction Hall
+  auction_02:
+    name: Auction Hall
+  ayo_dun01:
+    name: Ancient Shrine Maze
+    title: Ancient Shrine Maze
+    background: dungeon_s2
+  ayo_dun02:
+    name: Inside Ancient Shrine
+    title: Inside Ancient Shrine
+    background: dungeon_s2
+  ayo_fild01:
+    name: Ayothaya Field
+    title: Ayothaya Field
+    background: field_s2
+  ayo_fild02:
+    name: Ayothaya Field
+    title: Ayothaya Field
+    background: field_s2
+  ayo_in01:
+    name: Inside Ayothaya
+  ayo_in02:
+    name: Inside Ayothaya
+  ayothaya:
+    name: Ayothaya
+    title: Ayothaya
+    background: village_s2
+  ba_2whs01:
+    name: Upper Floor of Tartaros Storage
+    title: Upper Floor of Tartaros Storage
+    background: dungeon_s2
+  ba_2whs02:
+    name: Lower Floor of Tartaros Storage
+    title: Lower Floor of Tartaros Storage
+    background: dungeon_s2
+  ba_bath:
+    name: Large Bath Meditathio
+    title: Large Bath Meditathio
+    background: dungeon_s2
+  ba_chess:
+    name: Chess Garden
+    title: Chess Garden
+    background: dungeon_s2
+  ba_go:
+    name: Water Map (Palmist battlefield)
+    title: Water Map (Palmist battlefield)
+    background: dungeon_s2
+  ba_in01:
+    name: Inside the Varmundt's Mansion
+  ba_lib:
+    name: Library Memory Corridor
+    subtitle: Library
+    title: Memory Corridor
+    background: dungeon
+  ba_lost:
+    name: Lost Farm Valley
+    title: Lost Farm Valley
+    background: dungeon_s2
+  ba_maison:
+    name: Varmundt's Mansion Garden
+    title: Varmundt's Mansion Garden
+    background: noname_s2
+  ba_pw01:
+    name: 1st Power Plant
+    title: 1st Power Plant
+    background: dungeon_s2
+  ba_pw02:
+    name: Sewage Treatment Plant
+    title: Sewage Treatment Plant
+    background: dungeon_s2
+  ba_pw03:
+    name: 2nd Power Plant
+    title: 2nd Power Plant
+    background: dungeon_s2
+  bat_a01:
+    name: Tierra Valley
+    subtitle: Battleground
+    title: Tierra Valley
+    background: noname
+  bat_a02:
+    name: Tierra Valley
+    subtitle: Battleground
+    title: Tierra Valley
+    background: noname
+  bat_b01:
+    name: Flavian
+    subtitle: Battleground
+    title: Flavian
+    background: noname
+  bat_b02:
+    name: Flavian
+    subtitle: Battleground
+    title: Flavian
+    background: noname
+  bat_c01:
+    name: Krieger von Midgard
+    announced: true
+  bat_c02:
+    name: Krieger von Midgard
+    announced: true
+  bat_c03:
+    name: Krieger von Midgard
+    announced: true
+  bat_room:
+    name: Battlegrounds Waiting Room
+    title: Battlegrounds Waiting Room
+    background: noname_s2
+  beach_dun:
+    name: Karu, the West Cave
+    subtitle: Comodo
+    title: Karu, the West Cave
+    background: dungeon
+  beach_dun2:
+    name: Luanda, the North Cave
+    subtitle: Comodo
+    title: Luanda, the North Cave
+    background: dungeon
+  beach_dun3:
+    name: Mao, the East Cave
+    subtitle: Comodo
+    title: Mao, the East Cave
+    background: dungeon
+  bif_fild01:
+    name: Southern Bifrost
+    title: Southern Bifrost
+    background: field_s2
+  bif_fild02:
+    name: Northern Bifrost
+    title: Northern Bifrost
+    background: field_s2
+  bl_death:
+    name: Biosphere Specimen Environment - Death
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Death
+    background: dungeon
+  bl_depth1:
+    name: Biosphere Depth 1st Floor
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Depth 1st Floor
+    background: dungeon
+  bl_depth2:
+    name: Biosphere Depth - Abyss
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Depth - Abyss
+    background: dungeon
+  bl_grass:
+    name: Biosphere Specimen Environment - Grassland
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Grassland
+    background: dungeon
+  bl_ice:
+    name: Biosphere Specimen Environment - Severe Cold
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Severe Cold
+    background: dungeon
+  bl_lava:
+    name: Biosphere Specimen Environment - Flame
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Flame
+    background: dungeon
+  bl_soul:
+    name: Biosphere Specimen Environment - Soul
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Soul
+    background: dungeon
+  bl_temple:
+    name: Biosphere Specimen Environment - Temple
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Temple
+    background: dungeon
+  bl_venom:
+    name: Biosphere Specimen Environment - Venom
+    announced: true
+    subtitle: Varmundt's Biosphere
+    title: Specimen Environment - Venom
+    background: dungeon
+  bossnia_01:
+    name: Bossnia
+    title: Bossnia
+    background: dungeon_s2
+  bossnia_02:
+    name: Bossnia
+    title: Bossnia
+    background: dungeon_s2
+  bossnia_03:
+    name: Bossnia
+    title: Bossnia
+    background: dungeon_s2
+  bossnia_04:
+    name: Bossnia
+    title: Bossnia
+    background: dungeon_s2
+  bra_dun01:
+    name: Beyond the Waterfall
+    subtitle: Brasilis
+    title: Beyond the Waterfall
+    background: dungeon
+  bra_dun02:
+    name: Beyond the Waterfall
+    subtitle: Brasilis
+    title: Beyond the Waterfall
+    background: dungeon
+  bra_fild01:
+    name: Brasilis Field
+    title: Brasilis Field
+    background: field_s2
+  bra_in01:
+    name: Inside Brasilis
+  brasilis:
+    name: Brasilis
+    title: Brasilis
+    background: village_s2
+  c_tower1:
+    name: Clock Tower F1
+    subtitle: Aldebaran
+    title: Clock Tower F1
+    background: dungeon
+  c_tower2:
+    name: Clock Tower F2
+    subtitle: Aldebaran
+    title: Clock Tower F2
+    background: dungeon
+  c_tower2_:
+    name: Twisted Clock Tower F2
+    subtitle: The Twisted Time
+    title: Clock Tower F2
+    background: dungeon
+  c_tower3:
+    name: Clock Tower F3
+    subtitle: Aldebaran
+    title: Clock Tower F3
+    background: dungeon
+  c_tower3_:
+    name: Twisted Clock Tower F3
+    subtitle: The Twisted Time
+    title: Clock Tower F3
+    background: dungeon
+  c_tower4:
+    name: Clock Tower F4
+    subtitle: Aldebaran
+    title: Clock Tower F4
+    background: dungeon
+  cave:
+    name: Cave Village
+    title: Cave Village
+    background: noname_s2
+  ch1_dw:
+    name: Dark Whisper
+    announced: true
+    subtitle: Second World
+    title: Dark Whisper
+    background: noname
+  ch1_gef_in:
+    name: Inside Destroyed Geffen
+    announced: true
+    title: Inside Destroyed Geffen
+    background: village_s2
+  ch1_geffen:
+    name: Destroyed Geffen
+    announced: true
+    subtitle: Second World
+    title: Destroyed Geffen
+    background: village
+  ch1_gfn01:
+    name: Devoured Geffenia - East
+    announced: true
+    subtitle: Second World
+    title: Devoured Geffenia - East
+    background: dungeon
+  ch1_gfn03:
+    name: Devoured Geffenia - West
+    announced: true
+    subtitle: Second World
+    title: Devoured Geffenia - West
+    background: dungeon
+  ch1_que01:
+    name: Destroyed Geffen Basement
+    announced: true
+    title: Destroyed Geffen Basement
+    background: noname_s2
+  ch1_sf01:
+    name: Safe Place
+    announced: true
+    title: Safe Place
+    background: noname_s2
+  ch1_sf02:
+    name: Safe Place
+    announced: true
+    title: Safe Place
+    background: noname_s2
+  ch1_sf03:
+    name: Safe Place
+    announced: true
+    title: Safe Place
+    background: noname_s2
+  ch1_vrgef1:
+    name: Recreated Geffen Interior
+    announced: true
+    title: Recreated Geffen Interior
+    background: noname_s2
+  ch1_vrgef2:
+    name: Recreated Geffen
+    announced: true
+    title: Recreated Geffen
+    background: noname_s2
+  ch1fild1:
+    name: Twisted Dark Land - 1 Erosion
+    announced: true
+    subtitle: Northern Midgard
+    title: Twisted Dark Land - 1 Erosion
+    background: noname
+  ch1zero1:
+    name: Zerocell Sector, Abandoned Research Institute in the Second World - Lux
+    announced: true
+    subtitle: Second World, Abandoned Research Institute
+    title: Zerocell Sector - Lux
+    background: dungeon
+  ch1zero2:
+    name: Zerocell Sector, Abandoned Research Institute in the Second World - Nox
+    announced: true
+    subtitle: Second World, Abandoned Research Institute
+    title: Zerocell Sector - Nox
+    background: dungeon
+  ch1zero3:
+    name: Zerocell Sector, Abandoned Research Institute in the Second World - Vita
+    announced: true
+    subtitle: Second World, Abandoned Research Institute
+    title: Zerocell Sector - Vita
+    background: dungeon
+  ch1zero4:
+    name: Zerocell Sector, Abandoned Research Institute in the Second World - Arc
+    announced: true
+    subtitle: Second World, Abandoned Research Institute
+    title: Zerocell Sector - Arc
+    background: dungeon
+  clock_01:
+    name: Clock Tower Unknown Basement
+    announced: true
+    subtitle: Clock Tower
+    title: Unknown Basement
+    background: dungeon
+  cmd_bhole:
+    name: Unknown Blue Hole
+    announced: true
+    title: Unknown Blue Hole
+    background: dungeon
+  cmd_fild01:
+    name: Papuchicha Forest
+    subtitle: Comodo
+    title: Papuchicha Forest
+    background: field
+  cmd_fild02:
+    name: Kokomo Beach
+    subtitle: Comodo
+    title: Kokomo Beach
+    background: field
+  cmd_fild03:
+    name: Zenhai Marsh
+    subtitle: Comodo
+    title: Zenhai Marsh
+    background: field
+  cmd_fild04:
+    name: Kokomo Beach
+    subtitle: Comodo
+    title: Kokomo Beach
+    background: field
+  cmd_fild05:
+    name: Border of Papuchica Forest
+  cmd_fild06:
+    name: Fortress Saint Darmain (West)
+    title: Fortress Saint Darmain (West)
+    background: field_s2
+  cmd_fild07:
+    name: Beacon Island, Pharos
+    title: Beacon Island, Pharos
+    background: field_s2
+  cmd_fild08:
+    name: Fortress Saint Darmain (East)
+    title: Fortress Saint Darmain (East)
+    background: field_s2
+  cmd_fild09:
+    name: Fortress Saint Darmain (South
+    title: Fortress Saint Darmain (South
+    background: field_s2
+  cmd_in01:
+    name: Inside Comodo
+  cmd_in02:
+    name: Inside Comodo
+  com_d02_i:
+    name: Luanda, the North Cave
+    subtitle: Illusion
+    title: Luanda, the North Cave
+    background: dungeon
+  comodo:
+    name: Comodo, the Beach Town
+    subtitle: Beach Town in the Rune-Midgarts Kingdom
+    title: Comodo
+    background: village
+  conch_in:
+    name: Inside Conch
+    subtitle: Port Town Lasagne
+    title: Inside Conch
+    background: village
+  dali:
+    name: Dimensional Rift
+    title: Dimensional Rift
+    background: noname_s2
+  dali02:
+    name: Dimensional Rift
+    title: Dimensional Rift
+    background: noname_s2
+  dew_dun01:
+    name: Volcanic Island of Krakatoa
+    subtitle: Dewata
+    title: Volcanic Island of Krakatoa
+    background: dungeon
+  dew_dun02:
+    name: Istana Cave
+    subtitle: Dewata
+    title: Istana Cave
+    background: dungeon
+  dew_fild01:
+    name: Dewata Field (Tribal Village)
+    subtitle: Dewata
+    title: Tribal Village
+    background: field
+  dew_in01:
+    name: Inside Dewata
+  dewata:
+    name: Dewata
+    title: Dewata
+    background: village_s2
+  dic_dun01:
+    name: Kamidal Tunnel
+    subtitle: Jotunheim
+    title: Kamidal Tunnel
+    background: dungeon
+  dic_dun02:
+    name: Scaraba Hall
+    subtitle: Kamidal Tunnel
+    title: Scaraba Hall
+    background: dungeon
+  dic_dun03:
+    name: Scaraba Hole - Nightmare Mode
+    subtitle: Kamidal Tunnel
+    title: Scaraba Hole
+    background: dungeon
+  dic_fild01:
+    name: Bottom of Kamidal Mountain
+    subtitle: Jotunheim
+    title: Bottom of Kamidal Mountain
+    background: field
+  dic_fild02:
+    name: Bottom of Kamidal Mountain
+    subtitle: Jotunheim
+    title: Bottom of Kamidal Mountain
+    background: field
+  dic_in01:
+    name: Inside of El Dicastes
+  dicastes01:
+    name: El Dicastes, the Sapha Capital
+    subtitle: Jotunheim Sapha Capital
+    title: El Dicastes
+    background: village
+  dicastes02:
+    name: Broomeveld Forest
+    subtitle: El Dicastes
+    title: Broomeveld Forest
+    background: village
+  e_hugel:
+    name: Invaded Hugel
+    title: Invaded Hugel
+    background: field_s2
+  e_tower:
+    name: Misty Island
+    title: Misty Island
+    background: noname_s2
+  ecl_fild01:
+    name: Blooming Flower Land
+    title: Blooming Flower Land
+    background: field2_s2
+  ecl_hub01:
+    name: Eclage Perimeter
+  ecl_in01:
+    name: Eclage Indoor
+  ecl_in02:
+    name: Eclage Indoor
+  ecl_in03:
+    name: Eclage Indoor
+  ecl_in04:
+    name: Eclage Indoor
+  ecl_tdun01:
+    name: Bifrost Tower 1F
+    title: Bifrost Tower 1F
+    background: dungeon_s2
+  ecl_tdun02:
+    name: Bifrost Tower 2F
+    title: Bifrost Tower 2F
+    background: dungeon_s2
+  ecl_tdun03:
+    name: Bifrost Tower 3F
+    title: Bifrost Tower 3F
+    background: dungeon_s2
+  ecl_tdun04:
+    name: Bifrost Tower 4F
+    title: Bifrost Tower 4F
+    background: dungeon_s2
+  eclage:
+    name: Eclage, the capital of Lapine
+    subtitle: Alfheim - Lapine Capital
+    title: Eclage
+    background: village
+  ein_d02_i:
+    name: Nasarin Empire
+    subtitle: Illusion
+    title: Nasarin Empire
+    background: dungeon
+  ein_dun01:
+    name: Einbroch Mine F1
+    title: Einbroch Mine F1
+    background: dungeon_s2
+  ein_dun02:
+    name: Einbroch Mine F2
+    title: Einbroch Mine F2
+    background: dungeon_s2
+  ein_dun03:
+    name: Einbech Mine 3F
+    title: Einbech Mine 3F
+    background: dungeon_s2
+  ein_fild01:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild02:
+    name: Einbroch Field 2
+  ein_fild03:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild04:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild05:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild06:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild07:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild08:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild09:
+    name: Einbroch Field
+    title: Einbroch Field
+    background: field_s2
+  ein_fild10:
+    name: Einbroch Field 10
+  ein_in01:
+    name: Inside Einbroch
+  einbech:
+    name: Einbech, the Mining Village
+    subtitle: Mining Village in the Schwartzwald Republic
+    title: Einbech
+    background: village
+  einbroch:
+    name: Einbroch, the City of Steel
+    subtitle: City of Steel in the Schwartzwald Republic
+    title: Einbroch
+    background: village
+  evt_bomb:
+    name: Labyrinth Event
+  for_dun01:
+    name: Garden of Time - Forgotten Time Zone 1
+    announced: true
+    subtitle: Garden of Time
+    title: Forgotten Time Zone 1
+    background: dungeon
+  for_dun02:
+    name: Garden of Time - Forgotten Time Zone 2
+    announced: true
+    subtitle: Garden of Time
+    title: Forgotten Time Zone 2
+    background: dungeon
+  force_1-1:
+    name: Time Limit Fight
+  force_1-2:
+    name: Time Limit Fight
+  force_1-3:
+    name: Time Limit Fight
+  force_2-1:
+    name: Time Limit Fight
+  force_2-2:
+    name: Time Limit Fight
+  force_2-3:
+    name: Time Limit Fight
+  force_3-1:
+    name: Time Limit Fight
+  force_3-2:
+    name: Time Limit Fight
+  force_3-3:
+    name: Time Limit Fight
+  force_map1:
+    name: Time Limit Fight
+  force_map2:
+    name: Time Limit Fight
+  force_map3:
+    name: Time Limit Fight
+  g_room1-1:
+    name: Quiz Revolution
+  g_room1-2:
+    name: Quiz Revolution
+  g_room1-3:
+    name: Quiz Revolution
+  g_room2:
+    name: Quiz Revolution
+  gef_d01_i:
+    name: 250 Pages
+    subtitle: Illusion
+    title: 250 Pages
+    background: dungeon
+  gef_dun00:
+    name: Geffen Dungeon B1
+    title: Geffen Dungeon B1
+    background: dungeon_s2
+  gef_dun01:
+    name: Geffen Dungeon B2
+    title: Geffen Dungeon B2
+    background: dungeon_s2
+  gef_dun02:
+    name: Geffen Dungeon B3
+    title: Geffen Dungeon B3
+    background: dungeon_s2
+  gef_dun03:
+    name: Geffenia Dungeon
+    subtitle: Geffen
+    title: Geffenia
+    background: dungeon
+  gef_fild00:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild01:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild02:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild03:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild04:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild05:
+    name: Gypsy Village
+    subtitle: Geffen Field
+    title: Gypsy Village
+    background: field
+  gef_fild06:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild07:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild08:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild09:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild10:
+    name: Orc Village
+    subtitle: Geffen Field
+    title: Orc Village
+    background: field
+  gef_fild11:
+    name: Geffen Field
+    title: Geffen Field
+    background: field_s2
+  gef_fild12:
+    name: Kordt Forest
+  gef_fild13:
+    name: Britoniah
+    subtitle: Geffen Field
+    title: Britoniah
+    background: noname
+  gef_fild14:
+    name: West Orc Village
+  gef_tower:
+    name: Geffen Tower
+    subtitle: Geffen
+    title: Geffen Tower
+    background: village
+  gefenia01:
+    name: Geffenia
+    title: Geffenia
+    background: dungeon_s2
+  gefenia02:
+    name: Geffenia
+    title: Geffenia
+    background: dungeon_s2
+  gefenia03:
+    name: Geffenia
+    title: Geffenia
+    background: dungeon_s2
+  gefenia04:
+    name: Geffenia
+    title: Geffenia
+    background: dungeon_s2
+  geffen:
+    name: Geffen, the Magic City
+    subtitle: Magic City in the Rune-Midgarts Kingdom
+    title: Geffen
+    background: village
+  geffen_in:
+    name: Inside Geffen
+  gefg_cas01:
+    name: Repherion Castle
+    subtitle: Britoniah
+    title: Repherion Castle
+    background: siege
+  gefg_cas02:
+    name: Eeyorbriggar Castle
+    subtitle: Britoniah
+    title: Eeyorbriggar Castle
+    background: siege
+  gefg_cas03:
+    name: Yesnelph Castle
+    subtitle: Britoniah
+    title: Yesnelph Castle
+    background: siege
+  gefg_cas04:
+    name: Bergel Castle
+    subtitle: Britoniah
+    title: Bergel Castle
+    background: siege
+  gefg_cas05:
+    name: Mersetzdeitz Castle
+    subtitle: Britoniah
+    title: Mersetzdeitz Castle
+    background: siege
+  ggpro:
+    name: Admin map
+  gl_cas01:
+    name: Glastheim Castle F1
+    subtitle: Glastheim
+    title: Glastheim Castle F1
+    background: dungeon
+  gl_cas01_:
+    name: Abyss Glastheim Castle F1
+    subtitle: Abyss Glastheim
+    title: Castle F1
+    background: dungeon
+  gl_cas02:
+    name: Glastheim Castle F2
+    subtitle: Glastheim
+    title: Glastheim Castle F2
+    background: dungeon
+  gl_cas02_:
+    name: Glastheim Castle F2
+    subtitle: Glastheim Castle
+    title: Castle F2
+    background: dungeon
+  gl_church:
+    name: Glastheim Monastery
+    subtitle: Glastheim
+    title: Monastery
+    background: dungeon
+  gl_chyard:
+    name: Glastheim Underground Churchyard
+    subtitle: Glastheim
+    title: Underground Churchyard
+    background: dungeon
+  gl_chyard_:
+    name: Monastery Churchyard
+    subtitle: Glastheim
+    title: Monastery Churchyard
+    background: dungeon
+  gl_dun01:
+    name: The Lowest Cave in Glastheim B1
+    subtitle: Glastheim
+    title: The Lowest Cave in Glastheim B1
+    background: dungeon
+  gl_dun02:
+    name: The Lowest Cave in Glastheim B2
+    subtitle: Glastheim
+    title: The Lowest Cave in Glastheim B2
+    background: dungeon
+  gl_in01:
+    name: Inside Glastheim
+    subtitle: Glastheim
+    title: Inside Glastheim
+    background: dungeon
+  gl_knt01:
+    name: Inside Glastheim Chivalry F1
+    subtitle: Glastheim
+    title: Inside Chivalry F1
+    background: dungeon
+  gl_knt02:
+    name: Inside Glastheim Chivalry F2
+    subtitle: Glastheim
+    title: Inside Chivalry F1
+    background: dungeon
+  gl_prison:
+    name: Glastheim Underground Prison B1
+    subtitle: Glastheim
+    title: Underground Prison B1
+    background: dungeon
+  gl_prison1:
+    name: Glastheim Underground Prison B2
+    subtitle: Glastheim
+    title: Underground Prison B2
+    background: dungeon
+  gl_sew01:
+    name: Glastheim Underground Waterway B1
+    subtitle: Glastheim
+    title: Underground Waterway B1
+    background: dungeon
+  gl_sew02:
+    name: Glastheim Underground Waterway B2
+    subtitle: Glastheim
+    title: Underground Waterway B2
+    background: dungeon
+  gl_sew03:
+    name: Glastheim Underground Waterway B3
+    subtitle: Glastheim
+    title: Underground Waterway B3
+    background: dungeon
+  gl_sew04:
+    name: Glastheim Underground Waterway B4
+    subtitle: Glastheim
+    title: Underground Waterway B4
+    background: dungeon
+  gl_step:
+    name: Glastheim Staircase Dungeon
+    subtitle: Glastheim
+    title: Staircase Dungeon
+    background: dungeon
+  glast_01:
+    name: Glastheim
+    title: Glastheim
+    background: field_s2
+  gld2_ald:
+    name: 'Corridor of the Abyss: Tears of Hero'
+    subtitle: Louis Abyss Corridor
+    title: Tears of Hero
+    background: dungeon
+  gld2_gef:
+    name: 'Corridor of the Abyss: Dead Man Hill'
+    subtitle: Brittoria Abyss Corridor
+    title: Dead Man Hill
+    background: dungeon
+  gld2_pay:
+    name: 'Corridor of the Abyss: Ancient Wind'
+    subtitle: Greenwood Lake Abyss Corridor
+    title: Ancient Wind
+    background: dungeon
+  gld2_prt:
+    name: 'Corridor of the Abyss: Warrior''s Way'
+    subtitle: Valkyrie Realm Abyss Corridor
+    title: Warrior's Way
+    background: dungeon
+  gld_dun01:
+    name: Baldur Guild Dungeon
+    subtitle: Baldur
+    title: Guild Dungeon
+    background: dungeon
+  gld_dun01_2:
+    name: Greenwood Lake Dungeon 2F
+    subtitle: Greenwood Lake
+    title: Guild Dungeon Underground F2
+    background: dungeon
+  gld_dun02:
+    name: Luina Guild Dungeon
+    subtitle: Luina
+    title: Guild Dungeon
+    background: dungeon
+  gld_dun02_2:
+    name: Louisa Dungeon 2F
+    subtitle: Louisa
+    title: Guild Dungeon Underground F2
+    background: dungeon
+  gld_dun03:
+    name: Valkyrie Guild Dungeon
+    subtitle: Valkyrie
+    title: Guild Dungeon
+    background: dungeon
+  gld_dun03_2:
+    name: Valkyrie Realm Dungeon 2F
+    subtitle: Valkyrie Realm
+    title: Guild Dungeon Underground F2
+    background: dungeon
+  gld_dun04:
+    name: Britoniah Guild Dungeon
+    subtitle: Britoniah
+    title: Guild Dungeon
+    background: dungeon
+  gld_dun04_2:
+    name: Brittoria Dungeon 2F
+    subtitle: Brittoria
+    title: Guild Dungeon Underground F2
+    background: dungeon
+  gon_dun01:
+    name: Temple of the Western Queen
+    subtitle: Gonryun
+    title: Temple of the Western Queen
+    background: dungeon
+  gon_dun02:
+    name: Hermit's Checkerboard
+    subtitle: Gonryun
+    title: Hermit's Checkerboard
+    background: dungeon
+  gon_dun03:
+    name: The Peach Blossom Land
+    subtitle: Gonryun
+    title: The Peach Blossom Land
+    background: dungeon
+  gon_fild01:
+    name: Gonryun Field
+    title: Gonryun Field
+    background: dungeon_s2
+  gon_in:
+    name: Inside Gonryun
+  gon_test:
+    name: Kunlun Fighting Ground
+    title: Kunlun Fighting Ground
+    background: noname_s2
+  gonryun:
+    name: Gonryun, the Hermit Land (Kunlun)
+    subtitle: Hermit Land
+    title: Gonryun(Kunlun)
+    background: village
+  grademk:
+    name: Grade Enhancer
+    announced: true
+    subtitle: Grade Enhancer
+    background: village_s1
+  guild_room:
+    name: Guild Arena Waiting Room
+    title: Guild Arena Waiting Room
+    background: noname_s2
+  guild_vs1:
+    name: Guild Arena
+    title: Guild Arena
+    background: noname_s2
+  guild_vs1-1:
+    name: Guild Arena
+  guild_vs1-2:
+    name: Guild Arena
+  guild_vs1-3:
+    name: Guild Arena
+  guild_vs1-4:
+    name: Guild Arena
+  guild_vs2:
+    name: Guild Arena
+    title: Guild Arena
+    background: noname_s2
+  guild_vs2-1:
+    name: Guild Arena
+  guild_vs2-2:
+    name: Guild Arena
+  guild_vs3:
+    name: Guild Arena
+    title: Guild Arena
+    background: noname_s2
+  guild_vs4:
+    name: Guild Arena
+    title: Guild Arena
+    background: noname_s2
+  guild_vs5:
+    name: Guild Arena
+    title: Guild Arena
+    background: noname_s2
+  gw_fild01:
+    name: Gray Wolf Forest
+    announced: true
+    title: Gray Wolf Forest
+    background: field_s2
+  gw_fild02:
+    name: Gray Wolf Forest
+    announced: true
+    title: Gray Wolf Forest
+    background: field_s2
+  har_in01:
+    name: Rockridge
+  harboro1:
+    name: Rockridge
+    title: Rockridge
+    background: village_s2
+  harboro2:
+    name: Underground Waterway
+    subtitle: Rockridge
+    title: Underground Waterway
+    background: dungeon
+  hem_dun01:
+    name: Destroyed Verus
+    announced: true
+    subtitle: Second World
+    title: Destroyed Verus
+    background: dungeon
+  hem_dun02:
+    name: Destroyed Valkyrie Realm
+    announced: true
+    subtitle: Second World
+    title: Destroyed Valkyrie Realm
+    background: field2
+  hem_fild:
+    name: Destroyed Geffen Field
+    announced: true
+    subtitle: Second World
+    title: Destroyed Geffen Field
+    background: field2
+  hero_dun1:
+    name: Sanctuary Herosria PvP Dungeon
+    announced: true
+    subtitle: Sanctuary Herosria
+    title: PvP Dungeon
+    background: dungeon
+  hero_ent1:
+    name: Herosria 1st Hero's Gateway
+    announced: true
+    subtitle: Herosria
+    title: 1st Hero's Gateway
+    background: siege
+  hero_ent2:
+    name: Herosria 2nd Hero's Gateway
+    announced: true
+    subtitle: Herosria
+    title: 2nd Hero's Gateway
+    background: siege
+  hero_ent3:
+    name: Herosria 3rd Hero's Gateway
+    announced: true
+    subtitle: Herosria
+    title: 3rd Hero's Gateway
+    background: siege
+  hero_in1:
+    name: Herosria Spring Garden
+    announced: true
+    subtitle: Herosria
+    title: Spring Garden
+    background: siege
+  hero_in2:
+    name: Herosria Summer Garden
+    announced: true
+    subtitle: Herosria
+    title: Summer Garden
+    background: siege
+  hero_in3:
+    name: Herosria Fall Garden
+    announced: true
+    subtitle: Herosria
+    title: Fall Garden
+    background: siege
+  hero_in4:
+    name: Herosria Winter Garden
+    announced: true
+    subtitle: Herosria
+    title: Winter Garden
+    background: siege
+  hero_lb:
+    name: Herosria Garden of Beginnings
+    announced: true
+    subtitle: Herosria
+    title: Garden of Beginnings
+    background: siege
+  hero_out1:
+    name: Herosria Silvarium
+    announced: true
+    subtitle: Herosria
+    title: Silvarium
+    background: siege
+  hero_out2:
+    name: Herosria Lacusarium
+    announced: true
+    subtitle: Herosria
+    title: Lacusarium
+    background: siege
+  hero_out3:
+    name: Herosria Bastitarium
+    announced: true
+    subtitle: Herosria
+    title: Bastitarium
+    background: siege
+  hero_out4:
+    name: Herosria Labinarium
+    announced: true
+    subtitle: Herosria
+    title: Labinarium
+    background: siege
+  hero_tra:
+    name: Sanctuary Herosria Training Grounds
+    announced: true
+    subtitle: Sanctuary Herosria
+    title: Training Grounds
+    background: noname_s2
+  herosria:
+    name: Sanctuary Herosria Jewel Room
+    announced: true
+    subtitle: Sanctuary Herosria
+    title: Jewel Room
+    background: siege
+  himinn:
+    name: Valkyrie Hall (Himinn)
+    title: Valkyrie Hall
+    background: noname_s2
+  httyd_01:
+    name: The Serene Abyss Lake
+    announced: true
+    subtitle: How to Train Your Dragon
+    title: The Serene Abyss Lake
+    background: field_s2
+  httyd_02:
+    name: The Serene Abyss Lake Underground Cave
+    announced: true
+    subtitle: How to Train Your Dragon
+    title: The Serene Abyss Lake Underground Cave
+    background: dungeon
+  hu_fild01:
+    name: In front of Thanatos Tower
+    title: In front of Thanatos Tower
+    background: field_s2
+  hu_fild02:
+    name: Hugel Field
+    title: Hugel Field
+    background: field_s2
+  hu_fild03:
+    name: Royal Hunting Grounds
+    title: Royal Hunting Grounds
+    background: field_s2
+  hu_fild04:
+    name: Hugel Field
+    title: Hugel Field
+    background: field_s2
+  hu_fild05:
+    name: Hugel Abyss Lake
+    title: Hugel Abyss Lake
+    background: field_s2
+  hu_fild06:
+    name: Hugel Field
+    title: Hugel Field
+    background: field_s2
+  hu_fild07:
+    name: Hugel Field 7
+  hu_in01:
+    name: Inside Hugel
+  hugel:
+    name: Hugel, the Quaint Garden Village
+    subtitle: Quaint Garden Village
+    title: Hugel
+    background: village
+  hunter_1-1:
+    name: Hunter Guild
+  hunter_2-1:
+    name: Hunter Guild
+  hunter_3-1:
+    name: Hunter Guild
+  icas_in:
+    name: Inside the Ice Castle
+    announced: true
+    title: Inside the Ice Castle
+    background: village_s2
+  icas_in2:
+    name: Inside the Ice Castle
+    announced: true
+    title: Inside the Ice Castle
+    background: village_s2
+  ice_d03_i:
+    name: Frozen Memory
+    subtitle: Illusion
+    title: Frozen Memory
+    background: dungeon
+  ice_dun01:
+    name: Rachel Ice Cave 1F
+    title: Rachel Ice Cave 1F
+    background: dungeon_s2
+  ice_dun02:
+    name: Rachel Ice Cave 2F
+    title: Rachel Ice Cave 2F
+    background: dungeon_s2
+  ice_dun03:
+    name: Rachel Ice Cave 3F
+    title: Rachel Ice Cave 3F
+    background: dungeon_s2
+  ice_dun04:
+    name: Rachel Ice Cave - Sealed Space
+    title: Rachel Ice Cave - Sealed Space
+    background: noname_s2
+  icecastle:
+    name: Issgard Ice Castle
+    announced: true
+    subtitle: Issgard
+    title: Ice Castle
+    background: village
+  in_hunter:
+    name: Hunter Guild
+    title: Hunter Guild
+    background: noname_s2
+  in_moc_16:
+    name: Assassin Guild
+    subtitle: Assassin Guild
+    title: Sograt Desert
+    background: field
+  in_orcs01:
+    name: Inside Orc Village
+  in_rogue:
+    name: Inside the Rogue Guild
+  in_sphinx1:
+    name: Morroc Sphinx B1
+    subtitle: Sograt Desert
+    title: Morroc Sphinx B1
+    background: dungeon
+  in_sphinx2:
+    name: Morroc Sphinx B2
+    subtitle: Sograt Desert
+    title: Morroc Sphinx B2
+    background: dungeon
+  in_sphinx3:
+    name: Morroc Sphinx B3
+    subtitle: Sograt Desert
+    title: Morroc Sphinx B3
+    background: dungeon
+  in_sphinx4:
+    name: Morroc Sphinx B4
+    subtitle: Sograt Desert
+    title: Morroc Sphinx B4
+    background: dungeon
+  in_sphinx5:
+    name: Morroc Sphinx B5
+    subtitle: Sograt Desert
+    title: Morroc Sphinx B5
+    background: dungeon
+  int_land:
+    name: Remote Island
+    title: Remote Island
+    background: field_s2
+  int_land01:
+    name: Remote Island
+    title: Remote Island
+    background: field_s2
+  int_land02:
+    name: Remote Island
+    title: Remote Island
+    background: field_s2
+  int_land03:
+    name: Remote Island
+    title: Remote Island
+    background: field_s2
+  int_land04:
+    name: Remote Island
+    title: Remote Island
+    background: field_s2
+  itemmall:
+    name: Kafra Shop
+  iz_ac01:
+    name: Criatura Academy F1
+    subtitle: Criatura Academy F1
+    background: noname_s1
+  iz_ac01_a:
+    name: Criatura Academy F1
+    subtitle: Criatura Academy F1
+    background: noname_s1
+  iz_ac01_b:
+    name: Criatura Academy F1
+    subtitle: Criatura Academy F1
+    background: noname_s1
+  iz_ac01_c:
+    name: Criatura Academy F1
+    subtitle: Criatura Academy F1
+    background: noname_s1
+  iz_ac01_d:
+    name: Criatura Academy F1
+    subtitle: Criatura Academy F1
+    background: noname_s1
+  iz_ac02:
+    name: Criatura Academy F2
+    subtitle: Criatura Academy F2
+    background: noname_s1
+  iz_ac02_a:
+    name: Criatura Academy F2
+    subtitle: Criatura Academy F2
+    background: noname_s1
+  iz_ac02_b:
+    name: Criatura Academy F2
+    subtitle: Criatura Academy F2
+    background: noname_s1
+  iz_ac02_c:
+    name: Criatura Academy F2
+    subtitle: Criatura Academy F2
+    background: noname_s1
+  iz_ac02_d:
+    name: Criatura Academy F2
+    subtitle: Criatura Academy F2
+    background: noname_s1
+  iz_d04_i:
+    name: Deep Sea Cave
+    title: Deep Sea Cave
+    background: dungeon
+  iz_d05_i:
+    name: Deep Sea Cave
+    title: Deep Sea Cave
+    background: dungeon
+  iz_dun00:
+    name: Undersea Tunnel B1
+    subtitle: Byalan Island
+    title: Undersea Tunnel B1
+    background: dungeon
+  iz_dun01:
+    name: Undersea Tunnel B2
+    subtitle: Byalan Island
+    title: Undersea Tunnel B2
+    background: dungeon
+  iz_dun02:
+    name: Undersea Tunnel B3
+    subtitle: Byalan Island
+    title: Undersea Tunnel B3
+    background: dungeon
+  iz_dun03:
+    name: Undersea Tunnel B4
+    subtitle: Byalan Island
+    title: Undersea Tunnel B4
+    background: dungeon
+  iz_dun04:
+    name: Undersea Tunnel B5
+    subtitle: Byalan Island
+    title: Undersea Tunnel B5
+    background: dungeon
+  iz_dun05:
+    name: Undersea Tunnel B6
+    subtitle: Izlude
+    title: Undersea Tunnel B6
+    background: dungeon
+  iz_in_a:
+    name: Inside Izlude
+  iz_in_b:
+    name: Inside Izlude
+  iz_in_c:
+    name: Inside Izlude
+  iz_in_d:
+    name: Inside Izlude
+  iz_int:
+    name: Stranded Passenger Ship
+    title: Stranded Passenger Ship
+    background: noname_s2
+  iz_int01:
+    name: Stranded Passenger Ship
+    title: Stranded Passenger Ship
+    background: noname_s2
+  iz_int02:
+    name: Stranded Passenger Ship
+    title: Stranded Passenger Ship
+    background: noname_s2
+  iz_int03:
+    name: Stranded Passenger Ship
+    title: Stranded Passenger Ship
+    background: noname_s2
+  iz_int04:
+    name: Stranded Passenger Ship
+    title: Stranded Passenger Ship
+    background: noname_s2
+  iz_ng01:
+    name: Ninja Tutorial Map
+  izlu2dun:
+    name: Byalan Island
+    subtitle: Izlude
+    title: Byalan Island
+    background: field
+  izlude:
+    name: Izlude, the Satellite City
+    subtitle: Rune-Midgarts Kingdom
+    title: Izlude
+    background: village
+  izlude_a:
+    name: Izlude, the Satellite City
+    subtitle: Rune-Midgarts Kingdom
+    title: Izlude
+    background: village
+  izlude_b:
+    name: Izlude, the Satellite City
+    subtitle: Rune-Midgarts Kingdom
+    title: Izlude
+    background: village
+  izlude_c:
+    name: Izlude, the Satellite City
+    subtitle: Rune-Midgarts Kingdom
+    title: Izlude
+    background: village
+  izlude_d:
+    name: Izlude, the Satellite City
+    subtitle: Rune-Midgarts Kingdom
+    title: Izlude
+    background: village
+  izlude_in:
+    name: Inside Izlude
+  jalbe_in:
+    name: Inside the Fishing Village Alberta
+    announced: true
+    title: Inside the Fishing Village Alberta
+    background: village_s2
+  jawaii:
+    name: Jawaii, the Honeymoon Island
+    subtitle: Honeymoon Island
+    title: Jawaii
+    background: village
+  jawaii_in:
+    name: Inside Jawaii
+  job3_arch01:
+    name: Waiting room for Archbishop Job Change
+  job3_arch02:
+    name: Odin Temple
+  job3_arch03:
+    name: Waiting room for Archbishop Job Change
+  job3_gen01:
+    name: Geneticist Lab
+  job3_guil01:
+    name: Secret Tavern
+  job3_guil02:
+    name: Inside the Old Warehouse
+  job3_guil03:
+    name: Isolated mansion
+  job3_rang01:
+    name: Waiting room for Ranger Job Change
+  job3_rang02:
+    name: Test room for Ranger Job Change
+  job3_rune01:
+    name: Inside of Rune Knight Templar
+  job3_rune02:
+    name: Test room for Rune Knight Job Change
+  job3_rune03:
+    name: Test room for Rune Knight Job Change
+  job3_war01:
+    name: Test room for Warlock Job Change
+  job3_war02:
+    name: Test room for Warlock Job Change
+  job4_bio:
+    name: Secret Garden
+    announced: true
+    title: Secret Garden
+    background: field2_s2
+  job4_mag:
+    name: Magic Fountain
+    announced: true
+    title: Magic Fountain
+    background: field2_s2
+  job4_tro:
+    name: Empty Kvashir's Ship
+    announced: true
+    title: Empty Kvashir's Ship
+    background: field2_s2
+  job_cru:
+    name: Crusader Realm
+  job_duncer:
+    name: Comodo Theatre
+  job_gun:
+    name: Shelter of Rebellion
+    title: Shelter of Rebellion
+    background: noname_s2
+  job_hunte:
+    name: Hunter Job Change Place
+  job_hunter:
+    name: Hunter Guild
+  job_knight:
+    name: The Chivalry
+  job_knt:
+    name: Knight Realm
+  job_ko:
+    name: Hidden Place
+  job_monk:
+    name: Saint Capitolina Abbey
+  job_priest:
+    name: The Sanctum
+  job_prist:
+    name: Priest Realm
+  job_sage:
+    name: Sage Realm
+  job_soul:
+    name: Your Heart
+  job_star:
+    name: The Sun, the Moon and the Stars
+  job_sword1:
+    name: Swordman Test Hall
+  job_thief1:
+    name: Mushroom Farm
+  job_wiz:
+    name: Wizard Realm
+  job_wizard:
+    name: Wizard Academy
+  jor_ab01:
+    name: Abandoned Pit 1st Floor
+    announced: true
+    title: Abandoned Pit 1st Floor
+    background: dungeon_s2
+  jor_ab02:
+    name: Abandoned Pit 2nd Floor
+    announced: true
+    title: Abandoned Pit 2nd Floor
+    background: dungeon_s2
+  jor_albe:
+    name: Fishing Village Alberta
+    announced: true
+    subtitle: Fishing Village
+    title: Alberta
+    background: village
+  jor_back1:
+    name: Frozen Scale Hill
+    announced: true
+    title: Frozen Scale Hill
+    background: field2_s2
+  jor_back2:
+    name: Frozen Scale Plains
+    announced: true
+    title: Frozen Scale Plains
+    background: field2_s2
+  jor_back3:
+    name: Frozen Scale Glacier
+    announced: true
+    title: Frozen Scale Glacier
+    background: field2_s2
+  jor_back4:
+    name: Frozen Scale Beach
+    announced: true
+    title: Frozen Scale Beach
+    background: field2_s2
+  jor_back5:
+    name: Ancient Ice Canyon East
+    announced: true
+    title: Ancient Ice Canyon East
+    background: field2_s2
+  jor_back6:
+    name: Ancient Ice Canyon West
+    announced: true
+    title: Ancient Ice Canyon West
+    background: field2_s2
+  jor_base:
+    name: Jormgand Cult Village Jornville
+    announced: true
+    subtitle: Jormgand Cult Village
+    title: Jornville
+    background: field
+  jor_crk:
+    name: Scale Island
+    announced: true
+    subtitle: Issgard
+    title: Scale Island
+    background: noname
+  jor_crk_p:
+    name: Scale Island
+    announced: true
+    title: Scale Island
+    background: noname_s2
+  jor_dun01:
+    name: Snake God's Warmth 1st Floor
+    announced: true
+    title: Snake God's Warmth 1st Floor
+    background: dungeon_s2
+  jor_dun02:
+    name: Snake God's Warmth 2nd Floor
+    announced: true
+    title: Snake God's Warmth 2nd Floor
+    background: dungeon_s2
+  jor_dun03:
+    name: Inside the Snake's Nest
+    announced: true
+    title: Inside the Snake's Nest
+    background: noname_s2
+  jor_maze:
+    name: Snake Labyrinth
+    announced: true
+    title: Snake Labyrinth
+    background: dungeon_s2
+  jor_mbase:
+    name: Geoborg Base Lunaforma
+    announced: true
+    subtitle: Geoborg Base
+    title: Lunaforma
+    background: village
+  jor_nest:
+    name: Snake's Nest
+    announced: true
+    subtitle: Rgan Hideout
+    title: Snake's Nest
+    background: noname
+  jor_que:
+    name: Abandoned Snake God's Warmth
+    announced: true
+    title: Abandoned Snake God's Warmth
+    background: noname_s2
+  jor_raise1:
+    name: Northern Rising Land
+    announced: true
+    title: Northern Rising Land
+    background: field2_s2
+  jor_raise2:
+    name: Southern Rising Land
+    announced: true
+    title: Southern Rising Land
+    background: field2_s2
+  jor_root1:
+    name: Snake God's Root 1F
+    announced: true
+    title: Snake God's Root 1F
+    background: dungeon_s2
+  jor_root2:
+    name: Snake God's Root 2F
+    announced: true
+    title: Snake God's Root 2F
+    background: dungeon_s2
+  jor_root3:
+    name: Deep Root Cave
+    announced: true
+    title: Deep Root Cave
+    background: dungeon_s2
+  jor_safty1:
+    name: Safe Place
+    announced: true
+    subtitle: Safe Place
+    background: field2_s1
+  jor_safty2:
+    name: Safe Place
+    announced: true
+    subtitle: Safe Place
+    background: dungeon_s1
+  jor_sanct:
+    name: Sacred Root
+    announced: true
+    subtitle: Rgan Hideout
+    title: Sacred Root
+    background: noname
+  jor_sklf1:
+    name: Jormungand Cult Shrine 1st Floor
+    announced: true
+    subtitle: Annex of the Jormungand Cult Shrine
+    title: Yorscalp 1st Floor
+    background: dungeon
+  jor_sklf2:
+    name: Jormungand Cult Shrine 2nd Floor
+    announced: true
+    subtitle: Annex of the Jormungand Cult Shrine
+    title: Yorscalp 2nd Floor
+    background: dungeon
+  jor_tail:
+    name: Frozen Tail
+    announced: true
+    title: Frozen Tail
+    background: field2_s2
+  jor_tmple1:
+    name: Jormungand Cult Temple Gimleh 1st Floor
+    announced: true
+    subtitle: Jormungand Cult Temple Gimleh
+    title: 1st Floor
+    background: dungeon
+  jor_tmple2:
+    name: Jormungand Cult Temple Gimleh 2nd Floor
+    announced: true
+    subtitle: Jormungand Cult Temple Gimleh
+    title: 2nd Floor
+    background: dungeon
+  jor_twice:
+    name: Drift Ice Zone
+    announced: true
+    title: Drift Ice Zone
+    background: field2_s2
+  jor_twig:
+    name: Issgard Sanctuary Twig's Nest
+    announced: true
+    subtitle: Issgard Sanctuary
+    title: Twig's Nest
+    background: village
+  jupe_area1:
+    name: Juperos, Restricted Zone
+    title: Juperos, Restricted Zone
+    background: noname_s2
+  jupe_area2:
+    name: Juperos, Restricted Zone
+    title: Juperos, Restricted Zone
+    background: noname_s2
+  jupe_cave:
+    name: Juperos Dungeon Entrance
+    title: Juperos Dungeon Entrance
+    background: noname_s2
+  jupe_core:
+    name: Center of Juperos
+    title: Center of Juperos
+    background: dungeon
+  jupe_core2:
+    name: Center of Juperos
+    title: Center of Juperos
+    background: dungeon_s2
+  jupe_ele:
+    name: Juperos Elevator
+    title: Juperos Elevator
+    background: noname_s2
+  jupe_ele_r:
+    name: Juperos Elevator Room
+    title: Juperos Elevator Room
+    background: noname_s2
+  jupe_gate:
+    name: Juperos, Restricted Zone
+    title: Juperos, Restricted Zone
+    background: noname_s2
+  juperos_01:
+    name: Outside of the Juperos Ruins
+    title: Outside of the Juperos Ruins
+    background: dungeon_s2
+  juperos_02:
+    name: Inside the Juperos Ruins
+    title: Inside the Juperos Ruins
+    background: dungeon_s2
+  kh_dun01:
+    name: Robot Factory F1
+    title: Robot Factory F1
+    background: dungeon_s2
+  kh_dun02:
+    name: Robot Factory F2
+    title: Robot Factory F2
+    background: dungeon_s2
+  kh_kiehl01:
+    name: Kiel's Room
+  kh_kiehl02:
+    name: Kiel's Room
+  kh_mansion:
+    name: Kiel Hyre's Mansion
+    title: Kiel Hyre's Mansion
+    background: noname_s2
+  kh_rossi:
+    name: The Rosimier's Mansion
+    title: The Rosimier's Mansion
+    background: noname_s2
+  kh_school:
+    name: Kiel Hyre's Academy
+    title: Kiel Hyre's Academy
+    background: noname_s2
+  kh_vila:
+    name: Kiel Hyre's Cottage
+    title: Kiel Hyre's Cottage
+    background: noname_s2
+  knight_1-1:
+    name: The Chivalry
+  knight_2-1:
+    name: The Chivalry
+  knight_3-1:
+    name: The Chivalry
+  lasa_dun01:
+    name: Dragon Nest
+    title: Dragon Nest F1
+    background: dungeon_s2
+  lasa_dun02:
+    name: Dragon Nest
+    title: Dragon Nest F2
+    background: dungeon_s2
+  lasa_dun03:
+    name: Dragon Nest
+    title: Dragon Nest F3
+    background: dungeon_s2
+  lasa_dun_q:
+    name: Dragon Nest
+    title: Dragon Nest
+    background: dungeon_s2
+  lasa_fild01:
+    name: Ravioli Plain, Border Post
+    subtitle: Lasagna
+    title: Ravioli Plain, Border Post
+    background: field
+  lasa_fild02:
+    name: Ravioli Forest
+    title: Ravioli Forest
+    background: field2_s2
+  lasa_in01:
+    name: Inside Lasagna
+  lasa_sea:
+    name: Lasagna Cave
+    title: Lasagna Cave
+    background: noname_s2
+  lasagna:
+    name: Port Town Lasagna
+    subtitle: Far-Star Continental Port Town
+    title: Lasagna
+    background: village
+  lhz_airport:
+    name: Lighthalzen Airport
+    title: Lighthalzen Airport
+    background: noname_s2
+  lhz_cube:
+    name: Cube Room
+  lhz_d_n2:
+    name: Void of Vicious Mind
+    title: Void of Vicious Mind
+    background: noname_s2
+  lhz_dun01:
+    name: Somatology Laboratory F1
+    title: Somatology Laboratory F1
+    background: dungeon_s2
+  lhz_dun02:
+    name: Somatology Laboratory F2
+    title: Somatology Laboratory F2
+    background: dungeon_s2
+  lhz_dun03:
+    name: Somatology Laboratory F3
+    title: Somatology Laboratory F3
+    background: dungeon_s2
+  lhz_dun04:
+    name: Somatology Laboratory 4th Basement
+    title: Somatology Laboratory 4th Basement
+    background: dungeon_s2
+  lhz_dun_n:
+    name: Tomb of the Fallen
+    title: Tomb of the Fallen
+    background: dungeon_s2
+  lhz_fild01:
+    name: Lighthalzen Field
+    title: Lighthalzen Field
+    background: field_s2
+  lhz_fild02:
+    name: Lighthalzen Field(Grim Reaper's Valley)
+    subtitle: Lighthalzen Field
+    title: Grim Reaper's Valley
+    background: field
+  lhz_fild03:
+    name: Lighthalzen Field
+    title: Lighthalzen Field
+    background: field_s2
+  lhz_in01:
+    name: Rekenber Corporation Headquarters
+    title: Rekenber Corporation Headquarters
+    background: noname_s2
+  lhz_in02:
+    name: Inside Lighthalzen
+  lhz_in03:
+    name: Inside Lighthalzen
+  lhz_que01:
+    name: Inside Lighthalzen
+  lighthalzen:
+    name: Lighthalzen, the City-State of Prosperity
+    subtitle: City-State of Prosperity of the Schwartzwald Republic
+    title: Lighthalzen
+    background: village
+  lou_dun01:
+    name: The Royal Tomb
+    title: The Royal Tomb
+    background: dungeon_s2
+  lou_dun02:
+    name: Inside the Royal Tomb
+    title: Inside the Royal Tomb
+    background: dungeon_s2
+  lou_dun03:
+    name: Suei Long Gon
+    title: Suei Long Gon
+    background: dungeon_s2
+  lou_fild01:
+    name: Louyang Field
+    title: Louyang Field
+    background: field_s2
+  lou_in01:
+    name: Inside Louyang
+  lou_in02:
+    name: Inside Louyang
+  louyang:
+    name: Louyang, the Highland
+    subtitle: Highland
+    title: Louyang
+    background: village
+  luna_sf1:
+    name: Safe Place
+    announced: true
+    title: Safe Place
+    background: noname_s2
+  luna_sf2:
+    name: Safe Place
+    announced: true
+    title: Safe Place
+    background: noname_s2
+  ma_dun01:
+    name: Bangungot Hospital F1
+    title: Bangungot Hospital F1
+    background: dungeon_s2
+  ma_fild01:
+    name: Baryo Mahiwaga
+    subtitle: Port Malaya
+    title: Baryo Mahiwaga
+    background: field
+  ma_fild02:
+    name: Forest
+    subtitle: Port Malaya
+    title: Forest
+    background: field
+  ma_in01:
+    name: Inside of Malaya
+  ma_scene01:
+    name: Bakonawa Lake
+    subtitle: Port Malaya
+    title: Bakonawa Lake
+    background: field
+  ma_zif01:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif02:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif03:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif04:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif05:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif06:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif07:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif08:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  ma_zif09:
+    name: Inside of Jeepney
+    title: Jeepney
+    background: noname_s2
+  mag_dun01:
+    name: Nogg Road Dungeon F1
+    title: Nogg Road Dungeon F1
+    background: dungeon_s2
+  mag_dun02:
+    name: Nogg Road Dungeon F2
+    title: Nogg Road Dungeon F2
+    background: dungeon_s2
+  mag_dun03:
+    name: Nogg Road Dungeon F3
+    title: Nogg Road Dungeon F3
+    background: dungeon_s2
+  mal_dun01:
+    name: Starry Coral Area
+    title: Starry Coral Area
+    background: dungeon_s2
+  mal_in01:
+    name: Inside Malangdo
+  mal_in02:
+    name: Inside the Ship
+    subtitle: Malangdo
+    title: Inside the Ship
+    background: village
+  malangdo:
+    name: Malangdo
+    title: Malangdo
+    background: village_s2
+  malaya:
+    name: Port Malaya
+    title: Port Malaya
+    background: village_s2
+  man_fild01:
+    name: Manuk Field
+    announced: true
+    title: Manuk Field
+    background: field_s2
+  man_fild02:
+    name: Manuk Mining Camp
+    title: Manuk Mining Camp
+    background: field_s2
+  man_fild03:
+    name: Manuk Field
+    title: Manuk Field
+    background: field_s2
+  man_in01:
+    name: Inside Manuk
+  manuk:
+    name: Manuk Mining Camp
+    subtitle: Yotunheim Sapha's Mining Village
+    title: Manuk
+    background: village
+  mbase_in:
+    name: Inside Lunaforma
+    announced: true
+    title: Inside Lunaforma
+    background: village_s2
+  memohall:
+    name: Dimensional Guardian Memorial
+    announced: true
+    title: Dimensional Guardian Memorial
+    background: village_s2
+  mid_camp:
+    name: Midgard Expedition Camp
+    subtitle: Yotunheim
+    title: Midgard Expedition Camp
+    background: village
+  mid_campin:
+    name: Inside Midgard Expedition Camp
+  mjo_dun01:
+    name: Mjolnir Dead Pit F1
+    subtitle: North of Mt. Mjolnir
+    title: Dead Pit F1
+    background: dungeon
+  mjo_dun02:
+    name: Mjolnir Dead Pit F2
+    subtitle: North of Mt. Mjolnir
+    title: Dead Pit F2
+    background: dungeon
+  mjo_dun03:
+    name: Mjolnir Dead Pit F3
+    subtitle: North of Mt. Mjolnir
+    title: Dead Pit F3
+    background: dungeon
+  mjo_wst01:
+    name: Mjolnir Underground Cave
+    announced: true
+    title: Mjolnir Underground Cave
+    background: dungeon_s2
+  mjolnir_01:
+    name: Mt.Mjolnir North Area
+    title: Mt.Mjolnir North Area
+    background: field_s2
+  mjolnir_02:
+    name: Mt.Mjolnir North Area
+    title: Mt.Mjolnir North Area
+    background: field_s2
+  mjolnir_03:
+    name: Mt.Mjolnir North Area
+    title: Mt.Mjolnir North Area
+    background: field_s2
+  mjolnir_04:
+    name: Mt.Mjolnir North Area
+    title: Mt.Mjolnir North Area
+    background: field_s2
+  mjolnir_05:
+    name: Mt.Mjolnir North Area
+    title: Mt.Mjolnir North Area
+    background: field_s2
+  mjolnir_06:
+    name: Mt.Mjolnir South Area
+    title: Mt.Mjolnir South Area
+    background: field_s2
+  mjolnir_07:
+    name: Mt.Mjolnir South Area
+    title: Mt.Mjolnir South Area
+    background: field_s2
+  mjolnir_08:
+    name: Mt.Mjolnir South Area
+    title: Mt.Mjolnir South Area
+    background: field_s2
+  mjolnir_09:
+    name: Mt.Mjolnir South Foothills
+    title: Mt.Mjolnir South Foothills
+    background: field_s2
+  mjolnir_10:
+    name: Mt.Mjolnir South Area
+    title: Mt.Mjolnir South Area
+    background: field_s2
+  mjolnir_11:
+    name: Mt.Mjolnir South Area
+    title: Mt.Mjolnir South Area
+    background: field_s2
+  mjolnir_12:
+    name: Mt.Mjolnir North Foothills
+    title: Mt.Mjolnir North Foothills
+    background: field_s2
+  moc_akhet:
+    name: Ancient Temple Akhet
+    announced: true
+    subtitle: Ancient Temple
+    title: Akhet
+    background: dungeon
+  moc_castle:
+    name: Morroc Castle
+  moc_fild01:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild02:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild03:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild04:
+    name: Sograt Desert F4
+  moc_fild05:
+    name: Sograt Desert F5
+  moc_fild06:
+    name: Sograt Desert F6
+  moc_fild07:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild08:
+    name: Sograt Desert F8
+  moc_fild09:
+    name: Sograt Desert F9
+  moc_fild10:
+    name: Sograt Desert F10
+  moc_fild11:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild12:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild13:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild14:
+    name: Sograt Desert F14
+  moc_fild15:
+    name: Sograt Desert F15
+  moc_fild16:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild17:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild18:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild19:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  moc_fild20:
+    name: Sograt Desert - Dimensional Rift
+    subtitle: Sograt Desert
+    title: Dimensional Rift
+    background: field
+  moc_fild21:
+    name: Sograt Desert - Dimensional Rift
+    subtitle: Sograt Desert
+    title: Dimensional Rift
+    background: field
+  moc_fild22:
+    name: Sograt Desert - Dimensional Rift
+    subtitle: Sograt Desert
+    title: Dimensional Rift
+    background: field
+  moc_fild22b:
+    name: Dimension Crack in Sograt Desert
+    subtitle: Sograt Desert
+    title: Dimension Crack
+    background: field2
+  moc_para01:
+    name: Inside of Morroc Eden Group
+    title: Paradise
+    background: village_s2
+  moc_pryd01:
+    name: Inside Pyramid F1
+    subtitle: Morroc
+    title: Inside Pyramid F1
+    background: dungeon
+  moc_pryd02:
+    name: Inside Pyramid F2
+    subtitle: Morroc
+    title: Inside Pyramid F2
+    background: dungeon
+  moc_pryd03:
+    name: Inside Pyramid F3
+    subtitle: Morroc
+    title: Inside Pyramid F3
+    background: dungeon
+  moc_pryd04:
+    name: Inside Pyramid F4
+    subtitle: Morroc
+    title: Inside Pyramid F4
+    background: dungeon
+  moc_pryd05:
+    name: Inside Pyramid B1
+    subtitle: Morroc
+    title: Inside Pyramid B1
+    background: dungeon
+  moc_pryd06:
+    name: Inside Pyramid B2
+    subtitle: Morroc
+    title: Inside Pyramid B2
+    background: dungeon
+  moc_prydb1:
+    name: Thief Guild
+    subtitle: Morroc
+    title: Thief Guild
+    background: noname
+  moc_prydn1:
+    name: Morroc Pyramid B1 - Nightmare
+    title: Pyramid B1
+    background: dungeon_s2
+  moc_prydn2:
+    name: Morroc Pyramid B2 - Nightmare
+    title: Pyramid B2
+    background: dungeon_s2
+  moc_ruins:
+    name: Morroc Ruins
+    title: Morroc Ruins
+    background: village_s2
+  monk_in:
+    name: Inside St. Abbey
+    title: Inside St. Abbey
+    background: noname_s2
+  monk_test:
+    name: Saint Capitolina Abbey
+  mora:
+    name: Raffle Village Mora
+    subtitle: Bifrost Raffle Village
+    title: Mora
+    background: village
+  moro_cav:
+    name: Flame Cave
+    title: Flame Cave
+    background: noname_s2
+  moro_vol:
+    name: Flame Basin
+    title: Flame Basin
+    background: field_s2
+  morocc:
+    name: Morroc Town
+    subtitle: Desert City in the Rune-Midgarts Kingdom
+    title: Morroc
+    background: village
+  morocc_in:
+    name: Inside Morroc
+  moscovia:
+    name: Moscovia
+    title: Moscovia
+    background: village_s2
+  mosk_dun01:
+    name: Les Forest
+    title: Les Forest
+    background: field_s2
+  mosk_dun02:
+    name: Temny Forest
+    subtitle: Moscovia
+    title: Temny Forest
+    background: field
+  mosk_dun03:
+    name: Dremuci Forest
+    subtitle: Moscovia
+    title: Dremuci Forest
+    background: field
+  mosk_fild01:
+    name: Whale Island
+    subtitle: Moscovia
+    title: Whale Island
+    background: field
+  mosk_fild02:
+    name: Moscovia Field
+    title: Moscovia Field
+    background: field_s2
+  mosk_in:
+    name: Inside Moscovia
+  mosk_que:
+    name: Marozka's Cave
+  mosk_ship:
+    name: Charabel
+  mu_fild01:
+    name: Outside the Bolund Valley
+    announced: true
+    subtitle: Muspelheim
+    title: Outside the Bolund Valley
+    background: field2
+  nameless_i:
+    name: Nameless Island Entrance
+    title: Nameless Island Entrance
+    background: field_s2
+  nameless_in:
+    name: Inside Nameless Island
+  nameless_n:
+    name: Nameless Island Entrance
+    title: Nameless Island Entrance
+    background: field_s2
+  new_1-1:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_1-2:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_1-3:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_1-4:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_2-1:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_2-2:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_2-3:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_2-4:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_3-1:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_3-2:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_3-3:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_3-4:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_4-1:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_4-2:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_4-3:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_4-4:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_5-1:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_5-2:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_5-3:
+    name: Training Ground
+    title: Training Ground
+    background: field_s2
+  new_5-4:
+    name: Training Ground
+  new_zone01:
+    name: Training Ground
+  new_zone02:
+    name: Training Ground
+  new_zone03:
+    name: Training Ground
+  new_zone04:
+    name: Training Ground
+  nif_dun01:
+    name: Dead Man's Banquet Hall
+    announced: true
+    subtitle: Niflheim Dungeon - 1st Floor
+    title: Dead Man's Banquet Hall
+    background: dungeon
+  nif_dun02:
+    name: Collapsed Opera House
+    announced: true
+    subtitle: Niflheim Dungeon - 2nd Floor
+    title: Collapsed Opera House
+    background: dungeon
+  nif_fild01:
+    name: Skellington, a Solitary Village in Niflheim
+    subtitle: Niflheim
+    title: Skellington, a Solitary Village
+    background: field
+  nif_fild02:
+    name: Valley of Niflheim
+    subtitle: Niflheim
+    title: Valley
+    background: field
+  nif_fild03:
+    name: Niflheim Pumpkin Farm
+    announced: true
+    title: Niflheim Pumpkin Farm
+    background: field2_s2
+  nif_in:
+    name: Inside Niflheim
+  niflheim:
+    name: Niflheim, Realm of the Dead
+    subtitle: Realm of the Dead
+    title: Niflheim
+    background: village
+  nyd_dun01:
+    name: Yggdrasil Root F1
+    title: Yggdrasil Root F1
+    background: dungeon_s2
+  nyd_dun02:
+    name: Yggdrasil Root F2
+    title: Yggdrasil Root F2
+    background: dungeon_s2
+  odin_past:
+    name: Ancient Odin Temple
+    title: Ancient Odin Temple
+    background: field2_s2
+  odin_tem01:
+    name: Odin's Temple West Area
+    title: Odin's Temple West Area
+    background: field_s2
+  odin_tem02:
+    name: Odin's Temple South Area
+    title: Odin's Temple South Area
+    background: field_s2
+  odin_tem03:
+    name: Odin's Temple North Area
+    title: Odin's Temple North Area
+    background: field_s2
+  orcsdun01:
+    name: Orc Dungeon F1
+    subtitle: Orc Village
+    title: Orc Dungeon F1
+    background: dungeon
+  orcsdun02:
+    name: Orc Dungeon F2
+    subtitle: Orc Village
+    title: Orc Dungeon F2
+    background: dungeon
+  ordeal_1-1:
+    name: Battle Ordeal Mode
+  ordeal_1-2:
+    name: Battle Ordeal Mode
+  ordeal_2-1:
+    name: Battle Ordeal Mode
+  ordeal_2-2:
+    name: Battle Ordeal Mode
+  ordeal_3-1:
+    name: Battle Ordeal Mode
+  ordeal_3-2:
+    name: Battle Ordeal Mode
+  ordeal_a00:
+    name: Battle Ordeal Mode
+  ordeal_a02:
+    name: Battle Ordeal Mode
+  oz_dun01:
+    name: Oz's Labyrinth 1F
+    announced: true
+    title: Oz's Labyrinth 1F
+    background: dungeon_s2
+  oz_dun02:
+    name: Oz's Labyrinth 2F
+    announced: true
+    title: Oz's Labyrinth 2F
+    background: dungeon_s2
+  p_track01:
+    name: Monster Race Arena
+    title: Monster Race Arena
+    background: noname_s2
+  p_track02:
+    name: Monster Race Arena
+    title: Monster Race Arena
+    background: noname_s2
+  paramk:
+    name: Para Market
+  pay_arche:
+    name: Payon Archer Village
+    subtitle: Payon
+    title: Archer Village
+    background: village
+  pay_d03_i:
+    name: Nightmare of Moonlight
+    subtitle: Illusion
+    title: Nightmare of Moonlight
+    background: dungeon
+  pay_dun00:
+    name: Payon Cave F1
+    subtitle: Payon Archer Village
+    title: Payon Cave F1
+    background: dungeon
+  pay_dun01:
+    name: Payon Cave F2
+    subtitle: Payon Archer Village
+    title: Payon Cave F2
+    background: dungeon
+  pay_dun02:
+    name: Payon Cave F3
+    subtitle: Payon Archer Village
+    title: Payon Cave F3
+    background: dungeon
+  pay_dun03:
+    name: Payon Cave F4
+    subtitle: Payon Archer Village
+    title: Payon Cave F4
+    background: dungeon
+  pay_dun04:
+    name: Payon Cave F5
+    subtitle: Payon Archer Village
+    title: Payon Cave F5
+    background: dungeon
+  pay_fild01:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild02:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild03:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild04:
+    name: Sograt Desert
+    title: Sograt Desert
+    background: field_s2
+  pay_fild05:
+    name: Payon Forest F5
+  pay_fild06:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild07:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild08:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild09:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild10:
+    name: Payon Forest
+    title: Payon Forest
+    background: field_s2
+  pay_fild11:
+    name: Payon Forest F11
+  pay_gld:
+    name: Greenwood Lake
+    subtitle: Payon
+    title: Greenwood Lake
+    background: siege
+  payg_cas01:
+    name: Bright Arbor Castle
+    subtitle: Greenwood Lake
+    title: Bright Arbor Castle
+    background: siege
+  payg_cas02:
+    name: Scarlet Palace Castle
+    subtitle: Greenwood Lake
+    title: Scarlet Palace Castle
+    background: siege
+  payg_cas03:
+    name: Holy Shadow Castle
+    subtitle: Greenwood Lake
+    title: Holy Shadow Castle
+    background: siege
+  payg_cas04:
+    name: Sacred Altar Castle
+    subtitle: Greenwood Lake
+    title: Sacred Altar Castle
+    background: siege
+  payg_cas05:
+    name: Bamboo Grove Hill Castle
+    subtitle: Greenwood Lake
+    title: Bamboo Grove Hill
+    background: siege
+  payon:
+    name: Payon Town
+    subtitle: Mountain City in the Rune-Midgarts Kingdom
+    title: Payon
+    background: village
+  payon_in01:
+    name: Inside Payon
+  payon_in02:
+    name: Inside Payon
+  payon_in03:
+    name: Inside Payon
+  poring_c01:
+    name: Poring Waiting Room
+  poring_c02:
+    name: Poring Market
+  poring_w01:
+    name: Poring War Waiting Room
+    title: Poring War Waiting Room
+    background: noname_s2
+  poring_w02:
+    name: Poring War Market
+    title: Poring War Market
+    background: noname_s2
+  priest_1-1:
+    name: The Sanctum
+  priest_2-1:
+    name: The Sanctum
+  priest_3-1:
+    name: The Sanctum
+  prontera:
+    name: Prontera, Capital of Rune Midgard
+    subtitle: Capital of the Rune-Midgarts Kingdom
+    title: Prontera
+    background: village
+  prt_are01:
+    name: Arena
+    title: Arena
+    background: noname_s2
+  prt_are_in:
+    name: Waiting room
+    title: Waiting room
+    background: noname_s2
+  prt_cas:
+    name: Prontera Central Palace
+    subtitle: Prontera Castle
+    title: Central Palace
+    background: village
+  prt_cas_q:
+    name: Prontera Star Palace
+    subtitle: Prontera Castle
+    title: Star Palace
+    background: village
+  prt_castle:
+    name: Prontera Castle
+    title: Prontera Castle
+    background: village_s2
+  prt_church:
+    name: The Sanctuary
+    title: The Sanctuary
+    background: village_s2
+  prt_elib:
+    name: Prontera East Library
+    announced: true
+    subtitle: Prontera East Library
+    background: village_s1
+  prt_evt_in:
+    name: Hunting Lodge
+  prt_fild00:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild01:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild02:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild03:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild04:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild05:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild06:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild07:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild08:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild08a:
+    name: Prontera Field
+    title: South Field of Prontera
+    background: field_s2
+  prt_fild08b:
+    name: Prontera Field
+    title: South Field of Prontera
+    background: field_s2
+  prt_fild08c:
+    name: Prontera Field
+    title: South Field of Prontera
+    background: field_s2
+  prt_fild08d:
+    name: Prontera Field
+    title: South Field of Prontera
+    background: field_s2
+  prt_fild09:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild10:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_fild11:
+    name: Prontera Field
+    title: Prontera Field
+    background: field_s2
+  prt_gld:
+    name: Valkyrie Realm
+    subtitle: Prontera
+    title: Valkyrie Realm
+    background: siege
+  prt_in:
+    name: Inside Prontera
+  prt_lib:
+    name: Memorial of Royal Family
+    subtitle: Prontera Royal Palace
+    title: Memorial of Royal Family
+    background: noname
+  prt_lib_q:
+    name: Memorial of Past Royal Family
+  prt_maze01:
+    name: Labyrinth Forest F1
+    subtitle: Prontera Field
+    title: Labyrinth Forest F1
+    background: dungeon
+  prt_maze02:
+    name: Labyrinth Forest F2
+    subtitle: Prontera Field
+    title: Labyrinth Forest F2
+    background: dungeon
+  prt_maze03:
+    name: Labyrinth Forest F3
+    subtitle: Prontera Field
+    title: Labyrinth Forest F3
+    background: dungeon
+  prt_mk:
+    name: Prontera Market Street
+    announced: true
+    title: Prontera Market Street
+    background: village_s2
+  prt_monk:
+    name: St. Capitolina Abbey
+    title: St. Capitolina Abbey
+    background: noname_s2
+  prt_mz03_i:
+    name: Twisted Labyrinth Forest
+    subtitle: Illusion
+    title: Twisted Labyrinth Forest
+    background: dungeon
+  prt_pri00:
+    name: Prontera Prison
+  prt_prison:
+    name: Prontera Prison Cell
+    subtitle: Prontera Castle
+    title: Dungeon
+    background: dungeon
+  prt_q:
+    name: Invaded Prontera
+    title: Invaded Prontera
+    background: dungeon_s2
+  prt_sewb1:
+    name: Prontera Culvert F1
+    subtitle: Prontera Field
+    title: Culvert F1
+    background: dungeon
+  prt_sewb2:
+    name: Prontera Culvert F2
+    subtitle: Prontera Field
+    title: Culvert F2
+    background: dungeon
+  prt_sewb3:
+    name: Prontera Culvert F3
+    subtitle: Prontera Field
+    title: Culvert F3
+    background: dungeon
+  prt_sewb4:
+    name: Prontera Culvert F4
+    subtitle: Prontera Field
+    title: Culvert F4
+    background: dungeon
+  prtg_cas01:
+    name: Kriemhild Castle
+    subtitle: Valkyrie Realm
+    title: Kriemhild Castle
+    background: siege
+  prtg_cas02:
+    name: Swanhild Castle
+    subtitle: Valkyrie Realm
+    title: Swanhild Castle
+    background: siege
+  prtg_cas03:
+    name: Fadhgridh Castle
+    subtitle: Valkyrie Realm
+    title: Fadhgridh Castle
+    background: siege
+  prtg_cas04:
+    name: Skoegul Castle
+    subtitle: Valkyrie Realm
+    title: Skoegul Castle
+    background: siege
+  prtg_cas05:
+    name: Gondul Castle
+    subtitle: Valkyrie Realm
+    title: Gondul Castle
+    background: siege
+  pub_cat:
+    name: Cat on a Bullet
+    subtitle: Einbroch Rebellion Pub
+    title: Cat on a Bullet
+    background: village
+  pvp_2vs2:
+    name: 'PvP : Event Coliseum'
+    title: PvP Event Coliseum
+    background: noname_s2
+  pvp_c_room:
+    name: 'PvP : Waiting Room'
+    title: PvP Waiting Room
+    background: noname_s2
+  pvp_n_1-1:
+    name: DB Room
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_1-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_1-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_1-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_1-5:
+    name: MVP Room
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_2-1:
+    name: Duel Room
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_2-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_2-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_2-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_2-5:
+    name: 'PvP : Room Copass'
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_3-1:
+    name: BB Room
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_3-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_3-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_3-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_3-5:
+    name: Carnage Room
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_4-1:
+    name: PvP Room
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_4-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_4-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_4-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_4-5:
+    name: 'PvP : Room Copass'
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_5-1:
+    name: 'PvP : Room Sandwich'
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_5-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_5-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_5-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_5-5:
+    name: 'PvP : Room Copass'
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_6-1:
+    name: 'PvP : Room Sandwich'
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_6-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_6-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_6-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_6-5:
+    name: 'PvP : Room Copass'
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_7-1:
+    name: 'PvP : Room Sandwich'
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_7-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_7-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_7-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_7-5:
+    name: 'PvP : Room Copass'
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_8-1:
+    name: 'PvP : Room Sandwich'
+    title: PvP Room Sandwich
+    background: noname_s2
+  pvp_n_8-2:
+    name: 'PvP : Room Rock On'
+    title: PvP Room Rock On
+    background: noname_s2
+  pvp_n_8-3:
+    name: 'PvP : Four Room'
+    title: PvP Four Room
+    background: noname_s2
+  pvp_n_8-4:
+    name: 'PvP : Room Undercross'
+    title: PvP Room Undercross
+    background: noname_s2
+  pvp_n_8-5:
+    name: 'PvP : Room Copass'
+    title: PvP Room Copass
+    background: noname_s2
+  pvp_n_room:
+    name: 'PvP : Waiting Room'
+    title: PvP Waiting Room
+    background: noname_s2
+  pvp_room:
+    name: PvP Waiting Room
+  pvp_y_1-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_1-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_1-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_1-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_1-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_2-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_2-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_2-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_2-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_2-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_3-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_3-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_3-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_3-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_3-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_4-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_4-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_4-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_4-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_4-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_5-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_5-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_5-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_5-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_5-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_6-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_6-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_6-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_6-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_6-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_7-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_7-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_7-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_7-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_7-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_8-1:
+    name: 'PvP : Room Prontera'
+    title: PvP Room Prontera
+    background: noname_s2
+  pvp_y_8-2:
+    name: 'PvP : Room Izlude'
+    title: PvP Room Izlude
+    background: noname_s2
+  pvp_y_8-3:
+    name: 'PvP : Room Payon'
+    title: PvP Room Payon
+    background: noname_s2
+  pvp_y_8-4:
+    name: 'PvP : Room Alberta'
+    title: PvP Room Alberta
+    background: noname_s2
+  pvp_y_8-5:
+    name: 'PvP : Room Morroc'
+    title: PvP Room Morroc
+    background: noname_s2
+  pvp_y_room:
+    name: 'PvP : Waiting Room'
+    title: PvP Waiting Room
+    background: noname_s2
+  que_avan01:
+    name: Avant's Laboratory
+  que_ba:
+    name: Unknown
+  que_bingo:
+    name: Bingo Game Room
+  que_dan01:
+    name: Hugel Field
+  que_dan02:
+    name: Inside of the Abandoned House in Yuno
+  que_god01:
+    name: Quest Map
+  que_god02:
+    name: Quest Map
+  que_house_s:
+    name: Strange House
+  que_hugel:
+    name: Odin Shrine's Underground
+    title: Odin Shrine's Underground
+    background: noname_s2
+  que_job01:
+    name: Private Pub
+    title: Private Pub
+    background: noname_s2
+  que_job02:
+    name: Job Quest 2
+  que_job03:
+    name: Job Quest 3
+  que_lhz:
+    name: Somatology Laboratory 4th Basement
+    title: Somatology Laboratory 4th Basement
+    background: noname_s2
+  que_moc_16:
+    name: Moon Palace, Mob Area
+  que_moon:
+    name: Moon Palace
+  que_ng:
+    name: Unknown Place
+  que_qaru01:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qaru02:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qaru03:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qaru04:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qaru05:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qsch01:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qsch02:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qsch03:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qsch04:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_qsch05:
+    name: Fallacious Okolnir
+    title: Fallacious Okolnir
+    background: dungeon_s2
+  que_rachel:
+    name: Inside Freya's Temple
+  que_san04:
+    name: Inside Freya's Temple
+  que_sign02:
+    name: Valley of Gyoll
+  que_swat:
+    name: Heart Hunter Military Base
+    title: Heart Hunter Military Base
+    background: dungeon_s2
+  que_temsky:
+    name: Pope's Room (Sky Garden
+    subtitle: Pope's Room
+    title: Sky Garden
+    background: noname
+  que_thor:
+    name: Thor Volcano Dungeon
+    title: Thor Volcano Dungeon
+    background: noname_s2
+  que_thr:
+    name: Inside Thor Volcano
+    announced: true
+    title: Inside Thor Volcano
+    background: noname_s2
+  quiz_00:
+    name: Quiz Revolution
+    title: Quiz Revolution
+    background: noname_s2
+  quiz_01:
+    name: Quiz Revolution
+    title: Quiz Revolution
+    background: noname_s2
+  quiz_02:
+    name: Quiz Arena
+  quiz_test:
+    name: Quiz Hall
+  ra_fild01:
+    name: Audumla Grassland
+    title: Audumla Grassland
+    background: field_s2
+  ra_fild02:
+    name: Od Canyon
+    announced: true
+    title: Od Canyon
+    background: field_s2
+  ra_fild03:
+    name: Ida Plains
+    title: Ida Plains
+    background: field_s2
+  ra_fild04:
+    name: Audumla Grassland
+    title: Audumla Grassland
+    background: field_s2
+  ra_fild05:
+    name: Audumla Grassland
+    title: Audumla Grassland
+    background: field_s2
+  ra_fild06:
+    name: Portus Luna
+    title: Portus Luna
+    background: field_s2
+  ra_fild07:
+    name: Od Canyon
+    announced: true
+    title: Od Canyon
+    background: field_s2
+  ra_fild08:
+    name: Ida Plains
+    title: Ida Plains
+    background: field_s2
+  ra_fild09:
+    name: Audumla Grassland
+    announced: true
+    title: Audumla Grassland
+    background: field_s2
+  ra_fild10:
+    name: Od Canyon
+    announced: true
+    title: Od Canyon
+    background: field_s2
+  ra_fild11:
+    name: Ida Plains
+    title: Ida Plains
+    background: field_s2
+  ra_fild12:
+    name: Ida Plains
+    title: Ida Plains
+    background: field_s2
+  ra_fild13:
+    name: Shore of Tears
+    announced: true
+    title: Shore of Tears
+    background: field_s2
+  ra_in01:
+    name: Inside Rachel
+  ra_pol01:
+    name: Power Twisted Plains
+    announced: true
+    title: Power Twisted Plains
+    background: field2_s2
+  ra_san01:
+    name: Rachel Temple Sanctuary North Area 1F
+    subtitle: Rachel Temple
+    title: Sanctuary North Area 1F
+    background: dungeon
+  ra_san02:
+    name: Rachel Temple Sanctuary West Area 1F
+    subtitle: Rachel Temple
+    title: Sanctuary West Area 1F
+    background: dungeon
+  ra_san03:
+    name: Rachel Temple Sanctuary East Area 1F
+    subtitle: Rachel Temple
+    title: Sanctuary East Area 1F
+    background: dungeon
+  ra_san04:
+    name: Rachel Temple Sanctuary South Area 1F
+    subtitle: Rachel Temple
+    title: Sanctuary South Area 1F
+    background: dungeon
+  ra_san05:
+    name: Rachel Temple Sanctuary Central Area 2F
+    subtitle: Rachel Temple
+    title: Sanctuary Central Area 2F
+    background: dungeon
+  ra_temin:
+    name: Inside Rachel Sanctuary
+  ra_temple:
+    name: Freya's Grand Temple (Sesilmir)
+    subtitle: Freya's Grand Temple
+    title: Sesilmir
+    background: village
+  ra_temsky:
+    name: Pope's Room (Sky Garden)
+    subtitle: Pope's Room
+    title: Sky Garden
+    background: noname
+  rachel:
+    name: Rachel, Capital of Arunafelz, the Study Nation
+    subtitle: Capital of Arunafelz, the Study Nation
+    title: Rachel
+    background: village
+  rag_fes:
+    name: RAG-FES Exhibition Hall
+    announced: true
+    subtitle: Ragnarok Festival
+    title: RAG-FES Exhibition Hall
+    background: village
+  rag_fes_a:
+    name: RAG-FES Exhibition Hall
+    announced: true
+    subtitle: Ragnarok Festival
+    title: RAG-FES Exhibition Hall
+    background: village
+  rebel_in:
+    name: Clana Nemieri
+    title: Clana Nemieri
+    background: noname_s2
+  rgsr_in:
+    name: Rekenber Research Institute
+    title: Rekenber Research Institute
+    background: village_s2
+  rockmi1:
+    name: Rockridge Mine
+    title: Rockridge Mine F1
+    background: dungeon
+  rockmi2:
+    name: Rockridge Mine
+    title: Rockridge Mine F2
+    background: dungeon
+  rockrdg1:
+    name: Kiwawa Desert
+    subtitle: Rockridge
+    title: Kiwawa Desert
+    background: field
+  rockrdg2:
+    name: Kiwawa Desert
+    subtitle: Rockridge
+    title: Kiwawa Desert
+    background: field
+  s_atelier:
+    name: Shadow Workshop
+  sch_gld:
+    name: Nidhoggur
+    subtitle: Yuno
+    title: Nidhoggur
+    background: siege
+  schg_cas01:
+    name: Himinn Castle
+    subtitle: Nidhoggur
+    title: Himinn Castle
+    background: siege
+  schg_cas02:
+    name: Andlangr Castle
+    subtitle: 'Nidhoggur '
+    title: Andlangr Castle
+    background: siege
+  schg_cas03:
+    name: Vidblainn Castle
+    subtitle: Nidhoggur
+    title: Vidblainn Castle
+    background: siege
+  schg_cas04:
+    name: Hljod Castle
+    subtitle: Nidhoggur
+    title: Hljod Castle
+    background: siege
+  schg_cas05:
+    name: Skidbladnir Castle
+    subtitle: Nidhoggur
+    title: Skidbladnir Castle
+    background: siege
+  schg_dun01:
+    name: Schwartzwald Guild Dungeon
+    subtitle: Schwartzwald
+    title: Guild Dungeon
+    background: dungeon
+  schg_que01:
+    name: Morestone Prairie
+    title: Morestone Prairie
+    background: noname_s2
+  sec_in01:
+    name: Inside Valhalla
+  sec_in02:
+    name: Inside Valhalla
+  sec_pri:
+    name: Room of Meditation (Valhalla Prison)
+  silk_lair:
+    name: Python's Lair
+    announced: true
+  slabw01:
+    name: Werner Research Institute
+    title: Werner Research Institute
+    background: dungeon_s2
+  sp_cor:
+    name: Special Border Area Cor
+    subtitle: Special Border Area
+    title: Cor
+    background: field
+  sp_os:
+    name: Special Border Area OS
+    subtitle: Special Border Area
+    title: OS
+    background: dungeon
+  sp_rudus:
+    name: Rudus, Experiment Waste Disposal F1
+    subtitle: Experiment Waste Disposal
+    title: Rudus F1
+    background: dungeon
+  sp_rudus2:
+    name: Rudus, Experiment Waste Disposal F2
+    subtitle: Experiment Waste Disposal
+    title: Rudus F2
+    background: dungeon
+  sp_rudus3:
+    name: Rudus, Experiment Waste Disposal F3
+    subtitle: Experiment Waste Disposal
+    title: Rudus F3
+    background: dungeon
+  sp_rudus4:
+    name: Rudus, Experiment Waste Disposal F4
+    announced: true
+    subtitle: Experiment Waste Disposal
+    title: Rudus F4
+    background: dungeon
+  spl_fild01:
+    name: Splendide Field
+    title: Splendide Field
+    background: field_s2
+  spl_fild02:
+    name: Splendide Field
+    title: Splendide Field
+    background: field_s2
+  spl_fild03:
+    name: Splendide Field
+    title: Splendide Field
+    background: field_s2
+  spl_in01:
+    name: Inside Splendide Field Command
+  spl_in02:
+    name: Inside Splendide
+  splendide:
+    name: Splendide, Lapine Base
+    subtitle: Yotunheim Lapine Base
+    title: Splendide
+    background: village
+  star_frst:
+    name: Yu Seong Lim
+    title: Yu Seong Lim
+    background: noname_s2
+  star_in:
+    name: Inside Yu Seong Lim
+  sword_1-1:
+    name: Swordman Test Hall
+  sword_2-1:
+    name: Swordman Test Hall
+  sword_3-1:
+    name: Swordman Test Hall
+  t_garden:
+    name: Garden of Time
+    announced: true
+    title: Garden of Time
+    background: noname_s2
+  te_alde_gld:
+    name: Kafra's Den
+    subtitle: Rune-Midgarts
+    title: Kafra's Den
+    background: siege
+  te_prt_gld:
+    name: Gloria
+    subtitle: Rune-Midgarts
+    title: Gloria
+    background: siege
+  te_prtcas01:
+    name: Geoborg Castle
+    subtitle: Rune-Midgarts
+    title: Geoborg Castle
+    background: siege
+  te_prtcas02:
+    name: Richard Castle
+    subtitle: Rune-Midgarts
+    title: Richard Castle
+    background: siege
+  te_prtcas03:
+    name: Wigner Castle
+    subtitle: Rune-Midgarts
+    title: Wigner Castle
+    background: siege
+  te_prtcas04:
+    name: Heine Castle
+    subtitle: Rune-Midgarts
+    title: Heine Castle
+    background: siege
+  te_prtcas05:
+    name: Nerius Castle
+    subtitle: Rune-Midgarts
+    title: Nerius Castle
+    background: siege
+  teg_dun01:
+    name: Guild Underground Dungeon
+    subtitle: Rune-Midgarts
+    title: Guild Underground Dungeon
+    background: dungeon
+  teg_dun02:
+    name: Guild Underground Dungeon
+    subtitle: Rune-Midgarts
+    title: Guild Underground Dungeon
+    background: dungeon
+  tha_scene01:
+    name: Thanatos Tower Entrance
+  tha_t01:
+    name: Thanatos Tower Museum Entrance
+    subtitle: Thanatos Tower
+    title: Museum Entrance
+    background: dungeon
+  tha_t02:
+    name: Thanatos Tower Museum
+    subtitle: Thanatos Tower
+    title: Museum
+    background: dungeon
+  tha_t03:
+    name: Thanatos Tower Abandoned Place
+    subtitle: Thanatos Tower
+    title: Abandoned Place
+    background: dungeon
+  tha_t04:
+    name: Thanatos Tower Abandoned Place
+    subtitle: Thanatos Tower
+    title: Abandoned Place
+    background: dungeon
+  tha_t05:
+    name: Thanatos Tower Upper Level
+    title: Thanatos Tower Upper Level
+    background: dungeon_s2
+  tha_t06:
+    name: Thanatos Tower Upper Level
+    title: Thanatos Tower Upper Level
+    background: dungeon_s2
+  tha_t07:
+    name: Thanatos Tower Upper Level - Room of Angel
+    subtitle: Thanatos Tower Upper Level
+    title: Room of Angel
+    background: dungeon
+  tha_t08:
+    name: Thanatos Tower Upper Level - Room of Angel
+    subtitle: Thanatos Tower Upper Level
+    title: Room of Angel
+    background: dungeon
+  tha_t09:
+    name: Thanatos Tower Upper Level - Room of Agony
+    subtitle: Thanatos Tower Upper Level
+    title: Room of Agony
+    background: dungeon
+  tha_t10:
+    name: Thanatos Tower Upper Level - Room of Sorrow
+    subtitle: Thanatos Tower Upper Level
+    title: Room of Sorrow
+    background: dungeon
+  tha_t11:
+    name: Thanatos Tower Upper Level - Room of Despair
+    subtitle: Thanatos Tower Upper Level
+    title: Room of Despair
+    background: dungeon
+  tha_t12:
+    name: Thanatos Tower Upper Level - Room of Hatred
+    subtitle: Thanatos Tower Upper Level
+    title: Room of Hatred
+    background: dungeon
+  thana_boss:
+    name: Thanatos Tower - Unknown Place
+  thana_step:
+    name: Thanatos Tower Upper Level - Stairs
+    title: Thanatos Tower Upper Level - Stairs
+  thor_camp:
+    name: Thor Volcano Camp
+    title: Thor Volcano Camp
+    background: noname_s2
+  thor_v01:
+    name: Thor Volcano Dungeon 1F
+    title: Thor Volcano Dungeon 1F
+    background: dungeon_s2
+  thor_v02:
+    name: Thor Volcano Dungeon 2F
+    title: Thor Volcano Dungeon 2F
+    background: dungeon_s2
+  thor_v03:
+    name: Thor Volcano Dungeon 3F
+    title: Thor Volcano Dungeon 3F
+    background: dungeon_s2
+  tra_fild:
+    name: Prontera Outer Training Grounds
+    announced: true
+    title: Prontera Outer Training Grounds
+    background: field_s2
+  treasure01:
+    name: Sunken Ship B1
+    subtitle: Alberta
+    title: Sunken Ship B1
+    background: dungeon
+  treasure02:
+    name: Sunken Ship B2
+    subtitle: Alberta
+    title: Sunken Ship B2
+    background: dungeon
+  treasure_n1:
+    name: Izlude Shipwreck B1
+    title: Izlude Shipwreck B1
+    background: dungeon_s2
+  treasure_n2:
+    name: Izlude Shipwreck B2
+    title: Izlude Shipwreck B2
+    background: dungeon_s2
+  tur_d03_i:
+    name: Desolate Village
+    subtitle: Illusion
+    title: Desolate Village
+    background: dungeon
+  tur_d04_i:
+    name: Bleak Turtle Palace
+    subtitle: Illusion
+    title: Bleak Turtle Palace
+    background: dungeon
+  tur_dun01:
+    name: Turtle Island
+    title: Turtle Island
+    background: field_s2
+  tur_dun02:
+    name: Turtle Island Dungeon
+    title: Turtle Island Dungeon
+    background: dungeon_s2
+  tur_dun03:
+    name: Turtle Village
+    title: Turtle Village
+    background: dungeon_s2
+  tur_dun04:
+    name: Turtle Palace
+    title: Turtle Palace
+    background: dungeon_s2
+  tur_dun05:
+    name: Underground Swamp Zone
+    title: Underground Swamp Zone
+    background: dungeon_s2
+  tur_dun06:
+    name: Underground Swamp Zone
+    title: Underground Swamp Zone
+    background: dungeon_s2
+  turbo_e_16:
+    name: Turbo Track Stadium
+  turbo_e_4:
+    name: Turbo Track Stadium
+  turbo_e_8:
+    name: Turbo Track Stadium
+  turbo_n_1:
+    name: Turbo Track Stadium
+  turbo_n_16:
+    name: Turbo Track Stadium
+  turbo_n_4:
+    name: Turbo Track Stadium
+  turbo_n_8:
+    name: Turbo Track Stadium
+  turbo_room:
+    name: Waiting Room
+    title: Waiting Room
+    background: noname_s2
+  uknw_ruin:
+    name: Distorted Brimir 1st Floor
+    announced: true
+    subtitle: Unknown Dimension
+    title: Distorted Brimir 1st Floor
+    background: dungeon
+  uknw_ruin2:
+    name: Distorted Brimir 2nd Floor
+    announced: true
+    subtitle: Unknown Dimension
+    title: Distorted Brimir 2nd Floor
+    background: dungeon
+  um_dun01:
+    name: Carpenter's Shop in the Tree
+    subtitle: Umbala
+    title: Carpenter's Shop
+    background: dungeon
+  um_dun02:
+    name: Passage to a Foreign World
+    subtitle: Umbala
+    title: Passage to a Foreign World
+    background: dungeon
+  um_fild01:
+    name: Luluka Forest
+    subtitle: Umbala
+    title: Luluka Forest
+    background: field
+  um_fild02:
+    name: Hoomga Forest
+    subtitle: Umbala
+    title: Hoomga Forest
+    background: field
+  um_fild03:
+    name: Kalala Swamp
+    subtitle: Umbala
+    title: Kalala Swamp
+    background: field
+  um_fild04:
+    name: Hoomga Jungle
+    subtitle: Umbala
+    title: Hoomga Jungle
+    background: field
+  um_in:
+    name: Inside Umbala
+  umbala:
+    name: Wootan Tribe's Village, Umbala
+    subtitle: Wootan Tribe's Village
+    title: Umbala
+    background: village
+  un_bk_q:
+    name: Underground Bunker
+    title: Underground Bunker
+    background: noname_s2
+  un_bunker:
+    name: Underground Bunker
+    title: Underground Bunker
+    background: noname_s2
+  un_myst:
+    name: Underground Tunnel
+    title: Underground Tunnel
+    background: noname_s2
+  valkyrie:
+    name: Valkyrie Hall, the Hall of Honor
+    subtitle: Hall of Honor
+    title: Valkyrie Hall
+    background: noname
+  ve_fild01:
+    name: Veins Field
+    title: Veins Field
+    background: field_s2
+  ve_fild02:
+    name: Veins Field
+    title: Veins Field
+    background: field_s2
+  ve_fild03:
+    name: Veins Field
+    title: Veins Field
+    background: field_s2
+  ve_fild04:
+    name: Veins Field
+    title: Veins Field
+    background: field_s2
+  ve_fild05:
+    name: Veins Field
+    announced: true
+    title: Veins Field
+    background: field_s2
+  ve_fild06:
+    name: Veins Field
+    title: Veins Field
+    background: field_s2
+  ve_fild07:
+    name: Veins Field
+    title: Veins Field
+    background: field_s2
+  ve_in:
+    name: Inside Veins
+  ve_in02:
+    name: Inside Veins
+  veins:
+    name: Veins, the Canyon Village
+    subtitle: Arunafeltz Canyon Village
+    title: Veins
+    background: village
+  ver_eju:
+    name: Eastern Ruins of Juperos
+    subtitle: Juperos
+    title: East Ruins
+    background: dungeon
+  ver_tunn:
+    name: Verus - Tunnel Outskirts
+    subtitle: Verus
+    title: Tunnel Outskirts
+    background: dungeon
+  verus01:
+    name: Laboratory-OPTATIO
+    subtitle: Verus City
+    title: Laboratory-OPTATIO
+    background: dungeon
+  verus02:
+    name: Research Building-WISH
+    subtitle: Verus City
+    title: Research Building-WISH
+    background: dungeon
+  verus03:
+    name: Verus - Central Plaza
+    subtitle: Verus City
+    title: Central Plaza
+    background: dungeon
+  verus04:
+    name: Verus - Excavation Site
+    subtitle: Verus - Excavation Site
+    title: Residential Building-HOPE
+    background: noname
+  vis_h01:
+    name: Illusion Corridor F1
+    title: Illusion Corridor F1
+    background: dungeon_s2
+  vis_h02:
+    name: Illusion Corridor F2
+    title: Illusion Corridor F2
+    background: dungeon_s2
+  vis_h03:
+    name: Illusion Corridor F3
+    title: Illusion Corridor F3
+    background: dungeon_s2
+  vis_h04:
+    name: Illusion Corridor F4
+    title: Illusion Corridor F4
+    background: dungeon_s2
+  vr_bob:
+    name: Fantasy Series - Today's Table
+    announced: true
+    subtitle: Fantasy Series-006
+    title: Today's Table
+    background: noname
+  vr_cas:
+    name: Fantasy Series - Lilium Palace
+    announced: true
+    subtitle: Fantasy Series-001
+    title: Lilium Palace
+    background: village
+  vr_clo1:
+    name: Fantasy Series - Mirror Monastery
+    announced: true
+    subtitle: Fantasy Series-005
+    title: Mirror Monastery
+    background: noname
+  vr_clo2:
+    name: Fantasy Series - All Those Moments
+    announced: true
+    subtitle: Fantasy Series-005
+    title: All Those Moments
+    background: noname
+  vr_gen:
+    name: Fantasy Series - Generic Research Institute
+    announced: true
+    subtitle: Fantasy Series-004
+    title: Generic Research Institute
+    background: noname
+  vr_po:
+    name: Fantasy Series - Poringtera
+    announced: true
+    subtitle: Fantasy Series-007
+    title: Poringtera
+    background: noname
+  vr_pop1:
+    name: Fantasy Series - Rainbow Road
+    announced: true
+    subtitle: Fantasy Series-012
+    title: Rainbow Road
+    background: field
+  vr_pop2:
+    name: Fantasy Series - Rainbow Road
+    announced: true
+    subtitle: Fantasy Series-012
+    title: Rainbow Road
+    background: field
+  vr_pop3:
+    name: Fantasy Series - Rainbow Lake
+    announced: true
+    subtitle: Fantasy Series-012
+    title: Rainbow Lake
+    background: field
+  wizard_1-1:
+    name: Wizard Academy
+  wizard_2-1:
+    name: Wizard Academy
+  wizard_3-1:
+    name: Wizard Academy
+  wolfvill:
+    name: Gray Wolf Village
+    announced: true
+    subtitle: Native Hidout
+    title: Gray Wolf Village
+    background: village
+  x_lhz:
+    name: Lighthalzen - Beyond Dimension
+    subtitle: Beyond Dimension
+    title: Lighthalzen
+    background: noname
+  x_prt:
+    name: Prontera - Beyond Dimension
+    subtitle: Beyond Dimension
+    title: Prontera
+    background: noname
+  x_ra:
+    name: Rachel - Beyond Dimension
+    subtitle: Beyond Dimension
+    title: Rachel
+    background: noname
+  xmas:
+    name: Lutie, the Snow Village
+    subtitle: Snow Village
+    title: Lutie
+    background: village
+  xmas_dun01:
+    name: Toy Factory Warehouse
+    subtitle: Lutie
+    title: Toy Factory Warehouse
+    background: dungeon
+  xmas_dun02:
+    name: Toy Monitoring Room
+    subtitle: Lutie
+    title: Toy Monitoring Room
+    background: dungeon
+  xmas_fild01:
+    name: Lutie Field
+    title: Lutie Field
+    background: field_s2
+  xmas_in:
+    name: Inside Lutie
+  y_airport:
+    name: Yuno Airport
+    title: Yuno Airport
+    background: noname_s2
+  ygg_edge:
+    name: Water Lily Village
+    announced: true
+    subtitle: Edge of the World Tree
+    title: Water Lily Village
+    background: village
+  ygg_fruit:
+    name: Inside Water Lily Village
+    announced: true
+    title: Inside Water Lily Village
+    background: village_s2
+  ygg_roots:
+    name: Twisted Dark Land
+    announced: true
+    subtitle: North of Midgard
+    title: Twisted Dark Land
+    background: noname
+  yggdrasil01:
+    name: Hvergelmir's Fountain (Trunk of Yggdrasil)
+    title: Hvergelmir's Fountain
+    background: noname_s2
+  yuno:
+    name: Yuno, Capital of Schwartzwald Republic
+    subtitle: Capital of Schwartzwald Republic
+    title: Yuno
+    background: village
+  yuno_fild01:
+    name: Border Posts
+    title: Border Posts
+    background: field_s2
+  yuno_fild02:
+    name: Kiel Hyre's Cottage
+    title: Kiel Hyre's Cottage
+    background: field_s2
+  yuno_fild03:
+    name: El Mes Plateau
+    title: El Mes Plateau
+    background: field_s2
+  yuno_fild04:
+    name: El Mes Plateau
+    title: El Mes Plateau
+    background: field_s2
+  yuno_fild05:
+    name: El Mes Plateau
+  yuno_fild06:
+    name: El Mes Plateau
+    title: El Mes Plateau
+    background: field_s2
+  yuno_fild07:
+    name: El Mes Gorge (Valley of Abyss)
+    subtitle: Valley of Abyss
+    title: El Mes Gorge
+    background: field
+  yuno_fild08:
+    name: Kiel Hyre's Academy
+    title: Kiel Hyre's Academy
+    background: field_s2
+  yuno_fild09:
+    name: Schwartzwald Guards Camp
+    title: Schwartzwald Guards Camp
+    background: field_s2
+  yuno_fild10:
+    name: Yuno Field
+  yuno_fild11:
+    name: Yuno Field
+    title: Yuno Field
+    background: field_s2
+  yuno_fild12:
+    name: Border Checkpoint
+    title: Border Checkpoint
+    background: field_s2
+  yuno_in01:
+    name: Inside Yuno
+  yuno_in02:
+    name: Inside the Sage Castle
+  yuno_in03:
+    name: Inside Yuno
+  yuno_in04:
+    name: Republic Library
+    title: Republic Library
+    background: noname_s2
+  yuno_in05:
+    name: Power Plant of Ymir's Heart
+    title: Power Plant of Ymir's Heart
+    background: noname_s2
+  yuno_pre:
+    name: Schwartzwald Government Buildings
+    title: Schwartzwald Government Buildings
+    background: noname_s2
+  z_agit:
+    name: Z Gang's Hideout
+    title: Z Gang's Hideout
+    background: noname_s2
