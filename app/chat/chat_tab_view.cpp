@@ -545,18 +545,7 @@ void ChatTabsView::Apply(std::uint32_t group, const ro::ui::ChatWindowAction& as
         asked.moved_to >= static_cast<int>(ranks.size()) ? ranks.back() + 1 : real(asked.moved_to);
     if (from != kNoTab && to != kNoTab) {
       tabs_.Move(from, to);
-      // ⚠ CE QUI SE TROUVAIT ENTRE LES DEUX PLACES GLISSE D'UN RANG, l'onglet
-      // montré compris : ne recaler que celui qu'on déplace faisait passer la
-      // vue à son voisin dès qu'on rangeait un AUTRE onglet par-dessus lui.
-      const int moved_from = asked.moved_from;
-      const int moved_to = asked.moved_to;
-      if (state.tab == moved_from) {
-        state.tab = moved_to > moved_from ? moved_to - 1 : moved_to;
-      } else if (moved_from < moved_to && state.tab > moved_from && state.tab < moved_to) {
-        --state.tab;
-      } else if (moved_to < moved_from && state.tab >= moved_to && state.tab < moved_from) {
-        ++state.tab;
-      }
+      state.tab = ShownAfterMove(state.tab, asked.moved_from, asked.moved_to);
     }
   }
   if (const std::size_t rank = real(asked.clear_tab); rank != kNoTab) {
@@ -645,6 +634,18 @@ void ChatTabsView::Harvest(std::span<const ro::sim::ChatLine> chat) {
         .minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute),
         .second = static_cast<std::uint8_t>(second % kSecondsPerMinute),
         .color = ShownRgbOfChatLine(line.kind, line.color)});
+    // ⚠ UN FICHIER PAR JOUR, MINUIT COMPRIS : une partie qui passe minuit
+    // rouvre le journal du nouveau jour, coiffé de son repère. Sans cela les
+    // lignes d'après minuit tombaient dans le fichier de la veille, où leur
+    // heure seule mentait sur leur jour.
+    if (log_.open()) {
+      const std::string stamp = StampNow();
+      if (stamp.size() >= kDateTextSize &&
+          std::string_view(stamp).substr(0, kDateTextSize) != log_.day()) {
+        log_.Open(client_root_, std::string_view(stamp).substr(0, kDateTextSize),
+                  SessionMark(stamp));
+      }
+    }
     // ⚠ ÉCRITE TOUT DE SUITE, pas à la fermeture : c'est ce qui distingue le
     // journal de l'historique, et ce qui le fait survivre à une sortie brutale.
     log_.Write(seen_.back());

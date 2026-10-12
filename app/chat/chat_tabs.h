@@ -205,6 +205,25 @@ struct ChatTab {
 // ⚠ ELLE N'EST JAMAIS VIDE. Un joueur qui retire son dernier onglet n'aurait
 // plus rien où lire, et rien où cliquer pour en refaire un : le dernier ne se
 // retire pas.
+// L'ONGLET MONTRÉ, APRÈS QU'UNE LANGUETTE A BOUGÉ de `from` à AVANT `before`,
+// rangs comptés dans la bande telle qu'elle est dessinée.
+//
+// 🔴 PAS SEULEMENT QUAND C'EST LUI QUI BOUGE : tout ce qui se trouvait entre les
+// deux places glisse d'un rang. Ne recaler que la languette déplacée faisait
+// passer la vue à son voisin dès qu'on en rangeait une AUTRE par-dessus elle.
+[[nodiscard]] constexpr int ShownAfterMove(int shown, int from, int before) noexcept {
+  if (shown == from) {
+    return before > from ? before - 1 : before;
+  }
+  if (from < before && shown > from && shown < before) {
+    return shown - 1;
+  }
+  if (before < from && shown >= before && shown < from) {
+    return shown + 1;
+  }
+  return shown;
+}
+
 class ChatTabs {
  public:
   // Part avec l'onglet du client : un seul, qui accepte `kDefaultChatTypes`.

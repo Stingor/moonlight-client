@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <map>
@@ -112,11 +113,36 @@ class ActorOutfit {
   // le corps bouge : sans la seconde moitié, le cache la figerait sur sa
   // première image.
   using FrameKey = std::pair<std::size_t, std::vector<std::size_t>>;
+  // L'ordre des clés, qui se compare aussi à une clé EMPRUNTÉE — l'image du
+  // corps et une vue sur celles des pièces. ⚠ C'EST CE QUI ÉPARGNE UNE
+  // ALLOCATION PAR ACTEUR ET PAR IMAGE : la clé ne se bâtit qu'à l'insertion.
+  // Même ordre que celui de la paire.
+  struct FrameKeyOrder {
+    using is_transparent = void;
+    using Probe = std::pair<std::size_t, std::span<const std::size_t>>;
+    [[nodiscard]] static Probe View(const FrameKey& key) noexcept {
+      return {key.first, key.second};
+    }
+    [[nodiscard]] static Probe View(const Probe& probe) noexcept { return probe; }
+    template <class Left, class Right>
+    [[nodiscard]] bool operator()(const Left& left, const Right& right) const noexcept {
+      const Probe one = View(left);
+      const Probe other = View(right);
+      if (one.first != other.first) {
+        return one.first < other.first;
+      }
+      return std::ranges::lexicographical_compare(one.second, other.second);
+    }
+  };
   // Les compositions déjà faites, par animation du corps puis par image. Un
   // `std::map` parce que ses nœuds ne bougent pas : une référence rendue reste
   // valide tant que la tenue vit. Le nombre d'entrées est borné par celui des
   // images du .act.
-  std::vector<std::map<FrameKey, std::array<ComposedActor, kDirectionCount>>> composed_;
+  std::vector<std::map<FrameKey, std::array<ComposedActor, kDirectionCount>, FrameKeyOrder>>
+      composed_;
+  // L'image de chaque pièce accrochée pour l'appel en cours, gardée d'un
+  // appel à l'autre pour ne pas se réallouer.
+  std::vector<std::size_t> attachment_frames_;
   // Le .act de la TÊTE : c'est lui qui sert de référence à l'animation propre
   // des coiffes. Nul pour une tenue qui n'en porte pas.
   const formats::ActAnimation* head_animation_ = nullptr;

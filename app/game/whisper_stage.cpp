@@ -399,7 +399,8 @@ void WhisperStage::Send(std::string_view peer, std::string text, const WhisperCo
   const ro::core::Result<void> sent =
       ro::net::SendChat(context.link, context.world.player_name(), intent);
   if (sent) {
-    static_cast<void>(ro::net::NoteWhisperSent(outbox_, intent, context.now_ms));
+    static_cast<void>(
+        ro::net::NoteWhisperSent(outbox_, intent, context.now_ms, context.world.player_statuses()));
   }
   ReportRefusal(sent);
 }

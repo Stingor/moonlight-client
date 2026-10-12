@@ -46,6 +46,12 @@ inline constexpr StatusEffectId kEfstSuHide = 933;
 // pose, et les bulles au-dessus de la tête. Voir `NoteSleep`.
 inline constexpr StatusEffectId kEfstDeepSleep = 435;
 
+// LES ÉTATS QUI COUPENT LA PAROLE : ceux qui portent `NoChat` dans
+// `db/re/status.yml`, avec le sommeil profond ci-dessus. Le serveur jette
+// alors le message SANS L'ACCUSER — voir `ro::net::NoteWhisperSent`.
+inline constexpr StatusEffectId kEfstBerserk = 107;
+inline constexpr StatusEffectId kEfstSaturdayNightFever = 448;
+
 // L'AVEUGLEMENT PROFOND (EFST_HANDICAPSTATE_DEEPBLIND) : il pose lui-même le noir
 // du joueur aveuglé, et ce noir survit à la fin de l'aveuglement ordinaire.
 inline constexpr StatusEffectId kEfstDeepBlind = 1205;

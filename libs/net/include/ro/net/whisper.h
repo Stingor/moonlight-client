@@ -1,12 +1,14 @@
 #pragma once
 
 #include <cstdint>
+#include <span>
 #include <string_view>
 
 #include "ro/net/chat_target.h"
 #include "ro/net/world_update.h"
 #include "ro/sim/friend_list.h"
 #include "ro/sim/guild.h"
+#include "ro/sim/status_effects.h"
 #include "ro/sim/whisper.h"
 #include "ro/sim/world_fwd.h"
 
@@ -50,9 +52,17 @@ struct WhisperCircle {
 // (« #nom », qui passe par le même paquet), ni un message à un PNJ qui existe
 // (« NPC:nom »), ni une COMMANDE (« @… », « #… »), ni un texte trop long.
 //
-// ⚠ TROIS CAS NE SE VOIENT PAS D'ICI, et leur envoi attend son oubli : un PNJ
-// qui n'existe pas (le serveur accuse alors « absent »), un joueur muet, et
-// une ligne envoyée plus vite que le délai de parole du serveur.
-bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::uint32_t sent_ms);
+// ⚠ UN JOUEUR MUET NE SE NOTE PAS NON PLUS : sous un état qui coupe la parole
+// (`player_statuses`), le serveur jette le message sans accusé, et l'envoi
+// noté aurait pris l'accusé du suivant — l'écho et le refus passaient alors à
+// un autre destinataire.
+//
+// ⚠ CE QUI NE SE VOIT PAS D'ICI attend son oubli : un PNJ qui n'existe pas (le
+// serveur accuse alors « absent »), le mutisme de bonnes manières — il ne
+// porte pas d'icône —, une ligne envoyée plus vite que le délai de parole du
+// serveur, et un « #canal » inexistant, que le serveur reprend comme un
+// chuchotement et accuse « absent » sans qu'on l'ait noté.
+bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::uint32_t sent_ms,
+                     std::span<const sim::ActiveStatus> player_statuses = {});
 
 }  // namespace ro::net

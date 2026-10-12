@@ -130,6 +130,8 @@ class ChatLogWriter {
   // EN SERVICE, et non « fichier ouvert » : c'est la question que pose
   // l'appelant, qui repousse la case à chaque image.
   [[nodiscard]] bool open() const noexcept { return serving_; }
+  // Le jour servi, en `AAAA-MM-JJ` : l'appelant le compare à l'horloge.
+  [[nodiscard]] const std::string& day() const noexcept { return day_; }
   // Vide tant que rien n'a été écrit : il n'y a pas encore de fichier.
   [[nodiscard]] const std::filesystem::path& path() const noexcept { return path_; }
 

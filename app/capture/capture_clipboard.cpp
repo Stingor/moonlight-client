@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <string_view>
+#include <system_error>
 #include <vector>
 
 #include "ro/core/log.h"
@@ -32,6 +34,34 @@ namespace {
 // l'implémentation de référence a laissé passer : chez elle, le nom traverse la
 // traduction et ne survit que parce que le français le rend inchangé.
 constexpr const char* kPreferredDropEffect = "Preferred DropEffect";
+
+// LES PORTEURS D'ANIMATION, dans le dossier temporaire : leur préfixe, et l'âge
+// au-delà duquel on les retire.
+constexpr std::string_view kCarrierPrefix = "moonclient_";
+constexpr std::string_view kCarrierSuffix = ".gif";
+constexpr std::chrono::hours kCarrierKeptFor{24};
+
+// RETIRE LES PORTEURS D'UN AUTRE JOUR.
+//
+// 🔴 RIEN D'AUTRE NE LES EFFACE : le presse-papier cite le fichier, il ne le
+// garde pas, et un joueur qui fait des clips chaque jour accumulait des
+// centaines de mégaoctets. ⚠ PAS LES RÉCENTS : le dernier copié peut encore
+// être collé, et c'est toute sa raison d'être.
+void ForgetOldCarriers(const std::filesystem::path& folder) {
+  const auto oldest = std::filesystem::file_time_type::clock::now() - kCarrierKeptFor;
+  std::error_code failed;
+  for (auto entry = std::filesystem::directory_iterator(folder, failed);
+       !failed && entry != std::filesystem::directory_iterator(); entry.increment(failed)) {
+    const std::string name = ro::core::Utf8FromPath(entry->path().filename());
+    if (!name.starts_with(kCarrierPrefix) || !name.ends_with(kCarrierSuffix)) {
+      continue;
+    }
+    std::error_code ignored;
+    if (entry->last_write_time(ignored) < oldest && !ignored) {
+      std::filesystem::remove(entry->path(), ignored);
+    }
+  }
+}
 
 // Dépose un bloc dans le presse-papier. En cas de SUCCÈS le presse-papier en
 // devient PROPRIÉTAIRE : le libérer serait une seconde libération.
@@ -149,8 +179,15 @@ bool PutAnimationOnClipboard(std::span<const std::uint8_t> gif) {
   // Un nom qui ne se répète pas : deux captures d'affilée ne doivent pas se
   // disputer le même porteur, dont la première peut encore être collée.
   const auto stamp = std::chrono::steady_clock::now().time_since_epoch().count();
+  std::error_code no_temp;
+  const std::filesystem::path temp = std::filesystem::temp_directory_path(no_temp);
+  if (no_temp) {
+    ro::core::LogError("dossier temporaire introuvable — l'animation ne sera pas copiée");
+    return false;
+  }
+  ForgetOldCarriers(temp);
   const std::filesystem::path carrier =
-      std::filesystem::temp_directory_path() / ("moonclient_" + std::to_string(stamp) + ".gif");
+      temp / (std::string(kCarrierPrefix) + std::to_string(stamp) + std::string(kCarrierSuffix));
   {
     std::ofstream out(carrier, std::ios::binary);
     if (!out) {

@@ -85,8 +85,9 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
 
   state.drops_order.clear();
   for (std::size_t rank = 0; rank < drops.rows.size(); ++rank) {
-    const std::string name(drops.rows[rank].name);
-    if (filter.PassFilter(name.c_str())) {
+    // Par ses bornes, sans copie : voir le filtre des probabilités.
+    const std::string_view name = drops.rows[rank].name;
+    if (filter.PassFilter(name.data(), name.data() + name.size())) {
       state.drops_order.push_back(static_cast<int>(rank));
     }
   }

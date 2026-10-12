@@ -147,8 +147,17 @@ FrameOutcome ApplyWhisperFrame(const Frame& frame, sim::World& world, const Whis
   }
 }
 
-bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::uint32_t sent_ms) {
+bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::uint32_t sent_ms,
+                     std::span<const sim::ActiveStatus> player_statuses) {
   if (intent.target != ChatTarget::kWhisper || intent.recipient.empty() || intent.text.empty()) {
+    return false;
+  }
+  // MUET : le serveur jette la ligne sans un mot, donc sans accusé.
+  const bool muted = std::ranges::any_of(player_statuses, [](const sim::ActiveStatus& status) {
+    return status.effect == sim::kEfstBerserk || status.effect == sim::kEfstDeepSleep ||
+           status.effect == sim::kEfstSaturdayNightFever;
+  });
+  if (muted) {
     return false;
   }
   // UN CANAL : « /w #nom » et la case « Pseudo » y mènent aussi.

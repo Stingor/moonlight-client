@@ -521,9 +521,12 @@ void ModelRenderer::DrawStillExcept(const Batch& batch, std::span<const std::uin
   }
 }
 
+// ⚠ PAR DICHOTOMIE : `Upload` range les lots dans l'ordre croissant des
+// modèles, et la passe voilée en cherche un par face émise et par face peinte,
+// à chaque image — une recherche linéaire y coûtait faces × lots.
 const ModelRenderer::Batch* ModelRenderer::BatchOf(std::size_t model_index) const {
-  const auto found = std::ranges::find(batches_, model_index, &Batch::model_index);
-  return found != batches_.end() ? &*found : nullptr;
+  const auto found = std::ranges::lower_bound(batches_, model_index, {}, &Batch::model_index);
+  return found != batches_.end() && found->model_index == model_index ? &*found : nullptr;
 }
 
 void ModelRenderer::SetTextureMotion(const TextureMotion& motion) const {
@@ -670,7 +673,12 @@ void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, fl
   }
   // Les faces mêlées des poses pleines, que la passe opaque a sautées.
   for (const Batch& batch : batches_) {
-    if (batch.model_index >= models.size()) {
+    // ⚠ LE MARQUAGE DES TEXTURES MÊLÉES EST DÉJÀ CUIT DANS LE LOT : sans ce
+    // raccourci, `BlendedPoses` le refaisait pour chaque modèle à chaque image —
+    // une allocation et une lecture de nom par texture, pour la plupart des
+    // modèles qui n'en ont aucune.
+    if (batch.model_index >= models.size() ||
+        std::ranges::none_of(batch.blended, [](std::uint8_t mark) { return mark != 0; })) {
       continue;
     }
     for (const VeiledPose& pose :

@@ -251,33 +251,42 @@ std::size_t DrawLogWindow(LogWindowState& state, std::span<const core::LoggedLin
                                            : core::Tr("Aucune ligne ne passe le filtre."));
       ImGui::PopStyleColor();
     }
-    for (const core::LoggedLine& line : shown) {
-      // LA LIGNE ENTIÈRE EST CLIQUABLE, sur toute la largeur : viser le texte
-      // exact d'une ligne de journal, qui n'a pas deux fois la même longueur,
-      // serait pénible.
-      const bool chosen_here = state.selected.contains(line.serial);
-      // ⚠ L'IDENTIFIANT VIENT DU NUMÉRO DE LIGNE, ET NON DE L'ÉTIQUETTE. ImGui
-      // nomme chaque élément d'après son texte, et l'étiquette est ici
-      // l'horodatage : une rafale de messages arrive dans la même milliseconde,
-      // donc douze lignes portaient le même nom et devenaient le MÊME élément.
-      // ImGui l'a signalé lui-même en jeu — « 9 visible items with conflicting
-      // ID » — et la conséquence était que cliquer sur l'une en sélectionnait une
-      // autre.
-      //
-      // Le numéro d'écriture ne se réemploie jamais : c'est déjà ce qui fait
-      // tenir la sélection, et cela fait aussi un identifiant unique.
-      ImGui::PushID(static_cast<int>(line.serial));
-      ImGui::PushStyleColor(ImGuiCol_Text, ColorOf(core::LogLevel::kDebug));
-      if (ImGui::Selectable(StampOf(line.since_start_ms).data(), chosen_here,
-                            ImGuiSelectableFlags_SpanAllColumns)) {
-        ClickLine(state, shown, line.serial);
+    // ⚠ SEULES LES LIGNES VISIBLES SE METTENT EN PAGE : le journal en garde
+    // quatre mille, et les dessiner toutes posait huit mille éléments ImGui à
+    // chaque image pour trente qu'on voit. Une ligne tient une rangée, ce qui
+    // est la condition du découpage.
+    ImGuiListClipper clipper;
+    clipper.Begin(static_cast<int>(shown.size()));
+    while (clipper.Step()) {
+      for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row) {
+        const core::LoggedLine& line = shown[static_cast<std::size_t>(row)];
+        // LA LIGNE ENTIÈRE EST CLIQUABLE, sur toute la largeur : viser le texte
+        // exact d'une ligne de journal, qui n'a pas deux fois la même longueur,
+        // serait pénible.
+        const bool chosen_here = state.selected.contains(line.serial);
+        // ⚠ L'IDENTIFIANT VIENT DU NUMÉRO DE LIGNE, ET NON DE L'ÉTIQUETTE. ImGui
+        // nomme chaque élément d'après son texte, et l'étiquette est ici
+        // l'horodatage : une rafale de messages arrive dans la même milliseconde,
+        // donc douze lignes portaient le même nom et devenaient le MÊME élément.
+        // ImGui l'a signalé lui-même en jeu — « 9 visible items with conflicting
+        // ID » — et la conséquence était que cliquer sur l'une en sélectionnait une
+        // autre.
+        //
+        // Le numéro d'écriture ne se réemploie jamais : c'est déjà ce qui fait
+        // tenir la sélection, et cela fait aussi un identifiant unique.
+        ImGui::PushID(static_cast<int>(line.serial));
+        ImGui::PushStyleColor(ImGuiCol_Text, ColorOf(core::LogLevel::kDebug));
+        if (ImGui::Selectable(StampOf(line.since_start_ms).data(), chosen_here,
+                              ImGuiSelectableFlags_SpanAllColumns)) {
+          ClickLine(state, shown, line.serial);
+        }
+        ImGui::PopStyleColor();
+        ImGui::PopID();
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Text, ColorOf(line.level));
+        ImGui::TextUnformatted(line.text.c_str());
+        ImGui::PopStyleColor();
       }
-      ImGui::PopStyleColor();
-      ImGui::PopID();
-      ImGui::SameLine();
-      ImGui::PushStyleColor(ImGuiCol_Text, ColorOf(line.level));
-      ImGui::TextUnformatted(line.text.c_str());
-      ImGui::PopStyleColor();
     }
     // ⚠ ON NE REDESCEND QUE SI L'ON ÉTAIT DÉJÀ EN BAS. Sans cette condition, la
     // fenêtre arracherait la lecture à chaque ligne écrite, et le suivi

@@ -128,11 +128,13 @@ std::vector<NaviHitGroup> SearchNavi(const NaviData& data, const NaviSearchQuery
   for (const std::string& word : words) joined += (joined.empty() ? "" : " ") + word;
   if (words.empty()) return {};
 
+  // 🔴 TOUT SE RECUEILLE, LA BORNE NE TOMBE QU'APRÈS LE CLASSEMENT. Bornée
+  // pendant la collecte — cartes, puis PNJ, puis monstres —, elle laissait
+  // quatre cents correspondances faibles évincer un nom de monstre exact.
   std::map<GroupKey, Collected> groups;
-  std::size_t kept = 0;
   const auto keep = [&](NaviHitKind kind, std::uint32_t rank, const std::string& name,
                         const std::string& folded_name, Match match) {
-    if (match == Match::kNone || kept >= query.max_hits) return;
+    if (match == Match::kNone) return;
     Collected& slot = groups[GroupKey{kind, folded_name}];
     if (slot.group.hits.empty()) {
       slot.group.kind = kind;
@@ -140,7 +142,6 @@ std::vector<NaviHitGroup> SearchNavi(const NaviData& data, const NaviSearchQuery
     }
     slot.group.hits.push_back({kind, rank});
     slot.best = std::max(slot.best, match);
-    ++kept;
   };
 
   // Le contexte d'une carte se replie une fois, pas une fois par PNJ.
@@ -200,9 +201,17 @@ std::vector<NaviHitGroup> SearchNavi(const NaviData& data, const NaviSearchQuery
            std::tie(right.second.kind, right.second.name);
   });
 
+  // La borne, dans l'ordre du classement : un groupe qui la franchit garde ses
+  // premiers résultats, ceux de la carte du joueur en tête.
   std::vector<NaviHitGroup> result;
   result.reserve(ordered.size());
-  for (auto& [match, group] : ordered) result.push_back(std::move(group));
+  std::size_t left = query.max_hits;
+  for (auto& [match, group] : ordered) {
+    if (left == 0) break;
+    if (group.hits.size() > left) group.hits.resize(left);
+    left -= group.hits.size();
+    result.push_back(std::move(group));
+  }
   return result;
 }
 

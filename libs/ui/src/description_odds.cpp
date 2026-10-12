@@ -13,6 +13,7 @@
 #include <cctype>
 #include <cstdio>
 #include <string>
+#include <string_view>
 
 #include <imgui.h>
 
@@ -144,8 +145,10 @@ void DrawOddsTab(DescriptionWindowState& state, const DescriptionView& view,
 
   state.odds_order.clear();
   for (std::size_t rank = 0; rank < view.odds.size(); ++rank) {
-    const std::string name(view.odds[rank].name);
-    if (filter.PassFilter(name.c_str())) {
+    // ⚠ PAR SES BORNES, sans copie : une boîte peut compter mille lignes, et
+    // la liste se refiltre à chaque image.
+    const std::string_view name = view.odds[rank].name;
+    if (filter.PassFilter(name.data(), name.data() + name.size())) {
       state.odds_order.push_back(static_cast<int>(rank));
     }
   }

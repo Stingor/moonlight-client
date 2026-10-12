@@ -191,6 +191,12 @@ constexpr std::int32_t kChromaDivisor = -4;
 // Le flux s'ouvre sur la taille de l'espace de travail du décodeur, qu'on
 // n'emploie pas.
 constexpr std::size_t kScratchSizeBytes = 4;
+// LE PLUS GRAND CÔTÉ ADMIS. Les textures des modèles du jeu en sont loin ; au
+// format, un côté va jusqu'à 32 767, et une texture de quelques octets en
+// annonçant deux demandait une dizaine de gigaoctets — sa texture RGBA et ses
+// plans — avant le premier contrôle de son flux. Refusée, la texture laisse
+// le maillage sans peinture, rien de plus.
+constexpr std::int32_t kLargestTextureSide = 4096;
 
 std::uint32_t AlignDimension(std::int32_t value) {
   return (static_cast<std::uint32_t>(value) + kDimensionAlignment - 1) & ~(kDimensionAlignment - 1);
@@ -206,13 +212,13 @@ core::Result<std::vector<std::uint8_t>> DecodeGr2WaveletTexture(std::span<const 
                                                                 std::int32_t width,
                                                                 std::int32_t height,
                                                                 bool has_alpha) {
-  if (width <= 0 || height <= 0 || width > INT16_MAX || height > INT16_MAX) {
+  if (width <= 0 || height <= 0 || width > kLargestTextureSide || height > kLargestTextureSide) {
     return core::Fail(core::ErrorCode::kCorruptData, "texture Granny : dimensions invalides");
   }
   const std::size_t pixel_count =
       static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
-  std::vector<std::uint8_t> rgba(pixel_count * kRgbaBytes);
   if (pixel_count <= static_cast<std::size_t>(kGr2LargestRawTexturePixels)) {
+    std::vector<std::uint8_t> rgba(pixel_count * kRgbaBytes);
     const std::size_t stride = has_alpha ? kRgbaBytes : kRgbBytes;
     if (data.size() < pixel_count * stride) {
       return core::Fail(core::ErrorCode::kUnexpectedEnd, "texture Granny : pixels tronqués");
@@ -243,6 +249,8 @@ core::Result<std::vector<std::uint8_t>> DecodeGr2WaveletTexture(std::span<const 
     gr2::SynthesizeGr2Plane(plane, row_flags);
     offset += *consumed;
   }
+  // ⚠ ALLOUÉE APRÈS LES PLANS : un flux qui ne les porte pas échoue avant.
+  std::vector<std::uint8_t> rgba(pixel_count * kRgbaBytes);
   const std::size_t pitch = planes[0].width;
   for (std::size_t y = 0; y < static_cast<std::size_t>(height); ++y) {
     for (std::size_t x = 0; x < static_cast<std::size_t>(width); ++x) {

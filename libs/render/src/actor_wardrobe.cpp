@@ -119,7 +119,8 @@ const ComposedActor& ActorOutfit::Composed(std::size_t animation, std::size_t di
   // pendant que l'acteur tient sa pose : voir AlternateFrame. Elles se
   // calculent pour la direction zéro, qui sert de témoin au cache — les huit
   // actions d'un même rang portent le même nombre d'images.
-  std::vector<std::size_t> attachment_frames(attachments.size(), frame);
+  std::vector<std::size_t>& attachment_frames = attachment_frames_;
+  attachment_frames.assign(attachments.size(), frame);
   if (head_animation_ != nullptr) {
     const std::size_t witness = BoundedActionIndex(animation_of_body, played, 0);
     for (std::size_t index = 0; index < attachments.size(); ++index) {
@@ -135,17 +136,18 @@ const ComposedActor& ActorOutfit::Composed(std::size_t animation, std::size_t di
     }
   }
 
-  FrameKey key(frame, std::move(attachment_frames));
-  auto found = composed_[played].find(key);
+  auto found = composed_[played].find(
+      FrameKeyOrder::Probe(frame, std::span<const std::size_t>(attachment_frames)));
   if (found == composed_[played].end()) {
     std::array<ComposedActor, kDirectionCount> directions;
     for (std::size_t each = 0; each < kDirectionCount; ++each) {
       const std::size_t action_index = BoundedActionIndex(animation_of_body, played, each);
       directions[each] = ComposeActor(pieces_.front(), attachments, action_index, frame,
-                                      garment_.DrawsBehind(action_index, frame), key.second);
+                                      garment_.DrawsBehind(action_index, frame), attachment_frames);
       ScaleQuads(directions[each], body_scale_);
     }
-    found = composed_[played].emplace(std::move(key), std::move(directions)).first;
+    found =
+        composed_[played].emplace(FrameKey(frame, attachment_frames), std::move(directions)).first;
   }
   return found->second[facing];
 }

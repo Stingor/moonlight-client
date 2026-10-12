@@ -31,6 +31,14 @@ constexpr std::int32_t kVersionZlibBgra = 32;
 // un en-tête corrompu avant qu'il ne devienne une allocation démesurée.
 constexpr std::int32_t kMaxDimension = 4096;
 constexpr std::int32_t kMaxFrameCount = 10000;
+// LE PLUS DE PIXELS PALETTISÉS QU'UN SPRITE PEUT DÉPLOYER, toutes images
+// confondues : des centaines de fois ce que porte le plus gros monstre.
+//
+// 🔴 UNE IMAGE RLE NE SE BORNE PAS PAR SA LONGUEUR : un flux plus court que
+// l'image est légitime — le reste est transparent, et la référence le lit
+// ainsi. Sans plafond commun, dix mille images de 4096×4096 annoncées par
+// soixante kilo-octets demandaient cent soixante gigaoctets.
+constexpr std::size_t kMostSpritePixels = std::size_t{256} * 1024 * 1024;
 
 // Décompresse les plages d'une image palettisée.
 //
@@ -74,7 +82,9 @@ core::Result<std::pair<std::int32_t, std::int32_t>> ReadFrameSize(ByteReader& re
   return std::pair{width, height};
 }
 
-core::Result<SprIndexedFrame> ReadIndexedFrame(ByteReader& reader, std::int32_t version) {
+// `pixels_left` est ce qui reste du budget du sprite : voir `kMostSpritePixels`.
+core::Result<SprIndexedFrame> ReadIndexedFrame(ByteReader& reader, std::int32_t version,
+                                               std::size_t& pixels_left) {
   auto size = ReadFrameSize(reader);
   if (!size) {
     return std::unexpected(size.error());
@@ -85,17 +95,23 @@ core::Result<SprIndexedFrame> ReadIndexedFrame(ByteReader& reader, std::int32_t 
   frame.height = size->second;
   const auto pixel_count =
       static_cast<std::size_t>(frame.width) * static_cast<std::size_t>(frame.height);
-  frame.indices.assign(pixel_count, 0);
+  if (pixel_count > pixels_left) {
+    return Fail(ErrorCode::kCorruptData, "sprite démesuré : trop de pixels annoncés");
+  }
+  pixels_left -= pixel_count;
 
   if (version < kVersionRunLength) {
     // Avant la 2.1, les index sont écrits tels quels, sans longueur préalable.
+    // ⚠ LUS AVANT D'ALLOUER : une taille annoncée que le fichier ne porte pas
+    // ne coûte alors rien.
     const std::span<const std::uint8_t> pixels = reader.Bytes(pixel_count);
     if (pixels.size() != pixel_count) {
       return Fail(ErrorCode::kUnexpectedEnd, "image palettisée tronquée");
     }
-    std::copy(pixels.begin(), pixels.end(), frame.indices.begin());
+    frame.indices.assign(pixels.begin(), pixels.end());
     return frame;
   }
+  frame.indices.assign(pixel_count, 0);
 
   const std::size_t length = version >= kVersionWideLength ? static_cast<std::size_t>(reader.U32())
                                                            : static_cast<std::size_t>(reader.U16());
@@ -123,12 +139,12 @@ core::Result<Image> ReadBgraFrame(ByteReader& reader) {
   image.height = size->second;
   const auto pixel_count =
       static_cast<std::size_t>(image.width) * static_cast<std::size_t>(image.height);
-  image.pixels.assign(pixel_count * 4, 0);
-
+  // ⚠ LUS AVANT D'ALLOUER, comme les index bruts.
   const std::span<const std::uint8_t> raw = reader.Bytes(pixel_count * 4);
   if (raw.size() != pixel_count * 4) {
     return Fail(ErrorCode::kUnexpectedEnd, "image BGRA tronquée");
   }
+  image.pixels.assign(pixel_count * 4, 0);
 
   // ⚠ Seul endroit du format où les rangées sont à l'ENVERS, et où les
   // composantes viennent dans l'ordre alpha, bleu, vert, rouge. Rater le sens
@@ -211,8 +227,9 @@ core::Result<SprSprite> SprSprite::Parse(std::span<const std::uint8_t> data) {
   std::optional<core::Error> first_error;
 
   sprite.indexed_frames_.reserve(static_cast<std::size_t>(indexed_count));
+  std::size_t pixels_left = kMostSpritePixels;
   for (std::int32_t index = 0; index < indexed_count && !first_error.has_value(); ++index) {
-    auto frame = ReadIndexedFrame(reader, sprite.version_);
+    auto frame = ReadIndexedFrame(reader, sprite.version_, pixels_left);
     if (!frame) {
       first_error = frame.error();
       break;
