@@ -948,7 +948,7 @@ target_include_directories(moonclient_craft PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(moonclient_navigation STATIC
     world/minimap_compose.cpp
     world/world_map_compose.cpp
-    world/world_map_kafra.cpp
+    world/world_map_warp_agent.cpp
     world/world_map_routes.cpp
     world/navi_bug_report.cpp
     world/navi_file.cpp

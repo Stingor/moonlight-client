@@ -1,0 +1,63 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les Warp Agent du serveur
+#
+#  Tiré des scripts de PNJ du serveur Moonlight, ceux que
+#  moon/scripts_moon.conf fait charger : le PNJ « Warp Agent » et chacune de
+#  ses copies (`duplicate`). La classe de chaque figure vient de l'énumération
+#  e_job_types de src/map/npc.hpp. Le commentaire en bout de ligne nomme le
+#  fichier du PNJ.
+#
+#  Fichier produit par scripts/yaml_tables/warp_agents.py. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/warp_agents.py --serveur <dépôt moonlight> \
+#          --sortie dist/data/yaml_files/warp_agents.yml
+#
+#  agents : carte où se tient un Warp Agent -> sa figure, par le nom que le
+#    script écrit (sprite) et par la classe que le serveur annonce (class).
+#
+#  Lu par moonclient (ro/vfs/warp_agents.h) : la carte du monde montre la
+#  figure du Warp Agent au survol d'une ville qui en a un.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+agents:
+  alberta: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  aldebaran: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  amatsu: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  ayothaya: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  bat_room: {sprite: "4_F_01", class: 90}  # moon/rathena/battleground/bg_common.txt
+  brasilis: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  comodo: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  dewata: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  dicastes01: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  eclage: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  einbech: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  einbroch: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  geffen: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  ggpro: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  gonryun: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  harboro1: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  hugel: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  izlude: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  jawaii: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  lasagna: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  lighthalzen: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  louyang: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  malangdo: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  malaya: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  manuk: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  mid_camp: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  moc_ruins: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  mora: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  morocc: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  moscovia: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  niflheim: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  pay_arche: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  payon: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  prontera: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  prt_fild05: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  rachel: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  splendide: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  umbala: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  veins: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
+  xmas: {sprite: "4_F_06", class: 714}  # moon/warp_agent.npc
+  yuno: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc

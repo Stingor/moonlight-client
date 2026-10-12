@@ -17266,3 +17266,6 @@ tr: Los mensajes de chat no se mostrarán en la ventana de chat. [Mostrar OFF]
 
 fr: La parole s'affichera dans la fenêtre de conversation. [Affichage ON]
 tr: Los mensajes de chat se mostrarán en la ventana de chat. [Mostrar ON]
+
+fr: Warp Agent
+tr: Warp Agent

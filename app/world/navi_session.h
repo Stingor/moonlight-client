@@ -23,7 +23,7 @@
 #include "world/navi_trail_view.h"
 #include "world/navigation_compose.h"
 #include "world/world_map_compose.h"
-#include "world/world_map_kafra.h"
+#include "world/world_map_warp_agent.h"
 
 namespace moonclient {
 
@@ -66,10 +66,10 @@ class NaviSession {
   // sien dans la même image, et un seul sprite changerait de classe deux fois.
   std::optional<MonsterSprite> tip_sprite;
   std::uint32_t tip_map_entries = 0;
-  // LA KAFRA DE LA CARTE DU MONDE, au survol d'une ville qui téléporte, et
-  // l'entrée de carte où elle a été composée.
-  std::optional<WorldMapKafra> kafra;
-  std::uint32_t kafra_map_entries = 0;
+  // LE WARP AGENT DE LA CARTE DU MONDE, au survol d'une ville qui en a un, et
+  // l'entrée de carte où il a été composé.
+  std::optional<WorldMapWarpAgent> warp_agent;
+  std::uint32_t warp_agent_map_entries = 0;
 
   // Relit les préférences du joueur, puis lance la lecture des tables — une
   // fois par partie.

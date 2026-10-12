@@ -148,24 +148,15 @@ struct WorldMapPreview {
   SkinImage image;
 };
 
-// UNE DESTINATION DE LA KAFRA : la carte, et la flèche qui y mène, de la ville
-// à elle, en pixels de l'image.
-struct WorldMapKafraLeg {
-  WorldMapAirStop stop;
-  ImVec2 from{0.0F, 0.0F};
-  ImVec2 to{0.0F, 0.0F};
-};
-
-// LE SERVICE DE TÉLÉPORTATION D'UNE VILLE, montré au survol : ses flèches, ses
-// destinations, et la Kafra en haut à droite de la ville.
-struct WorldMapKafraView {
+// LE WARP AGENT D'UNE VILLE, montré au survol : sa figure en haut à droite de
+// la ville, et son nom à côté.
+struct WorldMapWarpAgentView {
   std::string_view town_map;
   WorldMapRect town;
-  std::span<const WorldMapKafraLeg> legs;
-  // L'image de la Kafra à cet instant, et ses pieds dans l'image.
+  // L'image de sa figure à cet instant, et ses pieds dans l'image.
   SkinImage sprite;
   ImVec2 sprite_feet{0.0F, 0.0F};
-  // La hauteur de la Kafra au-dessus de ses pieds, en pixels d'écran.
+  // La hauteur de la figure au-dessus de ses pieds, en pixels d'écran.
   float sprite_height = 0.0F;
 };
 
@@ -195,10 +186,8 @@ struct WorldMapView {
   // l'image précédente désignait.
   ImU32 select_box = IM_COL32(149, 15, 15, 70);
   std::optional<WorldMapPreview> preview;
-  // LA KAFRA de la ville désignée à l'image précédente, et ses flèches.
-  std::optional<WorldMapKafraView> kafra;
-  SkinImage kafra_arrow_body;
-  SkinImage kafra_arrow_head;
+  // LE WARP AGENT de la ville désignée à l'image précédente.
+  std::optional<WorldMapWarpAgentView> warp_agent;
   // LE GROUPE, sur le monde montré.
   std::span<const WorldMapPartyView> party;
   SkinImage party_face;
@@ -242,12 +231,8 @@ struct WorldMapWindowState {
   // La carte survolée à la dernière image : son aperçu se compose à la
   // suivante. Vide : aucune.
   std::string hovered_map;
-  // Le palier de taille de la dernière image : la Kafra s'y compose.
+  // Le palier de taille de la dernière image : le Warp Agent s'y compose.
   std::size_t size_tier = 0;
-  // LES FLÈCHES DE LA KAFRA poussent en une seconde, et repartent de zéro
-  // quand la souris passe à une autre ville.
-  std::string kafra_town;
-  float kafra_grow = 0.0F;
   // Le clic droit du staff sur une carte, posé par `app` selon ses droits, et
   // la carte que son menu désigne — le premier étage pour un donjon.
   bool staff_warp = false;
@@ -324,18 +309,18 @@ struct WorldMapFlight {
 };
 [[nodiscard]] WorldMapFlight FlyWorldMapLeg(ImVec2 from, ImVec2 to, float progress);
 
-// UNE FLÈCHE DE LA KAFRA, en pixels d'écran : un corps de dix pixels qui part
-// du bord de la ville et finit au bord de la destination — chaque bout avance
-// pixel par pixel hors de son rectangle —, long de `progress`. Tant qu'elle
-// pousse, une pointe de vingt pixels la termine : ses trois coins, le haut de
-// l'image au bout de la pointe.
-struct WorldMapArrow {
-  WorldMapQuad body;
-  std::optional<std::array<ImVec2, 3>> head;
+// LA PLACE DU WARP AGENT, en pixels d'écran, pour une ville dont `town` est le
+// rectangle à l'écran : les pieds de la figure sur le coin haut droit de la
+// ville — sans monter plus haut que six pixels plus sa hauteur sous le haut de
+// l'image, `image_top` —, et son nom à droite des pieds, le milieu de la ligne
+// à mi-hauteur de la figure. `sprite_corner` est le coin haut gauche de
+// l'image ; `label_at` le haut gauche du texte, haut de `font_pixels`.
+struct WorldMapWarpAgentPlace {
+  ImVec2 sprite_corner{0.0F, 0.0F};
+  ImVec2 label_at{0.0F, 0.0F};
 };
-[[nodiscard]] std::optional<WorldMapArrow> MakeWorldMapArrow(ImVec2 from, ImVec2 to,
-                                                             const WorldMapRect& from_box,
-                                                             const WorldMapRect& to_box,
-                                                             float progress, ImU32 color);
+[[nodiscard]] WorldMapWarpAgentPlace PlaceWorldMapWarpAgent(const WorldMapWarpAgentView& agent,
+                                                            const WorldMapRect& town,
+                                                            float image_top, float font_pixels);
 
 }  // namespace ro::ui

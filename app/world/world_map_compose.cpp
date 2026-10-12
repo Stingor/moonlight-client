@@ -32,13 +32,6 @@ constexpr std::string_view kPartyFaceImage = "worldview_interface\\wv_face.bmp";
 constexpr std::string_view kPartyFaceHereImage = "worldview_interface\\wv_face1.bmp";
 constexpr std::string_view kStepMarkImage = "worldview_interface\\wv_select.bmp";
 constexpr std::string_view kPreviewFolder = "map\\";
-// Les flèches de la Kafra, sous la racine des textures.
-constexpr std::string_view kKafraArrowBody = "maparrow_body.bmp";
-constexpr std::string_view kKafraArrowHead = "maparrow_head.bmp";
-// IZLUDE EST COLLÉE À PRONTERA : la flèche qui y mène part du bord droit de la
-// ville, et vise le haut de sa case, aux quatre cinquièmes de sa largeur.
-constexpr std::string_view kKafraNarrowTown = "izlude";
-constexpr float kKafraNarrowAim = 0.8F;
 // L'IMAGE D'UN PALIER DE RECHERCHE : la carte, cinq paliers de monstres, le PNJ
 // seul puis avec cinq paliers de monstres.
 constexpr std::string_view kSearchImagePrefix = "worldview_interface\\wv_sreach";
@@ -230,7 +223,6 @@ const ro::ui::WorldMapView& WorldMapComposer::Compose(const WorldMapSources& sou
   member_names_.clear();
   members_.clear();
   party_.clear();
-  kafra_legs_.clear();
   route_.clear();
   air_stops_.clear();
   air_tours_.clear();
@@ -288,7 +280,7 @@ const ro::ui::WorldMapView& WorldMapComposer::Compose(const WorldMapSources& sou
   ComposeRoute(sources, shown);
   ComposeAirLines(sources, world);
   ComposeParty(sources, shown);
-  ComposeKafra(sources, world);
+  ComposeWarpAgent(sources, world);
 
   view_.worlds = world_names_;
   view_.world = static_cast<int>(shown);
@@ -388,10 +380,6 @@ const ro::ui::WorldMapView& WorldMapComposer::Compose(const WorldMapSources& sou
     view_.air_trail = sources.image_at(kAirTrailImage);
     view_.airship = sources.image_at(kAirshipImage);
   }
-  if (sources.texture_at) {
-    view_.kafra_arrow_body = sources.texture_at(kKafraArrowBody);
-    view_.kafra_arrow_head = sources.texture_at(kKafraArrowHead);
-  }
   return view_;
 }
 
@@ -457,50 +445,24 @@ void WorldMapComposer::ComposeParty(const WorldMapSources& sources, std::size_t 
   }
 }
 
-void WorldMapComposer::ComposeKafra(const WorldMapSources& sources,
-                                    const ro::vfs::WorldView& world) {
-  if (sources.kafra_maps == nullptr || sources.preview_map.empty()) {
+void WorldMapComposer::ComposeWarpAgent(const WorldMapSources& sources,
+                                        const ro::vfs::WorldView& world) {
+  if (sources.warp_agents == nullptr || sources.preview_map.empty() ||
+      !sources.warp_agents->ClassAt(sources.preview_map).has_value()) {
     return;
   }
-  const std::span<const std::string> destinations =
-      sources.kafra_maps->DestinationsOf(sources.preview_map);
   const auto town =
       std::ranges::find(world.areas, sources.preview_map, &ro::vfs::WorldArea::map_name);
-  if (destinations.empty() || town == world.areas.end()) {
+  if (town == world.areas.end()) {
     return;
   }
-  const auto center = [](const ro::vfs::WorldRect& rect) {
-    return ImVec2(static_cast<float>(rect.right - rect.left) * 0.5F + static_cast<float>(rect.left),
-                  static_cast<float>(rect.bottom - rect.top) * 0.5F + static_cast<float>(rect.top));
-  };
-  // LES DESTINATIONS SE CHERCHENT SUR LE PREMIER MONDE, celui des Kafra.
-  const std::vector<ro::vfs::WorldArea>& first = sources.tables->worlds().front().areas;
-  for (const std::string& destination : destinations) {
-    const auto area = std::ranges::find(first, destination, &ro::vfs::WorldArea::map_name);
-    if (area == first.end()) {
-      continue;
-    }
-    ro::ui::WorldMapKafraLeg leg{.stop = {.rect = RectOf(area->rect),
-                                          .map_name = area->map_name,
-                                          .title = ShownNameOf(*area, sources.map_names)},
-                                 .from = center(town->rect),
-                                 .to = center(area->rect)};
-    if (area->map_name == kKafraNarrowTown) {
-      leg.from.x = static_cast<float>(town->rect.right);
-      leg.to = ImVec2(static_cast<float>(area->rect.left) +
-                          kKafraNarrowAim * static_cast<float>(area->rect.right - area->rect.left),
-                      static_cast<float>(area->rect.top));
-    }
-    kafra_legs_.push_back(leg);
+  ro::ui::WorldMapWarpAgentView agent{.town_map = town->map_name, .town = RectOf(town->rect)};
+  if (sources.warp_agent_sprite != nullptr) {
+    agent.sprite = sources.warp_agent_sprite->image;
+    agent.sprite_feet = sources.warp_agent_sprite->feet;
+    agent.sprite_height = sources.warp_agent_sprite->height;
   }
-  ro::ui::WorldMapKafraView kafra{
-      .town_map = town->map_name, .town = RectOf(town->rect), .legs = kafra_legs_};
-  if (sources.kafra_sprite != nullptr) {
-    kafra.sprite = sources.kafra_sprite->image;
-    kafra.sprite_feet = sources.kafra_sprite->feet;
-    kafra.sprite_height = sources.kafra_sprite->height;
-  }
-  view_.kafra = kafra;
+  view_.warp_agent = agent;
 }
 
 void WorldMapComposer::ComposeAirLines(const WorldMapSources& sources,

@@ -52,7 +52,7 @@ add_library(ro_vfs STATIC
     src/text_table.cpp
     src/town_info.cpp
     src/world_view.cpp
-    src/kafra_move_maps.cpp
+    src/warp_agents.cpp
     src/warp_list_words.cpp
     src/warp_memo_words.cpp
     src/vfs.cpp)

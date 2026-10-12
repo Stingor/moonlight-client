@@ -136,7 +136,7 @@ add_library(ro_ui STATIC
     src/minimap_settings.cpp
     src/minimap_window.cpp
     src/world_map_flight.cpp
-    src/world_map_kafra.cpp
+    src/world_map_warp_agent.cpp
     src/world_map_marks.cpp
     src/world_map_window.cpp
     src/modal_box.cpp

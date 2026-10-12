@@ -33,8 +33,6 @@ namespace moonclient {
 namespace {
 
 constexpr std::string_view kGatExtension = ".gat";
-// La racine des textures du client, où vivent les flèches de la Kafra.
-constexpr std::string_view kTextureRoot = "data\\texture\\";
 
 // La ligne choisie dans la fenêtre ; une référence hors liste quand rien ne
 // l'est, que `HitAt` refuse.
@@ -297,30 +295,21 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     const std::vector<WorldMapMember> party = WorldMapPartyMembers(
         party_, world_.player_id(),
         self != nullptr ? std::string_view(self->name) : std::string_view(), here, party_maps);
-    // LA KAFRA de la ville désignée, si elle en a une. La garde-robe se vide à
-    // chaque entrée de carte : la Kafra se recompose alors de zéro.
-    const ro::vfs::KafraMoveMaps* kafra_maps =
-        pieces_.kafra_move_maps.has_value() ? &*pieces_.kafra_move_maps : nullptr;
-    WorldMapKafra::Shown kafra_shown;
-    if (kafra_maps != nullptr && pieces_.wardrobe.has_value() &&
-        !kafra_maps->DestinationsOf(navigation.world_map.hovered_map).empty()) {
-      if (!navi_.kafra.has_value() || navi_.kafra_map_entries != world_.map_entries()) {
-        navi_.kafra.emplace(*pieces_.wardrobe);
-        navi_.kafra_map_entries = world_.map_entries();
+    // LE WARP AGENT de la ville désignée, si elle en a un. La garde-robe se
+    // vide à chaque entrée de carte : sa figure se recompose alors de zéro.
+    const ro::vfs::WarpAgents* agents =
+        pieces_.warp_agents.has_value() ? &*pieces_.warp_agents : nullptr;
+    const std::optional<std::uint32_t> agent_job =
+        agents != nullptr ? agents->ClassAt(navigation.world_map.hovered_map) : std::nullopt;
+    WorldMapWarpAgent::Shown agent_shown;
+    if (agent_job.has_value() && pieces_.wardrobe.has_value()) {
+      if (!navi_.warp_agent.has_value() || navi_.warp_agent_map_entries != world_.map_entries()) {
+        navi_.warp_agent.emplace(*pieces_.wardrobe);
+        navi_.warp_agent_map_entries = world_.map_entries();
       }
-      kafra_shown =
-          navi_.kafra->Compose(WorldMapKafraScale(navigation.world_map.size_tier), now_ms);
+      agent_shown = navi_.warp_agent->Compose(
+          *agent_job, WorldMapWarpAgentScale(navigation.world_map.size_tier), now_ms);
     }
-    const MinimapImageAt texture_at = [this](std::string_view path) -> ro::ui::SkinImage {
-      if (!pieces_.game_images.has_value()) return {};
-      std::string full(kTextureRoot);
-      full += path;
-      const ro::render::IconTexture& icon = pieces_.game_images->GetOurs(full);
-      if (!icon.usable()) return {};
-      return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                               .width = static_cast<float>(icon.width_px),
-                               .height = static_cast<float>(icon.height_px)};
-    };
     navigation.world_map_view = &navi_.world_map_view.Compose(WorldMapSources{
         .tables = &*pieces_.world_view,
         .here_map = here,
@@ -329,13 +318,12 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
         .step_map = step_map,
         .party = party,
         .preview_map = navigation.world_map.hovered_map,
-        .kafra_maps = kafra_maps,
-        .kafra_sprite = &kafra_shown,
+        .warp_agents = agents,
+        .warp_agent_sprite = &agent_shown,
         .navi = data,
         .search = navi_.navigation_view.groups(),
         .chosen_world = navigation.world_map.world,
-        .image_at = image_at,
-        .texture_at = texture_at});
+        .image_at = image_at});
   } else {
     navigation.world_map_view = nullptr;
   }

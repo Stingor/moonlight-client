@@ -11,22 +11,19 @@
 
 namespace moonclient {
 
-// LA KAFRA DE LA CARTE DU MONDE, celle de la classe de PNJ 112.
-inline constexpr std::uint32_t kWorldMapKafraClass = 112;
-
 // L'IMAGE DE SON ATTENTE À UN INSTANT : le tour dure quatre secondes, partagées
 // également entre les images, quelle que soit la durée que le .act leur donne.
-[[nodiscard]] std::size_t WorldMapKafraFrame(std::size_t frames, std::uint32_t now_ms);
+[[nodiscard]] std::size_t WorldMapWarpAgentFrame(std::size_t frames, std::uint32_t now_ms);
 
-// L'ÉCHELLE DE LA KAFRA à un palier de taille : la moitié au premier, deux
+// L'ÉCHELLE DU WARP AGENT à un palier de taille : la moitié au premier, deux
 // dixièmes de plus à chacun des suivants.
-[[nodiscard]] float WorldMapKafraScale(std::size_t size_tier);
+[[nodiscard]] float WorldMapWarpAgentScale(std::size_t size_tier);
 
-// Compose la Kafra, de face, dans une image qui dure d'une image de jeu à
-// l'autre.
-class WorldMapKafra {
+// Compose la figure d'un Warp Agent, de face, dans une image qui dure d'une
+// image de jeu à l'autre.
+class WorldMapWarpAgent {
  public:
-  explicit WorldMapKafra(ro::render::ActorWardrobe& wardrobe)
+  explicit WorldMapWarpAgent(ro::render::ActorWardrobe& wardrobe)
       : wardrobe_(&wardrobe), vignette_(wardrobe) {}
 
   struct Shown {
@@ -35,7 +32,8 @@ class WorldMapKafra {
     ImVec2 feet{0.0F, 0.0F};
     float height = 0.0F;
   };
-  [[nodiscard]] Shown Compose(float scale, std::uint32_t now_ms);
+  // `job` : la classe de PNJ de sa figure, celle que le serveur annonce.
+  [[nodiscard]] Shown Compose(std::uint32_t job, float scale, std::uint32_t now_ms);
 
  private:
   ro::render::ActorWardrobe* wardrobe_;

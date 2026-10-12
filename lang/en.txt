@@ -17266,3 +17266,6 @@ tr: Chat content will not be displayed in the chat window. [Display OFF]
 
 fr: La parole s'affichera dans la fenêtre de conversation. [Affichage ON]
 tr: Chat content will be displayed in the chat window. [Display ON]
+
+fr: Warp Agent
+tr: Warp Agent

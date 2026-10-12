@@ -1,6 +1,6 @@
-// La Kafra de la carte du monde. Voir l'en-tête.
+// Le Warp Agent de la carte du monde. Voir l'en-tête.
 
-#include "world/world_map_kafra.h"
+#include "world/world_map_warp_agent.h"
 
 #include <algorithm>
 
@@ -12,12 +12,12 @@ namespace {
 constexpr std::uint32_t kTourMs = 4000;
 constexpr float kFirstScale = 0.5F;
 constexpr float kScaleStep = 0.2F;
-// La boîte où elle se compose, assez grande pour la plus grande échelle.
+// La boîte où il se compose, assez grande pour la plus grande échelle.
 constexpr std::int32_t kBoxPixels = 256;
 
 }  // namespace
 
-std::size_t WorldMapKafraFrame(std::size_t frames, std::uint32_t now_ms) {
+std::size_t WorldMapWarpAgentFrame(std::size_t frames, std::uint32_t now_ms) {
   if (frames == 0) {
     return 0;
   }
@@ -27,13 +27,14 @@ std::size_t WorldMapKafraFrame(std::size_t frames, std::uint32_t now_ms) {
   return std::min(frame, frames - 1);
 }
 
-float WorldMapKafraScale(std::size_t size_tier) {
+float WorldMapWarpAgentScale(std::size_t size_tier) {
   return kFirstScale + kScaleStep * static_cast<float>(size_tier);
 }
 
-WorldMapKafra::Shown WorldMapKafra::Compose(float scale, std::uint32_t now_ms) {
+WorldMapWarpAgent::Shown WorldMapWarpAgent::Compose(std::uint32_t job, float scale,
+                                                    std::uint32_t now_ms) {
   ro::render::ActorLook look;
-  look.job = kWorldMapKafraClass;
+  look.job = job;
   const ro::render::ActorOutfit* outfit = wardrobe_->OutfitFor(look);
   if (outfit == nullptr) {
     return {};
@@ -43,7 +44,7 @@ WorldMapKafra::Shown WorldMapKafra::Compose(float scale, std::uint32_t now_ms) {
   pose.animation = ro::render::kAnimationIdle;
   pose.direction = 0;
   pose.held_frame =
-      WorldMapKafraFrame(outfit->BodyActionFrameCount(ro::render::kAnimationIdle, 0), now_ms);
+      WorldMapWarpAgentFrame(outfit->BodyActionFrameCount(ro::render::kAnimationIdle, 0), now_ms);
   pose.box.width = kBoxPixels;
   pose.box.height = kBoxPixels;
   pose.box.scale = scale;

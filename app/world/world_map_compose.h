@@ -11,12 +11,12 @@
 #include "ro/sim/navi_search.h"
 #include "ro/sim/party_roster.h"
 #include "ro/ui/world_map_window.h"
-#include "ro/vfs/kafra_move_maps.h"
 #include "ro/vfs/map_display_names.h"
+#include "ro/vfs/warp_agents.h"
 #include "ro/vfs/world_view.h"
 
 #include "world/minimap_compose.h"
-#include "world/world_map_kafra.h"
+#include "world/world_map_warp_agent.h"
 
 namespace moonclient {
 
@@ -53,13 +53,13 @@ struct WorldMapSources {
   std::string_view step_map;
   // Le groupe, chacun sur sa carte.
   std::span<const WorldMapMember> party;
-  // La carte que la souris désignait à l'image précédente : son aperçu, et sa
-  // Kafra si elle en a une.
+  // La carte que la souris désignait à l'image précédente : son aperçu, et son
+  // Warp Agent si elle en a un.
   std::string_view preview_map;
-  // Les destinations des Kafra, et la Kafra composée pour cette image. Nul :
-  // aucune.
-  const ro::vfs::KafraMoveMaps* kafra_maps = nullptr;
-  const WorldMapKafra::Shown* kafra_sprite = nullptr;
+  // Les cartes qui ont un Warp Agent, et sa figure composée pour cette image.
+  // Nul : aucun.
+  const ro::vfs::WarpAgents* warp_agents = nullptr;
+  const WorldMapWarpAgent::Shown* warp_agent_sprite = nullptr;
   // Les tables de la navigation : les monstres de chaque carte. Nul : aucun.
   const ro::formats::NaviData* navi = nullptr;
   // La dernière recherche de la navigation : ses cartes se surlignent.
@@ -69,8 +69,6 @@ struct WorldMapSources {
   int chosen_world = -1;
   // Une image sous la racine d'interface, par son nom.
   MinimapImageAt image_at;
-  // Une image sous la racine des textures, par son nom.
-  MinimapImageAt texture_at;
 };
 
 // ── LA RECHERCHE SUR LA CARTE DU MONDE ─────────────────────────────────────
@@ -101,7 +99,7 @@ class WorldMapComposer {
   void ComposeRoute(const WorldMapSources& sources, std::size_t shown);
   void ComposeAirLines(const WorldMapSources& sources, const ro::vfs::WorldView& world);
   void ComposeParty(const WorldMapSources& sources, std::size_t shown);
-  void ComposeKafra(const WorldMapSources& sources, const ro::vfs::WorldView& world);
+  void ComposeWarpAgent(const WorldMapSources& sources, const ro::vfs::WorldView& world);
 
   std::vector<const char*> world_names_;
   std::vector<ro::ui::WorldMapMonsterView> monsters_;
@@ -115,7 +113,6 @@ class WorldMapComposer {
   std::vector<std::string> member_names_;
   std::vector<ro::ui::WorldMapMemberView> members_;
   std::vector<ro::ui::WorldMapPartyView> party_;
-  std::vector<ro::ui::WorldMapKafraLeg> kafra_legs_;
   ro::ui::WorldMapView view_;
 };
 

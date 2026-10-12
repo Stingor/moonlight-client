@@ -34,7 +34,6 @@
 #include "ro/vfs/item_properties.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/job_names.h"
-#include "ro/vfs/kafra_move_maps.h"
 #include "ro/vfs/map_display_names.h"
 #include "ro/vfs/monster_list.h"
 #include "ro/vfs/package_items.h"
@@ -42,6 +41,7 @@
 #include "ro/vfs/skill_words.h"
 #include "ro/vfs/status_table.h"
 #include "ro/vfs/vfs.h"
+#include "ro/vfs/warp_agents.h"
 #include "ro/vfs/world_view.h"
 
 #include "character/grimoire_keys.h"
@@ -343,9 +343,9 @@ struct GamePieces {
   // LA CARTE DU MONDE : ses mondes, leurs cartes et leurs donjons. Absente, la
   // minimap dit que la carte du monde manque.
   std::optional<ro::vfs::WorldViewTables> world_view;
-  // LES DESTINATIONS DES KAFRA, que la carte du monde montre au survol d'une
-  // ville. Absentes, elle n'en montre aucune.
-  std::optional<ro::vfs::KafraMoveMaps> kafra_move_maps;
+  // LES CARTES QUI ONT UN WARP AGENT, et sa figure : la carte du monde la
+  // montre au survol de la ville. Absentes, elle n'en montre aucun.
+  std::optional<ro::vfs::WarpAgents> warp_agents;
   // La langue dans laquelle les deux catalogues se sont lus. Voir
   // `FollowQuestLanguage`.
   std::string quest_language;

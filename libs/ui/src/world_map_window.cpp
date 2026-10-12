@@ -240,7 +240,7 @@ WorldMapAction DrawWorldMapWindow(WorldMapWindowState& state, const WorldMapView
   state.hovered_map = std::string(hovered_map);
   state.size_tier = WorldMapSizeTier(view.image_size.x * fit.scale);
   DrawWorldMapHover(into, fit, view, hover);
-  DrawWorldMapKafra(into, fit, view, state, hovered_map);
+  DrawWorldMapWarpAgent(into, fit, view, hovered_map);
   // LES DIRIGEABLES, qui ne se montrent qu'au survol, puis les lettres et les
   // filets par-dessus les images.
   DrawWorldMapAirLines(into, fit, view, state, hovered_map);

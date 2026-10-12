@@ -476,13 +476,13 @@ void LoadWorldView(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   }
   ro::core::LogInfo("carte du monde : {} monde(s)", tables->worlds().size());
   pieces.world_view = std::move(*tables);
-  auto kafra = ro::vfs::KafraMoveMaps::Load(vfs);
-  if (!kafra) {
-    ro::core::LogWarning("carte du monde : pas de destinations des Kafra — {}",
-                         ro::core::Describe(kafra.error()));
+  auto agents = ro::vfs::WarpAgents::Load(vfs);
+  if (!agents) {
+    ro::core::LogWarning("carte du monde : pas de table des Warp Agent — {}",
+                         ro::core::Describe(agents.error()));
     return;
   }
-  pieces.kafra_move_maps = std::move(*kafra);
+  pieces.warp_agents = std::move(*agents);
 }
 
 // LE NOM LISIBLE DE CHAQUE CARTE. Absente, une destination s'écrit avec le mot

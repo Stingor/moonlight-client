@@ -17,14 +17,13 @@ void DrawWorldMapRoute(ImDrawList* into, const WorldMapFit& fit, const WorldMapV
 void DrawWorldMapAirLines(ImDrawList* into, const WorldMapFit& fit, const WorldMapView& view,
                           WorldMapWindowState& state, std::string_view hovered_map);
 
-// LES ÉTIQUETTES D'ESCALES — d'un dirigeable ou de la Kafra —, une par carte,
-// sauf celle qu'on survole : un voile, un filet blanc, et le nom en orangé.
+// LES ÉTIQUETTES D'ESCALES D'UN DIRIGEABLE, une par carte, sauf celle qu'on
+// survole : un voile, un filet blanc, et le nom en orangé.
 void LabelWorldMapStops(ImDrawList* into, const WorldMapFit& fit,
                         std::span<const WorldMapAirStop> stops, std::string_view hovered_map);
 
-// LA KAFRA DE LA VILLE SURVOLÉE : ses flèches poussent, puis elle-même et les
-// étiquettes de ses destinations.
-void DrawWorldMapKafra(ImDrawList* into, const WorldMapFit& fit, const WorldMapView& view,
-                       WorldMapWindowState& state, std::string_view hovered_map);
+// LE WARP AGENT DE LA VILLE SURVOLÉE : sa figure, et son nom à côté.
+void DrawWorldMapWarpAgent(ImDrawList* into, const WorldMapFit& fit, const WorldMapView& view,
+                           std::string_view hovered_map);
 
 }  // namespace ro::ui
