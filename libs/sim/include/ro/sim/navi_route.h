@@ -5,7 +5,6 @@
 #include <optional>
 #include <vector>
 
-#include "ro/formats/navi_npc_distances.h"
 #include "ro/formats/navi_tables.h"
 
 namespace ro::sim {
@@ -23,9 +22,8 @@ namespace ro::sim {
 //   · le DÉPART est mesuré, pas estimé — l'appelant fournit la vraie marche du
 //     joueur jusqu'à chaque sortie de sa carte, calculée sur sa grille ;
 //   · l'ARRIVÉE aussi : l'appelant fournit la marche de la sortie de chaque
-//     liaison jusqu'à la destination, mesurée sur la grille de la carte visée ou
-//     lue dans la table des distances aux PNJ. Sans elle, une case ou un PNJ
-//     d'une autre carte n'a pas d'itinéraire ;
+//     liaison jusqu'à la destination, mesurée sur la grille de la carte visée.
+//     Sans elle, une case ou un PNJ d'une autre carte n'a pas d'itinéraire ;
 //   · chaque passage coûte en plus un forfait — l'écran de chargement d'un
 //     portail, le dialogue d'un PNJ — pour que, à marche égale, l'itinéraire qui
 //     change moins souvent de carte l'emporte.
@@ -96,13 +94,6 @@ struct NaviRoute {
                                                      const NaviRouteOptions& options,
                                                      const NaviStartCost& start_cost = {},
                                                      const NaviGoalCost& goal_cost = {});
-
-// L'arrivée lue dans la table des distances aux PNJ, pour le PNJ visé. Une
-// liaison absente de sa liste ne mène pas à lui. Vide quand la table ne dit
-// rien de ce PNJ : aucune liaison ne mène alors à lui.
-[[nodiscard]] NaviGoalCost NaviTableGoalCost(const formats::NaviData& data,
-                                             const formats::NaviNpcDistances& table,
-                                             std::uint32_t npc_id);
 
 // La liaison est-elle permise par ces options ?
 [[nodiscard]] bool NaviLinkAllowed(const formats::NaviLink& link,

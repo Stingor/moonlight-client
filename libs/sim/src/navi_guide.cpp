@@ -161,10 +161,6 @@ void NaviGuide::Plan(formats::NaviMapIndex here, const WalkMap* walk, CellPositi
         };
       }
     }
-    if (!goal_cost && goal.kind == NaviGoalKind::kNpc && goal_terrain_ != nullptr) {
-      if (const formats::NaviNpcDistances* table = goal_terrain_->NpcDistancesOn(*data_, goal_name))
-        goal_cost = NaviTableGoalCost(*data_, *table, request_.npc_id);
-    }
   }
 
   const NaviStart start{here, player.x, player.y};

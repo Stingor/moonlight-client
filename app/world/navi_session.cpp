@@ -44,7 +44,7 @@ void NaviSession::Open(const std::filesystem::path& client_root,
     ro::vfs::NaviLoadReport report;
     auto data = ro::vfs::LoadNaviData(*vfs, report);
     if (!data) {
-      ro::core::LogWarning("navigation : tables illisibles ({}) — pas de guidage cette partie",
+      ro::core::LogWarning("navigation : table illisible ({}) — pas de guidage cette partie",
                            ro::core::Describe(data.error()));
     } else {
       ro::core::LogInfo(
@@ -52,18 +52,7 @@ void NaviSession::Open(const std::filesystem::path& client_root,
           "analysés en {} ms",
           data->maps.size(), data->npcs.size(), data->spawns.size(), data->links.size(),
           report.bytes, report.read_ms, report.parse_ms);
-      if (!report.degraded.empty())
-        ro::core::LogWarning("navigation : données incomplètes — {}", report.degraded);
-      const ro::formats::NaviSkipCounts& skipped = data->skipped;
-      if (skipped.npcs_on_unknown_map + skipped.links_on_unknown_map +
-              skipped.spawns_on_unknown_map !=
-          0)
-        ro::core::LogWarning(
-            "navigation : génération périmée ? {} PNJ, {} liaisons et {} apparitions sur des "
-            "cartes inconnues",
-            skipped.npcs_on_unknown_map, skipped.links_on_unknown_map,
-            skipped.spawns_on_unknown_map);
-      if (data->link_steps == ro::formats::NaviSteps::kModulo256)
+      if (!data->exact_steps)
         ro::core::LogWarning(
             "navigation : distances entre liaisons d'un ancien générateur (longueurs modulo 256, "
             "redressées) — à régénérer");

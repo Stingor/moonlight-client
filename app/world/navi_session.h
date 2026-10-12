@@ -30,8 +30,8 @@ namespace moonclient {
 // LA NAVIGATION D'UNE PARTIE : les données du graphe, le guidage en cours, les
 // repères du serveur, et ce que le joueur a réglé.
 //
-// ⚠ LES TABLES SE LISENT EN ARRIÈRE-PLAN. Une dizaine de mégaoctets de texte :
-// les lire sur le fil de rendu figerait l'entrée en jeu d'une demi-seconde. Le
+// ⚠ LA TABLE SE LIT EN ARRIÈRE-PLAN. Quelques mégaoctets de texte :
+// la lire sur le fil de rendu figerait l'entrée en jeu. Le
 // fil de lecture monte SA PROPRE archive — un `Vfs` n'est pas fait pour être lu
 // de deux fils à la fois —, et la partie adopte le résultat quand il est prêt.
 // Une demande de guidage faite avant attend (`NaviGuideStatus::kPending`).
@@ -80,9 +80,8 @@ class NaviSession {
   // ne doit pas réécrire les réglages.
   void Open(const std::filesystem::path& client_root, const ro::vfs::MountOptions& mount);
   // L'archive de la partie, lue sur le fil de rendu quand le guidage calcule
-  // un itinéraire : la grille de la carte visée, et au besoin la table des
-  // distances aux PNJ. Nulle : une case ou un PNJ d'une autre carte n'a pas
-  // d'itinéraire.
+  // un itinéraire : la grille de la carte visée. Nulle : une case ou un PNJ
+  // d'une autre carte n'a pas d'itinéraire.
   void UseArchive(ro::vfs::Vfs* vfs);
   // Adopte les tables quand le fil les a lues. À chaque image, sans coût tant
   // que rien n'est prêt. `here_map` est la carte où l'on se tient : la

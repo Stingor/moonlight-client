@@ -1,13 +1,11 @@
 #include "world/navi_goal_terrain.h"
 
 #include <string>
-#include <utility>
 
 #include "ro/core/ascii.h"
 #include "ro/core/error.h"
 #include "ro/core/log.h"
 #include "ro/formats/gat.h"
-#include "ro/vfs/navi_library.h"
 
 namespace moonclient {
 namespace {
@@ -37,37 +35,6 @@ const ro::sim::WalkMap* NaviGoalLoader::GridOf(std::string_view map_name) {
     }
   }
   return grid_->walk.has_value() ? &*grid_->walk : nullptr;
-}
-
-const ro::formats::NaviNpcDistances* NaviGoalLoader::NpcDistancesOn(
-    const ro::formats::NaviData& data, std::string_view map_name) {
-  if (vfs_ == nullptr) return nullptr;
-  if (!table_tried_) {
-    table_tried_ = true;
-    if (auto file = ro::vfs::LoadNaviNpcDistanceFile(*vfs_)) {
-      ro::core::LogInfo("navigation : distances aux PNJ indexées — {} cartes, {} octets",
-                        file->map_count(), file->byte_count());
-      if (file->steps() == ro::formats::NaviSteps::kModulo256)
-        ro::core::LogWarning(
-            "navigation : distances aux PNJ d'un ancien générateur (longueurs modulo 256, "
-            "redressées) — à régénérer");
-      table_file_ = std::move(*file);
-    } else {
-      ro::core::LogWarning("navigation : distances aux PNJ illisibles ({})",
-                           ro::core::Describe(file.error()));
-    }
-  }
-  if (!table_file_.has_value()) return nullptr;
-  const std::string wanted = ro::core::AsciiLower(map_name);
-  if (!distances_.has_value() || distances_->map_name != wanted) {
-    distances_ = Distances{.map_name = wanted, .table = std::nullopt};
-    if (auto table = table_file_->ReadMap(wanted, data)) {
-      distances_->table = std::move(*table);
-    } else {
-      ro::core::LogWarning("navigation : {}", ro::core::Describe(table.error()));
-    }
-  }
-  return distances_->table.has_value() ? &*distances_->table : nullptr;
 }
 
 }  // namespace moonclient

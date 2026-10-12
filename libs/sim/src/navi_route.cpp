@@ -6,7 +6,6 @@
 #include <limits>
 #include <optional>
 #include <queue>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -24,7 +23,7 @@ namespace link_kind = formats::navi_link_kind;
 constexpr std::uint32_t kUnreached = std::numeric_limits<std::uint32_t>::max();
 constexpr std::uint32_t kNoPrevious = std::numeric_limits<std::uint32_t>::max();
 
-// Les tables du serveur comptent la marche en PAS ; le planificateur compte en
+// La table de navigation compte la marche en PAS ; le planificateur compte en
 // unités de pas, dix par case droite, comme la recherche de chemin.
 [[nodiscard]] std::uint32_t StepsToCost(std::int32_t steps) noexcept {
   return steps <= 0 ? 0 : static_cast<std::uint32_t>(steps) * kMoveCost;
@@ -47,29 +46,6 @@ constexpr std::uint32_t kNoPrevious = std::numeric_limits<std::uint32_t>::max();
 }
 
 }  // namespace
-
-NaviGoalCost NaviTableGoalCost(const NaviData& data, const formats::NaviNpcDistances& table,
-                               std::uint32_t npc_id) {
-  const formats::NaviNpc* npc = data.FindNpc(npc_id);
-  if (npc == nullptr) return {};
-  std::unordered_map<std::uint32_t, std::uint32_t> legs;
-  for (const formats::NaviNpcPassRun& run : table.PassesTo(npc_id)) {
-    for (std::uint32_t offset = 0; offset < run.link_count; ++offset) {
-      const std::uint32_t link_id = run.first_link_id + offset;
-      const NaviLink* link = data.FindLink(link_id);
-      if (link == nullptr) continue;
-      legs.emplace(link_id, StepsToCost(formats::NaviExactSteps(
-                                table.steps, run.distance_cells, link->dest_cell_x,
-                                link->dest_cell_y, npc->cell_x, npc->cell_y)));
-    }
-  }
-  if (legs.empty()) return {};
-  return [legs = std::move(legs)](const NaviLink& link) -> std::optional<std::uint32_t> {
-    const auto found = legs.find(link.link_id);
-    if (found == legs.end()) return std::nullopt;
-    return found->second;
-  };
-}
 
 bool NaviLinkAllowed(const NaviLink& link, const NaviRouteOptions& options) noexcept {
   switch (link.kind) {
@@ -154,11 +130,7 @@ std::optional<NaviRoute> PlanNaviRoute(const NaviData& data, const NaviStart& st
       for (std::uint32_t offset = 0; offset < run.link_count; ++offset) {
         const auto next = data.LinkSlot(run.first_link_id + offset);
         if (!next || !NaviLinkAllowed(data.links[*next], options)) continue;
-        const NaviLink& onward = data.links[*next];
-        const std::int32_t steps =
-            formats::NaviExactSteps(data.link_steps, run.distance_cells, link.dest_cell_x,
-                                    link.dest_cell_y, onward.cell_x, onward.cell_y);
-        offer(*next, Saturating(arrived, StepsToCost(steps)), node);
+        offer(*next, Saturating(arrived, StepsToCost(run.distance_cells)), node);
       }
     }
   }

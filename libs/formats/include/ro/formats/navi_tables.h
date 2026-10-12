@@ -15,44 +15,32 @@ namespace ro::formats {
 
 // LES DONNÉES DE LA NAVIGATION : le graphe du monde, tel que le serveur le décrit.
 //
-// Six tables, GÉNÉRÉES par le serveur depuis ce qu'il a réellement chargé — les
-// cartes, les PNJ qu'on peut chercher, les liaisons entre cartes, les apparitions
-// de monstres, puis deux tables de DISTANCES précalculées à la marche :
+// Une table, `navigation.yml`, que `scripts/yaml_tables/navigation.py` tire du
+// générateur de navigation du serveur : les cartes, les PNJ qu'on peut chercher,
+// les apparitions de monstres, les liaisons entre cartes, et, depuis la sortie de
+// chaque liaison, la marche jusqu'à chaque liaison de la carte d'arrivée. La
+// marche jusqu'à une case ou un PNJ ne s'y trouve pas : le guidage la mesure sur
+// la grille de la carte visée.
 //
-//   · d'une liaison entrante à chaque liaison sortante de la carte d'arrivée ;
-//   · d'une liaison entrante à chaque PNJ de la carte d'arrivée.
+// C'est du YAML en style FLUX, une entrée par ligne, que le script écrit dans un
+// ordre fixe : les cartes d'abord, puisque les autres sections les nomment. Il
+// pèse quelques mégaoctets ; un lecteur YAML générique bâtirait un nœud par
+// champ. Ce lecteur-ci n'accepte que ce que le script écrit et va droit aux
+// structures.
 //
-// Ces fichiers portent l'extension .lub mais sont du Lua EN CLAIR, et d'une
-// grammaire bien plus étroite que celle que lit `ReadLuaSource` : des listes
-// d'accolades à plat, des chaînes et des entiers. Ils pèsent une dizaine de
-// mégaoctets, et le lecteur générique bâtirait une table partagée par ligne — des
-// centaines de milliers d'allocations pour des enregistrements de huit champs. Ce
-// lecteur-ci va droit aux structures, sans arbre intermédiaire.
-//
-// ⚠ UNE ENTRÉE INCOMPRÉHENSIBLE REFUSE LE FICHIER ; UNE ENTRÉE ORPHELINE NE LE
-// REFUSE PAS. Une accolade manquante ou un champ du mauvais type disent que le
-// fichier n'est pas celui qu'on croit : le lire à moitié donnerait un graphe
-// troué sans que personne ne le sache. Mais un PNJ posé sur une carte que la
-// table des cartes ne nomme pas n'est qu'une donnée périmée — la génération a
-// été faite contre un autre jeu de cartes. Celui-là est COMPTÉ et sauté.
+// ⚠ UNE ENTRÉE INCOMPRÉHENSIBLE REFUSE LE FICHIER : une accolade manquante, un
+// champ inconnu, absent ou hors bornes, une carte ou une liaison que le fichier
+// ne définit pas. Le script a vérifié la table entre elle avant de l'écrire ;
+// un écart dit que le fichier n'est pas celui qu'on croit, et le lire à moitié
+// donnerait un graphe troué sans que personne ne le sache.
 
-// Où le client range ces tables, et le suffixe de la variante de serveur.
-inline constexpr std::string_view kNaviTableDirectory =
-    "data\\luafiles514\\lua files\\navigation\\";
-inline constexpr std::string_view kNaviMapTableFile = "navi_map_krpri.lub";
-inline constexpr std::string_view kNaviNpcTableFile = "navi_npc_krpri.lub";
-inline constexpr std::string_view kNaviMobTableFile = "navi_mob_krpri.lub";
-inline constexpr std::string_view kNaviLinkTableFile = "navi_link_krpri.lub";
-inline constexpr std::string_view kNaviLinkDistanceTableFile = "navi_linkdistance_krpri.lub";
-inline constexpr std::string_view kNaviNpcDistanceTableFile = "navi_npcdistance_krpri.lub";
-
-// Le rang d'une carte dans `NaviData::maps`. Les autres tables désignent une
+// Le rang d'une carte dans `NaviData::maps`. Les autres sections désignent une
 // carte par son NOM ; on le résout une fois, au chargement, plutôt qu'à chaque
 // question du pathfinder.
 using NaviMapIndex = std::uint16_t;
 inline constexpr NaviMapIndex kNoNaviMap = 0xFFFF;
 
-// La nature d'une liaison — le troisième champ d'une ligne de la table des liaisons.
+// La nature d'une liaison (`kind` d'une entrée de `links`).
 //
 // 🔴 ELLE DÉCIDE SI LA LIAISON EST EMPRUNTABLE. Un portail ou un PNJ scripté se
 // franchissent toujours ; un service de transport — sur Moonlight, le Warp
@@ -67,11 +55,20 @@ inline constexpr std::uint16_t kTransportService = 204;
 inline constexpr std::uint16_t kAirport = 205;
 }  // namespace navi_link_kind
 
+// La nature d'une carte (`kind` d'une entrée de `maps`).
+namespace navi_map_kind {
+inline constexpr std::uint16_t kPlain = 5001;
+inline constexpr std::uint16_t kAirport = 5002;
+// Des liaisons de la carte ne se joignent pas à pied.
+inline constexpr std::uint16_t kSegmented = 5003;
+inline constexpr std::uint16_t kSegmentedWithMonsters = 5005;
+}  // namespace navi_map_kind
+
 // La classe de sprite qu'un PNJ porte quand il n'est qu'un PORTAIL. Elle dépasse
 // seize bits : le champ d'un PNJ ne se masque jamais.
 inline constexpr std::int32_t kNaviWarpPortalSprite = 99999;
 
-// Le troisième champ des tables de PNJ et d'apparitions.
+// La sorte d'un PNJ ou d'une apparition.
 namespace navi_subtype {
 inline constexpr std::uint16_t kNpc = 101;
 inline constexpr std::uint16_t kShop = 102;
@@ -82,12 +79,12 @@ inline constexpr std::uint16_t kBossSpawn = 301;
 struct NaviMap {
   // Nom INTERNE (« pay_fild10 ») : le seul qui désigne une carte ailleurs.
   std::string name;
-  // Nom AFFICHÉ (« Payon Forest »). Retombe sur le nom interne quand le serveur
-  // n'en connaît pas.
+  // Nom AFFICHÉ (« Payon Forest »). Le nom interne quand le serveur n'en
+  // connaît pas.
   std::string display_name;
-  // 5001 simple, 5002 aéroport, 5003 carte en morceaux, 5005 en morceaux avec
-  // monstres. Gardé tel quel : rien ne s'en sert encore pour choisir.
-  std::uint16_t map_kind = 0;
+  // Une valeur de `navi_map_kind`. Gardée telle quelle : rien ne s'en sert
+  // encore pour choisir.
+  std::uint16_t map_kind = navi_map_kind::kPlain;
   std::uint16_t width_cells = 0;
   std::uint16_t height_cells = 0;
 };
@@ -98,7 +95,7 @@ struct NaviNpc {
   std::uint16_t subtype = navi_subtype::kNpc;
   // Classe de sprite, TELLE QUELLE : `kNaviWarpPortalSprite` pour un portail.
   std::int32_t sprite_class = 0;
-  // Le nom VISIBLE — le serveur a déjà retiré ce qui suit le dièse.
+  // Le nom VISIBLE — sans ce qui suit le dièse.
   std::string name;
   std::int16_t cell_x = 0;
   std::int16_t cell_y = 0;
@@ -148,61 +145,22 @@ struct NaviSpawn {
 
 // Une SUITE de liaisons consécutives à la même distance.
 //
-// Le serveur regroupe les identifiants consécutifs qui partagent une distance :
-// un PNJ qui offre deux cents destinations depuis un seul point en produit deux
-// cents à la même distance, relistées pour CHAQUE liaison entrante. Gardées
-// groupées, elles coûtent une ligne au lieu de deux cents — en mémoire comme au
-// parcours.
+// Le générateur regroupe les identifiants consécutifs qui partagent une
+// distance : un PNJ qui offre deux cents destinations depuis un seul point en
+// produit deux cents à la même distance, relistées pour CHAQUE liaison
+// entrante. Gardées groupées, elles coûtent une ligne au lieu de deux cents — en
+// mémoire comme au parcours.
 struct NaviPassRun {
   std::uint32_t first_link_id = 0;
   std::uint32_t link_count = 1;
+  // La marche, en PAS.
   std::int32_t distance_cells = 0;
 };
-
-// La même chose vers les PNJ : la liaison entrante est nommée par sa carte de
-// DÉPART, que la table porte en plus.
-struct NaviNpcPassRun {
-  NaviMapIndex from_map = kNoNaviMap;
-  std::uint32_t first_link_id = 0;
-  std::uint32_t link_count = 1;
-  std::int32_t distance_cells = 0;
-};
-
-// Comment une table de distances écrit la longueur d'une marche.
-//
-// Une table ouverte par la ligne `-- navi_format: <n>`, avec n ≥ 2, l'écrit
-// EXACTE. Sans cette ligne, elle vient d'un générateur qui ne gardait que
-// l'octet du bas : au-delà de 255 pas, elle écrit le reste modulo 256.
-enum class NaviSteps : std::uint8_t {
-  kExact,
-  kModulo256,
-};
-
-// Le premier format dont les longueurs sont exactes.
-inline constexpr std::int64_t kNaviExactStepsFormat = 2;
-
-// La marche lue dans une table, de la case (from) à la case (to), rendue en pas
-// exacts. Pour une table modulo 256 : une marche compte au moins autant de pas
-// que le plus grand de ses deux écarts, donc tant que la valeur lue est en
-// dessous, on lui rend un tour. Une valeur négative passe telle quelle.
-[[nodiscard]] std::int32_t NaviExactSteps(NaviSteps encoding, std::int32_t steps,
-                                          std::int32_t from_x, std::int32_t from_y,
-                                          std::int32_t to_x, std::int32_t to_y) noexcept;
 
 // Où trouver, dans un tableau plat, les suites d'un même propriétaire.
 struct NaviPassSpan {
   std::uint32_t first = 0;
   std::uint32_t count = 0;
-};
-
-// Ce qu'une lecture a dû sauter, par table. Rien de tout cela n'est une erreur ;
-// c'est ce qu'un journal doit dire UNE fois, pour qu'une génération périmée se
-// voie.
-struct NaviSkipCounts {
-  std::size_t npcs_on_unknown_map = 0;
-  std::size_t links_on_unknown_map = 0;
-  std::size_t spawns_on_unknown_map = 0;
-  std::size_t distances_from_unknown_link = 0;
 };
 
 class NaviData {
@@ -211,7 +169,10 @@ class NaviData {
   std::vector<NaviNpc> npcs;
   std::vector<NaviLink> links;
   std::vector<NaviSpawn> spawns;
-  NaviSkipCounts skipped;
+
+  // Faux quand le script a dû REDRESSER les longueurs de marche d'une
+  // génération qui n'en gardait que l'octet du bas : la génération est à refaire.
+  bool exact_steps = true;
 
   // Rend `kNoNaviMap` pour une carte inconnue. La casse ne compte pas.
   [[nodiscard]] NaviMapIndex FindMap(std::string_view internal_name) const;
@@ -230,18 +191,12 @@ class NaviData {
   // la carte d'arrivée. Vide si la table n'en dit rien.
   [[nodiscard]] std::span<const NaviPassRun> PassesAfter(std::uint32_t link_id) const;
 
-  // Reconstruit les index. Chaque lecteur d'une table d'objets l'appelle en
-  // finissant : la table des cartes doit être indexée pour que les suivantes y
-  // résolvent leurs noms.
+  // Reconstruit les index, après toute retouche des tableaux.
   void BuildIndexes();
 
-  // La table brute des distances entre liaisons, remplie par son lecteur.
-  // Celle des distances aux PNJ n'en fait pas partie : elle se lit à la demande
-  // (`NaviNpcDistanceFile`).
+  // Les distances entre liaisons, à plat, et la part de chaque liaison.
   std::vector<NaviPassRun> link_passes;
   std::unordered_map<std::uint32_t, NaviPassSpan> link_pass_spans;
-  // Comment cette table écrit ses longueurs ; posé par son lecteur.
-  NaviSteps link_steps = NaviSteps::kExact;
 
  private:
   std::unordered_map<std::string, NaviMapIndex> map_by_lower_name_;
@@ -259,17 +214,8 @@ class NaviData {
   std::vector<std::vector<std::uint32_t>> spawns_on_;
 };
 
-// Les lecteurs des cinq tables qu'on lit d'un bloc. La table des cartes d'abord :
-// les autres résolvent leurs noms de carte contre elle, d'où leur `NaviData&`.
-//
-// Chacun échoue si le fichier ne suit pas sa grammaire, et laisse alors `data`
-// tel qu'il l'a trouvé pour SA table.
-[[nodiscard]] core::Result<void> ReadNaviMaps(std::span<const std::uint8_t> bytes, NaviData& data);
-[[nodiscard]] core::Result<void> ReadNaviNpcs(std::span<const std::uint8_t> bytes, NaviData& data);
-[[nodiscard]] core::Result<void> ReadNaviSpawns(std::span<const std::uint8_t> bytes,
-                                                NaviData& data);
-[[nodiscard]] core::Result<void> ReadNaviLinks(std::span<const std::uint8_t> bytes, NaviData& data);
-[[nodiscard]] core::Result<void> ReadNaviLinkDistances(std::span<const std::uint8_t> bytes,
-                                                       NaviData& data);
+// Le texte de `navigation.yml`. Refuse le fichier entier au premier écart, en
+// nommant la ligne.
+[[nodiscard]] core::Result<NaviData> ReadNaviTable(std::span<const std::uint8_t> bytes);
 
 }  // namespace ro::formats

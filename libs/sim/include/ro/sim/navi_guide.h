@@ -7,7 +7,6 @@
 #include <string_view>
 #include <vector>
 
-#include "ro/formats/navi_npc_distances.h"
 #include "ro/formats/navi_tables.h"
 #include "ro/sim/navi_route.h"
 #include "ro/sim/packed_position.h"
@@ -55,23 +54,18 @@ struct NaviGuideRequest {
 };
 
 // CE QUE LE GUIDAGE SAIT DE LA CARTE VISÉE quand ce n'est pas celle du joueur.
-// L'application le fournit : lire une grille ou une table demande l'archive.
+// L'application le fournit : lire une grille demande l'archive.
 //
-// La marche jusqu'à une case ou un PNJ se mesure d'abord sur la GRILLE de la
-// carte visée : une inondation depuis la destination donne d'un coup la marche
-// depuis chaque arrivée de liaison. La table des distances aux PNJ n'est que le
-// repli d'une carte sans grille lisible. Sans l'une ni l'autre, la destination
-// n'a pas d'itinéraire, comme une liste vide dans la table.
+// La marche jusqu'à une case ou un PNJ se mesure sur la GRILLE de la carte
+// visée : une inondation depuis la destination donne d'un coup la marche depuis
+// chaque arrivée de liaison. Sans grille lisible, la destination n'a pas
+// d'itinéraire.
 class NaviGoalTerrain {
  public:
   virtual ~NaviGoalTerrain() = default;
   // La grille de marche d'une carte, nulle si elle ne se lit pas. Le pointeur
   // vaut jusqu'à l'appel suivant.
   [[nodiscard]] virtual const WalkMap* GridOf(std::string_view map_name) = 0;
-  // Les distances précalculées vers les PNJ d'une carte, nulles si la table
-  // manque. Le pointeur vaut jusqu'à l'appel suivant.
-  [[nodiscard]] virtual const formats::NaviNpcDistances* NpcDistancesOn(
-      const formats::NaviData& data, std::string_view map_name) = 0;
 };
 
 // Une étape : une liaison à franchir.

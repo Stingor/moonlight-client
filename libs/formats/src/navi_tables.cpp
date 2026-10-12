@@ -1,16 +1,15 @@
 #include "ro/formats/navi_tables.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
-#include <cstdlib>
-#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <utility>
 
 #include "ro/core/ascii.h"
-#include "ro/core/text.h"
 
 #include "navi_cursor.h"
 
@@ -18,15 +17,13 @@ namespace ro::formats {
 
 namespace {
 
-using navi_internal::Broken;
-using navi_internal::ClosedAtEnd;
 using navi_internal::Cursor;
-using navi_internal::ForEachEntry;
+using navi_internal::FieldKey;
+using navi_internal::ForEachField;
+using navi_internal::ForEachItem;
 using navi_internal::Narrow;
-using navi_internal::NextInteger;
-using navi_internal::NextString;
-using navi_internal::OpenTable;
-using navi_internal::StepsOf;
+
+constexpr std::int64_t kSchemaVersion = 1;
 
 // Le décalage et les masques des statistiques empaquetées d'une apparition.
 constexpr std::uint32_t kElementShift = 16;
@@ -34,28 +31,269 @@ constexpr std::uint32_t kElementMask = 0xFFFF;
 constexpr std::uint32_t kElementsPerLevel = 20;
 constexpr std::uint32_t kSizeShift = 8;
 constexpr std::uint32_t kByteMask = 0xFF;
-// Le quatrième champ d'une apparition : quantité en haut, sprite en bas.
-constexpr std::uint32_t kAmountShift = 16;
-constexpr std::uint32_t kSpriteMask = 0xFFFF;
 
-// Le marqueur de fin d'une liste de distances entre liaisons, et l'étiquette
-// d'une passe.
-constexpr std::string_view kLinkPassEnd = "NULL";
-constexpr std::string_view kLinkPassTag = "E";
+// Une suite : [première liaison, pas] ou [première liaison, pas, nombre].
+constexpr std::size_t kPassFields = 2;
+constexpr std::size_t kRunFields = 3;
 
-// Les libellés sont écrits dans l'encodage des scripts du serveur. Le fil sait
-// déjà reconnaître l'UTF-8 du 1252 ; on s'en remet à lui.
-[[nodiscard]] std::string Readable(const std::string& raw) { return core::Utf8FromWire(raw); }
+constexpr std::string_view kTrue = "true";
+constexpr std::string_view kFalse = "false";
 
-// Un lecteur qui écrit dans une COPIE, rendue à `data` seulement s'il réussit :
-// un fichier refusé ne laisse pas une table à moitié remplie.
-template <typename T, typename Read>
-[[nodiscard]] core::Result<void> Replacing(std::vector<T>& target, Read&& read) {
-  std::vector<T> fresh;
-  auto result = read(fresh);
-  if (!result) return result;
-  target = std::move(fresh);
+struct NamedKind {
+  std::string_view word;
+  std::uint16_t value;
+};
+
+constexpr std::array kMapKinds{
+    NamedKind{"plain", navi_map_kind::kPlain},
+    NamedKind{"airport", navi_map_kind::kAirport},
+    NamedKind{"segmented", navi_map_kind::kSegmented},
+    NamedKind{"segmented_with_monsters", navi_map_kind::kSegmentedWithMonsters},
+};
+
+constexpr std::array kLinkKinds{
+    NamedKind{"portal", navi_link_kind::kWarpPortal},
+    NamedKind{"npc", navi_link_kind::kScriptedNpc},
+    NamedKind{"kafra_dungeon", navi_link_kind::kKafraDungeonWarp},
+    NamedKind{"event_dungeon", navi_link_kind::kEventDungeonWarp},
+    NamedKind{"service", navi_link_kind::kTransportService},
+    NamedKind{"airport", navi_link_kind::kAirport},
+};
+
+// Un champ ne se lit qu'une fois, et seulement s'il se lit.
+template <typename T>
+[[nodiscard]] bool Once(std::optional<T>& slot, std::optional<T> value) {
+  if (slot.has_value() || !value.has_value()) return false;
+  slot = std::move(value);
+  return true;
+}
+
+template <std::size_t N>
+[[nodiscard]] std::optional<std::uint16_t> KindOf(Cursor& cursor,
+                                                  const std::array<NamedKind, N>& kinds) {
+  const auto word = cursor.Word();
+  if (!word) return std::nullopt;
+  for (const NamedKind& kind : kinds)
+    if (kind.word == *word) return kind.value;
+  return std::nullopt;
+}
+
+[[nodiscard]] std::optional<bool> Flag(Cursor& cursor) {
+  const auto word = cursor.Word();
+  if (word == kTrue) return true;
+  if (word == kFalse) return false;
+  return std::nullopt;
+}
+
+// Une carte nommée par la section des cartes ; rien sinon.
+[[nodiscard]] std::optional<NaviMapIndex> MapOf(Cursor& cursor, const NaviData& data) {
+  const auto name = cursor.Quoted();
+  if (!name) return std::nullopt;
+  const NaviMapIndex found = data.FindMap(*name);
+  if (found == kNoNaviMap) return std::nullopt;
+  return found;
+}
+
+// `<section>: { <clé>: { … }, … }`, chaque entrée confiée à `read_entry`.
+template <typename ReadEntry>
+[[nodiscard]] core::Result<void> ReadSection(Cursor& cursor, std::string_view section,
+                                             ReadEntry&& read_entry) {
+  const auto key = FieldKey(cursor);
+  if (key != section)
+    return std::unexpected(cursor.Refused("section « " + std::string(section) + " » attendue"));
+  if (!ForEachItem(cursor, '{', '}', read_entry))
+    return std::unexpected(
+        cursor.Refused("entrée illisible dans « " + std::string(section) + " »"));
   return {};
+}
+
+// Un identifiant suivi de ses deux-points, jamais deux fois dans une section.
+[[nodiscard]] std::optional<std::uint32_t> EntryId(Cursor& cursor,
+                                                   std::unordered_set<std::uint32_t>& seen) {
+  const auto id = Narrow<std::uint32_t>(cursor.Integer());
+  if (!id || !cursor.Take(':') || !seen.insert(*id).second) return std::nullopt;
+  return id;
+}
+
+// Une carte, jamais deux fois sous le même nom, à la casse près.
+[[nodiscard]] bool ReadMap(Cursor& cursor, NaviData& data,
+                           std::unordered_set<std::string>& seen_names) {
+  auto internal = cursor.Quoted();
+  if (!internal || internal->empty() || !cursor.Take(':') ||
+      !seen_names.insert(core::AsciiLower(*internal)).second)
+    return false;
+  std::optional<std::string> shown;
+  std::optional<std::uint16_t> kind;
+  std::optional<std::uint16_t> width;
+  std::optional<std::uint16_t> height;
+  const bool read = ForEachField(cursor, [&](std::string_view key) {
+    if (key == "name") return Once(shown, cursor.Quoted());
+    if (key == "kind") return Once(kind, KindOf(cursor, kMapKinds));
+    if (key == "width") return Once(width, Narrow<std::uint16_t>(cursor.Integer()));
+    if (key == "height") return Once(height, Narrow<std::uint16_t>(cursor.Integer()));
+    return false;
+  });
+  if (!read || !shown || !kind || !width || !height || data.maps.size() >= kNoNaviMap) return false;
+  if (shown->empty()) shown = *internal;
+  data.maps.push_back({.name = std::move(*internal),
+                       .display_name = std::move(*shown),
+                       .map_kind = *kind,
+                       .width_cells = *width,
+                       .height_cells = *height});
+  return true;
+}
+
+[[nodiscard]] bool ReadNpc(Cursor& cursor, NaviData& data,
+                           std::unordered_set<std::uint32_t>& seen) {
+  const auto id = EntryId(cursor, seen);
+  if (!id) return false;
+  std::optional<NaviMapIndex> map;
+  std::optional<bool> shop;
+  std::optional<std::int32_t> sprite;
+  std::optional<std::string> name;
+  std::optional<std::int16_t> x;
+  std::optional<std::int16_t> y;
+  const bool read = ForEachField(cursor, [&](std::string_view key) {
+    if (key == "map") return Once(map, MapOf(cursor, data));
+    if (key == "shop") return Once(shop, Flag(cursor));
+    if (key == "sprite") return Once(sprite, Narrow<std::int32_t>(cursor.Integer()));
+    if (key == "name") return Once(name, cursor.Quoted());
+    if (key == "x") return Once(x, Narrow<std::int16_t>(cursor.Integer()));
+    if (key == "y") return Once(y, Narrow<std::int16_t>(cursor.Integer()));
+    return false;
+  });
+  if (!read || !map || !sprite || !name || !x || !y) return false;
+  data.npcs.push_back({.map = *map,
+                       .npc_id = *id,
+                       .subtype = shop.value_or(false) ? navi_subtype::kShop : navi_subtype::kNpc,
+                       .sprite_class = *sprite,
+                       .name = std::move(*name),
+                       .cell_x = *x,
+                       .cell_y = *y});
+  return true;
+}
+
+[[nodiscard]] bool ReadSpawn(Cursor& cursor, NaviData& data,
+                             std::unordered_set<std::uint32_t>& seen) {
+  const auto id = EntryId(cursor, seen);
+  if (!id) return false;
+  std::optional<NaviMapIndex> map;
+  std::optional<bool> boss;
+  std::optional<std::uint16_t> amount;
+  std::optional<std::uint16_t> sprite;
+  std::optional<std::string> name;
+  std::optional<std::string> sprite_name;
+  std::optional<std::int32_t> level;
+  std::optional<std::uint32_t> element;
+  std::optional<std::uint32_t> element_level;
+  std::optional<std::uint32_t> size;
+  std::optional<std::uint32_t> race;
+  const bool read = ForEachField(cursor, [&](std::string_view key) {
+    if (key == "map") return Once(map, MapOf(cursor, data));
+    if (key == "boss") return Once(boss, Flag(cursor));
+    if (key == "amount") return Once(amount, Narrow<std::uint16_t>(cursor.Integer()));
+    if (key == "sprite") return Once(sprite, Narrow<std::uint16_t>(cursor.Integer()));
+    if (key == "name") return Once(name, cursor.Quoted());
+    if (key == "sprite_name") return Once(sprite_name, cursor.Quoted());
+    if (key == "level") return Once(level, Narrow<std::int32_t>(cursor.Integer()));
+    if (key == "element") return Once(element, Narrow<std::uint32_t>(cursor.Integer()));
+    if (key == "element_level") return Once(element_level, Narrow<std::uint32_t>(cursor.Integer()));
+    if (key == "size") return Once(size, Narrow<std::uint32_t>(cursor.Integer()));
+    if (key == "race") return Once(race, Narrow<std::uint32_t>(cursor.Integer()));
+    return false;
+  });
+  if (!read || !map || !amount || !sprite || !name || !sprite_name || !level || !element ||
+      !element_level || !size || !race)
+    return false;
+  const std::uint64_t element_code =
+      std::uint64_t{*element_level} * kElementsPerLevel + std::uint64_t{*element};
+  if (*element >= kElementsPerLevel || element_code > kElementMask || *size > kByteMask ||
+      *race > kByteMask)
+    return false;
+  data.spawns.push_back(
+      {.map = *map,
+       .spawn_id = *id,
+       .subtype = boss.value_or(false) ? navi_subtype::kBossSpawn : navi_subtype::kSpawn,
+       .amount = *amount,
+       .sprite_class = *sprite,
+       .name = std::move(*name),
+       .sprite_name = std::move(*sprite_name),
+       .level = *level,
+       .packed_stats = static_cast<std::uint32_t>(element_code << kElementShift) |
+                       (*size << kSizeShift) | *race});
+  return true;
+}
+
+[[nodiscard]] bool ReadLink(Cursor& cursor, NaviData& data,
+                            std::unordered_set<std::uint32_t>& seen) {
+  const auto id = EntryId(cursor, seen);
+  if (!id) return false;
+  std::optional<NaviMapIndex> map;
+  std::optional<std::uint16_t> kind;
+  std::optional<std::int32_t> sprite;
+  std::optional<std::string> name;
+  std::optional<std::int16_t> x;
+  std::optional<std::int16_t> y;
+  std::optional<NaviMapIndex> to;
+  std::optional<std::int16_t> to_x;
+  std::optional<std::int16_t> to_y;
+  const bool read = ForEachField(cursor, [&](std::string_view key) {
+    if (key == "map") return Once(map, MapOf(cursor, data));
+    if (key == "kind") return Once(kind, KindOf(cursor, kLinkKinds));
+    if (key == "sprite") return Once(sprite, Narrow<std::int32_t>(cursor.Integer()));
+    if (key == "name") return Once(name, cursor.Quoted());
+    if (key == "x") return Once(x, Narrow<std::int16_t>(cursor.Integer()));
+    if (key == "y") return Once(y, Narrow<std::int16_t>(cursor.Integer()));
+    if (key == "to") return Once(to, MapOf(cursor, data));
+    if (key == "to_x") return Once(to_x, Narrow<std::int16_t>(cursor.Integer()));
+    if (key == "to_y") return Once(to_y, Narrow<std::int16_t>(cursor.Integer()));
+    return false;
+  });
+  if (!read || !map || !kind || !sprite || !name || !x || !y || !to || !to_x || !to_y) return false;
+  data.links.push_back({.map = *map,
+                        .link_id = *id,
+                        .kind = *kind,
+                        .sprite_class = *sprite,
+                        .name = std::move(*name),
+                        .cell_x = *x,
+                        .cell_y = *y,
+                        .dest_map = *to,
+                        .dest_cell_x = *to_x,
+                        .dest_cell_y = *to_y});
+  return true;
+}
+
+// `<liaison>: [[première, pas], [première, pas, nombre], …]`. La liaison et
+// chacune des liaisons d'une suite doivent être connues.
+[[nodiscard]] bool ReadPasses(Cursor& cursor, NaviData& data,
+                              std::unordered_set<std::uint32_t>& seen) {
+  const auto owner = EntryId(cursor, seen);
+  if (!owner || data.FindLink(*owner) == nullptr) return false;
+  NaviPassSpan span{static_cast<std::uint32_t>(data.link_passes.size()), 0};
+  const bool read = ForEachItem(cursor, '[', ']', [&] {
+    std::array<std::int64_t, kRunFields> fields{};
+    std::size_t count = 0;
+    const bool listed = ForEachItem(cursor, '[', ']', [&] {
+      const auto value = cursor.Integer();
+      if (!value || count >= kRunFields) return false;
+      fields[count++] = *value;
+      return true;
+    });
+    if (!listed || count < kPassFields) return false;
+    const auto first = Narrow<std::uint32_t>(fields[0]);
+    const auto steps = Narrow<std::int32_t>(fields[1]);
+    const std::optional<std::uint32_t> length =
+        count == kRunFields ? Narrow<std::uint32_t>(fields[2]) : std::optional<std::uint32_t>(1);
+    if (!first || !steps || !length || *length == 0) return false;
+    for (std::uint32_t offset = 0; offset < *length; ++offset)
+      if (data.FindLink(*first + offset) == nullptr) return false;
+    data.link_passes.push_back({*first, *length, *steps});
+    ++span.count;
+    return true;
+  });
+  if (!read || span.count == 0) return false;
+  data.link_pass_spans.emplace(*owner, span);
+  return true;
 }
 
 }  // namespace
@@ -74,249 +312,49 @@ std::uint32_t NaviSpawn::size() const noexcept { return (packed_stats >> kSizeSh
 
 std::uint32_t NaviSpawn::race() const noexcept { return packed_stats & kByteMask; }
 
-// ── Lecteurs ─────────────────────────────────────────────────────────────────
+// ── Le lecteur ───────────────────────────────────────────────────────────────
 
-core::Result<void> ReadNaviMaps(std::span<const std::uint8_t> bytes, NaviData& data) {
-  constexpr std::string_view kTable = "Navi_Map";
-  auto result = Replacing(data.maps, [&](std::vector<NaviMap>& maps) -> core::Result<void> {
-    Cursor cursor(bytes);
-    if (!OpenTable(cursor, kTable)) return Broken(kTable, cursor, "en-tête attendu");
-    const bool read = ForEachEntry(cursor, [&] {
-      NaviMap map;
-      auto name = cursor.String();
-      auto shown = NextString(cursor);
-      const auto kind = Narrow<std::uint16_t>(NextInteger(cursor));
-      const auto width = Narrow<std::uint16_t>(NextInteger(cursor));
-      const auto height = Narrow<std::uint16_t>(NextInteger(cursor));
-      if (!name || !shown || !kind || !width || !height) return false;
-      map.name = std::move(*name);
-      map.display_name = shown->empty() ? map.name : Readable(*shown);
-      map.map_kind = *kind;
-      map.width_cells = *width;
-      map.height_cells = *height;
-      maps.push_back(std::move(map));
-      return maps.size() < kNoNaviMap;
-    });
-    if (!read || !ClosedAtEnd(cursor)) return Broken(kTable, cursor, "ligne illisible");
-    return {};
-  });
-  // Les tables suivantes résolvent leurs noms de carte contre celle-ci.
-  if (result) data.BuildIndexes();
-  return result;
-}
-
-core::Result<void> ReadNaviNpcs(std::span<const std::uint8_t> bytes, NaviData& data) {
-  constexpr std::string_view kTable = "Navi_Npc";
-  std::size_t orphans = 0;
-  auto result = Replacing(data.npcs, [&](std::vector<NaviNpc>& npcs) -> core::Result<void> {
-    Cursor cursor(bytes);
-    if (!OpenTable(cursor, kTable)) return Broken(kTable, cursor, "en-tête attendu");
-    const bool read = ForEachEntry(cursor, [&] {
-      const auto map = cursor.String();
-      const auto id = Narrow<std::uint32_t>(NextInteger(cursor));
-      const auto subtype = Narrow<std::uint16_t>(NextInteger(cursor));
-      const auto sprite = Narrow<std::int32_t>(NextInteger(cursor));
-      const auto name = NextString(cursor);
-      const auto unique = NextString(cursor);
-      const auto x = Narrow<std::int16_t>(NextInteger(cursor));
-      const auto y = Narrow<std::int16_t>(NextInteger(cursor));
-      if (!map || !id || !subtype || !sprite || !name || !unique || !x || !y) return false;
-      const NaviMapIndex where = data.FindMap(*map);
-      if (where == kNoNaviMap) {
-        ++orphans;
-        return true;
-      }
-      NaviNpc npc;
-      npc.map = where;
-      npc.npc_id = *id;
-      npc.subtype = *subtype;
-      npc.sprite_class = *sprite;
-      npc.name = Readable(*name);
-      npc.cell_x = *x;
-      npc.cell_y = *y;
-      npcs.push_back(std::move(npc));
-      return true;
-    });
-    if (!read || !ClosedAtEnd(cursor)) return Broken(kTable, cursor, "ligne illisible");
-    return {};
-  });
-  if (result) {
-    data.skipped.npcs_on_unknown_map = orphans;
-    data.BuildIndexes();
-  }
-  return result;
-}
-
-core::Result<void> ReadNaviSpawns(std::span<const std::uint8_t> bytes, NaviData& data) {
-  constexpr std::string_view kTable = "Navi_Mob";
-  std::size_t orphans = 0;
-  auto result = Replacing(data.spawns, [&](std::vector<NaviSpawn>& spawns) -> core::Result<void> {
-    Cursor cursor(bytes);
-    if (!OpenTable(cursor, kTable)) return Broken(kTable, cursor, "en-tête attendu");
-    const bool read = ForEachEntry(cursor, [&] {
-      const auto map = cursor.String();
-      const auto id = Narrow<std::uint32_t>(NextInteger(cursor));
-      const auto subtype = Narrow<std::uint16_t>(NextInteger(cursor));
-      const auto packed = Narrow<std::uint32_t>(NextInteger(cursor));
-      const auto name = NextString(cursor);
-      const auto sprite_name = NextString(cursor);
-      const auto level = Narrow<std::int32_t>(NextInteger(cursor));
-      const auto stats = Narrow<std::uint32_t>(NextInteger(cursor));
-      if (!map || !id || !subtype || !packed || !name || !sprite_name || !level || !stats)
-        return false;
-      const NaviMapIndex where = data.FindMap(*map);
-      if (where == kNoNaviMap) {
-        ++orphans;
-        return true;
-      }
-      NaviSpawn spawn;
-      spawn.map = where;
-      spawn.spawn_id = *id;
-      spawn.subtype = *subtype;
-      spawn.amount = static_cast<std::uint16_t>(*packed >> kAmountShift);
-      spawn.sprite_class = static_cast<std::uint16_t>(*packed & kSpriteMask);
-      spawn.name = Readable(*name);
-      spawn.sprite_name = std::move(*sprite_name);
-      spawn.level = *level;
-      spawn.packed_stats = *stats;
-      spawns.push_back(std::move(spawn));
-      return true;
-    });
-    if (!read || !ClosedAtEnd(cursor)) return Broken(kTable, cursor, "ligne illisible");
-    return {};
-  });
-  if (result) {
-    data.skipped.spawns_on_unknown_map = orphans;
-    data.BuildIndexes();
-  }
-  return result;
-}
-
-core::Result<void> ReadNaviLinks(std::span<const std::uint8_t> bytes, NaviData& data) {
-  constexpr std::string_view kTable = "Navi_Link";
-  std::size_t orphans = 0;
-  auto result = Replacing(data.links, [&](std::vector<NaviLink>& links) -> core::Result<void> {
-    Cursor cursor(bytes);
-    if (!OpenTable(cursor, kTable)) return Broken(kTable, cursor, "en-tête attendu");
-    const bool read = ForEachEntry(cursor, [&] {
-      const auto map = cursor.String();
-      const auto id = Narrow<std::uint32_t>(NextInteger(cursor));
-      const auto kind = Narrow<std::uint16_t>(NextInteger(cursor));
-      const auto sprite = Narrow<std::int32_t>(NextInteger(cursor));
-      const auto name = NextString(cursor);
-      const auto unique = NextString(cursor);
-      const auto x = Narrow<std::int16_t>(NextInteger(cursor));
-      const auto y = Narrow<std::int16_t>(NextInteger(cursor));
-      const auto dest = NextString(cursor);
-      const auto dest_x = Narrow<std::int16_t>(NextInteger(cursor));
-      const auto dest_y = Narrow<std::int16_t>(NextInteger(cursor));
-      if (!map || !id || !kind || !sprite || !name || !unique || !x || !y || !dest || !dest_x ||
-          !dest_y)
-        return false;
-      const NaviMapIndex from = data.FindMap(*map);
-      const NaviMapIndex to = data.FindMap(*dest);
-      if (from == kNoNaviMap || to == kNoNaviMap) {
-        ++orphans;
-        return true;
-      }
-      NaviLink link;
-      link.map = from;
-      link.link_id = *id;
-      link.kind = *kind;
-      link.sprite_class = *sprite;
-      link.name = Readable(*name);
-      link.cell_x = *x;
-      link.cell_y = *y;
-      link.dest_map = to;
-      link.dest_cell_x = *dest_x;
-      link.dest_cell_y = *dest_y;
-      links.push_back(std::move(link));
-      return true;
-    });
-    if (!read || !ClosedAtEnd(cursor)) return Broken(kTable, cursor, "ligne illisible");
-    return {};
-  });
-  if (result) {
-    data.skipped.links_on_unknown_map = orphans;
-    data.BuildIndexes();
-  }
-  return result;
-}
-
-// ── La table des distances entre liaisons ────────────────────────────────────
-//
-// Par carte, `"<carte>", <compte>, { … }`, et dans les accolades une entrée par
-// liaison entrante — `{ <id>, {…}, {…}, {"NULL", 0, 0} }`. La table des
-// distances aux PNJ suit la même charpente ; elle se lit à part, à la demande
-// (`navi_npc_distances.h`).
-
-namespace {
-
-constexpr std::int32_t kStepsWrap = 256;
-
-}  // namespace
-
-std::int32_t NaviExactSteps(NaviSteps encoding, std::int32_t steps, std::int32_t from_x,
-                            std::int32_t from_y, std::int32_t to_x, std::int32_t to_y) noexcept {
-  if (encoding == NaviSteps::kExact || steps < 0) return steps;
-  const std::int32_t least = std::max(std::abs(to_x - from_x), std::abs(to_y - from_y));
-  while (steps < least) steps += kStepsWrap;
-  return steps;
-}
-
-core::Result<void> ReadNaviLinkDistances(std::span<const std::uint8_t> bytes, NaviData& data) {
-  constexpr std::string_view kTable = "Navi_Distance";
+core::Result<NaviData> ReadNaviTable(std::span<const std::uint8_t> bytes) {
   Cursor cursor(bytes);
-  if (!OpenTable(cursor, kTable)) return Broken(kTable, cursor, "en-tête attendu");
+  NaviData data;
 
-  std::vector<NaviPassRun> runs;
-  std::unordered_map<std::uint32_t, NaviPassSpan> spans;
-  while (!cursor.Peek('}')) {
-    const auto map = cursor.String();
-    const auto declared = NextInteger(cursor);
-    if (!map || !declared || !cursor.Take(',') || !cursor.Take('{'))
-      return Broken(kTable, cursor, "carte illisible");
-    const bool read = ForEachEntry(cursor, [&] {
-      const auto owner = Narrow<std::uint32_t>(cursor.Integer());
-      if (!owner) return false;
-      NaviPassSpan span{static_cast<std::uint32_t>(runs.size()), 0};
-      while (true) {
-        if (!cursor.Take(',') || !cursor.Take('{')) return false;
-        const auto tag = cursor.String();
-        const auto first = Narrow<std::uint32_t>(NextInteger(cursor));
-        const auto distance = Narrow<std::int32_t>(NextInteger(cursor));
-        if (!tag || !first || !distance) return false;
-        std::uint32_t count = 1;
-        if (cursor.Peek(',')) {
-          const auto length = Narrow<std::uint32_t>(NextInteger(cursor));
-          if (!length || *length == 0) return false;
-          count = *length;
-        }
-        if (!cursor.Take('}')) return false;
-        if (*tag == kLinkPassEnd) break;
-        // Seules les passes « E » (depuis la sortie de la liaison) existent dans
-        // les tables qu'on lit ; une autre étiquette n'a pas de sens ici.
-        if (*tag != kLinkPassTag) return false;
-        runs.push_back({*first, count, *distance});
-        ++span.count;
-      }
-      cursor.TakeOptionalComma();
-      spans[*owner] = span;
-      return true;
-    });
-    if (!read) return Broken(kTable, cursor, "entrée illisible");
-    cursor.TakeOptionalComma();
-  }
-  if (!cursor.Take('}') || !ClosedAtEnd(cursor)) return Broken(kTable, cursor, "fin attendue");
+  const auto version_key = FieldKey(cursor);
+  const auto version = cursor.Integer();
+  if (version_key != "version" || version != kSchemaVersion)
+    return std::unexpected(
+        cursor.Refused("version " + std::to_string(kSchemaVersion) + " attendue"));
+  const auto exact_key = FieldKey(cursor);
+  const auto exact = Flag(cursor);
+  if (exact_key != "exact_steps" || !exact)
+    return std::unexpected(cursor.Refused("exact_steps attendu"));
+  data.exact_steps = *exact;
 
-  std::size_t orphans = 0;
-  for (const auto& [owner, span] : spans)
-    if (data.FindLink(owner) == nullptr) ++orphans;
-  data.link_passes = std::move(runs);
-  data.link_pass_spans = std::move(spans);
-  data.link_steps = StepsOf(bytes);
-  data.skipped.distances_from_unknown_link = orphans;
-  return {};
+  // Les cartes d'abord : les autres sections les nomment.
+  std::unordered_set<std::string> map_names;
+  if (auto read = ReadSection(cursor, "maps", [&] { return ReadMap(cursor, data, map_names); });
+      !read)
+    return std::unexpected(read.error());
+  data.BuildIndexes();
+
+  std::unordered_set<std::uint32_t> seen;
+  if (auto read = ReadSection(cursor, "npcs", [&] { return ReadNpc(cursor, data, seen); }); !read)
+    return std::unexpected(read.error());
+  seen.clear();
+  if (auto read = ReadSection(cursor, "spawns", [&] { return ReadSpawn(cursor, data, seen); });
+      !read)
+    return std::unexpected(read.error());
+  seen.clear();
+  if (auto read = ReadSection(cursor, "links", [&] { return ReadLink(cursor, data, seen); }); !read)
+    return std::unexpected(read.error());
+  // Les suites désignent les liaisons par leur identifiant.
+  data.BuildIndexes();
+  seen.clear();
+  if (auto read = ReadSection(cursor, "passes", [&] { return ReadPasses(cursor, data, seen); });
+      !read)
+    return std::unexpected(read.error());
+  if (!cursor.AtEnd()) return std::unexpected(cursor.Refused("texte après la dernière section"));
+  data.BuildIndexes();
+  return data;
 }
 
 // ── Index ────────────────────────────────────────────────────────────────────
