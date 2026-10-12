@@ -1,7 +1,9 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstdint>
+#include <span>
 #include <string_view>
 
 namespace ro::ui {
@@ -240,6 +242,76 @@ struct SeatFrame {
   // Arrondi au supérieur : le reste tient sur une page de plus, même s'il n'y a
   // qu'un personnage dessus.
   return (slots - kHonourSeats + kBenchSeats - 1) / kBenchSeats;
+}
+
+// UN PAS DES FLÈCHES sur la tablée.
+enum class SeatStep : std::uint8_t { kLeft, kRight, kUp, kDown };
+
+// UN CONVIVE QU'ON PEUT DÉSIGNER, à son point d'assise en pixels d'écran.
+struct SeatPoint {
+  int slot = -1;
+  float x = 0.0F;
+  float y = 0.0F;
+};
+
+// L'ÉCART LATÉRAL PÈSE DOUBLE face à l'avancée : on suit la rangée plutôt que
+// de couper en diagonale vers un convive à peine plus proche.
+inline constexpr float kSeatStepSidePenalty = 2.0F;
+
+// L'EMPLACEMENT OÙ MÈNE UNE FLÈCHE depuis `from_slot`, ou -1 s'il n'y a
+// personne dans cette direction.
+//
+// 🔴 PAR LA GÉOMÉTRIE, ET NON PAR LE NUMÉRO : la mise en page appartient au
+// joueur, qui déplace les sièges où il veut. « Droite » mène à qui est assis à
+// droite, quel que soit son rang dans la liste du serveur.
+//
+// ⚠ DANS UN QUART DE TOUR CENTRÉ SUR LA DIRECTION : un convive n'est candidat
+// que s'il est plus avancé dans la direction qu'écarté d'elle. Sans cette
+// garde, « bas » depuis le bout gauche de la table mènerait au bout droit,
+// assis deux pixels plus bas. Les quatre quarts couvrent le plan : chaque
+// convive reste joignable par l'une des flèches.
+//
+// Si `from_slot` n'est pas sur la tablée — rien n'est désigné, ou le désigné
+// est sur une autre page —, la flèche désigne le plus petit emplacement
+// présent.
+[[nodiscard]] inline int NearestSeatToward(std::span<const SeatPoint> seats, int from_slot,
+                                           SeatStep step) noexcept {
+  const SeatPoint* from = nullptr;
+  int lowest_slot = -1;
+  for (const SeatPoint& seat : seats) {
+    if (seat.slot == from_slot) {
+      from = &seat;
+    }
+    if (lowest_slot < 0 || seat.slot < lowest_slot) {
+      lowest_slot = seat.slot;
+    }
+  }
+  if (from == nullptr) {
+    return lowest_slot;
+  }
+  const bool horizontal = step == SeatStep::kLeft || step == SeatStep::kRight;
+  const bool forward = step == SeatStep::kRight || step == SeatStep::kDown;
+  int best_slot = -1;
+  float best_cost = 0.0F;
+  for (const SeatPoint& seat : seats) {
+    if (seat.slot == from_slot) {
+      continue;
+    }
+    const float dx = seat.x - from->x;
+    const float dy = seat.y - from->y;
+    const float signed_along = horizontal ? dx : dy;
+    const float along = forward ? signed_along : -signed_along;
+    const float aside = std::fabs(horizontal ? dy : dx);
+    if (along <= 0.0F || along < aside) {
+      continue;
+    }
+    const float cost = along + aside * kSeatStepSidePenalty;
+    if (best_slot < 0 || cost < best_cost) {
+      best_slot = seat.slot;
+      best_cost = cost;
+    }
+  }
+  return best_slot;
 }
 
 }  // namespace ro::ui

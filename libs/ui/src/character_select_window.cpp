@@ -7,6 +7,7 @@
 #include <numbers>
 #include <span>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <imgui.h>
@@ -506,6 +507,8 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   // soumis en dernier lui aussi, gagne les clics là où deux cadres se
   // recouvrent. C'est le bon arbitrage : on vise ce qu'on voit.
   const CharacterSlotView nobody;
+  // Les convives de cette page, pour les flèches.
+  std::vector<SeatPoint> peopled_seats;
   for (int seat = 0; seat < kSeatCount; ++seat) {
     const int slot = SeatedSlot(seat, state.page);
     const bool has_slot = slot < slot_count;
@@ -571,6 +574,7 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
       continue;
     }
 
+    peopled_seats.push_back({slot, seating.centre_x, seating.chair_y});
     const bool chosen = state.selected == slot;
     const float grab_width = seating.grab_right - seating.grab_left;
     if (chosen) {
@@ -582,6 +586,32 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
     }
     DrawDoll(list, seating, who);
     DrawNamePlate(list, seating, who, chosen);
+  }
+
+  // ── Les flèches, d'un convive à son voisin ────────────────────────────────
+  //
+  // ⚠ AVANT LA BARRE D'ACTION : Entrée, qu'elle lit, porte alors sur le
+  // convive que la flèche vient de désigner. Et pas pendant une saisie, sous
+  // une fenêtre ni pendant la personnalisation, pour les mêmes raisons que F10.
+  const bool arrows_ours =
+      !editing && !view.busy && !view.dialog_open && !ImGui::GetIO().WantTextInput &&
+      !ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+  if (arrows_ours) {
+    constexpr std::array<std::pair<ImGuiKey, SeatStep>, 4> kArrows = {{
+        {ImGuiKey_LeftArrow, SeatStep::kLeft},
+        {ImGuiKey_RightArrow, SeatStep::kRight},
+        {ImGuiKey_UpArrow, SeatStep::kUp},
+        {ImGuiKey_DownArrow, SeatStep::kDown},
+    }};
+    for (const auto& [key, step] : kArrows) {
+      if (!ImGui::IsKeyPressed(key, true)) {
+        continue;
+      }
+      const int next_slot = NearestSeatToward(peopled_seats, state.selected, step);
+      if (next_slot >= 0) {
+        state.selected = next_slot;
+      }
+    }
   }
 
   // ── Le titre, et ce que la scène a à dire ─────────────────────────────────
