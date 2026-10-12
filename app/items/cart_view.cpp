@@ -17,6 +17,7 @@ CartView::CartView(const ro::vfs::ItemTable* items, const ro::vfs::ItemWords* wo
 void CartView::Refresh(bool open, const ro::sim::World& world, ro::ui::ItemTab tab,
                        std::string_view filter) {
   const ro::sim::Inventory& cart = world.cart();
+  const bool was_here = tally_.exists();
   tally_ = ro::ui::CartTally{
       .weight = cart.weight(),
       .max_weight = cart.max_weight(),
@@ -27,6 +28,7 @@ void CartView::Refresh(bool open, const ro::sim::World& world, ro::ui::ItemTab t
       // reprend quand la charrette part.
       .capacity = cart.capacity(),
   };
+  departed_ = was_here && !tally_.exists();
   if (!open) {
     cells_.clear();
     return;

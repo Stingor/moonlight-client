@@ -260,8 +260,18 @@ class ChatTabs {
   // Le range dans cette fenêtre, AVANT le rang réel `before` — créé s'il
   // manque, déplacé sinon.
   void DockMeter(std::string name, std::uint32_t group, std::size_t before);
-  // Le retire des onglets : le compteur redevient une fenêtre à lui.
+  // Le retire des onglets : le compteur redevient une fenêtre à lui. Sa place
+  // se retient, pour `RedockMeter`.
   void UndockMeter();
+  // Le remet là où il était rangé avant de sortir ; jamais rangé, au bout de la
+  // principale.
+  void RedockMeter(std::string name);
+  // LE RANGEMENT QUE DIT LE PROFIL DE DISPOSITION. `wanted` est son
+  // interrupteur, `seen` ce qu'il valait à l'appel précédent : changé depuis —
+  // un profil posé —, le compteur rentre ou sort ; sinon, ce sont les gestes du
+  // joueur qui ont la main. Rend le rangement qui vaut désormais, que
+  // l'interrupteur recopie.
+  [[nodiscard]] bool FollowMeterDock(bool wanted, bool seen, std::string name);
   // Vrai quand il est SEUL dans une flottante : une fenêtre de conversation
   // qui ne porte que lui n'a plus de raison d'être.
   [[nodiscard]] bool lone_meter() const;
@@ -307,6 +317,13 @@ class ChatTabs {
   // du plus grand qu'il porte : repartir de un rendrait à une fenêtre neuve le
   // numéro d'une fenêtre encore ouverte, donc sa géométrie.
   std::uint32_t next_group_ = 1;
+  // OÙ LE COMPTEUR ÉTAIT RANGÉ avant de sortir : sa fenêtre, et son rang dans
+  // toute la liste — celui de l'onglet qui le suivait, une fois sorti.
+  struct MeterHome {
+    std::uint32_t group = 0;
+    std::size_t rank = 0;
+  };
+  std::optional<MeterHome> meter_home_;
 };
 
 }  // namespace moonclient

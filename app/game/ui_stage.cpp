@@ -18,18 +18,11 @@
 #include "ro/ui/unlock_notice.h"
 
 #include "game/character_bug_report.h"
+#include "game/layout_windows.h"
 #include "game/system_fonts.h"
 
 namespace moonclient {
 namespace {
-
-// Ce qui distingue, dans le fichier de réglages, l'épingle d'une fenêtre de son
-// ouverture. ⚠ COLLÉ À L'IDENTITÉ, jamais au titre : un titre traduit rangerait
-// l'épingle sous un nom et la place sous un autre.
-constexpr const char* kPinSuffix = ".pinned";
-// Le repli des Skills de l'homoncule et du mercenaire, gardé d'une partie à l'autre.
-constexpr const char* kHomunculusSkillsKey = "character.homunculus.skills";
-constexpr const char* kMercenarySkillsKey = "character.mercenary.skills";
 
 constexpr const char* kPartyDisbandId = "groupe_dissolution";
 constexpr const char* kAdoptionId = "adoption_demande";
@@ -69,40 +62,8 @@ ro::core::Result<UiStage> UiStage::Open(SDL_Window* window, Windows& windows, in
   if (!settings_file.empty()) {
     ui->UseSettingsFile(settings_file);
   }
-  // ⚠ L'IDENTITÉ, PAS LE TITRE. C'est la même clé qu'ImGui emploie pour ranger
-  // la position de la fenêtre, et elle ne doit pas dépendre de la langue : un
-  // titre traduit donnerait un fichier où la place se souvient sous un nom et
-  // l'ouverture sous un autre.
-  ui->RememberWindow(ro::ui::kLogWindowId, &windows.log.open);
-  ui->RememberWindow(ro::ui::kChatWindowId, &windows.chat.main.open);
-  ui->RememberWindow(ro::ui::kPacketWindowId, &windows.packets.open);
-  // L'ÉTABLI ROUVRE AU LANCEMENT pour qui s'en sert : le rouvrir chaque jour
-  // serait une corvée. ⚠ ET UN `true` HÉRITÉ N'OUVRE RIEN SANS LE DROIT — le
-  // dessin le revérifie, ce qui vaut aussi pour l'état venu du fichier.
-  ui->RememberWindow(ro::ui::kStaffToolsId, &windows.staff_tools.open);
-  ui->RememberWindow(ro::ui::kChatMacroId, &windows.macros.open);
-  // L'ATLAS SE RETROUVE OUVERT au lancement s'il l'était : c'est un outil qu'on
-  // garde à côté de soi en préparant une fabrication.
-  ui->RememberWindow(ro::ui::kCraftAtlasWindowId, &windows.craft_atlas.state.open);
-  ui->RememberWindow(ro::ui::kNavigationWindowId, &windows.navigation.state.open);
-  // LES ÉPINGLES, à côté des ouvertures et par le même chemin. ⚠ UNE CLÉ
-  // DÉRIVÉE DE L'IDENTITÉ, jamais du titre : voir juste au-dessus.
-  ui->RememberWindow(std::string(ro::ui::kInventoryWindowId) + kPinSuffix,
-                     &windows.inventory.pinned);
-  ui->RememberWindow(std::string(ro::ui::kCartWindowId) + kPinSuffix, &windows.cart.pinned);
-  ui->RememberWindow(std::string(ro::ui::kCharacterWindowId) + kPinSuffix,
-                     &windows.character.pinned);
-  ui->RememberWindow(ro::ui::kPartyFriendWindowId, &windows.party.window.open);
-  ui->RememberWindow(std::string(ro::ui::kPartyFriendWindowId) + kPinSuffix,
-                     &windows.party.window.pinned);
-  ui->RememberWindow(std::string(ro::ui::kCompanionAiWindowId) + kPinSuffix,
-                     &windows.companion_ai.pinned);
-  ui->RememberWindow(std::string(ro::ui::kCompanionTacticWindowId) + kPinSuffix,
-                     &windows.companion_tactic.pinned);
-  ui->RememberWindow(std::string(ro::ui::kMvpTrackerWindowId) + kPinSuffix,
-                     &windows.mvp_tracker.window.pinned);
-  ui->RememberWindow(kHomunculusSkillsKey, &windows.character.homunculus.skills_open);
-  ui->RememberWindow(kMercenarySkillsKey, &windows.character.mercenary.skills_open);
+  // LES INTERRUPTEURS DU PROFIL DE DISPOSITION : voir `RememberLayoutWindows`.
+  RememberLayoutWindows(*ui, windows);
 
   return UiStage(std::move(ui), std::move(*backend));
 }
@@ -378,7 +339,13 @@ UiStage::Answers UiStage::Draw(
   // LA CHARRETTE SUIT LE SAC, pour la même raison que le sac suit la fiche :
   // les deux se consultent ensemble, et l'on y déplace des objets de l'une à
   // l'autre.
-  answers.cart = ro::ui::DrawCartWindow(windows.cart, windows.cart_view, cart, cart_tally, skin_);
+  //
+  // ⚠ SANS CHARRETTE, ELLE NE PARAÎT PAS, ouverte ou non : son ouverture est
+  // celle du profil de disposition, qu'un personnage sans charrette partage
+  // avec celui qui en pousse une. Elle attend que le serveur en annonce une.
+  if (cart_tally.exists()) {
+    answers.cart = ro::ui::DrawCartWindow(windows.cart, windows.cart_view, cart, cart_tally, skin_);
+  }
 
   // LE COFFRE APRÈS LES DEUX AUTRES : c'est lui qu'on vient d'ouvrir quand il
   // est là, et les trois se consultent ensemble.

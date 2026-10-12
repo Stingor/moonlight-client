@@ -99,10 +99,13 @@ void Game::StageContainers() {
   windows_.storage_view.transfers_frozen = frozen;
   cart_->Refresh(windows_.cart.open, world_, windows_.cart.tab, windows_.cart.filter);
   // 🔴 SA FENÊTRE SE REFERME QUAND LA CHARRETTE PART. Le serveur la reprend d'un
-  // paquet -- une compétence qu'on retire, une monture qu'on descend --, et la
-  // fenêtre resterait sinon ouverte sur une grille que plus rien ne peut
-  // remplir. C'est le pendant de la touche, qui refuse d'ouvrir sans charrette.
-  if (!cart_->tally().exists()) {
+  // paquet -- une compétence qu'on retire, une monture qu'on descend --, et le
+  // joueur la retrouverait sinon rouverte à la prochaine charrette.
+  //
+  // ⚠ AU DÉPART SEULEMENT, pas tant qu'il n'y en a pas : à l'entrée en jeu, la
+  // charrette n'est pas encore annoncée, et l'ouverture que le profil de
+  // disposition vient de poser doit l'attendre — le dessin la tient cachée.
+  if (cart_->departed()) {
     windows_.cart.open = false;
   }
   // ⚠ CE N'EST PAS LE JOUEUR QUI OUVRE SON COFFRE : la fenêtre recopie ce que le

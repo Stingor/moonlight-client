@@ -67,24 +67,33 @@ struct FactoryToggle {
   bool on = false;
 };
 
-// LES FENÊTRES OUVERTES ET ÉPINGLÉES : la conversation seule est ouverte.
+// LES FENÊTRES OUVERTES ET ÉPINGLÉES : la conversation seule est ouverte, et le
+// compteur de dégâts flotte hors d'elle.
 constexpr std::array kFactoryToggles = {
     FactoryToggle{"###companion_ai.pinned", false},
     FactoryToggle{"###companion_tactic.pinned", false},
+    FactoryToggle{"###world_map", false},
+    FactoryToggle{"achievements", false},
+    FactoryToggle{"cart", false},
     FactoryToggle{"cart.pinned", false},
+    FactoryToggle{"character", false},
     FactoryToggle{"character.homunculus.skills", true},
     FactoryToggle{"character.mercenary.skills", true},
     FactoryToggle{"character.pinned", false},
     FactoryToggle{"chat", true},
     FactoryToggle{"chat_macros", false},
     FactoryToggle{"craft_atlas", false},
+    FactoryToggle{"damage_meter.docked", false},
+    FactoryToggle{"inventory", false},
     FactoryToggle{"inventory.pinned", false},
     FactoryToggle{"log", false},
+    FactoryToggle{"mvp_tracker", false},
     FactoryToggle{"mvp_tracker.pinned", false},
     FactoryToggle{"navigation", false},
     FactoryToggle{"packets", false},
     FactoryToggle{"party_friends", false},
     FactoryToggle{"party_friends.pinned", false},
+    FactoryToggle{"quest_log", false},
     FactoryToggle{"staff_tools", false},
 };
 

@@ -225,6 +225,8 @@ ChatTabsView::ChatTabsView(std::filesystem::path client_root)
   // compterait comme un changement et le fichier serait réécrit à la première
   // image de chaque partie.
   saved_revision_ = tabs_.revision();
+  // Le rangement lu est celui que le profil de disposition trouve en entrant.
+  meter_dock_seen_ = meter_docked();
   if (first_time) {
     static_cast<void>(SaveChatTabs(client_root_, tabs_));
   }
@@ -291,6 +293,9 @@ void ChatTabsView::Refresh(ro::ui::ChatWindows& windows, std::span<const ro::sim
         continue;
       }
       const bool meter = tabs[rank].content == ChatTabContent::kDamageMeter;
+      if (meter && meter_hidden_) {
+        continue;
+      }
       views.tabs.push_back(ro::ui::ChatStripTab{.name = meter ? meter_label_ : tabs[rank].name,
                                                 .cleared = tabs[rank].cleared_through != 0,
                                                 .meter = meter,

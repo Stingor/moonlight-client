@@ -92,13 +92,13 @@ void Game::StageChat(std::uint32_t now_ms) {
       &pieces_.item_words);
   chat_tabs_->ReadsMaps(pieces_.map_display_names.has_value() ? &*pieces_.map_display_names
                                                               : nullptr);
-  // LE COMPTEUR RANGÉ PARMI LES ONGLETS. Éteint dans les réglages, il quitte
-  // la conversation ; sa languette porte ce que le joueur a choisi d'y lire.
+  // LE COMPTEUR RANGÉ PARMI LES ONGLETS. Rangé ou flottant, c'est le profil de
+  // disposition qui le dit ; éteint dans les réglages, sa languette se cache
+  // sans qu'il sorte. Elle porte ce que le joueur a choisi d'y lire.
   // ⚠ COMPOSÉE À L'IMAGE PRÉCÉDENTE : le compteur se compose après la
   // conversation, et une image de retard ne se voit pas.
-  if (!settings_->options().pages().damage_meter.look().shown && chat_tabs_->meter_docked()) {
-    chat_tabs_->UndockMeter();
-  }
+  chat_tabs_->HideMeter(!settings_->options().pages().damage_meter.look().shown);
+  chat_tabs_->FollowMeterDock(windows_.damage_meter.docked);
   chat_tabs_->LabelMeter(pieces_.damage_meter.tab_label());
   // LES CONVERSATIONS 1:1 AVANT LE TRI : ce qu'elles prennent au fil n'y paraît
   // pas, et elles le prennent en lisant les lignes neuves. L'alarme sonne pour

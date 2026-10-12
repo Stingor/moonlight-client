@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <optional>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -253,9 +254,27 @@ void ChatTabs::DockMeter(std::string name, std::uint32_t group, std::size_t befo
 
 void ChatTabs::UndockMeter() {
   if (const std::optional<std::size_t> kept = MeterRank(); kept.has_value()) {
+    meter_home_ = MeterHome{.group = tabs_[*kept].group, .rank = *kept};
     tabs_.erase(tabs_.begin() + static_cast<std::ptrdiff_t>(*kept));
     ++revision_;
   }
+}
+
+void ChatTabs::RedockMeter(std::string name) {
+  // ⚠ UNE FENÊTRE PARTIE DEPUIS SE LIT COMME LA PRINCIPALE : c'est `DockMeter`
+  // qui en décide, et le rang trop grand y tombe au bout.
+  const MeterHome home = meter_home_.value_or(MeterHome{.group = 0, .rank = tabs_.size()});
+  DockMeter(std::move(name), home.group, home.rank);
+}
+
+bool ChatTabs::FollowMeterDock(bool wanted, bool seen, std::string name) {
+  const bool docked = MeterRank().has_value();
+  if (wanted != seen && wanted && !docked) {
+    RedockMeter(std::move(name));
+  } else if (wanted != seen && !wanted && docked) {
+    UndockMeter();
+  }
+  return MeterRank().has_value();
 }
 
 bool ChatTabs::lone_meter() const {

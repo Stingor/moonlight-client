@@ -152,6 +152,13 @@ class ChatTabsView {
   void UndockMeter();
   // Ce que sa languette affiche, refait à chaque image : il porte le rythme.
   void LabelMeter(std::string label) { meter_label_ = std::move(label); }
+  // ÉTEINT DANS LES RÉGLAGES, sa languette se cache sans qu'il quitte sa bande :
+  // le fichier des onglets est commun, et un réglage d'un seul personnage ne
+  // doit pas le sortir de la conversation des autres.
+  void HideMeter(bool hidden) noexcept { meter_hidden_ = hidden; }
+  // LE RANGEMENT SUIT LE PROFIL DE DISPOSITION, dont `wanted` est
+  // l'interrupteur : voir `ChatTabs::FollowMeterDock`. Une fois par image.
+  void FollowMeterDock(bool& wanted);
 
   // ── LE FIL D'UN SALON — chat_room_lines.cpp ────────────────────────────
   // Ses lignes, décorées comme celles de la conversation et dans le MÊME jeu
@@ -359,6 +366,10 @@ class ChatTabsView {
   // La languette du compteur. ⚠ ICI ET NON SUR LA PILE : la bande n'en garde
   // qu'une vue, lue pendant le dessin.
   std::string meter_label_;
+  // Éteint dans les réglages : sa languette ne paraît pas, il garde sa place.
+  bool meter_hidden_ = false;
+  // Le rangement que le profil de disposition a vu à la dernière image.
+  bool meter_dock_seen_ = false;
   const ro::vfs::ItemTable* items_ = nullptr;
   const ro::vfs::ItemWords* words_ = nullptr;
   const ro::vfs::MapDisplayNames* maps_ = nullptr;

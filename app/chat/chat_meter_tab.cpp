@@ -40,4 +40,10 @@ void ChatTabsView::UndockMeter() {
   SaveIfNeeded();
 }
 
+void ChatTabsView::FollowMeterDock(bool& wanted) {
+  wanted = tabs_.FollowMeterDock(wanted, meter_dock_seen_, std::string(ro::core::Tr("DPS")));
+  meter_dock_seen_ = wanted;
+  SaveIfNeeded();
+}
+
 }  // namespace moonclient

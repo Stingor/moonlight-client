@@ -1587,6 +1587,7 @@ add_executable(moonclient
     game/system_fonts.cpp
     game/ui_layouts.cpp
     game/ui_layout_factory.cpp
+    game/layout_windows.cpp
     game/ui_stage.cpp
     game/ui_stage_lobby.cpp
     game/ui_stage_trade.cpp

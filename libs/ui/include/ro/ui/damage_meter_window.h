@@ -187,6 +187,9 @@ struct DamageMeterState {
   // LA BARRE DE TITRE EST TIRÉE : le compteur est en route, peut-être vers une
   // bande d'onglets où il se rangera.
   bool title_dragging = false;
+  // RANGÉ DANS UNE CONVERSATION plutôt que flottant : l'interrupteur que retient
+  // le profil de disposition. `app` en fait la vérité des onglets.
+  bool docked = false;
 };
 
 // OÙ RANGER LE COMPTEUR : une fenêtre de conversation, et le rang qu'il y

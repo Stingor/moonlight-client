@@ -438,13 +438,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
       // refermer — pour une phrase d'une ligne. Elle se dit dans la conversation,
       // là où le joueur lit déjà tous les refus.
       //
-      // ⚠ REFERMER MARCHE TOUJOURS, quoi qu'il en soit : une fenêtre ouverte doit
-      // pouvoir se fermer même si la charrette vient de disparaître sous elle.
+      // ⚠ ET SANS CHARRETTE, ELLE NE REFERME RIEN : la fenêtre ne paraît alors
+      // pas, et l'ouverture que garde le profil de disposition est celle d'un
+      // autre personnage qui, lui, en pousse une.
       if (to.cart != nullptr && to.world != nullptr) {
-        if (to.cart->open) {
-          to.cart->open = false;
-        } else if (to.world->cart().capacity() > 0) {
-          to.cart->open = true;
+        if (to.world->cart().capacity() > 0) {
+          to.cart->open = !to.cart->open;
         } else {
           to.world->RecordChat(ro::sim::ChatKind::kServer, 0,
                                ro::core::Tr("Vous ne possédez pas de Cart."), to.now_ms);

@@ -32,12 +32,15 @@ class CartView {
 
   // ⚠ LES CASES NE SE REFONT QUE FENÊTRE OUVERTE, comme celles du sac. Le pied,
   // lui, se relève toujours : c'est sa capacité qui dit si la charrette existe,
-  // et la fenêtre se referme sur elle.
+  // et la fenêtre ne paraît qu'avec elle.
   void Refresh(bool open, const ro::sim::World& world, ro::ui::ItemTab tab,
                std::string_view filter);
 
   [[nodiscard]] std::span<const ro::ui::InventoryCellView> cells() const noexcept { return cells_; }
   [[nodiscard]] ro::ui::CartTally tally() const noexcept { return tally_; }
+  // Vrai quand la charrette poussée au `Refresh` d'avant ne l'est plus à
+  // celui-ci : elle vient de partir.
+  [[nodiscard]] bool departed() const noexcept { return departed_; }
 
   // ⚠ ÉMET ET S'ARRÊTE LÀ. La charrette ne bouge qu'à la réponse du serveur.
   //
@@ -56,6 +59,7 @@ class CartView {
   std::vector<std::string> names_;
   std::vector<ro::ui::InventoryCellView> cells_;
   ro::ui::CartTally tally_;
+  bool departed_ = false;
 };
 
 }  // namespace moonclient

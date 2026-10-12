@@ -20,6 +20,7 @@
 #include "ro/ui/minimap_window.h"
 #include "ro/ui/tracker_panel.h"
 
+#include "chat/chat_tab_file.h"
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
 #include "game/game.h"
@@ -57,6 +58,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // le serveur redira ceux du nouveau à l'entrée en jeu.
   pieces_.commands = CommandsPage{};
   settings_->options().pages().commands_body = pieces_.commands.Body();
+  // LE RANGEMENT DU COMPTEUR PART DU FICHIER DES ONGLETS : un profil de
+  // disposition qui ne le nomme pas encore le garde ainsi tel qu'il était.
+  ChatTabs tabs_on_disk;
+  LoadChatTabs(client_root_, tabs_on_disk);
+  windows_.damage_meter.docked = tabs_on_disk.MeterRank().has_value();
   // LA DISPOSITION ET LES RÉGLAGES DE CE PERSONNAGE, posés dès l'entrée. ⚠ LES
   // RÉGLAGES SANS ÊTRE POUSSÉS : la fin de l'ouverture les applique tous.
   shell_.layouts().EnterCharacter(world_.player_name());
@@ -483,7 +489,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
   pieces_.achievements.SeeSaveRoot(client_root_);
   pieces_.achievements.StartSession();
+  // ⚠ L'OUVERTURE SURVIT, elle : le profil de disposition vient de la poser.
+  const bool achievements_open = windows_.achievements.window.open;
   windows_.achievements = AchievementWindows{};
+  windows_.achievements.window.open = achievements_open;
   // LES QUÊTES DE MÊME : le journal est celui du personnage qui entre, et le
   // serveur le redit à l'entrée sur la carte. Le suivi reprend ses réglages.
   pieces_.quests.See(
@@ -501,7 +510,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     return ro::ui::DrawMinimapSettings(shell_.layouts().minimap().settings, art);
   });
   pieces_.quests.StartSession();
+  // L'ouverture survit, de même.
+  const bool quests_open = windows_.quests.window.open;
   windows_.quests = QuestWindows{};
+  windows_.quests.window.open = quests_open;
   pieces_.tracker.SeeSaveRoot(client_root_);
   pieces_.tracker.StartSession();
   windows_.tracker = TrackerWindows{};
