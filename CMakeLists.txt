@@ -164,6 +164,10 @@ if(MOONCLIENT_PLATFORM_LAYERS)
   if(EXISTS "${CMAKE_SOURCE_DIR}/tools/roc-cli/CMakeLists.txt")
     add_subdirectory(tools/roc-cli)
   endif()
+  # L'éditeur des tables source : une fenêtre ImGui, l'aperçu du jeu compris.
+  if(EXISTS "${CMAKE_SOURCE_DIR}/tools/table-editor/CMakeLists.txt")
+    add_subdirectory(tools/table-editor)
+  endif()
 endif()
 
 # Les sources publiées (`scripts/publish_mirror.py`) ne portent ni `tools/` ni

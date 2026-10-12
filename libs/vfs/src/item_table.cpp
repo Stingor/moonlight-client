@@ -7,8 +7,7 @@
 #include <vector>
 
 #include "ro/vfs/encoding.h"
-
-#include "item_info_text.h"
+#include "ro/vfs/item_info_text.h"
 
 namespace ro::vfs {
 namespace {
@@ -79,8 +78,9 @@ void AppendLines(std::vector<std::string>&& told, std::vector<std::string>& line
   return lines;
 }
 
-// L'objet tel que le client le montre, ou la raison de son refus.
-[[nodiscard]] core::Result<ItemEntry> Described(ItemInfoRecord&& record) {
+}  // namespace
+
+core::Result<ItemEntry> DescribeItem(ItemInfoRecord record) {
   // ⚠ L'ALLER-RETOUR SE VÉRIFIE : un caractère que le CP949 n'a pas peut se
   // remplacer en silence par un caractère de repli, et la ressource désignerait
   // alors un autre fichier.
@@ -101,8 +101,6 @@ void AppendLines(std::vector<std::string>&& told, std::vector<std::string>& line
   AppendLines(std::move(record.description), described.description);
   return described;
 }
-
-}  // namespace
 
 void ItemTable::Put(std::uint32_t item_id, ItemEntry entry) { by_id_[item_id] = std::move(entry); }
 
@@ -129,7 +127,7 @@ core::Result<ItemTable> ParseItemTable(std::string_view yaml_text) {
   ItemTable table;
   auto read = ReadItemInfoText(yaml_text, [&table](ItemInfoRecord&& record) -> core::Result<void> {
     const std::uint32_t item_id = record.item_id;
-    auto described = Described(std::move(record));
+    auto described = DescribeItem(std::move(record));
     if (!described) {
       return std::unexpected(described.error());
     }

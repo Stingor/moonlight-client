@@ -18,6 +18,7 @@
 #include "ro/render/map_scene.h"
 #include "ro/ui/chat_emote_names.h"
 #include "ro/ui/minimap_window.h"
+#include "ro/ui/system_fonts.h"
 #include "ro/ui/tracker_panel.h"
 
 #include "chat/banned_input.h"
@@ -25,7 +26,6 @@
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
 #include "game/game.h"
-#include "game/system_fonts.h"
 
 namespace moonclient {
 
@@ -341,7 +341,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // du côté de la table alors qu'il est dans l'atlas. Un onglet absent se
   // comprend ; un onglet plein de carrés, non.
   emojis_.clear();
-  if (!EmojiFontSource().empty()) {
+  if (!ro::ui::EmojiFontSource().empty()) {
     for (const EmojiCategory& group : EmojiCategories()) {
       // L'intertitre arrive déjà traduit : c'est le catalogue qui le fait, là
       // où les libellés sont des littéraux.

@@ -13,9 +13,11 @@
 #  Moonlight et de ses imports ; un objet que seul le serveur connaît en prend
 #  aussi le nom et l'apparence.
 #
-#  Fichier produit par scripts/yaml_tables/item_info.py. Ne pas éditer à la main :
+#  CE FICHIER EST LA SOURCE DES TEXTES DES OBJETS : il s'édite avec l'éditeur
+#  de tables (tools/table-editor), et rien ne le régénère. Le serveur fait foi
+#  pour l'existence des objets et leurs emplacements ; la vérification :
 #      python scripts/yaml_tables/item_info.py --serveur <dépôt moonlight> \
-#          --client <dossier client> --sortie dist/data/yaml_files/item_info.yml
+#          --verifier --table dist/data/yaml_files/item_info.yml
 #
 #  items : identifiant -> une ligne par objet :
 #    name        : le nom montré au joueur ;

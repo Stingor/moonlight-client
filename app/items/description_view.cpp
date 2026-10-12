@@ -164,22 +164,16 @@ void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id
     }
   }
   if (icons_ != nullptr) {
-    // 🔴 TROIS IMAGES POUR UN OBJET, ET L'ORDRE EST CELUI DU CLIENT : le dessin
-    // de la carte s'il en est une, sinon la grande image de collection — onze
-    // mille objets l'ont —, sinon l'icône de 24 pixels. Sauter la première
-    // montrerait le dos de carte générique pour les mille cinq cents cartes,
-    // puisqu'elles partagent toutes cette ressource ; sauter la seconde
-    // donnerait à une description la vignette d'une case de sac.
-    const ro::render::IconTexture& drawn = icons_->GetCardIllustration(item_id);
-    const ro::render::IconTexture& art = drawn.usable() ? drawn : icons_->GetCollection(item_id);
-    const ro::render::IconTexture& shown = art.usable() ? art : icons_->Get(item_id);
-    if (shown.usable()) {
-      view_.picture = ro::ui::SkinImage{.id = static_cast<ImTextureID>(shown.texture.name()),
-                                        .width = static_cast<float>(shown.width_px),
-                                        .height = static_cast<float>(shown.height_px)};
+    // L'ORDRE DES TROIS IMAGES est celui de `ItemIcons::GetDescriptionPicture`.
+    const ro::render::ItemIcons::DescriptionPicture picture =
+        icons_->GetDescriptionPicture(item_id);
+    if (const ro::render::IconTexture* shown = picture.texture; shown != nullptr) {
+      view_.picture = ro::ui::SkinImage{.id = static_cast<ImTextureID>(shown->texture.name()),
+                                        .width = static_cast<float>(shown->width_px),
+                                        .height = static_cast<float>(shown->height_px)};
       // ⚠ C'EST ICI QU'ON SAIT SI C'EN EST UNE, et nulle part ailleurs : la
       // fenêtre en fait un survol à part, et `ui` n'a pas la table qui le dit.
-      view_.picture_is_card = drawn.usable();
+      view_.picture_is_card = picture.card;
       view_.picture_whole = from == ro::ui::ItemHolder::kCardAlbum;
     }
   }

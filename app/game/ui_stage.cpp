@@ -15,11 +15,11 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/loading_screen.h"
 #include "ro/ui/modal_box.h"
+#include "ro/ui/system_fonts.h"
 #include "ro/ui/unlock_notice.h"
 
 #include "game/character_bug_report.h"
 #include "game/layout_windows.h"
-#include "game/system_fonts.h"
 
 namespace moonclient {
 namespace {
@@ -42,12 +42,12 @@ ro::core::Result<UiStage> UiStage::Open(SDL_Window* window, Windows& windows, in
   // tiret cadratin, œ — sort en « ? » à l'écran, y compris dans les textes du
   // jeu, que nous n'écrivons pas.
   std::vector<ro::ui::FontFamilySpec> usable_families;
-  ro::ui::FontSetup fonts = ReadableFontSetup(font_family, usable_families);
+  ro::ui::FontSetup fonts = ro::ui::ReadableFontSetup(font_family, usable_families);
   // LES POLICES DU JOUEUR, lues une fois ici : en déposer une nouvelle demande
   // de relancer le client, comme toute police de l'atlas.
-  const std::vector<LooseFontFile> loose_files = FindLooseFonts(loose_font_folder);
+  const std::vector<ro::ui::LooseFontFile> loose_files = ro::ui::FindLooseFonts(loose_font_folder);
   std::vector<ro::ui::FontFamilySpec> loose_fonts;
-  for (const LooseFontFile& file : loose_files) {
+  for (const ro::ui::LooseFontFile& file : loose_files) {
     loose_fonts.push_back(ro::ui::FontFamilySpec{.label = file.label, .regular = file.path});
   }
   fonts.loose = loose_fonts;
@@ -85,7 +85,7 @@ void UiStage::ChooseFont(int family) {
   // familles trouvées, et une famille absente de la machine décalerait tout ce
   // qui la suit d'un cran. Hors de la table — la police intégrée, ou un fichier
   // trafiqué —, c'est la règle du contexte qui tranche.
-  const std::span<const ro::ui::FontFamilySpec> families = SystemFontFamilies();
+  const std::span<const ro::ui::FontFamilySpec> families = ro::ui::SystemFontFamilies();
   if (family < 0 || family >= static_cast<int>(families.size())) {
     ui_->ChooseFont(family);
     return;

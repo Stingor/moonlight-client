@@ -1,4 +1,4 @@
-#include "game/system_fonts.h"
+#include "ro/ui/system_fonts.h"
 
 #include <algorithm>
 #include <array>
@@ -16,10 +16,8 @@
 #include "ro/core/i18n.h"
 #include "ro/core/utf8_path.h"
 
-namespace moonclient {
+namespace ro::ui {
 namespace {
-
-using ro::ui::FontFamilySpec;
 
 // Ce que FreeType sait ouvrir, en minuscules.
 constexpr std::array<std::string_view, 3> kLooseFontExtensions = {".ttf", ".otf", ".ttc"};
@@ -223,7 +221,7 @@ std::string_view BackslashFontSource() {
   return {};
 }
 
-ro::ui::FontSetup ReadableFontSetup(int chosen, std::vector<FontFamilySpec>& usable) {
+FontSetup ReadableFontSetup(int chosen, std::vector<FontFamilySpec>& usable) {
   // ⚠ LES FAMILLES INTROUVABLES SONT RETIRÉES, pas laissées vides, et par le
   // MÊME relevé que les menus : le rang d'une famille dans l'atlas est alors sa
   // place dans le menu, et une entrée qui ne dessinerait rien n'y figure pas.
@@ -239,12 +237,11 @@ ro::ui::FontSetup ReadableFontSetup(int chosen, std::vector<FontFamilySpec>& usa
                        .italic = Exists(family.italic) ? family.italic : std::string_view()});
   }
   // Moins de zéro reste la police intégrée : c'est un choix, pas un rang.
-  return ro::ui::FontSetup{
-      .families = usable,
-      .chosen = usable.empty() || chosen < 0 ? -1 : MenuRankOfFontFamily(chosen),
-      .size_pixels = ro::ui::kDefaultFontPixels,
-      .backslash_source = BackslashFontSource(),
-      .emoji_source = EmojiFontSource()};
+  return FontSetup{.families = usable,
+                   .chosen = usable.empty() || chosen < 0 ? -1 : MenuRankOfFontFamily(chosen),
+                   .size_pixels = kDefaultFontPixels,
+                   .backslash_source = BackslashFontSource(),
+                   .emoji_source = EmojiFontSource()};
 }
 
 std::vector<LooseFontFile> FindLooseFonts(const std::filesystem::path& folder) {
@@ -275,4 +272,4 @@ std::vector<LooseFontFile> FindLooseFonts(const std::filesystem::path& folder) {
   return found;
 }
 
-}  // namespace moonclient
+}  // namespace ro::ui

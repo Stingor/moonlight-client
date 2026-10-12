@@ -15,10 +15,10 @@
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/ui/system_fonts.h"
 #include "ro/ui/ui_context.h"
 
 #include "chat/chat_history_file.h"
-#include "game/system_fonts.h"
 #include "options/display_options.h"
 #include "options/option_row_kinds.h"
 
@@ -691,7 +691,7 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
       break;
     case GameOption::kFontFamily:
       // La place dans le menu, qui ne montre que les familles présentes.
-      font_family_ = FontFamilyAtMenuRank(asked.chosen);
+      font_family_ = ro::ui::FontFamilyAtMenuRank(asked.chosen);
       break;
     case GameOption::kLanguage: {
       const std::span<const Language> languages = KnownLanguages();

@@ -13,8 +13,8 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/system_fonts.h"
 
-#include "game/system_fonts.h"
 #include "options/game_options.h"
 #include "options/option_row_kinds.h"
 
@@ -92,8 +92,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   //
   // ⚠ LES SEULES FAMILLES PRÉSENTES : la place dans la liste n'est donc pas le
   // rang du réglage, et `FontFamilyAtMenuRank` traduit l'une en l'autre.
-  for (const int family : InstalledFontFamilies()) {
-    font_names_.push_back(SystemFontFamilies()[static_cast<std::size_t>(family)].label.data());
+  for (const int family : ro::ui::InstalledFontFamilies()) {
+    font_names_.push_back(
+        ro::ui::SystemFontFamilies()[static_cast<std::size_t>(family)].label.data());
   }
   display_rows_.push_back(
       OptionRowView{.id = static_cast<int>(GameOption::kFontFamily),
@@ -102,7 +103,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
                                "accents, la ponctuation et les chemins coréens de "
                                "l'installation. Les autres sont latines."),
                     .kind = OptionKind::kChoice,
-                    .chosen = MenuRankOfFontFamily(font_family_),
+                    .chosen = ro::ui::MenuRankOfFontFamily(font_family_),
                     .choices = font_names_});
   // 🔴 DES PALIERS ET NON UN CURSEUR. Poser l'échelle redimensionne TOUTES les
   // fenêtres, et la passe est à PERTE : un curseur invite à balayer la plage,

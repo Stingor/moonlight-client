@@ -186,6 +186,7 @@ add_library(ro_ui STATIC
     src/item_obtain_toast.cpp
     src/shortcut_bar.cpp
     src/skin_palette.cpp
+    src/system_fonts.cpp
     src/skin_look_sample.cpp
     src/skin_tabs.cpp
     src/skin_slider.cpp

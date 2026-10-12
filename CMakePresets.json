@@ -102,6 +102,15 @@
       "jobs": 0
     },
     {
+      "name": "windows-release-editor",
+      "configurePreset": "windows",
+      "configuration": "Release",
+      "targets": [
+        "table-editor"
+      ],
+      "jobs": 0
+    },
+    {
       "name": "windows-asan",
       "configurePreset": "windows-asan",
       "configuration": "Debug",

@@ -9,7 +9,7 @@
 
 #include "ro/ui/font_setup.h"
 
-namespace moonclient {
+namespace ro::ui {
 
 // LES POLICES QUE L'INSTALLATION PORTE DÉJÀ.
 //
@@ -33,7 +33,7 @@ namespace moonclient {
 // Les familles, dans l'ordre de la table. La PREMIÈRE est le défaut. ⚠ LE
 // RÉGLAGE « police » EST UN RANG DANS CETTE TABLE-CI, la même sur toute
 // machine ; les menus, eux, ne montrent que les familles présentes.
-[[nodiscard]] std::span<const ro::ui::FontFamilySpec> SystemFontFamilies();
+[[nodiscard]] std::span<const FontFamilySpec> SystemFontFamilies();
 
 // LES FAMILLES QUE CETTE MACHINE PORTE, par leur rang dans la table, dans son
 // ordre : ce qu'un menu de polices offre, et ce que l'atlas bâtit. Une famille
@@ -82,8 +82,7 @@ namespace moonclient {
 // ⚠ `usable` PORTE LES FAMILLES, et la réponse n'en est qu'une vue : il doit
 // vivre jusqu'à ce que `UseFonts` l'ait lue. C'est l'appelant qui le tient, et
 // non un tableau statique qu'un second appel viderait sous la vue du premier.
-[[nodiscard]] ro::ui::FontSetup ReadableFontSetup(int chosen,
-                                                  std::vector<ro::ui::FontFamilySpec>& usable);
+[[nodiscard]] FontSetup ReadableFontSetup(int chosen, std::vector<FontFamilySpec>& usable);
 
 // ── LES POLICES DU DOSSIER DU JEU ───────────────────────────────────────────
 //
@@ -102,4 +101,4 @@ struct LooseFontFile {
 // le dossier n'existe pas : il est facultatif.
 [[nodiscard]] std::vector<LooseFontFile> FindLooseFonts(const std::filesystem::path& folder);
 
-}  // namespace moonclient
+}  // namespace ro::ui

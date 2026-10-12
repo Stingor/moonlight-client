@@ -17,10 +17,10 @@
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/ui/system_fonts.h"
 #include "ro/ui/ui_context.h"
 
 #include "chat/chat_history_file.h"
-#include "game/system_fonts.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
 

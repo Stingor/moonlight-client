@@ -1603,7 +1603,6 @@ add_executable(moonclient
     character/skill_view.cpp
     character/style_preview.cpp
     character/style_view.cpp
-    game/system_fonts.cpp
     game/ui_layouts.cpp
     game/ui_layout_factory.cpp
     game/layout_windows.cpp

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/vfs/item_info_text.h"
 #include "ro/vfs/vfs.h"
 
 namespace ro::vfs {
@@ -138,6 +139,16 @@ inline constexpr std::string_view kDescriptionGap = " ";
 // la première ligne d'une description, et deux endroits qui l'assemblent
 // finiraient par ne plus pointer au même endroit.
 [[nodiscard]] std::string ItemDatabaseUrl(std::uint32_t item_id);
+
+// L'OBJET TEL QUE LE CLIENT LE MONTRE, tiré d'une entrée de la table : la
+// ressource retranscodée en CP949, les trois lignes du script de chargement en
+// tête de la description, et chaque `#` final changé en trait. Refuse une
+// ressource que le CP949 ne sait pas écrire à l'identique.
+//
+// ⚠ C'EST LA RÈGLE QUE `ParseItemTable` APPLIQUE À CHAQUE ENTRÉE, et la seule :
+// qui montre une entrée hors de la table — l'éditeur de tables, pour son
+// aperçu — passe par elle, et voit ce que le jeu verra.
+[[nodiscard]] core::Result<ItemEntry> DescribeItem(ItemInfoRecord record);
 
 // Lit la table. Une table ABSENTE rend une table VIDE, pas une erreur : le jeu
 // se joue sans, en montrant des numéros là où il montrerait des noms. Une table

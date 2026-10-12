@@ -70,6 +70,22 @@ class ItemIcons {
   // l'illustration de collection.
   [[nodiscard]] const IconTexture& GetCardIllustration(std::uint32_t item_id);
 
+  // L'IMAGE D'UNE DESCRIPTION, et si c'est le dessin d'une carte.
+  //
+  // 🔴 TROIS IMAGES POUR UN OBJET, ET L'ORDRE EST CELUI DU CLIENT : le dessin
+  // de la carte s'il en est une, sinon la grande image de collection — onze
+  // mille objets l'ont —, sinon l'icône de 24 pixels. Sauter la première
+  // montrerait le dos de carte générique pour les mille cinq cents cartes,
+  // puisqu'elles partagent toutes cette ressource ; sauter la seconde
+  // donnerait à une description la vignette d'une case de sac.
+  //
+  // `texture` est nulle quand aucune des trois n'existe.
+  struct DescriptionPicture {
+    const IconTexture* texture = nullptr;
+    bool card = false;
+  };
+  [[nodiscard]] DescriptionPicture GetDescriptionPicture(std::uint32_t item_id);
+
   [[nodiscard]] std::size_t loaded_count() const noexcept { return loaded_.size(); }
 
   // OUBLIE TOUT : le skin a changé. Voir `GameImages::Clear`.

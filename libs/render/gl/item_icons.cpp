@@ -74,6 +74,16 @@ const IconTexture& ItemIcons::GetCollection(std::uint32_t item_id) {
   return art;
 }
 
+ItemIcons::DescriptionPicture ItemIcons::GetDescriptionPicture(std::uint32_t item_id) {
+  const IconTexture& drawn = GetCardIllustration(item_id);
+  if (drawn.usable()) {
+    return DescriptionPicture{.texture = &drawn, .card = true};
+  }
+  const IconTexture& art = GetCollection(item_id);
+  const IconTexture& shown = art.usable() ? art : Get(item_id);
+  return DescriptionPicture{.texture = shown.usable() ? &shown : nullptr, .card = false};
+}
+
 void ItemIcons::Clear() {
   loaded_.clear();
   collections_.clear();

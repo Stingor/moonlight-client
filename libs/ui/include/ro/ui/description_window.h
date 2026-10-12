@@ -501,6 +501,11 @@ inline constexpr ImU32 kDescriptionBrokenShadow = IM_COL32(250, 80, 80, 255);
 // qu'après — est inséparable de son ouverture.
 void DrawDescriptionPreview(const DescriptionView& view, const SkinArt& art);
 
+// LE MÊME APERÇU, POSÉ DANS LA FENÊTRE EN COURS au lieu d'une infobulle : même
+// papier, même cadre, même largeur, même texte. C'est ce que l'éditeur de
+// tables montre à côté d'une fiche — l'aperçu du jeu, et non une imitation.
+void DrawDescriptionPreviewPanel(const char* id, const DescriptionView& view, const SkinArt& art);
+
 // LE FIL DE NAVIGATION de la description d'un objet.
 //
 // Tient la pile de retour à jour, une fois par image, AVANT le dessin : fermée,

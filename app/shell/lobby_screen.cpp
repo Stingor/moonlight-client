@@ -24,10 +24,10 @@
 #include "ro/core/log.h"
 #include "ro/core/text.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/system_fonts.h"
 
 #include "character/recent_characters.h"
 #include "game/connected_session.h"
-#include "game/system_fonts.h"
 #include "options/game_options.h"
 #include "options/option_targets.h"
 #include "world/overlay_view.h"
@@ -326,11 +326,11 @@ ro::ui::LoginWindowView LobbyScreen::Compose() {
   }
   // ⚠ LES SEULES FAMILLES PRÉSENTES, comme dans les options : la place dans la
   // liste n'est pas le rang du réglage, voir `FontFamilyAtMenuRank`.
-  for (const int family : InstalledFontFamilies()) {
+  for (const int family : ro::ui::InstalledFontFamilies()) {
     view.first_screen.fonts.emplace_back(
-        SystemFontFamilies()[static_cast<std::size_t>(family)].label);
+        ro::ui::SystemFontFamilies()[static_cast<std::size_t>(family)].label);
   }
-  view.first_screen.font = MenuRankOfFontFamily(settings.font_family());
+  view.first_screen.font = ro::ui::MenuRankOfFontFamily(settings.font_family());
   view.first_screen.backdrop_wanted = settings.backdrop_wanted();
   view.first_screen.backdrop_live = flow_.backdrop().state() == lobby::BackdropState::kLive;
   // 🔴 LE VOILE NE COUVRE QUE CE QUI BLOQUE, et la distinction est tout.
@@ -379,7 +379,7 @@ void LobbyScreen::RouteFirstScreen(const ro::ui::LoginFirstScreenAction& asked) 
     }
   }
   if (asked.font >= 0) {
-    static_cast<void>(settings.SetFontFamily(FontFamilyAtMenuRank(asked.font), targets));
+    static_cast<void>(settings.SetFontFamily(ro::ui::FontFamilyAtMenuRank(asked.font), targets));
   }
   if (asked.backdrop_toggled) {
     settings.SetBackdropWanted(asked.backdrop_wanted, targets);

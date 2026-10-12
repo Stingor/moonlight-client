@@ -162,6 +162,52 @@ bool IsDatabaseLinkLine(std::string_view line) {
   return line.find("<URL>") != std::string_view::npos;
 }
 
+namespace {
+
+// Les variables de style que pose `PushPreviewStyle`.
+constexpr int kPreviewStyleVars = 5;
+
+// LE DESSIN D'UNE CARTE EN ENTIER, quand la vue le demande et qu'il est là.
+[[nodiscard]] bool ShowsWholePicture(const DescriptionView& view) {
+  return view.picture_whole && view.picture_is_card && view.picture.usable();
+}
+
+// LE PAPIER DE L'APERÇU, et sa largeur maximale.
+//
+// ⚠ LE FOND EST LE PAPIER, ARRONDI, PEINT PAR IMGUI, et sa bordure RETIRÉE :
+// c'est elle qui ferait le liseré sombre à angles droits. Le seul cadre visible
+// doit être l'art du client. Les mêmes réglages valent pour une infobulle et
+// pour un panneau : `Window…` pour l'une, `Child…` pour l'autre.
+[[nodiscard]] float PushPreviewStyle(const DescriptionView& view, const SkinArt& art) {
+  const float edge = DescPanelEdge(art);
+  PushPaperStyle(art.look());
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0F);
+  ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.0F);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, kDescriptionPreviewRounding);
+  ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kDescriptionPreviewRounding);
+  // ⚠ LA MARGE EST L'ÉPAISSEUR DU CADRE : sans elle, le texte passerait dessous.
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(edge, edge));
+  // ⚠ LE DESSIN ENTIER ÉLARGIT L'APERÇU DE SA PROPRE LARGEUR : le texte garde la
+  // sienne à côté, au lieu de se tasser dans ce que l'image lui laisse.
+  const float picture_room =
+      ShowsWholePicture(view) ? view.picture.width + kPictureGapPixels : 0.0F;
+  const float widest = kDescriptionPreviewWidest + picture_room;
+  ImGui::SetNextWindowSizeConstraints(
+      ImVec2(0.0F, 0.0F),
+      ImVec2(widest, ImGui::GetIO().DisplaySize.y * kDescriptionPreviewScreenShare));
+  return widest;
+}
+
+void PopPreviewStyle() {
+  ImGui::PopStyleVar(kPreviewStyleVars);
+  ImGui::PopStyleColor(kPaperStyleColors);
+}
+
+// LE CORPS DE L'APERÇU, dans l'infobulle ou le panneau déjà ouvert.
+void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float widest);
+
+}  // namespace
+
 void DrawDescriptionPreview(const DescriptionView& view, const SkinArt& art) {
   if (view.item_id == 0) {
     return;
@@ -171,30 +217,37 @@ void DrawDescriptionPreview(const DescriptionView& view, const SkinArt& art) {
   // 🔴 IMGUI ORDONNE LES FENÊTRES PAR FOCUS : une fenêtre ordinaire, même
   // soumise après celle qu'on survole, passerait DERRIÈRE elle. Les infobulles
   // vivent dans la couche avant, et ImGui les recadre lui-même près des bords.
-  //
-  // ⚠ LE FOND EST LE PAPIER, ARRONDI, PEINT PAR IMGUI, et sa bordure RETIRÉE :
-  // c'est elle qui ferait le liseré sombre à angles droits. Le seul cadre
-  // visible doit être l'art du client.
-  const float edge = DescPanelEdge(art);
-  PushPaperStyle(art.look());
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0F);
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, kDescriptionPreviewRounding);
-  // ⚠ LA MARGE EST L'ÉPAISSEUR DU CADRE : sans elle, le texte passerait dessous.
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(edge, edge));
-  // ⚠ LE DESSIN ENTIER ÉLARGIT L'INFOBULLE DE SA PROPRE LARGEUR : le texte garde
-  // la sienne à côté, au lieu de se tasser dans ce que l'image lui laisse.
-  const bool whole = view.picture_whole && view.picture_is_card && view.picture.usable();
-  const float picture_room = whole ? view.picture.width + kPictureGapPixels : 0.0F;
-  const float widest = kDescriptionPreviewWidest + picture_room;
-  ImGui::SetNextWindowSizeConstraints(
-      ImVec2(0.0F, 0.0F),
-      ImVec2(widest, ImGui::GetIO().DisplaySize.y * kDescriptionPreviewScreenShare));
-  const bool shown = ImGui::BeginTooltip();
-  if (!shown) {
-    ImGui::PopStyleVar(3);
-    ImGui::PopStyleColor(kPaperStyleColors);
+  const float widest = PushPreviewStyle(view, art);
+  if (ImGui::BeginTooltip()) {
+    DrawPreviewBody(view, art, widest);
+    ImGui::EndTooltip();
+  }
+  PopPreviewStyle();
+}
+
+void DrawDescriptionPreviewPanel(const char* id, const DescriptionView& view, const SkinArt& art) {
+  if (view.item_id == 0) {
     return;
   }
+  const float widest = PushPreviewStyle(view, art);
+  // ⚠ LE PANNEAU SE DIMENSIONNE SUR SON CONTENU, comme l'infobulle : une
+  // description courte donne un petit papier.
+  ImGui::PushStyleColor(ImGuiCol_ChildBg, art.look().paper);
+  if (ImGui::BeginChild(id, ImVec2(0.0F, 0.0F),
+                        ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY |
+                            ImGuiChildFlags_AlwaysUseWindowPadding,
+                        ImGuiWindowFlags_NoScrollbar)) {
+    DrawPreviewBody(view, art, widest);
+  }
+  ImGui::EndChild();
+  ImGui::PopStyleColor();
+  PopPreviewStyle();
+}
+
+namespace {
+
+void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float widest) {
+  const float edge = DescPanelEdge(art);
   // 🔴 DEUX CANAUX, ET C'EST LE SEUL MOYEN. Le cadre doit être DERRIÈRE le
   // contenu, mais on ne connaît la taille de l'infobulle qu'une fois le contenu
   // écrit. On écrit donc le contenu sur le canal 1, le cadre sur le 0, et la
@@ -237,8 +290,9 @@ void DrawDescriptionPreview(const DescriptionView& view, const SkinArt& art) {
     lines = lines.subspan(1);
   }
   const bool has_text = !lines.empty();
-  const ImVec2 picture = whole ? ImVec2(view.picture.width, view.picture.height)
-                               : PictureSize(view.picture, kPreviewPictureHeightPixels, true);
+  const ImVec2 picture = ShowsWholePicture(view)
+                             ? ImVec2(view.picture.width, view.picture.height)
+                             : PictureSize(view.picture, kPreviewPictureHeightPixels, true);
   if (picture.x > 0.0F || has_text) {
     ImGui::Separator();
   }
@@ -273,12 +327,7 @@ void DrawDescriptionPreview(const DescriptionView& view, const SkinArt& art) {
   const ImVec2 size = ImGui::GetWindowSize();
   DrawDescPanelFrame(into, art, at, ImVec2(at.x + size.x, at.y + size.y), /*fill_bg=*/false);
   into->ChannelsMerge();
-  ImGui::EndTooltip();
-  ImGui::PopStyleVar(3);
-  ImGui::PopStyleColor(kPaperStyleColors);
 }
-
-namespace {
 
 // LA LIGNE DU STAFF : « Staff : [N] [@item] ». La quantité est celle de l'état
 // de la fenêtre, qui la retient d'un item à l'autre.

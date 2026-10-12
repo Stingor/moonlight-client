@@ -26,8 +26,8 @@
 // ⚠ POUR LE NOMBRE DE DIRECTIONS D'UN .ACT : c'est lui qui borne la direction
 // relue du fichier, et le redéclarer ici en ferait une seconde vérité.
 #include "ro/render/actor_layers.h"
+#include "ro/ui/system_fonts.h"
 
-#include "game/system_fonts.h"
 #include "options/game_options.h"
 
 namespace moonclient {
@@ -163,7 +163,7 @@ bool GameOptions::SetLanguage(std::string_view code, const OptionTargets& to, st
 }
 
 bool GameOptions::SetFontFamily(int family, const OptionTargets& to) {
-  if (family < 0 || family >= static_cast<int>(SystemFontFamilies().size())) {
+  if (family < 0 || family >= static_cast<int>(ro::ui::SystemFontFamilies().size())) {
     return false;
   }
   font_family_ = family;

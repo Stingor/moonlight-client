@@ -24,8 +24,8 @@
 
 #include "ro/core/i18n.h"
 #include "ro/render/number_look.h"
+#include "ro/ui/system_fonts.h"
 
-#include "game/system_fonts.h"
 #include "options/damage_page_names.h"
 #include "options/damage_path_anchors.h"
 #include "options/damage_path_rows.h"
@@ -77,8 +77,9 @@ void FillDamageChoices(DamagePageNames& names) {
   // liste déroulante traduit elle-même ce qu'on lui donne.
   names.fonts.clear();
   names.fonts.push_back(Tr("Celle de l'interface"));
-  for (const int family : InstalledFontFamilies()) {
-    names.fonts.push_back(SystemFontFamilies()[static_cast<std::size_t>(family)].label.data());
+  for (const int family : ro::ui::InstalledFontFamilies()) {
+    names.fonts.push_back(
+        ro::ui::SystemFontFamilies()[static_cast<std::size_t>(family)].label.data());
   }
   for (const std::string& loose : names.loose_fonts) {
     names.fonts.push_back(loose.c_str());
@@ -91,10 +92,11 @@ void FillDamageChoices(DamagePageNames& names) {
   if (chosen <= 0) {
     return {};
   }
-  const std::span<const int> installed = InstalledFontFamilies();
+  const std::span<const int> installed = ro::ui::InstalledFontFamilies();
   auto rank = static_cast<std::size_t>(chosen - 1);
   if (rank < installed.size()) {
-    return std::string(SystemFontFamilies()[static_cast<std::size_t>(installed[rank])].label);
+    return std::string(
+        ro::ui::SystemFontFamilies()[static_cast<std::size_t>(installed[rank])].label);
   }
   rank -= installed.size();
   return rank < names.loose_fonts.size() ? names.loose_fonts[rank] : std::string();
@@ -106,9 +108,9 @@ void FillDamageChoices(DamagePageNames& names) {
   if (name.empty()) {
     return 0;
   }
-  const std::span<const int> installed = InstalledFontFamilies();
+  const std::span<const int> installed = ro::ui::InstalledFontFamilies();
   for (std::size_t rank = 0; rank < installed.size(); ++rank) {
-    if (SystemFontFamilies()[static_cast<std::size_t>(installed[rank])].label == name) {
+    if (ro::ui::SystemFontFamilies()[static_cast<std::size_t>(installed[rank])].label == name) {
       return static_cast<int>(rank) + 1;
     }
   }

@@ -1,6 +1,6 @@
 // Le texte d'`item_info.yml`. Voir l'en-tête.
 
-#include "item_info_text.h"
+#include "ro/vfs/item_info_text.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -294,7 +294,7 @@ class TableText {
     return table.ReadBoolean(record.costume);
   }
   if (field == kEffectField) {
-    return table.ReadWhole(std::numeric_limits<std::uint32_t>::max(), number);
+    return table.ReadWhole(std::numeric_limits<std::uint32_t>::max(), record.effect);
   }
   if (field == kDescriptionField) {
     return ReadLines(table, record.description);
@@ -367,6 +367,143 @@ core::Result<void> ReadItemInfoText(
     return std::unexpected(table.Refused("texte après la fermeture de « items »"));
   }
   return {};
+}
+
+std::string_view ItemInfoHeader(std::string_view text) {
+  std::size_t at = 0;
+  while (at < text.size()) {
+    const std::size_t end = text.find('\n', at);
+    const std::size_t next = end == std::string_view::npos ? text.size() : end + 1;
+    const std::string_view line = text.substr(at, next - at);
+    const std::size_t first = line.find_first_not_of(" \t\r\n");
+    if (first != std::string_view::npos && line[first] != '#') {
+      break;
+    }
+    at = next;
+  }
+  return text.substr(0, at);
+}
+
+namespace {
+
+// Le dernier caractère de contrôle : en deçà, tout s'écrit en `\u00xx`.
+constexpr unsigned char kLastControl = 0x1F;
+constexpr std::string_view kHexDigitsLower = "0123456789abcdef";
+constexpr unsigned kNibbleBits = 4;
+constexpr unsigned kNibbleMask = 0xF;
+
+// Un texte entre guillemets, comme `json.dumps(…, ensure_ascii=False)` l'écrit.
+void AppendQuoted(std::string_view text, std::string& out) {
+  out.push_back('"');
+  for (const char c : text) {
+    switch (c) {
+      case '"':
+        out += "\\\"";
+        break;
+      case '\\':
+        out += "\\\\";
+        break;
+      case '\n':
+        out += "\\n";
+        break;
+      case '\r':
+        out += "\\r";
+        break;
+      case '\t':
+        out += "\\t";
+        break;
+      case '\b':
+        out += "\\b";
+        break;
+      case '\f':
+        out += "\\f";
+        break;
+      default:
+        if (static_cast<unsigned char>(c) <= kLastControl) {
+          const auto code = static_cast<unsigned>(static_cast<unsigned char>(c));
+          out += "\\u00";
+          out.push_back(kHexDigitsLower[(code >> kNibbleBits) & kNibbleMask]);
+          out.push_back(kHexDigitsLower[code & kNibbleMask]);
+        } else {
+          out.push_back(c);
+        }
+    }
+  }
+  out.push_back('"');
+}
+
+// Un objet, `{…}` compris, ses champs non nuls dans l'ordre du script.
+void AppendRecord(const ItemInfoRecord& record, std::string& out) {
+  bool first = true;
+  const auto field = [&out, &first](std::string_view key) {
+    out += first ? "" : ", ";
+    first = false;
+    out += key;
+    out += ": ";
+  };
+  out.push_back('{');
+  if (!record.name.empty()) {
+    field(kNameField);
+    AppendQuoted(record.name, out);
+  }
+  if (!record.resource.empty()) {
+    field(kResourceField);
+    AppendQuoted(record.resource, out);
+  }
+  if (record.slots != 0) {
+    field(kSlotsField);
+    out += std::to_string(record.slots);
+  }
+  if (record.view != 0) {
+    field(kViewField);
+    out += std::to_string(record.view);
+  }
+  if (record.costume) {
+    field(kCostumeField);
+    out += kTrue;
+  }
+  if (record.effect != 0) {
+    field(kEffectField);
+    out += std::to_string(record.effect);
+  }
+  if (!record.description.empty()) {
+    field(kDescriptionField);
+    out.push_back('[');
+    for (std::size_t rank = 0; rank < record.description.size(); ++rank) {
+      out += rank == 0 ? "" : ", ";
+      AppendQuoted(record.description[rank], out);
+    }
+    out.push_back(']');
+  }
+  out.push_back('}');
+}
+
+}  // namespace
+
+std::string WriteItemInfoText(std::string_view header, std::span<const ItemInfoRecord> records) {
+  std::vector<const ItemInfoRecord*> ordered;
+  ordered.reserve(records.size());
+  for (const ItemInfoRecord& record : records) {
+    ordered.push_back(&record);
+  }
+  std::ranges::stable_sort(ordered, {},
+                           [](const ItemInfoRecord* record) { return record->item_id; });
+  std::string out(header);
+  out += kVersionKey;
+  out += ": ";
+  out += std::to_string(kItemInfoVersion);
+  out += "\n";
+  out += kItemsKey;
+  out += ": {\n";
+  for (std::size_t rank = 0; rank < ordered.size(); ++rank) {
+    out += "  ";
+    out += std::to_string(ordered[rank]->item_id);
+    out += ": ";
+    AppendRecord(*ordered[rank], out);
+    out += rank + 1 == ordered.size() ? "\n" : ",\n";
+  }
+  out += "}\n";
+  return out;
 }
 
 }  // namespace ro::vfs

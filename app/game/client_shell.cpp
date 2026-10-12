@@ -17,11 +17,11 @@
 #include <SDL3/SDL.h>
 
 #include "ro/core/log.h"
+#include "ro/ui/system_fonts.h"
 
 #include "game/game.h"
 #include "game/save_folder.h"
 #include "game/skin_reload.h"
-#include "game/system_fonts.h"
 #include "options/screen_choice.h"
 #include "shell/skin_folder.h"
 #include "world/map_music.h"
@@ -118,8 +118,9 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
 
   // L'INTERFACE, aussitôt après : elle est ce qui décide, à chaque événement,
   // si le geste revient au jeu ou à une fenêtre.
-  auto opened = UiStage::Open(gl_->window(), windows_, settings_->options().font_family(),
-                              client_root_ / kLooseFontFolder, InterfaceSettingsFile(client_root_));
+  auto opened =
+      UiStage::Open(gl_->window(), windows_, settings_->options().font_family(),
+                    client_root_ / ro::ui::kLooseFontFolder, InterfaceSettingsFile(client_root_));
   if (!opened) {
     return std::unexpected(opened.error());
   }

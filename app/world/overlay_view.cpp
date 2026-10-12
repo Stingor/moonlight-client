@@ -10,8 +10,8 @@
 #include "ro/render/signboard.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/sim/world.h"
+#include "ro/ui/system_fonts.h"
 
-#include "game/system_fonts.h"
 #include "world/entity_bar_view.h"
 #include "world/item_dropper.h"
 #include "world/name_plate_view.h"
@@ -178,7 +178,7 @@ std::filesystem::path DefaultFontPath() {
 #ifdef _WIN32
   return std::filesystem::path("C:\\Windows\\Fonts\\arial.ttf");
 #else
-  return std::filesystem::path(BackslashFontSource());
+  return std::filesystem::path(ro::ui::BackslashFontSource());
 #endif
 }
 

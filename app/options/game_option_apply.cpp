@@ -15,11 +15,11 @@
 
 #include "ro/core/log.h"
 #include "ro/sim/world.h"
+#include "ro/ui/system_fonts.h"
 #include "ro/ui/ui_context.h"
 
 #include "chat/chat_history_file.h"
 #include "effects/effect_view.h"
-#include "game/system_fonts.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
 
