@@ -48,6 +48,11 @@ constexpr int kOpaqueAlpha = 255;
 // ajoute à la profondeur des rectangles cliquables, par genre.
 constexpr float kNonPlayerPickBias = 100.0F;
 constexpr float kMonsterPickBias = 200.0F;
+// UN FAMILIER CÈDE LE PIXEL À UN MONSTRE, et le prend encore à son maître : qui
+// chasse vise le monstre derrière son pet, et qui veut son pet le trouve
+// par-dessus lui-même. L'écart de cent avec le monstre dépasse ce qui sépare en
+// profondeur deux acteurs voisins à l'écran.
+constexpr float kCompanionPickBias = 300.0F;
 constexpr float kPlayerPickBias = 400.0F;
 // UN MONSTRE QUI AGONISE RECULE AU-DELÀ DE TOUT ce que la caméra peut voir :
 // il ne prend le pixel que si personne d'autre ne le tient. Un monstre vivant
@@ -255,6 +260,9 @@ float PickBiasOf(const ro::sim::Actor& actor) {
   // joueur mort doit rester désignable, on le vise pour le relever.
   if (actor.kind == ro::sim::ActorKind::kMonster && actor.posture == ro::sim::Posture::kDead) {
     return kCorpsePickBias;
+  }
+  if (actor.familiar != ro::sim::Familiar::kNone) {
+    return kCompanionPickBias;
   }
   switch (actor.kind) {
     case ro::sim::ActorKind::kPlayer:
