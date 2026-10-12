@@ -84,6 +84,36 @@ std::uint32_t WearAt(std::uint32_t wearable_at, bool alternate) {
   return wearable_at;
 }
 
+ShortcutItemGesture ShortcutGestureOf(const ro::sim::InventoryItem& item) {
+  if (item.wearable_at == ro::sim::kEquipAmmo) {
+    return {ShortcutItemAct::kWear, ro::sim::kEquipAmmo};
+  }
+  if (item.wearable_at == 0) {
+    return {ShortcutItemAct::kUse, 0};
+  }
+  if (item.equipped() || !item.identified) {
+    return {};
+  }
+  return {ShortcutItemAct::kWear, item.wearable_at};
+}
+
+const ro::sim::InventoryItem* ShortcutTargetIn(const ro::sim::Inventory& bag,
+                                               std::uint32_t item_id) {
+  const ro::sim::InventoryItem* first = nullptr;
+  for (const ro::sim::InventoryItem& item : bag.items()) {
+    if (item.item_id != item_id) {
+      continue;
+    }
+    if (!item.equipped()) {
+      return &item;
+    }
+    if (first == nullptr) {
+      first = &item;
+    }
+  }
+  return first;
+}
+
 WornViews WornPieceViews(const ro::sim::Inventory& bag) {
   const ro::sim::InventoryItem* top = bag.WornAt(ro::sim::kEquipHeadTop);
   const ro::sim::InventoryItem* mid = bag.WornAt(ro::sim::kEquipHeadMid);

@@ -65,6 +65,33 @@ namespace moonclient {
 // pas changée : le serveur l'accepte par la gauche et la pose sur les deux.
 [[nodiscard]] std::uint32_t WearAt(std::uint32_t wearable_at, bool alternate);
 
+// CE QU'UNE CASE DE BARRE FAIT DE L'OBJET QU'ELLE DÉSIGNE.
+enum class ShortcutItemAct : std::uint8_t {
+  kUse,
+  kWear,
+  kNothing,
+};
+
+struct ShortcutItemGesture {
+  ShortcutItemAct act = ShortcutItemAct::kNothing;
+  // L'emplacement demandé au serveur, pour `kWear` seulement.
+  std::uint32_t wear_at = 0;
+};
+
+// 🔴 UNE PIÈCE QUI SE PORTE S'ÉQUIPE, ELLE NE S'UTILISE PAS : le serveur refuse
+// en silence la demande d'usage d'un équipement ou d'une munition.
+//
+// ⚠ UNE PIÈCE DÉJÀ PORTÉE NE FAIT RIEN — la touche n'ôte pas —, une pièce non
+// identifiée non plus. Les munitions échappent aux deux : la demande repart même
+// portées, et le serveur les pose toujours à leur place.
+[[nodiscard]] ShortcutItemGesture ShortcutGestureOf(const ro::sim::InventoryItem& item);
+
+// L'EXEMPLAIRE DU SAC QU'UNE CASE DE BARRE VISE : le premier qui n'est pas porté,
+// à défaut le premier tout court. Deux exemplaires d'une même pièce, l'un porté,
+// l'autre pas : la touche doit équiper le second, pas buter sur le premier.
+[[nodiscard]] const ro::sim::InventoryItem* ShortcutTargetIn(const ro::sim::Inventory& bag,
+                                                             std::uint32_t item_id);
+
 // CE QUE LE PERSONNAGE PORTE À LA TÊTE ET AU DOS, tel que le catalogue le
 // dessine : les numéros d'apparence que le serveur donne à chaque pièce.
 struct WornViews {

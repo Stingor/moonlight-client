@@ -12,6 +12,7 @@
 #include "ro/sim/world.h"
 #include "ro/ui/staff_tools.h"
 
+#include "character/equip_slot_map.h"
 #include "character/shortcut_file.h"
 #include "game/homunculus_stage.h"
 #include "game/mercenary_stage.h"
@@ -244,10 +245,22 @@ void ShortcutBarView::Cast(std::size_t slot, SkillBookPanel& book, ro::net::Conn
     // 🔴 ON CHERCHE LA PLACE AU MOMENT DE PARTIR, jamais avant. La case retient
     // un identifiant d'objet ; sa place dans le sac change dès qu'on consomme la
     // pile précédente, et une place retenue désignerait bientôt autre chose.
-    const ro::sim::InventoryItem* held = FindInBag(world, what.item_id);
+    const ro::sim::InventoryItem* held = ShortcutTargetIn(world.inventory(), what.item_id);
     if (held == nullptr) {
       world.RecordChat(ro::sim::ChatKind::kServer, 0,
                        std::string(ro::core::Tr("Il n'en reste plus.")), now_ms);
+      return;
+    }
+    const ShortcutItemGesture gesture = ShortcutGestureOf(*held);
+    if (gesture.act == ShortcutItemAct::kNothing) {
+      return;
+    }
+    // ⚠ PORTER NE COMPTE PAS COMME UN USAGE : Quick cast répète ce qui se
+    // consomme, et une pièce qu'on remet à chaque période ferait du bruit.
+    if (gesture.act == ShortcutItemAct::kWear) {
+      if (auto sent = ro::net::RequestEquip(link, held->client_slot, gesture.wear_at); !sent) {
+        ro::core::LogWarning("barre : demande non émise — {}", ro::core::Describe(sent.error()));
+      }
       return;
     }
     if (auto sent = ro::net::RequestUseItem(link, held->client_slot, world.player_id()); !sent) {
@@ -335,8 +348,8 @@ bool ShortcutBarView::RepeatItemSlot(std::size_t slot, std::uint32_t item_id,
   if (!what.holds_item() || what.item_id != item_id) {
     return false;
   }
-  const ro::sim::InventoryItem* held = FindInBag(world, item_id);
-  if (held == nullptr) {
+  const ro::sim::InventoryItem* held = ShortcutTargetIn(world.inventory(), item_id);
+  if (held == nullptr || ShortcutGestureOf(*held).act != ShortcutItemAct::kUse) {
     return false;
   }
   if (auto sent = ro::net::RequestUseItem(link, held->client_slot, world.player_id()); !sent) {
