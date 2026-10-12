@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <charconv>
 #include <span>
+#include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
@@ -325,9 +327,19 @@ Result<void> ThorArchive::VerifyIntegrity() {
   if (!checksums) {
     return std::unexpected(checksums.error());
   }
+  // ⚠ L'INDEX SE BÂTIT UNE FOIS : `Find` normalise toute la table à chaque
+  // appel, et une somme par fichier en ferait un parcours quadratique. La
+  // dernière entrée d'un chemin l'emporte, comme dans `Find`.
+  std::unordered_map<std::string, const ThorEntry*> by_path;
+  by_path.reserve(entries_.size());
+  for (const ThorEntry& entry : entries_) {
+    by_path.insert_or_assign(NormalizeGrfPath(entry.path), &entry);
+  }
   std::unordered_set<std::string> listed;
   for (const ThorChecksum& checksum : *checksums) {
-    const ThorEntry* entry = Find(checksum.path);
+    std::string wanted = NormalizeGrfPath(checksum.path);
+    const auto found = by_path.find(wanted);
+    const ThorEntry* entry = found == by_path.end() ? nullptr : found->second;
     if (entry == nullptr || entry->is_removed) {
       return Fail(ErrorCode::kCorruptData, "somme d'une entrée absente : " + checksum.path);
     }
@@ -340,7 +352,7 @@ Result<void> ThorArchive::VerifyIntegrity() {
     if (computed != checksum.crc32) {
       return Fail(ErrorCode::kCorruptData, "somme fausse : " + checksum.path);
     }
-    listed.insert(NormalizeGrfPath(checksum.path));
+    listed.insert(std::move(wanted));
   }
   for (const ThorEntry& entry : entries_) {
     if (!entry.is_removed && !listed.contains(NormalizeGrfPath(entry.path))) {

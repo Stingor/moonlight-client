@@ -1,6 +1,8 @@
 #include "ro/render/actor_vignette.h"
 
+#include <algorithm>
 #include <optional>
+#include <span>
 #include <utility>
 #include <vector>
 
@@ -24,6 +26,18 @@ namespace {
   return left.width == right.width && left.height == right.height &&
          left.min_body_height == right.min_body_height && left.scale == right.scale &&
          left.fit == right.fit;
+}
+
+// Deux compositions peignent la même chose quand chaque quad tombe au même
+// endroit, dans le même sens et la même teinte.
+//
+// ⚠ LES IMAGES NE SUFFISENT PAS : une animation qui réemploie une image du
+// .spr peut la déplacer (un bond d'attaque), la retourner ou la pâlir.
+[[nodiscard]] bool SameQuads(std::span<const SpriteQuad> left, std::span<const SpriteQuad> right) {
+  return std::ranges::equal(left, right, [](const SpriteQuad& one, const SpriteQuad& other) {
+    return one.image_index == other.image_index && one.section == other.section &&
+           one.corners == other.corners && one.mirrored == other.mirrored && one.tint == other.tint;
+  });
 }
 
 }  // namespace
@@ -81,7 +95,8 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
   drawn_bounds_ = ComputeBounds(painted);
 
   const bool unchanged = same_outfit && SameBox(pose.box, box_) && pose.direction == direction_ &&
-                         !drawn_.empty() && composed.sources == drawn_;
+                         !drawn_.empty() && composed.sources == drawn_ &&
+                         SameQuads(composed.quads, drawn_quads_);
   if (unchanged) {
     return texture_;
   }
@@ -91,6 +106,7 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
   direction_ = pose.direction;
   box_ = pose.box;
   drawn_ = composed.sources;
+  drawn_quads_ = composed.quads;
 
   const formats::Image image = DrawVignette(composed, pose.box, framing_);
   if (image.empty()) {

@@ -365,7 +365,7 @@ class World {
   // Combien de lignes garder PAR GENRE. ⚠ N'ÉLAGUE PAS CE QUI EST DÉJÀ LÀ :
   // abaisser la borne ne doit pas faire disparaître sous les yeux du joueur ce
   // qu'il est en train de lire. Le trop-plein part au fil des lignes qui
-  // arrivent, comme d'habitude.
+  // arrivent, deux anciennes par nouvelle, jusqu'à retomber sous la borne.
   void SetChatLinesKeptPerKind(int kept) noexcept {
     kept_per_kind_ = std::clamp(kept, kFewestChatLinesKept, kMostChatLinesKept);
   }
@@ -670,7 +670,10 @@ class World {
   [[nodiscard]] DamageMeter& damage_meter() noexcept { return damage_meter_; }
   [[nodiscard]] const DamageMeter& damage_meter() const noexcept { return damage_meter_; }
 
-  void set_player_id(std::uint32_t id) noexcept { player_id_ = id; }
+  void set_player_id(std::uint32_t id) noexcept {
+    player_id_ = id;
+    pending_player_hp_.reset();
+  }
   [[nodiscard]] std::uint32_t player_id() const noexcept { return player_id_; }
   // Le personnage du joueur. Nul tant que le serveur ne l'a pas nommé.
   [[nodiscard]] const Actor* player() const { return Find(player_id_); }
@@ -773,6 +776,8 @@ class World {
   void RefreshPvpRing(std::uint32_t id, std::uint32_t now_ms);
 
   std::uint32_t player_id_ = 0;
+  // La vie du joueur arrivée AVANT son maximum, en attente de lui.
+  std::optional<std::int32_t> pending_player_hp_;
   // La dernière annonce de DEVOTION numérotée : voir `DevotionList::told_serial`.
   std::uint32_t devotion_serial_ = 0;
   DamageMeter damage_meter_;

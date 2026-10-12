@@ -93,6 +93,8 @@ class ActorVignette {
   // Ce que la texture montre déjà. ⚠ `drawn_` VIDE VEUT DIRE « RIEN DE
   // DESSINÉ » : c'est ce qui force la première composition.
   std::vector<SpriteImageKey> drawn_;
+  // Et où, dans quel sens et quelle teinte : voir `SameQuads`.
+  std::vector<SpriteQuad> drawn_quads_;
   ActorLook look_;
   std::size_t animation_ = 0;
   std::size_t direction_ = 0;

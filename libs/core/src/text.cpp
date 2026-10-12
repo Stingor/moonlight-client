@@ -109,6 +109,11 @@ constexpr char32_t kThreeByteMax = 0xFFFF;
 constexpr std::uint8_t kContinuationMark = 0x80;
 constexpr std::uint8_t kContinuationMask = 0xC0;
 constexpr char32_t kSixBits = 0x3F;
+// Les moitiés de paire UTF-16 n'ont pas de forme UTF-8 légale, et Unicode
+// s'arrête à U+10FFFF.
+constexpr char32_t kFirstSurrogate = 0xD800;
+constexpr char32_t kLastSurrogate = 0xDFFF;
+constexpr char32_t kLastCodePoint = 0x10FFFF;
 
 bool IsContinuation(std::string_view utf8, std::size_t at) {
   return (static_cast<unsigned char>(utf8[at]) & kContinuationMask) == kContinuationMark;
@@ -123,28 +128,36 @@ char32_t NextCodePoint(std::string_view utf8, std::size_t& at) {
     at += 1;
     return lead;
   }
+  // ⚠ UNE SÉQUENCE BIEN FORMÉE NE SUFFIT PAS : elle doit aussi être la plus
+  // COURTE possible, et ne désigner ni une moitié de paire UTF-16 ni rien
+  // au-delà de U+10FFFF. Sans ce contrôle, du 1252 comme « À… » (C0 85) passe
+  // pour de l'UTF-8, et `LooksLikeUtf8` le laisse partir sans conversion.
   if ((lead & 0xE0U) == 0xC0U && remaining >= 2 && IsContinuation(utf8, at + 1)) {
     const char32_t code =
         ((lead & 0x1FU) << 6) | (static_cast<unsigned char>(utf8[at + 1]) & kSixBits);
-    at += 2;
-    return code;
-  }
-  if ((lead & 0xF0U) == 0xE0U && remaining >= 3 && IsContinuation(utf8, at + 1) &&
-      IsContinuation(utf8, at + 2)) {
+    if (code > kOneByteMax) {
+      at += 2;
+      return code;
+    }
+  } else if ((lead & 0xF0U) == 0xE0U && remaining >= 3 && IsContinuation(utf8, at + 1) &&
+             IsContinuation(utf8, at + 2)) {
     const char32_t code = ((lead & 0x0FU) << 12) |
                           ((static_cast<unsigned char>(utf8[at + 1]) & kSixBits) << 6) |
                           (static_cast<unsigned char>(utf8[at + 2]) & kSixBits);
-    at += 3;
-    return code;
-  }
-  if ((lead & 0xF8U) == 0xF0U && remaining >= 4 && IsContinuation(utf8, at + 1) &&
-      IsContinuation(utf8, at + 2) && IsContinuation(utf8, at + 3)) {
+    if (code > kTwoByteMax && (code < kFirstSurrogate || code > kLastSurrogate)) {
+      at += 3;
+      return code;
+    }
+  } else if ((lead & 0xF8U) == 0xF0U && remaining >= 4 && IsContinuation(utf8, at + 1) &&
+             IsContinuation(utf8, at + 2) && IsContinuation(utf8, at + 3)) {
     const char32_t code = ((lead & 0x07U) << 18) |
                           ((static_cast<unsigned char>(utf8[at + 1]) & kSixBits) << 12) |
                           ((static_cast<unsigned char>(utf8[at + 2]) & kSixBits) << 6) |
                           (static_cast<unsigned char>(utf8[at + 3]) & kSixBits);
-    at += 4;
-    return code;
+    if (code > kThreeByteMax && code <= kLastCodePoint) {
+      at += 4;
+      return code;
+    }
   }
   at += 1;
   return kReplacementCharacter;

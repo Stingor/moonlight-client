@@ -80,12 +80,18 @@ std::vector<std::uint8_t> RawPixels(Gr2File& file, const Gr2Object& layout,
           file.Scalar(*member, layout.address, static_cast<std::uint32_t>(lane)));
     }
   }
-  if (bytes_per_pixel == 0 || bytes_per_pixel > kLargestPixelBytes) {
+  if (bytes_per_pixel == 0 || bytes_per_pixel > kLargestPixelBytes || width <= 0 || height <= 0 ||
+      width > INT16_MAX || height > INT16_MAX) {
     return {};
   }
-  const std::size_t row_bytes = stride > 0 ? static_cast<std::size_t>(stride)
-                                           : static_cast<std::size_t>(width) * bytes_per_pixel;
-  if (pixels.size() < row_bytes * static_cast<std::size_t>(height)) {
+  // ⚠ LE PAS VIENT DU FICHIER, et rien ne l'oblige à couvrir une rangée : un
+  // pas plus court que `width × octets` ferait lire la dernière rangée au-delà
+  // des pixels. La borne porte donc sur le dernier octet LU, pas sur
+  // `pas × hauteur`.
+  const std::size_t packed_row = static_cast<std::size_t>(width) * bytes_per_pixel;
+  const std::size_t row_bytes = stride > 0 ? static_cast<std::size_t>(stride) : packed_row;
+  if (row_bytes < packed_row ||
+      pixels.size() < row_bytes * (static_cast<std::size_t>(height) - 1) + packed_row) {
     return {};
   }
   std::vector<std::uint8_t> rgba(static_cast<std::size_t>(width) *

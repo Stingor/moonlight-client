@@ -447,9 +447,21 @@ ParameterOutcome World::SetPlayerParameter(std::uint16_t parameter, std::int64_t
     // l'autre effacerait la barre : `SetHealth` rend la vie INCONNUE dès que le
     // maximum est nul ou négatif, ce qu'il vaut justement tant que le second
     // paramètre n'est pas arrivé. On garde donc celui qu'on tient déjà.
+    //
+    // ⚠ ET LA VIE QUI PRÉCÈDE SON MAXIMUM SE MET DE CÔTÉ : `SetHealth` la
+    // rendrait inconnue, et le maximum, à son arrivée, partirait alors de rien
+    // — une barre à zéro jusqu'au prochain coup, que la régénération d'un
+    // joueur plein n'envoie jamais.
     const auto given = static_cast<std::int32_t>(value);
-    const std::int32_t hp = named == ServerParameter::kHp ? given : self->health;
+    if (named == ServerParameter::kHp && self->max_health <= 0) {
+      pending_player_hp_ = given;
+      return ParameterOutcome::kStored;
+    }
+    const std::int32_t held_hp =
+        self->max_health > 0 ? self->health : pending_player_hp_.value_or(kUnknownHealth);
+    const std::int32_t hp = named == ServerParameter::kHp ? given : held_hp;
     const std::int32_t max_hp = named == ServerParameter::kMaxHp ? given : self->max_health;
+    pending_player_hp_.reset();
     return SetHealth(player_id_, hp, max_hp) ? ParameterOutcome::kStored
                                              : ParameterOutcome::kKnownButUnused;
   }
@@ -594,20 +606,25 @@ void World::RecordChat(ChatKind kind, ChatType type, std::uint32_t speaker_id, s
     found->second.chat_text = text;
     found->second.chat_since_ms = said_ms;
   }
-  // ÉVICTION PAR GENRE : la plus ancienne de CE genre-là s'en va, en un parcours.
-  auto oldest = chat_lines_.end();
-  int of_kind = 0;
-  for (auto at = chat_lines_.begin(); at != chat_lines_.end(); ++at) {
-    if (at->kind != kind) {
-      continue;
-    }
-    if (oldest == chat_lines_.end()) {
-      oldest = at;
-    }
-    ++of_kind;
-  }
-  if (of_kind >= kept_per_kind_ && oldest != chat_lines_.end()) {
-    chat_lines_.erase(oldest);
+  // ÉVICTION PAR GENRE : les plus anciennes de CE genre-là s'en vont.
+  //
+  // ⚠ DEUX AU PLUS PAR LIGNE ARRIVÉE quand la borne est dépassée, et non une :
+  // une seule retirée pour une ajoutée laisserait le compte où il est, et une
+  // borne abaissée ne prendrait jamais effet. Deux, et non tout l'excédent :
+  // le trop-plein s'écoule au fil des lignes, sans vider d'un coup ce que le
+  // joueur est en train de lire.
+  constexpr int kMostEvictedPerLine = 2;
+  const auto of_kind = static_cast<int>(std::ranges::count_if(
+      chat_lines_, [kind](const ChatLine& line) { return line.kind == kind; }));
+  int evicted = std::min(of_kind - kept_per_kind_ + 1, kMostEvictedPerLine);
+  if (evicted > 0) {
+    std::erase_if(chat_lines_, [kind, &evicted](const ChatLine& line) {
+      if (evicted == 0 || line.kind != kind) {
+        return false;
+      }
+      --evicted;
+      return true;
+    });
   }
   // Le rang part à UN : une marque de vidage à zéro ne désigne aucune ligne.
   ++chat_lines_seen_;
@@ -744,6 +761,9 @@ void World::Clear() {
   // plus. C'est ce qui la sépare de l'identifiant du joueur, juste en dessous.
   Designate(0);
   // L'identifiant du joueur SURVIT : il vient de la connexion, pas de la carte.
+  // Sa vie en attente, non : elle attendait un maximum posé sur l'acteur
+  // qu'on vient d'effacer.
+  pending_player_hp_.reset();
 }
 
 }  // namespace ro::sim

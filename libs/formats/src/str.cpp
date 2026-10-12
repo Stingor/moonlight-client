@@ -111,7 +111,9 @@ core::Result<StrEffect> StrEffect::Parse(std::span<const std::uint8_t> bytes) {
       return Fail(ErrorCode::kCorruptData, "nombre d'images clés STR hors bornes");
     }
     layer.key_frames.reserve(reader.AtMostRemaining(static_cast<std::size_t>(key_count)));
-    for (std::int32_t key = 0; key < key_count; ++key) {
+    // ⚠ ON S'ARRÊTE À LA PREMIÈRE LECTURE MANQUÉE : un compte gonflé ferait
+    // sinon pousser un million d'images clés vides avant de constater la fin.
+    for (std::int32_t key = 0; key < key_count && reader.ok(); ++key) {
       layer.key_frames.push_back(ReadKeyFrame(reader));
     }
     if (!reader.ok()) {
