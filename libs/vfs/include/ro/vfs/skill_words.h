@@ -7,8 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
+#include "ro/vfs/skill_info.h"
 
 namespace ro::vfs {
 
@@ -16,24 +15,17 @@ namespace ro::vfs {
 //
 // 🔴 LE FIL N'EN PORTE RIEN. Le serveur envoie un identifiant, un rang et un
 // coût ; ce que la compétence FAIT — sa portée, sa cible, ses conditions, le
-// paragraphe de conseils qui suit — vit dans une table de l'installation, et
-// nulle part ailleurs. Sans elle, le grimoire montre des icônes muettes.
+// paragraphe de conseils qui suit — vit dans `skill_info.yml`, et nulle part
+// ailleurs. Sans lui, le grimoire montre des icônes muettes.
 //
 // ⚠ CES TEXTES NE SONT PAS TRADUITS PAR NOUS : l'ADR 0034 a tranché, les
-// descriptions du JEU viennent de l'installation du joueur. Ils
-// n'entrent pas dans `lang/`, et `core::Tr` n'a rien à y voir.
+// descriptions du JEU viennent de l'installation (sa traduction ROenglishRE,
+// versée dans la table). Ils n'entrent pas dans `lang/`, et `core::Tr` n'a rien
+// à y voir.
 //
 // ⚠ LE BALISAGE EST CONSERVÉ TEL QUEL — `^RRGGBB`, `<NAVI>`, `<URL>`. C'est
 // `ro/ui/rich_text.h` qui le lit ; le retirer ici déciderait à sa place, et
 // perdrait les couleurs que la table pose exprès.
-
-// LA TABLE DU CLIENT, et la clé sous laquelle chaque description est rangée.
-//
-// ⚠ ELLE S'INDEXE PAR NUMÉRO DE COMPÉTENCE, pas par nom : le fichier écrit
-// `[SKID.AL_HEAL]`, et `SKID` — évaluée plus tôt dans la même chaîne — rend le
-// numéro. C'est pour cela que la lecture n'a pas besoin des noms internes.
-inline constexpr std::string_view kSkillDescriptGlobal = "SKILL_DESCRIPT";
-
 class SkillWords {
  public:
   // Les lignes d'une compétence, balisage compris. VIDE pour une compétence que
@@ -46,10 +38,10 @@ class SkillWords {
 
   [[nodiscard]] std::size_t skill_count() const noexcept { return by_skill_.size(); }
 
-  // Monte la table à partir de globales DÉJÀ évaluées. Séparé de la lecture des
-  // fichiers pour la même raison que l'arbre : elle se vérifie sans VFS ni
-  // archive.
-  [[nodiscard]] static core::Result<SkillWords> FromGlobals(const formats::LuaTable& globals);
+  // Monte la table à partir des fiches lues. Les lignes sont DÉPLACÉES hors des
+  // fiches, qui restent sans description : un méga-octet et demi de texte ne se
+  // copie pas pour rien. Une fiche sans ligne n'a pas de description.
+  [[nodiscard]] static SkillWords FromRecords(std::span<SkillInfoRecord> records);
 
  private:
   // OÙ LES LIGNES D'UNE COMPÉTENCE COMMENCENT, et combien il y en a.

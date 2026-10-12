@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <span>
 #include <string>
@@ -8,29 +8,29 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
-
 namespace ro::sim {
 
 // L'ARBRE DES COMPÉTENCES : CE QUE LE SERVEUR N'ENVOIE JAMAIS.
 //
 // ⚠ C'EST LA MOITIÉ MANQUANTE DU GRIMOIRE. Le serveur n'annonce que ce que le
 // personnage sait DÉJÀ — une ligne par compétence apprise. Le reste vient de
-// deux sources, et chacune a son domaine :
+// trois tables, et chacune a son domaine :
 //
 //   - les RÈGLES, ce qu'un métier peut apprendre — rang maximal, prérequis —
 //     viennent des bases du serveur (`data\yaml_files\skill_trees.yml`) et
 //     arrivent par `UseServerRules` ;
-//   - la FORME — cases de la grille, onglets, nom affiché, coût et zone par
-//     rang — vient des tables Lua de l'installation.
+//   - les FICHES — nom interne, nom affiché, coût, portée et zone par rang —
+//     viennent de `skill_info.yml` : le serveur pour ce qu'il tient, les
+//     tables de l'installation pour le reste ;
+//   - la FORME — cases de la grille, onglets, chaînes d'héritage — vient de
+//     `skill_layout.yml`, tirée des tables de l'installation.
 //
 // Le grimoire croise cet arbre et `sim::SkillBook`, l'état.
 //
-// ⚠ ELLE NE LIT AUCUN FICHIER. On lui remet des tables DÉJÀ évaluées et des
-// règles déjà lues : `sim` ne connaît pas le VFS, et l'arbre n'a pas à savoir
-// d'où viennent ses octets. Qui les lit trouvera `vfs::ReadLuaChain`, la liste
-// de fichiers ci-dessous et `vfs::SkillTreeRules`.
+// ⚠ ELLE NE LIT AUCUN FICHIER. On lui remet des fiches et une disposition déjà
+// lues : `sim` ne connaît pas le VFS, et l'arbre n'a pas à savoir d'où viennent
+// ses octets. Qui les lit trouvera `vfs::LoadSkillInfo`, `vfs::LoadSkillLayout`
+// et `vfs::SkillTreeRules`.
 
 // Un PRÉREQUIS : la compétence réclamée et le rang qu'il en faut.
 struct SkillRequirement {
@@ -63,7 +63,6 @@ struct SkillRules {
   bool skill_free = false;
 };
 
-// Ce que les tables du client disent d'une compétence.
 // LA ZONE QU'UN SORT COUVRE, en cases, telle que le client la déclare.
 //
 // ⚠ PUREMENT COSMÉTIQUE. C'est ce que le client DESSINE, pas ce que le serveur
@@ -89,8 +88,9 @@ struct SkillNode {
   std::string idname;
   // Le libellé affiché, dans la langue du client.
   std::string display_name;
-  // Le coût et la portée PAR RANG : le rang n vaut l'entrée n-1. Les tables en
-  // donnent une par niveau maximal, et une compétence sans coût n'en a aucune.
+  // Le coût et la portée PAR RANG, ceux que le serveur applique : le rang n vaut
+  // l'entrée n-1. Une compétence sans coût n'en a aucun, et une portée nulle à
+  // tout rang n'en a pas non plus.
   std::vector<std::uint16_t> sp_by_level;
   std::vector<std::uint16_t> range_cells_by_level;
   // La zone PAR RANG, même convention que les deux précédentes. Vide pour qui
@@ -98,6 +98,11 @@ struct SkillNode {
   std::vector<SkillScaleCells> scale_by_level;
   // Vrai quand l'effet dépend du rang lancé — c'est ce qui autorise à lancer
   // une compétence en dessous du rang appris.
+  //
+  // 🔴 LE DÉFAUT N'EST PAS « FAUX ». Une fiche qui ne le dit pas le règle dès
+  // qu'elle porte un coût : cent cinquante-trois compétences des classes de base sont
+  // dans ce cas — Bash, Heal, Fire Bolt. La conversion a déjà tranché ; ce champ
+  // porte la réponse.
   bool level_matters = false;
 };
 
@@ -129,44 +134,23 @@ struct SkillSlot {
 // disposition : les rangs de case viennent de ses tables.
 inline constexpr int kSkillGridColumns = 7;
 
-// Les fichiers à évaluer, dans cet ordre, et ce que chacun nomme :
-//
-//   jobinheritlist : `JOBID`, puis `JOB_INHERIT_LIST` — de quel métier chaque
-//                    métier descend ;
-//   skillid        : `SKID`, l'identifiant de chaque compétence ;
-//   skillinfolist  : `SKILL_INFO_LIST`, la fiche de chacune — nom, coût,
-//                    portée et zone par rang. Son rang maximal et ses
-//                    prérequis ne sont PAS lus : ce sont les règles du serveur ;
-//   skilltreeview  : `SKILL_TREEVIEW_FOR_JOB`, la grille de chaque métier ;
-//   skilldescript  : `SKILL_DESCRIPT`, ce que chaque compétence FAIT.
-//
-// ⚠ L'ORDRE EST UNE DÉPENDANCE, pas une préférence : les trois derniers fichiers
-// écrivent `[SKID.SM_BASH]` et `[JOBID.JT_SWORDMAN]`, des clés que seuls les
-// deux premiers savent résoudre. Lus seuls, ils se refusent — comme chez le
-// client, qui enchaîne ses fichiers dans un même état.
-//
-// 🔴 UNE SEULE CHAÎNE POUR DEUX LECTEURS, et c'est voulu : l'arbre est monté
-// ici, les descriptions par `ro::vfs::SkillWords`, et les deux sortent des mêmes
-// globales. Deux chaînes évalueraient `skillid` deux fois pour rien — et la
-// dépendance d'ordre se retrouverait écrite à deux endroits, où elle ne pourrait
-// que diverger.
-inline constexpr std::array<std::string_view, 5> kSkillLuaFiles = {
-    "data\\luafiles514\\lua files\\skillinfoz\\jobinheritlist.lub",
-    "data\\luafiles514\\lua files\\skillinfoz\\skillid.lub",
-    "data\\luafiles514\\lua files\\skillinfoz\\skillinfolist.lub",
-    "data\\luafiles514\\lua files\\skillinfoz\\skilltreeview.lub",
-    "data\\luafiles514\\lua files\\skillinfoz\\skilldescript.lub",
+// LA DISPOSITION, déjà lue : les grilles, les deux chaînes d'héritage et les
+// noms d'onglets.
+struct SkillTreeLayout {
+  // Les cases de chaque métier qui a une grille. L'ordre importe peu : l'arbre
+  // les range par case.
+  std::unordered_map<std::uint32_t, std::vector<SkillSlot>> slots_by_job;
+  // De quel métier chaque métier descend. Le sommet de la chaîne n'y figure pas.
+  std::unordered_map<std::uint32_t, std::uint32_t> parent_by_job;
+  // ⚠ UNE SECONDE CHAÎNE, ET ELLE NE FAIT PAS DOUBLON. Elle dit de quel métier
+  // ORDINAIRE descend un métier transcendant — Chevalier Runique transcendant
+  // vers Chevalier Runique. Les treize métiers qu'elle nomme n'ont PAS de grille
+  // à eux : sans elle, un Chevalier Dragon perd tout l'arbre de la troisième
+  // classe, et rien ne le signale.
+  std::unordered_map<std::uint32_t, std::uint32_t> origin_by_job;
+  // Les noms d'onglets, par métier qui s'en est donné.
+  std::unordered_map<std::uint32_t, std::vector<std::string>> tab_names_by_job;
 };
-
-inline constexpr std::string_view kSkillInfoListGlobal = "SKILL_INFO_LIST";
-inline constexpr std::string_view kSkillTreeViewGlobal = "SKILL_TREEVIEW_FOR_JOB";
-inline constexpr std::string_view kJobInheritListGlobal = "JOB_INHERIT_LIST";
-// ⚠ UNE SECONDE TABLE D'HÉRITAGE, ET ELLE NE FAIT PAS DOUBLON. Elle dit de quel
-// métier ORDINAIRE descend un métier transcendant — Chevalier Runique
-// transcendant vers Chevalier Runique. Les treize métiers qu'elle nomme n'ont
-// PAS de grille à eux : sans elle, un Chevalier Dragon perd tout l'arbre de la
-// troisième classe, et rien ne le signale.
-inline constexpr std::string_view kJobOriginListGlobal = "JOB_INHERIT_LIST2";
 
 // L'ONGLET où le client range la grille d'un métier de la chaîne d'héritage.
 //
@@ -193,14 +177,6 @@ struct SkillJobTab {
   std::uint32_t job = 0;
   SkillTab tab = SkillTab::kFirst;
 };
-
-// L'appel Lua qui nomme les onglets d'un métier : le premier argument est le
-// métier, les suivants sont les noms, dans l'ordre des onglets.
-//
-// ⚠ C'EST LA SEULE SOURCE DE CES NOMS. Ils ne sont pas dans une table mais dans
-// dix appels au bas de `skilltreeview`, et c'est pour eux que le lecteur Lua
-// garde les appels au lieu de les sauter.
-inline constexpr std::string_view kTabNameCall = "JobSkillTab.ChangeSkillTabName";
 
 class SkillTree {
  public:
@@ -248,9 +224,12 @@ class SkillTree {
 
   [[nodiscard]] std::size_t node_count() const noexcept { return nodes_.size(); }
 
-  // Monte l'arbre à partir de globales DÉJÀ évaluées. Séparé de la lecture des
-  // fichiers pour que l'arbre se vérifie sans VFS ni archive.
-  [[nodiscard]] static core::Result<SkillTree> FromGlobals(const formats::LuaTable& globals);
+  // Monte l'arbre à partir de fiches et d'une disposition DÉJÀ lues. Séparé de
+  // la lecture des fichiers pour que l'arbre se vérifie sans VFS ni archive.
+  //
+  // ⚠ LA PREMIÈRE FICHE D'UN NUMÉRO, et la première d'un nom interne,
+  // l'emportent ; une grille vide n'en est pas une.
+  [[nodiscard]] static SkillTree FromTables(std::vector<SkillNode> nodes, SkillTreeLayout layout);
 
   // ── Les règles du serveur ───────────────────────────────────────────────
   //
@@ -283,13 +262,8 @@ class SkillTree {
   std::vector<SkillNode> nodes_;
   std::unordered_map<std::uint16_t, std::size_t> slot_by_skill_;
   std::unordered_map<std::string, std::size_t> slot_by_name_;
-  std::unordered_map<std::uint32_t, std::vector<SkillSlot>> slots_by_job_;
-  // De quel métier chaque métier descend. Le sommet de la chaîne n'y figure pas.
-  std::unordered_map<std::uint32_t, std::uint32_t> parent_by_job_;
-  // De quel métier ORDINAIRE descend un métier transcendant.
-  std::unordered_map<std::uint32_t, std::uint32_t> origin_by_job_;
-  // Les noms d'onglets, par métier qui s'en est donné.
-  std::unordered_map<std::uint32_t, std::vector<std::string>> tab_names_by_job_;
+  // Les grilles rangées par case, sans grille vide.
+  SkillTreeLayout layout_;
   // Les règles, chaque liste rangée par compétence.
   SkillRules rules_;
   bool has_rules_ = false;

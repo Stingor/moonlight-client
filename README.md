@@ -120,8 +120,12 @@ tête d'où elle vient et comment la régénérer.
   revendiqués comme partie de ce projet.
 - `skill_trees.yml` est exporté des arbres de compétences des métiers et de la
   guilde du serveur Moonlight (et de ses bases de compétences et de métiers).
-  La disposition de la fenêtre — cases, onglets — reste lue dans les tables de
-  l'installation du joueur ; elle n'est pas versée au dépôt.
+- `skill_info.yml` et `skill_layout.yml` prennent le nom interne, le coût et la
+  portée des compétences à la base de compétences du serveur Moonlight, et le
+  reste — noms affichés, descriptions, zones, cases et onglets de la fenêtre —
+  aux tables de compétences que livre le client, traduites par
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) ; ces textes ne sont
+  pas revendiqués comme partie de ce projet.
 - `random_options.yml` prend ses identifiants à la base des options aléatoires
   du serveur Moonlight, et ses libellés aux traductions
   [ROenglishRE](https://github.com/llchrisll/ROenglishRE) que livre le client ;

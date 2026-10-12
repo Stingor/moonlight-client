@@ -1,5 +1,5 @@
-// La LECTURE de l'arbre des compétences : quatre tables du client, enchaînées,
-// dont on ne garde que la forme de l'arbre, et les règles du serveur.
+// L'arbre des compétences : ses fiches, sa disposition et les règles du serveur,
+// déjà lues, et le classement des métiers en onglets.
 
 #include "ro/sim/skill_tree.h"
 
@@ -10,86 +10,10 @@
 namespace ro::sim {
 namespace {
 
-// Les champs d'une fiche, tels que `skillinfolist` les nomme. Son rang maximal
-// et ses prérequis ne sont pas lus : ce sont les règles du serveur.
-constexpr std::string_view kFieldName = "SkillName";
-constexpr std::string_view kFieldSpAmount = "SpAmount";
-constexpr std::string_view kFieldAttackRange = "AttackRange";
-// ⚠ ORTHOGRAPHE DU CLIENT, faute comprise : « bSeperateLv ». La corriger ici,
-// c'est ne plus rien trouver.
-constexpr std::string_view kFieldSeparateLevel = "bSeperateLv";
-// LA ZONE DESSINÉE AU SOL, par rang : `SkillScale[lv] = { x = .., y = .. }`.
-// C'est la table que le client interroge par sa globale `GetSkillScale`, et la
-// seule source de la taille — le paquet du serveur ne la porte pas.
-constexpr std::string_view kFieldSkillScale = "SkillScale";
-constexpr std::string_view kScaleX = "x";
-constexpr std::string_view kScaleY = "y";
-
-// Le nom interne est la PREMIÈRE entrée numérotée de la fiche, sans clé.
-constexpr double kIdNameIndex = 1.0;
-
 // Une chaîne d'héritage plus longue que cela n'existe pas — la plus profonde en
 // compte six. Le plafond n'est pas là pour elle mais pour un cycle dans les
 // tables, qui ferait tourner la remontée sans fin.
 constexpr std::size_t kLongestInheritance = 16;
-
-[[nodiscard]] const formats::LuaTable* TableOf(const formats::LuaValue* value) {
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kTable ||
-      value->table == nullptr) {
-    return nullptr;
-  }
-  return value->table.get();
-}
-
-[[nodiscard]] std::uint16_t NumberOr(const formats::LuaValue* value, std::uint16_t fallback) {
-  if (value == nullptr || value->kind != formats::LuaValue::Kind::kNumber || value->number < 0.0) {
-    return fallback;
-  }
-  return static_cast<std::uint16_t>(value->number);
-}
-
-// Une liste de nombres par rang — coût, portée. Les tables en donnent une par
-// niveau maximal ; une compétence sans coût n'en a aucune.
-[[nodiscard]] std::vector<std::uint16_t> NumbersByLevel(const formats::LuaValue* value) {
-  std::vector<std::uint16_t> levels;
-  const formats::LuaTable* table = TableOf(value);
-  if (table == nullptr) {
-    return levels;
-  }
-  levels.reserve(table->by_index.size());
-  for (const auto& [rank, entry] : table->by_index) {
-    levels.push_back(NumberOr(&entry, 0));
-  }
-  return levels;
-}
-
-// La zone par rang. ⚠ CHAQUE ENTRÉE EST UNE TABLE `{x = .., y = ..}`, et non un
-// nombre : `NumbersByLevel` rendrait des zéros sans rien signaler.
-//
-// ⚠ ET LES RANGS SONT CREUX. Une compétence peut n'en déclarer que pour
-// quelques-uns ; la table Lua est indexée, et un rang absent laisse une zone non
-// déclarée plutôt que de décaler ceux qui suivent.
-[[nodiscard]] std::vector<SkillScaleCells> ScaleByLevel(const formats::LuaValue* value) {
-  std::vector<SkillScaleCells> levels;
-  const formats::LuaTable* table = TableOf(value);
-  if (table == nullptr) {
-    return levels;
-  }
-  for (const auto& [rank, entry] : table->by_index) {
-    const formats::LuaTable* cell = TableOf(&entry);
-    if (cell == nullptr) {
-      continue;
-    }
-    // Le rang est celui du client, à partir de un : la case n vaut l'entrée
-    // n-1, et les trous restent non déclarés.
-    if (rank >= 1) {
-      levels.resize(std::max<std::size_t>(levels.size(), static_cast<std::size_t>(rank)));
-      levels[static_cast<std::size_t>(rank) - 1] = SkillScaleCells{
-          .x = NumberOr(cell->Find(kScaleX), 0), .y = NumberOr(cell->Find(kScaleY), 0)};
-    }
-  }
-  return levels;
-}
 
 // La règle d'une compétence dans une liste rangée par compétence, ou nullptr.
 [[nodiscard]] const SkillRule* RuleIn(std::span<const SkillRule> rules, std::uint16_t skill_id) {
@@ -191,19 +115,19 @@ const SkillNode* SkillTree::FindByName(std::string_view idname) const {
 }
 
 std::span<const SkillSlot> SkillTree::SlotsOfJob(std::uint32_t job) const {
-  const auto found = slots_by_job_.find(job);
-  if (found != slots_by_job_.end()) {
+  const auto found = layout_.slots_by_job.find(job);
+  if (found != layout_.slots_by_job.end()) {
     return found->second;
   }
   // ⚠ UN MÉTIER TRANSCENDANT N'A PAS DE GRILLE À LUI : il prend celle de sa
   // classe d'origine. Sans ce report, un Chevalier Dragon perd tout l'arbre du
   // Chevalier Runique — sa chaîne passe par le transcendant, qui n'a rien.
-  const auto origin = origin_by_job_.find(job);
-  if (origin == origin_by_job_.end()) {
+  const auto origin = layout_.origin_by_job.find(job);
+  if (origin == layout_.origin_by_job.end()) {
     return {};
   }
-  const auto borrowed = slots_by_job_.find(origin->second);
-  return borrowed == slots_by_job_.end() ? std::span<const SkillSlot>{} : borrowed->second;
+  const auto borrowed = layout_.slots_by_job.find(origin->second);
+  return borrowed == layout_.slots_by_job.end() ? std::span<const SkillSlot>{} : borrowed->second;
 }
 
 std::vector<std::uint32_t> SkillTree::InheritanceOfJob(std::uint32_t job) const {
@@ -211,8 +135,8 @@ std::vector<std::uint32_t> SkillTree::InheritanceOfJob(std::uint32_t job) const 
   std::uint32_t current = job;
   while (chain.size() < kLongestInheritance) {
     chain.push_back(current);
-    const auto parent = parent_by_job_.find(current);
-    if (parent == parent_by_job_.end() || parent->second == current) {
+    const auto parent = layout_.parent_by_job.find(current);
+    if (parent == layout_.parent_by_job.end() || parent->second == current) {
       break;
     }
     // Un métier déjà vu ferme un cycle : les tables en portent un — le Spirit
@@ -257,8 +181,8 @@ std::span<const std::string> SkillTree::TabNamesOfJob(std::uint32_t job) const {
   // Du plus RÉCENT au plus ancien : le métier qui s'est donné des noms l'emporte
   // sur ses ancêtres.
   for (auto step = chain.rbegin(); step != chain.rend(); ++step) {
-    const auto found = tab_names_by_job_.find(*step);
-    if (found != tab_names_by_job_.end()) {
+    const auto found = layout_.tab_names_by_job.find(*step);
+    if (found != layout_.tab_names_by_job.end()) {
       return found->second;
     }
   }
@@ -297,135 +221,23 @@ std::span<const SkillRequirement> SkillTree::NeedsOf(std::uint32_t job,
   return rule->needs;
 }
 
-core::Result<SkillTree> SkillTree::FromGlobals(const formats::LuaTable& globals) {
-  const formats::LuaTable* infos = TableOf(globals.Find(kSkillInfoListGlobal));
-  if (infos == nullptr) {
-    return std::unexpected(core::Error{core::ErrorCode::kCorruptData,
-                                       std::string(kSkillInfoListGlobal) + " est absente"});
-  }
-
+SkillTree SkillTree::FromTables(std::vector<SkillNode> nodes, SkillTreeLayout layout) {
   SkillTree tree;
-  tree.nodes_.reserve(infos->by_index.size());
-  for (const auto& [skill_id, entry] : infos->by_index) {
-    const formats::LuaTable* skill_table = TableOf(&entry);
-    if (skill_table == nullptr || skill_id <= 0.0) {
-      continue;
-    }
-    const formats::LuaValue* idname = skill_table->Find(kIdNameIndex);
-    SkillNode node;
-    node.id = static_cast<std::uint16_t>(skill_id);
-    if (idname != nullptr && idname->kind == formats::LuaValue::Kind::kString) {
-      node.idname = idname->text;
-    }
-    const formats::LuaValue* display = skill_table->Find(kFieldName);
-    if (display != nullptr && display->kind == formats::LuaValue::Kind::kString) {
-      node.display_name = display->text;
-    }
-    node.sp_by_level = NumbersByLevel(skill_table->Find(kFieldSpAmount));
-    node.range_cells_by_level = NumbersByLevel(skill_table->Find(kFieldAttackRange));
-    node.scale_by_level = ScaleByLevel(skill_table->Find(kFieldSkillScale));
-    // 🔴 LE DÉFAUT N'EST PAS « FAUX », ET C'EST LE CLIENT QUI LE DIT. Sa fonction
-    // `IsLevelUseSkill` vit dans `skillinfo_f.lub` ; son bytecode répond en TROIS
-    // temps, pas en deux :
-    //
-    //   pas de fiche          → faux ;
-    //   `bSeperateLv` présent → sa valeur ;
-    //   `bSeperateLv` ABSENT  → VRAI si la fiche porte `SpAmount`, faux sinon.
-    //
-    // 🔴 ET C'EST LE TROISIÈME CAS QUI DOMINE. Dans cette installation, cent
-    // cinquante-trois compétences des classes de base n'ont pas le champ — Bash,
-    // Heal, Fire Bolt, Soul Strike, Cold Bolt. Les lire « faux » retirerait le
-    // réglage du rang de lancement à presque tout ce qu'un joueur lance : la
-    // molette n'aurait plus rien à régler, et le menu plus sa section.
-    //
-    // ⚠ `sp_by_level` EST LE TÉMOIN DE `SpAmount`, et il vient d'être rempli
-    // juste au-dessus : une fiche sans coût par rang est une passive, et une
-    // passive ne se dose pas.
-    const formats::LuaValue* separate = skill_table->Find(kFieldSeparateLevel);
-    const bool told = separate != nullptr && separate->kind == formats::LuaValue::Kind::kBoolean;
-    node.level_matters = told ? separate->boolean : !node.sp_by_level.empty();
-
-    tree.slot_by_skill_.emplace(node.id, tree.nodes_.size());
+  tree.nodes_ = std::move(nodes);
+  for (std::size_t slot = 0; slot < tree.nodes_.size(); ++slot) {
+    const SkillNode& node = tree.nodes_[slot];
+    tree.slot_by_skill_.emplace(node.id, slot);
     if (!node.idname.empty()) {
-      tree.slot_by_name_.emplace(node.idname, tree.nodes_.size());
-    }
-    tree.nodes_.push_back(std::move(node));
-  }
-
-  // ── Les grilles ──────────────────────────────────────────────────────────
-  // ⚠ ABSENTE N'EST PAS UNE ERREUR ICI : un serveur peut ne livrer que les
-  // fiches. Le grimoire retombe alors sur une grille vide par métier, ce qui
-  // reste lisible — contrairement à des fiches manquantes, qui laisseraient des
-  // cases sans nom ni niveau maximal.
-  const formats::LuaTable* grids = TableOf(globals.Find(kSkillTreeViewGlobal));
-  if (grids != nullptr) {
-    for (const auto& [job, entry] : grids->by_index) {
-      const formats::LuaTable* grid = TableOf(&entry);
-      if (grid == nullptr || job < 0.0) {
-        continue;
-      }
-      std::vector<SkillSlot> slots;
-      slots.reserve(grid->by_index.size());
-      for (const auto& [position, skill] : grid->by_index) {
-        const std::uint16_t skill_id = NumberOr(&skill, 0);
-        if (skill_id == 0 || position < 0.0) {
-          continue;
-        }
-        slots.push_back(
-            SkillSlot{.position = static_cast<std::uint16_t>(position), .skill_id = skill_id});
-      }
-      if (slots.empty()) {
-        continue;
-      }
-      // Rangées par case : les tables les donnent presque toujours dans l'ordre,
-      // mais « presque » ne suffit pas quand c'est l'ordre du dessin.
-      std::sort(slots.begin(), slots.end(),
-                [](const SkillSlot& a, const SkillSlot& b) { return a.position < b.position; });
-      tree.slots_by_job_.emplace(static_cast<std::uint32_t>(job), std::move(slots));
+      tree.slot_by_name_.emplace(node.idname, slot);
     }
   }
-
-  // ── L'héritage ───────────────────────────────────────────────────────────
-  const auto read_links = [&globals](std::string_view global,
-                                     std::unordered_map<std::uint32_t, std::uint32_t>& into) {
-    const formats::LuaTable* table = TableOf(globals.Find(global));
-    if (table == nullptr) {
-      return;
-    }
-    for (const auto& [job, parent] : table->by_index) {
-      if (job < 0.0 || parent.kind != formats::LuaValue::Kind::kNumber || parent.number < 0.0) {
-        continue;
-      }
-      into.insert_or_assign(static_cast<std::uint32_t>(job),
-                            static_cast<std::uint32_t>(parent.number));
-    }
-  };
-  read_links(kJobInheritListGlobal, tree.parent_by_job_);
-  read_links(kJobOriginListGlobal, tree.origin_by_job_);
-
-  // ── Les noms d'onglets ───────────────────────────────────────────────────
-  // Ils ne sont dans aucune table : le fichier de grilles se termine par dix
-  // APPELS qui les posent, un par métier qui s'en donne.
-  for (const formats::LuaCall& call : globals.calls) {
-    if (call.name != kTabNameCall || call.arguments.size() < 2) {
-      continue;
-    }
-    const formats::LuaValue& named_job = call.arguments.front();
-    if (named_job.kind != formats::LuaValue::Kind::kNumber || named_job.number < 0.0) {
-      continue;
-    }
-    std::vector<std::string> names;
-    names.reserve(call.arguments.size() - 1);
-    for (std::size_t rank = 1; rank < call.arguments.size(); ++rank) {
-      if (call.arguments[rank].kind == formats::LuaValue::Kind::kString) {
-        names.push_back(call.arguments[rank].text);
-      }
-    }
-    if (!names.empty()) {
-      tree.tab_names_by_job_.insert_or_assign(static_cast<std::uint32_t>(named_job.number),
-                                              std::move(names));
-    }
+  // Rangées par case : c'est l'ordre du dessin, et une table retouchée à la main
+  // peut ne pas le suivre.
+  std::erase_if(layout.slots_by_job, [](const auto& grid) { return grid.second.empty(); });
+  for (auto& [job, slots] : layout.slots_by_job) {
+    std::ranges::sort(slots, {}, &SkillSlot::position);
   }
+  tree.layout_ = std::move(layout);
   return tree;
 }
 

@@ -10,7 +10,7 @@ namespace ro::sim {
 
 // CE QUE LE SERVEUR SEUL SAIT D'UNE COMPÉTENCE.
 //
-// 🔴 NI L'INSTALLATION NI LE FIL ORDINAIRE NE LE PORTENT. `skilldescript.lub`
+// 🔴 NI L'INSTALLATION NI LE FIL ORDINAIRE NE LE PORTENT. Sa description
 // écrit un paragraphe pour le joueur ; le grimoire envoie un rang et un coût. Le
 // TEMPS d'incantation, le temps d'attente, le délai d'après-coup et les DÉGÂTS
 // qu'une compétence ferait vivent dans `skill_db` et dans les formules de

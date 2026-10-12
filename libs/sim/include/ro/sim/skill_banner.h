@@ -16,8 +16,8 @@ namespace ro::sim {
 // chat — et c'est pourquoi la bannière prend l'aspect, la place et la durée
 // d'une bulle de dialogue.
 //
-// Le nom vient du Lua, c'est-à-dire du libellé
-// affiché de `skillinfolist.lub` : voir `SkillNode::display_name`.
+// Le nom est le libellé affiché de `skill_info.yml` : voir
+// `SkillNode::display_name`.
 
 // Ce que le client ajoute derrière le nom d'un partenaire : espace, deux points
 // d'exclamation, deux espaces.

@@ -278,11 +278,13 @@ target_link_libraries(moonclient_skillrefusal
 
 target_include_directories(moonclient_skillrefusal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# LES RÈGLES DES ARBRES DE COMPÉTENCES, lues dans `skill_trees.yml` et remises à
+# L'ARBRE DES COMPÉTENCES : ses fiches et sa disposition (`skill_info.yml`,
+# `skill_layout.yml`) et les règles lues dans `skill_trees.yml`, remises à
 # l'arbre. En bibliothèque parce que le client et `roc-cli skill` montent le
 # même arbre : deux conversions finiraient par diverger.
 add_library(moonclient_skillrules STATIC
-    game/skill_rules.cpp)
+    game/skill_rules.cpp
+    game/skill_tables.cpp)
 
 target_link_libraries(moonclient_skillrules
     PUBLIC ro_core ro_sim ro_vfs

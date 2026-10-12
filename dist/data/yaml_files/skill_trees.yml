@@ -14,7 +14,7 @@
 #    (niveaux requis), by_points (faux : ne s'apprend pas par points).
 #
 #  Lu par moonclient (ro/vfs/skill_tree_rules.h). La disposition de la fenêtre
-#  — cases, onglets — reste lue dans les tables de l'installation.
+#  — cases, onglets — vient de skill_layout.yml (skill_info.py).
 # ─────────────────────────────────────────────────────────────────────────────
 version: 1
 mode: Prerenewal

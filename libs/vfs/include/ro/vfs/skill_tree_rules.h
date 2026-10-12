@@ -31,7 +31,7 @@ namespace ro::vfs {
 // leur défaut : aucun prérequis, aucun niveau requis, apprenable par points.
 //
 // 🔴 C'EST LA DONNÉE DE JEU, pas la disposition : les cases et les onglets de la
-// fenêtre restent ceux des tables de l'installation.
+// fenêtre viennent de `skill_layout.yml`.
 inline constexpr std::string_view kSkillTreeRulesPath = "data\\yaml_files\\skill_trees.yml";
 
 struct ServerSkillRule {
