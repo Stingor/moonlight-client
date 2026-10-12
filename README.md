@@ -139,10 +139,10 @@ tête d'où elle vient et comment la régénérer.
   traductions [ROenglishRE](https://github.com/llchrisll/ROenglishRE) des
   titres de Gravity, et ceux des titres propres au serveur. Ces libellés ne
   sont pas revendiqués comme partie de ce projet.
-- `town_info.yml` est tiré des fichiers `Towninfo.lub` et `Towninfo_C.lub` que
-  livre le client, traduits par
-  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) ; ils ne sont pas
-  revendiqués comme partie de ce projet.
+- `town_info.yml` est tiré des PNJ que placent les scripts du serveur
+  Moonlight, classés par des règles explicites et une liste éditée à la main ;
+  le fichier `Towninfo.lub` que livre le client ne sert qu'à comparer, rien
+  n'en est repris.
 - `map_sky.yml` est tiré de la table compilée `mapskydata.lub` que livre le
   client ; ces données de Gravity ne sont pas revendiquées comme partie de ce
   projet.

@@ -18,13 +18,13 @@ class Vfs;
 // ce que la minimap montre en icônes cliquables.
 //
 // La table est `data\yaml_files\town_info.yml`, que
-// `scripts/yaml_tables/town_info.py` tire de la table de l'installation et de
-// son complément :
+// `scripts/yaml_tables/town_info.py` tire des PNJ que le serveur place dans ses
+// villes :
 //
 //     version: 1
 //     towns:
 //       prontera:
-//         - {name: Kafra Employee, x: 146, y: 89, facility: kafra}
+//         - {name: Kafra, x: 155, y: 194, facility: kafra}
 inline constexpr std::string_view kTownInfoPath = "data\\yaml_files\\town_info.yml";
 
 // La nature d'une commodité.

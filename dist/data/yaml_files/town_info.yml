@@ -1,21 +1,18 @@
-# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
-# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
-# This file can be distributed, used and modified freely
-# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
-#
 # ─────────────────────────────────────────────────────────────────────────────
 #  Les commodités des villes, montrées sur la mini-carte
 #
-#  Tiré de SystemEN\Towninfo.lub de l'installation et de son complément
-#  SystemEN\Towninfo_C.lub, traduction ROenglishRE (mention ci-dessus).
+#  Tiré des PNJ que le serveur Moonlight charge (moon/scripts_moon.conf et ses
+#  scripts) : chaque PNJ placé sur une ville est classé par des règles
+#  explicites (scripts/yaml_tables/town_npcs.py), et la liste éditée à la main
+#  scripts/yaml_tables/town_info_overrides.yml impose, exclut ou renomme.
 #
 #  Fichier produit par scripts/yaml_tables/town_info.py. Ne pas éditer à la main :
 #      python scripts/yaml_tables/town_info.py --serveur <dépôt moonlight> \
 #          --client <dossier client> --sortie dist/data/yaml_files/town_info.yml
 #
-#  towns : carte (son nom, en minuscules) -> ses commodités, dans l'ordre :
-#    name     : le nom montré, facultatif ;
-#    x, y     : la case ;
+#  towns : carte (son nom, en minuscules) -> ses commodités :
+#    name     : le nom du PNJ, facultatif ;
+#    x, y     : sa case ;
 #    facility : tool_dealer, weapon_dealer, armor_dealer, smith, guide, inn,
 #               kafra ou stylist.
 #
@@ -25,328 +22,207 @@
 version: 1
 towns:
   alb2trea:
-  - {name: Kafra Employee, x: 59, y: 69, facility: kafra}
+  - {name: Tool Dealer, x: 87, y: 65, facility: tool_dealer}
   alberta:
-  - {name: Kafra Employee, x: 28, y: 229, facility: kafra}
-  - {name: Kafra Employee, x: 113, y: 60, facility: kafra}
+  - {name: Shop, x: 53, y: 247, facility: tool_dealer}
   - {name: Guide, x: 23, y: 238, facility: guide}
-  - {name: Guide, x: 184, y: 143, facility: guide}
   - {name: Guide, x: 120, y: 60, facility: guide}
-  - {name: Tool Dealer, x: 98, y: 154, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 117, y: 37, facility: weapon_dealer}
-  - {name: Smith, x: 35, y: 41, facility: smith}
-  - {name: Inn, x: 65, y: 233, facility: inn}
-  - {name: Styling Shop, x: 47, y: 145, facility: stylist}
+  - {name: Guide, x: 184, y: 143, facility: guide}
+  - {name: Kafra, x: 44, y: 247, facility: kafra}
   aldebaran:
-  - {name: Kafra Employee, x: 143, y: 119, facility: kafra}
+  - {name: Shop, x: 145, y: 115, facility: tool_dealer}
+  - {name: Guide, x: 36, y: 135, facility: guide}
+  - {name: Guide, x: 135, y: 243, facility: guide}
   - {name: Guide, x: 139, y: 63, facility: guide}
   - {name: Guide, x: 243, y: 143, facility: guide}
-  - {name: Guide, x: 135, y: 243, facility: guide}
-  - {name: Guide, x: 36, y: 135, facility: guide}
-  - {name: Tool Dealer, x: 197, y: 70, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 72, y: 197, facility: weapon_dealer}
+  - {name: Kafra, x: 133, y: 112, facility: kafra}
   amatsu:
-  - {name: Kafra Employee, x: 102, y: 149, facility: kafra}
-  - {name: Guide, x: 202, y: 91, facility: guide}
-  - {name: Tool Dealer, x: 96, y: 118, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 129, y: 117, facility: weapon_dealer}
+  - {name: Shop, x: 204, y: 115, facility: tool_dealer}
+  - {name: Amatsu Guide, x: 202, y: 91, facility: guide}
+  - {name: Kafra, x: 193, y: 115, facility: kafra}
   ayothaya:
-  - {name: Kafra Employee, x: 212, y: 169, facility: kafra}
-  - {name: Guide, x: 203, y: 169, facility: guide}
-  - {name: Guide, x: 146, y: 86, facility: guide}
-  - {name: Tool Dealer, x: 131, y: 86, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 165, y: 90, facility: weapon_dealer}
-  ba_maison:
-  - {name: Guide, x: 193, y: 69, facility: guide}
-  - {name: Guide, x: 193, y: 133, facility: guide}
-  - {name: Guide, x: 73, y: 169, facility: guide}
-  - {name: Guide, x: 297, y: 200, facility: guide}
+  - {name: Shop, x: 214, y: 190, facility: tool_dealer}
+  - {name: Ayothaya Guide Noa, x: 146, y: 86, facility: guide}
+  - {name: Ayothaya Guide Noi, x: 203, y: 169, facility: guide}
   brasilis:
-  - {name: Kafra Employee, x: 197, y: 221, facility: kafra}
-  - {name: Guide, x: 219, y: 97, facility: guide}
+  - {name: Shop, x: 200, y: 215, facility: tool_dealer}
   - {name: Tool Dealer, x: 252, y: 257, facility: tool_dealer}
   - {name: Weapon Dealer, x: 244, y: 243, facility: weapon_dealer}
-  - {name: Inn, x: 274, y: 151, facility: inn}
+  - {name: Brasilis Guide, x: 219, y: 97, facility: guide}
   cmd_fild07:
   - {name: Tool Dealer, x: 257, y: 126, facility: tool_dealer}
+  - {name: Weapon Dealer, x: 250, y: 98, facility: weapon_dealer}
   - {name: Armor Dealer, x: 277, y: 85, facility: armor_dealer}
-  - {name: Kafra Employee, x: 136, y: 134, facility: kafra}
   comodo:
-  - {name: Kafra Employee, x: 195, y: 150, facility: kafra}
-  - {name: Guide, x: 322, y: 178, facility: guide}
-  - {name: Guide, x: 197, y: 149, facility: guide}
-  - {name: Guide, x: 37, y: 219, facility: guide}
-  - {name: Guide, x: 181, y: 347, facility: guide}
-  - {name: Tool Dealer, x: 92, y: 128, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 266, y: 74, facility: weapon_dealer}
+  - {name: Shop, x: 172, y: 160, facility: tool_dealer}
+  - {name: Comodo Guide, x: 37, y: 219, facility: guide}
+  - {name: Comodo Guide, x: 181, y: 347, facility: guide}
+  - {name: Comodo Guide, x: 197, y: 149, facility: guide}
+  - {name: Comodo Guide, x: 322, y: 178, facility: guide}
   dewata:
-  - {name: Kafra Employee, x: 202, y: 184, facility: kafra}
-  - {name: Guide, x: 202, y: 106, facility: guide}
-  - {name: Guide, x: 197, y: 184, facility: guide}
+  - {name: Shop, x: 206, y: 169, facility: tool_dealer}
   - {name: Tool Dealer, x: 182, y: 164, facility: tool_dealer}
   - {name: Weapon Dealer, x: 218, y: 164, facility: weapon_dealer}
   - {name: Armor Dealer, x: 158, y: 182, facility: armor_dealer}
+  - {name: Dewata Guide, x: 197, y: 184, facility: guide}
+  - {name: Dewata Guide, x: 202, y: 106, facility: guide}
   dicastes01:
-  - {name: Kafra Employee, x: 136, y: 106, facility: kafra}
-  - {name: Guide, x: 189, y: 191, facility: guide}
+  - {name: Shop, x: 205, y: 234, facility: tool_dealer}
+  eclage:
+  - {name: Shop, x: 162, y: 188, facility: tool_dealer}
   einbech:
-  - {name: Kafra Employee, x: 181, y: 132, facility: kafra}
-  - {name: Guide, x: 67, y: 37, facility: guide}
-  - {name: Guide, x: 48, y: 214, facility: guide}
-  - {name: Tool Dealer, x: 176, y: 136, facility: tool_dealer}
+  - {name: Shop, x: 176, y: 121, facility: tool_dealer}
+  - {name: Einbech Guide, x: 48, y: 214, facility: guide}
+  - {name: Einbech Guide, x: 67, y: 37, facility: guide}
   einbroch:
-  - {name: Kafra Employee, x: 59, y: 203, facility: kafra}
-  - {name: Kafra Employee, x: 242, y: 205, facility: kafra}
-  - {name: Guide, x: 72, y: 202, facility: guide}
-  - {name: Guide, x: 155, y: 43, facility: guide}
-  - {name: Guide, x: 252, y: 320, facility: guide}
-  - {name: Guide, x: 162, y: 317, facility: guide}
-  - {name: Weapon Dealer, x: 215, y: 212, facility: weapon_dealer}
-  - {name: Smith, x: 255, y: 109, facility: smith}
-  - {name: Inn, x: 255, y: 199, facility: inn}
-  gef_fild10:
-  - {name: Kafra Employee, x: 73, y: 340, facility: kafra}
+  - {name: Paddler, x: 82, y: 199, facility: tool_dealer}
+  - {name: Shop, x: 72, y: 208, facility: tool_dealer}
+  - {name: Einbroch Guide, x: 72, y: 202, facility: guide}
+  - {name: Einbroch Guide, x: 155, y: 43, facility: guide}
+  - {name: Einbroch Guide, x: 162, y: 317, facility: guide}
+  - {name: Einbroch Guide, x: 252, y: 320, facility: guide}
   geffen:
-  - {name: Kafra Employee, x: 120, y: 62, facility: kafra}
-  - {name: Kafra Employee, x: 203, y: 123, facility: kafra}
-  - {name: Guide, x: 203, y: 116, facility: guide}
-  - {name: Guide, x: 118, y: 62, facility: guide}
+  - {name: Shop, x: 130, y: 69, facility: tool_dealer}
   - {name: Guide, x: 36, y: 123, facility: guide}
+  - {name: Guide, x: 118, y: 62, facility: guide}
   - {name: Guide, x: 123, y: 203, facility: guide}
-  - {name: Tool Dealer, x: 44, y: 86, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 99, y: 140, facility: weapon_dealer}
-  - {name: Smith, x: 182, y: 59, facility: smith}
-  - {name: Inn, x: 172, y: 174, facility: inn}
+  - {name: Guide, x: 203, y: 116, facility: guide}
+  - {name: Kafra, x: 113, y: 70, facility: kafra}
   gonryun:
-  - {name: Kafra Employee, x: 159, y: 122, facility: kafra}
-  - {name: Guide, x: 163, y: 60, facility: guide}
+  - {name: Shop, x: 157, y: 126, facility: tool_dealer}
   - {name: Tool Dealer, x: 147, y: 84, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 174, y: 101, facility: weapon_dealer}
   - {name: Armor Dealer, x: 173, y: 84, facility: armor_dealer}
+  - {name: Shop accessoires, x: 173, y: 88, facility: armor_dealer}
+  - {name: Guide, x: 170, y: 126, facility: guide}
+  - {name: Kunlun Guide, x: 163, y: 60, facility: guide}
+  - {name: Kafra, x: 155, y: 122, facility: kafra}
+  - {name: Styliste, x: 160, y: 126, facility: stylist}
   harboro1:
-  - {name: Kafra Employee, x: 291, y: 207, facility: kafra}
-  - {name: Inn, x: 156, y: 215, facility: inn}
-  - {name: Guide, x: 356, y: 211, facility: guide}
+  - {name: Shop, x: 283, y: 219, facility: tool_dealer}
   - {name: Guide, x: 80, y: 211, facility: guide}
-  - {name: Tool Dealer, x: 312, y: 193, facility: tool_dealer}
+  - {name: Guide, x: 356, y: 211, facility: guide}
   hugel:
-  - {name: Kafra Employee, x: 88, y: 168, facility: kafra}
-  - {name: Guide, x: 98, y: 56, facility: guide}
-  - {name: Guide, x: 187, y: 172, facility: guide}
-  - {name: Tool Dealer, x: 93, y: 167, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 70, y: 158, facility: weapon_dealer}
-  - {name: Inn, x: 104, y: 79, facility: inn}
-  icecastle:
-  - {name: Belgund Lab, x: 186, y: 222, facility: tool_dealer}
-  - {name: Guide, x: 59, y: 123, facility: guide}
-  - {name: Feather Bed and Breakfast, x: 64, y: 224, facility: inn}
-  izlu2dun:
-  - {name: Kafra Employee, x: 106, y: 58, facility: kafra}
+  - {name: Shop, x: 102, y: 142, facility: tool_dealer}
+  - {name: Guide Rich King, x: 187, y: 172, facility: guide}
+  - {name: Hugel Guide Granny, x: 98, y: 56, facility: guide}
+  - {name: Cool Event Corp. Staff, x: 88, y: 168, facility: kafra}
   izlude:
-  - {name: Kafra Employee, x: 128, y: 148, facility: kafra}
+  - {name: Shop, x: 132, y: 121, facility: tool_dealer}
   - {name: Guide, x: 129, y: 175, facility: guide}
   - {name: Guide, x: 133, y: 113, facility: guide}
-  - {name: Guide, x: 120, y: 206, facility: guide}
-  - {name: Tool Dealer, x: 112, y: 179, facility: tool_dealer}
-  - {name: Smith, x: 162, y: 125, facility: smith}
+  - {name: Kafra, x: 122, y: 121, facility: kafra}
   izlude_a:
-  - {name: Kafra Employee, x: 128, y: 148, facility: kafra}
   - {name: Guide, x: 129, y: 175, facility: guide}
   - {name: Guide, x: 133, y: 113, facility: guide}
-  - {name: Guide, x: 120, y: 206, facility: guide}
-  - {name: Tool Dealer, x: 112, y: 179, facility: tool_dealer}
   izlude_b:
-  - {name: Kafra Employee, x: 128, y: 148, facility: kafra}
   - {name: Guide, x: 129, y: 175, facility: guide}
   - {name: Guide, x: 133, y: 113, facility: guide}
-  - {name: Guide, x: 120, y: 206, facility: guide}
-  - {name: Tool Dealer, x: 112, y: 179, facility: tool_dealer}
   izlude_c:
-  - {name: Kafra Employee, x: 128, y: 148, facility: kafra}
   - {name: Guide, x: 129, y: 175, facility: guide}
   - {name: Guide, x: 133, y: 113, facility: guide}
-  - {name: Guide, x: 120, y: 206, facility: guide}
-  - {name: Tool Dealer, x: 112, y: 179, facility: tool_dealer}
   izlude_d:
-  - {name: Kafra Employee, x: 128, y: 148, facility: kafra}
   - {name: Guide, x: 129, y: 175, facility: guide}
   - {name: Guide, x: 133, y: 113, facility: guide}
-  - {name: Guide, x: 120, y: 206, facility: guide}
-  - {name: Tool Dealer, x: 112, y: 179, facility: tool_dealer}
-  jor_albe:
-  - {name: Nyar's Warehouse, x: 62, y: 150, facility: kafra}
-  - {name: Inn, x: 72, y: 138, facility: inn}
-  - {name: Tool Dealer, x: 118, y: 150, facility: tool_dealer}
-  jor_mbase:
-  - {name: Nyar's Warehouse, x: 220, y: 165, facility: kafra}
-  - {name: Lodging, x: 170, y: 248, facility: inn}
-  - {name: Stores and Warehouses, x: 222, y: 264, facility: tool_dealer}
   lasagna:
-  - {name: Kafra Employee, x: 208, y: 188, facility: kafra}
-  - {name: Tool Dealer, x: 165, y: 125, facility: tool_dealer}
-  - {name: Guide, x: 176, y: 160, facility: guide}
-  - {name: Star, x: 134, y: 113, facility: stylist}
+  - {name: Tool Merchant, x: 165, y: 125, facility: tool_dealer}
+  - {name: Vigilante Guide, x: 174, y: 160, facility: guide}
+  - {name: Vigilante Guide, x: 202, y: 291, facility: guide}
+  - {name: Cat Paw Service, x: 208, y: 188, facility: kafra}
   lighthalzen:
-  - {name: Kafra Employee, x: 191, y: 320, facility: kafra}
-  - {name: Kafra Employee, x: 164, y: 100, facility: kafra}
-  - {name: Kafra Employee, x: 94, y: 248, facility: kafra}
-  - {name: Guide, x: 207, y: 310, facility: guide}
-  - {name: Guide, x: 220, y: 311, facility: guide}
-  - {name: Guide, x: 154, y: 100, facility: guide}
-  - {name: Guide, x: 247, y: 82, facility: guide}
-  - {name: Guide, x: 307, y: 224, facility: guide}
-  - {name: Tool Dealer, x: 199, y: 163, facility: tool_dealer}
-  - {name: Tool Dealer, x: 324, y: 301, facility: tool_dealer}
-  - {name: Inn, x: 159, y: 133, facility: inn}
-  - {name: Weapon Dealer, x: 196, y: 46, facility: weapon_dealer}
+  - {name: Shop, x: 164, y: 87, facility: tool_dealer}
+  - {name: Lighthalzen Guide, x: 154, y: 100, facility: guide}
+  - {name: Lighthalzen Guide, x: 207, y: 310, facility: guide}
+  - {name: Lighthalzen Guide, x: 220, y: 310, facility: guide}
+  - {name: Lighthalzen Guide, x: 247, y: 82, facility: guide}
+  - {name: Lighthalzen Guide, x: 307, y: 224, facility: guide}
+  - {name: Cool Event Corp Staff, x: 94, y: 248, facility: kafra}
   louyang:
-  - {name: Kafra Employee, x: 210, y: 104, facility: kafra}
-  - {name: Guide, x: 224, y: 104, facility: guide}
-  - {name: Tool Dealer, x: 135, y: 98, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 145, y: 172, facility: weapon_dealer}
+  - {name: Shop, x: 227, y: 109, facility: tool_dealer}
+  - {name: Louyang Guide, x: 224, y: 104, facility: guide}
   malangdo:
-  - {name: Kafra Employee, x: 184, y: 138, facility: kafra}
-  - {name: Guide, x: 218, y: 101, facility: guide}
-  - {name: Tool Dealer, x: 232, y: 163, facility: tool_dealer}
-  - {name: Inn, x: 147, y: 120, facility: inn}
+  - {name: Shop, x: 167, y: 146, facility: tool_dealer}
+  - {name: Tool Dealer Myo, x: 232, y: 163, facility: tool_dealer}
+  - {name: Malangdo Guide, x: 218, y: 101, facility: guide}
+  - {name: Storekeeper, x: 184, y: 139, facility: kafra}
   malaya:
-  - {name: Kafra Employee, x: 71, y: 79, facility: kafra}
-  - {name: Kafra Employee, x: 234, y: 204, facility: kafra}
-  - {name: Guide, x: 71, y: 72, facility: guide}
-  - {name: Guide, x: 250, y: 83, facility: guide}
-  - {name: Guide, x: 224, y: 204, facility: guide}
-  - {name: Tool Dealer, x: 298, y: 167, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 114, y: 212, facility: weapon_dealer}
-  - {name: Inn, x: 178, y: 211, facility: inn}
-  mjolnir_02:
-  - {name: Kafra Employee, x: 82, y: 362, facility: kafra}
+  - {name: Shop, x: 140, y: 249, facility: tool_dealer}
+  - {name: Port Malaya Guide, x: 71, y: 72, facility: guide}
+  - {name: Port Malaya Guide, x: 224, y: 204, facility: guide}
+  - {name: Port Malaya Guide, x: 250, y: 83, facility: guide}
   moc_ruins:
-  - {name: Kafra Employee, x: 59, y: 157, facility: kafra}
-  - {name: Guide, x: 159, y: 53, facility: guide}
-  - {name: Guide, x: 70, y: 164, facility: guide}
-  - {name: Guide, x: 65, y: 44, facility: guide}
+  - {name: Shop, x: 72, y: 164, facility: tool_dealer}
   - {name: Tool Dealer, x: 91, y: 128, facility: tool_dealer}
   - {name: Tool Dealer, x: 114, y: 63, facility: tool_dealer}
+  - {name: Guide, x: 65, y: 44, facility: guide}
+  - {name: Guide, x: 70, y: 164, facility: guide}
+  - {name: Guide, x: 159, y: 53, facility: guide}
   mora:
-  - {name: Kafra Employee, x: 48, y: 127, facility: kafra}
-  - {name: Guide, x: 115, y: 138, facility: guide}
-  - {name: Guide, x: 72, y: 51, facility: guide}
-  - {name: Guide, x: 25, y: 158, facility: guide}
-  - {name: Guide, x: 167, y: 76, facility: guide}
-  - {name: Guide, x: 167, y: 76, facility: guide}
   - {name: Tool Dealer, x: 100, y: 118, facility: tool_dealer}
-  - {name: Inn, x: 44, y: 127, facility: inn}
+  - {name: Raffle Guide, x: 25, y: 158, facility: guide}
+  - {name: Raffle Guide, x: 72, y: 51, facility: guide}
+  - {name: Raffle Guide, x: 115, y: 138, facility: guide}
+  - {name: Raffle Guide, x: 167, y: 76, facility: guide}
+  - {name: Drawer, x: 48, y: 128, facility: kafra}
   morocc:
-  - {name: Kafra Employee, x: 160, y: 258, facility: kafra}
-  - {name: Kafra Employee, x: 156, y: 97, facility: kafra}
+  - {name: Shop, x: 171, y: 86, facility: tool_dealer}
+  - {name: Tool Dealer, x: 146, y: 103, facility: tool_dealer}
+  - {name: Tool Dealer, x: 151, y: 241, facility: tool_dealer}
+  - {name: Guide, x: 28, y: 170, facility: guide}
   - {name: Guide, x: 153, y: 286, facility: guide}
   - {name: Guide, x: 154, y: 38, facility: guide}
   - {name: Guide, x: 296, y: 213, facility: guide}
-  - {name: Guide, x: 28, y: 170, facility: guide}
-  - {name: Weapon Dealer, x: 253, y: 56, facility: weapon_dealer}
-  - {name: Smith, x: 47, y: 47, facility: smith}
-  - {name: Inn, x: 197, y: 66, facility: inn}
-  - {name: Inn, x: 273, y: 269, facility: inn}
+  - {name: Kafra, x: 164, y: 101, facility: kafra}
   moscovia:
-  - {name: Kafra Employee, x: 223, y: 191, facility: kafra}
-  - {name: Guide, x: 161, y: 76, facility: guide}
-  - {name: Tool Dealer, x: 223, y: 174, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 185, y: 189, facility: weapon_dealer}
-  - {name: Inn, x: 229, y: 208, facility: inn}
-  - {name: Armor Dealer, x: 203, y: 170, facility: armor_dealer}
+  - {name: Shop, x: 230, y: 186, facility: tool_dealer}
+  - {name: Moscovia Guide, x: 161, y: 76, facility: guide}
+  - {name: Moscovia Guide, x: 226, y: 191, facility: guide}
   niflheim:
-  - {name: Kafra Employee, x: 202, y: 180, facility: kafra}
-  - {name: Guide, x: 201, y: 187, facility: guide}
-  - {name: Tool Dealer, x: 217, y: 196, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 216, y: 171, facility: weapon_dealer}
+  - {name: Niflheim Guide, x: 201, y: 187, facility: guide}
   pay_arche:
-  - {name: Kafra Employee, x: 55, y: 123, facility: kafra}
+  - {name: Shop, x: 56, y: 126, facility: tool_dealer}
   - {name: Guide, x: 86, y: 33, facility: guide}
-  - {name: Tool Dealer, x: 71, y: 156, facility: tool_dealer}
   payon:
-  - {name: Kafra Employee, x: 181, y: 104, facility: kafra}
-  - {name: Kafra Employee, x: 175, y: 226, facility: kafra}
-  - {name: Guide, x: 160, y: 67, facility: guide}
+  - {name: Shop, x: 183, y: 94, facility: tool_dealer}
+  - {name: Tool Dealer, x: 159, y: 96, facility: tool_dealer}
   - {name: Guide, x: 151, y: 182, facility: guide}
+  - {name: Guide, x: 160, y: 67, facility: guide}
   - {name: Guide, x: 221, y: 85, facility: guide}
   - {name: Guide, x: 233, y: 324, facility: guide}
-  - {name: Tool Dealer, x: 144, y: 85, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 139, y: 159, facility: weapon_dealer}
-  - {name: Smith, x: 144, y: 173, facility: smith}
-  - {name: Inn, x: 220, y: 117, facility: inn}
+  - {name: Kafra, x: 180, y: 100, facility: kafra}
   prontera:
-  - {name: Kafra Employee, x: 146, y: 89, facility: kafra}
-  - {name: Kafra Employee, x: 151, y: 29, facility: kafra}
-  - {name: Kafra Employee, x: 282, y: 200, facility: kafra}
-  - {name: Kafra Employee, x: 29, y: 207, facility: kafra}
-  - {name: Kafra Employee, x: 152, y: 326, facility: kafra}
+  - {name: Rebellion Accessories, x: 96, y: 209, facility: tool_dealer}
+  - {name: Shop, x: 163, y: 178, facility: tool_dealer}
+  - {name: Rebellion Weapons, x: 92, y: 209, facility: weapon_dealer}
+  - {name: Guide, x: 29, y: 200, facility: guide}
   - {name: Guide, x: 154, y: 187, facility: guide}
-  - {name: Guide, x: 276, y: 211, facility: guide}
-  - {name: Guide, x: 37, y: 198, facility: guide}
-  - {name: Guide, x: 162, y: 35, facility: guide}
-  - {name: Guide, x: 150, y: 326, facility: guide}
-  - {name: Tool Dealer, x: 134, y: 221, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 175, y: 220, facility: weapon_dealer}
-  - {name: Smith, x: 178, y: 186, facility: smith}
-  - {name: Inn, x: 204, y: 191, facility: inn}
-  - {name: Inn, x: 107, y: 218, facility: inn}
-  - {name: Styling Shop, x: 76, y: 93, facility: stylist}
+  - {name: Guide, x: 159, y: 326, facility: guide}
+  - {name: Guide, x: 160, y: 29, facility: guide}
+  - {name: Guide, x: 282, y: 208, facility: guide}
+  - {name: Kafra, x: 155, y: 194, facility: kafra}
   prt_fild05:
-  - {name: Kafra Employee, x: 290, y: 224, facility: kafra}
   - {name: Tool Dealer, x: 290, y: 221, facility: tool_dealer}
-  prt_mk:
-  - {name: Convenience Service, x: 162, y: 153, facility: kafra}
-  - {name: Convenience Service, x: 172, y: 24, facility: kafra}
-  - {name: Convenience Service, x: 295, y: 171, facility: kafra}
-  - {name: Convenience Service, x: 28, y: 154, facility: kafra}
-  - {name: Convenience Service, x: 152, y: 299, facility: kafra}
-  - {name: Guide, x: 252, y: 300, facility: guide}
-  - {name: Guide, x: 299, y: 67, facility: guide}
-  - {name: Guide, x: 71, y: 20, facility: guide}
-  - {name: Guide, x: 24, y: 256, facility: guide}
-  - {name: Guide, x: 161, y: 171, facility: guide}
-  - {name: Smith, x: 297, y: 47, facility: tool_dealer}
-  - {name: Smith, x: 53, y: 23, facility: tool_dealer}
-  - {name: Smith, x: 27, y: 275, facility: tool_dealer}
-  - {name: Smith, x: 272, y: 299, facility: tool_dealer}
   prt_monk:
-  - {name: '[=[Weapon Dealer]=]', x: 135, y: 263, facility: weapon_dealer}
+  - {name: Weapon Dealer, x: 135, y: 263, facility: weapon_dealer}
   rachel:
-  - {name: Kafra Employee, x: 109, y: 138, facility: kafra}
-  - {name: Guide, x: 138, y: 146, facility: guide}
-  - {name: Tool Dealer, x: 83, y: 78, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 42, y: 87, facility: weapon_dealer}
-  - {name: Inn, x: 115, y: 149, facility: inn}
-  - {name: Styling Shop, x: 90, y: 189, facility: stylist}
+  - {name: Shop, x: 136, y: 105, facility: tool_dealer}
+  - {name: Rachel Guide, x: 138, y: 146, facility: guide}
+  - {name: Cool Event Corp. Staff, x: 109, y: 138, facility: kafra}
   umbala:
-  - {name: Kafra Employee, x: 87, y: 160, facility: kafra}
-  - {name: Guide, x: 128, y: 94, facility: guide}
-  - {name: Guide, x: 99, y: 158, facility: guide}
-  - {name: Tool Dealer, x: 136, y: 127, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 126, y: 154, facility: weapon_dealer}
+  - {name: Shop, x: 133, y: 139, facility: tool_dealer}
+  - {name: Umbala Guide, x: 99, y: 158, facility: guide}
+  - {name: Umbala Guide, x: 128, y: 94, facility: guide}
   veins:
-  - {name: Kafra Employee, x: 208, y: 128, facility: kafra}
-  - {name: Guide, x: 210, y: 345, facility: guide}
-  - {name: Guide, x: 189, y: 101, facility: guide}
-  - {name: Tool Dealer, x: 230, y: 165, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 149, y: 180, facility: weapon_dealer}
-  - {name: Inn, x: 112, y: 278, facility: inn}
-  wolfvill:
-  - {name: Stores and Warehouses, x: 167, y: 135, facility: tool_dealer}
+  - {name: Shop, x: 201, y: 239, facility: tool_dealer}
+  - {name: Veins Guide, x: 189, y: 101, facility: guide}
+  - {name: Veins Guide, x: 210, y: 345, facility: guide}
+  - {name: Cool Event Corp. Staff, x: 208, y: 128, facility: kafra}
   xmas:
-  - {name: Kafra Employee, x: 148, y: 134, facility: kafra}
-  - {name: Guide, x: 140, y: 137, facility: guide}
-  - {name: Tool Dealer, x: 122, y: 131, facility: tool_dealer}
-  - {name: Weapon Dealer, x: 171, y: 158, facility: weapon_dealer}
-  ygg_edge:
-  - {name: Fruit Shop, x: 141, y: 209, facility: tool_dealer}
-  - {name: Guide, x: 167, y: 182, facility: guide}
+  - {name: Shop, x: 154, y: 128, facility: tool_dealer}
+  - {name: Lutie Guide, x: 140, y: 137, facility: guide}
   yuno:
-  - {name: Kafra Employee, x: 327, y: 108, facility: kafra}
-  - {name: Kafra Employee, x: 277, y: 221, facility: kafra}
-  - {name: Kafra Employee, x: 152, y: 187, facility: kafra}
-  - {name: Guide, x: 153, y: 47, facility: guide}
-  - {name: Guide, x: 59, y: 212, facility: guide}
-  - {name: Tool Dealer, x: 193, y: 142, facility: tool_dealer}
-  - {name: Smith, x: 120, y: 138, facility: smith}
-  - {name: Styling Shop, x: 196, y: 87, facility: stylist}
+  - {name: Shop, x: 166, y: 121, facility: tool_dealer}
+  - {name: Tool Dealer, x: 218, y: 97, facility: tool_dealer}
+  - {name: Mr. King's Shop, x: 205, y: 103, facility: armor_dealer}
+  - {name: Juno Guide, x: 59, y: 212, facility: guide}
+  - {name: Juno Guide, x: 153, y: 47, facility: guide}
+  - {name: Kafra, x: 149, y: 129, facility: kafra}
