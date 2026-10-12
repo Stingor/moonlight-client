@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
 
 namespace ro::vfs {
 
@@ -17,25 +16,27 @@ class Vfs;
 
 // ── LA CARTE DU MONDE ───────────────────────────────────────────────────────
 //
-// Quatre tables du client, en Lua, lues À LA SUITE dans le même état : la
-// table des cartes cite les noms que pose celle de la langue.
+// Lue dans `data\yaml_files\world_map.yml`, que `scripts/yaml_tables/world_map.py`
+// tire des tables de la carte du monde que livre l'installation :
 //
-//   • la LISTE DES MONDES : pour chacun, un titre, le nom de sa table de cartes,
-//     celui de sa table de donjons, et son image ;
-//   • une TABLE DE CARTES : groupe, fichier `.rsw`, rectangle (gauche, haut,
-//     droite, bas), nom lisible, niveau conseillé ;
-//   • une TABLE DE DONJONS : groupe, rectangle, nom lisible, niveaux ;
-//   • les TEINTES : composantes rouge, verte, bleue et opacité, par usage.
+//     version: 1
+//     worlds:
+//       - title: "Midgard"
+//         image: "worldmap.jpg"
+//         areas:      # [groupe, carte, gauche, haut, droite, bas, nom, niveau]
+//           - [108, "prontera", 812, 587, 870, 643, "Prontera", ""]
+//         dungeons:   # [groupe, gauche, haut, droite, bas, nom, niveaux]
+//           - [1, 725, 17, 745, 37, "Thanatos Tower", "110~130"]
+//     colors:
+//       dungeon_box: {red: 255, green: 0, blue: 0, alpha: 180}
+//       dungeon_name: {letter: {red: 200}, shadow: {red: 40}, sizes: [9, 10, 11, 12]}
+//       search_monsters: [{alpha: 110}, …]
 //
 // Un monde est une image — 1280 × 1024 dans l'installation —, et chaque carte
 // y occupe un rectangle EN PIXELS DE CETTE IMAGE. Les étages d'un donjon
-// partagent le numéro de groupe de sa case dans la table des donjons.
-inline constexpr std::array<std::string_view, 4> kWorldViewPaths = {
-    "data\\luafiles514\\lua files\\worldviewdata\\worldviewdata_language.lub",
-    "data\\luafiles514\\lua files\\worldviewdata\\worldviewdata_table.lub",
-    "data\\luafiles514\\lua files\\worldviewdata\\worldviewdata_list.lub",
-    "data\\luafiles514\\lua files\\worldviewdata\\worldviewdata_info.lub",
-};
+// partagent le numéro de groupe de sa case. Une composante de teinte absente,
+// ou une taille `null`, garde le défaut de `WorldViewColors`.
+inline constexpr std::string_view kWorldMapPath = "data\\yaml_files\\world_map.yml";
 
 // Un rectangle de l'image d'un monde, en pixels de l'image.
 struct WorldRect {
@@ -129,8 +130,10 @@ struct WorldViewColors {
 class WorldViewTables {
  public:
   [[nodiscard]] static core::Result<WorldViewTables> Load(Vfs& vfs);
-  // Depuis l'état où la chaîne s'est lue : ce qui s'éprouve sans archive.
-  [[nodiscard]] static core::Result<WorldViewTables> FromGlobals(const formats::LuaTable& globals);
+  // Le texte de `world_map.yml`. Refuse un texte qui n'est pas du YAML, dont
+  // `version` n'est pas 1, sans monde, dont un monde n'a pas d'image, ou dont
+  // une ligne de carte ou de donjon, une teinte ou une taille n'a pas sa forme.
+  [[nodiscard]] static core::Result<WorldViewTables> Parse(std::string_view yaml_text);
 
   [[nodiscard]] const std::vector<WorldView>& worlds() const noexcept { return worlds_; }
   [[nodiscard]] const WorldViewColors& colors() const noexcept { return colors_; }

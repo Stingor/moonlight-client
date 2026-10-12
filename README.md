@@ -146,6 +146,15 @@ tête d'où elle vient et comment la régénérer.
 - `map_sky.yml` est tiré de la table compilée `mapskydata.lub` que livre le
   client ; ces données de Gravity ne sont pas revendiquées comme partie de ce
   projet.
+- `world_map.yml` est tiré des tables de la carte du monde que livre le
+  client, traduites par [ROenglishRE](https://github.com/llchrisll/ROenglishRE) ;
+  elles ne sont pas revendiquées comme partie de ce projet.
+- `pet_info.yml` prend sa liste des familiers à la base des familiers du
+  serveur Moonlight, et leurs noms d'espèce et les fichiers de leurs
+  accessoires au fichier `petinfo.lub` que livre le client, traduit par
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) ; ces textes ne sont
+  pas revendiqués comme partie de ce projet. Un familier que ce fichier ne
+  nomme pas prend le nom de son monstre dans la base du serveur.
 
 Ragnarok Online est une marque de Gravity Co., Ltd. Ce projet n'est ni
 affilié à Gravity ni approuvé par elle.

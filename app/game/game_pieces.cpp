@@ -466,7 +466,7 @@ void LoadRecommendedCatalog(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.recommended_catalog = std::move(*catalog);
 }
 
-// LA CARTE DU MONDE, quatre tables du client lues à la suite.
+// LA CARTE DU MONDE, lue dans world_map.yml.
 void LoadWorldView(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   auto tables = ro::vfs::WorldViewTables::Load(vfs);
   if (!tables) {

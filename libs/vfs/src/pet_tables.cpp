@@ -2,27 +2,15 @@
 
 #include "ro/vfs/pet_tables.h"
 
-#include <array>
 #include <expected>
-#include <limits>
-#include <optional>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
 
 #include "ro/core/log.h"
-#include "ro/vfs/encoding.h"
-#include "ro/vfs/lua_chain.h"
 
 namespace ro::vfs {
 namespace {
-
-using formats::LuaValue;
-
-constexpr std::string_view kSpeciesGlobal = "PetStringTable";
-// Les .act d'accessoire : la table coréenne fait foi, l'anglaise complète.
-constexpr std::array<std::string_view, 2> kAccessoryActGlobals = {"PetAccActNameTable",
-                                                                  "PetAccActNameTable_Eng"};
 
 constexpr int kSupportedVersion = 1;
 // Un matériau s'écrit [item, quantité].
@@ -30,34 +18,31 @@ constexpr std::size_t kMaterialItemField = 0;
 constexpr std::size_t kMaterialAmountField = 1;
 constexpr std::size_t kMaterialFieldCount = 2;
 
-constexpr std::uint32_t kAnyId = std::numeric_limits<std::uint32_t>::max();
-
-[[nodiscard]] const formats::LuaTable* TableNamed(const formats::LuaTable& globals,
-                                                  std::string_view name) {
-  const LuaValue* value = globals.Find(name);
-  if (value == nullptr || value->kind != LuaValue::Kind::kTable || !value->table) {
-    return nullptr;
-  }
-  return value->table.get();
-}
-
-// Une table `[identifiant] = "nom"`, dans la page de codes du client. Un
-// identifiant déjà connu GARDE son nom : la première table lue fait foi.
-void FillNameMap(const formats::LuaTable* table,
-                 std::unordered_map<std::uint32_t, std::string>& into) {
-  if (table == nullptr) {
-    return;
-  }
-  for (const auto& [key, value] : table->by_index) {
-    const std::optional<std::uint32_t> id = formats::LuaWholeNumber(key, kAnyId);
-    if (id.has_value() && value.kind == LuaValue::Kind::kString) {
-      into.try_emplace(*id, Cp949ToUtf8Lossy(value.text));
-    }
-  }
-}
-
 core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData, "table des familiers : " + std::move(detail)};
+}
+
+core::Error RefusedInfo(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData, "noms des familiers : " + std::move(detail)};
+}
+
+// Une table `identifiant: "texte"`, facultative. Faux si elle n'en est pas une ;
+// une clé ou une valeur d'un autre type lève l'exception de yaml-cpp.
+[[nodiscard]] bool ReadNameMap(const YAML::Node& node,
+                               std::unordered_map<std::uint32_t, std::string>& into) {
+  if (!node) {
+    return true;
+  }
+  if (!node.IsMap()) {
+    return false;
+  }
+  for (const auto& pair : node) {
+    if (!pair.second.IsScalar()) {
+      throw YAML::RepresentationException(pair.second.Mark(), "une valeur n'est pas un texte");
+    }
+    into[pair.first.as<std::uint32_t>()] = pair.second.as<std::string>();
+  }
+  return true;
 }
 
 // Un champ obligatoire d'une table YAML, absent : une exception, comme yaml-cpp
@@ -136,11 +121,31 @@ const PetEvolutionRecipe* PetTables::RecipeOf(std::uint32_t source_egg_id,
   return nullptr;
 }
 
-void FillPetInfo(const formats::LuaTable& globals, PetTables& tables) {
-  FillNameMap(TableNamed(globals, kSpeciesGlobal), tables.species_by_class);
-  for (const std::string_view global : kAccessoryActGlobals) {
-    FillNameMap(TableNamed(globals, global), tables.accessory_act_by_item);
+core::Result<void> ParsePetInfo(std::string_view yaml_text, PetTables& tables) {
+  // Tout se lit à part, et n'entre dans `tables` qu'une fois le texte accepté.
+  PetTables read;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(RefusedInfo("le texte n'est pas une table YAML"));
+    }
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(RefusedInfo("version non gérée"));
+    }
+    if (!ReadNameMap(whole["species"], read.species_by_class)) {
+      return std::unexpected(RefusedInfo("« species » n'est pas une table"));
+    }
+    if (!ReadNameMap(whole["accessories"], read.accessory_act_by_item)) {
+      return std::unexpected(RefusedInfo("« accessories » n'est pas une table"));
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(RefusedInfo(failure.what()));
   }
+  tables.species_by_class = std::move(read.species_by_class);
+  tables.accessory_act_by_item = std::move(read.accessory_act_by_item);
+  return {};
 }
 
 core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& tables) {
@@ -199,12 +204,14 @@ core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& table
 
 PetTables ReadPetTables(Vfs& vfs) {
   PetTables tables;
-  auto globals = ReadLuaChain(vfs, kPetInfoChain);
-  if (globals) {
-    FillPetInfo(*globals, tables);
-  } else {
-    core::LogWarning("tables du familier : {} — la fiche se montrera sans nom d'espèce",
-                     core::Describe(globals.error()));
+  if (auto info = vfs.Read(std::string(kPetInfoPath)); !info) {
+    core::LogWarning("noms des familiers : {} absente — la fiche se montrera sans nom d'espèce",
+                     kPetInfoPath);
+  } else if (auto parsed = ParsePetInfo(
+                 std::string_view(reinterpret_cast<const char*>(info->data()), info->size()),
+                 tables);
+             !parsed) {
+    core::LogWarning("{} — la fiche se montrera sans nom d'espèce", core::Describe(parsed.error()));
   }
   // ⚠ LES DEUX SOURCES ÉCHOUENT SÉPARÉMENT : une table du serveur illisible ne
   // coûte pas les espèces ni les accessoires.

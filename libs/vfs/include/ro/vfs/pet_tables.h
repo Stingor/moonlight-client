@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <cstdint>
 #include <span>
 #include <string>
@@ -10,7 +9,6 @@
 #include <vector>
 
 #include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
 #include "ro/vfs/vfs.h"
 
 namespace ro::vfs {
@@ -33,17 +31,16 @@ namespace ro::vfs {
 //           …
 //         }
 //
-//   * `petinfo.lub`, qui indexe ses tables par les constantes de métier : il se
-//     lit APRÈS `npcidentity` et `jobidentity`, dans le même état. Il ne donne
-//     plus que ce que le serveur ignore : le nom de l'espèce et le .act d'un
-//     accessoire.
+//   * `data\yaml_files\pet_info.yml`, que `scripts/yaml_tables/pet_info.py`
+//     tire des tables de l'installation pour les familiers du serveur : ce
+//     que le serveur ignore, le nom de l'espèce et le .act d'un accessoire.
+//
+//         version: 1
+//         species: {1002: "Poring", …}
+//         accessories: {10013: "ACC_PORING.act", …}
 
-inline constexpr std::array<std::string_view, 3> kPetInfoChain = {
-    "data\\luafiles514\\lua files\\datainfo\\npcidentity.lub",
-    "data\\luafiles514\\lua files\\datainfo\\jobidentity.lub",
-    "data\\luafiles514\\lua files\\datainfo\\petinfo.lub",
-};
 inline constexpr std::string_view kPetDatabasePath = "data\\yaml_files\\pets.yml";
+inline constexpr std::string_view kPetInfoPath = "data\\yaml_files\\pet_info.yml";
 
 // Un matériau d'une recette : l'item, et combien il en faut.
 struct PetEvolutionMaterial {
@@ -72,10 +69,6 @@ struct PetTables {
   // L'accessoire → le .act qui remplace celui du corps quand le familier le
   // porte, en UTF-8. La clé est l'identifiant d'item de l'accessoire, qui est
   // aussi l'apparence que le serveur annonce.
-  //
-  // ⚠ DEUX TABLES, LA CORÉENNE D'ABORD : c'est elle qui nomme les fichiers que
-  // l'installation porte. La variante anglaise ne fait qu'ajouter les
-  // accessoires que la coréenne ignore.
   std::unordered_map<std::uint32_t, std::string> accessory_act_by_item;
 
   // Zéro quand la table ne connaît pas l'œuf ou la classe.
@@ -99,9 +92,12 @@ struct PetTables {
   [[nodiscard]] std::string_view AccessoryActOf(std::uint32_t item_id) const;
 };
 
-// Remplit les espèces et les .act d'accessoire depuis les globales de
-// `petinfo`, déjà évaluées.
-void FillPetInfo(const formats::LuaTable& globals, PetTables& tables);
+// Remplit les espèces et les .act d'accessoire depuis le texte de
+// `pet_info.yml`. Refuse un texte qui n'est pas du YAML, dont `version` n'est
+// pas 1, dont `species` ou `accessories` n'est pas une table, ou dont une clé
+// n'est pas un identifiant ou une valeur un texte. REFUSÉ, il ne touche pas
+// `tables`.
+[[nodiscard]] core::Result<void> ParsePetInfo(std::string_view yaml_text, PetTables& tables);
 
 // Remplit l'œuf, la nourriture, l'auto-alimentation et les évolutions depuis le
 // texte de `pets.yml`. Refuse un texte qui n'est pas du YAML, dont `version`

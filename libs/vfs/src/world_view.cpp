@@ -3,195 +3,206 @@
 #include "ro/vfs/world_view.h"
 
 #include <algorithm>
-#include <cmath>
+#include <expected>
 #include <string>
 #include <utility>
 
+#include <yaml-cpp/yaml.h>
+
 #include "ro/core/ascii.h"
-#include "ro/vfs/encoding.h"
-#include "ro/vfs/lua_chain.h"
+#include "ro/vfs/vfs.h"
 
 namespace ro::vfs {
 namespace {
 
-using formats::LuaTable;
-using formats::LuaValue;
+constexpr int kSupportedVersion = 1;
 
-constexpr std::string_view kWorldListName = "World_List";
-constexpr std::string_view kInfoName = "worldview_info";
-// L'extension que la table écrit après le nom de la carte.
-constexpr std::string_view kWorldExtension = ".rsw";
+// Le rectangle tient quatre colonnes : gauche, haut, droite, bas.
+constexpr std::size_t kRectColumns = 4;
+// Les colonnes d'une carte : groupe, carte, rectangle, nom, niveau.
+constexpr std::size_t kAreaGroup = 0;
+constexpr std::size_t kAreaMap = 1;
+constexpr std::size_t kAreaLeft = 2;
+constexpr std::size_t kAreaTitle = kAreaLeft + kRectColumns;
+constexpr std::size_t kAreaLevel = kAreaTitle + 1;
+constexpr std::size_t kAreaColumns = kAreaLevel + 1;
+// Les colonnes d'un donjon : groupe, rectangle, nom, niveaux.
+constexpr std::size_t kDungeonGroup = 0;
+constexpr std::size_t kDungeonLeft = 1;
+constexpr std::size_t kDungeonTitle = kDungeonLeft + kRectColumns;
+constexpr std::size_t kDungeonLevel = kDungeonTitle + 1;
+constexpr std::size_t kDungeonColumns = kDungeonLevel + 1;
 
-// Les colonnes d'une ligne de monde.
-enum WorldColumn : int { kWorldTitle = 1, kWorldAreas, kWorldDungeons, kWorldImage };
-// Les colonnes d'une carte : groupe, fichier, rectangle, nom, niveau.
-enum AreaColumn : int {
-  kAreaGroup = 1,
-  kAreaMap,
-  kAreaLeft,
-  kAreaTop,
-  kAreaRight,
-  kAreaBottom,
-  kAreaTitle,
-  kAreaLevel
-};
-// Les colonnes d'un donjon : groupe, rectangle, nom, niveau.
-enum DungeonColumn : int {
-  kDungeonGroup = 1,
-  kDungeonLeft,
-  kDungeonTop,
-  kDungeonRight,
-  kDungeonBottom,
-  kDungeonTitle,
-  kDungeonLevel
-};
-
-[[nodiscard]] const LuaTable* TableOf(const LuaValue* value) {
-  return value != nullptr && value->kind == LuaValue::Kind::kTable ? value->table.get() : nullptr;
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData, "carte du monde : " + std::move(detail)};
 }
 
-[[nodiscard]] std::string TextAt(const LuaTable& row, int column) {
-  const LuaValue* value = row.Find(static_cast<double>(column));
-  if (value == nullptr || value->kind != LuaValue::Kind::kString) {
-    return {};
+// Une forme inattendue : une exception, comme yaml-cpp signale un champ qui
+// n'entre pas dans son type.
+[[noreturn]] void Malformed(const YAML::Node& node, const std::string& what) {
+  throw YAML::RepresentationException(node.Mark(), what);
+}
+
+[[nodiscard]] YAML::Node RowOf(const YAML::Node& row, std::size_t columns) {
+  if (!row.IsSequence() || row.size() != columns) {
+    Malformed(row, "une ligne n'a pas ses " + std::to_string(columns) + " colonnes");
   }
-  return Cp949ToUtf8Lossy(value->text);
+  return row;
 }
 
-[[nodiscard]] std::optional<std::int32_t> WholeAt(const LuaTable& row, int column) {
-  const LuaValue* value = row.Find(static_cast<double>(column));
-  if (value == nullptr || value->kind != LuaValue::Kind::kNumber) {
-    return std::nullopt;
+[[nodiscard]] WorldRect RectAt(const YAML::Node& row, std::size_t first) {
+  // Les quatre coins, dans l'ordre des colonnes.
+  enum Corner : std::size_t { kLeft, kTop, kRight, kBottom };
+  return WorldRect{.left = row[first + kLeft].as<std::int32_t>(),
+                   .top = row[first + kTop].as<std::int32_t>(),
+                   .right = row[first + kRight].as<std::int32_t>(),
+                   .bottom = row[first + kBottom].as<std::int32_t>()};
+}
+
+// Une liste facultative : absente, rien ; présente, une suite.
+[[nodiscard]] YAML::Node ListAt(const YAML::Node& map, const char* key) {
+  YAML::Node list = map[key];
+  if (list && !list.IsSequence()) {
+    Malformed(list, std::string("« ") + key + " » n'est pas une liste");
   }
-  return static_cast<std::int32_t>(std::lround(value->number));
+  return list;
 }
 
-[[nodiscard]] std::optional<WorldRect> RectAt(const LuaTable& row, int first_column) {
-  const auto left = WholeAt(row, first_column);
-  const auto top = WholeAt(row, first_column + 1);
-  const auto right = WholeAt(row, first_column + 2);
-  const auto bottom = WholeAt(row, first_column + 3);
-  if (!left || !top || !right || !bottom) {
-    return std::nullopt;
+// Une composante écrite remplace le défaut ; absente, il reste.
+void ReadChannel(const YAML::Node& color, const char* key, std::uint8_t& into) {
+  if (const YAML::Node value = color[key]; value) {
+    into = value.as<std::uint8_t>();
   }
-  return WorldRect{.left = *left, .top = *top, .right = *right, .bottom = *bottom};
 }
 
-// Les lignes d'une table, dans l'ordre du fichier ; vide si elle manque.
-template <typename Read>
-void ForEachRow(const LuaTable& globals, std::string_view name, Read read) {
-  const LuaTable* rows = TableOf(globals.Find(name));
-  if (rows == nullptr) {
+void ReadColor(const YAML::Node& color, WorldViewColor& into) {
+  if (!color) {
     return;
   }
-  for (const auto& [index, value] : rows->by_index) {
-    if (const LuaTable* row = TableOf(&value); row != nullptr) {
-      read(*row);
+  if (!color.IsMap()) {
+    Malformed(color, "une teinte n'est pas une table");
+  }
+  ReadChannel(color, "red", into.red);
+  ReadChannel(color, "green", into.green);
+  ReadChannel(color, "blue", into.blue);
+  ReadChannel(color, "alpha", into.alpha);
+}
+
+void ReadText(const YAML::Node& text, WorldViewText& into) {
+  if (!text) {
+    return;
+  }
+  if (!text.IsMap()) {
+    Malformed(text, "un texte n'est pas une table");
+  }
+  ReadColor(text["letter"], into.letter);
+  ReadColor(text["shadow"], into.shadow);
+  const YAML::Node sizes = text["sizes"];
+  if (!sizes) {
+    return;
+  }
+  if (!sizes.IsSequence() || sizes.size() != into.sizes.size()) {
+    Malformed(sizes, "« sizes » n'a pas ses quatre paliers");
+  }
+  for (std::size_t tier = 0; tier < into.sizes.size(); ++tier) {
+    if (!sizes[tier].IsNull()) {
+      into.sizes[tier] = sizes[tier].as<std::uint8_t>();
     }
   }
 }
 
-[[nodiscard]] std::uint8_t ChannelOf(const LuaTable& info, const std::string& field,
-                                     std::uint8_t fallback) {
-  const LuaValue* value = info.Find(field);
-  if (value == nullptr || value->kind != LuaValue::Kind::kNumber) {
-    return fallback;
+void ReadColors(const YAML::Node& colors, WorldViewColors& into) {
+  if (!colors) {
+    return;
   }
-  constexpr double kMostChannel = 255.0;
-  return static_cast<std::uint8_t>(
-      std::clamp(std::lround(value->number), 0L, static_cast<long>(kMostChannel)));
+  if (!colors.IsMap()) {
+    Malformed(colors, "« colors » n'est pas une table");
+  }
+  ReadColor(colors["dungeon_box"], into.dungeon_box);
+  ReadColor(colors["selected"], into.selected);
+  ReadColor(colors["select_box"], into.select_box);
+  ReadColor(colors["field_edge"], into.field_edge);
+  ReadText(colors["dungeon_name"], into.dungeon_name);
+  ReadText(colors["field_name"], into.field_name);
+  ReadText(colors["field_level"], into.field_level);
+  ReadColor(colors["route"], into.route);
+  ReadColor(colors["search_map"], into.search_map);
+  ReadColor(colors["search_npc"], into.search_npc);
+  const YAML::Node monsters = colors["search_monsters"];
+  if (!monsters) {
+    return;
+  }
+  if (!monsters.IsSequence() || monsters.size() != into.search_monsters.size()) {
+    Malformed(monsters, "« search_monsters » n'a pas ses cinq paliers");
+  }
+  for (std::size_t tier = 0; tier < into.search_monsters.size(); ++tier) {
+    ReadColor(monsters[tier], into.search_monsters[tier]);
+  }
 }
 
-// Un texte : sa lettre `<lettre>R/G/B`, son ombre `<lettre>RS/GS/BS`, et ses
-// quatre tailles `<taille>0` à `<taille>3`.
-void ReadText(const LuaTable& info, std::string_view letter, std::string_view size,
-              WorldViewText& into) {
-  const std::string color(letter);
-  into.letter.red = ChannelOf(info, color + "R", into.letter.red);
-  into.letter.green = ChannelOf(info, color + "G", into.letter.green);
-  into.letter.blue = ChannelOf(info, color + "B", into.letter.blue);
-  into.shadow.red = ChannelOf(info, color + "RS", into.shadow.red);
-  into.shadow.green = ChannelOf(info, color + "GS", into.shadow.green);
-  into.shadow.blue = ChannelOf(info, color + "BS", into.shadow.blue);
-  for (std::size_t tier = 0; tier < into.sizes.size(); ++tier) {
-    into.sizes[tier] = ChannelOf(info, std::string(size) + std::to_string(tier), into.sizes[tier]);
+[[nodiscard]] WorldView ReadWorld(const YAML::Node& node) {
+  if (!node.IsMap()) {
+    Malformed(node, "un monde n'est pas une table");
   }
-}
-
-// Une couleur `<préfixe>ColorR/G/B` et `<préfixe>Alpha`, champ par champ.
-void ReadColor(const LuaTable& info, std::string_view prefix, WorldViewColor& into) {
-  const std::string name(prefix);
-  into.red = ChannelOf(info, name + "ColorR", into.red);
-  into.green = ChannelOf(info, name + "ColorG", into.green);
-  into.blue = ChannelOf(info, name + "ColorB", into.blue);
-  into.alpha = ChannelOf(info, name + "Alpha", into.alpha);
+  WorldView world;
+  world.title = node["title"].as<std::string>(std::string());
+  world.image = node["image"].as<std::string>(std::string());
+  if (world.image.empty()) {
+    Malformed(node, "un monde sans image");
+  }
+  for (const YAML::Node& line : ListAt(node, "areas")) {
+    const YAML::Node row = RowOf(line, kAreaColumns);
+    world.areas.push_back(WorldArea{.group = row[kAreaGroup].as<std::int32_t>(),
+                                    .map_name = row[kAreaMap].as<std::string>(),
+                                    .rect = RectAt(row, kAreaLeft),
+                                    .title = row[kAreaTitle].as<std::string>(),
+                                    .level = row[kAreaLevel].as<std::string>()});
+    if (world.areas.back().map_name.empty()) {
+      Malformed(line, "une carte sans nom");
+    }
+  }
+  for (const YAML::Node& line : ListAt(node, "dungeons")) {
+    const YAML::Node row = RowOf(line, kDungeonColumns);
+    world.dungeons.push_back(WorldDungeon{.group = row[kDungeonGroup].as<std::int32_t>(),
+                                          .rect = RectAt(row, kDungeonLeft),
+                                          .title = row[kDungeonTitle].as<std::string>(),
+                                          .level = row[kDungeonLevel].as<std::string>()});
+  }
+  return world;
 }
 
 }  // namespace
 
 core::Result<WorldViewTables> WorldViewTables::Load(Vfs& vfs) {
-  auto globals = ReadLuaChain(vfs, kWorldViewPaths);
-  if (!globals) {
-    return std::unexpected(globals.error());
+  auto bytes = vfs.Read(std::string(kWorldMapPath));
+  if (!bytes) {
+    return std::unexpected(bytes.error());
   }
-  return FromGlobals(*globals);
+  return Parse(std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
 }
 
-core::Result<WorldViewTables> WorldViewTables::FromGlobals(const LuaTable& globals) {
+core::Result<WorldViewTables> WorldViewTables::Parse(std::string_view yaml_text) {
   WorldViewTables tables;
-  ForEachRow(globals, kWorldListName, [&globals, &tables](const LuaTable& line) {
-    WorldView world;
-    world.title = TextAt(line, kWorldTitle);
-    world.image = TextAt(line, kWorldImage);
-    ForEachRow(globals, TextAt(line, kWorldAreas), [&world](const LuaTable& row) {
-      const auto group = WholeAt(row, kAreaGroup);
-      const auto rect = RectAt(row, kAreaLeft);
-      std::string map = core::AsciiLower(TextAt(row, kAreaMap));
-      if (map.ends_with(kWorldExtension)) {
-        map.resize(map.size() - kWorldExtension.size());
-      }
-      if (!group || !rect || map.empty()) {
-        return;
-      }
-      world.areas.push_back(WorldArea{.group = *group,
-                                      .map_name = std::move(map),
-                                      .rect = *rect,
-                                      .title = TextAt(row, kAreaTitle),
-                                      .level = TextAt(row, kAreaLevel)});
-    });
-    ForEachRow(globals, TextAt(line, kWorldDungeons), [&world](const LuaTable& row) {
-      const auto group = WholeAt(row, kDungeonGroup);
-      const auto rect = RectAt(row, kDungeonLeft);
-      if (!group || !rect) {
-        return;
-      }
-      world.dungeons.push_back(WorldDungeon{.group = *group,
-                                            .rect = *rect,
-                                            .title = TextAt(row, kDungeonTitle),
-                                            .level = TextAt(row, kDungeonLevel)});
-    });
-    if (!world.image.empty()) {
-      tables.worlds_.push_back(std::move(world));
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
     }
-  });
-  if (tables.worlds_.empty()) {
-    return core::Fail(core::ErrorCode::kNotFound, "World_List : aucun monde");
-  }
-  if (const LuaTable* info = TableOf(globals.Find(kInfoName)); info != nullptr) {
-    ReadColor(*info, "DungeonBox_", tables.colors_.dungeon_box);
-    ReadColor(*info, "Dungeon_Select", tables.colors_.selected);
-    ReadColor(*info, "SelectBox_", tables.colors_.select_box);
-    ReadColor(*info, "MobBoxLine_", tables.colors_.field_edge);
-    ReadText(*info, "Dungeon_FontColor", "Dungeon_fontSize", tables.colors_.dungeon_name);
-    ReadText(*info, "MobName_fontColor", "MobName_fontSize", tables.colors_.field_name);
-    ReadText(*info, "MobLv_fontColor", "MobLv_fontSize", tables.colors_.field_level);
-    ReadColor(*info, "Run_", tables.colors_.route);
-    ReadColor(*info, "SreachMap_", tables.colors_.search_map);
-    ReadColor(*info, "SreachNpc_", tables.colors_.search_npc);
-    for (std::size_t tier = 0; tier < tables.colors_.search_monsters.size(); ++tier) {
-      ReadColor(*info, "SreachMob" + std::to_string(tier + 1) + "_",
-                tables.colors_.search_monsters[tier]);
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
     }
+    const YAML::Node worlds = whole["worlds"];
+    if (!worlds || !worlds.IsSequence() || worlds.size() == 0) {
+      return std::unexpected(Refused("aucun monde"));
+    }
+    for (const YAML::Node& world : worlds) {
+      tables.worlds_.push_back(ReadWorld(world));
+    }
+    ReadColors(whole["colors"], tables.colors_);
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
   }
   return tables;
 }
