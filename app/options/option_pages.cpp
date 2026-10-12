@@ -1,6 +1,9 @@
 #include "options/option_pages.h"
 
+#include <utility>
+
 #include "options/option_sections.h"
+#include "options/skin_look_profiles.h"
 
 namespace moonclient {
 namespace {
@@ -100,10 +103,18 @@ ro::ui::OptionSectionView OptionPages::ComposeSkinSection() {
   skin_look.ComposeInto(skin_rows);
   skin_pinned_rows.clear();
   skin_look.ComposeSample(skin_pinned_rows);
+  ro::ui::OptionSectionBody profiles = skin_look.ProfilesBody();
+  // LE TITRE DES PROFILS D'HABILLAGE, pour la recherche : la page les dessine
+  // elle-même. Refait à chaque image, comme la langue peut changer.
+  skin_terms.clear();
+  if (profiles) {
+    skin_terms.push_back({.text = SkinLookProfiles::Text().title});
+  }
   return ro::ui::OptionSectionView{.title = ro::core::Tr("Skin"),
                                    .rows = skin_rows,
                                    .pinned_rows = skin_pinned_rows,
-                                   .body = skin_look.ProfilesBody()};
+                                   .body = std::move(profiles),
+                                   .body_terms = skin_terms};
 }
 
 void OptionPages::NoteRestorable(const SettingsFile& file) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <deque>
 #include <span>
 #include <string>
 #include <string_view>
@@ -23,12 +24,14 @@ namespace ro::ui {
 // trouverait partout.
 //
 // 🔴 UN TITRE TROUVÉ GARDE TOUT CE QU'IL COIFFE. « Bulles » montre toute la
-// section, « Les effets » tout son bloc : on a tapé le nom de ce qu'on cherche,
-// pas celui d'un réglage.
+// section, « Barre 5 » tout son onglet, « Les effets » tout son bloc : on a tapé
+// le nom de ce qu'on cherche, pas celui d'un réglage.
 //
-// ⚠ CE QUI NE SE CHERCHE PAS ENCORE : les rangées des onglets fermés — seul
-// l'onglet ouvert est composé — et ce que dessine une page elle-même (voir
-// `OptionSectionView::body`), dont seul le titre se trouve.
+// ⚠ LES ONGLETS FERMÉS SE CHERCHENT DANS UNE COPIE : l'appelant ne compose que
+// l'onglet ouvert, et recopie les autres dans un `SearchedTabs` le temps d'une
+// recherche. Une page dessinée par elle-même se cherche dans les libellés
+// qu'elle donne (`OptionSectionView::body_terms`) : trouvée, elle se montre
+// entière, la fenêtre ne sachant pas en masquer une partie.
 
 // LE TEXTE TAPÉ, réduit une fois à sa clé de recherche.
 class OptionsSearch {
@@ -62,14 +65,56 @@ class OptionsSearch {
 struct SectionFinding {
   // Elle se montre dans la navigation.
   bool shown = true;
-  // Son titre ou un de ses onglets est trouvé : tout se montre.
+  // Son titre est trouvé : tout se montre.
   bool whole = true;
-  // Les réglages trouvés.
+  // Les réglages trouvés, page dessinée comprise : un libellé trouvé compte
+  // pour un.
   int settings = 0;
+  // PAR ONGLET de la section : son nom est trouvé — tout l'onglet se montre —,
+  // et les réglages qu'il porte. Vides pour une section sans onglets ; le
+  // compte reste à zéro sans `searched_tabs`.
+  std::vector<bool> tab_whole;
+  std::vector<int> tab_settings;
+  // Le premier onglet qui répond, ou moins un.
+  int first_tab = -1;
+  // La page dessinée par elle-même a un libellé trouvé, et l'onglet du premier
+  // — moins un s'il vaut sous tous.
+  bool body_found = false;
+  int body_tab = -1;
+
+  // L'onglet `tab` se montre-t-il entier ?
+  [[nodiscard]] bool TabWhole(int tab) const;
 };
 
 [[nodiscard]] SectionFinding FindInSection(const OptionSectionView& section,
                                            const OptionsSearch& search);
+
+// LES RANGÉES DES ONGLETS FERMÉS, RECOPIÉES pour la recherche : la section ne
+// garde de rangées que pour l'onglet ouvert.
+//
+// 🔴 UNE COPIE QUI POSSÈDE SES TEXTES. Un libellé composé pointe souvent dans
+// un tampon que l'onglet suivant réécrit — « Barre 3 » devient « Barre 4 » — :
+// garder son adresse ferait chercher dans le dernier onglet composé. Seul ce
+// que la recherche lit survit à la copie : identité, libellés, titres, forme et
+// mise en page ; ni valeur, ni aperçu, ni panneau.
+class SearchedTabs {
+ public:
+  void Clear();
+  // Les rangées d'un onglet de plus, au rang qui suit les précédents.
+  void Add(std::span<const OptionRowView> rows);
+  [[nodiscard]] std::span<const std::span<const OptionRowView>> tabs() const noexcept {
+    return views_;
+  }
+
+ private:
+  [[nodiscard]] const char* Keep(const char* text);
+
+  // ⚠ UNE DEQUE : ses chaînes ne bougent pas quand elle grandit, et les rangées
+  // pointent dedans.
+  std::deque<std::string> texts_;
+  std::vector<std::vector<OptionRowView>> rows_;
+  std::vector<std::span<const OptionRowView>> views_;
+};
 
 // LES ENTRÉES DE LA NAVIGATION, dans l'ordre où elles se lisent : chaque
 // famille garde sa place, et ses sections s'y rangent par ordre alphabétique

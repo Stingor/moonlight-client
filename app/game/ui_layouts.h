@@ -78,9 +78,10 @@ class UiLayouts {
   // dessine et la règle, le gardien l'enregistre dans le profil posé.
   [[nodiscard]] ro::ui::MinimapLayout& minimap() noexcept { return port_.minimap(); }
 
- private:
+  // Le titre et l'aide de la page, traduits : la recherche du panneau les lit.
   [[nodiscard]] static ProfileFamilyText Text();
 
+ private:
   LayoutPort port_;
   ProfileKeeper<ro::ui::LayoutProfile> keeper_;
 };

@@ -163,7 +163,7 @@ void AskPreset(CommandsPresetGesture gesture, std::uint8_t slot, const char* nam
 // « Presets : », la case du chargement automatique, et celui qui l'a.
 void DrawAutoloadLine(const CommandsPageView& view, const CommandsPageState& state,
                       const SkinArt& art, CommandsPageAction& asked) {
-  ImGui::TextUnformatted(core::Tr("Presets :"));
+  ImGui::TextUnformatted(Translated(kPresetsLabel));
   ImGui::SameLine();
   const CommandsPresetView* selected = FindPreset(view.presets, state.selected_preset);
   bool autoload = selected != nullptr && selected->autoload;
@@ -290,7 +290,7 @@ void DrawChoiceLine(const CommandsPageView& view, CommandsPageState& state, cons
 
 void DrawAutolootIdNode(const CommandsPageView& view, CommandsPageState& state, const SkinArt& art,
                         CommandsPageAction& asked) {
-  if (!ImGui::TreeNode("@autolootid")) {
+  if (!ImGui::TreeNode(kAutolootIdCommand)) {
     return;
   }
   ImGui::TextUnformatted("@autolootid :");

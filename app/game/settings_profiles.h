@@ -67,9 +67,10 @@ class SettingsProfiles {
   void AfterPose(std::function<void()> then) { port_.AfterPose(std::move(then)); }
   [[nodiscard]] ro::ui::OptionSectionBody Body() { return keeper_.Body(); }
 
- private:
+  // Le titre et l'aide de la page, traduits : la recherche du panneau les lit.
   [[nodiscard]] static ProfileFamilyText Text();
 
+ private:
   SettingsPort port_;
   ProfileKeeper<SettingsValues> keeper_;
 };

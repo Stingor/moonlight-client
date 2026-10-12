@@ -86,9 +86,9 @@ class GameOptions {
   // Refait les lignes des deux panneaux. ⚠ SEULEMENT SI L'UN EST OUVERT :
   // composer sept lignes par image pour des fenêtres fermées serait du temps
   // donné à rien.
-  // `shown_bar` est l onglet choisi dans la section des barres : la composition
-  // ne fait que ses lignes. Voir `ComposeShortcutRows`.
-  void Refresh(bool a_panel_is_open, int shown_bar);
+  // `shown_bar` est l'onglet ouvert : la composition ne fait que ses lignes —
+  // sauf `searching`, où les autres onglets se recopient pour le filtre.
+  void Refresh(bool a_panel_is_open, int shown_bar, bool searching = false);
 
   // ⚠ DEUX GROUPES, ET ILS NE SE MÉLANGENT PAS. Ce que le CLIENT D'ORIGINE
   // sait régler d'un côté — le son, la caméra ; ce que CE client ajoute de

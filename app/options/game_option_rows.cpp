@@ -10,11 +10,16 @@
 // fait qu'un changement de langue se voit à l'image suivante, sans rien de figé —
 // et c'est pourquoi rien ici ne doit coûter cher.
 
+#include <cstddef>
+#include <vector>
+
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/commands_page.h"
 #include "ro/ui/system_fonts.h"
 
+#include "options/entity_page_tabs.h"
 #include "options/game_options.h"
 #include "options/option_row_kinds.h"
 
@@ -35,9 +40,26 @@ using ro::ui::OptionRowView;
                        .format = "%.0f %%"};
 }
 
+// LES ONGLETS D'UNE SECTION, RECOPIÉS POUR LE FILTRE : chacun se compose à son
+// tour, puis l'appelant recompose l'onglet ouvert — c'est lui que la page
+// montre. Rien sans recherche : huit barres composées à chaque image pour un
+// filtre vide seraient du temps donné à rien.
+template <typename Compose>
+void CopyTabsForSearch(bool searching, std::size_t tab_count, ro::ui::SearchedTabs& into,
+                       const std::vector<OptionRowView>& rows, Compose compose) {
+  into.Clear();
+  if (!searching) {
+    return;
+  }
+  for (std::size_t tab = 0; tab < tab_count; ++tab) {
+    compose(static_cast<int>(tab));
+    into.Add(rows);
+  }
+}
+
 }  // namespace
 
-void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
+void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   if (!a_panel_is_open) {
     // L'aperçu des dégâts ne vit que panneau ouvert : fermé, personne ne
     // doit retrouver son personnage battu par des coups factices.
@@ -450,6 +472,8 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
 
   // Les barres de raccourcis, à part : quarante-deux lignes composées en boucle.
   // Voir `game_option_bars.cpp`.
+  CopyTabsForSearch(searching, ro::ui::kShortcutBarCount, pages_.shortcut_search, shortcut_rows_,
+                    [this](int tab) { ComposeShortcutRows(tab); });
   ComposeShortcutRows(shown_bar);
 
   // LA BARRE DÉTATS : une famille, un fichier. Voir
@@ -554,13 +578,19 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   // partage fautif : la fenêtre ne montre qu'UNE section à la fois, donc son
   // onglet ouvert ne désigne jamais deux choses en même temps.
   BuildCaptureRows();
+  CopyTabsForSearch(searching, static_cast<std::size_t>(DamageTab::kCount), pages_.damage_search,
+                    damage_rows_, [this](int tab) { ComposeDamageRows(tab); });
   ComposeDamageRows(shown_bar);
+  CopyTabsForSearch(searching, ro::ui::kStatBarCount, pages_.stat_bar_search, stat_bar_rows_,
+                    [this](int tab) { BuildStatBarRows(tab); });
   BuildStatBarRows(shown_bar);
   // ⚠ LES NOMS ET LA ZONE CLIQUABLE SE COMPOSENT AVEC LES BARRES, dans la même
   // page : voir `BuildEntityBarRows`. La zone se compose AVANT, puisqu'elle y
   // est ajoutée. ⚠ LA LARGEUR DE LA FENÊTRE EST CELLE D'IMGUI, relevée à
   // l'image : les planchers que la page annonce sont ceux de cet écran-là.
   pages_.pick_precision.Compose(ImGui::GetIO().DisplaySize.x);
+  CopyTabsForSearch(searching, kEntityPageTabCount, pages_.entity_search, entity_bar_rows_,
+                    [this](int tab) { BuildEntityBarRows(tab); });
   BuildEntityBarRows(shown_bar);
 
   // ── LES NEUF SECTIONS, EN DEUX FAMILLES ───────────────────────────────────
@@ -625,7 +655,8 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
                                 .rows = damage_rows_,
                                 .shared_rows = damage_shared_rows_,
                                 .side_rows = pages_.damage_side_rows,
-                                .tabs = damage_names_.tabs};
+                                .tabs = damage_names_.tabs,
+                                .searched_tabs = pages_.damage_search.tabs()};
   // ⚠ DANS « CORE », CONTRE LES DÉGÂTS : ces barres sont posées SUR LE MONDE,
   // au-dessus des têtes, et non dans une fenêtre qu'on range. Six onglets, un
   // par espèce, parce que ce que le serveur dit de la vie d'autrui dépend
@@ -635,16 +666,27 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
                                 .rows = entity_bar_rows_,
                                 .shared_rows = entity_bar_shared_rows_,
                                 .pinned_rows = pages_.entity_pinned_rows,
-                                .tabs = entity_bar_tabs_};
+                                .tabs = entity_bar_tabs_,
+                                .searched_tabs = pages_.entity_search.tabs()};
   // ⚠ DANS « CORE » ET NON DANS L'INTERFACE : c'est le PROGRAMME qui relit son
   // image, et ce que la capture montre est tout ce que l'écran porte.
   sections_[Rank(OptionSection::kCapture)] =
       ro::ui::OptionSectionView{.title = Tr("Capture d'écran"), .rows = capture_rows_};
+  // CE QUE LES PAGES DESSINÉES PAR ELLES-MÊMES DONNENT AU FILTRE, quand on cherche.
+  pages_.interface_terms.clear();
+  pages_.commands_terms.clear();
+  if (searching && pages_.profiles_terms) {
+    pages_.profiles_terms(pages_.interface_terms);
+  }
+  if (searching && pages_.commands_body) {
+    ro::ui::AppendCommandsPageTerms(pages_.commands_terms);
+  }
   sections_[Rank(OptionSection::kInterface)] =
       ro::ui::OptionSectionView{.title = Tr("Interface"),
                                 .group = Tr("UI"),
                                 .rows = display_rows_,
-                                .body = pages_.profiles_body};
+                                .body = pages_.profiles_body,
+                                .body_terms = pages_.interface_terms};
   sections_[Rank(OptionSection::kSkin)] = pages_.ComposeSkinSection();
   pages_.minimap_panel.Compose();
   sections_[Rank(OptionSection::kMinimap)] =
@@ -659,12 +701,14 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
                                 // ⚠ HUIT ONGLETS, UN PAR BARRE : dix-neuf
                                 // réglages fois huit feraient cent cinquante
                                 // lignes qui se ressemblent toutes.
-                                .tabs = shortcut_tabs_};
+                                .tabs = shortcut_tabs_,
+                                .searched_tabs = pages_.shortcut_search.tabs()};
   sections_[Rank(OptionSection::kStatBars)] =
       ro::ui::OptionSectionView{.title = Tr("Jauges"),
                                 .rows = stat_bar_rows_,
                                 .shared_rows = stat_bar_shared_rows_,
-                                .tabs = stat_bar_tabs_};
+                                .tabs = stat_bar_tabs_,
+                                .searched_tabs = pages_.stat_bar_search.tabs()};
   sections_[Rank(OptionSection::kStatuses)] =
       ro::ui::OptionSectionView{.title = Tr("États"), .rows = status_rows_};
   // ⚠ COMPOSÉ AVANT la vue qui le désigne : elle n'en garde qu'un span.
@@ -724,8 +768,11 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   sections_[Rank(OptionSection::kQuestTracker)] = ro::ui::OptionSectionView{
       .title = Tr("Quêtes et suivi"), .rows = pages_.quest_tracker.rows()};
   // ⚠ AUCUNE RANGÉE : la page se dessine elle-même. Voir `options/commands_page.h`.
-  sections_[Rank(OptionSection::kCommands)] = ro::ui::OptionSectionView{
-      .title = Tr("Commands Settings"), .group = Tr("Server"), .body = pages_.commands_body};
+  sections_[Rank(OptionSection::kCommands)] =
+      ro::ui::OptionSectionView{.title = Tr("Commands Settings"),
+                                .group = Tr("Server"),
+                                .body = pages_.commands_body,
+                                .body_terms = pages_.commands_terms};
   pages_.MarkRestorable(sections_);
 }
 

@@ -102,6 +102,7 @@ add_library(ro_ui STATIC
     src/commands_page.cpp
     src/commands_page_autoloot.cpp
     src/commands_page_presets.cpp
+    src/commands_page_texts.cpp
     src/emblem_canvas.cpp
     src/guild_confirmations.cpp
     src/guild_emblem_modal.cpp

@@ -2,10 +2,12 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
 #include <span>
 #include <vector>
 
 #include "ro/ui/entity_sample.h"
+#include "ro/ui/options_search.h"
 #include "ro/ui/options_window.h"
 #include "ro/ui/path_canvas.h"
 
@@ -137,6 +139,22 @@ struct OptionPages {
   // « Interface », posés par la partie. Voir `UiLayouts` et `SettingsProfiles`.
   // ⚠ PAS UN RÉGLAGE.
   ro::ui::OptionSectionBody profiles_body;
+  // CE QUE CES PROFILS DONNENT À LA RECHERCHE : leurs titres, traduits. Posé
+  // par la partie avec le corps. ⚠ PAS UN RÉGLAGE.
+  std::function<void(std::vector<ro::ui::OptionBodyTerm>&)> profiles_terms;
+
+  // ── CE QUE LE FILTRE DU PANNEAU LIT, refait à chaque image où l'on cherche ──
+  //
+  // Les mots des pages dessinées par elles-mêmes, et les rangées des onglets
+  // fermés recopiées : voir `ro/ui/options_search.h`. ⚠ ICI ET NON SUR LA PILE :
+  // les sections n'en gardent qu'une vue. Vides quand rien n'est cherché.
+  std::vector<ro::ui::OptionBodyTerm> interface_terms;
+  std::vector<ro::ui::OptionBodyTerm> skin_terms;
+  std::vector<ro::ui::OptionBodyTerm> commands_terms;
+  ro::ui::SearchedTabs shortcut_search;
+  ro::ui::SearchedTabs stat_bar_search;
+  ro::ui::SearchedTabs entity_search;
+  ro::ui::SearchedTabs damage_search;
 
   // LA SECTION « SKIN » : le choix du dossier, son habillage, puis les profils
   // d'habillage. ⚠ ICI ET NON SUR LA PILE : la section n'en garde qu'une vue.

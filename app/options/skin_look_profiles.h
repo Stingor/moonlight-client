@@ -66,9 +66,10 @@ class SkinLookProfiles {
   // Le geste de la page, appliqué au prochain `Tick`.
   void Ask(ro::ui::ProfilesPageAction asked) { keeper_.Ask(std::move(asked)); }
 
- private:
+  // Le titre et l'aide de la page, traduits : la recherche du panneau les lit.
   [[nodiscard]] static ProfileFamilyText Text();
 
+ private:
   SkinLookPort port_;
   ProfileKeeper<SettingsValues> keeper_;
 };

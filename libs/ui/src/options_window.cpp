@@ -52,6 +52,57 @@ constexpr float kSidePanelWidthPixels = 620.0F;
 constexpr int kBugReportRank = 0;
 // De quoi écrire « Résultats : » et un compte, dans toutes les langues.
 constexpr std::size_t kFoundTextBytes = 64;
+// De quoi écrire un nom d'onglet, son compte et son identité.
+constexpr std::size_t kTabLabelBytes = 96;
+
+// L'ONGLET OÙ LE FILTRE A TROUVÉ, ouvert une fois par mot tapé et par page —
+// pas à chaque image : le joueur qui clique ensuite un autre onglet y reste.
+// L'onglet ouvert qui répond lui-même ne cède pas sa place.
+void OpenFoundTab(const OptionSectionView& section, const SectionFinding& finding, bool searching,
+                  OptionsWindowState& state) {
+  if (!searching) {
+    state.searched_section = -1;
+    state.searched_filter.front() = '\0';
+    return;
+  }
+  if (state.searched_section == state.section && state.searched_filter == state.filter) {
+    return;
+  }
+  state.searched_section = state.section;
+  state.searched_filter = state.filter;
+  if (!section.tabs.empty()) {
+    const auto open = static_cast<std::size_t>(state.section_tab);
+    const bool open_found = finding.TabWhole(state.section_tab) ||
+                            (open < finding.tab_settings.size() && finding.tab_settings[open] > 0);
+    if (!open_found && finding.first_tab >= 0) {
+      state.section_tab_wanted = finding.first_tab;
+    }
+    return;
+  }
+  if (finding.body_found && finding.body_tab >= 0) {
+    state.section_tab_wanted = finding.body_tab;
+  }
+}
+
+// LE LIBELLÉ D'UN ONGLET, et sous un filtre le compte des réglages qu'il porte.
+//
+// ⚠ L'IDENTITÉ EST LE RANG, derrière « ### » : le compte change à chaque
+// lettre tapée, et un libellé qui serait aussi l'identité ferait voir à ImGui
+// un onglet neuf à chaque fois.
+[[nodiscard]] std::array<char, kTabLabelBytes> TabLabel(const OptionSectionView& section,
+                                                        const SectionFinding& finding,
+                                                        bool searching, int rank) {
+  std::array<char, kTabLabelBytes> label{};
+  const char* const name = section.tabs[static_cast<std::size_t>(rank)];
+  const auto at = static_cast<std::size_t>(rank);
+  if (searching && at < finding.tab_settings.size()) {
+    std::snprintf(label.data(), label.size(), "%s (%d)###onglet%d", name, finding.tab_settings[at],
+                  rank);
+  } else {
+    std::snprintf(label.data(), label.size(), "%s###onglet%d", name, rank);
+  }
+  return label;
+}
 
 // UNE SECTION : ses réglages, le contrôle d'abord et le libellé ensuite.
 //
@@ -65,16 +116,23 @@ constexpr std::size_t kFoundTextBytes = 64;
 // widgets le libellé qu'ils savent poser.
 //
 // SOUS UN FILTRE, les réglages communs et les lignes ne gardent que ce qu'il
-// trouve — sauf quand le titre de la page l'est (`whole`). Ce qui ne défile pas
-// et le volet restent entiers : ce sont des aperçus, pas des réglages.
+// trouve — sauf quand le titre de la page, ou celui de l'onglet ouvert, l'est.
+// Ce qui ne défile pas et le volet restent entiers : ce sont des aperçus, pas
+// des réglages. La page dessinée par elle-même se montre entière quand un de
+// ses libellés est trouvé, et pas du tout sinon.
 void DrawSection(const OptionSectionView& section, OptionsWindowState& state, const SkinArt& art,
-                 bool offers_links, const OptionsSearch& search, bool whole,
+                 bool offers_links, const OptionsSearch& search, const SectionFinding& finding,
                  OptionsWindowAction* asked) {
-  const bool filtered = search.active() && !whole;
+  const bool shared_filtered = search.active() && !finding.whole;
+  const bool rows_whole =
+      section.searched_tabs.empty()
+          ? finding.whole || std::ranges::any_of(finding.tab_whole, std::identity{})
+          : finding.TabWhole(state.section_tab);
+  const bool rows_filtered = search.active() && !rows_whole;
   const std::vector<bool> shared_kept =
-      filtered ? KeptRows(section.shared_rows, search, false) : std::vector<bool>{};
+      shared_filtered ? KeptRows(section.shared_rows, search, false) : std::vector<bool>{};
   const std::vector<bool> rows_kept =
-      filtered ? KeptRows(section.rows, search, false) : std::vector<bool>{};
+      rows_filtered ? KeptRows(section.rows, search, false) : std::vector<bool>{};
   // 🔴 CE QU'UN SÉLECTEUR DÉROULÉ RECOUVRE EST NEUTRALISÉ. Il s'ouvre
   // sous sa pastille et mange les rangées suivantes ; les laisser vivantes
   // ferait attraper un curseur invisible en visant une couleur.
@@ -103,7 +161,7 @@ void DrawSection(const OptionSectionView& section, OptionsWindowState& state, co
   // commun, rien d'autre ne le peut.
   ImGui::PushID(state.section);
   DrawOptionRows("communs", section.shared_rows, art, asked, &covered,
-                 filtered ? &shared_kept : nullptr, &state.row_wanted);
+                 shared_filtered ? &shared_kept : nullptr, &state.row_wanted);
   ImGui::PopID();
   // LA SECONDE NAVIGATION, quand la section en porte une : une rangée d'onglets
   // au-dessus de ses lignes. Voir `OptionSectionView::tabs`.
@@ -132,8 +190,8 @@ void DrawSection(const OptionSectionView& section, OptionsWindowState& state, co
         // que passera l'ouverture du panneau SUR une barre donnée.
         const ImGuiTabItemFlags flags =
             state.section_tab_wanted == rank ? ImGuiTabItemFlags_SetSelected : 0;
-        const bool opened =
-            ImGui::BeginTabItem(section.tabs[static_cast<std::size_t>(rank)], nullptr, flags);
+        const bool opened = ImGui::BeginTabItem(
+            TabLabel(section, finding, search.active(), rank).data(), nullptr, flags);
         // ⚠ SUR LA LANGUETTE, avant son contenu : voir `OfferChatLink`. Le Maj +
         // clic la sélectionne aussi au passage, et montre ce qu'on vient de poser.
         if (OfferChatLink(offers_links)) {
@@ -153,11 +211,11 @@ void DrawSection(const OptionSectionView& section, OptionsWindowState& state, co
   // et une autre page ne prête pas la sienne.
   ImGui::PushID(state.section);
   ImGui::PushID(state.section_tab);
-  DrawOptionRows("lignes", section.rows, art, asked, &covered, filtered ? &rows_kept : nullptr,
+  DrawOptionRows("lignes", section.rows, art, asked, &covered, rows_filtered ? &rows_kept : nullptr,
                  &state.row_wanted);
   ImGui::PopID();
   ImGui::PopID();
-  if (section.body) {
+  if (section.body && (!search.active() || finding.whole || finding.body_found)) {
     // LES ONGLETS QUE LA PAGE DESSINE ELLE-MÊME reçoivent la demande, quand la
     // section n'en porte pas qui l'auraient déjà prise, et rendent leur lien
     // comme ceux de la section.
@@ -326,8 +384,8 @@ struct SettingsWindowWords {
       ImGui::TextDisabled("%s", core::Tr("Aucun réglage ne correspond à ce filtre."));
     } else if (!sections.empty()) {
       const auto rank = static_cast<std::size_t>(state.section);
-      DrawSection(sections[rank], state, art, words.offers_links, search, findings[rank].whole,
-                  &asked);
+      OpenFoundTab(sections[rank], findings[rank], search.active(), state);
+      DrawSection(sections[rank], state, art, words.offers_links, search, findings[rank], &asked);
     }
     EndNavPanel(art);
   }

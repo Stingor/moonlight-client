@@ -101,7 +101,8 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   options_.card_album().NoteOpenKey(LabelOfBinding(bindings_.Of(GameAction::kOpenCardAlbum)));
   options_.pages().mvp_tracker.NoteOpenKey(
       LabelOfBinding(bindings_.Of(GameAction::kOpenMvpTracker)));
-  options_.Refresh(windows.options.open, windows.options.section_tab);
+  options_.Refresh(windows.options.open, windows.options.section_tab,
+                   windows.options.filter.front() != '\0');
   windows.card_album.look = options_.card_album().look();
   windows.mvp_tracker.window.look = options_.pages().mvp_tracker.look();
   windows.menu_icons.look = &options_.pages().menu_icons.look();

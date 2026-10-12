@@ -3,6 +3,8 @@
 #include "ro/ui/options_search.h"
 
 #include <algorithm>
+#include <functional>
+#include <utility>
 
 #include "ro/core/search_key.h"
 
@@ -103,16 +105,92 @@ int CountKeptSettings(std::span<const OptionRowView> rows, const std::vector<boo
   return counted;
 }
 
+bool SectionFinding::TabWhole(int tab) const {
+  return whole || (tab >= 0 && static_cast<std::size_t>(tab) < tab_whole.size() &&
+                   tab_whole[static_cast<std::size_t>(tab)]);
+}
+
 SectionFinding FindInSection(const OptionSectionView& section, const OptionsSearch& search) {
   SectionFinding finding;
-  finding.whole =
-      !search.active() || search.Finds(section.title) ||
-      std::ranges::any_of(section.tabs, [&search](const char* tab) { return search.Finds(tab); });
+  finding.whole = !search.active() || search.Finds(section.title);
+  finding.tab_whole.reserve(section.tabs.size());
+  for (const char* tab : section.tabs) {
+    finding.tab_whole.push_back(finding.whole || search.Finds(tab));
+  }
   finding.settings =
-      CountKeptSettings(section.shared_rows, KeptRows(section.shared_rows, search, finding.whole)) +
-      CountKeptSettings(section.rows, KeptRows(section.rows, search, finding.whole));
-  finding.shown = finding.whole || finding.settings > 0;
+      CountKeptSettings(section.shared_rows, KeptRows(section.shared_rows, search, finding.whole));
+  if (section.searched_tabs.empty()) {
+    // SANS COPIE DES ONGLETS, la seule page composée — et un nom d'onglet
+    // trouvé la montre entière, faute de savoir laquelle elle est.
+    const bool whole_rows =
+        finding.whole || std::ranges::any_of(finding.tab_whole, std::identity{});
+    finding.settings += CountKeptSettings(section.rows, KeptRows(section.rows, search, whole_rows));
+  } else {
+    finding.tab_settings.assign(finding.tab_whole.size(), 0);
+    for (std::size_t tab = 0;
+         tab < section.searched_tabs.size() && tab < finding.tab_settings.size(); ++tab) {
+      const std::span<const OptionRowView> rows = section.searched_tabs[tab];
+      finding.tab_settings[tab] =
+          CountKeptSettings(rows, KeptRows(rows, search, finding.tab_whole[tab]));
+      finding.settings += finding.tab_settings[tab];
+    }
+  }
+  for (std::size_t tab = 0; tab < finding.tab_whole.size(); ++tab) {
+    const bool found = finding.tab_whole[tab] ||
+                       (tab < finding.tab_settings.size() && finding.tab_settings[tab] > 0);
+    if (found) {
+      finding.first_tab = static_cast<int>(tab);
+      break;
+    }
+  }
+  if (search.active()) {
+    for (const OptionBodyTerm& term : section.body_terms) {
+      if (!search.Finds(term.text)) {
+        continue;
+      }
+      if (!finding.body_found) {
+        finding.body_tab = term.tab;
+      }
+      finding.body_found = true;
+      ++finding.settings;
+    }
+  }
+  finding.shown = finding.whole || finding.settings > 0 ||
+                  std::ranges::any_of(finding.tab_whole, std::identity{});
   return finding;
+}
+
+void SearchedTabs::Clear() {
+  texts_.clear();
+  rows_.clear();
+  views_.clear();
+}
+
+const char* SearchedTabs::Keep(const char* text) {
+  if (text == nullptr) {
+    return nullptr;
+  }
+  return texts_.emplace_back(text).c_str();
+}
+
+void SearchedTabs::Add(std::span<const OptionRowView> rows) {
+  std::vector<OptionRowView> copied;
+  copied.reserve(rows.size());
+  for (const OptionRowView& row : rows) {
+    copied.push_back(OptionRowView{.id = row.id,
+                                   .label = Keep(row.label),
+                                   .command = Keep(row.command),
+                                   .kind = row.kind,
+                                   .object = Keep(row.object),
+                                   .heading = Keep(row.heading),
+                                   .fold = Keep(row.fold),
+                                   .indented = row.indented,
+                                   .same_line = row.same_line});
+  }
+  // ⚠ LE TAMPON D'UN VECTEUR DÉPLACÉ NE BOUGE PAS : la vue prise ici survit aux
+  // onglets qu'on ajoute ensuite.
+  rows_.push_back(std::move(copied));
+  views_.emplace_back(rows_.back());
 }
 
 std::vector<NavEntry> SortedNavEntries(std::span<const OptionSectionView> sections,

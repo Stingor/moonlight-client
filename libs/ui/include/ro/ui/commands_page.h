@@ -6,7 +6,9 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <vector>
 
+#include "ro/ui/options_window.h"
 #include "ro/ui/skin_art.h"
 
 namespace ro::ui {
@@ -180,6 +182,11 @@ struct CommandsPageAction {
 
 [[nodiscard]] CommandsPageAction DrawCommandsPage(const CommandsPageView& view,
                                                   CommandsPageState& state, const SkinArt& art);
+
+// CE QUE LA PAGE DONNE À LA RECHERCHE DU PANNEAU : ses libellés traduits et ses
+// commandes, chacun avec son onglet. Voir `OptionSectionView::body_terms`.
+// ⚠ À REFAIRE À CHAQUE IMAGE où l'on cherche : la langue a pu changer.
+void AppendCommandsPageTerms(std::vector<OptionBodyTerm>& into);
 
 // LE SEUIL DE ZENY TEL QUE LE SERVEUR LE RETIENT : borné, puis arrondi au pas du
 // fil, vers le bas.

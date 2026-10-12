@@ -244,6 +244,15 @@ struct OptionBodyTabs {
   int link = -1;
 };
 
+// UN LIBELLÉ QU'UNE PAGE DESSINÉE PAR ELLE-MÊME DONNE À LA RECHERCHE. ⚠ DÉJÀ
+// TRADUIT, comme partout dans cette couche.
+struct OptionBodyTerm {
+  const char* text = "";
+  // L'onglet de la page qui le porte, par le rang qu'elle lui donne ; moins un
+  // pour ce qui vaut sous tous.
+  int tab = -1;
+};
+
 // CE QU'UNE PAGE DESSINE ELLE-MÊME, sous ses rangées. Voir
 // `OptionSectionView::body`.
 using OptionSectionBody = std::function<void(const SkinArt& art, OptionBodyTabs& tabs)>;
@@ -306,6 +315,16 @@ struct OptionSectionView {
   // ce qu'elle montre — c'est l'appelant qui a fermé sur sa vue et sur ce qu'il
   // attend en retour.
   OptionSectionBody body;
+  // CE QUE LA PAGE DESSINÉE PAR ELLE-MÊME DONNE À LA RECHERCHE : ses libellés,
+  // et l'onglet qui porte chacun. Voir `options_search.h`. ⚠ SANS EUX, LE
+  // FILTRE NE LA TROUVE QUE PAR SON TITRE : la fenêtre ne voit pas ce qu'elle
+  // dessine.
+  std::span<const OptionBodyTerm> body_terms;
+
+  // LES RANGÉES DE CHAQUE ONGLET, POUR LA RECHERCHE SEULE, par rang d'onglet —
+  // ou vide. `rows` ne porte que l'onglet ouvert : sans ceci, un réglage d'un
+  // onglet fermé ne se trouverait pas. Voir `SearchedTabs`.
+  std::span<const std::span<const OptionRowView>> searched_tabs;
 
   // LA PAGE A DES RÉGLAGES QU'ON PEUT RENDRE À L'ORIGINE, elle seule : le bouton
   // « Rétablir cette page » ne se montre que là. ⚠ FAUX PAR DÉFAUT : une page
@@ -364,6 +383,11 @@ struct OptionsWindowState {
   // Voir `options_search.h`. ⚠ CELUI QUI OUVRE UNE PAGE PRÉCISE LE VIDE : sous
   // un filtre qui ne la trouve pas, elle ne se montrerait pas.
   std::array<char, kOptionsFilterBytes> filter{};
+  // LE FILTRE ET LA PAGE POUR LESQUELS L'ONGLET DU PREMIER RÉSULTAT A ÉTÉ
+  // OUVERT. ⚠ UNE FOIS PAR MOT TAPÉ ET PAR PAGE, pas à chaque image : le joueur
+  // qui clique ensuite un autre onglet doit pouvoir y rester.
+  std::array<char, kOptionsFilterBytes> searched_filter{};
+  int searched_section = -1;
   // Le bouton « Signaler un bug » de la barre de titre, selon le réglage. ⚠ LES
   // OPTIONS DU JEU SEULES : l'écran de connexion n'a personne à qui l'envoyer.
   bool bug_report = false;

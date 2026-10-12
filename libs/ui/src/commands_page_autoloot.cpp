@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <array>
+#include <initializer_list>
+#include <vector>
 
 #include <imgui.h>
 
@@ -44,6 +46,15 @@ constexpr std::array<AutolootType, 10> kAutolootTypes = {{
     {"Cash", 1U << 11U},
 }};
 
+// LES MOTS QUE LE DESSIN ET LA RECHERCHE PARTAGENT : les commandes, telles
+// qu'elles se tapent, et les libellés marqués.
+constexpr const char* kRateCommand = "@autoloot";
+constexpr const char* kMinZenyLabel = "@autolootpognon (z)";
+constexpr const char* kTypeCommand = "@autoloottype";
+constexpr const char* kRaresLabel = core::TrText("Autoloot rares");
+constexpr const char* kMvpLabel = core::TrText("Autoloot MVP");
+constexpr const char* kMvpRewardsLabel = core::TrText("Autoloot MVP rewards (actif par défaut)");
+
 void AskMinZeny(int zeny, CommandsPageAction& asked) {
   asked.field = CommandsField::kAutolootMinZeny;
   asked.value = ClampAutolootMinZeny(zeny);
@@ -52,7 +63,7 @@ void AskMinZeny(int zeny, CommandsPageAction& asked) {
 void DrawRate(const CommandsPageView& view, const SkinArt& art, CommandsPageAction& asked) {
   int rate = view.autoloot_rate_percent;
   ImGui::SetNextItemWidth(Px(kRateSliderWidth));
-  if (SkinSliderInt("@autoloot", &rate, 0, kCommandsAutolootRateHighest, art, "%d%%")) {
+  if (SkinSliderInt(kRateCommand, &rate, 0, kCommandsAutolootRateHighest, art, "%d%%")) {
     asked.field = CommandsField::kAutolootRate;
     asked.value = rate;
   }
@@ -70,7 +81,7 @@ void DrawMinZeny(const CommandsPageView& view, CommandsPageState& state, const S
   // seuils, dont quatre que le joueur n'a jamais voulus.
   int zeny = state.min_zeny_editing ? state.min_zeny_draft : view.autoloot_min_zeny;
   ImGui::SetNextItemWidth(Px(kMinZenyInputWidth));
-  ImGui::InputInt("@autolootpognon (z)", &zeny, 0, 0);
+  ImGui::InputInt(kMinZenyLabel, &zeny, 0, 0);
   if (ImGui::IsItemDeactivatedAfterEdit()) {
     state.min_zeny_editing = false;
     AskMinZeny(zeny, asked);
@@ -105,7 +116,7 @@ void DrawMinZeny(const CommandsPageView& view, CommandsPageState& state, const S
 }
 
 void DrawTypes(const CommandsPageView& view, const SkinArt& art, CommandsPageAction& asked) {
-  if (!ImGui::TreeNode("@autoloottype")) {
+  if (!ImGui::TreeNode(kTypeCommand)) {
     return;
   }
   ImGui::TextUnformatted("@autoloottype :");
@@ -137,6 +148,18 @@ void DrawTypes(const CommandsPageView& view, const SkinArt& art, CommandsPageAct
 
 }  // namespace
 
+void AppendAutolootTerms(std::vector<OptionBodyTerm>& into, int tab) {
+  for (const char* command : {kRateCommand, kMinZenyLabel, kTypeCommand, kAutolootIdCommand}) {
+    into.push_back({.text = command, .tab = tab});
+  }
+  for (const char* label : {kRaresLabel, kMvpLabel, kMvpRewardsLabel, kPresetsLabel}) {
+    into.push_back({.text = Translated(label), .tab = tab});
+  }
+  for (const AutolootType& type : kAutolootTypes) {
+    into.push_back({.text = type.label, .tab = tab});
+  }
+}
+
 void DrawAutolootTab(const CommandsPageView& view, CommandsPageState& state, const SkinArt& art,
                      CommandsPageAction& asked) {
   ImGui::Spacing();
@@ -146,7 +169,7 @@ void DrawAutolootTab(const CommandsPageView& view, CommandsPageState& state, con
   ImGui::Separator();
   DrawTypes(view, art, asked);
   ImGui::Separator();
-  Toggle(core::Tr("Autoloot rares"), view.autoloot_rares,
+  Toggle(Translated(kRaresLabel), view.autoloot_rares,
          core::Tr("Autolooting: Toutes les Cards\nOld Blue Box (603)\nYggdrasil Berry "
                   "(607)\nYggdrasil Seed (608)\nOld Card Album (616)\nOld Purple Box (617)\nGift "
                   "Box (644)\nGold (969)\n"
@@ -159,10 +182,10 @@ void DrawAutolootTab(const CommandsPageView& view, CommandsPageState& state, con
                   "Card Album (12246)\nSentimental Fragment (22687)\nCursed Fragment (23016)"),
          CommandsField::kAutolootRares, art, asked);
   ImGui::Separator();
-  Toggle(core::Tr("Autoloot MVP"), view.autoloot_mvp,
+  Toggle(Translated(kMvpLabel), view.autoloot_mvp,
          core::Tr("Loot automatiquement les MVP\nquelque soit leur taux de drop. (@autolootmvp)"),
          CommandsField::kAutolootMvp, art, asked);
-  Toggle(core::Tr("Autoloot MVP rewards (actif par défaut)"), view.autoloot_mvp_rewards,
+  Toggle(Translated(kMvpRewardsLabel), view.autoloot_mvp_rewards,
          core::Tr("Les drops de récompense des MVP sont lootés\nautomatiquement par "
                   "défaut.\nDécocher pour désactiver. (@autolootmvpreward)"),
          CommandsField::kAutolootMvpRewards, art, asked);

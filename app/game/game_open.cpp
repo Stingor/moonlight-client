@@ -85,6 +85,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
         layouts(art, tabs);
         settings(art, tabs);
       };
+  settings_->options().pages().profiles_terms = [](std::vector<ro::ui::OptionBodyTerm>& into) {
+    into.push_back({.text = UiLayouts::Text().title});
+    into.push_back({.text = SettingsProfiles::Text().title});
+  };
   // « VOIR L'ÉQUIPEMENT » AUSSI, pour la même raison, avec ses deux cases
   // retenues : elles ne se relisent qu'ici, et la fenêtre les porte ensuite.
   windows_.view_equip = UiStage::Windows::ViewEquip{};
