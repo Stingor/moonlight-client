@@ -95,7 +95,6 @@ core::Result<ItemEntry> DescribeItem(ItemInfoRecord record) {
   described.resource = std::move(*archived);
   described.view_id = record.view;
   described.card_slots = record.slots;
-  described.costume = record.costume;
   // ⚠ LES TROIS LIGNES DU SCRIPT AVANT CELLES DE LA TABLE : voir l'en-tête.
   described.description = HeaderLines(record.item_id, record.view);
   AppendLines(std::move(record.description), described.description);

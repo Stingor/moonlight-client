@@ -11,9 +11,9 @@
 //   · `version: <entier>`, puis `items: {` ;
 //   · par objet, `<identifiant>: {<champ>: <valeur>, …}`, séparés par des
 //     virgules, et la table fermée par `}` ;
-//   · une valeur est un entier sans signe, `true` ou `false`, un texte entre
-//     guillemets doubles aux échappements de JSON (`\"`, `\\`, `\/`, `\b`,
-//     `\f`, `\n`, `\r`, `\t`, `\uXXXX`), ou une suite `[…]` de tels textes.
+//   · une valeur est un entier sans signe, un texte entre guillemets doubles
+//     aux échappements de JSON (`\"`, `\\`, `\/`, `\b`, `\f`, `\n`, `\r`,
+//     `\t`, `\uXXXX`), ou une suite `[…]` de tels textes.
 //
 // ⚠ TOUT AUTRE TEXTE EST REFUSÉ, même du YAML valide : un texte sans
 // guillemets, un échappement propre à YAML, un champ inconnu. Une table
@@ -41,9 +41,6 @@ struct ItemInfoRecord {
   std::string resource;
   std::uint8_t slots = 0;
   std::uint16_t view = 0;
-  bool costume = false;
-  // L'effet de l'objet au sol : la table le porte, le client ne le montre pas.
-  std::uint32_t effect = 0;
   // Les lignes BRUTES : le `#` final qui vaut trait de séparation y reste.
   std::vector<std::string> description;
 
@@ -59,6 +56,29 @@ inline constexpr std::uint32_t kItemInfoVersion = 1;
 [[nodiscard]] core::Result<void> ReadItemInfoText(
     std::string_view text, const std::function<core::Result<void>(ItemInfoRecord&&)>& take);
 
+// ── LES FAITS DU SERVEUR ────────────────────────────────────────────────────
+//
+// Ce que `item_info.py --faits-serveur` écrit pour l'éditeur de tables : la
+// forme de la table, et deux champs qu'elle ne porte pas —
+//
+//   · `type`      : le type d'objet du serveur, en majuscules comme ses
+//                   constantes (`WEAPON`, `ARMOR`, `ETC`…) ;
+//   · `locations` : ses emplacements d'équipement, de même (`HEAD_TOP`,
+//                   `LEFT_HAND`, `COSTUME_GARMENT`…).
+//
+// ⚠ LA TABLE REFUSE CES DEUX CHAMPS : seul le lecteur des faits les accepte.
+// Le client n'en a que faire — le serveur les lui annonce objet par objet.
+struct ItemServerFactsRecord {
+  ItemInfoRecord sheet;
+  std::string type;
+  std::vector<std::string> locations;
+
+  [[nodiscard]] bool operator==(const ItemServerFactsRecord& other) const = default;
+};
+
+[[nodiscard]] core::Result<void> ReadItemServerFactsText(
+    std::string_view text, const std::function<core::Result<void>(ItemServerFactsRecord&&)>& take);
+
 // L'EN-TÊTE DU TEXTE : ses lignes de commentaire et ses lignes vides de tête,
 // fins de ligne comprises, jusqu'à la première ligne de données. C'est ce que
 // l'écrivain recopie tel quel.
@@ -68,12 +88,12 @@ inline constexpr std::uint32_t kItemInfoVersion = 1;
 // IDENTIFIANT CROISSANT quel que soit l'ordre reçu.
 //
 // 🔴 OCTET POUR OCTET LA FORME DU SCRIPT D'IMPORT, et un essai le tient : les
-// champs dans l'ordre `name`, `resource`, `slots`, `view`, `costume`, `effect`,
-// `description` ; un champ nul, faux ou vide omis ; les textes entre
-// guillemets à la manière de JSON sans échappement des caractères non ASCII —
-// seuls `"`, `\`, les fins de ligne, la tabulation et les autres caractères de
-// contrôle s'échappent, ceux-ci en `\u00xx` minuscule. Une table relue puis
-// réécrite rend donc ses propres octets.
+// champs dans l'ordre `name`, `resource`, `slots`, `view`, `description` ; un
+// champ nul ou vide omis ; les textes entre guillemets à la manière de JSON
+// sans échappement des caractères non ASCII — seuls `"`, `\`, les fins de
+// ligne, la tabulation et les autres caractères de contrôle s'échappent,
+// ceux-ci en `\u00xx` minuscule. Une table relue puis réécrite rend donc ses
+// propres octets.
 [[nodiscard]] std::string WriteItemInfoText(std::string_view header,
                                             std::span<const ItemInfoRecord> records);
 

@@ -55,9 +55,6 @@ struct ItemEntry {
   // Combien de cartes l'objet peut recevoir. C'est ce nombre qui compose le
   // suffixe « [N] » du nom affiché.
   std::uint8_t card_slots = 0;
-
-  // Une pièce d'apparat : elle se voit et ne protège pas.
-  bool costume = false;
 };
 
 class ItemTable {
@@ -87,9 +84,9 @@ class ItemTable {
   std::unordered_map<std::uint32_t, ItemEntry> by_id_;
 };
 
-// LA TABLE : `data\yaml_files\item_info.yml`, que `scripts/yaml_tables/item_info.py`
-// tire de la table des objets de l'installation et de l'item_db du serveur. Une
-// ligne par objet (coupée ici pour la lecture), ses champs tous facultatifs :
+// LA TABLE : `data\yaml_files\item_info.yml`, une source éditée (ADR 0112) que
+// l'éditeur de tables corrige. Une ligne par objet (coupée ici pour la
+// lecture), ses champs tous facultatifs :
 //
 //     version: 1
 //     items: {
@@ -97,9 +94,8 @@ class ItemTable {
 //              description: ["Une lame courte.#", "^0000CCPoids :^000000 40"]},
 //     }
 //
-// `costume` (booléen) et `effect` (l'effet de l'objet au sol, que ce client ne
-// montre pas encore) complètent la liste. Le texte est en UTF-8, la ressource
-// comprise : le lecteur la retranscode en CP949, l'encodage des archives.
+// Le texte est en UTF-8, la ressource comprise : le lecteur la retranscode en
+// CP949, l'encodage des archives.
 //
 // ⚠ C'EST DU YAML, MAIS LU SANS BIBLIOTHÈQUE YAML : la table pèse une douzaine
 // de méga-octets, qu'un analyseur général lit en secondes. Le lecteur n'accepte

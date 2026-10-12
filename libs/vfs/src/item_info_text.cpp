@@ -18,12 +18,10 @@ constexpr std::string_view kNameField = "name";
 constexpr std::string_view kResourceField = "resource";
 constexpr std::string_view kSlotsField = "slots";
 constexpr std::string_view kViewField = "view";
-constexpr std::string_view kCostumeField = "costume";
-// L'effet de l'objet au sol : la table le porte, ce client ne le montre pas.
-constexpr std::string_view kEffectField = "effect";
 constexpr std::string_view kDescriptionField = "description";
-constexpr std::string_view kTrue = "true";
-constexpr std::string_view kFalse = "false";
+// Les deux champs que seuls les faits du serveur portent.
+constexpr std::string_view kTypeField = "type";
+constexpr std::string_view kLocationsField = "locations";
 
 // Les bornes de l'UTF-16 qu'un `\uXXXX` écrit, et celles de l'UTF-8 qu'on en
 // tire.
@@ -136,15 +134,6 @@ class TableText {
     }
     value = static_cast<std::uint32_t>(read);
     return at_ > start;
-  }
-
-  [[nodiscard]] bool ReadBoolean(bool& value) {
-    std::string_view word;
-    if (!ReadKey(word) || (word != kTrue && word != kFalse)) {
-      return false;
-    }
-    value = word == kTrue;
-    return true;
   }
 
   // Un texte entre guillemets doubles, ses échappements résolus.
@@ -290,20 +279,35 @@ class TableText {
     record.view = static_cast<std::uint16_t>(number);
     return read;
   }
-  if (field == kCostumeField) {
-    return table.ReadBoolean(record.costume);
-  }
-  if (field == kEffectField) {
-    return table.ReadWhole(std::numeric_limits<std::uint32_t>::max(), record.effect);
-  }
   if (field == kDescriptionField) {
     return ReadLines(table, record.description);
   }
   return false;
 }
 
+// Quels champs le texte peut porter.
+enum class TextForm : std::uint8_t {
+  kTable,        // la table : ses seuls champs
+  kServerFacts,  // les faits du serveur : ceux de la table, plus `type` et `locations`
+};
+
+// Un champ des faits, ou de la table si ce n'en est pas un.
+[[nodiscard]] bool ReadAnyField(TableText& table, TextForm form, std::string_view field,
+                                ItemServerFactsRecord& record) {
+  if (form == TextForm::kServerFacts) {
+    if (field == kTypeField) {
+      return table.ReadQuoted(record.type);
+    }
+    if (field == kLocationsField) {
+      return ReadLines(table, record.locations);
+    }
+  }
+  return ReadField(table, field, record.sheet);
+}
+
 // `{<champ>: <valeur>, …}`.
-[[nodiscard]] core::Result<void> ReadRecord(TableText& table, ItemInfoRecord& record) {
+[[nodiscard]] core::Result<void> ReadRecord(TableText& table, TextForm form,
+                                            ItemServerFactsRecord& record) {
   if (!table.Take('{')) {
     return std::unexpected(table.Refused("un objet s'ouvre par « { »"));
   }
@@ -315,7 +319,7 @@ class TableText {
     if (!table.ReadKey(field) || !table.Take(':')) {
       return std::unexpected(table.Refused("nom de champ attendu"));
     }
-    if (!ReadField(table, field, record)) {
+    if (!ReadAnyField(table, form, field, record)) {
       return std::unexpected(
           table.Refused("champ « " + std::string(field) + " » inconnu ou mal formé"));
     }
@@ -326,10 +330,10 @@ class TableText {
   return {};
 }
 
-}  // namespace
-
-core::Result<void> ReadItemInfoText(
-    std::string_view text, const std::function<core::Result<void>(ItemInfoRecord&&)>& take) {
+// Le texte entier, dans la forme dite : chaque objet à `take`.
+[[nodiscard]] core::Result<void> ReadText(
+    std::string_view text, TextForm form,
+    const std::function<core::Result<void>(ItemServerFactsRecord&&)>& take) {
   TableText table(text);
   std::string_view key;
   std::uint32_t version = 0;
@@ -345,12 +349,12 @@ core::Result<void> ReadItemInfoText(
   }
   bool closed = table.Take('}');
   while (!closed) {
-    ItemInfoRecord record;
-    if (!table.ReadWhole(std::numeric_limits<std::uint32_t>::max(), record.item_id) ||
+    ItemServerFactsRecord record;
+    if (!table.ReadWhole(std::numeric_limits<std::uint32_t>::max(), record.sheet.item_id) ||
         !table.Take(':')) {
       return std::unexpected(table.Refused("identifiant d'objet attendu"));
     }
-    if (auto read = ReadRecord(table, record); !read) {
+    if (auto read = ReadRecord(table, form, record); !read) {
       return read;
     }
     if (auto taken = take(std::move(record)); !taken) {
@@ -367,6 +371,20 @@ core::Result<void> ReadItemInfoText(
     return std::unexpected(table.Refused("texte après la fermeture de « items »"));
   }
   return {};
+}
+
+}  // namespace
+
+core::Result<void> ReadItemInfoText(
+    std::string_view text, const std::function<core::Result<void>(ItemInfoRecord&&)>& take) {
+  return ReadText(text, TextForm::kTable, [&take](ItemServerFactsRecord&& record) {
+    return take(std::move(record.sheet));
+  });
+}
+
+core::Result<void> ReadItemServerFactsText(
+    std::string_view text, const std::function<core::Result<void>(ItemServerFactsRecord&&)>& take) {
+  return ReadText(text, TextForm::kServerFacts, take);
 }
 
 std::string_view ItemInfoHeader(std::string_view text) {
@@ -457,14 +475,6 @@ void AppendRecord(const ItemInfoRecord& record, std::string& out) {
   if (record.view != 0) {
     field(kViewField);
     out += std::to_string(record.view);
-  }
-  if (record.costume) {
-    field(kCostumeField);
-    out += kTrue;
-  }
-  if (record.effect != 0) {
-    field(kEffectField);
-    out += std::to_string(record.effect);
   }
   if (!record.description.empty()) {
     field(kDescriptionField);

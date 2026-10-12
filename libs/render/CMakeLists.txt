@@ -551,6 +551,7 @@ add_library(ro_render STATIC
     src/sprite_catalog_mercenary.cpp
     src/sprite_catalog_mount.cpp
     src/sprite_catalog_pet.cpp
+    src/item_view_names.cpp
     src/shown_job.cpp
     src/sprite_frame.cpp
     src/terrain_mesh.cpp

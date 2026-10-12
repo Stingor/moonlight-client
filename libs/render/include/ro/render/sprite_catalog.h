@@ -175,6 +175,11 @@ inline constexpr LayerTableGlobals kSmallLayerTableGlobals = {"_New_SmallLayerDi
 
 [[nodiscard]] core::Result<SpriteCatalog> LoadSpriteCatalog(vfs::Vfs& vfs);
 
+// Les seules tables Lua du catalogue — `kSpriteCatalogFiles`, dans leur ordre —,
+// sans la table des objets ni les gestes de créature : ce dont a besoin qui
+// nomme une apparence sans habiller d'acteur (voir `item_view_names.h`).
+[[nodiscard]] core::Result<formats::LuaTable> ReadSpriteCatalogGlobals(vfs::Vfs& vfs);
+
 // Une pièce à charger.
 struct ActorPieceFiles {
   ActorPart part = ActorPart::kBody;

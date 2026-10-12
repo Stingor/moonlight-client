@@ -13,8 +13,8 @@
 
 namespace ro::render {
 
-core::Result<SpriteCatalog> LoadSpriteCatalog(vfs::Vfs& vfs) {
-  SpriteCatalog catalog;
+core::Result<formats::LuaTable> ReadSpriteCatalogGlobals(vfs::Vfs& vfs) {
+  formats::LuaTable read;
   for (const std::string_view file : kSpriteCatalogFiles) {
     auto bytes = vfs.Read(std::string(file));
     if (!bytes) {
@@ -23,13 +23,23 @@ core::Result<SpriteCatalog> LoadSpriteCatalog(vfs::Vfs& vfs) {
       }
       return std::unexpected(bytes.error());
     }
-    auto globals = formats::ReadLuaFile(*bytes, std::move(catalog.globals));
+    auto globals = formats::ReadLuaFile(*bytes, std::move(read));
     if (!globals) {
       return std::unexpected(
           core::Error{globals.error().code, std::string(file) + " : " + globals.error().detail});
     }
-    catalog.globals = std::move(*globals);
+    read = std::move(*globals);
   }
+  return read;
+}
+
+core::Result<SpriteCatalog> LoadSpriteCatalog(vfs::Vfs& vfs) {
+  SpriteCatalog catalog;
+  auto globals = ReadSpriteCatalogGlobals(vfs);
+  if (!globals) {
+    return std::unexpected(globals.error());
+  }
+  catalog.globals = std::move(*globals);
 
   // La table des objets se lit À PART, et par `vfs` — voir
   // `ro/vfs/item_table.h`. Elle n'est pas du Lua, et ses dizaines de milliers
