@@ -7,28 +7,25 @@
 #include <vector>
 
 #include "ro/core/error.h"
-#include "ro/formats/lua_table.h"
 #include "ro/vfs/vfs.h"
 
 namespace ro::render {
 
-// LES TITRES, et ils vivent dans les DONNÉES de l'installation.
+// LES TITRES, et ils vivent dans les DONNÉES du client.
 //
 // 🔴 UN TITRE N'A AUCUN TEXTE SUR LE FIL. Le serveur n'envoie qu'un ENTIER —
 // `title_id` de `ZC_ACK_REQNAMEALL`, persisté dans `char.title_id` — et le
-// libellé est à cent pour cent du côté du client : `title_tbl`, dans
-// `titletable.lub`, que le global `GetTitleString(id)` interroge. Chercher le
-// texte dans un paquet ou dans l'exécutable ne rend rien.
+// libellé est à cent pour cent du côté du client. Chercher le texte dans un
+// paquet ou dans l'exécutable ne rend rien.
 //
-// Troisième table de ce genre après les effets de chapeau et les effets
-// nommés : elle se lit à l'exécution, et un correctif de l'installation la fait
-// grandir sans qu'on touche au code. ADR 0027.
-inline constexpr std::string_view kTitleTablePath =
-    "data\\luafiles514\\lua files\\datainfo\\titletable.lub";
-
-// La globale sous laquelle le fichier range ses libellés, indexés par le numéro
-// de titre lui-même.
-inline constexpr std::string_view kTitleTableGlobal = "title_tbl";
+// La table est `data\yaml_files\titles.yml`, que `scripts/yaml_tables/titles.py`
+// tire de la table de l'installation et des bornes du serveur :
+//
+//     version: 1
+//     titles:
+//       1000: Junction of life
+//       1001: Specialist
+inline constexpr std::string_view kTitleTablePath = "data\\yaml_files\\titles.yml";
 
 // Le premier numéro que la table emploie — `TITLE_BASE` du serveur. Zéro veut
 // donc dire « aucun titre », et non « le titre numéro zéro ».
@@ -39,14 +36,14 @@ class TitleTable {
  public:
   [[nodiscard]] static core::Result<TitleTable> Load(vfs::Vfs& vfs);
 
-  // La MÊME lecture, à partir de globales déjà lues — la seule moitié qui se
-  // mette sous test, puisqu'aucun asset du jeu n'est versé au dépôt.
-  [[nodiscard]] static core::Result<TitleTable> Parse(const formats::LuaTable& globals);
+  // La MÊME lecture, à partir du texte de la table. Refuse un texte qui n'est
+  // pas du YAML, dont `version` n'est pas 1, sans table `titles`, ou dont une
+  // entrée n'est pas un numéro et un texte.
+  [[nodiscard]] static core::Result<TitleTable> Parse(std::string_view yaml_text);
 
   // Le libellé, ou vide. ⚠ UN NUMÉRO SANS LIBELLÉ N'EST PAS UNE ERREUR : le
-  // serveur en connaît jusqu'à `TITLE_MAX`, et l'installation n'en traduit que
-  // ce que son lot de données porte. Le client natif n'écrit alors rien non
-  // plus.
+  // serveur en connaît jusqu'à `TITLE_MAX`, et la table n'en traduit que ce
+  // que son lot de données porte. Rien ne s'écrit alors.
   [[nodiscard]] std::string_view Find(std::int32_t title_id) const;
 
   struct Entry {

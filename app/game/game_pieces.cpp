@@ -388,8 +388,7 @@ void OpenStatusIcons(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.status_icons.emplace(vfs, pieces.status_table);
 }
 
-// LES LIBELLÉS DES TITRES. Une table, et elle se lit seule : elle n'indexe rien
-// par une globale qu'un autre fichier écrirait.
+// LES LIBELLÉS DES TITRES, lus dans `titles.yml`.
 void LoadTitles(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   auto titles = ro::render::TitleTable::Load(vfs);
   if (!titles) {

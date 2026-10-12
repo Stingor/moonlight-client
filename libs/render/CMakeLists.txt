@@ -567,11 +567,14 @@ find_package(glm CONFIG REQUIRED)
 # La police des noms et de l'interface : le client grave ses glyphes lui-même,
 # faute de quoi il n'aurait aucun texte à afficher.
 find_package(freetype CONFIG REQUIRED)
+# Les tables du client sous data\yaml_files\ — les titres, le ciel des cartes —
+# sont du YAML.
+find_package(yaml-cpp CONFIG REQUIRED)
 
 target_include_directories(ro_render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ro_render
     PUBLIC ro_core ro_formats ro_vfs glm::glm
-    PRIVATE freetype ro_warnings)
+    PRIVATE freetype yaml-cpp::yaml-cpp ro_warnings)
 
 # ---------------------------------------------------------------------------
 

@@ -69,8 +69,8 @@ FrameOutcome ApplyActorNameFrame(const Frame& frame, sim::World& world) {
     card.aside = Said(packet.party_name);
     card.banner = Said(packet.guild_name);
     card.badge = Said(packet.position_name);
-    // 🔴 LE TITRE N'EST QU'UN NUMÉRO ICI, et c'est une table de l'installation
-    // qui le traduit — `title_tbl`, dans `titletable.lub`. La couche réseau ne
+    // 🔴 LE TITRE N'EST QU'UN NUMÉRO ICI, et c'est une table du client qui le
+    // traduit — `data\yaml_files\titles.yml`. La couche réseau ne
     // lit aucun fichier du jeu : elle porte le numéro, et `render` le résout.
     card.title_id = packet.title_id;
     const auto id = static_cast<std::uint32_t>(packet.gid);

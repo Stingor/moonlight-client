@@ -210,7 +210,7 @@ struct NameCard {
   // n'envoie qu'un numéro, et c'est une table de données du client qui le
   // traduit : voir `title_id`.
   std::string title;
-  // Le numéro du titre équipé, de la table `title_tbl` de l'installation. Zéro
+  // Le numéro du titre équipé, de la table `titles.yml` du client. Zéro
   // quand le joueur n'en porte aucun — la table commence à mille.
   std::int32_t title_id = 0;
   // LE NOM TEL QUE L'ÉTIQUETTE L'ÉCRIT, quand il n'est pas celui du personnage

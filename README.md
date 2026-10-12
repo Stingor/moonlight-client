@@ -134,6 +134,18 @@ tête d'où elle vient et comment la régénérer.
   prennent leur nom à elle.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
+- `titles.yml` prend ses numéros aux bornes et aux succès du serveur Moonlight,
+  et ses libellés au fichier `titletable.lub` que livre le client : les
+  traductions [ROenglishRE](https://github.com/llchrisll/ROenglishRE) des
+  titres de Gravity, et ceux des titres propres au serveur. Ces libellés ne
+  sont pas revendiqués comme partie de ce projet.
+- `town_info.yml` est tiré des fichiers `Towninfo.lub` et `Towninfo_C.lub` que
+  livre le client, traduits par
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) ; ils ne sont pas
+  revendiqués comme partie de ce projet.
+- `map_sky.yml` est tiré de la table compilée `mapskydata.lub` que livre le
+  client ; ces données de Gravity ne sont pas revendiquées comme partie de ce
+  projet.
 
 Ragnarok Online est une marque de Gravity Co., Ltd. Ce projet n'est ni
 affilié à Gravity ni approuvé par elle.

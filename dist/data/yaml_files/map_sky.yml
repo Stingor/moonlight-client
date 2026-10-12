@@ -1,0 +1,795 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le ciel des cartes
+#
+#  Tiré de MapSkyData, dans data\luafiles514\lua files\mapskydata\mapskydata.lub
+#  de l'installation : une table compilée de Gravity, que ce dépôt ne revendique
+#  pas comme sienne.
+#
+#  Fichier produit par scripts/yaml_tables/map_sky.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/map_sky.py --serveur <dépôt moonlight> \
+#          --client <dossier client> --sortie dist/data/yaml_files/map_sky.yml
+#
+#  maps : carte (son nom, sans extension) ->
+#    background     : la couleur peinte au-delà des bords, [rouge, vert, bleu]
+#                     de 0 à 255 ;
+#    background_fog : vrai quand ce fond se mêle au brouillard de la carte ;
+#    star           : vrai quand un champ d'étoiles s'y joue ;
+#    styles         : les numéros des ciels animés tout faits, dans l'ordre ;
+#    clouds         : les nuages paramétrés — count, cull_distance, color,
+#                     size, size_extra, expand_rate, alpha_in_time,
+#                     alpha_in_time_extra, alpha_in_speed, alpha_out_time,
+#                     alpha_out_time_extra, alpha_out_speed, height,
+#                     height_extra.
+#  Un champ absent est vide (les booléens : faux). Une carte absente s'ouvre sur
+#  du noir, sans ciel animé.
+#
+#  Lu par moonclient (ro/render/map_sky.h). Absent, aucune carte n'a de ciel.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+maps:
+  1@air1:
+    background: [102, 153, 204]
+    styles: [1]
+  1@air2:
+    background: [15, 15, 98]
+    star: true
+    styles: [1]
+  1@ch1a:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 80
+      height_extra: 10
+  1@colo:
+    background: [102, 153, 204]
+    styles: [1]
+  1@def02:
+    background: [102, 153, 204]
+    styles: [1]
+  1@dth1:
+    background: [102, 153, 204]
+    styles: [1]
+  1@dth2:
+    background: [255, 170, 70]
+    star: true
+    styles: [1]
+  1@dth3:
+    background: [15, 15, 98]
+    star: true
+    styles: [1]
+  1@eom:
+    background: [25, 10, 8]
+    styles: [10]
+  1@exds:
+    background: [153, 204, 255]
+    background_fog: true
+    clouds:
+    - count: 500
+      cull_distance: 200
+      color: [255, 255, 255]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 40
+      height_extra: 10
+  1@exhn:
+    background: [18, 18, 30]
+    background_fog: true
+    clouds:
+    - count: 1000
+      cull_distance: 400
+      color: [30, 30, 80]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 100
+      height_extra: 0
+  1@infi:
+    background: [6, 21, 35]
+    star: true
+  1@mist:
+    background: [41, 0, 134]
+    star: true
+  1@pdb:
+    background: [153, 204, 255]
+    styles: [2]
+  1@sthd:
+    background: [25, 10, 8]
+    styles: [10]
+  1@tnm2:
+    background: [224, 213, 194]
+    styles: [5]
+  1@twas:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  1@twbs:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  2009rwc_03:
+    background: [153, 204, 255]
+    styles: [1]
+  2009rwc_07:
+    background: [153, 204, 255]
+    styles: [1]
+  2@exds:
+    background: [18, 18, 30]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [60, 60, 75]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [80, 80, 95]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  5@tower:
+    background: [51, 0, 51]
+    styles: [8]
+  6@tower:
+    styles: [7]
+  8@thts:
+    background: [224, 213, 194]
+    styles: [5]
+  air_evt:
+    background: [153, 204, 255]
+    styles: [1]
+  airplane:
+    background: [153, 204, 255]
+    styles: [4]
+  airplane_01:
+    background: [153, 204, 255]
+    styles: [4]
+  bat_b01:
+    background: [153, 204, 255]
+    styles: [1]
+  bat_b02:
+    background: [153, 204, 255]
+    styles: [1]
+  bat_b03:
+    background: [153, 204, 255]
+    styles: [1]
+  bat_b04:
+    background: [153, 204, 255]
+    styles: [1]
+  bat_b05:
+    background: [153, 204, 255]
+    styles: [1]
+  bat_fild02:
+    background: [153, 204, 255]
+    styles: [1]
+  bif_dun01:
+    background: [41, 0, 134]
+    star: true
+  bif_fild01:
+    background: [15, 58, 147]
+    star: true
+  bif_fild02:
+    background: [19, 0, 59]
+    star: true
+  bl_depth1:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 80
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 90
+      height_extra: 0
+  bl_depth2:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  ch1_sf02:
+    background: [7, 7, 24]
+    background_fog: true
+    star: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 42]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  d_mond03: {star: true}
+  dali:
+    background: [6, 21, 35]
+    star: true
+  dali02:
+    background: [6, 21, 35]
+    star: true
+  defence02:
+    background: [102, 153, 204]
+  ecl_fild01:
+    background: [6, 21, 35]
+    star: true
+  einbroch:
+    styles: [3]
+  first_sp:
+    styles: [15]
+  gef_fild07:
+    styles: [0]
+  gld2_ald:
+    background: [153, 204, 255]
+    styles: [1]
+  gon_dun02:
+    background: [102, 153, 204]
+    styles: [1]
+  gonryun:
+    background: [102, 153, 204]
+    styles: [1]
+  hero_ent3:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  hero_lb:
+    background: [153, 204, 255]
+    background_fog: true
+    clouds:
+    - count: 500
+      cull_distance: 200
+      color: [255, 255, 255]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 40
+      height_extra: 10
+  hero_out1:
+    background: [153, 204, 255]
+    background_fog: true
+    clouds:
+    - count: 500
+      cull_distance: 200
+      color: [255, 255, 255]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 40
+      height_extra: 10
+  hero_tra:
+    background: [153, 204, 255]
+    background_fog: true
+    clouds:
+    - count: 500
+      cull_distance: 200
+      color: [255, 255, 255]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 40
+      height_extra: 10
+  herosria:
+    background: [7, 7, 24]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  himinn:
+    background: [153, 204, 255]
+    styles: [2]
+  jor_crk:
+    background: [7, 7, 24]
+    background_fog: true
+    star: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  jor_crk_p:
+    background: [7, 7, 24]
+    background_fog: true
+    star: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  mjolnir_01:
+    styles: [0]
+  moc_akhet:
+    background: [7, 7, 24]
+    background_fog: true
+    star: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  moc_fild22:
+    styles: [5]
+  moc_fild22b:
+    styles: [5]
+  que_qaru01:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qaru02:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qaru03:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qaru04:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qaru05:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qsch01:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qsch02:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qsch03:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qsch04:
+    background: [153, 204, 255]
+    styles: [2]
+  que_qsch05:
+    background: [153, 204, 255]
+    styles: [2]
+  que_temsky:
+    background: [102, 153, 204]
+    styles: [1]
+  ra_temsky:
+    background: [102, 153, 204]
+    styles: [1]
+  rwc01:
+    background: [153, 204, 255]
+    styles: [2]
+  sch_gld:
+    background: [153, 204, 255]
+    styles: [1]
+  sky1:
+    background: [102, 153, 204]
+    styles: [1]
+  t_crack:
+    background: [23, 42, 72]
+    star: true
+    styles: [11]
+  t_garden:
+    background: [7, 7, 24]
+    background_fog: true
+    star: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  thana_boss:
+    background: [224, 213, 194]
+    styles: [5]
+  uknw_ruin:
+    background: [7, 7, 24]
+    background_fog: true
+    star: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [24, 16, 43]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [13, 22, 35]
+      size: 25
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  uknw_ruin2:
+    background: [140, 60, 50]
+    background_fog: true
+    clouds:
+    - count: 400
+      cull_distance: 400
+      color: [150, 90, 60]
+      size: 30
+      size_extra: 30
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 80
+      height_extra: 0
+    - count: 200
+      cull_distance: 400
+      color: [160, 100, 90]
+      size: 30
+      size_extra: 30
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 50
+      height_extra: 0
+  valkyrie:
+    background: [153, 204, 255]
+    styles: [2]
+  ygg_edge:
+    background: [153, 204, 255]
+    background_fog: true
+    clouds:
+    - count: 500
+      cull_distance: 200
+      color: [255, 255, 255]
+      size: 20
+      size_extra: 20
+      expand_rate: 0.05
+      alpha_in_time: 80
+      alpha_in_time_extra: 50
+      alpha_in_speed: 1
+      alpha_out_time: 300
+      alpha_out_time_extra: 200
+      alpha_out_speed: 0.5
+      height: 270
+      height_extra: 10
+  yuno:
+    background: [153, 204, 255]
+    styles: [1]
