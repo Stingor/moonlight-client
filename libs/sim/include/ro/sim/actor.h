@@ -505,6 +505,8 @@ struct Actor {
   // combien de temps la bulle tient.
   std::string chat_text;
   std::uint32_t chat_since_ms = 0;
+  // LA TEINTE DU TEXTE DE SA BULLE, en 0x00BBGGRR ; zéro garde celle du thème.
+  std::uint32_t chat_bgr = 0;
   // LA COMPÉTENCE QU'IL VIENT D'ANNONCER, et l'instant de l'annonce dans
   // l'horloge de l'APPELANT. Zéro tant qu'il n'a rien annoncé.
   //

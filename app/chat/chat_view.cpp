@@ -31,6 +31,7 @@
 #include "ro/sim/world.h"
 
 #include "chat/announce_command.h"
+#include "chat/chat_line_color.h"
 #include "chat/chat_line_preview.h"
 #include "chat/chat_rich_decor.h"
 #include "chat/chat_tab_view.h"
@@ -257,6 +258,7 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
         .head = ImVec2((bounds->min.x + bounds->max.x) * 0.5F, bounds->min.y),
         .text = said,
         .elapsed_ms = elapsed_ms,
+        .text_color = banner ? ImU32{0} : ColorOfBubbleBgr(actor->chat_bgr),
         .speaker_id = ids[index]};
     // ⚠ RIEN N'EST RECOPIÉ SANS BALISE NI BALISAGE : la quasi-totalité des
     // phrases n'en porte pas, et leur bulle continue de regarder le texte du

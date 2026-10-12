@@ -423,17 +423,25 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
         }
         const std::string said = core::Utf8FromWire(packet.message);
         // ⚠ CE QUE LE SERVEUR RÉPOND AU JOUEUR PORTE L'IDENTIFIANT DU JOUEUR, et
-        // ce n'est pas lui qui parle. Le client d'origine lui met tout de même
-        // une bulle au-dessus de la tête ; nous avons tranché l'inverse pour
-        // `ZC_NOTIFY_PLAYERCHAT`, et deux règles contraires pour la même chose se
-        // contrediraient à l'écran.
+        // ce n'est pas lui qui parle. Ni ligne à son nom, ni bulle : le client
+        // d'origine ne cherche l'orateur que parmi les AUTRES acteurs, et le
+        // joueur n'y figure pas.
         //
         // ⚠ SOUS LA CASE GÉNÉRALE dans les deux cas, PNJ compris : ce paquet ne
         // porte pas la parole d'un joueur.
+        //
+        // ⚠ NI MASQUE NI `TalkMute` : le client d'origine écrit ce paquet tel
+        // qu'il arrive, et aucune des deux bascules ne le tait.
         const bool mine = packet.speaker_id == world.player_id();
         world.RecordChat(mine ? sim::ChatKind::kServer : sim::ChatKind::kPublic,
                          sim::ChatType::kPublic, mine ? 0 : packet.speaker_id, said, now_ms,
                          packet.color);
+        // ⚠ LA BULLE PREND LA COULEUR DU PAQUET, et la lit dans l'AUTRE ORDRE
+        // que la ligne : bleu-vert-rouge, le rouge en dernier. Un serveur qui
+        // veut une bulle juste envoie donc sa couleur retournée.
+        if (!mine) {
+          world.ShowSpeech(packet.speaker_id, said, now_ms, packet.color);
+        }
         return FrameOutcome::kApplied;
       });
 

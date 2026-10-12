@@ -264,14 +264,13 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // Pose la jauge d'un acteur, ou la retire si elle est vide. Faux pour un acteur hors de vue.
   bool SetGauge(std::uint32_t id, std::optional<SkillGauge> gauge);
 
-  // Note ce qu'un acteur DIT, et l'instant. Un locuteur inconnu — zéro, ou
-  // quelqu'un qu'on n'a jamais vu — ne fait qu'entrer dans la conversation :
-  // les réponses du serveur arrivent par le même paquet que sa propre parole.
-  // ⚠ LE GENRE EST LE PREMIER ARGUMENT, SANS DÉFAUT : un défaut rangerait sous
-  // « serveur » ce qu'un appelant pressé oublierait de qualifier, et la ligne
-  // paraîtrait dans le mauvais onglet sans rien casser. Le TYPE se déduit du
-  // genre (`DefaultChatType`), ou se donne quand l'appelant en sait plus ;
-  // l'AUTEUR, quand le serveur l'a décrit à part du texte.
+  // Note ce qu'un acteur DIT, et l'instant. Un locuteur inconnu — zéro, ou quelqu'un qu'on n'a
+  // jamais vu — ne fait qu'entrer dans la conversation : les réponses du serveur arrivent par le
+  // même paquet que sa propre parole.
+  // ⚠ LE GENRE EST LE PREMIER ARGUMENT, SANS DÉFAUT : un défaut rangerait sous « serveur » ce
+  // qu'un appelant pressé oublierait de qualifier, et la ligne paraîtrait dans le mauvais onglet
+  // sans rien casser. Le TYPE se déduit du genre (`DefaultChatType`), ou se donne quand
+  // l'appelant en sait plus ; l'AUTEUR, quand le serveur l'a décrit à part du texte.
   void RecordChat(ChatKind kind, ChatType type, std::uint32_t speaker_id, std::string text,
                   std::uint32_t said_ms, std::uint32_t color = 0,
                   std::optional<ChatAuthor> author = std::nullopt);
@@ -279,8 +278,9 @@ class World : public WorldHoldings, public WorldNpcDialog {
                   std::uint32_t color = 0) {
     RecordChat(kind, DefaultChatType(kind), speaker_id, std::move(text), said_ms, color);
   }
-  // LA BULLE SANS LA LIGNE : ce que `TalkMute` laisse d'une parole. Rien d'un inconnu.
-  void ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms);
+  // LA BULLE SANS LA LIGNE (voir `TalkMute`) ; rien d'un inconnu. Sa teinte : `Actor::chat_bgr`.
+  void ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms,
+                  std::uint32_t bubble_bgr = 0);
   // Un CHUCHOTEMENT, reçu, renvoyé en écho ou refusé : il nomme l'autre.
   void RecordWhisper(WhisperFacts facts, std::string text, std::uint32_t said_ms);
 

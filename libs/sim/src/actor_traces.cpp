@@ -23,6 +23,7 @@ void ForgetLastMapTraces(Actor& actor) {
   // carte, et la bannière de compétence EST une bulle chez le client.
   actor.chat_text.clear();
   actor.chat_since_ms = 0;
+  actor.chat_bgr = 0;
   actor.announced_skill_id = 0;
   actor.announced_skill_since_ms = 0;
   actor.emotion.reset();

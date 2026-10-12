@@ -38,6 +38,11 @@ namespace moonclient {
 // La couleur d'une ligne relue, depuis cette forme-là.
 [[nodiscard]] ImU32 ColorOfShownRgb(std::uint32_t shown_rgb);
 
+// LE TEXTE D'UNE BULLE TEINTÉE, depuis `Actor::chat_bgr` (0x00BBGGRR). Zéro pour
+// la couleur du thème. ⚠ PAS `ColorOfShownRgb` : la bulle lit ses octets dans
+// l'autre ordre que la ligne.
+[[nodiscard]] ImU32 ColorOfBubbleBgr(std::uint32_t bubble_bgr);
+
 // LE FOND SUR LEQUEL CES TEINTES SONT PENSÉES : celui, sombre, du fil. Elles sont
 // claires, et posées telles quelles sur une liste ou un champ clairs, elles ne
 // se liraient plus — qui les montre ailleurs que dans le fil les pose sur lui.

@@ -87,4 +87,13 @@ ImU32 ColorOfShownRgb(std::uint32_t shown_rgb) {
                   shown_rgb & kByteMask, kOpaque);
 }
 
+ImU32 ColorOfBubbleBgr(std::uint32_t bubble_bgr) {
+  if (bubble_bgr == 0) {
+    return 0;
+  }
+  // L'ordre inverse de celui d'une ligne : le rouge dans l'octet de poids faible.
+  return IM_COL32(bubble_bgr & kByteMask, (bubble_bgr >> kGreenShift) & kByteMask,
+                  (bubble_bgr >> kRedShift) & kByteMask, kOpaque);
+}
+
 }  // namespace moonclient

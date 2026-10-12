@@ -121,6 +121,7 @@ void World::Spawn(Actor actor) {
     actor.skill_scale = found->second.skill_scale;
     actor.chat_text = std::move(found->second.chat_text);
     actor.chat_since_ms = found->second.chat_since_ms;
+    actor.chat_bgr = found->second.chat_bgr;
     // LA JAUGE aussi : la barre de progression d'un PNJ n'est redite qu'à
     // l'entrée en vue.
     actor.gauge = found->second.gauge;
@@ -605,10 +606,12 @@ void World::RecordWhisper(WhisperFacts facts, std::string text, std::uint32_t sa
   chat_lines_.back().whisper = std::move(facts);
 }
 
-void World::ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms) {
+void World::ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms,
+                       std::uint32_t bubble_bgr) {
   if (const auto found = actors_.find(speaker_id); found != actors_.end()) {
     found->second.chat_text = std::move(text);
     found->second.chat_since_ms = said_ms;
+    found->second.chat_bgr = bubble_bgr;
   }
 }
 
