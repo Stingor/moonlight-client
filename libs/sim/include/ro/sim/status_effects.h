@@ -47,13 +47,17 @@ inline constexpr StatusEffectId kEfstSuHide = 933;
 // pose, et les bulles au-dessus de la tête. Voir `NoteSleep`.
 inline constexpr StatusEffectId kEfstDeepSleep = 435;
 
-// LES ÉTATS QUI COUPENT LA PAROLE : ceux qui portent `NoChat` dans
-// `db/re/status.yml`, avec le sommeil profond ci-dessus. Le serveur jette
+// LES ÉTATS QUI COUPENT LA PAROLE : ceux qui portent `NoChat` dans la table
+// des états de CE serveur — `db/pre-re/status.yml`, surchargée par
+// `db/import/status.yml` —, avec le sommeil profond ci-dessus. Le serveur jette
 // alors le message SANS L'ACCUSER — voir `ro::net::NoteWhisperSent`.
-inline constexpr StatusEffectId kEfstBerserk = 107;
+//
+// 🔴 PAS BERSERK : la table d'origine le rend muet, et ce serveur lève ce
+// mutisme dans sa surcharge. Le compter ici ferait perdre l'accusé de chaque
+// chuchotement envoyé en Berserk.
 inline constexpr StatusEffectId kEfstSaturdayNightFever = 448;
 
-// LE JOUEUR PEUT-IL PARLER ? Non sous un des trois états ci-dessus, ni quand
+// LE JOUEUR PEUT-IL PARLER ? Non sous un des deux états ci-dessus, ni quand
 // ses bonnes manières sont négatives (`PlayerStatus::manner`) : le serveur
 // pose alors `SC_NOCHAT`, qui ne porte pas d'icône, et coupe la parole tant que
 // `manner_system` en garde le bit — c'est le cas sur ce serveur.
@@ -65,8 +69,7 @@ inline constexpr StatusEffectId kEfstSaturdayNightFever = 448;
     return true;
   }
   for (const ActiveStatus& status : statuses) {
-    if (status.effect == kEfstBerserk || status.effect == kEfstDeepSleep ||
-        status.effect == kEfstSaturdayNightFever) {
+    if (status.effect == kEfstDeepSleep || status.effect == kEfstSaturdayNightFever) {
       return true;
     }
   }
