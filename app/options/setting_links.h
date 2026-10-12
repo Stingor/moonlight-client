@@ -48,6 +48,9 @@ enum class SettingDestinationKind : std::uint8_t {
 // « Pas d'onglet » : la page entière.
 inline constexpr int kNoSettingTab = -1;
 
+// « Pas de rangée » : la page s'ouvre en haut.
+inline constexpr int kNoSettingRow = -1;
+
 struct SettingDestination {
   // La clé écrite dans la balise.
   std::string_view key;
@@ -67,6 +70,10 @@ struct SettingDestination {
   int subtab = kNoSettingTab;
   // Un numéro posé après le libellé — « Barre 3 » —, ou zéro.
   int ordinal = 0;
+  // LA RANGÉE À AMENER EN HAUT DE LA PAGE, par son identifiant, ou
+  // `kNoSettingRow` : une fenêtre dont les réglages sont un bloc d'une page plus
+  // large mène à SON bloc. Voir `OptionsWindowState::row_wanted`.
+  int row = kNoSettingRow;
 };
 
 // CE QUE LE LECTEUR A, À CETTE IMAGE, pour qu'une destination conditionnelle

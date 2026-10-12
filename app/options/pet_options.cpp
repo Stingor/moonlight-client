@@ -30,17 +30,16 @@ void PetOptions::Declare(SettingsFile& into) {
   into.Declare(kAnimateSpriteKey, &settings_.animate_sprite);
 }
 
-void PetOptions::Compose() {
-  rows_.clear();
-  rows_.push_back(Toggle(PetRow::kConfirmReturnToEgg, Tr("Confirmer « Remettre dans l'œuf »"),
-                         Tr("Demande avant de remettre le pet dans son œuf. Le jeu ne le "
-                            "demandait pas, et un clic de travers range le pet."),
-                         settings_.confirm_return_to_egg));
-  rows_.back().heading = Tr("Fiche de pet");
-  rows_.push_back(Toggle(PetRow::kAnimateSprite, Tr("Animer le sprite"),
-                         Tr("Le pet bouge dans sa fiche ; éteint, il reste sur sa première "
-                            "image."),
-                         settings_.animate_sprite));
+void PetOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const {
+  rows.push_back(Toggle(PetRow::kConfirmReturnToEgg, Tr("Confirmer « Remettre dans l'œuf »"),
+                        Tr("Demande avant de remettre le pet dans son œuf. Le jeu ne le "
+                           "demandait pas, et un clic de travers range le pet."),
+                        settings_.confirm_return_to_egg));
+  rows.back().heading = Tr("Fiche de pet");
+  rows.push_back(Toggle(PetRow::kAnimateSprite, Tr("Animer le sprite"),
+                        Tr("Le pet bouge dans sa fiche ; éteint, il reste sur sa première "
+                           "image."),
+                        settings_.animate_sprite));
 }
 
 bool PetOptions::Change(const ro::ui::OptionsWindowAction& asked) {

@@ -5,6 +5,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/i18n.h"
 #include "ro/ui/chat_link_offer.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -28,6 +29,9 @@ constexpr const char* kContentChild = "contenu";
 // relâchement ; « aucune » sinon.
 constexpr const char* kLinkArmedKey = "##lien_arme";
 constexpr int kNoLinkArmed = -1;
+
+// ⚠ JAMAIS TRADUIT : c'est une clé ImGui, pas un texte.
+constexpr const char* kFilterId = "##filtre_nav";
 
 // Ce que la liste VOUDRAIT, et ce qu'on lui DONNE. Les deux, parce que leur
 // écart est exactement ce qui dit si les libellés sont coupés.
@@ -56,12 +60,42 @@ struct NavWidth {
   return measured;
 }
 
+// LE CHAMP DE FILTRE, à la largeur de la liste, puis — quand on cherche — le
+// bouton qui le vide et le compte des résultats.
+//
+// ⚠ LE COMPTE NE DÉBORDE PAS SUR LE CONTENU : la colonne n'est pas un cadre qui
+// le couperait. Trop large à côté du bouton, il passe à la ligne.
+void DrawFilter(NavFilter& filter, float width, const SkinArt& art) {
+  if (filter.focus) {
+    ImGui::SetKeyboardFocusHere();
+  }
+  ImGui::SetNextItemWidth(width);
+  ImGui::InputTextWithHint(kFilterId, filter.hint, filter.typed.data(), filter.typed.size(),
+                           ImGuiInputTextFlags_EscapeClearsAll);
+  if (filter.typed.empty() || filter.typed.front() == '\0') {
+    return;
+  }
+  const float left = ImGui::GetCursorPosX();
+  if (SkinSmallButton(core::Tr("Effacer"), art)) {
+    filter.typed.front() = '\0';
+  }
+  if (filter.found == nullptr) {
+    return;
+  }
+  const float spacing = ImGui::GetStyle().ItemSpacing.x;
+  const float used = ImGui::GetItemRectMax().x - ImGui::GetWindowPos().x - left;
+  if (used + spacing + ImGui::CalcTextSize(filter.found).x <= width) {
+    ImGui::SameLine();
+  }
+  ImGui::TextDisabled("%s", filter.found);
+}
+
 }  // namespace
 
 float NavPanelWidth(std::span<const NavEntry> entries) { return MeasureNav(entries).given; }
 
 void BeginNavPanel(const char* id, std::span<const NavEntry> entries, int* current,
-                   const SkinArt& art, int* linked) {
+                   const SkinArt& art, int* linked, NavFilter* filter) {
   ImGui::PushID(id);
   const NavWidth measured = MeasureNav(entries);
   // La borne a mordu : les libellés ne tiennent pas, et ImGui les coupe NET,
@@ -69,6 +103,12 @@ void BeginNavPanel(const char* id, std::span<const NavEntry> entries, int* curre
   // contenu en a besoin —, on rend le libellé lisible autrement, en infobulle.
   const bool clipped = measured.given < measured.wanted;
 
+  // LE FILTRE ET LA LISTE FORMENT UNE COLONNE : le champ ne défile pas avec les
+  // entrées, il reste là où on le tape.
+  ImGui::BeginGroup();
+  if (filter != nullptr) {
+    DrawFilter(*filter, measured.given, art);
+  }
   // Hauteur nulle : les deux volets prennent toute la place que la fenêtre leur
   // laisse. C'est elle qui décide de la taille, et c'est elle que le joueur
   // redimensionne.
@@ -90,15 +130,19 @@ void BeginNavPanel(const char* id, std::span<const NavEntry> entries, int* curre
       ImGui::TextDisabled("%s", entry.group);
       ImGui::Separator();
     }
-    const bool chosen = ImGui::Selectable(entry.label, current != nullptr && *current == rank);
+    const int target = entry.target >= 0 ? entry.target : rank;
+    // ⚠ SOUS L'IDENTITÉ DE LA SECTION, pas du rang : la liste filtrée décale les
+    // rangs, et un appui tenu suivrait sinon l'entrée qui prend la place.
+    ImGui::PushID(target);
+    const bool chosen = ImGui::Selectable(entry.label, current != nullptr && *current == target);
     const bool offers = linked != nullptr;
     if (offers && ShiftClickedLastItem()) {
-      *linked = rank;
-      armed = rank;
-    } else if (chosen && armed == rank) {
+      *linked = target;
+      armed = target;
+    } else if (chosen && armed == target) {
       armed = kNoLinkArmed;
     } else if (chosen && current != nullptr && !(offers && ImGui::GetIO().KeyShift)) {
-      *current = rank;
+      *current = target;
     }
     // ⚠ UNE SEULE BULLE PORTE LES DEUX AIDES — le libellé entier d'une liste
     // trop étroite, et le geste du lien : deux bulles sur le même élément, c'est
@@ -112,6 +156,7 @@ void BeginNavPanel(const char* id, std::span<const NavEntry> entries, int* curre
     } else if (!offers && clipped && ImGui::IsItemHovered()) {
       SkinTooltipFormat("%s", entry.label);
     }
+    ImGui::PopID();
   }
   // ⚠ LE BOUTON RELÂCHÉ AILLEURS DÉSARME AUSSI : l'appui suivant repart de zéro.
   if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
@@ -122,6 +167,7 @@ void BeginNavPanel(const char* id, std::span<const NavEntry> entries, int* curre
   // elle défilerait sans rien montrer.
   PaintWindowScrollbar(art);
   ImGui::EndChild();
+  ImGui::EndGroup();
 
   ImGui::SameLine();
   ImGui::BeginChild(kContentChild, ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders);

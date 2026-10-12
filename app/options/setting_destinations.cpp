@@ -19,6 +19,8 @@
 #include "input/hotkeys.h"
 #include "options/damage_page_names.h"
 #include "options/entity_page_tabs.h"
+#include "options/game_option_ids.h"
+#include "options/pet_options.h"
 #include "options/setting_links.h"
 
 namespace moonclient {
@@ -31,6 +33,12 @@ using Kind = SettingDestinationKind;
 [[nodiscard]] constexpr SettingDestination Page(std::string_view key, const char* label,
                                                 OptionSection section) {
   return SettingDestination{.key = key, .label = label, .section = section};
+}
+
+// UN BLOC D'UNE PAGE : la page s'ouvre sur la rangée qui porte son intertitre.
+[[nodiscard]] constexpr SettingDestination PageRow(std::string_view key, const char* label,
+                                                   OptionSection section, int row) {
+  return SettingDestination{.key = key, .label = label, .section = section, .row = row};
 }
 
 // UN ONGLET D'UNE PAGE, par son rang dans la page.
@@ -73,6 +81,11 @@ constexpr int kAchievementBattleTab = ro::ui::AchievementTabOfMajor(3);
 constexpr int kAchievementQuestTab = ro::ui::AchievementTabOfMajor(4);
 constexpr int kAchievementMemorialTab = ro::ui::AchievementTabOfMajor(5);
 constexpr int kAchievementFeatTab = ro::ui::AchievementTabOfMajor(6);
+
+// LES PREMIÈRES RANGÉES DES BLOCS qu'un lien désigne : celles qui portent leur
+// intertitre.
+constexpr int kCharacterSheetRow = static_cast<int>(GameOption::kCharacterHoverDescription);
+constexpr int kPetSheetRow = PetRowId(PetRow::kConfirmReturnToEgg);
 
 using ro::ui::CharacterTab;
 using ro::ui::CommandsTab;
@@ -161,10 +174,12 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     Page("refine", TrText("Refine"), OptionSection::kWeaponRefine),
     Page("card_album", TrText("Album de cartes"), OptionSection::kCardAlbum),
     Page("desc", TrText("Descriptions"), OptionSection::kDescriptions),
-    Page("character", TrText("Personnage"), OptionSection::kCharacter),
-    // Le grimoire : la page du personnage chez nous.
-    Page("skills", TrText("Personnage"), OptionSection::kCharacter),
-    Page("pet", TrText("Fiche de pet"), OptionSection::kPet),
+    // La fiche du personnage et celle du pet : un bloc d'« Interface » chacune.
+    PageRow("character", TrText("Fiche du personnage"), OptionSection::kInterface,
+            kCharacterSheetRow),
+    // Le grimoire : la fiche du personnage chez nous.
+    PageRow("skills", TrText("Fiche du personnage"), OptionSection::kInterface, kCharacterSheetRow),
+    PageRow("pet", TrText("Fiche de pet"), OptionSection::kInterface, kPetSheetRow),
     Page("quest_tracker", TrText("Quêtes et suivi"), OptionSection::kQuestTracker),
     Page("commands", TrText("Commands Settings"), OptionSection::kCommands),
     // Les onglets que la page dessine elle-même.

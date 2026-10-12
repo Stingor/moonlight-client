@@ -234,8 +234,12 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   }
 }
 
-void GameSettings::OpenOptionsAt(UiStage::Windows& windows, OptionSection section) {
+void GameSettings::OpenOptionsAt(UiStage::Windows& windows, OptionSection section, int row) {
   windows.options.open = true;
+  windows.options.row_wanted = row;
+  // ⚠ LE FILTRE SE VIDE : sous un mot tapé plus tôt, la page de la fenêtre d'où
+  // l'on vient ne se montrerait peut-être pas.
+  windows.options.filter.front() = '\0';
   // ⚠ UNE AUTRE PAGE REPART DE SON PREMIER ONGLET, comme par la navigation :
   // le rang d'onglet de la page qu'on quitte ne désigne rien dans celle-ci.
   if (windows.options.section != static_cast<int>(Rank(section))) {

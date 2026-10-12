@@ -622,7 +622,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Declare(kCartHoverDescriptionKey, &cart_hover_description_);
   page(OptionSection::kStorage);
   into.Declare(kStorageHoverDescriptionKey, &storage_hover_description_);
-  page(OptionSection::kCharacter);
+  page(OptionSection::kInterface);
   into.Declare(kCharacterHoverDescriptionKey, &character_hover_description_);
   into.Section("La fiche de personnage");
   into.Declare(kGrimoireSmoothIconsKey, &grimoire_smooth_icons_);

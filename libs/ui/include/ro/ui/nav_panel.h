@@ -29,15 +29,36 @@ namespace ro::ui {
 // UNE ENTRÉE DE LA LISTE, et la FAMILLE qu'elle ouvre s'il y a lieu.
 //
 // 🔴 LE TITRE DE FAMILLE EST PORTÉ PAR SON PREMIER MEMBRE, et non par une entrée
-// à lui. C'est ce qui garde l'indice de la liste égal à l'indice de la SECTION :
-// une famille qui occuperait un rang décalerait tout ce qui suit, et l'état
-// enregistré — « j'étais sur la quatrième » — désignerait alors sa voisine dès
-// qu'on ajoute une famille.
+// à lui : une famille qui occuperait un rang décalerait tout ce qui suit.
+//
+// 🔴 ET L'ENTRÉE DIT LA SECTION QU'ELLE DÉSIGNE, plutôt que son rang dans la
+// liste. La liste se trie et se filtre ; la section, elle, est ce que retiennent
+// l'état de l'appelant, les liens et les puces des fenêtres. Un rang de liste
+// changerait de sens à chaque lettre tapée.
 struct NavEntry {
   // ⚠ DÉJÀ TRADUIT par l'appelant, comme partout dans cette couche.
   const char* label = "";
   // Le titre de la famille qui s'ouvre AVANT cette entrée, ou nul.
   const char* group = nullptr;
+  // La section que l'entrée désigne ; moins un, son rang dans la liste.
+  int target = -1;
+};
+
+// LE CHAMP DE FILTRE posé au-dessus de la liste, quand l'appelant en offre un.
+//
+// ⚠ LA NAV NE FILTRE RIEN ELLE-MÊME : elle montre le champ et les entrées
+// qu'on lui donne. C'est l'appelant qui relit le texte et ne passe que les
+// entrées qui y répondent.
+struct NavFilter {
+  // Le tampon du texte tapé, terminé par un zéro.
+  std::span<char> typed;
+  // Ce que montre le champ vide. ⚠ DÉJÀ TRADUIT.
+  const char* hint = "";
+  // Le compte des résultats, posé sous le champ, ou nul quand rien n'est
+  // cherché. ⚠ DÉJÀ TRADUIT ET FORMATÉ.
+  const char* found = nullptr;
+  // Le champ prend le clavier à cette image.
+  bool focus = false;
 };
 
 // Ouvre la nav. `*current` est l'indice de la section montrée, borné à la liste.
@@ -48,8 +69,10 @@ struct NavEntry {
 //
 // 🔴 OFFERT, MAJ DÉSARME LA SÉLECTION : le geste pose le lien SANS changer de
 // section sous les yeux de celui qui explique.
+//
+// `filter`, non nul, pose son champ au-dessus de la liste, à sa largeur.
 void BeginNavPanel(const char* id, std::span<const NavEntry> entries, int* current,
-                   const SkinArt& art, int* linked = nullptr);
+                   const SkinArt& art, int* linked = nullptr, NavFilter* filter = nullptr);
 
 // Referme le cadre du contenu, après y avoir peint son ascenseur.
 void EndNavPanel(const SkinArt& art);

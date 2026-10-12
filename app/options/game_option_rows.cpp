@@ -191,6 +191,15 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   pages_.map_sign.ComposeInto(display_rows_);
   display_rows_.back().heading = Tr("Arrivée sur une carte");
   pages_.window_title.ComposeInto(display_rows_);
+  // LES FENÊTRES QUI N'ONT QUE QUELQUES RÉGLAGES, un bloc chacune : voir
+  // `OptionSection::kInterface`. Leur puce mène à leur intertitre.
+  display_rows_.push_back(
+      Toggle(GameOption::kCharacterHoverDescription, Tr("Description au survol"),
+             Tr("Le survol d'une pièce portée montre sa description entière plutôt que son "
+                "seul nom. Elle REMPLACE l'infobulle de nom, elle ne s'y ajoute pas."),
+             nullptr, character_hover_description_));
+  display_rows_.back().heading = Tr("Fiche du personnage");
+  pages_.pet.ComposeInto(display_rows_);
   // LE RENONCEMENT AU RAPPORT DE BUG, en fin d'interface.
   pages_.bug_report.AppendRows(display_rows_);
 
@@ -442,12 +451,6 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   // Les barres de raccourcis, à part : quarante-deux lignes composées en boucle.
   // Voir `game_option_bars.cpp`.
   ComposeShortcutRows(shown_bar);
-  character_rows_.clear();
-  character_rows_.push_back(
-      Toggle(GameOption::kCharacterHoverDescription, Tr("Description au survol"),
-             Tr("Le survol d'une pièce portée montre sa description entière plutôt que son "
-                "seul nom. Elle REMPLACE l'infobulle de nom, elle ne s'y ajoute pas."),
-             nullptr, character_hover_description_));
 
   // LA BARRE DÉTATS : une famille, un fichier. Voir
   // `game_option_statuses.cpp`.
@@ -717,11 +720,6 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar) {
   pages_.descriptions.Compose();
   sections_[Rank(OptionSection::kDescriptions)] =
       ro::ui::OptionSectionView{.title = Tr("Descriptions"), .rows = pages_.descriptions.rows()};
-  sections_[Rank(OptionSection::kCharacter)] =
-      ro::ui::OptionSectionView{.title = Tr("Personnage"), .rows = character_rows_};
-  pages_.pet.Compose();
-  sections_[Rank(OptionSection::kPet)] =
-      ro::ui::OptionSectionView{.title = Tr("Fiche de pet"), .rows = pages_.pet.rows()};
   pages_.quest_tracker.Compose();
   sections_[Rank(OptionSection::kQuestTracker)] = ro::ui::OptionSectionView{
       .title = Tr("Quêtes et suivi"), .rows = pages_.quest_tracker.rows()};

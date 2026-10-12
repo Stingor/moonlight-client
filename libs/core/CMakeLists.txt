@@ -20,6 +20,7 @@ add_library(ro_core STATIC
     src/log.cpp
     src/printed.cpp
     src/program_arguments.cpp
+    src/search_key.cpp
     src/sha256.cpp
     src/text.cpp
     src/web_address.cpp

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <span>
 #include <vector>
 
 #include "ro/ui/options_window.h"
@@ -9,11 +8,11 @@
 
 namespace moonclient {
 
-// ── LA PAGE « PET » ─────────────────────────────────────────────────────────
+// ── LE BLOC « FICHE DE PET » D'INTERFACE ────────────────────────────────────
 //
 // Les deux réglages de la fiche du pet : demander avant de remettre le pet dans
 // son œuf, et animer son sprite. La puce de la barre de titre de la fiche mène
-// ici.
+// à son intertitre, que porte la première rangée.
 inline constexpr int kPetRowBase = 7900;
 
 enum class PetRow : int {
@@ -34,16 +33,15 @@ class PetOptions {
  public:
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
-  // Refait les lignes, à chaque image où le panneau est ouvert.
-  void Compose();
-  [[nodiscard]] std::span<const ro::ui::OptionRowView> rows() const noexcept { return rows_; }
+  // Ajoute ses lignes à celles d'Interface, à chaque image où le panneau est
+  // ouvert.
+  void ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const;
   // Rend vrai quand la ligne était l'une des siennes.
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);
   [[nodiscard]] const PetSettings& settings() const noexcept { return settings_; }
 
  private:
   PetSettings settings_;
-  std::vector<ro::ui::OptionRowView> rows_;
 };
 
 }  // namespace moonclient

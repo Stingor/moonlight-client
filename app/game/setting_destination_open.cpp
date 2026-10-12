@@ -21,6 +21,9 @@ void OpenSettingDestination(const SettingDestination& destination, UiStage::Wind
       const int tab = std::max(destination.tab, 0);
       options.section_tab = tab;
       options.section_tab_wanted = tab;
+      options.row_wanted = destination.row;
+      // ⚠ LE FILTRE SE VIDE : la page qu'on vient chercher ne s'y trouve peut-être pas.
+      options.filter.front() = '\0';
       return;
     }
     case SettingDestinationKind::kSheet: {

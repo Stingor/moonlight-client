@@ -670,12 +670,13 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   pieces_.spell_list.Apply(answers.spell_list, link_);
   pieces_.repair.Apply(answers.repair, link_);
   pieces_.pet.Apply(answers.pet, answers.pet_hatch, windows_.pet, link_, world_, now_ms);
-  // LA FICHE DU PET suit sa page de réglages, et sa puce y mène.
+  // LA FICHE DU PET suit son bloc de réglages, et sa puce y mène.
   const PetSettings& pet_page = settings_->options().pages().pet.settings();
   windows_.pet.confirm_return_to_egg = pet_page.confirm_return_to_egg;
   windows_.pet.animate_sprite = pet_page.animate_sprite;
   if (answers.pet.settings_asked) {
-    GameSettings::OpenOptionsAt(windows_, OptionSection::kPet);
+    GameSettings::OpenOptionsAt(windows_, OptionSection::kInterface,
+                                PetRowId(PetRow::kConfirmReturnToEgg));
   }
   // Les matériaux et les espèces du panneau d'évolution, les œufs de l'éclosion :
   // des items de catalogue, avec les gestes de partout.

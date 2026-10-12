@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -69,6 +70,10 @@ enum class OptionKind : std::uint8_t {
 
 // LA PLUS LONGUE LIGNE QU'UN CHAMP `kText` ACCEPTE, terminateur compris.
 inline constexpr std::size_t kOptionTextBytes = 260;
+
+// Le plus long filtre qu'on tape dans la navigation, terminateur compris. Voir
+// `options_search.h`.
+inline constexpr std::size_t kOptionsFilterBytes = 64;
 
 // Ce que dessine un panneau, avec l'habillage de la fenêtre ; vrai quand un
 // réglage a changé. Voir `kPanel`.
@@ -351,6 +356,14 @@ struct OptionsWindowState {
   // voir avec l'onglet 6 d'une autre, et en garder le rang ferait ouvrir une
   // section sur une page que le joueur n'a pas demandée.
   int section_tab_wanted = -1;
+  // LA RANGÉE À AMENER EN HAUT DE LA PAGE, par son identifiant, ou moins un :
+  // une puce de fenêtre mène à SON bloc dans une page qui en porte d'autres.
+  // Consommée comme la demande d'onglet, en une image.
+  int row_wanted = -1;
+  // LE FILTRE TAPÉ AU-DESSUS DE LA NAVIGATION, vide quand on ne cherche rien.
+  // Voir `options_search.h`. ⚠ CELUI QUI OUVRE UNE PAGE PRÉCISE LE VIDE : sous
+  // un filtre qui ne la trouve pas, elle ne se montrerait pas.
+  std::array<char, kOptionsFilterBytes> filter{};
   // Le bouton « Signaler un bug » de la barre de titre, selon le réglage. ⚠ LES
   // OPTIONS DU JEU SEULES : l'écran de connexion n'a personne à qui l'envoyer.
   bool bug_report = false;

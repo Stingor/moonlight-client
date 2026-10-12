@@ -188,7 +188,10 @@ class GameSettings {
   // ⚠ LA SECTION EST POSÉE MÊME SI LE PANNEAU ÉTAIT DÉJÀ OUVERT : un second clic
   // sur la puce depuis une autre fenêtre doit changer de section, pas ne rien
   // faire.
-  static void OpenOptionsAt(UiStage::Windows& windows, OptionSection section);
+  //
+  // `row`, quand la fenêtre n'est qu'un bloc de la section : la rangée qui
+  // porte son intertitre, amenée en haut de la page.
+  static void OpenOptionsAt(UiStage::Windows& windows, OptionSection section, int row = -1);
 
   // BASCULE UN INTERRUPTEUR DEPUIS AILLEURS QUE LE PANNEAU — le pied d'une
   // fenêtre, un raccourci.

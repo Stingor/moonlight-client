@@ -91,7 +91,7 @@ void OptionPages::Declare(SettingsFile& into) {
   into.Section("Le champ de bataille");
   DeclareOn(into, OptionSection::kGameplay, battleground);
   into.Section("La fiche du pet");
-  DeclareOn(into, OptionSection::kPet, pet);
+  DeclareOn(into, OptionSection::kInterface, pet);
 }
 
 ro::ui::OptionSectionView OptionPages::ComposeSkinSection() {

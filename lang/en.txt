@@ -17269,3 +17269,9 @@ tr: Chat content will be displayed in the chat window. [Display ON]
 
 fr: Warp Agent
 tr: Warp Agent
+
+fr: Résultats : %d
+tr: Results: %d
+
+fr: Aucun réglage ne correspond à ce filtre.
+tr: No setting matches this filter.

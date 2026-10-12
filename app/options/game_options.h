@@ -667,7 +667,6 @@ class GameOptions {
   // facteur courant en fait partie, et il vient peut-être de changer.
   void ReadInterfaceScales();
   std::vector<ro::ui::OptionRowView> storage_rows_;
-  std::vector<ro::ui::OptionRowView> character_rows_;
   std::vector<ro::ui::OptionRowView> status_rows_;
   std::vector<ro::ui::OptionRowView> stat_bar_rows_;
   // CE QUI VAUT POUR LES SIX, dessiné AU-DESSUS des onglets. ⚠ C'EST LA PLACE

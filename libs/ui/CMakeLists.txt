@@ -154,6 +154,8 @@ add_library(ro_ui STATIC
     src/navigation_results.cpp
     src/navigation_search_tip.cpp
     src/navigation_window.cpp
+    src/options_rows.cpp
+    src/options_search.cpp
     src/options_window.cpp
     src/packet_window.cpp
     src/party_friend_dialogs.cpp
