@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include <yaml-cpp/yaml.h>
 
@@ -48,35 +49,98 @@ constexpr const char* kFileHeader =
     "# Une competence s'ecrit par son NOM INTERNE -- MG_COLDBOLT -- et non par un\n"
     "# numero : le fichier se relit et se corrige a la main.\n"
     "#\n"
-    "# Une case vide s'ecrit ~. Une competence inconnue des tables laisse la case\n"
-    "# vide, sans effacer le reste.\n"
+    "# Une case vide s'ecrit ~. Une competence inconnue des tables se montre\n"
+    "# vide, mais reste ecrite tant qu'on ne pose rien d'autre dans sa case.\n"
     "#\n"
     "# Un compte staff garde en plus un jeu par metier, sous `jobs`, indexe par\n"
     "# numero de metier : changer de metier en jeu y reprend ses barres.\n";
 
-// Lit le fichier entier, ou rend un document vide. ⚠ IL FAUT LE TOUT pour
-// écrire : la barre d'un personnage ne doit pas emporter celles des autres.
-[[nodiscard]] YAML::Node ReadWhole(const std::filesystem::path& path) {
+// Lit le fichier entier : un document vide quand il n'existe pas, rien quand il
+// est illisible. ⚠ IL FAUT LE TOUT pour écrire : la barre d'un personnage ne
+// doit pas emporter celles des autres.
+[[nodiscard]] std::optional<YAML::Node> ReadWhole(const std::filesystem::path& path) {
   std::error_code missing;
   if (!std::filesystem::exists(path, missing)) {
     return YAML::Node(YAML::NodeType::Map);
   }
   try {
     YAML::Node whole = LoadYamlFile(path);
-    return whole.IsMap() ? whole : YAML::Node(YAML::NodeType::Map);
+    if (whole.IsNull()) {
+      return YAML::Node(YAML::NodeType::Map);
+    }
+    if (!whole.IsMap()) {
+      ro::core::LogWarning(
+          "barre de raccourcis : le fichier n'est pas une table — il ne sera "
+          "pas réécrit");
+      return std::nullopt;
+    }
+    return whole;
   } catch (const YAML::Exception& broken) {
     // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : la
     // bibliothèque n'offre pas d'autre voie, et un fichier abîmé ne doit pas
     // empêcher de jouer.
-    // ⚠ CE QUE CE FICHIER ABÎMÉ COÛTE VRAIMENT : `SaveShortcutBar` relit par
-    // CETTE fonction avant d'écrire, et repart donc d'une carte vide. La
-    // première sauvegarde suivante emporte les barres de tous les autres
-    // personnages.
     ro::core::LogWarning(
-        "barre de raccourcis : fichier illisible ({}) — les barres repartent vides, et le "
-        "prochain enregistrement écrasera celles de TOUS les personnages",
+        "barre de raccourcis : fichier illisible ({}) — les barres repartent vides, et il ne "
+        "sera pas réécrit",
         broken.what());
-    return YAML::Node(YAML::NodeType::Map);
+    return std::nullopt;
+  }
+}
+
+// UNE CASE QUE LES TABLES NE CONNAISSENT PAS : une compétence nommée, introuvable.
+[[nodiscard]] bool HoldsUnknownSkill(const YAML::Node& entry, const ro::sim::SkillTree& tree) {
+  if (!entry || !entry.IsMap() || entry[kItemField]) {
+    return false;
+  }
+  const YAML::Node named = entry[kSkillField];
+  return named && named.IsScalar() &&
+         tree.FindByName(named.as<std::string>(std::string())) == nullptr;
+}
+
+// 🔴 UNE COMPÉTENCE INCONNUE SURVIT À LA RÉÉCRITURE. Elle se lit comme une case
+// vide ; la récrire telle quelle la perdrait pour de bon, alors qu'une table
+// complétée ou un autre arbre de métier la reconnaîtra. Elle ne cède qu'à ce
+// que le joueur pose dans sa case.
+void KeepUnknownSkills(const YAML::Node& before, YAML::Node& bars, const ro::sim::SkillTree& tree) {
+  if (!before || !before.IsMap()) {
+    return;
+  }
+  const YAML::Node& written = bars;
+  for (std::size_t bar = 0; bar < ro::sim::kShortcutBarCount; ++bar) {
+    const YAML::Node old_list = before[BarKey(bar)];
+    if (!old_list || !old_list.IsSequence()) {
+      continue;
+    }
+    // ⚠ UNE COPIE, PUIS UNE SEULE AFFECTATION : un nœud yaml-cpp affecté
+    // désigne l'entrée de sa table, et l'écraser en cours de route l'y écrirait.
+    std::vector<YAML::Node> slots;
+    if (const YAML::Node now = written[BarKey(bar)]; now && now.IsSequence()) {
+      for (const YAML::Node& entry : now) {
+        slots.push_back(YAML::Clone(entry));
+      }
+    }
+    bool kept = false;
+    for (std::size_t rank = 0; rank < old_list.size() && rank < ro::sim::kShortcutSlotsPerBar;
+         ++rank) {
+      if (!HoldsUnknownSkill(old_list[rank], tree)) {
+        continue;
+      }
+      if (slots.size() <= rank) {
+        slots.resize(rank + 1);
+      }
+      if (!slots[rank] || slots[rank].IsNull()) {
+        slots[rank] = YAML::Clone(old_list[rank]);
+        kept = true;
+      }
+    }
+    if (!kept) {
+      continue;
+    }
+    YAML::Node list(YAML::NodeType::Sequence);
+    for (const YAML::Node& entry : slots) {
+      list.push_back(entry);
+    }
+    bars[BarKey(bar)] = list;
   }
 }
 
@@ -194,12 +258,12 @@ void LoadShortcutBar(const std::filesystem::path& client_root, std::string_view 
   if (character.empty() || tree == nullptr) {
     return;
   }
-  const YAML::Node whole = ReadWhole(ShortcutFilePath(client_root));
-  const YAML::Node mine = whole[std::string(character)];
-  if (!mine) {
+  const std::optional<YAML::Node> whole = ReadWhole(ShortcutFilePath(client_root));
+  if (!whole.has_value()) {
     return;
   }
-  if (!mine.IsMap()) {
+  const YAML::Node mine = (*whole)[std::string(character)];
+  if (!mine || !mine.IsMap()) {
     return;
   }
   ReadBars(mine, *tree, into);
@@ -211,8 +275,11 @@ bool LoadJobShortcutBar(const std::filesystem::path& client_root, std::string_vi
   if (character.empty() || tree == nullptr) {
     return false;
   }
-  const YAML::Node whole = ReadWhole(ShortcutFilePath(client_root));
-  const YAML::Node mine = whole[std::string(character)];
+  const std::optional<YAML::Node> whole = ReadWhole(ShortcutFilePath(client_root));
+  if (!whole.has_value()) {
+    return false;
+  }
+  const YAML::Node mine = (*whole)[std::string(character)];
   if (!mine || !mine.IsMap()) {
     return false;
   }
@@ -237,16 +304,29 @@ bool SaveShortcutBar(const std::filesystem::path& client_root, std::string_view 
   const std::filesystem::path path = ShortcutFilePath(client_root);
   // ⚠ ON RELIT POUR ÉCRIRE : les autres personnages du joueur ont leur barre
   // dans le même fichier, et n'écrire que la sienne les effacerait tous.
-  YAML::Node whole = ReadWhole(path);
+  // 🔴 ET UN FICHIER ILLISIBLE NE SE RÉÉCRIT PAS : repartir d'une table vide
+  // emporterait les barres de tous les autres personnages.
+  std::optional<YAML::Node> read = ReadWhole(path);
+  if (!read.has_value()) {
+    return false;
+  }
+  YAML::Node whole = *read;
+  const YAML::Node& whole_read = whole;
+  const YAML::Node before = whole_read[std::string(character)];
   YAML::Node mine = WriteBars(from, *tree);
+  KeepUnknownSkills(before, mine, *tree);
   // ⚠ LES JEUX DES AUTRES MÉTIERS SURVIVENT à la réécriture de l'entrée : ils
   // se relisent de l'ancienne, et seul celui du métier en cours change.
-  const YAML::Node before = whole[std::string(character)];
   const YAML::Node kept_jobs = before && before.IsMap() ? before[kJobsField] : YAML::Node();
   YAML::Node jobs =
       kept_jobs && kept_jobs.IsMap() ? YAML::Clone(kept_jobs) : YAML::Node(YAML::NodeType::Map);
   if (job.has_value()) {
-    jobs[std::to_string(*job)] = WriteBars(from, *tree);
+    const std::string job_key = std::to_string(*job);
+    YAML::Node job_bars = WriteBars(from, *tree);
+    if (kept_jobs && kept_jobs.IsMap()) {
+      KeepUnknownSkills(kept_jobs[job_key], job_bars, *tree);
+    }
+    jobs[job_key] = job_bars;
   }
   if (jobs.size() > 0) {
     mine[kJobsField] = jobs;

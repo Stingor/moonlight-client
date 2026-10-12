@@ -47,6 +47,9 @@ void LoadShortcutBar(const std::filesystem::path& client_root, std::string_view 
 
 // Écrit la barre d'un personnage, en gardant celles des autres. Avec `job`, le
 // même jeu s'écrit AUSSI sous ce métier ; les jeux des autres métiers restent.
+// Une compétence inconnue des tables reste écrite dans sa case tant que `from`
+// ne la remplit pas. Rend `false` sans rien écrire quand le fichier présent est
+// illisible.
 //
 // ⚠ IL FAUT DONC RELIRE LE FICHIER D'ABORD : écrire la seule barre courante
 // effacerait celles de tous les autres personnages du joueur.
