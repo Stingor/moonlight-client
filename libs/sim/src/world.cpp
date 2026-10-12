@@ -468,6 +468,12 @@ ParameterOutcome World::SetPlayerParameter(std::uint16_t parameter, std::int64_t
   return ApplyParameter(player_status_, parameter, value);
 }
 
+void World::set_player_id(std::uint32_t id) noexcept {
+  player_id_ = id;
+  // La vie en attente était celle de l'ancien joueur.
+  pending_player_hp_.reset();
+}
+
 bool World::SetPlayerAttribute(std::uint16_t parameter, std::int64_t base, std::int64_t bonus) {
   // ⚠ `ZC_COUPLESTATUS` NUMÉROTE COMME `enum _sp`, et non de zéro à cinq : son
   // `statusType` vaut SP_STR pour la force. La base passe donc par la même
