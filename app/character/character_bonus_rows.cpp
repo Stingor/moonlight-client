@@ -190,10 +190,11 @@ struct ConditionalKind {
 
 // Le nom d'un STATUT, ou son numéro si cette installation ne le nomme pas.
 //
-// ⚠ LE NUMÉRO N'EST PAS UN PIS-ALLER HONTEUX : l'installation nomme huit cent
-// deux statuts là où ses identifiants en déclarent mille deux cent
-// soixante-deux, et le serveur peut en envoyer un que la table ignore. Le
-// numéro se retrouve dans `efstids` ; « ? » ne se retrouverait nulle part.
+// ⚠ LE NUMÉRO N'EST PAS UN PIS-ALLER HONTEUX : la table des états en nomme
+// huit cent deux là où le serveur en déclare mille quatre cent soixante et
+// onze, et il peut en envoyer un que la table ignore. Le numéro se retrouve
+// dans l'énumération `efst_type` du serveur ; « ? » ne se retrouverait nulle
+// part.
 [[nodiscard]] std::string StatusNameOf(const StatusNamer& status_of, std::uint16_t effect_id) {
   if (status_of) {
     const std::string_view named = status_of(effect_id);

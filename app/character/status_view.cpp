@@ -14,8 +14,8 @@ namespace {
 // pixels de haut, la quatrième ne se lit plus.
 constexpr std::size_t kAbbreviationLetters = 3;
 
-// Au-delà, `efstids` ne déclare plus rien : le plus grand relevé est 1688, et la
-// borne évite de balayer au hasard.
+// Au-delà, la table des états ne décrit plus rien : le plus grand identifiant
+// est 1688, et la borne évite de balayer au hasard.
 constexpr std::uint32_t kHighestStatusEffect = 1700;
 
 // Les durées de l'aperçu, en millisecondes. ⚠ LA DERNIÈRE EST NULLE : c'est

@@ -18,7 +18,8 @@ constexpr float kIconGapPixels = 8.0F;
 // Le nom montré, ou le numéro à défaut.
 //
 // ⚠ LE NUMÉRO N'EST PAS UN PIS-ALLER MUET : c'est la clé qu'on retrouve dans
-// `efstids`, donc ce qu'un joueur peut redire à quelqu'un qui saura.
+// l'énumération `efst_type` du serveur, donc ce qu'un joueur peut redire à
+// quelqu'un qui saura.
 [[nodiscard]] std::string ShownName(const StatusPreviewView& view) {
   if (!view.name.empty()) {
     return std::string(view.name);

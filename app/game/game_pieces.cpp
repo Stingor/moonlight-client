@@ -370,9 +370,8 @@ void LoadJobNames(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.job_names = std::move(*names);
 }
 
-// CE QUE L'INSTALLATION SAIT DES STATUTS : leurs noms, leurs icônes, leur rang.
-// Trois tables à la suite, dont deux qui indexent des clés que seule la première
-// sait résoudre.
+// CE QUE LE CLIENT SAIT DES STATUTS : leurs noms, leurs icônes, leur rang, lus
+// dans `data\yaml_files\status_effects.yml`.
 void LoadStatusTable(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   auto names = ro::vfs::ReadStatusTable(vfs);
   if (!names) {

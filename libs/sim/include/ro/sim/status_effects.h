@@ -90,8 +90,8 @@ inline constexpr StatusEffectId kEfstDeepBlind = 1205;
 // pas sous nous.
 //
 // ⚠ LA TABLE EST CELLE DU SERVEUR, à la ligne où il la fait lui-même pour son
-// propre paquet (`clif.cpp`, `push_once`). Les identifiants, eux, viennent
-// d'`efstids.lub` — la table du CLIENT, seule autorité sur les numéros.
+// propre paquet (`clif.cpp`, `push_once`). Les identifiants, eux, viennent de
+// son énumération `efst_type`, seule autorité sur les numéros.
 inline constexpr StatusEffectId kEfstStoneCurse = 875;
 inline constexpr StatusEffectId kEfstFreezing = 876;
 inline constexpr StatusEffectId kEfstStun = 877;
@@ -106,9 +106,9 @@ inline constexpr StatusEffectId kEfstConfusion = 886;
 inline constexpr StatusEffectId kEfstHeavyPoison = 890;
 inline constexpr StatusEffectId kEfstFear = 891;
 
-// ⚠ CES DEUX-LÀ NE SONT DANS AUCUNE TABLE DU CLIENT : `efstids.lub` ne les
-// déclare pas, et `stateiconimginfo.lub` n'a pas d'image pour eux — d'où le
-// trou dans la numérotation ci-dessus, 887 et 889 entre des voisins présents.
+// ⚠ CES DEUX-LÀ NE SONT DANS AUCUNE TABLE DU CLIENT : le serveur les déclare
+// (887 et 889), mais la table des états ne les décrit pas et n'a pas d'image
+// pour eux — d'où le trou dans la numérotation ci-dessus.
 // L'exécutable n'en nomme pas non plus. La barre d'états n'en invente rien : le
 // jour où la table les nomme, leur case paraît d'elle-même.
 inline constexpr StatusEffectId kEfstBlind = 887;

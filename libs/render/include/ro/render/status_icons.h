@@ -14,7 +14,7 @@ namespace ro::render {
 //
 // 🔴 PAS SOUS LA RACINE D'INTERFACE, contrairement aux icônes d'objet : celles-ci
 // vivent avec les EFFETS. Mesuré : 19 822 fichiers sous `data\texture\effect`,
-// et 466 des 533 images que `stateiconimginfo` nomme s'y retrouvent.
+// et 466 des 533 images que la table des états nomme s'y retrouvent.
 //
 // ⚠ LES SOIXANTE-SEPT AUTRES SONT NOMMÉES ET ABSENTES. Ce n'est pas une panne :
 // la table du client décrit plus d'états que cette installation n'en dessine, et

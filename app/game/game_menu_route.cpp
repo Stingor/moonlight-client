@@ -40,8 +40,9 @@ bool Game::CanResurrect() const {
       return true;
     }
   }
-  // ⚠ LE NUMÉRO VIENT D'`efstids.lub`, LA TABLE DU CLIENT — seule autorité sur
-  // les identifiants d'état, comme pour les altérations de `status_effects.h`.
+  // ⚠ LE NUMÉRO VIENT DE L'ÉNUMÉRATION `efst_type` DU SERVEUR — seule autorité
+  // sur les identifiants d'état, comme pour les altérations de
+  // `status_effects.h`.
   constexpr ro::sim::StatusEffectId kEfstLightOfRegene = 580;
   for (const ro::sim::ActiveStatus& status : world_.player_statuses()) {
     if (status.effect == kEfstLightOfRegene) {

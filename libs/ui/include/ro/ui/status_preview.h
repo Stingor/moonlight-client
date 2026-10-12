@@ -25,7 +25,8 @@ struct StatusPreviewView {
   // Zéro : rien à montrer, et rien n'est dessiné.
   std::uint32_t effect_id = 0;
   // Vide quand la table ne nomme pas cet état : la bulle écrit alors son
-  // numéro, qui est la clé qu'on retrouve dans `efstids`.
+  // numéro, qui est la clé qu'on retrouve dans l'énumération `efst_type` du
+  // serveur.
   std::string_view name;
   // CE QUE L'ÉTAT FAIT, ligne à ligne. Vide quand la table ne l'explique pas —
   // six cent trente-trois en portent une dans cette installation.
