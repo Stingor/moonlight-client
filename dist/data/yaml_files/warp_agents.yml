@@ -33,7 +33,6 @@ agents:
   einbech: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
   einbroch: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
   geffen: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
-  ggpro: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
   gonryun: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
   harboro1: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
   hugel: {sprite: "4_F_01", class: 90}  # moon/warp_agent.npc
