@@ -474,17 +474,6 @@ std::optional<std::uint32_t> LuaWholeNumber(double value, std::uint32_t most) {
   return static_cast<std::uint32_t>(value);
 }
 
-bool AliasGlobal(LuaTable& globals, std::string_view known, std::string_view alias) {
-  const LuaValue* value = globals.Find(known);
-  if (value == nullptr) {
-    return false;
-  }
-  // ⚠ UNE COPIE DE LA VALEUR, dont la table est un pointeur PARTAGÉ : les deux
-  // noms désignent la même table, comme chez le client.
-  SetByName(globals, std::string(alias), *value);
-  return true;
-}
-
 const LuaValue* LuaTable::Find(std::string_view name) const {
   const auto found = slot_by_name.find(name);
   return found != slot_by_name.end() ? &by_name[found->second].second : nullptr;

@@ -11,9 +11,9 @@
 // SERVEUR : quels identifiants il accepte. `ui` en reçoit une vue en lecture,
 // comme pour tout le reste.
 //
-// ⚠ LE NOM VIENT DU CLIENT, PAS D'ICI. `pcjobname.lub` nomme les classes que
-// cette installation connaît ; le repli ci-dessous ne sert que pour celles
-// qu'elle ignore — et il ne se traduit pas, c'est le terme du jeu.
+// ⚠ LE NOM VIENT DE `job_names.yml`, PAS D'ICI. Le repli ci-dessous ne sert que
+// pour les classes que la table ne nomme pas — et il ne se traduit pas, c'est le
+// terme du jeu.
 
 #include "character/staff_jobs.h"
 

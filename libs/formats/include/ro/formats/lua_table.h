@@ -128,21 +128,6 @@ struct LuaTable {
   [[nodiscard]] const LuaValue* Find(double index) const;
 };
 
-// DONNE UN SECOND NOM À UNE GLOBALE DÉJÀ LUE.
-//
-// 🔴 CERTAINES GLOBALES NE SONT POSÉES PAR AUCUN FICHIER : le client les crée
-// lui-même avant d'évaluer les siens. `pcjobname.lub` indexe `JOBID`, que RIEN
-// dans l'installation ne définit — relevé sur les soixante-dix tables de
-// `datainfo`, `admin` et `cls` : deux fichiers l'emploient, aucun ne l'écrit.
-// Sans ce second nom, la table entière se refuse.
-//
-// ⚠ LE FAIRE ICI ET NON DANS LE LECTEUR : les deux listes d'une table ne se
-// modifient que par les lecteurs, parce que leurs index doivent les suivre.
-//
-// Rend `false` quand la source n'existe pas — l'appelant sait alors que sa chaîne
-// n'a pas donné ce qu'il croyait.
-[[nodiscard]] bool AliasGlobal(LuaTable& globals, std::string_view known, std::string_view alias);
-
 // UN NOMBRE LUA LU COMME ENTIER : fini, sans partie décimale, et dans [0, most].
 // Rien sinon.
 //
@@ -166,11 +151,9 @@ inline constexpr int kMaxLuaTableDepth = 32;
 // de compétences, une clé nulle veut dire que le fichier précédent n'a pas été lu
 // — laisser passer donnerait une table à trous que personne ne verrait.
 //
-// ⚠ UN SEUL CAS DEMANDE L'AUTRE, et il est mesuré : `pcjobname.lub` indexe des
-// constantes que le CLIENT pose et qu'aucun fichier de l'installation ne définit.
-// Cent cinquante-quatre de ses entrées se résolvent, les suivantes — les formes
-// montées — non. Refuser coûterait les cent cinquante-quatre pour les vingt-cinq
-// que nous n'employons pas : le serveur n'envoie jamais ces identifiants-là.
+// ⚠ UN SEUL CAS DEMANDE L'AUTRE, et il est mesuré : `efstids.lub` décrit plus de
+// statuts que les tables qui les nomment et les dessinent, et une installation
+// dépareillée ferait sinon tomber tous les statuts pour une constante manquante.
 //
 // ⚠ LE CHOIX VAUT POUR LES DEUX FORMES, compilée comme en clair : « même
 // contrat, même résultat ». Un fichier compilé refusait sinon en entier ce que

@@ -1,0 +1,172 @@
+# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
+# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
+# This file can be distributed, used and modified freely
+# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
+#
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le nom affiché de chaque métier
+#
+#  Les noms sont ceux de lua files\datainfo\pcjobname.lub, lus par
+#  jobidentity.lub, tels que les livre moonlight.grf : la traduction de
+#  ROenglishRE, sous la mention ci-dessus. Les identifiants sont ceux de la
+#  job_db du serveur Moonlight (mode Prerenewal) ; le commentaire de chaque ligne
+#  y nomme le métier.
+#
+#  Fichier produit par scripts/yaml_tables/job_names.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/job_names.py --serveur <dépôt moonlight> \
+#          --client <dossier client> --sortie dist/data/yaml_files/job_names.yml
+#
+#  jobs : identifiant du métier -> son nom affiché.
+#
+#  Lu par moonclient (ro/vfs/job_names.h). Absent, la fiche d'un personnage
+#  n'écrit que ses niveaux.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+jobs:
+  0: "Novice"  # Novice
+  1: "Swordman"  # Swordman
+  2: "Magician"  # Mage
+  3: "Archer"  # Archer
+  4: "Acolyte"  # Acolyte
+  5: "Merchant"  # Merchant
+  6: "Thief"  # Thief
+  7: "Knight"  # Knight
+  8: "Priest"  # Priest
+  9: "Wizard"  # Wizard
+  10: "Blacksmith"  # Blacksmith
+  11: "Hunter"  # Hunter
+  12: "Assassin"  # Assassin
+  14: "Crusader"  # Crusader
+  15: "Monk"  # Monk
+  16: "Sage"  # Sage
+  17: "Rogue"  # Rogue
+  18: "Alchemist"  # Alchemist
+  19: "Bard"  # Bard
+  20: "Dancer"  # Dancer
+  23: "Super Novice"  # Supernovice
+  24: "Gunslinger"  # Gunslinger
+  25: "Ninja"  # Ninja
+  4001: "Novice High"  # Novice_High
+  4002: "Swordman High"  # Swordman_High
+  4003: "Magician High"  # Mage_High
+  4004: "Archer High"  # Archer_High
+  4005: "Acolyte High"  # Acolyte_High
+  4006: "Merchant High"  # Merchant_High
+  4007: "Thief High"  # Thief_High
+  4008: "Lord Knight"  # Lord_Knight
+  4009: "High Priest"  # High_Priest
+  4010: "High Wizard"  # High_Wizard
+  4011: "White Smith"  # Whitesmith
+  4012: "Sniper"  # Sniper
+  4013: "Assassin Cross"  # Assassin_Cross
+  4015: "Paladin"  # Paladin
+  4016: "Champion"  # Champion
+  4017: "Professor"  # Professor
+  4018: "Stalker"  # Stalker
+  4019: "Creator"  # Creator
+  4020: "Clown"  # Clown
+  4021: "Gypsy"  # Gypsy
+  4023: "Baby"  # Baby
+  4024: "Baby Swordman"  # Baby_Swordman
+  4025: "Baby Magician"  # Baby_Mage
+  4026: "Baby Archer"  # Baby_Archer
+  4027: "Baby Acolyte"  # Baby_Acolyte
+  4028: "Baby Merchant"  # Baby_Merchant
+  4029: "Baby Thief"  # Baby_Thief
+  4030: "Baby Knight"  # Baby_Knight
+  4031: "Baby Priest"  # Baby_Priest
+  4032: "Baby Wizard"  # Baby_Wizard
+  4033: "Baby Blacksmith"  # Baby_Blacksmith
+  4034: "Baby Hunter"  # Baby_Hunter
+  4035: "Baby Assassin"  # Baby_Assassin
+  4037: "Baby Crusader"  # Baby_Crusader
+  4038: "Baby Monk"  # Baby_Monk
+  4039: "Baby Sage"  # Baby_Sage
+  4040: "Baby Rogue"  # Baby_Rogue
+  4041: "Baby Alchemist"  # Baby_Alchemist
+  4042: "Baby Bard"  # Baby_Bard
+  4043: "Baby Dancer"  # Baby_Dancer
+  4045: "Super Baby"  # Super_Baby
+  4046: "Taekwon"  # Taekwon
+  4047: "Star Gladiator"  # Star_Gladiator
+  4048: "Star Gladiator"  # Star_Gladiator2
+  4049: "Soul Linker"  # Soul_Linker
+  4054: "Rune Knight"  # Rune_Knight
+  4055: "Warlock"  # Warlock
+  4056: "Ranger"  # Ranger
+  4057: "Arch Bishop"  # Arch_Bishop
+  4058: "Mechanic"  # Mechanic
+  4059: "Glt. Cross"  # Guillotine_Cross
+  4060: "Rune Knight"  # Rune_Knight_T
+  4061: "Warlock"  # Warlock_T
+  4062: "Ranger"  # Ranger_T
+  4063: "Arch Bishop"  # Arch_Bishop_T
+  4064: "Mechanic"  # Mechanic_T
+  4065: "Glt. Cross"  # Guillotine_Cross_T
+  4066: "Royal Guard"  # Royal_Guard
+  4067: "Sorcerer"  # Sorcerer
+  4068: "Minstrel"  # Minstrel
+  4069: "Wanderer"  # Wanderer
+  4070: "Sura"  # Sura
+  4071: "Genetic"  # Genetic
+  4072: "Shadow Chaser"  # Shadow_Chaser
+  4073: "Royal Guard"  # Royal_Guard_T
+  4074: "Sorcerer"  # Sorcerer_T
+  4075: "Minstrel"  # Minstrel_T
+  4076: "Wanderer"  # Wanderer_T
+  4077: "Sura"  # Sura_T
+  4078: "Genetic"  # Genetic_T
+  4079: "Shadow Chaser"  # Shadow_Chaser_T
+  4096: "Baby Rune"  # Baby_Rune_Knight
+  4097: "Baby Warlock"  # Baby_Warlock
+  4098: "Baby Ranger"  # Baby_Ranger
+  4099: "Baby Bishop"  # Baby_Arch_Bishop
+  4100: "Baby Mechanic"  # Baby_Mechanic
+  4101: "Baby Cross"  # Baby_Guillotine_Cross
+  4102: "Baby Guard"  # Baby_Royal_Guard
+  4103: "Baby Sorcerer"  # Baby_Sorcerer
+  4104: "Baby Minstrel"  # Baby_Minstrel
+  4105: "Baby Wanderer"  # Baby_Wanderer
+  4106: "Baby Sura"  # Baby_Sura
+  4107: "Baby Genetic"  # Baby_Genetic
+  4108: "Baby Chaser"  # Baby_Shadow_Chaser
+  4190: "Super Novice"  # Super_Novice_E
+  4191: "Baby Super Novice"  # Super_Baby_E
+  4211: "Kagerou"  # Kagerou
+  4212: "Oboro"  # Oboro
+  4215: "Rebellion"  # Rebellion
+  4218: "Summoner"  # Summoner
+  4220: "Baby Summoner"  # Baby_Summoner
+  4222: "Baby Ninja"  # Baby_Ninja
+  4223: "Baby Kagerou"  # Baby_Kagerou
+  4224: "Baby Oboro"  # Baby_Oboro
+  4225: "Baby TaeKwon"  # Baby_Taekwon
+  4226: "Baby Star Gladiator"  # Baby_Star_Gladiator
+  4227: "Baby Soul Linker"  # Baby_Soul_Linker
+  4228: "Baby Gunslinger"  # Baby_Gunslinger
+  4229: "Baby Rebellion"  # Baby_Rebellion
+  4238: "Baby Star Gladiator"  # Baby_Star_Gladiator2
+  4239: "Star Emperor"  # Star_Emperor
+  4240: "Soul Reaper"  # Soul_Reaper
+  4241: "Baby Star Emperor"  # Baby_Star_Emperor
+  4242: "Baby Soul Reaper"  # Baby_Soul_Reaper
+  4243: "Star Emperor"  # Star_Emperor2
+  4244: "Baby Star Emperor"  # Baby_Star_Emperor2
+  4252: "Dragon Knight"  # Dragon_Knight
+  4253: "Meister"  # Meister
+  4254: "Shadow Cross"  # Shadow_Cross
+  4255: "Arch Mage"  # Arch_Mage
+  4256: "Cardinal"  # Cardinal
+  4257: "Windhawk"  # Windhawk
+  4258: "Imperial Guard"  # Imperial_Guard
+  4259: "Biolo"  # Biolo
+  4260: "Abyss Chaser"  # Abyss_Chaser
+  4261: "Elemental Master"  # Elemental_Master
+  4262: "Inquisitor"  # Inquisitor
+  4263: "Troubadour"  # Troubadour
+  4264: "Trouvere"  # Trouvere
+  4302: "Sky Emperor"  # Sky_Emperor
+  4303: "Soul Ascetic"  # Soul_Ascetic
+  4304: "Shinkiro"  # Shinkiro
+  4305: "Shiranui"  # Shiranui
+  4306: "Night Watch"  # Night_Watch

@@ -358,8 +358,7 @@ void LoadCardIllustrations(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.card_illustrations = std::move(*cards);
 }
 
-// LES NOMS DE MÉTIER. Deux tables du client, évaluées À LA SUITE : la seconde
-// écrit des clés que seule la première sait résoudre.
+// LES NOMS DE MÉTIER, lus dans `job_names.yml`.
 void LoadJobNames(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   auto names = ro::vfs::ReadJobNames(vfs);
   if (!names) {
