@@ -70,6 +70,13 @@ struct Memory {
 // La ligne qui clôt un journal : voir `EndLogFile`. Sa formulation est relue au
 // lancement suivant, donc elle ne change pas sans que la relecture suive.
 constexpr std::string_view kSessionEndMarker = "journal fermé proprement";
+// L'annonce, en première ligne, que ce journal se clôt par la ligne de fin.
+//
+// ⚠ SANS ELLE, UNE VERSION ANTÉRIEURE SE LIRAIT COMME UNE MORT MUETTE : elle
+// n'écrivait aucune ligne de fin, et le premier lancement après une mise à
+// jour aurait crié à l'arrêt sans prévenir. Un journal qui ne l'annonce pas ne
+// se juge donc pas sur sa fin.
+constexpr std::string_view kSessionEndPromise = "clos par une ligne de fin";
 // Ce que le filet écrit sur un plantage : voir `crash_report.cpp`.
 constexpr std::string_view kCrashMarker = "PLANTAGE";
 // `moonclient.log` devient `moonclient.precedent.log`.
@@ -77,6 +84,8 @@ constexpr std::string_view kPreviousLogInfix = ".precedent";
 // Ce qu'on relit de la fin du journal précédent : la ligne de fin y est la
 // dernière, et la dernière ligne utile se tient juste avant.
 constexpr std::uintmax_t kPreviousTailBytes = 4096;
+// Ce qu'on relit de son début : la première ligne, qui porte l'annonce.
+constexpr std::uintmax_t kPreviousHeadBytes = 1024;
 
 // LA PORTE DU FICHIER : un puits qui en contient un autre, ou aucun.
 //
@@ -124,6 +133,17 @@ struct PreviousLog {
   return start == std::string_view::npos ? text : text.substr(start + 1);
 }
 
+// `count_bytes` octets du fichier à partir de `start_byte`, moins s'il est court.
+[[nodiscard]] std::string ReadSpan(std::ifstream& file, std::uintmax_t start_byte,
+                                   std::uintmax_t count_bytes) {
+  file.clear();
+  file.seekg(static_cast<std::streamoff>(start_byte));
+  std::string read(static_cast<std::size_t>(count_bytes), '\0');
+  file.read(read.data(), static_cast<std::streamsize>(read.size()));
+  read.resize(static_cast<std::size_t>(file.gcount()));
+  return read;
+}
+
 // Dit au journal neuf comment le précédent s'est terminé, quand ce n'est pas
 // par une sortie voulue.
 void ReviewPreviousLog(const std::filesystem::path& previous) {
@@ -141,18 +161,20 @@ void ReviewPreviousLog(const std::filesystem::path& previous) {
     return;
   }
   std::ifstream file(previous, std::ios::binary);
-  const std::uintmax_t start_byte =
+  const std::string head = ReadSpan(file, 0, std::min(size_bytes, kPreviousHeadBytes));
+  const std::uintmax_t tail_start_byte =
       size_bytes > kPreviousTailBytes ? size_bytes - kPreviousTailBytes : 0;
-  file.seekg(static_cast<std::streamoff>(start_byte));
-  std::string tail(static_cast<std::size_t>(size_bytes - start_byte), '\0');
-  file.read(tail.data(), static_cast<std::streamsize>(tail.size()));
-  tail.resize(static_cast<std::size_t>(file.gcount()));
+  const std::string tail = ReadSpan(file, tail_start_byte, size_bytes - tail_start_byte);
   if (tail.find(kSessionEndMarker) != std::string::npos) {
     return;
   }
+  // ⚠ LE PLANTAGE AVANT L'ANNONCE : une version antérieure l'écrivait déjà.
   if (tail.find(kCrashMarker) != std::string::npos) {
     LogWarning("lancement précédent : il a planté — son rapport plantage-*.txt et {} sont à côté",
                shown);
+    return;
+  }
+  if (head.find(kSessionEndPromise) == std::string::npos) {
     return;
   }
   LogWarning(
@@ -232,7 +254,8 @@ Result<void> InitLogging(const std::filesystem::path& file_path) {
   // LA PREMIÈRE LIGNE DIT QUI PARLE. Un journal qu'un joueur envoie sans savoir
   // quelle version il jouait oblige à le lui redemander, souvent des jours plus
   // tard, et parfois à chercher une panne déjà corrigée.
-  LogInfo("moonclient {} — revision {} (arbre {})", kBuildVersion, kBuildCommit, kBuildTree);
+  LogInfo("moonclient {} — revision {} (arbre {}) — journal {}", kBuildVersion, kBuildCommit,
+          kBuildTree, kSessionEndPromise);
   if (!opened) {
     LogError("journal : {} — rien de ce qui suit n'atteint le disque", Describe(opened.error()));
   }
