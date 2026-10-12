@@ -1,18 +1,19 @@
 #include "ro/vfs/random_option_names.h"
 
-#include <array>
-#include <limits>
-#include <optional>
+#include <expected>
 #include <string>
+#include <utility>
 
-#include "ro/formats/lua_table.h"
-#include "ro/vfs/encoding.h"
-#include "ro/vfs/lua_chain.h"
+#include <yaml-cpp/yaml.h>
 
 namespace ro::vfs {
 namespace {
 
-constexpr std::string_view kTableGlobal = "NameTable_VAR";
+constexpr int kSupportedVersion = 1;
+
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData, "options aléatoires : " + std::move(detail)};
+}
 
 }  // namespace
 
@@ -51,30 +52,54 @@ std::string RandomOptionNames::Format(std::uint32_t option_id, int value) const 
   return FillOptionTemplate(found->second, value);
 }
 
-core::Result<RandomOptionNames> ReadRandomOptionNames(Vfs& vfs) {
+core::Result<RandomOptionNames> ParseRandomOptionNames(std::string_view yaml_text) {
   RandomOptionNames names;
-  const std::array<std::string_view, 2> chain = {kEnumVarPath, kRandomOptionNamesPath};
-  auto globals = ReadLuaChain(vfs, chain);
-  if (!globals) {
-    if (globals.error().code == core::ErrorCode::kNotFound) {
-      return names;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
     }
-    return std::unexpected(globals.error());
-  }
-  const formats::LuaValue* table = globals->Find(kTableGlobal);
-  if (table == nullptr || table->kind != formats::LuaValue::Kind::kTable || !table->table) {
-    return names;
-  }
-  for (const auto& [key, value] : table->table->by_index) {
-    const std::optional<std::uint32_t> id =
-        formats::LuaWholeNumber(key, std::numeric_limits<std::uint32_t>::max());
-    if (!id.has_value() || value.kind != formats::LuaValue::Kind::kString) {
-      continue;
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
     }
-    // Les tables du client sont dans sa page de codes.
-    names.templates[*id] = Cp949ToUtf8Lossy(value.text);
+    const YAML::Node options = whole["options"];
+    if (!options || !options.IsMap()) {
+      return std::unexpected(Refused("« options » n'est pas une table"));
+    }
+    for (const auto& pair : options) {
+      const auto option_id = pair.first.as<std::uint32_t>();
+      if (!pair.second.IsMap()) {
+        return std::unexpected(
+            Refused("l'option " + std::to_string(option_id) + " n'est pas une table"));
+      }
+      const YAML::Node name = pair.second["name"];
+      if (!name) {
+        continue;  // une option que le serveur connaît sans libellé
+      }
+      if (!name.IsScalar()) {
+        return std::unexpected(
+            Refused("le nom de l'option " + std::to_string(option_id) + " n'est pas un texte"));
+      }
+      names.templates[option_id] = name.as<std::string>();
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
   }
   return names;
+}
+
+core::Result<RandomOptionNames> ReadRandomOptionNames(Vfs& vfs) {
+  auto bytes = vfs.Read(std::string(kRandomOptionsPath));
+  if (!bytes) {
+    if (bytes.error().code == core::ErrorCode::kNotFound) {
+      return RandomOptionNames{};
+    }
+    return std::unexpected(bytes.error());
+  }
+  const std::string_view text(reinterpret_cast<const char*>(bytes->data()), bytes->size());
+  return ParseRandomOptionNames(text);
 }
 
 }  // namespace ro::vfs

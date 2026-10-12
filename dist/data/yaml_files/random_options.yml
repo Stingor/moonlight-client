@@ -1,0 +1,266 @@
+# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
+# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
+# This file can be distributed, used and modified freely
+# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
+#
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les options aléatoires d'équipement, et leur nom affiché
+#
+#  Les identifiants et les constantes (`option`) sont exportés de
+#  l'item_randomopt_db du serveur Moonlight (mode Prerenewal). Les noms (`name`)
+#  sont les traductions ROenglishRE que livre moonlight.grf, dans
+#  data\luafiles514\lua files\datainfo\enumvar.lub et
+#  addrandomoptionnametable.lub : ce dépôt ne les revendique pas comme siennes.
+#
+#  Fichier produit par scripts/yaml_tables/random_options.py. Ne pas éditer à
+#  la main :
+#      python scripts/yaml_tables/random_options.py --serveur <dépôt moonlight> \
+#          --client <dossier client> --sortie dist/data/yaml_files/random_options.yml
+#
+#  options : identifiant de l'option, tel que le paquet de l'item le porte ->
+#    option (sa constante au serveur) et name (son gabarit : `%d` reçoit la
+#    valeur, `%%` s'écrit %). Une option sans `name` s'écrit par son numéro.
+#
+#  Lu par moonclient (ro/vfs/random_option_names.h). Absent, toutes les options
+#  s'écrivent par leur numéro.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+mode: Prerenewal
+options:
+  1: {option: VAR_MAXHPAMOUNT, name: "MaxHP +%d"}
+  2: {option: VAR_MAXSPAMOUNT, name: "MaxSP +%d"}
+  3: {option: VAR_STRAMOUNT, name: "STR +%d"}
+  4: {option: VAR_AGIAMOUNT, name: "AGI +%d"}
+  5: {option: VAR_VITAMOUNT, name: "VIT +%d"}
+  6: {option: VAR_INTAMOUNT, name: "INT +%d"}
+  7: {option: VAR_DEXAMOUNT, name: "DEX +%d"}
+  8: {option: VAR_LUKAMOUNT, name: "LUK +%d"}
+  9: {option: VAR_MAXHPPERCENT, name: "MaxHP +%d%%"}
+  10: {option: VAR_MAXSPPERCENT, name: "MaxSP +%d%%"}
+  11: {option: VAR_HPACCELERATION, name: "HP Recovery +%d%%"}
+  12: {option: VAR_SPACCELERATION, name: "SP Recovery +%d%%"}
+  13: {option: VAR_ATKPERCENT, name: "ATK +%d%%"}
+  14: {option: VAR_MAGICATKPERCENT, name: "MATK +%d%%"}
+  15: {option: VAR_PLUSASPD, name: "ASPD +%d"}
+  16: {option: VAR_PLUSASPDPERCENT, name: "ASPD -%d%%"}
+  17: {option: VAR_ATTPOWER, name: "ATK +%d"}
+  18: {option: VAR_HITSUCCESSVALUE, name: "HIT +%d"}
+  19: {option: VAR_ATTMPOWER, name: "MATK +%d"}
+  20: {option: VAR_ITEMDEFPOWER, name: "DEF +%d"}
+  21: {option: VAR_MDEFPOWER, name: "MDEF +%d"}
+  22: {option: VAR_AVOIDSUCCESSVALUE, name: "FLEE +%d"}
+  23: {option: VAR_PLUSAVOIDSUCCESSVALUE, name: "Perfect Dodge +%d"}
+  24: {option: VAR_CRITICALSUCCESSVALUE, name: "Critical +%d"}
+  25: {option: ATTR_TOLERACE_NOTHING, name: "Neutral elemental resistance +%d%%"}
+  26: {option: ATTR_TOLERACE_WATER, name: "Water elemental resistance +%d%%"}
+  27: {option: ATTR_TOLERACE_GROUND, name: "Earth elemental resistance +%d%%"}
+  28: {option: ATTR_TOLERACE_FIRE, name: "Fire elemental resistance +%d%%"}
+  29: {option: ATTR_TOLERACE_WIND, name: "Wind elemental resistance +%d%%"}
+  30: {option: ATTR_TOLERACE_POISON, name: "Poison elemental resistance +%d%%"}
+  31: {option: ATTR_TOLERACE_SAINT, name: "Holy elemental resistance +%d%%"}
+  32: {option: ATTR_TOLERACE_DARKNESS, name: "Shadow elemental resistance +%d%%"}
+  33: {option: ATTR_TOLERACE_TELEKINESIS, name: "Ghost elemental resistance +%d%%"}
+  34: {option: ATTR_TOLERACE_UNDEAD, name: "Undead elemental resistance +%d%%"}
+  35: {option: ATTR_TOLERACE_ALLBUTNOTHING, name: "All elemental (except Neutral) resistance +%d%%"}
+  36: {option: DAMAGE_PROPERTY_NOTHING_USER, name: "Neutral monster resistance +%d%%"}
+  37: {option: DAMAGE_PROPERTY_NOTHING_TARGET, name: "ATK +%d%% against Neutral monster"}
+  38: {option: DAMAGE_PROPERTY_WATER_USER, name: "Water monster resistance +%d%%"}
+  39: {option: DAMAGE_PROPERTY_WATER_TARGET, name: "ATK +%d%% against Water monster"}
+  40: {option: DAMAGE_PROPERTY_GROUND_USER, name: "Earth monster resistance +%d%%"}
+  41: {option: DAMAGE_PROPERTY_GROUND_TARGET, name: "ATK +%d%% against Earth monster"}
+  42: {option: DAMAGE_PROPERTY_FIRE_USER, name: "Fire monster resistance +%d%%"}
+  43: {option: DAMAGE_PROPERTY_FIRE_TARGET, name: "ATK +%d%% against Fire monster"}
+  44: {option: DAMAGE_PROPERTY_WIND_USER, name: "Wind monster resistance +%d%%"}
+  45: {option: DAMAGE_PROPERTY_WIND_TARGET, name: "ATK +%d%% against Wind monster"}
+  46: {option: DAMAGE_PROPERTY_POISON_USER, name: "Poison monster resistance +%d%%"}
+  47: {option: DAMAGE_PROPERTY_POISON_TARGET, name: "ATK +%d%% against Poison monster"}
+  48: {option: DAMAGE_PROPERTY_SAINT_USER, name: "Holy monster resistance +%d%%"}
+  49: {option: DAMAGE_PROPERTY_SAINT_TARGET, name: "ATK +%d%% against Holy monster"}
+  50: {option: DAMAGE_PROPERTY_DARKNESS_USER, name: "Shadow monster resistance +%d%%"}
+  51: {option: DAMAGE_PROPERTY_DARKNESS_TARGET, name: "ATK +%d%% against Shadow monster"}
+  52: {option: DAMAGE_PROPERTY_TELEKINESIS_USER, name: "Ghost monster resistance +%d%%"}
+  53: {option: DAMAGE_PROPERTY_TELEKINESIS_TARGET, name: "ATK +%d%% against Ghost monster"}
+  54: {option: DAMAGE_PROPERTY_UNDEAD_USER, name: "Undead monster resistance +%d%%"}
+  55: {option: DAMAGE_PROPERTY_UNDEAD_TARGET, name: "ATK +%d%% against Undead monster"}
+  56: {option: MDAMAGE_PROPERTY_NOTHING_USER, name: "Neutral monster magic resistance +%d%%"}
+  57: {option: MDAMAGE_PROPERTY_NOTHING_TARGET, name: "MATK +%d%% against Neutral monster"}
+  58: {option: MDAMAGE_PROPERTY_WATER_USER, name: "Water monster magic resistance +%d%%"}
+  59: {option: MDAMAGE_PROPERTY_WATER_TARGET, name: "MATK +%d%% against Water monster"}
+  60: {option: MDAMAGE_PROPERTY_GROUND_USER, name: "Earth monster magic resistance +%d%%"}
+  61: {option: MDAMAGE_PROPERTY_GROUND_TARGET, name: "MATK +%d%% against  Earth monster"}
+  62: {option: MDAMAGE_PROPERTY_FIRE_USER, name: "Fire monster magic resistance +%d%%"}
+  63: {option: MDAMAGE_PROPERTY_FIRE_TARGET, name: "MATK +%d%% against Fire monster"}
+  64: {option: MDAMAGE_PROPERTY_WIND_USER, name: "Wind monster magic resistance +%d%%"}
+  65: {option: MDAMAGE_PROPERTY_WIND_TARGET, name: "MATK +%d%% against Wind monster"}
+  66: {option: MDAMAGE_PROPERTY_POISON_USER, name: "Poison monster magic resistance +%d%%"}
+  67: {option: MDAMAGE_PROPERTY_POISON_TARGET, name: "MATK +%d%% against Poison monster"}
+  68: {option: MDAMAGE_PROPERTY_SAINT_USER, name: "Holy monster magic resistance +%d%%"}
+  69: {option: MDAMAGE_PROPERTY_SAINT_TARGET, name: "MATK +%d%% against Holy monster"}
+  70: {option: MDAMAGE_PROPERTY_DARKNESS_USER, name: "Shadow monster magic resistance +%d%%"}
+  71: {option: MDAMAGE_PROPERTY_DARKNESS_TARGET, name: "MATK +%d%% against Shadow monster"}
+  72: {option: MDAMAGE_PROPERTY_TELEKINESIS_USER, name: "Ghost monster magic resistance +%d%%"}
+  73: {option: MDAMAGE_PROPERTY_TELEKINESIS_TARGET, name: "MATK +%d%% against Ghost monster"}
+  74: {option: MDAMAGE_PROPERTY_UNDEAD_USER, name: "Undead monster magic resistance +%d%%"}
+  75: {option: MDAMAGE_PROPERTY_UNDEAD_TARGET, name: "MATK +%d%% against Undead monster"}
+  76: {option: BODY_ATTR_NOTHING, name: "Armor Element: Neutral"}
+  77: {option: BODY_ATTR_WATER, name: "Armor Element: Water"}
+  78: {option: BODY_ATTR_GROUND, name: "Armor Element: Earth"}
+  79: {option: BODY_ATTR_FIRE, name: "Armor Element: Fire"}
+  80: {option: BODY_ATTR_WIND, name: "Armor Element: Wind"}
+  81: {option: BODY_ATTR_POISON, name: "Armor Element: Poison"}
+  82: {option: BODY_ATTR_SAINT, name: "Armor Element: Holy"}
+  83: {option: BODY_ATTR_DARKNESS, name: "Armor Element: Shadow"}
+  84: {option: BODY_ATTR_TELEKINESIS, name: "Armor Element: Ghost"}
+  85: {option: BODY_ATTR_UNDEAD, name: "Armor Element: Undead"}
+  87: {option: RACE_TOLERACE_NOTHING, name: "Formless monster resistance +%d%%"}
+  88: {option: RACE_TOLERACE_UNDEAD, name: "Undead monster resistance +%d%%"}
+  89: {option: RACE_TOLERACE_ANIMAL, name: "Brute monster resistance +%d%%"}
+  90: {option: RACE_TOLERACE_PLANT, name: "Plant monster resistance +%d%%"}
+  91: {option: RACE_TOLERACE_INSECT, name: "Insect monster resistance +%d%%"}
+  92: {option: RACE_TOLERACE_FISHS, name: "Fish monster resistance +%d%%"}
+  93: {option: RACE_TOLERACE_DEVIL, name: "Demon monster resistance +%d%%"}
+  94: {option: RACE_TOLERACE_HUMAN, name: "Demihuman monster resistance +%d%%"}
+  95: {option: RACE_TOLERACE_ANGEL, name: "Angel monster resistance +%d%%"}
+  96: {option: RACE_TOLERACE_DRAGON, name: "Dragon monster resistance +%d%%"}
+  97: {option: RACE_DAMAGE_NOTHING, name: "ATK +%d%% against Formless monster"}
+  98: {option: RACE_DAMAGE_UNDEAD, name: "ATK +%d%% against Undead monster"}
+  99: {option: RACE_DAMAGE_ANIMAL, name: "ATK +%d%% against Brute monster"}
+  100: {option: RACE_DAMAGE_PLANT, name: "ATK +%d%% against Plant monster"}
+  101: {option: RACE_DAMAGE_INSECT, name: "ATK +%d%% against Insect monster"}
+  102: {option: RACE_DAMAGE_FISHS, name: "ATK +%d%% against Fish monster"}
+  103: {option: RACE_DAMAGE_DEVIL, name: "ATK +%d%% against Demon monster"}
+  104: {option: RACE_DAMAGE_HUMAN, name: "ATK +%d%% against Demihuman monster"}
+  105: {option: RACE_DAMAGE_ANGEL, name: "ATK +%d%% against Angel monster"}
+  106: {option: RACE_DAMAGE_DRAGON, name: "ATK +%d%% against Dragon monster"}
+  107: {option: RACE_MDAMAGE_NOTHING, name: "MATK +%d%% against Formless monster"}
+  108: {option: RACE_MDAMAGE_UNDEAD, name: "MATK +%d%% against Undead monster"}
+  109: {option: RACE_MDAMAGE_ANIMAL, name: "MATK +%d%% against Brute monster"}
+  110: {option: RACE_MDAMAGE_PLANT, name: "MATK +%d%% against Plant monster"}
+  111: {option: RACE_MDAMAGE_INSECT, name: "MATK +%d%% against Insect monster"}
+  112: {option: RACE_MDAMAGE_FISHS, name: "MATK +%d%% against Fish monster"}
+  113: {option: RACE_MDAMAGE_DEVIL, name: "MATK +%d%% against Devil monster"}
+  114: {option: RACE_MDAMAGE_HUMAN, name: "MATK +%d%% against Demihuman monster"}
+  115: {option: RACE_MDAMAGE_ANGEL, name: "MATK +%d%% against Angel monster"}
+  116: {option: RACE_MDAMAGE_DRAGON, name: "MATK +%d%% against Dragon monster"}
+  117: {option: RACE_CRI_PERCENT_NOTHING, name: "Critical +%d against Formless monster"}
+  118: {option: RACE_CRI_PERCENT_UNDEAD, name: "Critical +%d against Undead monster"}
+  119: {option: RACE_CRI_PERCENT_ANIMAL, name: "Critical +%d against Brute monster"}
+  120: {option: RACE_CRI_PERCENT_PLANT, name: "Critical +%d against Plant monster"}
+  121: {option: RACE_CRI_PERCENT_INSECT, name: "Critical +%d against Insect monster"}
+  122: {option: RACE_CRI_PERCENT_FISHS, name: "Critical +%d against Fish monster"}
+  123: {option: RACE_CRI_PERCENT_DEVIL, name: "Critical +%d against Demon monster"}
+  124: {option: RACE_CRI_PERCENT_HUMAN, name: "Critical +%d against Demihuman monster"}
+  125: {option: RACE_CRI_PERCENT_ANGEL, name: "Critical +%d against Angel monster"}
+  126: {option: RACE_CRI_PERCENT_DRAGON, name: "Critical +%d against Dragon monster"}
+  127: {option: RACE_IGNORE_DEF_PERCENT_NOTHING, name: "Pierces %d%% DEF of Formless monster"}
+  128: {option: RACE_IGNORE_DEF_PERCENT_UNDEAD, name: "Pierces %d%% DEF of Undead monster"}
+  129: {option: RACE_IGNORE_DEF_PERCENT_ANIMAL, name: "Pierces %d%% DEF of Brute monster"}
+  130: {option: RACE_IGNORE_DEF_PERCENT_PLANT, name: "Pierces %d%% DEF of Plant monster"}
+  131: {option: RACE_IGNORE_DEF_PERCENT_INSECT, name: "Pierces %d%% DEF of Insect monster"}
+  132: {option: RACE_IGNORE_DEF_PERCENT_FISHS, name: "Pierces %d%% DEF of Fish monster"}
+  133: {option: RACE_IGNORE_DEF_PERCENT_DEVIL, name: "Pierces %d%% DEF of Demon monster"}
+  134: {option: RACE_IGNORE_DEF_PERCENT_HUMAN, name: "Pierces %d%% DEF of Demihuman monster"}
+  135: {option: RACE_IGNORE_DEF_PERCENT_ANGEL, name: "Pierces %d%% DEF of Angel monster"}
+  136: {option: RACE_IGNORE_DEF_PERCENT_DRAGON, name: "Pierces %d%% DEF of Dragon monster"}
+  137: {option: RACE_IGNORE_MDEF_PERCENT_NOTHING, name: "Pierces %d%% MDEF of Formless monster"}
+  138: {option: RACE_IGNORE_MDEF_PERCENT_UNDEAD, name: "Pierces %d%% MDEF of Undead monster"}
+  139: {option: RACE_IGNORE_MDEF_PERCENT_ANIMAL, name: "Pierces %d%% MDEF of Brute monster"}
+  140: {option: RACE_IGNORE_MDEF_PERCENT_PLANT, name: "Pierces %d%% MDEF of Plant monster"}
+  141: {option: RACE_IGNORE_MDEF_PERCENT_INSECT, name: "Pierces %d%% MDEF of Insect monster"}
+  142: {option: RACE_IGNORE_MDEF_PERCENT_FISHS, name: "Pierces %d%% MDEF of Fish monster"}
+  143: {option: RACE_IGNORE_MDEF_PERCENT_DEVIL, name: "Pierces %d%% MDEF of Demon monster"}
+  144: {option: RACE_IGNORE_MDEF_PERCENT_HUMAN, name: "Pierces %d%% MDEF of Demihuman monster"}
+  145: {option: RACE_IGNORE_MDEF_PERCENT_ANGEL, name: "Pierces %d%% MDEF of Angel monster"}
+  146: {option: RACE_IGNORE_MDEF_PERCENT_DRAGON, name: "Pierces %d%% MDEF of Dragon monster"}
+  147: {option: CLASS_DAMAGE_NORMAL_TARGET, name: "ATK +%d%% against Normal monster"}
+  148: {option: CLASS_DAMAGE_BOSS_TARGET, name: "ATK +%d%% against Boss monster"}
+  149: {option: CLASS_DAMAGE_NORMAL_USER, name: "Normal monster resistance +%d%%"}
+  150: {option: CLASS_DAMAGE_BOSS_USER, name: "Boss monster resistance +%d%%"}
+  151: {option: CLASS_MDAMAGE_NORMAL, name: "MATK +%d%% against Normal monster"}
+  152: {option: CLASS_MDAMAGE_BOSS, name: "MATK +%d%% against Boss monster"}
+  153: {option: CLASS_IGNORE_DEF_PERCENT_NORMAL, name: "Pierces %d%% DEF of Normal monster"}
+  154: {option: CLASS_IGNORE_DEF_PERCENT_BOSS, name: "Pierces %d%% DEF of Boss monster"}
+  155: {option: CLASS_IGNORE_MDEF_PERCENT_NORMAL, name: "Pierces %d%% MDEF of Normal monster"}
+  156: {option: CLASS_IGNORE_MDEF_PERCENT_BOSS, name: "Pierces %d%% MDEF of Boss monster"}
+  157: {option: DAMAGE_SIZE_SMALL_TARGET, name: "ATK +%d%% against Small size monster"}
+  158: {option: DAMAGE_SIZE_MIDIUM_TARGET, name: "ATK +%d%% against Medium size monster"}
+  159: {option: DAMAGE_SIZE_LARGE_TARGET, name: "ATK +%d%% against Large size monster"}
+  160: {option: DAMAGE_SIZE_SMALL_USER, name: "Small monster resistance +%d%%"}
+  161: {option: DAMAGE_SIZE_MIDIUM_USER, name: "Medium monster resistance +%d%%"}
+  162: {option: DAMAGE_SIZE_LARGE_USER, name: "Large monster resistance +%d%%"}
+  163: {option: DAMAGE_SIZE_PERFECT, name: "Nullify weapon's damage size penalty"}
+  164: {option: DAMAGE_CRI_TARGET, name: "Critical Damage +%d%%"}
+  165: {option: DAMAGE_CRI_USER, name: "Critical Damage -%d%%"}
+  166: {option: RANGE_ATTACK_DAMAGE_TARGET, name: "Ranged Physical Damage +%d%%"}
+  167: {option: RANGE_ATTACK_DAMAGE_USER, name: "Received Ranged Physical Damage -%d%%"}
+  168: {option: HEAL_VALUE, name: "Healing effectiveness +%d%%"}
+  169: {option: HEAL_MODIFY_PERCENT, name: "Recovery gained from Healing skills +%d%%"}
+  170: {option: DEC_SPELL_CAST_TIME, name: "Variable Casting Time -%d%%"}
+  171: {option: DEC_SPELL_DELAY_TIME, name: "After Skill Delay -%d%%"}
+  172: {option: DEC_SP_CONSUMPTION, name: "SP Consumption -%d%%"}
+  175: {option: WEAPON_ATTR_NOTHING, name: "Weapon Element: Neutral"}
+  176: {option: WEAPON_ATTR_WATER, name: "Weapon Element: Water"}
+  177: {option: WEAPON_ATTR_GROUND, name: "Weapon Element: Earth"}
+  178: {option: WEAPON_ATTR_FIRE, name: "Weapon Element: Fire"}
+  179: {option: WEAPON_ATTR_WIND, name: "Weapon Element: Wind"}
+  180: {option: WEAPON_ATTR_POISON, name: "Weapon Element: Poison"}
+  181: {option: WEAPON_ATTR_SAINT, name: "Weapon Element: Holy"}
+  182: {option: WEAPON_ATTR_DARKNESS, name: "Weapon Element: Shadow"}
+  183: {option: WEAPON_ATTR_TELEKINESIS, name: "Weapon Element: Ghost"}
+  184: {option: WEAPON_ATTR_UNDEAD, name: "Weapon Element: Undead"}
+  185: {option: WEAPON_INDESTRUCTIBLE, name: "Indestructible in battle"}
+  186: {option: BODY_INDESTRUCTIBLE, name: "Indestructible in battle"}
+  187: {option: MDAMAGE_SIZE_SMALL_TARGET, name: "MATK against Small size monster +%d%%"}
+  188: {option: MDAMAGE_SIZE_MIDIUM_TARGET, name: "MATK against Medium size monster +%d%%"}
+  189: {option: MDAMAGE_SIZE_LARGE_TARGET, name: "MATK against Large size monster +%d%%"}
+  190: {option: MDAMAGE_SIZE_SMALL_USER, name: "Small monster magic resistance +%d%%"}
+  191: {option: MDAMAGE_SIZE_MIDIUM_USER, name: "Medium monster magic resistance +%d%%"}
+  192: {option: MDAMAGE_SIZE_LARGE_USER, name: "Large monster magic resistance +%d%%"}
+  193: {option: ATTR_TOLERACE_ALL, name: "Elemental attacks resistance +%d%%"}
+  194: {option: RACE_WEAPON_TOLERACE_NOTHING, name: "Formless monster resistance +%d%%"}
+  195: {option: RACE_WEAPON_TOLERACE_UNDEAD, name: "Undead monster resistance +%d%%"}
+  196: {option: RACE_WEAPON_TOLERACE_ANIMAL, name: "Brute monster resistance +%d%%"}
+  197: {option: RACE_WEAPON_TOLERACE_PLANT, name: "Plant monster resistance +%d%%"}
+  198: {option: RACE_WEAPON_TOLERACE_INSECT, name: "Insect monster resistance +%d%%"}
+  199: {option: RACE_WEAPON_TOLERACE_FISHS, name: "Fish monster resistance +%d%%"}
+  200: {option: RACE_WEAPON_TOLERACE_DEVIL, name: "Demon monster resistance +%d%%"}
+  201: {option: RACE_WEAPON_TOLERACE_HUMAN, name: "Demihuman monster resistance +%d%%"}
+  202: {option: RACE_WEAPON_TOLERACE_ANGEL, name: "Angel monster resistance +%d%%"}
+  203: {option: RACE_WEAPON_TOLERACE_DRAGON, name: "Dragon monster resistance +%d%%"}
+  206: {option: RACE_TOLERACE_PLAYER_HUMAN, name: "Demi-Human players resistance + %d%%"}
+  207: {option: RACE_TOLERACE_PLAYER_DORAM, name: "Doram players resistance +%d%%"}
+  208: {option: RACE_DAMAGE_PLAYER_HUMAN, name: "ATK against Demi-Human players +%d%%"}
+  209: {option: RACE_DAMAGE_PLAYER_DORAM, name: "ATK against Doram players +%d%%"}
+  210: {option: RACE_MDAMAGE_PLAYER_HUMAN, name: "MATK against Demi-Human players +%d%%"}
+  211: {option: RACE_MDAMAGE_PLAYER_DORAM, name: "MATK against Doram players +%d%%"}
+  212: {option: RACE_CRI_PERCENT_PLAYER_HUMAN, name: "Critical +%d for Demi-Human players"}
+  213: {option: RACE_CRI_PERCENT_PLAYER_DORAM, name: "Critical +%d for Doram players"}
+  214: {option: RACE_IGNORE_DEF_PERCENT_PLAYER_HUMAN, name: "Pierces %d%% DEF of Demi-Human players"}
+  215: {option: RACE_IGNORE_DEF_PERCENT_PLAYER_DORAM, name: "Pierces %d%% DEF of Doram players"}
+  216: {option: RACE_IGNORE_MDEF_PERCENT_PLAYER_HUMAN, name: "Pierces %d%% MDEF of Demi-Human players"}
+  217: {option: RACE_IGNORE_MDEF_PERCENT_PLAYER_DORAM, name: "Pierces %d%% MDEF of Doram players"}
+  218: {option: REFLECT_DAMAGE_PERCENT, name: "Recieved reflected damage -%d%%"}
+  219: {option: MELEE_ATTACK_DAMAGE_TARGET, name: "Melee Physical Damage +%d%%"}
+  220: {option: MELEE_ATTACK_DAMAGE_USER, name: "Received Melee Physical Damage -%d%%"}
+  221: {option: ADDSKILLMDAMAGE_NOTHING, name: "Neutral elemental magic skill damage +%d%%"}
+  222: {option: ADDSKILLMDAMAGE_WATER, name: "Water elemental magic skill damage +%d%%"}
+  223: {option: ADDSKILLMDAMAGE_GROUND, name: "Earth elemental magic skill damage +%d%%"}
+  224: {option: ADDSKILLMDAMAGE_FIRE, name: "Fire elemental magic skill damage +%d%%"}
+  225: {option: ADDSKILLMDAMAGE_WIND, name: "Wind elemental magic skill damage +%d%%"}
+  226: {option: ADDSKILLMDAMAGE_POISON, name: "Poison elemental magic skill damage +%d%%"}
+  227: {option: ADDSKILLMDAMAGE_SAINT, name: "Holy elemental magic skill damage +%d%%"}
+  228: {option: ADDSKILLMDAMAGE_DARKNESS, name: "Shadow elemental magic skill damage +%d%%"}
+  229: {option: ADDSKILLMDAMAGE_TELEKINESIS, name: "Ghost elemental magic skill damage +%d%%"}
+  230: {option: ADDSKILLMDAMAGE_UNDEAD, name: "Undead elemental magic skill damage +%d%%"}
+  231: {option: ADDSKILLMDAMAGE_ALL, name: "All elemental magic skill damage +%d%%"}
+  232: {option: ADDEXPPERCENT_KILLRACE_NOTHING, name: "Experience gained from Formless race monsters +%d%%"}
+  233: {option: ADDEXPPERCENT_KILLRACE_UNDEAD, name: "Experience gained from Undead race monsters +%d%%"}
+  234: {option: ADDEXPPERCENT_KILLRACE_ANIMAL, name: "Experience gained from Brute race monsters +%d%%"}
+  235: {option: ADDEXPPERCENT_KILLRACE_PLANT, name: "Experience gained from Plant race monsters +%d%%"}
+  236: {option: ADDEXPPERCENT_KILLRACE_INSECT, name: "Experience gained from Insect race monsters +%d%%"}
+  237: {option: ADDEXPPERCENT_KILLRACE_FISHS, name: "Experience gained from Fish race monsters +%d%%"}
+  238: {option: ADDEXPPERCENT_KILLRACE_DEVIL, name: "Experience gained from Demon race monsters +%d%%"}
+  239: {option: ADDEXPPERCENT_KILLRACE_HUMAN, name: "Experience gained from Demi-Human race monsters +%d%%"}
+  240: {option: ADDEXPPERCENT_KILLRACE_ANGEL, name: "Experience gained from Angel race monsters +%d%%"}
+  241: {option: ADDEXPPERCENT_KILLRACE_DRAGON, name: "Experience gained from Dragon race monsters +%d%%"}
+  242: {option: ADDEXPPERCENT_KILLRACE_ALL, name: "Experience gained from all race monsters +%d%%"}

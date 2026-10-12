@@ -120,6 +120,10 @@ tête d'où elle vient et comment la régénérer.
   guilde du serveur Moonlight (et de ses bases de compétences et de métiers).
   La disposition de la fenêtre — cases, onglets — reste lue dans les tables de
   l'installation du joueur ; elle n'est pas versée au dépôt.
+- `random_options.yml` prend ses identifiants à la base des options aléatoires
+  du serveur Moonlight, et ses libellés aux traductions
+  [ROenglishRE](https://github.com/llchrisll/ROenglishRE) que livre le client ;
+  ces libellés ne sont pas revendiqués comme partie de ce projet.
 - `party_booking.yml` est tiré du fichier `party_booking.lub` que livre le
   client ; sa traduction n'est pas revendiquée comme partie de ce projet.
 
