@@ -89,18 +89,19 @@ class WhisperStage {
   void RememberBlocks(std::string origin, web::UserConfigIdentity identity);
   // L'avis de chargement d'une carte est parti : le serveur écoute.
   void NoteMapEntered() noexcept;
-  // LES MOTS INTERDITS DE L'INSTALLATION, relus ; aucun sans `vfs`.
-  void LoadBannedWords(ro::vfs::Vfs* vfs);
 
-  // Les deux paquets du chuchotement, les trois réponses du blocage, puis les
-  // deux annonces — la voix d'un nom ignoré s'y tait, les mots interdits s'y
-  // masquent. ⚠
-  // AVANT LE MONDE : lui lirait les deux premiers, mais sans nos amis ni nos
-  // envois.
+  // Les deux paquets du chuchotement, les trois réponses du blocage, les deux
+  // annonces — la voix d'un nom ignoré s'y tait —, puis la parole des joueurs.
+  // Les mots interdits se masquent dans les deux dernières. ⚠ AVANT LE
+  // MONDE : lui lirait tout cela, mais sans nos amis, nos envois ni la liste.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  const ro::sim::FriendList& friends,
                                                  const ro::sim::GuildBook& guild,
                                                  std::uint32_t now_ms);
+
+  // LES MOTS INTERDITS DE L'INSTALLATION : masqués dans ce qui arrive, et dans
+  // ce qui part d'une conversation 1:1. Nuls : rien ne se masque.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
 
   // « CHUCHOTER DANS UNE FENÊTRE… » : ouvre ou ramène, et donne le clavier.
   void Open(std::string_view peer);
@@ -149,7 +150,7 @@ class WhisperStage {
   WhisperDesk desk_;
   ro::sim::WhisperOutbox outbox_;
   ro::sim::WhisperBlockList blocks_;
-  ro::sim::BannedWords banned_words_;
+  const ro::sim::BannedWords* banned_ = nullptr;
   // ⚠ LE TRANSPORT AVANT LA MÉMOIRE QUI LE REGARDE : elle meurt la première.
   std::unique_ptr<web::HttpTransport> blocks_transport_;
   std::optional<WhisperBlockMemory> block_memory_;

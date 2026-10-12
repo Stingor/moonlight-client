@@ -5,6 +5,7 @@
 
 #include "ro/net/connection.h"
 #include "ro/render/item_icons.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/command_settings.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world_fwd.h"
@@ -76,6 +77,9 @@ struct TradeContext {
   // poids d'un achat et le drapeau de buying store ne se jugent pas, et le
   // serveur reste seul à les refuser.
   const ro::vfs::ItemProperties* item_properties = nullptr;
+  // LES MOTS INTERDITS : le titre d'une échoppe qui en porte un ne part pas.
+  // Nuls : rien n'est éprouvé.
+  const ro::sim::BannedWords* banned = nullptr;
 };
 
 }  // namespace moonclient

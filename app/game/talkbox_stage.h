@@ -3,10 +3,13 @@
 // LA SAISIE DE TALKIE BOX, DANS LA BOUCLE DE LA PARTIE : la pose qui attend son
 // texte, ce que la fenêtre en montre, et ce que sa réponse devient sur le fil.
 
+#include <cstdint>
 #include <optional>
 
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
+#include "ro/sim/banned_words.h"
+#include "ro/sim/world_fwd.h"
 #include "ro/ui/talkbox_window.h"
 #include "ro/vfs/item_words.h"
 
@@ -31,14 +34,22 @@ class TalkboxStage {
 
   // « OK » envoie la pose avec son texte ; « Annuler » l'abandonne. Les deux
   // ferment la fenêtre. Rend l'échec d'émission, s'il y en a un.
+  //
+  // 🔴 UN TEXTE QUI PORTE UN MOT INTERDIT NE PART PAS : la pose est abandonnée,
+  // et le refus s'écrit dans la conversation.
   [[nodiscard]] ro::core::Result<void> Apply(const ro::ui::TalkboxWindowAction& asked,
-                                             ro::net::Connection& link);
+                                             ro::net::Connection& link, ro::sim::World& world,
+                                             std::uint32_t now_ms);
+
+  // Les mots interdits de l'installation, que le texte éprouve.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
 
   // Le changement de carte emporte la pose, sans un mot au serveur.
   void Forget() noexcept { pending_.reset(); }
 
  private:
   std::optional<GroundCast> pending_;
+  const ro::sim::BannedWords* banned_ = nullptr;
 };
 
 }  // namespace moonclient

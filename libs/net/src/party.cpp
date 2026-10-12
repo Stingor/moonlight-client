@@ -2,6 +2,7 @@
 
 #include <array>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -20,6 +21,12 @@ using sim::PartyNoticeKind;
 
 // ⚠ LES NOMS SONT DES IDENTIFIANTS DU JEU, en 1252, comme ceux de la guilde.
 [[nodiscard]] std::string Name(std::string_view wire) { return core::Utf8FromCp1252(wire); }
+
+// LE NOM DU GROUPE, ses mots interdits masqués quand on tient la liste. Celui
+// des membres ne l'est pas.
+[[nodiscard]] std::string PartyName(std::string_view wire, const sim::BannedWords* banned) {
+  return sim::BannedWords::MaskWith(banned, Name(wire));
+}
 
 // Le fil code le CHEF par zéro.
 constexpr std::uint32_t kWireLeader = 0;
@@ -158,10 +165,11 @@ FrameOutcome ApplyShare(const Frame& frame, sim::PartyRoster& party) {
 }
 
 FrameOutcome ApplyPartyFrameAt(const Frame& frame, sim::PartyRoster& party,
-                               std::uint32_t own_account_id, std::optional<std::uint32_t> now_ms) {
+                               std::uint32_t own_account_id, std::optional<std::uint32_t> now_ms,
+                               const sim::BannedWords* banned) {
   switch (frame.opcode) {
     case proto::ZcGroupList::kOpcode:
-      return Decoded<proto::ZcGroupList>(frame, [&party](const auto& packet) {
+      return Decoded<proto::ZcGroupList>(frame, [&party, banned](const auto& packet) {
         std::vector<sim::PartyMember> members;
         members.reserve(packet.members.size());
         for (const proto::ZcGroupListSub& member : packet.members) {
@@ -175,12 +183,12 @@ FrameOutcome ApplyPartyFrameAt(const Frame& frame, sim::PartyRoster& party,
                                .job = static_cast<std::uint16_t>(member.class_),
                                .base_level = static_cast<std::uint16_t>(member.baseLevel)});
         }
-        party.Replace(Name(packet.partyName), std::move(members));
+        party.Replace(PartyName(packet.partyName, banned), std::move(members));
         return FrameOutcome::kApplied;
       });
 
     case proto::ZcAddMemberToGroup::kOpcode:
-      return Decoded<proto::ZcAddMemberToGroup>(frame, [&party](const auto& packet) {
+      return Decoded<proto::ZcAddMemberToGroup>(frame, [&party, banned](const auto& packet) {
         sim::PartyMember member{.account_id = packet.AID,
                                 .char_id = packet.GID,
                                 .name = Name(packet.playerName),
@@ -191,7 +199,7 @@ FrameOutcome ApplyPartyFrameAt(const Frame& frame, sim::PartyRoster& party,
                                 .base_level = static_cast<std::uint16_t>(packet.baseLevel)};
         const bool placed = packet.offline == 0;
         const sim::PartyPosition cell{.x = packet.x, .y = packet.y};
-        party.TellName(Name(packet.partyName));
+        party.TellName(PartyName(packet.partyName, banned));
         party.Upsert(std::move(member));
         if (placed) {
           party.TellPosition(packet.AID, cell);
@@ -248,10 +256,10 @@ FrameOutcome ApplyPartyFrameAt(const Frame& frame, sim::PartyRoster& party,
       });
 
     case proto::ZcPartyJoinReq::kOpcode:
-      return Decoded<proto::ZcPartyJoinReq>(frame, [&party](const auto& packet) {
+      return Decoded<proto::ZcPartyJoinReq>(frame, [&party, banned](const auto& packet) {
         party.TellInvitation(
             sim::PartyInvitation{.party_id = static_cast<std::uint32_t>(packet.GRID),
-                                 .party_name = Name(packet.groupName)});
+                                 .party_name = PartyName(packet.groupName, banned)});
         return FrameOutcome::kApplied;
       });
 
@@ -291,13 +299,19 @@ FrameOutcome ApplyPartyFrameAt(const Frame& frame, sim::PartyRoster& party,
 }  // namespace
 
 FrameOutcome ApplyPartyFrame(const Frame& frame, sim::PartyRoster& party,
+                             std::uint32_t own_account_id, std::uint32_t now_ms,
+                             const sim::BannedWords* banned) {
+  return ApplyPartyFrameAt(frame, party, own_account_id, now_ms, banned);
+}
+
+FrameOutcome ApplyPartyFrame(const Frame& frame, sim::PartyRoster& party,
                              std::uint32_t own_account_id, std::uint32_t now_ms) {
-  return ApplyPartyFrameAt(frame, party, own_account_id, now_ms);
+  return ApplyPartyFrameAt(frame, party, own_account_id, now_ms, nullptr);
 }
 
 FrameOutcome ApplyPartyFrame(const Frame& frame, sim::PartyRoster& party,
                              std::uint32_t own_account_id) {
-  return ApplyPartyFrameAt(frame, party, own_account_id, std::nullopt);
+  return ApplyPartyFrameAt(frame, party, own_account_id, std::nullopt, nullptr);
 }
 
 }  // namespace ro::net

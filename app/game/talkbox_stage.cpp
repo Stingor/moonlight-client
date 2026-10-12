@@ -1,8 +1,13 @@
 #include "game/talkbox_stage.h"
 
+#include <string>
+
 #include "ro/net/skill.h"
 #include "ro/sim/skill_book.h"
+#include "ro/sim/world.h"
 #include "ro/vfs/talkbox_words.h"
+
+#include "chat/banned_input.h"
 
 namespace moonclient {
 
@@ -24,13 +29,23 @@ void TalkboxStage::Stage(const ro::vfs::ItemWords& words, ro::ui::TalkboxWindowS
 }
 
 ro::core::Result<void> TalkboxStage::Apply(const ro::ui::TalkboxWindowAction& asked,
-                                           ro::net::Connection& link) {
+                                           ro::net::Connection& link, ro::sim::World& world,
+                                           std::uint32_t now_ms) {
   if (!pending_.has_value()) {
     return {};
   }
   if (asked.confirmed.has_value()) {
     const GroundCast cast = *pending_;
     pending_.reset();
+    if (banned_ != nullptr) {
+      if (const std::optional<std::string> refused =
+              BannedInputRefusal(*banned_, *asked.confirmed, BannedInput::kTalkbox);
+          refused.has_value()) {
+        world.RecordChat(ro::sim::ChatKind::kServer, 0, *refused, now_ms,
+                         BannedInputColor(BannedInput::kTalkbox));
+        return {};
+      }
+    }
     return ro::net::RequestSkillOnGroundWithText(link, cast.skill_id, cast.skill_level, cast.cell,
                                                  *asked.confirmed);
   }

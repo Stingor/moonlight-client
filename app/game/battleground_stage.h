@@ -10,6 +10,7 @@
 
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/entry_queue.h"
 #include "ro/sim/guild.h"
 #include "ro/sim/party_roster.h"
@@ -87,9 +88,12 @@ class BattlegroundStage {
   void StartSession(BattlegroundWindows& windows);
 
   // La file, puis le combat. ⚠ CONSULTÉ À CHAQUE TRAME, même réclamée par un
-  // autre traducteur : la vie d'un coéquipier intéresse aussi le monde.
+  // autre traducteur : la vie d'un coéquipier intéresse aussi le monde. Les
+  // mots interdits se masquent dans la parole.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  std::uint32_t now_ms);
+  // Les mots interdits de l'installation. Nuls : rien ne se masque.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
 
   // À CHAQUE IMAGE : la table des terrains, la réponse des fenêtres, les
   // transitions de la file, l'effectif redemandé, la vue.
@@ -113,6 +117,7 @@ class BattlegroundStage {
   [[nodiscard]] const ro::sim::EntryQueue& queue() const noexcept { return queue_; }
 
  private:
+  const ro::sim::BannedWords* banned_ = nullptr;
   // La table se lit une fois, à la première avancée qui a de quoi la lire ;
   // un échec se dit une fois.
   void EnsureTable(ro::vfs::Vfs* vfs);

@@ -101,7 +101,7 @@ ro::net::FrameOutcome BattlegroundStage::ApplyFrame(const ro::net::Frame& frame,
       queued != ro::net::FrameOutcome::kUnhandled) {
     return queued;
   }
-  return ro::net::ApplyBattlefieldFrame(frame, world, now_ms);
+  return ro::net::ApplyBattlefieldFrame(frame, world, banned_, now_ms);
 }
 
 void BattlegroundStage::Advance(BattlegroundWindows& windows, const BattlegroundContext& context) {

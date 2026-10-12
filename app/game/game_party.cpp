@@ -13,6 +13,7 @@
 #include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
 
+#include "chat/banned_input.h"
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/party_booking_bug_report.h"
@@ -170,6 +171,14 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       ReportRefusal(ro::net::RequestFriendRemoval(link_, asked.account_id, asked.char_id));
       break;
     case ro::ui::PartyFriendVerb::kCreateParty:
+      // 🔴 UN NOM QUI PORTE UN MOT INTERDIT NE PART PAS.
+      if (const std::optional<std::string> refused =
+              BannedInputRefusal(pieces_.banned_words, asked.name, BannedInput::kSentence);
+          refused.has_value()) {
+        world_.RecordChat(ro::sim::ChatKind::kServer, 0, *refused, now_ms,
+                          BannedInputColor(BannedInput::kSentence));
+        break;
+      }
       ReportRefusal(ro::net::RequestPartyCreation(link_, asked.name, false, false));
       break;
     case ro::ui::PartyFriendVerb::kInvite:

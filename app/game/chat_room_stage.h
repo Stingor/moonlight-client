@@ -14,6 +14,7 @@
 #include "ro/net/chat_room.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/chat_room.h"
 #include "ro/sim/friend_list.h"
 #include "ro/sim/world.h"
@@ -69,9 +70,14 @@ class ChatRoomStage {
   [[nodiscard]] ro::net::FrameOutcome ApplyFrame(const ro::net::Frame& frame, ro::sim::World& world,
                                                  const ro::vfs::ItemWords& words,
                                                  std::uint32_t now_ms);
-  // La parole qui, en salon, revient au salon. ⚠ AVANT LE MONDE.
+  // La parole qui, en salon, revient au salon, ses mots interdits masqués.
+  // ⚠ AVANT LE MONDE.
   [[nodiscard]] ro::net::FrameOutcome ClaimLine(const ro::net::Frame& frame,
                                                 const ro::sim::World& world, std::uint32_t now_ms);
+
+  // LES MOTS INTERDITS DE L'INSTALLATION : masqués dans la parole et le titre
+  // d'un salon, refusés dans le titre qu'on lui donne. Nuls : rien.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
 
   // LE RACCOURCI : il ouvre et referme le formulaire. ⚠ DANS UN SALON, il
   // montre la salle — c'est elle que le joueur cherchait, et le serveur
@@ -102,6 +108,7 @@ class ChatRoomStage {
   [[nodiscard]] std::vector<InterfaceSoundFile> TakeSounds() { return std::exchange(sounds_, {}); }
 
  private:
+  const ro::sim::BannedWords* banned_ = nullptr;
   enum class Asked : std::uint8_t { kNone, kToggle, kOpen };
 
   void FollowMake(ChatRoomWindows& windows, const ChatRoomContext& context);

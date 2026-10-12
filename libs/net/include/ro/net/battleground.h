@@ -6,6 +6,7 @@
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/entry_queue.h"
 #include "ro/sim/world_fwd.h"
 
@@ -24,8 +25,10 @@ namespace ro::net {
 
 // `ZC 0x02DC` (la parole, écrite dans la conversation avec sa bulle), `0x02DD`
 // (les camps), `0x02DE` (le score), `0x02DF` (les coéquipiers, nous exceptés)
-// et `0x0A0E` (la vie d'un coéquipier en vue).
+// et `0x0A0E` (la vie d'un coéquipier en vue). Les mots de `banned` se masquent
+// dans la parole ; nul, rien ne se masque.
 [[nodiscard]] FrameOutcome ApplyBattlefieldFrame(const Frame& frame, sim::World& world,
+                                                 const sim::BannedWords* banned,
                                                  std::uint32_t now_ms);
 
 // ── LES VERBES ──────────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdio>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -13,6 +14,7 @@
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
+#include "chat/banned_input.h"
 #include "game/game_pieces.h"
 #include "items/inventory_view.h"
 
@@ -490,8 +492,15 @@ void PetStage::Apply(const ro::ui::PetWindowAction& asked,
       Command(link, CommandOf(*asked.order));
     }
   }
-  if (asked.rename.has_value() && ro::sim::CheckPetName(ro::core::Cp1252FromUtf8(*asked.rename)) ==
-                                      ro::sim::PetNameRefusal::kNone) {
+  std::optional<std::string> banned_name;
+  if (asked.rename.has_value() && banned_ != nullptr) {
+    banned_name = BannedInputRefusal(*banned_, *asked.rename, BannedInput::kCompanionName);
+  }
+  if (banned_name.has_value()) {
+    window.status = std::move(*banned_name);
+    window.status_refused = true;
+  } else if (asked.rename.has_value() && ro::sim::CheckPetName(ro::core::Cp1252FromUtf8(
+                                             *asked.rename)) == ro::sim::PetNameRefusal::kNone) {
     if (const auto sent = ro::net::RequestPetRename(link, *asked.rename); sent) {
       pet_.Rename(*asked.rename);
     } else {

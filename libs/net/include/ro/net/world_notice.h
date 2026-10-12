@@ -47,6 +47,18 @@ struct BroadcastFilter {
 [[nodiscard]] FrameOutcome ApplyBroadcastFrame(const Frame& frame, sim::World& world,
                                                const BroadcastFilter& filter, std::uint32_t now_ms);
 
+// LA PAROLE DES JOUEURS — publique, son propre écho, groupe, guilde, clan —, ses
+// mots interdits masqués ; `kUnhandled` pour toute autre trame. `banned` nul :
+// rien ne se masque.
+//
+// ⚠ À APPELER AVANT `ApplyFrame` quand on tient la liste : le monde lit ces
+// paquets aussi, mais sans elle.
+//
+// ⚠ LE CHUCHOTEMENT N'EN EST PAS : il paraît tel quel dans la conversation, et
+// seule sa fenêtre 1:1 le masque.
+[[nodiscard]] FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world,
+                                            const sim::BannedWords* banned, std::uint32_t now_ms);
+
 // LE MOTIF D'UNE ÉVICTION (`SC_NOTIFY_BAN`), ou rien si cette trame n'en est pas
 // une. Le serveur coupe la liaison aussitôt après : c'est à `app` de fermer le
 // jeu en disant pourquoi — voir `BanText`.

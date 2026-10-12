@@ -645,7 +645,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
       answers.character,
       windows_.character.open && windows_.character.tab == ro::ui::CharacterTab::kTitles, link_,
       world_);
-  ApplyGuildAnswers(answers);
+  ApplyGuildAnswers(answers, now_ms);
   // MAJ + CLIC SUR UNE ENTRÉE OU UN ONGLET : son lien dans la saisie du chat.
   // ⚠ AVANT LE GROUPE, qui vide sa réponse en l'appliquant.
   if (const SettingDestination* const linked = AskedSettingLink(answers, windows_);
@@ -682,7 +682,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   FollowCatalogItem(answers.pet.link, now_ms);
   FollowCatalogItem(answers.pet_hatch.link, now_ms);
   pieces_.homunculus.Apply(answers.character.homunculus, link_, world_, now_ms,
-                           windows_.skill_description);
+                           windows_.skill_description, windows_.character.homunculus);
   pieces_.mercenary.Apply(answers.character.mercenary, link_, world_, now_ms,
                           windows_.skill_description);
   // LA FAIM DU PET ET DE L'HOMONCULE, au palier où ils perdent de l'intimité :
@@ -693,7 +693,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
       pieces_.item_toast->Announce(std::move(*hungry), now_ms);
     }
   }
-  ReportRefusal(pieces_.talkbox.Apply(answers.talkbox, link_));
+  ReportRefusal(pieces_.talkbox.Apply(answers.talkbox, link_, world_, now_ms));
   pieces_.companion_ai.ApplyTacticWindow(answers.companion_tactic, now_ms);
   // « Régler… » dans l'onglet d'un compagnon, puis ce que la fenêtre de l'IA a
   // demandé.
@@ -755,7 +755,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                                                .now_ms = now_ms});
   }
   settings_->TickDisplayRevert(OptionsTargets(), now_ms);
-  SendNpcAnswer(answers.npc, link_, world_);
+  SendNpcAnswer(answers.npc, link_, world_, &pieces_.banned_words, now_ms);
   // ⚠ APRÈS LA RÉPONSE, ET À PART D'ELLE : cliquer un lien dans une page n'est
   // pas répondre au PNJ, et les deux peuvent arriver dans la même image.
   FollowNpcDialogLink(answers.npc, now_ms);

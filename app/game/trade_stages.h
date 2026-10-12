@@ -44,6 +44,8 @@ class TradeStages {
   // Les propriétés d'item du serveur — poids, drapeau de buying store —, qui
   // laissent un commerce refuser avant lui. Même règle que les réglages : une
   // adresse donnée une fois.
+  // Les mots interdits de l'installation, qu'un titre d'échoppe éprouve.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
   void SeeItemProperties(const ro::vfs::ItemProperties* properties) noexcept {
     item_properties_ = properties;
   }
@@ -125,6 +127,7 @@ class TradeStages {
   TradeItems items_;
   const ro::sim::CommandSettings* commands_ = nullptr;
   const ro::vfs::ItemProperties* item_properties_ = nullptr;
+  const ro::sim::BannedWords* banned_ = nullptr;
   NpcShopStage npc_shop_;
   BarterStage barter_;
   BuyingStoreStage buying_store_;

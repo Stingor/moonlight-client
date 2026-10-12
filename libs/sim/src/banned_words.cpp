@@ -87,6 +87,23 @@ BannedWords BannedWords::FromMannerText(std::string_view bytes) {
   return BannedWords(std::move(words));
 }
 
+std::size_t BannedWords::SkipItemLink(std::string_view lower, std::size_t at) {
+  if (lower.compare(at, kItemLinkOpen.size(), kItemLinkOpen) != 0) {
+    return at;
+  }
+  const std::size_t close = lower.find(kItemLinkClose, at);
+  return close == std::string_view::npos ? at : close + kItemLinkClose.size();
+}
+
+const std::string* BannedWords::WordAt(std::string_view lower, std::size_t at) const {
+  for (const std::string& word : words_) {
+    if (lower.compare(at, word.size(), word) == 0) {
+      return &word;
+    }
+  }
+  return nullptr;
+}
+
 std::string BannedWords::Mask(std::string_view utf8_text) const {
   if (words_.empty()) {
     return std::string(utf8_text);
@@ -96,21 +113,10 @@ std::string BannedWords::Mask(std::string_view utf8_text) const {
   masked.reserve(utf8_text.size());
   std::size_t at = 0;
   while (at < utf8_text.size()) {
-    if (lower.compare(at, kItemLinkOpen.size(), kItemLinkOpen) == 0) {
-      if (const std::size_t close = lower.find(kItemLinkClose, at); close != std::string::npos) {
-        const std::size_t after = close + kItemLinkClose.size();
-        masked.append(utf8_text.substr(at, after - at));
-        at = after;
-      }
-    }
-    const std::string* found = nullptr;
-    for (const std::string& word : words_) {
-      if (lower.compare(at, word.size(), word) == 0) {
-        found = &word;
-        break;
-      }
-    }
-    if (found != nullptr) {
+    const std::size_t after_link = SkipItemLink(lower, at);
+    masked.append(utf8_text.substr(at, after_link - at));
+    at = after_link;
+    if (const std::string* found = WordAt(lower, at); found != nullptr) {
       masked.append(CodePointCount(*found), kMaskStar);
       at += found->size();
       continue;
@@ -124,6 +130,25 @@ std::string BannedWords::Mask(std::string_view utf8_text) const {
     at = next;
   }
   return masked;
+}
+
+bool BannedWords::Contains(std::string_view utf8_text) const {
+  if (words_.empty()) {
+    return false;
+  }
+  const std::string lower = core::AsciiLower(utf8_text);
+  std::size_t at = 0;
+  while (at < utf8_text.size()) {
+    at = SkipItemLink(lower, at);
+    if (WordAt(lower, at) != nullptr) {
+      return true;
+    }
+    if (at >= utf8_text.size()) {
+      break;
+    }
+    static_cast<void>(core::NextCodePoint(utf8_text, at));
+  }
+  return false;
 }
 
 }  // namespace ro::sim

@@ -254,6 +254,92 @@ FrameOutcome ApplyBroadcastFrame(const Frame& frame, sim::World& world,
   }
 }
 
+FrameOutcome ApplySpokenFrame(const Frame& frame, sim::World& world, const sim::BannedWords* banned,
+                              std::uint32_t now_ms) {
+  const auto masked = [banned](std::string text) {
+    return sim::BannedWords::MaskWith(banned, text);
+  };
+  switch (frame.opcode) {
+    case proto::ZcNotifyChat::kOpcode:
+      return Decoded<proto::ZcNotifyChat>(frame, [&](const auto& packet) {
+        // Ce que quelqu'un d'AUTRE a dit. Le serveur écrit le nom devant, et le
+        // garder rend la conversation lisible sans table de noms.
+        AuthoredText said = ReadAuthoredText(frame, packet.Message);
+        world.RecordChat(sim::ChatKind::kPublic, sim::ChatType::kPublicChat, packet.GID,
+                         masked(std::move(said.text)), now_ms, 0, std::move(said.author));
+        return FrameOutcome::kApplied;
+      });
+
+    case kPlayerChatOpcode:
+      return Decoded<proto::ZcNotifyPlayerchat>(frame, [&](const auto& packet) {
+        // Le même paquet porte deux choses : l'écho de sa propre parole, que le
+        // serveur préfixe du nom, et ce qu'il écrit au joueur, qui ne vient de
+        // personne. C'est le préfixe qui les sépare — et sans lui, une réponse
+        // de commande paraîtrait au-dessus de la tête du joueur.
+        //
+        // ⚠ LE PRÉFIXE SE RECONNAÎT AVANT LE MASQUE : un nom qui porte un mot
+        // interdit reste le nôtre.
+        const std::string said = core::Utf8FromWire(packet.Message);
+        const std::string prefix =
+            world.player_name() + std::string(proto::ChatRequest::kNameSeparator);
+        const bool mine = !world.player_name().empty() && said.starts_with(prefix);
+        // ⚠ LES DEUX SOUS LA CASE « CHAT PUBLIC » : c'est le paquet de la
+        // parole publique, et le client d'origine range ses deux usages ensemble.
+        world.RecordChat(mine ? sim::ChatKind::kSelf : sim::ChatKind::kServer,
+                         sim::ChatType::kPublicChat, mine ? world.player_id() : 0, masked(said),
+                         now_ms);
+        return FrameOutcome::kApplied;
+      });
+
+    case proto::ZcNotifyChatParty::kOpcode:
+      return Decoded<proto::ZcNotifyChatParty>(frame, [&](const auto& packet) {
+        // Le serveur écrit le nom du camarade DEVANT son texte, comme pour la
+        // parole publique : la ligne se lit sans table de noms.
+        const auto speaker_id = static_cast<std::uint32_t>(packet.AID);
+        const bool mine = speaker_id != 0 && speaker_id == world.player_id();
+        AuthoredText said = ReadAuthoredText(frame, packet.chatMsg);
+        world.RecordChat(sim::ChatKind::kParty, sim::ChatType::kPartyChat, speaker_id,
+                         masked(std::move(said.text)), now_ms, mine ? kOwnPartySpeechColor : 0,
+                         std::move(said.author));
+        return FrameOutcome::kApplied;
+      });
+
+    case proto::ZcGuildChat::kOpcode:
+      return Decoded<proto::ZcGuildChat>(frame, [&](const auto& packet) {
+        // ⚠ CELUI-CI NE NOMME PERSONNE DU TOUT : pas d'identifiant, pas de champ
+        // de nom. L'auteur est dans le texte, ou dans la trame qui le précède.
+        //
+        // ⚠ L'ORATEUR RESTE ZÉRO MÊME QUAND L'AUTEUR EST CONNU : la parole de
+        // guilde ne met pas de bulle au-dessus d'une tête.
+        AuthoredText said = ReadAuthoredText(frame, packet.message);
+        world.RecordChat(sim::ChatKind::kGuild, sim::ChatType::kGuildChat, 0,
+                         masked(std::move(said.text)), now_ms, 0, std::move(said.author));
+        return FrameOutcome::kApplied;
+      });
+
+    case proto::ZcNotifyClanChat::kOpcode:
+      return Decoded<proto::ZcNotifyClanChat>(frame, [&](const auto& packet) {
+        // LE CLAN, QUI N'EST PAS LA GUILDE : on y entre par sa classe, et un
+        // personnage peut tenir les deux à la fois — les mêler donnerait un
+        // onglet « Guilde » qui montre les paroles d'un groupe qu'on n'a pas
+        // choisi.
+        //
+        // ⚠ SON CHAMP DE NOM EST VIDE, ET C'EST VOULU CÔTÉ SERVEUR : « le nom de
+        // l'émetteur devrait aussi être rempli ici, mais le client ne le demande
+        // pas, et comme il est aussi dans le message nous ne le remplissons
+        // pas » (clif_clan_message). L'auteur est donc dans le texte, ou dans
+        // la trame qui le précède, comme pour la guilde.
+        AuthoredText said = ReadAuthoredText(frame, packet.Message);
+        world.RecordChat(sim::ChatKind::kClan, sim::ChatType::kClanChat, 0,
+                         masked(std::move(said.text)), now_ms, 0, std::move(said.author));
+        return FrameOutcome::kApplied;
+      });
+
+    default:
+      return FrameOutcome::kUnhandled;
+  }
+}
+
 FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32_t now_ms) {
   switch (frame.opcode) {
     case proto::ZcEmotion::kOpcode:
@@ -288,31 +374,13 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
       });
 
     case proto::ZcNotifyChat::kOpcode:
-      return Decoded<proto::ZcNotifyChat>(frame, [&frame, &world, now_ms](const auto& packet) {
-        // Ce que quelqu'un d'AUTRE a dit. Le serveur écrit le nom devant, et le
-        // garder rend la conversation lisible sans table de noms.
-        AuthoredText said = ReadAuthoredText(frame, packet.Message);
-        world.RecordChat(sim::ChatKind::kPublic, sim::ChatType::kPublicChat, packet.GID,
-                         std::move(said.text), now_ms, 0, std::move(said.author));
-        return FrameOutcome::kApplied;
-      });
-
     case kPlayerChatOpcode:
-      return Decoded<proto::ZcNotifyPlayerchat>(frame, [&world, now_ms](const auto& packet) {
-        // Le même paquet porte deux choses : l'écho de sa propre parole, que le
-        // serveur préfixe du nom, et ce qu'il écrit au joueur, qui ne vient de
-        // personne. C'est le préfixe qui les sépare — et sans lui, une réponse
-        // de commande paraîtrait au-dessus de la tête du joueur.
-        const std::string said = core::Utf8FromWire(packet.Message);
-        const std::string prefix =
-            world.player_name() + std::string(proto::ChatRequest::kNameSeparator);
-        const bool mine = !world.player_name().empty() && said.starts_with(prefix);
-        // ⚠ LES DEUX SOUS LA CASE « CHAT PUBLIC » : c'est le paquet de la
-        // parole publique, et le client d'origine range ses deux usages ensemble.
-        world.RecordChat(mine ? sim::ChatKind::kSelf : sim::ChatKind::kServer,
-                         sim::ChatType::kPublicChat, mine ? world.player_id() : 0, said, now_ms);
-        return FrameOutcome::kApplied;
-      });
+    case proto::ZcNotifyChatParty::kOpcode:
+    case proto::ZcGuildChat::kOpcode:
+    case proto::ZcNotifyClanChat::kOpcode:
+      // ⚠ SANS LISTE : rien ne se masque. La partie lit ces paquets AVANT le
+      // monde, avec les mots interdits de l'installation.
+      return ApplySpokenFrame(frame, world, nullptr, now_ms);
 
     case proto::ZcBroadcast::kOpcode:
     case proto::ZcBroadcast2::kOpcode:
@@ -326,32 +394,6 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
       // aucun envoi. La partie lit ces deux paquets AVANT le monde, avec ses amis
       // et sa file d'envois — voir `ro/net/whisper.h`.
       return ApplyWhisperFrame(frame, world, WhisperCircle{}, now_ms);
-
-    case proto::ZcNotifyChatParty::kOpcode:
-      return Decoded<proto::ZcNotifyChatParty>(frame, [&frame, &world, now_ms](const auto& packet) {
-        // Le serveur écrit le nom du camarade DEVANT son texte, comme pour la
-        // parole publique : la ligne se lit sans table de noms.
-        const auto speaker_id = static_cast<std::uint32_t>(packet.AID);
-        const bool mine = speaker_id != 0 && speaker_id == world.player_id();
-        AuthoredText said = ReadAuthoredText(frame, packet.chatMsg);
-        world.RecordChat(sim::ChatKind::kParty, sim::ChatType::kPartyChat, speaker_id,
-                         std::move(said.text), now_ms, mine ? kOwnPartySpeechColor : 0,
-                         std::move(said.author));
-        return FrameOutcome::kApplied;
-      });
-
-    case proto::ZcGuildChat::kOpcode:
-      return Decoded<proto::ZcGuildChat>(frame, [&frame, &world, now_ms](const auto& packet) {
-        // ⚠ CELUI-CI NE NOMME PERSONNE DU TOUT : pas d'identifiant, pas de champ
-        // de nom. L'auteur est dans le texte, ou dans la trame qui le précède.
-        //
-        // ⚠ L'ORATEUR RESTE ZÉRO MÊME QUAND L'AUTEUR EST CONNU : la parole de
-        // guilde ne met pas de bulle au-dessus d'une tête.
-        AuthoredText said = ReadAuthoredText(frame, packet.message);
-        world.RecordChat(sim::ChatKind::kGuild, sim::ChatType::kGuildChat, 0, std::move(said.text),
-                         now_ms, 0, std::move(said.author));
-        return FrameOutcome::kApplied;
-      });
 
     case proto::ColoredNotice::kOpcode:
       return Decoded<proto::ColoredNotice>(frame, [&frame, &world, now_ms](const auto& packet) {
@@ -382,24 +424,6 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
         world.RecordChat(mine ? sim::ChatKind::kServer : sim::ChatKind::kPublic,
                          sim::ChatType::kPublic, mine ? 0 : packet.speaker_id, said, now_ms,
                          packet.color);
-        return FrameOutcome::kApplied;
-      });
-
-    case proto::ZcNotifyClanChat::kOpcode:
-      return Decoded<proto::ZcNotifyClanChat>(frame, [&frame, &world, now_ms](const auto& packet) {
-        // LE CLAN, QUI N'EST PAS LA GUILDE : on y entre par sa classe, et un
-        // personnage peut tenir les deux à la fois — les mêler donnerait un
-        // onglet « Guilde » qui montre les paroles d'un groupe qu'on n'a pas
-        // choisi.
-        //
-        // ⚠ SON CHAMP DE NOM EST VIDE, ET C'EST VOULU CÔTÉ SERVEUR : « le nom de
-        // l'émetteur devrait aussi être rempli ici, mais le client ne le demande
-        // pas, et comme il est aussi dans le message nous ne le remplissons
-        // pas » (clif_clan_message). L'auteur est donc dans le texte, ou dans
-        // la trame qui le précède, comme pour la guilde.
-        AuthoredText said = ReadAuthoredText(frame, packet.Message);
-        world.RecordChat(sim::ChatKind::kClan, sim::ChatType::kClanChat, 0, std::move(said.text),
-                         now_ms, 0, std::move(said.author));
         return FrameOutcome::kApplied;
       });
 

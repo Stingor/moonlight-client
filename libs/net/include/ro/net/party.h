@@ -6,6 +6,7 @@
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/party_roster.h"
 
 namespace ro::net {
@@ -24,6 +25,12 @@ namespace ro::net {
 //
 // ⚠ `now_ms` EST L'HORLOGE DE L'APPELANT : elle date le PS d'un membre, que le
 // serveur ne donne que sur demande. Sans horloge, la réponse n'est pas lue.
+//
+// LES MOTS INTERDITS de `banned` se masquent dans le nom du groupe — le sien,
+// et celui du groupe qui invite. Sans liste, rien ne se masque.
+[[nodiscard]] FrameOutcome ApplyPartyFrame(const Frame& frame, sim::PartyRoster& party,
+                                           std::uint32_t own_account_id, std::uint32_t now_ms,
+                                           const sim::BannedWords* banned);
 [[nodiscard]] FrameOutcome ApplyPartyFrame(const Frame& frame, sim::PartyRoster& party,
                                            std::uint32_t own_account_id, std::uint32_t now_ms);
 [[nodiscard]] FrameOutcome ApplyPartyFrame(const Frame& frame, sim::PartyRoster& party,

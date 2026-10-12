@@ -14,6 +14,7 @@
 #include "ro/render/cursor.h"
 #include "ro/render/screen_overlay.h"
 #include "ro/sim/bank.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/character_create_window.h"
 #include "ro/ui/character_delete_window.h"
@@ -242,6 +243,10 @@ class LobbyScreen : public Screen {
   web::SystemSecretStore web_vault_;
   ro::ui::CharacterSelectState seats_;
   ro::ui::CharacterCreateState newcomer_;
+  // LES MOTS INTERDITS, relus à l'ouverture du formulaire, et le refus qu'ils
+  // ont valu au dernier nom proposé : le nom ne part pas, la fenêtre le dit.
+  ro::sim::BannedWords newcomer_banned_;
+  std::string newcomer_refusal_;
   // Ce que la fenêtre de création a demandé à l'image PRÉCÉDENTE : la tranche
   // de grille visible et la boîte du pantin, que `app` compose ensuite. Voir
   // `CreatePickerRequest`.

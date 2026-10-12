@@ -1,14 +1,19 @@
 #include "world/npc_talk.h"
 
+#include <optional>
+#include <string>
+
 #include "ro/net/npc_dialog.h"
 #include "ro/sim/world.h"
 
+#include "chat/banned_input.h"
 #include "world/click_action.h"
 
 namespace moonclient {
 
 void SendNpcAnswer(const ro::ui::NpcDialogAnswer& answer, ro::net::Connection& link,
-                   ro::sim::World& world) {
+                   ro::sim::World& world, const ro::sim::BannedWords* banned,
+                   std::uint32_t now_ms) {
   switch (answer.intent) {
     case ro::ui::NpcDialogIntent::kNext:
       ReportRefusal(ro::net::AnswerNpcNext(link, world));
@@ -20,6 +25,15 @@ void SendNpcAnswer(const ro::ui::NpcDialogAnswer& answer, ro::net::Connection& l
       ReportRefusal(ro::net::AnswerNpcNumber(link, world, answer.number));
       return;
     case ro::ui::NpcDialogIntent::kText:
+      if (banned != nullptr) {
+        if (const std::optional<std::string> refused =
+                BannedInputRefusal(*banned, answer.text, BannedInput::kSentence);
+            refused.has_value()) {
+          world.RecordChat(ro::sim::ChatKind::kServer, 0, *refused, now_ms,
+                           BannedInputColor(BannedInput::kSentence));
+          return;
+        }
+      }
       ReportRefusal(ro::net::AnswerNpcText(link, world, answer.text));
       return;
     case ro::ui::NpcDialogIntent::kClose:

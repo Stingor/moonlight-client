@@ -239,22 +239,12 @@ ro::net::FrameOutcome WhisperStage::ApplyFrame(const ro::net::Frame& frame, ro::
            (block_memory_.has_value() &&
             std::ranges::find(block_memory_->names(), name) != block_memory_->names().end());
   };
-  return ro::net::ApplyBroadcastFrame(
-      frame, world, ro::net::BroadcastFilter{.ignores = ignores, .banned = &banned_words_}, now_ms);
-}
-
-void WhisperStage::LoadBannedWords(ro::vfs::Vfs* vfs) {
-  banned_words_ = ro::sim::BannedWords{};
-  if (vfs == nullptr) {
-    return;
+  const ro::net::FrameOutcome announced = ro::net::ApplyBroadcastFrame(
+      frame, world, ro::net::BroadcastFilter{.ignores = ignores, .banned = banned_}, now_ms);
+  if (announced != ro::net::FrameOutcome::kUnhandled) {
+    return announced;
   }
-  auto bytes = vfs->Read(ro::sim::kBannedWordsPath);
-  if (!bytes) {
-    // ⚠ SANS FICHIER, RIEN NE SE MASQUE : le client d'origine fait de même.
-    return;
-  }
-  banned_words_ = ro::sim::BannedWords::FromMannerText(
-      std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
+  return ro::net::ApplySpokenFrame(frame, world, banned_, now_ms);
 }
 
 void WhisperStage::Open(std::string_view peer) {
@@ -392,10 +382,11 @@ void WhisperStage::Send(std::string_view peer, std::string text, const WhisperCo
     return;
   }
   // 🔴 LA CIBLE EST FIGÉE : la phrase part à ce correspondant, telle quelle —
-  // un « % » en tête n'en fait pas une parole de groupe.
+  // un « % » en tête n'en fait pas une parole de groupe. ⚠ SES MOTS INTERDITS
+  // MASQUÉS : la phrase part quand même.
   const ro::net::ChatIntent intent{.target = ro::net::ChatTarget::kWhisper,
                                    .recipient = std::string(peer),
-                                   .text = std::move(text)};
+                                   .text = ro::sim::BannedWords::MaskWith(banned_, text)};
   const ro::core::Result<void> sent =
       ro::net::SendChat(context.link, context.world.player_name(), intent);
   if (sent) {

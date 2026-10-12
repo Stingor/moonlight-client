@@ -28,6 +28,7 @@
 #include "ro/render/sprite_renderer.h"
 #include "ro/render/title_table.h"
 #include "ro/sim/actor.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/packed_position.h"
 #include "ro/sim/party_roster.h"
 #include "ro/sim/world_fwd.h"
@@ -147,7 +148,7 @@ inline constexpr int kNameFontPixels = 12;
     const std::optional<ro::ui::ScreenBand>& bars_under_feet,
     const ro::render::EntityNamesLook& names, const ro::render::BossBadges& badges,
     const ro::formats::Image* emblem, float viewport_width, float viewport_height,
-    std::string_view name = {});
+    const ro::sim::BannedWords* banned, std::string_view name = {});
 
 // Les enseignes des acteurs dessinés : l'échoppe qu'ils tiennent, le salon
 // qu'ils ont ouvert. Chacune au-dessus du sien, dans la surface que `surfaces`
@@ -159,6 +160,8 @@ inline constexpr int kNameFontPixels = 12;
 // `spotlit_owner_id` désigne le marchand du dernier résultat cliqué dans la
 // recherche d'échoppes : son enseigne se peint en jaune pâle. Zéro : aucune.
 //
+// Les mots de `banned` se masquent dans les titres ; nul, rien ne se masque.
+//
 // `hits`, s'il est donné, reçoit le cadre de chaque enseigne peinte, dans
 // l'ordre de la peinture : c'est ce qu'un clic vise. Voir `SignboardHit`.
 [[nodiscard]] std::vector<ro::render::ScreenQuad> DrawnSignboards(
@@ -167,7 +170,8 @@ inline constexpr int kNameFontPixels = 12;
     const ro::sim::World& world, const ro::sim::PartyRoster& party,
     const ro::render::FontAtlas& font, const ro::render::SignboardSurfaces& surfaces,
     const ro::ui::EntityBarsLook& bars, bool shops_shown, std::uint32_t spotlit_owner_id,
-    float viewport_width, float viewport_height, std::vector<SignboardHit>* hits = nullptr);
+    float viewport_width, float viewport_height, const ro::sim::BannedWords* banned,
+    std::vector<SignboardHit>* hits = nullptr);
 
 // ⚠ LES JAUGES DE VIE NE SONT PLUS ICI. Elles se règlent espèce par espèce et
 // écrivent parfois leurs nombres : elles sont donc passées en ImGui, où vit la

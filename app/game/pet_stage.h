@@ -11,6 +11,7 @@
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
 #include "ro/proto/pet_packets.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/hunger_alarm.h"
 #include "ro/sim/pet.h"
 #include "ro/sim/world.h"
@@ -48,6 +49,9 @@ class PetStage {
   void Apply(const ro::ui::PetWindowAction& asked, const ro::ui::PetHatchWindowAction& hatched,
              ro::ui::PetWindowState& window, ro::net::Connection& link, ro::sim::World& world,
              std::uint32_t now_ms);
+  // Les mots interdits de l'installation : un nouveau nom qui en porte un ne
+  // part pas, et le refus s'écrit dans la fenêtre.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
 
   // UNE PARTIE NEUVE : le familier du personnage d'avant est oublié.
   //
@@ -113,6 +117,7 @@ class PetStage {
                     ro::ui::PetHatchWindowView& view) const;
 
   ro::sim::Pet pet_;
+  const ro::sim::BannedWords* banned_ = nullptr;
   // Lues au premier besoin ; vides si l'installation ne les porte pas.
   std::optional<ro::vfs::PetTables> tables_;
   bool tables_tried_ = false;

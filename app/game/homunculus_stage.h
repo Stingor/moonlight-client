@@ -11,6 +11,7 @@
 
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/homunculus.h"
 #include "ro/sim/hunger_alarm.h"
 #include "ro/sim/world.h"
@@ -38,10 +39,13 @@ class HomunculusStage {
   [[nodiscard]] const ro::ui::HomunculusTabView& view() const noexcept { return view_; }
 
   // Ce que l'onglet a demandé, mis sur le fil. Une description demandée ouvre
-  // la fenêtre des compétences.
+  // la fenêtre des compétences. 🔴 UN NOM QUI PORTE UN MOT INTERDIT NE PART
+  // PAS : le refus s'écrit dans l'onglet `tab`.
   void Apply(const ro::ui::HomunculusTabAction& asked, ro::net::Connection& link,
              ro::sim::World& world, std::uint32_t now_ms,
-             ro::ui::SkillDescriptionWindowState& description);
+             ro::ui::SkillDescriptionWindowState& description, ro::ui::HomunculusTabState& tab);
+  // Les mots interdits de l'installation, qu'un nouveau nom éprouve.
+  void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
 
   // ── POUR LE MENU D'ENTITÉ ET LES RACCOURCIS ───────────────────────────────
   //
@@ -88,6 +92,7 @@ class HomunculusStage {
                         const ro::sim::World& world);
 
   ro::sim::Homunculus homunculus_;
+  const ro::sim::BannedWords* banned_ = nullptr;
   // Le personnage dont l'homoncule est suivi.
   std::string owner_name_;
   // Le nom de ressource de l'espèce, relu quand l'acteur change de classe.

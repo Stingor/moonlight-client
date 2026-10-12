@@ -8,6 +8,7 @@
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/guild.h"
 #include "ro/sim/world_fwd.h"
 
@@ -24,6 +25,14 @@ namespace ro::net {
 // ⚠ `own_char_id` EST LE PERSONNAGE JOUÉ. Le départ et l'expulsion d'un membre
 // sont rediffusés à toute la guilde sous le numéro du personnage concerné :
 // quand c'est le nôtre, c'est NOUS qui partons, et le carnet se vide.
+//
+// LES MOTS INTERDITS de `banned` se masquent dans ce que le client d'origine
+// masque : le nom de la guilde, son avis, les noms de ses postes, ceux des
+// guildes alliées ou ennemies, et celui de la guilde qui invite ou propose une
+// alliance. Sans liste, rien ne se masque.
+[[nodiscard]] FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild,
+                                           std::uint32_t own_char_id,
+                                           const sim::BannedWords* banned);
 [[nodiscard]] FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild,
                                            std::uint32_t own_char_id);
 

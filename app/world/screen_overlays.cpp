@@ -113,7 +113,7 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
         DrawnSignboards(camera, aspect_ratio, actors.drawn, actors.ids, world, party, *font,
                         pieces.signboards, what.entity_bars, what.shop_signboards_shown,
                         pieces.trade.store_search().spotlit_owner_aid(), viewport_width,
-                        viewport_height, &pieces.trade.signboards());
+                        viewport_height, &pieces.banned_words, &pieces.trade.signboards());
     pieces.overlay.Draw(boards, viewport_width, viewport_height);
   }
 
@@ -205,7 +205,7 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
       const std::vector<ro::render::ScreenQuad> one =
           DrawnName(*name_font, camera, aspect_ratio, actors.drawn[rank], *actor, titles, world,
                     BarsUnderFeetOf(what, actor->id), what.entity_names, pieces.boss_badges, emblem,
-                    viewport_width, viewport_height, item_name);
+                    viewport_width, viewport_height, &pieces.banned_words, item_name);
       names.insert(names.end(), one.begin(), one.end());
     }
     pieces.overlay.Draw(names, viewport_width, viewport_height);

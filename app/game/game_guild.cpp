@@ -4,11 +4,15 @@
 // rafraîchir avant le dessin, appliquer après.
 
 #include <algorithm>
+#include <optional>
+#include <string>
+#include <utility>
 
 #include "ro/core/log.h"
 #include "ro/formats/assist_address.h"
 #include "ro/net/guild.h"
 
+#include "chat/banned_input.h"
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/save_folder.h"
@@ -75,11 +79,30 @@ void Game::RefreshGuild(std::uint32_t now_ms) {
                         shown, now_ms);
 }
 
-void Game::ApplyGuildAnswers(const UiStage::Answers& answers) {
+void Game::ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_ms) {
   const GuildPlayer player{.account_id = world_.player_id(), .char_id = ticket_.character_id};
-  const GuildElsewhere elsewhere =
-      guild_panel_->Apply(answers.character.guild, windows_.character.guild, guild_book_, world_,
-                          *guild_emblems_, link_, player);
+  // 🔴 UN NOM DE GUILDE OU UN AVIS QUI PORTE UN MOT INTERDIT NE PART PAS : le
+  // refus s'écrit dans la conversation, et l'onglet ne voit rien partir. L'avis
+  // s'éprouve par son objet, puis par son corps.
+  ro::ui::GuildAction asked = answers.character.guild;
+  std::optional<std::string> refused;
+  BannedInput input = BannedInput::kGuildName;
+  if (asked.verb == ro::ui::GuildVerb::kCreate) {
+    refused = BannedInputRefusal(pieces_.banned_words, asked.text, input);
+  } else if (asked.verb == ro::ui::GuildVerb::kSaveNotice) {
+    input = BannedInput::kSentence;
+    refused = BannedInputRefusal(pieces_.banned_words, asked.subject, input);
+    if (!refused.has_value()) {
+      refused = BannedInputRefusal(pieces_.banned_words, asked.body, input);
+    }
+  }
+  if (refused.has_value()) {
+    world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(*refused), now_ms,
+                      BannedInputColor(input));
+    asked.verb = ro::ui::GuildVerb::kNothing;
+  }
+  const GuildElsewhere elsewhere = guild_panel_->Apply(asked, windows_.character.guild, guild_book_,
+                                                       world_, *guild_emblems_, link_, player);
   // CHUCHOTER : le nom part dans la case du destinataire, et le clavier dans la
   // phrase — comme un lien qu'on vient de poser, la barre se déplie.
   if (!elsewhere.whisper_to.empty()) {

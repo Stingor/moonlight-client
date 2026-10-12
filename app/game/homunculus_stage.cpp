@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -15,6 +16,7 @@
 #include "ro/net/skill.h"
 #include "ro/render/sprite_catalog.h"
 
+#include "chat/banned_input.h"
 #include "game/game_pieces.h"
 #include "game/homunculus_staff_words.h"
 
@@ -225,7 +227,8 @@ void HomunculusStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
 
 void HomunculusStage::Apply(const ro::ui::HomunculusTabAction& asked, ro::net::Connection& link,
                             ro::sim::World& world, std::uint32_t now_ms,
-                            ro::ui::SkillDescriptionWindowState& description) {
+                            ro::ui::SkillDescriptionWindowState& description,
+                            ro::ui::HomunculusTabState& tab) {
   // LA FAIM QUI DESCEND AU PALIER où il perd de l'intimité : le bandeau le dit.
   const ro::sim::HomunculusSheet& sheet = homunculus_.sheet();
   if (hunger_alarm_.Observe(homunculus_.present() && homunculus_.sheet_known(), sheet.hunger)) {
@@ -243,6 +246,14 @@ void HomunculusStage::Apply(const ro::ui::HomunculusTabAction& asked, ro::net::C
     case ro::ui::HomunculusVerb::kDeclineAiProposal:
       break;
     case ro::ui::HomunculusVerb::kRename:
+      if (banned_ != nullptr) {
+        if (std::optional<std::string> refused =
+                BannedInputRefusal(*banned_, asked.name, BannedInput::kCompanionName);
+            refused.has_value()) {
+          tab.status = std::move(*refused);
+          break;
+        }
+      }
       Complain(ro::net::RequestHomunculusRename(link, asked.name), "renommage");
       break;
     case ro::ui::HomunculusVerb::kFeed:

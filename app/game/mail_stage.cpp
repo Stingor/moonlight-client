@@ -6,6 +6,8 @@
 #include <array>
 #include <chrono>
 #include <initializer_list>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -15,6 +17,7 @@
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
 
+#include "chat/banned_input.h"
 #include "game/mail_bug_report.h"
 #include "items/inventory_view.h"
 
@@ -389,6 +392,18 @@ void MailStage::Send(const ro::ui::MailComposeSend& send, const TradeContext& co
       fault != ro::sim::MailSendFault::kNone) {
     compose_error_ = SendFaultText(fault);
     return;
+  }
+  // 🔴 L'OBJET PUIS LE CORPS : l'un ou l'autre qui porte un mot interdit, et
+  // le courrier ne part pas.
+  if (context.banned != nullptr) {
+    for (const std::string& typed : {send.subject, send.message}) {
+      if (std::optional<std::string> refused =
+              BannedInputRefusal(*context.banned, typed, BannedInput::kMail);
+          refused.has_value()) {
+        compose_error_ = std::move(*refused);
+        return;
+      }
+    }
   }
   const bool carried = mailbox_.attachment_count() > 0;
   if (auto sent = ro::net::RequestSendMail(context.link, mailbox_, fields, send.zeny, purse,

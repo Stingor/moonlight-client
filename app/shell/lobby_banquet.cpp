@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <ctime>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -22,6 +23,7 @@
 
 #include "character/character_styles.h"
 #include "character/recent_characters.h"
+#include "chat/banned_input.h"
 #include "shell/lobby_screen.h"
 
 namespace moonclient {
@@ -126,11 +128,14 @@ void LobbyScreen::OpenCreate(int slot) {
   // modifiable.
   newcomer_.sex = flow_.account().sex <= 1 ? flow_.account().sex : 1;
   newcomer_asked_ = ro::ui::CharacterCreateAction{};
+  newcomer_banned_ = LoadBannedWords(&shell_.vfs());
+  newcomer_refusal_.clear();
   flow_.ForgetCreation();
 }
 
 void LobbyScreen::CloseCreate() {
   newcomer_ = ro::ui::CharacterCreateState{};
+  newcomer_refusal_.clear();
   newcomer_asked_ = ro::ui::CharacterCreateAction{};
   if (newcomer_dolls_.has_value()) {
     newcomer_dolls_->Close();
@@ -221,6 +226,9 @@ ro::ui::CharacterCreateView LobbyScreen::ComposeNewcomer(const ro::ui::Character
   if (flow_.creation() == ro::net::CreationState::kRefused) {
     view.refusal = flow_.creation_refusal();
   }
+  if (!newcomer_refusal_.empty()) {
+    view.refusal = newcomer_refusal_;
+  }
   return view;
 }
 
@@ -244,6 +252,15 @@ void LobbyScreen::RouteCreate(const ro::ui::CharacterCreateAction& asked) {
     case ro::ui::CharacterCreateVerb::kNothing:
       break;
     case ro::ui::CharacterCreateVerb::kSubmit: {
+      // 🔴 UN NOM QUI PORTE UN MOT INTERDIT NE PART PAS : le client le refuse
+      // lui-même, et le serveur n'en entend rien.
+      if (std::optional<std::string> refused = BannedInputRefusal(
+              newcomer_banned_, newcomer_.name.data(), BannedInput::kCharacterName);
+          refused.has_value()) {
+        newcomer_refusal_ = std::move(*refused);
+        break;
+      }
+      newcomer_refusal_.clear();
       ro::net::CharacterDraft draft;
       // ⚠ LE NOM REPART DANS LA PAGE DE CODE DU SERVEUR : la saisie d'ImGui est
       // en UTF-8, et le fil ne l'est pas. Sans cette conversion, un accent

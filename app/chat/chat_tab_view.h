@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "ro/sim/banned_words.h"
 #include "ro/sim/chat_line.h"
 #include "ro/ui/chat_window.h"
 #include "ro/vfs/item_table.h"
@@ -180,6 +181,11 @@ class ChatTabsView {
   // Ce qu'une conversation 1:1 a pris ne paraît plus dans le fil. Nul : rien
   // n'est pris.
   void SeesConversations(const WhisperDesk* desk) noexcept { desk_ = desk; }
+  // LES MOTS INTERDITS, masqués dans la phrase d'une conversation 1:1 — et là
+  // seulement : un chuchotement paraît tel quel dans le fil. Nul : rien.
+  void MasksConversations(const ro::sim::BannedWords* banned) noexcept {
+    conversation_banned_ = banned;
+  }
   // Le nom du personnage joué, en tête de ce qu'on a dit dans une conversation.
   void SeesOwnName(std::string_view own) { own_name_ = own; }
   // CE QUE LE MENU D'UN PSEUDO REFUSE D'AVANCE, demandé une fois par nom et par
@@ -390,6 +396,7 @@ class ChatTabsView {
   // même raison que `shown_` : les vues sont rendues par span.
   std::map<std::string, GroupViews, std::less<>> whisper_views_;
   const WhisperDesk* desk_ = nullptr;
+  const ro::sim::BannedWords* conversation_banned_ = nullptr;
   std::string own_name_;
   std::function<ro::ui::PlayerLinkRefusals(std::string_view)> judge_;
   MvpLinkClock mvp_clock_;

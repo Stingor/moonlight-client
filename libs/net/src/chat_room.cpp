@@ -146,7 +146,7 @@ FrameOutcome ApplyChatRoomFrame(const Frame& frame, sim::ChatRoom& room, sim::Wo
 }
 
 FrameOutcome ClaimChatRoomLine(const Frame& frame, sim::ChatRoom& room, const sim::World& world,
-                               std::uint32_t now_ms) {
+                               const sim::BannedWords* banned, std::uint32_t now_ms) {
   if (!room.in_room()) {
     return FrameOutcome::kUnhandled;
   }
@@ -154,8 +154,9 @@ FrameOutcome ClaimChatRoomLine(const Frame& frame, sim::ChatRoom& room, const si
     case proto::ZcNotifyChat::kOpcode:
       return Decoded<proto::ZcNotifyChat>(frame, [&](const auto& packet) {
         AuthoredText said = ReadAuthoredText(frame, packet.Message);
-        room.RecordLine(sim::ChatKind::kPublic, packet.GID, std::move(said.text),
-                        kChatRoomSpeechColor, now_ms, std::move(said.author));
+        room.RecordLine(sim::ChatKind::kPublic, packet.GID,
+                        sim::BannedWords::MaskWith(banned, said.text), kChatRoomSpeechColor, now_ms,
+                        std::move(said.author));
         return FrameOutcome::kApplied;
       });
 
@@ -166,8 +167,8 @@ FrameOutcome ClaimChatRoomLine(const Frame& frame, sim::ChatRoom& room, const si
             world.player_name() + std::string(proto::ChatRequest::kNameSeparator);
         const bool mine = !world.player_name().empty() && said.starts_with(prefix);
         room.RecordLine(mine ? sim::ChatKind::kSelf : sim::ChatKind::kServer,
-                        mine ? world.player_id() : 0, std::move(said), kChatRoomOwnSpeechColor,
-                        now_ms);
+                        mine ? world.player_id() : 0, sim::BannedWords::MaskWith(banned, said),
+                        kChatRoomOwnSpeechColor, now_ms);
         return FrameOutcome::kApplied;
       });
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <span>
 #include <string>
 #include <string_view>
@@ -55,7 +56,23 @@ class BannedWords {
   // fermante.
   [[nodiscard]] std::string Mask(std::string_view utf8_text) const;
 
+  // LE TEXTE PORTE-T-IL UN MOT INTERDIT ? Même lecture que `Mask` — mêmes
+  // positions, même lien d'objet sauté. C'est l'épreuve d'une SAISIE : un nom
+  // ou un titre qui en porte un ne se masque pas, il se refuse.
+  [[nodiscard]] bool Contains(std::string_view utf8_text) const;
+
+  // LE TEXTE MASQUÉ, ou tel quel sans liste : la forme du masque à un étage
+  // qui peut ne pas en tenir.
+  [[nodiscard]] static std::string MaskWith(const BannedWords* banned, std::string_view utf8_text) {
+    return banned == nullptr ? std::string(utf8_text) : banned->Mask(utf8_text);
+  }
+
  private:
+  // Après le lien d'objet qui ouvre `at` dans le texte abaissé, ou `at`.
+  [[nodiscard]] static std::size_t SkipItemLink(std::string_view lower, std::size_t at);
+  // Le premier mot de la liste qui commence à `at`, ou nul.
+  [[nodiscard]] const std::string* WordAt(std::string_view lower, std::size_t at) const;
+
   std::vector<std::string> words_;
 };
 

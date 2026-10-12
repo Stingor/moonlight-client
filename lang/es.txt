@@ -1350,6 +1350,9 @@ tr: Esa es tu propia guild.
 fr: Ce joueur est protégé contre les signalements.
 tr: Este jugador está protegido contra las denuncias.
 
+fr: Ce nom n'est pas disponible.
+tr: Este nombre no está disponible.
+
 fr: Cible introuvable...
 tr: Objetivo no encontrado...
 
@@ -2035,6 +2038,9 @@ tr: Archivo no encontrado en savedata.
 fr: File du champ de bataille
 tr: Cola del campo de batalla
 
+fr: Filtre de discussion : non, ça ne passera pas.
+tr: Filtro de chat: no, eso no va a pasar.
+
 fr: Filtrer : nom ou carte
 tr: Filtrar: nombre o mapa
 
@@ -2049,6 +2055,9 @@ tr: Arrastra para mover · Clic derecho: devolver al cuaderno
 
 fr: Glisser une ligne du carnet par sa poignée, à gauche, et la lâcher HORS de la fenêtre : elle reste à l'écran et survit à la fermeture du carnet. Les lignes s'aimantent entre elles. Clic droit sur une ligne pour la remettre au carnet.
 tr: Arrastra una fila del cuaderno por su asa, a la izquierda, y suéltala FUERA de la ventana: se queda en pantalla y sobrevive al cierre del cuaderno. Las líneas se imantan entre sí. Clic derecho en una línea para devolverla al cuaderno.
+
+fr: Grossièreté détectée.\nVérifiez votre texte.
+tr: Grosería detectada.\nRevisa tu texto.
 
 fr: Groupe « %s » — %d membres###mvp_group
 tr: Grupo "%s" — %d miembros###mvp_group
@@ -2250,6 +2259,9 @@ tr: La cuadrícula ENTONCES toma el ratón en toda su superficie: no podrás cam
 
 fr: La table des conduites est pleine.
 tr: La tabla de comportamientos está llena.
+
+fr: Langage grossier détecté.
+tr: Lenguaje ofensivo detectado.
 
 fr: Le canal alpha de chaque couleur EST son opacité — les deux sont réglables séparément, précisément pour obtenir ce qu'on veut d'une ligne discrète : un fond presque transparent sous un texte resté lisible.
 tr: El canal alfa de cada color ES su opacidad — ambos se ajustan por separado, precisamente para lograr lo que necesita una línea discreta: un fondo casi transparente bajo un texto que sigue siendo legible.
@@ -2688,6 +2700,9 @@ tr: Rechazado por el servidor (código %u).
 
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Devuelve este perfil a los ajustes de origen del cliente.
+
+fr: Un nom qui contient des mots interdits ne peut pas être enregistré.
+tr: No se puede registrar un nombre que contiene palabras prohibidas.
 
 fr: Écraser##profile
 tr: Sobrescribir##profile

@@ -92,17 +92,20 @@ FrameOutcome ApplyEntryQueueFrame(const Frame& frame, sim::EntryQueue& queue,
   }
 }
 
-FrameOutcome ApplyBattlefieldFrame(const Frame& frame, sim::World& world, std::uint32_t now_ms) {
+FrameOutcome ApplyBattlefieldFrame(const Frame& frame, sim::World& world,
+                                   const sim::BannedWords* banned, std::uint32_t now_ms) {
   switch (frame.opcode) {
     case proto::BattlefieldChatNotice::kOpcode:
-      return Decoded<proto::BattlefieldChatNotice>(frame, [&world, now_ms](const auto& packet) {
-        // Le texte porte déjà le nom de qui parle. Un orateur nul est le
-        // serveur : la ligne entre dans la conversation, sans bulle.
-        world.RecordChat(sim::ChatKind::kBattlefield, sim::ChatType::kBattlefield,
-                         packet.speaker_id, core::Utf8FromWire(packet.message), now_ms,
-                         sim::kBattlefieldChatRgb);
-        return FrameOutcome::kApplied;
-      });
+      return Decoded<proto::BattlefieldChatNotice>(
+          frame, [&world, banned, now_ms](const auto& packet) {
+            // Le texte porte déjà le nom de qui parle. Un orateur nul est le
+            // serveur : la ligne entre dans la conversation, sans bulle.
+            world.RecordChat(sim::ChatKind::kBattlefield, sim::ChatType::kBattlefield,
+                             packet.speaker_id,
+                             sim::BannedWords::MaskWith(banned, core::Utf8FromWire(packet.message)),
+                             now_ms, sim::kBattlefieldChatRgb);
+            return FrameOutcome::kApplied;
+          });
 
     case proto::BattlefieldCampNotice::kOpcode:
       return Decoded<proto::BattlefieldCampNotice>(frame, [&world](const auto& packet) {

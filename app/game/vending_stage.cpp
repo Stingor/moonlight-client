@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cstring>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -15,6 +17,7 @@
 #include "ro/sim/world.h"
 #include "ro/ui/inventory_window.h"
 
+#include "chat/banned_input.h"
 #include "game/trade_recap.h"
 #include "game/vending_said.h"
 #include "items/inventory_view.h"
@@ -177,6 +180,15 @@ void VendingStage::FollowSetup(VendingWindows& windows, const TradeContext& cont
   if (!unreadable.empty()) {
     Say(context, ro::core::Tr("Un prix ne se lit pas."), kVendingFailedColor);
     return;
+  }
+  // 🔴 UN TITRE QUI PORTE UN MOT INTERDIT NE PART PAS, avant même les lignes.
+  if (context.banned != nullptr) {
+    if (const std::optional<std::string> refused =
+            BannedInputRefusal(*context.banned, typed, BannedInput::kSentence);
+        refused.has_value()) {
+      Say(context, *refused, BannedInputColor(BannedInput::kSentence));
+      return;
+    }
   }
   if (const std::vector<ro::sim::VendingSetupRefusal> refusals = ro::sim::CheckVendingSetup(
           ro::sim::FitVendingTitle(typed), lines, vending_.permitted_lines(), cart, zeny);

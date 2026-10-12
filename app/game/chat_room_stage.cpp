@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <optional>
 #include <span>
 #include <string_view>
 #include <utility>
@@ -12,6 +13,8 @@
 #include "ro/net/friends.h"
 #include "ro/vfs/chat_room_words.h"
 #include "ro/vfs/trade_words.h"
+
+#include "chat/banned_input.h"
 
 namespace moonclient {
 namespace {
@@ -37,6 +40,15 @@ constexpr std::uint32_t kRefusalColor = 0xFF0000;
     out.push_back(letter);
   }
   return out;
+}
+
+// LE REFUS D'UN TITRE qui porte un mot interdit, ou rien. Sans liste, aucun.
+[[nodiscard]] std::optional<std::string> BannedTitleRefusal(const ro::sim::BannedWords* banned,
+                                                            std::string_view title) {
+  if (banned == nullptr) {
+    return std::nullopt;
+  }
+  return BannedInputRefusal(*banned, title, BannedInput::kSentence);
 }
 
 // La place d'une phrase composée d'un titre de salon.
@@ -159,7 +171,7 @@ bool ChatRoomStage::AskLeave() noexcept {
 
 ro::net::FrameOutcome ChatRoomStage::ClaimLine(const ro::net::Frame& frame,
                                                const ro::sim::World& world, std::uint32_t now_ms) {
-  return ro::net::ClaimChatRoomLine(frame, room_, world, now_ms);
+  return ro::net::ClaimChatRoomLine(frame, room_, world, banned_, now_ms);
 }
 
 void ChatRoomStage::AskJoin(std::uint32_t room_id, std::uint8_t status) {
@@ -270,6 +282,13 @@ void ChatRoomStage::Create(ChatRoomWindows& windows, const ChatRoomContext& cont
     SetError(BlockerText(blocker, context.words), ro::ui::ChatRoomField::kNone);
     return;
   }
+  // UN TITRE QUI PORTE UN MOT INTERDIT, après le titre vide et avant tout le
+  // reste : un titre vide n'en porte aucun.
+  if (const std::optional<std::string> refused = BannedTitleRefusal(banned_, settings.title);
+      refused.has_value()) {
+    SetError(*refused, ro::ui::ChatRoomField::kTitle);
+    return;
+  }
   std::array<char, kSentenceBytes> sentence{};
   switch (ro::net::CheckChatRoomSettings(settings)) {
     case ro::net::ChatRoomSettingsFault::kNone:
@@ -373,6 +392,11 @@ void ChatRoomStage::ApplySettings(ChatRoomWindows& windows, const ChatRoomContex
                                                           ro::sim::kChatRoomMostSeats))};
   // UN REFUS SE DIT DANS LE VOLET, qui reste ouvert : le joueur corrige d'un
   // caractère au lieu de tout retaper.
+  if (std::optional<std::string> refused = BannedTitleRefusal(banned_, settings.title);
+      refused.has_value()) {
+    settings_error_ = std::move(*refused);
+    return;
+  }
   if (ro::net::CheckChatRoomSettings(settings) ==
       ro::net::ChatRoomSettingsFault::kPasswordNotEncodable) {
     settings_error_ =
@@ -570,8 +594,10 @@ void ChatRoomStage::Compose(ChatRoomWindows& windows, const ChatRoomContext& con
     if (!caption_.empty()) {
       caption_ += ' ';
     }
-    caption_ += ShownTitle(inside->title) + " (" + std::to_string(inside->users) + "/" +
-                std::to_string(inside->limit) + ")";
+    // ⚠ LE TITRE, SES MOTS INTERDITS MASQUÉS : c'est un autre joueur qui l'a
+    // écrit.
+    caption_ += ShownTitle(ro::sim::BannedWords::MaskWith(banned_, inside->title)) + " (" +
+                std::to_string(inside->users) + "/" + std::to_string(inside->limit) + ")";
     members_.clear();
     for (const ro::sim::ChatRoomMember& member : inside->members) {
       members_.push_back(

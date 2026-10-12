@@ -506,8 +506,10 @@ target_include_directories(moonclient_chatroom PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 # elle se lit, et les conversations 1:1 — ce qui les ouvre, ce qu'elles prennent
 # au fil, leur non-lu. Règles pures, jugées sur un banc sans fenêtre. La liste
 # de blocage rangée au service web aussi : `moonclient_web` ne connaît aucune
-# plateforme, et le transport se donne au constructeur.
+# plateforme, et le transport se donne au constructeur. Les mots interdits de
+# l'installation, et le refus d'une saisie qui en porte un.
 add_library(moonclient_whispers STATIC
+    chat/banned_input.cpp
     chat/player_link_judge.cpp
     chat/whisper_desk.cpp
     chat/whisper_block_memory.cpp

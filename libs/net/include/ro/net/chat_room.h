@@ -6,6 +6,7 @@
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/chat_room.h"
 #include "ro/sim/world.h"
 
@@ -35,8 +36,11 @@ namespace ro::net {
 //
 // Rend `kApplied` quand la trame est prise, `kUnhandled` sinon : le monde
 // l'applique alors comme d'habitude. ⚠ À APPELER AVANT LUI.
+//
+// Les mots de `banned` s'y masquent ; nul, rien ne se masque.
 [[nodiscard]] FrameOutcome ClaimChatRoomLine(const Frame& frame, sim::ChatRoom& room,
-                                             const sim::World& world, std::uint32_t now_ms);
+                                             const sim::World& world,
+                                             const sim::BannedWords* banned, std::uint32_t now_ms);
 
 // Les couleurs des lignes du salon, en `0xRRGGBB` : celles du client d'origine,
 // sombres parce que le corps de sa fenêtre est clair.

@@ -23,6 +23,7 @@
 #include "ro/render/skin_textures.h"
 #include "ro/render/status_icons.h"
 #include "ro/render/title_table.h"
+#include "ro/sim/banned_words.h"
 #include "ro/sim/progress_bar.h"
 #include "ro/sim/skill_tree.h"
 #include "ro/vfs/achievement_catalog.h"
@@ -467,6 +468,9 @@ struct GamePieces {
 
   // LES CHUCHOTEMENTS ET LES CONVERSATIONS 1:1 : voir `WhisperStage`.
   WhisperStage whispers;
+  // LES MOTS INTERDITS DE L'INSTALLATION, relus à chaque partie : voir
+  // `chat/banned_input.h`.
+  ro::sim::BannedWords banned_words;
   // LES ADRESSES ET LES IMAGES DU CHAT, et l'alerte d'une ligne qui nous nomme :
   // voir `ChatWebStage` et `ChatMentionWatch`.
   ChatWebStage chat_web;

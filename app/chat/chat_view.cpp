@@ -445,7 +445,10 @@ void SendLine(const ChatDispatch& to, const std::string& line, std::uint32_t sai
   // ⚠ LA CARTE SE RELIT ICI, au moment de l'envoi : une macro peut parler sans
   // que la barre ait été recomposée depuis le dernier changement de carte.
   armed.on_battlefield = to.world->map_mode().battlefield;
-  const ro::net::ChatIntent intent = ro::net::ReadChatIntent(line, armed);
+  // ⚠ LA PAROLE PART SES MOTS INTERDITS MASQUÉS, quel que soit son canal : le
+  // joueur n'est pas arrêté, ses mots si.
+  ro::net::ChatIntent intent = ro::net::ReadChatIntent(line, armed);
+  intent.text = ro::sim::BannedWords::MaskWith(to.banned, intent.text);
   // ⚠ HORS D'UNE CARTE DE CHAMP, LE SERVEUR N'A AUCUNE ÉQUIPE À QUI RELAYER, et
   // il jette la ligne sans un mot : c'est donc ici qu'on le dit.
   if (intent.target == ro::net::ChatTarget::kBattlefield) {

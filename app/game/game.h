@@ -348,7 +348,7 @@ class Game : public Screen {
   // rafraîchir avant le dessin, appliquer après — c'est tout ce qu'ils coûtent.
   void OpenGuild();
   void RefreshGuild(std::uint32_t now_ms);
-  void ApplyGuildAnswers(const UiStage::Answers& answers);
+  void ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
   void RefreshParty(std::uint32_t now_ms);
   void ApplyPartyAnswers(std::uint32_t now_ms);
 

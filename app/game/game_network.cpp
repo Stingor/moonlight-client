@@ -104,9 +104,10 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     const std::optional<ro::net::NpcFarewell> farewell = ro::net::NpcFarewellDue(world_);
     // 🔴 EN SALON, LA PAROLE REVIENT AU SALON, et le monde ne l'écrit pas : le
     // serveur ne nous fait plus entendre la carte.
+    const ro::sim::BannedWords* banned = &pieces_.banned_words;
     ro::net::FrameOutcome outcome = pieces_.chat_rooms.ClaimLine(received, world_, now_ms);
     // LES CHUCHOTEMENTS AVANT LE MONDE : eux seuls savent qui sont nos amis et
-    // ce qui attend un accusé.
+    // ce qui attend un accusé. La parole masquée aussi.
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = pieces_.whispers.ApplyFrame(received, world_, friends_, guild_book_, now_ms);
     }
@@ -132,14 +133,14 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // LA GUILDE AUSSI : son carnet vit hors du monde, et le départ d'un membre
     // se reconnaît au personnage joué.
     const ro::net::FrameOutcome guilded =
-        ro::net::ApplyGuildFrame(received, guild_book_, ticket_.character_id);
+        ro::net::ApplyGuildFrame(received, guild_book_, ticket_.character_id, banned);
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = guilded;
     }
     // LE GROUPE, de même, reconnu par le compte joué ; l'horloge date le PS d'un
     // membre. Et LES AMIS, dans la même passe.
     const ro::net::FrameOutcome grouped =
-        ro::net::ApplyPartyFrame(received, party_, world_.player_id(), now_ms);
+        ro::net::ApplyPartyFrame(received, party_, world_.player_id(), now_ms, banned);
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = grouped;
     }

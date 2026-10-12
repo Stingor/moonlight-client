@@ -153,11 +153,14 @@ int LiftOf(const ro::sim::Signboard& board) {
 // titre —, une échoppe n'annonce que son titre.
 //
 // ⚠ UN TITRE S'ARRÊTE AU PREMIER RETOUR CHARIOT : ce qui suit ne s'écrit pas.
-std::string SignboardText(const ro::sim::Signboard& board) {
-  const std::string_view title =
-      std::string_view(board.title).substr(0, board.title.find(kCarriageReturn));
+//
+// ⚠ LE TITRE SE MASQUE, quelle que soit l'enseigne : c'est un joueur qui l'a
+// écrit.
+std::string SignboardText(const ro::sim::Signboard& board, const ro::sim::BannedWords* banned) {
+  const std::string title = ro::sim::BannedWords::MaskWith(
+      banned, std::string_view(board.title).substr(0, board.title.find(kCarriageReturn)));
   if (board.kind != ro::sim::SignboardKind::kChatRoom || board.status == ro::sim::kRoomPkZone) {
-    return std::string(title);
+    return title;
   }
   return std::format("{} ({}/{})", title, board.users, board.limit);
 }
@@ -221,7 +224,7 @@ std::vector<ro::render::ScreenQuad> DrawnName(
     const std::optional<ro::ui::ScreenBand>& bars_under_feet,
     const ro::render::EntityNamesLook& names, const ro::render::BossBadges& badges,
     const ro::formats::Image* emblem, float viewport_width, float viewport_height,
-    std::string_view name) {
+    const ro::sim::BannedWords* banned, std::string_view name) {
   const ro::render::EntityNameLook& how =
       names.kinds[static_cast<std::size_t>(NamePlateKindOf(actor, world))];
 
@@ -232,7 +235,13 @@ std::vector<ro::render::ScreenQuad> DrawnName(
   if (actor.card.has_value() && !actor.card->shown_name.empty()) {
     label = actor.card->shown_name;
   }
-  what.name = name.empty() ? label : name;
+  // ⚠ LES QUATRE NOMS D'UN ACTEUR SE MASQUENT — le sien, ceux de son groupe, de
+  // sa guilde et de son poste —, le nom d'un objet au sol et le titre non.
+  const std::string masked_label = ro::sim::BannedWords::MaskWith(banned, label);
+  std::string masked_aside;
+  std::string masked_banner;
+  std::string masked_badge;
+  what.name = name.empty() ? std::string_view(masked_label) : name;
   // ⚠ LA QUANTITÉ PREND LA PLACE DE L'« ASIDE », celle qui s'écrit entre
   // parenthèses à la suite du nom. Un objet au sol n'a pas de carte de nom : la
   // place est libre, et elle donne « Red Potion (5) » sans rien inventer.
@@ -241,9 +250,12 @@ std::vector<ro::render::ScreenQuad> DrawnName(
   what.cut_at_hash = NameCutAtHash(actor);
   std::string_view from_table;
   if (actor.card.has_value()) {
-    what.aside = actor.card->aside;
-    what.banner = actor.card->banner;
-    what.badge = actor.card->badge;
+    masked_aside = ro::sim::BannedWords::MaskWith(banned, actor.card->aside);
+    masked_banner = ro::sim::BannedWords::MaskWith(banned, actor.card->banner);
+    masked_badge = ro::sim::BannedWords::MaskWith(banned, actor.card->badge);
+    what.aside = masked_aside;
+    what.banner = masked_banner;
+    what.badge = masked_badge;
     // 🔴 DEUX SOURCES POUR UN SEUL TITRE, ET ELLES NE SE MÉLANGENT PAS : un PNJ
     // reçoit le sien EN TOUTES LETTRES, un joueur un NUMÉRO que la table de
     // l'installation traduit. Le second ne se lit que si le premier manque.
@@ -353,7 +365,8 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
     const ro::sim::World& world, const ro::sim::PartyRoster& party,
     const ro::render::FontAtlas& font, const ro::render::SignboardSurfaces& surfaces,
     const ro::ui::EntityBarsLook& bars, bool shops_shown, std::uint32_t spotlit_owner_id,
-    float viewport_width, float viewport_height, std::vector<SignboardHit>* hits) {
+    float viewport_width, float viewport_height, const ro::sim::BannedWords* banned,
+    std::vector<SignboardHit>* hits) {
   std::vector<ro::render::ScreenQuad> quads;
   if (hits != nullptr) {
     hits->clear();
@@ -388,7 +401,7 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
                                                                       drawn[index].scale));
     const glm::vec2 top_left =
         ro::render::SignboardTopLeft(glm::vec2{feet->x, head_y}, LiftOf(*actor->signboard));
-    const std::string text = SignboardText(*actor->signboard);
+    const std::string text = SignboardText(*actor->signboard, banned);
     const std::string shown = ro::render::FitSignboardTitle(font, text);
     const bool spotlit = spotlit_owner_id != 0 && actor->id == spotlit_owner_id;
     Append(quads, ro::render::ComposeSignboard(

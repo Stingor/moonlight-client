@@ -1350,6 +1350,9 @@ tr: That is your own guild.
 fr: Ce joueur est protégé contre les signalements.
 tr: The target is under report protection.
 
+fr: Ce nom n'est pas disponible.
+tr: Name isn't available.
+
 fr: Cible introuvable...
 tr: Target not found...
 
@@ -2035,6 +2038,9 @@ tr: File not found in savedata.
 fr: File du champ de bataille
 tr: Battleground queue
 
+fr: Filtre de discussion : non, ça ne passera pas.
+tr: Chat Filter: Yeah, uh, I don't think so buddy...
+
 fr: Filtrer : nom ou carte
 tr: Filter: name or map
 
@@ -2049,6 +2055,9 @@ tr: Drag to move · Right-click: put back in the log
 
 fr: Glisser une ligne du carnet par sa poignée, à gauche, et la lâcher HORS de la fenêtre : elle reste à l'écran et survit à la fermeture du carnet. Les lignes s'aimantent entre elles. Clic droit sur une ligne pour la remettre au carnet.
 tr: Drag a row out of the log by its grip, on the left, and drop it OUTSIDE the window: it stays on screen and survives the log being closed. Lines snap to each other. Right-click a line to put it back in the log.
+
+fr: Grossièreté détectée.\nVérifiez votre texte.
+tr: Profanity detected.\nPlease check again.
 
 fr: Groupe « %s » — %d membres###mvp_group
 tr: Group "%s" — %d members###mvp_group
@@ -2250,6 +2259,9 @@ tr: The grid then TAKES the mouse over its whole surface: you cannot walk or str
 
 fr: La table des conduites est pleine.
 tr: The behavior table is full.
+
+fr: Langage grossier détecté.
+tr: Foul Language Detected.
 
 fr: Le canal alpha de chaque couleur EST son opacité — les deux sont réglables séparément, précisément pour obtenir ce qu'on veut d'une ligne discrète : un fond presque transparent sous un texte resté lisible.
 tr: Each color's alpha channel IS its opacity — both are set separately, precisely to get what a discreet line needs: an almost transparent background under text that stays readable.
@@ -2688,6 +2700,9 @@ tr: Refused by the server (code %u).
 
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Resets this profile to the client's original settings.
+
+fr: Un nom qui contient des mots interdits ne peut pas être enregistré.
+tr: Names with bad words can not be registered.
 
 fr: Écraser##profile
 tr: Overwrite##profile

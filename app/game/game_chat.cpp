@@ -166,6 +166,7 @@ void Game::StageChat(std::uint32_t now_ms) {
       .naming_seqs =
           web.mentions ? pieces_.mentions.naming_seqs() : std::span<const std::uint64_t>()});
   chat_tabs_->SeesConversations(&pieces_.whispers.desk());
+  chat_tabs_->MasksConversations(&pieces_.banned_words);
   chat_tabs_->SeesOwnName(world_.player_name());
   chat_tabs_->JudgesPlayers([this](std::string_view name) {
     const MvpInviteCircle hunt{

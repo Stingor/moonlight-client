@@ -4,6 +4,7 @@
 #include "ro/net/guild.h"
 
 #include <optional>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -34,6 +35,11 @@ constexpr std::uint8_t kLastInviteAnswer =
 // revenir en UTF-8 quand c'est un client comme le nôtre qui les a écrites.
 [[nodiscard]] std::string Name(std::string_view wire) { return core::Utf8FromCp1252(wire); }
 [[nodiscard]] std::string Phrase(std::string_view wire) { return core::Utf8FromWire(wire); }
+
+// LE TEXTE, ses mots interdits masqués quand on tient la liste.
+[[nodiscard]] std::string Masked(const sim::BannedWords* banned, const std::string& utf8_text) {
+  return sim::BannedWords::MaskWith(banned, utf8_text);
+}
 
 // LES DEUX DRAPEAUX DE GUILDE — l'étendard d'une carte de siège, et celui que
 // pose une compétence de guilde — inscrivent leur version d'emblème même nulle.
@@ -118,24 +124,26 @@ FrameOutcome ApplySkills(const proto::ZcGuildSkillinfo& packet, sim::GuildBook& 
 
 // Les deux paquets que le générateur ne décode pas : les noms des postes, et
 // l'accusé d'un changement de postes.
-FrameOutcome ApplyPositionNames(const Frame& frame, sim::GuildBook& guild) {
+FrameOutcome ApplyPositionNames(const Frame& frame, sim::GuildBook& guild,
+                                const sim::BannedWords* banned) {
   const auto names = proto::DecodeGuildPositionNames(frame.bytes);
   if (!names) {
     return FrameOutcome::kUndecodable;
   }
   for (const proto::GuildPositionName& entry : *names) {
-    guild.TellPositionName(entry.position, Phrase(entry.name));
+    guild.TellPositionName(entry.position, Masked(banned, Phrase(entry.name)));
   }
   return FrameOutcome::kApplied;
 }
 
-FrameOutcome ApplyPositionsChanged(const Frame& frame, sim::GuildBook& guild) {
+FrameOutcome ApplyPositionsChanged(const Frame& frame, sim::GuildBook& guild,
+                                   const sim::BannedWords* banned) {
   const auto entries = proto::DecodeGuildPositionsChanged(frame.bytes);
   if (!entries) {
     return FrameOutcome::kUndecodable;
   }
   for (const proto::GuildPositionEntry& entry : *entries) {
-    guild.TellPositionName(entry.position, Phrase(entry.name));
+    guild.TellPositionName(entry.position, Masked(banned, Phrase(entry.name)));
     guild.TellPositionRights(entry.position, entry.rights, entry.pay_rate);
   }
   return FrameOutcome::kApplied;
@@ -154,6 +162,11 @@ FrameOutcome ApplyEmblemImage(const Frame& frame, sim::GuildBook& guild) {
 }  // namespace
 
 FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uint32_t own_char_id) {
+  return ApplyGuildFrame(frame, guild, own_char_id, nullptr);
+}
+
+FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uint32_t own_char_id,
+                             const sim::BannedWords* banned) {
   switch (frame.opcode) {
     case proto::ZcNotifyPositionToGuildm::kOpcode:
       return Decoded<proto::ZcNotifyPositionToGuildm>(frame, [&guild](const auto& packet) {
@@ -180,7 +193,7 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
       });
 
     case proto::ZcGuildInfo::kOpcode:
-      return Decoded<proto::ZcGuildInfo>(frame, [&guild, own_char_id](const auto& packet) {
+      return Decoded<proto::ZcGuildInfo>(frame, [&guild, own_char_id, banned](const auto& packet) {
         // 🔴 L'EN-TÊTE VAUT APPARTENANCE : le serveur ne l'envoie qu'aux membres
         // de la guilde qu'il décrit. Et c'est le SEUL témoin d'une adhésion en
         // cours de session — à qui vient d'accepter une invitation, le serveur
@@ -190,13 +203,16 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
         // ⚠ UNE APPARTENANCE DÉJÀ CONNUE DE LA MÊME GUILDE NE SE RÉÉCRIT PAS :
         // elle porte le masque de droits et le drapeau de maître, que l'en-tête
         // n'a pas, et ce paquet revient à chaque rafraîchissement de la fenêtre.
+        //
+        // ⚠ SON NOM SE MASQUE, celui de son maître non.
         const bool known = guild.in_guild() && guild.belonging()->guild_id == packet.GDID;
+        const std::string name = Masked(banned, Name(packet.guildname));
         if (packet.GDID > 0 && !known) {
           guild.TellBelonging(sim::GuildBelonging{
               .guild_id = packet.GDID,
               .emblem_version = packet.emblemVersion,
               .master = static_cast<std::uint32_t>(packet.masterGID) == own_char_id,
-              .name = Name(packet.guildname),
+              .name = name,
               .master_char_id = packet.masterGID,
           });
         }
@@ -209,7 +225,7 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
             .exp = packet.exp,
             .next_exp = packet.maxExp,
             .emblem_version = packet.emblemVersion,
-            .name = Name(packet.guildname),
+            .name = name,
             .land = Phrase(packet.manageLand),
             .master_char_id = packet.masterGID,
             .master_name = Name(packet.masterName),
@@ -218,8 +234,9 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
       });
 
     case proto::ZcGuildNotice::kOpcode:
-      return Decoded<proto::ZcGuildNotice>(frame, [&guild](const auto& packet) {
-        guild.TellNotice(Phrase(packet.subject), Phrase(packet.notice));
+      return Decoded<proto::ZcGuildNotice>(frame, [&guild, banned](const auto& packet) {
+        guild.TellNotice(Masked(banned, Phrase(packet.subject)),
+                         Masked(banned, Phrase(packet.notice)));
         return FrameOutcome::kApplied;
       });
 
@@ -228,7 +245,7 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
           frame, [&guild](const auto& packet) { return ApplyMembers(packet, guild); });
 
     case proto::kGuildPositionNamesOpcode:
-      return ApplyPositionNames(frame, guild);
+      return ApplyPositionNames(frame, guild, banned);
 
     case proto::ZcPositionInfo::kOpcode:
       return Decoded<proto::ZcPositionInfo>(frame, [&guild](const auto& packet) {
@@ -239,7 +256,7 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
       });
 
     case proto::kGuildPositionsChangedOpcode:
-      return ApplyPositionsChanged(frame, guild);
+      return ApplyPositionsChanged(frame, guild, banned);
 
     case proto::ZcAckReqChangeMembers::kOpcode:
       return Decoded<proto::ZcAckReqChangeMembers>(frame, [&guild](const auto& packet) {
@@ -301,11 +318,12 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
       });
 
     case proto::ZcMyguildBasicInfo::kOpcode:
-      return Decoded<proto::ZcMyguildBasicInfo>(frame, [&guild](const auto& packet) {
+      return Decoded<proto::ZcMyguildBasicInfo>(frame, [&guild, banned](const auto& packet) {
         std::vector<sim::GuildRelation> relations;
         relations.reserve(packet.rgInfo.size());
         for (const proto::RelatedGuildInfo& entry : packet.rgInfo) {
-          relations.push_back({entry.GDID, KindOf(entry.relation), Name(entry.guildname)});
+          relations.push_back(
+              {entry.GDID, KindOf(entry.relation), Masked(banned, Name(entry.guildname))});
         }
         guild.ReplaceRelations(std::move(relations));
         return FrameOutcome::kApplied;
@@ -327,16 +345,16 @@ FrameOutcome ApplyGuildFrame(const Frame& frame, sim::GuildBook& guild, std::uin
       });
 
     case proto::ZcReqJoinGuild::kOpcode:
-      return Decoded<proto::ZcReqJoinGuild>(frame, [&guild](const auto& packet) {
+      return Decoded<proto::ZcReqJoinGuild>(frame, [&guild, banned](const auto& packet) {
         guild.TellInvitation(sim::GuildInvitation{static_cast<std::int32_t>(packet.guild_id),
-                                                  Name(packet.guild_name)});
+                                                  Masked(banned, Name(packet.guild_name))});
         return FrameOutcome::kApplied;
       });
 
     case proto::ZcReqAllyGuild::kOpcode:
-      return Decoded<proto::ZcReqAllyGuild>(frame, [&guild](const auto& packet) {
-        guild.TellAllianceOffer(
-            sim::GuildAllianceOffer{packet.inviterId, Name(packet.inviterGuildName)});
+      return Decoded<proto::ZcReqAllyGuild>(frame, [&guild, banned](const auto& packet) {
+        guild.TellAllianceOffer(sim::GuildAllianceOffer{
+            packet.inviterId, Masked(banned, Name(packet.inviterGuildName))});
         return FrameOutcome::kApplied;
       });
 

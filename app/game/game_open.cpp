@@ -20,6 +20,7 @@
 #include "ro/ui/minimap_window.h"
 #include "ro/ui/tracker_panel.h"
 
+#include "chat/banned_input.h"
 #include "chat/chat_tab_file.h"
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
@@ -430,6 +431,13 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                     &pieces_.item_words);
   pieces_.trade.SeeCommands(&pieces_.commands.settings());
   pieces_.trade.SeeItemProperties(&pieces_.item_properties);
+  pieces_.trade.SeeBannedWords(&pieces_.banned_words);
+  pieces_.chat_rooms.SeeBannedWords(&pieces_.banned_words);
+  pieces_.whispers.SeeBannedWords(&pieces_.banned_words);
+  pieces_.homunculus.SeeBannedWords(&pieces_.banned_words);
+  pieces_.pet.SeeBannedWords(&pieces_.banned_words);
+  pieces_.talkbox.SeeBannedWords(&pieces_.banned_words);
+  pieces_.battleground.SeeBannedWords(&pieces_.banned_words);
   pieces_.trade.deal().SeeApproachClock(&grimoire_.approach_clock());
   pieces_.trade.store_search().SeeCards(
       {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});
@@ -468,7 +476,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   windows_.chat_room.make.open = false;
   // LES CONVERSATIONS 1:1 : aucune n'est ouverte, aucun envoi n'attend.
   pieces_.whispers.StartSession(world_.last_chat_seq());
-  pieces_.whispers.LoadBannedWords(vfs_);
+  pieces_.banned_words = LoadBannedWords(vfs_);
   windows_.whispers = WhisperWindows{};
   // LA LISTE DE BLOCAGE DU COMPTE, que le service web garde d'une connexion à
   // l'autre : relue maintenant, rejouée après la première carte.
@@ -676,7 +684,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .whisper_blocks = &pieces_.whispers.blocks(),
       .line_preview = &chat_preview_,
       .follow = &world_mouse_.follow,
-      .own_config = &own_config_});
+      .own_config = &own_config_,
+      .banned = &pieces_.banned_words});
   // ⚠ LA SECONDE PASSE, et la coquille a déjà fait la première.
   //
   // Elle en fait davantage, et c'est pourquoi les deux existent : la musique,

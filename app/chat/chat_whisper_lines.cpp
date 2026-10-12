@@ -120,6 +120,18 @@ void ChatTabsView::ShowLine(const ro::sim::ChatLine& line, WhisperSurface surfac
   // ⚠ RECOPIÉ, LUI : l'en-tête ne vit pas dans le monde. Les chuchotements sont
   // rares au regard du reste du fil, et c'est ce qui rend la copie abordable.
   WhisperHead head = ComposeWhisperHead(line.whisper, surface, own_name_);
+  // ⚠ DANS LA CONVERSATION, LA LIGNE ENTIÈRE SE MASQUE, noms compris ; le fil la
+  // montre telle quelle. Le pseudo masqué garde son lien vers le vrai nom.
+  const bool masks = surface == WhisperSurface::kConversation;
+  if (masks && head.name_length > 0) {
+    const std::string name = ro::sim::BannedWords::MaskWith(
+        conversation_banned_,
+        std::string_view(head.text).substr(head.name_offset, head.name_length));
+    head.text.replace(head.name_offset, head.name_length, name);
+    head.name_length = name.size();
+  } else if (masks) {
+    head.text = ro::sim::BannedWords::MaskWith(conversation_banned_, head.text);
+  }
   DecoratedChatLine composed;
   composed.text = std::move(head.text);
   const auto body_at = static_cast<std::uint32_t>(composed.text.size());
@@ -136,7 +148,10 @@ void ChatTabsView::ShowLine(const ro::sim::ChatLine& line, WhisperSurface surfac
     composed.carried.push_back(std::move(target));
   }
   // LA PHRASE, décalée derrière l'en-tête : ses liens, ses styles, ses images.
-  const std::string_view said = WhisperSaid(line, words_);
+  const std::string masked =
+      masks ? ro::sim::BannedWords::MaskWith(conversation_banned_, WhisperSaid(line, words_))
+            : std::string(WhisperSaid(line, words_));
+  const std::string_view said = masked;
   DecoratedChatLine body;
   if (DecorateRichChatLine(said, false, Tables(), rich_, &body)) {
     // 🔴 UN CHUCHOTEMENT SE RÉSOUT PAR SON SENS, jamais par son en-tête : reçu,
