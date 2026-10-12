@@ -258,8 +258,8 @@ struct SeatPoint {
 // de couper en diagonale vers un convive à peine plus proche.
 inline constexpr float kSeatStepSidePenalty = 2.0F;
 
-// L'EMPLACEMENT OÙ MÈNE UNE FLÈCHE depuis `from_slot`, ou -1 s'il n'y a
-// personne dans cette direction.
+// L'EMPLACEMENT OÙ MÈNE UNE FLÈCHE depuis `from_slot`, ou -1 si elle ne mène
+// nulle part.
 //
 // 🔴 PAR LA GÉOMÉTRIE, ET NON PAR LE NUMÉRO : la mise en page appartient au
 // joueur, qui déplace les sièges où il veut. « Droite » mène à qui est assis à
@@ -270,6 +270,11 @@ inline constexpr float kSeatStepSidePenalty = 2.0F;
 // garde, « bas » depuis le bout gauche de la table mènerait au bout droit,
 // assis deux pixels plus bas. Les quatre quarts couvrent le plan : chaque
 // convive reste joignable par l'une des flèches.
+//
+// ⚠ AU BOUT, LA FLÈCHE BOUCLE : personne devant, elle revient au convive le
+// plus éloigné dans le quart OPPOSÉ — l'autre bout de la rangée, ou de la
+// colonne. Le même quart de tour la garde : sans personne sur la ligne, elle
+// ne mène nulle part. Et elle ne tourne jamais la page, qui a ses boutons.
 //
 // Si `from_slot` n'est pas sur la tablée — rien n'est désigné, ou le désigné
 // est sur une autre page —, la flèche désigne le plus petit emplacement
@@ -293,6 +298,8 @@ inline constexpr float kSeatStepSidePenalty = 2.0F;
   const bool forward = step == SeatStep::kRight || step == SeatStep::kDown;
   int best_slot = -1;
   float best_cost = 0.0F;
+  int wrap_slot = -1;
+  float wrap_reach = 0.0F;
   for (const SeatPoint& seat : seats) {
     if (seat.slot == from_slot) {
       continue;
@@ -302,16 +309,23 @@ inline constexpr float kSeatStepSidePenalty = 2.0F;
     const float signed_along = horizontal ? dx : dy;
     const float along = forward ? signed_along : -signed_along;
     const float aside = std::fabs(horizontal ? dy : dx);
-    if (along <= 0.0F || along < aside) {
-      continue;
-    }
-    const float cost = along + aside * kSeatStepSidePenalty;
-    if (best_slot < 0 || cost < best_cost) {
-      best_slot = seat.slot;
-      best_cost = cost;
+    if (along > 0.0F && along >= aside) {
+      const float cost = along + aside * kSeatStepSidePenalty;
+      if (best_slot < 0 || cost < best_cost) {
+        best_slot = seat.slot;
+        best_cost = cost;
+      }
+    } else if (along < 0.0F && -along >= aside) {
+      // Le quart opposé, où l'on cherche le plus LOINTAIN : c'est le bout de
+      // la rangée par lequel on revient.
+      const float reach = -along - aside * kSeatStepSidePenalty;
+      if (wrap_slot < 0 || reach > wrap_reach) {
+        wrap_slot = seat.slot;
+        wrap_reach = reach;
+      }
     }
   }
-  return best_slot;
+  return best_slot >= 0 ? best_slot : wrap_slot;
 }
 
 }  // namespace ro::ui
