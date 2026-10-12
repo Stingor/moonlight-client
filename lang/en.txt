@@ -5889,8 +5889,8 @@ tr: A new profile, copy of the basic AI.
 fr: Un profil retient la place, la taille et l'ouverture de chaque fenêtre. Chaque personnage garde le sien. Une fenêtre suit le bord de l'écran dont elle est la plus proche : changer de résolution ne la perd pas.
 tr: A profile remembers the place, size and open state of every window. Each character keeps its own. A window follows the screen edge it is closest to: changing the resolution does not lose it.
 
-fr: Un profil retient tous les réglages des options, sauf ceux de la machine : écran, volumes, langue et échelle de l'interface. Chaque personnage garde le sien.
-tr: A profile remembers every setting of the options, except the machine's: screen, volumes, language and interface scale. Each character keeps its own.
+fr: Un profil retient tous les réglages des options et les touches des raccourcis, sauf les réglages de la machine : écran, volumes, langue et échelle de l'interface. Chaque personnage garde le sien.
+tr: A profile remembers every setting of the options and the hotkey keys, except the machine's settings: screen, volumes, language and interface scale. Each character keeps its own.
 
 fr: Un salon visible porte déjà ce titre, à %d cases d'ici.
 tr: A visible chat room already has this title, %d cells from here.

@@ -152,16 +152,9 @@ bool SaveHotkeys(const std::filesystem::path& client_root, const Hotkeys& from) 
   if (const ro::core::Result<void> written =
           ro::core::WriteFileAtomically(HotkeyFilePath(client_root), text);
       !written) {
-    // 🔴 EN ERREUR, ET SEULE DE SA FAMILLE. Les autres écritures atomiques de
-    // réglages du dépôt sont des alertes parce que le prochain changement les
-    // rejoue ; celle-ci, non — `SaveHotkeysIfNeeded` avance `saved_revision_`
-    // AVANT d'écrire et jette le booléen, exprès, pour ne pas réessayer soixante
-    // fois par seconde. La touche que le joueur vient de régler est donc perdue
-    // pour de bon, et sans un mot ailleurs.
-    ro::core::LogError(
-        "raccourcis : {} — la touche réglée ne sera pas retenue au prochain "
-        "démarrage",
-        ro::core::Describe(written.error()));
+    // EN ERREUR : rien ne rejoue cette écriture.
+    ro::core::LogError("raccourcis : {} — le fichier des touches n'est pas écrit",
+                       ro::core::Describe(written.error()));
     return false;
   }
   return true;

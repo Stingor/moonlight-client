@@ -23,7 +23,11 @@ constexpr const char* kFileHeader =
     "# Les profils de réglages.\n"
     "#\n"
     "# Sous « profiles », chaque profil porte les réglages de settings.yml, sous\n"
-    "# les mêmes clés — sauf ceux de la machine : écran, son, langue, échelle.\n"
+    "# les mêmes clés — sauf ceux de la machine : écran, son, langue, échelle —,\n"
+    "# et les touches des raccourcis : « hotkey_ » suivi du nom de l'action, la\n"
+    "# valeur « ctrl+alt+shift+F1 » sans les modificateurs relâchés, vide pour\n"
+    "# aucune touche. Sans aucune clé « hotkey_ », le profil prend les touches de\n"
+    "# hotkeys.yml.\n"
     "# Une clé absente prend sa valeur d'origine. Sous « characters », le profil\n"
     "# que chaque personnage pose en entrant en jeu ; sans fiche, c'est « Default ».\n";
 

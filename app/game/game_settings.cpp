@@ -14,17 +14,15 @@ namespace moonclient {
 GameSettings::GameSettings(std::filesystem::path client_root)
     : client_root_(std::move(client_root)),
       file_(client_root_ / kSaveFolder / kSettingsFileName),
-      profiles_(client_root_, file_, options_) {
+      profiles_(client_root_, file_, options_, bindings_) {
+  // ⚠ LES TOUCHES D'AVANT L'ENTRÉE EN JEU : celles de `hotkeys.yml`. Le profil
+  // du personnage pose ensuite les siennes. Voir `SettingsProfilePort`.
   LoadHotkeys(client_root_, bindings_);
   // ⚠ LUE MÊME QUAND LE PLACEMENT LIBRE EST ÉTEINT : le réglage se rallume sans
   // redémarrer, et la disposition doit être là quand il le fait.
   LoadItemLayout(client_root_, item_layout_);
   LoadStorageFavorites(client_root_, storage_favorites_);
   LoadStorageTabNames(client_root_, storage_tab_names_);
-  // ⚠ CE QUI VIENT D'ÊTRE LU EST DÉJÀ « ENREGISTRÉ ». Sans cela, la lecture
-  // compterait comme un changement et le fichier serait réécrit à la première
-  // image de chaque partie.
-  saved_revision_ = bindings_.revision();
 
   // ⚠ DÉCLARER PUIS LIRE, DANS CET ORDRE : la valeur présente au moment de la
   // déclaration est ce qui sert de défaut.
@@ -421,7 +419,8 @@ void GameSettings::Apply(const UiStage::Answers& answers, const OptionTargets& t
     bindings_.RestoreDefaults();
     windows.hotkeys.robbed[0] = '\0';
   }
-  SaveHotkeysIfNeeded();
+  // ⚠ RIEN À ÉCRIRE ICI : la table fait partie du profil de réglages, dont le
+  // gardien voit grandir la révision. Voir `SettingsProfilePort`.
 
   // Les options s'enregistrent elles-mêmes : le fichier fait partie de ce
   // qu'elles touchent. Voir `OptionTargets`.
@@ -470,21 +469,6 @@ void GameSettings::Flush() {
   profiles_.Flush();
   file_.Flush();
   options_.pages().skin_look.Flush();
-}
-
-void GameSettings::SaveHotkeysIfNeeded() {
-  // ⚠ ON COMPARE UN COMPTE, ON NE LÈVE PAS UN DRAPEAU. La table se modifie aussi
-  // depuis le CLAVIER, quand la configuration capture une touche : un drapeau
-  // qu'il faudrait penser à lever là-bas aussi serait oublié le jour où un
-  // troisième endroit la modifiera.
-  if (bindings_.revision() == saved_revision_) {
-    return;
-  }
-  // ⚠ RETENU MÊME SI L'ÉCRITURE ÉCHOUE. Le contraire ferait réessayer soixante
-  // fois par seconde sur un dossier en lecture seule, et noierait le journal
-  // sous le même avertissement.
-  saved_revision_ = bindings_.revision();
-  static_cast<void>(SaveHotkeys(client_root_, bindings_));
 }
 
 }  // namespace moonclient

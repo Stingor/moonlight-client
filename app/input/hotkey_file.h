@@ -10,6 +10,10 @@ namespace moonclient {
 
 // LES RACCOURCIS, SUR LE DISQUE.
 //
+// 🔴 LE JEU NE L'ÉCRIT PLUS : les touches suivent le profil de réglages. Il se
+// LIT encore — c'est ce qu'hérite un profil qui n'a pas de touches, et ce qui
+// vaut avant l'entrée en jeu. Voir `SettingsProfilePort`.
+//
 // ⚠ DANS `savedata\`, AVEC CEUX DU CLIENT. C'est là que le jeu garde ce qui
 // appartient au joueur — ses touches, la place de ses fenêtres, ses macros — et
 // c'est donc là qu'un joueur va chercher, et qu'une sauvegarde de dossier

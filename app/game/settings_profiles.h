@@ -4,24 +4,27 @@
 #include <filesystem>
 #include <functional>
 #include <string_view>
+#include <utility>
 
 #include "ro/ui/options_window.h"
 
 #include "game/profile_keeper.h"
 #include "game/settings_file.h"
-#include "game/settings_profile_file.h"
+#include "game/settings_profile_port.h"
+#include "input/hotkeys.h"
 
 namespace moonclient {
 
 class GameOptions;
 struct OptionTargets;
 
-// LES RÉGLAGES, vus comme une famille de profils : ceux de `settings.yml`
-// hors de la machine. Voir `SettingsFile::MachineScope`.
-class SettingsPort final : public ProfilePort<SettingsValues> {
+// LES RÉGLAGES ET LES TOUCHES, vus comme une famille de profils, et poussés
+// dans la partie quand on les pose. Voir `SettingsProfilePort`.
+class SettingsPort final : public SettingsProfilePort {
  public:
-  SettingsPort(std::filesystem::path client_root, SettingsFile& file, GameOptions& options)
-      : client_root_(std::move(client_root)), file_(file), options_(options) {}
+  SettingsPort(std::filesystem::path client_root, SettingsFile& file, GameOptions& options,
+               Hotkeys& hotkeys)
+      : SettingsProfilePort(std::move(client_root), file, hotkeys), options_(options) {}
 
   // Où pousser ce qu'on pose, ou nul : les valeurs se posent alors sans être
   // poussées, et l'appelant les poussera lui-même.
@@ -31,16 +34,9 @@ class SettingsPort final : public ProfilePort<SettingsValues> {
   // par-dessus le profil qu'on vient de poser. Vide hors partie.
   void AfterPose(std::function<void()> then) { after_pose_ = std::move(then); }
 
-  [[nodiscard]] std::uint64_t Revision() override { return file_.revision(); }
-  [[nodiscard]] SettingsValues Capture() override { return file_.SharedValues(); }
-  void Pose(const SettingsValues& profile) override;
-  [[nodiscard]] SettingsValues Defaults() override { return file_.SharedDefaults(); }
-  [[nodiscard]] bool Load(SettingsProfileBook& into) override;
-  void Save(const SettingsProfileBook& from) override;
-
  private:
-  std::filesystem::path client_root_;
-  SettingsFile& file_;
+  void AfterAssign() override;
+
   GameOptions& options_;
   const OptionTargets* to_ = nullptr;
   std::function<void()> after_pose_;
@@ -51,8 +47,9 @@ class SettingsPort final : public ProfilePort<SettingsValues> {
 // jeu qui pose le profil du personnage.
 class SettingsProfiles {
  public:
-  SettingsProfiles(std::filesystem::path client_root, SettingsFile& file, GameOptions& options)
-      : port_(std::move(client_root), file, options), keeper_(port_, &Text) {}
+  SettingsProfiles(std::filesystem::path client_root, SettingsFile& file, GameOptions& options,
+                   Hotkeys& hotkeys)
+      : port_(std::move(client_root), file, options, hotkeys), keeper_(port_, &Text) {}
 
   void Start() { keeper_.Start(false); }
   // ⚠ SANS POUSSER : la partie applique tous les réglages juste après.

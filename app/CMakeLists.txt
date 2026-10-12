@@ -574,10 +574,11 @@ target_include_directories(moonclient_quests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(moonclient_profiles STATIC
     game/profile_yaml.cpp
     game/settings_profile_file.cpp
+    game/settings_profile_port.cpp
     game/ui_layout_file.cpp)
 
 target_link_libraries(moonclient_profiles
-    PUBLIC ro_core ro_ui yaml-cpp::yaml-cpp
+    PUBLIC ro_core ro_ui yaml-cpp::yaml-cpp moonclient_settings moonclient_hotkeys
     PRIVATE ro_warnings)
 
 target_include_directories(moonclient_profiles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

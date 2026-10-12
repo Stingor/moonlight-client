@@ -5889,8 +5889,8 @@ tr: Un perfil nuevo, copia de la IA básica.
 fr: Un profil retient la place, la taille et l'ouverture de chaque fenêtre. Chaque personnage garde le sien. Une fenêtre suit le bord de l'écran dont elle est la plus proche : changer de résolution ne la perd pas.
 tr: Un perfil recuerda el sitio, el tamaño y la apertura de cada ventana. Cada personaje conserva el suyo. Una ventana sigue el borde de la pantalla más cercano: cambiar la resolución no la pierde.
 
-fr: Un profil retient tous les réglages des options, sauf ceux de la machine : écran, volumes, langue et échelle de l'interface. Chaque personnage garde le sien.
-tr: Un perfil recuerda todos los ajustes de las opciones, salvo los de la máquina: pantalla, volúmenes, idioma y escala de la interfaz. Cada personaje conserva el suyo.
+fr: Un profil retient tous les réglages des options et les touches des raccourcis, sauf les réglages de la machine : écran, volumes, langue et échelle de l'interface. Chaque personnage garde le sien.
+tr: Un perfil recuerda todos los ajustes de las opciones y las teclas de los atajos, salvo los ajustes de la máquina: pantalla, volúmenes, idioma y escala de la interfaz. Cada personaje conserva el suyo.
 
 fr: Un salon visible porte déjà ce titre, à %d cases d'ici.
 tr: Una sala de chat visible ya lleva este título, a %d casillas de aquí.

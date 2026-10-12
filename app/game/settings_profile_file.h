@@ -12,7 +12,8 @@ namespace moonclient {
 // ── LES PROFILS DE RÉGLAGES SUR LE DISQUE : `savedata/settings_profiles.yml`
 //
 // Des profils nommés, chacun les réglages de `settings.yml` sauf ceux de la
-// machine — voir `SettingsFile::MachineScope` —, et le profil de chaque
+// machine — voir `SettingsFile::MachineScope` — avec les touches des
+// raccourcis — voir `SettingsProfilePort` —, et le profil de chaque
 // personnage. `settings.yml` reste le réglage VIVANT ; un profil en est une
 // copie, qui se pose en entrant en jeu.
 //

@@ -31,11 +31,10 @@ namespace moonclient {
 // un libellé de touche — parce que `ui` ne sait pas ce qu'est un code de touche
 // et n'a pas à l'apprendre. Même frontière que partout ailleurs.
 //
-// ⚠ DEUX FICHIERS, ET C'EST VOULU. Les touches ont le leur, les options le leur.
-// Ce ne sont pas les mêmes durées de vie : une table de raccourcis se recopie
-// d'une machine à l'autre, un volume ne s'emporte pas. Et une forme y va mal
-// pour l'autre — les touches sont une liste d'entrées, les options des valeurs
-// nommées.
+// ⚠ LES TOUCHES SUIVENT LE PROFIL DE RÉGLAGES, comme les options hors de la
+// machine : deux personnages sur un même profil ont les mêmes. `hotkeys.yml`
+// ne fait plus que les donner avant l'entrée en jeu, et aux profils qui n'en
+// ont pas. Voir `SettingsProfilePort`.
 class GameSettings {
  public:
   // La racine du client : c'est sous elle que vit `savedata`.
@@ -215,8 +214,6 @@ class GameSettings {
   void Flush();
 
  private:
-  void SaveHotkeysIfNeeded();
-
   std::filesystem::path client_root_;
   Hotkeys bindings_;
   ItemLayout item_layout_;
@@ -233,8 +230,6 @@ class GameSettings {
   std::vector<std::string> groups_;
   std::vector<ro::ui::HotkeyRowView> rows_;
   std::array<std::string_view, kHotkeyTabCount> tab_names_{};
-  // Le compte de changements DÉJÀ enregistré. Voir `Hotkeys::revision`.
-  std::uint32_t saved_revision_ = 0;
 
   // Les commandes que le menu du clic droit des macros propose.
   MacroCommandCatalogue macro_commands_;
