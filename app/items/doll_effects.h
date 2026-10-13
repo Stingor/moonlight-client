@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <map>
 #include <optional>
 #include <span>
 #include <string>
@@ -21,6 +23,8 @@
 
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
+#include "items/doll_body.h"
+#include "items/doll_wearing.h"
 #include "items/item_doll.h"
 #include "world/actor_ghosts.h"
 #include "world/map_stage.h"
@@ -44,6 +48,11 @@ namespace moonclient {
 // ⚠ LA PEINTURE SE FAIT PAR UN RAPPEL DE L'INTERFACE, pas ici : voir
 // `ro::ui::DollOverlay`.
 //
+// ⚠ UNE INSTANCE PAR PANTIN MONTRÉ EN MÊME TEMPS : elle ne porte qu'un
+// ensemble d'effets à la fois. Les aperçus de la boutique et de la description
+// se partagent la leur — un seul se survole —, le portrait de statut, toujours
+// à l'écran, a la sienne.
+//
 // ⚠ NI DÉPLACÉ NI COPIÉ : le moteur d'effets garde l'adresse du catalogue et de
 // la troupe, et le rappel celle de l'objet.
 class DollEffects {
@@ -55,16 +64,41 @@ class DollEffects {
   DollEffects& operator=(DollEffects&&) = delete;
   ~DollEffects() = default;
 
-  // FAIT VIVRE L'EFFET DE CE RANG sur le pantin de `doll`, et y pose le rappel
-  // qui le peindra. Rien sans rang, sans pantin ou sans joueur : l'effet d'avant
-  // s'oublie alors.
+  // LE PANTIN QUE LES EFFETS SUIVENT, à cette image.
+  struct DollPose {
+    // Où ses pieds tombent dans la boîte de `canvas`, et de combien il a grandi.
+    ro::render::VignetteFraming framing;
+    DollCanvas canvas;
+    // Le corps qu'il montre : quand un effet change l'acteur, c'est lui que le
+    // rappel repeint, à la place de l'image composée — voir
+    // `ComposeChangedDollBody`. Sa tête déplacée emporte ce qui s'y pose.
+    DollBodySource body;
+    // LA DIRECTION DU .ACT QU'IL MONTRE : le porteur s'y tourne, et un effet
+    // qui suit l'orientation de son porteur la suit.
+    std::size_t sprite_direction = 0;
+  };
+
+  // FAIT VIVRE CES EFFETS DE CHAPEAU sur le pantin `doll`, et rend le rappel
+  // qui les peindra. Rien sans effet connu, sans cadrage ou sans joueur : ce
+  // qui jouait s'oublie alors, et le rappel rendu est vide.
+  //
+  // `worn` : RANGÉS ET SANS DOUBLON. Un ensemble qui change repart de zéro —
+  // voir `DollWearing`.
+  struct Shown {
+    ro::ui::DollOverlay overlay;
+    // L'image composée du pantin ne se pose pas : le rappel peint le corps.
+    bool body_overlaid = false;
+  };
+  [[nodiscard]] Shown Advance(std::span<const ro::sim::HatEffectId> worn, const DollPose& doll,
+                              const ro::sim::World& world, const MapStage& stage,
+                              std::uint32_t now_ms);
+
+  // L'APERÇU D'UNE PIÈCE : l'effet de CE RANG sur le pantin de `doll`, dans la
+  // direction où la molette l'a tourné, et dont le rappel se pose sur lui. Rien
+  // sans rang ou sans pantin.
   //
   // ⚠ APRÈS LE PANTIN, dont `framing` est le cadrage : c'est lui qui efface
   // chaque image le rappel de la précédente.
-  //
-  // `body` est le corps que le pantin montre à cette image, ou nul : quand un
-  // effet du rang change l'acteur, c'est lui que le rappel repeint, à la place
-  // de l'image composée. Voir `ComposeChangedDollBody`.
   void Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordinal,
                const ro::render::VignetteFraming& framing, const DollBody* body,
                const ro::sim::World& world, const MapStage& stage, std::uint32_t now_ms);
@@ -97,6 +131,9 @@ class DollEffects {
   ro::sim::World stand_;
   ro::sim::WalkPlanner planner_{nullptr};
   ro::render::Camera camera_;
+  // LE DÉPLACEMENT DE LA TÊTE DU PORTEUR à cette image, sous son numéro : le
+  // moteur garde l'adresse de la table, que `SeeScene` lui passe.
+  std::map<std::uint32_t, glm::vec2> head_shifts_;
   // Ce que le moteur a rendu à cette image, peint par le rappel.
   std::span<const ro::render::DrawnEffect> played_;
   // LE CORPS DU PANTIN QUE SES EFFETS CHANGENT, rémanences en tête, peint par le
@@ -109,12 +146,11 @@ class DollEffects {
   // La carte où le porteur se tient, lue au moment de peindre les cases de
   // terrain. Nulle au repos.
   const MapStage* stage_ = nullptr;
-  // Le rang porté, zéro au repos, et la carte où il a été posé : l'un ou
-  // l'autre qui change repart de zéro.
-  std::int16_t worn_ = 0;
-  // Le joueur était-il sur une monture du shop quand le porteur est né ?
-  bool mounted_ = false;
-  std::string map_name_;
+  // Ce que le porteur porte, et où : vide au repos. Ce qui change repart de
+  // zéro.
+  DollWearing wearing_;
+  // La toile de la dernière image, que le rappel retrouve.
+  DollCanvas canvas_;
 };
 
 }  // namespace moonclient

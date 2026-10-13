@@ -237,20 +237,6 @@ void DrawDescriptionPanels(DescriptionWindowState& state, const DescriptionView&
   }
 }
 
-namespace {
-
-// Glisse le rappel de `app` dans la liste de dessin, à la place où il se
-// peindra, puis rend à l'interface l'état qu'il a changé. La liste COPIE
-// l'appel : le même peut resservir, passe changée, pour le rappel suivant.
-void PaintDollOverlay(const DollOverlay& overlay, const DollOverlayCall& call) {
-  ImDrawList* into = ImGui::GetWindowDrawList();
-  // ⚠ LA TAILLE PASSÉE : la liste COPIE l'appel, qui ne vit pas jusqu'au dessin.
-  into->AddCallback(overlay.paint, const_cast<DollOverlayCall*>(&call), sizeof(call));
-  into->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
-}
-
-}  // namespace
-
 void DrawItemDollTooltip(const DescriptionDollState& doll) {
   // Juste au-dessus du curseur, un peu à gauche : le pantin se tient au bas
   // de sa boîte, ses pieds près du curseur.

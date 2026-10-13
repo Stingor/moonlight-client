@@ -7,6 +7,15 @@
 
 namespace moonclient {
 
+DollBodySource SourceOf(const DollBody* body) {
+  if (body == nullptr) {
+    return {};
+  }
+  return DollBodySource{.composed = &body->composed,
+                        .animation_duration_ms = body->animation_duration_ms,
+                        .head_shift = body->head_shift};
+}
+
 bool ComposeChangedDollBody(std::span<const ro::render::ActorEffectPlay> played,
                             const DollBody& body, std::uint32_t bearer_id, glm::vec3 feet,
                             ActorGhosts& ghosts, std::uint32_t now_ms,

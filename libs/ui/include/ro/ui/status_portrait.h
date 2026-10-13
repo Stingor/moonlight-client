@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 
+#include "ro/ui/doll_overlay.h"
 #include "ro/ui/hud_frame.h"
 #include "ro/ui/skin_art.h"
 
@@ -98,6 +99,13 @@ struct StatusPortraitView {
   // `model` signale.
   SkinImage portrait;
   bool model = false;
+  // LES EFFETS DE CHAPEAU QUE LE JOUEUR PORTE, peints par `app` avec le
+  // portrait, au même cadrage et découpés à l'intérieur du cadre ; vide sans
+  // effet. Voir `DollOverlay`.
+  DollOverlay overlay;
+  // UN EFFET CHANGE LE CORPS — le rapetisse, l'éclaire, le double — : le
+  // rappel le repeint, et l'image composée ne se pose pas.
+  bool body_overlaid = false;
   // LES CADRES D'UN AUTRE HUD, visibles, sur lesquels les quatre s'aimantent
   // aussi — les jauges de la même page. Ils ne bougent jamais d'ici : un bloc
   // CTRL ne les emporte pas.

@@ -43,10 +43,27 @@ void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
   }
   if (!link_.is_open() || !status_portrait_.has_value()) {
     windows_.status_portrait.view = nullptr;
+    pieces_.portrait_effects.reset();
     return;
   }
   status_portrait_->Refresh(world_, options, settings_->options().stat_bars(), styles_, now_ms,
                             ImGui::GetIO().DisplaySize);
+  // LES EFFETS DE CHAPEAU DU PORTRAIT, par son propre moteur : un monde et trois
+  // renderers, qu'un joueur sans costume ou sans portrait ne paie pas.
+  if (!status_portrait_->portrait_shown()) {
+    pieces_.portrait_effects.reset();
+  } else if (!pieces_.portrait_effects.has_value() && effects_.has_value() &&
+             std::ranges::any_of(status_portrait_->hat_effects(),
+                                 [this](ro::sim::HatEffectId effect) {
+                                   return effects_->HatEffectFor(effect) != nullptr;
+                                 })) {
+    // ⚠ UN NUMÉRO SANS FICHE NE FAIT PAS NAÎTRE LE MOTEUR : il ne montrerait
+    // rien.
+    pieces_.portrait_effects.emplace(*vfs_);
+  }
+  if (pieces_.portrait_effects.has_value() && stage_.has_value()) {
+    status_portrait_->ShowHatEffects(*pieces_.portrait_effects, world_, *stage_, now_ms);
+  }
   windows_.status_portrait.view = &status_portrait_->view();
 }
 

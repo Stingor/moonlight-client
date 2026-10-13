@@ -198,6 +198,7 @@ add_library(ro_ui STATIC
     src/skin_combo.cpp
     src/description_odds.cpp
     src/description_panels.cpp
+    src/doll_overlay.cpp
     src/bug_report_window.cpp
     src/book_window.cpp
     src/skill_description_window.cpp

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -19,7 +20,22 @@ namespace moonclient {
 struct DollBody {
   ro::render::ComposedActor composed;
   float animation_duration_ms = 0.0F;
+  // DE COMBIEN SA TÊTE S'EST DÉPLACÉE depuis sa place de repos, en pixels de
+  // sprite — assis, en marche, monté —, ou rien sans tête : un effet posé sur
+  // la tête la suit. Voir `HeadShiftOf`.
+  std::optional<glm::vec2> head_shift;
 };
+
+// LE MÊME CORPS, DÉSIGNÉ ET NON COPIÉ : ce qu'un pantin montre à cette image,
+// tant que sa vignette ne recompose pas. Nul `composed` : pas de corps.
+struct DollBodySource {
+  const ro::render::ComposedActor* composed = nullptr;
+  float animation_duration_ms = 0.0F;
+  std::optional<glm::vec2> head_shift;
+};
+
+// Ce que désigne un corps gardé, ou rien.
+[[nodiscard]] DollBodySource SourceOf(const DollBody* body);
 
 // LE CORPS DU PANTIN QU'UN EFFET DE CHAPEAU CHANGE, tel que la partie le
 // peindrait : rapetissé, teint, aux calques additifs, suivi de ses rémanences.

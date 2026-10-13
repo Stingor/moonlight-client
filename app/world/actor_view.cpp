@@ -152,9 +152,8 @@ void FillOngoingAction(ro::render::ActorWardrobe& wardrobe, const ro::sim::World
   }
 }
 
-// DE COMBIEN LA TÊTE COMPOSÉE S'EST DÉPLACÉE depuis sa place de repos, que le
-// client mesure sur le corps À PIED du même acteur : une monture relève donc
-// la tête, et ce qu'elle porte avec. Rien sans tête.
+}  // namespace
+
 std::optional<glm::vec2> HeadShiftOf(ro::render::ActorWardrobe& wardrobe,
                                      const ro::render::ActorOutfit& outfit,
                                      const ro::render::ActorLook& look,
@@ -172,8 +171,6 @@ std::optional<glm::vec2> HeadShiftOf(ro::render::ActorWardrobe& wardrobe,
   }
   return *composed.head_place - *rest;
 }
-
-}  // namespace
 
 const ro::sim::Strike* PosingStrikeOf(const ro::sim::World& world, const ro::sim::Actor& actor) {
   if (!actor.attack.has_value()) {

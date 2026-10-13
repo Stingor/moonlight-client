@@ -462,6 +462,14 @@ void ReportCensus(const SceneCensus& census, SceneCensus& last_reported);
     ro::render::ActorWardrobe& wardrobe, const ro::sim::World& world,
     const ro::sim::Actor& attacker, const ro::sim::Strike& strike);
 
+// DE COMBIEN LA TÊTE COMPOSÉE S'EST DÉPLACÉE depuis sa place de repos, en
+// pixels de sprite, mesurée sur le corps À PIED de la même apparence : une
+// monture relève donc la tête, et ce qu'elle porte avec. Rien sans tête.
+[[nodiscard]] std::optional<glm::vec2> HeadShiftOf(ro::render::ActorWardrobe& wardrobe,
+                                                   const ro::render::ActorOutfit& outfit,
+                                                   const ro::render::ActorLook& look,
+                                                   const ro::render::ComposedActor& composed);
+
 // LE COUP DONT L'ACTEUR MONTRE LE GESTE : son dernier, sauf quand c'est une
 // éclaboussure, qui ne pose rien — c'est alors celui d'avant. Rien sans coup.
 [[nodiscard]] const ro::sim::Strike* PosingStrikeOf(const ro::sim::World& world,

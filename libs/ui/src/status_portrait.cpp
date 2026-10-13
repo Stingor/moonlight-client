@@ -48,10 +48,20 @@ constexpr const char* kSlashedJoint = "/";
 void PaintHead(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right,
                const StatusPortraitView& view, float pixels) {
   if (view.portrait.usable()) {
-    into.AddImage(
-        view.portrait.id,
-        ImVec2(top_left.x + kPortraitImageInset, top_left.y + kPortraitImageInset),
-        ImVec2(bottom_right.x - kPortraitImageInset, bottom_right.y - kPortraitImageInset));
+    // LES EFFETS DE CHAPEAU ENCADRENT L'IMAGE, dans le rectangle même où elle
+    // tombe : ce que la partie peint avant les corps passe dessous, le reste
+    // dessus. Voir `DollOverlay`.
+    DollOverlayCall call{
+        .painter = view.overlay.painter,
+        .min = ImVec2(top_left.x + kPortraitImageInset, top_left.y + kPortraitImageInset),
+        .max = ImVec2(bottom_right.x - kPortraitImageInset, bottom_right.y - kPortraitImageInset),
+        .pass = DollOverlayPass::kBehind};
+    PaintDollOverlay(view.overlay, call);
+    if (view.overlay.paint == nullptr || !view.body_overlaid) {
+      into.AddImage(view.portrait.id, call.min, call.max);
+    }
+    call.pass = DollOverlayPass::kFront;
+    PaintDollOverlay(view.overlay, call);
     return;
   }
   if (view.model) {

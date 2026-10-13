@@ -168,6 +168,14 @@ std::size_t SpriteDirection(std::size_t compass_direction, float camera_yaw_degr
   return static_cast<std::size_t>((direction + kDirections) % kDirections);
 }
 
+std::size_t CompassOfSpriteDirection(std::size_t sprite_direction) noexcept {
+  // Le nord de la boussole est la cinquième direction du .act, et les deux
+  // tournent en sens contraires : la même soustraction les relie dans les deux
+  // sens.
+  constexpr std::size_t kSpriteNorth = kDirectionCount / 2;
+  return (kSpriteNorth + kDirectionCount - sprite_direction % kDirectionCount) % kDirectionCount;
+}
+
 std::size_t SpriteDirectionOfDegrees(float client_body_degrees, float camera_yaw_degrees,
                                      bool rounded) noexcept {
   constexpr float kFullTurnDegrees = 360.0F;

@@ -441,6 +441,10 @@ struct GamePieces {
   // L'EFFET DE CHAPEAU SUR LE PANTIN DES APERÇUS — celui de la boutique, celui
   // du « ViewID ». Voir `DollEffects`.
   std::optional<DollEffects> doll_effects;
+  // ET CELUI DU PORTRAIT DE STATUT, à lui seul : toujours à l'écran, il ne prend
+  // pas le moteur des aperçus, qui ne l'éteignent pas davantage. Né au premier
+  // effet à montrer, rendu quand le portrait quitte l'écran.
+  std::optional<DollEffects> portrait_effects;
 
   // LE DÉCOR QUI SE VOILE DEVANT LE JOUEUR : voir `DecorVeilView`.
   DecorVeilView decor_veil;

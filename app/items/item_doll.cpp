@@ -123,8 +123,14 @@ void ItemDoll::Refresh(const ro::sim::World& world, std::uint16_t view_id,
     return;
   }
   if (const ro::render::ComposedActor* composed = doll_->composed()) {
-    body_ =
-        DollBody{.composed = *composed, .animation_duration_ms = doll_->animation_duration_ms()};
+    // SA TÊTE DÉPLACÉE, que suit un effet posé sur elle : assise, en marche.
+    const ro::render::ActorOutfit* outfit =
+        wardrobe_ != nullptr ? wardrobe_->OutfitFor(pose.look) : nullptr;
+    body_ = DollBody{.composed = *composed,
+                     .animation_duration_ms = doll_->animation_duration_ms(),
+                     .head_shift = outfit != nullptr
+                                       ? HeadShiftOf(*wardrobe_, *outfit, pose.look, *composed)
+                                       : std::nullopt};
   }
   state.image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(drawn.texture.name()),
                                   .width = ro::ui::kDescriptionDollWidthPixels,

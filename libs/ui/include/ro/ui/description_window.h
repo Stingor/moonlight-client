@@ -12,6 +12,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/chat_link.h"
+#include "ro/ui/doll_overlay.h"
 #include "ro/ui/item_link_cell.h"
 #include "ro/ui/rich_text.h"
 #include "ro/ui/shortcut_bar.h"
@@ -69,39 +70,6 @@ struct DescriptionPlacement {
 inline constexpr float kDescriptionDollWidthPixels = 260.0F;
 inline constexpr float kDescriptionDollHeightPixels = 240.0F;
 inline constexpr float kDescriptionDollBodyPixels = 120.0F;
-
-// L'EFFET QUE `app` PEINT AVEC LE PANTIN — un effet de chapeau —, au moment
-// même où l'interface se dessine.
-//
-// 🔴 UN RAPPEL DE DESSIN, ET NON UNE IMAGE : un effet se mélange à ce qu'il a
-// derrière lui, et derrière la bulle il y a le jeu. Une image transparente
-// perdrait tout ce qui s'ajoute ; le rappel peint dans l'image elle-même, à la
-// place de la bulle. Voir `ro::render::BeginInsetPaint`.
-//
-// 🔴 DEUX PASSES, COMME LA PARTIE : ce que la partie peint AVANT les corps — la
-// file du sol, les fichiers qu'une fiche range avant le personnage — passe
-// derrière l'image du pantin, le reste devant. Un seul rappel placé d'un côté
-// ou de l'autre ne peut pas montrer un effet dont une moitié passe derrière.
-struct DollOverlay {
-  // Nul : rien à peindre.
-  ImDrawCallback paint = nullptr;
-  void* painter = nullptr;
-};
-
-// La passe qu'un rappel peint.
-enum class DollOverlayPass : std::uint8_t {
-  kBehind,  // avant l'image du pantin : ce que les corps recouvrent
-  kFront,   // après elle
-};
-
-// CE QUE LE RAPPEL REÇOIT, copié dans la liste de dessin : son peintre, le
-// rectangle du pantin en coordonnées d'écran de l'interface, et sa passe.
-struct DollOverlayCall {
-  void* painter = nullptr;
-  ImVec2 min{0.0F, 0.0F};
-  ImVec2 max{0.0F, 0.0F};
-  DollOverlayPass pass = DollOverlayPass::kFront;
-};
 
 struct DescriptionDollState {
   // Le pantin composé, posé par `app`.

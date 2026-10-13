@@ -9,10 +9,12 @@
 #include "ro/core/log.h"
 #include "ro/render/hat_effect_table.h"
 #include "ro/render/inset_paint.h"
+#include "ro/render/sprite_frame.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/movement.h"
 
 #include "effects/doll_camera.h"
+#include "effects/effect_actor_view.h"
 #include "effects/effect_layers.h"
 #include "items/doll_body.h"
 #include "world/actor_effect_finish.h"
@@ -30,15 +32,13 @@ constexpr std::uint32_t kBearerId = 1;
   return static_cast<std::int32_t>(std::lround(value));
 }
 
-// 🔴 LA TOILE DE L'EFFET DÉBORDE LA BOÎTE DU PANTIN, d'une boîte entière de
-// chaque côté : une aura, une paire d'ailes s'étendent bien au-delà du
-// personnage, et bornées à sa boîte elles se coupaient net. Les pieds restent
-// où le pantin les pose, à la même échelle ; seul le cadre grandit.
-constexpr float kCanvasMarginBoxes = 1.0F;
-constexpr float kCanvasMarginX = ro::ui::kDescriptionDollWidthPixels * kCanvasMarginBoxes;
-constexpr float kCanvasMarginY = ro::ui::kDescriptionDollHeightPixels * kCanvasMarginBoxes;
-constexpr float kCanvasWidth = ro::ui::kDescriptionDollWidthPixels + 2.0F * kCanvasMarginX;
-constexpr float kCanvasHeight = ro::ui::kDescriptionDollHeightPixels + 2.0F * kCanvasMarginY;
+// 🔴 LA TOILE DE L'EFFET D'UN APERÇU DÉBORDE LA BOÎTE DU PANTIN, d'une boîte
+// entière de chaque côté : une aura, une paire d'ailes s'étendent bien au-delà
+// du personnage, et doivent s'y montrer entières. Les pieds restent où le
+// pantin les pose, à la même échelle ; seul le cadre grandit.
+constexpr DollCanvas kPreviewCanvas{
+    .box_px = glm::vec2(ro::ui::kDescriptionDollWidthPixels, ro::ui::kDescriptionDollHeightPixels),
+    .margin_boxes = 1.0F};
 
 }  // namespace
 
@@ -56,86 +56,130 @@ DollEffects::DollEffects(ro::vfs::Vfs& vfs)
   ground_quads_ = std::move(*ground_quads);
 }
 
-void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordinal,
-                          const ro::render::VignetteFraming& framing, const DollBody* body,
-                          const ro::sim::World& world, const MapStage& stage,
-                          std::uint32_t now_ms) {
+DollEffects::Shown DollEffects::Advance(std::span<const ro::sim::HatEffectId> worn,
+                                        const DollPose& doll, const ro::sim::World& world,
+                                        const MapStage& stage, std::uint32_t now_ms) {
   const ro::sim::Actor* player = world.player();
   const bool ready = effect_renderer_.has_value() && sprites_.has_value();
-  if (ordinal <= 0 || !doll.image.usable() || !framing.usable() || player == nullptr || !ready) {
+  if (worn.empty() || !doll.framing.usable() || !doll.canvas.usable() || player == nullptr ||
+      !ready) {
     Rest();
-    return;
+    return {};
   }
-  const auto worn = static_cast<ro::sim::HatEffectId>(ordinal);
-  const ro::render::HatEffect* record = effects_.HatEffectFor(worn);
-  if (record == nullptr) {
+  // ⚠ UN NUMÉRO SANS FICHE NE PORTE RIEN, comme en partie : l'ensemble ne
+  // garde que ce qui se montre, et rien de montrable revient au repos.
+  std::vector<ro::sim::HatEffectId> shown_effects;
+  for (const ro::sim::HatEffectId effect : worn) {
+    if (effects_.HatEffectFor(effect) != nullptr) {
+      shown_effects.push_back(effect);
+    }
+  }
+  if (shown_effects.empty()) {
     Rest();
-    return;
+    return {};
   }
   // LE PORTEUR NAÎT À LA CASE DU JOUEUR, et y reste : le sol de la carte est
-  // là, et les nœuds qui rebondissent le cherchent.
-  // ET IL MONTE COMME LUI : le pantin montre sa monture du shop, et l'ancre
-  // d'un chapeau la lit.
-  const bool mounted = player->status_effects.contains(ro::sim::kStatusAllRiding);
-  if (ordinal != worn_ || stage.name != map_name_ || mounted != mounted_) {
+  // là, et les nœuds qui rebondissent le cherchent. IL MONTRE LE MÊME CORPS :
+  // métier montré et monture du shop, que l'ancre d'un chapeau lit.
+  DollWearing wanted = WearingOf(*player, std::move(shown_effects), stage.name);
+  if (wanted != wearing_) {
     Rest();
     ro::sim::Actor bearer;
     bearer.id = kBearerId;
     bearer.kind = ro::sim::ActorKind::kPlayer;
     bearer.position = player->position;
-    // LE MÉTIER QUE MONTRE LE JOUEUR : l'ancre d'un chapeau monte avec une
-    // monture et se réduit avec un bébé.
-    bearer.look.job = static_cast<std::uint16_t>(ShownJobOf(*player));
-    bearer.hat_effects.insert(worn);
-    if (mounted) {
+    bearer.look.job = static_cast<std::uint16_t>(wanted.shown_job);
+    bearer.hat_effects.insert(wanted.worn.begin(), wanted.worn.end());
+    if (wanted.mounted) {
       bearer.status_effects.insert(ro::sim::kStatusAllRiding);
     }
     stand_.Spawn(std::move(bearer));
-    worn_ = ordinal;
-    mounted_ = mounted;
-    map_name_ = stage.name;
+    wearing_ = std::move(wanted);
   }
+  // IL REGARDE OÙ LE PANTIN REGARDE, à chaque image : la molette d'un aperçu,
+  // la direction choisie pour le portrait. La caméra du pantin n'a pas pivoté.
+  static_cast<void>(stand_.Turn(
+      kBearerId,
+      static_cast<std::uint8_t>(ro::render::CompassOfSpriteDirection(doll.sprite_direction)), 0));
   const ro::sim::Actor* bearer = stand_.Find(kBearerId);
   if (bearer == nullptr) {
-    return;
+    return {};
   }
   const ro::sim::FractionalCell cell =
       ro::sim::InterpolatedCell(*bearer, planner_.PathFor(*bearer), now_ms);
   const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
-  ro::render::VignetteFraming on_canvas = framing;
-  on_canvas.origin += glm::vec2(kCanvasMarginX, kCanvasMarginY);
-  camera_ = DollCamera(glm::vec3(ground[0], ground[1], ground[2]), on_canvas, kCanvasWidth,
-                       kCanvasHeight);
+  canvas_ = doll.canvas;
+  const glm::vec2 canvas_px = doll.canvas.size_px();
+  camera_ = DollCamera(glm::vec3(ground[0], ground[1], ground[2]),
+                       OnDollCanvas(doll.framing, doll.canvas), canvas_px.x, canvas_px.y);
   stage_ = &stage;
+  // SA TÊTE BOUGE COMME CELLE DU PANTIN — assise, balancée par la marche,
+  // relevée par une monture — et ce qui s'y pose la suit.
+  head_shifts_.clear();
+  if (doll.body.head_shift.has_value()) {
+    head_shifts_[kBearerId] = *doll.body.head_shift;
+  }
+  const std::size_t sprite_direction = doll.sprite_direction;
   // LE MÊME BATTEMENT QUE LA PARTIE, réduit à ce qu'un porteur immobile demande.
   nodes_.NoticeWorld(EffectScatterWorldOf(stage));
-  effects_.SeeScene(camera_, {});
-  effects_.Classes().SeeScene(camera_, kCanvasWidth, kCanvasHeight, effects_.MinimalEffects());
+  effects_.SeeScene(camera_,
+                    EffectActorView{.sprite_direction_of =
+                                        [sprite_direction](const ro::sim::Actor& /*actor*/,
+                                                           std::uint32_t /*now_ms*/) {
+                                          return std::optional<std::size_t>(sprite_direction);
+                                        },
+                                    .head_shifts = &head_shifts_});
+  effects_.Classes().SeeScene(camera_, canvas_px.x, canvas_px.y, effects_.MinimalEffects());
   effects_.NoticeHatEffects(stand_, stage, planner_, now_ms);
   played_ = effects_.Drawn(now_ms, stage, stand_, planner_);
   static_cast<void>(nodes_.Drawn(now_ms, camera_));
   effects_.SowRequestedEffects(stand_, stage, planner_, now_ms);
   Drain(now_ms);
   // LE CORPS QUE SES EFFETS CHANGENT se repeint ici, et l'image composée se
-  // retire : voir `ComposeChangedDollBody`.
+  // retire : voir `ComposeChangedDollBody`. ⚠ LA SEULE COPIE DU CORPS : il doit
+  // vivre jusqu'à la peinture.
+  Shown shown;
   body_draws_.clear();
-  doll.body_overlaid = false;
-  if (body != nullptr) {
+  if (doll.body.composed != nullptr) {
     if (const ro::sim::Actor* settled = stand_.Find(kBearerId)) {
-      body_ = *body;
+      body_ = DollBody{.composed = *doll.body.composed,
+                       .animation_duration_ms = doll.body.animation_duration_ms,
+                       .head_shift = doll.body.head_shift};
       PlayedEffectsOf(*settled, now_ms, bearer_effects_);
-      doll.body_overlaid = ComposeChangedDollBody(bearer_effects_, body_, kBearerId,
-                                                  glm::vec3(ground[0], ground[1], ground[2]),
-                                                  ghosts_, now_ms, body_draws_);
+      shown.body_overlaid = ComposeChangedDollBody(bearer_effects_, body_, kBearerId,
+                                                   glm::vec3(ground[0], ground[1], ground[2]),
+                                                   ghosts_, now_ms, body_draws_);
     }
   }
   // ⚠ CE QUE LA PARTIE PEINT AVANT LES CORPS passe sous le pantin : l'ombre d'un
   // costume, le fichier qu'une fiche range avant le personnage. Voir `PaintInto`.
-  doll.overlay = ro::ui::DollOverlay{.paint = &DollEffects::Paint, .painter = this};
+  shown.overlay = ro::ui::DollOverlay{.paint = &DollEffects::Paint, .painter = this};
+  return shown;
+}
+
+void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordinal,
+                          const ro::render::VignetteFraming& framing, const DollBody* body,
+                          const ro::sim::World& world, const MapStage& stage,
+                          std::uint32_t now_ms) {
+  if (ordinal <= 0 || !doll.image.usable()) {
+    Rest();
+    return;
+  }
+  const std::array<ro::sim::HatEffectId, 1> worn = {static_cast<ro::sim::HatEffectId>(ordinal)};
+  const Shown shown = Advance(worn,
+                              DollPose{.framing = framing,
+                                       .canvas = kPreviewCanvas,
+                                       .body = SourceOf(body),
+                                       .sprite_direction = doll.direction},
+                              world, stage, now_ms);
+  doll.body_overlaid = shown.body_overlaid;
+  if (shown.overlay.paint != nullptr) {
+    doll.overlay = shown.overlay;
+  }
 }
 
 void DollEffects::Rest() {
-  if (worn_ == 0) {
+  if (wearing_.worn.empty()) {
     return;
   }
   effects_.Forget();
@@ -154,9 +198,7 @@ void DollEffects::Rest() {
   body_draws_.clear();
   ghosts_.Forget();
   stage_ = nullptr;
-  worn_ = 0;
-  mounted_ = false;
-  map_name_.clear();
+  wearing_ = DollWearing();
 }
 
 void DollEffects::ForgetTextures() {
@@ -193,8 +235,8 @@ void DollEffects::Paint(const ImDrawList* list, const ImDrawCmd* command) {
 
 void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call) {
   const ImDrawData* frame = ImGui::GetDrawData();
-  if (worn_ == 0 || stage_ == nullptr || !effect_renderer_.has_value() || !sprites_.has_value() ||
-      frame == nullptr) {
+  if (wearing_.worn.empty() || stage_ == nullptr || !effect_renderer_.has_value() ||
+      !sprites_.has_value() || frame == nullptr) {
     return;
   }
   // Des coordonnées de l'interface aux pixels de l'image, dont OpenGL compte les
@@ -206,8 +248,8 @@ void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call) {
   if (box_width <= 0.0F || box_height <= 0.0F) {
     return;
   }
-  const float margin_x = kCanvasMarginX * box_width / ro::ui::kDescriptionDollWidthPixels;
-  const float margin_y = kCanvasMarginY * box_height / ro::ui::kDescriptionDollHeightPixels;
+  const float margin_x = canvas_.margin_boxes * box_width;
+  const float margin_y = canvas_.margin_boxes * box_height;
   const float left = (call.min.x - frame->DisplayPos.x) * scale.x - margin_x;
   const float top = (call.min.y - frame->DisplayPos.y) * scale.y - margin_y;
   const float width = box_width + 2.0F * margin_x;

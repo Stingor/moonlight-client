@@ -178,6 +178,12 @@ inline constexpr float kWalkFramesPerWorldUnit = 0.37F * 4.0F;
 [[nodiscard]] std::size_t SpriteDirection(std::size_t compass_direction,
                                           float camera_yaw_degrees = 0.0F) noexcept;
 
+// L'INVERSE DE `SpriteDirection` sous une caméra qui n'a pas pivoté : la
+// direction de boussole qu'un acteur doit tenir pour montrer cette direction
+// du .act. C'est ainsi qu'un acteur factice se tourne comme l'image qu'il
+// double — un pantin qu'on fait tourner à la molette.
+[[nodiscard]] std::size_t CompassOfSpriteDirection(std::size_t sprite_direction) noexcept;
+
 // LA DIRECTION D'ÉCRAN D'UN CORPS DONT LE CLIENT TIENT L'ANGLE DE FACE — voir
 // `ro::sim::ClientAimDegrees` : le sud vaut zéro, l'est quatre-vingt-dix —,
 // vu d'une caméra tournée de `camera_yaw_degrees`, dans la convention de

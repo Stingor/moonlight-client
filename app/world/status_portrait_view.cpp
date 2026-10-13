@@ -8,13 +8,19 @@
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
 
+#include "items/doll_effects.h"
 #include "world/actor_view.h"
+#include "world/map_stage.h"
 
 namespace moonclient {
 namespace {
 
 // Un cadre a deux bords par axe, et l'écart se prend des deux côtés.
 constexpr float kEdgesPerAxis = 2.0F;
+
+// LES EFFETS DE CHAPEAU S'ARRÊTENT AU BORD DU CADRE, comme le personnage : leur
+// toile est la boîte dessinée, sans marge.
+constexpr float kPortraitCanvasMarginBoxes = 0.0F;
 
 // Ce que le serveur dit d'un niveau, ou rien tant qu'il ne l'a pas dit.
 [[nodiscard]] std::optional<std::int32_t> KnownLevel(std::int64_t level) {
@@ -39,6 +45,10 @@ void PortraitHudView::Refresh(const ro::sim::World& world, const StatusPortraitO
                               const ro::ui::StatBarsLook& gauges, ActorStyles& styles,
                               std::uint32_t now_ms, ImVec2 screen) {
   view_ = ro::ui::StatusPortraitView();
+  portrait_shown_ = false;
+  hat_effects_.clear();
+  framing_ = ro::render::VignetteFraming();
+  body_ = DollBodySource();
   const ro::sim::Actor* self = world.player();
   if (self == nullptr || !options.look().shown) {
     return;
@@ -63,8 +73,26 @@ void PortraitHudView::Refresh(const ro::sim::World& world, const StatusPortraitO
   view_.base_level = KnownLevel(status.base_level);
   view_.job_level = KnownLevel(status.job_level);
   if (options.look().parts[Rank(ro::ui::PortraitPart::kHead)].shown) {
+    portrait_shown_ = true;
     RefreshPortrait(world, options, styles, now_ms, screen);
   }
+}
+
+void PortraitHudView::ShowHatEffects(DollEffects& effects, const ro::sim::World& world,
+                                     const MapStage& stage, std::uint32_t now_ms) {
+  // Sans image, rien où les poser : l'ensemble vide repose le moteur.
+  if (!view_.portrait.usable()) {
+    hat_effects_.clear();
+  }
+  const DollEffects::Shown shown =
+      effects.Advance(hat_effects_,
+                      DollEffects::DollPose{.framing = framing_,
+                                            .canvas = canvas_,
+                                            .body = body_,
+                                            .sprite_direction = sprite_direction_},
+                      world, stage, now_ms);
+  view_.overlay = shown.overlay;
+  view_.body_overlaid = shown.body_overlaid;
 }
 
 void PortraitHudView::RefreshPortrait(const ro::sim::World& world,
@@ -90,8 +118,9 @@ void PortraitHudView::RefreshPortrait(const ro::sim::World& world,
   // L'apparence que la carte montre, couleurs composées comprises.
   ro::render::ActorLook dressed = LookOf(*self);
   styles.Dress(self->id, dressed, *wardrobe_, world.styles());
-  if (ro::render::DrawnAsModel(wardrobe_->catalog(), dressed)) {
-    view_.model = true;
+  view_.model = ro::render::DrawnAsModel(wardrobe_->catalog(), dressed);
+  hat_effects_ = PortraitHatEffects(*self, view_.model);
+  if (view_.model) {
     return;
   }
   const PortraitFramingSettings framing = BoundedFraming(options.framing());
@@ -117,6 +146,26 @@ void PortraitHudView::RefreshPortrait(const ro::sim::World& world,
   const ro::render::IconTexture& drawn = portrait_->Get(pose);
   if (!drawn.usable()) {
     return;
+  }
+  // 🔴 LE CADRAGE IMPOSÉ, ET NON CELUI DE LA BOÎTE : en portrait, la vignette
+  // rend l'origine et l'échelle que `FramePortrait` vient de choisir, dans la
+  // boîte dessinée — tête seule, zoom et décalages compris. L'effet suit donc
+  // le personnage là où le cadre le montre.
+  framing_ = portrait_->framing();
+  canvas_ = DollCanvas{.box_px = glm::vec2(static_cast<float>(width), static_cast<float>(height)),
+                       .margin_boxes = kPortraitCanvasMarginBoxes};
+  sprite_direction_ = pose.direction;
+  // LE CORPS DÉSIGNÉ, SANS COPIE : seul le moteur d'effets le copie, quand il
+  // en a l'usage. Sa tête déplacée emporte ce qui s'y pose.
+  if (!hat_effects_.empty()) {
+    if (const ro::render::ComposedActor* composed = portrait_->composed()) {
+      const ro::render::ActorOutfit* outfit = wardrobe_->OutfitFor(dressed);
+      body_ = DollBodySource{
+          .composed = composed,
+          .animation_duration_ms = portrait_->animation_duration_ms(),
+          .head_shift = outfit != nullptr ? HeadShiftOf(*wardrobe_, *outfit, dressed, *composed)
+                                          : std::nullopt};
+    }
   }
   // La taille posée est celle de la boîte : la texture est en pixels de sprite,
   // et c'est la carte qui l'agrandit.

@@ -200,6 +200,9 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     effect_renderer_ = std::move(*renderer);
   }
   pieces_.doll_effects.emplace(*vfs_);
+  // CELUI DU PORTRAIT RENAÎT À SON PREMIER EFFET : un autre personnage, même
+  // costume et même carte, n'hérite pas du porteur de son prédécesseur.
+  pieces_.portrait_effects.reset();
   report_stage("effets");
 
   // LE POST-TRAITEMENT DU MONDE. ⚠ MÊME INDULGENCE : un pilote qui refuse ses
