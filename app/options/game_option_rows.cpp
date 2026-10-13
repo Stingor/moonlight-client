@@ -19,6 +19,7 @@
 #include "ro/ui/commands_page.h"
 #include "ro/ui/system_fonts.h"
 
+#include "options/bubble_samples.h"
 #include "options/entity_page_tabs.h"
 #include "options/game_options.h"
 #include "options/option_row_kinds.h"
@@ -213,7 +214,6 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   pages_.map_sign.ComposeInto(display_rows_);
   display_rows_.back().heading = Tr("Arrivée sur une carte");
   pages_.window_title.ComposeInto(display_rows_);
-  pages_.balloons.ComposeInto(display_rows_);
   // LES FENÊTRES QUI N'ONT QUE QUELQUES RÉGLAGES, un bloc chacune : voir
   // `OptionSection::kInterface`. Leur puce mène à leur intertitre.
   display_rows_.push_back(
@@ -739,8 +739,16 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
       ro::ui::OptionSectionView{.title = Tr("Groupe / Amis"), .rows = pages_.party.window_rows()};
   sections_[Rank(OptionSection::kChat)] =
       ro::ui::OptionSectionView{.title = Tr("Conversation"), .rows = chat_rows_};
+  pages_.bubble_pinned_rows.assign(1, ChatBubbleSampleRow(bubbles_));
   sections_[Rank(OptionSection::kBubbles)] =
-      ro::ui::OptionSectionView{.title = Tr("Bulles"), .rows = bubble_rows_};
+      ro::ui::OptionSectionView{.title = Tr("Bulles de chat"),
+                                .rows = bubble_rows_,
+                                .pinned_rows = pages_.bubble_pinned_rows};
+  pages_.balloons.Compose();
+  sections_[Rank(OptionSection::kBroadcastBalloons)] =
+      ro::ui::OptionSectionView{.title = Tr("Bulles d'annonces"),
+                                .rows = pages_.balloons.rows(),
+                                .pinned_rows = pages_.balloons.pinned_rows()};
   // ⚠ « INVENTORY », « CART » ET « STORAGE » RESTENT EN ANGLAIS : c'est le
   // vocabulaire de jeu, que les joueurs lisent ainsi depuis des années.
   sections_[Rank(OptionSection::kItemObtain)] =

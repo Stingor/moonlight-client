@@ -186,9 +186,13 @@ void DrawBroadcastBalloons(std::span<const BalloonView> balloons, const Broadcas
   if (balloons.empty()) {
     return;
   }
-  ImDrawList* into = ImGui::GetBackgroundDrawList();
-  const float center = BalloonCenterX(anchor, ImGui::GetIO().DisplaySize.x);
+  PaintBroadcastBalloons(ImGui::GetBackgroundDrawList(), balloons, look,
+                         BalloonCenterX(anchor, ImGui::GetIO().DisplaySize.x), top_y, rich);
+}
 
+float PaintBroadcastBalloons(ImDrawList* into, std::span<const BalloonView> balloons,
+                             const BroadcastBalloonLook& look, float center_x, float top_y,
+                             const ChatRichArt* rich) {
   // Ce que le fil sait peindre, SANS SES VIGNETTES : une bulle ne télécharge
   // rien, et sa rangée ne doit pas grandir.
   ChatRichArt balloon_rich;
@@ -219,8 +223,12 @@ void DrawBroadcastBalloons(std::span<const BalloonView> balloons, const Broadcas
     const float widest = row_widths.empty() ? 0.0F : *std::ranges::max_element(row_widths);
     const ImVec2 size = BalloonSize(widest, stacked);
     // ⚠ ENTIER COMME CHEZ LE CLIENT : un bord à x,5 baverait d'un pixel.
-    const ImVec2 top_left(std::floor(center - size.x * 0.5F), y);
+    const ImVec2 top_left(std::floor(center_x - size.x * 0.5F), y);
     const ImVec2 bottom_right(top_left.x + size.x, top_left.y + size.y);
+    y = bottom_right.y;
+    if (into == nullptr) {
+      continue;
+    }
 
     const int first_vertex = into->VtxBuffer.Size;
     // LE VOILE À L'INTÉRIEUR DU LISERÉ, puis le liseré par-dessus.
@@ -238,9 +246,8 @@ void DrawBroadcastBalloons(std::span<const BalloonView> balloons, const Broadcas
     ShadeSince(into, shadow_vertex);
     PlaceLines(balloon, frame, text_at, PlaceTarget{.into = into}, nullptr);
     FadeSince(into, first_vertex, std::clamp(balloon.alpha, 0.0F, 1.0F));
-
-    y = bottom_right.y;
   }
+  return y;
 }
 
 }  // namespace ro::ui

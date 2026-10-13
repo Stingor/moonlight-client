@@ -7724,9 +7724,6 @@ tr: Arco
 fr: Bruitages
 tr: Efectos de sonido
 
-fr: Bulles
-tr: Burbujas
-
 fr: Bullet
 tr: Bala
 
@@ -17543,9 +17540,6 @@ tr: Anuncios — arrastra para colocar
 fr: Au-delà, la plus ancienne part pour la nouvelle. Le jeu en garde trois. L'avancée des chasses n'en montre toujours qu'une : chacune remplace la précédente.
 tr: Más allá, la más antigua se va para dejar sitio a la nueva. El juego guarda tres. El avance de las cacerías siempre muestra solo una: cada una reemplaza a la anterior.
 
-fr: Bulles d'annonce
-tr: Burbujas de anuncio
-
 fr: Bulles d'annonce en haut de l'écran
 tr: Burbujas de anuncio en la parte superior de la pantalla
 
@@ -17623,3 +17617,27 @@ tr: [%s] no ha conseguido mejorar el item [%s grado %s].
 
 fr: [%s] n'a pas réussi à raffiner [+%d %s].
 tr: [%s] no ha conseguido refinar [+%d %s].
+
+fr: Bulles de chat
+tr: Burbujas de chat
+
+fr: Bulles d'annonces
+tr: Burbujas de anuncios
+
+fr: Salut tout le monde !
+tr: ¡Hola a todos!
+
+fr: Quelqu'un pour une partie à Glast Heim ?
+tr: ¿Alguien para una partida en Glast Heim?
+
+fr: Bienvenue ! Le serveur redémarre dans dix minutes.
+tr: ¡Bienvenidos! El servidor se reinicia en diez minutos.
+
+fr: Poring a raffiné un équipement avec succès : +9 Knife obtenu.
+tr: Poring ha refinado un equipo con éxito: +9 Knife obtenido.
+
+fr: Une annonce plus longue se replie à la largeur réglée, sur autant de rangées qu'il faut pour la lire jusqu'au bout.
+tr: Un anuncio más largo se pliega al ancho elegido, en tantas filas como haga falta para leerlo hasta el final.
+
+fr: Poring [ 3 / 10 ]
+tr: Poring [ 3 / 10 ]

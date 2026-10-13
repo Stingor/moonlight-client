@@ -52,7 +52,7 @@ void OptionPages::Declare(SettingsFile& into) {
   into.Section("Le titre de la fenêtre");
   DeclareOn(into, OptionSection::kInterface, window_title);
   into.Section("Les bulles d'annonce");
-  DeclareOn(into, OptionSection::kInterface, balloons);
+  DeclareOn(into, OptionSection::kBroadcastBalloons, balloons);
   // ⚠ LA PAGE DU SKIN TIENT AUSSI L'HABILLAGE, rangé dans un autre fichier :
   // « Rétablir cette page » le rend avec elle, voir `RestorePage`.
   into.Section("Le skin");

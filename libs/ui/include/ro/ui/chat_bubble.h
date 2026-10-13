@@ -148,4 +148,11 @@ struct ChatBubbleView {
 void DrawChatBubbles(std::span<const ChatBubbleView> bubbles, const ChatBubbleLook& look,
                      const ChatRichArt* rich = nullptr);
 
+// LA MÊME PEINTURE, SUR LA LISTE DONNÉE : l'aperçu des réglages pose ses bulles
+// dans son cadre. `most_width_px` est la largeur qu'une bulle ne dépasse pas ;
+// zéro la laisse d'un seul tenant.
+void PaintChatBubbles(ImDrawList& into, std::span<const ChatBubbleView> bubbles,
+                      const ChatBubbleLook& look, float most_width_px,
+                      const ChatRichArt* rich = nullptr);
+
 }  // namespace ro::ui

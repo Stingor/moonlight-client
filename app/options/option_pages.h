@@ -137,6 +137,9 @@ struct OptionPages {
   // Le cadre qui le montre, épinglé en haut de la page « Entités ». ⚠ ICI ET
   // NON SUR LA PILE : la section n'en garde qu'une vue.
   std::vector<ro::ui::OptionRowView> entity_pinned_rows;
+  // L'aperçu épinglé en haut de la page des bulles de chat. ⚠ ICI ET NON SUR LA
+  // PILE, pour la même raison.
+  std::vector<ro::ui::OptionRowView> bubble_pinned_rows;
   // LE CADRE DES TRAJECTOIRES DE DÉGÂTS, composé par la partie quand son onglet
   // est sous les yeux — voir `world/damage_path_sample.h` —, et les rangées du
   // volet de droite qui le montrent. ⚠ PAS UN RÉGLAGE.

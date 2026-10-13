@@ -81,17 +81,15 @@ float ChatBubbleLifeMs(const ChatBubbleLook& look, std::string_view text,
   return std::clamp(life, kShortestBubbleMs, kLongestBubbleMs);
 }
 
-void DrawChatBubbles(std::span<const ChatBubbleView> bubbles, const ChatBubbleLook& look,
-                     const ChatRichArt* rich) {
+void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bubbles,
+                      const ChatBubbleLook& look, float most_width_px, const ChatRichArt* rich) {
   if (bubbles.empty()) {
     return;
   }
-  // ⚠ LA LISTE DE FOND : au-dessus du monde et des jauges, que le renderer a
-  // déjà peints ; SOUS toutes les fenêtres, qu'une bulle ne doit pas traverser.
-  ImDrawList* into = ImGui::GetBackgroundDrawList();
+  ImDrawList* into = &into_list;
   ImFont* const font = ImGui::GetFont();
   const float line_height = ImGui::GetTextLineHeight();
-  const float most_width = ImGui::GetIO().DisplaySize.x * std::max(0.0F, look.width_fraction);
+  const float most_width = std::max(0.0F, most_width_px);
 
   // Ce que le fil sait peindre, SANS SES VIGNETTES : leur rangée grandirait, et
   // leur attente demanderait un téléchargement que la bulle n'a pas à lancer.
@@ -169,6 +167,14 @@ void DrawChatBubbles(std::span<const ChatBubbleView> bubbles, const ChatBubbleLo
     LayOutLine(frame, PlaceTarget{.into = into}, line, &pen);
     FadeSince(into, first_vertex, alpha);
   }
+}
+
+void DrawChatBubbles(std::span<const ChatBubbleView> bubbles, const ChatBubbleLook& look,
+                     const ChatRichArt* rich) {
+  // ⚠ LA LISTE DE FOND : au-dessus du monde et des jauges, que le renderer a
+  // déjà peints ; SOUS toutes les fenêtres, qu'une bulle ne doit pas traverser.
+  PaintChatBubbles(*ImGui::GetBackgroundDrawList(), bubbles, look,
+                   ImGui::GetIO().DisplaySize.x * look.width_fraction, rich);
 }
 
 }  // namespace ro::ui

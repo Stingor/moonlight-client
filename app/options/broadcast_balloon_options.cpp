@@ -5,6 +5,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/item_obtain_toast.h"
 
+#include "options/bubble_samples.h"
+
 namespace moonclient {
 namespace {
 
@@ -84,13 +86,16 @@ void BroadcastBalloonOptions::Declare(SettingsFile& into) {
   into.Declare(kHuntYKey, &look_.hunts.top_y);
 }
 
-void BroadcastBalloonOptions::ComposeInto(std::vector<OptionRowView>& rows) {
+void BroadcastBalloonOptions::Compose() {
+  pinned_rows_.clear();
+  pinned_rows_.push_back(BroadcastBalloonSampleRow(look_));
+  std::vector<OptionRowView>& rows = rows_;
+  rows.clear();
   rows.push_back(Toggle(BalloonRow::kShown, Tr("Bulles d'annonce en haut de l'écran"),
                         Tr("Les annonces du serveur, l'avancée des chasses de quête et ce que "
                            "l'équipe chuchote se posent aussi en haut de l'écran, comme dans le "
                            "jeu. Éteintes, elles ne vivent plus que dans la conversation."),
                         look_.shown));
-  rows.back().heading = Tr("Bulles d'annonce");
   const bool off = !look_.shown;
   const auto added = [&rows, off](OptionRowView row) {
     row.disabled = off;
@@ -143,6 +148,7 @@ void BroadcastBalloonOptions::ComposeInto(std::vector<OptionRowView>& rows) {
                   "glisse-la où tu veux. Un exemple s'affiche tant qu'aucune annonce n'est "
                   "là.\nUn déplacement vertical garde le centrage."),
                !look_.announcements.locked));
+  rows.back().heading = Tr("Position");
   added(Button(BalloonRow::kAnnouncementsHome, Tr("Rendre aux annonces la place du jeu"), nullptr));
   added(Toggle(BalloonRow::kHuntsUnlocked, Tr("Déverrouiller les chasses (glisser pour déplacer)"),
                Tr("Le bandeau qui montre l'avancée des chasses de quête. Le jeu le pose plus "

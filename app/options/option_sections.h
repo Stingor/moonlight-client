@@ -80,7 +80,11 @@ enum class OptionSection : std::size_t {
   kPartyGrid,
   kPartyFriend,
   kChat,
+  // LES BULLES DE CHAT, au-dessus des têtes.
   kBubbles,
+  // LES BULLES D'ANNONCE, en haut de l'écran. ⚠ À PART DES BULLES DE CHAT : ni
+  // la même place, ni la même vie, ni les mêmes réglages.
+  kBroadcastBalloons,
   // LE BANDEAU « objet obtenu ».
   kItemObtain,
   kInventory,

@@ -199,4 +199,12 @@ void DrawBroadcastBalloons(std::span<const BalloonView> balloons, const Broadcas
                            const char* label, BalloonAnchorGrip& grip, BalloonAnchorAsk* ask,
                            const ChatRichArt* rich = nullptr);
 
+// LA PILE DE BULLES SEULE, centrée sur `center_x` à partir de `top_y`, sur la
+// liste donnée — celle d'un cadre d'aperçu. Rend le bas de la dernière bulle.
+// ⚠ UNE LISTE NULLE NE PEINT RIEN ET MESURE : c'est ainsi qu'un cadre connaît
+// sa hauteur avant d'être posé.
+float PaintBroadcastBalloons(ImDrawList* into, std::span<const BalloonView> balloons,
+                             const BroadcastBalloonLook& look, float center_x, float top_y,
+                             const ChatRichArt* rich = nullptr);
+
 }  // namespace ro::ui
