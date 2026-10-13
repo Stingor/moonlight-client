@@ -57,4 +57,25 @@ inline constexpr int kGifPictureColors = 255;
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> EncodeAnimatedGif(
     std::span<const Image> frames, int delay_centiseconds);
 
+// ── UN GIF À FOND TRANSPARENT, POUR UN SPRITE ───────────────────────────────
+//
+// 🔴 ICI L'ALPHA COMPTE, ET L'INDEX TRANSPARENT VEUT DIRE « RIEN ». Un pixel
+// sous la moitié d'opacité devient l'index réservé ; tous les autres prennent
+// leur couleur, pleine — le format ne sait pas faire de demi-teinte.
+//
+// 🔴 ET CHAQUE IMAGE REMET LE FOND AVANT LA SUIVANTE (disposition 2). Un
+// personnage qui bouge découvre ce qu'il cachait : en « laisser en place »,
+// le bras de l'image précédente resterait peint sous le nouveau. L'image
+// différentielle n'a donc pas cours ici ; chaque image est rognée à ce qu'elle
+// peint, et le reste de la toile est déjà vide.
+//
+// Le délai est donné PAR IMAGE, en centièmes de seconde : une animation dont
+// les calques suivent des horloges différentes n'a pas d'intervalle commun.
+// Un délai négatif vaut zéro.
+//
+// Échoue si la liste est vide, si deux images n'ont pas la même taille, si
+// l'une d'elles est vide, ou s'il n'y a pas autant de délais que d'images.
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> EncodeTransparentGif(
+    std::span<const Image> frames, std::span<const int> delays_centiseconds);
+
 }  // namespace ro::formats

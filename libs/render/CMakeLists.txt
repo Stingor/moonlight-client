@@ -160,6 +160,7 @@ add_library(ro_render STATIC
     src/post_fx_reference.cpp
     src/sprite_canvas.cpp
     src/sprite_vignette.cpp
+    src/doll_animation.cpp
     src/portrait_framing.cpp
     src/effect_arc_ribbon.cpp
     src/effect_arc_ribbon_seed.cpp

@@ -225,6 +225,26 @@ void LayerDrawsOf(const ComposedActor& composed, ActorPartSet shown_parts,
 // ci-dessous.
 [[nodiscard]] bool HasOwnAnimation(ActorPart part) noexcept;
 
+// L'HORLOGE PROPRE d'une pièce animée : sa cadence, en tics de vingt-quatre
+// millisecondes, et le nombre d'images de son sous-groupe. Un tour complet dure
+// donc `cadence_units × multiple` tics. Voir `AlternateFrame`.
+struct AlternateClock {
+  std::int32_t cadence_units = 0;
+  std::size_t multiple = 0;
+
+  // La durée d'un pas, et celle d'un tour, en millisecondes.
+  [[nodiscard]] float step_ms() const noexcept {
+    return static_cast<float>(cadence_units) * formats::kMillisecondsPerSpeedUnit;
+  }
+  [[nodiscard]] float cycle_ms() const noexcept { return step_ms() * static_cast<float>(multiple); }
+};
+
+// L'horloge d'une pièce pour cette action, ou rien si elle suit l'acteur — la
+// même règle que `AlternateFrame`, qui s'en sert.
+[[nodiscard]] std::optional<AlternateClock> AlternateClockOf(const formats::ActAnimation& reference,
+                                                             const formats::ActAnimation& piece,
+                                                             std::size_t action_index);
+
 // L'image ALTERNATIVE d'une pièce, ou rien si la règle ne s'applique pas.
 //
 // Une coiffe dont l'action compte un MULTIPLE EXACT des images de sa référence

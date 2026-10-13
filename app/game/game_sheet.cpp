@@ -1,14 +1,18 @@
 // LA FICHE ET L'ÉDITEUR DE STYLE, VUS DE LA BOUCLE : ce que la fiche montre du
 // personnage — ses pièces, ses presets, ses titres, ses compagnons, son avatar,
 // le volet du staff — et les pantins de l'éditeur et de l'aperçu d'un style
-// reçu, composés avant le dessin ; puis ce que les presets et ces deux-là ont
-// demandé.
+// reçu, composés avant le dessin ; puis ce que les presets, le GIF du pantin et
+// ces deux-là ont demandé.
 
 #include <cstdint>
 #include <optional>
+#include <string>
 
 #include "ro/net/guild.h"
+#include "ro/render/doll_animation.h"
 
+#include "character/character_view.h"
+#include "character/doll_gif_export.h"
 #include "character/equip_slot_map.h"
 #include "character/staff_view.h"
 #include "game/game.h"
@@ -71,7 +75,15 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
     }
     character_->RefreshAvatar(world_, windows_.character.avatar,
                               windows_.character_view.avatar_image, now_ms, dressed);
+    sheet_look_ = dressed;
   }
+  // LE GIF DU PANTIN : ce que l'encodage et le dialogue ont rendu, puis ce que
+  // la fiche en montre. ⚠ MÊME FICHE FERMÉE : un enregistrement fini doit se
+  // dire dans la conversation, et l'export d'un fil ne s'abandonne pas.
+  if (const std::optional<std::string> saved = pieces_.doll_gif->Tick(); saved.has_value()) {
+    world_.RecordChat(ro::sim::ChatKind::kServer, 0, *saved, now_ms);
+  }
+  windows_.character_view.doll_gif = pieces_.doll_gif->view();
   // ⚠ RELU À CHAQUE IMAGE, comme celui de l'établi — voir `StaffToolsAllowed`.
   // Il montre la ligne du staff du grimoire et le volet du mannequin ; le
   // retirer fait disparaître le volet ET son cran de largeur, sans attendre une
@@ -141,12 +153,41 @@ void Game::StageStyle(std::uint32_t now_ms) {
   style_view_->TickDraft(windows_.style, now_ms);
 }
 
-void Game::ApplyPresetAnswers(const UiStage::Answers& answers) {
+void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
   const ro::ui::PresetAction& asked = answers.character.presets;
   if (asked.toggle_style) {
     windows_.style.open = !windows_.style.open;
   }
   presets_->Apply(asked, windows_.character.presets, link_, world_);
+
+  // LE GIF DU PANTIN, figé sur ce que la fiche montrait à ce clic : la pose, la
+  // direction, l'échelle et l'apparence habillée avant le dessin.
+  const ro::ui::DollGifVerb gif = answers.character.doll_gif;
+  if (gif == ro::ui::DollGifVerb::kNothing) {
+    return;
+  }
+  // ⚠ UN CLIC QUI NE PEUT RIEN FAIRE LE DIT : sans sprites ni personnage, la
+  // place de l'avatar est vide, et le GIF le serait aussi.
+  if (!pieces_.wardrobe.has_value()) {
+    pieces_.doll_gif->Refuse("l'installation n'a pas de garde-robe");
+  } else if (world_.player() == nullptr) {
+    pieces_.doll_gif->Refuse("aucun personnage à photographier");
+  } else {
+    const ro::ui::CharacterAvatarState& avatar = windows_.character.avatar;
+    const bool plays = avatar.animated && ro::ui::CharacterPoseAnimates(avatar.pose);
+    DollGifOrder order;
+    order.verb = gif;
+    order.look = sheet_look_;
+    order.shot = ro::render::DollShot{.animation = CharacterPoseAnimation(avatar.pose),
+                                      .direction = avatar.direction,
+                                      .body_plays = plays,
+                                      .scale = avatar.gif_scale,
+                                      .margin_px = ro::render::kDollGifMarginPx};
+    order.file_name = ro::ui::DollGifFileName(
+        world_.player_name(), ro::ui::CharacterPoseLabel(avatar.pose, avatar.animated),
+        avatar.direction);
+    pieces_.doll_gif->Start(order, *pieces_.wardrobe, gl_->window(), client_root_);
+  }
 }
 
 void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_ms) {

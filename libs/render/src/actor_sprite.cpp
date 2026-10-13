@@ -356,10 +356,9 @@ bool HasOwnAnimation(ActorPart part) noexcept {
   return IsHeadgear(part) || part == ActorPart::kGarment;
 }
 
-std::optional<std::size_t> AlternateFrame(const formats::ActAnimation& reference,
-                                          const formats::ActAnimation& piece,
-                                          std::size_t action_index, std::size_t frame_index,
-                                          float elapsed_ms) {
+std::optional<AlternateClock> AlternateClockOf(const formats::ActAnimation& reference,
+                                               const formats::ActAnimation& piece,
+                                               std::size_t action_index) {
   if (reference.actions().empty() || piece.actions().empty()) {
     return std::nullopt;
   }
@@ -374,14 +373,24 @@ std::optional<std::size_t> AlternateFrame(const formats::ActAnimation& reference
       piece_frames % reference_frames != 0) {
     return std::nullopt;
   }
-  const std::size_t multiple = piece_frames / reference_frames;
   // La cadence est celle de la PIÈCE, tronquée à l'entier comme le fait le
   // client ; nulle, elle vaut quatre.
   const auto declared = static_cast<std::int32_t>(piece_action.speed_units);
-  const std::int32_t cadence = declared > 0 ? declared : kDefaultAlternateCadence;
+  return AlternateClock{.cadence_units = declared > 0 ? declared : kDefaultAlternateCadence,
+                        .multiple = piece_frames / reference_frames};
+}
+
+std::optional<std::size_t> AlternateFrame(const formats::ActAnimation& reference,
+                                          const formats::ActAnimation& piece,
+                                          std::size_t action_index, std::size_t frame_index,
+                                          float elapsed_ms) {
+  const std::optional<AlternateClock> clock = AlternateClockOf(reference, piece, action_index);
+  if (!clock.has_value()) {
+    return std::nullopt;
+  }
   const float ticks = std::max(0.0F, elapsed_ms) / formats::kMillisecondsPerSpeedUnit;
-  const auto step = static_cast<std::size_t>(ticks / static_cast<float>(cadence));
-  return frame_index * multiple + step % multiple;
+  const auto step = static_cast<std::size_t>(ticks / static_cast<float>(clock->cadence_units));
+  return frame_index * clock->multiple + step % clock->multiple;
 }
 
 namespace {

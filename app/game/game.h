@@ -256,7 +256,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void StageCharacterSheet(std::uint32_t now_ms);
   void StageStyle(std::uint32_t now_ms);
   void ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
-  void ApplyPresetAnswers(const UiStage::Answers& answers);
+  // Les presets, puis le GIF du pantin : ce que la fiche a demandé après le dessin.
+  void ApplySheetAnswers(const UiStage::Answers& answers);
   // Les descriptions et le survol, dans `game_description.cpp`.
   void StageDescriptions(std::uint32_t now_ms);
   void ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
@@ -503,6 +504,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LA FICHE, CROISÉE. Elle désigne les mêmes accessoires que le sac — la
   // table des objets, les mots, les icônes — et se construit donc après eux.
   std::optional<CharacterView> character_;
+  // L'APPARENCE QUE SON PANTIN MONTRE, habillée avant le dessin : c'est elle que
+  // le GIF photographie, au clic qui suit.
+  ro::render::ActorLook sheet_look_;
   std::optional<PresetView> presets_;  // son onglet des presets, et leur fichier
   // SON ONGLET DES TITRES, croisé avec les deux tables qui les nomment.
   std::optional<TitleView> title_view_;

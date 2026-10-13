@@ -270,10 +270,10 @@ class GameOptions {
   [[nodiscard]] bool staff_battle_ignore() const noexcept { return staff_battle_ignore_; }
   [[nodiscard]] bool NoteStaffBattleIgnore(bool seen) noexcept;
 
-  // LA POSE DE L'AVATAR, sa direction, et si elle défile. ⚠ PAS D'ENTRÉE DANS
-  // `GameOption` NON PLUS, et pour la même raison que le volet : ce n'est pas
-  // un réglage qu'on va chercher dans un panneau, c'est ce qu'on regardait la
-  // dernière fois — on le change à la molette et par la liste, sur la fiche.
+  // LA POSE DE L'AVATAR, sa direction, si elle défile, et l'échelle de son GIF.
+  // ⚠ PAS D'ENTRÉE DANS `GameOption` NON PLUS, pour la même raison que le volet :
+  // ce n'est pas un réglage qu'on va chercher dans un panneau, c'est ce qu'on
+  // regardait la dernière fois — on le change sur la fiche même.
   //
   // La pose est retenue par son RANG dans `ro::ui::CharacterPose`, et il se
   // borne à la relecture : un fichier écrit par une version qui en portait
@@ -283,8 +283,8 @@ class GameOptions {
     return character_avatar_animated_;
   }
   [[nodiscard]] std::uint8_t character_avatar_direction() const noexcept;
-  [[nodiscard]] bool NoteCharacterAvatar(ro::ui::CharacterPose pose, bool animated,
-                                         std::uint8_t direction) noexcept;
+  [[nodiscard]] std::uint8_t character_avatar_gif_scale() const noexcept;
+  [[nodiscard]] bool NoteCharacterAvatar(const ro::ui::CharacterAvatarState& avatar) noexcept;
 
   // CE QUE LES HUIT BARRES DE RACCOURCIS MONTRENT, ET COMMENT.
   //
@@ -473,6 +473,7 @@ class GameOptions {
   int character_avatar_pose_ = static_cast<int>(ro::ui::CharacterPose::kReady);
   bool character_avatar_animated_ = true;
   int character_avatar_direction_ = 0;
+  int character_avatar_gif_scale_ = ro::ui::kDefaultDollGifScale;
   // LA DISPOSITION DES ONGLETS : debout partout, le coffre compris.
   bool inventory_tabs_vertical_ = true;
   bool inventory_free_layout_ = false;

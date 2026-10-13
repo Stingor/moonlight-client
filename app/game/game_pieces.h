@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <span>
 #include <vector>
@@ -44,6 +45,7 @@
 #include "ro/vfs/warp_agents.h"
 #include "ro/vfs/world_view.h"
 
+#include "character/doll_gif_export.h"
 #include "character/grimoire_keys.h"
 #include "chat/chat_mentions.h"
 #include "chat/chat_web_stage.h"
@@ -132,6 +134,10 @@ struct GamePieces {
   // chacun d'après ce que le serveur a dit de lui. Sans elles, aucun
   // personnage ne se dessine.
   std::optional<ro::render::ActorWardrobe> wardrobe;
+  // LE GIF DU PANTIN DE LA FICHE : voir `character/doll_gif_export.h`. ⚠ ICI ET
+  // NON DANS LA PARTIE, pour survivre à un changement de partie pendant que le
+  // dialogue est ouvert. Un pointeur, parce que son fil en garde l'adresse.
+  std::unique_ptr<DollGifExport> doll_gif = std::make_unique<DollGifExport>();
   // L'ENTITÉ DU CADRE D'ESSAI de la page des barres d'entité.
   EntitySampler entity_sampler;
 

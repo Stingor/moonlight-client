@@ -1921,6 +1921,9 @@ tr: Comportamiento del mercenario
 fr: Connexion non chiffrée (http) : ce qui transite peut être lu ou modifié en chemin.
 tr: Conexión sin cifrar (http): lo que circula puede leerse o modificarse por el camino.
 
+fr: Copie le GIF dans le presse-papier, pour le coller dans Discord ou ailleurs
+tr: Copia el GIF al portapapeles, para pegarlo en Discord o en otro sitio
+
 fr: Copie le profil choisi sous ce nom, sans le poser.
 tr: Copia el perfil elegido con este nombre, sin aplicarlo.
 
@@ -2038,6 +2041,12 @@ tr: En tamaños del marco: 0 deja el personaje centrado. El zoom sigue centrado.
 fr: Enregistre l'état présent sous ce nom, et le pose. Un nom déjà pris remplace ce profil.
 tr: Guarda el estado actual con este nombre y lo aplica. Un nombre ya usado reemplaza ese perfil.
 
+fr: Enregistre le personnage animé, sur fond transparent, dans la pose et la direction montrées
+tr: Guarda el personaje animado, con fondo transparente, en la pose y la dirección mostradas
+
+fr: Enregistrer le GIF du personnage
+tr: Guardar el GIF del personaje
+
 fr: Enregistrer sous##profile
 tr: Guardar como##profile
 
@@ -2058,6 +2067,9 @@ tr: Error de base de datos: no se cambió nada.
 
 fr: Exclure
 tr: Expulsar
+
+fr: Export annulé
+tr: Exportación cancelada
 
 fr: Face
 tr: De frente
@@ -2101,6 +2113,24 @@ tr: Formato
 fr: Format du niveau
 tr: Formato del nivel
 
+fr: GIF animé (*.gif)
+tr: GIF animado (*.gif)
+
+fr: GIF copié — Ctrl+V pour le coller.
+tr: GIF copiado — Ctrl+V para pegarlo.
+
+fr: GIF du personnage enregistré : %s
+tr: GIF del personaje guardado: %s
+
+fr: GIF enregistré : %s
+tr: GIF guardado: %s
+
+fr: GIF enregistré sous un nom libre : %s
+tr: GIF guardado con un nombre libre: %s
+
+fr: GIF trop grand : choisis une taille plus petite
+tr: GIF demasiado grande: elige un tamaño más pequeño
+
 fr: Gauche
 tr: Izquierda
 
@@ -2127,6 +2157,9 @@ tr: Guiar hasta la tumba
 
 fr: Guilde et liste d'amis uniquement.\nInviter quelqu'un, c'est inviter tous ses personnages et tous ses comptes de jeu.
 tr: Solo gremio y lista de amigos.\nInvitar a alguien es invitar a todos sus personajes y todas sus cuentas de juego.
+
+fr: Générer le GIF
+tr: Generar el GIF
 
 fr: HP insuffisants.
 tr: HP insuficientes.
@@ -2779,6 +2812,9 @@ tr: Devuelve este perfil a los ajustes de origen del cliente.
 fr: Repose les quatre cadres à leur place d'origine. Les couleurs et les interrupteurs ne bougent pas.
 tr: Devuelve los cuatro marcos a su sitio original. Los colores y los interruptores no cambian.
 
+fr: Taille du GIF : chaque pixel du sprite devient un carré de ce côté
+tr: Tamaño del GIF: cada píxel del sprite se convierte en un cuadrado de este lado
+
 fr: Tête seule
 tr: Solo la cabeza
 
@@ -2799,6 +2835,9 @@ tr: Bloqueado: los marcos ya no se mueven y dejan pasar los clics al juego.\nDes
 
 fr: Zoom
 tr: Zoom
+
+fr: Échec du GIF
+tr: Error al crear el GIF
 
 fr: Écraser##profile
 tr: Sobrescribir##profile

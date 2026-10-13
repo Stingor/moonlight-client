@@ -1921,6 +1921,9 @@ tr: Mercenary behavior
 fr: Connexion non chiffrée (http) : ce qui transite peut être lu ou modifié en chemin.
 tr: Unencrypted connection (http): what travels can be read or altered on the way.
 
+fr: Copie le GIF dans le presse-papier, pour le coller dans Discord ou ailleurs
+tr: Copies the GIF to the clipboard, to paste it in Discord or elsewhere
+
 fr: Copie le profil choisi sous ce nom, sans le poser.
 tr: Copies the chosen profile under this name, without applying it.
 
@@ -2038,6 +2041,12 @@ tr: In frame sizes: 0 keeps the character centred. The zoom stays centred.
 fr: Enregistre l'état présent sous ce nom, et le pose. Un nom déjà pris remplace ce profil.
 tr: Saves the current state under this name and applies it. A name already in use replaces that profile.
 
+fr: Enregistre le personnage animé, sur fond transparent, dans la pose et la direction montrées
+tr: Saves the animated character, on a transparent background, in the pose and direction shown
+
+fr: Enregistrer le GIF du personnage
+tr: Save character GIF
+
 fr: Enregistrer sous##profile
 tr: Save as##profile
 
@@ -2058,6 +2067,9 @@ tr: Database error: nothing was changed.
 
 fr: Exclure
 tr: Remove
+
+fr: Export annulé
+tr: Export cancelled
 
 fr: Face
 tr: Front
@@ -2101,6 +2113,24 @@ tr: Format
 fr: Format du niveau
 tr: Level format
 
+fr: GIF animé (*.gif)
+tr: Animated GIF (*.gif)
+
+fr: GIF copié — Ctrl+V pour le coller.
+tr: GIF copied — Ctrl+V to paste it.
+
+fr: GIF du personnage enregistré : %s
+tr: Character GIF saved: %s
+
+fr: GIF enregistré : %s
+tr: GIF saved: %s
+
+fr: GIF enregistré sous un nom libre : %s
+tr: GIF saved under a free name: %s
+
+fr: GIF trop grand : choisis une taille plus petite
+tr: GIF too large: pick a smaller size
+
 fr: Gauche
 tr: Left
 
@@ -2127,6 +2157,9 @@ tr: Guide me to the tomb
 
 fr: Guilde et liste d'amis uniquement.\nInviter quelqu'un, c'est inviter tous ses personnages et tous ses comptes de jeu.
 tr: Guild and friend list only.\nInviting someone invites all of their characters and all of their game accounts.
+
+fr: Générer le GIF
+tr: Make GIF
 
 fr: HP insuffisants.
 tr: Insufficient HP.
@@ -2779,6 +2812,9 @@ tr: Resets this profile to the client's original settings.
 fr: Repose les quatre cadres à leur place d'origine. Les couleurs et les interrupteurs ne bougent pas.
 tr: Puts the four frames back in their original place. Colours and switches do not change.
 
+fr: Taille du GIF : chaque pixel du sprite devient un carré de ce côté
+tr: GIF size: each sprite pixel becomes a square of this side
+
 fr: Tête seule
 tr: Head only
 
@@ -2799,6 +2835,9 @@ tr: Locked: the frames no longer move and let clicks through to the game.\nUnloc
 
 fr: Zoom
 tr: Zoom
+
+fr: Échec du GIF
+tr: GIF failed
 
 fr: Écraser##profile
 tr: Overwrite##profile

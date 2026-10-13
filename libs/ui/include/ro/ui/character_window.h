@@ -11,6 +11,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/character_staff.h"
+#include "ro/ui/doll_gif.h"
 #include "ro/ui/guild_tab.h"
 #include "ro/ui/homunculus_tab.h"
 #include "ro/ui/mercenary_tab.h"
@@ -260,6 +261,13 @@ struct CharacterAvatarState {
   // laquelle un joueur se reconnaît, et le repos donne une fiche inerte.
   CharacterPose pose = CharacterPose::kReady;
   bool animated = true;
+  // L'ÉCHELLE DU GIF, entière : chaque pixel du sprite devient un carré de ce
+  // côté. Retenue avec la pose, pour la même raison.
+  std::uint8_t gif_scale = kDefaultDollGifScale;
+  // ⚠ UN RELEVÉ, PAS UN RÉGLAGE : la hauteur que le GIF ajoute sous le
+  // mannequin à l'image précédente — sa ligne d'échelle, son message, et son
+  // bouton quand il passe sous les poses. Le plancher de la fenêtre la loge.
+  float gif_rows_height = 0.0F;
   // Le portail qui empêche de faire tourner le personnage en parcourant la
   // fiche. Voir `ro/ui/wheel_gate.h`.
   WheelGateState wheel;
@@ -452,6 +460,8 @@ struct CharacterWindowView {
   // TANT QU'IL N'A RIEN DIT, à l'inverse de sa sœur : l'une et l'autre montrent
   // alors le réglage d'un personnage neuf.
   std::optional<bool> costumes_shown;
+  // L'EXPORT DU PANTIN EN GIF : s'il est en cours, et son dernier mot.
+  DollGifView doll_gif;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -587,6 +597,10 @@ struct CharacterWindowAction {
   std::optional<bool> show_equipment;
   // « VOIR LES COSTUMES » : l'état que la case demande, sous la même règle.
   std::optional<bool> show_costumes;
+  // LE GIF DU PANTIN : l'enregistrer ou le copier. ⚠ LA POSE, LA DIRECTION ET
+  // L'ÉCHELLE SONT CELLES DE `CharacterAvatarState` À CETTE IMAGE : c'est `app`
+  // qui les fige au clic.
+  DollGifVerb doll_gif = DollGifVerb::kNothing;
   // « Signaler un bug » : `app` joint ce que la fiche montre — l'onglet, le
   // métier et les niveaux, et ce qui est propre à l'onglet.
   bool report_bug = false;

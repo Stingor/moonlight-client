@@ -63,11 +63,16 @@ constexpr int kBugReportRank = 0;
 // ⚠ IL VAUT POUR TOUS LES ONGLETS, et non pour le seul onglet Équipement qui
 // montre les compagnons : un plancher propre à l'onglet ferait sauter la
 // hauteur de la fenêtre à chaque passage de l'un à l'autre.
-[[nodiscard]] float MinimumHeight(std::size_t companion_count) {
+//
+// ⚠ PLUS CE QUE LE GIF AJOUTE SOUS LES POSES, tel que le mannequin l'a MESURÉ
+// à son dernier dessin — voir `CharacterAvatarState::gif_rows_height`. Déjà en
+// pixels d'écran : il ne se remet pas à l'échelle.
+[[nodiscard]] float MinimumHeight(std::size_t companion_count, float gif_rows_height) {
   const std::size_t extra_rows =
       companion_count > kCompanionsWithinFloor ? companion_count - kCompanionsWithinFloor : 0;
   const float row_step = kEquipSlotPixels + kEquipSlotGapPixels;
-  return (kMinimumHeightPixels + static_cast<float>(extra_rows) * row_step) * Scale();
+  return (kMinimumHeightPixels + static_cast<float>(extra_rows) * row_step) * Scale() +
+         gif_rows_height;
 }
 
 // La largeur du volet du mannequin : le plus large de son bloc et des cases
@@ -118,7 +123,7 @@ void DrawDollAndStats(CharacterWindowState& state, const CharacterWindowView& vi
   // peint le sien.
   if (ImGui::BeginChild("mannequin", ImVec2(doll_width, 0.0F), ImGuiChildFlags_Borders)) {
     DrawCharacterDoll(header, slots, view.companions, state.avatar, view.avatar_image,
-                      view.equipment_shown, view.costumes_shown,
+                      view.equipment_shown, view.costumes_shown, view.doll_gif,
                       state.tab == CharacterTab::kCostume, state.hover_preview,
                       ImGui::GetContentRegionAvail().x, art, action);
     PaintWindowScrollbar(art);
@@ -360,7 +365,7 @@ CharacterWindowAction DrawCharacterWindow(
   // ne ferait qu'étirer le vide entre deux volets.
   ImGui::SetNextWindowSizeConstraints(
       ImVec2(state.width.force_wide ? state.width.wide : state.width.narrow,
-             MinimumHeight(view.companions.size())),
+             MinimumHeight(view.companions.size(), state.avatar.gif_rows_height)),
       ImVec2(state.width.extra, kNoHeightCeiling), SnapToPaneSteps, &state.width);
   // La fenêtre s'ouvre sur le mannequin ET ses nombres : c'est la vue que le
   // joueur cherche, et la replier tout de suite serait lui faire élargir à

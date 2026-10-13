@@ -21,6 +21,7 @@ add_library(ro_formats STATIC
     src/emblem.cpp
     src/gat.cpp
     src/gif.cpp
+    src/gif_transparent.cpp
     src/gnd.cpp
     src/gr2_arith.cpp
     src/gr2_file.cpp

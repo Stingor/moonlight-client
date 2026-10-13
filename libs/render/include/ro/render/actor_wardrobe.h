@@ -98,6 +98,11 @@ class ActorOutfit {
   // millisecondes ; une action que le .act ne porte pas en a un de
   // `ro::render::kUndeclaredActionDelayUnits`, comme sans corps.
   [[nodiscard]] float BodyActionDelayUnits(std::size_t animation, std::size_t direction) const;
+  // LES HORLOGES PROPRES des pièces accrochées qui en ont une pour cette
+  // animation : les coiffes et la cape animées, voir `AlternateClockOf`. Vide
+  // quand tout suit le corps, ou sans tête qui leur serve de référence. Lues sur
+  // la direction zéro, comme la composition.
+  [[nodiscard]] std::vector<AlternateClock> OwnClocks(std::size_t animation) const;
   // L'IMAGE DE FRAPPE de l'animation, lue sur le .act du CORPS : la première
   // qui porte le marqueur du coup, sinon l'avant-dernière — voir
   // `ro::render::AttackSoundFrame`. Zéro sans corps.

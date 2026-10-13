@@ -640,7 +640,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   ApplyCaptureGesture(answers, now_ms);
   sheet_->Apply(answers.character.grimoire, grimoire_, link_, world_, now_ms);
   character_->Apply(answers.character, link_, world_);
-  ApplyPresetAnswers(answers);
+  ApplySheetAnswers(answers);
   title_view_->Apply(
       answers.character,
       windows_.character.open && windows_.character.tab == ro::ui::CharacterTab::kTitles, link_,

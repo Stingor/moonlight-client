@@ -91,6 +91,7 @@ constexpr const char* kStaffBattleIgnoreKey = "sheet_staff_ignores_of_monsters";
 constexpr const char* kCharacterAvatarPoseKey = "sheet_avatar_placed";
 constexpr const char* kCharacterAvatarAnimatedKey = "sheet_avatar_animated";
 constexpr const char* kCharacterAvatarDirectionKey = "sheet_avatar_direction";
+constexpr const char* kCharacterAvatarGifScaleKey = "sheet_avatar_gif_scale";
 // LA BARRE D'ÉTATS. ⚠ SES CLÉS SONT PRÉFIXÉES `etats_` et non `statut_` : c'est
 // le mot que le reste du client emploie déjà — `StatusTable`, `ActiveStatus` —,
 // et une clé de fichier ne se renomme pas sans perdre le réglage de qui l'avait
@@ -631,6 +632,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Declare(kCharacterAvatarPoseKey, &character_avatar_pose_);
   into.Declare(kCharacterAvatarAnimatedKey, &character_avatar_animated_);
   into.Declare(kCharacterAvatarDirectionKey, &character_avatar_direction_);
+  into.Declare(kCharacterAvatarGifScaleKey, &character_avatar_gif_scale_);
   page(OptionSection::kInterface);
   into.Section("Les dialogues de PNJ");
   into.Declare(kNpcMenuSearchKey, &npc_menu_search_);

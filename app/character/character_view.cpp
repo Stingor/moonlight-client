@@ -70,14 +70,7 @@ CharacterView::CharacterView(const ro::vfs::ItemTable* items, const ro::vfs::Ite
   }
 }
 
-namespace {
-
-// Le rang d'animation d'une pose de la fiche.
-//
-// ⚠ LA TRADUCTION EST ICI, et non dans `ui` : la fenêtre propose des poses, le
-// .act range des rangs, et faire connaître les seconds à la première lui
-// donnerait une part du rendu qui ne la regarde pas.
-[[nodiscard]] std::size_t AnimationOf(ro::ui::CharacterPose pose) {
+std::size_t CharacterPoseAnimation(ro::ui::CharacterPose pose) {
   switch (pose) {
     case ro::ui::CharacterPose::kIdle:
       return ro::render::kAnimationIdle;
@@ -90,8 +83,6 @@ namespace {
   }
   return ro::render::kAnimationIdle;
 }
-
-}  // namespace
 
 void CharacterView::RefreshAvatar(const ro::sim::World& world,
                                   const ro::ui::CharacterAvatarState& avatar,
@@ -115,7 +106,7 @@ void CharacterView::RefreshAvatar(const ro::sim::World& world,
 
   ro::render::ActorVignette::Pose pose;
   pose.look = dressed;
-  pose.animation = AnimationOf(avatar.pose);
+  pose.animation = CharacterPoseAnimation(avatar.pose);
   pose.direction = avatar.direction;
   // ⚠ LES DEUX CONDITIONS : le joueur peut avoir choisi « animé » sur une pose
   // qui ne défile pas — un réglage relu d'une version précédente, par exemple —

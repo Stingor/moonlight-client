@@ -67,6 +67,7 @@ add_library(ro_ui STATIC
     src/cash_shop_window.cpp
     src/npc_illustration_window.cpp
     src/character_doll.cpp
+    src/character_doll_gif.cpp
     src/character_staff.cpp
     src/character_stats.cpp
     src/character_titles.cpp

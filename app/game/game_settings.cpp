@@ -171,6 +171,7 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   windows.character.avatar.pose = options_.character_avatar_pose();
   windows.character.avatar.animated = options_.character_avatar_animated();
   windows.character.avatar.direction = options_.character_avatar_direction();
+  windows.character.avatar.gif_scale = options_.character_avatar_gif_scale();
   // ⚠ LE SOL UNI DESCEND AVANT LE DESSIN, et il remonte après : voir
   // `NoteStaffTools`. L'ordre est ce qui rend les deux sens compatibles — la
   // copie posée ici est celle que l'établi éditera dans la même image.
@@ -323,8 +324,7 @@ void GameSettings::NoteStaffBattleIgnore(bool wanted) {
 }
 
 void GameSettings::NoteCharacterAvatar(const UiStage::Windows& windows) {
-  if (options_.NoteCharacterAvatar(windows.character.avatar.pose, windows.character.avatar.animated,
-                                   windows.character.avatar.direction)) {
+  if (options_.NoteCharacterAvatar(windows.character.avatar)) {
     file_.Touch();
   }
 }

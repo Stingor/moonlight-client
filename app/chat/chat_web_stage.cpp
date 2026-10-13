@@ -14,12 +14,11 @@
 #include "ro/render/emotion.h"
 #include "ro/ui/chat_emote_names.h"
 
+#include "capture/screenshot_folder.h"
+
 namespace moonclient {
 namespace {
 
-// Le dossier, sous l'installation, où la visionneuse enregistre une image :
-// celui des captures du jeu.
-constexpr std::string_view kSavedPicturesFolder = "ScreenShot";
 // Les adresses dont on garde les faits d'une image à l'autre. Au-delà, tout
 // est oublié au `Compose` suivant, et relu au besoin : un fil montre bien
 // moins d'adresses à la fois.

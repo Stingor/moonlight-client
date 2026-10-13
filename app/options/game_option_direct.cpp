@@ -26,6 +26,7 @@
 // ⚠ POUR LE NOMBRE DE DIRECTIONS D'UN .ACT : c'est lui qui borne la direction
 // relue du fichier, et le redéclarer ici en ferait une seconde vérité.
 #include "ro/render/actor_layers.h"
+#include "ro/render/doll_animation.h"
 #include "ro/ui/system_fonts.h"
 
 #include "options/game_options.h"
@@ -274,17 +275,28 @@ std::uint8_t GameOptions::character_avatar_direction() const noexcept {
   return static_cast<std::uint8_t>(character_avatar_direction_);
 }
 
-bool GameOptions::NoteCharacterAvatar(ro::ui::CharacterPose pose, bool animated,
-                                      std::uint8_t direction) noexcept {
-  const int rank = static_cast<int>(pose);
-  const int turned = static_cast<int>(direction);
-  if (character_avatar_pose_ == rank && character_avatar_animated_ == animated &&
-      character_avatar_direction_ == turned) {
+std::uint8_t GameOptions::character_avatar_gif_scale() const noexcept {
+  // Même borne : une échelle hors de celles que la fiche propose ferait un
+  // GIF démesuré, ou vide.
+  if (character_avatar_gif_scale_ < ro::render::kSmallestDollGifScale ||
+      character_avatar_gif_scale_ > ro::render::kLargestDollGifScale) {
+    return ro::ui::kDefaultDollGifScale;
+  }
+  return static_cast<std::uint8_t>(character_avatar_gif_scale_);
+}
+
+bool GameOptions::NoteCharacterAvatar(const ro::ui::CharacterAvatarState& avatar) noexcept {
+  const int rank = static_cast<int>(avatar.pose);
+  const int turned = static_cast<int>(avatar.direction);
+  const int gif_scale = static_cast<int>(avatar.gif_scale);
+  if (character_avatar_pose_ == rank && character_avatar_animated_ == avatar.animated &&
+      character_avatar_direction_ == turned && character_avatar_gif_scale_ == gif_scale) {
     return false;
   }
   character_avatar_pose_ = rank;
-  character_avatar_animated_ = animated;
+  character_avatar_animated_ = avatar.animated;
   character_avatar_direction_ = turned;
+  character_avatar_gif_scale_ = gif_scale;
   return true;
 }
 

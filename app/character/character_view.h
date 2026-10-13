@@ -26,6 +26,14 @@
 
 namespace moonclient {
 
+// Le rang d'animation d'une pose de la fiche : celui que l'avatar compose, et
+// celui que le GIF du pantin photographie.
+//
+// ⚠ LA TRADUCTION EST ICI, et non dans `ui` : la fenêtre propose des poses, le
+// .act range des rangs, et faire connaître les seconds à la première lui
+// donnerait une part du rendu qui ne la regarde pas.
+[[nodiscard]] std::size_t CharacterPoseAnimation(ro::ui::CharacterPose pose);
+
 // LA FICHE DE PERSONNAGE, VUE DE LA PARTIE.
 //
 // ⚠ ELLE CROISE CE QUE RIEN NE RELIE : les pièces portées vivent dans le SAC,

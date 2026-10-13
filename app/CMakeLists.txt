@@ -1468,6 +1468,7 @@ add_executable(moonclient
     items/storage_view.cpp
     items/view_equip_view.cpp
     character/character_view.cpp
+    character/doll_gif_export.cpp
     character/preset_view.cpp
     character/staff_jobs.cpp
     character/staff_view.cpp

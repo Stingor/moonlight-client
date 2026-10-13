@@ -47,6 +47,8 @@ constexpr int kCardinalStep = 2;
 constexpr float kPoseComboGap = 8.0F;
 // Le jour entre la liste des poses et la case qui la suit.
 constexpr float kDollSettingGap = 4.0F;
+// L'écart entre la liste des poses et le bouton du GIF, sur leur ligne commune.
+constexpr float kPoseLineGap = 8.0F;
 
 // La colonne gauche et la colonne droite, de haut en bas.
 //
@@ -449,8 +451,15 @@ float DollSettingWidth(const SkinArt& art) {
 // fois, figées puis animées. Ce sont deux choses différentes à l'œil — une pose
 // tenue se regarde, une animation se joue — et les séparer en une case à cocher
 // obligerait à la griser pour deux poses sur quatre.
-void DrawPoseList(CharacterAvatarState& avatar, float pane_width, const SkinArt& art) {
+//
+// 🔴 LE BOUTON DU GIF EST SUR LA MÊME LIGNE, À DROITE, et c'est le BLOC des
+// deux qui se centre. Quand le volet est trop étroit pour les deux — fenêtre
+// rétrécie, ascenseur apparu —, le bouton passe dessous, centré à son tour,
+// plutôt que de sortir du cadre.
+void DrawPoseList(CharacterAvatarState& avatar, const DollGifView& gif, float pane_width,
+                  const SkinArt& art, CharacterWindowAction& action) {
   ImGui::SetCursorPosY(ImGui::GetCursorPosY() + kPoseComboGap * Scale());
+  const float start_x = ImGui::GetCursorPosX();
   const char* shown = CharacterPoseLabel(avatar.pose, avatar.animated);
 
   // Les entrées dans l'ordre de la liste : la molette les parcourt comme elle.
@@ -472,7 +481,11 @@ void DrawPoseList(CharacterAvatarState& avatar, float pane_width, const SkinArt&
     }
   }
   const float width = std::min(pane_width, widest + SkinComboChromeWidth(art));
-  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0F, (pane_width - width) * 0.5F));
+  const float gap = kPoseLineGap * Scale();
+  const float button = DollGifButtonWidth(art);
+  const bool one_line = width + gap + button <= pane_width;
+  const float line = one_line ? width + gap + button : width;
+  ImGui::SetCursorPosX(start_x + std::max(0.0F, (pane_width - line) * 0.5F));
   ImGui::SetNextItemWidth(width);
 
   int step = 0;
@@ -480,23 +493,30 @@ void DrawPoseList(CharacterAvatarState& avatar, float pane_width, const SkinArt&
   if (const int stepped = SkinComboStepped(current, step, count); stepped != current) {
     TakePose(avatar, entries[static_cast<std::size_t>(stepped)]);
   }
-  if (!open) {
-    return;
-  }
-  for (int rank = 0; rank < count; ++rank) {
-    const PoseEntry& entry = entries[static_cast<std::size_t>(rank)];
-    if (ImGui::Selectable(CharacterPoseLabel(entry.pose, entry.animated), rank == current)) {
-      TakePose(avatar, entry);
+  if (open) {
+    for (int rank = 0; rank < count; ++rank) {
+      const PoseEntry& entry = entries[static_cast<std::size_t>(rank)];
+      if (ImGui::Selectable(CharacterPoseLabel(entry.pose, entry.animated), rank == current)) {
+        TakePose(avatar, entry);
+      }
     }
+    EndSkinCombo();
   }
-  EndSkinCombo();
+
+  if (one_line) {
+    ImGui::SameLine(0.0F, gap);
+  } else {
+    ImGui::SetCursorPosX(start_x + std::max(0.0F, (pane_width - button) * 0.5F));
+  }
+  DrawDollGifButton(gif, art, action);
 }
 
 void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipSlotView> slots,
                        std::span<const CompanionCaseView> companions, CharacterAvatarState& avatar,
                        const SkinImage& avatar_image, const std::optional<bool>& equipment_shown,
-                       const std::optional<bool>& costumes_shown, bool costume, bool preview,
-                       float pane_width, const SkinArt& art, CharacterWindowAction& action) {
+                       const std::optional<bool>& costumes_shown, const DollGifView& gif,
+                       bool costume, bool preview, float pane_width, const SkinArt& art,
+                       CharacterWindowAction& action) {
   DrawHeader(header, pane_width, art.look());
 
   const float scale = Scale();
@@ -586,7 +606,18 @@ void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipS
   // LA LISTE DES POSES vient APRÈS la place réservée, et non par-dessus : c'est
   // le seul morceau du volet qui se pose au curseur, et il lui faut le bas du
   // mannequin pour savoir où tomber.
-  DrawPoseList(avatar, pane_width, art);
+  const float pose_top = ImGui::GetCursorPosY();
+  DrawPoseList(avatar, gif, pane_width, art, action);
+  // L'ÉCHELLE ET LA COPIE DU GIF, puis son dernier mot : sous la ligne des
+  // poses, et avant la case qu'elle précédait.
+  DrawDollGifTools(avatar, gif, pane_width, art, action);
+  // 🔴 CE QUE LE GIF AJOUTE SOUS LE MANNEQUIN SE MESURE, il ne se devine pas :
+  // la ligne d'échelle, le message replié sur un nombre de lignes qui dépend de
+  // la langue, et le bouton passé sous les poses quand la ligne ne tient pas.
+  // C'est tout ce qui dépasse la seule liste des poses, que le plancher logeait
+  // déjà.
+  const float pose_list_alone = kPoseComboGap * Scale() + ImGui::GetFrameHeightWithSpacing();
+  avatar.gif_rows_height = std::max(0.0F, ImGui::GetCursorPosY() - pose_top - pose_list_alone);
   // UNE CASE PAR ONGLET, AU MÊME JOUR SOUS LES POSES : chacun dit le réglage de
   // ce qu'il montre. ⚠ SANS RÉPONSE DU SERVEUR, chacune montre le réglage d'un personnage
   // neuf — équipement caché, costumes affichés.

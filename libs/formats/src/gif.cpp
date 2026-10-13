@@ -5,77 +5,11 @@
 #include <cstring>
 #include <unordered_map>
 
+#include "gif_internal.h"
+
 namespace ro::formats {
+namespace gif_internal {
 namespace {
-
-// ── LES OCTETS DU FORMAT ────────────────────────────────────────────────────
-// Ce sont des valeurs de la spécification GIF89a, pas des choix : elles portent
-// leur nom pour qu'une relecture n'ait pas à ouvrir le document.
-constexpr std::array<std::uint8_t, 6> kSignature = {'G', 'I', 'F', '8', '9', 'a'};
-constexpr std::uint8_t kExtensionIntroducer = 0x21;
-constexpr std::uint8_t kGraphicControlLabel = 0xF9;
-constexpr std::uint8_t kApplicationLabel = 0xFF;
-constexpr std::uint8_t kImageSeparator = 0x2C;
-constexpr std::uint8_t kTrailer = 0x3B;
-constexpr std::uint8_t kBlockTerminator = 0x00;
-
-// Table globale présente, 8 bits par couleur d'origine, 256 entrées.
-constexpr std::uint8_t kGlobalTableFlags = 0xF7;
-// Disposition 1 — « laisser en place » —, plus le drapeau de transparence.
-// 🔴 C'EST CE COUPLE QUI FAIT L'IMAGE DIFFÉRENTIELLE : sans « laisser en
-// place », chaque image effacerait la précédente et les pixels inchangés, qu'on
-// a écrits transparents, laisseraient un trou.
-constexpr std::uint8_t kLeaveInPlaceAndTransparent = (1 << 2) | 0x01;
-// L'index que la différence emploie pour dire « inchangé ».
-constexpr std::uint8_t kTransparentIndex = 0;
-// Une table de 256 entrées se code sur 8 bits.
-constexpr int kGlobalMinCodeSize = 8;
-// Un bloc de données ne porte que 255 octets : c'est un compte sur un octet, et
-// zéro termine la suite.
-constexpr std::size_t kLargestBlock = 255;
-
-// La boucle sans fin, telle que Netscape l'a introduite et que tout le monde lit
-// depuis. ⚠ SANS ELLE, LE GIF NE JOUE QU'UNE FOIS.
-constexpr std::array<std::uint8_t, 19> kLoopForever = {kExtensionIntroducer,
-                                                       kApplicationLabel,
-                                                       0x0B,
-                                                       'N',
-                                                       'E',
-                                                       'T',
-                                                       'S',
-                                                       'C',
-                                                       'A',
-                                                       'P',
-                                                       'E',
-                                                       '2',
-                                                       '.',
-                                                       '0',
-                                                       0x03,
-                                                       0x01,
-                                                       0x00,
-                                                       0x00,
-                                                       0x00};
-
-// ── L'HISTOGRAMME ───────────────────────────────────────────────────────────
-// Les couleurs sont d'abord rangées dans une grille de 5 bits par canal : 32 768
-// cases, assez petit pour se parcourir plusieurs fois, assez fin pour que
-// l'arrondi ne se voie pas une fois le tout ramené à 255 couleurs.
-constexpr int kChannelBits = 5;
-constexpr int kChannelSteps = 1 << kChannelBits;  // 32
-constexpr int kHistogramCells = kChannelSteps * kChannelSteps * kChannelSteps;
-constexpr int kLargestStep = kChannelSteps - 1;
-
-void PutU16(std::vector<std::uint8_t>& out, unsigned value) {
-  out.push_back(static_cast<std::uint8_t>(value & 0xFFU));
-  out.push_back(static_cast<std::uint8_t>((value >> 8) & 0xFFU));
-}
-
-[[nodiscard]] constexpr std::uint16_t CellOf(std::uint8_t red, std::uint8_t green,
-                                             std::uint8_t blue) noexcept {
-  const unsigned shift = 8 - kChannelBits;
-  return static_cast<std::uint16_t>(((red >> shift) << (2 * kChannelBits)) |
-                                    ((green >> shift) << kChannelBits) | (blue >> shift));
-}
 
 [[nodiscard]] constexpr int CellRed(std::uint16_t cell) noexcept {
   return (cell >> (2 * kChannelBits)) & kLargestStep;
@@ -91,107 +25,6 @@ void PutU16(std::vector<std::uint8_t>& out, unsigned value) {
 // au lieu de 255, et le blanc deviendrait gris.
 [[nodiscard]] constexpr int StepToByte(int step) noexcept {
   return (step << (8 - kChannelBits)) | (step >> (2 * kChannelBits - 8));
-}
-
-// ── L'ÉCRITURE DES CODES ────────────────────────────────────────────────────
-//
-// Les codes LZW sortent bit de poids FAIBLE en tête, et la suite se découpe en
-// blocs d'au plus 255 octets précédés de leur longueur.
-class CodeWriter {
- public:
-  explicit CodeWriter(std::vector<std::uint8_t>& out) : out_(out) {}
-
-  void Write(unsigned code, int bits) {
-    buffer_ |= code << held_;
-    held_ += bits;
-    while (held_ >= 8) {
-      PushByte(static_cast<std::uint8_t>(buffer_ & 0xFFU));
-      buffer_ >>= 8;
-      held_ -= 8;
-    }
-  }
-
-  // Les bits qui restent, le bloc entamé, puis le terminateur.
-  void Finish() {
-    if (held_ > 0) {
-      PushByte(static_cast<std::uint8_t>(buffer_ & 0xFFU));
-      buffer_ = 0;
-      held_ = 0;
-    }
-    if (!block_.empty()) {
-      out_.push_back(static_cast<std::uint8_t>(block_.size()));
-      out_.insert(out_.end(), block_.begin(), block_.end());
-      block_.clear();
-    }
-    out_.push_back(kBlockTerminator);
-  }
-
- private:
-  void PushByte(std::uint8_t value) {
-    block_.push_back(value);
-    if (block_.size() == kLargestBlock) {
-      out_.push_back(static_cast<std::uint8_t>(kLargestBlock));
-      out_.insert(out_.end(), block_.begin(), block_.end());
-      block_.clear();
-    }
-  }
-
-  std::vector<std::uint8_t>& out_;
-  std::vector<std::uint8_t> block_;
-  unsigned buffer_ = 0;
-  int held_ = 0;
-};
-
-// LZW de GIF, dans sa forme standard.
-//
-// Le dictionnaire est indexé par (préfixe << 8 | octet) — un index de palette
-// tient sur un octet, donc la clé tient sur un entier. La largeur de code grandit
-// quand le code qu'on vient d'attribuer atteint sa puissance de deux, et le
-// dictionnaire se vide à 4095, juste avant le plafond de douze bits.
-void EmitLzw(CodeWriter& writer, std::span<const std::uint8_t> indices, int min_code_size) {
-  constexpr int kLargestCodeBits = 12;
-  constexpr int kDictionaryFull = 4095;
-  const unsigned clear_code = 1U << min_code_size;
-  const unsigned end_code = clear_code + 1;
-  int code_bits = min_code_size + 1;
-  int next_code = static_cast<int>(end_code) + 1;
-  std::unordered_map<int, int> dictionary;
-  dictionary.reserve(kDictionaryFull);
-
-  writer.Write(clear_code, code_bits);
-  if (indices.empty()) {
-    writer.Write(end_code, code_bits);
-    writer.Finish();
-    return;
-  }
-
-  int current = indices[0];
-  for (std::size_t at = 1; at < indices.size(); ++at) {
-    const int next = indices[at];
-    const int key = (current << 8) | next;
-    const auto found = dictionary.find(key);
-    if (found != dictionary.end()) {
-      current = found->second;
-      continue;
-    }
-    writer.Write(static_cast<unsigned>(current), code_bits);
-    dictionary.emplace(key, next_code);
-    if (next_code == (1 << code_bits) && code_bits < kLargestCodeBits) {
-      ++code_bits;
-    }
-    if (next_code == kDictionaryFull) {
-      writer.Write(clear_code, code_bits);
-      dictionary.clear();
-      code_bits = min_code_size + 1;
-      next_code = static_cast<int>(end_code) + 1;
-    } else {
-      ++next_code;
-    }
-    current = next;
-  }
-  writer.Write(static_cast<unsigned>(current), code_bits);
-  writer.Write(end_code, code_bits);
-  writer.Finish();
 }
 
 // ── LA COUPE MÉDIANE ────────────────────────────────────────────────────────
@@ -311,16 +144,103 @@ void MedianCut(std::vector<Bucket>& buckets, std::vector<Box>& boxes, int wanted
   }
 }
 
-// La table globale, et le chemin direct d'une case vers son entrée.
-struct Palette {
-  std::array<std::uint8_t, 256 * 3> colors = {};
-  std::vector<std::uint8_t> of_cell;
-};
+}  // namespace
 
-[[nodiscard]] Palette BuildPalette(std::span<const Image> frames) {
+void PutU16(std::vector<std::uint8_t>& out, unsigned value) {
+  out.push_back(static_cast<std::uint8_t>(value & 0xFFU));
+  out.push_back(static_cast<std::uint8_t>((value >> 8) & 0xFFU));
+}
+
+void CodeWriter::Write(unsigned code, int bits) {
+  buffer_ |= code << held_;
+  held_ += bits;
+  while (held_ >= 8) {
+    PushByte(static_cast<std::uint8_t>(buffer_ & 0xFFU));
+    buffer_ >>= 8;
+    held_ -= 8;
+  }
+}
+
+void CodeWriter::Finish() {
+  if (held_ > 0) {
+    PushByte(static_cast<std::uint8_t>(buffer_ & 0xFFU));
+    buffer_ = 0;
+    held_ = 0;
+  }
+  if (!block_.empty()) {
+    out_.push_back(static_cast<std::uint8_t>(block_.size()));
+    out_.insert(out_.end(), block_.begin(), block_.end());
+    block_.clear();
+  }
+  out_.push_back(kBlockTerminator);
+}
+
+void CodeWriter::PushByte(std::uint8_t value) {
+  block_.push_back(value);
+  if (block_.size() == kLargestBlock) {
+    out_.push_back(static_cast<std::uint8_t>(kLargestBlock));
+    out_.insert(out_.end(), block_.begin(), block_.end());
+    block_.clear();
+  }
+}
+
+// Le dictionnaire est indexé par (préfixe << 8 | octet) — un index de palette
+// tient sur un octet, donc la clé tient sur un entier. La largeur de code grandit
+// quand le code qu'on vient d'attribuer atteint sa puissance de deux, et le
+// dictionnaire se vide à 4095, juste avant le plafond de douze bits.
+void EmitLzw(CodeWriter& writer, std::span<const std::uint8_t> indices, int min_code_size) {
+  constexpr int kLargestCodeBits = 12;
+  constexpr int kDictionaryFull = 4095;
+  const unsigned clear_code = 1U << min_code_size;
+  const unsigned end_code = clear_code + 1;
+  int code_bits = min_code_size + 1;
+  int next_code = static_cast<int>(end_code) + 1;
+  std::unordered_map<int, int> dictionary;
+  dictionary.reserve(kDictionaryFull);
+
+  writer.Write(clear_code, code_bits);
+  if (indices.empty()) {
+    writer.Write(end_code, code_bits);
+    writer.Finish();
+    return;
+  }
+
+  int current = indices[0];
+  for (std::size_t at = 1; at < indices.size(); ++at) {
+    const int next = indices[at];
+    const int key = (current << 8) | next;
+    const auto found = dictionary.find(key);
+    if (found != dictionary.end()) {
+      current = found->second;
+      continue;
+    }
+    writer.Write(static_cast<unsigned>(current), code_bits);
+    dictionary.emplace(key, next_code);
+    if (next_code == (1 << code_bits) && code_bits < kLargestCodeBits) {
+      ++code_bits;
+    }
+    if (next_code == kDictionaryFull) {
+      writer.Write(clear_code, code_bits);
+      dictionary.clear();
+      code_bits = min_code_size + 1;
+      next_code = static_cast<int>(end_code) + 1;
+    } else {
+      ++next_code;
+    }
+    current = next;
+  }
+  writer.Write(static_cast<unsigned>(current), code_bits);
+  writer.Write(end_code, code_bits);
+  writer.Finish();
+}
+
+Palette BuildPalette(std::span<const Image> frames, bool opaque_only) {
   std::vector<std::uint32_t> histogram(kHistogramCells, 0);
   for (const Image& frame : frames) {
     for (std::size_t at = 0; at + 3 < frame.pixels.size(); at += 4) {
+      if (opaque_only && frame.pixels[at + 3] < kOpaqueAlpha) {
+        continue;
+      }
       ++histogram[CellOf(frame.pixels[at], frame.pixels[at + 1], frame.pixels[at + 2])];
     }
   }
@@ -333,15 +253,19 @@ struct Palette {
     }
   }
 
+  Palette palette;
+  palette.of_cell.assign(kHistogramCells, kTransparentIndex);
+  // RIEN D'OPAQUE : une table toute transparente, et aucune boîte à couper.
+  if (buckets.empty()) {
+    return palette;
+  }
+
   std::vector<Box> boxes;
   MedianCut(buckets, boxes, kGifPictureColors);
 
-  Palette palette;
-  palette.of_cell.assign(kHistogramCells, kTransparentIndex);
   for (std::size_t at = 0; at < boxes.size(); ++at) {
     const Box& box = boxes[at];
-    // ⚠ LES ENTRÉES COMMENCENT À 1 : la zéro appartient à la transparence, donc
-    // à la différence entre deux images.
+    // ⚠ LES ENTRÉES COMMENCENT À 1 : la zéro appartient à la transparence.
     const auto index = static_cast<std::uint8_t>(at + 1);
     std::uint64_t red = 0;
     std::uint64_t green = 0;
@@ -367,6 +291,54 @@ struct Palette {
   }
   return palette;
 }
+
+void PutHeader(std::vector<std::uint8_t>& out, int width, int height, const Palette& palette) {
+  out.insert(out.end(), kSignature.begin(), kSignature.end());
+  PutU16(out, static_cast<unsigned>(width));
+  PutU16(out, static_cast<unsigned>(height));
+  out.push_back(kGlobalTableFlags);
+  out.push_back(kTransparentIndex);  // index du fond
+  out.push_back(0x00);               // rapport d'aspect du pixel
+  out.insert(out.end(), palette.colors.begin(), palette.colors.end());
+  out.insert(out.end(), kLoopForever.begin(), kLoopForever.end());
+}
+
+void PutGraphicControl(std::vector<std::uint8_t>& out, std::uint8_t flags, int delay_centiseconds) {
+  out.push_back(kExtensionIntroducer);
+  out.push_back(kGraphicControlLabel);
+  out.push_back(kGraphicControlLength);
+  out.push_back(flags);
+  PutU16(out, static_cast<unsigned>(std::max(delay_centiseconds, 0)));
+  out.push_back(kTransparentIndex);
+  out.push_back(kBlockTerminator);
+}
+
+void PutImage(std::vector<std::uint8_t>& out, int left, int top, int width, int height,
+              std::span<const std::uint8_t> indices) {
+  out.push_back(kImageSeparator);
+  PutU16(out, static_cast<unsigned>(left));
+  PutU16(out, static_cast<unsigned>(top));
+  PutU16(out, static_cast<unsigned>(width));
+  PutU16(out, static_cast<unsigned>(height));
+  out.push_back(0x00);  // pas de table locale : la globale couvre tout le clip
+  out.push_back(kGlobalMinCodeSize);
+  CodeWriter writer(out);
+  EmitLzw(writer, indices, kGlobalMinCodeSize);
+}
+
+}  // namespace gif_internal
+
+namespace {
+
+using gif_internal::CellOf;
+using gif_internal::kTransparentIndex;
+
+// Disposition 1 — « laisser en place » —, plus le drapeau de transparence.
+// 🔴 C'EST CE COUPLE QUI FAIT L'IMAGE DIFFÉRENTIELLE : sans « laisser en
+// place », chaque image effacerait la précédente et les pixels inchangés, qu'on
+// a écrits transparents, laisseraient un trou.
+constexpr std::uint8_t kLeaveInPlaceAndTransparent =
+    (1 << gif_internal::kDisposalShift) | gif_internal::kTransparentFlag;
 
 // La boîte de ce qui a bougé depuis l'image précédente.
 struct Changed {
@@ -423,18 +395,10 @@ core::Result<std::vector<std::uint8_t>> EncodeAnimatedGif(std::span<const Image>
     }
   }
 
-  const Palette palette = BuildPalette(frames);
-  const int delay = std::max(delay_centiseconds, 0);
+  const gif_internal::Palette palette = gif_internal::BuildPalette(frames, /*opaque_only=*/false);
 
   std::vector<std::uint8_t> out;
-  out.insert(out.end(), kSignature.begin(), kSignature.end());
-  PutU16(out, static_cast<unsigned>(width));
-  PutU16(out, static_cast<unsigned>(height));
-  out.push_back(kGlobalTableFlags);
-  out.push_back(0x00);  // index du fond
-  out.push_back(0x00);  // rapport d'aspect du pixel
-  out.insert(out.end(), palette.colors.begin(), palette.colors.end());
-  out.insert(out.end(), kLoopForever.begin(), kLoopForever.end());
+  gif_internal::PutHeader(out, width, height, palette);
 
   const auto count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
   std::vector<std::uint8_t> now(count);
@@ -465,28 +429,13 @@ core::Result<std::vector<std::uint8_t>> EncodeAnimatedGif(std::span<const Image>
       }
     }
 
-    out.push_back(kExtensionIntroducer);
-    out.push_back(kGraphicControlLabel);
-    out.push_back(0x04);  // longueur du bloc de contrôle
-    out.push_back(kLeaveInPlaceAndTransparent);
-    PutU16(out, static_cast<unsigned>(delay));
-    out.push_back(kTransparentIndex);
-    out.push_back(kBlockTerminator);
-
-    out.push_back(kImageSeparator);
-    PutU16(out, static_cast<unsigned>(moved.left));
-    PutU16(out, static_cast<unsigned>(moved.top));
-    PutU16(out, static_cast<unsigned>(moved.width));
-    PutU16(out, static_cast<unsigned>(moved.height));
-    out.push_back(0x00);  // pas de table locale : la globale couvre tout le clip
-    out.push_back(kGlobalMinCodeSize);
-    CodeWriter writer(out);
-    EmitLzw(writer, piece, kGlobalMinCodeSize);
+    gif_internal::PutGraphicControl(out, kLeaveInPlaceAndTransparent, delay_centiseconds);
+    gif_internal::PutImage(out, moved.left, moved.top, moved.width, moved.height, piece);
 
     before.swap(now);
   }
 
-  out.push_back(kTrailer);
+  out.push_back(gif_internal::kTrailer);
   return out;
 }
 

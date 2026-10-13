@@ -202,6 +202,29 @@ float ActorOutfit::BodyActionDelayUnits(std::size_t animation, std::size_t direc
   return action < actions.size() ? actions[action].speed_units : kUndeclaredActionDelayUnits;
 }
 
+std::vector<AlternateClock> ActorOutfit::OwnClocks(std::size_t animation) const {
+  std::vector<AlternateClock> clocks;
+  if (composed_.empty() || head_animation_ == nullptr) {
+    return clocks;
+  }
+  // ⚠ LE MÊME TÉMOIN QUE `Composed` : l'action de la direction zéro, sur le
+  // rang réellement joué.
+  const std::size_t played = animation < composed_.size() ? animation : kAnimationIdle;
+  const formats::ActAnimation& animation_of_body = *pieces_.front().animation;
+  const std::size_t witness = BoundedActionIndex(animation_of_body, played, 0);
+  for (const ActorPiece& piece : std::span<const ActorPiece>(pieces_).subspan(1)) {
+    if (piece.animation == nullptr || !HasOwnAnimation(piece.part)) {
+      continue;
+    }
+    if (const std::optional<AlternateClock> clock =
+            AlternateClockOf(*head_animation_, *piece.animation, witness);
+        clock.has_value()) {
+      clocks.push_back(*clock);
+    }
+  }
+  return clocks;
+}
+
 std::size_t ActorOutfit::AttackSoundFrame(std::size_t animation) const {
   if (composed_.empty()) {
     return 0;

@@ -22,12 +22,28 @@ namespace ro::ui {
 //
 // `equipment_shown` et `costumes_shown` : ce que le serveur dit des deux
 // réglages que la case sous les poses montre — « Montrer mon équipement » sur
-// l'onglet Équipement, « Voir les costumes » sur l'onglet Costume.
+// l'onglet Équipement, « Voir les costumes » sur l'onglet Costume. `gif` : ce
+// que `app` dit de l'export du pantin.
 void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipSlotView> slots,
                        std::span<const CompanionCaseView> companions, CharacterAvatarState& avatar,
                        const SkinImage& avatar_image, const std::optional<bool>& equipment_shown,
-                       const std::optional<bool>& costumes_shown, bool costume, bool preview,
-                       float pane_width, const SkinArt& art, CharacterWindowAction& action);
+                       const std::optional<bool>& costumes_shown, const DollGifView& gif,
+                       bool costume, bool preview, float pane_width, const SkinArt& art,
+                       CharacterWindowAction& action);
+
+// ── LE GIF DU PANTIN, sous la liste des poses ────────────────────────────────
+
+// La largeur du bouton « Générer le GIF », dans la langue courante : la ligne
+// des poses la compte pour savoir si elle tient.
+[[nodiscard]] float DollGifButtonWidth(const SkinArt& art);
+
+// Le bouton lui-même, au curseur. Grisé pendant un export.
+void DrawDollGifButton(const DollGifView& gif, const SkinArt& art, CharacterWindowAction& action);
+
+// La ligne de l'échelle et de la copie, centrée, puis le dernier mot replié dans
+// la largeur du volet.
+void DrawDollGifTools(CharacterAvatarState& avatar, const DollGifView& gif, float pane_width,
+                      const SkinArt& art, CharacterWindowAction& action);
 
 // La largeur de la plus large des deux cases sous les poses, libellé compris :
 // le volet du mannequin ne descend pas sous elle, et ne change donc pas de
