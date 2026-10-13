@@ -99,6 +99,7 @@ add_library(ro_net STATIC
     src/companion_orders.cpp
     src/mercenary_frames.cpp
     src/member_statuses.cpp
+    src/memorial_dungeon.cpp
     src/friends.cpp
     src/adoption.cpp
     src/social_text.cpp

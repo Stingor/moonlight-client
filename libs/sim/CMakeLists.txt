@@ -13,6 +13,7 @@ add_library(ro_sim STATIC
     src/barter.cpp
     src/battlefield.cpp
     src/entry_queue.cpp
+    src/memorial_dungeon.cpp
     src/buying_store.cpp
     src/buying_store_checks.cpp
     src/card_album.cpp

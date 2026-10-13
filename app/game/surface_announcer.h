@@ -31,7 +31,7 @@ inline constexpr std::uint32_t kAlwaysShownSurfaces =
     ro::net::kUiCapCardAlbumDropper | ro::net::kUiCapFlagGraffiti | ro::net::kUiCapUnitMaster |
     ro::net::kUiCapServerRules | ro::net::kUiCapMvpTrackerExt | ro::net::kUiCapQuestEnd |
     ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich |
-    ro::net::kUiCapEquipAttributes;
+    ro::net::kUiCapEquipAttributes | ro::net::kUiCapInstanceInfo;
 [[nodiscard]] constexpr std::uint32_t ShownSurfaces(bool mvp_tracker_enabled) noexcept {
   return kAlwaysShownSurfaces | (mvp_tracker_enabled ? ro::net::kUiCapMvpTracker : 0U);
 }

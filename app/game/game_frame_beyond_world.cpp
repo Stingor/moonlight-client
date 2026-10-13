@@ -9,6 +9,7 @@
 // joueur, les annonces de succès.
 
 #include <cstdint>
+#include <ctime>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -287,6 +288,13 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
           pieces_.battleground.ApplyFrame(received, world_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = fought;
+  }
+  // ET L'INSTANCE, datée sur l'horloge réelle : le serveur annonce ses
+  // échéances en secondes Unix.
+  if (const ro::net::FrameOutcome instanced =
+          pieces_.memorial.ApplyFrame(received, static_cast<std::int64_t>(std::time(nullptr)));
+      outcome == ro::net::FrameOutcome::kUnhandled) {
+    outcome = instanced;
   }
   // ET CE QUE LE SERVEUR DIT DU NÔTRE. ⚠ CHAQUE ANNONCE DE L'ÉQUIPEMENT
   // PARLE, même quand la valeur ne change pas : c'est la réponse au clic.

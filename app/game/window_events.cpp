@@ -141,6 +141,7 @@ struct WindowPixels {
           .mail = to.mail,
           .achievements = to.achievements,
           .quests = to.quests,
+          .memorial = to.memorial,
           .chat_rooms = to.chat_rooms,
           .menu = to.menu,
           .macros = to.macros,

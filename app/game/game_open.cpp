@@ -569,6 +569,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.mvp_tracker.StartSession(windows_.mvp_tracker);
   // LA FILE DU CHAMP DE BATAILLE repart hors file : le serveur redit ce qu'il tient.
   pieces_.battleground.StartSession(windows_.battleground);
+  pieces_.memorial.StartSession(windows_.memorial);
   // LA RECHERCHE DE GROUPE : le serveur oublie l'annonce d'un personnage qui part.
   pieces_.party_booking.StartSession();
   pieces_.party_booking.SeePlaces(vfs_);

@@ -11877,6 +11877,55 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet) {
+  if (frame.size() < ZcMoonlightInstanceInfo::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightInstanceInfo::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.server_time = static_cast<std::uint32_t>(reader.U32());
+  packet.duration_limit = static_cast<std::uint32_t>(reader.U32());
+  packet.idle_timeout = static_cast<std::uint32_t>(reader.U32());
+  packet.hardmode = static_cast<std::int16_t>(reader.I16());
+  packet.turbo = static_cast<std::uint8_t>(reader.U8());
+  packet.mode = static_cast<std::uint8_t>(reader.U8());
+  packet.destroyable = static_cast<std::uint8_t>(reader.U8());
+  packet.may_destroy = static_cast<std::uint8_t>(reader.U8());
+  packet.on_instance_map = static_cast<std::uint8_t>(reader.U8());
+  packet.players_inside = static_cast<std::uint16_t>(reader.U16());
+  packet.owner_name = reader.FixedString(24);
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightInstanceInfo& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightInstanceInfo::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightInstanceInfo::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U32(static_cast<std::uint32_t>(packet.server_time));
+  writer.U32(static_cast<std::uint32_t>(packet.duration_limit));
+  writer.U32(static_cast<std::uint32_t>(packet.idle_timeout));
+  writer.I16(static_cast<std::int16_t>(packet.hardmode));
+  writer.U8(static_cast<std::uint8_t>(packet.turbo));
+  writer.U8(static_cast<std::uint8_t>(packet.mode));
+  writer.U8(static_cast<std::uint8_t>(packet.destroyable));
+  writer.U8(static_cast<std::uint8_t>(packet.may_destroy));
+  writer.U8(static_cast<std::uint8_t>(packet.on_instance_map));
+  writer.U16(static_cast<std::uint16_t>(packet.players_inside));
+  writer.FixedString(packet.owner_name, 24);
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

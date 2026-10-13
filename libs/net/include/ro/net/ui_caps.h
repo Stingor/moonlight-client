@@ -58,6 +58,10 @@ inline constexpr std::uint32_t kUiCapCompanionMaster = 0x00001000;
 // ensemble qui entre ou sort de l'équipement (`ZC 0x0F3D`). Même règle : le
 // serveur ne l'envoie qu'à qui l'annonce.
 inline constexpr std::uint32_t kUiCapEquipAttributes = 0x00002000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire le détail d'une instance —
+// difficulté, turbo, droit de destruction (`ZC 0x0F40`). Même règle : le
+// serveur ne l'envoie qu'à qui l'annonce.
+inline constexpr std::uint32_t kUiCapInstanceInfo = 0x00004000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

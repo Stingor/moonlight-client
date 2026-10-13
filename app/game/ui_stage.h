@@ -93,6 +93,7 @@
 #include "game/chat_room_stage.h"
 #include "game/hud_rounds.h"
 #include "game/mail_stage.h"
+#include "game/memorial_stage.h"
 #include "game/navigation_windows.h"
 #include "game/over_world_paint.h"
 #include "game/party_windows.h"
@@ -383,13 +384,12 @@ class UiStage {
     // LES SALONS : le formulaire, la salle, l'invite. Voir
     // `ui_stage_chat_room.cpp`.
     ChatRoomWindows chat_room;
-    // LES CONVERSATIONS 1:1. Voir `ui_stage_whisper.cpp`.
-    WhisperWindows whispers;
-    AchievementWindows achievements;  // La fenêtre, la bannière : `ui_stage_achievements.cpp`.
-    QuestWindows quests;              // Le journal : `ui_stage_quests.cpp`.
-    TrackerWindows tracker;           // Le suivi commun aux succès, de même.
-    // LE CARNET DE CHASSE MVP. Voir `ui_stage_mvp_tracker.cpp`.
-    MvpTrackerWindows mvp_tracker;
+    WhisperWindows whispers;            // Les conversations 1:1 : `ui_stage_whisper.cpp`.
+    AchievementWindows achievements;    // La fenêtre, la bannière : `ui_stage_achievements.cpp`.
+    QuestWindows quests;                // Le journal : `ui_stage_quests.cpp`.
+    TrackerWindows tracker;             // Le suivi commun aux succès, de même.
+    MvpTrackerWindows mvp_tracker;      // Le carnet MVP : `ui_stage_mvp_tracker.cpp`.
+    MemorialWindows memorial;           // L'instance : `game/memorial_stage.h`.
     BattlegroundWindows battleground;   // Voir `ui_stage_battleground.cpp`.
     RankingBoardWindows ranking_board;  // Voir `ui_stage_ranking.cpp`.
     PartyBookingWindows party_booking;  // Voir `ui_stage_party_booking.cpp`.

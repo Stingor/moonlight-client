@@ -277,7 +277,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void AdvanceNavigation(std::uint32_t now_ms);  // minimap, navigation : `game_navigation.cpp`
   void AdvanceMvpTracker(std::uint32_t now_ms);  // le carnet MVP : `game_mvp_tracker.cpp`
   void FollowCraftGestures(const CraftGestures& asked, std::uint32_t now_ms);  // `game_craft.cpp`
-  void AdvanceQuests(std::uint32_t now_ms);  // le journal et le suivi : `game_quests.cpp`
+  void AdvanceQuests(std::uint32_t now_ms);           // le journal et le suivi : `game_quests.cpp`
+  void AdvanceMemorialDungeon(std::uint32_t now_ms);  // l'instance : `game_memorial.cpp`
   // UN OBJET TIRÉ D'UN CONTENANT ET LÂCHÉ DANS UN AUTRE.
   //
   // 🔴 LES SIX SENS PASSENT PAR ICI, et c'est ce qui les garde d'accord : une

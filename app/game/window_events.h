@@ -44,6 +44,7 @@ namespace moonclient {
 class CashShopStage;
 class AchievementStage;
 class QuestStage;
+class MemorialStage;
 class MailStage;
 class ChatRoomStage;
 class CompanionAiStage;
@@ -116,6 +117,7 @@ struct EventRouting {
   // Les succès : leur fenêtre renaît sur le résumé à chaque ouverture.
   AchievementStage* achievements = nullptr;
   QuestStage* quests = nullptr;
+  MemorialStage* memorial = nullptr;  // Alt+B, l'instance.
   // LES COMMERCES : un clic sur l'enseigne d'une échoppe — ou sur son
   // marchand — leur demande de l'ouvrir, et ne fait pas marcher.
   TradeStages* trade = nullptr;

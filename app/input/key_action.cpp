@@ -16,6 +16,7 @@
 #include "game/chat_room_stage.h"
 #include "game/companion_ai_stage.h"
 #include "game/mail_stage.h"
+#include "game/memorial_stage.h"
 #include "game/quest_stage.h"
 #include "input/key_gate.h"
 #include "mvp/mvp_tracker_stage.h"
@@ -505,6 +506,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
     case GameAction::kOpenQuests:
       if (to.quests != nullptr) {
         to.quests->Toggle();
+      }
+      break;
+    case GameAction::kOpenMemorialDungeon:
+      // Joué à l'image suivante, là où l'instance compose sa vue.
+      if (to.memorial != nullptr) {
+        to.memorial->Toggle();
       }
       break;
     case GameAction::kOpenChatRoom:

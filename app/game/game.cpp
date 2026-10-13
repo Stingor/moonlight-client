@@ -71,8 +71,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // locaux, et les faits des liens prêtés au chat ne se vident qu'ici. Après le
   // réseau, donc après le guidage et l'annonce des surfaces de l'image.
   AdvanceMvpTracker(now_ms);
-  // LE JOURNAL DES QUÊTES ET LE SUIVI, après le réseau qui a avancé les succès.
-  AdvanceQuests(now_ms);
+  AdvanceQuests(now_ms);           // Le journal et le suivi, après le réseau qui avance les succès.
+  AdvanceMemorialDungeon(now_ms);  // L'instance : `game_memorial.cpp`.
   // 🔴 LE CHAMP DE BATAILLE AUSSI, LIAISON FERMÉE COMPRISE : sa file survit aux
   // cartes, ses fenêtres suivent la file, et ce qu'elles demandent part d'ici.
   pieces_.battleground.Advance(
@@ -274,6 +274,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .mail = &pieces_.mail,
                 .achievements = &pieces_.achievements,
                 .quests = &pieces_.quests,
+                .memorial = &pieces_.memorial,
                 .trade = &pieces_.trade,
                 .chat_rooms = &pieces_.chat_rooms,
                 .chat_room_form_open = windows_.chat_room.make.open,

@@ -42,6 +42,7 @@ namespace moonclient {
 class CashShopStage;
 class AchievementStage;
 class QuestStage;
+class MemorialStage;
 class MailStage;
 class ChatRoomStage;
 class CompanionAiStage;
@@ -100,6 +101,7 @@ struct KeyPress {
   // LES SUCCÈS : la fenêtre renaît sur le résumé à chaque ouverture.
   AchievementStage* achievements = nullptr;
   QuestStage* quests = nullptr;
+  MemorialStage* memorial = nullptr;
   // LES SALONS : la touche ouvre le formulaire, ou montre la salle.
   ChatRoomStage* chat_rooms = nullptr;
   // Le menu du jeu, qu'Échap ouvre quand il n'a plus rien à fermer.

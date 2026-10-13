@@ -89,6 +89,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kOpenAchievements, "achievements"},
     {GameAction::kOpenQuests, "quests"},
     {GameAction::kOpenChatRoom, "chat_room"},
+    {GameAction::kOpenMemorialDungeon, "memorial_dungeon"},
     {GameAction::kReportBug, "bug_report"},
     {GameAction::kFrameWholeMap, "whole_map"},
     {GameAction::kSitOrStand, "sit"},
@@ -240,6 +241,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenAchievements:
     case GameAction::kOpenQuests:
     case GameAction::kOpenChatRoom:
+    case GameAction::kOpenMemorialDungeon:
     case GameAction::kReportBug:
     case GameAction::kAfkScreen:
       return HotkeyTab::kInterface;
@@ -381,6 +383,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Quêtes");
     case GameAction::kOpenChatRoom:
       return ro::core::Tr("Salon de discussion");
+    case GameAction::kOpenMemorialDungeon:
+      return ro::core::Tr("Instance");
     case GameAction::kReportBug:
       return ro::core::Tr("Signaler un bug");
     case GameAction::kFrameWholeMap:
@@ -513,6 +517,7 @@ Hotkeys::Hotkeys() {
   // List ». Un joueur la connaît avant de connaître ce client.
   set(GameAction::kOpenChatMacros, SDLK_M, /*alt=*/true);
   set(GameAction::kOpenChatRoom, SDLK_C, /*alt=*/true);
+  set(GameAction::kOpenMemorialDungeon, SDLK_B, /*alt=*/true);
   set(GameAction::kOpenQuests, SDLK_U, /*alt=*/true);
   // ⚠ ALT+P POUR LES COULEURS : les joueurs de ce serveur l'ont déjà dans les
   // doigts. Le jeu n'a pas cette fenêtre-là, donc aucune touche native ne la

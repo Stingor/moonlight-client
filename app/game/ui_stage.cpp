@@ -477,6 +477,8 @@ UiStage::Answers UiStage::Draw(
   DrawNavigationWindows(windows.navigation);
   DrawMvpTrackerWindows(windows.mvp_tracker);
   DrawBattlegroundWindows(windows.battleground);
+  windows.memorial.answer =
+      ro::ui::DrawMemorialDungeonWindow(windows.memorial.window, windows.memorial.view, skin_);
   // LA BOUTIQUE DE VOTE, avant la description qu'on ouvre depuis ses cartes.
   if (windows.cash_shop.view != nullptr) {
     windows.cash_shop.answer =
@@ -656,6 +658,7 @@ UiStage::Answers UiStage::Draw(
   RegisterNavigationEscapes(windows.navigation);
   RegisterMvpTrackerEscapes(windows.mvp_tracker);
   RegisterBattlegroundEscapes(windows.battleground);
+  escape_.Register(ro::ui::kMemorialDungeonWindowId, &windows.memorial.window.open);
   RegisterRankingEscapes(windows.ranking_board);
   RegisterPartyBookingEscapes(windows.party_booking);
   // LES ATELIERS AUSSI : leur interrupteur recopie la session du serveur, mais

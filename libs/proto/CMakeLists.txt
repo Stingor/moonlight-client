@@ -31,6 +31,7 @@ add_library(ro_proto STATIC
     src/guild_packets.cpp
     src/homunculus_packets.cpp
     src/companion_packets.cpp
+    src/memorial_packets.cpp
     src/mercenary_packets.cpp
     src/pet_packets.cpp
     src/quest_marker_packets.cpp

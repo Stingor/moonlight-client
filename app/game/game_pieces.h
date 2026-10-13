@@ -62,6 +62,7 @@
 #include "game/damage_meter_stage.h"
 #include "game/homunculus_stage.h"
 #include "game/mail_stage.h"
+#include "game/memorial_stage.h"
 #include "game/mercenary_stage.h"
 #include "game/over_world_layer.h"
 #include "game/pet_stage.h"
@@ -503,6 +504,8 @@ struct GamePieces {
   MvpTrackerStage mvp_tracker;
   // LE CHAMP DE BATAILLE : voir `BattlegroundStage`.
   BattlegroundStage battleground;
+  // L'INSTANCE (« Memorial Dungeon ») : voir `MemorialStage`.
+  MemorialStage memorial;
   // LES CLASSEMENTS ET LES AVIS D'ÉTOILE : voir `RankNotices`.
   RankNotices rank_notices;
   // LE TABLEAU DES CLASSEMENTS : voir `RankingBoard`.

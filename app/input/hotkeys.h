@@ -112,6 +112,8 @@ enum class GameAction : std::uint8_t {
   // LE SALON DE DISCUSSION : Alt+C, la touche du jeu. Elle ouvre et referme le
   // formulaire ; dans un salon, elle montre la salle.
   kOpenChatRoom,
+  // L'INSTANCE : Alt+B, la touche du jeu. Rien ne part vers le serveur.
+  kOpenMemorialDungeon,
   // LE RAPPORT DE BUG, sans contexte : carte et position viennent du serveur.
   // ⚠ CTRL+ALT+B : les joueurs de ce serveur l'ont déjà dans les doigts. C'est aussi le recours
   // quand la fenêtre en cause est trop étroite pour garder son bouton, ou quand aucune n'est

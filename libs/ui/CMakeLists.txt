@@ -47,6 +47,7 @@ add_library(ro_ui STATIC
     src/bank_window.cpp
     src/entry_queue_prompts.cpp
     src/entry_queue_window.cpp
+    src/memorial_dungeon_window.cpp
     src/barter_window.cpp
     src/buying_store_log_window.cpp
     src/buying_store_own_window.cpp
