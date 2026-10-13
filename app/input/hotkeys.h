@@ -421,6 +421,8 @@ class Hotkeys {
   // ⚠ LES MODIFICATEURS COMPTENT EXACTEMENT. Alt+S et S sont deux raccourcis
   // distincts — l'un ouvre la fiche, l'autre le grimoire de lancement — et une
   // comparaison qui les confondrait en rendrait un inatteignable.
+  //
+  // Entrée du pavé numérique vaut Entrée, sauf si une liaison la nomme elle-même.
   [[nodiscard]] std::optional<ActionRef> ActionFor(std::uint32_t key, bool ctrl, bool shift,
                                                    bool alt) const;
 

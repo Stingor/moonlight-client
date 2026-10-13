@@ -565,6 +565,9 @@ std::optional<ActionRef> Hotkeys::ActionFor(std::uint32_t key, bool ctrl, bool s
       return action;
     }
   }
+  if (key == SDLK_KP_ENTER) {
+    return ActionFor(SDLK_RETURN, ctrl, shift, alt);
+  }
   return std::nullopt;
 }
 
