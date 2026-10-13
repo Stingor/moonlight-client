@@ -2356,6 +2356,9 @@ tr: La tabla de comportamientos está llena.
 fr: Langage grossier détecté.
 tr: Lenguaje ofensivo detectado.
 
+fr: Le nom du personnage doit compter au moins 4 caractères.
+tr: El nombre del personaje debe tener al menos 4 caracteres.
+
 fr: Le canal alpha de chaque couleur EST son opacité — les deux sont réglables séparément, précisément pour obtenir ce qu'on veut d'une ligne discrète : un fond presque transparent sous un texte resté lisible.
 tr: El canal alfa de cada color ES su opacidad — ambos se ajustan por separado, precisamente para lograr lo que necesita una línea discreta: un fondo casi transparente bajo un texto que sigue siendo legible.
 

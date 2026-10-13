@@ -1,6 +1,7 @@
 #include "chat/banned_input.h"
 
 #include "ro/core/i18n.h"
+#include "ro/core/text.h"
 
 namespace moonclient {
 namespace {
@@ -9,6 +10,16 @@ namespace {
 // guilde.
 constexpr std::uint32_t kRefusalRed = 0xFF0000;
 constexpr std::uint32_t kGuildNameRefusalSalmon = 0xFF966E;
+
+// Le refus d'un nom qui porte une balise de lien d'objet, le même pour un
+// personnage et pour un compagnon. Rien quand il n'en porte aucune.
+std::optional<std::string> ItemLinkTagRefusal(std::string_view utf8_name) {
+  if (utf8_name.find(kItemLinkOpeningTag) == std::string_view::npos &&
+      utf8_name.find(kItemLinkClosingTag) == std::string_view::npos) {
+    return std::nullopt;
+  }
+  return std::string(ro::core::Tr("Un nom qui porte cette balise ne peut pas être employé."));
+}
 
 }  // namespace
 
@@ -47,11 +58,21 @@ std::optional<std::string> BannedInputRefusal(const ro::sim::BannedWords& banned
   return std::string(ro::core::Tr("Langage grossier détecté."));
 }
 
+std::optional<std::string> CharacterNameRefusal(const ro::sim::BannedWords& banned,
+                                                std::string_view utf8_name) {
+  if (ro::core::Cp1252FromUtf8(utf8_name).size() < kCharacterNameMinBytes) {
+    return std::string(ro::core::Tr("Le nom du personnage doit compter au moins 4 caractères."));
+  }
+  if (std::optional<std::string> refused = ItemLinkTagRefusal(utf8_name); refused.has_value()) {
+    return refused;
+  }
+  return BannedInputRefusal(banned, utf8_name, BannedInput::kCharacterName);
+}
+
 std::optional<std::string> CompanionNameRefusal(const ro::sim::BannedWords* banned,
                                                 std::string_view utf8_name) {
-  if (utf8_name.find(kItemLinkOpeningTag) != std::string_view::npos ||
-      utf8_name.find(kItemLinkClosingTag) != std::string_view::npos) {
-    return std::string(ro::core::Tr("Un nom qui porte cette balise ne peut pas être employé."));
+  if (std::optional<std::string> refused = ItemLinkTagRefusal(utf8_name); refused.has_value()) {
+    return refused;
   }
   if (banned == nullptr) {
     return std::nullopt;

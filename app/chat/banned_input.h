@@ -15,6 +15,7 @@
 //     ne part PAS : la saisie est refusée, avec le message que le client
 //     d'origine montre pour CETTE saisie, et rien n'est émis.
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -52,11 +53,24 @@ enum class BannedInput : std::uint8_t {
                                                             std::string_view utf8_text,
                                                             BannedInput input);
 
-// LES BALISES QU'UN NOM DE COMPAGNON NE PORTE PAS : celles d'un lien d'objet,
-// cherchées telles quelles, casse comprise, n'importe où dans le nom. Un nom
-// qui en contient une se lirait comme un lien partout où il s'affiche.
+// LES BALISES QU'UN NOM NE PORTE PAS — celui d'un personnage à sa création,
+// le nouveau nom d'un compagnon : celles d'un lien d'objet, cherchées telles
+// quelles, casse comprise, n'importe où dans le nom. Un nom qui en contient une
+// se lirait comme un lien partout où il s'affiche. Une PAROLE, elle, les porte
+// librement : c'est ainsi qu'un lien d'objet part dans la conversation.
 inline constexpr std::string_view kItemLinkOpeningTag = "<ITEML>";
 inline constexpr std::string_view kItemLinkClosingTag = "</ITEML>";
+
+// LA LONGUEUR MINIMALE DU NOM D'UN PERSONNAGE, en OCTETS de la page de code du
+// serveur : « Élie » passe, « Éva » non, bien qu'elle compte quatre octets en
+// UTF-8. Un nom plus court est refusé avant toute autre épreuve.
+inline constexpr std::size_t kCharacterNameMinBytes = 4;
+
+// LE REFUS DU NOM D'UN PERSONNAGE À SA CRÉATION, traduit : la longueur
+// minimale d'abord, puis une balise de lien d'objet, puis un mot interdit.
+// Rien quand le nom passe.
+[[nodiscard]] std::optional<std::string> CharacterNameRefusal(const ro::sim::BannedWords& banned,
+                                                              std::string_view utf8_name);
 
 // LE REFUS DU NOUVEAU NOM D'UN HOMONCULE OU D'UN FAMILIER, traduit, une fois
 // la borne de longueur passée : une balise de lien d'objet d'abord, puis un

@@ -217,10 +217,11 @@ CharacterCreateAction DrawCharacterCreate(CharacterCreateState& state,
   }
 
   // ⚠ LA GARDE EST SUR LE BOUTON, et elle ne porte que ce que l'écran SAIT :
-  // un nom vide, et une demande déjà partie. La longueur minimale, les lettres
-  // autorisées et le plafond de personnages sont au serveur — les recopier au
-  // jugé donnerait une seconde vérité, celle qui refuserait un nom qu'il
-  // aurait pris.
+  // un nom vide, et une demande déjà partie. Un nom trop court, une balise de
+  // lien d'objet ou un mot interdit se refusent à l'envoi, avec leur message ;
+  // les lettres autorisées et le plafond de personnages sont au serveur — les
+  // recopier au jugé donnerait une seconde vérité, celle qui refuserait un nom
+  // qu'il aurait pris.
   const bool can_create = state.name[0] != '\0' && !view.pending;
   ImGui::BeginDisabled(!can_create);
   if (SkinButton(core::Tr("Créer"), art)) {

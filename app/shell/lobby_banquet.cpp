@@ -252,10 +252,10 @@ void LobbyScreen::RouteCreate(const ro::ui::CharacterCreateAction& asked) {
     case ro::ui::CharacterCreateVerb::kNothing:
       break;
     case ro::ui::CharacterCreateVerb::kSubmit: {
-      // 🔴 UN NOM QUI PORTE UN MOT INTERDIT NE PART PAS : le client le refuse
-      // lui-même, et le serveur n'en entend rien.
-      if (std::optional<std::string> refused = BannedInputRefusal(
-              newcomer_banned_, newcomer_.name.data(), BannedInput::kCharacterName);
+      // 🔴 UN NOM QUI PORTE UNE BALISE DE LIEN D'OBJET OU UN MOT INTERDIT NE
+      // PART PAS : le client le refuse lui-même, et le serveur n'en entend rien.
+      if (std::optional<std::string> refused =
+              CharacterNameRefusal(newcomer_banned_, newcomer_.name.data());
           refused.has_value()) {
         newcomer_refusal_ = std::move(*refused);
         break;
