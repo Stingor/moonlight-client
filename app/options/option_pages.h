@@ -23,6 +23,7 @@
 #include "options/craft_atlas_options.h"
 #include "options/damage_meter_options.h"
 #include "options/description_options.h"
+#include "options/factory_layout.h"
 #include "options/graphics_options.h"
 #include "options/grey_world_options.h"
 #include "options/grimoire_key_options.h"
@@ -88,8 +89,9 @@ static_assert(kTalkFilterRowBase + static_cast<int>(TalkFilterRow::kCount) <= kP
 struct OptionPages {
   AfkOptions afk;
   TargetOptions targeting;
-  // L'onglet « Portrait » de la page « Basic Info ».
-  StatusPortraitOptions portrait;
+  // Les onglets « Portrait » et « Étiquettes » de la page « Basic Info »,
+  // nés dans la disposition d'usine.
+  StatusPortraitOptions portrait{FactoryStatusPortrait()};
   ContextMenuOptions context_menu;
   ViewEquipMemory view_equip;
   GraphicsOptions graphics;
