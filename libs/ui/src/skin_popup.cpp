@@ -4,6 +4,8 @@
 #include <tuple>
 #include <utility>
 
+#include <imgui_internal.h>
+
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_tooltip.h"
 
@@ -87,6 +89,39 @@ constexpr int kBlueWeight = 114;
 constexpr int kWeightTotal = 1000;
 constexpr unsigned kChannelMask = 0xFFU;
 
+// Le menu d'un clic droit s'ouvre comme celui d'ImGui : taillé à son contenu,
+// sans titre, sans réglage retenu.
+constexpr ImGuiWindowFlags kContextMenuFlags = ImGuiWindowFlags_AlwaysAutoResize |
+                                               ImGuiWindowFlags_NoTitleBar |
+                                               ImGuiWindowFlags_NoSavedSettings;
+
+// La marque, rangée dans la fenêtre hôte, d'un menu ouvert quand on a enfoncé le
+// bouton sur son élément.
+constexpr int kOpenAtPressTag = 1;
+
+// 🔴 LE MÊME CLIC QUI OUVRE LE MENU LE REFERME. Sans cela, ImGui le ferme à
+// l'enfoncement, comme tout clic hors du menu, puis le rouvre au relâchement,
+// puisque le bouton est relâché sur l'élément : le menu clignote et reste.
+//
+// ⚠ L'ÉTAT SE LIT À L'ENFONCEMENT, seul instant où le menu est encore ouvert ;
+// il se consomme au relâchement, où qu'il tombe, pour qu'un geste interrompu ne
+// mange pas l'ouverture suivante.
+[[nodiscard]] bool ClosesOnReclick(ImGuiID popup_id, ImGuiPopupFlags flags) {
+  const ImGuiMouseButton button = ImGui::GetMouseButtonFromPopupFlags(flags);
+  ImGuiStorage* kept = ImGui::GetStateStorage();
+  const ImGuiID key = ImGui::GetIDWithSeed(kOpenAtPressTag, popup_id);
+  if (ImGui::IsMouseClicked(button) &&
+      ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup)) {
+    kept->SetBool(key, ImGui::IsPopupOpen(popup_id, ImGuiPopupFlags_None));
+  }
+  if (!ImGui::IsMouseReleased(button)) {
+    return false;
+  }
+  const bool was_open = kept->GetBool(key);
+  kept->SetBool(key, false);
+  return was_open;
+}
+
 }  // namespace
 
 bool SkinPopupNeedsBody(ImU32 ambient) {
@@ -112,8 +147,16 @@ bool BeginSkinPopup(const char* id, ImGuiWindowFlags flags) {
 }
 
 bool BeginSkinPopupContextItem(const char* id, ImGuiPopupFlags flags) {
+  if (ImGui::GetCurrentWindow()->SkipItems) {
+    return false;
+  }
+  const ImGuiID item_id = ImGui::GetItemID();
+  const ImGuiID popup_id = id != nullptr ? ImGui::GetID(id) : item_id;
+  if (!ClosesOnReclick(popup_id, flags) && ImGui::IsPopupOpenRequestForItem(flags, item_id)) {
+    ImGui::OpenPopupEx(popup_id, flags);
+  }
   PushBody();
-  const bool open = ImGui::BeginPopupContextItem(id, flags);
+  const bool open = ImGui::BeginPopupEx(popup_id, kContextMenuFlags);
   if (!open) {
     PopBody();
     return false;

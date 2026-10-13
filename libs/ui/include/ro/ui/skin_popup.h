@@ -32,7 +32,8 @@ namespace ro::ui {
 // ⚠ `EndSkinPopup` NE S'APPELLE QUE SI L'OUVERTURE A RENDU VRAI, comme
 // `EndPopup`.
 [[nodiscard]] bool BeginSkinPopup(const char* id, ImGuiWindowFlags flags = 0);
-// Le menu d'un clic droit sur l'élément qu'on vient de poser.
+// Le menu d'un clic droit sur l'élément qu'on vient de poser. Un second clic
+// sur le même élément, menu ouvert, le referme au lieu de le rouvrir.
 [[nodiscard]] bool BeginSkinPopupContextItem(
     const char* id = nullptr, ImGuiPopupFlags flags = ImGuiPopupFlags_MouseButtonRight);
 void EndSkinPopup();
