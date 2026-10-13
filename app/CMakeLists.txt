@@ -1580,6 +1580,7 @@ add_executable(moonclient
     game/companion_ai_window_profiles.cpp
     game/pet_stage.cpp
     game/pet_talk_stage.cpp
+    game/level_up_cue.cpp
     game/barter_stage.cpp
     game/buying_store_stage.cpp
     game/buying_store_visit.cpp

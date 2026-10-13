@@ -12,6 +12,7 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <SDL3/SDL.h>
@@ -36,6 +37,8 @@
 #include "game/connected_session.h"
 #include "game/game.h"
 #include "game/handshake_pump.h"
+#include "game/interface_sound.h"
+#include "game/level_up_cue.h"
 #include "input/camera_aim.h"
 #include "world/attack_intent.h"
 #include "world/click_action.h"
@@ -106,6 +109,17 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = ro::net::ApplyFrame(received, world_, now_ms);
+    }
+    // LA MONTÉE DE NIVEAU DU JOUEUR : son effet, et son son. Voir `CueLevelUp`.
+    if (const std::optional<std::string_view> sound = CueLevelUp(received, world_, now_ms);
+        sound.has_value() && vfs_ != nullptr) {
+      const InterfaceSoundFile file{.place = InterfaceSoundPlace::kSoundArchive,
+                                    .path = std::string(*sound)};
+      if (const ro::core::Result<void> played =
+              PlayInterfaceSound(audio_, *vfs_, client_root_, file);
+          !played) {
+        ro::core::LogWarning("son de montée de niveau : {}", ro::core::Describe(played.error()));
+      }
     }
     // 🔴 LES REPÈRES ET LES POSITIONS DE LA GUILDE SE VIDENT ICI, trame par
     // trame, et non après la boucle : le serveur redit ceux de la nouvelle carte

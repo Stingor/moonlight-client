@@ -120,6 +120,13 @@ FrameOutcome ApplyWorldSkillFrame(const Frame& frame, sim::World& world, std::ui
     // ro/sim/misc_effect.h, qui porte les dix cas.
     case proto::ZcNotifyEffect::kOpcode:
       return Decoded<proto::ZcNotifyEffect>(frame, [&world, now_ms](const auto& packet) {
+        // ⚠ SUR SOI, RIEN : le client ne cherche cet acteur que parmi les
+        // autres. La montée de niveau du joueur se montre par le paramètre qui
+        // la précède — voir ro/sim/level_up_effect.h —, et la semer ici aussi
+        // la doublerait.
+        if (packet.aid == world.player_id()) {
+          return FrameOutcome::kIgnored;
+        }
         const std::uint16_t effect = sim::MiscEffectId(packet.effectId);
         if (effect == 0) {
           // La fin de partie ne montre rien chez le client non plus : elle y
