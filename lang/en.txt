@@ -17761,3 +17761,6 @@ tr: no limit
 
 fr: %d h %02d min %02d s
 tr: %d h %02d min %02d s
+
+fr: file : %d
+tr: queue: %d

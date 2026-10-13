@@ -47,6 +47,7 @@ add_library(ro_proto STATIC
     src/repair_packets.cpp
     src/party_booking_packets.cpp
     src/pincode.cpp
+    src/play_ready_packets.cpp
     src/snap_packets.cpp
     src/social_packets.cpp
     src/player_packets.cpp

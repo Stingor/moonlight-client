@@ -1,6 +1,8 @@
 #include "ro/net/movement.h"
 
 #include "ro/proto/manual_packets.h"
+#include "ro/proto/map_packets.h"
+#include "ro/proto/play_ready_packets.h"
 
 namespace ro::net {
 
@@ -10,6 +12,18 @@ core::Result<void> NotifyMapLoaded(Connection& link) {
     return std::unexpected(frame.error());
   }
   link.Send(*frame);
+  return {};
+}
+
+core::Result<void> AnswerMapProperty(const Frame& frame, Connection& link) {
+  if (frame.opcode != proto::PacketMaptypeproperty2::kOpcode) {
+    return {};
+  }
+  auto ready = proto::EncodePlayReady();
+  if (!ready) {
+    return std::unexpected(ready.error());
+  }
+  link.Send(*ready);
   return {};
 }
 

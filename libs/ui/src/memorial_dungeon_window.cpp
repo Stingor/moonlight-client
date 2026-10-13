@@ -13,13 +13,13 @@
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
-#include "ro/ui/window_name.h"
 
 namespace ro::ui {
 namespace {
 
-constexpr const char* kTitle = core::TrText("Instance");
 constexpr const char* kDestroyQuestionId = "memorial_dungeon_destroy";
+// Assez pour « 99 h 59 min 59 s » ou une place en file, dans toute langue.
+constexpr std::size_t kCollapsedTailBytes = 64;
 
 constexpr std::int64_t kSecondsPerMinute = 60;
 constexpr std::int64_t kSecondsPerHour = 3600;
@@ -169,6 +169,14 @@ void DrawTimers(const MemorialDungeonView& view, float column) {
   return nullptr;
 }
 
+// « FERMER », EN PLUS DE LA CROIX : une fenêtre qu'on lit puis qu'on congédie
+// se ferme là où l'œil finit sa lecture.
+void DrawClose(MemorialDungeonWindowState& state, const SkinArt& art) {
+  if (SkinButton(core::Tr("Fermer"), art)) {
+    state.open = false;
+  }
+}
+
 // Le bouton et sa confirmation. Rend vrai au « oui ».
 [[nodiscard]] bool DrawDestroy(const MemorialDungeonView& view, const SkinArt& art) {
   if (view.destroy == MemorialDestroyGate::kHidden) {
@@ -191,6 +199,22 @@ void DrawTimers(const MemorialDungeonView& view, float column) {
 }
 
 }  // namespace
+
+std::string MemorialCollapsedTitle(const MemorialDungeonView& view) {
+  std::string title = core::Tr("Instance");
+  if (!view.present) {
+    return title;
+  }
+  std::array<char, kCollapsedTailBytes> tail{};
+  if (view.waiting) {
+    std::snprintf(tail.data(), tail.size(), core::Tr("file : %d"), view.wait_position);
+  } else if (view.seconds_left.has_value()) {
+    std::snprintf(tail.data(), tail.size(), "%s", MemorialDuration(*view.seconds_left).c_str());
+  } else {
+    return title;
+  }
+  return title + " · " + tail.data();
+}
 
 const char* MemorialHardModeName(int hard_mode) {
   // LES NIVEAUX DU MENU DE DIFFICULTÉ ; les autres n'ont pas de nom.
@@ -238,16 +262,22 @@ MemorialDungeonWindowAction DrawMemorialDungeonWindow(MemorialDungeonWindowState
   const ImGuiViewport* screen = ImGui::GetMainViewport();
   ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_FirstUseEver, ImVec2(0.5F, 0.5F));
   ImGui::SetNextWindowSize(ImVec2(kMemorialDungeonWindowWidth * Scale(), 0.0F), ImGuiCond_Always);
-  static WindowName name(kTitle, kMemorialDungeonWindowId);
-  const bool begun =
-      BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar,
-                         ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+  // ⚠ `###` FIGE L'IDENTITÉ : le titre replié change à chaque seconde, la place
+  // de la fenêtre, elle, ne doit pas changer.
+  state.title =
+      (state.was_collapsed ? MemorialCollapsedTitle(view) : std::string(core::Tr("Instance"))) +
+      "###" + kMemorialDungeonWindowId;
+  const bool begun = BeginSkinnedWindow(state.title.c_str(), &state.open, art, SkinnedTitle::kBar,
+                                        ImGuiWindowFlags_AlwaysAutoResize);
+  state.was_collapsed = !begun && state.open;
   if (!begun) {
     EndSkinnedWindow();
     return action;
   }
   if (!view.present) {
     ImGui::TextColored(kQuietColor, "%s", core::Tr("Aucune instance en cours."));
+    ImGui::Separator();
+    DrawClose(state, art);
     EndSkinnedWindow();
     return action;
   }
@@ -268,10 +298,12 @@ MemorialDungeonWindowAction DrawMemorialDungeonWindow(MemorialDungeonWindowState
   if (!view.waiting) {
     DrawTimers(view, column);
   }
+  ImGui::Separator();
   if (view.destroy != MemorialDestroyGate::kHidden) {
-    ImGui::Separator();
     action.destroy = DrawDestroy(view, art);
+    ImGui::SameLine();
   }
+  DrawClose(state, art);
   EndSkinnedWindow();
   return action;
 }

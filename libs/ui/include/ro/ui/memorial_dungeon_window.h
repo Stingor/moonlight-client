@@ -72,6 +72,11 @@ struct MemorialDungeonView {
 
 struct MemorialDungeonWindowState {
   bool open = false;
+  // REPLIÉE PAR SA BARRE : le titre porte alors le temps restant, tout ce
+  // qui reste à l'écran. Le pli n'est connu qu'après le `Begin` : on se fie
+  // à l'image précédente.
+  bool was_collapsed = false;
+  std::string title;
 };
 
 struct MemorialDungeonWindowAction {
@@ -86,6 +91,10 @@ struct MemorialDungeonWindowAction {
 // « 1 h 02 min 03 s », « 4 min 05 s », « 12 s » : une durée lisible d'un coup
 // d'œil, déjà traduite.
 [[nodiscard]] std::string MemorialDuration(std::int64_t seconds);
+
+// LE TITRE DE LA FENÊTRE REPLIÉE : « Instance · 57 min 31 s », la place en
+// file pendant la préparation, « Instance » seul sinon. Déjà traduit.
+[[nodiscard]] std::string MemorialCollapsedTitle(const MemorialDungeonView& view);
 
 [[nodiscard]] MemorialDungeonWindowAction DrawMemorialDungeonWindow(
     MemorialDungeonWindowState& state, const MemorialDungeonView& view, const SkinArt& art);

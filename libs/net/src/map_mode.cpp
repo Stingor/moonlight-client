@@ -88,6 +88,10 @@ FrameOutcome ApplyMapModeFrame(const Frame& frame, sim::World& world) {
       return FrameOutcome::kApplied;
     });
   }
+  // LA RÉPONSE À « JE SUIS PRÊT À JOUER » : elle ne dit rien d'autre.
+  if (frame.opcode == proto::ZcNotifyActorinit::kOpcode) {
+    return FrameOutcome::kIgnored;
+  }
   if (frame.opcode != proto::PacketMaptypeproperty2::kOpcode) {
     return FrameOutcome::kUnhandled;
   }

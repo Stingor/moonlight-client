@@ -36,4 +36,9 @@ namespace ro::net {
 // personnage est déjà posé.
 [[nodiscard]] core::Result<void> NotifyMapLoaded(Connection& link);
 
+// Dire au serveur qu'on est prêt à jouer, si `frame` est une
+// `ZC_MAPPROPERTY_R2 0x099B` — la réponse que le jeu fait à chacune : voir
+// `ro/proto/play_ready_packets.h`. Toute autre trame ne fait rien partir.
+[[nodiscard]] core::Result<void> AnswerMapProperty(const Frame& frame, Connection& link);
+
 }  // namespace ro::net

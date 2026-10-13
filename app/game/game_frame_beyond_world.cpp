@@ -14,6 +14,7 @@
 #include <string>
 #include <string_view>
 
+#include "ro/core/log.h"
 #include "ro/net/adoption.h"
 #include "ro/net/bug_report.h"
 #include "ro/net/card_album.h"
@@ -30,6 +31,7 @@
 #include "ro/net/map_guidance.h"
 #include "ro/net/member_statuses.h"
 #include "ro/net/monster_sheet.h"
+#include "ro/net/movement.h"
 #include "ro/net/npc_illustration.h"
 #include "ro/net/party.h"
 #include "ro/net/player_config.h"
@@ -288,6 +290,11 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
           pieces_.battleground.ApplyFrame(received, world_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = fought;
+  }
+  // 🔴 CHAQUE DÉCLARATION DE CARTE APPELLE « JE SUIS PRÊT À JOUER », comme
+  // dans le jeu : c'est elle qui fait redire l'instance par le serveur.
+  if (const auto told = ro::net::AnswerMapProperty(received, link_); !told) {
+    ro::core::LogError("prêt à jouer refusé : {}", ro::core::Describe(told.error()));
   }
   // ET L'INSTANCE, datée sur l'horloge réelle : le serveur annonce ses
   // échéances en secondes Unix.
