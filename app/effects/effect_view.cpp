@@ -19,6 +19,7 @@
 #include "ro/render/effect_launch.h"
 #include "ro/render/effect_life_table.h"
 #include "ro/render/effect_node_pattern_table.h"
+#include "ro/render/effect_step_blend.h"
 #include "ro/render/effect_table.h"
 #include "ro/render/effect_visibility.h"
 #include "ro/render/floating_number.h"
@@ -350,6 +351,11 @@ std::span<const ro::render::DrawnEffect> EffectsInPlay::Drawn(std::uint32_t now_
       shown.scale = playing.scale;
       shown.flip_x = playing.flip_x;
       shown.flip_y = playing.flip_y;
+      // LISSÉ, LE FICHIER SE DÉFORME ENTRE DEUX IMAGES : voir `EffectLayerAt`.
+      if (nodes_->steps().enabled()) {
+        shown.frame_fraction =
+            ro::render::EffectFrameFraction(static_cast<float>(now_ms - playing.started_ms));
+      }
       (playing.behind_actors ? behind_ : playing.over_everything ? over_ : drawn_).push_back(shown);
     }
     per_map_.playing[kept] = playing;

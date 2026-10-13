@@ -17518,3 +17518,9 @@ tr: Remove all their equipment
 
 fr: minutes###menu_entite_manieres
 tr: minutes###menu_entite_manieres
+
+fr: Effets fluides
+tr: Smooth effects
+
+fr: Les effets des skills avancent par pas de 16 ms. Coché, ils glissent d'un pas à l'autre au lieu de sauter : plus doux sur un écran au-delà de 60 Hz.\n\nN'apporte rien à 60 Hz et coûte un peu de calcul. Seul l'affichage change.
+tr: Skill effects advance in 16 ms steps. Checked, they glide from one step to the next instead of jumping: smoother on a screen above 60 Hz.\n\nGains nothing at 60 Hz and costs a little computation. Only the display changes.

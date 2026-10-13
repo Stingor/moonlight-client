@@ -349,6 +349,9 @@ struct PooledEffectNode {
   // LA DERNIÈRE PISTE DE L'ANNEAU EN COUCHES ONDULE SANS FIN : voir
   // `EffectLayeredRingNodePattern::waves_last_track`.
   bool waves_last_track = false;
+  // LE RANG DU NŒUD DANS LA TROUPE, croissant à chaque `Add` et jamais repris :
+  // il le reconnaît d'un pas à l'autre, quand d'autres meurent avant lui.
+  std::uint64_t pool_serial = 0;
 };
 
 // Au-delà de ce nombre de tics dus, la troupe abandonne le reste.
@@ -382,6 +385,7 @@ class EffectNodePool {
     node.instance_beats_left = InstanceBeatsLeft();
     node.instance_life_beats_left = InstanceLifeBeatsLeft();
     node.from_hat = next_from_hat_;
+    node.pool_serial = ++last_serial_;
     nodes_.push_back(std::move(node));
   }
 
@@ -683,6 +687,8 @@ class EffectNodePool {
 
   [[nodiscard]] std::span<const PooledEffectNode> nodes() const noexcept { return nodes_; }
   [[nodiscard]] std::size_t size() const noexcept { return nodes_.size(); }
+  // Ce qui reste d'un pas entamé : voir `EffectStepAlpha`.
+  [[nodiscard]] std::uint32_t owed_ms() const noexcept { return owed_ms_; }
 
   void Clear() {
     nodes_.clear();
@@ -700,6 +706,7 @@ class EffectNodePool {
   std::vector<EffectNodeSound> bounces_;
   // Ce qui reste d'un pas entamé, en millisecondes — toujours moins qu'un pas.
   std::uint32_t owed_ms_ = 0;
+  std::uint64_t last_serial_ = 0;  // voir `PooledEffectNode::pool_serial`
   EffectScatterWorld world_;
   std::function<bool(const PooledEffectNode&)> draw_gate_;
   // Le dernier cap de vue, pour les semis qui figent leur angle de naissance.

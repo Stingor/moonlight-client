@@ -26,6 +26,7 @@ namespace moonclient {
 
 void EffectNodesInPlay::Forget() {
   pool_.Clear();
+  steps_.Forget();
   clocks_.clear();
   screen_nodes_.clear();
   screen_quad_lots_.clear();

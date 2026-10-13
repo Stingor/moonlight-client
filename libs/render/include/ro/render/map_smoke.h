@@ -73,6 +73,10 @@ class MapChimney {
   // son écart.
   void MoveTo(glm::vec3 native_position) noexcept { position_ = native_position; }
   [[nodiscard]] std::uint32_t owner_id() const noexcept { return owner_id_; }
+  // LE NUMÉRO QUE `MapEffects` LUI DONNE, croissant et jamais repris : une
+  // cheminée portée part avec son porteur, et les autres changent de rang.
+  void Identify(std::uint64_t serial) noexcept { serial_ = serial; }
+  [[nodiscard]] std::uint64_t serial() const noexcept { return serial_; }
 
   // Un pas du jeu : le tri par distance, puis,
   // à portée, la mise à jour. Loin, ses bouffées se figent.
@@ -81,8 +85,12 @@ class MapChimney {
   [[nodiscard]] bool drawn() const noexcept { return ticked_ && !hidden_; }
 
   // Les quads de ses bouffées visibles, dans NOTRE repère.
+  // `tags`, quand il est donné, reçoit UNE ÉTIQUETTE PAR QUAD : voir
+  // `MapEffectQuadTag`. Le lissage des effets n'y mêle que les quads de même
+  // étiquette.
   void AppendQuads(const MapEffectFrame& frame, const BillboardBasis& basis,
-                   const ChimneySmokeLook& look, std::vector<EffectWorldQuad>& quads) const;
+                   const ChimneySmokeLook& look, std::vector<EffectWorldQuad>& quads,
+                   std::vector<std::uint64_t>* tags = nullptr) const;
 
   [[nodiscard]] glm::vec3 native_position() const noexcept { return position_; }
   // Combien de bouffées le client dessine à cet instant.
@@ -103,6 +111,8 @@ class MapChimney {
     std::int32_t age_steps = 0;
     // Faux tant que sa première renaissance n'a pas posé le sprite.
     bool dressed = false;
+    // CHANGE À CHAQUE RENAISSANCE : voir `MapEffectQuadTag`.
+    std::uint32_t generation = 0;
   };
 
   glm::vec3 position_{0.0F, 0.0F, 0.0F};
@@ -110,6 +120,7 @@ class MapChimney {
   std::array<Puff, kChimneyPuffs> puffs_{};
   // Champ 204 : un au constructeur.
   std::int32_t drawn_count_ = 1;
+  std::uint64_t serial_ = 0;
   bool hidden_ = false;
   bool ticked_ = false;
 };

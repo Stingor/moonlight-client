@@ -40,13 +40,16 @@ struct EffectQuad {
 //
 // Une couche qui n'a pas commencé, qui n'a pas de texture ou que sa couleur
 // rend invisible ne rend aucun quad.
+// `frame_fraction` : la part d'image écoulée au-delà de `frame`, voir
+// `EffectLayerAt`.
 [[nodiscard]] std::vector<EffectQuad> ComposeEffect(const PreparedEffect& effect,
-                                                    std::int32_t frame);
+                                                    std::int32_t frame,
+                                                    float frame_fraction = 0.0F);
 
 // La même composition, rangée dans `quads`, qu'elle vide d'abord : un appelant
 // qui compose à chaque image y garde sa mémoire d'une image à l'autre.
-void ComposeEffect(const PreparedEffect& effect, std::int32_t frame,
-                   std::vector<EffectQuad>& quads);
+void ComposeEffect(const PreparedEffect& effect, std::int32_t frame, std::vector<EffectQuad>& quads,
+                   float frame_fraction = 0.0F);
 
 // Les facteurs de mélange d'un nœud PROCÉDURAL, dans la numérotation de
 // Direct3D : la source par son alpha, la destination TELLE QUELLE. C'est une

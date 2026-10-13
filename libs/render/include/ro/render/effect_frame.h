@@ -128,8 +128,16 @@ struct EffectLayerFrame {
 // celle-ci se déforme : la couche tient alors sa pose jusqu'au bout de l'effet.
 // Sans cette fin, une couche qui s'achève opaque reste figée à l'écran pendant
 // que le reste de l'effet se termine.
+//
+// `frame_fraction`, dans ]-1, 1[, place le CONTINU — coins, coordonnées,
+// couleur, place, angle — à `frame + frame_fraction`, déformation comprise :
+// le lissage des effets, voir `effect_step_blend.h`. Négative, elle montre le
+// chemin depuis l'image d'avant. Le discret suit l'image entière : la couche
+// paraît ou finit, son image de texture et son mélange sont ceux de `frame`.
+// Zéro rend exactement l'image.
 [[nodiscard]] std::optional<EffectLayerFrame> EffectLayerAt(const PreparedEffectLayer& layer,
                                                             std::int32_t frame,
-                                                            std::int32_t last_frame);
+                                                            std::int32_t last_frame,
+                                                            float frame_fraction = 0.0F);
 
 }  // namespace ro::render

@@ -142,8 +142,11 @@ PreparedEffect PrepareEffect(const formats::StrEffect& effect) {
   return prepared;
 }
 
-std::optional<EffectLayerFrame> EffectLayerAt(const PreparedEffectLayer& layer, std::int32_t frame,
-                                              std::int32_t last_frame) {
+namespace {
+
+// La couche à une image ENTIÈRE : voir `EffectLayerAt`.
+std::optional<EffectLayerFrame> LayerAtWholeFrame(const PreparedEffectLayer& layer,
+                                                  std::int32_t frame, std::int32_t last_frame) {
   if (layer.keys.empty() || frame < layer.keys.front().key.frame_index) {
     return std::nullopt;
   }
@@ -202,6 +205,55 @@ std::optional<EffectLayerFrame> EffectLayerAt(const PreparedEffectLayer& layer, 
   // suivante.
   shown.blend_source = current.key.blend_source;
   shown.blend_destination = current.key.blend_destination;
+  return shown;
+}
+
+// REPLACE LES CHAMPS CONTINUS de `shown` à l'instant `moment`, en images non
+// entières : coins, coordonnées, couleur, place et angle. Le segment de clés
+// est celui qui contient l'instant ; une clé posée y tient sa pose, une clé qui
+// se déforme y avance, sans jamais dépasser ses deux bouts.
+void PlaceAtMoment(const PreparedEffectLayer& layer, float moment, std::int32_t last_frame,
+                   EffectLayerFrame& shown) {
+  std::size_t at = 0;
+  for (std::size_t index = 1; index < layer.keys.size(); ++index) {
+    if (static_cast<float>(layer.keys[index].key.frame_index) > moment) {
+      break;
+    }
+    at = index;
+  }
+  const PreparedEffectKey& current = layer.keys[at];
+  StrKeyFrame tail = current.key;
+  tail.frame_index = last_frame;
+  const StrKeyFrame& next = at + 1 < layer.keys.size() ? layer.keys[at + 1].key : tail;
+  const float span = static_cast<float>(next.frame_index - current.key.frame_index);
+  const float progress =
+      current.morphs && span > 0.0F
+          ? std::clamp((moment - static_cast<float>(current.key.frame_index)) / span, 0.0F, 1.0F)
+          : 0.0F;
+  for (std::size_t index = 0; index < shown.corners.size(); ++index) {
+    shown.corners[index] = Lerp(current.key.corners[index], next.corners[index], progress);
+  }
+  for (std::size_t index = 0; index < shown.uv.size(); ++index) {
+    shown.uv[index] = Lerp(current.key.uv[index], next.uv[index], progress);
+  }
+  for (std::size_t index = 0; index < shown.color.size(); ++index) {
+    shown.color[index] = Lerp(current.key.color[index], next.color[index], progress);
+  }
+  shown.offset_x = Lerp(current.key.offset_x, next.offset_x, progress);
+  shown.offset_y = Lerp(current.key.offset_y, next.offset_y, progress);
+  shown.angle_degrees = Lerp(current.key.angle_degrees, next.angle_degrees, progress);
+}
+
+}  // namespace
+
+std::optional<EffectLayerFrame> EffectLayerAt(const PreparedEffectLayer& layer, std::int32_t frame,
+                                              std::int32_t last_frame, float frame_fraction) {
+  std::optional<EffectLayerFrame> shown = LayerAtWholeFrame(layer, frame, last_frame);
+  // L'IMAGE ENTIÈRE DÉCIDE DE TOUT CE QUI EST DISCRET — paraître, finir, l'image
+  // de texture, le mélange — et la part ne déplace que le continu.
+  if (shown.has_value() && frame_fraction != 0.0F) {
+    PlaceAtMoment(layer, static_cast<float>(frame) + frame_fraction, last_frame, *shown);
+  }
   return shown;
 }
 

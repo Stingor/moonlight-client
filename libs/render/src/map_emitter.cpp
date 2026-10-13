@@ -157,6 +157,7 @@ void MapEmitter::Tick(glm::vec3 native_player, std::uint32_t& draws) {
       free_slot->used = true;
       ++used_;
       InitParticle(*free_slot, draws);
+      ++free_slot->generation;
       if (setting_.eternal) {
         free_slot->alpha = setting_.color[3];
       }
@@ -229,13 +230,15 @@ void MapEmitter::UpdateParticle(Particle& particle) {
   } else {
     // Elle retourne à la réserve.
     particle.used = false;
+    ++particle.generation;
     --used_;
   }
   ++particle.age_steps;
 }
 
 void MapEmitter::AppendQuads(const MapEffectFrame& frame, const BillboardBasis& basis,
-                             std::vector<EffectWorldQuad>& quads) const {
+                             std::vector<EffectWorldQuad>& quads,
+                             std::vector<std::uint64_t>* tags) const {
   if (!drawn()) {
     return;
   }
@@ -252,7 +255,11 @@ void MapEmitter::AppendQuads(const MapEffectFrame& frame, const BillboardBasis& 
   }
   constexpr glm::vec3 kWorldUp{0.0F, 1.0F, 0.0F};
 
-  for (const Particle& particle : particles_) {
+  for (std::size_t slot = 0; slot < particles_.size(); ++slot) {
+    const Particle& particle = particles_[slot];
+    if (tags != nullptr) {
+      tags->push_back(MapEffectQuadTag(slot, particle.generation));
+    }
     std::array<glm::vec3, 4> corners{};
     const glm::vec3 center = frame.ToWorld(particle.position);
     for (std::size_t corner = 0; corner < kUnitQuad.size(); ++corner) {

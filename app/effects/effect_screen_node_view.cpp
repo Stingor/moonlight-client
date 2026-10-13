@@ -288,6 +288,8 @@ std::span<const ro::render::DrawnScreenQuads> EffectNodesInPlay::ScreenQuads(
     if (!pool_.IsShown(pooled)) {
       continue;
     }
+    // CE QUE LE NŒUD COMPOSE SE RETIENT pour le lissage : voir `EffectNodeSteps`.
+    const EffectNodeSteps::ScreenOutputs outputs_of_node(steps_, *this, pooled);
     const std::optional<glm::vec2> bearer = ro::render::EffectScreenPositionOf(
         camera, pooled.ground_position, viewport_width, viewport_height);
     if (pooled.shape == ro::render::PooledNodeShape::kGridPlane) {
@@ -343,6 +345,7 @@ std::span<const ro::render::DrawnScreenQuads> EffectNodesInPlay::ScreenQuads(
     if (live.node.age_ticks == 0 && !live.instance_beats_every_frame) {
       continue;
     }
+    const EffectNodeSteps::ScreenOutputs outputs_of_node(steps_, *this, live);
     // ⚠ L'INDEX DE VUE CHOISIT L'IMAGE, et il TOURNE. Il deborde quand le noeud
     // vit plus longtemps que son jeu d'images ; le ramener dans ses bornes est
     // plus sur que de compter sur l'horloge.
@@ -391,6 +394,8 @@ std::span<const ro::render::DrawnScreenQuads> EffectNodesInPlay::ScreenQuads(
     screen_quad_lots_.push_back(std::move(lot));
     screen_quads_.push_back(ro::render::DrawnScreenQuads{{}, &texture->first, &texture->second});
   }
+  // LE LISSAGE MÊLE avant que les lots ne se recollent : voir `EffectNodeSteps`.
+  steps_.SmoothScreen(*this, camera, viewport_width, viewport_height, dark_veil);
   // Les span se recollent APRÈS que la liste a fini de grandir : les prendre au
   // fil des ajouts les laisserait pendre à la première réallocation.
   for (std::size_t index = 0; index < screen_quads_.size(); ++index) {

@@ -15,6 +15,7 @@
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_sprite.h"
 #include "ro/render/effect_render_word.h"
+#include "ro/render/effect_step_blend.h"
 #include "ro/render/effect_table.h"
 #include "ro/render/sprite_billboard.h"
 #include "ro/render/sprite_frame.h"
@@ -158,7 +159,8 @@ bool EffectClassesInPlay::Spawn(const Birth& birth, std::uint32_t now_ms) {
   std::unique_ptr<ro::render::EffectClassInstance> instance =
       ro::render::SpawnEffectClass(birth_point, View());
   if (instance != nullptr) {
-    living_.push_back(Living{std::move(instance), birth.owner_id, birth.bound_id, birth.from_hat});
+    living_.push_back(Living{std::move(instance), birth.owner_id, birth.bound_id, birth.from_hat,
+                             ++last_serial_});
   }
   return true;
 }
@@ -296,13 +298,18 @@ void EffectClassesInPlay::Advance(const ro::sim::World& world, const MapStage& s
   }
   // LA PORTE DE DESSIN SAUTE LE DESSIN SEUL : l'instance a battu, elle a fait
   // ses sons et ses demandes. Voir `EffectDrawGate`.
+  // LE LISSAGE retient ce que chaque instance dessine : voir `EffectClassSteps`.
+  steps_.BeginFrame(ticks, ro::render::EffectStepAlpha(now_ms - last_tick_ms_));
   ro::render::EffectClassOutput dessin;
   for (const Living& living : living_) {
     if (!living.instance->culled() &&
         draw_gate_.DrawsEffect(living.instance->effect_id(), living.owner_id, living.from_hat)) {
+      steps_.OpenInstance(living.serial, dessin);
       living.instance->Draw(view, dessin);
+      steps_.CloseInstance(dessin);
     }
   }
+  steps_.Blend(dessin);
   Compose(dessin);
 }
 
@@ -369,6 +376,7 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
     peint.scale = str.scale;
     peint.alpha = str.alpha;
     peint.flip_x = str.flip_x;
+    peint.frame_fraction = str.frame_fraction;
     (str.behind_actors ? behind_ : drawn_).push_back(peint);
   }
   // LES QUADS, UN LOT PAR TEXTURE ET PAR MOT DE RENDU, dans l'ordre d'arrivée.
@@ -494,6 +502,7 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
 
 void EffectClassesInPlay::Forget() {
   living_.clear();
+  steps_.Forget();
   drawn_.clear();
   behind_.clear();
   quads_.clear();

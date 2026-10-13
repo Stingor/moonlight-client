@@ -75,6 +75,8 @@ class EffectsInPlay {
   // TUENT RIEN : les portiers relisent le drapeau à chaque image, et ce qui
   // était caché revient si l'on rebascule.
   void SetEffectSwitches(bool shown, bool minimal);
+  // LE LISSAGE DES EFFETS ENTRE DEUX TICS, éteint par défaut : voir `EffectNodeSteps`.
+  void SetSmoothSteps(bool on);
   // LA PORTE DE DESSIN DE L'IMAGE, recalculée sur le monde et le groupe : voir
   // `EffectDrawGate`. Les chapeaux de ses porteurs cachés y sont nommés.
   void NoticeDrawGate(const ro::sim::World& world, const ro::sim::PartyRoster* party);

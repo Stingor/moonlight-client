@@ -52,8 +52,12 @@ class MapEmitter {
   [[nodiscard]] bool drawn() const noexcept { return ticked_ && !hidden_; }
 
   // Les quads de toutes ses particules, dans NOTRE repère.
+  // `tags`, quand il est donné, reçoit UNE ÉTIQUETTE PAR QUAD : voir
+  // `MapEffectQuadTag`. Le lissage des effets n'y mêle que les quads de même
+  // étiquette.
   void AppendQuads(const MapEffectFrame& frame, const BillboardBasis& basis,
-                   std::vector<EffectWorldQuad>& quads) const;
+                   std::vector<EffectWorldQuad>& quads,
+                   std::vector<std::uint64_t>* tags = nullptr) const;
 
   [[nodiscard]] const MapEmitterSetting& setting() const noexcept { return setting_; }
   [[nodiscard]] glm::vec3 native_position() const noexcept { return position_; }
@@ -91,6 +95,9 @@ class MapEmitter {
     glm::vec2 facing_scale{1.0F, 1.0F};
     // Tirée de la réserve et pas encore rendue.
     bool used = false;
+    // CHANGE À CHAQUE NAISSANCE ET À CHAQUE MORT : l'emplacement recyclé porte
+    // alors une autre particule. Voir `MapEffectQuadTag`.
+    std::uint32_t generation = 0;
   };
 
   void InitParticle(Particle& particle, std::uint32_t& draws) const;
