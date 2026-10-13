@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
 #include <cstdint>
 
 #include <glm/glm.hpp>
@@ -23,16 +22,6 @@ using NativeMatrix = std::array<float, 12>;
 
 inline constexpr NativeMatrix kNativeIdentity = {1.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F,
                                                  0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F};
-
-// L'ÉTIQUETTE D'UN QUAD D'EFFET DE CARTE : l'emplacement de sa particule dans
-// les poids forts, sa génération dans les faibles. Un emplacement recyclé change
-// de génération, donc d'étiquette ; et les quads d'un objet sortent par
-// emplacement croissant, donc par étiquette croissante.
-inline constexpr unsigned kMapEffectSlotShift = 32;
-[[nodiscard]] constexpr std::uint64_t MapEffectQuadTag(std::size_t slot,
-                                                       std::uint32_t generation) noexcept {
-  return (static_cast<std::uint64_t>(slot) << kMapEffectSlotShift) | generation;
-}
 
 // Une mise à l'échelle.
 [[nodiscard]] NativeMatrix NativeScale(float x, float y, float z);

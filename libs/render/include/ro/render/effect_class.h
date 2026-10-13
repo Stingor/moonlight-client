@@ -156,8 +156,6 @@ struct EffectClassStrDraw {
   float alpha = 1.0F;
   // RETOURNÉ À L'ÉCRAN : ses coins changent de côté autour du point qui le porte.
   bool flip_x = false;
-  // LA PART D'IMAGE que le lissage pose : voir `DrawnEffect::frame_fraction`.
-  float frame_fraction = 0.0F;
 };
 
 // UN QUAD DU MONDE À PEINDRE, sa texture relative au dossier des textures et

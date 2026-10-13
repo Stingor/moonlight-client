@@ -51,12 +51,6 @@ class BackdropEffects {
   BackdropEffects& operator=(BackdropEffects&&) = delete;
   ~BackdropEffects() = default;
 
-  // LE LISSAGE ENTRE DEUX PAS, comme dans la partie : voir `EffectsInPlay::SetSmoothSteps`.
-  void SetSmoothSteps(bool on) {
-    effects_.SetSmoothSteps(on);
-    map_effects_.SetSmoothSteps(on);
-  }
-
   // AVANT LES PASSANTS : les effets qui passent derrière les corps. Le lot est
   // celui que l'image précédente a fait vivre, comme dans la partie.
   void DrawBehindActors(const ro::render::Camera& camera, float aspect_ratio,

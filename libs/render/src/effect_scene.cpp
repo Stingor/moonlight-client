@@ -22,15 +22,14 @@ float Radians(float degrees) { return degrees * std::numbers::pi_v<float> / 180.
 
 }  // namespace
 
-std::vector<EffectQuad> ComposeEffect(const PreparedEffect& effect, std::int32_t frame,
-                                      float frame_fraction) {
+std::vector<EffectQuad> ComposeEffect(const PreparedEffect& effect, std::int32_t frame) {
   std::vector<EffectQuad> quads;
-  ComposeEffect(effect, frame, quads, frame_fraction);
+  ComposeEffect(effect, frame, quads);
   return quads;
 }
 
-void ComposeEffect(const PreparedEffect& effect, std::int32_t frame, std::vector<EffectQuad>& quads,
-                   float frame_fraction) {
+void ComposeEffect(const PreparedEffect& effect, std::int32_t frame,
+                   std::vector<EffectQuad>& quads) {
   quads.clear();
   quads.reserve(effect.layers.size());
 
@@ -38,8 +37,7 @@ void ComposeEffect(const PreparedEffect& effect, std::int32_t frame, std::vector
     if (layer.texture_count == 0) {
       continue;
     }
-    const std::optional<EffectLayerFrame> shown =
-        EffectLayerAt(layer, frame, effect.last_frame, frame_fraction);
+    const std::optional<EffectLayerFrame> shown = EffectLayerAt(layer, frame, effect.last_frame);
     if (!shown.has_value()) {
       continue;
     }

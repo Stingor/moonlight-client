@@ -28,7 +28,6 @@ constexpr const char* kAppearFadeKey = "spawn_fade_ms";
 constexpr const char* kLeaveFadeKey = "exit_of_view_fade_ms";
 constexpr const char* kSkillGestureFloorKey = "gesture_of_skill_min_ms";
 constexpr const char* kCastSpansBarKey = "cast_on_the_bar";
-constexpr const char* kSmoothEffectsKey = "effects_smooth";
 
 // Le plus long plancher proposé au geste d'une compétence : au-delà, le geste
 // déborderait sur le coup suivant d'un personnage qui enchaîne.
@@ -81,7 +80,6 @@ enum class GraphicsRow : int {
   kFxaa,
   kFxaaStrength,
   kReset,
-  kSmoothEffects,
   kCount,
 };
 
@@ -205,7 +203,6 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kLeaveFadeKey, &leave_fade_ms_);
   into.Declare(kSkillGestureFloorKey, &skill_gesture_floor_ms_);
   into.Declare(kCastSpansBarKey, &cast_spans_bar_);
-  into.Declare(kSmoothEffectsKey, &smooth_effects_);
   {
     // CE QUE LA CARTE GRAPHIQUE PEUT PORTER TIENT À LA MACHINE.
     const SettingsFile::MachineScope machine(into);
@@ -351,12 +348,6 @@ void GraphicsOptions::Compose() {
          "jamais : ses planches de motifs en sortiraient en damier."),
       decor_names_,
       std::clamp(decor_filter_rank_, 0, static_cast<int>(kDecorAnisotropy.size()) - 1)));
-  rows_.push_back(
-      Toggle(GraphicsRow::kSmoothEffects, Tr("Effets fluides"),
-             Tr("Les effets des skills avancent par pas de 16 ms. Coché, ils glissent d'un "
-                "pas à l'autre au lieu de sauter : plus doux sur un écran au-delà de 60 Hz.\n\n"
-                "N'apporte rien à 60 Hz et coûte un peu de calcul. Seul l'affichage change."),
-             nullptr, smooth_effects_));
 
   ComposePostFx();
 }
@@ -452,9 +443,6 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kCastSpansBar:
       cast_spans_bar_ = asked.on;
-      break;
-    case GraphicsRow::kSmoothEffects:
-      smooth_effects_ = asked.on;
       break;
     case GraphicsRow::kSkillGestureFloor:
       skill_gesture_floor_ms_ =

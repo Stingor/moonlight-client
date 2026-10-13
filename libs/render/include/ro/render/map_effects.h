@@ -124,15 +124,6 @@ class MapEffects {
   [[nodiscard]] std::span<const MapEffectLot> Lots(const Camera& camera,
                                                    const ChimneySmokeLook* smoke = nullptr);
 
-  // LE LISSAGE ENTRE DEUX PAS, éteint par défaut. Allumé, `Advance` garde les
-  // objets tels qu'ils étaient avant le dernier pas, et `Lots` mêle leurs quads,
-  // vus de la caméra de l'image, à ceux du pas courant — voir
-  // `effect_step_blend.h`. Un objet se reconnaît par sa sorte et son rang, une
-  // cheminée par son numéro ; une particule par son ÉTIQUETTE, qui change quand
-  // son emplacement la recycle (`MapEffectQuadTag`) : une renaissance ne se
-  // mêle donc jamais à la particule d'avant. La simulation n'en sait rien.
-  void SetSmoothSteps(bool on);
-
   // Ce que les semeurs ont lancé pendant le dernier `Advance`, dans l'ordre des
   // pas. Vidé à chaque appel : `app` le draine dans la foulée.
   [[nodiscard]] std::span<const MapEffectSowing> sown() const noexcept { return sown_; }
@@ -152,29 +143,9 @@ class MapEffects {
   std::vector<MapChimney> chimneys_;
   std::vector<MapEffectMaker> makers_;
   std::vector<MapEffectSowing> sown_;
-  // UN JEU DE LOTS : les lots de la dernière image, et au-delà ceux d'images
-  // plus chargées, que `Lots` reprend avant d'en créer de nouveaux ; la clé de
-  // l'objet de chacun, et l'étiquette de chacun de ses quads quand on lisse.
-  struct LotSet {
-    std::vector<MapEffectLot> lots;
-    std::vector<std::uint64_t> keys;
-    std::vector<std::vector<std::uint64_t>> tags;
-    std::size_t count = 0;
-  };
-  // Compose les lots de ces objets dans `into`.
-  void ComposeLots(std::span<const MapEmitter> emitters, std::span<const MapWind> winds,
-                   std::span<const MapChimney> chimneys, const BillboardBasis& basis,
-                   const ChimneySmokeLook* smoke, LotSet& into) const;
-  // Mêle les lots de l'image à ceux des objets d'avant le dernier pas.
-  void SmoothLots(const BillboardBasis& basis, const ChimneySmokeLook* smoke);
-  LotSet current_;
-  bool smooth_ = false;
-  bool has_previous_ = false;
-  std::vector<MapEmitter> previous_emitters_;
-  std::vector<MapWind> previous_winds_;
-  std::vector<MapChimney> previous_chimneys_;
-  LotSet previous_lots_;
-  std::uint64_t last_chimney_serial_ = 0;  // voir `MapChimney::Identify`
+  // Les lots de la dernière image, et au-delà ceux d'images plus chargées, que
+  // `Lots` reprend avant d'en créer de nouveaux.
+  std::vector<MapEffectLot> lots_;
   // Le générateur partagé : le client tire tous ses effets dans le même `rand()`.
   std::uint32_t draws_ = 1;
   std::uint32_t last_ms_ = 0;

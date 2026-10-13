@@ -189,7 +189,6 @@ add_library(ro_render STATIC
     src/hat_effect_table.cpp
     src/effect_catalog.cpp
     src/effect_frame.cpp
-    src/effect_step_blend.cpp
     src/effect_duration.cpp
     src/effect_life_table.cpp
     src/effect_marching_sower.cpp

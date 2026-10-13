@@ -40,12 +40,7 @@ class MapWind {
   [[nodiscard]] bool drawn() const noexcept { return ticked_ && !hidden_; }
 
   // Les quads de ses rubans, dans NOTRE repère.
-  // `tags`, quand il est donné, reçoit UNE ÉTIQUETTE PAR QUAD : voir
-  // `MapEffectQuadTag`. Le lissage des effets n'y mêle que les quads de même
-  // étiquette.
-  // Un segment ne renaît jamais : sa génération reste nulle.
-  void AppendQuads(const MapEffectFrame& frame, std::vector<EffectWorldQuad>& quads,
-                   std::vector<std::uint64_t>* tags = nullptr) const;
+  void AppendQuads(const MapEffectFrame& frame, std::vector<EffectWorldQuad>& quads) const;
 
   [[nodiscard]] const MapWindSetting& setting() const noexcept { return setting_; }
   [[nodiscard]] glm::vec3 native_position() const noexcept { return position_; }

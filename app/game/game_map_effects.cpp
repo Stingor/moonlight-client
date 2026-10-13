@@ -133,7 +133,6 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
   if (effect_nodes_.has_value()) {
     effect_nodes_->SetLocalPlayerPosition(player_position);
   }
-  map_effects_.SetSmoothSteps(settings_->options().graphics().smooth_effects());
   map_effects_.Advance(now_ms, reference);
 
   // 🔴 LES SEMEURS NE DESSINENT RIEN : ils LANCENT l'effet ordinaire de leur

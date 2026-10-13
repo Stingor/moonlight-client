@@ -420,7 +420,6 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // et n'auraient rien à éclaircir plus tôt. Leur porte de dessin se juge sur le
   // monde et le groupe de cette image.
   effects_->NoticeDrawGate(world_, &party_);
-  effects_->SetSmoothSteps(settings_->options().graphics().smooth_effects());
   DrawEffectLayers(*effects_, *effect_nodes_, *actor_sounds_, footprints_, drops_, scene, sprites_,
                    effect_renderer_, pieces_.effect_ground, aspect_ratio_,
                    static_cast<float>(size_.width), static_cast<float>(size_.height), fog);

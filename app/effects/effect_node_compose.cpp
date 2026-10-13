@@ -114,9 +114,45 @@ constexpr std::uint32_t kSilentFramesBeforeWarning = 30;
 
 std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t now_ms,
                                                                  const ro::render::Camera& camera) {
-  // LES TICS DUS BATTENT D'ABORD, et la composition lit ce qu'ils ont laissé :
-  // voir `EffectNodeSteps::Beat`.
-  static_cast<void>(steps_.Beat(*this, now_ms, camera));
+  // Le PREMIER passage ne rattrape rien : `beat_ms_` n'est pas encore un
+  // instant, et le prendre pour tel ferait vieillir la troupe de tout le temps
+  // écoulé depuis le début de la partie.
+  // ⚠ LES ANGLES AVANT LE MOUVEMENT. Le mouvement de la cascade les RANGE dans
+  // les pistes, et son dessinateur les y relit : les poser après le laisserait
+  // dessiner avec ceux de l'image précédente.
+  pool_.FaceCamera(ro::render::EffectBillboardTurnDegrees(camera),
+                   ro::render::EffectBillboardTiltDegrees(camera));
+  const std::uint32_t elapsed_ms = beat_ms_ == 0 ? 0 : now_ms - beat_ms_;
+  beat_ms_ = now_ms;
+  // 🔴 UN SEUL COMPTE DE TICS, ET TIC PAR TIC : le client refait une passe
+  // complète par tic dû — le bâtisseur de chaque instance sème, puis ses nœuds
+  // sont mis à jour dans ce même passage. Semer tous les tics d'une image avant
+  // d'avancer la troupe donnerait au dernier semé autant de mises à jour qu'au
+  // premier, et deux comptes séparés feraient naître un nœud avant son passage.
+  const std::int32_t ticks_advanced = pool_.TakeDueTicks(elapsed_ms);
+  const bool single_frame = ticks_advanced == 0;
+  std::uint32_t screen_generator = now_ms + 1U;
+  for (std::int32_t pass = 0; pass < (single_frame ? 1 : ticks_advanced); ++pass) {
+    StepClocks(single_frame);
+    pool_.Pass(single_frame);
+    // ⚠ LES NŒUDS D'ECRAN BATTENT ICI, au meme passage que la troupe et par le
+    // meme chemin : les avancer au moment de composer les figerait des qu'une
+    // image est sautee, et les ferait courir deux fois si l'on compose deux fois.
+    ScreenPass(single_frame, screen_generator);
+  }
+  pool_.FinishFrame();
+  // LES EFFETS QUE LES NŒUDS DEMANDENT en se peignant, au plus une fois par
+  // image et seulement après un tic — voir `TakeSpawnRequests`. Celles qu'on n'a
+  // pas emportées tombent : une demande vaut pour l'image qui l'a faite.
+  spawn_requests_.clear();
+  if (ticks_advanced > 0) {
+    for (const ro::render::PooledEffectNode& pooled : pool_.nodes()) {
+      // ⚠ PAS SANS SON DESSIN : c'est en se peignant qu'un nœud demande.
+      if (pool_.IsShown(pooled)) {
+        ro::render::CollectEffectSpawnRequests(pooled, spawn_requests_);
+      }
+    }
+  }
 
   composed_.clear();
   placements_.clear();
@@ -138,8 +174,6 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
     if (ro::render::EffectNodeShapeOnlySpawns(pooled.shape) || !pool_.IsShown(pooled)) {
       continue;
     }
-    // CE QUE LE NŒUD COMPOSE SE RETIENT pour le lissage : voir `EffectNodeSteps`.
-    const EffectNodeSteps::NodeOutputs outputs_of_node(steps_, *this, pooled);
     // ⚠ TOUTES LES IMAGES DU NŒUD ENTRENT AU CACHE, pas seulement la première :
     // un semis ne juge que celle de tête, et une figure qui en peint plusieurs
     // perdait en silence les traînées des autres — quatre des six glyphes de
@@ -644,8 +678,6 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
     // MONDE mais une image d'ACT, et il vit donc avec les autres figures.
     ComposeNodeAsSprite(pooled, camera);
   }
-  // LE LISSAGE MÊLE avant que les poses ne deviennent des acteurs : voir `EffectNodeSteps`.
-  steps_.Smooth(*this, now_ms, camera);
   // Les pointeurs se prennent APRÈS que la liste a fini de grandir : les
   // prendre au fil des ajouts les laisserait pendre à la première
   // réallocation. C'est vrai des quads d'anneau comme des acteurs composés.

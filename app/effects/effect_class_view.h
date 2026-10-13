@@ -26,7 +26,6 @@
 #include "ro/sim/world_fwd.h"
 #include "ro/vfs/vfs.h"
 
-#include "effects/effect_class_steps.h"
 #include "effects/effect_draw_gate.h"
 #include "world/actor_sounds.h"
 #include "world/map_stage.h"
@@ -132,17 +131,12 @@ class EffectClassesInPlay {
 
   void Forget();
 
-  // LE LISSAGE ENTRE DEUX TICS, éteint par défaut : voir `EffectClassSteps`.
-  [[nodiscard]] EffectClassSteps& steps() noexcept { return steps_; }
-
  private:
   struct Living {
     std::unique_ptr<ro::render::EffectClassInstance> instance;
     std::uint32_t owner_id = 0;
     std::uint32_t bound_id = 0;
     bool from_hat = false;  // voir `Birth::from_hat`
-    // LE NUMÉRO DE L'INSTANCE, croissant et jamais repris : voir `EffectClassSteps`.
-    std::uint64_t serial = 0;
   };
 
   [[nodiscard]] std::optional<glm::vec3> PlaceOf(std::uint32_t id, const ro::sim::World& world,
@@ -167,8 +161,6 @@ class EffectClassesInPlay {
   std::uint32_t last_tick_ms_ = 0;
   bool clock_started_ = false;
   std::uint32_t seed_ = 1;
-  std::uint64_t last_serial_ = 0;  // voir `Living::serial`
-  EffectClassSteps steps_;
   std::map<std::string, const ro::render::LoadedEffect*> strs_;
   std::map<std::string, ro::formats::Image> textures_;
   // La révision des surcharges du VFS à la lecture : un skin changé fait

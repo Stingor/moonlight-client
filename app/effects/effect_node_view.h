@@ -38,8 +38,6 @@
 #include "effects/effect_draw_gate.h"
 #include "effects/effect_node_command.h"
 #include "effects/effect_node_sowing.h"
-#include "effects/effect_node_steps.h"
-#include "effects/effect_screen_node_in_play.h"
 
 // LES NŒUDS procéduraux en jeu : la famille d'effets que le client dessine en
 // CODE, et dont aucun n'a de fichier — voir `docs/adr/0014`.
@@ -238,8 +236,6 @@ class EffectNodesInPlay {
 
   // LES DEUX BASCULES D'EFFET DU JEU. Posées par `EffectsInPlay`, qui les tient
   // des réglages — voir `EffectsInPlay::SetEffectSwitches`.
-  // LES PAS FIXES DE LA TROUPE ET LEUR LISSAGE, éteint par défaut : voir `EffectNodeSteps`.
-  [[nodiscard]] EffectNodeSteps& steps() noexcept { return steps_; }
   void SetEffectSwitches(bool shown, bool minimal) noexcept {
     effects_shown_ = shown;
     minimal_effects_ = minimal;
@@ -692,8 +688,6 @@ class EffectNodesInPlay {
   std::map<std::string, ro::formats::Image, std::less<>> textures_;
   std::uint64_t textures_revision_ = 0;
   ro::render::EffectNodePool pool_;
-  friend class EffectNodeSteps;
-  EffectNodeSteps steps_;
   std::vector<ro::render::ComposedActor> composed_;
 
   // OÙ UN ACTEUR COMPOSÉ SE POSE, et avec quelle teinte — un par DESSIN et non
@@ -726,7 +720,26 @@ class EffectNodesInPlay {
   std::vector<std::vector<ro::render::EffectGroundCellPaint>> ground_cell_lots_;
   std::vector<DrawnGroundCells> ground_cells_;
 
-  using ScreenNodeInPlay = EffectScreenNodeInPlay;
+  // UN NŒUD D'ECRAN EN VIE : son etat, son image, et OU SON PORTEUR SE TIENT
+  // dans le monde.
+  //
+  // ⚠ LA POSITION DU PORTEUR EST GARDEE EN COORDONNEES DU MONDE, et projetee a
+  // chaque image : la projeter une fois pour toutes au semis figerait le nœud a
+  // l'ecran des que la camera bouge.
+  struct ScreenNodeInPlay {
+    ro::render::EffectScreenNode node;
+    // ⚠ PLUSIEURS IMAGES, ET L'INDEX DE VUE CHOISIT. Un batisseur qui COMPOSE le
+    // nom de son image en pose huit, et l'index du noeud tourne dessus. N'en
+    // porter qu'une figerait l'explosion sur sa premiere.
+    std::vector<std::string> texture_paths;
+    glm::vec3 owner_position{0.0F, 0.0F, 0.0F};
+    bool beats_every_frame = false;  // voir `EffectBeatsEveryFrame`
+    // Voir `PooledEffectNode::instance_beats_left`.
+    std::int32_t instance_beats_left = -1;
+    bool instance_beats_every_frame = false;  // voir `EffectInstanceBeatsEveryFrame`
+    std::uint32_t owner_actor_id = 0;         // qui le porte, ou zéro : voir `FollowActor`
+    bool from_hat = false;                    // voir `SowAsHat`
+  };
   std::vector<ScreenNodeInPlay> screen_nodes_;
   EffectDrawGate draw_gate_;
   std::vector<std::vector<ro::render::EffectScreenQuad>> screen_quad_lots_;

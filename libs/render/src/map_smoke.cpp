@@ -128,7 +128,6 @@ void MapChimney::Tick(glm::vec3 native_player, std::uint32_t& draws) {
       // LA RENAISSANCE, dans l'ordre des tirages du client : la montée, la
       // pente, le cap, puis le nombre de bouffées peintes.
       puff.dressed = true;
-      ++puff.generation;
       puff.size = kPuffSize;
       puff.roll_step_degrees = kPuffRollStepDegrees;
       const auto spread = static_cast<std::int32_t>(NextEffectNodeDraw(draws) % kRiseSpread);
@@ -155,8 +154,8 @@ void MapChimney::Tick(glm::vec3 native_player, std::uint32_t& draws) {
 }
 
 void MapChimney::AppendQuads(const MapEffectFrame& frame, const BillboardBasis& basis,
-                             const ChimneySmokeLook& look, std::vector<EffectWorldQuad>& quads,
-                             std::vector<std::uint64_t>* tags) const {
+                             const ChimneySmokeLook& look,
+                             std::vector<EffectWorldQuad>& quads) const {
   if (!drawn() || look.image.empty()) {
     return;
   }
@@ -213,9 +212,6 @@ void MapChimney::AppendQuads(const MapEffectFrame& frame, const BillboardBasis& 
     quad.blend_source = kSmokeBlendSource;
     quad.blend_destination = kSmokeBlendDestination;
     quads.push_back(quad);
-    if (tags != nullptr) {
-      tags->push_back(MapEffectQuadTag(rank, puff.generation));
-    }
   }
 }
 

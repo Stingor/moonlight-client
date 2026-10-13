@@ -130,8 +130,7 @@ void MapWind::Tick(glm::vec3 native_player) {
   }
 }
 
-void MapWind::AppendQuads(const MapEffectFrame& frame, std::vector<EffectWorldQuad>& quads,
-                          std::vector<std::uint64_t>* tags) const {
+void MapWind::AppendQuads(const MapEffectFrame& frame, std::vector<EffectWorldQuad>& quads) const {
   if (!drawn()) {
     return;
   }
@@ -160,9 +159,6 @@ void MapWind::AppendQuads(const MapEffectFrame& frame, std::vector<EffectWorldQu
     quad.blend_source = source;
     quad.blend_destination = destination;
     quads.push_back(quad);
-    if (tags != nullptr) {
-      tags->push_back(MapEffectQuadTag(static_cast<std::size_t>(&segment - segments_.data()), 0));
-    }
   }
 }
 

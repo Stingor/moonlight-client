@@ -72,9 +72,6 @@ class GraphicsOptions {
   // L'incantation ordinaire déroule son geste sur toute sa barre, au lieu d'en
   // tenir la première image. Éteint par défaut, comme le client.
   [[nodiscard]] bool cast_spans_bar() const noexcept { return cast_spans_bar_; }
-  // Les effets se lissent entre deux pas fixes de 16 ms. Éteint par défaut : rien
-  // à gagner sur un écran à 60 Hz. Voir `EffectNodeSteps`.
-  [[nodiscard]] bool smooth_effects() const noexcept { return smooth_effects_; }
   // Le post-traitement, BORNÉ : le fichier se modifie à la main.
   [[nodiscard]] ro::render::PostFxSettings post_fx() const { return ro::render::Clamped(post_fx_); }
   // Où le monde se peint : échantillons et échelle, bornés à ce qu'on propose.
@@ -116,7 +113,6 @@ class GraphicsOptions {
   std::uint32_t leave_fade_ms_ = ro::render::kClientLeaveFadeMs;
   std::uint32_t skill_gesture_floor_ms_ = 0;
   bool cast_spans_bar_ = false;
-  bool smooth_effects_ = false;
   int msaa_samples_ = 0;
   int render_scale_percent_ = 100;
   int decor_filter_rank_ = 0;

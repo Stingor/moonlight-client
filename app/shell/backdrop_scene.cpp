@@ -123,7 +123,6 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                ro::render::ModelStages{.blended_apart = true}, &model_clock_, fog);
   // LES EFFETS QUI PASSENT DERRIÈRE LES CORPS, avant eux.
   if (effects_.has_value()) {
-    effects_->SetSmoothSteps(graphics.smooth_effects());
     effects_->DrawBehindActors(camera, aspect_ratio, fog, sprites_);
   }
 

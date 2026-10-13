@@ -427,7 +427,7 @@ void EffectRenderer::Draw(const Camera& camera, std::span<const DrawnEffect> eff
   vertices_.clear();
   for (const DrawnEffect* drawn : ordered_effects_) {
     const LoadedEffect& loaded = *drawn->effect;
-    ComposeEffect(loaded.prepared, drawn->frame, effect_quads_, drawn->frame_fraction);
+    ComposeEffect(loaded.prepared, drawn->frame, effect_quads_);
     for (const EffectQuad& quad : effect_quads_) {
       if (quad.texture >= loaded.textures.size() || loaded.textures[quad.texture].empty()) {
         continue;

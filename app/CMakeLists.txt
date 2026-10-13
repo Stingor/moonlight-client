@@ -54,14 +54,12 @@ add_library(moonclient_effect_nodes STATIC
     effects/effect_node_compose.cpp
     effects/effect_node_compose_multi.cpp
     effects/effect_node_compose_shapes.cpp
-    effects/effect_node_screen_steps.cpp
     effects/effect_node_sow.cpp
     effects/effect_node_sow_clocked.cpp
     effects/effect_node_sow_waves.cpp
     effects/effect_node_sown_figures.cpp
     effects/effect_node_spawn.cpp
     effects/effect_node_sprite_sow.cpp
-    effects/effect_node_steps.cpp
     effects/effect_node_view.cpp
     effects/effect_ring_sow.cpp
     effects/effect_rising_quad_sow.cpp
@@ -110,7 +108,6 @@ add_library(moonclient_effects STATIC
     effects/doll_camera.cpp
     effects/effect_arrow_shower.cpp
     effects/effect_bearer_gate.cpp
-    effects/effect_class_steps.cpp
     effects/effect_class_view.cpp
     effects/effect_devotion_view.cpp
     effects/effect_ground_skill_view.cpp

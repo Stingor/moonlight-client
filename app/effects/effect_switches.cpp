@@ -34,13 +34,6 @@ void EffectsInPlay::SetEffectSwitches(bool shown, bool minimal) {
   nodes_->SetEffectSwitches(shown, minimal);
 }
 
-void EffectsInPlay::SetSmoothSteps(bool on) {
-  // LA TROUPE PORTE LE DRAPEAU, et les fichiers `.str` le relisent là ; les
-  // classes, qui battent à part, reçoivent le même au même geste.
-  nodes_->steps().Enable(on);
-  classes_.steps().Enable(on);
-}
-
 bool EffectsInPlay::ShowsEffect(std::uint32_t effect_id) const {
   return effects_shown_ || ro::render::IsForcedVisibleEffect(effect_id);
 }

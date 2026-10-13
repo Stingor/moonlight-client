@@ -17540,12 +17540,6 @@ tr: Quitarle todo el equipo
 fr: minutes###menu_entite_manieres
 tr: minutos###menu_entite_manieres
 
-fr: Effets fluides
-tr: Efectos fluidos
-
-fr: Les effets des skills avancent par pas de 16 ms. Coché, ils glissent d'un pas à l'autre au lieu de sauter : plus doux sur un écran au-delà de 60 Hz.\n\nN'apporte rien à 60 Hz et coûte un peu de calcul. Seul l'affichage change.
-tr: Los efectos de las habilidades avanzan en pasos de 16 ms. Marcado, se deslizan de un paso al siguiente en lugar de saltar: más suave en una pantalla de más de 60 Hz.\n\nNo aporta nada a 60 Hz y cuesta un poco de cálculo. Solo cambia la visualización.
-
 fr: Annonces — glisser pour placer
 tr: Anuncios — arrastra para colocar
 
