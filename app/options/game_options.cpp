@@ -68,67 +68,16 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
   if (pages_.ChangeServerHeld(asked)) {  // tenu par le serveur : rien à écrire, une demande
     return;
   }
-  if (ChangeEntityBar(asked)) {
-    Record(to);
-    return;
-  }
-  if (ChangeEntityName(asked)) {
-    Record(to);
-    return;
-  }
-  if (ChangeShortcutBar(asked)) {
-    Record(to);
-    return;
-  }
-  if (ChangeArmedSkill(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.targeting.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.context_menu.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.graphics.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.monster_sheet.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.craft_atlas.Change(asked, to.craft_atlas)) {
-    Record(to);
-    return;
-  }
-  if (pages_.make_item.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.weapon_refine.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.quick_cast.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.card_album.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.descriptions.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.bug_report.Change(asked)) {
-    Record(to);
-    return;
-  }
-  if (pages_.ChangeSetting(asked)) {
+  // CHAQUE PAGE PREND CE QUI EST À ELLE, dans cet ordre, et la première qui
+  // répond arrête la recherche.
+  if (ChangeEntityBar(asked) || ChangeEntityName(asked) || ChangeShortcutBar(asked) ||
+      ChangeArmedSkill(asked) || pages_.targeting.Change(asked) ||
+      pages_.context_menu.Change(asked) || pages_.graphics.Change(asked) ||
+      pages_.monster_sheet.Change(asked) || pages_.craft_atlas.Change(asked, to.craft_atlas) ||
+      pages_.make_item.Change(asked) || pages_.weapon_refine.Change(asked) ||
+      pages_.quick_cast.Change(asked) || pages_.card_album.Change(asked) ||
+      pages_.descriptions.Change(asked) || pages_.bug_report.Change(asked) ||
+      pages_.ChangeSetting(asked)) {
     Record(to);
     return;
   }
@@ -413,6 +362,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
       break;
     case GameOption::kMinimalEffects:
       minimal_effects_ = asked.on;
+      break;
+    case GameOption::kSkyEffectsShown:
+      sky_effects_shown_ = asked.on;
       break;
     case GameOption::kStatusBarSide:
       status_bar_.side_px = asked.value;

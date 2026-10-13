@@ -35,6 +35,7 @@ enum class GameOption : std::uint8_t {
   kSpatialSound,
   kEffectsShown,
   kMinimalEffects,
+  kSkyEffectsShown,
   kLanguage,
   kInterfaceScale,
   kNpcMenuSearch,

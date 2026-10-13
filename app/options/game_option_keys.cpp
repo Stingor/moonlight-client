@@ -42,6 +42,7 @@ using ro::ui::OptionRowView;
 // c'est sans danger tant qu'elles ne bougent plus.
 constexpr const char* kEffectsShownKey = "effects_shown";
 constexpr const char* kMinimalEffectsKey = "effects_minimal";
+constexpr const char* kSkyEffectsShownKey = "effects_sky_shown";
 constexpr const char* kLanguageKey = "language";
 constexpr const char* kLoginAccountKey = "count_held";
 constexpr const char* kScreenNameKey = "display_screen";
@@ -525,6 +526,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Section("Les effets");
   into.Declare(kEffectsShownKey, &effects_shown_);
   into.Declare(kMinimalEffectsKey, &minimal_effects_);
+  into.Declare(kSkyEffectsShownKey, &sky_effects_shown_);
   no_page();
   into.Section("La langue et l'échelle de l'interface");
   {

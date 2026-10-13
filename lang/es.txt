@@ -11741,6 +11741,12 @@ tr: Mostrar los efectos
 fr: Effets allégés
 tr: Efectos reducidos
 
+fr: Effets du ciel
+tr: Efectos del cielo
+
+fr: Les brumes, nuées et météos que certaines cartes posent autour du personnage. « Afficher les effets » les coupe aussi.
+tr: Las brumas, nubes y climas que algunos mapas colocan alrededor del personaje. « Mostrar los efectos » también los desactiva.
+
 fr: Les effets
 tr: Efectos
 

@@ -217,6 +217,9 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
         to.effects->SetEffectSwitches(effects_shown_, minimal_effects_);
       }
       break;
+    case GameOption::kSkyEffectsShown:
+      // Relu à chaque image par `Game::RaiseMapSky`, qui retire ou relève le ciel.
+      break;
     case GameOption::kExpandedZoom:
       // Relu à chaque image par les bornes de la caméra.
       break;

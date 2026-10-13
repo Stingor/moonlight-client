@@ -708,6 +708,12 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
                          minimal ? "effets : allégés" : "effets : complets", said_ms);
     return;
   }
+  if (line == kSkyEffectsCommand && to.options != nullptr) {
+    const bool shown = to.options->ToggleSkyEffectsShown(to.option_targets);
+    to.world->RecordChat(ro::sim::ChatKind::kServer, 0,
+                         shown ? "effets du ciel : affichés" : "effets du ciel : coupés", said_ms);
+    return;
+  }
   if (to.craft_atlas != nullptr && IsCraftAtlasCommand(line)) {
     to.craft_atlas->open = true;
     to.craft_atlas->raise = true;

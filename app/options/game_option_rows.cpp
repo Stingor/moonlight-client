@@ -206,6 +206,11 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                                  Tr("Remplace les effets les plus chargés par une version "
                                     "plus sobre, quand le client en connaît une."),
                                  "/mineffect", minimal_effects_));
+  display_rows_.push_back(
+      Toggle(GameOption::kSkyEffectsShown, Tr("Effets du ciel"),
+             Tr("Les brumes, nuées et météos que certaines cartes posent "
+                "autour du personnage. « Afficher les effets » les coupe aussi."),
+             "/skyeffect", sky_effects_shown_));
 
   // LA PARTIE PVP : la place des deux pièces du classement. Voir
   // `game_option_pvp.cpp` — une famille, un fichier, comme les jauges.

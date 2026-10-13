@@ -656,8 +656,10 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // quatre-vingts nœuds par image. Remis à faux avec le reste, au changement de
   // carte — voir `ForgetWhatPlayed`.
   bool sky_raised_ = false;
-  // Ce que GreyWorld en a fait : sans sens tant qu'il n'est pas levé.
+  // Ce que GreyWorld et les bascules d'effet en ont fait, et de la météo :
+  // sans sens tant qu'il n'est pas levé. Voir `RaiseMapSky`.
   bool sky_hidden_ = false;
+  bool weather_hidden_ = false;
   // Les effets de la carte ont-ils été montés sur CETTE scène ? Remis à faux au
   // seul changement de carte : un téléport sur place ne les recrée pas.
   bool map_effects_raised_ = false;

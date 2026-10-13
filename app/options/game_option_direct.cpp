@@ -84,6 +84,13 @@ bool GameOptions::ToggleMinimalEffects(const OptionTargets& to) {
   return minimal_effects_;
 }
 
+bool GameOptions::ToggleSkyEffectsShown(const OptionTargets& to) {
+  sky_effects_shown_ = !sky_effects_shown_;
+  Apply(GameOption::kSkyEffectsShown, to);
+  Record(to);
+  return sky_effects_shown_;
+}
+
 bool GameOptions::ToggleFixedCamera(const OptionTargets& to) {
   fixed_camera_ = !fixed_camera_;
   Apply(GameOption::kFixedCamera, to);

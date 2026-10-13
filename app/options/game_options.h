@@ -110,9 +110,10 @@ class GameOptions {
   // commande annonce dans le chat.
   bool ToggleMusic(const OptionTargets& to);
   bool ToggleSound(const OptionTargets& to);
-  // LES DEUX BASCULES D'EFFET : `/effect` crible l'AFFICHAGE, `/mineffect` la RESSOURCE.
+  // LES BASCULES D'EFFET : `/effect` l'AFFICHAGE, `/mineffect` la RESSOURCE, `/skyeffect` le CIEL.
   bool ToggleEffectsShown(const OptionTargets& to);
   bool ToggleMinimalEffects(const OptionTargets& to);
+  bool ToggleSkyEffectsShown(const OptionTargets& to);
   bool ToggleFixedCamera(const OptionTargets& to);
   bool ToggleExpandedZoom(const OptionTargets& to);
   bool ToggleLightmaps(const OptionTargets& to);
@@ -335,9 +336,8 @@ class GameOptions {
     return status_preview_ ? status_bar_.most : 0;
   }
 
-  // Les effets, la recherche des longs menus de PNJ, et l'avis de pose.
-  [[nodiscard]] bool effects_shown() const noexcept { return effects_shown_; }
-  [[nodiscard]] bool minimal_effects() const noexcept { return minimal_effects_; }
+  // Le ciel, que `/effect` coupe aussi, les longs menus de PNJ, et l'avis de pose.
+  [[nodiscard]] bool sky_shown() const noexcept { return effects_shown_ && sky_effects_shown_; }
   [[nodiscard]] bool npc_menu_search() const noexcept { return npc_menu_search_; }
   [[nodiscard]] bool unlock_notice() const noexcept { return unlock_notice_; }
   [[nodiscard]] bool skill_fail_shown() const noexcept { return skill_fail_shown_; }
@@ -446,6 +446,7 @@ class GameOptions {
   // choisis : les effets s'affichent, leur version allégée est coupée.
   bool effects_shown_ = true;
   bool minimal_effects_ = false;
+  bool sky_effects_shown_ = true;  // ⚠ à nous, le client ne l'a pas
   std::string language_{kDefaultLanguage};
   // Le champ de filtre est MASQUE par defaut : il coute une ligne a une fenetre
   // qui en a peu.

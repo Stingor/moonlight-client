@@ -11741,6 +11741,12 @@ tr: Display effects
 fr: Effets allégés
 tr: Minimal effects
 
+fr: Effets du ciel
+tr: Sky effects
+
+fr: Les brumes, nuées et météos que certaines cartes posent autour du personnage. « Afficher les effets » les coupe aussi.
+tr: The mists, clouds and weather some maps lay around the character. 'Display effects' turns them off too.
+
 fr: Les effets
 tr: Effects
 

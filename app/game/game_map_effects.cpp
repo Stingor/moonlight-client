@@ -2,12 +2,14 @@
 // que ses semeurs lancent.
 
 #include <optional>
+#include <vector>
 
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effect_lots.h"
 #include "ro/sim/actor.h"
 
 #include "game/game.h"
+#include "options/game_options.h"
 
 namespace moonclient {
 
@@ -16,12 +18,20 @@ void Game::RaiseMapSky(std::uint32_t now_ms) {
       (stage_->scene.sky_effects.empty() && stage_->scene.weather_effects.empty())) {
     return;
   }
-  // GREYWORLD RETIRE LE CIEL avec les autres effets de la carte, et le rend
-  // quand on décoche : c'est l'écart entre ce qui est levé et ce que le réglage
-  // veut qui décide, comme pour le relief.
+  // `/effect` ET `/skyeffect` RETIRENT LE CIEL ET LA MÉTÉO, GreyWorld le ciel
+  // seul ; tous les rendent quand on rebascule. C'est l'écart entre ce qui est
+  // levé et ce que les réglages veulent qui décide, comme pour le relief.
+  //
+  // ⚠ LA LISTE BLANCHE DE `/effect` N'Y CHANGE RIEN : c'est la bascule qui se
+  // lit, pas l'effet. Et taire l'horloge ne suffit pas — les nœuds du ciel
+  // RENAISSENT sur place et vivraient aussi longtemps que la carte : il faut
+  // éteindre l'effet.
+  GameOptions& options = settings_->options();
+  const bool sky_cut = !options.sky_shown();
   const bool hide_sky =
-      ro::render::GreyWorldHidesMapEffects(settings_->options().pages().grey_world.look());
-  if (sky_raised_ && hide_sky == sky_hidden_) {
+      sky_cut || ro::render::GreyWorldHidesMapEffects(options.pages().grey_world.look());
+  const bool hide_weather = sky_cut;
+  if (sky_raised_ && hide_sky == sky_hidden_ && hide_weather == weather_hidden_) {
     return;
   }
   // 🔴 LE CIEL S'ATTACHE AU JOUEUR, et il faut donc l'attendre. Ses particules
@@ -37,34 +47,30 @@ void Game::RaiseMapSky(std::uint32_t now_ms) {
   if (local_player == nullptr) {
     return;
   }
-  sky_hidden_ = hide_sky;
-  if (hide_sky) {
-    for (const std::uint32_t effect_id : stage_->scene.sky_effects) {
-      effect_nodes_->StopEffect(effect_id, world_.player_id());
-    }
-  }
   const ro::sim::FractionalCell cell =
       ro::sim::InterpolatedCell(*local_player, planner_.PathFor(*local_player), now_ms);
   const std::array<float, 3> ground = GroundPositionAt(*stage_, cell.x, cell.y);
-  if (!hide_sky) {
-    for (const std::uint32_t effect_id : stage_->scene.sky_effects) {
-      effect_nodes_->PlayProcedural(effect_id, glm::vec3(ground[0], ground[1], ground[2]),
-                                    std::nullopt, 0.0F, world_.player_id());
+  // LE CIEL ET LA MÉTÉO, au même instant et sur le même porteur. Un groupe ne se
+  // touche que si son état change : relever un groupe déjà levé empilerait ses
+  // nœuds.
+  const auto follow = [&](const std::vector<std::uint32_t>& effect_ids, bool hide,
+                          bool was_hidden) {
+    if (sky_raised_ && hide == was_hidden) {
+      return;
     }
-  }
-  if (sky_raised_) {
-    return;
-  }
-  // LA MÉTÉO, au même instant et sur le même porteur, une seule fois : GreyWorld
-  // n'y touche pas. ⚠ `/effect` COUPÉ À L'ENTRÉE, ELLE NE SE LÈVE PAS DU TOUT —
-  // la liste blanche n'y change rien : le client lit la bascule elle-même, pas
-  // l'effet.
-  if (effects_.has_value() && effects_->EffectsShown()) {
-    for (const std::uint32_t effect_id : stage_->scene.weather_effects) {
-      effect_nodes_->PlayProcedural(effect_id, glm::vec3(ground[0], ground[1], ground[2]),
-                                    std::nullopt, 0.0F, world_.player_id());
+    for (const std::uint32_t effect_id : effect_ids) {
+      if (hide) {
+        effect_nodes_->StopEffect(effect_id, world_.player_id());
+      } else {
+        effect_nodes_->PlayProcedural(effect_id, glm::vec3(ground[0], ground[1], ground[2]),
+                                      std::nullopt, 0.0F, world_.player_id());
+      }
     }
-  }
+  };
+  follow(stage_->scene.sky_effects, hide_sky, sky_hidden_);
+  follow(stage_->scene.weather_effects, hide_weather, weather_hidden_);
+  sky_hidden_ = hide_sky;
+  weather_hidden_ = hide_weather;
   sky_raised_ = true;
 }
 

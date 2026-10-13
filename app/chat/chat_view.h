@@ -288,6 +288,9 @@ inline constexpr std::string_view kMinEffectCommand = "/mineffect";
 // endroit. Ce texte vaut « /minimize » dans cette installation — une
 // traduction décide donc ici quels MOTS sont des commandes.
 inline constexpr std::string_view kMinEffectAltCommand = "/minimize";
+// `/skyeffect` : une bascule à nous, sans équivalent chez le client. Elle ne
+// coupe que le ciel et la météo de la carte — voir `Game::RaiseMapSky`.
+inline constexpr std::string_view kSkyEffectsCommand = "/skyeffect";
 
 // LE BATTLE MODE : la barre de saisie se replie, et le clavier revient au jeu.
 //
