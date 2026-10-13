@@ -97,12 +97,21 @@ void MemorialStage::Advance(MemorialWindows& windows, ro::net::Connection& link,
   // 🔴 LA PORTE SE REJUGE AU « OUI » : le serveur a pu répondre pendant que la
   // boîte attendait.
   const MemorialDestroyGate gate = MemorialDestroyGateOf(dungeon_, now_unix_s);
-  if (std::exchange(windows.answer, {}).destroy && link_ready &&
-      (gate == MemorialDestroyGate::kAllowed || gate == MemorialDestroyGate::kUnknownRights)) {
-    ro::net::RequestMemorialDungeonDestroy(link);
-    dungeon_.NoteDestroyAsked(now_unix_s);
-    // LE SERVEUR SE TAIT S'IL REFUSE : le journal garde de quoi le constater.
-    ro::core::LogInfo("instance « {} » : destruction demandée au serveur", dungeon_.name());
+  const bool open_gate =
+      gate == MemorialDestroyGate::kAllowed || gate == MemorialDestroyGate::kUnknownRights;
+  if (std::exchange(windows.answer, {}).destroy) {
+    // LE SERVEUR SE TAIT S'IL REFUSE : le journal garde de quoi le constater,
+    // et dit aussi un « oui » que le client lui-même n'a pas fait partir.
+    if (link_ready && open_gate) {
+      ro::net::RequestMemorialDungeonDestroy(link);
+      dungeon_.NoteDestroyAsked(now_unix_s);
+      ro::core::LogInfo("instance « {} » : destruction demandée au serveur", dungeon_.name());
+    } else {
+      ro::core::LogWarning(
+          "instance « {} » : destruction confirmée mais non envoyée (liaison {}, "
+          "porte {})",
+          dungeon_.name(), link_ready ? "prête" : "fermée", static_cast<int>(gate));
+    }
   }
   if (std::exchange(toggle_asked_, false)) {
     windows.window.open = !windows.window.open;
