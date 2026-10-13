@@ -103,6 +103,7 @@
 #include "mvp/mvp_tracker_stage.h"
 #include "party/party_booking_board.h"
 #include "ui_backend_gl.h"
+#include "world/broadcast_balloons.h"
 #include "world/ranking_board.h"
 
 struct SDL_Window;
@@ -177,6 +178,7 @@ class UiStage {
     std::optional<ro::ui::MapSignView> map_sign;
     // La liaison au serveur : bandeau et boîte de perte, composés par `app`.
     ro::ui::LinkNoticeState link_notice;
+    BalloonBoards balloons;  // les bulles d'annonce, composées à chaque image
     ro::ui::PacketWindowState packets;
     ro::ui::LogWindowState log;
     ro::ui::ChatWindows chat;

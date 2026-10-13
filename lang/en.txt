@@ -1383,9 +1383,6 @@ tr: The target is under report protection.
 fr: Ce nom n'est pas disponible.
 tr: Name isn't available.
 
-fr: Chaque icône revient à sa place d'origine. Les icônes masquées le restent.
-tr: Each icon returns to its original place. Hidden icons stay hidden.
-
 fr: Cible introuvable...
 tr: Target not found...
 
@@ -4116,9 +4113,6 @@ tr: this site
 
 fr: Étape franchie
 tr: Step cleared
-
-fr: Étiquettes
-tr: Labels
 
 fr: … et %d autre(s)
 tr: … and %d more
@@ -13133,6 +13127,9 @@ tr: Back to the grid
 fr: Remettre toutes les icônes à leur place d'origine ?
 tr: Put every icon back in its original place?
 
+fr: Chaque icône revient à sa case d'origine, au coin haut-droit de l'écran. Les icônes masquées le restent.
+tr: Each icon returns to its original cell, in the top-right corner of the screen. Hidden icons stay hidden.
+
 fr: Les bords de l'icône qu'on déplace s'alignent sur ceux des autres. La grille d'alignement de l'interface aimante aussi, si elle est allumée.
 tr: The edges of the icon being moved line up with those of the others. The interface alignment grid also snaps, when it is on.
 
@@ -17527,3 +17524,72 @@ tr: Smooth effects
 
 fr: Les effets des skills avancent par pas de 16 ms. Coché, ils glissent d'un pas à l'autre au lieu de sauter : plus doux sur un écran au-delà de 60 Hz.\n\nN'apporte rien à 60 Hz et coûte un peu de calcul. Seul l'affichage change.
 tr: Skill effects advance in 16 ms steps. Checked, they glide from one step to the next instead of jumping: smoother on a screen above 60 Hz.\n\nGains nothing at 60 Hz and costs a little computation. Only the display changes.
+
+fr: Annonces — glisser pour placer
+tr: Announcements — drag to place
+
+fr: Au-delà, la plus ancienne part pour la nouvelle. Le jeu en garde trois. L'avancée des chasses n'en montre toujours qu'une : chacune remplace la précédente.
+tr: Beyond that, the oldest one leaves for the new one. The game keeps three. Hunt progress always shows only one: each replaces the previous one.
+
+fr: Bulles d'annonce
+tr: Announcement balloons
+
+fr: Bulles d'annonce en haut de l'écran
+tr: Announcement balloons at the top of the screen
+
+fr: Bulles à la fois
+tr: Balloons at once
+
+fr: Chasses — glisser pour placer
+tr: Hunts — drag to place
+
+fr: Durée du fondu (ms)
+tr: Fade duration (ms)
+
+fr: Déverrouiller les annonces (glisser pour déplacer)
+tr: Unlock announcements (drag to move)
+
+fr: Déverrouiller les chasses (glisser pour déplacer)
+tr: Unlock hunts (drag to move)
+
+fr: Déverrouillé, une poignée apparaît en haut du bandeau des annonces : glisse-la où tu veux. Un exemple s'affiche tant qu'aucune annonce n'est là.\nUn déplacement vertical garde le centrage.
+tr: Unlocked, a handle appears at the top of the announcement banner: drag it wherever you like. An example shows while no announcement is there.\nA vertical move keeps the centering.
+
+fr: En pourcentage du corps du jeu : douze pixels pour une annonce, quatorze pour l'avis d'étoile, et ce que l'annonce colorée demande.
+tr: As a percentage of the game's size: twelve pixels for an announcement, fourteen for the star notice, and whatever the colored announcement asks for.
+
+fr: Exemple d'annonce : glissez la poignée pour placer le bandeau.
+tr: Example announcement: drag the handle to place the banner.
+
+fr: Exemple de chasse [ 3 / 10 ]
+tr: Example hunt [ 3 / 10 ]
+
+fr: Fondu de sortie
+tr: Fade out
+
+fr: La bulle s'efface en fin de vie au lieu de disparaître d'un coup comme dans le jeu.
+tr: The balloon fades out at the end of its life instead of vanishing all at once as in the game.
+
+fr: Largeur avant retour à la ligne
+tr: Width before wrapping
+
+fr: Le bandeau qui montre l'avancée des chasses de quête. Le jeu le pose plus bas que les annonces, à une hauteur qui suit celle de l'écran.
+tr: The banner that shows quest hunt progress. The game places it below the announcements, at a height that follows the screen's.
+
+fr: Le jeu pose un voile noir au quart d'opacité, qui laisse le texte se perdre sur un sol clair. Plus dense, il se lit partout.
+tr: The game lays a black veil at a quarter opacity, which lets the text get lost on light ground. Denser, it reads everywhere.
+
+fr: Le jeu tient une bulle 20000 ms, sans réglage possible.
+tr: The game keeps a balloon for 20000 ms, with no setting.
+
+fr: Les annonces du serveur, l'avancée des chasses de quête et ce que l'équipe chuchote se posent aussi en haut de l'écran, comme dans le jeu. Éteintes, elles ne vivent plus que dans la conversation.
+tr: Server announcements, quest hunt progress and what the staff whispers also appear at the top of the screen, as in the game. Turned off, they only live in the chat.
+
+fr: Rendre aux annonces la place du jeu
+tr: Put the announcements back where the game places them
+
+fr: Rendre aux chasses la place du jeu
+tr: Put the hunts back where the game places them
+
+fr: Une annonce simple plus large se replie. Le jeu la coupe tous les 72 octets, ce qui coupe un caractère accentué en deux ; ce client replie à la largeur, et 380 pixels valent ses 72 caractères.
+tr: A plain announcement wider than this wraps. The game cuts it every 72 bytes, which splits an accented character in two; this client wraps by width, and 380 pixels match its 72 characters.

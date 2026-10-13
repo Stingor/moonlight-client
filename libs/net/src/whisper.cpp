@@ -101,7 +101,8 @@ FrameOutcome ApplyWhisperFrame(const Frame& frame, sim::World& world, const Whis
         const sim::WhisperRelation relation = WhisperRelationOf(sender, packet.from_staff, circle);
         world.RecordWhisper(sim::WhisperFacts{.side = sim::WhisperSide::kReceived,
                                               .peer_name = std::move(sender),
-                                              .relation = relation},
+                                              .relation = relation,
+                                              .from_staff = packet.from_staff},
                             std::move(message), now_ms);
         return FrameOutcome::kApplied;
       });

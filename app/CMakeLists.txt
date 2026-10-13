@@ -687,17 +687,6 @@ target_link_libraries(moonclient_battlefield
 
 target_include_directories(moonclient_battlefield PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# LA DISPOSITION D'USINE, en bibliothèque : ce que le joueur voit au premier
-# lancement se vérifie sur un banc, valeur par valeur.
-add_library(moonclient_factorylayout STATIC
-    options/factory_layout.cpp)
-
-target_link_libraries(moonclient_factorylayout
-    PUBLIC ro_core ro_render ro_ui moonclient_portraitoptions
-    PRIVATE ro_warnings)
-
-target_include_directories(moonclient_factorylayout PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
 # L'ONGLET « PORTRAIT » DE LA PAGE « BASIC INFO », en bibliothèque : ses bornes
 # et sa plage d'identifiants se vérifient sur un banc.
 add_library(moonclient_portraitoptions STATIC
@@ -1036,6 +1025,21 @@ target_link_libraries(moonclient_itemtoast
     PRIVATE ro_warnings)
 
 target_include_directories(moonclient_itemtoast PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# LES BULLES D'ANNONCE DU HAUT DE L'ECRAN : la pile de chaque famille, la vie
+# d'une bulle et son fondu.
+#
+# 🔴 EN BIBLIOTHEQUE POUR LA MEME RAISON QUE LE BANDEAU D'OBTENTION : une bulle
+# qui part par le mauvais bout, ou une famille rangee avant l'autre, ressemble
+# en jeu a une annonce qu'on n'a pas vue passer.
+add_library(moonclient_balloons STATIC
+    world/broadcast_balloons.cpp)
+
+target_link_libraries(moonclient_balloons
+    PUBLIC ro_sim ro_ui moonclient_chatlinks
+    PRIVATE ro_core ro_warnings)
+
+target_include_directories(moonclient_balloons PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(moonclient_damage STATIC
     options/damage_path_anchors.cpp
@@ -1563,6 +1567,7 @@ add_executable(moonclient
     game/game_chat.cpp
     game/game_containers.cpp
     game/game_sheet.cpp
+    game/game_balloons.cpp
     game/game_guild.cpp
     game/game_party.cpp
     party/party_panel.cpp
@@ -1603,6 +1608,7 @@ add_executable(moonclient
     options/bug_report_options.cpp
     options/menu_icons_options.cpp
     options/map_sign_options.cpp
+    options/broadcast_balloon_options.cpp
     options/window_title_options.cpp
     options/minimap_panel_options.cpp
     options/quest_tracker_options.cpp
@@ -1621,6 +1627,7 @@ add_executable(moonclient
     options/target_options.cpp
     game/display_settings.cpp
     options/game_options.cpp
+    options/factory_layout.cpp
     options/sound_options.cpp
     game/game_settings.cpp
     game/setting_destination_open.cpp
@@ -1662,11 +1669,11 @@ add_executable(moonclient
     game/window_events.cpp)
 
 target_link_libraries(moonclient
-    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_statuses moonclient_titles
+    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
-            moonclient_portraitoptions moonclient_factorylayout
+            moonclient_portraitoptions
             moonclient_seatlayout moonclient_settings moonclient_settinglinks ro_audio ro_core ro_formats
             ro_net ro_sim ro_vfs
             ro_render ro_render_gl ro_ui ro_ui_gl SDL3::SDL3 yaml-cpp::yaml-cpp

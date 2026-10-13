@@ -22,6 +22,8 @@ namespace {
 // La couleur des nouvelles des quêtes dans la conversation : le jaune du
 // client, dans le canal d'information des quêtes.
 constexpr std::uint32_t kQuestChatColor = 0xFFFF00;
+// Et celle des lignes de la bulle de suivi, en haut de l'écran : le même jaune.
+constexpr std::uint32_t kHuntBalloonColor = 0xFFFF00;
 
 // L'heure du mur, celle des échéances que le serveur envoie.
 [[nodiscard]] std::int64_t UnixNow() { return static_cast<std::int64_t>(std::time(nullptr)); }
@@ -343,11 +345,19 @@ ro::net::FrameOutcome QuestStage::ApplyFrame(const ro::net::Frame& frame, QuestW
                      DepartureLine(*result.removed, result.ending), now_ms, kQuestChatColor);
     NoteDeparture(*result.removed, now_unix_s, result.ending);
   }
+  // ⚠ UNE SEULE BULLE PAR TRAME, une ligne par chasse redite : elle remplace
+  // la précédente en haut de l'écran.
+  ro::sim::BalloonNotice hunts{.family = ro::sim::BalloonFamily::kHunt, .heard_ms = now_ms};
   for (const ro::net::QuestProgress& said : result.reported) {
     if (const ro::sim::QuestRecord* quest = log_.Find(said.quest_id); quest != nullptr) {
       SayProgress(*quest, said.hunt_rank, world, now_ms);
+      if (said.hunt_rank < quest->hunts.size()) {
+        hunts.lines.push_back(ro::sim::BalloonLine{
+            .text = HuntBalloonLine(quest->hunts[said.hunt_rank]), .color = kHuntBalloonColor});
+      }
     }
   }
+  world.balloon_news().Post(std::move(hunts));
   for (const ro::net::QuestProgress& progress : result.progressed) {
     std::erase_if(flash_until_ms_,
                   [&progress](const auto& flash) { return flash.first == progress.quest_id; });

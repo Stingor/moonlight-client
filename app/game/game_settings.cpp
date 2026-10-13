@@ -344,6 +344,11 @@ void GameSettings::NoteItemObtainAnchor(int pos_x, int pos_y) {
   file_.Touch();
 }
 
+void GameSettings::NoteBalloonAnchor(bool hunts, const ro::ui::BalloonAnchorAsk& asked) {
+  options_.pages().balloons.NoteAnchor(hunts, asked);
+  file_.Touch();
+}
+
 void GameSettings::TickDisplayRevert(const OptionTargets& to, std::uint32_t now_ms) {
   if (options_.revert_seconds(now_ms) == 0) {
     options_.RevertDisplay(to);

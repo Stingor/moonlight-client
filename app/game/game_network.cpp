@@ -506,6 +506,9 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   if (pieces_.item_toast.has_value()) {
     pieces_.item_toast->Notice(world_, settings_->options().item_obtain(), creators, now_ms);
   }
+  // LES BULLES D'ANNONCE, pour la même raison : une image sautée ne doit en
+  // perdre aucune.
+  StageBalloons(now_ms);
   // Et ce que le ramassage dit dans la conversation : le gain, le refus.
   // ⚠ INDÉPENDANT DU BANDEAU, comme chez le client : couper l'un ne coupe
   // pas l'autre.

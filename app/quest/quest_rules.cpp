@@ -260,6 +260,16 @@ std::string HuntLabel(const QuestHunt& hunt) {
   return label;
 }
 
+std::string HuntBalloonLine(const QuestHunt& hunt) {
+  // ⚠ « PLEIN » SE LIT À L'ÉGALITÉ, comme le client : un compte qui dépasse son
+  // total garde ses chiffres.
+  if (hunt.killed == hunt.total) {
+    return QuestFill("{} [ {} ]", {HuntLabel(hunt), ro::core::Tr("Terminé")});
+  }
+  return QuestFill("{} [ {} / {} ]",
+                   {HuntLabel(hunt), std::to_string(hunt.killed), std::to_string(hunt.total)});
+}
+
 QuestTimeLeft TimeLeftOf(std::uint32_t expires_unix_s, std::int64_t now_unix_s) {
   QuestTimeLeft left;
   if (expires_unix_s == 0) {

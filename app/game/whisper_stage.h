@@ -149,8 +149,14 @@ class WhisperStage {
   // leur champ.
   void PruneLinks(const WhisperWindows& windows);
   void Compose(WhisperWindows& windows, const WhisperContext& context);
+  // CE QUE L'ÉQUIPE A CHUCHOTÉ DEPUIS LE DERNIER PASSAGE se pose en haut de
+  // l'écran. ⚠ APRÈS `Absorb` : la forme de la bulle dépend de ce qu'une
+  // conversation a pris.
+  void PostStaffBalloons(ro::sim::World& world);
 
   WhisperDesk desk_;
+  // Le rang de la dernière ligne que `PostStaffBalloons` a lue.
+  std::uint64_t staff_balloons_through_ = 0;
   ro::sim::WhisperOutbox outbox_;
   ro::sim::WhisperBlockList blocks_;
   const ro::sim::BannedWords* banned_ = nullptr;

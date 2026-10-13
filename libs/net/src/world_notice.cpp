@@ -186,6 +186,30 @@ struct Announcement {
   return {.text = FoldHashName(message)};
 }
 
+// LE CORPS DE POLICE QU'UNE ANNONCE HABILLÉE DEMANDE, en pixels. Un corps nul ou
+// négatif n'a pas de sens : la bulle garde le sien. Au-delà du plafond, une
+// seule annonce couvrirait l'écran.
+constexpr std::int16_t kLargestBalloonFontPixels = 48;
+
+[[nodiscard]] std::uint16_t BalloonFontOf(std::int16_t asked_px) {
+  if (asked_px <= 0) {
+    return sim::kBalloonFontPixels;
+  }
+  return static_cast<std::uint16_t>(std::min(asked_px, kLargestBalloonFontPixels));
+}
+
+// UNE ANNONCE SE POSE AUSSI EN HAUT DE L'ÉCRAN, avec le texte et la couleur de
+// sa ligne.
+void PostAnnouncementBalloon(sim::World& world, std::string text, std::uint32_t color,
+                             std::uint16_t font_px, bool wraps, std::uint32_t now_ms) {
+  sim::BalloonNotice notice{.family = sim::BalloonFamily::kAnnouncement,
+                            .font_px = font_px,
+                            .wraps = wraps,
+                            .heard_ms = now_ms};
+  notice.lines.push_back(sim::BalloonLine{.text = std::move(text), .color = color});
+  world.balloon_news().Post(std::move(notice));
+}
+
 // Le texte, ses mots interdits masqués quand le filtre en tient.
 [[nodiscard]] std::string Masked(const BroadcastFilter& filter, std::string utf8_text) {
   return filter.banned == nullptr ? utf8_text : filter.banned->Mask(utf8_text);
@@ -225,6 +249,10 @@ FrameOutcome ApplyBroadcastFrame(const Frame& frame, sim::World& world,
           }
           text = Masked(filter, std::move(text));
         }
+        // ⚠ TOUTE ANNONCE MONTRÉE A SA BULLE, la voix d'un joueur et celle du
+        // siège comprises ; c'est la seule source dont le texte se replie.
+        PostAnnouncementBalloon(world, text, announcement.color, sim::kBalloonFontPixels,
+                                /*wraps=*/true, now_ms);
         world.RecordChat(sim::ChatKind::kAnnouncement, announcement.type, 0, std::move(text),
                          now_ms, announcement.color);
         return FrameOutcome::kApplied;
@@ -240,12 +268,14 @@ FrameOutcome ApplyBroadcastFrame(const Frame& frame, sim::World& world,
         // ⚠ LE MASQUE PASSE AVANT LE REPLI, sur le texte entier : un mot que le
         // repli recollerait de part et d'autre du « # » ne se masque pas.
         //
-        // ⚠ DE CE CHAMP, ON NE PREND QUE LA COULEUR. La police, la taille et la
-        // hauteur à l'écran décrivent la bannière que le client d'origine fait
-        // glisser en haut de l'écran, pas la ligne du fil.
-        world.RecordChat(sim::ChatKind::kAnnouncement, 0,
-                         FoldHashName(Masked(filter, core::Utf8FromWire(packet.message))), now_ms,
-                         packet.fontColor & kRgbMask);
+        // ⚠ LA LIGNE DU FIL NE PREND QUE LA COULEUR ; la bulle prend aussi la
+        // TAILLE. Le type de police, l'alignement et la hauteur ne servent à
+        // rien chez le client : sa bulle se centre et se pose comme les autres.
+        std::string text = FoldHashName(Masked(filter, core::Utf8FromWire(packet.message)));
+        const std::uint32_t color = packet.fontColor & kRgbMask;
+        PostAnnouncementBalloon(world, text, color, BalloonFontOf(packet.fontSize),
+                                /*wraps=*/false, now_ms);
+        world.RecordChat(sim::ChatKind::kAnnouncement, 0, std::move(text), now_ms, color);
         return FrameOutcome::kApplied;
       });
 

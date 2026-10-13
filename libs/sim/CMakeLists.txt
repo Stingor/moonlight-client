@@ -41,6 +41,7 @@ add_library(ro_sim STATIC
     src/inventory.cpp
     src/item_facts.cpp
     src/item_news.cpp
+    src/broadcast_balloon.cpp
     src/packed_position.cpp
     src/party_roster.cpp
     src/party_leave.cpp

@@ -1383,9 +1383,6 @@ tr: Este jugador está protegido contra las denuncias.
 fr: Ce nom n'est pas disponible.
 tr: Este nombre no está disponible.
 
-fr: Chaque icône revient à sa place d'origine. Les icônes masquées le restent.
-tr: Cada icono vuelve a su lugar de origen. Los iconos ocultos siguen ocultos.
-
 fr: Cible introuvable...
 tr: Objetivo no encontrado...
 
@@ -4116,9 +4113,6 @@ tr: este sitio
 
 fr: Étape franchie
 tr: Etapa superada
-
-fr: Étiquettes
-tr: Etiquetas
 
 fr: … et %d autre(s)
 tr: … y %d más
@@ -13133,6 +13127,9 @@ tr: Volver a la cuadrícula
 fr: Remettre toutes les icônes à leur place d'origine ?
 tr: ¿Devolver todos los iconos a su lugar de origen?
 
+fr: Chaque icône revient à sa case d'origine, au coin haut-droit de l'écran. Les icônes masquées le restent.
+tr: Cada icono vuelve a su casilla de origen, en la esquina superior derecha de la pantalla. Los iconos ocultos siguen ocultos.
+
 fr: Les bords de l'icône qu'on déplace s'alignent sur ceux des autres. La grille d'alignement de l'interface aimante aussi, si elle est allumée.
 tr: Los bordes del icono que se mueve se alinean con los de los demás. La cuadrícula de alineación de la interfaz también imanta, si está activada.
 
@@ -17527,3 +17524,72 @@ tr: Efectos fluidos
 
 fr: Les effets des skills avancent par pas de 16 ms. Coché, ils glissent d'un pas à l'autre au lieu de sauter : plus doux sur un écran au-delà de 60 Hz.\n\nN'apporte rien à 60 Hz et coûte un peu de calcul. Seul l'affichage change.
 tr: Los efectos de las habilidades avanzan en pasos de 16 ms. Marcado, se deslizan de un paso al siguiente en lugar de saltar: más suave en una pantalla de más de 60 Hz.\n\nNo aporta nada a 60 Hz y cuesta un poco de cálculo. Solo cambia la visualización.
+
+fr: Annonces — glisser pour placer
+tr: Anuncios — arrastra para colocar
+
+fr: Au-delà, la plus ancienne part pour la nouvelle. Le jeu en garde trois. L'avancée des chasses n'en montre toujours qu'une : chacune remplace la précédente.
+tr: Más allá, la más antigua se va para dejar sitio a la nueva. El juego guarda tres. El avance de las cacerías siempre muestra solo una: cada una reemplaza a la anterior.
+
+fr: Bulles d'annonce
+tr: Burbujas de anuncio
+
+fr: Bulles d'annonce en haut de l'écran
+tr: Burbujas de anuncio en la parte superior de la pantalla
+
+fr: Bulles à la fois
+tr: Burbujas a la vez
+
+fr: Chasses — glisser pour placer
+tr: Cacerías — arrastra para colocar
+
+fr: Durée du fondu (ms)
+tr: Duración del fundido (ms)
+
+fr: Déverrouiller les annonces (glisser pour déplacer)
+tr: Desbloquear los anuncios (arrastrar para mover)
+
+fr: Déverrouiller les chasses (glisser pour déplacer)
+tr: Desbloquear las cacerías (arrastrar para mover)
+
+fr: Déverrouillé, une poignée apparaît en haut du bandeau des annonces : glisse-la où tu veux. Un exemple s'affiche tant qu'aucune annonce n'est là.\nUn déplacement vertical garde le centrage.
+tr: Desbloqueado, aparece un asa en la parte superior de la franja de anuncios: arrástrala donde quieras. Se muestra un ejemplo mientras no haya ningún anuncio.\nUn desplazamiento vertical conserva el centrado.
+
+fr: En pourcentage du corps du jeu : douze pixels pour une annonce, quatorze pour l'avis d'étoile, et ce que l'annonce colorée demande.
+tr: En porcentaje del tamaño del juego: doce píxeles para un anuncio, catorce para el aviso de estrella, y lo que pida el anuncio de color.
+
+fr: Exemple d'annonce : glissez la poignée pour placer le bandeau.
+tr: Ejemplo de anuncio: arrastra el asa para colocar la franja.
+
+fr: Exemple de chasse [ 3 / 10 ]
+tr: Ejemplo de cacería [ 3 / 10 ]
+
+fr: Fondu de sortie
+tr: Fundido de salida
+
+fr: La bulle s'efface en fin de vie au lieu de disparaître d'un coup comme dans le jeu.
+tr: La burbuja se desvanece al final de su vida en lugar de desaparecer de golpe como en el juego.
+
+fr: Largeur avant retour à la ligne
+tr: Ancho antes del salto de línea
+
+fr: Le bandeau qui montre l'avancée des chasses de quête. Le jeu le pose plus bas que les annonces, à une hauteur qui suit celle de l'écran.
+tr: La franja que muestra el avance de las cacerías de misión. El juego la coloca debajo de los anuncios, a una altura que sigue la de la pantalla.
+
+fr: Le jeu pose un voile noir au quart d'opacité, qui laisse le texte se perdre sur un sol clair. Plus dense, il se lit partout.
+tr: El juego pone un velo negro a un cuarto de opacidad, que deja que el texto se pierda sobre un suelo claro. Más denso, se lee en todas partes.
+
+fr: Le jeu tient une bulle 20000 ms, sans réglage possible.
+tr: El juego mantiene una burbuja 20000 ms, sin ajuste posible.
+
+fr: Les annonces du serveur, l'avancée des chasses de quête et ce que l'équipe chuchote se posent aussi en haut de l'écran, comme dans le jeu. Éteintes, elles ne vivent plus que dans la conversation.
+tr: Los anuncios del servidor, el avance de las cacerías de misión y lo que susurra el equipo también aparecen en la parte superior de la pantalla, como en el juego. Desactivadas, solo viven en la conversación.
+
+fr: Rendre aux annonces la place du jeu
+tr: Devolver los anuncios al lugar del juego
+
+fr: Rendre aux chasses la place du jeu
+tr: Devolver las cacerías al lugar del juego
+
+fr: Une annonce simple plus large se replie. Le jeu la coupe tous les 72 octets, ce qui coupe un caractère accentué en deux ; ce client replie à la largeur, et 380 pixels valent ses 72 caractères.
+tr: Un anuncio simple más ancho se divide en líneas. El juego lo corta cada 72 bytes, lo que parte en dos un carácter acentuado; este cliente divide según el ancho, y 380 píxeles equivalen a sus 72 caracteres.

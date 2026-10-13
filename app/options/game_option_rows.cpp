@@ -213,6 +213,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   pages_.map_sign.ComposeInto(display_rows_);
   display_rows_.back().heading = Tr("Arrivée sur une carte");
   pages_.window_title.ComposeInto(display_rows_);
+  pages_.balloons.ComposeInto(display_rows_);
   // LES FENÊTRES QUI N'ONT QUE QUELQUES RÉGLAGES, un bloc chacune : voir
   // `OptionSection::kInterface`. Leur puce mène à leur intertitre.
   display_rows_.push_back(
@@ -582,7 +583,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                     damage_rows_, [this](int tab) { ComposeDamageRows(tab); });
   ComposeDamageRows(shown_bar);
   CopyTabsForSearch(searching, kBasicInfoTabCount, pages_.stat_bar_search, stat_bar_rows_,
-                    [this](int tab) { BuildStatBarRows(tab, /*for_search=*/true); });
+                    [this](int tab) { BuildStatBarRows(tab); });
   BuildStatBarRows(shown_bar);
   // ⚠ LES NOMS ET LA ZONE CLIQUABLE SE COMPOSENT AVEC LES BARRES, dans la même
   // page : voir `BuildEntityBarRows`. La zone se compose AVANT, puisqu'elle y

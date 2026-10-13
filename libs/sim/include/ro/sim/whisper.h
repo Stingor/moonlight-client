@@ -72,6 +72,10 @@ struct WhisperFacts {
   // LE CODE D'UN REFUS, tel que l'accusé le porte. C'est lui qui choisit la
   // phrase à l'affichage : la ligne d'un refus n'a pas de texte à elle.
   WhisperRefusal refusal = WhisperRefusal::kNone;
+  // REÇU D'UN MEMBRE DE L'ÉQUIPE, que le serveur signale par un drapeau du
+  // paquet. ⚠ PAS LA RELATION : un ami de l'équipe reste un ami pour l'en-tête,
+  // mais son chuchotement se pose quand même en haut de l'écran.
+  bool from_staff = false;
 };
 
 // UN ENVOI QUI ATTEND SON ACCUSÉ. Le texte est celui que le joueur a écrit,

@@ -284,6 +284,14 @@ ro::net::FrameOutcome RankNotices::ApplyFrame(const ro::net::Frame& frame, ro::s
     const std::optional<StarNoticeOutcome> outcome =
         StarNoticeOutcomeOf(*notice, player != nullptr ? player->name : std::string());
     if (outcome.has_value()) {
+      // L'AVIS SE POSE AUSSI EN HAUT DE L'ÉCRAN, dans un corps plus grand que
+      // celui des annonces.
+      ro::sim::BalloonNotice balloon{.family = ro::sim::BalloonFamily::kAnnouncement,
+                                     .font_px = ro::sim::kStarBalloonFontPixels,
+                                     .heard_ms = now_ms};
+      balloon.lines.push_back(
+          ro::sim::BalloonLine{.text = outcome->line.text, .color = outcome->line.color});
+      world.balloon_news().Post(std::move(balloon));
       world.RecordChat(ro::sim::ChatKind::kServer, 0, outcome->line.text, now_ms,
                        outcome->line.color);
       if (outcome->effect_id != 0 && player != nullptr) {

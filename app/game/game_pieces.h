@@ -83,6 +83,7 @@
 #include "world/actor_models.h"
 #include "world/ailment_tints.h"
 #include "world/battle_log.h"
+#include "world/broadcast_balloons.h"
 #include "world/chat_block_log.h"
 #include "world/damage_path_sample.h"
 #include "world/decor_veil_view.h"
@@ -426,6 +427,9 @@ struct GamePieces {
   // LES NOUVELLES D'OBJETS que le réseau dépose et que `item_report` écrit : le
   // ramassage d'un membre du groupe, une pièce abîmée.
   ro::sim::ItemNews item_news;
+  // LES BULLES D'ANNONCE du haut de l'écran : ce que le monde a déposé, tenu
+  // jusqu'à son extinction.
+  BroadcastBalloons balloons;
 
   // CE QUE LES COUPS DISENT DANS LA CONVERSATION. ⚠ APRÈS LES MOTS, de même.
   std::optional<BattleLog> battle_log;

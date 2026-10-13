@@ -259,6 +259,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
   void ApplyContainerSwitches(const UiStage::Answers& answers, std::uint32_t now_ms);
   void ApplyBankAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  // Les bulles d'annonce : ce que le monde a déposé, puis ce que leurs bandeaux
+  // peindront, et la place d'une poignée tirée : `game_balloons.cpp`.
+  void StageBalloons(std::uint32_t now_ms);
   // La fiche, ses presets, l'éditeur de style et son aperçu : `game_sheet.cpp`.
   void StageCharacterSheet(std::uint32_t now_ms);
   void StageStyle(std::uint32_t now_ms);

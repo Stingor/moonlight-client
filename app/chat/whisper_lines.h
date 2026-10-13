@@ -62,6 +62,12 @@ struct WhisperHead {
 [[nodiscard]] std::string WhisperLogText(const ro::sim::ChatLine& line,
                                          const ro::vfs::ItemWords* words);
 
+// CE QU'UN CHUCHOTEMENT DE L'ÉQUIPE MONTRE EN HAUT DE L'ÉCRAN : l'en-tête du
+// fil, puis la phrase — « [ Nom ] : … », ou « [ Friend Nom ] : … » pour un ami.
+// Prise par une conversation 1:1 (`shown_apart`), la ligne ne paraît pas au fil,
+// et sa bulle prend toujours la forme de l'équipe.
+[[nodiscard]] std::string StaffBalloonText(const ro::sim::ChatLine& line, bool shown_apart);
+
 // LE SENS ET LE PAIR D'UNE LIGNE RELUE dans le journal, retrouvés dans
 // l'en-tête que `WhisperLogText` y a écrit : le journal ne garde que le texte.
 // Une ligne sans en-tête de chuchotement reçu ou envoyé rend `kNone` — un refus

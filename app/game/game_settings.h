@@ -150,6 +150,8 @@ class GameSettings {
   // `Touch` arme l'anti-rebond du fichier, si bien qu'un glisser de deux
   // secondes ne produit qu'une écriture.
   void NoteItemObtainAnchor(int pos_x, int pos_y);
+  // Et celle d'un bandeau de bulles d'annonce, sous le même anti-rebond.
+  void NoteBalloonAnchor(bool hunts, const ro::ui::BalloonAnchorAsk& asked);
 
   // RETIENT SI LE VOLET DU STAFF ÉTAIT OUVERT. ⚠ MUET SANS LE DROIT : le volet
   // est alors caché par force, et l'enregistrer effacerait le souvenir.

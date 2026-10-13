@@ -25,6 +25,7 @@
 #include "chat/chat_line_preview.h"
 #include "chat/chat_mvp_link.h"
 #include "chat/chat_navi_search_link.h"
+#include "chat/whisper_lines.h"
 #include "game/interface_sound.h"
 #include "world/click_action.h"
 
@@ -190,6 +191,7 @@ void PlayWhisperAlarm(ro::audio::AudioEngine& audio, ro::vfs::Vfs& vfs,
 
 void WhisperStage::StartSession(std::uint64_t last_seq) {
   desk_.Clear(last_seq);
+  staff_balloons_through_ = last_seq;
   outbox_.Clear();
   blocks_.Clear();
   titles_.clear();
@@ -326,6 +328,7 @@ int WhisperStage::Advance(WhisperWindows& windows, const WhisperContext& context
   }
   const WhisperDesk::Absorbed absorbed =
       desk_.Absorb(context.world.chat_lines(), context.setup, context.world.player_name());
+  PostStaffBalloons(context.world);
   for (auto& [peer, answer] : answers) {
     if (answer.closed) {
       continue;
@@ -469,6 +472,29 @@ void WhisperStage::PruneLinks(const WhisperWindows& windows) {
   if (!links_peer_.empty() && !windows.states.contains(links_peer_)) {
     links_peer_.clear();
   }
+}
+
+void WhisperStage::PostStaffBalloons(ro::sim::World& world) {
+  // Le jaune du client pour ce que l'équipe chuchote, en `0xRRGGBB`.
+  constexpr std::uint32_t kStaffBalloonColor = 0xFFFF00;
+  // ⚠ DEPUIS LA FIN : les lignes sont rangées par rang croissant, et seules les
+  // dernières sont neuves — parcourir tout le fil à chaque image coûterait des
+  // milliers de lignes pour en trouver zéro.
+  const std::span<const ro::sim::ChatLine> lines = world.chat_lines();
+  auto first_new = lines.end();
+  while (first_new != lines.begin() && std::prev(first_new)->seq > staff_balloons_through_) {
+    --first_new;
+  }
+  for (const ro::sim::ChatLine& line : std::span(first_new, lines.end())) {
+    if (line.whisper.side == ro::sim::WhisperSide::kReceived && line.whisper.from_staff) {
+      ro::sim::BalloonNotice notice{.family = ro::sim::BalloonFamily::kStaffWhisper,
+                                    .heard_ms = line.said_ms};
+      notice.lines.push_back(ro::sim::BalloonLine{
+          .text = StaffBalloonText(line, desk_.ShownApart(line.seq)), .color = kStaffBalloonColor});
+      world.balloon_news().Post(std::move(notice));
+    }
+  }
+  staff_balloons_through_ = world.last_chat_seq();
 }
 
 bool WhisperStage::TakesLinks() const noexcept { return !links_peer_.empty(); }

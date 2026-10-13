@@ -52,6 +52,10 @@ inline constexpr std::string_view kQuestOtherCategory = "etc";
 // puis la tranche de niveaux que le serveur borne.
 [[nodiscard]] std::string HuntLabel(const ro::sim::QuestHunt& hunt);
 
+// LA LIGNE D'UNE CHASSE DANS LA BULLE DE SUIVI, en haut de l'écran :
+// « Poring [ 4 / 10 ] », puis « Poring [ Terminé ] » quand le compte est plein.
+[[nodiscard]] std::string HuntBalloonLine(const ro::sim::QuestHunt& hunt);
+
 // LE TEMPS QUI RESTE AVANT UNE ÉCHÉANCE.
 struct QuestTimeLeft {
   // « 3 j 4 h », « 2 h 13 min », « 12 min », « moins d'une minute »,

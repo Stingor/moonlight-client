@@ -80,6 +80,7 @@ add_library(ro_ui STATIC
     src/preset_tab.cpp
     src/chat_bar.cpp
     src/chat_bubble.cpp
+    src/broadcast_balloon.cpp
     src/chat_frame.cpp
     src/chat_input.cpp
     src/chat_input_chips.cpp

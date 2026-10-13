@@ -13,6 +13,7 @@
 
 #include "options/afk_options.h"
 #include "options/battleground_options.h"
+#include "options/broadcast_balloon_options.h"
 #include "options/bug_report_options.h"
 #include "options/call_options.h"
 #include "options/card_album_options.h"
@@ -22,7 +23,6 @@
 #include "options/craft_atlas_options.h"
 #include "options/damage_meter_options.h"
 #include "options/description_options.h"
-#include "options/factory_layout.h"
 #include "options/graphics_options.h"
 #include "options/grey_world_options.h"
 #include "options/grimoire_key_options.h"
@@ -88,9 +88,8 @@ static_assert(kTalkFilterRowBase + static_cast<int>(TalkFilterRow::kCount) <= kP
 struct OptionPages {
   AfkOptions afk;
   TargetOptions targeting;
-  // Les onglets « Portrait » et « Étiquettes » de la page « Basic Info »,
-  // nés dans la disposition d'usine.
-  StatusPortraitOptions portrait{FactoryStatusPortrait()};
+  // L'onglet « Portrait » de la page « Basic Info ».
+  StatusPortraitOptions portrait;
   ContextMenuOptions context_menu;
   ViewEquipMemory view_equip;
   GraphicsOptions graphics;
@@ -105,6 +104,8 @@ struct OptionPages {
   MenuIconsOptions menu_icons;
   MapSignOptions map_sign;
   WindowTitleOptions window_title;
+  // Les deux bandeaux de bulles du haut de l'écran : annonces et chasses.
+  BroadcastBalloonOptions balloons;
   MinimapPanelOptions minimap_panel;
   SkinOptions skin;
   SkinLookOptions skin_look;

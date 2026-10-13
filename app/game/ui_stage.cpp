@@ -178,6 +178,8 @@ UiStage::Answers UiStage::Draw(
   // pas a barrer ce que quelqu un vient de dire.
   // ⚠ AVEC CE QUE LE FIL SAIT PEINDRE : une bulle montre la même phrase que lui.
   ro::ui::DrawChatBubbles(bubbles, bubble_look, &windows.chat.rich);
+  // LES BULLES D'ANNONCE, sur la même liste et du même texte que le fil.
+  DrawBalloonBoards(windows.balloons, &windows.chat.rich);
   // CE QUE LA PARTIE PEINT PAR-DESSUS LE MONDE — le voile de ténèbres —, après
   // les barres et les bulles, qui appartiennent au monde, et sous toute
   // fenêtre : la liste de fond passe avant elles.

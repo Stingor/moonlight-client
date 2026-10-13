@@ -161,6 +161,18 @@ std::string WhisperLogText(const ro::sim::ChatLine& line, const ro::vfs::ItemWor
   return std::move(head.text);
 }
 
+std::string StaffBalloonText(const ro::sim::ChatLine& line, bool shown_apart) {
+  ro::sim::WhisperFacts facts = line.whisper;
+  // ⚠ PRISE PAR UNE CONVERSATION, LA LIGNE N'A PAS D'EN-TÊTE DE FIL : la bulle
+  // garde la forme de l'équipe, même pour un ami.
+  if (shown_apart) {
+    facts.relation = WhisperRelation::kStaff;
+  }
+  WhisperHead head = ComposeWhisperHead(facts, WhisperSurface::kLog, {});
+  head.text.append(line.text);
+  return std::move(head.text);
+}
+
 ro::sim::WhisperFacts WhisperFactsOfLogText(std::string_view text) {
   for (const LogHeadForm& form : kLogHeadForms) {
     if (!text.starts_with(form.open)) {

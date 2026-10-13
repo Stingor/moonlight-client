@@ -51,6 +51,8 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kInterface, map_sign);
   into.Section("Le titre de la fenêtre");
   DeclareOn(into, OptionSection::kInterface, window_title);
+  into.Section("Les bulles d'annonce");
+  DeclareOn(into, OptionSection::kInterface, balloons);
   // ⚠ LA PAGE DU SKIN TIENT AUSSI L'HABILLAGE, rangé dans un autre fichier :
   // « Rétablir cette page » le rend avec elle, voir `RestorePage`.
   into.Section("Le skin");
@@ -149,7 +151,8 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
          damage_meter.Change(asked) || shops.Change(asked) || whispers.Change(asked) ||
          grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
          battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
-         chat_web.Change(asked) || talk_filter.Change(asked) || portrait.Change(asked);
+         chat_web.Change(asked) || talk_filter.Change(asked) || portrait.Change(asked) ||
+         balloons.Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {

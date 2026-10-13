@@ -13,6 +13,7 @@
 
 #include "ro/sim/actor.h"
 #include "ro/sim/battlefield.h"
+#include "ro/sim/broadcast_balloon.h"
 #include "ro/sim/chat_channel.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/damage_meter.h"
@@ -552,6 +553,10 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // LE CHAMP DE BATAILLE DE LA CARTE, vidé quand la carte change : `Battlefield`.
   [[nodiscard]] const Battlefield& battlefield() const noexcept { return battlefield_; }
   [[nodiscard]] Battlefield& battlefield() noexcept { return battlefield_; }
+  // LES BULLES D'ANNONCE DÉPOSÉES, que l'application prend à chaque image :
+  // voir `BalloonNews`. ⚠ ELLES SURVIVENT AU CHANGEMENT DE CARTE, comme la
+  // conversation : une annonce reçue pendant le chargement se montre à l'arrivée.
+  [[nodiscard]] BalloonNews& balloon_news() noexcept { return balloon_news_; }
 
  private:
   // Repose un acteur et annule sa marche, en gardant le compte de ce qu'il a
@@ -570,6 +575,7 @@ class World : public WorldHoldings, public WorldNpcDialog {
   StyleBook styles_;
   QuestMarkers quest_markers_;
   Battlefield battlefield_;
+  BalloonNews balloon_news_;
   std::vector<ChatChannel> chat_channels_;
   std::string player_name_;
   SessionSettings session_;
