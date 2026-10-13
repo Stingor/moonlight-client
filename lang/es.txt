@@ -831,11 +831,14 @@ tr: Mostrar el nivel
 fr: Afficher le nom détaillé du lieu
 tr: Mostrar el nombre completo del lugar
 
-fr: Afficher le portrait et les étiquettes
-tr: Mostrar el retrato y las etiquetas
+fr: Afficher le portrait
+tr: Mostrar el retrato
 
 fr: Afficher les enseignes des échoppes
 tr: Mostrar los letreros de las tiendas
+
+fr: Afficher les étiquettes
+tr: Mostrar las etiquetas
 
 fr: Afficher « carte,x,y »
 tr: Mostrar «mapa,x,y»
@@ -1211,9 +1214,6 @@ tr: No se ofrece ningún campo por ahora.
 
 fr: Aucun œuf de familier dans l'inventory.
 tr: No hay ningún huevo de mascota en el inventory.
-
-fr: Aucun skill reçu du serveur.
-tr: Ningún skill recibido del servidor.
 
 fr: Aucune arme équipée.
 tr: Ningún arma equipada.
@@ -2419,8 +2419,11 @@ tr: Has superado el número de denuncias del día: ya no puedes denunciar.
 fr: Le passage vers un autre serveur de carte a échoué.
 tr: No se pudo pasar a otro servidor de mapa.
 
-fr: Le portrait du personnage, son pseudo, sa classe et son niveau : quatre cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
-tr: El retrato del personaje, su nombre, su clase y su nivel: cuatro marcos independientes que mueves, redimensionas y coloreas cada uno a tu gusto.
+fr: Le personnage dans son cadre, que l'on déplace, retaille et colore à son goût.
+tr: Tu personaje en su marco, que puedes mover, redimensionar y colorear a tu gusto.
+
+fr: Le pseudo, la classe et le niveau : trois cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
+tr: El nombre, la clase y el nivel: tres marcos independientes que puedes mover, redimensionar y colorear cada uno a tu gusto.
 
 fr: Le serveur a envoyé une réponse que ce client ne sait pas lire.
 tr: El servidor envió una respuesta que este cliente no sabe leer.
@@ -2479,8 +2482,11 @@ tr: Los SP de la invocación no bastan.
 fr: Les SP du partenaire sont insuffisants, ou son skill est désactivé.
 tr: Los SP del compañero son insuficientes, o su skill está desactivado.
 
-fr: Les bords d'un cadre qu'on déplace s'alignent sur ceux des autres. Deux cadres qui se touchent partent ensemble au CTRL.
-tr: Los bordes del marco que mueves se alinean con los de los demás. Dos marcos que se tocan se mueven juntos con CTRL.
+fr: Les bords d'une étiquette qu'on déplace s'alignent sur ceux des autres étiquettes, du portrait et des jauges. Deux étiquettes qui se touchent partent ensemble au CTRL ; le portrait et les jauges restent en place.
+tr: Al mover una etiqueta, sus bordes se alinean con los de las demás etiquetas, el retrato y las barras. Dos etiquetas que se tocan se mueven juntas con CTRL; el retrato y las barras se quedan en su sitio.
+
+fr: Les bords du portrait qu'on déplace s'alignent sur ceux des étiquettes et des jauges, qui restent en place.
+tr: Al mover el retrato, sus bordes se alinean con los de las etiquetas y las barras, que se quedan en su sitio.
 
 fr: Les bruitages du jeu sont coupés : la case « Bruitages » les rallume.
 tr: Los efectos de sonido del juego están desactivados: la casilla "Efectos de sonido" los vuelve a activar.
@@ -2848,8 +2854,11 @@ tr: Rechazado por el servidor (código %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Devuelve este perfil a los ajustes de origen del cliente.
 
-fr: Repose les quatre cadres à leur place d'origine. Les couleurs et les interrupteurs ne bougent pas.
-tr: Devuelve los cuatro marcos a su sitio original. Los colores y los interruptores no cambian.
+fr: Repose le cadre du portrait à sa place d'origine. Ses couleurs et son cadrage ne bougent pas.
+tr: Devuelve el marco del retrato a su sitio original. Sus colores y su encuadre no cambian.
+
+fr: Repose les trois étiquettes à leur place d'origine. Leurs couleurs et leurs interrupteurs ne bougent pas.
+tr: Devuelve las tres etiquetas a su sitio original. Sus colores y sus interruptores no cambian.
 
 fr: Taille du GIF : chaque pixel du sprite devient un carré de ce côté
 tr: Tamaño del GIF: cada píxel del sprite se convierte en un cuadrado de este lado
@@ -2863,14 +2872,17 @@ tr: No se puede registrar un nombre que contiene palabras prohibidas.
 fr: Un nom qui porte cette balise ne peut pas être employé.
 tr: No se puede usar un nombre con esta etiqueta.
 
-fr: Un trait d'un pixel autour de chaque cadre.
-tr: Una línea de un píxel alrededor de cada marco.
+fr: Un trait d'un pixel autour de chaque étiquette.
+tr: Una línea de un píxel alrededor de cada etiqueta.
 
-fr: Verrouiller le portrait
-tr: Bloquear el retrato
+fr: Un trait d'un pixel autour du cadre du portrait.
+tr: Una línea de un píxel alrededor del marco del retrato.
 
-fr: Verrouillé : les cadres ne bougent plus et laissent passer les clics au jeu.\nDéverrouillé : glisser pour déplacer, tirer un bord ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent.
-tr: Bloqueado: los marcos ya no se mueven y dejan pasar los clics al juego.\nDesbloqueado: arrastra para mover, tira de un borde o de una esquina para redimensionar. CTRL mueve en bloque los marcos que se tocan.
+fr: Verrouiller les jauges, le portrait et les étiquettes
+tr: Bloquear las barras, el retrato y las etiquetas
+
+fr: Verrouillés, les jauges, le portrait et les étiquettes se figent et laissent passer les clics au jeu.\nDéverrouillés : glisser pour déplacer, tirer un bord ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent.
+tr: Bloqueados, las barras, el retrato y las etiquetas se congelan y dejan pasar los clics al juego.\nDesbloqueados: arrastra para mover, tira de un borde o de una esquina para redimensionar. CTRL mueve en bloque los marcos que se tocan.
 
 fr: Zoom
 tr: Zoom
@@ -8120,9 +8132,6 @@ tr: Confirmar antes de un refine
 fr: Confirmer le refine
 tr: Confirmar el refine
 
-fr: Skill
-tr: Habilidad
-
 fr: Skill passif : rien à lancer.
 tr: Habilidad pasiva: nada que lanzar.
 
@@ -11107,9 +11116,6 @@ tr: Bloqueada, la barra queda fija y deja pasar los clics al juego de debajo.\n\
 
 fr: Verrouillées, les barres ne se déplacent plus — leurs cases restent utilisables. Déverrouillées, on les attrape n'importe où, et leurs cases deviennent inertes.
 tr: Bloqueadas, las barras ya no se mueven — sus casillas siguen utilizables. Desbloqueadas, se agarran por cualquier parte, y sus casillas quedan inertes.
-
-fr: Verrouillées, les jauges se figent et laissent passer les clics au jeu. Déverrouillées, on les déplace au glisser et on les retaille par un bord.
-tr: Bloqueadas, las barras se congelan y dejan pasar los clics al juego. Desbloqueadas, se arrastran para moverlas y se redimensionan por un borde.
 
 fr: Vers l'inventory
 tr: Al inventario

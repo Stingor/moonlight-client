@@ -18,9 +18,11 @@ using ro::ui::PortraitPart;
 // Les clés du fichier. GRAVÉES : les changer rend à tous les joueurs les
 // réglages d'origine, sans que rien ne le dise.
 constexpr const char* kShownKey = "portrait_shown";
-constexpr const char* kLockedKey = "portrait_locked";
 constexpr const char* kStickyKey = "portrait_snapped";
 constexpr const char* kBorderKey = "portrait_border";
+constexpr const char* kLabelsShownKey = "labels_shown";
+constexpr const char* kLabelsStickyKey = "labels_snapped";
+constexpr const char* kLabelsBorderKey = "labels_border";
 constexpr const char* kHeadOnlyKey = "portrait_head_only";
 constexpr const char* kZoomKey = "portrait_zoom";
 constexpr const char* kOffsetXKey = "portrait_offset_x";
@@ -30,6 +32,11 @@ constexpr const char* kDirectionKey = "portrait_orientation";
 constexpr const char* kAnimatedKey = "portrait_animated";
 constexpr const char* kGarmentKey = "portrait_garment";
 constexpr const char* kLevelFormatKey = "portrait_level_format";
+
+// LES CLÉS RETIRÉES. Le verrou est celui des jauges ; le cadre du portrait
+// s'allume par l'interrupteur de son groupe, dont il est le seul membre.
+constexpr const char* kRetiredLockedKey = "portrait_locked";
+constexpr const char* kRetiredHeadShownKey = "portrait_head_shown";
 
 // Le nom de chaque cadre dans le fichier, dans l'ordre de `PortraitPart`.
 constexpr std::array<const char*, ro::ui::kPortraitPartCount> kPartKeys = {"head", "name", "class",
@@ -98,10 +105,16 @@ PortraitFramingSettings BoundedFraming(const PortraitFramingSettings& stored) {
 }
 
 void StatusPortraitOptions::Declare(SettingsFile& into) {
-  into.Declare(kShownKey, &look_.shown);
-  into.Declare(kLockedKey, &look_.locked);
-  into.Declare(kStickyKey, &look_.sticky);
-  into.Declare(kBorderKey, &look_.border);
+  ro::ui::PortraitGroupLook& head = look_.group(ro::ui::PortraitGroup::kHead);
+  into.Declare(kShownKey, &head.shown);
+  into.Declare(kStickyKey, &head.sticky);
+  into.Declare(kBorderKey, &head.border);
+  ro::ui::PortraitGroupLook& labels = look_.group(ro::ui::PortraitGroup::kLabels);
+  into.Declare(kLabelsShownKey, &labels.shown);
+  into.Declare(kLabelsStickyKey, &labels.sticky);
+  into.Declare(kLabelsBorderKey, &labels.border);
+  into.Retire(kRetiredLockedKey);
+  into.Retire(kRetiredHeadShownKey);
   into.Declare(kHeadOnlyKey, &framing_.head_only);
   into.Declare(kZoomKey, &framing_.zoom);
   into.Declare(kOffsetXKey, &framing_.offset_x);
@@ -115,7 +128,9 @@ void StatusPortraitOptions::Declare(SettingsFile& into) {
   // elle se persiste comme le reste.
   for (std::size_t part = 0; part < ro::ui::kPortraitPartCount; ++part) {
     ro::ui::PortraitPartLook& look = look_.parts[part];
-    into.Declare(PartKey(part, "shown"), &look.shown);
+    if (static_cast<PortraitPart>(part) != PortraitPart::kHead) {
+      into.Declare(PartKey(part, "shown"), &look.shown);
+    }
     into.Declare(PartKey(part, "x"), &look.rect.x);
     into.Declare(PartKey(part, "y"), &look.rect.y);
     into.Declare(PartKey(part, "width"), &look.rect.width);
@@ -129,51 +144,73 @@ void StatusPortraitOptions::Declare(SettingsFile& into) {
   }
 }
 
-void StatusPortraitOptions::Compose(PortraitTab tab, bool shared) {
+void StatusPortraitOptions::Compose(PortraitTab tab, bool locked) {
   rows_.clear();
-  if (shared) {
-    ComposeShared();
-  }
-  // Tout ce qui suit l'interrupteur maître lui obéit.
-  const std::size_t governed_from = shared ? 1 : 0;
+  ComposeGroup(tab, locked);
   if (tab == PortraitTab::kLabels) {
     ComposeLabels();
   } else {
     ComposeFraming();
   }
 
-  // Un interrupteur maître grise ce qu'il commande : cliquable et sans effet
-  // serait le pire des deux mondes.
-  const bool off = !look_.shown;
-  for (std::size_t rank = governed_from; rank < rows_.size(); ++rank) {
+  // L'interrupteur du groupe grise tout ce qui le suit dans l'onglet :
+  // cliquable et sans effet serait le pire des deux mondes.
+  const bool off = !look_.group(GroupOfTab(tab)).shown;
+  for (std::size_t rank = 1; rank < rows_.size(); ++rank) {
     rows_[rank].disabled = rows_[rank].disabled || off;
   }
 }
 
-void StatusPortraitOptions::ComposeShared() {
-  rows_.push_back(Toggle(PortraitRow::kShown, Tr("Afficher le portrait et les étiquettes"),
-                         Tr("Le portrait du personnage, son pseudo, sa classe et son niveau : "
-                            "quatre cadres indépendants, que l'on déplace, retaille et colore "
-                            "chacun à son goût."),
-                         look_.shown));
-  rows_.push_back(Toggle(PortraitRow::kLocked, Tr("Verrouiller le portrait"),
-                         Tr("Verrouillé : les cadres ne bougent plus et laissent passer les clics "
-                            "au jeu.\nDéverrouillé : glisser pour déplacer, tirer un bord ou un "
-                            "coin pour retailler. CTRL déplace d'un bloc les cadres qui se "
-                            "touchent."),
-                         look_.locked));
+void StatusPortraitOptions::ComposeGroup(PortraitTab tab, bool locked) {
+  const ro::ui::PortraitGroupLook& group = look_.group(GroupOfTab(tab));
+  if (tab == PortraitTab::kLabels) {
+    rows_.push_back(Toggle(PortraitRow::kLabelsShown, Tr("Afficher les étiquettes"),
+                           Tr("Le pseudo, la classe et le niveau : trois cadres indépendants, "
+                              "que l'on déplace, retaille et colore chacun à son goût."),
+                           group.shown));
+    rows_.push_back(Toggle(PortraitRow::kLabelsSticky, Tr("Aimanter"),
+                           Tr("Les bords d'une étiquette qu'on déplace s'alignent sur ceux des "
+                              "autres étiquettes, du portrait et des jauges. Deux étiquettes qui "
+                              "se touchent partent ensemble au CTRL ; le portrait et les jauges "
+                              "restent en place."),
+                           group.sticky));
+    rows_.back().disabled = locked;
+    rows_.push_back(Toggle(PortraitRow::kLabelsBorder, Tr("Bordure"),
+                           Tr("Un trait d'un pixel autour de chaque étiquette."), group.border));
+    rows_.push_back(OptionRowView{.id = PortraitRowId(PortraitRow::kLabelsResetLayout),
+                                  .label = Tr("Réinitialiser la disposition"),
+                                  .help = Tr("Repose les trois étiquettes à leur place d'origine. "
+                                             "Leurs couleurs et leurs interrupteurs ne bougent "
+                                             "pas."),
+                                  .kind = OptionKind::kAction});
+    return;
+  }
+  rows_.push_back(Toggle(PortraitRow::kShown, Tr("Afficher le portrait"),
+                         Tr("Le personnage dans son cadre, que l'on déplace, retaille et colore "
+                            "à son goût."),
+                         group.shown));
   rows_.push_back(Toggle(PortraitRow::kSticky, Tr("Aimanter"),
-                         Tr("Les bords d'un cadre qu'on déplace s'alignent sur ceux des autres. "
-                            "Deux cadres qui se touchent partent ensemble au CTRL."),
-                         look_.sticky));
-  rows_.back().disabled = look_.locked;
+                         Tr("Les bords du portrait qu'on déplace s'alignent sur ceux des "
+                            "étiquettes et des jauges, qui restent en place."),
+                         group.sticky));
+  rows_.back().disabled = locked;
   rows_.push_back(Toggle(PortraitRow::kBorder, Tr("Bordure"),
-                         Tr("Un trait d'un pixel autour de chaque cadre."), look_.border));
+                         Tr("Un trait d'un pixel autour du cadre du portrait."), group.border));
   rows_.push_back(OptionRowView{.id = PortraitRowId(PortraitRow::kResetLayout),
                                 .label = Tr("Réinitialiser la disposition"),
-                                .help = Tr("Repose les quatre cadres à leur place d'origine. Les "
-                                           "couleurs et les interrupteurs ne bougent pas."),
+                                .help = Tr("Repose le cadre du portrait à sa place d'origine. Ses "
+                                           "couleurs et son cadrage ne bougent pas."),
                                 .kind = OptionKind::kAction});
+}
+
+void StatusPortraitOptions::ResetLayout(ro::ui::PortraitGroup group) {
+  // Les géométries seules, celles que le propriétaire a livrées : couleurs et
+  // interrupteurs ne bougent pas.
+  for (std::size_t rank = 0; rank < ro::ui::kPortraitPartCount; ++rank) {
+    if (ro::ui::PortraitGroupOf(static_cast<PortraitPart>(rank)) == group) {
+      look_.parts[rank].rect = factory_look_.parts[rank].rect;
+    }
+  }
 }
 
 void StatusPortraitOptions::ComposeFraming() {
@@ -232,18 +269,22 @@ void StatusPortraitOptions::ComposeLabels() {
 
 void StatusPortraitOptions::ComposePart(PortraitPart part, const char* heading) {
   const ro::ui::PortraitPartLook& look = look_.parts[static_cast<std::size_t>(part)];
-  // Le portrait n'écrit rien : ni texte, ni taille.
+  // Le portrait n'écrit rien : ni texte, ni taille. Et il n'a pas d'interrupteur
+  // à lui : seul de son groupe, il s'allume par celui du groupe.
   const bool writes = part != PortraitPart::kHead;
-  rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kShown),
-                                .label = PartLabel(part),
-                                .kind = OptionKind::kToggle,
-                                .on = look.shown,
-                                .heading = heading});
+  if (writes) {
+    rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kShown),
+                                  .label = PartLabel(part),
+                                  .kind = OptionKind::kToggle,
+                                  .on = look.shown,
+                                  .heading = heading});
+  }
   rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kBackground),
                                 .label = Tr("Fond"),
                                 .kind = OptionKind::kColor,
                                 .color = look.background,
-                                .indented = true,
+                                .heading = writes ? nullptr : heading,
+                                .indented = writes,
                                 .disabled = !look.shown});
   if (writes) {
     rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kText),
@@ -308,18 +349,32 @@ bool StatusPortraitOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       asked.changed >= kPortraitRowBase + static_cast<int>(PortraitRow::kCount)) {
     return false;
   }
+  ro::ui::PortraitGroupLook& head = look_.group(ro::ui::PortraitGroup::kHead);
+  ro::ui::PortraitGroupLook& labels = look_.group(ro::ui::PortraitGroup::kLabels);
   switch (static_cast<PortraitRow>(asked.changed - kPortraitRowBase)) {
     case PortraitRow::kShown:
-      look_.shown = asked.on;
-      break;
-    case PortraitRow::kLocked:
-      look_.locked = asked.on;
+      head.shown = asked.on;
       break;
     case PortraitRow::kSticky:
-      look_.sticky = asked.on;
+      head.sticky = asked.on;
       break;
     case PortraitRow::kBorder:
-      look_.border = asked.on;
+      head.border = asked.on;
+      break;
+    case PortraitRow::kResetLayout:
+      ResetLayout(ro::ui::PortraitGroup::kHead);
+      break;
+    case PortraitRow::kLabelsShown:
+      labels.shown = asked.on;
+      break;
+    case PortraitRow::kLabelsSticky:
+      labels.sticky = asked.on;
+      break;
+    case PortraitRow::kLabelsBorder:
+      labels.border = asked.on;
+      break;
+    case PortraitRow::kLabelsResetLayout:
+      ResetLayout(ro::ui::PortraitGroup::kLabels);
       break;
     case PortraitRow::kHeadOnly:
       framing_.head_only = asked.on;
@@ -347,13 +402,6 @@ bool StatusPortraitOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case PortraitRow::kLevelFormat:
       look_.level_format = static_cast<int>(ro::ui::LevelFormatOf(asked.chosen));
-      break;
-    case PortraitRow::kResetLayout:
-      // Les géométries seules, celles que le propriétaire a livrées : couleurs
-      // et interrupteurs ne bougent pas.
-      for (std::size_t rank = 0; rank < ro::ui::kPortraitPartCount; ++rank) {
-        look_.parts[rank].rect = factory_look_.parts[rank].rect;
-      }
       break;
     case PortraitRow::kCount:
       break;

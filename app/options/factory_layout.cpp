@@ -140,8 +140,13 @@ ro::ui::StatBarsLook FactoryStatBars() {
 StatusPortraitSetup FactoryStatusPortrait() {
   using ro::ui::PortraitPart;
   StatusPortraitSetup setup;
-  setup.look.shown = true;
-  setup.look.locked = true;
+  // Les deux groupes montrés, aimantés, sans bordure. Le verrou est celui des
+  // jauges : voir `FactoryStatBars`.
+  for (ro::ui::PortraitGroupLook& group : setup.look.groups) {
+    group.shown = true;
+    group.sticky = true;
+    group.border = false;
+  }
   const auto rect = [&setup](PortraitPart part) -> ro::ui::HudRect& {
     return setup.look.parts[static_cast<std::size_t>(part)].rect;
   };

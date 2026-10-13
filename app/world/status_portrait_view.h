@@ -37,8 +37,9 @@ class PortraitHudView {
   PortraitHudView(ro::render::ActorWardrobe* wardrobe, const ro::vfs::JobNames& jobs);
 
   // `gauges` : les jauges de la même page, sur lesquelles les cadres
-  // s'aimantent aussi. `screen` : la taille de l'écran, qui borne celle du
-  // cadre comme le dessin la borne — voir `ro::ui::HudOnScreen`.
+  // s'aimantent aussi, et dont le verrou les fige. `screen` : la taille de
+  // l'écran, qui borne celle du cadre comme le dessin la borne — voir
+  // `ro::ui::HudOnScreen`.
   void Refresh(const ro::sim::World& world, const StatusPortraitOptions& options,
                const ro::ui::StatBarsLook& gauges, ActorStyles& styles, std::uint32_t now_ms,
                ImVec2 screen);

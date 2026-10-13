@@ -50,10 +50,12 @@ void PortraitHudView::Refresh(const ro::sim::World& world, const StatusPortraitO
   framing_ = ro::render::VignetteFraming();
   body_ = DollBodySource();
   const ro::sim::Actor* self = world.player();
-  if (self == nullptr || !options.look().shown) {
+  if (self == nullptr || !options.look().AnyShown()) {
     return;
   }
   view_.present = true;
+  // LE VERROU DE LA PAGE, celui des jauges : il fige aussi les quatre cadres.
+  view_.locked = gauges.locked;
   // LES JAUGES À L'ÉCRAN, sauf l'incantation, qui ne paraît que pendant un
   // sort : s'aligner sur elle, c'est s'aligner sur du vide.
   neighbours_.clear();
@@ -72,7 +74,7 @@ void PortraitHudView::Refresh(const ro::sim::World& world, const StatusPortraitO
   const ro::sim::PlayerStatus& status = world.player_status();
   view_.base_level = KnownLevel(status.base_level);
   view_.job_level = KnownLevel(status.job_level);
-  if (options.look().parts[Rank(ro::ui::PortraitPart::kHead)].shown) {
+  if (options.look().PartShown(ro::ui::PortraitPart::kHead)) {
     portrait_shown_ = true;
     RefreshPortrait(world, options, styles, now_ms, screen);
   }

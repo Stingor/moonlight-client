@@ -20,8 +20,12 @@ namespace ro::ui {
 //
 // Le personnage du joueur, d'un coup d'œil : son portrait, son pseudo, sa
 // classe et son niveau, en quatre cadres libres que le joueur pose, retaille
-// et colore chacun à son goût. Un verrou commun les fige et les rend
-// transparents aux clics, et l'aimantation les aligne entre eux.
+// et colore chacun à son goût.
+//
+// DEUX GROUPES : le portrait seul, et les trois étiquettes. Chacun s'affiche,
+// s'aimante et se borde pour lui. Le verrou n'est à aucun des deux : c'est
+// celui de la page « Basic Info », que les jauges portent — voir
+// `StatusPortraitView::locked`.
 
 // Les quatre cadres. ⚠ L'ORDRE PART DANS LES RÉGLAGES ET DANS LE FICHIER.
 enum class PortraitPart : std::uint8_t {
@@ -31,6 +35,16 @@ enum class PortraitPart : std::uint8_t {
   kLevel = 3,
 };
 inline constexpr std::size_t kPortraitPartCount = 4;
+
+// Les deux groupes de cadres, dans l'ordre des onglets des réglages.
+enum class PortraitGroup : std::uint8_t {
+  // Le portrait seul.
+  kHead = 0,
+  // Le pseudo, la classe et le niveau.
+  kLabels = 1,
+};
+inline constexpr std::size_t kPortraitGroupCount = 2;
+[[nodiscard]] PortraitGroup PortraitGroupOf(PortraitPart part) noexcept;
 
 // Comment le niveau s'écrit. ⚠ MÊME RÈGLE D'ORDRE : le rang est gravé dans le
 // fichier.
@@ -73,15 +87,32 @@ struct PortraitPartLook {
 [[nodiscard]] HudRect DefaultPortraitPartRect(PortraitPart part);
 [[nodiscard]] std::array<PortraitPartLook, kPortraitPartCount> DefaultPortraitParts();
 
-struct StatusPortraitLook {
-  // ⚠ ÉTEINT PAR DÉFAUT : quatre cadres de plus ne s'imposent pas à l'écran.
+// Ce qu'un groupe règle pour lui seul.
+struct PortraitGroupLook {
+  // ⚠ ÉTEINT PAR DÉFAUT : des cadres de plus ne s'imposent pas à l'écran.
   bool shown = false;
-  bool locked = false;
+  // Les bords d'un cadre du groupe qu'on déplace s'alignent sur ceux des
+  // autres cadres visibles ; un bloc CTRL n'emporte que ceux de son groupe.
   bool sticky = true;
   bool border = false;
+};
+
+struct StatusPortraitLook {
+  std::array<PortraitGroupLook, kPortraitGroupCount> groups{};
   // Un `LevelFormat`, gardé en entier pour le fichier : voir `LevelFormatOf`.
   int level_format = static_cast<int>(LevelFormat::kSlashed);
   std::array<PortraitPartLook, kPortraitPartCount> parts = DefaultPortraitParts();
+
+  [[nodiscard]] PortraitGroupLook& group(PortraitGroup which) noexcept {
+    return groups[static_cast<std::size_t>(which)];
+  }
+  [[nodiscard]] const PortraitGroupLook& group(PortraitGroup which) const noexcept {
+    return groups[static_cast<std::size_t>(which)];
+  }
+  // Un groupe au moins est allumé.
+  [[nodiscard]] bool AnyShown() const noexcept;
+  // Le cadre paraît : son groupe ET lui sont allumés.
+  [[nodiscard]] bool PartShown(PortraitPart part) const noexcept;
 };
 
 // Le joueur, en lecture seule. `ui` ne connaît pas `sim` : c'est `app` qui lit
@@ -110,6 +141,10 @@ struct StatusPortraitView {
   // aussi — les jauges de la même page. Ils ne bougent jamais d'ici : un bloc
   // CTRL ne les emporte pas.
   std::span<const HudRect> neighbours;
+  // LE VERROU DE LA PAGE « BASIC INFO », celui des jauges : le portrait ne le
+  // possède pas, il le lit. Verrouillés, les cadres se figent et laissent
+  // passer les clics au jeu.
+  bool locked = false;
 };
 
 // L'écart entre le portrait rendu et le bord de son cadre, de chaque côté.
@@ -120,7 +155,8 @@ struct StatusPortraitAnswer {
   bool moved = false;
 };
 
-// Dessine les quatre cadres. `look` est modifié quand le joueur en déplace un.
+// Dessine les cadres allumés, groupe par groupe. `look` est modifié quand le
+// joueur en déplace un.
 void DrawStatusPortrait(const StatusPortraitView& view, const AlignGrid& grid,
                         StatusPortraitLook& look, HudGrip& grip, StatusPortraitAnswer& answer);
 

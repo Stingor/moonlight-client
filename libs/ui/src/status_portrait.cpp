@@ -1,9 +1,10 @@
-// Le portrait de statut : quatre cadres frères.
+// Le portrait de statut : quatre cadres, en deux groupes de frères.
 
 #include "ro/ui/status_portrait.h"
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <span>
 #include <string>
 
@@ -15,7 +16,7 @@ namespace {
 
 // L'identité ImGui de chaque cadre, stable et unique.
 static_assert(kPortraitPartCount <= static_cast<std::size_t>(kHudMostSiblings),
-              "les quatre cadres doivent tenir dans un groupe de frères");
+              "les quatre cadres doivent tenir dans une rangée de frères");
 constexpr std::array<const char*, kPortraitPartCount> kPartIds = {
     "##status_portrait_head",
     "##status_portrait_name",
@@ -85,7 +86,124 @@ void PaintHead(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right,
   return {};
 }
 
+// UN GROUPE ET CE SUR QUOI IL S'AIMANTE, rangés comme `HudSiblings` les veut :
+// les cadres du groupe en tête — eux seuls partent d'un bloc au CTRL —, puis
+// ceux de l'autre groupe et les jauges, qui ne prêtent que leurs bords.
+struct GroupFrames {
+  std::array<HudRect, kHudMostSiblings> rects{};
+  std::array<bool, kHudMostSiblings> shown{};
+  // Le cadre que désigne chacun des rangs du groupe, en tête.
+  std::array<std::size_t, kPortraitPartCount> parts{};
+  std::size_t movable = 0;
+  std::size_t count = 0;
+};
+
+[[nodiscard]] GroupFrames GatherGroup(PortraitGroup group, const StatusPortraitLook& look,
+                                      std::span<const HudRect> neighbours) {
+  GroupFrames frames;
+  for (std::size_t rank = 0; rank < kPortraitPartCount; ++rank) {
+    const auto part = static_cast<PortraitPart>(rank);
+    if (PortraitGroupOf(part) == group) {
+      frames.parts[frames.movable] = rank;
+      frames.rects[frames.count] = look.parts[rank].rect;
+      frames.shown[frames.count] = look.PartShown(part);
+      ++frames.count;
+      frames.movable = frames.count;
+    }
+  }
+  for (std::size_t rank = 0; rank < kPortraitPartCount; ++rank) {
+    const auto part = static_cast<PortraitPart>(rank);
+    if (PortraitGroupOf(part) != group) {
+      frames.rects[frames.count] = look.parts[rank].rect;
+      frames.shown[frames.count] = look.PartShown(part);
+      ++frames.count;
+    }
+  }
+  for (const HudRect& neighbour : neighbours) {
+    if (frames.count >= frames.rects.size()) {
+      break;
+    }
+    frames.rects[frames.count] = neighbour;
+    frames.shown[frames.count] = true;
+    ++frames.count;
+  }
+  return frames;
+}
+
+void DrawGroup(PortraitGroup group, const StatusPortraitView& view, const AlignGrid& grid,
+               StatusPortraitLook& look, HudGrip& grip, StatusPortraitAnswer& answer) {
+  const PortraitGroupLook& settings = look.group(group);
+  if (!settings.shown) {
+    return;
+  }
+  GroupFrames frames = GatherGroup(group, look, view.neighbours);
+
+  for (std::size_t rank = 0; rank < frames.movable; ++rank) {
+    const std::size_t index = frames.parts[rank];
+    const PortraitPartLook& mine = look.parts[index];
+    if (!mine.shown) {
+      continue;
+    }
+    const auto part = static_cast<PortraitPart>(index);
+
+    HudFrameLook frame;
+    frame.locked = view.locked;
+    frame.border = settings.border;
+    frame.rounding = std::clamp(mine.rounding, 0.0F, kPortraitRoundingMost);
+    frame.background = mine.background;
+    frame.grid = &grid;
+    frame.sticky = settings.sticky;
+
+    HudSiblings siblings;
+    siblings.frames = std::span<HudRect>(frames.rects.data(), frames.count);
+    siblings.shown = std::span<const bool>(frames.shown.data(), frames.count);
+    siblings.mine = static_cast<int>(rank);
+    siblings.movable = static_cast<int>(frames.movable);
+
+    bool moved = false;
+    // `frames.rects[rank]` lui-même : le cadre y écrit, et écrit aussi chez
+    // ses frères en déplacement de bloc.
+    if (BeginHudFrame(kPartIds[index], frames.rects[rank], frame, siblings, grip, &moved)) {
+      ImDrawList* into = ImGui::GetWindowDrawList();
+      const ImVec2 top_left = ImGui::GetWindowPos();
+      const ImVec2 size = ImGui::GetWindowSize();
+      const ImVec2 bottom_right(top_left.x + size.x, top_left.y + size.y);
+      const float pixels =
+          ImGui::GetFontSize() *
+          std::clamp(mine.text_scale, kPortraitTextScaleLeast, kPortraitTextScaleMost);
+      if (into != nullptr) {
+        if (part == PortraitPart::kHead) {
+          PaintHead(*into, top_left, bottom_right, view, pixels);
+        } else {
+          const std::string caption = CaptionOf(part, view, look);
+          PaintHudCaption(*into, top_left, bottom_right, caption.c_str(), mine.text, pixels);
+        }
+      }
+    }
+    EndHudFrame(grip);
+    answer.moved = answer.moved || moved;
+  }
+
+  // Les frères emportés par un bloc ont bougé aussi : tout le groupe se
+  // recopie. Les autres n'ont fait que prêter leurs bords.
+  for (std::size_t rank = 0; rank < frames.movable; ++rank) {
+    look.parts[frames.parts[rank]].rect = frames.rects[rank];
+  }
+}
+
 }  // namespace
+
+PortraitGroup PortraitGroupOf(PortraitPart part) noexcept {
+  return part == PortraitPart::kHead ? PortraitGroup::kHead : PortraitGroup::kLabels;
+}
+
+bool StatusPortraitLook::AnyShown() const noexcept {
+  return std::ranges::any_of(groups, &PortraitGroupLook::shown);
+}
+
+bool StatusPortraitLook::PartShown(PortraitPart part) const noexcept {
+  return group(PortraitGroupOf(part)).shown && parts[static_cast<std::size_t>(part)].shown;
+}
 
 LevelFormat LevelFormatOf(int stored) noexcept {
   if (stored < 0 || stored > static_cast<int>(LevelFormat::kBaseOnly)) {
@@ -133,73 +251,12 @@ std::array<PortraitPartLook, kPortraitPartCount> DefaultPortraitParts() {
 
 void DrawStatusPortrait(const StatusPortraitView& view, const AlignGrid& grid,
                         StatusPortraitLook& look, HudGrip& grip, StatusPortraitAnswer& answer) {
-  if (!look.shown || !view.present) {
+  if (!view.present) {
     return;
   }
-
-  // LES QUATRE CADRES EN TÊTE, puis les voisins d'un autre HUD : ceux-là ne
-  // prêtent que leurs bords. Voir `HudSiblings::movable`.
-  std::array<HudRect, kHudMostSiblings> rects{};
-  std::array<bool, kHudMostSiblings> shown{};
-  for (std::size_t rank = 0; rank < kPortraitPartCount; ++rank) {
-    rects[rank] = look.parts[rank].rect;
-    shown[rank] = look.parts[rank].shown;
-  }
-  const std::size_t count = std::min(rects.size(), kPortraitPartCount + view.neighbours.size());
-  for (std::size_t rank = kPortraitPartCount; rank < count; ++rank) {
-    rects[rank] = view.neighbours[rank - kPortraitPartCount];
-    shown[rank] = true;
-  }
-
-  for (std::size_t rank = 0; rank < kPortraitPartCount; ++rank) {
-    const PortraitPartLook& mine = look.parts[rank];
-    if (!mine.shown) {
-      continue;
-    }
-    const auto part = static_cast<PortraitPart>(rank);
-
-    HudFrameLook frame;
-    frame.locked = look.locked;
-    frame.border = look.border;
-    frame.rounding = std::clamp(mine.rounding, 0.0F, kPortraitRoundingMost);
-    frame.background = mine.background;
-    frame.grid = &grid;
-    frame.sticky = look.sticky;
-
-    HudSiblings siblings;
-    siblings.frames = std::span<HudRect>(rects.data(), count);
-    siblings.shown = std::span<const bool>(shown.data(), count);
-    siblings.mine = static_cast<int>(rank);
-    siblings.movable = static_cast<int>(kPortraitPartCount);
-
-    bool moved = false;
-    // `rects[rank]` lui-même : le cadre y écrit, et écrit aussi chez ses frères
-    // en déplacement de bloc.
-    if (BeginHudFrame(kPartIds[rank], rects[rank], frame, siblings, grip, &moved)) {
-      ImDrawList* into = ImGui::GetWindowDrawList();
-      const ImVec2 top_left = ImGui::GetWindowPos();
-      const ImVec2 size = ImGui::GetWindowSize();
-      const ImVec2 bottom_right(top_left.x + size.x, top_left.y + size.y);
-      const float pixels =
-          ImGui::GetFontSize() *
-          std::clamp(mine.text_scale, kPortraitTextScaleLeast, kPortraitTextScaleMost);
-      if (into != nullptr) {
-        if (part == PortraitPart::kHead) {
-          PaintHead(*into, top_left, bottom_right, view, pixels);
-        } else {
-          const std::string caption = CaptionOf(part, view, look);
-          PaintHudCaption(*into, top_left, bottom_right, caption.c_str(), mine.text, pixels);
-        }
-      }
-    }
-    EndHudFrame(grip);
-    answer.moved = answer.moved || moved;
-  }
-
-  // Les frères emportés par un bloc ont bougé aussi : tous se recopient.
-  for (std::size_t rank = 0; rank < kPortraitPartCount; ++rank) {
-    look.parts[rank].rect = rects[rank];
-  }
+  // Le groupe dessiné en second voit déjà où le premier a posé ses cadres.
+  DrawGroup(PortraitGroup::kHead, view, grid, look, grip, answer);
+  DrawGroup(PortraitGroup::kLabels, view, grid, look, grip, answer);
 }
 
 }  // namespace ro::ui

@@ -30,12 +30,12 @@ void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
   if (options.status_bar().shown && !options.status_bar().locked) {
     into.push_back(ro::core::Tr("États"));
   }
-  // LES JAUGES ET LE PORTRAIT partagent la page « Basic Info », et l'avis la
-  // nomme une fois. Le portrait n'a de vue qu'en jeu.
-  const ro::ui::StatusPortraitLook& portrait = options.pages().portrait.look();
-  const bool portrait_unlocked =
-      windows.status_portrait.view != nullptr && portrait.shown && !portrait.locked;
-  if ((options.stat_bars().shown && !options.stat_bars().locked) || portrait_unlocked) {
+  // LES JAUGES, LE PORTRAIT ET LES ÉTIQUETTES partagent la page « Basic Info »
+  // et son verrou, et l'avis la nomme une fois. Le portrait n'a de vue qu'en
+  // jeu.
+  const bool portrait_on_screen =
+      windows.status_portrait.view != nullptr && options.pages().portrait.look().AnyShown();
+  if (!options.stat_bars().locked && (options.stat_bars().shown || portrait_on_screen)) {
     into.push_back(ro::core::Tr("Basic Info"));
   }
   // Déverrouillés, les deux cadres PvP s'ouvrent partout, hors PvP compris.
@@ -79,6 +79,7 @@ void LockWholeHud(GameSettings& settings, const OptionTargets& to, std::uint32_t
   if (!options.status_bar().locked) {
     settings.SetSwitch(GameOption::kStatusBarLocked, true, to, now_ms);
   }
+  // Le verrou de toute la page « Basic Info » : jauges, portrait et étiquettes.
   if (!options.stat_bars().locked) {
     settings.SetSwitch(GameOption::kStatBarsLocked, true, to, now_ms);
   }
@@ -101,9 +102,6 @@ void LockWholeHud(GameSettings& settings, const OptionTargets& to, std::uint32_t
   }
   if (!pages.targeting.look().locked) {
     settings.SetRowSwitch(TargetRowId(TargetRow::kLocked), true, to, now_ms);
-  }
-  if (!pages.portrait.look().locked) {
-    settings.SetRowSwitch(PortraitRowId(PortraitRow::kLocked), true, to, now_ms);
   }
   if (!pages.party.grid().locked) {
     settings.SetRowSwitch(PartyGridRowId(PartyGridRow::kLocked), true, to, now_ms);

@@ -18,10 +18,13 @@ namespace moonclient {
 // montre, ce qu'une ligne change.
 //
 // « Portrait » règle le personnage et son cadre ; « Étiquettes », le pseudo, la
-// classe et le niveau. 🔴 CE QUI VAUT POUR LES QUATRE CADRES — l'interrupteur
-// maître, le verrou, l'aimant, la bordure, la réinitialisation — OUVRE LES DEUX
-// ONGLETS : le joueur le cherche là où il regarde, et l'interrupteur maître
-// grise ce qu'il commande dans l'un comme dans l'autre.
+// classe et le niveau. 🔴 CHAQUE ONGLET EST UN GROUPE QUI SE RÈGLE SEUL : il
+// s'ouvre sur son interrupteur, son aimant, sa bordure et sa réinitialisation,
+// et son interrupteur grise le reste de l'onglet, sans toucher à l'autre.
+//
+// 🔴 LE VERROU N'EST PAS ICI : c'est celui des jauges, qui fige toute la page
+// « Basic Info » et se présente au-dessus de tous ses onglets. Les deux groupes
+// le lisent — voir `Compose` et `StatusPortraitView::locked`.
 //
 // ⚠ LES LIGNES PORTENT UN IDENTIFIANT COMPOSÉ, hors de `GameOption`, comme
 // celles du HUD de cible.
@@ -30,9 +33,11 @@ inline constexpr int kPortraitPartRowBase = 9100;
 inline constexpr int kPortraitFieldsPerPart = 5;
 
 enum class PortraitRow : int {
+  // Le groupe du portrait.
   kShown = 0,
-  kLocked,
   kSticky,
+  kBorder,
+  kResetLayout,
   kHeadOnly,
   kGarment,
   kZoom,
@@ -41,9 +46,12 @@ enum class PortraitRow : int {
   kAnimation,
   kDirection,
   kAnimated,
+  // Le groupe des étiquettes.
+  kLabelsShown,
+  kLabelsSticky,
+  kLabelsBorder,
+  kLabelsResetLayout,
   kLevelFormat,
-  kResetLayout,
-  kBorder,
   kCount,
 };
 
@@ -67,8 +75,18 @@ static_assert(kPortraitRowBase + static_cast<int>(PortraitRow::kCount) < kPortra
          static_cast<int>(field);
 }
 
-// LES DEUX ONGLETS du portrait, dans l'ordre de la page.
+// LES DEUX ONGLETS du portrait, dans l'ordre de la page : un par groupe.
 enum class PortraitTab : int { kPortrait = 0, kLabels, kCount };
+static_assert(static_cast<int>(PortraitTab::kPortrait) ==
+              static_cast<int>(ro::ui::PortraitGroup::kHead));
+static_assert(static_cast<int>(PortraitTab::kLabels) ==
+              static_cast<int>(ro::ui::PortraitGroup::kLabels));
+static_assert(static_cast<std::size_t>(PortraitTab::kCount) == ro::ui::kPortraitGroupCount);
+
+// Le groupe de cadres qu'un onglet règle.
+[[nodiscard]] constexpr ro::ui::PortraitGroup GroupOfTab(PortraitTab tab) {
+  return static_cast<ro::ui::PortraitGroup>(static_cast<int>(tab));
+}
 
 // LEUR PLACE dans la page « Basic Info » : après les sept jauges, et les
 // derniers. Le filtre des Options compose les onglets jusqu'à ce compte.
@@ -139,17 +157,20 @@ class StatusPortraitOptions {
   void Declare(SettingsFile& into);
 
   // Refait les lignes de cet onglet, à chaque image où il est sous les yeux.
-  // `shared` faux omet les réglages communs aux deux onglets : la recherche
-  // ne les compose que sous le premier, pour qu'ils ne ressortent qu'une fois.
-  void Compose(PortraitTab tab, bool shared = true);
+  // `locked` : le verrou de la page, celui des jauges. Verrouillé, rien ne se
+  // déplace, et l'aimant se grise.
+  void Compose(PortraitTab tab, bool locked);
   [[nodiscard]] std::span<const ro::ui::OptionRowView> rows() const noexcept { return rows_; }
 
   // Rend vrai quand la ligne était l'une des siennes.
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);
 
  private:
-  // Ce qui ouvre les deux onglets.
-  void ComposeShared();
+  // Ce qui ouvre l'onglet : l'interrupteur du groupe, son aimant, sa bordure
+  // et sa réinitialisation.
+  void ComposeGroup(PortraitTab tab, bool locked);
+  // Repose les places livrées des cadres de ce groupe, et d'eux seuls.
+  void ResetLayout(ro::ui::PortraitGroup group);
   // Le personnage : sa pose, son cadrage, son cadre.
   void ComposeFraming();
   // Le pseudo, la classe et le niveau.

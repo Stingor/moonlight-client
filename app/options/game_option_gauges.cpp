@@ -15,9 +15,10 @@
 // pose décrivent le GESTE, et il n'y a qu'une souris.
 //
 // LE PORTRAIT DE STATUT FERME LA RANGÉE D'ONGLETS, en deux : « Portrait » et
-// « Étiquettes ». Il a ses réglages à lui — voir `StatusPortraitOptions` — et
-// aucun de ceux des jauges ne le gouverne : sur ses deux onglets, les réglages
-// communs des jauges se retirent, et les siens ouvrent chacun des deux.
+// « Étiquettes ». Chacun a ses réglages à lui — voir `StatusPortraitOptions` —,
+// et sur ces deux onglets les réglages communs des jauges se retirent, sauf UN :
+// le verrou. Il fige toute la page, jauges, portrait et étiquettes, et se
+// présente donc au-dessus de tous ses onglets — une ligne, une clé.
 
 #include <algorithm>
 #include <cstddef>
@@ -63,21 +64,38 @@ using ro::ui::OptionRowView;
 
 }  // namespace
 
-// CE QUI VAUT POUR LES SEPT, puis les onglets.
-void GameOptions::BuildStatBarShared() {
+// LE VERROU DE LA PAGE, les onglets, puis ce qui vaut pour les sept jauges.
+// `gauge_tab` faux — un onglet du portrait — n'en garde que le verrou.
+void GameOptions::BuildStatBarShared(bool gauge_tab) {
   const bool bars_off = !stat_bars_.shown;
   stat_bar_shared_rows_.clear();
+  stat_bar_shared_rows_.push_back(Toggle(
+      GameOption::kStatBarsLocked, Tr("Verrouiller les jauges, le portrait et les étiquettes"),
+      Tr("Verrouillés, les jauges, le portrait et les étiquettes se figent et laissent "
+         "passer les clics au jeu.\nDéverrouillés : glisser pour déplacer, tirer un bord "
+         "ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent."),
+      nullptr, stat_bars_.locked));
+  // Grisé seulement quand il ne fige plus rien à l'écran.
+  stat_bar_shared_rows_.back().disabled = bars_off && !pages_.portrait.look().AnyShown();
+
+  // LES ONGLETS. ⚠ REFAITS À CHAQUE IMAGE comme tout le reste : ces noms se
+  // traduisent, et un nom mis en cache resterait dans la langue d'avant.
+  stat_bar_tabs_.clear();
+  stat_bar_tabs_.reserve(kBasicInfoTabCount);
+  for (std::size_t bar = 0; bar < ro::ui::kStatBarCount; ++bar) {
+    stat_bar_tabs_.push_back(StatBarLabel(bar));
+  }
+  stat_bar_tabs_.push_back(Tr("Portrait"));
+  stat_bar_tabs_.push_back(Tr("Étiquettes"));
+  if (!gauge_tab) {
+    return;
+  }
+
   stat_bar_shared_rows_.push_back(
       Toggle(GameOption::kStatBarsShown, Tr("Montrer les jauges"),
              Tr("Sept jauges libres — vie, magie, les deux expériences, le poids, la "
                 "bourse et l'incantation — que l'on pose où l'on veut sur l'écran."),
              nullptr, stat_bars_.shown));
-  stat_bar_shared_rows_.push_back(
-      Toggle(GameOption::kStatBarsLocked, Tr("Verrouiller"),
-             Tr("Verrouillées, les jauges se figent et laissent passer les clics au jeu. "
-                "Déverrouillées, on les déplace au glisser et on les retaille par un bord."),
-             nullptr, stat_bars_.locked));
-  stat_bar_shared_rows_.back().disabled = bars_off;
   stat_bar_shared_rows_.push_back(
       Toggle(GameOption::kStatBarsSticky, Tr("Aimanter entre elles"),
              Tr("Les bords d'une jauge qu'on déplace s'alignent sur ceux des autres. Deux "
@@ -106,16 +124,6 @@ void GameOptions::BuildStatBarShared() {
                 "ouvert."),
              nullptr, stat_bars_.tuning));
   stat_bar_shared_rows_.back().disabled = bars_off;
-
-  // LES ONGLETS. ⚠ REFAITS À CHAQUE IMAGE comme tout le reste : ces noms se
-  // traduisent, et un nom mis en cache resterait dans la langue d'avant.
-  stat_bar_tabs_.clear();
-  stat_bar_tabs_.reserve(kBasicInfoTabCount);
-  for (std::size_t bar = 0; bar < ro::ui::kStatBarCount; ++bar) {
-    stat_bar_tabs_.push_back(StatBarLabel(bar));
-  }
-  stat_bar_tabs_.push_back(Tr("Portrait"));
-  stat_bar_tabs_.push_back(Tr("Étiquettes"));
 }
 
 // LES DIX-HUIT RÉGLAGES D'UNE JAUGE.
@@ -124,15 +132,14 @@ void GameOptions::BuildStatBarShared() {
 // réglage qui disparaît quand on change de forme fait sauter la mise en page, et
 // le joueur cherche ce qu'il vient de perdre. Grisé, il dit « pas pour cette
 // forme-là », et OÙ il est.
-void GameOptions::BuildStatBarRows(int shown_bar, bool for_search) {
-  BuildStatBarShared();
-  if (shown_bar >= static_cast<int>(kPortraitTab) &&
-      shown_bar < static_cast<int>(kBasicInfoTabCount)) {
-    stat_bar_shared_rows_.clear();
+void GameOptions::BuildStatBarRows(int shown_bar) {
+  const bool portrait_tab = shown_bar >= static_cast<int>(kPortraitTab) &&
+                            shown_bar < static_cast<int>(kBasicInfoTabCount);
+  BuildStatBarShared(!portrait_tab);
+  if (portrait_tab) {
     const auto tab = static_cast<PortraitTab>(shown_bar - static_cast<int>(kPortraitTab));
-    // LES RÉGLAGES COMMUNS NE RESSORTENT QU'UNE FOIS dans la recherche, sous
-    // le premier des deux onglets.
-    pages_.portrait.Compose(tab, !for_search || tab == PortraitTab::kPortrait);
+    // Chaque onglet n'a que ses lignes : la recherche ne voit aucun doublon.
+    pages_.portrait.Compose(tab, stat_bars_.locked);
     const std::span<const OptionRowView> portrait = pages_.portrait.rows();
     stat_bar_rows_.assign(portrait.begin(), portrait.end());
     return;

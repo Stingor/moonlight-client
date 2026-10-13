@@ -831,11 +831,14 @@ tr: Show the level
 fr: Afficher le nom détaillé du lieu
 tr: Show the full place name
 
-fr: Afficher le portrait et les étiquettes
-tr: Show the portrait and labels
+fr: Afficher le portrait
+tr: Show the portrait
 
 fr: Afficher les enseignes des échoppes
 tr: Show shop signs
+
+fr: Afficher les étiquettes
+tr: Show the labels
 
 fr: Afficher « carte,x,y »
 tr: Show “map,x,y”
@@ -1211,9 +1214,6 @@ tr: No battleground is offered right now.
 
 fr: Aucun œuf de familier dans l'inventory.
 tr: No pet egg in the inventory.
-
-fr: Aucun skill reçu du serveur.
-tr: No skill received from the server.
 
 fr: Aucune arme équipée.
 tr: No equipped weapon.
@@ -2419,8 +2419,11 @@ tr: If you have exceeded the number of daily reports, you will no longer be able
 fr: Le passage vers un autre serveur de carte a échoué.
 tr: Moving to another map server failed.
 
-fr: Le portrait du personnage, son pseudo, sa classe et son niveau : quatre cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
-tr: The character's portrait, name, class and level: four independent frames, each one moved, resized and coloured to your liking.
+fr: Le personnage dans son cadre, que l'on déplace, retaille et colore à son goût.
+tr: Your character in its frame, which you can move, resize and colour as you like.
+
+fr: Le pseudo, la classe et le niveau : trois cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
+tr: Name, class and level: three independent frames, each of which you can move, resize and colour as you like.
 
 fr: Le serveur a envoyé une réponse que ce client ne sait pas lire.
 tr: The server sent a reply this client cannot read.
@@ -2479,8 +2482,11 @@ tr: The summon's SP is not enough.
 fr: Les SP du partenaire sont insuffisants, ou son skill est désactivé.
 tr: Partner's SP is insufficient or skill is disabled.
 
-fr: Les bords d'un cadre qu'on déplace s'alignent sur ceux des autres. Deux cadres qui se touchent partent ensemble au CTRL.
-tr: The edges of a frame being moved line up with those of the others. Two frames that touch move together with CTRL.
+fr: Les bords d'une étiquette qu'on déplace s'alignent sur ceux des autres étiquettes, du portrait et des jauges. Deux étiquettes qui se touchent partent ensemble au CTRL ; le portrait et les jauges restent en place.
+tr: When you move a label, its edges line up with those of the other labels, the portrait and the gauges. Two labels that touch move together with CTRL; the portrait and the gauges stay in place.
+
+fr: Les bords du portrait qu'on déplace s'alignent sur ceux des étiquettes et des jauges, qui restent en place.
+tr: When you move the portrait, its edges line up with those of the labels and gauges, which stay in place.
 
 fr: Les bruitages du jeu sont coupés : la case « Bruitages » les rallume.
 tr: The game's sound effects are off: the "Sound effects" box turns them back on.
@@ -2848,8 +2854,11 @@ tr: Refused by the server (code %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Resets this profile to the client's original settings.
 
-fr: Repose les quatre cadres à leur place d'origine. Les couleurs et les interrupteurs ne bougent pas.
-tr: Puts the four frames back in their original place. Colours and switches do not change.
+fr: Repose le cadre du portrait à sa place d'origine. Ses couleurs et son cadrage ne bougent pas.
+tr: Puts the portrait frame back in its original place. Its colours and framing do not change.
+
+fr: Repose les trois étiquettes à leur place d'origine. Leurs couleurs et leurs interrupteurs ne bougent pas.
+tr: Puts the three labels back in their original place. Their colours and switches do not change.
 
 fr: Taille du GIF : chaque pixel du sprite devient un carré de ce côté
 tr: GIF size: each sprite pixel becomes a square of this side
@@ -2863,14 +2872,17 @@ tr: Names with bad words can not be registered.
 fr: Un nom qui porte cette balise ne peut pas être employé.
 tr: Name with this tag cannot be used.
 
-fr: Un trait d'un pixel autour de chaque cadre.
-tr: A one-pixel line around each frame.
+fr: Un trait d'un pixel autour de chaque étiquette.
+tr: A one-pixel line around each label.
 
-fr: Verrouiller le portrait
-tr: Lock the portrait
+fr: Un trait d'un pixel autour du cadre du portrait.
+tr: A one-pixel line around the portrait frame.
 
-fr: Verrouillé : les cadres ne bougent plus et laissent passer les clics au jeu.\nDéverrouillé : glisser pour déplacer, tirer un bord ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent.
-tr: Locked: the frames no longer move and let clicks through to the game.\nUnlocked: drag to move, pull an edge or a corner to resize. CTRL moves frames that touch as one block.
+fr: Verrouiller les jauges, le portrait et les étiquettes
+tr: Lock the gauges, portrait and labels
+
+fr: Verrouillés, les jauges, le portrait et les étiquettes se figent et laissent passer les clics au jeu.\nDéverrouillés : glisser pour déplacer, tirer un bord ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent.
+tr: Locked, the gauges, portrait and labels freeze and let clicks through to the game.\nUnlocked: drag to move, pull an edge or a corner to resize. CTRL moves frames that touch as one block.
 
 fr: Zoom
 tr: Zoom
@@ -8120,9 +8132,6 @@ tr: Confirm before a refine
 fr: Confirmer le refine
 tr: Confirm the refine
 
-fr: Skill
-tr: Skill
-
 fr: Skill passif : rien à lancer.
 tr: Passive skill: nothing to cast.
 
@@ -11107,9 +11116,6 @@ tr: Locked, the bar is fixed and lets clicks through to the game below.\n\nHold 
 
 fr: Verrouillées, les barres ne se déplacent plus — leurs cases restent utilisables. Déverrouillées, on les attrape n'importe où, et leurs cases deviennent inertes.
 tr: Locked, bars no longer move - their slots stay usable. Unlocked, you grab them anywhere, and their slots go inert.
-
-fr: Verrouillées, les jauges se figent et laissent passer les clics au jeu. Déverrouillées, on les déplace au glisser et on les retaille par un bord.
-tr: Locked, the gauges freeze and let clicks through to the game. Unlocked, drag to move them and pull an edge to resize.
 
 fr: Vers l'inventory
 tr: To inventory
