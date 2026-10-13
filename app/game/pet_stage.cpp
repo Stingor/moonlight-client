@@ -524,12 +524,12 @@ void PetStage::Apply(const ro::ui::PetWindowAction& asked,
       Command(link, CommandOf(*asked.order));
     }
   }
-  std::optional<std::string> banned_name;
-  if (asked.rename.has_value() && banned_ != nullptr) {
-    banned_name = BannedInputRefusal(*banned_, *asked.rename, BannedInput::kCompanionName);
+  std::optional<std::string> refused_name;
+  if (asked.rename.has_value()) {
+    refused_name = CompanionNameRefusal(banned_, *asked.rename);
   }
-  if (banned_name.has_value()) {
-    window.status = std::move(*banned_name);
+  if (refused_name.has_value()) {
+    window.status = std::move(*refused_name);
     window.status_refused = true;
   } else if (asked.rename.has_value() && ro::sim::CheckPetName(ro::core::Cp1252FromUtf8(
                                              *asked.rename)) == ro::sim::PetNameRefusal::kNone) {

@@ -52,6 +52,19 @@ enum class BannedInput : std::uint8_t {
                                                             std::string_view utf8_text,
                                                             BannedInput input);
 
+// LES BALISES QU'UN NOM DE COMPAGNON NE PORTE PAS : celles d'un lien d'objet,
+// cherchées telles quelles, casse comprise, n'importe où dans le nom. Un nom
+// qui en contient une se lirait comme un lien partout où il s'affiche.
+inline constexpr std::string_view kItemLinkOpeningTag = "<ITEML>";
+inline constexpr std::string_view kItemLinkClosingTag = "</ITEML>";
+
+// LE REFUS DU NOUVEAU NOM D'UN HOMONCULE OU D'UN FAMILIER, traduit, une fois
+// la borne de longueur passée : une balise de lien d'objet d'abord, puis un
+// mot interdit. Rien quand le nom passe ; sans liste, seules les balises
+// s'éprouvent.
+[[nodiscard]] std::optional<std::string> CompanionNameRefusal(const ro::sim::BannedWords* banned,
+                                                              std::string_view utf8_name);
+
 // LA COULEUR DE CE REFUS quand il s'écrit dans la conversation, en 0xRRGGBB.
 [[nodiscard]] std::uint32_t BannedInputColor(BannedInput input);
 

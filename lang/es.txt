@@ -2785,6 +2785,9 @@ tr: Solo la cabeza
 fr: Un nom qui contient des mots interdits ne peut pas être enregistré.
 tr: No se puede registrar un nombre que contiene palabras prohibidas.
 
+fr: Un nom qui porte cette balise ne peut pas être employé.
+tr: No se puede usar un nombre con esta etiqueta.
+
 fr: Un trait d'un pixel autour de chaque cadre.
 tr: Una línea de un píxel alrededor de cada marco.
 

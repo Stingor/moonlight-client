@@ -11,6 +11,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/text.h"
 #include "ro/net/chat_target.h"
 #include "ro/net/homunculus_frames.h"
 #include "ro/net/skill.h"
@@ -246,13 +247,15 @@ void HomunculusStage::Apply(const ro::ui::HomunculusTabAction& asked, ro::net::C
     case ro::ui::HomunculusVerb::kDeclineAiProposal:
       break;
     case ro::ui::HomunculusVerb::kRename:
-      if (banned_ != nullptr) {
-        if (std::optional<std::string> refused =
-                BannedInputRefusal(*banned_, asked.name, BannedInput::kCompanionName);
-            refused.has_value()) {
-          tab.status = std::move(*refused);
-          break;
-        }
+      // LA BORNE D'ABORD, sur la forme envoyée, puis les balises et les mots.
+      if (ro::core::Cp1252FromUtf8(asked.name).size() > ro::sim::kHomunculusNameMaxBytes) {
+        tab.status = ro::core::Tr("Donne à ton homoncule un nom de 23 lettres au plus.");
+        break;
+      }
+      if (std::optional<std::string> refused = CompanionNameRefusal(banned_, asked.name);
+          refused.has_value()) {
+        tab.status = std::move(*refused);
+        break;
       }
       Complain(ro::net::RequestHomunculusRename(link, asked.name), "renommage");
       break;

@@ -47,6 +47,18 @@ std::optional<std::string> BannedInputRefusal(const ro::sim::BannedWords& banned
   return std::string(ro::core::Tr("Langage grossier détecté."));
 }
 
+std::optional<std::string> CompanionNameRefusal(const ro::sim::BannedWords* banned,
+                                                std::string_view utf8_name) {
+  if (utf8_name.find(kItemLinkOpeningTag) != std::string_view::npos ||
+      utf8_name.find(kItemLinkClosingTag) != std::string_view::npos) {
+    return std::string(ro::core::Tr("Un nom qui porte cette balise ne peut pas être employé."));
+  }
+  if (banned == nullptr) {
+    return std::nullopt;
+  }
+  return BannedInputRefusal(*banned, utf8_name, BannedInput::kCompanionName);
+}
+
 std::uint32_t BannedInputColor(BannedInput input) {
   return input == BannedInput::kGuildName ? kGuildNameRefusalSalmon : kRefusalRed;
 }

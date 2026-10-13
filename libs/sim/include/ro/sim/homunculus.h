@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <span>
 #include <string>
@@ -30,6 +31,9 @@ inline constexpr std::uint16_t kHomunculusSkillCount = 43;
 // La satiété se lit sur cent, et l'intimité sur mille.
 inline constexpr int kHomunculusHungerMost = 100;
 inline constexpr int kHomunculusIntimacyMost = 1000;
+
+// Le plus long nom qu'un homoncule reçoit, en octets sur le fil.
+inline constexpr std::size_t kHomunculusNameMaxBytes = 23;
 
 // LES HUIT PALIERS D'INTIMITÉ, aux bornes mêmes du serveur.
 enum class HomunculusIntimacyGrade : std::uint8_t {

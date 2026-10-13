@@ -2785,6 +2785,9 @@ tr: Head only
 fr: Un nom qui contient des mots interdits ne peut pas être enregistré.
 tr: Names with bad words can not be registered.
 
+fr: Un nom qui porte cette balise ne peut pas être employé.
+tr: Name with this tag cannot be used.
+
 fr: Un trait d'un pixel autour de chaque cadre.
 tr: A one-pixel line around each frame.
 
