@@ -17,10 +17,30 @@
 namespace moonclient {
 
 bool ComposedAsPlayer(const ro::sim::Actor& actor) {
+  // 🔴 LE TYPE D'OBJET 1 NE SE COMPOSE PAS, bien qu'il soit rangé avec les
+  // joueurs : c'est un joueur DÉGUISÉ en une classe qui n'est pas un métier, et
+  // il se dessine d'après cette classe, comme un PNJ. Le serveur pose aussi ce
+  // type sur l'interlocuteur fictif d'une commande qui ouvre un dialogue, une
+  // classe de PNJ caché posée sur la case du joueur : composé, il dessinerait un
+  // novice par-dessus lui.
+  constexpr std::uint8_t kDisguisedPlayerObject = 0x1;
+  if (actor.kind == ro::sim::ActorKind::kPlayer) {
+    return actor.object_type != kDisguisedPlayerObject;
+  }
   // UN PNJ VÊTU D'UN MÉTIER se compose comme un joueur : voir `IsPlayerClass`.
-  return actor.kind == ro::sim::ActorKind::kPlayer ||
-         (actor.kind == ro::sim::ActorKind::kNonPlayer &&
+  return (actor.kind == ro::sim::ActorKind::kNonPlayer &&
           ro::render::IsPlayerClass(actor.look.job));
+}
+
+bool IsUnseenClass(const ro::sim::Actor& actor) {
+  constexpr std::uint16_t kUnseenJob = 104;
+  constexpr std::uint16_t kHiddenNpcJob = 111;
+  constexpr std::uint16_t kHiddenWarpJob = 139;
+  if (actor.kind == ro::sim::ActorKind::kItem || ComposedAsPlayer(actor)) {
+    return false;
+  }
+  const std::uint16_t job = actor.look.job;
+  return job == kUnseenJob || job == kHiddenNpcJob || job == kHiddenWarpJob;
 }
 
 std::uint32_t ShownJobOf(const ro::sim::Actor& actor) {

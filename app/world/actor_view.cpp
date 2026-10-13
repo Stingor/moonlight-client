@@ -386,7 +386,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       ++census.hidden;
       return;
     }
-    if (!HasSprite(actor.kind)) {
+    if (!HasSprite(actor.kind) || IsUnseenClass(actor)) {
       ++census.without_sprite;
       return;
     }

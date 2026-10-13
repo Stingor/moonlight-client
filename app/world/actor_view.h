@@ -62,6 +62,16 @@ struct GroundUnitPick;
 // en prend la disposition et tient, au repos, l'image de son regard.
 [[nodiscard]] bool ComposedAsPlayer(const ro::sim::Actor& actor);
 
+// TROIS CLASSES DE NON-JOUEUR QUI NE SE MONTRENT PAS : 104, le PNJ caché (111)
+// et le portail caché (139). Ni corps, ni ombre, ni zone de clic, alors que la
+// table des sprites leur trouve un corps : 139, hors de ses plages, y prend le
+// Poring par défaut.
+//
+// ⚠ PAR LA CLASSE, QUEL QUE SOIT LE GENRE : le serveur annonce aussi en joueur
+// déguisé l'interlocuteur fictif d'une commande qui ouvre un dialogue, en PNJ
+// caché. Ce qui se compose comme un joueur n'est pas concerné.
+[[nodiscard]] bool IsUnseenClass(const ro::sim::Actor& actor);
+
 // La disposition du .act d'un acteur : celle d'un joueur pour qui se compose
 // comme un joueur, celle d'une créature pour tout le reste.
 [[nodiscard]] ro::render::SpriteLayout LayoutOf(const ro::sim::Actor& actor);
