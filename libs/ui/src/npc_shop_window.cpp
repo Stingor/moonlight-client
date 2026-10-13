@@ -95,23 +95,9 @@ bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
   return filter.PassFilter(name.data(), name.data() + name.size());
 }
 
-// Un panier qui mérite une confirmation : il vend un objet précieux, ou tout
-// ce qui est vendable.
-bool SaleNeedsConfirmation(const NpcShopWindowState& state, const NpcShopView& view,
-                           std::span<const NpcShopCartLine> lines) {
-  if (state.close_after_sale) {
-    return true;
-  }
-  return std::ranges::any_of(lines, [&view](const NpcShopCartLine& line) {
-    return std::ranges::any_of(view.sells, [&line](const NpcShopSellView& sold) {
-      return sold.client_slot == line.client_slot && sold.precious;
-    });
-  });
-}
-
 void AskSale(NpcShopWindowState& state, const NpcShopView& view, std::vector<NpcShopCartLine> lines,
              bool immediate, NpcShopWindowAction& action) {
-  if (SaleNeedsConfirmation(state, view, lines)) {
+  if (NpcShopSaleNeedsConfirmation(state, view, lines)) {
     // 🔴 LA BOÎTE NE S'OUVRE PAS ICI : on est dans une fenêtre ENFANT — la table
     // ou le panier —, et ImGui nomme un surgissant dans la pile d'identités du
     // moment. La boîte, dessinée au niveau de la fenêtre, ne se trouverait
@@ -282,9 +268,11 @@ void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const Skin
       state.close_after_sale = true;
     }
     if (ImGui::IsItemHovered()) {
-      SkinTooltip(
-          core::Tr("Ajoute tout ce qui est vendable ; la boutique se fermera après la "
-                   "vente, qui se confirme d'abord."));
+      SkinTooltip(state.confirm_sell_all
+                      ? core::Tr("Ajoute tout ce qui est vendable ; la boutique se fermera après "
+                                 "la vente, qui se confirme d'abord.")
+                      : core::Tr("Ajoute tout ce qui est vendable ; la boutique se fermera après "
+                                 "la vente."));
     }
   }
   if (view.hidden_favorites > 0) {
@@ -556,6 +544,18 @@ bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine&
   }
   same->amount = std::min(same->amount + line.amount, same->most);
   return true;
+}
+
+bool NpcShopSaleNeedsConfirmation(const NpcShopWindowState& state, const NpcShopView& view,
+                                  std::span<const NpcShopCartLine> lines) {
+  if (state.close_after_sale && state.confirm_sell_all) {
+    return true;
+  }
+  return std::ranges::any_of(lines, [&view](const NpcShopCartLine& line) {
+    return std::ranges::any_of(view.sells, [&line](const NpcShopSellView& sold) {
+      return sold.client_slot == line.client_slot && sold.precious;
+    });
+  });
 }
 
 NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state, const NpcShopView& view,

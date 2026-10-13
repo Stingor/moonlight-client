@@ -20,11 +20,16 @@ namespace moonclient {
 //     salons restent.
 //
 // ⚠ TOUTES DEUX ALLUMÉES PAR DÉFAUT, comme au client d'origine.
+//
+// Et une bascule sans commande, pour la boutique d'un PNJ : « Tout ajouter au
+// panier » se confirme-t-il avant de vendre ? Allumée par défaut ; éteinte, un
+// objet raffiné ou serti se confirme encore.
 inline constexpr int kShopRowBase = 7200;
 
 enum class ShopRow : int {
   kOneClick = 0,
   kSignboardsShown,
+  kConfirmSellAll,
   kCount,
 };
 
@@ -35,6 +40,7 @@ class ShopOptions {
  public:
   [[nodiscard]] bool one_click() const noexcept { return one_click_; }
   [[nodiscard]] bool signboards_shown() const noexcept { return signboards_shown_; }
+  [[nodiscard]] bool confirm_sell_all() const noexcept { return confirm_sell_all_; }
 
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
@@ -51,6 +57,7 @@ class ShopOptions {
  private:
   bool one_click_ = true;
   bool signboards_shown_ = true;
+  bool confirm_sell_all_ = true;
 };
 
 }  // namespace moonclient

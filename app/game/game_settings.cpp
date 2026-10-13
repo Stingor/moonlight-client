@@ -113,6 +113,7 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   windows.inventory.drop_locked = options_.inventory_drop_locked();
   windows.inventory.sell_locked = options_.inventory_sell_locked();
   windows.inventory.sorted = options_.inventory_sorted();
+  windows.trade.npc_shop.state.confirm_sell_all = options_.shops().confirm_sell_all();
   windows.cart.filter_shown = options_.cart_filter_shown();
   windows.cart.size_locked = options_.cart_size_locked();
   windows.storage.filter_shown = options_.storage_filter_shown();

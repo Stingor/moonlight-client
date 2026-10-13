@@ -876,6 +876,15 @@ tr: Adds or removes the entered amount from %s. It is an ADJUSTMENT, not a targe
 fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente, qui se confirme d'abord.
 tr: Adds everything sellable; the shop closes after the sale, which asks for confirmation first.
 
+fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente.
+tr: Adds everything sellable; the shop closes after the sale.
+
+fr: Confirmer « Tout ajouter au panier » chez un PNJ
+tr: Confirm "Add all to cart" at an NPC
+
+fr: Avant de vendre tout l'inventory à un PNJ, une boîte rappelle le nombre de lignes et le total. Éteint, la vente part d'un clic ; un item raffiné ou serti se confirme encore.
+tr: Before selling your whole inventory to an NPC, a box recalls the number of lines and the total. Off, the sale goes through in one click; a refined or carded item still asks for confirmation.
+
 fr: Ajoute une barre de recherche au-dessus de la table, qui filtre sur le nom du MVP comme sur celui de la carte.\n\nLe filtre lui-même n'est pas enregistré : on filtre pour trouver quelque chose maintenant, pas pour rouvrir demain sur une table amputée sans se rappeler pourquoi.
 tr: Adds a search bar above the table, filtering on the MVP name as well as the map name.\n\nThe filter itself is not saved: you filter to find something now, not to reopen tomorrow on a truncated table without remembering why.
 

@@ -130,6 +130,9 @@ struct NpcShopWindowState {
   std::vector<NpcShopCartLine> cart;
   // « Tout ajouter au panier » : la boutique se ferme après la vente réussie.
   bool close_after_sale = false;
+  // Réglage du joueur, descendu par `app` : éteint, « Tout ajouter au panier »
+  // vend sans confirmation. Un objet précieux se confirme toujours.
+  bool confirm_sell_all = true;
   // LA VENTE ATTEND SA CONFIRMATION : un objet précieux, ou tout le sac vendable.
   std::vector<NpcShopCartLine> pending_sale;
   // La boîte de confirmation est à OUVRIR, au niveau de la fenêtre : voir
@@ -172,6 +175,12 @@ void OpenNpcShopOn(NpcShopWindowState& state, std::uint32_t opening_seq, bool bu
 // Ajoute au panier, ou à la ligne qui existe déjà, borné à `most`. Rend faux si
 // la ligne était déjà pleine — un équipement ne s'achète qu'un à la fois.
 bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine& line);
+
+// Une vente qui se confirme avant de partir : elle porte un objet précieux, ou
+// elle vend tout le sac et le joueur veut qu'on le lui demande.
+[[nodiscard]] bool NpcShopSaleNeedsConfirmation(const NpcShopWindowState& state,
+                                                const NpcShopView& view,
+                                                std::span<const NpcShopCartLine> lines);
 
 // Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
 // shop, pour le menu d'un item.
