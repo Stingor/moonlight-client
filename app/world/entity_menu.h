@@ -77,7 +77,9 @@ inline constexpr std::uint32_t kFixedNpcLastId = 3000099;
 
 // LE NIVEAU DE GROUPE DE L'ADMINISTRATEUR, au-dessus de celui du staff : ce qui
 // MODIFIE le monde pour tous les joueurs connectés — décharger un PNJ, recharger
-// son script — ne s'ouvre qu'à lui. Le serveur refait le même test.
+// son script — ne s'ouvre qu'à lui. Le serveur refait le même test. C'est aussi
+// le seul groupe qui détienne `@fullstrip` : il a toutes les commandes, aucun
+// autre ne la nomme.
 inline constexpr std::uint8_t kAdminMinGroupLevel = 99;
 
 // La famille d'un acteur, pour le joueur `own_id`.
@@ -245,6 +247,12 @@ enum class EntityVerb : int {
   // « SIGNALER CE JOUEUR » : la fenêtre de signalement, sur un autre joueur.
   // Voir `world/player_report.h`.
   kReportPlayer,
+  // LES POINTS DE MANIÈRE, au staff, sur un joueur : des minutes de silence
+  // retirées ou ajoutées. Voir `ro/net/manner_points.h`.
+  kMannerGood,
+  kMannerBad,
+  // « RETIRER TOUT SON ÉQUIPEMENT », à l'administrateur, sur un joueur.
+  kFullStrip,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -266,7 +274,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kReportPlayer) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kFullStrip) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==

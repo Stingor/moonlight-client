@@ -107,6 +107,7 @@ add_library(ro_net STATIC
     src/socket.cpp
     src/skill_facts.cpp
     src/staff_requests.cpp
+    src/manner_points.cpp
     src/storage_facts.cpp
     src/storage_list.cpp
     src/whisper.cpp

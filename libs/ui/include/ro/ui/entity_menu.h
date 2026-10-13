@@ -45,11 +45,23 @@ enum class EntityMenuQuestion : std::uint8_t {
   kPetFeed,
   // Nourrir son homoncule, demandé de même : rassasié, il perd de l'intimité.
   kHomunculusFeed,
+  // UNE SAISIE encore, comme les points d'event : les minutes d'un bon point de
+  // manière, qui raccourcit le silence, ou d'un mauvais, qui l'allonge.
+  kMannerGood,
+  kMannerBad,
 };
 
 // Le pas d'un don de points d'event, dans un sens comme dans l'autre. Le serveur
 // reborne de son côté : ceci ne fait que cadrer la saisie.
 inline constexpr int kEventPointsStep = 50;
+
+// Les minutes d'un point de manière : la saisie part de une, et ne dépasse pas
+// ce que le client d'origine laisse partir.
+inline constexpr int kMannerMinutesFirst = 1;
+inline constexpr int kMannerMinutesMost = 30000;
+// Les deux pas de la saisie : un clic, et Ctrl + clic — une heure.
+inline constexpr int kMannerMinutesStep = 1;
+inline constexpr int kMannerMinutesFastStep = 60;
 
 struct EntityMenuItem {
   // ⚠ DÉJÀ TRADUIT par l'appelant.
@@ -105,9 +117,10 @@ struct EntityMenuState {
   int question_verb = 0;
   std::uint32_t question_subject = 0;
   std::string question_name;
-  // 🔴 REMISE À ZÉRO À CHAQUE QUESTION : gardée d'une fois sur l'autre, un
-  // « +50 » resterait armé et partirait sur le joueur suivant d'un simple
-  // « Appliquer » — un don qu'on n'a pas voulu.
+  // 🔴 REMISE À SON DÉPART À CHAQUE QUESTION : gardée d'une fois sur l'autre,
+  // un « +50 » resterait armé et partirait sur le joueur suivant d'un simple
+  // « Appliquer » — un don qu'on n'a pas voulu. Zéro pour les points d'event,
+  // une minute pour un point de manière.
   int points = 0;
 };
 
@@ -119,7 +132,7 @@ struct EntityMenuAnswer {
   int toggled = 0;
   bool toggled_on = false;
   // La question tranchée par l'affirmative : son verbe, l'entité qu'elle
-  // nommait, et la saisie pour les points d'event.
+  // nommait, et la saisie pour les points d'event ou de manière.
   int confirmed = 0;
   std::uint32_t confirmed_subject = 0;
   int points = 0;

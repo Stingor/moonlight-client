@@ -58,6 +58,10 @@ constexpr std::size_t kLineBytes = 256;
       return core::Tr("Nourrir le pet###menu_entite_question");
     case EntityMenuQuestion::kHomunculusFeed:
       return core::Tr("Nourrir l'homoncule###menu_entite_question");
+    case EntityMenuQuestion::kMannerGood:
+      return core::Tr("Bon point de manière###menu_entite_question");
+    case EntityMenuQuestion::kMannerBad:
+      return core::Tr("Mauvais point de manière###menu_entite_question");
     case EntityMenuQuestion::kNpcUnload:
     case EntityMenuQuestion::kNone:
       break;
@@ -157,6 +161,29 @@ void AsideText(const char* text) { ImGui::TextColored(kAsideColor, "%s", text); 
   return ConfirmButtons(core::Tr("Appliquer"), state.points != 0, art);
 }
 
+// LES MINUTES D'UN POINT DE MANIÈRE. ⚠ LE SILENCE EN COURS N'EST PAS AFFICHÉ :
+// le client ne le connaît pas, pas plus que le solde des points d'event.
+[[nodiscard]] bool AskManner(EntityMenuState& state, const SkinArt& art) {
+  const bool good = state.question == EntityMenuQuestion::kMannerGood;
+  if (good) {
+    ImGui::Text(core::Tr("Bon point de manière pour %s"), NameOrUnknown(state));
+  } else {
+    ImGui::TextColored(kDangerColor, core::Tr("Mauvais point de manière pour %s"),
+                       NameOrUnknown(state));
+  }
+  ImGui::Spacing();
+  static_cast<void>(SkinInputInt(core::Tr("minutes###menu_entite_manieres"), &state.points,
+                                 kMannerMinutesFirst, kMannerMinutesMost, kMannerMinutesStep,
+                                 kMannerMinutesFastStep, art));
+  ImGui::Spacing();
+  AsideText(good ? core::Tr("Retire autant de minutes à son silence, et le lève\n"
+                            "quand il n'en reste plus.")
+                 : core::Tr("Ajoute autant de minutes de silence : ni chat ni\n"
+                            "skills. Appliqué deux fois, il prolonge."));
+  ImGui::Spacing();
+  return ConfirmButtons(core::Tr("Appliquer"), state.points >= kMannerMinutesFirst, art);
+}
+
 // Les trois gestes de groupe et d'amitié posent la même question, « celui-ci,
 // sûr ? », et ne diffèrent que par la phrase.
 [[nodiscard]] bool AskSocial(EntityMenuState& state, const SkinArt& art) {
@@ -230,6 +257,10 @@ void DrawQuestion(EntityMenuState& state, const SkinArt& art, EntityMenuAnswer& 
       ImGui::Spacing();
       confirmed = ConfirmButtons(core::Tr("Nourrir"), true, art);
       break;
+    case EntityMenuQuestion::kMannerGood:
+    case EntityMenuQuestion::kMannerBad:
+      confirmed = AskManner(state, art);
+      break;
     case EntityMenuQuestion::kNone:
       ImGui::CloseCurrentPopup();
       break;
@@ -292,7 +323,9 @@ void DrawQuestion(EntityMenuState& state, const SkinArt& art, EntityMenuAnswer& 
     state.question_verb = item.verb;
     state.question_subject = view.subject;
     state.question_name = view.name;
-    state.points = 0;
+    const bool manner = item.question == EntityMenuQuestion::kMannerGood ||
+                        item.question == EntityMenuQuestion::kMannerBad;
+    state.points = manner ? kMannerMinutesFirst : 0;
   } else {
     answer.chosen = item.verb;
   }

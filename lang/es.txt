@@ -17371,3 +17371,54 @@ tr: Resultados: %d
 
 fr: Aucun réglage ne correspond à ce filtre.
 tr: Ningún ajuste coincide con este filtro.
+
+fr: @fullstrip : tout ce qu'il porte retourne dans son inventory. Le serveur ne répond rien quand c'est fait.
+tr: @fullstrip: todo lo que lleva vuelve a su inventario. El servidor no responde nada cuando está hecho.
+
+fr: Ajoute autant de minutes de silence : ni chat ni\nskills. Appliqué deux fois, il prolonge.
+tr: Añade esos minutos de silencio: ni chat ni\nhabilidades. Aplicado dos veces, se prolonga.
+
+fr: Ajoute des minutes de silence : ni chat ni skills.
+tr: Añade minutos de silencio: ni chat ni habilidades.
+
+fr: Bon point de manière pour %s
+tr: Punto de modales bueno para %s
+
+fr: Bon point de manière reçu de %s.
+tr: Has recibido un punto de modales bueno de %s.
+
+fr: Bon point de manière###menu_entite_question
+tr: Punto de modales bueno###menu_entite_question
+
+fr: Bon point de manière…
+tr: Punto de modales bueno…
+
+fr: L'anti-spam vous a interdit le chat et les skills pour un moment.
+tr: El sistema antispam te ha bloqueado el chat y las habilidades durante un tiempo.
+
+fr: Le point de manière a été appliqué.
+tr: El punto de modales se ha aplicado.
+
+fr: Le staff vous a interdit le chat et les skills pour mauvaise conduite.
+tr: El staff te ha bloqueado el chat y las habilidades por mala conducta.
+
+fr: Mauvais point de manière pour %s
+tr: Punto de modales malo para %s
+
+fr: Mauvais point de manière###menu_entite_question
+tr: Punto de modales malo###menu_entite_question
+
+fr: Mauvais point de manière…
+tr: Punto de modales malo…
+
+fr: Retire autant de minutes à son silence, et le lève\nquand il n'en reste plus.
+tr: Quita esos minutos a su silencio, y lo levanta\ncuando no queda ninguno.
+
+fr: Retire des minutes à son silence, et le lève quand il n'en reste plus.
+tr: Quita minutos a su silencio, y lo levanta cuando no queda ninguno.
+
+fr: Retirer tout son équipement
+tr: Quitarle todo el equipo
+
+fr: minutes###menu_entite_manieres
+tr: minutos###menu_entite_manieres

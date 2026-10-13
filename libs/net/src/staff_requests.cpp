@@ -42,6 +42,17 @@ core::Result<void> RequestKick(Connection& link, std::uint32_t account_id) {
   return {};
 }
 
+core::Result<void> RequestFullStrip(Connection& link, std::uint32_t account_id) {
+  proto::FullStripRequest request;
+  request.account_id = account_id;
+  auto frame = proto::Encode(request);
+  if (!frame) {
+    return std::unexpected(frame.error());
+  }
+  link.Send(*frame);
+  return {};
+}
+
 namespace {
 
 // Le texte d'une annonce, tel que le serveur le lit : page de codes du jeu,

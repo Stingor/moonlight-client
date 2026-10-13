@@ -17,6 +17,7 @@
 #include "ro/net/friends.h"
 #include "ro/net/guild.h"
 #include "ro/net/inventory.h"
+#include "ro/net/manner_points.h"
 #include "ro/net/npc_dialog.h"
 #include "ro/net/party.h"
 #include "ro/net/staff_requests.h"
@@ -45,6 +46,10 @@ constexpr std::uint32_t kMenuAskLifeMs = 500;
 
 // Assez pour l'identité de pick la plus longue, et pour une phrase de blocage.
 constexpr std::size_t kLineBytes = 256;
+
+// La saisie des minutes d'un point de manière ne doit pas promettre plus que le
+// fil n'en laisse partir.
+static_assert(ro::ui::kMannerMinutesMost == ro::net::kMannerPointsMostMinutes);
 
 [[nodiscard]] ro::net::PlayerAdminAction PlayerAdminOf(EntityVerb verb) {
   switch (verb) {
@@ -621,6 +626,18 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       return;
     case EntityVerb::kKick:
       ReportRefusal(ro::net::RequestKick(link_, id));
+      return;
+    case EntityVerb::kMannerGood:
+    case EntityVerb::kMannerBad:
+      // Le verdict revient en ZC 0x014A, et s'écrit dans la conversation.
+      ReportRefusal(ro::net::RequestMannerPoint(link_, id,
+                                                verb == EntityVerb::kMannerGood
+                                                    ? ro::net::MannerPointWay::kGood
+                                                    : ro::net::MannerPointWay::kBad,
+                                                points));
+      return;
+    case EntityVerb::kFullStrip:
+      ReportRefusal(ro::net::RequestFullStrip(link_, id));
       return;
     case EntityVerb::kNpcReloadFile:
     case EntityVerb::kNpcMoveHere:

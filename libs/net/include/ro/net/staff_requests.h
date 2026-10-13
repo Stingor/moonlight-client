@@ -62,6 +62,12 @@ enum class PlayerAdminAction : std::uint8_t {
 // `CZ 0x00CC` : expulser un joueur. Le serveur rejoue `@kick`.
 [[nodiscard]] core::Result<void> RequestKick(Connection& link, std::uint32_t account_id);
 
+// `CZ 0x07F5` : retirer tout l'équipement d'un joueur. Le serveur rejoue
+// `@fullstrip`, que seul le niveau de groupe 99 détient. Il ne répond rien à
+// l'émetteur quand la commande réussit, et l'ignore sans un mot quand le groupe
+// ne la détient pas.
+[[nodiscard]] core::Result<void> RequestFullStrip(Connection& link, std::uint32_t account_id);
+
 // ── LES ANNONCES DU STAFF ────────────────────────────────────────────────────
 //
 // `CZ 0x0099` (`/b`) à tout le serveur, `CZ 0x019C` (`/lb`) à la carte seule.

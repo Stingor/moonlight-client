@@ -25,6 +25,7 @@
 #include "ro/net/inventory.h"
 #include "ro/net/item_facts.h"
 #include "ro/net/item_news.h"
+#include "ro/net/manner_points.h"
 #include "ro/net/map_guidance.h"
 #include "ro/net/member_statuses.h"
 #include "ro/net/monster_sheet.h"
@@ -76,8 +77,9 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // LES AMIS ; CE QU'UN SCRIPT MONTRE SUR LA CARTE (repères, navigation à
   // prendre), le boss d'un Convex Mirror, les nouvelles d'objets (ramassage
   // d'un membre, pièce abîmée), l'issue d'une alliance ou d'une hostilité,
-  // l'adoption, les fiches du staff, l'accusé d'un signalement, la ligne d'un
-  // état, et l'équipement montré par un autre joueur, avec son refus.
+  // l'adoption, les fiches du staff, l'accusé d'un signalement, les points de
+  // manière, la ligne d'un état, et l'équipement montré par un autre joueur,
+  // avec son refus.
   for (const ro::net::FrameOutcome told :
        {ro::net::ApplyFriendFrame(received, friends_),
         ro::net::ApplyViewEquipFrame(received, inspected_),
@@ -88,6 +90,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
         pieces_.entity_inspector.ApplyFrame(received), pieces_.chat_block_log.ApplyFrame(received),
         PlayerReportDesk::ApplyFrame(received, world_, now_ms),
+        ro::net::ApplyMannerPointFrame(received, world_, now_ms),
         ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
         character_->SayEquipAttributes(received, world_, now_ms)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {

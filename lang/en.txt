@@ -17371,3 +17371,54 @@ tr: Results: %d
 
 fr: Aucun réglage ne correspond à ce filtre.
 tr: No setting matches this filter.
+
+fr: @fullstrip : tout ce qu'il porte retourne dans son inventory. Le serveur ne répond rien quand c'est fait.
+tr: @fullstrip: everything they wear goes back to their inventory. The server replies nothing once it is done.
+
+fr: Ajoute autant de minutes de silence : ni chat ni\nskills. Appliqué deux fois, il prolonge.
+tr: Adds that many minutes of silence: no chat and no\nskills. Applied twice, it extends.
+
+fr: Ajoute des minutes de silence : ni chat ni skills.
+tr: Adds minutes of silence: no chat and no skills.
+
+fr: Bon point de manière pour %s
+tr: Good manner point for %s
+
+fr: Bon point de manière reçu de %s.
+tr: Received a good manner point from %s.
+
+fr: Bon point de manière###menu_entite_question
+tr: Good manner point###menu_entite_question
+
+fr: Bon point de manière…
+tr: Good manner point…
+
+fr: L'anti-spam vous a interdit le chat et les skills pour un moment.
+tr: The anti-spam system has blocked your chat and skills for a while.
+
+fr: Le point de manière a été appliqué.
+tr: The manner point has been applied.
+
+fr: Le staff vous a interdit le chat et les skills pour mauvaise conduite.
+tr: The staff has blocked your chat and skills for misconduct.
+
+fr: Mauvais point de manière pour %s
+tr: Bad manner point for %s
+
+fr: Mauvais point de manière###menu_entite_question
+tr: Bad manner point###menu_entite_question
+
+fr: Mauvais point de manière…
+tr: Bad manner point…
+
+fr: Retire autant de minutes à son silence, et le lève\nquand il n'en reste plus.
+tr: Takes that many minutes off their silence, and lifts\nit when none are left.
+
+fr: Retire des minutes à son silence, et le lève quand il n'en reste plus.
+tr: Takes minutes off their silence, and lifts it when none are left.
+
+fr: Retirer tout son équipement
+tr: Remove all their equipment
+
+fr: minutes###menu_entite_manieres
+tr: minutes###menu_entite_manieres

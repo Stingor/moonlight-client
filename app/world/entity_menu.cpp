@@ -466,6 +466,15 @@ void AddStaff(Composer& menu, const EntityMenuFacts& facts) {
              Tr("Ajoute 60 minutes de silence. Appliqué deux fois, il prolonge — ce n'est pas un "
                 "interrupteur."));
     menu.Add(Tr("Lui rendre la parole"), EntityVerb::kUnmute);
+    // LES POINTS DE MANIÈRE : le même silence, compté en minutes qu'on choisit.
+    // Le serveur les accepte de tout groupe qui a `@mute`, du niveau 40 au-dessus :
+    // tout le staff qui voit ce sous-menu.
+    menu.Add(Tr("Bon point de manière…"), EntityVerb::kMannerGood,
+             Tr("Retire des minutes à son silence, et le lève quand il n'en reste plus."))
+        .question = EntityMenuQuestion::kMannerGood;
+    menu.Add(Tr("Mauvais point de manière…"), EntityVerb::kMannerBad,
+             Tr("Ajoute des minutes de silence : ni chat ni skills."))
+        .question = EntityMenuQuestion::kMannerBad;
     menu.Add(Tr("Journal des blocages de chat"), EntityVerb::kChatBlockLog,
              Tr("Les @mute et @unmute qui ont visé ce personnage, datés, avec leur auteur et "
                 "leur durée, tels que le journal des commandes du serveur les a gardés.\n"
@@ -474,6 +483,14 @@ void AddStaff(Composer& menu, const EntityMenuFacts& facts) {
     // CE QUI PUNIT, en rouge et en dernier : on ne clique pas là par erreur en
     // visant la ligne du dessus.
     menu.Group();
+    // 🔴 NIVEAU 99 : le serveur ignore sans un mot `@fullstrip` d'un autre
+    // groupe. Montrée en dessous, la ligne ne ferait rien.
+    if (facts.admin) {
+      menu.Add(Tr("Retirer tout son équipement"), EntityVerb::kFullStrip,
+               Tr("@fullstrip : tout ce qu'il porte retourne dans son inventory. Le serveur ne "
+                  "répond rien quand c'est fait."))
+          .danger = true;
+    }
     menu.Add(Tr("Le foudroyer"), EntityVerb::kNuke,
              Tr("@nuke : une explosion sur sa case. Il meurt, avec la pénalité de mort "
                 "habituelle."))
