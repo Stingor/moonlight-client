@@ -443,6 +443,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.trade.SeeCommands(&pieces_.commands.settings());
   pieces_.trade.SeeItemProperties(&pieces_.item_properties);
   pieces_.trade.SeeBannedWords(&pieces_.banned_words);
+  pieces_.trade.SeeGameImages(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
   pieces_.chat_rooms.SeeBannedWords(&pieces_.banned_words);
   pieces_.whispers.SeeBannedWords(&pieces_.banned_words);
   pieces_.homunculus.SeeBannedWords(&pieces_.banned_words);

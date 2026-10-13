@@ -4,6 +4,7 @@
 #include <string>
 
 #include "ro/net/connection.h"
+#include "ro/render/game_images.h"
 #include "ro/render/item_icons.h"
 #include "ro/sim/banned_words.h"
 #include "ro/sim/command_settings.h"
@@ -80,6 +81,9 @@ struct TradeContext {
   // LES MOTS INTERDITS : le titre d'une échoppe qui en porte un ne part pas.
   // Nuls : rien n'est éprouvé.
   const ro::sim::BannedWords* banned = nullptr;
+  // Les images d'interface de l'installation, que la recherche d'échoppes
+  // pose sur les icônes. Nulles : aucune ne se pose.
+  ro::render::GameImages* images = nullptr;
 };
 
 }  // namespace moonclient

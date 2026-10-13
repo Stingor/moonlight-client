@@ -471,7 +471,8 @@ target_include_directories(moonclient_buyingstore PUBLIC ${CMAKE_CURRENT_SOURCE_
 # LA RECHERCHE D'ÉCHOPPES VUE DE L'ÉCRAN, à part de son étage : le catalogue
 # qu'elle parcourt, et les tables qui y disent qui est une carte.
 add_library(moonclient_storesearch STATIC
-    game/store_search_catalogue.cpp)
+    game/store_search_catalogue.cpp
+    game/store_search_grade.cpp)
 
 target_link_libraries(moonclient_storesearch
     PUBLIC ro_core ro_sim ro_vfs

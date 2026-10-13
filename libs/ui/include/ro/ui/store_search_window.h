@@ -24,6 +24,7 @@ namespace ro::ui {
 // Les gestes sont les siens :
 // - un DOUBLE-CLIC sur le nom d'une échoppe la désigne au serveur ; quand
 //   l'objet de catalogue ouvre les échoppes à distance, une boîte le confirme ;
+//   la souris y prend la main qui pointe, et ne la prend que là ;
 // - le survol montre en bulle le nom de l'échoppe, ou celui de l'objet ;
 // - l'icône et l'objet d'un résultat se manient comme un item de commerce
 //   (`TradeItemGesture`) : Maj + clic repose son lien dans la saisie, le clic
@@ -36,6 +37,12 @@ namespace ro::ui {
 // confirmation.
 
 inline constexpr const char* kStoreSearchWindowId = "###store_search";
+
+// LA TAILLE DE LA FENÊTRE À SA PREMIÈRE OUVERTURE, en pixels d'interface :
+// celle que l'installation du client d'origine donne à sa fenêtre de recherche
+// d'échoppes. Le client ne lit pas le script qui la porte : elle est écrite ici.
+inline constexpr float kStoreSearchWindowWidthPixels = 445.0F;
+inline constexpr float kStoreSearchWindowHeightPixels = 380.0F;
 
 // La place d'un champ de saisie, NUL compris : cinquante caractères, la limite
 // des champs du client d'origine.
@@ -70,6 +77,10 @@ struct StoreSearchWords {
 // UN RÉSULTAT DE LA PAGE MONTRÉE.
 struct StoreSearchRowView {
   TradeItemView item;
+  // L'EMBLÈME DU GRADE de l'objet, posé dans le coin bas gauche de son icône, à
+  // sa taille propre ; vide quand l'objet n'a pas de grade ou que l'installation
+  // n'a pas l'image.
+  SkinImage grade_badge;
   // Le nom de l'échoppe, arrêté au premier retour chariot.
   std::string_view shop_name;
   int amount = 0;

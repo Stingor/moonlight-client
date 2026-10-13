@@ -20,10 +20,7 @@ namespace {
 [[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES DU CLIENT D'ORIGINE ─────────────────────────────────────────
-// La largeur de la fenêtre et sa hauteur : dix lignes de vingt-cinq pixels,
-// l'en-tête et le formulaire au-dessus, le pied en dessous.
-constexpr float kFirstWidthPixels = 440.0F;
-constexpr float kFirstHeightPixels = 390.0F;
+// La hauteur d'une ligne de résultat.
 constexpr float kRowPixels = 25.0F;
 // Les colonnes : icône, échoppe, objet, quantité, prix.
 constexpr float kIconColumnPixels = 45.0F;
@@ -93,13 +90,23 @@ void DrawPrice(std::int64_t price_zeny) {
   ImGui::Dummy(size);
 }
 
-void DrawIcon(const TradeItemView& item) {
-  const float side = kTradeIconPixels * Scale();
-  if (item.icon.usable()) {
-    ImGui::Image(item.icon.id, ImVec2(side, side));
+// L'icône, et l'emblème du grade dans son coin bas gauche, à sa taille propre.
+void DrawIcon(const StoreSearchRowView& row) {
+  const float scale = Scale();
+  const float side = kTradeIconPixels * scale;
+  const ImVec2 at = ImGui::GetCursorScreenPos();
+  if (row.item.icon.usable()) {
+    ImGui::Image(row.item.icon.id, ImVec2(side, side));
   } else {
     ImGui::Dummy(ImVec2(side, side));
   }
+  if (!row.grade_badge.usable()) {
+    return;
+  }
+  const ImVec2 badge(row.grade_badge.width * scale, row.grade_badge.height * scale);
+  const ImVec2 low(at.x, at.y + side - badge.y);
+  ImGui::GetWindowDrawList()->AddImage(row.grade_badge.id, low,
+                                       ImVec2(low.x + badge.x, low.y + badge.y));
 }
 
 // La bulle et les gestes d'une cellule qui montre l'objet : ceux d'un item de
@@ -207,7 +214,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
                              OnBackground(kHoveredRowColor, PaintingLook().body));
     }
     ImGui::TableNextColumn();
-    DrawIcon(row.item);
+    DrawIcon(row);
     NoteItemCell(row_index, row.item, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
@@ -216,6 +223,8 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
                       ImGuiSelectableFlags_AllowDoubleClick);
     if (ImGui::IsItemHovered()) {
       action.hovered_row = row_index;
+      // LA MAIN QUI POINTE dit où le double-clic porte : sur l'échoppe seule.
+      ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
       SkinTooltip(std::string(row.shop_name).c_str());
       if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
         const StoreSearchPick pick{
@@ -334,8 +343,9 @@ StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state, const Sto
     return action;
   }
   const float scale = Scale();
-  ImGui::SetNextWindowSize(ImVec2(kFirstWidthPixels * scale, kFirstHeightPixels * scale),
-                           ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(
+      ImVec2(kStoreSearchWindowWidthPixels * scale, kStoreSearchWindowHeightPixels * scale),
+      ImGuiCond_FirstUseEver);
   const std::string title = std::string(view.words.title) + kStoreSearchWindowId;
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art, SkinnedTitle::kBar,
                                              ImGuiWindowFlags_NoCollapse);

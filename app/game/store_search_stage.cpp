@@ -2,15 +2,20 @@
 
 #include "game/store_search_stage.h"
 
+#include <cstdint>
+#include <string>
 #include <string_view>
 #include <utility>
 
 #include "ro/core/log.h"
 #include "ro/net/store_search.h"
+#include "ro/render/game_images.h"
+#include "ro/render/skin_pieces.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/trade_words.h"
 
 #include "game/store_search_catalogue.h"
+#include "game/store_search_grade.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -19,6 +24,23 @@ namespace {
 using ro::vfs::TradeWord;
 
 constexpr char kCarriageReturn = '\r';
+
+// L'emblème du grade, pris dans l'habillage de l'installation ; vide sans
+// grade, sans images, ou quand l'installation ne l'a pas.
+ro::ui::SkinImage GradeBadgeOf(std::uint8_t grade, ro::render::GameImages* images) {
+  const std::string path = StoreSearchGradeBadgePath(grade);
+  if (path.empty() || images == nullptr) {
+    return {};
+  }
+  const ro::render::IconTexture& badge =
+      images->GetOurs(std::string(ro::render::kSkinRoot).append(path));
+  if (!badge.usable()) {
+    return {};
+  }
+  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(badge.texture.name()),
+                           .width = static_cast<float>(badge.width_px),
+                           .height = static_cast<float>(badge.height_px)};
+}
 
 // Le mot d'un refus de la saisie, avec les mots du jeu.
 TradeWord WordOfFault(ro::sim::StoreSearchFault fault) {
@@ -250,6 +272,7 @@ void StoreSearchStage::Compose(const ro::ui::StoreSearchWindowState& state,
         .item = ro::ui::TradeItemView{.item_id = result.item.item_id,
                                       .name = names_[rank],
                                       .icon = context.items.IconOf(result.item.item_id)},
+        .grade_badge = GradeBadgeOf(result.item.grade, context.images),
         .shop_name = ShownShopName(result.shop_name),
         .amount = result.item.amount,
         .price_zeny = result.price_zeny,

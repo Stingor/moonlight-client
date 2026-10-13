@@ -46,6 +46,9 @@ class TradeStages {
   // adresse donnée une fois.
   // Les mots interdits de l'installation, qu'un titre d'échoppe éprouve.
   void SeeBannedWords(const ro::sim::BannedWords* banned) noexcept { banned_ = banned; }
+  // Les images d'interface de l'installation. Même règle : une adresse donnée
+  // une fois.
+  void SeeGameImages(ro::render::GameImages* images) noexcept { images_ = images; }
   void SeeItemProperties(const ro::vfs::ItemProperties* properties) noexcept {
     item_properties_ = properties;
   }
@@ -128,6 +131,7 @@ class TradeStages {
   const ro::sim::CommandSettings* commands_ = nullptr;
   const ro::vfs::ItemProperties* item_properties_ = nullptr;
   const ro::sim::BannedWords* banned_ = nullptr;
+  ro::render::GameImages* images_ = nullptr;
   NpcShopStage npc_shop_;
   BarterStage barter_;
   BuyingStoreStage buying_store_;

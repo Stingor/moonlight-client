@@ -86,7 +86,8 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
                              .now_ms = now_ms,
                              .commands = commands_,
                              .item_properties = item_properties_,
-                             .banned = banned_};
+                             .banned = banned_,
+                             .images = images_};
   if (in_chat_room) {
     RefuseStoresInChatRoom(windows, context);
   }
