@@ -204,8 +204,12 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void NoteScreenTargets();
   // LA FLÈCHE DU JEU, à chaque image : ce que l'action du personnage et la
   // souris font de l'engagement, la décision qui en découle — que le mode
-  // Ciblage détourne —, puis le dessin. Voir `world/native_marker.h`.
+  // Ciblage détourne —, en tête d'image ; puis le dessin. Voir
+  // `world/native_marker.h`.
+  void DecideSelectionMarker(std::uint32_t now_ms);
   void DrawSelectionMarker(std::uint32_t now_ms);
+  // Un nom cliqué dans la fenêtre Groupe / Amis : voir `world/name_click.h`.
+  void ClickName(std::uint32_t account_id, std::uint32_t now_ms);
   void PlaceSelectionMarker(MarkerCall call, std::uint32_t now_ms);
   [[nodiscard]] EngagementFrame UnderMouse() const;
   // Un ordre d'attaque explicite — double-clic, cadre du HUD — sur `target`.

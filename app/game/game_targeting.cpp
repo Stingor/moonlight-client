@@ -17,11 +17,15 @@
 #include "ro/net/target_info.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/sim/guild.h"
 #include "ro/sim/movement.h"
 
 #include "game/game.h"
+#include "world/armed_cursor.h"
 #include "world/click_action.h"
+#include "world/click_rules.h"
 #include "world/map_stage.h"
+#include "world/name_click.h"
 #include "world/name_plate_view.h"
 #include "world/versus_gate.h"
 
@@ -79,6 +83,7 @@ void Game::AdvanceTargeting(std::uint32_t now_ms) {
   // Ce que le HUD a reçu à l'image précédente.
   const ro::ui::TargetHudAnswer answer = std::exchange(windows_.target_hud.answer, {});
   target_hud_hovered_ = answer.hovered;
+  targeting_.NoteFrameHover(answer.hovered);
   // Un cadre déplacé s'écrit, une fois : `Touch` arme l'anti-rebond du fichier.
   if (answer.moved) {
     settings_->file().Touch();
@@ -264,8 +269,15 @@ void Game::PlaceSelectionMarker(MarkerCall call, std::uint32_t now_ms) {
   ApplyMarker(marker_pose_, MarkerOrder::kShow, GroundPositionAt(*stage_, placed.x, placed.y));
 }
 
-void Game::DrawSelectionMarker(std::uint32_t now_ms) {
-  if (!link_.is_open()) {
+// 🔴 LA DÉCISION SE PREND EN TÊTE D'IMAGE, AVANT LE RÉSEAU ET LE TIC qui font
+// avancer les acteurs et partir l'action en attente ; le dessin, lui, suit.
+// Une compétence lancée à portée garde donc sa flèche l'image de son départ :
+// la décision l'a vue en attente, et c'est l'image suivante qui la voit partie.
+void Game::DecideSelectionMarker(std::uint32_t now_ms) {
+  // L'image précédente, dont la décision lit les positions : voir `MarkerSampleMs`.
+  const std::uint32_t sample_ms = MarkerSampleMs(marker_previous_frame_ms_, now_ms);
+  marker_previous_frame_ms_ = now_ms;
+  if (!link_.is_open() || !stage_.has_value()) {
     return;
   }
   MouseEngagement& engagement = world_mouse_.engagement;
@@ -278,19 +290,8 @@ void Game::DrawSelectionMarker(std::uint32_t now_ms) {
   }
 
   // L'ACTION DU PERSONNAGE D'ABORD : c'est sa fin qui fait le plus souvent
-  // retomber l'engagement. Une compétence qui attend sa portée est l'action en
-  // cours, d'où qu'elle soit partie — un clic, une touche, un cadre —, et elle
-  // s'achève en partant ; un ramassage s'achève fait ou abandonné.
-  const PlayerDeed deed = engagement.action.deed;
-  if (const std::uint32_t aimed = grimoire_.pending_target_id(); aimed != 0) {
-    if (deed != PlayerDeed::kSkillOnTarget || engagement.action.target_id != aimed) {
-      NoteDeed(engagement, PlayerDeed::kSkillOnTarget, aimed, /*stops_on_release=*/false);
-    }
-  } else if (deed == PlayerDeed::kSkillOnTarget ||
-             (deed == PlayerDeed::kPickup && !pickup_.has_value())) {
-    EndDeed(engagement);
-  }
-  AdvanceDeed(engagement, world_);
+  // retomber l'engagement. Voir `FollowOwnAction`.
+  FollowOwnAction(engagement, grimoire_.pending_target_id(), pickup_.has_value(), world_);
 
   // LA MORT fait retomber et cache la flèche, une fois ; puis tout se fige.
   const ro::sim::Actor* self = world_.player();
@@ -319,7 +320,13 @@ void Game::DrawSelectionMarker(std::uint32_t now_ms) {
     PlaceSelectionMarker(
         UnderTargetingMode(NativeMarkerCall(engagement, world_, world_mouse_.follow.followed_id),
                            hud_marked),
-        now_ms);
+        sample_ms);
+  }
+}
+
+void Game::DrawSelectionMarker(std::uint32_t now_ms) {
+  if (!link_.is_open()) {
+    return;
   }
   if (!marker_epoch_ms_.has_value()) {
     marker_epoch_ms_ = now_ms;
@@ -346,6 +353,102 @@ void Game::DrawSelectionMarker(std::uint32_t now_ms) {
                   ro::render::SpriteRenderer::DepthWrite::kOff,
                   ro::render::SpriteRenderer::DepthTest::kOff);
   }
+}
+
+void Game::ClickName(std::uint32_t account_id, std::uint32_t now_ms) {
+  if (!link_.is_open()) {
+    return;
+  }
+  const ro::sim::Actor* self = world_.player();
+  const bool is_self = account_id == world_.player_id();
+  const ro::sim::Actor* named = is_self ? self : world_.Find(account_id);
+  // LA COMPÉTENCE QUE L'APPUI A DÉSARMÉE : le nom la vise encore. Voir
+  // `PressOnWindowDisarms`.
+  const std::optional<ro::sim::KnownSkill> pressed = std::exchange(world_mouse_.armed_at_press, {});
+  const ro::sim::KnownSkill* armed = pressed.has_value() ? &*pressed : nullptr;
+  NamedAim aim = NamedAim::kNothing;
+  switch (armed != nullptr ? SkillAimOf(*armed) : SkillAim::kNothing) {
+    case SkillAim::kNothing:
+      break;
+    case SkillAim::kTarget:
+      aim = SkillAimKindOf(*armed) == SkillAimKind::kSupport ? NamedAim::kSupport
+                                                             : NamedAim::kOffensive;
+      break;
+    case SkillAim::kGround:
+    case SkillAim::kTrap:
+      aim = NamedAim::kElsewhere;
+      break;
+  }
+  const std::uint16_t skill_id = armed != nullptr ? armed->id : 0;
+  const std::uint32_t own_guild = self != nullptr ? self->guild_id : 0;
+  const std::uint32_t named_guild = named != nullptr ? named->guild_id : 0;
+  const bool allied = std::ranges::any_of(
+      guild_book_.relations(), [named_guild](const ro::sim::GuildRelation& relation) {
+        return relation.kind == ro::sim::GuildRelationKind::kAlly &&
+               static_cast<std::uint32_t>(relation.guild_id) == named_guild;
+      });
+  const SDL_Keymod modifiers = SDL_GetModState();
+  MouseEngagement& engagement = world_mouse_.engagement;
+  const bool siege = SiegeMap(engagement, world_.map_mode());
+  const NameClickOrder order = NameClickOrderOf(
+      NameClickScene{.aim = aim,
+                     .skill_id = skill_id,
+                     .self = is_self,
+                     .dead = self != nullptr && self->posture == ro::sim::Posture::kDead,
+                     .shift_held = (modifiers & SDL_KMOD_SHIFT) != 0,
+                     .no_shift = settings_->options().no_shift(),
+                     .alt_held = (modifiers & SDL_KMOD_ALT) != 0,
+                     .second_of_double = engagement.press_doubled,
+                     .pk_zone = NameClickPkZone(world_.map_type()),
+                     .siege_map = siege,
+                     .online_party_member = party_.HasOnlineMember(account_id),
+                     .seen = !is_self && named != nullptr,
+                     .same_guild = own_guild != 0 && named_guild == own_guild,
+                     .allied_guild = named_guild != 0 && allied});
+  if (order == NameClickOrder::kNothing) {
+    return;
+  }
+  NoteNamedClick(engagement,
+                 Targeting::WantsContinuousAttack(siege, (modifiers & SDL_KMOD_CTRL) != 0,
+                                                  settings_->options().no_ctrl()));
+  if (!PassesWeightGuard(world_, skill_id, now_ms) || order == NameClickOrder::kEngageOnly) {
+    return;
+  }
+  if (order == NameClickOrder::kSkill) {
+    // Assis ou caché, rien ne part : voir `TakesSkillOrder`.
+    if (self != nullptr && !TakesSkillOrder(*self, skill_id)) {
+      return;
+    }
+    // HORS DE VUE, RIEN NE PART, et l'action qui le visait s'achève à la
+    // décision suivante : c'est ce qu'en fait le tic du jeu, qui ne trouve pas
+    // sa cible. L'action précédente, elle, est remplacée.
+    pickup_.reset();
+    attack_.reset();
+    grimoire_.CancelPending();
+    if (named != nullptr) {
+      grimoire_.CastOn(*armed, *named);
+    }
+    NoteDeed(engagement, PlayerDeed::kSkillOnTarget, account_id, /*stops_on_release=*/false);
+    return;
+  }
+  // Sans compétence armée : une attaque, comme un clic sur le sprite — que le
+  // serveur refuse hors d'une zone de combat.
+  if (self != nullptr && !TakesAttackOrder(*self)) {
+    return;
+  }
+  const bool continuous = engagement.continuous;
+  pickup_.reset();
+  attack_.reset();
+  grimoire_.CancelPending();
+  if (named == nullptr) {
+    NoteDeed(engagement, PlayerDeed::kAttack, account_id, /*stops_on_release=*/!continuous);
+    return;
+  }
+  ReportRefusal(ClickOn(link_, world_, *named, now_ms,
+                        ClickIntents{pickup_, attack_, grimoire_.approach_clock(),
+                                     &world_mouse_.deferred_walk, scene_actors_.player_gesture},
+                        continuous));
+  NoteDeedOfClickOn(&engagement, world_, *named, continuous);
 }
 
 }  // namespace moonclient

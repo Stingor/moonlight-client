@@ -173,6 +173,10 @@ class Targeting {
   // L'identifiant cliqué au bouton gauche, ou zéro ; puis au bouton droit.
   [[nodiscard]] std::uint32_t TakeFrameClick();
   [[nodiscard]] std::uint32_t TakeFrameMenu();
+  // La souris était sur un cadre qui agit, à l'image précédente : un appui y
+  // vaut un clic sur l'entité, et ne désarme pas la visée.
+  void NoteFrameHover(bool hovered) noexcept { frame_hovered_ = hovered; }
+  [[nodiscard]] bool frame_hovered() const noexcept { return frame_hovered_; }
 
   // Les cadres reprennent-ils la souris cette image ? Il faut une cible, des
   // cadres verrouillés, et que cliquer l'entité veuille dire quelque chose.
@@ -230,6 +234,7 @@ class Targeting {
 
   std::uint32_t frame_click_id_ = 0;
   std::uint32_t frame_menu_id_ = 0;
+  bool frame_hovered_ = false;
   // L'entité dont la fenêtre est masquée à la main, ou zéro.
   std::uint32_t hidden_id_ = 0;
   std::optional<std::uint32_t> selection_write_;

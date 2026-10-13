@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 
 #include "ro/sim/actor.h"
 #include "ro/sim/movement.h"
@@ -78,6 +79,14 @@ struct MarkerCall {
 [[nodiscard]] ro::sim::FractionalCell MarkerCell(ro::sim::FractionalCell actor_cell,
                                                  int map_width_cells, int map_height_cells,
                                                  float cell_units);
+
+// L'INSTANT OÙ LA FLÈCHE LIT LA POSITION DE SON ENTITÉ : celui de l'image
+// PRÉCÉDENTE. La décision se prend en tête d'image, avant que les acteurs
+// n'avancent : elle voit l'entité où l'image précédente l'a laissée, et une
+// entité qui marche a toujours une image d'avance sur sa flèche. La première
+// image n'a pas de précédente, et lit le présent.
+[[nodiscard]] std::uint32_t MarkerSampleMs(std::optional<std::uint32_t> previous_frame_ms,
+                                           std::uint32_t now_ms);
 
 // La flèche telle qu'elle est posée. Elle naît cachée.
 struct MarkerPose {

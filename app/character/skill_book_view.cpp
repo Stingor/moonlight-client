@@ -96,14 +96,15 @@ void SkillBookPanel::Toggle() {
   }
 }
 
-SkillAim SkillBookPanel::aim() const {
-  if (!armed_.has_value()) {
-    return SkillAim::kNothing;
-  }
-  if (ro::sim::SkillNeedsGround(*armed_)) {
+SkillAim SkillAimOf(const KnownSkill& skill) {
+  if (ro::sim::SkillNeedsGround(skill)) {
     return SkillAim::kGround;
   }
-  return ro::sim::SkillTargetsTrap(*armed_) ? SkillAim::kTrap : SkillAim::kTarget;
+  return ro::sim::SkillTargetsTrap(skill) ? SkillAim::kTrap : SkillAim::kTarget;
+}
+
+SkillAim SkillBookPanel::aim() const {
+  return armed_.has_value() ? SkillAimOf(*armed_) : SkillAim::kNothing;
 }
 
 const KnownSkill* SkillBookPanel::armed() const { return armed_.has_value() ? &*armed_ : nullptr; }

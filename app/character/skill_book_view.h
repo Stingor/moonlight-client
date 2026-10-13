@@ -47,6 +47,10 @@ struct GroundCast {
 // refusé. Un clic muet ne laisse aucun moyen de distinguer « la demande n'est
 // pas partie » de « elle est partie et le serveur n'en a rien fait », et c'est
 // la première question qu'on se pose quand rien n'apparaît.
+// La visée qu'une compétence armée attend : une case, un piège posé, ou
+// quelqu'un.
+[[nodiscard]] SkillAim SkillAimOf(const ro::sim::KnownSkill& skill);
+
 class SkillBookPanel {
  public:
   [[nodiscard]] bool open() const noexcept { return open_; }

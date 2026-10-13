@@ -287,6 +287,12 @@ struct PartyFriendAction {
   int share = 0;
 
   // Ce qui peut arriver dans la même image qu'un verbe.
+  //
+  // LE NOM CLIQUÉ : un appui gauche sur la ligne d'un membre du groupe ou d'un
+  // ami EN LIGNE, soi compris, que le joueur soit en vue ou non. `app` en fait
+  // ce qu'un clic sur son sprite ferait — viser, frapper — selon la compétence
+  // armée et les touches tenues ; zéro, aucun.
+  std::uint32_t named_account_id = 0;
   bool settings_asked = false;
   // La fenêtre de recherche de groupe est demandée.
   bool booking_asked = false;

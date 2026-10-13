@@ -816,6 +816,7 @@ add_library(moonclient_targeting STATIC
     world/click_rules.cpp
     world/follow_rules.cpp
     world/mouse_engagement.cpp
+    world/name_click.cpp
     world/native_marker.cpp
     world/target_facts.cpp
     world/targeting.cpp)

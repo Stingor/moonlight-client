@@ -103,6 +103,8 @@ class GameFoundation {
   // L'entrée sur la carte : l'animation de la flèche compte depuis elle. Vide
   // jusqu'au premier dessin qui la suit.
   std::optional<std::uint32_t> marker_epoch_ms_;
+  // L'instant de la décision précédente : voir `MarkerSampleMs`.
+  std::optional<std::uint32_t> marker_previous_frame_ms_;
   // La mort cache la flèche une fois, au moment où elle survient.
   bool player_was_dead_ = false;
   // La souris était sur un cadre qui agit, à l'image précédente : le curseur

@@ -119,26 +119,40 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     // son anneau.
     const bool held_sword = world_takes_clicks && aim == SkillAim::kNothing &&
                             EngagementShowsSword(world_mouse_.engagement);
+    ro::render::CursorShape over_actor = ShapeUnderShift(
+        CursorShapeOver(hovered_other, GroundHoverOn((*stage_), hovered_cell),
+                        VersusGateOf(world_, shift_held, settings_->options().no_shift())),
+        hovered_other, shift_held, settings_->options().no_shift());
+    // UNE COMPÉTENCE VISÉE SUR UN JOUEUR OU UN MONSTRE : l'anneau vif là où le
+    // clic la lancerait, le lent ailleurs — voir `AimedSkillReachesActor`.
+    if (const ro::sim::KnownSkill* aimed = grimoire_.armed();
+        aimed != nullptr && grimoire_.aim() == SkillAim::kTarget && hovered_other != nullptr &&
+        (hovered_other->kind == ro::sim::ActorKind::kPlayer ||
+         hovered_other->kind == ro::sim::ActorKind::kMonster) &&
+        hovered_other->posture != ro::sim::Posture::kDead) {
+      // ⚠ ALT NE CHANGE PAS LA FORME : seul le clic le lit.
+      over_actor = AimedSkillReachesActor(world_, *hovered_other, *aimed, world_mouse_.ties,
+                                          AimKeys{.shift_held = shift_held,
+                                                  .no_shift = settings_->options().no_shift(),
+                                                  .alt_held = false},
+                                          SiegeMap(world_mouse_.engagement, world_.map_mode()),
+                                          /*for_cursor=*/true)
+                       ? ro::render::CursorShape::kAttack
+                       : ro::render::CursorShape::kArrow;
+    }
     const ro::render::CursorShape shape =
-        gate.mouse_to_ui
-            ? over_interface
-            : ArmedCursor(
-                  aim, designated,
-                  // ⚠ MAJ SE RELIT À CHAQUE IMAGE ICI, et non à l'appui :
-                  // presser la touche change la forme du curseur sans
-                  // qu'on bouge la souris, et c'est ainsi qu'on voit
-                  // qu'une cible est devenue atteignable avant de
-                  // cliquer. Le clic, lui, relève l'état de son APPUI.
-                  CameraTurning() ? ro::render::CursorShape::kRotate
-                  : held_sword    ? ro::render::CursorShape::kAttack
-                  : over_store    ? ro::render::CursorShape::kPoint
-                  : on_unit.has_value()
-                      ? *on_unit
-                      : ShapeUnderShift(
-                            CursorShapeOver(
-                                hovered_other, GroundHoverOn((*stage_), hovered_cell),
-                                VersusGateOf(world_, shift_held, settings_->options().no_shift())),
-                            hovered_other, shift_held, settings_->options().no_shift()));
+        gate.mouse_to_ui ? over_interface
+                         : ArmedCursor(aim, designated,
+                                       // ⚠ MAJ SE RELIT À CHAQUE IMAGE ICI, et non à l'appui :
+                                       // presser la touche change la forme du curseur sans
+                                       // qu'on bouge la souris, et c'est ainsi qu'on voit
+                                       // qu'une cible est devenue atteignable avant de
+                                       // cliquer. Le clic, lui, relève l'état de son APPUI.
+                                       CameraTurning()       ? ro::render::CursorShape::kRotate
+                                       : held_sword          ? ro::render::CursorShape::kAttack
+                                       : over_store          ? ro::render::CursorShape::kPoint
+                                       : on_unit.has_value() ? *on_unit
+                                                             : over_actor);
     if (shape != cursor_shape_) {
       cursor_shape_ = shape;
       cursor_since_ms_ = now_ms;

@@ -66,6 +66,10 @@ ro::sim::FractionalCell MarkerCell(ro::sim::FractionalCell actor_cell, int map_w
   return {across / cell_units - to_centre_x, along / cell_units - to_centre_y};
 }
 
+std::uint32_t MarkerSampleMs(std::optional<std::uint32_t> previous_frame_ms, std::uint32_t now_ms) {
+  return previous_frame_ms.value_or(now_ms);
+}
+
 void ApplyMarker(MarkerPose& pose, MarkerOrder order, const std::array<float, 3>& ground) {
   switch (order) {
     case MarkerOrder::kKeep:

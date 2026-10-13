@@ -143,6 +143,12 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   // L'ADOPTION : la réponse à la demande reçue, et les refus de la nôtre.
   pieces_.adoption.Advance(windows_.party.adoption, link_, world_, now_ms);
 
+  // LE NOM CLIQUÉ vise ou frappe comme un clic sur le sprite : voir
+  // `world/name_click.h`.
+  if (asked.named_account_id != 0) {
+    ClickName(asked.named_account_id, now_ms);
+  }
+
   // Un membre qu'un acteur représente : son menu d'entité, ou la désignation.
   const auto open_menu = [this, own, now_ms](std::uint32_t account_id) {
     if (const ro::sim::Actor* actor = world_.Find(account_id); actor != nullptr) {

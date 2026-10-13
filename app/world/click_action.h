@@ -28,6 +28,11 @@
 #include "world/overlay_view.h"
 #include "world/targeting.h"
 
+namespace ro::sim {
+class GuildBook;
+class PartyRoster;
+}  // namespace ro::sim
+
 namespace moonclient {
 
 struct GroundUnitPick;
@@ -199,6 +204,29 @@ struct ClickIntents {
 void NoteDeedOfClickOn(MouseEngagement* engagement, const ro::sim::World& world,
                        const ro::sim::Actor& target, bool repeat);
 
+// LES LIENS DU PERSONNAGE QUE LA VISÉE CONSULTE : son groupe et sa guilde.
+// Nuls hors partie : personne n'est alors membre, ni allié.
+struct SocialTies {
+  const ro::sim::PartyRoster* party = nullptr;
+  const ro::sim::GuildBook* guild = nullptr;
+};
+
+// Les touches d'une visée, relevées à l'appui pour le clic, à l'image pour le
+// curseur.
+struct AimKeys {
+  bool shift_held = false;
+  bool no_shift = false;
+  bool alt_held = false;
+};
+
+// LA COMPÉTENCE VISÉE ATTEINT-ELLE CE SPRITE ? Un joueur ou un monstre suit
+// `AimedSkillReachesPlayer` ou `AimedSkillReachesMonster` (`world/name_click.h`) ;
+// tout autre acteur, oui. `for_cursor` épargne en outre un monstre de ma
+// guilde, ce que le clic ne fait pas.
+[[nodiscard]] bool AimedSkillReachesActor(const ro::sim::World& world, const ro::sim::Actor& target,
+                                          const ro::sim::KnownSkill& skill, SocialTies ties,
+                                          AimKeys keys, bool siege_map, bool for_cursor);
+
 // Ce qu'un clic gauche a sous la main.
 //
 // Passé par pointeurs plutôt que gardé : le routage ne POSSÈDE rien. C'est
@@ -277,6 +305,8 @@ struct WorldClick {
   // `/noshift` : MAJ ne retient plus le clic sur un monstre — voir
   // `MonsterClickWithheld`.
   bool no_shift = false;
+  // Le groupe et la guilde, que la compétence visée consulte sur un joueur.
+  SocialTies ties;
 };
 
 // Ce qui arrête la souris dans le monde, à cet instant : la mort, le coffre, un
@@ -320,6 +350,12 @@ struct WorldMouse {
   DoubleClickClocks double_click;
   // Le joueur que le personnage suit : voir `world/follow_rules.h`.
   FollowState follow;
+  // Le groupe et la guilde du personnage, posés à l'ouverture de la partie.
+  SocialTies ties;
+  // LA COMPÉTENCE QU'UN APPUI SUR UNE FENÊTRE VIENT DE DÉSARMER : la ligne
+  // d'un nom, que l'interface lit après l'appui, la vise encore. Vide sans
+  // compétence armée, ou après tout autre appui.
+  std::optional<ro::sim::KnownSkill> armed_at_press;
 };
 
 // Ce qu'un clic gauche déclenche, dans l'ordre où le jeu tranche.

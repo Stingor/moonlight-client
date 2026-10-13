@@ -446,9 +446,14 @@ void DrawPartyRow(PartyFriendWindowState& state, const PartyFriendView& view,
   // Pas de sprite, pas de cible : un HUD de cible vide ne vaut pas un clic muet.
   const bool targetable =
       look.click_targets && !member.offline && (member.is_me || member.actor_present);
-  if (targetable && row_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+  const bool left_pressed = row_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+  if (targetable && left_pressed) {
     action.verb = PartyFriendVerb::kTarget;
     action.account_id = member.account_id;
+  }
+  // LE NOM SE CLIQUE, en vue ou non : voir `PartyFriendAction::named_account_id`.
+  if (!member.offline && left_pressed) {
+    action.named_account_id = member.account_id;
   }
   if (look.click_targets) {
     if (member.account_id != 0 && member.account_id == view.target_account_id) {
@@ -487,9 +492,14 @@ void DrawFriendRow(PartyFriendWindowState& state, const PartyFriendView& view,
                   row.online ? core::Tr("En ligne") : core::Tr("Hors ligne"));
 
   const float bottom = ImGui::GetCursorScreenPos().y;
-  if (ImGui::IsWindowHovered() &&
-      ImGui::IsMouseHoveringRect(origin, ImVec2(origin.x + row_width, bottom)) &&
-      ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+  const bool row_hovered = ImGui::IsWindowHovered() &&
+                           ImGui::IsMouseHoveringRect(origin, ImVec2(origin.x + row_width, bottom));
+  // LE NOM D'UN AMI SE CLIQUE COMME CELUI D'UN MEMBRE : voir
+  // `PartyFriendAction::named_account_id`.
+  if (row.online && row_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+    action.named_account_id = row.account_id;
+  }
+  if (row_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
     if (row.online && row.actor_present) {
       action.verb = PartyFriendVerb::kEntityMenu;
       action.account_id = row.account_id;

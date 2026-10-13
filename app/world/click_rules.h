@@ -20,6 +20,18 @@ namespace moonclient {
 // relâchement du bouton.
 [[nodiscard]] constexpr bool WorldTakesClicks(MouseRoute route) noexcept { return !route.frozen; }
 
+// L'APPUI GAUCHE FRAIS SUR UNE FENÊTRE DÉSARME LA COMPÉTENCE ARMÉE — toute
+// fenêtre, sa partie vide comprise, la barre de raccourcis aussi : elle arme au
+// RELÂCHEMENT, si bien que l'appui fait place nette avant. Le second appui d'un
+// double-clic ne désarme pas.
+//
+// ⚠ UN CADRE QUI AGIT COMME LA CIBLE (`over_acting_frame`) N'EST PAS UNE
+// FENÊTRE ICI : son clic vaut un clic sur l'entité, et la visée l'attend.
+[[nodiscard]] constexpr bool PressOnWindowDisarms(bool second_of_double,
+                                                  bool over_acting_frame) noexcept {
+  return !second_of_double && !over_acting_frame;
+}
+
 // CTRL TENU, LE CLIC AU SOL NE BOUGE PAS LE PERSONNAGE : ni marche, ni
 // demi-tour — au clic comme à sa reprise, bouton tenu. Un sort au sol part
 // quand même : il se résout avant.

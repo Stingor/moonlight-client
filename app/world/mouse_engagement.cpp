@@ -61,6 +61,7 @@ void Disengage(MouseEngagement& engagement) {
 void NoteLeftPress(MouseEngagement& engagement, bool second_of_double, MouseRoute route) {
   engagement.left_held = true;
   engagement.fresh_press = true;
+  engagement.press_doubled = second_of_double;
   if (route.runs() && engagement.engaged && engagement.continuous && !second_of_double) {
     Disengage(engagement);
   }
@@ -72,6 +73,26 @@ void NoteEngagingClick(MouseEngagement& engagement, std::uint32_t id, bool conti
   engagement.engaged = true;
   engagement.continuous = continuous;
   engagement.clicked_id = id;
+}
+
+void NoteNamedClick(MouseEngagement& engagement, bool continuous) {
+  engagement.engaged = true;
+  engagement.continuous = continuous;
+}
+
+void FollowOwnAction(MouseEngagement& engagement, std::uint32_t aimed_target_id,
+                     bool pickup_pending, const ro::sim::World& world) {
+  const PlayerDeed deed = engagement.action.deed;
+  if (aimed_target_id != 0) {
+    if (deed != PlayerDeed::kSkillOnTarget || engagement.action.target_id != aimed_target_id) {
+      NoteDeed(engagement, PlayerDeed::kSkillOnTarget, aimed_target_id,
+               /*stops_on_release=*/false);
+    }
+  } else if (deed == PlayerDeed::kSkillOnTarget ||
+             (deed == PlayerDeed::kPickup && !pickup_pending)) {
+    EndDeed(engagement);
+  }
+  AdvanceDeed(engagement, world);
 }
 
 void NoteRelease(MouseEngagement& engagement) {

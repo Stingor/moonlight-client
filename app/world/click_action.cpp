@@ -15,7 +15,10 @@
 #include "ro/render/ground_pick.h"
 #include "ro/render/map_scene.h"
 #include "ro/sim/chat_line.h"
+#include "ro/sim/guild.h"
+#include "ro/sim/map_mode.h"
 #include "ro/sim/movement.h"
+#include "ro/sim/party_roster.h"
 #include "ro/sim/player_status.h"
 #include "ro/sim/skill_book.h"
 #include "ro/sim/world.h"
@@ -25,6 +28,7 @@
 #include "world/blocked_npcs.h"
 #include "world/cast_bar_view.h"
 #include "world/ground_unit_view.h"
+#include "world/name_click.h"
 #include "world/overlay_view.h"
 
 namespace moonclient {
@@ -104,6 +108,46 @@ bool SkillOnActorPasses(ro::sim::World& world, std::uint16_t skill_id, std::uint
   }
   const ro::sim::Actor* self = world.player();
   return self == nullptr || TakesSkillOrder(*self, skill_id);
+}
+
+bool AimedSkillReachesActor(const ro::sim::World& world, const ro::sim::Actor& target,
+                            const ro::sim::KnownSkill& skill, SocialTies ties, AimKeys keys,
+                            bool siege_map, bool for_cursor) {
+  const ro::sim::Actor* self = world.player();
+  const std::uint32_t own_guild = self != nullptr ? self->guild_id : 0;
+  const bool same_guild = own_guild != 0 && target.guild_id == own_guild;
+  const ro::sim::MapMode& mode = world.map_mode();
+  if (target.kind == ro::sim::ActorKind::kMonster) {
+    const bool spared = for_cursor && same_guild && (mode.attackable_beyond_guild || siege_map);
+    return AimedSkillReachesMonster(skill.id, keys.shift_held, keys.no_shift, keys.alt_held,
+                                    spared);
+  }
+  if (target.kind != ro::sim::ActorKind::kPlayer) {
+    return true;
+  }
+  const bool allied =
+      ties.guild != nullptr && target.guild_id != 0 &&
+      std::ranges::any_of(ties.guild->relations(), [&target](const ro::sim::GuildRelation& tie) {
+        return tie.kind == ro::sim::GuildRelationKind::kAlly &&
+               static_cast<std::uint32_t>(tie.guild_id) == target.guild_id;
+      });
+  return AimedSkillReachesPlayer(AimedPlayerScene{
+      .skill_id = skill.id,
+      .support = SkillAimKindOf(skill) == SkillAimKind::kSupport,
+      .self = target.id == world.player_id(),
+      .shift_held = keys.shift_held,
+      .no_shift = keys.no_shift,
+      .alt_held = keys.alt_held,
+      .battlefield = mode.battlefield,
+      .other_team = mode.battlefield && !world.battlefield().IsAlly(target.id),
+      .beyond_party = mode.attackable_beyond_party,
+      .beyond_guild = mode.attackable_beyond_guild,
+      .siege_map = siege_map,
+      .open_field =
+          target.pk_mode || NameClickPkZone(world.map_type()) || mode.attackable_without_shift,
+      .online_party_member = ties.party != nullptr && ties.party->HasOnlineMember(target.id),
+      .same_guild = same_guild,
+      .allied_guild = allied});
 }
 
 bool ActorTakesClick(const ro::sim::Actor& actor, VersusGate versus) {
@@ -369,11 +413,20 @@ HeldClick LeftClick(const WorldClick& scene, glm::vec2 mouse_px, const ClickInte
     // La compétence ARMÉE d'abord, et sur N'IMPORTE QUI : c'est une visée, et
     // un soin se lance justement sur un autre joueur ou sur soi-même.
     //
-    // Refusée — trop chargé, assis, caché —, rien ne part, et la visée se
-    // désarme comme après un lancer.
+    // Refusée — un joueur ou un monstre que les tables ne laissent pas viser,
+    // trop chargé, assis, caché —, rien ne part, et la visée se désarme comme
+    // après un lancer. Voir `AimedSkillReachesActor`.
     if (const ro::sim::KnownSkill* aimed = scene.skills->armed();
         aimed != nullptr && aim == SkillAim::kTarget &&
-        !SkillOnActorPasses(*scene.world, aimed->id, scene.now_ms)) {
+        (!AimedSkillReachesActor(
+             *scene.world, *target, *aimed, scene.ties,
+             AimKeys{.shift_held = scene.shift_held,
+                     .no_shift = scene.no_shift,
+                     .alt_held = scene.alt_held},
+             SiegeMap(scene.engagement != nullptr ? *scene.engagement : MouseEngagement{},
+                      scene.world->map_mode()),
+             /*for_cursor=*/false) ||
+         !SkillOnActorPasses(*scene.world, aimed->id, scene.now_ms))) {
       scene.skills->Disarm();
       return HeldClick::kNothing;
     }

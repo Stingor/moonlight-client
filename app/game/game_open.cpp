@@ -58,6 +58,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // d'avant. Les explications des PNJ bloqués se redisent aussi : c'est une
   // nouvelle session.
   windows_.entity_menu = UiStage::Windows::EntityMenu{};
+  // Le groupe et la guilde que la visée d'une compétence consulte.
+  world_mouse_.ties = SocialTies{.party = &party_, .guild = &guild_book_};
   settings_->options().context_menu().blocked().ForgetExplanations();
   // LES RÉGLAGES DU SERVEUR REPARTENT DE RIEN : ils sont ceux d'un personnage, et
   // le serveur redira ceux du nouveau à l'entrée en jeu.

@@ -364,6 +364,7 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   scene.second_of_double = second_of_double;
   scene.ctrl_held = ctrl_held;
   scene.no_shift = to.no_shift;
+  scene.ties = to.world_mouse->ties;
   scene.ground_units = to.scene_actors->ground_units;
   scene.ground_unit_floor_pixels = to.scene_actors->ground_unit_floor_pixels;
   // LES COMPAGNONS AVANT LE PERSONNAGE : un skill de compagnon armé, ou le
@@ -403,7 +404,25 @@ void OnLeftButtonDown(const EventRouting& to, const SDL_MouseButtonEvent& button
   // À L'APPUI, comme dans le jeu : attendre le relâchement retarde chaque coup
   // et chaque pas de la durée du clic.
   if (!over_interface) {
+    to.world_mouse->armed_at_press.reset();
     OnLeftPress(to, button, second_of_double);
+    return;
+  }
+  // 🔴 L'APPUI FRAIS SUR UNE FENÊTRE DÉSARME, quelle que soit la fenêtre et
+  // même sur sa partie vide : voir `PressOnWindowDisarms`. La compétence
+  // désarmée reste lisible le temps de l'image, pour le nom qu'on vient de
+  // cliquer.
+  to.world_mouse->armed_at_press.reset();
+  if (to.link->is_open() &&
+      PressOnWindowDisarms(second_of_double,
+                           to.targeting != nullptr && to.targeting->frame_hovered())) {
+    if (const ro::sim::KnownSkill* armed = to.grimoire->armed(); armed != nullptr) {
+      to.world_mouse->armed_at_press = *armed;
+    }
+    to.grimoire->Disarm();
+    if (to.companion_ai != nullptr) {
+      to.companion_ai->Disarm();
+    }
   }
 }
 

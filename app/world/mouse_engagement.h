@@ -66,6 +66,8 @@ struct MouseEngagement {
   bool left_held = false;
   // Il a été enfoncé depuis la dernière passe de la souris.
   bool fresh_press = false;
+  // Le dernier appui complétait un double-clic : sur un nom, il n'agit pas.
+  bool press_doubled = false;
   PointerPx last_mouse;
   PlayerAction action;
   // La carte a annoncé le siège depuis l'arrivée : l'attaque ne se poursuit
@@ -140,6 +142,20 @@ void NoteFocusLost(MouseEngagement& engagement);
 
 // Un clic d'action sur une entité : l'engagement se lève sur elle.
 void NoteEngagingClick(MouseEngagement& engagement, std::uint32_t id, bool continuous);
+
+// UN NOM CLIQUÉ DANS UNE FENÊTRE engage la souris SANS changer la sélection :
+// la flèche, si elle paraît, se pose sur la dernière entité cliquée dans le
+// monde, pas sur celle que le nom désigne. Voir `world/name_click.h`.
+void NoteNamedClick(MouseEngagement& engagement, bool continuous);
+
+// L'ACTION DU PERSONNAGE, relue en tête de la décision de l'image, AVANT que le
+// tic ne fasse avancer les acteurs. Une compétence qui attend sa portée
+// (`aimed_target_id`, zéro pour aucune) est l'action en cours, d'où qu'elle
+// soit partie — un clic, une touche, un cadre, un nom — ; partie, elle
+// s'achève, et l'engagement avec elle. Un ramassage s'achève fait ou abandonné
+// (`pickup_pending` faux). Puis `AdvanceDeed`.
+void FollowOwnAction(MouseEngagement& engagement, std::uint32_t aimed_target_id,
+                     bool pickup_pending, const ro::sim::World& world);
 
 // L'action que le clic laisse au personnage. Elle remplace la précédente sans
 // rien faire retomber.

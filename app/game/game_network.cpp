@@ -48,6 +48,8 @@ namespace moonclient {
 ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // Le réseau AVANT le dessin : une image doit montrer l'état le plus récent,
   // pas celui d'avant la lecture.
+  // 🔴 MAIS LA FLÈCHE DU JEU DÉCIDE AVANT LUI : voir `DecideSelectionMarker`.
+  DecideSelectionMarker(now_ms);
   // LA BOÎTE DE PERTE A-T-ELLE EU SA RÉPONSE ? Voir `game_link_loss.cpp`.
   FollowLinkLoss();
   if (moving_.has_value()) {
