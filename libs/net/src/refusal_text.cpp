@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "ro/core/i18n.h"
+
 namespace ro::net {
 namespace {
 
@@ -24,31 +26,32 @@ std::string BanText(std::uint8_t code) {
   // motif par défaut les couvre, avec leur numéro.
   switch (code) {
     case 0:  // BAN_UNFAIR
-      return "le serveur a mis fin à la session";
+      return core::Tr("le serveur a mis fin à la session");
     case 1:  // server closed
-      return "le serveur ferme";
+      return core::Tr("le serveur ferme");
     case 2:  // ID already logged in
-      return "quelqu'un vient de se connecter avec ce compte";
+      return core::Tr("quelqu'un vient de se connecter avec ce compte");
     case 3:
       // timeout / too much lag chez Gravity — MAIS c'est aussi, et surtout, le
       // renvoi pour intégrité de ce serveur-ci. Les deux causes tiennent dans
       // la même phrase : dans un cas comme dans l'autre, le serveur n'a pas eu
       // de ce client ce qu'il attendait.
-      return "le serveur n'a plus rien reçu de ce client, ou n'a pas reconnu sa version";
+      return core::Tr("le serveur n'a plus rien reçu de ce client, ou n'a pas reconnu sa version");
     case 4:  // server full
-      return "le serveur est plein";
+      return core::Tr("le serveur est plein");
     case 5:  // underaged
-      return "ce compte n'a pas l'âge requis";
+      return core::Tr("ce compte n'a pas l'âge requis");
     case 8:  // Server still recognizes last connection
-      return "le serveur tient encore la connexion précédente ; réessayer dans une minute";
+      return core::Tr(
+          "le serveur tient encore la connexion précédente ; réessayer dans une minute");
     case 9:  // too many connections from this ip
-      return "trop de connexions depuis cette adresse";
+      return core::Tr("trop de connexions depuis cette adresse");
     case 10:  // out of available time paid for
-      return "le temps de jeu payé pour ce compte est épuisé";
+      return core::Tr("le temps de jeu payé pour ce compte est épuisé");
     case 15:  // disconnected by a GM
-      return "un membre de l'équipe a déconnecté ce compte";
+      return core::Tr("un membre de l'équipe a déconnecté ce compte");
     default:
-      return UnknownReason("le serveur a mis fin à la session", code);
+      return UnknownReason(core::Tr("le serveur a mis fin à la session"), code);
   }
 }
 

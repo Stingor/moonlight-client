@@ -65,8 +65,8 @@ struct BroadcastFilter {
                                             sim::TalkMute mute = {});
 
 // LE MOTIF D'UNE ÉVICTION (`SC_NOTIFY_BAN`), ou rien si cette trame n'en est pas
-// une. Le serveur coupe la liaison aussitôt après : c'est à `app` de fermer le
-// jeu en disant pourquoi — voir `BanText`.
+// une. Le serveur coupe la liaison aussitôt après : c'est à `app` de dire la
+// perte avec son motif — voir `BanText` et `EvictionText`.
 [[nodiscard]] std::optional<std::uint8_t> EvictionOf(const Frame& frame);
 
 }  // namespace ro::net

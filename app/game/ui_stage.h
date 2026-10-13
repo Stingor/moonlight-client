@@ -48,6 +48,7 @@
 #include "ro/ui/hotkey_window.h"
 #include "ro/ui/inventory_window.h"
 #include "ro/ui/item_obtain_toast.h"
+#include "ro/ui/link_notice.h"
 #include "ro/ui/log_window.h"
 #include "ro/ui/login_window.h"
 #include "ro/ui/make_item_window.h"
@@ -174,6 +175,8 @@ class UiStage {
   struct Windows {
     // Le bandeau du nom de la carte, composé à chaque image par `app`.
     std::optional<ro::ui::MapSignView> map_sign;
+    // La liaison au serveur : bandeau et boîte de perte, composés par `app`.
+    ro::ui::LinkNoticeState link_notice;
     ro::ui::PacketWindowState packets;
     ro::ui::LogWindowState log;
     ro::ui::ChatWindows chat;

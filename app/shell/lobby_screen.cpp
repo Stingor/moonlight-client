@@ -112,6 +112,14 @@ ro::core::Result<void> LobbyScreen::Open(std::uint32_t now_ms) {
   form_.web.remember_member = known.remember_member;
   form_.web.remember_password = known.remember_password;
 
+  // LE RETOUR D'UNE PARTIE QUI A PERDU SON SERVEUR : le formulaire, rempli,
+  // et pourquoi on y est. ⚠ APRÈS LE REMPLISSAGE, pour la même raison que le
+  // retour à la tablée ci-dessous.
+  if (!notice_.empty()) {
+    form_.door = resume_door_;
+    flow_.Notify(std::exchange(notice_, std::string()));
+  }
+
   // LE RETOUR DEPUIS LA PARTIE : droit au serveur de personnages. ⚠ PAS DE
   // VILLE DE FOND — la salle couvre l'écran, et monter une carte coûterait une
   // seconde et demie au joueur qui ne veut que changer de personnage.

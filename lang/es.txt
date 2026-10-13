@@ -2002,6 +2002,9 @@ tr: Desplazamiento horizontal
 fr: Décoché, les échecs sans motif précis et les délais de réutilisation ne s'écrivent plus dans la discussion.
 tr: Desmarcado, los fallos sin motivo concreto y los tiempos de reutilización ya no se escriben en el chat.
 
+fr: Déconnecté du serveur.
+tr: Desconectado del servidor.
+
 fr: Défaite
 tr: Derrota
 
@@ -2338,6 +2341,9 @@ tr: La casilla se oscurece a medida que el estado transcurre.
 fr: La commande REMPLACE l'état complet : ce qui n'est pas coché est RETIRÉ. Les cases sont amorcées sur l'état connu du client pour ne pas perdre la monture ou le cart en chemin.\nElle remet aussi à zéro les statuts (pétrifié, gelé, maudit...).
 tr: El comando REEMPLAZA el estado completo: lo que no esté marcado se QUITA. Las casillas parten del estado que conoce el cliente para no perder la montura o el cart por el camino.\nTambién reinicia los estados (petrificado, congelado, maldito...).
 
+fr: La connexion réseau a été interrompue.
+tr: La conexión de red se ha interrumpido.
+
 fr: La demande n'a pas pu partir : réessayez dans un instant.
 tr: La solicitud no pudo enviarse: reinténtalo en un momento.
 
@@ -2398,14 +2404,29 @@ tr: El nombre del sitio contiene caracteres no latinos: puede imitar otro sitio.
 fr: Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.
 tr: Has superado el número de denuncias del día: ya no puedes denunciar.
 
+fr: Le passage vers un autre serveur de carte a échoué.
+tr: No se pudo pasar a otro servidor de mapa.
+
 fr: Le portrait du personnage, son pseudo, sa classe et son niveau : quatre cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
 tr: El retrato del personaje, su nombre, su clase y su nivel: cuatro marcos independientes que mueves, redimensionas y coloreas cada uno a tu gusto.
+
+fr: Le serveur a envoyé une réponse que ce client ne sait pas lire.
+tr: El servidor envió una respuesta que este cliente no sabe leer.
+
+fr: Le serveur a fermé la connexion.
+tr: El servidor cerró la conexión.
 
 fr: Le serveur a refusé l'annulation : vous restez en file.
 tr: El servidor rechazó la cancelación: sigues en la cola.
 
 fr: Le serveur n'a pas répondu à l'inscription.
 tr: El servidor no respondió a la inscripción.
+
+fr: Le serveur ne répond plus.
+tr: El servidor no responde.
+
+fr: Le serveur ne répond plus…
+tr: El servidor no responde…
 
 fr: Le signalement est enregistré pour l'équipe, qui le consulte.
 tr: La denuncia queda registrada para el equipo, que la revisa.
@@ -2583,6 +2604,9 @@ tr: Muestra el garment equipado — solo con el personaje entero.
 
 fr: Mort à %s
 tr: Muerto a las %s
+
+fr: Motif : {}.
+tr: Motivo: {}.
 
 fr: Mots-clés
 tr: Palabras clave
@@ -2838,6 +2862,36 @@ tr: Bloqueado: los marcos ya no se mueven y dejan pasar los clics al juego.\nDes
 
 fr: Zoom
 tr: Zoom
+
+fr: ce compte n'a pas l'âge requis
+tr: esta cuenta no tiene la edad requerida
+
+fr: le serveur a mis fin à la session
+tr: el servidor terminó la sesión
+
+fr: le serveur est plein
+tr: el servidor está lleno
+
+fr: le serveur ferme
+tr: el servidor se está cerrando
+
+fr: le serveur n'a plus rien reçu de ce client, ou n'a pas reconnu sa version
+tr: el servidor dejó de recibir datos de este cliente, o no reconoció su versión
+
+fr: le serveur tient encore la connexion précédente ; réessayer dans une minute
+tr: el servidor aún mantiene la conexión anterior; vuelve a intentarlo en un minuto
+
+fr: le temps de jeu payé pour ce compte est épuisé
+tr: el tiempo de juego pagado de esta cuenta se ha agotado
+
+fr: quelqu'un vient de se connecter avec ce compte
+tr: alguien acaba de conectarse con esta cuenta
+
+fr: trop de connexions depuis cette adresse
+tr: demasiadas conexiones desde esta dirección
+
+fr: un membre de l'équipe a déconnecté ce compte
+tr: un miembro del equipo desconectó esta cuenta
 
 fr: Échec du GIF
 tr: Error al crear el GIF

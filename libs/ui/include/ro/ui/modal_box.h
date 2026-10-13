@@ -60,6 +60,18 @@ void AskModal(const char* id);
                                        const char* no, const SkinArt& art,
                                        ModalEnter enter = ModalEnter::kIgnored);
 
+// LA BOÎTE QUI NE DEMANDE RIEN : elle DIT, et un seul bouton en prend acte.
+//
+// Même habillage, même modalité, même ouverture par `AskModal` que la boîte à
+// deux boutons. Rend vrai à l'image où le joueur a pris acte, et se referme.
+//
+// ⚠ ENTRÉE ET ÉCHAP VALENT TOUS DEUX « OK » : il n'y a qu'une réponse, et une
+// boîte qui ne cède qu'à la souris retiendrait le joueur qui joue au clavier.
+//
+// `text` et `ok` sont DÉJÀ TRADUITS par l'appelant.
+[[nodiscard]] bool DrawNoticeBox(const char* id, const char* text, const char* ok,
+                                 const SkinArt& art);
+
 // LA BOÎTE QUI SE RÉPOND « NON » TOUTE SEULE.
 //
 // 🔴 CE N'EST PAS UNE CONFIRMATION, C'EST UN FILET — et la différence décide de

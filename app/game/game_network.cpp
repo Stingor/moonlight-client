@@ -19,6 +19,7 @@
 #include "ro/core/log.h"
 #include "ro/net/action.h"
 #include "ro/net/attack_reach.h"
+#include "ro/net/link_loss.h"
 #include "ro/net/movement.h"
 #include "ro/net/npc_dialog.h"
 #include "ro/net/progress_bar.h"
@@ -46,18 +47,28 @@ namespace moonclient {
 ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // Le réseau AVANT le dessin : une image doit montrer l'état le plus récent,
   // pas celui d'avant la lecture.
+  // LA BOÎTE DE PERTE A-T-ELLE EU SA RÉPONSE ? Voir `game_link_loss.cpp`.
+  FollowLinkLoss();
   if (moving_.has_value()) {
-    AdvanceZoneMove();
+    AdvanceZoneMove(now_ms);
   }
   if (!link_.is_open()) {
+    // ⚠ SANS LIAISON, PAS DE SILENCE À MESURER — un changement de serveur de
+    // zone en cours, qui a son propre délai (`ro::net::ZoneMoveOverdue`), ou
+    // une perte déjà dite. La garde repart de zéro avec la liaison suivante.
+    link_watch_.Restart(now_ms);
+    windows_.link_notice.unsteady = false;
     return {};
   }
+  // ⚠ AVANT LA LECTURE : c'est l'écart avec l'image précédente qui dit si la
+  // boucle a gelé, et un gel n'est pas un silence. Voir `ro::net::LinkWatch`.
+  link_watch_.NoteLoop(now_ms);
   ro::net::Connection::Polled polled = link_.Poll();
   // LA CIBLE D'UN REFUS DE PORTÉE, s'il en arrive un. ⚠ RELEVÉE ICI ET AGIE
   // PLUS BAS : la poursuite a besoin des positions que la trame vient de
   // recaler, et reprendre depuis la boucle la ferait partir de l'état d'avant.
   std::optional<std::uint32_t> refused_target;
-  // LE MOTIF D'UNE ÉVICTION, s'il en arrive une : la partie s'arrête après le
+  // LE MOTIF D'UNE ÉVICTION, s'il en arrive une : la perte se déclare après le
   // drain, une fois la ligne écrite dans la conversation.
   std::optional<std::uint8_t> evicted;
   // LE SERVEUR QUI PASSE LA MAIN, s'il le fait. ⚠ CE QUI SUIT SA TRAME SUR
@@ -133,23 +144,15 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
   }
   if (evicted.has_value()) {
-    // 🔴 UNE ÉVICTION FERME LE JEU, comme un kick du staff le demande : le
-    // serveur a déjà coupé la liaison, et rester ouvert laisserait le joueur
-    // devant un monde figé. La boîte dit pourquoi avant que la fenêtre ne
-    // disparaisse — la conversation, elle, disparaît avec.
+    // 🔴 UNE ÉVICTION EST UNE PERTE DE LIAISON QUI DIT SON MOTIF : le serveur a
+    // déjà coupé, et rester sur la carte laisserait le joueur devant un monde
+    // figé. Même boîte, même retour à l'écran de connexion que toute perte —
+    // dessinée DANS le jeu, donc visible en plein écran comme en fenêtre.
     //
-    // ⚠ HORS DU PLEIN ÉCRAN D'ABORD, et la fenêtre du jeu pour parente : en
-    // plein écran exclusif, la boîte s'ouvrirait derrière l'image figée, et la
-    // boucle attendrait une réponse que personne ne peut donner. Le réglage,
-    // lui, ne change pas : seule la fenêtre de cette partie-ci en sort.
-    const std::string why = ro::net::BanText(*evicted);
-    ro::core::LogError("session close par le serveur (code {}) : {}", *evicted, why);
-    SDL_Window* window = gl_->window();
-    SDL_SetWindowFullscreen(window, false);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, std::string(kWindowTitle).c_str(),
-                             why.c_str(), window);
-    link_.Close();
-    running_ = false;
+    // ⚠ SANS LIGNE DE PLUS : le monde a écrit la sienne en lisant le paquet.
+    ro::core::LogError("session close par le serveur (code {}) : {}", *evicted,
+                       ro::net::BanText(*evicted));
+    DeclareLinkLoss(ro::net::EvictionText(*evicted), false, now_ms);
     return {};
   }
   if (server_move.has_value()) {
@@ -161,8 +164,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // rendu la main, et la partie s'arrête de toute façon.
     return {};
   } else if (polled.status != ro::net::LinkStatus::kOpen) {
+    // LE DÉTAIL TECHNIQUE AU JOURNAL, ce qu'il veut dire au joueur.
     ro::core::LogError("liaison perdue : {}", DescribeLinkLoss(polled.status, link_.error()));
-    link_.Close();
+    DeclareLinkLoss(ro::net::LinkLossText(ro::net::LinkLossCauseOf(polled.status)), true, now_ms);
+  } else {
+    // ET LE SILENCE, que rien ne ferme : voir `ro::net::LinkWatch`.
+    WatchLinkSilence(!polled.frames.empty(), now_ms);
   }
 
   ExpireCharacterSelect(now_ms);
@@ -284,6 +291,9 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
     // Même carte comprise : toute entrée repose la vue d'arrivée.
     camera_rig_.EnterMap(camera_, stage_->name);
+    // ⚠ LE CHARGEMENT N'EST PAS UN SILENCE : on ne lisait pas pendant qu'il
+    // bloquait. La garde repart d'ici.
+    link_watch_.Restart(now_ms);
     // 🔴 ET LE CIEL SE REDEMANDE. Ses nœuds vivent aussi longtemps que la carte,
     // donc ceux de la précédente survivraient au voyage — et ceux de la nouvelle
     // ne se lèveraient jamais, le drapeau étant resté posé.

@@ -73,6 +73,14 @@ class LobbyScreen : public Screen {
     resume_door_ = door;
   }
 
+  // OUVRIR SUR LE FORMULAIRE AVEC UN MOTIF, au retour d'une partie qui a perdu
+  // son serveur : à appeler avant `Open`. Le formulaire se remplit comme à
+  // l'ordinaire, et le motif s'affiche dessous. Même porte que `ResumeAt`.
+  void ReturnWithNotice(std::string why, ro::ui::LoginDoor door) {
+    notice_ = std::move(why);
+    resume_door_ = door;
+  }
+
   // Donne à voir les octets que le serveur de zone envoie au joueur, pour
   // enregistrer la session. Vide, rien n'est observé. À appeler avant `Open`.
   void ObserveZone(ro::net::ReceiveObserver observer) { flow_.ObserveZone(std::move(observer)); }
@@ -290,6 +298,8 @@ class LobbyScreen : public Screen {
   std::optional<lobby::Comeback> resume_;
   ro::ui::LoginDoor resume_door_ = ro::ui::LoginDoor::kMoonlight;
   bool resuming_ = false;
+  // LE MOTIF DU RETOUR FORCÉ, montré sous le formulaire. Voir `ReturnWithNotice`.
+  std::string notice_;
   // Pris à la remise, AVANT que `Close` ne rende la session qui le tient.
   lobby::Comeback comeback_;
   // Le repli local a-t-il déjà été tenté ? Voir `AskLocalBackdrop`.

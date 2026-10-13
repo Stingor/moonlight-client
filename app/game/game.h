@@ -155,6 +155,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LA PARTIE S'EST ARRÊTÉE POUR REVENIR À LA SÉLECTION DE PERSONNAGE : le
   // serveur l'a accordé. Faux quand le joueur a quitté.
   [[nodiscard]] bool back_to_characters() const noexcept { return back_to_characters_; }
+  // LA PARTIE S'EST ARRÊTÉE SUR UNE LIAISON PERDUE dont le joueur a pris acte :
+  // ce que l'écran de connexion doit lui dire. Vide sinon.
+  [[nodiscard]] std::string link_lost_notice() const { return link_loss_.LoginNotice(); }
 
   // Écrit ce qui attendait : la conversation de cette partie.
   //
@@ -177,7 +180,11 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LE PASSAGE D'UN SERVEUR DE ZONE À UN AUTRE : l'ancienne liaison se ferme,
   // la nouvelle s'ouvre sans bloquer, et prend sa place une fois acceptée.
   void StartZoneMove(const ro::net::CharacterPhase::Handoff& handoff, std::uint32_t now_ms);
-  void AdvanceZoneMove();
+  void AdvanceZoneMove(std::uint32_t now_ms);
+  // LA LIAISON PERDUE : voir `game_link_loss.cpp`.
+  void DeclareLinkLoss(std::string_view cause, bool say_in_chat, std::uint32_t now_ms);
+  void FollowLinkLoss();
+  void WatchLinkSilence(bool received, std::uint32_t now_ms);
   [[nodiscard]] ro::net::MoonclientHandshake FreshHandshake() const;  // pour un serveur neuf
   // 🔴 TOUT CE QUI SE VOYAIT S'ÉTEINT AU CHANGEMENT DE CARTE, MÊME SI LA CARTE
   // EST LA MÊME. `@refresh` et `@load` passent par le paquet du voyage, et le

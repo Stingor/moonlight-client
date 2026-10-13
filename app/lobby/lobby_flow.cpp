@@ -31,6 +31,13 @@ void LobbyFlow::Resume(const Comeback& comeback) {
   screen_ = LobbyScreenKind::kConnecting;
 }
 
+void LobbyFlow::Notify(std::string why) {
+  if (screen_ != LobbyScreenKind::kForm) {
+    return;
+  }
+  message_ = std::move(why);
+}
+
 void LobbyFlow::FallBackToForm(std::string why) {
   player_.Release();
   message_ = std::move(why);

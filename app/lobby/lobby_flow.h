@@ -82,6 +82,11 @@ class LobbyFlow {
   // formulaire, motif en clair, comme tout échec après lui.
   void Resume(const Comeback& comeback);
 
+  // LE RETOUR FORCÉ DEPUIS LA PARTIE : la liaison perdue, et pourquoi. Le
+  // motif s'affiche sous le formulaire comme celui d'un refus, et s'efface de
+  // la même façon à la tentative suivante. Sans effet hors de `kForm`.
+  void Notify(std::string why);
+
   // De quoi revenir à la sélection plus tard. Voir `Comeback`.
   [[nodiscard]] Comeback comeback() const { return player_.comeback(); }
 

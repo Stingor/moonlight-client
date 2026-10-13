@@ -100,6 +100,15 @@ void Game::StartAfkNow(std::uint32_t now_ms) {
 
 void Game::AdvanceAfk(std::uint32_t now_ms) {
   const AfkSettings& how = settings_->options().afk();
+  // 🔴 PAS DE VEILLE APRÈS UNE PERTE DE LIAISON, ni automatique ni demandée :
+  // « masquer l'interface » cacherait la boîte qui la dit. Le joueur absent au
+  // moment de la panne doit la trouver à son retour, et non un monde qui tourne.
+  if (link_loss_.declared()) {
+    afk_requested_ = false;
+    afk_screen_.EndNow(afk_idle_, camera_);
+    afk_screen_.ForgetAnnounce();
+    return;
+  }
   if (afk_requested_) {
     afk_requested_ = false;
     StartAfkNow(now_ms);

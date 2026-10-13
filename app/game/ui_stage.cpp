@@ -714,6 +714,9 @@ UiStage::Answers UiStage::Draw(
   }
   ro::ui::DrawZoneSelection(capture, skin_, zone_trace_, &answers.capture);
   ro::ui::DrawCaptureBadge(capture, skin_);
+  // LA LIAISON PERDUE, EN DERNIER : la boîte passe devant tout, et Échap lui
+  // revient avant la pile — voir juste dessous.
+  ro::ui::DrawLinkNotice(windows.link_notice, skin_);
 
   if (ro::ui::PopupTakesEscape()) {
     escape_.Suppress();

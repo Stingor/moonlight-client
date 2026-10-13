@@ -220,6 +220,57 @@ ModalAnswer DrawModalBox(const char* id, const char* question, const char* yes, 
   return answer;
 }
 
+bool DrawNoticeBox(const char* id, const char* text, const char* ok, const SkinArt& art) {
+  const ImGuiViewport* screen = ImGui::GetMainViewport();
+  ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+
+  const float scale = Scale();
+  const BoxStyle style = PushBoxStyle(art);
+  ImGui::SetNextWindowSize(ImVec2(kBoxWidthPixels * scale, 0.0F), ImGuiCond_Always);
+
+  constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                      ImGuiWindowFlags_NoScrollbar |
+                                      ImGuiWindowFlags_NoSavedSettings;
+  bool acknowledged = false;
+  if (ImGui::BeginPopupModal(id, nullptr, kFlags)) {
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    if (style.painted) {
+      PaintFrame(window->DrawList, art, window->Pos,
+                 ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y));
+    }
+
+    ImGui::PushTextWrapPos(0.0F);
+    ImGui::TextUnformatted(text);
+    ImGui::PopTextWrapPos();
+    ImGui::Dummy(ImVec2(0.0F, kQuestionGapPixels * scale));
+
+    // LE BOUTON SEUL, CENTRÉ, à la largeur que prendrait chacun de deux.
+    const std::array<const char*, 1> labels = {ok};
+    const float button = SkinWidestButton(labels, art);
+    ImGui::SetCursorPosX(
+        std::max(ImGui::GetCursorPosX(), (ImGui::GetWindowSize().x - button) * 0.5F));
+    if (SkinButton(ok, art, ImVec2(button, 0.0F))) {
+      acknowledged = true;
+    }
+    // 🔴 PAS À L'IMAGE OÙ ELLE PARAÎT, ET JAMAIS SUR UNE RÉPÉTITION : une
+    // touche frappée ou tenue AVANT qu'elle ne s'ouvre — Échap martelé devant
+    // un jeu figé — la refermerait sans qu'elle ait jamais été vue.
+    const bool keys_count = !ImGui::IsWindowAppearing();
+    if (keys_count && (ImGui::IsKeyPressed(ImGuiKey_Escape, false) ||
+                       ImGui::IsKeyPressed(ImGuiKey_Enter, false) ||
+                       ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false))) {
+      acknowledged = true;
+    }
+    if (acknowledged) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+
+  PopBoxStyle(style);
+  return acknowledged;
+}
+
 ModalAnswer DrawRevertBox(const char* id, const char* question, const char* note, const char* yes,
                           const char* no, int seconds_left, const SkinArt& art) {
   const ImGuiViewport* screen = ImGui::GetMainViewport();

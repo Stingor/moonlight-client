@@ -469,8 +469,9 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
         //
         // ⚠ LE MONDE N'EN GARDE QUE LA LIGNE DE CONVERSATION, à la suite de ce
         // que le serveur y a écrit juste avant — l'avis de patch précède le
-        // renvoi de cinq secondes. Fermer le jeu en disant pourquoi n'est pas
-        // un fait du monde : c'est `app` qui le fait, par `EvictionOf`.
+        // renvoi de cinq secondes. Dire la perte de liaison et ramener à
+        // l'écran de connexion n'est pas un fait du monde : c'est `app` qui le
+        // fait, par `EvictionOf`.
         world.RecordChat(sim::ChatKind::kServer, 0, BanText(packet.result), now_ms);
         return FrameOutcome::kApplied;
       });

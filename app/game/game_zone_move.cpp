@@ -1,10 +1,16 @@
 // LE PASSAGE D'UN SERVEUR DE ZONE À UN AUTRE, quand le serveur courant passe la
 // main : une liaison neuve s'ouvre, et la partie reste hors ligne tant qu'elle
 // n'a pas été acceptée.
+//
+// 🔴 UNE ENTRÉE IMPOSSIBLE, REFUSÉE, ÉCHOUÉE OU SANS RÉPONSE LAISSE LA PARTIE HORS LIGNE POUR
+// DE BON : c'est une perte de liaison, et elle se dit comme les autres — voir
+// `game_link_loss.cpp`.
 
 #include <utility>
 
 #include "ro/core/log.h"
+#include "ro/net/link_loss.h"
+#include "ro/net/link_watch.h"
 #include "ro/net/moonclient_handshake.h"
 #include "ro/net/session.h"
 
@@ -27,12 +33,14 @@ void Game::StartZoneMove(const ro::net::CharacterPhase::Handoff& handoff, std::u
         "changement de serveur de zone vers {} : aucune entrée connue, la partie "
         "reste hors ligne",
         handoff.map_name);
+    DeclareLinkLoss(ro::net::LinkLossText(ro::net::LinkLossCause::kZoneMoveFailed), true, now_ms);
     return;
   }
   ro::core::LogInfo("changement de serveur de zone vers {}", handoff.map_name);
   auto opened = ro::net::MapPhase::Start(handoff, ticket_.account, now_ms);
   if (!opened.has_value()) {
     ro::core::LogError("changement de serveur de zone : {}", ro::core::Describe(opened.error()));
+    DeclareLinkLoss(ro::net::LinkLossText(ro::net::LinkLossCause::kZoneMoveFailed), true, now_ms);
     return;
   }
   // UNE LIAISON NEUVE, DONC UN FICHIER DE CAPTURE NEUF quand on enregistre — voir
@@ -42,12 +50,19 @@ void Game::StartZoneMove(const ro::net::CharacterPhase::Handoff& handoff, std::u
     opened->SetReceiveObserver(std::move(capture));
   }
   moving_.emplace(std::move(*opened));
+  moving_since_ms_ = now_ms;
 }
 
-void Game::AdvanceZoneMove() {
+void Game::AdvanceZoneMove(std::uint32_t now_ms) {
   switch (moving_->Advance()) {
     case ro::net::PhaseState::kWaiting:
-      return;
+      // ⚠ L'ATTENTE A UNE FIN : voir `ro::net::ZoneMoveOverdue`.
+      if (!ro::net::ZoneMoveOverdue(moving_since_ms_, now_ms)) {
+        return;
+      }
+      ro::core::LogError("serveur de zone : aucune réponse depuis {} ms",
+                         now_ms - moving_since_ms_);
+      break;
     case ro::net::PhaseState::kDone:
       link_ = moving_->TakeLink();
       // LA LIAISON EST NEUVE : les ateliers doivent la regarder à nouveau.
@@ -62,7 +77,8 @@ void Game::AdvanceZoneMove() {
       // Ni ceux qu'on bloquait : il repart d'une liste vide.
       pieces_.whispers.blocks().Clear();
       ro::core::LogInfo("serveur de zone : entrée acceptée");
-      break;
+      moving_.reset();
+      return;
     case ro::net::PhaseState::kRefused:
       ro::core::LogError("serveur de zone : entrée refusée (code {})", moving_->refusal_code());
       break;
@@ -71,6 +87,7 @@ void Game::AdvanceZoneMove() {
       break;
   }
   moving_.reset();
+  DeclareLinkLoss(ro::net::LinkLossText(ro::net::LinkLossCause::kZoneMoveFailed), true, now_ms);
 }
 
 }  // namespace moonclient

@@ -142,6 +142,7 @@ add_library(ro_ui STATIC
     src/world_map_marks.cpp
     src/world_map_window.cpp
     src/modal_box.cpp
+    src/link_notice.cpp
     src/chat_block_log_window.cpp
     src/player_report_window.cpp
     src/entity_inspector_window.cpp

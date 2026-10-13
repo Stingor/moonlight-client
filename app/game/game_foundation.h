@@ -6,6 +6,8 @@
 
 #include "ro/audio/audio_engine.h"
 #include "ro/net/connection.h"
+#include "ro/net/link_loss.h"
+#include "ro/net/link_watch.h"
 #include "ro/net/session.h"
 #include "ro/net/zone_move.h"
 #include "ro/render/gl_context.h"
@@ -117,6 +119,11 @@ class GameFoundation {
   // viserait une entité cliquée il y a longtemps.
   std::uint32_t menu_asked_ms_ = 0;
   std::optional<ro::net::MapPhase> moving_;
+  // Quand le passage en cours a commencé : voir `ro::net::ZoneMoveOverdue`.
+  std::uint32_t moving_since_ms_ = 0;
+  // LA GARDE DU SILENCE et LA PERTE DÉCLARÉE : voir `game_link_loss.cpp`.
+  ro::net::LinkWatch link_watch_;
+  ro::net::LinkLoss link_loss_;
   // CE QUE LE VOLET DU STAFF TIENT LE TEMPS DE LA PARTIE : la liste des classes,
   // composée une fois, et ce qu'on sait avoir basculé chez le serveur. ⚠ À LA
   // PARTIE ET NON À LA FENÊTRE : le serveur oublie ses bascules à la déconnexion.

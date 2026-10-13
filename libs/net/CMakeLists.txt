@@ -42,6 +42,8 @@ add_library(ro_net STATIC
     src/command_settings.cpp
     src/companion.cpp
     src/connection.cpp
+    src/link_loss.cpp
+    src/link_watch.cpp
     src/discord_relay.cpp
     src/chat_blocks.cpp
     src/entity_props.cpp

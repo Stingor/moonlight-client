@@ -125,9 +125,11 @@ int ReportError(const ro::core::Error& error) {
 //
 // `back_to_characters` dit en sortant si le joueur a demandé, par le menu
 // d'Échap, à revenir à la sélection du personnage, et si le serveur l'a
-// accordé.
+// accordé. `link_lost` porte le motif quand la partie s'est arrêtée sur une
+// liaison perdue dont le joueur a pris acte, et reste vide sinon.
 int Play(moonclient::ClientShell& shell, const std::string& map_name, ro::net::Connection link,
-         ro::sim::World world, const ro::net::ZoneTicket& ticket, bool& back_to_characters) {
+         ro::sim::World world, const ro::net::ZoneTicket& ticket, bool& back_to_characters,
+         std::string& link_lost) {
   moonclient::Game game(shell, std::move(link), std::move(world), ticket);
   if (auto opened = game.Open(map_name); !opened) {
     return ReportError(opened.error());
@@ -136,6 +138,7 @@ int Play(moonclient::ClientShell& shell, const std::string& map_name, ro::net::C
     return ReportError(played.error());
   }
   back_to_characters = game.back_to_characters();
+  link_lost = game.link_lost_notice();
   return 0;
 }
 
@@ -144,8 +147,13 @@ int Play(moonclient::ClientShell& shell, const std::string& map_name, ro::net::C
 // 🔴 ET ELLE BOUCLE : « Sélection du personnage », dans le menu d'Échap, rend la
 // main ici, et la tablée se rouvre avec les jetons de la connexion — sans
 // formulaire ni mot de passe. Voir `ro/net/character_select_return.h`.
+//
+// 🔴 UNE LIAISON PERDUE RAMÈNE AU FORMULAIRE, et non à la tablée : sans
+// serveur, les jetons de la connexion ne valent plus rien. Le motif s'affiche
+// sous les champs.
 int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
   std::optional<moonclient::lobby::Comeback> comeback;
+  std::string link_lost;
   ro::ui::LoginDoor door = ro::ui::LoginDoor::kMoonlight;
   while (true) {
     moonclient::LobbyScreen lobby(shell, std::string(launch.host), launch.port);
@@ -154,6 +162,8 @@ int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
     lobby.ObserveZone(shell.ObserveZoneLink());
     if (comeback.has_value()) {
       lobby.ResumeAt(*comeback, door);
+    } else if (!link_lost.empty()) {
+      lobby.ReturnWithNotice(std::exchange(link_lost, std::string()), door);
     }
     if (auto opened = lobby.Open(static_cast<std::uint32_t>(SDL_GetTicks())); !opened) {
       return ReportError(opened.error());
@@ -169,7 +179,11 @@ int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
     door = lobby.door();
     bool back_to_characters = false;
     const int played = Play(shell, lobby.map_name(), lobby.TakeLink(), lobby.TakeWorld(),
-                            lobby.ticket(), back_to_characters);
+                            lobby.ticket(), back_to_characters, link_lost);
+    if (played == 0 && !link_lost.empty()) {
+      comeback.reset();
+      continue;
+    }
     if (!back_to_characters || !next.usable()) {
       return played;
     }

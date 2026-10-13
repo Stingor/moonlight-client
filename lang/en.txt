@@ -2002,6 +2002,9 @@ tr: Horizontal offset
 fr: Décoché, les échecs sans motif précis et les délais de réutilisation ne s'écrivent plus dans la discussion.
 tr: Unticked, failures without a specific reason and cooldown delays are no longer written in the chat.
 
+fr: Déconnecté du serveur.
+tr: Disconnected from Server.
+
 fr: Défaite
 tr: Defeat
 
@@ -2338,6 +2341,9 @@ tr: The cell darkens as the state elapses.
 fr: La commande REMPLACE l'état complet : ce qui n'est pas coché est RETIRÉ. Les cases sont amorcées sur l'état connu du client pour ne pas perdre la monture ou le cart en chemin.\nElle remet aussi à zéro les statuts (pétrifié, gelé, maudit...).
 tr: The command REPLACES the whole state: whatever is unchecked is REMOVED. The boxes start from the state the client knows, so the mount or the cart is not lost on the way.\nIt also clears the statuses (petrified, frozen, cursed...).
 
+fr: La connexion réseau a été interrompue.
+tr: The network connection was interrupted.
+
 fr: La demande n'a pas pu partir : réessayez dans un instant.
 tr: The request could not be sent: try again in a moment.
 
@@ -2398,14 +2404,29 @@ tr: The site name contains non-Latin characters: it can imitate another site.
 fr: Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.
 tr: If you have exceeded the number of daily reports, you will no longer be able to report.
 
+fr: Le passage vers un autre serveur de carte a échoué.
+tr: Moving to another map server failed.
+
 fr: Le portrait du personnage, son pseudo, sa classe et son niveau : quatre cadres indépendants, que l'on déplace, retaille et colore chacun à son goût.
 tr: The character's portrait, name, class and level: four independent frames, each one moved, resized and coloured to your liking.
+
+fr: Le serveur a envoyé une réponse que ce client ne sait pas lire.
+tr: The server sent a reply this client cannot read.
+
+fr: Le serveur a fermé la connexion.
+tr: The server closed the connection.
 
 fr: Le serveur a refusé l'annulation : vous restez en file.
 tr: The server refused the cancellation: you stay in the queue.
 
 fr: Le serveur n'a pas répondu à l'inscription.
 tr: The server did not answer the application.
+
+fr: Le serveur ne répond plus.
+tr: The server is not responding.
+
+fr: Le serveur ne répond plus…
+tr: The server is not responding…
 
 fr: Le signalement est enregistré pour l'équipe, qui le consulte.
 tr: The report is recorded for the staff, who review it.
@@ -2583,6 +2604,9 @@ tr: Shows the equipped garment — whole character only.
 
 fr: Mort à %s
 tr: Died at %s
+
+fr: Motif : {}.
+tr: Reason: {}.
 
 fr: Mots-clés
 tr: Keywords
@@ -2838,6 +2862,36 @@ tr: Locked: the frames no longer move and let clicks through to the game.\nUnloc
 
 fr: Zoom
 tr: Zoom
+
+fr: ce compte n'a pas l'âge requis
+tr: this account does not meet the age requirement
+
+fr: le serveur a mis fin à la session
+tr: the server ended the session
+
+fr: le serveur est plein
+tr: the server is full
+
+fr: le serveur ferme
+tr: the server is shutting down
+
+fr: le serveur n'a plus rien reçu de ce client, ou n'a pas reconnu sa version
+tr: the server stopped receiving anything from this client, or did not recognize its version
+
+fr: le serveur tient encore la connexion précédente ; réessayer dans une minute
+tr: the server still holds the previous connection; try again in a minute
+
+fr: le temps de jeu payé pour ce compte est épuisé
+tr: the paid play time for this account has run out
+
+fr: quelqu'un vient de se connecter avec ce compte
+tr: someone just logged in with this account
+
+fr: trop de connexions depuis cette adresse
+tr: too many connections from this address
+
+fr: un membre de l'équipe a déconnecté ce compte
+tr: a staff member disconnected this account
 
 fr: Échec du GIF
 tr: GIF failed
