@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/log.h"
 #include "ro/net/memorial_dungeon.h"
 
 #include "chat/chat_mvp_link.h"
@@ -100,6 +101,8 @@ void MemorialStage::Advance(MemorialWindows& windows, ro::net::Connection& link,
       (gate == MemorialDestroyGate::kAllowed || gate == MemorialDestroyGate::kUnknownRights)) {
     ro::net::RequestMemorialDungeonDestroy(link);
     dungeon_.NoteDestroyAsked(now_unix_s);
+    // LE SERVEUR SE TAIT S'IL REFUSE : le journal garde de quoi le constater.
+    ro::core::LogInfo("instance « {} » : destruction demandée au serveur", dungeon_.name());
   }
   if (std::exchange(toggle_asked_, false)) {
     windows.window.open = !windows.window.open;
@@ -147,6 +150,7 @@ void MemorialStage::Compose(ro::ui::MemorialDungeonView& view, std::int64_t now_
 std::vector<std::string> MemorialStage::TakeNotices() {
   std::vector<std::string> notices;
   for (const MemorialEnding ending : dungeon_.TakeEndings()) {
+    ro::core::LogInfo("instance : fin annoncée par le serveur ({})", static_cast<int>(ending));
     notices.emplace_back(EndingText(ending));
   }
   return notices;

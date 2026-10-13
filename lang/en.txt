@@ -17702,8 +17702,8 @@ tr: Players inside:
 fr: L'instance a été détruite.
 tr: The instance has been destroyed.
 
-fr: L'instance sera détruite vers %s.
-tr: The instance will be destroyed around %s.
+fr: Fin prévue :
+tr: Expected end:
 
 fr: La demande est partie : le serveur n'a pas encore répondu.
 tr: The request was sent: the server has not answered yet.

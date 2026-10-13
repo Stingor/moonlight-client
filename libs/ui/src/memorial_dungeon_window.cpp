@@ -11,7 +11,6 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/modal_box.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
@@ -137,8 +136,8 @@ void DrawTimers(const MemorialDungeonView& view, float column) {
     DrawCountdown(*view.seconds_left, view.duration_s);
     ImGui::EndGroup();
     if (!view.end_clock.empty()) {
-      const std::string clock(view.end_clock);
-      SkinTooltipFormat(core::Tr("L'instance sera détruite vers %s."), clock.c_str());
+      Label(core::Tr("Fin prévue :"), column);
+      ImGui::TextUnformatted(view.end_clock.data(), view.end_clock.data() + view.end_clock.size());
     }
   }
   if (view.idle_seconds_left.has_value()) {

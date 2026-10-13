@@ -17702,8 +17702,8 @@ tr: Jugadores dentro:
 fr: L'instance a été détruite.
 tr: La instancia ha sido destruida.
 
-fr: L'instance sera détruite vers %s.
-tr: La instancia será destruida hacia las %s.
+fr: Fin prévue :
+tr: Fin prevista:
 
 fr: La demande est partie : le serveur n'a pas encore répondu.
 tr: La solicitud se ha enviado: el servidor aún no ha respondido.
