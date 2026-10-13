@@ -14,9 +14,10 @@
 // « CE QUI NE PEUT PAS DIFFÉRER » : le verrou, l'aimantation et le repère de
 // pose décrivent le GESTE, et il n'y a qu'une souris.
 //
-// LE PORTRAIT DE STATUT FERME LA RANGÉE D'ONGLETS. Il a ses réglages à lui —
-// voir `StatusPortraitOptions` — et aucun de ceux des jauges ne le gouverne :
-// sur son onglet, les réglages communs se retirent.
+// LE PORTRAIT DE STATUT FERME LA RANGÉE D'ONGLETS, en deux : « Portrait » et
+// « Étiquettes ». Il a ses réglages à lui — voir `StatusPortraitOptions` — et
+// aucun de ceux des jauges ne le gouverne : sur ses deux onglets, les réglages
+// communs des jauges se retirent, et les siens ouvrent chacun des deux.
 
 #include <algorithm>
 #include <cstddef>
@@ -114,6 +115,7 @@ void GameOptions::BuildStatBarShared() {
     stat_bar_tabs_.push_back(StatBarLabel(bar));
   }
   stat_bar_tabs_.push_back(Tr("Portrait"));
+  stat_bar_tabs_.push_back(Tr("Étiquettes"));
 }
 
 // LES DIX-HUIT RÉGLAGES D'UNE JAUGE.
@@ -122,11 +124,15 @@ void GameOptions::BuildStatBarShared() {
 // réglage qui disparaît quand on change de forme fait sauter la mise en page, et
 // le joueur cherche ce qu'il vient de perdre. Grisé, il dit « pas pour cette
 // forme-là », et OÙ il est.
-void GameOptions::BuildStatBarRows(int shown_bar) {
+void GameOptions::BuildStatBarRows(int shown_bar, bool for_search) {
   BuildStatBarShared();
-  if (shown_bar == static_cast<int>(kPortraitTab)) {
+  if (shown_bar >= static_cast<int>(kPortraitTab) &&
+      shown_bar < static_cast<int>(kBasicInfoTabCount)) {
     stat_bar_shared_rows_.clear();
-    pages_.portrait.Compose();
+    const auto tab = static_cast<PortraitTab>(shown_bar - static_cast<int>(kPortraitTab));
+    // LES RÉGLAGES COMMUNS NE RESSORTENT QU'UNE FOIS dans la recherche, sous
+    // le premier des deux onglets.
+    pages_.portrait.Compose(tab, !for_search || tab == PortraitTab::kPortrait);
     const std::span<const OptionRowView> portrait = pages_.portrait.rows();
     stat_bar_rows_.assign(portrait.begin(), portrait.end());
     return;

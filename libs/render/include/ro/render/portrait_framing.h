@@ -1,11 +1,15 @@
 #pragma once
 
+#include <cstddef>
 #include <span>
 
 #include <glm/glm.hpp>
 
 #include "ro/render/actor_layers.h"
+#include "ro/render/actor_sprite.h"
+#include "ro/render/actor_wardrobe.h"
 #include "ro/render/sprite_canvas.h"
+#include "ro/render/sprite_catalog.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/render/sprite_vignette.h"
 
@@ -17,10 +21,11 @@ namespace ro::render {
 // corps et les coiffes à la tête : retirer le corps les ferait tomber. On
 // compose donc tout, et c'est le cadre qui coupe ce qui sort de lui.
 //
-// ⚠ IL SE REFAIT À CHAQUE IMAGE, sur ce que l'image peint : la tête qui
-// respire ou se baisse en attaquant reste au même endroit du cadre. C'est
-// l'inverse de la vignette en pied, dont l'échelle se fixe sur l'enveloppe de
-// toute l'animation.
+// 🔴 UN CADRAGE PAR POSE, ET NON PAR IMAGE : les boîtes se mesurent sur la
+// BOUCLE ENTIÈRE — chaque image du corps dans la direction montrée, et chaque
+// instant des pièces à horloge propre. Mesurées sur l'image courante, elles
+// bougeraient avec une coiffe ou une cape animée, et le personnage sauterait
+// dans son cadre ; sur la boucle, il s'anime DANS un cadre fixe, comme en jeu.
 //
 // ⚠ AUCUNE DÉPENDANCE À OPENGL : tout se vérifie par des nombres.
 
@@ -45,6 +50,29 @@ struct PortraitBoxes {
 // même le décalage de son .act, et étirerait la boîte jusque-là.
 [[nodiscard]] PortraitBoxes MeasurePortraitBoxes(std::span<const SpriteQuad> quads,
                                                  std::span<const ActorPart> parts);
+
+// Les deux boîtes de ce qu'une composition PEINT : les calques sans image ne
+// comptent pas.
+[[nodiscard]] PortraitBoxes MeasurePaintedPortraitBoxes(const ComposedActor& composed);
+
+// LA POSE DONT ON MESURE LA BOUCLE.
+struct PortraitLoop {
+  // Le RANG d'animation et la direction du .act — voir `ActorVignette::Pose`.
+  std::size_t animation = kAnimationIdle;
+  std::size_t direction = 0;
+  // Le corps joue-t-il ses images ? Faux, il tient `rest_frame` ; les pièces à
+  // horloge propre bougent dans les deux cas.
+  bool body_plays = false;
+  std::size_t rest_frame = 0;
+};
+
+// Les deux boîtes de TOUTE la boucle de cette pose : l'union de ce que peint
+// chacun de ses échantillons (`DollEnvelopeProbes`) — chaque image de chaque
+// pièce, sur chaque image du corps.
+//
+// ⚠ UNE COMPOSITION PAR ÉCHANTILLON : à faire une fois par pose, jamais à
+// chaque image — c'est le rôle de `PortraitFramer`.
+[[nodiscard]] PortraitBoxes MeasureLoopPortraitBoxes(ActorOutfit& outfit, const PortraitLoop& loop);
 
 // CE QUE LE JOUEUR A CHOISI DE VOIR.
 struct PortraitAim {
@@ -88,5 +116,35 @@ inline constexpr float kPortraitLeastBoxPx = 1.0F;
 // sur une boîte dégénérée.
 [[nodiscard]] VignetteFraming FramePortrait(const PortraitBoxes& boxes, const PortraitAim& aim,
                                             glm::vec2 box_size);
+
+// LE CADRAGE STABLE D'UN PORTRAIT : les boîtes de la boucle, mesurées une fois
+// par pose, puis la règle de `FramePortrait` appliquée à chaque appel.
+//
+// La mesure se refait quand la tenue (l'apparence, ou la tenue que la
+// garde-robe rend pour elle), l'animation, la direction ou le jeu du corps
+// changent. Le choix du joueur — tête seule, zoom, décalages, taille du cadre
+// — ne la refait pas : il ne change que la règle appliquée aux mêmes boîtes.
+// La cape, elle, change l'apparence.
+class PortraitFramer {
+ public:
+  [[nodiscard]] VignetteFraming Frame(ActorOutfit& outfit, const ActorLook& look,
+                                      const PortraitLoop& loop, const PortraitAim& aim,
+                                      glm::vec2 box_size);
+
+  // Combien de boucles ont été mesurées depuis la naissance : ce qui prouve
+  // que la mesure ne tourne pas à chaque image.
+  [[nodiscard]] std::size_t measure_count() const noexcept { return measure_count_; }
+
+ private:
+  // ⚠ L'ADRESSE DE LA TENUE NE SUFFIT PAS : une tenue oubliée par la
+  // garde-robe peut rendre la sienne à une autre apparence. L'apparence seule
+  // non plus : oubliée puis refaite, sa tenue n'est plus la même.
+  const ActorOutfit* outfit_ = nullptr;
+  ActorLook look_;
+  PortraitLoop loop_;
+  PortraitBoxes boxes_;
+  bool measured_ = false;
+  std::size_t measure_count_ = 0;
+};
 
 }  // namespace ro::render

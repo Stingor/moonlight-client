@@ -582,7 +582,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                     damage_rows_, [this](int tab) { ComposeDamageRows(tab); });
   ComposeDamageRows(shown_bar);
   CopyTabsForSearch(searching, kBasicInfoTabCount, pages_.stat_bar_search, stat_bar_rows_,
-                    [this](int tab) { BuildStatBarRows(tab); });
+                    [this](int tab) { BuildStatBarRows(tab, /*for_search=*/true); });
   BuildStatBarRows(shown_bar);
   // ⚠ LES NOMS ET LA ZONE CLIQUABLE SE COMPOSENT AVEC LES BARRES, dans la même
   // page : voir `BuildEntityBarRows`. La zone se compose AVANT, puisqu'elle y

@@ -12,10 +12,16 @@
 
 namespace moonclient {
 
-// ── L'ONGLET « PORTRAIT » DE LA PAGE « BASIC INFO » ─────────────────────────
+// ── LES ONGLETS « PORTRAIT » ET « ÉTIQUETTES » DE LA PAGE « BASIC INFO » ────
 //
-// Le portrait de statut du joueur : ce qu'il garde, ce que l'onglet montre, ce
-// qu'une ligne change.
+// Le portrait de statut du joueur : ce qu'il garde, ce que chaque onglet
+// montre, ce qu'une ligne change.
+//
+// « Portrait » règle le personnage et son cadre ; « Étiquettes », le pseudo, la
+// classe et le niveau. 🔴 CE QUI VAUT POUR LES QUATRE CADRES — l'interrupteur
+// maître, le verrou, l'aimant, la bordure, la réinitialisation — OUVRE LES DEUX
+// ONGLETS : le joueur le cherche là où il regarde, et l'interrupteur maître
+// grise ce qu'il commande dans l'un comme dans l'autre.
 //
 // ⚠ LES LIGNES PORTENT UN IDENTIFIANT COMPOSÉ, hors de `GameOption`, comme
 // celles du HUD de cible.
@@ -61,10 +67,16 @@ static_assert(kPortraitRowBase + static_cast<int>(PortraitRow::kCount) < kPortra
          static_cast<int>(field);
 }
 
-// LA PLACE DE L'ONGLET dans la page « Basic Info » : après les sept jauges, et
-// le dernier. Le filtre des Options compose les onglets jusqu'à ce compte.
+// LES DEUX ONGLETS du portrait, dans l'ordre de la page.
+enum class PortraitTab : int { kPortrait = 0, kLabels, kCount };
+
+// LEUR PLACE dans la page « Basic Info » : après les sept jauges, et les
+// derniers. Le filtre des Options compose les onglets jusqu'à ce compte.
 inline constexpr std::size_t kPortraitTab = ro::ui::kStatBarCount;
-inline constexpr std::size_t kBasicInfoTabCount = kPortraitTab + 1;
+inline constexpr std::size_t kLabelsTab = kPortraitTab + 1;
+inline constexpr std::size_t kBasicInfoTabCount =
+    kPortraitTab + static_cast<std::size_t>(PortraitTab::kCount);
+static_assert(kLabelsTab - kPortraitTab == static_cast<std::size_t>(PortraitTab::kLabels));
 
 // Les bornes du cadrage, celles du panneau ET celles que la vue applique : une
 // valeur relue d'un fichier édité à la main ne sort pas d'elles.
@@ -102,8 +114,22 @@ struct PortraitFramingSettings {
 // boucle, le reste se borne.
 [[nodiscard]] PortraitFramingSettings BoundedFraming(const PortraitFramingSettings& stored);
 
+// CE QU'UN PROPRIÉTAIRE LIVRE AU PREMIER LANCEMENT : le cadrage et les quatre
+// cadres. « Réinitialiser la disposition » repose les places de ce `look`.
+struct StatusPortraitSetup {
+  PortraitFramingSettings framing;
+  ro::ui::StatusPortraitLook look;
+};
+
 class StatusPortraitOptions {
  public:
+  // Les défauts d'origine, ceux des structures.
+  StatusPortraitOptions() = default;
+  // ⚠ AVANT `Declare` : c'est ce qui en fait les défauts du fichier, donc ce
+  // que « Rétablir cette page » repose.
+  explicit StatusPortraitOptions(const StatusPortraitSetup& factory)
+      : framing_(factory.framing), look_(factory.look), factory_look_(factory.look) {}
+
   [[nodiscard]] const PortraitFramingSettings& framing() const noexcept { return framing_; }
   // En écriture : le joueur pose les cadres à la souris.
   [[nodiscard]] ro::ui::StatusPortraitLook& look() noexcept { return look_; }
@@ -112,16 +138,30 @@ class StatusPortraitOptions {
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
 
-  // Refait les lignes, à chaque image où l'onglet est sous les yeux.
-  void Compose();
+  // Refait les lignes de cet onglet, à chaque image où il est sous les yeux.
+  // `shared` faux omet les réglages communs aux deux onglets : la recherche
+  // ne les compose que sous le premier, pour qu'ils ne ressortent qu'une fois.
+  void Compose(PortraitTab tab, bool shared = true);
   [[nodiscard]] std::span<const ro::ui::OptionRowView> rows() const noexcept { return rows_; }
 
   // Rend vrai quand la ligne était l'une des siennes.
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);
 
  private:
+  // Ce qui ouvre les deux onglets.
+  void ComposeShared();
+  // Le personnage : sa pose, son cadrage, son cadre.
+  void ComposeFraming();
+  // Le pseudo, la classe et le niveau.
+  void ComposeLabels();
+  // Le cadre d'une partie : un interrupteur, puis le fond, le texte, l'arrondi
+  // et la taille du texte — ces deux-là pour une étiquette seulement.
+  void ComposePart(ro::ui::PortraitPart part, const char* heading);
+
   PortraitFramingSettings framing_;
   ro::ui::StatusPortraitLook look_;
+  // La disposition livrée, que « Réinitialiser la disposition » repose.
+  ro::ui::StatusPortraitLook factory_look_;
   std::vector<ro::ui::OptionRowView> rows_;
   // Refaits à chaque composition : le pointeur d'un texte traduit meurt au
   // changement de langue.

@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#include "ro/render/doll_animation.h"
+
 namespace ro::render {
 namespace {
 
@@ -37,6 +39,27 @@ void Grow(SpriteBounds& bounds, bool& grown, const SpriteQuad& quad) {
   return SpriteBounds{.min = glm::min(one.min, other.min), .max = glm::max(one.max, other.max)};
 }
 
+// Fait grandir une boîte pour qu'elle couvre une autre, si celle-ci existe.
+void Absorb(SpriteBounds& bounds, bool& grown, const SpriteBounds& other, bool other_grown) {
+  if (!other_grown) {
+    return;
+  }
+  bounds = grown ? Union(bounds, other) : other;
+  grown = true;
+}
+
+// Deux apparences sont les mêmes quand aucune ne précède l'autre : on compare
+// les champs, on ne hache pas.
+[[nodiscard]] bool SameLook(const ActorLook& left, const ActorLook& right) {
+  const ActorLookOrder before;
+  return !before(left, right) && !before(right, left);
+}
+
+[[nodiscard]] bool SameLoop(const PortraitLoop& left, const PortraitLoop& right) {
+  return left.animation == right.animation && left.direction == right.direction &&
+         left.body_plays == right.body_plays && left.rest_frame == right.rest_frame;
+}
+
 }  // namespace
 
 PortraitBoxes MeasurePortraitBoxes(std::span<const SpriteQuad> quads,
@@ -51,6 +74,34 @@ PortraitBoxes MeasurePortraitBoxes(std::span<const SpriteQuad> quads,
     }
   }
   return boxes;
+}
+
+PortraitBoxes MeasurePaintedPortraitBoxes(const ComposedActor& composed) {
+  PortraitBoxes boxes;
+  for (std::size_t index = 0; index < composed.quads.size(); ++index) {
+    if (index >= composed.sources.size() || !HasImage(composed.sources[index])) {
+      continue;
+    }
+    const ActorPart part = PartOfQuad(composed, index);
+    if (IsHeadPart(part)) {
+      Grow(boxes.head, boxes.has_head, composed.quads[index]);
+    } else if (part == ActorPart::kBody) {
+      Grow(boxes.body, boxes.has_body, composed.quads[index]);
+    }
+  }
+  return boxes;
+}
+
+PortraitBoxes MeasureLoopPortraitBoxes(ActorOutfit& outfit, const PortraitLoop& loop) {
+  const DollClocks clocks = DollClocksOf(outfit, loop.animation, loop.direction, loop.body_plays);
+  PortraitBoxes envelope;
+  for (const DollProbe& probe : DollEnvelopeProbes(clocks, loop.rest_frame)) {
+    const PortraitBoxes instant = MeasurePaintedPortraitBoxes(
+        ComposeDollProbe(outfit, loop.animation, loop.direction, probe));
+    Absorb(envelope.head, envelope.has_head, instant.head, instant.has_head);
+    Absorb(envelope.body, envelope.has_body, instant.body, instant.has_body);
+  }
+  return envelope;
 }
 
 VignetteFraming FramePortrait(const PortraitBoxes& boxes, const PortraitAim& aim,
@@ -87,6 +138,22 @@ VignetteFraming FramePortrait(const PortraitBoxes& boxes, const PortraitAim& aim
   framing.origin =
       frame * (glm::vec2(kHalf) + aim.offset) - focus * scale - glm::vec2(aim.inset_px);
   return framing;
+}
+
+VignetteFraming PortraitFramer::Frame(ActorOutfit& outfit, const ActorLook& look,
+                                      const PortraitLoop& loop, const PortraitAim& aim,
+                                      glm::vec2 box_size) {
+  const bool same_pose =
+      measured_ && outfit_ == &outfit && SameLook(look, look_) && SameLoop(loop, loop_);
+  if (!same_pose) {
+    boxes_ = MeasureLoopPortraitBoxes(outfit, loop);
+    outfit_ = &outfit;
+    look_ = look;
+    loop_ = loop;
+    measured_ = true;
+    ++measure_count_;
+  }
+  return FramePortrait(boxes_, aim, box_size);
 }
 
 }  // namespace ro::render

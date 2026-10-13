@@ -92,18 +92,23 @@ const IconTexture& ActorVignette::Get(const Pose& pose) {
   // LES BORNES DE CE QUI EST PEINT, relevées à chaque image : elles bougent
   // avec l'animation, même quand la texture n'a pas à être refaite.
   std::vector<SpriteQuad> painted;
-  std::vector<ActorPart> painted_parts;
   for (std::size_t index = 0; index < composed.quads.size(); ++index) {
     if (index < composed.sources.size() && HasImage(composed.sources[index])) {
       painted.push_back(composed.quads[index]);
-      painted_parts.push_back(PartOfQuad(composed, index));
     }
   }
   drawn_bounds_ = ComputeBounds(painted);
-  // LE PORTRAIT SE CADRE SUR CE QUI EST PEINT, à chaque image.
+  // LE PORTRAIT SE CADRE SUR LA BOUCLE DE SA POSE, mesurée une fois : le corps
+  // et ses coiffes s'animent dans un cadre qui ne bouge pas. Le corps joue
+  // quand la pose est animée et qu'aucune image ne lui est imposée — la même
+  // règle que la composition ci-dessus.
   if (pose.aim.has_value()) {
-    framing_ = FramePortrait(
-        MeasurePortraitBoxes(painted, painted_parts), *pose.aim,
+    const PortraitLoop loop{.animation = pose.animation,
+                            .direction = pose.direction,
+                            .body_plays = !held.has_value(),
+                            .rest_frame = held.value_or(0)};
+    framing_ = portrait_framer_.Frame(
+        *outfit, pose.look, loop, *pose.aim,
         glm::vec2(static_cast<float>(pose.box.width), static_cast<float>(pose.box.height)));
   }
 

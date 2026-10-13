@@ -223,6 +223,37 @@ DollTimeline PlanDollTimeline(const DollClocks& clocks) {
   return Spaced(StepsWithin(alone, kept.length_ms()), kept.length_ms());
 }
 
+std::vector<DollProbe> DollEnvelopeProbes(const DollClocks& clocks, std::size_t rest_frame) {
+  // Les instants des pièces : chaque pas de chaque tour, sur sa longueur.
+  std::vector<float> instants = {0.0F};
+  for (const AlternateClock& clock : clocks.attachments) {
+    if (clock.multiple > 1 && Believable(clock.step_ms())) {
+      for (std::size_t step = 1; step < clock.multiple; ++step) {
+        instants.push_back(clock.step_ms() * static_cast<float>(step));
+      }
+    }
+  }
+  std::sort(instants.begin(), instants.end());
+  instants.erase(std::unique(instants.begin(), instants.end()), instants.end());
+
+  const bool plays = BodyPlays(clocks);
+  const std::size_t body_frames = plays ? clocks.body_frames : 1;
+  std::vector<DollProbe> probes;
+  probes.reserve(body_frames * instants.size());
+  for (std::size_t frame = 0; frame < body_frames; ++frame) {
+    for (const float at_ms : instants) {
+      probes.push_back(DollProbe{.at_ms = at_ms, .body_frame = plays ? frame : rest_frame});
+    }
+  }
+  return probes;
+}
+
+const ComposedActor& ComposeDollProbe(ActorOutfit& outfit, std::size_t animation,
+                                      std::size_t direction, const DollProbe& probe) {
+  return outfit.Composed(animation, direction, probe.at_ms + kSampleNudgeMs, /*loop=*/true,
+                         probe.body_frame);
+}
+
 core::Result<DollPoses> ComposeDollPoses(ActorOutfit& outfit, const DollShot& shot,
                                          const DollTimeline& timeline) {
   const DollClocks clocks = DollClocksOf(outfit, shot.animation, shot.direction, shot.body_plays);

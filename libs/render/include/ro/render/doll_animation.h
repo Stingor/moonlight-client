@@ -101,6 +101,29 @@ struct DollTimeline {
 // kLongestDollStepMs] — : une seule image, de délai nul.
 [[nodiscard]] DollTimeline PlanDollTimeline(const DollClocks& clocks);
 
+// UN ÉCHANTILLON POUR MESURER UNE ENVELOPPE : l'instant qui place les pièces à
+// horloge propre, en millisecondes, et l'image que le corps tient.
+struct DollProbe {
+  float at_ms = 0.0F;
+  std::size_t body_frame = 0;
+};
+
+// DE QUOI VOIR CHAQUE IMAGE DE CHAQUE PIÈCE, sur chaque image du corps.
+//
+// 🔴 CE N'EST PAS LE PLAN D'UN GIF. Une boucle qui retombe juste peut compter
+// des centaines d'instants, et son repli n'échantillonne une pièce qu'aux pas
+// d'un autre tour : il en manquerait les images extrêmes. Ici, chaque tour se
+// parcourt sur SA propre longueur, et le corps se tient sur chacune de ses
+// images — celle de `rest_frame` seule quand il ne joue pas. Une pièce
+// s'accroche au corps ou à la tête, jamais à une autre pièce : ce produit voit
+// donc chaque position qu'elle prend. Coût : images du corps × somme des pas.
+[[nodiscard]] std::vector<DollProbe> DollEnvelopeProbes(const DollClocks& clocks,
+                                                        std::size_t rest_frame);
+
+// La pose d'un échantillon. ⚠ LA RÉFÉRENCE APPARTIENT À LA TENUE.
+[[nodiscard]] const ComposedActor& ComposeDollProbe(ActorOutfit& outfit, std::size_t animation,
+                                                    std::size_t direction, const DollProbe& probe);
+
 // CE QU'ON PHOTOGRAPHIE.
 struct DollShot {
   // Le RANG d'animation, tel que le .act les range — voir `sprite_frame.h`.

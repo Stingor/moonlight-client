@@ -1383,6 +1383,9 @@ tr: The target is under report protection.
 fr: Ce nom n'est pas disponible.
 tr: Name isn't available.
 
+fr: Chaque icône revient à sa place d'origine. Les icônes masquées le restent.
+tr: Each icon returns to its original place. Hidden icons stay hidden.
+
 fr: Cible introuvable...
 tr: Target not found...
 
@@ -4113,6 +4116,9 @@ tr: this site
 
 fr: Étape franchie
 tr: Step cleared
+
+fr: Étiquettes
+tr: Labels
 
 fr: … et %d autre(s)
 tr: … and %d more
@@ -13126,9 +13132,6 @@ tr: Back to the grid
 
 fr: Remettre toutes les icônes à leur place d'origine ?
 tr: Put every icon back in its original place?
-
-fr: Chaque icône revient à sa case d'origine, au coin haut-droit de l'écran. Les icônes masquées le restent.
-tr: Each icon returns to its original cell, in the top-right corner of the screen. Hidden icons stay hidden.
 
 fr: Les bords de l'icône qu'on déplace s'alignent sur ceux des autres. La grille d'alignement de l'interface aimante aussi, si elle est allumée.
 tr: The edges of the icon being moved line up with those of the others. The interface alignment grid also snaps, when it is on.

@@ -8,6 +8,7 @@
 
 #include "game/settings_file.h"
 #include "options/bug_report_options.h"
+#include "options/factory_layout.h"
 
 namespace moonclient {
 
@@ -36,11 +37,6 @@ static_assert(kBugReportRowBase + static_cast<int>(BugReportRow::kCount) <= kMen
 [[nodiscard]] constexpr int MenuIconsRowId(MenuIconsRow row) {
   return kMenuIconsRowBase + static_cast<int>(row);
 }
-
-// LA PLACE D'USINE DES ICÔNES : un bloc de cinq colonnes au coin haut-gauche,
-// et le bouton du Vote Shop ancré à droite. Une icône absente de la table garde
-// sa case de la grille du jeu.
-[[nodiscard]] ro::ui::MenuIconsLook FactoryMenuIcons();
 
 class MenuIconsOptions {
  public:

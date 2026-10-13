@@ -1383,6 +1383,9 @@ tr: Este jugador está protegido contra las denuncias.
 fr: Ce nom n'est pas disponible.
 tr: Este nombre no está disponible.
 
+fr: Chaque icône revient à sa place d'origine. Les icônes masquées le restent.
+tr: Cada icono vuelve a su lugar de origen. Los iconos ocultos siguen ocultos.
+
 fr: Cible introuvable...
 tr: Objetivo no encontrado...
 
@@ -4113,6 +4116,9 @@ tr: este sitio
 
 fr: Étape franchie
 tr: Etapa superada
+
+fr: Étiquettes
+tr: Etiquetas
 
 fr: … et %d autre(s)
 tr: … y %d más
@@ -13126,9 +13132,6 @@ tr: Volver a la cuadrícula
 
 fr: Remettre toutes les icônes à leur place d'origine ?
 tr: ¿Devolver todos los iconos a su lugar de origen?
-
-fr: Chaque icône revient à sa case d'origine, au coin haut-droit de l'écran. Les icônes masquées le restent.
-tr: Cada icono vuelve a su casilla de origen, en la esquina superior derecha de la pantalla. Los iconos ocultos siguen ocultos.
 
 fr: Les bords de l'icône qu'on déplace s'alignent sur ceux des autres. La grille d'alignement de l'interface aimante aussi, si elle est allumée.
 tr: Los bordes del icono que se mueve se alinean con los de los demás. La cuadrícula de alineación de la interfaz también imanta, si está activada.

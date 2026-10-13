@@ -129,22 +129,33 @@ void StatusPortraitOptions::Declare(SettingsFile& into) {
   }
 }
 
-void StatusPortraitOptions::Compose() {
+void StatusPortraitOptions::Compose(PortraitTab tab, bool shared) {
   rows_.clear();
-  animation_names_ = {Tr("Repos"),   Tr("Marche"), Tr("Assis"), Tr("Ramasser"), Tr("Combat"),
-                      Tr("Attaque"), Tr("Touché"), Tr("Gelé"),  Tr("Mort")};
-  direction_names_ = {Tr("Face"), Tr("Profil-Gauche"),  Tr("Gauche"), Tr("Arrière-Gauche"),
-                      Tr("Dos"),  Tr("Arrière-Droite"), Tr("Droite"), Tr("Profil-Droite")};
-  // « Base » et « Job » restent en anglais : c'est le vocabulaire du jeu.
-  level_format_names_ = {"99/70", "Base 99 · Job 70", Tr("Base seule (99)")};
-  const bool off = !look_.shown;
+  if (shared) {
+    ComposeShared();
+  }
+  // Tout ce qui suit l'interrupteur maître lui obéit.
+  const std::size_t governed_from = shared ? 1 : 0;
+  if (tab == PortraitTab::kLabels) {
+    ComposeLabels();
+  } else {
+    ComposeFraming();
+  }
 
+  // Un interrupteur maître grise ce qu'il commande : cliquable et sans effet
+  // serait le pire des deux mondes.
+  const bool off = !look_.shown;
+  for (std::size_t rank = governed_from; rank < rows_.size(); ++rank) {
+    rows_[rank].disabled = rows_[rank].disabled || off;
+  }
+}
+
+void StatusPortraitOptions::ComposeShared() {
   rows_.push_back(Toggle(PortraitRow::kShown, Tr("Afficher le portrait et les étiquettes"),
                          Tr("Le portrait du personnage, son pseudo, sa classe et son niveau : "
                             "quatre cadres indépendants, que l'on déplace, retaille et colore "
                             "chacun à son goût."),
                          look_.shown));
-  const std::size_t governed_from = rows_.size();
   rows_.push_back(Toggle(PortraitRow::kLocked, Tr("Verrouiller le portrait"),
                          Tr("Verrouillé : les cadres ne bougent plus et laissent passer les clics "
                             "au jeu.\nDéverrouillé : glisser pour déplacer, tirer un bord ou un "
@@ -156,6 +167,20 @@ void StatusPortraitOptions::Compose() {
                             "Deux cadres qui se touchent partent ensemble au CTRL."),
                          look_.sticky));
   rows_.back().disabled = look_.locked;
+  rows_.push_back(Toggle(PortraitRow::kBorder, Tr("Bordure"),
+                         Tr("Un trait d'un pixel autour de chaque cadre."), look_.border));
+  rows_.push_back(OptionRowView{.id = PortraitRowId(PortraitRow::kResetLayout),
+                                .label = Tr("Réinitialiser la disposition"),
+                                .help = Tr("Repose les quatre cadres à leur place d'origine. Les "
+                                           "couleurs et les interrupteurs ne bougent pas."),
+                                .kind = OptionKind::kAction});
+}
+
+void StatusPortraitOptions::ComposeFraming() {
+  animation_names_ = {Tr("Repos"),   Tr("Marche"), Tr("Assis"), Tr("Ramasser"), Tr("Combat"),
+                      Tr("Attaque"), Tr("Touché"), Tr("Gelé"),  Tr("Mort")};
+  direction_names_ = {Tr("Face"), Tr("Profil-Gauche"),  Tr("Gauche"), Tr("Arrière-Gauche"),
+                      Tr("Dos"),  Tr("Arrière-Droite"), Tr("Droite"), Tr("Profil-Droite")};
 
   rows_.push_back(Toggle(PortraitRow::kHeadOnly, Tr("Tête seule"),
                          Tr("Cadre la tête et ses coiffes ; le corps sort du cadre et la cape est "
@@ -185,69 +210,68 @@ void StatusPortraitOptions::Compose() {
                             "première image."),
                          framing_.animated));
 
+  ComposePart(PortraitPart::kHead, Tr("Apparence"));
+}
+
+void StatusPortraitOptions::ComposeLabels() {
+  // « Base » et « Job » restent en anglais : c'est le vocabulaire du jeu.
+  level_format_names_ = {"99/70", "Base 99 · Job 70", Tr("Base seule (99)")};
   rows_.push_back(Choice(PortraitRow::kLevelFormat, Tr("Format du niveau"), nullptr,
                          level_format_names_,
                          static_cast<int>(ro::ui::LevelFormatOf(look_.level_format))));
   rows_.back().heading = Tr("Niveau");
 
-  rows_.push_back(Toggle(PortraitRow::kBorder, Tr("Bordure"),
-                         Tr("Un trait d'un pixel autour de chaque cadre."), look_.border));
-  rows_.back().heading = Tr("Couleurs, arrondis et taille du texte");
-  // Les cadres : un interrupteur, puis le fond, le texte, l'arrondi et la
-  // taille du texte. Le portrait n'écrit rien : ni texte, ni taille.
-  for (std::size_t rank = 0; rank < ro::ui::kPortraitPartCount; ++rank) {
-    const auto part = static_cast<PortraitPart>(rank);
-    const ro::ui::PortraitPartLook& look = look_.parts[rank];
-    const bool writes = part != PortraitPart::kHead;
-    rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kShown),
-                                  .label = PartLabel(part),
-                                  .kind = OptionKind::kToggle,
-                                  .on = look.shown});
-    rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kBackground),
-                                  .label = Tr("Fond"),
-                                  .kind = OptionKind::kColor,
-                                  .color = look.background,
-                                  .indented = true,
-                                  .disabled = !look.shown});
-    if (writes) {
-      rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kText),
-                                    .label = Tr("Texte"),
-                                    .kind = OptionKind::kColor,
-                                    .color = look.text,
-                                    .indented = true,
-                                    .disabled = !look.shown});
-    }
-    rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kRounding),
-                                  .label = Tr("Arrondi"),
-                                  .kind = OptionKind::kSlider,
-                                  .value = look.rounding,
-                                  .lowest = 0.0F,
-                                  .highest = ro::ui::kPortraitRoundingMost,
-                                  .format = "%.0f",
-                                  .indented = true,
-                                  .disabled = !look.shown});
-    if (writes) {
-      rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kTextScale),
-                                    .label = Tr("Taille du texte"),
-                                    .kind = OptionKind::kSlider,
-                                    .value = look.text_scale,
-                                    .lowest = ro::ui::kPortraitTextScaleLeast,
-                                    .highest = ro::ui::kPortraitTextScaleMost,
-                                    .format = "%.2f",
-                                    .indented = true,
-                                    .disabled = !look.shown});
-    }
+  const char* heading = Tr("Couleurs, arrondis et taille du texte");
+  for (const PortraitPart part :
+       {PortraitPart::kName, PortraitPart::kClass, PortraitPart::kLevel}) {
+    ComposePart(part, heading);
+    // Le titre ne se pose qu'une fois, sur la première étiquette.
+    heading = nullptr;
   }
-  rows_.push_back(OptionRowView{.id = PortraitRowId(PortraitRow::kResetLayout),
-                                .label = Tr("Réinitialiser la disposition"),
-                                .help = Tr("Repose les quatre cadres à leur place d'origine. Les "
-                                           "couleurs et les interrupteurs ne bougent pas."),
-                                .kind = OptionKind::kAction});
+}
 
-  // Un interrupteur maître grise ce qu'il commande : cliquable et sans effet
-  // serait le pire des deux mondes.
-  for (std::size_t rank = governed_from; rank < rows_.size(); ++rank) {
-    rows_[rank].disabled = rows_[rank].disabled || off;
+void StatusPortraitOptions::ComposePart(PortraitPart part, const char* heading) {
+  const ro::ui::PortraitPartLook& look = look_.parts[static_cast<std::size_t>(part)];
+  // Le portrait n'écrit rien : ni texte, ni taille.
+  const bool writes = part != PortraitPart::kHead;
+  rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kShown),
+                                .label = PartLabel(part),
+                                .kind = OptionKind::kToggle,
+                                .on = look.shown,
+                                .heading = heading});
+  rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kBackground),
+                                .label = Tr("Fond"),
+                                .kind = OptionKind::kColor,
+                                .color = look.background,
+                                .indented = true,
+                                .disabled = !look.shown});
+  if (writes) {
+    rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kText),
+                                  .label = Tr("Texte"),
+                                  .kind = OptionKind::kColor,
+                                  .color = look.text,
+                                  .indented = true,
+                                  .disabled = !look.shown});
+  }
+  rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kRounding),
+                                .label = Tr("Arrondi"),
+                                .kind = OptionKind::kSlider,
+                                .value = look.rounding,
+                                .lowest = 0.0F,
+                                .highest = ro::ui::kPortraitRoundingMost,
+                                .format = "%.0f",
+                                .indented = true,
+                                .disabled = !look.shown});
+  if (writes) {
+    rows_.push_back(OptionRowView{.id = PortraitPartRowId(part, PortraitPartField::kTextScale),
+                                  .label = Tr("Taille du texte"),
+                                  .kind = OptionKind::kSlider,
+                                  .value = look.text_scale,
+                                  .lowest = ro::ui::kPortraitTextScaleLeast,
+                                  .highest = ro::ui::kPortraitTextScaleMost,
+                                  .format = "%.2f",
+                                  .indented = true,
+                                  .disabled = !look.shown});
   }
 }
 
@@ -325,9 +349,10 @@ bool StatusPortraitOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       look_.level_format = static_cast<int>(ro::ui::LevelFormatOf(asked.chosen));
       break;
     case PortraitRow::kResetLayout:
-      // Les géométries seules : couleurs et interrupteurs ne bougent pas.
+      // Les géométries seules, celles que le propriétaire a livrées : couleurs
+      // et interrupteurs ne bougent pas.
       for (std::size_t rank = 0; rank < ro::ui::kPortraitPartCount; ++rank) {
-        look_.parts[rank].rect = ro::ui::DefaultPortraitPartRect(static_cast<PortraitPart>(rank));
+        look_.parts[rank].rect = factory_look_.parts[rank].rect;
       }
       break;
     case PortraitRow::kCount:

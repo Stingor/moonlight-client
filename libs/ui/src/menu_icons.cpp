@@ -421,15 +421,6 @@ float MenuIconsHomeRight(float scale) {
   return (kMenuIconsScreenMargin + MenuIconsGridSize(kMenuIconsPerRow).x) * scale;
 }
 
-void ForgetMenuIconPlaces(MenuIconsLook& look) noexcept {
-  for (MenuIconPlace& place : look.places) {
-    place.x = -1.0F;
-    place.y = -1.0F;
-    place.across = 0;
-    place.down = 0;
-  }
-}
-
 MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconView> icons,
                               MenuIconsLook& look, const AlignGrid& grid, HudGrip& grip,
                               const SkinArt& art) {

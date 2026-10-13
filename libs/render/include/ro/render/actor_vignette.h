@@ -53,8 +53,9 @@ class ActorVignette {
     // que la tête se tourne. À l'appelant de la borner au nombre d'images.
     std::optional<std::size_t> held_frame;
     // LE CADRAGE DE PORTRAIT, ou rien pour la vignette en pied. Présent, il
-    // remplace celui de la boîte : la vignette se recadre à CHAQUE IMAGE sur
-    // ce qu'elle peint de la tête et du corps. Voir `portrait_framing.h`.
+    // remplace celui de la boîte : la vignette se cadre sur ce que la BOUCLE
+    // ENTIÈRE de la pose peint de la tête et du corps, mesurée une fois par
+    // pose. Voir `portrait_framing.h`.
     std::optional<PortraitAim> aim;
   };
 
@@ -115,6 +116,9 @@ class ActorVignette {
   // Le dernier `Get` cadrait-il un portrait ? Le cadrage en pied se refait
   // alors au suivant, même boîte et même tenue.
   bool aimed_ = false;
+  // Les boîtes de la boucle du portrait, gardées tant que la pose ne change
+  // pas.
+  PortraitFramer portrait_framer_;
   SpriteBounds drawn_bounds_;
   const ComposedActor* composed_ = nullptr;
   float animation_duration_ms_ = 0.0F;

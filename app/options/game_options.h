@@ -735,7 +735,8 @@ class GameOptions {
   [[nodiscard]] bool ChangeShortcutBar(const ro::ui::OptionsWindowAction& asked);
   [[nodiscard]] bool ChangeStatBar(const ro::ui::OptionsWindowAction& asked);
   // `shown_bar` est l'onglet ouvert : on ne compose que ses seize lignes.
-  void BuildStatBarRows(int shown_bar);
+  // `for_search` : composé pour la recherche, où une ligne ne ressort qu'une fois.
+  void BuildStatBarRows(int shown_bar, bool for_search = false);
   // LES BARRES DES ENTITÉS : six onglets, un par espèce, dans
   // `game_option_entities.cpp`. Même dispositif que les jauges, et pour la même
   // raison — cent quarante-quatre lignes qui se ressemblent toutes.

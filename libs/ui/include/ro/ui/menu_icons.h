@@ -265,10 +265,6 @@ inline constexpr float kMenuButtonGap = 8.0F;
 // masque une.
 [[nodiscard]] float MenuIconsHomeRight(float scale);
 
-// Oublie toutes les places posées : chaque icône revient à sa case d'origine.
-// ⚠ LES MASQUÉES LE RESTENT : on range, on ne remontre pas.
-void ForgetMenuIconPlaces(MenuIconsLook& look) noexcept;
-
 // Ce que la grille rend à l'appelant, pour cette image.
 struct MenuIconsAnswer {
   std::optional<MenuCommand> clicked;

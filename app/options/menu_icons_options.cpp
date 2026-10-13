@@ -7,7 +7,8 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
-#include "ro/ui/window_places.h"
+
+#include "options/factory_layout.h"
 
 namespace moonclient {
 namespace {
@@ -33,43 +34,6 @@ constexpr const char* kStickyKey = "menu_icons_snapped";
   return key;
 }
 
-// Une place d'usine, par nom de bitmap : voir `FactoryMenuIcons`.
-struct FactoryIconPlace {
-  std::string_view stem;
-  float x = 0.0F;
-  float y = 0.0F;
-  ro::ui::AnchorSide across = ro::ui::AnchorSide::kStart;
-};
-
-// ⚠ PAR NOM DE BITMAP ET NON PAR RANG : le nom est celui du fichier du jeu, et
-// ne bouge pas quand le catalogue s'ordonne autrement.
-constexpr std::array kFactoryIconPlaces = {
-    FactoryIconPlace{.stem = "status", .x = 3.0F, .y = 55.0F},
-    FactoryIconPlace{.stem = "party", .x = 35.0F, .y = 56.0F},
-    FactoryIconPlace{.stem = "item", .x = 67.0F, .y = 55.0F},
-    FactoryIconPlace{.stem = "skill", .x = 99.0F, .y = 55.0F},
-    FactoryIconPlace{.stem = "booking", .x = 131.0F, .y = 55.0F},
-    FactoryIconPlace{.stem = "equip", .x = 3.0F, .y = 90.0F},
-    FactoryIconPlace{.stem = "guild", .x = 35.0F, .y = 89.0F},
-    FactoryIconPlace{.stem = "battle", .x = 67.0F, .y = 89.0F},
-    FactoryIconPlace{.stem = "quest", .x = 99.0F, .y = 89.0F},
-    FactoryIconPlace{.stem = "map", .x = 131.0F, .y = 89.0F},
-    FactoryIconPlace{.stem = "navigation", .x = 3.0F, .y = 123.0F},
-    FactoryIconPlace{.stem = "option", .x = 35.0F, .y = 123.0F},
-    FactoryIconPlace{.stem = "bank", .x = 67.0F, .y = 123.0F},
-    FactoryIconPlace{.stem = "mail", .x = 99.0F, .y = 123.0F},
-    FactoryIconPlace{.stem = "achievement", .x = 131.0F, .y = 123.0F},
-    FactoryIconPlace{.stem = "shop", .x = 3.0F, .y = 155.0F},
-    FactoryIconPlace{.stem = "keyboard", .x = 35.0F, .y = 157.0F},
-    FactoryIconPlace{.stem = "album", .x = 67.0F, .y = 157.0F},
-    FactoryIconPlace{.stem = "atlas", .x = 99.0F, .y = 157.0F},
-    FactoryIconPlace{.stem = "tracker", .x = 131.0F, .y = 157.0F},
-    FactoryIconPlace{.stem = "ranking", .x = 3.0F, .y = 191.0F},
-    FactoryIconPlace{.stem = "pet", .x = 35.0F, .y = 191.0F},
-    FactoryIconPlace{
-        .stem = "NC_CashShop", .x = 254.0F, .y = 14.0F, .across = ro::ui::AnchorSide::kEnd},
-};
-
 [[nodiscard]] OptionRowView Toggle(int id, const char* label, const char* help, bool on) {
   return OptionRowView{
       .id = id, .label = label, .help = help, .kind = OptionKind::kToggle, .on = on};
@@ -80,21 +44,6 @@ constexpr std::array kFactoryIconPlaces = {
 }
 
 }  // namespace
-
-ro::ui::MenuIconsLook FactoryMenuIcons() {
-  ro::ui::MenuIconsLook look;
-  for (const ro::ui::MenuIconEntry& entry : ro::ui::MenuIconCatalogue()) {
-    const auto found = std::ranges::find(kFactoryIconPlaces, entry.stem, &FactoryIconPlace::stem);
-    if (found == kFactoryIconPlaces.end()) {
-      continue;
-    }
-    ro::ui::MenuIconPlace& place = look.places[static_cast<std::size_t>(entry.command)];
-    place.x = found->x;
-    place.y = found->y;
-    place.across = static_cast<int>(found->across);
-  }
-  return look;
-}
 
 void MenuIconsOptions::Declare(SettingsFile& into) {
   into.Declare(kLockedKey, &look_.locked);
@@ -131,8 +80,7 @@ void MenuIconsOptions::Compose() {
   rows_.push_back(OptionRowView{
       .id = MenuIconsRowId(MenuIconsRow::kForgetPlaces),
       .label = Tr("Remettre en grille"),
-      .help = Tr("Chaque icône revient à sa case d'origine, au coin haut-droit de l'écran. "
-                 "Les icônes masquées le restent."),
+      .help = Tr("Chaque icône revient à sa place d'origine. Les icônes masquées le restent."),
       .kind = OptionKind::kAction,
       .confirm = Tr("Remettre toutes les icônes à leur place d'origine ?")});
 
@@ -174,9 +122,16 @@ bool MenuIconsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
     case MenuIconsRow::kSticky:
       look_.sticky = asked.on;
       break;
-    case MenuIconsRow::kForgetPlaces:
-      ro::ui::ForgetMenuIconPlaces(look_);
+    case MenuIconsRow::kForgetPlaces: {
+      // LES PLACES D'USINE, et elles seules : une icône masquée le reste.
+      const ro::ui::MenuIconsLook factory = FactoryMenuIcons();
+      for (std::size_t index = 0; index < look_.places.size(); ++index) {
+        const bool hidden = look_.places[index].hidden;
+        look_.places[index] = factory.places[index];
+        look_.places[index].hidden = hidden;
+      }
       break;
+    }
     case MenuIconsRow::kFirstIcon:
     case MenuIconsRow::kCount:
       break;
