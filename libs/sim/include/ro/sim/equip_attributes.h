@@ -22,6 +22,10 @@ namespace ro::sim {
 enum class EquipAttributesKind : std::uint8_t {
   kPiece = 0,  // l'identifiant est celui de la pièce
   kCombo = 1,  // l'identifiant est celui de l'ensemble
+  // Ce que le familier sorti apporte à son maître, selon son intimité du moment :
+  // « posé » à l'éclosion, « retiré » quand il quitte le joueur (retour à l'œuf,
+  // évolution, œuf perdu). L'identifiant est celui de son œuf.
+  kPet = 2,
 };
 
 // Le niveau d'une entrée qui n'est pas une commande bonus : l'apport propre de

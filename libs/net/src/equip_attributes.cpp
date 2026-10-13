@@ -18,6 +18,7 @@ std::optional<sim::EquipAttributes> ReadEquipAttributes(const Frame& frame) {
   switch (static_cast<sim::EquipAttributesKind>(packet.kind)) {
     case sim::EquipAttributesKind::kPiece:
     case sim::EquipAttributesKind::kCombo:
+    case sim::EquipAttributesKind::kPet:
       told.kind = static_cast<sim::EquipAttributesKind>(packet.kind);
       break;
     default:

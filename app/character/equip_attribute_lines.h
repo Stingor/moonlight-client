@@ -18,9 +18,9 @@ namespace moonclient {
 // (`ro::sim::EquipAttributes`).
 //
 // Comme le client d'origine : une ligne par attribut, verte à la pose, rouge au
-// retrait ; celles d'un ensemble préfixées « (C) », sans espace. Les LIBELLÉS
-// sont ceux de la fiche du personnage : un bonus qui y a sa rangée s'écrit avec
-// elle, mot pour mot.
+// retrait ; celles d'un ensemble préfixées « (C) », celles du familier « (P) »,
+// sans espace. Les LIBELLÉS sont ceux de la fiche du personnage : un bonus qui y
+// a sa rangée s'écrit avec elle, mot pour mot.
 
 // Ce qui nomme les cibles, les compétences, les statuts et les objets. Chacun
 // peut manquer : le nom cède alors la place au numéro.
@@ -36,12 +36,28 @@ inline constexpr std::uint32_t kEquipAttributesOnColor = 0x00FFC8;
 inline constexpr std::uint32_t kEquipAttributesOffColor = 0xFF0000;
 // Le préfixe des lignes d'un ensemble.
 inline constexpr std::string_view kEquipComboPrefix = "(C)";
+// Le préfixe des lignes du familier.
+inline constexpr std::string_view kEquipPetPrefix = "(P)";
+
+// Le préfixe des lignes d'une nature, vide pour une pièce.
+[[nodiscard]] constexpr std::string_view EquipAttributesPrefix(
+    ro::sim::EquipAttributesKind kind) noexcept {
+  switch (kind) {
+    case ro::sim::EquipAttributesKind::kCombo:
+      return kEquipComboPrefix;
+    case ro::sim::EquipAttributesKind::kPet:
+      return kEquipPetPrefix;
+    case ro::sim::EquipAttributesKind::kPiece:
+      break;
+  }
+  return {};
+}
 
 [[nodiscard]] constexpr std::uint32_t EquipAttributesColor(bool equipped) noexcept {
   return equipped ? kEquipAttributesOnColor : kEquipAttributesOffColor;
 }
 
-// Une ligne par bonus, préfixée pour un ensemble. Un bonus qui ne dit rien — une
+// Une ligne par bonus, préfixée selon la nature. Un bonus qui ne dit rien — une
 // valeur nulle — ne donne pas de ligne.
 [[nodiscard]] std::vector<std::string> ComposeEquipAttributeLines(
     const ro::sim::EquipAttributes& told, const EquipAttributeNames& names);
