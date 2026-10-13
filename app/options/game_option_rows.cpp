@@ -684,6 +684,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   sections_[Rank(OptionSection::kInterface)] =
       ro::ui::OptionSectionView{.title = Tr("Interface"),
                                 .group = Tr("UI"),
+                                .leads = true,
                                 .rows = display_rows_,
                                 .body = pages_.profiles_body,
                                 .body_terms = pages_.interface_terms};

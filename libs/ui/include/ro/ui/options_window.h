@@ -264,6 +264,9 @@ struct OptionSectionView {
   // Le titre de la FAMILLE que cette section ouvre, ou nul. ⚠ PORTÉ PAR SON
   // PREMIER MEMBRE : voir `NavEntry`, qui dit pourquoi.
   const char* group = nullptr;
+  // EN TÊTE DE SA FAMILLE, hors de l'ordre alphabétique : les sections de tête
+  // passent avant les autres, dans l'ordre reçu. Voir `SortedNavEntries`.
+  bool leads = false;
   // 🔴 UNE VUE, À PRENDRE APRÈS QUE LE VECTEUR EST REMPLI. Prise avant, elle
   // survit tant qu'il ne se réalloue pas — jusqu'au premier onglet qui compose
   // plus de lignes que le précédent —, puis elle pointe sur un tampon libéré.

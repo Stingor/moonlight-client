@@ -23,8 +23,9 @@ namespace moonclient {
 // ⚠ L'ORDRE DIT LES FAMILLES, PAS L'ORDRE DE LECTURE : `kDisplay` à `kCapture`
 // forment « Core », `kInterface` à `kQuestTracker` « UI », `kCommands`
 // « Server ». La navigation range chaque famille par ordre alphabétique de ses
-// titres, dans la langue du joueur. Une section sortie de son bloc changerait
-// de famille.
+// titres, dans la langue du joueur — sauf `kInterface` et `kSkin`, posées en
+// tête de « UI » quelle que soit la langue. Une section sortie de son bloc
+// changerait de famille.
 enum class OptionSection : std::size_t {
   // ── CORE : ce que le programme fait ──
   kDisplay = 0,

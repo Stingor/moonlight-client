@@ -113,6 +113,7 @@ ro::ui::OptionSectionView OptionPages::ComposeSkinSection() {
     skin_terms.push_back({.text = SkinLookProfiles::Text().title});
   }
   return ro::ui::OptionSectionView{.title = ro::core::Tr("Skin"),
+                                   .leads = true,
                                    .rows = skin_rows,
                                    .pinned_rows = skin_pinned_rows,
                                    .body = std::move(profiles),

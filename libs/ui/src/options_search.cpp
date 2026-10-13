@@ -197,6 +197,7 @@ std::vector<NavEntry> SortedNavEntries(std::span<const OptionSectionView> sectio
                                        const std::vector<bool>& shown) {
   struct Ranked {
     int family = 0;
+    bool leads = false;
     std::string key;
     int section = 0;
   };
@@ -213,6 +214,7 @@ std::vector<NavEntry> SortedNavEntries(std::span<const OptionSectionView> sectio
       continue;
     }
     ranked.push_back(Ranked{.family = family,
+                            .leads = section.leads,
                             .key = core::SearchKey(section.title),
                             .section = static_cast<int>(rank)});
   }
@@ -221,6 +223,10 @@ std::vector<NavEntry> SortedNavEntries(std::span<const OptionSectionView> sectio
   std::ranges::stable_sort(ranked, [](const Ranked& left, const Ranked& right) {
     if (left.family != right.family) {
       return left.family < right.family;
+    }
+    // Les sections de tête passent avant, et gardent entre elles l'ordre reçu.
+    if (left.leads || right.leads) {
+      return left.leads && !right.leads;
     }
     return left.key < right.key;
   });

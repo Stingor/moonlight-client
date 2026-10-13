@@ -118,8 +118,10 @@ class SearchedTabs {
 
 // LES ENTRÉES DE LA NAVIGATION, dans l'ordre où elles se lisent : chaque
 // famille garde sa place, et ses sections s'y rangent par ordre alphabétique
-// de leur titre, accents et casse ignorés. Une section qu'on ne montre pas
-// — `shown` faux — n'a pas d'entrée ; une famille sans entrée perd son titre.
+// de leur titre, accents et casse ignorés — sauf les sections de tête
+// (`OptionSectionView::leads`), qui passent avant, dans l'ordre reçu. Une
+// section qu'on ne montre pas — `shown` faux — n'a pas d'entrée ; une famille
+// sans entrée perd son titre.
 //
 // ⚠ LA FAMILLE D'UNE SECTION EST CELLE DU DERNIER TITRE DE FAMILLE QUI LA
 // PRÉCÈDE dans `sections` : c'est l'ordre reçu qui la dit, le tri ne la change
