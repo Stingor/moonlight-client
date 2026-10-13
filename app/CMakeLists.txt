@@ -1634,6 +1634,7 @@ add_executable(moonclient
     options/menu_icons_options.cpp
     options/map_sign_options.cpp
     options/broadcast_balloon_options.cpp
+    options/bubble_samples.cpp
     options/window_title_options.cpp
     options/minimap_panel_options.cpp
     options/quest_tracker_options.cpp

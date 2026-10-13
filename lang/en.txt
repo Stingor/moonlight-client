@@ -7724,9 +7724,6 @@ tr: Bow
 fr: Bruitages
 tr: Sound effects
 
-fr: Bulles
-tr: Bubbles
-
 fr: Bullet
 tr: Bullet
 
@@ -17543,9 +17540,6 @@ tr: Announcements — drag to place
 fr: Au-delà, la plus ancienne part pour la nouvelle. Le jeu en garde trois. L'avancée des chasses n'en montre toujours qu'une : chacune remplace la précédente.
 tr: Beyond that, the oldest one leaves for the new one. The game keeps three. Hunt progress always shows only one: each replaces the previous one.
 
-fr: Bulles d'annonce
-tr: Announcement balloons
-
 fr: Bulles d'annonce en haut de l'écran
 tr: Announcement balloons at the top of the screen
 
@@ -17623,6 +17617,30 @@ tr: [%s] failed to upgrade the [%s grade %s] item.
 
 fr: [%s] n'a pas réussi à raffiner [+%d %s].
 tr: [%s] fails to upgrade [+%d %s].
+
+fr: Bulles de chat
+tr: Chat bubbles
+
+fr: Bulles d'annonces
+tr: Announcement bubbles
+
+fr: Salut tout le monde !
+tr: Hi everyone!
+
+fr: Quelqu'un pour une partie à Glast Heim ?
+tr: Anyone up for a Glast Heim run?
+
+fr: Bienvenue ! Le serveur redémarre dans dix minutes.
+tr: Welcome! The server restarts in ten minutes.
+
+fr: Poring a raffiné un équipement avec succès : +9 Knife obtenu.
+tr: Poring successfully upgrades an equipment, +9 Knife obtained.
+
+fr: Une annonce plus longue se replie à la largeur réglée, sur autant de rangées qu'il faut pour la lire jusqu'au bout.
+tr: A longer announcement wraps at the chosen width, over as many rows as it takes to read it to the end.
+
+fr: Poring [ 3 / 10 ]
+tr: Poring [ 3 / 10 ]
 
 fr: Aucune instance en cours.
 tr: No instance in progress.
