@@ -17596,3 +17596,21 @@ tr: Put the hunts back where the game places them
 
 fr: Une annonce simple plus large se replie. Le jeu la coupe tous les 72 octets, ce qui coupe un caractère accentué en deux ; ce client replie à la largeur, et 380 pixels valent ses 72 caractères.
 tr: A plain announcement wider than this wraps. The game cuts it every 72 bytes, which splits an accented character in two; this client wraps by width, and 380 pixels match its 72 characters.
+
+fr: %s a ouvert [%s] et obtenu [%s].
+tr: %s has opened [%s] and received [%s].
+
+fr: Félicitations %s, [%s] obtenu !
+tr: Congratulation %s,  Acquired [%s] !
+
+fr: [%s] a amélioré le grade avec succès et obtenu l'item [%s grade %s].
+tr: [%s] succeeded in enhancing the grade, and acquired the [%s grade %s] item.
+
+fr: [%s] a raffiné un équipement avec succès : [+%d %s] obtenu.
+tr: [%s] successfully upgrades an equipment, [+%d %s] obtained.
+
+fr: [%s] n'a pas réussi à améliorer l'item [%s grade %s].
+tr: [%s] failed to upgrade the [%s grade %s] item.
+
+fr: [%s] n'a pas réussi à raffiner [+%d %s].
+tr: [%s] fails to upgrade [+%d %s].

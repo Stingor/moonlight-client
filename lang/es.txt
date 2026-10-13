@@ -17596,3 +17596,21 @@ tr: Devolver las cacerías al lugar del juego
 
 fr: Une annonce simple plus large se replie. Le jeu la coupe tous les 72 octets, ce qui coupe un caractère accentué en deux ; ce client replie à la largeur, et 380 pixels valent ses 72 caractères.
 tr: Un anuncio simple más ancho se divide en líneas. El juego lo corta cada 72 bytes, lo que parte en dos un carácter acentuado; este cliente divide según el ancho, y 380 píxeles equivalen a sus 72 caracteres.
+
+fr: %s a ouvert [%s] et obtenu [%s].
+tr: %s ha abierto [%s] y ha obtenido [%s].
+
+fr: Félicitations %s, [%s] obtenu !
+tr: ¡Felicidades %s, has obtenido [%s]!
+
+fr: [%s] a amélioré le grade avec succès et obtenu l'item [%s grade %s].
+tr: [%s] ha mejorado el grado con éxito y ha obtenido el item [%s grado %s].
+
+fr: [%s] a raffiné un équipement avec succès : [+%d %s] obtenu.
+tr: [%s] ha refinado un equipo con éxito: [+%d %s] obtenido.
+
+fr: [%s] n'a pas réussi à améliorer l'item [%s grade %s].
+tr: [%s] no ha conseguido mejorar el item [%s grado %s].
+
+fr: [%s] n'a pas réussi à raffiner [+%d %s].
+tr: [%s] no ha conseguido refinar [+%d %s].

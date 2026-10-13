@@ -21,6 +21,18 @@ void ItemNews::NotePartyPickup(PartyPickup pickup) { Keep(pickups_, std::move(pi
 
 void ItemNews::NoteEquipDamage(EquipDamage damage) { Keep(damages_, damage); }
 
+void ItemNews::NoteRareObtain(RareItemObtain obtained) { Keep(rare_obtains_, std::move(obtained)); }
+
+void ItemNews::NoteRefine(RefineAnnounce refined) { Keep(refines_, std::move(refined)); }
+
+void ItemNews::NoteGrade(GradeAnnounce graded) { Keep(grades_, std::move(graded)); }
+
+std::vector<RareItemObtain> ItemNews::TakeRareObtains() { return std::exchange(rare_obtains_, {}); }
+
+std::vector<RefineAnnounce> ItemNews::TakeRefines() { return std::exchange(refines_, {}); }
+
+std::vector<GradeAnnounce> ItemNews::TakeGrades() { return std::exchange(grades_, {}); }
+
 std::vector<PartyPickup> ItemNews::TakePartyPickups() { return std::exchange(pickups_, {}); }
 
 std::vector<EquipDamage> ItemNews::TakeEquipDamages() { return std::exchange(damages_, {}); }

@@ -1038,17 +1038,19 @@ target_link_libraries(moonclient_itemtoast
 target_include_directories(moonclient_itemtoast PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LES BULLES D'ANNONCE DU HAUT DE L'ECRAN : la pile de chaque famille, la vie
-# d'une bulle et son fondu.
+# d'une bulle et son fondu, et les annonces d'objet qui en posent une — objet
+# rare, raffinage, grade.
 #
 # 🔴 EN BIBLIOTHEQUE POUR LA MEME RAISON QUE LE BANDEAU D'OBTENTION : une bulle
 # qui part par le mauvais bout, ou une famille rangee avant l'autre, ressemble
 # en jeu a une annonce qu'on n'a pas vue passer.
 add_library(moonclient_balloons STATIC
-    world/broadcast_balloons.cpp)
+    world/broadcast_balloons.cpp
+    world/item_broadcast_report.cpp)
 
 target_link_libraries(moonclient_balloons
     PUBLIC ro_sim ro_ui moonclient_chatlinks
-    PRIVATE ro_core ro_warnings)
+    PRIVATE ro_core ro_vfs ro_warnings)
 
 target_include_directories(moonclient_balloons PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

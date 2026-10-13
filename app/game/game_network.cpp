@@ -40,6 +40,7 @@
 #include "world/attack_intent.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
+#include "world/item_broadcast_report.h"
 #include "world/monster_auras.h"
 
 namespace moonclient {
@@ -516,6 +517,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     pieces_.item_report->Notice(world_, creators, now_ms);
     pieces_.item_report->NoticeNews(pieces_.item_news, world_, party_, creators);
   }
+  // Ce que le serveur annonce à tous sur des objets : rare, raffinage, grade.
+  ReportItemBroadcasts(pieces_.item_news, world_);
   // Et les refus de compétence, nommés et avec l'objet qui manque.
   pieces_.skill_refusals.Notice(
       world_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
