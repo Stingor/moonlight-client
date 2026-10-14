@@ -79,4 +79,11 @@ inline constexpr float kWarpPickRadius = ro::render::kWarpRingRewindRadius;
 void KeepWarp(std::uint32_t actor_id, const glm::vec3& ground_position,
               std::vector<ro::render::DrawnActor>& drawn, std::vector<std::uint32_t>& ids);
 
+// UN ACTEUR SANS CORPS QUI SE CLIQUE prend sa place dans la scène sans rien y
+// peindre : un rang ajouté à `drawn` et `ids`, désigné par le point de ses pieds
+// (voir `ro::render::DrawnActor::point_pick`), avec ce recul. Ni nom, ni jauge,
+// ni ombre ne s'y accrochent.
+void KeepPointPick(std::uint32_t actor_id, const glm::vec3& ground_position, float pick_bias,
+                   std::vector<ro::render::DrawnActor>& drawn, std::vector<std::uint32_t>& ids);
+
 }  // namespace moonclient

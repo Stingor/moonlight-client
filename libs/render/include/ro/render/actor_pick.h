@@ -123,6 +123,10 @@ void WidenToWholeFloor(ScreenRect& rect, float floor_pixels);
 // de son centre à sa part (`DrawnActor::pick_share`). L'ombre n'en fait pas
 // partie — on ne clique pas une ombre. Rien si l'acteur n'a aucun quad, ou
 // s'il passe derrière l'œil.
+//
+// UN ACTEUR DÉSIGNÉ PAR UN POINT (`DrawnActor::point_pick`) n'a pas de quad :
+// son emprise est le carré du plancher, en pixels entiers, centré sur le point
+// de ses pieds.
 [[nodiscard]] std::optional<ScreenRect> ActorScreenRect(const Camera& camera, float aspect_ratio,
                                                         const DrawnActor& drawn,
                                                         float viewport_width,

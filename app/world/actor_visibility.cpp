@@ -51,4 +51,13 @@ void KeepWarp(std::uint32_t actor_id, const glm::vec3& ground_position,
   ids.push_back(actor_id);
 }
 
+void KeepPointPick(std::uint32_t actor_id, const glm::vec3& ground_position, float pick_bias,
+                   std::vector<ro::render::DrawnActor>& drawn, std::vector<std::uint32_t>& ids) {
+  ro::render::DrawnActor bodiless{nullptr, nullptr, ground_position};
+  bodiless.point_pick = true;
+  bodiless.pick_bias = pick_bias;
+  drawn.push_back(bodiless);
+  ids.push_back(actor_id);
+}
+
 }  // namespace moonclient

@@ -32,15 +32,25 @@ bool ComposedAsPlayer(const ro::sim::Actor& actor) {
           ro::render::IsPlayerClass(actor.look.job));
 }
 
+namespace {
+
+constexpr std::uint16_t kHiddenNpcJob = 111;
+
+}  // namespace
+
 bool IsUnseenClass(const ro::sim::Actor& actor) {
   constexpr std::uint16_t kUnseenJob = 104;
-  constexpr std::uint16_t kHiddenNpcJob = 111;
   constexpr std::uint16_t kHiddenWarpJob = 139;
   if (actor.kind == ro::sim::ActorKind::kItem || ComposedAsPlayer(actor)) {
     return false;
   }
   const std::uint16_t job = actor.look.job;
   return job == kUnseenJob || job == kHiddenNpcJob || job == kHiddenWarpJob;
+}
+
+bool IsPickedWithoutBody(const ro::sim::Actor& actor) {
+  return actor.kind == ro::sim::ActorKind::kNonPlayer && IsUnseenClass(actor) &&
+         actor.look.job == kHiddenNpcJob;
 }
 
 std::uint32_t ShownJobOf(const ro::sim::Actor& actor) {

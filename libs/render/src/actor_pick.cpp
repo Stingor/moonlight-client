@@ -306,9 +306,37 @@ std::optional<float> ActorSpriteScreenScale(const Camera& camera, float aspect_r
   return (on_screen->max.y - on_screen->min.y) / ((bottom - top) * drawn.scale);
 }
 
+namespace {
+
+// L'EMPRISE D'UN ACTEUR SANS IMAGE QUI SE DÉSIGNE : un rectangle de taille
+// nulle sur le point de ses pieds, élargi au plancher comme le client, en
+// pixels entiers — un carré du plancher centré sur ce point —, puis réduit à
+// sa part.
+std::optional<ScreenRect> PointScreenRect(const Camera& camera, float aspect_ratio,
+                                          const DrawnActor& drawn, float viewport_width,
+                                          float viewport_height) {
+  const std::optional<glm::vec2> foot =
+      ProjectToScreen(camera, aspect_ratio, drawn.ground_position, viewport_width, viewport_height);
+  if (!foot.has_value()) {
+    return std::nullopt;
+  }
+  ScreenRect rect{.min = *foot, .max = *foot};
+  WidenToWholeFloor(rect, drawn.pick_floor_pixels);
+  if (drawn.pick_share < 1.0F) {
+    Shrink(rect.min.x, rect.max.x, drawn.pick_share);
+    Shrink(rect.min.y, rect.max.y, drawn.pick_share);
+  }
+  return rect;
+}
+
+}  // namespace
+
 std::optional<ScreenRect> ActorScreenRect(const Camera& camera, float aspect_ratio,
                                           const DrawnActor& drawn, float viewport_width,
                                           float viewport_height) {
+  if (drawn.point_pick) {
+    return PointScreenRect(camera, aspect_ratio, drawn, viewport_width, viewport_height);
+  }
   std::optional<ScreenRect> rect =
       ActorScreenBounds(camera, aspect_ratio, drawn, viewport_width, viewport_height);
   if (!rect.has_value()) {

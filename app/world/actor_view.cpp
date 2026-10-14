@@ -396,6 +396,15 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
       return;
     }
     if (!HasSprite(actor.kind) || IsUnseenClass(actor)) {
+      // Le PNJ caché se clique sans se montrer : voir `IsPickedWithoutBody`.
+      // Une copie qui s'efface ne se désigne plus.
+      if (scene_id != 0 && IsPickedWithoutBody(actor)) {
+        const ro::sim::FractionalCell cell =
+            ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
+        const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+        KeepPointPick(scene_id, glm::vec3(ground[0], ground[1], ground[2]), kNonPlayerPickBias,
+                      scene.drawn, scene.ids);
+      }
       ++census.without_sprite;
       return;
     }

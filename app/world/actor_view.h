@@ -63,14 +63,27 @@ struct GroundUnitPick;
 [[nodiscard]] bool ComposedAsPlayer(const ro::sim::Actor& actor);
 
 // TROIS CLASSES DE NON-JOUEUR QUI NE SE MONTRENT PAS : 104, le PNJ caché (111)
-// et le portail caché (139). Ni corps, ni ombre, ni zone de clic, alors que la
-// table des sprites leur trouve un corps : 139, hors de ses plages, y prend le
-// Poring par défaut.
+// et le portail caché (139). Ni corps ni ombre, alors que la table des sprites
+// leur trouve un corps : 139, hors de ses plages, y prend le Poring par défaut.
+// Seul le PNJ caché garde une zone de clic : voir `IsPickedWithoutBody`.
 //
 // ⚠ PAR LA CLASSE, QUEL QUE SOIT LE GENRE : le serveur annonce aussi en joueur
 // déguisé l'interlocuteur fictif d'une commande qui ouvre un dialogue, en PNJ
 // caché. Ce qui se compose comme un joueur n'est pas concerné.
 [[nodiscard]] bool IsUnseenClass(const ro::sim::Actor& actor);
+
+// 🔴 LE PNJ CACHÉ NE SE MONTRE PAS, MAIS IL SE CLIQUE. C'est lui que le
+// château pose sur les drapeaux et les leviers de son décor : le drapeau qui
+// mène au concierge, aux investissements et à la salle des coffres, les
+// dispositifs de contrôle, l'interrupteur secret. Il se désigne par un carré du
+// plancher de clic centré sur le point de ses pieds (voir
+// `ro::render::DrawnActor::point_pick`), avec le recul d'un PNJ. 104 et 139,
+// eux, ne prennent aucun clic.
+//
+// ⚠ UN PNJ ANNONCÉ COMME TEL, et lui seul : l'interlocuteur fictif d'une
+// commande, posé en joueur déguisé sur la case du joueur, prendrait sinon le
+// clic porté sur ses pieds.
+[[nodiscard]] bool IsPickedWithoutBody(const ro::sim::Actor& actor);
 
 // La disposition du .act d'un acteur : celle d'un joueur pour qui se compose
 // comme un joueur, celle d'une créature pour tout le reste.

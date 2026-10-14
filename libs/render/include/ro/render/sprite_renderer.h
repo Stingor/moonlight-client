@@ -90,6 +90,11 @@ struct DrawnActor {
   // ⚠ CE DISQUE NE SERT QU'À DÉSIGNER. `ActorScreenBounds` n'en rend rien : ce
   // qu'on ancre à un acteur — jauge, nom, bulle — n'a rien à faire sur un warp.
   float ground_pick_radius = 0.0F;
+  // UN ACTEUR SANS IMAGE QUI SE DÉSIGNE QUAND MÊME — un PNJ caché, posé sur un
+  // drapeau ou un levier du décor — n'a ni quad ni modèle : son emprise est le
+  // POINT de `ground_position` projeté à l'écran, élargi au plancher. Faux pour
+  // tout autre acteur. Comme le disque d'un warp, elle ne sert qu'à désigner.
+  bool point_pick = false;
   // LE BROUILLARD LE PREND-IL, quand le dessin en porte un ? Oui pour un corps
   // ordinaire ; non pour ce que le client range à part — un corps additif, les
   // halos et les voiles qu'un effet pose sur lui, un sprite d'effet dont le mot
