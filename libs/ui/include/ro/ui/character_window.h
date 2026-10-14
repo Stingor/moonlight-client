@@ -312,6 +312,12 @@ struct CharacterAttributeView {
   std::int64_t cost = 0;
 };
 
+// CE QU'UN CLIC DE MONTÉE DEMANDE : un cran, ou avec Maj, jusqu'au prochain
+// palier de dix. ⚠ LE PALIER SE COMPTE SUR LE TOTAL, bonus compris : les seuils
+// du jeu tombent sur lui, pas sur la base. Le serveur borne la demande aux crans
+// que les points paient. La fiche et la fenêtre de statut partagent la règle.
+[[nodiscard]] int AttributeRaiseAmount(const CharacterAttributeView& attribute, bool to_next_step);
+
 // Les nombres du volet de droite.
 // UNE RANGÉE DE LA SECTION « BONUS D'ÉQUIPEMENT ».
 //

@@ -254,10 +254,7 @@ void AttributeRow(std::size_t rank, const CharacterAttributeView& attribute,
   if (SkinButton("+", art, ImVec2(square, 0.0F))) {
     action.verb = CharacterVerb::kRaiseAttribute;
     action.attribute = static_cast<std::uint8_t>(rank);
-    // MAJ : JUSQU'AU PROCHAIN PALIER DE DIX, et c'est le TOTAL qui compte — les
-    // seuils du jeu tombent sur le total, pas sur la valeur de base.
-    const std::int64_t total = attribute.base + attribute.bonus;
-    action.amount = ImGui::GetIO().KeyShift ? static_cast<int>(kStatStep - (total % kStatStep)) : 1;
+    action.amount = AttributeRaiseAmount(attribute, ImGui::GetIO().KeyShift);
   }
   ImGui::EndDisabled();
 
@@ -267,6 +264,14 @@ void AttributeRow(std::size_t rank, const CharacterAttributeView& attribute,
 }
 
 }  // namespace
+
+int AttributeRaiseAmount(const CharacterAttributeView& attribute, bool to_next_step) {
+  if (!to_next_step) {
+    return 1;
+  }
+  const std::int64_t total = attribute.base + attribute.bonus;
+  return static_cast<int>(kStatStep - (total % kStatStep));
+}
 
 float CharacterStatsPaneWidth(const SkinArt& art) {
   const ImGuiStyle& style = ImGui::GetStyle();

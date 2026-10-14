@@ -58,10 +58,6 @@ inline constexpr float kStatusArrowLeftPixels = 88.0F;
 inline constexpr float kStatusArrowPixels = 11.0F;
 inline constexpr float kStatusArrowAboveCenterPixels = 5.0F;
 
-// CE QU'UN CLIC SUR LA FLÈCHE DEMANDE : un cran, jamais plus. La fiche, elle,
-// sait aussi monter au palier et au maximum.
-inline constexpr int kStatusRaiseAmount = 1;
-
 // CE QUE LA FENÊTRE SAIT DU MONDE, recopié par l'appelant à chaque image.
 //
 // ⚠ LES DEUX BORNES DE LA MATK SONT NOMMÉES, et dans l'ordre qu'on lit : le

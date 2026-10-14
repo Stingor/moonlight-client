@@ -31,9 +31,10 @@ using render::SkinPiece;
 constexpr float kTextNormal = 13.0F;
 constexpr float kTextSmall = 11.0F;
 constexpr std::int64_t kLargestNormalNumber = 999;
-// Le nom de guilde, un cran sous les nombres, et un pixel plus haut qu'eux.
+// Le nom de guilde, un cran sous les nombres, et un pixel plus bas qu'eux : à
+// la hauteur des nombres, la petite taille le fait paraître au-dessus du libellé.
 constexpr float kTextGuild = 12.0F;
-constexpr float kGuildRaisePixels = 1.0F;
+constexpr float kGuildLowerPixels = 1.0F;
 // Le haut d'un texte, au-dessus du centre de sa rangée.
 constexpr float kTextAboveCenterPixels = 6.0F;
 
@@ -307,7 +308,7 @@ void DrawAttributes(const Painter& paint, const StatusWindowView& view, const Sk
             .pressed) {
       action.verb = StatusVerb::kRaiseAttribute;
       action.attribute = static_cast<std::uint8_t>(rank);
-      action.amount = kStatusRaiseAmount;
+      action.amount = AttributeRaiseAmount(attribute, ImGui::GetIO().KeyShift);
     }
     if (arrow.usable()) {
       paint.Art(arrow, kStatusArrowLeftPixels, arrow_top);
@@ -343,7 +344,7 @@ void DrawDerived(const Painter& paint, const StatusWindowView& view) {
   near_column(5, Number(view.critical));
   far_column(5, Number(view.perfect_dodge));
   if (!view.guild_name.empty()) {
-    paint.Text(kGuildLeft, TextTop(kStatusAttributeCount) - kGuildRaisePixels, view.guild_name,
+    paint.Text(kGuildLeft, TextTop(kStatusAttributeCount) + kGuildLowerPixels, view.guild_name,
                kTextGuild, ink);
   }
 }
