@@ -57,13 +57,6 @@ MarketRoute RouteMarketAnswer(const ro::ui::MarketAction& answer,
   return route;
 }
 
-MarketRefusalStep StepOfMarketRefusal(ro::sim::MarketStatus status, bool for_store) {
-  if (status == ro::sim::MarketStatus::kNotInTown) {
-    return MarketRefusalStep::kCloseWithNotice;
-  }
-  return for_store ? MarketRefusalStep::kStoreStatus : MarketRefusalStep::kStatus;
-}
-
 std::optional<ro::sim::MarketKind> MarketKindOfSignboard(ro::sim::SignboardKind signboard) {
   switch (signboard) {
     case ro::sim::SignboardKind::kVendingShop:

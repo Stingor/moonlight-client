@@ -92,7 +92,6 @@ void Market::NoteSent(const MarketQuery& query) {
 }
 
 void Market::Tell(MarketReplyPart part) {
-  catalog_uses_ = part.catalog_uses;
   if (part.status == MarketStatus::kOpen) {
     open_query_ = std::move(part.query);
     ++open_seq_;
@@ -104,8 +103,8 @@ void Market::Tell(MarketReplyPart part) {
     static_cast<void>(answer.Take(std::move(part)));
     return;
   }
-  // UN REFUS d'une demande périmée ne dit plus rien ; celui du catalogue (aucune
-  // demande) se dit toujours.
+  // UN REFUS d'une demande périmée ne dit plus rien ; un refus sans demande
+  // (numéro zéro) se dit toujours.
   if (part.query_id != 0 && part.query_id != answer.query_id()) {
     return;
   }

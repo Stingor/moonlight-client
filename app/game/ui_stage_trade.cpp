@@ -71,13 +71,11 @@ void UiStage::DrawTradeWindows(TradeWindows& trade,
   }
   const std::string search_notice_id = std::string(ro::core::Tr("Shop")) + "###store_search_notice";
   ro::ui::DrawTradeNotice(search.notice, search_notice_id.c_str(), skin_);
-  // LE MARCHÉ, puis la boîte de son refus.
+  // LE MARCHÉ.
   MarketWindows& market = trade.market;
   if (market.view != nullptr) {
     market.answer = ro::ui::DrawMarketWindow(market.state, *market.view, skin_, vote_shop);
   }
-  const std::string market_notice_id = std::string(ro::core::Tr("Marché")) + "###market_notice";
-  ro::ui::DrawTradeNotice(market.notice, market_notice_id.c_str(), skin_);
   // L'ÉCHANGE ENTRE JOUEURS : la proposition, puis la fenêtre des deux offres.
   DealWindows& deal = trade.deal;
   if (deal.proposal_view != nullptr) {

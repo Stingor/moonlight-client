@@ -47,18 +47,6 @@ struct MarketRoute {
                                             std::span<const std::size_t> page_ranks,
                                             ro::sim::MarketKind kind);
 
-// CE QU'UN REFUS DU SERVEUR FAIT DE LA FENÊTRE.
-enum class MarketRefusalStep : std::uint8_t {
-  // Hors d'une ville : la fenêtre se ferme, et le refus se dit dans une boîte.
-  kCloseWithNotice,
-  // Le refus s'écrit dans la fenêtre du contenu d'une échoppe.
-  kStoreStatus,
-  // Le refus s'écrit au pied du Marché.
-  kStatus,
-};
-
-[[nodiscard]] MarketRefusalStep StepOfMarketRefusal(ro::sim::MarketStatus status, bool for_store);
-
 // COMPARER UNE ÉCHOPPE : celle de `owner_aid`, de vente ou d'achat.
 struct MarketCompare {
   std::uint32_t owner_aid = 0;

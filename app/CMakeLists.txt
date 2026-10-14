@@ -482,7 +482,7 @@ target_link_libraries(moonclient_storesearch
 target_include_directories(moonclient_storesearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LE MARCHÉ VU DE L'ÉCRAN, à part de son étage : ce que la réponse de sa fenêtre
-# et les refus du serveur demandent — « Y aller », « Voir », la boîte hors ville.
+# demande — « Y aller », « Voir », l'ouverture sur un item.
 add_library(moonclient_market STATIC
     game/market_route.cpp)
 

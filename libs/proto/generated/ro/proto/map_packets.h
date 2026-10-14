@@ -5172,7 +5172,7 @@ struct ZcMoonlightMarket {
   std::uint8_t truncated = 0;
   std::uint32_t store_id = 0;
   std::uint32_t owner_aid = 0;
-  std::uint8_t catalog_uses = 0;
+  std::uint8_t reserved = 0;
   std::string query;
   std::vector<MoonlightMarketEntry> entries;
 };

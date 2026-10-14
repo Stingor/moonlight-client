@@ -13,7 +13,6 @@
 
 #include "ro/sim/market.h"
 #include "ro/ui/market_window.h"
-#include "ro/ui/trade_widgets.h"
 #include "ro/vfs/random_option_names.h"
 
 #include "game/market_route.h"
@@ -31,9 +30,6 @@ struct MarketWindows {
   // L'ICÔNE DU MENU, qui n'atteint que les fenêtres : sa bascule se dépose ici,
   // et l'étage la joue comme celle de la touche (`MarketStage::RequestToggle`).
   bool toggle_asked = false;
-  // LE REFUS QUI SE DIT DANS UNE BOÎTE : hors d'une ville, la fenêtre ne
-  // s'ouvre pas.
-  ro::ui::TradeNoticeState notice;
 };
 
 // Ce que la ligne dépliée d'une offre montre : ses cartes, son grade et ses
@@ -57,7 +53,7 @@ class MarketStage {
   // 🔴 L'INTENTION UNIQUE : « ouvre le Marché », sur cet item ou sans. Le menu
   // principal, la touche, `/marche`, le geste d'item, le menu du sac et la
   // description passent tous par elle. La fenêtre s'ouvre et la recherche part
-  // à l'image suivante ; c'est le serveur qui juge la ville.
+  // à l'image suivante, où que soit le joueur.
   void AskOpen(std::optional<std::uint32_t> item_id = std::nullopt) {
     AskOpenOn(MarketOpening{.query = MarketOpeningQuery(item_id)});
   }
@@ -88,7 +84,7 @@ class MarketStage {
   void OpenAsked(MarketWindows& windows, const TradeContext& context);
   void Follow(MarketWindows& windows, const TradeContext& context);
   void Search(MarketWindows& windows, const TradeContext& context);
-  void SayNews(MarketWindows& windows, const TradeContext& context);
+  void SayNews();
   void Compose(const ro::ui::MarketWindowState& state, const TradeContext& context);
   void ComposeRows(std::span<const ro::sim::MarketOffer> offers, std::span<const std::size_t> ranks,
                    std::size_t first_name, const TradeContext& context,

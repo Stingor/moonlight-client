@@ -20,8 +20,8 @@ namespace ro::sim {
 // `CZ 0x0F41` et reçues par `ZC 0x0F42` (ADR 0114). Il remplace la recherche
 // d'échoppes du client d'origine.
 //
-// 🔴 LE SERVEUR DÉCIDE DE L'ACCÈS : en ville, ou sous le droit d'un catalogue.
-// Le client ne sait pas ce qu'est une ville ; il demande, et dit le refus.
+// 🔴 PARTOUT : aucune condition de carte ni de catalogue. Un Universal Catalog
+// n'est qu'un raccourci qui ouvre la fenêtre, et le serveur ne le consomme pas.
 // 🔴 LECTURE SEULE : rien ici n'achète ni ne vend. « Y aller » guide jusqu'à
 // l'échoppe, où l'achat se fait comme d'habitude.
 //
@@ -65,9 +65,10 @@ inline constexpr std::size_t kMarketCategoryCount = 8;
 // Ce que dit le serveur, par son code sur le fil.
 enum class MarketStatus : std::uint8_t {
   kOk = 0,
-  // Un catalogue utilisé : la fenêtre s'ouvre.
+  // Le serveur ouvre la fenêtre : un catalogue, `@shopsearch`.
   kOpen = 1,
-  kNotInTown = 2,
+  // Le code 2 est RÉSERVÉ : le serveur ne l'émet pas, et une trame qui le porte
+  // ne se décode pas. Il ne se réattribue pas.
   kTooSoon = 3,
   // L'échoppe dont on voulait le contenu n'est plus ouverte.
   kStoreGone = 4,
@@ -144,8 +145,6 @@ struct MarketReplyPart {
   bool truncated = false;
   std::uint32_t store_id = 0;
   std::uint32_t owner_aid = 0;
-  // Les demandes qu'un catalogue accorde encore hors ville.
-  int catalog_uses = 0;
   // L'OUVERTURE : la saisie à poser — un ID, un nom, ou rien.
   std::string query;
   std::vector<MarketOffer> offers;
@@ -192,7 +191,7 @@ class MarketAnswer {
 class Market {
  public:
   // Le numéro de la prochaine demande ; jamais zéro, que le serveur réserve à
-  // l'ouverture par catalogue.
+  // ses ouvertures (catalogue, `@shopsearch`).
   [[nodiscard]] std::uint16_t NextQueryId() noexcept;
 
   // Une demande part : la recherche, ou le contenu d'une échoppe.
@@ -203,13 +202,10 @@ class Market {
   [[nodiscard]] const MarketAnswer& search() const noexcept { return search_; }
   [[nodiscard]] const MarketAnswer& store() const noexcept { return store_; }
 
-  // Change à chaque catalogue qui ouvre la fenêtre.
+  // Change à chaque ouverture du serveur (catalogue, `@shopsearch`).
   [[nodiscard]] std::uint32_t open_seq() const noexcept { return open_seq_; }
   // La saisie que la dernière ouverture du serveur pose.
   [[nodiscard]] const std::string& open_query() const noexcept { return open_query_; }
-  // LE DROIT D'UN CATALOGUE : les demandes qu'il accorde encore hors ville,
-  // telles que la dernière trame les a dites.
-  [[nodiscard]] int catalog_uses() const noexcept { return catalog_uses_; }
   // Le dernier refus, et son rang.
   [[nodiscard]] MarketStatus refusal() const noexcept { return refusal_; }
   [[nodiscard]] std::uint32_t refusal_seq() const noexcept { return refusal_seq_; }
@@ -222,7 +218,6 @@ class Market {
   MarketAnswer store_;
   std::uint32_t open_seq_ = 0;
   std::string open_query_;
-  int catalog_uses_ = 0;
   MarketStatus refusal_ = MarketStatus::kOk;
   std::uint32_t refusal_seq_ = 0;
   bool refusal_for_store_ = false;

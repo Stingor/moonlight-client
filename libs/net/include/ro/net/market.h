@@ -17,8 +17,11 @@ namespace ro::net {
 //      [drapeaux:1][prix_min:4][prix_max:4][échoppe:4][marchand:4]
 //      puis un identifiant d'objet de 4 octets par objet cherché
 //   ZC [op][len:2][query_id:2][statut:1][sorte:1][trame:2][trames:2][total:2]
-//      [tronqué:1][échoppe:4][marchand:4][catalogue:1][saisie:50]
+//      [tronqué:1][échoppe:4][marchand:4][réservé:1][saisie:50]
 //      puis les entrées de 201 octets
+//
+// L'octet réservé vaut toujours 0 et ne se lit pas ; il tient la place des
+// champs qui le suivent. Le statut 2 est réservé lui aussi : il n'est plus émis.
 //
 // La sorte 2 est celle des boutiques de PNJ ; l'échoppe est alors le PNJ.
 //

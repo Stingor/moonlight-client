@@ -17917,12 +17917,6 @@ tr: barter
 fr: troc + %s z
 tr: barter + %s z
 
-fr: catalogue : %d demandes hors ville
-tr: catalog: %d requests outside town
-
-fr: Le Marché ne s'ouvre qu'en ville, ou hors ville avec un Universal Catalog.
-tr: The Market only opens in town, or outside town with a Universal Catalog.
-
 fr: Comparer sur le Marché
 tr: Compare on the Market
 

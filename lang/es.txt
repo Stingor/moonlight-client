@@ -17917,12 +17917,6 @@ tr: trueque
 fr: troc + %s z
 tr: trueque + %s z
 
-fr: catalogue : %d demandes hors ville
-tr: catálogo: %d solicitudes fuera de la ciudad
-
-fr: Le Marché ne s'ouvre qu'en ville, ou hors ville avec un Universal Catalog.
-tr: El Mercado solo se abre en una ciudad, o fuera de ella con un Universal Catalog.
-
 fr: Comparer sur le Marché
 tr: Comparar en el Mercado
 

@@ -12069,7 +12069,7 @@ bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet) {
   packet.truncated = static_cast<std::uint8_t>(reader.U8());
   packet.store_id = static_cast<std::uint32_t>(reader.U32());
   packet.owner_aid = static_cast<std::uint32_t>(reader.U32());
-  packet.catalog_uses = static_cast<std::uint8_t>(reader.U8());
+  packet.reserved = static_cast<std::uint8_t>(reader.U8());
   packet.query = reader.FixedString(50);
   if (reader.remaining() % MoonlightMarketEntry::kWireSize != 0) {
     reader.Invalidate();
@@ -12098,7 +12098,7 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet) {
   writer.U8(static_cast<std::uint8_t>(packet.truncated));
   writer.U32(static_cast<std::uint32_t>(packet.store_id));
   writer.U32(static_cast<std::uint32_t>(packet.owner_aid));
-  writer.U8(static_cast<std::uint8_t>(packet.catalog_uses));
+  writer.U8(static_cast<std::uint8_t>(packet.reserved));
   writer.FixedString(packet.query, 50);
   for (const MoonlightMarketEntry& element : packet.entries) {
     WriteMoonlightMarketEntry(writer, element);

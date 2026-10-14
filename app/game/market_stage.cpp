@@ -23,8 +23,6 @@ namespace moonclient {
 namespace {
 
 constexpr char kCarriageReturn = '\r';
-// Ce qui sépare deux parties du pied.
-constexpr std::string_view kSummarySeparator = " — ";
 // La place d'une ligne composée par `snprintf`.
 constexpr std::size_t kLineBytes = 160;
 // Les lettres des grades, du premier au quatrième.
@@ -102,9 +100,6 @@ std::string FaultText(ro::sim::MarketFault fault) {
 
 std::string RefusalText(ro::sim::MarketStatus status) {
   switch (status) {
-    case ro::sim::MarketStatus::kNotInTown:
-      return ro::core::Tr(
-          "Le Marché ne s'ouvre qu'en ville, ou hors ville avec un Universal Catalog.");
     case ro::sim::MarketStatus::kTooSoon:
       return ro::core::Tr("Trop de demandes : patientez un instant avant de recommencer.");
     case ro::sim::MarketStatus::kStoreGone:
@@ -236,7 +231,7 @@ void MarketStage::Advance(MarketWindows& windows, const TradeContext& context) {
   }
   OpenAsked(windows, context);
   Follow(windows, context);
-  SayNews(windows, context);
+  SayNews();
   if (!windows.state.open) {
     windows.view = nullptr;
     return;
@@ -331,28 +326,14 @@ void MarketStage::Search(MarketWindows& windows, const TradeContext& context) {
   }
 }
 
-void MarketStage::SayNews(MarketWindows& windows, const TradeContext& /*context*/) {
+void MarketStage::SayNews() {
   if (refusal_seen_ == market_.refusal_seq()) {
     return;
   }
   refusal_seen_ = market_.refusal_seq();
-  const std::string text = RefusalText(market_.refusal());
-  // 🔴 HORS D'UNE VILLE, LA FENÊTRE NE RESTE PAS OUVERTE : le refus se dit
-  // dans une boîte, qu'il vienne du bouton, d'un geste ou d'un catalogue.
-  switch (StepOfMarketRefusal(market_.refusal(), market_.refusal_for_store())) {
-    case MarketRefusalStep::kCloseWithNotice:
-      windows.state.open = false;
-      windows.state.store_open = false;
-      windows.notice.text = text;
-      windows.notice.asked = false;
-      return;
-    case MarketRefusalStep::kStoreStatus:
-      store_status_ = text;
-      return;
-    case MarketRefusalStep::kStatus:
-      status_ = text;
-      return;
-  }
+  // Le refus s'écrit au pied de la fenêtre qu'il concerne.
+  std::string& said = market_.refusal_for_store() ? store_status_ : status_;
+  said = RefusalText(market_.refusal());
 }
 
 void MarketStage::ComposeRows(std::span<const ro::sim::MarketOffer> offers,
@@ -447,13 +428,6 @@ void MarketStage::Compose(const ro::ui::MarketWindowState& state, const TradeCon
     std::snprintf(text.data(), text.size(), ro::core::Tr("%d offres"),
                   static_cast<int>(offers.size()));
     summary_ = text.data();
-  }
-  // LE DROIT D'UN CATALOGUE, tant qu'il en reste : hors ville, chaque demande
-  // en coûte une.
-  if (market_.catalog_uses() > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("catalogue : %d demandes hors ville"),
-                  market_.catalog_uses());
-    summary_ += std::string(kSummarySeparator) + text.data();
   }
   view_ = ro::ui::MarketView{
       .rows = rows_,

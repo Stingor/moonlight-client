@@ -15,14 +15,23 @@ namespace {
 
 static_assert(kMarketReplyOpcode == proto::ZcMoonlightMarket::kOpcode);
 
-// Le dernier statut que le fil connaît : un plus grand ne promet rien.
-constexpr auto kLastStatus = sim::MarketStatus::kBadRequest;
-
+// Le statut, ou rien quand le fil porte un code inconnu ou réservé.
 std::optional<sim::MarketStatus> StatusOf(std::uint8_t wire) {
-  if (wire > static_cast<std::uint8_t>(kLastStatus)) {
-    return std::nullopt;
+  switch (wire) {
+    case static_cast<std::uint8_t>(sim::MarketStatus::kOk):
+      return sim::MarketStatus::kOk;
+    case static_cast<std::uint8_t>(sim::MarketStatus::kOpen):
+      return sim::MarketStatus::kOpen;
+    case static_cast<std::uint8_t>(sim::MarketStatus::kTooSoon):
+      return sim::MarketStatus::kTooSoon;
+    case static_cast<std::uint8_t>(sim::MarketStatus::kStoreGone):
+      return sim::MarketStatus::kStoreGone;
+    case static_cast<std::uint8_t>(sim::MarketStatus::kBadRequest):
+      return sim::MarketStatus::kBadRequest;
+    default:
+      break;
   }
-  return static_cast<sim::MarketStatus>(wire);
+  return std::nullopt;
 }
 
 std::optional<sim::MarketKind> KindOf(std::uint8_t wire) {
@@ -127,7 +136,6 @@ std::optional<sim::MarketReplyPart> DecodeMarketReply(std::span<const std::uint8
                             .truncated = packet.truncated != 0,
                             .store_id = packet.store_id,
                             .owner_aid = packet.owner_aid,
-                            .catalog_uses = packet.catalog_uses,
                             .query = core::Utf8FromWire(packet.query),
                             .offers = {}};
   part.offers.reserve(packet.entries.size());
