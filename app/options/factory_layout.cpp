@@ -82,6 +82,7 @@ constexpr std::array kFactoryIconPlaces = {
     FactoryIconPlace{.stem = "tracker", .x = 132.0F, .y = 237.0F},
     FactoryIconPlace{.stem = "ranking", .x = 4.0F, .y = 271.0F},
     FactoryIconPlace{.stem = "pet", .x = 36.0F, .y = 271.0F},
+    FactoryIconPlace{.stem = "market", .x = 68.0F, .y = 271.0F},
     FactoryIconPlace{
         .stem = "NC_CashShop", .x = 254.0F, .y = 14.0F, .across = ro::ui::AnchorSide::kEnd},
 };

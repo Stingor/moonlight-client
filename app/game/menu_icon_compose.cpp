@@ -76,6 +76,7 @@ std::optional<GameAction> ActionOfMenuCommand(MenuCommand command) {
     case MenuCommand::kAdventureGuide:
     case MenuCommand::kProbability:
     case MenuCommand::kRankingBoard:
+    case MenuCommand::kMarket:
       break;
     case MenuCommand::kCardAlbum:
       return GameAction::kOpenCardAlbum;
@@ -111,9 +112,12 @@ bool MenuCommandPorted(MenuCommand command) {
   // son icône l'ouvrent.
   // LA RECHERCHE DE GROUPE NON PLUS : son icône, et le bouton de la fenêtre de
   // groupe.
+  // LE MARCHÉ NON PLUS : sa touche passe par son étage, que l'icône n'atteint
+  // pas ; elle dépose sa bascule dans ses fenêtres.
   return ActionOfMenuCommand(command).has_value() || command == MenuCommand::kOption ||
          command == MenuCommand::kShortcut || command == MenuCommand::kBattleground ||
-         command == MenuCommand::kRankingBoard || command == MenuCommand::kBooking;
+         command == MenuCommand::kRankingBoard || command == MenuCommand::kBooking ||
+         command == MenuCommand::kMarket;
 }
 
 void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameImages* images,

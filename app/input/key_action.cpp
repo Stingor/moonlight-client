@@ -16,6 +16,7 @@
 #include "game/chat_room_stage.h"
 #include "game/companion_ai_stage.h"
 #include "game/mail_stage.h"
+#include "game/market_stage.h"
 #include "game/memorial_stage.h"
 #include "game/quest_stage.h"
 #include "input/key_gate.h"
@@ -512,6 +513,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
       // Joué à l'image suivante, là où l'instance compose sa vue.
       if (to.memorial != nullptr) {
         to.memorial->Toggle();
+      }
+      break;
+    case GameAction::kOpenMarket:
+      // Joué à l'image suivante, là où le Marché voit sa fenêtre.
+      if (to.market != nullptr) {
+        to.market->RequestToggle();
       }
       break;
     case GameAction::kOpenChatRoom:

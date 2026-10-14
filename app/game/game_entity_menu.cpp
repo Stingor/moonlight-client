@@ -311,6 +311,8 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   facts.whisper_blocked = pieces_.whispers.blocks().Blocks(actor.name);
   facts.dealing = pieces_.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
   facts.followed = world_mouse_.follow.followed_id == actor.id;
+  facts.store_open =
+      actor.signboard.has_value() && MarketKindOfSignboard(actor.signboard->kind).has_value();
   facts.npc_blocked = page.blocked().Has(actor.id);
   facts.pet_has_accessory = pieces_.pet.has_accessory();
   if (const char* refusal = pieces_.pet.FeedRefusal(); refusal != nullptr) {
@@ -603,6 +605,14 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       pieces_.chat_block_log.Open(windows_.chat_block_log.state, id, subject.data(), now_ms);
       return;
     }
+    case EntityVerb::kMarketCompare:
+      // L'ENSEIGNE EST RELUE AU CLIC : l'échoppe a pu fermer depuis l'ouverture.
+      if (const ro::sim::Actor* shop = world_.Find(id); shop != nullptr && shop->signboard) {
+        if (const auto kind = MarketKindOfSignboard(shop->signboard->kind); kind.has_value()) {
+          pieces_.trade.market().AskCompare({.owner_aid = id, .kind = *kind, .owner_name = name});
+        }
+      }
+      return;
     case EntityVerb::kReportPlayer:
       // ⚠ JAMAIS SOI : le menu de soi n'a pas l'entrée, et le clic le revérifie.
       if (id != world_.player_id()) {

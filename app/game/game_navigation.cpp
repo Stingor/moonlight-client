@@ -69,6 +69,17 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     }
   }
 
+  // ── « Y aller » au Marché : le guidage jusqu'à l'échoppe, comme un lieu ────
+  if (const std::optional<MarketDestination> shop = pieces_.trade.market().TakeGoTo()) {
+    const PlaceLink place{.map = shop->map_name, .x = shop->cell_x, .y = shop->cell_y};
+    navi_.GuideToPlace(place.map, place.x, place.y);
+    world_.RecordChat(
+        ro::sim::ChatKind::kServer, 0,
+        PlaceDestinationLine(
+            place, pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr),
+        now_ms);
+  }
+
   // ── Ce que la minimap a rendu ──────────────────────────────────────────────
   if (mini.guide_to.has_value()) navi_.GuideToPlace(here, mini.guide_to->x, mini.guide_to->y);
   if (mini.add_memo.has_value())

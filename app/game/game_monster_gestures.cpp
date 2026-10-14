@@ -67,6 +67,7 @@ void Game::FollowMonsterGesture(ro::ui::ChatLinkGesture gesture, const MonsterLi
     case ro::ui::ChatLinkGesture::kOpenDatabase:
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops:
+    case ro::ui::ChatLinkGesture::kMarketSearch:
     case ro::ui::ChatLinkGesture::kTryStyle:
     case ro::ui::ChatLinkGesture::kCopyCode:
     case ro::ui::ChatLinkGesture::kOpenInNavigation:
@@ -127,6 +128,7 @@ void Game::FollowNaviSearchLink(const ro::ui::ChatLinkAsk& asked, const NaviSear
     case ro::ui::ChatLinkGesture::kOpenDatabase:
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops:
+    case ro::ui::ChatLinkGesture::kMarketSearch:
     case ro::ui::ChatLinkGesture::kTryStyle:
     case ro::ui::ChatLinkGesture::kOpenBestiary:
     case ro::ui::ChatLinkGesture::kOpenInNavigation:

@@ -71,6 +71,13 @@ void UiStage::DrawTradeWindows(TradeWindows& trade,
   }
   const std::string search_notice_id = std::string(ro::core::Tr("Shop")) + "###store_search_notice";
   ro::ui::DrawTradeNotice(search.notice, search_notice_id.c_str(), skin_);
+  // LE MARCHÉ, puis la boîte de son refus.
+  MarketWindows& market = trade.market;
+  if (market.view != nullptr) {
+    market.answer = ro::ui::DrawMarketWindow(market.state, *market.view, skin_, vote_shop);
+  }
+  const std::string market_notice_id = std::string(ro::core::Tr("Marché")) + "###market_notice";
+  ro::ui::DrawTradeNotice(market.notice, market_notice_id.c_str(), skin_);
   // L'ÉCHANGE ENTRE JOUEURS : la proposition, puis la fenêtre des deux offres.
   DealWindows& deal = trade.deal;
   if (deal.proposal_view != nullptr) {
@@ -126,6 +133,11 @@ void UiStage::RegisterTradeEscapes(TradeWindows& trade) {
   // `StoreSearchStage` dit la fermeture au serveur.
   if (trade.store_search.view != nullptr) {
     escape_.Register(ro::ui::kStoreSearchWindowId, &trade.store_search.state.open);
+  }
+  // LE MARCHÉ : Échap baisse le contenu d'une échoppe, puis la fenêtre.
+  if (trade.market.view != nullptr) {
+    escape_.Register(ro::ui::kMarketWindowId, &trade.market.state.open);
+    escape_.Register(ro::ui::kMarketStoreWindowId, &trade.market.state.store_open);
   }
   // L'ÉCHANGE : Échap baisse l'interrupteur, et `DealStage` lit une fenêtre
   // baissée comme une annulation, une proposition baissée comme un refus.

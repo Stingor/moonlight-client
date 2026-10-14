@@ -53,6 +53,7 @@ constexpr std::array<MenuIconEntry, kMenuCommandCount> kCatalogue = {{
     {kMvpTracker, "tracker", true, true},
     {kPetWindow, "pet", true, false},
     {kRankingBoard, "ranking", true, false},
+    {kMarket, "market", true, false},
     {kCashShopButton, "NC_CashShop", true, false, true},
 }};
 
@@ -330,6 +331,8 @@ const char* MenuIconLabel(MenuCommand command) {
       return core::Tr("Fiche du pet");
     case kRankingBoard:
       return core::Tr("Tableau des classements");
+    case kMarket:
+      return core::Tr("Marché");
     case kCashShopButton:
       return core::Tr("Bouton du Vote Shop");
   }

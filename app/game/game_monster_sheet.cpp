@@ -173,6 +173,9 @@ void Game::FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now
       FollowDescriptionLink(
           ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(item_id)}, now_ms);
       break;
+    case ro::ui::ChatLinkGesture::kMarketSearch:
+      pieces_.trade.market().AskOpen(item_id);
+      break;
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops: {
       const char* const verb =

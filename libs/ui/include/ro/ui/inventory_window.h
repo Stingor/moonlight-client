@@ -430,6 +430,9 @@ struct InventoryWindowAction {
   std::uint16_t to_album_slot = 0;
   std::uint32_t album_withdraw = 0;
 
+  // LE MARCHÉ, ouvert sur l'identifiant de cet item ; zéro sinon.
+  std::uint32_t market_item_id = 0;
+
   // Les raccourcis de barre de titre vers les autres fenêtres d'objets.
   bool toggle_storage = false;
   bool toggle_cart = false;

@@ -107,6 +107,8 @@ struct ChatDispatch {
   // LE TABLEAU DES CLASSEMENTS, dont `/ranking` demande l'ouverture. Nul : la
   // commande se tait.
   bool* ranking_board_asked = nullptr;
+  // LE MARCHÉ, dont `/marche` demande l'ouverture. Nul : la commande se tait.
+  MarketStage* market = nullptr;
   // LA NAVIGATION, que `/navi` et `/navigation` ouvrent ou lancent : le guidage
   // et les tables de recherche, la fenêtre, et les noms affichés des cartes.
   NaviSession* navi = nullptr;

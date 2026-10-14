@@ -114,6 +114,10 @@ enum class GameAction : std::uint8_t {
   kOpenChatRoom,
   // L'INSTANCE : Alt+B, la touche du jeu. Rien ne part vers le serveur.
   kOpenMemorialDungeon,
+  // LE MARCHÉ. ⚠ SANS TOUCHE D'USINE : l'icône du menu et `/marche` l'ouvrent
+  // déjà. Joué à l'image suivante par son étage ; c'est le serveur qui juge la
+  // ville.
+  kOpenMarket,
   // LE RAPPORT DE BUG, sans contexte : carte et position viennent du serveur.
   // ⚠ CTRL+ALT+B : les joueurs de ce serveur l'ont déjà dans les doigts. C'est aussi le recours
   // quand la fenêtre en cause est trop étroite pour garder son bouton, ou quand aucune n'est

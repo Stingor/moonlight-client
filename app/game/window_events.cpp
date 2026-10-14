@@ -151,6 +151,7 @@ struct WindowPixels {
           .world_map = to.world_map,
           .minimap_shown = to.minimap_shown,
           .mvp_tracker = to.mvp_tracker,
+          .market = to.trade != nullptr ? &to.trade->market() : nullptr,
           .bug_report = to.bug_report,
           .recorder = to.recorder,
           .bindings = to.bindings,
@@ -458,8 +459,14 @@ void OnRightRelease(const EventRouting& to, const SDL_MouseButtonEvent& button,
     return;
   }
   // ⚠ UNE ENSEIGNE COUVRE L'ACTEUR QU'ELLE SURMONTE : le bouton relâché sur
-  // elle ne vise personne, comme sur une fenêtre.
+  // elle ne vise que son marchand, celui d'une échoppe ; un salon, personne.
+  // Sous `/shopping`, l'appui a en outre refermé la visite en cours.
   if (to.trade != nullptr && to.trade->SignboardCovers(glm::vec2{button.x, button.y})) {
+    if (const std::optional<SignboardHit> board = to.trade->SignboardAt({button.x, button.y});
+        board.has_value()) {
+      to.entity_menu->ask = EntityMenuAsk{.id = board->owner_id,
+                                          .gesture = WorldMenuGesture{.over_interface = false}};
+    }
     return;
   }
   const SDL_Keymod modifiers = SDL_GetModState();

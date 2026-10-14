@@ -173,6 +173,7 @@ void Game::FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link,
     case ro::ui::ChatLinkGesture::kOpenDatabase:
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops:
+    case ro::ui::ChatLinkGesture::kMarketSearch:
     case ro::ui::ChatLinkGesture::kTryStyle:
     case ro::ui::ChatLinkGesture::kCopyCode:
     case ro::ui::ChatLinkGesture::kOpenBestiary:

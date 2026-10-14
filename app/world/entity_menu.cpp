@@ -246,6 +246,12 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   if (facts.dealing) {
     Composer::Disable(deal, Tr("Un échange est déjà en cours."));
   }
+  // SON ÉCHOPPE, comparée au Marché : sur son personnage comme sur son enseigne.
+  if (facts.store_open) {
+    menu.Add(Tr("Comparer sur le Marché"), EntityVerb::kMarketCompare,
+             Tr("Ouvre le Marché sur tous les items de cette échoppe, pour voir s'ils sont "
+                "moins chers ailleurs."));
+  }
   // LE SUIVI : une ligne OU l'autre, selon qu'on le suit déjà.
   if (facts.followed) {
     menu.Add(Tr("Ne plus le suivre"), EntityVerb::kUnfollow);

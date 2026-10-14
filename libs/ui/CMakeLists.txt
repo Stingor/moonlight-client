@@ -76,6 +76,7 @@ add_library(ro_ui STATIC
     src/craft_atlas_window.cpp
     src/craft_window_parts.cpp
     src/make_item_window.cpp
+    src/market_window.cpp
     src/weapon_refine_window.cpp
     src/character_window.cpp
     src/preset_tab.cpp

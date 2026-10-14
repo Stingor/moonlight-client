@@ -63,6 +63,10 @@ void DrawInventoryCellMenu(const InventoryCellView& cell, ImVec2 menu_padding, I
       action.describe_id = cell.item_id;
       action.describe_slot = cell.client_slot;
     }
+    // LE MARCHÉ, ouvert sur cet item : lui non plus ne touche à rien.
+    if (ImGui::MenuItem(core::Tr("Rechercher sur le Marché"))) {
+      action.market_item_id = cell.item_id;
+    }
     ImGui::Separator();
     if (cell.worn) {
       if (ImGui::MenuItem(core::Tr("Retirer"))) {

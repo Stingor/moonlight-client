@@ -17791,3 +17791,129 @@ tr: %d h %02d min %02d s
 
 fr: file : %d
 tr: cola: %d
+
+fr: %d offres
+tr: %d ofertas
+
+fr: %d offres, les meilleures seulement : précisez la recherche.
+tr: %d ofertas, solo las mejores: precisa la búsqueda.
+
+fr: Achats
+tr: Compras
+
+fr: Aucun item ne porte ce nom.
+tr: Ningún item tiene ese nombre.
+
+fr: Avec cartes
+tr: Con cartas
+
+fr: Avec options
+tr: Con opciones
+
+fr: Carte : %s
+tr: Carta: %s
+
+fr: Cette échoppe n'est plus ouverte.
+tr: Esta tienda ya no está abierta.
+
+fr: Familiers
+tr: Mascotas
+
+fr: Fourchette de prix illisible.
+tr: Rango de precios ilegible.
+
+fr: Grade : %c
+tr: Grado: %c
+
+fr: Guide jusqu'à l'échoppe
+tr: Te guía hasta la tienda
+
+fr: Le raffinement minimum dépasse le maximum.
+tr: El refinado mínimo supera el máximo.
+
+fr: Le serveur a refusé la demande.
+tr: El servidor rechazó la solicitud.
+
+fr: Marchand en ligne
+tr: Mercader conectado
+
+fr: Marchand hors ligne
+tr: Mercader desconectado
+
+fr: Marché
+tr: Mercado
+
+fr: Montre tout le contenu de l'échoppe
+tr: Muestra todo el contenido de la tienda
+
+fr: Munitions
+tr: Munición
+
+fr: Nom ou ID d'item
+tr: Nombre o ID del item
+
+fr: Option %d : %d
+tr: Opción %d: %d
+
+fr: Ouvre le Marché sur cet item : qui le vend, qui l'achète.
+tr: Abre el Mercado con este item: quién lo vende, quién lo compra.
+
+fr: Raffinement
+tr: Refinado
+
+fr: Rechercher sur le Marché
+tr: Buscar en el Mercado
+
+fr: Tous les types
+tr: Todos los tipos
+
+fr: Trop d'items portent ce nom : précisez la recherche.
+tr: Demasiados items coinciden con ese nombre: precisa la búsqueda.
+
+fr: Trop de demandes : patientez un instant avant de recommencer.
+tr: Demasiadas solicitudes: espera un momento antes de volver a intentarlo.
+
+fr: Ventes
+tr: Ventas
+
+fr: Voir
+tr: Ver
+
+fr: max
+tr: máx
+
+fr: min
+tr: mín
+
+fr: Échoppe
+tr: Tienda
+
+fr: Guide jusqu'au PNJ
+tr: Te guía hasta el PNJ
+
+fr: Montre tout ce que vend ce PNJ
+tr: Muestra todo lo que vende este PNJ
+
+fr: %s cash
+tr: %s cash
+
+fr: troc
+tr: trueque
+
+fr: troc + %s z
+tr: trueque + %s z
+
+fr: catalogue : %d demandes hors ville
+tr: catálogo: %d solicitudes fuera de la ciudad
+
+fr: Le Marché ne s'ouvre qu'en ville, ou hors ville avec un Universal Catalog.
+tr: El Mercado solo se abre en una ciudad, o fuera de ella con un Universal Catalog.
+
+fr: Comparer sur le Marché
+tr: Comparar en el Mercado
+
+fr: Ouvre le Marché sur tous les items de cette échoppe, pour voir s'ils sont moins chers ailleurs.
+tr: Abre el Mercado con todos los items de esta tienda, para ver si son más baratos en otra parte.
+
+fr: %d offres, comparées à l'échoppe de %s
+tr: %d ofertas, comparadas con la tienda de %s

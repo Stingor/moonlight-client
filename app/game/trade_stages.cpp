@@ -8,6 +8,7 @@
 #include "ro/core/log.h"
 #include "ro/net/barter.h"
 #include "ro/net/buying_store.h"
+#include "ro/net/market.h"
 #include "ro/net/npc_shop.h"
 #include "ro/net/store_search.h"
 #include "ro/net/vending.h"
@@ -30,6 +31,7 @@ void TradeStages::StartSession() {
   vending_.StartSession();
   deal_.StartSession();
   store_search_.StartSession();
+  market_.StartSession();
   signboards_.clear();
   pending_visit_.reset();
   last_visit_ms_.reset();
@@ -51,6 +53,11 @@ ro::net::FrameOutcome TradeStages::ApplyFrame(const ro::net::Frame& frame,
           ro::net::ApplyStoreSearchFrame(frame, store_search_.search());
       searched != ro::net::FrameOutcome::kUnhandled) {
     return searched;
+  }
+  // LE MARCHÉ : son opcode n'est qu'à lui.
+  if (const ro::net::FrameOutcome marketed = ro::net::ApplyMarketFrame(frame, market_.market());
+      marketed != ro::net::FrameOutcome::kUnhandled) {
+    return marketed;
   }
   // L'ÉCHOPPE D'ACHAT : ses opcodes ne sont qu'à elle, et les changements de
   // carte, qu'elle lit aussi, ressortent `kUnhandled` pour les suivants. ⚠ LE
@@ -107,6 +114,7 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
   vending_.Advance(windows.vending, context);
   deal_.Advance(windows.deal, context);
   store_search_.Advance(windows.store_search, context);
+  market_.Advance(windows.market, context);
   // LES ENSEIGNES PEINTES, pour la bulle d'un titre coupé.
   windows.signboard_tips.clear();
   for (const SignboardHit& board : signboards_) {
@@ -204,6 +212,9 @@ TradeItemFocus TradeStages::hovered() const noexcept {
   if (store_search_.hovered().item_id != 0) {
     return store_search_.hovered();
   }
+  if (market_.hovered().item_id != 0) {
+    return market_.hovered();
+  }
   if (buying_store_.hovered().item_id != 0) {
     return buying_store_.hovered();
   }
@@ -223,6 +234,9 @@ std::optional<TradeItemFocus> TradeStages::TakeDescribed() noexcept {
   if (std::optional<TradeItemFocus> searched = store_search_.TakeDescribed();
       searched.has_value()) {
     return searched;
+  }
+  if (std::optional<TradeItemFocus> marketed = market_.TakeDescribed(); marketed.has_value()) {
+    return marketed;
   }
   if (std::optional<TradeItemFocus> bought = buying_store_.TakeDescribed(); bought.has_value()) {
     return bought;

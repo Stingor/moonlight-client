@@ -43,6 +43,7 @@
 #include "chat/talk_filter_command.h"
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
+#include "game/market_route.h"
 #include "items/warp_memo_report.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
@@ -748,6 +749,13 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
   if (IsRankingBoardCommand(line)) {
     if (to.ranking_board_asked != nullptr) {
       *to.ranking_board_asked = true;
+    }
+    return;
+  }
+  // LE MARCHÉ. Même règle : la ligne se prend même sans Marché.
+  if (IsMarketCommand(line)) {
+    if (to.market != nullptr) {
+      to.market->AskOpen();
     }
     return;
   }

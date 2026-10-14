@@ -5104,6 +5104,79 @@ struct ZcMoonlightInstanceInfo {
   std::string owner_name;
 };
 
+// PACKET_MOONLIGHT_MARKET_ITEM_ID
+struct MoonlightMarketItemId {
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 4;
+
+  std::uint32_t itemId = 0;
+};
+
+// PACKET_CZ_MOONLIGHT_MARKET_REQ
+struct CzMoonlightMarketReq {
+  static constexpr std::uint16_t kOpcode = 0x0f41;
+  // Taille sur le fil SANS la queue variable, qui la porte elle-même.
+  static constexpr std::size_t kWireSize = 27;
+
+  std::uint16_t query_id = 0;
+  std::uint8_t kind = 0;
+  std::uint8_t category = 0;
+  std::uint8_t refine_min = 0;
+  std::uint8_t refine_max = 0;
+  std::uint8_t flags = 0;
+  std::uint32_t price_min = 0;
+  std::uint32_t price_max = 0;
+  std::uint32_t store_id = 0;
+  std::uint32_t owner_aid = 0;
+  std::vector<MoonlightMarketItemId> items;
+};
+
+// PACKET_MOONLIGHT_MARKET_ENTRY
+struct MoonlightMarketEntry {
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 201;
+
+  std::uint32_t store_id = 0;
+  std::uint32_t owner_aid = 0;
+  std::uint32_t itemId = 0;
+  std::uint16_t amount = 0;
+  std::uint32_t price = 0;
+  std::uint8_t refine = 0;
+  std::uint8_t grade = 0;
+  std::uint8_t identified = 0;
+  std::uint8_t damaged = 0;
+  std::uint8_t autotrade = 0;
+  std::array<std::uint32_t, 4> cards = {};
+  std::array<Itemoptions, 5> options = {};
+  std::string map;
+  std::uint16_t x = 0;
+  std::uint16_t y = 0;
+  std::string title;
+  std::uint8_t currency = 0;
+  std::uint32_t currency_item = 0;
+  std::string currency_name;
+};
+
+// PACKET_ZC_MOONLIGHT_MARKET
+struct ZcMoonlightMarket {
+  static constexpr std::uint16_t kOpcode = 0x0f42;
+  // Taille sur le fil SANS la queue variable, qui la porte elle-même.
+  static constexpr std::size_t kWireSize = 74;
+
+  std::uint16_t query_id = 0;
+  std::uint8_t status = 0;
+  std::uint8_t kind = 0;
+  std::uint16_t part = 0;
+  std::uint16_t part_count = 0;
+  std::uint16_t total = 0;
+  std::uint8_t truncated = 0;
+  std::uint32_t store_id = 0;
+  std::uint32_t owner_aid = 0;
+  std::uint8_t catalog_uses = 0;
+  std::string query;
+  std::vector<MoonlightMarketEntry> entries;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8248,6 +8321,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqChatBlocks& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightChatBlocks& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMarketReq& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -8847,6 +8922,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqChatBlocks& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightInstanceInfo& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightMarketReq& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

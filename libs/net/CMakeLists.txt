@@ -32,6 +32,7 @@ add_library(ro_net STATIC
     src/craft_session.cpp
     src/deal.cpp
     src/mail.cpp
+    src/market.cpp
     src/cart_choice.cpp
     src/cash_shop.cpp
     src/npc_illustration.cpp

@@ -47,6 +47,7 @@ class MailStage;
 class ChatRoomStage;
 class CompanionAiStage;
 class MvpTrackerStage;
+class MarketStage;
 
 // CE QU'UNE TOUCHE FAIT, hors de la boucle qui la reçoit.
 //
@@ -124,6 +125,8 @@ struct KeyPress {
   // LE CARNET DE CHASSE MVP : joué à l'image suivante, là où l'étage a les
   // réglages en main — éteint, la touche n'ouvre rien.
   MvpTrackerStage* mvp_tracker = nullptr;
+  // LE MARCHÉ : joué à l'image suivante, là où son étage voit sa fenêtre.
+  MarketStage* market = nullptr;
   // LA BOÎTE DU RAPPORT DE BUG, qu'on ouvre sans contexte.
   ro::ui::BugReportWindowState* bug_report = nullptr;
   // L'ENREGISTREUR DE ZONE, pour ses trois touches. ⚠ IL N'EST PAS UNE FENÊTRE :

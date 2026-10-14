@@ -186,6 +186,12 @@ constexpr std::size_t kMaxFrameSize = 0xFFFF;
                                                const MoonlightEquipBonus& value);
 [[maybe_unused]] void ReadMoonlightChatBlock(ByteReader& reader, MoonlightChatBlock& value);
 [[maybe_unused]] void WriteMoonlightChatBlock(ByteWriter& writer, const MoonlightChatBlock& value);
+[[maybe_unused]] void ReadMoonlightMarketItemId(ByteReader& reader, MoonlightMarketItemId& value);
+[[maybe_unused]] void WriteMoonlightMarketItemId(ByteWriter& writer,
+                                                 const MoonlightMarketItemId& value);
+[[maybe_unused]] void ReadMoonlightMarketEntry(ByteReader& reader, MoonlightMarketEntry& value);
+[[maybe_unused]] void WriteMoonlightMarketEntry(ByteWriter& writer,
+                                                const MoonlightMarketEntry& value);
 [[maybe_unused]] void ReadCzSePcBuyCashitemListSub(ByteReader& reader,
                                                    CzSePcBuyCashitemListSub& value);
 [[maybe_unused]] void WriteCzSePcBuyCashitemListSub(ByteWriter& writer,
@@ -1086,6 +1092,66 @@ void WriteMoonlightChatBlock(ByteWriter& writer, const MoonlightChatBlock& value
   writer.I32(static_cast<std::int32_t>(value.minutes));
   writer.U8(static_cast<std::uint8_t>(value.kind));
   writer.FixedString(value.author, 24);
+}
+
+void ReadMoonlightMarketItemId(ByteReader& reader, MoonlightMarketItemId& value) {
+  value.itemId = static_cast<std::uint32_t>(reader.U32());
+}
+
+void WriteMoonlightMarketItemId(ByteWriter& writer, const MoonlightMarketItemId& value) {
+  writer.U32(static_cast<std::uint32_t>(value.itemId));
+}
+
+void ReadMoonlightMarketEntry(ByteReader& reader, MoonlightMarketEntry& value) {
+  value.store_id = static_cast<std::uint32_t>(reader.U32());
+  value.owner_aid = static_cast<std::uint32_t>(reader.U32());
+  value.itemId = static_cast<std::uint32_t>(reader.U32());
+  value.amount = static_cast<std::uint16_t>(reader.U16());
+  value.price = static_cast<std::uint32_t>(reader.U32());
+  value.refine = static_cast<std::uint8_t>(reader.U8());
+  value.grade = static_cast<std::uint8_t>(reader.U8());
+  value.identified = static_cast<std::uint8_t>(reader.U8());
+  value.damaged = static_cast<std::uint8_t>(reader.U8());
+  value.autotrade = static_cast<std::uint8_t>(reader.U8());
+  for (std::uint32_t& element : value.cards) {
+    element = static_cast<std::uint32_t>(reader.U32());
+  }
+  for (Itemoptions& element : value.options) {
+    ReadItemoptions(reader, element);
+  }
+  value.map = reader.FixedString(16);
+  value.x = static_cast<std::uint16_t>(reader.U16());
+  value.y = static_cast<std::uint16_t>(reader.U16());
+  value.title = reader.FixedString(80);
+  value.currency = static_cast<std::uint8_t>(reader.U8());
+  value.currency_item = static_cast<std::uint32_t>(reader.U32());
+  value.currency_name = reader.FixedString(32);
+}
+
+void WriteMoonlightMarketEntry(ByteWriter& writer, const MoonlightMarketEntry& value) {
+  writer.U32(static_cast<std::uint32_t>(value.store_id));
+  writer.U32(static_cast<std::uint32_t>(value.owner_aid));
+  writer.U32(static_cast<std::uint32_t>(value.itemId));
+  writer.U16(static_cast<std::uint16_t>(value.amount));
+  writer.U32(static_cast<std::uint32_t>(value.price));
+  writer.U8(static_cast<std::uint8_t>(value.refine));
+  writer.U8(static_cast<std::uint8_t>(value.grade));
+  writer.U8(static_cast<std::uint8_t>(value.identified));
+  writer.U8(static_cast<std::uint8_t>(value.damaged));
+  writer.U8(static_cast<std::uint8_t>(value.autotrade));
+  for (const std::uint32_t element : value.cards) {
+    writer.U32(static_cast<std::uint32_t>(element));
+  }
+  for (const Itemoptions& element : value.options) {
+    WriteItemoptions(writer, element);
+  }
+  writer.FixedString(value.map, 16);
+  writer.U16(static_cast<std::uint16_t>(value.x));
+  writer.U16(static_cast<std::uint16_t>(value.y));
+  writer.FixedString(value.title, 80);
+  writer.U8(static_cast<std::uint8_t>(value.currency));
+  writer.U32(static_cast<std::uint32_t>(value.currency_item));
+  writer.FixedString(value.currency_name, 32);
 }
 
 void ReadCzSePcBuyCashitemListSub(ByteReader& reader, CzSePcBuyCashitemListSub& value) {
@@ -11919,6 +11985,124 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightInstanceInfo& packet) {
   writer.U8(static_cast<std::uint8_t>(packet.on_instance_map));
   writer.U16(static_cast<std::uint16_t>(packet.players_inside));
   writer.FixedString(packet.owner_name, 24);
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMarketReq& packet) {
+  if (frame.size() < CzMoonlightMarketReq::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightMarketReq::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.query_id = static_cast<std::uint16_t>(reader.U16());
+  packet.kind = static_cast<std::uint8_t>(reader.U8());
+  packet.category = static_cast<std::uint8_t>(reader.U8());
+  packet.refine_min = static_cast<std::uint8_t>(reader.U8());
+  packet.refine_max = static_cast<std::uint8_t>(reader.U8());
+  packet.flags = static_cast<std::uint8_t>(reader.U8());
+  packet.price_min = static_cast<std::uint32_t>(reader.U32());
+  packet.price_max = static_cast<std::uint32_t>(reader.U32());
+  packet.store_id = static_cast<std::uint32_t>(reader.U32());
+  packet.owner_aid = static_cast<std::uint32_t>(reader.U32());
+  if (reader.remaining() % MoonlightMarketItemId::kWireSize != 0) {
+    reader.Invalidate();
+  } else {
+    packet.items.resize(reader.remaining() / MoonlightMarketItemId::kWireSize);
+    for (MoonlightMarketItemId& element : packet.items) {
+      ReadMoonlightMarketItemId(reader, element);
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightMarketReq& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightMarketReq::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightMarketReq::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U16(static_cast<std::uint16_t>(packet.query_id));
+  writer.U8(static_cast<std::uint8_t>(packet.kind));
+  writer.U8(static_cast<std::uint8_t>(packet.category));
+  writer.U8(static_cast<std::uint8_t>(packet.refine_min));
+  writer.U8(static_cast<std::uint8_t>(packet.refine_max));
+  writer.U8(static_cast<std::uint8_t>(packet.flags));
+  writer.U32(static_cast<std::uint32_t>(packet.price_min));
+  writer.U32(static_cast<std::uint32_t>(packet.price_max));
+  writer.U32(static_cast<std::uint32_t>(packet.store_id));
+  writer.U32(static_cast<std::uint32_t>(packet.owner_aid));
+  for (const MoonlightMarketItemId& element : packet.items) {
+    WriteMoonlightMarketItemId(writer, element);
+  }
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet) {
+  if (frame.size() < ZcMoonlightMarket::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightMarket::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.query_id = static_cast<std::uint16_t>(reader.U16());
+  packet.status = static_cast<std::uint8_t>(reader.U8());
+  packet.kind = static_cast<std::uint8_t>(reader.U8());
+  packet.part = static_cast<std::uint16_t>(reader.U16());
+  packet.part_count = static_cast<std::uint16_t>(reader.U16());
+  packet.total = static_cast<std::uint16_t>(reader.U16());
+  packet.truncated = static_cast<std::uint8_t>(reader.U8());
+  packet.store_id = static_cast<std::uint32_t>(reader.U32());
+  packet.owner_aid = static_cast<std::uint32_t>(reader.U32());
+  packet.catalog_uses = static_cast<std::uint8_t>(reader.U8());
+  packet.query = reader.FixedString(50);
+  if (reader.remaining() % MoonlightMarketEntry::kWireSize != 0) {
+    reader.Invalidate();
+  } else {
+    packet.entries.resize(reader.remaining() / MoonlightMarketEntry::kWireSize);
+    for (MoonlightMarketEntry& element : packet.entries) {
+      ReadMoonlightMarketEntry(reader, element);
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightMarket::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightMarket::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U16(static_cast<std::uint16_t>(packet.query_id));
+  writer.U8(static_cast<std::uint8_t>(packet.status));
+  writer.U8(static_cast<std::uint8_t>(packet.kind));
+  writer.U16(static_cast<std::uint16_t>(packet.part));
+  writer.U16(static_cast<std::uint16_t>(packet.part_count));
+  writer.U16(static_cast<std::uint16_t>(packet.total));
+  writer.U8(static_cast<std::uint8_t>(packet.truncated));
+  writer.U32(static_cast<std::uint32_t>(packet.store_id));
+  writer.U32(static_cast<std::uint32_t>(packet.owner_aid));
+  writer.U8(static_cast<std::uint8_t>(packet.catalog_uses));
+  writer.FixedString(packet.query, 50);
+  for (const MoonlightMarketEntry& element : packet.entries) {
+    WriteMoonlightMarketEntry(writer, element);
+  }
   if (writer.size() > kMaxFrameSize ||
       !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
     return {};

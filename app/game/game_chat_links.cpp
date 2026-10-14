@@ -422,6 +422,9 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
           ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(asked.item_id)},
           now_ms);
       break;
+    case ro::ui::ChatLinkGesture::kMarketSearch:
+      pieces_.trade.market().AskOpen(asked.item_id);
+      break;
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops: {
       // ⚠ ENVOYÉES COMME UNE LIGNE TAPÉE : leur réponse revient dans le fil, et
@@ -500,6 +503,7 @@ void Game::FollowStyleLink(const ChatLinkTarget& aimed, ro::ui::ChatLinkGesture 
     case ro::ui::ChatLinkGesture::kOpenDatabase:
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops:
+    case ro::ui::ChatLinkGesture::kMarketSearch:
     case ro::ui::ChatLinkGesture::kVoteShop:
     case ro::ui::ChatLinkGesture::kOpenBestiary:
     case ro::ui::ChatLinkGesture::kOpenInNavigation:

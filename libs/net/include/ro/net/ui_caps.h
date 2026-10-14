@@ -62,6 +62,10 @@ inline constexpr std::uint32_t kUiCapEquipAttributes = 0x00002000;
 // difficulté, turbo, droit de destruction (`ZC 0x0F40`). Même règle : le
 // serveur ne l'envoie qu'à qui l'annonce.
 inline constexpr std::uint32_t kUiCapInstanceInfo = 0x00004000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client a le Marché (`CZ 0x0F41` → `ZC 0x0F42`).
+// Le serveur ne répond qu'à qui l'annonce, et un catalogue lui ouvre le Marché
+// au lieu de la recherche d'échoppes d'origine.
+inline constexpr std::uint32_t kUiCapMarket = 0x00008000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

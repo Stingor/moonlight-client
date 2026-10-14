@@ -17791,3 +17791,129 @@ tr: %d h %02d min %02d s
 
 fr: file : %d
 tr: queue: %d
+
+fr: %d offres
+tr: %d offers
+
+fr: %d offres, les meilleures seulement : précisez la recherche.
+tr: %d offers, the best only: narrow the search.
+
+fr: Achats
+tr: Buying
+
+fr: Aucun item ne porte ce nom.
+tr: No item has this name.
+
+fr: Avec cartes
+tr: With cards
+
+fr: Avec options
+tr: With options
+
+fr: Carte : %s
+tr: Card: %s
+
+fr: Cette échoppe n'est plus ouverte.
+tr: This shop is no longer open.
+
+fr: Familiers
+tr: Pets
+
+fr: Fourchette de prix illisible.
+tr: Unreadable price range.
+
+fr: Grade : %c
+tr: Grade: %c
+
+fr: Guide jusqu'à l'échoppe
+tr: Guides you to the shop
+
+fr: Le raffinement minimum dépasse le maximum.
+tr: The minimum refine exceeds the maximum.
+
+fr: Le serveur a refusé la demande.
+tr: The server refused the request.
+
+fr: Marchand en ligne
+tr: Merchant online
+
+fr: Marchand hors ligne
+tr: Merchant offline
+
+fr: Marché
+tr: Market
+
+fr: Montre tout le contenu de l'échoppe
+tr: Shows everything the shop holds
+
+fr: Munitions
+tr: Ammunition
+
+fr: Nom ou ID d'item
+tr: Item name or ID
+
+fr: Option %d : %d
+tr: Option %d: %d
+
+fr: Ouvre le Marché sur cet item : qui le vend, qui l'achète.
+tr: Opens the Market on this item: who sells it, who buys it.
+
+fr: Raffinement
+tr: Refine
+
+fr: Rechercher sur le Marché
+tr: Search the Market
+
+fr: Tous les types
+tr: All types
+
+fr: Trop d'items portent ce nom : précisez la recherche.
+tr: Too many items match this name: narrow the search.
+
+fr: Trop de demandes : patientez un instant avant de recommencer.
+tr: Too many requests: wait a moment before trying again.
+
+fr: Ventes
+tr: Selling
+
+fr: Voir
+tr: View
+
+fr: max
+tr: max
+
+fr: min
+tr: min
+
+fr: Échoppe
+tr: Shop
+
+fr: Guide jusqu'au PNJ
+tr: Guides you to the NPC
+
+fr: Montre tout ce que vend ce PNJ
+tr: Shows everything this NPC sells
+
+fr: %s cash
+tr: %s cash
+
+fr: troc
+tr: barter
+
+fr: troc + %s z
+tr: barter + %s z
+
+fr: catalogue : %d demandes hors ville
+tr: catalog: %d requests outside town
+
+fr: Le Marché ne s'ouvre qu'en ville, ou hors ville avec un Universal Catalog.
+tr: The Market only opens in town, or outside town with a Universal Catalog.
+
+fr: Comparer sur le Marché
+tr: Compare on the Market
+
+fr: Ouvre le Marché sur tous les items de cette échoppe, pour voir s'ils sont moins chers ailleurs.
+tr: Opens the Market on every item of this shop, to see whether they are cheaper elsewhere.
+
+fr: %d offres, comparées à l'échoppe de %s
+tr: %d offers, compared with %s's shop

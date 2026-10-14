@@ -17,6 +17,7 @@
 #include "game/barter_stage.h"
 #include "game/buying_store_stage.h"
 #include "game/deal_stage.h"
+#include "game/market_stage.h"
 #include "game/npc_shop_stage.h"
 #include "game/store_search_stage.h"
 #include "game/trade_items.h"
@@ -96,6 +97,8 @@ class TradeStages {
   [[nodiscard]] const DealStage& deal() const noexcept { return deal_; }
   [[nodiscard]] StoreSearchStage& store_search() noexcept { return store_search_; }
   [[nodiscard]] const StoreSearchStage& store_search() const noexcept { return store_search_; }
+  // LE MARCHÉ : son intention unique d'ouverture, et « Y aller ».
+  [[nodiscard]] MarketStage& market() noexcept { return market_; }
 
   // LES ENSEIGNES D'ÉCHOPPE PEINTES À L'IMAGE PRÉCÉDENTE, que la peinture
   // remplit et que le clic lit. Voir `SignboardHit`.
@@ -138,6 +141,7 @@ class TradeStages {
   VendingStage vending_;
   DealStage deal_;
   StoreSearchStage store_search_;
+  MarketStage market_;
   std::vector<SignboardHit> signboards_;
   // L'échoppe dont on a demandé à voir la liste, pas encore envoyée.
   std::optional<SignboardHit> pending_visit_;

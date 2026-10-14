@@ -421,6 +421,8 @@ struct DescriptionWindowAction {
   bool open_vote_shop = false;
   // « + alootid » ou « - alootid » : l'item entre dans la liste, ou en sort.
   bool toggle_autoloot = false;
+  // « Marché » : le Marché s'ouvre sur l'identifiant de l'item montré.
+  bool search_market = false;
   // La case « Comparer » a changé, et vaut maintenant `compare`.
   bool compare_changed = false;
   bool compare = false;

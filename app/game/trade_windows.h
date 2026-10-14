@@ -16,6 +16,7 @@
 
 #include "game/buying_store_windows.h"
 #include "game/deal_stage.h"
+#include "game/market_stage.h"
 #include "game/store_search_stage.h"
 #include "game/vending_windows.h"
 
@@ -54,6 +55,10 @@ struct TradeWindows {
   // LA RECHERCHE D'ÉCHOPPES, qu'ouvre un objet de catalogue, et la boîte de ses
   // refus.
   StoreSearchWindows store_search;
+
+  // LE MARCHÉ, qu'ouvrent le menu, sa touche, `/marche`, un item ou un
+  // catalogue, et la boîte de son refus hors d'une ville.
+  MarketWindows market;
 
   // LES ENSEIGNES PEINTES À L'IMAGE PRÉCÉDENTE — échoppes et salons —, pour
   // la bulle qui montre un titre coupé en entier.

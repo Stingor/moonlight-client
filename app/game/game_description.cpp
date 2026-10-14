@@ -268,6 +268,9 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
             ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(odds.item_id)},
             now_ms);
         break;
+      case ro::ui::ChatLinkGesture::kMarketSearch:
+        pieces_.trade.market().AskOpen(odds.item_id);
+        break;
       case ro::ui::ChatLinkGesture::kItemInfo:
       case ro::ui::ChatLinkGesture::kWhoDrops: {
         const char* const verb =
@@ -347,6 +350,9 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   }
   if (answers.description.toggle_autoloot) {
     item_description_->ToggleAutoloot(link_, windows_.description.item_id);
+  }
+  if (answers.description.search_market && windows_.description.item_id != 0) {
+    pieces_.trade.market().AskOpen(windows_.description.item_id);
   }
   FollowSkillDescriptionLink(answers.skill_description, now_ms);
   skill_facts_.Ask(answers.skill_description, link_);

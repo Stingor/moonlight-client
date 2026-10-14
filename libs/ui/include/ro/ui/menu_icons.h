@@ -84,6 +84,9 @@ enum class MenuCommand : std::uint8_t {
   // LE TABLEAU DES CLASSEMENTS, que le jeu n'a pas. Aucun art `bt_ranking` ne
   // se livre : le carré de secours, à sa place.
   kRankingBoard,
+  // LE MARCHÉ, qui remplace la recherche d'échoppes. Aucun art `bt_market` ne
+  // se livre : le carré de secours, à sa place.
+  kMarket,
   // ── HORS DE LA GRILLE ─────────────────────────────────────────────────────
   //
   // LE BOUTON DU VOTE SHOP, posé à part. C'est une icône du jeu,

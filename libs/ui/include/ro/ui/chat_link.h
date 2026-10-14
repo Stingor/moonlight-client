@@ -215,6 +215,8 @@ enum class ChatLinkGesture : std::uint8_t {
   kOpenDatabase,
   kItemInfo,
   kWhoDrops,
+  // Le Marché ouvert sur l'identifiant de l'item : qui le vend, qui l'achète.
+  kMarketSearch,
 
   // ── CE QU'UN LIEN DE STYLE PROPOSE EN PLUS ────────────────────────────────
   //

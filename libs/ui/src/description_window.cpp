@@ -464,6 +464,13 @@ void DrawItemBody(DescriptionDollState* doll, int* staff_amount, const Descripti
     SkinTooltip(listed ? core::Tr("Cet item est dans ta liste de ramassage automatique. "
                                   "Clique pour l'en retirer.")
                        : core::Tr("Ramasser automatiquement cet item."));
+    // « MARCHÉ », à côté et aux mêmes conditions : le Marché s'ouvre sur
+    // l'identifiant de l'item.
+    ImGui::SameLine();
+    if (SkinSmallButton(core::Tr("Marché"), art)) {
+      action.search_market = true;
+    }
+    SkinTooltip(core::Tr("Ouvre le Marché sur cet item : qui le vend, qui l'achète."));
     action_row = true;
   }
   // « LIRE » ET « LECTURE AUTO », pour un livre qu'on possède.
