@@ -116,9 +116,29 @@ class CharacterView {
                                                          ro::sim::World& world,
                                                          std::uint32_t now_ms) const;
 
+  // « <nom> a été équipé. » / « <nom> a été retiré. », à l'accusé accordé de
+  // pose ou de retrait, dans la case « Équipement mis/retiré ». Voir
+  // `character/equip_change_line.h`. ⚠ À LIRE AVANT `SayEquipAttributes` sur
+  // la même trame comme sur les suivantes : le nom de la pièce précède ce
+  // qu'elle apporte.
+  [[nodiscard]] ro::net::FrameOutcome SayEquipChange(const ro::net::Frame& frame,
+                                                     ro::sim::World& world,
+                                                     std::uint32_t now_ms) const;
+
+  // Ce que les accusés du jeu d'équipement de rechange écrivent dans la
+  // discussion. Voir `EquipSwitchLines`. ⚠ LE JEU LUI-MÊME se tient dans le
+  // carnet du personnage (`ro::net::ApplyLedgerFrame`) : ceci ne fait qu'écrire.
+  [[nodiscard]] ro::net::FrameOutcome SayEquipSwitch(const ro::net::Frame& frame,
+                                                     ro::sim::World& world,
+                                                     std::uint32_t now_ms) const;
+
  private:
   // Ce qui nomme ce que les bonus désignent, pour la fiche et pour la discussion.
   [[nodiscard]] EquipAttributeNames Names() const;
+
+  // Le nom affiché d'une pièce du sac, vide si elle n'y est pas ou si les
+  // tables manquent.
+  [[nodiscard]] std::string ShownName(const ro::sim::World& world, std::uint16_t client_slot) const;
 
   // Les trois cases, refaites à chaque image par `Refresh`.
   void RefreshCompanions(const ro::sim::World& world);

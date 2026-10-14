@@ -189,6 +189,20 @@ tr: %s: fallo, materiales perdidos.
 
 fr: %s a accepté votre invitation de groupe.
 tr: %s aceptó su invitación de grupo.
+fr: %s a été équipé.
+tr: %s ha sido equipado.
+fr: %s a été retiré.
+tr: %s ha sido retirado.
+fr: %s a été placé dans la fenêtre d'échange d'équipement.
+tr: %s se ha colocado en la ventana de intercambio de equipo.
+fr: %s a été retiré de la fenêtre d'échange d'équipement.
+tr: %s se ha retirado de la ventana de intercambio de equipo.
+fr: Il n'y a aucun équipement à échanger.
+tr: No hay ningún objeto que reemplazar.
+fr: Impossible de ranger cet item dans la fenêtre d'échange.
+tr: No se puede registrar el objeto.
+fr: Impossible d'échanger l'équipement.
+tr: No se puede intercambiar el equipo.
 fr: %s a refusé votre invitation de groupe.
 tr: %s rechazó su invitación de grupo.
 fr: %s aujourd'hui

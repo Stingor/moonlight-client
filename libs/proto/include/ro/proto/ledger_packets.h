@@ -9,8 +9,7 @@
 #include "ro/core/error.h"
 
 // CE QUE LE SERVEUR DE CARTE DIT DU PERSONNAGE SANS QUE LE GÉNÉRATEUR LE
-// DÉCRIVE : il écrit ces quatre paquets champ par champ, sans structure à
-// relever.
+// DÉCRIVE : il écrit ces paquets champ par champ, sans structure à relever.
 namespace ro::proto {
 
 // L'IDENTIFIANT DE COMPTE, redit par le serveur de carte dès la connexion.
@@ -117,5 +116,45 @@ struct EquipSwitchList {
 [[nodiscard]] core::Result<EquipSwitchList> DecodeEquipSwitchList(
     std::span<const std::uint8_t> frame);
 [[nodiscard]] std::vector<std::uint8_t> EncodeEquipSwitchList(const EquipSwitchList& list);
+
+// L'ACCUSÉ D'UNE PIÈCE RANGÉE DANS LE JEU DE RECHANGE : zéro accorde, tout autre
+// code refuse (`ITEM_EQUIP_ACK_*` du serveur).
+struct EquipSwitchAddAck {
+  static constexpr std::uint16_t kOpcode = 0x0A98;
+  static constexpr std::size_t kWireSize = 10;
+
+  std::uint16_t client_slot = 0;
+  std::uint32_t location = 0;
+  std::uint16_t result = 0;
+};
+
+// L'ACCUSÉ D'UNE PIÈCE SORTIE DU JEU DE RECHANGE : zéro accorde, un refuse.
+struct EquipSwitchRemoveAck {
+  static constexpr std::uint16_t kOpcode = 0x0A9A;
+  static constexpr std::size_t kWireSize = 10;
+
+  std::uint16_t client_slot = 0;
+  std::uint32_t location = 0;
+  std::uint16_t failure = 0;
+};
+
+// L'ACCUSÉ DE L'ÉCHANGE COMPLET : zéro accorde.
+struct EquipSwitchRunAck {
+  static constexpr std::uint16_t kOpcode = 0x0A9D;
+  static constexpr std::size_t kWireSize = 4;
+
+  std::uint16_t failure = 0;
+};
+
+// ⚠ REFUSENT une trame qui ne fait pas sa longueur, ou qui porte un autre opcode.
+[[nodiscard]] core::Result<EquipSwitchAddAck> DecodeEquipSwitchAddAck(
+    std::span<const std::uint8_t> frame);
+[[nodiscard]] std::vector<std::uint8_t> EncodeEquipSwitchAddAck(const EquipSwitchAddAck& ack);
+[[nodiscard]] core::Result<EquipSwitchRemoveAck> DecodeEquipSwitchRemoveAck(
+    std::span<const std::uint8_t> frame);
+[[nodiscard]] std::vector<std::uint8_t> EncodeEquipSwitchRemoveAck(const EquipSwitchRemoveAck& ack);
+[[nodiscard]] core::Result<EquipSwitchRunAck> DecodeEquipSwitchRunAck(
+    std::span<const std::uint8_t> frame);
+[[nodiscard]] std::vector<std::uint8_t> EncodeEquipSwitchRunAck(const EquipSwitchRunAck& ack);
 
 }  // namespace ro::proto

@@ -1,12 +1,15 @@
 #include "character/character_view.h"
 
 #include <array>
+#include <optional>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/character.h"
+#include "ro/net/character_ledger.h"
 #include "ro/net/companion.h"
 #include "ro/net/equip_attributes.h"
 #include "ro/net/inventory.h"
@@ -21,6 +24,7 @@
 
 #include "character/character_bonus_rows.h"
 #include "character/equip_attribute_lines.h"
+#include "character/equip_change_line.h"
 #include "character/equip_slot_map.h"
 #include "items/inventory_view.h"
 #include "world/actor_view.h"
@@ -335,6 +339,56 @@ ro::net::FrameOutcome CharacterView::SayEquipAttributes(const ro::net::Frame& fr
                      std::move(line), now_ms, EquipAttributesColor(told->equipped));
   }
   return ro::net::FrameOutcome::kApplied;
+}
+
+ro::net::FrameOutcome CharacterView::SayEquipChange(const ro::net::Frame& frame,
+                                                    ro::sim::World& world,
+                                                    std::uint32_t now_ms) const {
+  const std::optional<ro::net::EquipChange> change = ro::net::GrantedEquipChangeOf(frame);
+  if (!change.has_value()) {
+    return ro::net::FrameOutcome::kUnhandled;
+  }
+  const std::string name = ShownName(world, change->client_slot);
+  if (name.empty()) {
+    return ro::net::FrameOutcome::kUnhandled;
+  }
+  EquipChangeLine line = EquipChangeLineOf(name, change->equipped);
+  world.RecordChat(ro::sim::ChatKind::kServer, line.type, 0, std::move(line.text), now_ms,
+                   line.color);
+  return ro::net::FrameOutcome::kApplied;
+}
+
+ro::net::FrameOutcome CharacterView::SayEquipSwitch(const ro::net::Frame& frame,
+                                                    ro::sim::World& world,
+                                                    std::uint32_t now_ms) const {
+  const std::optional<ro::sim::EquipSwitchNews> news = ro::net::EquipSwitchNewsOf(frame);
+  if (!news.has_value()) {
+    return ro::net::FrameOutcome::kUnhandled;
+  }
+  std::vector<EquipChangeLine> lines = EquipSwitchLines(*news, ShownName(world, news->client_slot));
+  if (lines.empty()) {
+    return ro::net::FrameOutcome::kUnhandled;
+  }
+  for (EquipChangeLine& line : lines) {
+    world.RecordChat(ro::sim::ChatKind::kServer, line.type, 0, std::move(line.text), now_ms,
+                     line.color);
+  }
+  return ro::net::FrameOutcome::kApplied;
+}
+
+std::string CharacterView::ShownName(const ro::sim::World& world, std::uint16_t client_slot) const {
+  if (items_ == nullptr || words_ == nullptr) {
+    return {};
+  }
+  // ⚠ LE SAC APRÈS LE MONDE : la pièce y est toujours, posée, rendue ou rangée.
+  const ro::sim::InventoryItem* piece = world.inventory().Find(client_slot);
+  if (piece == nullptr) {
+    return {};
+  }
+  ro::vfs::ItemNameFacts facts = ItemNameFactsOf(*piece);
+  creators_.Fill(facts);
+  return ro::vfs::ItemNameText(
+      ro::vfs::ComposeItemName(facts, *items_, *words_, ro::vfs::ItemNameSlots::kShown));
 }
 
 void CharacterView::Apply(const ro::ui::CharacterWindowAction& asked, ro::net::Connection& link,

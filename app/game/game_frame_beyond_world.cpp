@@ -81,8 +81,9 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // prendre), le boss d'un Convex Mirror, les nouvelles d'objets (ramassage
   // d'un membre, pièce abîmée), l'issue d'une alliance ou d'une hostilité,
   // l'adoption, les fiches du staff, l'accusé d'un signalement, les points de
-  // manière, la ligne d'un état, et l'équipement montré par un autre joueur,
-  // avec son refus.
+  // manière, la ligne d'un état, l'équipement montré par un autre joueur,
+  // avec son refus, le jeu d'équipement de rechange, et la pièce posée ou
+  // retirée — son nom, puis ce qu'elle apporte.
   for (const ro::net::FrameOutcome told :
        {ro::net::ApplyFriendFrame(received, friends_),
         ro::net::ApplyViewEquipFrame(received, inspected_),
@@ -95,6 +96,8 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         PlayerReportDesk::ApplyFrame(received, world_, now_ms),
         ro::net::ApplyMannerPointFrame(received, world_, now_ms),
         ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
+        character_->SayEquipSwitch(received, world_, now_ms),
+        character_->SayEquipChange(received, world_, now_ms),
         character_->SayEquipAttributes(received, world_, now_ms)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = told;

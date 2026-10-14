@@ -183,4 +183,74 @@ std::vector<std::uint8_t> EncodeEquipSwitchList(const EquipSwitchList& list) {
   return frame;
 }
 
+core::Result<EquipSwitchAddAck> DecodeEquipSwitchAddAck(std::span<const std::uint8_t> frame) {
+  if (frame.size() != EquipSwitchAddAck::kWireSize) {
+    return core::Fail(ErrorCode::kUnexpectedEnd, "accusé de rangement de longueur inattendue");
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != EquipSwitchAddAck::kOpcode) {
+    return core::Fail(ErrorCode::kBadSignature,
+                      "trame d'un autre paquet que l'accusé de rangement");
+  }
+  EquipSwitchAddAck ack;
+  ack.client_slot = reader.U16();
+  ack.location = reader.U32();
+  ack.result = reader.U16();
+  return ack;
+}
+
+std::vector<std::uint8_t> EncodeEquipSwitchAddAck(const EquipSwitchAddAck& ack) {
+  std::vector<std::uint8_t> frame;
+  ByteWriter writer(frame);
+  writer.U16(EquipSwitchAddAck::kOpcode);
+  writer.U16(ack.client_slot);
+  writer.U32(ack.location);
+  writer.U16(ack.result);
+  return frame;
+}
+
+core::Result<EquipSwitchRemoveAck> DecodeEquipSwitchRemoveAck(std::span<const std::uint8_t> frame) {
+  if (frame.size() != EquipSwitchRemoveAck::kWireSize) {
+    return core::Fail(ErrorCode::kUnexpectedEnd, "accusé de sortie de longueur inattendue");
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != EquipSwitchRemoveAck::kOpcode) {
+    return core::Fail(ErrorCode::kBadSignature, "trame d'un autre paquet que l'accusé de sortie");
+  }
+  EquipSwitchRemoveAck ack;
+  ack.client_slot = reader.U16();
+  ack.location = reader.U32();
+  ack.failure = reader.U16();
+  return ack;
+}
+
+std::vector<std::uint8_t> EncodeEquipSwitchRemoveAck(const EquipSwitchRemoveAck& ack) {
+  std::vector<std::uint8_t> frame;
+  ByteWriter writer(frame);
+  writer.U16(EquipSwitchRemoveAck::kOpcode);
+  writer.U16(ack.client_slot);
+  writer.U32(ack.location);
+  writer.U16(ack.failure);
+  return frame;
+}
+
+core::Result<EquipSwitchRunAck> DecodeEquipSwitchRunAck(std::span<const std::uint8_t> frame) {
+  if (frame.size() != EquipSwitchRunAck::kWireSize) {
+    return core::Fail(ErrorCode::kUnexpectedEnd, "accusé d'échange de longueur inattendue");
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != EquipSwitchRunAck::kOpcode) {
+    return core::Fail(ErrorCode::kBadSignature, "trame d'un autre paquet que l'accusé d'échange");
+  }
+  return EquipSwitchRunAck{.failure = reader.U16()};
+}
+
+std::vector<std::uint8_t> EncodeEquipSwitchRunAck(const EquipSwitchRunAck& ack) {
+  std::vector<std::uint8_t> frame;
+  ByteWriter writer(frame);
+  writer.U16(EquipSwitchRunAck::kOpcode);
+  writer.U16(ack.failure);
+  return frame;
+}
+
 }  // namespace ro::proto

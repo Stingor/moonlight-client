@@ -17,6 +17,43 @@ struct EquipSwitchPiece {
   std::uint32_t location = 0;
 };
 
+// CE QU'UN ACCUSÉ DU JEU D'ÉQUIPEMENT DE RECHANGE ANNONCE, pour la discussion.
+//
+// ⚠ DES FAITS, PAS DES PHRASES : la ligne nomme la pièce, et seule la couche qui
+// connaît les tables sait composer un nom.
+enum class EquipSwitchEvent : std::uint8_t {
+  // La pièce entre dans le jeu de rechange.
+  kPlaced,
+  // Le serveur refuse de l'y ranger.
+  kPlaceRefused,
+  // Elle en sort.
+  kRemoved,
+  // Il refuse de l'en sortir — et elle en sort quand même chez le client.
+  kRemoveRefused,
+  // Il refuse l'échange complet.
+  kSwapRefused,
+};
+
+// POURQUOI LE SERVEUR REFUSE, quand il le dit.
+enum class EquipSwitchRefusal : std::uint8_t {
+  kNone,
+  // Rien à échanger.
+  kNothingToReplace,
+  // La pièce ne peut pas entrer dans le jeu.
+  kCannotRegister,
+  // L'échange ne peut pas se faire.
+  kCannotSwap,
+};
+
+struct EquipSwitchNews {
+  EquipSwitchEvent event = EquipSwitchEvent::kPlaced;
+  // La case de la pièce dans le sac, vue du client ; sans objet pour l'échange.
+  std::uint16_t client_slot = 0;
+  // Les emplacements qu'elle occupe dans le jeu de rechange.
+  std::uint32_t location = 0;
+  EquipSwitchRefusal refusal = EquipSwitchRefusal::kNone;
+};
+
 // CE QUE LE SERVEUR DIT DU PERSONNAGE ET QU'AUCUNE FENÊTRE NE MONTRE ENCORE.
 //
 // Le serveur l'envoie à l'entrée sur la carte, et ne le redit qu'au
@@ -53,6 +90,21 @@ class CharacterLedger {
   // ⚠ REMPLACE : le serveur envoie toujours la liste entière.
   void ReplaceEquipSwitch(std::vector<EquipSwitchPiece> pieces) {
     equip_switch_ = std::move(pieces);
+  }
+
+  // Une pièce entre dans le jeu, ou y change d'emplacements. ⚠ CELLE QU'ELLE
+  // DÉLOGE a déjà été retirée : le serveur envoie ce retrait avant.
+  void PlaceEquipSwitch(EquipSwitchPiece piece) {
+    std::erase_if(equip_switch_, [&piece](const EquipSwitchPiece& kept) {
+      return kept.client_slot == piece.client_slot;
+    });
+    equip_switch_.push_back(piece);
+  }
+
+  void RemoveEquipSwitch(std::uint16_t client_slot) {
+    std::erase_if(equip_switch_, [client_slot](const EquipSwitchPiece& kept) {
+      return kept.client_slot == client_slot;
+    });
   }
 
   // ⚠ FUSIONNE : le serveur envoie la liste entière à la connexion, puis la

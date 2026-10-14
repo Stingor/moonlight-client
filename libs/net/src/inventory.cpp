@@ -187,8 +187,9 @@ constexpr std::uint8_t kUseRefused = 0;
 // ── LE REFUS D'ÉQUIPER OU DE RETIRER, DIT DANS LA DISCUSSION ────────────────
 //
 // Une ligne rouge dans la case « Équipement mis/retiré », et seulement pour
-// ces codes-là : un accordé ne dit rien — la pièce bouge sur la poupée —, et un
-// code inconnu non plus.
+// ces codes-là ; un code inconnu ne dit rien. Un accordé se dit aussi, dans la
+// même case, mais pas ici : sa phrase nomme la pièce — voir
+// `GrantedEquipChangeOf`.
 //
 //   0x0999 code 1 (niveau insuffisant) : « conditions non remplies » ;
 //   0x0999 code 2 (échec)              : « vous ne pouvez pas équiper » ;
@@ -522,6 +523,24 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
     default:
       return FrameOutcome::kUnhandled;
   }
+}
+
+std::optional<EquipChange> GrantedEquipChangeOf(const Frame& frame) {
+  if (frame.opcode == proto::ZcReqWearEquipAck::kOpcode) {
+    proto::ZcReqWearEquipAck packet;
+    if (!proto::Decode(frame.bytes, packet) || packet.result != kEquipGranted) {
+      return std::nullopt;
+    }
+    return EquipChange{.client_slot = packet.index, .equipped = true};
+  }
+  if (frame.opcode == proto::PacketUnequipitemAck::kOpcode) {
+    proto::PacketUnequipitemAck packet;
+    if (!proto::Decode(frame.bytes, packet) || packet.result != kTakeOffGranted) {
+      return std::nullopt;
+    }
+    return EquipChange{.client_slot = packet.index, .equipped = false};
+  }
+  return std::nullopt;
 }
 
 FrameOutcome ApplyViewEquipFrame(const Frame& frame, sim::ViewedEquipmentBook& book) {

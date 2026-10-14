@@ -189,6 +189,20 @@ tr: %s: failed, materials lost.
 
 fr: %s a accepté votre invitation de groupe.
 tr: %s accepted your party invitation.
+fr: %s a été équipé.
+tr: %s is put on.
+fr: %s a été retiré.
+tr: %s is taken off.
+fr: %s a été placé dans la fenêtre d'échange d'équipement.
+tr: %s has been placed in the Swap Equipment window.
+fr: %s a été retiré de la fenêtre d'échange d'équipement.
+tr: %s has been removed from the Swap Equipment window.
+fr: Il n'y a aucun équipement à échanger.
+tr: There is no item to replace.
+fr: Impossible de ranger cet item dans la fenêtre d'échange.
+tr: Unable to register item.
+fr: Impossible d'échanger l'équipement.
+tr: Unable to swap equipment.
 fr: %s a refusé votre invitation de groupe.
 tr: %s rejected your party invitation.
 fr: %s aujourd'hui

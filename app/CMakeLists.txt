@@ -154,6 +154,7 @@ target_include_directories(moonclient_effects PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 add_library(moonclient_equip STATIC
     character/character_bonus_rows.cpp
     character/equip_attribute_lines.cpp
+    character/equip_change_line.cpp
     character/equip_bonus_text.cpp
     world/entity_traits.cpp
     character/stat_bar_values.cpp

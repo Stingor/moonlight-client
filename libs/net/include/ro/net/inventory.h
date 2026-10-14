@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
@@ -26,6 +27,22 @@ namespace ro::net {
 // bandeau montrerait alors des objets nés tous au même instant.
 [[nodiscard]] FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world,
                                                std::uint32_t now_ms);
+
+// UNE PIÈCE QUE LE SERVEUR VIENT DE POSER OU DE RETIRER : l'accusé ACCORDÉ de
+// `ZC 0x0999` (posée) ou de `ZC 0x099A` (retirée), munitions comprises au
+// retrait. La case est celle du sac, telle que le fil la donne.
+//
+// ⚠ LA PHRASE NE S'ÉCRIT PAS ICI : elle nomme la pièce, et `net` ne sait pas
+// composer un nom. Le décodage du résultat, lui, reste ici — les deux accusés
+// n'appellent pas « accordé » la même valeur.
+struct EquipChange {
+  std::uint16_t client_slot = 0;
+  bool equipped = false;
+};
+
+// L'accusé accordé que porte cette trame, ou rien : autre opcode, refus, ou
+// trame illisible.
+[[nodiscard]] std::optional<EquipChange> GrantedEquipChangeOf(const Frame& frame);
 
 // ── Les opcodes que la structure ne porte pas ────────────────────────────────
 //
