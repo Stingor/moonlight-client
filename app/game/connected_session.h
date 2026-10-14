@@ -63,6 +63,17 @@ struct MapEntry {
   // personnages ne rend rien. Le client natif la lit là, et c'est pourquoi il
   // l'affiche dès l'entrée.
   std::int64_t zeny = 0;
+
+  // 🔴 LES TROIS MOTS D'ÉTAT — corps, santé, options —, ET LA MONTURE AVEC EUX.
+  // Le serveur de zone annonce le joueur aux AUTRES avec ses options, jamais à
+  // lui-même : son lot d'accueil (`clif_parse_LoadEndAck`) lui pose l'icône
+  // EFST_RIDING, et ne lui envoie le changement d'état que s'il est
+  // spectateur. Le Peco, le dragon, le loup ou le Madogear ne se lisent donc
+  // que dans la liste, qui porte l'option sauvegardée. Sans eux, le chevalier
+  // entre à pied, l'icône de sa monture allumée.
+  std::uint16_t body_state = 0;
+  std::uint16_t health_state = 0;
+  std::uint32_t option = 0;
 };
 
 // L'APPARENCE D'UN PERSONNAGE, TELLE QUE LA LISTE LA DONNE.

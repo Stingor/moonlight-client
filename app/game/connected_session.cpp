@@ -18,6 +18,11 @@ namespace {
 // src/char/char.cpp : 0 femme, 1 homme, 99 « celui de la connexion »).
 constexpr std::uint8_t kSexFromAccount = 99;
 
+// L'INSTANT DES ÉTATS QUE LE JOUEUR APPORTE EN ENTRANT, dans l'horloge du
+// monde : avant toute image. Un corps qui entre gelé l'est déjà, il ne se fige
+// pas sous les yeux.
+constexpr std::uint32_t kEnteredAtMs = 0;
+
 }  // namespace
 
 ro::sim::Appearance AppearanceOf(const ro::proto::CharacterInfo& character,
@@ -54,6 +59,9 @@ MapEntry ComposeMapEntry(const ro::proto::CharacterInfo& chosen,
   entry.job_level = chosen.joblevel;
   entry.zeny = chosen.money;
   entry.spawn = ro::sim::UnpackPosition(spawn.packed_position);
+  entry.body_state = static_cast<std::uint16_t>(chosen.bodystate);
+  entry.health_state = static_cast<std::uint16_t>(chosen.healthstate);
+  entry.option = static_cast<std::uint32_t>(chosen.effectstate);
   return entry;
 }
 
@@ -75,8 +83,9 @@ void SpawnPlayer(const MapEntry& entry, ro::sim::World& world) {
   static_cast<void>(world.SetPlayerParameter(
       static_cast<std::uint16_t>(ro::sim::ServerParameter::kZeny), entry.zeny));
 
+  const std::uint32_t self_id = entry.map_id;
   ro::sim::Actor self;
-  self.id = entry.map_id;
+  self.id = self_id;
   self.name = entry.character_name;
   self.kind = ro::sim::ActorKind::kPlayer;
   self.position = entry.spawn;
@@ -84,6 +93,13 @@ void SpawnPlayer(const MapEntry& entry, ro::sim::World& world) {
   self.speed_ms_per_cell =
       entry.speed_ms_per_cell != 0 ? entry.speed_ms_per_cell : ro::sim::kDefaultWalkSpeedMsPerCell;
   world.Spawn(std::move(self));
+
+  // SES ÉTATS PASSENT PAR LA PORTE D'UN CHANGEMENT D'ÉTAT, comme s'il venait
+  // d'être annoncé : les bits allumés le sont en FRONT MONTANT, et ce qui naît
+  // d'une option — la monture, Ruwach, Sight — naît comme en cours de partie.
+  // Aucun mode PK : la liste n'en porte pas.
+  static_cast<void>(
+      world.SetStates(self_id, entry.body_state, entry.health_state, entry.option, kEnteredAtMs));
 }
 
 std::string DescribeLinkLoss(ro::net::LinkStatus status, const ro::core::Error& why) {
