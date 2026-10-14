@@ -3,8 +3,10 @@
 #include "ro/net/rank_notices.h"
 
 #include <string_view>
+#include <vector>
 
 #include "ro/core/byte_reader.h"
+#include "ro/core/byte_writer.h"
 #include "ro/core/text.h"
 #include "ro/proto/map_packets.h"
 
@@ -17,6 +19,11 @@ constexpr std::uint16_t kStarNoticeOpcode = 0x020E;
 constexpr std::size_t kStarNoticeSize = 32;
 constexpr std::size_t kStarNoticeNameOffset = 2;
 constexpr std::size_t kStarNoticeNameSize = 24;
+
+// LA QUESTION DE DÉSIGNATION et sa réponse : l'opcode puis le sujet.
+constexpr std::uint16_t kStarPlaceQuestionOpcode = 0x0253;
+constexpr std::uint16_t kStarPlaceAgreementOpcode = 0x0254;
+constexpr std::size_t kStarPlaceSize = 3;
 
 // Un nom de taille fixe, coupé à son premier zéro.
 std::string FixedName(std::span<const std::uint8_t> raw) {
@@ -90,6 +97,27 @@ std::optional<CharacterNameAnswer> ReadCharacterName(const Frame& frame) {
     return std::nullopt;
   }
   return CharacterNameAnswer{.character_id = packet.CID, .name = core::Utf8FromCp1252(packet.name)};
+}
+
+std::optional<std::uint8_t> ReadStarPlaceQuestion(const Frame& frame) {
+  if (frame.opcode != kStarPlaceQuestionOpcode || frame.bytes.size() < kStarPlaceSize) {
+    return std::nullopt;
+  }
+  core::ByteReader reader(frame.bytes);
+  reader.Skip(sizeof(std::uint16_t));
+  const std::uint8_t subject = reader.U8();
+  if (!reader.ok()) {
+    return std::nullopt;
+  }
+  return subject;
+}
+
+void AgreeStarPlace(Connection& link, std::uint8_t subject) {
+  std::vector<std::uint8_t> bytes;
+  core::ByteWriter writer(bytes);
+  writer.U16(kStarPlaceAgreementOpcode);
+  writer.U8(subject);
+  link.Send(bytes);
 }
 
 }  // namespace ro::net

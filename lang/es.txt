@@ -17979,3 +17979,9 @@ tr: Tasa de evasión
 
 fr: Défense magique
 tr: Defensa mágica
+
+fr: Lancer le sort qui consomme 1 Black Gemstone et 1 000 000 zeny ?
+tr: ¿Lanzar el hechizo que consume 1 Black Gemstone y 1.000.000 de zeny?
+
+fr: Une carte désignée ne peut plus être changée. Voulez-vous vraiment désigner cette carte ?
+tr: Un mapa designado ya no se puede cambiar. ¿Seguro que quieres designar este mapa?

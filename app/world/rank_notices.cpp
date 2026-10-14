@@ -125,6 +125,15 @@ std::string MonsterNamed(const ro::net::StarNotice& notice) {
 
 }  // namespace
 
+const char* StarPlaceQuestion(std::uint8_t subject) {
+  if (subject == ro::net::kCostlySpellSubject) {
+    return Tr("Lancer le sort qui consomme 1 Black Gemstone et 1 000 000 zeny ?");
+  }
+  return Tr(
+      "Une carte désignée ne peut plus être changée. Voulez-vous vraiment désigner cette "
+      "carte ?");
+}
+
 std::vector<RankNoticeLine> RankingLines(
     const ro::net::RankingList& list, const std::array<std::string, ro::net::kRankingSize>& names) {
   const std::optional<RankStyle> style = StyleOf(list.kind);
@@ -276,6 +285,11 @@ ro::net::FrameOutcome RankNotices::ApplyFrame(const ro::net::Frame& frame, ro::s
     }
     return ro::net::FrameOutcome::kApplied;
   }
+  if (const std::optional<std::uint8_t> subject = ro::net::ReadStarPlaceQuestion(frame)) {
+    star_place_subject_ = *subject;
+    ++star_place_serial_;
+    return ro::net::FrameOutcome::kApplied;
+  }
   if (const std::optional<ro::net::StarNotice> notice = ro::net::ReadStarNotice(frame)) {
     if (notice->code == StarNoticeCode::kTaekwonMission) {
       mission_.Start(notice->subject_id, notice->name, notice->star);
@@ -328,6 +342,24 @@ void RankNotices::Advance(ro::sim::World& world, std::uint32_t now_ms) {
 }
 
 std::vector<std::string> RankNotices::TakeSounds() { return std::exchange(sounds_, {}); }
+
+void RankNotices::AdvanceStarPlace(StarPlaceBox& box, ro::net::Connection& link) {
+  // ⚠ LA RÉPONSE VISE LA QUESTION QUE LA BOÎTE MONTRAIT, qui est la dernière
+  // reçue.
+  if (const std::optional<bool> answer = std::exchange(box.answer, std::nullopt);
+      answer.has_value() && star_place_subject_.has_value()) {
+    if (*answer) {
+      ro::net::AgreeStarPlace(link, *star_place_subject_);
+    }
+    star_place_subject_.reset();
+    box.question.clear();
+  }
+  if (star_place_serial_ != star_place_asked_serial_ && star_place_subject_.has_value()) {
+    star_place_asked_serial_ = star_place_serial_;
+    box.ask = true;
+    box.question = StarPlaceQuestion(*star_place_subject_);
+  }
+}
 
 bool RankNotices::AllNamesKnown(const ro::net::RankingList& list) const {
   for (const std::uint32_t character_id : list.character_ids) {

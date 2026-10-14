@@ -35,6 +35,8 @@ struct RankingBoardWindows {
   ro::ui::RankingWindowAction answer;
   // UNE OUVERTURE DEMANDÉE — `/ranking`, l'icône —, lue à l'avancée suivante.
   bool open_asked = false;
+  // LA QUESTION DE DÉSIGNATION de Feeling, qui vit avec les avis d'étoile.
+  StarPlaceBox star_place;
 };
 
 // L'onglet d'un classement, rien pour un genre que le tableau ne montre pas ;

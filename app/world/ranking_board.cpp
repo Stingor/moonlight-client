@@ -62,6 +62,7 @@ void ToggleRankingBoard(RankingBoardWindows& windows) {
 
 void RankingBoard::Advance(RankingBoardWindows& windows, RankNotices& notices,
                            ro::net::Connection& link, std::uint32_t now_ms) {
+  notices.AdvanceStarPlace(windows.star_place, link);
   // L'ONGLET CHANGÉ À L'IMAGE PRÉCÉDENTE redemande toujours le sien : un
   // classement change pendant qu'on le regarde.
   if (std::exchange(windows.answer, {}).requested) {

@@ -18,6 +18,12 @@ namespace ro::net {
 //   ZC 0x097E [op][type:2][gagnés:4][total:4]    des points de rang gagnés
 //   ZC 0x020E [op][nom:24][id:4][étoile:1][code:1]
 //   ZC 0x0AF7 [op][drapeau:2][cid:4][nom:24]     le nom d'un personnage
+//   ZC 0x0253 [op][sujet:1]                      « désigner cette carte ? »
+//   CZ 0x0254 [op][sujet:1]                      « oui »
+//
+// 🔴 FEELING NE MÉMORISE RIEN SANS L'ACCORD : le serveur pose la question,
+// et seule la réponse fait désigner la carte, puis l'avis d'étoile arrive.
+// Une question sans réponse, et le sort n'a rien fait.
 //
 // 🔴 LE CLASSEMENT NE PORTE QUE DES IDENTIFIANTS DE PERSONNAGE : les noms se
 // demandent à part, et arrivent quand ils arrivent. C'est à `app` de les
@@ -92,5 +98,14 @@ void RequestRanking(Connection& link, RankKind kind);
 [[nodiscard]] std::optional<RankingPoints> ReadRankingPoints(const Frame& frame);
 [[nodiscard]] std::optional<StarNotice> ReadStarNotice(const Frame& frame);
 [[nodiscard]] std::optional<CharacterNameAnswer> ReadCharacterName(const Frame& frame);
+
+// LE SUJET D'UNE QUESTION DE DÉSIGNATION : le soleil, la lune ou l'étoile
+// (0, 1, 2) pour Feeling ; `kCostlySpellSubject` pour le sort qui coûte une
+// Black Gemstone et un million de zeny.
+inline constexpr std::uint8_t kCostlySpellSubject = 10;
+
+[[nodiscard]] std::optional<std::uint8_t> ReadStarPlaceQuestion(const Frame& frame);
+// « Oui » : renvoie le sujet de la question.
+void AgreeStarPlace(Connection& link, std::uint8_t subject);
 
 }  // namespace ro::net

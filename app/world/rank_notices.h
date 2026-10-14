@@ -58,6 +58,20 @@ struct StarNoticeOutcome {
 [[nodiscard]] std::optional<StarNoticeOutcome> StarNoticeOutcomeOf(
     const ro::net::StarNotice& notice, std::string_view own_name);
 
+// LA QUESTION DE DÉSIGNATION, telle que l'étage d'interface la dessine : une
+// boîte OK / Annuler. Annuler ne dit rien au serveur.
+struct StarPlaceBox {
+  // La question, DÉJÀ TRADUITE ; vide quand aucune n'attend.
+  std::string question;
+  // Une question vient d'arriver : la boîte s'ouvre.
+  bool ask = false;
+  // Ce que le joueur a répondu.
+  std::optional<bool> answer;
+};
+
+// La question d'un sujet, DÉJÀ TRADUITE.
+[[nodiscard]] const char* StarPlaceQuestion(std::uint8_t subject);
+
 class RankNotices {
  public:
   // Lit une trame : un classement, des points, un avis, ou le nom d'un
@@ -71,6 +85,9 @@ class RankNotices {
   [[nodiscard]] const TaekwonMission& mission() const noexcept { return mission_; }
   // Les sons à jouer depuis la dernière fois, nommés dans le dossier des sons.
   [[nodiscard]] std::vector<std::string> TakeSounds();
+  // L'IMAGE DE LA QUESTION DE DÉSIGNATION : la réponse donnée part, puis la
+  // boîte se compose pour la question arrivée. ⚠ ÉMET : « OK » répond.
+  void AdvanceStarPlace(StarPlaceBox& box, ro::net::Connection& link);
 
   // LA PROCHAINE RÉPONSE DE CE CLASSEMENT NE S'ÉCRIT PAS dans la conversation :
   // elle a été demandée par un onglet du tableau, qui la montre. Les commandes
@@ -119,6 +136,11 @@ class RankNotices {
   std::optional<QuietRequest> quiet_;
   std::vector<std::string> sounds_;
   TaekwonMission mission_;
+  // LA DERNIÈRE QUESTION DE DÉSIGNATION, tant qu'elle attend sa réponse : une
+  // nouvelle remplace l'ancienne dans la même boîte.
+  std::optional<std::uint8_t> star_place_subject_;
+  std::uint32_t star_place_serial_ = 0;
+  std::uint32_t star_place_asked_serial_ = 0;
 };
 
 }  // namespace moonclient
