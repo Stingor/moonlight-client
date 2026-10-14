@@ -62,6 +62,12 @@ namespace {
 // sienne, aucune ne se devine, et chacune se relève chez le serveur.
 constexpr std::uint8_t kStatUpAccepted = 1;
 
+// Une montée de caractéristique doit-elle se taire ? Voir `RequestStatUp`.
+[[nodiscard]] bool StatRaiseHeld(const sim::World& world) {
+  const sim::Actor* self = world.player();
+  return world.stat_raise_awaited() || (self != nullptr && self->posture == sim::Posture::kDead);
+}
+
 }  // namespace
 
 FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world) {
@@ -191,6 +197,8 @@ FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world) {
 
     case proto::ZcStatusChangeAck::kOpcode:
       return Decoded<proto::ZcStatusChangeAck>(frame, [&world](const auto& packet) {
+        // La réponse arrive, quelle qu'elle soit : la montée suivante peut partir.
+        world.AwaitStatRaise(false);
         if (packet.ok != kStatUpAccepted) {
           // REFUSÉ, ET RIEN À RANGER. Le serveur refuse pour trois raisons —
           // numéro hors des six, plafond du personnage atteint, points
@@ -211,7 +219,11 @@ FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world) {
   }
 }
 
-core::Result<void> RequestStatUp(Connection& link, std::uint16_t parameter, std::uint8_t amount) {
+core::Result<void> RequestStatUp(Connection& link, sim::World& world, std::uint16_t parameter,
+                                 std::uint8_t amount) {
+  if (StatRaiseHeld(world)) {
+    return {};
+  }
   proto::StatUpRequest request;
   request.parameter = parameter;
   request.amount = amount;
@@ -220,6 +232,21 @@ core::Result<void> RequestStatUp(Connection& link, std::uint16_t parameter, std:
     return std::unexpected(frame.error());
   }
   link.Send(*frame);
+  world.AwaitStatRaise(true);
+  return {};
+}
+
+core::Result<void> RequestTraitStatUp(Connection& link, sim::World& world, std::uint16_t parameter,
+                                      std::uint16_t amount) {
+  if (StatRaiseHeld(world)) {
+    return {};
+  }
+  proto::CzAdvancedStatusChange request;
+  // Le serveur déclare ces deux champs signés ; les octets sont les mêmes.
+  request.type = static_cast<std::int16_t>(parameter);
+  request.amount = static_cast<std::int16_t>(amount);
+  link.Send(proto::Encode(request));
+  world.AwaitStatRaise(true);
   return {};
 }
 

@@ -40,6 +40,7 @@
 #include "chat/navigation_command.h"
 #include "chat/rank_command.h"
 #include "chat/show_equipment_command.h"
+#include "chat/stat_raise_command.h"
 #include "chat/talk_filter_command.h"
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
@@ -774,6 +775,9 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     if (to.link->is_open()) {
       ReportRefusal(ro::net::RequestWarpMemo(*to.link));
     }
+    return;
+  }
+  if (RunStatRaiseCommand(*to.link, *to.world, line)) {
     return;
   }
   // 🔴 CE QUE LE CLIENT DU JOUEUR NE CONNAÎT PAS PART AU SERVEUR, comme une

@@ -397,7 +397,7 @@ std::string CharacterView::ShownName(const ro::sim::World& world, std::uint16_t 
 }
 
 void CharacterView::Apply(const ro::ui::CharacterWindowAction& asked, ro::net::Connection& link,
-                          const ro::sim::World& world) {
+                          ro::sim::World& world) {
   // « MONTRER MON ÉQUIPEMENT » ET « VOIR LES COSTUMES » se lisent EN TÊTE, et
   // sans s'arrêter là : ils ne désignent ni pièce ni compagnon, et ne doivent
   // pas en masquer un.
@@ -471,7 +471,7 @@ void CharacterView::Apply(const ro::ui::CharacterWindowAction& asked, ro::net::C
       // plus que ce qui est payable — et c'est le serveur qui le borne au
       // nombre de crans que les points permettent.
       const int amount = asked.amount > 255 ? 255 : asked.amount;
-      sent = ro::net::RequestStatUp(link, parameter, static_cast<std::uint8_t>(amount));
+      sent = ro::net::RequestStatUp(link, world, parameter, static_cast<std::uint8_t>(amount));
       break;
     }
   }

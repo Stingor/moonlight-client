@@ -61,6 +61,7 @@ void World::EnterMap(std::string map_name, std::uint16_t x, std::uint16_t y) {
   // défaut n'est pas l'octet nul — les deux permissions s'écrivent à l'envers.
   map_mode_ = MapMode();
   map_type_ = 0;
+  stat_raise_awaited_ = false;
   // LE CLASSEMENT AUSSI : il appartient à la carte qu'on quitte. ⚠ LE SERVEUR
   // L'ÉTEINT DÉJÀ — `map_mapflag_pvp_stop_sub` envoie un rang et un total nuls
   // en quittant la zone — mais seulement quand la zone s'éteint sous nos pieds,
@@ -765,6 +766,7 @@ void World::Clear() {
   // Sa vie en attente, non : elle attendait un maximum posé sur l'acteur
   // qu'on vient d'effacer.
   pending_player_hp_.reset();
+  stat_raise_awaited_ = false;
 }
 
 }  // namespace ro::sim

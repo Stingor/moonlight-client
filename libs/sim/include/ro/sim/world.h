@@ -473,6 +473,12 @@ class World : public WorldHoldings, public WorldNpcDialog {
   void TellMapType(std::uint16_t map_type) noexcept { map_type_ = map_type; }
   [[nodiscard]] std::uint16_t map_type() const noexcept { return map_type_; }
 
+  // UNE MONTÉE DE CARACTÉRISTIQUE À LA FOIS : tant que le serveur n'a pas
+  // répondu à la précédente, une nouvelle demande se tait. L'accusé — accepté
+  // ou refusé — lève l'attente, l'entrée sur une carte aussi.
+  [[nodiscard]] bool stat_raise_awaited() const noexcept { return stat_raise_awaited_; }
+  void AwaitStatRaise(bool awaited) noexcept { stat_raise_awaited_ = awaited; }
+
   // LE CLASSEMENT PVP DE CETTE CARTE. Le chronomètre du premier et le carnet des
   // rangs vivent dans `PvpStanding` ; ne reste ici que ce qui touche aux acteurs.
   [[nodiscard]] PvpStanding& pvp_standing() noexcept { return pvp_standing_; }
@@ -601,6 +607,7 @@ class World : public WorldHoldings, public WorldNpcDialog {
   std::uint32_t map_entries_ = 0;
   MapMode map_mode_;
   std::uint16_t map_type_ = 0;
+  bool stat_raise_awaited_ = false;
   PvpStanding pvp_standing_;
   ServerClock server_clock_;
 };

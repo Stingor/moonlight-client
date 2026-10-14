@@ -251,7 +251,9 @@ add_library(moonclient_chatlinks STATIC
     chat/staff_item_command.cpp
     chat/announce_command.cpp
     chat/whisper_block_command.cpp
-    chat/show_equipment_command.cpp)
+    chat/show_equipment_command.cpp
+    chat/stat_raise_command.cpp
+    chat/native_slash_commands.cpp)
 
 # ⚠ `ro_sim` EST PUBLIC : une ligne de conversation porte deux
 # espèces de balise, et celle d'un STYLE se lit — donc se valide — avec
@@ -1502,7 +1504,6 @@ add_executable(moonclient
     chat/chat_view.cpp
     chat/talk_filter_command.cpp
     chat/dev_commands.cpp
-    chat/native_slash_commands.cpp
     items/description_view.cpp
     world/attack_intent.cpp
     world/click_action.cpp

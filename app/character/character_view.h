@@ -112,7 +112,7 @@ class CharacterView {
   // refuse une montée pour trois raisons distinctes ; avancer la valeur chez
   // nous montrerait une force que le monde ne partage pas.
   void Apply(const ro::ui::CharacterWindowAction& asked, ro::net::Connection& link,
-             const ro::sim::World& world);
+             ro::sim::World& world);
 
   // CE QU'APPORTE UNE PIÈCE OU UN ENSEMBLE qui entre ou sort de l'équipement
   // (`ZC 0x0F3D`), écrit dans la case « Attributs d'équipement » de la

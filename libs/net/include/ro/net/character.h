@@ -35,7 +35,18 @@ namespace ro::net {
 // nous montrerait une force que le monde ne partage pas.
 //
 // `parameter` est le numéro du serveur : `SP_STR` à `SP_LUK`, soit 13 à 18.
-[[nodiscard]] core::Result<void> RequestStatUp(Connection& link, std::uint16_t parameter,
-                                               std::uint8_t amount);
+//
+// ⚠ DEUX DEMANDES SE TAISENT SANS RIEN ÉMETTRE, comme au jeu : celle d'un
+// personnage mort, et celle qui suit une montée dont l'accusé n'est pas encore
+// arrivé — voir `World::stat_raise_awaited`. Une demande émise pose l'attente.
+[[nodiscard]] core::Result<void> RequestStatUp(Connection& link, sim::World& world,
+                                               std::uint16_t parameter, std::uint8_t amount);
+
+// « Je monte cette caractéristique de métier » — `CZ_ADVANCED_STATUS_CHANGE`,
+// 0x0B24 : `SP_POW` à `SP_CRT`, soit 219 à 224, et la quantité sur DEUX octets.
+// Le serveur la lit avec `clif_parse_traitstatus_up` et répond par le même
+// accusé que `RequestStatUp`, dont elle partage les deux silences.
+[[nodiscard]] core::Result<void> RequestTraitStatUp(Connection& link, sim::World& world,
+                                                    std::uint16_t parameter, std::uint16_t amount);
 
 }  // namespace ro::net
