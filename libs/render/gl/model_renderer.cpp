@@ -72,6 +72,8 @@ void main() {
     gl_Position = u_view_projection * world;
     v_fog_kept = FogKeptPart(gl_Position.w);
 
+    // La partie 3 × 3 de la pose, et non la transposée de son inverse : c'est
+    // ainsi que le client éclaire un modèle étiré — voir `TransformedNormal`.
     vec3 normal = normalize(mat3(u_model) * a_normal);
     // Une face qui tourne le dos au soleil ne reçoit que l'ambiante. Prendre
     // la valeur ABSOLUE l'éclairerait autant que celle qui lui fait face, et le

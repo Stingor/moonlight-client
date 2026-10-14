@@ -149,8 +149,14 @@ constexpr std::span<const formats::RsmTextureAnimation> kNoTextureMotion{};
 // Ajoute les faces d'un maillage, groupées par texture.
 //
 // `local` place le maillage dans son nœud, `pose` place le nœud dans le modèle
-// à l'image zéro. Les normales se calculent TOUJOURS sur la pose complète :
-// c'est l'éclairage de l'image zéro, même pour un sommet laissé dans son nœud.
+// à l'image zéro.
+//
+// LA NORMALE NAÎT DANS LE REPÈRE DU MAILLAGE, et la pose la transporte ensuite :
+// les faces se mesurent sur les sommets placés par `local` seul, et `pose`
+// n'agit sur leur normale que par `TransformedNormal`. C'est l'ordre du client,
+// et sous une échelle non uniforme d'un nœud, mesurer la face déjà posée
+// donnerait un autre éclairage que le sien. Elle porte TOUJOURS la pose de
+// l'image zéro, même pour un sommet laissé dans son nœud.
 //
 // `baked_motion` porte les animations de texture du nœud : un sommet posé y
 // prend ses coordonnées de l'image zéro. Un sommet laissé dans son nœud garde
@@ -173,6 +179,7 @@ void EmitMesh(const RsmMesh& mesh, const RsmModel& model, const glm::mat4& local
   const glm::mat4& output = emitted == Emitted::kPosed ? posed : local;
   // Les positions transformées et la normale de chaque face, calculées d'abord :
   // le lissage a besoin de TOUTES les faces avant de pouvoir en moyenner une.
+  // `corners` est le maillage dans son nœud, où les faces se mesurent.
   std::vector<std::array<glm::vec3, 3>> corners(mesh.faces.size());
   std::vector<std::array<glm::vec3, 3>> outputs(mesh.faces.size());
   std::vector<glm::vec3> face_normals(mesh.faces.size(), glm::vec3{0.0F, 1.0F, 0.0F});
@@ -187,7 +194,7 @@ void EmitMesh(const RsmMesh& mesh, const RsmModel& model, const glm::mat4& local
     }
     for (std::size_t corner = 0; corner < 3; ++corner) {
       const glm::vec4 vertex{ToVec3(mesh.vertices[face.vertex_ids[corner]]), 1.0F};
-      corners[index][corner] = glm::vec3(posed * vertex);
+      corners[index][corner] = glm::vec3(local * vertex);
       outputs[index][corner] = glm::vec3(output * vertex);
     }
     const std::array<float, 3> normal =
@@ -256,8 +263,8 @@ void EmitMesh(const RsmMesh& mesh, const RsmModel& model, const glm::mat4& local
       const auto& texel = mesh.texture_vertices[face.texture_vertex_ids[corner]];
       const std::array<float, 2> uv = MoveTextureCoordinate(motion, {texel.u, texel.v});
       const glm::vec3& position = outputs[index][corner];
-      const glm::vec3 normal =
-          smoothed.empty() ? face_normals[index] : smoothed[index * 3 + corner];
+      const glm::vec3 normal = TransformedNormal(
+          pose, smoothed.empty() ? face_normals[index] : smoothed[index * 3 + corner]);
       out.push_back(
           ModelVertex{{position.x, position.y, position.z}, uv, {normal.x, normal.y, normal.z}});
     }
@@ -296,6 +303,12 @@ ModelRigPart AppendPart(std::size_t node, const SortedVertices& by_texture,
 }
 
 }  // namespace
+
+glm::vec3 TransformedNormal(const glm::mat4& transform, const glm::vec3& normal) {
+  const glm::vec3 moved = glm::mat3(transform) * normal;
+  const float length = glm::length(moved);
+  return length > 0.0F ? moved / length : moved;
+}
 
 std::array<float, 3> ModelMesh::center() const noexcept {
   return {(bounds_min[0] + bounds_max[0]) * 0.5F, (bounds_min[1] + bounds_max[1]) * 0.5F,

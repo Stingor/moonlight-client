@@ -79,6 +79,17 @@ struct ModelMesh {
 // l'image zéro.
 [[nodiscard]] ModelMesh BuildModelMesh(const formats::RsmModel& model);
 
+// LA NORMALE D'UN SOMMET SOUS UNE TRANSFORMATION : la partie 3 × 3 de la
+// matrice, celle qui place les positions, puis renormalisée.
+//
+// ⚠ CE N'EST PAS LA TRANSPOSÉE DE L'INVERSE, et c'est voulu : le client éclaire
+// ses modèles ainsi, et sous une échelle non uniforme, la normale qu'il obtient
+// n'est plus perpendiculaire à la face transformée. Le but est d'éclairer comme
+// lui. Une échelle uniforme ou une rotation ne change rien à la direction.
+//
+// La normale nulle reste nulle : rien ne la distingue d'une face dégénérée.
+[[nodiscard]] glm::vec3 TransformedNormal(const glm::mat4& transform, const glm::vec3& normal);
+
 // La part d'un nœud dans un modèle animé : ses lots de dessin.
 struct ModelRigPart {
   // Index dans les nœuds du gréement, de l'une ou l'autre famille.
