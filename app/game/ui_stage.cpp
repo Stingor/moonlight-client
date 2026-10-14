@@ -725,7 +725,7 @@ UiStage::Answers UiStage::Draw(
   // LE NOM DE LA CARTE, après les fenêtres comme le client, et pour la même
   // raison que l'enregistreur passe après lui.
   if (windows.map_sign.has_value()) {
-    ro::ui::DrawMapSign(*windows.map_sign);
+    ro::ui::DrawMapSign(*windows.map_sign, ui_->MapSignFont());
   }
   ro::ui::DrawZoneSelection(capture, skin_, zone_trace_, &answers.capture);
   ro::ui::DrawCaptureBadge(capture, skin_);

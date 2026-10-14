@@ -133,6 +133,7 @@ void UiContext::UseFonts(const FontSetup& setup) {
   ImGuiIO& io = ImGui::GetIO();
   io.Fonts->Clear();
   fonts_ = {};
+  map_sign_font_ = nullptr;
   family_count_ = std::min(setup.families.size(), kMostFontFamilies);
   family_labels_ = {};
   // ⚠ APRÈS `Clear` SEULEMENT : l'atlas ne lit plus leurs octets.
@@ -237,6 +238,15 @@ void UiContext::UseFonts(const FontSetup& setup) {
     loose_fonts_.push_back(std::move(kept));
   }
 
+  // LA POLICE DU BANDEAU DU NOM DE LA CARTE, en tout-ou-rien : chaque pixel
+  // d'une lettre est plein ou vide, comme le jeu la grave. Le fort hinting est
+  // celui que FreeType destine à ce mode-là ; sans lui, les fûts d'un même
+  // caractère tombent à des épaisseurs inégales.
+  ImFontConfig aliased = shape;
+  aliased.FontLoaderFlags |=
+      ImGuiFreeTypeLoaderFlags_Monochrome | ImGuiFreeTypeLoaderFlags_MonoHinting;
+  map_sign_font_ = AddFile(setup.map_sign_source, setup.size_pixels, aliased);
+
   ChooseFont(setup.chosen);
 
   // ⚠ CE QUI A ÉTÉ BÂTI SE DIT, et ce n'est pas du bavardage : une police qui
@@ -249,9 +259,11 @@ void UiContext::UseFonts(const FontSetup& setup) {
   // apercevoir : une police chargée sans taille sort à vingt pixels, pas à celle
   // qu'on croyait demander, et rien ne le dit.
   core::LogInfo(
-      "polices : {} famille(s) et {} du dossier du jeu, choix {} — {}, {} px, dessin avec {}",
+      "polices : {} famille(s) et {} du dossier du jeu, choix {} — {}, {} px, dessin avec {} ; "
+      "bandeau de carte : {}",
       family_count_, loose_fonts_.size(), chosen_font_, loaded ? "chargée" : "celle d'ImGui",
-      setup.size_pixels, drawing != nullptr ? drawing->GetDebugName() : "(rien)");
+      setup.size_pixels, drawing != nullptr ? drawing->GetDebugName() : "(rien)",
+      map_sign_font_ != nullptr ? setup.map_sign_source : "police courante");
 }
 
 void UiContext::ChooseFont(int family) {

@@ -18,6 +18,11 @@ namespace ro::ui {
 // client : la bande prend un cinquième de la hauteur, et l'image comme les
 // textes suivent l'échelle qu'elle leur donne. Le bandeau a donc la même
 // allure à toutes les résolutions.
+//
+// ⚠ ET TOUT TOMBE SUR LE PIXEL, tronqué : la bande, l'image, la taille et la
+// place des textes. Le texte est dessiné SANS LISSAGE — en Arial gras, voir
+// `MapSignFontSource` — et une lettre sans lissage posée entre deux pixels
+// serait floutée par l'échantillonnage de la texture.
 
 // Où la bande commence, et quelle part de la hauteur elle prend.
 inline constexpr float kMapSignTopShare = 0.12F;
@@ -29,6 +34,12 @@ inline constexpr float kMapSignSubtitleSize = 16.0F;
 inline constexpr float kMapSignSubtitleTop = 72.0F;
 inline constexpr float kMapSignTitleSize = 44.0F;
 inline constexpr float kMapSignTitleTop = 95.0F;
+
+// ⚠ LA TAILLE D'UN TEXTE EST LA HAUTEUR DE SA CELLULE — jambages compris —,
+// ARRONDIE AU PIXEL PAR TRONCATURE, PUIS GRANDIE DE TROIS PIXELS. C'est ce que
+// le jeu ajoute à toute police latine. Sans ces trois pixels, le titre d'un
+// écran de 720 lignes sort à 33 pixels au lieu de 36 : l'écart se voit.
+inline constexpr float kMapSignCellGrowthPx = 3.0F;
 
 // Pleinement visible pendant ce temps, puis effacé linéairement sur le suivant.
 inline constexpr std::uint32_t kMapSignShownMs = 5000;
@@ -60,9 +71,10 @@ struct MapSignView {
   std::uint32_t elapsed_ms = 0;
 };
 
-// Peint le bandeau PAR-DESSUS les fenêtres, comme le client.
+// Peint le bandeau PAR-DESSUS les fenêtres, comme le client, avec `font` —
+// celle que `UiContext::MapSignFont` rend. Nulle, la police courante sert.
 //
 // ⚠ SANS IMAGE, RIEN : le client ne pose pas les textes seuls sur le monde.
-void DrawMapSign(const MapSignView& sign);
+void DrawMapSign(const MapSignView& sign, ImFont* font);
 
 }  // namespace ro::ui

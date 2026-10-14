@@ -101,6 +101,12 @@ struct FontSetup {
   // ⚠ UN FICHIER ILLISIBLE EST ÉCARTÉ, PAS FATAL : il vient d'un dossier que
   // n'importe quoi peut remplir.
   std::span<const FontFamilySpec> loose;
+
+  // ── LA POLICE DU BANDEAU DU NOM DE LA CARTE ───────────────────────────────
+  // Un seul fichier, gravé SANS LISSAGE : le jeu y dessine ses lettres en
+  // tout-ou-rien, aux bords nets, et non dans la police de l'interface.
+  // Vide = le bandeau prend la police courante.
+  std::string_view map_sign_source;
 };
 
 // Combien de polices du dossier du jeu l'atlas accueille. Au-delà, les

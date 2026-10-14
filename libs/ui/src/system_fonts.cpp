@@ -221,6 +221,27 @@ std::string_view BackslashFontSource() {
   return {};
 }
 
+std::span<const std::string_view> MapSignFontCandidates() {
+#ifdef _WIN32
+  static const std::array<std::string_view, 1> kCandidates = {Kept("arialbd.ttf")};
+#else
+  // Liberation Sans a les MÊMES CHASSES qu'Arial, lettre à lettre : un titre
+  // y garde sa largeur, donc sa place. DejaVu, plus large, ne vient qu'après.
+  static const std::array<std::string_view, 2> kCandidates = {Kept("LiberationSans-Bold.ttf"),
+                                                              Kept("DejaVuSans-Bold.ttf")};
+#endif
+  return kCandidates;
+}
+
+std::string_view MapSignFontSource() {
+  for (const std::string_view candidate : MapSignFontCandidates()) {
+    if (Exists(candidate)) {
+      return candidate;
+    }
+  }
+  return {};
+}
+
 FontSetup ReadableFontSetup(int chosen, std::vector<FontFamilySpec>& usable) {
   // ⚠ LES FAMILLES INTROUVABLES SONT RETIRÉES, pas laissées vides, et par le
   // MÊME relevé que les menus : le rang d'une famille dans l'atlas est alors sa
@@ -241,7 +262,8 @@ FontSetup ReadableFontSetup(int chosen, std::vector<FontFamilySpec>& usable) {
                    .chosen = usable.empty() || chosen < 0 ? -1 : MenuRankOfFontFamily(chosen),
                    .size_pixels = kDefaultFontPixels,
                    .backslash_source = BackslashFontSource(),
-                   .emoji_source = EmojiFontSource()};
+                   .emoji_source = EmojiFontSource(),
+                   .map_sign_source = MapSignFontSource()};
 }
 
 std::vector<LooseFontFile> FindLooseFonts(const std::filesystem::path& folder) {

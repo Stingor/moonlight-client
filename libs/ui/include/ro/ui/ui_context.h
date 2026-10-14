@@ -184,6 +184,11 @@ class UiContext {
   // où on les a données.
   [[nodiscard]] std::vector<std::string> LooseFontNames() const;
 
+  // LA POLICE DU BANDEAU DU NOM DE LA CARTE, sans lissage — voir
+  // `FontSetup::map_sign_source`. Nulle quand le fichier manque : le bandeau
+  // garde alors la police courante.
+  [[nodiscard]] ImFont* MapSignFont() const { return map_sign_font_; }
+
   // RETIENT LA PLACE DES FENÊTRES d'une partie à l'autre, dans ce fichier.
   //
   // ⚠ LE CHEMIN SE DONNE, IL NE SE DEVINE PAS. Sans cet appel, ImGui écrirait
@@ -349,6 +354,7 @@ class UiContext {
     ImFont* font = nullptr;
   };
   std::vector<LooseFont> loose_fonts_;
+  ImFont* map_sign_font_ = nullptr;
   // Le fichier d'emoji en mémoire, et le chemin d'où il vient. Voir `UseFonts`.
   std::vector<char> emoji_bytes_;
   std::string emoji_path_;

@@ -27,7 +27,7 @@ ro::ui::LoginWindowAction UiStage::DrawLobby(ro::ui::LoginWindowState& login,
   *settings_asked = ro::ui::DrawLoginSettingsWindow(settings, pages, skin_);
   // Le nom de la ville du décor, par-dessus le formulaire comme en jeu.
   if (map_sign != nullptr) {
-    ro::ui::DrawMapSign(*map_sign);
+    ro::ui::DrawMapSign(*map_sign, ui_->MapSignFont());
   }
   // ⚠ LA PILE D'ÉCHAPPEMENT TOURNE AUSSI ICI : elle est ce qui décide à qui va
   // la touche, et un écran qui la sauterait laisserait la partie suivante

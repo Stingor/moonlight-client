@@ -77,6 +77,16 @@ namespace ro::ui {
 // Voir `FontSetup::emoji_source`.
 [[nodiscard]] std::string_view EmojiFontSource();
 
+// LA POLICE DU BANDEAU DU NOM DE LA CARTE : ARIAL GRAS, et non celle de
+// l'interface. C'est celle que le jeu y emploie pour une installation en
+// langue latine — un fichier de Windows, pas de l'installation. Sous Linux,
+// sa jumelle métrique Liberation Sans, puis DejaVu Sans.
+//
+// Les candidates dans l'ordre de préférence, et la première présente — vide
+// si aucune : le bandeau prend alors la police courante.
+[[nodiscard]] std::span<const std::string_view> MapSignFontCandidates();
+[[nodiscard]] std::string_view MapSignFontSource();
+
 // Ce qu'il faut donner au contexte d'interface, familles introuvables retirées.
 //
 // ⚠ `usable` PORTE LES FAMILLES, et la réponse n'en est qu'une vue : il doit
