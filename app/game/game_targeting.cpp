@@ -307,6 +307,9 @@ void Game::DecideSelectionMarker(std::uint32_t now_ms) {
   // UN COMMERCE OUVERT FIGE LA SOURIS, la boutique de vote comprise — et
   // l'écriture d'un courrier, pendant laquelle le serveur refuse la marche,
   // et le formulaire de salon : le salon naît sur la case du personnage.
+  // Un ATELIER DE FABRICATION ne fige pas — flèches, élémentaires, poisons,
+  // cuisine, bombes, pharmacie, forge, ni les runes du Rune Knight : sa
+  // fenêtre laisse la souris au monde.
   engagement.trade_freeze = pieces_.trade.HoldsWorld() || pieces_.cash_shop.shop().open() ||
                             pieces_.mail.HoldsWorld() || windows_.chat_room.make.open;
 
