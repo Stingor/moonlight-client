@@ -807,8 +807,10 @@ target_include_directories(moonclient_versus PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # une place sans corps pour le joueur lui-même. En bibliothèque parce que la
 # règle ne connaît que `sim` et `render`, et qu'elle peut être fausse sans que
 # rien ne le dise : le joueur caché resterait à l'écran. Et les effets d'office
-# d'une créature, qui se posent et s'ôtent selon cette même règle.
+# d'une créature, qui se posent et s'ôtent selon cette même règle. Et l'ombre
+# au sol, que l'état de l'acteur retire ou laisse.
 add_library(moonclient_visibility STATIC
+    world/actor_shadow.cpp
     world/actor_visibility.cpp
     world/monster_auras.cpp)
 target_link_libraries(moonclient_visibility

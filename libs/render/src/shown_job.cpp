@@ -157,4 +157,8 @@ bool IsMadogearJob(std::uint32_t shown_job) noexcept {
   return std::ranges::find(kMadogearMounts, shown_job, &Mount::shown) != kMadogearMounts.end();
 }
 
+bool IsUnionFlightJob(std::uint32_t shown_job) noexcept {
+  return std::ranges::find(kUnionFlights, shown_job, &Mount::shown) != kUnionFlights.end();
+}
+
 }  // namespace ro::render

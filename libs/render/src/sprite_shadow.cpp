@@ -11,9 +11,15 @@
 namespace ro::render {
 
 float ShadowScaleFor(const SpriteCatalog& catalog, const ActorLook& look) {
+  // UN OBJET AU SOL porte une petite ombre, sans regarder aucune table : son
+  // numéro est celui d'un objet, pas d'une classe.
+  constexpr float kItemShadow = 0.4F;
+  if (look.item) {
+    return kItemShadow;
+  }
   // La tombe d'un monstre n'a pas d'ombre : le client l'écarte par sa classe.
   constexpr std::uint32_t kMobTombClass = 565;
-  if (look.item || look.job == kMobTombClass) {
+  if (look.job == kMobTombClass) {
     return 0.0F;
   }
   // LA COMBINAISON DE MADOGEAR élargit l'ombre, et ce qu'en disent les tables

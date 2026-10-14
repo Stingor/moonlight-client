@@ -369,12 +369,19 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
             scaled, drawn.grow_screen_pixels *
                         SpritePixelsPerScreenPixel(camera, drawn.ground_position, viewport_height));
       }
+      // L'OMBRE SE POSE AU SOL et garde la couleur de son calque : ni la teinte
+      // ni la transparence de son porteur ne la touchent.
+      const glm::vec3 anchor =
+          layered ? drawn.ground_position
+                  : glm::vec3(drawn.ground_position.x,
+                              drawn.shadow_ground_height.value_or(drawn.ground_position.y),
+                              drawn.ground_position.z);
       prepared_.push_back(PreparedQuad{texture,
-                                       BillboardCorners(scaled, drawn.ground_position, basis),
-                                       BillboardDepthCorners(scaled, drawn.ground_position, basis),
+                                       BillboardCorners(scaled, anchor, basis),
+                                       BillboardDepthCorners(scaled, anchor, basis),
                                        {glm::vec2{left_u, 0.0F}, glm::vec2{right_u, 0.0F},
                                         glm::vec2{right_u, 1.0F}, glm::vec2{left_u, 1.0F}},
-                                       Tinted(quad.tint, drawn.tint),
+                                       layered ? Tinted(quad.tint, drawn.tint) : quad.tint,
                                        drawn.fogged && !layer.additive ? 1.0F : 0.0F,
                                        blending == Blending::kAdditive || layer.additive,
                                        drawn.depth_bias});

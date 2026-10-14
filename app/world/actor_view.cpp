@@ -28,6 +28,7 @@
 #include "ro/sim/world.h"
 
 #include "world/actor_effect_finish.h"
+#include "world/actor_shadow.h"
 #include "world/actor_tint.h"
 #include "world/battle_log_rules.h"
 #include "world/corpse_agony.h"
@@ -43,6 +44,8 @@ constexpr std::uint32_t kTenths = 10;
 
 // Un alpha qui ne cache rien.
 constexpr int kOpaqueAlpha = 255;
+// La place de l'alpha dans une teinte RGBA.
+constexpr std::size_t kTintAlpha = 3;
 
 // Les reculs de désignation, en unités du monde — les marges que le client
 // ajoute à la profondeur des rectangles cliquables, par genre.
@@ -376,9 +379,10 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
   frozen_poses.Retain(world);
   // UN ACTEUR, sous l'identifiant que la scène lui donne : le sien, ou zéro pour
   // une copie qui s'efface et que plus rien ne désigne — ni nom, ni jauge, ni
-  // clic. `leaving_alpha` multiplie son opacité.
+  // clic. `leaving_alpha` multiplie son opacité ; `leaving_sight` dit qu'il
+  // s'efface parce qu'il est sorti de vue.
   const auto compose = [&](const ro::sim::Actor& actor, std::uint32_t scene_id,
-                           std::uint8_t leaving_alpha) {
+                           std::uint8_t leaving_alpha, bool leaving_sight) {
     const std::uint32_t id = actor.id;
     // Qui se cache ne se voit pas, sauf à garder sa place : voir `ConcealmentOf`.
     const Concealment concealment = ConcealmentOf(actor, world);
@@ -434,8 +438,8 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // CE QU'UN OBJET AU SOL FAIT EN ARRIVANT : il tombe du ciel, ou il jaillit
     // de qui l'a lâché. Le module POSSÈDE sa position tant qu'il vole ; pour
     // tout autre acteur il rend la case telle quelle.
-    const ItemDropPose drop =
-        drops.PoseAt(world, stage, actor, GroundPositionAt(stage, cell.x, cell.y), now_ms);
+    const std::array<float, 3> standing = GroundPositionAt(stage, cell.x, cell.y);
+    const ItemDropPose drop = drops.PoseAt(world, stage, actor, standing, now_ms);
     const std::array<float, 3>& ground = drop.ground;
     // CE QUE LES EFFETS FONT DU CORPS. La liste vient AVANT la direction : un
     // effet peut faire pivoter l'acteur sur lui-même, et l'image à composer en
@@ -652,21 +656,29 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     if (blur.has_value()) {
       ghosts.NoticeBlur(id, *blur, played.motion, composed, feet, blur_ghost, now_ms);
     }
+    // L'OMBRE : l'état de l'acteur décide si elle se peint, et elle reste au sol
+    // de sa case quand le corps s'élève. Voir `CastsShadow`.
+    const bool casts_shadow = CastsShadow({.kind = actor.kind,
+                                           .motion = played.motion,
+                                           .shown_job = look.job,
+                                           .body_alpha = tint[kTintAlpha],
+                                           .leaving_sight = leaving_sight});
     ro::render::DrawnActor body{&composed,
-                                &outfit->Shadow(),
+                                casts_shadow ? &outfit->Shadow() : nullptr,
                                 feet,
                                 tint,
                                 PickBiasOf(actor),
                                 scale,
                                 BodyJitter(id, now_ms, pose.jitter_pixels) + hover_offset,
                                 pose.height_scale};
+    body.shadow_ground_height = standing[1];
     swing_layers(body);
     BlendLayers(pose, weapon_echo_frame, body);
     scene.drawn.push_back(body);
     scene.ids.push_back(scene_id);
   };
   for (const auto& [id, actor] : world.actors()) {
-    compose(actor, id, static_cast<std::uint8_t>(kOpaqueAlpha));
+    compose(actor, id, static_cast<std::uint8_t>(kOpaqueAlpha), false);
   }
   // LES ACTEURS SORTIS DE VUE, qui s'effacent encore. Le monde les a oubliés :
   // ils se dessinent sans identifiant, puis s'en vont au bout du fondu.
@@ -675,7 +687,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
   });
   for (const ro::sim::FadingActor& fading : scene.fading) {
     const std::uint32_t since = now_ms > fading.since_ms ? now_ms - fading.since_ms : 0;
-    compose(fading.actor, 0, ro::render::LeaveAlphaAt(since, scene.leave_fade_ms));
+    compose(fading.actor, 0, ro::render::LeaveAlphaAt(since, scene.leave_fade_ms), true);
   }
   // LES CADAVRES, de même, au fondu du cadavre — compté depuis la fin de
   // l'agonie, d'où l'agonie nulle.
@@ -686,7 +698,8 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
   });
   for (const ro::sim::FadingActor& corpse : scene.corpses) {
     const std::uint32_t since = now_ms > corpse.since_ms ? now_ms - corpse.since_ms : 0;
-    compose(corpse.actor, 0, ro::render::VanishAlphaAt(kAgonyOver, since, scene.corpse_fade_ms));
+    compose(corpse.actor, 0, ro::render::VanishAlphaAt(kAgonyOver, since, scene.corpse_fade_ms),
+            false);
   }
   scene.union_hovers.ForgetUnseen();
   census.drawn = scene.drawn.size();

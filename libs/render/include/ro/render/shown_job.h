@@ -79,4 +79,9 @@ struct ShownBodyStates {
 // ni arme ni bouclier, et porte à la place la lueur de sa machine.
 [[nodiscard]] bool IsMadogearJob(std::uint32_t shown_job) noexcept;
 
+// VRAI POUR UN CORPS DU VOL DE L'UNION : Star Gladiator, son bébé, Star Emperor,
+// son bébé et Sky Emperor, en lévitation. Assis, ce corps flotte encore au-dessus
+// du sol.
+[[nodiscard]] bool IsUnionFlightJob(std::uint32_t shown_job) noexcept;
+
 }  // namespace ro::render

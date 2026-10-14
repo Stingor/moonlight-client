@@ -158,10 +158,15 @@ inline constexpr std::string_view kShadowSpritePath = "data\\sprite\\shadow";
 // et qu'il garde en cache. Un pour ce qui ne figure ni dans l'une
 // ni dans l'autre.
 //
-// Deux acteurs n'en ont aucune : la tombe d'un monstre, que le client écarte
-// nommément, et un objet au sol, qui n'est pas un être. Un portail non plus,
-// mais c'est la table qui le dit, par un facteur nul. Et la combinaison de
-// Madogear passe outre les deux tables : une fois et demie, 1,12 pour le bébé.
+// La tombe d'un monstre n'en a aucune : le client l'écarte nommément. Un
+// portail non plus, mais c'est la table qui le dit, par un facteur nul. Un objet
+// au sol en porte une petite, quatre dixièmes, que ni l'une ni l'autre table ne
+// règle. Et la combinaison de Madogear passe outre les deux tables : une fois et
+// demie, 1,12 pour le bébé.
+//
+// ⚠ L'ÉCHELLE NE DIT PAS SI L'OMBRE SE PEINT À CETTE IMAGE : un joueur assis ou
+// mort n'en porte pas, une créature à demi transparente non plus. C'est `app`
+// qui en décide, d'après l'état de l'acteur.
 [[nodiscard]] float ShadowScaleFor(const SpriteCatalog& catalog, const ActorLook& look);
 
 // Le sprite de corps. Pour un joueur, d'après son métier, son sexe et sa

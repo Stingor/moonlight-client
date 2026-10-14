@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -134,6 +135,10 @@ struct DrawnActor {
   // DE COMBIEN CHAQUE CALQUE TOURNE SUR SON CENTRE, en degrés, dans le sens des
   // aiguilles d'une montre à l'écran. L'ombre ne tourne pas.
   float layer_spin_degrees = 0.0F;
+  // L'ALTITUDE DU SOL OÙ L'OMBRE SE POSE, en unités du monde ; rien pour celle
+  // de `ground_position`. Un corps soulevé — un saut, un objet qui tombe encore —
+  // monte seul : son ombre reste au sol, sous lui.
+  std::optional<float> shadow_ground_height;
 };
 
 // Dessine les acteurs, en panneaux face à la caméra.
