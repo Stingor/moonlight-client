@@ -455,16 +455,18 @@ void MarketStage::Compose(const ro::ui::MarketWindowState& state, const TradeCon
                   market_.catalog_uses());
     summary_ += std::string(kSummarySeparator) + text.data();
   }
-  view_ = ro::ui::MarketView{.rows = rows_,
-                             .page_count = ro::sim::MarketPageCount(offers.size()),
-                             .summary = summary_,
-                             .status = status_,
-                             .busy = market_.search().waiting(),
-                             .store_title = store_title_,
-                             .store_status = market_.store().waiting()
-                                                 ? std::string_view(ro::core::Tr("Chargement…"))
-                                                 : std::string_view(store_status_),
-                             .store_rows = store_rows_};
+  view_ = ro::ui::MarketView{
+      .rows = rows_,
+      .page_count = ro::sim::MarketPageCount(offers.size()),
+      .summary = summary_,
+      .status = status_,
+      .busy = market_.search().waiting(),
+      .amount_shown = MarketAmountColumnShown(offers, market_.search().kind()),
+      .store_title = store_title_,
+      .store_status = market_.store().waiting() ? std::string_view(ro::core::Tr("Chargement…"))
+                                                : std::string_view(store_status_),
+      .store_rows = store_rows_,
+      .store_amount_shown = MarketAmountColumnShown(store, market_.store().kind())};
 }
 
 }  // namespace moonclient

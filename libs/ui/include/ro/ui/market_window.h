@@ -28,8 +28,10 @@ namespace ro::ui {
 inline constexpr const char* kMarketWindowId = "###market";
 inline constexpr const char* kMarketStoreWindowId = "###market_store";
 
-// La taille à la première ouverture, en pixels d'interface.
-inline constexpr float kMarketWindowWidthPixels = 700.0F;
+// La taille à la première ouverture, en pixels d'interface : toutes les
+// colonnes à leur largeur initiale, et le nom de l'échoppe bien au-delà de sa
+// largeur minimale.
+inline constexpr float kMarketWindowWidthPixels = 860.0F;
 inline constexpr float kMarketWindowHeightPixels = 480.0F;
 inline constexpr float kMarketStoreWindowWidthPixels = 420.0F;
 inline constexpr float kMarketStoreWindowHeightPixels = 360.0F;
@@ -55,6 +57,13 @@ inline constexpr int kMarketPriceColumn = 1;
 inline constexpr int kMarketAmountColumn = 2;
 inline constexpr int kMarketShopColumn = 3;
 inline constexpr int kMarketMapColumn = 4;
+inline constexpr int kMarketActionsColumn = 5;
+
+// LES COLONNES SE RÈGLENT À LA SOURIS, et le fichier de réglages d'ImGui
+// retient leur largeur. Celle du nom de l'échoppe ou du PNJ prend la place qui
+// reste ; la fenêtre ne se rétrécit pas en deçà de ce qui lui laisse au moins
+// cette largeur, les autres colonnes à leur largeur initiale.
+inline constexpr float kMarketShopColumnLeastPixels = 160.0F;
 
 // UNE LIGNE MONTRÉE.
 struct MarketRowView {
@@ -88,10 +97,14 @@ struct MarketView {
   std::string_view status;
   // Une demande est en route : les boutons qui en enverraient une se grisent.
   bool busy = false;
+  // LA COLONNE DES QUANTITÉS : masquée quand elle n'aurait que des tirets — des
+  // PNJ au stock illimité.
+  bool amount_shown = true;
   // LE CONTENU D'UNE ÉCHOPPE, quand il est demandé.
   std::string_view store_title;
   std::string_view store_status;
   std::span<const MarketRowView> store_rows;
+  bool store_amount_shown = true;
 };
 
 struct MarketWindowState {

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -19,11 +20,14 @@ namespace {
 [[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES ─────────────────────────────────────────────────────────────
-constexpr float kItemColumnPixels = 200.0F;
+constexpr float kItemColumnPixels = 180.0F;
 constexpr float kPriceColumnPixels = 90.0F;
 constexpr float kAmountColumnPixels = 40.0F;
-constexpr float kMapColumnPixels = 110.0F;
-constexpr float kActionsColumnPixels = 90.0F;
+// La colonne de la carte, à sa première ouverture, tient ce texte.
+constexpr const char* kMapColumnSample = "moc_ruins 999,999";
+constexpr int kResultColumnCount = kMarketActionsColumn + 1;
+// L'épaisseur d'une bordure de colonne.
+constexpr float kColumnBorderPixels = 1.0F;
 constexpr float kQueryFieldPixels = 220.0F;
 constexpr float kPriceFieldPixels = 80.0F;
 constexpr float kCategoryFieldPixels = 130.0F;
@@ -49,11 +53,77 @@ void TextOf(std::string_view text) {
   ImGui::TextUnformatted(text.data(), text.data() + text.size());
 }
 
-void TextRightAligned(std::string_view text) {
-  const float width = ImGui::CalcTextSize(text.data(), text.data() + text.size()).x;
-  ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
-                       std::max(0.0F, ImGui::GetContentRegionAvail().x - width));
+[[nodiscard]] float TextWidth(std::string_view text) {
+  return ImGui::CalcTextSize(text.data(), text.data() + text.size()).x;
+}
+
+// UN TEXTE QUE SA COLONNE COUPE : plus large que la place qui reste dans la
+// cellule. À juger AVANT de l'écrire.
+[[nodiscard]] bool Overflows(std::string_view text) {
+  return TextWidth(text) > ImGui::GetContentRegionAvail().x;
+}
+
+// L'entier d'un texte coupé, en bulle. ⚠ Ne teste pas le survol.
+void TooltipWhole(std::string_view text) {
+  SkinTooltipFormat("%.*s", static_cast<int>(text.size()), text.data());
+}
+
+// Le texte d'une cellule ; coupé, il se lit entier au survol.
+void CellText(std::string_view text) {
+  const bool overflows = Overflows(text);
   TextOf(text);
+  if (overflows && ImGui::IsItemHovered()) {
+    TooltipWhole(text);
+  }
+}
+
+void TextRightAligned(std::string_view text) {
+  const bool overflows = Overflows(text);
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
+                       std::max(0.0F, ImGui::GetContentRegionAvail().x - TextWidth(text)));
+  TextOf(text);
+  if (overflows && ImGui::IsItemHovered()) {
+    TooltipWhole(text);
+  }
+}
+
+// LES LARGEURS INITIALES DES COLONNES FIXES de la table des offres, en pixels
+// d'écran. Celle des actions tient pile ses deux boutons.
+struct ResultColumns {
+  float item = 0.0F;
+  float price = 0.0F;
+  float amount = 0.0F;
+  float map = 0.0F;
+  float actions = 0.0F;
+  bool amount_shown = true;
+};
+
+[[nodiscard]] ResultColumns ResultColumnsOf(const SkinArt& art, bool amount_shown) {
+  const float scale = Scale();
+  return ResultColumns{
+      .item = kItemColumnPixels * scale,
+      .price = kPriceColumnPixels * scale,
+      .amount = kAmountColumnPixels * scale,
+      .map = ImGui::CalcTextSize(kMapColumnSample).x,
+      .actions = SkinSmallButtonWidth(core::Tr("Y aller"), art) + ImGui::GetStyle().ItemSpacing.x +
+                 SkinSmallButtonWidth(core::Tr("Voir"), art),
+      .amount_shown = amount_shown,
+  };
+}
+
+// LA FENÊTRE LA PLUS ÉTROITE qui laisse au nom sa largeur minimale, les autres
+// colonnes à leur largeur initiale : leurs marges, leurs bordures, la barre de
+// défilement et la marge de la fenêtre comprises.
+[[nodiscard]] float LeastWindowWidth(const ResultColumns& columns) {
+  const ImGuiStyle& style = ImGui::GetStyle();
+  const int shown_columns = kResultColumnCount - (columns.amount_shown ? 0 : 1);
+  const float contents = columns.item + columns.price +
+                         (columns.amount_shown ? columns.amount : 0.0F) + columns.map +
+                         columns.actions + kMarketShopColumnLeastPixels * Scale();
+  const float chrome =
+      static_cast<float>(shown_columns) * (style.CellPadding.x * 2.0F + kColumnBorderPixels) +
+      style.ScrollbarSize + style.WindowPadding.x * 2.0F;
+  return contents + chrome;
 }
 
 // L'icône, et l'emblème du grade dans son coin bas gauche.
@@ -199,6 +269,34 @@ void DrawFilters(MarketWindowState& state, const SkinArt& art) {
   ImGui::EndDisabled();
 }
 
+// LE NOM DE L'ÉCHOPPE OU DU PNJ. Au survol, la bulle dit le nom entier s'il est
+// coupé, et si le marchand est en ligne — un PNJ l'est toujours.
+void DrawShopCell(const MarketRowView& row, bool npc) {
+  ImGui::AlignTextToFramePadding();
+  const bool overflows = Overflows(row.shop_name);
+  if (row.autotrade) {
+    ImGui::TextColored(kAutotradeText, "%.*s", static_cast<int>(row.shop_name.size()),
+                       row.shop_name.data());
+  } else {
+    TextOf(row.shop_name);
+  }
+  if (!ImGui::IsItemHovered()) {
+    return;
+  }
+  const char* presence = nullptr;
+  if (!npc) {
+    presence = row.autotrade ? core::Tr("Marchand hors ligne") : core::Tr("Marchand en ligne");
+  }
+  if (overflows && presence != nullptr) {
+    SkinTooltipFormat("%.*s\n%s", static_cast<int>(row.shop_name.size()), row.shop_name.data(),
+                      presence);
+  } else if (overflows) {
+    TooltipWhole(row.shop_name);
+  } else if (presence != nullptr) {
+    SkinTooltip(presence);
+  }
+}
+
 // Les détails d'une ligne dépliée, sous elle.
 void DrawDetails(const MarketRowView& row) {
   ImGui::TableNextRow();
@@ -212,35 +310,40 @@ void DrawDetails(const MarketRowView& row) {
 
 void DrawResults(MarketWindowState& state, const MarketView& view, const SkinArt& art,
                  MarketAction& action) {
-  const float scale = Scale();
   const float height =
       std::max(ImGui::GetFrameHeight(), ImGui::GetContentRegionAvail().y -
                                             kFooterLines * ImGui::GetFrameHeightWithSpacing());
-  constexpr int kColumns = 6;
-  if (!ImGui::BeginTable("##market_results", kColumns,
-                         ImGuiTableFlags_Sortable | ImGuiTableFlags_SizingFixedFit |
-                             ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuter |
-                             ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+  // 🔴 LES COLONNES SE RÈGLENT À LA SOURIS, et ImGui retient leur largeur dans
+  // son fichier de réglages : la table n'est pas `NoSavedSettings`. Une seule
+  // colonne s'étire, celle du nom : avec deux, leurs poids se partageraient la
+  // place, et un poids initial pris pour une largeur écraserait l'autre.
+  if (!ImGui::BeginTable("##market_results", kResultColumnCount,
+                         ImGuiTableFlags_Sortable | ImGuiTableFlags_Resizable |
+                             ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV |
+                             ImGuiTableFlags_BordersOuter | ImGuiTableFlags_RowBg |
+                             ImGuiTableFlags_ScrollY,
                          ImVec2(0.0F, height))) {
     return;
   }
+  const ResultColumns columns = ResultColumnsOf(art, view.amount_shown);
   ImGui::TableSetupScrollFreeze(0, 1);
-  ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthStretch,
-                          kItemColumnPixels * scale);
+  ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthFixed, columns.item);
   ImGui::TableSetupColumn(core::Tr("Prix"),
                           ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultSort |
                               ImGuiTableColumnFlags_PreferSortAscending,
-                          kPriceColumnPixels * scale);
-  ImGui::TableSetupColumn(core::Tr("Qté"), ImGuiTableColumnFlags_WidthFixed,
-                          kAmountColumnPixels * scale);
+                          columns.price);
+  ImGui::TableSetupColumn(
+      core::Tr("Qté"),
+      ImGuiTableColumnFlags_WidthFixed | (view.amount_shown ? 0 : ImGuiTableColumnFlags_Disabled),
+      columns.amount);
   const bool npc = state.tab == kMarketNpcTab;
   ImGui::TableSetupColumn(npc ? core::Tr("PNJ") : core::Tr("Échoppe"),
                           ImGuiTableColumnFlags_WidthStretch);
-  ImGui::TableSetupColumn(core::Tr("Carte"), ImGuiTableColumnFlags_WidthFixed,
-                          kMapColumnPixels * scale);
+  ImGui::TableSetupColumn(core::Tr("Carte"), ImGuiTableColumnFlags_WidthFixed, columns.map);
   ImGui::TableSetupColumn("##market_actions",
-                          ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort,
-                          kActionsColumnPixels * scale);
+                          ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort |
+                              ImGuiTableColumnFlags_NoResize,
+                          columns.actions);
   ImGui::TableHeadersRow();
   ReadSort(state);
   for (std::size_t rank = 0; rank < view.rows.size(); ++rank) {
@@ -265,22 +368,15 @@ void DrawResults(MarketWindowState& state, const MarketView& view, const SkinArt
     ImGui::AlignTextToFramePadding();
     TextRightAligned(row.price);
     ImGui::TableNextColumn();
-    ImGui::AlignTextToFramePadding();
-    TextRightAligned(row.amount);
-    ImGui::TableNextColumn();
-    ImGui::AlignTextToFramePadding();
-    if (row.autotrade) {
-      ImGui::TextColored(kAutotradeText, "%.*s", static_cast<int>(row.shop_name.size()),
-                         row.shop_name.data());
-    } else {
-      TextOf(row.shop_name);
-    }
-    if (!npc && ImGui::IsItemHovered()) {
-      SkinTooltip(row.autotrade ? core::Tr("Marchand hors ligne") : core::Tr("Marchand en ligne"));
+    if (view.amount_shown) {
+      ImGui::AlignTextToFramePadding();
+      TextRightAligned(row.amount);
     }
     ImGui::TableNextColumn();
+    DrawShopCell(row, npc);
+    ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
-    TextOf(row.place);
+    CellText(row.place);
     ImGui::TableNextColumn();
     if (SkinSmallButton(core::Tr("Y aller"), art)) {
       action.go_to_row = row_index;
@@ -352,12 +448,15 @@ void DrawStoreWindow(MarketWindowState& state, const MarketView& view, const Ski
     }
     constexpr int kColumns = 3;
     if (ImGui::BeginTable("##market_store", kColumns,
-                          ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV |
-                              ImGuiTableFlags_BordersOuter | ImGuiTableFlags_RowBg)) {
+                          ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit |
+                              ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuter |
+                              ImGuiTableFlags_RowBg)) {
       ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthStretch);
       ImGui::TableSetupColumn(core::Tr("Prix"), ImGuiTableColumnFlags_WidthFixed,
                               kPriceColumnPixels * scale);
-      ImGui::TableSetupColumn(core::Tr("Qté"), ImGuiTableColumnFlags_WidthFixed,
+      ImGui::TableSetupColumn(core::Tr("Qté"),
+                              ImGuiTableColumnFlags_WidthFixed |
+                                  (view.store_amount_shown ? 0 : ImGuiTableColumnFlags_Disabled),
                               kAmountColumnPixels * scale);
       ImGui::TableHeadersRow();
       for (std::size_t rank = 0; rank < view.store_rows.size(); ++rank) {
@@ -371,8 +470,10 @@ void DrawStoreWindow(MarketWindowState& state, const MarketView& view, const Ski
         ImGui::AlignTextToFramePadding();
         TextRightAligned(row.price);
         ImGui::TableNextColumn();
-        ImGui::AlignTextToFramePadding();
-        TextRightAligned(row.amount);
+        if (view.store_amount_shown) {
+          ImGui::AlignTextToFramePadding();
+          TextRightAligned(row.amount);
+        }
         ImGui::PopID();
       }
       ImGui::EndTable();
@@ -418,6 +519,9 @@ MarketAction DrawMarketWindow(MarketWindowState& state, const MarketView& view, 
   ImGui::SetNextWindowSize(
       ImVec2(kMarketWindowWidthPixels * scale, kMarketWindowHeightPixels * scale),
       ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSizeConstraints(
+      ImVec2(LeastWindowWidth(ResultColumnsOf(art, view.amount_shown)), 0.0F),
+      ImVec2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()));
   const std::string title = std::string(core::Tr("Marché")) + kMarketWindowId;
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art, SkinnedTitle::kBar,
                                              ImGuiWindowFlags_NoCollapse);

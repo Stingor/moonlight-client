@@ -94,6 +94,11 @@ struct MarketOpening {
 [[nodiscard]] std::string MarketAmountText(const ro::sim::MarketOffer& offer,
                                            ro::sim::MarketKind kind);
 
+// LA COLONNE DES QUANTITÉS A-T-ELLE QUELQUE CHOSE À DIRE ? Faux quand toutes les
+// offres sont d'un PNJ au stock illimité : elle n'y montrerait que des tirets.
+[[nodiscard]] bool MarketAmountColumnShown(std::span<const ro::sim::MarketOffer> offers,
+                                           ro::sim::MarketKind kind);
+
 // `/marche` : ouvre le Marché. ⚠ UNE COMMANDE DE CE CLIENT, que le client
 // d'origine n'a pas : elle ne part jamais au serveur. La ligne entière compte,
 // sans la casse.

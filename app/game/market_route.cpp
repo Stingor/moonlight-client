@@ -2,6 +2,7 @@
 
 #include "game/market_route.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 
@@ -123,6 +124,15 @@ std::string MarketAmountText(const ro::sim::MarketOffer& offer, ro::sim::MarketK
     return std::string(kUnlimited);
   }
   return std::to_string(offer.item.amount);
+}
+
+bool MarketAmountColumnShown(std::span<const ro::sim::MarketOffer> offers,
+                             ro::sim::MarketKind kind) {
+  if (kind != ro::sim::MarketKind::kNpc) {
+    return true;
+  }
+  return std::ranges::any_of(
+      offers, [](const ro::sim::MarketOffer& offer) { return offer.item.amount != 0; });
 }
 
 bool IsMarketCommand(std::string_view line) { return ro::core::EqualsFolded(line, kMarketCommand); }
