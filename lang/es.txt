@@ -882,6 +882,12 @@ tr: Añade todo lo que se puede vender; la tienda se cerrará tras la venta, que
 fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente.
 tr: Añade todo lo que se puede vender; la tienda se cerrará tras la venta.
 
+fr: aucun morceau
+tr: ninguna pista
+
+fr: aucune carte
+tr: ningún mapa
+
 fr: Confirmer « Tout ajouter au panier » chez un PNJ
 tr: Confirmar «Añadir todo al carrito» con un PNJ
 
@@ -2044,6 +2050,9 @@ tr: En espera (%zu)
 fr: En attente de la réponse du serveur…
 tr: Esperando la respuesta del servidor…
 
+fr: En cours :
+tr: Sonando:
+
 fr: En dernier
 tr: En último lugar
 
@@ -2368,6 +2377,9 @@ tr: La cola ha terminado: ya no estás inscrito.
 fr: La grille PREND alors la souris sur toute sa surface : impossible de marcher ou de frapper en cliquant dessous. C'est le prix des gestes sur les tuiles — décoché, la grille se contente d'afficher et laisse tout passer.
 tr: La cuadrícula ENTONCES toma el ratón en toda su superficie: no podrás caminar ni golpear pulsando debajo. Es el precio de los gestos sobre las casillas: sin marcar, la cuadrícula solo muestra y deja pasar todo.
 
+fr: La musique est coupée dans les options : le morceau choisi jouera à son retour.
+tr: La música está desactivada en las opciones: la pista elegida sonará cuando vuelva.
+
 fr: La table des conduites est pleine.
 tr: La tabla de comportamientos está llena.
 
@@ -2473,6 +2485,9 @@ tr: El campo está listo: entra o rechaza.
 fr: Le terrain « %s » est prêt.
 tr: El campo «%s» está listo.
 
+fr: Lecteur de musique
+tr: Reproductor de música
+
 fr: Les COLONNES, elles, se règlent au clic droit sur la ligne d'en-tête — on y montre « Délai », le temps de retour habituel, masqué par défaut.
 tr: Las COLUMNAS se ajustan con clic derecho en la fila de cabecera — ahí se muestra "Retardo", el tiempo de regreso habitual, oculto por defecto.
 
@@ -2535,6 +2550,9 @@ tr: Líneas genéricas y clases
 
 fr: Linker ce NPC
 tr: Enlazar este PNJ
+
+fr: Morceau
+tr: Pista
 
 fr: MVP : %s dans %s
 tr: MVP: %s en %s
@@ -2833,6 +2851,9 @@ tr: Misión «{}» lista: vuelve a ver al PNJ.
 fr: Rebrasser
 tr: Resortear
 
+fr: Rechercher : numéro ou carte
+tr: Buscar: número o mapa
+
 fr: Recommandées (%zu)
 tr: Recomendadas (%zu)
 
@@ -2854,11 +2875,17 @@ tr: Rechazado por el servidor (código %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Devuelve este perfil a los ajustes de origen del cliente.
 
+fr: Rend la main à la carte : sa musique reprend, et la suit de nouveau d'une carte à l'autre.
+tr: Devuelve el control al mapa: su música vuelve a sonar y lo sigue de nuevo de un mapa a otro.
+
 fr: Repose le cadre du portrait à sa place d'origine. Ses couleurs et son cadrage ne bougent pas.
 tr: Devuelve el marco del retrato a su sitio original. Sus colores y su encuadre no cambian.
 
 fr: Repose les trois étiquettes à leur place d'origine. Leurs couleurs et leurs interrupteurs ne bougent pas.
 tr: Devuelve las tres etiquetas a su sitio original. Sus colores y sus interruptores no cambian.
+
+fr: Suivre la carte
+tr: Seguir el mapa
 
 fr: Taille du GIF : chaque pixel du sprite devient un carré de ce côté
 tr: Tamaño del GIF: cada píxel del sprite se convierte en un cuadrado de este lado
@@ -4140,6 +4167,12 @@ tr: Etapa superada
 
 fr: Étiquettes
 tr: Etiquetas
+
+fr: — choisi au lecteur
+tr: — elegida en el reproductor
+
+fr: — musique de la carte
+tr: — música del mapa
 
 fr: … et %d autre(s)
 tr: … y %d más

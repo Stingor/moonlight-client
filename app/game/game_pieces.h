@@ -96,6 +96,7 @@
 #include "world/item_obtain_toast.h"
 #include "world/item_pickup_report.h"
 #include "world/map_sign_stage.h"
+#include "world/music_player_stage.h"
 #include "world/night_light_view.h"
 #include "world/npc_illustration_stage.h"
 #include "world/overlay_view.h"
@@ -512,6 +513,8 @@ struct GamePieces {
   RankingBoard ranking_board;
   // LA RECHERCHE DE GROUPE : voir `PartyBookingBoard`.
   PartyBookingBoard party_booking;
+  // LE LECTEUR DE MUSIQUE : voir `MusicPlayerStage`.
+  MusicPlayerStage music_player;
   // CE QUE CE CLIENT SAIT MONTRER, annoncé au serveur : voir `SurfaceAnnouncer`.
   SurfaceAnnouncer surfaces;
 };

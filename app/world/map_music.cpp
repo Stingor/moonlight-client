@@ -7,6 +7,8 @@
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
 
+#include "world/music_catalogue.h"
+
 namespace moonclient {
 namespace {
 
@@ -72,6 +74,15 @@ void MapMusic::Follow(ro::audio::AudioEngine& audio, const std::string& map_name
   }
   followed_ = map_name;
 
+  // ⚠ LE CHOIX DU JOUEUR PASSE AVANT LA CARTE, et la suit d'une carte à
+  // l'autre. Rejoué ici, il revient aussi après une coupure de la musique.
+  if (!chosen_.empty()) {
+    if (!PlayTrack(audio, chosen_, map_name)) {
+      FollowMapAgain();
+    }
+    return;
+  }
+
   const std::string_view track = table_.TrackFor(map_name);
   if (track.empty()) {
     // 🔴 LE SILENCE SE DIT, ET C'EST TOUT L'OBJET DE CETTE LIGNE. Une carte que
@@ -88,18 +99,29 @@ void MapMusic::Follow(ro::audio::AudioEngine& audio, const std::string& map_name
     audio.StopMusic();
     return;
   }
+  static_cast<void>(PlayTrack(audio, track, map_name));
+}
 
+void MapMusic::Choose(ro::audio::AudioEngine& audio, const std::string& track) {
+  chosen_ = track;
+  if (!PlayTrack(audio, track, "lecteur")) {
+    FollowMapAgain();
+  }
+}
+
+bool MapMusic::PlayTrack(ro::audio::AudioEngine& audio, std::string_view track,
+                         std::string_view why) {
   // ⚠ RIEN À LIRE QUAND RIEN NE JOUERA : la musique coupée ou sans carte son,
   // ou le morceau qui joue déjà — deux cartes voisines le partagent souvent.
   // Le fichier fait plusieurs mégaoctets, et sa lecture tombe sur la première
   // image de la carte.
   if (!audio.is_open() || !audio.music_audible()) {
-    ro::core::LogInfo("musique : {} — {}, non jouée : son coupé ou absent", map_name, track);
-    return;
+    ro::core::LogInfo("musique : {} — {}, non jouée : son coupé ou absent", why, track);
+    return true;
   }
-  if (audio.music_name() == track) {
-    ro::core::LogInfo("musique : {} — {}, qui joue déjà", map_name, track);
-    return;
+  if (SameMusic(audio.music_name(), track)) {
+    ro::core::LogInfo("musique : {} — {}, qui joue déjà", why, track);
+    return true;
   }
 
   // ⚠ LE NOM VIENT DE LA TABLE DU JEU, « bgm\131.mp3 » : `FindOnDisk` en
@@ -111,16 +133,17 @@ void MapMusic::Follow(ro::audio::AudioEngine& audio, const std::string& map_name
     ro::core::LogWarning("musique : fichier absent — {}",
                          ro::core::Utf8FromPath((client_root_ / std::filesystem::path(track))));
     audio.StopMusic();
-    return;
+    return false;
   }
   if (auto played = audio.PlayMusic(std::string(track), bytes); !played) {
     ro::core::LogWarning("musique : {} — {}", track, ro::core::Describe(played.error()));
-    return;
+    return false;
   }
   // ⚠ ET CE QUI MARCHE SE DIT AUSSI. Un journal qui ne nomme que les échecs
   // laisse croire, quand il se tait, que rien n'a jamais été tenté — c'est-à-
   // dire exactement ce qu'on cherche à savoir quand on n'entend rien.
-  ro::core::LogInfo("musique : {} — {}", map_name, track);
+  ro::core::LogInfo("musique : {} — {}", why, track);
+  return true;
 }
 
 }  // namespace moonclient

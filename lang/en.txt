@@ -882,6 +882,12 @@ tr: Adds everything sellable; the shop closes after the sale, which asks for con
 fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente.
 tr: Adds everything sellable; the shop closes after the sale.
 
+fr: aucun morceau
+tr: no track
+
+fr: aucune carte
+tr: no map
+
 fr: Confirmer « Tout ajouter au panier » chez un PNJ
 tr: Confirm "Add all to cart" at an NPC
 
@@ -2044,6 +2050,9 @@ tr: Standby (%zu)
 fr: En attente de la réponse du serveur…
 tr: Waiting for the server's answer…
 
+fr: En cours :
+tr: Now playing:
+
 fr: En dernier
 tr: Last
 
@@ -2368,6 +2377,9 @@ tr: The queue has ended: you are no longer registered.
 fr: La grille PREND alors la souris sur toute sa surface : impossible de marcher ou de frapper en cliquant dessous. C'est le prix des gestes sur les tuiles — décoché, la grille se contente d'afficher et laisse tout passer.
 tr: The grid then TAKES the mouse over its whole surface: you cannot walk or strike by clicking underneath. That is the price of gestures on tiles — unchecked, the grid only displays and lets everything through.
 
+fr: La musique est coupée dans les options : le morceau choisi jouera à son retour.
+tr: Music is muted in the options: the chosen track will play once it is back on.
+
 fr: La table des conduites est pleine.
 tr: The behavior table is full.
 
@@ -2473,6 +2485,9 @@ tr: The battleground is ready: enter or decline.
 fr: Le terrain « %s » est prêt.
 tr: The battleground “%s” is ready.
 
+fr: Lecteur de musique
+tr: Music player
+
 fr: Les COLONNES, elles, se règlent au clic droit sur la ligne d'en-tête — on y montre « Délai », le temps de retour habituel, masqué par défaut.
 tr: The COLUMNS are set by right-clicking the header row — that is where "Delay", the usual return time, is shown; hidden by default.
 
@@ -2535,6 +2550,9 @@ tr: Generic lines and classes
 
 fr: Linker ce NPC
 tr: Link this NPC
+
+fr: Morceau
+tr: Track
 
 fr: MVP : %s dans %s
 tr: MVP: %s in %s
@@ -2833,6 +2851,9 @@ tr: Quest "{}" is ready: go back to the NPC.
 fr: Rebrasser
 tr: Reroll
 
+fr: Rechercher : numéro ou carte
+tr: Search: number or map
+
 fr: Recommandées (%zu)
 tr: Recommended (%zu)
 
@@ -2854,11 +2875,17 @@ tr: Refused by the server (code %u).
 fr: Remet ce profil aux réglages d'origine du client.
 tr: Resets this profile to the client's original settings.
 
+fr: Rend la main à la carte : sa musique reprend, et la suit de nouveau d'une carte à l'autre.
+tr: Hands control back to the map: its music resumes, and follows you from map to map again.
+
 fr: Repose le cadre du portrait à sa place d'origine. Ses couleurs et son cadrage ne bougent pas.
 tr: Puts the portrait frame back in its original place. Its colours and framing do not change.
 
 fr: Repose les trois étiquettes à leur place d'origine. Leurs couleurs et leurs interrupteurs ne bougent pas.
 tr: Puts the three labels back in their original place. Their colours and switches do not change.
+
+fr: Suivre la carte
+tr: Follow the map
 
 fr: Taille du GIF : chaque pixel du sprite devient un carré de ce côté
 tr: GIF size: each sprite pixel becomes a square of this side
@@ -4140,6 +4167,12 @@ tr: Step cleared
 
 fr: Étiquettes
 tr: Labels
+
+fr: — choisi au lecteur
+tr: — chosen in the player
+
+fr: — musique de la carte
+tr: — map music
 
 fr: … et %d autre(s)
 tr: … and %d more

@@ -490,6 +490,10 @@ UiStage::Answers UiStage::Draw(
   DrawAchievementWindows(windows.achievements);
   DrawRankingWindows(windows.ranking_board);
   DrawPartyBookingWindows(windows.party_booking);
+  if (windows.music_player.composed) {
+    windows.music_player.answer = ro::ui::DrawMusicPlayerWindow(windows.music_player.window,
+                                                                windows.music_player.view, skin_);
+  }
 
   // L'APERÇU AU SURVOL, APRÈS LES TROIS FENÊTRES D'OBJETS.
   //
@@ -661,6 +665,7 @@ UiStage::Answers UiStage::Draw(
   escape_.Register(ro::ui::kMemorialDungeonWindowId, &windows.memorial.window.open);
   RegisterRankingEscapes(windows.ranking_board);
   RegisterPartyBookingEscapes(windows.party_booking);
+  escape_.Register(ro::ui::kMusicPlayerId, &windows.music_player.window.open);
   // LES ATELIERS AUSSI : leur interrupteur recopie la session du serveur, mais
   // la boucle lit un interrupteur BAISSÉ comme une fermeture, et répond au
   // serveur — voir `CraftStage::Apply`.

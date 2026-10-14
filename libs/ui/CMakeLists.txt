@@ -174,6 +174,7 @@ add_library(ro_ui STATIC
     src/damage_meter_records.cpp
     src/damage_meter_group.cpp
     src/game_menu.cpp
+    src/music_player_window.cpp
     src/menu_icons.cpp
     src/map_sign_banner.cpp
     src/skin_popup.cpp

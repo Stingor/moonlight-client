@@ -105,6 +105,7 @@
 #include "party/party_booking_board.h"
 #include "ui_backend_gl.h"
 #include "world/broadcast_balloons.h"
+#include "world/music_player_stage.h"
 #include "world/ranking_board.h"
 
 struct SDL_Window;
@@ -393,9 +394,8 @@ class UiStage {
     BattlegroundWindows battleground;   // Voir `ui_stage_battleground.cpp`.
     RankingBoardWindows ranking_board;  // Voir `ui_stage_ranking.cpp`.
     PartyBookingWindows party_booking;  // Voir `ui_stage_party_booking.cpp`.
-    // LA FENÊTRE GROUPE / AMIS ET LA GRILLE DE GROUPE, même aller-retour. Voir
-    // `game/party_windows.h`.
-    PartyWindows party;
+    PartyWindows party;                 // Groupe, amis et grille : `game/party_windows.h`.
+    MusicPlayerWindows music_player;    // Le lecteur : `world/music_player_stage.h`.
     // Les éléments déverrouillés à l'écran, déjà traduits : l'avis de pose
     // (`game/hud_lock.h`) paraît tant qu'il y en a un, et les nomme.
     std::vector<const char*> unlocked_hud;

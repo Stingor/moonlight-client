@@ -385,6 +385,10 @@ void GameSettings::Apply(const UiStage::Answers& answers, const OptionTargets& t
       windows.staff_tools.open = true;
       windows.menu.open = false;
       break;
+    case ro::ui::GameMenuChoice::kMusicPlayer:
+      windows.music_player.window.open = true;
+      windows.menu.open = false;
+      break;
     // ⚠ LES TROIS GESTES QUI PARLENT AU SERVEUR NE SONT PAS ICI. Ils demandent
     // la connexion ou le routage de la conversation, que les réglages ne
     // possèdent pas — c'est la boucle qui les joue, juste après.

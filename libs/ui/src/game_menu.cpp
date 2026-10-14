@@ -26,15 +26,16 @@ namespace {
 // chaîne construite n'entre dans aucun catalogue. C'est le même texte que le
 // titre des fenêtres, à dessein — un bouton doit nommer ce qu'il ouvre.
 [[nodiscard]] float MenuWidth(const SkinArt& art) {
-  const std::array<const char*, 9> labels = {core::Tr("Retour au jeu"),
-                                             core::Tr("Retour à mon point de sauvegarde"),
-                                             core::Tr("Sélection du personnage"),
-                                             core::Tr("Options"),
-                                             core::Tr("Configuration des raccourcis"),
-                                             core::Tr("Macros de chat"),
-                                             core::Tr("Staff Tools"),
-                                             core::Tr("Résurrection"),
-                                             core::Tr("Quitter le jeu")};
+  const std::array<const char*, 10> labels = {core::Tr("Retour au jeu"),
+                                              core::Tr("Retour à mon point de sauvegarde"),
+                                              core::Tr("Sélection du personnage"),
+                                              core::Tr("Options"),
+                                              core::Tr("Configuration des raccourcis"),
+                                              core::Tr("Macros de chat"),
+                                              core::Tr("Lecteur de musique"),
+                                              core::Tr("Staff Tools"),
+                                              core::Tr("Résurrection"),
+                                              core::Tr("Quitter le jeu")};
   return SkinWidestButton(labels, art);
 }
 
@@ -82,6 +83,10 @@ namespace {
   // LES COULEURS, après les macros : c'est de l'apparence, pas du clavier.
   if (SkinButton(core::Tr("Couleurs du personnage"), art, size)) {
     chosen = GameMenuChoice::kStyleEditor;
+  }
+  // LA MUSIQUE, après l'apparence : ni l'une ni l'autre ne touche à la partie.
+  if (SkinButton(core::Tr("Lecteur de musique"), art, size)) {
+    chosen = GameMenuChoice::kMusicPlayer;
   }
   // L'ÉTABLI DU STAFF, et il n'apparaît que pour qui y a droit. ⚠ ABSENT PLUTÔT
   // QUE GRISÉ, à rebours du reste de ce client : un bouton grisé annonce à tout

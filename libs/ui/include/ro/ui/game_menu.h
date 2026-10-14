@@ -41,6 +41,9 @@ enum class GameMenuChoice : std::uint8_t {
   // D'ORIGINE : c'est un ajout de ce serveur, et son styliste peut aussi
   // l'ouvrir lui-même — voir `ZC_MOONLIGHT_STYLE_OPEN`.
   kStyleEditor,
+  // LE LECTEUR DE MUSIQUE. ⚠ UN AJOUT DE CE CLIENT : voir
+  // `music_player_window.h`.
+  kMusicPlayer,
   // L'établi du staff. ⚠ Ce bouton n'apparaît que pour qui y a droit : voir
   // `staff_tools.h`, qui dit d'où vient ce droit et pourquoi il ne se mémorise
   // pas.

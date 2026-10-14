@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <string_view>
 
 #include "ro/audio/audio_engine.h"
 #include "ro/formats/bgm_table.h"
@@ -57,13 +58,41 @@ class MapMusic {
   // carte pour entendre quelque chose.
   void Forget() { followed_.clear(); }
 
+  // LE MORCEAU CHOISI PAR LE JOUEUR, au lecteur de musique : il remplace celui
+  // de la carte, et le reste d'une carte à l'autre jusqu'à `FollowMapAgain`.
+  //
+  // Musique coupée, le choix est retenu sans rien lire : il jouera au retour du
+  // son, comme l'aurait fait celle de la carte. Un fichier illisible, lui, rend
+  // la main à la carte — un choix qui ne joue rien ne se distingue pas d'un
+  // silence voulu.
+  void Choose(ro::audio::AudioEngine& audio, const std::string& track);
+
+  // Rend la main à la carte : sa musique reprend au prochain `Follow`, sans
+  // attendre d'en changer.
+  void FollowMapAgain() {
+    chosen_.clear();
+    followed_.clear();
+  }
+
+  // Le morceau choisi, ou vide quand la carte décide.
+  [[nodiscard]] const std::string& chosen() const noexcept { return chosen_; }
+
+  [[nodiscard]] const ro::formats::BgmTable& table() const noexcept { return table_; }
+  [[nodiscard]] const std::filesystem::path& client_root() const noexcept { return client_root_; }
+
   [[nodiscard]] std::size_t known_maps() const noexcept { return table_.size(); }
 
  private:
+  // Joue `track` s'il ne joue pas déjà. `why` ne sert qu'au journal : la carte,
+  // ou le lecteur. Faux quand le fichier manque ou ne se décode pas.
+  bool PlayTrack(ro::audio::AudioEngine& audio, std::string_view track, std::string_view why);
+
   std::filesystem::path client_root_;
   ro::formats::BgmTable table_;
   // La dernière carte suivie, pour ne pas relire la table à chaque image.
   std::string followed_;
+  // Le morceau que le joueur a choisi ; vide quand la carte décide.
+  std::string chosen_;
 };
 
 }  // namespace moonclient

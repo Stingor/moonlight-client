@@ -879,6 +879,19 @@ target_link_libraries(moonclient_songmusic
     PRIVATE ro_render ro_warnings)
 target_include_directories(moonclient_songmusic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LA MUSIQUE DES CARTES ET LE LECTEUR DE MUSIQUE : la carte suivie, le morceau
+# choisi par le joueur, et le catalogue du dossier des musiques. En bibliothèque
+# pour que l'essai éprouve le catalogue — un morceau rangé de travers ou privé
+# de ses cartes ne se verrait qu'en jeu.
+add_library(moonclient_music STATIC
+    world/map_music.cpp
+    world/music_catalogue.cpp
+    world/music_player_stage.cpp)
+target_link_libraries(moonclient_music
+    PUBLIC ro_audio ro_formats ro_vfs ro_ui ro_core
+    PRIVATE ro_warnings)
+target_include_directories(moonclient_music PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LES CLASSEMENTS ET LES AVIS D'ÉTOILE DANS LA CONVERSATION, les trois
 # commandes qui demandent un classement, et le tableau qui le montre. En
 # bibliothèque pour que leurs lignes s'éprouvent : un rang sans nom, une mission
@@ -1522,7 +1535,6 @@ add_executable(moonclient
     input/key_action.cpp
     chat/macro_commands.cpp
     game/main.cpp
-    world/map_music.cpp
     world/npc_talk.cpp
     world/npc_illustration_stage.cpp
     world/npc_talk_view.cpp
@@ -1695,7 +1707,7 @@ add_executable(moonclient
     game/window_events.cpp)
 
 target_link_libraries(moonclient
-    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
+    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net

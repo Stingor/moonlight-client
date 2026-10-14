@@ -37,6 +37,12 @@ class BgmTable {
 
   [[nodiscard]] std::size_t size() const noexcept { return tracks_.size(); }
 
+  // Toutes les cartes nommées et leur musique : la carte en minuscules et sans
+  // extension, le fichier tel que `TrackFor` le rend.
+  [[nodiscard]] const std::map<std::string, std::string, std::less<>>& tracks() const noexcept {
+    return tracks_;
+  }
+
  private:
   // Par nom de carte en minuscules, sans extension.
   std::map<std::string, std::string, std::less<>> tracks_;

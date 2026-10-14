@@ -106,6 +106,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (audio_.music_audible()) {
     music_.Follow(audio_, stage_->name);
   }
+  // LE LECTEUR DE MUSIQUE, même muet : un choix fait son coupé se retient.
+  pieces_.music_player.Advance(windows_.music_player, music_, audio_, stage_->name);
 
   // LE SOL UNI, quand l'établi ou GreyWorld le demandent : voir `FlatGroundOf`.
   const ro::render::GreyWorldLook& grey_world = settings_->options().pages().grey_world.look();
