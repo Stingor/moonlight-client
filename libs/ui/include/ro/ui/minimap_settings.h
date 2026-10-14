@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "ro/ui/anchor_side.h"
+
 namespace ro::ui {
 
 // ── CE QUE LE JOUEUR A RÉGLÉ DE LA MINIMAP ──────────────────────────────────
@@ -16,24 +18,32 @@ inline constexpr float kMinimapZoomLeast = 1.0F;
 inline constexpr float kMinimapZoomMost = 4.0F;
 inline constexpr float kMinimapZoomStep = 4.0F / 3.0F;
 
-// La position d'une minimap que le joueur n'a jamais glissée.
-inline constexpr int kMinimapUnplaced = -1;
+// L'écart d'une minimap que le joueur n'a jamais glissée, sur les deux axes,
+// ancrée au départ.
+inline constexpr float kMinimapUnplaced = -1.0F;
 
 // La teinte qui laisse l'art de la flèche tel quel : blanc opaque, ses quatre
 // canaux à 255 — la même valeur dans tout ordre d'octets.
 inline constexpr std::uint32_t kMinimapArrowUntinted = 0xFFFF'FFFFU;
 
 struct MinimapSettings {
-  // La position de la fenêtre. Elle n'a pas de réglage numérique : on la glisse,
+  // La place de la fenêtre. Elle n'a pas de réglage numérique : on la glisse,
   // et le glissement se retient ici.
+  //
+  // 🔴 ANCRÉE AU BORD LE PLUS PROCHE, par la règle de `WindowPlace` : le bord
+  // de l'écran sur chaque axe, puis l'écart de la fenêtre à ce bord, en pixels.
+  // Posée contre le bord droit ou le bas, elle y reste quand sa taille change —
+  // le nom de la carte qui se replie sur une ligne de plus — et quand l'écran
+  // change.
   //
   // ⚠ `kMinimapUnplaced` TANT QUE LE JOUEUR NE L'A PAS GLISSÉE : elle se tient alors
   // au coin haut-droit, calculé à chaque image contre l'écran du moment — le coin
-  // haut-gauche est celui des icônes de menu. Un coin écrit dans le fichier
-  // serait celui d'UNE taille d'écran. Une place qui ne tient plus dans l'écran
-  // s'y montre ramenée, sans être réécrite.
-  int pos_x = kMinimapUnplaced;
-  int pos_y = kMinimapUnplaced;
+  // haut-gauche est celui des icônes de menu. Une place qui ne tient plus dans
+  // l'écran s'y montre ramenée, sans être réécrite.
+  AnchorSide across = AnchorSide::kStart;
+  AnchorSide down = AnchorSide::kStart;
+  float offset_x_px = kMinimapUnplaced;
+  float offset_y_px = kMinimapUnplaced;
   // Le côté de la ZONE DE CARTE, en pixels — pas la taille de la fenêtre.
   // Réglé à la poignée, jamais par un curseur. Un écran trop petit le montre
   // rabattu, sans le réécrire.
@@ -67,6 +77,12 @@ struct MinimapSettings {
 
   [[nodiscard]] friend bool operator==(const MinimapSettings&, const MinimapSettings&) = default;
 };
+
+// Le joueur n'a jamais glissé la minimap. Voir `MinimapSettings::across`.
+[[nodiscard]] constexpr bool MinimapUnplaced(const MinimapSettings& settings) {
+  return settings.across == AnchorSide::kStart && settings.down == AnchorSide::kStart &&
+         settings.offset_x_px == kMinimapUnplaced && settings.offset_y_px == kMinimapUnplaced;
+}
 
 // LA PRÉSENTATION DE LA MINIMAP, telle qu'un profil de disposition la range :
 // ses réglages, et si elle est affichée — un raccourci la masque et la rend.

@@ -1,6 +1,7 @@
 #include "ro/ui/minimap_window.h"
 
 #include <algorithm>
+#include <cmath>
 #include <string>
 
 #include <imgui.h>
@@ -12,6 +13,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/window_bounds.h"
+#include "ro/ui/window_places.h"
 
 #include "minimap_parts.h"
 
@@ -29,10 +31,6 @@ constexpr ImU32 kGripColor = IM_COL32(30, 34, 44, 130);
 constexpr ImU32 kGripHoveredColor = IM_COL32(30, 34, 44, 200);
 constexpr ImU32 kGripActiveColor = IM_COL32(30, 34, 44, 255);
 constexpr int kGripColorCount = 3;
-
-// Le plafond des tours qui accordent la hauteur du nom replié au côté de la
-// carte : un garde-fou, l'accord vient bien avant.
-constexpr int kCaptionFitPasses = 4;
 
 // Le bouton de réglages, dans le coin HAUT-gauche : les deux coins du bas
 // portent les poignées d'ImGui, et un bouton posé là les couvrirait.
@@ -84,16 +82,39 @@ void KeepSquare(ImGuiSizeCallbackData* data) {
   data->DesiredSize = FitMinimapSquare(data->DesiredSize, *fit);
 }
 
-// LE COIN OÙ LA FENÊTRE SE MONTRE : celui que le joueur a glissé, ou, tant qu'il
-// ne l'a pas fait, le coin haut-droit de l'écran du moment — ramené, dans les
-// deux cas, pour que la fenêtre de cette taille tienne entière dans l'écran.
+// LE COIN OÙ LA FENÊTRE SE MONTRE : celui que donne la place glissée par le
+// joueur, à CETTE taille — l'ancre garde son bord —, ou, tant qu'il ne l'a pas
+// glissée, le coin haut-droit de l'écran du moment ; ramené, dans les deux cas,
+// pour que la fenêtre tienne entière dans l'écran.
 [[nodiscard]] ImVec2 CornerOf(const MinimapSettings& settings, ImVec2 size) {
-  ImVec2 wanted(static_cast<float>(settings.pos_x), static_cast<float>(settings.pos_y));
-  if (settings.pos_x == kMinimapUnplaced && settings.pos_y == kMinimapUnplaced) {
+  const ImVec2 screen = ImGui::GetIO().DisplaySize;
+  ImVec2 wanted;
+  if (MinimapUnplaced(settings)) {
     const float margin = kMinimapScreenMargin * ImGui::GetStyle().FontScaleMain;
-    wanted = ImVec2(ImGui::GetIO().DisplaySize.x - margin - size.x, margin);
+    wanted = ImVec2(screen.x - margin - size.x, margin);
+  } else {
+    const ScreenRect rect = RectFromPlace(WindowPlace{.across = settings.across,
+                                                      .down = settings.down,
+                                                      .offset_x = settings.offset_x_px,
+                                                      .offset_y = settings.offset_y_px,
+                                                      .width = size.x,
+                                                      .height = size.y},
+                                          screen.x, screen.y, 1.0F);
+    wanted = ImVec2(std::round(rect.x_px), std::round(rect.y_px));
   }
   return ClampWindowPosToScreen(wanted, size);
+}
+
+// La place que dit ce rectangle d'écran, dans les réglages : ancre et écart.
+void NotePlace(MinimapSettings& settings, ImVec2 at, ImVec2 size) {
+  const ImVec2 screen = ImGui::GetIO().DisplaySize;
+  const WindowPlace place =
+      PlaceFromRect(ScreenRect{.x_px = at.x, .y_px = at.y, .width_px = size.x, .height_px = size.y},
+                    screen.x, screen.y, 1.0F);
+  settings.across = place.across;
+  settings.down = place.down;
+  settings.offset_x_px = place.offset_x;
+  settings.offset_y_px = place.offset_y;
 }
 
 // LE JOUEUR TIENT LA FENÊTRE : il la glisse, tire une poignée, ou presse un de
@@ -302,42 +323,43 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
       .pad_x = style.WindowPadding.x * 2.0F,
       .pad_y = style.WindowPadding.y * 2.0F,
       .extra_height = settings.show_coords ? ImGui::GetTextLineHeightWithSpacing() : 0.0F};
+  // ⚠ UN NOM STABLE : il porte l'identité de la fenêtre. Le faire varier avec
+  // la carte lui ferait perdre sa place à chaque déplacement.
+  const std::string name = std::string("###") + kMinimapWindowId;
+  ImGuiWindow* const existing = ImGui::FindWindowByName(name.c_str());
+
+  // LE CARRÉ ET LA LIGNE DES COORDONNÉES tiennent dans la part d'écran permise ;
+  // sur un écran trop petit pour le minimum, c'est le minimum qui gagne.
+  //
+  // 🔴 LE NOM DE LA CARTE N'ENTRE PAS DANS LE PLAFOND DU CÔTÉ : la largeur de
+  // la fenêtre ne dépend que de l'écran et du réglage, jamais de la carte où
+  // l'on se trouve. Compté dedans, un nom long rabotait le côté, donc la
+  // largeur, et la fenêtre se décollait de son bord à chaque changement de
+  // carte. Le nom se replie sur le côté ainsi fixé, et s'ajoute dessous, dans
+  // la marge que la part d'écran laisse.
+  //
+  // 🔴 PENDANT QUE LE JOUEUR TIRE UNE POIGNÉE, le côté bute aussi sur le bord de
+  // l'écran, dans l'image même : le carré se garde par une contrainte qu'ImGui
+  // applique APRÈS ses bornes, donc c'est elle qui doit buter.
+  const float most_height = io.DisplaySize.y * kMinimapScreenShare - fit.pad_y - fit.extra_height;
+  fit.most_side = std::max(
+      std::min(io.DisplaySize.x * kMinimapScreenShare - fit.pad_x, most_height), kMinimapLeastSide);
+  float side = std::clamp(static_cast<float>(settings.side_px), kMinimapLeastSide, fit.most_side);
+
   // La hauteur du nom entre dans la contrainte AVANT l'ouverture : replié, il
   // peut prendre plusieurs lignes, et la fenêtre doit déjà pouvoir les porter.
-  //
-  // 🔴 REPLIÉ SUR LE CÔTÉ QUI SERA VRAIMENT DESSINÉ, pas sur celui du réglage :
-  // un côté que la part d'écran rabote replie le nom sur plus de lignes, et une
-  // hauteur comptée sur le côté du réglage en coupait la fin. Le côté dépend
-  // lui-même de cette hauteur : on recompte jusqu'à ce que les deux s'accordent.
-  // Chaque tour ne peut qu'ajouter des lignes et rétrécir le côté, et un nom
-  // n'a que quelques mots, donc l'accord vient en peu de tours.
   const bool named = settings.show_map_name && !view.display_name.empty();
-  // La FENÊTRE entière tient dans la part d'écran permise ; sur un écran trop
-  // petit pour le minimum, c'est le minimum qui gagne.
-  const float most_width = io.DisplaySize.x * kMinimapScreenShare - fit.pad_x;
-  const auto most_side_for = [&](float extra_height) {
-    const float most_height = io.DisplaySize.y * kMinimapScreenShare - fit.pad_y - extra_height;
-    return std::max(std::min(most_width, most_height), kMinimapLeastSide);
-  };
-  const auto side_within = [&](float most_side) {
-    return std::clamp(static_cast<float>(settings.side_px), kMinimapLeastSide, most_side);
-  };
   if (named) {
     const std::string shown(view.display_name);
-    float caption_height = 0.0F;
-    for (int pass = 0; pass < kCaptionFitPasses; ++pass) {
-      const float wrap = side_within(most_side_for(fit.extra_height + caption_height));
-      const float counted =
-          ImGui::CalcTextSize(shown.c_str(), nullptr, false, wrap).y + style.ItemSpacing.y;
-      if (counted == caption_height) {
-        break;
-      }
-      caption_height = counted;
-    }
-    fit.extra_height += caption_height;
+    fit.extra_height +=
+        ImGui::CalcTextSize(shown.c_str(), nullptr, false, side).y + style.ItemSpacing.y;
   }
-  fit.most_side = most_side_for(fit.extra_height);
-  float side = side_within(fit.most_side);
+  if (const HeldResize resize = HeldResizeOf(existing); resize.held) {
+    fit.most_side = std::max(std::min({fit.most_side, resize.largest_px.x - fit.pad_x,
+                                       resize.largest_px.y - fit.pad_y - fit.extra_height}),
+                             kMinimapLeastSide);
+    side = std::min(side, fit.most_side);
+  }
 
   const ImVec2 window_size(side + fit.pad_x, side + fit.pad_y + fit.extra_height);
   const ImVec2 corner = CornerOf(settings, window_size);
@@ -351,15 +373,12 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
   if (!interactive) {
     flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoResize;
   }
-  // ⚠ UN NOM STABLE : il porte l'identité de la fenêtre. Le faire varier avec
-  // la carte lui ferait perdre sa place à chaque déplacement.
-  const std::string name = std::string("###") + kMinimapWindowId;
   // 🔴 LA PLACE ET LA TAILLE S'IMPOSENT À CHAQUE IMAGE, sauf pendant le geste du
   // joueur. Imposées une seule fois, elles resteraient celles du premier écran
   // vu — inconnu, ou plus petit que celui qui suit —, et la fenêtre ne suivrait
   // plus ni son coin ni l'écran. Un réglage changé ailleurs — réinitialisé,
   // relu d'un fichier — s'impose de la même façon.
-  const bool held = HeldByPlayer(ImGui::FindWindowByName(name.c_str()));
+  const bool held = HeldByPlayer(existing);
   if (!held) {
     ImGui::SetNextWindowPos(corner, ImGuiCond_Always);
     ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
@@ -377,13 +396,15 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
     // ⚠ COMPARÉ AU COIN OÙ ELLE SE MONTRE, pas au réglage : une minimap jamais
     // glissée ne s'écrit pas dans le fichier tant qu'elle reste à son coin, et
     // une place ramenée dans l'écran ne remplace pas celle du joueur.
+    //
+    // La place se retient par son ancre : voir `MinimapSettings::across`.
     if (held) {
       const ImVec2 at = ImGui::GetWindowPos();
       if (static_cast<int>(at.x) != static_cast<int>(corner.x) ||
           static_cast<int>(at.y) != static_cast<int>(corner.y)) {
-        settings.pos_x = static_cast<int>(at.x);
-        settings.pos_y = static_cast<int>(at.y);
-        state.save_pending = true;
+        const MinimapSettings before = settings;
+        NotePlace(settings, at, ImGui::GetWindowSize());
+        state.save_pending = state.save_pending || settings != before;
       }
     }
     // 🔴 LE CÔTÉ VIENT DE LA FENÊTRE, pas du réglage : la poignée commande, et

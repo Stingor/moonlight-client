@@ -60,7 +60,8 @@ inline constexpr const char* kMinimapWindowId = "minimap";
 // Côté minimal de la zone de carte, en pixels : en dessous, la flèche du joueur
 // mange l'image et plus rien ne se lit.
 inline constexpr float kMinimapLeastSide = 128.0F;
-// La part de l'écran que la fenêtre ne dépasse jamais, sur les deux axes.
+// La part de l'écran que la fenêtre ne dépasse jamais, sur les deux axes —
+// hors le nom de la carte, qui s'ajoute dessous sans raboter la largeur.
 inline constexpr float kMinimapScreenShare = 0.9F;
 
 // Plafond de marqueurs du joueur par carte : au-delà, la carte et la liste du

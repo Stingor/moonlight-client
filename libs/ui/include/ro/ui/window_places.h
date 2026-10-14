@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "ro/ui/anchor_side.h"
 #include "ro/ui/minimap_settings.h"
 
 struct ImGuiWindow;
@@ -20,10 +21,24 @@ namespace ro::ui {
 // passer de 1920 à 1024 rabat les fenêtres, revenir à 1920 les rend où elles
 // étaient.
 //
-// ⚠ LA PLACE S'ANCRE AU BORD LE PLUS PROCHE, sur chaque axe : une fenêtre
-// posée dans le tiers droit de l'écran retient sa distance au bord DROIT, et le
-// suit quand l'écran change de largeur. Celle du tiers central retient l'écart
-// de son centre au centre de l'écran.
+// ⚠ LA PLACE S'ANCRE AU BORD LE PLUS PROCHE, sur chaque axe. L'espace LIBRE —
+// l'écran moins la fenêtre — se coupe en trois : une fenêtre dont l'écart au
+// bord droit tient dans le dernier tiers retient sa distance au bord DROIT, et
+// le suit quand l'écran change de largeur ou qu'elle change de taille. Entre les
+// deux, elle retient l'écart de son centre au centre de l'écran.
+//
+// 🔴 C'EST L'ESPACE LIBRE QUI SE COUPE, PAS L'ÉCRAN : une grande fenêtre collée
+// au bord droit a son centre au milieu de l'écran, et s'y ancrer la décollait du
+// bord au premier changement de taille.
+//
+// 🔴 UNE TAILLE QUI CHANGE SANS QUE LE JOUEUR TIENNE LA FENÊTRE — contenu qui
+// grandit, appelant qui impose sa taille, contrainte qui la rabat — GARDE
+// L'ANCRE : la place ne se relit pas depuis le coin haut-gauche, sinon une
+// fenêtre collée en bas s'en décolle dès qu'elle rapetisse.
+//
+// 🔴 PENDANT QUE LE JOUEUR TIRE UNE POIGNÉE, la passe borne la TAILLE, jamais
+// la position : déplacer la fenêtre sous la poignée la faisait grandir encore à
+// l'image suivante, jusqu'au plafond.
 //
 // ⚠ EN UNITÉS D'INTERFACE, pas en pixels : décalages et tailles sont divisés
 // par l'échelle de l'interface. Changer d'échelle n'écrit donc rien ici — la
@@ -31,12 +46,6 @@ namespace ro::ui {
 // d'avant, au pixel près.
 //
 // ⚠ AUCUN TYPE D'IMGUI DANS CET EN-TÊTE : `app` le lit, et n'inclut pas ImGui.
-
-enum class AnchorSide : std::uint8_t {
-  kStart,   // le bord gauche, ou le haut
-  kCenter,  // le milieu de l'écran
-  kEnd,     // le bord droit, ou le bas
-};
 
 struct WindowPlace {
   AnchorSide across = AnchorSide::kStart;

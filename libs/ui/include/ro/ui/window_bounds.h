@@ -1,6 +1,10 @@
 #pragma once
 
+#include <cfloat>
+
 #include <imgui.h>
+
+struct ImGuiWindow;
 
 namespace ro::ui {
 
@@ -48,6 +52,26 @@ inline constexpr float kMaxScreenFraction = 0.90F;
 // peut n'exister encore nulle part : c'est sa première image, elle n'a alors ni
 // position ni poignée, et seule la part d'écran la borne.
 void ConstrainNextWindowToScreen(const char* name);
+
+// LE GESTE DE REDIMENSIONNEMENT EN COURS sur une fenêtre : ce que le bord de
+// l'écran laisse encore grandir, et les bords qui bougent sous la main.
+//
+// ⚠ LE BORD QUI NE BOUGE PAS DOIT RESTER OÙ IL EST. Tirer le coin bas-droit
+// laisse le coin haut-gauche en place ; tirer le bord gauche laisse le bord
+// droit. Qui borne la taille pendant le geste borne donc la taille, et garde ce
+// bord-là — déplacer la fenêtre sous la poignée la ferait grandir encore à
+// l'image suivante, puisque la poignée suit toujours la souris.
+struct HeldResize {
+  // Le joueur tient une poignée ou un bord de cette fenêtre.
+  bool held = false;
+  // Ce que le bord de l'écran laisse grandir, par axe ; `FLT_MAX` : rien.
+  ImVec2 largest_px{FLT_MAX, FLT_MAX};
+  // Le bord gauche, ou le haut, bouge sous la main : c'est alors le bord droit,
+  // ou le bas, qui reste en place.
+  bool moves_left = false;
+  bool moves_top = false;
+};
+[[nodiscard]] HeldResize HeldResizeOf(ImGuiWindow* window);
 
 // Les fenêtres dont ImGui décide seul : il les borne déjà au viewport, et les
 // replace de toute façon à chaque `Begin`.

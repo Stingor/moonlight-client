@@ -26,11 +26,12 @@ namespace {
 // ⚠ ET SEULEMENT PENDANT LE GESTE. Posée en permanence, cette borne
 // empêcherait une fenêtre de se donner sa taille à l'ouverture tant que la passe
 // de position ne l'a pas ramenée dans l'écran.
-[[nodiscard]] ImVec2 EdgeLimitWhileHeld(ImGuiWindow* window, ImVec2 screen, ImGuiID held) {
-  ImVec2 limit(FLT_MAX, FLT_MAX);
+[[nodiscard]] HeldResize HeldResizeAt(ImGuiWindow* window, ImVec2 screen, ImGuiID held) {
+  HeldResize resize;
   if (window == nullptr || held == 0) {
-    return limit;
+    return resize;
   }
+  ImVec2& limit = resize.largest_px;
   // Ce qui reste d'écran de chaque côté, mesuré depuis le bord qui, lui, NE
   // BOUGE PAS pendant le geste.
   const float toward_right = screen.x - window->Pos.x;
@@ -42,26 +43,38 @@ namespace {
   // bas-droit toujours, le bas-gauche quand le redimensionnement par les bords
   // est ouvert. Les deux autres rangs existent dans sa table, mais aucun clic ne
   // peut les atteindre.
+  resize.held = true;
   if (held == ImGui::GetWindowResizeCornerID(window, 0)) {
-    return {toward_right, toward_bottom};
-  }
-  if (held == ImGui::GetWindowResizeCornerID(window, 1)) {
-    return {toward_left, toward_bottom};
-  }
-
-  if (held == ImGui::GetWindowResizeBorderID(window, ImGuiDir_Right)) {
+    limit = ImVec2(toward_right, toward_bottom);
+  } else if (held == ImGui::GetWindowResizeCornerID(window, 1)) {
+    limit = ImVec2(toward_left, toward_bottom);
+    resize.moves_left = true;
+  } else if (held == ImGui::GetWindowResizeBorderID(window, ImGuiDir_Right)) {
     limit.x = toward_right;
   } else if (held == ImGui::GetWindowResizeBorderID(window, ImGuiDir_Left)) {
     limit.x = toward_left;
+    resize.moves_left = true;
   } else if (held == ImGui::GetWindowResizeBorderID(window, ImGuiDir_Down)) {
     limit.y = toward_bottom;
   } else if (held == ImGui::GetWindowResizeBorderID(window, ImGuiDir_Up)) {
     limit.y = toward_top;
+    resize.moves_top = true;
+  } else {
+    resize.held = false;
   }
-  return limit;
+  return resize;
 }
 
 }  // namespace
+
+HeldResize HeldResizeOf(ImGuiWindow* window) {
+  const ImGuiContext* context = ImGui::GetCurrentContext();
+  const ImVec2 screen = ScreenOrNothing();
+  if (context == nullptr || screen.x <= 0.0F) {
+    return {};
+  }
+  return HeldResizeAt(window, screen, context->ActiveId);
+}
 
 ImVec2 ClampWindowPosToScreen(ImVec2 window_pos, ImVec2 window_size) {
   const ImVec2 screen = ScreenOrNothing();
@@ -84,7 +97,8 @@ void ConstrainNextWindowToScreen(const char* name) {
   }
   // La fenêtre peut ne pas exister encore : c'est sa toute première image, elle
   // n'a donc ni position ni poignée, et seule la part d'écran la borne.
-  const ImVec2 edge = EdgeLimitWhileHeld(ImGui::FindWindowByName(name), screen, context->ActiveId);
+  const ImVec2 edge =
+      HeldResizeAt(ImGui::FindWindowByName(name), screen, context->ActiveId).largest_px;
   const ImVec2 largest(ImMin(screen.x * kMaxScreenFraction, edge.x),
                        ImMin(screen.y * kMaxScreenFraction, edge.y));
 

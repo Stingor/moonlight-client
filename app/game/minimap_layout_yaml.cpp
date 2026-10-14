@@ -2,6 +2,9 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <string>
+
+#include "ro/ui/anchor_side.h"
 
 namespace moonclient {
 namespace {
@@ -9,8 +12,13 @@ namespace {
 // Les champs. ⚠ GRAVÉS : la section « minimap » de `navigation.yml` les porte
 // encore chez un joueur existant, et un profil sans minimap en hérite.
 constexpr const char* kShownField = "shown";
+// « x » et « y » : l'écart au bord que nomment « x_from » et « y_from »
+// (start, center, end). ⚠ SANS EUX, l'écart part du bord gauche et du haut :
+// c'est ce que disent les fichiers écrits avant l'ancre.
 constexpr const char* kPosXField = "x";
 constexpr const char* kPosYField = "y";
+constexpr const char* kAcrossField = "x_from";
+constexpr const char* kDownField = "y_from";
 constexpr const char* kSideField = "side";
 constexpr const char* kClickThroughField = "click_through";
 constexpr const char* kZoomField = "zoom";
@@ -37,13 +45,26 @@ void Read(const YAML::Node& node, const char* field, T& into) {
   if (const YAML::Node value = node[field]; value && value.IsScalar()) into = value.as<T>(into);
 }
 
+// Un mot inconnu laisse l'ancre telle quelle.
+void ReadSide(const YAML::Node& node, const char* field, ro::ui::AnchorSide& into) {
+  if (const YAML::Node value = node[field]; value && value.IsScalar()) {
+    into = ro::ui::AnchorSideFromWord(value.Scalar()).value_or(into);
+  }
+}
+
+[[nodiscard]] std::string SideName(ro::ui::AnchorSide side) {
+  return std::string(ro::ui::AnchorSideWord(side));
+}
+
 }  // namespace
 
 void ReadMinimapLayout(const YAML::Node& node, ro::ui::MinimapLayout& into) {
   ro::ui::MinimapSettings& minimap = into.settings;
   Read(node, kShownField, into.shown);
-  Read(node, kPosXField, minimap.pos_x);
-  Read(node, kPosYField, minimap.pos_y);
+  Read(node, kPosXField, minimap.offset_x_px);
+  Read(node, kPosYField, minimap.offset_y_px);
+  ReadSide(node, kAcrossField, minimap.across);
+  ReadSide(node, kDownField, minimap.down);
   Read(node, kSideField, minimap.side_px);
   Read(node, kClickThroughField, minimap.click_through);
   Read(node, kZoomField, minimap.zoom);
@@ -73,8 +94,10 @@ void WriteMinimapLayout(YAML::Emitter& out, const ro::ui::MinimapLayout& from) {
   const ro::ui::MinimapSettings& minimap = from.settings;
   out << YAML::BeginMap;
   out << YAML::Key << kShownField << YAML::Value << from.shown;
-  out << YAML::Key << kPosXField << YAML::Value << minimap.pos_x;
-  out << YAML::Key << kPosYField << YAML::Value << minimap.pos_y;
+  out << YAML::Key << kAcrossField << YAML::Value << SideName(minimap.across);
+  out << YAML::Key << kDownField << YAML::Value << SideName(minimap.down);
+  out << YAML::Key << kPosXField << YAML::Value << minimap.offset_x_px;
+  out << YAML::Key << kPosYField << YAML::Value << minimap.offset_y_px;
   out << YAML::Key << kSideField << YAML::Value << minimap.side_px;
   out << YAML::Key << kClickThroughField << YAML::Value << minimap.click_through;
   out << YAML::Key << kZoomField << YAML::Value << minimap.zoom;

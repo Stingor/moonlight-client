@@ -10,17 +10,25 @@
 namespace ro::ui {
 namespace {
 
-// Un écran se coupe en trois sur chaque axe : le centre d'une fenêtre dans le
-// premier tiers l'ancre au bord de départ, dans le dernier au bord d'arrivée.
+// L'espace LIBRE se coupe en trois sur chaque axe : une fenêtre dont l'écart à
+// un bord tient dans le tiers de cet espace s'ancre à ce bord.
 constexpr float kThirds = 3.0F;
 constexpr float kHalf = 0.5F;
 
+// LE BORD LE PLUS PROCHE, voir l'en-tête. Une fenêtre qui remplit l'axe n'a
+// pas d'espace libre : elle s'ancre au départ, comme le bornage l'y colle.
 [[nodiscard]] AnchorSide SideOf(float start_px, float extent_px, float screen_px) {
-  const float middle_px = start_px + extent_px * kHalf;
-  if (middle_px < screen_px / kThirds) {
+  const float free_px = screen_px - extent_px;
+  if (free_px <= 0.0F) {
     return AnchorSide::kStart;
   }
-  if (middle_px > screen_px - screen_px / kThirds) {
+  const float gap_start_px = start_px;
+  const float gap_end_px = free_px - start_px;
+  const float third_px = free_px / kThirds;
+  if (gap_start_px <= third_px && gap_start_px <= gap_end_px) {
+    return AnchorSide::kStart;
+  }
+  if (gap_end_px <= third_px) {
     return AnchorSide::kEnd;
   }
   return AnchorSide::kCenter;
@@ -94,6 +102,31 @@ struct Shown {
   ImVec2 at;
   ImVec2 size;
 };
+
+// LA FENÊTRE SOUS LA POIGNÉE DU JOUEUR, bornée : la taille s'arrête au bord de
+// l'écran et à sa part, et le bord que le geste ne tire pas reste où il est.
+// Voir `HeldResize`.
+[[nodiscard]] Shown UnderTheHand(const ImGuiWindow& window, const HeldResize& resize, ImVec2 screen,
+                                 bool capped) {
+  ImVec2 size = capped ? Bounded(window.SizeFull, screen) : window.SizeFull;
+  size = ImMin(size, resize.largest_px);
+  ImVec2 at = window.Pos;
+  if (resize.moves_left) {
+    at.x += window.SizeFull.x - size.x;
+  }
+  if (resize.moves_top) {
+    at.y += window.SizeFull.y - size.y;
+  }
+  return Shown{.at = at, .size = size};
+}
+
+// LA FENÊTRE N'A CHANGÉ QUE DE TAILLE, et personne ne la tient : son contenu,
+// son appelant ou une contrainte l'ont redimensionnée. Voir l'en-tête.
+[[nodiscard]] bool OnlyResized(const ImGuiWindow& window, float posed_x_px, float posed_y_px,
+                               bool posed_collapsed) {
+  return window.Pos.x == posed_x_px && window.Pos.y == posed_y_px &&
+         window.Collapsed == posed_collapsed;
+}
 
 // CE QU'UNE PLACE VOULUE DONNE À L'ÉCRAN, bornée. `measured` : la taille que
 // la fenêtre a quand ce n'est pas la place qui la dit.
@@ -209,10 +242,18 @@ void WindowPlacer::Place(float interface_scale) {
     }
     const bool size_follows = SizeFollowsPlace(*window);
     const bool capped = SizeCapped(*window);
+    const HeldResize resize = HeldResizeOf(window);
 
     // UNE FENÊTRE QU'ON NE RETIENT PAS n'a pas de place voulue : elle se borne
     // dans l'écran, là où elle est.
     if ((window->Flags & ImGuiWindowFlags_NoSavedSettings) != 0) {
+      if (resize.held) {
+        const Shown held = UnderTheHand(*window, resize, screen, capped);
+        window->Pos = held.at;
+        window->SizeFull = held.size;
+        window->Size = held.size;
+        continue;
+      }
       const ImVec2 size = capped ? ImFloor(Bounded(window->SizeFull, screen)) : window->SizeFull;
       window->SizeFull = size;
       if (!window->Collapsed) {
@@ -226,7 +267,35 @@ void WindowPlacer::Place(float interface_scale) {
     const auto posed = posed_.find(window->ID);
     auto wanted = places_.find(key);
     bool moved_elsewhere = false;
-    if (posed != posed_.end()) {
+    const bool known = posed != posed_.end() && wanted != places_.end();
+    if (known && resize.held) {
+      // LE JOUEUR TIRE UNE POIGNÉE : la place suit sa main, bornée par la
+      // taille et sans déplacer le bord qu'il ne tire pas.
+      const Shown held = UnderTheHand(*window, resize, screen, capped);
+      WindowPlace adopted = PlaceFromRect(ScreenRect{.x_px = held.at.x,
+                                                     .y_px = held.at.y,
+                                                     .width_px = held.size.x,
+                                                     .height_px = held.size.y},
+                                          screen.x, screen.y, scale);
+      adopted.collapsed = window->Collapsed;
+      if (wanted->second != adopted) {
+        wanted->second = adopted;
+        ++revision_;
+      }
+    } else if (known && Differs(posed->second, *window) &&
+               OnlyResized(*window, posed->second.x_px, posed->second.y_px,
+                           posed->second.collapsed)) {
+      // 🔴 REDIMENSIONNÉE SANS GESTE DU JOUEUR : l'ancre et l'écart restent,
+      // seule la taille change. Voir l'en-tête.
+      const ImVec2 size = capped ? Bounded(window->SizeFull, screen) : window->SizeFull;
+      WindowPlace resized = wanted->second;
+      resized.width = size.x / scale;
+      resized.height = size.y / scale;
+      if (wanted->second != resized) {
+        wanted->second = resized;
+        ++revision_;
+      }
+    } else if (posed != posed_.end()) {
       moved_elsewhere = Differs(posed->second, *window);
     } else if (wanted == places_.end()) {
       // ⚠ UNE FENÊTRE QUE LA DISPOSITION POSÉE NE NOMME PAS attend d'être

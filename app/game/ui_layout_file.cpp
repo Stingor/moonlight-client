@@ -2,6 +2,7 @@
 
 #include <array>
 #include <optional>
+#include <string>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
@@ -10,6 +11,7 @@
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
+#include "ro/ui/anchor_side.h"
 
 #include "game/minimap_layout_yaml.h"
 #include "game/profile_yaml.h"
@@ -29,9 +31,6 @@ constexpr const char* kCollapsedField = "collapsed";
 constexpr const char* kTogglesField = "toggles";
 constexpr const char* kMinimapField = "minimap";
 
-// Les mots d'une ancre, dans l'ordre de `AnchorSide`.
-constexpr std::array<const char*, 3> kSideWords = {"start", "center", "end"};
-
 constexpr const char* kFileHeader =
     "# Les profils de disposition de l'interface.\n"
     "#\n"
@@ -49,16 +48,11 @@ constexpr const char* kFileHeader =
   if (!node || !node.IsScalar()) {
     return std::nullopt;
   }
-  for (std::size_t rank = 0; rank < kSideWords.size(); ++rank) {
-    if (node.Scalar() == kSideWords[rank]) {
-      return static_cast<ro::ui::AnchorSide>(rank);
-    }
-  }
-  return std::nullopt;
+  return ro::ui::AnchorSideFromWord(node.Scalar());
 }
 
-[[nodiscard]] const char* WordOf(ro::ui::AnchorSide side) {
-  return kSideWords[static_cast<std::size_t>(side)];
+[[nodiscard]] std::string WordOf(ro::ui::AnchorSide side) {
+  return std::string(ro::ui::AnchorSideWord(side));
 }
 
 // Une paire de nombres, `[x, y]`.
