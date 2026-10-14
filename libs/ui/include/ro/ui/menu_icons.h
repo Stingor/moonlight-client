@@ -87,6 +87,9 @@ enum class MenuCommand : std::uint8_t {
   // LE MARCHÉ, qui remplace la recherche d'échoppes. Aucun art `bt_market` ne
   // se livre : le carré de secours, à sa place.
   kMarket,
+  // LA BASE DE DONNÉES des objets et des monstres. Aucun art `bt_database` ne
+  // se livre : le carré de secours, à sa place.
+  kDatabase,
   // ── HORS DE LA GRILLE ─────────────────────────────────────────────────────
   //
   // LE BOUTON DU VOTE SHOP, posé à part. C'est une icône du jeu,

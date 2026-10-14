@@ -341,6 +341,7 @@ void ChatWebStage::Follow(const ro::ui::ChatLinkAsk& asked, std::string_view wri
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops:
     case ro::ui::ChatLinkGesture::kMarketSearch:
+    case ro::ui::ChatLinkGesture::kGameDatabase:
     case ro::ui::ChatLinkGesture::kTryStyle:
     case ro::ui::ChatLinkGesture::kOpenBestiary:
     case ro::ui::ChatLinkGesture::kOpenInNavigation:

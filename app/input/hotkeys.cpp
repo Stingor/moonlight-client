@@ -92,6 +92,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kOpenChatRoom, "chat_room"},
     {GameAction::kOpenMemorialDungeon, "memorial_dungeon"},
     {GameAction::kOpenMarket, "market"},
+    {GameAction::kOpenDatabase, "database"},
     {GameAction::kReportBug, "bug_report"},
     {GameAction::kFrameWholeMap, "whole_map"},
     {GameAction::kSitOrStand, "sit"},
@@ -246,6 +247,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenChatRoom:
     case GameAction::kOpenMemorialDungeon:
     case GameAction::kOpenMarket:
+    case GameAction::kOpenDatabase:
     case GameAction::kReportBug:
     case GameAction::kAfkScreen:
       return HotkeyTab::kInterface;
@@ -393,6 +395,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Instance");
     case GameAction::kOpenMarket:
       return ro::core::Tr("Marché");
+    case GameAction::kOpenDatabase:
+      return ro::core::Tr("Base de données");
     case GameAction::kReportBug:
       return ro::core::Tr("Signaler un bug");
     case GameAction::kFrameWholeMap:

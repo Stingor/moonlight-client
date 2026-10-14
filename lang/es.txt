@@ -17979,3 +17979,177 @@ tr: ¿Lanzar el hechizo que consume 1 Black Gemstone y 1.000.000 de zeny?
 
 fr: Une carte désignée ne peut plus être changée. Voulez-vous vraiment désigner cette carte ?
 tr: Un mapa designado ya no se puede cambiar. ¿Seguro que quieres designar este mapa?
+
+fr: Niv. %u Boss
+tr: Nv. %u Jefe
+
+fr: Niv. %u MVP
+tr: Nv. %u MVP
+
+fr: %d monstres
+tr: %d monstruos
+
+fr: %d items
+tr: %d items
+
+fr: (récompense MVP)
+tr: (recompensa MVP)
+
+fr: Accessoire
+tr: Accesorio
+
+fr: Attaque magique
+tr: Ataque mágico
+
+fr: Au retrait
+tr: Al quitar
+
+fr: Aucun PNJ ne le vend.
+tr: Ningún PNJ lo vende.
+
+fr: Aucun monstre ne le lâche.
+tr: Ningún monstruo lo suelta.
+
+fr: Bas de tête
+tr: Cabeza inferior
+
+fr: Base de données
+tr: Base de datos
+
+fr: Base de données##mi_database
+tr: Base de datos##mi_database
+
+fr: Brute
+tr: Bestia
+
+fr: Choisissez un item ou un monstre dans la liste.
+tr: Elige un item o un monstruo en la lista.
+
+fr: Consommables différés
+tr: Consumibles diferidos
+
+fr: Demande au serveur…
+tr: Preguntando al servidor…
+
+fr: Description en jeu###db_description
+tr: Descripción en el juego###db_description
+
+fr: Emplacements de carte
+tr: Ranuras de carta
+
+fr: Femmes seulement
+tr: Solo mujeres
+
+fr: Fiche précédente
+tr: Ficha anterior
+
+fr: Fiche suivante
+tr: Ficha siguiente
+
+fr: Grand
+tr: Grande
+
+fr: Haut de tête
+tr: Cabeza superior
+
+fr: Hommes seulement
+tr: Solo hombres
+
+fr: Items de la boutique
+tr: Items de la tienda
+
+fr: Jobs
+tr: Jobs
+
+fr: La base de données n'est pas disponible sans installation.
+tr: La base de datos no está disponible sin instalación.
+
+fr: Le serveur seul le sait : connectez-vous.
+tr: Solo el servidor lo sabe: conéctate.
+
+fr: Lecture de la base de données…
+tr: Leyendo la base de datos…
+
+fr: Les tables de la base de données sont absentes de l'installation.
+tr: Las tablas de la base de datos faltan en la instalación.
+
+fr: Les tables de la base de données sont illisibles.
+tr: Las tablas de la base de datos son ilegibles.
+
+fr: Lâché par (%d)###db_droppers
+tr: Soltado por (%d)###db_droppers
+
+fr: Marché##db_market
+tr: Mercado##db_market
+
+fr: Milieu de tête
+tr: Cabeza media
+
+fr: Niv. %u
+tr: Nv. %u
+
+fr: Niveau d'arme
+tr: Nivel de arma
+
+fr: Niveau d'armure
+tr: Nivel de armadura
+
+fr: Niveau requis
+tr: Nivel requerido
+
+fr: Nom ou ID
+tr: Nombre o ID
+
+fr: Ordinaires
+tr: Normales
+
+fr: Ouvre la fiche de cet item dans la base de données.
+tr: Abre la ficha de este item en la base de datos.
+
+fr: Ouvrir ce monstre dans la base de données.
+tr: Abrir este monstruo en la base de datos.
+
+fr: Ouvrir dans la base de données
+tr: Abrir en la base de datos
+
+fr: Petit
+tr: Pequeño
+
+fr: Prix d'achat
+tr: Precio de compra
+
+fr: Raffinable
+tr: Refinable
+
+fr: Réessayer##db_sellers_retry
+tr: Reintentar##db_sellers_retry
+
+fr: Script du serveur
+tr: Script del servidor
+
+fr: Se porte
+tr: Se lleva en
+
+fr: Vendu chez###db_sellers
+tr: Vendido por###db_sellers
+
+fr: [Mini-boss]
+tr: [Minijefe]
+
+fr: À l'usage ou porté
+tr: Al usar o llevado
+
+fr: À l'équipement
+tr: Al equipar
+
+fr: Équipements d'ombre
+tr: Equipo de sombra
+
+fr: Équipements de familier
+tr: Equipo de mascota
+
+fr: Œufs de familier
+tr: Huevos de mascota
+
+fr: EXP écrite dans la base : %s\nTaux du serveur : %lld %%
+tr: EXP escrita en la base: %s\nTasa del servidor: %lld %%

@@ -240,9 +240,8 @@ void Game::PumpEvents(std::uint32_t now_ms) {
     if (NoteAfkInput(event, now_ms)) {
       continue;
     }
-    // L'INTERFACE VOIT TOUT, ET AVANT TOUT LE MONDE : elle ne sait ce qu'il y a
-    // sous le curseur que si elle a vu la souris bouger. Ce qu'elle en dit
-    // ensuite décide à qui revient le geste — voir `window_events.h`.
+    // L'INTERFACE VOIT TOUT, AVANT TOUT LE MONDE : il lui faut avoir vu la souris
+    // bouger, et ce qu'elle en dit décide à qui revient le geste (`window_events.h`).
     interface_->TakeEvent(event);
     RouteEvent({.gl = &*gl_,
                 .interface = &*interface_,
@@ -286,6 +285,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .world_map = &windows_.navigation.world_map,
                 .minimap_shown = &shell_.layouts().minimap().shown,
                 .mvp_tracker = &pieces_.mvp_tracker,
+                .database_toggle = &windows_.monster_sheet.database.toggle_asked,
                 .bug_report = &windows_.bug_report,
                 .recorder = &recorder_,
                 .hotkeys = &windows_.hotkeys,

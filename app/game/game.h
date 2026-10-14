@@ -51,6 +51,7 @@
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
 #include "game/client_shell.h"
+#include "game/database_stage.h"
 #include "game/game_foundation.h"
 #include "game/game_pieces.h"
 #include "game/game_rendering.h"
@@ -228,6 +229,10 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void AdvanceViewEquip(std::uint32_t now_ms);
   // LA FICHE D'UN MONSTRE, même aller-retour, dans `game_monster_sheet.cpp`.
   void AdvanceMonsterSheet(std::uint32_t now_ms);
+  // LA BASE DE DONNÉES, qui passe juste avant elle et peut l'héberger :
+  // `game_database.cpp`. `HostMonsterSheet` rend vrai quand elle l'héberge.
+  void AdvanceDatabase(std::uint32_t now_ms);
+  [[nodiscard]] bool HostMonsterSheet(MonsterSheet& sheet);
   // « MONTRER MON ÉQUIPEMENT » : la ligne dans la conversation, à chaque annonce.
   void SayEquipmentShown(std::uint32_t now_ms);
   // L'APPEL D'URGENCE, de même, sous son propre genre de ligne.
@@ -560,6 +565,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   std::optional<ViewedEquipmentView> viewed_equipment_;
   // LA FICHE D'UN MONSTRE : ce que le serveur en a dit, le relevé de Sense, sa vue.
   std::optional<MonsterSheet> monster_sheet_;
+  // LA BASE DE DONNÉES : ses tables, lues à la première ouverture, et ses vues.
+  DatabaseStage database_;
   std::optional<CraftAtlasView> craft_atlas_;  // l'Atlas des recettes : son livre, sa vue
   // « MONTRER MON ÉQUIPEMENT » ET « VOIR LES COSTUMES » : ce que le serveur dit
   // des nôtres. ⚠ UN ÉTAT DE SESSION : l'équipement ne se réannonce pas au

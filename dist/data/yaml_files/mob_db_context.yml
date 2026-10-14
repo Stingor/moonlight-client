@@ -1,0 +1,3373 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le contexte de la base de données du client
+#
+#  Tiré de la base du serveur Moonlight (rAthena, mode Prerenewal) par
+#  scripts/yaml_tables/server_db.py, fusionnée comme le serveur la charge :
+#  db/mob_db.yml et chaque import en pied de fichier, dans l'ordre. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/server_db.py --serveur <dépôt moonlight>
+#
+#  battle       : les réglages effectifs de conf/battle_athena.conf et de ses
+#                 imports — taux de butin et leurs bornes, EXP, apparitions.
+#  item_ratios  : objet -> [ratio, [monstres visés]] (mob_item_ratio.yml) ;
+#                 une liste vide vise tous les monstres.
+#  spawns       : monstre -> {carte: nombre}, les apparitions permanentes des
+#                 scripts que moon/scripts_moon.conf charge, cartes de GM
+#                 exclues.
+#  monsters     : monstre -> [race, élément, niveau d'élément, taille, rang,
+#                 bits de comportement], les NOMBRES que le serveur déduit au
+#                 chargement — ceux de la fiche qu'il envoie. Rang : 0
+#                 ordinaire, 1 mini-boss, 2 MVP.
+#
+#  Lu par moonclient (ro/vfs/server_db.h), à la première ouverture de la
+#  fenêtre « Base de données » seulement.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: 1
+mode: Prerenewal
+battle:
+  item_rate_common: 1000
+  item_rate_common_boss: 1000
+  item_rate_common_mvp: 1000
+  item_drop_common_min: 1000
+  item_drop_common_max: 10000
+  item_rate_heal: 2500
+  item_rate_heal_boss: 500
+  item_rate_heal_mvp: 500
+  item_drop_heal_min: 500
+  item_drop_heal_max: 10000
+  item_rate_use: 1000
+  item_rate_use_boss: 500
+  item_rate_use_mvp: 500
+  item_drop_use_min: 500
+  item_drop_use_max: 10000
+  item_rate_equip: 10000
+  item_rate_equip_boss: 100
+  item_rate_equip_mvp: 100
+  item_drop_equip_min: 500
+  item_drop_equip_max: 500
+  item_drop_equip_boss_min: 500
+  item_drop_equip_boss_max: 2500
+  item_drop_equip_mvp_min: 500
+  item_drop_equip_mvp_max: 2500
+  item_rate_card: 10000
+  item_rate_card_boss: 1000
+  item_rate_card_mvp: 5000
+  item_drop_card_min: 50
+  item_drop_card_max: 10000
+  item_rate_mvp: 1000
+  item_drop_mvp_min: 1000
+  item_drop_mvp_max: 10000
+  item_rate_treasure: 1250
+  item_drop_treasure_min: 1000
+  item_drop_treasure_max: 10000
+  item_logarithmic_drops: 0
+  drop_rate0item: 0
+  drop_rateincrease: 0
+  base_exp_rate: 100000
+  job_exp_rate: 100000
+  mvp_exp_rate: 25000
+  mob_count_rate: 100
+  override_mob_names: 1
+item_ratios: {}
+spawns:
+  1001: {moc_fild18: 140, moc_fild11: 30}
+  1002: {prt_fild08: 110, gef_fild00: 30, pay_fild01: 30, prt_fild01: 30, prt_fild06: 30, pay_fild03: 25, gef_fild07: 20, pay_fild04: 15, xmas_dun01: 10, prt_maze01: 5}
+  1004: {prt_fild05: 140, mjolnir_09: 30}
+  1005: {moc_pryd01: 50, mjo_dun01: 30, anthell01: 20, anthell02: 20, prt_sewb3: 20, orcsdun01: 15, pay_dun00: 15, prt_sewb1: 10, prt_sewb2: 10}
+  1007: {prt_fild06: 140, pay_fild03: 130, prt_fild08: 100, gef_fild00: 30, pay_fild01: 30, prt_fild01: 30, gef_fild04: 25, gef_fild07: 20, prt_maze01: 5}
+  1008: {gef_fild07: 130, pay_fild03: 20, prt_maze01: 5}
+  1009: {moc_fild11: 30, moc_fild12: 30, moc_fild18: 30}
+  1010: {pay_fild01: 140, mjolnir_09: 30, pay_fild03: 25}
+  1011: {gef_fild00: 140, moc_fild07: 30, gef_fild04: 25, gef_fild07: 20, prt_maze01: 5, un_bunker: 2}
+  1012: {prt_fild00: 130, gef_fild01: 80, gef_fild09: 20, prt_fild04: 20}
+  1013: {moc_fild03: 140, moc_fild13: 15, prt_maze01: 5}
+  1014: {pay_fild08: 140, pay_fild02: 30, pay_fild06: 30, prt_sewb2: 20}
+  1015: {pay_dun00: 40, gef_dun01: 25}
+  1016: {moc_pryd02: 30, pay_dun01: 30, pay_dun02: 20, pay_dun04: 15}
+  1018: {gef_fild05: 140, mjolnir_06: 30, prt_fild02: 30, mjolnir_01: 20, pay_fild07: 20, prt_maze01: 1}
+  1019: {moc_fild01: 130, moc_fild02: 60}
+  1020: {gef_fild04: 125, pay_dun03: 10, pay_dun02: 3}
+  1023: {gef_fild10: 130, gef_fild03: 60}
+  1024: {pay_fild06: 140, pay_fild02: 30, pay_fild08: 30}
+  1025: {pay_fild02: 140, pay_fild06: 30, pay_fild08: 30, prt_maze01: 5}
+  1026: {pay_dun02: 40, lou_dun02: 25, pay_dun03: 3}
+  1028: {pay_dun01: 50, pay_dun02: 45, moc_pryd02: 30}
+  1029: {moc_pryd04: 50, moc_pryd02: 5}
+  1030: {ra_fild08: 100, ra_fild03: 20}
+  1031: {pay_fild04: 130, prt_maze03: 45, prt_fild02: 30, prt_fild03: 30, prt_maze02: 25, gef_fild02: 20, mjolnir_02: 20, moc_pryd01: 20, moc_pryd02: 20, mosk_dun01: 20, pay_fild09: 20, prt_fild10: 20, xmas_dun01: 20, gef_dun00: 15, pay_dun00: 15, cmd_fild05: 10, pay_dun02: 10, prt_maze01: 5}
+  1032: {moc_pryd05: 80, moc_pryd06: 80, moc_pryd03: 20}
+  1033: {pay_fild09: 140, prt_fild10: 140, gef_fild02: 20, mjolnir_02: 20}
+  1034: {beach_dun3: 50, tur_dun01: 10}
+  1035: {mjolnir_12: 35, gef_dun00: 30, prt_maze03: 30, prt_q: 15, gef_dun02: 10, gl_prison: 10, gl_prison1: 10, prt_maze01: 4, gl_chyard: 3}
+  1036: {abbey01: 56, gef_dun01: 40, nameless_n: 40, ayo_dun01: 30, gef_dun02: 10, prt_q: 10}
+  1037: {mjolnir_03: 130, mosk_fild02: 40, mjolnir_04: 35, gef_fild06: 30, prt_maze03: 30, in_sphinx5: 20, gon_fild01: 10, lou_dun01: 10, prt_maze01: 3}
+  1038: {moc_pryd04: 1}
+  1039: {gef_dun03: 1, gld_dun03: 1, prt_maze03: 1}
+  1040: {cmd_fild06: 150, cmd_fild08: 2}
+  1041: {moc_pryd03: 70, moc_pryd02: 30, moc_pryd04: 25, moc_pryd05: 10}
+  1042: {moc_fild13: 140, moc_fild03: 20, orcsdun02: 20, orcsdun01: 10, prt_maze01: 5}
+  1044: {iz_dun02: 40}
+  1045: {iz_dun03: 40}
+  1046: {gef_dun02: 1, gef_dun03: 1, gld_dun04: 1}
+  1047: {moc_fild12: 35, moc_fild01: 20, moc_fild02: 10, moc_fild07: 10}
+  1048: {prt_sewb1: 80, prt_fild05: 30, prt_sewb2: 20, gef_fild05: 10, prt_sewb3: 10, prt_sewb4: 10}
+  1049: {moc_fild12: 50, moc_fild07: 10}
+  1050: {moc_fild12: 50, moc_fild07: 15}
+  1051: {prt_sewb2: 70, prt_fild05: 30, prt_sewb1: 30, job_monk: 20, prt_sewb3: 20, prt_sewb4: 20, gef_fild05: 10, rockrdg1: 10, rockrdg2: 8, un_bunker: 6, rockmi1: 3}
+  1052: {prt_fild07: 150, prt_maze01: 5}
+  1053: {prt_sewb3: 65, prt_sewb4: 20, prt_sewb2: 10}
+  1054: {prt_sewb4: 70, prt_sewb3: 65}
+  1055: {moc_fild02: 130, moc_fild01: 50}
+  1056: {pay_fild09: 80, ayo_fild01: 30, mjolnir_06: 30, gef_fild05: 20, prt_maze01: 5}
+  1057: {prt_fild03: 100, ayo_fild02: 45, ayo_fild01: 30, mjolnir_02: 20, ein_fild10: 10, prt_maze01: 4}
+  1058: {cmd_fild09: 145, prt_fild09: 60, cmd_fild06: 50, moc_fild13: 15}
+  1059: {gld_dun02: 1, mjolnir_04: 1}
+  1060: {pay_fild07: 130, pay_fild09: 70, mjolnir_01: 20, ama_fild01: 15, prt_maze01: 5, prt_maze02: 5}
+  1061: {gef_dun01: 30, gef_dun02: 20}
+  1062: {xmas: 50}
+  1063: {prt_fild01: 140, prt_fild08: 100, prt_fild06: 30, gef_fild04: 25, prt_maze01: 5}
+  1064: {beach_dun3: 30}
+  1065: {iz_dun04: 50}
+  1066: {iz_dun01: 60, iz_dun00: 15}
+  1067: {iz_dun02: 60, iz_dun01: 15}
+  1068: {treasure01: 71, iz_dun02: 40, pay_dun02: 31, beach_dun3: 30, iz_dun01: 30, iz_dun03: 30, iz_dun04: 18, treasure02: 18, pay_dun03: 17, bra_dun01: 15, bra_dun02: 15, iz_dun00: 15, ama_fild01: 14, beach_dun2: 10}
+  1069: {iz_dun03: 40, iz_dun04: 10}
+  1070: {iz_dun01: 50, treasure01: 20, treasure02: 20, iz_dun00: 15, bra_dun01: 10, bra_dun02: 10}
+  1071: {treasure01: 43, treasure02: 20}
+  1072: {mag_dun01: 20, thor_v02: 10}
+  1073: {cmd_fild07: 30, cmd_fild02: 20, cmd_fild04: 20, hu_fild06: 20, mal_dun01: 10}
+  1074: {hu_fild06: 50, cmd_fild07: 30, cmd_fild02: 20, cmd_fild04: 20, mal_dun01: 10, jawaii: 3}
+  1076: {pay_dun00: 35}
+  1077: {mjolnir_06: 140, gef_dun00: 25, prt_sewb3: 15, treasure01: 12}
+  1078: {ein_fild10: 20, pay_dun03: 16, gef_fild05: 15, pay_dun00: 15, yggdrasil01: 15, yuno_fild01: 15, yuno_fild03: 15, gef_dun00: 12, ein_fild04: 10, ein_fild06: 10, ein_fild07: 10, ein_fild08: 10, ein_fild09: 10, lhz_fild01: 10, lhz_fild03: 10, mjolnir_05: 10, pay_dun01: 10, pay_dun04: 10, ve_fild01: 10, ve_fild02: 10, ve_fild03: 10, yuno_fild02: 10, yuno_fild04: 10, yuno_fild06: 10, yuno_fild07: 10, yuno_fild08: 10, yuno_fild09: 10, yuno_fild11: 10, pay_dun02: 8, mjolnir_02: 6, gon_dun01: 5, lasa_fild01: 5, prt_maze01: 5, prt_maze03: 5, ra_fild11: 5, ra_fild12: 5, um_fild02: 5, um_fild04: 5}
+  1079: {ein_fild10: 20, odin_tem03: 15, yggdrasil01: 15, odin_tem02: 10, mjolnir_05: 9, gef_fild08: 8, cmd_fild01: 6, gef_fild10: 6, hu_fild04: 6, mjolnir_02: 6, mjolnir_01: 5, odin_tem01: 5, prt_maze03: 5, um_fild03: 5, gef_fild02: 4, ve_fild01: 4, yuno_fild03: 4, gef_fild09: 3, pay_fild10: 3, prt_maze01: 3, ve_fild04: 3, gef_fild00: 2, glast_01: 2, mjolnir_06: 2, mjolnir_07: 2, mjolnir_08: 2, mjolnir_11: 2, prt_fild03: 2, yuno_fild01: 2, gef_dun01: 1, gef_fild07: 1, moc_fild17: 1, pay_dun03: 1, prt_fild01: 1, prt_fild05: 1}
+  1080: {yggdrasil01: 26, mjolnir_02: 23, gef_fild03: 21, prt_fild03: 20, yuno_fild01: 20, mjolnir_04: 17, glast_01: 16, ein_fild03: 15, lhz_fild02: 15, pay_fild10: 15, prt_fild06: 15, yuno_fild03: 15, moc_fild03: 14, mjolnir_03: 13, mjolnir_11: 11, ayo_fild01: 10, ein_fild04: 10, hu_fild04: 10, hu_fild06: 10, lhz_fild01: 10, lhz_fild03: 10, mjolnir_01: 10, mjolnir_10: 10, pay_fild06: 10, pay_fild08: 10, pay_fild09: 10, um_fild01: 10, um_fild03: 10, yuno_fild02: 10, yuno_fild04: 10, yuno_fild06: 10, yuno_fild07: 10, yuno_fild08: 10, yuno_fild09: 10, yuno_fild11: 10, gef_fild02: 8, pay_fild07: 8, rockrdg1: 8, mjolnir_07: 7, moc_fild02: 7, gef_fild00: 6, gef_fild04: 6, gef_fild07: 6, mjolnir_08: 6, prt_fild05: 6, cmd_fild01: 5, cmd_fild05: 5, gef_fild01: 5, gon_fild01: 5, odin_tem01: 5, pay_fild01: 5, pay_fild04: 5, prt_fild00: 5, prt_fild04: 5, rockrdg2: 5, pay_fild02: 4, pay_fild03: 4, gef_fild10: 3, prt_fild01: 3, gef_dun00: 1, pay_dun03: 1}
+  1081: {yuno_fild01: 23, ein_fild10: 20, ein_fild03: 15, lhz_fild02: 15, moc_fild13: 15, ra_fild11: 15, ra_fild12: 15, yuno_fild03: 15, ayo_fild02: 10, ein_fild04: 10, ein_fild06: 10, ein_fild07: 10, ein_fild08: 10, ein_fild09: 10, gon_dun01: 10, gon_dun02: 10, hu_fild04: 10, hu_fild06: 10, lhz_fild01: 10, lou_fild01: 10, moc_fild01: 10, moc_fild12: 10, mosk_dun03: 10, um_fild01: 10, ve_fild01: 10, ve_fild02: 10, ve_fild03: 10, ve_fild04: 10, yuno_fild02: 10, yuno_fild04: 10, yuno_fild06: 10, yuno_fild07: 10, yuno_fild08: 10, yuno_fild09: 10, yuno_fild11: 10, cmd_fild08: 8, moc_fild18: 8, moc_fild02: 7, cmd_fild05: 6, moc_fild17: 6, cmd_fild06: 5, moc_fild07: 5, mosk_fild02: 5, odin_tem01: 5, um_fild02: 5, um_fild04: 5, yggdrasil01: 5, rockrdg1: 4, rockrdg2: 4, prt_fild09: 3, prt_maze01: 2, gef_dun00: 1, pay_dun03: 1, prt_maze03: 1}
+  1082: {gef_dun03: 20, gef_dun02: 12, gef_dun01: 10, gon_dun01: 10, gon_dun03: 10, mosk_dun03: 10, ve_fild07: 10, pay_dun02: 6, pay_dun04: 6, mosk_fild02: 5, orcsdun01: 5, orcsdun02: 5, pay_dun03: 5, rockrdg2: 5, yggdrasil01: 5, prt_maze01: 3}
+  1083: {yggdrasil01: 26, odin_tem03: 15, gef_dun03: 6, lou_dun01: 5, mosk_dun03: 5, prt_maze03: 5, um_fild01: 5, gef_fild06: 4, rockrdg2: 4, cmd_fild03: 3, mjolnir_04: 3, prt_fild02: 3, yuno_fild01: 3, bra_dun02: 2, gef_dun02: 2, mjolnir_01: 2, mjolnir_03: 2, pay_dun04: 2, prt_maze01: 2, um_fild03: 2, cmd_fild01: 1, cmd_fild05: 1, gef_dun00: 1, gef_fild02: 1, gef_fild07: 1, glast_01: 1, gon_fild01: 1, mjolnir_05: 1, mjolnir_10: 1, pay_fild04: 1, pay_fild06: 1, pay_fild08: 1, pay_fild09: 1, prt_fild00: 1, prt_fild10: 1, ve_fild01: 1, yuno_fild03: 1}
+  1084: {gef_fild11: 21, harboro2: 19, iz_dun02: 15, pay_fild01: 15, gl_knt01: 12, iz_dun01: 10, orcsdun01: 10, pay_dun02: 8, rockrdg1: 8, pay_dun01: 7, gef_dun00: 6, prt_maze03: 6, bra_dun01: 5, bra_dun02: 5, ein_fild06: 5, gef_dun01: 5, iz_dun00: 5, lou_dun01: 5, lou_fild01: 5, orcsdun02: 5, prt_maze01: 5, jawaii_in: 3, pay_dun00: 3, prt_fild07: 3, un_bunker: 1}
+  1085: {prt_fild10: 15, moc_fild13: 13, mjolnir_09: 11, ein_fild07: 10, ein_fild08: 10, ein_fild09: 10, gef_fild09: 10, prt_fild11: 10, mjolnir_06: 8, pay_fild06: 8, pay_fild03: 6, bra_fild01: 5, gef_fild02: 5, prt_maze01: 5, prt_maze03: 5, pay_fild02: 4, mjolnir_07: 2, jawaii_in: 1, lhz_in01: 1}
+  1086: {prt_sewb4: 1}
+  1087: {gef_fild03: 1}
+  1088: {prt_fild04: 1, prt_fild07: 1, prt_maze03: 1}
+  1089: {cmd_fild03: 1, gef_fild01: 1}
+  1090: {pay_fild04: 1, prt_maze03: 1, xmas_dun01: 1, yuno_fild04: 1}
+  1091: {moc_fild18: 1}
+  1092: {prt_maze01: 1, prt_maze03: 1}
+  1093: {prt_fild02: 1, prt_maze03: 1}
+  1094: {gef_fild09: 80, prt_fild04: 80, prt_fild00: 50, gef_fild01: 20}
+  1095: {anthell02: 50, cmd_fild08: 50, anthell01: 15, cmd_fild09: 15}
+  1096: {pay_fild04: 1, xmas_dun01: 1, yuno_fild03: 1}
+  1097: {anthell01: 87, cmd_fild08: 30, anthell02: 15, cmd_fild09: 10}
+  1098: {in_sphinx4: 25, in_sphinx5: 10}
+  1099: {mjolnir_05: 130, mjolnir_11: 130, dew_fild01: 45, mosk_fild02: 30, prt_maze01: 3}
+  1100: {mjolnir_10: 140, mjolnir_11: 35, moc_fild03: 20, moc_fild13: 15, prt_maze01: 3}
+  1101: {prt_maze03: 25}
+  1102: {alde_dun04: 50, c_tower1: 10}
+  1103: {mjolnir_01: 140, pay_fild07: 30, prt_maze01: 5}
+  1104: {gef_fild02: 140, ayo_fild01: 30, pay_fild09: 30, prt_fild10: 20, prt_maze01: 5}
+  1105: {cmd_fild08: 50, anthell01: 40, anthell02: 15, cmd_fild09: 15}
+  1106: {ra_fild01: 130, ra_fild04: 20}
+  1107: {moc_fild11: 140, moc_fild18: 30, ra_fild01: 20, ra_fild12: 15, ra_fild08: 10}
+  1108: {iz_dun04: 3}
+  1109: {gef_dun02: 45, gef_dun03: 8}
+  1110: {pay_dun04: 40, bra_fild01: 10}
+  1111: {alde_dun03: 55, alde_dun01: 40, in_sphinx1: 40, gef_dun01: 20, mjo_dun02: 20, moc_pryd02: 20, orcsdun02: 20, prt_sewb4: 20, in_sphinx2: 15, gl_sew04: 10, moc_pryd03: 5, orcsdun01: 5, pay_dun01: 5}
+  1112: {treasure02: 1}
+  1113: {moc_fild07: 140, ra_fild13: 40, moc_fild12: 30, pay_fild04: 20, xmas_dun01: 10}
+  1114: {mjolnir_12: 130, yuno_fild01: 35, prt_maze01: 5}
+  1115: {gld_dun01_2: 1, pay_fild10: 1}
+  1116: {pay_dun01: 15}
+  1117: {gl_church: 61, gl_chyard: 10, gl_cas02: 9}
+  1118: {cmd_fild01: 50, cmd_fild03: 50, mjolnir_11: 35, gef_fild08: 30, mjolnir_07: 30, mjolnir_08: 30, mjolnir_10: 30, ein_fild10: 20}
+  1119: {cmd_fild05: 45, moc_fild16: 10, moc_fild17: 10}
+  1120: {gld_dun04: 1, pay_fild04: 1, prt_maze03: 1, treasure02: 1}
+  1121: {mjo_dun02: 35, mjo_dun03: 5, anthell02: 3, anthell01: 1}
+  1122: {gef_fild11: 50, prt_fild11: 10}
+  1123: {gef_fild11: 50, prt_fild11: 10}
+  1124: {gef_fild11: 50, prt_fild11: 10}
+  1125: {gef_fild11: 50, prt_fild11: 10}
+  1126: {prt_fild11: 60}
+  1127: {moc_fild17: 130, moc_fild16: 30}
+  1128: {mjolnir_02: 140, pay_fild09: 30, prt_fild03: 30, gef_fild02: 20, prt_fild10: 20, prt_maze01: 5}
+  1129: {pay_dun04: 30, lou_dun01: 15, ama_dun02: 10}
+  1130: {gef_dun01: 40}
+  1131: {alde_dun04: 10, gef_dun03: 5}
+  1132: {gl_knt02: 40, gl_knt01: 10, gl_cas02: 6, gef_dun03: 2}
+  1133: {ra_fild05: 70, ra_fild06: 40}
+  1134: {ra_fild05: 70, ra_fild06: 40}
+  1135: {ra_fild05: 70, ra_fild06: 40}
+  1138: {prt_fild09: 140, moc_fild13: 15}
+  1139: {mjolnir_03: 35, mjolnir_04: 35, mjolnir_05: 35, mjolnir_12: 35, yuno_fild01: 35, gef_fild06: 30, gef_fild08: 30, prt_maze03: 30, yuno_fild12: 30, lou_fild01: 19, mosk_dun01: 10, mosk_fild02: 10, prt_maze01: 3}
+  1140: {in_sphinx3: 65}
+  1141: {iz_dun00: 45, bra_dun01: 20, iz_dun01: 15, bra_dun02: 10}
+  1142: {iz_dun03: 20, iz_dun04: 10}
+  1143: {gef_dun02: 30, gl_in01: 20, treasure02: 1}
+  1144: {iz_dun02: 40}
+  1145: {mjo_dun02: 60, mjo_dun01: 20, mjo_dun03: 5, prt_maze01: 5}
+  1146: {in_sphinx2: 20, moc_pryd04: 20, in_sphinx3: 15, in_sphinx1: 10, in_sphinx5: 10, moc_pryd03: 10}
+  1147: {anthell02: 1, gld_dun02_2: 1}
+  1148: {beach_dun: 60}
+  1149: {moc_pryd05: 60, in_sphinx4: 50}
+  1150: {gld_dun01: 1, pay_dun04: 1}
+  1151: {mjo_dun03: 35}
+  1152: {orcsdun02: 50, orcsdun01: 10}
+  1153: {orcsdun01: 80}
+  1154: {in_sphinx5: 70, in_sphinx4: 20, in_sphinx3: 5}
+  1155: {gef_fild06: 130}
+  1156: {gef_fild08: 130}
+  1157: {in_sphinx5: 1}
+  1158: {iz_dun03: 45, jawaii: 3}
+  1159: {moc_fild17: 1}
+  1160: {anthell01: 50, cmd_fild08: 50, anthell02: 15, cmd_fild09: 15}
+  1161: {iz_dun00: 65, prt_sewb2: 30, bra_dun01: 10, bra_dun02: 10, iz_dun01: 10}
+  1162: {lhz_fild01: 130, lhz_fild02: 20, lhz_fild03: 20}
+  1163: {gl_knt01: 90, gl_knt02: 80, gl_cas02: 36}
+  1164: {in_sphinx2: 50, in_sphinx1: 20}
+  1165: {moc_fild16: 130, moc_fild17: 30}
+  1166: {mjolnir_07: 140, pay_fild10: 50, mjolnir_08: 30, prt_maze01: 8, bra_fild01: 5}
+  1167: {mjolnir_09: 140, prt_fild07: 50, prt_fild00: 20}
+  1169: {mjo_dun03: 70, mjo_dun02: 20}
+  1170: {pay_dun03: 70}
+  1174: {prt_fild02: 140, gef_fild05: 20, mjolnir_01: 20, pay_fild07: 20, prt_maze01: 5}
+  1175: {mjo_dun01: 60, prt_sewb2: 60, prt_sewb3: 15, prt_sewb1: 10, einbech: 5}
+  1176: {anthell02: 30, anthell01: 10}
+  1177: {orcsdun02: 50}
+  1178: {in_sphinx2: 50, in_sphinx1: 20}
+  1179: {gl_sew01: 40, ayo_dun02: 20, gef_dun02: 20, treasure01: 15, treasure02: 14, alde_dun04: 10, ayo_dun01: 10, gl_cas01: 10, c_tower4: 5}
+  1180: {pay_dun04: 30, pay_dun03: 2, pay_dun02: 1}
+  1182: {job_monk: 70}
+  1185: {pay_dun03: 4, gl_cas02: 1}
+  1186: {gl_knt01: 1, pay_dun03: 1}
+  1188: {pay_dun02: 30, pay_dun03: 3}
+  1189: {alde_dun02: 20, orcsdun02: 5}
+  1190: {gef_fild10: 1}
+  1191: {tha_t02: 30, tha_t01: 20, tha_t04: 20, c_tower4: 12, abyss_01: 10, abyss_02: 10, abyss_03: 10, moc_pryd04: 10, tha_t03: 10, gl_church: 9, moc_pryd06: 8, treasure02: 8, c_tower3: 7, in_sphinx5: 7, ama_dun03: 5, gl_step: 5, in_sphinx3: 5, lou_dun02: 5, moc_pryd03: 5, in_sphinx4: 4, c_tower2: 3, gl_chyard: 3, gl_cas02: 2}
+  1192: {gl_church: 55, gl_chyard: 35, gef_dun03: 8}
+  1193: {c_tower3: 80, c_tower4: 30}
+  1194: {alde_dun01: 50, gl_dun01: 50, alde_dun02: 20, gl_sew01: 10, moc_pryd06: 8}
+  1195: {c_tower1: 70, tha_t03: 30, gl_cas02: 29, gl_knt01: 21, tha_t01: 20, tha_t04: 20, c_tower4: 15, gl_cas01: 15, c_tower2: 12, tha_t02: 10, gl_in01: 8, c_tower3: 6}
+  1196: {gl_prison1: 30}
+  1197: {gl_prison: 30}
+  1198: {gl_chyard: 60}
+  1199: {c_tower1: 70, ein_fild01: 50, c_tower2: 40}
+  1200: {gl_prison1: 1}
+  1201: {gl_prison: 15, gl_prison1: 10}
+  1202: {gl_prison1: 25}
+  1203: {gefenia01: 1, gefenia02: 1, gefenia03: 1, gefenia04: 1, gl_cas02: 1, gl_knt02: 1}
+  1204: {gefenia01: 1, gefenia02: 1, gefenia03: 1, gefenia04: 1, gl_cas02: 1}
+  1205: {gefenia01: 1, gefenia02: 1, gefenia03: 1, gefenia04: 1}
+  1206: {gl_sew04: 100}
+  1207: {gl_sew03: 70, gl_dun01: 40}
+  1208: {gl_cas02: 41, gl_in01: 1, treasure02: 1}
+  1209: {alde_dun03: 56, gl_sew02: 15, gl_prison1: 5, prt_sewb4: 5, mjo_dun03: 3}
+  1211: {alde_dun02: 20}
+  1213: {alde_dun02: 50}
+  1214: {um_fild02: 5, prt_maze01: 2, um_fild04: 2, prt_fild03: 1}
+  1215: {lhz_fild02: 100, lhz_fild01: 35, lhz_fild03: 20, prt_maze03: 20, cmd_fild05: 5}
+  1216: {alde_dun03: 85, treasure02: 38, abyss_01: 30}
+  1219: {gl_knt01: 25, gefenia01: 10, gefenia02: 10, gefenia03: 10, gefenia04: 10, gl_cas02: 7, gl_knt02: 6, gef_dun03: 2, glast_01: 2}
+  1242: {xmas_fild01: 35, pay_fild04: 30, xmas_dun01: 20}
+  1243: {mosk_que: 15, xmas_fild01: 5, prt_maze02: 1}
+  1246: {xmas_dun01: 40, xmas_dun02: 20}
+  1248: {xmas_dun02: 35}
+  1249: {xmas_dun02: 50, xmas_dun01: 5}
+  1250: {xmas_dun01: 1}
+  1251: {xmas_dun02: 1}
+  1252: {xmas_fild01: 1}
+  1253: {gl_sew02: 55, gl_sew03: 40, gl_sew01: 30, gl_sew04: 20, gl_dun02: 15, glast_01: 10}
+  1254: {cmd_fild07: 100}
+  1255: {beach_dun: 20, beach_dun2: 3, beach_dun3: 1}
+  1256: {beach_dun: 20, tur_dun01: 15, tur_dun02: 15, cmd_fild05: 5}
+  1257: {gl_prison1: 40, gl_prison: 20}
+  1258: {prt_fild11: 50}
+  1259: {hu_fild02: 3, gef_dun03: 1}
+  1260: {gl_cas01: 20, gl_in01: 10}
+  1261: {um_fild04: 30}
+  1262: {cmd_fild03: 4}
+  1263: {gl_step: 100, gef_dun03: 3}
+  1264: {iz_dun04: 52, beach_dun: 3, iz_dun03: 3, iz_dun02: 1}
+  1265: {xmas_dun01: 40, xmas_dun02: 20}
+  1266: {cmd_fild07: 30, hu_fild06: 20, mal_dun01: 20, cmd_fild02: 10, cmd_fild04: 10, jawaii: 3}
+  1267: {gl_cas01: 50}
+  1268: {gef_dun03: 2, gefenia01: 1, gefenia02: 1, gefenia03: 1, gefenia04: 1, gl_knt02: 1}
+  1269: {c_tower2: 40, c_tower4: 35}
+  1270: {c_tower3: 6, c_tower4: 6, c_tower1: 5, c_tower2: 5}
+  1271: {cmd_fild03: 150, cmd_fild05: 20}
+  1272: {gef_dun03: 1, gl_chyard: 1, gld_dun04_2: 1}
+  1273: {gef_fild03: 130, gef_fild10: 40}
+  1274: {beach_dun2: 15}
+  1275: {kh_dun01: 25, tha_t02: 10, tha_t01: 5, gef_dun03: 3, gl_cas01: 1, gl_cas02: 1, gl_in01: 1, gl_knt01: 1, gl_knt02: 1}
+  1276: {gl_knt02: 30, gl_cas02: 20, gl_knt01: 10, gl_step: 10}
+  1277: {pay_fild10: 100, pay_dun04: 15, pay_dun03: 3}
+  1278: {beach_dun2: 65}
+  1279: {beach_dun2: 20}
+  1280: {prt_fild11: 30}
+  1281: {gl_in01: 25, gl_cas01: 10}
+  1282: {ra_fild06: 70}
+  1283: {gl_cas02: 3, gef_dun03: 1}
+  1289: {gld2_ald: 3, gld_dun02_2: 3}
+  1290: {gld2_pay: 60, gld_dun01_2: 50, pay_dun04: 1}
+  1291: {gld_dun04: 25, gef_dun03: 4, gl_church: 1}
+  1292: {gefenia02: 30, gefenia03: 30, gefenia01: 20, gefenia04: 20, gld_dun04: 10, gef_dun03: 2}
+  1293: {gld_dun03: 35}
+  1294: {gld2_ald: 60, gld_dun02_2: 30, prt_maze03: 1}
+  1295: {tha_t06: 40, tha_t05: 20, tha_t04: 10, gl_cas01: 6}
+  1296: {gld_dun03_2: 1, ra_fild06: 1}
+  1297: {moc_pryd06: 60, moc_pryd04: 5}
+  1298: {gld_dun04: 55}
+  1299: {gef_fild11: 1}
+  1300: {gld_dun03: 35}
+  1301: {gld2_pay: 25, dew_dun02: 20, gld_dun01_2: 15, pay_dun04: 1}
+  1302: {gef_dun03: 2, gl_chyard: 1, gld2_gef: 1, gld_dun04_2: 1}
+  1303: {gld_dun02: 30}
+  1304: {gld_dun02: 15}
+  1305: {dew_dun01: 25, gld_dun02: 25}
+  1306: {gld_dun01: 55, lou_dun01: 1, prt_maze02: 1}
+  1307: {gld_dun01: 3, pay_dun04: 1}
+  1308: {prt_fild11: 1}
+  1309: {dew_dun02: 30, gld2_pay: 30, gld_dun01_2: 20}
+  1310: {gl_dun02: 45}
+  1311: {gld_dun01: 30, dew_dun01: 10}
+  1312: {tur_dun04: 1}
+  1313: {cmd_fild02: 1}
+  1314: {tur_dun02: 40, tur_dun03: 15, tur_dun01: 10, tur_dun04: 4, tur_dun05: 3}
+  1315: {tur_dun04: 41, tur_dun03: 35, tur_dun05: 1}
+  1316: {tur_dun02: 40}
+  1317: {cmd_fild02: 120}
+  1318: {tur_dun04: 33, tur_dun03: 10}
+  1319: {tur_dun03: 40, tur_dun02: 20, tur_dun04: 15, tur_dun05: 5}
+  1320: {tha_t05: 80, tha_t06: 40, c_tower4: 30, gl_cas01: 20, tha_t04: 10}
+  1321: {tur_dun01: 25}
+  1322: {tur_dun01: 25}
+  1323: {cmd_fild04: 120}
+  1365: {juperos_02: 70, gef_dun03: 2}
+  1366: {mag_dun01: 20}
+  1367: {mag_dun01: 20, mag_dun02: 20}
+  1368: {yuno_fild12: 60, yuno_fild01: 50, yuno_fild11: 40, yuno_fild04: 35, hu_fild02: 30, hu_fild04: 30, yuno_fild08: 30, yuno_fild09: 30, yuno_fild06: 20, lou_fild01: 19, hu_fild01: 10, ein_fild10: 5, mosk_fild02: 5}
+  1369: {yuno_fild08: 130, yuno_fild09: 130, yuno_fild02: 35, yuno_fild07: 30}
+  1370: {gefenia02: 20, gef_dun03: 10, gefenia01: 10, gefenia03: 10, gefenia04: 10}
+  1371: {gefenia01: 60, gefenia03: 40, gefenia02: 30, gefenia04: 30, gef_dun03: 8}
+  1372: {yuno_fild11: 100, yuno_fild07: 90, yuno_fild03: 35, yuno_fild04: 35, yuno_fild08: 30}
+  1373: {gef_dun03: 1}
+  1374: {gefenia03: 20, gef_dun03: 10, gefenia01: 10, gefenia02: 10, gefenia04: 10}
+  1375: {ama_dun03: 20, ama_dun02: 1}
+  1376: {yuno_fild03: 130, yuno_fild04: 130, yuno_fild07: 50, yuno_fild02: 35, ra_fild09: 1}
+  1377: {tha_t06: 35, tha_t04: 20, tha_t05: 20, tha_t02: 10, tha_t03: 10, c_tower2: 2, c_tower4: 2}
+  1378: {ein_fild01: 55, ein_fild02: 30, ein_fild04: 15, ein_fild05: 15, lhz_fild02: 15, lhz_fild03: 15}
+  1379: {mag_dun02: 46, gef_dun03: 3}
+  1380: {mjolnir_04: 130, ein_fild02: 45, mjolnir_03: 35, mjolnir_05: 35}
+  1381: {lou_dun01: 15, mag_dun01: 10}
+  1382: {mag_dun02: 15}
+  1383: {mag_dun01: 30}
+  1384: {mag_dun02: 38}
+  1385: {mag_dun02: 40}
+  1386: {yuno_fild02: 130, yuno_fild06: 80, yuno_fild03: 35, yuno_fild09: 30}
+  1387: {mag_dun02: 35}
+  1388: {yuno_fild04: 1}
+  1389: {gef_dun01: 1}
+  1390: {gefenia02: 40, gefenia03: 40, gefenia01: 30, gefenia04: 30, gef_dun03: 10}
+  1391: {cmd_fild02: 30, cmd_fild04: 30}
+  1392: {prt_fild11: 50}
+  1400: {ama_fild01: 50}
+  1401: {ama_dun03: 55, ama_dun01: 2, ama_dun02: 2}
+  1402: {ama_dun02: 35, ama_fild01: 1}
+  1403: {ama_dun01: 45, ama_dun03: 25, ama_dun02: 20}
+  1404: {ama_dun01: 65, ama_dun02: 5, ama_fild01: 2, ama_dun03: 1}
+  1405: {ama_dun03: 55}
+  1406: {ama_fild01: 40}
+  1408: {gon_dun01: 55, gon_dun02: 20}
+  1409: {gon_fild01: 55}
+  1410: {gon_dun01: 35, gon_dun02: 21}
+  1412: {gon_dun03: 30, gon_dun02: 20}
+  1413: {gon_dun03: 20}
+  1415: {gon_fild01: 40, gon_dun02: 6}
+  1416: {gon_dun03: 50}
+  1417: {gon_dun01: 30}
+  1418: {gon_dun03: 1}
+  1423: {que_sign02: 20}
+  1435: {que_sign02: 8}
+  1446: {que_sign02: 8}
+  1475: {que_sign02: 15}
+  1479: {que_sign02: 15}
+  1480: {que_sign02: 15}
+  1492: {ama_dun03: 1}
+  1493: {um_fild01: 70}
+  1494: {mjolnir_08: 140, pay_fild10: 50, mjolnir_07: 30, mjolnir_10: 30}
+  1495: {um_fild03: 25, um_fild01: 15, um_fild02: 15, um_fild04: 10}
+  1497: {um_fild04: 25, um_fild01: 10}
+  1498: {um_fild02: 25, um_fild01: 10, um_fild03: 10, um_fild04: 5}
+  1499: {um_fild02: 40, um_fild01: 10, um_fild03: 10, um_fild04: 5}
+  1500: {um_fild03: 60}
+  1503: {nif_fild02: 20, nif_fild01: 10, niflheim: 10}
+  1504: {nif_fild01: 20, nif_fild02: 10, niflheim: 5}
+  1505: {nif_fild02: 21}
+  1506: {nif_fild01: 50}
+  1507: {nif_fild02: 25}
+  1508: {nif_fild01: 30, niflheim: 20}
+  1509: {niflheim: 20, nif_fild02: 10}
+  1510: {nif_fild01: 25, nif_fild02: 10, niflheim: 10}
+  1511: {moc_pryd06: 1}
+  1512: {lou_dun02: 40, lou_dun03: 25}
+  1513: {lou_dun03: 25}
+  1514: {lou_dun03: 25, lou_dun02: 5}
+  1515: {xmas_fild01: 1}
+  1516: {lou_fild01: 40, lou_dun01: 15}
+  1517: {lou_dun01: 45}
+  1522: {que_sign02: 8}
+  1566: {que_sign02: 8}
+  1580: {que_sign02: 8}
+  1582: {pay_fild04: 1, yuno_fild03: 1}
+  1583: {beach_dun: 1}
+  1584: {ayo_dun02: 100}
+  1586: {ayo_dun01: 65, ayo_fild02: 35}
+  1587: {ayo_dun02: 20, ayo_dun01: 5, ayo_fild02: 5}
+  1613: {ein_fild08: 100, ein_fild07: 90, lhz_dun01: 50, lhz_fild01: 35, ein_fild06: 30, ein_fild09: 30, lhz_fild02: 20, lhz_fild03: 20, ra_fild09: 20}
+  1614: {ein_dun02: 50}
+  1615: {ein_dun02: 40}
+  1616: {ein_dun01: 70, ein_fild03: 20, ein_fild04: 10, ein_fild05: 10}
+  1617: {ein_dun02: 30, ein_dun01: 1}
+  1618: {ein_dun01: 1, ein_fild02: 1, ein_fild07: 1}
+  1619: {ein_fild09: 70, ein_dun01: 30, ein_fild07: 30, ein_fild08: 30, ein_fild10: 30}
+  1620: {ein_fild05: 100, ein_dun01: 30, ein_fild04: 30, ein_fild03: 20}
+  1621: {ein_fild04: 100, ein_fild05: 30, ein_fild03: 20, ein_dun01: 10}
+  1622: {ein_fild03: 100, ein_dun02: 30, ein_fild04: 20, ein_fild05: 20}
+  1623: {ein_dun02: 1}
+  1626: {gef_dun03: 1}
+  1627: {lhz_dun01: 70, ra_fild12: 30, ra_fild03: 20, ra_fild04: 20, harboro2: 10, ra_fild01: 10, ra_fild05: 10, ra_fild06: 10, ra_fild08: 10}
+  1628: {ein_fild06: 100, ein_fild07: 10}
+  1630: {lou_dun03: 1}
+  1631: {lou_dun03: 10}
+  1632: {ra_san01: 25, ra_san02: 10, ra_san03: 5}
+  1633: {ra_san02: 25, ra_san01: 6, ra_san03: 5}
+  1634: {lhz_dun03: 60}
+  1635: {lhz_dun03: 60, lhz_dun02: 1}
+  1636: {lhz_dun03: 60}
+  1637: {lhz_dun03: 60}
+  1638: {lhz_dun03: 60}
+  1639: {lhz_dun03: 60}
+  1640: {lhz_dun03: 2}
+  1641: {lhz_dun03: 2}
+  1642: {lhz_dun03: 2}
+  1643: {lhz_dun03: 2}
+  1644: {lhz_dun03: 2}
+  1645: {lhz_dun03: 2}
+  1652: {lhz_dun02: 50, lhz_dun01: 8}
+  1653: {lhz_dun02: 50, lhz_dun01: 11}
+  1654: {lhz_dun02: 50, lhz_dun01: 8}
+  1655: {lhz_dun02: 50, lhz_dun01: 13}
+  1656: {lhz_dun02: 50, lhz_dun01: 13}
+  1657: {lhz_dun02: 50, lhz_dun01: 11}
+  1658: {lhz_dun02: 1}
+  1668: {jupe_core: 40}
+  1670: {jupe_core: 40, juperos_01: 10}
+  1671: {jupe_core: 40, juperos_01: 5}
+  1672: {jupe_core: 40, juperos_01: 5}
+  1673: {jupe_core: 40, juperos_01: 5}
+  1676: {juperos_01: 70, juperos_02: 65, jupe_core: 25}
+  1677: {juperos_01: 70, juperos_02: 65, jupe_core: 25}
+  1678: {juperos_01: 70, juperos_02: 65, jupe_core: 25}
+  1679: {juperos_01: 50, juperos_02: 50}
+  1680: {ra_fild03: 130, ra_fild04: 130, ra_fild08: 20, ra_fild09: 10}
+  1681: {lhz_dun02: 10, lhz_dun01: 1}
+  1682: {lhz_dun01: 100, lhz_dun02: 20}
+  1685: {jupe_core: 1}
+  1686: {gef_fild03: 20, gef_fild10: 20}
+  1687: {cmd_fild01: 150}
+  1688: {ayo_dun02: 1}
+  1692: {lhz_fild03: 130, lhz_fild02: 40, odin_tem01: 10}
+  1693: {odin_tem03: 20, odin_tem02: 15, odin_tem01: 10, tha_t12: 10}
+  1694: {tha_t04: 20, tha_t05: 10, tha_t06: 10, tha_t09: 10, odin_tem01: 3}
+  1695: {tha_t01: 20, tha_t05: 10, tha_t06: 10, tha_t11: 10, odin_tem01: 3}
+  1696: {tha_t03: 20, tha_t05: 10, tha_t06: 10, odin_tem01: 3}
+  1697: {tha_t02: 20, tha_t05: 10, tha_t06: 10, tha_t10: 10, odin_tem01: 3}
+  1698: {tha_t03: 80, tha_t05: 40, tha_t06: 40, tha_t04: 20, tha_t07: 15, tha_t08: 15, tha_t02: 10}
+  1699: {tha_t02: 80, tha_t05: 40, tha_t06: 40, tha_t04: 20, tha_t07: 15, tha_t08: 15, abyss_01: 10, abyss_02: 10, abyss_03: 10, tha_t03: 10}
+  1700: {tha_t12: 16, tha_t07: 10, tha_t08: 10, tha_t09: 10, tha_t10: 10, tha_t11: 10, tha_t04: 4}
+  1701: {tha_t11: 25, tha_t07: 10, tha_t08: 10, tha_t09: 10, tha_t10: 10, tha_t12: 10, tha_t03: 4}
+  1702: {tha_t08: 25, tha_t10: 25, tha_t07: 20, tha_t09: 10, tha_t11: 10, tha_t12: 10, tha_t02: 4}
+  1703: {tha_t09: 20, tha_t07: 10, tha_t08: 10, tha_t10: 10, tha_t11: 10, tha_t12: 10, tha_t01: 4}
+  1704: {tha_t08: 4}
+  1705: {tha_t07: 4, tha_t11: 2}
+  1706: {tha_t06: 4, tha_t10: 2}
+  1707: {tha_t05: 2, tha_t09: 2}
+  1709: {tha_t12: 6}
+  1710: {tha_t11: 6}
+  1711: {tha_t10: 3}
+  1712: {tha_t09: 6}
+  1713: {abyss_03: 60, abyss_02: 10}
+  1714: {abyss_02: 50, abyss_01: 30, abyss_03: 10}
+  1715: {hu_fild01: 100, hu_fild02: 100, hu_fild05: 35, hu_fild04: 30, abyss_01: 9, abyss_02: 5}
+  1716: {abyss_02: 60, abyss_03: 10}
+  1717: {abyss_01: 55, abyss_03: 10}
+  1718: {hu_fild05: 130, hu_fild04: 100, hu_fild01: 35, hu_fild02: 30, abyss_01: 9, abyss_02: 5}
+  1719: {abyss_03: 1}
+  1720: {abyss_03: 1}
+  1721: {hu_fild02: 20, hu_fild04: 20, hu_fild05: 20, abyss_02: 10, abyss_03: 10, hu_fild01: 10, abyss_01: 8}
+  1734: {kh_dun02: 1}
+  1735: {kh_dun02: 30, kh_dun01: 3, kh_kiehl01: 1}
+  1736: {kh_dun02: 25, kh_dun01: 3, kh_kiehl01: 2}
+  1737: {kh_dun01: 45, kh_dun02: 10, kh_kiehl01: 1}
+  1738: {kh_dun02: 15, kh_dun01: 8}
+  1739: {kh_kiehl01: 5}
+  1740: {kh_kiehl01: 7}
+  1745: {kh_kiehl01: 10, kh_dun01: 5, kh_dun02: 5}
+  1746: {kh_kiehl01: 4}
+  1751: {odin_tem03: 1}
+  1752: {odin_tem02: 30, odin_tem01: 5, odin_tem03: 4}
+  1753: {odin_tem02: 30, odin_tem01: 5, odin_tem03: 4}
+  1754: {odin_tem03: 16, odin_tem02: 1}
+  1755: {odin_tem03: 16, odin_tem02: 1}
+  1761: {odin_tem03: 5, odin_tem02: 2}
+  1762: {odin_tem03: 5, odin_tem02: 3}
+  1765: {odin_tem03: 2}
+  1768: {ra_san05: 1}
+  1769: {ra_san05: 80, ra_san04: 20}
+  1770: {ra_san04: 60, ra_san05: 30}
+  1771: {ra_san01: 82, ra_san02: 30}
+  1772: {ra_san02: 85, ra_san01: 36, ra_san05: 10}
+  1773: {ra_san03: 60, ra_san05: 20, ra_san04: 10, ra_san01: 6, ra_san02: 3}
+  1774: {ra_san03: 40, ra_san05: 20, ra_san04: 10, ra_san02: 2}
+  1775: {ice_dun02: 70, ice_dun03: 15}
+  1776: {ice_dun01: 75, ice_dun02: 30}
+  1777: {ice_dun03: 70, ice_dun02: 7}
+  1778: {ice_dun03: 42, ice_dun02: 15, ice_dun01: 2}
+  1779: {ice_dun03: 1}
+  1780: {ve_fild04: 100, ra_fild02: 60, ve_fild03: 35, ve_fild07: 30, ve_fild01: 20, ve_fild02: 20, ice_dun01: 5}
+  1781: {ve_fild02: 130, ra_fild09: 60, ve_fild04: 50, ve_fild07: 50, ve_fild03: 35, ra_fild02: 20, ve_fild01: 20, ra_fild11: 10, ra_fild10: 5}
+  1782: {ra_fild12: 130, ra_fild07: 50, ra_fild08: 50, ra_fild01: 30, ra_fild03: 30, ra_fild04: 30, ice_dun01: 5, ra_fild13: 5}
+  1783: {ve_fild01: 35, ra_fild07: 20, ve_fild04: 20, ra_fild02: 15, ve_fild02: 10}
+  1784: {ve_fild07: 100, ra_fild13: 60, ve_fild01: 20, ra_fild07: 10}
+  1785: {gld_dun03_2: 1, ra_fild03: 1, ra_fild04: 1, ve_fild01: 1, ve_fild02: 1}
+  1789: {ice_dun03: 32, ice_dun02: 19}
+  1796: {arug_dun01: 22}
+  1797: {arug_dun01: 5}
+  1829: {thor_v03: 20, thor_v01: 10, thor_v02: 1}
+  1830: {thor_v03: 20, thor_v01: 10, thor_v02: 1}
+  1831: {thor_v03: 60, thor_v01: 7, thor_v02: 1}
+  1832: {thor_v03: 1}
+  1833: {thor_v01: 45, thor_v03: 40}
+  1836: {ve_fild03: 130, thor_v01: 10, thor_v02: 10, ra_fild10: 5}
+  1837: {thor_v01: 25, thor_v02: 10}
+  1838: {thor_v02: 55}
+  1839: {thor_v03: 5, thor_v01: 1}
+  1864: {abbey02: 210, abbey01: 30, nameless_n: 12}
+  1865: {abbey02: 70, abbey01: 33, nameless_n: 12}
+  1866: {abbey01: 25, nameless_n: 17}
+  1867: {abbey01: 93, abbey03: 30, nameless_n: 16}
+  1869: {abbey03: 25, abbey01: 21, abbey02: 21, nameless_n: 3}
+  1870: {abbey03: 60, arug_dun01: 18, abbey02: 7}
+  1871: {abbey02: 1}
+  1874: {abbey03: 1}
+  1880: {mosk_dun01: 66, mosk_dun02: 30}
+  1881: {mosk_dun02: 40, mosk_dun01: 33}
+  1882: {mosk_dun03: 60, mosk_dun02: 20}
+  1883: {mosk_dun03: 35, mosk_dun02: 5}
+  1884: {mosk_dun03: 15}
+  1885: {mosk_dun03: 1}
+  1887: {mosk_que: 10}
+  1888: {mosk_que: 3}
+  1894: {mal_dun01: 30}
+  1917: {moc_fild22: 1}
+  1918: {moc_fild22: 60, moc_fild21: 46, moro_vol: 15, moc_fild20: 1}
+  1919: {moc_fild22: 60, moc_fild21: 46, moro_vol: 15, moc_fild20: 1}
+  1920: {moc_fild22: 60, moc_fild21: 46, moro_vol: 15, moc_fild20: 1}
+  1921: {moc_fild21: 34, moc_fild22: 25, moro_vol: 15, moc_fild20: 1}
+  1974: {arug_dun01: 22}
+  1975: {arug_dun01: 22}
+  1976: {schg_dun01: 15}
+  1977: {schg_dun01: 15}
+  1978: {schg_dun01: 20}
+  1979: {schg_dun01: 20}
+  1986: {dic_fild01: 25, dic_fild02: 25, man_fild02: 25, man_fild03: 25}
+  1987: {dic_fild01: 60, dic_fild02: 35, man_fild02: 35, man_fild03: 25, man_fild01: 2}
+  1988: {man_fild01: 105}
+  1989: {man_fild03: 25, man_fild01: 10}
+  1990: {man_fild03: 1}
+  1991: {spl_fild03: 1}
+  1992: {spl_fild01: 25, spl_fild03: 25, bif_fild01: 17, bif_fild02: 16}
+  1993: {spl_fild01: 35, spl_fild03: 20}
+  1994: {spl_fild03: 35, bif_fild01: 29, bif_fild02: 27, spl_fild02: 15}
+  1995: {spl_fild02: 75}
+  1999: {dic_fild01: 30, man_fild01: 30, dic_fild02: 10}
+  2013: {nyd_dun01: 40}
+  2014: {nyd_dun01: 10}
+  2015: {spl_fild01: 50, nyd_dun01: 10}
+  2016: {nyd_dun01: 20}
+  2017: {nyd_dun01: 2}
+  2018: {nyd_dun01: 2}
+  2024: {man_fild02: 50, dic_fild02: 3}
+  2057: {alb_ship: 25}
+  2068: {bra_dun02: 1}
+  2069: {bra_dun02: 110, bra_dun01: 30}
+  2070: {bra_dun01: 80, bra_dun02: 60}
+  2071: {bra_fild01: 40}
+  2072: {bra_fild01: 55}
+  2073: {bra_fild01: 60}
+  2074: {bra_fild01: 50}
+  2081: {brasilis: 18}
+  2083: {dic_dun01: 50}
+  2084: {dic_dun01: 45}
+  2085: {dic_dun02: 50}
+  2086: {dic_dun02: 45}
+  2087: {dic_dun02: 1}
+  2088: {dic_dun01: 15}
+  2089: {dic_dun01: 15}
+  2090: {dic_dun02: 15}
+  2091: {dic_dun02: 15}
+  2092: {dic_fild02: 80, dic_fild01: 20}
+  2132: {bif_fild01: 5, bif_fild02: 5}
+  2133: {gld2_ald: 70, gld_dun02_2: 40, bif_fild01: 5, bif_fild02: 5}
+  2136: {bif_fild02: 55, bif_fild01: 34}
+  2137: {bif_fild01: 58, bif_fild02: 33}
+  2151: {dew_fild01: 60}
+  2152: {dew_dun01: 70}
+  2153: {dew_fild01: 10}
+  2154: {dew_dun02: 50}
+  2155: {dew_dun02: 30}
+  2156: {dew_dun01: 1}
+  2161: {dic_dun03: 30}
+  2162: {dic_dun03: 30}
+  2163: {dic_dun03: 40}
+  2164: {dic_dun03: 40}
+  2165: {dic_dun03: 1}
+  2166: {dic_dun03: 10}
+  2167: {dic_dun03: 10}
+  2168: {dic_dun03: 10}
+  2169: {dic_dun03: 10}
+  2197: {mal_dun01: 60}
+  2198: {iz_dun05: 25}
+  2199: {mal_dun01: 45}
+  2201: {iz_dun05: 50}
+  2202: {iz_dun05: 1}
+  2203: {iz_dun05: 30}
+  2204: {iz_dun05: 60}
+  2208: {mal_dun01: 1}
+  2221: {lhz_dun04: 60}
+  2222: {lhz_dun04: 60}
+  2223: {lhz_dun04: 60}
+  2224: {lhz_dun04: 60}
+  2225: {lhz_dun04: 60}
+  2226: {lhz_dun04: 60}
+  2227: {lhz_dun04: 60}
+  2228: {lhz_dun04: 2}
+  2229: {lhz_dun04: 2}
+  2230: {lhz_dun04: 2}
+  2231: {lhz_dun04: 2}
+  2232: {lhz_dun04: 2}
+  2233: {lhz_dun04: 2}
+  2234: {lhz_dun04: 2}
+  2249: {gld2_prt: 1}
+  2250: {gld2_prt: 1}
+  2251: {gld2_ald: 1}
+  2252: {gld2_ald: 1}
+  2253: {gld2_pay: 1}
+  2254: {gld2_pay: 1}
+  2255: {gld2_gef: 1}
+  2256: {gld2_gef: 1}
+  2281: {gld2_gef: 80, gld_dun04_2: 45}
+  2282: {gld2_gef: 20, gld_dun04_2: 15}
+  2283: {gld2_gef: 20, gld_dun04_2: 15}
+  2284: {gld2_prt: 25, gld_dun03_2: 13}
+  2285: {gld2_prt: 35, gld_dun03_2: 23}
+  2286: {gld2_prt: 35, gld_dun03_2: 23}
+  2287: {gld2_prt: 35, gld_dun03_2: 23}
+  2288: {gld2_ald: 5, gld2_gef: 5, gld2_pay: 5, gld2_prt: 5}
+  2309: {ma_fild02: 40}
+  2310: {ma_fild02: 25}
+  2311: {ma_dun01: 40}
+  2312: {ma_fild02: 30}
+  2313: {ma_fild01: 50}
+  2314: {ma_fild01: 50, ma_dun01: 40}
+  2315: {ma_dun01: 30, ma_fild02: 25}
+  2316: {ma_fild01: 30, ma_fild02: 20}
+  2353: {moc_prydn1: 100}
+  2354: {moc_prydn1: 60}
+  2355: {moc_prydn1: 100, moc_prydn2: 50}
+  2356: {moc_prydn2: 15}
+  2358: {moc_prydn2: 15}
+  2360: {moc_prydn2: 110}
+  2362: {moc_prydn2: 1}
+  2363: {ecl_fild01: 60}
+  2364: {ecl_fild01: 50}
+  2365: {ecl_tdun03: 15, ecl_tdun02: 10, ecl_tdun01: 5}
+  2366: {ecl_tdun03: 15, ecl_tdun02: 10, ecl_tdun01: 5}
+  2367: {ecl_tdun02: 15, ecl_tdun01: 5, ecl_tdun03: 5}
+  2368: {ecl_tdun03: 15, ecl_tdun02: 5}
+  2369: {ecl_tdun03: 10}
+  2370: {ecl_tdun03: 15}
+  2371: {ecl_tdun03: 5}
+  2398: {prt_fild08: 30}
+  2408: {pvp_n_5-5: 5}
+  2409: {pvp_n_5-5: 5}
+  2410: {pvp_n_5-5: 5}
+  2415: {teg_dun01: 20}
+  2416: {teg_dun01: 15}
+  2417: {teg_dun01: 15}
+  2418: {teg_dun01: 35}
+  2419: {teg_dun01: 30}
+  2420: {teg_dun01: 20}
+  2421: {teg_dun02: 15}
+  2422: {teg_dun02: 15}
+  2423: {teg_dun02: 15}
+  2424: {teg_dun02: 15}
+  2425: {teg_dun02: 15}
+  2426: {teg_dun02: 15}
+  2427: {teg_dun02: 15}
+  2441: {teg_dun01: 1}
+  2442: {teg_dun02: 1}
+  2477: {gl_cas02_: 140}
+  2478: {c_tower3_: 50, gl_cas02_: 40, c_tower2_: 35}
+  2479: {c_tower3_: 50, gl_cas02_: 40, c_tower2_: 35, gl_chyard_: 25}
+  2480: {gl_cas02_: 25, gl_chyard_: 25}
+  2481: {gl_chyard_: 210}
+  2483: {gl_cas02_: 1}
+  2485: {gl_cas02_: 15}
+  2603: {abbey02: 2}
+  2604: {gl_prison: 2}
+  2605: {gld_dun04: 2}
+  2606: {pay_dun00: 2}
+  2607: {schg_dun01: 2}
+  2608: {prt_fild03: 2}
+  2609: {ayo_fild02: 2}
+  2610: {pay_fild06: 2}
+  2611: {um_fild02: 2}
+  2612: {mosk_dun01: 2}
+  2613: {moc_fild03: 2}
+  2614: {gl_step: 2}
+  2615: {pay_fild01: 2}
+  2616: {um_fild04: 2}
+  2617: {gon_dun03: 2}
+  2618: {gl_sew01: 2}
+  2619: {treasure_n2: 2}
+  2620: {gl_cas02: 2}
+  2621: {gefenia04: 2}
+  2622: {gefenia03: 2}
+  2623: {gefenia02: 2}
+  2624: {ein_fild04: 2}
+  2625: {juperos_01: 2}
+  2626: {mosk_dun03: 2}
+  2627: {ra_san01: 2}
+  2628: {iz_dun01: 2}
+  2629: {ein_fild02: 2}
+  2630: {bra_fild01: 2}
+  2631: {ma_fild01: 2}
+  2632: {prt_sewb4: 2}
+  2633: {prt_sewb3: 2}
+  2634: {prt_sewb2: 2}
+  2635: {beach_dun3: 2}
+  2636: {ein_fild03: 2}
+  2637: {man_fild03: 2}
+  2638: {mjo_dun01: 2}
+  2639: {ayo_dun02: 2}
+  2640: {gl_sew03: 2}
+  2641: {lhz_fild02: 2}
+  2642: {moc_fild13: 2}
+  2643: {ve_fild07: 2}
+  2644: {beach_dun2: 2}
+  2645: {prt_fild02: 2}
+  2646: {treasure_n1: 2}
+  2647: {tur_dun02: 2}
+  2648: {pay_dun02: 2}
+  2649: {pay_dun01: 2}
+  2650: {tha_t09: 2}
+  2651: {pay_dun03: 2}
+  2652: {ice_dun02: 2}
+  2653: {pay_fild02: 2}
+  2654: {ayo_fild01: 2}
+  2655: {yuno_fild06: 2}
+  2656: {yuno_fild02: 2}
+  2657: {odin_tem02: 2}
+  2658: {gld2_pay: 2}
+  2659: {gld_dun01_2: 2}
+  2660: {mjo_dun03: 2}
+  2661: {ice_dun01: 2}
+  2662: {mosk_fild02: 2}
+  2663: {mjolnir_03: 2}
+  2664: {ama_dun03: 2}
+  2665: {tha_t11: 2}
+  2666: {hu_fild06: 2}
+  2667: {lhz_dun03: 2}
+  2668: {cmd_fild04: 2}
+  2669: {iz_dun05: 2}
+  2670: {moc_fild18: 2}
+  2671: {mjolnir_09: 2}
+  2672: {prt_maze01: 2}
+  2673: {mjolnir_07: 2}
+  2674: {moc_fild16: 2}
+  2675: {thor_v03: 2}
+  2676: {treasure01: 2}
+  2677: {ra_fild12: 2}
+  2678: {prt_fild00: 2}
+  2679: {gef_fild01: 2}
+  2680: {prt_fild07: 2}
+  2681: {tha_t01: 2}
+  2682: {c_tower1: 2}
+  2683: {gon_fild01: 2}
+  2684: {tha_t10: 2}
+  2685: {tha_t08: 2}
+  2686: {tha_t07: 2}
+  2687: {in_sphinx2: 2}
+  2688: {lhz_dun01: 2}
+  2689: {mal_dun01: 2}
+  2690: {gl_knt02: 2}
+  2691: {gl_knt01: 2}
+  2692: {lhz_dun02: 2}
+  2693: {dic_dun03: 2}
+  2694: {cmd_fild07: 2}
+  2695: {lhz_fild01: 2}
+  2696: {lhz_fild01: 2}
+  2697: {lhz_fild01: 2}
+  2698: {lhz_fild01: 2}
+  2699: {gef_fild07: 2}
+  2700: {ein_fild09: 2}
+  2701: {prt_maze03: 2}
+  2702: {prt_maze02: 2}
+  2703: {pay_fild04: 2}
+  2704: {ama_dun02: 2}
+  2705: {mjolnir_06: 2}
+  2706: {odin_tem03: 2}
+  2707: {iz_dun00: 2}
+  2708: {ein_dun01: 2}
+  2709: {bra_dun01: 2}
+  2710: {spl_fild01: 2}
+  2711: {spl_fild02: 2}
+  2712: {moc_fild12: 2}
+  2713: {iz_dun03: 2}
+  2714: {gef_fild08: 2}
+  2715: {gef_fild06: 2}
+  2716: {treasure02: 2}
+  2717: {alde_dun03: 2}
+  2718: {moc_fild02: 2}
+  2719: {in_sphinx5: 2}
+  2720: {um_fild03: 2}
+  2721: {tha_t05: 2}
+  2722: {gef_fild10: 2}
+  2723: {orcsdun01: 2}
+  2724: {orcsdun02: 2}
+  2725: {gef_fild03: 2}
+  2726: {tha_t12: 2}
+  2727: {ein_fild05: 2}
+  2728: {hu_fild05: 2}
+  2729: {hu_fild04: 2}
+  2730: {hu_fild02: 2}
+  2731: {hu_fild01: 2}
+  2732: {mag_dun02: 2}
+  2733: {gl_chyard_: 2}
+  2734: {gl_cas02_: 2}
+  2735: {man_fild01: 2}
+  2736: {abbey03: 2}
+  2737: {xmas_dun02: 2}
+  2738: {ve_fild04: 2}
+  2739: {moc_pryd03: 2}
+  2740: {moc_pryd02: 2}
+  2741: {moc_fild01: 2}
+  2742: {moc_fild22: 2}
+  2743: {moc_fild21: 2}
+  2744: {moc_fild20: 2}
+  2745: {ein_fild06: 2}
+  2746: {ama_dun01: 2}
+  2747: {moc_prydn1: 2}
+  2748: {moc_pryd05: 2}
+  2749: {in_sphinx4: 2}
+  2750: {ein_dun02: 2}
+  2751: {bif_fild01: 2}
+  2752: {moc_prydn2: 2}
+  2753: {moc_pryd06: 2}
+  2754: {cmd_fild09: 2}
+  2755: {ein_fild08: 2}
+  2756: {ein_fild07: 2}
+  2757: {iz_dun04: 2}
+  2758: {ecl_fild01: 2}
+  2759: {beach_dun: 2}
+  2760: {mjo_dun02: 2}
+  2761: {gl_in01: 2}
+  2762: {xmas_fild01: 2}
+  2763: {in_sphinx3: 2}
+  2764: {prt_maze03: 2}
+  2765: {gef_fild04: 2}
+  2766: {ma_dun01: 2}
+  2767: {gl_dun02: 2}
+  2768: {prt_fild09: 2}
+  2769: {ve_fild03: 2}
+  2770: {prt_fild08: 3}
+  2771: {prt_fild01: 2}
+  2772: {niflheim: 2}
+  2773: {spl_fild03: 2}
+  2774: {nif_fild02: 2}
+  2775: {gon_dun02: 2}
+  2776: {new_1-3: 2}
+  2777: {bif_fild02: 2}
+  2778: {lou_dun01: 2}
+  2779: {mosk_dun02: 4}
+  2780: {gld_dun01: 2}
+  2781: {ayo_dun01: 2}
+  2782: {teg_dun02: 2}
+  2783: {teg_dun01: 2}
+  2784: {ra_fild06: 3}
+  2785: {ra_fild05: 3}
+  2786: {thor_v02: 3}
+  2787: {mjolnir_08: 2}
+  2788: {thor_v01: 2}
+  2789: {ama_fild01: 2}
+  2790: {moc_pryd04: 2}
+  2791: {ra_san02: 2}
+  2792: {gl_prison1: 2}
+  2793: {lou_fild01: 2}
+  2794: {ice_dun03: 2}
+  2795: {bra_dun02: 2}
+  2796: {lou_dun02: 2}
+  2797: {gef_dun00: 2}
+  2798: {prt_fild05: 2}
+  2799: {dic_dun01: 2}
+  2800: {pay_fild09: 2}
+  2801: {ra_san03: 2}
+  2802: {moc_fild17: 2}
+  2803: {ra_fild04: 2}
+  2804: {ra_fild03: 2}
+  2805: {alde_dun02: 2}
+  2806: {yuno_fild04: 2}
+  2807: {yuno_fild03: 2}
+  2808: {cmd_fild01: 2}
+  2809: {pay_fild10: 2}
+  2810: {yuno_fild09: 2}
+  2811: {yuno_fild08: 2}
+  2812: {cmd_fild06: 2}
+  2813: {prt_fild11: 2}
+  2814: {gef_fild11: 2}
+  2815: {yuno_fild11: 2}
+  2816: {yuno_fild07: 2}
+  2817: {gld2_prt: 2}
+  2818: {gld_dun03_2: 2}
+  2819: {gld2_gef: 2}
+  2820: {gld_dun04_2: 2}
+  2821: {gld_dun02: 2}
+  2822: {nameless_n: 2}
+  2823: {gef_dun01: 2}
+  2824: {yuno_fild12: 2}
+  2825: {yuno_fild01: 2}
+  2826: {glast_01: 2}
+  2827: {gl_sew02: 2}
+  2828: {ve_fild01: 2}
+  2829: {cmd_fild02: 2}
+  2830: {tur_dun05: 2}
+  2831: {tur_dun03: 2}
+  2832: {abyss_01: 2}
+  2833: {prt_sewb1: 2}
+  2834: {gefenia01: 2}
+  2835: {prt_fild06: 2}
+  2836: {pay_fild03: 2}
+  2837: {mag_dun01: 2}
+  2838: {gl_church: 2}
+  2839: {prt_fild10: 2}
+  2840: {mjolnir_02: 2}
+  2841: {ra_san04: 2}
+  2842: {mjolnir_12: 2}
+  2843: {um_fild01: 2}
+  2844: {ve_fild02: 2}
+  2845: {moc_fild07: 2}
+  2846: {mjolnir_04: 2}
+  2847: {in_sphinx1: 2}
+  2848: {tur_dun01: 2}
+  2849: {nyd_dun01: 2}
+  2850: {dic_fild02: 2}
+  2851: {pay_dun04: 2}
+  2852: {nif_fild01: 2}
+  2853: {jupe_core: 2}
+  2854: {gef_dun02: 2}
+  2855: {ra_fild01: 2}
+  2856: {moc_fild11: 2}
+  2857: {cmd_fild08: 2}
+  2858: {tha_t06: 2}
+  2859: {tha_t04: 2}
+  2860: {tha_t03: 2}
+  2861: {gl_chyard: 2}
+  2862: {lou_dun03: 2}
+  2863: {gef_fild05: 2}
+  2864: {iz_dun02: 2}
+  2865: {xmas_dun01: 2}
+  2866: {kh_kiehl01: 2}
+  2867: {dew_dun01: 2}
+  2868: {gef_fild09: 2}
+  2869: {gef_fild02: 2}
+  2870: {c_tower4: 2}
+  2871: {c_tower2: 2}
+  2872: {gef_fild00: 2}
+  2873: {dic_fild01: 2}
+  2874: {ecl_tdun01: 2}
+  2875: {lhz_dun04: 2}
+  2876: {gld_dun03: 2}
+  2877: {gl_cas01: 2}
+  2878: {mjolnir_01: 2}
+  2879: {ma_fild02: 2}
+  2880: {odin_tem01: 2}
+  2881: {lhz_fild03: 2}
+  2882: {man_fild02: 2}
+  2883: {gon_dun01: 2}
+  2884: {pay_fild07: 2}
+  2885: {alde_dun04: 2}
+  2886: {arug_dun01: 2}
+  2887: {abbey01: 2}
+  2888: {dew_dun02: 2}
+  2889: {tur_dun04: 2}
+  2890: {mjolnir_10: 2}
+  2891: {mjolnir_11: 2}
+  2892: {mjolnir_05: 2}
+  2893: {gl_dun01: 2}
+  2894: {alde_dun01: 2}
+  2895: {juperos_02: 2}
+  2896: {dic_dun02: 2}
+  2897: {ecl_tdun03: 2}
+  2898: {ecl_tdun02: 2}
+  2899: {gl_sew04: 2}
+  2900: {gld2_ald: 2}
+  2901: {gld_dun02_2: 2}
+  2902: {anthell02: 2}
+  2903: {tha_t02: 2}
+  2904: {ra_fild08: 2}
+  2905: {prt_fild04: 2}
+  2906: {dew_fild01: 2}
+  2907: {cmd_fild03: 2}
+  2908: {kh_dun01: 2}
+  2909: {kh_dun02: 2}
+  2910: {c_tower3: 2}
+  2911: {ra_san05: 2}
+  2912: {abyss_03: 2}
+  2913: {abyss_02: 2}
+  2916: {c_tower2_: 80}
+  2917: {c_tower3_: 150}
+  2918: {c_tower3_: 20, c_tower2_: 8}
+  2919: {c_tower2_: 80}
+  2920: {c_tower2_: 8}
+  2921: {c_tower3_: 30}
+  2923: {c_tower3_: 30}
+  3020: {moro_vol: 30}
+  3021: {moro_vol: 30}
+  3022: {moro_vol: 30}
+  3023: {moro_vol: 30}
+  3026: {moro_vol: 10}
+  3027: {moro_vol: 10}
+  3028: {moro_vol: 30}
+  3074: {c_tower3_: 1}
+  3153: {ver_eju: 10}
+  3154: {ver_eju: 50, ver_tunn: 5}
+  3155: {verus03: 50}
+  3156: {verus03: 50}
+  3158: {verus03: 10}
+  3159: {verus03: 40}
+  3208: {lhz_dun_n: 50}
+  3209: {lhz_dun_n: 50}
+  3210: {lhz_dun_n: 50}
+  3211: {lhz_dun_n: 50}
+  3212: {lhz_dun_n: 50}
+  3213: {lhz_dun_n: 50}
+  3226: {lhz_dun_n: 50}
+  3227: {lhz_dun_n: 50}
+  3228: {lhz_dun_n: 50}
+  3229: {lhz_dun_n: 50}
+  3230: {lhz_dun_n: 50}
+  3231: {lhz_dun_n: 50}
+  3232: {lhz_dun_n: 50}
+  3247: {verus01: 50}
+  3248: {verus02: 50, verus01: 25}
+  3249: {verus02: 50, verus01: 25}
+  3250: {un_bunker: 28}
+  3251: {un_bunker: 10}
+  3252: {un_bunker: 14}
+  3255: {un_bunker: 68}
+  3256: {un_bunker: 80}
+  3442: {prt_prison: 20}
+  3443: {prt_prison: 50}
+  3444: {prt_prison: 30}
+  3451: {prt_q: 30}
+  3452: {prt_q: 60}
+  3455: {prt_cas: 15}
+  3490: {prt_q: 1}
+  3495: {lasa_fild01: 80}
+  3496: {lasa_fild01: 80}
+  3497: {lasa_fild01: 80}
+  3498: {lasa_fild02: 40}
+  3499: {lasa_fild02: 40}
+  3500: {lasa_fild02: 40}
+  3501: {lasa_dun01: 40}
+  3502: {lasa_dun01: 40, lasa_dun_q: 40, lasa_fild02: 5}
+  3503: {lasa_dun02: 40}
+  3504: {lasa_dun03: 80}
+  3505: {lasa_dun01: 1}
+  3506: {lasa_dun02: 40}
+  3507: {lasa_dun03: 80}
+  3631: {slabw01: 45}
+  3632: {slabw01: 45}
+  3633: {slabw01: 1}
+  3736: {rockrdg1: 46}
+  3737: {rockrdg1: 29, rockrdg2: 17}
+  3738: {rockrdg2: 52}
+  3739: {rockrdg1: 51, rockrdg2: 8}
+  3740: {rockmi1: 18}
+  3741: {rockmi1: 1}
+  3742: {rockmi2: 31}
+  3743: {harboro2: 20}
+  3747: {rockmi1: 3}
+  3748: {rockmi1: 8}
+  3749: {rockmi1: 6}
+  3787: {harboro2: 29}
+  3788: {harboro2: 29}
+  20372: {mag_dun03: 25}
+  20373: {mag_dun03: 35}
+  20374: {mag_dun03: 40}
+  20375: {mag_dun03: 40}
+  20376: {mag_dun03: 25}
+  20377: {mag_dun03: 25}
+  20378: {mag_dun03: 25}
+  20419: {mag_dun03: 1}
+  20630: {ba_maison: 65, ba_lib: 25, ba_pw01: 25}
+  20633: {ba_bath: 50}
+  20634: {ba_bath: 50}
+  20637: {ba_2whs02: 110}
+  20639: {ba_2whs02: 110, ba_2whs01: 45}
+  20640: {ba_maison: 20}
+  20641: {ba_2whs01: 120, ba_2whs02: 50}
+  20643: {ba_bath: 100}
+  20644: {ba_bath: 75}
+  20645: {ba_bath: 75}
+  20646: {ba_bath: 100}
+  20648: {ba_lost: 1}
+  20649: {ba_lost: 70}
+  20650: {ba_lost: 70}
+  20651: {ba_lost: 70}
+  20652: {ba_lost: 70}
+  20653: {ba_lost: 50}
+  20679: {ba_maison: 35}
+  20680: {ba_lib: 45, ba_pw02: 35, ba_pw01: 25}
+  20682: {ba_2whs01: 95}
+  20683: {ba_lib: 100, ba_maison: 25}
+  20684: {ba_lib: 90, ba_maison: 20}
+  20685: {ba_pw02: 90}
+  20686: {ba_pw02: 110}
+  20687: {ba_pw02: 85}
+  20688: {ba_pw01: 110, ba_pw02: 85}
+  20689: {ba_pw01: 100}
+  20690: {ba_pw01: 75}
+  20691: {ba_pw03: 110}
+  20692: {ba_pw03: 110}
+  20693: {ba_pw03: 95}
+  20694: {ba_pw03: 95}
+  20920: {amicitia2: 90}
+  20921: {amicitia2: 90}
+  20922: {amicitia2: 90}
+  20923: {amicitia2: 90}
+  20924: {amicitia1: 80}
+  20925: {amicitia1: 80}
+  20926: {amicitia1: 80}
+  20927: {amicitia1: 80}
+  20928: {amicitia2: 1}
+monsters:
+  1001: [4, 3, 1, 0, 0, 33566869]
+  1002: [3, 1, 1, 1, 0, 131]
+  1004: [4, 4, 1, 0, 0, 33558665]
+  1005: [2, 7, 1, 0, 0, 14469]
+  1007: [4, 2, 1, 0, 0, 33554561]
+  1008: [4, 2, 1, 0, 0, 33554432]
+  1009: [2, 4, 1, 1, 0, 4233]
+  1010: [3, 2, 1, 1, 0, 129]
+  1011: [4, 4, 1, 0, 0, 33554561]
+  1012: [5, 1, 1, 1, 0, 129]
+  1013: [2, 2, 1, 1, 0, 4233]
+  1014: [3, 1, 1, 1, 0, 129]
+  1015: [1, 9, 1, 1, 0, 14469]
+  1016: [1, 9, 1, 1, 0, 8325]
+  1018: [4, 4, 1, 0, 0, 33554561]
+  1019: [2, 3, 1, 2, 0, 4233]
+  1020: [3, 2, 3, 1, 0, 132]
+  1022: [0, 0, 4, 1, 1, 102774421]
+  1023: [7, 2, 1, 1, 0, 14469]
+  1024: [3, 2, 1, 1, 0, 145]
+  1025: [2, 2, 1, 1, 0, 129]
+  1026: [1, 9, 1, 1, 0, 14469]
+  1028: [1, 9, 1, 1, 0, 14469]
+  1029: [6, 7, 1, 2, 0, 33566869]
+  1030: [2, 5, 1, 1, 0, 145]
+  1031: [3, 5, 1, 1, 0, 131]
+  1032: [1, 9, 1, 1, 0, 131]
+  1033: [3, 3, 2, 1, 0, 12437]
+  1034: [5, 1, 2, 1, 0, 129]
+  1035: [4, 4, 2, 0, 0, 33568901]
+  1036: [1, 9, 2, 1, 0, 14469]
+  1037: [2, 5, 1, 1, 0, 12437]
+  1038: [1, 9, 4, 1, 2, 103298709]
+  1039: [6, 7, 3, 2, 2, 103298709]
+  1040: [0, 0, 3, 2, 0, 145]
+  1041: [1, 9, 2, 1, 0, 14469]
+  1042: [4, 4, 1, 0, 0, 33558667]
+  1044: [5, 1, 2, 1, 0, 12437]
+  1045: [5, 1, 2, 1, 0, 14469]
+  1046: [6, 7, 3, 1, 2, 103298709]
+  1047: [0, 0, 3, 0, 0, 0]
+  1048: [4, 7, 1, 0, 0, 33554432]
+  1049: [2, 3, 1, 0, 0, 129]
+  1050: [2, 3, 1, 0, 0, 129]
+  1051: [4, 0, 3, 0, 0, 33558667]
+  1052: [4, 2, 1, 1, 0, 33554561]
+  1053: [4, 7, 1, 1, 0, 33558667]
+  1054: [4, 7, 1, 1, 0, 33566861]
+  1055: [3, 2, 1, 2, 0, 129]
+  1056: [2, 2, 1, 0, 0, 145]
+  1057: [2, 2, 1, 0, 0, 4235]
+  1058: [4, 3, 1, 1, 0, 33558667]
+  1059: [4, 4, 4, 0, 2, 103298709]
+  1060: [2, 2, 1, 2, 0, 145]
+  1061: [6, 8, 3, 2, 0, 33567381]
+  1062: [3, 6, 1, 1, 0, 129]
+  1063: [2, 0, 3, 0, 0, 129]
+  1064: [1, 9, 1, 1, 0, 129]
+  1065: [5, 1, 3, 2, 0, 14469]
+  1066: [5, 1, 1, 0, 0, 145]
+  1067: [5, 1, 1, 0, 0, 145]
+  1068: [3, 1, 2, 0, 0, 132]
+  1069: [5, 1, 2, 2, 0, 14469]
+  1070: [5, 1, 1, 0, 0, 131]
+  1071: [1, 9, 1, 1, 0, 14469]
+  1072: [6, 3, 4, 1, 0, 33568901]
+  1073: [5, 1, 1, 0, 0, 129]
+  1074: [5, 1, 1, 0, 0, 145]
+  1076: [1, 9, 1, 1, 0, 145]
+  1077: [3, 5, 1, 1, 0, 14469]
+  1078: [3, 2, 1, 0, 0, 1507328]
+  1079: [3, 2, 1, 0, 0, 1507328]
+  1080: [3, 2, 1, 0, 0, 1507328]
+  1081: [3, 2, 1, 0, 0, 1507328]
+  1082: [3, 2, 1, 0, 0, 1507328]
+  1083: [3, 6, 1, 0, 0, 1507328]
+  1084: [3, 2, 1, 0, 0, 1507328]
+  1085: [3, 2, 1, 0, 0, 1507328]
+  1086: [4, 3, 2, 2, 2, 103288971]
+  1087: [7, 2, 2, 2, 2, 103298709]
+  1088: [4, 2, 1, 1, 0, 33568405]
+  1089: [5, 1, 1, 1, 1, 102774421]
+  1090: [3, 1, 1, 1, 1, 102774421]
+  1091: [4, 4, 1, 0, 1, 102774421]
+  1092: [2, 2, 1, 1, 1, 102774421]
+  1093: [2, 0, 3, 1, 1, 102774421]
+  1094: [4, 1, 1, 2, 0, 33554577]
+  1095: [4, 2, 1, 0, 0, 33558667]
+  1096: [8, 6, 4, 1, 1, 102774421]
+  1097: [0, 0, 3, 0, 0, 0]
+  1098: [7, 9, 2, 2, 0, 13973]
+  1099: [4, 5, 1, 2, 0, 33568405]
+  1100: [4, 5, 1, 2, 0, 33566869]
+  1101: [6, 7, 1, 0, 0, 33568405]
+  1102: [7, 7, 1, 1, 0, 13973]
+  1103: [2, 2, 1, 0, 0, 145]
+  1104: [2, 2, 1, 0, 0, 145]
+  1105: [4, 2, 1, 0, 0, 33558667]
+  1106: [2, 3, 1, 1, 0, 12429]
+  1107: [2, 3, 1, 0, 0, 4233]
+  1108: [5, 1, 4, 1, 0, 145]
+  1109: [6, 7, 1, 0, 0, 33568405]
+  1110: [6, 7, 1, 0, 0, 33554577]
+  1111: [2, 7, 2, 0, 0, 12437]
+  1112: [1, 9, 1, 1, 2, 103298709]
+  1113: [3, 3, 1, 1, 0, 131]
+  1114: [4, 4, 2, 0, 0, 33554577]
+  1115: [2, 3, 1, 2, 2, 103298709]
+  1116: [0, 8, 2, 1, 0, 145]
+  1117: [1, 9, 4, 2, 0, 13973]
+  1118: [3, 2, 1, 2, 0, 132]
+  1119: [2, 3, 1, 1, 0, 14469]
+  1120: [6, 8, 4, 1, 1, 102774421]
+  1121: [6, 2, 1, 0, 0, 33554577]
+  1122: [7, 4, 1, 1, 0, 13973]
+  1123: [7, 3, 1, 1, 0, 12437]
+  1124: [7, 5, 1, 1, 0, 12429]
+  1125: [7, 2, 1, 1, 0, 12429]
+  1126: [7, 1, 1, 1, 0, 12429]
+  1127: [2, 2, 2, 1, 0, 129]
+  1128: [4, 2, 1, 1, 0, 33554577]
+  1129: [0, 3, 4, 0, 0, 12429]
+  1130: [0, 3, 2, 1, 0, 13973]
+  1131: [7, 4, 4, 2, 0, 13973]
+  1132: [1, 9, 1, 2, 0, 13973]
+  1133: [7, 4, 2, 1, 0, 12429]
+  1134: [7, 5, 2, 1, 0, 12429]
+  1135: [7, 3, 2, 1, 0, 12429]
+  1136: [7, 5, 2, 1, 0, 12429]
+  1137: [7, 3, 2, 1, 0, 12429]
+  1138: [6, 1, 1, 0, 0, 33554563]
+  1139: [4, 2, 1, 1, 0, 33566869]
+  1140: [7, 3, 1, 2, 0, 12437]
+  1141: [3, 1, 2, 0, 0, 129]
+  1142: [3, 1, 2, 0, 0, 0]
+  1143: [6, 8, 3, 0, 0, 33566869]
+  1144: [5, 1, 2, 0, 0, 145]
+  1145: [2, 2, 2, 0, 0, 129]
+  1146: [2, 7, 1, 1, 0, 12437]
+  1147: [4, 2, 4, 2, 2, 103298709]
+  1148: [6, 0, 2, 1, 0, 33568405]
+  1149: [2, 3, 2, 2, 0, 12437]
+  1150: [6, 3, 3, 1, 2, 103298709]
+  1151: [0, 5, 1, 2, 0, 13973]
+  1152: [1, 9, 1, 1, 0, 14469]
+  1153: [1, 9, 1, 1, 0, 14469]
+  1154: [7, 3, 2, 1, 0, 12437]
+  1155: [9, 2, 1, 1, 0, 12437]
+  1156: [9, 4, 1, 1, 0, 12437]
+  1157: [7, 7, 3, 2, 2, 103298709]
+  1158: [5, 1, 2, 1, 0, 145]
+  1159: [2, 0, 3, 2, 2, 103298709]
+  1160: [4, 2, 1, 0, 0, 33558667]
+  1161: [3, 1, 3, 0, 0, 129]
+  1162: [3, 2, 1, 0, 0, 14469]
+  1163: [7, 7, 2, 2, 0, 12437]
+  1164: [7, 7, 1, 1, 0, 14469]
+  1165: [0, 2, 3, 1, 0, 14469]
+  1166: [2, 2, 2, 2, 0, 145]
+  1167: [2, 2, 1, 0, 0, 129]
+  1169: [1, 9, 1, 1, 0, 14469]
+  1170: [6, 1, 1, 1, 0, 33554577]
+  1174: [4, 4, 1, 0, 0, 33554577]
+  1175: [2, 7, 1, 0, 0, 145]
+  1176: [4, 2, 1, 0, 0, 33554577]
+  1177: [7, 7, 1, 1, 0, 131]
+  1178: [7, 3, 1, 1, 0, 14469]
+  1179: [6, 8, 3, 0, 0, 33566869]
+  1180: [2, 3, 3, 1, 0, 13973]
+  1182: [3, 2, 1, 0, 0, 1507328]
+  1183: [4, 4, 1, 0, 0, 33568901]
+  1184: [4, 2, 1, 0, 0, 33568901]
+  1185: [1, 8, 1, 0, 0, 0]
+  1186: [6, 8, 2, 0, 0, 33568405]
+  1187: [0, 0, 1, 1, 0, 0]
+  1188: [1, 9, 1, 1, 0, 12437]
+  1189: [7, 2, 1, 1, 0, 12437]
+  1190: [7, 2, 4, 2, 2, 103298709]
+  1191: [0, 0, 3, 1, 0, 12437]
+  1192: [1, 9, 4, 2, 0, 13973]
+  1193: [0, 0, 3, 1, 0, 13973]
+  1194: [4, 2, 2, 1, 0, 33566869]
+  1195: [0, 0, 3, 0, 0, 13973]
+  1196: [1, 9, 3, 1, 0, 12429]
+  1197: [1, 9, 3, 1, 0, 12429]
+  1198: [6, 9, 4, 1, 1, 102772877]
+  1199: [3, 4, 1, 0, 0, 12437]
+  1200: [7, 0, 3, 1, 0, 12429]
+  1201: [6, 0, 2, 2, 0, 33566861]
+  1202: [7, 0, 2, 2, 0, 12429]
+  1203: [0, 7, 4, 2, 1, 102774421]
+  1204: [0, 7, 3, 1, 1, 102774421]
+  1205: [0, 7, 2, 2, 1, 102774421]
+  1206: [5, 1, 2, 1, 0, 13973]
+  1207: [0, 2, 3, 1, 0, 13973]
+  1208: [6, 4, 1, 1, 0, 33568405]
+  1209: [2, 5, 2, 0, 0, 12437]
+  1211: [4, 3, 1, 0, 0, 33566869]
+  1212: [4, 0, 3, 1, 0, 33566869]
+  1213: [7, 3, 2, 2, 0, 13973]
+  1214: [2, 3, 1, 0, 0, 12437]
+  1215: [3, 4, 1, 1, 0, 12437]
+  1216: [5, 5, 1, 1, 0, 13973]
+  1219: [7, 7, 4, 2, 0, 13973]
+  1220: [2, 3, 1, 1, 0, 13973]
+  1221: [2, 2, 2, 2, 0, 13973]
+  1229: [4, 2, 1, 0, 0, 33554561]
+  1230: [4, 2, 1, 0, 0, 33554432]
+  1231: [4, 4, 1, 0, 0, 33554561]
+  1232: [0, 0, 3, 0, 0, 0]
+  1234: [2, 2, 1, 0, 0, 4235]
+  1235: [7, 2, 1, 1, 0, 12429]
+  1236: [0, 0, 3, 0, 0, 0]
+  1237: [4, 2, 1, 0, 0, 33558667]
+  1238: [4, 2, 1, 0, 0, 33558667]
+  1239: [4, 2, 1, 0, 0, 33558667]
+  1240: [2, 3, 1, 0, 0, 129]
+  1241: [2, 3, 1, 0, 0, 129]
+  1242: [3, 1, 2, 1, 0, 129]
+  1243: [2, 0, 3, 2, 0, 13973]
+  1244: [0, 3, 2, 1, 0, 129]
+  1245: [7, 4, 1, 1, 0, 129]
+  1246: [7, 6, 2, 0, 0, 145]
+  1247: [3, 6, 3, 1, 0, 1507457]
+  1248: [0, 0, 3, 1, 0, 8325]
+  1249: [0, 0, 3, 1, 0, 145]
+  1250: [7, 3, 1, 1, 0, 13973]
+  1251: [0, 4, 4, 2, 2, 103298709]
+  1252: [2, 1, 4, 2, 2, 103298709]
+  1253: [6, 4, 3, 1, 0, 33562757]
+  1254: [2, 4, 1, 0, 0, 13973]
+  1255: [2, 2, 1, 0, 0, 13973]
+  1256: [2, 7, 2, 0, 0, 13973]
+  1257: [1, 7, 2, 1, 0, 13973]
+  1258: [7, 5, 1, 0, 0, 8325]
+  1259: [2, 4, 4, 2, 1, 102774421]
+  1260: [6, 7, 3, 1, 0, 33568405]
+  1261: [2, 4, 1, 0, 0, 131]
+  1262: [9, 3, 2, 2, 1, 102774421]
+  1263: [6, 4, 3, 1, 0, 33568405]
+  1264: [7, 1, 3, 1, 0, 13973]
+  1265: [7, 0, 3, 0, 0, 4233]
+  1266: [5, 2, 1, 0, 0, 145]
+  1267: [6, 4, 2, 1, 0, 33568405]
+  1268: [0, 7, 4, 2, 0, 13973]
+  1269: [0, 2, 2, 1, 0, 145]
+  1270: [0, 0, 4, 2, 0, 145]
+  1271: [2, 1, 1, 1, 0, 145]
+  1272: [6, 9, 4, 2, 2, 103298709]
+  1273: [7, 2, 2, 1, 0, 13973]
+  1274: [0, 0, 4, 2, 0, 132]
+  1275: [7, 0, 3, 1, 0, 145]
+  1276: [6, 7, 2, 1, 0, 33562757]
+  1277: [0, 3, 2, 1, 0, 132]
+  1278: [0, 0, 4, 2, 0, 145]
+  1279: [4, 2, 1, 0, 0, 33568405]
+  1280: [7, 4, 2, 1, 0, 145]
+  1281: [2, 0, 3, 0, 0, 145]
+  1282: [7, 3, 1, 0, 0, 8325]
+  1283: [2, 3, 3, 2, 1, 102774421]
+  1285: [7, 0, 4, 2, 1, 102768261]
+  1286: [7, 0, 4, 2, 1, 102768261]
+  1287: [4, 2, 1, 0, 1, 102768773]
+  1288: [4, 6, 1, 0, 2, 71237632]
+  1289: [4, 2, 4, 2, 1, 102774421]
+  1290: [1, 9, 1, 1, 0, 13973]
+  1291: [1, 9, 4, 2, 0, 13973]
+  1292: [6, 7, 1, 0, 0, 33568405]
+  1293: [4, 4, 1, 0, 0, 33568405]
+  1294: [4, 2, 1, 1, 0, 33568405]
+  1295: [6, 0, 3, 2, 1, 102774421]
+  1296: [7, 4, 2, 1, 0, 13973]
+  1297: [1, 9, 2, 1, 0, 13973]
+  1298: [1, 9, 1, 1, 0, 13973]
+  1299: [7, 4, 1, 1, 0, 13973]
+  1300: [4, 2, 1, 0, 0, 33568405]
+  1301: [6, 7, 1, 0, 0, 33568405]
+  1302: [6, 9, 4, 2, 1, 102774421]
+  1303: [4, 4, 1, 0, 0, 33568405]
+  1304: [4, 5, 1, 2, 0, 33568405]
+  1305: [4, 5, 1, 2, 0, 33568405]
+  1306: [2, 2, 1, 2, 0, 13973]
+  1307: [6, 3, 3, 1, 1, 102774421]
+  1308: [7, 4, 2, 1, 0, 13973]
+  1309: [0, 3, 4, 0, 0, 13973]
+  1310: [2, 3, 2, 2, 0, 13973]
+  1311: [2, 2, 2, 2, 0, 13973]
+  1312: [2, 2, 2, 2, 2, 103298709]
+  1313: [7, 0, 1, 1, 0, 13973]
+  1314: [2, 0, 2, 1, 0, 145]
+  1315: [7, 4, 2, 1, 0, 13973]
+  1316: [2, 2, 2, 1, 0, 145]
+  1317: [2, 1, 1, 1, 0, 14469]
+  1318: [2, 3, 2, 1, 0, 13973]
+  1319: [2, 1, 2, 1, 0, 13973]
+  1320: [6, 0, 3, 2, 1, 102774421]
+  1321: [4, 4, 2, 1, 0, 33568405]
+  1322: [2, 2, 2, 1, 0, 131]
+  1323: [2, 1, 3, 1, 0, 14469]
+  1324: [0, 0, 1, 0, 1, 102760448]
+  1325: [0, 0, 1, 0, 1, 102760448]
+  1326: [0, 0, 1, 0, 1, 102760448]
+  1327: [0, 0, 1, 0, 1, 102760448]
+  1328: [0, 0, 1, 0, 1, 102760448]
+  1329: [0, 0, 1, 0, 1, 102760448]
+  1330: [0, 0, 1, 0, 1, 102760448]
+  1331: [0, 0, 1, 0, 1, 102760448]
+  1332: [0, 0, 1, 0, 1, 102760448]
+  1333: [0, 0, 1, 0, 1, 102760448]
+  1334: [0, 0, 1, 0, 1, 102760448]
+  1335: [0, 0, 1, 0, 1, 102760448]
+  1336: [0, 0, 1, 0, 1, 102760448]
+  1337: [0, 0, 1, 0, 1, 102760448]
+  1338: [0, 0, 1, 0, 1, 102760448]
+  1339: [0, 0, 1, 0, 1, 102760448]
+  1340: [0, 0, 1, 0, 1, 102760448]
+  1341: [0, 0, 1, 0, 1, 102760448]
+  1342: [0, 0, 1, 0, 1, 102760448]
+  1343: [0, 0, 1, 0, 1, 102760448]
+  1344: [0, 0, 1, 0, 1, 102760448]
+  1345: [0, 0, 1, 0, 1, 102760448]
+  1346: [0, 0, 1, 0, 1, 102760448]
+  1347: [0, 0, 1, 0, 1, 102760448]
+  1348: [0, 0, 1, 0, 1, 102760448]
+  1349: [0, 0, 1, 0, 1, 102760448]
+  1350: [0, 0, 1, 0, 1, 102760448]
+  1351: [0, 0, 1, 0, 1, 102760448]
+  1352: [0, 0, 1, 0, 1, 102760448]
+  1353: [0, 0, 1, 0, 1, 102760448]
+  1354: [0, 0, 1, 0, 1, 102760448]
+  1355: [0, 0, 1, 0, 1, 102760448]
+  1356: [0, 0, 1, 0, 1, 102760448]
+  1357: [0, 0, 1, 0, 1, 102760448]
+  1358: [0, 0, 1, 0, 1, 102760448]
+  1359: [0, 0, 1, 0, 1, 102760448]
+  1360: [0, 0, 1, 0, 1, 102760448]
+  1361: [0, 0, 1, 0, 1, 102760448]
+  1362: [0, 0, 1, 0, 1, 102760448]
+  1363: [0, 0, 1, 0, 1, 102760448]
+  1364: [6, 4, 2, 1, 0, 33568405]
+  1365: [0, 0, 3, 2, 0, 145]
+  1366: [0, 3, 4, 2, 0, 12437]
+  1367: [6, 3, 2, 1, 0, 33567381]
+  1368: [3, 2, 3, 1, 0, 132]
+  1369: [2, 3, 2, 2, 0, 4233]
+  1370: [6, 7, 3, 1, 0, 33568405]
+  1371: [8, 6, 3, 0, 0, 14469]
+  1372: [2, 3, 3, 1, 0, 4233]
+  1373: [6, 7, 3, 2, 2, 103298709]
+  1374: [6, 7, 3, 1, 0, 33568405]
+  1375: [0, 0, 3, 1, 0, 14469]
+  1376: [6, 4, 3, 1, 0, 33568901]
+  1377: [7, 0, 4, 2, 0, 14469]
+  1378: [6, 5, 3, 0, 0, 33568901]
+  1379: [6, 7, 3, 2, 0, 33568901]
+  1380: [2, 2, 1, 1, 0, 14469]
+  1381: [2, 3, 3, 2, 0, 14469]
+  1382: [6, 7, 2, 0, 0, 33568901]
+  1383: [2, 3, 3, 0, 0, 14469]
+  1384: [9, 3, 2, 1, 0, 12429]
+  1385: [9, 3, 2, 1, 0, 12429]
+  1386: [0, 2, 2, 1, 0, 14469]
+  1387: [2, 3, 2, 0, 0, 14469]
+  1388: [8, 6, 3, 1, 1, 102774421]
+  1389: [6, 7, 4, 2, 2, 103298709]
+  1390: [7, 0, 2, 1, 0, 8325]
+  1391: [2, 2, 1, 0, 0, 4235]
+  1392: [0, 4, 2, 2, 0, 8325]
+  1393: [1, 9, 2, 1, 0, 14469]
+  1394: [1, 9, 1, 1, 0, 14469]
+  1395: [0, 0, 1, 0, 1, 104267777]
+  1396: [0, 0, 1, 0, 1, 104267777]
+  1397: [0, 0, 1, 0, 1, 104267777]
+  1398: [0, 0, 1, 0, 1, 104267777]
+  1399: [6, 7, 3, 2, 2, 103298709]
+  1400: [0, 0, 3, 1, 0, 129]
+  1401: [7, 7, 3, 1, 0, 13973]
+  1402: [2, 5, 2, 1, 0, 129]
+  1403: [1, 9, 2, 1, 0, 8325]
+  1404: [6, 7, 1, 1, 0, 33554577]
+  1405: [6, 2, 2, 2, 0, 33568901]
+  1406: [5, 1, 1, 1, 0, 14469]
+  1408: [4, 4, 2, 1, 0, 33566861]
+  1409: [7, 0, 1, 0, 0, 145]
+  1410: [3, 2, 2, 1, 0, 8325]
+  1412: [0, 0, 2, 2, 0, 8325]
+  1413: [3, 3, 2, 0, 0, 145]
+  1415: [2, 8, 1, 0, 0, 14469]
+  1416: [6, 7, 3, 1, 0, 33568405]
+  1417: [2, 7, 1, 1, 0, 145]
+  1418: [2, 8, 3, 2, 2, 103298709]
+  1419: [2, 7, 1, 0, 0, 14469]
+  1420: [1, 9, 1, 1, 0, 14469]
+  1421: [6, 7, 1, 2, 0, 33568901]
+  1422: [4, 4, 2, 0, 0, 33568901]
+  1423: [1, 9, 2, 1, 0, 14469]
+  1424: [2, 5, 1, 1, 0, 14469]
+  1425: [5, 1, 2, 1, 0, 14469]
+  1426: [5, 1, 2, 1, 0, 14469]
+  1427: [6, 8, 3, 2, 0, 33568901]
+  1428: [3, 5, 1, 1, 0, 14469]
+  1429: [4, 5, 1, 2, 0, 33568901]
+  1430: [4, 5, 1, 2, 0, 33568901]
+  1431: [6, 7, 1, 0, 0, 33568901]
+  1432: [2, 3, 1, 1, 0, 14469]
+  1433: [6, 7, 1, 0, 0, 33568901]
+  1434: [2, 7, 2, 0, 0, 14469]
+  1435: [1, 9, 4, 2, 0, 14469]
+  1436: [0, 3, 2, 1, 0, 14469]
+  1437: [7, 4, 4, 2, 0, 14469]
+  1438: [1, 9, 1, 2, 0, 14469]
+  1439: [7, 3, 2, 2, 0, 14469]
+  1440: [3, 4, 1, 1, 0, 14469]
+  1441: [5, 5, 1, 1, 0, 14469]
+  1442: [2, 0, 3, 2, 0, 14469]
+  1443: [0, 0, 3, 1, 0, 14469]
+  1444: [7, 3, 1, 1, 0, 14469]
+  1445: [2, 4, 1, 0, 0, 14469]
+  1446: [1, 7, 2, 1, 0, 14469]
+  1447: [2, 4, 4, 2, 1, 102774917]
+  1448: [6, 7, 3, 1, 0, 33568901]
+  1449: [9, 3, 2, 2, 1, 102774917]
+  1450: [6, 4, 3, 1, 0, 33568901]
+  1451: [7, 1, 2, 1, 0, 14469]
+  1452: [7, 2, 2, 1, 0, 14469]
+  1453: [6, 7, 2, 1, 0, 33568901]
+  1454: [4, 2, 1, 0, 0, 33568901]
+  1455: [7, 3, 1, 0, 0, 14469]
+  1456: [2, 3, 3, 2, 1, 102774917]
+  1457: [4, 2, 1, 1, 0, 33568901]
+  1458: [7, 3, 1, 2, 0, 14469]
+  1459: [6, 8, 3, 0, 0, 33568901]
+  1460: [2, 7, 1, 1, 0, 14469]
+  1461: [2, 3, 2, 2, 0, 14469]
+  1462: [1, 9, 1, 1, 0, 14469]
+  1463: [1, 9, 1, 1, 0, 14469]
+  1464: [7, 3, 2, 1, 0, 14469]
+  1465: [9, 2, 1, 1, 0, 14469]
+  1466: [9, 4, 1, 1, 0, 14469]
+  1467: [7, 7, 2, 2, 0, 14469]
+  1468: [7, 7, 1, 1, 0, 14469]
+  1469: [1, 9, 1, 1, 0, 14469]
+  1470: [7, 3, 1, 1, 0, 14469]
+  1471: [2, 3, 3, 1, 0, 14469]
+  1472: [1, 9, 1, 1, 0, 14469]
+  1473: [7, 2, 1, 1, 0, 14469]
+  1474: [0, 0, 3, 1, 0, 14469]
+  1475: [1, 9, 4, 2, 0, 14469]
+  1476: [0, 0, 3, 1, 0, 14469]
+  1477: [4, 2, 2, 1, 0, 33568901]
+  1478: [0, 0, 3, 0, 0, 14469]
+  1479: [1, 9, 3, 1, 0, 14469]
+  1480: [1, 9, 3, 1, 0, 14469]
+  1481: [3, 4, 1, 0, 0, 14469]
+  1482: [7, 0, 3, 1, 0, 14469]
+  1483: [6, 0, 2, 2, 0, 33568901]
+  1484: [7, 0, 2, 2, 0, 14469]
+  1485: [0, 7, 4, 2, 1, 102774917]
+  1486: [0, 7, 3, 1, 1, 102774917]
+  1487: [0, 7, 2, 2, 1, 102774917]
+  1488: [5, 1, 2, 1, 0, 14469]
+  1489: [0, 2, 3, 1, 0, 14469]
+  1490: [6, 4, 1, 1, 0, 33568901]
+  1491: [6, 7, 1, 0, 0, 33568901]
+  1492: [7, 7, 3, 2, 2, 103298709]
+  1493: [3, 2, 4, 1, 0, 14469]
+  1494: [4, 2, 1, 0, 0, 33558665]
+  1495: [3, 3, 3, 1, 0, 14469]
+  1497: [3, 2, 4, 2, 0, 14469]
+  1498: [7, 2, 2, 1, 0, 14469]
+  1499: [7, 3, 2, 1, 0, 14469]
+  1500: [3, 4, 2, 1, 0, 132]
+  1502: [3, 5, 1, 1, 2, 103299205]
+  1503: [6, 7, 1, 2, 0, 33568901]
+  1504: [1, 9, 2, 1, 0, 14469]
+  1505: [6, 7, 4, 2, 0, 33568901]
+  1506: [6, 2, 4, 1, 0, 33568901]
+  1507: [7, 7, 3, 2, 0, 14469]
+  1508: [1, 9, 1, 0, 0, 14469]
+  1509: [1, 9, 1, 0, 0, 14469]
+  1510: [6, 7, 2, 0, 0, 33568901]
+  1511: [7, 2, 3, 2, 2, 103284868]
+  1512: [1, 9, 2, 1, 0, 14469]
+  1513: [2, 4, 2, 1, 0, 14469]
+  1514: [9, 4, 2, 1, 0, 131]
+  1515: [2, 1, 2, 1, 0, 14469]
+  1516: [0, 2, 3, 1, 0, 145]
+  1517: [6, 2, 3, 1, 0, 33568901]
+  1518: [7, 1, 2, 2, 0, 13973]
+  1519: [7, 0, 2, 1, 0, 13973]
+  1520: [3, 1, 1, 1, 0, 129]
+  1521: [7, 0, 3, 1, 0, 145]
+  1522: [1, 9, 2, 1, 0, 13973]
+  1523: [1, 9, 2, 1, 0, 8325]
+  1524: [2, 8, 1, 0, 0, 14469]
+  1525: [7, 7, 1, 1, 0, 13973]
+  1526: [4, 4, 2, 1, 0, 33566861]
+  1527: [0, 0, 4, 2, 0, 145]
+  1528: [0, 2, 2, 1, 0, 145]
+  1529: [2, 8, 3, 2, 1, 102774421]
+  1530: [6, 7, 4, 2, 1, 102774421]
+  1531: [0, 0, 2, 2, 0, 8325]
+  1532: [2, 3, 3, 0, 0, 14469]
+  1533: [2, 1, 1, 1, 0, 12437]
+  1534: [7, 4, 1, 1, 0, 13973]
+  1535: [7, 3, 1, 1, 0, 12437]
+  1536: [7, 5, 1, 1, 0, 12429]
+  1537: [7, 2, 1, 1, 0, 12429]
+  1538: [7, 1, 1, 1, 0, 12429]
+  1539: [7, 4, 1, 1, 0, 13973]
+  1540: [0, 0, 3, 2, 0, 145]
+  1541: [0, 3, 2, 1, 0, 132]
+  1542: [7, 7, 3, 2, 1, 102774421]
+  1543: [5, 1, 1, 1, 0, 14469]
+  1544: [0, 0, 3, 1, 0, 129]
+  1545: [7, 4, 2, 1, 0, 12429]
+  1546: [7, 5, 2, 1, 0, 12429]
+  1547: [7, 3, 2, 1, 0, 12429]
+  1548: [7, 4, 2, 1, 0, 13973]
+  1549: [0, 3, 4, 2, 0, 12437]
+  1550: [3, 2, 2, 1, 0, 8325]
+  1551: [5, 1, 2, 0, 0, 145]
+  1552: [6, 7, 1, 1, 0, 33554577]
+  1553: [0, 5, 1, 2, 0, 13973]
+  1554: [6, 7, 3, 2, 0, 33568901]
+  1555: [3, 4, 2, 1, 0, 132]
+  1556: [2, 5, 2, 1, 0, 129]
+  1557: [0, 4, 2, 2, 0, 8325]
+  1558: [0, 2, 3, 1, 0, 14469]
+  1559: [4, 3, 1, 0, 0, 33566869]
+  1560: [7, 7, 3, 1, 0, 13973]
+  1561: [2, 2, 1, 0, 0, 145]
+  1562: [1, 9, 1, 1, 0, 14469]
+  1563: [6, 2, 2, 2, 0, 33568901]
+  1564: [6, 7, 3, 1, 0, 33568405]
+  1565: [3, 3, 2, 0, 0, 145]
+  1566: [1, 9, 4, 2, 0, 13973]
+  1567: [4, 5, 1, 2, 0, 33568405]
+  1568: [8, 6, 4, 1, 1, 102774421]
+  1569: [0, 7, 4, 2, 0, 13973]
+  1570: [2, 5, 2, 0, 0, 12437]
+  1571: [5, 1, 4, 1, 0, 145]
+  1572: [3, 3, 1, 1, 0, 131]
+  1573: [7, 0, 4, 2, 0, 14469]
+  1574: [3, 3, 2, 1, 0, 12437]
+  1575: [3, 2, 1, 2, 0, 132]
+  1576: [6, 8, 4, 1, 1, 102774421]
+  1577: [7, 5, 1, 0, 0, 8325]
+  1578: [0, 3, 4, 0, 0, 12429]
+  1579: [3, 1, 2, 0, 0, 132]
+  1580: [6, 7, 3, 1, 0, 33568405]
+  1581: [4, 2, 1, 1, 0, 33568405]
+  1582: [6, 7, 4, 1, 1, 102774421]
+  1583: [6, 0, 3, 2, 2, 103298709]
+  1584: [6, 7, 3, 2, 0, 33566861]
+  1585: [3, 1, 1, 1, 0, 131]
+  1586: [2, 2, 1, 0, 0, 131]
+  1587: [0, 8, 2, 1, 0, 12437]
+  1588: [7, 2, 1, 1, 0, 129]
+  1589: [3, 2, 3, 1, 0, 132]
+  1590: [3, 2, 3, 1, 0, 132]
+  1591: [2, 0, 3, 0, 0, 69206145]
+  1592: [7, 0, 1, 1, 1, 102764681]
+  1593: [1, 9, 3, 1, 0, 69206165]
+  1594: [2, 1, 2, 1, 0, 13973]
+  1595: [3, 1, 2, 1, 0, 129]
+  1596: [6, 7, 3, 2, 0, 33566861]
+  1597: [6, 4, 3, 1, 0, 33562757]
+  1598: [6, 3, 2, 1, 0, 33567381]
+  1599: [6, 8, 2, 0, 0, 33568405]
+  1600: [2, 3, 2, 1, 0, 13973]
+  1601: [2, 0, 2, 1, 0, 13973]
+  1602: [2, 2, 2, 1, 0, 13973]
+  1603: [2, 2, 1, 2, 0, 145]
+  1604: [4, 4, 1, 0, 0, 33568405]
+  1605: [6, 9, 4, 2, 1, 102774421]
+  1606: [2, 1, 2, 1, 0, 14469]
+  1607: [7, 4, 1, 1, 0, 13973]
+  1608: [4, 7, 1, 1, 0, 33566861]
+  1609: [9, 4, 2, 1, 0, 69206147]
+  1610: [1, 9, 4, 1, 1, 102774917]
+  1611: [1, 9, 4, 1, 1, 102772885]
+  1612: [1, 9, 4, 1, 1, 102774917]
+  1613: [0, 0, 1, 0, 0, 131]
+  1614: [0, 0, 2, 0, 0, 145]
+  1615: [0, 2, 2, 0, 0, 14469]
+  1616: [1, 2, 2, 2, 0, 145]
+  1617: [0, 0, 1, 2, 0, 14469]
+  1618: [4, 5, 2, 2, 0, 33568405]
+  1619: [4, 2, 3, 0, 0, 33554563]
+  1620: [0, 8, 3, 1, 0, 14469]
+  1621: [0, 5, 1, 1, 0, 14469]
+  1622: [0, 0, 3, 0, 0, 12949]
+  1623: [0, 0, 3, 2, 2, 103298709]
+  1624: [0, 0, 1, 2, 0, 14469]
+  1625: [4, 2, 3, 0, 0, 33568901]
+  1626: [6, 9, 3, 1, 1, 102774421]
+  1627: [4, 4, 3, 0, 0, 14469]
+  1628: [2, 2, 2, 0, 0, 4233]
+  1629: [2, 4, 3, 1, 0, 14469]
+  1630: [7, 4, 3, 2, 2, 103299205]
+  1631: [7, 4, 2, 1, 0, 14469]
+  1632: [6, 7, 2, 2, 0, 33554577]
+  1633: [0, 4, 2, 0, 0, 145]
+  1634: [6, 3, 3, 1, 0, 33566869]
+  1635: [6, 5, 4, 1, 0, 33566869]
+  1636: [7, 1, 4, 1, 0, 12437]
+  1637: [7, 6, 3, 1, 0, 12949]
+  1638: [7, 4, 3, 1, 0, 12437]
+  1639: [7, 8, 3, 1, 0, 12949]
+  1640: [7, 3, 4, 1, 1, 102774421]
+  1641: [7, 5, 4, 1, 1, 102774421]
+  1642: [7, 1, 4, 1, 1, 102774421]
+  1643: [7, 6, 4, 1, 1, 102774421]
+  1644: [7, 4, 4, 1, 1, 102774421]
+  1645: [7, 8, 3, 1, 1, 102774421]
+  1646: [7, 3, 4, 1, 2, 103298709]
+  1647: [7, 5, 4, 1, 2, 103298709]
+  1648: [7, 2, 4, 1, 2, 103298709]
+  1649: [7, 6, 4, 1, 2, 103298709]
+  1650: [7, 4, 4, 1, 2, 103298709]
+  1651: [7, 8, 3, 1, 2, 103298709]
+  1652: [7, 3, 2, 1, 0, 14469]
+  1653: [7, 5, 3, 1, 0, 14469]
+  1654: [7, 2, 3, 1, 0, 14469]
+  1655: [7, 6, 2, 1, 0, 14469]
+  1656: [7, 4, 2, 1, 0, 14469]
+  1657: [7, 8, 2, 1, 0, 14469]
+  1658: [7, 3, 2, 1, 2, 103298709]
+  1659: [7, 5, 3, 1, 0, 14469]
+  1660: [7, 2, 3, 1, 0, 14469]
+  1661: [7, 6, 2, 1, 0, 14469]
+  1662: [7, 4, 2, 1, 0, 14469]
+  1663: [7, 8, 2, 1, 0, 14469]
+  1664: [0, 0, 2, 1, 0, 132]
+  1665: [0, 0, 2, 1, 0, 132]
+  1666: [0, 0, 2, 1, 0, 132]
+  1667: [0, 0, 2, 1, 0, 132]
+  1668: [7, 0, 3, 2, 0, 13973]
+  1669: [0, 0, 2, 1, 0, 14469]
+  1670: [0, 4, 2, 1, 0, 14469]
+  1671: [0, 1, 2, 1, 0, 14469]
+  1672: [0, 2, 2, 1, 0, 14469]
+  1673: [0, 3, 2, 1, 0, 14469]
+  1674: [0, 3, 3, 2, 1, 102760580]
+  1675: [0, 3, 2, 1, 0, 14469]
+  1676: [0, 0, 2, 1, 0, 14469]
+  1677: [0, 4, 2, 1, 0, 14469]
+  1678: [0, 2, 2, 1, 0, 14469]
+  1679: [0, 1, 2, 1, 0, 14469]
+  1680: [2, 4, 3, 1, 0, 14469]
+  1681: [0, 1, 1, 1, 1, 102774917]
+  1682: [1, 9, 2, 1, 0, 14469]
+  1683: [0, 3, 2, 1, 0, 14469]
+  1684: [8, 0, 3, 2, 0, 14469]
+  1685: [2, 6, 2, 2, 2, 103298709]
+  1686: [7, 2, 1, 0, 0, 14469]
+  1687: [2, 2, 2, 1, 0, 131]
+  1688: [3, 4, 3, 2, 2, 103284868]
+  1689: [7, 4, 3, 2, 1, 102774421]
+  1690: [2, 2, 2, 1, 0, 1507459]
+  1691: [0, 8, 2, 1, 0, 14469]
+  1692: [0, 4, 3, 1, 0, 14469]
+  1693: [0, 8, 4, 0, 0, 14469]
+  1694: [0, 3, 4, 0, 0, 14469]
+  1695: [0, 2, 4, 0, 0, 14469]
+  1696: [0, 7, 4, 0, 0, 14469]
+  1697: [0, 1, 4, 0, 0, 14469]
+  1698: [0, 0, 3, 1, 0, 13973]
+  1699: [0, 0, 3, 2, 0, 14469]
+  1700: [8, 0, 4, 1, 1, 102773397]
+  1701: [8, 6, 3, 1, 1, 102773397]
+  1702: [8, 7, 3, 1, 1, 102773397]
+  1703: [8, 6, 3, 1, 1, 102773397]
+  1704: [1, 8, 4, 2, 1, 102774421]
+  1705: [1, 8, 4, 2, 1, 102774421]
+  1706: [1, 8, 4, 1, 1, 102774421]
+  1707: [1, 8, 4, 0, 1, 102774421]
+  1708: [6, 8, 4, 2, 2, 103298709]
+  1709: [1, 8, 4, 2, 1, 102773397]
+  1710: [1, 8, 4, 2, 1, 102773397]
+  1711: [1, 8, 4, 1, 1, 102773397]
+  1712: [1, 8, 4, 0, 1, 102773397]
+  1713: [9, 6, 2, 2, 0, 12437]
+  1714: [9, 3, 2, 2, 0, 12437]
+  1715: [9, 0, 1, 0, 0, 14469]
+  1716: [9, 4, 2, 2, 0, 12437]
+  1717: [9, 2, 2, 2, 0, 12437]
+  1718: [9, 0, 1, 0, 0, 14469]
+  1719: [9, 7, 3, 2, 2, 103298709]
+  1720: [9, 7, 2, 2, 1, 102774421]
+  1721: [9, 0, 2, 1, 0, 0]
+  1722: [0, 3, 2, 1, 0, 129]
+  1723: [7, 4, 3, 1, 0, 13973]
+  1724: [0, 0, 2, 1, 0, 132]
+  1725: [3, 1, 1, 1, 0, 131]
+  1726: [2, 0, 3, 0, 0, 131]
+  1727: [2, 2, 1, 0, 0, 131]
+  1728: [2, 3, 1, 0, 0, 131]
+  1729: [6, 7, 1, 0, 0, 33554563]
+  1730: [6, 7, 1, 0, 0, 33554563]
+  1731: [8, 8, 2, 2, 1, 102774421]
+  1732: [0, 0, 1, 0, 1, 102760448]
+  1733: [0, 7, 2, 1, 1, 102774421]
+  1734: [0, 7, 2, 1, 2, 103298709]
+  1735: [6, 0, 3, 1, 0, 33566861]
+  1736: [6, 0, 3, 1, 0, 33566861]
+  1737: [7, 0, 3, 1, 0, 145]
+  1738: [0, 7, 3, 0, 0, 14469]
+  1739: [6, 0, 3, 1, 0, 33566861]
+  1740: [6, 0, 3, 1, 0, 33566861]
+  1741: [7, 6, 2, 0, 0, 14469]
+  1742: [6, 4, 2, 1, 0, 33568901]
+  1743: [0, 0, 3, 1, 0, 14469]
+  1744: [2, 4, 1, 0, 0, 14469]
+  1745: [6, 7, 3, 0, 0, 33562757]
+  1746: [7, 0, 3, 1, 0, 14469]
+  1747: [2, 2, 1, 1, 0, 14469]
+  1748: [2, 5, 1, 1, 0, 14469]
+  1749: [6, 0, 2, 1, 0, 33568901]
+  1750: [3, 2, 1, 0, 0, 1507328]
+  1751: [8, 6, 4, 2, 2, 103298709]
+  1752: [6, 7, 3, 1, 0, 33567381]
+  1753: [6, 7, 3, 1, 0, 33567381]
+  1754: [8, 6, 2, 0, 1, 102774421]
+  1755: [8, 6, 2, 0, 1, 102774421]
+  1756: [9, 7, 2, 2, 1, 102774917]
+  1757: [9, 6, 2, 2, 0, 14469]
+  1758: [9, 3, 2, 2, 0, 14469]
+  1759: [9, 4, 2, 2, 0, 14469]
+  1760: [9, 2, 2, 2, 0, 14469]
+  1761: [6, 7, 3, 1, 0, 33568901]
+  1762: [6, 7, 3, 1, 0, 33568901]
+  1763: [8, 6, 2, 0, 1, 102774917]
+  1764: [8, 6, 2, 0, 1, 102774917]
+  1765: [8, 6, 4, 2, 1, 102774421]
+  1766: [8, 6, 3, 0, 0, 69207189]
+  1767: [8, 6, 3, 0, 0, 69207189]
+  1768: [0, 8, 3, 2, 2, 103298709]
+  1769: [7, 0, 4, 1, 0, 12949]
+  1770: [7, 0, 4, 1, 0, 12949]
+  1771: [7, 0, 4, 1, 0, 14469]
+  1772: [7, 0, 4, 1, 0, 14469]
+  1773: [6, 7, 3, 1, 0, 33568901]
+  1774: [0, 4, 3, 0, 0, 12949]
+  1775: [0, 1, 2, 2, 0, 14469]
+  1776: [0, 1, 3, 0, 0, 131]
+  1777: [0, 1, 3, 2, 0, 14469]
+  1778: [6, 1, 1, 1, 0, 33567381]
+  1779: [2, 1, 4, 2, 2, 103298709]
+  1780: [3, 2, 1, 1, 0, 132]
+  1781: [3, 2, 1, 1, 0, 132]
+  1782: [2, 4, 1, 1, 0, 4235]
+  1783: [2, 4, 2, 1, 1, 102764683]
+  1784: [0, 2, 2, 0, 0, 131]
+  1785: [2, 7, 3, 2, 2, 103298709]
+  1786: [7, 0, 2, 1, 0, 12949]
+  1787: [7, 0, 2, 1, 0, 12949]
+  1788: [0, 1, 3, 2, 0, 12949]
+  1789: [0, 1, 2, 0, 0, 132]
+  1790: [3, 2, 1, 0, 0, 14469]
+  1791: [2, 4, 2, 1, 1, 102764683]
+  1792: [0, 0, 1, 0, 0, 1507328]
+  1793: [0, 0, 4, 2, 0, 13973]
+  1794: [2, 4, 1, 1, 0, 12949]
+  1795: [8, 8, 1, 2, 1, 102774421]
+  1796: [7, 0, 4, 1, 0, 12949]
+  1797: [7, 0, 4, 1, 0, 13973]
+  1798: [0, 0, 1, 0, 0, 1507328]
+  1799: [7, 3, 4, 1, 1, 102774421]
+  1800: [7, 5, 4, 1, 1, 102774421]
+  1801: [7, 1, 4, 1, 1, 102774421]
+  1802: [7, 6, 4, 1, 1, 102774421]
+  1803: [7, 4, 4, 1, 1, 102773397]
+  1804: [7, 8, 3, 1, 1, 102774421]
+  1805: [7, 3, 4, 1, 1, 102774421]
+  1806: [7, 5, 4, 1, 1, 102774421]
+  1807: [7, 2, 4, 1, 1, 102774421]
+  1808: [7, 6, 4, 1, 1, 102774421]
+  1809: [7, 4, 4, 1, 1, 102774421]
+  1810: [7, 8, 3, 1, 1, 102774421]
+  1811: [2, 2, 1, 0, 0, 145]
+  1812: [0, 0, 1, 0, 0, 1507328]
+  1813: [8, 8, 1, 2, 1, 102774421]
+  1814: [2, 3, 3, 1, 1, 102774421]
+  1815: [0, 0, 1, 1, 0, 1507328]
+  1816: [0, 0, 1, 1, 0, 1507328]
+  1817: [8, 8, 2, 2, 2, 103298709]
+  1818: [0, 0, 3, 1, 0, 13973]
+  1819: [7, 7, 1, 1, 0, 13973]
+  1820: [2, 2, 1, 2, 0, 145]
+  1821: [2, 3, 1, 1, 0, 12429]
+  1822: [6, 7, 1, 0, 0, 33568405]
+  1823: [2, 1, 2, 1, 0, 13973]
+  1824: [2, 1, 2, 1, 0, 14469]
+  1825: [7, 4, 1, 1, 0, 13973]
+  1826: [0, 5, 1, 2, 0, 13973]
+  1827: [2, 0, 3, 2, 0, 13973]
+  1828: [2, 2, 2, 2, 0, 13973]
+  1829: [7, 0, 4, 2, 1, 102774421]
+  1830: [7, 0, 4, 2, 1, 102774421]
+  1831: [0, 3, 3, 2, 1, 102774421]
+  1832: [0, 3, 4, 2, 2, 103298709]
+  1833: [0, 3, 3, 2, 1, 102774421]
+  1834: [0, 3, 3, 2, 1, 102774421]
+  1835: [0, 3, 3, 2, 1, 102774421]
+  1836: [0, 3, 2, 0, 0, 131]
+  1837: [6, 3, 3, 0, 0, 33567381]
+  1838: [6, 2, 1, 0, 0, 33554577]
+  1839: [7, 0, 1, 1, 1, 102774421]
+  1840: [2, 2, 2, 2, 0, 70725777]
+  1841: [2, 2, 1, 1, 0, 129]
+  1842: [2, 5, 1, 1, 0, 145]
+  1843: [2, 5, 1, 1, 0, 12437]
+  1844: [6, 7, 1, 2, 0, 33566869]
+  1845: [0, 0, 1, 0, 1, 102760448]
+  1846: [0, 6, 1, 0, 1, 102760448]
+  1847: [8, 8, 1, 1, 1, 102774421]
+  1848: [6, 7, 3, 2, 1, 102774421]
+  1849: [1, 9, 4, 1, 1, 102774421]
+  1850: [7, 2, 4, 2, 1, 102774421]
+  1851: [7, 0, 1, 1, 0, 13973]
+  1852: [8, 6, 3, 0, 1, 102774421]
+  1853: [8, 6, 3, 0, 1, 102774421]
+  1854: [3, 2, 1, 2, 0, 131]
+  1855: [3, 5, 1, 1, 0, 14469]
+  1856: [6, 1, 1, 0, 0, 33554563]
+  1857: [3, 1, 2, 1, 0, 129]
+  1858: [3, 1, 3, 0, 0, 129]
+  1859: [3, 2, 3, 1, 0, 132]
+  1860: [2, 2, 1, 0, 0, 145]
+  1861: [2, 3, 1, 0, 0, 12437]
+  1862: [2, 2, 2, 0, 0, 129]
+  1863: [2, 2, 2, 1, 0, 131]
+  1864: [1, 9, 3, 1, 0, 13973]
+  1865: [1, 9, 3, 1, 0, 13973]
+  1866: [6, 7, 1, 0, 0, 33568405]
+  1867: [6, 7, 2, 1, 0, 33568405]
+  1868: [6, 7, 2, 1, 0, 33568405]
+  1869: [6, 8, 3, 0, 0, 33566869]
+  1870: [1, 9, 4, 1, 1, 102774421]
+  1871: [6, 7, 2, 1, 2, 103298709]
+  1872: [4, 4, 4, 0, 1, 102774421]
+  1873: [6, 8, 4, 0, 2, 103298709]
+  1874: [6, 8, 4, 2, 2, 103298709]
+  1875: [1, 9, 4, 1, 0, 13973]
+  1876: [6, 7, 3, 2, 2, 103298709]
+  1877: [0, 0, 1, 0, 1, 104267777]
+  1878: [3, 6, 1, 0, 0, 1507328]
+  1879: [2, 0, 3, 1, 1, 102774421]
+  1880: [3, 2, 3, 1, 0, 129]
+  1881: [3, 2, 4, 1, 0, 4233]
+  1882: [7, 1, 1, 1, 0, 14469]
+  1883: [7, 1, 3, 1, 0, 14469]
+  1884: [3, 2, 3, 1, 0, 14469]
+  1885: [2, 2, 3, 2, 2, 103298709]
+  1886: [3, 2, 3, 1, 0, 14469]
+  1887: [2, 1, 2, 1, 0, 13973]
+  1888: [2, 1, 2, 1, 0, 14469]
+  1889: [2, 1, 4, 2, 1, 102774421]
+  1890: [2, 2, 3, 2, 0, 12949]
+  1891: [8, 6, 4, 2, 1, 102774421]
+  1892: [6, 7, 4, 2, 0, 33568901]
+  1893: [7, 7, 4, 2, 0, 13973]
+  1894: [3, 8, 3, 0, 1, 102764683]
+  1895: [6, 3, 3, 1, 0, 12949]
+  1896: [7, 8, 3, 1, 0, 12949]
+  1897: [6, 7, 3, 2, 1, 102774421]
+  1898: [1, 9, 1, 1, 0, 14469]
+  1899: [7, 0, 4, 2, 0, 69214341]
+  1900: [7, 0, 4, 2, 0, 69214341]
+  1901: [8, 6, 1, 0, 0, 4233]
+  1902: [0, 6, 1, 0, 1, 102760448]
+  1903: [0, 6, 1, 0, 1, 102760448]
+  1904: [0, 0, 1, 0, 0, 12429]
+  1905: [0, 0, 1, 2, 1, 102760448]
+  1906: [0, 0, 1, 2, 1, 104267776]
+  1907: [0, 0, 1, 0, 2, 71237632]
+  1908: [0, 0, 1, 0, 2, 71237632]
+  1909: [0, 0, 1, 2, 1, 104267776]
+  1910: [0, 0, 1, 2, 1, 104267776]
+  1911: [0, 0, 1, 2, 1, 104267776]
+  1912: [0, 0, 1, 2, 1, 104267776]
+  1913: [0, 0, 1, 2, 1, 104267776]
+  1914: [0, 0, 1, 2, 1, 104267776]
+  1915: [0, 0, 1, 2, 1, 104267776]
+  1916: [6, 7, 4, 2, 1, 102774421]
+  1917: [6, 7, 4, 2, 2, 103298709]
+  1918: [8, 7, 1, 2, 1, 102774421]
+  1919: [6, 7, 3, 1, 1, 102774421]
+  1920: [6, 9, 3, 1, 1, 102774421]
+  1921: [6, 8, 3, 1, 1, 102774421]
+  1922: [8, 7, 1, 2, 1, 102774421]
+  1923: [6, 7, 3, 1, 1, 102774421]
+  1924: [6, 9, 3, 1, 1, 102774421]
+  1925: [6, 8, 3, 1, 1, 102774421]
+  1926: [0, 3, 2, 1, 0, 13973]
+  1927: [6, 8, 3, 0, 0, 33566869]
+  1928: [6, 7, 1, 0, 0, 33568405]
+  1929: [6, 7, 3, 2, 2, 103288971]
+  1930: [7, 0, 1, 0, 1, 102774421]
+  1931: [8, 8, 1, 2, 1, 102774421]
+  1932: [0, 2, 2, 0, 0, 70713473]
+  1933: [8, 0, 4, 1, 1, 102774421]
+  1934: [3, 2, 1, 1, 0, 70713344]
+  1935: [3, 2, 1, 1, 0, 70713344]
+  1936: [3, 2, 1, 1, 0, 70713344]
+  1937: [0, 7, 3, 0, 0, 14469]
+  1938: [0, 0, 1, 0, 1, 102760448]
+  1939: [0, 0, 1, 0, 1, 102760448]
+  1940: [0, 0, 1, 0, 1, 102760448]
+  1941: [0, 0, 1, 0, 1, 102760448]
+  1942: [0, 0, 1, 0, 1, 102760448]
+  1943: [0, 0, 1, 0, 1, 102760448]
+  1944: [0, 0, 1, 0, 1, 102760448]
+  1945: [0, 0, 1, 0, 1, 102760448]
+  1946: [0, 0, 1, 0, 1, 102760448]
+  1947: [7, 0, 1, 0, 1, 102774421]
+  1948: [7, 3, 2, 1, 0, 14469]
+  1949: [7, 0, 4, 2, 0, 8325]
+  1950: [7, 0, 4, 2, 0, 8325]
+  1951: [0, 0, 1, 0, 1, 104267777]
+  1952: [0, 0, 1, 0, 1, 104267777]
+  1953: [0, 0, 1, 0, 1, 104267777]
+  1954: [0, 0, 1, 0, 1, 104267777]
+  1955: [0, 0, 1, 0, 0, 131]
+  1956: [6, 8, 4, 2, 2, 103298709]
+  1957: [6, 7, 4, 1, 2, 103284868]
+  1958: [6, 7, 4, 0, 1, 102760580]
+  1959: [6, 8, 4, 0, 1, 102760580]
+  1960: [6, 7, 4, 0, 1, 102760580]
+  1961: [6, 7, 4, 0, 1, 102760580]
+  1962: [7, 0, 1, 1, 0, 131]
+  1963: [7, 0, 2, 1, 0, 13973]
+  1964: [2, 8, 3, 2, 1, 102760448]
+  1965: [2, 4, 1, 0, 1, 102760448]
+  1966: [6, 7, 3, 1, 1, 102760448]
+  1967: [7, 3, 2, 1, 1, 102760448]
+  1968: [5, 1, 3, 2, 1, 102760448]
+  1969: [5, 1, 2, 1, 1, 102760448]
+  1970: [5, 1, 2, 1, 1, 102760448]
+  1971: [5, 1, 1, 0, 1, 102760448]
+  1972: [3, 1, 2, 0, 1, 102760448]
+  1973: [3, 1, 1, 1, 1, 102760448]
+  1974: [6, 7, 2, 1, 0, 33567381]
+  1975: [0, 4, 2, 1, 0, 12949]
+  1976: [0, 0, 2, 1, 0, 12949]
+  1977: [0, 0, 1, 0, 0, 12949]
+  1978: [0, 0, 3, 2, 0, 12949]
+  1979: [7, 0, 3, 2, 0, 13973]
+  1980: [7, 2, 1, 1, 2, 103298709]
+  1981: [7, 3, 2, 2, 0, 13973]
+  1982: [7, 2, 1, 1, 0, 12437]
+  1983: [1, 9, 1, 1, 0, 14469]
+  1984: [7, 2, 2, 1, 0, 13973]
+  1985: [7, 7, 2, 1, 0, 13973]
+  1986: [2, 2, 1, 1, 0, 4235]
+  1987: [4, 5, 2, 1, 0, 33568405]
+  1988: [3, 5, 2, 1, 0, 132]
+  1989: [2, 2, 1, 0, 0, 12429]
+  1990: [2, 2, 3, 2, 1, 102774421]
+  1991: [2, 2, 2, 1, 1, 102774421]
+  1992: [2, 6, 3, 1, 0, 4233]
+  1993: [2, 2, 2, 2, 0, 13973]
+  1994: [4, 4, 1, 1, 0, 33583237]
+  1995: [3, 2, 3, 1, 0, 12429]
+  1997: [2, 2, 1, 1, 0, 4235]
+  1998: [2, 2, 1, 0, 0, 12429]
+  1999: [4, 5, 1, 0, 0, 33568405]
+  2000: [7, 0, 1, 1, 0, 129]
+  2001: [7, 0, 1, 1, 0, 129]
+  2002: [2, 2, 2, 1, 0, 131]
+  2003: [7, 1, 2, 2, 0, 13973]
+  2004: [6, 7, 3, 1, 0, 13973]
+  2005: [0, 1, 4, 0, 0, 14469]
+  2006: [0, 7, 4, 0, 0, 14469]
+  2007: [0, 3, 4, 0, 0, 14469]
+  2008: [6, 8, 2, 2, 0, 13973]
+  2009: [6, 8, 2, 1, 0, 13973]
+  2010: [6, 8, 1, 2, 1, 102760448]
+  2011: [1, 9, 2, 1, 0, 14469]
+  2012: [1, 9, 1, 1, 0, 14469]
+  2013: [9, 2, 1, 1, 0, 4233]
+  2014: [9, 2, 4, 1, 0, 0]
+  2015: [3, 5, 2, 1, 0, 12429]
+  2016: [0, 1, 4, 2, 0, 12437]
+  2017: [7, 2, 3, 1, 0, 12949]
+  2018: [7, 2, 3, 1, 0, 12949]
+  2019: [3, 2, 3, 2, 0, 12429]
+  2020: [0, 1, 3, 1, 0, 12429]
+  2021: [0, 1, 3, 1, 0, 8325]
+  2022: [9, 7, 4, 2, 2, 103298709]
+  2023: [0, 7, 2, 0, 0, 33566869]
+  2024: [0, 2, 2, 2, 0, 12949]
+  2025: [0, 0, 1, 1, 0, 129]
+  2026: [7, 7, 1, 1, 0, 13973]
+  2027: [0, 7, 2, 0, 0, 33568405]
+  2030: [6, 9, 4, 2, 1, 102774421]
+  2031: [7, 7, 2, 1, 1, 102774421]
+  2032: [6, 7, 1, 0, 0, 12429]
+  2033: [3, 2, 1, 0, 0, 0]
+  2035: [4, 2, 1, 0, 0, 33554432]
+  2036: [1, 9, 3, 1, 0, 12429]
+  2039: [0, 7, 2, 2, 1, 102774421]
+  2040: [0, 7, 3, 1, 1, 102774421]
+  2041: [0, 7, 4, 2, 1, 102774421]
+  2042: [0, 0, 1, 1, 0, 132]
+  2043: [0, 3, 1, 1, 0, 132]
+  2044: [0, 1, 1, 1, 0, 132]
+  2045: [0, 2, 1, 1, 0, 132]
+  2046: [0, 4, 1, 1, 0, 132]
+  2047: [2, 2, 2, 2, 0, 13973]
+  2048: [3, 5, 2, 1, 0, 12429]
+  2049: [0, 2, 2, 2, 0, 14485]
+  2050: [0, 1, 4, 2, 0, 12437]
+  2052: [6, 9, 4, 2, 2, 103298709]
+  2057: [3, 1, 1, 1, 1, 102760448]
+  2066: [0, 0, 1, 0, 0, 129]
+  2067: [4, 4, 3, 0, 1, 102760448]
+  2068: [0, 3, 3, 2, 2, 103298709]
+  2069: [5, 1, 3, 1, 0, 145]
+  2070: [5, 1, 3, 1, 0, 12949]
+  2071: [6, 3, 3, 2, 0, 33568901]
+  2072: [2, 2, 2, 1, 0, 14469]
+  2073: [2, 4, 2, 0, 0, 14469]
+  2074: [6, 2, 1, 1, 0, 33558667]
+  2075: [5, 8, 4, 2, 2, 103298709]
+  2076: [6, 4, 3, 1, 0, 33568405]
+  2077: [6, 7, 3, 1, 0, 33567381]
+  2078: [6, 7, 3, 1, 0, 33568405]
+  2079: [0, 0, 3, 2, 1, 102760448]
+  2080: [0, 0, 3, 2, 1, 102760448]
+  2081: [3, 1, 2, 0, 0, 0]
+  2082: [5, 1, 3, 1, 0, 12949]
+  2083: [4, 2, 1, 0, 0, 33558665]
+  2084: [4, 2, 1, 0, 0, 33558665]
+  2085: [4, 2, 2, 1, 0, 33568901]
+  2086: [4, 2, 2, 1, 0, 33568901]
+  2087: [4, 2, 3, 2, 2, 103298709]
+  2088: [4, 0, 1, 0, 0, 33554432]
+  2089: [4, 0, 1, 0, 0, 33554432]
+  2090: [4, 0, 1, 0, 0, 33554432]
+  2091: [4, 0, 1, 0, 0, 33554432]
+  2092: [4, 1, 3, 2, 0, 33568901]
+  2093: [0, 6, 1, 0, 0, 129]
+  2094: [7, 2, 2, 2, 2, 103298709]
+  2095: [2, 3, 1, 2, 2, 103298709]
+  2096: [1, 9, 4, 1, 2, 103298709]
+  2097: [6, 7, 4, 2, 2, 103298709]
+  2098: [6, 7, 3, 1, 2, 103298709]
+  2099: [4, 4, 4, 0, 2, 103298709]
+  2100: [6, 7, 3, 2, 2, 103298709]
+  2101: [6, 7, 3, 2, 2, 103298709]
+  2102: [6, 0, 1, 2, 2, 103298709]
+  2103: [2, 1, 4, 2, 2, 103298709]
+  2104: [2, 8, 3, 2, 2, 103298709]
+  2105: [2, 2, 2, 2, 2, 103298709]
+  2106: [2, 6, 2, 2, 2, 103298709]
+  2107: [6, 7, 2, 1, 2, 103298709]
+  2108: [0, 8, 3, 2, 2, 103298709]
+  2109: [8, 6, 4, 2, 2, 103298709]
+  2110: [0, 3, 4, 2, 2, 103298709]
+  2111: [7, 2, 4, 1, 2, 103298709]
+  2112: [7, 3, 4, 1, 2, 103298709]
+  2113: [7, 5, 4, 1, 2, 103298709]
+  2126: [4, 4, 3, 0, 0, 33568901]
+  2127: [4, 4, 1, 0, 0, 33558657]
+  2128: [4, 4, 1, 0, 0, 33558657]
+  2129: [4, 4, 1, 1, 0, 33584789]
+  2130: [4, 4, 1, 1, 0, 33584789]
+  2131: [9, 7, 3, 2, 2, 103298709]
+  2132: [4, 2, 3, 1, 0, 33568901]
+  2133: [4, 2, 2, 1, 0, 33568901]
+  2134: [2, 2, 2, 0, 0, 14469]
+  2135: [3, 2, 1, 1, 0, 1507328]
+  2136: [7, 4, 2, 0, 0, 14469]
+  2137: [0, 0, 1, 0, 0, 14469]
+  2138: [0, 0, 1, 0, 1, 104267777]
+  2139: [0, 0, 1, 0, 1, 104267777]
+  2140: [0, 0, 1, 0, 1, 104267777]
+  2141: [0, 0, 1, 0, 1, 104267777]
+  2142: [0, 0, 1, 0, 1, 104267777]
+  2143: [0, 0, 1, 0, 1, 104267777]
+  2144: [4, 2, 2, 1, 0, 33568901]
+  2145: [4, 2, 2, 1, 0, 33568901]
+  2146: [9, 7, 4, 2, 1, 102774421]
+  2147: [3, 1, 1, 1, 0, 131]
+  2148: [3, 1, 1, 1, 0, 131]
+  2149: [3, 1, 1, 1, 0, 131]
+  2150: [3, 1, 1, 1, 0, 1507328]
+  2151: [3, 2, 1, 1, 0, 14485]
+  2152: [2, 5, 3, 1, 0, 14485]
+  2153: [8, 3, 1, 1, 0, 14485]
+  2154: [0, 3, 3, 0, 0, 14485]
+  2155: [6, 3, 2, 2, 0, 33573013]
+  2156: [6, 7, 2, 2, 2, 103298709]
+  2157: [0, 3, 3, 0, 1, 102774421]
+  2158: [3, 1, 1, 1, 0, 131]
+  2159: [3, 1, 1, 1, 0, 131]
+  2160: [3, 1, 1, 1, 0, 131]
+  2161: [4, 2, 1, 0, 0, 33568405]
+  2162: [4, 2, 1, 0, 0, 33568405]
+  2163: [4, 2, 2, 1, 0, 33568405]
+  2164: [4, 2, 2, 1, 0, 33568405]
+  2165: [4, 2, 3, 2, 2, 103298709]
+  2166: [4, 0, 1, 0, 0, 0]
+  2167: [4, 0, 1, 0, 0, 0]
+  2168: [4, 0, 1, 0, 0, 0]
+  2169: [4, 0, 1, 0, 0, 0]
+  2170: [4, 2, 2, 1, 1, 102774421]
+  2171: [4, 2, 2, 1, 1, 102774421]
+  2172: [4, 2, 1, 0, 1, 102774421]
+  2173: [4, 2, 1, 0, 1, 102774421]
+  2174: [5, 1, 1, 0, 1, 102773397]
+  2175: [5, 1, 2, 0, 1, 102773397]
+  2176: [5, 1, 1, 0, 1, 102773397]
+  2177: [5, 1, 1, 0, 1, 102904469]
+  2178: [5, 1, 2, 0, 1, 102904469]
+  2179: [4, 1, 1, 0, 1, 102773397]
+  2180: [5, 1, 3, 2, 1, 102773397]
+  2181: [5, 1, 2, 2, 1, 102904469]
+  2182: [5, 1, 2, 1, 1, 102773397]
+  2183: [5, 1, 2, 1, 1, 102904469]
+  2184: [6, 1, 3, 1, 1, 102773397]
+  2185: [6, 1, 2, 1, 1, 102773397]
+  2186: [5, 1, 2, 2, 2, 103298709]
+  2187: [5, 1, 2, 2, 2, 103298709]
+  2188: [5, 1, 2, 2, 2, 103298709]
+  2189: [5, 1, 2, 2, 2, 103298709]
+  2190: [5, 1, 2, 2, 1, 102774421]
+  2191: [5, 1, 1, 0, 1, 104267908]
+  2192: [5, 1, 2, 0, 1, 102773397]
+  2193: [5, 1, 2, 0, 1, 102760580]
+  2194: [5, 1, 2, 2, 2, 103298709]
+  2195: [4, 1, 1, 0, 0, 33567381]
+  2196: [5, 1, 3, 2, 1, 102773397]
+  2197: [5, 1, 2, 1, 0, 4233]
+  2198: [5, 1, 2, 2, 1, 102774421]
+  2199: [0, 1, 1, 0, 0, 131]
+  2200: [0, 0, 1, 0, 0, 131]
+  2201: [5, 1, 2, 1, 0, 33568405]
+  2202: [5, 1, 4, 2, 2, 103298709]
+  2203: [5, 1, 2, 0, 0, 4233]
+  2204: [5, 1, 2, 1, 0, 33568405]
+  2205: [5, 1, 2, 1, 1, 102774421]
+  2206: [5, 1, 4, 2, 1, 102774421]
+  2208: [5, 1, 2, 2, 1, 102774421]
+  2209: [3, 1, 1, 1, 0, 33554561]
+  2210: [3, 1, 1, 1, 0, 131]
+  2211: [3, 1, 1, 1, 0, 131]
+  2212: [3, 1, 1, 1, 0, 131]
+  2213: [3, 1, 1, 1, 0, 131]
+  2214: [3, 1, 1, 1, 0, 131]
+  2215: [3, 1, 1, 1, 0, 131]
+  2216: [3, 1, 1, 1, 0, 131]
+  2217: [3, 1, 1, 1, 0, 131]
+  2218: [3, 1, 1, 1, 0, 131]
+  2219: [3, 1, 1, 1, 0, 131]
+  2220: [3, 1, 1, 1, 0, 131]
+  2221: [7, 6, 3, 1, 0, 12437]
+  2222: [7, 3, 3, 1, 0, 12437]
+  2223: [7, 8, 3, 1, 0, 12949]
+  2224: [6, 1, 4, 1, 0, 12949]
+  2225: [6, 5, 4, 1, 0, 33566869]
+  2226: [7, 4, 3, 1, 0, 12437]
+  2227: [7, 4, 3, 1, 0, 12437]
+  2228: [7, 6, 4, 1, 1, 102774421]
+  2229: [7, 3, 4, 1, 1, 102774421]
+  2230: [7, 8, 4, 1, 1, 102774421]
+  2231: [6, 1, 4, 1, 1, 102774421]
+  2232: [6, 5, 4, 1, 1, 102774421]
+  2233: [7, 4, 4, 1, 1, 102774421]
+  2234: [7, 4, 4, 1, 1, 102774421]
+  2235: [7, 6, 4, 1, 2, 103298709]
+  2236: [7, 3, 4, 1, 2, 103298709]
+  2237: [7, 8, 4, 1, 2, 103298709]
+  2238: [6, 1, 4, 1, 2, 103298709]
+  2239: [6, 5, 4, 1, 2, 103298709]
+  2240: [7, 4, 4, 1, 2, 103298709]
+  2241: [7, 4, 4, 1, 2, 103298709]
+  2242: [6, 0, 1, 1, 1, 102774421]
+  2243: [6, 0, 1, 0, 1, 102774421]
+  2244: [7, 1, 4, 1, 1, 102774421]
+  2245: [7, 1, 1, 1, 0, 131]
+  2246: [7, 3, 2, 1, 0, 131]
+  2247: [0, 2, 3, 1, 0, 131]
+  2248: [3, 1, 1, 1, 0, 1507459]
+  2249: [7, 3, 4, 1, 2, 103298709]
+  2250: [7, 3, 2, 0, 0, 33568405]
+  2251: [0, 4, 4, 2, 2, 103298709]
+  2252: [0, 4, 3, 0, 0, 33568405]
+  2253: [7, 2, 3, 2, 2, 103298709]
+  2254: [7, 4, 3, 1, 0, 33568405]
+  2255: [0, 7, 3, 2, 2, 103298709]
+  2256: [8, 6, 3, 0, 0, 33568405]
+  2257: [3, 1, 1, 1, 0, 131]
+  2258: [3, 1, 1, 1, 0, 131]
+  2259: [3, 1, 1, 1, 0, 131]
+  2260: [3, 1, 1, 1, 0, 131]
+  2261: [3, 1, 1, 1, 0, 131]
+  2262: [3, 1, 1, 1, 0, 131]
+  2263: [3, 1, 1, 1, 0, 131]
+  2264: [3, 1, 1, 1, 0, 131]
+  2265: [3, 1, 1, 1, 0, 131]
+  2266: [3, 1, 1, 1, 0, 131]
+  2267: [3, 1, 1, 1, 0, 131]
+  2268: [3, 1, 1, 1, 0, 131]
+  2269: [3, 1, 1, 1, 0, 131]
+  2270: [3, 1, 1, 1, 0, 131]
+  2271: [3, 1, 1, 1, 0, 131]
+  2272: [3, 1, 1, 1, 0, 131]
+  2273: [3, 1, 1, 1, 0, 131]
+  2274: [3, 1, 1, 1, 0, 131]
+  2275: [3, 1, 1, 1, 0, 131]
+  2276: [3, 1, 1, 1, 0, 131]
+  2277: [7, 3, 2, 0, 0, 33568405]
+  2278: [0, 4, 3, 0, 0, 33568405]
+  2279: [7, 4, 3, 1, 0, 33568405]
+  2280: [8, 6, 3, 0, 0, 33568405]
+  2281: [0, 7, 2, 0, 0, 33568405]
+  2282: [6, 7, 3, 1, 0, 33568405]
+  2283: [6, 9, 4, 1, 0, 33568405]
+  2284: [7, 4, 2, 1, 0, 33568405]
+  2285: [7, 5, 2, 1, 0, 33568405]
+  2286: [7, 3, 2, 1, 0, 33568405]
+  2287: [7, 3, 1, 0, 0, 33568405]
+  2288: [0, 6, 1, 0, 1, 102760448]
+  2289: [3, 1, 1, 1, 0, 131]
+  2290: [3, 1, 1, 1, 0, 131]
+  2291: [3, 1, 1, 1, 0, 131]
+  2292: [3, 1, 1, 1, 0, 131]
+  2293: [3, 1, 1, 1, 0, 131]
+  2294: [3, 1, 1, 1, 0, 131]
+  2295: [3, 1, 1, 1, 0, 131]
+  2296: [3, 1, 1, 1, 0, 131]
+  2297: [3, 1, 1, 1, 0, 131]
+  2298: [3, 1, 1, 1, 0, 131]
+  2299: [3, 1, 1, 1, 0, 131]
+  2300: [3, 1, 1, 1, 0, 131]
+  2301: [3, 1, 1, 1, 0, 131]
+  2302: [3, 1, 1, 1, 0, 131]
+  2303: [3, 1, 1, 1, 0, 131]
+  2304: [3, 1, 1, 1, 0, 131]
+  2305: [3, 1, 1, 1, 0, 131]
+  2306: [4, 3, 2, 2, 0, 131]
+  2307: [3, 1, 1, 1, 0, 131]
+  2308: [7, 0, 1, 1, 0, 0]
+  2309: [7, 2, 2, 2, 0, 33568405]
+  2310: [7, 0, 2, 1, 0, 33568405]
+  2311: [6, 7, 2, 1, 0, 33568405]
+  2312: [6, 0, 2, 1, 0, 33568405]
+  2313: [2, 4, 3, 2, 0, 33568405]
+  2314: [6, 7, 2, 0, 0, 33568405]
+  2315: [6, 7, 2, 0, 0, 33568405]
+  2316: [3, 2, 2, 2, 0, 129]
+  2317: [6, 7, 2, 1, 1, 102774421]
+  2318: [6, 7, 2, 1, 0, 70713344]
+  2319: [9, 1, 4, 2, 2, 103298709]
+  2320: [9, 1, 4, 2, 1, 102760580]
+  2321: [9, 1, 4, 2, 1, 102760580]
+  2322: [9, 1, 4, 2, 1, 102760580]
+  2323: [0, 0, 1, 0, 0, 12429]
+  2324: [5, 5, 1, 1, 0, 13973]
+  2325: [6, 7, 1, 0, 1, 102774421]
+  2326: [2, 2, 1, 0, 1, 102774421]
+  2327: [6, 7, 2, 1, 2, 71237632]
+  2328: [0, 0, 1, 0, 0, 1507328]
+  2329: [0, 0, 3, 0, 0, 0]
+  2330: [3, 2, 1, 0, 0, 33568405]
+  2331: [5, 1, 1, 0, 0, 35061892]
+  2332: [3, 1, 4, 0, 1, 102774421]
+  2333: [3, 1, 4, 0, 0, 70713344]
+  2334: [6, 7, 2, 0, 0, 131]
+  2335: [0, 6, 1, 0, 2, 103284736]
+  2336: [2, 2, 1, 0, 0, 131]
+  2337: [4, 8, 4, 0, 0, 35061892]
+  2338: [6, 7, 2, 1, 0, 33568405]
+  2339: [6, 0, 2, 1, 0, 33568405]
+  2340: [6, 7, 2, 0, 0, 33568405]
+  2341: [8, 6, 4, 2, 2, 103298709]
+  2342: [6, 7, 2, 0, 1, 102774421]
+  2343: [4, 8, 4, 0, 0, 35061892]
+  2344: [6, 7, 2, 0, 0, 131]
+  2345: [6, 7, 2, 0, 1, 102774421]
+  2346: [6, 7, 2, 0, 1, 102774421]
+  2347: [6, 7, 2, 0, 1, 102774421]
+  2348: [6, 7, 2, 0, 1, 102774421]
+  2349: [6, 7, 2, 0, 1, 102774421]
+  2350: [6, 7, 2, 0, 1, 102774421]
+  2351: [6, 7, 2, 0, 1, 102774421]
+  2352: [3, 1, 1, 1, 0, 131]
+  2353: [2, 3, 2, 2, 0, 33568405]
+  2354: [1, 9, 2, 1, 0, 33568405]
+  2355: [1, 9, 1, 1, 0, 33568405]
+  2356: [0, 0, 3, 1, 0, 33568405]
+  2357: [0, 0, 3, 1, 0, 33568405]
+  2358: [4, 2, 2, 1, 0, 33568405]
+  2359: [4, 2, 2, 1, 0, 33568405]
+  2360: [1, 9, 2, 1, 0, 33568405]
+  2361: [1, 9, 2, 1, 0, 33568405]
+  2362: [7, 2, 3, 2, 2, 103284868]
+  2363: [4, 4, 2, 1, 0, 33568405]
+  2364: [2, 4, 1, 1, 0, 33568405]
+  2365: [3, 4, 1, 0, 0, 33568405]
+  2366: [0, 0, 3, 0, 0, 33568405]
+  2367: [0, 1, 4, 0, 0, 33568405]
+  2368: [0, 8, 4, 0, 0, 33568405]
+  2369: [0, 3, 4, 0, 0, 33568405]
+  2370: [0, 2, 4, 0, 0, 33568405]
+  2371: [0, 0, 4, 2, 0, 33568405]
+  2372: [3, 2, 1, 0, 0, 1507328]
+  2373: [3, 2, 1, 0, 0, 1507328]
+  2374: [3, 2, 1, 0, 0, 1507328]
+  2375: [6, 9, 3, 1, 0, 131]
+  2376: [6, 7, 3, 1, 0, 131]
+  2377: [9, 0, 1, 0, 0, 131]
+  2378: [4, 2, 2, 1, 1, 102774421]
+  2379: [2, 2, 1, 0, 0, 35061889]
+  2380: [2, 2, 1, 0, 0, 35061889]
+  2398: [3, 1, 1, 0, 0, 131]
+  2401: [3, 1, 1, 1, 0, 131]
+  2402: [3, 5, 1, 1, 0, 0]
+  2403: [3, 5, 1, 1, 0, 0]
+  2404: [1, 9, 1, 0, 0, 129]
+  2405: [1, 9, 1, 1, 0, 145]
+  2406: [1, 9, 1, 1, 0, 14469]
+  2407: [1, 9, 1, 1, 0, 14469]
+  2408: [0, 0, 1, 0, 0, 0]
+  2409: [0, 0, 1, 1, 1, 102760448]
+  2410: [0, 0, 1, 2, 1, 102760448]
+  2411: [0, 0, 1, 1, 1, 102760448]
+  2413: [0, 3, 1, 1, 0, 0]
+  2415: [7, 3, 3, 1, 0, 14469]
+  2416: [7, 5, 4, 1, 0, 14469]
+  2417: [7, 1, 4, 1, 0, 14469]
+  2418: [7, 4, 3, 1, 0, 14469]
+  2419: [7, 8, 3, 1, 0, 14469]
+  2420: [7, 6, 3, 1, 0, 14469]
+  2421: [7, 3, 2, 1, 0, 14469]
+  2422: [7, 5, 3, 1, 0, 14469]
+  2423: [7, 2, 3, 1, 0, 14469]
+  2424: [7, 4, 2, 1, 0, 14469]
+  2425: [7, 4, 2, 1, 0, 14469]
+  2426: [7, 8, 2, 1, 0, 14469]
+  2427: [7, 6, 2, 1, 0, 14469]
+  2428: [7, 3, 3, 1, 0, 14469]
+  2429: [7, 5, 4, 1, 0, 14469]
+  2430: [7, 1, 4, 1, 0, 14469]
+  2431: [7, 4, 3, 1, 0, 14469]
+  2432: [7, 8, 3, 1, 0, 14469]
+  2433: [7, 6, 3, 1, 0, 14469]
+  2434: [7, 3, 2, 1, 0, 14469]
+  2435: [7, 5, 3, 1, 0, 14469]
+  2436: [7, 2, 3, 1, 0, 14469]
+  2437: [7, 4, 2, 1, 0, 14469]
+  2438: [7, 4, 2, 1, 0, 14469]
+  2439: [7, 8, 2, 1, 0, 14469]
+  2440: [7, 6, 2, 1, 0, 14469]
+  2441: [7, 3, 4, 1, 2, 103300757]
+  2442: [7, 3, 4, 1, 2, 103300757]
+  2443: [7, 3, 3, 1, 2, 103298709]
+  2444: [7, 8, 3, 1, 2, 103298709]
+  2445: [7, 2, 4, 1, 2, 103298709]
+  2446: [7, 4, 3, 1, 2, 103298709]
+  2447: [7, 1, 3, 1, 2, 103298709]
+  2448: [7, 7, 3, 1, 2, 103298709]
+  2449: [7, 5, 2, 1, 2, 103298709]
+  2450: [3, 1, 1, 1, 0, 1507457]
+  2451: [3, 1, 1, 1, 0, 1507457]
+  2452: [0, 0, 1, 0, 0, 16777216]
+  2453: [0, 0, 1, 0, 0, 16777216]
+  2454: [0, 0, 1, 0, 0, 16777216]
+  2455: [0, 0, 1, 0, 0, 16777216]
+  2456: [0, 0, 1, 0, 0, 16777216]
+  2457: [0, 0, 1, 0, 0, 16777216]
+  2458: [0, 0, 1, 0, 0, 16777216]
+  2459: [0, 0, 1, 0, 0, 16777216]
+  2460: [0, 0, 1, 0, 0, 16777216]
+  2461: [0, 0, 1, 0, 0, 16777216]
+  2462: [0, 0, 1, 0, 0, 16777216]
+  2464: [1, 9, 1, 1, 0, 14469]
+  2465: [1, 9, 4, 2, 0, 13973]
+  2466: [1, 9, 2, 1, 0, 14469]
+  2467: [4, 2, 2, 0, 0, 33566869]
+  2468: [1, 7, 2, 1, 0, 12437]
+  2469: [1, 7, 2, 1, 0, 33562757]
+  2470: [1, 7, 4, 2, 1, 102774421]
+  2471: [1, 9, 1, 2, 1, 102774421]
+  2472: [1, 7, 4, 2, 1, 102774421]
+  2473: [1, 9, 2, 1, 1, 102774421]
+  2474: [1, 9, 2, 1, 1, 102774421]
+  2475: [6, 2, 3, 2, 2, 103284868]
+  2476: [1, 9, 4, 2, 2, 103298709]
+  2477: [6, 4, 1, 1, 0, 33568405]
+  2478: [0, 0, 3, 0, 0, 13973]
+  2479: [0, 0, 3, 1, 0, 12437]
+  2480: [1, 9, 4, 2, 0, 13973]
+  2481: [1, 9, 4, 2, 0, 13973]
+  2483: [6, 7, 3, 2, 2, 103298709]
+  2484: [6, 7, 1, 0, 0, 13973]
+  2485: [2, 3, 3, 2, 0, 33568405]
+  2528: [4, 5, 1, 2, 0, 33554565]
+  2529: [4, 5, 4, 2, 2, 103298709]
+  2530: [4, 5, 2, 2, 1, 102774421]
+  2531: [4, 5, 1, 0, 0, 35651716]
+  2532: [4, 3, 1, 2, 2, 103298709]
+  2533: [4, 2, 1, 2, 2, 103298709]
+  2534: [4, 1, 1, 2, 2, 103298709]
+  2535: [4, 4, 1, 2, 2, 103298709]
+  2536: [4, 8, 4, 0, 0, 37159044]
+  2537: [0, 8, 4, 0, 0, 3604612]
+  2538: [6, 0, 4, 1, 2, 103298709]
+  2539: [0, 8, 4, 0, 0, 37159044]
+  2540: [4, 5, 1, 1, 0, 37158912]
+  2541: [4, 5, 2, 1, 0, 33554565]
+  2542: [7, 0, 1, 1, 1, 102774421]
+  2543: [7, 0, 1, 1, 0, 12437]
+  2544: [7, 0, 1, 1, 0, 12437]
+  2545: [2, 2, 1, 1, 0, 12433]
+  2546: [2, 3, 1, 1, 0, 12437]
+  2549: [7, 0, 1, 1, 0, 133]
+  2550: [7, 0, 1, 1, 0, 133]
+  2551: [7, 0, 1, 1, 0, 133]
+  2552: [7, 0, 1, 1, 0, 133]
+  2553: [7, 0, 1, 1, 0, 133]
+  2554: [7, 0, 1, 1, 0, 133]
+  2555: [7, 0, 1, 1, 0, 133]
+  2556: [7, 8, 2, 1, 0, 133]
+  2557: [7, 0, 1, 1, 0, 133]
+  2558: [7, 0, 1, 1, 0, 133]
+  2559: [7, 0, 1, 1, 0, 133]
+  2560: [7, 0, 1, 1, 0, 133]
+  2561: [7, 0, 1, 1, 0, 133]
+  2562: [7, 8, 2, 1, 1, 102760581]
+  2563: [7, 8, 2, 1, 1, 102760581]
+  2564: [7, 8, 2, 1, 2, 103284869]
+  2565: [7, 2, 2, 1, 0, 133]
+  2566: [7, 2, 3, 1, 0, 133]
+  2567: [7, 0, 1, 1, 0, 133]
+  2568: [7, 0, 1, 1, 0, 133]
+  2603: [1, 9, 3, 1, 0, 13973]
+  2604: [1, 9, 3, 1, 0, 12429]
+  2605: [1, 9, 1, 1, 0, 13973]
+  2606: [1, 9, 1, 1, 0, 14469]
+  2607: [7, 0, 3, 2, 0, 14469]
+  2608: [2, 2, 1, 0, 0, 4235]
+  2609: [2, 2, 1, 0, 0, 4235]
+  2610: [3, 2, 1, 1, 0, 145]
+  2611: [7, 3, 2, 1, 0, 14469]
+  2612: [3, 2, 3, 1, 0, 129]
+  2613: [2, 2, 1, 1, 0, 4233]
+  2614: [6, 4, 3, 1, 0, 33568405]
+  2615: [3, 2, 1, 1, 0, 129]
+  2616: [2, 4, 1, 0, 0, 131]
+  2617: [6, 7, 3, 1, 0, 33568405]
+  2618: [6, 8, 3, 0, 0, 33566869]
+  2619: [1, 9, 1, 1, 0, 145]
+  2620: [6, 4, 1, 1, 0, 33568405]
+  2621: [7, 0, 2, 1, 0, 8325]
+  2622: [7, 0, 2, 1, 0, 8325]
+  2623: [7, 0, 2, 1, 0, 8325]
+  2624: [0, 5, 1, 1, 0, 14469]
+  2625: [0, 0, 2, 1, 0, 14469]
+  2626: [7, 1, 1, 1, 0, 14469]
+  2627: [7, 0, 4, 1, 0, 14469]
+  2628: [5, 1, 1, 0, 0, 145]
+  2629: [4, 5, 2, 2, 0, 33568405]
+  2630: [2, 4, 2, 1, 0, 4233]
+  2631: [6, 7, 2, 0, 0, 33568405]
+  2632: [4, 0, 3, 0, 0, 33558659]
+  2633: [4, 0, 3, 0, 0, 33558659]
+  2634: [4, 0, 3, 0, 0, 33558659]
+  2635: [5, 1, 2, 1, 0, 129]
+  2636: [0, 0, 3, 0, 0, 12949]
+  2637: [2, 2, 1, 1, 0, 4235]
+  2638: [2, 7, 1, 0, 0, 145]
+  2639: [6, 7, 3, 2, 0, 33566861]
+  2640: [0, 2, 3, 1, 0, 13973]
+  2641: [3, 4, 1, 1, 0, 12437]
+  2642: [4, 4, 1, 0, 0, 33558667]
+  2643: [0, 2, 2, 0, 0, 131]
+  2644: [0, 0, 4, 2, 0, 145]
+  2645: [4, 4, 1, 0, 0, 33554577]
+  2646: [3, 1, 1, 1, 0, 129]
+  2647: [2, 2, 2, 1, 0, 145]
+  2648: [1, 9, 1, 1, 0, 14469]
+  2649: [1, 9, 1, 1, 0, 14469]
+  2650: [8, 6, 3, 1, 1, 102773397]
+  2651: [6, 1, 1, 1, 0, 33554577]
+  2652: [0, 1, 2, 2, 0, 14469]
+  2653: [2, 2, 1, 1, 0, 129]
+  2654: [2, 2, 1, 0, 0, 145]
+  2655: [0, 2, 2, 1, 0, 14469]
+  2656: [0, 2, 2, 1, 0, 14469]
+  2657: [6, 7, 3, 1, 0, 33567381]
+  2658: [1, 9, 1, 1, 0, 13973]
+  2659: [1, 9, 1, 1, 0, 13973]
+  2660: [1, 9, 1, 1, 0, 14469]
+  2661: [0, 1, 3, 0, 0, 131]
+  2662: [2, 5, 1, 1, 0, 12437]
+  2663: [2, 5, 1, 1, 0, 12437]
+  2664: [7, 7, 3, 1, 0, 13973]
+  2665: [8, 6, 3, 1, 1, 102773397]
+  2666: [5, 1, 1, 0, 0, 145]
+  2667: [7, 4, 3, 1, 0, 12437]
+  2668: [2, 1, 3, 1, 0, 14469]
+  2669: [5, 1, 2, 1, 0, 33568405]
+  2670: [4, 3, 1, 0, 0, 33566865]
+  2671: [2, 2, 1, 0, 0, 129]
+  2672: [2, 2, 2, 2, 0, 145]
+  2673: [2, 2, 2, 2, 0, 145]
+  2674: [0, 2, 3, 1, 0, 14469]
+  2675: [0, 3, 3, 2, 1, 102774421]
+  2676: [1, 9, 1, 1, 0, 14469]
+  2677: [2, 4, 1, 1, 0, 4235]
+  2678: [5, 1, 1, 1, 0, 129]
+  2679: [5, 1, 1, 1, 0, 129]
+  2680: [4, 2, 1, 1, 0, 33554561]
+  2681: [0, 0, 3, 0, 0, 13973]
+  2682: [0, 0, 3, 0, 0, 13973]
+  2683: [7, 0, 1, 0, 0, 145]
+  2684: [8, 7, 3, 1, 1, 102773397]
+  2685: [8, 7, 3, 1, 1, 102773397]
+  2686: [8, 7, 3, 1, 1, 102773397]
+  2687: [7, 7, 1, 1, 0, 14469]
+  2688: [1, 9, 2, 1, 0, 14469]
+  2689: [5, 1, 2, 1, 0, 4233]
+  2690: [7, 7, 2, 2, 0, 12437]
+  2691: [7, 7, 2, 2, 0, 12437]
+  2692: [7, 8, 2, 1, 0, 14469]
+  2693: [4, 2, 2, 1, 0, 33568901]
+  2694: [2, 4, 1, 0, 0, 13973]
+  2695: [3, 2, 1, 0, 0, 14469]
+  2696: [3, 1, 1, 1, 0, 131]
+  2697: [3, 1, 1, 1, 0, 131]
+  2698: [3, 1, 1, 1, 0, 131]
+  2699: [3, 1, 1, 1, 0, 131]
+  2700: [4, 2, 3, 0, 0, 33554563]
+  2701: [3, 5, 1, 1, 0, 131]
+  2702: [3, 5, 1, 1, 0, 131]
+  2703: [3, 5, 1, 1, 0, 131]
+  2704: [2, 5, 2, 1, 0, 129]
+  2705: [3, 5, 1, 1, 0, 14469]
+  2706: [0, 8, 4, 0, 0, 14469]
+  2707: [3, 1, 3, 0, 0, 129]
+  2708: [1, 2, 2, 2, 0, 145]
+  2709: [5, 1, 3, 2, 0, 14469]
+  2710: [3, 5, 2, 1, 0, 12429]
+  2711: [3, 2, 3, 1, 0, 12429]
+  2712: [2, 3, 1, 0, 0, 129]
+  2713: [5, 1, 2, 1, 0, 145]
+  2714: [9, 2, 1, 1, 0, 12437]
+  2715: [9, 2, 1, 1, 0, 12437]
+  2716: [5, 5, 1, 1, 0, 13973]
+  2717: [5, 5, 1, 1, 0, 13973]
+  2718: [2, 3, 1, 2, 0, 4233]
+  2719: [7, 3, 2, 1, 0, 12437]
+  2720: [3, 4, 2, 1, 0, 132]
+  2721: [6, 0, 3, 2, 1, 102774421]
+  2722: [7, 2, 1, 1, 0, 14469]
+  2723: [1, 9, 1, 1, 0, 14469]
+  2724: [1, 9, 1, 1, 0, 14469]
+  2725: [7, 2, 2, 1, 0, 13973]
+  2726: [8, 0, 4, 1, 1, 102773397]
+  2727: [0, 8, 3, 1, 0, 14469]
+  2728: [9, 0, 1, 0, 0, 14469]
+  2729: [9, 0, 1, 0, 0, 14469]
+  2730: [9, 0, 1, 0, 0, 14469]
+  2731: [9, 0, 1, 0, 0, 14469]
+  2732: [6, 7, 3, 2, 0, 33568901]
+  2733: [1, 9, 4, 2, 0, 13973]
+  2734: [6, 4, 1, 1, 0, 33568901]
+  2735: [3, 5, 2, 1, 0, 132]
+  2736: [1, 9, 4, 1, 1, 102774421]
+  2737: [0, 0, 3, 1, 0, 145]
+  2738: [3, 2, 1, 1, 0, 132]
+  2739: [1, 9, 2, 1, 0, 14469]
+  2740: [1, 9, 2, 1, 0, 14469]
+  2741: [3, 2, 1, 2, 0, 129]
+  2742: [8, 7, 1, 2, 1, 102774421]
+  2743: [8, 7, 1, 2, 1, 102774421]
+  2744: [8, 7, 1, 2, 1, 102774421]
+  2745: [2, 2, 2, 0, 0, 4233]
+  2746: [6, 7, 1, 1, 0, 33554577]
+  2747: [2, 3, 2, 2, 0, 12437]
+  2748: [2, 3, 2, 2, 0, 12437]
+  2749: [2, 3, 2, 2, 0, 12437]
+  2750: [0, 0, 2, 0, 0, 145]
+  2751: [0, 0, 1, 0, 0, 14469]
+  2752: [0, 0, 3, 1, 0, 12437]
+  2753: [0, 0, 3, 1, 0, 12437]
+  2754: [4, 3, 1, 1, 0, 33558667]
+  2755: [0, 0, 1, 0, 0, 131]
+  2756: [0, 0, 1, 0, 0, 131]
+  2757: [7, 1, 3, 1, 0, 13973]
+  2758: [4, 4, 2, 1, 0, 33568405]
+  2759: [6, 0, 2, 1, 0, 33568405]
+  2760: [2, 2, 2, 0, 0, 129]
+  2761: [6, 8, 3, 0, 0, 33566869]
+  2762: [3, 1, 2, 1, 0, 131]
+  2763: [7, 3, 1, 2, 0, 12437]
+  2764: [4, 2, 1, 1, 0, 33566869]
+  2765: [3, 2, 3, 1, 0, 132]
+  2766: [6, 7, 2, 1, 0, 33568405]
+  2767: [2, 3, 2, 2, 0, 13973]
+  2768: [6, 1, 1, 0, 0, 33554563]
+  2769: [0, 3, 2, 0, 0, 131]
+  2770: [2, 0, 3, 0, 0, 129]
+  2771: [2, 0, 3, 0, 0, 129]
+  2772: [1, 9, 1, 0, 0, 14469]
+  2773: [4, 4, 1, 1, 0, 33584789]
+  2774: [6, 7, 4, 2, 0, 33568901]
+  2775: [3, 2, 2, 1, 0, 8325]
+  2776: [3, 1, 1, 0, 0, 131]
+  2777: [7, 4, 2, 0, 0, 14469]
+  2778: [6, 2, 3, 1, 0, 33568901]
+  2779: [3, 2, 4, 1, 0, 4233]
+  2780: [2, 2, 1, 2, 0, 13973]
+  2781: [2, 2, 1, 0, 0, 131]
+  2782: [7, 5, 3, 1, 0, 14469]
+  2783: [7, 5, 4, 1, 0, 33566869]
+  2784: [7, 3, 1, 0, 0, 8325]
+  2785: [7, 4, 2, 1, 0, 12429]
+  2786: [6, 2, 1, 0, 0, 33554577]
+  2787: [4, 2, 1, 0, 0, 33558665]
+  2788: [0, 3, 3, 2, 1, 102774421]
+  2789: [0, 0, 3, 1, 0, 129]
+  2790: [6, 7, 1, 2, 0, 33566869]
+  2791: [7, 0, 4, 1, 0, 14469]
+  2792: [1, 7, 2, 1, 0, 13973]
+  2793: [0, 2, 3, 1, 0, 145]
+  2794: [0, 1, 3, 2, 0, 14469]
+  2795: [5, 1, 3, 1, 0, 145]
+  2796: [1, 9, 2, 1, 0, 14469]
+  2797: [4, 4, 2, 0, 0, 33568901]
+  2798: [4, 4, 1, 0, 0, 33558657]
+  2799: [4, 2, 1, 0, 0, 33558665]
+  2800: [4, 2, 1, 1, 0, 33554577]
+  2801: [6, 7, 3, 1, 0, 33568901]
+  2802: [2, 2, 2, 1, 0, 129]
+  2803: [2, 4, 3, 1, 0, 14469]
+  2804: [2, 4, 3, 1, 0, 14469]
+  2805: [7, 3, 2, 2, 0, 13973]
+  2806: [6, 4, 3, 1, 0, 33568901]
+  2807: [6, 4, 3, 1, 0, 33568901]
+  2808: [2, 2, 2, 1, 0, 131]
+  2809: [0, 3, 2, 1, 0, 132]
+  2810: [2, 3, 2, 2, 0, 4233]
+  2811: [2, 3, 2, 2, 0, 4233]
+  2812: [0, 0, 3, 2, 0, 145]
+  2813: [7, 4, 1, 1, 0, 13973]
+  2814: [7, 4, 1, 1, 0, 13973]
+  2815: [2, 3, 3, 1, 0, 4233]
+  2816: [2, 3, 3, 1, 0, 4233]
+  2817: [7, 5, 2, 1, 0, 33568405]
+  2818: [7, 5, 2, 1, 0, 33568405]
+  2819: [0, 7, 2, 0, 0, 33568405]
+  2820: [0, 7, 2, 0, 0, 33568405]
+  2821: [4, 4, 1, 0, 0, 33568405]
+  2822: [1, 9, 2, 1, 0, 14469]
+  2823: [1, 9, 2, 1, 0, 14469]
+  2824: [3, 2, 3, 1, 0, 132]
+  2825: [3, 2, 3, 1, 0, 132]
+  2826: [6, 4, 3, 1, 0, 33562757]
+  2827: [6, 4, 3, 1, 0, 33562757]
+  2828: [2, 4, 2, 1, 1, 102764683]
+  2829: [2, 1, 1, 1, 0, 14469]
+  2830: [2, 1, 2, 1, 0, 13973]
+  2831: [2, 1, 2, 1, 0, 13973]
+  2832: [9, 2, 2, 2, 0, 12437]
+  2833: [2, 7, 1, 0, 0, 14465]
+  2834: [8, 6, 3, 0, 0, 14469]
+  2835: [4, 2, 1, 0, 0, 33554561]
+  2836: [4, 2, 1, 0, 0, 33554561]
+  2837: [2, 3, 3, 0, 0, 14469]
+  2838: [1, 9, 4, 2, 0, 13973]
+  2839: [3, 3, 2, 1, 0, 12437]
+  2840: [3, 3, 2, 1, 0, 12437]
+  2841: [7, 0, 4, 1, 0, 12949]
+  2842: [4, 4, 2, 0, 0, 33554577]
+  2843: [3, 2, 4, 1, 0, 14469]
+  2844: [3, 2, 1, 1, 0, 132]
+  2845: [3, 3, 1, 1, 0, 131]
+  2846: [2, 2, 1, 1, 0, 14469]
+  2847: [2, 7, 2, 0, 0, 12437]
+  2848: [4, 4, 2, 1, 0, 33568405]
+  2849: [9, 2, 1, 1, 0, 4233]
+  2850: [4, 1, 3, 2, 0, 33568901]
+  2851: [6, 7, 1, 0, 0, 33554577]
+  2852: [6, 2, 4, 1, 0, 33568901]
+  2853: [0, 4, 2, 1, 0, 14469]
+  2854: [6, 7, 1, 0, 0, 33568405]
+  2855: [2, 3, 1, 0, 0, 4225]
+  2856: [2, 3, 1, 0, 0, 4225]
+  2857: [4, 2, 1, 0, 0, 33558657]
+  2858: [0, 0, 3, 1, 0, 13973]
+  2859: [0, 0, 3, 1, 0, 13973]
+  2860: [0, 0, 3, 1, 0, 13973]
+  2861: [6, 9, 4, 1, 1, 102772877]
+  2862: [9, 4, 2, 1, 0, 131]
+  2863: [4, 4, 1, 0, 0, 33554561]
+  2864: [5, 1, 1, 0, 0, 145]
+  2865: [7, 0, 3, 0, 0, 4233]
+  2866: [0, 7, 3, 0, 0, 14469]
+  2867: [2, 5, 3, 1, 0, 14485]
+  2868: [2, 2, 1, 0, 0, 145]
+  2869: [2, 2, 1, 0, 0, 145]
+  2870: [0, 2, 2, 1, 0, 145]
+  2871: [0, 2, 2, 1, 0, 145]
+  2872: [4, 4, 1, 0, 0, 33554561]
+  2873: [4, 5, 2, 1, 0, 33568405]
+  2874: [3, 4, 1, 0, 0, 33568405]
+  2875: [7, 8, 3, 1, 0, 12949]
+  2876: [4, 2, 1, 0, 0, 33568405]
+  2877: [6, 4, 2, 1, 0, 33568405]
+  2878: [2, 2, 1, 0, 0, 145]
+  2879: [7, 2, 2, 2, 0, 33568405]
+  2880: [0, 4, 3, 1, 0, 14469]
+  2881: [0, 4, 3, 1, 0, 14469]
+  2882: [0, 2, 2, 2, 0, 12949]
+  2883: [4, 4, 2, 1, 0, 33566861]
+  2884: [2, 2, 1, 2, 0, 145]
+  2885: [7, 7, 1, 1, 0, 13973]
+  2886: [6, 7, 2, 1, 0, 33568405]
+  2887: [6, 7, 2, 1, 0, 33568405]
+  2888: [0, 3, 3, 0, 0, 14485]
+  2889: [7, 4, 2, 1, 0, 13973]
+  2890: [7, 4, 2, 1, 0, 13973]
+  2891: [4, 5, 1, 2, 0, 33568405]
+  2892: [4, 5, 1, 2, 0, 33568405]
+  2893: [0, 0, 3, 2, 0, 145]
+  2894: [0, 0, 3, 2, 0, 145]
+  2895: [0, 0, 3, 2, 0, 145]
+  2896: [4, 2, 2, 1, 0, 33568901]
+  2897: [0, 0, 3, 0, 0, 33568405]
+  2898: [0, 0, 3, 0, 0, 33568405]
+  2899: [5, 1, 2, 1, 0, 13973]
+  2900: [4, 2, 2, 1, 0, 33568901]
+  2901: [4, 2, 2, 1, 0, 33568901]
+  2902: [4, 2, 1, 0, 0, 33558657]
+  2903: [0, 0, 3, 2, 0, 14469]
+  2904: [2, 5, 1, 1, 0, 145]
+  2905: [4, 1, 1, 2, 0, 33554577]
+  2906: [3, 2, 1, 1, 0, 14485]
+  2907: [2, 1, 1, 1, 0, 145]
+  2908: [7, 0, 3, 1, 0, 145]
+  2909: [6, 0, 3, 1, 0, 33566861]
+  2910: [0, 0, 3, 1, 0, 13973]
+  2911: [7, 0, 4, 1, 0, 12949]
+  2912: [9, 4, 2, 2, 0, 12437]
+  2913: [9, 4, 2, 2, 0, 12437]
+  2914: [7, 0, 1, 1, 0, 133]
+  2916: [0, 2, 2, 1, 0, 145]
+  2917: [0, 0, 3, 1, 0, 13973]
+  2918: [0, 0, 4, 2, 0, 145]
+  2919: [3, 4, 1, 0, 0, 12437]
+  2920: [7, 0, 4, 2, 0, 14469]
+  2921: [6, 0, 3, 2, 1, 102774421]
+  2922: [6, 0, 3, 2, 1, 102774421]
+  2923: [6, 0, 3, 2, 1, 102774421]
+  2924: [3, 3, 2, 1, 0, 12437]
+  2925: [3, 2, 1, 1, 0, 129]
+  2926: [6, 4, 3, 1, 0, 14469]
+  2927: [0, 0, 2, 0, 0, 145]
+  2928: [6, 7, 1, 2, 0, 14469]
+  2929: [0, 2, 4, 0, 0, 14469]
+  2930: [8, 6, 3, 1, 0, 12949]
+  2931: [0, 0, 1, 0, 0, 131]
+  2932: [3, 5, 1, 1, 0, 131]
+  2933: [6, 7, 4, 1, 0, 13973]
+  2934: [8, 6, 3, 1, 0, 13973]
+  2935: [0, 0, 2, 2, 0, 8325]
+  2936: [3, 0, 1, 0, 0, 0]
+  2938: [0, 0, 1, 2, 0, 0]
+  2939: [6, 7, 2, 2, 0, 33554565]
+  2940: [6, 7, 2, 1, 0, 33554565]
+  2941: [6, 7, 2, 2, 0, 33554565]
+  2942: [6, 7, 3, 2, 2, 103284869]
+  2943: [4, 8, 4, 0, 0, 236388352]
+  2948: [1, 9, 3, 1, 0, 14469]
+  2949: [7, 7, 3, 2, 0, 14469]
+  2950: [6, 7, 3, 1, 0, 33568901]
+  2951: [6, 8, 3, 0, 0, 33568901]
+  2952: [6, 4, 3, 1, 0, 33568901]
+  2953: [1, 9, 3, 1, 0, 14469]
+  2954: [1, 9, 3, 1, 0, 14469]
+  2955: [1, 9, 2, 1, 0, 14469]
+  2956: [1, 9, 1, 2, 0, 14469]
+  2957: [1, 9, 2, 1, 0, 14469]
+  2958: [6, 7, 3, 1, 0, 33568901]
+  2959: [7, 2, 3, 1, 0, 14469]
+  2960: [4, 8, 4, 0, 0, 236388352]
+  2961: [7, 2, 3, 1, 0, 14469]
+  2987: [6, 9, 3, 2, 0, 33568901]
+  2988: [1, 7, 3, 1, 2, 104792193]
+  2989: [6, 7, 3, 0, 0, 33558665]
+  2990: [6, 9, 3, 1, 0, 33562757]
+  2991: [6, 7, 3, 1, 0, 33558665]
+  2992: [1, 7, 3, 0, 0, 14465]
+  2993: [6, 7, 3, 0, 0, 33568901]
+  2994: [6, 8, 1, 0, 0, 33566869]
+  2995: [6, 9, 3, 0, 0, 33567381]
+  2996: [1, 8, 1, 2, 2, 103298709]
+  2997: [1, 8, 1, 2, 1, 102774421]
+  2998: [6, 0, 3, 2, 1, 102760581]
+  2999: [7, 0, 3, 1, 2, 103284869]
+  3000: [7, 2, 4, 1, 2, 103284868]
+  3001: [6, 0, 3, 1, 1, 102760581]
+  3002: [6, 0, 3, 1, 1, 102760581]
+  3003: [6, 0, 3, 1, 1, 102760581]
+  3004: [6, 0, 3, 2, 1, 102760581]
+  3005: [6, 0, 3, 1, 1, 102760581]
+  3006: [6, 0, 3, 0, 1, 102760581]
+  3007: [6, 0, 3, 0, 1, 104267776]
+  3008: [6, 0, 3, 0, 1, 102760588]
+  3010: [7, 2, 2, 0, 0, 133]
+  3011: [2, 3, 2, 0, 0, 133]
+  3012: [5, 1, 2, 0, 0, 133]
+  3013: [7, 2, 2, 1, 0, 133]
+  3014: [2, 3, 2, 1, 0, 133]
+  3015: [5, 1, 2, 1, 0, 133]
+  3016: [7, 9, 2, 1, 0, 133]
+  3017: [2, 9, 2, 1, 0, 133]
+  3018: [5, 9, 2, 1, 0, 133]
+  3020: [2, 3, 2, 1, 0, 129]
+  3021: [0, 3, 3, 1, 0, 14469]
+  3022: [2, 3, 3, 1, 0, 129]
+  3023: [0, 3, 4, 2, 0, 14469]
+  3026: [1, 9, 1, 1, 0, 1507328]
+  3027: [1, 9, 1, 1, 0, 1]
+  3028: [1, 9, 1, 1, 0, 1507328]
+  3029: [1, 9, 4, 2, 2, 103284869]
+  3038: [0, 8, 4, 0, 1, 104267780]
+  3039: [8, 7, 1, 2, 0, 33554565]
+  3040: [6, 7, 3, 1, 0, 33554565]
+  3041: [8, 7, 1, 2, 0, 33554565]
+  3061: [0, 0, 1, 1, 0, 1507328]
+  3069: [6, 2, 2, 0, 0, 33568901]
+  3070: [6, 1, 2, 0, 0, 33568901]
+  3071: [6, 1, 2, 0, 0, 33568901]
+  3072: [6, 2, 2, 0, 0, 33568901]
+  3073: [6, 9, 3, 2, 2, 103298709]
+  3074: [6, 0, 4, 2, 2, 103298709]
+  3087: [7, 0, 1, 1, 0, 33568901]
+  3088: [0, 0, 1, 2, 0, 33568901]
+  3089: [6, 7, 2, 2, 0, 33568901]
+  3090: [6, 7, 2, 2, 0, 33568901]
+  3091: [6, 1, 3, 2, 1, 102774917]
+  3092: [6, 3, 3, 2, 1, 102774917]
+  3093: [6, 1, 1, 2, 0, 33568901]
+  3094: [6, 3, 1, 2, 0, 33568901]
+  3095: [6, 3, 1, 2, 0, 33568901]
+  3096: [6, 6, 3, 1, 0, 33568901]
+  3097: [0, 3, 3, 1, 2, 103299205]
+  3098: [6, 7, 4, 2, 0, 33568901]
+  3099: [6, 7, 4, 2, 0, 33568901]
+  3101: [0, 0, 1, 0, 0, 33568901]
+  3102: [0, 0, 1, 0, 0, 1507328]
+  3103: [0, 0, 1, 0, 0, 1507328]
+  3105: [8, 3, 2, 2, 1, 102774917]
+  3106: [6, 8, 3, 1, 1, 102774917]
+  3108: [6, 9, 2, 2, 1, 102774421]
+  3109: [6, 9, 2, 2, 1, 102774421]
+  3122: [2, 2, 1, 2, 1, 102774421]
+  3123: [2, 2, 1, 2, 1, 102774421]
+  3124: [7, 0, 1, 2, 2, 103298709]
+  3125: [7, 0, 1, 1, 1, 102774421]
+  3126: [6, 0, 2, 1, 1, 102774421]
+  3127: [7, 0, 1, 0, 1, 102774421]
+  3128: [7, 0, 1, 1, 1, 102774421]
+  3153: [0, 0, 3, 1, 0, 133]
+  3154: [0, 0, 4, 2, 0, 133]
+  3155: [3, 4, 1, 0, 0, 133]
+  3156: [7, 0, 4, 2, 0, 133]
+  3157: [7, 0, 2, 1, 0, 133]
+  3158: [7, 0, 2, 1, 0, 133]
+  3159: [0, 0, 2, 0, 0, 3604512]
+  3162: [2, 3, 1, 1, 1, 102774421]
+  3163: [2, 3, 1, 1, 1, 102774421]
+  3164: [2, 3, 1, 1, 1, 102774421]
+  3165: [2, 3, 1, 1, 1, 102774421]
+  3169: [0, 0, 1, 0, 0, 1]
+  3170: [0, 0, 1, 0, 0, 1]
+  3173: [6, 3, 4, 1, 2, 103298709]
+  3175: [0, 4, 2, 2, 0, 8325]
+  3176: [6, 7, 2, 2, 0, 33568901]
+  3177: [6, 7, 2, 2, 0, 33554577]
+  3178: [9, 7, 2, 2, 0, 12437]
+  3179: [9, 4, 2, 2, 0, 12433]
+  3180: [9, 7, 4, 2, 0, 12433]
+  3181: [9, 7, 2, 2, 2, 103284865]
+  3190: [7, 0, 1, 1, 2, 104792196]
+  3191: [6, 7, 2, 1, 2, 103626885]
+  3192: [6, 7, 2, 1, 2, 103430277]
+  3193: [6, 7, 2, 1, 2, 103626389]
+  3194: [6, 7, 2, 2, 2, 103626885]
+  3195: [6, 7, 2, 2, 2, 103430277]
+  3196: [6, 7, 2, 2, 2, 103626389]
+  3197: [6, 4, 3, 1, 0, 33562757]
+  3198: [2, 4, 2, 1, 0, 2101391]
+  3199: [9, 3, 2, 2, 0, 2111125]
+  3200: [2, 3, 3, 2, 0, 2111125]
+  3202: [0, 0, 1, 0, 0, 70713345]
+  3203: [0, 0, 1, 0, 0, 70713345]
+  3208: [6, 5, 4, 1, 1, 102774421]
+  3209: [7, 6, 4, 1, 1, 102774421]
+  3210: [7, 8, 4, 1, 1, 102774421]
+  3211: [7, 4, 4, 1, 1, 102774421]
+  3212: [7, 1, 4, 1, 1, 102774421]
+  3213: [6, 3, 4, 1, 1, 102774421]
+  3214: [6, 5, 4, 1, 1, 102774421]
+  3215: [7, 6, 4, 1, 1, 102774421]
+  3216: [7, 8, 4, 1, 1, 102774421]
+  3217: [7, 4, 4, 1, 1, 102774421]
+  3218: [7, 2, 4, 1, 1, 102774421]
+  3219: [6, 3, 4, 1, 1, 102774421]
+  3220: [7, 5, 4, 1, 2, 103298709]
+  3221: [7, 6, 4, 1, 2, 103298709]
+  3222: [7, 4, 4, 1, 2, 103298709]
+  3223: [7, 1, 4, 1, 2, 103298709]
+  3224: [7, 8, 4, 1, 2, 103298709]
+  3225: [7, 3, 4, 1, 2, 103298709]
+  3226: [7, 6, 4, 1, 1, 102774421]
+  3227: [7, 3, 4, 1, 1, 102774421]
+  3228: [7, 8, 4, 1, 1, 102774421]
+  3229: [6, 1, 4, 1, 1, 102774421]
+  3230: [6, 5, 4, 1, 1, 102774421]
+  3231: [7, 4, 4, 1, 1, 102774421]
+  3232: [7, 4, 4, 1, 1, 102774421]
+  3233: [7, 6, 4, 1, 1, 102774421]
+  3234: [7, 3, 4, 1, 1, 102774421]
+  3235: [7, 8, 4, 1, 1, 102774421]
+  3236: [6, 1, 4, 1, 1, 102774421]
+  3237: [6, 5, 4, 1, 1, 102774421]
+  3238: [7, 4, 4, 1, 1, 102774421]
+  3239: [7, 4, 4, 1, 1, 102774421]
+  3240: [7, 6, 4, 1, 2, 103298709]
+  3241: [7, 3, 4, 1, 2, 103298709]
+  3242: [7, 8, 4, 1, 2, 103298709]
+  3243: [7, 1, 4, 1, 2, 103298709]
+  3244: [7, 5, 4, 1, 2, 103298709]
+  3245: [7, 4, 4, 1, 2, 103298709]
+  3246: [7, 4, 4, 1, 2, 103298709]
+  3247: [0, 4, 1, 0, 0, 133]
+  3248: [0, 0, 2, 0, 0, 139]
+  3249: [0, 0, 4, 2, 0, 133]
+  3250: [0, 0, 1, 0, 0, 458885]
+  3251: [0, 7, 2, 0, 0, 133]
+  3252: [0, 7, 1, 1, 0, 133]
+  3253: [0, 0, 1, 0, 0, 202834049]
+  3254: [6, 7, 3, 2, 2, 103284869]
+  3255: [3, 4, 1, 0, 0, 133]
+  3256: [0, 0, 3, 0, 0, 133]
+  3261: [3, 5, 1, 1, 1, 102774421]
+  3306: [3, 1, 1, 1, 1, 102774421]
+  3317: [0, 3, 1, 1, 1, 102774421]
+  3318: [0, 1, 1, 1, 1, 102774421]
+  3319: [0, 5, 1, 1, 1, 102774421]
+  3320: [0, 2, 1, 1, 1, 102774421]
+  3321: [0, 7, 1, 1, 1, 102774421]
+  3322: [0, 0, 4, 1, 1, 102774421]
+  3349: [0, 0, 4, 1, 1, 102774421]
+  3380: [5, 1, 4, 1, 1, 102774421]
+  3384: [3, 1, 1, 1, 0, 14469]
+  3385: [2, 0, 3, 0, 0, 14469]
+  3386: [4, 2, 1, 0, 0, 33568901]
+  3387: [2, 3, 1, 0, 0, 14469]
+  3388: [2, 4, 1, 1, 0, 14469]
+  3389: [3, 2, 1, 1, 0, 14469]
+  3390: [3, 1, 1, 1, 0, 14469]
+  3391: [3, 5, 1, 1, 0, 14469]
+  3392: [2, 2, 1, 0, 0, 14469]
+  3393: [6, 7, 1, 0, 0, 33568901]
+  3394: [2, 2, 1, 2, 0, 14469]
+  3395: [3, 2, 1, 1, 0, 14469]
+  3396: [2, 2, 1, 1, 0, 14469]
+  3397: [2, 2, 1, 1, 0, 14469]
+  3398: [2, 5, 1, 1, 0, 14469]
+  3399: [3, 1, 2, 1, 0, 14469]
+  3400: [3, 2, 1, 2, 0, 14469]
+  3401: [2, 3, 1, 2, 0, 14469]
+  3402: [4, 2, 1, 0, 0, 33568901]
+  3403: [4, 2, 1, 0, 0, 33568901]
+  3404: [4, 2, 1, 0, 0, 33568901]
+  3405: [0, 0, 3, 2, 0, 14469]
+  3406: [4, 3, 1, 0, 0, 33568901]
+  3407: [4, 4, 1, 0, 0, 33568901]
+  3408: [4, 3, 1, 1, 0, 33568901]
+  3409: [0, 2, 3, 1, 0, 14469]
+  3410: [2, 4, 1, 0, 0, 14469]
+  3411: [4, 4, 2, 1, 0, 33568901]
+  3412: [2, 2, 2, 1, 0, 14469]
+  3413: [2, 1, 3, 1, 0, 14469]
+  3414: [2, 2, 1, 0, 0, 14469]
+  3415: [2, 1, 1, 1, 0, 14469]
+  3416: [2, 1, 1, 1, 0, 14469]
+  3417: [1, 9, 1, 1, 0, 14469]
+  3418: [4, 2, 1, 0, 0, 33568901]
+  3419: [0, 0, 4, 2, 0, 132]
+  3420: [3, 2, 4, 1, 0, 14469]
+  3421: [5, 1, 1, 1, 1, 102774917]
+  3422: [2, 2, 1, 1, 1, 102774917]
+  3423: [4, 2, 1, 1, 1, 102774917]
+  3424: [2, 0, 3, 1, 1, 102774917]
+  3425: [2, 3, 3, 2, 1, 102774917]
+  3426: [2, 3, 1, 2, 2, 103298709]
+  3427: [1, 9, 4, 1, 2, 103298709]
+  3428: [2, 0, 3, 2, 2, 103298709]
+  3429: [7, 2, 2, 2, 2, 103298709]
+  3430: [6, 0, 3, 2, 2, 103298709]
+  3431: [5, 1, 1, 1, 0, 14469]
+  3432: [2, 2, 1, 1, 0, 14469]
+  3433: [4, 2, 1, 1, 0, 33568901]
+  3434: [2, 0, 3, 0, 0, 14469]
+  3435: [6, 4, 3, 1, 0, 33568901]
+  3436: [2, 2, 1, 2, 0, 14469]
+  3437: [1, 9, 2, 1, 0, 14469]
+  3438: [0, 2, 3, 1, 0, 14469]
+  3439: [7, 3, 2, 2, 0, 14469]
+  3440: [0, 0, 4, 2, 0, 13973]
+  3442: [2, 1, 1, 1, 0, 14469]
+  3443: [2, 2, 1, 1, 0, 145]
+  3444: [0, 4, 1, 0, 0, 14469]
+  3445: [1, 9, 3, 1, 0, 14469]
+  3446: [1, 9, 3, 1, 0, 14469]
+  3447: [1, 9, 3, 1, 0, 14469]
+  3448: [1, 9, 1, 2, 0, 14469]
+  3449: [1, 9, 1, 2, 0, 14469]
+  3450: [1, 9, 4, 2, 2, 103298709]
+  3451: [6, 9, 4, 1, 0, 33568901]
+  3452: [1, 9, 4, 1, 0, 14469]
+  3454: [7, 7, 2, 1, 0, 14469]
+  3455: [0, 0, 1, 0, 0, 1507328]
+  3473: [1, 9, 1, 2, 2, 103298709]
+  3474: [0, 7, 2, 2, 1, 102774421]
+  3475: [6, 4, 2, 1, 1, 102774421]
+  3476: [1, 9, 1, 1, 0, 14469]
+  3477: [6, 9, 1, 1, 0, 33568901]
+  3478: [1, 9, 2, 1, 1, 102774917]
+  3479: [1, 9, 1, 1, 0, 14469]
+  3480: [1, 9, 1, 1, 0, 14469]
+  3481: [6, 7, 1, 2, 0, 33568901]
+  3482: [6, 7, 1, 1, 0, 33568901]
+  3483: [6, 7, 1, 2, 0, 33568901]
+  3484: [1, 9, 2, 2, 1, 102774421]
+  3485: [1, 9, 1, 1, 0, 14469]
+  3487: [6, 9, 4, 0, 0, 14469]
+  3488: [6, 9, 4, 0, 0, 14469]
+  3489: [6, 9, 4, 0, 0, 14469]
+  3490: [6, 9, 4, 1, 0, 33568901]
+  3494: [0, 0, 1, 0, 1, 108462209]
+  3495: [3, 2, 1, 1, 0, 131]
+  3496: [2, 0, 3, 0, 0, 129]
+  3497: [4, 2, 1, 0, 0, 33554561]
+  3498: [4, 4, 1, 0, 0, 33558657]
+  3499: [5, 1, 1, 1, 0, 129]
+  3500: [2, 3, 1, 1, 0, 4233]
+  3501: [3, 1, 1, 1, 0, 129]
+  3502: [2, 2, 1, 1, 0, 14469]
+  3503: [2, 2, 2, 1, 0, 14469]
+  3504: [2, 2, 2, 1, 0, 14469]
+  3505: [3, 2, 3, 1, 2, 103298709]
+  3506: [3, 2, 3, 1, 1, 102774421]
+  3507: [4, 2, 3, 1, 0, 33568901]
+  3508: [3, 2, 1, 1, 0, 131]
+  3510: [7, 0, 2, 1, 0, 14469]
+  3511: [7, 0, 2, 1, 0, 14469]
+  3512: [7, 0, 2, 1, 0, 14469]
+  3513: [2, 3, 2, 1, 0, 12437]
+  3514: [7, 0, 3, 1, 1, 102774421]
+  3515: [0, 1, 2, 0, 0, 132]
+  3516: [7, 1, 3, 1, 1, 102774421]
+  3517: [0, 1, 2, 2, 0, 161]
+  3518: [7, 0, 2, 1, 0, 14469]
+  3519: [7, 0, 2, 1, 0, 14469]
+  3520: [7, 0, 2, 1, 0, 14469]
+  3521: [2, 3, 2, 1, 0, 12437]
+  3522: [7, 0, 3, 1, 1, 102774421]
+  3523: [0, 1, 2, 0, 0, 132]
+  3524: [7, 0, 3, 1, 0, 13973]
+  3525: [0, 1, 2, 2, 0, 161]
+  3526: [0, 1, 3, 2, 1, 102774421]
+  3527: [7, 6, 3, 0, 0, 0]
+  3528: [7, 6, 3, 0, 0, 0]
+  3621: [2, 7, 3, 2, 2, 103298709]
+  3622: [7, 3, 1, 1, 0, 14469]
+  3623: [0, 3, 1, 0, 1, 104267776]
+  3624: [0, 2, 1, 0, 1, 104267776]
+  3625: [0, 1, 1, 0, 1, 104267776]
+  3626: [7, 7, 2, 2, 0, 14469]
+  3627: [7, 7, 2, 1, 0, 14469]
+  3628: [7, 7, 2, 1, 2, 103298709]
+  3629: [1, 8, 2, 1, 0, 14469]
+  3630: [7, 4, 3, 1, 0, 14469]
+  3631: [2, 0, 2, 1, 0, 14469]
+  3632: [2, 3, 2, 1, 0, 14469]
+  3633: [2, 5, 4, 2, 2, 103298709]
+  3636: [6, 7, 1, 2, 1, 102774421]
+  3669: [6, 7, 2, 0, 0, 33568901]
+  3670: [9, 3, 2, 1, 0, 12429]
+  3731: [6, 0, 4, 1, 2, 103298709]
+  3736: [7, 3, 2, 2, 0, 14469]
+  3737: [7, 3, 2, 2, 0, 14469]
+  3738: [7, 3, 2, 2, 0, 14469]
+  3739: [2, 2, 2, 1, 0, 14465]
+  3740: [0, 5, 2, 1, 0, 14469]
+  3741: [0, 0, 2, 2, 2, 103298709]
+  3742: [0, 0, 1, 0, 0, 1507328]
+  3743: [0, 0, 1, 0, 0, 135725056]
+  3744: [7, 3, 3, 2, 0, 14469]
+  3745: [7, 3, 3, 2, 0, 14469]
+  3746: [7, 3, 3, 2, 0, 14469]
+  3747: [7, 3, 3, 2, 0, 14469]
+  3748: [7, 3, 3, 2, 0, 14469]
+  3749: [7, 3, 3, 2, 0, 14469]
+  3787: [4, 2, 2, 1, 0, 33568901]
+  3788: [2, 5, 2, 0, 0, 14469]
+  3790: [3, 3, 1, 1, 0, 131]
+  3817: [3, 5, 1, 1, 1, 102774421]
+  3971: [6, 0, 4, 1, 2, 103298709]
+  3995: [0, 0, 1, 1, 0, 129]
+  20343: [5, 1, 4, 1, 2, 103298709]
+  20355: [0, 0, 4, 1, 2, 103298709]
+  20356: [0, 0, 4, 1, 2, 103298709]
+  20372: [6, 0, 2, 1, 0, 33568405]
+  20373: [6, 7, 3, 2, 0, 33568405]
+  20374: [9, 0, 2, 1, 0, 13973]
+  20375: [9, 0, 2, 1, 0, 13973]
+  20376: [2, 0, 2, 0, 0, 13973]
+  20377: [0, 7, 2, 1, 0, 13973]
+  20378: [0, 0, 2, 2, 0, 13973]
+  20381: [2, 0, 4, 1, 2, 103298709]
+  20419: [6, 3, 3, 1, 2, 103298709]
+  20420: [6, 4, 2, 1, 0, 33568405]
+  20500: [10, 6, 4, 1, 1, 102774421]
+  20501: [10, 3, 4, 1, 1, 102774421]
+  20502: [10, 3, 4, 1, 1, 102774421]
+  20503: [10, 3, 4, 1, 1, 102774421]
+  20510: [10, 3, 4, 1, 1, 102774421]
+  20511: [10, 0, 2, 1, 1, 102774421]
+  20570: [3, 5, 1, 1, 1, 102774421]
+  20591: [3, 5, 1, 1, 1, 102774421]
+  20606: [8, 6, 4, 1, 1, 102774421]
+  20607: [8, 6, 4, 1, 1, 102774421]
+  20608: [0, 6, 4, 1, 1, 102774421]
+  20609: [0, 8, 4, 1, 1, 102774421]
+  20610: [8, 3, 4, 1, 2, 103298709]
+  20611: [8, 1, 4, 1, 2, 103298709]
+  20616: [1, 9, 4, 1, 1, 102774421]
+  20617: [1, 9, 4, 1, 1, 102774421]
+  20618: [1, 9, 4, 1, 2, 103298709]
+  20630: [0, 0, 2, 1, 0, 14469]
+  20633: [0, 0, 2, 1, 0, 14469]
+  20634: [0, 0, 2, 1, 0, 14469]
+  20637: [7, 0, 2, 1, 0, 14469]
+  20639: [0, 4, 2, 1, 0, 14469]
+  20640: [0, 0, 2, 0, 0, 131]
+  20641: [0, 0, 2, 0, 0, 14469]
+  20643: [5, 1, 2, 1, 0, 14469]
+  20644: [5, 1, 2, 1, 0, 14469]
+  20645: [5, 1, 2, 2, 0, 14469]
+  20646: [5, 1, 3, 2, 0, 14469]
+  20647: [5, 1, 2, 1, 1, 102774917]
+  20648: [3, 3, 3, 0, 2, 103298709]
+  20649: [3, 3, 1, 0, 0, 14469]
+  20650: [3, 4, 1, 0, 0, 14469]
+  20651: [3, 1, 1, 0, 0, 14469]
+  20652: [3, 5, 1, 0, 0, 14469]
+  20653: [3, 2, 1, 0, 0, 14469]
+  20679: [0, 0, 3, 2, 0, 3604480]
+  20680: [7, 0, 2, 1, 0, 14469]
+  20682: [7, 7, 2, 1, 0, 14469]
+  20683: [4, 2, 2, 2, 0, 33568901]
+  20684: [0, 0, 3, 1, 0, 14469]
+  20685: [6, 7, 2, 2, 0, 33568901]
+  20686: [2, 5, 1, 0, 0, 14469]
+  20687: [0, 5, 2, 1, 0, 14469]
+  20688: [7, 8, 1, 1, 0, 8325]
+  20689: [7, 8, 1, 1, 0, 14469]
+  20690: [0, 8, 2, 1, 0, 14469]
+  20691: [6, 5, 3, 2, 0, 33568901]
+  20692: [7, 6, 2, 1, 0, 14469]
+  20693: [0, 8, 3, 1, 0, 14469]
+  20694: [0, 8, 3, 1, 0, 14469]
+  20695: [3, 2, 1, 1, 1, 102774421]
+  20773: [8, 8, 4, 1, 1, 102774421]
+  20774: [8, 4, 4, 1, 1, 102774421]
+  20775: [6, 3, 4, 1, 1, 102774421]
+  20776: [6, 5, 4, 1, 1, 102774421]
+  20777: [1, 8, 4, 1, 1, 102774421]
+  20778: [6, 8, 4, 1, 0, 33566869]
+  20779: [0, 0, 4, 1, 0, 33566869]
+  20780: [0, 9, 4, 1, 0, 33566869]
+  20781: [7, 7, 4, 1, 0, 33566869]
+  20782: [6, 4, 4, 1, 0, 33566869]
+  20783: [6, 0, 4, 1, 0, 33566869]
+  20785: [6, 8, 4, 1, 2, 103298709]
+  20811: [5, 1, 4, 1, 0, 33566869]
+  20843: [6, 7, 3, 1, 2, 103298709]
+  20920: [0, 3, 3, 0, 0, 14469]
+  20921: [2, 1, 3, 1, 0, 14469]
+  20922: [3, 4, 3, 1, 0, 14469]
+  20923: [7, 2, 3, 1, 0, 14469]
+  20924: [2, 2, 3, 1, 0, 14469]
+  20925: [7, 4, 3, 1, 0, 14469]
+  20926: [2, 3, 3, 1, 0, 14469]
+  20927: [0, 1, 3, 0, 0, 14469]
+  20928: [0, 0, 3, 2, 2, 103298709]

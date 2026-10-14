@@ -2,7 +2,6 @@
 
 #include <cfloat>
 #include <cinttypes>
-#include <cstdarg>
 #include <cstdio>
 #include <string>
 
@@ -123,12 +122,6 @@ constexpr std::uint32_t kModeBits[] = {
                                  : (rate > kHitMostPercent ? kHitMostPercent : rate);
 }
 
-// La largeur d'une bulle d'aide, en caractères de la police.
-constexpr float kHelpWrapChars = 32.0F;
-
-// La plus longue ligne qu'on imprime ; au-delà, elle est tronquée.
-constexpr std::size_t kPrintedBytes = 256;
-
 // ── LE SPRITE ───────────────────────────────────────────────────────────────
 //
 // 🔴 LE CADRE EST UNE ZONE ACTIVE : la molette tourne le monstre, un clic le
@@ -205,6 +198,13 @@ void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, MonsterSheet
       answer.post_link = true;
     }
     SkinTooltip(core::Tr("Poser ce monstre dans la barre de chat."));
+  }
+  if (view.database_link) {
+    ImGui::SameLine();
+    if (SkinSmallButton(core::Tr("Base de données##mi_database"), art)) {
+      answer.open_database = true;
+    }
+    SkinTooltip(core::Tr("Ouvrir ce monstre dans la base de données."));
   }
 
   const MonsterSheetWords& words = view.words;
@@ -443,6 +443,31 @@ void StatRow(const char* first_label, const std::string& first, const char* seco
   ImGui::TextUnformatted(second.c_str());
 }
 
+// UNE CASE D'EXP : l'EXP RÉELLE — celle que le serveur donne, ses taux
+// appliqués —, et au survol l'EXP écrite dans la base avec le taux qui la
+// multiplie, quand la base de données les connaît.
+void ExpCell(std::uint32_t real, std::uint32_t written, std::int64_t rate_percent, bool known) {
+  ImGui::TableNextColumn();
+  ImGui::TextUnformatted(GroupThousands(real).c_str());
+  if (known && ImGui::IsItemHovered()) {
+    SkinTooltipFormat(core::Tr("EXP écrite dans la base : %s\nTaux du serveur : %lld %%"),
+                      GroupThousands(written).c_str(), static_cast<long long>(rate_percent));
+  }
+}
+
+void ExpRows(const MonsterSheetView& view) {
+  const bool known = view.written_exp.has_value();
+  const MonsterSheetWrittenExpView written =
+      view.written_exp.value_or(MonsterSheetWrittenExpView{});
+  ImGui::TableNextRow();
+  ImGui::TableNextColumn();
+  Label(core::Tr("EXP de base"));
+  ExpCell(view.base_exp, written.base_exp, written.base_rate_percent, known);
+  ImGui::TableNextColumn();
+  Label(core::Tr("EXP de job"));
+  ExpCell(view.job_exp, written.job_exp, written.job_rate_percent, known);
+}
+
 // ⚠ `speed` EST LE TEMPS DE MARCHE D'UNE CASE : plus il est petit, plus le
 // monstre est rapide. On le retourne en cases par seconde, l'unité dans
 // laquelle un joueur pense sa fuite.
@@ -528,8 +553,7 @@ void DrawStatsTab(const MonsterSheetView& view) {
     // Les milliers ne se séparent que sur ce qui atteint le million : PV, SP,
     // EXP. Partout ailleurs ce serait du bruit.
     StatRow(core::Tr("PV"), GroupThousands(view.hp), core::Tr("SP"), GroupThousands(view.sp));
-    StatRow(core::Tr("EXP de base"), GroupThousands(view.base_exp), core::Tr("EXP de job"),
-            GroupThousands(view.job_exp));
+    ExpRows(view);
     StatRow(core::Tr("ATK"), Printed("%d ~ %d", view.atk_min, view.atk_max), core::Tr("MATK"),
             Printed("%d ~ %d", view.matk_min, view.matk_max));
     const std::string def(view.words.def);
@@ -544,13 +568,18 @@ void DrawStatsTab(const MonsterSheetView& view) {
             Printed(core::Tr("%u case(s)"), static_cast<unsigned>(view.attack_range_cells)),
             core::Tr("Vitesse de dépl."), WalkSpeed(view.walk_ms_per_cell));
     if (view.mvp_exp > 0) {
-      StatRow(core::Tr("EXP MVP"), GroupThousands(view.mvp_exp), "", "");
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      Label(core::Tr("EXP MVP"));
+      ExpCell(view.mvp_exp, view.written_exp.has_value() ? view.written_exp->mvp_exp : 0,
+              view.written_exp.has_value() ? view.written_exp->mvp_rate_percent : 0,
+              view.written_exp.has_value());
     }
     ImGui::EndTable();
   }
 
-  // Les deux lignes d'EXP ci-dessus sont celles de la base, les mêmes pour
-  // tout le monde. Ce que le joueur veut savoir vient juste après.
+  // Les lignes d'EXP ci-dessus sont celles que le serveur donne à tous, ses
+  // taux appliqués. Ce que le joueur, lui, en tirerait vient juste après.
   DrawExpGain(view);
 
   const int mob_hit = view.level + view.dex;
@@ -609,7 +638,7 @@ void DrawTabs(MonsterSheetWindowState& state, const MonsterSheetView& view, cons
     DrawStatsTab(view);
     ImGui::EndTabItem();
   }
-  if (ImGui::BeginTabItem(core::Tr("Résistances"))) {
+  if (view.resist_known && ImGui::BeginTabItem(core::Tr("Résistances"))) {
     DrawResistTab(view);
     ImGui::EndTabItem();
   }
@@ -636,84 +665,6 @@ void DrawTabs(MonsterSheetWindowState& state, const MonsterSheetView& view, cons
 }
 
 }  // namespace
-
-float Px(float pixels) { return pixels * Scale(); }
-
-const char* BossBadge(std::uint8_t rank) {
-  if (rank == kBossRankMini) {
-    return core::Tr("Mini-boss");
-  }
-  if (rank == kBossRankMvp) {
-    return core::Tr("MVP");
-  }
-  return nullptr;
-}
-
-void DrawBossBadge(std::uint8_t rank) {
-  if (const char* badge = BossBadge(rank); badge != nullptr) {
-    ImGui::SameLine();
-    Colored(rank == kBossRankMvp ? kRedColor : kAmberColor, Printed("[%s]", badge).c_str());
-  }
-}
-
-std::string Printed(const char* format, ...) {
-  char text[kPrintedBytes] = {};
-  std::va_list arguments;
-  va_start(arguments, format);
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-  std::vsnprintf(text, sizeof(text), format, arguments);
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-  va_end(arguments);
-  return text;
-}
-
-void Label(const char* text) { Colored(kLabelColor, text); }
-
-void LabelWrapped(const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, kLabelColor);
-  ImGui::PushTextWrapPos(0.0F);
-  ImGui::TextUnformatted(text);
-  ImGui::PopTextWrapPos();
-  ImGui::PopStyleColor();
-}
-
-ImU32 LinkColor() {
-  return ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_TextLink));
-}
-
-void Colored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
-
-void Help(const char* text) {
-  ImGui::SameLine();
-  Colored(kLabelColor, "(?)");
-  if (!ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) || !BeginSkinTooltip()) {
-    return;
-  }
-  ImGui::PushTextWrapPos(ImGui::GetFontSize() * kHelpWrapChars);
-  ImGui::TextUnformatted(text);
-  ImGui::PopTextWrapPos();
-  EndSkinTooltip();
-}
-
-void DecorateLink(bool hovered) {
-  if (!hovered) {
-    return;
-  }
-  ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-  const ImVec2 least = ImGui::GetItemRectMin();
-  const ImVec2 most = ImGui::GetItemRectMax();
-  ImGui::GetWindowDrawList()->AddLine(ImVec2(least.x, most.y), ImVec2(most.x, most.y),
-                                      ImGui::GetColorU32(ImGuiCol_TextLink));
-}
 
 }  // namespace monster_sheet
 
@@ -750,31 +701,38 @@ MonsterSheetAnswer DrawMonsterSheetWindow(MonsterSheetWindowState& state,
                                       ImVec2(FLT_MAX, FLT_MAX));
   if (BeginSkinnedWindow(state.title.c_str(), &state.open, art, SkinnedTitle::kDescription,
                          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing)) {
-    switch (view.phase) {
-      case MonsterSheetPhase::kAsking:
-        Label(core::Tr("Interrogation du serveur..."));
-        break;
-      case MonsterSheetPhase::kUnknown:
-        Colored(
-            kRedColor,
-            Printed(core::Tr("Monstre inconnu du serveur (classe %u)."), view.shown_id).c_str());
-        // Le relevé de Sense, s'il vise ce monstre : mieux que rien.
-        if (view.sense.has_value() && view.sense->sprite_class == view.shown_id) {
-          ImGui::Separator();
-          ImGui::Text(core::Tr("Relevé Sense : niveau %u, PV %u, DEF %u, MDEF %u"),
-                      static_cast<unsigned>(view.sense->level), view.sense->hp,
-                      static_cast<unsigned>(view.sense->def),
-                      static_cast<unsigned>(view.sense->mdef));
-        }
-        break;
-      case MonsterSheetPhase::kReady:
-        DrawHeader(state, view, art, answer);
-        ImGui::Separator();
-        DrawTabs(state, view, art, answer);
-        break;
-    }
+    answer = DrawMonsterSheetBody(state, view, art);
   }
   EndSkinnedWindow();
+  return answer;
+}
+
+MonsterSheetAnswer DrawMonsterSheetBody(MonsterSheetWindowState& state,
+                                        const MonsterSheetView& view, const SkinArt& art) {
+  using namespace monster_sheet;
+  MonsterSheetAnswer answer;
+  switch (view.phase) {
+    case MonsterSheetPhase::kAsking:
+      Label(core::Tr("Interrogation du serveur..."));
+      break;
+    case MonsterSheetPhase::kUnknown:
+      Colored(kRedColor,
+              Printed(core::Tr("Monstre inconnu du serveur (classe %u)."), view.shown_id).c_str());
+      // Le relevé de Sense, s'il vise ce monstre : mieux que rien.
+      if (view.sense.has_value() && view.sense->sprite_class == view.shown_id) {
+        ImGui::Separator();
+        ImGui::Text(core::Tr("Relevé Sense : niveau %u, PV %u, DEF %u, MDEF %u"),
+                    static_cast<unsigned>(view.sense->level), view.sense->hp,
+                    static_cast<unsigned>(view.sense->def),
+                    static_cast<unsigned>(view.sense->mdef));
+      }
+      break;
+    case MonsterSheetPhase::kReady:
+      DrawHeader(state, view, art, answer);
+      ImGui::Separator();
+      DrawTabs(state, view, art, answer);
+      break;
+  }
   return answer;
 }
 

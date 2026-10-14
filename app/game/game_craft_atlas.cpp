@@ -69,6 +69,9 @@ void Game::AdvanceCraftAtlas(std::uint32_t now_ms) {
     case ro::ui::ChatLinkGesture::kMarketSearch:
       pieces_.trade.market().AskOpen(item_id);
       break;
+    case ro::ui::ChatLinkGesture::kGameDatabase:
+      database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = item_id});
+      break;
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops: {
       const char* const verb =

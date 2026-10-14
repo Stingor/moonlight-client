@@ -49,6 +49,9 @@ void ItemEntries(ChatLinkAsk& asked, std::span<const VoteShopOffer> vote_shop) {
   if (ImGui::MenuItem(core::Tr("Rechercher sur le Marché"))) {
     asked.gesture = ChatLinkGesture::kMarketSearch;
   }
+  if (ImGui::MenuItem(core::Tr("Ouvrir dans la base de données"))) {
+    asked.gesture = ChatLinkGesture::kGameDatabase;
+  }
   // LE VOTE SHOP : l'entrée n'existe QUE si l'item y est vendu — sa présence
   // EST l'information. Le prix y figure parce que la question d'après est
   // toujours « combien ? ».

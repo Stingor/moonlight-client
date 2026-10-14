@@ -55,7 +55,6 @@
 #include "ro/ui/map_sign_banner.h"
 #include "ro/ui/menu_icons.h"
 #include "ro/ui/minimap_window.h"
-#include "ro/ui/monster_sheet_window.h"
 #include "ro/ui/navigation_window.h"
 #include "ro/ui/npc_dialog_window.h"
 #include "ro/ui/npc_illustration_window.h"
@@ -91,6 +90,7 @@
 #include "game/achievement_stage.h"
 #include "game/battleground_stage.h"
 #include "game/chat_room_stage.h"
+#include "game/database_windows.h"
 #include "game/hud_rounds.h"
 #include "game/mail_stage.h"
 #include "game/memorial_stage.h"
@@ -175,8 +175,7 @@ class UiStage {
   // en paramètres : chaque fenêtre nouvelle en ajouterait un, et l'ordre de
   // quatre booléens voisins devient vite un piège.
   struct Windows {
-    // Le bandeau du nom de la carte, composé à chaque image par `app`.
-    std::optional<ro::ui::MapSignView> map_sign;
+    std::optional<ro::ui::MapSignView> map_sign;  // le bandeau de la carte, composé par `app`
     // La liaison au serveur : bandeau et boîte de perte, composés par `app`.
     ro::ui::LinkNoticeState link_notice;
     BalloonBoards balloons;  // les bulles d'annonce, composées à chaque image
@@ -323,14 +322,15 @@ class UiStage {
       ro::ui::ViewEquipAnswer answer;
     };
     ViewEquip view_equip;
-    // LA FICHE D'UN MONSTRE, même aller-retour. Vue nulle, rien ne se dessine.
+    // LA FICHE D'UN MONSTRE, même aller-retour ; vue nulle, rien ne se dessine.
+    // Et LA BASE DE DONNÉES, qui l'héberge quand elle est ouverte (ADR 0116).
     struct MonsterSheet {
       ro::ui::MonsterSheetWindowState state;
       const ro::ui::MonsterSheetView* view = nullptr;
       ro::ui::MonsterSheetAnswer answer;
-      // L'aperçu d'un lien de monstre survolé : nul quand rien ne l'est.
-      const ro::ui::MonsterSheetPreview* preview = nullptr;
+      const ro::ui::MonsterSheetPreview* preview = nullptr;  // un lien survolé, ou nul
       ro::ui::MonsterSheetPreviewState preview_state;
+      DatabaseWindows database;
     };
     MonsterSheet monster_sheet;
     // LES FICHES DU STAFF, même aller-retour : voir `game/staff_window_rounds.h`.

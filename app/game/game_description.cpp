@@ -270,6 +270,10 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
       case ro::ui::ChatLinkGesture::kMarketSearch:
         pieces_.trade.market().AskOpen(odds.item_id);
         break;
+      case ro::ui::ChatLinkGesture::kGameDatabase:
+        database_.AskOpen(
+            ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = odds.item_id});
+        break;
       case ro::ui::ChatLinkGesture::kItemInfo:
       case ro::ui::ChatLinkGesture::kWhoDrops: {
         const char* const verb =
@@ -352,6 +356,10 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   }
   if (answers.description.search_market && windows_.description.item_id != 0) {
     pieces_.trade.market().AskOpen(windows_.description.item_id);
+  }
+  if (answers.description.open_database && windows_.description.item_id != 0) {
+    database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem,
+                                             .id = windows_.description.item_id});
   }
   FollowSkillDescriptionLink(answers.skill_description, now_ms);
   skill_facts_.Ask(answers.skill_description, link_);

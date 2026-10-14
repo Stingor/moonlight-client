@@ -461,6 +461,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.trade.store_search().SeeCards(
       {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});
   pieces_.trade.market().SeeRandomOptions(&pieces_.random_option_names);
+  // LA BASE DE DONNÉES : ses tables ne se lisent qu'à sa première ouverture.
+  database_.See(vfs_, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
+                pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
+                &pieces_.item_words);
   pieces_.trade.vending().SeeSaveRoot(client_root_);
   pieces_.trade.StartSession();
   windows_.trade = TradeWindows{};
@@ -695,6 +699,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .craft_atlas = &windows_.craft_atlas.state,
       .ranking_board_asked = &windows_.ranking_board.open_asked,
       .market = &pieces_.trade.market(),
+      .database = &database_,
       .navi = &navi_,
       .navigation = &windows_.navigation.state,
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,

@@ -432,6 +432,8 @@ struct InventoryWindowAction {
 
   // LE MARCHÉ, ouvert sur l'identifiant de cet item ; zéro sinon.
   std::uint32_t market_item_id = 0;
+  // LA BASE DE DONNÉES, ouverte sur la fiche de cet item ; zéro sinon.
+  std::uint32_t database_item_id = 0;
 
   // Les raccourcis de barre de titre vers les autres fenêtres d'objets.
   bool toggle_storage = false;

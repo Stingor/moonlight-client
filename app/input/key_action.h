@@ -130,6 +130,8 @@ struct KeyPress {
   MvpTrackerStage* mvp_tracker = nullptr;
   // LE MARCHÉ : joué à l'image suivante, là où son étage voit sa fenêtre.
   MarketStage* market = nullptr;
+  // LA BASE DE DONNÉES : sa bascule, jouée à l'image suivante par son étage.
+  bool* database_toggle = nullptr;
   // LA BOÎTE DU RAPPORT DE BUG, qu'on ouvre sans contexte.
   ro::ui::BugReportWindowState* bug_report = nullptr;
   // L'ENREGISTREUR DE ZONE, pour ses trois touches. ⚠ IL N'EST PAS UNE FENÊTRE :

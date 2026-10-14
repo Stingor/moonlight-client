@@ -75,6 +75,17 @@ struct MonsterExpGain {
 // l'ordre des constantes `ELE_*` du serveur.
 inline constexpr std::size_t kMonsterResistCount = 10;
 
+// L'EXP ÉCRITE DANS LA BASE, et les taux du serveur qui la multiplient : la
+// fiche montre l'EXP réelle, et celle-ci au survol.
+struct MonsterWrittenExp {
+  std::uint32_t base_exp = 0;
+  std::uint32_t job_exp = 0;
+  std::uint32_t mvp_exp = 0;
+  std::int64_t base_rate_percent = 0;
+  std::int64_t job_rate_percent = 0;
+  std::int64_t mvp_rate_percent = 0;
+};
+
 struct MonsterSheet {
   // La classe de SPRITE, celle qui dessine le monstre. ⚠ PAS FORCÉMENT SON
   // IDENTIFIANT : un monstre déguisé porte l'apparence d'un autre.
@@ -137,6 +148,8 @@ struct MonsterSheet {
 
   // Absente d'un serveur qui ne la calcule pas.
   std::optional<MonsterExpGain> exp_gain;
+  // Connue de la base de données seule ; absente d'une réponse du serveur.
+  std::optional<MonsterWrittenExp> written_exp;
 };
 
 // Le nombre de résistances du relevé de Sense : le neutre n'y est pas.

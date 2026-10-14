@@ -263,6 +263,10 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
   if (answers.inventory.market_item_id != 0) {
     pieces_.trade.market().AskOpen(answers.inventory.market_item_id);
   }
+  if (answers.inventory.database_item_id != 0) {
+    database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem,
+                                             .id = answers.inventory.database_item_id});
+  }
   if (asked.describe_id != 0) {
     windows_.description.item_id = asked.describe_id;
     windows_.description.from_slot = 0;

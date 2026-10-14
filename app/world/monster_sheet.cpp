@@ -27,6 +27,9 @@ constexpr std::array<std::uint32_t, 5> kGuardianClasses = {1285, 1286, 1287, 182
 // donnent : son numéro.
 constexpr std::size_t kSkillNumberBytes = 16;
 
+// Le rang d'arrivée d'une fiche tirée de la base, qu'aucune réponse ne porte.
+constexpr std::uint32_t kBaseArrival = UINT32_MAX;
+
 [[nodiscard]] bool IsGuardian(std::uint32_t sprite_class) {
   return std::ranges::find(kGuardianClasses, sprite_class) != kGuardianClasses.end();
 }
@@ -102,6 +105,24 @@ void MonsterSheet::Open(ro::ui::MonsterSheetWindowState& state, std::uint32_t mo
   }
   state.open = true;
   state.raise = true;
+}
+
+void MonsterSheet::Show(std::uint32_t monster_id) {
+  if (monster_id == 0) {
+    return;
+  }
+  shown_id_ = monster_id;
+  // Le premier `operator[]` note une question par identifiant de base.
+  static_cast<void>(asked_[monster_id]);
+}
+
+bool MonsterSheet::shown_by_view() const {
+  const auto found = asked_.find(shown_id_);
+  return found != asked_.end() && found->second.by_view;
+}
+
+void MonsterSheet::NoteBase(std::uint32_t monster_id, ro::sim::MonsterSheet sheet) {
+  base_[monster_id] = std::move(sheet);
 }
 
 std::optional<MonsterSheet::Ask> MonsterSheet::NextAsk(const ro::sim::PlayerStatus& status,
@@ -289,15 +310,25 @@ const ro::ui::MonsterSheetView& MonsterSheet::Refresh(const ro::ui::MonsterSheet
                                                 .def = sense_->def,
                                                 .mdef = sense_->mdef};
   }
-  const ro::sim::MonsterSheet* const sheet = book_.Find(shown_id_);
+  // LA RÉPONSE DU SERVEUR D'ABORD, la fiche de la base sinon : une fiche
+  // complète l'emporte sur une fiche partielle.
+  const ro::sim::MonsterSheet* sheet = book_.Find(shown_id_);
+  const auto base = base_.find(shown_id_);
+  const bool from_base = sheet == nullptr && base != base_.end();
+  if (from_base) {
+    sheet = &base->second;
+  }
   if (sheet == nullptr) {
     view_.phase = book_.IsUnknown(shown_id_) ? ro::ui::MonsterSheetPhase::kUnknown
                                              : ro::ui::MonsterSheetPhase::kAsking;
     return view_;
   }
   view_.phase = ro::ui::MonsterSheetPhase::kReady;
+  view_.resist_known = !from_base;
 
-  const std::uint32_t arrival = book_.ArrivalOf(shown_id_);
+  // La fiche de la base se range sous un rang à elle : la réponse qui la
+  // remplace refait les listes.
+  const std::uint32_t arrival = from_base ? kBaseArrival : book_.ArrivalOf(shown_id_);
   if (lists_for_id_ != shown_id_ || lists_for_arrival_ != arrival) {
     lists_for_id_ = shown_id_;
     lists_for_arrival_ = arrival;
@@ -373,6 +404,21 @@ const ro::ui::MonsterSheetView& MonsterSheet::Refresh(const ro::ui::MonsterSheet
                                                  .job_level_maxed = gain.job_level_maxed};
   }
   view_.own = OwnOf(status);
+  // L'EXP ÉCRITE, que seule la base sait : celle de la fiche montrée, ou de sa
+  // fiche de base quand le serveur a répondu.
+  const std::optional<ro::sim::MonsterWrittenExp> written =
+      sheet->written_exp.has_value() ? sheet->written_exp
+      : base != base_.end()          ? base->second.written_exp
+                                     : std::nullopt;
+  if (written.has_value()) {
+    view_.written_exp =
+        ro::ui::MonsterSheetWrittenExpView{.base_exp = written->base_exp,
+                                           .job_exp = written->job_exp,
+                                           .mvp_exp = written->mvp_exp,
+                                           .base_rate_percent = written->base_rate_percent,
+                                           .job_rate_percent = written->job_rate_percent,
+                                           .mvp_rate_percent = written->mvp_rate_percent};
+  }
   view_.aegis_name = sheet->aegis_name;
   view_.namesake_count = sheet->namesake_count;
   view_.namesake_origin = sheet->namesake_origin;

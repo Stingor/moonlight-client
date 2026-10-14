@@ -78,6 +78,7 @@ std::optional<GameAction> ActionOfMenuCommand(MenuCommand command) {
     case MenuCommand::kProbability:
     case MenuCommand::kRankingBoard:
     case MenuCommand::kMarket:
+    case MenuCommand::kDatabase:
       break;
     case MenuCommand::kCardAlbum:
       return GameAction::kOpenCardAlbum;
@@ -118,7 +119,7 @@ bool MenuCommandPorted(MenuCommand command) {
   return ActionOfMenuCommand(command).has_value() || command == MenuCommand::kOption ||
          command == MenuCommand::kShortcut || command == MenuCommand::kBattleground ||
          command == MenuCommand::kRankingBoard || command == MenuCommand::kBooking ||
-         command == MenuCommand::kMarket;
+         command == MenuCommand::kMarket || command == MenuCommand::kDatabase;
 }
 
 void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameImages* images,

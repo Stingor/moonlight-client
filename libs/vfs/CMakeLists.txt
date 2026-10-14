@@ -41,6 +41,9 @@ add_library(ro_vfs STATIC
     src/random_option_names.cpp
     src/books.cpp
     src/monster_list.cpp
+    src/server_db.cpp
+    src/server_db_rates.cpp
+    src/server_db_search.cpp
     src/monster_size_effects.cpp
     src/monster_words.cpp
     src/res_name_table.cpp

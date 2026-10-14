@@ -78,6 +78,9 @@ add_library(ro_ui STATIC
     src/craft_window_parts.cpp
     src/make_item_window.cpp
     src/market_window.cpp
+    src/database_item_sheet.cpp
+    src/database_labels.cpp
+    src/database_window.cpp
     src/weapon_refine_window.cpp
     src/character_window.cpp
     src/preset_tab.cpp
@@ -152,6 +155,7 @@ add_library(ro_ui STATIC
     src/entity_inspector_window.cpp
     src/monster_sheet_preview.cpp
     src/monster_sheet_tables.cpp
+    src/monster_sheet_text.cpp
     src/monster_sheet_window.cpp
     src/mvp_tracker_overlays.cpp
     src/mvp_tracker_parts.cpp

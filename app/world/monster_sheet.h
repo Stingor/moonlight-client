@@ -49,6 +49,20 @@ class MonsterSheet {
   // Montre la fiche de ce monstre. `by_view` : l'identifiant est une classe de
   // SPRITE, et non un identifiant de la base — voir `RequestMonsterSheet`.
   void Open(ro::ui::MonsterSheetWindowState& state, std::uint32_t monster_id, bool by_view);
+  // La même, sans toucher la fenêtre : la base de données l'héberge (ADR 0116).
+  void Show(std::uint32_t monster_id);
+  // La fiche montrée a été demandée par une classe de sprite (Sense) : la base
+  // de données, qui range par identifiant, ne la reprend pas.
+  [[nodiscard]] bool shown_by_view() const;
+
+  // LA FICHE QUE LA BASE DE DONNÉES TIRE D'ELLE-MÊME, montrée tant que le
+  // serveur n'a pas répondu, ou quand il ne répond pas. La réponse du serveur
+  // la remplace dès qu'elle arrive : elle seule porte les résistances, les
+  // compétences et le gain d'EXP du personnage.
+  void NoteBase(std::uint32_t monster_id, ro::sim::MonsterSheet sheet);
+  [[nodiscard]] bool HasBase(std::uint32_t monster_id) const { return base_.contains(monster_id); }
+  // « Base de données » dans la fiche, APRÈS `Refresh`, qui remet la vue à zéro.
+  void NoteDatabaseLink(bool shown) noexcept { view_.database_link = shown; }
 
   // CE QU'IL FAUT DEMANDER AU SERVEUR À CETTE IMAGE, et c'est noté comme parti.
   //
@@ -145,6 +159,9 @@ class MonsterSheet {
   std::optional<MonsterSprite> preview_sprite_;
 
   ro::sim::MonsterSheetBook book_;
+  // Les fiches tirées de la base, par identifiant. Elles survivent au
+  // changement de carte : la base ne change pas avec lui.
+  std::map<std::uint32_t, ro::sim::MonsterSheet> base_;
   std::map<std::uint32_t, Asked> asked_;
   std::uint32_t shown_id_ = 0;
   std::uint32_t sense_seen_ = 0;

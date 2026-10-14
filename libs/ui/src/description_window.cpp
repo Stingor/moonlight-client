@@ -471,6 +471,12 @@ void DrawItemBody(DescriptionDollState* doll, int* staff_amount, const Descripti
       action.search_market = true;
     }
     SkinTooltip(core::Tr("Ouvre le Marché sur cet item : qui le vend, qui l'achète."));
+    // « BASE DE DONNÉES », juste après : la fiche entière de l'item.
+    ImGui::SameLine();
+    if (SkinSmallButton(core::Tr("Base de données"), art)) {
+      action.open_database = true;
+    }
+    SkinTooltip(core::Tr("Ouvre la fiche de cet item dans la base de données."));
     action_row = true;
   }
   // « LIRE » ET « LECTURE AUTO », pour un livre qu'on possède.

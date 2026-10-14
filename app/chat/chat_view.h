@@ -52,6 +52,7 @@ namespace moonclient {
 
 class ChatLinePreviewMaker;
 class ChatRoomStage;
+class DatabaseStage;
 class ChatTabsView;
 struct FollowState;
 class NaviSession;
@@ -109,6 +110,8 @@ struct ChatDispatch {
   bool* ranking_board_asked = nullptr;
   // LE MARCHÉ, dont `/marche` demande l'ouverture. Nul : la commande se tait.
   MarketStage* market = nullptr;
+  // LA BASE DE DONNÉES, que `/db` ouvre. Nulle : la commande se tait.
+  DatabaseStage* database = nullptr;
   // LA NAVIGATION, que `/navi` et `/navigation` ouvrent ou lancent : le guidage
   // et les tables de recherche, la fenêtre, et les noms affichés des cartes.
   NaviSession* navi = nullptr;

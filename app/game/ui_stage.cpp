@@ -459,6 +459,10 @@ UiStage::Answers UiStage::Draw(
     windows.monster_sheet.answer = ro::ui::DrawMonsterSheetWindow(
         windows.monster_sheet.state, *windows.monster_sheet.view, skin_);
   }
+  if (DatabaseWindows& database = windows.monster_sheet.database; database.view != nullptr) {
+    database.answer = ro::ui::DrawDatabaseWindow(database.state, *database.view,
+                                                 windows.monster_sheet.state, skin_);
+  }
   if (windows.entity_inspector.view != nullptr) {
     windows.entity_inspector.answer = ro::ui::DrawEntityInspectorWindow(
         windows.entity_inspector.state, *windows.entity_inspector.view, skin_);
@@ -659,6 +663,7 @@ UiStage::Answers UiStage::Draw(
   escape_.RegisterReading(ro::ui::kSkillDescriptionWindowId, &windows.skill_description.open);
   // La fiche d'un monstre se lit et se referme, comme une description.
   escape_.RegisterReading(ro::ui::kMonsterSheetWindowId, &windows.monster_sheet.state.open);
+  escape_.Register(ro::ui::kDatabaseWindowId, &windows.monster_sheet.database.state.open);
   escape_.RegisterReading(ro::ui::kEntityInspectorWindowId, &windows.entity_inspector.state.open);
   escape_.RegisterReading(ro::ui::kChatBlockLogWindowId, &windows.chat_block_log.state.open);
   escape_.Register(ro::ui::kPlayerReportWindowId, &windows.player_report.open);

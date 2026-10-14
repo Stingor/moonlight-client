@@ -153,6 +153,7 @@ struct WindowPixels {
           .minimap_shown = to.minimap_shown,
           .mvp_tracker = to.mvp_tracker,
           .market = to.trade != nullptr ? &to.trade->market() : nullptr,
+          .database_toggle = to.database_toggle,
           .bug_report = to.bug_report,
           .recorder = to.recorder,
           .bindings = to.bindings,

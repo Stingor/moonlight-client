@@ -121,6 +121,9 @@ enum class GameAction : std::uint8_t {
   // déjà. Joué à l'image suivante par son étage ; c'est le serveur qui juge la
   // ville.
   kOpenMarket,
+  // LA BASE DE DONNÉES. ⚠ SANS TOUCHE D'USINE, comme le Marché : l'icône du
+  // menu et `/db` l'ouvrent déjà. Jouée à l'image suivante par son étage.
+  kOpenDatabase,
   // LE RAPPORT DE BUG, sans contexte : carte et position viennent du serveur.
   // ⚠ CTRL+ALT+B : les joueurs de ce serveur l'ont déjà dans les doigts. C'est aussi le recours
   // quand la fenêtre en cause est trop étroite pour garder son bouton, ou quand aucune n'est

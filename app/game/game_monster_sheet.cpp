@@ -31,6 +31,9 @@ constexpr float kSheetSoundPan = 0.0F;
 }  // namespace
 
 void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
+  // LA BASE DE DONNÉES D'ABORD : elle peut héberger la fiche, et les gestes
+  // qu'on y a faits sur elle sont ceux de cette image.
+  AdvanceDatabase(now_ms);
   if (!monster_sheet_.has_value()) {
     windows_.monster_sheet.view = nullptr;
     return;
@@ -63,6 +66,10 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   }
   if (answer.open_monster != 0) {
     sheet.Open(state, answer.open_monster, /*by_view=*/false);
+  }
+  if (answer.open_database && sheet.shown_id() != 0) {
+    database_.AskOpen(
+        ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kMonster, .id = sheet.shown_id()});
   }
   ro::ui::AskSkillDescription(windows_.skill_description, answer.describe_skill);
   // ── UNE CARTE D'APPARITION, avec les gestes de tout lieu ──────────────────
@@ -107,21 +114,28 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   // ⚠ LA FENÊTRE SEULEMENT OUVERTE : c'est l'ouverture qui pose la question, et
   // une fiche qu'on ne regarde pas n'a pas à se rafraîchir. L'aperçu, lui,
   // demande ce qu'il survole.
+  // ── LA BASE DE DONNÉES L'HÉBERGE, quand elle est ouverte ──────────────────
+  const bool hosted = HostMonsterSheet(sheet);
   if (link_.is_open()) {
     if (const std::optional<MonsterSheet::Ask> ask =
-            sheet.NextAsk(world_.player_status(), state.open, now_ms);
+            sheet.NextAsk(world_.player_status(), state.open || hosted, now_ms);
         ask.has_value()) {
       ReportRefusal(ro::net::RequestMonsterSheet(link_, ask->monster_id, ask->by_view));
     }
   }
 
-  if (!state.open) {
+  if (!state.open && !hosted) {
     windows_.monster_sheet.view = nullptr;
+    database_.NoteMonsterView(windows_.monster_sheet.database, nullptr);
     return;
   }
-  windows_.monster_sheet.view =
-      &sheet.Refresh(state, world_.player_status(), options.animate(), true, now_ms);
+  const ro::ui::MonsterSheetView& view =
+      sheet.Refresh(state, world_.player_status(), options.animate(), true, now_ms);
   sheet.NoteVoteShop(pieces_.cash_shop.offers());
+  // « Base de données » dans la fiche seule, que la base reprendrait.
+  sheet.NoteDatabaseLink(state.open && !sheet.shown_by_view());
+  windows_.monster_sheet.view = state.open ? &view : nullptr;
+  database_.NoteMonsterView(windows_.monster_sheet.database, hosted ? &view : nullptr);
 
   // ── CE QUE LE SPRITE FAIT ENTENDRE ────────────────────────────────────────
   if (MonsterSprite* const sprite = sheet.sprite(); sprite != nullptr) {
@@ -170,6 +184,9 @@ void Game::FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now
       break;
     case ro::ui::ChatLinkGesture::kMarketSearch:
       pieces_.trade.market().AskOpen(item_id);
+      break;
+    case ro::ui::ChatLinkGesture::kGameDatabase:
+      database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = item_id});
       break;
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops: {

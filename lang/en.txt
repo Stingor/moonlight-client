@@ -17979,3 +17979,177 @@ tr: Do you agree to cast the magic spell that consumes 1 Black Gemstone and 1,00
 
 fr: Une carte désignée ne peut plus être changée. Voulez-vous vraiment désigner cette carte ?
 tr: You cannot change a map's designation once it is designated. Are you sure that you want to designate this map?
+
+fr: Niv. %u Boss
+tr: Lv. %u Boss
+
+fr: Niv. %u MVP
+tr: Lv. %u MVP
+
+fr: %d monstres
+tr: %d monsters
+
+fr: %d items
+tr: %d items
+
+fr: (récompense MVP)
+tr: (MVP reward)
+
+fr: Accessoire
+tr: Accessory
+
+fr: Attaque magique
+tr: Magic attack
+
+fr: Au retrait
+tr: On unequip
+
+fr: Aucun PNJ ne le vend.
+tr: No NPC sells it.
+
+fr: Aucun monstre ne le lâche.
+tr: No monster drops it.
+
+fr: Bas de tête
+tr: Lower headgear
+
+fr: Base de données
+tr: Database
+
+fr: Base de données##mi_database
+tr: Database##mi_database
+
+fr: Brute
+tr: Brute
+
+fr: Choisissez un item ou un monstre dans la liste.
+tr: Pick an item or a monster in the list.
+
+fr: Consommables différés
+tr: Delayed consumables
+
+fr: Demande au serveur…
+tr: Asking the server…
+
+fr: Description en jeu###db_description
+tr: In-game description###db_description
+
+fr: Emplacements de carte
+tr: Card slots
+
+fr: Femmes seulement
+tr: Women only
+
+fr: Fiche précédente
+tr: Previous sheet
+
+fr: Fiche suivante
+tr: Next sheet
+
+fr: Grand
+tr: Large
+
+fr: Haut de tête
+tr: Upper headgear
+
+fr: Hommes seulement
+tr: Men only
+
+fr: Items de la boutique
+tr: Cash shop items
+
+fr: Jobs
+tr: Jobs
+
+fr: La base de données n'est pas disponible sans installation.
+tr: The database is not available without a game installation.
+
+fr: Le serveur seul le sait : connectez-vous.
+tr: Only the server knows: log in.
+
+fr: Lecture de la base de données…
+tr: Reading the database…
+
+fr: Les tables de la base de données sont absentes de l'installation.
+tr: The database tables are missing from the installation.
+
+fr: Les tables de la base de données sont illisibles.
+tr: The database tables are unreadable.
+
+fr: Lâché par (%d)###db_droppers
+tr: Dropped by (%d)###db_droppers
+
+fr: Marché##db_market
+tr: Market##db_market
+
+fr: Milieu de tête
+tr: Middle headgear
+
+fr: Niv. %u
+tr: Lv. %u
+
+fr: Niveau d'arme
+tr: Weapon level
+
+fr: Niveau d'armure
+tr: Armor level
+
+fr: Niveau requis
+tr: Required level
+
+fr: Nom ou ID
+tr: Name or ID
+
+fr: Ordinaires
+tr: Ordinary
+
+fr: Ouvre la fiche de cet item dans la base de données.
+tr: Opens this item's sheet in the database.
+
+fr: Ouvrir ce monstre dans la base de données.
+tr: Open this monster in the database.
+
+fr: Ouvrir dans la base de données
+tr: Open in the database
+
+fr: Petit
+tr: Small
+
+fr: Prix d'achat
+tr: Buying price
+
+fr: Raffinable
+tr: Refinable
+
+fr: Réessayer##db_sellers_retry
+tr: Retry##db_sellers_retry
+
+fr: Script du serveur
+tr: Server script
+
+fr: Se porte
+tr: Worn on
+
+fr: Vendu chez###db_sellers
+tr: Sold by###db_sellers
+
+fr: [Mini-boss]
+tr: [Mini-boss]
+
+fr: À l'usage ou porté
+tr: On use or while worn
+
+fr: À l'équipement
+tr: On equip
+
+fr: Équipements d'ombre
+tr: Shadow gear
+
+fr: Équipements de familier
+tr: Pet gear
+
+fr: Œufs de familier
+tr: Pet eggs
+
+fr: EXP écrite dans la base : %s\nTaux du serveur : %lld %%
+tr: EXP written in the database: %s\nServer rate: %lld %%

@@ -84,7 +84,9 @@ std::uint16_t Market::NextQueryId() noexcept {
 }
 
 void Market::NoteSent(const MarketQuery& query) {
-  if (query.store_id != 0) {
+  if (query.aside) {
+    aside_.Await(query);
+  } else if (query.store_id != 0) {
     store_.Await(query);
   } else {
     search_.Await(query);
@@ -95,6 +97,18 @@ void Market::Tell(MarketReplyPart part) {
   if (part.status == MarketStatus::kOpen) {
     open_query_ = std::move(part.query);
     ++open_seq_;
+    return;
+  }
+  // UNE DEMANDE À PART se reconnaît à son numéro : sa réponse et son refus ne
+  // touchent ni la liste du Marché ni le pied de sa fenêtre.
+  if (part.query_id != 0 && part.query_id == aside_.query_id()) {
+    if (part.status == MarketStatus::kOk) {
+      static_cast<void>(aside_.Take(std::move(part)));
+    } else {
+      aside_.Abandon();
+      aside_refusal_ = part.status;
+      ++aside_refusal_seq_;
+    }
     return;
   }
   const bool for_store = part.store_id != 0;
@@ -186,6 +200,14 @@ MarketQuery MarketStoreQuery(MarketKind kind, std::uint32_t store_id, std::uint3
   query.kind = kind;
   query.store_id = store_id;
   query.owner_aid = owner_aid;
+  return query;
+}
+
+MarketQuery MarketNpcSellersQuery(std::uint32_t item_id) {
+  MarketQuery query;
+  query.kind = MarketKind::kNpc;
+  query.item_ids = {item_id};
+  query.aside = true;
   return query;
 }
 

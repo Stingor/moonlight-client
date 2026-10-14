@@ -143,6 +143,10 @@ void Game::AdvanceViewEquip(std::uint32_t now_ms) {
       case ro::ui::ChatLinkGesture::kMarketSearch:
         pieces_.trade.market().AskOpen(aimed.item->item_id);
         break;
+      case ro::ui::ChatLinkGesture::kGameDatabase:
+        database_.AskOpen(
+            ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = aimed.item->item_id});
+        break;
       case ro::ui::ChatLinkGesture::kItemInfo:
       case ro::ui::ChatLinkGesture::kWhoDrops: {
         const char* const verb =

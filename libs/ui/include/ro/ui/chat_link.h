@@ -217,6 +217,8 @@ enum class ChatLinkGesture : std::uint8_t {
   kWhoDrops,
   // Le Marché ouvert sur l'identifiant de l'item : qui le vend, qui l'achète.
   kMarketSearch,
+  // La fiche de l'item dans la base de données du jeu (ADR 0116).
+  kGameDatabase,
 
   // ── CE QU'UN LIEN DE STYLE PROPOSE EN PLUS ────────────────────────────────
   //

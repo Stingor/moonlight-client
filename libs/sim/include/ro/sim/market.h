@@ -132,6 +132,9 @@ struct MarketQuery {
   std::uint32_t owner_aid = 0;
   // Vide : tous les objets.
   std::vector<std::uint32_t> item_ids;
+  // UNE DEMANDE À PART, que pose une autre fenêtre — « Vendu chez » de la base
+  // de données. Sa réponse ne remplace pas la liste du Marché. Rien sur le fil.
+  bool aside = false;
 };
 
 // UNE TRAME DE LA RÉPONSE, telle que le fil la porte.
@@ -201,6 +204,10 @@ class Market {
 
   [[nodiscard]] const MarketAnswer& search() const noexcept { return search_; }
   [[nodiscard]] const MarketAnswer& store() const noexcept { return store_; }
+  // La réponse de la dernière demande À PART, et son dernier refus.
+  [[nodiscard]] const MarketAnswer& aside() const noexcept { return aside_; }
+  [[nodiscard]] MarketStatus aside_refusal() const noexcept { return aside_refusal_; }
+  [[nodiscard]] std::uint32_t aside_refusal_seq() const noexcept { return aside_refusal_seq_; }
 
   // Change à chaque ouverture du serveur (catalogue, `@shopsearch`).
   [[nodiscard]] std::uint32_t open_seq() const noexcept { return open_seq_; }
@@ -216,6 +223,9 @@ class Market {
   std::uint16_t last_query_id_ = 0;
   MarketAnswer search_;
   MarketAnswer store_;
+  MarketAnswer aside_;
+  MarketStatus aside_refusal_ = MarketStatus::kOk;
+  std::uint32_t aside_refusal_seq_ = 0;
   std::uint32_t open_seq_ = 0;
   std::string open_query_;
   MarketStatus refusal_ = MarketStatus::kOk;
@@ -270,6 +280,10 @@ struct MarketPlan {
 // La demande du contenu d'une échoppe, d'après l'une de ses offres.
 [[nodiscard]] MarketQuery MarketStoreQuery(MarketKind kind, std::uint32_t store_id,
                                            std::uint32_t owner_aid);
+
+// « VENDU CHEZ » : les boutiques de PNJ qui vendent cet objet, partout. Une
+// demande À PART : la liste du Marché ne bouge pas.
+[[nodiscard]] MarketQuery MarketNpcSellersQuery(std::uint32_t item_id);
 
 // ── LE TRI ET LES PAGES ─────────────────────────────────────────────────────
 

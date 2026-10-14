@@ -38,13 +38,13 @@
 #include "chat/dev_commands.h"
 #include "chat/native_slash_commands.h"
 #include "chat/navigation_command.h"
+#include "chat/opening_commands.h"
 #include "chat/rank_command.h"
 #include "chat/show_equipment_command.h"
 #include "chat/stat_raise_command.h"
 #include "chat/talk_filter_command.h"
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
-#include "game/market_route.h"
 #include "items/warp_memo_report.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
@@ -753,11 +753,8 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     }
     return;
   }
-  // LE MARCHÉ. Même règle : la ligne se prend même sans Marché.
-  if (IsMarketCommand(line)) {
-    if (to.market != nullptr) {
-      to.market->AskOpen();
-    }
+  // LE MARCHÉ ET LA BASE DE DONNÉES. Même règle : la ligne se prend sans eux.
+  if (FollowOpeningCommand(line, to.market, to.database)) {
     return;
   }
   // LES CLASSEMENTS : la réponse s'écrit quand elle arrive, ses noms avec —

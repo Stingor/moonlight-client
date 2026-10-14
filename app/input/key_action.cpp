@@ -527,6 +527,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
         to.market->RequestToggle();
       }
       break;
+    case GameAction::kOpenDatabase:
+      // Jouée à l'image suivante, là où la base de données voit sa fenêtre.
+      if (to.database_toggle != nullptr) {
+        *to.database_toggle = true;
+      }
+      break;
     case GameAction::kOpenChatRoom:
       // Joué à l'image suivante, là où le salon a le fil en main.
       if (to.chat_rooms != nullptr) {

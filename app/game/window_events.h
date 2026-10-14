@@ -143,6 +143,7 @@ struct EventRouting {
   bool* minimap_shown = nullptr;
   // Le carnet de chasse MVP : sa touche est jouée par l'étage, à l'image suivante.
   MvpTrackerStage* mvp_tracker = nullptr;
+  bool* database_toggle = nullptr;  // la bascule de la base de données, de même
   ro::ui::BugReportWindowState* bug_report = nullptr;
   // L'ENREGISTREUR DE ZONE : ses trois touches lui parlent directement. ⚠ IL
   // N'EST PAS UNE FENÊTRE — pas de drapeau d'ouverture à basculer, un ordre à

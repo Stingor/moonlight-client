@@ -119,6 +119,16 @@ struct MonsterSheetWords {
   std::array<std::string_view, kMonsterSheetResistCount> resist;
 };
 
+// L'EXP écrite dans la base et les taux du serveur, pour l'infobulle de l'EXP.
+struct MonsterSheetWrittenExpView {
+  std::uint32_t base_exp = 0;
+  std::uint32_t job_exp = 0;
+  std::uint32_t mvp_exp = 0;
+  std::int64_t base_rate_percent = 0;
+  std::int64_t job_rate_percent = 0;
+  std::int64_t mvp_rate_percent = 0;
+};
+
 struct MonsterSheetView {
   MonsterSheetPhase phase = MonsterSheetPhase::kAsking;
   // Le catalogue du vote shop, pour l'entrée du menu d'un item.
@@ -145,6 +155,8 @@ struct MonsterSheetView {
   bool sprite_is_model = false;
   // Poser le monstre dans la barre de chat est possible.
   bool can_post_link = false;
+  // « Base de données » : la fiche est seule, et la base peut la reprendre.
+  bool database_link = false;
   MonsterSheetWords words;
 
   // ── LES STATISTIQUES ──────────────────────────────────────────────────────
@@ -174,7 +186,13 @@ struct MonsterSheetView {
   // Le temps de marche d'une case ; zéro pour un monstre immobile.
   int walk_ms_per_cell = 0;
   std::array<int, kMonsterSheetResistCount> resist_percent{};
+  // FAUX QUAND LA FICHE VIENT DE LA BASE SEULE, que le serveur n'a pas encore
+  // complétée : la base ne porte pas les résistances, et des zéros mentiraient.
+  // L'onglet n'existe alors pas.
+  bool resist_known = true;
   std::optional<MonsterSheetExpView> exp_gain;
+  // L'EXP de la base, avant les taux du serveur : l'infobulle de l'EXP réelle.
+  std::optional<MonsterSheetWrittenExpView> written_exp;
   // Absentes tant que le serveur n'a rien dit du personnage.
   std::optional<MonsterSheetOwnView> own;
 
@@ -238,7 +256,16 @@ struct MonsterSheetAnswer {
   std::string hovered_map;
   // Poser le monstre dans la barre de chat.
   bool post_link = false;
+  // Ouvrir ce monstre dans la base de données.
+  bool open_database = false;
 };
+
+// 🔴 UN SEUL DESSIN DE FICHE, DEUX HÔTES : la fenêtre ci-dessous, quand on
+// l'ouvre depuis un monstre en jeu, ou le panneau de droite de la base de
+// données (ADR 0116). Le corps se dessine dans la fenêtre en cours.
+[[nodiscard]] MonsterSheetAnswer DrawMonsterSheetBody(MonsterSheetWindowState& state,
+                                                      const MonsterSheetView& view,
+                                                      const SkinArt& art);
 
 // Dessine la fenêtre si elle est ouverte.
 [[nodiscard]] MonsterSheetAnswer DrawMonsterSheetWindow(MonsterSheetWindowState& state,

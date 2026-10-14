@@ -423,6 +423,8 @@ struct DescriptionWindowAction {
   bool toggle_autoloot = false;
   // « Marché » : le Marché s'ouvre sur l'identifiant de l'item montré.
   bool search_market = false;
+  // « Base de données » : la base s'ouvre sur la fiche de l'item montré.
+  bool open_database = false;
   // La case « Comparer » a changé, et vaut maintenant `compare`.
   bool compare_changed = false;
   bool compare = false;
