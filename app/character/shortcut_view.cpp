@@ -385,6 +385,11 @@ std::uint32_t ShortcutBarView::DescribedItem(std::size_t slot, const ro::sim::Wo
   return what.item_id;
 }
 
+std::uint16_t ShortcutBarView::DescribedSkill(std::size_t slot) const {
+  const ro::sim::ShortcutSlot what = bar_.At(slot);
+  return what.holds_item() ? 0 : what.skill_id;
+}
+
 void ShortcutBarView::Apply(const ro::ui::ShortcutBarsAction& asked, SkillBookPanel& book,
                             ro::net::Connection& link, ro::sim::World& world,
                             std::uint32_t now_ms) {

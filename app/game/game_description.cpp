@@ -229,15 +229,14 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   }
   // ── LA DESCRIPTION D'UNE COMPÉTENCE ───────────────────────────────────────
   //
-  // ⚠ ELLE REMONTE À CHAQUE DEMANDE, comme celle d'un objet : décrire une AUTRE
-  // compétence pendant qu'elle est ouverte n'offre aucun front montant, et son
-  // contenu changerait derrière une fenêtre qu'on ne voit plus.
-  if (answers.character.grimoire.describe != 0) {
-    windows_.skill_description.skill_id = answers.character.grimoire.describe;
-    windows_.skill_description.open = true;
-    windows_.skill_description.place_at_mouse = true;
-    windows_.skill_description.raise = true;
+  // Le grimoire la demande au Ctrl + clic droit, la barre au clic droit ; la
+  // redemander pour la compétence qu'elle montre la referme.
+  std::uint16_t described_skill = answers.character.grimoire.describe;
+  if (described_skill == 0 && answers.shortcuts.describe >= 0) {
+    described_skill =
+        shortcuts_->DescribedSkill(static_cast<std::size_t>(answers.shortcuts.describe));
   }
+  ro::ui::AskSkillDescription(windows_.skill_description, described_skill);
   FollowDescriptionLink(answers.description, now_ms);
   item_description_->RefreshSources(windows_.description.item_id, answers.description);
   // UN GESTE SUR UNE LIGNE DE LA TABLE DE TIRAGE. ⚠ DÉCRIRE UN OBJET N'ARRIVE PAS

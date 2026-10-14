@@ -175,6 +175,20 @@ void DrawDamageTab(SkillDescriptionWindowState& state, const SkillDescriptionVie
 
 }  // namespace
 
+void AskSkillDescription(SkillDescriptionWindowState& state, std::uint16_t skill_id) {
+  if (skill_id == 0) {
+    return;
+  }
+  if (state.open && state.skill_id == skill_id) {
+    state.open = false;
+    return;
+  }
+  state.skill_id = skill_id;
+  state.open = true;
+  state.place_at_mouse = true;
+  state.raise = true;
+}
+
 SkillDescriptionAction DrawSkillDescriptionWindow(SkillDescriptionWindowState& state,
                                                   const SkillDescriptionView& view,
                                                   const SkinArt& art) {

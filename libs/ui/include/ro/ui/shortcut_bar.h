@@ -392,10 +392,7 @@ struct ShortcutBarsAction {
   // n'existe pas dans le fil du jeu.
   int link = -1;
   // La case dont il demande la DESCRIPTION, au clic droit, ou moins de zéro.
-  //
-  // ⚠ UN OBJET SEULEMENT. Il n'existe pas de fenêtre de description pour une
-  // compétence ; une case qui en porte une ne rend donc rien, plutôt qu'un clic
-  // qui n'ouvre rien et passe pour une panne.
+  // Objet ou compétence : `app` lit la case pour savoir quelle fenêtre ouvrir.
   int describe = -1;
   // La case que le joueur veut lancer, ou moins de zéro.
   //

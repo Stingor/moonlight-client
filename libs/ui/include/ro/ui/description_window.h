@@ -658,6 +658,15 @@ struct SkillDescriptionAction {
 // découpage est une règle de la table et non une coïncidence.
 inline constexpr std::size_t kSkillDescriptionHeaderLines = 2;
 
+// DEMANDER LA DESCRIPTION D'UNE COMPÉTENCE : l'ouvre, ou la REFERME quand elle
+// montre déjà celle-là. Le geste qui ouvre est donc aussi celui qui ferme,
+// sans aller chercher la croix.
+//
+// ⚠ UNE AUTRE COMPÉTENCE REMPLACE LE CONTENU et fait remonter la fenêtre sous
+// le curseur : son contenu changerait sinon derrière une fenêtre qu'on ne voit
+// plus.
+void AskSkillDescription(SkillDescriptionWindowState& state, std::uint16_t skill_id);
+
 // LA FENÊTRE D'UNE COMPÉTENCE : celle qu'on ouvre au Ctrl + clic droit.
 [[nodiscard]] SkillDescriptionAction DrawSkillDescriptionWindow(SkillDescriptionWindowState& state,
                                                                 const SkillDescriptionView& view,

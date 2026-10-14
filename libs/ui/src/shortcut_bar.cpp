@@ -544,10 +544,11 @@ void DrawOneBar(std::size_t bar, const ShortcutBarLayout& look, const ShortcutBa
       if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) {
         asked.cleared = index;
       }
-      // LE CLIC DROIT DÉCRIT — et seulement un OBJET. Il n'existe pas de fenêtre
-      // de description pour une compétence : la demander ouvrirait le vide, et
-      // un clic qui n'ouvre rien passe pour une panne.
-      if (slot.item_id != 0 && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+      // LE CLIC DROIT DÉCRIT ce que la case porte, objet ou compétence, sans
+      // menu ni modificateur : c'est le geste du jeu sur sa barre. Le même clic
+      // sur la même case referme la description ; c'est `app` qui tranche, lui
+      // seul sait ce qu'elle montre.
+      if (carries_something && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
         asked.describe = index;
       }
       // ── MAJ + MOLETTE : LE RANG AUQUEL CETTE CASE PART ────────────────────

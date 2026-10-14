@@ -155,10 +155,12 @@ class ShortcutBarView {
   // veut dire « plus aucun exemplaire », auquel cas le nom de base fait
   // l'affaire.
   //
-  // Rend zéro pour une case vide, hors compte, ou qui porte une compétence : il
-  // n'existe pas de fenêtre de description pour celles-ci.
+  // Rend zéro pour une case vide, hors compte, ou qui porte une compétence.
   [[nodiscard]] std::uint32_t DescribedItem(std::size_t slot, const ro::sim::World& world,
                                             std::uint16_t* found_at) const;
+  // LA COMPÉTENCE D'UNE CASE, POUR LA DÉCRIRE ; zéro pour une case vide, hors
+  // compte, ou qui porte un objet.
+  [[nodiscard]] std::uint16_t DescribedSkill(std::size_t slot) const;
 
  private:
   void FollowJob(const ro::sim::World& world);

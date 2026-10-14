@@ -127,12 +127,7 @@ void Game::ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_
     pieces_.mvp_tracker.Invite(elsewhere.mvp_invite, link_);
   }
   // LA DESCRIPTION D'UNE COMPÉTENCE DE GUILDE : la fenêtre du grimoire.
-  if (elsewhere.describe_skill != 0) {
-    windows_.skill_description.skill_id = elsewhere.describe_skill;
-    windows_.skill_description.open = true;
-    windows_.skill_description.place_at_mouse = true;
-    windows_.skill_description.raise = true;
-  }
+  ro::ui::AskSkillDescription(windows_.skill_description, elsewhere.describe_skill);
   if (answers.guild_invitation.has_value() && guild_book_.invitation().has_value()) {
     const auto answered = ro::net::AnswerGuildInvitation(link_, guild_book_.invitation()->guild_id,
                                                          *answers.guild_invitation);

@@ -286,11 +286,7 @@ void HomunculusStage::Apply(const ro::ui::HomunculusTabAction& asked, ro::net::C
       SendStaffCommand(asked, link, world);
       break;
     case ro::ui::HomunculusVerb::kDescribeSkill:
-      // ⚠ ELLE REMONTE À CHAQUE DEMANDE, comme depuis le grimoire.
-      description.skill_id = asked.skill_id;
-      description.open = true;
-      description.place_at_mouse = true;
-      description.raise = true;
+      ro::ui::AskSkillDescription(description, asked.skill_id);
       break;
   }
 }

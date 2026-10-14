@@ -64,12 +64,7 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   if (answer.open_monster != 0) {
     sheet.Open(state, answer.open_monster, /*by_view=*/false);
   }
-  if (answer.describe_skill != 0) {
-    windows_.skill_description.skill_id = answer.describe_skill;
-    windows_.skill_description.open = true;
-    windows_.skill_description.place_at_mouse = true;
-    windows_.skill_description.raise = true;
-  }
+  ro::ui::AskSkillDescription(windows_.skill_description, answer.describe_skill);
   // ── UNE CARTE D'APPARITION, avec les gestes de tout lieu ──────────────────
   //
   // Le clic guide vers la carte ENTIÈRE — la fiche ne dit pas où, sur elle, le

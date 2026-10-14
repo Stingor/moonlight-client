@@ -197,12 +197,7 @@ void MercenaryStage::Apply(const ro::ui::MercenaryTabAction& asked, ro::net::Con
                   static_cast<int>(minutes));
     world.RecordChat(ro::sim::ChatKind::kServer, 0, line.data(), now_ms);
   }
-  if (asked.describe_skill_id != 0) {
-    description.skill_id = asked.describe_skill_id;
-    description.open = true;
-    description.place_at_mouse = true;
-    description.raise = true;
-  }
+  ro::ui::AskSkillDescription(description, asked.describe_skill_id);
   if (asked.cast.has_value()) {
     // L'onglet ne propose que ce qui part : un refus ici vient d'une liste
     // changée entre le dessin et le geste.
