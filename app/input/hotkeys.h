@@ -55,6 +55,9 @@ enum class GameAction : std::uint8_t {
   // refuse d'ouvrir sa fenêtre sans lui.
   kOpenCharacterHomunculus,
   kOpenCharacterMercenary,
+  // LA PETITE FENÊTRE DE STATUT, à côté de la fiche. ⚠ ALT+A, la touche du jeu
+  // pour cette fenêtre-là ; A seul reste à la troisième barre.
+  kOpenStatus,
   // LA FICHE DU PET. ⚠ SANS TOUCHE D'USINE : le jeu n'en a pas — on n'y
   // accède que par le menu du pet —, et toute touche libre est déjà prise.
   kOpenPetWindow,

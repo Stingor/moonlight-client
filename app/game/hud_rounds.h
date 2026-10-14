@@ -1,6 +1,9 @@
 #pragma once
 
+#include <string>
+
 #include "ro/ui/status_portrait.h"
+#include "ro/ui/status_window.h"
 #include "ro/ui/target_hud.h"
 
 namespace moonclient {
@@ -23,6 +26,19 @@ struct StatusPortraitRound {
   const ro::ui::StatusPortraitView* view = nullptr;
   ro::ui::StatusPortraitLook* look = nullptr;
   ro::ui::StatusPortraitAnswer answer;
+};
+
+// LA PETITE FENÊTRE DE STATUT, à côté de la fiche, même aller-retour : sa vue
+// est recopiée par `app` à chaque image, et la flèche cliquée remonte à la
+// suivante. Son interrupteur vit ici, retenu d'une session à l'autre comme
+// celui de la fiche.
+struct StatusWindowRound {
+  ro::ui::StatusWindowState state;
+  ro::ui::StatusWindowView view;
+  ro::ui::StatusWindowAction answer;
+  // LE NOM DE GUILDE QUE LA VUE DÉSIGNE, copié à chaque composition : la vue
+  // ne pointe jamais dans le livre de guilde, que le réseau réécrit.
+  std::string guild_name;
 };
 
 }  // namespace moonclient

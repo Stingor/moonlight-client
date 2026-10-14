@@ -17931,3 +17931,51 @@ tr: Opens the Market on every item of this shop, to see whether they are cheaper
 
 fr: %d offres, comparées à l'échoppe de %s
 tr: %d offers, compared with %s's shop
+
+fr: Force : ^66cc33ATK^ffffff et ^66cc33capacité de charge^ffffff
+tr: Strength: ^66cc33ATK^ffffff and ^66cc33Weight Capacity^ffffff
+
+fr: Agilité : ^66cc33ASPD, FLEE^ffffff et ^66cc33DEF^ffffff
+tr: Agility: ^66cc33ASPD, FLEE^ffffff and ^66cc33DEF^ffffff
+
+fr: Vitalité : ^66cc33MaxHP, DEF^ffffff et ^66cc33MDEF^ffffff
+tr: Vitality: ^66cc33MaxHP, DEF^ffffff and ^66cc33MDEF^ffffff
+
+fr: Intelligence : ^66cc33MATK, temps d'incantation^ffffff et ^66cc33MDEF^ffffff
+tr: Intelligence: ^66cc33MATK, Casting Time^ffffff and ^66cc33MDEF^ffffff
+
+fr: Dextérité : ^66cc33ATK à distance, HIT, MATK^ffffff et ^66cc33temps d'incantation^ffffff
+tr: Dexterity: ^66cc33Ranged ATK, HIT, MATK^ffffff and ^66cc33Casting Time^ffffff
+
+fr: Chance : ^66cc33critique, HIT, ATK, MATK^ffffff et ^66cc33esquive parfaite^ffffff
+tr: Luck: ^66cc33Critical, HIT, ATK, MATK^ffffff and ^66cc33Perfect Dodge^ffffff
+
+fr: Points de statut
+tr: Status point
+
+fr: Dégâts physiques
+tr: Physical Damage
+
+fr: Vitesse d'attaque
+tr: Attack Speed
+
+fr: Défense physique
+tr: Physical Defense
+
+fr: Dégâts magiques
+tr: Magical Damage
+
+fr: Précision
+tr: Hit Rate
+
+fr: Taux de critique
+tr: Critical Rate
+
+fr: Guilde d'appartenance
+tr: Affiliated Guild
+
+fr: Taux d'esquive
+tr: Flee Rate
+
+fr: Défense magique
+tr: Magical Defense

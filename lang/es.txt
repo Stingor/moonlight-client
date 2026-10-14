@@ -17931,3 +17931,51 @@ tr: Abre el Mercado con todos los items de esta tienda, para ver si son más bar
 
 fr: %d offres, comparées à l'échoppe de %s
 tr: %d ofertas, comparadas con la tienda de %s
+
+fr: Force : ^66cc33ATK^ffffff et ^66cc33capacité de charge^ffffff
+tr: Fuerza: ^66cc33ATK^ffffff y ^66cc33capacidad de carga^ffffff
+
+fr: Agilité : ^66cc33ASPD, FLEE^ffffff et ^66cc33DEF^ffffff
+tr: Agilidad: ^66cc33ASPD, FLEE^ffffff y ^66cc33DEF^ffffff
+
+fr: Vitalité : ^66cc33MaxHP, DEF^ffffff et ^66cc33MDEF^ffffff
+tr: Vitalidad: ^66cc33MaxHP, DEF^ffffff y ^66cc33MDEF^ffffff
+
+fr: Intelligence : ^66cc33MATK, temps d'incantation^ffffff et ^66cc33MDEF^ffffff
+tr: Inteligencia: ^66cc33MATK, tiempo de lanzamiento^ffffff y ^66cc33MDEF^ffffff
+
+fr: Dextérité : ^66cc33ATK à distance, HIT, MATK^ffffff et ^66cc33temps d'incantation^ffffff
+tr: Destreza: ^66cc33ATK a distancia, HIT, MATK^ffffff y ^66cc33tiempo de lanzamiento^ffffff
+
+fr: Chance : ^66cc33critique, HIT, ATK, MATK^ffffff et ^66cc33esquive parfaite^ffffff
+tr: Suerte: ^66cc33crítico, HIT, ATK, MATK^ffffff y ^66cc33esquiva perfecta^ffffff
+
+fr: Points de statut
+tr: Puntos de estado
+
+fr: Dégâts physiques
+tr: Daño físico
+
+fr: Vitesse d'attaque
+tr: Velocidad de ataque
+
+fr: Défense physique
+tr: Defensa física
+
+fr: Dégâts magiques
+tr: Daño mágico
+
+fr: Précision
+tr: Precisión
+
+fr: Taux de critique
+tr: Tasa de crítico
+
+fr: Guilde d'appartenance
+tr: Guild de pertenencia
+
+fr: Taux d'esquive
+tr: Tasa de evasión
+
+fr: Défense magique
+tr: Defensa mágica

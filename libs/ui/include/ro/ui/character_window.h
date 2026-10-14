@@ -29,9 +29,12 @@ namespace ro::ui {
 // emplacements du serveur ni la table des objets : elle dessine ce qu'on lui
 // donne et rend ce que le joueur a demandé.
 //
-// ⚠ ET C'EST LA MÊME FENÊTRE QUE LE GRIMOIRE, qui en est le premier onglet. Une
-// seconde fenêtre « statut » à côté d'une fenêtre « personnage » est ce que le
-// client d'origine fait ; ici, il n'y en a qu'une.
+// ⚠ ET C'EST LA MÊME FENÊTRE QUE LE GRIMOIRE, qui en est le premier onglet.
+//
+// ⚠ LA PETITE FENÊTRE DE STATUT DU JEU EXISTE AUSSI, À CÔTÉ : la fiche dit
+// tout, celle-là tient en 302 pixels et ne montre que les caractéristiques et
+// les dérivées. Les deux lisent les mêmes nombres, et montent par la même
+// route. Voir `ro/ui/status_window.h`.
 
 // ── LA GÉOMÉTRIE DU MANNEQUIN, EN PIXELS D'ART ──────────────────────────────
 //

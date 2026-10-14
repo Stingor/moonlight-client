@@ -18,6 +18,7 @@
 #include "ro/ui/palette_editor.h"
 #include "ro/ui/pet_window.h"
 #include "ro/ui/skill_window.h"
+#include "ro/ui/status_window.h"
 
 #include "capture/zone_recorder.h"
 #include "character/grimoire_keys.h"
@@ -91,6 +92,8 @@ struct EventRouting {
   // les porte pas.
   const ro::sim::SkillTree* skill_tree = nullptr;
   ro::ui::CharacterWindowState* sheet = nullptr;
+  // La petite fenêtre de statut, qu'Alt+A bascule.
+  ro::ui::StatusWindowState* status = nullptr;
   // Le mode clavier du grimoire : il prend la touche avant qu'elle n'agisse.
   GrimoireKeys* grimoire_keys = nullptr;
   // L'homoncule et le mercenaire existent : leurs touches ouvrent leur onglet.

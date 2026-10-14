@@ -255,6 +255,23 @@ void CharacterView::Refresh(bool open, const ro::sim::World& world, bool costume
       .max_sp = Shown(status.max_sp),
   };
 
+  RefreshNumbers(world);
+
+  BuildBonusRows(world.player_bonuses(), bonus_rows_);
+  stats_.equipment_bonuses = bonus_rows_;
+  const ro::vfs::ItemWords no_words;
+  BuildConditionalRows(world.player_bonuses(), words_ != nullptr ? *words_ : no_words,
+                       conditional_labels_, conditional_rows_);
+  stats_.conditional_bonuses = conditional_rows_;
+  const EquipAttributeNames names = Names();
+  BuildSkillRows(world.player_bonuses(), skills_, names.status_of, skill_labels_, skill_rows_);
+  stats_.skill_bonuses = skill_rows_;
+  BuildItemRows(world.player_bonuses(), names.item_of, item_labels_, item_rows_);
+  stats_.item_bonuses = item_rows_;
+}
+
+void CharacterView::RefreshNumbers(const ro::sim::World& world) {
+  const ro::sim::PlayerStatus& status = world.player_status();
   const std::array<std::int64_t, 6> base = {status.str,  status.agi, status.vit,
                                             status.int_, status.dex, status.luk};
   const std::array<std::int64_t, 6> bonus = {status.str_bonus, status.agi_bonus, status.vit_bonus,
@@ -289,18 +306,6 @@ void CharacterView::Refresh(bool open, const ro::sim::World& world, bool costume
   // la sentinelle : un délai pas encore arrivé afficherait 200, une valeur
   // plausible que personne ne mettrait en doute.
   stats_.aspd = Shown(ro::sim::DisplayedAspd(status.amotion));
-
-  BuildBonusRows(world.player_bonuses(), bonus_rows_);
-  stats_.equipment_bonuses = bonus_rows_;
-  const ro::vfs::ItemWords no_words;
-  BuildConditionalRows(world.player_bonuses(), words_ != nullptr ? *words_ : no_words,
-                       conditional_labels_, conditional_rows_);
-  stats_.conditional_bonuses = conditional_rows_;
-  const EquipAttributeNames names = Names();
-  BuildSkillRows(world.player_bonuses(), skills_, names.status_of, skill_labels_, skill_rows_);
-  stats_.skill_bonuses = skill_rows_;
-  BuildItemRows(world.player_bonuses(), names.item_of, item_labels_, item_rows_);
-  stats_.item_bonuses = item_rows_;
 }
 
 EquipAttributeNames CharacterView::Names() const {

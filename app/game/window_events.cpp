@@ -129,6 +129,7 @@ struct WindowPixels {
           .sheet = to.sheet,
           .homunculus_present = to.homunculus_present,
           .mercenary_present = to.mercenary_present,
+          .status = to.status,
           .companion_ai = to.companion_ai,
           .pet = to.pet,
           .inventory = to.inventory,

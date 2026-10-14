@@ -187,7 +187,6 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // 🔴 LA PRISE ICI, ENTRE LE DESSIN ET LA PRÉSENTATION. Plus tôt, elle
   // rendrait un écran sans ses fenêtres — or ce sont elles que l'on montre.
   // Plus tard, il n'y a plus rien à lire : l'image a été présentée.
-  //
   // ⚠ ELLE RESTE DANS LA PARTIE bien que la présentation soit à la coquille :
   // l'enregistreur est à la partie, et ce qu'il prend est ce que la partie
   // vient de dessiner. Le seul point commun avec la coquille est l'instant.
@@ -259,6 +258,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .grimoire = &grimoire_,
                 .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
                 .sheet = &windows_.character,
+                .status = &windows_.status.state,
                 .grimoire_keys = &pieces_.grimoire_keys,
                 .homunculus_present = pieces_.homunculus.view().present,
                 .mercenary_present = pieces_.mercenary.view().present,

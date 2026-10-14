@@ -22,6 +22,7 @@
 #include "ro/ui/party_friend_window.h"
 #include "ro/ui/pet_window.h"
 #include "ro/ui/skill_window.h"
+#include "ro/ui/status_window.h"
 #include "ro/ui/world_map_window.h"
 
 #include "capture/zone_recorder.h"
@@ -73,6 +74,8 @@ struct KeyPress {
   // rien : le jeu refuse d'ouvrir leur fenêtre.
   bool homunculus_present = false;
   bool mercenary_present = false;
+  // LA PETITE FENÊTRE DE STATUT, à côté de la fiche : Alt+A dans le jeu.
+  ro::ui::StatusWindowState* status = nullptr;
   // L'IA DES DEUX COMPAGNONS : Alt+T et Ctrl+T basculent leur attente, et Échap
   // désarme le skill de compagnon qui attend sa cible.
   CompanionAiStage* companion_ai = nullptr;

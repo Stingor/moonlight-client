@@ -287,10 +287,20 @@ enum class SkinPiece : std::uint8_t {
   kCancelButtonOut,
   kCancelButtonOver,
   kCancelButtonDown,
+
+  // ── LA PETITE FENÊTRE DE STATUT ────────────────────────────────────────
+  //
+  // 🔴 SON FOND PORTE SES LIBELLÉS, peints : la fenêtre n'écrit que les
+  // nombres, et prend la largeur du bitmap comme la banque.
+  //
+  // ⚠ LA FLÈCHE DE MONTÉE N'A QU'UNE IMAGE pour ses trois états — au repos,
+  // survolée, enfoncée —, et c'est le dessin du jeu.
+  kStatusBackground,
+  kStatusRaiseArrow,
 };
 
 inline constexpr std::size_t kSkinPieceCount =
-    static_cast<std::size_t>(SkinPiece::kCancelButtonDown) + 1;
+    static_cast<std::size_t>(SkinPiece::kStatusRaiseArrow) + 1;
 
 // LE NOMBRE DE CHEMINS DÉCLARÉS, pour que la table et l'énumération ne puissent
 // pas diverger. ⚠ UN `std::array` SOUS-REMPLI EST LÉGAL : ajouter une pièce sans

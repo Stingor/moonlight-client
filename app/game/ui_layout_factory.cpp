@@ -57,6 +57,8 @@ constexpr std::array kFactoryWindows = {
     FactoryWindow{"shortcut_bar", At(kCenter, kEnd, 1.0F, 164.0F, 406.0F, 32.0F)},
     FactoryWindow{"shortcut_bar2", At(kCenter, kEnd, 1.0F, 129.0F, 406.0F, 32.0F)},
     FactoryWindow{"staff_tools", At(kStart, kStart, 60.0F, 60.0F, 420.0F, 320.0F)},
+    // La petite fenêtre de statut, à droite de la fiche et alignée sur son haut.
+    FactoryWindow{"status", At(kStart, kCenter, 646.0F, -324.0F, 302.0F, 132.0F)},
     FactoryWindow{"status_bar", At(kCenter, kStart, 174.0F, 16.0F, 638.0F, 84.0F)},
     FactoryWindow{"storage", At(kStart, kStart, 60.0F, 60.0F, 564.0F, 420.0F)},
     FactoryWindow{"world_map", At(kStart, kCenter, 60.0F, -40.0F, 820.0F, 700.0F)},
@@ -95,6 +97,7 @@ constexpr std::array kFactoryToggles = {
     FactoryToggle{"party_friends.pinned", false},
     FactoryToggle{"quest_log", false},
     FactoryToggle{"staff_tools", false},
+    FactoryToggle{"status", false},
 };
 
 }  // namespace

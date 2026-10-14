@@ -424,6 +424,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
         OpenSheetTab(to.sheet, ro::ui::CharacterTab::kMercenary);
       }
       break;
+    case GameAction::kOpenStatus:
+      // Une bascule, sans rien demander au serveur : les nombres sont déjà là.
+      if (Wired(to.status, "fenêtre de statut")) {
+        to.status->open = !to.status->open;
+      }
+      break;
     case GameAction::kOpenPetWindow:
       if (to.pet != nullptr) {
         to.pet->toggle_requested = true;

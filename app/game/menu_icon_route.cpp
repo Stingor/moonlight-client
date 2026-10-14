@@ -30,6 +30,7 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
       facts.open.push_back(command);
     }
   };
+  open_when(MenuCommand::kStatus, windows.status.state.open);
   open_when(MenuCommand::kCraftAtlas, windows.craft_atlas.state.open);
   open_when(MenuCommand::kNavigation, windows.navigation.state.open);
   open_when(MenuCommand::kWorldMap, windows.navigation.world_map.open);
@@ -68,6 +69,7 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
   }
   if (const std::optional<GameAction> action = ActionOfMenuCommand(command); action.has_value()) {
     const KeyPress press{.sheet = &to.windows->character,
+                         .status = &to.windows->status.state,
                          .pet = &to.windows->pet,
                          .inventory = &to.windows->inventory,
                          .party = &to.windows->party.window,

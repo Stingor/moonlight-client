@@ -1,12 +1,14 @@
 // LA FICHE ET L'ÉDITEUR DE STYLE, VUS DE LA BOUCLE : ce que la fiche montre du
 // personnage — ses pièces, ses presets, ses titres, ses compagnons, son avatar,
-// le volet du staff — et les pantins de l'éditeur et de l'aperçu d'un style
+// le volet du staff —, la petite fenêtre de statut qui lit ses nombres, et les
+// pantins de l'éditeur et de l'aperçu d'un style
 // reçu, composés avant le dessin ; puis ce que les presets, le GIF du pantin et
 // ces deux-là ont demandé.
 
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <utility>
 
 #include "ro/net/guild.h"
 #include "ro/render/doll_animation.h"
@@ -15,6 +17,7 @@
 #include "character/doll_gif_export.h"
 #include "character/equip_slot_map.h"
 #include "character/staff_view.h"
+#include "character/status_window_view.h"
 #include "game/game.h"
 #include "world/actor_view.h"
 
@@ -30,8 +33,27 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   }
   // LA FICHE SE REFAIT AVANT LE DESSIN : l'onglet ouvert décide des
   // emplacements cherchés, et il a pu changer à l'image précédente.
+  //
+  // ⚠ LA PETITE FENÊTRE DE STATUT LIT LES MÊMES NOMBRES : ouverte seule, elle
+  // ne fait refaire qu'eux.
+  StatusWindowRound& status = windows_.status;
   character_->Refresh(windows_.character.open, world_,
                       windows_.character.tab == ro::ui::CharacterTab::kCostume);
+  if (status.state.open && !windows_.character.open) {
+    character_->RefreshNumbers(world_);
+  }
+  // LA FLÈCHE CLIQUÉE À L'IMAGE PRÉCÉDENTE part par la route du « + » de la
+  // fiche. ⚠ CONSOMMÉE : laissée en place, elle remonterait la caractéristique
+  // à chaque image.
+  if (const ro::ui::StatusWindowAction asked = std::exchange(status.answer, {});
+      asked.verb != ro::ui::StatusVerb::kNothing) {
+    character_->Apply(SheetActionOf(asked), link_, world_);
+  }
+  // ⚠ LE NOM SE COPIE DANS LE PORTEUR : la vue de l'onglet de guilde date de
+  // l'image précédente, et le réseau a pu réécrire depuis la chaîne qu'elle
+  // désigne.
+  status.guild_name = GuildNameOf(guild_book_);
+  status.view = StatusWindowViewOf(character_->stats(), status.guild_name);
   // Fiche ouverte, et pas seulement sur son onglet : un clic sur l'onglet ne le
   // montre qu'à l'image suivante, que ses lignes doivent déjà servir.
   presets_->Refresh(windows_.character.open, settings_->bindings());

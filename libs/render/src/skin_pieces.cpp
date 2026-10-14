@@ -157,6 +157,9 @@ constexpr std::array<std::string_view, kSkinPieceCount> kPaths = {
     "btn_cancel.bmp",
     "btn_cancel_a.bmp",
     "btn_cancel_b.bmp",
+    // La petite fenêtre de statut. ⚠ LES DEUX NE SONT PAS DANS LE MÊME DOSSIER.
+    "statuswnd\\w_statwin_bg.bmp",
+    "basic_interface\\arw_right.bmp",
 };
 
 }  // namespace

@@ -69,6 +69,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kOpenCharacterGrimoire, "sheet_grimoire"},
     {GameAction::kOpenCharacterHomunculus, "sheet_homunculus"},
     {GameAction::kOpenCharacterMercenary, "sheet_mercenary"},
+    {GameAction::kOpenStatus, "status"},
     {GameAction::kOpenPetWindow, "sheet_pet"},
     {GameAction::kOpenInventory, "inventory"},
     {GameAction::kOpenCart, "cart"},
@@ -222,6 +223,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenCharacterGrimoire:
     case GameAction::kOpenCharacterHomunculus:
     case GameAction::kOpenCharacterMercenary:
+    case GameAction::kOpenStatus:
     case GameAction::kOpenPetWindow:
     case GameAction::kOpenInventory:
     case GameAction::kOpenCart:
@@ -342,6 +344,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Fiche : homoncule");
     case GameAction::kOpenCharacterMercenary:
       return ro::core::Tr("Fiche : mercenaire");
+    case GameAction::kOpenStatus:
+      return ro::core::Tr("Statut");
     case GameAction::kOpenPetWindow:
       return ro::core::Tr("Fiche du pet");
     case GameAction::kOpenInventory:
@@ -466,6 +470,8 @@ Hotkeys::Hotkeys() {
   set(GameAction::kOpenCharacterHomunculus, SDLK_R, /*alt=*/true);
   bindings_[ActionRef(GameAction::kOpenCharacterMercenary).rank()] =
       Binding{.key = SDLK_R, .ctrl = true};
+  // ⚠ ALT+A POUR LA PETITE FENÊTRE DE STATUT : la touche du jeu.
+  set(GameAction::kOpenStatus, SDLK_A, /*alt=*/true);
   // ⚠ ALT+T ET CTRL+T POUR LEUR ATTENTE : les touches du jeu, elles aussi.
   set(GameAction::kHomunculusStandby, SDLK_T, /*alt=*/true);
   bindings_[ActionRef(GameAction::kMercenaryStandby).rank()] = Binding{.key = SDLK_T, .ctrl = true};

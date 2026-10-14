@@ -267,6 +267,10 @@ UiStage::Answers UiStage::Draw(
   if (answers.character.presets.escape_spent) {
     escape_.Suppress();
   }
+  // LA PETITE FENÊTRE DE STATUT, juste après la fiche : on monte un personnage
+  // en regardant l'une ou l'autre.
+  windows.status.answer =
+      ro::ui::DrawStatusWindow(windows.status.state, windows.status.view, skin_);
   if (!sheet.guild_invitation.empty()) {
     bool accepted = false;
     if (ro::ui::DrawGuildInvitation(sheet.guild_invitation, accepted, skin_)) {
@@ -626,6 +630,7 @@ UiStage::Answers UiStage::Draw(
     escape_.SkipNext();
   }
   escape_.Register(ro::ui::kCharacterWindowId, &windows.character.open);
+  escape_.Register(ro::ui::kStatusWindowId, &windows.status.state.open);
   if (windows.party.window.pinned) {
     escape_.SkipNext();
   }

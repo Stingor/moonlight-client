@@ -147,10 +147,6 @@ class UiStage {
     std::optional<ro::ui::NpcIllustrationView> illustration;
   };
 
-  // Ce que les fenêtres gardent d'une image à l'autre.
-  //
-  // Groupé plutôt qu'énuméré en paramètres : chaque fenêtre nouvelle en
-  // ajouterait un, et l'ordre de quatre booléens voisins devient vite un piège.
   // CE QUE LA FICHE MONTRE, groupé : trois vues qui ne se lisent qu'ensemble,
   // et qui viendraient sinon s'ajouter une à une à une signature déjà longue.
   struct CharacterSheetView {
@@ -175,6 +171,9 @@ class UiStage {
     ro::ui::ChatWindowAction asked;
   };
 
+  // Ce que les fenêtres gardent d'une image à l'autre. Groupé plutôt qu'énuméré
+  // en paramètres : chaque fenêtre nouvelle en ajouterait un, et l'ordre de
+  // quatre booléens voisins devient vite un piège.
   struct Windows {
     // Le bandeau du nom de la carte, composé à chaque image par `app`.
     std::optional<ro::ui::MapSignView> map_sign;
@@ -304,9 +303,10 @@ class UiStage {
     // lignes de la fenêtre de configuration — ils descendent ici, remplis
     // seulement quand la fenêtre est ouverte.
     std::array<std::string, ro::ui::kChatMacroCount> macro_keys;
-    // LE HUD DE CIBLE ET LE PORTRAIT DE STATUT : voir `game/hud_rounds.h`.
+    // LE HUD DE CIBLE, LE PORTRAIT ET LA FENÊTRE DE STATUT : `game/hud_rounds.h`.
     TargetHudRound target_hud;
     StatusPortraitRound status_portrait;
+    StatusWindowRound status;
     // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, même aller-retour : sa vue descend
     // d'`app` à l'ouverture, sa réponse remonte à l'image suivante.
     struct EntityMenu {

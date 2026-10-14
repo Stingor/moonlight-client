@@ -51,6 +51,7 @@ constexpr std::string_view kMapWithoutCashShopButton = "new_event";
 std::optional<GameAction> ActionOfMenuCommand(MenuCommand command) {
   switch (command) {
     case MenuCommand::kStatus:
+      return GameAction::kOpenStatus;
     case MenuCommand::kEquipment:
       return GameAction::kOpenCharacterEquipment;
     case MenuCommand::kItem:

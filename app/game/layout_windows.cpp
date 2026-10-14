@@ -18,6 +18,7 @@
 #include "ro/ui/party_friend_window.h"
 #include "ro/ui/quest_window.h"
 #include "ro/ui/staff_tools.h"
+#include "ro/ui/status_window.h"
 #include "ro/ui/world_map_window.h"
 
 namespace moonclient {
@@ -52,6 +53,7 @@ void RememberLayoutWindows(ro::ui::UiContext& ui, UiStage::Windows& windows) {
   // arrive après l'entrée.
   ui.RememberWindow(ro::ui::kInventoryWindowId, &windows.inventory.open);
   ui.RememberWindow(ro::ui::kCharacterWindowId, &windows.character.open);
+  ui.RememberWindow(ro::ui::kStatusWindowId, &windows.status.state.open);
   // ⚠ LA CHARRETTE NE SE MONTRE QUE PORTÉE : ouverte par le profil d'un
   // personnage qui n'en a pas, elle attend sans paraître.
   ui.RememberWindow(ro::ui::kCartWindowId, &windows.cart.open);

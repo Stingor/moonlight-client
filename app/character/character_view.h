@@ -65,6 +65,12 @@ class CharacterView {
   // nombres, les bonus et les compagnons ne sont lus que par elle.
   void Refresh(bool open, const ro::sim::World& world, bool costume);
 
+  // LES NOMBRES SEULS — caractéristiques, coûts, points, dérivées —, que
+  // `Refresh` refait aussi. ⚠ POUR LA PETITE FENÊTRE DE STATUT, fiche fermée :
+  // elle ne lit qu'eux, et recomposer les cases, les bonus et les compagnons
+  // pour elle coûterait une fiche entière à chaque image.
+  void RefreshNumbers(const ro::sim::World& world);
+
   [[nodiscard]] std::span<const ro::ui::EquipSlotView> slots() const noexcept { return slots_; }
   [[nodiscard]] const ro::ui::CharacterHeaderView& header() const noexcept { return header_; }
   [[nodiscard]] const ro::ui::CharacterStatsView& stats() const noexcept { return stats_; }
