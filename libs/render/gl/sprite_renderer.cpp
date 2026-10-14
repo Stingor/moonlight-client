@@ -360,6 +360,9 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
           corner.y -= screen_offset_pixels.y;
         }
       }
+      if (drawn.grow_sprite_pixels != 0.0F) {
+        scaled = GrowSpriteQuad(scaled, drawn.grow_sprite_pixels);
+      }
       // L'ÉLARGISSEMENT EN PIXELS D'ÉCRAN, converti à la profondeur de l'acteur.
       if (drawn.grow_screen_pixels != 0.0F) {
         scaled = GrowSpriteQuad(

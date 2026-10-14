@@ -556,6 +556,11 @@ struct ActorBodyCopy {
   // profondeur des contours d'un cheveu, si bien qu'ils teignent le corps
   // entier ; la lueur qui respire, elle, recule et ne se voit qu'autour de lui.
   bool in_front = false;
+  // DE COMBIEN CHAQUE CALQUE DE LA COPIE S'ÉLARGIT, en pixels de sprite, sur
+  // chacun de ses quatre côtés. Le client pousse les bords de chaque quad vers
+  // l'extérieur : la copie grandit autour du centre de chaque calque, dans
+  // toutes les directions, et non vers le haut depuis les pieds.
+  float grow_pixels = 0.0F;
 };
 
 // Combien de copies un acteur peut porter à la fois. QUATRE par bit au plus —
@@ -584,16 +589,11 @@ inline constexpr std::size_t kMaxBodyCopies = 8;
 
 // Les copies que les effets en cours demandent, écrites dans `out`.
 //
-// `body_height_pixels` est la hauteur du corps en pixels de sprite : le client
-// ÉLARGIT le quad d'un nombre de pixels, et c'est cette hauteur qui convertit
-// l'élargissement en échelle. Un corps de hauteur nulle n'a pas de halo.
-//
 // `0x8` pose deux copies blanches qui respirent, `0x800` et `0x80000` deux
 // copies teintées dont l'alpha est le paramètre de l'effet — toutes quatre EN
 // ADDITION —, `0x200` et `0x1000` les anneaux et la croix. Rendu : combien de
 // copies ont été écrites.
 [[nodiscard]] std::size_t BodyCopiesAfterEffects(std::span<const ActorEffectPlay> played,
-                                                 float body_height_pixels,
                                                  std::span<ActorBodyCopy> out);
 
 // La teinte d'un acteur une fois posés les effets qu'il porte, en rouge, vert,

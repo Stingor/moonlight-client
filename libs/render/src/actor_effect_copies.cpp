@@ -26,7 +26,8 @@ inline constexpr std::uint32_t kGreenOutline = 0x80000;
 //
 // Le client pose QUATRE copies de plus en plus larges, chacune décalée d'un
 // quart de cycle, et dont l'alpha tombe à mesure qu'elles s'élargissent. C'est
-// le bouclier qui renvoie les coups.
+// le bouclier qui renvoie les coups. Chaque calque s'élargit autour de son
+// centre : les anneaux partent dans toutes les directions.
 inline constexpr std::uint32_t kSpreadingRings = 0x200;
 
 // LA CROIX — `EF_4WAYBODY`.
@@ -113,17 +114,6 @@ inline constexpr std::int32_t kCrossAlphaAtCenter = 150;
 inline constexpr std::int32_t kCrossAlphaPerStep = 5;
 inline constexpr std::size_t kCrossArms = 4;
 
-// L'échelle qui élargit un corps de tant de pixels de chaque côté.
-//
-// Le client pousse les quatre bords vers l'extérieur ; à hauteur égale, cela
-// revient à grandir le sprite autour de son centre.
-float ScaleForInflation(float inflate_pixels, float body_height_pixels) {
-  if (!(body_height_pixels > 0.0F)) {
-    return 1.0F;
-  }
-  return 1.0F + 2.0F * inflate_pixels / body_height_pixels;
-}
-
 float SineOfPhase(std::uint32_t age_ticks) {
   const auto degrees = static_cast<float>(age_ticks % kPhaseWrap);
   return std::sin(degrees * std::numbers::pi_v<float> / 180.0F);
@@ -141,14 +131,15 @@ const ActorFieldWrite* WriteOn(const ActorEffectChange& change, std::uint16_t fi
 }  // namespace
 
 std::size_t BodyCopiesAfterEffects(std::span<const ActorEffectPlay> played,
-                                   float body_height_pixels, std::span<ActorBodyCopy> out) {
+                                   std::span<ActorBodyCopy> out) {
   std::size_t written = 0;
   const auto ajouter = [&](float scale, std::array<std::uint8_t, 4> tint,
                            std::array<float, 2> offset_pixels = {0.0F, 0.0F},
                            ActorPartSet parts = kAllActorParts, bool additive = false,
-                           bool in_front = false) {
+                           bool in_front = false, float grow_pixels = 0.0F) {
     if (written < out.size()) {
-      out[written++] = ActorBodyCopy{scale, tint, offset_pixels, parts, additive, in_front};
+      out[written++] =
+          ActorBodyCopy{scale, tint, offset_pixels, parts, additive, in_front, grow_pixels};
     }
   };
   // ⚠ LES GARDES LISENT LE MOT DE RENDU ENTIER, pas les bits d'un seul effet :
@@ -169,10 +160,10 @@ std::size_t BodyCopiesAfterEffects(std::span<const ActorEffectPlay> played,
     if ((raised & kBreathingGlow) != 0 &&
         (raised_by_all & (kFadeOutRising | kFadeInFalling)) == 0) {
       const float sine = SineOfPhase(play.age_ticks);
-      ajouter(ScaleForInflation(sine + kInnerGlowBase, body_height_pixels),
-              {255, 255, 255, kInnerGlowAlpha}, {0.0F, 0.0F}, kBreathingGlowParts, true);
-      ajouter(ScaleForInflation(kOuterGlowSwing * sine + kOuterGlowBase, body_height_pixels),
-              {255, 255, 255, kOuterGlowAlpha}, {0.0F, 0.0F}, kBreathingGlowParts, true);
+      ajouter(1.0F, {255, 255, 255, kInnerGlowAlpha}, {0.0F, 0.0F}, kBreathingGlowParts, true,
+              false, sine + kInnerGlowBase);
+      ajouter(1.0F, {255, 255, 255, kOuterGlowAlpha}, {0.0F, 0.0F}, kBreathingGlowParts, true,
+              false, kOuterGlowSwing * sine + kOuterGlowBase);
     }
     if ((raised & kSpreadingRings) != 0) {
       const auto phase = static_cast<float>(play.age_ticks % kRingPhaseWrap);
@@ -187,7 +178,9 @@ std::size_t BodyCopiesAfterEffects(std::span<const ActorEffectPlay> played,
         const auto alpha = static_cast<std::uint8_t>(std::clamp<std::int32_t>(
             static_cast<std::int32_t>(kRingAlphaAtCenter * (1.0F - width / kRingWidthPixels)), 0,
             kOpaque));
-        ajouter(ScaleForInflation(width, body_height_pixels), {255, 255, 255, alpha});
+        // ⚠ DEVANT LE CORPS : le client avance leur profondeur, et ils
+        // voilent le corps qu'ils entourent.
+        ajouter(1.0F, {255, 255, 255, alpha}, {0.0F, 0.0F}, kAllActorParts, false, true, width);
       }
     }
     if ((raised & kSpreadCross) != 0) {

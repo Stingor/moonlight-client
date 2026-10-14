@@ -590,8 +590,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // LES HALOS D'ABORD : le client soumet ses copies avant le corps qu'elles
     // entourent, et elles n'ont ni ombre ni boîte de clic à elles.
     std::array<ro::render::ActorBodyCopy, ro::render::kMaxBodyCopies> halos;
-    const std::size_t count =
-        ro::render::BodyCopiesAfterEffects(played_effects, body_pixels, halos);
+    const std::size_t count = ro::render::BodyCopiesAfterEffects(played_effects, halos);
     for (std::size_t copy_rank = 0; copy_rank < count; ++copy_rank) {
       // ⚠ UN CONTOUR PASSE DEVANT LE CORPS, comme un voile et du même pas : voir
       // `ActorBodyCopy::in_front`. Les autres copies restent derrière lui.
@@ -603,6 +602,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
               hover_offset});
       // Un halo se range dans un seau à mélange propre, hors du brouillard.
       layer.back().fogged = false;
+      layer.back().grow_sprite_pixels = halos[copy_rank].grow_pixels;
       if (in_front) {
         layer.back().depth_bias = kVeilDepthBias;
       }

@@ -72,6 +72,11 @@ struct DrawnActor {
   // quatre côtés — après l'échelle, comme le client l'ajoute au rectangle déjà
   // projeté. Zéro pour tout acteur ; le halo d'un sprite éclatant en porte un.
   float grow_screen_pixels = 0.0F;
+  // DE COMBIEN CHAQUE CALQUE S'ÉLARGIT, en pixels de SPRITE, sur chacun de ses
+  // quatre côtés, après l'échelle. Le calque grandit autour de son centre, et
+  // non depuis les pieds comme le fait `scale` : c'est le halo qui respire et
+  // les anneaux qui s'écartent. Il suit le zoom, comme le sprite.
+  float grow_sprite_pixels = 0.0F;
   // UN ACTEUR EN MODÈLE n'a pas de quad : son emprise est un CARRÉ d'écran
   // autour du point `model_pick_center`, d'un demi-côté de `√(côté² / 2)` unités
   // de la vue, où `model_pick_side` est ce côté. Zéro pour tout autre acteur.
