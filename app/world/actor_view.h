@@ -541,6 +541,8 @@ struct ComposedScene {
   std::vector<std::uint32_t> ids;
   std::vector<ro::render::DrawnActor> behind;
   std::vector<ro::render::DrawnActor> front;
+  // LES AUTRES ACTEURS DISSIMULÉS, hors de `drawn` : voir `ConcealedPlace`.
+  std::vector<ConcealedPlace> concealed;
   // COMBIEN D'IMAGES ONT ÉTÉ COMPOSÉES, depuis toujours : `Clear` ne le remet
   // pas à zéro. L'arme doublée ne paraît qu'une image sur deux, et c'est ce
   // compte qui le dit.
@@ -599,6 +601,7 @@ struct ComposedScene {
     ids.clear();
     behind.clear();
     front.clear();
+    concealed.clear();
     vanished.clear();
     head_shifts.clear();
     hover_pixels.clear();

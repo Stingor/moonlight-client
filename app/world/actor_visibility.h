@@ -37,6 +37,14 @@ enum class Concealment : std::uint8_t {
 // Vrai pour un acteur dont le CORPS ne se dessine pas : voir `ConcealmentOf`.
 [[nodiscard]] bool IsHidden(const ro::sim::Actor& actor, const ro::sim::World& world);
 
+// UN AUTRE ACTEUR DISSIMULÉ, à la place qu'il occupe sur le sol. Il n'a ni corps
+// ni rang dans la scène dessinée, donc ni nom, ni jauge, ni clic : seul ce qui
+// doit le montrer malgré tout s'y rapporte.
+struct ConcealedPlace {
+  std::uint32_t actor_id = 0;
+  glm::vec3 ground_position{0.0F};
+};
+
 // LE JOUEUR DISSIMULÉ GARDE SA PLACE DANS LA SCÈNE, SANS CORPS : un rang sans
 // sprite, ajouté à `drawn` et `ids`, où sa jauge et son nom s'accrochent encore
 // et que rien ne peut cliquer. Caché, il laisse en plus son ombre au sol, portée

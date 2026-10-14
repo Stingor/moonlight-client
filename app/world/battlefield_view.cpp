@@ -17,6 +17,9 @@ constexpr ImU32 kLionColor = IM_COL32(255, 150, 40, 255);
 constexpr ImU32 kEagleColor = IM_COL32(70, 170, 255, 255);
 constexpr ImU32 kUnknownSideColor = IM_COL32(200, 200, 200, 255);
 
+// L'échelle d'un corps qu'on ne dessine pas : ni grandi ni rapetissé.
+constexpr float kOrdinaryBodyScale = 1.0F;
+
 [[nodiscard]] ro::render::BattleScoreHighlight HighlightOf(ro::sim::BattleSide side) {
   switch (side) {
     case ro::sim::BattleSide::kLion:
@@ -34,8 +37,8 @@ constexpr ImU32 kUnknownSideColor = IM_COL32(200, 200, 200, 255);
 std::vector<ro::render::ScreenQuad> EnemyMarkersOnScreen(
     const ro::render::Camera& camera, float aspect_ratio,
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
-    const ro::sim::World& world, const ro::render::BattlefieldArt& art, float viewport_width,
-    float viewport_height) {
+    std::span<const ConcealedPlace> concealed, bool sees_concealed, const ro::sim::World& world,
+    const ro::render::BattlefieldArt& art, float viewport_width, float viewport_height) {
   std::vector<ro::render::ScreenQuad> markers;
   if (!world.map_mode().battlefield || art.enemy_marker.empty()) {
     return markers;
@@ -46,6 +49,17 @@ std::vector<ro::render::ScreenQuad> EnemyMarkersOnScreen(
   // compte déjà dans son décalage.
   const float apparent = ro::render::ApparentScale(camera);
   const glm::vec2 viewport{viewport_width, viewport_height};
+  const auto mark = [&](const glm::vec3& ground_position, float body_scale) {
+    const std::optional<glm::vec2> feet = ro::render::ProjectToScreen(
+        camera, aspect_ratio, ground_position, viewport_width, viewport_height);
+    if (!feet.has_value()) {
+      return;
+    }
+    const float height_scale =
+        ro::render::ScreenAnchorScale(ro::render::kClientReferenceHeight, apparent, body_scale);
+    markers.push_back(
+        ro::render::ComposeEnemyMarker(art.enemy_marker, *feet, viewport, height_scale));
+  };
   for (std::size_t index = 0; index < drawn.size() && index < ids.size(); ++index) {
     if (!field.IsEnemy(ids[index])) {
       continue;
@@ -54,15 +68,14 @@ std::vector<ro::render::ScreenQuad> EnemyMarkersOnScreen(
     if (actor == nullptr || IsHidden(*actor, world)) {
       continue;
     }
-    const std::optional<glm::vec2> feet = ro::render::ProjectToScreen(
-        camera, aspect_ratio, drawn[index].ground_position, viewport_width, viewport_height);
-    if (!feet.has_value()) {
-      continue;
+    mark(drawn[index].ground_position, drawn[index].scale);
+  }
+  if (sees_concealed) {
+    for (const ConcealedPlace& place : concealed) {
+      if (field.IsEnemy(place.actor_id)) {
+        mark(place.ground_position, kOrdinaryBodyScale);
+      }
     }
-    const float height_scale = ro::render::ScreenAnchorScale(ro::render::kClientReferenceHeight,
-                                                             apparent, drawn[index].scale);
-    markers.push_back(
-        ro::render::ComposeEnemyMarker(art.enemy_marker, *feet, viewport, height_scale));
   }
   return markers;
 }

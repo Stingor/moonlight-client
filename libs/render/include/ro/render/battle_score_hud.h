@@ -36,19 +36,25 @@ inline constexpr float kBattleUnitsWideFromRightPx = 175.0F;
 inline constexpr float kBattleDigitPitchPx = 32.0F;
 inline constexpr float kLionDigitsTopPx = 50.0F;
 inline constexpr float kEagleDigitsTopPx = 108.0F;
-// Au-delà, le score se montre borné : deux chiffres, pas trois.
-inline constexpr std::int32_t kBattleScoreMost = 99;
+// AU-DELÀ DE 99, SEULS LES DEUX DERNIERS CHIFFRES se montrent : 150 s'affiche
+// « 50 », 105 s'affiche « 05 ». Le score n'a que deux places.
+inline constexpr std::int32_t kBattleScoreShownModulus = 100;
 
 // LA MARQUE D'UN ENNEMI, au-dessus de sa tête : son coin haut-gauche part du
-// point d'écran des pieds, décalé d'une fraction de l'écran mesurée sur un
-// écran de référence, puis mise à l'échelle de la hauteur du sprite.
-inline constexpr float kEnemyMarkerReferenceWidthPx = 640.0F;
-inline constexpr float kEnemyMarkerReferenceHeightPx = 480.0F;
-inline constexpr float kEnemyMarkerShiftXPx = -5.0F;
-inline constexpr float kEnemyMarkerShiftYPx = -100.0F;
+// point d'écran des pieds, décalé d'une fraction ENTIÈRE de l'écran mesurée sur
+// un écran de référence, puis mise à l'échelle de la hauteur du sprite.
+//
+// 🔴 LA FRACTION SE CALCULE EN ENTIERS, tronquée : `5 × largeur / 640` vaut 10
+// sur 1366 pixels, et non 10,67. Les pieds et le coin final se tronquent au
+// pixel de même.
+inline constexpr std::int32_t kEnemyMarkerReferenceWidthPx = 640;
+inline constexpr std::int32_t kEnemyMarkerReferenceHeightPx = 480;
+inline constexpr std::int32_t kEnemyMarkerShiftXPx = -5;
+inline constexpr std::int32_t kEnemyMarkerShiftYPx = -100;
 
-// Les deux emblèmes sont des images à fond blanc : elles se posent un peu
-// transparentes, et le fond reste visible comme un cartouche pâle.
+// LES DEUX EMBLÈMES : des images de 36 pixels à fond blanc, ÉTIRÉES sur 48, et
+// teintées de blanc à l'alpha 205 sur 255 (80 %) : le fond blanc reste visible
+// comme un cartouche pâle.
 inline constexpr std::uint8_t kBattleEmblemAlpha = 205;
 
 // Le camp que le HUD surligne : celui du joueur, s'il est connu et que le
@@ -68,10 +74,14 @@ struct BattleScoreFigures {
                                                          const BattleScoreFigures& figures,
                                                          glm::vec2 viewport_px);
 
+// LE DÉCALAGE DE LA MARQUE à cette taille d'écran, avant la hauteur du sprite :
+// des pixels entiers, la fraction tronquée.
+[[nodiscard]] glm::vec2 EnemyMarkerShiftPx(glm::vec2 viewport_px);
+
 // LA MARQUE D'UN ENNEMI, à sa taille d'image, coin haut-gauche en
 // `feet_px` + décalage × `height_scale` (le facteur de hauteur du sprite, celui
-// qui place aussi la bulle de parole). Un quad vide — d'aire nulle — si
-// l'image manque.
+// qui place aussi la bulle de parole), tronqué au pixel comme les pieds. Un
+// quad vide — d'aire nulle — si l'image manque.
 [[nodiscard]] ScreenQuad ComposeEnemyMarker(const formats::Image& marker, glm::vec2 feet_px,
                                             glm::vec2 viewport_px, float height_scale);
 

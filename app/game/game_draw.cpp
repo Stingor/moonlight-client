@@ -28,6 +28,7 @@
 #include "game/setting_destination_open.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
+#include "world/entity_menu.h"
 #include "world/ground_unit_view.h"
 #include "world/pick_box_view.h"
 #include "world/scene_graphics.h"
@@ -564,6 +565,9 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .emblems = guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
       .pvp_hud = settings_->options().pvp_hud(),
       .battleground = settings_->options().pages().battleground.settings(),
+      // L'ADMINISTRATEUR comme le menu d'entité le reconnaît : le niveau de
+      // groupe que le serveur nous annonce.
+      .sees_concealed_enemies = Rights().staff_tools && world_.group_level() >= kAdminMinGroupLevel,
       .items = pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
       .words = &pieces_.item_words,
       .creators =

@@ -2,8 +2,9 @@
 
 #include "ro/render/battle_score_hud.h"
 
-#include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstdint>
 
 namespace ro::render {
 namespace {
@@ -32,7 +33,9 @@ void Append(std::vector<ScreenQuad>& into, const std::vector<ScreenQuad>& from) 
 }
 
 // L'emblème puis les chiffres d'une rangée : les unités à leur colonne, les
-// dizaines un pas à leur gauche, et pas de zéro de tête.
+// dizaines un pas à leur gauche dès que le score passe 9, et pas de zéro de
+// tête. Au-delà de 99, les dizaines montrées sont celles des deux derniers
+// chiffres — un zéro, alors, se dessine.
 [[nodiscard]] std::vector<ScreenQuad> ComposeRow(const formats::SprSprite& digits_sprite,
                                                  const formats::ActAnimation& digits,
                                                  const ScoreRow& row, float viewport_w,
@@ -49,7 +52,8 @@ void Append(std::vector<ScreenQuad>& into, const std::vector<ScreenQuad>& from) 
   Append(quads, ComposeScreenSprite(digits_sprite, digits, units, kOnlyFrame,
                                     glm::vec2{units_x, row.digits_top_px}));
   if (row.score >= kDecimalBase) {
-    const auto tens = static_cast<std::size_t>(row.score / kDecimalBase);
+    const auto tens =
+        static_cast<std::size_t>((row.score % kBattleScoreShownModulus) / kDecimalBase);
     Append(quads, ComposeScreenSprite(digits_sprite, digits, tens, kOnlyFrame,
                                       glm::vec2{units_x - kBattleDigitPitchPx, row.digits_top_px}));
   }
@@ -77,12 +81,12 @@ std::vector<ScreenQuad> ComposeBattleScore(const formats::SprSprite& digits_spri
                                            const BattleScoreFigures& figures,
                                            glm::vec2 viewport_px) {
   if (figures.lion < 0 || figures.eagle < 0) return {};
-  const ScoreRow lion{.score = std::min(figures.lion, kBattleScoreMost),
+  const ScoreRow lion{.score = figures.lion,
                       .emblem = &art.lion,
                       .emblem_top_px = kLionEmblemTopPx,
                       .emblem_bottom_px = kLionEmblemBottomPx,
                       .digits_top_px = kLionDigitsTopPx};
-  const ScoreRow eagle{.score = std::min(figures.eagle, kBattleScoreMost),
+  const ScoreRow eagle{.score = figures.eagle,
                        .emblem = &art.eagle,
                        .emblem_top_px = kEagleEmblemTopPx,
                        .emblem_bottom_px = kEagleEmblemBottomPx,
@@ -108,14 +112,20 @@ std::vector<ScreenQuad> ComposeBattleScore(const formats::SprSprite& digits_spri
   return quads;
 }
 
+glm::vec2 EnemyMarkerShiftPx(glm::vec2 viewport_px) {
+  const auto width_px = static_cast<std::int32_t>(viewport_px.x);
+  const auto height_px = static_cast<std::int32_t>(viewport_px.y);
+  return {static_cast<float>(kEnemyMarkerShiftXPx * width_px / kEnemyMarkerReferenceWidthPx),
+          static_cast<float>(kEnemyMarkerShiftYPx * height_px / kEnemyMarkerReferenceHeightPx)};
+}
+
 ScreenQuad ComposeEnemyMarker(const formats::Image& marker, glm::vec2 feet_px,
                               glm::vec2 viewport_px, float height_scale) {
   if (marker.empty()) return ScreenQuad{};
   // LE DÉCALAGE SUIT L'ÉCRAN : une fraction de sa largeur et de sa hauteur,
   // puis la hauteur du sprite. L'image, elle, garde sa taille de fichier.
-  const glm::vec2 shift{kEnemyMarkerShiftXPx / kEnemyMarkerReferenceWidthPx * viewport_px.x,
-                        kEnemyMarkerShiftYPx / kEnemyMarkerReferenceHeightPx * viewport_px.y};
-  const glm::vec2 top_left = feet_px + shift * height_scale;
+  const glm::vec2 top_left =
+      glm::trunc(glm::trunc(feet_px) + EnemyMarkerShiftPx(viewport_px) * height_scale);
   const glm::vec2 size{static_cast<float>(marker.width), static_cast<float>(marker.height)};
   return ScreenQuad{.min = top_left, .max = top_left + size, .atlas = &marker};
 }

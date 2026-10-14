@@ -59,34 +59,37 @@ void PaintGameHud(const ScreenOverlays& what, std::span<const ro::render::Screen
   return std::nullopt;
 }
 
-// LE CHAMP DE BATAILLE : la marque au-dessus des ennemis, puis le score.
+// LE CHAMP DE BATAILLE : le score, puis la marque au-dessus des ennemis.
 //
-// ⚠ LA MARQUE APPARTIENT AU MONDE, et se peint tout de suite : le voile de
-// ténèbres doit la couvrir comme l'ennemi qu'elle désigne. Le score est du HUD.
+// 🔴 LA MARQUE EST DE L'INTERFACE, PAS DU MONDE : chaque marque est une petite
+// fenêtre, peinte avec les fenêtres, donc par-dessus le monde et le voile de
+// ténèbres, et APRÈS le score, qui se peint avant elles. Toutes deux passent
+// par le HUD de jeu, sous les fenêtres de ce client.
 void PaintBattlefield(const ScreenOverlays& what, float aspect_ratio, float viewport_width,
                       float viewport_height) {
   GamePieces& pieces = *what.pieces;
   const ro::sim::World& world = *what.world;
+  if (what.battleground.score_shown && pieces.pvp_rank_font.sprite != nullptr &&
+      pieces.pvp_rank_font.animation != nullptr) {
+    if (const std::optional<ro::render::BattleScoreFigures> figures =
+            BattleScoreOf(world, what.battleground.own_side_highlighted);
+        figures.has_value()) {
+      PaintGameHud(what,
+                   ro::render::ComposeBattleScore(
+                       *pieces.pvp_rank_font.sprite, *pieces.pvp_rank_font.animation,
+                       pieces.battlefield_art, *figures, {viewport_width, viewport_height}),
+                   viewport_width, viewport_height);
+    }
+  }
   if (what.battleground.enemy_marker) {
     // ⚠ L'IMAGE EST CELLE DES PIÈCES, en place pour toute la partie : les quads
     // la désignent par son adresse.
-    const std::vector<ro::render::ScreenQuad> markers =
+    PaintGameHud(
+        what,
         EnemyMarkersOnScreen(*what.camera, aspect_ratio, what.actors->drawn, what.actors->ids,
-                             world, pieces.battlefield_art, viewport_width, viewport_height);
-    pieces.overlay.Draw(markers, viewport_width, viewport_height);
-  }
-  if (!what.battleground.score_shown || pieces.pvp_rank_font.sprite == nullptr ||
-      pieces.pvp_rank_font.animation == nullptr) {
-    return;
-  }
-  if (const std::optional<ro::render::BattleScoreFigures> figures =
-          BattleScoreOf(world, what.battleground.own_side_highlighted);
-      figures.has_value()) {
-    PaintGameHud(what,
-                 ro::render::ComposeBattleScore(
-                     *pieces.pvp_rank_font.sprite, *pieces.pvp_rank_font.animation,
-                     pieces.battlefield_art, *figures, {viewport_width, viewport_height}),
-                 viewport_width, viewport_height);
+                             what.actors->concealed, what.sees_concealed_enemies, world,
+                             pieces.battlefield_art, viewport_width, viewport_height),
+        viewport_width, viewport_height);
   }
 }
 

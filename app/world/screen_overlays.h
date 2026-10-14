@@ -118,6 +118,9 @@ struct ScreenOverlays {
   // CE QUE LE CHAMP DE BATAILLE MONTRE : le score et son surlignage, la marque
   // des ennemis. ⚠ REÇU et non gardé, comme le classement PVP.
   BattlegroundSettings battleground;
+  // UN ADMINISTRATEUR voit la marque des ennemis cachés : voir
+  // `EnemyMarkersOnScreen`.
+  bool sees_concealed_enemies = false;
   // De quoi traduire, quand la partie les a lues.
   const ro::vfs::ItemTable* items = nullptr;
   const ro::vfs::ItemWords* words = nullptr;

@@ -383,6 +383,15 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // Qui se cache ne se voit pas, sauf à garder sa place : voir `ConcealmentOf`.
     const Concealment concealment = ConcealmentOf(actor, world);
     if (concealment != Concealment::kVisible && id != world.player_id()) {
+      // Sa place reste connue : une copie qui s'efface, que plus rien ne
+      // désigne, n'en laisse pas.
+      if (scene_id != 0) {
+        const ro::sim::FractionalCell cell =
+            ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
+        const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+        scene.concealed.push_back(
+            ConcealedPlace{scene_id, glm::vec3(ground[0], ground[1], ground[2])});
+      }
       ++census.hidden;
       return;
     }
