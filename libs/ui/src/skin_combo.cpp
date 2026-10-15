@@ -176,7 +176,7 @@ int SkinComboStepped(int rank, int step, int count) {
 }
 
 bool SkinCombo(const char* label, int* chosen, std::span<const char* const> items,
-               const SkinArt& art) {
+               const SkinArt& art, const char* closed_text) {
   if (chosen == nullptr || items.empty()) {
     return false;
   }
@@ -188,8 +188,9 @@ bool SkinCombo(const char* label, int* chosen, std::span<const char* const> item
   // appelants passent une table STATIQUE : une traduction posée à sa définition
   // serait évaluée avant le catalogue et resterait française pour toujours. À la
   // lecture, un seul point de code rend traduisibles toutes les listes.
-  const bool open =
-      BeginSkinCombo(label, core::Tr(items[static_cast<std::size_t>(*chosen)]), art, &step);
+  const char* shown =
+      closed_text != nullptr ? closed_text : core::Tr(items[static_cast<std::size_t>(*chosen)]);
+  const bool open = BeginSkinCombo(label, shown, art, &step);
   // Un cran en butée n'est pas un changement.
   if (const int stepped = SkinComboStepped(*chosen, step, count); stepped != *chosen) {
     *chosen = stepped;

@@ -161,6 +161,9 @@ tr: %s (%s): back at %s.
 fr: %s (%s) entre dans sa fenêtre.
 tr: %s (%s) is entering its window.
 
+fr: %s - %s
+tr: %s - %s
+
 fr: %s - %s : %s | %s : %s | %s : %s
 tr: %s - %s: %s | %s: %s | %s: %s
 fr: %s : %d demandés, %d dans l'inventory

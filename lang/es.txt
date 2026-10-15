@@ -161,6 +161,9 @@ tr: %s (%s): de vuelta a las %s.
 fr: %s (%s) entre dans sa fenêtre.
 tr: %s (%s) entra en su ventana.
 
+fr: %s - %s
+tr: %s - %s
+
 fr: %s - %s : %s | %s : %s | %s : %s
 tr: %s - %s: %s | %s: %s | %s: %s
 fr: %s : %d demandés, %d dans l'inventory

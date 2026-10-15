@@ -160,6 +160,17 @@ inline constexpr std::array<const char*, 3> kDatabaseRanks = {
 [[nodiscard]] const char* DatabaseItemTypeLabel(std::string_view server_type);
 [[nodiscard]] const char* DatabaseItemPlaceLabel(std::string_view server_place);
 
+// L'entrée choisie d'une liste de filtre, TRADUITE : « Tous » au rang zéro,
+// sinon `values` au rang moins un. `values` se passe en français, et un rang
+// hors de la liste est borné.
+[[nodiscard]] const char* DatabaseFilterChoice(int chosen, std::span<const char* const> values);
+
+// Le texte d'une liste de filtre FERMÉE : le nom du filtre, puis l'entrée
+// choisie — « Type - Tous », « Race - Démon » —, pour qu'on sache toujours
+// quelle liste est laquelle. `filter_name` se passe déjà traduit.
+[[nodiscard]] std::string DatabaseFilterShown(const char* filter_name, int chosen,
+                                              std::span<const char* const> values);
+
 // Les rangs choisis des listes, et les bornes de niveau ; zéro : sans borne.
 struct DatabaseFilters {
   int item_type = kDatabaseAnyChoice;

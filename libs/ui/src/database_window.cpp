@@ -18,6 +18,18 @@
 #include "database_parts.h"
 
 namespace ro::ui {
+
+// La place du texte d'une liste de filtre fermée : un nom et une entrée.
+constexpr std::size_t kFilterShownBytes = 128;
+
+std::string DatabaseFilterShown(const char* filter_name, int chosen,
+                                std::span<const char* const> values) {
+  std::array<char, kFilterShownBytes> shown{};
+  std::snprintf(shown.data(), shown.size(), core::Tr("%s - %s"), filter_name,
+                DatabaseFilterChoice(chosen, values));
+  return shown.data();
+}
+
 namespace {
 
 [[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
@@ -41,14 +53,16 @@ void TextOf(std::string_view text) {
   ImGui::TextUnformatted(text.data(), text.data() + text.size());
 }
 
-// UNE LISTE DE FILTRE : « tous », puis la table. Rend vrai sur un changement.
+// UNE LISTE DE FILTRE : « tous », puis la table. Fermée, elle se nomme devant
+// son choix. Rend vrai sur un changement.
 template <std::size_t Count>
-bool FilterCombo(const char* id, int* chosen, const std::array<const char*, Count>& labels,
-                 const SkinArt& art) {
-  std::array<const char*, Count + 1> shown{};
-  shown[0] = core::TrText("Tous");
-  std::ranges::copy(labels, shown.begin() + 1);
-  return SkinCombo(id, chosen, shown, art);
+bool FilterCombo(const char* id, const char* filter_name, int* chosen,
+                 const std::array<const char*, Count>& labels, const SkinArt& art) {
+  std::array<const char*, Count + 1> entries{};
+  entries[0] = core::TrText("Tous");
+  std::ranges::copy(labels, entries.begin() + 1);
+  const std::string closed = DatabaseFilterShown(filter_name, *chosen, labels);
+  return SkinCombo(id, chosen, entries, art, closed.c_str());
 }
 
 template <typename Entry, std::size_t Count>
@@ -77,26 +91,28 @@ void DrawFilters(DatabaseWindowState& state, const SkinArt& art) {
   const float full = ImGui::GetContentRegionAvail().x;
   if (state.tab == kDatabaseItemTab) {
     ImGui::SetNextItemWidth(full);
-    static_cast<void>(
-        FilterCombo("##db_item_type", &filters.item_type, LabelsOf(kDatabaseItemTypes), art));
+    static_cast<void>(FilterCombo("##db_item_type", core::Tr("Type"), &filters.item_type,
+                                  LabelsOf(kDatabaseItemTypes), art));
     ImGui::SetNextItemWidth(full);
-    static_cast<void>(
-        FilterCombo("##db_item_place", &filters.item_place, LabelsOf(kDatabaseItemPlaces), art));
+    static_cast<void>(FilterCombo("##db_item_place", core::Tr("Emplacement"), &filters.item_place,
+                                  LabelsOf(kDatabaseItemPlaces), art));
     LevelBounds("##db_item_level_min", "##db_item_level_max", &filters.item_level_min,
                 &filters.item_level_max, art);
     return;
   }
   const float half = (full - ImGui::GetStyle().ItemSpacing.x) * 0.5F;
   ImGui::SetNextItemWidth(half);
-  static_cast<void>(FilterCombo("##db_race", &filters.race, kDatabaseRaces, art));
+  static_cast<void>(FilterCombo("##db_race", core::Tr("Race"), &filters.race, kDatabaseRaces, art));
   ImGui::SameLine();
   ImGui::SetNextItemWidth(half);
-  static_cast<void>(FilterCombo("##db_element", &filters.element, kDatabaseElements, art));
+  static_cast<void>(
+      FilterCombo("##db_element", core::Tr("Élément"), &filters.element, kDatabaseElements, art));
   ImGui::SetNextItemWidth(half);
-  static_cast<void>(FilterCombo("##db_size", &filters.size, kDatabaseSizes, art));
+  static_cast<void>(
+      FilterCombo("##db_size", core::Tr("Taille"), &filters.size, kDatabaseSizes, art));
   ImGui::SameLine();
   ImGui::SetNextItemWidth(half);
-  static_cast<void>(FilterCombo("##db_rank", &filters.rank, kDatabaseRanks, art));
+  static_cast<void>(FilterCombo("##db_rank", core::Tr("Rang"), &filters.rank, kDatabaseRanks, art));
   LevelBounds("##db_level_min", "##db_level_max", &filters.level_min, &filters.level_max, art);
 }
 

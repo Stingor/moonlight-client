@@ -247,8 +247,11 @@ void EndSkinCombo();
 // toujours statique, et la traduire à sa définition l'évaluerait avant le
 // catalogue — elle resterait française pour toujours. Le marqueur est ce qui la
 // fait entrer au catalogue malgré tout.
+//
+// `closed_text`, s'il est donné, remplace l'entrée choisie dans la liste
+// FERMÉE — déjà traduit ; les entrées de la liste ouverte restent les libellés.
 [[nodiscard]] bool SkinCombo(const char* label, int* chosen, std::span<const char* const> items,
-                             const SkinArt& art);
+                             const SkinArt& art, const char* closed_text = nullptr);
 
 // OÙ POSER LE HAUT D'UN TEXTE dans une rangée, pour qu'il y soit centré.
 //

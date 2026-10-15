@@ -40,4 +40,10 @@ const char* DatabaseItemPlaceLabel(std::string_view server_place) {
   return nullptr;
 }
 
+const char* DatabaseFilterChoice(int chosen, std::span<const char* const> values) {
+  const int rank = std::clamp(chosen, kDatabaseAnyChoice, static_cast<int>(values.size()));
+  return rank == kDatabaseAnyChoice ? core::Tr("Tous")
+                                    : core::Tr(values[static_cast<std::size_t>(rank - 1)]);
+}
+
 }  // namespace ro::ui
