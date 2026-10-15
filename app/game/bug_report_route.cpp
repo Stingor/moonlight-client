@@ -92,6 +92,7 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
   box.buttons = buttons;
   windows.description.bug_report = buttons;
   windows.monster_sheet.database.state.item_sheet.bug_report = buttons;
+  windows.monster_sheet.state.bug_report = buttons;
   windows.skill_description.bug_report = buttons;
   windows.npc_dialog.bug_report = buttons;
   windows.style.bug_report = buttons;

@@ -237,6 +237,10 @@ struct MonsterSheetWindowState {
   // LE MENU D'UN BUTIN, armé au clic droit et ouvert hors de la table : une
   // cellule change la pile d'ids, et le surgissant ne s'y retrouverait pas.
   ItemLinkMenu menu;
+  // « Signaler un bug », posé par `app` d'après le réglage commun : dans la
+  // barre de titre de la fenêtre, dans l'en-tête de la fiche quand la base
+  // l'héberge.
+  bool bug_report = false;
 };
 
 struct MonsterSheetAnswer {
@@ -258,14 +262,20 @@ struct MonsterSheetAnswer {
   bool post_link = false;
   // Ouvrir ce monstre dans la base de données.
   bool open_database = false;
+  // Le formulaire de rapport de bug, pré-rempli de ce monstre.
+  bool report_bug = false;
 };
+
+// OÙ LA FICHE SE DESSINE. Seul « Signaler un bug » en dépend : la fenêtre le
+// porte dans sa barre de titre, la base, qui n'en a pas, dans l'en-tête.
+enum class MonsterSheetHost : std::uint8_t { kWindow, kDatabase };
 
 // 🔴 UN SEUL DESSIN DE FICHE, DEUX HÔTES : la fenêtre ci-dessous, quand on
 // l'ouvre depuis un monstre en jeu, ou le panneau de droite de la base de
 // données (ADR 0116). Le corps se dessine dans la fenêtre en cours.
 [[nodiscard]] MonsterSheetAnswer DrawMonsterSheetBody(MonsterSheetWindowState& state,
                                                       const MonsterSheetView& view,
-                                                      const SkinArt& art);
+                                                      const SkinArt& art, MonsterSheetHost host);
 
 // Dessine la fenêtre si elle est ouverte.
 [[nodiscard]] MonsterSheetAnswer DrawMonsterSheetWindow(MonsterSheetWindowState& state,

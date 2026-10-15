@@ -13954,6 +13954,9 @@ tr: El reporte no se ha podido guardar (error del servidor).
 fr: Merci ! Ton rapport de bug a bien été enregistré.
 tr: ¡Gracias! Tu reporte de bug se ha guardado.
 
+fr: Monstre : %s (#%u)
+tr: Monstruo: %s (#%u)
+
 fr: PNJ : %s (GID %u)
 tr: NPC: %s (GID %u)
 

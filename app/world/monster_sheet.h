@@ -6,6 +6,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "ro/render/actor_wardrobe.h"
@@ -54,6 +55,13 @@ class MonsterSheet {
   // La fiche montrée a été demandée par une classe de sprite (Sense) : la base
   // de données, qui range par identifiant, ne la reprend pas.
   [[nodiscard]] bool shown_by_view() const;
+  // LE MONSTRE MONTRÉ A ÉTÉ VU EN JEU, sur cette carte : Sense, le menu d'un
+  // acteur. À poser APRÈS `Open`. Un autre monstre montré ou un changement de
+  // carte l'oublient.
+  void NoteSeenOn(std::string map_name) { seen_map_ = std::move(map_name); }
+  [[nodiscard]] const std::string& seen_map() const noexcept { return seen_map_; }
+  // La vue de la dernière image dessinée.
+  [[nodiscard]] const ro::ui::MonsterSheetView& view() const noexcept { return view_; }
 
   // LA FICHE QUE LA BASE DE DONNÉES TIRE D'ELLE-MÊME, montrée tant que le
   // serveur n'a pas répondu, ou quand il ne répond pas. La réponse du serveur
@@ -164,6 +172,7 @@ class MonsterSheet {
   std::map<std::uint32_t, ro::sim::MonsterSheet> base_;
   std::map<std::uint32_t, Asked> asked_;
   std::uint32_t shown_id_ = 0;
+  std::string seen_map_;
   std::uint32_t sense_seen_ = 0;
   std::uint32_t map_entries_ = 0;
   std::optional<ro::sim::SenseReading> sense_;

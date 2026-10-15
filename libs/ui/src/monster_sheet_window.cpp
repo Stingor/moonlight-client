@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/bug_report_window.h"
 #include "ro/ui/inventory_window.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -178,7 +179,8 @@ void DrawSprite(MonsterSheetWindowState& state, const MonsterSheetView& view,
 }
 
 // Le nom, ses badges, et les lignes de la fiche.
-void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, MonsterSheetAnswer& answer) {
+void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, bool bug_report_button,
+                  MonsterSheetAnswer& answer) {
   ImGui::BeginGroup();
   Colored(kTitleColor, view.name.empty() ? core::Tr("(sans nom)") : view.name.c_str());
   // Le qualificatif fait partie du TITRE : c'est là qu'il faut lever le doute.
@@ -206,6 +208,18 @@ void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, MonsterSheet
       answer.open_database = true;
     }
     SkinTooltip(core::Tr("Ouvrir ce monstre dans la base de données."));
+  }
+  // « SIGNALER UN BUG », celui de la barre de titre de la fenêtre : le panneau
+  // de la base n'a pas de barre, l'en-tête le porte. Même réglage, même
+  // demande.
+  if (bug_report_button) {
+    ImGui::SameLine();
+    if (SkinSmallButton(core::Tr("Signaler un bug"), art)) {
+      answer.report_bug = true;
+    }
+    SkinTooltip(
+        core::Tr("Envoyer un rapport de bug à l'équipe (le contexte est "
+                 "joint automatiquement)"));
   }
 
   const MonsterSheetWords& words = view.words;
@@ -313,10 +327,10 @@ void DrawSenseNote(const MonsterSheetView& view) {
 }
 
 void DrawHeader(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
-                MonsterSheetAnswer& answer) {
+                MonsterSheetHost host, MonsterSheetAnswer& answer) {
   DrawSprite(state, view, answer);
   ImGui::SameLine();
-  DrawIdentity(view, art, answer);
+  DrawIdentity(view, art, host == MonsterSheetHost::kDatabase && state.bug_report, answer);
   DrawNamesakeNote(view, art, answer);
   DrawSenseNote(view);
 }
@@ -700,16 +714,22 @@ MonsterSheetAnswer DrawMonsterSheetWindow(MonsterSheetWindowState& state,
                            ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(ImVec2(Px(kLeastWidthPixels), Px(kLeastHeightPixels)),
                                       ImVec2(FLT_MAX, FLT_MAX));
-  if (BeginSkinnedWindow(state.title.c_str(), &state.open, art, SkinnedTitle::kDescription,
-                         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing)) {
-    answer = DrawMonsterSheetBody(state, view, art);
+  PoseBugReportButton(state.bug_report);
+  const bool body_shown =
+      BeginSkinnedWindow(state.title.c_str(), &state.open, art, SkinnedTitle::kDescription,
+                         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing);
+  const bool report_bug = state.bug_report && TitleActionClicked(0);
+  if (body_shown) {
+    answer = DrawMonsterSheetBody(state, view, art, MonsterSheetHost::kWindow);
   }
   EndSkinnedWindow();
+  answer.report_bug = answer.report_bug || report_bug;
   return answer;
 }
 
 MonsterSheetAnswer DrawMonsterSheetBody(MonsterSheetWindowState& state,
-                                        const MonsterSheetView& view, const SkinArt& art) {
+                                        const MonsterSheetView& view, const SkinArt& art,
+                                        MonsterSheetHost host) {
   using namespace monster_sheet;
   MonsterSheetAnswer answer;
   switch (view.phase) {
@@ -729,7 +749,7 @@ MonsterSheetAnswer DrawMonsterSheetBody(MonsterSheetWindowState& state,
       }
       break;
     case MonsterSheetPhase::kReady:
-      DrawHeader(state, view, art, answer);
+      DrawHeader(state, view, art, host, answer);
       ImGui::Separator();
       DrawTabs(state, view, art, answer);
       break;

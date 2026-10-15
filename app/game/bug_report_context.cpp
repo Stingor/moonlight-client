@@ -102,6 +102,23 @@ BugReportContext NpcBugReport(std::uint32_t npc_gid, std::string_view name) {
   return Entity(BugReportCategory::kNpc, label.data(), "npc_gid", npc_gid, name, "");
 }
 
+BugReportContext MonsterBugReport(const MonsterBugScene& scene) {
+  std::string extra;
+  if (!scene.aegis_name.empty()) {
+    extra += std::format(R"(,"aegis_name":"{}")", JsonEscaped(scene.aegis_name));
+  }
+  extra += std::format(R"(,"boss_rank":{})", scene.boss_rank);
+  if (!scene.seen_map.empty()) {
+    extra += std::format(R"(,"seen_map":"{}")", JsonEscaped(scene.seen_map));
+  }
+  std::array<char, kLabelBytes> label{};
+  std::snprintf(label.data(), label.size(), ro::core::Tr("Monstre : %s (#%u)"),
+                Shown(scene.name).c_str(), static_cast<unsigned>(scene.monster_id));
+  return Entity(BugReportCategory::kGeneric, label.data(),
+                scene.by_sprite_class ? "sprite_class" : "mob_id", scene.monster_id, scene.name,
+                extra);
+}
+
 BugReportContext StyleBugReport(std::string_view style_code) {
   return BugReportContext{
       .category = static_cast<std::uint8_t>(BugReportCategory::kStyle),

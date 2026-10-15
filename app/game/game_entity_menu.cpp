@@ -660,6 +660,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       // Le serveur remonte d'elle à l'identifiant, exactement comme pour Sense.
       if (monster_sheet_.has_value() && menu_target_.job != 0) {
         monster_sheet_->Open(windows_.monster_sheet.state, menu_target_.job, /*by_view=*/true);
+        monster_sheet_->NoteSeenOn(world_.map_name());
       }
       return;
     case EntityVerb::kMonsterLink:

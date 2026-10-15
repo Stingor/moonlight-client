@@ -255,7 +255,8 @@ void DrawSheetPane(DatabaseWindowState& state, const DatabaseView& view,
   if (view.item != nullptr) {
     DrawItemSheetBody(state.item_sheet, *view.item, art, ItemSheetHost::kDatabase, answer.item);
   } else if (view.monster != nullptr) {
-    answer.monster = DrawMonsterSheetBody(monster_state, *view.monster, art);
+    answer.monster =
+        DrawMonsterSheetBody(monster_state, *view.monster, art, MonsterSheetHost::kDatabase);
   } else {
     ImGui::TextDisabled("%s", core::Tr("Choisissez un item ou un monstre dans la liste."));
   }

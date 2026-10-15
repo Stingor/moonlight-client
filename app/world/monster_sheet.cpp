@@ -98,6 +98,9 @@ void MonsterSheet::Open(ro::ui::MonsterSheetWindowState& state, std::uint32_t mo
   if (monster_id == 0) {
     return;
   }
+  if (monster_id != shown_id_) {
+    seen_map_.clear();
+  }
   shown_id_ = monster_id;
   Asked& asked = asked_[monster_id];
   if (!asked.sent) {
@@ -110,6 +113,9 @@ void MonsterSheet::Open(ro::ui::MonsterSheetWindowState& state, std::uint32_t mo
 void MonsterSheet::Show(std::uint32_t monster_id) {
   if (monster_id == 0) {
     return;
+  }
+  if (monster_id != shown_id_) {
+    seen_map_.clear();
   }
   shown_id_ = monster_id;
   // Le premier `operator[]` note une question par identifiant de base.
@@ -463,6 +469,7 @@ void MonsterSheet::Forget() {
   book_.Clear();
   asked_.clear();
   shown_id_ = 0;
+  seen_map_.clear();
   sense_.reset();
   lists_for_id_ = 0;
   lists_for_arrival_ = 0;

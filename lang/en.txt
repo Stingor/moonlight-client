@@ -13954,6 +13954,9 @@ tr: The report could not be saved (server error).
 fr: Merci ! Ton rapport de bug a bien été enregistré.
 tr: Thank you! Your bug report has been saved.
 
+fr: Monstre : %s (#%u)
+tr: Monster: %s (#%u)
+
 fr: PNJ : %s (GID %u)
 tr: NPC: %s (GID %u)
 

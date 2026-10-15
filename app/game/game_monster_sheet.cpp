@@ -17,6 +17,7 @@
 #include "ro/vfs/item_table.h"
 
 #include "chat/chat_view.h"
+#include "game/bug_report_context.h"
 #include "game/game.h"
 #include "game/map_plan_tip.h"
 
@@ -43,6 +44,21 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   const ro::ui::MonsterSheetAnswer answer = std::exchange(windows_.monster_sheet.answer, {});
   const MonsterSheetOptions& options = settings_->options().monster_sheet();
 
+  // « SIGNALER UN BUG », de la fenêtre comme de la base : le formulaire de tout
+  // rapport, pré-rempli du monstre que l'image a montré. ⚠ AVANT TOUT CE QUI
+  // CHANGE LA FICHE MONTRÉE : changement de carte, Sense, homonyme.
+  if (answer.report_bug && sheet.shown_id() != 0) {
+    const ro::ui::MonsterSheetView& shown = sheet.view();
+    AskBugReport(windows_.bug_report, MonsterBugReport(MonsterBugScene{
+                                          .monster_id = sheet.shown_id(),
+                                          .by_sprite_class = sheet.shown_by_view(),
+                                          .name = shown.name,
+                                          .aegis_name = shown.aegis_name,
+                                          .boss_rank = shown.boss_rank,
+                                          .seen_map = sheet.seen_map(),
+                                      }));
+  }
+
   // 🔴 UNE AUTRE CARTE, UNE FICHE REFERMÉE ET OUBLIÉE : les ressources du
   // sprite ont pu partir, et une fiche d'une autre session ne s'affiche pas.
   if (sheet.ForgetOnMapEntry(world_.map_entries())) {
@@ -56,6 +72,7 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   if (const std::optional<std::uint32_t> sensed = sheet.TakeSense(options.show_guardians());
       sensed.has_value()) {
     sheet.Open(state, *sensed, /*by_view=*/true);
+    sheet.NoteSeenOn(world_.map_name());
   }
 
   // ── CE QUE LA FENÊTRE A DEMANDÉ ───────────────────────────────────────────
