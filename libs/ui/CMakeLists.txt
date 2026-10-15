@@ -273,6 +273,7 @@ add_library(ro_ui STATIC
     src/skill_chain.cpp
     src/skill_window.cpp
     src/skinned_window.cpp
+    src/desc_panel_frame.cpp
     src/ui_context.cpp
     src/window_bounds.cpp
     src/window_places.cpp

@@ -323,9 +323,7 @@ void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float wide
   into->ChannelsSetCurrent(0);
   // ⚠ SANS FOND : ImGui vient d'en peindre un, ARRONDI. Celui du cadre est à
   // angles droits et lui écraserait les coins.
-  const ImVec2 at = ImGui::GetWindowPos();
-  const ImVec2 size = ImGui::GetWindowSize();
-  DrawDescPanelFrame(into, art, at, ImVec2(at.x + size.x, at.y + size.y), /*fill_bg=*/false);
+  DrawDescPanelFrameAroundWindow(into, art, /*fill_bg=*/false);
   into->ChannelsMerge();
 }
 

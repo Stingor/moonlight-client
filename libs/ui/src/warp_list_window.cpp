@@ -307,9 +307,7 @@ WarpListWindowAction DrawWarpListWindow(WarpListWindowState& state, const WarpLi
       ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar |
       ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse;
   if (ImGui::Begin(kWindowName, nullptr, kFlags)) {
-    const ImVec2 corner = ImGui::GetWindowPos();
-    DrawDescPanelFrame(ImGui::GetWindowDrawList(), art, corner,
-                       ImVec2(corner.x + size.x, corner.y + size.y), true);
+    DrawDescPanelFrameAroundWindow(ImGui::GetWindowDrawList(), art, /*fill_bg=*/true);
 
     // ── LE CLAVIER, fenêtre au premier plan ──────────────────────────────────
     // Les flèches déplacent la sélection ; Entrée et Espace valent « OK »,

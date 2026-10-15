@@ -22,15 +22,10 @@
 namespace moonclient {
 namespace {
 
-constexpr char kCarriageReturn = '\r';
 // La place d'une ligne composée par `snprintf`.
 constexpr std::size_t kLineBytes = 160;
 // Les lettres des grades, du premier au quatrième.
 constexpr std::string_view kGradeLetters = "DCBA";
-
-std::string_view ShownShopName(std::string_view name) {
-  return name.substr(0, name.find(kCarriageReturn));
-}
 
 ro::ui::SkinImage GradeBadgeOf(std::uint8_t grade, ro::render::GameImages* images) {
   const std::string path = StoreSearchGradeBadgePath(grade);
@@ -280,7 +275,8 @@ void MarketStage::Follow(MarketWindows& windows, const TradeContext& context) {
   // « VOIR » DEMANDE LE CONTENU DE L'ÉCHOPPE : sa fenêtre s'ouvre, et se
   // remplit à la réponse.
   if (route.store_query.has_value()) {
-    store_title_ = std::string(ShownShopName(route.store_offer->shop_name));
+    store_title_ = std::string(
+        ro::sim::MarketShownShopName(market_.search().kind(), route.store_offer->shop_name));
     store_status_.clear();
     windows.state.store_open = true;
     if (auto sent = ro::net::RequestMarket(context.link, market_, std::move(*route.store_query));
@@ -337,8 +333,8 @@ void MarketStage::SayNews() {
 }
 
 void MarketStage::ComposeRows(std::span<const ro::sim::MarketOffer> offers,
-                              std::span<const std::size_t> ranks, std::size_t first_name,
-                              const TradeContext& context,
+                              std::span<const std::size_t> ranks, ro::sim::MarketKind kind,
+                              std::size_t first_name, const TradeContext& context,
                               std::vector<ro::ui::MarketRowView>& rows) {
   rows.clear();
   rows.reserve(ranks.size());
@@ -354,7 +350,7 @@ void MarketStage::ComposeRows(std::span<const ro::sim::MarketOffer> offers,
         .grade_badge = GradeBadgeOf(offer.item.grade, context.images),
         .price = prices_[first_name + row],
         .amount = amounts_[first_name + row],
-        .shop_name = ShownShopName(offer.shop_name),
+        .shop_name = ro::sim::MarketShownShopName(kind, offer.shop_name),
         .place = places_[first_name + row],
         .autotrade = offer.autotrade,
         .compared = compared_aid != 0 && offer.owner_aid == compared_aid,
@@ -410,8 +406,9 @@ void MarketStage::Compose(const ro::ui::MarketWindowState& state, const TradeCon
   };
   add_texts(offers, page_ranks_, market_.search().kind());
   add_texts(store, store_ranks_, market_.store().kind());
-  ComposeRows(offers, page_ranks_, 0, context, rows_);
-  ComposeRows(store, store_ranks_, page_ranks_.size(), context, store_rows_);
+  ComposeRows(offers, page_ranks_, market_.search().kind(), 0, context, rows_);
+  ComposeRows(store, store_ranks_, market_.store().kind(), page_ranks_.size(), context,
+              store_rows_);
   std::array<char, kLineBytes> text{};
   if (market_.search().waiting()) {
     summary_ = ro::core::Tr("Recherche en cours…");

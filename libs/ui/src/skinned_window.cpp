@@ -74,13 +74,6 @@ void PaintDescriptionFrame(ImDrawList* into, const SkinArt& art, ImVec2 top_left
        ImVec2(bottom_right.x - edge, bottom_right.y));
 }
 
-// Blitte une pièce du cadre au papier dans un rectangle, ou rien sans l'art.
-void Blit(ImDrawList* into, const SkinArt& art, const SkinImage& piece, ImVec2 from, ImVec2 to) {
-  if (piece.usable()) {
-    PaintFrameOn(into, piece.id, from, to, art.look().paper);
-  }
-}
-
 void PaintStrip(ImDrawList* into, const SkinArt& art, render::SkinPiece left,
                 render::SkinPiece middle, render::SkinPiece right, ImVec2 top_left,
                 ImVec2 bottom_right) {
@@ -258,52 +251,6 @@ void SetNextWindowPinnable(bool* pinned) { g_next_pinned = pinned; }
 void SetNextWindowTitleShadow(ImU32 color) { g_next_title_shadow = color; }
 
 void SetNextWindowRounding(float pixels) { g_next_rounding = pixels; }
-
-float DescPanelEdge(const SkinArt& art) {
-  return art.Get(render::SkinPiece::kFrameLeft).width * Scale();
-}
-
-void DrawDescPanelFrame(ImDrawList* into, const SkinArt& art, ImVec2 top_left, ImVec2 bottom_right,
-                        bool fill_bg) {
-  if (into == nullptr || bottom_right.x <= top_left.x || bottom_right.y <= top_left.y) {
-    return;
-  }
-  const float edge = DescPanelEdge(art);
-  // 🔴 LE CORPS NE PASSE PAS SOUS LES PIÈCES : il s'arrête à leur bord intérieur.
-  // Les coins sont arrondis par leur image, dont l'extérieur est transparent ;
-  // un aplat étendu jusqu'au bord remplirait cet extérieur et rendrait les
-  // coins carrés.
-  if (fill_bg && bottom_right.x - top_left.x > 2.0F * edge &&
-      bottom_right.y - top_left.y > 2.0F * edge) {
-    into->AddRectFilled(ImVec2(top_left.x + edge, top_left.y + edge),
-                        ImVec2(bottom_right.x - edge, bottom_right.y - edge), art.look().paper);
-  }
-  if (edge <= 0.0F) {
-    return;
-  }
-  const float left = top_left.x;
-  const float right = bottom_right.x;
-  const float top = top_left.y;
-  const float bottom = bottom_right.y;
-  into->PushClipRect(top_left, bottom_right, false);
-  Blit(into, art, art.Get(render::SkinPiece::kFrameTopLeft), ImVec2(left, top),
-       ImVec2(left + edge, top + edge));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameTopRight), ImVec2(right - edge, top),
-       ImVec2(right, top + edge));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameBottomLeft), ImVec2(left, bottom - edge),
-       ImVec2(left + edge, bottom));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameBottomRight),
-       ImVec2(right - edge, bottom - edge), ImVec2(right, bottom));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameTopMiddle), ImVec2(left + edge, top),
-       ImVec2(right - edge, top + edge));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameBottomMiddle),
-       ImVec2(left + edge, bottom - edge), ImVec2(right - edge, bottom));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameLeft), ImVec2(left, top + edge),
-       ImVec2(left + edge, bottom - edge));
-  Blit(into, art, art.Get(render::SkinPiece::kFrameRight), ImVec2(right - edge, top + edge),
-       ImVec2(right, bottom - edge));
-  into->PopClipRect();
-}
 
 bool BeginSkinnedWindow(const char* name, bool* open, const SkinArt& art, SkinnedTitle title,
                         ImGuiWindowFlags flags) {
@@ -786,9 +733,7 @@ void EndSkinnedTooltip(const SkinArt& art) {
   into->ChannelsSetCurrent(0);
   // ⚠ SANS FOND : ImGui vient d'en peindre un, ARRONDI. Celui du cadre est à
   // angles droits et lui écraserait les coins.
-  const ImVec2 at = ImGui::GetWindowPos();
-  const ImVec2 size = ImGui::GetWindowSize();
-  DrawDescPanelFrame(into, art, at, ImVec2(at.x + size.x, at.y + size.y), /*fill_bg=*/false);
+  DrawDescPanelFrameAroundWindow(into, art, /*fill_bg=*/false);
   into->ChannelsMerge();
   ImGui::EndTooltip();
   ImGui::PopStyleVar(3);

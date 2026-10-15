@@ -170,8 +170,20 @@ void SetNextWindowTitleShadow(ImU32 color);
 // ⚠ `fill_bg` PEINT LE CORPS ENTRE LES PIÈCES, jamais dessous : l'extérieur
 // arrondi des coins reste transparent, comme chez le client. À faux quand
 // l'appelant a déjà peint son propre fond.
+//
+// 🔴 IL NE PEINT JAMAIS HORS DU DÉCOUPAGE EN COURS DE LA LISTE : un cadre posé
+// dans une zone qui défile en sortirait, par-dessus la fenêtre et sa barre de
+// titre, dès qu'on fait défiler.
 void DrawDescPanelFrame(ImDrawList* into, const SkinArt& art, ImVec2 top_left, ImVec2 bottom_right,
                         bool fill_bg);
+
+// LE MÊME CADRE AUTOUR DE LA FENÊTRE EN COURS, bord compris, sur sa liste.
+//
+// ⚠ LE DÉCOUPAGE EST LA PART VISIBLE DE LA FENÊTRE, et non celui de son
+// contenu : celui-ci rogne la moitié de la marge, donc la moitié du cadre. Une
+// fenêtre-enfant n'est visible que dans son parent : un panneau qu'on fait
+// défiler hors de sa zone y perd son cadre avec le reste.
+void DrawDescPanelFrameAroundWindow(ImDrawList* into, const SkinArt& art, bool fill_bg);
 
 [[nodiscard]] bool BeginSkinnedWindow(const char* name, bool* open, const SkinArt& art,
                                       SkinnedTitle title = SkinnedTitle::kBar,

@@ -285,6 +285,14 @@ struct MarketPlan {
 // demande À PART : la liste du Marché ne bouge pas.
 [[nodiscard]] MarketQuery MarketNpcSellersQuery(std::uint32_t item_id);
 
+// LE NOM D'UNE ÉCHOPPE TEL QUE LE JOUEUR LE LIT : le titre s'arrête au retour
+// chariot. Chez un PNJ, le fil porte son nom ENTIER, partie cachée comprise
+// (« Tool Dealer#tu ») : seule la partie avant le dièse se montre, comme sur sa
+// plaque en jeu. ⚠ SEULEMENT CHEZ UN PNJ : le titre d'un joueur peut porter un
+// dièse qui lui appartient.
+[[nodiscard]] std::string_view MarketShownShopName(MarketKind kind,
+                                                   std::string_view shop_name) noexcept;
+
 // ── LE TRI ET LES PAGES ─────────────────────────────────────────────────────
 
 // Les colonnes que l'on trie, dans l'ordre de la table.

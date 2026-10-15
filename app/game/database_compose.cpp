@@ -323,10 +323,9 @@ std::vector<SellerLine> SellerLinesOf(std::span<const ro::sim::MarketOffer> offe
     std::array<char, kLineBytes> place{};
     std::snprintf(place.data(), place.size(), "%s %d,%d", offer.map_name.c_str(), offer.cell_x,
                   offer.cell_y);
-    // Le nom d'un PNJ s'arrête au retour chariot, comme au Marché.
-    const std::string_view shop(offer.shop_name);
     lines.push_back(SellerLine{
-        .npc = std::string(shop.substr(0, shop.find('\r'))),
+        .npc =
+            std::string(ro::sim::MarketShownShopName(ro::sim::MarketKind::kNpc, offer.shop_name)),
         .place = place.data(),
         .price = MarketPriceText(
             offer, offer.currency_item != 0 ? item_name(offer.currency_item) : std::string())});

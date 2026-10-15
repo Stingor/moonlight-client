@@ -115,9 +115,7 @@ class Panel {
     if (shown_) {
       ImDrawList* const into = ImGui::GetWindowDrawList();
       into->ChannelsSetCurrent(0);
-      const ImVec2 at = ImGui::GetWindowPos();
-      const ImVec2 size = ImGui::GetWindowSize();
-      DrawDescPanelFrame(into, art_, at, ImVec2(at.x + size.x, at.y + size.y), /*fill_bg=*/false);
+      DrawDescPanelFrameAroundWindow(into, art_, /*fill_bg=*/false);
       into->ChannelsMerge();
     }
     ImGui::End();

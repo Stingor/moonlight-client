@@ -87,7 +87,7 @@ class MarketStage {
   void SayNews();
   void Compose(const ro::ui::MarketWindowState& state, const TradeContext& context);
   void ComposeRows(std::span<const ro::sim::MarketOffer> offers, std::span<const std::size_t> ranks,
-                   std::size_t first_name, const TradeContext& context,
+                   ro::sim::MarketKind kind, std::size_t first_name, const TradeContext& context,
                    std::vector<ro::ui::MarketRowView>& rows);
   void Note(int row, bool in_store, bool hovered, bool described,
             ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);

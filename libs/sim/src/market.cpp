@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "ro/core/search_key.h"
+#include "ro/sim/navi_search.h"
 
 namespace ro::sim {
 namespace {
@@ -209,6 +210,12 @@ MarketQuery MarketNpcSellersQuery(std::uint32_t item_id) {
   query.item_ids = {item_id};
   query.aside = true;
   return query;
+}
+
+std::string_view MarketShownShopName(MarketKind kind, std::string_view shop_name) noexcept {
+  constexpr char kTitleEnd = '\r';
+  const std::string_view title = shop_name.substr(0, shop_name.find(kTitleEnd));
+  return kind == MarketKind::kNpc ? VisibleNpcName(title) : title;
 }
 
 std::vector<std::size_t> MarketOrder(std::span<const MarketOffer> offers,
