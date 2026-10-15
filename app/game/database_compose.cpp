@@ -29,8 +29,6 @@ constexpr std::uint32_t kTenths = 10;
 constexpr int kMatkLeastDivisor = 7;
 constexpr int kMatkMostDivisor = 5;
 constexpr int kMdefVitDivisor = 2;
-// Le temps de marche d'une case d'un monstre que la base ne règle pas.
-constexpr std::uint16_t kDefaultWalkMs = 150;
 // Le métier qui vaut tous les métiers.
 constexpr std::string_view kAllJobs = "All";
 
@@ -149,7 +147,9 @@ std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
   if (item.armor_level > 0) {
     add(ro::core::Tr("Niveau d'armure"), Printed("%u", item.armor_level));
   }
-  if (item.equip_level_min > 0) {
+  // Le niveau 1 ne restreint rien : la ligne ne paraît que pour une borne.
+  if (item.equip_level_min > ro::vfs::kServerItemDefaultEquipLevelMin ||
+      item.equip_level_max != 0) {
     add(ro::core::Tr("Niveau requis"), LevelText(item));
   }
   if (!item.jobs.empty()) {
@@ -260,8 +260,7 @@ ro::sim::MonsterSheet MonsterSheetOf(const ro::vfs::ServerMonster& monster,
   sheet.element_level = monster.element_level;
   sheet.boss_rank = monster.rank;
   sheet.mode = monster.mode;
-  sheet.walk_ms_per_cell =
-      monster.walk_ms_per_cell != 0 ? monster.walk_ms_per_cell : kDefaultWalkMs;
+  sheet.walk_ms_per_cell = monster.walk_ms_per_cell;
   sheet.name = monster.name;
   sheet.aegis_name = monster.aegis_name;
   // LES BUTINS ORDINAIRES, PUIS LES RÉCOMPENSES : l'ordre de la fiche du

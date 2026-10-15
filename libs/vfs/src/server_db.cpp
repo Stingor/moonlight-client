@@ -25,7 +25,15 @@ constexpr std::string_view kMobDbType = "MOB_DB";
 constexpr int kContextVersion = 1;
 constexpr std::string_view kTrueText = "true";
 constexpr std::string_view kTreasureGroup = "Treasure";
-constexpr std::string_view kEtcType = "Etc";
+constexpr std::string_view kWeaponType = "Weapon";
+constexpr std::string_view kCardType = "Card";
+// Les objets dont le serveur impose le genre, quel qu'en soit l'écrit.
+constexpr std::uint32_t kWeddingRingMale = 2634;
+constexpr std::uint32_t kWeddingRingFemale = 2635;
+constexpr std::string_view kMaleOnlySubType = "Musical";
+constexpr std::string_view kFemaleOnlySubType = "Whip";
+constexpr std::string_view kMaleGender = "Male";
+constexpr std::string_view kFemaleGender = "Female";
 // `override_mob_names` à cette valeur montre `JapaneseName`.
 constexpr std::int64_t kJapaneseNameOverride = 2;
 // Les champs d'une ligne `monsters` du contexte, dans l'ordre que le script écrit.
@@ -168,7 +176,7 @@ ServerItem ItemOf(const formats::RathenaEntry& entry) {
     } else if (key == "ArmorLevel") {
       item.armor_level = FieldNumber<std::uint16_t>(value, 0);
     } else if (key == "EquipLevelMin") {
-      item.equip_level_min = FieldNumber<std::uint16_t>(value, 0);
+      item.equip_level_min = FieldNumber<std::uint16_t>(value, kServerItemDefaultEquipLevelMin);
     } else if (key == "EquipLevelMax") {
       item.equip_level_max = FieldNumber<std::uint16_t>(value, 0);
     } else if (key == "Refineable") {
@@ -183,9 +191,25 @@ ServerItem ItemOf(const formats::RathenaEntry& entry) {
       item.unequip_script = FieldText(value);
     }
   }
-  // Sans `Type`, le serveur en fait un objet divers.
+  // Un texte vide vaut le champ absent : le défaut du serveur.
   if (item.type.empty()) {
-    item.type = kEtcType;
+    item.type = kServerItemDefaultType;
+  }
+  if (item.gender.empty()) {
+    item.gender = kServerItemDefaultGender;
+  }
+  const bool weapon = SameText(item.type, kWeaponType);
+  if (item.sub_type.empty() && weapon) {
+    item.sub_type = kServerWeaponDefaultSubType;
+  } else if (item.sub_type.empty() && SameText(item.type, kCardType)) {
+    item.sub_type = kServerCardDefaultSubType;
+  }
+  // Le genre que le serveur impose, écrit ou non.
+  if (item.item_id == kWeddingRingMale || (weapon && SameText(item.sub_type, kMaleOnlySubType))) {
+    item.gender = kMaleGender;
+  } else if (item.item_id == kWeddingRingFemale ||
+             (weapon && SameText(item.sub_type, kFemaleOnlySubType))) {
+    item.gender = kFemaleGender;
   }
   return item;
 }
@@ -222,11 +246,11 @@ ServerMonster MonsterOf(const formats::RathenaEntry& entry, const AegisIndex& it
     } else if (key == "JapaneseName") {
       japanese = FieldText(value);
     } else if (key == "Level") {
-      monster.level = FieldNumber<std::uint16_t>(value, 1);
+      monster.level = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultLevel);
     } else if (key == "Hp") {
-      monster.hp = FieldNumber<std::uint32_t>(value, 1);
+      monster.hp = FieldNumber<std::uint32_t>(value, kServerMonsterDefaultHp);
     } else if (key == "Sp") {
-      monster.sp = FieldNumber<std::uint32_t>(value, 1);
+      monster.sp = FieldNumber<std::uint32_t>(value, kServerMonsterDefaultSp);
     } else if (key == "BaseExp") {
       monster.base_exp = FieldNumber<std::uint32_t>(value, 0);
     } else if (key == "JobExp") {
@@ -242,21 +266,21 @@ ServerMonster MonsterOf(const formats::RathenaEntry& entry, const AegisIndex& it
     } else if (key == "MagicDefense") {
       monster.magic_defense = FieldNumber<std::uint32_t>(value, 0);
     } else if (key == "Str") {
-      monster.str = FieldNumber<std::uint16_t>(value, 1);
+      monster.str = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultStat);
     } else if (key == "Agi") {
-      monster.agi = FieldNumber<std::uint16_t>(value, 1);
+      monster.agi = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultStat);
     } else if (key == "Vit") {
-      monster.vit = FieldNumber<std::uint16_t>(value, 1);
+      monster.vit = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultStat);
     } else if (key == "Int") {
-      monster.int_stat = FieldNumber<std::uint16_t>(value, 1);
+      monster.int_stat = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultStat);
     } else if (key == "Dex") {
-      monster.dex = FieldNumber<std::uint16_t>(value, 1);
+      monster.dex = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultStat);
     } else if (key == "Luk") {
-      monster.luk = FieldNumber<std::uint16_t>(value, 1);
+      monster.luk = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultStat);
     } else if (key == "AttackRange") {
       monster.attack_range_cells = FieldNumber<std::uint16_t>(value, 0);
     } else if (key == "WalkSpeed") {
-      monster.walk_ms_per_cell = FieldNumber<std::uint16_t>(value, 0);
+      monster.walk_ms_per_cell = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultWalkMs);
     } else if (key == "RaceGroups") {
       monster.treasure = std::ranges::any_of(FieldRaised(value), [](const std::string& group) {
         return SameText(group, kTreasureGroup);

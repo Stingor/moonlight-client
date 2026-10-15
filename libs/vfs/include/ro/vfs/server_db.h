@@ -39,14 +39,43 @@ inline constexpr std::string_view kServerDbContextPath = "data\\yaml_files\\mob_
 // Les centièmes de pour cent d'un taux qui tombe à coup sûr.
 inline constexpr std::uint32_t kDropRateWhole = 10000;
 
+// ── LES DÉFAUTS DU SERVEUR ──────────────────────────────────────────────────
+//
+// 🔴 UN CHAMP ABSENT VAUT LE DÉFAUT QUE LE SERVEUR POSE SUR UNE ENTRÉE NEUVE :
+// le script n'écrit pas un champ égal à son défaut
+// (`scripts/yaml_tables/server_db_defaults.py`), et il refuse d'exporter si
+// une constante ci-dessous ne vaut plus le défaut du serveur. Un défaut nul
+// (prix, poids, attaque, défense, portée, emplacements de carte, niveau
+// d'arme et d'armure, apparence, EXP, rang d'attaque) est le zéro du champ ;
+// un booléen absent est faux ; une table de clés absente n'en lève aucune.
+//
+// Objet : sans `Type`, un objet divers ; sans `EquipLevelMin`, le niveau 1 ;
+// sans `Classes`, toutes ; sans `SubType`, le sous-type 0 de son type ; sans
+// `Gender`, les deux ; puis, écrit ou non, le genre que le serveur IMPOSE aux
+// instruments (hommes), aux fouets et aux anneaux de mariage. `EquipLevelMax`
+// est écrit quand il borne : zéro dit qu'il ne borne pas.
+inline constexpr std::string_view kServerItemDefaultType = "Etc";
+inline constexpr std::uint16_t kServerItemDefaultEquipLevelMin = 1;
+inline constexpr std::string_view kServerItemDefaultClass = "All";
+inline constexpr std::string_view kServerItemDefaultGender = "Both";
+inline constexpr std::string_view kServerWeaponDefaultSubType = "Fist";
+inline constexpr std::string_view kServerCardDefaultSubType = "Normal";
+// Monstre : sans `JapaneseName`, le nom ; sans `WalkSpeed`, la vitesse de
+// marche par défaut du serveur.
+inline constexpr std::uint16_t kServerMonsterDefaultLevel = 1;
+inline constexpr std::uint32_t kServerMonsterDefaultHp = 1;
+inline constexpr std::uint32_t kServerMonsterDefaultSp = 1;
+inline constexpr std::uint16_t kServerMonsterDefaultStat = 1;
+inline constexpr std::uint16_t kServerMonsterDefaultWalkMs = 150;
+inline constexpr std::uint8_t kServerMonsterDefaultElementLevel = 1;
+
 // UN OBJET DE L'ITEM_DB. Les textes — type, emplacements, métiers — sont ceux
 // de la base, en anglais, que l'appelant traduit.
 struct ServerItem {
   std::uint32_t item_id = 0;
   std::string aegis_name;
   std::string name;
-  // « Etc » quand la base ne le dit pas : le serveur en fait un objet divers.
-  std::string type;
+  std::string type{kServerItemDefaultType};
   std::string sub_type;
   std::uint32_t buy_zeny = 0;
   std::uint32_t sell_zeny = 0;
@@ -58,13 +87,13 @@ struct ServerItem {
   std::uint16_t slots = 0;
   // Les métiers, les classes et les emplacements LEVÉS, dans l'ordre écrit.
   std::vector<std::string> jobs;
-  std::vector<std::string> classes;
+  std::vector<std::string> classes{std::string(kServerItemDefaultClass)};
   std::vector<std::string> locations;
-  std::string gender;
+  std::string gender{kServerItemDefaultGender};
   std::uint16_t weapon_level = 0;
   std::uint16_t armor_level = 0;
+  std::uint16_t equip_level_min = kServerItemDefaultEquipLevelMin;
   // Zéro : la base ne borne pas.
-  std::uint16_t equip_level_min = 0;
   std::uint16_t equip_level_max = 0;
   bool refineable = false;
   std::uint32_t view = 0;
@@ -90,9 +119,9 @@ struct ServerMonster {
   std::string aegis_name;
   // Le nom que le serveur MONTRE, selon `override_mob_names`.
   std::string name;
-  std::uint16_t level = 1;
-  std::uint32_t hp = 1;
-  std::uint32_t sp = 1;
+  std::uint16_t level = kServerMonsterDefaultLevel;
+  std::uint32_t hp = kServerMonsterDefaultHp;
+  std::uint32_t sp = kServerMonsterDefaultSp;
   std::uint32_t base_exp = 0;
   std::uint32_t job_exp = 0;
   std::uint32_t mvp_exp = 0;
@@ -100,19 +129,19 @@ struct ServerMonster {
   std::uint32_t attack2 = 0;
   std::uint32_t defense = 0;
   std::uint32_t magic_defense = 0;
-  std::uint16_t str = 1;
-  std::uint16_t agi = 1;
-  std::uint16_t vit = 1;
-  std::uint16_t int_stat = 1;
-  std::uint16_t dex = 1;
-  std::uint16_t luk = 1;
+  std::uint16_t str = kServerMonsterDefaultStat;
+  std::uint16_t agi = kServerMonsterDefaultStat;
+  std::uint16_t vit = kServerMonsterDefaultStat;
+  std::uint16_t int_stat = kServerMonsterDefaultStat;
+  std::uint16_t dex = kServerMonsterDefaultStat;
+  std::uint16_t luk = kServerMonsterDefaultStat;
   std::uint16_t attack_range_cells = 0;
-  // Le temps de marche d'une case ; zéro quand la base ne le dit pas.
-  std::uint16_t walk_ms_per_cell = 0;
+  // Le temps de marche d'une case.
+  std::uint16_t walk_ms_per_cell = kServerMonsterDefaultWalkMs;
   // ── LES NOMBRES QUE LE SERVEUR DÉDUIT, ceux de sa fiche ──────────────────
   std::uint8_t race = 0;
   std::uint8_t element = 0;
-  std::uint8_t element_level = 1;
+  std::uint8_t element_level = kServerMonsterDefaultElementLevel;
   std::uint8_t size = 0;
   std::uint8_t rank = kServerMonsterOrdinary;
   std::uint32_t mode = 0;
