@@ -81,8 +81,12 @@ class DatabaseStage {
   void Load();
   void Index();
   void ComposeRows(const ro::ui::DatabaseWindowState& state);
-  void ComposeItem(std::uint32_t item_id, const DatabaseContext& context);
-  void FollowSellers(std::uint32_t item_id, const DatabaseContext& context, bool retry);
+  // `sellers_shown` : l'onglet « Vendu chez » était montré à l'image d'avant.
+  void ComposeItem(std::uint32_t item_id, const DatabaseContext& context, bool sellers_shown);
+  // CE QUE « VENDU CHEZ » DEMANDE AU MARCHÉ : rien, l'objet une fois, ou de
+  // nouveau après un refus.
+  enum class SellersAsk : std::uint8_t { kNever, kOnce, kRetry };
+  void FollowSellers(std::uint32_t item_id, const DatabaseContext& context, SellersAsk ask);
   [[nodiscard]] std::string ItemName(std::uint32_t item_id) const;
 
   ro::vfs::Vfs* vfs_ = nullptr;

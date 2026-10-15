@@ -175,12 +175,20 @@ struct DatabaseFilters {
   bool operator==(const DatabaseFilters&) const = default;
 };
 
+// LES ONGLETS DE LA FICHE D'UN OBJET, dans leur ordre. « Description » n'existe
+// qu'avec une description, « Script » qu'avec un script du serveur.
+enum class DatabaseItemTab : std::uint8_t { kGeneral, kDescription, kScript, kDroppers, kSellers };
+
 struct DatabaseWindowState {
   bool open = false;
   bool raise = false;
   int tab = kDatabaseItemTab;
   // L'onglet de `tab` s'impose à la prochaine image.
   bool select_tab = true;
+  // L'ONGLET DE LA FICHE D'UN OBJET QUE LE JOUEUR A CLIQUÉ, retenu d'un objet à
+  // l'autre. Un objet qui ne l'a pas s'ouvre sur « Général » sans l'oublier :
+  // l'objet suivant qui l'a le rouvre.
+  DatabaseItemTab item_tab = DatabaseItemTab::kGeneral;
   std::array<char, kDatabaseQueryBytes> item_query{};
   std::array<char, kDatabaseQueryBytes> monster_query{};
   DatabaseFilters filters;
@@ -217,6 +225,7 @@ struct DatabaseDropperRow {
 enum class DatabaseSellersPhase : std::uint8_t {
   // Personne à qui demander : hors ligne.
   kOffline,
+  // La demande est partie, ou partira à l'ouverture de l'onglet.
   kAsking,
   kReady,
   // Le serveur a refusé — trop tôt après une autre demande : « Réessayer ».
@@ -248,6 +257,9 @@ struct DatabaseItemView {
   std::span<const VoteShopOffer> vote_shop;
 };
 
+// Vrai quand la fiche de cet objet porte cet onglet.
+[[nodiscard]] bool DatabaseItemTabShown(DatabaseItemTab tab, const DatabaseItemView& view);
+
 struct DatabaseView {
   // La base se lit encore : la première ouverture.
   bool loading = false;
@@ -264,6 +276,9 @@ struct DatabaseView {
 struct DatabaseAnswer {
   // « Marché » : le Marché s'ouvre sur cet objet ; zéro sinon.
   std::uint32_t market_item = 0;
+  // L'onglet « Vendu chez » est montré : la demande au Marché peut partir. Elle
+  // n'attend que lui, pour qu'une fiche feuilletée ne coûte rien au serveur.
+  bool sellers_shown = false;
   // « Réessayer » de « Vendu chez ».
   bool ask_sellers = false;
   // « Y aller » vers ce rang des vendeurs ; négatif sinon.

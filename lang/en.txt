@@ -18031,8 +18031,11 @@ tr: Delayed consumables
 fr: Demande au serveur…
 tr: Asking the server…
 
-fr: Description en jeu###db_description
-tr: In-game description###db_description
+fr: Description###db_description
+tr: Description###db_description
+
+fr: Général###db_general
+tr: General###db_general
 
 fr: Emplacements de carte
 tr: Card slots
@@ -18124,14 +18127,17 @@ tr: Refinable
 fr: Réessayer##db_sellers_retry
 tr: Retry##db_sellers_retry
 
-fr: Script du serveur
-tr: Server script
+fr: Script###db_script
+tr: Script###db_script
 
 fr: Se porte
 tr: Worn on
 
 fr: Vendu chez###db_sellers
 tr: Sold by###db_sellers
+
+fr: Vendu chez (%d)###db_sellers
+tr: Sold by (%d)###db_sellers
 
 fr: [Mini-boss]
 tr: [Mini-boss]

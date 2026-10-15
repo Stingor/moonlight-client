@@ -1,5 +1,6 @@
-// La fiche d'un objet dans la base de données : ce que le serveur en sait, la
-// description que le jeu montre, ses scripts, qui le lâche et qui le vend.
+// La fiche d'un objet dans la base de données : sous son en-tête, un onglet par
+// sujet — ce que le serveur en sait, la description que le jeu montre, ses
+// scripts, qui le lâche et qui le vend.
 
 #include <array>
 #include <cstddef>
@@ -7,6 +8,7 @@
 #include <string>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_tooltip.h"
@@ -93,13 +95,6 @@ void DrawScript(const char* heading, std::string_view script) {
 }
 
 void DrawScripts(const DatabaseItemView& view) {
-  if (view.script.empty() && view.equip_script.empty() && view.unequip_script.empty()) {
-    return;
-  }
-  // REPLIÉ PAR DÉFAUT : un script se lit quand on le cherche.
-  if (!ImGui::CollapsingHeader(core::Tr("Script du serveur"))) {
-    return;
-  }
   DrawScript(core::Tr("À l'usage ou porté"), view.script);
   DrawScript(core::Tr("À l'équipement"), view.equip_script);
   DrawScript(core::Tr("Au retrait"), view.unequip_script);
@@ -107,12 +102,6 @@ void DrawScripts(const DatabaseItemView& view) {
 
 // « LÂCHÉ PAR » : chaque monstre est un lien vers sa fiche.
 void DrawDroppers(DatabaseWindowState& state, const DatabaseItemView& view) {
-  std::array<char, kLineBytes> heading{};
-  std::snprintf(heading.data(), heading.size(), core::Tr("Lâché par (%d)###db_droppers"),
-                static_cast<int>(view.droppers.size()));
-  if (!ImGui::CollapsingHeader(heading.data(), ImGuiTreeNodeFlags_DefaultOpen)) {
-    return;
-  }
   if (view.droppers.empty()) {
     ImGui::TextDisabled("%s", core::Tr("Aucun monstre ne le lâche."));
     return;
@@ -155,10 +144,6 @@ void DrawDroppers(DatabaseWindowState& state, const DatabaseItemView& view) {
 
 // « VENDU CHEZ » : les boutiques de PNJ, que le Marché sait.
 void DrawSellers(const DatabaseItemView& view, const SkinArt& art, DatabaseAnswer& answer) {
-  if (!ImGui::CollapsingHeader(core::Tr("Vendu chez###db_sellers"),
-                               ImGuiTreeNodeFlags_DefaultOpen)) {
-    return;
-  }
   switch (view.sellers_phase) {
     case DatabaseSellersPhase::kOffline:
       ImGui::TextDisabled("%s", core::Tr("Le serveur seul le sait : connectez-vous."));
@@ -208,21 +193,127 @@ void DrawSellers(const DatabaseItemView& view, const SkinArt& art, DatabaseAnswe
   ImGui::EndTable();
 }
 
+constexpr std::array<DatabaseItemTab, 5> kItemTabs = {
+    DatabaseItemTab::kGeneral,  DatabaseItemTab::kDescription, DatabaseItemTab::kScript,
+    DatabaseItemTab::kDroppers, DatabaseItemTab::kSellers,
+};
+
+// ⚠ LE COMPTE FAIT PARTIE DU LIBELLÉ, l'identité non : `###` la fige, sans quoi
+// l'onglet choisi sauterait d'un objet à l'autre.
+[[nodiscard]] std::string TabLabel(DatabaseItemTab tab, const DatabaseItemView& view) {
+  std::array<char, kLineBytes> counted{};
+  switch (tab) {
+    case DatabaseItemTab::kGeneral:
+      return core::Tr("Général###db_general");
+    case DatabaseItemTab::kDescription:
+      return core::Tr("Description###db_description");
+    case DatabaseItemTab::kScript:
+      return core::Tr("Script###db_script");
+    case DatabaseItemTab::kDroppers:
+      std::snprintf(counted.data(), counted.size(), core::Tr("Lâché par (%d)###db_droppers"),
+                    static_cast<int>(view.droppers.size()));
+      return counted.data();
+    case DatabaseItemTab::kSellers:
+      // Le nombre n'est su qu'à la réponse du Marché.
+      if (view.sellers_phase != DatabaseSellersPhase::kReady) {
+        return core::Tr("Vendu chez###db_sellers");
+      }
+      std::snprintf(counted.data(), counted.size(), core::Tr("Vendu chez (%d)###db_sellers"),
+                    static_cast<int>(view.sellers.size()));
+      return counted.data();
+  }
+  return {};
+}
+
+void DrawTabBody(DatabaseItemTab tab, DatabaseWindowState& state, const DatabaseItemView& view,
+                 const SkinArt& art, DatabaseAnswer& answer) {
+  switch (tab) {
+    case DatabaseItemTab::kGeneral:
+      DrawFacts(view);
+      return;
+    case DatabaseItemTab::kDescription:
+      DrawDescriptionPreviewPanel("##db_description_panel", *view.description, art);
+      return;
+    case DatabaseItemTab::kScript:
+      DrawScripts(view);
+      return;
+    case DatabaseItemTab::kDroppers:
+      DrawDroppers(state, view);
+      return;
+    case DatabaseItemTab::kSellers:
+      answer.sellers_shown = true;
+      DrawSellers(view, art, answer);
+      return;
+  }
+}
+
+void DrawTabs(DatabaseWindowState& state, const DatabaseItemView& view, const SkinArt& art,
+              DatabaseAnswer& answer) {
+  // L'ONGLET MONTRÉ : le choix du joueur, ou « Général » quand l'objet ne l'a
+  // pas — sans toucher au choix, que l'objet suivant retrouvera.
+  const DatabaseItemTab shown =
+      DatabaseItemTabShown(state.item_tab, view) ? state.item_tab : DatabaseItemTab::kGeneral;
+  if (!BeginSkinTabBar("##db_item_tabs", art)) {
+    return;
+  }
+  // ⚠ IMPOSÉ AVANT LE PREMIER ONGLET : la barre ne se dispose qu'à lui, et y
+  // prend la sélection en attente. `SetSelected` n'obéirait qu'à l'image
+  // d'après, et l'image entre les deux n'aurait montré aucun onglet. Un clic
+  // en attente passe devant : c'est un nouveau choix.
+  ImGuiTabBar* const bar = GImGui->CurrentTabBar;
+  const std::string shown_label = TabLabel(shown, view);
+  const bool clicked = bar->NextSelectedTabId != 0;
+  if (!clicked && bar->SelectedTabId != ImGui::GetCurrentWindow()->GetID(shown_label.c_str())) {
+    ImGui::TabBarQueueFocus(bar, shown_label.c_str());
+  }
+  for (const DatabaseItemTab tab : kItemTabs) {
+    if (!DatabaseItemTabShown(tab, view)) {
+      continue;
+    }
+    const std::string label = TabLabel(tab, view);
+    if (!ImGui::BeginTabItem(label.c_str())) {
+      continue;
+    }
+    // ⚠ UN ONGLET NE SE MONTRE PAS À L'IMAGE OÙ IL PARAÎT : ImGui en montre
+    // alors un autre, que seul un clic fait choisir.
+    if (clicked && tab != shown) {
+      state.item_tab = tab;
+    }
+    // LE CONTENU DÉFILE SEUL : l'en-tête et les onglets restent en place.
+    if (ImGui::BeginChild("##db_item_body")) {
+      DrawTabBody(tab, state, view, art, answer);
+    }
+    ImGui::EndChild();
+    ImGui::EndTabItem();
+  }
+  EndSkinTabBar();
+}
+
 }  // namespace
 
 void DrawItemSheet(DatabaseWindowState& state, const DatabaseItemView& view, const SkinArt& art,
                    ItemLinkMenu& menu, DatabaseAnswer& answer) {
   DrawHeader(view, art, menu, answer);
   ImGui::Separator();
-  DrawFacts(view);
-  if (view.description != nullptr &&
-      ImGui::CollapsingHeader(core::Tr("Description en jeu###db_description"),
-                              ImGuiTreeNodeFlags_DefaultOpen)) {
-    DrawDescriptionPreviewPanel("##db_description_panel", *view.description, art);
-  }
-  DrawScripts(view);
-  DrawDroppers(state, view);
-  DrawSellers(view, art, answer);
+  DrawTabs(state, view, art, answer);
 }
 
 }  // namespace ro::ui::database
+
+namespace ro::ui {
+
+bool DatabaseItemTabShown(DatabaseItemTab tab, const DatabaseItemView& view) {
+  switch (tab) {
+    case DatabaseItemTab::kDescription:
+      return view.description != nullptr;
+    case DatabaseItemTab::kScript:
+      return !view.script.empty() || !view.equip_script.empty() || !view.unequip_script.empty();
+    case DatabaseItemTab::kGeneral:
+    case DatabaseItemTab::kDroppers:
+    case DatabaseItemTab::kSellers:
+      return true;
+  }
+  return false;
+}
+
+}  // namespace ro::ui

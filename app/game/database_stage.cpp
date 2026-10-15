@@ -215,7 +215,8 @@ void DatabaseStage::ComposeRows(const ro::ui::DatabaseWindowState& state) {
   summary_ = text_line.data();
 }
 
-void DatabaseStage::ComposeItem(std::uint32_t item_id, const DatabaseContext& context) {
+void DatabaseStage::ComposeItem(std::uint32_t item_id, const DatabaseContext& context,
+                                bool sellers_shown) {
   const ro::vfs::ServerItem* const item = db_.FindItem(item_id);
   if (item == nullptr) {
     view_.item = nullptr;
@@ -264,12 +265,12 @@ void DatabaseStage::ComposeItem(std::uint32_t item_id, const DatabaseContext& co
   item_view_.unequip_script = item->unequip_script;
   item_view_.droppers = droppers_;
   item_view_.vote_shop = context.vote_shop;
-  FollowSellers(item_id, context, /*retry=*/false);
+  FollowSellers(item_id, context, sellers_shown ? SellersAsk::kOnce : SellersAsk::kNever);
   view_.item = &item_view_;
 }
 
 void DatabaseStage::FollowSellers(std::uint32_t item_id, const DatabaseContext& context,
-                                  bool retry) {
+                                  SellersAsk ask) {
   // LA RÉPONSE ARRIVÉE, rangée sous l'objet demandé — si c'est bien la sienne.
   const ro::sim::MarketAnswer& aside = context.market.aside();
   if (aside.complete() && aside.complete_seq() != answer_seen_) {
@@ -305,7 +306,8 @@ void DatabaseStage::FollowSellers(std::uint32_t item_id, const DatabaseContext& 
     return;
   }
   // UNE DEMANDE PAR OBJET, et une seule en vol : un refus attend « Réessayer ».
-  if (sellers_asked_ != item_id || retry) {
+  // Elle ne part qu'onglet ouvert.
+  if ((ask == SellersAsk::kOnce && sellers_asked_ != item_id) || ask == SellersAsk::kRetry) {
     sellers_asked_ = item_id;
     sellers_refused_ = false;
     if (auto sent = ro::net::RequestMarket(context.link, context.market,
@@ -316,8 +318,9 @@ void DatabaseStage::FollowSellers(std::uint32_t item_id, const DatabaseContext& 
       sellers_query_ = context.market.aside().query_id();
     }
   }
-  view.sellers_phase = sellers_refused_ ? ro::ui::DatabaseSellersPhase::kRefused
-                                        : ro::ui::DatabaseSellersPhase::kAsking;
+  view.sellers_phase = sellers_asked_ == item_id && sellers_refused_
+                           ? ro::ui::DatabaseSellersPhase::kRefused
+                           : ro::ui::DatabaseSellersPhase::kAsking;
   view.sellers_status = sellers_status_;
 }
 
@@ -333,7 +336,7 @@ void DatabaseStage::Advance(DatabaseWindows& windows, const DatabaseContext& con
     if (const std::optional<ro::ui::DatabaseTarget> shown = windows.state.history.current();
         shown.has_value() && shown->kind == ro::ui::DatabaseKind::kItem) {
       if (answer.ask_sellers) {
-        FollowSellers(shown->id, context, /*retry=*/true);
+        FollowSellers(shown->id, context, SellersAsk::kRetry);
       }
       if (answer.go_to_seller >= 0) {
         const auto known = sellers_.find(shown->id);
@@ -354,7 +357,7 @@ void DatabaseStage::Advance(DatabaseWindows& windows, const DatabaseContext& con
     const std::optional<ro::ui::DatabaseTarget> shown = windows.state.history.current();
     // LA FICHE SUIT LE FIL, pas l'onglet : l'onglet ne choisit que la liste.
     if (shown.has_value() && shown->kind == ro::ui::DatabaseKind::kItem) {
-      ComposeItem(shown->id, context);
+      ComposeItem(shown->id, context, answer.sellers_shown);
     }
   }
   windows.view = &view_;

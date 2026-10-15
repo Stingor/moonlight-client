@@ -18031,8 +18031,11 @@ tr: Consumibles diferidos
 fr: Demande au serveur…
 tr: Preguntando al servidor…
 
-fr: Description en jeu###db_description
-tr: Descripción en el juego###db_description
+fr: Description###db_description
+tr: Descripción###db_description
+
+fr: Général###db_general
+tr: General###db_general
 
 fr: Emplacements de carte
 tr: Ranuras de carta
@@ -18124,14 +18127,17 @@ tr: Refinable
 fr: Réessayer##db_sellers_retry
 tr: Reintentar##db_sellers_retry
 
-fr: Script du serveur
-tr: Script del servidor
+fr: Script###db_script
+tr: Script###db_script
 
 fr: Se porte
 tr: Se lleva en
 
 fr: Vendu chez###db_sellers
 tr: Vendido por###db_sellers
+
+fr: Vendu chez (%d)###db_sellers
+tr: Vendido por (%d)###db_sellers
 
 fr: [Mini-boss]
 tr: [Minijefe]
