@@ -5,6 +5,7 @@
 #include <limits>
 #include <utility>
 
+#include "ro/core/i18n.h"
 #include "ro/net/item_facts.h"
 #include "ro/sim/card_composition.h"
 #include "ro/sim/equip_compare.h"
@@ -12,6 +13,7 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/item_name.h"
 
+#include "game/item_db_block.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -76,14 +78,24 @@ void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id
   }
   // ⚠ ON NE REFAIT QUE CE QUI CHANGE. Les lignes et l'illustration sont figées
   // pour un identifiant ; seul le nom décoré suit l'objet, qui peut se faire
-  // sertir ou raffiner pendant qu'on le lit.
-  if (shown_ != item_id) {
+  // sertir ou raffiner pendant qu'on le lit. Les lignes se refont aussi quand
+  // la base du serveur vient d'être lue, ou quand la langue change : le bloc de
+  // l'item_db est traduit.
+  const bool with_base = server_db_ != nullptr && server_db_->known();
+  const std::size_t language = ro::core::LanguageSerial();
+  const bool new_item = shown_ != item_id;
+  if (new_item || with_base != lines_with_base_ || language != lines_language_) {
     shown_ = item_id;
+    lines_with_base_ = with_base;
+    lines_language_ = language;
     lines_.clear();
     if (const ro::vfs::ItemEntry* entry = items_ != nullptr ? items_->Find(item_id) : nullptr;
         entry != nullptr) {
       lines_ = entry->description;
     }
+    AppendItemDbBlock(lines_, server_db_, item_id);
+  }
+  if (new_item) {
     RefreshOdds(item_id);
   }
 
@@ -208,6 +220,14 @@ void DescriptionView::EnableComparison() {
   compare_ = std::make_unique<DescriptionView>(items_, words_, icons_);
   compare_->SeeRandomOptions(option_names_);
   compare_->ShareCreatorsWith(*this);
+  compare_->SeeServerDb(server_db_);
+}
+
+void DescriptionView::SeeServerDb(const ro::vfs::ServerDb* db) noexcept {
+  server_db_ = db;
+  if (compare_ != nullptr) {
+    compare_->SeeServerDb(db);
+  }
 }
 
 void DescriptionView::ToggleAutoloot(ro::net::Connection& link, std::uint32_t item_id) {

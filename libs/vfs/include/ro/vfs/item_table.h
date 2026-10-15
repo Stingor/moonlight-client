@@ -130,6 +130,14 @@ inline constexpr std::string_view kDatabaseLinkSuffix = "</INFO></URL>";
 // vide ne se replierait pas de la même façon.
 inline constexpr std::string_view kDescriptionGap = " ";
 
+// LE TRAIT DE SÉPARATION DU CLIENT : vingt-quatre soulignés, ni plus ni moins.
+//
+// 🔴 CE N'EST PAS UN DESSIN MAIS DU TEXTE, et c'est le script du client qui
+// l'écrit. Un vrai filet — pleine largeur, épaisseur du thème — ne serait pas ce
+// que le joueur voit : le sien s'arrête net au bout de vingt-quatre caractères,
+// et il se sélectionne et se copie avec le reste.
+inline constexpr std::string_view kDescriptionRule = "________________________";
+
 // L'ADRESSE DE LA FICHE D'UN OBJET, sans le balisage qui l'entoure dans une
 // description. ⚠ COMPOSÉE ICI ET NULLE PART AILLEURS : c'est la même adresse que
 // la première ligne d'une description, et deux endroits qui l'assemblent

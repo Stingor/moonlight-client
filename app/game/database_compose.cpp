@@ -13,6 +13,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/inventory_window.h"
 
+#include "game/item_db_block.h"
 #include "game/market_route.h"
 
 namespace moonclient {
@@ -27,8 +28,6 @@ constexpr std::uint32_t kTenths = 10;
 constexpr int kMatkLeastDivisor = 7;
 constexpr int kMatkMostDivisor = 5;
 constexpr int kMdefVitDivisor = 2;
-// Le métier qui vaut tous les métiers.
-constexpr std::string_view kAllJobs = "All";
 
 [[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
   return left.size() == right.size() &&
@@ -150,10 +149,9 @@ std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
       item.equip_level_max != 0) {
     add(ro::core::Tr("Niveau requis"), LevelText(item));
   }
-  if (!item.jobs.empty()) {
-    const bool all = std::ranges::any_of(
-        item.jobs, [](const std::string& job) { return SameText(job, kAllJobs); });
-    add(ro::core::Tr("Jobs"), all ? std::string(ro::core::Tr("Tous")) : Joined(item.jobs));
+  // Les jobs d'un équipement, ou de tout objet que la base ferme à un job.
+  if (IsEquipment(item) || JobsRestricted(item)) {
+    add(ro::core::Tr("Jobs"), JobsSummaryOf(item));
   }
   if (SameText(item.gender, "Female")) {
     add(ro::core::Tr("Sexe"), ro::core::Tr("Femmes seulement"));

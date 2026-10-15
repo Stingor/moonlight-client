@@ -123,6 +123,17 @@ template <typename Number>
   return raised;
 }
 
+// Les clés abaissées d'une table de booléens, dans l'ordre écrit.
+[[nodiscard]] std::vector<std::string> FieldLowered(const Field& field) {
+  std::vector<std::string> lowered;
+  for (const formats::RathenaPair& pair : field.map) {
+    if (!SameText(pair.value, kTrueText)) {
+      lowered.emplace_back(pair.key);
+    }
+  }
+  return lowered;
+}
+
 // La valeur d'un couple d'une table d'une ligne ; vide sans lui.
 [[nodiscard]] std::string_view PairValue(const Pairs& pairs, std::string_view key) {
   for (const formats::RathenaPair& pair : pairs) {
@@ -165,6 +176,7 @@ ServerItem ItemOf(const formats::RathenaEntry& entry) {
       item.slots = FieldNumber<std::uint16_t>(value, 0);
     } else if (key == "Jobs") {
       item.jobs = FieldRaised(value);
+      item.jobs_lowered = FieldLowered(value);
     } else if (key == "Classes") {
       item.classes = FieldRaised(value);
     } else if (key == "Locations") {

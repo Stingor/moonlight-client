@@ -16,14 +16,6 @@ core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData, "table des objets : " + std::move(detail)};
 }
 
-// LE TRAIT DE SÉPARATION DU CLIENT : vingt-quatre soulignés, ni plus ni moins.
-//
-// 🔴 CE N'EST PAS UN DESSIN MAIS DU TEXTE, et c'est le script du client qui
-// l'écrit. Un vrai filet — pleine largeur, épaisseur du thème — ne serait pas ce
-// que le joueur voit : le sien s'arrête net au bout de vingt-quatre caractères,
-// et il se sélectionne et se copie avec le reste.
-constexpr std::string_view kDescriptionRule = "________________________";
-
 // Les lignes de description, telles que le CLIENT les pose.
 //
 // 🔴 UN `#` EN FIN DE LIGNE N'EST PAS DU TEXTE : c'est la marque d'un trait de

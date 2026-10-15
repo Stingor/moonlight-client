@@ -18129,3 +18129,207 @@ tr: Huevos de mascota
 
 fr: EXP écrite dans la base : %s\nTaux du serveur : %lld %%
 tr: EXP escrita en la base: %s\nTasa del servidor: %lld %%
+
+fr: %u,%u
+tr: %u,%u
+
+fr: Arc
+tr: Arco
+
+fr: Arme de lancer
+tr: Arma arrojadiza
+
+fr: Attaque :
+tr: Ataque:
+
+fr: Attaque magique :
+tr: Ataque mágico:
+
+fr: Balle
+tr: Bala
+
+fr: Boulet de canon
+tr: Bala de cañón
+
+fr: Bâton
+tr: Báculo
+
+fr: Bâton à deux mains
+tr: Báculo a dos manos
+
+fr: Bébé
+tr: Bebé
+
+fr: Cartouche
+tr: Cartucho
+
+fr: Classes : %s
+tr: Clases: %s
+
+fr: Classes : aucune
+tr: Clases: ninguna
+
+fr: Consommable
+tr: Consumible
+
+fr: Consommable différé
+tr: Consumible diferido
+
+fr: Couvre-chef
+tr: Casco
+
+fr: Dague
+tr: Daga
+
+fr: Dague de lancer
+tr: Daga arrojadiza
+
+fr: Deux mains
+tr: Dos manos
+
+fr: Données du serveur
+tr: Datos del servidor
+
+fr: Données du serveur : item inconnu
+tr: Datos del servidor: item desconocido
+
+fr: Défense :
+tr: Defensa:
+
+fr: Emplacements de carte :
+tr: Ranuras de carta:
+
+fr: Enchantement
+tr: Encantamiento
+
+fr: Flèche
+tr: Flecha
+
+fr: Fouet
+tr: Látigo
+
+fr: Fusil
+tr: Rifle
+
+fr: Fusil à pompe
+tr: Escopeta
+
+fr: Gatling
+tr: Gatling
+
+fr: Hache à deux mains
+tr: Hacha a dos manos
+
+fr: Hache à une main
+tr: Hacha a una mano
+
+fr: Instrument de musique
+tr: Instrumento musical
+
+fr: Item de la boutique
+tr: Item de la tienda
+
+fr: Lance à deux mains
+tr: Lanza a dos manos
+
+fr: Lance à une main
+tr: Lanza a una mano
+
+fr: Lance-grenades
+tr: Lanzagranadas
+
+fr: Mains nues
+tr: Manos desnudas
+
+fr: Masse
+tr: Maza
+
+fr: Masse à deux mains
+tr: Maza a dos manos
+
+fr: Milieu
+tr: Medio
+
+fr: Niveau d'arme :
+tr: Nivel de arma:
+
+fr: Niveau d'armure :
+tr: Nivel de armadura:
+
+fr: Niveau de base %u
+tr: Nivel base %u
+
+fr: Niveau de base %u à %u
+tr: Nivel base %u a %u
+
+fr: Normale
+tr: Normal
+
+fr: Poids :
+tr: Peso:
+
+fr: Poing
+tr: Nudillos
+
+fr: Portée :
+tr: Alcance:
+
+fr: Position :
+tr: Posición:
+
+fr: Prérequis :
+tr: Requisitos:
+
+fr: Quatrième
+tr: Cuarta
+
+fr: Raffinable :
+tr: Refinable:
+
+fr: Se sertit sur :
+tr: Se engarza en:
+
+fr: Shuriken Huuma
+tr: Shuriken Huuma
+
+fr: Tous les jobs
+tr: Todos los jobs
+
+fr: Tous les jobs sauf %s
+tr: Todos los jobs salvo %s
+
+fr: Transcendante
+tr: Trascendente
+
+fr: Troisième
+tr: Tercera
+
+fr: Troisième bébé
+tr: Tercera bebé
+
+fr: Troisième transcendante
+tr: Tercera trascendente
+
+fr: Type :
+tr: Tipo:
+
+fr: classes %s
+tr: clases %s
+
+fr: Épée à deux mains
+tr: Espada a dos manos
+
+fr: Épée à une main
+tr: Espada a una mano
+
+fr: Équipement d'ombre
+tr: Equipo de sombra
+
+fr: Équipement de familier
+tr: Equipo de mascota
+
+fr: Œuf de familier
+tr: Huevo de mascota
+
+fr: Aucun job
+tr: Ningún job

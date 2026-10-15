@@ -85,6 +85,10 @@ class DatabaseStage {
   [[nodiscard]] const ro::vfs::ServerDb* db() const noexcept {
     return db_.known() ? &db_ : nullptr;
   }
+  // LA BASE, LUE OU NON : son adresse ne bouge pas de la partie, et `known()`
+  // dit le jour où elle est lue. Pour qui la consulte à chaque image sans la
+  // demander — le bloc de faits des descriptions.
+  [[nodiscard]] const ro::vfs::ServerDb& base() const noexcept { return db_; }
   // Le monstre ou l'objet que la fenêtre montre ; zéro quand elle n'en montre
   // pas.
   [[nodiscard]] std::uint32_t ShownMonster(const DatabaseWindows& windows) const;

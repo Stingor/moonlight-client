@@ -425,6 +425,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   description_preview_->SeeRandomOptions(&pieces_.random_option_names);
   description_preview_->ShareCreatorsWith(*item_description_);
   item_description_->EnableComparison();
+  // LE BLOC DE FAITS DE L'ITEM_DB suit les lignes de la table, dans la fenêtre,
+  // sa comparaison et l'aperçu, dès que la base est lue.
+  item_description_->SeeServerDb(&database_.base());
+  description_preview_->SeeServerDb(&database_.base());
   item_description_->books().See(
       vfs_, &pieces_.books,
       pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr);

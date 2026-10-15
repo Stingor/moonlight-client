@@ -50,12 +50,13 @@ inline constexpr std::uint32_t kDropRateWhole = 10000;
 // un booléen absent est faux ; une table de clés absente n'en lève aucune.
 //
 // Objet : sans `Type`, un objet divers ; sans `EquipLevelMin`, le niveau 1 ;
-// sans `Classes`, toutes ; sans `SubType`, le sous-type 0 de son type ; sans
+// sans `Jobs`, tous ; sans `Classes`, toutes ; sans `SubType`, le sous-type 0 de son type ; sans
 // `Gender`, les deux ; puis, écrit ou non, le genre que le serveur IMPOSE aux
 // instruments (hommes), aux fouets et aux anneaux de mariage. `EquipLevelMax`
 // est écrit quand il borne : zéro dit qu'il ne borne pas.
 inline constexpr std::string_view kServerItemDefaultType = "Etc";
 inline constexpr std::uint16_t kServerItemDefaultEquipLevelMin = 1;
+inline constexpr std::string_view kServerItemDefaultJob = "All";
 inline constexpr std::string_view kServerItemDefaultClass = "All";
 inline constexpr std::string_view kServerItemDefaultGender = "Both";
 inline constexpr std::string_view kServerWeaponDefaultSubType = "Fist";
@@ -86,7 +87,11 @@ struct ServerItem {
   std::uint16_t range_cells = 0;
   std::uint16_t slots = 0;
   // Les métiers, les classes et les emplacements LEVÉS, dans l'ordre écrit.
-  std::vector<std::string> jobs;
+  // Sans `Jobs`, tous les métiers ; un `Jobs` sans clé levée n'en ouvre aucun.
+  std::vector<std::string> jobs{std::string(kServerItemDefaultJob)};
+  // Les métiers ABAISSÉS, dans l'ordre écrit : ceux que `All` lève et que la
+  // même table retire (`{All: true, Novice: false}`).
+  std::vector<std::string> jobs_lowered;
   std::vector<std::string> classes{std::string(kServerItemDefaultClass)};
   std::vector<std::string> locations;
   std::string gender{kServerItemDefaultGender};

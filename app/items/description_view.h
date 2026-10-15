@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -24,6 +25,7 @@
 #include "ro/vfs/monster_list.h"
 #include "ro/vfs/package_items.h"
 #include "ro/vfs/random_option_names.h"
+#include "ro/vfs/server_db.h"
 
 #include "game/bug_report_context.h"
 #include "items/book_reader.h"
@@ -122,6 +124,11 @@ class DescriptionView {
   // Les libellés des options aléatoires. Absents, une option s'écrit par son
   // numéro.
   void SeeRandomOptions(const ro::vfs::RandomOptionNames* names) noexcept { option_names_ = names; }
+  // L'ITEM_DB DU SERVEUR, dont le bloc de faits suit les lignes de la table
+  // (`AppendItemDbBlock`). ⚠ CONFIÉE UNE FOIS, ENCORE NON LUE : sa lecture est
+  // paresseuse, et les lignes se refont le jour où elle est lue. La pièce
+  // portée d'une comparaison la reçoit aussi.
+  void SeeServerDb(const ro::vfs::ServerDb* db) noexcept;
 
   // L'OBJET D'UN LIEN DE LA CONVERSATION, qu'on décrit sous
   // `ItemHolder::kChatLink`. ⚠ RECOPIÉ : la table des liens se refait à chaque
@@ -217,6 +224,11 @@ class DescriptionView {
   // après le retour de cette fonction.
   std::string name_;
   std::vector<std::string> lines_;
+  // Les lignes portent le bloc de l'item_db une fois la base lue, et dans la
+  // langue où elles ont été composées.
+  const ro::vfs::ServerDb* server_db_ = nullptr;
+  bool lines_with_base_ = false;
+  std::size_t lines_language_ = 0;
   std::string craft_label_;
   std::string craft_tip_;
   std::string vote_shop_label_;

@@ -61,6 +61,7 @@ void DatabaseStage::See(ro::vfs::Vfs* vfs, const ro::vfs::ItemTable* items,
   vfs_ = vfs;
   items_.See(items, icons, words);
   description_.emplace(items, words, icons);
+  description_->SeeServerDb(&db_);
 }
 
 void DatabaseStage::BorrowSheetFrom(DescriptionView& owner, ro::render::ActorWardrobe* wardrobe) {

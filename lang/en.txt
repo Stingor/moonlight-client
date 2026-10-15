@@ -18129,3 +18129,207 @@ tr: Pet eggs
 
 fr: EXP écrite dans la base : %s\nTaux du serveur : %lld %%
 tr: EXP written in the database: %s\nServer rate: %lld %%
+
+fr: %u,%u
+tr: %u.%u
+
+fr: Arc
+tr: Bow
+
+fr: Arme de lancer
+tr: Throwing weapon
+
+fr: Attaque :
+tr: Attack:
+
+fr: Attaque magique :
+tr: Magic attack:
+
+fr: Balle
+tr: Bullet
+
+fr: Boulet de canon
+tr: Cannonball
+
+fr: Bâton
+tr: Staff
+
+fr: Bâton à deux mains
+tr: Two-handed staff
+
+fr: Bébé
+tr: Baby
+
+fr: Cartouche
+tr: Shell
+
+fr: Classes : %s
+tr: Classes: %s
+
+fr: Classes : aucune
+tr: Classes: none
+
+fr: Consommable
+tr: Usable
+
+fr: Consommable différé
+tr: Delayed usable
+
+fr: Couvre-chef
+tr: Headgear
+
+fr: Dague
+tr: Dagger
+
+fr: Dague de lancer
+tr: Throwing dagger
+
+fr: Deux mains
+tr: Two hands
+
+fr: Données du serveur
+tr: Server data
+
+fr: Données du serveur : item inconnu
+tr: Server data: unknown item
+
+fr: Défense :
+tr: Defense:
+
+fr: Emplacements de carte :
+tr: Card slots:
+
+fr: Enchantement
+tr: Enchantment
+
+fr: Flèche
+tr: Arrow
+
+fr: Fouet
+tr: Whip
+
+fr: Fusil
+tr: Rifle
+
+fr: Fusil à pompe
+tr: Shotgun
+
+fr: Gatling
+tr: Gatling
+
+fr: Hache à deux mains
+tr: Two-handed axe
+
+fr: Hache à une main
+tr: One-handed axe
+
+fr: Instrument de musique
+tr: Musical instrument
+
+fr: Item de la boutique
+tr: Cash shop item
+
+fr: Lance à deux mains
+tr: Two-handed spear
+
+fr: Lance à une main
+tr: One-handed spear
+
+fr: Lance-grenades
+tr: Grenade launcher
+
+fr: Mains nues
+tr: Bare hands
+
+fr: Masse
+tr: Mace
+
+fr: Masse à deux mains
+tr: Two-handed mace
+
+fr: Milieu
+tr: Middle
+
+fr: Niveau d'arme :
+tr: Weapon level:
+
+fr: Niveau d'armure :
+tr: Armor level:
+
+fr: Niveau de base %u
+tr: Base level %u
+
+fr: Niveau de base %u à %u
+tr: Base level %u to %u
+
+fr: Normale
+tr: Normal
+
+fr: Poids :
+tr: Weight:
+
+fr: Poing
+tr: Knuckle
+
+fr: Portée :
+tr: Range:
+
+fr: Position :
+tr: Position:
+
+fr: Prérequis :
+tr: Requirements:
+
+fr: Quatrième
+tr: Fourth
+
+fr: Raffinable :
+tr: Refinable:
+
+fr: Se sertit sur :
+tr: Compound on:
+
+fr: Shuriken Huuma
+tr: Huuma shuriken
+
+fr: Tous les jobs
+tr: All jobs
+
+fr: Tous les jobs sauf %s
+tr: All jobs except %s
+
+fr: Transcendante
+tr: Transcendent
+
+fr: Troisième
+tr: Third
+
+fr: Troisième bébé
+tr: Third baby
+
+fr: Troisième transcendante
+tr: Third transcendent
+
+fr: Type :
+tr: Type:
+
+fr: classes %s
+tr: %s classes
+
+fr: Épée à deux mains
+tr: Two-handed sword
+
+fr: Épée à une main
+tr: One-handed sword
+
+fr: Équipement d'ombre
+tr: Shadow gear
+
+fr: Équipement de familier
+tr: Pet equipment
+
+fr: Œuf de familier
+tr: Pet egg
+
+fr: Aucun job
+tr: No job

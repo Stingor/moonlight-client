@@ -494,9 +494,11 @@ target_include_directories(moonclient_market PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LA BASE DE DONNÉES VUE DE L'ÉCRAN, à part de son étage : la fiche d'un objet
 # en lignes, un taux écrit, la recherche que les filtres demandent, la fiche
-# d'un monstre tirée de la base, `/db`. Chacun se juge sur un banc (ADR 0116).
+# d'un monstre tirée de la base, `/db`, et le bloc de faits que l'item_db
+# ajoute à toute description. Chacun se juge sur un banc (ADR 0116).
 add_library(moonclient_database STATIC
-    game/database_compose.cpp)
+    game/database_compose.cpp
+    game/item_db_block.cpp)
 
 target_link_libraries(moonclient_database
     PUBLIC ro_core ro_sim ro_ui ro_vfs moonclient_market
