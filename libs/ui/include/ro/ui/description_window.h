@@ -169,11 +169,16 @@ struct DescriptionDropRow {
   std::uint32_t rate_hundredths = 0;
 };
 
+// ⚠ LE SERVEUR D'ABORD, LA BASE À DÉFAUT : sa réponse porte les taux du moment
+// — événements, VIP —, celle de la base les taux réels du chargement. Tant
+// qu'il n'a pas répondu, ou hors ligne, la base remplit l'onglet
+// (`from_database`), et la réponse arrivée la remplace.
 struct DescriptionDropsView {
   DescriptionFetch fetch = DescriptionFetch::kUnasked;
   std::span<const DescriptionDropRow> rows;
   bool truncated = false;
   int treasure_excluded = 0;
+  bool from_database = false;
 };
 
 struct DescriptionComboMember {
@@ -186,6 +191,8 @@ struct DescriptionComboView {
   std::string_view script;
 };
 
+// Les scripts suivent la même règle que les sources. ⚠ LA BASE NE CONNAÎT PAS
+// LES COMBOS : remplis par elle, l'onglet « Combos » attend le serveur.
 struct DescriptionScriptsView {
   DescriptionFetch fetch = DescriptionFetch::kUnasked;
   // Le serveur ne connaît pas l'objet.
@@ -194,7 +201,52 @@ struct DescriptionScriptsView {
   std::string_view equip;
   std::string_view unequip;
   std::span<const DescriptionComboView> combos;
+  bool from_database = false;
 };
+
+// ── CE QUE LA BASE DE DONNÉES AJOUTE À LA FICHE (ADR 0116) ──────────────────
+//
+// Une ligne « libellé : valeur » de l'onglet « Général », déjà composée.
+struct ItemSheetFact {
+  std::string_view label;
+  std::string_view value;
+};
+
+// « VENDU CHEZ » : le Marché, interrogé sur les boutiques de PNJ.
+enum class ItemSheetSellersPhase : std::uint8_t {
+  // Personne à qui demander, hors ligne : l'onglet n'existe pas.
+  kAbsent,
+  // La demande est partie, ou partira à l'ouverture de l'onglet.
+  kAsking,
+  kReady,
+  // Le serveur a refusé — trop tôt après une autre demande : « Réessayer ».
+  kRefused,
+};
+
+struct ItemSheetSellerRow {
+  std::string_view npc;
+  std::string_view place;
+  std::string_view price;
+};
+
+// LES ONGLETS DE LA FICHE D'UN OBJET, dans leur ordre. « Description » est
+// toujours là ; les autres selon ce que la vue porte.
+enum class ItemSheetTab : std::uint8_t {
+  kDescription,
+  kGeneral,
+  kOdds,
+  kMonsters,
+  kBoss,
+  kScript,
+  kCombos,
+  kSellers,
+};
+
+// OÙ LA FICHE SE DESSINE : sa propre fenêtre, ou le panneau de droite de la
+// base de données. Le dessin est le même ; seuls l'en-tête et la navigation
+// diffèrent — la fenêtre a sa barre de titre et « < Retour », la base son
+// en-tête et son fil ◀ ▶.
+enum class ItemSheetHost : std::uint8_t { kDescriptionWindow, kDatabase };
 
 struct DescriptionView {
   std::uint32_t item_id = 0;
@@ -302,12 +354,26 @@ struct DescriptionView {
 
   // ── LES ONGLETS DU SERVEUR ────────────────────────────────────────────────
   //
-  // ⚠ FAUX DANS L'APERÇU, qui n'a pas d'onglets, et hors ligne, où personne ne
-  // répondrait : les quatre onglets n'existent alors pas.
+  // ⚠ FAUX DANS L'APERÇU, qui n'a pas d'onglets, et quand ni le serveur ni la
+  // base ne peuvent répondre : les quatre onglets n'existent alors pas.
   bool server_tabs = false;
+  // En ligne : « Rafraichir » redemande les sources au serveur.
+  bool online = false;
   DescriptionDropsView drops_ordinary;
   DescriptionDropsView drops_boss;
   DescriptionScriptsView scripts;
+
+  // ── CE QUE LA BASE DE DONNÉES AJOUTE ──────────────────────────────────────
+  //
+  // « Général » : vide, l'onglet n'existe pas — la base n'est pas encore lue.
+  std::span<const ItemSheetFact> facts;
+  ItemSheetSellersPhase sellers_phase = ItemSheetSellersPhase::kAbsent;
+  std::string_view sellers_status;
+  std::span<const ItemSheetSellerRow> sellers;
+  // LA FICHE EST DANS LA BASE : son en-tête porte l'icône et « Marché », et
+  // « Base de données » n'y mènerait nulle part.
+  bool in_database = false;
+  SkinImage icon;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -377,15 +443,13 @@ struct DescriptionWindowState {
   std::uint32_t navigated_to = 0;
   std::uint32_t last_item = 0;
 
-  // ── L'ONGLET « PROBABILITÉS » ─────────────────────────────────────────────
+  // ── L'ONGLET RETENU ───────────────────────────────────────────────────────
   //
-  // 🔴 IL DISPARAÎT dès qu'on suit un lien vers un objet ordinaire, et ImGui
-  // rend alors la sélection au premier onglet : le retour au conteneur
-  // rouvrirait sur « Description ». On redemande donc la sélection à la
-  // RÉAPPARITION de l'onglet, une fois — la redemander à chaque image
-  // clouerait le joueur dessus.
-  bool odds_tab_present = false;
-  bool odds_tab_sticky = false;
+  // L'ONGLET QUE LE JOUEUR A CLIQUÉ, retenu d'un objet à l'autre. Un objet qui
+  // ne l'a pas — ou dont l'onglet est grisé — s'ouvre sur « Description » sans
+  // l'oublier : l'objet suivant qui l'a le rouvre. C'est ce qui ramène
+  // « Probabilités » au retour d'un lien suivi vers un objet ordinaire.
+  ItemSheetTab sheet_tab = ItemSheetTab::kDescription;
   // Le filtre par nom, retenu PAR OBJET : passer d'une boîte à l'autre n'hérite
   // pas du filtre de la précédente.
   std::unordered_map<std::uint32_t, ImGuiTextFilter> odds_filters;
@@ -442,6 +506,13 @@ struct DescriptionWindowAction {
   bool refresh_boss = false;
   // Le bouton « @item » du staff : l'item décrit, à la quantité du champ.
   std::optional<StaffItemGrant> staff_item;
+  // L'onglet « Vendu chez » est montré : la demande au Marché peut partir. Elle
+  // n'attend que lui, pour qu'une fiche feuilletée ne coûte rien au serveur.
+  bool sellers_shown = false;
+  // « Réessayer » de « Vendu chez ».
+  bool ask_sellers = false;
+  // « Y aller » vers ce rang des vendeurs ; négatif sinon.
+  int go_to_seller = -1;
 };
 
 inline constexpr const char* kDescriptionWindowTitle = core::TrText("Description");
@@ -459,6 +530,24 @@ inline constexpr ImU32 kDescriptionBrokenShadow = IM_COL32(250, 80, 80, 255);
 [[nodiscard]] DescriptionWindowAction DrawDescriptionWindow(DescriptionWindowState& state,
                                                             const DescriptionView& view,
                                                             const SkinArt& art);
+
+// ── LA FICHE D'UN OBJET : UN SEUL DESSIN, DEUX HÔTES ────────────────────────
+//
+// 🔴 La fenêtre ci-dessus et le panneau de droite de la base de données
+// dessinent LA MÊME fiche : onglets, liens, scripts colorés, sources, combos,
+// faits de la base, vendeurs. Chaque hôte tient son propre état.
+//
+// Le corps, dans la fenêtre en cours.
+void DrawItemSheetBody(DescriptionWindowState& state, const DescriptionView& view,
+                       const SkinArt& art, ItemSheetHost host, DescriptionWindowAction& action);
+// APRÈS LE CORPS, une fois, hors de toute table et de tout enfant : le menu
+// d'un lien, puis la navigation. Dans la fenêtre, décrire un objet le montre À
+// LA PLACE de celui qu'on lit ; dans la base, le geste reste dans `action`,
+// et la base visite la fiche de l'objet.
+void FinishItemSheetLinks(DescriptionWindowState& state, const DescriptionView& view,
+                          ItemSheetHost host, DescriptionWindowAction& action);
+// Vrai quand la fiche de cet objet porte cet onglet, et qu'il n'est pas grisé.
+[[nodiscard]] bool ItemSheetTabOffered(ItemSheetTab tab, const DescriptionView& view);
 
 // L'APERÇU : ce que le survol montre.
 //

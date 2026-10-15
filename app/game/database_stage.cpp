@@ -63,6 +63,21 @@ void DatabaseStage::See(ro::vfs::Vfs* vfs, const ro::vfs::ItemTable* items,
   description_.emplace(items, words, icons);
 }
 
+void DatabaseStage::BorrowSheetFrom(DescriptionView& owner, ro::render::ActorWardrobe* wardrobe) {
+  if (description_.has_value()) {
+    description_->BorrowFrom(owner, wardrobe);
+  }
+}
+
+std::uint32_t DatabaseStage::ShownItem(const DatabaseWindows& windows) const {
+  const std::optional<ro::ui::DatabaseTarget> shown = windows.state.history.current();
+  if (!windows.state.open || db() == nullptr || !shown.has_value() ||
+      shown->kind != ro::ui::DatabaseKind::kItem) {
+    return 0;
+  }
+  return shown->id;
+}
+
 std::uint32_t DatabaseStage::ShownMonster(const DatabaseWindows& windows) const {
   const std::optional<ro::ui::DatabaseTarget> shown = windows.state.history.current();
   if (!windows.state.open || db() == nullptr || !shown.has_value() ||
@@ -215,62 +230,76 @@ void DatabaseStage::ComposeRows(const ro::ui::DatabaseWindowState& state) {
   summary_ = text_line.data();
 }
 
-void DatabaseStage::ComposeItem(std::uint32_t item_id, const DatabaseContext& context,
-                                bool sellers_shown) {
-  const ro::vfs::ServerItem* const item = db_.FindItem(item_id);
-  if (item == nullptr) {
+void DatabaseStage::NoteSheetAsked(ro::ui::ItemSheetHost host,
+                                   const ro::ui::DescriptionWindowAction& asked) {
+  sheets_[HostRank(host)].asked = SheetAsked{.sellers_shown = asked.sellers_shown,
+                                             .ask_sellers = asked.ask_sellers,
+                                             .go_to_seller = asked.go_to_seller};
+}
+
+void DatabaseStage::FillItemSheet(ro::ui::ItemSheetHost host, std::uint32_t item_id,
+                                  const DatabaseContext& context, DescriptionView& sheet) {
+  Load();
+  SheetPart& part = sheets_[HostRank(host)];
+  const SheetAsked asked = std::exchange(part.asked, {});
+  ItemSheetBase base{.in_database = host == ro::ui::ItemSheetHost::kDatabase};
+  // « Y ALLER » vers un PNJ qui vend l'objet : la partie y guide.
+  if (asked.go_to_seller >= 0) {
+    const auto known = sellers_.find(item_id);
+    if (known != sellers_.end() &&
+        static_cast<std::size_t>(asked.go_to_seller) < known->second.size()) {
+      go_to_ = known->second[static_cast<std::size_t>(asked.go_to_seller)];
+    }
+  }
+  FollowSellers(part, item_id, context,
+                asked.ask_sellers     ? SellersAsk::kRetry
+                : asked.sellers_shown ? SellersAsk::kOnce
+                                      : SellersAsk::kNever,
+                base);
+  const ro::vfs::ServerItem* const item = db_.known() ? db_.FindItem(item_id) : nullptr;
+  if (item != nullptr) {
+    if (part.item_id != item_id) {
+      part.item_id = item_id;
+      part.facts = ItemFactsOf(*item);
+      part.fact_views.clear();
+      for (const ItemFactLine& line : part.facts) {
+        part.fact_views.push_back(ro::ui::ItemSheetFact{.label = line.label, .value = line.value});
+      }
+      part.droppers = DropperRowsOf(db_, item_id);
+    }
+    const auto named =
+        std::ranges::lower_bound(db_.items(), item_id, {}, &ro::vfs::ServerItem::item_id);
+    base.known = true;
+    base.facts = part.fact_views;
+    base.ordinary = part.droppers.ordinary;
+    base.boss = part.droppers.boss;
+    base.script = item->script;
+    base.equip_script = item->equip_script;
+    base.unequip_script = item->unequip_script;
+    base.name = item_names_[static_cast<std::size_t>(named - db_.items().begin())];
+  }
+  if (base.in_database) {
+    base.icon = items_.IconOf(item_id);
+  }
+  sheet.NoteDatabase(base);
+}
+
+void DatabaseStage::ComposeItem(std::uint32_t item_id, const DatabaseContext& context) {
+  if (!description_.has_value() || db_.FindItem(item_id) == nullptr) {
     view_.item = nullptr;
     return;
   }
-  if (item_shown_ != item_id) {
-    item_shown_ = item_id;
-    facts_ = ItemFactsOf(*item);
-    fact_views_.clear();
-    for (const ItemFactLine& line : facts_) {
-      fact_views_.push_back(ro::ui::DatabaseFact{.label = line.label, .value = line.value});
-    }
-    const std::vector<ro::vfs::ItemDropper> droppers = db_.DroppersOf(item_id);
-    dropper_names_.clear();
-    dropper_rates_.clear();
-    droppers_.clear();
-    for (const ro::vfs::ItemDropper& dropper : droppers) {
-      const ro::vfs::ServerMonster* const monster = db_.FindMonster(dropper.monster_id);
-      dropper_names_.push_back(monster != nullptr ? monster->name
-                                                  : "#" + std::to_string(dropper.monster_id));
-      dropper_rates_.push_back(DropRateText(dropper.rate_hundredths));
-    }
-    for (std::size_t rank = 0; rank < droppers.size(); ++rank) {
-      const ro::vfs::ServerMonster* const monster = db_.FindMonster(droppers[rank].monster_id);
-      droppers_.push_back(ro::ui::DatabaseDropperRow{
-          .monster_id = droppers[rank].monster_id,
-          .name = dropper_names_[rank],
-          .rank = monster != nullptr ? monster->rank : ro::vfs::kServerMonsterOrdinary,
-          .rate = dropper_rates_[rank],
-          .mvp_reward = droppers[rank].mvp_reward});
-    }
-  }
-  item_view_ = ro::ui::DatabaseItemView{};
-  item_view_.item_id = item_id;
-  const auto named =
-      std::ranges::lower_bound(db_.items(), item_id, {}, &ro::vfs::ServerItem::item_id);
-  item_view_.name = item_names_[static_cast<std::size_t>(named - db_.items().begin())];
-  item_view_.icon = items_.IconOf(item_id);
-  item_view_.facts = fact_views_;
-  if (description_.has_value()) {
-    description_->Refresh(context.world, item_id, ro::ui::ItemHolder::kInventory, 0);
-    item_view_.description = &description_->view();
-  }
-  item_view_.script = item->script;
-  item_view_.equip_script = item->equip_script;
-  item_view_.unequip_script = item->unequip_script;
-  item_view_.droppers = droppers_;
-  item_view_.vote_shop = context.vote_shop;
-  FollowSellers(item_id, context, sellers_shown ? SellersAsk::kOnce : SellersAsk::kNever);
-  view_.item = &item_view_;
+  // LA FICHE DE LA DESCRIPTION, composée comme dans sa fenêtre : un objet de
+  // catalogue, sans place.
+  description_->Refresh(context.world, item_id, ro::ui::ItemHolder::kInventory, 0);
+  description_->AskFacts(context.link, true, item_id, context.now_ms);
+  FillItemSheet(ro::ui::ItemSheetHost::kDatabase, item_id, context, *description_);
+  view_.item = &description_->view();
 }
 
-void DatabaseStage::FollowSellers(std::uint32_t item_id, const DatabaseContext& context,
-                                  SellersAsk ask) {
+void DatabaseStage::FollowSellers(SheetPart& part, std::uint32_t item_id,
+                                  const DatabaseContext& context, SellersAsk ask,
+                                  ItemSheetBase& base) {
   // LA RÉPONSE ARRIVÉE, rangée sous l'objet demandé — si c'est bien la sienne.
   const ro::sim::MarketAnswer& aside = context.market.aside();
   if (aside.complete() && aside.complete_seq() != answer_seen_) {
@@ -285,24 +314,24 @@ void DatabaseStage::FollowSellers(std::uint32_t item_id, const DatabaseContext& 
     sellers_refused_ = true;
     sellers_status_ = RefusalText(context.market.aside_refusal());
   }
-  ro::ui::DatabaseItemView& view = item_view_;
+  // HORS LIGNE, personne à qui demander : l'onglet n'existe pas.
   if (!context.online) {
-    view.sellers_phase = ro::ui::DatabaseSellersPhase::kOffline;
+    base.sellers_phase = ro::ui::ItemSheetSellersPhase::kAbsent;
     return;
   }
   if (const auto known = sellers_.find(item_id); known != sellers_.end()) {
-    if (seller_rows_for_ != item_id) {
-      seller_rows_for_ = item_id;
-      seller_lines_ =
+    if (part.seller_rows_for != item_id) {
+      part.seller_rows_for = item_id;
+      part.seller_lines =
           SellerLinesOf(known->second, [this](std::uint32_t id) { return ItemName(id); });
-      seller_rows_.clear();
-      for (const SellerLine& line : seller_lines_) {
-        seller_rows_.push_back(
-            ro::ui::DatabaseSellerRow{.npc = line.npc, .place = line.place, .price = line.price});
+      part.seller_rows.clear();
+      for (const SellerLine& line : part.seller_lines) {
+        part.seller_rows.push_back(
+            ro::ui::ItemSheetSellerRow{.npc = line.npc, .place = line.place, .price = line.price});
       }
     }
-    view.sellers_phase = ro::ui::DatabaseSellersPhase::kReady;
-    view.sellers = seller_rows_;
+    base.sellers_phase = ro::ui::ItemSheetSellersPhase::kReady;
+    base.sellers = part.seller_rows;
     return;
   }
   // UNE DEMANDE PAR OBJET, et une seule en vol : un refus attend « Réessayer ».
@@ -318,46 +347,39 @@ void DatabaseStage::FollowSellers(std::uint32_t item_id, const DatabaseContext& 
       sellers_query_ = context.market.aside().query_id();
     }
   }
-  view.sellers_phase = sellers_asked_ == item_id && sellers_refused_
-                           ? ro::ui::DatabaseSellersPhase::kRefused
-                           : ro::ui::DatabaseSellersPhase::kAsking;
-  view.sellers_status = sellers_status_;
+  base.sellers_phase = sellers_asked_ == item_id && sellers_refused_
+                           ? ro::ui::ItemSheetSellersPhase::kRefused
+                           : ro::ui::ItemSheetSellersPhase::kAsking;
+  base.sellers_status = sellers_status_;
 }
 
 void DatabaseStage::Advance(DatabaseWindows& windows, const DatabaseContext& context) {
   OpenAsked(windows);
-  const ro::ui::DatabaseAnswer answer = std::exchange(windows.answer, {});
+  windows.answer = {};
   if (!windows.state.open) {
     windows.view = nullptr;
+    view_.item = nullptr;
+    // Fermée, la fiche le dit à ses demandes : sa réouverture redemandera les
+    // sources.
+    if (description_.has_value()) {
+      description_->AskFacts(context.link, false, 0, context.now_ms);
+    }
     return;
   }
   view_ = ro::ui::DatabaseView{};
-  if (db_.known()) {
-    if (const std::optional<ro::ui::DatabaseTarget> shown = windows.state.history.current();
-        shown.has_value() && shown->kind == ro::ui::DatabaseKind::kItem) {
-      if (answer.ask_sellers) {
-        FollowSellers(shown->id, context, SellersAsk::kRetry);
-      }
-      if (answer.go_to_seller >= 0) {
-        const auto known = sellers_.find(shown->id);
-        if (known != sellers_.end() &&
-            static_cast<std::size_t>(answer.go_to_seller) < known->second.size()) {
-          go_to_ = known->second[static_cast<std::size_t>(answer.go_to_seller)];
-        }
-      }
-    }
-  }
   Load();
   view_.loading = loading_.valid();
   view_.status = status_;
+  view_.vote_shop = context.vote_shop;
   if (db_.known()) {
     ComposeRows(windows.state);
     view_.rows = rows_;
     view_.summary = summary_;
-    const std::optional<ro::ui::DatabaseTarget> shown = windows.state.history.current();
     // LA FICHE SUIT LE FIL, pas l'onglet : l'onglet ne choisit que la liste.
-    if (shown.has_value() && shown->kind == ro::ui::DatabaseKind::kItem) {
-      ComposeItem(shown->id, context, answer.sellers_shown);
+    if (const std::uint32_t item_id = ShownItem(windows); item_id != 0) {
+      ComposeItem(item_id, context);
+    } else if (description_.has_value()) {
+      description_->AskFacts(context.link, false, 0, context.now_ms);
     }
   }
   windows.view = &view_;

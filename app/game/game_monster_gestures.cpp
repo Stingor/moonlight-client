@@ -66,9 +66,15 @@ void Game::FollowMonsterGesture(ro::ui::ChatLinkGesture gesture, const MonsterLi
     case ro::ui::ChatLinkGesture::kMenu:
     case ro::ui::ChatLinkGesture::kOpenDatabase:
     case ro::ui::ChatLinkGesture::kItemInfo:
+    case ro::ui::ChatLinkGesture::kGameDatabase:
+      // La fiche du monstre dans la base de données du jeu.
+      if (database_id != 0) {
+        database_.AskOpen(
+            ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kMonster, .id = database_id});
+      }
+      break;
     case ro::ui::ChatLinkGesture::kWhoDrops:
     case ro::ui::ChatLinkGesture::kMarketSearch:
-    case ro::ui::ChatLinkGesture::kGameDatabase:
     case ro::ui::ChatLinkGesture::kTryStyle:
     case ro::ui::ChatLinkGesture::kCopyCode:
     case ro::ui::ChatLinkGesture::kOpenInNavigation:

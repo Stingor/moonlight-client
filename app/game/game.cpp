@@ -434,24 +434,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
           ? pieces_.map_sign.Stage(
                 pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, now_ms)
           : std::nullopt;
-  // L'EFFET DE CHAPEAU DU PANTIN SURVOLÉ. ⚠ APRÈS LES DEUX PANTINS, composés
-  // plus haut, qui effacent chacun le rappel de l'image d'avant ; un seul se
-  // survole à la fois, et la boutique passe d'abord.
-  if (pieces_.doll_effects.has_value()) {
-    const ro::sim::HatEffectItems& hats = pieces_.cash_shop.hat_effects();
-    if (windows_.cash_shop.state.doll.wanted) {
-      pieces_.doll_effects->Advance(
-          windows_.cash_shop.state.doll, hats.OrdinalOf(windows_.cash_shop.state.doll_item),
-          pieces_.cash_shop.doll_framing(), pieces_.cash_shop.doll_body(), world_, *stage_, now_ms);
-    } else if (windows_.description.open && windows_.description.doll.wanted) {
-      pieces_.doll_effects->Advance(windows_.description.doll,
-                                    hats.OrdinalOf(windows_.description.item_id),
-                                    item_description_->doll_framing(),
-                                    item_description_->doll_body(), world_, *stage_, now_ms);
-    } else {
-      pieces_.doll_effects->Rest();
-    }
-  }
+  AdvanceHoveredDollEffect(now_ms);
   ComposeMenuIcons(windows_.menu_icons.icons,
                    pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
                    settings_->bindings(),

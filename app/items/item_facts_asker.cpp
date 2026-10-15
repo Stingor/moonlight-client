@@ -81,12 +81,17 @@ void ItemFactsAsker::Ask(ro::net::Connection& link, bool window_open, std::uint3
   if (link.is_open()) {
     AskCreators(link, now_ms);
   }
-  if (window_open && !window_was_open_ && item_id != 0) {
+  AskFor(link, window_open, window_was_open_, item_id, now_ms);
+}
+
+void ItemFactsAsker::AskFor(ro::net::Connection& link, bool open, bool& was_open,
+                            std::uint32_t item_id, std::uint32_t now_ms) {
+  if (open && !was_open && item_id != 0) {
     Forget(item_id, Kind::kOrdinary);
     Forget(item_id, Kind::kBoss);
   }
-  window_was_open_ = window_open;
-  if (!window_open || item_id == 0 || !link.is_open()) {
+  was_open = open;
+  if (!open || item_id == 0 || !link.is_open()) {
     return;
   }
   AskOne(link, item_id, Kind::kOrdinary, now_ms);

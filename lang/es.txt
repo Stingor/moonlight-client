@@ -13825,9 +13825,6 @@ tr: Copiar
 fr: Filtrer (monstre)
 tr: Filtrar (monstruo)
 
-fr: MVP reward
-tr: Recompensa MVP
-
 fr: Note : les spawns d'instance ne sont pas encore comptés/scannés.
 tr: Nota: las apariciones en instancia aún no se cuentan/escanean.
 
@@ -17995,23 +17992,14 @@ tr: %d monstruos
 fr: %d items
 tr: %d items
 
-fr: (récompense MVP)
-tr: (recompensa MVP)
-
 fr: Accessoire
 tr: Accesorio
 
 fr: Attaque magique
 tr: Ataque mágico
 
-fr: Au retrait
-tr: Al quitar
-
 fr: Aucun PNJ ne le vend.
 tr: Ningún PNJ lo vende.
-
-fr: Aucun monstre ne le lâche.
-tr: Ningún monstruo lo suelta.
 
 fr: Bas de tête
 tr: Cabeza inferior
@@ -18033,12 +18021,6 @@ tr: Consumibles diferidos
 
 fr: Demande au serveur…
 tr: Preguntando al servidor…
-
-fr: Description###db_description
-tr: Descripción###db_description
-
-fr: Général###db_general
-tr: General###db_general
 
 fr: Emplacements de carte
 tr: Ranuras de carta
@@ -18082,12 +18064,6 @@ tr: Las tablas de la base de datos faltan en la instalación.
 fr: Les tables de la base de données sont illisibles.
 tr: Las tablas de la base de datos son ilegibles.
 
-fr: Lâché par (%d)###db_droppers
-tr: Soltado por (%d)###db_droppers
-
-fr: Marché##db_market
-tr: Mercado##db_market
-
 fr: Milieu de tête
 tr: Cabeza media
 
@@ -18127,29 +18103,17 @@ tr: Precio de compra
 fr: Raffinable
 tr: Refinable
 
-fr: Réessayer##db_sellers_retry
-tr: Reintentar##db_sellers_retry
-
-fr: Script###db_script
-tr: Script###db_script
-
 fr: Se porte
 tr: Se lleva en
 
-fr: Vendu chez###db_sellers
-tr: Vendido por###db_sellers
+fr: Vendu chez
+tr: Vendido por
 
-fr: Vendu chez (%d)###db_sellers
-tr: Vendido por (%d)###db_sellers
+fr: Vendu chez (%d)
+tr: Vendido por (%d)
 
-fr: [Mini-boss]
-tr: [Minijefe]
-
-fr: À l'usage ou porté
-tr: Al usar o llevado
-
-fr: À l'équipement
-tr: Al equipar
+fr: Taux réels de la base de données : le serveur n'a pas encore répondu.
+tr: Tasas reales de la base de datos: el servidor aún no ha respondido.
 
 fr: Équipements d'ombre
 tr: Equipo de sombra

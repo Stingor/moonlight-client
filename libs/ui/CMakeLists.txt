@@ -78,7 +78,7 @@ add_library(ro_ui STATIC
     src/craft_window_parts.cpp
     src/make_item_window.cpp
     src/market_window.cpp
-    src/database_item_sheet.cpp
+    src/item_sheet.cpp
     src/database_labels.cpp
     src/database_window.cpp
     src/weapon_refine_window.cpp
@@ -216,6 +216,7 @@ add_library(ro_ui STATIC
     src/description_script.cpp
     src/description_server_tabs.cpp
     src/description_window.cpp
+    src/table_cells.cpp
     src/rich_text.cpp
     src/skin_widgets.cpp
     src/skin_scrollbar.cpp

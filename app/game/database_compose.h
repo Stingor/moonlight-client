@@ -31,8 +31,14 @@ struct ItemFactLine {
 // de sens (une attaque nulle) n'est pas écrite.
 [[nodiscard]] std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item);
 
-// UN TAUX EN CENTIÈMES DE POUR CENT, écrit « 12,50 % ».
-[[nodiscard]] std::string DropRateText(std::uint32_t rate_hundredths);
+// LES MONSTRES QUI LÂCHENT UN OBJET, aux taux réels, rangés comme les deux
+// onglets de la fiche : les ordinaires d'un côté, mini-boss et MVP de l'autre.
+// ⚠ LES NOMS POINTENT DANS `db`, qui doit leur survivre.
+struct DropperRows {
+  std::vector<ro::ui::DescriptionDropRow> ordinary;
+  std::vector<ro::ui::DescriptionDropRow> boss;
+};
+[[nodiscard]] DropperRows DropperRowsOf(const ro::vfs::ServerDb& db, std::uint32_t item_id);
 
 // La recherche que la saisie et les filtres de la fenêtre demandent.
 [[nodiscard]] ro::vfs::ItemSearch ItemSearchOf(const ro::ui::DatabaseFilters& filters,

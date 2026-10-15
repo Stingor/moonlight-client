@@ -128,6 +128,10 @@ void MonsterEntries(ChatLinkAsk& asked, const MvpLinkMenuFacts* facts, std::stri
   if (database_id && ImGui::MenuItem(core::Tr("Bestiaire du site"))) {
     asked.gesture = ChatLinkGesture::kOpenBestiary;
   }
+  // La fiche du monstre dans la base de données du jeu (ADR 0116).
+  if (database_id && ImGui::MenuItem(core::Tr("Ouvrir dans la base de données"))) {
+    asked.gesture = ChatLinkGesture::kGameDatabase;
+  }
   // Un lien de monstre porte un identifiant de la BASE : une classe de sprite
   // relayée ouvrirait, chez le lecteur, la fiche d'un autre monstre.
   if (database_id && ImGui::MenuItem(core::Tr("Lien dans le chat"))) {

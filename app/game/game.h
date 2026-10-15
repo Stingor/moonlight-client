@@ -233,6 +233,20 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // `game_database.cpp`. `HostMonsterSheet` rend vrai quand elle l'héberge.
   void AdvanceDatabase(std::uint32_t now_ms);
   [[nodiscard]] bool HostMonsterSheet(MonsterSheet& sheet);
+  // Le lien d'un monstre de la base : son rang et son nom, quand elle le sait.
+  [[nodiscard]] MonsterLink DatabaseMonsterLink(std::uint32_t monster_id) const;
+  [[nodiscard]] DatabaseContext DatabaseContextNow(std::uint32_t now_ms);
+  // LA FICHE D'UN OBJET, dans ses deux hôtes : `game_item_sheet.cpp`. Ce que la
+  // fiche a demandé se route de même d'où qu'elle vienne ; `sheet` est la vue
+  // qui l'a dessinée, `item_id` l'objet qu'elle montrait.
+  void RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uint32_t item_id,
+                      const DescriptionView& sheet, ro::ui::ItemSheetHost host,
+                      std::uint32_t now_ms);
+  // Ce que la boutique, l'Atlas et le staff ajoutent à une fiche, APRÈS sa
+  // composition, qui l'efface.
+  void DecorateItemSheet(DescriptionView& sheet, std::uint32_t item_id);
+  // L'effet de chapeau du pantin survolé : boutique, description ou base.
+  void AdvanceHoveredDollEffect(std::uint32_t now_ms);
   // « MONTRER MON ÉQUIPEMENT » : la ligne dans la conversation, à chaque annonce.
   void SayEquipmentShown(std::uint32_t now_ms);
   // L'APPEL D'URGENCE, de même, sous son propre genre de ligne.

@@ -14,6 +14,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "monster_sheet_parts.h"
+#include "table_cells.h"
 
 namespace ro::ui {
 namespace monster_sheet {
@@ -360,9 +361,9 @@ void DrawExpGain(const MonsterSheetView& view) {
   }
   ImGui::Spacing();
   Colored(kTitleColor, core::Tr("Ce qu'il vous rapporte"));
-  if (!ImGui::BeginTable(
-          "##mi_expgain", 4,
-          ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+  if (!ImGui::BeginTable("##mi_expgain", 4,
+                         ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable |
+                             ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
     return;
   }
   ImGui::TableNextRow();
@@ -436,11 +437,11 @@ void StatRow(const char* first_label, const std::string& first, const char* seco
   ImGui::TableNextColumn();
   Label(first_label);
   ImGui::TableNextColumn();
-  ImGui::TextUnformatted(first.c_str());
+  CellText(first);
   ImGui::TableNextColumn();
   Label(second_label);
   ImGui::TableNextColumn();
-  ImGui::TextUnformatted(second.c_str());
+  CellText(second);
 }
 
 // UNE CASE D'EXP : l'EXP RÉELLE — celle que le serveur donne, ses taux
@@ -487,9 +488,9 @@ void DrawVersus(const MonsterSheetView& view, int mob_hit, int mob_flee) {
   const MonsterSheetOwnView& own = *view.own;
   ImGui::Spacing();
   Colored(kTitleColor, core::Tr("Face à votre personnage"));
-  if (!ImGui::BeginTable(
-          "##mi_versus", 2,
-          ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+  if (!ImGui::BeginTable("##mi_versus", 2,
+                         ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable |
+                             ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
     return;
   }
   const auto line = [](const char* label, const char* help, const std::string& value, ImU32 color) {
@@ -547,9 +548,9 @@ void DrawVersus(const MonsterSheetView& view, int mob_hit, int mob_flee) {
 }
 
 void DrawStatsTab(const MonsterSheetView& view) {
-  if (ImGui::BeginTable(
-          "##mi_stats", 4,
-          ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+  if (ImGui::BeginTable("##mi_stats", 4,
+                        ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable |
+                            ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
     // Les milliers ne se séparent que sur ce qui atteint le million : PV, SP,
     // EXP. Partout ailleurs ce serait du bruit.
     StatRow(core::Tr("PV"), GroupThousands(view.hp), core::Tr("SP"), GroupThousands(view.sp));
@@ -586,9 +587,9 @@ void DrawStatsTab(const MonsterSheetView& view) {
   const int mob_flee = view.level + view.agi;
   ImGui::Spacing();
   Colored(kTitleColor, core::Tr("Précision et esquive"));
-  if (ImGui::BeginTable(
-          "##mi_hitflee", 4,
-          ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+  if (ImGui::BeginTable("##mi_hitflee", 4,
+                        ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable |
+                            ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     Label(core::Tr("HIT"));

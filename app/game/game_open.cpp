@@ -461,10 +461,14 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.trade.store_search().SeeCards(
       {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});
   pieces_.trade.market().SeeRandomOptions(&pieces_.random_option_names);
-  // LA BASE DE DONNÉES : ses tables ne se lisent qu'à sa première ouverture.
+  // LA BASE DE DONNÉES : ses tables ne se lisent qu'à la première ouverture de
+  // la base ou d'une description. Sa fiche d'objet emprunte celle de la
+  // description.
   database_.See(vfs_, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
                 pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
                 &pieces_.item_words);
+  database_.BorrowSheetFrom(*item_description_,
+                            pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
   pieces_.trade.vending().SeeSaveRoot(client_root_);
   pieces_.trade.StartSession();
   windows_.trade = TradeWindows{};

@@ -11,12 +11,9 @@
 // fenêtre redemande à chaque image, sans savoir ce que le monde porte déjà.
 // Aucune cadence ne peut vivre là-bas.
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <cstdio>
 #include <optional>
-#include <span>
 #include <string>
 #include <utility>
 
@@ -35,12 +32,6 @@
 #include "game/game.h"
 
 namespace moonclient {
-namespace {
-
-// Le libellé du bouton du vote shop : son nom et un prix.
-constexpr std::size_t kVoteShopLabelBytes = 64;
-
-}  // namespace
 
 // LE LIEN SUIVI DEPUIS LA DESCRIPTION D'UNE COMPÉTENCE.
 //
@@ -106,6 +97,7 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
   windows_.description.compare = settings_->options().descriptions().compare();
   const ro::ui::RichTextSelect text_select = settings_->options().descriptions().text_select();
   windows_.description.text_select = text_select;
+  windows_.monster_sheet.database.state.item_sheet.text_select = text_select;
   windows_.skill_description.text_select = text_select;
   // LE LIVRE : sa fenêtre s'ouvre où les descriptions s'ouvrent, et la
   // récitation avance à chaque image. Une ligne dite rouvre la conversation
@@ -128,9 +120,6 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
                                windows_.description.from_holder, windows_.description.from_slot);
     item_description_->NoteBack(
         windows_.description.back.empty() ? 0 : windows_.description.back.back());
-    item_description_->NoteVoteShop(pieces_.cash_shop.offers());
-    item_description_->NoteHatEffect(
-        pieces_.cash_shop.hat_effects().OrdinalOf(windows_.description.item_id) != 0);
   }
   // CE QUE LE SERVEUR SEUL SAIT : les sources et le script, demandés dès que la
   // fenêtre est ouverte. ⚠ À CHAQUE IMAGE, fermée comprise : c'est ainsi que la
@@ -138,31 +127,16 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
   item_description_->AskFacts(link_, windows_.description.open, windows_.description.item_id,
                               now_ms);
   if (windows_.description.open) {
+    // CE QUE LA BASE DE DONNÉES AJOUTE — « Général », les sources de repli,
+    // « Vendu chez » —, puis ce que la boutique, l'Atlas et le staff ajoutent.
+    database_.FillItemSheet(ro::ui::ItemSheetHost::kDescriptionWindow, windows_.description.item_id,
+                            DatabaseContextNow(now_ms), *item_description_);
+    DecorateItemSheet(*item_description_, windows_.description.item_id);
     // LE PANTIN DU « VIEWID », quand sa ligne est survolée.
     item_description_->RefreshDoll(
         world_, windows_.description.doll,
         pieces_.cash_shop.hat_effects().OrdinalOf(windows_.description.item_id) != 0, styles_,
         now_ms);
-    // L'ÉTIQUETTE « CRAFT », que seul l'Atlas sait composer.
-    std::string craft_label;
-    std::string craft_tip;
-    if (craft_atlas_.has_value() &&
-        craft_atlas_->CraftTagOf(windows_.description.item_id, &craft_label, &craft_tip)) {
-      item_description_->NoteCraftTag(std::move(craft_label), std::move(craft_tip));
-    }
-    // LE BOUTON DU VOTE SHOP, que seule la boutique sait composer — et
-    // seulement quand l'item est à son catalogue.
-    if (const std::optional<CashShopStage::Offer> offer =
-            pieces_.cash_shop.Find(windows_.description.item_id);
-        offer.has_value()) {
-      std::array<char, kVoteShopLabelBytes> label{};
-      std::snprintf(label.data(), label.size(), ro::core::Tr("Vote Shop : %d pts"), offer->price);
-      item_description_->NoteVoteShopTag(label.data());
-    }
-    // LA LIGNE « @item », pour le staff seulement.
-    item_description_->NoteStaff(Rights().staff_tools,
-                                 pieces_.item_properties.IsStackable(windows_.description.item_id),
-                                 StaffFreeBagSlots(world_.inventory()));
   }
   // ⚠ L'APERÇU NE SE BÂTIT QUE S'IL SE MONTRE : sans le réglage, il n'a rien à
   // composer, et une description entière par image de survol serait payée pour
@@ -237,99 +211,11 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
         shortcuts_->DescribedSkill(static_cast<std::size_t>(answers.shortcuts.describe));
   }
   ro::ui::AskSkillDescription(windows_.skill_description, described_skill);
-  FollowDescriptionLink(answers.description, now_ms);
-  item_description_->RefreshSources(windows_.description.item_id, answers.description);
-  // UN GESTE SUR UNE LIGNE DE LA TABLE DE TIRAGE. ⚠ DÉCRIRE UN OBJET N'ARRIVE PAS
-  // ICI : la fenêtre navigue elle-même. Le reste est ce qu'on fait de tout lien —
-  // la fiche d'un monstre, le lien posé dans la conversation, la base du site.
+  // LA FICHE DE LA FENÊTRE : ce qu'elle a demandé se route comme celle de la
+  // base, sur l'objet qu'elle montre.
+  RouteItemSheet(answers.description, windows_.description.item_id, *item_description_,
+                 ro::ui::ItemSheetHost::kDescriptionWindow, now_ms);
   const ro::ui::ChatLinkAsk& odds = answers.description.link;
-  if (odds.hovered_id != 0 && odds.hovered_kind == ro::ui::ChatLinkKind::kMonster &&
-      monster_sheet_.has_value()) {
-    monster_sheet_->NoteHovered(odds.hovered_id, /*by_view=*/false);
-  }
-  if (odds.item_id != 0 && odds.kind == ro::ui::ChatLinkKind::kMonster) {
-    // Le rang n'est pas dans la table : le lien part ordinaire, et son aperçu
-    // dira le vrai.
-    std::string_view named = item_description_->OddsNameOf(odds.item_id);
-    if (named.empty()) {
-      named = item_description_->SourceNameOf(odds.item_id);
-    }
-    FollowMonsterGesture(odds.gesture,
-                         MonsterLink{.monster_id = odds.item_id, .name = std::string(named)},
-                         /*by_view=*/false, now_ms);
-  } else if (odds.item_id != 0) {
-    switch (odds.gesture) {
-      case ro::ui::ChatLinkGesture::kRepost:
-        PostChatLink(ro::vfs::ItemLink{.item_id = odds.item_id});
-        break;
-      case ro::ui::ChatLinkGesture::kOpenDatabase:
-        FollowDescriptionLink(
-            ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(odds.item_id)},
-            now_ms);
-        break;
-      case ro::ui::ChatLinkGesture::kMarketSearch:
-        pieces_.trade.market().AskOpen(odds.item_id);
-        break;
-      case ro::ui::ChatLinkGesture::kGameDatabase:
-        database_.AskOpen(
-            ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = odds.item_id});
-        break;
-      case ro::ui::ChatLinkGesture::kItemInfo:
-      case ro::ui::ChatLinkGesture::kWhoDrops: {
-        const char* const verb =
-            odds.gesture == ro::ui::ChatLinkGesture::kItemInfo ? "@iteminfo " : "@whodrops ";
-        if (chat_dispatch_.has_value()) {
-          SubmitChat(*chat_dispatch_, verb + std::to_string(odds.item_id), now_ms);
-        }
-        break;
-      }
-      case ro::ui::ChatLinkGesture::kVoteShop:
-        // Le vote shop : la boutique s'ouvre, l'item au panier.
-        static_cast<void>(
-            pieces_.cash_shop.OpenWithItem(odds.item_id, windows_.cash_shop.state, link_));
-        break;
-      case ro::ui::ChatLinkGesture::kNothing:
-      case ro::ui::ChatLinkGesture::kDescribe:
-      case ro::ui::ChatLinkGesture::kMenu:
-      case ro::ui::ChatLinkGesture::kTryStyle:
-      case ro::ui::ChatLinkGesture::kCopyCode:
-      case ro::ui::ChatLinkGesture::kOpenBestiary:
-      case ro::ui::ChatLinkGesture::kOpenInNavigation:
-      case ro::ui::ChatLinkGesture::kPlaceContents:
-      case ro::ui::ChatLinkGesture::kStaffWarp:
-      case ro::ui::ChatLinkGesture::kWhisperWindow:
-      case ro::ui::ChatLinkGesture::kInviteParty:
-      case ro::ui::ChatLinkGesture::kInviteGuild:
-      case ro::ui::ChatLinkGesture::kAddFriend:
-      case ro::ui::ChatLinkGesture::kMonsterSheet:
-      case ro::ui::ChatLinkGesture::kShareRespawn:
-      case ro::ui::ChatLinkGesture::kGuideToTomb:
-      case ro::ui::ChatLinkGesture::kWhereToFind:
-      case ro::ui::ChatLinkGesture::kMobInfo:
-      case ro::ui::ChatLinkGesture::kWhereIs:
-      case ro::ui::ChatLinkGesture::kAddToMvpLog:
-      case ro::ui::ChatLinkGesture::kInviteMvp:
-      case ro::ui::ChatLinkGesture::kShowImageOnce:
-      case ro::ui::ChatLinkGesture::kAllowImageHost:
-      case ro::ui::ChatLinkGesture::kViewImage:
-      case ro::ui::ChatLinkGesture::kPostWhereToFind:
-      case ro::ui::ChatLinkGesture::kGoThere:
-        break;
-    }
-  }
-  // Le bouton du vote shop : la boutique s'ouvre, l'item décrit au panier.
-  if (answers.description.open_vote_shop) {
-    static_cast<void>(pieces_.cash_shop.OpenWithItem(windows_.description.item_id,
-                                                     windows_.cash_shop.state, link_));
-  }
-  // Le « @item » du staff : le droit se relit ici, au geste.
-  if (answers.description.staff_item.has_value()) {
-    SendStaffItems(std::span(&*answers.description.staff_item, 1), Rights(), link_, world_);
-  }
-  // L'étiquette « Craft » : l'Atlas s'ouvre sur l'item décrit.
-  if (answers.description.open_craft_atlas) {
-    ro::ui::OpenCraftAtlasOn(windows_.craft_atlas.state, windows_.description.item_id);
-  }
   // La case « Comparer » de la fenêtre : c'est le réglage lui-même.
   if (answers.description.compare_changed) {
     settings_->options().descriptions().SetCompare(answers.description.compare, &settings_->file());
@@ -339,27 +225,8 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   // « SIGNALER CE JOUEUR » : l'envoi que sa fenêtre demande.
   pieces_.player_report.Advance(windows_.player_report, answers.player_report, world_.player_id(),
                                 link_);
-  if (answers.description.read_book || answers.description.recite_book) {
-    const bool first_page = settings_->options().descriptions().book_first_page();
-    if (answers.description.read_book) {
-      item_description_->books().Open(windows_.description.item_id, windows_.book, first_page);
-    } else {
-      item_description_->books().StartRecital(windows_.description.item_id, windows_.book,
-                                              first_page, now_ms);
-    }
-  }
   if (answers.book.closed) {
     item_description_->books().NoteClosed(windows_.book.item_id, answers.book.page);
-  }
-  if (answers.description.toggle_autoloot) {
-    item_description_->ToggleAutoloot(link_, windows_.description.item_id);
-  }
-  if (answers.description.search_market && windows_.description.item_id != 0) {
-    pieces_.trade.market().AskOpen(windows_.description.item_id);
-  }
-  if (answers.description.open_database && windows_.description.item_id != 0) {
-    database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem,
-                                             .id = windows_.description.item_id});
   }
   FollowSkillDescriptionLink(answers.skill_description, now_ms);
   skill_facts_.Ask(answers.skill_description, link_);

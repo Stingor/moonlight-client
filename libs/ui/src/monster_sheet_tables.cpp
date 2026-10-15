@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <initializer_list>
 #include <numeric>
 #include <span>
 #include <string>
@@ -16,6 +17,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "monster_sheet_parts.h"
+#include "table_cells.h"
 
 namespace ro::ui::monster_sheet {
 namespace {
@@ -28,11 +30,12 @@ constexpr int kResistNormalPercent = 100;
 
 // Les colonnes des tables, en pixels d'interface.
 constexpr float kFilterWidthPixels = 180.0F;
-constexpr float kRateColumnPixels = 70.0F;
-constexpr float kKindColumnPixels = 95.0F;
-constexpr float kCountColumnPixels = 80.0F;
-constexpr float kLevelColumnPixels = 60.0F;
-constexpr float kIdColumnPixels = 50.0F;
+// Les plus larges valeurs qu'écrivent les colonnes fixes : un taux, un
+// nombre d'apparitions, un niveau, un identifiant de compétence.
+constexpr const char* kWidestRate = "100.00%";
+constexpr const char* kWidestCount = "9999";
+constexpr const char* kWidestLevel = "99";
+constexpr const char* kWidestSkillId = "99999";
 // L'icône d'un butin, en lignes de texte.
 constexpr float kDropIconLines = 1.4F;
 
@@ -125,6 +128,13 @@ void DropCell(MonsterSheetWindowState& state, const MonsterSheetDropView& drop, 
   ImGui::PopID();
 }
 
+// LA LARGEUR INITIALE D'UNE COLONNE FIXE ET TRIABLE : son en-tête traduit,
+// flèche comprise, ou la plus large de ses valeurs.
+[[nodiscard]] float FixedColumnWidth(const char* header,
+                                     std::initializer_list<std::string_view> values) {
+  return std::max(SortedHeaderWidth(header), WidestText(values));
+}
+
 // Le menu d'un butin, ouvert HORS de la table : une cellule change la pile
 // d'ids, et le surgissant ne s'y retrouverait pas.
 void DrawDropMenu(MonsterSheetWindowState& state, const MonsterSheetView& view,
@@ -142,9 +152,9 @@ void DrawResistTab(const MonsterSheetView& view) {
   ImGui::Text(core::Tr("Élément du monstre : %s niveau %u"), element.c_str(),
               static_cast<unsigned>(view.element_level));
   ImGui::Separator();
-  if (!ImGui::BeginTable(
-          "##mi_resist", kResistColumns,
-          ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+  if (!ImGui::BeginTable("##mi_resist", kResistColumns,
+                         ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Resizable |
+                             ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
     return;
   }
   for (std::size_t element_rank = 0; element_rank < kMonsterSheetResistCount; ++element_rank) {
@@ -166,18 +176,24 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
   ImGui::SetNextItemWidth(Px(kFilterWidthPixels));
   state.drop_filter.Draw(core::Tr("Filtrer (item)"));
 
+  // 🔴 LES COLONNES SE RÈGLENT À LA SOURIS, et leur largeur initiale tient le
+  // plus long libellé TRADUIT : « Récompense MVP » ne se coupe pas à
+  // l'ouverture. Seul le nom s'étire. Réglée plus étroite, une cellule coupée
+  // se lit entière au survol.
   constexpr ImGuiTableFlags kFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
                                      ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable |
-                                     ImGuiTableFlags_SizingStretchProp;
+                                     ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit;
+  const char* const mvp_reward = core::Tr("Récompense MVP");
+  const char* const ordinary_drop = core::Tr("Drop normal");
   if (ImGui::BeginTable("##mi_drops", 3, kFlags)) {
     ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthStretch);
     ImGui::TableSetupColumn(core::Tr("Taux"),
                             ImGuiTableColumnFlags_WidthFixed |
                                 ImGuiTableColumnFlags_PreferSortDescending |
                                 ImGuiTableColumnFlags_DefaultSort,
-                            Px(kRateColumnPixels));
+                            FixedColumnWidth(core::Tr("Taux"), {kWidestRate}));
     ImGui::TableSetupColumn(core::Tr("Type"), ImGuiTableColumnFlags_WidthFixed,
-                            Px(kKindColumnPixels));
+                            FixedColumnWidth(core::Tr("Type"), {mvp_reward, ordinary_drop}));
     ImGui::TableSetupScrollFreeze(0, 1);
     ImGui::TableHeadersRow();
 
@@ -205,13 +221,13 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
       DropCell(state, drop, rank, answer);
       ImGui::TableNextColumn();
       // Deux décimales, en centièmes de pour cent, comme la fiche d'objet.
-      ImGui::Text("%.2f%%", static_cast<double>(static_cast<float>(drop.rate_hundredths) /
-                                                kHundredthsPerPercent));
+      CellText(Printed("%.2f%%", static_cast<double>(static_cast<float>(drop.rate_hundredths) /
+                                                     kHundredthsPerPercent)));
       ImGui::TableNextColumn();
       if (drop.mvp_reward) {
-        Colored(kAmberColor, core::Tr("Récompense MVP"));
+        Colored(kAmberColor, mvp_reward);
       } else {
-        Label(core::Tr("Drop normal"));
+        Label(ordinary_drop);
       }
     }
     PaintWindowScrollbar(art);
@@ -230,13 +246,14 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
   }
   if (ImGui::BeginTable("##mi_spawns", 2,
                         ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
-                            ImGuiTableFlags_Sortable | ImGuiTableFlags_SizingStretchProp)) {
+                            ImGuiTableFlags_Sortable | ImGuiTableFlags_Resizable |
+                            ImGuiTableFlags_SizingFixedFit)) {
     ImGui::TableSetupColumn(core::Tr("Carte"),
                             ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultSort);
     ImGui::TableSetupColumn(
         core::Tr("Nombre"),
         ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_PreferSortDescending,
-        Px(kCountColumnPixels));
+        FixedColumnWidth(core::Tr("Nombre"), {kWidestCount}));
     ImGui::TableSetupScrollFreeze(0, 1);
     ImGui::TableHeadersRow();
 
@@ -271,7 +288,7 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
       }
       ImGui::PopID();
       ImGui::TableNextColumn();
-      ImGui::Text("%u", static_cast<unsigned>(spawn.count));
+      CellText(Printed("%u", static_cast<unsigned>(spawn.count)));
     }
     PaintWindowScrollbar(art);
     ImGui::EndTable();
@@ -285,7 +302,8 @@ void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
   Label(core::Tr("Clic sur un skill : sa description (fenêtre du client)."));
   if (!ImGui::BeginTable("##mi_skills", 3,
                          ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
-                             ImGuiTableFlags_Sortable | ImGuiTableFlags_SizingStretchProp)) {
+                             ImGuiTableFlags_Sortable | ImGuiTableFlags_Resizable |
+                             ImGuiTableFlags_SizingFixedFit)) {
     return;
   }
   ImGui::TableSetupColumn(core::Tr("Skill"),
@@ -293,8 +311,9 @@ void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
   ImGui::TableSetupColumn(
       core::Tr("Niveau"),
       ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_PreferSortDescending,
-      Px(kLevelColumnPixels));
-  ImGui::TableSetupColumn(core::Tr("ID"), ImGuiTableColumnFlags_WidthFixed, Px(kIdColumnPixels));
+      FixedColumnWidth(core::Tr("Niveau"), {kWidestLevel}));
+  ImGui::TableSetupColumn(core::Tr("ID"), ImGuiTableColumnFlags_WidthFixed,
+                          FixedColumnWidth(core::Tr("ID"), {kWidestSkillId}));
   ImGui::TableSetupScrollFreeze(0, 1);
   ImGui::TableHeadersRow();
 
@@ -326,11 +345,11 @@ void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
         answer.describe_skill = skill.skill_id;
       }
     } else {
-      ImGui::TextUnformatted(skill.name.c_str());
+      CellText(skill.name);
     }
     ImGui::PopID();
     ImGui::TableNextColumn();
-    ImGui::Text("%u", static_cast<unsigned>(skill.level));
+    CellText(Printed("%u", static_cast<unsigned>(skill.level)));
     ImGui::TableNextColumn();
     Label(Printed("%u", static_cast<unsigned>(skill.skill_id)).c_str());
   }

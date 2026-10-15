@@ -91,6 +91,7 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
   // LE BOUTON, POUR L'IMAGE SUIVANTE : un seul réglage pour toutes les fenêtres.
   box.buttons = buttons;
   windows.description.bug_report = buttons;
+  windows.monster_sheet.database.state.item_sheet.bug_report = buttons;
   windows.skill_description.bug_report = buttons;
   windows.npc_dialog.bug_report = buttons;
   windows.style.bug_report = buttons;

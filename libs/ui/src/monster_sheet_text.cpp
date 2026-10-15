@@ -11,6 +11,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "monster_sheet_parts.h"
+#include "table_cells.h"
 
 namespace ro::ui::monster_sheet {
 namespace {
@@ -73,9 +74,8 @@ ImU32 LinkColor() {
 }
 
 void Colored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
+  // Coupé par sa colonne, le texte se lit entier au survol.
+  CellText(text, color);
 }
 
 void Help(const char* text) {

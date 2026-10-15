@@ -1,5 +1,6 @@
 // La fenêtre « Base de données » : onglets, liste, filtres et fil des fiches.
-// Voir l'en-tête ; la fiche d'un objet est dans `database_item_sheet.cpp`.
+// Voir l'en-tête ; la fiche d'un objet est celle de la description
+// (`item_sheet.cpp`).
 
 #include "ro/ui/database_window.h"
 
@@ -14,8 +15,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
-
-#include "database_parts.h"
+#include "ro/ui/trade_widgets.h"
 
 namespace ro::ui {
 
@@ -47,7 +47,7 @@ constexpr int kSplitColumns = 2;
 constexpr std::size_t kLineBytes = 64;
 // La place du pied, sous la liste.
 constexpr float kFooterLines = 1.0F;
-constexpr const char* kItemMenuId = "##database_item_menu";
+constexpr const char* kListMenuId = "##database_list_menu";
 
 void TextOf(std::string_view text) {
   ImGui::TextUnformatted(text.data(), text.data() + text.size());
@@ -116,8 +116,37 @@ void DrawFilters(DatabaseWindowState& state, const SkinArt& art) {
   LevelBounds("##db_level_min", "##db_level_max", &filters.level_min, &filters.level_max, art);
 }
 
-// LA LISTE : un clic visite la fiche de la ligne.
-void DrawList(DatabaseWindowState& state, const DatabaseView& view) {
+// LES GESTES DE TOUT OBJET OU MONSTRE sur la ligne qu'on vient de poser : le
+// survol, Maj + clic, le clic droit qui arme le menu, Ctrl + clic droit.
+void NoteRowGestures(DatabaseWindowState& state, DatabaseKind kind, const DatabaseRowView& row,
+                     DatabaseAnswer& answer) {
+  TradeItemGesture gesture;
+  AddLastItemGesture(gesture);
+  const ChatLinkKind link_kind =
+      kind == DatabaseKind::kItem ? ChatLinkKind::kItem : ChatLinkKind::kMonster;
+  if (gesture.hovered) {
+    answer.list.hovered_id = row.id;
+    answer.list.hovered_kind = link_kind;
+    answer.list.hovering = true;
+  }
+  if (gesture.menu || gesture.describe) {
+    state.list_menu.armed = gesture.menu;
+    state.list_menu.describe_at_once = gesture.describe;
+    state.list_menu.kind = link_kind;
+    state.list_menu.item_id = row.id;
+    state.list_menu.token = 0;
+    state.list_menu.label = std::string(row.name);
+  }
+  if (gesture.repost) {
+    answer.list.gesture = ChatLinkGesture::kRepost;
+    answer.list.kind = link_kind;
+    answer.list.item_id = row.id;
+  }
+}
+
+// LA LISTE : un clic visite la fiche de la ligne ; les autres gestes sont ceux
+// de tout objet ou monstre.
+void DrawList(DatabaseWindowState& state, const DatabaseView& view, DatabaseAnswer& answer) {
   const DatabaseKind kind =
       state.tab == kDatabaseItemTab ? DatabaseKind::kItem : DatabaseKind::kMonster;
   const std::optional<DatabaseTarget> shown = state.history.current();
@@ -153,9 +182,12 @@ void DrawList(DatabaseWindowState& state, const DatabaseView& view) {
       std::snprintf(label.data(), label.size(), "#%u %.*s##db_row%d", static_cast<unsigned>(row.id),
                     static_cast<int>(row.name.size()), row.name.data(), rank);
       const bool selected = shown.has_value() && shown->kind == kind && shown->id == row.id;
-      if (ImGui::Selectable(label.data(), selected, ImGuiSelectableFlags_SpanAllColumns)) {
+      // ⚠ MAJ + CLIC POSE LE LIEN, il ne visite pas : c'est le geste de tout lien.
+      if (ImGui::Selectable(label.data(), selected, ImGuiSelectableFlags_SpanAllColumns) &&
+          !ImGui::GetIO().KeyShift) {
         state.history.Visit(DatabaseTarget{.kind = kind, .id = row.id});
       }
+      NoteRowGestures(state, kind, row, answer);
       ImGui::TableNextColumn();
       ImGui::TextDisabled("%.*s", static_cast<int>(row.note.size()), row.note.data());
     }
@@ -164,14 +196,15 @@ void DrawList(DatabaseWindowState& state, const DatabaseView& view) {
   TextOf(view.summary);
 }
 
-void DrawListPane(DatabaseWindowState& state, const DatabaseView& view, const SkinArt& art) {
+void DrawListPane(DatabaseWindowState& state, const DatabaseView& view, const SkinArt& art,
+                  DatabaseAnswer& answer) {
   std::array<char, kDatabaseQueryBytes>& query =
       state.tab == kDatabaseItemTab ? state.item_query : state.monster_query;
   ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
   ImGui::InputTextWithHint("##db_query", core::Tr("Nom ou ID"), query.data(), query.size());
   DrawFilters(state, art);
   ImGui::Separator();
-  DrawList(state, view);
+  DrawList(state, view, answer);
 }
 
 // LA BARRE DU HAUT : les deux onglets, puis ◀ ▶.
@@ -220,12 +253,29 @@ void DrawSheetPane(DatabaseWindowState& state, const DatabaseView& view,
                    MonsterSheetWindowState& monster_state, const SkinArt& art,
                    DatabaseAnswer& answer) {
   if (view.item != nullptr) {
-    database::DrawItemSheet(state, *view.item, art, state.item_menu, answer);
+    DrawItemSheetBody(state.item_sheet, *view.item, art, ItemSheetHost::kDatabase, answer.item);
   } else if (view.monster != nullptr) {
     answer.monster = DrawMonsterSheetBody(monster_state, *view.monster, art);
   } else {
     ImGui::TextDisabled("%s", core::Tr("Choisissez un item ou un monstre dans la liste."));
   }
+}
+
+// UN LIEN SUIVI DANS LA FICHE D'UN OBJET reste dans la base : un autre objet,
+// ou un monstre qui le lâche, s'y visite. Le clic sur l'objet MONTRÉ, lui,
+// ouvre sa description, comme partout : il ne mènerait nulle part ici.
+void FollowSheetLink(DatabaseWindowState& state, const DescriptionView& item, ChatLinkAsk& link) {
+  if (link.gesture != ChatLinkGesture::kDescribe || link.item_id == 0) {
+    return;
+  }
+  if (link.kind == ChatLinkKind::kMonster) {
+    state.history.Visit(DatabaseTarget{.kind = DatabaseKind::kMonster, .id = link.item_id});
+  } else if (link.kind == ChatLinkKind::kItem && link.item_id != item.item_id) {
+    state.history.Visit(DatabaseTarget{.kind = DatabaseKind::kItem, .id = link.item_id});
+  } else {
+    return;
+  }
+  link.gesture = ChatLinkGesture::kNothing;
 }
 
 }  // namespace
@@ -283,6 +333,9 @@ void OpenDatabaseOn(DatabaseWindowState& state, std::optional<DatabaseTarget> ta
 DatabaseAnswer DrawDatabaseWindow(DatabaseWindowState& state, const DatabaseView& view,
                                   MonsterSheetWindowState& monster_state, const SkinArt& art) {
   DatabaseAnswer answer;
+  // Le pantin de la fiche n'est voulu que tant que sa ligne est survolée, et
+  // elle le redit.
+  state.item_sheet.doll.wanted = false;
   if (!state.open) {
     return answer;
   }
@@ -314,7 +367,7 @@ DatabaseAnswer DrawDatabaseWindow(DatabaseWindowState& state, const DatabaseView
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
       if (ImGui::BeginChild("##db_list_child")) {
-        DrawListPane(state, view, art);
+        DrawListPane(state, view, art, answer);
       }
       ImGui::EndChild();
       ImGui::TableNextColumn();
@@ -324,10 +377,12 @@ DatabaseAnswer DrawDatabaseWindow(DatabaseWindowState& state, const DatabaseView
       ImGui::EndChild();
       ImGui::EndTable();
     }
-    // Le menu de l'objet de la fiche, HORS de la table et des panneaux : une
-    // cellule change la pile d'identifiants.
+    // LES MENUS, HORS de la table et des panneaux : une cellule change la pile
+    // d'identifiants. Celui d'une ligne de la liste, puis ceux de la fiche.
+    DrawItemLinkMenu(kListMenuId, state.list_menu, answer.list, view.vote_shop);
     if (view.item != nullptr) {
-      DrawItemLinkMenu(kItemMenuId, state.item_menu, answer.item, view.item->vote_shop);
+      FinishItemSheetLinks(state.item_sheet, *view.item, ItemSheetHost::kDatabase, answer.item);
+      FollowSheetLink(state, *view.item, answer.item.link);
     }
   }
   EndSkinnedWindow();

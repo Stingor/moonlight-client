@@ -71,15 +71,16 @@ void DrawDescriptionLink(DescriptionWindowState& state, const DescriptionLinkCel
                    state.link_menu, action.link);
 }
 
-void FinishDescriptionLinks(DescriptionWindowState& state, const DescriptionView& view,
-                            DescriptionWindowAction& action) {
+void FinishItemSheetLinks(DescriptionWindowState& state, const DescriptionView& view,
+                          ItemSheetHost host, DescriptionWindowAction& action) {
   // Le menu, hors des tables : une cellule change la pile d'identifiants, et le
   // surgissant ne s'y retrouverait pas.
   DrawItemLinkMenu(kLinkMenuId, state.link_menu, action.link, view.vote_shop);
-  // 🔴 DÉCRIRE UN OBJET NE SORT PAS DE LA FENÊTRE : c'est une surface de
-  // description, et le clic y REMPLACE l'objet affiché. Un monstre, lui, a sa
-  // propre fenêtre.
-  if (action.link.gesture == ChatLinkGesture::kDescribe &&
+  // 🔴 DÉCRIRE UN OBJET NE SORT PAS DE LA FICHE : c'est une surface de
+  // description, et le clic y REMPLACE l'objet affiché — la fenêtre par son fil
+  // « < Retour », la base par le sien. Un monstre, lui, a sa propre fiche.
+  if (host == ItemSheetHost::kDescriptionWindow &&
+      action.link.gesture == ChatLinkGesture::kDescribe &&
       action.link.kind == ChatLinkKind::kItem) {
     NavigateDescription(state, action.link.item_id);
     action.link.gesture = ChatLinkGesture::kNothing;

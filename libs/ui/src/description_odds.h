@@ -27,15 +27,22 @@ struct DescriptionLinkCell {
 void DrawDescriptionLink(DescriptionWindowState& state, const DescriptionLinkCell& cell,
                          DescriptionWindowAction& action);
 
-// Après tous les onglets, UNE fois : le menu d'un lien, et la navigation quand
-// on décrit un objet.
-void FinishDescriptionLinks(DescriptionWindowState& state, const DescriptionView& view,
-                            DescriptionWindowAction& action);
+// LES QUATRE ONGLETS DU SERVEUR — « Monstres », « Boss / MVP », « Script »,
+// « Combos » — : leur contenu, et ce qui les grise. Un onglet ne se grise que
+// sur une réponse ARRIVÉE et vide.
+[[nodiscard]] bool SourcesKnownEmpty(const DescriptionDropsView& drops);
+[[nodiscard]] bool ScriptsKnownEmpty(const DescriptionScriptsView& scripts);
+[[nodiscard]] bool CombosKnownEmpty(const DescriptionScriptsView& scripts);
+// `boss` : l'onglet « Boss / MVP », sinon « Monstres ».
+void DrawSourcesTab(DescriptionWindowState& state, const DescriptionView& view, bool boss,
+                    const SkinArt& art, DescriptionWindowAction& action);
+void DrawScriptsTab(const DescriptionScriptsView& scripts, const SkinArt& art);
+void DrawCombosTab(DescriptionWindowState& state, const DescriptionView& view, const SkinArt& art,
+                   DescriptionWindowAction& action);
 
-// Les quatre onglets du serveur, dans la barre ouverte : « Monstres »,
-// « Boss / MVP », « Script », « Combos ».
-void DrawServerTabs(DescriptionWindowState& state, const DescriptionView& view, const SkinArt& art,
-                    DescriptionWindowAction& action);
+// L'ONGLET « DESCRIPTION » : le corps seul, ou la comparaison en deux colonnes.
+void DrawDescriptionTab(DescriptionWindowState& state, const DescriptionView& view,
+                        const SkinArt& art, DescriptionWindowAction& action);
 
 // Un script rAthena dans un bloc « éditeur » : une instruction par ligne,
 // coloration, et « Copier ».

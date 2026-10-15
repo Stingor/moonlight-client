@@ -1,5 +1,6 @@
-// LA DESCRIPTION D'UN OBJET : les quatre onglets du serveur — « Monstres »,
-// « Boss / MVP », « Script », « Combos ».
+// LA FICHE D'UN OBJET : les quatre onglets du serveur — « Monstres »,
+// « Boss / MVP », « Script », « Combos ». La base de données les remplit tant
+// que le serveur n'a pas répondu, ou hors ligne ; seuls les combos l'attendent.
 //
 // 🔴 UN ONGLET SANS CONTENU SE GRISE, IL NE DISPARAÎT PAS : la barre garde la
 // même forme d'un objet à l'autre, et surtout elle ne se réorganise pas sous le
@@ -8,6 +9,7 @@
 // ARRIVÉE et vide : en attendant, on ne sait rien.
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdio>
 #include <string>
@@ -19,6 +21,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "description_odds.h"
+#include "table_cells.h"
 
 namespace ro::ui {
 namespace {
@@ -26,11 +29,10 @@ namespace {
 [[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 constexpr float kFilterWidthPixels = 180.0F;
-constexpr float kRateColumnPixels = 70.0F;
-constexpr float kKindColumnPixels = 105.0F;
 constexpr ImU32 kHeaderColor = IM_COL32(206, 198, 172, 255);
 constexpr ImVec4 kMvpColor(0.85F, 0.15F, 0.15F, 1.0F);
 constexpr ImVec4 kMiniBossColor(0.80F, 0.55F, 0.10F, 1.0F);
+constexpr ImU32 kMvpRewardColor = IM_COL32(204, 140, 25, 255);
 constexpr ImVec4 kNoteColor(0.70F, 0.55F, 0.20F, 1.0F);
 constexpr ImVec4 kSectionColor(0.85F, 0.72F, 0.35F, 1.0F);
 constexpr ImVec4 kComboColor(0.55F, 0.80F, 0.55F, 1.0F);
@@ -40,6 +42,9 @@ constexpr ImU32 kSelfColor = IM_COL32(230, 200, 90, 255);
 constexpr float kHundredthsPerPercent = 100.0F;
 constexpr std::uint8_t kMvpRank = 2;
 constexpr std::uint8_t kMiniBossRank = 1;
+// Le plus large taux qu'une ligne écrit.
+constexpr const char* kWidestRate = "100.00%";
+constexpr std::size_t kRateBytes = 16;
 
 constexpr int kRateColumn = 1;
 constexpr int kKindColumn = 2;
@@ -60,16 +65,23 @@ constexpr int kKindColumn = 2;
   return Compare(static_cast<std::uint32_t>(left.size()), static_cast<std::uint32_t>(right.size()));
 }
 
-// « Chargement... » en attendant, rien quand personne n'a pu demander.
+// « Chargement... » en attendant, l'appel au serveur quand personne n'a pu
+// demander.
 [[nodiscard]] bool Ready(DescriptionFetch fetch) {
   if (fetch == DescriptionFetch::kWaiting) {
     ImGui::TextDisabled("%s", core::Tr("Chargement..."));
+  } else if (fetch == DescriptionFetch::kUnasked) {
+    ImGui::TextDisabled("%s", core::Tr("Le serveur seul le sait : connectez-vous."));
   }
   return fetch == DescriptionFetch::kReady;
 }
 
 // La table des monstres qui laissent tomber l'objet. `with_kind` : la colonne
 // qui sépare un butin d'une récompense de MVP.
+//
+// 🔴 LES COLONNES SE RÈGLENT À LA SOURIS, et leur largeur initiale tient le
+// plus long libellé TRADUIT : « Récompense MVP » ne se coupe pas à l'ouverture.
+// Réglée plus étroite, une cellule coupée se lit entière au survol.
 void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& drops,
                    ImGuiTextFilter& filter, const char* table_id, bool with_kind,
                    DescriptionWindowAction& action) {
@@ -92,18 +104,22 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
     }
   }
   constexpr ImGuiTableFlags kFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
-                                     ImGuiTableFlags_Sortable | ImGuiTableFlags_SizingStretchProp;
+                                     ImGuiTableFlags_Sortable | ImGuiTableFlags_Resizable |
+                                     ImGuiTableFlags_SizingFixedFit;
+  const char* const mvp_reward = core::Tr("Récompense MVP");
+  const char* const ordinary_drop = core::Tr("Drop normal");
   ImGui::PushStyleColor(ImGuiCol_TableHeaderBg, kHeaderColor);
   if (ImGui::BeginTable(table_id, with_kind ? 3 : 2, kFlags)) {
     ImGui::TableSetupColumn(core::Tr("Monstre"), ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn(core::Tr("Taux"),
-                            ImGuiTableColumnFlags_WidthFixed |
-                                ImGuiTableColumnFlags_PreferSortDescending |
-                                ImGuiTableColumnFlags_DefaultSort,
-                            Px(kRateColumnPixels));
+    ImGui::TableSetupColumn(
+        core::Tr("Taux"),
+        ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_PreferSortDescending |
+            ImGuiTableColumnFlags_DefaultSort,
+        std::max(SortedHeaderWidth(core::Tr("Taux")), WidestText({kWidestRate})));
     if (with_kind) {
-      ImGui::TableSetupColumn(core::Tr("Type"), ImGuiTableColumnFlags_WidthFixed,
-                              Px(kKindColumnPixels));
+      ImGui::TableSetupColumn(
+          core::Tr("Type"), ImGuiTableColumnFlags_WidthFixed,
+          std::max(SortedHeaderWidth(core::Tr("Type")), WidestText({mvp_reward, ordinary_drop})));
     }
     ImGui::TableHeadersRow();
     if (const ImGuiTableSortSpecs* sort = ImGui::TableGetSortSpecs();
@@ -148,14 +164,17 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
       ImGui::PopID();
       ImGui::PopID();
       ImGui::TableNextColumn();
-      ImGui::Text("%.2f%%", static_cast<double>(static_cast<float>(row.rate_hundredths) /
-                                                kHundredthsPerPercent));
+      std::array<char, kRateBytes> rate{};
+      std::snprintf(
+          rate.data(), rate.size(), "%.2f%%",
+          static_cast<double>(static_cast<float>(row.rate_hundredths) / kHundredthsPerPercent));
+      CellText(rate.data());
       if (with_kind) {
         ImGui::TableNextColumn();
         if (row.mvp_reward) {
-          ImGui::TextColored(kMiniBossColor, "%s", core::Tr("MVP reward"));
+          CellText(mvp_reward, kMvpRewardColor);
         } else {
-          ImGui::TextDisabled("%s", core::Tr("Drop normal"));
+          CellText(ordinary_drop, ImGui::GetColorU32(ImGuiCol_TextDisabled));
         }
       }
     }
@@ -169,27 +188,16 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
   if (drops.truncated) {
     ImGui::TextDisabled("%s", core::Tr("... autres sources : voir la base de données."));
   }
+  if (drops.from_database) {
+    ImGui::TextColored(kNoteColor, "%s",
+                       core::Tr("Taux réels de la base de données : le serveur n'a pas encore "
+                                "répondu."));
+    return;
+  }
   // Les donjons instanciés ne sont pas encore parcourus par le serveur : leurs
   // sources peuvent manquer.
   ImGui::TextColored(kNoteColor, "%s",
                      core::Tr("Note : les spawns d'instance ne sont pas encore comptés/scannés."));
-}
-
-// Un onglet de sources : son bouton « Rafraichir », puis sa table.
-void DrawDropsTab(DescriptionWindowState& state, const DescriptionDropsView& drops,
-                  ImGuiTextFilter& filter, const char* table_id, bool with_kind, bool& refresh,
-                  const SkinArt& art, DescriptionWindowAction& action) {
-  const std::string button = std::string(core::Tr("Rafraichir")) + "##" + table_id;
-  if (SkinSmallButton(button.c_str(), art)) {
-    refresh = true;
-  }
-  if (Ready(drops.fetch)) {
-    DrawDropTable(state, drops, filter, table_id, with_kind, action);
-  }
-}
-
-[[nodiscard]] bool KnownEmpty(const DescriptionDropsView& drops) {
-  return drops.fetch == DescriptionFetch::kReady && drops.rows.empty();
 }
 
 [[nodiscard]] bool Readable(const DescriptionScriptsView& scripts) {
@@ -201,6 +209,39 @@ void DrawDropsTab(DescriptionWindowState& state, const DescriptionDropsView& dro
     return false;
   }
   return true;
+}
+
+}  // namespace
+
+bool SourcesKnownEmpty(const DescriptionDropsView& drops) {
+  return drops.fetch == DescriptionFetch::kReady && drops.rows.empty();
+}
+
+bool ScriptsKnownEmpty(const DescriptionScriptsView& scripts) {
+  return scripts.fetch == DescriptionFetch::kReady && scripts.main.empty() &&
+         scripts.equip.empty() && scripts.unequip.empty();
+}
+
+bool CombosKnownEmpty(const DescriptionScriptsView& scripts) {
+  return scripts.fetch == DescriptionFetch::kReady && !scripts.from_database &&
+         scripts.combos.empty();
+}
+
+void DrawSourcesTab(DescriptionWindowState& state, const DescriptionView& view, bool boss,
+                    const SkinArt& art, DescriptionWindowAction& action) {
+  const DescriptionDropsView& drops = boss ? view.drops_boss : view.drops_ordinary;
+  const char* const table_id = boss ? "sources_boss" : "sources_ordinaires";
+  if (view.online) {
+    const std::string button = std::string(core::Tr("Rafraichir")) + "##" + table_id;
+    if (SkinSmallButton(button.c_str(), art)) {
+      (boss ? action.refresh_boss : action.refresh_ordinary) = true;
+    }
+  }
+  if (Ready(drops.fetch)) {
+    ImGuiTextFilter& filter =
+        boss ? state.boss_filters[view.item_id] : state.ordinary_filters[view.item_id];
+    DrawDropTable(state, drops, filter, table_id, boss, action);
+  }
 }
 
 void DrawScriptsTab(const DescriptionScriptsView& scripts, const SkinArt& art) {
@@ -229,6 +270,12 @@ void DrawScriptsTab(const DescriptionScriptsView& scripts, const SkinArt& art) {
 void DrawCombosTab(DescriptionWindowState& state, const DescriptionView& view, const SkinArt& art,
                    DescriptionWindowAction& action) {
   const DescriptionScriptsView& scripts = view.scripts;
+  if (scripts.from_database) {
+    // La base ne connaît pas les combos : seul le serveur répond.
+    ImGui::TextDisabled("%s", view.online ? core::Tr("Chargement...")
+                                          : core::Tr("Le serveur seul le sait : connectez-vous."));
+    return;
+  }
   if (!Readable(scripts)) {
     return;
   }
@@ -274,47 +321,6 @@ void DrawCombosTab(DescriptionWindowState& state, const DescriptionView& view, c
       ImGui::Separator();
     }
     ImGui::PopID();
-  }
-}
-
-}  // namespace
-
-void DrawServerTabs(DescriptionWindowState& state, const DescriptionView& view, const SkinArt& art,
-                    DescriptionWindowAction& action) {
-  // 🔴 LE GRISÉ NE COUVRE QUE L'ONGLET, pas son corps : l'onglet resté ouvert
-  // quand la réponse vide est arrivée se dessinerait gris lui aussi.
-  ImGui::BeginDisabled(KnownEmpty(view.drops_ordinary));
-  const bool ordinary = ImGui::BeginTabItem(core::Tr("Monstres"));
-  ImGui::EndDisabled();
-  if (ordinary) {
-    DrawDropsTab(state, view.drops_ordinary, state.ordinary_filters[view.item_id],
-                 "sources_ordinaires", false, action.refresh_ordinary, art, action);
-    ImGui::EndTabItem();
-  }
-  ImGui::BeginDisabled(KnownEmpty(view.drops_boss));
-  const bool boss = ImGui::BeginTabItem(core::Tr("Boss / MVP"));
-  ImGui::EndDisabled();
-  if (boss) {
-    DrawDropsTab(state, view.drops_boss, state.boss_filters[view.item_id], "sources_boss", true,
-                 action.refresh_boss, art, action);
-    ImGui::EndTabItem();
-  }
-  const DescriptionScriptsView& scripts = view.scripts;
-  const bool scripts_ready = scripts.fetch == DescriptionFetch::kReady;
-  ImGui::BeginDisabled(scripts_ready && scripts.main.empty() && scripts.equip.empty() &&
-                       scripts.unequip.empty());
-  const bool script = ImGui::BeginTabItem(core::Tr("Script"));
-  ImGui::EndDisabled();
-  if (script) {
-    DrawScriptsTab(scripts, art);
-    ImGui::EndTabItem();
-  }
-  ImGui::BeginDisabled(scripts_ready && scripts.combos.empty());
-  const bool combos = ImGui::BeginTabItem(core::Tr("Combos"));
-  ImGui::EndDisabled();
-  if (combos) {
-    DrawCombosTab(state, view, art, action);
-    ImGui::EndTabItem();
   }
 }
 

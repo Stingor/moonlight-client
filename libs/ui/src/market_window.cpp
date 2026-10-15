@@ -14,6 +14,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "table_cells.h"
+
 namespace ro::ui {
 namespace {
 
@@ -57,28 +59,8 @@ void TextOf(std::string_view text) {
   return ImGui::CalcTextSize(text.data(), text.data() + text.size()).x;
 }
 
-// UN TEXTE QUE SA COLONNE COUPE : plus large que la place qui reste dans la
-// cellule. À juger AVANT de l'écrire.
-[[nodiscard]] bool Overflows(std::string_view text) {
-  return TextWidth(text) > ImGui::GetContentRegionAvail().x;
-}
-
-// L'entier d'un texte coupé, en bulle. ⚠ Ne teste pas le survol.
-void TooltipWhole(std::string_view text) {
-  SkinTooltipFormat("%.*s", static_cast<int>(text.size()), text.data());
-}
-
-// Le texte d'une cellule ; coupé, il se lit entier au survol.
-void CellText(std::string_view text) {
-  const bool overflows = Overflows(text);
-  TextOf(text);
-  if (overflows && ImGui::IsItemHovered()) {
-    TooltipWhole(text);
-  }
-}
-
 void TextRightAligned(std::string_view text) {
-  const bool overflows = Overflows(text);
+  const bool overflows = OverflowsCell(text);
   ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
                        std::max(0.0F, ImGui::GetContentRegionAvail().x - TextWidth(text)));
   TextOf(text);
@@ -273,7 +255,7 @@ void DrawFilters(MarketWindowState& state, const SkinArt& art) {
 // coupé, et si le marchand est en ligne — un PNJ l'est toujours.
 void DrawShopCell(const MarketRowView& row, bool npc) {
   ImGui::AlignTextToFramePadding();
-  const bool overflows = Overflows(row.shop_name);
+  const bool overflows = OverflowsCell(row.shop_name);
   if (row.autotrade) {
     ImGui::TextColored(kAutotradeText, "%.*s", static_cast<int>(row.shop_name.size()),
                        row.shop_name.data());

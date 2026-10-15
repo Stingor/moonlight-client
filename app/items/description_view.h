@@ -7,6 +7,7 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -31,6 +32,29 @@
 #include "items/item_facts_asker.h"
 
 namespace moonclient {
+
+// CE QUE LA BASE DE DONNÉES AJOUTE À LA FICHE D'UN OBJET (ADR 0116). Les vues
+// pointent sur ce que l'appelant garde, le temps d'une image.
+struct ItemSheetBase {
+  // « Général » ; vide, l'onglet n'existe pas.
+  std::span<const ro::ui::ItemSheetFact> facts;
+  // LA BASE CONNAÎT L'OBJET : ses sources et ses scripts remplissent ce que le
+  // serveur n'a pas encore dit.
+  bool known = false;
+  std::span<const ro::ui::DescriptionDropRow> ordinary;
+  std::span<const ro::ui::DescriptionDropRow> boss;
+  std::string_view script;
+  std::string_view equip_script;
+  std::string_view unequip_script;
+  ro::ui::ItemSheetSellersPhase sellers_phase = ro::ui::ItemSheetSellersPhase::kAbsent;
+  std::string_view sellers_status;
+  std::span<const ro::ui::ItemSheetSellerRow> sellers;
+  // La fiche est dans la base : son icône en en-tête, et le nom du serveur
+  // pour un objet que la table du client ignore.
+  bool in_database = false;
+  ro::ui::SkinImage icon;
+  std::string_view name;
+};
 
 // LA DESCRIPTION D'UN OBJET, VUE DE LA PARTIE.
 //
@@ -108,6 +132,13 @@ class DescriptionView {
   // à chaque image. L'aperçu lit donc les noms de la fenêtre, et y met ses
   // demandes.
   void ShareCreatorsWith(DescriptionView& owner) noexcept { creators_ = &owner.asker_; }
+  // 🔴 LA FICHE DE LA BASE EMPRUNTE CELLE DE LA FENÊTRE : ses faits du serveur
+  // — les réponses n'arrivent qu'à un seul endroit —, ses forgerons, ses tables
+  // de tirage, d'options et de monstres, et sa garde-robe pour le pantin.
+  void BorrowFrom(DescriptionView& owner, ro::render::ActorWardrobe* wardrobe);
+  // CE QUE LA BASE AJOUTE, APRÈS `AskFacts` qui recompose les onglets du
+  // serveur.
+  void NoteDatabase(const ItemSheetBase& base);
   // LA POIGNÉE DES FORGERONS, pour les autres surfaces qui nomment un item.
   [[nodiscard]] CreatorNames creator_names() noexcept { return CreatorNames(creators_); }
 
@@ -146,7 +177,7 @@ class DescriptionView {
   // vaut quinze secondes, et se redemande à chaque réouverture de la fenêtre.
   // Le script, lui, ne bouge pas de la session. Une demande sans réponse se
   // rejoue au bout de trois secondes.
-  [[nodiscard]] ro::sim::ItemFacts& facts() noexcept { return asker_.facts(); }
+  [[nodiscard]] ro::sim::ItemFacts& facts() noexcept { return facts_from_->facts(); }
   void AskFacts(ro::net::Connection& link, bool window_open, std::uint32_t item_id,
                 std::uint32_t now_ms);
   // « Rafraichir » d'un onglet de sources : oublier la réponse, et redemander.
@@ -206,6 +237,9 @@ class DescriptionView {
   void ComposeFacts(std::uint32_t item_id, bool online);
   ItemFactsAsker asker_;
   ItemFactsAsker* creators_ = &asker_;
+  // Les faits du serveur : les siens, ou ceux de la vue empruntée.
+  ItemFactsAsker* facts_from_ = &asker_;
+  bool facts_window_was_open_ = false;
   std::unique_ptr<DescriptionView> compare_;
   // L'exemplaire tenu, pour le rapport de bug : moins un et rien sans lui.
   int held_refine_ = -1;

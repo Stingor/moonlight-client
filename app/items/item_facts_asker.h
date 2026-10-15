@@ -33,6 +33,10 @@ class ItemFactsAsker {
   // onglet vide avant qu'on ait cliqué dessus.
   void Ask(ro::net::Connection& link, bool window_open, std::uint32_t item_id,
            std::uint32_t now_ms);
+  // LES MÊMES DEMANDES POUR UNE AUTRE SURFACE — la fiche de la base —, sur sa
+  // propre ouverture : `was_open` est le sien, que l'appel remet à jour.
+  void AskFor(ro::net::Connection& link, bool open, bool& was_open, std::uint32_t item_id,
+              std::uint32_t now_ms);
 
   // « Rafraichir » : oublier la réponse, et redemander à l'image suivante.
   void Forget(std::uint32_t item_id, Kind kind);

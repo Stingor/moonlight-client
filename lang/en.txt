@@ -13825,9 +13825,6 @@ tr: Copy
 fr: Filtrer (monstre)
 tr: Filter (monster)
 
-fr: MVP reward
-tr: MVP reward
-
 fr: Note : les spawns d'instance ne sont pas encore comptés/scannés.
 tr: Note: instance spawns are not counted/scanned yet.
 
@@ -17995,23 +17992,14 @@ tr: %d monsters
 fr: %d items
 tr: %d items
 
-fr: (récompense MVP)
-tr: (MVP reward)
-
 fr: Accessoire
 tr: Accessory
 
 fr: Attaque magique
 tr: Magic attack
 
-fr: Au retrait
-tr: On unequip
-
 fr: Aucun PNJ ne le vend.
 tr: No NPC sells it.
-
-fr: Aucun monstre ne le lâche.
-tr: No monster drops it.
 
 fr: Bas de tête
 tr: Lower headgear
@@ -18033,12 +18021,6 @@ tr: Delayed consumables
 
 fr: Demande au serveur…
 tr: Asking the server…
-
-fr: Description###db_description
-tr: Description###db_description
-
-fr: Général###db_general
-tr: General###db_general
 
 fr: Emplacements de carte
 tr: Card slots
@@ -18082,12 +18064,6 @@ tr: The database tables are missing from the installation.
 fr: Les tables de la base de données sont illisibles.
 tr: The database tables are unreadable.
 
-fr: Lâché par (%d)###db_droppers
-tr: Dropped by (%d)###db_droppers
-
-fr: Marché##db_market
-tr: Market##db_market
-
 fr: Milieu de tête
 tr: Middle headgear
 
@@ -18127,29 +18103,17 @@ tr: Buying price
 fr: Raffinable
 tr: Refinable
 
-fr: Réessayer##db_sellers_retry
-tr: Retry##db_sellers_retry
-
-fr: Script###db_script
-tr: Script###db_script
-
 fr: Se porte
 tr: Worn on
 
-fr: Vendu chez###db_sellers
-tr: Sold by###db_sellers
+fr: Vendu chez
+tr: Sold by
 
-fr: Vendu chez (%d)###db_sellers
-tr: Sold by (%d)###db_sellers
+fr: Vendu chez (%d)
+tr: Sold by (%d)
 
-fr: [Mini-boss]
-tr: [Mini-boss]
-
-fr: À l'usage ou porté
-tr: On use or while worn
-
-fr: À l'équipement
-tr: On equip
+fr: Taux réels de la base de données : le serveur n'a pas encore répondu.
+tr: Real rates from the database: the server has not answered yet.
 
 fr: Équipements d'ombre
 tr: Shadow gear

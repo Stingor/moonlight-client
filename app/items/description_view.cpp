@@ -130,7 +130,7 @@ void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id
   view_.odds_many_groups = odds_many_groups_;
   view_.back_name = back_name_;
   view_.name_pieces = name_pieces_;
-  if (const ro::sim::ItemFacts& facts = asker_.facts(); facts.autoloot_told()) {
+  if (const ro::sim::ItemFacts& facts = facts_from_->facts(); facts.autoloot_told()) {
     view_.autoloot = facts.Autoloots(item_id) ? ro::ui::DescriptionAutoloot::kIn
                                               : ro::ui::DescriptionAutoloot::kOut;
   }
@@ -211,11 +211,11 @@ void DescriptionView::EnableComparison() {
 }
 
 void DescriptionView::ToggleAutoloot(ro::net::Connection& link, std::uint32_t item_id) {
-  SetAutoloot(link, item_id, !asker_.facts().Autoloots(item_id));
+  SetAutoloot(link, item_id, !facts_from_->facts().Autoloots(item_id));
 }
 
 void DescriptionView::SetAutoloot(ro::net::Connection& link, std::uint32_t item_id, bool listed) {
-  ro::sim::ItemFacts& facts = asker_.facts();
+  ro::sim::ItemFacts& facts = facts_from_->facts();
   if (item_id == 0 || !facts.autoloot_told() || !link.is_open() ||
       facts.Autoloots(item_id) == listed) {
     return;
@@ -381,29 +381,82 @@ void DescriptionView::RefreshOdds(std::uint32_t item_id) {
 void DescriptionView::RefreshSources(std::uint32_t item_id,
                                      const ro::ui::DescriptionWindowAction& asked) {
   if (asked.refresh_ordinary) {
-    asker_.Forget(item_id, ItemFactsAsker::Kind::kOrdinary);
+    facts_from_->Forget(item_id, ItemFactsAsker::Kind::kOrdinary);
   }
   if (asked.refresh_boss) {
-    asker_.Forget(item_id, ItemFactsAsker::Kind::kBoss);
+    facts_from_->Forget(item_id, ItemFactsAsker::Kind::kBoss);
   }
 }
 
 void DescriptionView::AskFacts(ro::net::Connection& link, bool window_open, std::uint32_t item_id,
                                std::uint32_t now_ms) {
-  asker_.Ask(link, window_open, item_id, now_ms);
+  if (facts_from_ == &asker_) {
+    asker_.Ask(link, window_open, item_id, now_ms);
+  } else {
+    // UNE VUE QUI EMPRUNTE LES FAITS D'UNE AUTRE demande sur sa propre
+    // ouverture : sa réouverture redemande les sources, pas celle de l'autre.
+    facts_from_->AskFor(link, window_open, facts_window_was_open_, item_id, now_ms);
+  }
   ComposeFacts(item_id, link.is_open());
+}
+
+void DescriptionView::BorrowFrom(DescriptionView& owner, ro::render::ActorWardrobe* wardrobe) {
+  facts_from_ = owner.facts_from_;
+  creators_ = owner.creators_;
+  packages_ = owner.packages_;
+  monsters_ = owner.monsters_;
+  option_names_ = owner.option_names_;
+  viewed_ = owner.viewed_;
+  SeeWardrobe(wardrobe);
+}
+
+void DescriptionView::NoteDatabase(const ItemSheetBase& base) {
+  view_.facts = base.facts;
+  view_.sellers_phase = base.sellers_phase;
+  view_.sellers_status = base.sellers_status;
+  view_.sellers = base.sellers;
+  view_.in_database = base.in_database;
+  view_.icon = base.icon;
+  // UN OBJET QUE LA TABLE DU CLIENT IGNORE se nomme comme le serveur le nomme.
+  if (!base.name.empty() && (items_ == nullptr || items_->Find(view_.item_id) == nullptr)) {
+    name_ = base.name;
+    view_.name = name_;
+  }
+  if (!base.known || view_.item_id == 0) {
+    return;
+  }
+  // 🔴 LE SERVEUR D'ABORD, LA BASE À DÉFAUT : elle ne remplit que ce qu'il n'a
+  // pas encore dit, et sa réponse arrivée la remplace.
+  view_.server_tabs = true;
+  const auto fill = [](ro::ui::DescriptionDropsView& drops,
+                       std::span<const ro::ui::DescriptionDropRow> rows) {
+    if (drops.fetch != ro::ui::DescriptionFetch::kReady) {
+      drops = ro::ui::DescriptionDropsView{
+          .fetch = ro::ui::DescriptionFetch::kReady, .rows = rows, .from_database = true};
+    }
+  };
+  fill(view_.drops_ordinary, base.ordinary);
+  fill(view_.drops_boss, base.boss);
+  if (view_.scripts.fetch != ro::ui::DescriptionFetch::kReady) {
+    view_.scripts = ro::ui::DescriptionScriptsView{.fetch = ro::ui::DescriptionFetch::kReady,
+                                                   .main = base.script,
+                                                   .equip = base.equip_script,
+                                                   .unequip = base.unequip_script,
+                                                   .from_database = true};
+  }
 }
 
 void DescriptionView::ComposeFacts(std::uint32_t item_id, bool online) {
   view_.server_tabs = online && item_id != 0;
+  view_.online = online;
   const auto drops = [&](bool boss, std::vector<ro::ui::DescriptionDropRow>& rows) {
     ro::ui::DescriptionDropsView shown;
     rows.clear();
-    const ro::sim::ItemDropSources* told = asker_.facts().SourcesOf(
+    const ro::sim::ItemDropSources* told = facts_from_->facts().SourcesOf(
         item_id, boss ? ro::sim::ItemSourceScope::kBoss : ro::sim::ItemSourceScope::kOrdinary);
     if (told == nullptr) {
-      shown.fetch = asker_.Asked(item_id, boss ? ItemFactsAsker::Kind::kBoss
-                                               : ItemFactsAsker::Kind::kOrdinary)
+      shown.fetch = facts_from_->Asked(item_id, boss ? ItemFactsAsker::Kind::kBoss
+                                                     : ItemFactsAsker::Kind::kOrdinary)
                         ? ro::ui::DescriptionFetch::kWaiting
                         : ro::ui::DescriptionFetch::kUnasked;
       return shown;
@@ -428,7 +481,7 @@ void DescriptionView::ComposeFacts(std::uint32_t item_id, bool online) {
   ro::ui::DescriptionScriptsView scripts;
   combo_members_.clear();
   combos_.clear();
-  if (const ro::sim::ItemScripts* told = asker_.facts().ScriptsOf(item_id); told != nullptr) {
+  if (const ro::sim::ItemScripts* told = facts_from_->facts().ScriptsOf(item_id); told != nullptr) {
     scripts.fetch = ro::ui::DescriptionFetch::kReady;
     scripts.unknown = told->status != 0;
     scripts.main = told->main;
@@ -449,7 +502,7 @@ void DescriptionView::ComposeFacts(std::uint32_t item_id, bool online) {
                                                      .script = told->combos[rank].script});
     }
     scripts.combos = combos_;
-  } else if (asker_.Asked(item_id, ItemFactsAsker::Kind::kScripts)) {
+  } else if (facts_from_->Asked(item_id, ItemFactsAsker::Kind::kScripts)) {
     scripts.fetch = ro::ui::DescriptionFetch::kWaiting;
   }
   view_.scripts = scripts;

@@ -10,6 +10,7 @@
 
 #include "ro/ui/database_window.h"
 
+#include "game/bug_report_context.h"
 #include "game/game.h"
 
 namespace moonclient {
@@ -20,11 +21,34 @@ void Game::AdvanceDatabase(std::uint32_t now_ms) {
   const bool hosted_before = windows.view != nullptr && windows.view->monster != nullptr;
   ro::ui::DatabaseAnswer& answer = windows.answer;
 
-  // ── L'OBJET DE LA FICHE : le Marché, et les gestes de tout objet ──────────
-  if (answer.market_item != 0) {
-    pieces_.trade.market().AskOpen(std::exchange(answer.market_item, 0));
+  // ── LA FICHE D'UN OBJET : les demandes de la description, routées de même ─
+  const std::uint32_t sheet_item = database_.ShownItem(windows);
+  const ro::ui::DescriptionWindowAction sheet = std::exchange(answer.item, {});
+  if (const DescriptionView* const shown = database_.item_sheet();
+      shown != nullptr && sheet_item != 0) {
+    RouteItemSheet(sheet, sheet_item, *shown, ro::ui::ItemSheetHost::kDatabase, now_ms);
+    // « SIGNALER UN BUG » : le formulaire de la description, pré-rempli de
+    // l'objet de la fiche.
+    if (sheet.report_bug) {
+      AskBugReport(windows_.bug_report, shown->BugReport(sheet_item));
+    }
   }
-  FollowCatalogItem(std::exchange(answer.item, {}), now_ms);
+
+  // ── UNE LIGNE DE LA LISTE : les gestes de tout objet ou de tout monstre ───
+  const ro::ui::ChatLinkAsk row = std::exchange(answer.list, {});
+  if (row.hovered_id != 0 && row.hovered_kind == ro::ui::ChatLinkKind::kMonster &&
+      monster_sheet_.has_value()) {
+    monster_sheet_->NoteHovered(row.hovered_id, /*by_view=*/false);
+  }
+  if (row.kind == ro::ui::ChatLinkKind::kMonster && row.item_id != 0) {
+    FollowMonsterGesture(row.gesture, DatabaseMonsterLink(row.item_id), /*by_view=*/false, now_ms);
+  } else {
+    ro::ui::ChatLinkAsk item_row = row;
+    if (item_row.hovered_kind != ro::ui::ChatLinkKind::kItem) {
+      item_row.hovered_id = 0;
+    }
+    FollowCatalogItem(item_row, now_ms);
+  }
 
   // ── LA FICHE DE MONSTRE HÉBERGÉE ──────────────────────────────────────────
   //
@@ -46,15 +70,31 @@ void Game::AdvanceDatabase(std::uint32_t now_ms) {
     windows_.monster_sheet.answer = monster;
   }
 
-  database_.Advance(windows, DatabaseContext{.link = link_,
-                                             .world = world_,
-                                             .market = pieces_.trade.market().market(),
-                                             .online = link_.is_open(),
-                                             .vote_shop = pieces_.cash_shop.offers()});
+  database_.Advance(windows, DatabaseContextNow(now_ms));
+  // LA FICHE D'UN OBJET SE DÉCORE COMME LA DESCRIPTION : boutique, Atlas,
+  // staff, et le pantin de sa pièce.
+  if (DescriptionView* const shown = database_.item_sheet(); shown != nullptr) {
+    const std::uint32_t item_id = database_.ShownItem(windows);
+    DecorateItemSheet(*shown, item_id);
+    shown->RefreshDoll(world_, windows.state.item_sheet.doll,
+                       pieces_.cash_shop.hat_effects().OrdinalOf(item_id) != 0, styles_, now_ms);
+  }
   // « Y ALLER » vers un PNJ qui vend l'objet : la navigation y guide.
   if (const std::optional<ro::sim::MarketOffer> seller = database_.TakeGoTo(); seller.has_value()) {
     navi_.GuideToPlace(seller->map_name, seller->cell_x, seller->cell_y);
   }
+}
+
+MonsterLink Game::DatabaseMonsterLink(std::uint32_t monster_id) const {
+  MonsterLink link{.monster_id = monster_id};
+  if (const ro::vfs::ServerDb* const db = database_.db(); db != nullptr) {
+    if (const ro::vfs::ServerMonster* const monster = db->FindMonster(monster_id);
+        monster != nullptr) {
+      link.rank = monster->rank;
+      link.name = monster->name;
+    }
+  }
+  return link;
 }
 
 bool Game::HostMonsterSheet(MonsterSheet& sheet) {

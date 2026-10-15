@@ -463,18 +463,20 @@ void DrawItemBody(DescriptionDollState* doll, int* staff_amount, const Descripti
                                   "Clique pour l'en retirer.")
                        : core::Tr("Ramasser automatiquement cet item."));
     // « MARCHÉ », à côté et aux mêmes conditions : le Marché s'ouvre sur
-    // l'identifiant de l'item.
-    ImGui::SameLine();
-    if (SkinSmallButton(core::Tr("Marché"), art)) {
-      action.search_market = true;
+    // l'identifiant de l'item. « BASE DE DONNÉES », juste après : la fiche
+    // entière de l'item. ⚠ DANS LA BASE, son en-tête porte déjà « Marché ».
+    if (!view.in_database) {
+      ImGui::SameLine();
+      if (SkinSmallButton(core::Tr("Marché"), art)) {
+        action.search_market = true;
+      }
+      SkinTooltip(core::Tr("Ouvre le Marché sur cet item : qui le vend, qui l'achète."));
+      ImGui::SameLine();
+      if (SkinSmallButton(core::Tr("Base de données"), art)) {
+        action.open_database = true;
+      }
+      SkinTooltip(core::Tr("Ouvre la fiche de cet item dans la base de données."));
     }
-    SkinTooltip(core::Tr("Ouvre le Marché sur cet item : qui le vend, qui l'achète."));
-    // « BASE DE DONNÉES », juste après : la fiche entière de l'item.
-    ImGui::SameLine();
-    if (SkinSmallButton(core::Tr("Base de données"), art)) {
-      action.open_database = true;
-    }
-    SkinTooltip(core::Tr("Ouvre la fiche de cet item dans la base de données."));
     action_row = true;
   }
   // « LIRE » ET « LECTURE AUTO », pour un livre qu'on possède.
@@ -576,6 +578,8 @@ void DrawComparedColumn(DescriptionDollState* doll, int* staff_amount, const Des
   }
 }
 
+}  // namespace
+
 // L'ONGLET « DESCRIPTION » : le corps seul, ou la comparaison en deux colonnes,
 // et la case qui passe de l'un à l'autre quand une pièce portée existe.
 void DrawDescriptionTab(DescriptionWindowState& state, const DescriptionView& view,
@@ -615,8 +619,6 @@ void DrawDescriptionTab(DescriptionWindowState& state, const DescriptionView& vi
     ImGui::EndTable();
   }
 }
-
-}  // namespace
 
 DescriptionWindowAction DrawDescriptionWindow(DescriptionWindowState& state,
                                               const DescriptionView& view, const SkinArt& art) {
@@ -696,38 +698,7 @@ DescriptionWindowAction DrawDescriptionWindow(DescriptionWindowState& state,
     return action;
   }
 
-  DrawDescriptionBack(state, view, art);
-  // 🔴 PAS D'ONGLETS SANS RIEN À Y METTRE : hors ligne, et pour un objet qui
-  // n'est pas un conteneur, un onglet « Description » seul n'offrirait aucun
-  // choix et prendrait une ligne.
-  if (view.odds.empty() && !view.server_tabs) {
-    state.odds_tab_present = false;
-    DrawDescriptionTab(state, view, art, action);
-  } else if (BeginSkinTabBar("##onglets_description", art)) {
-    if (ImGui::BeginTabItem(core::Tr("Description"))) {
-      DrawDescriptionTab(state, view, art, action);
-      ImGui::EndTabItem();
-    }
-    const bool odds_present = !view.odds.empty();
-    const ImGuiTabItemFlags flags = odds_present && !state.odds_tab_present && state.odds_tab_sticky
-                                        ? ImGuiTabItemFlags_SetSelected
-                                        : ImGuiTabItemFlags_None;
-    state.odds_tab_present = odds_present;
-    if (odds_present) {
-      const bool odds_open = ImGui::BeginTabItem(core::Tr("Probabilités"), nullptr, flags);
-      // La mémoire ne se met à jour que tant que l'onglet EXISTE : sinon, le
-      // passage par un objet ordinaire l'effacerait à chaque lien suivi.
-      state.odds_tab_sticky = odds_open;
-      if (odds_open) {
-        DrawOddsTab(state, view, action);
-        ImGui::EndTabItem();
-      }
-    }
-    if (view.server_tabs) {
-      DrawServerTabs(state, view, art, action);
-    }
-    EndSkinTabBar();
-  }
+  DrawItemSheetBody(state, view, art, ItemSheetHost::kDescriptionWindow, action);
 
   // Les panneaux se posent sous la fenêtre ; ⚠ LE MENU D'UN LIEN S'OUVRE APRÈS
   // EUX, pour qu'une carte cliquée y navigue comme une ligne de table.
@@ -747,7 +718,7 @@ DescriptionWindowAction DrawDescriptionWindow(DescriptionWindowState& state,
     DrawDescriptionPanels(state, view, art, ImVec2(window_at.x, bottom), window_size.x, in_front,
                           "decrit", action);
   }
-  FinishDescriptionLinks(state, view, action);
+  FinishItemSheetLinks(state, view, ItemSheetHost::kDescriptionWindow, action);
   return action;
 }
 }  // namespace ro::ui

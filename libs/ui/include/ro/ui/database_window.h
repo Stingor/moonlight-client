@@ -25,8 +25,14 @@ namespace ro::ui {
 // de ce qu'on a choisi. Les liens d'une fiche mènent à une autre — un butin à
 // son objet, un objet aux monstres qui le lâchent —, et ◀ ▶ remontent le fil.
 //
-// 🔴 LA FICHE D'UN MONSTRE EST CELLE DE LA FENÊTRE DE MONSTRE : un seul dessin
-// (`DrawMonsterSheetBody`), posé ici dans le panneau de droite.
+// 🔴 LA FICHE D'UN MONSTRE EST CELLE DE LA FENÊTRE DE MONSTRE, et celle d'un
+// objet celle de la fenêtre de description : un seul dessin chacune
+// (`DrawMonsterSheetBody`, `DrawItemSheetBody`), posé ici dans le panneau de
+// droite.
+//
+// LES LIGNES DE LA LISTE SE MANIENT COMME TOUT OBJET OU TOUT MONSTRE : le clic
+// visite la fiche, Maj + clic pose le lien dans la saisie, le clic droit ouvre
+// LE menu des liens (`DrawItemLinkMenu`), Ctrl + clic droit décrit.
 //
 // La fenêtre ne possède rien du jeu : elle tient sa saisie, ses filtres et le
 // fil de ses fiches ; `app` lit la base, compose les vues et route les gestes.
@@ -186,28 +192,23 @@ struct DatabaseFilters {
   bool operator==(const DatabaseFilters&) const = default;
 };
 
-// LES ONGLETS DE LA FICHE D'UN OBJET, dans leur ordre. « Description » n'existe
-// qu'avec une description, « Script » qu'avec un script du serveur.
-enum class DatabaseItemTab : std::uint8_t { kGeneral, kDescription, kScript, kDroppers, kSellers };
-
 struct DatabaseWindowState {
   bool open = false;
   bool raise = false;
   int tab = kDatabaseItemTab;
   // L'onglet de `tab` s'impose à la prochaine image.
   bool select_tab = true;
-  // L'ONGLET DE LA FICHE D'UN OBJET QUE LE JOUEUR A CLIQUÉ, retenu d'un objet à
-  // l'autre. Un objet qui ne l'a pas s'ouvre sur « Général » sans l'oublier :
-  // l'objet suivant qui l'a le rouvre.
-  DatabaseItemTab item_tab = DatabaseItemTab::kGeneral;
   std::array<char, kDatabaseQueryBytes> item_query{};
   std::array<char, kDatabaseQueryBytes> monster_query{};
   DatabaseFilters filters;
   DatabaseHistory history;
   // La liste doit défiler jusqu'à la fiche montrée : une fiche ouverte d'ailleurs.
   bool scroll_to_shown = false;
-  // Le menu que le clic droit sur l'objet de la fiche a armé.
-  ItemLinkMenu item_menu;
+  // L'ÉTAT DE LA FICHE D'UN OBJET, celle de la fenêtre de description posée
+  // dans le panneau de droite : son onglet retenu, ses filtres, son menu.
+  DescriptionWindowState item_sheet;
+  // Le menu que le clic droit sur une ligne de la liste a armé.
+  ItemLinkMenu list_menu;
 };
 
 // UNE LIGNE DE LA LISTE : l'identifiant, le nom, et ce qu'on lit à droite.
@@ -217,60 +218,6 @@ struct DatabaseRowView {
   std::string_view note;
 };
 
-// Une ligne « libellé : valeur » de la fiche d'un objet, déjà composée.
-struct DatabaseFact {
-  std::string_view label;
-  std::string_view value;
-};
-
-// UN MONSTRE QUI LÂCHE L'OBJET, au taux réel déjà écrit.
-struct DatabaseDropperRow {
-  std::uint32_t monster_id = 0;
-  std::string_view name;
-  std::uint8_t rank = 0;
-  std::string_view rate;
-  bool mvp_reward = false;
-};
-
-// « VENDU CHEZ » : le Marché, interrogé sur les boutiques de PNJ.
-enum class DatabaseSellersPhase : std::uint8_t {
-  // Personne à qui demander : hors ligne.
-  kOffline,
-  // La demande est partie, ou partira à l'ouverture de l'onglet.
-  kAsking,
-  kReady,
-  // Le serveur a refusé — trop tôt après une autre demande : « Réessayer ».
-  kRefused,
-};
-
-struct DatabaseSellerRow {
-  std::string_view npc;
-  std::string_view place;
-  std::string_view price;
-};
-
-struct DatabaseItemView {
-  std::uint32_t item_id = 0;
-  std::string_view name;
-  SkinImage icon;
-  std::span<const DatabaseFact> facts;
-  // LA DESCRIPTION QUE LE JEU MONTRE, son aperçu tel quel ; nulle sans table.
-  const DescriptionView* description = nullptr;
-  // Les scripts du serveur, bruts ; vides s'il n'en a pas.
-  std::string_view script;
-  std::string_view equip_script;
-  std::string_view unequip_script;
-  std::span<const DatabaseDropperRow> droppers;
-  DatabaseSellersPhase sellers_phase = DatabaseSellersPhase::kOffline;
-  std::string_view sellers_status;
-  std::span<const DatabaseSellerRow> sellers;
-  // Le catalogue du vote shop, pour le menu de l'objet.
-  std::span<const VoteShopOffer> vote_shop;
-};
-
-// Vrai quand la fiche de cet objet porte cet onglet.
-[[nodiscard]] bool DatabaseItemTabShown(DatabaseItemTab tab, const DatabaseItemView& view);
-
 struct DatabaseView {
   // La base se lit encore : la première ouverture.
   bool loading = false;
@@ -279,23 +226,23 @@ struct DatabaseView {
   // Les résultats de l'onglet montré, et ce qu'en dit le pied.
   std::span<const DatabaseRowView> rows;
   std::string_view summary;
-  // La fiche montrée : l'une ou l'autre, ou aucune.
-  const DatabaseItemView* item = nullptr;
+  // La fiche montrée : l'une ou l'autre, ou aucune. Celle d'un objet est LA
+  // fiche de la fenêtre de description (`DrawItemSheetBody`).
+  const DescriptionView* item = nullptr;
   const MonsterSheetView* monster = nullptr;
+  // Le catalogue du vote shop, pour le menu d'une ligne de la liste.
+  std::span<const VoteShopOffer> vote_shop;
 };
 
 struct DatabaseAnswer {
-  // « Marché » : le Marché s'ouvre sur cet objet ; zéro sinon.
-  std::uint32_t market_item = 0;
-  // L'onglet « Vendu chez » est montré : la demande au Marché peut partir. Elle
-  // n'attend que lui, pour qu'une fiche feuilletée ne coûte rien au serveur.
-  bool sellers_shown = false;
-  // « Réessayer » de « Vendu chez ».
-  bool ask_sellers = false;
-  // « Y aller » vers ce rang des vendeurs ; négatif sinon.
-  int go_to_seller = -1;
-  // Un geste sur l'objet de la fiche — sa description, son lien, son menu.
-  ChatLinkAsk item;
+  // Ce que la fiche d'un objet a demandé — les mêmes demandes que dans la
+  // fenêtre de description, que `app` route de même. ⚠ Un lien vers un AUTRE
+  // objet y a déjà été suivi : la base a visité sa fiche.
+  DescriptionWindowAction item;
+  // LES GESTES DE TOUT OBJET OU DE TOUT MONSTRE, sur une ligne de la liste :
+  // Maj + clic, le menu du clic droit, Ctrl + clic droit, et le survol. Le
+  // clic simple, lui, visite la ligne.
+  ChatLinkAsk list;
   // Les gestes de la fiche de monstre, que `app` route comme ceux de la
   // fenêtre de monstre.
   MonsterSheetAnswer monster;

@@ -1601,6 +1601,7 @@ add_executable(moonclient
     game/game_zone_move.cpp
     game/game_view_equip.cpp
     game/game_database.cpp
+    game/game_item_sheet.cpp
     game/game_monster_sheet.cpp
     game/game_craft_atlas.cpp
     game/game_navigation.cpp

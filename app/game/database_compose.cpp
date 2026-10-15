@@ -19,8 +19,6 @@ namespace moonclient {
 namespace {
 
 constexpr std::size_t kLineBytes = 96;
-// Les centièmes de pour cent d'un pour cent.
-constexpr std::uint32_t kHundredthsPerPercent = 100;
 // Le poids se compte en dixièmes.
 constexpr std::uint32_t kTenths = 10;
 // LES FORMULES D'AVANT LA REFONTE que le serveur applique à un monstre au
@@ -168,12 +166,20 @@ std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
   return lines;
 }
 
-std::string DropRateText(std::uint32_t rate_hundredths) {
-  std::array<char, kLineBytes> text{};
-  std::snprintf(text.data(), text.size(), "%u,%02u %%",
-                static_cast<unsigned>(rate_hundredths / kHundredthsPerPercent),
-                static_cast<unsigned>(rate_hundredths % kHundredthsPerPercent));
-  return text.data();
+DropperRows DropperRowsOf(const ro::vfs::ServerDb& db, std::uint32_t item_id) {
+  DropperRows rows;
+  for (const ro::vfs::ItemDropper& dropper : db.DroppersOf(item_id)) {
+    const ro::vfs::ServerMonster* const monster = db.FindMonster(dropper.monster_id);
+    const std::uint8_t rank = monster != nullptr ? monster->rank : ro::vfs::kServerMonsterOrdinary;
+    const ro::ui::DescriptionDropRow row{
+        .monster_id = dropper.monster_id,
+        .name = monster != nullptr ? std::string_view(monster->name) : std::string_view(),
+        .boss_rank = rank,
+        .mvp_reward = dropper.mvp_reward,
+        .rate_hundredths = dropper.rate_hundredths};
+    (rank == ro::vfs::kServerMonsterOrdinary ? rows.ordinary : rows.boss).push_back(row);
+  }
+  return rows;
 }
 
 ro::vfs::ItemSearch ItemSearchOf(const ro::ui::DatabaseFilters& filters, std::string_view text) {
