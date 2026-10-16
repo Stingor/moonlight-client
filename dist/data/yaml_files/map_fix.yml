@@ -34,11 +34,4 @@
 #  retouchée.
 # ─────────────────────────────────────────────────────────────────────────────
 version: 1
-maps:
-  gonryun:
-    models:
-      - index: 879
-        file: '외부소품\나무다리.rsm'
-        origin: [50.279, -52.445, -492.465]
-        position: [50.279, -55, -492.465]
-        why: "La tête de pont sud enfonce ses planches dans l'herbe entre ses poteaux, comme dans le client d'origine. Remontée de 2,5 unités, elle montre ses planches entières et se raccorde au reste du pont."
+maps: {}
