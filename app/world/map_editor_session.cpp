@@ -496,10 +496,10 @@ void MapEditorSession::Save(MapEditStore& store) {
   }
   const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
   for (std::size_t slot = 0; slot < lights.size(); ++slot) {
-    if (lights[slot].why.empty()) {
+    if (lights[slot].why.empty() || !(lights[slot].range > 0.0F)) {
       Line refused{};
       std::snprintf(refused.data(), refused.size(),
-                    ro::core::Tr("La lumière %zu n'a pas de raison."), slot);
+                    ro::core::Tr("La lumière %zu n'a pas de raison, ou pas de portée."), slot);
       status_ = refused.data();
       return;
     }

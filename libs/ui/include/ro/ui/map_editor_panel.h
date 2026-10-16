@@ -216,6 +216,8 @@ struct MapEditorPanelState {
   // La raison de la lumière réglée, et la lumière dont c'est la saisie.
   std::array<char, kWhyCapacity> light_why{};
   std::optional<std::size_t> light_why_of;
+  // On tape dans ce champ : le document ne le recharge pas sous les doigts.
+  bool light_why_typing = false;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

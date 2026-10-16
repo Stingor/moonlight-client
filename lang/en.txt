@@ -18754,8 +18754,8 @@ tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+4
 fr: Ajouter une lumière
 tr: Add a light
 
-fr: La lumière %zu n'a pas de raison.
-tr: Light %zu has no reason.
+fr: La lumière %zu n'a pas de raison, ou pas de portée.
+tr: Light %zu has no reason, or no range.
 
 fr: La nuit seulement
 tr: Only at night

@@ -77,9 +77,8 @@ class ModelRenderer {
   //
   // 🔴 UN MODÈLE QUI N'A PAS CHANGÉ GARDE SES TAMPONS : même fichier, même
   // variante, mêmes sommets déplacés et mêmes images, il a le même maillage ; et
-  // mêmes poses figées, la même cuisson. L'éditeur de carte retéléverse le décor
-  // à chaque image d'un glissé, où une seule pose bouge : tout recuire coûtait
-  // l'image entière.
+  // mêmes poses figées, la même cuisson. Retéléverser un décor dont une seule
+  // pose bouge ne recuit donc que son lot.
   //
   // 🔴 LES TEXTURES SE PARTAGENT PAR NOM, ET SURVIVENT D'UN TÉLÉVERSEMENT À
   // L'AUTRE : un nom désigne toujours le même fichier de l'archive, donc la même

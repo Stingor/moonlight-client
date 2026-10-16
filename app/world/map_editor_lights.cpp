@@ -4,6 +4,7 @@
 // règle depuis le panneau ; chaque geste compte dans l'historique, un glissé
 // au relâcher seulement.
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <optional>
@@ -21,10 +22,14 @@ namespace {
 constexpr std::size_t kLabelCapacity = 192;
 // UNE LUMIÈRE NEUVE : une lanterne. Sa hauteur au-dessus du point visé — un y
 // négatif monte, dans le RSW —, sa portée en unités du RSW (cinq carreaux du
-// sol) et sa couleur chaude ; elle ne s'allume qu'à la nuit.
+// sol) et sa couleur chaude. Elle brille aussitôt, de jour comme de nuit : on
+// la voit en la posant.
 constexpr float kNewLightHeight = 15.0F;
 constexpr float kNewLightRange = 50.0F;
 constexpr std::array<float, 3> kNewLightColor{1.0F, 0.85F, 0.6F};
+// La plus petite portée qu'une lumière garde : le document refuse une portée
+// nulle, et la relecture rejetterait tout le document avec elle.
+constexpr float kSmallestLightRange = 0.5F;
 
 ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light) {
   return ro::ui::MapEditorLight{.position = light.position,
@@ -92,7 +97,7 @@ MapEditorSession::Outcome MapEditorSession::AddLight(MapEditStore& store) {
       .position = {drop_point_[0], drop_point_[1] - kNewLightHeight, drop_point_[2]},
       .color = kNewLightColor,
       .range = kNewLightRange,
-      .night_only = true,
+      .night_only = false,
       .why = {}});
   store.Set(map_name_, after);
   selected_light_ = after.lights().size() - 1;
@@ -110,7 +115,9 @@ MapEditorSession::Outcome MapEditorSession::SetLight(const ro::ui::map_editor::S
     gesture_before_ = before;
   }
   ro::mapedit::MapEdit after = before;
-  after.SetLight(set.slot, DocumentLight(set.light));
+  ro::mapedit::AddedLight light = DocumentLight(set.light);
+  light.range = std::max(light.range, kSmallestLightRange);
+  after.SetLight(set.slot, std::move(light));
   if (!(after == before)) {
     store.Set(map_name_, after);
   }

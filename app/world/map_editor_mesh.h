@@ -43,7 +43,7 @@ class RsmCache {
 // LE CONTEXTE DE L'OUTIL SOMMETS, rebâti seulement quand ce qui le fait
 // change : le modèle désigné, sa pose, ou la retouche de maillage qu'il dessine.
 // Le rebâtir copie le fichier, lui applique l'édition et pose tous ses nœuds :
-// à chaque image, c'était le prix de l'outil.
+// trop cher pour chaque image.
 class VertexContextCache {
  public:
   // Vrai quand le contexte a changé depuis l'appel précédent.

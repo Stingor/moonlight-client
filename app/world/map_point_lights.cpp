@@ -6,9 +6,11 @@ namespace moonclient {
 
 ro::render::PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
                                          const ro::render::MapEffectFrame& frame,
-                                         glm::vec3 daylight, glm::vec3 eye) {
-  const float brightest = std::max({daylight.r, daylight.g, daylight.b});
-  const float night = 1.0F - std::clamp(brightest, 0.0F, 1.0F);
+                                         const ro::render::SceneLight& sky, bool always_night,
+                                         glm::vec3 eye) {
+  const glm::vec3 day = sky.daylight * sky.tint;
+  const float brightest = std::max({day.r, day.g, day.b});
+  const float night = always_night ? 1.0F : 1.0F - std::clamp(brightest, 0.0F, 1.0F);
   std::vector<ro::render::PointLight> placed;
   placed.reserve(lights.size());
   for (const ro::mapedit::AddedLight& light : lights) {

@@ -34,8 +34,7 @@ ro::render::SkyLight Game::SkyOfFrame(std::uint32_t now_ms) {
   if (!Rights().staff_tools || !clock.forced) {
     // LE CYCLE DU JOUEUR, en plein air : l'heure qu'il fait sur le serveur. Un
     // intérieur, une caverne ou un donjon n'a ni soleil ni lune.
-    const bool closed = camera_rig_.limits().rules.indoor ||
-                        (stage_.has_value() && closed_maps_.Closes(stage_->name));
+    const bool closed = MapClosedToSky();
     if (settings_->options().graphics().day_night_cycle() && !closed) {
       if (const std::optional<float> hour =
               ServerSkyHour(shell_.server_time_zone(), std::chrono::system_clock::now());
@@ -112,6 +111,11 @@ void Game::ShadeVoid(const ro::render::SkyLight& sky) {
                                                            : ro::render::kSunAngularRadiusDegrees),
                          sky.moon, aspect_ratio_);
   }
+}
+
+bool Game::MapClosedToSky() const {
+  return camera_rig_.limits().rules.indoor ||
+         (stage_.has_value() && closed_maps_.Closes(stage_->name));
 }
 
 }  // namespace moonclient

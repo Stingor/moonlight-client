@@ -169,8 +169,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // la caméra regarde : voir docs/adr/0119.
   const ro::render::PointLightSet points = MapPointLights(
       map_edits_.Document(stage_->name).lights(),
-      ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
-      sky.light.daylight, camera_.look_at);
+      ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}, sky.light,
+      MapClosedToSky(), camera_.look_at);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());
@@ -253,7 +253,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
         unit_light.tint = sky.light.tint;
         unit_light.daylight = sky.light.daylight;
         ground_unit_models_.Draw(camera_, unit_light, aspect_ratio_, ro::render::ModelStages(),
-                                 &ground_units_->Advance(world_, now_ms), fog);
+                                 &ground_units_->Advance(world_, now_ms), fog, nullptr,
+                                 ro::render::SunShadowView(), points);
         break;
       }
     }

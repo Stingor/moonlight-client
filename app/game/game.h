@@ -279,6 +279,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // voir `StaffSkyClock` —, sinon à l'heure du serveur quand le joueur veut le
   // cycle jour/nuit. Fait avancer l'heure de l'établi quand elle tourne.
   [[nodiscard]] ro::render::SkyLight SkyOfFrame(std::uint32_t now_ms);
+  // La carte est-elle fermée au ciel — intérieur, ou citée par closed_maps.yml ?
+  [[nodiscard]] bool MapClosedToSky() const;
   // Assombrit le vide sous le monde de ce que l'heure retire, puis y peint
   // l'astre à sa vraie place : voir `VoidShade`. Rien sans ciel à l'heure.
   void ShadeVoid(const ro::render::SkyLight& sky);

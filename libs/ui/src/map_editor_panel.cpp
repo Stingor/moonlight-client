@@ -57,6 +57,10 @@ constexpr float kLightMarkerPixels = 7.0F;
 // Les pas des glissières d'une lumière : sa portée, et sa couleur.
 constexpr float kLightRangeStep = 0.5F;
 constexpr float kLightColorStep = 0.01F;
+// Leurs bornes : une portée reste positive — le document refuse une portée
+// nulle —, une couleur ni négative ni plus de quatre fois la pleine intensité.
+constexpr float kLightRangeMax = 2000.0F;
+constexpr float kLightColorMax = 4.0F;
 
 // La hauteur de l'arbre de la scène, en lignes : au-delà, il défile.
 constexpr float kTreeRows = 12.0F;
@@ -353,13 +357,17 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
                                0.0F, "%.3f");
   released |= ImGui::IsItemDeactivatedAfterEdit();
   changed |= ImGui::DragFloat3(core::Tr("Couleur"), set.light.color.data(), kLightColorStep, 0.0F,
-                               0.0F, "%.2f");
+                               kLightColorMax, "%.2f", ImGuiSliderFlags_AlwaysClamp);
   released |= ImGui::IsItemDeactivatedAfterEdit();
-  changed |= ImGui::DragFloat(core::Tr("Portée"), &set.light.range, kLightRangeStep,
-                              kLightRangeStep, 0.0F, "%.1f");
+  changed |=
+      ImGui::DragFloat(core::Tr("Portée"), &set.light.range, kLightRangeStep, kLightRangeStep,
+                       kLightRangeMax, "%.1f", ImGuiSliderFlags_AlwaysClamp);
   released |= ImGui::IsItemDeactivatedAfterEdit();
   const bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
-  if (panel.light_why_of != view.selected_light) {
+  const std::string_view typed(panel.light_why.data(),
+                               strnlen(panel.light_why.data(), panel.light_why.size()));
+  if (panel.light_why_of != view.selected_light ||
+      (!panel.light_why_typing && typed != set.light.why)) {
     panel.light_why.fill('\0');
     const std::size_t kept = std::min(set.light.why.size(), panel.light_why.size() - 1);
     std::copy_n(set.light.why.begin(), kept, panel.light_why.begin());
@@ -367,6 +375,7 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   }
   static_cast<void>(
       ImGui::InputText(core::Tr("Pourquoi"), panel.light_why.data(), panel.light_why.size()));
+  panel.light_why_typing = ImGui::IsItemActive();
   if (ImGui::IsItemDeactivatedAfterEdit()) {
     set.light.why = std::string(panel.light_why.data(),
                                 strnlen(panel.light_why.data(), panel.light_why.size()));
