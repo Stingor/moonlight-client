@@ -47,22 +47,6 @@ constexpr int kOpaqueAlpha = 255;
 // La place de l'alpha dans une teinte RGBA.
 constexpr std::size_t kTintAlpha = 3;
 
-// Les reculs de désignation, en unités du monde — les marges que le client
-// ajoute à la profondeur des rectangles cliquables, par genre.
-constexpr float kNonPlayerPickBias = 100.0F;
-constexpr float kMonsterPickBias = 200.0F;
-// UN FAMILIER CÈDE LE PIXEL À UN MONSTRE, et le prend encore à son maître : qui
-// chasse vise le monstre derrière son pet, et qui veut son pet le trouve
-// par-dessus lui-même. L'écart de cent avec le monstre dépasse ce qui sépare en
-// profondeur deux acteurs voisins à l'écran.
-constexpr float kCompanionPickBias = 300.0F;
-constexpr float kPlayerPickBias = 400.0F;
-// UN MONSTRE QUI AGONISE RECULE AU-DELÀ DE TOUT ce que la caméra peut voir :
-// il ne prend le pixel que si personne d'autre ne le tient. Un monstre vivant
-// posé sur la case d'un mort reste donc désignable, quel que soit le plus
-// proche de l'œil.
-constexpr float kCorpsePickBias = 1.0e6F;
-
 // L'ALPHA D'UNE PLANTE D'HALLUCINATION, que son propre gestionnaire de messages
 // pose : cent quatre-vingts, et non la pleine opacité.
 constexpr std::uint8_t kHallucinationAlpha = 180;
@@ -255,27 +239,6 @@ std::uint32_t AgonyStartMs(ro::render::ActorWardrobe* wardrobe, const ro::sim::W
   return 0;
 }
 
-float PickBiasOf(const ro::sim::Actor& actor) {
-  // ⚠ L'AGONIE D'UN MONSTRE SEUL — son cadavre, lui, ne se désigne plus : un
-  // joueur mort doit rester désignable, on le vise pour le relever.
-  if (actor.kind == ro::sim::ActorKind::kMonster && actor.posture == ro::sim::Posture::kDead) {
-    return kCorpsePickBias;
-  }
-  if (actor.familiar != ro::sim::Familiar::kNone) {
-    return kCompanionPickBias;
-  }
-  switch (actor.kind) {
-    case ro::sim::ActorKind::kPlayer:
-      return kPlayerPickBias;
-    case ro::sim::ActorKind::kMonster:
-      return kMonsterPickBias;
-    case ro::sim::ActorKind::kNonPlayer:
-      return kNonPlayerPickBias;
-    default:
-      return 0.0F;
-  }
-}
-
 glm::vec2 BodyJitter(std::uint32_t actor_id, std::uint32_t now_ms, float amplitude_pixels) {
   if (!(amplitude_pixels > 0.0F)) {
     return {0.0F, 0.0F};
@@ -406,7 +369,7 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
         const ro::sim::FractionalCell cell =
             ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
         const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
-        KeepPointPick(scene_id, glm::vec3(ground[0], ground[1], ground[2]), kNonPlayerPickBias,
+        KeepPointPick(scene_id, glm::vec3(ground[0], ground[1], ground[2]), PickBiasOf(actor),
                       scene.drawn, scene.ids);
       }
       ++census.without_sprite;

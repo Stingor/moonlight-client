@@ -86,4 +86,13 @@ void KeepWarp(std::uint32_t actor_id, const glm::vec3& ground_position,
 void KeepPointPick(std::uint32_t actor_id, const glm::vec3& ground_position, float pick_bias,
                    std::vector<ro::render::DrawnActor>& drawn, std::vector<std::uint32_t>& ids);
 
+// De combien un acteur RECULE quand plusieurs se disputent le pixel cliqué, en
+// unités du monde : la marge que le client ajoute à la profondeur du rectangle
+// de chacun selon son genre — cent pour un PNJ, deux cents pour un monstre, deux cent cinquante
+// pour un objet au sol, trois cents pour un familier, quatre cents pour un joueur. Un joueur planté
+// sur un marchand ne l'empêche donc pas de vendre, ni un monstre sur un joueur de se faire frapper,
+// ni un pet sur un monstre de le chasser, ni un tas de butin sur un monstre de le viser. Un monstre
+// mort recule derrière tout le reste.
+[[nodiscard]] float PickBiasOf(const ro::sim::Actor& actor);
+
 }  // namespace moonclient

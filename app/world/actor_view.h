@@ -110,15 +110,6 @@ struct GroundUnitPick;
                                                           ro::render::SpriteLayout layout,
                                                           std::uint32_t posed_ms);
 
-// De combien un acteur RECULE quand plusieurs se disputent le pixel cliqué, en
-// unités du monde : la marge que le client ajoute à la profondeur du rectangle
-// de chacun selon son genre — cent pour un PNJ, deux cents pour un monstre, trois cents pour un
-// familier, quatre cents pour un joueur. Un joueur planté sur un marchand ne l'empêche donc pas de
-// vendre, ni un monstre sur un joueur de se faire frapper, ni un pet sur un monstre de le chasser.
-// Rien pour un objet au sol : petit, il passe devant tout. Un monstre mort recule derrière tout le
-// reste.
-[[nodiscard]] float PickBiasOf(const ro::sim::Actor& actor);
-
 // LE TREMBLEMENT D'UN CORPS à cette image, en pixels de sprite.
 //
 // La table dit l'AMPLITUDE, le tirage se fait ici : `render` doit rester sans
