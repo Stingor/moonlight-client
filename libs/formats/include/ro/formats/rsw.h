@@ -192,9 +192,6 @@ class RswScene {
   // du fichier. Un rang hors de la liste ne repose rien.
   void PlaceModel(std::size_t model_index, const std::array<float, 3>& position,
                   const std::array<float, 3>& rotation, const std::array<float, 3>& scale) noexcept;
-  // Retire les modèles de ces rangs, comptés dans la liste d'AVANT le retrait :
-  // les suivants remontent. Un rang hors de la liste est ignoré.
-  void RemoveModels(std::span<const std::size_t> model_indices);
   [[nodiscard]] const std::vector<RswSound>& sounds() const noexcept { return sounds_; }
   [[nodiscard]] const RswObjectCounts& object_counts() const noexcept { return object_counts_; }
   // Vide quand le fichier n'en porte pas, ou quand la liste d'objets n'a pas pu

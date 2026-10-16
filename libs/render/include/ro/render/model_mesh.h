@@ -194,7 +194,12 @@ struct ModelPlaybackGroup {
   std::int32_t animation_type = 0;
   float animation_speed = 1.0F;
   std::vector<glm::mat4> transforms;
+  // Le rang de chaque pose dans le RSW, dans l'ordre de `transforms`.
+  std::vector<std::size_t> rsw_ranks;
 };
+
+// Le rang d'une pose qui ne vient pas d'un RSW.
+inline constexpr std::size_t kNoRswRank = static_cast<std::size_t>(-1);
 
 // Un modèle prêt à dessiner, et les poses où il apparaît.
 //
@@ -210,8 +215,12 @@ struct ModelInstances {
   // la même image. Une ville cite jusqu'à 43 % de ses textures deux fois ou
   // plus — morocc, 256 citations pour 146 fichiers.
   std::vector<std::shared_ptr<const formats::Image>> textures;
+  // Le fichier .rsm, tel que le RSW le cite : en CP949.
+  std::string rsm_file;
   // Les poses FIGÉES, dessinées d'un seul maillage.
   std::vector<glm::mat4> transforms;
+  // Le rang de chaque pose figée dans le RSW, dans l'ordre de `transforms`.
+  std::vector<std::size_t> rsw_ranks;
   // Vide tant que le modèle n'a rien qui bouge.
   ModelRig rig;
   // Les poses qui s'animent, par façon de jouer. Leur matrice de pose est
@@ -234,7 +243,8 @@ struct ModelInstances {
 // Elle s'anime si le .rsw le DEMANDE, si le modèle a un nœud qui tourne, ET si
 // son cran n'est pas nul : une horloge de vitesse 0,01 ne bouge jamais chez le
 // natif, et la dessiner nœud par nœud ne montrerait rien de plus.
+// `rsw_rank` est le rang de la pose dans son RSW.
 bool AddInstance(ModelInstances& instances, const glm::mat4& instance,
-                 const formats::RswModel& placement);
+                 const formats::RswModel& placement, std::size_t rsw_rank = kNoRswRank);
 
 }  // namespace ro::render

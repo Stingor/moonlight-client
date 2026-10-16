@@ -131,6 +131,7 @@ add_library(ro_render STATIC
     src/ground_unit_pose.cpp
     src/model_bake.cpp
     src/model_mesh.cpp
+    src/model_pick.cpp
     src/model_pose.cpp
     src/model_sight.cpp
     src/model_veil.cpp

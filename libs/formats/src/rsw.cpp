@@ -334,23 +334,4 @@ void RswScene::PlaceModel(std::size_t model_index, const std::array<float, 3>& p
   }
 }
 
-void RswScene::RemoveModels(std::span<const std::size_t> model_indices) {
-  std::vector<bool> removed(models_.size(), false);
-  for (const std::size_t index : model_indices) {
-    if (index < removed.size()) {
-      removed[index] = true;
-    }
-  }
-  std::size_t kept = 0;
-  for (std::size_t index = 0; index < models_.size(); ++index) {
-    if (!removed[index]) {
-      if (kept != index) {
-        models_[kept] = std::move(models_[index]);
-      }
-      ++kept;
-    }
-  }
-  models_.resize(kept);
-}
-
 }  // namespace ro::formats

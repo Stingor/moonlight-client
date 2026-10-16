@@ -123,9 +123,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     shell_.KeepAlive();
   };
 
-  auto first_map =
-      LoadMapStage(*vfs_, map_name,
-                   ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look()));
+  // LES RETOUCHES DE CARTE, avant la première : voir `LoadMapFixFile`.
+  map_fixes_ = LoadMapFixFile(client_root_, *vfs_);
+  auto first_map = LoadMapStage(
+      *vfs_, map_name,
+      ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look()), &map_fixes_);
   if (!first_map) {
     return std::unexpected(first_map.error());
   }

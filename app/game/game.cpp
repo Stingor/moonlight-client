@@ -151,6 +151,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   if (auto followed = FollowGreyWorldRelief(); !followed) {
     return followed;
   }
+  // LES RETOUCHES DE L'ÉTABLI, sur le décor de cette image : voir game_map_fix.cpp.
+  ServeMapFixEditor();
   camera_rig_.SetBounded(!(windows_.staff_tools.look.free_camera && Rights().staff_tools));
   camera_rig_.SetExpandedZoom(settings_->options().expanded_zoom());
   // Après le suivi, la secousse et la veille : l'œil de cette image.
@@ -305,6 +307,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .no_ctrl = settings_->options().no_ctrl(),
                 .shop_one_click = settings_->options().shops().one_click(),
                 .bench = &effect_bench_,
+                .map_fix = Rights().staff_tools ? &windows_.staff_tools.map_fix : nullptr,
                 .chat_dispatch = &*chat_dispatch_,
                 .scene_actors = &scene_actors_,
                 .mouse = &mouse_,

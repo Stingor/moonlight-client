@@ -757,6 +757,7 @@ target_include_directories(moonclient_portraitoptions PUBLIC ${CMAKE_CURRENT_SOU
 add_library(moonclient_graphics STATIC
     options/graphics_options.cpp
     world/closed_maps.cpp
+    world/map_fix_file.cpp
     world/scene_graphics.cpp
     world/server_sky_hour.cpp)
 
@@ -1597,6 +1598,7 @@ add_executable(moonclient
     game/game_draw.cpp
     game/game_sky.cpp
     game/game_grey_world.cpp
+    game/game_map_fix.cpp
     game/game_map_effects.cpp
     game/over_world_layer.cpp
     game/game_cursor.cpp

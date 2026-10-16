@@ -3069,8 +3069,8 @@ tr: too many connections from this address
 fr: un membre de l'équipe a déconnecté ce compte
 tr: a staff member disconnected this account
 
-fr: À midi, c'est la lumière que la carte déclare. Le soleil se lève à 6 h et se couche à 18 h ; la lune prend la nuit, plus faible et bleutée.
-tr: At noon, it is the light the map declares. The sun rises at 6:00 and sets at 18:00; the moon takes the night, dimmer and bluish.
+fr: Le soleil se lève et se couche aux heures que règle la course des astres ; la lune prend la nuit, plus faible et bleutée.
+tr: The sun rises and sets at the hours the celestial course sets; the moon takes the night, dimmer and bluish.
 
 fr: Échec du GIF
 tr: GIF failed
@@ -18618,3 +18618,57 @@ tr: Element:
 
 fr: Étourdissement
 tr: Stun
+
+fr: Aucun modèle désigné.
+tr: No model selected.
+
+fr: Aucun modèle sous le clic.
+tr: No model under the click.
+
+fr: Chaque retouche vérifie le rang, le fichier et la position d'origine du modèle : une carte changée par un patch n'est pas retouchée de travers.
+tr: Each fix checks the model's rank, file and original position: a map changed by a patch is never fixed the wrong way.
+
+fr: Cliquez sur un modèle…
+tr: Click a model…
+
+fr: Désigne un modèle du décor d'un clic, puis règle sa position, sa rotation et son échelle : le décor se repose aussitôt. Une case le masque.
+tr: Select a scenery model with a click, then adjust its position, rotation and scale: the scenery is rebuilt at once. A checkbox hides it.
+
+fr: Désigner d'un clic
+tr: Select with a click
+
+fr: Enregistrer les retouches
+tr: Save the fixes
+
+fr: La retouche du rang %zu n'a pas de raison.
+tr: The fix of rank %zu has no reason.
+
+fr: Masquer
+tr: Hide
+
+fr: Origine
+tr: Origin
+
+fr: Pourquoi
+tr: Why
+
+fr: Retouches de carte
+tr: Map fixes
+
+fr: Retouches enregistrées.
+tr: Fixes saved.
+
+fr: Rotation (°)
+tr: Rotation (°)
+
+fr: Rétablir le modèle
+tr: Restore the model
+
+fr: « Enregistrer » écrit data/yaml_files/map_fix.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
+tr: “Save” writes data/yaml_files/map_fix.yml in the client folder. Visuals only: walking stays the server's.
+
+fr: « Pourquoi » est obligatoire : la table refuse une retouche sans raison.
+tr: “Why” is required: the table refuses a fix without a reason.
+
+fr: Échelle
+tr: Scale

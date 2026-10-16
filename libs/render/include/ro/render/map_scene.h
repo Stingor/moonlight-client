@@ -54,7 +54,13 @@ enum class SceneTextureKey : std::uint8_t { kGroundAndDecor, kEffect };
 // qui évite que le second réécrive le chargement du premier.
 struct MapScene {
   formats::GndMap gnd;
+  // Le RSW, retouches du staff posées.
   formats::RswScene rsw;
+  // Ses modèles tels que le fichier les pose, avant toute retouche : ce que
+  // l'établi rétablit, et la position d'origine qu'une retouche vérifie.
+  std::vector<formats::RswModel> unfixed_models;
+  // Les rangs des modèles que les retouches masquent, croissants.
+  std::vector<std::size_t> hidden_models;
   LightmapAtlas atlas;
   TerrainMesh terrain;
   std::vector<formats::Image> terrain_textures;
@@ -154,5 +160,13 @@ struct MapSceneOptions {
 
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                                   const MapSceneOptions& options = {});
+
+// REPOSE LE DÉCOR DE `scene` SELON `fixes`, sans relire la carte : les modèles
+// reprennent leur placement d'origine, les retouches se posent, et les poses se
+// recalculent sur les maillages déjà chargés. C'est ce qui rend la retouche en
+// direct immédiate. Un modèle que la carte n'a pas pu lire ne revient pas.
+//
+// À téléverser ensuite au renderer, comme au chargement.
+MapFixReport ReplaceSceneModels(MapScene& scene, const MapFixes& fixes);
 
 }  // namespace ro::render

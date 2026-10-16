@@ -49,10 +49,13 @@ std::string WindowTitle(bool names_shown, const ro::sim::World& world) {
 }
 
 ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
-                                        bool flatten_relief) {
+                                        bool flatten_relief, const ro::render::MapFixTable* fixes) {
   const std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
-  auto scene = ro::render::LoadMapScene(
-      vfs, map_name, ro::render::MapSceneOptions{.flatten_relief = flatten_relief});
+  ro::render::MapSceneOptions options{.flatten_relief = flatten_relief};
+  if (fixes != nullptr) {
+    options.fixes = fixes->FixesOf(map_name);
+  }
+  auto scene = ro::render::LoadMapScene(vfs, map_name, options);
   if (!scene) {
     return std::unexpected(scene.error());
   }
@@ -177,7 +180,8 @@ ro::core::Result<void> EnterAnnouncedMap(const MapArrival& arrival) {
   }
   *arrival.attempted = arrival.world->map_name();
 
-  auto arrived = LoadMapStage(*arrival.vfs, *arrival.attempted, arrival.flatten_relief);
+  auto arrived =
+      LoadMapStage(*arrival.vfs, *arrival.attempted, arrival.flatten_relief, arrival.map_fixes);
   if (!arrived) {
     // ⚠ CE QUI RESTE À L'ÉCRAN : on rend un succès juste après, sans toucher à la
     // scène. Le client garde donc la géométrie de la carte PRÉCÉDENTE pendant
@@ -218,7 +222,8 @@ ro::core::Result<bool> ReloadStageRelief(const MapArrival& arrival) {
   // ⚠ LA DEMANDE EST NOTÉE AVANT LA LECTURE, succès ou non : un échec ne se
   // retente pas à chaque image.
   arrival.stage->flatten_asked = arrival.flatten_relief;
-  auto reread = LoadMapStage(*arrival.vfs, arrival.stage->name, arrival.flatten_relief);
+  auto reread =
+      LoadMapStage(*arrival.vfs, arrival.stage->name, arrival.flatten_relief, arrival.map_fixes);
   if (!reread) {
     ro::core::LogError("carte {} : {} — le relief reste celui d'avant", arrival.stage->name,
                        ro::core::Describe(reread.error()));

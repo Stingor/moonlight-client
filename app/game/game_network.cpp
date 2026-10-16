@@ -301,8 +301,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     const std::string left_map = stage_->name;
     const bool flatten =
         ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look());
-    const MapArrival arrival{&*vfs_,  &*stage_, &planner_,    &world_,         &terrain_,
-                             &water_, &models_, &background_, &attempted_map_, flatten};
+    const MapArrival arrival{&*vfs_,   &*stage_,     &planner_,       &world_, &terrain_,  &water_,
+                             &models_, &background_, &attempted_map_, flatten, &map_fixes_};
     if (auto entered = EnterAnnouncedMap(arrival); !entered) {
       return std::unexpected(entered.error());
     }

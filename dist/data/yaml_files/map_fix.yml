@@ -8,6 +8,9 @@
 #
 #  Le visuel seulement : la marchabilité (GAT) n'est jamais touchée.
 #
+#  Écrite par l'établi du staff (section « Retouches de carte ») ; elle se
+#  relit et se corrige aussi à la main.
+#
 #  maps : carte (son nom, sans extension) ->
 #    models : les retouches de modèles du RSW, chacune :
 #      index    : le rang du modèle dans le RSW, compté à partir de zéro ;
@@ -37,8 +40,5 @@ maps:
       - index: 879
         file: '외부소품\나무다리.rsm'
         origin: [50.279, -52.445, -492.465]
-        position: [50.279, -55.0, -492.465]
-        why: >-
-          La tête de pont sud enfonce ses planches dans l'herbe entre ses
-          poteaux, comme dans le client d'origine. Remontée de 2,5 unités,
-          elle montre ses planches entières et se raccorde au reste du pont.
+        position: [50.279, -55, -492.465]
+        why: "La tête de pont sud enfonce ses planches dans l'herbe entre ses poteaux, comme dans le client d'origine. Remontée de 2,5 unités, elle montre ses planches entières et se raccorde au reste du pont."

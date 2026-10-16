@@ -86,6 +86,7 @@
 #include "world/graffiti_view.h"
 #include "world/ground_unit_view.h"
 #include "world/item_drops.h"
+#include "world/map_fix_file.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
 #include "world/monster_sheet.h"
@@ -288,6 +289,10 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void DrawMapEffects();
   // Le relief suit GreyWorld, relu sur place : voir `ReloadStageRelief`.
   [[nodiscard]] ro::core::Result<void> FollowGreyWorldRelief();
+  // LA RETOUCHE DES MODÈLES EN DIRECT : voir game_map_fix.cpp.
+  void ServeMapFixEditor();
+  void ReplaceMapModels();
+  void SaveMapFixes(ro::ui::StaffMapFixEditor& editor);
   void DrawInterface(std::uint32_t now_ms);
 
   // ── L'INTERFACE, PAR FAMILLE DE FENÊTRES ──────────────────────────────────
@@ -505,6 +510,13 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   bool sky_zone_unknown_reported_ = false;
   // Les cartes où le cycle jour/nuit ne s'applique pas : voir `ClosedMaps`.
   ClosedMaps closed_maps_;
+  // La table de retouches de carte que l'établi tient : voir `LoadMapFixFile`.
+  ro::render::MapFixTable map_fixes_;
+  // Elle diffère du fichier enregistré.
+  bool map_fixes_unsaved_ = false;
+  // Le modèle dont l'établi montre les valeurs, et sa carte.
+  std::optional<std::size_t> map_fix_loaded_rank_;
+  std::string map_fix_loaded_map_;
   ro::render::DrawableSize size_{};
   float aspect_ratio_ = 1.0F;
   glm::vec2 mouse_{0.0F, 0.0F};

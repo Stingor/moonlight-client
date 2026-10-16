@@ -115,8 +115,9 @@ std::vector<WaterAnimation> LoadWaterAnimations(vfs::Vfs& vfs, const WaterPlane&
 // instances pour 62 fichiers. Charger par instance multiplierait le travail par
 // vingt pour un résultat identique.
 std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswScene& rsw,
-                                            const formats::GndMap& gnd, MapScene& scene) {
+                                            MapScene& scene) {
   std::map<std::string, ModelInstances> by_file;
+  std::set<std::string> unreadable_files;
   std::set<std::string> missing_textures;
   // LES TEXTURES, LUES UNE FOIS PAR NOM pour toute la carte, et leur échec
   // retenu comme leur succès.
@@ -126,22 +127,27 @@ std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswSce
   // fois.
   std::map<std::string, std::shared_ptr<const formats::Image>> read_textures;
 
+  // ⚠ UN MODÈLE MASQUÉ SE LIT AUSSI : l'établi peut le démasquer sans relire
+  // la carte.
   for (const formats::RswModel& placement : rsw.models()) {
-    auto entry = by_file.find(placement.model_name);
-    if (entry == by_file.end()) {
+    if (by_file.contains(placement.model_name) || unreadable_files.contains(placement.model_name)) {
+      continue;
+    }
+    {
       // ReadRaw : le nom vient du RSW, donc c'est déjà du CP949.
       auto bytes = vfs.ReadRaw("data\\model\\" + placement.model_name);
       if (!bytes) {
-        ++scene.unreadable_models;
+        unreadable_files.insert(placement.model_name);
         continue;
       }
       auto model = formats::RsmModel::Parse(*bytes);
       if (!model) {
-        ++scene.unreadable_models;
+        unreadable_files.insert(placement.model_name);
         continue;
       }
 
       ModelInstances instances;
+      instances.rsm_file = placement.model_name;
       instances.mesh = BuildModelMesh(*model);
       instances.rig = BuildModelRig(*model, instances.mesh);
       instances.rsm_version = model->version();
@@ -160,18 +166,7 @@ std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswSce
         }
         instances.textures.push_back(kept->second);
       }
-      entry = by_file.emplace(placement.model_name, std::move(instances)).first;
-    }
-
-    const glm::mat4 instance = ModelInstanceMatrix(placement, gnd.width(), gnd.height(),
-                                                   entry->second.mesh, entry->second.rsm_version);
-    if (!IsInstanceOnMap(instance, gnd.width(), gnd.height())) {
-      ++scene.off_map_instances;
-      continue;
-    }
-    ++scene.model_instance_count;
-    if (AddInstance(entry->second, instance, placement)) {
-      ++scene.animated_instance_count;
+      by_file.emplace(placement.model_name, std::move(instances));
     }
   }
 
@@ -185,7 +180,59 @@ std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswSce
   return models;
 }
 
+// Pose les modèles du RSW de `scene` sur les maillages chargés : une pose par
+// modèle, sauf les masqués, ceux dont le fichier manque et ceux posés hors de
+// la carte. Les poses d'avant s'effacent, et les compteurs se refont.
+void PlaceSceneInstances(MapScene& scene) {
+  std::map<std::string_view, std::size_t> by_file;
+  for (std::size_t index = 0; index < scene.models.size(); ++index) {
+    ModelInstances& instances = scene.models[index];
+    by_file.emplace(instances.rsm_file, index);
+    instances.transforms.clear();
+    instances.rsw_ranks.clear();
+    instances.animated.clear();
+  }
+  scene.unreadable_models = 0;
+  scene.off_map_instances = 0;
+  scene.model_instance_count = 0;
+  scene.animated_instance_count = 0;
+  const std::vector<formats::RswModel>& placements = scene.rsw.models();
+  for (std::size_t rank = 0; rank < placements.size(); ++rank) {
+    const formats::RswModel& placement = placements[rank];
+    const auto found = by_file.find(placement.model_name);
+    if (found == by_file.end()) {
+      ++scene.unreadable_models;
+      continue;
+    }
+    if (std::ranges::binary_search(scene.hidden_models, rank)) {
+      continue;
+    }
+    ModelInstances& instances = scene.models[found->second];
+    const glm::mat4 instance = ModelInstanceMatrix(placement, scene.gnd.width(), scene.gnd.height(),
+                                                   instances.mesh, instances.rsm_version);
+    if (!IsInstanceOnMap(instance, scene.gnd.width(), scene.gnd.height())) {
+      ++scene.off_map_instances;
+      continue;
+    }
+    ++scene.model_instance_count;
+    if (AddInstance(instances, instance, placement, rank)) {
+      ++scene.animated_instance_count;
+    }
+  }
+}
+
 }  // namespace
+
+MapFixReport ReplaceSceneModels(MapScene& scene, const MapFixes& fixes) {
+  for (std::size_t rank = 0; rank < scene.unfixed_models.size(); ++rank) {
+    const formats::RswModel& original = scene.unfixed_models[rank];
+    scene.rsw.PlaceModel(rank, original.position, original.rotation, original.scale);
+  }
+  MapFixReport report = ApplyMapFixes(fixes, scene.rsw);
+  scene.hidden_models = report.hidden;
+  PlaceSceneInstances(scene);
+  return report;
+}
 
 std::string GroundFilePath(const vfs::ResNameTable& res_names, const formats::RswScene& rsw,
                            std::string_view map_name) {
@@ -207,7 +254,8 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
     return std::unexpected(rsw.error());
   }
   // LES RETOUCHES DU STAFF, sur les données lues et avant tout le reste : voir
-  // map_fix.h.
+  // map_fix.h. Le placement d'origine se garde pour l'établi.
+  std::vector<formats::RswModel> unfixed_models = rsw->models();
   const MapFixReport fixed =
       ApplyMapFixes(options.fixes.has_value() ? *options.fixes : LoadMapFixes(vfs, map_name), *rsw);
   for (const std::string& refusal : fixed.refused) {
@@ -233,6 +281,8 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   MapScene scene{
       .gnd = std::move(*gnd),
       .rsw = std::move(*rsw),
+      .unfixed_models = std::move(unfixed_models),
+      .hidden_models = fixed.hidden,
       .atlas = std::move(atlas),
       .light = light,
   };
@@ -263,7 +313,8 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   //
   // ⚠ SAUF SUR UN RELIEF APLATI : voir `MapSceneOptions::flatten_relief`.
   if (!scene.relief_level.has_value()) {
-    scene.models = LoadSceneModels(vfs, scene.rsw, scene.gnd, scene);
+    scene.models = LoadSceneModels(vfs, scene.rsw, scene);
+    PlaceSceneInstances(scene);
   }
   // LA TABLE DES EFFETS DE LA CARTE.
   scene.effect_table = LoadMapEffectTable(vfs, map_name);

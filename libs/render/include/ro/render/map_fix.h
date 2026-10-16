@@ -51,11 +51,15 @@ struct ModelFix {
   bool hidden = false;
   // Pourquoi : la table refuse une retouche qui ne le dit pas.
   std::string why;
+
+  friend bool operator==(const ModelFix&, const ModelFix&) = default;
 };
 
-// Les retouches d'une carte.
+// Les retouches d'une carte, rangées par rang de modèle.
 struct MapFixes {
   std::vector<ModelFix> models;
+
+  friend bool operator==(const MapFixes&, const MapFixes&) = default;
 };
 
 class MapFixTable {
@@ -70,6 +74,17 @@ class MapFixTable {
 
   [[nodiscard]] std::size_t map_count() const noexcept { return by_map_.size(); }
 
+  // Pose `fix` parmi les retouches de `map_name` : elle remplace celle qui vise
+  // le même rang, ou prend sa place dans l'ordre des rangs.
+  void SetModelFix(std::string_view map_name, ModelFix fix);
+  // Retire la retouche du rang `model_index` de `map_name`. Une carte qui n'en
+  // a plus quitte la table.
+  void RemoveModelFix(std::string_view map_name, std::size_t model_index);
+
+  // LE TEXTE DE LA TABLE, en-tête compris, tel que `Parse` le relit à
+  // l'identique : c'est ce que l'établi enregistre.
+  [[nodiscard]] std::string ToYaml() const;
+
  private:
   std::map<std::string, MapFixes, std::less<>> by_map_;
 };
@@ -79,15 +94,21 @@ class MapFixTable {
 struct MapFixReport {
   std::size_t applied = 0;
   std::vector<std::string> refused;
+  // Les rangs des modèles à ne pas dessiner, croissants.
+  std::vector<std::size_t> hidden;
 };
 
-// Pose `fixes` sur `rsw`. Toutes les cibles se vérifient sur le RSW d'ORIGINE :
-// les modèles masqués ne se retirent qu'après, sans décaler les rangs que les
-// autres retouches désignent.
+// Pose `fixes` sur `rsw`, dont chaque cible se vérifie. Un modèle masqué RESTE
+// dans le RSW, à son rang : il va dans `MapFixReport::hidden`, et le décor ne
+// le dessine pas. Les rangs du RSW restent ainsi ceux du fichier, que l'établi
+// désigne.
 [[nodiscard]] MapFixReport ApplyMapFixes(const MapFixes& fixes, formats::RswScene& rsw);
 
-// Les retouches de `map_name` lues dans l'installation. Une table absente ou
-// illisible n'en donne aucune, et le dit au journal.
+// La table de l'installation. Absente ou illisible, elle est vide, et le
+// journal le dit.
+[[nodiscard]] MapFixTable ReadMapFixTable(vfs::Vfs& vfs);
+
+// Les retouches de `map_name` dans la table de l'installation.
 [[nodiscard]] MapFixes LoadMapFixes(vfs::Vfs& vfs, std::string_view map_name);
 
 }  // namespace ro::render

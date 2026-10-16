@@ -3,8 +3,10 @@
 #include <optional>
 #include <string>
 
+#include "ro/core/i18n.h"
 #include "ro/net/action.h"
 #include "ro/render/actor_pick.h"
+#include "ro/render/model_pick.h"
 #include "ro/sim/world.h"
 
 #include "game/chat_room_stage.h"
@@ -317,6 +319,18 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   // juger une figure, ce qui ne demande rien au serveur.
   if (to.bench->Click(*to.effects, *to.effect_nodes, *to.world, *to.stage, *to.planner, pointer,
                       window.width, window.height, to.now_ms)) {
+    return;
+  }
+  // LA RETOUCHE DE CARTE ARMÉE désigne le modèle sous le clic, et rien d'autre.
+  if (to.map_fix != nullptr && to.map_fix->picking && window.height > 0.0F) {
+    to.map_fix->picking = false;
+    const ro::render::ScreenRay ray =
+        ro::render::MakeScreenRay(*to.camera, window.width / window.height, pointer.x, pointer.y,
+                                  window.width, window.height);
+    to.map_fix->model_index = ro::render::PickSceneModel(to.stage->scene, ray);
+    to.map_fix->status = to.map_fix->model_index.has_value()
+                             ? std::string()
+                             : ro::core::Tr("Aucun modèle sous le clic.");
     return;
   }
   if (!to.link->is_open() || to.chat_room_form_open) {

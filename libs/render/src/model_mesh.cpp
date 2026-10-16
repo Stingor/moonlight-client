@@ -459,7 +459,7 @@ std::vector<TextureMotion> RigTextureMotions(const ModelRig& rig, float frame) {
 }
 
 bool AddInstance(ModelInstances& instances, const glm::mat4& instance,
-                 const formats::RswModel& placement) {
+                 const formats::RswModel& placement, std::size_t rsw_rank) {
   // La seconde famille compte en millisecondes : aucune vitesse admise par le
   // .rsw n'y fige un objet, contrairement au cran tronqué de la première.
   const bool requested =
@@ -472,6 +472,7 @@ bool AddInstance(ModelInstances& instances, const glm::mat4& instance,
                                     instances.rig.animation_length));
   if (!played) {
     instances.transforms.push_back(instance);
+    instances.rsw_ranks.push_back(rsw_rank);
     return false;
   }
   const auto group =
@@ -480,9 +481,11 @@ bool AddInstance(ModelInstances& instances, const glm::mat4& instance,
                candidate.animation_speed == placement.animation_speed;
       });
   if (group == instances.animated.end()) {
-    instances.animated.push_back({placement.animation_type, placement.animation_speed, {instance}});
+    instances.animated.push_back(
+        {placement.animation_type, placement.animation_speed, {instance}, {rsw_rank}});
   } else {
     group->transforms.push_back(instance);
+    group->rsw_ranks.push_back(rsw_rank);
   }
   return true;
 }

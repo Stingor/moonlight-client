@@ -4,6 +4,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdio>
+#include <format>
+#include <string>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
@@ -116,8 +118,8 @@ constexpr std::array<const char*, 4> kSkyHelp = {
     core::TrText("Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor "
                  "suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée "
                  "dans Graphics."),
-    core::TrText("À midi, c'est la lumière que la carte déclare. Le soleil se lève à 6 h et se "
-                 "couche à 18 h ; la lune prend la nuit, plus faible et bleutée."),
+    core::TrText("Le soleil se lève et se couche aux heures que règle la course des astres ; "
+                 "la lune prend la nuit, plus faible et bleutée."),
     core::TrText("Seul ce client voit ce ciel : rien ne part au serveur."),
     core::TrText("Rien n'est retenu : chaque lancement rend le ciel de la carte."),
 };
@@ -172,6 +174,73 @@ constexpr float kMostAzimuthOffsetDegrees = 180.0F;
 constexpr float kLowestNoonAltitudeDegrees = 5.0F;
 constexpr float kHighestNoonAltitudeDegrees = 90.0F;
 constexpr float kLatestSunriseHour = 12.0F;
+
+constexpr std::array<const char*, 4> kMapFixHelp = {
+    core::TrText("Désigne un modèle du décor d'un clic, puis règle sa position, sa rotation et "
+                 "son échelle : le décor se repose aussitôt. Une case le masque."),
+    core::TrText("Chaque retouche vérifie le rang, le fichier et la position d'origine du modèle : "
+                 "une carte changée par un patch n'est pas retouchée de travers."),
+    core::TrText("« Pourquoi » est obligatoire : la table refuse une retouche sans raison."),
+    core::TrText("« Enregistrer » écrit data/yaml_files/map_fix.yml dans le dossier du client. "
+                 "Le visuel seulement : la marche reste celle du serveur."),
+};
+
+// Le pas des glissières, par pixel de souris : en unités du RSW, en degrés, et
+// en facteur d'échelle.
+constexpr float kMapFixPositionStep = 0.05F;
+constexpr float kMapFixRotationStep = 0.5F;
+constexpr float kMapFixScaleStep = 0.005F;
+
+// LES RETOUCHES DE CARTE : désigner un modèle, le régler, enregistrer.
+void DrawMapFix(StaffMapFixEditor& editor, const SkinArt& art) {
+  ImGui::SeparatorText(core::Tr("Retouches de carte"));
+  if (SkinButton(
+          editor.picking ? core::Tr("Cliquez sur un modèle…") : core::Tr("Désigner d'un clic"),
+          art)) {
+    editor.picking = !editor.picking;
+  }
+  ImGui::SameLine();
+  SkinHelpMarker(core::Tr("Retouches de carte"), kMapFixHelp);
+  // LES RETOUCHES DE LA CARTE, à désigner d'un clic dans la liste : c'est le
+  // seul moyen de retrouver un modèle masqué.
+  for (const std::size_t rank : editor.fixed_models) {
+    ImGui::SameLine();
+    const std::string label = std::to_string(rank);
+    if (ImGui::SmallButton(label.c_str())) {
+      editor.model_index = rank;
+      editor.picking = false;
+    }
+  }
+  if (!editor.model_index.has_value()) {
+    ImGui::TextDisabled("%s", core::Tr("Aucun modèle désigné."));
+  } else {
+    ImGui::TextUnformatted(
+        std::format("{} {} — {}", core::Tr("Rang"), *editor.model_index, editor.model_file)
+            .c_str());
+    ImGui::TextDisabled("%s", std::format("{} {:.3f} {:.3f} {:.3f}", core::Tr("Origine"),
+                                          editor.origin[0], editor.origin[1], editor.origin[2])
+                                  .c_str());
+    static_cast<void>(ImGui::DragFloat3(core::Tr("Position"), editor.position.data(),
+                                        kMapFixPositionStep, 0.0F, 0.0F, "%.3f"));
+    static_cast<void>(ImGui::DragFloat3(core::Tr("Rotation (°)"), editor.rotation.data(),
+                                        kMapFixRotationStep, 0.0F, 0.0F, "%.2f"));
+    static_cast<void>(ImGui::DragFloat3(core::Tr("Échelle"), editor.scale.data(), kMapFixScaleStep,
+                                        0.0F, 0.0F, "%.3f"));
+    static_cast<void>(SkinCheckBox(core::Tr("Masquer"), &editor.hidden, art));
+    static_cast<void>(ImGui::InputText(core::Tr("Pourquoi"), editor.why.data(), editor.why.size()));
+    if (SkinButton(core::Tr("Rétablir le modèle"), art)) {
+      editor.revert_asked = true;
+    }
+  }
+  ImGui::BeginDisabled(!editor.unsaved);
+  if (SkinButton(core::Tr("Enregistrer les retouches"), art)) {
+    editor.save_asked = true;
+  }
+  ImGui::EndDisabled();
+  if (!editor.status.empty()) {
+    ImGui::TextDisabled("%s", editor.status.c_str());
+  }
+}
 
 // LA COURSE DES ASTRES : voir `render::SkyCourse`.
 void DrawSkyCourse(StaffToolsLook& look, const SkinArt& art) {
@@ -376,6 +445,7 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
   DrawSky(state.sky, state.look.sky_course_tuned ? state.look.sky_course : render::SkyCourse(),
           art);
   DrawSkyCourse(state.look, art);
+  DrawMapFix(state.map_fix, art);
   DrawSound(state, art);
   DrawPicking(state.look.picking, art);
   DrawDebugConsole(state, art);
