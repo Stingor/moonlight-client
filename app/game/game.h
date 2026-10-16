@@ -22,12 +22,14 @@
 #include "ro/render/effect_catalog.h"
 #include "ro/render/gl_context.h"
 #include "ro/render/screen_tint.h"
+#include "ro/render/sky_clock.h"
 #include "ro/sim/character_ledger.h"
 #include "ro/sim/pending_action.h"
 #include "ro/sim/pickup_intent.h"
 #include "ro/sim/player_config.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world.h"
+#include "ro/ui/staff_tools.h"
 #include "ro/vfs/vfs.h"
 
 #include "afk/afk_screen.h"
@@ -79,6 +81,7 @@
 #include "world/actor_talk.h"
 #include "world/actor_view.h"
 #include "world/click_action.h"
+#include "world/closed_maps.h"
 #include "world/entity_menu.h"
 #include "world/graffiti_view.h"
 #include "world/ground_unit_view.h"
@@ -254,6 +257,28 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // Le monde, en trois dimensions puis en coordonnées d'écran. Rend ce que la
   // souris désigne : la forme du curseur en dépend.
   [[nodiscard]] ro::core::Result<void> DrawWorld(std::uint32_t now_ms);
+  // L'OMBRE DU SOLEIL est-elle de l'image : la page « Graphics » la demande, la
+  // carte est en plein air — voir `SunShadowsApply` —, et sa carte a pu naître.
+  [[nodiscard]] bool SunShadowsAsked(const ro::render::TerrainStages& stages) const;
+  // LES ACTEURS DE L'IMAGE, composés dans `scene_actors_` AVANT toute peinture :
+  // leur silhouette entre dans l'ombre du soleil, qui précède le sol. Sous le
+  // soleil, ils prennent la lumière posée sans l'ombre cuite, et perdent leur
+  // ombre ronde. Rien sans garde-robe.
+  void ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tuning, bool sun_shadows);
+  // L'OMBRE DU SOLEIL de l'image, peinte quand `asked` : le sol, le décor, les
+  // acteurs composés, `carts` et les acteurs en modèle. Sans elle, une vue
+  // vide, qui n'ombre rien.
+  [[nodiscard]] ro::render::SunShadowView DrawSunShadowIfAsked(
+      bool asked, bool models_shown, std::span<const ro::render::DrawnActor> carts,
+      const ro::render::SkyLight& sky);
+  // LE CIEL DE L'IMAGE : la lumière de la carte, teintée par la nuit du
+  // serveur, et placée à l'heure que l'établi impose quand il en impose une —
+  // voir `StaffSkyClock` —, sinon à l'heure du serveur quand le joueur veut le
+  // cycle jour/nuit. Fait avancer l'heure de l'établi quand elle tourne.
+  [[nodiscard]] ro::render::SkyLight SkyOfFrame(std::uint32_t now_ms);
+  // Assombrit le vide sous le monde de ce que l'heure retire, puis y peint
+  // l'astre à sa vraie place : voir `VoidShade`. Rien sans ciel à l'heure.
+  void ShadeVoid(const ro::render::SkyLight& sky);
   // Lève le ciel animé de la carte une fois le joueur là, puis le retire ou le rend selon
   // GreyWorld. Sans effet sur les quatre cartes sur cinq qui n'en ont pas.
   void RaiseMapSky(std::uint32_t now_ms);
@@ -474,6 +499,12 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   ro::render::Camera camera_;
   CameraAim aim_;
   CameraRig camera_rig_;
+  // L'image précédente, pour l'heure du ciel qui tourne : voir `SkyOfFrame`.
+  std::optional<std::uint32_t> last_sky_ms_;
+  // Le fuseau du serveur s'est révélé inconnu : dit une fois au journal.
+  bool sky_zone_unknown_reported_ = false;
+  // Les cartes où le cycle jour/nuit ne s'applique pas : voir `ClosedMaps`.
+  ClosedMaps closed_maps_;
   ro::render::DrawableSize size_{};
   float aspect_ratio_ = 1.0F;
   glm::vec2 mouse_{0.0F, 0.0F};

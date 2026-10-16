@@ -8,7 +8,9 @@
 #include "ro/render/model_renderer.h"
 #include "ro/render/scene_post_process.h"
 #include "ro/render/sprite_renderer.h"
+#include "ro/render/sun_shadow_map.h"
 #include "ro/render/terrain_renderer.h"
+#include "ro/render/void_shade.h"
 #include "ro/render/water_renderer.h"
 
 namespace moonclient {
@@ -24,6 +26,13 @@ class GameRendering {
  protected:
   // ── LE RENDU ───────────────────────────────────────────────────────────────
   ro::render::TerrainRenderer terrain_;
+  // LA CARTE D'OMBRE DU SOLEIL, créée la première fois qu'on la demande.
+  // `sun_map_refused_` retient un échec : il ne se retente pas à chaque image.
+  ro::render::SunShadowMap sun_map_;
+  bool sun_map_refused_ = false;
+  // LE VIDE SOUS LE MONDE, assombri par l'heure ; créé à la première nuit.
+  ro::render::VoidShade void_shade_;
+  bool void_shade_refused_ = false;
   // LE MONDE PEINT À PART, repeint à travers la page « Graphics ».
   ro::render::ScenePostProcess scene_post_;
   // LA NAPPE D'EAU. Vide sur une carte qui n'en a pas, et elle ne dessine alors

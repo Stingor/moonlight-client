@@ -8,6 +8,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/render/actor_pick.h"
+#include "ro/render/sky_clock.h"
 #include "ro/ui/quick_cast_look.h"
 #include "ro/ui/skin_art.h"
 
@@ -134,9 +135,38 @@ struct StaffToolsLook {
   // LES ZONES CLIQUABLES, et ce qui les règle. Voir `pick_boxes.h` et
   // `PickTuningOf`.
   PickTuningLook picking;
+  // LA COURSE DES ASTRES, réglée sur ce client quand `sky_course_tuned` : elle
+  // vaut pour l'heure forcée comme pour le cycle jour/nuit. Retenue, à la
+  // différence de l'heure : elle ne change que sous la main du staff.
+  bool sky_course_tuned = false;
+  render::SkyCourse sky_course;
 
   // Engendrée : un champ ajouté entre de lui-même dans le relevé.
   friend bool operator==(const StaffToolsLook&, const StaffToolsLook&) = default;
+};
+
+// LE CIEL DE L'ÉTABLI : l'heure du soleil et de la lune, forcée sur CE client
+// seulement. Voir `render::SkyLightAt`.
+//
+// ⚠ PAS DANS `look` : rien n'est retenu, et chaque lancement rend le ciel de la
+// carte. Une heure qui tourne changerait aussi le fichier à chaque image.
+struct StaffSkyClock {
+  // LES VITESSES PROPOSÉES, en minutes du ciel par minute réelle : du temps réel
+  // à cinq jours par minute. Une liste, et non un curseur : d'un bout à l'autre
+  // il y a un facteur sept mille, et un curseur linéaire ne saurait plus
+  // s'arrêter sur le temps réel.
+  static constexpr std::array<int, 9> kMinutesPerMinute = {1, 2, 5, 10, 30, 60, 240, 1440, 7200};
+  // Quatre heures par minute : une journée en six minutes.
+  static constexpr int kDefaultSpeedRank = 6;
+
+  bool forced = false;
+  float hour = render::kNoonHour;
+  // Le temps tourne tout seul, à la vitesse de rang `speed_rank`.
+  bool running = false;
+  int speed_rank = kDefaultSpeedRank;
+
+  // Les heures du ciel qui passent par minute réelle, au rang choisi.
+  [[nodiscard]] float HoursPerMinute() const noexcept;
 };
 
 // Ce que le joueur a réglé, et qui doit survivre d'une image à la suivante.
@@ -147,6 +177,7 @@ struct StaffToolsState {
   // d'options : l'établi les montre aussi. Elle descend avant le dessin et
   // remonte après, comme `look`.
   QuickCastLook quick_cast;
+  StaffSkyClock sky;
   // LES BRUITAGES SONNENT-ILS ? Posé par l'appelant avant le dessin : l'établi
   // ne connaît pas l'audio.
   //

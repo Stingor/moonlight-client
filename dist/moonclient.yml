@@ -16,6 +16,10 @@ servers:
 # Le service web du serveur (emblèmes de guilde). Sans schéma, c'est du http.
 web: moonlight-destiny.fr:8888
 
+# Le fuseau horaire du serveur, au nom de la base des fuseaux : le cycle
+# jour/nuit se cale sur l'heure qu'il fait là-bas. Absent : Europe/Paris.
+server_time_zone: Europe/Paris
+
 # Les archives du jeu, par priorité DÉCROISSANTE : la première l'emporte. Des
 # noms relatifs à ce dossier. C'est cette liste, et elle seule, que le client
 # monte. Une archive absente est passée.

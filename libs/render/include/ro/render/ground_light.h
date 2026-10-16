@@ -44,7 +44,16 @@ struct GroundLight {
 // du sol de plus de deux unités et demie — un pont, un toit —, la lightmap du
 // dessous ne la concerne pas : l'ombre d'une rive ne doit pas noircir qui
 // traverse le pont au-dessus.
-[[nodiscard]] GroundLight BuildGroundLight(const formats::GndMap& gnd, const formats::GatMap& gat);
+//
+// `terms` peut écarter l'ombre cuite et ne garder que la couleur posée : c'est
+// la lumière des acteurs quand l'ombre du soleil remplace celle de la carte.
+enum class GroundLightTerms : std::uint8_t {
+  kShadowAndLaidLight,
+  kLaidLightOnly,
+};
+[[nodiscard]] GroundLight BuildGroundLight(
+    const formats::GndMap& gnd, const formats::GatMap& gat,
+    GroundLightTerms terms = GroundLightTerms::kShadowAndLaidLight);
 
 // Une teinte d'acteur prise dans cette lumière : le rouge, le vert et le bleu
 // multipliés par les facteurs de sa cellule, l'alpha intact.

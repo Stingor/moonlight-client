@@ -1,5 +1,6 @@
 #include "ro/render/sprite_billboard.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace ro::render {
@@ -18,6 +19,58 @@ BillboardBasis MakeBillboardBasis(const Camera& camera) {
   basis.up = glm::cross(basis.right, forward);
   basis.forward = forward;
   return basis;
+}
+
+BillboardBasis ShadowPanelBasis(const glm::vec3& toward_sun, const BillboardBasis& facing_camera) {
+  constexpr glm::vec3 world_up{0.0F, 1.0F, 0.0F};
+  BillboardBasis basis;
+  basis.right = facing_camera.right;
+  basis.forward = glm::cross(world_up, basis.right);
+  basis.up = world_up;
+  // En dessous, la trace du soleil au sol est trop courte pour dire une
+  // direction : l'ombre tombe sous les pieds, quelle que soit la face.
+  constexpr float kShortestGroundTrace = 1e-3F;
+  const glm::vec3 ground_trace(toward_sun.x, 0.0F, toward_sun.z);
+  if (glm::length(ground_trace) < kShortestGroundTrace) {
+    return basis;
+  }
+  const glm::vec3 sun_way = glm::normalize(ground_trace);
+  const float facing = glm::dot(basis.forward, sun_way);
+  if (std::abs(facing) >= kShadowPanelMinimumSunFacing) {
+    return basis;
+  }
+  // Le panneau tourne juste assez pour montrer au soleil la part minimale de
+  // sa largeur, du côté où il penchait déjà.
+  const glm::vec3 across_sun = glm::cross(world_up, sun_way);
+  const float toward_side = facing < 0.0F ? -1.0F : 1.0F;
+  const float across_side = glm::dot(basis.forward, across_sun) < 0.0F ? -1.0F : 1.0F;
+  const float across_share =
+      std::sqrt(1.0F - (kShadowPanelMinimumSunFacing * kShadowPanelMinimumSunFacing));
+  basis.forward = (sun_way * (toward_side * kShadowPanelMinimumSunFacing)) +
+                  (across_sun * (across_side * across_share));
+  basis.right = glm::normalize(glm::cross(basis.forward, world_up));
+  // LA DROITE DU PANNEAU RESTE DU CÔTÉ DE CELLE DE L'ÉCRAN : la silhouette
+  // portée ne se retourne pas.
+  if (glm::dot(basis.right, facing_camera.right) < 0.0F) {
+    basis.right = -basis.right;
+    basis.forward = -basis.forward;
+  }
+  return basis;
+}
+
+glm::vec3 ShadowFootShift(float sunk_height, const BillboardBasis& facing_camera) {
+  const float missing = (kShadowFootOverlapPixels / kSpritePixelsPerWorldUnit) - sunk_height;
+  const glm::vec3 ground_forward(facing_camera.forward.x, 0.0F, facing_camera.forward.z);
+  // Une caméra qui regarde à la verticale n'a pas de devant : le haut de
+  // l'écran n'y désigne aucun recul au sol.
+  constexpr float kShortestGroundForward = 1e-3F;
+  if (missing <= 0.0F || glm::length(ground_forward) < kShortestGroundForward) {
+    return glm::vec3(0.0F);
+  }
+  // Un pas de la hauteur de l'écran, vu sous une plongée `dive`, couvre au sol
+  // `1 / dive` dans l'axe du regard.
+  const float dive = std::max(-facing_camera.forward.y, kShadowFootMinimumDive);
+  return glm::normalize(ground_forward) * (missing / dive);
 }
 
 std::array<glm::vec3, 4> BillboardCorners(const std::array<glm::vec2, 4>& quad_corners,

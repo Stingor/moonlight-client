@@ -90,6 +90,12 @@ bool DrawMinimapSettings(MinimapSettings& settings, const SkinArt& art) {
   SkinHelpMarker(
       core::Tr("Le nom lisible du lieu — « PvP : Room Copass » pour « pvp_n_3-5 ». "
                "Plus long que la minimap, il passe à la ligne."));
+  changed |=
+      SkinCheckBox(core::Tr("Afficher l'heure du serveur"), &settings.show_server_clock, art);
+  ImGui::SameLine();
+  SkinHelpMarker(
+      core::Tr("L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit "
+               "— et non celle de votre ordinateur."));
 
   ImGui::SeparatorText(core::Tr("Marqueurs"));
   changed |= SkinCheckBox(core::Tr("PNJ et commodités"), &settings.show_town, art);

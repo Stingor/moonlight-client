@@ -64,6 +64,9 @@ struct MinimapSettings {
   bool show_coords = true;
   // Le nom LISIBLE du lieu, replié sur la largeur de la carte.
   bool show_map_name = true;
+  // L'HEURE QU'IL FAIT SUR LE SERVEUR, « HH:MM », sous la carte. Éteinte par
+  // défaut : le client d'origine n'en montre pas.
+  bool show_server_clock = false;
   bool show_party = true;
   bool show_guild = true;
   bool show_quests = true;

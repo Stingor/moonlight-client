@@ -17,6 +17,9 @@ tr: %.*s — nivel %d
 fr: %.0f s
 tr: %.0f s
 
+fr: %02d h %02d — %s
+tr: %02d:%02d — %s
+
 fr: %c ou %s champ de bataille
 tr: %c o %s campo de batalla
 
@@ -200,6 +203,63 @@ fr: %s a été placé dans la fenêtre d'échange d'équipement.
 tr: %s se ha colocado en la ventana de intercambio de equipo.
 fr: %s a été retiré de la fenêtre d'échange d'équipement.
 tr: %s se ha retirado de la ventana de intercambio de equipo.
+fr: 1 h / min
+tr: 1 h / min
+
+fr: 1 jour / min
+tr: 1 día / min
+
+fr: 10 min / min
+tr: 10 min / min
+
+fr: 2 min / min
+tr: 2 min / min
+
+fr: 30 min / min
+tr: 30 min / min
+
+fr: 4 h / min
+tr: 4 h / min
+
+fr: 5 jours / min
+tr: 5 días / min
+
+fr: 5 min / min
+tr: 5 min / min
+
+fr: Afficher l'heure du serveur
+tr: Mostrar la hora del servidor
+
+fr: Balayage (°)
+tr: Barrido (°)
+
+fr: Ciel
+tr: Cielo
+
+fr: Coucher (h)
+tr: Ocaso (h)
+
+fr: Cycle jour/nuit
+tr: Ciclo día/noche
+
+fr: Décalage d'azimut (°)
+tr: Desfase de acimut (°)
+
+fr: Décochée, c'est la course tirée de la lumière de la carte.
+tr: Desmarcada, es el recorrido sacado de la luz del mapa.
+
+fr: Faire tourner le temps
+tr: Hacer correr el tiempo
+
+fr: Forcer l'heure du ciel
+tr: Forzar la hora del cielo
+
+fr: Hauteur de midi (°)
+tr: Altura de mediodía (°)
+
+fr: Hauteur de midi imposée
+tr: Forzar la altura de mediodía
+
 fr: Il n'y a aucun équipement à échanger.
 tr: No hay ningún objeto que reemplazar.
 fr: Impossible de ranger cet item dans la fenêtre d'échange.
@@ -898,6 +958,51 @@ tr: Añade todo lo que se puede vender; la tienda se cerrará tras la venta, que
 
 fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente.
 tr: Añade todo lo que se puede vender; la tienda se cerrará tras la venta.
+
+fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
+tr: La hora que es en el servidor, la que sigue el ciclo día/noche — y no la de tu ordenador.
+
+fr: Le sol et le décor reçoivent l'ombre du soleil de la carte, calculée à chaque image au lieu de celle que la carte a peinte : les arbres et les bâtiments s'ombrent aussi eux-mêmes. En plein air seulement.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
+tr: El suelo y el decorado reciben la sombra del sol del mapa, calculada en cada imagen en lugar de la que el mapa tiene pintada: los árboles y los edificios también se sombrean a sí mismos. Solo al aire libre.\n\nEl cliente original no la tiene, y la tarjeta gráfica trabaja más.
+
+fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres du soleil en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
+tr: El sol, y luego la luna, siguen la hora que es en el servidor: luz de la mañana, del mediodía y de la tarde, y luego una noche más oscura y azulada. Solo al aire libre.\n\nCon «Sombras del sol en tiempo real», las sombras giran con él. El cliente original mantiene la luz del mapa a cualquier hora.
+
+fr: Lever (h)
+tr: Salida (h)
+
+fr: Ombres du soleil en temps réel
+tr: Sombras del sol en tiempo real
+
+fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée dans Graphics.
+tr: Coloca el sol, o la luna, a la hora elegida: la luz del suelo y del decorado la sigue, y también las sombras cuando «Sombras del sol en tiempo real» está marcada en Graphics.
+
+fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
+tr: No se guarda nada: cada inicio devuelve el cielo del mapa.
+
+fr: Règle le chemin du soleil et de la lune dans le ciel : d'où ils viennent, à quelle hauteur ils culminent à midi, et quelle part de l'horizon ils balaient.
+tr: Ajusta el camino del sol y de la luna por el cielo: de dónde vienen, a qué altura culminan a mediodía y qué parte del horizonte barren.
+
+fr: Régler la course des astres
+tr: Ajustar el recorrido de los astros
+
+fr: Rétablir la course
+tr: Restablecer el recorrido
+
+fr: Serveur %.*s
+tr: Servidor %.*s
+
+fr: Seul ce client voit ce ciel : rien ne part au serveur.
+tr: Solo este cliente ve este cielo: nada se envía al servidor.
+
+fr: Temps réel (1 min / min)
+tr: Tiempo real (1 min / min)
+
+fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
+tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.
+
+fr: Vitesse du temps
+tr: Velocidad del tiempo
 
 fr: aucun morceau
 tr: ninguna pista
@@ -2952,14 +3057,23 @@ tr: el servidor aún mantiene la conexión anterior; vuelve a intentarlo en un m
 fr: le temps de jeu payé pour ce compte est épuisé
 tr: el tiempo de juego pagado de esta cuenta se ha agotado
 
+fr: lune
+tr: luna
+
 fr: quelqu'un vient de se connecter avec ce compte
 tr: alguien acaba de conectarse con esta cuenta
+
+fr: soleil
+tr: sol
 
 fr: trop de connexions depuis cette adresse
 tr: demasiadas conexiones desde esta dirección
 
 fr: un membre de l'équipe a déconnecté ce compte
 tr: un miembro del equipo desconectó esta cuenta
+
+fr: À midi, c'est la lumière que la carte déclare. Le soleil se lève à 6 h et se couche à 18 h ; la lune prend la nuit, plus faible et bleutée.
+tr: A mediodía, es la luz que declara el mapa. El sol sale a las 6:00 y se pone a las 18:00; la luna toma la noche, más tenue y azulada.
 
 fr: Échec du GIF
 tr: Error al crear el GIF

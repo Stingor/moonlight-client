@@ -64,6 +64,43 @@ inline constexpr float kSpriteStandingClearance = 2.5F;
 // personnages se coucheraient au sol vus de haut.
 [[nodiscard]] BillboardBasis MakeBillboardBasis(const Camera& camera);
 
+// La part minimale de sa largeur que le panneau d'ombre montre au soleil : le
+// cosinus de l'angle entre sa face et la trace du soleil au sol, ici 60°.
+inline constexpr float kShadowPanelMinimumSunFacing = 0.5F;
+
+// LE PANNEAU QUI PORTE L'OMBRE D'UN SPRITE : debout sur les pieds, et parallèle
+// à l'ÉCRAN. Son bord bas suit la ligne des pieds telle que la caméra la
+// montre, si bien que l'ombre portée est l'image du sprite cisaillée depuis
+// ses pieds. Quand le soleil rase ce plan, l'ombre se réduirait à un trait :
+// le panneau pivote alors autour de la verticale juste assez pour montrer au
+// soleil `kShadowPanelMinimumSunFacing` de sa largeur. Un soleil au zénith ne
+// donne aucune direction au sol, et le panneau reste parallèle à l'écran.
+[[nodiscard]] BillboardBasis ShadowPanelBasis(const glm::vec3& toward_sun,
+                                              const BillboardBasis& facing_camera);
+
+// DE COMBIEN LES PIEDS D'UN SPRITE RECOUVRENT LE DÉBUT DE SON OMBRE, en pixels
+// du sprite : ce qu'une image vue de face dessine sous son point d'ancrage
+// (six pixels pour un chevalier sur Peco, dix pour un épéiste).
+inline constexpr float kShadowFootOverlapPixels = 6.0F;
+// La plongée la plus faible dont on tient compte pour reculer une silhouette :
+// le sinus de l'angle sous l'horizon, une quinzaine de degrés. En deçà, un pas
+// de l'écran couvrirait au sol une distance sans fin.
+inline constexpr float kShadowFootMinimumDive = 0.25F;
+
+// LE RECUL QUI GLISSE L'OMBRE D'UN SPRITE SOUS SES PIEDS.
+//
+// Vu de face, un sprite dessine ses pieds sous son point d'ancrage : ils
+// recouvrent le début de son ombre, et il touche le sol. Vu de dos, la même
+// créature s'arrête souvent à l'ancrage, et l'ombre de ses jambes, trop fine,
+// laisse un vide entre les pieds et celle du corps : il paraît flotter.
+//
+// `sunk_height` est la profondeur, en unités du monde, du point le plus bas du
+// sprite sous son ancrage. Ce qui manque pour atteindre
+// `kShadowFootOverlapPixels` se rattrape en reculant le panneau d'ombre, à
+// l'opposé de la caméra, jusqu'au point du sol que l'écran montre d'autant
+// plus haut. Une image qui recouvre déjà son ombre ne bouge pas.
+[[nodiscard]] glm::vec3 ShadowFootShift(float sunk_height, const BillboardBasis& facing_camera);
+
 // L'ANGLE D'ÉCRAN D'UNE DIRECTION DU MONDE, en degrés, pour un sprite dont
 // l'image pointe vers le HAUT de l'écran au repos : de combien la tourner pour
 // qu'elle pointe le long de cette direction, telle que la caméra la montre.

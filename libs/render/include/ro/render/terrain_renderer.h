@@ -11,6 +11,7 @@
 #include "ro/render/gl_texture.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
+#include "ro/render/sun_shadow_map.h"
 #include "ro/render/terrain_mesh.h"
 
 namespace ro::render {
@@ -91,9 +92,17 @@ class TerrainRenderer {
 
   void Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
             const std::array<float, 4>& clear_color, const TerrainStages& stages = TerrainStages(),
-            const SceneFog& fog = SceneFog()) const;
+            const SceneFog& fog = SceneFog(), const SunShadowView& sun = SunShadowView()) const;
+
+  // LE SOL DANS LA CARTE D'OMBRE : sa seule profondeur, vue du soleil, sans
+  // effacer. Les carreaux transparents n'y portent pas d'ombre.
+  void DrawDepth(const glm::mat4& light_view_projection) const;
 
  private:
+  void DrawSurfaces(const glm::mat4& view_projection, const SceneLight& light,
+                    const TerrainStages& stages, const SceneFog& fog,
+                    const SunShadowView& sun) const;
+
   GlProgram program_;
   std::vector<GlTexture> textures_;
   // LE SEUIL DE DÉCOUPE de chaque texture, dans l'ordre de `textures_` : il

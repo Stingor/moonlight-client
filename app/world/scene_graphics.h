@@ -25,6 +25,13 @@ namespace moonclient {
 [[nodiscard]] ro::render::TerrainStages TerrainStagesOf(const GraphicsOptions& graphics,
                                                         bool lightmap_hidden);
 
+// L'OMBRE DU SOLEIL REMPLACE-T-ELLE CELLE DE LA CARTE : demandée, là où l'ombre
+// cuite se peindrait — `stages`, tels que les rend `TerrainStagesOf` —, hors du
+// sol uni, et en plein air. Un intérieur n'a pas de soleil, quoi que dise sa
+// lumière.
+[[nodiscard]] bool SunShadowsApply(const GraphicsOptions& graphics,
+                                   const ro::render::TerrainStages& stages, bool indoor);
+
 // LA LUMIÈRE DE LA CARTE SUR LES CORPS : le sol éclairé `ground` quand le
 // joueur garde les ombres de carte, aucun sinon ; la lumière froide comme sur
 // le terrain. `ailment_tints` est nul hors de la partie.

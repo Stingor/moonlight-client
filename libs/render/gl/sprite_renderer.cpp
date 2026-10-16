@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 
 #include "ro/render/fog_shader.h"
+#include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
 namespace {
@@ -38,6 +39,11 @@ layout(location = 3) in vec3 a_depth_position;
 layout(location = 4) in float a_fogged;
 // Ce qui s'ajoute à l'inverse de la distance à l'œil : voir `DrawnActor::depth_bias`.
 layout(location = 5) in float a_depth_bias;
+// LE POINT OÙ L'ACTEUR LIT L'OMBRE DU SOLEIL : ses pieds, posés au sol.
+layout(location = 6) in vec3 a_sun_anchor;
+// Le même sommet sur le panneau d'ombre de l'acteur : voir
+// `kSunShadowSpriteFragmentGlsl`.
+layout(location = 7) in vec3 a_sun_panel;
 
 uniform mat4 u_view_projection;
 // Ce que la profondeur normalisée gagne par unité d'inverse de distance : le
@@ -47,6 +53,15 @@ uniform float u_depth_per_inverse_distance;
 out vec2 v_texture_uv;
 out vec4 v_tint;
 out float v_fog_kept;
+// La part du soleil que l'acteur reçoit, la même pour tout son sprite.
+out float v_sun_visibility;
+out vec3 v_sun_panel;
+// La hauteur sous laquelle le panneau d'ombre ne se lit pas : celle des pieds.
+out float v_sun_floor;
+
+// Les pieds se lisent un peu au-dessus du sol : à sa hauteur exacte, le sol
+// s'ombrerait lui-même.
+const float kSunAnchorLift = 0.5;
 
 void main() {
     v_texture_uv = a_texture_uv;
@@ -65,6 +80,9 @@ void main() {
     z += a_depth_bias * u_depth_per_inverse_distance * drawn.w;
     gl_Position = vec4(drawn.xy, z, drawn.w);
     v_fog_kept = mix(1.0, FogKeptPart(drawn.w), a_fogged);
+    v_sun_visibility = SunVisibilityAround(a_sun_anchor + vec3(0.0, kSunAnchorLift, 0.0));
+    v_sun_panel = a_sun_panel;
+    v_sun_floor = a_sun_anchor.y + kSunAnchorLift;
 }
 )GLSL";
 
@@ -73,9 +91,16 @@ constexpr std::string_view kFragmentShader = R"GLSL(
 in vec2 v_texture_uv;
 in vec4 v_tint;
 in float v_fog_kept;
+in float v_sun_visibility;
+in vec3 v_sun_panel;
+in float v_sun_floor;
 
 uniform sampler2D u_texture;
 uniform float u_alpha_floor;
+// Ce que l'ombre du soleil laisse à l'acteur : voir `SunShadowView::sprite_shade`.
+uniform vec3 u_sun_shade;
+// Ce que l'heure du ciel laisse de la lumière de midi : voir `SceneLight::daylight`.
+uniform vec3 u_daylight;
 
 out vec4 frag_color;
 
@@ -90,6 +115,12 @@ void main() {
     if (texel.a < u_alpha_floor) {
         discard;
     }
+    // Le décor ombre l'acteur par ses pieds ; les autres acteurs, point par point.
+    // ⚠ JAMAIS SOUS LES PIEDS : le bas du panneau s'enfonce dans le sol, où le
+    // terrain le masquerait, et l'acteur s'ombrerait lui-même.
+    vec3 sun_panel = vec3(v_sun_panel.x, max(v_sun_panel.y, v_sun_floor), v_sun_panel.z);
+    float sun_visibility = v_sun_visibility * ActorVisibilityAt(sun_panel);
+    texel.rgb *= mix(u_sun_shade, vec3(1.0), sun_visibility) * u_daylight;
     frag_color = vec4(Fogged(texel.rgb, v_fog_kept), texel.a);
 }
 )GLSL";
@@ -122,6 +153,11 @@ constexpr GLuint kEveryStencilBit = 0xFF;
 // calques par personnage, l'économie d'un index ne vaut pas sa complication.
 constexpr std::size_t kVerticesPerQuad = 6;
 
+// L'emplacement des pieds où l'acteur lit l'ombre, voir `a_sun_anchor`.
+constexpr GLuint kSunAnchorAttribute = 6;
+// Celui du sommet sur le panneau d'ombre, voir `a_sun_panel`.
+constexpr GLuint kSunPanelAttribute = 7;
+
 // Le carré de la distance entre deux points.
 //
 // Écrit ici plutôt qu'emprunté à glm : la fonction équivalente vit dans une
@@ -144,6 +180,8 @@ struct SpriteRenderer::SpriteVertex {
   glm::vec3 depth_position;
   float fogged;
   float depth_bias;
+  glm::vec3 sun_anchor;
+  glm::vec3 sun_panel;
 };
 
 // Un quad prêt à dessiner : sa géométrie, et la texture à lui lier.
@@ -156,6 +194,10 @@ struct SpriteRenderer::PreparedQuad {
   float fogged = 1.0F;
   bool additive = false;
   float depth_bias = 0.0F;
+  glm::vec3 sun_anchor{0.0F};
+  // Les coins sur le panneau d'ombre de l'acteur : ceux de `corners` pour une
+  // silhouette, ceux où le sprite dessiné lit l'ombre des autres sinon.
+  std::array<glm::vec3, 4> panel_corners{};
 };
 
 SpriteRenderer::SpriteRenderer() = default;
@@ -204,8 +246,9 @@ void SpriteRenderer::Release() noexcept {
 }
 
 core::Result<SpriteRenderer> SpriteRenderer::Create() {
-  auto program = GlProgram::Link(WithFog(kVertexShader, kFogVertexGlsl),
-                                 WithFog(kFragmentShader, kFogFragmentGlsl));
+  auto program = GlProgram::Link(
+      WithFog(WithSunShadow(kVertexShader, kSunShadowSpriteVertexGlsl), kFogVertexGlsl),
+      WithFog(WithSunShadow(kFragmentShader, kSunShadowSpriteFragmentGlsl), kFogFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -236,6 +279,12 @@ core::Result<SpriteRenderer> SpriteRenderer::Create() {
   glEnableVertexAttribArray(5);
   glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, stride,
                         reinterpret_cast<void*>(offsetof(SpriteVertex, depth_bias)));
+  glEnableVertexAttribArray(kSunAnchorAttribute);
+  glVertexAttribPointer(kSunAnchorAttribute, 3, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(offsetof(SpriteVertex, sun_anchor)));
+  glEnableVertexAttribArray(kSunPanelAttribute);
+  glVertexAttribPointer(kSunPanelAttribute, 3, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(offsetof(SpriteVertex, sun_panel)));
   glBindVertexArray(0);
   return renderer;
 }
@@ -266,7 +315,8 @@ void SpriteRenderer::ForgetUnusedTextures() {
 void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> actors,
                           float aspect_ratio, Blending blending, DepthWrite depth_write,
                           DepthTest depth_test, const SceneFog& fog, DrawOrder order,
-                          BodySilhouette silhouette) {
+                          BodySilhouette silhouette, const SunShadowView& sun,
+                          const glm::vec3& daylight) {
   if (actors.empty()) {
     return;
   }
@@ -298,108 +348,11 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
     });
   }
 
-  prepared_.clear();
-  // LA HAUTEUR DE LA VUE EN PIXELS, que seul un élargissement en pixels d'écran
-  // consulte.
-  std::array<GLint, 4> viewport{};
-  glGetIntegerv(GL_VIEWPORT, viewport.data());
-  constexpr std::size_t kViewportHeight = 3;
-  const auto viewport_height = static_cast<float>(viewport[kViewportHeight]);
-  // `layered` sépare l'acteur de son ombre : l'ombre n'a pas de calques, et ce
-  // qu'un effet fait aux calques de son porteur ne la touche pas.
-  const auto emit = [&](const ComposedActor& composed, const DrawnActor& drawn,
-                        glm::vec2 screen_offset_pixels, bool layered) {
-    LayerDrawsOf(composed, layered ? drawn.shown_parts : kAllActorParts,
-                 layered ? drawn.additive_parts : ActorPartSet{0}, layered && drawn.doubles_weapon,
-                 layer_draws_);
-    for (const LayerDraw& layer : layer_draws_) {
-      const std::size_t index = layer.quad;
-      const SpriteQuad& quad = composed.quads[index];
-      if (index >= composed.sources.size()) {
-        continue;
-      }
-      const GlTexture* texture = TextureFor(composed.sources[index]);
-      if (texture == nullptr) {
-        continue;
-      }
-      // Le miroir échange les abscisses de texture, il ne déplace pas le quad.
-      const float left_u = quad.mirrored ? 1.0F : 0.0F;
-      const float right_u = quad.mirrored ? 0.0F : 1.0F;
-      SpriteQuad scaled = quad;
-      // LE DÉCALAGE D'UNE PARTIE, avant l'échelle. L'ombre n'a pas de parties.
-      if (const glm::vec2 part_offset =
-              drawn.part_offset_pixels[static_cast<std::size_t>(layer.part)];
-          layered && part_offset != glm::vec2(0.0F, 0.0F)) {
-        for (glm::vec2& corner : scaled.corners) {
-          corner.x += part_offset.x;
-          corner.y -= part_offset.y;
-        }
-      }
-      if (drawn.scale != 1.0F) {
-        for (glm::vec2& corner : scaled.corners) {
-          corner *= drawn.scale;
-        }
-      }
-      if (drawn.height_scale != 1.0F) {
-        for (glm::vec2& corner : scaled.corners) {
-          corner.y *= drawn.height_scale;
-        }
-      }
-      // LA CULBUTE : le calque tourne sur son propre centre, une fois tassé.
-      if (layered && drawn.layer_spin_degrees != 0.0F) {
-        scaled = SpinSpriteQuad(scaled, drawn.layer_spin_degrees);
-      }
-      // LE DÉCALAGE D'ÉCRAN, après l'échelle et dans l'unité des coins.
-      //
-      // ⚠ L'AXE Y D'UN SPRITE DESCEND : un décalage vers le haut se retranche.
-      // C'est la même inversion que fait BillboardCorners, et l'oublier ferait
-      // sauter un corps vers le sol.
-      if (screen_offset_pixels != glm::vec2(0.0F, 0.0F)) {
-        for (glm::vec2& corner : scaled.corners) {
-          corner.x += screen_offset_pixels.x;
-          corner.y -= screen_offset_pixels.y;
-        }
-      }
-      if (drawn.grow_sprite_pixels != 0.0F) {
-        scaled = GrowSpriteQuad(scaled, drawn.grow_sprite_pixels);
-      }
-      // L'ÉLARGISSEMENT EN PIXELS D'ÉCRAN, converti à la profondeur de l'acteur.
-      if (drawn.grow_screen_pixels != 0.0F) {
-        scaled = GrowSpriteQuad(
-            scaled, drawn.grow_screen_pixels *
-                        SpritePixelsPerScreenPixel(camera, drawn.ground_position, viewport_height));
-      }
-      // L'OMBRE SE POSE AU SOL et garde la couleur de son calque : ni la teinte
-      // ni la transparence de son porteur ne la touchent.
-      const glm::vec3 anchor =
-          layered ? drawn.ground_position
-                  : glm::vec3(drawn.ground_position.x,
-                              drawn.shadow_ground_height.value_or(drawn.ground_position.y),
-                              drawn.ground_position.z);
-      prepared_.push_back(PreparedQuad{texture,
-                                       BillboardCorners(scaled, anchor, basis),
-                                       BillboardDepthCorners(scaled, anchor, basis),
-                                       {glm::vec2{left_u, 0.0F}, glm::vec2{right_u, 0.0F},
-                                        glm::vec2{right_u, 1.0F}, glm::vec2{left_u, 1.0F}},
-                                       layered ? Tinted(quad.tint, drawn.tint) : quad.tint,
-                                       drawn.fogged && !layer.additive ? 1.0F : 0.0F,
-                                       blending == Blending::kAdditive || layer.additive,
-                                       drawn.depth_bias});
-    }
-  };
-  for (const DrawnActor* drawn : ordered_) {
-    // L'ombre d'abord : elle est au sol, et tout le reste passe dessus.
-    //
-    // ⚠ ELLE NE SUIT PAS LE DÉCALAGE D'ÉCRAN. Le client la dessine hors de la
-    // chaîne de calques où vivent les effets : un corps qui tremble tremble
-    // seul, son ombre reste posée.
-    if (drawn->shadow != nullptr) {
-      emit(*drawn->shadow, *drawn, glm::vec2(0.0F, 0.0F), false);
-    }
-    if (drawn->actor != nullptr) {
-      emit(*drawn->actor, *drawn, drawn->screen_offset_pixels, true);
-    }
-  }
+  // LE PANNEAU D'OMBRE de chaque acteur, quand une ombre se lit : celui que la
+  // passe de profondeur a dressé.
+  const bool sun_read = sun.map != nullptr && sun.map->valid() && sun.strength > 0.0F;
+  const BillboardBasis panel_basis = ShadowPanelBasis(sun.toward_sun, basis);
+  PrepareQuads(camera, basis, blending, /*silhouettes=*/false, sun_read ? &panel_basis : nullptr);
   if (prepared_.empty()) {
     return;
   }
@@ -412,24 +365,7 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
       }).begin();
   const auto additive_from = static_cast<std::size_t>(first_additive - prepared_.begin());
 
-  vertices_.clear();
-  vertices_.reserve(prepared_.size() * kVerticesPerQuad);
-  for (const PreparedQuad& quad : prepared_) {
-    // Deux triangles, dans l'ordre haut-gauche, haut-droit, bas-droit puis
-    // haut-gauche, bas-droit, bas-gauche.
-    constexpr std::array<std::size_t, kVerticesPerQuad> kOrder = {0, 1, 2, 0, 2, 3};
-    for (const std::size_t corner : kOrder) {
-      vertices_.push_back(SpriteVertex{quad.corners[corner], quad.texture_uv[corner], quad.tint,
-                                       quad.depth_corners[corner], quad.fogged, quad.depth_bias});
-    }
-  }
-
-  glBindVertexArray(vertex_array_);
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
-  // Le maillage change à chaque image ET à chaque mouvement de caméra : c'est
-  // un tampon de flux, pas un tampon statique.
-  glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices_.size() * sizeof(SpriteVertex)),
-               vertices_.data(), GL_STREAM_DRAW);
+  UploadPrepared();
 
   // ⚠ CE QUI SE LIT PAR-DESSUS LE MONDE NE S'ÉPROUVE PAS CONTRE LUI. Voir
   // `DepthTest` : un nombre de dégâts se pose à l'aplomb d'un acteur, donc à SA
@@ -452,6 +388,9 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
   program_.SetFloat("u_depth_per_inverse_distance", projection[kTranslationColumn][kDepthRow]);
   program_.SetInt("u_texture", 0);
   SetFogUniforms(program_, fog);
+  SetSunSpriteShadowUniforms(program_, sun);
+  program_.SetVector3("u_sun_shade", sun.sprite_shade);
+  program_.SetVector3("u_daylight", daylight);
 
   // ⚠ LES QUADS VOISINS D'UNE MÊME TEXTURE PARTENT ENSEMBLE : leurs sommets se
   // suivent déjà dans le tampon, et l'ordre de dessin ne change pas — seul le
@@ -531,6 +470,218 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_DEPTH_TEST);
   glDepthMask(GL_TRUE);
+  glBindVertexArray(0);
+}
+
+void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& basis,
+                                  Blending blending, bool silhouettes,
+                                  const BillboardBasis* panel_basis) {
+  prepared_.clear();
+  // LA HAUTEUR DE LA VUE EN PIXELS, que seul un élargissement en pixels d'écran
+  // consulte.
+  std::array<GLint, 4> viewport{};
+  glGetIntegerv(GL_VIEWPORT, viewport.data());
+  constexpr std::size_t kViewportHeight = 3;
+  const auto viewport_height = static_cast<float>(viewport[kViewportHeight]);
+  // `layered` sépare l'acteur de son ombre : l'ombre n'a pas de calques, et ce
+  // qu'un effet fait aux calques de son porteur ne la touche pas.
+  const auto emit = [&](const ComposedActor& composed, const DrawnActor& drawn,
+                        glm::vec2 screen_offset_pixels, bool layered) {
+    LayerDrawsOf(composed, layered ? drawn.shown_parts : kAllActorParts,
+                 layered ? drawn.additive_parts : ActorPartSet{0}, layered && drawn.doubles_weapon,
+                 layer_draws_);
+    for (const LayerDraw& layer : layer_draws_) {
+      const std::size_t index = layer.quad;
+      const SpriteQuad& quad = composed.quads[index];
+      if (index >= composed.sources.size()) {
+        continue;
+      }
+      // UN CALQUE ADDITIF NE PORTE PAS D'OMBRE : c'est de la lumière.
+      if (silhouettes && (blending == Blending::kAdditive || layer.additive)) {
+        continue;
+      }
+      const GlTexture* texture = TextureFor(composed.sources[index]);
+      if (texture == nullptr) {
+        continue;
+      }
+      // Le miroir échange les abscisses de texture, il ne déplace pas le quad.
+      const float left_u = quad.mirrored ? 1.0F : 0.0F;
+      const float right_u = quad.mirrored ? 0.0F : 1.0F;
+      SpriteQuad scaled = quad;
+      // LE DÉCALAGE D'UNE PARTIE, avant l'échelle. L'ombre n'a pas de parties.
+      if (const glm::vec2 part_offset =
+              drawn.part_offset_pixels[static_cast<std::size_t>(layer.part)];
+          layered && part_offset != glm::vec2(0.0F, 0.0F)) {
+        for (glm::vec2& corner : scaled.corners) {
+          corner.x += part_offset.x;
+          corner.y -= part_offset.y;
+        }
+      }
+      if (drawn.scale != 1.0F) {
+        for (glm::vec2& corner : scaled.corners) {
+          corner *= drawn.scale;
+        }
+      }
+      if (drawn.height_scale != 1.0F) {
+        for (glm::vec2& corner : scaled.corners) {
+          corner.y *= drawn.height_scale;
+        }
+      }
+      // LA CULBUTE : le calque tourne sur son propre centre, une fois tassé.
+      if (layered && drawn.layer_spin_degrees != 0.0F) {
+        scaled = SpinSpriteQuad(scaled, drawn.layer_spin_degrees);
+      }
+      // LE DÉCALAGE D'ÉCRAN, après l'échelle et dans l'unité des coins.
+      //
+      // ⚠ L'AXE Y D'UN SPRITE DESCEND : un décalage vers le haut se retranche.
+      // C'est la même inversion que fait BillboardCorners, et l'oublier ferait
+      // sauter un corps vers le sol.
+      if (screen_offset_pixels != glm::vec2(0.0F, 0.0F)) {
+        for (glm::vec2& corner : scaled.corners) {
+          corner.x += screen_offset_pixels.x;
+          corner.y -= screen_offset_pixels.y;
+        }
+      }
+      if (drawn.grow_sprite_pixels != 0.0F) {
+        scaled = GrowSpriteQuad(scaled, drawn.grow_sprite_pixels);
+      }
+      // L'ÉLARGISSEMENT EN PIXELS D'ÉCRAN, converti à la profondeur de l'acteur.
+      if (drawn.grow_screen_pixels != 0.0F) {
+        scaled = GrowSpriteQuad(
+            scaled, drawn.grow_screen_pixels *
+                        SpritePixelsPerScreenPixel(camera, drawn.ground_position, viewport_height));
+      }
+      // L'OMBRE SE POSE AU SOL et garde la couleur de son calque : ni la teinte
+      // ni la transparence de son porteur ne la touchent.
+      const glm::vec3 on_ground(drawn.ground_position.x,
+                                drawn.shadow_ground_height.value_or(drawn.ground_position.y),
+                                drawn.ground_position.z);
+      const glm::vec3 anchor = layered ? drawn.ground_position : on_ground;
+      const std::array<glm::vec3, 4> corners = BillboardCorners(scaled, anchor, basis);
+      const std::array<glm::vec3, 4> panel_corners =
+          silhouettes || panel_basis == nullptr ? corners
+                                                : BillboardCorners(scaled, anchor, *panel_basis);
+      // LA SILHOUETTE PREND SA PROFONDEUR SUR LE PANNEAU LUI-MÊME : c'est lui que
+      // le soleil voit.
+      prepared_.push_back(
+          PreparedQuad{texture,
+                       corners,
+                       silhouettes ? corners : BillboardDepthCorners(scaled, anchor, basis),
+                       {glm::vec2{left_u, 0.0F}, glm::vec2{right_u, 0.0F}, glm::vec2{right_u, 1.0F},
+                        glm::vec2{left_u, 1.0F}},
+                       layered ? Tinted(quad.tint, drawn.tint) : quad.tint,
+                       drawn.fogged && !layer.additive ? 1.0F : 0.0F,
+                       blending == Blending::kAdditive || layer.additive,
+                       drawn.depth_bias,
+                       on_ground,
+                       panel_corners});
+    }
+  };
+  for (const DrawnActor* drawn : ordered_) {
+    // L'ombre d'abord : elle est au sol, et tout le reste passe dessus.
+    //
+    // ⚠ ELLE NE SUIT PAS LE DÉCALAGE D'ÉCRAN. Le client la dessine hors de la
+    // chaîne de calques où vivent les effets : un corps qui tremble tremble
+    // seul, son ombre reste posée.
+    if (drawn->shadow != nullptr && !silhouettes) {
+      emit(*drawn->shadow, *drawn, glm::vec2(0.0F, 0.0F), false);
+    }
+    if (drawn->actor != nullptr) {
+      const std::size_t first = prepared_.size();
+      emit(*drawn->actor, *drawn, drawn->screen_offset_pixels, true);
+      if (silhouettes || panel_basis != nullptr) {
+        SlideUnderFeet(std::span(prepared_).subspan(first), drawn->ground_position.y,
+                       MakeBillboardBasis(camera), silhouettes);
+      }
+    }
+  }
+}
+
+void SpriteRenderer::SlideUnderFeet(std::span<PreparedQuad> quads, float anchor_height,
+                                    const BillboardBasis& facing_camera, bool silhouettes) {
+  float lowest = anchor_height;
+  for (const PreparedQuad& quad : quads) {
+    for (const glm::vec3& corner : quad.panel_corners) {
+      lowest = std::min(lowest, corner.y);
+    }
+  }
+  const glm::vec3 shift = ShadowFootShift(anchor_height - lowest, facing_camera);
+  for (PreparedQuad& quad : quads) {
+    for (std::size_t index = 0; index < quad.corners.size(); ++index) {
+      quad.panel_corners[index] += shift;
+      // Une silhouette EST son panneau : elle se déplace avec lui.
+      if (silhouettes) {
+        quad.corners[index] += shift;
+        quad.depth_corners[index] += shift;
+      }
+    }
+  }
+}
+
+void SpriteRenderer::UploadPrepared() {
+  vertices_.clear();
+  vertices_.reserve(prepared_.size() * kVerticesPerQuad);
+  for (const PreparedQuad& quad : prepared_) {
+    // Deux triangles, dans l'ordre haut-gauche, haut-droit, bas-droit puis
+    // haut-gauche, bas-droit, bas-gauche.
+    constexpr std::array<std::size_t, kVerticesPerQuad> kOrder = {0, 1, 2, 0, 2, 3};
+    for (const std::size_t corner : kOrder) {
+      vertices_.push_back(SpriteVertex{quad.corners[corner], quad.texture_uv[corner], quad.tint,
+                                       quad.depth_corners[corner], quad.fogged, quad.depth_bias,
+                                       quad.sun_anchor, quad.panel_corners[corner]});
+    }
+  }
+
+  glBindVertexArray(vertex_array_);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
+  // Le maillage change à chaque image ET à chaque mouvement de caméra : c'est
+  // un tampon de flux, pas un tampon statique.
+  glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices_.size() * sizeof(SpriteVertex)),
+               vertices_.data(), GL_STREAM_DRAW);
+}
+
+void SpriteRenderer::DrawDepth(const glm::mat4& light_view_projection, const glm::vec3& toward_sun,
+                               const Camera& camera, std::span<const DrawnActor> actors) {
+  ordered_.clear();
+  for (const DrawnActor& actor : actors) {
+    if (actor.actor != nullptr && !actor.actor->quads.empty()) {
+      ordered_.push_back(&actor);
+    }
+  }
+  if (ordered_.empty()) {
+    return;
+  }
+  PrepareQuads(camera, ShadowPanelBasis(toward_sun, MakeBillboardBasis(camera)), Blending::kOver,
+               /*silhouettes=*/true);
+  if (prepared_.empty()) {
+    return;
+  }
+  UploadPrepared();
+
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+  program_.Use();
+  program_.SetMatrix4("u_view_projection", light_view_projection);
+  // Une projection orthogonale : la profondeur ne dépend pas de la distance.
+  program_.SetFloat("u_depth_per_inverse_distance", 0.0F);
+  program_.SetInt("u_texture", 0);
+  SetFogUniforms(program_, SceneFog());
+  SetSunSpriteShadowUniforms(program_, SunShadowView());
+  program_.SetVector3("u_sun_shade", glm::vec3(1.0F));
+  program_.SetVector3("u_daylight", glm::vec3(1.0F));
+  // LA SILHOUETTE COUPE OÙ COUPE CELLE DES CORPS : voir `kSpriteDepthAlphaFloor`.
+  program_.SetFloat("u_alpha_floor", kSpriteDepthAlphaFloor);
+  for (std::size_t first = 0; first < prepared_.size();) {
+    std::size_t end = first + 1;
+    while (end < prepared_.size() && prepared_[end].texture == prepared_[first].texture) {
+      ++end;
+    }
+    prepared_[first].texture->Bind(0);
+    glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first * kVerticesPerQuad),
+                 static_cast<GLsizei>((end - first) * kVerticesPerQuad));
+    first = end;
+  }
   glBindVertexArray(0);
 }
 

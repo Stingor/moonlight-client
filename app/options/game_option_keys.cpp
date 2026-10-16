@@ -23,6 +23,7 @@
 #include "chat/chat_history_file.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
+#include "options/staff_sky_keys.h"
 
 namespace moonclient {
 namespace {
@@ -704,6 +705,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Declare(kStaffPickFloorPixelsKey, &staff_tools_.picking.actor_floor_pixels);
   into.Declare(kStaffPickNegativeKey, &staff_tools_.picking.shrink_negative_ids);
   into.Declare(kStaffPickNegativePercentKey, &staff_tools_.picking.negative_id_percent);
+  DeclareStaffSkyCourse(into, staff_tools_);
   into.Section("Les dix macros de chat");
   // LES DIX MACROS DE CHAT. ⚠ DES CLÉS NUMÉROTÉES À PARTIR DE UN, comme la
   // fenêtre les montre : « macro_1 » est la ligne d'Alt+1, et un fichier qu'on

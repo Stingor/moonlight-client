@@ -75,6 +75,8 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
         gat->LevelCornerHeights(*stage.scene.relief_level);
       }
       stage.ground_light = ro::render::BuildGroundLight(stage.scene.gnd, *gat);
+      stage.ground_laid_light = ro::render::BuildGroundLight(
+          stage.scene.gnd, *gat, ro::render::GroundLightTerms::kLaidLightOnly);
       stage.gat = std::move(*gat);
     } else {
       // ⚠ LES DEUX ÉCHECS NE PORTENT PAS LE MÊME LIBELLÉ : la fenêtre de
@@ -232,6 +234,7 @@ ro::core::Result<bool> ReloadStageRelief(const MapArrival& arrival) {
   arrival.stage->scene = std::move(reread->scene);
   arrival.stage->gat = std::move(reread->gat);
   arrival.stage->ground_light = std::move(reread->ground_light);
+  arrival.stage->ground_laid_light = std::move(reread->ground_laid_light);
   arrival.stage->read_ms = reread->read_ms;
   ReportMapStage(*arrival.stage);
   if (auto uploaded = arrival.terrain->Upload(arrival.stage->scene.terrain,

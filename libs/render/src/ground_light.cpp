@@ -103,7 +103,8 @@ bool IsPerched(const formats::GndMap& gnd, const formats::GatMap& gat, std::int3
   return walk_height < ground_top - kPerchedMargin;
 }
 
-std::array<float, 3> LightOf(const formats::GndMap& gnd, std::int32_t cell_x, std::int32_t cell_y) {
+std::array<float, 3> LightOf(const formats::GndMap& gnd, std::int32_t cell_x, std::int32_t cell_y,
+                             GroundLightTerms terms) {
   std::uint32_t shadow_sum = 0;
   std::array<std::uint32_t, 3> color_sum = {0, 0, 0};
   for (const std::array<std::int32_t, 2>& offset : kCrossOffsets) {
@@ -114,7 +115,11 @@ std::array<float, 3> LightOf(const formats::GndMap& gnd, std::int32_t cell_x, st
     }
   }
   const auto samples = static_cast<float>(kCrossOffsets.size());
-  const float shadow = static_cast<float>(shadow_sum) / samples / kShadowScale;
+  // SANS L'OMBRE CUITE, la case est en pleine lumière : l'ombre du soleil la
+  // remplace.
+  const float shadow = terms == GroundLightTerms::kLaidLightOnly
+                           ? 1.0F
+                           : static_cast<float>(shadow_sum) / samples / kShadowScale;
   std::array<float, 3> factors{};
   for (std::size_t channel = 0; channel < factors.size(); ++channel) {
     factors[channel] = static_cast<float>(color_sum[channel]) / samples / kColorScale + shadow;
@@ -144,7 +149,8 @@ std::array<float, 3> GroundLight::Under(float cell_x, float cell_y) const {
             static_cast<std::int32_t>(std::floor(cell_y + kHalfCell)));
 }
 
-GroundLight BuildGroundLight(const formats::GndMap& gnd, const formats::GatMap& gat) {
+GroundLight BuildGroundLight(const formats::GndMap& gnd, const formats::GatMap& gat,
+                             GroundLightTerms terms) {
   GroundLight light;
   if (gnd.lightmap_count() <= 0) {
     return light;
@@ -159,7 +165,7 @@ GroundLight BuildGroundLight(const formats::GndMap& gnd, const formats::GatMap& 
         continue;
       }
       light.factors[static_cast<std::size_t>(cell_y) * static_cast<std::size_t>(light.width) +
-                    static_cast<std::size_t>(cell_x)] = LightOf(gnd, cell_x, cell_y);
+                    static_cast<std::size_t>(cell_x)] = LightOf(gnd, cell_x, cell_y, terms);
     }
   }
   return light;

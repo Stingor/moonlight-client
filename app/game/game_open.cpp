@@ -193,6 +193,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // joue. Sans renderer — un pilote qui refuse le programme —, ils ne
   // paraissent pas, et le reste du jeu tourne quand même.
   camera_rig_.LoadTables(*vfs_);
+  closed_maps_ = LoadClosedMaps(*vfs_);
   effect_catalog_.emplace(*vfs_);
   effect_nodes_.emplace(*vfs_);
   effects_.emplace(*effect_catalog_, *effect_nodes_, *vfs_);

@@ -28,6 +28,7 @@ namespace moonclient {
 //       address: moonlight-destiny.fr
 //       port: 16900
 //   web: moonlight-destiny.fr:8888
+//   server_time_zone: Europe/Paris
 //   archives:
 //     - moonlight.grf
 //     - data.grf
@@ -75,6 +76,9 @@ struct PatcherConfig {
   bool create_grf = false;
 };
 
+// Celui du serveur Moonlight.
+inline constexpr std::string_view kDefaultServerTimeZone = "Europe/Paris";
+
 struct ClientConfig {
   // Dans l'ordre du fichier : le PREMIER est celui qu'un lancement sans
   // argument rejoint.
@@ -82,6 +86,10 @@ struct ClientConfig {
   // L'adresse du service web du serveur — emblèmes de guilde —, telle
   // qu'écrite : `hôte:port`, avec ou sans schéma. Vide : pas de service web.
   std::string web;
+  // LE FUSEAU HORAIRE DU SERVEUR, au nom de la base des fuseaux : le cycle jour
+  // et nuit se cale sur l'heure qu'il fait LÀ-BAS. Le serveur n'envoie que des
+  // instants, jamais son fuseau. Absent du fichier : `kDefaultServerTimeZone`.
+  std::string server_time_zone = std::string(kDefaultServerTimeZone);
   // LES ARCHIVES DU JEU, par priorité DÉCROISSANTE : la première l'emporte.
   // Des noms relatifs à l'installation.
   //

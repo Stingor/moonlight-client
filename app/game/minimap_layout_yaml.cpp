@@ -29,6 +29,7 @@ constexpr const char* kArrowHalfField = "arrow_px";
 constexpr const char* kArrowTintField = "arrow_tint";
 constexpr const char* kCoordsField = "coordinates";
 constexpr const char* kMapNameField = "place_name";
+constexpr const char* kServerClockField = "server_clock";
 constexpr const char* kPartyField = "party";
 constexpr const char* kGuildField = "guild";
 constexpr const char* kQuestsField = "quests";
@@ -75,6 +76,7 @@ void ReadMinimapLayout(const YAML::Node& node, ro::ui::MinimapLayout& into) {
   Read(node, kArrowTintField, minimap.arrow_tint);
   Read(node, kCoordsField, minimap.show_coords);
   Read(node, kMapNameField, minimap.show_map_name);
+  Read(node, kServerClockField, minimap.show_server_clock);
   Read(node, kPartyField, minimap.show_party);
   Read(node, kGuildField, minimap.show_guild);
   Read(node, kQuestsField, minimap.show_quests);
@@ -108,6 +110,7 @@ void WriteMinimapLayout(YAML::Emitter& out, const ro::ui::MinimapLayout& from) {
   out << YAML::Key << kArrowTintField << YAML::Value << minimap.arrow_tint;
   out << YAML::Key << kCoordsField << YAML::Value << minimap.show_coords;
   out << YAML::Key << kMapNameField << YAML::Value << minimap.show_map_name;
+  out << YAML::Key << kServerClockField << YAML::Value << minimap.show_server_clock;
   out << YAML::Key << kPartyField << YAML::Value << minimap.show_party;
   out << YAML::Key << kGuildField << YAML::Value << minimap.show_guild;
   out << YAML::Key << kQuestsField << YAML::Value << minimap.show_quests;

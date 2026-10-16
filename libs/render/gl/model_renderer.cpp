@@ -15,6 +15,7 @@
 #include "ro/formats/image.h"
 #include "ro/render/fog_shader.h"
 #include "ro/render/scene_cutout.h"
+#include "ro/render/sun_shadow_map.h"
 #include "ro/render/veiled_prims.h"
 
 namespace ro::render {
@@ -50,6 +51,8 @@ uniform vec3 u_light_ambient;
 uniform vec3 u_light_diffuse;
 // La nuit de la carte, en facteur : voir `SceneLight::tint`.
 uniform vec3 u_light_tint;
+// Ce que l'heure laisse de la lumière de midi : voir `SceneLight::daylight`.
+uniform vec3 u_daylight;
 // Ce que le .rsm déclare : zéro veut dire « pas d'ombrage ».
 uniform int u_shade_type;
 // Vaut 1 quand l'éclairage s'applique, 0 quand il est coupé pour mesurer.
@@ -57,6 +60,8 @@ uniform float u_light_strength;
 
 out vec2 v_texture_uv;
 out vec3 v_light;
+// L'éclairement sans le soleil : celui d'une face à l'ombre.
+out vec3 v_shaded_light;
 out float v_fog_kept;
 flat out uint v_side;
 
@@ -75,6 +80,7 @@ void main() {
     // La partie 3 × 3 de la pose, et non la transposée de son inverse : c'est
     // ainsi que le client éclaire un modèle étiré — voir `TransformedNormal`.
     vec3 normal = normalize(mat3(u_model) * a_normal);
+    SunShadowProject(world.xyz, normal);
     // Une face qui tourne le dos au soleil ne reçoit que l'ambiante. Prendre
     // la valeur ABSOLUE l'éclairerait autant que celle qui lui fait face, et le
     // modelé disparaîtrait : les deux pans d'un toit sortiraient identiques.
@@ -95,7 +101,9 @@ void main() {
     vec3 applied = u_shade_type == 0 ? ceiling : min(lit, ceiling);
     // ⚠ LA NUIT S'APPLIQUE MÊME ÉCLAIRAGE COUPÉ : elle teinte la couleur du
     // sommet, quelle qu'en soit l'origine.
-    v_light = clamp(max(applied, vec3(1.0 - u_light_strength)), 0.0, 1.0) * u_light_tint;
+    v_light = clamp(max(applied, vec3(1.0 - u_light_strength)), 0.0, 1.0) * u_light_tint * u_daylight;
+    v_shaded_light = clamp(max(min(ambient, ceiling), vec3(1.0 - u_light_strength)), 0.0, 1.0) *
+                     u_light_tint * u_daylight;
 }
 )GLSL";
 
@@ -103,6 +111,7 @@ constexpr std::string_view kFragmentShader = R"GLSL(
 #version 330 core
 in vec2 v_texture_uv;
 in vec3 v_light;
+in vec3 v_shaded_light;
 in float v_fog_kept;
 flat in uint v_side;
 
@@ -136,7 +145,8 @@ void main() {
         discard;
     }
     vec4 color = texture(u_texture, v_texture_uv);
-    frag_color = vec4(Fogged(color.rgb * v_light, v_fog_kept),
+    vec3 light = mix(v_shaded_light, v_light, SunVisibility());
+    frag_color = vec4(Fogged(color.rgb * light, v_fog_kept),
                       mix(1.0, color.a * u_opacity, u_translucent));
 }
 )GLSL";
@@ -333,8 +343,9 @@ void ModelRenderer::Release(VertexStore& store) {
 }
 
 core::Result<ModelRenderer> ModelRenderer::Create() {
-  auto program = GlProgram::Link(WithFog(kVertexShader, kFogVertexGlsl),
-                                 WithFog(kFragmentShader, kFogFragmentGlsl));
+  auto program = GlProgram::Link(
+      WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
+      WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -537,20 +548,22 @@ void ModelRenderer::SetTextureMotion(const TextureMotion& motion) const {
   program_.SetFloat("u_texture_angle", motion.angle);
 }
 
-void ModelRenderer::Use(const Camera& camera, const SceneLight& light, float aspect_ratio,
-                        const ModelStages& stages, const SceneFog& fog) const {
+void ModelRenderer::Use(const glm::mat4& view_projection, const SceneLight& light,
+                        const ModelStages& stages, const SceneFog& fog,
+                        const SunShadowView& sun) const {
   program_.Use();
-  program_.SetMatrix4("u_view_projection",
-                      camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
+  program_.SetMatrix4("u_view_projection", view_projection);
   program_.SetInt("u_texture", 0);
   program_.SetVector3("u_light_direction", light.direction);
   program_.SetVector3("u_light_ambient", light.ambient);
   program_.SetVector3("u_light_diffuse", light.diffuse);
   program_.SetVector3("u_light_tint", light.tint);
+  program_.SetVector3("u_daylight", light.daylight);
   program_.SetFloat("u_light_strength", stages.light ? 1.0F : 0.0F);
   program_.SetInt("u_one_sided", stages.one_sided ? 1 : 0);
   program_.SetInt("u_flip_sides", 0);
   SetFogUniforms(program_, fog);
+  SetSunShadowUniforms(program_, sun);
 }
 
 ModelRenderer::GroupPose ModelRenderer::PoseOf(const Batch& batch, const ModelClock* clock,
@@ -570,14 +583,31 @@ ModelRenderer::GroupPose ModelRenderer::PoseOf(const Batch& batch, const ModelCl
 
 void ModelRenderer::Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
                          const ModelStages& stages, const ModelClock* clock, const SceneFog& fog,
-                         const ModelOpacities* opacities) const {
+                         const ModelOpacities* opacities, const SunShadowView& sun) const {
+  DrawOpaque(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), light, stages, clock, fog,
+             opacities, sun);
+}
+
+void ModelRenderer::DrawDepth(const glm::mat4& light_view_projection,
+                              const ModelClock* clock) const {
+  // LES DEUX CÔTÉS D'UNE FACE PORTENT OMBRE, et une face mêlée aussi, découpée
+  // à son seuil : un feuillage ombre le sol par ses seules feuilles.
+  DrawOpaque(light_view_projection, SceneLight(),
+             ModelStages{.light = true, .one_sided = false, .blended_apart = false}, clock,
+             SceneFog(), nullptr, SunShadowView());
+}
+
+void ModelRenderer::DrawOpaque(const glm::mat4& view_projection, const SceneLight& light,
+                               const ModelStages& stages, const ModelClock* clock,
+                               const SceneFog& fog, const ModelOpacities* opacities,
+                               const SunShadowView& sun) const {
   glEnable(GL_DEPTH_TEST);
   // LE TRI DES FACES SIMPLES SE FAIT DANS LE NUANCIER, sommet par sommet : les
   // poses cuites ensemble n'ont pas toutes le même côté.
   glDisable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
 
-  Use(camera, light, aspect_ratio, stages, fog);
+  Use(view_projection, light, stages, fog, sun);
   program_.SetFloat("u_opacity", 1.0F);
   program_.SetFloat("u_translucent", 0.0F);
   // ⚠ LE PLACEHOLDER, d'un seul pixel, est complet à tout filtrage : il n'a
@@ -708,7 +738,7 @@ void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, fl
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  Use(camera, light, aspect_ratio, ModelStages(), fog);
+  Use(view_projection, light, ModelStages(), fog, SunShadowView());
   const glm::mat4 identity{1.0F};
   program_.SetMatrix4("u_model", identity);
   program_.SetMatrix4("u_node", identity);

@@ -15,6 +15,10 @@ struct SceneLight {
   // Ce que la lumière calculée reçoit en facteur, canal par canal : la nuit
   // d'une carte — voir `DayNightLight`. Un, rien ne change.
   glm::vec3 tint{1.0F, 1.0F, 1.0F};
+  // CE QUE L'HEURE LAISSE DE LA LUMIÈRE DE MIDI, sur un sol plat, canal par
+  // canal : voir `SkyLightAt`. Ce que la direction n'éclaire pas — les modèles
+  // sans ombrage, le ciel de fond — le reçoit en facteur. Un, à midi.
+  glm::vec3 daylight{1.0F, 1.0F, 1.0F};
 };
 
 // LA LUMIÈRE DES MODÈLES D'UNITÉ AU SOL — un piège, un leurre : FIXE, la même

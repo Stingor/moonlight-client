@@ -107,6 +107,7 @@ int ReportError(const ro::core::Error& error) {
   launch.host = server.address;
   launch.port = server.port;
   launch.web = config->web;
+  launch.server_time_zone = config->server_time_zone;
   launch.archives = config->archives;
   launch.patcher = config->patcher;
 
@@ -223,6 +224,7 @@ int Run(int argc, char** argv) {
   }
   moonclient::ClientShell shell(launch->install_folder, launch->archive_folder, launch->archives,
                                 launch->web);
+  shell.SetServerTimeZone(launch->server_time_zone);
   if (!launch->capture_file.empty()) {
     shell.CaptureZoneStreams(launch->capture_file);
   }

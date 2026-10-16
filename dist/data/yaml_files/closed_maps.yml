@@ -1,0 +1,266 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les cartes fermées au cycle jour/nuit
+#
+#  Cavernes, donjons, souterrains : le ciel ne s'y voit pas. Le cycle jour/nuit
+#  que le joueur active ne s'y applique pas, et la lumière de la carte reste
+#  celle que son RSW déclare. Les intérieurs que l'installation nomme dans
+#  data\indoorrswtable.txt en sont déjà retirés : inutile de les répéter ici.
+#
+#  TENU À LA MAIN. La liste de départ a retenu, dans map_names.yml, les cartes
+#  dont le nom dit une caverne, un donjon ou un souterrain, moins celles qu'on
+#  sait en plein air. Une carte s'ajoute ou se retire par une ligne ; le
+#  commentaire qui suit son nom n'est là que pour la relire.
+#
+#  maps : les noms de carte, sans extension.
+#
+#  Lu par moonclient (app/world/closed_maps.h). Absent, le cycle s'applique à
+#  toute carte en plein air.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+maps:
+  - 1@4cdn  # Cave of the Last Ordeal Vision
+  - 1@4inq  # Monastery Basement
+  - 1@cash  # Octopus Cave
+  - 1@cata  # Catacombs
+  - 1@ch_t  # Constellation Tower
+  - 1@ch_u  # Sunken Tower
+  - 1@def01  # Wave Dungeon - Forest
+  - 1@def02  # Wave Dungeon - Sky
+  - 1@def03  # Wave Dungeon - Lava
+  - 1@face  # Faceworm's Nest
+  - 1@gl_k  # Old Glastheim Chivalry F1
+  - 1@gl_k2  # Old Glastheim Chivalry F1
+  - 1@gl_kh  # Old Glastheim Chivalry F2
+  - 1@jorchs  # Confused Snake's Nest
+  - 1@jorlab  # Bagot Lab
+  - 1@lab  # Central Laboratory
+  - 1@lhz  # Wolfchev's Lab
+  - 1@ma_c  # Buwaya Cave
+  - 1@mjo2  # Mjolnir Mountains - Forgotten Cavity
+  - 1@nyd  # Nidhoggr's Nest
+  - 1@orcs  # Orc Underground Cave
+  - 1@oz  # Oz's Labyrinth
+  - 1@rev  # Morse Cave
+  - 1@thts  # Thanatos Tower
+  - 1@tnm1  # Demon's Tower - Upper floor
+  - 1@tnm2  # Demon's Tower - Top floor
+  - 1@tnm3  # Morroc Castle - Basement
+  - 1@tower  # Endless Tower
+  - 1@twig  # Twig's Nest
+  - 1@vrev  # Fantasy Series-Amicitia's Secret Lab
+  - 2025arena5  # Arena Somatology Laboratory
+  - 2@ch_t  # Constellation Tower
+  - 2@gl_k  # Old Glastheim Chivalry F2
+  - 2@gl_k2  # Old Glastheim Chivalry F1
+  - 2@gl_kh  # Old Glastheim Chivalry F2
+  - 2@nyd  # Nidhoggr's Nest
+  - 2@orcs  # Orc Underground Cave
+  - 2@tower  # Endless Tower
+  - 3@ch_t  # Constellation Tower
+  - 3@tower  # Endless Tower
+  - 4@tower  # Endless Tower
+  - 5@tower  # Endless Tower
+  - 6@tower  # Endless Tower (Unknown Area)
+  - 8@thts  # Thanatos Tower
+  - abbey01  # Cursed Abbey Dungeon B1
+  - abbey02  # Cursed Abbey Dungeon B2
+  - abbey03  # Cursed Abbey Dungeon B3
+  - abyss_01  # Abyss Lake Underground Cave 1F
+  - abyss_02  # Abyss Lake Underground Cave 2F
+  - abyss_03  # Abyss Lake Underground Cave 3F
+  - abyss_04  # Abyss Lake Underground Cave 4F
+  - alde_dun01  # Clock Tower B1
+  - alde_dun02  # Clock Tower B2
+  - alde_dun03  # Clock Tower B3
+  - alde_dun04  # Clock Tower B4
+  - ama_dun01  # Tatami Maze
+  - ama_dun02  # Battle Field in the Underground Forest
+  - ama_dun03  # Amatsu Underground Shrine
+  - amicitia1  # Abandoned Lab Amicitia
+  - amicitia2  # Abandoned Lab Amicitia
+  - anthell01  # Ant Hell Dungeon F1
+  - anthell02  # Ant Hell Dungeon F2
+  - arug_dun01  # Arunafeltz Guild Dungeon
+  - ayo_dun01  # Ancient Shrine Maze
+  - ayo_dun02  # Inside Ancient Shrine
+  - beach_dun  # Karu, the West Cave
+  - beach_dun2  # Luanda, the North Cave
+  - beach_dun3  # Mao, the East Cave
+  - bl_depth1  # Biosphere Depth 1st Floor
+  - bl_depth2  # Biosphere Depth - Abyss
+  - bra_dun01  # Beyond the Waterfall
+  - bra_dun02  # Beyond the Waterfall
+  - c_tower1  # Clock Tower F1
+  - c_tower2  # Clock Tower F2
+  - c_tower2_  # Twisted Clock Tower F2
+  - c_tower3  # Clock Tower F3
+  - c_tower3_  # Twisted Clock Tower F3
+  - c_tower4  # Clock Tower F4
+  - cave  # Cave Village
+  - ch1_que01  # Destroyed Geffen Basement
+  - clock_01  # Clock Tower Unknown Basement
+  - com_d02_i  # Luanda, the North Cave
+  - dew_dun02  # Istana Cave
+  - dic_dun01  # Kamidal Tunnel
+  - dic_dun02  # Scaraba Hall
+  - dic_dun03  # Scaraba Hole - Nightmare Mode
+  - ein_dun01  # Einbroch Mine F1
+  - ein_dun02  # Einbroch Mine F2
+  - ein_dun03  # Einbech Mine 3F
+  - for_dun01  # Garden of Time - Forgotten Time Zone 1
+  - for_dun02  # Garden of Time - Forgotten Time Zone 2
+  - gef_dun00  # Geffen Dungeon B1
+  - gef_dun01  # Geffen Dungeon B2
+  - gef_dun02  # Geffen Dungeon B3
+  - gef_dun03  # Geffenia Dungeon
+  - gef_tower  # Geffen Tower
+  - gl_cas01_  # Abyss Glastheim Castle F1
+  - gl_chyard  # Glastheim Underground Churchyard
+  - gl_dun01  # The Lowest Cave in Glastheim B1
+  - gl_dun02  # The Lowest Cave in Glastheim B2
+  - gl_knt01  # Inside Glastheim Chivalry F1
+  - gl_knt02  # Inside Glastheim Chivalry F2
+  - gl_prison  # Glastheim Underground Prison B1
+  - gl_prison1  # Glastheim Underground Prison B2
+  - gl_sew01  # Glastheim Underground Waterway B1
+  - gl_sew02  # Glastheim Underground Waterway B2
+  - gl_sew03  # Glastheim Underground Waterway B3
+  - gl_sew04  # Glastheim Underground Waterway B4
+  - gl_step  # Glastheim Staircase Dungeon
+  - gld2_ald  # Corridor of the Abyss: Tears of Hero
+  - gld2_gef  # Corridor of the Abyss: Dead Man Hill
+  - gld2_pay  # Corridor of the Abyss: Ancient Wind
+  - gld2_prt  # Corridor of the Abyss: Warrior's Way
+  - gld_dun01  # Baldur Guild Dungeon
+  - gld_dun01_2  # Greenwood Lake Dungeon 2F
+  - gld_dun02  # Luina Guild Dungeon
+  - gld_dun02_2  # Louisa Dungeon 2F
+  - gld_dun03  # Valkyrie Guild Dungeon
+  - gld_dun03_2  # Valkyrie Realm Dungeon 2F
+  - gld_dun04  # Britoniah Guild Dungeon
+  - gld_dun04_2  # Brittoria Dungeon 2F
+  - gon_dun01  # Temple of the Western Queen
+  - harboro2  # Underground Waterway
+  - hem_dun01  # Destroyed Verus
+  - hem_dun02  # Destroyed Valkyrie Realm
+  - hero_dun1  # Sanctuary Herosria PvP Dungeon
+  - httyd_02  # The Serene Abyss Lake Underground Cave
+  - ice_dun01  # Rachel Ice Cave 1F
+  - ice_dun02  # Rachel Ice Cave 2F
+  - ice_dun03  # Rachel Ice Cave 3F
+  - ice_dun04  # Rachel Ice Cave - Sealed Space
+  - in_sphinx1  # Morroc Sphinx B1
+  - in_sphinx2  # Morroc Sphinx B2
+  - in_sphinx3  # Morroc Sphinx B3
+  - in_sphinx4  # Morroc Sphinx B4
+  - in_sphinx5  # Morroc Sphinx B5
+  - iz_d04_i  # Deep Sea Cave
+  - iz_d05_i  # Deep Sea Cave
+  - iz_dun00  # Undersea Tunnel B1
+  - iz_dun01  # Undersea Tunnel B2
+  - iz_dun02  # Undersea Tunnel B3
+  - iz_dun03  # Undersea Tunnel B4
+  - iz_dun04  # Undersea Tunnel B5
+  - iz_dun05  # Undersea Tunnel B6
+  - job3_gen01  # Geneticist Lab
+  - job_duncer  # Comodo Theatre
+  - job_knight  # The Chivalry
+  - jor_dun01  # Snake God's Warmth 1st Floor
+  - jor_dun02  # Snake God's Warmth 2nd Floor
+  - jor_dun03  # Inside the Snake's Nest
+  - jor_maze  # Snake Labyrinth
+  - jor_nest  # Snake's Nest
+  - jor_root3  # Deep Root Cave
+  - jor_twig  # Issgard Sanctuary Twig's Nest
+  - jupe_cave  # Juperos Dungeon Entrance
+  - kh_dun01  # Robot Factory F1
+  - kh_dun02  # Robot Factory F2
+  - knight_1-1  # The Chivalry
+  - knight_2-1  # The Chivalry
+  - knight_3-1  # The Chivalry
+  - lasa_dun01  # Dragon Nest
+  - lasa_dun02  # Dragon Nest
+  - lasa_dun03  # Dragon Nest
+  - lasa_dun_q  # Dragon Nest
+  - lasa_sea  # Lasagna Cave
+  - lhz_dun01  # Somatology Laboratory F1
+  - lhz_dun02  # Somatology Laboratory F2
+  - lhz_dun03  # Somatology Laboratory F3
+  - lhz_dun04  # Somatology Laboratory 4th Basement
+  - lhz_dun_n  # Tomb of the Fallen
+  - lou_dun02  # Inside the Royal Tomb
+  - lou_dun03  # Suei Long Gon
+  - ma_dun01  # Bangungot Hospital F1
+  - mag_dun01  # Nogg Road Dungeon F1
+  - mag_dun02  # Nogg Road Dungeon F2
+  - mag_dun03  # Nogg Road Dungeon F3
+  - mal_dun01  # Starry Coral Area
+  - mjo_dun01  # Mjolnir Dead Pit F1
+  - mjo_dun02  # Mjolnir Dead Pit F2
+  - mjo_dun03  # Mjolnir Dead Pit F3
+  - mjo_wst01  # Mjolnir Underground Cave
+  - moc_pryd01  # Inside Pyramid F1
+  - moc_pryd02  # Inside Pyramid F2
+  - moc_pryd03  # Inside Pyramid F3
+  - moc_pryd04  # Inside Pyramid F4
+  - moc_pryd05  # Inside Pyramid B1
+  - moc_pryd06  # Inside Pyramid B2
+  - moc_prydn1  # Morroc Pyramid B1 - Nightmare
+  - moc_prydn2  # Morroc Pyramid B2 - Nightmare
+  - moro_cav  # Flame Cave
+  - mosk_que  # Marozka's Cave
+  - nif_dun01  # Dead Man's Banquet Hall
+  - nif_dun02  # Collapsed Opera House
+  - nyd_dun01  # Yggdrasil Root F1
+  - nyd_dun02  # Yggdrasil Root F2
+  - orcsdun01  # Orc Dungeon F1
+  - orcsdun02  # Orc Dungeon F2
+  - oz_dun01  # Oz's Labyrinth 1F
+  - oz_dun02  # Oz's Labyrinth 2F
+  - pay_dun00  # Payon Cave F1
+  - pay_dun01  # Payon Cave F2
+  - pay_dun02  # Payon Cave F3
+  - pay_dun03  # Payon Cave F4
+  - pay_dun04  # Payon Cave F5
+  - prt_pri00  # Prontera Prison
+  - prt_prison  # Prontera Prison Cell
+  - que_avan01  # Avant's Laboratory
+  - que_hugel  # Odin Shrine's Underground
+  - que_lhz  # Somatology Laboratory 4th Basement
+  - que_thor  # Thor Volcano Dungeon
+  - rockmi1  # Rockridge Mine
+  - rockmi2  # Rockridge Mine
+  - schg_dun01  # Schwartzwald Guild Dungeon
+  - sec_pri  # Room of Meditation (Valhalla Prison)
+  - teg_dun01  # Guild Underground Dungeon
+  - teg_dun02  # Guild Underground Dungeon
+  - tha_scene01  # Thanatos Tower Entrance
+  - tha_t01  # Thanatos Tower Museum Entrance
+  - tha_t02  # Thanatos Tower Museum
+  - tha_t03  # Thanatos Tower Abandoned Place
+  - tha_t04  # Thanatos Tower Abandoned Place
+  - tha_t05  # Thanatos Tower Upper Level
+  - tha_t06  # Thanatos Tower Upper Level
+  - tha_t07  # Thanatos Tower Upper Level - Room of Angel
+  - tha_t08  # Thanatos Tower Upper Level - Room of Angel
+  - tha_t09  # Thanatos Tower Upper Level - Room of Agony
+  - tha_t10  # Thanatos Tower Upper Level - Room of Sorrow
+  - tha_t11  # Thanatos Tower Upper Level - Room of Despair
+  - tha_t12  # Thanatos Tower Upper Level - Room of Hatred
+  - thana_boss  # Thanatos Tower - Unknown Place
+  - thana_step  # Thanatos Tower Upper Level - Stairs
+  - thor_v01  # Thor Volcano Dungeon 1F
+  - thor_v02  # Thor Volcano Dungeon 2F
+  - thor_v03  # Thor Volcano Dungeon 3F
+  - tur_dun02  # Turtle Island Dungeon
+  - tur_dun04  # Turtle Palace
+  - tur_dun05  # Underground Swamp Zone
+  - tur_dun06  # Underground Swamp Zone
+  - um_dun01  # Carpenter's Shop in the Tree
+  - um_dun02  # Passage to a Foreign World
+  - un_bk_q  # Underground Bunker
+  - un_bunker  # Underground Bunker
+  - un_myst  # Underground Tunnel
+  - verus01  # Laboratory-OPTATIO
+  - xmas_dun01  # Toy Factory Warehouse
+  - xmas_dun02  # Toy Monitoring Room

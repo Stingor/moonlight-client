@@ -11,6 +11,11 @@ ro::render::TerrainStages TerrainStagesOf(const GraphicsOptions& graphics, bool 
   return stages;
 }
 
+bool SunShadowsApply(const GraphicsOptions& graphics, const ro::render::TerrainStages& stages,
+                     bool indoor) {
+  return graphics.sun_shadows() && stages.shadowmap && !stages.flat_color.has_value() && !indoor;
+}
+
 ActorLighting ActorLightingOf(const GraphicsOptions& graphics,
                               const ro::render::GroundLight* ground,
                               const AilmentTints* ailment_tints) {

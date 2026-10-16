@@ -5,6 +5,7 @@
 // ⚠ À CÔTÉ DE LA BOUCLE : un sujet entier — un graphe lu en arrière-plan, un
 // guidage, deux fenêtres et les portes qui y mènent.
 
+#include <chrono>
 #include <cstdio>
 #include <optional>
 #include <string>
@@ -27,6 +28,7 @@
 #include "world/minimap_compose.h"
 #include "world/navi_bug_report.h"
 #include "world/navigation_compose.h"
+#include "world/server_sky_hour.h"
 #include "world/world_map_routes.h"
 
 namespace moonclient {
@@ -293,6 +295,16 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     sources.battle_mates_shown = settings_->options().pages().battleground.settings().minimap_mates;
     sources.battle_mate_color = BattleSideColor(world_.battlefield().own_side());
     sources.image_at = image_at;
+    // L'HEURE DU SERVEUR, dans le fuseau que `moonclient.yml` lui donne.
+    std::string server_clock;
+    if (minimap_layout.settings.show_server_clock) {
+      if (const std::optional<float> hour =
+              ServerSkyHour(shell_.server_time_zone(), std::chrono::system_clock::now());
+          hour.has_value()) {
+        server_clock = ServerClockText(*hour);
+      }
+    }
+    sources.server_clock = server_clock;
     minimap.view = &navi_.minimap_view.Compose(sources);
   } else {
     minimap.view = nullptr;

@@ -156,6 +156,9 @@ struct MinimapView {
   std::string_view map_name;
   // Son nom lisible, vide si le jeu n'en connaît pas.
   std::string_view display_name;
+  // L'heure du serveur, « HH:MM » ; vide quand elle ne se montre pas ou ne se
+  // connaît pas. Voir `MinimapSettings::show_server_clock`.
+  std::string_view server_clock;
   // La taille de la carte en cellules. Zéro : rien ne se situe, la fenêtre ne
   // montre que le fond.
   int cells_width = 0;

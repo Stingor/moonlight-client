@@ -37,6 +37,9 @@ struct MapStage {
   // La lumière peinte sur la carte, telle qu'un sprite la reçoit. Vide sans
   // grille : c'est elle qui dit où un acteur se tient au-dessus du sol.
   ro::render::GroundLight ground_light;
+  // La même, SANS l'ombre cuite : celle des acteurs quand l'ombre du soleil
+  // remplace celle de la carte.
+  ro::render::GroundLight ground_laid_light;
   // LE RELIEF QU'ON A DEMANDÉ À LA LECTURE : aplati (GreyWorld) ou non.
   //
   // ⚠ PAS FORCÉMENT CELUI QU'ON A : une carte sans aucun sol ne s'aplatit pas,

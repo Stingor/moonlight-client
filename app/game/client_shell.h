@@ -13,6 +13,7 @@
 #include "ro/render/gl_context.h"
 #include "ro/vfs/vfs.h"
 
+#include "game/client_config.h"
 #include "game/game_pieces.h"
 #include "game/game_settings.h"
 #include "game/ui_layouts.h"
@@ -123,6 +124,10 @@ class ClientShell {
     return ro::vfs::MountOptions{.root = archive_root_, .archives = archives_};
   }
   [[nodiscard]] const std::string& web() const noexcept { return web_; }
+  // Le fuseau horaire du serveur, lu dans `moonclient.yml` : voir
+  // `ClientConfig::server_time_zone`.
+  void SetServerTimeZone(std::string zone) { server_time_zone_ = std::move(zone); }
+  [[nodiscard]] const std::string& server_time_zone() const noexcept { return server_time_zone_; }
 
   // L'ENREGISTREMENT DU FLUX DE ZONE, quand une option d'essai le demande.
   // Voir `ZoneStreamCapture`.
@@ -226,6 +231,7 @@ class ClientShell {
   // navigation.
   std::vector<std::string> archives_;
   std::string web_;
+  std::string server_time_zone_ = std::string(kDefaultServerTimeZone);
   std::optional<ZoneStreamCapture> zone_capture_;
   std::optional<ro::vfs::Vfs> vfs_;
   std::optional<GameSettings> settings_;

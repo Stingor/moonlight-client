@@ -86,6 +86,8 @@ const ro::ui::MinimapView& MinimapComposer::Compose(const MinimapSources& from) 
   map_name_ = from.world->map_name();
   view_.map_name = map_name_;
   view_.display_name = from.display_name;
+  server_clock_ = from.server_clock;
+  view_.server_clock = server_clock_;
   view_.cells_width = from.cells_width;
   view_.cells_height = from.cells_height;
   if (const ro::sim::Actor* player = from.world->player(); player != nullptr) {

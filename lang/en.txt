@@ -17,6 +17,9 @@ tr: %.*s — level %d
 fr: %.0f s
 tr: %.0f s
 
+fr: %02d h %02d — %s
+tr: %02d:%02d — %s
+
 fr: %c ou %s champ de bataille
 tr: %c or %s battleground
 
@@ -200,6 +203,63 @@ fr: %s a été placé dans la fenêtre d'échange d'équipement.
 tr: %s has been placed in the Swap Equipment window.
 fr: %s a été retiré de la fenêtre d'échange d'équipement.
 tr: %s has been removed from the Swap Equipment window.
+fr: 1 h / min
+tr: 1 h / min
+
+fr: 1 jour / min
+tr: 1 day / min
+
+fr: 10 min / min
+tr: 10 min / min
+
+fr: 2 min / min
+tr: 2 min / min
+
+fr: 30 min / min
+tr: 30 min / min
+
+fr: 4 h / min
+tr: 4 h / min
+
+fr: 5 jours / min
+tr: 5 days / min
+
+fr: 5 min / min
+tr: 5 min / min
+
+fr: Afficher l'heure du serveur
+tr: Show the server time
+
+fr: Balayage (°)
+tr: Sweep (°)
+
+fr: Ciel
+tr: Sky
+
+fr: Coucher (h)
+tr: Sunset (h)
+
+fr: Cycle jour/nuit
+tr: Day/night cycle
+
+fr: Décalage d'azimut (°)
+tr: Azimuth offset (°)
+
+fr: Décochée, c'est la course tirée de la lumière de la carte.
+tr: Unchecked, it is the course drawn from the map's light.
+
+fr: Faire tourner le temps
+tr: Let time run
+
+fr: Forcer l'heure du ciel
+tr: Force the sky's hour
+
+fr: Hauteur de midi (°)
+tr: Noon altitude (°)
+
+fr: Hauteur de midi imposée
+tr: Force the noon altitude
+
 fr: Il n'y a aucun équipement à échanger.
 tr: There is no item to replace.
 fr: Impossible de ranger cet item dans la fenêtre d'échange.
@@ -898,6 +958,51 @@ tr: Adds everything sellable; the shop closes after the sale, which asks for con
 
 fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente.
 tr: Adds everything sellable; the shop closes after the sale.
+
+fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
+tr: The time of day on the server, the one the day/night cycle follows — not your computer's.
+
+fr: Le sol et le décor reçoivent l'ombre du soleil de la carte, calculée à chaque image au lieu de celle que la carte a peinte : les arbres et les bâtiments s'ombrent aussi eux-mêmes. En plein air seulement.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
+tr: The ground and scenery receive the shadow of the map's sun, computed every frame instead of the one painted into the map: trees and buildings also shade themselves. Outdoors only.\n\nThe original client has none, and the graphics card works harder.
+
+fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres du soleil en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
+tr: The sun, then the moon, follow the time of day on the server: morning, noon and evening light, then a darker, bluish night. Outdoors only.\n\nWith “Real-time sun shadows”, the shadows turn with it. The original client keeps the map's light at every hour.
+
+fr: Lever (h)
+tr: Sunrise (h)
+
+fr: Ombres du soleil en temps réel
+tr: Real-time sun shadows
+
+fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée dans Graphics.
+tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time sun shadows” is checked in Graphics.
+
+fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
+tr: Nothing is saved: every launch brings back the map's own sky.
+
+fr: Règle le chemin du soleil et de la lune dans le ciel : d'où ils viennent, à quelle hauteur ils culminent à midi, et quelle part de l'horizon ils balaient.
+tr: Adjusts the path of the sun and moon across the sky: where they come from, how high they climb at noon, and how much of the horizon they sweep.
+
+fr: Régler la course des astres
+tr: Adjust the course of the sky
+
+fr: Rétablir la course
+tr: Reset the course
+
+fr: Serveur %.*s
+tr: Server %.*s
+
+fr: Seul ce client voit ce ciel : rien ne part au serveur.
+tr: Only this client sees this sky: nothing is sent to the server.
+
+fr: Temps réel (1 min / min)
+tr: Real time (1 min / min)
+
+fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
+tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
+
+fr: Vitesse du temps
+tr: Speed of time
 
 fr: aucun morceau
 tr: no track
@@ -2952,14 +3057,23 @@ tr: the server still holds the previous connection; try again in a minute
 fr: le temps de jeu payé pour ce compte est épuisé
 tr: the paid play time for this account has run out
 
+fr: lune
+tr: moon
+
 fr: quelqu'un vient de se connecter avec ce compte
 tr: someone just logged in with this account
+
+fr: soleil
+tr: sun
 
 fr: trop de connexions depuis cette adresse
 tr: too many connections from this address
 
 fr: un membre de l'équipe a déconnecté ce compte
 tr: a staff member disconnected this account
+
+fr: À midi, c'est la lumière que la carte déclare. Le soleil se lève à 6 h et se couche à 18 h ; la lune prend la nuit, plus faible et bleutée.
+tr: At noon, it is the light the map declares. The sun rises at 6:00 and sets at 18:00; the moon takes the night, dimmer and bluish.
 
 fr: Échec du GIF
 tr: GIF failed

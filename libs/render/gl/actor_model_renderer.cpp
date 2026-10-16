@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 
 #include "ro/render/fog_shader.h"
+#include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
 namespace {
@@ -30,11 +31,13 @@ void main() {
     v_color = a_color;
     gl_Position = u_view_projection * vec4(a_position, 1.0);
     v_fog_kept = FogKeptPart(gl_Position.w);
+    // Les sommets ne portent pas de normale : le décalage se fait vers le ciel.
+    SunShadowProject(a_position, vec3(0.0, 1.0, 0.0));
 }
 )GLSL";
 
 // Le rejet des texels vides est celui des autres primitives du client : un test
-// d'alpha de seuil un.
+// d'alpha de seuil un. La carte d'ombre coupe plus haut, comme les sprites.
 constexpr std::string_view kFragmentShader = R"GLSL(
 #version 330 core
 in vec2 v_texture_uv;
@@ -42,19 +45,28 @@ in vec4 v_color;
 in float v_fog_kept;
 
 uniform sampler2D u_texture;
+uniform float u_alpha_reference;
+// Ce que l'ombre du soleil laisse au modèle : voir `SunShadowView::sprite_shade`.
+uniform vec3 u_sun_shade;
+// Ce que l'heure laisse de la lumière de midi : voir `SceneLight::daylight`.
+uniform vec3 u_daylight;
 
 out vec4 frag_color;
 
-const float kAlphaReference = 1.0 / 255.0;
-
 void main() {
     vec4 color = texture(u_texture, v_texture_uv) * v_color;
-    if (color.a < kAlphaReference) {
+    if (color.a < u_alpha_reference) {
         discard;
     }
+    color.rgb *= mix(u_sun_shade, vec3(1.0), SunVisibility()) * u_daylight;
     frag_color = vec4(Fogged(color.rgb, v_fog_kept), color.a);
 }
 )GLSL";
+
+constexpr float kColorAlphaReference = 1.0F / 255.0F;
+// LA SILHOUETTE DANS LA CARTE D'OMBRE coupe au demi : un bord adouci ne porte
+// pas d'ombre.
+constexpr float kDepthAlphaReference = 0.5F;
 
 formats::Image ImageOf(const formats::GrannyTextureImage& texture) {
   formats::Image image;
@@ -102,8 +114,9 @@ void ActorModelRenderer::Release() noexcept {
 }
 
 core::Result<ActorModelRenderer> ActorModelRenderer::Create() {
-  auto program = GlProgram::Link(WithFog(kVertexShader, kFogVertexGlsl),
-                                 WithFog(kFragmentShader, kFogFragmentGlsl));
+  auto program = GlProgram::Link(
+      WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
+      WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -150,7 +163,8 @@ const GlTexture* ActorModelRenderer::TextureFor(const ActorModelTexture& texture
 }
 
 void ActorModelRenderer::Draw(const Camera& camera, std::span<const DrawnActorModel> models,
-                              float aspect_ratio, const SceneFog& fog) {
+                              float aspect_ratio, const SceneFog& fog, const SunShadowView& sun,
+                              const glm::vec3& daylight) {
   if (models.empty()) {
     return;
   }
@@ -163,7 +177,36 @@ void ActorModelRenderer::Draw(const Camera& camera, std::span<const DrawnActorMo
   program_.SetMatrix4("u_view_projection",
                       camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
   program_.SetInt("u_texture", 0);
+  program_.SetFloat("u_alpha_reference", kColorAlphaReference);
   SetFogUniforms(program_, fog);
+  SetSunShadowUniforms(program_, sun, SunShadowLayer::kWorld);
+  program_.SetVector3("u_sun_shade", sun.sprite_shade);
+  program_.SetVector3("u_daylight", daylight);
+  DrawMeshes(models);
+  glDisable(GL_BLEND);
+}
+
+void ActorModelRenderer::DrawDepth(const glm::mat4& light_view_projection,
+                                   std::span<const DrawnActorModel> models) {
+  if (models.empty()) {
+    return;
+  }
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_BLEND);
+  program_.Use();
+  program_.SetMatrix4("u_view_projection", light_view_projection);
+  program_.SetInt("u_texture", 0);
+  program_.SetFloat("u_alpha_reference", kDepthAlphaReference);
+  SetFogUniforms(program_, SceneFog());
+  SetSunShadowUniforms(program_, SunShadowView());
+  program_.SetVector3("u_sun_shade", glm::vec3(1.0F));
+  program_.SetVector3("u_daylight", glm::vec3(1.0F));
+  DrawMeshes(models);
+}
+
+void ActorModelRenderer::DrawMeshes(std::span<const DrawnActorModel> models) {
   glBindVertexArray(vertex_array_);
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
   for (const DrawnActorModel& model : models) {
@@ -183,7 +226,6 @@ void ActorModelRenderer::Draw(const Camera& camera, std::span<const DrawnActorMo
     }
   }
   glBindVertexArray(0);
-  glDisable(GL_BLEND);
 }
 
 }  // namespace ro::render

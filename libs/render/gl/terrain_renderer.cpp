@@ -7,6 +7,7 @@
 
 #include "ro/render/fog_shader.h"
 #include "ro/render/scene_cutout.h"
+#include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
 namespace {
@@ -33,6 +34,8 @@ out vec2 v_texture_uv;
 out vec2 v_lightmap_uv;
 out vec4 v_color;
 out vec3 v_light;
+// L'éclairement sans le soleil : celui d'un point à l'ombre.
+out vec3 v_shaded_light;
 out float v_fog_kept;
 
 void main() {
@@ -41,6 +44,7 @@ void main() {
     v_color = a_color;
     gl_Position = u_view_projection * vec4(a_position, 1.0);
     v_fog_kept = FogKeptPart(gl_Position.w);
+    SunShadowProject(a_position, normalize(a_normal));
 
     // Incidence mesurée contre la direction TELLE QUELLE, sans la négliger.
     //
@@ -67,6 +71,7 @@ void main() {
                            min(u_light_diffuse, u_light_ambient),
                        1.0);
     v_light = clamp(min(lit, ceiling), 0.0, 1.0);
+    v_shaded_light = clamp(min(ambient, ceiling), 0.0, 1.0);
 }
 )GLSL";
 
@@ -76,6 +81,7 @@ in vec2 v_texture_uv;
 in vec2 v_lightmap_uv;
 in vec4 v_color;
 in vec3 v_light;
+in vec3 v_shaded_light;
 in float v_fog_kept;
 
 uniform sampler2D u_texture;
@@ -89,6 +95,8 @@ uniform float u_lightmap_strength;
 uniform float u_tile_color_strength;
 // La nuit de la carte, en facteur : voir `SceneLight::tint`.
 uniform vec3 u_light_tint;
+// Ce que l'heure laisse de la lumière de midi : voir `SceneLight::daylight`.
+uniform vec3 u_daylight;
 // La lumière froide : 1 quand le rouge et le bleu de la lumière posée
 // s'échangent, 0 sinon. Voir TerrainStages::cold_light.
 uniform float u_cold_light;
@@ -113,13 +121,15 @@ void main() {
         discard;
     }
 
-    vec3 result = texel.rgb * max(v_light, vec3(1.0 - u_vertex_light_strength));
+    // À L'OMBRE DU SOLEIL, la diffuse s'éteint et l'ambiante reste.
+    vec3 light = mix(v_shaded_light, v_light, SunVisibility());
+    vec3 result = texel.rgb * max(light, vec3(1.0 - u_vertex_light_strength));
     // La couleur de carreau module la texture, comme l'éclairage du sommet :
     // c'est la passe de base, que l'extinction des ombres laisse en place.
     result *= max(v_color.rgb, vec3(1.0 - u_tile_color_strength));
     // LA NUIT ASSOMBRIT LA COULEUR DU CARREAU, pas la lumière posée par la
     // lightmap, qui s'ajoute ensuite.
-    result *= u_light_tint;
+    result *= u_light_tint * u_daylight;
 
     // L'alpha de la lightmap est l'OMBRE, multiplicative ; son RGB est la
     // lumière posée par-dessus, additive. Les deux ne se composent pas de la
@@ -186,8 +196,9 @@ TerrainRenderer::~TerrainRenderer() {
 }
 
 core::Result<TerrainRenderer> TerrainRenderer::Create() {
-  auto program = GlProgram::Link(WithFog(kVertexShader, kFogVertexGlsl),
-                                 WithFog(kFragmentShader, kFogFragmentGlsl));
+  auto program = GlProgram::Link(
+      WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
+      WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -262,11 +273,22 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
 
 void TerrainRenderer::Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
                            const std::array<float, 4>& clear_color, const TerrainStages& stages,
-                           const SceneFog& fog) const {
+                           const SceneFog& fog, const SunShadowView& sun) const {
   glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
   // Le stencil avec la profondeur : la silhouette des corps ne vaut que pour
   // l'image qui la pose.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  DrawSurfaces(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), light, stages, fog,
+               sun);
+}
+
+void TerrainRenderer::DrawDepth(const glm::mat4& light_view_projection) const {
+  DrawSurfaces(light_view_projection, SceneLight(), TerrainStages(), SceneFog(), SunShadowView());
+}
+
+void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const SceneLight& light,
+                                   const TerrainStages& stages, const SceneFog& fog,
+                                   const SunShadowView& sun) const {
   glEnable(GL_DEPTH_TEST);
   // Pas d'élimination des faces arrière : les faces latérales du terrain ne
   // sont pas orientées de façon cohérente d'un dénivelé à l'autre, et en
@@ -274,8 +296,7 @@ void TerrainRenderer::Draw(const Camera& camera, const SceneLight& light, float 
   glDisable(GL_CULL_FACE);
 
   program_.Use();
-  program_.SetMatrix4("u_view_projection",
-                      camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
+  program_.SetMatrix4("u_view_projection", view_projection);
   program_.SetInt("u_texture", 0);
   program_.SetInt("u_lightmap", 1);
   const float lightmap_present = has_lightmap_ ? 1.0F : 0.0F;
@@ -291,7 +312,9 @@ void TerrainRenderer::Draw(const Camera& camera, const SceneLight& light, float 
   program_.SetVector3("u_light_ambient", light.ambient);
   program_.SetVector3("u_light_diffuse", light.diffuse);
   program_.SetVector3("u_light_tint", light.tint);
+  program_.SetVector3("u_daylight", light.daylight);
   SetFogUniforms(program_, fog);
+  SetSunShadowUniforms(program_, sun);
 
   (has_lightmap_ ? lightmap_ : placeholder_).Bind(1);
 

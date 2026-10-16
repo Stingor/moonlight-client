@@ -287,19 +287,8 @@ bool DrawSettingsPopup(MinimapSettings& settings, MinimapWindowState& state, con
   return open;
 }
 
-// « carte,x,y », la forme sous laquelle un joueur lit et annonce une position,
-// précédée du nom lisible replié sur la largeur de la carte.
-void DrawCaption(const MinimapSettings& settings, const MinimapView& view, bool named, bool located,
-                 float side) {
-  if (named) {
-    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + side);
-    ImGui::TextUnformatted(view.display_name.data(),
-                           view.display_name.data() + view.display_name.size());
-    ImGui::PopTextWrapPos();
-  }
-  if (!settings.show_coords) {
-    return;
-  }
+// « carte,x,y » quand le joueur se situe, la carte seule sinon.
+void DrawCoordinates(const MinimapView& view, bool located) {
   const int map_bytes = static_cast<int>(view.map_name.size());
   if (!view.map_name.empty() && located) {
     ImGui::Text("%.*s,%d,%d", map_bytes, view.map_name.data(), static_cast<int>(view.player_cell_x),
@@ -308,6 +297,31 @@ void DrawCaption(const MinimapSettings& settings, const MinimapView& view, bool 
     ImGui::TextDisabled("%.*s", map_bytes, view.map_name.data());
   } else {
     ImGui::TextDisabled("-");
+  }
+}
+
+// L'HEURE DU SERVEUR se montre-t-elle : la case, et une heure connue.
+[[nodiscard]] bool ClockShown(const MinimapSettings& settings, const MinimapView& view) {
+  return settings.show_server_clock && !view.server_clock.empty();
+}
+
+// « carte,x,y », la forme sous laquelle un joueur lit et annonce une position,
+// précédée du nom lisible replié sur la largeur de la carte, et suivie de
+// l'heure du serveur.
+void DrawCaption(const MinimapSettings& settings, const MinimapView& view, bool named, bool located,
+                 float side) {
+  if (named) {
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + side);
+    ImGui::TextUnformatted(view.display_name.data(),
+                           view.display_name.data() + view.display_name.size());
+    ImGui::PopTextWrapPos();
+  }
+  if (settings.show_coords) {
+    DrawCoordinates(view, located);
+  }
+  if (ClockShown(settings, view)) {
+    ImGui::Text(core::Tr("Serveur %.*s"), static_cast<int>(view.server_clock.size()),
+                view.server_clock.data());
   }
 }
 
@@ -322,7 +336,8 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
   MinimapSquareFit fit{
       .pad_x = style.WindowPadding.x * 2.0F,
       .pad_y = style.WindowPadding.y * 2.0F,
-      .extra_height = settings.show_coords ? ImGui::GetTextLineHeightWithSpacing() : 0.0F};
+      .extra_height = (settings.show_coords ? ImGui::GetTextLineHeightWithSpacing() : 0.0F) +
+                      (ClockShown(settings, view) ? ImGui::GetTextLineHeightWithSpacing() : 0.0F)};
   // ⚠ UN NOM STABLE : il porte l'identité de la fenêtre. Le faire varier avec
   // la carte lui ferait perdre sa place à chaque déplacement.
   const std::string name = std::string("###") + kMinimapWindowId;

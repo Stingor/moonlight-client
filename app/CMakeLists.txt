@@ -756,12 +756,14 @@ target_include_directories(moonclient_portraitoptions PUBLIC ${CMAKE_CURRENT_SOU
 # verrait qu'en comparant deux écrans. Un banc le voit.
 add_library(moonclient_graphics STATIC
     options/graphics_options.cpp
-    world/scene_graphics.cpp)
+    world/closed_maps.cpp
+    world/scene_graphics.cpp
+    world/server_sky_hour.cpp)
 
 target_link_libraries(moonclient_graphics
     PUBLIC ro_audio ro_core ro_formats ro_sim ro_vfs ro_render ro_ui moonclient_display
            moonclient_settings
-    PRIVATE ro_warnings)
+    PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -1593,6 +1595,7 @@ add_executable(moonclient
     game/game_afk.cpp
     game/game_description.cpp
     game/game_draw.cpp
+    game/game_sky.cpp
     game/game_grey_world.cpp
     game/game_map_effects.cpp
     game/over_world_layer.cpp
@@ -1683,6 +1686,7 @@ add_executable(moonclient
     options/game_option_items.cpp
     options/game_option_toast.cpp
     options/game_option_keys.cpp
+    options/staff_sky_keys.cpp
     options/game_option_rows.cpp
     options/game_option_skill_area.cpp
     options/monster_sheet_options.cpp

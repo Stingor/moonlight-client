@@ -11,6 +11,7 @@
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
 #include "ro/render/scene_fog.h"
+#include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
 
@@ -33,8 +34,18 @@ class ActorModelRenderer {
 
   [[nodiscard]] static core::Result<ActorModelRenderer> Create();
 
+  // `sun` assombrit chaque face de l'ombre du soleil, lue sur la couche du monde
+  // seul : un modèle d'acteur ne s'ombre pas lui-même — sa lumière par sommet
+  // porte déjà son modelé.
+  //
+  // `daylight` est ce que l'heure laisse de la lumière de midi : voir
+  // `SceneLight::daylight`.
   void Draw(const Camera& camera, std::span<const DrawnActorModel> models, float aspect_ratio,
-            const SceneFog& fog = SceneFog());
+            const SceneFog& fog = SceneFog(), const SunShadowView& sun = SunShadowView(),
+            const glm::vec3& daylight = glm::vec3(1.0F));
+
+  // LES MODÈLES DANS LA CARTE D'OMBRE : leur seule profondeur, vue du soleil.
+  void DrawDepth(const glm::mat4& light_view_projection, std::span<const DrawnActorModel> models);
 
   // Oublie les textures d'une source qui s'en va — une ressource déchargée,
   // un emblème remplacé.
@@ -42,6 +53,8 @@ class ActorModelRenderer {
 
  private:
   void Release() noexcept;
+  // Les tracés des maillages, texture liée, sur le programme en service.
+  void DrawMeshes(std::span<const DrawnActorModel> models);
   [[nodiscard]] const GlTexture* TextureFor(const ActorModelTexture& texture);
 
   GlProgram program_;

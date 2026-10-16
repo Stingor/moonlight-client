@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdio>
 
 #include "ro/core/i18n.h"
@@ -109,6 +110,98 @@ void DrawSound(StaffToolsState& state, const SkinArt& art) {
   // L'aide HORS du grisé : c'est elle qui dit pourquoi la case ne répond plus.
   ImGui::SameLine();
   SkinHelpMarker(core::Tr("Zones de son d'ambiance"), kSoundZonesHelp);
+}
+
+constexpr std::array<const char*, 4> kSkyHelp = {
+    core::TrText("Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor "
+                 "suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée "
+                 "dans Graphics."),
+    core::TrText("À midi, c'est la lumière que la carte déclare. Le soleil se lève à 6 h et se "
+                 "couche à 18 h ; la lune prend la nuit, plus faible et bleutée."),
+    core::TrText("Seul ce client voit ce ciel : rien ne part au serveur."),
+    core::TrText("Rien n'est retenu : chaque lancement rend le ciel de la carte."),
+};
+
+constexpr float kMinutesPerHour = 60.0F;
+
+// Les libellés des vitesses, dans l'ordre de `StaffSkyClock::kMinutesPerMinute`.
+constexpr std::array<const char*, StaffSkyClock::kMinutesPerMinute.size()> kSkySpeedNames = {
+    core::TrText("Temps réel (1 min / min)"),
+    core::TrText("2 min / min"),
+    core::TrText("5 min / min"),
+    core::TrText("10 min / min"),
+    core::TrText("30 min / min"),
+    core::TrText("1 h / min"),
+    core::TrText("4 h / min"),
+    core::TrText("1 jour / min"),
+    core::TrText("5 jours / min"),
+};
+
+// LE CIEL : l'heure du soleil et de la lune.
+void DrawSky(StaffSkyClock& sky, const render::SkyCourse& course, const SkinArt& art) {
+  ImGui::SeparatorText(core::Tr("Ciel"));
+  static_cast<void>(SkinCheckBox(core::Tr("Forcer l'heure du ciel"), &sky.forced, art));
+  ImGui::SameLine();
+  SkinHelpMarker(core::Tr("Forcer l'heure du ciel"), kSkyHelp);
+  ImGui::SameLine();
+  const auto whole_hours = static_cast<int>(sky.hour);
+  const auto minutes =
+      static_cast<int>((sky.hour - static_cast<float>(whole_hours)) * kMinutesPerHour);
+  ImGui::TextDisabled(core::Tr("%02d h %02d — %s"), whole_hours, minutes,
+                      course.SunAt(sky.hour) ? core::Tr("soleil") : core::Tr("lune"));
+  ImGui::BeginDisabled(!sky.forced);
+  static_cast<void>(
+      SkinSliderFloat(core::Tr("Heure"), &sky.hour, 0.0F, render::kHoursPerDay, art, "%.2f"));
+  static_cast<void>(SkinCheckBox(core::Tr("Faire tourner le temps"), &sky.running, art));
+  ImGui::BeginDisabled(!sky.running);
+  static_cast<void>(SkinCombo(core::Tr("Vitesse du temps"), &sky.speed_rank, kSkySpeedNames, art));
+  ImGui::EndDisabled();
+  ImGui::EndDisabled();
+}
+
+constexpr std::array<const char*, 3> kSkyCourseHelp = {
+    core::TrText("Règle le chemin du soleil et de la lune dans le ciel : d'où ils viennent, à "
+                 "quelle hauteur ils culminent à midi, et quelle part de l'horizon ils balaient."),
+    core::TrText("Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de "
+                 "Graphics. Seul ce client le voit."),
+    core::TrText("Décochée, c'est la course tirée de la lumière de la carte."),
+};
+
+// Les bornes des curseurs de la course, en degrés et en heures.
+constexpr float kMostAzimuthOffsetDegrees = 180.0F;
+constexpr float kLowestNoonAltitudeDegrees = 5.0F;
+constexpr float kHighestNoonAltitudeDegrees = 90.0F;
+constexpr float kLatestSunriseHour = 12.0F;
+
+// LA COURSE DES ASTRES : voir `render::SkyCourse`.
+void DrawSkyCourse(StaffToolsLook& look, const SkinArt& art) {
+  static_cast<void>(
+      SkinCheckBox(core::Tr("Régler la course des astres"), &look.sky_course_tuned, art));
+  ImGui::SameLine();
+  SkinHelpMarker(core::Tr("Régler la course des astres"), kSkyCourseHelp);
+  render::SkyCourse& course = look.sky_course;
+  ImGui::BeginDisabled(!look.sky_course_tuned);
+  static_cast<void>(SkinSliderFloat(core::Tr("Décalage d'azimut (°)"),
+                                    &course.azimuth_offset_degrees, -kMostAzimuthOffsetDegrees,
+                                    kMostAzimuthOffsetDegrees, art, "%.0f"));
+  static_cast<void>(
+      SkinCheckBox(core::Tr("Hauteur de midi imposée"), &course.noon_altitude_forced, art));
+  ImGui::BeginDisabled(!course.noon_altitude_forced);
+  static_cast<void>(SkinSliderFloat(core::Tr("Hauteur de midi (°)"), &course.noon_altitude_degrees,
+                                    kLowestNoonAltitudeDegrees, kHighestNoonAltitudeDegrees, art,
+                                    "%.0f"));
+  ImGui::EndDisabled();
+  static_cast<void>(SkinSliderFloat(core::Tr("Balayage (°)"), &course.sweep_degrees,
+                                    render::kNarrowestSweepDegrees, render::kWidestSweepDegrees,
+                                    art, "%.0f"));
+  static_cast<void>(SkinSliderFloat(core::Tr("Lever (h)"), &course.sunrise_hour, 0.0F,
+                                    kLatestSunriseHour, art, "%.1f"));
+  static_cast<void>(SkinSliderFloat(core::Tr("Coucher (h)"), &course.sunset_hour,
+                                    kLatestSunriseHour, render::kHoursPerDay, art, "%.1f"));
+  if (SkinButton(core::Tr("Rétablir la course"), art)) {
+    course = render::SkyCourse();
+  }
+  ImGui::EndDisabled();
 }
 
 constexpr std::array<const char*, 3> kDebugConsoleHelp = {
@@ -233,6 +326,12 @@ std::array<float, 3> FlatGroundColorOf(const FlatGroundLook& flat) {
   return {held.x, held.y, held.z};
 }
 
+float StaffSkyClock::HoursPerMinute() const noexcept {
+  const auto rank = static_cast<std::size_t>(
+      std::clamp(speed_rank, 0, static_cast<int>(kMinutesPerMinute.size()) - 1));
+  return static_cast<float>(kMinutesPerMinute[rank]) / kMinutesPerHour;
+}
+
 bool SoundZonesShown(const StaffToolsState& state) noexcept {
   return state.look.sound_zones && state.sound_audible;
 }
@@ -274,6 +373,9 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
   // Juste avant la caméra.
   static_cast<void>(DrawQuickCastSettings(state.quick_cast, art, allowed));
   DrawDebugCamera(state.look, art);
+  DrawSky(state.sky, state.look.sky_course_tuned ? state.look.sky_course : render::SkyCourse(),
+          art);
+  DrawSkyCourse(state.look, art);
   DrawSound(state, art);
   DrawPicking(state.look.picking, art);
   DrawDebugConsole(state, art);

@@ -20,6 +20,8 @@ using ro::ui::OptionRowView;
 
 constexpr const char* kLightmapsKey = "shadows_of_the_map";
 constexpr const char* kColdLightKey = "light_cold";
+constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
+constexpr const char* kDayNightCycleKey = "cycle_day_night";
 constexpr const char* kFogKey = "fog";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
 constexpr const char* kSummonTranslucentKey = "summons_translucent";
@@ -54,6 +56,8 @@ constexpr const char* kFxaaStrengthKey = "post_fx_fxaa_forced";
 enum class GraphicsRow : int {
   kLightmaps = 0,
   kColdLight,
+  kSunShadows,
+  kDayNightCycle,
   kFog,
   kDecorVeil,
   kSummonTranslucent,
@@ -195,6 +199,7 @@ ro::render::ModelTextureFilter GraphicsOptions::decor_filter() const {
 void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kLightmapsKey, &lightmaps_);
   into.Declare(kColdLightKey, &cold_light_);
+  into.Declare(kDayNightCycleKey, &day_night_cycle_);
   into.Declare(kFogKey, &fog_);
   into.Declare(kDecorVeilKey, &decor_veil_);
   into.Declare(kSummonTranslucentKey, &summon_translucent_);
@@ -209,6 +214,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
     into.Declare(kMsaaKey, &msaa_samples_);
     into.Declare(kRenderScaleKey, &render_scale_percent_);
     into.Declare(kDecorFilterKey, &decor_filter_rank_);
+    into.Declare(kSunShadowsKey, &sun_shadows_);
   }
   into.Declare(kPostFxKey, &post_fx_.enabled);
   into.Declare(kBrightnessKey, &post_fx_.brightness);
@@ -240,6 +246,24 @@ void GraphicsOptions::Compose() {
                          nullptr, cold_light_));
   rows_.back().indented = true;
   rows_.back().disabled = !lightmaps_;
+  // ⚠ GRISÉE SANS OMBRES, comme la lumière froide : c'est l'ombre de la carte
+  // qu'elle remplace.
+  rows_.push_back(Toggle(GraphicsRow::kSunShadows, Tr("Ombres du soleil en temps réel"),
+                         Tr("Le sol et le décor reçoivent l'ombre du soleil de la carte, "
+                            "calculée à chaque image au lieu de celle que la carte a peinte : "
+                            "les arbres et les bâtiments s'ombrent aussi eux-mêmes. En plein "
+                            "air seulement.\n\nLe client d'origine n'en a pas, et la carte "
+                            "graphique travaille davantage."),
+                         nullptr, sun_shadows_));
+  rows_.back().indented = true;
+  rows_.back().disabled = !lightmaps_;
+  rows_.push_back(Toggle(GraphicsRow::kDayNightCycle, Tr("Cycle jour/nuit"),
+                         Tr("Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : "
+                            "lumière du matin, du midi et du soir, puis une nuit plus sombre et "
+                            "bleutée. En plein air seulement.\n\nAvec « Ombres du soleil en temps "
+                            "réel », les ombres tournent avec lui. Le client d'origine garde la "
+                            "lumière de la carte à toute heure."),
+                         nullptr, day_night_cycle_));
   rows_.push_back(Toggle(GraphicsRow::kFog, Tr("Brouillard"),
                          Tr("La brume que certaines cartes posent au loin : le décor et les "
                             "personnages s'effacent dans sa couleur à mesure qu'ils s'éloignent."),
@@ -425,6 +449,12 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kColdLight:
       cold_light_ = asked.on;
+      break;
+    case GraphicsRow::kSunShadows:
+      sun_shadows_ = asked.on;
+      break;
+    case GraphicsRow::kDayNightCycle:
+      day_night_cycle_ = asked.on;
       break;
     case GraphicsRow::kFog:
       fog_ = asked.on;

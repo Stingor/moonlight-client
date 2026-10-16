@@ -33,6 +33,9 @@ struct MinimapSources {
   int cells_width = 0;
   int cells_height = 0;
   std::string_view display_name;
+  // L'heure du serveur, « HH:MM », vide quand elle ne se montre pas. RECOPIÉE :
+  // le texte peut mourir avec l'appel.
+  std::string_view server_clock;
   const ro::vfs::TownInfo* towns = nullptr;
   const ro::formats::NaviData* navi = nullptr;
   const ro::sim::PartyRoster* party = nullptr;
@@ -70,6 +73,7 @@ class MinimapComposer {
 
   ro::ui::MinimapView view_;
   std::string map_name_;
+  std::string server_clock_;
   std::vector<std::string> labels_;
   std::vector<ro::ui::MinimapTownIcon> town_;
   std::vector<ro::ui::MinimapTownIcon> portals_;

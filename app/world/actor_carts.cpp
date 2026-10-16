@@ -189,7 +189,7 @@ std::span<const ro::render::DrawnActor> ActorCarts::Update(const CartFrame& fram
     // calque, quand la charrette prend l'opacité du réglage. Elle part donc à
     // part, AVANT la charrette et au même endroit — le tri, stable, la garde
     // dessous.
-    if (!shadow_.quads.empty()) {
+    if (frame.round_shadow && !shadow_.quads.empty()) {
       drawn_.push_back(ro::render::DrawnActor{&shadow_, nullptr, placed});
     }
     std::array<std::uint8_t, 4> tint = {255, 255, 255, alpha};

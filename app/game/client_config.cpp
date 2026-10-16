@@ -19,6 +19,7 @@ constexpr const char* kNameKey = "name";
 constexpr const char* kAddressKey = "address";
 constexpr const char* kPortKey = "port";
 constexpr const char* kWebKey = "web";
+constexpr const char* kServerTimeZoneKey = "server_time_zone";
 // Au premier niveau, la liste des GRF ; dans une fiche de serveur de patchs,
 // le dossier des archives de patch. Même mot, deux étages.
 constexpr const char* kGameArchivesKey = "archives";
@@ -171,6 +172,9 @@ ro::core::Result<ClientConfig> ParseClientConfig(std::string_view text) {
 
   if (const YAML::Node web = file[kWebKey]; web && web.IsScalar()) {
     config.web = web.as<std::string>();
+  }
+  if (const YAML::Node zone = file[kServerTimeZoneKey]; zone && zone.IsScalar()) {
+    config.server_time_zone = zone.as<std::string>();
   }
   auto archives = ParseArchives(file[kGameArchivesKey]);
   if (!archives) {

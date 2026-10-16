@@ -17,6 +17,7 @@
 #include "ro/render/gl_texture.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/sprite_billboard.h"
+#include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
 
@@ -264,11 +265,27 @@ class SpriteRenderer {
   // qui portent la même tête à la même pose n'en téléversent qu'une.
   //
   // `fog` n'embrume que les acteurs dont `DrawnActor::fogged` est vrai.
+  //
+  // `sun` assombrit chaque acteur de l'ombre du soleil lue À SES PIEDS, d'un
+  // seul tenant : un dessin plat à moitié ombré par sa propre silhouette serait
+  // faux. Il lit la couche de la carte sans les acteurs.
+  //
+  // `daylight` multiplie leur couleur : ce que l'heure du ciel laisse de la
+  // lumière de midi — voir `SceneLight::daylight`. Un sans ciel à l'heure.
   void Draw(const Camera& camera, std::span<const DrawnActor> actors, float aspect_ratio,
             Blending blending = Blending::kOver, DepthWrite depth_write = DepthWrite::kOff,
             DepthTest depth_test = DepthTest::kOn, const SceneFog& fog = SceneFog(),
             DrawOrder order = DrawOrder::kFarthestFirst,
-            BodySilhouette silhouette = BodySilhouette::kIgnored);
+            BodySilhouette silhouette = BodySilhouette::kIgnored,
+            const SunShadowView& sun = SunShadowView(),
+            const glm::vec3& daylight = glm::vec3(1.0F));
+
+  // LES SILHOUETTES DANS LA CARTE D'OMBRE : la seule profondeur des calques
+  // opaques, sur un panneau debout parallèle à l'écran — voir
+  // `ShadowPanelBasis`. Ni ombre ronde, ni calque additif. `camera` ne sert qu'aux
+  // élargissements comptés en pixels d'écran.
+  void DrawDepth(const glm::mat4& light_view_projection, const glm::vec3& toward_sun,
+                 const Camera& camera, std::span<const DrawnActor> actors);
 
   // Oublie les textures dont plus aucun acteur ne se sert.
   //
@@ -292,6 +309,21 @@ class SpriteRenderer {
 
   struct PreparedQuad;
   struct SpriteVertex;
+
+  // Remplit `prepared_` des quads de `ordered_`, sur le panneau `basis`.
+  // `silhouettes` ne garde que ce qui porte ombre : ni ombre ronde, ni calque
+  // additif, et la profondeur prise sur le panneau lui-même.
+  // `panel_basis`, quand une ombre se lit, pose aussi chaque quad dessiné sur
+  // le panneau d'ombre de son acteur.
+  void PrepareQuads(const Camera& camera, const BillboardBasis& basis, Blending blending,
+                    bool silhouettes, const BillboardBasis* panel_basis = nullptr);
+  // Glisse sous les pieds le panneau d'ombre des `quads` d'un acteur ancré à
+  // la hauteur `anchor_height` : voir `ShadowFootShift`. Des `silhouettes` se
+  // déplacent avec lui.
+  void SlideUnderFeet(std::span<PreparedQuad> quads, float anchor_height,
+                      const BillboardBasis& facing_camera, bool silhouettes);
+  // Verse `prepared_` dans le tampon de sommets, et le lie.
+  void UploadPrepared();
 
   GlProgram program_;
   std::map<SpriteImageKey, CachedTexture> textures_;

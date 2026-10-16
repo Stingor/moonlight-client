@@ -50,6 +50,9 @@ struct CartFrame {
   // La lumière de la carte, quand elle est allumée ; nulle sinon.
   const ro::render::GroundLight* light = nullptr;
   bool cold_light = false;
+  // L'OMBRE RONDE sous chaque charrette. Sous le soleil, sa silhouette en porte
+  // une, et la ronde se tait.
+  bool round_shadow = true;
 };
 
 class ActorCarts {

@@ -137,6 +137,9 @@ add_library(ro_render STATIC
     src/sight_quad_tree.cpp
     src/veiled_prims.cpp
     src/scene_light.cpp
+    src/sun_shadow.cpp
+    src/sky_clock.cpp
+    src/sky_body.cpp
     src/day_night_light.cpp
     src/second_family_pose.cpp
     src/screen_overlay.cpp
@@ -615,7 +618,10 @@ add_library(ro_render_gl STATIC
     gl/screen_tint.cpp
     gl/overlay_renderer.cpp
     gl/sprite_renderer.cpp
+    gl/sun_shadow_map.cpp
+    gl/sun_shadow_pass.cpp
     gl/terrain_renderer.cpp
+    gl/void_shade.cpp
     gl/water_renderer.cpp)
 add_library(ro::render_gl ALIAS ro_render_gl)
 

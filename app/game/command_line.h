@@ -42,6 +42,8 @@ struct Launch {
   // L'adresse du service web du serveur. Vide quand on la tait : la partie se
   // joue alors sans emblèmes de guilde.
   std::string web;
+  // Le fuseau horaire du serveur : voir `ClientConfig::server_time_zone`.
+  std::string server_time_zone = std::string(kDefaultServerTimeZone);
   // Les archives à monter, par priorité décroissante.
   std::vector<std::string> archives;
   // La mise à jour. Absente : on ne se patche pas — c'est le cas d'un dossier

@@ -21,6 +21,7 @@
 #include "ro/render/model_veil.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
+#include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
 
@@ -95,7 +96,12 @@ class ModelRenderer {
   // qui les peint, plus tard.
   void Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
             const ModelStages& stages = ModelStages(), const ModelClock* clock = nullptr,
-            const SceneFog& fog = SceneFog(), const ModelOpacities* opacities = nullptr) const;
+            const SceneFog& fog = SceneFog(), const ModelOpacities* opacities = nullptr,
+            const SunShadowView& sun = SunShadowView()) const;
+
+  // LE DÉCOR DANS LA CARTE D'OMBRE : sa seule profondeur, vue du soleil, toutes
+  // poses pleines, posées par `clock` comme dans `Draw`.
+  void DrawDepth(const glm::mat4& light_view_projection, const ModelClock* clock) const;
 
   // LA PASSE TRANSLUCIDE DES POSES VOILÉES, par-dessus tout ce qui est peint :
   // leurs suites de faces triées de la plus lointaine à la plus proche, mêlées
@@ -177,8 +183,12 @@ class ModelRenderer {
   // Remplit le tampon lié à GL_ARRAY_BUFFER, doubles faute de côtés.
   static void UploadSides(std::size_t vertex_count, std::span<const FaceSide> sides);
   static void Release(VertexStore& store);
-  void Use(const Camera& camera, const SceneLight& light, float aspect_ratio,
-           const ModelStages& stages, const SceneFog& fog) const;
+  void Use(const glm::mat4& view_projection, const SceneLight& light, const ModelStages& stages,
+           const SceneFog& fog, const SunShadowView& sun) const;
+  // La passe opaque, vue par `view_projection` : la caméra ou le soleil.
+  void DrawOpaque(const glm::mat4& view_projection, const SceneLight& light,
+                  const ModelStages& stages, const ModelClock* clock, const SceneFog& fog,
+                  const ModelOpacities* opacities, const SunShadowView& sun) const;
   // Lie la texture et son échantillonneur ; rend la texture liée, nulle pour le
   // repli.
   const GlTexture* BindTexture(const Batch& batch, std::int32_t texture_index, bool filtered) const;

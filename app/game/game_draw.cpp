@@ -119,27 +119,18 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // LE BROUILLARD, pour tout ce que le client peint dessous — voir `SceneFog`.
   const bool fog_shown = settings_->options().graphics().fog();
   const ro::render::SceneFog fog = FogOf(*stage_, fog_shown);
-  terrain_.Draw(camera_, pieces_.night_light.light(), aspect_ratio_,
-                ClearColorOf(*stage_, background_, fog_shown), stages, fog);
   // LES MODÈLES ANIMÉS partent de l'image zéro à la première image de la carte,
-  // comme chez le natif qui les pose à leur chargement.
+  // comme chez le natif qui les pose à leur chargement. Posés AVANT l'ombre du
+  // soleil, qui les peint dans la même pose que l'image.
   if (!model_clock_.started()) {
     model_clock_.Start(stage_->scene.models, now_ms);
   }
   model_clock_.Advance(stage_->scene.models, now_ms);
-  models_.SetTextureFilter(settings_->options().graphics().decor_filter());
-  ground_unit_models_.SetTextureFilter(settings_->options().graphics().decor_filter());
-  // LES FACES À TEXTURE MÊLÉE attendent la passe translucide, plus bas.
   const bool models_shown = !ro::render::GreyWorldHidesModels(grey_world);
-  if (models_shown) {
-    models_.Draw(camera_, pieces_.night_light.light(), aspect_ratio_,
-                 ro::render::ModelStages{.blended_apart = true}, &model_clock_, fog,
-                 pieces_.decor_veil.opacities());
-  }
   // Les unités posées au sol : ce sont des modèles, et elles ne se téléversent
   // que lorsque l'ensemble posé a bougé. Leur horloge à elles les tient figées
   // jusqu'à ce qu'elles se déclenchent. Elles se PEIGNENT plus bas, sur le
-  // cadre de la case.
+  // cadre de la case. ⚠ AVANT LA COMPOSITION, qui relit leurs emprises.
   if (const std::vector<ro::render::ModelInstances>* placed =
           ground_units_->Changed((*stage_), world_);
       placed != nullptr) {
@@ -147,6 +138,40 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       present_scene();
       return std::unexpected(uploaded.error());
     }
+  }
+  // LES ACTEURS SE COMPOSENT AVANT TOUTE PEINTURE : leur silhouette entre dans
+  // l'ombre du soleil, que le sol lit.
+  const bool sun_asked = SunShadowsAsked(stages);
+  ComposeActors(now_ms, pick_tuning, sun_asked);
+  // LA LUMIÈRE DE LA CARTE SOUS LES CHARRETTES ET LES FAUCONS : la même que sous
+  // les corps, sans l'ombre cuite quand celle du soleil la remplace.
+  const ro::render::GroundLight* actor_ground = !settings_->options().graphics().lightmaps()
+                                                    ? nullptr
+                                                : sun_asked ? &stage_->ground_laid_light
+                                                            : &stage_->ground_light;
+  // LES CHARRETTES AVANCENT ICI, une fois par image : leur silhouette entre dans
+  // l'ombre du soleil, avant qu'elles ne se peignent avec les corps.
+  std::span<const ro::render::DrawnActor> carts;
+  if (link_.is_open() && pieces_.wardrobe.has_value()) {
+    const GraphicsOptions& graphics = settings_->options().graphics();
+    carts = pieces_.carts.Update(CartFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees,
+                                           now_ms, graphics.summon_translucent(), actor_ground,
+                                           graphics.cold_light(), !sun_asked});
+  }
+  // LE CIEL DE L'IMAGE : la lumière de la carte, à l'heure que l'établi impose.
+  const ro::render::SkyLight sky = SkyOfFrame(now_ms);
+  const ro::render::SunShadowView sun = DrawSunShadowIfAsked(sun_asked, models_shown, carts, sky);
+  if (sun.map != nullptr) {
+    stages.shadowmap = false;
+  }
+  terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
+                stages, fog, sun);
+  models_.SetTextureFilter(settings_->options().graphics().decor_filter());
+  ground_unit_models_.SetTextureFilter(settings_->options().graphics().decor_filter());
+  // LES FACES À TEXTURE MÊLÉE attendent la passe translucide, plus bas.
+  if (models_shown) {
+    models_.Draw(camera_, sky.light, aspect_ratio_, ro::render::ModelStages{.blended_apart = true},
+                 &model_clock_, fog, pieces_.decor_veil.opacities(), sun);
   }
 
   // LA CASE QUE LE CADRE MARQUE : figée sous l'emprise d'une unité au sol.
@@ -218,7 +243,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
         // LEUR LUMIÈRE EST FIXE, MAIS LA NUIT LES TEINTE : ce sont des modèles
         // comme le décor.
         ro::render::SceneLight unit_light = ro::render::kGroundUnitModelLight;
-        unit_light.tint = pieces_.night_light.light().tint;
+        unit_light.tint = sky.light.tint;
+        unit_light.daylight = sky.light.daylight;
         ground_unit_models_.Draw(camera_, unit_light, aspect_ratio_, ro::render::ModelStages(),
                                  &ground_units_->Advance(world_, now_ms), fog);
         break;
@@ -236,59 +262,13 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
     water_.Draw(camera_, aspect_ratio_, now_ms, fog);
     DrawMapEffects();
     if (models_shown) {
-      pieces_.decor_veil.Draw(models_, camera_, *stage_, pieces_.night_light.light(), aspect_ratio_,
-                              &model_clock_, fog);
+      pieces_.decor_veil.Draw(models_, camera_, *stage_, sky.light, aspect_ratio_, &model_clock_,
+                              fog);
     }
     present_scene();
     ComposeCursor(nullptr, hovered_cell, now_ms);
     return {};
   }
-
-  const auto elapsed_ms = static_cast<float>(SDL_GetTicks() - start_ticks_);
-  scene_actors_.Clear();
-  scene_actors_.ground_units = ground_units_->picks();
-  if (link_.is_open()) {
-    // LA TEINTE QUI RESTE se relit avant la scène qui la montre.
-    pieces_.ailment_tints.Observe(world_, now_ms);
-    TimeComposedScene(settings_->options().graphics(), scene_actors_);
-    SceneCensus census =
-        ComposeScene(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, world_, planner_,
-                     (*stage_), camera_.yaw_degrees, now_ms, elapsed_ms, &styles_, scene_actors_,
-                     ghosts_, drops_, pieces_.frozen_poses,
-                     ActorLightingOf(settings_->options().graphics(), &stage_->ground_light,
-                                     &pieces_.ailment_tints));
-    // LES ACTEURS EN MODÈLE rejoignent la scène APRÈS les sprites : ils n'y ont
-    // qu'une emprise, et leurs triangles se peignent à part, plus bas.
-    if (pieces_.actor_models.has_value() && pieces_.wardrobe.has_value()) {
-      pieces_.actor_models->Compose(
-          ActorModels::Frame{&pieces_.wardrobe->catalog(), &*pieces_.wardrobe, &world_, &planner_,
-                             &*stage_, &camera_, &guild_book_,
-                             guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
-                             now_ms},
-          scene_actors_, census);
-      if (effects_.has_value()) {
-        for (const ro::render::ActorModelMeshEvent& event : pieces_.actor_models->mesh_events()) {
-          static_cast<void>(effects_->PlayById(event.effect_id, event.position, now_ms));
-        }
-      }
-    }
-    // ⚠ LE BALAYAGE VIENT APRÈS LA COMPOSITION, jamais pendant : oublier un
-    // style détruit les tenues qui le portaient, et le parcours les lirait
-    // mortes.
-    styles_.Sweep(*pieces_.wardrobe, world_.styles());
-    ReportCensus(census, reported_census_);
-    // LA MARCHE QU'UN GESTE RETENAIT part dès que la motion a changé, d'après ce
-    // que cette image vient de composer : voir `DeferredWalk`.
-    static_cast<void>(ReleaseDeferredWalk(link_, world_, grimoire_.approach_clock(),
-                                          world_mouse_.deferred_walk, scene_actors_.player_gesture,
-                                          now_ms));
-    ReportMissingSprites(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-                         reported_missing_);
-    NoteScreenTargets();
-  }
-
-  ApplyPickTuning(pick_tuning, scene_actors_.drawn, scene_actors_.ids, world_);
-  scene_actors_.ground_unit_floor_pixels = pick_tuning.ground_floor_pixels;
 
   // APRÈS le terrain et le décor : le mélange alpha n'est correct que si ce qui
   // se trouve derrière est déjà peint.
@@ -299,15 +279,22 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // voiles, eux, sont des copies du même sprite : les laisser écrire découperait
   // leur porteur.
   using Silhouette = ro::render::SpriteRenderer::BodySilhouette;
-  const auto paint = [this, &fog](std::span<const ro::render::DrawnActor> actors_to_draw,
-                                  ro::render::SpriteRenderer::DepthWrite depth,
-                                  ro::render::SpriteRenderer::BodySilhouette silhouette =
-                                      ro::render::SpriteRenderer::BodySilhouette::kIgnored) {
+  // `shaded` : ce qui se tient au sol, que l'ombre du soleil assombrit et que
+  // l'heure du ciel baisse. ⚠ L'HEURE SEULEMENT QUAND LE CIEL EN A UNE : la nuit
+  // du serveur, elle, n'assombrit pas les corps, comme dans le jeu.
+  const glm::vec3 body_daylight = sky.body_shown ? sky.light.daylight : glm::vec3(1.0F);
+  const auto paint = [this, &fog, &sun, &body_daylight](
+                         std::span<const ro::render::DrawnActor> actors_to_draw,
+                         ro::render::SpriteRenderer::DepthWrite depth,
+                         ro::render::SpriteRenderer::BodySilhouette silhouette =
+                             ro::render::SpriteRenderer::BodySilhouette::kIgnored,
+                         bool shaded = false) {
     if (!actors_to_draw.empty()) {
-      sprites_.Draw(camera_, actors_to_draw, aspect_ratio_,
-                    ro::render::SpriteRenderer::Blending::kOver, depth,
-                    ro::render::SpriteRenderer::DepthTest::kOn, fog,
-                    ro::render::SpriteRenderer::DrawOrder::kFarthestFirst, silhouette);
+      sprites_.Draw(
+          camera_, actors_to_draw, aspect_ratio_, ro::render::SpriteRenderer::Blending::kOver,
+          depth, ro::render::SpriteRenderer::DepthTest::kOn, fog,
+          ro::render::SpriteRenderer::DrawOrder::kFarthestFirst, silhouette,
+          shaded ? sun : ro::render::SunShadowView(), shaded ? body_daylight : glm::vec3(1.0F));
     }
   };
   // LES EFFETS QUI PASSENT DERRIÈRE LES CORPS, avant tout le reste.
@@ -334,25 +321,22 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // profondeur, et un sprite qui passe derrière doit s'y couper.
   if (link_.is_open() && pieces_.actor_models.has_value() &&
       pieces_.actor_model_renderer.has_value()) {
-    pieces_.actor_model_renderer->Draw(camera_, pieces_.actor_models->drawn(), aspect_ratio_, fog);
+    pieces_.actor_model_renderer->Draw(camera_, pieces_.actor_models->drawn(), aspect_ratio_, fog,
+                                       sun, sky.light.daylight);
   }
   // LES CORPS ET LEURS OMBRES laissent leur silhouette, que l'eau plonge et que
   // les halos évitent.
-  paint(scene_actors_.drawn, ro::render::SpriteRenderer::DepthWrite::kOn, Silhouette::kLeft);
+  paint(scene_actors_.drawn, ro::render::SpriteRenderer::DepthWrite::kOn, Silhouette::kLeft,
+        /*shaded=*/true);
   // LES CHARRETTES, juste après les corps et avant leurs voiles : une charrette
   // derrière son maître s'y coupe, une charrette devant lui le couvre. Opaque,
   // elle écrit sa profondeur comme un corps ; translucide, elle s'en abstient,
   // comme le faucon.
-  if (link_.is_open()) {
-    const GraphicsOptions& graphics = settings_->options().graphics();
-    paint(pieces_.carts.Update(CartFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees,
-                                         now_ms, graphics.summon_translucent(),
-                                         graphics.lightmaps() ? &stage_->ground_light : nullptr,
-                                         graphics.cold_light()}),
-          graphics.summon_translucent() ? ro::render::SpriteRenderer::DepthWrite::kOff
-                                        : ro::render::SpriteRenderer::DepthWrite::kOn,
-          Silhouette::kLeft);
-  }
+  paint(carts,
+        settings_->options().graphics().summon_translucent()
+            ? ro::render::SpriteRenderer::DepthWrite::kOff
+            : ro::render::SpriteRenderer::DepthWrite::kOn,
+        Silhouette::kLeft, /*shaded=*/true);
   // 🔴 LA NAPPE D'EAU APRÈS LES CORPS, LEURS OMBRES ET LES CHARRETTES : éprouvée contre
   // la profondeur qu'ils ont écrite, elle recouvre ce qui est SOUS sa surface — les pieds
   // de qui patauge, son ombre, les marques au sol. Puis cheminées et émetteurs, dessus.
@@ -378,10 +362,9 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // en serait découpé.
   if (link_.is_open()) {
     const GraphicsOptions& graphics = settings_->options().graphics();
-    paint(pieces_.falcons.Update(FalconFrame{
-              &world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
-              graphics.summon_translucent(), graphics.lightmaps() ? &stage_->ground_light : nullptr,
-              graphics.cold_light()}),
+    paint(pieces_.falcons.Update(
+              FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
+                          graphics.summon_translucent(), actor_ground, graphics.cold_light()}),
           ro::render::SpriteRenderer::DepthWrite::kOff);
   }
   // LA FLÈCHE DE LA CIBLE, un nœud de la scène comme les acteurs qu'elle surmonte.
@@ -430,11 +413,13 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
     aim_.shake.Request(*quake);
   }
   SettleActorEffects(world_, effects_->TakeActorEffects());
+  // LE VIDE SOUS LE MONDE prend l'heure du ciel, nuages compris.
+  ShadeVoid(sky);
   // LE DÉCOR VOILÉ DEVANT LE JOUEUR, et les faces mêlées du décor, sur tout ce
   // qui est peint derrière.
   if (models_shown) {
-    pieces_.decor_veil.Draw(models_, camera_, *stage_, pieces_.night_light.light(), aspect_ratio_,
-                            &model_clock_, fog);
+    pieces_.decor_veil.Draw(models_, camera_, *stage_, sky.light, aspect_ratio_, &model_clock_,
+                            fog);
   }
 
   // LA FIN DU MONDE PEINT : terrain, décor, personnages, effets. Ce qui suit se
@@ -626,6 +611,68 @@ void Game::TintForAfk(std::uint32_t now_ms) {
   const ro::render::DrawableSize surface = gl_->drawable_size();
   screen_tint_.Draw(afk_screen_.tint(settings_->options().afk()), surface.width, surface.height,
                     now_ms);
+}
+
+void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tuning,
+                         bool sun_shadows) {
+  if (!pieces_.wardrobe.has_value()) {
+    return;
+  }
+  const auto elapsed_ms = static_cast<float>(SDL_GetTicks() - start_ticks_);
+  scene_actors_.Clear();
+  scene_actors_.ground_units = ground_units_->picks();
+  if (link_.is_open()) {
+    // LA TEINTE QUI RESTE se relit avant la scène qui la montre.
+    pieces_.ailment_tints.Observe(world_, now_ms);
+    TimeComposedScene(settings_->options().graphics(), scene_actors_);
+    SceneCensus census = ComposeScene(
+        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, world_, planner_, (*stage_),
+        camera_.yaw_degrees, now_ms, elapsed_ms, &styles_, scene_actors_, ghosts_, drops_,
+        pieces_.frozen_poses,
+        ActorLightingOf(settings_->options().graphics(),
+                        sun_shadows ? &stage_->ground_laid_light : &stage_->ground_light,
+                        &pieces_.ailment_tints));
+    // LES ACTEURS EN MODÈLE rejoignent la scène APRÈS les sprites : ils n'y ont
+    // qu'une emprise, et leurs triangles se peignent à part, plus bas.
+    if (pieces_.actor_models.has_value() && pieces_.wardrobe.has_value()) {
+      pieces_.actor_models->Compose(
+          ActorModels::Frame{&pieces_.wardrobe->catalog(), &*pieces_.wardrobe, &world_, &planner_,
+                             &*stage_, &camera_, &guild_book_,
+                             guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
+                             now_ms},
+          scene_actors_, census);
+      if (effects_.has_value()) {
+        for (const ro::render::ActorModelMeshEvent& event : pieces_.actor_models->mesh_events()) {
+          static_cast<void>(effects_->PlayById(event.effect_id, event.position, now_ms));
+        }
+      }
+    }
+    // ⚠ LE BALAYAGE VIENT APRÈS LA COMPOSITION, jamais pendant : oublier un
+    // style détruit les tenues qui le portaient, et le parcours les lirait
+    // mortes.
+    styles_.Sweep(*pieces_.wardrobe, world_.styles());
+    ReportCensus(census, reported_census_);
+    // LA MARCHE QU'UN GESTE RETENAIT part dès que la motion a changé, d'après ce
+    // que cette image vient de composer : voir `DeferredWalk`.
+    static_cast<void>(ReleaseDeferredWalk(link_, world_, grimoire_.approach_clock(),
+                                          world_mouse_.deferred_walk, scene_actors_.player_gesture,
+                                          now_ms));
+    ReportMissingSprites(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+                         reported_missing_);
+    NoteScreenTargets();
+  }
+
+  ApplyPickTuning(pick_tuning, scene_actors_.drawn, scene_actors_.ids, world_);
+  scene_actors_.ground_unit_floor_pixels = pick_tuning.ground_floor_pixels;
+  // SOUS LE SOLEIL, UN CORPS N'A PLUS D'OMBRE RONDE : sa silhouette en porte
+  // une. Celui qui n'a plus que son ombre — le joueur dissimulé — la garde.
+  if (sun_shadows) {
+    for (ro::render::DrawnActor& drawn : scene_actors_.drawn) {
+      if (drawn.actor != nullptr) {
+        drawn.shadow = nullptr;
+      }
+    }
+  }
 }
 
 void Game::ForgetWhatPlayed() {
