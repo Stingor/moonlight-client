@@ -18,6 +18,7 @@
 #include "ro/render/model_bake.h"
 #include "ro/render/model_clock.h"
 #include "ro/render/model_mesh.h"
+#include "ro/render/model_mesh_identity.h"
 #include "ro/render/model_veil.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
@@ -73,6 +74,12 @@ class ModelRenderer {
 
   // Remplace les modèles téléversés par ceux-ci.
   //
+  // 🔴 UN MODÈLE QUI N'A PAS CHANGÉ GARDE SES TAMPONS : même fichier, même
+  // variante, mêmes sommets déplacés et mêmes images, il a le même maillage ; et
+  // mêmes poses figées, la même cuisson. L'éditeur de carte retéléverse le décor
+  // à chaque image d'un glissé, où une seule pose bouge : tout recuire coûtait
+  // l'image entière.
+  //
   // 🔴 LES TEXTURES SE PARTAGENT PAR NOM, ET SURVIVENT D'UN TÉLÉVERSEMENT À
   // L'AUTRE : un nom désigne toujours le même fichier de l'archive, donc la même
   // image. Une texture que plusieurs modèles citent ne part qu'une fois au
@@ -85,6 +92,9 @@ class ModelRenderer {
   // Combien de textures le dernier téléversement a dû envoyer au pilote : celles
   // qu'aucun précédent n'avait déjà envoyées.
   [[nodiscard]] std::size_t uploaded_textures() const noexcept { return uploaded_textures_; }
+  // Combien de lots le dernier téléversement a dû cuire : ceux qu'aucun
+  // précédent ne portait déjà tels quels.
+  [[nodiscard]] std::size_t baked_batches() const noexcept { return baked_batches_; }
 
   // Dessine par-dessus une scène déjà rendue : ni effacement, ni changement de
   // cible. Le test de profondeur du terrain reste en vigueur.
@@ -168,7 +178,20 @@ class ModelRenderer {
     // La pose et les grandeurs de texture de l'image zéro, faute d'horloge.
     std::vector<glm::mat4> rest_pose;
     std::vector<TextureMotion> rest_texture_motions;
+    // Ce qui fait le maillage, pour reconnaître un modèle inchangé au
+    // téléversement suivant.
+    ModelMeshIdentity identity;
+    // Et ce qui fait la cuisson : les poses figées.
+    std::vector<glm::mat4> baked_transforms;
+    // Vrai une fois qu'un modèle a repris ses tampons : un lot ne sert qu'une
+    // fois.
+    bool taken = false;
   };
+
+  // Reprend le lot de `previous`, pas encore repris, qui porte le maillage
+  // d'identité `identity` ; ou nul.
+  [[nodiscard]] static Batch* TakeSameMesh(std::vector<Batch>& previous,
+                                           const ModelMeshIdentity& identity);
 
   // La pose des nœuds d'un groupe animé et les grandeurs de ses lots, à l'image
   // de l'horloge — celles de l'image zéro faute d'horloge.
@@ -218,6 +241,7 @@ class ModelRenderer {
   std::vector<Batch> batches_;
   std::size_t instance_count_ = 0;
   std::size_t uploaded_textures_ = 0;
+  std::size_t baked_batches_ = 0;
   // LES ÉCHANTILLONNEURS, un lié à chaque tracé : borné à ses bords ou répété
   // selon que la texture s'anime — voir `Batch::repeats` —, net ou avec les
   // niveaux réduits du filtrage choisi. Ils écrasent ceux des textures. Voir

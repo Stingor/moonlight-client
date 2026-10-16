@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 #include "ro/formats/rsm.h"
 #include "ro/mapedit/map_edit.h"
 #include "ro/render/camera.h"
@@ -37,6 +39,38 @@ class RsmCache {
 [[nodiscard]] std::optional<MapEditorSession::VertexContext> BuildVertexContext(
     const ro::render::MapScene& scene, std::size_t rank, const ro::mapedit::MapEdit& document,
     RsmCache& cache, ro::vfs::Vfs& vfs);
+
+// LE CONTEXTE DE L'OUTIL SOMMETS, rebâti seulement quand ce qui le fait
+// change : le modèle désigné, sa pose, ou la retouche de maillage qu'il dessine.
+// Le rebâtir copie le fichier, lui applique l'édition et pose tous ses nœuds :
+// à chaque image, c'était le prix de l'outil.
+class VertexContextCache {
+ public:
+  // Vrai quand le contexte a changé depuis l'appel précédent.
+  bool Refresh(const ro::render::MapScene& scene, std::size_t rank,
+               const ro::mapedit::MapEdit& document, ro::vfs::Vfs& vfs);
+  [[nodiscard]] const std::optional<MapEditorSession::VertexContext>& context() const noexcept {
+    return context_;
+  }
+  // L'outil est posé : le prochain `Refresh` rebâtit. Les fichiers lus restent.
+  void Forget() {
+    key_.reset();
+    context_.reset();
+  }
+
+ private:
+  struct Key {
+    std::size_t rank = 0;
+    std::string raw_file;
+    glm::mat4 to_world{1.0F};
+    std::optional<ro::mapedit::MeshEdit> mesh;
+
+    friend bool operator==(const Key&, const Key&) = default;
+  };
+  RsmCache files_;
+  std::optional<Key> key_;
+  std::optional<MapEditorSession::VertexContext> context_;
+};
 
 // Les points de ses sommets à l'écran ; un sommet derrière l'œil n'en a pas.
 [[nodiscard]] std::vector<MapEditorSession::VertexDot> VertexDots(

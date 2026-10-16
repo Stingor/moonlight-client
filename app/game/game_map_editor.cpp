@@ -71,6 +71,8 @@ void Game::ServeMapEditor() {
   tools.map_editor.library = model_library_;
   if (!map_editor_.active() || !map_editor_.selected().has_value()) {
     map_editor_.SetGizmo(GizmoFrame(), {});
+    map_editor_.SetVertexContext(std::nullopt);
+    vertex_context_.Forget();
     return;
   }
   const auto width = static_cast<float>(shell_.width());
@@ -83,6 +85,7 @@ void Game::ServeMapEditor() {
   }
   map_editor_.SetVertexContext(std::nullopt);
   map_editor_.SetVertexDots({});
+  vertex_context_.Forget();
   // LES POIGNÉES, sur le pivot du placement que montre la vue.
   const GizmoFrame frame = GizmoFrameOf(map_frame, tools.map_editor.position, camera_);
   map_editor_.SetGizmo(
@@ -93,8 +96,11 @@ void Game::ServeMapEditor() {
 
 void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height) {
   ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
-  std::optional<MapEditorSession::VertexContext> context = BuildVertexContext(
-      stage_->scene, *map_editor_.selected(), map_edits_.Document(stage_->name), rsm_cache_, *vfs_);
+  if (vertex_context_.Refresh(stage_->scene, *map_editor_.selected(),
+                              map_edits_.Document(stage_->name), *vfs_)) {
+    map_editor_.SetVertexContext(vertex_context_.context());
+  }
+  const std::optional<MapEditorSession::VertexContext>& context = vertex_context_.context();
   if (!context.has_value()) {
     map_editor_.SetVertexContext(std::nullopt);
     map_editor_.SetVertexDots({});
@@ -114,7 +120,6 @@ void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float wi
     handles =
         GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera_, aspect_ratio_, width, height);
   }
-  map_editor_.SetVertexContext(std::move(context));
   map_editor_.SetGizmo(frame, std::move(handles));
   // LA VUE SE RECOMPOSE : elle a été faite avant le contexte, et ne savait pas
   // encore nommer le sommet désigné. Ses traits gardent la boîte du modèle.

@@ -518,8 +518,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   MapEditorSession map_editor_;
   // La bibliothèque de l'éditeur, lue à sa première ouverture.
   std::shared_ptr<const std::vector<std::string>> model_library_;
-  // Les fichiers de modèles que l'outil Sommets a lus.
-  RsmCache rsm_cache_;
+  // Ce que l'outil Sommets sait du modèle désigné, et les fichiers qu'il a lus.
+  VertexContextCache vertex_context_;
   ro::render::DrawableSize size_{};
   float aspect_ratio_ = 1.0F;
   glm::vec2 mouse_{0.0F, 0.0F};

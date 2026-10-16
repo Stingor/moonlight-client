@@ -94,6 +94,27 @@ std::optional<MapEditorSession::VertexContext> BuildVertexContext(
   return context;
 }
 
+bool VertexContextCache::Refresh(const ro::render::MapScene& scene, std::size_t rank,
+                                 const ro::mapedit::MapEdit& document, ro::vfs::Vfs& vfs) {
+  std::optional<Key> key;
+  if (const std::optional<ro::render::ScenePose> pose = ro::render::FindScenePose(scene, rank);
+      pose.has_value() && rank < scene.rsw.models().size()) {
+    const std::string& raw_file = scene.rsw.models()[rank].model_name;
+    const ro::mapedit::MeshEdit* mesh = DrawnMeshEdit(document, rank, CitedName(raw_file));
+    key = Key{.rank = rank,
+              .raw_file = raw_file,
+              .to_world = pose->transform,
+              .mesh = mesh != nullptr ? std::optional(*mesh) : std::nullopt};
+  }
+  if (key == key_ && (key_.has_value() || !context_.has_value())) {
+    return false;
+  }
+  key_ = std::move(key);
+  context_ =
+      key_.has_value() ? BuildVertexContext(scene, rank, document, files_, vfs) : std::nullopt;
+  return true;
+}
+
 std::vector<MapEditorSession::VertexDot> VertexDots(const MapEditorSession::VertexContext& context,
                                                     const ro::render::Camera& camera,
                                                     float aspect_ratio, float viewport_width,

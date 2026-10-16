@@ -373,16 +373,24 @@ core::Result<ModelRenderer> ModelRenderer::Create() {
   return renderer;
 }
 
-core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& models) {
-  // Les tampons de la carte précédente se rendent au pilote AVANT d'être
-  // oubliés : un changement de carte les laissait sinon en mémoire graphique.
-  for (Batch& batch : batches_) {
-    Release(batch.baked);
-    Release(batch.rig);
+ModelRenderer::Batch* ModelRenderer::TakeSameMesh(std::vector<Batch>& previous,
+                                                  const ModelMeshIdentity& identity) {
+  for (Batch& batch : previous) {
+    if (!batch.taken && batch.identity == identity) {
+      batch.taken = true;
+      return &batch;
+    }
   }
-  batches_.clear();
+  return nullptr;
+}
+
+core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& models) {
+  // Les lots précédents qu'un modèle inchangé ne reprend pas se rendent au
+  // pilote à la fin : sinon, ils resteraient en mémoire graphique.
+  std::vector<Batch> previous = std::exchange(batches_, {});
   instance_count_ = 0;
   uploaded_textures_ = 0;
+  baked_batches_ = 0;
   batches_.reserve(models.size());
   // Les noms que ce téléversement cite : les autres textures se rendront au
   // pilote une fois tous les lots posés.
@@ -409,27 +417,48 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
     }
     batch.blended = BlendedTextures(model);
     batch.repeats = AnimatedTextures(model);
-    const BakedModel baked = BakeInstances(model.mesh, model.transforms, model.rsm_version);
-    if (!baked.vertices.empty()) {
-      batch.baked = UploadVertices(baked.vertices, baked.sides);
-      batch.baked_runs = baked.runs;
-      batch.baked_surfaces = baked.surfaces;
-    }
-    batch.still_poses = model.transforms.size();
+    batch.identity = MeshIdentityOf(model);
     batch.rsm_version = model.rsm_version;
+    Batch* kept = TakeSameMesh(previous, batch.identity);
+    if (kept != nullptr && kept->baked_transforms == model.transforms) {
+      batch.baked = std::exchange(kept->baked, VertexStore());
+      batch.baked_runs = std::move(kept->baked_runs);
+      batch.baked_surfaces = std::move(kept->baked_surfaces);
+    } else {
+      const BakedModel baked = BakeInstances(model.mesh, model.transforms, model.rsm_version);
+      if (!baked.vertices.empty()) {
+        batch.baked = UploadVertices(baked.vertices, baked.sides);
+        batch.baked_runs = baked.runs;
+        batch.baked_surfaces = baked.surfaces;
+      }
+      ++baked_batches_;
+    }
+    batch.baked_transforms = model.transforms;
+    batch.still_poses = model.transforms.size();
     instance_count_ += model.transforms.size();
 
     if (animated) {
-      batch.rig = UploadVertices(model.rig.vertices, RigSides(model.rig));
-      batch.rig_parts = model.rig.parts;
-      batch.rest_pose = PoseRig(model.rig, 0.0F);
-      batch.rest_texture_motions = RigTextureMotions(model.rig, 0.0F);
+      if (kept != nullptr && kept->rig.vertex_array != 0) {
+        batch.rig = std::exchange(kept->rig, VertexStore());
+        batch.rig_parts = std::move(kept->rig_parts);
+        batch.rest_pose = std::move(kept->rest_pose);
+        batch.rest_texture_motions = std::move(kept->rest_texture_motions);
+      } else {
+        batch.rig = UploadVertices(model.rig.vertices, RigSides(model.rig));
+        batch.rig_parts = model.rig.parts;
+        batch.rest_pose = PoseRig(model.rig, 0.0F);
+        batch.rest_texture_motions = RigTextureMotions(model.rig, 0.0F);
+      }
       for (const ModelPlaybackGroup& group : model.animated) {
         batch.animated_transforms.push_back(group.transforms);
         instance_count_ += group.transforms.size();
       }
     }
     batches_.push_back(std::move(batch));
+  }
+  for (Batch& batch : previous) {
+    Release(batch.baked);
+    Release(batch.rig);
   }
   std::erase_if(textures_, [&cited](const auto& kept) { return !cited.contains(kept.first); });
   return {};
