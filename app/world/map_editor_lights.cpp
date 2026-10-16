@@ -22,11 +22,12 @@ namespace {
 constexpr std::size_t kLabelCapacity = 192;
 // UNE LUMIÈRE NEUVE : une lanterne. Sa hauteur au-dessus du point visé — un y
 // négatif monte, dans le RSW —, sa portée en unités du RSW (cinq carreaux du
-// sol) et sa couleur chaude. Elle brille aussitôt, de jour comme de nuit : on
-// la voit en la posant.
+// sol) et sa couleur chaude, deux fois la pleine intensité : sur une texture
+// sombre de nuit, une lumière de 1 se devine à peine. Elle brille aussitôt, de
+// jour comme de nuit : on la voit en la posant.
 constexpr float kNewLightHeight = 15.0F;
 constexpr float kNewLightRange = 50.0F;
-constexpr std::array<float, 3> kNewLightColor{1.0F, 0.85F, 0.6F};
+constexpr std::array<float, 3> kNewLightColor{2.0F, 1.7F, 1.2F};
 // La plus petite portée qu'une lumière garde : le document refuse une portée
 // nulle, et la relecture rejetterait tout le document avec elle.
 constexpr float kSmallestLightRange = 0.5F;
