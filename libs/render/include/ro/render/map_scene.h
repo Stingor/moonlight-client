@@ -14,6 +14,7 @@
 #include "ro/formats/rsw.h"
 #include "ro/render/lightmap_atlas.h"
 #include "ro/render/map_effect_table.h"
+#include "ro/render/map_fix.h"
 #include "ro/render/map_fog.h"
 #include "ro/render/map_smoke.h"
 #include "ro/render/model_mesh.h"
@@ -146,6 +147,9 @@ struct MapSceneOptions {
   // ⚠ C'EST AU CHARGEMENT, parce que le maillage du terrain se bâtit sur les
   // hauteurs. Changer d'avis demande de relire la carte.
   bool flatten_relief = false;
+  // LES RETOUCHES À POSER au lieu de celles de l'installation — voir
+  // `LoadMapFixes`. Un banc ou un outil y met celles d'une table qu'il éprouve.
+  std::optional<MapFixes> fixes;
 };
 
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,

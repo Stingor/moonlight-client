@@ -324,4 +324,33 @@ void RswScene::MoveEffect(std::size_t effect_index, const std::array<float, 3>& 
   }
 }
 
+void RswScene::PlaceModel(std::size_t model_index, const std::array<float, 3>& position,
+                          const std::array<float, 3>& rotation,
+                          const std::array<float, 3>& scale) noexcept {
+  if (model_index < models_.size()) {
+    models_[model_index].position = position;
+    models_[model_index].rotation = rotation;
+    models_[model_index].scale = scale;
+  }
+}
+
+void RswScene::RemoveModels(std::span<const std::size_t> model_indices) {
+  std::vector<bool> removed(models_.size(), false);
+  for (const std::size_t index : model_indices) {
+    if (index < removed.size()) {
+      removed[index] = true;
+    }
+  }
+  std::size_t kept = 0;
+  for (std::size_t index = 0; index < models_.size(); ++index) {
+    if (!removed[index]) {
+      if (kept != index) {
+        models_[kept] = std::move(models_[index]);
+      }
+      ++kept;
+    }
+  }
+  models_.resize(kept);
+}
+
 }  // namespace ro::formats

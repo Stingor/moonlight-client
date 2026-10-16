@@ -118,6 +118,7 @@ add_library(ro_render STATIC
     src/map_effect_table.cpp
     src/map_effects.cpp
     src/map_emitter.cpp
+    src/map_fix.cpp
     src/map_fog.cpp
     src/map_scene.cpp
     src/map_smoke.cpp

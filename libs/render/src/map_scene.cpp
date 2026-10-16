@@ -5,12 +5,15 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <string>
 #include <utility>
 
+#include "ro/core/log.h"
 #include "ro/formats/grf.h"
 #include "ro/formats/rsm.h"
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effects.h"
+#include "ro/render/map_fix.h"
 #include "ro/render/map_sky.h"
 #include "ro/render/map_weather.h"
 
@@ -202,6 +205,16 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   auto rsw = formats::RswScene::Parse(*rsw_bytes);
   if (!rsw) {
     return std::unexpected(rsw.error());
+  }
+  // LES RETOUCHES DU STAFF, sur les données lues et avant tout le reste : voir
+  // map_fix.h.
+  const MapFixReport fixed =
+      ApplyMapFixes(options.fixes.has_value() ? *options.fixes : LoadMapFixes(vfs, map_name), *rsw);
+  for (const std::string& refusal : fixed.refused) {
+    core::LogWarning("retouche de {} refusée — {}", map_name, refusal);
+  }
+  if (fixed.applied > 0) {
+    core::LogInfo("{} : {} retouche(s) du staff posée(s)", map_name, fixed.applied);
   }
 
   // ReadRaw : `ground_file` vient du RSW, donc c'est déjà du CP949.

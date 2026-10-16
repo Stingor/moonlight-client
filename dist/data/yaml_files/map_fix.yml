@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les retouches de carte du staff
+#
+#  Donnée de moonclient, tenue par le staff (docs/adr/0117). Certaines cartes
+#  officielles portent des défauts que le client d'origine montre aussi, parce
+#  qu'ils sont dans leurs données ; la carte reste celle de l'installation, et
+#  le client la retouche au chargement, avant de bâtir ses maillages.
+#
+#  Le visuel seulement : la marchabilité (GAT) n'est jamais touchée.
+#
+#  maps : carte (son nom, sans extension) ->
+#    models : les retouches de modèles du RSW, chacune :
+#      index    : le rang du modèle dans le RSW, compté à partir de zéro ;
+#      file     : son fichier, relatif à data\model\ ;
+#      origin   : sa position dans le RSW d'origine, [x, y, z] ;
+#      position, rotation, scale : ce qui change, [x, y, z], dans le repère
+#                 du fichier — un champ absent garde la valeur du RSW ;
+#      hidden   : vrai pour ne plus le dessiner ;
+#      why      : pourquoi, obligatoire.
+#  Une retouche dont le rang, le fichier ou la position d'origine ne
+#  correspondent plus n'est pas posée, et le journal le dit.
+#
+#  Les modèles d'une carte, leur rang et leur placement :
+#      roc-cli map models <dossier client> <carte> [<case x> <case y> <rayon>]
+#  Vérifier la table sur une carte, sans l'installer (le journal dit ce qui
+#  est posé et ce qui est refusé) :
+#      roc-cli map view <dossier client> <carte> <sortie.png> <x> <y> \
+#          --retouches dist/data/yaml_files/map_fix.yml
+#
+#  Lu par moonclient (ro/render/map_fix.h). Absent, aucune carte n'est
+#  retouchée.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+maps:
+  gonryun:
+    models:
+      - index: 879
+        file: '외부소품\나무다리.rsm'
+        origin: [50.279, -52.445, -492.465]
+        position: [50.279, -55.0, -492.465]
+        why: >-
+          La tête de pont sud enfonce ses planches dans l'herbe entre ses
+          poteaux, comme dans le client d'origine. Remontée de 2,5 unités,
+          elle montre ses planches entières et se raccorde au reste du pont.
