@@ -341,6 +341,10 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   // et ne fait rien d'autre — ni marcher, ni viser. Ctrl+clic le traverse : le
   // clic redevient celui du jeu, Ctrl compris comme absent.
   const bool through_editor = to.map_editor != nullptr && CtrlHeld();
+  // Marcher ramène la caméra sur le personnage.
+  if (through_editor) {
+    to.map_editor->ReleaseViewPoint();
+  }
   if (to.map_editor != nullptr && !through_editor) {
     // Une poignée sous l'appui se saisit, avant de désigner quoi que ce soit.
     if (to.map_editor->Grab(pointer, to.map_editor_view != nullptr ? *to.map_editor_view

@@ -87,7 +87,7 @@ void Game::ServeMapEditorTools() {
     replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
   }
   tools.map_editor_intents.clear();
-  // LES GESTES DES POIGNÉES, mis en file par la souris.
+  // LES GESTES DES POIGNÉES ET DU CLAVIER, mis en file.
   for (const ro::ui::MapEditorIntent& intent : map_editor_.TakeQueued()) {
     replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
   }

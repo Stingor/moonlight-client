@@ -21,8 +21,8 @@
 namespace moonclient {
 
 // LES RACCOURCIS DU MODE ÉDITEUR, Ctrl tenu : Z annule, Y — ou Maj+Z — rétablit,
-// S enregistre, D duplique, et 1 à 4 choisissent l'outil. `key` est la touche, en minuscule
-// ASCII ; rien pour une autre.
+// S enregistre, D duplique, F centre la caméra, et 1 à 4 choisissent l'outil. `key` est la touche,
+// en minuscule ASCII ; rien pour une autre.
 [[nodiscard]] std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held);
 
 // LE MODE ÉDITEUR DE CARTE : voir docs/adr/0118.
@@ -40,6 +40,13 @@ class MapEditorSession {
   };
 
   [[nodiscard]] bool active() const noexcept { return active_; }
+  // LE POINT QUE LA CAMÉRA REGARDE au lieu du personnage, dans le repère du RSW,
+  // posé par « Centrer » ; rien pour suivre le personnage. Marcher ou quitter
+  // l'éditeur le lève.
+  [[nodiscard]] const std::optional<std::array<float, 3>>& view_point() const noexcept {
+    return view_point_;
+  }
+  void ReleaseViewPoint() noexcept { view_point_.reset(); }
   void Leave() noexcept;
 
   // SUIT LA CARTE AFFICHÉE : une autre carte vide l'historique, la sélection
@@ -182,6 +189,7 @@ class MapEditorSession {
   std::vector<std::string> model_files_;
   ro::ui::MapEditorTool tool_ = ro::ui::MapEditorTool::kMove;
   std::array<float, 3> drop_point_{};
+  std::optional<std::array<float, 3>> view_point_;
   // La lumière qu'on règle, par son rang dans le document, et les cercles de
   // toutes à l'écran.
   std::optional<std::size_t> selected_light_;
@@ -203,6 +211,9 @@ class MapEditorSession {
   void ChooseLight(std::optional<std::size_t> slot);
   void ChooseModel(std::optional<std::size_t> model_index);
   Outcome MoveLight(const ro::ui::map_editor::MoveLight& move, MapEditStore& store);
+  // La caméra regardera ce qui est désigné : la lumière, ou la pose du modèle
+  // telle que l'édition la place.
+  Outcome Focus(const ro::render::MapScene& scene, const MapEditStore& store);
   // Le nombre de modèles du RSW d'origine : les ajouts prennent rang après.
   std::size_t original_count_ = 0;
   GizmoFrame gizmo_frame_;

@@ -26,6 +26,8 @@ std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_he
       return ro::ui::map_editor::Save{};
     case 'd':
       return ro::ui::map_editor::Duplicate{};
+    case 'f':
+      return ro::ui::map_editor::Focus{};
     case '1':
       return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kMove};
     case '2':
@@ -59,6 +61,7 @@ const ro::formats::RswModel* OriginalOf(const ro::render::MapScene& scene, std::
 
 void MapEditorSession::Leave() noexcept {
   active_ = false;
+  view_point_.reset();
   gesture_before_.reset();
   drag_.reset();
   handles_.clear();
@@ -236,6 +239,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return SetAllPoses(asked.all, store);
         } else if constexpr (std::is_same_v<Asked, intents::Duplicate>) {
           return Duplicate(scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::Focus>) {
+          return Focus(scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
           return AddLight(store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {

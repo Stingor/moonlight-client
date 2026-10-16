@@ -117,6 +117,17 @@ void MapEditorSession::ChooseModel(std::optional<std::size_t> model_index) {
   }
 }
 
+MapEditorSession::Outcome MapEditorSession::Focus(const ro::render::MapScene& scene,
+                                                  const MapEditStore& store) {
+  const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
+  if (selected_light_.has_value() && *selected_light_ < lights.size()) {
+    view_point_ = lights[*selected_light_].position;
+  } else if (!selection_.empty() && *selection_.model_index < scene.rsw.models().size()) {
+    view_point_ = scene.rsw.models()[*selection_.model_index].position;
+  }
+  return {};
+}
+
 MapEditorSession::Outcome MapEditorSession::MoveLight(const ro::ui::map_editor::MoveLight& move,
                                                       MapEditStore& store) {
   const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();

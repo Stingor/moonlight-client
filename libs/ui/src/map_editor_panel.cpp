@@ -47,7 +47,8 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
-                 "Ctrl+4 choisissent l'outil, Ctrl+D duplique. Ctrl+clic fait marcher le "
+                 "Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra. Ctrl+clic "
+                 "fait marcher le "
                  "personnage, Échap quitte "
                  "l'éditeur."),
 };
@@ -329,6 +330,10 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
   if (SkinButton(core::Tr("Dupliquer"), art)) {
     intents.emplace_back(map_editor::Duplicate{});
   }
+  ImGui::SameLine();
+  if (SkinButton(core::Tr("Centrer"), art)) {
+    intents.emplace_back(map_editor::Focus{});
+  }
 }
 
 // LES LUMIÈRES PONCTUELLES : la liste, l'ajout, et la lumière désignée — ses
@@ -393,6 +398,10 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   }
   if (SkinButton(core::Tr("Retirer la lumière"), art)) {
     intents.emplace_back(map_editor::RemoveLight{slot});
+  }
+  ImGui::SameLine();
+  if (SkinButton(core::Tr("Centrer"), art)) {
+    intents.emplace_back(map_editor::Focus{});
   }
   ImGui::PopID();
 }

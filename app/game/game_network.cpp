@@ -28,6 +28,7 @@
 #include "ro/net/world_notice.h"
 #include "ro/net/world_update.h"
 #include "ro/render/gl_context.h"
+#include "ro/render/map_effect_math.h"
 #include "ro/sim/damage_meter.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/server_clock.h"
@@ -338,6 +339,13 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
 
   // La caméra suit le personnage, et tremble quand un effet le demande.
   AimCamera(camera_, (*stage_), world_, planner_, now_ms, aim_);
+  // L'ÉDITEUR DE CARTE peut regarder ailleurs que le personnage : voir
+  // `MapEditorSession::view_point`.
+  if (const std::optional<std::array<float, 3>>& point = map_editor_.view_point();
+      point.has_value() && map_editor_.active()) {
+    const ro::render::MapEffectFrame frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
+    camera_.look_at = frame.ToWorld(glm::vec3((*point)[0], (*point)[1], (*point)[2]));
+  }
 
   // La cible visée se POURSUIT jusqu'à être à portée, puis se frappe. ⚠ APPELÉE
   // MÊME SANS POURSUITE EN COURS : le refus du serveur en rouvre une, et c'est
