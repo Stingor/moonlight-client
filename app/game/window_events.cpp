@@ -191,6 +191,12 @@ void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_i
   }
   // SES RACCOURCIS, Ctrl tenu, hors d'un champ de saisie : voir
   // `MapEditorShortcut`. Ils passent avant ceux du jeu.
+  // SUPPR, sans Ctrl : retirer ou masquer ce qui est désigné.
+  if (to.map_editor != nullptr && !text_input && !key.repeat && key.key == SDLK_DELETE &&
+      (key.mod & SDL_KMOD_CTRL) == 0) {
+    to.map_editor->Queue(ro::ui::map_editor::Delete{});
+    return;
+  }
   constexpr SDL_Keycode kLastAscii = 0x7F;
   if (to.map_editor != nullptr && !text_input && !key.repeat && (key.mod & SDL_KMOD_CTRL) != 0 &&
       key.key <= kLastAscii) {

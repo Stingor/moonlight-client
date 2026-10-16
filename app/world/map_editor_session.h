@@ -214,6 +214,8 @@ class MapEditorSession {
   // La caméra regardera ce qui est désigné : la lumière, ou la pose du modèle
   // telle que l'édition la place.
   Outcome Focus(const ro::render::MapScene& scene, const MapEditStore& store);
+  // La touche Suppr : voir `ro::ui::map_editor::Delete`.
+  Outcome Delete(const ro::render::MapScene& scene, MapEditStore& store);
   // Le nombre de modèles du RSW d'origine : les ajouts prennent rang après.
   std::size_t original_count_ = 0;
   GizmoFrame gizmo_frame_;

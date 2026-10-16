@@ -241,6 +241,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return Duplicate(scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::Focus>) {
           return Focus(scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::Delete>) {
+          return Delete(scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
           return AddLight(store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {
@@ -457,6 +459,33 @@ MapEditorSession::Outcome MapEditorSession::SetWhy(std::string why, MapEditStore
   Record(label.data(), before, after);
   // Une raison seule ne repose rien.
   return {};
+}
+
+MapEditorSession::Outcome MapEditorSession::Delete(const ro::render::MapScene& scene,
+                                                   MapEditStore& store) {
+  if (selected_light_.has_value()) {
+    return RemoveLight(*selected_light_, store);
+  }
+  if (selection_.empty()) {
+    return {};
+  }
+  const std::size_t rank = *selection_.model_index;
+  if (rank >= original_count_) {
+    return Revert(store);
+  }
+  // UN MODÈLE DE LA CARTE ne se retire pas : il se masque, ou se démasque, là
+  // où l'édition le pose.
+  if (rank >= scene.rsw.models().size()) {
+    return {};
+  }
+  const ro::formats::RswModel& placed = scene.rsw.models()[rank];
+  const ro::mapedit::ModelEdit* edit = store.Document(map_name_).ModelAt(rank);
+  return Place(ro::ui::map_editor::Place{.position = placed.position,
+                                         .rotation = placed.rotation,
+                                         .scale = placed.scale,
+                                         .hidden = edit == nullptr || !edit->hidden,
+                                         .released = true},
+               scene, store);
 }
 
 MapEditorSession::Outcome MapEditorSession::Revert(MapEditStore& store) {
