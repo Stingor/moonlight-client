@@ -134,8 +134,9 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
     for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
       const MapEditorModelRow& row = view.models[shown[static_cast<std::size_t>(line)]];
       const std::string label = std::format(
-          "{}{} — {}{}##modele{}", row.edited ? "✎ " : "", row.model_index, row.file,
-          row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(), row.model_index);
+          "{}{} — {}{}##modele{}", row.added ? "+ " : (row.edited ? "✎ " : ""), row.model_index,
+          row.file, row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
+          row.model_index);
       const bool selected = view.selected == row.model_index;
       if (ImGui::Selectable(label.c_str(), selected)) {
         intents.emplace_back(map_editor::Select{row.model_index});
@@ -143,6 +144,46 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
     }
   }
   ImGui::EndChild();
+}
+
+// LA BIBLIOTHÈQUE : les modèles de l'installation, filtrables ; le choisi
+// s'ajoute à la carte, là où l'appelant le pose.
+void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
+                 std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  if (view.library == nullptr || view.library->empty()) {
+    ImGui::TextDisabled("%s", core::Tr("Aucun modèle dans l'installation."));
+    return;
+  }
+  static_cast<void>(ImGui::InputTextWithHint("##filtre_bibliotheque", core::Tr("Filtrer…"),
+                                             panel.library_filter.data(),
+                                             panel.library_filter.size()));
+  const std::string_view filter(panel.library_filter.data(),
+                                strnlen(panel.library_filter.data(), panel.library_filter.size()));
+  std::vector<std::size_t> shown;
+  for (std::size_t slot = 0; slot < view.library->size(); ++slot) {
+    if (PassesFilter(MapEditorModelRow{.file = (*view.library)[slot]}, filter)) {
+      shown.push_back(slot);
+    }
+  }
+  const float height = ImGui::GetTextLineHeightWithSpacing() * kTreeRows;
+  if (ImGui::BeginChild("##bibliotheque", ImVec2(0.0F, height), ImGuiChildFlags_Borders)) {
+    ImGuiListClipper clipper;
+    clipper.Begin(static_cast<int>(shown.size()));
+    while (clipper.Step()) {
+      for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
+        const std::string& file = (*view.library)[shown[static_cast<std::size_t>(line)]];
+        if (ImGui::Selectable(file.c_str(), panel.library_choice == file)) {
+          panel.library_choice = file;
+        }
+      }
+    }
+  }
+  ImGui::EndChild();
+  ImGui::BeginDisabled(panel.library_choice.empty());
+  if (SkinButton(core::Tr("Ajouter à la carte"), art)) {
+    intents.emplace_back(map_editor::AddModel{panel.library_choice});
+  }
+  ImGui::EndDisabled();
 }
 
 // CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres.
@@ -210,7 +251,9 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
                                 .c_str());
   DrawPlacement(view, intents, art);
   DrawWhy(view, panel, intents);
-  if (SkinButton(core::Tr("Rétablir le modèle"), art)) {
+  if (SkinButton(view.selected_added ? core::Tr("Retirer le modèle ajouté")
+                                     : core::Tr("Rétablir le modèle"),
+                 art)) {
     intents.emplace_back(map_editor::Revert{});
   }
 }
@@ -265,6 +308,10 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
 
   ImGui::SeparatorText(core::Tr("Arbre de la scène"));
   DrawSceneTree(view, panel, intents, art);
+
+  if (ImGui::CollapsingHeader(core::Tr("Bibliothèque"))) {
+    DrawLibrary(view, panel, intents, art);
+  }
 
   ImGui::Separator();
   ImGui::BeginDisabled(!view.unsaved);

@@ -55,12 +55,36 @@ struct ModelEdit {
   friend bool operator==(const ModelEdit&, const ModelEdit&) = default;
 };
 
+// UN MODÈLE AJOUTÉ par l'éditeur : un fichier de l'installation, posé là où le
+// staff l'a voulu. Il prend rang APRÈS les modèles du RSW, dans l'ordre du
+// document ; masqué, il garde son rang et ne se dessine pas.
+struct AddedModel {
+  // Son fichier, relatif à data\model\, en UTF-8.
+  std::string model_file;
+  std::array<float, 3> position{};
+  std::array<float, 3> rotation{};
+  std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
+  bool hidden = false;
+  // Pourquoi : le document refuse un ajout qui ne le dit pas.
+  std::string why;
+
+  friend bool operator==(const AddedModel&, const AddedModel&) = default;
+};
+
 // Le document d'une carte.
 class MapEdit {
  public:
   // Les retouches de modèles, rangées par rang.
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
-  [[nodiscard]] bool empty() const noexcept { return models_.empty(); }
+  [[nodiscard]] bool empty() const noexcept { return models_.empty() && added_.empty(); }
+  // Les modèles ajoutés, dans l'ordre de leurs rangs.
+  [[nodiscard]] const std::vector<AddedModel>& added() const noexcept { return added_; }
+  // Ajoute un modèle au bout de la liste.
+  void AddModel(AddedModel model) { added_.push_back(std::move(model)); }
+  // Remplace l'ajout de rang `slot` dans la liste ; hors de la liste, rien.
+  void SetAdded(std::size_t slot, AddedModel model);
+  // Retire l'ajout de rang `slot` : les suivants remontent.
+  void RemoveAdded(std::size_t slot);
 
   // La retouche du modèle de rang `model_index`, ou rien.
   [[nodiscard]] const ModelEdit* ModelAt(std::size_t model_index) const;
@@ -74,6 +98,7 @@ class MapEdit {
 
  private:
   std::vector<ModelEdit> models_;
+  std::vector<AddedModel> added_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la
@@ -96,15 +121,21 @@ struct MapEditReport {
   std::vector<std::size_t> hidden;
 };
 
-// Le nom en UTF-8 d'un fichier que le RSW cite dans son encodage : `mapedit` ne
+// LES NOMS DE FICHIERS, de l'encodage du RSW à l'UTF-8 et retour : `mapedit` ne
 // connaît pas les encodages, l'appelant les lui traduit.
-using FileNameOf = std::string (*)(std::string_view raw);
+using FileNameOf = std::string (*)(std::string_view name);
+struct FileNameCodec {
+  // Du nom que le RSW cite à l'UTF-8 du document.
+  FileNameOf to_utf8 = nullptr;
+  // De l'UTF-8 du document au nom que le RSW citerait.
+  FileNameOf to_raw = nullptr;
+};
 
-// Pose `edit` sur `rsw`, dont chaque cible se vérifie. Un modèle masqué RESTE
-// dans le RSW, à son rang : il va dans `MapEditReport::hidden`, et le décor ne
-// le dessine pas. Les rangs du RSW restent ainsi ceux du fichier, que
-// l'éditeur désigne.
+// Pose `edit` sur `rsw`, dont chaque cible se vérifie, puis lui ajoute les
+// modèles ajoutés, au bout de sa liste. Un modèle masqué RESTE dans le RSW, à
+// son rang : il va dans `MapEditReport::hidden`, et le décor ne le dessine pas.
+// Les rangs du RSW restent ainsi ceux du fichier, que l'éditeur désigne.
 [[nodiscard]] MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
-                                         FileNameOf file_name_of);
+                                         const FileNameCodec& names);
 
 }  // namespace ro::mapedit

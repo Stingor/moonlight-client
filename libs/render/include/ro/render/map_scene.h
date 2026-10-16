@@ -172,7 +172,12 @@ struct MapSceneOptions {
 // recalculent sur les maillages déjà chargés. C'est ce qui rend l'édition en
 // direct immédiate. Un modèle que la carte n'a pas pu lire ne revient pas.
 //
+// `vfs`, quand il est donné, lit les fichiers des modèles ajoutés qui manquent
+// encore ; sans lui, un modèle ajouté dont le fichier n'est pas chargé ne se
+// montre pas.
+//
 // À téléverser ensuite au renderer, comme au chargement.
-mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdit& edit);
+mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdit& edit,
+                                          vfs::Vfs* vfs = nullptr);
 
 }  // namespace ro::render

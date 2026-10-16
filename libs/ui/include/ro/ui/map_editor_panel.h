@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
 #include <variant>
@@ -25,9 +26,10 @@ struct MapEditorModelRow {
   // Son rang dans le RSW, et son fichier en UTF-8.
   std::size_t model_index = 0;
   std::string file;
-  // Le document le retouche ; il le masque.
+  // Le document le retouche ; il le masque ; il l'a ajouté.
   bool edited = false;
   bool hidden = false;
+  bool added = false;
 };
 
 // CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres : des segments
@@ -64,6 +66,9 @@ struct MapEditorView {
   // position d'origine ; et ce que l'édition en fait.
   std::optional<std::size_t> selected;
   std::string selected_file;
+  // Le désigné est un modèle que le document ajoute : il se retire au lieu de
+  // se rétablir.
+  bool selected_added = false;
   std::array<float, 3> origin{};
   std::array<float, 3> position{};
   std::array<float, 3> rotation{};
@@ -76,6 +81,9 @@ struct MapEditorView {
   std::vector<MapEditorModelRow> models;
   // Ce que le mode trace par-dessus la vue.
   std::vector<MapEditorLine> lines;
+  // LA BIBLIOTHÈQUE : les fichiers de modèles de l'installation, relatifs à
+  // data\model\, triés. Partagée et non recopiée : elle en compte des milliers.
+  std::shared_ptr<const std::vector<std::string>> library;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
@@ -106,6 +114,10 @@ struct SetWhy {
 };
 // Rendre au modèle désigné son placement d'origine.
 struct Revert {};
+// Ajouter à la carte un modèle de la bibliothèque, là où l'appelant le pose.
+struct AddModel {
+  std::string file;
+};
 // Choisir l'outil des poignées.
 struct SetTool {
   MapEditorTool tool = MapEditorTool::kMove;
@@ -113,9 +125,10 @@ struct SetTool {
 struct Save {};
 }  // namespace map_editor
 
-using MapEditorIntent = std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo,
-                                     map_editor::Select, map_editor::Place, map_editor::SetWhy,
-                                     map_editor::Revert, map_editor::Save, map_editor::SetTool>;
+using MapEditorIntent =
+    std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
+                 map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
+                 map_editor::SetTool, map_editor::AddModel>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -129,6 +142,9 @@ struct MapEditorPanelState {
   std::array<char, kFilterCapacity> filter{};
   // N'y montrer que les modèles retouchés.
   bool edited_only = false;
+  // Le filtre de la bibliothèque, et le fichier qu'on y a choisi.
+  std::array<char, kFilterCapacity> library_filter{};
+  std::string library_choice;
 
   std::array<char, kWhyCapacity> why{};
   // Le modèle dont `why` est la saisie : un autre modèle la recharge.

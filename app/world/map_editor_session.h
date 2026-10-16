@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <map>
 #include <optional>
@@ -47,6 +48,10 @@ class MapEditorSession {
   // Le modèle sous un clic dans le monde, ou rien.
   void Pick(std::optional<std::size_t> model_index);
 
+  // OÙ SE POSE UN MODÈLE AJOUTÉ, dans le repère du RSW : posé par l'appelant à
+  // chaque image — le point que la caméra regarde.
+  void SetDropPoint(const std::array<float, 3>& rsw_position) { drop_point_ = rsw_position; }
+
   // LES POIGNÉES DE L'IMAGE, posées par l'appelant : leur repère, et ce
   // qu'elles montrent à l'écran.
   void SetGizmo(const GizmoFrame& frame, std::vector<GizmoHandle> handles);
@@ -77,6 +82,11 @@ class MapEditorSession {
                 MapEditStore& store);
   Outcome SetWhy(std::string why, MapEditStore& store);
   Outcome Revert(MapEditStore& store);
+  Outcome AddModel(std::string file, const ro::render::MapScene& scene, MapEditStore& store);
+  // Le placement d'un modèle AJOUTÉ, de rang `slot` dans la liste du document.
+  Outcome PlaceAdded(std::size_t slot, const ro::ui::map_editor::Place& place, MapEditStore& store);
+  // Le rang dans la liste des ajouts du modèle désigné, s'il en est un.
+  [[nodiscard]] std::optional<std::size_t> AddedSlot(const ro::render::MapScene& scene) const;
   void Save(MapEditStore& store);
   // Retient un geste dans l'historique, s'il a changé quelque chose.
   void Record(std::string label, const ro::mapedit::MapEdit& before,
@@ -96,6 +106,9 @@ class MapEditorSession {
   // converti une fois par carte, et non à chaque image.
   std::vector<std::string> model_files_;
   ro::ui::MapEditorTool tool_ = ro::ui::MapEditorTool::kMove;
+  std::array<float, 3> drop_point_{};
+  // Le nombre de modèles du RSW d'origine : les ajouts prennent rang après.
+  std::size_t original_count_ = 0;
   GizmoFrame gizmo_frame_;
   std::vector<GizmoHandle> handles_;
   // LA POIGNÉE SAISIE : son rang, le point de l'appui, le placement d'alors, et

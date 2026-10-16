@@ -4,7 +4,10 @@
 // Le panneau rend des intentions ; ici, elles passent à la session, le décor se
 // repose quand le document change, et le panneau reçoit sa vue de l'image.
 
+#include <memory>
 #include <string>
+#include <string_view>
+#include <vector>
 
 #include "ro/core/log.h"
 #include "ro/render/map_scene.h"
@@ -13,6 +16,24 @@
 #include "world/map_editor_overlay.h"
 
 namespace moonclient {
+namespace {
+
+constexpr std::string_view kModelFolder = "data\\model\\";
+constexpr std::string_view kModelExtension = ".rsm";
+
+// LES MODÈLES DE L'INSTALLATION, relatifs à data\model\ : ce que la
+// bibliothèque de l'éditeur propose.
+std::vector<std::string> ModelLibrary(ro::vfs::Vfs& vfs) {
+  std::vector<std::string> files = vfs.List(kModelFolder, kModelExtension);
+  for (std::string& file : files) {
+    if (file.size() > kModelFolder.size()) {
+      file.erase(0, kModelFolder.size());
+    }
+  }
+  return files;
+}
+
+}  // namespace
 
 void Game::ServeMapEditor() {
   ro::ui::StaffToolsState& tools = windows_.staff_tools;
@@ -24,6 +45,10 @@ void Game::ServeMapEditor() {
     return;
   }
   map_editor_.FollowMap(stage_->name, stage_->scene);
+  const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
+  // UN MODÈLE AJOUTÉ SE POSE où regarde la caméra.
+  const glm::vec3 drop = map_frame.ToNative(camera_.look_at);
+  map_editor_.SetDropPoint({drop.x, drop.y, drop.z});
   bool replace = false;
   for (const ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
     replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
@@ -37,6 +62,11 @@ void Game::ServeMapEditor() {
     ReplaceMapModels();
   }
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
+  // LA BIBLIOTHÈQUE, lue une fois dans l'installation, à la première ouverture.
+  if (map_editor_.active() && model_library_ == nullptr) {
+    model_library_ = std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));
+  }
+  tools.map_editor.library = model_library_;
   if (!map_editor_.active() || !map_editor_.selected().has_value()) {
     map_editor_.SetGizmo(GizmoFrame(), {});
     return;
@@ -46,7 +76,6 @@ void Game::ServeMapEditor() {
   tools.map_editor.lines = SelectionOutline(stage_->scene, *map_editor_.selected(), camera_,
                                             aspect_ratio_, width, height);
   // LES POIGNÉES, sur le pivot du placement que montre la vue.
-  const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
   const GizmoFrame frame = GizmoFrameOf(map_frame, tools.map_editor.position, camera_);
   map_editor_.SetGizmo(
       frame, GizmoHandles(map_editor_.tool(), frame, camera_, aspect_ratio_, width, height));
@@ -57,7 +86,7 @@ void Game::ServeMapEditor() {
 void Game::ReplaceMapModels() {
   ro::render::MapScene& scene = stage_->scene;
   const ro::mapedit::MapEditReport report =
-      ro::render::ReplaceSceneModels(scene, map_edits_.Document(stage_->name));
+      ro::render::ReplaceSceneModels(scene, map_edits_.Document(stage_->name), &*vfs_);
   for (const std::string& refusal : report.refused) {
     ro::core::LogWarning("édition de {} refusée — {}", stage_->name, refusal);
   }

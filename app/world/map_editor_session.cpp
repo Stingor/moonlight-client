@@ -93,6 +93,7 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
   if (map_name == map_name_ && model_files_.size() == scene.unfixed_models.size()) {
     return;
   }
+  original_count_ = scene.unfixed_models.size();
   model_files_.clear();
   model_files_.reserve(scene.unfixed_models.size());
   for (const ro::formats::RswModel& model : scene.unfixed_models) {
@@ -162,6 +163,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           tool_ = asked.tool;
           drag_.reset();
           return {};
+        } else if constexpr (std::is_same_v<Asked, intents::AddModel>) {
+          return AddModel(asked.file, scene, store);
         } else {
           Save(store);
           return {};
@@ -175,6 +178,9 @@ MapEditorSession::Outcome MapEditorSession::Place(const ro::ui::map_editor::Plac
                                                   MapEditStore& store) {
   if (selection_.empty()) {
     return {};
+  }
+  if (const std::optional<std::size_t> slot = AddedSlot(scene)) {
+    return PlaceAdded(*slot, place, store);
   }
   const std::size_t rank = *selection_.model_index;
   const ro::formats::RswModel* original = OriginalOf(scene, rank);
@@ -228,12 +234,80 @@ MapEditorSession::Outcome MapEditorSession::Place(const ro::ui::map_editor::Plac
   return outcome;
 }
 
+MapEditorSession::Outcome MapEditorSession::PlaceAdded(std::size_t slot,
+                                                       const ro::ui::map_editor::Place& place,
+                                                       MapEditStore& store) {
+  const ro::mapedit::MapEdit before = store.Document(map_name_);
+  if (slot >= before.added().size()) {
+    return {};
+  }
+  if (!gesture_before_.has_value()) {
+    gesture_before_ = before;
+  }
+  ro::mapedit::AddedModel added = before.added()[slot];
+  added.position = place.position;
+  added.rotation = place.rotation;
+  added.scale = place.scale;
+  added.hidden = place.hidden;
+  ro::mapedit::MapEdit after = before;
+  after.SetAdded(slot, std::move(added));
+  Outcome outcome;
+  if (!(after == before)) {
+    store.Set(map_name_, after);
+    outcome.replace_models = true;
+  }
+  if (place.released) {
+    Line label{};
+    std::snprintf(label.data(), label.size(), ro::core::Tr("Placer le modèle %zu"),
+                  original_count_ + slot);
+    Record(label.data(), *gesture_before_, store.Document(map_name_));
+    gesture_before_.reset();
+  }
+  return outcome;
+}
+
+MapEditorSession::Outcome MapEditorSession::AddModel(std::string file,
+                                                     const ro::render::MapScene& scene,
+                                                     MapEditStore& store) {
+  const ro::mapedit::MapEdit before = store.Document(map_name_);
+  ro::mapedit::MapEdit after = before;
+  after.AddModel(ro::mapedit::AddedModel{.model_file = std::move(file), .position = drop_point_});
+  store.Set(map_name_, after);
+  Record(ro::core::Tr("Ajouter un modèle"), before, after);
+  // LE NOUVEAU EST DÉSIGNÉ : c'est lui qu'on va placer.
+  selection_.model_index = scene.unfixed_models.size() + after.added().size() - 1;
+  status_ = ro::core::Tr("Modèle ajouté : dites pourquoi avant d'enregistrer.");
+  return {.replace_models = true};
+}
+
+std::optional<std::size_t> MapEditorSession::AddedSlot(const ro::render::MapScene& scene) const {
+  if (selection_.empty() || *selection_.model_index < scene.unfixed_models.size()) {
+    return std::nullopt;
+  }
+  return *selection_.model_index - scene.unfixed_models.size();
+}
+
 MapEditorSession::Outcome MapEditorSession::SetWhy(std::string why, MapEditStore& store) {
   if (selection_.empty()) {
     return {};
   }
   const std::size_t rank = *selection_.model_index;
   const ro::mapedit::MapEdit before = store.Document(map_name_);
+  if (rank >= original_count_) {
+    const std::size_t slot = rank - original_count_;
+    if (slot >= before.added().size() || before.added()[slot].why == why) {
+      return {};
+    }
+    ro::mapedit::AddedModel added = before.added()[slot];
+    added.why = std::move(why);
+    ro::mapedit::MapEdit after = before;
+    after.SetAdded(slot, std::move(added));
+    store.Set(map_name_, after);
+    Line label{};
+    std::snprintf(label.data(), label.size(), ro::core::Tr("Raison du modèle %zu"), rank);
+    Record(label.data(), before, after);
+    return {};
+  }
   const ro::mapedit::ModelEdit* existing = before.ModelAt(rank);
   if (existing == nullptr) {
     // Pas encore de retouche : la raison l'attendra.
@@ -261,6 +335,21 @@ MapEditorSession::Outcome MapEditorSession::Revert(MapEditStore& store) {
   }
   const std::size_t rank = *selection_.model_index;
   const ro::mapedit::MapEdit before = store.Document(map_name_);
+  // UN MODÈLE AJOUTÉ SE RETIRE : il n'a pas de placement d'origine où revenir.
+  if (rank >= original_count_) {
+    const std::size_t slot = rank - original_count_;
+    if (slot >= before.added().size()) {
+      return {};
+    }
+    ro::mapedit::MapEdit after = before;
+    after.RemoveAdded(slot);
+    store.Set(map_name_, after);
+    Line label{};
+    std::snprintf(label.data(), label.size(), ro::core::Tr("Retirer le modèle %zu"), rank);
+    Record(label.data(), before, after);
+    selection_.Clear();
+    return {.replace_models = true};
+  }
   if (before.ModelAt(rank) == nullptr) {
     return {};
   }
@@ -281,6 +370,17 @@ void MapEditorSession::Save(MapEditStore& store) {
       Line refused{};
       std::snprintf(refused.data(), refused.size(),
                     ro::core::Tr("La retouche du modèle %zu n'a pas de raison."), edit.model_index);
+      status_ = refused.data();
+      return;
+    }
+  }
+  const std::vector<ro::mapedit::AddedModel>& added = store.Document(map_name_).added();
+  for (std::size_t slot = 0; slot < added.size(); ++slot) {
+    if (added[slot].why.empty()) {
+      Line refused{};
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche du modèle %zu n'a pas de raison."),
+                    original_count_ + slot);
       status_ = refused.data();
       return;
     }
@@ -327,10 +427,33 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
       view.models[edit.model_index].hidden = edit.hidden;
     }
   }
+  // Les ajouts, après les modèles du RSW.
+  for (std::size_t slot = 0; slot < document.added().size(); ++slot) {
+    const ro::mapedit::AddedModel& added = document.added()[slot];
+    view.models.push_back(ro::ui::MapEditorModelRow{.model_index = model_files_.size() + slot,
+                                                    .file = added.model_file,
+                                                    .edited = true,
+                                                    .hidden = added.hidden,
+                                                    .added = true});
+  }
   if (selection_.empty()) {
     return view;
   }
   const std::size_t rank = *selection_.model_index;
+  if (const std::optional<std::size_t> slot = AddedSlot(scene);
+      slot.has_value() && *slot < document.added().size()) {
+    const ro::mapedit::AddedModel& added = document.added()[*slot];
+    view.selected = rank;
+    view.selected_added = true;
+    view.selected_file = added.model_file;
+    view.origin = added.position;
+    view.position = added.position;
+    view.rotation = added.rotation;
+    view.scale = added.scale;
+    view.hidden = added.hidden;
+    view.why = added.why;
+    return view;
+  }
   const ro::formats::RswModel* original = OriginalOf(scene, rank);
   if (original == nullptr) {
     return view;

@@ -18693,3 +18693,24 @@ tr: Girar
 
 fr: masqué
 tr: oculto
+
+fr: Ajouter un modèle
+tr: Añadir un modelo
+
+fr: Ajouter à la carte
+tr: Añadir al mapa
+
+fr: Aucun modèle dans l'installation.
+tr: Ningún modelo en la instalación.
+
+fr: Bibliothèque
+tr: Biblioteca
+
+fr: Modèle ajouté : dites pourquoi avant d'enregistrer.
+tr: Modelo añadido: di por qué antes de guardar.
+
+fr: Retirer le modèle %zu
+tr: Quitar el modelo %zu
+
+fr: Retirer le modèle ajouté
+tr: Quitar el modelo añadido

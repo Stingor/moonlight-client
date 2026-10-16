@@ -324,6 +324,17 @@ void RswScene::MoveEffect(std::size_t effect_index, const std::array<float, 3>& 
   }
 }
 
+std::size_t RswScene::AddModel(RswModel model) {
+  models_.push_back(std::move(model));
+  return models_.size() - 1;
+}
+
+void RswScene::TruncateModels(std::size_t count) {
+  if (count < models_.size()) {
+    models_.resize(count);
+  }
+}
+
 void RswScene::PlaceModel(std::size_t model_index, const std::array<float, 3>& position,
                           const std::array<float, 3>& rotation,
                           const std::array<float, 3>& scale) noexcept {

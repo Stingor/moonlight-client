@@ -36,6 +36,12 @@ constexpr std::string_view kMapEditHeader =
 #               fichier — un champ absent garde la valeur du RSW ;
 #    hidden   : vrai pour ne plus le dessiner ;
 #    why      : pourquoi, obligatoire.
+#  added  : les modèles ajoutés, qui prennent rang après ceux du RSW, chacun :
+#    file     : son fichier, relatif à data\model\ ;
+#    position, rotation, scale : son placement, [x, y, z], dans le repère du
+#               fichier — position est obligatoire ;
+#    hidden   : vrai pour ne pas le dessiner ;
+#    why      : pourquoi, obligatoire.
 #  Une opération dont la cible ne correspond plus n'est pas posée, et le
 #  journal le dit.
 #
@@ -126,6 +132,46 @@ core::Result<ModelEdit> ModelEditFrom(const YAML::Node& entry, std::string_view 
   return edit;
 }
 
+core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_view map_name,
+                                        const std::string& where) {
+  if (!entry.IsMap()) {
+    return std::unexpected(Refused(map_name, where + " n'est pas une table"));
+  }
+  const YAML::Node file = entry["file"];
+  const YAML::Node position = entry["position"];
+  const YAML::Node why = entry["why"];
+  if (!file || !position || !why) {
+    return std::unexpected(
+        Refused(map_name, where + " : « file », « position » et « why » sont dus"));
+  }
+  AddedModel added;
+  added.model_file = file.as<std::string>();
+  added.why = why.as<std::string>();
+  if (added.why.empty()) {
+    return std::unexpected(Refused(map_name, where + " : « why » est vide"));
+  }
+  core::Result<std::array<float, 3>> placed =
+      VectorFrom(position, map_name, where + " : « position »");
+  if (!placed) {
+    return std::unexpected(placed.error());
+  }
+  added.position = *placed;
+  auto rotation = OptionalVectorFrom(entry, "rotation", map_name, where);
+  auto scale = OptionalVectorFrom(entry, "scale", map_name, where);
+  if (!rotation) {
+    return std::unexpected(rotation.error());
+  }
+  if (!scale) {
+    return std::unexpected(scale.error());
+  }
+  added.rotation = rotation->value_or(added.rotation);
+  added.scale = scale->value_or(added.scale);
+  if (const YAML::Node hidden = entry["hidden"]) {
+    added.hidden = hidden.as<bool>();
+  }
+  return added;
+}
+
 // Une chaîne entre apostrophes : rien ne s'y échappe, sauf l'apostrophe, qui
 // se double. C'est ce qui garde lisibles les barres obliques inverses d'un
 // chemin.
@@ -194,6 +240,19 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
         edit.SetModel(std::move(*model));
       }
     }
+    if (const YAML::Node added = whole["added"]) {
+      if (!added.IsSequence()) {
+        return std::unexpected(Refused(map_name, "« added » n'est pas une liste"));
+      }
+      for (std::size_t rank = 0; rank < added.size(); ++rank) {
+        core::Result<AddedModel> model =
+            AddedModelFrom(added[rank], map_name, std::format("ajout {}", rank));
+        if (!model) {
+          return std::unexpected(model.error());
+        }
+        edit.AddModel(std::move(*model));
+      }
+    }
   } catch (const YAML::Exception& failure) {
     return std::unexpected(Refused(map_name, failure.what()));
   }
@@ -224,6 +283,19 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
       text += "    hidden: true\n";
     }
     text += std::format("    why: {}\n", DoubleQuoted(model.why));
+  }
+  if (!edit.added().empty()) {
+    text += "added:\n";
+  }
+  for (const AddedModel& added : edit.added()) {
+    text += std::format("  - file: {}\n", SingleQuoted(added.model_file));
+    text += std::format("    position: {}\n", VectorText(added.position));
+    text += std::format("    rotation: {}\n", VectorText(added.rotation));
+    text += std::format("    scale: {}\n", VectorText(added.scale));
+    if (added.hidden) {
+      text += "    hidden: true\n";
+    }
+    text += std::format("    why: {}\n", DoubleQuoted(added.why));
   }
   return text;
 }

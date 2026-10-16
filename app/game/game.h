@@ -513,6 +513,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LES DOCUMENTS D'ÉDITION DES CARTES, et le mode éditeur : voir docs/adr/0118.
   MapEditStore map_edits_;
   MapEditorSession map_editor_;
+  // La bibliothèque de l'éditeur, lue à sa première ouverture.
+  std::shared_ptr<const std::vector<std::string>> model_library_;
   ro::render::DrawableSize size_{};
   float aspect_ratio_ = 1.0F;
   glm::vec2 mouse_{0.0F, 0.0F};

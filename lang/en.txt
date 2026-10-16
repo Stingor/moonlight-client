@@ -18693,3 +18693,24 @@ tr: Rotate
 
 fr: masqué
 tr: hidden
+
+fr: Ajouter un modèle
+tr: Add a model
+
+fr: Ajouter à la carte
+tr: Add to the map
+
+fr: Aucun modèle dans l'installation.
+tr: No model in the installation.
+
+fr: Bibliothèque
+tr: Library
+
+fr: Modèle ajouté : dites pourquoi avant d'enregistrer.
+tr: Model added: say why before saving.
+
+fr: Retirer le modèle %zu
+tr: Remove model %zu
+
+fr: Retirer le modèle ajouté
+tr: Remove the added model

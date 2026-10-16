@@ -9,6 +9,9 @@ namespace ro::mapedit {
 namespace {
 
 constexpr std::string_view kMapEditFolder = "data\\map_edits\\";
+// Le nom que porte un modèle ajouté dans le RSW : celui du fichier ne sert
+// qu'aux éditeurs de cartes, et dit d'où il vient.
+constexpr std::string_view kAddedModelName = "map_edit";
 constexpr std::string_view kMapEditExtension = ".yml";
 
 [[nodiscard]] bool NearOrigin(const std::array<float, 3>& expected,
@@ -47,7 +50,20 @@ void MapEdit::RemoveModel(std::size_t model_index) {
                 [model_index](const ModelEdit& edit) { return edit.model_index == model_index; });
 }
 
-MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw, FileNameOf file_name_of) {
+void MapEdit::SetAdded(std::size_t slot, AddedModel model) {
+  if (slot < added_.size()) {
+    added_[slot] = std::move(model);
+  }
+}
+
+void MapEdit::RemoveAdded(std::size_t slot) {
+  if (slot < added_.size()) {
+    added_.erase(added_.begin() + static_cast<std::ptrdiff_t>(slot));
+  }
+}
+
+MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
+                           const FileNameCodec& names) {
   MapEditReport report;
   for (const ModelEdit& model_edit : edit.models()) {
     if (model_edit.model_index >= rsw.models().size()) {
@@ -56,7 +72,7 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw, FileName
       continue;
     }
     const formats::RswModel& model = rsw.models()[model_edit.model_index];
-    const std::string file = file_name_of(model.model_name);
+    const std::string file = names.to_utf8(model.model_name);
     if (file != model_edit.model_file) {
       report.refused.push_back(std::format("modèle {} : « {} » attendu, « {} » trouvé",
                                            model_edit.model_index, model_edit.model_file, file));
@@ -75,6 +91,20 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw, FileName
       rsw.PlaceModel(model_edit.model_index, model_edit.position.value_or(model.position),
                      model_edit.rotation.value_or(model.rotation),
                      model_edit.scale.value_or(model.scale));
+    }
+    ++report.applied;
+  }
+  // LES AJOUTS, au bout de la liste, dans l'ordre du document.
+  for (const AddedModel& added : edit.added()) {
+    formats::RswModel model;
+    model.name = std::string(kAddedModelName);
+    model.model_name = names.to_raw(added.model_file);
+    model.position = added.position;
+    model.rotation = added.rotation;
+    model.scale = added.scale;
+    const std::size_t rank = rsw.AddModel(std::move(model));
+    if (added.hidden) {
+      report.hidden.push_back(rank);
     }
     ++report.applied;
   }

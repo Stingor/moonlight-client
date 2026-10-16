@@ -114,10 +114,16 @@ std::vector<WaterAnimation> LoadWaterAnimations(vfs::Vfs& vfs, const WaterPlane&
 // Une carte pose le même arbre des centaines de fois : prontera compte 1303
 // instances pour 62 fichiers. Charger par instance multiplierait le travail par
 // vingt pour un résultat identique.
-std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswScene& rsw,
-                                            MapScene& scene) {
+//
+// ⚠ SEULEMENT CEUX QUI MANQUENT À LA SCÈNE : un modèle que l'éditeur ajoute se
+// lit à son ajout, sans relire ceux qui sont déjà là.
+void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
+  const formats::RswScene& rsw = scene.rsw;
   std::map<std::string, ModelInstances> by_file;
   std::set<std::string> unreadable_files;
+  for (const ModelInstances& instances : scene.models) {
+    unreadable_files.insert(instances.rsm_file);
+  }
   std::set<std::string> missing_textures;
   // LES TEXTURES, LUES UNE FOIS PAR NOM pour toute la carte, et leur échec
   // retenu comme leur succès.
@@ -170,19 +176,24 @@ std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswSce
     }
   }
 
-  scene.missing_model_textures.assign(missing_textures.begin(), missing_textures.end());
-
-  std::vector<ModelInstances> models;
-  models.reserve(by_file.size());
+  scene.missing_model_textures.insert(scene.missing_model_textures.end(), missing_textures.begin(),
+                                      missing_textures.end());
   for (auto& [name, instances] : by_file) {
-    models.push_back(std::move(instances));
+    scene.models.push_back(std::move(instances));
   }
-  return models;
 }
 
 // Le nom en UTF-8 d'un fichier que le RSW cite en CP949 : ce que l'édition
 // compare à celui qu'elle désigne.
 std::string CitedFileName(std::string_view raw) { return vfs::Cp949ToUtf8Lossy(raw); }
+
+// Le nom qu'un RSW citerait pour un fichier que l'édition nomme en UTF-8.
+std::string RawFileName(std::string_view utf8) {
+  auto raw = vfs::Utf8ToCp949(utf8);
+  return raw ? std::move(*raw) : std::string(utf8);
+}
+
+constexpr mapedit::FileNameCodec kFileNames{.to_utf8 = &CitedFileName, .to_raw = &RawFileName};
 
 // Pose les modèles du RSW de `scene` sur les maillages chargés : une pose par
 // modèle, sauf les masqués, ceux dont le fichier manque et ceux posés hors de
@@ -241,12 +252,18 @@ mapedit::MapEdit LoadMapEdit(vfs::Vfs& vfs, std::string_view map_name) {
   return std::move(*edit);
 }
 
-mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdit& edit) {
+mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdit& edit,
+                                          vfs::Vfs* vfs) {
   for (std::size_t rank = 0; rank < scene.unfixed_models.size(); ++rank) {
     const formats::RswModel& original = scene.unfixed_models[rank];
     scene.rsw.PlaceModel(rank, original.position, original.rotation, original.scale);
   }
-  mapedit::MapEditReport report = mapedit::ApplyMapEdit(edit, scene.rsw, &CitedFileName);
+  // Les modèles ajoutés repartent de zéro : l'édition les repose tous.
+  scene.rsw.TruncateModels(scene.unfixed_models.size());
+  mapedit::MapEditReport report = mapedit::ApplyMapEdit(edit, scene.rsw, kFileNames);
+  if (vfs != nullptr) {
+    LoadMissingSceneModels(*vfs, scene);
+  }
   scene.hidden_models = report.hidden;
   PlaceSceneInstances(scene);
   return report;
@@ -275,7 +292,7 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   // docs/adr/0118. Le placement d'origine se garde pour l'éditeur.
   std::vector<formats::RswModel> unfixed_models = rsw->models();
   const mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(
-      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name), *rsw, &CitedFileName);
+      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name), *rsw, kFileNames);
   for (const std::string& refusal : fixed.refused) {
     core::LogWarning("édition de {} refusée — {}", map_name, refusal);
   }
@@ -331,7 +348,7 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   //
   // ⚠ SAUF SUR UN RELIEF APLATI : voir `MapSceneOptions::flatten_relief`.
   if (!scene.relief_level.has_value()) {
-    scene.models = LoadSceneModels(vfs, scene.rsw, scene);
+    LoadMissingSceneModels(vfs, scene);
     PlaceSceneInstances(scene);
   }
   // LA TABLE DES EFFETS DE LA CARTE.
