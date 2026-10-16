@@ -186,6 +186,8 @@ struct EventRouting {
   // LE MODE ÉDITEUR DE CARTE, quand il est ouvert : un clic dans le monde y
   // désigne un modèle, et Échap en sort. Nul sinon, ou sans le droit.
   MapEditorSession* map_editor = nullptr;
+  // Sa vue de l'image : le placement d'où part une poignée saisie.
+  const ro::ui::MapEditorView* map_editor_view = nullptr;
   // Où part une ligne validée. Le routage ne l'envoie pas lui-même : c'est la
   // même séparation qu'entre `HandleKey` et la boucle.
   const ChatDispatch* chat_dispatch = nullptr;

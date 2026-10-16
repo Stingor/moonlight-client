@@ -10,6 +10,7 @@
 #include "ro/render/map_scene.h"
 
 #include "game/game.h"
+#include "world/map_editor_overlay.h"
 
 namespace moonclient {
 
@@ -22,16 +23,35 @@ void Game::ServeMapEditor() {
     tools.map_editor = ro::ui::MapEditorView();
     return;
   }
-  map_editor_.FollowMap(stage_->name);
+  map_editor_.FollowMap(stage_->name, stage_->scene);
   bool replace = false;
   for (const ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
     replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
   }
   tools.map_editor_intents.clear();
+  // LES GESTES DES POIGNÉES, mis en file par la souris.
+  for (const ro::ui::MapEditorIntent& intent : map_editor_.TakeQueued()) {
+    replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
+  }
   if (replace) {
     ReplaceMapModels();
   }
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
+  if (!map_editor_.active() || !map_editor_.selected().has_value()) {
+    map_editor_.SetGizmo(GizmoFrame(), {});
+    return;
+  }
+  const auto width = static_cast<float>(shell_.width());
+  const auto height = static_cast<float>(shell_.height());
+  tools.map_editor.lines = SelectionOutline(stage_->scene, *map_editor_.selected(), camera_,
+                                            aspect_ratio_, width, height);
+  // LES POIGNÉES, sur le pivot du placement que montre la vue.
+  const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
+  const GizmoFrame frame = GizmoFrameOf(map_frame, tools.map_editor.position, camera_);
+  map_editor_.SetGizmo(
+      frame, GizmoHandles(map_editor_.tool(), frame, camera_, aspect_ratio_, width, height));
+  const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
+  tools.map_editor.lines.insert(tools.map_editor.lines.end(), handles.begin(), handles.end());
 }
 
 void Game::ReplaceMapModels() {

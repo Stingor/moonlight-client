@@ -329,6 +329,11 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   // LE MODE ÉDITEUR : un clic dans le monde y désigne le modèle sous la souris,
   // et ne fait rien d'autre — ni marcher, ni viser.
   if (to.map_editor != nullptr) {
+    // Une poignée sous l'appui se saisit, avant de désigner quoi que ce soit.
+    if (to.map_editor->Grab(pointer, to.map_editor_view != nullptr ? *to.map_editor_view
+                                                                   : ro::ui::MapEditorView())) {
+      return;
+    }
     if (window.height > 0.0F) {
       const ro::render::ScreenRay ray =
           ro::render::MakeScreenRay(*to.camera, window.width / window.height, pointer.x, pointer.y,
@@ -629,6 +634,9 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       // relâché au-dessus d'une fenêtre laisserait sinon la marche se
       // redemander sans fin, le relâchement n'étant jamais vu.
       if (event.button.button == SDL_BUTTON_LEFT) {
+        if (to.map_editor != nullptr) {
+          to.map_editor->Release();
+        }
         to.world_mouse->held_click = HeldClick::kNothing;
         // Une attaque d'un seul clic qui frappait sans relâche s'arrête ici :
         // voir `ReleaseStopsAttack`.
@@ -720,6 +728,11 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       // le curseur du jeu, et la figer le laisserait planté là où la souris est
       // entrée dans le panneau.
       *to.mouse = glm::vec2{event.motion.x, event.motion.y};
+      // UNE POIGNÉE SAISIE suit la souris, fenêtres ou non, jusqu'au relâcher.
+      if (to.map_editor != nullptr && to.map_editor->dragging()) {
+        to.map_editor->DragTo(*to.mouse);
+        break;
+      }
       to.world_mouse->pressed = (event.motion.state & SDL_BUTTON_LMASK) != 0;
       to.world_mouse->double_click.NoteMotion();
       if (const std::optional<MouseGesture> gesture = DragOf(event.motion.state);

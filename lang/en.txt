@@ -18643,9 +18643,6 @@ tr: Restore the model
 fr: Échelle
 tr: Scale
 
-fr: Aucune.
-tr: None.
-
 fr: Cliquez sur un modèle du décor pour le désigner.
 tr: Click a scenery model to select it.
 
@@ -18670,9 +18667,6 @@ tr: Leave the editor
 fr: Raison du modèle %zu
 tr: Reason for model %zu
 
-fr: Retouches de cette carte
-tr: Fixes on this map
-
 fr: Rétablir le modèle %zu
 tr: Restore model %zu
 
@@ -18687,3 +18681,15 @@ tr: “Why” is required: the document refuses a fix without a reason.
 
 fr: Éditeur de carte
 tr: Map editor
+
+fr: Arbre de la scène
+tr: Scene tree
+
+fr: Retouchés
+tr: Fixed
+
+fr: Tourner
+tr: Rotate
+
+fr: masqué
+tr: hidden

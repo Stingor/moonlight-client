@@ -18643,9 +18643,6 @@ tr: Restablecer el modelo
 fr: Échelle
 tr: Escala
 
-fr: Aucune.
-tr: Ninguno.
-
 fr: Cliquez sur un modèle du décor pour le désigner.
 tr: Haz clic en un modelo del decorado para designarlo.
 
@@ -18670,9 +18667,6 @@ tr: Salir del editor
 fr: Raison du modèle %zu
 tr: Motivo del modelo %zu
 
-fr: Retouches de cette carte
-tr: Retoques de este mapa
-
 fr: Rétablir le modèle %zu
 tr: Restablecer el modelo %zu
 
@@ -18687,3 +18681,15 @@ tr: «Motivo» es obligatorio: el documento rechaza un retoque sin motivo.
 
 fr: Éditeur de carte
 tr: Editor de mapas
+
+fr: Arbre de la scène
+tr: Árbol de la escena
+
+fr: Retouchés
+tr: Retocados
+
+fr: Tourner
+tr: Girar
+
+fr: masqué
+tr: oculto

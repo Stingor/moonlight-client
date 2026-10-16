@@ -103,4 +103,43 @@ std::optional<std::size_t> PickSceneModel(const MapScene& scene, const ScreenRay
   return picked;
 }
 
+std::optional<ScenePose> FindScenePose(const MapScene& scene, std::size_t rsw_rank) {
+  const auto find_in = [rsw_rank](std::span<const glm::mat4> transforms,
+                                  std::span<const std::size_t> ranks) -> std::optional<glm::mat4> {
+    for (std::size_t pose = 0; pose < transforms.size() && pose < ranks.size(); ++pose) {
+      if (ranks[pose] == rsw_rank) {
+        return transforms[pose];
+      }
+    }
+    return std::nullopt;
+  };
+  for (const ModelInstances& instances : scene.models) {
+    if (auto found = find_in(instances.transforms, instances.rsw_ranks)) {
+      return ScenePose{.mesh = &instances.mesh, .transform = *found};
+    }
+    for (const ModelPlaybackGroup& group : instances.animated) {
+      if (auto found = find_in(group.transforms, group.rsw_ranks)) {
+        return ScenePose{.mesh = &instances.mesh, .transform = *found};
+      }
+    }
+  }
+  return std::nullopt;
+}
+
+std::array<glm::vec3, 8> PoseCorners(const ScenePose& pose) {
+  constexpr unsigned kHighX = 1U;
+  constexpr unsigned kHighY = 2U;
+  constexpr unsigned kHighZ = 4U;
+  const std::array<float, 3>& low = pose.mesh->bounds_min;
+  const std::array<float, 3>& high = pose.mesh->bounds_max;
+  std::array<glm::vec3, 8> corners{};
+  for (unsigned corner = 0; corner < corners.size(); ++corner) {
+    const glm::vec3 local{(corner & kHighX) != 0 ? high[0] : low[0],
+                          (corner & kHighY) != 0 ? high[1] : low[1],
+                          (corner & kHighZ) != 0 ? high[2] : low[2]};
+    corners[corner] = glm::vec3(pose.transform * glm::vec4(local, 1.0F));
+  }
+  return corners;
+}
+
 }  // namespace ro::render

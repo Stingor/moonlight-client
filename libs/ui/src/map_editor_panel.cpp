@@ -1,9 +1,13 @@
 #include "ro/ui/map_editor_panel.h"
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <format>
 #include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
@@ -43,6 +47,112 @@ constexpr std::array<const char*, 4> kMapEditorHelp = {
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
 };
+
+// La hauteur de l'arbre de la scène, en lignes : au-delà, il défile.
+constexpr float kTreeRows = 12.0F;
+// L'épaisseur des traits tracés par-dessus la vue, en pixels.
+constexpr float kLineThicknessPixels = 2.0F;
+// Les couleurs des traits, en RGBA : la boîte du désigné, les trois axes —
+// rouge, vert, bleu, comme partout ailleurs —, et la poignée saisie.
+constexpr ImU32 kSelectionColor = IM_COL32(255, 210, 60, 230);
+constexpr ImU32 kAxisXColor = IM_COL32(230, 70, 70, 255);
+constexpr ImU32 kAxisYColor = IM_COL32(80, 210, 80, 255);
+constexpr ImU32 kAxisZColor = IM_COL32(80, 130, 240, 255);
+constexpr ImU32 kActiveColor = IM_COL32(255, 255, 255, 255);
+
+ImU32 ColorOf(MapEditorLineKind kind) {
+  switch (kind) {
+    case MapEditorLineKind::kSelection:
+      return kSelectionColor;
+    case MapEditorLineKind::kAxisX:
+      return kAxisXColor;
+    case MapEditorLineKind::kAxisY:
+      return kAxisYColor;
+    case MapEditorLineKind::kAxisZ:
+      return kAxisZColor;
+    case MapEditorLineKind::kActive:
+      return kActiveColor;
+  }
+  return kSelectionColor;
+}
+
+// LA BARRE D'OUTILS : l'outil des poignées.
+void DrawToolbar(const MapEditorView& view, std::vector<MapEditorIntent>& intents) {
+  const auto offer = [&](MapEditorTool tool, const char* label) {
+    if (ImGui::RadioButton(label, view.tool == tool)) {
+      intents.emplace_back(map_editor::SetTool{tool});
+    }
+  };
+  offer(MapEditorTool::kMove, core::Tr("Déplacer"));
+  ImGui::SameLine();
+  offer(MapEditorTool::kRotate, core::Tr("Tourner"));
+  ImGui::SameLine();
+  offer(MapEditorTool::kScale, core::Tr("Échelle"));
+}
+
+// Le modèle passe-t-il le filtre ? Un morceau de son fichier, sans égard à la
+// casse ASCII, ou son rang écrit en entier.
+bool PassesFilter(const MapEditorModelRow& row, std::string_view filter) {
+  if (filter.empty()) {
+    return true;
+  }
+  if (std::to_string(row.model_index) == filter) {
+    return true;
+  }
+  const auto lower = [](char letter) {
+    return letter >= 'A' && letter <= 'Z' ? static_cast<char>(letter - 'A' + 'a') : letter;
+  };
+  const auto found = std::ranges::search(row.file, filter, {}, lower, lower);
+  return !found.empty();
+}
+
+// L'ARBRE DE LA SCÈNE : tous les modèles de la carte, filtrables. Un clic
+// désigne ; les retouchés sont marqués, et les masqués le disent.
+void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
+                   std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  static_cast<void>(ImGui::InputTextWithHint("##filtre_arbre", core::Tr("Filtrer…"),
+                                             panel.filter.data(), panel.filter.size()));
+  ImGui::SameLine();
+  static_cast<void>(SkinCheckBox(core::Tr("Retouchés"), &panel.edited_only, art));
+  const std::string_view filter(panel.filter.data(),
+                                strnlen(panel.filter.data(), panel.filter.size()));
+  std::vector<std::size_t> shown;
+  for (std::size_t slot = 0; slot < view.models.size(); ++slot) {
+    const MapEditorModelRow& row = view.models[slot];
+    if ((!panel.edited_only || row.edited) && PassesFilter(row, filter)) {
+      shown.push_back(slot);
+    }
+  }
+  const float height = ImGui::GetTextLineHeightWithSpacing() * kTreeRows;
+  if (!ImGui::BeginChild("##arbre_scene", ImVec2(0.0F, height), ImGuiChildFlags_Borders)) {
+    ImGui::EndChild();
+    return;
+  }
+  ImGuiListClipper clipper;
+  clipper.Begin(static_cast<int>(shown.size()));
+  while (clipper.Step()) {
+    for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
+      const MapEditorModelRow& row = view.models[shown[static_cast<std::size_t>(line)]];
+      const std::string label = std::format(
+          "{}{} — {}{}##modele{}", row.edited ? "✎ " : "", row.model_index, row.file,
+          row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(), row.model_index);
+      const bool selected = view.selected == row.model_index;
+      if (ImGui::Selectable(label.c_str(), selected)) {
+        intents.emplace_back(map_editor::Select{row.model_index});
+      }
+    }
+  }
+  ImGui::EndChild();
+}
+
+// CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres.
+void DrawLines(const MapEditorView& view) {
+  ImDrawList* list = ImGui::GetBackgroundDrawList();
+  for (const MapEditorLine& line : view.lines) {
+    list->AddLine(ImVec2(line.from.x, line.from.y), ImVec2(line.to.x, line.to.y),
+                  ColorOf(line.kind), kLineThicknessPixels);
+  }
+}
 
 // LE PLACEMENT, réglé par glissières. Un geste qui glisse se voit à chaque
 // image ; il ne devient une entrée de l'historique qu'au relâcher.
@@ -112,6 +222,7 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
   if (!view.active) {
     return;
   }
+  DrawLines(view);
   // Recomposé au changement de langue seulement : voir `WindowName`.
   static WindowName name(kMapEditorTitle, kMapEditorId);
   ImGui::SetNextWindowSize(ImVec2(kFirstWidth, kFirstHeight), ImGuiCond_FirstUseEver);
@@ -147,22 +258,13 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
     ImGui::TextDisabled("%s", view.undo_label.c_str());
   }
 
+  DrawToolbar(view, intents);
+
   ImGui::SeparatorText(core::Tr("Modèle désigné"));
   DrawSelection(view, panel, intents, art);
 
-  ImGui::SeparatorText(core::Tr("Retouches de cette carte"));
-  if (view.edited.empty()) {
-    ImGui::TextDisabled("%s", core::Tr("Aucune."));
-  }
-  for (std::size_t slot = 0; slot < view.edited.size(); ++slot) {
-    if (slot > 0) {
-      ImGui::SameLine();
-    }
-    const std::string label = std::to_string(view.edited[slot]);
-    if (ImGui::SmallButton(label.c_str())) {
-      intents.emplace_back(map_editor::Select{view.edited[slot]});
-    }
-  }
+  ImGui::SeparatorText(core::Tr("Arbre de la scène"));
+  DrawSceneTree(view, panel, intents, art);
 
   ImGui::Separator();
   ImGui::BeginDisabled(!view.unsaved);

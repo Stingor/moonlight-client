@@ -28,9 +28,76 @@ const ro::formats::RswModel* OriginalOf(const ro::render::MapScene& scene, std::
 void MapEditorSession::Leave() noexcept {
   active_ = false;
   gesture_before_.reset();
+  drag_.reset();
+  handles_.clear();
 }
 
-void MapEditorSession::FollowMap(std::string_view map_name) {
+void MapEditorSession::SetGizmo(const GizmoFrame& frame, std::vector<GizmoHandle> handles) {
+  // ⚠ PENDANT UN GLISSÉ, la poignée saisie garde le repère de son appui : le
+  // pivot qui suit le modèle ferait sinon dériver le glissé.
+  gizmo_frame_ = frame;
+  handles_ = std::move(handles);
+}
+
+std::vector<ro::ui::MapEditorLine> MapEditorSession::GizmoTrace() const {
+  return GizmoLines(handles_,
+                    drag_.has_value() ? std::optional<std::size_t>(drag_->handle) : std::nullopt);
+}
+
+bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
+  if (!active_ || !view.selected.has_value()) {
+    return false;
+  }
+  const std::optional<std::size_t> grabbed = GrabbedHandle(handles_, pointer);
+  if (!grabbed.has_value()) {
+    return false;
+  }
+  const ro::ui::map_editor::Place start{.position = view.position,
+                                        .rotation = view.rotation,
+                                        .scale = view.scale,
+                                        .hidden = view.hidden,
+                                        .released = false};
+  drag_ = Drag{.handle = *grabbed,
+               .grabbed = handles_[*grabbed],
+               .frame = gizmo_frame_,
+               .from = pointer,
+               .start = start,
+               .last = start};
+  return true;
+}
+
+void MapEditorSession::DragTo(glm::vec2 pointer) {
+  if (!drag_.has_value()) {
+    return;
+  }
+  drag_->last = Dragged(tool_, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
+  drag_->last.released = false;
+  queued_.emplace_back(drag_->last);
+}
+
+void MapEditorSession::Release() {
+  if (!drag_.has_value()) {
+    return;
+  }
+  ro::ui::map_editor::Place last = drag_->last;
+  last.released = true;
+  queued_.emplace_back(last);
+  drag_.reset();
+}
+
+std::vector<ro::ui::MapEditorIntent> MapEditorSession::TakeQueued() {
+  return std::exchange(queued_, {});
+}
+
+void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::MapScene& scene) {
+  if (map_name == map_name_ && model_files_.size() == scene.unfixed_models.size()) {
+    return;
+  }
+  model_files_.clear();
+  model_files_.reserve(scene.unfixed_models.size());
+  for (const ro::formats::RswModel& model : scene.unfixed_models) {
+    model_files_.push_back(ro::vfs::Cp949ToUtf8Lossy(model.model_name));
+  }
   if (map_name == map_name_) {
     return;
   }
@@ -91,6 +158,10 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return SetWhy(asked.why, store);
         } else if constexpr (std::is_same_v<Asked, intents::Revert>) {
           return Revert(store);
+        } else if constexpr (std::is_same_v<Asked, intents::SetTool>) {
+          tool_ = asked.tool;
+          drag_.reset();
+          return {};
         } else {
           Save(store);
           return {};
@@ -235,6 +306,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
                                              const MapEditStore& store) const {
   ro::ui::MapEditorView view;
   view.active = active_;
+  view.tool = tool_;
   view.map_name = map_name_;
   view.undo_label = history_.UndoLabel();
   view.redo_label = history_.RedoLabel();
@@ -243,6 +315,17 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   const ro::mapedit::MapEdit& document = store.Document(map_name_);
   for (const ro::mapedit::ModelEdit& edit : document.models()) {
     view.edited.push_back(edit.model_index);
+  }
+  view.models.reserve(model_files_.size());
+  for (std::size_t rank = 0; rank < model_files_.size(); ++rank) {
+    view.models.push_back(
+        ro::ui::MapEditorModelRow{.model_index = rank, .file = model_files_[rank]});
+  }
+  for (const ro::mapedit::ModelEdit& edit : document.models()) {
+    if (edit.model_index < view.models.size()) {
+      view.models[edit.model_index].edited = true;
+      view.models[edit.model_index].hidden = edit.hidden;
+    }
   }
   if (selection_.empty()) {
     return view;

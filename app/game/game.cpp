@@ -310,6 +310,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .shop_one_click = settings_->options().shops().one_click(),
                 .bench = &effect_bench_,
                 .map_editor = Rights().staff_tools && map_editor_.active() ? &map_editor_ : nullptr,
+                .map_editor_view = &windows_.staff_tools.map_editor,
                 .chat_dispatch = &*chat_dispatch_,
                 .scene_actors = &scene_actors_,
                 .mouse = &mouse_,
