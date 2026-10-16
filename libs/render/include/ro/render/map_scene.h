@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -12,6 +13,7 @@
 #include "ro/core/error.h"
 #include "ro/formats/gnd.h"
 #include "ro/formats/image.h"
+#include "ro/formats/rsm.h"
 #include "ro/formats/rsw.h"
 #include "ro/mapedit/map_edit.h"
 #include "ro/render/lightmap_atlas.h"
@@ -79,6 +81,15 @@ struct MapScene {
     glm::mat4 matrix{1.0F};
   };
   std::vector<std::optional<PlacedPose>> placed_poses;
+  // LES FICHIERS DES VARIANTES, tels qu'ils se lisent, et la boîte de leur
+  // maillage intact : une variante se rebâtit à chaque image d'un glissé de
+  // sommet, sans relire ni réanalyser son fichier. Seuls les fichiers qui ont
+  // une variante y entrent, pour ne pas garder tout le décor en double.
+  struct VariantSource {
+    std::shared_ptr<const formats::RsmModel> model;
+    std::array<std::array<float, 3>, 2> bounds{};
+  };
+  std::map<std::string, VariantSource> variant_sources;
   LightmapAtlas atlas;
   TerrainMesh terrain;
   std::vector<formats::Image> terrain_textures;

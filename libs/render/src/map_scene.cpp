@@ -1,12 +1,15 @@
 #include "ro/render/map_scene.h"
 
 #include <algorithm>
+#include <initializer_list>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "ro/core/log.h"
 #include "ro/formats/grf.h"
@@ -188,10 +191,16 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
   for (std::size_t rank = 0; rank < scene.rsw.models().size(); ++rank) {
     wanted.insert(KeyOf(scene, rank));
   }
-  std::erase_if(scene.models, [&](const ModelInstances& instances) {
+  // Les jeux qui s'en vont gardent leurs textures jusqu'à la fin : une
+  // variante qui se rebâtit reprend celles de la précédente.
+  const auto stays = [&](const ModelInstances& instances) {
     const InstancesKey key{instances.rsm_file, instances.variant_rank};
-    return !wanted.contains(key) || instances.applied_moves != MovesOf(scene, key);
-  });
+    return wanted.contains(key) && instances.applied_moves == MovesOf(scene, key);
+  };
+  const auto first_leaving = std::stable_partition(scene.models.begin(), scene.models.end(), stays);
+  std::vector<ModelInstances> leaving(std::make_move_iterator(first_leaving),
+                                      std::make_move_iterator(scene.models.end()));
+  scene.models.erase(first_leaving, scene.models.end());
   for (const ModelInstances& instances : scene.models) {
     wanted.erase(InstancesKey{instances.rsm_file, instances.variant_rank});
   }
@@ -204,29 +213,59 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
   // même texture avec des casses différentes, et une clé brute la lirait deux
   // fois.
   std::map<std::string, std::shared_ptr<const formats::Image>> read_textures;
+  // ⚠ ET CELLES QUE LA SCÈNE A DÉJÀ NE SE RELISENT PAS : une variante se rebâtit
+  // à chaque image d'un glissé de sommet, et décoder ses images à chaque fois
+  // coûtait plus que tout le reste.
+  if (!wanted.empty()) {
+    for (const std::vector<ModelInstances>* models : {&scene.models, &leaving}) {
+      for (const ModelInstances& known : *models) {
+        for (std::size_t rank = 0;
+             rank < known.textures.size() && rank < known.mesh.textures.size(); ++rank) {
+          if (known.textures[rank] != nullptr) {
+            read_textures.try_emplace(formats::NormalizeGrfPath(known.mesh.textures[rank]),
+                                      known.textures[rank]);
+          }
+        }
+      }
+    }
+  }
   // ⚠ UN MODÈLE MASQUÉ SE LIT AUSSI : l'éditeur peut le démasquer sans relire
   // la carte.
   for (const InstancesKey& key : wanted) {
-    // ReadRaw : le nom vient du RSW, donc c'est déjà du CP949.
-    auto bytes = vfs.ReadRaw("data\\model\\" + std::string(key.first));
-    if (!bytes) {
-      continue;
-    }
-    auto model = formats::RsmModel::Parse(*bytes);
-    if (!model) {
-      continue;
+    const std::vector<mapedit::VertexMove>& moves = MovesOf(scene, key);
+    // UNE VARIANTE repart du fichier gardé, s'il l'est déjà.
+    std::optional<formats::RsmModel> model;
+    const auto source = scene.variant_sources.find(std::string(key.first));
+    if (!moves.empty() && source != scene.variant_sources.end()) {
+      model = *source->second.model;
+    } else {
+      // ReadRaw : le nom vient du RSW, donc c'est déjà du CP949.
+      auto bytes = vfs.ReadRaw("data\\model\\" + std::string(key.first));
+      if (!bytes) {
+        continue;
+      }
+      auto parsed = formats::RsmModel::Parse(*bytes);
+      if (!parsed) {
+        continue;
+      }
+      model = std::move(*parsed);
     }
     ModelInstances instances;
     instances.rsm_file = std::string(key.first);
     instances.variant_rank = key.second;
-    instances.applied_moves = MovesOf(scene, key);
+    instances.applied_moves = moves;
     if (!instances.applied_moves.empty()) {
-      const ModelMesh untouched = BuildModelMesh(*model);
-      instances.placement_bounds =
-          std::array<std::array<float, 3>, 2>{untouched.bounds_min, untouched.bounds_max};
-      mapedit::MeshEdit moves;
-      moves.vertices = instances.applied_moves;
-      const mapedit::MapEditReport moved = mapedit::ApplyMeshEdit(moves, *model, kFileNames);
+      auto [kept, fresh] = scene.variant_sources.try_emplace(instances.rsm_file);
+      if (fresh) {
+        const ModelMesh untouched = BuildModelMesh(*model);
+        kept->second =
+            MapScene::VariantSource{.model = std::make_shared<const formats::RsmModel>(*model),
+                                    .bounds = {untouched.bounds_min, untouched.bounds_max}};
+      }
+      instances.placement_bounds = kept->second.bounds;
+      mapedit::MeshEdit edit_moves;
+      edit_moves.vertices = instances.applied_moves;
+      const mapedit::MapEditReport moved = mapedit::ApplyMeshEdit(edit_moves, *model, kFileNames);
       for (const std::string& refusal : moved.refused) {
         core::LogWarning("{} : sommet refusé — {}", CitedFileName(key.first), refusal);
       }
@@ -251,8 +290,14 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
     }
     scene.models.push_back(std::move(instances));
   }
-  scene.missing_model_textures.insert(scene.missing_model_textures.end(), missing_textures.begin(),
-                                      missing_textures.end());
+  // Une texture manquante ne se compte qu'une fois, si souvent que sa variante
+  // se rebâtisse.
+  for (const std::string& missing : missing_textures) {
+    if (std::ranges::find(scene.missing_model_textures, missing) ==
+        scene.missing_model_textures.end()) {
+      scene.missing_model_textures.push_back(missing);
+    }
+  }
 }
 
 // Les retouches de maillages de `edit` dont la cible correspond ; les autres
