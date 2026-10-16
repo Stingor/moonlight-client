@@ -476,9 +476,6 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.unsaved = store.Unsaved(map_name_);
   view.status = status_;
   const ro::mapedit::MapEdit& document = store.Document(map_name_);
-  for (const ro::mapedit::ModelEdit& edit : document.models()) {
-    view.edited.push_back(edit.model_index);
-  }
   view.models.reserve(model_files_.size());
   for (std::size_t rank = 0; rank < model_files_.size(); ++rank) {
     view.models.push_back(
@@ -488,6 +485,21 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
     if (edit.model_index < view.models.size()) {
       view.models[edit.model_index].edited = true;
       view.models[edit.model_index].hidden = edit.hidden;
+    }
+  }
+  // UN MAILLAGE RETOUCHÉ compte aussi : celui de sa pose, ou celui de toutes
+  // les poses de son fichier.
+  for (const ro::mapedit::MeshEdit& mesh : document.meshes()) {
+    for (ro::ui::MapEditorModelRow& row : view.models) {
+      if (row.model_index == mesh.model_index || (mesh.all_poses && row.file == mesh.model_file)) {
+        row.edited = true;
+      }
+    }
+  }
+  view.edited.clear();
+  for (const ro::ui::MapEditorModelRow& row : view.models) {
+    if (row.edited) {
+      view.edited.push_back(row.model_index);
     }
   }
   // Les ajouts, après les modèles du RSW.
