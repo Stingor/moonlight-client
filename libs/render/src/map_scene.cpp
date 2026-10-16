@@ -130,7 +130,12 @@ std::vector<WaterAnimation> LoadWaterAnimations(vfs::Vfs& vfs, const WaterPlane&
 // ⚠ SEULEMENT CEUX QUI MANQUENT À LA SCÈNE : un modèle que l'éditeur ajoute se
 // lit à son ajout, sans relire ceux qui sont déjà là.
 // LA CLÉ D'UN JEU DE POSES : son fichier, et la pose dont il est la variante.
-using InstancesKey = std::pair<std::string, std::optional<std::size_t>>;
+//
+// ⚠ UNE VUE, ET NON UNE COPIE : elle désigne le nom d'un modèle du RSW ou d'un
+// jeu de poses de la scène, et ne vit que le temps d'un repos du décor, où ni
+// l'un ni l'autre ne bouge. Reposer le décor demande une clé par pose, à chaque
+// image d'un glissé.
+using InstancesKey = std::pair<std::string_view, std::optional<std::size_t>>;
 
 // La retouche de maillage de la pose `rank`, réservée à elle seule, ou rien.
 const mapedit::MeshEdit* VariantEditOf(const MapScene& scene, std::size_t rank) {
@@ -160,10 +165,11 @@ InstancesKey KeyOf(const MapScene& scene, std::size_t rank) {
 }
 
 // Les sommets que l'édition déplace dans le jeu de poses `key`.
-std::vector<mapedit::VertexMove> MovesOf(const MapScene& scene, const InstancesKey& key) {
+const std::vector<mapedit::VertexMove>& MovesOf(const MapScene& scene, const InstancesKey& key) {
+  static const std::vector<mapedit::VertexMove> kNoMoves;
   const mapedit::MeshEdit* edit =
       key.second.has_value() ? VariantEditOf(scene, *key.second) : FileEditOf(scene, key.first);
-  return edit != nullptr ? edit->vertices : std::vector<mapedit::VertexMove>();
+  return edit != nullptr ? edit->vertices : kNoMoves;
 }
 
 // Charge les modèles du décor, une seule fois par fichier .rsm distinct — et
@@ -202,7 +208,7 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
   // la carte.
   for (const InstancesKey& key : wanted) {
     // ReadRaw : le nom vient du RSW, donc c'est déjà du CP949.
-    auto bytes = vfs.ReadRaw("data\\model\\" + key.first);
+    auto bytes = vfs.ReadRaw("data\\model\\" + std::string(key.first));
     if (!bytes) {
       continue;
     }
@@ -211,7 +217,7 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
       continue;
     }
     ModelInstances instances;
-    instances.rsm_file = key.first;
+    instances.rsm_file = std::string(key.first);
     instances.variant_rank = key.second;
     instances.applied_moves = MovesOf(scene, key);
     if (!instances.applied_moves.empty()) {
