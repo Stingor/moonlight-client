@@ -4,6 +4,7 @@
 // Le panneau rend des intentions ; ici, elles passent à la session, le décor se
 // repose quand le document change, et le panneau reçoit sa vue de l'image.
 
+#include <chrono>
 #include <memory>
 #include <optional>
 #include <string>
@@ -164,6 +165,7 @@ void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float wi
 }
 
 void Game::ReplaceMapModels() {
+  const auto started = std::chrono::steady_clock::now();
   ro::render::MapScene& scene = stage_->scene;
   const ro::mapedit::MapEditReport report =
       ro::render::ReplaceSceneModels(scene, map_edits_.Document(stage_->name), &*vfs_);
@@ -176,6 +178,19 @@ void Game::ReplaceMapModels() {
   }
   // L'horloge des modèles animés repart sur les nouvelles poses.
   model_clock_ = ro::render::ModelClock();
+  // LE BILAN, une fois par seconde de glissé : ce que coûte de reposer le décor.
+  const auto finished = std::chrono::steady_clock::now();
+  const double elapsed_ms = std::chrono::duration<double, std::milli>(finished - started).count();
+  const double now_ms =
+      std::chrono::duration<double, std::milli>(finished.time_since_epoch()).count();
+  if (replace_tally_.Add(elapsed_ms, models_.baked_batches(), now_ms)) {
+    ro::core::LogDebug(
+        "éditeur de {} : décor reposé {} fois, {:.1f} ms en moyenne, {:.1f} au pire, {} lot(s) "
+        "recuit(s) sur {} modèle(s)",
+        stage_->name, replace_tally_.count, replace_tally_.average_ms(), replace_tally_.worst_ms,
+        replace_tally_.baked_batches, scene.models.size());
+    replace_tally_ = ReplaceTally();
+  }
 }
 
 }  // namespace moonclient

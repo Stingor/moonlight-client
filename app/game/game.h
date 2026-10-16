@@ -95,6 +95,7 @@
 #include "world/name_card_asker.h"
 #include "world/native_marker.h"
 #include "world/npc_talk_view.h"
+#include "world/replace_tally.h"
 #include "world/skill_area_view.h"
 
 // ⚠ DÉCLARÉ PLUTÔT QU'INCLUS, comme derrière `ro::render::GlContext` : cet
@@ -524,6 +525,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   std::shared_ptr<const std::vector<std::string>> model_library_;
   // Ce que l'outil Sommets sait du modèle désigné, et les fichiers qu'il a lus.
   VertexContextCache vertex_context_;
+  // Le bilan par seconde du décor que l'éditeur repose.
+  ReplaceTally replace_tally_;
   ro::render::DrawableSize size_{};
   float aspect_ratio_ = 1.0F;
   glm::vec2 mouse_{0.0F, 0.0F};
