@@ -13,8 +13,12 @@
 // Le style est celui des lignes d'`item_info.yml` — libellé en bleu
 // `^0000CC`, valeur en noir, trait de vingt-quatre soulignés entre les
 // parties —, mais chaque texte passe par les catalogues de langue. Un en-tête
-// gris le distingue du texte de la table, qui reste affiché au-dessus tant que
-// les deux se comparent.
+// gris le distingue du texte de la table, affiché au-dessus.
+//
+// 🔴 LA TABLE NE REDIT PAS CE QUE LE BLOC DIT : `item_info.py --retirer-faits`
+// en retire les lignes de faits d'après ce que ce bloc écrit pour chaque objet,
+// lu par `roc-cli item db-blocks`. Un libellé renommé ici se renomme aussi dans
+// `scripts/yaml_tables/item_info_facts.py`, qui refuse sinon de retirer.
 
 #include <cstdint>
 #include <string>
