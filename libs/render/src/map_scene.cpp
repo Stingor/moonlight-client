@@ -283,6 +283,32 @@ void MergeMeshReport(mapedit::MapEditReport mesh_report, mapedit::MapEditReport&
   }
 }
 
+// La matrice de la pose `rank`, reprise de `scene.placed_poses` quand rien de
+// ce qui la fait n'a changé — placement, boîte, version —, recalculée sinon.
+glm::mat4 PoseMatrix(MapScene& scene, std::size_t rank, const formats::RswModel& placement,
+                     const ModelMesh& centred_on, std::int32_t rsm_version) {
+  if (scene.placed_poses.size() != scene.rsw.models().size()) {
+    scene.placed_poses.assign(scene.rsw.models().size(), std::nullopt);
+  }
+  std::optional<MapScene::PlacedPose>& kept = scene.placed_poses[rank];
+  if (kept.has_value() && kept->position == placement.position &&
+      kept->rotation == placement.rotation && kept->scale == placement.scale &&
+      kept->bounds_min == centred_on.bounds_min && kept->bounds_max == centred_on.bounds_max &&
+      kept->rsm_version == rsm_version) {
+    return kept->matrix;
+  }
+  kept = MapScene::PlacedPose{
+      .position = placement.position,
+      .rotation = placement.rotation,
+      .scale = placement.scale,
+      .bounds_min = centred_on.bounds_min,
+      .bounds_max = centred_on.bounds_max,
+      .rsm_version = rsm_version,
+      .matrix = ModelInstanceMatrix(placement, scene.gnd.width(), scene.gnd.height(), centred_on,
+                                    rsm_version)};
+  return kept->matrix;
+}
+
 // Pose les modèles du RSW de `scene` sur les maillages chargés : une pose par
 // modèle, sauf les masqués, ceux dont le fichier manque et ceux posés hors de
 // la carte. Les poses d'avant s'effacent, et les compteurs se refont.
@@ -320,8 +346,8 @@ void PlaceSceneInstances(MapScene& scene) {
       bounds_only.bounds_max = (*instances.placement_bounds)[1];
       centred_on = &bounds_only;
     }
-    const glm::mat4 instance = ModelInstanceMatrix(placement, scene.gnd.width(), scene.gnd.height(),
-                                                   *centred_on, instances.rsm_version);
+    const glm::mat4 instance =
+        PoseMatrix(scene, rank, placement, *centred_on, instances.rsm_version);
     if (!IsInstanceOnMap(instance, scene.gnd.width(), scene.gnd.height())) {
       ++scene.off_map_instances;
       continue;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -64,6 +65,20 @@ struct MapScene {
   // Les retouches de maillages dont la cible correspond : ce que le décor
   // dessine, variantes comprises.
   std::vector<mapedit::MeshEdit> mesh_edits;
+  // LA MATRICE DE CHAQUE POSE, par rang, et ce dont elle est faite : reposer le
+  // décor ne recalcule que celles dont le placement ou la boîte ont changé.
+  // L'éditeur repose le décor à chaque image d'un glissé, où une seule pose
+  // bouge.
+  struct PlacedPose {
+    std::array<float, 3> position{};
+    std::array<float, 3> rotation{};
+    std::array<float, 3> scale{};
+    std::array<float, 3> bounds_min{};
+    std::array<float, 3> bounds_max{};
+    std::int32_t rsm_version = 0;
+    glm::mat4 matrix{1.0F};
+  };
+  std::vector<std::optional<PlacedPose>> placed_poses;
   LightmapAtlas atlas;
   TerrainMesh terrain;
   std::vector<formats::Image> terrain_textures;
