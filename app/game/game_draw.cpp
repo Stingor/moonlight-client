@@ -170,7 +170,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   const ro::render::PointLightSet points = ro::render::MapPointLights(
       map_edits_.Document(stage_->name).lights(),
       ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}, sky.light,
-      MapClosedToSky(), camera_.look_at);
+      MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms));
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());

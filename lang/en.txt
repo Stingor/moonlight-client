@@ -18780,3 +18780,6 @@ tr: Duplicate model %zu
 
 fr: Centrer
 tr: Centre
+
+fr: Vacille
+tr: Flickers

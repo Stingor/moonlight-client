@@ -21,6 +21,13 @@ namespace ro::render {
 // `always_night` —, elle brille pleinement : rien n'y fait le jour.
 [[nodiscard]] PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
                                            const MapEffectFrame& frame, const SceneLight& sky,
-                                           bool always_night, glm::vec3 eye);
+                                           bool always_night, glm::vec3 eye, double time_ms = 0.0);
+
+// LE VACILLEMENT d'une lumière à l'instant `time_ms`, facteur de son intensité
+// entre `1 − kFlickerDepth` et 1 : deux ondes de périodes premières entre
+// elles, décalées par le rang `slot` pour que deux torches voisines ne
+// battent pas ensemble. Déterministe : la même image donne la même lumière.
+inline constexpr float kFlickerDepth = 0.35F;
+[[nodiscard]] float FlickerFactor(std::size_t slot, double time_ms);
 
 }  // namespace ro::render

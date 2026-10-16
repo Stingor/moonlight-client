@@ -40,6 +40,7 @@ struct MapEditorLight {
   std::array<float, 3> color{1.0F, 1.0F, 1.0F};
   float range = 0.0F;
   bool night_only = false;
+  bool flicker = false;
   std::string why;
 };
 

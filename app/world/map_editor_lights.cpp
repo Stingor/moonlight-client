@@ -37,6 +37,7 @@ ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light) {
                                 .color = light.color,
                                 .range = light.range,
                                 .night_only = light.night_only,
+                                .flicker = light.flicker,
                                 .why = light.why};
 }
 
@@ -45,6 +46,7 @@ ro::mapedit::AddedLight DocumentLight(const ro::ui::MapEditorLight& light) {
                                  .color = light.color,
                                  .range = light.range,
                                  .night_only = light.night_only,
+                                 .flicker = light.flicker,
                                  .why = light.why};
 }
 

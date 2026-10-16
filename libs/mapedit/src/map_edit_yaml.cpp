@@ -47,6 +47,7 @@ constexpr std::string_view kMapEditHeader =
 #    color    : [r, g, b], 1 pour la pleine intensité — au-delà, plus fort ;
 #    range    : le rayon où elle s'éteint, en unités du RSW ;
 #    night_only : vrai pour ne l'allumer qu'à la nuit ;
+#    flicker  : vrai pour qu'elle vacille, comme une torche ;
 #    why      : pourquoi, obligatoire.
 #  meshes : les retouches de maillages, chacune :
 #    index, file, origin : la pose qu'elle désigne, comme une retouche de
@@ -220,6 +221,9 @@ core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_vie
   light.color = *tinted;
   if (const YAML::Node night_only = entry["night_only"]) {
     light.night_only = night_only.as<bool>();
+  }
+  if (const YAML::Node flicker = entry["flicker"]) {
+    light.flicker = flicker.as<bool>();
   }
   return light;
 }
@@ -461,6 +465,9 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     text += std::format("    range: {}\n", light.range);
     if (light.night_only) {
       text += "    night_only: true\n";
+    }
+    if (light.flicker) {
+      text += "    flicker: true\n";
     }
     text += std::format("    why: {}\n", DoubleQuoted(light.why));
   }

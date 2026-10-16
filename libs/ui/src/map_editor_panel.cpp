@@ -372,7 +372,8 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
       ImGui::DragFloat(core::Tr("Portée"), &set.light.range, kLightRangeStep, kLightRangeStep,
                        kLightRangeMax, "%.1f", ImGuiSliderFlags_AlwaysClamp);
   released |= ImGui::IsItemDeactivatedAfterEdit();
-  const bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
+  bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
+  toggled |= SkinCheckBox(core::Tr("Vacille"), &set.light.flicker, art);
   const std::string_view typed(panel.light_why.data(),
                                strnlen(panel.light_why.data(), panel.light_why.size()));
   if (panel.light_why_of != view.selected_light ||

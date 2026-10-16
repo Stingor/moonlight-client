@@ -18780,3 +18780,6 @@ tr: Duplicar el modelo %zu
 
 fr: Centrer
 tr: Centrar
+
+fr: Vacille
+tr: Parpadea

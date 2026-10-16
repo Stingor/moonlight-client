@@ -83,6 +83,8 @@ struct AddedLight {
   float range = 0.0F;
   // Vrai : elle ne s'allume qu'à la nuit, et plus fort à mesure qu'elle tombe.
   bool night_only = false;
+  // Vrai : elle vacille, comme une torche ou un feu.
+  bool flicker = false;
   std::string why;
 
   friend bool operator==(const AddedLight&, const AddedLight&) = default;
