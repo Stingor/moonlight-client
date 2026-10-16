@@ -47,9 +47,9 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
-                 "Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Suppr "
-                 "retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le "
-                 "personnage, Échap quitte l'éditeur."),
+                 "Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
+                 "Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. "
+                 "Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur."),
 };
 
 // Le rayon du cercle d'une lumière ponctuelle, en pixels.

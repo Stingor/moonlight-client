@@ -15,6 +15,21 @@
 
 namespace moonclient {
 
+std::array<float, 3> MapEditorNudge(NudgeDirection direction, bool shift_held) {
+  const float step = shift_held ? kNudgeWideUnits : kNudgeUnits;
+  switch (direction) {
+    case NudgeDirection::kLeft:
+      return {-step, 0.0F, 0.0F};
+    case NudgeDirection::kRight:
+      return {step, 0.0F, 0.0F};
+    case NudgeDirection::kUp:
+      return {0.0F, 0.0F, step};
+    case NudgeDirection::kDown:
+      return {0.0F, 0.0F, -step};
+  }
+  return {};
+}
+
 std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held) {
   switch (key) {
     case 'z':
@@ -246,6 +261,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return Focus(scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::Delete>) {
           return Delete(scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::Nudge>) {
+          return Nudge(asked.delta, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
           return AddLight(store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {
@@ -372,8 +389,64 @@ MapEditorSession::Outcome MapEditorSession::AddModel(std::string file,
   return {.replace_models = true};
 }
 
+MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& delta,
+                                                  const ro::render::MapScene& scene,
+                                                  MapEditStore& store) {
+  const auto pushed = [&delta](std::array<float, 3> position) {
+    for (std::size_t axis = 0; axis < position.size(); ++axis) {
+      position[axis] += delta[axis];
+    }
+    return position;
+  };
+  if (selected_light_.has_value()) {
+    const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
+    if (*selected_light_ >= lights.size()) {
+      return {};
+    }
+    return MoveLight(
+        ro::ui::map_editor::MoveLight{.slot = *selected_light_,
+                                      .native = pushed(lights[*selected_light_].position),
+                                      .released = true},
+        store);
+  }
+  if (selection_.empty() || *selection_.model_index >= scene.rsw.models().size()) {
+    return {};
+  }
+  const std::size_t rank = *selection_.model_index;
+  const ro::formats::RswModel& placed = scene.rsw.models()[rank];
+  const ro::mapedit::MapEdit& document = store.Document(map_name_);
+  bool hidden = false;
+  if (rank >= original_count_) {
+    const std::size_t slot = rank - original_count_;
+    hidden = slot < document.added().size() && document.added()[slot].hidden;
+  } else if (const ro::mapedit::ModelEdit* edit = document.ModelAt(rank)) {
+    hidden = edit->hidden;
+  }
+  return Place(ro::ui::map_editor::Place{.position = pushed(placed.position),
+                                         .rotation = placed.rotation,
+                                         .scale = placed.scale,
+                                         .hidden = hidden,
+                                         .released = true},
+               scene, store);
+}
+
 MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene& scene,
                                                       MapEditStore& store) {
+  // UNE LUMIÈRE DÉSIGNÉE se duplique comme un modèle : à côté d'elle.
+  if (selected_light_.has_value()) {
+    const ro::mapedit::MapEdit before = store.Document(map_name_);
+    if (*selected_light_ >= before.lights().size()) {
+      return {};
+    }
+    ro::mapedit::AddedLight copy = before.lights()[*selected_light_];
+    copy.position[0] += kDuplicateShift;
+    ro::mapedit::MapEdit after = before;
+    after.AddLight(std::move(copy));
+    store.Set(map_name_, after);
+    ChooseLight(after.lights().size() - 1);
+    Record(ro::core::Tr("Ajouter une lumière"), before, after);
+    return {};
+  }
   if (selection_.empty() || *selection_.model_index >= scene.rsw.models().size()) {
     return {};
   }

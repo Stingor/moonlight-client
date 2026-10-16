@@ -175,6 +175,10 @@ struct Focus {};
 // Le geste de la touche Suppr sur ce qui est désigné : une lumière ou un modèle
 // ajouté se retirent, un modèle de la carte se masque, ou se démasque.
 struct Delete {};
+// Pousser ce qui est désigné de `delta`, dans le repère du RSW.
+struct Nudge {
+  std::array<float, 3> delta{};
+};
 // Ajouter une lumière ponctuelle, là où l'appelant pose ce qu'on ajoute.
 struct AddLight {};
 // Régler la lumière de rang `slot`, ou plus aucune.
@@ -199,12 +203,14 @@ struct MoveLight {
 };
 }  // namespace map_editor
 
-using MapEditorIntent = std::variant<
-    map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select, map_editor::Place,
-    map_editor::SetWhy, map_editor::Revert, map_editor::Save, map_editor::SetTool,
-    map_editor::AddModel, map_editor::MoveVertex, map_editor::RevertVertex, map_editor::SetAllPoses,
-    map_editor::AddLight, map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
-    map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus, map_editor::Delete>;
+using MapEditorIntent =
+    std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
+                 map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
+                 map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
+                 map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
+                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
+                 map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus,
+                 map_editor::Delete, map_editor::Nudge>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

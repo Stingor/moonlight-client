@@ -1765,6 +1765,7 @@ add_executable(moonclient
     game/ui_stage_mvp_tracker.cpp
     game/ui_stage_battleground.cpp
     game/ui_stage_navigation.cpp
+    game/map_editor_keys.cpp
     game/window_events.cpp)
 
 target_link_libraries(moonclient

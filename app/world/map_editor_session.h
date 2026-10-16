@@ -25,6 +25,13 @@ namespace moonclient {
 // en minuscule ASCII ; rien pour une autre.
 [[nodiscard]] std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held);
 
+// LA POUSSÉE D'UNE FLÈCHE, Ctrl tenu : d'une unité du RSW sur x (gauche,
+// droite) ou z (haut, bas), d'un demi-carreau avec Maj.
+inline constexpr float kNudgeUnits = 1.0F;
+inline constexpr float kNudgeWideUnits = 5.0F;
+enum class NudgeDirection : std::uint8_t { kLeft, kRight, kUp, kDown };
+[[nodiscard]] std::array<float, 3> MapEditorNudge(NudgeDirection direction, bool shift_held);
+
 // LE MODE ÉDITEUR DE CARTE : voir docs/adr/0118.
 //
 // La session tient ce que le panneau montre et ce que le staff fait : le mode
@@ -215,6 +222,9 @@ class MapEditorSession {
   // La caméra regardera ce qui est désigné : la lumière, ou la pose du modèle
   // telle que l'édition la place.
   Outcome Focus(const ro::render::MapScene& scene, const MapEditStore& store);
+  // Ctrl+flèches : voir `ro::ui::map_editor::Nudge`.
+  Outcome Nudge(const std::array<float, 3>& delta, const ro::render::MapScene& scene,
+                MapEditStore& store);
   // La touche Suppr : voir `ro::ui::map_editor::Delete`.
   Outcome Delete(const ro::render::MapScene& scene, MapEditStore& store);
   // Le nombre de modèles du RSW d'origine : les ajouts prennent rang après.

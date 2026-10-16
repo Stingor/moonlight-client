@@ -12,6 +12,7 @@
 #include "game/chat_room_stage.h"
 #include "game/companion_ai_stage.h"
 #include "game/companion_gestures.h"
+#include "game/map_editor_keys.h"
 #include "game/trade_stages.h"
 #include "input/key_action.h"
 #include "input/key_gate.h"
@@ -184,27 +185,9 @@ struct WindowPixels {
 }
 
 void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_input) {
-  // ÉCHAP FERME LE MODE ÉDITEUR, avant toute autre fenêtre.
-  if (to.map_editor != nullptr && key.key == SDLK_ESCAPE && !key.repeat) {
-    to.map_editor->Leave();
+  // LE MODE ÉDITEUR prend ses touches avant le jeu : voir `TakeMapEditorKey`.
+  if (to.map_editor != nullptr && TakeMapEditorKey(*to.map_editor, key, text_input)) {
     return;
-  }
-  // SES RACCOURCIS, Ctrl tenu, hors d'un champ de saisie : voir
-  // `MapEditorShortcut`. Ils passent avant ceux du jeu.
-  // SUPPR, sans Ctrl : retirer ou masquer ce qui est désigné.
-  if (to.map_editor != nullptr && !text_input && !key.repeat && key.key == SDLK_DELETE &&
-      (key.mod & SDL_KMOD_CTRL) == 0) {
-    to.map_editor->Queue(ro::ui::map_editor::Delete{});
-    return;
-  }
-  constexpr SDL_Keycode kLastAscii = 0x7F;
-  if (to.map_editor != nullptr && !text_input && !key.repeat && (key.mod & SDL_KMOD_CTRL) != 0 &&
-      key.key <= kLastAscii) {
-    if (std::optional<ro::ui::MapEditorIntent> intent =
-            MapEditorShortcut(static_cast<char>(key.key), (key.mod & SDL_KMOD_SHIFT) != 0)) {
-      to.map_editor->Queue(std::move(*intent));
-      return;
-    }
   }
   KeyPress press = KeyPressOf(to);
   press.text_input = text_input;
