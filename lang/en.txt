@@ -18427,8 +18427,20 @@ tr: Third transcendent
 fr: Type :
 tr: Type:
 
-fr: classes %s
-tr: %s classes
+fr: %s ; %s
+tr: %s; %s
+
+fr: Lignée %s
+tr: %s line
+
+fr: Lignées %s
+tr: %s lines
+
+fr: lignée %s
+tr: %s line
+
+fr: lignées %s
+tr: %s lines
 
 fr: Épée à deux mains
 tr: Two-handed sword

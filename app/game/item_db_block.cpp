@@ -479,27 +479,42 @@ constexpr std::array<Job, 4> kLaterJobs = {{
   return joined;
 }
 
+// Où la liste se lit : seule sur sa ligne, ou après « Tous les jobs sauf ».
+enum class ListPlace : std::uint8_t { kAlone, kAfterAllBut };
+
 // Des jobs en morceaux : les lignées complètes d'un côté, les jobs seuls de
 // l'autre. `pieces` compte ce que le joueur lira.
+//
+// 🔴 UN POINT-VIRGULE SÉPARE LES DEUX, et « lignée » ne couvre que ce qui le
+// précède : « Lignée Archer ; Thief, Rogue » ouvre Hunter et Bard / Dancer,
+// pas Assassin. Dans une seule énumération, Thief se lirait comme sa lignée.
 struct JobList {
   std::vector<std::string> lineages;
   std::vector<std::string> singles;
   [[nodiscard]] std::size_t pieces() const { return lineages.size() + singles.size(); }
-  [[nodiscard]] std::string Text() const {
-    std::string text;
-    if (!lineages.empty()) {
-      const std::string names = Joined(lineages, kListSeparator);
-      std::array<char, kLineBytes> line{};
-      std::snprintf(line.data(), line.size(), Tr("classes %s"), names.c_str());
-      text = line.data();
+  [[nodiscard]] std::string Text(ListPlace place) const {
+    const std::string single_names = Joined(singles, kListSeparator);
+    if (lineages.empty()) {
+      return single_names;
     }
-    for (const std::string& single : singles) {
-      if (!text.empty()) {
-        text += kListSeparator;
-      }
-      text += single;
+    const std::string lineage_names = Joined(lineages, kListSeparator);
+    const bool alone = place == ListPlace::kAlone;
+    const bool several = lineages.size() > 1;
+    std::array<char, kLineBytes> line{};
+    if (alone) {
+      std::snprintf(line.data(), line.size(), several ? Tr("Lignées %s") : Tr("Lignée %s"),
+                    lineage_names.c_str());
+    } else {
+      std::snprintf(line.data(), line.size(), several ? Tr("lignées %s") : Tr("lignée %s"),
+                    lineage_names.c_str());
     }
-    return text;
+    if (singles.empty()) {
+      return line.data();
+    }
+    const std::string lineage_text = line.data();
+    std::snprintf(line.data(), line.size(), Tr("%s ; %s"), lineage_text.c_str(),
+                  single_names.c_str());
+    return line.data();
   }
 };
 
@@ -533,7 +548,7 @@ struct JobList {
 }
 
 [[nodiscard]] std::string AllBut(const JobList& left_out) {
-  const std::string names = left_out.Text();
+  const std::string names = left_out.Text(ListPlace::kAfterAllBut);
   std::array<char, kLineBytes> line{};
   std::snprintf(line.data(), line.size(), Tr("Tous les jobs sauf %s"), names.c_str());
   return line.data();
@@ -631,7 +646,7 @@ std::string JobsSummaryOf(const ServerItem& item) {
       return AllBut(others);
     }
   }
-  return named.Text();
+  return named.Text(ListPlace::kAlone);
 }
 
 std::vector<std::string> ItemDbBlockOf(const ServerItem& item, const ItemDbNames& names) {

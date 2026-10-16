@@ -65,9 +65,10 @@ struct ItemDbNames {
 [[nodiscard]] bool JobsRestricted(const ro::vfs::ServerItem& item);
 
 // LES JOBS QUI PEUVENT PORTER L'OBJET, en résumé lisible : « Tous les jobs »,
-// « Tous les jobs sauf Novice, Super Novice », « Aucun job », ou la liste — une lignée
-// complète se dit « classes Swordman ». Une liste plus longue que son
-// complément parmi les jobs d'origine se dit par le complément. Traduit.
+// « Tous les jobs sauf lignée Novice », « Aucun job », ou la liste. Les lignées
+// complètes viennent d'abord, puis, après un point-virgule, les jobs seuls :
+// « Lignée Archer ; Thief, Rogue ». Une liste plus longue que son complément
+// parmi les jobs d'origine se dit par le complément. Traduit.
 [[nodiscard]] std::string JobsSummaryOf(const ro::vfs::ServerItem& item);
 
 // LES FAITS QUE DONNENT LE SCRIPT ET LA PET_DB (`item_script_facts.h`) :

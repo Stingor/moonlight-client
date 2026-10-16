@@ -18427,8 +18427,20 @@ tr: Tercera trascendente
 fr: Type :
 tr: Tipo:
 
-fr: classes %s
-tr: clases %s
+fr: %s ; %s
+tr: %s; %s
+
+fr: Lignée %s
+tr: Linaje %s
+
+fr: Lignées %s
+tr: Linajes %s
+
+fr: lignée %s
+tr: linaje %s
+
+fr: lignées %s
+tr: linajes %s
 
 fr: Épée à deux mains
 tr: Espada a dos manos
