@@ -1163,9 +1163,6 @@ tr: Sentado
 fr: ATK
 tr: ATK
 
-fr: ATK %
-tr: ATK %
-
 fr: Abréger en K et M
 tr: Abreviar con K y M
 
@@ -9751,9 +9748,6 @@ tr: Caminando (animado)
 fr: MATK
 tr: MATK
 
-fr: MATK %
-tr: MATK %
-
 fr: MDEF
 tr: MDEF
 
@@ -10149,9 +10143,6 @@ tr: HP al lanzar
 
 fr: PV max
 tr: HP máx.
-
-fr: PV max %
-tr: HP máx. %
 
 fr: PV max ajoutés par l'équipement.
 tr: HP máx. añadidos por el equipo.
@@ -10719,9 +10710,6 @@ tr: SP al lanzar
 
 fr: SP max
 tr: SP máx.
-
-fr: SP max %
-tr: SP máx. %
 
 fr: SP max ajoutés par l'équipement.
 tr: SP máx. añadidos por el equipo.

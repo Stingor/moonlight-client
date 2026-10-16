@@ -1163,9 +1163,6 @@ tr: Sitting
 fr: ATK
 tr: ATK
 
-fr: ATK %
-tr: ATK %
-
 fr: Abréger en K et M
 tr: Abbreviate with K and M
 
@@ -9751,9 +9748,6 @@ tr: Walking (animated)
 fr: MATK
 tr: MATK
 
-fr: MATK %
-tr: MATK %
-
 fr: MDEF
 tr: MDEF
 
@@ -10149,9 +10143,6 @@ tr: HP on cast
 
 fr: PV max
 tr: Max HP
-
-fr: PV max %
-tr: Max HP %
 
 fr: PV max ajoutés par l'équipement.
 tr: Max HP added by equipment.
@@ -10719,9 +10710,6 @@ tr: SP on cast
 
 fr: SP max
 tr: Max SP
-
-fr: SP max %
-tr: Max SP %
 
 fr: SP max ajoutés par l'équipement.
 tr: Max SP added by equipment.

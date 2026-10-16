@@ -406,8 +406,8 @@ void BuildBonusRows(const ro::sim::PlayerBonuses& bonuses,
       ro::core::Tr("Temps de cast variable (%). Négatif = réduction."));
   Pct(ro::core::Tr("Cast fixe"), bonuses.fcast_pct,
       ro::core::Tr("Temps de cast fixe (%). Négatif = réduction."));
-  Pct(ro::core::Tr("ATK %"), bonuses.atk_pct, ro::core::Tr("Bonus d'ATK physique global (%)."));
-  Pct(ro::core::Tr("MATK %"), bonuses.matk_pct, ro::core::Tr("Bonus d'ATK magique global (%)."));
+  Pct(ro::core::Tr("ATK"), bonuses.atk_pct, ro::core::Tr("Bonus d'ATK physique global (%)."));
+  Pct(ro::core::Tr("MATK"), bonuses.matk_pct, ro::core::Tr("Bonus d'ATK magique global (%)."));
   Pct(ro::core::Tr("Renvoi mêlée"), bonuses.dmg_ret_melee,
       ro::core::Tr("Renvoie une part des dégâts de mêlée reçus (%)."));
   Pct(ro::core::Tr("Renvoi dist."), bonuses.dmg_ret_ranged,
@@ -418,8 +418,8 @@ void BuildBonusRows(const ro::sim::PlayerBonuses& bonuses,
       ro::core::Tr("Chance de frapper deux fois (%)."));
   Pct(ro::core::Tr("Coup parfait"), bonuses.perfect_hit,
       ro::core::Tr("Chance de coup parfait (%) : ignore FLEE et DEF."));
-  Pct(ro::core::Tr("PV max %"), bonuses.hp_pct, ro::core::Tr("Bonus de PV maximum (%)."));
-  Pct(ro::core::Tr("SP max %"), bonuses.sp_pct, ro::core::Tr("Bonus de SP maximum (%)."));
+  Pct(ro::core::Tr("PV max"), bonuses.hp_pct, ro::core::Tr("Bonus de PV maximum (%)."));
+  Pct(ro::core::Tr("SP max"), bonuses.sp_pct, ro::core::Tr("Bonus de SP maximum (%)."));
   Pct(ro::core::Tr("Régén. PV"), bonuses.hp_regen_pct,
       ro::core::Tr("Récupération naturelle de PV (%)."));
   Pct(ro::core::Tr("Régén. SP"), bonuses.sp_regen_pct,
