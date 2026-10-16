@@ -251,11 +251,20 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
 
 // Les retouches de maillages de `edit` dont la cible correspond ; les autres
 // vont dans les refus de `report`.
-std::vector<mapedit::MeshEdit> ValidMeshEdits(const mapedit::MapEdit& edit,
-                                              const formats::RswScene& rsw,
-                                              mapedit::MapEditReport& report) {
-  std::vector<mapedit::MeshEdit> valid;
+//
+// UNE POSE DU RSW SE RECONNAÎT À SON PLACEMENT D'ORIGINE, et non à celui que
+// l'édition lui donne : déplacer la pose garde la retouche de son maillage.
+// Les retouches des poses du RSW se vérifient donc AVANT l'édition, celles des
+// modèles ajoutés après — ils n'existent qu'une fois l'édition posée.
+enum class MeshTargets { kRswModels, kAddedModels };
+
+void CheckMeshEdits(const mapedit::MapEdit& edit, const formats::RswScene& rsw,
+                    std::size_t rsw_model_count, MeshTargets targets,
+                    std::vector<mapedit::MeshEdit>& valid, mapedit::MapEditReport& report) {
   for (const mapedit::MeshEdit& mesh : edit.meshes()) {
+    if ((mesh.model_index < rsw_model_count) != (targets == MeshTargets::kRswModels)) {
+      continue;
+    }
     std::string refusal = mapedit::MeshTargetRefusal(mesh, rsw, kFileNames);
     if (refusal.empty()) {
       valid.push_back(mesh);
@@ -264,7 +273,14 @@ std::vector<mapedit::MeshEdit> ValidMeshEdits(const mapedit::MapEdit& edit,
       report.refused.push_back(std::move(refusal));
     }
   }
-  return valid;
+}
+
+// Les opérations de maillage rejoignent le bilan de l'édition.
+void MergeMeshReport(mapedit::MapEditReport mesh_report, mapedit::MapEditReport& report) {
+  report.applied += mesh_report.applied;
+  for (std::string& refusal : mesh_report.refused) {
+    report.refused.push_back(std::move(refusal));
+  }
 }
 
 // Pose les modèles du RSW de `scene` sur les maillages chargés : une pose par
@@ -341,8 +357,15 @@ mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdi
   }
   // Les modèles ajoutés repartent de zéro : l'édition les repose tous.
   scene.rsw.TruncateModels(scene.unfixed_models.size());
+  std::vector<mapedit::MeshEdit> mesh_edits;
+  mapedit::MapEditReport mesh_report;
+  CheckMeshEdits(edit, scene.rsw, scene.unfixed_models.size(), MeshTargets::kRswModels, mesh_edits,
+                 mesh_report);
   mapedit::MapEditReport report = mapedit::ApplyMapEdit(edit, scene.rsw, kFileNames);
-  scene.mesh_edits = ValidMeshEdits(edit, scene.rsw, report);
+  CheckMeshEdits(edit, scene.rsw, scene.unfixed_models.size(), MeshTargets::kAddedModels,
+                 mesh_edits, mesh_report);
+  MergeMeshReport(std::move(mesh_report), report);
+  scene.mesh_edits = std::move(mesh_edits);
   if (vfs != nullptr) {
     LoadMissingSceneModels(*vfs, scene);
   }
@@ -375,8 +398,14 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   std::vector<formats::RswModel> unfixed_models = rsw->models();
   const mapedit::MapEdit edit =
       options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name);
+  std::vector<mapedit::MeshEdit> mesh_edits;
+  mapedit::MapEditReport mesh_report;
+  CheckMeshEdits(edit, *rsw, unfixed_models.size(), MeshTargets::kRswModels, mesh_edits,
+                 mesh_report);
   mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(edit, *rsw, kFileNames);
-  std::vector<mapedit::MeshEdit> mesh_edits = ValidMeshEdits(edit, *rsw, fixed);
+  CheckMeshEdits(edit, *rsw, unfixed_models.size(), MeshTargets::kAddedModels, mesh_edits,
+                 mesh_report);
+  MergeMeshReport(std::move(mesh_report), fixed);
   for (const std::string& refusal : fixed.refused) {
     core::LogWarning("édition de {} refusée — {}", map_name, refusal);
   }
