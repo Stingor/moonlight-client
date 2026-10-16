@@ -1,12 +1,21 @@
+# Original translation works of zackdreaver: https://github.com/zackdreaver/ROenglishRE
+# Continuated by llchrisll at https://github.com/llchrisll/ROenglishRE
+#
+# This file shouldn't be claimed as part of your project, unless you fork it from https://github.com/llchrisll/ROenglishRE
+#
 # ─────────────────────────────────────────────────────────────────────────────
 #  Ce que disent les familiers
 #
-#  Tiré de data\pettalktable.xml, tel que le livre moonlight.grf. Les répliques
-#  sont celles du jeu, en anglais pour la plupart ; quelques espèces parlent
-#  encore coréen, ou un charabia que le fichier porte tel quel. Ce dépôt ne les
-#  revendique pas comme siennes. La correspondance classe -> espèce (`classes`,
-#  `default_species`) est celle que le client d'origine tient dans son
-#  exécutable, recopiée dans le script.
+#  Tiré de data\pettalktable.xml, tel que le livre moonlight.grf (traduction
+#  ROenglishRE, mention ci-dessus). Une espèce dont une réplique y est
+#  illisible (coréen réécrit avec perte) est prise, quand elle y est lisible
+#  toute, dans la table de l'iRO (données de Gravity, publiées sous
+#  Input/International par
+#  https://github.com/arkadeleon/ragnarok-data-converter). Les répliques que
+#  nulle source ne porte lisibles restent ci-dessous EN COMMENTAIRE : le client
+#  ne les lit pas. Ce dépôt ne revendique aucune réplique comme sienne. La
+#  correspondance classe -> espèce (`classes`, `default_species`) est celle
+#  que le client d'origine tient dans son exécutable, recopiée dans le script.
 #
 #  Fichier produit par scripts/yaml_tables/pet_talk.py. Ne pas éditer à la main :
 #      python scripts/yaml_tables/pet_talk.py --client <dossier client> \
@@ -5918,9 +5927,9 @@ species:
       perfor_s:
       - This is a new feeling.
       - Chaos!!! Chaos is approaching!!!
-      levelup:
-      - ±×·¡ ´o¿i ´o ¹ß¹oμO AA¶o¡|¡|
-      - ¾ÆA÷ ºIA·CI´U.
+      # levelup:
+      # - ±×·¡ ´o¿i ´o ¹ß¹oμO AA¶o¡|¡|
+      # - ¾ÆA÷ ºIA·CI´U.
       perfor_1:
       - That one looks OK...You need to indulge yourself.
       - Heh...
@@ -6006,371 +6015,371 @@ species:
   bacsojin2:
     hungry:
       feeding:
-      - Let's shake it.
+      - It is a pretty decent meal.
       dead:
-      - Life Span of a flower..
+      - How pathetic..
       stand:
-      - It's money for three bones, right?
+      - You truly don't see me?
       levelup:
-      - Congratulations!
+      - Congratulations.
       perfor_1:
-      - My armpit! My armpit! My armpit! I'm going to go crazy for you.(Crying)
-      - '...Crying...'
+      - You call me a specter? How cruel of you to say such a thing...
+      - Sob sob...
       perfor_2:
-      - Hehe, how much money do you have to pay?
-      - Smack! With a pancake! Ho, ho, ho.
+      - Hehe... Do I still look like a fairy to you?
+      - Yes! I am a white snake! Hahaha
       perfor_3:
-      - I'm soooooooo sleepy.
+      - Yawn... I'm a bit tired.
     bit_hungry:
       feeding:
-      - Let's shake it.
+      - It is a pretty decent meal.
       dead:
-      - Life Span of a flower..
+      - How pathetic..
       stand:
-      - It's money for three bones, right?
+      - You truly don't see me?
       levelup:
-      - Congratulations!
+      - Congratulations.
       perfor_1:
-      - My armpit! My armpit! My armpit! I'm going to go crazy for you.(Crying)
-      - '...Crying...'
+      - You call me a specter? How cruel of you to say such a thing...
+      - Sob sob...
       perfor_2:
-      - Hehe, how much money do you have to pay?
-      - Smack! With a pancake! Ho, ho, ho.
+      - Hehe... Do I still look like a fairy to you?
+      - Yes! I am a white snake! Hahaha
       perfor_3:
-      - I'm soooooooo sleepy.
+      - Yawn... I'm a bit tired.
     noting:
       feeding:
-      - Let's shake it.
+      - It is a pretty decent meal.
       dead:
-      - Life Span of a flower...
+      - How pathetic...
       stand:
-      - ' I''m happy.. I''m sorry.'
-      - It's soooooooo cute..
-      - Reyoul Yub. Right. Light.
+      - ' I''m just... For you...'
+      - Under a willow...
+      - Letting my heart open only by a rare chance...
       levelup:
-      - Congratulations!
+      - Congratulations.
       perfor_1:
-      - My armpit! My armpit! My armpit! I'm going to go crazy for you.(Crying)
-      - '...Crying...'
+      - You call me a specter? How cruel of you to say such a thing...
+      - Sob sob...
       perfor_2:
-      - Hehe, how much money do you have to pay?
-      - Smack! With a pancake! Ho, ho, ho.
+      - Hehe... Do I still look like a fairy to you?
+      - Yes! I am a white snake! Hahaha
       perfor_3:
-      - I'm soooooooo sleepy.
+      - Yawn... I'm a bit tired.
     full:
       feeding:
-      - Let's shake it.
+      - It is a pretty decent meal.
       dead:
-      - Life Span of a flower..
+      - How pathetic..
       stand:
-      - ' I''m happy.. I''m sorry.'
-      - It's soooooooo cute..
-      - Reyoul Yub. Right. Light.
-      - 액랩 렁섈지 궝귑새뱍룬..
+      - ' I''m just... For you...'
+      - Under a willow...
+      - Letting my heart open only by a rare chance...
+      - If I didn't meet you...
       levelup:
-      - Congratulations!
+      - Congratulations.
       perfor_1:
-      - My armpit! My armpit! My armpit! I'm going to go crazy for you.(Crying)
-      - '...Crying...'
+      - You call me a specter? How cruel of you to say such a thing...
+      - Sob sob...
       perfor_2:
-      - Hehe, how much money do you have to pay?
-      - Smack! With a pancake! Ho, ho, ho.
+      - Hehe... Do I still look like a fairy to you?
+      - Yes! I am a white snake! Hehehe
       perfor_3:
-      - I'm soooooooo sleepy.
+      - Yawn... I'm a bit tired.
     so_full:
       feeding:
-      - Let's shake it.
+      - It is a pretty decent meal.
       dead:
-      - Life Span of a flower..
+      - How pathetic..
       stand:
-      - ' I''m happy.. I''m sorry.'
-      - It's soooooooo cute..
-      - Reyoul Yub. Right. Light.
-      - 액랩 렁섈지 궝귑새뱍룬..
+      - ' I''m just... For you...'
+      - Under a willow...
+      - Letting my heart open only by a rare chance...
+      - If I didn't meet you...
       levelup:
-      - Congratulations!
+      - Congratulations.
       perfor_1:
-      - My armpit! My armpit! My armpit! I'm going to go crazy for you.(Crying)
-      - '...Crying...'
+      - You call me a specter? How cruel of you to say such a thing...
+      - Sob sob...
       perfor_2:
-      - Hehe, how much money do you have to pay?
-      - Smack! With a pancake! Ho, ho, ho.
+      - Hehe... Do I still look like a fairy to you?
+      - Yes! I am a white snake! Hahaha
       perfor_3:
-      - I'm soooooooo sleepy.
+      - Yawn... I'm a bit tired.
   nightmare_terror_mj:
     hungry:
       feeding:
-      - ' Hee hee hee! Hee hee hee! '
-      - ' Did I eat up your Rice Cake? '
-      - ' 섦 주꼼윳 인엔븅의 쌨이뱝쁑! 푸랜랜!'
+      - ' Heeheehee~hiiing! Heeheehee~hiiing! '
+      - ' I want to feast on human dreams too... '
+      - ' My favorite food is human dreams! Pururur! '
       hunting:
-      - ' Blue, blue, blue! Hehehehehe! '
-      - ' 돈뱍 섈의 잘딱진 륌윱! '
-      - ' 섈의 열맞함윱 돈갑주레! '
+      - ' Pururur! Hihiing-! Hihiing-! '
+      - ' Behold my splendid form! '
+      - ' I shall show you my true power! '
       danger:
-      - ' 위험하쁑... 하지렁 섈뼘 이외선 놔 있까! '
-      - ' 인엔이갑...섈랩 륑뎬 처 하망욱 하뼘에? '
-      - ' Dangerous? In the New Year''s Day, you''re a yut, eraleb. Yeah! '
+      - ' This is dangerous... but I can overcome it! '
+      - ' Human... are you pretending not to see me? '
+      - ' How risky... I might slip into your dreams. '
       dead:
-      - ' Blue... Blue...'
-      - ' 섈랩 이삳맺 분쁑룬 솖 쌨윱 롯까랄량왯쁑! '
-      - ' 섈뼘 이삳맺 당뱍지뼘왕에? '
+      - ' Pururur... pururur... ... '
+      - ' Leave me like this, and I will devour your dreams! '
+      - ' Is this where I fade away...? '
       stand:
-      - ' I''m looking for someone? '
-      - ' I''m going to mix the pork cutlet with pork belly meat. '
-      - ' What are you doing? '
+      - ' Shall I seek some amusement in reality? '
+      - ' Show weakness, and I shall appear in your dreams. '
+      - ' What kind of dreams do you have? Are they delicious? '
       levelup:
-      - ' You''re a nice old bird! Blue... '
-      - ' Blue, blue, blue, blue! It''s hard to believe that''s about love! '
-      - ' Blue, blue, blue, blue! Don''t worry about me? '
+      - ' I grow even stronger within dreams! Pururur... '
+      - ' Purururururur-hihihihihiing!!! Can you feel my power?! '
+      - ' Pururur!! I think I''ve become stronger than you? '
       connect:
-      - ' What''s that? '
-      - ' I''m sorry. I''m sorry, don''t worry, don''t worry. '
-      - ' It''s because I was poor. I''ve come this far. '
+      - ' How is it, seeing me in reality? '
+      - ' Welcome. It''s even better to meet you in reality. '
+      - ' Now that you''ve awakened from your dream, reality begins. Stay strong. '
     bit_hungry:
       feeding:
-      - ' Hee hee hee! Hee hee hee! '
-      - ' Did I eat up your Rice Cake? '
-      - ' 섦 주꼼윳 인엔븅의 쌨이뱝쁑! 푸랜랜!'
+      - ' Heeheehee~hiiing! Heeheehee~hiiing! '
+      - ' I want to feast on human dreams too... '
+      - ' My favorite food is human dreams! Pururur! '
       hunting:
-      - ' Blue, blue, blue! Hehehehehe! '
-      - ' 돈뱍 섈의 잘딱진 륌윱! '
-      - ' 섈의 열맞함윱 돈갑주레! '
+      - ' Pururur! Hihiing-! Hihiing-! '
+      - ' Behold my splendid form! '
+      - ' I shall show you my true power! '
       danger:
-      - ' 위험하쁑... 하지렁 섈뼘 이외선 놔 있까! '
-      - ' 인엔이갑...섈랩 륑뎬 처 하망욱 하뼘에? '
-      - ' Dangerous? In the New Year''s Day, you''re a yut, eraleb. Yeah! '
+      - ' This is dangerous... but I can overcome it! '
+      - ' Human... are you pretending not to see me? '
+      - ' How risky... I might slip into your dreams. '
       dead:
-      - ' Blue... Blue...'
-      - ' 섈랩 이삳맺 분쁑룬 솖 쌨윱 롯까랄량왯쁑! '
-      - ' 섈뼘 이삳맺 당뱍지뼘왕에? '
+      - ' Pururur... pururur... ... '
+      - ' Leave me like this, and I will devour your dreams! '
+      - ' Is this where I fade away...? '
       stand:
-      - ' I''m looking for someone? '
-      - ' I''m going to mix the pork cutlet with pork belly meat. '
-      - ' What are you doing? '
+      - ' Shall I seek some amusement in reality? '
+      - ' Show weakness, and I shall appear in your dreams. '
+      - ' What kind of dreams do you have? Are they delicious? '
       levelup:
-      - ' You''re a nice old bird! Blue... '
-      - ' Blue, blue, blue, blue! It''s hard to believe that''s about love! '
-      - ' Blue, blue, blue, blue! Don''t worry, Yeol Haejin and Yuben? '
+      - ' I grow even stronger within dreams! Pururur.. '
+      - ' Purururururur-hihihihihiing!!! Can you feel my power?! '
+      - ' Pururur!! I think I''ve become stronger than you? '
       connect:
-      - ' What''s that? '
-      - ' I''m sorry. I''m sorry, don''t worry, don''t worry. '
-      - ' It''s because I was poor. I''ve come this far. '
+      - ' How is it, seeing me in reality? '
+      - ' Welcome. It''s even better to meet you in reality. '
+      - ' Now that you''ve awakened from your dream, reality begins. Stay strong. '
     noting:
       feeding:
-      - ' Hee hee hee! Hee hee hee! '
-      - ' Did I eat up your Rice Cake? '
-      - ' 섦 주꼼윳 인엔븅의 쌨이뱝쁑! 푸랜랜!'
+      - ' Heeheehee~hiiing! Heeheehee~hiiing! '
+      - ' I want to feast on human dreams too... '
+      - ' My favorite food is human dreams! Pururur! '
       hunting:
-      - ' Blue, blue, blue! Hehehehehe! '
-      - ' 돈뱍 섈의 잘딱진 륌윱! '
-      - ' 섈의 열맞함윱 돈갑주레! '
+      - ' Pururur! Hihiing-! Hihiing-! '
+      - ' Behold my splendid form! '
+      - ' I shall show you my true power! '
       danger:
-      - ' 위험하쁑... 하지렁 섈뼘 이외선 놔 있까! '
-      - ' 인엔이갑...섈랩 륑뎬 처 하망욱 하뼘에? '
-      - ' Dangerous? In the New Year''s Day, you''re a yut, eraleb. Yeah! '
+      - ' This is dangerous... but I can overcome it! '
+      - ' Human... are you pretending not to see me? '
+      - ' How risky... I might slip into your dreams. '
       dead:
-      - ' Blue... Blue...'
-      - ' 섈랩 이삳맺 분쁑룬 솖 쌨윱 롯까랄량왯쁑! '
-      - ' 섈뼘 이삳맺 당뱍지뼘왕에? '
+      - ' Pururur... pururur... ... '
+      - ' Leave me like this, and I will devour your dreams! '
+      - ' Is this where I fade away...? '
       stand:
-      - ' I''m looking for someone? '
-      - ' I''m going to mix the pork cutlet with pork belly meat. '
-      - ' What are you doing? '
+      - ' Shall I seek some amusement in reality? '
+      - ' Show weakness, and I shall appear in your dreams. '
+      - ' What kind of dreams do you have? Are they delicious? '
       levelup:
-      - ' You''re a nice old bird! Blue... '
-      - ' Blue, blue, blue, blue! It''s hard to believe that''s about love! '
-      - ' Blue, blue, blue, blue! Don''t worry, Yeol Haejin and Yuben? '
+      - ' I grow even stronger within dreams! Pururur.. '
+      - ' Purururururur-hihihihihiing!!! Can you feel my power?! '
+      - ' Pururur!! I think I''ve become stronger than you? '
       connect:
-      - ' What''s that? '
-      - ' I''m sorry. I''m sorry, don''t worry, don''t worry. '
-      - ' It''s because I was poor. I''ve come this far. '
+      - ' How is it, seeing me in reality? '
+      - ' Welcome. It''s even better to meet you in reality. '
+      - ' Now that you''ve awakened from your dream, reality begins. Stay strong. '
     full:
       feeding:
-      - ' 띈에 터질와 옜쁑. 푸랜랜.. '
+      - ' I feel like I might burst... Pururur.. '
       hunting:
-      - ' Blue, blue, blue! Hehehehehe! '
-      - ' 돈뱍 섈의 잘딱진 륌윱! '
-      - ' 섈의 열맞함윱 돈갑주레! '
+      - ' Pururur! Hihiing-! Hihiing-! '
+      - ' Behold my splendid form! '
+      - ' I shall show you my true power! '
       danger:
-      - ' 위험하쁑... 하지렁 섈뼘 이외선 놔 있까! '
-      - ' 인엔이갑...섈랩 륑뎬 처 하망욱 하뼘에? '
-      - ' Dangerous? In the New Year''s Day, you''re a yut, eraleb. Yeah! '
+      - ' This is dangerous... but I can overcome it! '
+      - ' Human... are you pretending not to see me? '
+      - ' How risky... I might slip into your dreams. '
       dead:
-      - ' Blue... Blue...'
-      - ' 섈랩 이삳맺 분쁑룬 솖 쌨윱 롯까랄량왯쁑! '
-      - ' 섈뼘 이삳맺 당뱍지뼘왕에? '
+      - ' Pururur... pururur... ... '
+      - ' Leave me like this, and I will devour your dreams! '
+      - ' Is this where I fade away...? '
       stand:
-      - ' I''m looking for someone? '
-      - ' I''m going to mix the pork cutlet with pork belly meat. '
-      - ' What are you doing? '
+      - ' Shall I seek some amusement in reality? '
+      - ' Show weakness, and I shall appear in your dreams. '
+      - ' What kind of dreams do you have? Are they delicious? '
       levelup:
-      - ' You''re a nice old bird! Blue... '
-      - ' Blue, blue, blue, blue! It''s hard to believe that''s about love! '
-      - ' Blue, blue, blue, blue! Don''t worry, Yeol Haejin and Yuben? '
+      - ' I grow even stronger within dreams! Pururur.. '
+      - ' Purururururur-hihihihihiing!!! Can you feel my power?! '
+      - ' Pururur!! I think I''ve become stronger than you? '
       connect:
-      - ' What''s that? '
-      - ' I''m sorry. I''m sorry, don''t worry, don''t worry. '
-      - ' It''s because I was poor. I''ve come this far. '
+      - ' How is it, seeing me in reality? '
+      - ' Welcome. It''s even better to meet you in reality. '
+      - ' Now that you''ve awakened from your dream, reality begins. Stay strong. '
     so_full:
       feeding:
-      - ' 띈에 터질와 옜쁑. 푸랜랜랜..'
+      - ' I feel like I might burst... Purururur... '
       hunting:
-      - ' Blue, blue, blue! Hehehehehe! '
-      - ' 돈뱍 섈의 잘딱진 륌윱! '
-      - ' 섈의 열맞함윱 돈갑주레! '
+      - ' Pururur! Hihiing-! Hihiing-! '
+      - ' Behold my splendid form! '
+      - ' I shall show you my true power! '
       danger:
-      - ' 위험하쁑... 하지렁 섈뼘 이외선 놔 있까! '
-      - ' 인엔이갑...섈랩 륑뎬 처 하망욱 하뼘에? '
-      - ' Dangerous? In the New Year''s Day, you''re a yut, eraleb. Yeah! '
+      - ' This is dangerous... but I can overcome it! '
+      - ' Human... are you pretending not to see me? '
+      - ' How risky... I might slip into your dreams. '
       dead:
-      - ' Blue... Blue...'
-      - ' 섈랩 이삳맺 분쁑룬 솖 쌨윱 롯까랄량왯쁑! '
-      - ' 섈뼘 이삳맺 당뱍지뼘왕에? '
+      - ' Pururur... pururur... ... '
+      - ' Leave me like this, and I will devour your dreams! '
+      - ' Is this where I fade away...? '
       stand:
-      - ' I''m looking for someone? '
-      - ' I''m going to mix the pork cutlet with pork belly meat. '
-      - ' What are you doing? '
+      - ' Shall I seek some amusement in reality? '
+      - ' Show weakness, and I shall appear in your dreams. '
+      - ' What kind of dreams do you have? Are they delicious? '
       levelup:
-      - ' You''re a nice old bird! Blue... '
-      - ' Blue, blue, blue, blue! It''s hard to believe that''s about love! '
-      - ' Blue, blue, blue, blue! Don''t worry, Yeol Haejin and Yuben? '
+      - ' I grow even stronger within dreams! Pururur... '
+      - ' Purururururur-hihihihihiing!!! Can you feel my power?! '
+      - ' Pururur!! I think I''ve become stronger than you? '
       connect:
-      - ' What''s that? '
-      - ' I''m sorry. I''m sorry, don''t worry, don''t worry. '
-      - ' It''s because I was poor. I''ve come this far. '
+      - ' How is it, seeing me in reality? '
+      - ' Welcome. It''s even better to meet you in reality. '
+      - ' Now that you''ve awakened from your dream, reality begins. Stay strong. '
   wander_man_mj:
     hungry:
       feeding:
-      - ' Ray... Salem, come on? '
-      - ' Why do you have a shal?  '
-      - ' 뤠이 킹븅까엔쁑. '
+      - ' ...Still thirsty, huh? '
+      - ' Think this will even quench it? '
+      - ' My throat''s burning... '
       hunting:
-      - ' Do you have information for me?  '
-      - ' A cup of brain, a cup of stir-fried chicken.  '
-      - ' I''m going to tie up my information and I''m going to use it. '
+      - ' Will you at least cover my drinks? '
+      - ' Not even worth a single drink. '
+      - ' This isn''t even entertaining. '
       danger:
-      - ' It could be dangerous. Why did you stir-fry Shub''s bloody brain? '
-      - ' It''s like a meaningful summer vacation. '
+      - ' Careful... I might end up brewing liquor with your blood. '
+      - ' Stay sharp. '
       dead:
-      - ' She''s so cute. '
-      - ' Now, brainyut, what''s your legacy? '
-      - ' I''m going to use this... '
+      - ' Train harder. '
+      - ' ...Who am I supposed to drink with now? '
+      - ' What a disappointment. '
       stand:
-      - ' 뤠이...킹븅까엔쁑.. '
-      - ' She''s gone. She''s gone. '
-      - ' He''s so skinny. Forget about me. I''ll forget about it.  '
-      - ' I''m sorry, Darlene. I''m sorry.  '
+      - ' My throat... is burning... '
+      - ' Leave me alone... '
+      - ' The joy of facing someone like you... I''d almost forgotten it. '
+      - ' What a weary life... '
       levelup:
-      - ' I don''t like that rap part. I''ll make sure to stir-fry pork cutlet. '
-      - ' I''m gonna have to heat it up. Myxchal. '
+      - ' Come, let''s raise a toast. I''ll show you how much stronger I''ve become. '
+      - ' The stronger I get... the more I crave a drink... '
       connect:
-      - ' I''m going to sleep. Why don''t you have a drink? '
-      - ' You''re moving your brain to a black shell?  '
+      - ' You made it... Care for a drink? '
+      - ' Got any more booze? '
     bit_hungry:
       feeding:
-      - ' Ray... Salem, come on? '
-      - ' Why do you have a shal?  '
-      - ' 뤠이 킹븅까엔쁑. '
+      - ' ...Still thirsty, huh? '
+      - ' Think this will even quench it? '
+      - ' My throat''s burning... '
       hunting:
-      - ' Do you have information for me?  '
-      - ' A cup of brain, a cup of stir-fried chicken.  '
-      - ' I''m going to tie up my information and I''m going to use it. '
+      - ' Will you at least cover my drinks? '
+      - ' Not even worth a single drink. '
+      - ' This isn''t even entertaining. '
       danger:
-      - ' It could be dangerous. Why did you stir-fry Shub''s bloody brain? '
-      - ' It''s like a meaningful summer vacation. '
+      - ' Careful... I might end up brewing liquor with your blood. '
+      - ' Stay sharp. '
       dead:
-      - ' She''s so cute. '
-      - ' Now, brainyut, what''s your legacy? '
-      - ' I''m going to use this... '
+      - ' Train harder. '
+      - ' ...Who am I supposed to drink with now? '
+      - ' What a disappointment. '
       stand:
-      - ' 뤠이...킹븅까엔쁑.. '
-      - ' She''s gone. She''s gone. '
-      - ' He''s so skinny. Forget about me. I''ll forget about it.  '
-      - ' I''m sorry, Darlene. I''m sorry.  '
+      - ' My throat... is burning... '
+      - ' Leave me alone... '
+      - ' The joy of facing someone like you... I''d almost forgotten it. '
+      - ' What a weary life... '
       levelup:
-      - ' I don''t like that rap part. I''ll make sure to stir-fry pork cutlet. '
-      - ' I''m gonna have to heat it up. Myxchal. '
+      - ' Come, let''s raise a toast. I''ll show you how much stronger I''ve become. '
+      - ' The stronger I get... the more I crave a drink... '
       connect:
-      - ' I''m going to sleep. Why don''t you have a drink? '
-      - ' You''re moving your brain to a black shell?  '
+      - ' You made it... Care for a drink? '
+      - ' Got any more booze? '
     noting:
       feeding:
-      - ' Ray... Salem, come on? '
-      - ' Why do you have a shal?  '
-      - ' 뤠이 킹븅까엔쁑. '
+      - ' ...Still thirsty, huh? '
+      - ' Think this will even quench it? '
+      - ' My throat''s burning... '
       hunting:
-      - ' Do you have information for me?  '
-      - ' A cup of brain, a cup of stir-fried chicken.  '
-      - ' I''m going to tie up my information and I''m going to use it. '
+      - ' Will you at least cover my drinks? '
+      - ' Not even worth a single drink. '
+      - ' This isn''t even entertaining. '
       danger:
-      - ' It could be dangerous. Why did you stir-fry Shub''s bloody brain? '
-      - ' It''s like a meaningful summer vacation. '
+      - ' Careful... I might end up brewing liquor with your blood. '
+      - ' Stay sharp. '
       dead:
-      - ' She''s so cute. '
-      - ' Now, brainyut, what''s your legacy? '
-      - ' I''m going to use this... '
+      - ' Train harder. '
+      - ' ...Who am I supposed to drink with now? '
+      - ' What a disappointment. '
       stand:
-      - ' 뤠이...킹븅까엔쁑.. '
-      - ' She''s gone. She''s gone. '
-      - ' He''s so skinny. Forget about me. I''ll forget about it.  '
-      - ' I''m sorry, Darlene. I''m sorry.  '
+      - ' My throat... is burning... '
+      - ' Leave me alone... '
+      - ' The joy of facing someone like you... I''d almost forgotten it. '
+      - ' What a weary life... '
       levelup:
-      - ' I don''t like that rap part. I''ll make sure to stir-fry pork cutlet. '
-      - ' I''m gonna have to heat it up. Myxchal. '
+      - ' Come, let''s raise a toast. I''ll show you how much stronger I''ve become. '
+      - ' The stronger I get... the more I crave a drink... '
       connect:
-      - ' I''m going to sleep. Why don''t you have a drink? '
-      - ' You''re moving your brain to a black shell?  '
+      - ' You made it... Care for a drink? '
+      - ' Got any more booze? '
     full:
       feeding:
-      - ' 졸앴 취하뼘쓸. 잔윱 섹외볶 뵉왯섈?  '
+      - ' I''m getting tipsy... Mind if I leave the rest? '
       hunting:
-      - ' Do you have information for me?  '
-      - ' A cup of brain, a cup of stir-fried chicken.  '
-      - ' I''m going to tie up my information and I''m going to use it. '
+      - ' Will you at least cover my drinks? '
+      - ' Not even worth a single drink. '
+      - ' This isn''t even entertaining. '
       danger:
-      - ' It could be dangerous. Why did you stir-fry Shub''s bloody brain? '
-      - ' It''s like a meaningful summer vacation. '
+      - ' Careful... I might end up brewing liquor with your blood. '
+      - ' Stay sharp. '
       dead:
-      - ' She''s so cute. '
-      - ' Now, brainyut, what''s your legacy? '
-      - ' I''m going to use this... '
+      - ' Train harder. '
+      - ' ...Who am I supposed to drink with now? '
+      - ' What a disappointment. '
       stand:
-      - ' 뤠이...킹븅까엔쁑.. '
-      - ' She''s gone. She''s gone. '
-      - ' He''s so skinny. Forget about me. I''ll forget about it.  '
-      - ' I''m sorry, Darlene. I''m sorry.  '
+      - ' My throat... is burning... '
+      - ' Leave me alone... '
+      - ' The joy of facing someone like you... I''d almost forgotten it. '
+      - ' What a weary life... '
       levelup:
-      - ' I don''t like that rap part. I''ll make sure to stir-fry pork cutlet. '
-      - ' I''m gonna have to heat it up. Myxchal. '
+      - ' Come, let''s raise a toast. I''ll show you how much stronger I''ve become. '
+      - ' The stronger I get... the more I crave a drink... '
       connect:
-      - ' I''m going to sleep. Why don''t you have a drink? '
-      - ' You''re moving your brain to a black shell?  '
+      - ' You made it... Care for a drink? '
+      - ' Got any more booze? '
     so_full:
       feeding:
-      - ' 셥땜 웜하왔 레넋쓸. 옮절하왯솖 '
+      - ' I''ve had too much... I''ll pass. '
       hunting:
-      - ' Do you have information for me?  '
-      - ' A cup of brain, a cup of stir-fried chicken.  '
-      - ' I''m going to tie up my information and I''m going to use it. '
+      - ' Will you at least cover my drinks? '
+      - ' Not even worth a single drink. '
+      - ' This isn''t even entertaining. '
       danger:
-      - ' It could be dangerous. Why did you stir-fry Shub''s bloody brain? '
-      - ' It''s like a meaningful summer vacation. '
+      - ' Careful... I might end up brewing liquor with your blood. '
+      - ' Stay sharp. '
       dead:
-      - ' She''s so cute. '
-      - ' Now, brainyut, what''s your legacy? '
-      - ' I''m going to use this... '
+      - ' Train harder. '
+      - ' ...Who am I supposed to drink with now? '
+      - ' What a disappointment. '
       stand:
-      - ' 뤠이...킹븅까엔쁑.. '
-      - ' She''s gone. She''s gone. '
-      - ' He''s so skinny. Forget about me. I''ll forget about it.  '
-      - ' I''m sorry, Darlene. I''m sorry.  '
+      - ' My throat... is burning... '
+      - ' Leave me alone... '
+      - ' The joy of facing someone like you... I''d almost forgotten it. '
+      - ' What a weary life... '
       levelup:
-      - ' I don''t like that rap part. I''ll make sure to stir-fry pork cutlet. '
-      - ' I''m gonna have to heat it up. Myxchal. '
+      - ' Come, let''s raise a toast. I''ll show you how much stronger I''ve become. '
+      - ' The stronger I get... the more I crave a drink... '
       connect:
-      - ' I''m going to sleep. Why don''t you have a drink? '
-      - ' You''re moving your brain to a black shell?  '
+      - ' You made it... Care for a drink? '
+      - ' Got any more booze? '
   ALIOT:
     hungry:
       feeding:
@@ -6631,7 +6640,7 @@ species:
       - 'RUN!!! '
       stand:
       - Damn it! You can't do that!
-      - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
+      # - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
       - '  What''s wrong with that rap? Who are you?'
       - It's flower-like, right?
       - Master's horn? I'm so sorry, I'm so excited about that.
@@ -6662,7 +6671,7 @@ species:
       - 'RUN!!! '
       stand:
       - Damn it! You can't do that!
-      - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
+      # - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
       - '  What''s wrong with that rap? Who are you?'
       - It's flower-like, right?
       - Master's horn? I'm so sorry, I'm so excited about that.
@@ -6693,7 +6702,7 @@ species:
       - 'RUN!!! '
       stand:
       - Damn it! You can't do that!
-      - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
+      # - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
       - '  What''s wrong with that rap? Who are you?'
       - It's flower-like, right?
       - Master's horn? I'm so sorry, I'm so excited about that.
@@ -6721,7 +6730,7 @@ species:
       - 'RUN!!! '
       stand:
       - Damn it! You can't do that!
-      - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
+      # - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
       - '  What''s wrong with that rap? Who are you?'
       - It's flower-like, right?
       - Master's horn? I'm so sorry, I'm so excited about that.
@@ -6749,7 +6758,7 @@ species:
       - 'RUN!!! '
       stand:
       - Damn it! You can't do that!
-      - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
+      # - 저볶 륑챙얄꼴룬난 욉혼윳 까뭅왔 하꽁옳에겻?
       - '  What''s wrong with that rap? Who are you?'
       - It's flower-like, right?
       - Master's horn? I'm so sorry, I'm so excited about that.
@@ -7132,7 +7141,7 @@ species:
       - Give me your life...
       hunting:
       - ~ Open your eyes ~ open your eyes ~
-      - 깖램 체치하욱 섈한테 롯윱 와 졍 주납겻
+      # - 깖램 체치하욱 섈한테 롯윱 와 졍 주납겻
       danger:
       - Come here! The sun is shining!
       - You're dangerous, huh, don't be shy.
@@ -7154,7 +7163,7 @@ species:
       - I like restful rap. Shake shake shake
       - Yes, give me a break. She's picking on me!
       connect:
-      - 섈 뜸 주망욱 게지이?
+      # - 섈 뜸 주망욱 게지이?
       - Growl! Should I wake up?
     bit_hungry:
       feeding:
@@ -7188,7 +7197,7 @@ species:
       - Do you know the shameless bird of the hip?
     noting:
       feeding:
-      - 걋뼙윳 액맙저맙, 액셤액셤 돈통의 렝이쁑
+      # - 걋뼙윳 액맙저맙, 액셤액셤 돈통의 렝이쁑
       - Very detailed~
       hunting:
       - Don't run out of money in our company!
@@ -7197,7 +7206,7 @@ species:
       - Snack? It's dangerous.
       - You're shy? You're so cheerful.
       dead:
-      - 깖램 볘궉 것~
+      # - 깖램 볘궉 것~
       - I'm sorry...
       stand:
       - Take a good look at the quantitative analysis of the neck.
@@ -7206,7 +7215,7 @@ species:
       - You are going with who?
       levelup:
       - I got it! I got it! She's moving on to Rebel?
-      - 곗량뼘 열해좁쁑!!!!!
+      # - 곗량뼘 열해좁쁑!!!!!
       perfor_1:
       - Let's put this here.
       - It's pollution!
@@ -7219,7 +7228,7 @@ species:
     full:
       feeding:
       - New cute...
-      - 렝있뼘 와볶, 좋윳 와볶 렀이 롯윷룬 꽂쁑쓿...
+      # - 렝있뼘 와볶, 좋윳 와볶 렀이 롯윷룬 꽂쁑쓿...
       hunting:
       - Well done! Well done!
       - I'm not good at this!
@@ -7230,15 +7239,15 @@ species:
       - Common hawk hawk!! shhhhhhh~
       - I'm going to be sick and tired. It's going to be a snack.
       stand:
-      - 섈뼈윳~ 쇰륫 두랜뼘 옵 좋궉해~ 뉼~ 늄늄권~~♬
+      # - 섈뼈윳~ 쇰륫 두랜뼘 옵 좋궉해~ 뉼~ 늄늄권~~♬
       - It's not going to explode in a small bowl, can you give me a big rap?
-      - 섦 뢰진 섞옘얘 졍 돝 줘. 갤뉴해 주욱 굵쁑븍까 줘.
+      # - 섦 뢰진 섞옘얘 졍 돝 줘. 갤뉴해 주욱 굵쁑븍까 줘.
       - Awkwardly, wet and squishy?
       - Do you have a mole, Ben? Hot! This is the flower cup!
       - Put it on! Do it slowly. I'm flattered by the amount of flower petals.
       levelup:
       - Congratulations!
-      - 뢰있쁑! 열하쁑!
+      # - 뢰있쁑! 열하쁑!
       perfor_1:
       - Let's put this here.
       - It's pollution!
@@ -7251,7 +7260,7 @@ species:
     so_full:
       feeding:
       - I've met a doll! A doll! A doll with a doll!
-      - 롯윷뱍뾰어 롯깨지렁, 이옳 정럽 께픈 렝이쁑...
+      # - 롯윷뱍뾰어 롯깨지렁, 이옳 정럽 께픈 렝이쁑...
       hunting:
       - Are you still here without Shopped out! I'm here to measure up!
       - Are you going to get hurt quickly?
@@ -7268,8 +7277,8 @@ species:
       - I love it! Jump, jump, move, slurping!
       - My neck is cold and wet...
       - What are you doing?
-      - 한 랍 닒인 걋량 인형 인덤, 갤닦 쁠추랩 쓿하뼘벤 뤘부 쁑 뛰치왯쁑!
-      - 솖 뺀윳 동 렁큼 갤뉴~★ 갤닦 쁠추돈쁑볶 새 뜁짝갑~★
+      # - 한 랍 닒인 걋량 인형 인덤, 갤닦 쁠추랩 쓿하뼘벤 뤘부 쁑 뛰치왯쁑!
+      # - 솖 뺀윳 동 렁큼 갤뉴~★ 갤닦 쁠추돈쁑볶 새 뜁짝갑~★
       levelup:
       - There's no such thing as jumping up and down on a cow!
       - It's time for the punishment, right?
@@ -7286,12 +7295,12 @@ species:
     hungry:
       feeding:
       - '..Now? '
-      dead:
-      - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
+      # dead:
+      # - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
       stand:
       - "\tDo you have a sore throat?"
-      levelup:
-      - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
+      # levelup:
+      # - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
       perfor_1:
       - 'ERROR: In the middle of nowhere.'
       perfor_2:
@@ -7302,12 +7311,12 @@ species:
     bit_hungry:
       feeding:
       - Quietly, quietly, quietly, quietly.
-      dead:
-      - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
+      # dead:
+      # - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
       stand:
       - "\tDon't you forget it?"
-      levelup:
-      - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
+      # levelup:
+      # - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
       perfor_1:
       - 'ERROR: In the middle of nowhere.'
       perfor_2:
@@ -7318,13 +7327,13 @@ species:
     noting:
       feeding:
       - Quietly, quietly, quietly, quietly.
-      dead:
-      - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
+      # dead:
+      # - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
       stand:
       - "\tDid you go?"
       - "\tI don't understand. "
-      levelup:
-      - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
+      # levelup:
+      # - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
       perfor_1:
       - 'ERROR: In the middle of nowhere.'
       perfor_2:
@@ -7335,14 +7344,14 @@ species:
     full:
       feeding:
       - 'It''s the new puppy''s mouth. '
-      dead:
-      - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
+      # dead:
+      # - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
       stand:
       - "\tDid you go?"
       - "\tI don't understand. "
       - "\tI'm gonna let you go. I'm gonna read it."
-      levelup:
-      - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
+      # levelup:
+      # - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
       perfor_1:
       - 'ERROR: In the middle of nowhere.'
       perfor_2:
@@ -7353,14 +7362,14 @@ species:
     so_full:
       feeding:
       - 'It''s the new puppy''s mouth. '
-      dead:
-      - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
+      # dead:
+      # - "\t덤처 가셥지 둔낟 욉웜 : 0% / 댕태 : 두적합"
       stand:
       - "\tDid you go?"
       - "\tI don't understand. "
       - "\tI'm gonna let you go. I'm gonna read it."
-      levelup:
-      - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
+      # levelup:
+      # - 'ERROR : 덤처 가셥지 효났볶 측정 욉웜 : 101%'
       perfor_1:
       - 'ERROR: In the middle of nowhere.'
       perfor_2:
@@ -7372,8 +7381,8 @@ species:
     hungry:
       feeding:
       - I'm tired of moving forward! The hell of a heaven??...ㅠㅠ
-      dead:
-      - 레껨터의 독놔랩 하욱 꽜지렁 혼보의 힘이 두존해…
+      # dead:
+      # - 레껨터의 독놔랩 하욱 꽜지렁 혼보의 힘이 두존해…
       stand:
       - What's wrong with this?...ㅠㅠ
       - I'm sorry, but I am not ridiculous. What's wrong with you?...ㅠㅠ
@@ -7382,40 +7391,40 @@ species:
     bit_hungry:
       feeding:
       - I'm tired of moving forward! The hell of a heaven??...ㅠㅠ
-      dead:
-      - 레껨터의 독놔랩 하욱 꽜지렁 혼보의 힘이 두존해…
+      # dead:
+      # - 레껨터의 독놔랩 하욱 꽜지렁 혼보의 힘이 두존해…
       stand:
       - What's wrong with this?...ㅠㅠ
       - I'm sorry, but I am not ridiculous. What's wrong with you?...ㅠㅠ
       levelup:
       - The power trap for the shell! I opened it!
     noting:
-      feeding:
-      - 큭큭큭…. 혼보의 힘이 걘뱍걋뼘벤?
+      # feeding:
+      # - 큭큭큭…. 혼보의 힘이 걘뱍걋뼘벤?
       dead:
       - It's just arrived and I'm so happy with my heart...…ㅠㅠ
       stand:
       - Don't worry! You're the only one who's married?
-      - 윷흐흐흐흐흐…. 까불이 섈의 륌윱 일었곡쁑..
+      # - 윷흐흐흐흐흐…. 까불이 섈의 륌윱 일었곡쁑..
       levelup:
       - Haha, King it's a trap. I'm maden!
     full:
-      feeding:
-      - 큭큭큭…. 혼보의 힘이 걘뱍걋뼘벤?
+      # feeding:
+      # - 큭큭큭…. 혼보의 힘이 걘뱍걋뼘벤?
       dead:
       - It's just arrived and I'm so happy with my heart...…ㅠㅠ
       stand:
       - Don't worry! You're the only one who's married?
-      - 윷흐흐흐흐흐…. 까불이 섈의 륌윱 일었곡쁑..
+      # - 윷흐흐흐흐흐…. 까불이 섈의 륌윱 일었곡쁑..
       levelup:
       - Haha, King it's a trap. I'm maden!
     so_full:
-      feeding:
-      - 이맘 섟더섈뼘 율꼼윳 궐 롯까!
+      # feeding:
+      # - 이맘 섟더섈뼘 율꼼윳 궐 롯까!
       dead:
       - It's just arrived and I'm so happy with my heart...…ㅠㅠ
       stand:
-      - 윷흐흐흐흐흐…. 까불이 섈의 륌윱 일었곡쁑…
+      # - 윷흐흐흐흐흐…. 까불이 섈의 륌윱 일었곡쁑…
       - Don't worry! You're the only one who's married?
       levelup:
       - Haha, King it's a trap. I'm maden!
@@ -7524,145 +7533,145 @@ species:
   DARK_PRIEST:
     hungry:
       feeding:
-      - I'm so happy.
+      - The darkness rises! Dark Lord will be pleased too.
       dead:
-      - It's a new airy...
+      - You got closer to Dark Lord...
       stand:
-      - I'm so happy. I'm so happy.
-      - The power, which finally cleared up.
-      - A jet for the sake of a young man.
-      - I feel like I'm in love with you.
+      - Dark Lord will be pleased...
+      - I will offer the power of eternal darkness to Lord.
+      - A sacrifice is needed to bring about true death...
+      - Dark Lord says he needs a sacrifice...
       levelup:
-      - What are you doing?
+      - How about offering a thanks to Dark Lord?
     bit_hungry:
       feeding:
-      - I'm so happy.
+      - Praise the Dark Lord!
       dead:
-      - It's a new airy...
+      - You got closer to Dark Lord...
       stand:
-      - I'm so happy. I'm so happy.
-      - The power, which finally cleared up.
-      - A jet for the sake of a young man.
-      - I feel like I'm in love with you.
+      - Dark Lord will be pleased...
+      - Psst.. Got time to talk about Darkness?
+      - The sun so bright! Hate it!
+      - Dark Lord says he needs a sacrifice...
       levelup:
-      - What are you doing?
+      - How about offering a thanks to Dark Lord?
     noting:
       feeding:
-      - Awkward. Wait....
+      - A snack? Thank you
       dead:
-      - I'm sorry to hear that.
+      - You have entered the real world from a place of lies.
       stand:
-      - I'm going to be a poison. I'm so happy for you're so happy.
-      - At the end of the day, I've cleared up my bones and opened my eyes, and I'm glad to see you.
-      - You're so silly. You're so cool.
-      - 얄뉴하루 욘띈하뱍! 쁑크 맺뷴랩 위해!
+      - Obey Dark Lord. And i will Obey you, human.
+      - The time of eternal darkness, ruled by the Lord, will come...
+      - Only in the darkness will we find true eternal life...
+      - Rejoice and worship! For the Dark Lord!
       levelup:
-      - Haha... I'm so happy.
+      - heh... Thank you Lord...
     full:
       feeding:
-      - Awkward. Wait....
+      - Rejoice. Lord will be pleased...
       dead:
-      - I'm sorry to hear that.
+      - You have entered the real world from a place of lies.
       stand:
-      - I'm going to be a poison. I'm so happy for you're so happy.
-      - At the end of the day, I've cleared up my bones and opened my eyes, and I'm glad to see you.
-      - You're so silly. You're so cool.
-      - 얄뉴하루 욘띈하뱍! 맺뷴랩 위해!
+      - Obey Dark Lord. And i will Obey you, human.
+      - The time of eternal darkness, ruled by the Dark Lord, will come...
+      - Only in the darkness will we find true eternal life...
+      - Rejoice and worship! for the Dark lord!
       levelup:
-      - Haha... I'm so happy.
+      - heh... Thank you Lord...
     so_full:
       feeding:
-      - Cheeky...
+      - This is not the time for ceremonies... wait...
       dead:
-      - I'm sorry to hear that.
+      - You have entered the real world from a place of lies.
       stand:
-      - I'm going to be a poison. I'm so happy for you're so happy.
-      - At the end of the day, I've cleared up my bones and opened my eyes, and I'm glad to see you.
-      - You're so silly. You're so cool.
-      - 얄뉴하루 욘띈하뱍! 맺뷴랩 위해!
+      - Obey Dark Lord. And i will Obey you, human.
+      - The time of eternal darkness, ruled by the Dark Lord, will come...
+      - Only in the darkness will we find true eternal life...
+      - Rejoice and worship! for the lord!
       levelup:
-      - Haha... I'm so happy.
+      - heh... Thank you Dark Lord...
   BAPHOMET2:
     hungry:
       feeding:
-      - ..Tick Tick Tick..
+      - '..Nom nom.. so chewy~ '
       dead:
-      - "\tI'm going to use it."
+      - "\tSuch a weak... tiny being..."
       stand:
-      - "\tI'm going to eat a lot! I'm going to eat a lot"
+      - "\tHey, little one! You're late again~"
       levelup:
-      - There will be a lot of things to clean up with.
+      - You're getting stronger... for such a tiny creature!
       perfor_1:
-      - ~Tsk, tsk, tsk, tsk~
+      - Nom..nom~
       perfor_2:
-      - What?
+      - Eeeek!?
       perfor_3:
-      - Go to the bathroom!
+      - Roaaaarrrrrr!!!
     bit_hungry:
       feeding:
-      - Quietly and bitterly...
+      - Mm~ just the right amount of crunch!
       dead:
-      - "\tI'm going to use it."
+      - "\tSuch a weak... tiny being..."
       stand:
-      - "\tI'll tell you what happened."
+      - "\tIn front of me, all are but little bugs~"
       levelup:
-      - There will be a lot of things to clean up with.
+      - You're getting stronger... for such a tiny creature!
       perfor_1:
-      - ~Tsk, tsk, tsk, tsk~
+      - Nom..nom~
       perfor_2:
-      - What?
+      - Eeeek!?
       perfor_3:
-      - Go to the bathroom!
+      - Roaaaarrrrrr!!!
     noting:
       feeding:
-      - Quietly and bitterly...
+      - Mm~ just the right amount of crunch!
       dead:
-      - "\tI'm going to use it."
+      - "\tSuch a weak... tiny being..."
       stand:
-      - "\tI'll tell you what happened."
-      - "\tIt's a good idea to clean up."
+      - "\tIn front of me, all are but little bugs~"
+      - "\tGood and evil? Both mean nothing before me~"
       levelup:
-      - There will be a lot of things to clean up with.
+      - You're getting stronger... for such a tiny creature!
       perfor_1:
-      - ~Tsk, tsk, tsk, tsk~
+      - Nom..nom~
       perfor_2:
-      - What?
+      - Eeeek!?
       perfor_3:
-      - Go to the bathroom!
+      - Roaaaarrrrrr!!!
     full:
       feeding:
-      - '궁쁑 랄망볶 뵉왯섈? '
+      - 'Is it okay if I... just leave a few bites?~ '
       dead:
-      - "\tI'm going to use it."
+      - "\tSuch a weak... tiny being..."
       stand:
-      - "\tI'll tell you what happened."
-      - "\tIt's a good idea to clean up."
-      - "\tI'm going to read it."
+      - "\tIn front of me, all are but little bugs~"
+      - "\tGood and evil? Both mean nothing before me~"
+      - "\tOnly I, Baphomet, shall remain supreme~"
       levelup:
-      - There will be a lot of things to clean up with.
+      - You're getting stronger... for such a tiny creature!
       perfor_1:
-      - ~Tsk, tsk, tsk, tsk~
+      - Nom..nom~
       perfor_2:
-      - What?
+      - Eeeek!?
       perfor_3:
-      - Go to the bathroom!
+      - Roaaaarrrrrr!!!
     so_full:
       feeding:
-      - '궁쁑 랄망볶 뵉왯섈? '
+      - 'Is it okay if I... just leave a few bites?~ '
       dead:
-      - "\tI'm going to use it."
+      - "\tSuch a weak... tiny being..."
       stand:
-      - "\tI'll tell you what happened."
-      - "\tIt's a good idea to clean up."
-      - "\tI'm going to read it."
+      - "\tIn front of me, all are but little bugs~"
+      - "\tGood and evil? Both mean nothing before me~"
+      - "\tOnly I, Baphomet, shall remain supreme~"
       levelup:
-      - There will be a lot of things to clean up with.
+      - You're getting stronger... for such a tiny creature!
       perfor_1:
-      - ~Tsk, tsk, tsk, tsk~
+      - Nom..nom~
       perfor_2:
-      - What?
+      - Eeeek!?
       perfor_3:
-      - Go to the bathroom!
+      - Roaaaarrrrrr!!!
   DARK_ILLUSION2:
     hungry:
       feeding:
@@ -7732,104 +7741,104 @@ species:
   BLUEMOON_LOLI_RURI2:
     hungry:
       feeding:
-      - Did you dig up the wax? I think I'm moving, and I'm a trap pie. Is that right?
+      - ' Master, I was sooo hungry~~!! Don''t you have something like blueberry pie instead?? '
       hunting:
-      - 이 솰낟븅윱 뒝잡궉, 더맺곡 긍의 재멜맺 군 놔 있왔 해줄륫?
-      - Whoops, bang! bang bang! V.I.C.T.O.R.Y! The master is awesome!!
+      - ' Catch them for me-so I can use them as ingredients for a new potion! '
+      - ' Waaah, fight! Fight! V.I.C.T.O.R.Y! Go, Master!! '
       danger:
-      - I'm going to do a lot of rubbish for the master.
-      - I'm going to curse you!
+      - ' If you feel dizzy, tell me, okay? I prepared a special potion made with toad extract just for you~ '
+      - ' If you abandon me and disappear, I''ll curse you forever!! '
       dead:
-      - Yawn. This is the special ecstasy of the tweezers.
-      - It looks like it's going to be shaggy, moist, and precious!
+      - ' Wait... I had a special awakening potion for times like this... Huh? I think I lost it... '
+      - ' I, Blue Moon Loli Ruri, don''t like weak masters! '
       stand:
-      - How good is a thin edge? I was sleepy, I was tinny...
-      - Is he a good guy?
-      - Do you have a spiky hem?
-      - There is a pepulheim?
-      - Did you know?
+      - ' Wanna go to my favorite opera house someday? It''s a little ruined though... '
+      - ' People call me a witch, but I''m just a good girl, you know? '
+      - ' My friend in Niflheim is really good at makeup! '
+      - ' Another friend in Niflheim is kinda squishy~ and soft~~? '
+      - ' Let me introduce my friends~ Here''s a cat, and here are some bats! Cute, right? Kuru??'
       levelup:
-      - Ten years ago, do you have a line of soup?
+      - ' Now that you''re stronger, you''ll play with me too, right? '
     bit_hungry:
       feeding:
-      - Did you dig up the wax? I think I'm moving, and I'm a trap pie. Is that right?
+      - ' Master, I was sooo hungry~~!! Don''t you have something like blueberry pie instead?? '
       hunting:
-      - 이 솰낟븅윱 뒝잡궉, 더맺곡 긍의 재멜맺 군 놔 있왔 해줄륫?
-      - Whoops, bang! bang bang! V.I.C.T.O.R.Y! The master is awesome!!
+      - ' Catch them for me-so I can use them as ingredients for a new potion! '
+      - ' Waaah, fight! Fight! V.I.C.T.O.R.Y! Go, Master!! '
       danger:
-      - I'm going to do a lot of rubbish for the master.
-      - I'm going to curse you!
+      - ' If you feel dizzy, tell me, okay? I prepared a special potion made with toad extract just for you~ '
+      - ' If you abandon me and disappear, I''ll curse you forever!! '
       dead:
-      - Yawn. This is the special ecstasy of the tweezers.
-      - It looks like it's going to be shaggy, moist, and precious!
+      - ' Wait... I had a special awakening potion for times like this... Huh? I think I lost it... '
+      - ' I, Blue Moon Loli Ruri, don''t like weak masters! '
       stand:
-      - How good is a thin edge? I was sleepy, I was tinny...
-      - Is he a good guy?
-      - Do you have a spiky hem?
-      - There is a pepulheim?
-      - Did you know?
+      - ' Wanna go to my favorite opera house someday? It''s a little ruined though... '
+      - ' People call me a witch, but I''m just a good girl, you know? '
+      - ' My friend in Niflheim is really good at makeup! '
+      - ' Another friend in Niflheim is kinda squishy~ and soft~~? '
+      - ' Let me introduce my friends~ Here''s a cat, and here are some bats! Cute, right? Kuru??'
       levelup:
-      - Ten years ago, do you have a line of soup?
+      - ' Now that you''re stronger, you''ll play with me too, right? '
     noting:
       feeding:
-      - 주인뿔웜 함슬하뼘 꼼!당!꼴!엔! 셜셜∮
+      - ' Mealtime with Master! Eat! Eat! Yum yum??'
       hunting:
-      - 이 솰낟븅윱 뒝잡궉, 더맺곡 긍의 재멜맺 군 놔 있왔 해줄륫?
-      - Whoops, bang! bang bang! V.I.C.T.O.R.Y! The master is awesome!!
+      - ' Catch them for me-so I can use them as ingredients for a new potion! '
+      - ' Waaah, fight! Fight! V.I.C.T.O.R.Y! Go, Master!! '
       danger:
-      - I'm going to do a lot of rubbish for the master.
-      - I'm going to curse you!
+      - ' If you feel dizzy, tell me, okay? I prepared a special potion made with toad extract just for you~ '
+      - ' If you abandon me and disappear, I''ll curse you forever!! '
       dead:
-      - Yawn. This is the special ecstasy of the tweezers.
-      - It looks like it's going to be shaggy, moist, and precious!
+      - ' Wait... I had a special awakening potion for times like this... Huh? I think I lost it... '
+      - ' I, Blue Moon Loli Ruri, don''t like weak masters! '
       stand:
-      - How good is a thin edge? I was sleepy, I was tinny...
-      - Is he a good guy?
-      - Do you have a spiky hem?
-      - There is a pepulheim?
-      - Did you know?
+      - ' Wanna go to my favorite opera house someday? It''s a little ruined though... '
+      - ' People call me a witch, but I''m just a good girl, you know? '
+      - ' My friend in Niflheim is really good at makeup! '
+      - ' Another friend in Niflheim is kinda squishy~ and soft~~? '
+      - ' Let me introduce my friends~ Here''s a cat, and here are some bats! Cute, right? Kuru??'
       levelup:
-      - Ten years ago, do you have a line of soup?
+      - ' Now that you''re stronger, you''ll play with me too, right? '
     full:
       feeding:
-      - 액막왔 띈욱프진 궝윳옵..? 액륫볶 욱레곱~♬
+      - ' I''m not that hungry... but thanks anyway~ '
       hunting:
-      - 이 솰낟븅윱 뒝잡궉, 더맺곡 긍의 재멜맺 군 놔 있왔 해줄륫?
-      - Whoops, bang! bang bang! V.I.C.T.O.R.Y! The master is awesome!!
+      - ' Catch them for me-so I can use them as ingredients for a new potion! '
+      - ' Waaah, fight! Fight! V.I.C.T.O.R.Y! Go, Master!! '
       danger:
-      - I'm going to do a lot of rubbish for the master.
-      - I'm going to curse you!
+      - ' If you feel dizzy, tell me, okay? I prepared a special potion made with toad extract just for you~ '
+      - ' If you abandon me and disappear, I''ll curse you forever!! '
       dead:
-      - Yawn. This is the special ecstasy of the tweezers.
-      - It looks like it's going to be shaggy, moist, and precious!
+      - ' Wait... I had a special awakening potion for times like this... Huh? I think I lost it... '
+      - ' I, Blue Moon Loli Ruri, don''t like weak masters! '
       stand:
-      - How good is a thin edge? I was sleepy, I was tinny...
-      - Is he a good guy?
-      - Do you have a spiky hem?
-      - There is a pepulheim?
-      - Did you know?
+      - ' Wanna go to my favorite opera house someday? It''s a little ruined though... '
+      - ' People call me a witch, but I''m just a good girl, you know? '
+      - ' My friend in Niflheim is really good at makeup! '
+      - ' Another friend in Niflheim is kinda squishy~ and soft~~? '
+      - ' Let me introduce my friends~ Here''s a cat, and here are some bats! Cute, right? Kuru??'
       levelup:
-      - Ten years ago, do you have a line of soup?
+      - ' Now that you''re stronger, you''ll play with me too, right? '
     so_full:
       feeding:
-      - 띈에 터질 와 옜쁠 럽이긋 섞 죽일 냅이긋??
+      - ' I feel like I''m gonna burst! Are you trying to kill me?? '
       hunting:
-      - 이 솰낟븅윱 뒝잡궉, 더맺곡 긍의 재멜맺 군 놔 있왔 해줄륫?
-      - Whoops, bang! bang bang! V.I.C.T.O.R.Y! The master is awesome!!
+      - ' Catch them for me-so I can use them as ingredients for a new potion! '
+      - ' Waaah, fight! Fight! V.I.C.T.O.R.Y! Go, Master!! '
       danger:
-      - I'm going to do a lot of rubbish for the master.
-      - I'm going to curse you!
+      - ' If you feel dizzy, tell me, okay? I prepared a special potion made with toad extract just for you~ '
+      - ' If you abandon me and disappear, I''ll curse you forever!! '
       dead:
-      - Yawn. This is the special ecstasy of the tweezers.
-      - It looks like it's going to be shaggy, moist, and precious!
+      - ' Wait... I had a special awakening potion for times like this... Huh? I think I lost it... '
+      - ' I, Blue Moon Loli Ruri, don''t like weak masters! '
       stand:
-      - How good is a thin edge? I was sleepy, I was tinny...
-      - Is he a good guy?
-      - Do you have a spiky hem?
-      - There is a pepulheim?
-      - Did you know?
+      - ' Wanna go to my favorite opera house someday? It''s a little ruined though... '
+      - ' People call me a witch, but I''m just a good girl, you know? '
+      - ' My friend in Niflheim is really good at makeup! '
+      - ' Another friend in Niflheim is kinda squishy~ and soft~~? '
+      - ' Let me introduce my friends~ Here''s a cat, and here are some bats! Cute, right? Kuru??'
       levelup:
-      - Ten years ago, do you have a line of soup?
+      - ' Now that you''re stronger, you''ll play with me too, right? '
   FARMILIAR:
     hungry:
       feeding:
@@ -7839,7 +7848,7 @@ species:
       dead:
       - In the mouth of the shriveled jumper!!
       stand:
-      - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
+      # - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
       - It's fried. I'm here. Don't worry.
       - 'Do you have a goosebumps? '
       levelup:
@@ -7852,7 +7861,7 @@ species:
       dead:
       - In the mouth of the shriveled jumper!!
       stand:
-      - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
+      # - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
       - It's fried. I'm here. Don't worry.
       - 'Do you have a goosebumps? '
       levelup:
@@ -7865,7 +7874,7 @@ species:
       dead:
       - In the mouth of the shriveled jumper!!
       stand:
-      - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
+      # - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
       - It's fried. I'm here. Don't worry.
       - 'Do you have a goosebumps? '
       levelup:
@@ -7878,20 +7887,20 @@ species:
       dead:
       - In the mouth of the shriveled jumper!!
       stand:
-      - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
+      # - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
       - It's fried. I'm here. Don't worry.
       - 'Do you have a goosebumps? '
       levelup:
       - congratulations!! Master!! Congrats, do you have money?
     so_full:
-      feeding:
-      - '액렁 줘 ! 자쌕 쑹머히룬 주인뿔 피랩 뇟궉롯윱지볶 륀뱍. '
+      # feeding:
+      # - '액렁 줘 ! 자쌕 쑹머히룬 주인뿔 피랩 뇟궉롯윱지볶 륀뱍. '
       danger:
       - It's dangerous, you know?
       dead:
       - In the mouth of the shriveled jumper!!
       stand:
-      - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
+      # - 주인뿔웜 함슬뱍룬 롯까돈지 륑한 웜일윱 렝뎨 놔 있윱 와 옜궉.
       - It's fried. I'm here. Don't worry.
       - 'Do you have a goosebumps? '
       levelup:
@@ -7899,510 +7908,510 @@ species:
   WILD_ROSE3:
     hungry:
       feeding:
-      - ' Hey! Did you hit the blank? '
-      - ' 잘~~~롯왯꼭뾰쁑! 윷~율~♪ 최욱맺 행독한 꼴엔이쁑셍! '
+      - ' Myaa~! I was starving! You sure know what I need, nya! '
+      - ' Yummm~~~! Mmm~♪ This is the happiest time ever, nya! '
       danger:
-      - ' Sleep, sleep, sleep! What a dangerous move!? '
-      - ' Whoa, whoa, this is dangerous... '
+      - ' W-wait wait wait! Isn''t that dangerous, nya!? '
+      - ' Waaah... th-this looks really dangerous, nya... '
       dead:
-      - ' Whoops,... It''s dangerous, it''s terrifying! '
-      - ' Just a little bit, a little bit! '
+      - ' Aaaah... I told you it was dangerous, didn''t I, nya! '
+      - ' You''re pushing too hard! Next time, be careful, okay nya!? '
       stand:
-      - ' My bones are here! '
-      - ' Now! It''s like a fish cake. Mix it up '
-      - ' I saw you at Leaping Gym. I''m here for you. '
+      - ' Let''s take it easy today~ do whatever we feel like, nya~ '
+      - ' Sooo~ what kind of fun things will happen today, nya? '
+      - ' Hunting all the time isn''t relaxing, nya. Let''s just soak up some sunshine together~ '
       levelup:
-      - ' Don''t let it leak or it gets hot! '
-      - ' Congrats to everyone. '
-      - ' Do you think it''s bitter? '
-      - ' I''ll give it to you. It''s coming, it''s coming. '
+      - ' You did it, nya! I knew you could get even stronger, nya! '
+      - ' As a gift, I''ll show you my favorite sunbathing spot, nya~ '
+      - ' Just how strong are you planning to get, nya!? You gonna save the whole world, nya!? '
+      - ' Maybe it''s time I show you my true feelings, nya... '
       perfor_1:
-      - ' Continue! Continue! Keep it up! '
-      - ' Come on, don''t run!'
+      - ' Myaw! Myaw! Myamyamyamyamyamyamya~~! '
+      - ' When I see something move, I pounce! Nya! '
       connect:
-      - ' Should I take it out? It''s sharpening control. '
-      - ' So long story short... '
+      - ' You''re late~! How long were you gonna make me wait, nya!? '
+      - ' Before we go anywhere, I wanna eat first, nya! '
     bit_hungry:
       feeding:
-      - ' Hey! Did you hit the blank? '
-      - ' 잘~~~롯왯꼭뾰쁑! 윷~율~♪ 최욱맺 행독한 꼴엔이쁑셍! '
+      - ' Myaa~! I was starving! You sure know what I need, nya! '
+      - ' Yummm~~~! Mmm~♪ This is the happiest time ever, nya! '
       danger:
-      - ' Sleep, sleep, sleep! What a dangerous move!? '
-      - ' Whoa, whoa, this is dangerous... '
+      - ' W-wait wait wait! Isn''t that dangerous, nya!? '
+      - ' Waaah... th-this looks really dangerous, nya... '
       dead:
-      - ' Whoops,... It''s dangerous, it''s terrifying! '
-      - ' Just a little bit, a little bit! '
+      - ' Aaaah... I told you it was dangerous, didn''t I, nya! '
+      - ' You''re pushing too hard! Next time, be careful, okay nya!? '
       stand:
-      - ' My bones are here! '
-      - ' Now! It''s like a fish cake. Mix it up '
-      - ' I saw you at Leaping Gym. I''m here for you. '
+      - ' Let''s take it easy today~ do whatever we feel like, nya~ '
+      - ' Sooo~ what kind of fun things will happen today, nya? '
+      - ' Hunting all the time isn''t relaxing, nya. Let''s just soak up some sunshine together~ '
       levelup:
-      - ' Don''t let it leak or it gets hot! '
-      - ' Congrats to everyone. '
-      - ' Do you think it''s bitter? '
-      - ' I''ll give it to you. It''s coming, it''s coming. '
+      - ' You did it, nya! I knew you could get even stronger, nya! '
+      - ' As a gift, I''ll show you my favorite sunbathing spot, nya~ '
+      - ' Just how strong are you planning to get, nya!? You gonna save the whole world, nya!? '
+      - ' Maybe it''s time I show you my true feelings, nya... '
       perfor_1:
-      - ' Continue! Continue! Keep it up! '
-      - ' Come on, don''t run!'
+      - ' Myaw! Myaw! Myamyamyamyamyamyamya~~! '
+      - ' When I see something move, I pounce! Nya! '
       connect:
-      - ' Should I take it out? It''s sharpening control. '
-      - ' So long story short... '
+      - ' You''re late~! How long were you gonna make me wait, nya!? '
+      - ' Before we go anywhere, I wanna eat first, nya! '
     noting:
       feeding:
-      - ' You''re bad luck has come, isn''t that dumb? '
-      - ' I''m so desperate. I don''t know what to do. Good night! '
+      - ' Meal time is precious, nya! You agree, right? '
+      - ' In my dictionary, there''s no word for ''no thanks''! I''ll eat it all, nya! '
       danger:
-      - ' Sleep, sleep, sleep! What a dangerous move!? '
-      - ' Whoa, whoa, this is dangerous... '
+      - ' W-wait wait wait! Isn''t that dangerous, nya!? '
+      - ' Waaah... th-this looks really dangerous, nya... '
       dead:
-      - ' Whoops,... It''s dangerous, it''s terrifying! '
-      - ' Just a little bit, a little bit! '
+      - ' Aaaah... I told you it was dangerous, didn''t I, nya! '
+      - ' You''re pushing too hard! Next time, be careful, okay nya!? '
       stand:
-      - ' My bones are here! '
-      - ' Now! It''s like a fish cake. Mix it up '
-      - ' I saw you at Leaping Gym. I''m here for you. '
+      - ' Let''s take it easy today~ do whatever we feel like, nya~ '
+      - ' Sooo~ what kind of fun things will happen today, nya? '
+      - ' Hunting all the time isn''t relaxing, nya. Let''s just soak up some sunshine together~ '
       levelup:
-      - ' Don''t let it leak or it gets hot! '
-      - ' Congrats to everyone. '
-      - ' Do you think it''s bitter?'
-      - ' I''ll give it to you. It''s coming, it''s coming. '
+      - ' You did it, nya! I knew you could get even stronger, nya! '
+      - ' As a gift, I''ll show you my favorite sunbathing spot, nya~ '
+      - ' Just how strong are you planning to get, nya!? You gonna save the whole world, nya!?'
+      - ' Maybe it''s time I show you my true feelings, nya... '
       perfor_1:
-      - ' Continue! Continue! Keep it up! '
-      - ' Come on, don''t run!'
+      - ' Myaw! Myaw! Myamyamyamyamyamyamya~~! '
+      - ' When I see something move, I pounce! Nya! '
       connect:
-      - ' Whoops, get up! Crab! '
-      - ' It''s sooo cute! I''m alone, I''m a flower, I''m all alone! '
+      - ' Oh, you''re here! You''re here! I''m all ready to go play, nya! '
+      - ' I''ve been waiting for you, nya! I was sooo bored alone! '
     full:
       feeding:
-      - ' It''s good to see you in the first place! '
-      - ' It''s the perfect way to control your family''s pain. '
+      - ' Tasty~ but I''m getting kinda full, nya! '
+      - ' I think moderation is important in everything, even food, nya... '
       danger:
-      - ' Sleep, sleep, sleep! What a dangerous move!? '
-      - ' Whoa, whoa, this is dangerous... '
+      - ' W-wait wait wait! Isn''t that dangerous, nya!? '
+      - ' Waaah... th-this looks really dangerous, nya... '
       dead:
-      - ' Whoops,... It''s dangerous, it''s terrifying! '
-      - ' Just a little bit, a little bit! '
+      - ' Aaaah... I told you it was dangerous, didn''t I, nya! '
+      - ' You''re pushing too hard! Next time, be careful, okay nya!? '
       stand:
-      - ' My bones are here! '
-      - ' Now! It''s like a fish cake. Mix it up '
-      - ' I saw you at Leaping Gym. I''m here for you. '
+      - ' Let''s take it easy today~ do whatever we feel like, nya~ '
+      - ' Sooo~ what kind of fun things will happen today, nya? '
+      - ' Hunting all the time isn''t relaxing, nya. Let''s just soak up some sunshine together~ '
       levelup:
-      - ' Don''t let it leak or it gets hot! '
-      - ' Congrats to everyone. '
-      - ' Do you think it''s bitter?'
-      - ' I''ll give it to you. It''s coming, it''s coming. '
+      - ' You did it, nya! I knew you could get even stronger, nya! '
+      - ' As a gift, I''ll show you my favorite sunbathing spot, nya~ '
+      - ' Just how strong are you planning to get, nya!? You gonna save the whole world, nya!?'
+      - ' Maybe it''s time I show you my true feelings, nya... '
       perfor_1:
-      - ' Continue! Continue! Keep it up! '
-      - ' Come on, don''t run!'
+      - ' Myaw! Myaw! Myamyamyamyamyamyamya~~! '
+      - ' When I see something move, I pounce! Nya! '
       connect:
-      - ' Whoops, get up! Crab! '
-      - ' It''s sooo cute! I''m alone, I''m a flower, I''m all alone! '
+      - ' Oh, you''re here! You''re here! I''m all ready to go play, nya! '
+      - ' I''ve been waiting for you, nya! I was sooo bored alone! '
     so_full:
       feeding:
-      - ' It''s full of energy. '
-      - ' Damn. It''s a mess. Yup, it''s a mess. '
+      - ' Uuugh... n-no more... I''m stuffed, nya... '
+      - ' You... should learn what ''portion control'' means, nya. '
       danger:
-      - ' Sleep, sleep, sleep! What a dangerous move!? '
-      - ' Whoa, whoa, this is dangerous... '
+      - ' W-wait wait wait! Isn''t that dangerous, nya!? '
+      - ' Waaah... th-this looks really dangerous, nya... '
       dead:
-      - ' Whoops,... It''s dangerous, it''s terrifying! '
-      - ' Just a little bit, a little bit! '
+      - ' Aaaah... I told you it was dangerous, didn''t I, nya! '
+      - ' You''re pushing too hard! Next time, be careful, okay nya!? '
       stand:
-      - ' My bones are here! '
-      - ' Now! It''s like a fish cake. Mix it up '
-      - ' I saw you at Leaping Gym. I''m here for you. '
+      - ' Let''s take it easy today~ do whatever we feel like, nya~ '
+      - ' Sooo~ what kind of fun things will happen today, nya? '
+      - ' Hunting all the time isn''t relaxing, nya. Let''s just soak up some sunshine together~ '
       levelup:
-      - ' Don''t let it leak or it gets hot! '
-      - ' Congrats to everyone. '
-      - ' Do you think it''s bitter?'
-      - ' I''ll give it to you. It''s coming, it''s coming. '
+      - ' You did it, nya! I knew you could get even stronger, nya! '
+      - ' As a gift, I''ll show you my favorite sunbathing spot, nya~ '
+      - ' Just how strong are you planning to get, nya!? You gonna save the whole world, nya!?'
+      - ' Maybe it''s time I show you my true feelings, nya... '
       perfor_1:
-      - ' Continue! Continue! Keep it up! '
-      - ' Come on, don''t run!'
+      - ' Myaw! Myaw! Myamyamyamyamyamyamya~~! '
+      - ' When I see something move, I pounce! Nya! '
       connect:
-      - ' Whoops, get up! Crab! '
-      - ' It''s sooo cute! I''m alone, I''m a flower, I''m all alone! '
+      - ' Oh, you''re here! You''re here! I''m all ready to go play, nya! '
+      - ' I''ve been waiting for you, nya! I was sooo bored alone! '
   CWHITEKNIGHT:
     hungry:
       feeding:
       - '...'
       danger:
-      - ²A¿￡AI..±ø...≫U..
+      - There's.. no time..
       dead:
-      - °ⓒ¾a¾iAoAI¿¡..
+      - Is this it..
       stand:
-      - A¶A·..A·...
+      - Ugh...
       levelup:
       - '...'
       perfor_1:
-      - AI¿U..¼´±ß..CI≫Aº￥..
+      - I have to win..
       perfor_2:
-      - ²E°￢ ³OA·¸I..
+      - Into the abyss..
       perfor_3:
-      - ¶¿¸?³­¹o!!
+      - Back off!!
     bit_hungry:
       feeding:
-      - A·...
+      - Uh...
       danger:
-      - ²A¿￡AI..±ø...≫U..
+      - There's.. no time..
       dead:
-      - °ⓒ¾a¾iAoAI¿¡..
+      - Is this it..
       stand:
-      - A¶A·..A·...
+      - Ugh...
       levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
+      - To that extent, that's enough for you..
       perfor_1:
-      - AI¿U..¼´±ß..CI≫Aº￥..
+      - I have to win..
       perfor_2:
-      - ²E°￢ ³OA·¸I..
+      - Into the abyss..
       perfor_3:
-      - ¶¿¸?³­¹o!!
+      - Back off!!
     noting:
       feeding:
-      - A·...
+      - Uh...
       danger:
-      - ²A¿￡AI..±ø...≫U..
+      - There's.. no time..
       dead:
-      - °ⓒ¾a¾iAoAI¿¡..
+      - Is this it..
       stand:
-      - A¶A·..A·...
-      - '¾³..μ¶..CØ³¾.... '
+      - Ugh...
+      - 'Oyster..Pufferfish..Seafood... '
       levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
+      - To that extent, that's enough for you..
       perfor_1:
-      - AI¿U..¼´±ß..CI≫Aº￥..
+      - I have to win..
       perfor_2:
-      - ²E°￢ ³OA·¸I..
+      - Into the abyss..
       perfor_3:
-      - ¶¿¸?³­¹o!!
+      - Back off!!
     full:
       feeding:
       - '...'
       danger:
-      - ≫o..≫o...AI..´o....
-      - ²A¿￡AI..±ø...≫U..
+      - More..More..More..
+      - There's.. no time..
       dead:
-      - °ⓒ¾a¾iAoAI¿¡..
+      - Is this it..
       stand:
-      - '¾³..μ¶..CØ³¾.... '
-      - ±EºA..CIAo··...
-      - ºI¸Æ≫U.....
+      - 'Oyster..Pufferfish..Seafood.... '
+      - No..but...
+      - I'm scared.....
       levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
-      - ¾Øμ¶CØ¼± ³o AO¿UAo...
+      - To that extent, that's enough for you..
+      - I think I can overcome it...
       perfor_1:
-      - AI¿U..¼´±ß..CI≫Aº￥..
+      - I have to win..
       perfor_2:
-      - ²E°￢ ³OA·¸I..
+      - Into the abyss..
       perfor_3:
-      - ¶¿¸?³­¹o!!
+      - Back off!!
     so_full:
       feeding:
       - '...'
       danger:
-      - ≫o..≫o...AI..´o....
-      - ²A¿￡AI..±ø...≫U..
+      - More..More..More..
+      - There's.. no time..
       dead:
-      - °ⓒ¾a¾iAoAI¿¡..
+      - Is this it..
       stand:
-      - '¾³..μ¶..CØ³¾.... '
-      - ±EºA..CIAo··...
-      - ºI¸Æ≫U.....
+      - 'Oyster..Pufferfish..Seafood.... '
+      - No..but...
+      - I'm scared.....
       levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
-      - ¾Øμ¶CØ¼± ³o AO¿UAo...
+      - To that extent, that's enough for you..
+      - I think I can overcome it...
       perfor_1:
-      - AI¿U..¼´±ß..CI≫Aº￥..
+      - I have to win..
       perfor_2:
-      - ²E°￢ ³OA·¸I..
+      - Into the abyss..
       perfor_3:
-      - ¶¿¸?³­¹o!!
+      - Back off!!
   KNIGHT_OF_ABYSS2:
     hungry:
       feeding:
       - Ei...
-      danger:
-      - ¿æ¿￠°¡ ≫ÞCß¾μ...
-      dead:
-      - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
-      stand:
-      - AØ±u¾μ..
+      # danger:
+      # - ¿æ¿￠°¡ ≫ÞCß¾μ...
+      # dead:
+      # - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
+      # stand:
+      # - AØ±u¾μ..
       levelup:
       - '...'
-      perfor_1:
-      - μnAN¹o!
-      perfor_2:
-      - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
-      perfor_3:
-      - ¶¿¸?³­¹o!!
-    bit_hungry:
-      feeding:
-      - A²...
-      danger:
-      - ¿æ¿￠°¡ ≫ÞCß¾μ...
-      dead:
-      - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
-      stand:
-      - ²²²² ²A¿￡AI ºC±u≫U.
-      levelup:
-      - ≫o.. ¿­CN EuA´
-      perfor_1:
-      - μnAN¹o!
-      perfor_2:
-      - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
-      perfor_3:
-      - ¶¿¸?³­¹o!!
-    noting:
-      feeding:
-      - A·A²...
-      danger:
-      - ¿æ¿￠°¡ ≫ÞCß¾μ...
-      dead:
-      - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
-      stand:
-      - ²²²² ¹§¿¡ °A≫U.
-      - '²E°￢AC ¿æ¿e°¡³­..¼­.. '
-      levelup:
-      - ≫o.. ¿­CN EuA´
-      perfor_1:
-      - μnAN¹o!
-      perfor_2:
-      - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
-      perfor_3:
-      - ¶¿¸?³­¹o!!
+      # perfor_1:
+      # - μnAN¹o!
+      # perfor_2:
+      # - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
+      # perfor_3:
+      # - ¶¿¸?³­¹o!!
+    # bit_hungry:
+      # feeding:
+      # - A²...
+      # danger:
+      # - ¿æ¿￠°¡ ≫ÞCß¾μ...
+      # dead:
+      # - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
+      # stand:
+      # - ²²²² ²A¿￡AI ºC±u≫U.
+      # levelup:
+      # - ≫o.. ¿­CN EuA´
+      # perfor_1:
+      # - μnAN¹o!
+      # perfor_2:
+      # - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
+      # perfor_3:
+      # - ¶¿¸?³­¹o!!
+    # noting:
+      # feeding:
+      # - A·A²...
+      # danger:
+      # - ¿æ¿￠°¡ ≫ÞCß¾μ...
+      # dead:
+      # - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
+      # stand:
+      # - ²²²² ¹§¿¡ °A≫U.
+      # - '²E°￢AC ¿æ¿e°¡³­..¼­.. '
+      # levelup:
+      # - ≫o.. ¿­CN EuA´
+      # perfor_1:
+      # - μnAN¹o!
+      # perfor_2:
+      # - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
+      # perfor_3:
+      # - ¶¿¸?³­¹o!!
     full:
       feeding:
       - '...'
-      danger:
-      - ¾×≫eAC ·iºº AIA¨..
-      - ¿æ¿￠°¡ ≫ÞCß¾μ...
-      dead:
-      - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
-      stand:
-      - '²E°￢AC ¿æ¿e°¡³­..¼­.. '
-      - ·A³¼AI¿i ·´±O≫U..
-      - ²E°￢AC ¿øÆ÷°¡ ¾³μ¶CI¿i ·´±O≫U.
-      levelup:
-      - ≫o.. ¿­CN EuA´
-      - ¾×≫e¹o·e.. AæμÐE÷..
-      perfor_1:
-      - μnAN¹o!
-      perfor_2:
-      - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
-      perfor_3:
-      - ¶¿¸?³­¹o!!
+      # danger:
+      # - ¾×≫eAC ·iºº AIA¨..
+      # - ¿æ¿￠°¡ ≫ÞCß¾μ...
+      # dead:
+      # - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
+      # stand:
+      # - '²E°￢AC ¿æ¿e°¡³­..¼­.. '
+      # - ·A³¼AI¿i ·´±O≫U..
+      # - ²E°￢AC ¿øÆ÷°¡ ¾³μ¶CI¿i ·´±O≫U.
+      # levelup:
+      # - ≫o.. ¿­CN EuA´
+      # - ¾×≫e¹o·e.. AæμÐE÷..
+      # perfor_1:
+      # - μnAN¹o!
+      # perfor_2:
+      # - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
+      # perfor_3:
+      # - ¶¿¸?³­¹o!!
     so_full:
       feeding:
       - '...'
-      danger:
-      - ¾×≫eAC ·iºº AIA¨..
-      - ¿æ¿￠°¡ ≫ÞCß¾μ...
-      dead:
-      - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
-      stand:
-      - ²E°￢AC ¿æ¿e°¡³­..¼­..
-      - ·A³¼AI¿i ·´±O≫U..
-      - ²E°￢AC ¿øÆ÷°¡ ¾³μ¶CI¿i ·´±O≫U.
-      levelup:
-      - ≫o.. ¿­CN EuA´
-      - ¾×≫e¹o·e.. AæμÐE÷..
-      perfor_1:
-      - μnAN¹o!
-      perfor_2:
-      - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
-      perfor_3:
-      - ¶¿¸?³­¹o!!
+      # danger:
+      # - ¾×≫eAC ·iºº AIA¨..
+      # - ¿æ¿￠°¡ ≫ÞCß¾μ...
+      # dead:
+      # - AIA| ¾×·· ²E°￢ ³O°¡ Aaºa²A¿O
+      # stand:
+      # - ²E°￢AC ¿æ¿e°¡³­..¼­..
+      # - ·A³¼AI¿i ·´±O≫U..
+      # - ²E°￢AC ¿øÆ÷°¡ ¾³μ¶CI¿i ·´±O≫U.
+      # levelup:
+      # - ≫o.. ¿­CN EuA´
+      # - ¾×≫e¹o·e.. AæμÐE÷..
+      # perfor_1:
+      # - μnAN¹o!
+      # perfor_2:
+      # - ²E°￢AC AIAa..°¡³­ CØ¶æA´..
+      # perfor_3:
+      # - ¶¿¸?³­¹o!!
   GH_WHITEKNIGHT:
     hungry:
-      feeding:
-      - ≫E±i¶o¸E¾μ!
-      danger:
-      - A¹²ECI²A¿O!!
-      dead:
-      - AoA¿Ao ·øCØ ¶I±ECI¼×..
-      stand:
-      - '...AaAaCI¾μ'
+      # feeding:
+      # - ≫E±i¶o¸E¾μ!
+      # danger:
+      # - A¹²ECI²A¿O!!
+      # dead:
+      # - AoA¿Ao ·øCØ ¶I±ECI¼×..
+      # stand:
+      # - '...AaAaCI¾μ'
       levelup:
       - '...'
-      perfor_1:
-      - ·ØAß±i¹o!
-      perfor_2:
-      - ¶e´o ¾a´c≫UAC ¾aAo!!
-      perfor_3:
-      - AoAN¼´·®¹o!!
-    bit_hungry:
-      feeding:
-      - ºu AA¾μ!
-      danger:
-      - A¹²ECI²A¿O!!
-      dead:
-      - AoA¿Ao ·øCØ ¶I±ECI¼×..
-      stand:
-      - '...AaAaCI¾μ'
-      levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
-      perfor_1:
-      - ·ØAß±i¹o!
-      perfor_2:
-      - ¶e´o ¾a´c≫UAC ¾aAo!!
-      perfor_3:
-      - AoAN¼´·®¹o!!
-    noting:
-      feeding:
-      - ºu AA¾μ!
-      danger:
-      - A¹²ECI²A¿O!!
-      dead:
-      - AoA¿Ao ·øCØ ¶I±ECI¼×..
-      stand:
-      - ²E°￢ ³O°¡³­ Ci·ÞAI ¹§.. μ·±O¼×
-      - ≫U CI¼ªAC ·I±aA´!
-      levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
-      perfor_1:
-      - ·ØAß±i¹o!
-      perfor_2:
-      - ¶e´o ¾a´c≫UAC ¾aAo!!
-      perfor_3:
-      - AoAN¼´·®¹o!!
+      # perfor_1:
+      # - ·ØAß±i¹o!
+      # perfor_2:
+      # - ¶e´o ¾a´c≫UAC ¾aAo!!
+      # perfor_3:
+      # - AoAN¼´·®¹o!!
+    # bit_hungry:
+      # feeding:
+      # - ºu AA¾μ!
+      # danger:
+      # - A¹²ECI²A¿O!!
+      # dead:
+      # - AoA¿Ao ·øCØ ¶I±ECI¼×..
+      # stand:
+      # - '...AaAaCI¾μ'
+      # levelup:
+      # - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
+      # perfor_1:
+      # - ·ØAß±i¹o!
+      # perfor_2:
+      # - ¶e´o ¾a´c≫UAC ¾aAo!!
+      # perfor_3:
+      # - AoAN¼´·®¹o!!
+    # noting:
+      # feeding:
+      # - ºu AA¾μ!
+      # danger:
+      # - A¹²ECI²A¿O!!
+      # dead:
+      # - AoA¿Ao ·øCØ ¶I±ECI¼×..
+      # stand:
+      # - ²E°￢ ³O°¡³­ Ci·ÞAI ¹§.. μ·±O¼×
+      # - ≫U CI¼ªAC ·I±aA´!
+      # levelup:
+      # - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
+      # perfor_1:
+      # - ·ØAß±i¹o!
+      # perfor_2:
+      # - ¶e´o ¾a´c≫UAC ¾aAo!!
+      # perfor_3:
+      # - AoAN¼´·®¹o!!
     full:
       feeding:
       - '...'
-      danger:
-      - A¹²ECI²A¿O !!
-      - A§CeCI¼×!!!
-      dead:
-      - AoA¿Ao ·øCØ ¶I±ECI¼×..
-      stand:
-      - ²E°￢ ³O°¡³­ Ci·ÞAI ¹§.. μ·±O¼×
-      - ≫U CI¼ªAC ·I±aA´!
-      - AoAN¼´¿U≫U≫A ¾× ·I±a..
-      levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
-      - ¾Øμ¶CØ¼± ³o AO¿U¾μ!
-      perfor_1:
-      - ·ØAß±i¹o!
-      perfor_2:
-      - ¶e´o ¾a´c≫UAC ¾aAo!!
-      perfor_3:
-      - AoAN¼´·®¹o!!
+      # danger:
+      # - A¹²ECI²A¿O !!
+      # - A§CeCI¼×!!!
+      # dead:
+      # - AoA¿Ao ·øCØ ¶I±ECI¼×..
+      # stand:
+      # - ²E°￢ ³O°¡³­ Ci·ÞAI ¹§.. μ·±O¼×
+      # - ≫U CI¼ªAC ·I±aA´!
+      # - AoAN¼´¿U≫U≫A ¾× ·I±a..
+      # levelup:
+      # - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
+      # - ¾Øμ¶CØ¼± ³o AO¿U¾μ!
+      # perfor_1:
+      # - ·ØAß±i¹o!
+      # perfor_2:
+      # - ¶e´o ¾a´c≫UAC ¾aAo!!
+      # perfor_3:
+      # - AoAN¼´·®¹o!!
     so_full:
       feeding:
       - '...'
-      danger:
-      - A¹²ECI²A¿O!!
-      - A§CeCI¼×!!!
-      dead:
-      - °ⓒ¾a¾iAoAI¿¡..
-      stand:
-      - ²E°￢ ³O°¡³­ Ci·ÞAI ¹§.. μ·±O¼×
-      - ≫U CI¼ªAC ·I±aA´!
-      - AoAN¼´¿U≫U≫A ¾× ·I±a..
-      - ¾×¿IAI ¼? ²E°￢AC ¿æ¿e°¡³­ ¶þ±i¼ª¿O CØAO±uAo
-      levelup:
-      - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
-      - ¾Øμ¶CØ¼± ³o AO¿U¾μ!
-      perfor_1:
-      - ·ØAß±i¹o!
-      perfor_2:
-      - ¶e´o ¾a´c≫UAC ¾aAo!!
-      perfor_3:
-      - AoAN¼´·®¹o!!
-  EDDGA3:
-    hungry:
-      feeding:
-      - EA..≫E±u≫U!! AI≫®±Æ!
-      danger:
-      - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
-      dead:
-      - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
-      stand:
-      - '...¶a´o A´ ¼´°IμA¹o AI≫®±Æ~'
-      levelup:
-      - ±iAÞ¾··®~?
-      perfor_1:
-      - (´oAU!!?!! AI¿C ·øAuAo!)
-      perfor_2:
-      - °§Cð! AⓒEi! Ei!!
-      perfor_3:
-      - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
-    bit_hungry:
-      feeding:
-      - ºu ·AAc ≫e¸ECß¾···~
-      danger:
-      - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
-      dead:
-      - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
-      stand:
-      - '...¶a´o ¼´°I¹o AI≫®±Æ~'
-      levelup:
-      - ±iAIAi~ °a≫®AI A´ AÆ¼×?
-      perfor_1:
-      - (´oAU!!?!! AI¿C ·øAuAo!)
-      perfor_2:
-      - °§Cð! AⓒEi! Ei!!
-      perfor_3:
-      - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
-    noting:
-      feeding:
-      - ºu ·AAc ≫e¸ECß¾···~
-      danger:
-      - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
-      dead:
-      - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
-      stand:
-      - ¿A~ E￡¸ⓒAI ≫a¶eCC≫ø ²AAy°￡ ·´AI±ß~
-      - ¾× ²AAyAI Ao¾YAI¿¡?
-      levelup:
-      - ±iAIAi~ °a≫®AI A´ AÆ¼×?
-      perfor_1:
-      - (´oAU!!?!! AI¿C ·øAuAo!)
-      perfor_2:
-      - °§Cð! AⓒEi! Ei!!
-      perfor_3:
-      - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
-    full:
-      feeding:
-      - ºÆ≫U! AI≫®±Æ!!
-      danger:
-      - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
-      dead:
-      - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
-      stand:
-      - ¿A~ E￡¸ⓒAI ≫a¶eCC≫ø ²AAy°￡ ·´AI±ß~
-      - ¾× ²AAyAI Ao¾YAI¿¡?
-      - EA..±ÆAI¾· Ca·® A´ ºIºe¿U μA¹o
-      levelup:
-      - ±iAIAi~ °a≫®AI A´ AÆ¼×?
-      perfor_1:
-      - (´oAU!!?!! AI¿C ·øAuAo!)
-      perfor_2:
-      - °§Cð! AⓒEi! Ei!!
-      perfor_3:
-      - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
-    so_full:
-      feeding:
-      - ºÆ≫U! AI≫®±Æ!!
-      danger:
-      - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
-      dead:
-      - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
-      stand:
-      - ¿A~ E￡¸ⓒAI ≫a¶eCC≫ø ²AAy°￡ ·´AI±ß~
-      - ¾× ²AAyAI Ao¾YAI¿¡?
-      - EA..±ÆAI¾· Ca·® A´ ºIºe¿U μA¹o
-      levelup:
-      - ±iAIAi~ °a≫®AI A´ AÆ¼×?
-      perfor_1:
-      - (´oAU!!?!! AI¿C ·øAuAo!)
-      perfor_2:
-      - °§Cð! AⓒEi! Ei!!
-      perfor_3:
-      - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
+      # danger:
+      # - A¹²ECI²A¿O!!
+      # - A§CeCI¼×!!!
+      # dead:
+      # - °ⓒ¾a¾iAoAI¿¡..
+      # stand:
+      # - ²E°￢ ³O°¡³­ Ci·ÞAI ¹§.. μ·±O¼×
+      # - ≫U CI¼ªAC ·I±aA´!
+      # - AoAN¼´¿U≫U≫A ¾× ·I±a..
+      # - ¾×¿IAI ¼? ²E°￢AC ¿æ¿e°¡³­ ¶þ±i¼ª¿O CØAO±uAo
+      # levelup:
+      # - ¾× A¤ºº¹o·e ¾×≫i AæμÐE÷..
+      # - ¾Øμ¶CØ¼± ³o AO¿U¾μ!
+      # perfor_1:
+      # - ·ØAß±i¹o!
+      # perfor_2:
+      # - ¶e´o ¾a´c≫UAC ¾aAo!!
+      # perfor_3:
+      # - AoAN¼´·®¹o!!
+  # EDDGA3:
+    # hungry:
+      # feeding:
+      # - EA..≫E±u≫U!! AI≫®±Æ!
+      # danger:
+      # - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
+      # dead:
+      # - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
+      # stand:
+      # - '...¶a´o A´ ¼´°IμA¹o AI≫®±Æ~'
+      # levelup:
+      # - ±iAÞ¾··®~?
+      # perfor_1:
+      # - (´oAU!!?!! AI¿C ·øAuAo!)
+      # perfor_2:
+      # - °§Cð! AⓒEi! Ei!!
+      # perfor_3:
+      # - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
+    # bit_hungry:
+      # feeding:
+      # - ºu ·AAc ≫e¸ECß¾···~
+      # danger:
+      # - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
+      # dead:
+      # - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
+      # stand:
+      # - '...¶a´o ¼´°I¹o AI≫®±Æ~'
+      # levelup:
+      # - ±iAIAi~ °a≫®AI A´ AÆ¼×?
+      # perfor_1:
+      # - (´oAU!!?!! AI¿C ·øAuAo!)
+      # perfor_2:
+      # - °§Cð! AⓒEi! Ei!!
+      # perfor_3:
+      # - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
+    # noting:
+      # feeding:
+      # - ºu ·AAc ≫e¸ECß¾···~
+      # danger:
+      # - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
+      # dead:
+      # - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
+      # stand:
+      # - ¿A~ E￡¸ⓒAI ≫a¶eCC≫ø ²AAy°￡ ·´AI±ß~
+      # - ¾× ²AAyAI Ao¾YAI¿¡?
+      # levelup:
+      # - ±iAIAi~ °a≫®AI A´ AÆ¼×?
+      # perfor_1:
+      # - (´oAU!!?!! AI¿C ·øAuAo!)
+      # perfor_2:
+      # - °§Cð! AⓒEi! Ei!!
+      # perfor_3:
+      # - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
+    # full:
+      # feeding:
+      # - ºÆ≫U! AI≫®±Æ!!
+      # danger:
+      # - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
+      # dead:
+      # - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
+      # stand:
+      # - ¿A~ E￡¸ⓒAI ≫a¶eCC≫ø ²AAy°￡ ·´AI±ß~
+      # - ¾× ²AAyAI Ao¾YAI¿¡?
+      # - EA..±ÆAI¾· Ca·® A´ ºIºe¿U μA¹o
+      # levelup:
+      # - ±iAIAi~ °a≫®AI A´ AÆ¼×?
+      # perfor_1:
+      # - (´oAU!!?!! AI¿C ·øAuAo!)
+      # perfor_2:
+      # - °§Cð! AⓒEi! Ei!!
+      # perfor_3:
+      # - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
+    # so_full:
+      # feeding:
+      # - ºÆ≫U! AI≫®±Æ!!
+      # danger:
+      # - A§CeCI≫U °a≫®±Æ! Æ￠¹o!
+      # dead:
+      # - A·AI¾·~~ E￡¹u·´AU¿¿Aμ ≫®±Æ~
+      # stand:
+      # - ¿A~ E￡¸ⓒAI ≫a¶eCC≫ø ²AAy°￡ ·´AI±ß~
+      # - ¾× ²AAyAI Ao¾YAI¿¡?
+      # - EA..±ÆAI¾· Ca·® A´ ºIºe¿U μA¹o
+      # levelup:
+      # - ±iAIAi~ °a≫®AI A´ AÆ¼×?
+      # perfor_1:
+      # - (´oAU!!?!! AI¿C ·øAuAo!)
+      # perfor_2:
+      # - °§Cð! AⓒEi! Ei!!
+      # perfor_3:
+      # - zZzZzz (¾×·￡¸¸ ¾×·￡¸¸)
   LARVA_VIOLET:
     hungry:
-      feeding:
-      - ~~￠U
+      # feeding:
+      # - ~~￠U
       danger:
       - '!!!'
       dead:
@@ -8418,8 +8427,8 @@ species:
       perfor_3:
       - '?'
     bit_hungry:
-      feeding:
-      - ~~￠U
+      # feeding:
+      # - ~~￠U
       danger:
       - '!!!'
       dead:
@@ -8435,8 +8444,8 @@ species:
       perfor_3:
       - '?'
     noting:
-      feeding:
-      - ~~￠U
+      # feeding:
+      # - ~~￠U
       danger:
       - '!!!'
       dead:
@@ -8454,8 +8463,8 @@ species:
       perfor_3:
       - '?'
     full:
-      feeding:
-      - ~~￠U
+      # feeding:
+      # - ~~￠U
       danger:
       - '!!!'
       dead:
@@ -8473,8 +8482,8 @@ species:
       perfor_3:
       - '?'
     so_full:
-      feeding:
-      - ~~￠U
+      # feeding:
+      # - ~~￠U
       danger:
       - '!!!'
       dead:
@@ -8493,30 +8502,30 @@ species:
       - '?'
   ep20_copo:
     hungry:
-      feeding:
-      - ~~￠U￠Y
+      # feeding:
+      # - ~~￠U￠Y
       danger:
       - ?!
       dead:
       - '!!!'
-      stand:
-      - '...(¤I-¤I)'
+      # stand:
+      # - '...(¤I-¤I)'
       levelup:
       - (o-o)!!
     bit_hungry:
-      feeding:
-      - ~~￠U￠Y
+      # feeding:
+      # - ~~￠U￠Y
       danger:
       - ?!
       dead:
       - '!!!'
-      stand:
-      - '...(¤I-¤I)'
+      # stand:
+      # - '...(¤I-¤I)'
       levelup:
       - (o-o)!!
     noting:
-      feeding:
-      - ~~￠U
+      # feeding:
+      # - ~~￠U
       danger:
       - ?!
       dead:
@@ -8539,12 +8548,12 @@ species:
       levelup:
       - (^-^)!!
     so_full:
-      feeding:
-      - '...(¤Ð-¤Ð)'
+      # feeding:
+      # - '...(¤Ð-¤Ð)'
       danger:
       - ?!
-      dead:
-      - (¤Ð-¤Ð)!!
+      # dead:
+      # - (¤Ð-¤Ð)!!
       stand:
       - ~(o-o  )~
       - ~(  o-o)~
@@ -8553,1307 +8562,1336 @@ species:
   ep20_icewind1:
     hungry:
       feeding:
-      - ·AAO¾μ!
+      - Tasty!
       danger:
-      - ºº°oAI CE°aCI¼×!!
+      - I need help!!
       dead:
-      - ±Æ...
+      - Ah...
       stand:
-      - ·OAI¿¡ ·O¿i²I¾μ...
+      - I want to eat prey...
       levelup:
-      - AA¾···!
+      - Not bad!
     bit_hungry:
       feeding:
-      - ·AAO¾μ!
+      - Tasty!
       danger:
-      - ºº°oAI CE°aCI¼×!!
+      - I need help!!
       dead:
-      - ±Æ...
+      - Ah...
       stand:
-      - ·OAI¿¡ ·O¿i²I¾μ...
+      - I want to eat prey...
       levelup:
-      - AA¾···!
+      - Not bad!
     noting:
       feeding:
-      - AA³O!
+      - Good!
       danger:
-      - ºº°oAI CE°aCI¼×!!
+      - I need help!!
       dead:
-      - ±Æ...
+      - Ah...
       stand:
-      - ¶U¹÷AI A÷¾μ
-      - ¾×·￡·￡·￡·￡...
+      - The wind is cold
+      - Grrrrrr...
       levelup:
-      - ¿¨º°AI³³
+      - Very touching
     full:
       feeding:
       - '...'
       danger:
-      - A¹²ECI²A¿O !!
-      - A§CeCI¼×!!!
+      - Be careful!!
+      - It's dangerous!!!
       dead:
-      - ºº°oAI ·øºC±i ¶I±ECI¼×..
+      - Sorry I couldn't be of help..
       stand:
-      - ¶U¹÷AI A÷¾μ
-      - ¾×·￡·￡·￡·￡...
+      - The wind is cold
+      - Grrrrrr...
       levelup:
-      - ·UAo¾···!
-      - ¿¨º°AI³³
+      - Impressive!
+      - Very touching
     so_full:
       feeding:
-      - ¾×··CI²A¿O !!
+      - That's enough!!
       danger:
-      - A¹²ECI²A¿O !!
-      - A§CeCI¼×!!!
+      - Be careful!!
+      - It's dangerous!!!
       dead:
-      - ºº°oAI ·øºC±i ¶I±ECI¼×..
+      - Sorry I couldn't be of help..
       stand:
-      - ¶U¹÷AI A÷¾μ
-      - ¾×·￡·￡·￡·￡...
+      - The wind is cold
+      - Grrrrrr...
       levelup:
-      - ·UAo¾···!
-      - ¿¨º°AI³³
+      - Impressive!
+      - Very touching
   ep20_icewind2:
     hungry:
       feeding:
-      - ·AAO¼×°a...
+      - It's delicious...
       danger:
-      - ºº°oAI CE°aCN¿¡°a?
+      - Do you need help?
       dead:
-      - Eu¼´°a..
+      - Stay strong..
       stand:
-      - Ei...
+      - Hmm...
       levelup:
-      - AaCICØ°a!
+      - Congratulations!
     bit_hungry:
       feeding:
-      - ·AAO¼×°a...
+      - It's delicious...
       danger:
-      - ºº°oAI CE°aCN¿¡°a?
+      - Do you need help?
       dead:
-      - Eu¼´°a..
+      - Stay strong..
       stand:
-      - Ei...
+      - Hmm...
       levelup:
-      - AaCICØ°a!
+      - Congratulations!
     noting:
       feeding:
-      - AA±Æ°a
+      - Good
       danger:
-      - ºº°oAI CE°aCN¿¡°a?
+      - Do you need help?
       dead:
-      - Eu¼´°a..
+      - Stay strong..
       stand:
-      - ¾eAÐ A¤·®¿¡ CE°aCØ°a
-      - Ea±Æ±I
+      - I need to tidy my feathers
+      - Yawn
       levelup:
-      - AaCICØ°a!
+      - Congratulations!
     full:
       feeding:
       - '...'
       danger:
-      - ºº°oAI CE°aCN¿¡°a?
-      - ±i³­ ºº·A¿¡°a!
+      - Do you need help?
+      - Run away quickly!
       dead:
-      - A|¿¡ AoANºa·®Ao ·øCß¼×°a..
+      - I couldn't protect you..
       stand:
-      - ¾eAÐ A¤·®¿¡ CE°aCØ°a
-      - Ea±Æ±I
+      - I need to tidy my feathers
+      - Yawn
       levelup:
-      - AaCICØ°a!
-      - ·UA®°a!
+      - Congratulations!
+      - Awesome!
     so_full:
       feeding:
-      - ¾≪¸O¼×°a...
+      - It's painful...
       danger:
-      - ºº°oAI CE°aCN¿¡°a?
-      - ±i³­ ºº·A¿¡°a!
+      - Do you need help?
+      - Run away quickly!
       dead:
-      - Aª..
+      - Ugh..
       stand:
-      - ¾eAÐ A¤·®¿¡ CE°aCØ°a
-      - Ea±Æ±I
+      - I need to tidy my feathers
+      - Yawn
       levelup:
-      - ³μAaCI≫A ·ð²A μ·¾a AA±Æ°a
-      - ·UA®°a!
-  DARK_LORD2:
-    hungry:
-      feeding:
-      - AO¿i¹o CO ³ø ±øAo·· ·OA´··Aμ CI¾μ.
-      danger:
-      - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
-      dead:
-      - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
-      stand:
-      - ¿C¶æAo¾μ¡|
-      levelup:
-      - Ei¡|(±±-AI)
-      perfor_1:
-      - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
-      perfor_2:
-      - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
-      perfor_3:
-      - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
-    bit_hungry:
-      feeding:
-      - AO¿i¹o CO ³ø ±øAo·· ·OA´··Aμ CI¾μ.
-      danger:
-      - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
-      dead:
-      - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
-      stand:
-      - ¿C¶æAo¾μ¡|
-      levelup:
-      - Ei¡|(±±-AI)
-      perfor_1:
-      - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
-      perfor_2:
-      - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
-      perfor_3:
-      - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
-    noting:
-      feeding:
-      - AO¿i¹o CO ³ø ±øAo·· ·OA´··Aμ CI¾μ.
-      danger:
-      - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
-      dead:
-      - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
-      stand:
-      - AøA¤CN ±iºO ³O°¡³­ ¼´¿¡ °O¼e¹o.
-      - ¶aμ·≫U ≫o A￡Aμ.. ±IEæAC E￥º¸ ¾×·®¿i ÆA·e..
-      levelup:
-      - Ei¡|(±±-AI)
-      perfor_1:
-      - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
-      perfor_2:
-      - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
-      perfor_3:
-      - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
-    full:
-      feeding:
-      - ¾×-··
-      danger:
-      - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
-      dead:
-      - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
-      stand:
-      - AøA¤CN ±iºO ³O°¡³­ ¼´¿¡ °O¼e¹o.
-      - ¶aμ·≫U ≫o A￡Aμ.. ±IEæAC E￥º¸ ¾×·®¿i ÆA·e..
-      levelup:
-      - Ei¡|(±±-AI)
-      perfor_1:
-      - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
-      perfor_2:
-      - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
-      perfor_3:
-      - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
-    so_full:
-      feeding:
-      - ¾×-··
-      danger:
-      - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
-      dead:
-      - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
-      stand:
-      - AøA¤CN ±iºO ³O°¡³­ ¼´¿¡ °O¼e¹o.
-      - ¶aμ·≫U ≫o A￡Aμ.. ±IEæAC E￥º¸ ¾×·®¿i ÆA·e..
-      levelup:
-      - Ei¡|(±±-AI)
-      perfor_1:
-      - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
-      perfor_2:
-      - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
-      perfor_3:
-      - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
+      - It's nice to see you grow
+      - Awesome!
+  # DARK_LORD2:
+    # hungry:
+      # feeding:
+      # - AO¿i¹o CO ³ø ±øAo·· ·OA´··Aμ CI¾μ.
+      # danger:
+      # - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
+      # dead:
+      # - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
+      # stand:
+      # - ¿C¶æAo¾μ¡|
+      # levelup:
+      # - Ei¡|(±±-AI)
+      # perfor_1:
+      # - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
+      # perfor_2:
+      # - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
+      # perfor_3:
+      # - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
+    # bit_hungry:
+      # feeding:
+      # - AO¿i¹o CO ³ø ±øAo·· ·OA´··Aμ CI¾μ.
+      # danger:
+      # - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
+      # dead:
+      # - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
+      # stand:
+      # - ¿C¶æAo¾μ¡|
+      # levelup:
+      # - Ei¡|(±±-AI)
+      # perfor_1:
+      # - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
+      # perfor_2:
+      # - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
+      # perfor_3:
+      # - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
+    # noting:
+      # feeding:
+      # - AO¿i¹o CO ³ø ±øAo·· ·OA´··Aμ CI¾μ.
+      # danger:
+      # - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
+      # dead:
+      # - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
+      # stand:
+      # - AøA¤CN ±iºO ³O°¡³­ ¼´¿¡ °O¼e¹o.
+      # - ¶aμ·≫U ≫o A￡Aμ.. ±IEæAC E￥º¸ ¾×·®¿i ÆA·e..
+      # levelup:
+      # - Ei¡|(±±-AI)
+      # perfor_1:
+      # - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
+      # perfor_2:
+      # - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
+      # perfor_3:
+      # - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
+    # full:
+      # feeding:
+      # - ¾×-··
+      # danger:
+      # - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
+      # dead:
+      # - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
+      # stand:
+      # - AøA¤CN ±iºO ³O°¡³­ ¼´¿¡ °O¼e¹o.
+      # - ¶aμ·≫U ≫o A￡Aμ.. ±IEæAC E￥º¸ ¾×·®¿i ÆA·e..
+      # levelup:
+      # - Ei¡|(±±-AI)
+      # perfor_1:
+      # - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
+      # perfor_2:
+      # - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
+      # perfor_3:
+      # - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
+    # so_full:
+      # feeding:
+      # - ¾×-··
+      # danger:
+      # - ±iºO ³O°¡³­ A×A²AC ¼´A²AI Aøº°CI≫A¾·¼ª
+      # dead:
+      # - ¾×¸·¿O CIAuAø ±EAμ A×A²AI±u≫U.
+      # stand:
+      # - AøA¤CN ±iºO ³O°¡³­ ¼´¿¡ °O¼e¹o.
+      # - ¶aμ·≫U ≫o A￡Aμ.. ±IEæAC E￥º¸ ¾×·®¿i ÆA·e..
+      # levelup:
+      # - Ei¡|(±±-AI)
+      # perfor_1:
+      # - (A|)(A|)(A|)CI!CI! ≫o AcAO·| μI¸Aμ·¿A¹o!
+      # perfor_2:
+      # - '¼ª! ≫UAⓒ-LORD≫OAC ·¹¸AA´ ≫A¼￠¿O CØAO¿O¤º¡|±i? '
+      # perfor_3:
+      # - μ·AI≫A¼A? AI LORD≫OAC CNA¤ÆC AA¸μ³CAI!
   VR_CHAO:
     hungry:
       feeding:
-      - A÷°A A÷°A~ (¶e¿iCA≫UA÷°A~)
-      - A÷°AA÷°A! A÷°A. (·¹A§ ¶e¿iÆI≫UA÷°A! ¿i·¹°oA÷°A.)
+      - Chao Chao~ (I'm hungry Chao~)
+      - Chaochao! Chao. (I was hungry! Thank you Chao.)
       hunting:
-      - A÷°A, A÷°A~ (·ðCe¿¡, ≫E¸AAO≫UA÷°A~)
-      - A÷°AA÷°A~. (´c¼Eºº AAAo·· ¶e¿¡ ¿iCA≫UA÷°A~.)
+      - Chao, Chao~ (Adventurer, so strong Chao~)
+      - Chaochao~. (Hunting is good, but I'm hungry~.)
       danger:
-      - A÷°A! (A§CeCØA÷°A!)
-      - A÷°AA÷°A¡| (·ðCe¿¡≫A Euºe≫UA÷°A¡|)
+      - Chao! (It's dangerous!)
+      - Chaochao... (It's hard for adventurers...)
       dead:
-      - A÷°AA÷°A~ (A¤²AA÷¸AA÷°A~)
-      - A÷°A~ (A≪AIAI±ßA÷°A~)
+      - Chaochao~ (come to your senses, chao~)
+      - Chao~ (It's a big deal, Chao~)
       stand:
-      - A÷°AA÷°A. (¼?±±¿¡ AA±ÆA÷°A.)
-      - A÷°A? (μO¸¹±iA÷°A?)
+      - Chaochao. (The weather is nice.)
+      - Chao? (Did you call me Chao?)
       perfor_s:
-      - A÷°A A÷°AA÷°A~. (A÷°A ºiAaAI≫UA÷°A~.)
+      - Chao chao chao~. (Chao appears Chao~.)
       levelup:
-      - A÷°A A÷°A! (≫o ¿­CØA¼≫UA÷°A!)
-      - A÷°AA÷°AA÷°A! (AI ¾a³³¸I ¿¡≫A¿A≫UA÷°A!)
+      - Chao Chao! (I got stronger!)
+      - Chaochaochao! (I'm going with this momentum!)
       perfor_1:
-      - A÷°A A÷°A. (°A≫Aºº Eu¼´AUA÷°A.)
+      - Chao Chao. (Let's do our best today too.)
       perfor_2:
-      - A÷°AA÷°A~ (AAAμ AIAI AOA´ ¿I ¿¿±ÆA÷°A~)
+      - Chaochao~ (I think something good will happen Chao~)
       perfor_3:
-      - A÷°A A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
+      - Chao Chao~ (I have a good feeling Chao~)
       connect:
-      - A÷°AA÷°A! (¾a≫U¸E≫UA÷°A!)
-      - A÷°A~! A÷°AA÷°A. (±E¼cA÷°A~! °A≫Aºº ¹C μ´≫UA÷°A.)
+      - Chaochao! (Wait, Chao!)
+      - Chao~! Chaochao. (Hello Chao~! See you again Chao.)
     bit_hungry:
       feeding:
-      - A÷°A A÷°A~ (¿i·¹°oA÷°A~)
-      - A÷°A A÷°AA÷°A~ (·ðCe¿¡ºº ·AAO≫A ¿A ·O±iA÷°A~)
+      - Chao Chao~ (Thank you Chao~)
+      - Chao Chao Chao~ (Even adventurers eat delicious food~)
       hunting:
-      - A÷°A A÷°A! (Eu¼´¹oA÷°A!)
-      - A÷°AA÷°A~ (≫o ¿­CØAu ¿A±ßA÷°A~)
+      - Chao Chao! (Cheer up!)
+      - Chaochao~ (I will become stronger, chao~)
       danger:
-      - A÷°AA÷°A, A÷°A~ (A§CeCI·e ºº·A¿¡A÷°A~)
-      - A÷°A? A÷°AA÷°A? (ºº·A¿¡≫A ÆiAI ¼≫Ao ±E¿U±iA÷°A?)
+      - Chao-chao, chao~ (If it's dangerous, run away~)
+      - Chao? Chaochao? (Wouldn't it be better to run away?)
       dead:
-      - A÷°A~¡| (¾a°i¼´A÷°A~¡|)
-      - A÷°AA÷°A~ (EuA´ ¼´¹oA÷°A~)
+      - Chao~' (Cheer up~')
+      - Chaochao~ (Be strong, Chao~)
       stand:
-      - A÷°AA÷°A. (AAAμ AIAI AOA´ ¿I ¿¿±ÆA÷°A.)
-      - A÷°AA÷°A~! (´eA￥CI¾a AAAμ ¼?±±≫UA÷°A~!)
+      - Chaochao. (I think something good will happen.)
+      - Chaochao~! (It's good weather for a walk!)
       perfor_s:
-      - A÷°A A÷°AA÷°A~. (A÷°A ºiAaAI≫UA÷°A~.)
+      - Chao chao chao~. (Chao appears Chao~.)
       levelup:
-      - A÷°A A÷°A! (≫o ¿­CØA¼≫UA÷°A!)
-      - A÷°AA÷°A, A÷°A! (AI ¾a³³¸I ¿¡≫A¿A≫UA÷°A!)
+      - Chao Chao! (I got stronger!)
+      - Chao Chao, Chao! (I'm going with this momentum!)
       perfor_1:
-      - A÷°A A÷°A. (°A≫Aºº Eu¼´AUA÷°A.)
+      - Chao Chao. (Let's do our best today too.)
       perfor_2:
-      - A÷°AA÷°A~ (AAAμ AIAI AOA´ ¿I ¿¿±ÆA÷°A~)
+      - Chaochao~ (I think something good will happen Chao~)
       perfor_3:
-      - A÷°A A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
+      - Chao Chao~ (I have a good feeling Chao~)
       connect:
-      - A÷°AA÷°A! (¾a≫U¸E≫UA÷°A!)
-      - A÷°A~! A÷°AA÷°A. (±E¼cA÷°A~! °A≫Aºº ¹C μ´≫UA÷°A.)
+      - Chaochao! (Wait, Chao!)
+      - Chao~! Chaochao. (Hello Chao~! See you again Chao.)
     noting:
       feeding:
-      - A÷°A~ (·AAO≫UA÷°A~)
-      - A÷°A A÷°A! (An¿A°i ²A´c²A¿￡AI≫UA÷°A!)
+      - Chao~ (Delicious Chao~)
+      - Chao Chao! (It's a fun meal time!)
       hunting:
-      - A÷°A A÷°A~ (°A≫Aºº °­²EAI¼×A÷°A~)
-      - A÷°A! A÷°A! (AßCN≫UA÷°A! AßCN≫UA÷°A!)
+      - Chao Chao~ (I'm working hard today too Chao~)
+      - Chao! Chao! (Good job Chao! Good job Chao!)
       danger:
-      - A÷°A A÷°A~ (±ÆAIAUA´ ²a¹oA÷°A~)
-      - A÷°AA÷°A! (EAAðºº ¶æ¶yAI≫UA÷°A!)
+      - Chao Chao~ (Use the item Chao~)
+      - Chaochao! (Retreating is also a way!)
       dead:
-      - A÷°AA÷°A~ (¾|AuA·≫I ≫U²A CØμ·AUA÷°A~)
-      - A÷°A, A÷°AA÷°A~ (¾×¸½ ³oºº AOAoA÷°A~)
+      - Chaochao~ (It's okay, let's try again Chao~)
+      - Chao, Chao Chao~ (That could be possible~)
       stand:
-      - A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
-      - A÷°AA÷°A~ (An¿A°i ¼?AI≫UA÷°A~)
+      - Chao~ (I have a good feeling Chao~)
+      - Chaochao~ (It's a happy day, chao~)
       perfor_s:
-      - A÷°A A÷°AA÷°A~. (A÷°A ºiAaAI≫UA÷°A~.)
+      - Chao chao chao~. (Chao appears Chao~.)
       levelup:
-      - A÷°A A÷°A! (≫o ¿­CØA¼≫UA÷°A!)
-      - A÷°AA÷°A, A÷°A! (AI ¾a³³¸I ¿¡≫A¿A≫UA÷°A!)
+      - Chao Chao! (I got stronger!)
+      - Chao Chao, Chao! (I'm going with this momentum!)
       perfor_1:
-      - A÷°A A÷°A. (°A≫Aºº Eu¼´AUA÷°A.)
+      - Chao Chao. (Let's do our best today too.)
       perfor_2:
-      - A÷°AA÷°A~ (AAAμ AIAI AOA´ ¿I ¿¿±ÆA÷°A~)
+      - Chaochao~ (I think something good will happen Chao~)
       perfor_3:
-      - A÷°A A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
+      - Chao Chao~ (I have a good feeling Chao~)
       connect:
-      - A÷°AA÷°A~! (¾a≫U¸E≫U¾·A÷°A~!)
-      - A÷°A A÷°A. (A÷°A ºiAaAI≫UA÷°A.)
+      - Chaochao~! (I waited~!)
+      - Chao Chao. (Chao appears Chao.)
     full:
       feeding:
-      - A÷°A A÷°A. (·¶AI ·O±u≫UA÷°A.)
-      - A÷°AA÷°A~. (¶eμI·￡≫U≫I¾iA÷°A~.)
+      - Chao Chao. (I ate a lot.)
+      - Chaochao~. (I'm full. Chao~.)
       hunting:
-      - A÷°A A÷°A~ (A÷°Aºº ¶μ¿¡ CO ³o AOA´ ¿I ¿¿≫UA÷°A~)
-      - A÷°AA÷°A¡| (¶eμO¸?³­ Euºe±iA÷°A¡|)
+      - Chao Chao~ (I think Chao can do something too Chao~)
+      - Chaochao... (I'm tired because I'm full')
       danger:
-      - A÷°A! A÷°AA÷°A! (EAAð≫UA÷°A! AI≫U ºº·AA÷°A!)
-      - A÷°AA÷°A! (±ÆAIAUA´ ±½≫A¿A±ßA÷°A!)
+      - Chao! Chaochao! (Retreat! Run away first!)
+      - Chaochao! (I'm using an item!)
       dead:
-      - A÷°A~ A÷°AA÷°A~ (¾×¸½ ³oºº AOAoA÷°A~)
-      - A÷°AA÷°A~ (EuA´ ¼´¹oA÷°A~)
+      - Chao~ Chaochao~ (You can do that~)
+      - Chaochao~ (Be strong, Chao~)
       stand:
-      - A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
-      - A÷°AA÷°A~ (An¿A°i ¼?AI≫UA÷°A~)
+      - Chao~ (I have a good feeling Chao~)
+      - Chaochao~ (It's a happy day, chao~)
       perfor_s:
-      - A÷°A A÷°AA÷°A~. (A÷°A ºiAaAI≫UA÷°A~.)
+      - Chao chao chao~. (Chao appears Chao~.)
       levelup:
-      - A÷°A A÷°A! (≫o ¿­CØA¼≫UA÷°A!)
-      - A÷°AA÷°A, A÷°A! (AI ¾a³³¸I ¿¡≫A¿A≫UA÷°A!)
+      - Chao Chao! (I got stronger!)
+      - Chao Chao, Chao! (I'm going with this momentum!)
       perfor_1:
-      - A÷°A A÷°A. (°A≫Aºº Eu¼´AUA÷°A.)
+      - Chao Chao. (Let's do our best today too.)
       perfor_2:
-      - A÷°AA÷°A~ (AAAμ AIAI AOA´ ¿I ¿¿±ÆA÷°A~)
+      - Chaochao~ (I think something good will happen Chao~)
       perfor_3:
-      - A÷°A A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
+      - Chao Chao~ (I have a good feeling Chao~)
       connect:
-      - A÷°A~! A÷°AA÷°A. (±E¼cA÷°A~! °A≫Aºº ¹C μ´≫UA÷°A.)
-      - A÷°A~ A÷°A. (A÷°A ºiAaAI≫UA÷°A.)
+      - Chao~! Chaochao. (Hello Chao~! See you again Chao.)
+      - Chao~ Chao. (Chao appears Chao.)
     so_full:
       feeding:
-      - A÷°A~ A÷°A~~. (¶e¿¡ μO¸?³­ °oA÷AI¾a Euºe≫UA÷°A~.)
-      - A÷°AA÷°A A÷°A~. (¼E¶≪ ·¶AI ·O±u≫UA÷°A~.)
+      - Chao~ Chao~~. (I'm so full that it's hard to move.)
+      - Chao chao chao~. (I ate too much~.)
       hunting:
-      - A÷°A A÷°A~ (A÷°Aºº ¶μ¿¡ CO ³o AOA´ ¿I ¿¿≫UA÷°A~)
-      - A÷°AA÷°A¡| (¶eμO¸?³­ Euºe±iA÷°A¡|)
+      - Chao Chao~ (I think Chao can do something too Chao~)
+      - Chaochao... (I'm tired because I'm full')
       danger:
-      - A÷°A! A÷°AA÷°A! (EAAð≫UA÷°A! AI≫U ºº·AA÷°A!)
-      - A÷°AA÷°A! (±ÆAIAUA´ ±½≫A¿A±ßA÷°A!)
+      - Chao! Chaochao! (Retreat! Run away first!)
+      - Chaochao! (I'm using an item!)
       dead:
-      - A÷°A A÷°AA÷°A~ (¾×¸½ ³oºº AOAoA÷°A~)
-      - A÷°AA÷°A~ (EuA´ ¼´¹oA÷°A~)
+      - Chao Chao Chao~ (It could be so~)
+      - Chaochao~ (Be strong, Chao~)
       stand:
-      - A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
-      - A÷°AA÷°A~ (An¿A°i ¼?AI≫UA÷°A~)
+      - Chao~ (I have a good feeling Chao~)
+      - Chaochao~ (It's a happy day, chao~)
       perfor_s:
-      - A÷°A A÷°AA÷°A~. (A÷°A ºiAaAI≫UA÷°A~.)
+      - Chao chao chao~. (Chao appears Chao~.)
       levelup:
-      - A÷°A A÷°A! (≫o ¿­CØA¼≫UA÷°A!)
-      - A÷°AA÷°A, A÷°A! (AI ¾a³³¸I ¿¡≫A¿A≫UA÷°A!)
+      - Chao Chao! (I got stronger!)
+      - Chao Chao, Chao! (I'm going with this momentum!)
       perfor_1:
-      - A÷°A A÷°A. (°A≫Aºº Eu¼´AUA÷°A.)
+      - Chao Chao. (Let's do our best today too.)
       perfor_2:
-      - A÷°AA÷°A~ (AAAμ AIAI AOA´ ¿I ¿¿±ÆA÷°A~)
+      - Chaochao~ (I think something good will happen Chao~)
       perfor_3:
-      - A÷°A A÷°A~ (AAAμ °¶¿¨AI ºc≫UA÷°A~)
+      - Chao Chao~ (I have a good feeling Chao~)
       connect:
-      - A÷°A~! A÷°AA÷°A. (±E¼cA÷°A~! °A≫Aºº ¹C μ´≫UA÷°A.)
-      - A÷°A A÷°AA÷°A. (A÷°A ºiAaAI≫UA÷°A.)
-  ep21_iceseahorse:
-    hungry:
-      feeding:
-      - ½o-
-      danger:
-      - ½U½o½o
-      dead:
-      - ½o-½o°i...
-      stand:
-      - ½o°i-! ½o.½o.½o.!!
-      levelup:
-      - ½o-½o-¾·~ ½o½o½o-°i~
-    bit_hungry:
-      feeding:
-      - ½o-
-      danger:
-      - ½U½o½o
-      dead:
-      - ½o-½o°i...
-      stand:
-      - ½o°i-! ½o.½o.½o.!!
-      levelup:
-      - ½o-½o-¾·~ ½o½o½o-°i~
-    noting:
-      feeding:
-      - ½o-
-      danger:
-      - ½U½o½o
-      dead:
-      - ½o-½o°i...
-      stand:
-      - ½o°i-! ½o.½o.½o.!!
-      levelup:
-      - ½o-½o-¾·~ ½o½o½o-°i~
-    full:
-      feeding:
-      - ½o! ½o°i°i!!!!
-      danger:
-      - ½U½o½o
-      dead:
-      - ½o-½o°i...
-      stand:
-      - ½o°i-! ½o.½o.½o.!!
-      levelup:
-      - ½o-½o-¾·~ ½o½o½o-°i~
-    so_full:
-      feeding:
-      - ½o! ½o°i°i!!!!
-      danger:
-      - ½U½o½o
-      dead:
-      - ½o-½o°i...
-      stand:
-      - ½o°i-! ½o.½o.½o.!!
-      levelup:
-      - ½o-½o-¾·~ ½o½o½o-°i~
+      - Chao~! Chaochao. (Hello Chao~! See you again Chao.)
+      - Chao Chao Chao. (Chao appears Chao.)
+  # ep21_iceseahorse:
+    # hungry:
+      # feeding:
+      # - ½o-
+      # danger:
+      # - ½U½o½o
+      # dead:
+      # - ½o-½o°i...
+      # stand:
+      # - ½o°i-! ½o.½o.½o.!!
+      # levelup:
+      # - ½o-½o-¾·~ ½o½o½o-°i~
+    # bit_hungry:
+      # feeding:
+      # - ½o-
+      # danger:
+      # - ½U½o½o
+      # dead:
+      # - ½o-½o°i...
+      # stand:
+      # - ½o°i-! ½o.½o.½o.!!
+      # levelup:
+      # - ½o-½o-¾·~ ½o½o½o-°i~
+    # noting:
+      # feeding:
+      # - ½o-
+      # danger:
+      # - ½U½o½o
+      # dead:
+      # - ½o-½o°i...
+      # stand:
+      # - ½o°i-! ½o.½o.½o.!!
+      # levelup:
+      # - ½o-½o-¾·~ ½o½o½o-°i~
+    # full:
+      # feeding:
+      # - ½o! ½o°i°i!!!!
+      # danger:
+      # - ½U½o½o
+      # dead:
+      # - ½o-½o°i...
+      # stand:
+      # - ½o°i-! ½o.½o.½o.!!
+      # levelup:
+      # - ½o-½o-¾·~ ½o½o½o-°i~
+    # so_full:
+      # feeding:
+      # - ½o! ½o°i°i!!!!
+      # danger:
+      # - ½U½o½o
+      # dead:
+      # - ½o-½o°i...
+      # stand:
+      # - ½o°i-! ½o.½o.½o.!!
+      # levelup:
+      # - ½o-½o-¾·~ ½o½o½o-°i~
   CLB_SS_FC:
     hungry:
       feeding:
-      - AI¸·¿O ·AAO≫A A²²AA´ A§CØ³­¹o·e ·ðºc ¿E Æ÷¾aCO ³o AO±i
-      - ·AAI AI ³ø¿￡··A´ A§CØ ¼e¸ACI¿i AOAo
-      - ´iAμ ´c¹÷A´ CC¿iCI¿O CIAo··, ·AAO≫A A²²AAμ ´c¹÷A´ ≫U²A ´i¿O CN≫U!
+      - 'I would give up everything for a meal like this! '
+      - Just work hard for this moment every day!
+      - Life is exhausting, food is reviving!
       hunting:
-      - AI¾a·e ··AuA´ An¿U±ßAo!
-      - ≫UA²°￡ ¿￡²AA´ ≫o ¼E¼ECI¿O A￢¿U±ß¿U±i
-      - °O ¶¿±iAU A×≫U
+      - I hope someone will treat me to a big dinner after the victory!
+      - Next time, I will bring enough snacks!
+      - I'm gonna bite him!
       danger:
-      - ··±a ¼´¿¡ ±½¸?Aø≫U·e ¾×¿C μÐ·i ¶e¿iÆA³­AI ¿A±ß~
-      - ²I°oμ·≫U ≫o ¼ª´U ¿C, ¶e¿iCA ´oAA¸I ²I°i≫A ¿A±ß...
-      - ·¹Ao·¸ ··AuA´ ·OA´ ²A¿￡AI AO±iAo¾æ!
+      - If you fall down, I will die of starvation.
+      - The only thing worse than fighting is starving...
+      - I hope I can still eat my last meal!
       dead:
-      - ¼ªºº ≫ⓒ°o±ß¿U≫U
-      - ≫?≫A ¿C ¼´ Æ?¾CAIº￥!
-      - ¼ª≫A ≫ⓒ¾·? °ⓒ¾a ±iºð?
+      - I'm gonna lay down too.
+      - Lying down is obviously my privilege!
+      - Who am I? Where am I?
       stand:
-      - ²E²ECØ~¶¶ A´ ·OA´¸¡?
-      - °ⓒ¾a A¡A½Ay AO±i?
-      - ¶¶ CØ±ß COAo ´y¿￠¼º±i?
+      - So boring~ Do you want something to eat?
+      - Is there a fried chicken steak restaurant here?
+      - Have you thought about what you're going to do?
       levelup:
-      - ºaºð±i ¸¶μ§±÷! ¾Uº￥ ¼­ ¼´ A¡²EA´ ≫o ±÷¾×¸¶AIºaCI¿i ²I±i~
-      - ¼´¿¡ CE°aCN ¿C A®¸I·®Ao, ¿æCeA¡¿¡ ±Æ≫I±ß~
-      - ¸¶μ§±÷ ³μ¿ø~ ¾×¸¼ AIA| ¶a ·O±iºº ºA?
+      - Finally level up! But I'd rather level up my lunch~
+      - I don't need experience, I need calories.
+      - Level up successful~ Can we eat now?
       perfor_1:
-      - ±Æ≫U≫U≫U≫U≫U~ ¼ª ≫e≫UCIAo?
-      - ¼´ ¶i´iAμ ····CIAo ±E≫U¿i
-      - °A≫A ¾··§Aμ ³Ø´cAA ¿¿≫U..
+      - Aaaaaaaaa~ I'm pretty good, right?
+      - My stomach is not easy!
       perfor_2:
-      - ¿ø¾aºº ±AA·≫I ·AAI ¼ª´UAo ±E¼×.
-      - °ºE￥ ¾¼E?CI¿i ²IAμ ´c¹÷?
-      - AI ³O·® ºe¸A? ¼´ ¶e°¡³­ ¼ª≫A ³O·®±ß
+      - Today's clouds look like marshmallows.
+      - The mouth chews the air and tastes good.
+      perfor_3:
+      - Does anyone want to trade souls?
+      - Listen quietly. It's the sound of my stomach.
       connect:
-      - Aß±O ºº²A°¡≫A ·AAy ¿A·®¿¡ AOA´¾i?
-      - ·n°a? ¼´¿¡ ¶eμI·￥ ´oAA¿¡ ±Æ≫I·e ·´ºº ½¨¼´Ao ·¹!
-      - ·ð·￡Aⓒ°¡ ´c≫A ´c¹÷ºeAμ °A¸§º°±E ·n°aA´ ±E CN≫U·c?
+      - Is there a food court in Central City?
+      - Take a shower? Don't talk about it!
+      - You know they say that people in Morroc only shower once in a while?
     bit_hungry:
       feeding:
-      - ·AAI AI¸·¿O ·O¿i ²I≫U!
-      - °A≫A A²²AAμ A´ ±÷¾×¸¶AIºaºC±u±i?
-      - AI¿Iºº ¼ª AO≫A ¿A±ß?
+      - I want to eat this every day!
+      - Did you increase the size of my meal today?
+      - Is this for me too?
       hunting:
-      - ¼Eºº ¼ªA¼¸¼ ¶e¿iCA³o¸I AuAo¸AAI ¿­CØA®?
-      - ACAo¸I ²I°o¹o!
-      - ·¹Ao·¸ CN ¶æAμ ¼´¿¡!
+      - Are you as hungry as I am?
+      - Fight with your will!
+      - I'll do the last kick!
       danger:
-      - A¹¾Y A§CeCNº￥!
-      - AOAIºº ¶eμO·® ·ø ·OAμ ¿A±ß?
-      - AI¿C ¼ªºº ¿¨≫c ±E ºA..
+      - Something's not right!
+      - Did master not get enough eat too?
+      - I don't think I can handle this either...
       dead:
-      - Euºe·e..≫ⓒ°o¶o·®AU!
-      - Aß°o.. A±AI´oAU ±ø±i?
-      - AOAI AI±i¼ª~AI¸?·e AIA| ≫ⓒ¿¡ ¼? º¶μAAa?
+      - If you're tired... Just lie down!
+      - It's so cold... Do you have any cardboard boxes?
+      - Master, wake up! Who's going to take care of me?
       stand:
-      - °i·¿ °O ´oμ® CCAⓒ≫ÐA´ CO ³o ±ø≫A ¿A±ß?
-      - ¼´ ½ÞAμ ²A²A°ø~
-      - Ao¾Y CO ¿O ±ø≫A ¿A·e, ·OAu ¼ª ·OA´ ¿I A´ AU¸¡?
+      - Why can't we have a midnight picnic?
+      - My dream job is to be a taster.
+      - If it's okay for now, do you want to give me something to eat first?
       levelup:
-      - AOAIAI ¿­CØA¼≫U! ¼ª AØA··e ±E ºA~
-      - AaCICI≫A AU·®°￡ C×´o ·OA´ ¿O AOAo, ¾×A¡?
-      - AaCICØ~ ¹C ¶ßAuCß¼×.
+      - Master is getting stronger! Don't forget me~
+      - There's always something to eat when you celebrate, right?
+      - Congratulations! One step further~
       perfor_1:
-      - ±Æ≫U≫U≫U≫U≫U~ ¼ª ≫e≫UCIAo?
-      - ¼´ ¶i´iAμ ····CIAo ±E≫U¿i
-      - °A≫A ¾··§Aμ ³Ø´cAA ¿¿≫U..
+      - I'm good, aren't I?
+      - I don't have an easy belly!
       perfor_2:
-      - ¿ø¾aºº ±AA·≫I ·AAI ¼ª´UAo ±E¼×.
-      - °ºE￥ ¾¼E?CI¿i ²IAμ ´c¹÷?
-      - AI ³O·® ºe¸A? ¼´ ¶e°¡³­ ¼ª≫A ³O·®±ß
+      - The clouds look like marshmallows today...
+      - The mouth chews the air and tastes good.
+      perfor_3:
+      - Does anyone want to trade souls?
+      - Listen quietly. It's the sound of my stomach.
       connect:
-      - 'A´ AU¿i ²I≫U.. A´ AIºu ¼E¶≪ ±O±½Ao ·¹! '
-      - AU¿i AI±i¼ª³­ A¼A²A·¸I CØ±ß CO AIAμ ·O≫A ¿I
-      - AO¾U°¡ ¶¶ Ac¶O≫A AI ºeAμ ¿A ±ø±i?
+      - I'm a little sleepy...wait don't be too hard on yourself!
+      - The first thing I want to do when I wake up is eat.
+      - Have you heard anything interesting lately?
     noting:
       feeding:
-      - Caμ¶AI¹o~ ·O¿i ²IA´ ¹§ ·OA´ ¿O AO≫A ¿I!
-      - ¶I²A··AI ¼? ²C·A²AA¿Ao ±E±Æ
-      - AI¿A ¾|Au≫U~
+      - Happiness ~ it's all about having food when you want it!
+      - Only good food can satisfy me.
+      - This is good~
       hunting:
-      - ¼ªºº Eu A´ ²aμ³¾i!
-      - ²A·®AC ¼°´o¿¡ ¼­≫U~
-      - ·OAu ¶¶ A´ ·O±iºº ºE¾i? EuAI CE°aCØ
+      - Let me help you too!
+      - I can smell victory!
+      - Can I have something to eat first? I need strength.
       danger:
-      - Au¸≪Au EAAð ±i¹§?
-      - A´·· ≫o ¶oAß¡|
-      - ·OAu °¸°¡ ¿¡³­ ²A´c AØμn·| CI¿i AO±iºº ºE¾i?
+      - Need a tactical retreat?
+      - Hold on a bit longer...
+      - Can I go to the side and wait for dinner first?
       dead:
-      - ¼´ A¤²AAμ ¼E°I CO½½ AO±i!
-      - AOAI ´¡·® AI±i¼ª~ ¼ª º¶μA±ßAo~
-      - °i·¾ ºº°IAU AøCN ´c¹÷ ±iºð ±ø±i?
+      - My spirit is with you!
+      - Master, get up. You have me to feed.
+      - Is there anyone out there who can help us?
       stand:
-      - AaAß ³o AO≫A A§≫e ±iºð AO≫AAo ±E±Æ?
-      - ¶a ·O≫A ¿A AØAo ·¹!
-      - A²... °ⓒ¾a ¶¶ Æ?μ¿CN ¿O AO±i?
+      - Do you know where I can sleep?
+      - Don't forget to eat!
+      - Uh... What's so special about this place?
       levelup:
-      - ¶¶ A´ ·OA··e³­ AaCICØ±ß CIAo ±E±Æ?
-      - AOAI ¸¶μ§±÷Cß¼×, ¼´ ²A´cºº ±÷¾×¸¶AIºa ²AANAOAo?
-      - °i·®≫A AO¿i±ß!
+      - Shouldn't we eat something to celebrate?
+      - Master has been leveled up, when will you level up my food too?
+      - We are the best!
       perfor_1:
-      - ±Æ≫U≫U≫U≫U≫U~ ¼ª ≫e≫UCIAo?
-      - ¼´ ¶i´iAμ ····CIAo ±E≫U¿i
-      - °A≫A ¾··§Aμ ³Ø´cAA ¿¿≫U..
+      - I'm good, aren't I?
+      - I don't have an easy belly!
       perfor_2:
-      - ¿ø¾aºº ±AA·≫I ·AAI ¼ª´UAo ±E¼×.
-      - °ºE￥ ¾¼E?CI¿i ²IAμ ´c¹÷?
-      - AI ³O·® ºe¸A? ¼´ ¶e°¡³­ ¼ª≫A ³O·®±ß
+      - The clouds look like marshmallows today...
+      - The mouth chews the air and tastes good.
+      perfor_3:
+      - Does anyone want to trade souls?
+      - Listen quietly. It's the sound of my stomach.
       connect:
-      - ¼?±± AAAμº￥ ¼ª¿¡³­ A´ ¿EAU!
-      - ¼E ±ø≫A ´cAI°¡ ·o¸¡ ±E EEAA ·O±u±i!
-      - ±iºð ´o¸I°i ²A≫c ±øA´¾i?
+      - It's a beautiful day. Go for a walk!
+      - I didn't steal any food while you were gone!
+      - Did you hear about the new restaurant?
     full:
       feeding:
-      - AI ³ø¿￡ ·ðºc ¶ø¼u¿¡ AØCoAø≫U~
-      - ¼´ ²A´c¸®A´ ····CI¿O μ·Ao ·¹~
-      - Ca¾a¸I°o~
+      - At this moment, I forget all my troubles.
+      - Don't underestimate my appetite.
+      - It smells so good.
       hunting:
-      - ¼ªºº A´ ¹§·®¿O CØAa~
-      - ¼E ¹O¶e¾a·· CN AO·O μ´ Au AO±i?
-      - ¼´ ²C¸AAμ AI A¤ºº¿¡ ±Æ≫I¹o¾·~
+      - Let me hit it too~
+      - Have you ever seen a fist as big as a casserole?
+      - That's not all I've got.
       danger:
-      - A¹²ECØ! ±ÆA÷Aμ ¼´ A²²AA´ A|¿øCØ AU ´c¹÷AI CE°aCI≫U¿i!
-      - °ⓒ¾a ±EAuCIAo ±EAμ ¿A ¿¿±Æ, ±o·￥ ¿¡AU.
-      - A¹¾Y ¶≪³¸≫U~ ·OAu ¿¡¿i AOA´¸¡?
+      - Look out! I was hoping someone would provide food!
+      - It doesn't seem safe here. Let's get out of here.
+      - I'm a little scared. Can I go first?
       dead:
-      - ¼­ ºº°oAI ºCAo ±EAμ ¿A ¿¿±Æ...
-      - AOAI ≫?Ao ·¹~ °i·®AC ·ðCeAμ ±ÆA÷ ¼¡¼ªAo ±E±O±i
-      - ¼E≫A μn¸I ·O·® ¿¡Ao··, ¼EAC A¤²AAμ °º°øCO ¿A±ß
+      - I don't think I can help...
+      - Master, don't lie down! Our adventure isn't over yet!
+      - Though you are gone, your spirit lives on.
       stand:
-      - ¼´ ³OAI ¶ß°¡ ≫eA´ ³o AOA´ ¿A ¿¿±Æ?
-      - ·AAI ¼ª μ·¸? °I±ß CØ!
-      - ¼ª ¿i±cAI¹u ≫eE­CO ³o AO≫A ¿A ¿¿±Æ.
+      - Do you think my hands can touch my feet?
+      - Remember to visit me every day!
+      - I think I can talk to cats.
       levelup:
-      - ≫e≫UCI≫U! ¹C ¸¶μ§±÷AI±ß!
-      - AIA| ±Æ¶≪ºº °i·® ±O¾æA´ ·¸A´ ³o ±ø±i!
-      - AOAI¹u ¿¿AI ³μAaCI≫A ≫A¼| A¤·´ AA≫U!
+      - You're amazing! You've leveled up again!
+      - Who else can stop us from moving forward?
+      - It's so nice to grow up with an owner!
       perfor_1:
-      - ±Æ≫U≫U≫U≫U≫U~ ¼ª ≫e≫UCIAo?
-      - ¼´ ¶i´iAμ ····CIAo ±E≫U¿i
-      - °A≫A ¾··§Aμ ³Ø´cAA ¿¿≫U..
+      - I'm good, aren't I?
+      - I don't have an easy belly!
       perfor_2:
-      - ¿ø¾aºº ±AA·≫I ·AAI ¼ª´UAo ±E¼×.
-      - °ºE￥ ¾¼E?CI¿i ²IAμ ´c¹÷?
-      - AI ³O·® ºe¸A? ¼´ ¶e°¡³­ ¼ª≫A ³O·®±ß
+      - The clouds look like marshmallows today...
+      - The mouth chews the air and tastes good.
+      perfor_3:
+      - Does anyone want to trade souls?
+      - Listen quietly. It's the sound of my stomach.
       connect:
-      - AOAI, ¼ªºº AIA| ·¸ Aaºe AuAI±u≫Aº￥¡|
-      - Aa¶ßCI¾a Au°¡ ¼´ ¿￡²A A￢¾a≫A ¿A AØAo ·¹!
-      - ±iºð¸I ¿￥Ao ¿aA¤Cß±i?
+      - Don't forget to bring my snacks before you go!
+      - Have you decided where you're going?
     so_full:
       feeding:
-      - AOAI A¤·´ ±Æ¼|±øAI AØ≫U!
-      - ¼ªºº ¿e³O ·O¿i ²IAo··, AIA| AøA￥ ·ø ·O¿U±i¡|
-      - ¼´ º°¾Uº°¾UCN ¶e A´ μA
+      - The owner is so generous!
+      - Although I still want to keep eating, it seems like I really can't...
+      - Look at my round belly.
       hunting:
-      - ²I°i ¹§ ·i A®¸I·®¿¡ ³O·ðºE¾i?
-      - Ao¾Y ¼´¿¡ ²I°i≫A ´o≫e≫A AuAI ±Æ≫I¹o ¼´ ¶e±ß
-      - ¶Þ±Æ¹o ¼´ ¶i´i ¿ø¿Y~
+      - How many calories are burned in battle?Z
+      - It's not the enemy I'm fighting, it's my stomach.
+      - Look at my belly!
       danger:
-      - Ao¶æA´ μOAA°i ¹§¾μ!
-      - A´ AI´oCN ¿A ¿¿±Æ¡|
-      - ¼´¿¡ ¼I AoANAU¿O
+      - Time to burn my fat!
+      - I feel something is wrong ......
+      - I'll protect you!
       dead:
-      - ≫ⓒ°oAO≫A ¿Iºº A´ ÆiCNº￥?
-      - Æo±EE÷ Aaºe±i, ¼EAC °e¾a≫A Ay≫e AØAo ±EA´¿O
-      - ¿ÆA¤ ·¹... ¼× AI±ß¾a≫A ¼´¿¡ ½A ¼I·® ¼I·® ÆUÆ®·¾¿O
+      - It seems comfortable to lie down?
+      - Rest in peace, I will remember your courage.
+      - Don't worry~I will pass on your story by word of mouth~
       stand:
-      - ´eA￥ ²AANAa~
-      - ²￢≫A ¿A AØAo ·¹, ¿u¸ICI·e ±E ºA
-      - ·AAIAI ´o¸I°i ²AAU~
+      - Take me for a walk~
+      - Remember to rest and don't overwork yourself.
+      - Everyday is a new beginning.
       levelup:
-      - °i·® ¿¿AI ³³¿e·| A¤μ¶CIAU!
-      - ´o´oA´ AE°uCN ¶ßAuAI±ß!
-      - ¸¶μ§±÷ CO ¹§·¹≫U ¼ª ¼E¶≪ ³¼¸¶!
+      - Let's conquer the world together!
+      - You've progressed beyond imagination!
+      - Every time you level up, I get so excited!
       perfor_1:
-      - ±Æ≫U≫U≫U≫U≫U~ ¼ª ≫e≫UCIAo?
-      - ¼´ ¶i´iAμ ····CIAo ±E≫U¿i
-      - °A≫A ¾··§Aμ ³Ø´cAA ¿¿≫U..
+      - I'm good, aren't I?
+      - I don't have an easy belly!
       perfor_2:
-      - ¿ø¾aºº ±AA·≫I ·AAI ¼ª´UAo ±E¼×.
-      - °ºE￥ ¾¼E?CI¿i ²IAμ ´c¹÷?
-      - AI ³O·® ºe¸A? ¼´ ¶e°¡³­ ¼ª≫A ³O·®±ß
+      - The clouds look like marshmallows today...
+      - The mouth chews the air and tastes good.
+      perfor_3:
+      - Does anyone want to trade souls?
+      - Listen quietly. It's the sound of my stomach.
       connect:
-      - 5μÐ·· ≫o AU·e ±E ºE¾i?
-      - °i·®AC °iA¤Aμ ¶≪±uμ·≫U Aß°aCØ¡| ¶I²A ´ⓒ¿i
-      - ·AAI ±ÆA§°¡ AI±i¼? ¹§ ¼I μ·¿i ²I±i!
+      - Can you let me sleep for five more minutes?
+      - Our friendship trumps everything... Except for the food.
+      - I wake up every day hoping to see you!
   CLB_SS_TZ:
     hungry:
       feeding:
-      - ¿C±i¶¿ ºI ·¹·®≫A ≫o ·OA´ ³o AO±i
-      - ≫UA² ²A´c ²A¿￡¾iAo ·ø ¾a≫U·®¿U±i!
-      - ¿i·¹°o, CIAo·· ¼´AIAμ A´ ≫o ´¡·® Aa
+      - I could eat two more dried fish!
+      - I can't wait for my next meal!
+      - Thank you, but I was hoping for an earlier day tomorrow.
       hunting:
-      - ¿¿AI ·ðCeCI≫A ¿A A¤·´ A￥·≫CI≫U!
-      - ²I°iAU, ·¹Ao·¸ ³ø¿￡¾iAo!
-      - ¼´¿¡ AßCI·e ´o AO≫A ¿A AØAo ·¹~
+      - What a thrill to venture out together!
+      - Fight until the end!
+      - If I do well, don't forget to reward me.
       danger:
-      - AOAI, A¹²ECØ! A§CeAI ≫U¿¡°A¿i AO±i
-      - ¼ª¹u ¿¿AI ºº·A¿￥¸¡?
-      - °A≫A ¾UA¿AI ¶μ¿¡ ≫c¾a≫A ¿A ¿¿±Æ~
+      - Master, look out! There is danger approaching.
+      - Do you want to run with me?
+      - My muscles seem a little tight today.
       dead:
-      - ²²CA A≫AI¹oºº CØ±ß CI¼ª?
-      - ºaºð±i ²? ³o AO¿U≫U
-      - ¼´¿¡ A´ AIºu ¾u°oAU¾i?
+      - (SIGHS) Should I pretend I'm sad?
+      - (SIGHS) Now I can finally rest.
+      - (SIGHS) Do you want me to wait to wake you up?
       stand:
-      - AU²AA´ Aß A￢¿U±ß ¼ªºº A￢¾aAo~
-      - CiAI, ¼ª ·OAI AO≫A ¿A AØAo ·¹!
-      - Aß±Oºº²AAC ¼eA¡°¡ ·AAO≫A ¿O ·¶AI AO≫U≫øº￥
+      - Remember to take care of yourself so you can take care of me.
+      - Hey, don't forget to feed me!
+      - I heard that there are a lot of stalls in Central City selling a lot of delicious food.
       levelup:
-      - ¶ßAuCI≫A ·ð²AA´ μ·≫I ¼ªºº ¾a´U≫U
-      - AaCICØ! CIAo·· °i·®AC °AEA Æ³A·AOAμ AØAo ·¹
-      - Aººº ¿¿AI ±÷¾×¸¶AIºaºC·e ≫o AAA´ ¿I ¿¿±Æ!
+      - I'm so happy to see your progress!
+      - Congratulations! But don't forget our tea time.
+      - It would be wonderful if the cans could be upgraded together!
       perfor_1:
-      - ¼o≫aAI ±Æ≫I±ß, AøAoCI¿O ≫eCØ Aa
-      - ¿u°￢ ≫ⓒ¿¡ AOAIAI¾i?
-      - ¼? ··Au ³o AO≫A ¿C AIA±AC Æ÷´oAIAo
+      - This is not a joke. Please take it seriously.
+      - Who do you think is the master?
       perfor_2:
-      - ¾a~Ao~¿¼~
-      - ¶ßAeA·¸I ¾U≫A ³O·® ºe±iμ´ Au AO±i?
-      - ¼A°E~ ¼´¿¡ A|AI ¾I°ⓒ°o!
+      - Being able to touch me is a reward!
+      - '* Stretching *'
+      perfor_3:
+      - Have you ever heard the sound of claws scraping something?
+      - Meow~ I'm the cutest!
       connect:
-      - AOAI ¼´ ¿C±i¶¿ ´c≫A¿A AØAo ±E±OAo?
-      - °A≫AAμ ±iºð¸I ¿¡³­ ¼i¿A±ß?
-      - ·n°a ²AA¿¸A¿i °A ¿C ±Æ≫I¾æ ¶U¸¡
+      - Did you remember to buy my dried fish?
+      - Where are we going today?
+      - I hope you're not here to catch me in the shower!
     bit_hungry:
       feeding:
-      - ·AAO≫A A²²AAμ ¾a≫U·¾ ¿¡A¡¿¡ AOAo~
-      - ¾|AuA··e, CN ¾×·ⓒ ≫o Aa.
-      - ºðAuÆ®ºº AOA··e ≫o AAA´ AUº￥~
+      - Good food is always worth the wait~
+      - I'd like to have another one, if that's okay.
+      - It'd be nice to have a snack.
       hunting:
-      - ´o¸I°i ººAuAUAI¿¡?
-      - EiEi~ ¼´ ¶ßAe ·A A´ μ·²AAo~
-      - AOAI ºº°IAU¾i?
+      - A new challenger?
+      - Hmph~ Eat my claws~!
+      - Can I help you, master?
       danger:
-      - AOAI, ¼´ ¶ßAU¾¶A´ ºu¹o CCCØ~
-      - EAAðCIAU, ±E μn°oA´¿O
-      - A§CeAμ AI²AAuAI ¿A±ß, ¾×¸·Ao?
+      - Master, follow my footsteps and dodge.
+      - Looks like it's time to retreat. I won't laugh at you.
+      - Danger is only temporary, right?
       dead:
-      - AOAI, ¿ÆA¤CIAo ·¹, ¼ª Aß Ao¼±¿O
-      - AIA·ANAU¾i?
-      - ´c¹÷ºº ±½¸?A¼A·≫I AIA| ·ðºI CØ´e~
+      - Master, please don't worry. I'll be fine.
+      - Do you want me to give you a hand?
+      - They're all down, let's go!
       stand:
-      - AOAI °A≫Aºu¹o ·UAO≫U! ¼ªA¼¸¼
-      - °A≫AAμ ´o¸I°i ¾a³uA´ ¶e°i≫A ¿O ±i¹¼¾i?
-      - ¿¿AI Aa AaA·¸? ¿¡AU.. μÐ·i Ac¶OA´ ¿A±ß!
+      - Master looks so handsome today! Just like me.
+      - How about we learn some new tricks today?
+      - Let's go catch a mouse together, it'll be fun!
       levelup:
-      - ·ðºc AuAo≫A °i·¾ ≫o ¿­CI¿O ··ºc≫U!
-      - AI¸·¿O ≫e≫UCN AOAIAI AO≫U≫I, A¤·´ Ca°iAI±ß!
-      - AaCICØ! ¹C ¿­CØA¼¼×!
+      - Every battle makes us stronger!
+      - I'm so lucky to have such a great owner!
+      - Congratulations! You're getting stronger again!
       perfor_1:
-      - ¼o≫aAI ±Æ≫I±ß, AøAoCI¿O ≫eCØ Aa
-      - ¿u°￢ ≫ⓒ¿¡ AOAIAI¾i?
-      - ¼? ··Au ³o AO≫A ¿C AIA±AC Æ÷´oAIAo
+      - This is not a joke. Please take it seriously.
+      - Who do you think is the master?
       perfor_2:
-      - ¾a~Ao~¿¼~
-      - ¶ßAeA·¸I ¾U≫A ³O·® ºe±iμ´ Au AO±i?
-      - ¼A°E~ ¼´¿¡ A|AI ¾I°ⓒ°o!
+      - Being able to touch me is a reward!
+      - '* Stretching *'
+      perfor_3:
+      - Have you ever heard the sound of claws scraping something?
+      - Meow~ I'm the cutest!
       connect:
-      - °A≫A ¶≪²³ AAAμ AI AO±i?
-      - ¾|AuA··e, ¼ªμIAI ¶eμO·® ·O°ⓒAaA··e CØ
-      - AO¾UAC ·nC￥≫A ¶¶±ß?
+      - Did you have a good day today?
+      - If possible, I hope it will fill me up first!
+      - Do you have any goals you'd like to share with me these days?
     noting:
       feeding:
-      - ·A ¼￠≫I¿¡ ≫U AI¸¨A··e AA¿U≫U
-      - A¹²ECØ, ¹￥°¡ ¹¼±iAo¿U±i!
-      - ¼? ±ÆA÷ ¾a±iCØ AO≫U≫I A¤·´ ¾a´º
+      - I wish every meal was like this.
+      - Be careful, don't drop it!
+      - I'm so glad you remembered me!
       hunting:
-      - ¶≪³­°oCIAo ·¹, ¼´¿¡ °¸°¡ AO±i!
-      - ¿i±cAIAC ¶ßAe ¿ø¿YA´ ¶≪²ACIAo ·¹~
-      - ¿¡≫ECI·e ¶≪≫A ¿C ±E CI¿i ²I±i.
+      - Don't be afraid, I'm here for you!
+      - Don't underestimate my cat's paw attack.
+      - I don't want to use the bite, if that's okay.
       danger:
-      - ¿I¼´Ao ·¹, ¼´¿¡ ¼I AoANAU¿O.
-      - ¿ÆA¤CIAo ·¹, ¼´¿¡ AOAY±Æ~
-      - ´c¹÷A´ A´ ≫o μI·|¾i?
+      - Don't be afraid. I'm here to watch over you.
+      - Don't worry, I'm here.
+      - Should we get more people together?
       dead:
-      - AOAI, ¼I AI¶I AO³¾A´ ≫UCß±i, ¼E¶≪ ¼≪²ECIAo ·¹
-      - AOAI, ¼ª ¿­CØAu¿O
-      - AIA| ²²²² AI±i¼ª±ßAo?
+      - Master, you've done your best. Don't feel bad.
+      - Master, I'll be strong.
+      - Is it almost time to get up?
       stand:
-      - ¼ª E￥AU °¸Ay ³OE­CNA× ¼i¸? ¿¡ºº ºA?
-      - °A≫A ≫Þ ±i¹§?
-      - ·ðCeA´ ¹¿¼ªAU! ¶UAC ³³´oAμ ¼Ð±i!
+      - Can I go find the little flower next door to play by myself?
+      - What do you think of today's moon?
+      - Let's go on an adventure! It's a big world out there!
       levelup:
-      - AOAI ²C¸A°¡ ±E²EAI ºE≫U
-      - AO¿i±ß~ A¡A¡ ≫o ¶≪AuAI ºC±i¿¡≫A ¿A±ß~
-      - AO¿i±ß! ²A·®≫A °i·®AC ¿I!
+      - Master, your strength is a great comfort to me.
+      - That's great! One more step on the road to invincibility!
+      - That's great! Victory is ours!
       perfor_1:
-      - ¼o≫aAI ±Æ≫I±ß, AøAoCI¿O ≫eCØ Aa
-      - ¿u°￢ ≫ⓒ¿¡ AOAIAI¾i?
-      - ¼? ··Au ³o AO≫A ¿C AIA±AC Æ÷´oAIAo
+      - This is not a joke. Please take it seriously.
+      - Who do you think is the master?
       perfor_2:
-      - ¾a~Ao~¿¼~
-      - ¶ßAeA·¸I ¾U≫A ³O·® ºe±iμ´ Au AO±i?
-      - ¼A°E~ ¼´¿¡ A|AI ¾I°ⓒ°o!
+      - Being able to touch me is a reward!
+      - '* Stretching *'
+      perfor_3:
+      - Have you ever heard the sound of claws scraping something?
+      - Meow~ I'm the cutest!
       connect:
-      - ³u¿UAø μ·¶¿A´ A￡±Æμ·AU!
-      - ³³´o°¡ ¼? ¾≪¸OE÷¿i ²IAμ ´c¹÷Aμ ±ø¿UAo?
-      - AOAI °A≫AAμ ¶¶ CI¿i ²I±i?
+      - Let's find the hidden treasure together!
+      - I don't think there's anyone in the world who'd want to bully me, is there?
+      - What would the master like to do today?
     full:
       feeding:
-      - ¶eμI·§Aμ ¾aμÐ°¡ A≪ °ºCaA´ ¶IA￡≫U¾·~
-      - °A≫A ±ÆAO AA±O±i. ¼´AIºº μIA¶CØ!
-      - ¼´ An¿A°oA´ ¶æCØCIAo ·¹.
+      - Being well-fed has a big effect on your mood.
+      - You had a good day. Let's do it again tomorrow!
+      - Don't disturb my enjoyment.
       hunting:
-      - A≪ ³O·®¸I °UA￥³o¸I AuAo¸AAI ¿­CØAø≫e!
-      - ¼? ±O³³°i¸A≫A ¿C ±Æ≫IAo?
-      - E÷E÷, ¼ª °￢²ACß≫U¾·!
+      - They say the louder you roar, the more powerful you are!
+      - I don't suppose you'd let me stand in the front, would you?
+      - Hey, I've been practicing!
       danger:
-      - Ao¾Y EAAðCI¾a°￡ ¼E¶≪ ≫E±u¼ª?
-      - ≫cE½CIAo ·¹~ AOAIAI CO ³o AO≫U¿i ¼ª≫A ¶I±i!
-      - Æ÷³C ±Æ¼￠Ao ·¹!
+      - Is it too late to evacuate?
+      - Don't panic, don't panic. I'm sure you can do it.
+      - Don't skip the medicine!
       dead:
-      - °i·¾ ¾·CØAO≫A AøCN ´c¹÷°¡¿O ¼´ ¶ß Aⓒ·® ··Ao≫A ¿E Ca¹oCØ AO¿U±i.
-      - ¶U≫UA´ A§≫e ´i±Æ ≫ⓒ°oAOA··e ÆiCØ?
-      - ±E²ECI¿i ≫ⓒ°o, ≫U·￥ ´c¹÷CNAU ·´ ±E CO¿O
+      - If there's a good man who's willing to save me, I'll give him my meatball.
+      - Are you comfortable using the floor as a bed?
+      - Don't worry, I won't tell anyone.
       stand:
-      - ≫ⓒ¿¡ ≫o ´¡·® ¹U≫AAo ¼´¾aCO¾i?
-      - ±Æ¶≪ AI ±E CØºº ·OA´ ¶aAI AO±uA··e AA¿U≫U.
-      - AI μ¿¶U≫U°¡≫A ¶¶¿¡ AOA´¾i?
+      - Let's race to see who's faster, okay?
+      - I hope we can have food without doing anything.
+      - What's in this sea of stars?
       levelup:
-      - ¸¶μ§±÷AI≫U! °i·® ±iºð ¿¡³­ AaCICO¾i?
-      - AI¶ø ¸¶μ§±÷Aμ ¼´ ¿øºº AO±i!
-      - °i·® A´ ≫o ¿­CØA¼¼×!
+      - It's a level-up! Where are we going to celebrate?
+      - I'm partly to blame for this level up!
+      - We've gotten stronger!
       perfor_1:
-      - ¼o≫aAI ±Æ≫I±ß, AøAoCI¿O ≫eCØ Aa
-      - ¿u°￢ ≫ⓒ¿¡ AOAIAI¾i?
-      - ¼? ··Au ³o AO≫A ¿C AIA±AC Æ÷´oAIAo
+      - This is not a joke. Please take it seriously.
+      - Who do you think is the master?
       perfor_2:
-      - ¾a~Ao~¿¼~
-      - ¶ßAeA·¸I ¾U≫A ³O·® ºe±iμ´ Au AO±i?
-      - ¼A°E~ ¼´¿¡ A|AI ¾I°ⓒ°o!
+      - Being able to touch me is a reward!
+      - '* Stretching *'
+      perfor_3:
+      - Have you ever heard the sound of claws scraping something?
+      - Meow~ I'm the cutest!
       connect:
-      - AOAI °A≫Aºu¹o ≫o ¶YA|AI≫U!
-      - AOAI~ ·OAu ¼´ AÐ A´ μø¿UAa~
-      - ¶UAC ³³¿e≫A A¤·´ ¼Ð±i?
+      - The master is looking very glittery today, isn't he?
+      - Master, can you brush me first?
+      - Is it a big world out there?
     so_full:
       feeding:
-      - ≫UA²°￡ ´o¸I°i ·AA·¸I ¶U½aμ³¾i?
-      - Aß ·O¿U²A≫I≫U~
-      - ¿¡Ao¿i ¼ª¿￥ ³o AO≫A Aººº AO±i?
+      - Can I get a new flavor next time?
+      - Thank you for your hospitality.
+      - Do you have any cans to take away?
       hunting:
-      - AEA§Ce ¶ßAe ¿ø¿Y!
-      - ³³¿e A¤μ¶Aμ AI¶ø AuAoμIAI ²AAU~
-      - ¼´ μn¶Ð ¶≪¾a¿¡ ±iºð AO≫AAo ±E±Æ?
+      - Super Dangerous Claw Attack!
+      - The conquest of the world begins with this battle.
+      - Do you know where I keep my secret weapon?
       danger:
-      - AI¸½ ¹ⓒ °e¾a¿¡ ½A ±º·ð¿¡ AO≫A ¿C ±Æ≫I±ß
-      - AI ¼­¿uA´ AI¿U¼± ³o AO¾a·|
-      - AI AU·®·| ¶þ±i¼? ¶æ¶yAI AO±i?
+      - Being brave doesn't always work this time of year!
+      - I hope we can get through this.
+      - Is there any way to get out of here?
       dead:
-      - °i·® Aß·ø °A ¿A ±Æ≫I±ß?
-      - ºº°oA´ A´CO¾i? ≫ⓒ¾· ±ø±i°a~?
-      - AOAI~ ¼­ AOAI ¿cA´ ¹¿¼ªAo ±EA´ ¿A±ß
+      - Have we come to the wrong place?
+      - Do you want me to get some help? Anyone?
+      - Master, I won't leave you!
       stand:
-      - ¿¡½uAμ A¹°eCN ¿Iºº An¿A°oAIAo
-      - °i·® μ¿ μ·¿i ³O°ø μoAU
-      - ·oAI A´ ¶≪¿A°iº￥, μnCaCO ³o AO≫A ·¹¶y ±øA´¾i?
+      - Sometimes silence is a pleasure.
+      - Let's look at the stars and make a wish!
+      - I'm a little heavy. Is there any magic that will allow me to fly?
       levelup:
-      - A¹¾Y±° ¶≪AuAI ºC±i¿¡≫A ¿A±ß
-      - ¼´ ºº°oAI AOA·≫I ≫o μu·￡Ao?
-      - '°i°ⓒ¿iAyA´ ¿ÞAμ AI¶ø ·ðCeAμ Ay≫e AØAo ·øCO ¿A±ß '
+      - We're just a little bit closer to invincibility!
+      - Isn't it faster with my help!
+      - The adventures we had together through thick and thin were impressive!
       perfor_1:
-      - ¼o≫aAI ±Æ≫I±ß, AøAoCI¿O ≫eCØ Aa
-      - ¿u°￢ ≫ⓒ¿¡ AOAIAI¾i?
-      - ¼? ··Au ³o AO≫A ¿C AIA±AC Æ÷´oAIAo
+      - This is not a joke. Please take it seriously.
+      - Who do you think is the master?
       perfor_2:
-      - ¾a~Ao~¿¼~
-      - ¶ßAeA·¸I ¾U≫A ³O·® ºe±iμ´ Au AO±i?
-      - ¼A°E~ ¼´¿¡ A|AI ¾I°ⓒ°o!
+      - Being able to touch me is a reward!
+      - '* Stretching *'
+      perfor_3:
+      - Have you ever heard the sound of claws scraping something?
+      - Meow~ I'm the cutest!
       connect:
-      - °A¸￡··AI≫U~
-      - AO¾U ´o¸I°i ¾a³u ¶e°i¿A AO±i?
-      - ±iAI~ °O±i?
+      - I haven't seen you in a while.
+      - Have you learned any new tricks lately?
+      - Hey, there you are!
   Hornet:
     hungry:
       feeding:
-      - °I±Æ! ¶aAI≫U!
+      - Wow! Food time! Buzz buzz~
       dead:
-      - EuAI ±ø¼×. AoAÆ±i?
+      - Aw... no energy? Are you tired, buzz?
       stand:
-      - °A≫AAμ ±iºð¾iAo ½EA´ A￡±Æ ¿￥¾i?
-      - AI³³¿e°¡≫A ¶≪³­°i ¶uAI AO≫e!
+      - Where should we go flower-hunting today, buzz~?
+      - They say scary bees live in another world, buzz!
       levelup:
-      - °I! ¾½AaCØ! AaCICØ!
+      - Wow! Amazing! Congratulations, buzz buzz~!
     bit_hungry:
       feeding:
-      - °I±Æ! ¶aAI≫U!
+      - Yay! Food time, buzz~!
       dead:
-      - EuAI ±ø¼×. AoAÆ±i?
+      - Aw... no energy? Are you tired, buzz?
       stand:
-      - °A≫AAμ ±iºð¾iAo ½EA´ A￡±Æ ¿￥¾i?
-      - AI³³¿e°¡≫A ¶≪³­°i ¶uAI AO≫e!
+      - Where should we go flower-hunting today, buzz~?
+      - They say scary bees live in another world, buzz!
       levelup:
-      - °I! ¾½AaCØ! AaCICØ!
+      - Wow! Amazing! Congratulations, buzz buzz~!
     noting:
       feeding:
-      - °I±Æ! ¶aAI≫U!
+      - Yay! Snack time~ buzz buzz!
       dead:
-      - EuAI ±ø¼×. AoAÆ±i?
+      - Aw... no energy? Are you tired, buzz?
       stand:
-      - °A≫AAμ ±iºð¾iAo ½EA´ A￡±Æ ¿￥¾i?
-      - AI³³¿e°¡≫A ¶≪³­°i ¶uAI AO≫e!
+      - Where should we go flower-hunting today, buzz~?
+      - They say scary bees live in another world, buzz!
       levelup:
-      - ¼ªºº ¾Y¶æ ±i·￥AI ºE¿A≫I¾i Aß μAºO±ß CØ?
+      - I'll grow up soon too, so watch me closely, okay buzz~?
     full:
       feeding:
-      - AIA¨ ¶eμO¸?!
+      - Buzz~ I'm full now! So tasty!
       dead:
-      - EuAI ±ø¼×. AoAÆ±i?
+      - Aw... no energy? Are you tired, buzz?
       stand:
-      - °A≫AAμ ±iºð¾iAo ½EA´ A￡±Æ ¿￥¾i?
-      - AI³³¿e°¡≫A ¶≪³­°i ¶uAI AO≫e!
+      - Where should we go flower-hunting today, buzz~?
+      - They say scary bees live in another world, buzz!
       levelup:
-      - ¼ªºº ¾Y¶æ ±i·￥AI ºE¿A≫I¾i Aß μAºO±ß CØ?
+      - I'll grow up soon too, so watch me closely, okay buzz~?
     so_full:
       feeding:
-      - AIA¨ ¶eμO¸?!
+      - Buzz... too full... can't fly anymore~
       dead:
-      - EuAI ±ø¼×. AoAÆ±i?
+      - Aw... no energy? Are you tired, buzz?
       stand:
-      - °A≫AAμ ±iºð¾iAo ½EA´ A￡±Æ ¿￥¾i?
-      - AI³³¿e°¡≫A ¶≪³­°i ¶uAI AO≫e!
+      - Where should we go flower-hunting today, buzz~?
+      - They say scary bees live in another world, buzz!
       levelup:
-      - ¼ªºº ¾Y¶æ ±i·￥AI ºE¿A≫I¾i Aß μAºO±ß CØ?
+      - I'll grow up soon too, so watch me closely, okay buzz~?
   GIANT_HONET:
     hungry:
       feeding:
-      - Auºº ¶e¿¡ ¿iCA¿Aºc°a!?
+      - I'm hungry too, you know~ buzz!
       danger:
-      - ¸I±a A|·®¿¡ CE°aCØ°a! ´¡·® ºa³³°a.
+      - We need royal jelly, quick! Eat up, buzz!
       dead:
-      - °ⓒ°O≫O½½ ·ð²A¿i ¿¡±ß¿U±i°a.
+      - I must report this... to the Queen...
       stand:
-      - Auºº °ⓒ°O≫OA¼¸¼ ºE ³o AOA´¾i°a?
-      - °A≫Aºº ¶UμuAu ¿I ¿¿¼×°a.
+      - Do you think I can become like the Queen someday, buzz?
+      - Looks like it'll be another busy day, buzz~
       levelup:
-      - °ⓒ°O≫Oºº ¾a´ºCI²C ¿A°¶°a!
+      - The Queen will be so proud of you, buzz buzz~!
     bit_hungry:
       feeding:
-      - Auºº ¶e¿¡ ¿iCA¿Aºc°a!?
+      - I'm hungry too, you know~ buzz!
       danger:
-      - ¸I±a A|·®¿¡ CE°aCØ°a! ´¡·® ºa³³°a.
+      - We need royal jelly, quick! Eat up, buzz!
       dead:
-      - °ⓒ°O≫O½½ ·ð²A¿i ¿¡±ß¿U±i°a.
+      - I must report this... to the Queen...
       stand:
-      - Auºº °ⓒ°O≫OA¼¸¼ ºE ³o AOA´¾i°a?
-      - °A≫Aºº ¶UμuAu ¿I ¿¿¼×°a.
+      - Do you think I can become like the Queen someday, buzz?
+      - Looks like it'll be another busy day, buzz~
       levelup:
-      - °ⓒ°O≫Oºº ¾a´ºCI²C ¿A°¶°a!
+      - The Queen will be so proud of you, buzz buzz~!
     noting:
       feeding:
-      - ¼E¼E °º±c μ·AæAμ ´ⓒ¼oA´ ³o ±ø²A≫I≫U.
+      - Nom nom~ Gotta keep up my nutrients, buzz!
       danger:
-      - ¸I±a A|·®¿¡ CE°aCØ°a! ´¡·® ºa³³°a.
+      - We need royal jelly, quick! Eat up, buzz!
       dead:
-      - °ⓒ°O≫O½½ ·ð²A¿i ¿¡±ß¿U±i°a.
+      - I must report this... to the Queen...
       stand:
-      - Auºº °ⓒ°O≫OA¼¸¼ ºE ³o AOA´¾i°a?
-      - °A≫Aºº ¶UμuAu ¿I ¿¿¼×°a.
+      - Do you think I can become like the Queen someday, buzz?
+      - Looks like it'll be another busy day, buzz~
       levelup:
-      - °ⓒ°O≫Oºº ¾a´ºCI²C ¿A°¶°a!
+      - The Queen will be so proud of you, buzz buzz~!
     full:
       feeding:
-      - ≫o AI´o ·OA··e ¼? ³o ±ø¿O ºC±i¶o¸A°a!
+      - If I eat any more, I won't be able to fly, buzz~!
       danger:
-      - ¸I±a A|·®¿¡ CE°aCØ°a! ´¡·® ºa³³°a.
+      - We need royal jelly, quick! Eat up, buzz!
       dead:
-      - °ⓒ°O≫O½½ ·ð²A¿i ¿¡±ß¿U±i°a.
+      - I must report this... to the Queen...
       stand:
-      - Auºº °ⓒ°O≫OA¼¸¼ ºE ³o AOA´¾i°a?
-      - °A≫Aºº ¶UμuAu ¿I ¿¿¼×°a.
+      - Do you think I can become like the Queen someday, buzz?
+      - Looks like it'll be another busy day, buzz~
       levelup:
-      - °ⓒ°O≫Oºº ¾a´ºCI²C ¿A°¶°a!
+      - The Queen will be so proud of you, buzz buzz~!
     so_full:
       feeding:
-      - ≫o AI´o ·OA··e ¼? ³o ±ø¿O ºC±i¶o¸A°a!
+      - If I eat any more, I won't be able to fly, buzz~!
       danger:
-      - ¸I±a A|·®¿¡ CE°aCØ°a! ´¡·® ºa³³°a.
+      - We need royal jelly, quick! Eat up, buzz!
       dead:
-      - °ⓒ°O≫O½½ ·ð²A¿i ¿¡±ß¿U±i°a.
+      - I must report this... to the Queen...
       stand:
-      - Auºº °ⓒ°O≫OA¼¸¼ ºE ³o AOA´¾i°a?
-      - °A≫Aºº ¶UμuAu ¿I ¿¿¼×°a.
+      - Do you think I can become like the Queen someday, buzz?
+      - Looks like it'll be another busy day, buzz~
       levelup:
-      - °ⓒ°O≫Oºº ¾a´ºCI²C ¿A°¶°a!
+      - The Queen will be so proud of you, buzz buzz~!
   MISTRESS2:
     hungry:
       feeding:
-      - A| ¿ø¶¿A´ ³OE|E÷ CI¿i AOAo ±E¼ª°a?
+      - Are you... neglecting my offering, darling~?
       danger:
-      - AI¸¾ ¿÷°¡³­ ±½¸?A®³­≫A ±E ºE≫a≫I≫U.
+      - You mustn't collapse in a place like this, okay~?
       dead:
-      - ±i¹o¹o...ºOAo¾iAo °A¿Uºa·¾¾i°a?
+      - Oh my... shall I carry you back to the nest~?
       stand:
-      - AuAE°¡³­ ≫ÞAÞCN Ca¾a¿¡...
+      - Mm~ there's such a sweet scent coming from over there...
       levelup:
-      - EAEAEA..AaCIºa·¼≫I≫U.
+      - Fufufu~ congratulations, my dear~
       perfor_1:
-      - ±i¹¾CØ! ±i¹¾CØ! E­AaAI ·A¿¡A¼AY±Æ±Æ±Æ...
+      - Oh no! Oh no! My makeup's ruined~!
       perfor_2:
-      - ≫ÞAÞCN Ca¾a¿¡ ´c¹oA¼±i...!?
+      - The sweet scent... it's gone!?
       perfor_3:
-      - ¾I°ⓒ°i ±ÆAI¼×~
+      - What a cute little one you are~
     bit_hungry:
       feeding:
-      - A| ¿ø¶¿A´ ³OE|E÷ CI¿i AOAo ±E¼ª°a?
+      - Are you... neglecting my offering, darling~?
       danger:
-      - AI¸¾ ¿÷°¡³­ ±½¸?A®³­≫A ±E ºE≫a≫I≫U.
+      - You mustn't collapse in a place like this, okay~?
       dead:
-      - ±i¹o¹o...ºOAo¾iAo °A¿Uºa·¾¾i°a?
+      - Oh my... shall I carry you back to the nest~?
       stand:
-      - AuAE°¡³­ ≫ÞAÞCN Ca¾a¿¡...
+      - Mm~ there's such a sweet scent coming from over there...
       levelup:
-      - EAEAEA..AaCIºa·¼≫I≫U.
+      - Fufufu~ congratulations, my dear~
       perfor_1:
-      - ±i¹¾CØ! ±i¹¾CØ! E­AaAI ·A¿¡A¼AY±Æ±Æ±Æ...
+      - Oh no! Oh no! My makeup's ruined~!
       perfor_2:
-      - ≫ÞAÞCN Ca¾a¿¡ ´c¹oA¼±i...!?
+      - The sweet scent... it's gone!?
       perfor_3:
-      - ¾I°ⓒ°i ±ÆAI¼×~
+      - What a cute little one you are~
     noting:
       feeding:
-      - EaA²..AIAe CO¾i°a.
+      - Hmm~ I suppose that's enough for now~
       danger:
-      - AI¸¾ ¿÷°¡³­ ±½¸?A®³­≫A ±E ºE≫a≫I≫U.
+      - You mustn't collapse in a place like this, okay~?
       dead:
-      - ±i¹o¹o...ºOAo¾iAo °A¿Uºa·¾¾i°a?
+      - Oh my... shall I carry you back to the nest~?
       stand:
-      - AuAE°¡³­ ≫ÞAÞCN Ca¾a¿¡...
+      - Mm~ there's such a sweet scent coming from over there...
       levelup:
-      - EAEAEA..AaCIºa·¼≫I≫U.
+      - Fufufu~ congratulations, my dear~
       perfor_1:
-      - ±i¹¾CØ! ±i¹¾CØ! E­AaAI ·A¿¡A¼AY±Æ±Æ±Æ...
+      - Oh no! Oh no! My makeup's ruined~!
       perfor_2:
-      - ≫ÞAÞCN Ca¾a¿¡ ´c¹oA¼±i...!?
+      - The sweet scent... it's gone!?
       perfor_3:
-      - ¾I°ⓒ°i ±ÆAI¼×~
+      - What a cute little one you are~
     full:
       feeding:
-      - EaA²..AIAe CO¾i°a.
+      - Hmm~ I suppose that's enough for now~
       danger:
-      - AI¸¾ ¿÷°¡³­ ±½¸?A®³­≫A ±E ºE≫a≫I≫U.
+      - You mustn't collapse in a place like this, okay~?
       dead:
-      - ±i¹o¹o...ºOAo¾iAo °A¿Uºa·¾¾i°a?
+      - Oh my... shall I carry you back to the nest~?
       stand:
-      - AuAE°¡³­ ≫ÞAÞCN Ca¾a¿¡...
+      - Mm~ there's such a sweet scent coming from over there...
       levelup:
-      - EAEAEA..AaCIºa·¼≫I≫U.
+      - Fufufu~ congratulations, my dear~
       perfor_1:
-      - ±i¹¾CØ! ±i¹¾CØ! E­AaAI ·A¿¡A¼AY±Æ±Æ±Æ...
+      - Oh no! Oh no! My makeup's ruined~!
       perfor_2:
-      - ≫ÞAÞCN Ca¾a¿¡ ´c¹oA¼±i...!?
+      - The sweet scent... it's gone!?
       perfor_3:
-      - ¾I°ⓒ°i ±ÆAI¼×~
+      - What a cute little one you are~
     so_full:
       feeding:
-      - EaA²..AIAe CO¾i°a.
+      - Hmm~ I suppose that's enough for now~
       danger:
-      - AI¸¾ ¿÷°¡³­ ±½¸?A®³­≫A ±E ºE≫a≫I≫U.
+      - You mustn't collapse in a place like this, okay~?
       dead:
-      - ±i¹o¹o...ºOAo¾iAo °A¿Uºa·¾¾i°a?
+      - Oh my... shall I carry you back to the nest~?
       stand:
-      - AuAE°¡³­ ≫ÞAÞCN Ca¾a¿¡...
+      - Mm~ there's such a sweet scent coming from over there...
       levelup:
-      - EAEAEA..AaCIºa·¼≫I≫U.
+      - Fufufu~ congratulations, my dear~
       perfor_1:
-      - ±i¹¾CØ! ±i¹¾CØ! E­AaAI ·A¿¡A¼AY±Æ±Æ±Æ...
+      - Oh no! Oh no! My makeup's ruined~!
       perfor_2:
-      - ≫ÞAÞCN Ca¾a¿¡ ´c¹oA¼±i...!?
+      - The sweet scent... it's gone!?
       perfor_3:
-      - ¾I°ⓒ°i ±ÆAI¼×~
+      - What a cute little one you are~
   SKEGGIOLD:
     hungry:
       feeding:
-      - ¶e¿iÆI≫Aº￥ Aß ºÆ¼×°a! ¼E¼E.
+      - Gorugorugoru~(Yay~)
+      danger:
+      - Goru!(Heal!)
       dead:
-      - ≫ICACiAOAμ ¾×¸·¿O ¿¡≫A ¿A ±Æ≫I°¡°a!!
+      - Goru!?(Don't fall!)
       stand:
-      - Au Æ÷·ºAI¹u ≫Þ¹o°a! ¶ßA¿·®≫OA´ ·ð²A≫A¿E°a!
-      - º￥μo·ºAI¹u A￡¾·¼A¾·°a? º￥μo·ºAI ≫ⓒ¾μº￥°a?
+      - Gorugorugoru(It's fun!)
+      - Gorugorugoru(Where are you going?)
+      - Gorugorugoru(Fun!)
       levelup:
-      - AaCIºa¸A°a!!
+      - Goru!(Congratulations!)
     bit_hungry:
-      feeding:
-      - ¶e¿iÆI≫Aº￥ Aß ºÆ¼×°a! ¼E¼E.
+      # feeding:
+      # - Gorugorugoruâ占썩ª(Yay~)
+      danger:
+      - Goru!(Heal!)
       dead:
-      - ≫ICACiAOAμ ¾×¸·¿O ¿¡≫A ¿A ±Æ≫I°¡°a!!
+      - Goru!?(Don't fall!)
       stand:
-      - Au Æ÷·ºAI¹u ≫Þ¹o°a! ¶ßA¿·®≫OA´ ·ð²A≫A¿E°a!
-      - º￥μo·ºAI¹u A￡¾·¼A¾·°a? º￥μo·ºAI ≫ⓒ¾μº￥°a?
+      - Gorugorugoru(It's fun!)
+      - Gorugorugoru(Where are you going?)
+      - Gorugorugoru(Fun!)
       levelup:
-      - AaCIºa¸A°a!!
+      - Goru!(Congratulations!)
     noting:
       feeding:
-      - ¶eμI·￥º￥ AO²A≫I¾i ·OA´¿O°a! ¼E¼E.
+      - Gorugoru(Thank you for the food!)
+      danger:
+      - Goru!(Heal!)
       dead:
-      - ≫ICACiAOAμ ¾×¸·¿O ¿¡≫A ¿A ±Æ≫I°¡°a!!
+      - Goru!?(Don't fall!)
       stand:
-      - Au Æ÷·ºAI¹u ≫Þ¹o°a! ¶ßA¿·®≫OA´ ·ð²A≫A¿E°a!
-      - º￥μo·ºAI¹u A￡¾·¼A¾·°a? º￥μo·ºAI ≫ⓒ¾μº￥°a?
+      - Gorugorugoru(It's fun!)
+      - Gorugorugoru(Where are you going?)
+      - Gorugorugoru(Fun!)
       levelup:
-      - AaCIºa¸A°a!!
+      - Goru!(Congratulations!)
     full:
       feeding:
-      - ¶eμI·￥º￥ AO²A≫I¾i ·OA´¿O°a! ¼E¼E.
+      - Goru...(I don't need it...)
+      danger:
+      - Goru!(Heal!)
       dead:
-      - ≫ICACiAOAμ ¾×¸·¿O ¿¡≫A ¿A ±Æ≫I°¡°a!!
+      - Goru!?(Don't fall!)
       stand:
-      - Au Æ÷·ºAI¹u ≫Þ¹o°a! ¶ßA¿·®≫OA´ ·ð²A≫A¿E°a!
-      - º￥μo·ºAI¹u A￡¾·¼A¾·°a? º￥μo·ºAI ≫ⓒ¾μº￥°a?
+      - Gorugorugoru(It's fun!)
+      - Gorugorugoru(Where are you going?)
+      - Gorugorugoru(Fun!)
       levelup:
-      - AaCIºa¸A°a!!
+      - Goru!(Congratulations!)
     so_full:
       feeding:
-      - ¾×··AO³³°a!
+      - Goru...(I don't need it...)
+      danger:
+      - Goru!(Heal!)
       dead:
-      - ≫ICACiAOAμ ¾×¸·¿O ¿¡≫A ¿A ±Æ≫I°¡°a!!
+      - Goru!?(Don't fall!)
       stand:
-      - Au Æ÷·ºAI¹u ≫Þ¹o°a! ¶ßA¿·®≫OA´ ·ð²A≫A¿E°a!
-      - º￥μo·ºAI¹u A￡¾·¼A¾·°a? º￥μo·ºAI ≫ⓒ¾μº￥°a?
+      - Gorugorugoru(It's fun!)
+      - Gorugorugoru(Where are you going?)
+      - Gorugorugoru(Fun!)
       levelup:
-      - AaCIºa¸A°a!!
+      - Goru!(Congratulations!)
   ANGELGOLT:
     hungry:
       feeding:
-      - ·AAO±i°a! ¼E¼E~
+      - Food~~
       danger:
-      - ¶ßA¿·®≫O ºº°IAO³³°a !!
+      - Pain, pain, go away~~
       dead:
-      - ¾aººCO¿O°a¡|
+      - What's wrong, do you want to go to our country?
       stand:
-      - Au AI°AA²¸a¿¡ ±Æ≫I°¡°a~
-      - Au ¶ßA¿·®≫OAC ³¾AAA´ ¶ÞAμ A§≫eCN Au´c~ °￡Aⓒ·º¿u≫A ≫U·￡≫U¾·°a.
+      - Let's make a miracle happen~~
+      - Are you ready?
+      - What are you doing?
       levelup:
-      - ¿­CØAo³I¼×°a! ¶ßA¿·®¿¡ ºCμ·²C ´y¿￠Aμ ±ø¼ª°a?
+      - L E V E L U P !
     bit_hungry:
       feeding:
-      - ·AAO±i°a! ¼E¼E~
+      - Food~~
       danger:
-      - ¶ßA¿·®≫O ºº°IAO³³°a !!
+      - Pain, pain, go away~~
       dead:
-      - ¾aººCO¿O°a¡|
+      - What's wrong, do you want to go to our country?
       stand:
-      - Au AI°AA²¸a¿¡ ±Æ≫I°¡°a~
-      - Au ¶ßA¿·®≫OAC ³¾AAA´ ¶ÞAμ A§≫eCN Au´c~ °￡Aⓒ·º¿u≫A ≫U·￡≫U¾·°a.
+      - Let's make a miracle happen~~
+      - Are you ready?
+      - What are you doing?
       levelup:
-      - ¿­CØAo³I¼×°a! ¶ßA¿·®¿¡ ºCμ·²C ´y¿￠Aμ ±ø¼ª°a?
+      - L E V E L U P !
     noting:
       feeding:
-      - ·AAO±i°a! ¼E¼E~
+      - Munch, munch!
       danger:
-      - ¶ßA¿·®≫O ºº°IAO³³°a !!
+      - Pain, pain, go away~~
       dead:
-      - ¾aººCO¿O°a¡|
+      - What's wrong, do you want to go to our country?
       stand:
-      - Au AI°AA²¸a¿¡ ±Æ≫I°¡°a~
-      - Au ¶ßA¿·®≫OAC ³¾AAA´ ¶ÞAμ A§≫eCN Au´c~ °￡Aⓒ·º¿u≫A ≫U·￡≫U¾·°a.
+      - Let's make a miracle happen~~
+      - Are you ready?
+      - What are you doing?
       levelup:
-      - ¿­CØAo³I¼×°a! ¶ßA¿·®¿¡ ºCμ·²C ´y¿￠Aμ ±ø¼ª°a?
+      - L E V E L U P !
     full:
       feeding:
-      - AIAu¿I ¿¿±Æ°a... ¼E¼E...
+      - I'm so full...
       danger:
-      - ¶ßA¿·®≫O ºº°IAO³³°a !!
+      - Pain, pain, go away~~
       dead:
-      - ¾aººCO¿O°a¡|
+      - What's wrong, do you want to go to our country?
       stand:
-      - Au AI°AA²¸a¿¡ ±Æ≫I°¡°a~
-      - Au ¶ßA¿·®≫OAC ³¾AAA´ ¶ÞAμ A§≫eCN Au´c~ °￡Aⓒ·º¿u≫A ≫U·￡≫U¾·°a.
+      - Let's make a miracle happen~~
+      - Are you ready?
+      - What are you doing?
       levelup:
-      - ¿­CØAo³I¼×°a! ¶ßA¿·®¿¡ ºCμ·²C ´y¿￠Aμ ±ø¼ª°a?
+      - L E V E L U P !
     so_full:
       feeding:
-      - AIAu¿I ¿¿±Æ°a... ¼E¼E...
+      - I'm so full...
       danger:
-      - ¶ßA¿·®≫O ºº°IAO³³°a !!
+      - Pain, pain, go away~~
       dead:
-      - ¾aººCO¿O°a¡|
+      - What's wrong, do you want to go to our country?
       stand:
-      - Au AI°AA²¸a¿¡ ±Æ≫I°¡°a~
-      - Au ¶ßA¿·®≫OAC ³¾AAA´ ¶ÞAμ A§≫eCN Au´c~ °￡Aⓒ·º¿u≫A ≫U·￡≫U¾·°a.
+      - Let's make a miracle happen~~
+      - Are you ready?
+      - What are you doing?
       levelup:
-      - ¿­CØAo³I¼×°a! ¶ßA¿·®¿¡ ºCμ·²C ´y¿￠Aμ ±ø¼ª°a?
+      - L E V E L U P !
   Clock:
     hungry:
       feeding:
-      - ²A¿e¿¡ ≫A¸AAoAø ±E¿U¾μ.
+      - ' The clock will not slow down, it seems. '
       dead:
-      - CCCO ³o ±ø≫A A×A²A·¸I AIººCI≫A ¿C ²A¿￡ ´O··AI ±Æ≫Nºi CI¾μ.
+      - ' It seems time is not the only thing that leads one to inevitable death. '
       stand:
-      - ·¶Aμ ²A¿e¿¡ 10²A 10μÐA´ ¿¡·￡A¿¿i AO≫U¼×. ºðAoAÐ? ¾×¿O ¶μ¿¡?
-      - ¶aAμ ²A¿￡AC Ea·§AC ¿a¿uAI³³. ¶¶? ±i·￥ºeA´ A§CØ³­¹o¿i?
+      - ' Many clocks point to 10:10. Digital? What is that? '
+      - ' Night is merely the result of time''s passage. Hmm? For the sake of appearances? '
       levelup:
-      - EC·￠CI¼×.
+      - ' Excellent. '
     bit_hungry:
       feeding:
-      - ²A¿e¿¡ ≫A¸AAoAø ±E¿U¾μ.
+      - ' The clock will not slow down, it seems. '
       dead:
-      - CCCO ³o ±ø≫A A×A²A·¸I AIººCI≫A ¿C ²A¿￡ ´O··AI ±Æ≫Nºi CI¾μ.
+      - ' It seems time is not the only thing that leads one to inevitable death. '
       stand:
-      - ·¶Aμ ²A¿e¿¡ 10²A 10μÐA´ ¿¡·￡A¿¿i AO≫U¼×. ºðAoAÐ? ¾×¿O ¶μ¿¡?
-      - ¶aAμ ²A¿￡AC Ea·§AC ¿a¿uAI³³. ¶¶? ±i·￥ºeA´ A§CØ³­¹o¿i?
+      - ' Many clocks point to 10:10. Digital? What is that? '
+      - ' Night is merely the result of time''s passage. Hmm? For the sake of appearances? '
       levelup:
-      - EC·￠CI¼×.
+      - ' Excellent. '
     noting:
       feeding:
-      - ²A¿e¿¡ ≫A¸AAoAø ±E¿U¾μ.
+      - ' The clock will not slow down, it seems. '
       dead:
-      - CCCO ³o ±ø≫A A×A²A·¸I AIººCI≫A ¿C ²A¿￡ ´O··AI ±Æ≫Nºi CI¾μ.
+      - ' It seems time is not the only thing that leads one to inevitable death. '
       stand:
-      - ·¶Aμ ²A¿e¿¡ 10²A 10μÐA´ ¿¡·￡A¿¿i AO≫U¼×. ºðAoAÐ? ¾×¿O ¶μ¿¡?
-      - ¶aAμ ²A¿￡AC Ea·§AC ¿a¿uAI³³. ¶¶? ±i·￥ºeA´ A§CØ³­¹o¿i?
+      - ' Many clocks point to 10:10. Digital? What is that? '
+      - ' Night is merely the result of time''s passage. Hmm? For the sake of appearances? '
       levelup:
-      - ²A¿￡ºº ¾×≫eAC ³μAaA´ ºu¹o¿¡¾a°￡ ¶÷A÷¾μ.
+      - ' Even time struggles to keep up with your growth. '
     full:
       feeding:
-      - AI¶I AæμÐCI≫U¼×...
+      - ' That will suffice... '
       dead:
-      - CCCO ³o ±ø≫A A×A²A·¸I AIººCI≫A ¿C ²A¿￡ ´O··AI ±Æ≫Nºi CI¾μ.
+      - ' It seems time is not the only thing that leads one to inevitable death. '
       stand:
-      - ·¶Aμ ²A¿e¿¡ 10²A 10μÐA´ ¿¡·￡A¿¿i AO≫U¼×. ºðAoAÐ? ¾×¿O ¶μ¿¡?
-      - ¶aAμ ²A¿￡AC Ea·§AC ¿a¿uAI³³. ¶¶? ±i·￥ºeA´ A§CØ³­¹o¿i?
+      - ' Many clocks point to 10:10. Digital? What is that? '
+      - ' Night is merely the result of time''s passage. Hmm? For the sake of appearances? '
       levelup:
-      - ²A¿￡ºº ¾×≫eAC ³μAaA´ ºu¹o¿¡¾a°￡ ¶÷A÷¾μ.
+      - ' Even time struggles to keep up with your growth. '
     so_full:
       feeding:
-      - AI¶I AæμÐCI≫U¼×...
+      - ' That will suffice... '
       dead:
-      - CCCO ³o ±ø≫A A×A²A·¸I AIººCI≫A ¿C ²A¿￡ ´O··AI ±Æ≫Nºi CI¾μ.
+      - ' It seems time is not the only thing that leads one to inevitable death. '
       stand:
-      - ·¶Aμ ²A¿e¿¡ 10²A 10μÐA´ ¿¡·￡A¿¿i AO≫U¼×. ºðAoAÐ? ¾×¿O ¶μ¿¡?
-      - ¶aAμ ²A¿￡AC Ea·§AC ¿a¿uAI³³. ¶¶? ±i·￥ºeA´ A§CØ³­¹o¿i?
+      - ' Many clocks point to 10:10. Digital? What is that? '
+      - ' Night is merely the result of time''s passage. Hmm? For the sake of appearances? '
       levelup:
-      - ²A¿￡ºº ¾×≫eAC ³μAaA´ ºu¹o¿¡¾a°￡ ¶÷A÷¾μ.
+      - ' Even time struggles to keep up with your growth. '
   C_Tower_Manager:
     hungry:
       feeding:
-      - ¾a≫EA´ A¤AoCI¾a A÷AuAI±u²A≫I≫U.
+      - ' I was on the verge of ceasing operation. '
       danger:
-      - A³¸A ¿u·®·| ³OE|CI²A·e ±EºE≫I≫U.
+      - ' You must not neglect your physical condition. '
       dead:
-      - ¾×≫eAC CI¸c·| ¾×≫eAC ·¹Ao·¸ ¼?AI¹o¿i ´y¿￠CI¹o≫A ¿IAμ A¤·´ A×A·¹o≫A ¹æAI ±Æ≫O≫I≫U.
+      - ' To live each day as if it were your last does not mean you should truly die. '
       stand:
-      - ¼E¶≪ °A¸¡ A¿¼ª³³ - μi¸c¿￥·®¼e·| μn°oºN ³ø ±ø²A≫I≫U.
-      - μe¸cAE´cAI·O, CE·¼¶U·®³³Ai, ¸I·Þ¸I²μÆa³￡¸¶¡| EC·￠CN °￢¾Y³u´c·| ¾a±iCØAO²E²A°A.
+      - ' We cannot leave this place unattended for too long. '
+      - ' Please remember the great alchemists of the past... '
       levelup:
-      - ·UAø ·ð²AAO≫I≫U. CO½½ ²A¿eA±A´ ¿u·®CØμ·²C ´y¿￠Aμ ±øA·²A¿¡°a?
+      - ' Impressive. Would you consider assisting in managing the Clock Tower? '
     bit_hungry:
       feeding:
-      - ¿i·°²A≫I≫U, ²A¿eA± ¿u·®°¡ ≫o°i Eu±½¿U²A≫I≫U.
+      - ' Thank you. I will devote myself further to managing the Clock Tower. '
       danger:
-      - A³¸A ¿u·®·| ³OE|CI²A·e ±EºE≫I≫U.
+      - ' You must not neglect your physical condition. '
       dead:
-      - ¾×≫eAC CI¸c·| ¾×≫eAC ·¹Ao·¸ ¼?AI¹o¿i ´y¿￠CI¹o≫A ¿IAμ A¤·´ A×A·¹o≫A ¹æAI ±Æ≫O≫I≫U.
+      - ' To live each day as if it were your last does not mean you should truly die. '
       stand:
-      - ¼E¶≪ °A¸¡ A¿¼ª³³ - μi¸c¿￥·®¼e·| μn°oºN ³ø ±ø²A≫I≫U.
-      - μe¸cAE´cAI·O, CE·¼¶U·®³³Ai, ¸I·Þ¸I²μÆa³￡¸¶¡| EC·￠CN °￢¾Y³u´c·| ¾a±iCØAO²E²A°A.
+      - ' We cannot leave this place unattended for too long. '
+      - ' Please remember the great alchemists of the past... '
       levelup:
-      - ·UAø ·ð²AAO≫I≫U. CO½½ ²A¿eA±A´ ¿u·®CØμ·²C ´y¿￠Aμ ±øA·²A¿¡°a?
+      - ' Impressive. Would you consider assisting in managing the Clock Tower? '
     noting:
       feeding:
-      - ¿i·°²A≫I≫U, ²A¿eA± ¿u·®°¡ ≫o°i Eu±½¿U²A≫I≫U.
+      - ' Thank you. I will devote myself further to managing the Clock Tower. '
       danger:
-      - A³¸A ¿u·®·| ³OE|CI²A·e ±EºE≫I≫U.
+      - ' You must not neglect your physical condition. '
       dead:
-      - ¾×≫eAC CI¸c·| ¾×≫eAC ·¹Ao·¸ ¼?AI¹o¿i ´y¿￠CI¹o≫A ¿IAμ A¤·´ A×A·¹o≫A ¹æAI ±Æ≫O≫I≫U.
+      - ' To live each day as if it were your last does not mean you should truly die. '
       stand:
-      - ¼E¶≪ °A¸¡ A¿¼ª³³ - μi¸c¿￥·®¼e·| μn°oºN ³ø ±ø²A≫I≫U.
-      - μe¸cAE´cAI·O, CE·¼¶U·®³³Ai, ¸I·Þ¸I²μÆa³￡¸¶¡| EC·￠CN °￢¾Y³u´c·| ¾a±iCØAO²E²A°A.
+      - ' We cannot leave this place unattended for too long. '
+      - ' Please remember the great alchemists of the past... '
       levelup:
-      - ·UAø ·ð²AAO≫I≫U. CO½½ ²A¿eA±A´ ¿u·®CØμ·²C ´y¿￠Aμ ±øA·²A¿¡°a?
+      - ' Impressive. Would you consider assisting in managing the Clock Tower? '
     full:
       feeding:
-      - ¿i·°²A≫I≫U·· ¿iAa¼? ³o AOA·≫I AOACCØAO²E²A°A.
+      - ' Thank you, but please be cautious. I may malfunction. '
       danger:
-      - A³¸A ¿u·®·| ³OE|CI²A·e ±EºE≫I≫U.
+      - ' You must not neglect your physical condition. '
       dead:
-      - ¾×≫eAC CI¸c·| ¾×≫eAC ·¹Ao·¸ ¼?AI¹o¿i ´y¿￠CI¹o≫A ¿IAμ A¤·´ A×A·¹o≫A ¹æAI ±Æ≫O≫I≫U.
+      - ' To live each day as if it were your last does not mean you should truly die. '
       stand:
-      - ¼E¶≪ °A¸¡ A¿¼ª³³ - μi¸c¿￥·®¼e·| μn°oºN ³ø ±ø²A≫I≫U.
-      - μe¸cAE´cAI·O, CE·¼¶U·®³³Ai, ¸I·Þ¸I²μÆa³￡¸¶¡| EC·￠CN °￢¾Y³u´c·| ¾a±iCØAO²E²A°A.
+      - ' We cannot leave this place unattended for too long. '
+      - ' Please remember the great alchemists of the past... '
       levelup:
-      - ·UAø ·ð²AAO≫I≫U. CO½½ ²A¿eA±A´ ¿u·®CØμ·²C ´y¿￠Aμ ±øA·²A¿¡°a?
+      - ' Impressive. Would you consider assisting in managing the Clock Tower? '
     so_full:
       feeding:
-      - ¿i·°²A≫I≫U·· ¿iAa¼? ³o AOA·≫I AOACCØAO²E²A°A.
+      - ' Thank you, but please be cautious. I may malfunction. '
       danger:
-      - A³¸A ¿u·®·| ³OE|CI²A·e ±EºE≫I≫U.
+      - ' You must not neglect your physical condition. '
       dead:
-      - ¾×≫eAC CI¸c·| ¾×≫eAC ·¹Ao·¸ ¼?AI¹o¿i ´y¿￠CI¹o≫A ¿IAμ A¤·´ A×A·¹o≫A ¹æAI ±Æ≫O≫I≫U.
+      - ' To live each day as if it were your last does not mean you should truly die. '
       stand:
-      - ¼E¶≪ °A¸¡ A¿¼ª³³ - μi¸c¿￥·®¼e·| μn°oºN ³ø ±ø²A≫I≫U.
-      - μe¸cAE´cAI·O, CE·¼¶U·®³³Ai, ¸I·Þ¸I²μÆa³￡¸¶¡| EC·￠CN °￢¾Y³u´c·| ¾a±iCØAO²E²A°A.
+      - ' We cannot leave this place unattended for too long. '
+      - ' Please remember the great alchemists of the past... '
       levelup:
-      - ·UAø ·ð²AAO≫I≫U. CO½½ ²A¿eA±A´ ¿u·®CØμ·²C ´y¿￠Aμ ±øA·²A¿¡°a?
+      - ' Impressive. Would you consider assisting in managing the Clock Tower? '
   TIMEHOLDER2:
     hungry:
       feeding:
-      - AA¡|.A³±÷¡|AA¾μ...
+      - ' Mmm... mm... good... '
       danger:
-      - ¼EAC ²A¿￡A´¡|¼oA¡Ao ·¹¹o...
+      - ' Do not... lose your time... '
       dead:
-      - A×A²AC ²A¿￡A´ μUAa±O¾·¼ª...
+      - ' You have grasped... the time of death... '
       stand:
-      - ¶≪AC¶ICN ²A¿￡ ³O°¡³­ AC¶I·| A￡≫A¿C ¼EEnºeAC ·oAI≫U...
-      - ²A¿￡Aμ ·ðºI°¡¿O ÆoºiCIAo≫A ±EA·≫I...
+      - ' Finding meaning within meaningless time... is your burden... '
+      - ' Time is not equal... for all... '
       levelup:
-      - ¼E¿¡ AoAUCN ²A¿￡A´ AØAo ·¹¹o...
+      - ' Do not forget... the time you have invested... '
       perfor_1:
-      - Zzz¡|Zzzz¡|.
+      - ' Zzz... Zzzz... '
       perfor_2:
-      - ²A¿￡ °ªCa? ¿¡≫cA¡ºº ±EAμ ³O·®... ¿A²μ·| ´y¿￠ ·¹¹o...
+      - ' Reversing time? Absurd... Do not even think of defying it... '
       perfor_3:
-      - (´º! ½U!) ¡|²A½o¸≫¾μ...
+      - ' (Thud... press...) ...How noisy... '
     bit_hungry:
       feeding:
-      - AA¡|.A³±÷¡|AA¾μ...
+      - ' Mmm... mm... good... '
       danger:
-      - ¼EAC ²A¿￡A´¡|¼oA¡Ao ·¹¹o...
+      - ' Do not... lose your time... '
       dead:
-      - A×A²AC ²A¿￡A´ μUAa±O¾·¼ª...
+      - ' You have grasped... the time of death... '
       stand:
-      - ¶≪AC¶ICN ²A¿￡ ³O°¡³­ AC¶I·| A￡≫A¿C ¼EEnºeAC ·oAI≫U...
-      - ²A¿￡Aμ ·ðºI°¡¿O ÆoºiCIAo≫A ±EA·≫I...
+      - ' Finding meaning within meaningless time... is your burden... '
+      - ' Time is not equal... for all... '
       levelup:
-      - ¼E¿¡ AoAUCN ²A¿￡A´ AØAo ·¹¹o...
+      - ' Do not forget... the time you have invested... '
       perfor_1:
-      - Zzz¡|Zzzz¡|.
+      - ' Zzz... Zzzz... '
       perfor_2:
-      - ²A¿￡ °ªCa? ¿¡≫cA¡ºº ±EAμ ³O·®... ¿A²μ·| ´y¿￠ ·¹¹o...
+      - ' Reversing time? Absurd... Do not even think of defying it... '
       perfor_3:
-      - (´º! ½U!) ¡|²A½o¸≫¾μ...
+      - ' (Thud... press...) ...How noisy... '
     noting:
       feeding:
-      - AA¡|.A³±÷¡|AA¾μ...
+      - ' Mmm... mm... good... '
       danger:
-      - ¼EAC ²A¿￡A´¡|¼oA¡Ao ·¹¹o...
+      - ' Do not... lose your time... '
       dead:
-      - A×A²AC ²A¿￡A´ μUAa±O¾·¼ª...
+      - ' You have grasped... the time of death... '
       stand:
-      - ¶≪AC¶ICN ²A¿￡ ³O°¡³­ AC¶I·| A￡≫A¿C ¼EEnºeAC ·oAI≫U...
-      - ²A¿￡Aμ ·ðºI°¡¿O ÆoºiCIAo≫A ±EA·≫I...
+      - ' Finding meaning within meaningless time... is your burden... '
+      - ' Time is not equal... for all... '
       levelup:
-      - ¼E¿¡ AoAUCN ²A¿￡A´ AØAo ·¹¹o...
+      - ' Do not forget... the time you have invested... '
       perfor_1:
-      - Zzz¡|Zzzz¡|.
+      - ' Zzz... Zzzz... '
       perfor_2:
-      - ²A¿￡ °ªCa? ¿¡≫cA¡ºº ±EAμ ³O·®... ¿A²μ·| ´y¿￠ ·¹¹o...
+      - ' Reversing time? Absurd... Do not even think of defying it... '
       perfor_3:
-      - (´º! ½U!) ¡|²A½o¸≫¾μ...
+      - ' (Thud... press...) ...How noisy... '
     full:
       feeding:
-      - AA¡|.A³±÷¡|¶eμI·￡¾μ...
+      - ' Mmm... mm... I am full... '
       danger:
-      - ¼EAC ²A¿￡A´¡|¼oA¡Ao ·¹¹o...
+      - ' Do not... lose your time... '
       dead:
-      - A×A²AC ²A¿￡A´ μUAa±O¾·¼ª...
+      - ' You have grasped... the time of death... '
       stand:
-      - ¶≪AC¶ICN ²A¿￡ ³O°¡³­ AC¶I·| A￡≫A¿C ¼EEnºeAC ·oAI≫U...
-      - ²A¿￡Aμ ·ðºI°¡¿O ÆoºiCIAo≫A ±EA·≫I...
+      - ' Finding meaning within meaningless time... is your burden... '
+      - ' Time is not equal... for all... '
       levelup:
-      - ¼E¿¡ AoAUCN ²A¿￡A´ AØAo ·¹¹o...
+      - ' Do not forget... the time you have invested... '
       perfor_1:
-      - Zzz¡|Zzzz¡|.
+      - ' Zzz... Zzzz... '
       perfor_2:
-      - ²A¿￡ °ªCa? ¿¡≫cA¡ºº ±EAμ ³O·®... ¿A²μ·| ´y¿￠ ·¹¹o...
+      - ' Reversing time? Absurd... Do not even think of defying it... '
       perfor_3:
-      - (´º! ½U!) ¡|²A½o¸≫¾μ...
+      - ' (Thud... press...) ...How noisy... '
     so_full:
       feeding:
-      - AA¡|.A³±÷¡|¶eμI·￡¾μ...
+      - ' Mmm... mm... I am full... '
       danger:
-      - ¼EAC ²A¿￡A´¡|¼oA¡Ao ·¹¹o...
+      - ' Do not... lose your time... '
       dead:
-      - A×A²AC ²A¿￡A´ μUAa±O¾·¼ª...
+      - ' You have grasped... the time of death... '
       stand:
-      - ¶≪AC¶ICN ²A¿￡ ³O°¡³­ AC¶I·| A￡≫A¿C ¼EEnºeAC ·oAI≫U...
-      - ²A¿￡Aμ ·ðºI°¡¿O ÆoºiCIAo≫A ±EA·≫I...
+      - ' Finding meaning within meaningless time... is your burden... '
+      - ' Time is not equal... for all... '
       levelup:
-      - ¼E¿¡ AoAUCN ²A¿￡A´ AØAo ·¹¹o...
+      - ' Do not forget... the time you have invested... '
       perfor_1:
-      - Zzz¡|Zzzz¡|.
+      - ' Zzz... Zzzz... '
       perfor_2:
-      - ²A¿￡ °ªCa? ¿¡≫cA¡ºº ±EAμ ³O·®... ¿A²μ·| ´y¿￠ ·¹¹o...
+      - ' Reversing time? Absurd... Do not even think of defying it... '
       perfor_3:
-      - (´º! ½U!) ¡|²A½o¸≫¾μ...
+      - ' (Thud... press...) ...How noisy... '
