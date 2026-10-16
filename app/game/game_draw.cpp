@@ -16,6 +16,7 @@
 #include "ro/render/actor_sprite.h"
 #include "ro/render/ground_cursor.h"
 #include "ro/render/ground_pick.h"
+#include "ro/render/map_point_lights.h"
 #include "ro/render/skill_area.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/sim/actor.h"
@@ -30,7 +31,6 @@
 #include "world/click_action.h"
 #include "world/entity_menu.h"
 #include "world/ground_unit_view.h"
-#include "world/map_point_lights.h"
 #include "world/pick_box_view.h"
 #include "world/scene_graphics.h"
 #include "world/screen_overlays.h"
@@ -167,7 +167,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   }
   // LES LUMIÈRES PONCTUELLES DU DOCUMENT D'ÉDITION, les plus proches de ce que
   // la caméra regarde : voir docs/adr/0119.
-  const ro::render::PointLightSet points = MapPointLights(
+  const ro::render::PointLightSet points = ro::render::MapPointLights(
       map_edits_.Document(stage_->name).lights(),
       ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}, sky.light,
       MapClosedToSky(), camera_.look_at);

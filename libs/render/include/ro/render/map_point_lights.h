@@ -9,7 +9,7 @@
 #include "ro/render/point_lights.h"
 #include "ro/render/scene_light.h"
 
-namespace moonclient {
+namespace ro::render {
 
 // LES LUMIÈRES PONCTUELLES DE L'IMAGE : celles du document, passées au monde,
 // leur intensité de l'instant, puis les plus proches de `eye`. Voir
@@ -19,8 +19,8 @@ namespace moonclient {
 // composante la plus claire de `daylight × tint` : le ciel à l'heure ET la
 // nuit que le serveur pose. Sur une carte fermée au ciel — intérieur, donjon,
 // `always_night` —, elle brille pleinement : rien n'y fait le jour.
-[[nodiscard]] ro::render::PointLightSet MapPointLights(
-    const std::vector<ro::mapedit::AddedLight>& lights, const ro::render::MapEffectFrame& frame,
-    const ro::render::SceneLight& sky, bool always_night, glm::vec3 eye);
+[[nodiscard]] PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
+                                           const MapEffectFrame& frame, const SceneLight& sky,
+                                           bool always_night, glm::vec3 eye);
 
-}  // namespace moonclient
+}  // namespace ro::render

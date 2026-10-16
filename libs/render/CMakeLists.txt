@@ -130,6 +130,7 @@ add_library(ro_render STATIC
     src/ground_unit_pose.cpp
     src/model_bake.cpp
     src/model_mesh.cpp
+    src/map_point_lights.cpp
     src/model_mesh_identity.cpp
     src/point_lights.cpp
     src/model_pick.cpp
