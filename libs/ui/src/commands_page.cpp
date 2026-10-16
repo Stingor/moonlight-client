@@ -12,6 +12,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/chat_link_offer.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -159,15 +160,14 @@ void DrawGeneralTab(const CommandsPageView& view, const SkinArt& art, CommandsPa
     asked.value = to;
   }
   if (open) {
+    ComboKeys keys(shown, static_cast<int>(kKillStealLabels.size()));
     for (int rank = 0; rank < static_cast<int>(kKillStealLabels.size()); ++rank) {
       const bool selected = rank == shown;
-      if (ImGui::Selectable(kKillStealLabels[static_cast<std::size_t>(rank)], selected) &&
-          !selected) {
+      if (keys.Took(rank,
+                    ImGui::Selectable(kKillStealLabels[static_cast<std::size_t>(rank)], selected) &&
+                        !selected)) {
         asked.field = CommandsField::kKillStealGuard;
         asked.value = rank;
-      }
-      if (selected) {
-        ImGui::SetItemDefaultFocus();
       }
     }
     EndSkinCombo();

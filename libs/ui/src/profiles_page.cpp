@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_widgets.h"
 
 namespace ro::ui {
@@ -79,16 +80,14 @@ void DrawChoiceLine(const ProfilesPageView& view, ProfilesPageState& state, int 
     state.confirming = ProfileGesture::kNone;
   }
   if (open) {
+    ComboKeys keys(selected, count);
     for (int rank = 0; rank < count; ++rank) {
       ImGui::PushID(rank);
-      if (ImGui::Selectable(LabelAt(view, rank), rank == selected)) {
+      if (keys.Took(rank, ImGui::Selectable(LabelAt(view, rank), rank == selected))) {
         state.selected = rank;
         state.confirming = ProfileGesture::kNone;
       }
       ImGui::PopID();
-      if (rank == selected) {
-        ImGui::SetItemDefaultFocus();
-      }
     }
     EndSkinCombo();
   }
@@ -127,14 +126,18 @@ void DrawConfirmLine(const ProfilesPageView& view, ProfilesPageState& state, int
       (state.confirming == ProfileGesture::kOverwrite && selected == view.active)) {
     return;
   }
-  const char* question = core::Tr("Réinitialiser le profil « %s » ?");
-  if (state.confirming == ProfileGesture::kDelete) {
-    question = core::Tr("Supprimer le profil « %s » ?");
-  } else if (state.confirming == ProfileGesture::kOverwrite) {
-    question = core::Tr("Écraser le profil « %s » par l'état présent ?");
-  }
+  // Un `snprintf` par question : le format reste un littéral que le compilateur
+  // confronte à ses arguments.
   std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), question, LabelAt(view, selected));
+  const char* const label = LabelAt(view, selected);
+  if (state.confirming == ProfileGesture::kDelete) {
+    std::snprintf(line.data(), line.size(), core::Tr("Supprimer le profil « %s » ?"), label);
+  } else if (state.confirming == ProfileGesture::kOverwrite) {
+    std::snprintf(line.data(), line.size(),
+                  core::Tr("Écraser le profil « %s » par l'état présent ?"), label);
+  } else {
+    std::snprintf(line.data(), line.size(), core::Tr("Réinitialiser le profil « %s » ?"), label);
+  }
   ImGui::TextUnformatted(line.data());
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Confirmer"), art)) {

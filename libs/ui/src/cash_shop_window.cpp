@@ -10,6 +10,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -235,11 +236,15 @@ void DrawFilters(CashShopWindowState& state, std::span<const CashShopCard> cards
       state.slot = to == 0 ? kCashShopSlotAll : slots[static_cast<std::size_t>(to - 1)].key;
     }
     if (open) {
-      if (ImGui::Selectable(core::Tr("Emplacement: tous"), state.slot == kCashShopSlotAll)) {
+      ComboKeys keys(rank, static_cast<int>(slots.size()) + 1);
+      if (keys.Took(0, ImGui::Selectable(core::Tr("Emplacement: tous"),
+                                         state.slot == kCashShopSlotAll))) {
         state.slot = kCashShopSlotAll;
       }
-      for (const CashShopSlot& slot : slots) {
-        if (ImGui::Selectable(slot.label, state.slot == slot.key)) {
+      for (std::size_t index = 0; index < slots.size(); ++index) {
+        const CashShopSlot& slot = slots[index];
+        if (keys.Took(static_cast<int>(index) + 1,
+                      ImGui::Selectable(slot.label, state.slot == slot.key))) {
           state.slot = slot.key;
         }
       }

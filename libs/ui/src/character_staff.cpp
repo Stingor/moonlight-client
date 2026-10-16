@@ -1,13 +1,16 @@
 #include "ro/ui/character_staff.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -26,6 +29,8 @@ namespace {
 // colonne, et un gabarit à cinq chiffres couperait en deux la saisie d'un
 // million de zeny.
 constexpr const char* kWidestAmount = "999999999";
+// Une classe de la liste : son nom et son numéro.
+constexpr std::size_t kJobRowBytes = 96;
 
 [[nodiscard]] float AmountFieldWidth() {
   return ImGui::CalcTextSize(kWidestAmount).x + ImGui::GetStyle().FramePadding.x * 2.0F;
@@ -175,26 +180,38 @@ void DrawJobPicker(StaffPaneState& state, const StaffPaneView& view, const SkinA
   // l'en-tête du premier groupe.
   StaffJobFamily family = StaffJobFamily::kNovice;
   bool has_family = false;
+  std::vector<std::string> rows;
+  std::vector<const StaffJobView*> kept;
+  int own_rank = kListNoEntry;
   for (const StaffJobView& one : view.jobs) {
-    char row[96] = {};
-    std::snprintf(row, sizeof(row), "%.*s (%u)", static_cast<int>(one.label.size()),
+    std::array<char, kJobRowBytes> row{};
+    std::snprintf(row.data(), row.size(), "%.*s (%u)", static_cast<int>(one.label.size()),
                   one.label.data(), one.id);
-    if (!needle.empty()) {
-      std::string hay(row);
-      std::ranges::transform(hay, hay.begin(), [](unsigned char letter) {
-        return static_cast<char>(std::tolower(letter));
-      });
-      if (hay.find(needle) == std::string::npos) {
-        continue;
-      }
+    std::string hay(row.data());
+    std::ranges::transform(hay, hay.begin(), [](unsigned char letter) {
+      return static_cast<char>(std::tolower(letter));
+    });
+    if (!needle.empty() && hay.find(needle) == std::string::npos) {
+      continue;
     }
+    if (one.id == view.own_job) {
+      own_rank = static_cast<int>(kept.size());
+    }
+    rows.emplace_back(row.data());
+    kept.push_back(&one);
+  }
+  // 🔴 LE CLAVIER DÉSIGNE, ENTRÉE PREND : un pas de flèche changerait de classe.
+  ComboKeys keys(own_rank, static_cast<int>(kept.size()), {}, ComboKeyChoice::kOnEnter);
+  for (std::size_t rank = 0; rank < kept.size(); ++rank) {
+    const StaffJobView& one = *kept[rank];
     if (!has_family || family != one.family) {
       has_family = true;
       family = one.family;
       ImGui::TextDisabled("%s", StaffJobFamilyLabel(family));
     }
     const bool own = one.id == view.own_job;
-    if (ImGui::Selectable(row, own)) {
+    if (keys.Took(static_cast<int>(rank),
+                  ImGui::Selectable(rows[rank].c_str(), keys.marked() == static_cast<int>(rank)))) {
       action.order = StaffOrder::kChangeJob;
       action.job_id = one.id;
       ImGui::CloseCurrentPopup();
@@ -322,8 +339,9 @@ void DrawRefine(StaffPaneState& state, const SkinArt& art, StaffAction& action) 
   state.refine_place =
       SkinComboStepped(state.refine_place, step, static_cast<int>(kRefinePlaces.size()));
   if (open) {
+    ComboKeys keys(state.refine_place, static_cast<int>(kRefinePlaces.size()));
     for (int rank = 0; rank < static_cast<int>(kRefinePlaces.size()); ++rank) {
-      if (ImGui::Selectable(RefinePlaceLabel(rank), rank == state.refine_place)) {
+      if (keys.Took(rank, ImGui::Selectable(RefinePlaceLabel(rank), rank == state.refine_place))) {
         state.refine_place = rank;
       }
     }
@@ -360,6 +378,7 @@ void DrawOptionPopup(StaffPaneState& state, const SkinArt& art, StaffAction& act
   const bool open = BeginSkinCombo("Cart##etat_cart", cart, art, &step);
   state.option_cart = SkinComboStepped(state.option_cart, step, kCartLevelMost + 1);
   if (open) {
+    ComboKeys keys(state.option_cart, kCartLevelMost + 1);
     for (int level = 0; level <= kCartLevelMost; ++level) {
       char row[24] = {};
       if (level == 0) {
@@ -367,7 +386,7 @@ void DrawOptionPopup(StaffPaneState& state, const SkinArt& art, StaffAction& act
       } else {
         std::snprintf(row, sizeof(row), "Cart %d", level);
       }
-      if (ImGui::Selectable(row, level == state.option_cart)) {
+      if (keys.Took(level, ImGui::Selectable(row, level == state.option_cart))) {
         state.option_cart = level;
       }
     }

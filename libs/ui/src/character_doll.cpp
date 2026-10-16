@@ -12,6 +12,7 @@
 // seconde vérité.
 #include "ro/render/actor_layers.h"
 #include "ro/ui/inventory_window.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_text.h"
@@ -494,9 +495,11 @@ void DrawPoseList(CharacterAvatarState& avatar, const DollGifView& gif, float pa
     TakePose(avatar, entries[static_cast<std::size_t>(stepped)]);
   }
   if (open) {
+    ComboKeys keys(current, count);
     for (int rank = 0; rank < count; ++rank) {
       const PoseEntry& entry = entries[static_cast<std::size_t>(rank)];
-      if (ImGui::Selectable(CharacterPoseLabel(entry.pose, entry.animated), rank == current)) {
+      if (keys.Took(rank, ImGui::Selectable(CharacterPoseLabel(entry.pose, entry.animated),
+                                            rank == current))) {
         TakePose(avatar, entry);
       }
     }

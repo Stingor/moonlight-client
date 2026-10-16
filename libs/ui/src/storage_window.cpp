@@ -10,6 +10,7 @@
 #include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
@@ -408,12 +409,16 @@ StorageWindowAction DrawStorageWindow(StorageWindowState& state, const StorageWi
       state.sub_category = to == 0 ? kAnySubCategory : subs[static_cast<std::size_t>(to - 1)].key;
     }
     if (open) {
-      if (ImGui::Selectable(core::Tr("Tout"), state.sub_category == kAnySubCategory)) {
+      ComboKeys keys(rank, static_cast<int>(subs.size()) + 1);
+      if (keys.Took(0,
+                    ImGui::Selectable(core::Tr("Tout"), state.sub_category == kAnySubCategory))) {
         state.sub_category = kAnySubCategory;
       }
-      for (const StorageSubCategoryView& sub : view.sub_categories) {
+      for (std::size_t index = 0; index < subs.size(); ++index) {
+        const StorageSubCategoryView& sub = subs[index];
         ImGui::PushID(sub.key);
-        if (ImGui::Selectable(sub.label.data(), sub.key == state.sub_category)) {
+        if (keys.Took(static_cast<int>(index) + 1,
+                      ImGui::Selectable(sub.label.data(), sub.key == state.sub_category))) {
           state.sub_category = sub.key;
         }
         ImGui::PopID();

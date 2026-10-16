@@ -14,6 +14,7 @@
 
 #include "ro/core/case_fold.h"
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -182,12 +183,26 @@ bool RuleChoiceMatches(const RuleChoice& choice, std::string_view typed) {
 namespace ro::ui::companion_ai_parts {
 namespace {
 
+// Le rang du choix qui porte `value`, ou `kListNoEntry`.
+[[nodiscard]] int RankOfValue(std::span<const RuleChoice> choices, int value) {
+  const auto found = std::ranges::find(choices, value, &RuleChoice::value);
+  return found == choices.end() ? kListNoEntry : static_cast<int>(found - choices.begin());
+}
+
+// Le rang de `entry` dans `entries`, ou `kListNoEntry` sans entrée.
+template <typename Entry>
+[[nodiscard]] int RankOfEntry(std::span<const Entry> entries, const Entry* entry) {
+  return entry == nullptr ? kListNoEntry : static_cast<int>(entry - entries.data());
+}
+
 // UN CHOIX DE LA LISTE OUVERTE, et ce qui aide à le choisir en retrait. Rend
-// vrai quand il vient d'être pris.
-[[nodiscard]] bool ChoiceRow(const RuleChoice& one, std::size_t index, int* value) {
+// vrai quand il vient d'être pris, au clic ou au clavier.
+[[nodiscard]] bool ChoiceRow(const RuleChoice& one, std::size_t index, int* value, ComboKeys& keys,
+                             int rank) {
   bool changed = false;
   ImGui::PushID(static_cast<int>(index));
-  if (ImGui::Selectable(one.label.c_str(), one.value == *value) && one.value != *value) {
+  if (keys.Took(rank,
+                ImGui::Selectable(one.label.c_str(), one.value == *value) && one.value != *value)) {
     *value = one.value;
     changed = true;
   }
@@ -212,8 +227,9 @@ namespace {
     return false;
   }
   if (filter.empty() || choices.size() < kSearchedChoicesLeast) {
+    ComboKeys keys(RankOfValue(choices, *value), static_cast<int>(choices.size()));
     for (std::size_t index = 0; index < choices.size(); ++index) {
-      changed |= ChoiceRow(choices[index], index, value);
+      changed |= ChoiceRow(choices[index], index, value, keys, static_cast<int>(index));
     }
     EndSkinCombo();
     return changed;
@@ -227,8 +243,12 @@ namespace {
   const std::string_view typed(filter.data());
   std::vector<std::size_t> kept;
   kept.reserve(choices.size());
+  int chosen_row = kListNoEntry;
   for (std::size_t index = 0; index < choices.size(); ++index) {
     if (RuleChoiceMatches(choices[index], typed)) {
+      if (choices[index].value == *value) {
+        chosen_row = static_cast<int>(kept.size());
+      }
       kept.push_back(index);
     }
   }
@@ -236,14 +256,22 @@ namespace {
       static_cast<float>(std::min(kept.size(), kSearchedRowsShown)) + kSearchedRowsMargin;
   if (ImGui::BeginChild("##choix", ImVec2(Px(kSearchedListPixels),
                                           rows_shown * ImGui::GetTextLineHeightWithSpacing()))) {
+    // Dans la fille : c'est elle qui défile.
+    ComboKeys keys(chosen_row, static_cast<int>(kept.size()));
     ImGuiListClipper clipper;
     clipper.Begin(static_cast<int>(kept.size()));
+    if (keys.keyed() != kListNoEntry) {
+      clipper.IncludeItemByIndex(keys.keyed());
+    }
     while (clipper.Step()) {
       for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row) {
         const std::size_t index = kept[static_cast<std::size_t>(row)];
-        if (ChoiceRow(choices[index], index, value)) {
+        if (ChoiceRow(choices[index], index, value, keys, row)) {
           changed = true;
-          ImGui::CloseCurrentPopup();
+          // Un clic prend et referme ; une touche ne fait que choisir.
+          if (row != keys.keyed()) {
+            ImGui::CloseCurrentPopup();
+          }
         }
       }
     }
@@ -274,10 +302,13 @@ namespace {
   const RuleConditionKind* kind = KindOf(condition, vocabulary);
   ImGui::SetNextItemWidth(Px(kComboPixels));
   if (BeginSkinCombo("##kind", kind != nullptr ? kind->label.c_str() : "?", art)) {
+    ComboKeys keys(RankOfEntry(vocabulary.conditions, kind),
+                   static_cast<int>(vocabulary.conditions.size()));
     for (std::size_t index = 0; index < vocabulary.conditions.size(); ++index) {
       const RuleConditionKind& each = vocabulary.conditions[index];
       ImGui::PushID(static_cast<int>(index));
-      if (ImGui::Selectable(each.label.c_str(), &each == kind) && &each != kind) {
+      if (keys.Took(static_cast<int>(index),
+                    ImGui::Selectable(each.label.c_str(), &each == kind) && &each != kind)) {
         FitRuleCondition(condition, each);
         kind = &each;
         changed = true;
@@ -318,10 +349,13 @@ namespace {
   const RuleActionKind* kind = ActionOf(rule, vocabulary);
   ImGui::SetNextItemWidth(Px(kComboPixels));
   if (BeginSkinCombo("##action", kind != nullptr ? kind->label.c_str() : "?", art)) {
+    ComboKeys keys(RankOfEntry(vocabulary.actions, kind),
+                   static_cast<int>(vocabulary.actions.size()));
     for (std::size_t index = 0; index < vocabulary.actions.size(); ++index) {
       const RuleActionKind& each = vocabulary.actions[index];
       ImGui::PushID(static_cast<int>(index));
-      if (ImGui::Selectable(each.label.c_str(), &each == kind) && &each != kind) {
+      if (keys.Took(static_cast<int>(index),
+                    ImGui::Selectable(each.label.c_str(), &each == kind) && &each != kind)) {
         rule.action = each.action;
         FitRuleAction(rule, each, vocabulary);
         kind = &each;
@@ -340,9 +374,13 @@ namespace {
     const RuleSkillChoice* skill = SkillOf(rule.skill_id, vocabulary);
     ImGui::SetNextItemWidth(Px(kComboPixels));
     if (BeginSkinCombo("##skill", skill != nullptr ? skill->label.c_str() : "?", art)) {
-      for (const RuleSkillChoice& each : vocabulary.skills) {
+      ComboKeys keys(RankOfEntry(vocabulary.skills, skill),
+                     static_cast<int>(vocabulary.skills.size()));
+      for (std::size_t index = 0; index < vocabulary.skills.size(); ++index) {
+        const RuleSkillChoice& each = vocabulary.skills[index];
         ImGui::PushID(each.skill_id);
-        if (ImGui::Selectable(each.label.c_str(), &each == skill) && &each != skill) {
+        if (keys.Took(static_cast<int>(index),
+                      ImGui::Selectable(each.label.c_str(), &each == skill) && &each != skill)) {
           rule.skill_id = each.skill_id;
           FitRuleAction(rule, *kind, vocabulary);
           skill = &each;

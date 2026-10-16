@@ -11,6 +11,7 @@
 #include "ro/core/text.h"
 #include "ro/ui/chat_frame.h"
 #include "ro/ui/chat_strip.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -275,6 +276,7 @@ void DrawTarget(const ChatLinePreview& preview, float width, int* chose_mode, co
     *chose_mode = to;
   }
   if (open) {
+    ComboKeys keys(preview.mode, static_cast<int>(preview.modes.size()));
     for (int rank = 0; rank < static_cast<int>(preview.modes.size()); ++rank) {
       const ChatSendMode& mode = preview.modes[static_cast<std::size_t>(rank)];
       // Chacun dans SA couleur : c'est elle qu'on verra ensuite sur le texte, et
@@ -294,7 +296,7 @@ void DrawTarget(const ChatLinePreview& preview, float width, int* chose_mode, co
         label += " · ";
         label += core::Tr("Discord");
       }
-      if (ImGui::Selectable(label.c_str(), rank == preview.mode)) {
+      if (keys.Took(rank, ImGui::Selectable(label.c_str(), rank == preview.mode))) {
         *chose_mode = rank;
       }
       ImGui::PopStyleColor();

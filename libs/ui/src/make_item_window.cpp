@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -322,13 +323,16 @@ void DrawForgeSlots(const MakeItemView& view, const SkinArt& art, MakeItemWindow
           to == 0 ? std::uint32_t{0} : forge.choices[static_cast<std::size_t>(to - 1)].item_id;
     }
     if (open) {
-      if (ImGui::Selectable(core::Tr("(vide)"), forge.chosen == 0)) {
+      ComboKeys keys(rank, static_cast<int>(forge.choices.size()) + 1);
+      if (keys.Took(0, ImGui::Selectable(core::Tr("(vide)"), forge.chosen == 0))) {
         action.forge_slot = static_cast<int>(slot);
         action.forge_item_id = 0;
       }
-      for (const ForgeChoiceView& choice : forge.choices) {
+      for (std::size_t index = 0; index < forge.choices.size(); ++index) {
+        const ForgeChoiceView& choice = forge.choices[index];
         const std::string label(choice.label);
-        if (ImGui::Selectable(label.c_str(), forge.chosen == choice.item_id)) {
+        if (keys.Took(static_cast<int>(index) + 1,
+                      ImGui::Selectable(label.c_str(), forge.chosen == choice.item_id))) {
           action.forge_slot = static_cast<int>(slot);
           action.forge_item_id = choice.item_id;
         }

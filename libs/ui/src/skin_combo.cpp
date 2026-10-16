@@ -201,36 +201,19 @@ bool SkinCombo(const char* label, int* chosen, std::span<const char* const> item
   if (open) {
     // LE CLAVIER DE LA LISTE DÉROULÉE : le choix suit la touche, comme sous
     // la molette, et Entrée referme.
-    bool keyed = false;
-    if (ImGui::IsWindowFocused()) {
-      const int target =
-          ListKeyTarget(*chosen, count, VisibleListRows(ImGui::GetTextLineHeightWithSpacing()),
-                        PressedListKey(/*arrows_only=*/false));
-      if (target != kListNoEntry && target != *chosen) {
-        *chosen = target;
-        changed = true;
-        keyed = true;
-      }
-      if (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter)) {
-        ImGui::CloseCurrentPopup();
-      }
-    }
-    for (int rank = 0; rank < static_cast<int>(items.size()); ++rank) {
-      const bool current = *chosen == rank;
+    ComboKeys keys(*chosen, count);
+    for (int rank = 0; rank < count; ++rank) {
+      const bool current = keys.marked() == rank;
       // ⚠ VRAI SEULEMENT SUR UN VRAI CHANGEMENT. Posé dans le corps du `if`, ce
       // drapeau serait vrai à chaque image où la liste est ouverte : un appelant
       // qui écrit `if (changed) Enregistrer()` réécrirait son fichier de
       // réglages soixante fois par seconde. Recliquer l'entrée déjà choisie n'est
       // pas un changement non plus.
-      if (ImGui::Selectable(core::Tr(items[static_cast<std::size_t>(rank)]), current) && !current) {
+      if (keys.Took(rank,
+                    ImGui::Selectable(core::Tr(items[static_cast<std::size_t>(rank)]), current) &&
+                        !current)) {
         *chosen = rank;
         changed = true;
-      }
-      if (current) {
-        ImGui::SetItemDefaultFocus();
-        if (keyed) {
-          KeepLastItemInView();
-        }
       }
     }
     EndSkinCombo();

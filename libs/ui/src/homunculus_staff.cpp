@@ -17,6 +17,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -228,10 +229,12 @@ bool StaffHomunculusCombo(const char* id, int* rank, std::span<const StaffHomunc
   *rank = std::clamp(*rank, 0, static_cast<int>(choices.size()) - 1);
   bool changed = false;
   if (BeginSkinCombo(id, choices[static_cast<std::size_t>(*rank)].label.c_str(), art)) {
+    ComboKeys keys(*rank, static_cast<int>(choices.size()));
     for (std::size_t index = 0; index < choices.size(); ++index) {
       const bool chosen = static_cast<int>(index) == *rank;
       ImGui::PushID(static_cast<int>(index));
-      if (ImGui::Selectable(choices[index].label.c_str(), chosen) && !chosen) {
+      if (keys.Took(static_cast<int>(index),
+                    ImGui::Selectable(choices[index].label.c_str(), chosen) && !chosen)) {
         *rank = static_cast<int>(index);
         changed = true;
       }

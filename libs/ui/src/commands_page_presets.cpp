@@ -12,6 +12,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "commands_page_parts.h"
@@ -259,18 +260,17 @@ void DrawChoiceLine(const CommandsPageView& view, CommandsPageState& state, cons
     state.selected_preset = view.presets[static_cast<std::size_t>(to)].slot;
   }
   if (open) {
-    for (const CommandsPresetView& preset : view.presets) {
+    ComboKeys keys(rank, static_cast<int>(view.presets.size()));
+    for (std::size_t index = 0; index < view.presets.size(); ++index) {
+      const CommandsPresetView& preset = view.presets[index];
       const bool chosen = preset.slot == state.selected_preset;
       std::array<char, kPresetLabelBytes> label{};
       PresetLabel(preset, preset.slot == view.active_preset, label);
       ImGui::PushID(preset.slot);
-      if (ImGui::Selectable(label.data(), chosen)) {
+      if (keys.Took(static_cast<int>(index), ImGui::Selectable(label.data(), chosen))) {
         state.selected_preset = preset.slot;
       }
       ImGui::PopID();
-      if (chosen) {
-        ImGui::SetItemDefaultFocus();
-      }
     }
     EndSkinCombo();
   }

@@ -12,6 +12,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -133,10 +134,12 @@ void DrawDialog(CompanionAiWindowState& state, const CompanionAiView& view, cons
               ? "?"
               : profiles.imports[static_cast<std::size_t>(state.import_choice)].c_str();
       if (BeginSkinCombo("##import", shown, art)) {
+        ComboKeys keys(state.import_choice, static_cast<int>(profiles.imports.size()));
         for (std::size_t index = 0; index < profiles.imports.size(); ++index) {
           ImGui::PushID(static_cast<int>(index));
-          if (ImGui::Selectable(profiles.imports[index].c_str(),
-                                state.import_choice == static_cast<int>(index))) {
+          if (keys.Took(static_cast<int>(index),
+                        ImGui::Selectable(profiles.imports[index].c_str(),
+                                          state.import_choice == static_cast<int>(index)))) {
             state.import_choice = static_cast<int>(index);
           }
           ImGui::PopID();
@@ -205,16 +208,20 @@ void DrawContexts(const CompanionAiView& view, const SkinArt& art,
     const char* shown =
         chosen >= 0 ? LabelAt(profiles, chosen) : profiles.fallback[context].c_str();
     if (BeginSkinCombo("##context", shown, art)) {
-      if (ImGui::Selectable(profiles.fallback[context].c_str(), chosen < 0) && chosen >= 0) {
+      // Le rang zéro est le profil par défaut, les profils suivent.
+      ComboKeys keys(chosen < 0 ? 0 : chosen + 1, static_cast<int>(profiles.profiles.size()) + 1);
+      if (keys.Took(0, ImGui::Selectable(profiles.fallback[context].c_str(), chosen < 0) &&
+                           chosen >= 0)) {
         action.verb = CompanionAiVerb::kSetContextProfile;
         action.context = static_cast<int>(context);
         action.choice = -1;
       }
       for (std::size_t rank = 0; rank < profiles.profiles.size(); ++rank) {
         ImGui::PushID(static_cast<int>(rank));
-        if (ImGui::Selectable(profiles.profiles[rank].label.c_str(),
-                              chosen == static_cast<int>(rank)) &&
-            chosen != static_cast<int>(rank)) {
+        if (keys.Took(static_cast<int>(rank) + 1,
+                      ImGui::Selectable(profiles.profiles[rank].label.c_str(),
+                                        chosen == static_cast<int>(rank)) &&
+                          chosen != static_cast<int>(rank))) {
           action.verb = CompanionAiVerb::kSetContextProfile;
           action.context = static_cast<int>(context);
           action.choice = static_cast<int>(rank);
@@ -299,11 +306,13 @@ void DrawProfileHeader(CompanionAiWindowState& state, const CompanionAiView& vie
   ImGui::SameLine();
   ImGui::SetNextItemWidth(Px(kProfileComboPixels));
   if (BeginSkinCombo("##edited", LabelAt(profiles, profiles.edited), art)) {
+    ComboKeys keys(profiles.edited, static_cast<int>(profiles.profiles.size()));
     for (std::size_t rank = 0; rank < profiles.profiles.size(); ++rank) {
       ImGui::PushID(static_cast<int>(rank));
-      if (ImGui::Selectable(profiles.profiles[rank].label.c_str(),
-                            profiles.edited == static_cast<int>(rank)) &&
-          profiles.edited != static_cast<int>(rank)) {
+      if (keys.Took(static_cast<int>(rank),
+                    ImGui::Selectable(profiles.profiles[rank].label.c_str(),
+                                      profiles.edited == static_cast<int>(rank)) &&
+                        profiles.edited != static_cast<int>(rank))) {
         Edit(state, KeyAt(profiles, static_cast<int>(rank)));
       }
       ImGui::PopID();

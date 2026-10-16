@@ -10,6 +10,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/staff_skill_id.h"
@@ -96,13 +97,16 @@ bool LevelCombo(const char* id, int* level, int learned, const SkinArt& art) {
   const std::string shown = *level == 0 ? core::Tr("Niveau appris") : std::to_string(*level);
   bool changed = false;
   if (BeginSkinCombo(id, shown.c_str(), art)) {
-    if (ImGui::Selectable(core::Tr("Niveau appris"), *level == 0) && *level != 0) {
+    // Le rang d'une entrée est son niveau : zéro, « appris », d'abord.
+    ComboKeys keys(*level, learned + 1);
+    if (keys.Took(0, ImGui::Selectable(core::Tr("Niveau appris"), *level == 0) && *level != 0)) {
       *level = 0;
       changed = true;
     }
     for (int each = 1; each <= learned; ++each) {
       ImGui::PushID(each);
-      if (ImGui::Selectable(std::to_string(each).c_str(), *level == each) && *level != each) {
+      if (keys.Took(each, ImGui::Selectable(std::to_string(each).c_str(), *level == each) &&
+                              *level != each)) {
         *level = each;
         changed = true;
       }

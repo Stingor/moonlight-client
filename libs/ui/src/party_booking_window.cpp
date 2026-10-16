@@ -12,6 +12,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -55,10 +56,12 @@ void DrawPlaceCombos(const char* id, int& region, int& place, const PartyBooking
                    : std::string(core::Tr("Choisir une région"));
   ImGui::SetNextItemWidth(kPartyBookingComboPixels * Scale());
   if (BeginSkinCombo("##region", region_shown.c_str(), art)) {
+    ComboKeys keys(region, static_cast<int>(view.regions.size()));
     for (std::size_t rank = 0; rank < view.regions.size(); ++rank) {
       const std::string name(view.regions[rank].name);
       ImGui::PushID(static_cast<int>(rank));
-      if (ImGui::Selectable(name.c_str(), static_cast<int>(rank) == region)) {
+      if (keys.Took(static_cast<int>(rank),
+                    ImGui::Selectable(name.c_str(), static_cast<int>(rank) == region))) {
         region = static_cast<int>(rank);
         place = 0;
       }
@@ -75,10 +78,12 @@ void DrawPlaceCombos(const char* id, int& region, int& place, const PartyBooking
     ImGui::SameLine();
     ImGui::SetNextItemWidth(kPartyBookingComboPixels * Scale());
     if (BeginSkinCombo("##place", place_shown.c_str(), art)) {
+      ComboKeys keys(place, static_cast<int>(chosen.places.size()));
       for (std::size_t rank = 0; rank < chosen.places.size(); ++rank) {
         const std::string name(chosen.places[rank].name);
         ImGui::PushID(static_cast<int>(rank));
-        if (ImGui::Selectable(name.c_str(), static_cast<int>(rank) == place)) {
+        if (keys.Took(static_cast<int>(rank),
+                      ImGui::Selectable(name.c_str(), static_cast<int>(rank) == place))) {
           place = static_cast<int>(rank);
         }
         ImGui::PopID();
@@ -99,16 +104,30 @@ void DrawJobCombo(PartyBookingWindowState& state, const PartyBookingView& view,
   if (!BeginSkinCombo("##search_job", shown.c_str(), art)) {
     return;
   }
+  // Les rangs courent d'un groupe à l'autre : l'intitulé d'un groupe n'en a pas.
+  int job_count = 0;
+  int chosen_rank = kListNoEntry;
+  for (const PartyBookingJobGroupView& group : view.job_groups) {
+    for (const PartyBookingJobView& job : group.jobs) {
+      if (job.code == state.search_job) {
+        chosen_rank = job_count;
+      }
+      ++job_count;
+    }
+  }
+  ComboKeys keys(chosen_rank, job_count);
+  int rank = 0;
   for (const PartyBookingJobGroupView& group : view.job_groups) {
     const std::string label(group.label);
     ImGui::TextDisabled("%s", label.c_str());
     for (const PartyBookingJobView& job : group.jobs) {
       const std::string name(job.name);
       ImGui::PushID(job.code);
-      if (ImGui::Selectable(name.c_str(), job.code == state.search_job)) {
+      if (keys.Took(rank, ImGui::Selectable(name.c_str(), job.code == state.search_job))) {
         state.search_job = job.code;
       }
       ImGui::PopID();
+      ++rank;
     }
   }
   EndSkinCombo();

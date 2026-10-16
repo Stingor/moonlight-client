@@ -8,6 +8,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
@@ -84,15 +85,26 @@ bool DrawTacticAdvancedFields(TacticAdvancedFields& fields,
   }
   if (BeginSkinCombo(core::Tr("Skill d'ouverture"), OpeningLabel(fields.opening_skill_id, openings),
                      art)) {
-    if (ImGui::Selectable(core::Tr("Aucun"), fields.opening_skill_id == 0) &&
-        fields.opening_skill_id != 0) {
+    // Le rang zéro est « Aucun », les skills suivent.
+    const auto at =
+        std::ranges::find(openings, fields.opening_skill_id, &TacticSkillChoice::skill_id);
+    int chosen = 0;
+    if (fields.opening_skill_id != 0) {
+      chosen = at == openings.end() ? kListNoEntry : static_cast<int>(at - openings.begin()) + 1;
+    }
+    ComboKeys keys(chosen, static_cast<int>(openings.size()) + 1);
+    if (keys.Took(0, ImGui::Selectable(core::Tr("Aucun"), fields.opening_skill_id == 0) &&
+                         fields.opening_skill_id != 0)) {
       fields.opening_skill_id = 0;
       changed = true;
     }
-    for (const TacticSkillChoice& choice : openings) {
+    for (std::size_t index = 0; index < openings.size(); ++index) {
+      const TacticSkillChoice& choice = openings[index];
       ImGui::PushID(choice.skill_id);
-      if (ImGui::Selectable(choice.label.c_str(), fields.opening_skill_id == choice.skill_id) &&
-          fields.opening_skill_id != choice.skill_id) {
+      if (keys.Took(
+              static_cast<int>(index) + 1,
+              ImGui::Selectable(choice.label.c_str(), fields.opening_skill_id == choice.skill_id) &&
+                  fields.opening_skill_id != choice.skill_id)) {
         fields.opening_skill_id = choice.skill_id;
         changed = true;
       }

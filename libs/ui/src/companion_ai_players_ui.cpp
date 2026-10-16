@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -123,10 +124,12 @@ void DrawAdditions(CompanionAiWindowState& state, const CompanionAiView& view, c
   ImGui::SetNextItemWidth(Px(kJobComboPixels));
   const RuleChoice& shown = view.player_jobs[static_cast<std::size_t>(state.conduct_job_choice)];
   if (BeginSkinCombo("##job", shown.label.c_str(), art)) {
+    ComboKeys keys(state.conduct_job_choice, static_cast<int>(view.player_jobs.size()));
     for (std::size_t index = 0; index < view.player_jobs.size(); ++index) {
       ImGui::PushID(static_cast<int>(index));
-      if (ImGui::Selectable(view.player_jobs[index].label.c_str(),
-                            state.conduct_job_choice == static_cast<int>(index))) {
+      if (keys.Took(static_cast<int>(index),
+                    ImGui::Selectable(view.player_jobs[index].label.c_str(),
+                                      state.conduct_job_choice == static_cast<int>(index)))) {
         state.conduct_job_choice = static_cast<int>(index);
       }
       ImGui::PopID();

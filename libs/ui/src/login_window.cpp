@@ -5,6 +5,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/options_window.h"
 #include "ro/ui/skin_palette.h"
@@ -162,16 +163,17 @@ void DrawPickers(const LoginFirstScreenView& first, const SkinArt& art,
     }
   }
   if (language_open) {
-    for (int rank = 0; rank < static_cast<int>(first.languages.size()); ++rank) {
+    ComboKeys keys(first.language, language_count, [&first](int rank) {
+      return first.languages[static_cast<std::size_t>(rank)].available;
+    });
+    for (int rank = 0; rank < language_count; ++rank) {
       const LoginLanguage& one = first.languages[static_cast<std::size_t>(rank)];
       ImGui::BeginDisabled(!one.available);
-      if (ImGui::Selectable(one.name.c_str(), rank == first.language) && rank != first.language) {
+      if (keys.Took(rank, ImGui::Selectable(one.name.c_str(), rank == first.language) &&
+                              rank != first.language)) {
         asked.language = rank;
       }
       ImGui::EndDisabled();
-      if (rank == first.language) {
-        ImGui::SetItemDefaultFocus();
-      }
     }
     EndSkinCombo();
   }
@@ -194,14 +196,12 @@ void DrawPickers(const LoginFirstScreenView& first, const SkinArt& art,
     asked.font = to;
   }
   if (font_open) {
+    ComboKeys keys(first.font, static_cast<int>(first.fonts.size()));
     for (int rank = 0; rank < static_cast<int>(first.fonts.size()); ++rank) {
-      if (ImGui::Selectable(first.fonts[static_cast<std::size_t>(rank)].c_str(),
-                            rank == first.font) &&
-          rank != first.font) {
+      if (keys.Took(rank, ImGui::Selectable(first.fonts[static_cast<std::size_t>(rank)].c_str(),
+                                            rank == first.font) &&
+                              rank != first.font)) {
         asked.font = rank;
-      }
-      if (rank == first.font) {
-        ImGui::SetItemDefaultFocus();
       }
     }
     EndSkinCombo();
