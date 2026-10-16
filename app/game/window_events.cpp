@@ -327,8 +327,10 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
     return;
   }
   // LE MODE ÉDITEUR : un clic dans le monde y désigne le modèle sous la souris,
-  // et ne fait rien d'autre — ni marcher, ni viser.
-  if (to.map_editor != nullptr) {
+  // et ne fait rien d'autre — ni marcher, ni viser. Ctrl+clic le traverse : le
+  // clic redevient celui du jeu, Ctrl compris comme absent.
+  const bool through_editor = to.map_editor != nullptr && CtrlHeld();
+  if (to.map_editor != nullptr && !through_editor) {
     // Une poignée sous l'appui se saisit, avant de désigner quoi que ce soit.
     if (to.map_editor->Grab(pointer, to.map_editor_view != nullptr ? *to.map_editor_view
                                                                    : ro::ui::MapEditorView())) {
@@ -352,7 +354,9 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   }
   // ⚠ UN ÉVÉNEMENT DE SOURIS NE PORTE PAS LES MODIFICATEURS, contrairement à un
   // événement de clavier : il faut les demander à l'état courant.
-  const SDL_Keymod modifiers = SDL_GetModState();
+  const SDL_Keymod modifiers = through_editor
+                                   ? static_cast<SDL_Keymod>(SDL_GetModState() & ~SDL_KMOD_CTRL)
+                                   : SDL_GetModState();
   const bool shift_held = (modifiers & SDL_KMOD_SHIFT) != 0;
   const bool ctrl_held = (modifiers & SDL_KMOD_CTRL) != 0;
   const bool world_takes_clicks = WorldTakesClicks(
