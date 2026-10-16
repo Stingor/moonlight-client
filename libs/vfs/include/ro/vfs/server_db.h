@@ -102,6 +102,9 @@ struct ServerItem {
   std::uint16_t equip_level_max = 0;
   bool refineable = false;
   std::uint32_t view = 0;
+  // `Delay: {Duration}` : le temps avant de pouvoir réemployer l'objet. Zéro :
+  // aucun délai.
+  std::uint32_t reuse_delay_ms = 0;
   std::string script;
   std::string equip_script;
   std::string unequip_script;

@@ -2,6 +2,7 @@
 
 #include "ro/vfs/pet_tables.h"
 
+#include <algorithm>
 #include <expected>
 #include <utility>
 
@@ -93,6 +94,33 @@ std::uint32_t PetTables::ClassOfEgg(std::uint32_t egg_id) const {
   return found != class_by_egg.end() ? found->second : 0;
 }
 
+std::span<const std::uint32_t> PetTables::TamedBy(std::uint32_t item_id) const {
+  const auto found = classes_by_tame_item.find(item_id);
+  if (found == classes_by_tame_item.end()) {
+    return {};
+  }
+  return found->second;
+}
+
+std::span<const std::uint32_t> PetTables::WornBy(std::uint32_t item_id) const {
+  const auto found = classes_by_accessory.find(item_id);
+  if (found == classes_by_accessory.end()) {
+    return {};
+  }
+  return found->second;
+}
+
+std::vector<std::uint32_t> PetTables::FedBy(std::uint32_t item_id) const {
+  std::vector<std::uint32_t> classes;
+  for (const auto& [pet_class, food] : food_by_class) {
+    if (food == item_id && item_id != 0) {
+      classes.push_back(pet_class);
+    }
+  }
+  std::ranges::sort(classes);
+  return classes;
+}
+
 std::uint32_t PetTables::FoodOf(std::uint32_t pet_class) const {
   const auto found = food_by_class.find(pet_class);
   return found != food_by_class.end() ? found->second : 0;
@@ -176,6 +204,12 @@ core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& table
         return std::unexpected(Refused("une classe ou un œuf nul"));
       }
       read.food_by_class[pet_class] = Required(pet, "food").as<std::uint32_t>();
+      if (const auto tame = Required(pet, "tame").as<std::uint32_t>(); tame != 0) {
+        read.classes_by_tame_item[tame].push_back(pet_class);
+      }
+      if (const auto accessory = Required(pet, "accessory").as<std::uint32_t>(); accessory != 0) {
+        read.classes_by_accessory[accessory].push_back(pet_class);
+      }
       // UN ŒUF PARTAGÉ sort la plus petite classe, quel que soit l'ordre du texte.
       const auto [known, inserted] = read.class_by_egg.try_emplace(egg, pet_class);
       if (!inserted && pet_class < known->second) {
@@ -197,8 +231,18 @@ core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& table
   }
   tables.class_by_egg = std::move(read.class_by_egg);
   tables.food_by_class = std::move(read.food_by_class);
+  // Les classes d'un même objet de capture ou d'un même accessoire,
+  // croissantes, quel que soit l'ordre du texte.
+  for (auto& [tame, classes] : read.classes_by_tame_item) {
+    std::ranges::sort(classes);
+  }
+  for (auto& [accessory, classes] : read.classes_by_accessory) {
+    std::ranges::sort(classes);
+  }
+  tables.classes_by_accessory = std::move(read.classes_by_accessory);
   tables.recipes_by_egg = std::move(read.recipes_by_egg);
   tables.auto_feed_eggs = std::move(read.auto_feed_eggs);
+  tables.classes_by_tame_item = std::move(read.classes_by_tame_item);
   return {};
 }
 

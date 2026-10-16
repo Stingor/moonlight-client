@@ -498,7 +498,9 @@ target_include_directories(moonclient_market PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # ajoute à toute description. Chacun se juge sur un banc (ADR 0116).
 add_library(moonclient_database STATIC
     game/database_compose.cpp
-    game/item_db_block.cpp)
+    game/item_db_block.cpp
+    game/item_db_facts.cpp
+    game/item_script_facts.cpp)
 
 target_link_libraries(moonclient_database
     PUBLIC ro_core ro_sim ro_ui ro_vfs moonclient_market

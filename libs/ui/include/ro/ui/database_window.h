@@ -57,6 +57,11 @@ class DatabaseHistory {
  public:
   // Montre cette fiche. La même que la courante ne s'empile pas.
   void Visit(DatabaseTarget target);
+  // Montre la fiche où mène le CLAVIER de la liste : la première touche
+  // l'empile, les suivantes la remplacent, et revenir sur la fiche de départ
+  // la retrouve sans la doubler. Parcourir une liste aux flèches ne noie pas
+  // le fil, et ◀ ramène à la fiche d'où le clavier est parti.
+  void Step(DatabaseTarget target);
   bool Back() noexcept;
   bool Forward() noexcept;
   [[nodiscard]] bool can_go_back() const noexcept { return at_ > 0; }
@@ -66,6 +71,8 @@ class DatabaseHistory {
  private:
   std::vector<DatabaseTarget> visited_;
   std::size_t at_ = 0;
+  // La fiche courante vient du clavier.
+  bool stepped_ = false;
 };
 
 inline constexpr int kDatabaseItemTab = 0;

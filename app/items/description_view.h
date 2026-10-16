@@ -24,6 +24,7 @@
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/monster_list.h"
 #include "ro/vfs/package_items.h"
+#include "ro/vfs/pet_tables.h"
 #include "ro/vfs/random_option_names.h"
 #include "ro/vfs/server_db.h"
 
@@ -129,6 +130,9 @@ class DescriptionView {
   // paresseuse, et les lignes se refont le jour où elle est lue. La pièce
   // portée d'une comparaison la reçoit aussi.
   void SeeServerDb(const ro::vfs::ServerDb* db) noexcept;
+  // LES TABLES DU FAMILIER, qui nomment ce qu'un appât capture, ce qui sort d'un
+  // œuf et ce qu'il mange, dans le même bloc. La comparaison les reçoit aussi.
+  void SeePets(const ro::vfs::PetTables* pets) noexcept;
 
   // L'OBJET D'UN LIEN DE LA CONVERSATION, qu'on décrit sous
   // `ItemHolder::kChatLink`. ⚠ RECOPIÉ : la table des liens se refait à chaque
@@ -227,6 +231,8 @@ class DescriptionView {
   // Les lignes portent le bloc de l'item_db une fois la base lue, et dans la
   // langue où elles ont été composées.
   const ro::vfs::ServerDb* server_db_ = nullptr;
+  const ro::vfs::PetTables* pets_ = nullptr;
+  const ro::vfs::PetTables* lines_pets_ = nullptr;
   bool lines_with_base_ = false;
   std::size_t lines_language_ = 0;
   std::string craft_label_;

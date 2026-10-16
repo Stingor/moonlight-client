@@ -429,6 +429,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // sa comparaison et l'aperçu, dès que la base est lue.
   item_description_->SeeServerDb(&database_.base());
   description_preview_->SeeServerDb(&database_.base());
+  // Les tables du familier nomment ce qu'un appât capture, ce qui sort d'un œuf
+  // et ce qu'il mange.
+  const ro::vfs::PetTables* const pet_tables = pieces_.pet.Tables(*vfs_);
+  item_description_->SeePets(pet_tables);
+  description_preview_->SeePets(pet_tables);
   item_description_->books().See(
       vfs_, &pieces_.books,
       pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr);

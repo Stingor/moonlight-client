@@ -12,6 +12,7 @@
 
 #include <imgui.h>
 
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -144,12 +145,53 @@ void NoteRowGestures(DatabaseWindowState& state, DatabaseKind kind, const Databa
   }
 }
 
+// La ligne montrée dans la liste, ou `kListNoEntry`.
+[[nodiscard]] int ShownRow(const DatabaseView& view, DatabaseKind kind,
+                           const std::optional<DatabaseTarget>& shown) {
+  if (!shown.has_value() || shown->kind != kind) {
+    return kListNoEntry;
+  }
+  const auto found = std::ranges::find(view.rows, shown->id, &DatabaseRowView::id);
+  return found != view.rows.end() ? static_cast<int>(found - view.rows.begin()) : kListNoEntry;
+}
+
+// LE CLAVIER DE LA LISTE, fenêtre au premier plan : la fiche suit la ligne
+// choisie. Rend la ligne où il mène, ou `kListNoEntry` sans touche.
+[[nodiscard]] int StepByKeys(DatabaseWindowState& state, const DatabaseView& view,
+                             DatabaseKind kind, bool query_active) {
+  // ⚠ PAS PAR-DESSUS UNE LISTE DÉROULÉE : elle a ses propres touches.
+  if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows |
+                              ImGuiFocusedFlags_NoPopupHierarchy)) {
+    return kListNoEntry;
+  }
+  // Une autre saisie garde toutes ses touches ; celle de la recherche laisse
+  // les flèches à la liste.
+  const bool typing = ImGui::GetIO().WantTextInput;
+  if (typing && !query_active) {
+    return kListNoEntry;
+  }
+  const ListKeyMove move = PressedListKey(/*arrows_only=*/typing);
+  if (move == ListKeyMove::kNone) {
+    return kListNoEntry;
+  }
+  const float row_pitch = ImGui::GetTextLineHeight() + 2.0F * ImGui::GetStyle().CellPadding.y;
+  const int target =
+      ListKeyTarget(ShownRow(view, kind, state.history.current()),
+                    static_cast<int>(view.rows.size()), VisibleListRows(row_pitch), move);
+  if (target == kListNoEntry) {
+    return kListNoEntry;
+  }
+  state.history.Step(
+      DatabaseTarget{.kind = kind, .id = view.rows[static_cast<std::size_t>(target)].id});
+  return target;
+}
+
 // LA LISTE : un clic visite la fiche de la ligne ; les autres gestes sont ceux
-// de tout objet ou monstre.
-void DrawList(DatabaseWindowState& state, const DatabaseView& view, DatabaseAnswer& answer) {
+// de tout objet ou monstre. Elle défile sous l'ascenseur du jeu.
+void DrawList(DatabaseWindowState& state, const DatabaseView& view, const SkinArt& art,
+              bool query_active, DatabaseAnswer& answer) {
   const DatabaseKind kind =
       state.tab == kDatabaseItemTab ? DatabaseKind::kItem : DatabaseKind::kMonster;
-  const std::optional<DatabaseTarget> shown = state.history.current();
   const float height =
       std::max(ImGui::GetFrameHeight(), ImGui::GetContentRegionAvail().y -
                                             kFooterLines * ImGui::GetTextLineHeightWithSpacing());
@@ -162,17 +204,22 @@ void DrawList(DatabaseWindowState& state, const DatabaseView& view, DatabaseAnsw
   ImGui::TableSetupColumn("##db_name", ImGuiTableColumnFlags_WidthStretch);
   ImGui::TableSetupColumn("##db_note", ImGuiTableColumnFlags_WidthFixed,
                           kNoteColumnPixels * Scale());
-  int shown_row = -1;
+  // Lu DANS la table : c'est sa fenêtre intérieure qui défile.
+  const int keyed_row = StepByKeys(state, view, kind, query_active);
+  const std::optional<DatabaseTarget> shown = state.history.current();
   if (state.scroll_to_shown && shown.has_value() && shown->kind == kind) {
-    const auto found = std::ranges::find(view.rows, shown->id, &DatabaseRowView::id);
-    if (found != view.rows.end()) {
-      shown_row = static_cast<int>(found - view.rows.begin());
+    if (const int shown_row = ShownRow(view, kind, shown); shown_row != kListNoEntry) {
       ImGui::SetScrollY(static_cast<float>(shown_row) * ImGui::GetTextLineHeightWithSpacing());
     }
     state.scroll_to_shown = false;
   }
   ImGuiListClipper clipper;
   clipper.Begin(static_cast<int>(view.rows.size()));
+  // La ligne qu'une touche vient de choisir se pose même hors de la vue, pour
+  // que la liste la rejoigne.
+  if (keyed_row != kListNoEntry) {
+    clipper.IncludeItemByIndex(keyed_row);
+  }
   while (clipper.Step()) {
     for (int rank = clipper.DisplayStart; rank < clipper.DisplayEnd; ++rank) {
       const DatabaseRowView& row = view.rows[static_cast<std::size_t>(rank)];
@@ -187,11 +234,15 @@ void DrawList(DatabaseWindowState& state, const DatabaseView& view, DatabaseAnsw
           !ImGui::GetIO().KeyShift) {
         state.history.Visit(DatabaseTarget{.kind = kind, .id = row.id});
       }
+      if (rank == keyed_row) {
+        KeepLastItemInView();
+      }
       NoteRowGestures(state, kind, row, answer);
       ImGui::TableNextColumn();
       ImGui::TextDisabled("%.*s", static_cast<int>(row.note.size()), row.note.data());
     }
   }
+  PaintWindowScrollbar(art);
   ImGui::EndTable();
   TextOf(view.summary);
 }
@@ -202,9 +253,10 @@ void DrawListPane(DatabaseWindowState& state, const DatabaseView& view, const Sk
       state.tab == kDatabaseItemTab ? state.item_query : state.monster_query;
   ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
   ImGui::InputTextWithHint("##db_query", core::Tr("Nom ou ID"), query.data(), query.size());
+  const bool query_active = ImGui::IsItemActive();
   DrawFilters(state, art);
   ImGui::Separator();
-  DrawList(state, view, answer);
+  DrawList(state, view, art, query_active, answer);
 }
 
 // LA BARRE DU HAUT : les deux onglets, puis ◀ ▶.
@@ -281,11 +333,34 @@ void FollowSheetLink(DatabaseWindowState& state, const DescriptionView& item, Ch
 
 }  // namespace
 
+void DatabaseHistory::Step(DatabaseTarget target) {
+  if (const std::optional<DatabaseTarget> shown = current();
+      shown.has_value() && *shown == target) {
+    return;
+  }
+  if (!stepped_ || visited_.empty()) {
+    Visit(target);
+    stepped_ = true;
+    return;
+  }
+  // Revenu sur la fiche d'où il est parti, le clavier ne la double pas.
+  if (at_ > 0 && visited_[at_ - 1] == target) {
+    visited_.resize(at_);
+    --at_;
+    stepped_ = false;
+    return;
+  }
+  // Une suite coupée, comme par une visite.
+  visited_.resize(at_ + 1);
+  visited_[at_] = target;
+}
+
 void DatabaseHistory::Visit(DatabaseTarget target) {
   if (const std::optional<DatabaseTarget> shown = current();
       shown.has_value() && *shown == target) {
     return;
   }
+  stepped_ = false;
   if (!visited_.empty()) {
     visited_.resize(at_ + 1);
   }
@@ -301,6 +376,7 @@ bool DatabaseHistory::Back() noexcept {
     return false;
   }
   --at_;
+  stepped_ = false;
   return true;
 }
 
@@ -309,6 +385,7 @@ bool DatabaseHistory::Forward() noexcept {
     return false;
   }
   ++at_;
+  stepped_ = false;
   return true;
 }
 
@@ -369,11 +446,13 @@ DatabaseAnswer DrawDatabaseWindow(DatabaseWindowState& state, const DatabaseView
       ImGui::TableNextColumn();
       if (ImGui::BeginChild("##db_list_child")) {
         DrawListPane(state, view, art, answer);
+        PaintWindowScrollbar(art);
       }
       ImGui::EndChild();
       ImGui::TableNextColumn();
       if (ImGui::BeginChild("##db_sheet_child")) {
         DrawSheetPane(state, view, monster_state, art, answer);
+        PaintWindowScrollbar(art);
       }
       ImGui::EndChild();
       ImGui::EndTable();

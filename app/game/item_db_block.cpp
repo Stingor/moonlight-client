@@ -541,17 +541,6 @@ struct JobList {
 
 // ── LES LIGNES ──────────────────────────────────────────────────────────────
 
-[[nodiscard]] std::string Labelled(const char* label, std::string_view value) {
-  std::string line(kItemDbLabelInk);
-  line += label;
-  line += kItemDbPlainInk;
-  if (!value.empty()) {
-    line += ' ';
-    line += value;
-  }
-  return line;
-}
-
 [[nodiscard]] std::string WeightText(std::uint32_t tenths) {
   std::array<char, kLineBytes> text{};
   if (tenths % kWeightTenths == 0) {
@@ -601,6 +590,17 @@ struct JobList {
 
 }  // namespace
 
+std::string ItemDbLabelled(const char* label, std::string_view value) {
+  std::string line(kItemDbLabelInk);
+  line += label;
+  line += kItemDbPlainInk;
+  if (!value.empty()) {
+    line += ' ';
+    line += value;
+  }
+  return line;
+}
+
 bool JobsRestricted(const ServerItem& item) {
   return !Has(item.jobs, kAllKey) || !item.jobs_lowered.empty();
 }
@@ -634,7 +634,7 @@ std::string JobsSummaryOf(const ServerItem& item) {
   return named.Text();
 }
 
-std::vector<std::string> ItemDbBlockOf(const ServerItem& item) {
+std::vector<std::string> ItemDbBlockOf(const ServerItem& item, const ItemDbNames& names) {
   std::vector<std::string> lines;
   std::string header(kItemDbHeaderInk);
   header += Tr("Données du serveur");
@@ -648,46 +648,51 @@ std::vector<std::string> ItemDbBlockOf(const ServerItem& item) {
   // Ce qui se porte sur soi : le serveur y regarde les jobs et le raffinement.
   const bool worn_on_body = weapon || armor || IsType(item, "Ammo");
   const bool costume = worn.costume;
+  const ItemScriptFacts facts = ReadItemScript(item.script);
 
-  lines.push_back(Labelled(Tr("Type :"), KindOf(item, worn)));
+  // Un appât se dit item de capture, quel que soit son type.
+  lines.push_back(ItemDbLabelled(
+      Tr("Type :"), facts.captures ? std::string(Tr("Item de capture")) : KindOf(item, worn)));
   if (item.attack > 0) {
-    lines.push_back(Labelled(Tr("Attaque :"), NumberText(item.attack)));
+    lines.push_back(ItemDbLabelled(Tr("Attaque :"), NumberText(item.attack)));
   }
   if (item.magic_attack > 0) {
-    lines.push_back(Labelled(Tr("Attaque magique :"), NumberText(item.magic_attack)));
+    lines.push_back(ItemDbLabelled(Tr("Attaque magique :"), NumberText(item.magic_attack)));
   }
-  // Une armure dit sa défense, nulle comprise, comme la table.
-  if ((armor && !costume) || item.defense > 0) {
-    lines.push_back(Labelled(Tr("Défense :"), NumberText(item.defense)));
+  if (item.defense > 0) {
+    lines.push_back(ItemDbLabelled(Tr("Défense :"), NumberText(item.defense)));
   }
   if (armor) {
     if (const std::string position = PositionOf(worn); !position.empty()) {
-      lines.push_back(Labelled(Tr("Position :"), position));
+      lines.push_back(ItemDbLabelled(Tr("Position :"), position));
     }
   }
   if (card) {
     if (const std::string compound = CompoundOf(worn); !compound.empty()) {
-      lines.push_back(Labelled(Tr("Se sertit sur :"), compound));
+      lines.push_back(ItemDbLabelled(Tr("Se sertit sur :"), compound));
     }
   }
   if (weapon && item.range_cells > 0) {
     std::array<char, kLineBytes> range{};
     std::snprintf(range.data(), range.size(), Tr("%u case(s)"),
                   static_cast<unsigned>(item.range_cells));
-    lines.push_back(Labelled(Tr("Portée :"), range.data()));
+    lines.push_back(ItemDbLabelled(Tr("Portée :"), range.data()));
   }
-  lines.push_back(Labelled(Tr("Poids :"), WeightText(item.weight_tenths)));
+  AppendItemDbScriptFacts(lines, item, facts, names);
+  if (item.weight_tenths > 0) {
+    lines.push_back(ItemDbLabelled(Tr("Poids :"), WeightText(item.weight_tenths)));
+  }
   if (item.weapon_level > 0) {
-    lines.push_back(Labelled(Tr("Niveau d'arme :"), NumberText(item.weapon_level)));
+    lines.push_back(ItemDbLabelled(Tr("Niveau d'arme :"), NumberText(item.weapon_level)));
   }
   if (item.armor_level > 0) {
-    lines.push_back(Labelled(Tr("Niveau d'armure :"), NumberText(item.armor_level)));
+    lines.push_back(ItemDbLabelled(Tr("Niveau d'armure :"), NumberText(item.armor_level)));
   }
   if (item.slots > 0) {
-    lines.push_back(Labelled(Tr("Emplacements de carte :"), NumberText(item.slots)));
+    lines.push_back(ItemDbLabelled(Tr("Emplacements de carte :"), NumberText(item.slots)));
   }
   if ((weapon || armor) && !costume) {
-    lines.push_back(Labelled(Tr("Raffinable :"), item.refineable ? Tr("Oui") : Tr("Non")));
+    lines.push_back(ItemDbLabelled(Tr("Raffinable :"), item.refineable ? Tr("Oui") : Tr("Non")));
   }
 
   // ── LES PRÉREQUIS, après un trait, comme la table ─────────────────────────
@@ -708,14 +713,14 @@ std::vector<std::string> ItemDbBlockOf(const ServerItem& item) {
   }
   if (!needs.empty()) {
     lines.emplace_back(ro::vfs::kDescriptionRule);
-    lines.push_back(Labelled(Tr("Prérequis :"), {}));
+    lines.push_back(ItemDbLabelled(Tr("Prérequis :"), {}));
     lines.insert(lines.end(), needs.begin(), needs.end());
   }
   return lines;
 }
 
 void AppendItemDbBlock(std::vector<std::string>& lines, const ro::vfs::ServerDb* db,
-                       std::uint32_t item_id) {
+                       std::uint32_t item_id, const ItemDbNames& names) {
   if (db == nullptr || !db->known()) {
     return;
   }
@@ -730,7 +735,9 @@ void AppendItemDbBlock(std::vector<std::string>& lines, const ro::vfs::ServerDb*
     lines.push_back(std::move(unknown));
     return;
   }
-  const std::vector<std::string> block = ItemDbBlockOf(*item);
+  ItemDbNames with_base = names;
+  with_base.db = db;
+  const std::vector<std::string> block = ItemDbBlockOf(*item, with_base);
   lines.insert(lines.end(), block.begin(), block.end());
 }
 

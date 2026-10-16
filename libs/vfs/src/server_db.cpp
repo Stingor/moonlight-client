@@ -195,6 +195,8 @@ ServerItem ItemOf(const formats::RathenaEntry& entry) {
       item.refineable = FieldTrue(value);
     } else if (key == "View") {
       item.view = FieldNumber<std::uint32_t>(value, 0);
+    } else if (key == "Delay") {
+      item.reuse_delay_ms = NumberIn<std::uint32_t>(PairValue(value.map, "Duration"), 0);
     } else if (key == "Script") {
       item.script = FieldText(value);
     } else if (key == "EquipScript") {

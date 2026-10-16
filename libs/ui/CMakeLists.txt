@@ -128,6 +128,7 @@ add_library(ro_ui STATIC
     src/profiles_page.cpp
     src/loading_screen.cpp
     src/patch_screen.cpp
+    src/list_keys.cpp
     src/log_window.cpp
     src/character_create_window.cpp
     src/character_delete_window.cpp

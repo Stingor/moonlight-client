@@ -20,13 +20,15 @@ namespace ro::vfs {
 // que l'œuf peut devenir, se lit dans deux sources :
 //
 //   * `data\yaml_files\pets.yml`, exporté de la pet_db du serveur par
-//     `scripts/yaml_tables/pets.py` : l'œuf, la nourriture, le droit à
-//     l'auto-alimentation et les évolutions de chaque familier. C'est la table
-//     avec laquelle le serveur juge une évolution ;
+//     `scripts/yaml_tables/pets.py` : l'œuf, la nourriture, l'objet de
+//     capture, l'accessoire, le droit à l'auto-alimentation et les évolutions
+//     de chaque familier. C'est la table avec laquelle le serveur juge une
+//     évolution ;
 //
 //         version: 1
 //         pets: {
-//           1002: {egg: 9001, food: 531, auto_feed: false,
+//           1002: {egg: 9001, food: 531, tame: 619, accessory: 10013,
+//                  auto_feed: false,
 //                  evolutions: [{egg: 9069, materials: [[610, 10], [619, 3]]}]},
 //           …
 //         }
@@ -62,6 +64,11 @@ struct PetTables {
   std::unordered_map<std::uint32_t, std::uint32_t> class_by_egg;
   // La classe → l'item qui la nourrit.
   std::unordered_map<std::uint32_t, std::uint32_t> food_by_class;
+  // L'objet de capture → les classes qu'il capture, croissantes : le serveur
+  // n'accepte la capture que du monstre dont c'est le `TameItem`.
+  std::unordered_map<std::uint32_t, std::vector<std::uint32_t>> classes_by_tame_item;
+  // L'accessoire → les classes que le serveur laisse le porter, croissantes.
+  std::unordered_map<std::uint32_t, std::vector<std::uint32_t>> classes_by_accessory;
   // La classe → le nom de l'espèce, en UTF-8.
   std::unordered_map<std::uint32_t, std::string> species_by_class;
   // L'œuf SOURCE → ses évolutions, et leurs matériaux, dans l'ordre du fichier.
@@ -76,6 +83,12 @@ struct PetTables {
   // Zéro quand la table ne connaît pas l'œuf ou la classe.
   [[nodiscard]] std::uint32_t ClassOfEgg(std::uint32_t egg_id) const;
   [[nodiscard]] std::uint32_t FoodOf(std::uint32_t pet_class) const;
+  // Vide quand l'objet ne capture rien.
+  [[nodiscard]] std::span<const std::uint32_t> TamedBy(std::uint32_t item_id) const;
+  // Vide quand aucun familier ne porte l'objet.
+  [[nodiscard]] std::span<const std::uint32_t> WornBy(std::uint32_t item_id) const;
+  // Les classes que l'objet nourrit, croissantes ; vide pour l'item zéro.
+  [[nodiscard]] std::vector<std::uint32_t> FedBy(std::uint32_t item_id) const;
   // Vide quand la table ne nomme pas l'espèce.
   [[nodiscard]] std::string_view SpeciesOf(std::uint32_t pet_class) const;
   // Vide quand l'œuf n'a aucune recette.
@@ -101,12 +114,12 @@ struct PetTables {
 // `tables`.
 [[nodiscard]] core::Result<void> ParsePetInfo(std::string_view yaml_text, PetTables& tables);
 
-// Remplit l'œuf, la nourriture, l'auto-alimentation et les évolutions depuis le
-// texte de `pets.yml`. Refuse un texte qui n'est pas du YAML, dont `version`
-// n'est pas 1, dont `pets` n'est pas une table, ou dont un familier n'a pas ses
-// quatre champs, une classe ou un œuf nul, une évolution sans œuf cible ou un
-// matériau qui n'est pas une paire [item, quantité]. REFUSÉ, il ne touche pas
-// `tables`.
+// Remplit l'œuf, la nourriture, la capture, l'accessoire, l'auto-alimentation
+// et les évolutions depuis le texte de `pets.yml`. Refuse un texte qui n'est
+// pas du YAML, dont `version` n'est pas 1, dont `pets` n'est pas une table, ou
+// dont un familier n'a pas ses six champs, une classe ou un œuf nul, une
+// évolution sans œuf cible ou un matériau qui n'est pas une paire [item,
+// quantité]. REFUSÉ, il ne touche pas `tables`.
 [[nodiscard]] core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& tables);
 
 // Lit les deux sources. ABSENTE OU ILLISIBLE, chacune laisse ses tables vides et

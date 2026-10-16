@@ -18411,3 +18411,93 @@ tr: this name is not accepted: too short, forbidden letters or reserved name
 
 fr: le renommage est interdit sur ce serveur
 tr: renaming is forbidden on this server
+
+fr: %u %% des PV
+tr: %u %% of HP
+
+fr: %u %% des SP
+tr: %u %% of SP
+
+fr: %u PV
+tr: %u HP
+
+fr: %u SP
+tr: %u SP
+
+fr: %u ms
+tr: %u ms
+
+fr: %u ~ %u PV
+tr: %u ~ %u HP
+
+fr: %u ~ %u SP
+tr: %u ~ %u SP
+
+fr: %zu familiers
+tr: %zu pets
+
+fr: Capture :
+tr: Captures:
+
+fr: Confusion
+tr: Confusion
+
+fr: Corps de mort-vivant
+tr: Undead body
+
+fr: Cécité
+tr: Blind
+
+fr: Durée :
+tr: Duration:
+
+fr: Délai de réutilisation :
+tr: Cooldown:
+
+fr: Familier :
+tr: Pet:
+
+fr: Gel
+tr: Freeze
+
+fr: Guérit :
+tr: Cures:
+
+fr: Hallucination
+tr: Hallucination
+
+fr: Malédiction
+tr: Curse
+
+fr: Nourrit :
+tr: Feeds:
+
+fr: Item de capture
+tr: Taming item
+
+fr: Poison mortel
+tr: Deadly poison
+
+fr: Pétrification
+tr: Stone
+
+fr: Saignement
+tr: Bleeding
+
+fr: Silence
+tr: Silence
+
+fr: Soin :
+tr: Heal:
+
+fr: Sommeil
+tr: Sleep
+
+fr: Tête d'orc
+tr: Orc head
+
+fr: Élément :
+tr: Element:
+
+fr: Étourdissement
+tr: Stun

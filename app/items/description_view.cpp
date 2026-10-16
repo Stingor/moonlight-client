@@ -84,16 +84,18 @@ void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id
   const bool with_base = server_db_ != nullptr && server_db_->known();
   const std::size_t language = ro::core::LanguageSerial();
   const bool new_item = shown_ != item_id;
-  if (new_item || with_base != lines_with_base_ || language != lines_language_) {
+  if (new_item || with_base != lines_with_base_ || language != lines_language_ ||
+      pets_ != lines_pets_) {
     shown_ = item_id;
     lines_with_base_ = with_base;
     lines_language_ = language;
+    lines_pets_ = pets_;
     lines_.clear();
     if (const ro::vfs::ItemEntry* entry = items_ != nullptr ? items_->Find(item_id) : nullptr;
         entry != nullptr) {
       lines_ = entry->description;
     }
-    AppendItemDbBlock(lines_, server_db_, item_id);
+    AppendItemDbBlock(lines_, server_db_, item_id, ItemDbNames{.pets = pets_, .items = items_});
   }
   if (new_item) {
     RefreshOdds(item_id);
@@ -221,6 +223,14 @@ void DescriptionView::EnableComparison() {
   compare_->SeeRandomOptions(option_names_);
   compare_->ShareCreatorsWith(*this);
   compare_->SeeServerDb(server_db_);
+  compare_->SeePets(pets_);
+}
+
+void DescriptionView::SeePets(const ro::vfs::PetTables* pets) noexcept {
+  pets_ = pets;
+  if (compare_ != nullptr) {
+    compare_->SeePets(pets);
+  }
 }
 
 void DescriptionView::SeeServerDb(const ro::vfs::ServerDb* db) noexcept {
@@ -427,6 +437,7 @@ void DescriptionView::BorrowFrom(DescriptionView& owner, ro::render::ActorWardro
   monsters_ = owner.monsters_;
   option_names_ = owner.option_names_;
   viewed_ = owner.viewed_;
+  pets_ = owner.pets_;
   SeeWardrobe(wardrobe);
 }
 

@@ -1,5 +1,6 @@
 // LA LISTE DÉROULANTE DU JEU : un champ bordé, et le bouton flèche du client. La
-// molette au-dessus du champ fermé en fait défiler les entrées.
+// molette au-dessus du champ fermé en fait défiler les entrées ; déroulée,
+// `SkinCombo` se parcourt aux touches de liste (`list_keys.h`).
 //
 // ⚠ ELLE S'EMPLOIE COMME CELLE D'IMGUI — l'appelant pose ses `Selectable` entre
 // l'ouverture et la fermeture — et `EndSkinCombo` NE S'APPELLE QUE si l'ouverture
@@ -12,6 +13,7 @@
 #include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
@@ -197,6 +199,22 @@ bool SkinCombo(const char* label, int* chosen, std::span<const char* const> item
     changed = true;
   }
   if (open) {
+    // LE CLAVIER DE LA LISTE DÉROULÉE : le choix suit la touche, comme sous
+    // la molette, et Entrée referme.
+    bool keyed = false;
+    if (ImGui::IsWindowFocused()) {
+      const int target =
+          ListKeyTarget(*chosen, count, VisibleListRows(ImGui::GetTextLineHeightWithSpacing()),
+                        PressedListKey(/*arrows_only=*/false));
+      if (target != kListNoEntry && target != *chosen) {
+        *chosen = target;
+        changed = true;
+        keyed = true;
+      }
+      if (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter)) {
+        ImGui::CloseCurrentPopup();
+      }
+    }
     for (int rank = 0; rank < static_cast<int>(items.size()); ++rank) {
       const bool current = *chosen == rank;
       // ⚠ VRAI SEULEMENT SUR UN VRAI CHANGEMENT. Posé dans le corps du `if`, ce
@@ -210,6 +228,9 @@ bool SkinCombo(const char* label, int* chosen, std::span<const char* const> item
       }
       if (current) {
         ImGui::SetItemDefaultFocus();
+        if (keyed) {
+          KeepLastItemInView();
+        }
       }
     }
     EndSkinCombo();

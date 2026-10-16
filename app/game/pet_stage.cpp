@@ -254,6 +254,11 @@ void PetStage::LoadTables(ro::vfs::Vfs& vfs) {
   tables_ = ro::vfs::ReadPetTables(vfs);
 }
 
+const ro::vfs::PetTables* PetStage::Tables(ro::vfs::Vfs& vfs) {
+  LoadTables(vfs);
+  return tables_.has_value() ? &*tables_ : nullptr;
+}
+
 // ── LES COMPOSITIONS ────────────────────────────────────────────────────────
 
 void PetStage::Stage(ro::vfs::Vfs& vfs, const ro::sim::World& world, GamePieces& pieces,

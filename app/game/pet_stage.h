@@ -115,6 +115,9 @@ class PetStage {
   // Ce qui refuse « nourrir » AVANT même la question — une lettre en
   // rédaction, un échange en cours —, traduit ; nul quand rien ne s'y oppose.
   [[nodiscard]] const char* FeedRefusal() const;
+  // Les tables du familier, lues au premier appel : la description d'un œuf,
+  // d'un appât ou d'une nourriture les emploie aussi. Le pointeur ne bouge plus.
+  [[nodiscard]] const ro::vfs::PetTables* Tables(ro::vfs::Vfs& vfs);
   void Perform(ro::net::Connection& link);
   void UnequipAccessory(ro::net::Connection& link);
   void ReturnToEgg(ro::net::Connection& link);

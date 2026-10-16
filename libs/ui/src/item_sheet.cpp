@@ -294,6 +294,8 @@ void DrawTabs(DescriptionWindowState& state, const DescriptionView& view, const 
     // LE CONTENU DÉFILE SEUL : l'en-tête et les onglets restent en place.
     if (ImGui::BeginChild("##item_sheet_body")) {
       DrawTabBody(tab, state, view, art, action);
+      // L'ascenseur d'ImGui est transparent : c'est celui du jeu qui se voit.
+      PaintWindowScrollbar(art);
     }
     ImGui::EndChild();
     ImGui::EndTabItem();

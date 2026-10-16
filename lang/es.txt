@@ -18411,3 +18411,93 @@ tr: este nombre no se acepta: demasiado corto, letras prohibidas o nombre reserv
 
 fr: le renommage est interdit sur ce serveur
 tr: el cambio de nombre está prohibido en este servidor
+
+fr: %u %% des PV
+tr: %u %% de los PV
+
+fr: %u %% des SP
+tr: %u %% de los SP
+
+fr: %u PV
+tr: %u PV
+
+fr: %u SP
+tr: %u SP
+
+fr: %u ms
+tr: %u ms
+
+fr: %u ~ %u PV
+tr: %u ~ %u PV
+
+fr: %u ~ %u SP
+tr: %u ~ %u SP
+
+fr: %zu familiers
+tr: %zu mascotas
+
+fr: Capture :
+tr: Captura:
+
+fr: Confusion
+tr: Confusión
+
+fr: Corps de mort-vivant
+tr: Cuerpo de no muerto
+
+fr: Cécité
+tr: Ceguera
+
+fr: Durée :
+tr: Duración:
+
+fr: Délai de réutilisation :
+tr: Tiempo de reutilización:
+
+fr: Familier :
+tr: Mascota:
+
+fr: Gel
+tr: Congelación
+
+fr: Guérit :
+tr: Cura:
+
+fr: Hallucination
+tr: Alucinación
+
+fr: Malédiction
+tr: Maldición
+
+fr: Nourrit :
+tr: Alimenta:
+
+fr: Item de capture
+tr: Objeto de captura
+
+fr: Poison mortel
+tr: Veneno mortal
+
+fr: Pétrification
+tr: Petrificación
+
+fr: Saignement
+tr: Sangrado
+
+fr: Silence
+tr: Silencio
+
+fr: Soin :
+tr: Curación:
+
+fr: Sommeil
+tr: Sueño
+
+fr: Tête d'orc
+tr: Cabeza de orco
+
+fr: Élément :
+tr: Elemento:
+
+fr: Étourdissement
+tr: Aturdimiento
