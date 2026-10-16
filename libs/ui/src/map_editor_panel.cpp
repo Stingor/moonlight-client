@@ -136,9 +136,13 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
   static_cast<void>(SkinCheckBox(core::Tr("Retouchés"), &panel.edited_only, art));
   const std::string_view filter(panel.filter.data(),
                                 strnlen(panel.filter.data(), panel.filter.size()));
+  if (view.models == nullptr) {
+    return;
+  }
+  const std::vector<MapEditorModelRow>& rows = *view.models;
   std::vector<std::size_t> shown;
-  for (std::size_t slot = 0; slot < view.models.size(); ++slot) {
-    const MapEditorModelRow& row = view.models[slot];
+  for (std::size_t slot = 0; slot < rows.size(); ++slot) {
+    const MapEditorModelRow& row = rows[slot];
     if ((!panel.edited_only || row.edited) && PassesFilter(row, filter)) {
       shown.push_back(slot);
     }
@@ -152,7 +156,7 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
   clipper.Begin(static_cast<int>(shown.size()));
   while (clipper.Step()) {
     for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
-      const MapEditorModelRow& row = view.models[shown[static_cast<std::size_t>(line)]];
+      const MapEditorModelRow& row = rows[shown[static_cast<std::size_t>(line)]];
       const std::string label = std::format(
           "{}{} — {}{}##modele{}", row.added ? "+ " : (row.edited ? "✎ " : ""), row.model_index,
           row.file, row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),

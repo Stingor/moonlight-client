@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -156,6 +157,10 @@ class MapEditorSession {
   Outcome AddLight(MapEditStore& store);
   Outcome SetLight(const ro::ui::map_editor::SetLight& set, MapEditStore& store);
   Outcome RemoveLight(std::size_t slot, MapEditStore& store);
+  // LES LIGNES DE L'ARBRE DE LA SCÈNE, rebâties seulement quand le document, la
+  // carte ou ses modèles changent : les recopier à chaque image coûtait une
+  // chaîne par modèle.
+  void RefreshSceneRows(const ro::mapedit::MapEdit& document) const;
   // Ce que la vue montre des lumières.
   void ViewLights(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
   // Retient un geste dans l'historique, s'il a changé quelque chose.
@@ -181,6 +186,12 @@ class MapEditorSession {
   // toutes à l'écran.
   std::optional<std::size_t> selected_light_;
   std::vector<LightDot> light_dots_;
+  // Le cache de `RefreshSceneRows`, et ce dont il a été bâti.
+  mutable std::shared_ptr<const std::vector<ro::ui::MapEditorModelRow>> scene_rows_;
+  mutable std::vector<std::size_t> edited_ranks_;
+  mutable std::optional<ro::mapedit::MapEdit> rows_document_;
+  mutable std::string rows_map_;
+  mutable std::size_t rows_model_count_ = 0;
   // La saisie d'une poignée ou d'un sommet du modèle désigné ; puis celle d'un
   // cercle de lumière.
   [[nodiscard]] bool GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& view);

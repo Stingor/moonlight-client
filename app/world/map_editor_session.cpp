@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdio>
 #include <format>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -541,6 +542,52 @@ void MapEditorSession::Record(std::string label, const ro::mapedit::MapEdit& bef
   }
 }
 
+void MapEditorSession::RefreshSceneRows(const ro::mapedit::MapEdit& document) const {
+  if (scene_rows_ != nullptr && rows_document_ == document && rows_map_ == map_name_ &&
+      rows_model_count_ == model_files_.size()) {
+    return;
+  }
+  auto rows = std::make_shared<std::vector<ro::ui::MapEditorModelRow>>();
+  rows->reserve(model_files_.size() + document.added().size());
+  for (std::size_t rank = 0; rank < model_files_.size(); ++rank) {
+    rows->push_back(ro::ui::MapEditorModelRow{.model_index = rank, .file = model_files_[rank]});
+  }
+  for (const ro::mapedit::ModelEdit& edit : document.models()) {
+    if (edit.model_index < rows->size()) {
+      (*rows)[edit.model_index].edited = true;
+      (*rows)[edit.model_index].hidden = edit.hidden;
+    }
+  }
+  // UN MAILLAGE RETOUCHÉ compte aussi : celui de sa pose, ou celui de toutes
+  // les poses de son fichier.
+  for (const ro::mapedit::MeshEdit& mesh : document.meshes()) {
+    for (ro::ui::MapEditorModelRow& row : *rows) {
+      if (row.model_index == mesh.model_index || (mesh.all_poses && row.file == mesh.model_file)) {
+        row.edited = true;
+      }
+    }
+  }
+  edited_ranks_.clear();
+  for (const ro::ui::MapEditorModelRow& row : *rows) {
+    if (row.edited) {
+      edited_ranks_.push_back(row.model_index);
+    }
+  }
+  // Les ajouts, après les modèles du RSW.
+  for (std::size_t slot = 0; slot < document.added().size(); ++slot) {
+    const ro::mapedit::AddedModel& added = document.added()[slot];
+    rows->push_back(ro::ui::MapEditorModelRow{.model_index = model_files_.size() + slot,
+                                              .file = added.model_file,
+                                              .edited = true,
+                                              .hidden = added.hidden,
+                                              .added = true});
+  }
+  scene_rows_ = std::move(rows);
+  rows_document_ = document;
+  rows_map_ = map_name_;
+  rows_model_count_ = model_files_.size();
+}
+
 ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
                                              const MapEditStore& store) const {
   ro::ui::MapEditorView view;
@@ -552,41 +599,9 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.unsaved = store.Unsaved(map_name_);
   view.status = status_;
   const ro::mapedit::MapEdit& document = store.Document(map_name_);
-  view.models.reserve(model_files_.size());
-  for (std::size_t rank = 0; rank < model_files_.size(); ++rank) {
-    view.models.push_back(
-        ro::ui::MapEditorModelRow{.model_index = rank, .file = model_files_[rank]});
-  }
-  for (const ro::mapedit::ModelEdit& edit : document.models()) {
-    if (edit.model_index < view.models.size()) {
-      view.models[edit.model_index].edited = true;
-      view.models[edit.model_index].hidden = edit.hidden;
-    }
-  }
-  // UN MAILLAGE RETOUCHÉ compte aussi : celui de sa pose, ou celui de toutes
-  // les poses de son fichier.
-  for (const ro::mapedit::MeshEdit& mesh : document.meshes()) {
-    for (ro::ui::MapEditorModelRow& row : view.models) {
-      if (row.model_index == mesh.model_index || (mesh.all_poses && row.file == mesh.model_file)) {
-        row.edited = true;
-      }
-    }
-  }
-  view.edited.clear();
-  for (const ro::ui::MapEditorModelRow& row : view.models) {
-    if (row.edited) {
-      view.edited.push_back(row.model_index);
-    }
-  }
-  // Les ajouts, après les modèles du RSW.
-  for (std::size_t slot = 0; slot < document.added().size(); ++slot) {
-    const ro::mapedit::AddedModel& added = document.added()[slot];
-    view.models.push_back(ro::ui::MapEditorModelRow{.model_index = model_files_.size() + slot,
-                                                    .file = added.model_file,
-                                                    .edited = true,
-                                                    .hidden = added.hidden,
-                                                    .added = true});
-  }
+  RefreshSceneRows(document);
+  view.models = scene_rows_;
+  view.edited = edited_ranks_;
   ViewLights(document, view);
   if (selection_.empty()) {
     return view;

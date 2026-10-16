@@ -102,7 +102,9 @@ struct MapEditorView {
   // Les rangs que le document retouche sur cette carte.
   std::vector<std::size_t> edited;
   // L'ARBRE DE LA SCÈNE : tous les modèles de la carte, dans l'ordre du RSW.
-  std::vector<MapEditorModelRow> models;
+  // Partagé et non recopié : une carte en compte des centaines, et il ne change
+  // qu'avec le document. Jamais nul quand le mode est ouvert.
+  std::shared_ptr<const std::vector<MapEditorModelRow>> models;
   // Ce que le mode trace par-dessus la vue.
   std::vector<MapEditorLine> lines;
   // LA BIBLIOTHÈQUE : les fichiers de modèles de l'installation, relatifs à
