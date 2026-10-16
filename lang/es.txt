@@ -18747,3 +18747,6 @@ tr: Restablecer un vértice del modelo %zu
 
 fr: Étendre le maillage du modèle %zu
 tr: Extender la malla del modelo %zu
+
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
+tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta. Ctrl+clic hace caminar al personaje, Escape sale del editor.

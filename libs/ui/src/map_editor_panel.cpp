@@ -37,7 +37,7 @@ constexpr float kScaleStep = 0.005F;
 constexpr const char* kMapEditorTitle = core::TrText("Éditeur de carte");
 constexpr const char* kMapEditorId = "map_editor";
 
-constexpr std::array<const char*, 4> kMapEditorHelp = {
+constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("Un clic dans le monde désigne le modèle du décor sous la souris : la plus "
                  "petite boîte traversée gagne. Ses retouches se redésignent aussi depuis la "
                  "liste."),
@@ -46,6 +46,9 @@ constexpr std::array<const char*, 4> kMapEditorHelp = {
     core::TrText("« Pourquoi » est obligatoire : le document refuse une retouche sans raison."),
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
+    core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
+                 "Ctrl+4 choisissent l'outil. Ctrl+clic fait marcher le personnage, Échap quitte "
+                 "l'éditeur."),
 };
 
 // La hauteur de l'arbre de la scène, en lignes : au-delà, il défile.

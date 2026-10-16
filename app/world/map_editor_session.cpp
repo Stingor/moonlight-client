@@ -13,6 +13,28 @@
 #include "ro/vfs/encoding.h"
 
 namespace moonclient {
+
+std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held) {
+  switch (key) {
+    case 'z':
+      return shift_held ? ro::ui::MapEditorIntent(ro::ui::map_editor::Redo{})
+                        : ro::ui::MapEditorIntent(ro::ui::map_editor::Undo{});
+    case 'y':
+      return ro::ui::map_editor::Redo{};
+    case 's':
+      return ro::ui::map_editor::Save{};
+    case '1':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kMove};
+    case '2':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRotate};
+    case '3':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kScale};
+    case '4':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kVertices};
+    default:
+      return std::nullopt;
+  }
+}
 namespace {
 
 // La place d'un nom de geste ou d'une phrase d'état, zéro final compris.

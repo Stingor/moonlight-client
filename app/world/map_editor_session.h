@@ -19,6 +19,11 @@
 
 namespace moonclient {
 
+// LES RACCOURCIS DU MODE ÉDITEUR, Ctrl tenu : Z annule, Y — ou Maj+Z — rétablit,
+// S enregistre, et 1 à 4 choisissent l'outil. `key` est la touche, en minuscule
+// ASCII ; rien pour une autre.
+[[nodiscard]] std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held);
+
 // LE MODE ÉDITEUR DE CARTE : voir docs/adr/0118.
 //
 // La session tient ce que le panneau montre et ce que le staff fait : le mode
@@ -68,6 +73,8 @@ class MapEditorSession {
   void DragTo(glm::vec2 pointer);
   void Release();
   [[nodiscard]] std::vector<ro::ui::MapEditorIntent> TakeQueued();
+  // Une intention venue du clavier, rendue avec celles des poignées.
+  void Queue(ro::ui::MapEditorIntent intent) { queued_.push_back(std::move(intent)); }
 
   // L'OUTIL SOMMETS : ce que l'appelant dit, à chaque image, du modèle désigné.
   struct VertexNode {

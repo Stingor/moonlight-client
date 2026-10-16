@@ -189,6 +189,17 @@ void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_i
     to.map_editor->Leave();
     return;
   }
+  // SES RACCOURCIS, Ctrl tenu, hors d'un champ de saisie : voir
+  // `MapEditorShortcut`. Ils passent avant ceux du jeu.
+  constexpr SDL_Keycode kLastAscii = 0x7F;
+  if (to.map_editor != nullptr && !text_input && !key.repeat && (key.mod & SDL_KMOD_CTRL) != 0 &&
+      key.key <= kLastAscii) {
+    if (std::optional<ro::ui::MapEditorIntent> intent =
+            MapEditorShortcut(static_cast<char>(key.key), (key.mod & SDL_KMOD_SHIFT) != 0)) {
+      to.map_editor->Queue(std::move(*intent));
+      return;
+    }
+  }
   KeyPress press = KeyPressOf(to);
   press.text_input = text_input;
   const std::optional<std::string> said = HandleKey(press, key, FramedMapOf(to));

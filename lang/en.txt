@@ -18747,3 +18747,6 @@ tr: Restore a vertex of model %zu
 
 fr: Étendre le maillage du modèle %zu
 tr: Extend the mesh of model %zu
+
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
+tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+4 pick the tool. Ctrl+click walks the character, Escape leaves the editor.
