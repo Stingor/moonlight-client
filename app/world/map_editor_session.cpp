@@ -23,6 +23,8 @@ std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_he
       return ro::ui::map_editor::Redo{};
     case 's':
       return ro::ui::map_editor::Save{};
+    case 'd':
+      return ro::ui::map_editor::Duplicate{};
     case '1':
       return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kMove};
     case '2':
@@ -36,6 +38,12 @@ std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_he
   }
 }
 namespace {
+
+// UNE COPIE se pose à côté de l'original, sur l'axe x du RSW, pour se voir
+// tout de suite : deux carreaux du sol.
+constexpr float kDuplicateShift = 20.0F;
+// La place du nom de ce geste, zéro final compris.
+constexpr std::size_t kDuplicateLabelCapacity = 192;
 
 // La place d'un nom de geste ou d'une phrase d'état, zéro final compris.
 constexpr std::size_t kLineCapacity = 192;
@@ -222,6 +230,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return RevertVertex(store);
         } else if constexpr (std::is_same_v<Asked, intents::SetAllPoses>) {
           return SetAllPoses(asked.all, store);
+        } else if constexpr (std::is_same_v<Asked, intents::Duplicate>) {
+          return Duplicate(scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
           return AddLight(store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {
@@ -341,6 +351,29 @@ MapEditorSession::Outcome MapEditorSession::AddModel(std::string file,
   store.Set(map_name_, after);
   Record(ro::core::Tr("Ajouter un modèle"), before, after);
   // LE NOUVEAU EST DÉSIGNÉ : c'est lui qu'on va placer.
+  selection_.model_index = scene.unfixed_models.size() + after.added().size() - 1;
+  status_ = ro::core::Tr("Modèle ajouté : dites pourquoi avant d'enregistrer.");
+  return {.replace_models = true};
+}
+
+MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene& scene,
+                                                      MapEditStore& store) {
+  if (selection_.empty() || *selection_.model_index >= scene.rsw.models().size()) {
+    return {};
+  }
+  const std::size_t rank = *selection_.model_index;
+  const ro::formats::RswModel& placed = scene.rsw.models()[rank];
+  const ro::mapedit::MapEdit before = store.Document(map_name_);
+  ro::mapedit::MapEdit after = before;
+  after.AddModel(ro::mapedit::AddedModel{
+      .model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
+      .position = {placed.position[0] + kDuplicateShift, placed.position[1], placed.position[2]},
+      .rotation = placed.rotation,
+      .scale = placed.scale});
+  store.Set(map_name_, after);
+  std::array<char, kDuplicateLabelCapacity> label{};
+  std::snprintf(label.data(), label.size(), ro::core::Tr("Dupliquer le modèle %zu"), rank);
+  Record(label.data(), before, after);
   selection_.model_index = scene.unfixed_models.size() + after.added().size() - 1;
   status_ = ro::core::Tr("Modèle ajouté : dites pourquoi avant d'enregistrer.");
   return {.replace_models = true};

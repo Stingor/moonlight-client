@@ -20,7 +20,7 @@
 namespace moonclient {
 
 // LES RACCOURCIS DU MODE ÉDITEUR, Ctrl tenu : Z annule, Y — ou Maj+Z — rétablit,
-// S enregistre, et 1 à 4 choisissent l'outil. `key` est la touche, en minuscule
+// S enregistre, D duplique, et 1 à 4 choisissent l'outil. `key` est la touche, en minuscule
 // ASCII ; rien pour une autre.
 [[nodiscard]] std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held);
 
@@ -138,6 +138,8 @@ class MapEditorSession {
   Outcome SetWhy(std::string why, MapEditStore& store);
   Outcome Revert(MapEditStore& store);
   Outcome AddModel(std::string file, const ro::render::MapScene& scene, MapEditStore& store);
+  // Une copie du modèle désigné, tel que l'édition le pose, décalée sur x.
+  Outcome Duplicate(const ro::render::MapScene& scene, MapEditStore& store);
   // L'OUTIL SOMMETS : voir map_editor_vertices.cpp.
   [[nodiscard]] bool GrabVertex(glm::vec2 pointer);
   Outcome MoveVertex(const ro::ui::map_editor::MoveVertex& move, MapEditStore& store);

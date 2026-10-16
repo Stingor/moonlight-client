@@ -165,6 +165,8 @@ struct SetTool {
   MapEditorTool tool = MapEditorTool::kMove;
 };
 struct Save {};
+// Ajouter une copie du modèle désigné, un peu à côté de lui.
+struct Duplicate {};
 // Ajouter une lumière ponctuelle, là où l'appelant pose ce qu'on ajoute.
 struct AddLight {};
 // Régler la lumière de rang `slot`, ou plus aucune.
@@ -187,7 +189,8 @@ using MapEditorIntent =
                  map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
                  map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
                  map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
-                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight>;
+                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
+                 map_editor::Duplicate>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

@@ -47,7 +47,8 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
-                 "Ctrl+4 choisissent l'outil. Ctrl+clic fait marcher le personnage, Échap quitte "
+                 "Ctrl+4 choisissent l'outil, Ctrl+D duplique. Ctrl+clic fait marcher le "
+                 "personnage, Échap quitte "
                  "l'éditeur."),
 };
 
@@ -310,6 +311,10 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
                                      : core::Tr("Rétablir le modèle"),
                  art)) {
     intents.emplace_back(map_editor::Revert{});
+  }
+  ImGui::SameLine();
+  if (SkinButton(core::Tr("Dupliquer"), art)) {
+    intents.emplace_back(map_editor::Duplicate{});
   }
 }
 
