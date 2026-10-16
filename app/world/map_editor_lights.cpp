@@ -75,8 +75,58 @@ bool MapEditorSession::GrabLight(glm::vec2 pointer) {
   if (!picked.has_value()) {
     return false;
   }
-  selected_light_ = picked;
+  ChooseLight(picked);
   return true;
+}
+
+bool MapEditorSession::GrabLightHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
+  if (!view.selected_light.has_value() || *view.selected_light >= view.lights.size()) {
+    return false;
+  }
+  const std::optional<std::size_t> grabbed = GrabbedHandle(handles_, pointer);
+  if (!grabbed.has_value()) {
+    return false;
+  }
+  const ro::ui::map_editor::Place start{.position = view.lights[*view.selected_light].position,
+                                        .released = false};
+  drag_ = Drag{.handle = *grabbed,
+               .grabbed = handles_[*grabbed],
+               .frame = gizmo_frame_,
+               .from = pointer,
+               .start = start,
+               .last = start,
+               .light = view.selected_light};
+  return true;
+}
+
+void MapEditorSession::ChooseLight(std::optional<std::size_t> slot) {
+  selected_light_ = slot;
+  if (slot.has_value()) {
+    selection_.Clear();
+    vertex_.reset();
+  }
+}
+
+void MapEditorSession::ChooseModel(std::optional<std::size_t> model_index) {
+  if (selection_.model_index != model_index) {
+    vertex_.reset();
+  }
+  selection_.model_index = model_index;
+  if (model_index.has_value()) {
+    selected_light_.reset();
+  }
+}
+
+MapEditorSession::Outcome MapEditorSession::MoveLight(const ro::ui::map_editor::MoveLight& move,
+                                                      MapEditStore& store) {
+  const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
+  if (move.slot >= lights.size()) {
+    return {};
+  }
+  ro::ui::map_editor::SetLight set{
+      .slot = move.slot, .light = ShownLight(lights[move.slot]), .released = move.released};
+  set.light.position = move.native;
+  return SetLight(set, store);
 }
 
 void MapEditorSession::ViewLights(const ro::mapedit::MapEdit& document,
@@ -100,7 +150,7 @@ MapEditorSession::Outcome MapEditorSession::AddLight(MapEditStore& store) {
       .night_only = false,
       .why = {}});
   store.Set(map_name_, after);
-  selected_light_ = after.lights().size() - 1;
+  ChooseLight(after.lights().size() - 1);
   Record(ro::core::Tr("Ajouter une lumière"), before, after);
   return {};
 }

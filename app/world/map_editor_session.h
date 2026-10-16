@@ -196,6 +196,13 @@ class MapEditorSession {
   // cercle de lumière.
   [[nodiscard]] bool GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& view);
   [[nodiscard]] bool GrabLight(glm::vec2 pointer);
+  // La saisie de la flèche de la lumière désignée.
+  [[nodiscard]] bool GrabLightHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  // UN SEUL OBJET DÉSIGNÉ À LA FOIS : désigner une lumière oublie le modèle, et
+  // désigner un modèle oublie la lumière — la flèche ne sert qu'un maître.
+  void ChooseLight(std::optional<std::size_t> slot);
+  void ChooseModel(std::optional<std::size_t> model_index);
+  Outcome MoveLight(const ro::ui::map_editor::MoveLight& move, MapEditStore& store);
   // Le nombre de modèles du RSW d'origine : les ajouts prennent rang après.
   std::size_t original_count_ = 0;
   GizmoFrame gizmo_frame_;
@@ -211,6 +218,8 @@ class MapEditorSession {
     ro::ui::map_editor::Place last;
     // Le sommet que la poignée déplace, avec l'outil Sommets.
     std::optional<std::pair<std::size_t, std::size_t>> vertex;
+    // La lumière que la poignée déplace.
+    std::optional<std::size_t> light;
   };
   std::optional<Drag> drag_;
   std::vector<ro::ui::MapEditorIntent> queued_;

@@ -184,6 +184,13 @@ struct SetLight {
 struct RemoveLight {
   std::size_t slot = 0;
 };
+// Déplacer la lumière de rang `slot` en `native`, dans le repère du RSW — à la
+// flèche, comme une pose. `released`, comme pour `Place`.
+struct MoveLight {
+  std::size_t slot = 0;
+  std::array<float, 3> native{};
+  bool released = true;
+};
 }  // namespace map_editor
 
 using MapEditorIntent =
@@ -192,7 +199,7 @@ using MapEditorIntent =
                  map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
                  map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
                  map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
-                 map_editor::Duplicate>;
+                 map_editor::Duplicate, map_editor::MoveLight>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

@@ -51,6 +51,20 @@ void Game::ServeMapEditor() {
                                      static_cast<float>(shell_.height())));
   const std::vector<ro::ui::MapEditorLine> marks = map_editor_.LightTrace();
   view.lines.insert(view.lines.end(), marks.begin(), marks.end());
+  // LA LUMIÈRE DÉSIGNÉE a la flèche de déplacement, comme une pose : aucun
+  // modèle n'est alors désigné.
+  if (view.selected_light.has_value() && *view.selected_light < view.lights.size() &&
+      !view.selected.has_value()) {
+    const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
+                                               stage_->scene.gnd.height()};
+    const GizmoFrame frame =
+        GizmoFrameOf(map_frame, view.lights[*view.selected_light].position, camera_);
+    map_editor_.SetGizmo(frame, GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera_,
+                                             aspect_ratio_, static_cast<float>(shell_.width()),
+                                             static_cast<float>(shell_.height())));
+    const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
+    view.lines.insert(view.lines.end(), handles.begin(), handles.end());
+  }
 }
 
 void Game::ServeMapEditorTools() {
