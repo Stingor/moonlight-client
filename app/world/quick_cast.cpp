@@ -252,9 +252,13 @@ void QuickCast::Advance(QuickCastHands& hands, const QuickCastSignals& seen, std
 }
 
 void QuickCast::Forget() {
+  ForgetAim();
+  item_key_ = 0;
+}
+
+void QuickCast::ForgetAim() {
   repeat_key_ = 0;
   pending_key_ = 0;
-  item_key_ = 0;
   arm_key_ = 0;
 }
 

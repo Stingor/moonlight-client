@@ -662,8 +662,16 @@ void Game::ForgetWhatPlayed() {
   drops_.Forget();
   // Le monde purge la cible à l'arrivée ; les gestes en attente partent avec.
   targeting_.Forget();
-  // Le cercle et les relances de Quick cast visaient l'ancienne carte.
-  quick_cast_.Forget();
+  // Le nom annoncé est déjà le nouveau, celui qu'on a tenté de charger encore
+  // l'ancien.
+  const bool same_map = world_.map_name() == attempted_map_;
+  // Le cercle et les relances de Quick cast visaient l'ancienne carte ; sur la
+  // même, l'item tenu continue — voir `QuickCast::ForgetAim`.
+  if (same_map) {
+    quick_cast_.ForgetAim();
+  } else {
+    quick_cast_.Forget();
+  }
   // ⚠ LE SORT EN ATTENTE AUSSI, et c'est le sort AU SOL qui l'exige : une
   // action sur un acteur tombe d'elle-même quand il disparaît, une action sur
   // une case ne tombe jamais — le personnage repartirait vers les mêmes
@@ -672,9 +680,8 @@ void Game::ForgetWhatPlayed() {
   grimoire_.CancelPending();
   grimoire_.Disarm();
   // LA FLÈCHE RENAÎT CACHÉE, et son animation repart, même carte comprise.
-  // L'engagement, lui, ne tombe que sur une AUTRE carte : le nom annoncé est
-  // déjà le nouveau, celui qu'on a tenté de charger encore l'ancien.
-  EnterMap(world_mouse_.engagement, world_.map_name() == attempted_map_);
+  // L'engagement, lui, ne tombe que sur une AUTRE carte.
+  EnterMap(world_mouse_.engagement, same_map);
   marker_pose_ = MarkerPose();
   marker_epoch_ms_.reset();
   // 🔴 LE MENU NE SURVIT PAS À L'ENTITÉ QU'IL DÉSIGNE, ni la question qu'il

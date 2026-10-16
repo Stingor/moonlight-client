@@ -170,6 +170,12 @@ class QuickCast {
   // Le changement de carte : il n'y a plus de cercle à retirer, ni rien à
   // relancer.
   void Forget();
+  // L'arrivée sur la MÊME carte : le cercle et la relance de sort tombent avec
+  // le grimoire désarmé, la frappe en attente aussi.
+  //
+  // 🔴 L'ITEM TENU CONTINUE. Une aile de mouche qui part de la case EST cette
+  // arrivée : l'oublier ici arrêterait la touche tenue au premier téléport.
+  void ForgetAim();
 
   [[nodiscard]] std::uint32_t arm_key() const noexcept { return arm_key_; }
   [[nodiscard]] std::uint32_t repeat_key() const noexcept { return repeat_key_; }
