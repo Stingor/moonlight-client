@@ -1,0 +1,411 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les états du serveur
+#
+#  Tiré de la base du serveur Moonlight (rAthena, mode Prerenewal) par
+#  scripts/yaml_tables/server_db.py, fusionnée comme le serveur la charge :
+#  db/status.yml et chaque import en pied de fichier, dans l'ordre. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/server_db.py --serveur <dépôt moonlight>
+#
+#  Seuls les états qui portent un script sont écrits. Bonuses, quand il est
+#  là, est ce script lu entier, une commande `bonus` par ligne : Type est le
+#  numéro du bonus (enum _sp), Val le rang de la valeur de l'état qu'il prend
+#  (1 à 4 : val1 à val4), Negated son signe opposé, Value une valeur fixe.
+#  Sans Bonuses, l'effet ne se déduit pas du seul script.
+#
+#  Lu par moonclient (ro/vfs/server_db.h), à la première ouverture de la
+#  fenêtre « Base de données » seulement.
+# ─────────────────────────────────────────────────────────────────────────────
+
+Header:
+  Type: STATUS_DB
+  Version: 4
+
+Body:
+  - Status: Acaraje
+    Script: |
+      bonus bAspdRate, getstatus(SC_ACARAJE, 1);
+      bonus bHit, getstatus(SC_ACARAJE, 2);
+    Bonuses:
+      - {Bonus: bAspdRate, Type: 1015, Val: 1}
+      - {Bonus: bHit, Type: 49, Val: 2}
+  - Status: Agifood
+    Script: |
+      bonus bAgi, getstatus(SC_AGIFOOD, 1);
+    Bonuses:
+      - {Bonus: bAgi, Type: 14, Val: 1}
+  - Status: Armor_Element_Earth
+    Script: |
+      bonus2 bSubEle,Ele_Water, getstatus(SC_ARMOR_ELEMENT_EARTH, 1);
+      bonus2 bSubEle,Ele_Earth, getstatus(SC_ARMOR_ELEMENT_EARTH, 2);
+      bonus2 bSubEle,Ele_Fire, getstatus(SC_ARMOR_ELEMENT_EARTH, 3);
+      bonus2 bSubEle,Ele_Wind, getstatus(SC_ARMOR_ELEMENT_EARTH, 4);
+  - Status: Armor_Element_Fire
+    Script: |
+      bonus2 bSubEle,Ele_Water, getstatus(SC_ARMOR_ELEMENT_FIRE, 1);
+      bonus2 bSubEle,Ele_Earth, getstatus(SC_ARMOR_ELEMENT_FIRE, 2);
+      bonus2 bSubEle,Ele_Fire, getstatus(SC_ARMOR_ELEMENT_FIRE, 3);
+      bonus2 bSubEle,Ele_Wind, getstatus(SC_ARMOR_ELEMENT_FIRE, 4);
+  - Status: Armor_Element_Water
+    Script: |
+      bonus2 bSubEle,Ele_Water, getstatus(SC_ARMOR_ELEMENT_WATER, 1);
+      bonus2 bSubEle,Ele_Earth, getstatus(SC_ARMOR_ELEMENT_WATER, 2);
+      bonus2 bSubEle,Ele_Fire, getstatus(SC_ARMOR_ELEMENT_WATER, 3);
+      bonus2 bSubEle,Ele_Wind, getstatus(SC_ARMOR_ELEMENT_WATER, 4);
+  - Status: Armor_Element_Wind
+    Script: |
+      bonus2 bSubEle,Ele_Water, getstatus(SC_ARMOR_ELEMENT_WIND, 1);
+      bonus2 bSubEle,Ele_Earth, getstatus(SC_ARMOR_ELEMENT_WIND, 2);
+      bonus2 bSubEle,Ele_Fire, getstatus(SC_ARMOR_ELEMENT_WIND, 3);
+      bonus2 bSubEle,Ele_Wind, getstatus(SC_ARMOR_ELEMENT_WIND, 4);
+  - Status: Armor_Resist
+    Script: |
+      bonus2 bSubEle,Ele_Water, getstatus(SC_ARMOR_RESIST, 1);
+      bonus2 bSubEle,Ele_Earth, getstatus(SC_ARMOR_RESIST, 2);
+      bonus2 bSubEle,Ele_Fire, getstatus(SC_ARMOR_RESIST, 3);
+      bonus2 bSubEle,Ele_Wind, getstatus(SC_ARMOR_RESIST, 4);
+  - Status: Atkpotion
+    Script: |
+      bonus bBaseAtk, getstatus(SC_ATKPOTION, 1);
+    Bonuses:
+      - {Bonus: bBaseAtk, Type: 1014, Val: 1}
+  - Status: Atthaste_Cash
+    Script: |
+      bonus bAspdRate, getstatus(SC_ATTHASTE_CASH, 1);
+    Bonuses:
+      - {Bonus: bAspdRate, Type: 1015, Val: 1}
+  - Status: Batkfood
+    Script: |
+      bonus bBaseAtk, getstatus(SC_BATKFOOD, 1);
+    Bonuses:
+      - {Bonus: bBaseAtk, Type: 1014, Val: 1}
+  - Status: Boost500
+    Script: |
+      bonus bAspdRate, getstatus(SC_BOOST500, 1);
+    Bonuses:
+      - {Bonus: bAspdRate, Type: 1015, Val: 1}
+  - Status: Cocktail_Warg_Blood
+    Script: |
+      bonus bInt, getstatus(SC_COCKTAIL_WARG_BLOOD, 1);
+    Bonuses:
+      - {Bonus: bInt, Type: 16, Val: 1}
+  - Status: Commonsc_Resist
+    Script: |
+      .@val1 = getstatus(SC_COMMONSC_RESIST, 1);
+      bonus2 bResEff,Eff_Stun,.@val1;
+      bonus2 bResEff,Eff_Freeze,.@val1;
+      bonus2 bResEff,Eff_Stone,.@val1;
+      bonus2 bResEff,Eff_Curse,.@val1;
+      bonus2 bResEff,Eff_Poison,.@val1;
+      bonus2 bResEff,Eff_Silence,.@val1;
+      bonus2 bResEff,Eff_Blind,.@val1;
+      bonus2 bResEff,Eff_Sleep,.@val1;
+      bonus2 bResEff,Eff_Bleeding,.@val1;
+      bonus2 bResEff,Eff_Confusion,.@val1;
+  - Status: Dexfood
+    Script: |
+      bonus bDex, getstatus(SC_DEXFOOD, 1);
+    Bonuses:
+      - {Bonus: bDex, Type: 17, Val: 1}
+  - Status: Doram_Buf_01
+    Script: |
+      bonus2 bHPRegenRate,10,10000;
+  - Status: Doram_Buf_02
+    Script: |
+      bonus2 bSPRegenRate,5,10000;
+  - Status: Drocera_Herb_Steamed
+    Script: |
+      bonus bAgi, getstatus(SC_DROCERA_HERB_STEAMED, 1);
+    Bonuses:
+      - {Bonus: bAgi, Type: 14, Val: 1}
+  - Status: Extract_Salamine_Juice
+    Script: |
+      bonus bAspdRate, getstatus(SC_EXTRACT_SALAMINE_JUICE, 1);
+    Bonuses:
+      - {Bonus: bAspdRate, Type: 1015, Val: 1}
+  - Status: Extract_White_Potion_Z
+    Script: |
+      bonus bHPrecovRate, getstatus(SC_EXTRACT_WHITE_POTION_Z, 1);
+    Bonuses:
+      - {Bonus: bHPrecovRate, Type: 1016, Val: 1}
+  - Status: Fleefood
+    Script: |
+      bonus bFlee, getstatus(SC_FLEEFOOD, 1);
+    Bonuses:
+      - {Bonus: bFlee, Type: 50, Val: 1}
+  - Status: Food_Agi_Cash
+    Script: |
+      bonus bAgi, getstatus(SC_FOOD_AGI_CASH, 1);
+    Bonuses:
+      - {Bonus: bAgi, Type: 14, Val: 1}
+  - Status: Food_Dex_Cash
+    Script: |
+      bonus bDex, getstatus(SC_FOOD_DEX_CASH, 1);
+    Bonuses:
+      - {Bonus: bDex, Type: 17, Val: 1}
+  - Status: Food_Int_Cash
+    Script: |
+      bonus bInt, getstatus(SC_FOOD_INT_CASH, 1);
+    Bonuses:
+      - {Bonus: bInt, Type: 16, Val: 1}
+  - Status: Food_Luk_Cash
+    Script: |
+      bonus bLuk, getstatus(SC_FOOD_LUK_CASH, 1);
+    Bonuses:
+      - {Bonus: bLuk, Type: 18, Val: 1}
+  - Status: Food_Str_Cash
+    Script: |
+      bonus bStr, getstatus(SC_FOOD_STR_CASH, 1);
+    Bonuses:
+      - {Bonus: bStr, Type: 13, Val: 1}
+  - Status: Food_Vit_Cash
+    Script: |
+      bonus bVit, getstatus(SC_FOOD_VIT_CASH, 1);
+    Bonuses:
+      - {Bonus: bVit, Type: 15, Val: 1}
+  - Status: Full_Swing_K
+    Script: |
+      bonus bBaseAtk, getstatus(SC_FULL_SWING_K, 1);
+    Bonuses:
+      - {Bonus: bBaseAtk, Type: 1014, Val: 1}
+  - Status: Geffen_Magic1
+    Script: |
+      .@val1 = getstatus(SC_GEFFEN_MAGIC1, 1);
+      bonus2 bAddRace,RC_Player_Human, .@val1;
+      bonus2 bAddRace,RC_DemiHuman, .@val1;
+  - Status: Geffen_Magic2
+    Script: |
+      .@val1 = getstatus(SC_GEFFEN_MAGIC2, 1);
+      bonus2 bMagicAddRace,RC_Player_Human, .@val1;
+      bonus2 bMagicAddRace,RC_DemiHuman, .@val1;
+  - Status: Geffen_Magic3
+    Script: |
+      .@val1 = getstatus(SC_GEFFEN_MAGIC3, 1);
+      bonus2 bSubRace,RC_Player_Human, .@val1;
+      bonus2 bSubRace,RC_DemiHuman, .@val1;
+  - Status: Hitfood
+    Script: |
+      bonus bHit, getstatus(SC_HITFOOD, 1);
+    Bonuses:
+      - {Bonus: bHit, Type: 49, Val: 1}
+  - Status: Incagi
+    Script: |
+      bonus bAgi, getstatus(SC_INCAGI, 1);
+    Bonuses:
+      - {Bonus: bAgi, Type: 14, Val: 1}
+  - Status: Inccri
+    Script: |
+      bonus bCritical, getstatus(SC_INCCRI, 1);
+    Bonuses:
+      - {Bonus: bCritical, Type: 52, Val: 1}
+  - Status: Incdex
+    Script: |
+      bonus bDex, getstatus(SC_INCDEX, 1);
+    Bonuses:
+      - {Bonus: bDex, Type: 17, Val: 1}
+  - Status: Incflee2
+    Script: |
+      bonus bFlee2, getstatus(SC_INCFLEE2, 1);
+    Bonuses:
+      - {Bonus: bFlee2, Type: 51, Val: 1}
+  - Status: Incint
+    Script: |
+      bonus bInt, getstatus(SC_INCINT, 1);
+    Bonuses:
+      - {Bonus: bInt, Type: 16, Val: 1}
+  - Status: Incluk
+    Script: |
+      bonus bLuk, getstatus(SC_INCLUK, 1);
+    Bonuses:
+      - {Bonus: bLuk, Type: 18, Val: 1}
+  - Status: Increase_Maxhp
+    Script: |
+      bonus bMaxHPrate, getstatus(SC_INCREASE_MAXHP, 1);
+      bonus bHPrecovRate, getstatus(SC_INCREASE_MAXHP, 2);
+    Bonuses:
+      - {Bonus: bMaxHPrate, Type: 1004, Val: 1}
+      - {Bonus: bHPrecovRate, Type: 1016, Val: 2}
+  - Status: Increase_Maxsp
+    Script: |
+      bonus bMaxSPrate, getstatus(SC_INCREASE_MAXSP, 1);
+      bonus bSPrecovRate, getstatus(SC_INCREASE_MAXSP, 2);
+    Bonuses:
+      - {Bonus: bMaxSPrate, Type: 1005, Val: 1}
+      - {Bonus: bSPrecovRate, Type: 1017, Val: 2}
+  - Status: Incstr
+    Script: |
+      bonus bStr, getstatus(SC_INCSTR, 1);
+    Bonuses:
+      - {Bonus: bStr, Type: 13, Val: 1}
+  - Status: Incvit
+    Script: |
+      bonus bVit, getstatus(SC_INCVIT, 1);
+    Bonuses:
+      - {Bonus: bVit, Type: 15, Val: 1}
+  - Status: Intfood
+    Script: |
+      bonus bInt, getstatus(SC_INTFOOD, 1);
+    Bonuses:
+      - {Bonus: bInt, Type: 16, Val: 1}
+  - Status: Lhz_Dun_N1
+    Script: |
+      .@val1 = getstatus(SC_LHZ_DUN_N1, 1);
+      .@val2 = getstatus(SC_LHZ_DUN_N1, 2);
+      bonus2 bAddRace2,RC2_BIO5_SWORDMAN_THIEF, .@val1;
+      bonus2 bMagicAddRace2,RC2_BIO5_SWORDMAN_THIEF, .@val1;
+      bonus2 bSubRace2,RC2_BIO5_ACOLYTE_MERCHANT, .@val2;
+  - Status: Lhz_Dun_N2
+    Script: |
+      .@val1 = getstatus(SC_LHZ_DUN_N2, 1);
+      .@val2 = getstatus(SC_LHZ_DUN_N2, 2);
+      bonus2 bAddRace2,RC2_BIO5_ACOLYTE_MERCHANT, .@val1;
+      bonus2 bMagicAddRace2,RC2_BIO5_ACOLYTE_MERCHANT, .@val1;
+      bonus2 bSubRace2,RC2_BIO5_MAGE_ARCHER, .@val2;
+  - Status: Lhz_Dun_N3
+    Script: |
+      .@val1 = getstatus(SC_LHZ_DUN_N3, 1);
+      .@val2 = getstatus(SC_LHZ_DUN_N3, 2);
+      bonus2 bAddRace2,RC2_BIO5_MAGE_ARCHER, .@val1;
+      bonus2 bMagicAddRace2,RC2_BIO5_MAGE_ARCHER, .@val1;
+      bonus2 bSubRace2,RC2_BIO5_SWORDMAN_THIEF, .@val2;
+  - Status: Lhz_Dun_N4
+    Script: |
+      .@val1 = getstatus(SC_LHZ_DUN_N4, 1);
+      .@val2 = getstatus(SC_LHZ_DUN_N4, 2);
+      bonus2 bAddRace2,RC2_BIO5_MVP, .@val1;
+      bonus2 bMagicAddRace2,RC2_BIO5_MVP, .@val1;
+      bonus2 bSubRace2,RC2_BIO5_MVP, .@val2;
+  - Status: Life_Force_F
+    Script: |
+      bonus bMaxSPrate, getstatus(SC_LIFE_FORCE_F, 1);
+    Bonuses:
+      - {Bonus: bMaxSPrate, Type: 1005, Val: 1}
+  - Status: Lukfood
+    Script: |
+      bonus bLuk, getstatus(SC_LUKFOOD, 1);
+    Bonuses:
+      - {Bonus: bLuk, Type: 18, Val: 1}
+  - Status: L_Lifepotion
+    Script: |
+      if (!getstatus(SC_BERSERK)) {
+         .@val1 = -getstatus(SC_L_LIFEPOTION, 1);
+         .@val2 = getstatus(SC_L_LIFEPOTION, 2) * 1000;
+         bonus2 bRegenPercentHP, .@val1, .@val2;
+      }
+  - Status: Mana_Plus
+    Script: |
+      bonus bMatk, getstatus(SC_MANA_PLUS, 1);
+    Bonuses:
+      - {Bonus: bMatk, Type: 2046, Val: 1}
+  - Status: Manu_Atk
+    Script: |
+      bonus2 bAddRace2,RC2_MANUK, getstatus(SC_MANU_ATK, 1);
+  - Status: Manu_Def
+    Script: |
+      bonus2 bSubRace2,RC2_MANUK, getstatus(SC_MANU_DEF, 1);
+  - Status: Manu_Matk
+    Script: |
+      bonus2 bMagicAddRace2,RC2_MANUK, getstatus(SC_MANU_MATK, 1);
+  - Status: Matkfood
+    Script: |
+      bonus bMatk, getstatus(SC_MATKFOOD, 1);
+    Bonuses:
+      - {Bonus: bMatk, Type: 2046, Val: 1}
+  - Status: Matkpotion
+    Script: |
+      bonus bMatk, getstatus(SC_MATKPOTION, 1);
+    Bonuses:
+      - {Bonus: bMatk, Type: 2046, Val: 1}
+  - Status: Minor_Bbq
+    Script: |
+      bonus bVit, getstatus(SC_MINOR_BBQ, 1);
+    Bonuses:
+      - {Bonus: bVit, Type: 15, Val: 1}
+  - Status: Mustle_M
+    Script: |
+      bonus bMaxHPrate, getstatus(SC_MUSTLE_M, 1);
+    Bonuses:
+      - {Bonus: bMaxHPrate, Type: 1004, Val: 1}
+  - Status: Mysterious_Powder
+    Script: |
+      bonus bMaxHPrate, getstatus(SC_MYSTERIOUS_POWDER, 1);
+    Bonuses:
+      - {Bonus: bMaxHPrate, Type: 1004, Val: 1}
+  - Status: Putti_Tails_Noodles
+    Script: |
+      bonus bLuk, getstatus(SC_PUTTI_TAILS_NOODLES, 1);
+    Bonuses:
+      - {Bonus: bLuk, Type: 18, Val: 1}
+  - Status: Quest_Buff1
+    Script: |
+      .@val1 = getstatus(SC_QUEST_BUFF1, 1);
+      bonus bMatk, .@val1;
+      bonus bBaseAtk, .@val1;
+  - Status: Quest_Buff2
+    Script: |
+      .@val1 = getstatus(SC_QUEST_BUFF2, 1);
+      bonus bMatk, .@val1;
+      bonus bBaseAtk, .@val1;
+  - Status: Quest_Buff3
+    Script: |
+      .@val1 = getstatus(SC_QUEST_BUFF3, 1);
+      bonus bMatk, .@val1;
+      bonus bBaseAtk, .@val1;
+  - Status: Savage_Steak
+    Script: |
+      bonus bStr, getstatus(SC_SAVAGE_STEAK, 1);
+    Bonuses:
+      - {Bonus: bStr, Type: 13, Val: 1}
+  - Status: Siroma_Ice_Tea
+    Script: |
+      bonus bDex, getstatus(SC_SIROMA_ICE_TEA, 1);
+    Bonuses:
+      - {Bonus: bDex, Type: 17, Val: 1}
+  - Status: Spcost_Rate
+    Script: |
+      bonus bUseSPrate, -getstatus(SC_SPCOST_RATE, 1);
+    Bonuses:
+      - {Bonus: bUseSPrate, Type: 1006, Val: 1, Negated: true}
+  - Status: Speedup0
+    Script: |
+      bonus bSpeedRate, getstatus(SC_SPEEDUP0, 1);
+    Bonuses:
+      - {Bonus: bSpeedRate, Type: 1018, Val: 1}
+  - Status: Speedup1
+    Script: |
+      bonus bSpeedRate, getstatus(SC_SPEEDUP1, 1);
+    Bonuses:
+      - {Bonus: bSpeedRate, Type: 1018, Val: 1}
+  - Status: Spl_Atk
+    Script: |
+      bonus2 bAddRace2,RC2_SPLENDIDE, getstatus(SC_SPL_ATK, 1);
+  - Status: Spl_Def
+    Script: |
+      bonus2 bSubRace2,RC2_SPLENDIDE, getstatus(SC_SPL_DEF, 1);
+  - Status: Spl_Matk
+    Script: |
+      bonus2 bMagicAddRace2,RC2_SPLENDIDE, getstatus(SC_SPL_MATK, 1);
+  - Status: Strfood
+    Script: |
+      bonus bStr, getstatus(SC_STRFOOD, 1);
+    Bonuses:
+      - {Bonus: bStr, Type: 13, Val: 1}
+  - Status: S_Lifepotion
+    Script: |
+      if (!getstatus(SC_BERSERK)) {
+         .@val1 = -getstatus(SC_S_LIFEPOTION, 1);
+         .@val2 = getstatus(SC_S_LIFEPOTION, 2) * 1000;
+         bonus2 bRegenPercentHP, .@val1, .@val2;
+      }
+  - Status: Vitata_500
+    Script: |
+      bonus bSPrecovRate,20;
+      bonus bMaxSPrate,5;
+    Bonuses:
+      - {Bonus: bSPrecovRate, Type: 1017, Value: 20}
+      - {Bonus: bMaxSPrate, Type: 1005, Value: 5}
+  - Status: Vitfood
+    Script: |
+      bonus bVit, getstatus(SC_VITFOOD, 1);
+    Bonuses:
+      - {Bonus: bVit, Type: 15, Val: 1}

@@ -153,7 +153,7 @@ void DatabaseStage::Load() {
       return;
     }
     loading_ = std::async(std::launch::async, [texts = std::move(*texts)] {
-      return ro::vfs::ParseServerDb(texts.item_db, texts.mob_db, texts.context);
+      return ro::vfs::ParseServerDb(texts.item_db, texts.mob_db, texts.context, texts.status_db);
     });
   }
   if (!loading_.valid() ||

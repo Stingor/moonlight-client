@@ -2,8 +2,8 @@
 
 // CE QUE LE SCRIPT D'UN OBJET DIT DE LUI, LU PAR MOTIFS EXACTS : le soin
 // (`itemheal`, `percentheal`, `heal`), les états levés (`sc_end`), l'élément
-// d'attaque et d'armure (`bonus bAtkEle` / `bDefEle`), la capture (`pet`) et la
-// durée commune des états posés (`sc_start`).
+// d'attaque et d'armure (`bonus bAtkEle` / `bDefEle`), la capture (`pet`), la
+// durée commune des états posés (`sc_start`) et les valeurs que chacun reçoit.
 //
 // 🔴 UN FAIT SE LIT ENTIER OU PAS DU TOUT. Une instruction ne compte que posée
 // hors de toute accolade, seule, et écrite sous la forme exacte du motif, avec
@@ -16,6 +16,8 @@
 // Le lecteur n'interprète rien d'autre : un effet en texte libre reste aux
 // lignes d'item_info.
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -31,6 +33,17 @@ struct ScriptHeal {
   std::uint32_t hp_most = 0;
   std::uint32_t sp_least = 0;
   std::uint32_t sp_most = 0;
+};
+
+// Le plus de valeurs qu'un état reçoit à sa pose : val1 à val4.
+inline constexpr std::size_t kScriptStartValueCount = 4;
+
+// Un état posé par `sc_start`, `sc_start2` ou `sc_start4`, avec les valeurs
+// qu'il reçoit ; celles que la forme ne donne pas valent zéro.
+struct ScriptStart {
+  // La constante sans `SC_`, en majuscules : « PUTTI_TAILS_NOODLES ».
+  std::string status;
+  std::array<std::int32_t, kScriptStartValueCount> values{};
 };
 
 // Le rang d'un élément dans l'ordre du serveur, du neutre (0) au mort-vivant
@@ -53,6 +66,9 @@ struct ItemScriptFacts {
   // La durée que tous les `sc_start` de l'objet partagent ; zéro sans
   // `sc_start`, ou quand ils diffèrent.
   std::uint32_t effect_duration_ms = 0;
+  // Les états posés, dans l'ordre écrit ; vide quand un seul `sc_start` ne se
+  // lit pas, comme la durée.
+  std::vector<ScriptStart> starts;
 };
 
 [[nodiscard]] ItemScriptFacts ReadItemScript(std::string_view script);

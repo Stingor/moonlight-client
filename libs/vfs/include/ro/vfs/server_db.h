@@ -15,7 +15,7 @@ namespace ro::vfs {
 
 // ── LA BASE DE DONNÉES DU SERVEUR, POUR LA FENÊTRE « BASE DE DONNÉES » ──────
 //
-// Trois tables exportées par `scripts/yaml_tables/server_db.py`, qui en dit les
+// Quatre tables exportées par `scripts/yaml_tables/server_db.py`, qui en dit les
 // règles (ADR 0116) :
 //
 //   item_db.yml         une item_db rAthena, FUSIONNÉE comme le serveur la
@@ -23,9 +23,13 @@ namespace ro::vfs {
 //   mob_db.yml          une mob_db rAthena fusionnée, butins au taux ÉCRIT ;
 //   mob_db_context.yml  les réglages de butin effectifs, les exceptions de
 //                       `mob_item_ratio`, les cartes d'apparition, et les
-//                       nombres que le serveur déduit de chaque monstre.
+//                       nombres que le serveur déduit de chaque monstre ;
+//   status.yml          la status_db fusionnée, réduite aux états à script,
+//                       avec les bonus de ceux dont le script se lit entier.
+//                       FACULTATIVE : absente, la base reste connue, sans
+//                       états.
 //
-// 🔴 LES DEUX BASES SE PARCOURENT SANS ANALYSEUR YAML : leur script les écrit
+// 🔴 LES BASES SE PARCOURENT SANS ANALYSEUR YAML : leur script les écrit
 // sous une forme stricte (`ro/formats/rathena_db_text.h`), qu'un curseur lit
 // ligne à ligne. Seul le petit contexte passe par yaml-cpp. Elles ne se lisent
 // qu'à la première ouverture de la fenêtre, jamais au démarrage.
@@ -35,6 +39,7 @@ namespace ro::vfs {
 inline constexpr std::string_view kServerItemDbPath = "data\\yaml_files\\item_db.yml";
 inline constexpr std::string_view kServerMobDbPath = "data\\yaml_files\\mob_db.yml";
 inline constexpr std::string_view kServerDbContextPath = "data\\yaml_files\\mob_db_context.yml";
+inline constexpr std::string_view kServerStatusDbPath = "data\\yaml_files\\status.yml";
 
 // Les centièmes de pour cent d'un taux qui tombe à coup sûr.
 inline constexpr std::uint32_t kDropRateWhole = 10000;
@@ -164,6 +169,32 @@ struct ServerSpawn {
   std::uint32_t count = 0;
 };
 
+// Le rang d'une valeur d'état qui ne vient pas de l'état : la valeur est fixe.
+inline constexpr std::uint8_t kServerStatusFixedValue = 0;
+// Le plus grand rang d'une valeur d'état : val1 à val4.
+inline constexpr std::uint8_t kServerStatusValueCount = 4;
+
+// UNE COMMANDE `bonus bX,v` DU SCRIPT D'UN ÉTAT. `v` est la valeur de rang
+// `value_rank` que l'état a reçue à sa pose (1 à 4), de signe opposé si
+// `negated`, ou `fixed_value` quand le rang vaut `kServerStatusFixedValue`.
+struct ServerStatusBonus {
+  // Le numéro du bonus, celui d'`enum _sp` du serveur.
+  std::uint16_t bonus_type = 0;
+  std::uint8_t value_rank = kServerStatusFixedValue;
+  bool negated = false;
+  std::int32_t fixed_value = 0;
+};
+
+// UN ÉTAT DE LA STATUS_DB QUI PORTE UN SCRIPT. `bonuses` n'est rempli que
+// lorsque le script se lit ENTIER sous ces commandes : vide, l'effet de l'état
+// ne se déduit pas de son script.
+struct ServerStatus {
+  // La constante sans `SC_`, en majuscules : « PUTTI_TAILS_NOODLES ».
+  std::string constant;
+  std::string script;
+  std::vector<ServerStatusBonus> bonuses;
+};
+
 // LES RÉGLAGES DE BUTIN EFFECTIFS DU SERVEUR, ceux de `conf/battle/drops.conf`
 // après ses imports. Taux en pour cent (100 = tel quel), bornes en centièmes
 // de pour cent.
@@ -242,6 +273,11 @@ class ServerDb {
   // Les monstres qui lâchent cet objet, au taux réel décroissant.
   [[nodiscard]] std::vector<ItemDropper> DroppersOf(std::uint32_t item_id) const;
 
+  // Les états à script. `constant` se cherche sans `SC_` et sans tenir compte
+  // de la casse, comme le serveur résout le nom d'un état.
+  void NoteStatuses(std::vector<ServerStatus> statuses);
+  [[nodiscard]] const ServerStatus* FindStatus(std::string_view constant) const;
+
  private:
   struct Ratio {
     std::int64_t ratio = 0;
@@ -260,6 +296,8 @@ class ServerDb {
   std::unordered_map<std::uint32_t, std::vector<ServerSpawn>> spawns_;
   std::unordered_map<std::uint32_t, Ratio> ratios_;
   std::unordered_map<std::uint32_t, std::vector<DropRef>> droppers_;
+  // Rangés par constante.
+  std::vector<ServerStatus> statuses_;
 };
 
 // ── LE TAUX, COMME LE SERVEUR ───────────────────────────────────────────────
@@ -288,19 +326,22 @@ class ServerDb {
 // taux est celui de la base, du job ou du MVP, en pour cent.
 [[nodiscard]] std::uint64_t EffectiveExp(std::uint64_t written, std::int64_t rate_percent);
 
-// Lit les trois tables depuis leur texte. Refuse un texte qui n'est pas du
-// YAML, une en-tête qui n'est pas celle de la base attendue, ou un contexte
-// d'une version inconnue.
+// Lit les tables depuis leur texte. Refuse un texte qui n'est pas du YAML, une
+// en-tête qui n'est pas celle de la base attendue, ou un contexte d'une version
+// inconnue. Une status_db vide laisse la base sans états.
 [[nodiscard]] core::Result<ServerDb> ParseServerDb(std::string_view item_db_text,
                                                    std::string_view mob_db_text,
-                                                   std::string_view context_text);
+                                                   std::string_view context_text,
+                                                   std::string_view status_db_text = {});
 
-// Les trois textes de l'installation. ABSENTS, des textes vides : `ParseServerDb`
-// rend alors une base inconnue.
+// Les textes de l'installation. L'UN DES TROIS PREMIERS ABSENT, tous vides :
+// `ParseServerDb` rend alors une base inconnue. La status_db absente reste
+// vide seule.
 struct ServerDbTexts {
   std::string item_db;
   std::string mob_db;
   std::string context;
+  std::string status_db;
 };
 [[nodiscard]] core::Result<ServerDbTexts> ReadServerDbTexts(Vfs& vfs);
 

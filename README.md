@@ -115,7 +115,8 @@ tête d'où elle vient et comment la régénérer.
 - `item_db.yml` et `mob_db.yml` sont les bases d'objets et de monstres du
   serveur Moonlight (rAthena), fusionnées comme il les charge ;
   `mob_db_context.yml` y joint ses réglages de butin et ses cartes
-  d'apparition. La fenêtre « Base de données » les lit.
+  d'apparition, `status.yml` les scripts de ses états. La fenêtre « Base de
+  données » les lit.
 - `achievements.yml` prend sa liste des succès à la base des succès du serveur
   Moonlight (et à ses bases d'objets, de monstres et de cartes), et ses textes
   au fichier `achievements.lub` que livre le client : les traductions

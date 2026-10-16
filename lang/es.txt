@@ -18451,6 +18451,9 @@ tr: Ceguera
 fr: Durée :
 tr: Duración:
 
+fr: Effet :
+tr: Efecto:
+
 fr: Délai de réutilisation :
 tr: Tiempo de reutilización:
 

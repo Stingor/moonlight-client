@@ -504,7 +504,7 @@ add_library(moonclient_database STATIC
 
 target_link_libraries(moonclient_database
     PUBLIC ro_core ro_sim ro_ui ro_vfs moonclient_market
-    PRIVATE ro_warnings)
+    PRIVATE moonclient_equip ro_warnings)
 
 target_include_directories(moonclient_database PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

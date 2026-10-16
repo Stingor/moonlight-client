@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <expected>
 #include <limits>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -22,6 +23,7 @@ namespace {
 
 constexpr std::string_view kItemDbType = "ITEM_DB";
 constexpr std::string_view kMobDbType = "MOB_DB";
+constexpr std::string_view kStatusDbType = "STATUS_DB";
 constexpr int kContextVersion = 1;
 constexpr std::string_view kTrueText = "true";
 constexpr std::string_view kTreasureGroup = "Treasure";
@@ -311,6 +313,57 @@ ServerMonster MonsterOf(const formats::RathenaEntry& entry, const AegisIndex& it
   return monster;
 }
 
+// Une ligne de `Bonuses`, ou rien quand l'un de ses champs ne se lit pas.
+[[nodiscard]] std::optional<ServerStatusBonus> StatusBonusOf(const Pairs& line) {
+  constexpr std::uint16_t kNoType = 0;
+  ServerStatusBonus bonus;
+  bonus.bonus_type = NumberIn<std::uint16_t>(PairValue(line, "Type"), kNoType);
+  if (bonus.bonus_type == kNoType) {
+    return std::nullopt;
+  }
+  if (const std::string_view rank = PairValue(line, "Val"); !rank.empty()) {
+    bonus.value_rank = NumberIn<std::uint8_t>(rank, kServerStatusFixedValue);
+    if (bonus.value_rank == kServerStatusFixedValue || bonus.value_rank > kServerStatusValueCount) {
+      return std::nullopt;
+    }
+    bonus.negated = SameText(PairValue(line, "Negated"), kTrueText);
+    return bonus;
+  }
+  const std::string_view fixed = PairValue(line, "Value");
+  constexpr std::int32_t kUnread = std::numeric_limits<std::int32_t>::min();
+  bonus.fixed_value = NumberIn<std::int32_t>(fixed, kUnread);
+  if (fixed.empty() || bonus.fixed_value == kUnread) {
+    return std::nullopt;
+  }
+  return bonus;
+}
+
+// 🔴 UNE LIGNE ILLISIBLE TAIT TOUS LES BONUS DE L'ÉTAT : un effet en partie
+// montré se lirait comme l'effet entier.
+ServerStatus StatusOf(const formats::RathenaEntry& entry) {
+  ServerStatus status;
+  for (const Field& value : entry) {
+    if (value.key == "Status") {
+      status.constant = FieldText(value);
+      std::ranges::transform(status.constant, status.constant.begin(), [](unsigned char letter) {
+        return static_cast<char>(std::toupper(letter));
+      });
+    } else if (value.key == "Script") {
+      status.script = FieldText(value);
+    } else if (value.key == "Bonuses" && value.shape == formats::RathenaShape::kList) {
+      for (const Pairs& line : value.list) {
+        const std::optional<ServerStatusBonus> bonus = StatusBonusOf(line);
+        if (!bonus.has_value()) {
+          status.bonuses.clear();
+          break;
+        }
+        status.bonuses.push_back(*bonus);
+      }
+    }
+  }
+  return status;
+}
+
 [[nodiscard]] std::int64_t SettingOf(const YAML::Node& battle, const char* key,
                                      std::int64_t fallback) {
   return NumberOf<std::int64_t>(battle[key], fallback);
@@ -387,7 +440,8 @@ std::vector<ServerSpawn> SpawnsOf(const YAML::Node& places) {
 }  // namespace
 
 core::Result<ServerDb> ParseServerDb(std::string_view item_db_text, std::string_view mob_db_text,
-                                     std::string_view context_text) {
+                                     std::string_view context_text,
+                                     std::string_view status_db_text) {
   if (item_db_text.empty() || mob_db_text.empty() || context_text.empty()) {
     return ServerDb{};
   }
@@ -443,7 +497,22 @@ core::Result<ServerDb> ParseServerDb(std::string_view item_db_text, std::string_
       return std::unexpected(read.error());
     }
 
+    std::vector<ServerStatus> statuses;
+    if (!status_db_text.empty()) {
+      if (auto read = formats::ReadRathenaDb(status_db_text, kStatusDbType, kServerStatusDbPath,
+                                             [&](const formats::RathenaEntry& entry) {
+                                               ServerStatus status = StatusOf(entry);
+                                               if (!status.constant.empty()) {
+                                                 statuses.push_back(std::move(status));
+                                               }
+                                             });
+          !read) {
+        return std::unexpected(read.error());
+      }
+    }
+
     ServerDb db = ServerDb::Known(std::move(items), std::move(monsters), settings);
+    db.NoteStatuses(std::move(statuses));
     if (const YAML::Node spawns = context["spawns"]; IsMapNode(spawns)) {
       for (const auto& pair : spawns) {
         db.NoteSpawns(NumberOf<std::uint32_t>(pair.first, 0), SpawnsOf(pair.second));
@@ -483,6 +552,13 @@ core::Result<ServerDbTexts> ReadServerDbTexts(Vfs& vfs) {
           core::Error{bytes.error().code, std::string(path) + " : " + bytes.error().detail});
     }
     into->assign(reinterpret_cast<const char*>(bytes->data()), bytes->size());
+  }
+  auto statuses = vfs.Read(std::string(kServerStatusDbPath));
+  if (statuses) {
+    texts.status_db.assign(reinterpret_cast<const char*>(statuses->data()), statuses->size());
+  } else if (statuses.error().code != core::ErrorCode::kNotFound) {
+    return std::unexpected(core::Error{
+        statuses.error().code, std::string(kServerStatusDbPath) + " : " + statuses.error().detail});
   }
   return texts;
 }

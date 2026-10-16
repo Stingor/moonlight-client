@@ -4,14 +4,19 @@
 #include <array>
 #include <cstdint>
 #include <cstdio>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/sim/equip_attributes.h"
 #include "ro/ui/database_window.h"
+#include "ro/vfs/server_db.h"
 
+#include "character/equip_attribute_lines.h"
 #include "game/item_db_block.h"
 
 namespace moonclient {
@@ -209,6 +214,59 @@ using Text = std::array<char, kLineBytes>;
   return ro::ui::DatabaseFilterChoice(element + 1, ro::ui::kDatabaseElements);
 }
 
+// ── L'EFFET DES ÉTATS POSÉS ─────────────────────────────────────────────────
+
+// Le niveau de `bonus`, la commande à un seul argument.
+constexpr std::uint8_t kBonusCommandLevel = 1;
+
+// Vrai quand le texte d'un bonus est celui d'un type que le client ne sait pas
+// nommer : « Bonus #n », suivi de sa valeur.
+[[nodiscard]] bool Unnamed(std::string_view text, std::uint16_t bonus_type) {
+  Text numbered{};
+  std::snprintf(numbered.data(), numbered.size(), Tr("Bonus #%d"), static_cast<int>(bonus_type));
+  const std::string_view prefix(numbered.data());
+  return text.starts_with(prefix) && (text.size() == prefix.size() || text[prefix.size()] == ' ');
+}
+
+// LE TEXTE DES BONUS QUE DONNENT LES ÉTATS POSÉS, ou vide. Chaque bonus se
+// nomme comme dans la case des attributs d'équipement. 🔴 TOUT OU RIEN : un
+// état absent de la status_db, dont le script ne se lit pas entier, ou un bonus
+// que le client ne sait pas nommer taisent la ligne entière.
+[[nodiscard]] std::string EffectText(const ItemScriptFacts& facts, const ItemDbNames& names) {
+  if (names.db == nullptr || facts.starts.empty()) {
+    return {};
+  }
+  std::vector<std::string> parts;
+  for (const ScriptStart& start : facts.starts) {
+    const ro::vfs::ServerStatus* const status = names.db->FindStatus(start.status);
+    if (status == nullptr || status->bonuses.empty()) {
+      return {};
+    }
+    for (const ro::vfs::ServerStatusBonus& bonus : status->bonuses) {
+      std::int32_t value = bonus.fixed_value;
+      if (bonus.value_rank != ro::vfs::kServerStatusFixedValue) {
+        value = start.values[bonus.value_rank - 1];
+        if (bonus.negated) {
+          if (value == std::numeric_limits<std::int32_t>::min()) {
+            return {};
+          }
+          value = -value;
+        }
+      }
+      const ro::sim::EquipBonus one{
+          .level = kBonusCommandLevel, .type = bonus.bonus_type, .values = {value}};
+      std::string text = EquipBonusText(one, EquipAttributeNames{});
+      if (Unnamed(text, bonus.bonus_type)) {
+        return {};
+      }
+      if (!text.empty()) {
+        parts.push_back(std::move(text));
+      }
+    }
+  }
+  return Joined(parts);
+}
+
 }  // namespace
 
 void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ServerItem& item,
@@ -233,6 +291,9 @@ void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ServerItem& 
   }
   if (facts.effect_duration_ms > 0) {
     lines.push_back(ItemDbLabelled(Tr("Durée :"), DurationText(facts.effect_duration_ms)));
+  }
+  if (const std::string effect = EffectText(facts, names); !effect.empty()) {
+    lines.push_back(ItemDbLabelled(Tr("Effet :"), effect));
   }
   if (item.reuse_delay_ms > 0) {
     lines.push_back(

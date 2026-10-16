@@ -271,6 +271,9 @@ struct Reading {
   std::array<bool, kFamilyCount> mute{};
   std::size_t heals = 0;
   bool started = false;
+  // Un `sc_start` dont l'état ou une valeur ne se lit pas : aucun état ne se
+  // dit, puisque la liste serait incomplète.
+  bool starts_unread = false;
   void Mute(Family family) { mute[static_cast<std::size_t>(family)] = true; }
   [[nodiscard]] bool Muted(Family family) const { return mute[static_cast<std::size_t>(family)]; }
 };
@@ -318,8 +321,26 @@ struct Reading {
   return kNoScriptElement;
 }
 
-// La durée d'un `sc_start` exact, ou rien.
-[[nodiscard]] std::optional<std::uint32_t> StartDurationOf(std::string_view text) {
+// Un `sc_start` exact : sa durée, et l'état posé avec ses valeurs. L'état n'a
+// pas de nom quand sa constante n'est pas un mot seul.
+struct StartRead {
+  std::uint32_t tick_ms = 0;
+  ScriptStart start;
+};
+
+// Le rang du premier argument qui est une valeur d'état : après le type et la
+// durée.
+constexpr std::size_t kFirstValueArgument = 2;
+
+[[nodiscard]] std::string UpperStatus(std::string_view constant) {
+  std::string status(constant.substr(kStatusPrefix.size()));
+  std::ranges::transform(status, status.begin(), [](unsigned char letter) {
+    return static_cast<char>(std::toupper(letter));
+  });
+  return status;
+}
+
+[[nodiscard]] std::optional<StartRead> StartOf(std::string_view text) {
   for (const StartForm& form : kStartForms) {
     const auto arguments = ArgumentsOf(text, form.command);
     if (!arguments.has_value()) {
@@ -328,16 +349,31 @@ struct Reading {
     if (arguments->size() != form.arguments || !StartsWithText((*arguments)[0], kStatusPrefix)) {
       return std::nullopt;
     }
-    for (std::size_t rank = 2; rank < arguments->size(); ++rank) {
-      if (!IntegerOf((*arguments)[rank]).has_value()) {
+    StartRead read;
+    // Hors de la largeur d'une valeur d'état, la durée reste lisible, pas
+    // l'état.
+    bool values_fit = true;
+    for (std::size_t rank = kFirstValueArgument; rank < arguments->size(); ++rank) {
+      const std::optional<std::int64_t> value = IntegerOf((*arguments)[rank]);
+      if (!value.has_value()) {
         return std::nullopt;
       }
+      if (*value < std::numeric_limits<std::int32_t>::min() ||
+          *value > std::numeric_limits<std::int32_t>::max()) {
+        values_fit = false;
+        continue;
+      }
+      read.start.values[rank - kFirstValueArgument] = static_cast<std::int32_t>(*value);
     }
     const std::optional<std::int64_t> tick = IntegerOf((*arguments)[1]);
     if (!tick.has_value() || *tick <= 0 || *tick > std::numeric_limits<std::uint32_t>::max()) {
       return std::nullopt;
     }
-    return static_cast<std::uint32_t>(*tick);
+    read.tick_ms = static_cast<std::uint32_t>(*tick);
+    if (WordsOf((*arguments)[0]).size() == 1 && values_fit) {
+      read.start.status = UpperStatus((*arguments)[0]);
+    }
+    return read;
   }
   return std::nullopt;
 }
@@ -374,10 +410,7 @@ void ReadStatement(Reading& reading, std::string_view text, std::span<const Fami
           reading.Mute(family);
           break;
         }
-        std::string status((*arguments)[0].substr(kStatusPrefix.size()));
-        std::ranges::transform(status, status.begin(), [](unsigned char letter) {
-          return static_cast<char>(std::toupper(letter));
-        });
+        std::string status = UpperStatus((*arguments)[0]);
         if (std::ranges::find(facts.cured, status) == facts.cured.end()) {
           facts.cured.push_back(std::move(status));
         }
@@ -414,13 +447,23 @@ void ReadStatement(Reading& reading, std::string_view text, std::span<const Fami
         break;
       }
       case Family::kStart: {
-        const std::optional<std::uint32_t> tick = StartDurationOf(text);
-        if (!tick.has_value() || (reading.started && facts.effect_duration_ms != *tick)) {
+        const std::optional<StartRead> read = StartOf(text);
+        if (!read.has_value()) {
+          reading.Mute(family);
+          reading.starts_unread = true;
+          break;
+        }
+        if (read->start.status.empty()) {
+          reading.starts_unread = true;
+        } else {
+          facts.starts.push_back(read->start);
+        }
+        if (reading.started && facts.effect_duration_ms != read->tick_ms) {
           reading.Mute(family);
           break;
         }
         reading.started = true;
-        facts.effect_duration_ms = *tick;
+        facts.effect_duration_ms = read->tick_ms;
         break;
       }
     }
@@ -477,6 +520,9 @@ ItemScriptFacts ReadItemScript(std::string_view script) {
   }
   if (reading.Muted(Family::kStart)) {
     facts.effect_duration_ms = 0;
+  }
+  if (reading.Muted(Family::kStart) || reading.starts_unread) {
+    facts.starts.clear();
   }
   return facts;
 }

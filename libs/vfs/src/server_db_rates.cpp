@@ -4,8 +4,10 @@
 #include <cctype>
 #include <cmath>
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "ro/vfs/server_db.h"
 
@@ -193,6 +195,20 @@ const ServerMonster* ServerDb::FindMonster(std::uint32_t monster_id) const {
   const auto found =
       std::ranges::lower_bound(monsters_, monster_id, {}, &ServerMonster::monster_id);
   return found != monsters_.end() && found->monster_id == monster_id ? &*found : nullptr;
+}
+
+void ServerDb::NoteStatuses(std::vector<ServerStatus> statuses) {
+  statuses_ = std::move(statuses);
+  std::ranges::sort(statuses_, {}, &ServerStatus::constant);
+}
+
+const ServerStatus* ServerDb::FindStatus(std::string_view constant) const {
+  std::string wanted(constant);
+  std::ranges::transform(wanted, wanted.begin(), [](unsigned char letter) {
+    return static_cast<char>(std::toupper(letter));
+  });
+  const auto found = std::ranges::lower_bound(statuses_, wanted, {}, &ServerStatus::constant);
+  return found != statuses_.end() && found->constant == wanted ? &*found : nullptr;
 }
 
 std::span<const ServerSpawn> ServerDb::SpawnsOf(std::uint32_t monster_id) const {

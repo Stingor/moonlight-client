@@ -2,9 +2,9 @@
 
 // LE BLOC DE FAITS D'UN OBJET, COMPOSÉ DEPUIS L'ITEM_DB DU SERVEUR : type,
 // attaque, défense, emplacement, ce que son script dit par motifs exacts
-// (élément, soin, guérison, durée, capture), délai, familier, poids, niveaux,
-// raffinement, emplacements de carte, puis les prérequis — niveau, jobs,
-// classes, sexe.
+// (élément, soin, guérison, durée, effet, capture), délai, familier, poids,
+// niveaux, raffinement, emplacements de carte, puis les prérequis — niveau,
+// jobs, classes, sexe.
 //
 // 🔴 UN SEUL COMPOSANT, PARTOUT OÙ UNE DESCRIPTION S'AFFICHE : il s'ajoute aux
 // LIGNES de la description (`DescriptionView`), et la fenêtre, sa comparaison,
@@ -67,9 +67,11 @@ struct ItemDbNames {
 [[nodiscard]] std::string JobsSummaryOf(const ro::vfs::ServerItem& item);
 
 // LES FAITS QUE DONNENT LE SCRIPT ET LA PET_DB (`item_script_facts.h`) :
-// élément d'attaque et d'armure, soin, états guéris, durée, délai de
-// réutilisation, monstres capturés, familier d'un œuf et sa nourriture,
-// familiers qu'un objet nourrit ou qui le portent. Traduit.
+// élément d'attaque et d'armure, soin, états guéris, durée, effet des états
+// posés — les bonus que leur script dans la status_db de `names.db` donne,
+// quand chacun se lit entier —, délai de réutilisation, monstres capturés,
+// familier d'un œuf et sa nourriture, familiers qu'un objet nourrit ou qui le
+// portent. Traduit.
 void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ro::vfs::ServerItem& item,
                              const ItemScriptFacts& facts, const ItemDbNames& names);
 

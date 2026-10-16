@@ -18451,6 +18451,9 @@ tr: Blind
 fr: Durée :
 tr: Duration:
 
+fr: Effet :
+tr: Effect:
+
 fr: Délai de réutilisation :
 tr: Cooldown:
 
