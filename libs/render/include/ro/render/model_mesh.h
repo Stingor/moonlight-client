@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,7 @@
 #include "ro/formats/image.h"
 #include "ro/formats/rsm.h"
 #include "ro/formats/rsw.h"
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/model_pose.h"
 #include "ro/render/second_family_pose.h"
 
@@ -217,6 +219,16 @@ struct ModelInstances {
   std::vector<std::shared_ptr<const formats::Image>> textures;
   // Le fichier .rsm, tel que le RSW le cite : en CP949.
   std::string rsm_file;
+  // UNE VARIANTE : le maillage d'une seule pose, retouché par l'édition de la
+  // carte — le rang de cette pose. Rien pour le maillage du fichier.
+  std::optional<std::size_t> variant_rank;
+  // Les sommets que l'édition a déplacés dans ce maillage : ce qui dit s'il
+  // faut le rebâtir quand l'édition change.
+  std::vector<mapedit::VertexMove> applied_moves;
+  // 🔴 LA BOÎTE DU MAILLAGE D'ORIGINE, quand l'édition en a déplacé des
+  // sommets : c'est sur elle que la pose se recentre. Recentrée sur la boîte
+  // retouchée, la pose glisserait tout entière dès qu'un sommet en sort.
+  std::optional<std::array<std::array<float, 3>, 2>> placement_bounds;
   // Les poses FIGÉES, dessinées d'un seul maillage.
   std::vector<glm::mat4> transforms;
   // Le rang de chaque pose figée dans le RSW, dans l'ordre de `transforms`.
@@ -237,6 +249,18 @@ struct ModelInstances {
   // valeur d'ambiante est basse, et une ville entière vire au brun.
   std::int32_t shade_type = 0;
 };
+
+// LES NŒUDS D'UN MODÈLE TELS QUE LE MAILLAGE LES POSE : pour chaque nœud, la
+// matrice qui porte un sommet du repère du nœud — celui du fichier — dans le
+// repère du maillage — celui de `ModelMesh::vertices` —, et ses sommets ainsi
+// portés. C'est ce que l'éditeur de carte montre et déplace.
+struct PosedNode {
+  // Le rang du nœud dans `RsmModel::meshes`.
+  std::size_t mesh_index = 0;
+  glm::mat4 to_mesh{1.0F};
+  std::vector<glm::vec3> vertices;
+};
+[[nodiscard]] std::vector<PosedNode> PosedNodes(const formats::RsmModel& model);
 
 // Range une pose parmi les figées ou parmi les animées, et dit si elle s'anime.
 //

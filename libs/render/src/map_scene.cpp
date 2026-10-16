@@ -48,6 +48,18 @@ std::optional<formats::Image> LoadSceneTexture(vfs::Vfs& vfs, const std::string&
 
 namespace {
 
+// Le nom en UTF-8 d'un fichier que le RSW cite en CP949 : ce que l'édition
+// compare à celui qu'elle désigne.
+std::string CitedFileName(std::string_view raw) { return vfs::Cp949ToUtf8Lossy(raw); }
+
+// Le nom qu'un RSW citerait pour un fichier que l'édition nomme en UTF-8.
+std::string RawFileName(std::string_view utf8) {
+  auto raw = vfs::Utf8ToCp949(utf8);
+  return raw ? std::move(*raw) : std::string(utf8);
+}
+
+constexpr mapedit::FileNameCodec kFileNames{.to_utf8 = &CitedFileName, .to_raw = &RawFileName};
+
 // Décode les textures du terrain, dans l'ordre du GND.
 //
 // Une texture absente laisse une image VIDE à sa place plutôt que d'interrompre
@@ -117,13 +129,67 @@ std::vector<WaterAnimation> LoadWaterAnimations(vfs::Vfs& vfs, const WaterPlane&
 //
 // ⚠ SEULEMENT CEUX QUI MANQUENT À LA SCÈNE : un modèle que l'éditeur ajoute se
 // lit à son ajout, sans relire ceux qui sont déjà là.
-void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
-  const formats::RswScene& rsw = scene.rsw;
-  std::map<std::string, ModelInstances> by_file;
-  std::set<std::string> unreadable_files;
-  for (const ModelInstances& instances : scene.models) {
-    unreadable_files.insert(instances.rsm_file);
+// LA CLÉ D'UN JEU DE POSES : son fichier, et la pose dont il est la variante.
+using InstancesKey = std::pair<std::string, std::optional<std::size_t>>;
+
+// La retouche de maillage de la pose `rank`, réservée à elle seule, ou rien.
+const mapedit::MeshEdit* VariantEditOf(const MapScene& scene, std::size_t rank) {
+  for (const mapedit::MeshEdit& edit : scene.mesh_edits) {
+    if (!edit.all_poses && edit.model_index == rank) {
+      return &edit;
+    }
   }
+  return nullptr;
+}
+
+// La retouche de maillage qui vaut pour toutes les poses du fichier `raw_file`.
+const mapedit::MeshEdit* FileEditOf(const MapScene& scene, std::string_view raw_file) {
+  for (const mapedit::MeshEdit& edit : scene.mesh_edits) {
+    if (edit.all_poses && RawFileName(edit.model_file) == raw_file) {
+      return &edit;
+    }
+  }
+  return nullptr;
+}
+
+// Le jeu de poses où se dessine la pose `rank`.
+InstancesKey KeyOf(const MapScene& scene, std::size_t rank) {
+  const formats::RswModel& placement = scene.rsw.models()[rank];
+  return {placement.model_name,
+          VariantEditOf(scene, rank) != nullptr ? std::optional<std::size_t>(rank) : std::nullopt};
+}
+
+// Les sommets que l'édition déplace dans le jeu de poses `key`.
+std::vector<mapedit::VertexMove> MovesOf(const MapScene& scene, const InstancesKey& key) {
+  const mapedit::MeshEdit* edit =
+      key.second.has_value() ? VariantEditOf(scene, *key.second) : FileEditOf(scene, key.first);
+  return edit != nullptr ? edit->vertices : std::vector<mapedit::VertexMove>();
+}
+
+// Charge les modèles du décor, une seule fois par fichier .rsm distinct — et
+// une fois de plus par variante.
+//
+// Une carte pose le même arbre des centaines de fois : prontera compte 1303
+// instances pour 62 fichiers. Charger par instance multiplierait le travail par
+// vingt pour un résultat identique.
+//
+// ⚠ SEULEMENT CE QUI MANQUE À LA SCÈNE : un modèle que l'éditeur ajoute se lit
+// à son ajout, et une variante dont les sommets changent se rebâtit seule. Un
+// jeu de poses que l'édition ne demande plus, ou dont les sommets ont changé,
+// s'en va d'abord.
+void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
+  std::set<InstancesKey> wanted;
+  for (std::size_t rank = 0; rank < scene.rsw.models().size(); ++rank) {
+    wanted.insert(KeyOf(scene, rank));
+  }
+  std::erase_if(scene.models, [&](const ModelInstances& instances) {
+    const InstancesKey key{instances.rsm_file, instances.variant_rank};
+    return !wanted.contains(key) || instances.applied_moves != MovesOf(scene, key);
+  });
+  for (const ModelInstances& instances : scene.models) {
+    wanted.erase(InstancesKey{instances.rsm_file, instances.variant_rank});
+  }
+
   std::set<std::string> missing_textures;
   // LES TEXTURES, LUES UNE FOIS PAR NOM pour toute la carte, et leur échec
   // retenu comme leur succès.
@@ -132,77 +198,83 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
   // même texture avec des casses différentes, et une clé brute la lirait deux
   // fois.
   std::map<std::string, std::shared_ptr<const formats::Image>> read_textures;
-
-  // ⚠ UN MODÈLE MASQUÉ SE LIT AUSSI : l'établi peut le démasquer sans relire
+  // ⚠ UN MODÈLE MASQUÉ SE LIT AUSSI : l'éditeur peut le démasquer sans relire
   // la carte.
-  for (const formats::RswModel& placement : rsw.models()) {
-    if (by_file.contains(placement.model_name) || unreadable_files.contains(placement.model_name)) {
+  for (const InstancesKey& key : wanted) {
+    // ReadRaw : le nom vient du RSW, donc c'est déjà du CP949.
+    auto bytes = vfs.ReadRaw("data\\model\\" + key.first);
+    if (!bytes) {
       continue;
     }
-    {
-      // ReadRaw : le nom vient du RSW, donc c'est déjà du CP949.
-      auto bytes = vfs.ReadRaw("data\\model\\" + placement.model_name);
-      if (!bytes) {
-        unreadable_files.insert(placement.model_name);
-        continue;
-      }
-      auto model = formats::RsmModel::Parse(*bytes);
-      if (!model) {
-        unreadable_files.insert(placement.model_name);
-        continue;
-      }
-
-      ModelInstances instances;
-      instances.rsm_file = placement.model_name;
-      instances.mesh = BuildModelMesh(*model);
-      instances.rig = BuildModelRig(*model, instances.mesh);
-      instances.rsm_version = model->version();
-      instances.shade_type = model->shade_type();
-      for (const std::string& texture : instances.mesh.textures) {
-        ++scene.model_textures_cited;
-        auto [kept, fresh] = read_textures.try_emplace(formats::NormalizeGrfPath(texture));
-        if (fresh) {
-          ++scene.model_textures_read;
-          if (std::optional<formats::Image> image = LoadSceneTexture(vfs, texture)) {
-            kept->second = std::make_shared<const formats::Image>(std::move(*image));
-          }
-        }
-        if (kept->second == nullptr) {
-          missing_textures.insert(texture);
-        }
-        instances.textures.push_back(kept->second);
-      }
-      by_file.emplace(placement.model_name, std::move(instances));
+    auto model = formats::RsmModel::Parse(*bytes);
+    if (!model) {
+      continue;
     }
-  }
-
-  scene.missing_model_textures.insert(scene.missing_model_textures.end(), missing_textures.begin(),
-                                      missing_textures.end());
-  for (auto& [name, instances] : by_file) {
+    ModelInstances instances;
+    instances.rsm_file = key.first;
+    instances.variant_rank = key.second;
+    instances.applied_moves = MovesOf(scene, key);
+    if (!instances.applied_moves.empty()) {
+      const ModelMesh untouched = BuildModelMesh(*model);
+      instances.placement_bounds =
+          std::array<std::array<float, 3>, 2>{untouched.bounds_min, untouched.bounds_max};
+      mapedit::MeshEdit moves;
+      moves.vertices = instances.applied_moves;
+      const mapedit::MapEditReport moved = mapedit::ApplyMeshEdit(moves, *model, kFileNames);
+      for (const std::string& refusal : moved.refused) {
+        core::LogWarning("{} : sommet refusé — {}", CitedFileName(key.first), refusal);
+      }
+    }
+    instances.mesh = BuildModelMesh(*model);
+    instances.rig = BuildModelRig(*model, instances.mesh);
+    instances.rsm_version = model->version();
+    instances.shade_type = model->shade_type();
+    for (const std::string& texture : instances.mesh.textures) {
+      ++scene.model_textures_cited;
+      auto [kept, fresh] = read_textures.try_emplace(formats::NormalizeGrfPath(texture));
+      if (fresh) {
+        ++scene.model_textures_read;
+        if (std::optional<formats::Image> image = LoadSceneTexture(vfs, texture)) {
+          kept->second = std::make_shared<const formats::Image>(std::move(*image));
+        }
+      }
+      if (kept->second == nullptr) {
+        missing_textures.insert(texture);
+      }
+      instances.textures.push_back(kept->second);
+    }
     scene.models.push_back(std::move(instances));
   }
+  scene.missing_model_textures.insert(scene.missing_model_textures.end(), missing_textures.begin(),
+                                      missing_textures.end());
 }
 
-// Le nom en UTF-8 d'un fichier que le RSW cite en CP949 : ce que l'édition
-// compare à celui qu'elle désigne.
-std::string CitedFileName(std::string_view raw) { return vfs::Cp949ToUtf8Lossy(raw); }
-
-// Le nom qu'un RSW citerait pour un fichier que l'édition nomme en UTF-8.
-std::string RawFileName(std::string_view utf8) {
-  auto raw = vfs::Utf8ToCp949(utf8);
-  return raw ? std::move(*raw) : std::string(utf8);
+// Les retouches de maillages de `edit` dont la cible correspond ; les autres
+// vont dans les refus de `report`.
+std::vector<mapedit::MeshEdit> ValidMeshEdits(const mapedit::MapEdit& edit,
+                                              const formats::RswScene& rsw,
+                                              mapedit::MapEditReport& report) {
+  std::vector<mapedit::MeshEdit> valid;
+  for (const mapedit::MeshEdit& mesh : edit.meshes()) {
+    std::string refusal = mapedit::MeshTargetRefusal(mesh, rsw, kFileNames);
+    if (refusal.empty()) {
+      valid.push_back(mesh);
+      ++report.applied;
+    } else {
+      report.refused.push_back(std::move(refusal));
+    }
+  }
+  return valid;
 }
-
-constexpr mapedit::FileNameCodec kFileNames{.to_utf8 = &CitedFileName, .to_raw = &RawFileName};
 
 // Pose les modèles du RSW de `scene` sur les maillages chargés : une pose par
 // modèle, sauf les masqués, ceux dont le fichier manque et ceux posés hors de
 // la carte. Les poses d'avant s'effacent, et les compteurs se refont.
 void PlaceSceneInstances(MapScene& scene) {
-  std::map<std::string_view, std::size_t> by_file;
+  std::map<InstancesKey, std::size_t> by_key;
   for (std::size_t index = 0; index < scene.models.size(); ++index) {
     ModelInstances& instances = scene.models[index];
-    by_file.emplace(instances.rsm_file, index);
+    by_key.emplace(InstancesKey{instances.rsm_file, instances.variant_rank}, index);
     instances.transforms.clear();
     instances.rsw_ranks.clear();
     instances.animated.clear();
@@ -214,8 +286,8 @@ void PlaceSceneInstances(MapScene& scene) {
   const std::vector<formats::RswModel>& placements = scene.rsw.models();
   for (std::size_t rank = 0; rank < placements.size(); ++rank) {
     const formats::RswModel& placement = placements[rank];
-    const auto found = by_file.find(placement.model_name);
-    if (found == by_file.end()) {
+    const auto found = by_key.find(KeyOf(scene, rank));
+    if (found == by_key.end()) {
       ++scene.unreadable_models;
       continue;
     }
@@ -223,8 +295,17 @@ void PlaceSceneInstances(MapScene& scene) {
       continue;
     }
     ModelInstances& instances = scene.models[found->second];
+    // La pose se recentre sur la boîte d'origine quand l'édition en a déplacé
+    // des sommets : voir `ModelInstances::placement_bounds`.
+    ModelMesh bounds_only;
+    const ModelMesh* centred_on = &instances.mesh;
+    if (instances.placement_bounds.has_value()) {
+      bounds_only.bounds_min = (*instances.placement_bounds)[0];
+      bounds_only.bounds_max = (*instances.placement_bounds)[1];
+      centred_on = &bounds_only;
+    }
     const glm::mat4 instance = ModelInstanceMatrix(placement, scene.gnd.width(), scene.gnd.height(),
-                                                   instances.mesh, instances.rsm_version);
+                                                   *centred_on, instances.rsm_version);
     if (!IsInstanceOnMap(instance, scene.gnd.width(), scene.gnd.height())) {
       ++scene.off_map_instances;
       continue;
@@ -261,6 +342,7 @@ mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdi
   // Les modèles ajoutés repartent de zéro : l'édition les repose tous.
   scene.rsw.TruncateModels(scene.unfixed_models.size());
   mapedit::MapEditReport report = mapedit::ApplyMapEdit(edit, scene.rsw, kFileNames);
+  scene.mesh_edits = ValidMeshEdits(edit, scene.rsw, report);
   if (vfs != nullptr) {
     LoadMissingSceneModels(*vfs, scene);
   }
@@ -291,8 +373,10 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   // LES RETOUCHES DU STAFF, sur les données lues et avant tout le reste : voir
   // docs/adr/0118. Le placement d'origine se garde pour l'éditeur.
   std::vector<formats::RswModel> unfixed_models = rsw->models();
-  const mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(
-      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name), *rsw, kFileNames);
+  const mapedit::MapEdit edit =
+      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name);
+  mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(edit, *rsw, kFileNames);
+  std::vector<mapedit::MeshEdit> mesh_edits = ValidMeshEdits(edit, *rsw, fixed);
   for (const std::string& refusal : fixed.refused) {
     core::LogWarning("édition de {} refusée — {}", map_name, refusal);
   }
@@ -318,6 +402,7 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
       .rsw = std::move(*rsw),
       .unfixed_models = std::move(unfixed_models),
       .hidden_models = fixed.hidden,
+      .mesh_edits = std::move(mesh_edits),
       .atlas = std::move(atlas),
       .light = light,
   };

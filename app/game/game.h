@@ -87,6 +87,7 @@
 #include "world/ground_unit_view.h"
 #include "world/item_drops.h"
 #include "world/map_edit_store.h"
+#include "world/map_editor_mesh.h"
 #include "world/map_editor_session.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
@@ -293,6 +294,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LE MODE ÉDITEUR DE CARTE : voir game_map_editor.cpp.
   void ServeMapEditor();
   void ReplaceMapModels();
+  // L'outil Sommets de l'image : voir game_map_editor.cpp.
+  void ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height);
   void DrawInterface(std::uint32_t now_ms);
 
   // ── L'INTERFACE, PAR FAMILLE DE FENÊTRES ──────────────────────────────────
@@ -515,6 +518,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   MapEditorSession map_editor_;
   // La bibliothèque de l'éditeur, lue à sa première ouverture.
   std::shared_ptr<const std::vector<std::string>> model_library_;
+  // Les fichiers de modèles que l'outil Sommets a lus.
+  RsmCache rsm_cache_;
   ro::render::DrawableSize size_{};
   float aspect_ratio_ = 1.0F;
   glm::vec2 mouse_{0.0F, 0.0F};

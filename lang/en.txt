@@ -18714,3 +18714,36 @@ tr: Remove model %zu
 
 fr: Retirer le modèle ajouté
 tr: Remove the added model
+
+fr: Sommets
+tr: Vertices
+
+fr: Sommet
+tr: Vertex
+
+fr: Sommets déplacés
+tr: Moved vertices
+
+fr: Toutes les poses du fichier
+tr: Every placement of the file
+
+fr: Cliquez sur un point du modèle pour désigner un sommet.
+tr: Click a point of the model to select a vertex.
+
+fr: Rétablir le sommet
+tr: Restore the vertex
+
+fr: Raison du maillage %zu
+tr: Reason for mesh %zu
+
+fr: La retouche du maillage %zu n'a pas de raison.
+tr: The edit of mesh %zu has no reason.
+
+fr: Déplacer un sommet du modèle %zu
+tr: Move a vertex of model %zu
+
+fr: Rétablir un sommet du modèle %zu
+tr: Restore a vertex of model %zu
+
+fr: Étendre le maillage du modèle %zu
+tr: Extend the mesh of model %zu

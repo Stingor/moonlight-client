@@ -42,6 +42,13 @@ constexpr std::string_view kMapEditHeader =
 #               fichier — position est obligatoire ;
 #    hidden   : vrai pour ne pas le dessiner ;
 #    why      : pourquoi, obligatoire.
+#  meshes : les retouches de maillages, chacune :
+#    index, file, origin : la pose qu'elle désigne, comme une retouche de
+#               modèle ;
+#    all_poses : vrai pour toutes les poses du fichier, sinon cette pose seule ;
+#    vertices : les sommets déplacés — node (le nom du nœud), vertex (son rang
+#               dans le nœud), origin et position, dans le repère du nœud ;
+#    why      : pourquoi, obligatoire.
 #  Une opération dont la cible ne correspond plus n'est pas posée, et le
 #  journal le dit.
 #
@@ -172,6 +179,64 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
   return added;
 }
 
+core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view map_name,
+                                    const std::string& where) {
+  if (!entry.IsMap()) {
+    return std::unexpected(Refused(map_name, where + " n'est pas une table"));
+  }
+  const YAML::Node index = entry["index"];
+  const YAML::Node file = entry["file"];
+  const YAML::Node origin = entry["origin"];
+  const YAML::Node vertices = entry["vertices"];
+  const YAML::Node why = entry["why"];
+  if (!index || !file || !origin || !vertices || !why) {
+    return std::unexpected(Refused(
+        map_name, where + " : « index », « file », « origin », « vertices » et « why » sont dus"));
+  }
+  MeshEdit edit;
+  edit.model_index = index.as<std::size_t>();
+  edit.model_file = file.as<std::string>();
+  edit.why = why.as<std::string>();
+  if (edit.why.empty()) {
+    return std::unexpected(Refused(map_name, where + " : « why » est vide"));
+  }
+  core::Result<std::array<float, 3>> placed = VectorFrom(origin, map_name, where + " : « origin »");
+  if (!placed) {
+    return std::unexpected(placed.error());
+  }
+  edit.origin = *placed;
+  if (const YAML::Node all = entry["all_poses"]) {
+    edit.all_poses = all.as<bool>();
+  }
+  if (!vertices.IsSequence()) {
+    return std::unexpected(Refused(map_name, where + " : « vertices » n'est pas une liste"));
+  }
+  for (std::size_t rank = 0; rank < vertices.size(); ++rank) {
+    const YAML::Node vertex = vertices[rank];
+    const std::string at = std::format("{}, sommet {}", where, rank);
+    if (!vertex.IsMap() || !vertex["node"] || !vertex["vertex"] || !vertex["origin"] ||
+        !vertex["position"]) {
+      return std::unexpected(
+          Refused(map_name, at + " : « node », « vertex », « origin » et « position » sont dus"));
+    }
+    VertexMove move;
+    move.node = vertex["node"].as<std::string>();
+    move.vertex = vertex["vertex"].as<std::size_t>();
+    auto from = VectorFrom(vertex["origin"], map_name, at + " : « origin »");
+    auto to = VectorFrom(vertex["position"], map_name, at + " : « position »");
+    if (!from) {
+      return std::unexpected(from.error());
+    }
+    if (!to) {
+      return std::unexpected(to.error());
+    }
+    move.origin = *from;
+    move.position = *to;
+    edit.SetVertex(std::move(move));
+  }
+  return edit;
+}
+
 // Une chaîne entre apostrophes : rien ne s'y échappe, sauf l'apostrophe, qui
 // se double. C'est ce qui garde lisibles les barres obliques inverses d'un
 // chemin.
@@ -240,6 +305,19 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
         edit.SetModel(std::move(*model));
       }
     }
+    if (const YAML::Node meshes = whole["meshes"]) {
+      if (!meshes.IsSequence()) {
+        return std::unexpected(Refused(map_name, "« meshes » n'est pas une liste"));
+      }
+      for (std::size_t rank = 0; rank < meshes.size(); ++rank) {
+        core::Result<MeshEdit> mesh =
+            MeshEditFrom(meshes[rank], map_name, std::format("maillage {}", rank));
+        if (!mesh) {
+          return std::unexpected(mesh.error());
+        }
+        edit.SetMesh(std::move(*mesh));
+      }
+    }
     if (const YAML::Node added = whole["added"]) {
       if (!added.IsSequence()) {
         return std::unexpected(Refused(map_name, "« added » n'est pas une liste"));
@@ -283,6 +361,25 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
       text += "    hidden: true\n";
     }
     text += std::format("    why: {}\n", DoubleQuoted(model.why));
+  }
+  if (!edit.meshes().empty()) {
+    text += "meshes:\n";
+  }
+  for (const MeshEdit& mesh : edit.meshes()) {
+    text += std::format("  - index: {}\n", mesh.model_index);
+    text += std::format("    file: {}\n", SingleQuoted(mesh.model_file));
+    text += std::format("    origin: {}\n", VectorText(mesh.origin));
+    if (mesh.all_poses) {
+      text += "    all_poses: true\n";
+    }
+    text += "    vertices:\n";
+    for (const VertexMove& move : mesh.vertices) {
+      text += std::format("      - node: {}\n", SingleQuoted(move.node));
+      text += std::format("        vertex: {}\n", move.vertex);
+      text += std::format("        origin: {}\n", VectorText(move.origin));
+      text += std::format("        position: {}\n", VectorText(move.position));
+    }
+    text += std::format("    why: {}\n", DoubleQuoted(mesh.why));
   }
   if (!edit.added().empty()) {
     text += "added:\n";

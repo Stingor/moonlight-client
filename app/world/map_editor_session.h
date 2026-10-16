@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "ro/mapedit/edit_history.h"
@@ -68,6 +69,44 @@ class MapEditorSession {
   void Release();
   [[nodiscard]] std::vector<ro::ui::MapEditorIntent> TakeQueued();
 
+  // L'OUTIL SOMMETS : ce que l'appelant dit, à chaque image, du modèle désigné.
+  struct VertexNode {
+    // Le nom du nœud, en UTF-8.
+    std::string name;
+    // Du repère du nœud à celui du maillage : voir `ro::render::PosedNode`.
+    glm::mat4 to_mesh{1.0F};
+    // Les sommets tels que le fichier les porte, avant toute retouche.
+    std::vector<std::array<float, 3>> origins;
+    // Où l'édition les met, dans le monde.
+    std::vector<glm::vec3> world;
+  };
+  struct VertexContext {
+    std::size_t model_index = 0;
+    // Le fichier du modèle, en UTF-8, et la position de sa pose dans le RSW.
+    std::string model_file;
+    std::array<float, 3> pose_origin{};
+    // Du repère du maillage au monde : la matrice de la pose.
+    glm::mat4 to_world{1.0F};
+    ro::render::MapEffectFrame map_frame;
+    std::vector<VertexNode> nodes;
+  };
+  void SetVertexContext(std::optional<VertexContext> context) {
+    vertex_context_ = std::move(context);
+  }
+  // Le point d'un sommet à l'écran.
+  struct VertexDot {
+    glm::vec2 at{0.0F, 0.0F};
+    std::size_t node = 0;
+    std::size_t vertex = 0;
+  };
+  void SetVertexDots(std::vector<VertexDot> dots) { vertex_dots_ = std::move(dots); }
+  // Le sommet désigné, par son nœud et son rang.
+  [[nodiscard]] std::optional<std::pair<std::size_t, std::size_t>> selected_vertex() const {
+    return vertex_;
+  }
+  // Les points des sommets, le désigné distingué.
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> VertexTrace() const;
+
   [[nodiscard]] Outcome Apply(const ro::ui::MapEditorIntent& intent,
                               const ro::render::MapScene& scene, MapEditStore& store);
 
@@ -83,6 +122,13 @@ class MapEditorSession {
   Outcome SetWhy(std::string why, MapEditStore& store);
   Outcome Revert(MapEditStore& store);
   Outcome AddModel(std::string file, const ro::render::MapScene& scene, MapEditStore& store);
+  // L'OUTIL SOMMETS : voir map_editor_vertices.cpp.
+  [[nodiscard]] bool GrabVertex(glm::vec2 pointer);
+  Outcome MoveVertex(const ro::ui::map_editor::MoveVertex& move, MapEditStore& store);
+  Outcome RevertVertex(MapEditStore& store);
+  Outcome SetAllPoses(bool all, MapEditStore& store);
+  // La retouche du maillage du modèle désigné dans `document`, ou une neuve.
+  [[nodiscard]] ro::mapedit::MeshEdit MeshFor(const ro::mapedit::MapEdit& document) const;
   // Le placement d'un modèle AJOUTÉ, de rang `slot` dans la liste du document.
   Outcome PlaceAdded(std::size_t slot, const ro::ui::map_editor::Place& place, MapEditStore& store);
   // Le rang dans la liste des ajouts du modèle désigné, s'il en est un.
@@ -120,9 +166,17 @@ class MapEditorSession {
     glm::vec2 from{0.0F, 0.0F};
     ro::ui::map_editor::Place start;
     ro::ui::map_editor::Place last;
+    // Le sommet que la poignée déplace, avec l'outil Sommets.
+    std::optional<std::pair<std::size_t, std::size_t>> vertex;
   };
   std::optional<Drag> drag_;
   std::vector<ro::ui::MapEditorIntent> queued_;
+  std::optional<VertexContext> vertex_context_;
+  std::vector<VertexDot> vertex_dots_;
+  std::optional<std::pair<std::size_t, std::size_t>> vertex_;
+  bool all_poses_ = false;
+  // Les raisons saisies pour un maillage pas encore retouché.
+  std::map<std::size_t, std::string> pending_mesh_why_;
 };
 
 }  // namespace moonclient

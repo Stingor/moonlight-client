@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdio>
+#include <format>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -48,6 +49,9 @@ bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view
   if (!active_ || !view.selected.has_value()) {
     return false;
   }
+  if (tool_ == ro::ui::MapEditorTool::kVertices) {
+    return GrabVertex(pointer);
+  }
   const std::optional<std::size_t> grabbed = GrabbedHandle(handles_, pointer);
   if (!grabbed.has_value()) {
     return false;
@@ -70,8 +74,18 @@ void MapEditorSession::DragTo(glm::vec2 pointer) {
   if (!drag_.has_value()) {
     return;
   }
-  drag_->last = Dragged(tool_, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
+  // UN SOMMET se déplace comme une pose, à la flèche.
+  const ro::ui::MapEditorTool tool =
+      drag_->vertex.has_value() ? ro::ui::MapEditorTool::kMove : tool_;
+  drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
   drag_->last.released = false;
+  if (drag_->vertex.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveVertex{.node = drag_->vertex->first,
+                                                        .vertex = drag_->vertex->second,
+                                                        .native = drag_->last.position,
+                                                        .released = false});
+    return;
+  }
   queued_.emplace_back(drag_->last);
 }
 
@@ -81,7 +95,14 @@ void MapEditorSession::Release() {
   }
   ro::ui::map_editor::Place last = drag_->last;
   last.released = true;
-  queued_.emplace_back(last);
+  if (drag_->vertex.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveVertex{.node = drag_->vertex->first,
+                                                        .vertex = drag_->vertex->second,
+                                                        .native = last.position,
+                                                        .released = true});
+  } else {
+    queued_.emplace_back(last);
+  }
   drag_.reset();
 }
 
@@ -115,6 +136,9 @@ void MapEditorSession::Pick(std::optional<std::size_t> model_index) {
     return;
   }
   if (model_index.has_value()) {
+    if (selection_.model_index != model_index) {
+      vertex_.reset();
+    }
     selection_.model_index = model_index;
     status_.clear();
   } else {
@@ -151,6 +175,9 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           store.Set(map_name_, std::move(*after));
           return {.replace_models = true};
         } else if constexpr (std::is_same_v<Asked, intents::Select>) {
+          if (selection_.model_index != asked.model_index) {
+            vertex_.reset();
+          }
           selection_.model_index = asked.model_index;
           return {};
         } else if constexpr (std::is_same_v<Asked, intents::Place>) {
@@ -165,6 +192,12 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return {};
         } else if constexpr (std::is_same_v<Asked, intents::AddModel>) {
           return AddModel(asked.file, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::MoveVertex>) {
+          return MoveVertex(asked, store);
+        } else if constexpr (std::is_same_v<Asked, intents::RevertVertex>) {
+          return RevertVertex(store);
+        } else if constexpr (std::is_same_v<Asked, intents::SetAllPoses>) {
+          return SetAllPoses(asked.all, store);
         } else {
           Save(store);
           return {};
@@ -293,6 +326,26 @@ MapEditorSession::Outcome MapEditorSession::SetWhy(std::string why, MapEditStore
   }
   const std::size_t rank = *selection_.model_index;
   const ro::mapedit::MapEdit before = store.Document(map_name_);
+  // L'OUTIL SOMMETS dit pourquoi le maillage est retouché.
+  if (tool_ == ro::ui::MapEditorTool::kVertices) {
+    const ro::mapedit::MeshEdit* mesh = before.MeshAt(rank);
+    if (mesh == nullptr) {
+      pending_mesh_why_[rank] = std::move(why);
+      return {};
+    }
+    if (mesh->why == why) {
+      return {};
+    }
+    ro::mapedit::MeshEdit edited = *mesh;
+    edited.why = std::move(why);
+    ro::mapedit::MapEdit after = before;
+    after.SetMesh(std::move(edited));
+    store.Set(map_name_, after);
+    Line label{};
+    std::snprintf(label.data(), label.size(), ro::core::Tr("Raison du maillage %zu"), rank);
+    Record(label.data(), before, after);
+    return {};
+  }
   if (rank >= original_count_) {
     const std::size_t slot = rank - original_count_;
     if (slot >= before.added().size() || before.added()[slot].why == why) {
@@ -374,6 +427,16 @@ void MapEditorSession::Save(MapEditStore& store) {
       return;
     }
   }
+  for (const ro::mapedit::MeshEdit& mesh : store.Document(map_name_).meshes()) {
+    if (mesh.why.empty()) {
+      Line refused{};
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche du maillage %zu n'a pas de raison."),
+                    mesh.model_index);
+      status_ = refused.data();
+      return;
+    }
+  }
   const std::vector<ro::mapedit::AddedModel>& added = store.Document(map_name_).added();
   for (std::size_t slot = 0; slot < added.size(); ++slot) {
     if (added[slot].why.empty()) {
@@ -440,6 +503,15 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
     return view;
   }
   const std::size_t rank = *selection_.model_index;
+  // L'OUTIL SOMMETS : le maillage du désigné, et son sommet.
+  const ro::mapedit::MeshEdit* mesh = document.MeshAt(rank);
+  view.moved_vertices = mesh != nullptr ? mesh->vertices.size() : 0;
+  view.all_poses = mesh != nullptr ? mesh->all_poses : all_poses_;
+  if (vertex_.has_value() && vertex_context_.has_value() &&
+      vertex_->first < vertex_context_->nodes.size()) {
+    view.selected_vertex =
+        std::format("{} #{}", vertex_context_->nodes[vertex_->first].name, vertex_->second);
+  }
   if (const std::optional<std::size_t> slot = AddedSlot(scene);
       slot.has_value() && *slot < document.added().size()) {
     const ro::mapedit::AddedModel& added = document.added()[*slot];
@@ -468,7 +540,14 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
       edit != nullptr ? edit->rotation.value_or(original->rotation) : original->rotation;
   view.scale = edit != nullptr ? edit->scale.value_or(original->scale) : original->scale;
   view.hidden = edit != nullptr && edit->hidden;
-  if (edit != nullptr) {
+  if (tool_ == ro::ui::MapEditorTool::kVertices) {
+    if (mesh != nullptr) {
+      view.why = mesh->why;
+    } else if (const auto pending = pending_mesh_why_.find(rank);
+               pending != pending_mesh_why_.end()) {
+      view.why = pending->second;
+    }
+  } else if (edit != nullptr) {
     view.why = edit->why;
   } else if (const auto pending = pending_why_.find(rank); pending != pending_why_.end()) {
     view.why = pending->second;

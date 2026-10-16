@@ -18714,3 +18714,36 @@ tr: Quitar el modelo %zu
 
 fr: Retirer le modèle ajouté
 tr: Quitar el modelo añadido
+
+fr: Sommets
+tr: Vértices
+
+fr: Sommet
+tr: Vértice
+
+fr: Sommets déplacés
+tr: Vértices desplazados
+
+fr: Toutes les poses du fichier
+tr: Todas las colocaciones del archivo
+
+fr: Cliquez sur un point du modèle pour désigner un sommet.
+tr: Haga clic en un punto del modelo para designar un vértice.
+
+fr: Rétablir le sommet
+tr: Restablecer el vértice
+
+fr: Raison du maillage %zu
+tr: Motivo de la malla %zu
+
+fr: La retouche du maillage %zu n'a pas de raison.
+tr: El retoque de la malla %zu no tiene motivo.
+
+fr: Déplacer un sommet du modèle %zu
+tr: Desplazar un vértice del modelo %zu
+
+fr: Rétablir un sommet du modèle %zu
+tr: Restablecer un vértice del modelo %zu
+
+fr: Étendre le maillage du modèle %zu
+tr: Extender la malla del modelo %zu

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <format>
+#include <tuple>
 #include <utility>
 
 namespace ro::mapedit {
@@ -48,6 +49,97 @@ void MapEdit::SetModel(ModelEdit edit) {
 void MapEdit::RemoveModel(std::size_t model_index) {
   std::erase_if(models_,
                 [model_index](const ModelEdit& edit) { return edit.model_index == model_index; });
+}
+
+const VertexMove* MeshEdit::VertexAt(std::string_view node, std::size_t vertex) const {
+  const auto found = std::ranges::find_if(
+      vertices, [&](const VertexMove& move) { return move.node == node && move.vertex == vertex; });
+  return found == vertices.end() ? nullptr : &*found;
+}
+
+void MeshEdit::SetVertex(VertexMove move) {
+  const auto before = [](const VertexMove& left, const VertexMove& right) {
+    return std::tie(left.node, left.vertex) < std::tie(right.node, right.vertex);
+  };
+  const auto place = std::ranges::lower_bound(vertices, move, before);
+  if (place != vertices.end() && place->node == move.node && place->vertex == move.vertex) {
+    *place = std::move(move);
+  } else {
+    vertices.insert(place, std::move(move));
+  }
+}
+
+void MeshEdit::RemoveVertex(std::string_view node, std::size_t vertex) {
+  std::erase_if(vertices,
+                [&](const VertexMove& move) { return move.node == node && move.vertex == vertex; });
+}
+
+const MeshEdit* MapEdit::MeshAt(std::size_t model_index) const {
+  const auto found = std::ranges::find(meshes_, model_index, &MeshEdit::model_index);
+  return found == meshes_.end() ? nullptr : &*found;
+}
+
+void MapEdit::SetMesh(MeshEdit edit) {
+  const auto place =
+      std::ranges::lower_bound(meshes_, edit.model_index, {}, &MeshEdit::model_index);
+  if (place != meshes_.end() && place->model_index == edit.model_index) {
+    *place = std::move(edit);
+  } else {
+    meshes_.insert(place, std::move(edit));
+  }
+}
+
+void MapEdit::RemoveMesh(std::size_t model_index) {
+  std::erase_if(meshes_,
+                [model_index](const MeshEdit& edit) { return edit.model_index == model_index; });
+}
+
+std::string MeshTargetRefusal(const MeshEdit& edit, const formats::RswScene& rsw,
+                              const FileNameCodec& names) {
+  if (edit.model_index >= rsw.models().size()) {
+    return std::format("maillage {} : le RSW n'a que {} modèles", edit.model_index,
+                       rsw.models().size());
+  }
+  const formats::RswModel& model = rsw.models()[edit.model_index];
+  const std::string file = names.to_utf8(model.model_name);
+  if (file != edit.model_file) {
+    return std::format("maillage {} : « {} » attendu, « {} » trouvé", edit.model_index,
+                       edit.model_file, file);
+  }
+  if (!NearOrigin(edit.origin, model.position)) {
+    return std::format("maillage {} : attendu en {} {} {}, trouvé en {} {} {}", edit.model_index,
+                       edit.origin[0], edit.origin[1], edit.origin[2], model.position[0],
+                       model.position[1], model.position[2]);
+  }
+  return {};
+}
+
+MapEditReport ApplyMeshEdit(const MeshEdit& edit, formats::RsmModel& model,
+                            const FileNameCodec& names) {
+  MapEditReport report;
+  for (const VertexMove& move : edit.vertices) {
+    const std::string raw_node = names.to_raw(move.node);
+    const auto& meshes = model.meshes();
+    const auto node = std::ranges::find(meshes, raw_node, &formats::RsmMesh::name);
+    if (node == meshes.end()) {
+      report.refused.push_back(
+          std::format("maillage {} : pas de nœud « {} »", edit.model_index, move.node));
+      continue;
+    }
+    if (move.vertex >= node->vertices.size()) {
+      report.refused.push_back(std::format("maillage {} : le nœud « {} » n'a que {} sommets",
+                                           edit.model_index, move.node, node->vertices.size()));
+      continue;
+    }
+    if (!NearOrigin(move.origin, node->vertices[move.vertex])) {
+      report.refused.push_back(std::format("maillage {} : le sommet {} du nœud « {} » a bougé",
+                                           edit.model_index, move.vertex, move.node));
+      continue;
+    }
+    model.MoveVertex(static_cast<std::size_t>(node - meshes.begin()), move.vertex, move.position);
+    ++report.applied;
+  }
+  return report;
 }
 
 void MapEdit::SetAdded(std::size_t slot, AddedModel model) {

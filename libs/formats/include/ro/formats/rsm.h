@@ -142,6 +142,10 @@ class RsmModel {
     return main_mesh_names_;
   }
   [[nodiscard]] const std::vector<RsmMesh>& meshes() const noexcept { return meshes_; }
+  // Déplace le sommet `vertex` du nœud de rang `mesh_index`, dans le repère du
+  // nœud. Hors des listes, rien.
+  void MoveVertex(std::size_t mesh_index, std::size_t vertex,
+                  const std::array<float, 3>& position) noexcept;
 
   // Nombre total de faces, tous maillages confondus — la mesure la plus utile
   // pour juger du coût d'un modèle.

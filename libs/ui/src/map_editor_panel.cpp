@@ -52,6 +52,9 @@ constexpr std::array<const char*, 4> kMapEditorHelp = {
 constexpr float kTreeRows = 12.0F;
 // L'épaisseur des traits tracés par-dessus la vue, en pixels.
 constexpr float kLineThicknessPixels = 2.0F;
+// La demi-largeur du point d'un sommet, et du sommet désigné, en pixels.
+constexpr float kVertexHalfPixels = 2.5F;
+constexpr float kSelectedVertexHalfPixels = 4.5F;
 // Les couleurs des traits, en RGBA : la boîte du désigné, les trois axes —
 // rouge, vert, bleu, comme partout ailleurs —, et la poignée saisie.
 constexpr ImU32 kSelectionColor = IM_COL32(255, 210, 60, 230);
@@ -71,7 +74,10 @@ ImU32 ColorOf(MapEditorLineKind kind) {
     case MapEditorLineKind::kAxisZ:
       return kAxisZColor;
     case MapEditorLineKind::kActive:
+    case MapEditorLineKind::kVertexSelected:
       return kActiveColor;
+    case MapEditorLineKind::kVertex:
+      return kSelectionColor;
   }
   return kSelectionColor;
 }
@@ -88,6 +94,8 @@ void DrawToolbar(const MapEditorView& view, std::vector<MapEditorIntent>& intent
   offer(MapEditorTool::kRotate, core::Tr("Tourner"));
   ImGui::SameLine();
   offer(MapEditorTool::kScale, core::Tr("Échelle"));
+  ImGui::SameLine();
+  offer(MapEditorTool::kVertices, core::Tr("Sommets"));
 }
 
 // Le modèle passe-t-il le filtre ? Un morceau de son fichier, sans égard à la
@@ -190,8 +198,36 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
 void DrawLines(const MapEditorView& view) {
   ImDrawList* list = ImGui::GetBackgroundDrawList();
   for (const MapEditorLine& line : view.lines) {
+    if (line.kind == MapEditorLineKind::kVertex ||
+        line.kind == MapEditorLineKind::kVertexSelected) {
+      const float half =
+          line.kind == MapEditorLineKind::kVertex ? kVertexHalfPixels : kSelectedVertexHalfPixels;
+      list->AddRectFilled(ImVec2(line.from.x - half, line.from.y - half),
+                          ImVec2(line.from.x + half, line.from.y + half), ColorOf(line.kind));
+      continue;
+    }
     list->AddLine(ImVec2(line.from.x, line.from.y), ImVec2(line.to.x, line.to.y),
                   ColorOf(line.kind), kLineThicknessPixels);
+  }
+}
+
+// L'OUTIL SOMMETS : le sommet désigné, et ce qu'on en fait.
+void DrawVertexTool(const MapEditorView& view, std::vector<MapEditorIntent>& intents,
+                    const SkinArt& art) {
+  ImGui::SeparatorText(core::Tr("Sommets"));
+  bool all = view.all_poses;
+  if (SkinCheckBox(core::Tr("Toutes les poses du fichier"), &all, art)) {
+    intents.emplace_back(map_editor::SetAllPoses{all});
+  }
+  ImGui::TextDisabled(
+      "%s", std::format("{} : {}", core::Tr("Sommets déplacés"), view.moved_vertices).c_str());
+  if (view.selected_vertex.empty()) {
+    ImGui::TextDisabled("%s", core::Tr("Cliquez sur un point du modèle pour désigner un sommet."));
+    return;
+  }
+  ImGui::TextUnformatted(std::format("{} {}", core::Tr("Sommet"), view.selected_vertex).c_str());
+  if (SkinButton(core::Tr("Rétablir le sommet"), art)) {
+    intents.emplace_back(map_editor::RevertVertex{});
   }
 }
 
@@ -251,6 +287,9 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
                                 .c_str());
   DrawPlacement(view, intents, art);
   DrawWhy(view, panel, intents);
+  if (view.tool == MapEditorTool::kVertices) {
+    DrawVertexTool(view, intents, art);
+  }
   if (SkinButton(view.selected_added ? core::Tr("Retirer le modèle ajouté")
                                      : core::Tr("Rétablir le modèle"),
                  art)) {

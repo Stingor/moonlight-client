@@ -297,6 +297,13 @@ std::size_t RsmModel::face_count() const noexcept {
   return total;
 }
 
+void RsmModel::MoveVertex(std::size_t mesh_index, std::size_t vertex,
+                          const std::array<float, 3>& position) noexcept {
+  if (mesh_index < meshes_.size() && vertex < meshes_[mesh_index].vertices.size()) {
+    meshes_[mesh_index].vertices[vertex] = position;
+  }
+}
+
 core::Result<RsmModel> RsmModel::Parse(std::span<const std::uint8_t> data) {
   ByteReader reader(data);
 

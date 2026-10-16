@@ -61,6 +61,9 @@ struct MapScene {
   std::vector<formats::RswModel> unfixed_models;
   // Les rangs des modèles que les retouches masquent, croissants.
   std::vector<std::size_t> hidden_models;
+  // Les retouches de maillages dont la cible correspond : ce que le décor
+  // dessine, variantes comprises.
+  std::vector<mapedit::MeshEdit> mesh_edits;
   LightmapAtlas atlas;
   TerrainMesh terrain;
   std::vector<formats::Image> terrain_textures;

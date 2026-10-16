@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/formats/rsm.h"
 #include "ro/formats/rsw.h"
 
 namespace ro::mapedit {
@@ -71,12 +72,58 @@ struct AddedModel {
   friend bool operator==(const AddedModel&, const AddedModel&) = default;
 };
 
+// UN SOMMET DÉPLACÉ : son nœud, son rang dans le nœud, sa position dans le
+// fichier et la nouvelle, toutes deux dans le repère du nœud.
+struct VertexMove {
+  // Le nom du nœud, en UTF-8.
+  std::string node;
+  std::size_t vertex = 0;
+  std::array<float, 3> origin{};
+  std::array<float, 3> position{};
+
+  friend bool operator==(const VertexMove&, const VertexMove&) = default;
+};
+
+// LA RETOUCHE DU MAILLAGE D'UN MODÈLE : des sommets déplacés.
+//
+// Elle désigne sa pose comme une retouche de modèle — rang, fichier, position
+// d'origine — et vaut pour cette pose seule, qui se dessine alors avec SON
+// maillage, ou pour toutes les poses du fichier. Chaque sommet se vérifie à
+// son tour : un nœud, un rang ou une position d'origine qui ne correspondent
+// plus ne se déplacent pas.
+struct MeshEdit {
+  std::size_t model_index = 0;
+  std::string model_file;
+  std::array<float, 3> origin{};
+  // Vrai : toutes les poses du fichier ; faux : celle de rang `model_index`.
+  bool all_poses = false;
+  // Rangés par nœud, puis par rang.
+  std::vector<VertexMove> vertices;
+  std::string why;
+
+  // Le déplacement du sommet `vertex` du nœud `node`, ou rien.
+  [[nodiscard]] const VertexMove* VertexAt(std::string_view node, std::size_t vertex) const;
+  // Pose `move` : il remplace celui du même sommet, ou prend sa place.
+  void SetVertex(VertexMove move);
+  // Retire le déplacement d'un sommet.
+  void RemoveVertex(std::string_view node, std::size_t vertex);
+
+  friend bool operator==(const MeshEdit&, const MeshEdit&) = default;
+};
+
 // Le document d'une carte.
 class MapEdit {
  public:
   // Les retouches de modèles, rangées par rang.
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
-  [[nodiscard]] bool empty() const noexcept { return models_.empty() && added_.empty(); }
+  [[nodiscard]] bool empty() const noexcept {
+    return models_.empty() && added_.empty() && meshes_.empty();
+  }
+  // Les retouches de maillages, rangées par rang de pose.
+  [[nodiscard]] const std::vector<MeshEdit>& meshes() const noexcept { return meshes_; }
+  [[nodiscard]] const MeshEdit* MeshAt(std::size_t model_index) const;
+  void SetMesh(MeshEdit edit);
+  void RemoveMesh(std::size_t model_index);
   // Les modèles ajoutés, dans l'ordre de leurs rangs.
   [[nodiscard]] const std::vector<AddedModel>& added() const noexcept { return added_; }
   // Ajoute un modèle au bout de la liste.
@@ -99,6 +146,7 @@ class MapEdit {
  private:
   std::vector<ModelEdit> models_;
   std::vector<AddedModel> added_;
+  std::vector<MeshEdit> meshes_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la
@@ -137,5 +185,16 @@ struct FileNameCodec {
 // Les rangs du RSW restent ainsi ceux du fichier, que l'éditeur désigne.
 [[nodiscard]] MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
                                          const FileNameCodec& names);
+
+// La cible d'une retouche de maillage correspond-elle au modèle de son rang
+// dans `rsw` — fichier et position d'origine ? Rend la raison du refus, vide
+// quand elle correspond.
+[[nodiscard]] std::string MeshTargetRefusal(const MeshEdit& edit, const formats::RswScene& rsw,
+                                            const FileNameCodec& names);
+
+// Pose les sommets de `edit` sur `model` ; un sommet refusé se dit dans le
+// rapport, et ne bouge pas.
+[[nodiscard]] MapEditReport ApplyMeshEdit(const MeshEdit& edit, formats::RsmModel& model,
+                                          const FileNameCodec& names);
 
 }  // namespace ro::mapedit

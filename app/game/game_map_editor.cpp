@@ -5,6 +5,7 @@
 // repose quand le document change, et le panneau reçoit sa vue de l'image.
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -13,6 +14,7 @@
 #include "ro/render/map_scene.h"
 
 #include "game/game.h"
+#include "world/map_editor_mesh.h"
 #include "world/map_editor_overlay.h"
 
 namespace moonclient {
@@ -75,12 +77,55 @@ void Game::ServeMapEditor() {
   const auto height = static_cast<float>(shell_.height());
   tools.map_editor.lines = SelectionOutline(stage_->scene, *map_editor_.selected(), camera_,
                                             aspect_ratio_, width, height);
+  if (map_editor_.tool() == ro::ui::MapEditorTool::kVertices) {
+    ServeVertexTool(map_frame, width, height);
+    return;
+  }
+  map_editor_.SetVertexContext(std::nullopt);
+  map_editor_.SetVertexDots({});
   // LES POIGNÉES, sur le pivot du placement que montre la vue.
   const GizmoFrame frame = GizmoFrameOf(map_frame, tools.map_editor.position, camera_);
   map_editor_.SetGizmo(
       frame, GizmoHandles(map_editor_.tool(), frame, camera_, aspect_ratio_, width, height));
   const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
   tools.map_editor.lines.insert(tools.map_editor.lines.end(), handles.begin(), handles.end());
+}
+
+void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height) {
+  ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
+  std::optional<MapEditorSession::VertexContext> context = BuildVertexContext(
+      stage_->scene, *map_editor_.selected(), map_edits_.Document(stage_->name), rsm_cache_, *vfs_);
+  if (!context.has_value()) {
+    map_editor_.SetVertexContext(std::nullopt);
+    map_editor_.SetVertexDots({});
+    map_editor_.SetGizmo(GizmoFrame(), {});
+    return;
+  }
+  map_editor_.SetVertexDots(VertexDots(*context, camera_, aspect_ratio_, width, height));
+  // LA FLÈCHE, sur le sommet désigné.
+  std::vector<GizmoHandle> handles;
+  GizmoFrame frame;
+  if (const auto vertex = map_editor_.selected_vertex();
+      vertex.has_value() && vertex->first < context->nodes.size() &&
+      vertex->second < context->nodes[vertex->first].world.size()) {
+    const glm::vec3 native =
+        map_frame.ToNative(context->nodes[vertex->first].world[vertex->second]);
+    frame = GizmoFrameOf(map_frame, {native.x, native.y, native.z}, camera_);
+    handles =
+        GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera_, aspect_ratio_, width, height);
+  }
+  map_editor_.SetVertexContext(std::move(context));
+  map_editor_.SetGizmo(frame, std::move(handles));
+  // LA VUE SE RECOMPOSE : elle a été faite avant le contexte, et ne savait pas
+  // encore nommer le sommet désigné. Ses traits gardent la boîte du modèle.
+  std::vector<ro::ui::MapEditorLine> lines = std::move(view.lines);
+  view = map_editor_.View(stage_->scene, map_edits_);
+  view.library = model_library_;
+  const std::vector<ro::ui::MapEditorLine> dots = map_editor_.VertexTrace();
+  const std::vector<ro::ui::MapEditorLine> arrows = map_editor_.GizmoTrace();
+  lines.insert(lines.end(), dots.begin(), dots.end());
+  lines.insert(lines.end(), arrows.begin(), arrows.end());
+  view.lines = std::move(lines);
 }
 
 void Game::ReplaceMapModels() {

@@ -43,10 +43,14 @@ enum class MapEditorLineKind : std::uint8_t {
   kAxisZ = 3,
   // La poignée saisie.
   kActive = 4,
+  // Un sommet du modèle désigné, et le sommet désigné : des points, tracés en
+  // `from` seul.
+  kVertex = 5,
+  kVertexSelected = 6,
 };
 
 // L'OUTIL DES POIGNÉES : déplacer, tourner ou mettre à l'échelle.
-enum class MapEditorTool : std::uint8_t { kMove = 0, kRotate = 1, kScale = 2 };
+enum class MapEditorTool : std::uint8_t { kMove = 0, kRotate = 1, kScale = 2, kVertices = 3 };
 struct MapEditorLine {
   glm::vec2 from{0.0F, 0.0F};
   glm::vec2 to{0.0F, 0.0F};
@@ -69,6 +73,12 @@ struct MapEditorView {
   // Le désigné est un modèle que le document ajoute : il se retire au lieu de
   // se rétablir.
   bool selected_added = false;
+  // L'OUTIL SOMMETS : le sommet désigné — son nœud et son rang —, le nombre de
+  // sommets que le document déplace dans ce modèle, et s'il les déplace pour
+  // toutes les poses du fichier.
+  std::string selected_vertex;
+  std::size_t moved_vertices = 0;
+  bool all_poses = false;
   std::array<float, 3> origin{};
   std::array<float, 3> position{};
   std::array<float, 3> rotation{};
@@ -118,6 +128,21 @@ struct Revert {};
 struct AddModel {
   std::string file;
 };
+// Déplacer le sommet `vertex` du nœud `node`, dans le repère du RSW — comme
+// une pose. `released`, comme pour `Place`.
+struct MoveVertex {
+  std::size_t node = 0;
+  std::size_t vertex = 0;
+  std::array<float, 3> native{};
+  bool released = true;
+};
+// Rendre au sommet désigné sa position d'origine.
+struct RevertVertex {};
+// Déplacer les sommets pour toutes les poses du fichier, ou pour la seule
+// pose désignée.
+struct SetAllPoses {
+  bool all = false;
+};
 // Choisir l'outil des poignées.
 struct SetTool {
   MapEditorTool tool = MapEditorTool::kMove;
@@ -128,7 +153,8 @@ struct Save {};
 using MapEditorIntent =
     std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
                  map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
-                 map_editor::SetTool, map_editor::AddModel>;
+                 map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
+                 map_editor::RevertVertex, map_editor::SetAllPoses>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

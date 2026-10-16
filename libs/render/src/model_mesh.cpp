@@ -315,6 +315,34 @@ std::array<float, 3> ModelMesh::center() const noexcept {
           (bounds_min[2] + bounds_max[2]) * 0.5F};
 }
 
+std::vector<PosedNode> PosedNodes(const RsmModel& model) {
+  std::vector<PosedNode> posed;
+  const auto pose_node = [&](std::size_t mesh_index, const glm::mat4& to_mesh) {
+    PosedNode node{.mesh_index = mesh_index, .to_mesh = to_mesh};
+    for (const std::array<float, 3>& vertex : model.meshes()[mesh_index].vertices) {
+      node.vertices.emplace_back(to_mesh * glm::vec4(ToVec3(vertex), 1.0F));
+    }
+    posed.push_back(std::move(node));
+  };
+  // ⚠ LES MÊMES POSES QUE `BuildModelMesh`, image zéro comprise : un sommet
+  // montré ailleurs que là où le maillage le dessine ne se désignerait pas.
+  if (model.version() >= kVersionSecondFamily) {
+    const std::vector<SecondFamilyNode> nodes = SecondFamilyNodes(model);
+    const std::vector<glm::mat4> poses = PoseSecondFamily(nodes, static_cast<float>(kRestFrame));
+    for (std::size_t index = 0; index < nodes.size(); ++index) {
+      pose_node(nodes[index].mesh_index, poses[index]);
+    }
+  } else {
+    const std::vector<FirstFamilyNode> nodes = FirstFamilyNodes(model);
+    const std::vector<glm::mat4> poses = PoseFirstFamily(nodes, kRestFrame);
+    for (std::size_t index = 0; index < nodes.size(); ++index) {
+      const RsmMesh& mesh = model.meshes()[nodes[index].mesh_index];
+      pose_node(nodes[index].mesh_index, poses[index] * MeshTransform(mesh));
+    }
+  }
+  return posed;
+}
+
 ModelMesh BuildModelMesh(const RsmModel& model) {
   SortedVertices sorted;
   std::vector<PendingPrim> prims;
