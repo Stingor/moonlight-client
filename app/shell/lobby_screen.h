@@ -165,6 +165,11 @@ class LobbyScreen : public Screen {
   // Ouvre la confirmation sur ce personnage, cible FIGÉE.
   void OpenDelete(std::uint32_t character_id);
   void CloseDelete();
+  // LIT L'ISSUE D'UNE RETOUCHE — déplacement, renommage — et referme ce qui
+  // l'attendait. Voir `lobby_banquet.cpp`.
+  void SettleAmend();
+  // Ce que la scène a demandé pour une retouche. Rend vrai s'il l'a pris.
+  bool RouteAmend(const ro::ui::CharacterSelectAction& asked);
   // Ce que la machine à états dit à la fenêtre.
   // ⚠ NON CONSTANTE, et c'est le cache d'images qui l'impose : lire une image
   // de l'installation la CHARGE la première fois. Même raison que
@@ -260,6 +265,9 @@ class LobbyScreen : public Screen {
   // `CreatePickerRequest`.
   ro::ui::CharacterCreateAction newcomer_asked_;
   ro::ui::CharacterDeleteState doomed_;
+  // Le refus du client lui-même pour le dernier nouveau nom — mot interdit,
+  // balise de lien : il ne part pas, la fenêtre de renommage le dit.
+  std::string rename_refusal_;
   // Les pantins, montés en même temps que la garde-robe. ⚠ VIDE TANT QUE LA
   // LISTE N'EST PAS ARRIVÉE : voir `OpenBanquet`.
   std::optional<BanquetDolls> dolls_;

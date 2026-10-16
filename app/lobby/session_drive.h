@@ -135,6 +135,17 @@ class SessionDrive {
   [[nodiscard]] std::string deletion_refusal() const;
   void ForgetDeletion() noexcept;
 
+  // LES RETOUCHES : déplacer, renommer. Sans effet hors de `kChoosing`. Voir
+  // `ro::net::AmendStep`.
+  void MoveCharacter(std::uint8_t from_slot, std::uint8_t to_slot);
+  void RenameCharacter(std::uint32_t character_id, std::string_view new_name);
+
+  [[nodiscard]] ro::net::AmendStep amend_step() const noexcept;
+  [[nodiscard]] ro::net::AmendState amend() const noexcept;
+  [[nodiscard]] int amend_target_slot() const noexcept;
+  [[nodiscard]] std::string amend_refusal() const;
+  void ForgetAmend() noexcept;
+
   // Répond à la demande de code PIN. Sans effet hors de `kAwaitingPincode`.
   // Rend une erreur, sans rien émettre, si le code n'a pas quatre chiffres.
   [[nodiscard]] ro::core::Result<void> SubmitPincode(std::string_view digits);

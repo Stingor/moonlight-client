@@ -133,6 +133,8 @@ add_library(ro_ui STATIC
     src/character_delete_window.cpp
     src/character_select_window.cpp
     src/character_select_customize.cpp
+    src/character_select_amend.cpp
+    src/character_select_bars.cpp
     src/seat_layout.cpp
     src/web_door.cpp
     src/login_window.cpp

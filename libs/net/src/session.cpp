@@ -540,6 +540,12 @@ PhaseState CharacterPhase::Advance() {
       deletion_refusal_text_ = DeleteRefusalText(refused.error);
       continue;
     }
+    if (TookAmendAnswer(frame)) {
+      if (state_ == PhaseState::kFailed) {
+        return state_;
+      }
+      continue;
+    }
     if (frame.opcode == proto::HcAcceptMakechar::kOpcode) {
       proto::HcAcceptMakechar made;
       if (!proto::Decode(frame.bytes, made)) {

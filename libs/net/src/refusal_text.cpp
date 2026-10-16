@@ -174,4 +174,41 @@ std::string DeleteRefusalText(std::uint8_t code) {
   }
 }
 
+std::string MoveRefusalText(std::uint16_t reason) {
+  constexpr std::uint16_t kMoveFailed = 1;
+  if (reason != kMoveFailed) {
+    return UnknownReason(core::Tr("déplacement refusé"), reason);
+  }
+  return core::Tr(
+      "déplacement refusé : aucun déplacement disponible pour ce personnage, place hors du "
+      "compte, ou place occupée que le serveur n'échange pas");
+}
+
+std::string RenameRefusalText(std::uint32_t result) {
+  switch (result) {
+    case 1:
+      return core::Tr("ce personnage n'a plus de renommage disponible");
+    case 2:
+      return core::Tr("renommage refusé : le serveur ne reconnaît pas ce personnage");
+    case 3:
+      return core::Tr("renommage refusé : erreur de base du serveur");
+    case 4:
+      return core::Tr("ce nom est déjà pris ; choisis-en un autre");
+    case 5:
+      return core::Tr("ce personnage est dans une guilde ; quitte-la d'abord");
+    case 6:
+      return core::Tr("ce personnage est dans un groupe ; quitte-le d'abord");
+    case 7:
+      return core::Tr("ce nom est trop long");
+    case 8:
+      // ⚠ LE SERVEUR Y RANGE TOUT CE QUE `char_check_char_name` REFUSE, hors
+      // du nom déjà pris : trop court, lettres interdites, nom réservé.
+      return core::Tr("ce nom n'est pas accepté : trop court, lettres interdites ou nom réservé");
+    case 9:
+      return core::Tr("le renommage est interdit sur ce serveur");
+    default:
+      return UnknownReason(core::Tr("renommage refusé"), result);
+  }
+}
+
 }  // namespace ro::net

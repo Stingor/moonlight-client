@@ -38,6 +38,7 @@ add_library(ro_net STATIC
     src/npc_illustration.cpp
     src/progress_bar.cpp
     src/character.cpp
+    src/character_amend.cpp
     src/chat_channels.cpp
     src/chat_target.cpp
     src/command_settings.cpp

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/character_create_window.h"
 #include "ro/ui/character_seats.h"
 #include "ro/ui/seat_layout.h"
 #include "ro/ui/skin_art.h"
@@ -56,6 +57,13 @@ struct CharacterSlotView {
   int delete_in_seconds = -1;
 
   [[nodiscard]] bool doomed() const noexcept { return delete_in_seconds >= 0; }
+  // LES RETOUCHES QUI RESTENT À CE PERSONNAGE : combien de changements
+  // d'emplacement, et s'il peut changer de nom.
+  //
+  // ⚠ PAR PERSONNAGE, ET NON PAR COMPTE : un coupon utilisé en jeu crédite
+  // celui qui l'a utilisé. C'est sous LUI que l'étiquette doit paraître.
+  int moves_left = 0;
+  bool renamable = false;
   // LE PANTIN, déjà composé et téléversé par `app` ; sa taille est celle de la
   // BOÎTE, dont le bas est la ligne du siège (voir `SeatFrame`).
   //
@@ -108,6 +116,12 @@ struct CharacterSelectView {
   // bascule alors pas la personnalisation : le joueur se trouverait devant deux
   // interactions concurrentes.
   bool dialog_open = false;
+  // UNE RETOUCHE EST PARTIE : déplacer et renommer attendent la réponse, et
+  // leurs boutons se grisent — un second clic dépenserait un second coupon.
+  bool amend_pending = false;
+  // Le motif du dernier refus de renommage, déjà traduit, ou vide. ⚠ DANS SA
+  // FENÊTRE, pas dans le bandeau : c'est là que le joueur corrige le nom.
+  std::string rename_refusal;
 
   // ── CE QUE LE PANNEAU « PERSONNALISER » MONTRE ──────────────────────────
   //
@@ -130,6 +144,19 @@ struct CharacterSelectView {
   // il dépend de la pose ET de la classe, deux convives n'en ont pas forcément
   // autant. Zéro tant que rien n'est dessiné.
   std::array<int, kSeatCount> seat_frames = {};
+};
+
+// LE NOUVEAU NOM QU'ON SAISIT. Ouvert depuis la barre, fermé par `app` quand
+// le serveur a accepté.
+struct CharacterRenameDraft {
+  // 🔴 L'IDENTIFIANT, FIGÉ À L'OUVERTURE, et non l'emplacement : un
+  // déplacement peut changer la place du personnage sous la fenêtre.
+  std::uint32_t character_id = 0;
+  // L'ancien nom, recopié pour la question.
+  std::string former_name;
+  std::array<char, kCharacterNameBytes> name = {};
+
+  [[nodiscard]] bool open() const noexcept { return character_id != 0; }
 };
 
 // CE QUE LE JOUEUR A POSÉ SUR LA SCÈNE. Il appartient à l'APPELANT, comme tout
@@ -163,6 +190,19 @@ struct CharacterSelectState {
   bool pose_menu_asked = false;
   // La molette qui tourne un siège passe par le portail commun.
   WheelGateState wheel;
+
+  // ── LES RETOUCHES ────────────────────────────────────────────────────────
+  //
+  // L'emplacement du personnage qu'on déplace, ou -1 hors du mode
+  // déplacement. ⚠ PENDANT CE MODE, UN CLIC SUR UN SIÈGE DÉSIGNE L'ARRIVÉE,
+  // il ne choisit pas un convive.
+  int moving_slot = -1;
+  // L'arrivée désignée, ou -1. ⚠ RIEN NE PART AVANT « Valider » : le geste
+  // coûte un coupon, et un clic égaré ne doit pas le dépenser.
+  int moving_target = -1;
+  CharacterRenameDraft rename;
+
+  [[nodiscard]] bool moving() const noexcept { return moving_slot >= 0; }
 };
 
 // CE QUE LA SCÈNE A DEMANDÉ.
@@ -204,12 +244,26 @@ enum class CharacterSelectVerb : std::uint8_t {
   kSavePreset,
   kApplyPreset,
   kDeletePreset,
+  // ── LES RETOUCHES ───────────────────────────────────────────────────────
+  //
+  // ⚠ L'ÉTAT A DÉJÀ BASCULÉ quand les deux premiers sortent — mode
+  // déplacement, fenêtre de renommage — : `app` oublie le refus précédent.
+  kBeginMove,
+  kBeginRename,
+  // Déplacer le convive de `slot` vers `target_slot`.
+  kMove,
+  // Renommer `character_id` du nom que porte `state.rename`.
+  kRename,
+  // Le joueur renonce : mode déplacement quitté, fenêtre de renommage fermée.
+  kDropAmend,
 };
 
 struct CharacterSelectAction {
   CharacterSelectVerb verb = CharacterSelectVerb::kNothing;
-  // L'emplacement visé, ou -1. Renseigné pour `kEnter` et `kCreate`.
+  // L'emplacement visé, ou -1. Renseigné pour `kEnter`, `kCreate` et `kMove`.
   int slot = -1;
+  // L'emplacement d'arrivée d'un `kMove`, ou -1.
+  int target_slot = -1;
   // Le personnage visé, ou zéro. Renseigné pour les trois verbes de
   // suppression, qui le désignent ainsi.
   std::uint32_t character_id = 0;

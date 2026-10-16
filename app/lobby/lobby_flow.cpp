@@ -159,6 +159,20 @@ void LobbyFlow::ConfirmDeletion(std::uint32_t character_id, std::string_view sec
   player_.ConfirmDeletion(character_id, secret);
 }
 
+void LobbyFlow::MoveCharacter(std::uint8_t from_slot, std::uint8_t to_slot) {
+  if (screen_ != LobbyScreenKind::kCharacters) {
+    return;
+  }
+  player_.MoveCharacter(from_slot, to_slot);
+}
+
+void LobbyFlow::RenameCharacter(std::uint32_t character_id, std::string_view new_name) {
+  if (screen_ != LobbyScreenKind::kCharacters) {
+    return;
+  }
+  player_.RenameCharacter(character_id, new_name);
+}
+
 ro::core::Result<void> LobbyFlow::SubmitPincode(std::string_view digits) {
   if (screen_ != LobbyScreenKind::kPincode) {
     return {};

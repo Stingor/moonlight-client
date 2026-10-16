@@ -117,6 +117,26 @@ enum class DeletionStep : std::uint8_t {
 // Couper la liaison pour cela le renverrait au formulaire de connexion.
 enum class DeletionState : std::uint8_t { kIdle, kPending, kDone, kRefused };
 
+// QUELLE RETOUCHE D'UN PERSONNAGE EST EN COURS : changer d'emplacement, ou de
+// nom.
+//
+// ⚠ L'UNE ET L'AUTRE SE PAIENT. Le serveur compte par PERSONNAGE ce qu'il lui
+// reste — `chr_slot_changeCnt` et `chr_name_changeCnt` dans la liste —, et un
+// coupon utilisé en jeu ajoute au premier. Rien ne se retouche à zéro.
+enum class AmendStep : std::uint8_t {
+  kNone,
+  // `CH_REQ_CHANGE_CHARACTER_SLOT` (0x08d4).
+  kMove,
+  // `CH_REQ_CHANGE_CHARNAME` (0x08fc), qui porte le nouveau nom : la
+  // vérification préalable `CH_REQ_IS_VALID_CHARNAME` est facultative à cette
+  // version, et le serveur refait les mêmes contrôles au renommage.
+  kRename,
+};
+
+// 🔴 COMME POUR LA SUPPRESSION, UN REFUS N'EST PAS UN REFUS DE PHASE : un nom
+// déjà pris se corrige devant la tablée.
+enum class AmendState : std::uint8_t { kIdle, kPending, kDone, kRefused };
+
 // Où en est une phase de la session.
 enum class PhaseState : std::uint8_t {
   // Rien de neuf : la boucle doit rappeler. Ce n'est pas une erreur.
@@ -306,6 +326,33 @@ class CharacterPhase {
   }
   void ForgetDeletion() noexcept;
 
+  // ── LES RETOUCHES : DÉPLACER, RENOMMER ────────────────────────────────────
+  //
+  // ⚠ SANS EFFET HORS DU CHOIX, comme le reste.
+  //
+  // 🔴 LE SERVEUR ACCUSE, PUIS RENVOIE LA LISTE ENTIÈRE, dans cet ordre. La
+  // réussite se reporte donc aussitôt dans notre copie, et la liste qui suit la
+  // remplace par la vérité de la base — le compteur restant compris.
+
+  // Déplace le personnage de `from_slot` vers `to_slot`. Une place occupée
+  // ÉCHANGE les deux personnages, quand le serveur le permet
+  // (`char_movetoused`).
+  void MoveCharacter(std::uint8_t from_slot, std::uint8_t to_slot);
+
+  // Renomme ce personnage. `new_name` est dans la page de code du serveur.
+  //
+  // ⚠ RIEN N'EST VALIDÉ ICI, pour la raison dite à `Create`.
+  void RenameCharacter(std::uint32_t character_id, std::string_view new_name);
+
+  [[nodiscard]] AmendStep amend_step() const noexcept { return amend_step_; }
+  [[nodiscard]] AmendState amend() const noexcept { return amend_; }
+  // L'emplacement d'arrivée du dernier déplacement demandé, ou moins un.
+  [[nodiscard]] int amend_target_slot() const noexcept { return amend_to_slot_; }
+  [[nodiscard]] const std::string& amend_refusal_text() const noexcept {
+    return amend_refusal_text_;
+  }
+  void ForgetAmend() noexcept;
+
   // Répond à la demande de code PIN.
   //
   // Le code est brouillé avec la graine de la dernière demande reçue ; il ne
@@ -386,6 +433,10 @@ class CharacterPhase {
   // entre la demande et la réponse.
   [[nodiscard]] proto::CharacterInfo* Seated(std::uint32_t character_id) noexcept;
 
+  // Lit l'accusé d'une retouche. Rend faux si la trame n'en est pas un ; une
+  // trame illisible pose `kFailed`, que l'appelant relit.
+  [[nodiscard]] bool TookAmendAnswer(const Frame& frame);
+
   Connection link_;
   Step step_ = Step::kAwaitingAccountId;
   std::uint32_t account_id_ = 0;
@@ -409,6 +460,14 @@ class CharacterPhase {
   DeletionState deletion_ = DeletionState::kIdle;
   std::uint32_t deletion_character_id_ = 0;
   std::string deletion_refusal_text_;
+  AmendStep amend_step_ = AmendStep::kNone;
+  AmendState amend_ = AmendState::kIdle;
+  // ⚠ LES DEUX ACCUSÉS NE DISENT NI QUI NI OÙ : on retient la demande.
+  int amend_from_slot_ = -1;
+  int amend_to_slot_ = -1;
+  std::uint32_t amend_character_id_ = 0;
+  std::string amend_name_;
+  std::string amend_refusal_text_;
   // Quand le dernier battement est parti, ou rien tant que l'horloge n'est pas
   // armée. Voir `Beat`.
   std::optional<std::uint32_t> last_beat_ms_;

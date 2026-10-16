@@ -261,6 +261,42 @@ void SessionDrive::ForgetDeletion() noexcept {
   }
 }
 
+void SessionDrive::MoveCharacter(std::uint8_t from_slot, std::uint8_t to_slot) {
+  if (stage_ != Stage::kChoosing) {
+    return;
+  }
+  characters_->MoveCharacter(from_slot, to_slot);
+}
+
+void SessionDrive::RenameCharacter(std::uint32_t character_id, std::string_view new_name) {
+  if (stage_ != Stage::kChoosing) {
+    return;
+  }
+  characters_->RenameCharacter(character_id, new_name);
+}
+
+ro::net::AmendStep SessionDrive::amend_step() const noexcept {
+  return characters_.has_value() ? characters_->amend_step() : ro::net::AmendStep::kNone;
+}
+
+ro::net::AmendState SessionDrive::amend() const noexcept {
+  return characters_.has_value() ? characters_->amend() : ro::net::AmendState::kIdle;
+}
+
+int SessionDrive::amend_target_slot() const noexcept {
+  return characters_.has_value() ? characters_->amend_target_slot() : -1;
+}
+
+std::string SessionDrive::amend_refusal() const {
+  return characters_.has_value() ? characters_->amend_refusal_text() : std::string();
+}
+
+void SessionDrive::ForgetAmend() noexcept {
+  if (characters_.has_value()) {
+    characters_->ForgetAmend();
+  }
+}
+
 ro::core::Result<void> SessionDrive::SubmitPincode(std::string_view digits) {
   if (stage_ != Stage::kAwaitingPincode) {
     return {};

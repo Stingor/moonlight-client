@@ -89,4 +89,15 @@ namespace ro::net {
 // quand elle le peut.
 [[nodiscard]] std::string DeleteRefusalText(std::uint8_t code);
 
+// `HC_ACK_CHANGE_CHARACTER_SLOT` (0x0b70), quand sa raison n'est pas zéro.
+//
+// ⚠ UN SEUL CODE D'ÉCHEC POUR SIX CAUSES : `chclif_parse_moveCharSlot` répond
+// « 1 » pour une place hors du compte, une place occupée que le serveur
+// n'échange pas, un compteur à zéro, la fonction coupée, ou une panne de base.
+// Le texte énumère.
+[[nodiscard]] std::string MoveRefusalText(std::uint16_t reason);
+
+// `HC_ACK_CHANGE_CHARNAME` (0x08fd). Codes de `char_rename_char_sql`.
+[[nodiscard]] std::string RenameRefusalText(std::uint32_t result);
+
 }  // namespace ro::net

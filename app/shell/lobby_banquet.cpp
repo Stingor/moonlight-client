@@ -184,6 +184,19 @@ ro::ui::CharacterSelectView LobbyScreen::ComposeSeats(std::uint32_t now_ms) {
     seat.job_level = character.joblevel;
     seat.character_id = character.GID;
     seat.delete_in_seconds = DeleteCountdown(character.DelRevDate);
+    seat.moves_left = character.chr_slot_changeCnt;
+    seat.renamable = character.chr_name_changeCnt > 0;
+  }
+  view.amend_pending = flow_.amend() == ro::net::AmendState::kPending;
+  if (flow_.amend() == ro::net::AmendState::kRefused) {
+    if (flow_.amend_step() == ro::net::AmendStep::kMove) {
+      view.message = flow_.amend_refusal();
+    } else {
+      view.rename_refusal = flow_.amend_refusal();
+    }
+  }
+  if (!rename_refusal_.empty()) {
+    view.rename_refusal = rename_refusal_;
   }
 
   // 🔴 LES PANTINS SE COMPOSENT PAR SIÈGE, ET SEULEMENT POUR LA PAGE VISIBLE :
@@ -342,8 +355,78 @@ void LobbyScreen::RouteDelete(const ro::ui::CharacterDeleteAction& asked) {
   }
 }
 
+// 🔴 LA RÉUSSITE D'UNE RETOUCHE SE LIT ICI, comme celle d'une création : le
+// serveur accuse et renvoie la liste, il ne referme rien. Sans cette lecture, le
+// mode déplacement resterait ouvert sur une tablée où le convive a déjà changé
+// de place, et la fenêtre de renommage sur « en cours ».
+void LobbyScreen::SettleAmend() {
+  const ro::net::AmendStep step = flow_.amend_step();
+  if (flow_.amend() == ro::net::AmendState::kDone) {
+    if (step == ro::net::AmendStep::kMove) {
+      // ⚠ LE VOYAGEUR RESTE DÉSIGNÉ, à sa nouvelle place.
+      const int target = flow_.amend_target_slot();
+      seats_.moving_slot = -1;
+      seats_.moving_target = -1;
+      if (target >= 0) {
+        seats_.selected = target;
+      }
+    } else if (step == ro::net::AmendStep::kRename) {
+      seats_.rename = ro::ui::CharacterRenameDraft{};
+      rename_refusal_.clear();
+    }
+    flow_.ForgetAmend();
+    return;
+  }
+  // ⚠ UN DÉPLACEMENT REFUSÉ QUITTE LE MODE : le bandeau dit pourquoi, et
+  // insister sur la même arrivée ne changerait rien. Le refus reste affiché
+  // jusqu'à la retouche suivante.
+  if (flow_.amend() == ro::net::AmendState::kRefused && step == ro::net::AmendStep::kMove) {
+    seats_.moving_slot = -1;
+    seats_.moving_target = -1;
+  }
+}
+
+bool LobbyScreen::RouteAmend(const ro::ui::CharacterSelectAction& asked) {
+  switch (asked.verb) {
+    case ro::ui::CharacterSelectVerb::kBeginMove:
+    case ro::ui::CharacterSelectVerb::kBeginRename:
+    case ro::ui::CharacterSelectVerb::kDropAmend:
+      // ⚠ PAS PENDANT L'ATTENTE : oublier la demande en vol ferait lire sa
+      // réponse comme celle d'une retouche qu'on n'a pas faite.
+      if (flow_.amend() != ro::net::AmendState::kPending) {
+        flow_.ForgetAmend();
+      }
+      rename_refusal_.clear();
+      return true;
+    case ro::ui::CharacterSelectVerb::kMove:
+      if (asked.slot >= 0 && asked.target_slot >= 0) {
+        flow_.MoveCharacter(static_cast<std::uint8_t>(asked.slot),
+                            static_cast<std::uint8_t>(asked.target_slot));
+      }
+      return true;
+    case ro::ui::CharacterSelectVerb::kRename: {
+      // 🔴 LES MÊMES REFUS QU'À LA CRÉATION, et pour la même raison : un mot
+      // interdit ou une balise de lien d'objet ne part pas.
+      if (std::optional<std::string> refused =
+              CharacterNameRefusal(LoadBannedWords(&shell_.vfs()), seats_.rename.name.data());
+          refused.has_value()) {
+        rename_refusal_ = std::move(*refused);
+        return true;
+      }
+      rename_refusal_.clear();
+      // ⚠ DANS LA PAGE DE CODE DU SERVEUR, comme le nom d'un nouveau-né.
+      flow_.RenameCharacter(asked.character_id,
+                            ro::core::Cp1252FromUtf8(std::string(seats_.rename.name.data())));
+      return true;
+    }
+    default:
+      return false;
+  }
+}
+
 void LobbyScreen::RouteSeats(const ro::ui::CharacterSelectAction& asked) {
-  if (RouteLayout(asked)) {
+  SettleAmend();
+  if (RouteLayout(asked) || RouteAmend(asked)) {
     return;
   }
   switch (asked.verb) {
@@ -355,6 +438,11 @@ void LobbyScreen::RouteSeats(const ro::ui::CharacterSelectAction& asked) {
     case ro::ui::CharacterSelectVerb::kSavePreset:
     case ro::ui::CharacterSelectVerb::kApplyPreset:
     case ro::ui::CharacterSelectVerb::kDeletePreset:
+    case ro::ui::CharacterSelectVerb::kBeginMove:
+    case ro::ui::CharacterSelectVerb::kBeginRename:
+    case ro::ui::CharacterSelectVerb::kMove:
+    case ro::ui::CharacterSelectVerb::kRename:
+    case ro::ui::CharacterSelectVerb::kDropAmend:
       break;
     case ro::ui::CharacterSelectVerb::kReserveDeletion:
       flow_.ReserveDeletion(asked.character_id);

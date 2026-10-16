@@ -17,6 +17,8 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "character_select_amend.h"
+#include "character_select_bars.h"
 #include "character_select_customize.h"
 
 namespace ro::ui {
@@ -37,10 +39,12 @@ constexpr ImU32 kLevelColor = IM_COL32(200, 205, 220, 220);
 constexpr ImU32 kPlateColor = IM_COL32(0, 0, 0, 150);
 constexpr ImU32 kChosenHaloColor = IM_COL32(255, 210, 110, 70);
 constexpr ImU32 kHoverHaloColor = IM_COL32(200, 210, 235, 40);
+// L'arrivée choisie d'un déplacement : un bleu, pour ne pas la confondre avec le
+// convive qu'on déplace, qui garde son halo doré.
+constexpr ImU32 kMoveTargetHaloColor = IM_COL32(120, 200, 255, 110);
 constexpr ImU32 kRefusalColor = IM_COL32(255, 185, 185, 255);
 constexpr ImU32 kRefusalPlateColor = IM_COL32(70, 20, 20, 235);
 constexpr ImU32 kWaitingDollColor = IM_COL32(40, 44, 58, 120);
-constexpr ImU32 kPageColor = IM_COL32(240, 232, 208, 255);
 constexpr ImU32 kFreeSeatColor = IM_COL32(210, 200, 180, 150);
 constexpr ImU32 kFreeSeatHoverColor = IM_COL32(255, 230, 150, 230);
 constexpr ImU32 kDoomedColor = IM_COL32(255, 150, 150, 255);
@@ -63,10 +67,6 @@ constexpr float kTitleTopPixels = 24.0F;
 constexpr float kActionBarBottomPixels = 52.0F;
 constexpr float kExitBarRightPixels = 24.0F;
 constexpr float kPageBarBottomPixels = 96.0F;
-constexpr float kBarGapPixels = 12.0F;
-// La marge laissée de chaque côté de la barre avant qu'elle ne s'empile, en
-// écarts : un bouton collé au bord se clique mal.
-constexpr float kBarMarginRatio = 4.0F;
 
 // Le halo au sol : une fraction de la largeur du cadre cliquable.
 constexpr float kChosenHaloWidthRatio = 0.55F;
@@ -78,11 +78,6 @@ constexpr int kHaloSegments = 28;
 constexpr float kPlatePaddingPixels = 6.0F;
 constexpr float kPlateLiftPixels = 3.0F;
 constexpr float kPlateRounding = 3.0F;
-
-// La largeur des flèches de page, et de combien leur libellé descend pour
-// tomber au milieu du bouton.
-constexpr float kPageArrowWidth = 46.0F;
-constexpr float kPageLabelDrop = 6.0F;
 
 // LE MARQUEUR D'UNE PLACE LIBRE : un cercle barré d'une croix, posé à
 // mi-hauteur du cadre du siège. Son rayon est une fraction de la largeur de ce
@@ -157,7 +152,10 @@ void DrawNamePlate(ImDrawList* list, const SeatFrame& seat, const CharacterSlotV
   list->AddText(ImVec2(left, top), chosen ? kChosenNameColor : kNameColor, who.name.c_str());
   list->AddText(ImVec2(left + name_size.x, top), kLevelColor, levels.data());
 
+  // ⚠ LES RETOUCHES SE TAISENT SOUS UN CONDAMNÉ : la barre ne les propose plus,
+  // et deux étiquettes empilées descendraient sur le convive du rang suivant.
   if (!who.doomed()) {
+    DrawAmendTag(list, seat, who, top + name_size.y + 3.0F);
     return;
   }
   // ⚠ SOUS LE NOM, avec le temps qu'il reste : « suppression programmée » sans
@@ -213,197 +211,6 @@ void DrawDoll(ImDrawList* list, const SeatFrame& seat, const CharacterSlotView& 
   // qui se remplirait ferait sauter la scène sous les yeux du joueur.
   list->AddRectFilled(ImVec2(seat.grab_left, seat.grab_top), ImVec2(seat.grab_right, seat.chair_y),
                       kWaitingDollColor, 4.0F);
-}
-
-// UN BOUTON DE LA BARRE : son libellé, s'il répond, et ce qu'il demande.
-struct BarButton {
-  const char* label = nullptr;
-  bool enabled = true;
-  CharacterSelectVerb verb = CharacterSelectVerb::kNothing;
-};
-
-// LA FORME D'UNE BARRE : la largeur commune de ses boutons, et sur combien de
-// rangées elle tient.
-//
-// ⚠ ON MESURE, et l'on coupe en deux quand il le faut, plutôt que de laisser
-// sortir du cadre ce qu'aucune langue ne garantit court.
-struct BarShape {
-  float width = 0.0F;
-  int rows = 1;
-  int per_row = 0;
-};
-
-[[nodiscard]] BarShape ShapeBar(std::span<const char* const> labels, const SkinArt& art) {
-  BarShape shape;
-  shape.width = SkinWidestButton(labels, art);
-  const auto count = static_cast<int>(labels.size());
-  const float one_row = static_cast<float>(count) * (shape.width + kBarGapPixels) - kBarGapPixels;
-  const bool two_rows =
-      one_row > ImGui::GetMainViewport()->Size.x - kBarGapPixels * kBarMarginRatio;
-  shape.rows = two_rows ? 2 : 1;
-  shape.per_row = two_rows ? (count + 1) / 2 : count;
-  return shape;
-}
-
-[[nodiscard]] float BarRowHeight(const SkinArt& art) {
-  return SkinButtonHeight(art) + kBarGapPixels;
-}
-
-// LA BARRE D'ACTION, sur une ou DEUX rangées. Son ancre est le milieu-haut de
-// sa DERNIÈRE rangée : une seconde monte au-dessus.
-//
-// ⚠ ELLE PORTE JUSQU'À QUATRE BOUTONS dès qu'un condamné est désigné, et quatre
-// libellés traduits ne tiennent pas sur un écran étroit.
-[[nodiscard]] CharacterSelectAction DrawActionBar(CharacterSelectState& state,
-                                                  const CharacterSlotView* designated,
-                                                  const SkinArt& art, ImVec2 middle_top) {
-  CharacterSelectAction action;
-  const int selected = state.selected;
-
-  // ⚠ LA GARDE EST SUR LE BOUTON, contrairement au formulaire : là-bas, ce qui
-  // manque est dans un champ que le joueur regarde ; ici, « aucun personnage
-  // désigné » se voit sur la scène entière, et un bouton vif qui ne ferait
-  // rien serait la seule chose qui mente.
-  std::vector<BarButton> buttons;
-  buttons.push_back({core::Tr("Entrer en jeu"), designated != nullptr && !designated->doomed(),
-                     CharacterSelectVerb::kEnter});
-  // ⚠ UN BOUTON VISIBLE, et non un raccourci seul : c'est une fonctionnalité
-  // du joueur, pas un outil d'auteur. F10 reste en doublon pour qui l'a appris.
-  buttons.push_back({state.customizing ? core::Tr("Terminer") : core::Tr("Personnaliser"), true,
-                     CharacterSelectVerb::kBeginCustomizing});
-  if (designated != nullptr) {
-    if (!designated->doomed()) {
-      buttons.push_back(
-          {core::Tr("Programmer la suppression"), true, CharacterSelectVerb::kReserveDeletion});
-    } else {
-      buttons.push_back(
-          {core::Tr("Annuler la suppression"), true, CharacterSelectVerb::kCancelDeletion});
-      // ⚠ GRISÉ TANT QUE L'HEURE N'EST PAS VENUE, et le compte à rebours est
-      // sous le personnage : le serveur refuserait, et son refus se lit
-      // « adresse de courriel incorrecte » sur un courriel juste.
-      buttons.push_back({core::Tr("Supprimer"), designated->delete_in_seconds == 0,
-                         CharacterSelectVerb::kAskDeletion});
-    }
-  }
-
-  std::vector<const char*> labels;
-  labels.reserve(buttons.size());
-  for (const BarButton& button : buttons) {
-    labels.push_back(button.label);
-  }
-  const BarShape shape = ShapeBar(labels, art);
-  const float row_height = BarRowHeight(art);
-  const auto count = static_cast<int>(buttons.size());
-
-  int placed = 0;
-  int row = 0;
-  while (placed < count) {
-    const int here = std::min(shape.per_row, count - placed);
-    const float row_width =
-        static_cast<float>(here) * (shape.width + kBarGapPixels) - kBarGapPixels;
-    const float row_top = middle_top.y - static_cast<float>(shape.rows - 1 - row) * row_height;
-    ImGui::SetCursorScreenPos(ImVec2(middle_top.x - row_width * 0.5F, row_top));
-    for (int rank = 0; rank < here; ++rank) {
-      const BarButton& button = buttons[static_cast<std::size_t>(placed + rank)];
-      if (rank > 0) {
-        ImGui::SameLine(0.0F, kBarGapPixels);
-      }
-      ImGui::BeginDisabled(!button.enabled);
-      if (SkinButton(button.label, art, ImVec2(shape.width, 0.0F))) {
-        if (button.verb == CharacterSelectVerb::kBeginCustomizing) {
-          action.verb = ToggleCustomizing(state);
-        } else {
-          action.verb = button.verb;
-          action.slot = selected;
-          action.character_id = designated != nullptr ? designated->character_id : 0;
-        }
-      }
-      ImGui::EndDisabled();
-    }
-    placed += here;
-    ++row;
-  }
-
-  // ⚠ ENTRÉE VALIDE, comme au formulaire — et pas quand la scène attend une
-  // saisie : la création et la confirmation de suppression en demandent une.
-  // Ni pendant la personnalisation : on y compose la scène, on n'y joue pas.
-  if (designated != nullptr && !designated->doomed() && !state.customizing &&
-      !ImGui::GetIO().WantTextInput &&
-      (ImGui::IsKeyPressed(ImGuiKey_Enter, false) ||
-       ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false))) {
-    action.verb = CharacterSelectVerb::kEnter;
-    action.slot = selected;
-    action.character_id = designated->character_id;
-  }
-  return action;
-}
-
-// LA FORME QUE PREND LA BARRE D'ACTION AU PLUS LARGE : un condamné désigné.
-//
-// 🔴 C'EST ELLE, ET NON LA BARRE DU MOMENT, qui décide où va la barre de
-// sortie : sinon celle-ci sauterait de rangée au gré des sélections.
-[[nodiscard]] BarShape WidestActionBar(const SkinArt& art, int* count) {
-  const std::array<const char*, 6> every = {core::Tr("Entrer en jeu"),
-                                            core::Tr("Personnaliser"),
-                                            core::Tr("Terminer"),
-                                            core::Tr("Programmer la suppression"),
-                                            core::Tr("Annuler la suppression"),
-                                            core::Tr("Supprimer")};
-  // Entrer, personnaliser, annuler, supprimer : quatre à la fois, au plus.
-  constexpr int kWidestCount = 4;
-  *count = kWidestCount;
-  BarShape shape = ShapeBar(every, art);
-  const float one_row =
-      static_cast<float>(kWidestCount) * (shape.width + kBarGapPixels) - kBarGapPixels;
-  shape.rows = one_row > ImGui::GetMainViewport()->Size.x - kBarGapPixels * kBarMarginRatio ? 2 : 1;
-  return shape;
-}
-
-// LA BARRE DE SORTIE : revenir au login, ou quitter le jeu. Son ancre est son
-// coin gauche-haut.
-[[nodiscard]] CharacterSelectVerb DrawExitBar(const SkinArt& art, ImVec2 top_left, float width) {
-  CharacterSelectVerb verb = CharacterSelectVerb::kNothing;
-  ImGui::SetCursorScreenPos(top_left);
-  if (SkinButton(core::Tr("Revenir au login"), art, ImVec2(width, 0.0F))) {
-    verb = CharacterSelectVerb::kBack;
-  }
-  ImGui::SameLine(0.0F, kBarGapPixels);
-  if (SkinButton(core::Tr("Quitter le jeu"), art, ImVec2(width, 0.0F))) {
-    verb = CharacterSelectVerb::kQuit;
-  }
-  return verb;
-}
-
-// LES PAGES, autour de leur ancre — le milieu-haut de la rangée.
-void DrawPageBar(CharacterSelectState& state, int pages, const SkinArt& art, ImDrawList* list,
-                 ImVec2 middle_top) {
-  std::array<char, 40> label = {};
-  std::snprintf(label.data(), label.size(), core::Tr("Page %d / %d"), state.page + 1, pages);
-  const ImVec2 label_size = ImGui::CalcTextSize(label.data());
-  const float row_width = kPageArrowWidth * 2.0F + kBarGapPixels * 2.0F + label_size.x;
-  const float left = middle_top.x - row_width * 0.5F;
-
-  // ⚠ L'ÉTAT SE LIT AVANT LE CLIC : le clic change la page, donc relire la
-  // condition pour `EndDisabled` la dépareillerait de son `BeginDisabled`.
-  const bool at_first = state.page <= 0;
-  ImGui::SetCursorScreenPos(ImVec2(left, middle_top.y));
-  ImGui::BeginDisabled(at_first);
-  if (SkinButton("<", art, ImVec2(kPageArrowWidth, 0.0F))) {
-    --state.page;
-  }
-  ImGui::EndDisabled();
-
-  const bool at_last = state.page >= pages - 1;
-  ImGui::SetCursorScreenPos(
-      ImVec2(left + kPageArrowWidth + kBarGapPixels * 2.0F + label_size.x, middle_top.y));
-  ImGui::BeginDisabled(at_last);
-  if (SkinButton(">", art, ImVec2(kPageArrowWidth, 0.0F))) {
-    ++state.page;
-  }
-  ImGui::EndDisabled();
-
-  list->AddText(ImVec2(left + kPageArrowWidth + kBarGapPixels, middle_top.y + kPageLabelDrop),
-                kPageColor, label.data());
 }
 
 // LE VOILE NOIR DE L'ENTRÉE EN JEU, et son texte, qui montent ensemble.
@@ -540,6 +347,13 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
       // ⚠ PENDANT LA PERSONNALISATION, LE CLIC PLACE ET NE CHOISIT PAS : ni
       // sélection, ni double clic qui entrerait en jeu, ni création.
       EditSeat(state, seat, seating, list, display, hovered);
+    } else if (state.moving()) {
+      // ⚠ PENDANT UN DÉPLACEMENT, LE CLIC DÉSIGNE L'ARRIVÉE : ni sélection, ni
+      // entrée en jeu, ni création. Et rien ne part encore — voir
+      // `moving_target`.
+      if (clicked && IsMoveTarget(state, view, slot)) {
+        state.moving_target = slot;
+      }
     } else {
       if (clicked && who.occupied) {
         state.selected = slot;
@@ -560,15 +374,27 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
     }
     ImGui::PopID();
 
+    const bool move_target = IsMoveTarget(state, view, slot);
+    const float grab_width = seating.grab_right - seating.grab_left;
+    if (move_target && (state.moving_target == slot || hovered)) {
+      list->AddCircleFilled(
+          ImVec2(seating.centre_x, seating.chair_y), grab_width * kChosenHaloWidthRatio,
+          state.moving_target == slot ? kMoveTargetHaloColor : kHoverHaloColor, kHaloSegments);
+    }
+    if (move_target && hovered) {
+      MoveTargetTooltip(who, slot);
+    }
+
     if (!who.occupied) {
       // 🔴 MASQUÉE, ELLE RESTE CLIQUABLE : le bouton invisible est déjà
       // soumis, seul le dessin est sauté — et elle reparaît au survol. Jamais
-      // masquée pendant la personnalisation, où il faut pouvoir la placer.
-      if (state.layout.hide_free_seats && !editing && !hovered) {
+      // masquée pendant la personnalisation, où il faut pouvoir la placer, ni
+      // pendant un déplacement, où elle est une arrivée possible.
+      if (state.layout.hide_free_seats && !editing && !state.moving() && !hovered) {
         continue;
       }
       DrawFreeSeat(list, seating, hovered, state.layout.free_seat_alpha);
-      if (hovered) {
+      if (hovered && !state.moving()) {
         SkinTooltipFormat(core::Tr("Créer un personnage (emplacement %d)"), slot + 1);
       }
       continue;
@@ -576,11 +402,12 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
 
     peopled_seats.push_back({slot, seating.centre_x, seating.chair_y});
     const bool chosen = state.selected == slot;
-    const float grab_width = seating.grab_right - seating.grab_left;
-    if (chosen) {
+    // ⚠ UNE ARRIVÉE POSSIBLE A DÉJÀ SON HALO : deux disques empilés ne diraient
+    // plus lequel est choisi.
+    if (chosen && !move_target) {
       list->AddCircleFilled(ImVec2(seating.centre_x, seating.chair_y),
                             grab_width * kChosenHaloWidthRatio, kChosenHaloColor, kHaloSegments);
-    } else if (hovered) {
+    } else if (hovered && !move_target) {
       list->AddCircleFilled(ImVec2(seating.centre_x, seating.chair_y),
                             grab_width * kHoverHaloWidthRatio, kHoverHaloColor, kHaloSegments);
     }
@@ -594,7 +421,8 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   // convive que la flèche vient de désigner. Et pas pendant une saisie, sous
   // une fenêtre ni pendant la personnalisation, pour les mêmes raisons que F10.
   const bool arrows_ours =
-      !editing && !view.busy && !view.dialog_open && !ImGui::GetIO().WantTextInput &&
+      !editing && !state.moving() && !view.busy && !view.dialog_open && !state.rename.open() &&
+      !ImGui::GetIO().WantTextInput &&
       !ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
   if (arrows_ours) {
     constexpr std::array<std::pair<ImGuiKey, SeatStep>, 4> kArrows = {{
@@ -626,6 +454,11 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   float banner_top = title_at.y + title_size.y + 10.0F;
   if (!view.message.empty()) {
     DrawBanner(list, centre_x, banner_top, view.message.c_str(), kRefusalColor, kRefusalPlateColor);
+    banner_top += title_size.y + 14.0F;
+  }
+  if (state.moving()) {
+    const std::string moving = MoveBannerText(state, view);
+    DrawBanner(list, centre_x, banner_top, moving.c_str(), kTitleColor, kPlateColor);
     banner_top += title_size.y + 14.0F;
   }
   // 🔴 AUCUN PERSONNAGE EST UNE RÉPONSE, ET NON UNE ATTENTE. C'est l'état d'un
@@ -686,7 +519,7 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
               view.slots[static_cast<std::size_t>(state.selected)].occupied
           ? &view.slots[static_cast<std::size_t>(state.selected)]
           : nullptr;
-  const CharacterSelectAction from_bar = DrawActionBar(state, designated, art, action_at);
+  const CharacterSelectAction from_bar = DrawActionBar(state, view, designated, art, action_at);
   const CharacterSelectVerb from_exit = DrawExitBar(art, exit_pos, exit_width);
   // ⚠ LE DOUBLE CLIC L'EMPORTE S'IL A EU LIEU : il est parti du siège, avant
   // la barre, et écraser son verbe ferait perdre le geste le plus naturel de
@@ -716,8 +549,9 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   // devant deux interactions concurrentes.
   const bool any_popup =
       ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-  if (!view.busy && !view.dialog_open && !any_popup && !ImGui::GetIO().WantTextInput &&
-      ImGui::IsKeyPressed(ImGuiKey_F10, false) && action.verb == CharacterSelectVerb::kNothing) {
+  if (!view.busy && !view.dialog_open && !state.moving() && !state.rename.open() && !any_popup &&
+      !ImGui::GetIO().WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F10, false) &&
+      action.verb == CharacterSelectVerb::kNothing) {
     action.verb = ToggleCustomizing(state);
   }
   DrawSeatPoseMenu(state, view, skin_padding);
@@ -738,6 +572,11 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
     if (from_panel.verb != CharacterSelectVerb::kNothing) {
       action = from_panel;
     }
+  }
+  // ⚠ LA FENÊTRE DU NOUVEAU NOM AUSSI, pour la même raison.
+  const CharacterSelectAction from_rename = DrawRenameWindow(state, view, art);
+  if (from_rename.verb != CharacterSelectVerb::kNothing) {
+    action = from_rename;
   }
 
   // LE VOILE DE L'ENTRÉE EN JEU, par-dessus TOUT — la scène, le panneau, une

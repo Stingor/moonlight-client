@@ -18333,3 +18333,81 @@ tr: Huevo de mascota
 
 fr: Aucun job
 tr: Ningún job
+
+fr: Valider le déplacement
+tr: Confirmar el traslado
+
+fr: Annuler le déplacement
+tr: Cancelar el traslado
+
+fr: Déplacer
+tr: Trasladar
+
+fr: Déplacements : %d
+tr: Traslados: %d
+
+fr: Déplacements : %d · Renommage possible
+tr: Traslados: %d · Cambio de nombre disponible
+
+fr: Renommage possible
+tr: Cambio de nombre disponible
+
+fr: Renommer le personnage
+tr: Renombrar personaje
+
+fr: Nouveau nom pour « %s » :
+tr: Nuevo nombre para «%s»:
+
+fr: Le renommage utilise ton droit au changement de nom.
+tr: El cambio de nombre consume tu derecho a cambiarlo.
+
+fr: Renommage en cours…
+tr: Cambiando el nombre…
+
+fr: Échanger avec %s (emplacement %d)
+tr: Intercambiar con %s (espacio %d)
+
+fr: Déplacer ici (emplacement %d)
+tr: Trasladar aquí (espacio %d)
+
+fr: Choisis la nouvelle place de %s. Échap pour annuler.
+tr: Elige el nuevo espacio de %s. Escape para cancelar.
+
+fr: Emplacement %d choisi pour %s : valide pour utiliser un déplacement.
+tr: Espacio %d elegido para %s: confirma para usar un traslado.
+
+fr: déplacement refusé
+tr: traslado rechazado
+
+fr: déplacement refusé : aucun déplacement disponible pour ce personnage, place hors du compte, ou place occupée que le serveur n'échange pas
+tr: traslado rechazado: este personaje no tiene traslados, el espacio está fuera de la cuenta, o está ocupado y el servidor no intercambia
+
+fr: renommage refusé
+tr: cambio de nombre rechazado
+
+fr: ce personnage n'a plus de renommage disponible
+tr: este personaje ya no puede cambiar de nombre
+
+fr: renommage refusé : le serveur ne reconnaît pas ce personnage
+tr: cambio de nombre rechazado: el servidor no reconoce este personaje
+
+fr: renommage refusé : erreur de base du serveur
+tr: cambio de nombre rechazado: error de base de datos del servidor
+
+fr: ce nom est déjà pris ; choisis-en un autre
+tr: este nombre ya está en uso; elige otro
+
+fr: ce personnage est dans une guilde ; quitte-la d'abord
+tr: este personaje está en un gremio; sal de él primero
+
+fr: ce personnage est dans un groupe ; quitte-le d'abord
+tr: este personaje está en un grupo; sal de él primero
+
+fr: ce nom est trop long
+tr: este nombre es demasiado largo
+
+fr: ce nom n'est pas accepté : trop court, lettres interdites ou nom réservé
+tr: este nombre no se acepta: demasiado corto, letras prohibidas o nombre reservado
+
+fr: le renommage est interdit sur ce serveur
+tr: el cambio de nombre está prohibido en este servidor

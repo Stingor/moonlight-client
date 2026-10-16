@@ -125,6 +125,17 @@ class LobbyFlow {
   [[nodiscard]] std::string deletion_refusal() const { return player_.deletion_refusal(); }
   void ForgetDeletion() noexcept { player_.ForgetDeletion(); }
 
+  // LES RETOUCHES : déplacer, renommer. Sans effet hors de `kCharacters` ; un
+  // refus reste sur la tablée, comme celui d'une suppression.
+  void MoveCharacter(std::uint8_t from_slot, std::uint8_t to_slot);
+  void RenameCharacter(std::uint32_t character_id, std::string_view new_name);
+
+  [[nodiscard]] ro::net::AmendStep amend_step() const noexcept { return player_.amend_step(); }
+  [[nodiscard]] ro::net::AmendState amend() const noexcept { return player_.amend(); }
+  [[nodiscard]] int amend_target_slot() const noexcept { return player_.amend_target_slot(); }
+  [[nodiscard]] std::string amend_refusal() const { return player_.amend_refusal(); }
+  void ForgetAmend() noexcept { player_.ForgetAmend(); }
+
   // Répond au code PIN. Sans effet hors de `kPincode`.
   [[nodiscard]] ro::core::Result<void> SubmitPincode(std::string_view digits);
 

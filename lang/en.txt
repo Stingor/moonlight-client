@@ -18333,3 +18333,81 @@ tr: Pet egg
 
 fr: Aucun job
 tr: No job
+
+fr: Valider le déplacement
+tr: Confirm the move
+
+fr: Annuler le déplacement
+tr: Cancel the move
+
+fr: Déplacer
+tr: Move
+
+fr: Déplacements : %d
+tr: Moves: %d
+
+fr: Déplacements : %d · Renommage possible
+tr: Moves: %d · Rename available
+
+fr: Renommage possible
+tr: Rename available
+
+fr: Renommer le personnage
+tr: Rename character
+
+fr: Nouveau nom pour « %s » :
+tr: New name for “%s”:
+
+fr: Le renommage utilise ton droit au changement de nom.
+tr: Renaming uses up your name change.
+
+fr: Renommage en cours…
+tr: Renaming…
+
+fr: Échanger avec %s (emplacement %d)
+tr: Swap with %s (slot %d)
+
+fr: Déplacer ici (emplacement %d)
+tr: Move here (slot %d)
+
+fr: Choisis la nouvelle place de %s. Échap pour annuler.
+tr: Choose a new slot for %s. Escape to cancel.
+
+fr: Emplacement %d choisi pour %s : valide pour utiliser un déplacement.
+tr: Slot %d chosen for %s: confirm to use one move.
+
+fr: déplacement refusé
+tr: move refused
+
+fr: déplacement refusé : aucun déplacement disponible pour ce personnage, place hors du compte, ou place occupée que le serveur n'échange pas
+tr: move refused: this character has no move left, the slot is outside the account, or the slot is taken and the server does not swap
+
+fr: renommage refusé
+tr: rename refused
+
+fr: ce personnage n'a plus de renommage disponible
+tr: this character has no rename left
+
+fr: renommage refusé : le serveur ne reconnaît pas ce personnage
+tr: rename refused: the server does not recognize this character
+
+fr: renommage refusé : erreur de base du serveur
+tr: rename refused: server database error
+
+fr: ce nom est déjà pris ; choisis-en un autre
+tr: this name is already taken; choose another
+
+fr: ce personnage est dans une guilde ; quitte-la d'abord
+tr: this character is in a guild; leave it first
+
+fr: ce personnage est dans un groupe ; quitte-le d'abord
+tr: this character is in a party; leave it first
+
+fr: ce nom est trop long
+tr: this name is too long
+
+fr: ce nom n'est pas accepté : trop court, lettres interdites ou nom réservé
+tr: this name is not accepted: too short, forbidden letters or reserved name
+
+fr: le renommage est interdit sur ce serveur
+tr: renaming is forbidden on this server
