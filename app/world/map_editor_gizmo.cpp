@@ -196,4 +196,29 @@ std::vector<ro::ui::MapEditorLine> GizmoLines(const std::vector<GizmoHandle>& ha
   return lines;
 }
 
+ro::ui::map_editor::Place Snapped(ro::ui::MapEditorTool tool,
+                                  const ro::ui::map_editor::Place& start,
+                                  ro::ui::map_editor::Place placed) {
+  const auto snap = [](std::array<float, 3>& value, const std::array<float, 3>& from, float step) {
+    for (std::size_t axis = 0; axis < value.size(); ++axis) {
+      if (value[axis] != from[axis]) {
+        value[axis] = std::round(value[axis] / step) * step;
+      }
+    }
+  };
+  switch (tool) {
+    case ro::ui::MapEditorTool::kMove:
+    case ro::ui::MapEditorTool::kVertices:
+      snap(placed.position, start.position, kSnapPositionUnits);
+      break;
+    case ro::ui::MapEditorTool::kRotate:
+      snap(placed.rotation, start.rotation, kSnapRotationDegrees);
+      break;
+    case ro::ui::MapEditorTool::kScale:
+      snap(placed.scale, start.scale, kSnapScale);
+      break;
+  }
+  return placed;
+}
+
 }  // namespace moonclient

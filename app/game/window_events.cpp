@@ -755,7 +755,7 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       *to.mouse = glm::vec2{event.motion.x, event.motion.y};
       // UNE POIGNÉE SAISIE suit la souris, fenêtres ou non, jusqu'au relâcher.
       if (to.map_editor != nullptr && to.map_editor->dragging()) {
-        to.map_editor->DragTo(*to.mouse);
+        to.map_editor->DragTo(*to.mouse, (SDL_GetModState() & SDL_KMOD_SHIFT) != 0);
         break;
       }
       to.world_mouse->pressed = (event.motion.state & SDL_BUTTON_LMASK) != 0;

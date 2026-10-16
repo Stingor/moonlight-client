@@ -106,7 +106,7 @@ bool MapEditorSession::GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& 
   return true;
 }
 
-void MapEditorSession::DragTo(glm::vec2 pointer) {
+void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   if (!drag_.has_value()) {
     return;
   }
@@ -114,6 +114,9 @@ void MapEditorSession::DragTo(glm::vec2 pointer) {
   const ro::ui::MapEditorTool tool =
       drag_->vertex.has_value() || drag_->light.has_value() ? ro::ui::MapEditorTool::kMove : tool_;
   drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
+  if (snap) {
+    drag_->last = Snapped(tool, drag_->start, drag_->last);
+  }
   drag_->last.released = false;
   if (drag_->light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveLight{

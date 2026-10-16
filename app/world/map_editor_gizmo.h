@@ -85,6 +85,17 @@ struct GizmoHandle {
                                                 const ro::ui::map_editor::Place& start,
                                                 glm::vec2 drag);
 
+// L'AIMANTATION, Maj tenue : `placed` arrondi au pas de son outil — la
+// position au demi-carreau, la rotation à quinze degrés, l'échelle au
+// dixième. Seules les composantes que le glissé a changées depuis `start`
+// s'arrondissent : un axe qu'on ne tire pas ne saute pas sur la grille.
+inline constexpr float kSnapPositionUnits = 5.0F;
+inline constexpr float kSnapRotationDegrees = 15.0F;
+inline constexpr float kSnapScale = 0.1F;
+[[nodiscard]] ro::ui::map_editor::Place Snapped(ro::ui::MapEditorTool tool,
+                                                const ro::ui::map_editor::Place& start,
+                                                ro::ui::map_editor::Place placed);
+
 // Les traits des poignées, à tracer par-dessus la vue ; celle de rang
 // `active`, saisie, se distingue.
 [[nodiscard]] std::vector<ro::ui::MapEditorLine> GizmoLines(const std::vector<GizmoHandle>& handles,

@@ -78,7 +78,8 @@ class MapEditorSession {
   [[nodiscard]] bool dragging() const noexcept { return drag_.has_value(); }
   // Le glissé de la poignée saisie jusqu'en `pointer`, puis son relâcher : ils
   // deviennent des intentions de placement, que `TakeQueued` rend.
-  void DragTo(glm::vec2 pointer);
+  // `snap` : Maj tenue, le placement s'aimante — voir `Snapped`.
+  void DragTo(glm::vec2 pointer, bool snap = false);
   void Release();
   [[nodiscard]] std::vector<ro::ui::MapEditorIntent> TakeQueued();
   // Une intention venue du clavier, rendue avec celles des poignées.

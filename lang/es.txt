@@ -18748,8 +18748,8 @@ tr: Restablecer un vértice del modelo %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extender la malla del modelo %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Suppr retire ou masque. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
-tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Supr quita u oculta. Ctrl+clic hace caminar al personaje, Escape sale del editor.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
+tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje, Escape sale del editor.
 
 fr: Ajouter une lumière
 tr: Añadir una luz
