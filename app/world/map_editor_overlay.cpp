@@ -1,8 +1,11 @@
 #include "world/map_editor_overlay.h"
 
 #include <array>
+#include <cmath>
 #include <optional>
 #include <utility>
+
+#include <glm/gtc/constants.hpp>
 
 #include "ro/render/actor_pick.h"
 #include "ro/render/map_effect_math.h"
@@ -70,6 +73,35 @@ std::vector<MapEditorSession::LightDot> LightDots(const ro::ui::MapEditorView& v
     }
   }
   return dots;
+}
+
+std::vector<ro::ui::MapEditorLine> LightRangeRing(const ro::ui::MapEditorLight& light,
+                                                  const ro::render::MapScene& scene,
+                                                  const ro::render::Camera& camera,
+                                                  float aspect_ratio, float viewport_width,
+                                                  float viewport_height) {
+  // Le cercle en segments : assez pour paraître rond à l'écran.
+  constexpr int kRingSegments = 48;
+  const ro::render::MapEffectFrame frame{scene.gnd.width(), scene.gnd.height()};
+  const glm::vec3 centre =
+      frame.ToWorld(glm::vec3(light.position[0], light.position[1], light.position[2]));
+  const auto point_at = [&](int segment) {
+    const float angle =
+        glm::two_pi<float>() * static_cast<float>(segment) / static_cast<float>(kRingSegments);
+    return centre + glm::vec3(std::cos(angle), 0.0F, std::sin(angle)) * light.range;
+  };
+  std::vector<ro::ui::MapEditorLine> ring;
+  for (int segment = 0; segment < kRingSegments; ++segment) {
+    const std::optional<glm::vec2> from = ro::render::ProjectToScreen(
+        camera, aspect_ratio, point_at(segment), viewport_width, viewport_height);
+    const std::optional<glm::vec2> to = ro::render::ProjectToScreen(
+        camera, aspect_ratio, point_at(segment + 1), viewport_width, viewport_height);
+    if (from.has_value() && to.has_value()) {
+      ring.push_back(ro::ui::MapEditorLine{
+          .from = *from, .to = *to, .kind = ro::ui::MapEditorLineKind::kSelection});
+    }
+  }
+  return ring;
 }
 
 }  // namespace moonclient

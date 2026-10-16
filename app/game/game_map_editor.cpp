@@ -65,6 +65,11 @@ void Game::ServeMapEditor() {
                                              static_cast<float>(shell_.height())));
     const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
     view.lines.insert(view.lines.end(), handles.begin(), handles.end());
+    // ET SON CERCLE DE PORTÉE : où elle s'éteint.
+    const std::vector<ro::ui::MapEditorLine> ring =
+        LightRangeRing(view.lights[*view.selected_light], stage_->scene, camera_, aspect_ratio_,
+                       static_cast<float>(shell_.width()), static_cast<float>(shell_.height()));
+    view.lines.insert(view.lines.end(), ring.begin(), ring.end());
   }
 }
 

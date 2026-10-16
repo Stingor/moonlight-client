@@ -31,6 +31,9 @@ constexpr std::array<float, 3> kNewLightColor{2.0F, 1.7F, 1.2F};
 // La plus petite portée qu'une lumière garde : le document refuse une portée
 // nulle, et la relecture rejetterait tout le document avec elle.
 constexpr float kSmallestLightRange = 0.5F;
+// Une composante de couleur ni négative, ni plus de quatre fois la pleine
+// intensité.
+constexpr float kLargestLightColor = 4.0F;
 
 ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light) {
   return ro::ui::MapEditorLight{.position = light.position,
@@ -181,6 +184,9 @@ MapEditorSession::Outcome MapEditorSession::SetLight(const ro::ui::map_editor::S
   ro::mapedit::MapEdit after = before;
   ro::mapedit::AddedLight light = DocumentLight(set.light);
   light.range = std::max(light.range, kSmallestLightRange);
+  for (float& component : light.color) {
+    component = std::clamp(component, 0.0F, kLargestLightColor);
+  }
   after.SetLight(set.slot, std::move(light));
   if (!(after == before)) {
     store.Set(map_name_, after);

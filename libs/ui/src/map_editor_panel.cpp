@@ -56,11 +56,9 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
 constexpr float kLightMarkerPixels = 7.0F;
 // Les pas des glissières d'une lumière : sa portée, et sa couleur.
 constexpr float kLightRangeStep = 0.5F;
-constexpr float kLightColorStep = 0.01F;
-// Leurs bornes : une portée reste positive — le document refuse une portée
-// nulle —, une couleur ni négative ni plus de quatre fois la pleine intensité.
+// La plus grande portée : une portée reste positive — le document refuse une
+// portée nulle —, et la glissière la borne de ce côté aussi.
 constexpr float kLightRangeMax = 2000.0F;
-constexpr float kLightColorMax = 4.0F;
 
 // La hauteur de l'arbre de la scène, en lignes : au-delà, il défile.
 constexpr float kTreeRows = 12.0F;
@@ -365,8 +363,10 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   changed |= ImGui::DragFloat3(core::Tr("Position"), set.light.position.data(), kPositionStep, 0.0F,
                                0.0F, "%.3f");
   released |= ImGui::IsItemDeactivatedAfterEdit();
-  changed |= ImGui::DragFloat3(core::Tr("Couleur"), set.light.color.data(), kLightColorStep, 0.0F,
-                               kLightColorMax, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+  // UNE PASTILLE ET SON SÉLECTEUR : la couleur se choisit à l'œil. Au-delà de
+  // 1, une composante éclaire plus fort ; la session borne ce que l'on tape.
+  changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.light.color.data(),
+                               ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
   released |= ImGui::IsItemDeactivatedAfterEdit();
   changed |=
       ImGui::DragFloat(core::Tr("Portée"), &set.light.range, kLightRangeStep, kLightRangeStep,

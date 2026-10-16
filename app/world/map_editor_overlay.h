@@ -29,4 +29,14 @@ namespace moonclient {
                                                                 float viewport_width,
                                                                 float viewport_height);
 
+// LE CERCLE DE PORTÉE d'une lumière : où elle s'éteint, dans le plan
+// horizontal qui passe par elle, en segments projetés. Un segment dont un bout
+// passe derrière l'œil ne se trace pas.
+[[nodiscard]] std::vector<ro::ui::MapEditorLine> LightRangeRing(const ro::ui::MapEditorLight& light,
+                                                                const ro::render::MapScene& scene,
+                                                                const ro::render::Camera& camera,
+                                                                float aspect_ratio,
+                                                                float viewport_width,
+                                                                float viewport_height);
+
 }  // namespace moonclient
