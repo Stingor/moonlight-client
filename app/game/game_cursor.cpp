@@ -140,19 +140,23 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
                        ? ro::render::CursorShape::kAttack
                        : ro::render::CursorShape::kArrow;
     }
+    // LE MODE ÉDITEUR DE CARTE garde la flèche sur le monde : un clic y désigne
+    // un modèle, et rien de ce que la souris survole n'y répondrait comme au jeu.
     const ro::render::CursorShape shape =
         gate.mouse_to_ui ? over_interface
-                         : ArmedCursor(aim, designated,
-                                       // ⚠ MAJ SE RELIT À CHAQUE IMAGE ICI, et non à l'appui :
-                                       // presser la touche change la forme du curseur sans
-                                       // qu'on bouge la souris, et c'est ainsi qu'on voit
-                                       // qu'une cible est devenue atteignable avant de
-                                       // cliquer. Le clic, lui, relève l'état de son APPUI.
-                                       CameraTurning()       ? ro::render::CursorShape::kRotate
-                                       : held_sword          ? ro::render::CursorShape::kAttack
-                                       : over_store          ? ro::render::CursorShape::kPoint
-                                       : on_unit.has_value() ? *on_unit
-                                                             : over_actor);
+        : map_editor_.active()
+            ? (CameraTurning() ? ro::render::CursorShape::kRotate : ro::render::CursorShape::kArrow)
+            : ArmedCursor(aim, designated,
+                          // ⚠ MAJ SE RELIT À CHAQUE IMAGE ICI, et non à l'appui :
+                          // presser la touche change la forme du curseur sans
+                          // qu'on bouge la souris, et c'est ainsi qu'on voit
+                          // qu'une cible est devenue atteignable avant de
+                          // cliquer. Le clic, lui, relève l'état de son APPUI.
+                          CameraTurning()       ? ro::render::CursorShape::kRotate
+                          : held_sword          ? ro::render::CursorShape::kAttack
+                          : over_store          ? ro::render::CursorShape::kPoint
+                          : on_unit.has_value() ? *on_unit
+                                                : over_actor);
     if (shape != cursor_shape_) {
       cursor_shape_ = shape;
       cursor_since_ms_ = now_ms;
