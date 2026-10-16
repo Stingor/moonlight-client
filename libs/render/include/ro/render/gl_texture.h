@@ -73,6 +73,10 @@ class GlTexture {
   // quand même au lieu de disparaître.
   [[nodiscard]] static core::Result<GlTexture> Placeholder();
 
+  // Le plus fort filtrage anisotrope que le pilote accepte ; 1 sans extension
+  // qui le porte. Un contexte OpenGL doit être courant.
+  [[nodiscard]] static int MaxAnisotropy();
+
   void Bind(int unit) const;
   [[nodiscard]] bool valid() const noexcept { return texture_ != 0; }
 

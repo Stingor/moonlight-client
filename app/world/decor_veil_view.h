@@ -58,7 +58,8 @@ class DecorVeilView {
   // `ModelStages::blended_apart`.
   void Draw(const ro::render::ModelRenderer& models, const ro::render::Camera& camera,
             const MapStage& stage, const ro::render::SceneLight& light, float aspect_ratio,
-            const ro::render::ModelClock* clock, const ro::render::SceneFog& fog) const;
+            const ro::render::ModelClock* clock, const ro::render::SceneFog& fog,
+            const ro::render::PointLightSet& points = ro::render::PointLightSet()) const;
 
   [[nodiscard]] const ro::render::ModelVeils& veils() const noexcept { return veils_; }
 

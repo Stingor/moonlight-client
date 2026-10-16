@@ -293,6 +293,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   [[nodiscard]] ro::core::Result<void> FollowGreyWorldRelief();
   // LE MODE ÉDITEUR DE CARTE : voir game_map_editor.cpp.
   void ServeMapEditor();
+  // Les intentions, la vue et les poignées : tout l'éditeur sauf les lumières.
+  void ServeMapEditorTools();
   void ReplaceMapModels();
   // L'outil Sommets de l'image : voir game_map_editor.cpp.
   void ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height);

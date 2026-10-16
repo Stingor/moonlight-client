@@ -7,6 +7,8 @@
 #include "ro/render/map_scene.h"
 #include "ro/ui/map_editor_panel.h"
 
+#include "world/map_editor_session.h"
+
 namespace moonclient {
 
 // CE QUE LE MODE ÉDITEUR TRACE PAR-DESSUS LA VUE, projeté à l'écran.
@@ -17,5 +19,14 @@ namespace moonclient {
 [[nodiscard]] std::vector<ro::ui::MapEditorLine> SelectionOutline(
     const ro::render::MapScene& scene, std::size_t rsw_rank, const ro::render::Camera& camera,
     float aspect_ratio, float viewport_width, float viewport_height);
+
+// Le point de chaque lumière ponctuelle de la vue, en pixels de fenêtre. Une
+// lumière derrière l'œil n'en a pas.
+[[nodiscard]] std::vector<MapEditorSession::LightDot> LightDots(const ro::ui::MapEditorView& view,
+                                                                const ro::render::MapScene& scene,
+                                                                const ro::render::Camera& camera,
+                                                                float aspect_ratio,
+                                                                float viewport_width,
+                                                                float viewport_height);
 
 }  // namespace moonclient

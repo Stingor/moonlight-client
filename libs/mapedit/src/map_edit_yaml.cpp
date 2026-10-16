@@ -42,6 +42,12 @@ constexpr std::string_view kMapEditHeader =
 #               fichier — position est obligatoire ;
 #    hidden   : vrai pour ne pas le dessiner ;
 #    why      : pourquoi, obligatoire.
+#  lights : les lumières ponctuelles ajoutées, chacune :
+#    position : [x, y, z], dans le repère du RSW ;
+#    color    : [r, g, b], 1 pour la pleine intensité — au-delà, plus fort ;
+#    range    : le rayon où elle s'éteint, en unités du RSW ;
+#    night_only : vrai pour ne l'allumer qu'à la nuit ;
+#    why      : pourquoi, obligatoire.
 #  meshes : les retouches de maillages, chacune :
 #    index, file, origin : la pose qu'elle désigne, comme une retouche de
 #               modèle ;
@@ -177,6 +183,45 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
     added.hidden = hidden.as<bool>();
   }
   return added;
+}
+
+core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_view map_name,
+                                        const std::string& where) {
+  if (!entry.IsMap()) {
+    return std::unexpected(Refused(map_name, where + " n'est pas une table"));
+  }
+  const YAML::Node position = entry["position"];
+  const YAML::Node color = entry["color"];
+  const YAML::Node range = entry["range"];
+  const YAML::Node why = entry["why"];
+  if (!position || !color || !range || !why) {
+    return std::unexpected(
+        Refused(map_name, where + " : « position », « color », « range » et « why » sont dus"));
+  }
+  AddedLight light;
+  light.why = why.as<std::string>();
+  if (light.why.empty()) {
+    return std::unexpected(Refused(map_name, where + " : « why » est vide"));
+  }
+  light.range = range.as<float>();
+  if (!(light.range > 0.0F)) {
+    return std::unexpected(Refused(map_name, where + " : « range » doit être positive"));
+  }
+  core::Result<std::array<float, 3>> placed =
+      VectorFrom(position, map_name, where + " : « position »");
+  if (!placed) {
+    return std::unexpected(placed.error());
+  }
+  light.position = *placed;
+  core::Result<std::array<float, 3>> tinted = VectorFrom(color, map_name, where + " : « color »");
+  if (!tinted) {
+    return std::unexpected(tinted.error());
+  }
+  light.color = *tinted;
+  if (const YAML::Node night_only = entry["night_only"]) {
+    light.night_only = night_only.as<bool>();
+  }
+  return light;
 }
 
 core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view map_name,
@@ -318,6 +363,19 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
         edit.SetMesh(std::move(*mesh));
       }
     }
+    if (const YAML::Node lights = whole["lights"]) {
+      if (!lights.IsSequence()) {
+        return std::unexpected(Refused(map_name, "« lights » n'est pas une liste"));
+      }
+      for (std::size_t rank = 0; rank < lights.size(); ++rank) {
+        core::Result<AddedLight> light =
+            AddedLightFrom(lights[rank], map_name, std::format("lumière {}", rank));
+        if (!light) {
+          return std::unexpected(light.error());
+        }
+        edit.AddLight(std::move(*light));
+      }
+    }
     if (const YAML::Node added = whole["added"]) {
       if (!added.IsSequence()) {
         return std::unexpected(Refused(map_name, "« added » n'est pas une liste"));
@@ -393,6 +451,18 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
       text += "    hidden: true\n";
     }
     text += std::format("    why: {}\n", DoubleQuoted(added.why));
+  }
+  if (!edit.lights().empty()) {
+    text += "lights:\n";
+  }
+  for (const AddedLight& light : edit.lights()) {
+    text += std::format("  - position: {}\n", VectorText(light.position));
+    text += std::format("    color: {}\n", VectorText(light.color));
+    text += std::format("    range: {}\n", light.range);
+    if (light.night_only) {
+      text += "    night_only: true\n";
+    }
+    text += std::format("    why: {}\n", DoubleQuoted(light.why));
   }
   return text;
 }

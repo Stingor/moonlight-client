@@ -9,6 +9,7 @@
 #include "ro/render/camera.h"
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
+#include "ro/render/point_lights.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
 #include "ro/render/sun_shadow_map.h"
@@ -90,9 +91,12 @@ class TerrainRenderer {
                                           const std::vector<formats::Image>& textures,
                                           const formats::Image& lightmap);
 
+  // `points` sont les lumières ponctuelles que le sol reçoit, en plus de
+  // celles de la carte.
   void Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
             const std::array<float, 4>& clear_color, const TerrainStages& stages = TerrainStages(),
-            const SceneFog& fog = SceneFog(), const SunShadowView& sun = SunShadowView()) const;
+            const SceneFog& fog = SceneFog(), const SunShadowView& sun = SunShadowView(),
+            const PointLightSet& points = PointLightSet()) const;
 
   // LE SOL DANS LA CARTE D'OMBRE : sa seule profondeur, vue du soleil, sans
   // effacer. Les carreaux transparents n'y portent pas d'ombre.
@@ -100,8 +104,8 @@ class TerrainRenderer {
 
  private:
   void DrawSurfaces(const glm::mat4& view_projection, const SceneLight& light,
-                    const TerrainStages& stages, const SceneFog& fog,
-                    const SunShadowView& sun) const;
+                    const TerrainStages& stages, const SceneFog& fog, const SunShadowView& sun,
+                    const PointLightSet& points) const;
 
   GlProgram program_;
   std::vector<GlTexture> textures_;

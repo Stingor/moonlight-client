@@ -30,6 +30,7 @@
 #include "world/click_action.h"
 #include "world/entity_menu.h"
 #include "world/ground_unit_view.h"
+#include "world/map_point_lights.h"
 #include "world/pick_box_view.h"
 #include "world/scene_graphics.h"
 #include "world/screen_overlays.h"
@@ -164,14 +165,20 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (sun.map != nullptr) {
     stages.shadowmap = false;
   }
+  // LES LUMIÈRES PONCTUELLES DU DOCUMENT D'ÉDITION, les plus proches de ce que
+  // la caméra regarde : voir docs/adr/0119.
+  const ro::render::PointLightSet points = MapPointLights(
+      map_edits_.Document(stage_->name).lights(),
+      ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
+      sky.light.daylight, camera_.look_at);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
-                stages, fog, sun);
+                stages, fog, sun, points);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());
   ground_unit_models_.SetTextureFilter(settings_->options().graphics().decor_filter());
   // LES FACES À TEXTURE MÊLÉE attendent la passe translucide, plus bas.
   if (models_shown) {
     models_.Draw(camera_, sky.light, aspect_ratio_, ro::render::ModelStages{.blended_apart = true},
-                 &model_clock_, fog, pieces_.decor_veil.opacities(), sun);
+                 &model_clock_, fog, pieces_.decor_veil.opacities(), sun, points);
   }
 
   // LA CASE QUE LE CADRE MARQUE : figée sous l'emprise d'une unité au sol.
@@ -263,7 +270,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
     DrawMapEffects();
     if (models_shown) {
       pieces_.decor_veil.Draw(models_, camera_, *stage_, sky.light, aspect_ratio_, &model_clock_,
-                              fog);
+                              fog, points);
     }
     present_scene();
     ComposeCursor(nullptr, hovered_cell, now_ms);
@@ -418,8 +425,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // LE DÉCOR VOILÉ DEVANT LE JOUEUR, et les faces mêlées du décor, sur tout ce
   // qui est peint derrière.
   if (models_shown) {
-    pieces_.decor_veil.Draw(models_, camera_, *stage_, sky.light, aspect_ratio_, &model_clock_,
-                            fog);
+    pieces_.decor_veil.Draw(models_, camera_, *stage_, sky.light, aspect_ratio_, &model_clock_, fog,
+                            points);
   }
 
   // LA FIN DU MONDE PEINT : terrain, décor, personnages, effets. Ce qui suit se

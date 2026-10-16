@@ -1,7 +1,9 @@
 #include "ro/render/gl_texture.h"
 
+#include <algorithm>
 #include <array>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <glad/glad.h>
@@ -88,6 +90,28 @@ void GlTexture::GenerateMipmaps() {
   glBindTexture(GL_TEXTURE_2D, texture_);
   glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+// L'anisotrope n'est au cœur d'OpenGL qu'à partir de la 4.6 : en 3.3, il
+// vient d'une extension, qu'on cherche par son nom.
+int GlTexture::MaxAnisotropy() {
+  GLint count = 0;
+  glGetIntegerv(GL_NUM_EXTENSIONS, &count);
+  for (GLint index = 0; index < count; ++index) {
+    const auto* name =
+        reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, static_cast<GLuint>(index)));
+    if (name == nullptr) {
+      continue;
+    }
+    const std::string_view extension(name);
+    if (extension == "GL_EXT_texture_filter_anisotropic" ||
+        extension == "GL_ARB_texture_filter_anisotropic") {
+      GLfloat most = 1.0F;
+      glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &most);
+      return std::max(1, static_cast<int>(most));
+    }
+  }
+  return 1;
 }
 
 }  // namespace ro::render

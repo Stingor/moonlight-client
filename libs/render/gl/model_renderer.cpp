@@ -14,6 +14,7 @@
 #include "ro/formats/grf.h"
 #include "ro/formats/image.h"
 #include "ro/render/fog_shader.h"
+#include "ro/render/point_light_shader.h"
 #include "ro/render/scene_cutout.h"
 #include "ro/render/sun_shadow_map.h"
 #include "ro/render/veiled_prims.h"
@@ -74,6 +75,7 @@ void main() {
                         sine * centered.x + cosine * centered.y) * u_texture_scale +
                    0.5 + u_texture_offset;
     vec4 world = u_model * u_node * vec4(a_position, 1.0);
+    v_world_position = world.xyz;
     gl_Position = u_view_projection * world;
     v_fog_kept = FogKeptPart(gl_Position.w);
 
@@ -145,7 +147,7 @@ void main() {
         discard;
     }
     vec4 color = texture(u_texture, v_texture_uv);
-    vec3 light = mix(v_shaded_light, v_light, SunVisibility());
+    vec3 light = mix(v_shaded_light, v_light, SunVisibility()) + PointLighting(v_world_position);
     frag_color = vec4(Fogged(color.rgb * light, v_fog_kept),
                       mix(1.0, color.a * u_opacity, u_translucent));
 }
@@ -172,28 +174,6 @@ constexpr GLuint kSideAttribute = 3;
 // porte plus rien, un seul cran d'alpha sur deux cent cinquante-cinq.
 constexpr float kVeiledAlphaReference = 1.0F / 255.0F;
 constexpr float kOpacityScale = 255.0F;
-
-// L'anisotrope n'est au cœur d'OpenGL qu'à partir de la 4.6 : en 3.3, il
-// vient d'une extension, qu'on cherche par son nom.
-int MaxAnisotropy() {
-  GLint count = 0;
-  glGetIntegerv(GL_NUM_EXTENSIONS, &count);
-  for (GLint index = 0; index < count; ++index) {
-    const auto* name =
-        reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, static_cast<GLuint>(index)));
-    if (name == nullptr) {
-      continue;
-    }
-    const std::string_view extension(name);
-    if (extension == "GL_EXT_texture_filter_anisotropic" ||
-        extension == "GL_ARB_texture_filter_anisotropic") {
-      GLfloat most = 1.0F;
-      glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &most);
-      return std::max(1, static_cast<int>(most));
-    }
-  }
-  return 1;
-}
 
 // Le rang d'un échantillonneur dans `ModelRenderer::samplers_`.
 enum SamplerRank : std::size_t {
@@ -344,8 +324,11 @@ void ModelRenderer::Release(VertexStore& store) {
 
 core::Result<ModelRenderer> ModelRenderer::Create() {
   auto program = GlProgram::Link(
-      WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
-      WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl));
+      WithPointLights(WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
+                      kPointLightVertexGlsl),
+      WithPointLights(
+          WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl),
+          kPointLightFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -369,7 +352,7 @@ core::Result<ModelRenderer> ModelRenderer::Create() {
     glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, repeats ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, repeats ? GL_REPEAT : GL_CLAMP_TO_EDGE);
   }
-  renderer.max_anisotropy_ = MaxAnisotropy();
+  renderer.max_anisotropy_ = GlTexture::MaxAnisotropy();
   return renderer;
 }
 
@@ -578,8 +561,8 @@ void ModelRenderer::SetTextureMotion(const TextureMotion& motion) const {
 }
 
 void ModelRenderer::Use(const glm::mat4& view_projection, const SceneLight& light,
-                        const ModelStages& stages, const SceneFog& fog,
-                        const SunShadowView& sun) const {
+                        const ModelStages& stages, const SceneFog& fog, const SunShadowView& sun,
+                        const PointLightSet& points) const {
   program_.Use();
   program_.SetMatrix4("u_view_projection", view_projection);
   program_.SetInt("u_texture", 0);
@@ -593,6 +576,7 @@ void ModelRenderer::Use(const glm::mat4& view_projection, const SceneLight& ligh
   program_.SetInt("u_flip_sides", 0);
   SetFogUniforms(program_, fog);
   SetSunShadowUniforms(program_, sun);
+  SetPointLightUniforms(program_, points);
 }
 
 ModelRenderer::GroupPose ModelRenderer::PoseOf(const Batch& batch, const ModelClock* clock,
@@ -612,9 +596,10 @@ ModelRenderer::GroupPose ModelRenderer::PoseOf(const Batch& batch, const ModelCl
 
 void ModelRenderer::Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
                          const ModelStages& stages, const ModelClock* clock, const SceneFog& fog,
-                         const ModelOpacities* opacities, const SunShadowView& sun) const {
+                         const ModelOpacities* opacities, const SunShadowView& sun,
+                         const PointLightSet& points) const {
   DrawOpaque(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), light, stages, clock, fog,
-             opacities, sun);
+             opacities, sun, points);
 }
 
 void ModelRenderer::DrawDepth(const glm::mat4& light_view_projection,
@@ -623,20 +608,20 @@ void ModelRenderer::DrawDepth(const glm::mat4& light_view_projection,
   // à son seuil : un feuillage ombre le sol par ses seules feuilles.
   DrawOpaque(light_view_projection, SceneLight(),
              ModelStages{.light = true, .one_sided = false, .blended_apart = false}, clock,
-             SceneFog(), nullptr, SunShadowView());
+             SceneFog(), nullptr, SunShadowView(), PointLightSet());
 }
 
 void ModelRenderer::DrawOpaque(const glm::mat4& view_projection, const SceneLight& light,
                                const ModelStages& stages, const ModelClock* clock,
                                const SceneFog& fog, const ModelOpacities* opacities,
-                               const SunShadowView& sun) const {
+                               const SunShadowView& sun, const PointLightSet& points) const {
   glEnable(GL_DEPTH_TEST);
   // LE TRI DES FACES SIMPLES SE FAIT DANS LE NUANCIER, sommet par sommet : les
   // poses cuites ensemble n'ont pas toutes le même côté.
   glDisable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
 
-  Use(view_projection, light, stages, fog, sun);
+  Use(view_projection, light, stages, fog, sun, points);
   program_.SetFloat("u_opacity", 1.0F);
   program_.SetFloat("u_translucent", 0.0F);
   // ⚠ LE PLACEHOLDER, d'un seul pixel, est complet à tout filtrage : il n'a
@@ -711,7 +696,7 @@ void ModelRenderer::DrawOpaque(const glm::mat4& view_projection, const SceneLigh
 void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, float aspect_ratio,
                                const std::vector<ModelInstances>& models,
                                std::span<const VeiledPose> veiled, const ModelClock* clock,
-                               const SceneFog& fog) const {
+                               const SceneFog& fog, const PointLightSet& points) const {
   if (veiled_.vertex_buffer == 0) {
     return;
   }
@@ -767,7 +752,7 @@ void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, fl
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  Use(view_projection, light, ModelStages(), fog, SunShadowView());
+  Use(view_projection, light, ModelStages(), fog, SunShadowView(), points);
   const glm::mat4 identity{1.0F};
   program_.SetMatrix4("u_model", identity);
   program_.SetMatrix4("u_node", identity);

@@ -152,4 +152,16 @@ void GlProgram::SetFloat(std::string_view name, float value) const {
   glUniform1f(LocationOf(name), value);
 }
 
+void GlProgram::SetVector3Array(std::string_view name, std::span<const glm::vec3> values) const {
+  if (!values.empty()) {
+    glUniform3fv(LocationOf(name), static_cast<GLsizei>(values.size()), &values.front()[0]);
+  }
+}
+
+void GlProgram::SetFloatArray(std::string_view name, std::span<const float> values) const {
+  if (!values.empty()) {
+    glUniform1fv(LocationOf(name), static_cast<GLsizei>(values.size()), values.data());
+  }
+}
+
 }  // namespace ro::render

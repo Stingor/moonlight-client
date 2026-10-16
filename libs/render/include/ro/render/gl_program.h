@@ -1,5 +1,6 @@
 #pragma once
 
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -35,6 +36,9 @@ class GlProgram {
   void SetVector4(std::string_view name, const glm::vec4& value) const;
   void SetInt(std::string_view name, int value) const;
   void SetFloat(std::string_view name, float value) const;
+  // Un tableau d'uniformes, depuis son premier élément.
+  void SetVector3Array(std::string_view name, std::span<const glm::vec3> values) const;
+  void SetFloatArray(std::string_view name, std::span<const float> values) const;
 
   [[nodiscard]] unsigned int id() const noexcept { return program_; }
 

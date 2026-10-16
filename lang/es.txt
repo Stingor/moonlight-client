@@ -18750,3 +18750,27 @@ tr: Extender la malla del modelo %zu
 
 fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
 tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta. Ctrl+clic hace caminar al personaje, Escape sale del editor.
+
+fr: Ajouter une lumière
+tr: Añadir una luz
+
+fr: La lumière %zu n'a pas de raison.
+tr: La luz %zu no tiene motivo.
+
+fr: La nuit seulement
+tr: Solo de noche
+
+fr: Lumière
+tr: Luz
+
+fr: Lumières
+tr: Luces
+
+fr: Retirer la lumière
+tr: Quitar la luz
+
+fr: Retirer la lumière %zu
+tr: Quitar la luz %zu
+
+fr: Régler la lumière %zu
+tr: Ajustar la luz %zu

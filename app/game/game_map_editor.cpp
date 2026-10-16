@@ -38,6 +38,22 @@ std::vector<std::string> ModelLibrary(ro::vfs::Vfs& vfs) {
 }  // namespace
 
 void Game::ServeMapEditor() {
+  ServeMapEditorTools();
+  // LES LUMIÈRES SE MONTRENT TOUJOURS, quel que soit l'outil : un cercle sur
+  // chacune.
+  ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
+  if (!map_editor_.active() || !stage_.has_value()) {
+    map_editor_.SetLightDots({});
+    return;
+  }
+  map_editor_.SetLightDots(LightDots(view, stage_->scene, camera_, aspect_ratio_,
+                                     static_cast<float>(shell_.width()),
+                                     static_cast<float>(shell_.height())));
+  const std::vector<ro::ui::MapEditorLine> marks = map_editor_.LightTrace();
+  view.lines.insert(view.lines.end(), marks.begin(), marks.end());
+}
+
+void Game::ServeMapEditorTools() {
   ro::ui::StaffToolsState& tools = windows_.staff_tools;
   // SANS LE DROIT, le mode se ferme : il peut se perdre en cours de session.
   if (!Rights().staff_tools || !stage_.has_value()) {

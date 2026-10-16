@@ -68,9 +68,10 @@ std::vector<ro::ui::MapEditorLine> MapEditorSession::GizmoTrace() const {
 }
 
 bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
-  if (!active_ || !view.selected.has_value()) {
-    return false;
-  }
+  return active_ && ((view.selected.has_value() && GrabTool(pointer, view)) || GrabLight(pointer));
+}
+
+bool MapEditorSession::GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
   if (tool_ == ro::ui::MapEditorTool::kVertices) {
     return GrabVertex(pointer);
   }
@@ -148,6 +149,7 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
   map_name_ = std::string(map_name);
   history_.Clear();
   selection_.Clear();
+  selected_light_.reset();
   gesture_before_.reset();
   pending_why_.clear();
   status_.clear();
@@ -220,6 +222,15 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return RevertVertex(store);
         } else if constexpr (std::is_same_v<Asked, intents::SetAllPoses>) {
           return SetAllPoses(asked.all, store);
+        } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
+          return AddLight(store);
+        } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {
+          selected_light_ = asked.slot;
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::SetLight>) {
+          return SetLight(asked, store);
+        } else if constexpr (std::is_same_v<Asked, intents::RemoveLight>) {
+          return RemoveLight(asked.slot, store);
         } else {
           Save(store);
           return {};
@@ -449,6 +460,16 @@ void MapEditorSession::Save(MapEditStore& store) {
       return;
     }
   }
+  const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
+  for (std::size_t slot = 0; slot < lights.size(); ++slot) {
+    if (lights[slot].why.empty()) {
+      Line refused{};
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La lumière %zu n'a pas de raison."), slot);
+      status_ = refused.data();
+      return;
+    }
+  }
   for (const ro::mapedit::MeshEdit& mesh : store.Document(map_name_).meshes()) {
     if (mesh.why.empty()) {
       Line refused{};
@@ -533,6 +554,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
                                                     .hidden = added.hidden,
                                                     .added = true});
   }
+  ViewLights(document, view);
   if (selection_.empty()) {
     return view;
   }

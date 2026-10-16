@@ -53,10 +53,11 @@ void DecorVeilView::Advance(const DecorVeilFrame& frame) {
 void DecorVeilView::Draw(const ro::render::ModelRenderer& models, const ro::render::Camera& camera,
                          const MapStage& stage, const ro::render::SceneLight& light,
                          float aspect_ratio, const ro::render::ModelClock* clock,
-                         const ro::render::SceneFog& fog) const {
+                         const ro::render::SceneFog& fog,
+                         const ro::render::PointLightSet& points) const {
   const std::span<const ro::render::VeiledPose> veiled =
       enabled_ ? veils_.veiled() : std::span<const ro::render::VeiledPose>();
-  models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veiled, clock, fog);
+  models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veiled, clock, fog, points);
 }
 
 }  // namespace moonclient

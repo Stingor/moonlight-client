@@ -18750,3 +18750,27 @@ tr: Extend the mesh of model %zu
 
 fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
 tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+4 pick the tool. Ctrl+click walks the character, Escape leaves the editor.
+
+fr: Ajouter une lumière
+tr: Add a light
+
+fr: La lumière %zu n'a pas de raison.
+tr: Light %zu has no reason.
+
+fr: La nuit seulement
+tr: Only at night
+
+fr: Lumière
+tr: Light
+
+fr: Lumières
+tr: Lights
+
+fr: Retirer la lumière
+tr: Remove the light
+
+fr: Retirer la lumière %zu
+tr: Remove light %zu
+
+fr: Régler la lumière %zu
+tr: Adjust light %zu

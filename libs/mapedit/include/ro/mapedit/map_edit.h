@@ -72,6 +72,22 @@ struct AddedModel {
   friend bool operator==(const AddedModel&, const AddedModel&) = default;
 };
 
+// UNE LUMIÈRE PONCTUELLE ajoutée par l'éditeur : elle éclaire le sol et le
+// décor autour d'elle, jusqu'à sa portée, où elle s'éteint. La couleur porte
+// l'intensité : une composante au-delà de 1 éclaire plus fort.
+struct AddedLight {
+  // Sa position, dans le repère du RSW.
+  std::array<float, 3> position{};
+  std::array<float, 3> color{1.0F, 1.0F, 1.0F};
+  // Le rayon où elle s'éteint, en unités du RSW ; strictement positif.
+  float range = 0.0F;
+  // Vrai : elle ne s'allume qu'à la nuit, et plus fort à mesure qu'elle tombe.
+  bool night_only = false;
+  std::string why;
+
+  friend bool operator==(const AddedLight&, const AddedLight&) = default;
+};
+
 // UN SOMMET DÉPLACÉ : son nœud, son rang dans le nœud, sa position dans le
 // fichier et la nouvelle, toutes deux dans le repère du nœud.
 struct VertexMove {
@@ -117,8 +133,15 @@ class MapEdit {
   // Les retouches de modèles, rangées par rang.
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
   [[nodiscard]] bool empty() const noexcept {
-    return models_.empty() && added_.empty() && meshes_.empty();
+    return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty();
   }
+  // Les lumières ajoutées, dans l'ordre du document.
+  [[nodiscard]] const std::vector<AddedLight>& lights() const noexcept { return lights_; }
+  void AddLight(AddedLight light) { lights_.push_back(std::move(light)); }
+  // Remplace la lumière de rang `slot` ; hors de la liste, rien.
+  void SetLight(std::size_t slot, AddedLight light);
+  // Retire la lumière de rang `slot` : les suivantes remontent.
+  void RemoveLight(std::size_t slot);
   // Les retouches de maillages, rangées par rang de pose.
   [[nodiscard]] const std::vector<MeshEdit>& meshes() const noexcept { return meshes_; }
   [[nodiscard]] const MeshEdit* MeshAt(std::size_t model_index) const;
@@ -147,6 +170,7 @@ class MapEdit {
   std::vector<ModelEdit> models_;
   std::vector<AddedModel> added_;
   std::vector<MeshEdit> meshes_;
+  std::vector<AddedLight> lights_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

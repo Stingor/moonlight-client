@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 
 #include "ro/render/fog_shader.h"
+#include "ro/render/point_light_shader.h"
 #include "ro/render/scene_cutout.h"
 #include "ro/render/sun_shadow_map.h"
 
@@ -42,6 +43,7 @@ void main() {
     v_texture_uv = a_texture_uv;
     v_lightmap_uv = a_lightmap_uv;
     v_color = a_color;
+    v_world_position = a_position;
     gl_Position = u_view_projection * vec4(a_position, 1.0);
     v_fog_kept = FogKeptPart(gl_Position.w);
     SunShadowProject(a_position, normalize(a_normal));
@@ -136,6 +138,9 @@ void main() {
     // même façon, et les confondre écrase le relief cuit de la carte.
     vec4 lightmap = texture(u_lightmap, v_lightmap_uv);
     result *= max(lightmap.a, 1.0 - u_shadowmap_strength);
+    // LES LUMIÈRES PONCTUELLES S'AJOUTENT À L'ÉCLAIRAGE DU CARREAU, sur sa
+    // texture, sans que la nuit ni l'ombre cuite ne les assombrissent.
+    result += texel.rgb * PointLighting(v_world_position);
     vec3 laid_light = mix(lightmap.rgb, lightmap.bgr, u_cold_light);
     result += clamp(laid_light, 0.0, 1.0) * u_lightmap_strength;
 
@@ -197,8 +202,11 @@ TerrainRenderer::~TerrainRenderer() {
 
 core::Result<TerrainRenderer> TerrainRenderer::Create() {
   auto program = GlProgram::Link(
-      WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
-      WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl));
+      WithPointLights(WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
+                      kPointLightVertexGlsl),
+      WithPointLights(
+          WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl),
+          kPointLightFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -273,22 +281,24 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
 
 void TerrainRenderer::Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
                            const std::array<float, 4>& clear_color, const TerrainStages& stages,
-                           const SceneFog& fog, const SunShadowView& sun) const {
+                           const SceneFog& fog, const SunShadowView& sun,
+                           const PointLightSet& points) const {
   glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
   // Le stencil avec la profondeur : la silhouette des corps ne vaut que pour
   // l'image qui la pose.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-  DrawSurfaces(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), light, stages, fog,
-               sun);
+  DrawSurfaces(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), light, stages, fog, sun,
+               points);
 }
 
 void TerrainRenderer::DrawDepth(const glm::mat4& light_view_projection) const {
-  DrawSurfaces(light_view_projection, SceneLight(), TerrainStages(), SceneFog(), SunShadowView());
+  DrawSurfaces(light_view_projection, SceneLight(), TerrainStages(), SceneFog(), SunShadowView(),
+               PointLightSet());
 }
 
 void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const SceneLight& light,
                                    const TerrainStages& stages, const SceneFog& fog,
-                                   const SunShadowView& sun) const {
+                                   const SunShadowView& sun, const PointLightSet& points) const {
   glEnable(GL_DEPTH_TEST);
   // Pas d'élimination des faces arrière : les faces latérales du terrain ne
   // sont pas orientées de façon cohérente d'un dénivelé à l'autre, et en
@@ -315,6 +325,7 @@ void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const Scene
   program_.SetVector3("u_daylight", light.daylight);
   SetFogUniforms(program_, fog);
   SetSunShadowUniforms(program_, sun);
+  SetPointLightUniforms(program_, points);
 
   (has_lightmap_ ? lightmap_ : placeholder_).Bind(1);
 

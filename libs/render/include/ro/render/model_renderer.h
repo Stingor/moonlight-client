@@ -20,6 +20,7 @@
 #include "ro/render/model_mesh.h"
 #include "ro/render/model_mesh_identity.h"
 #include "ro/render/model_veil.h"
+#include "ro/render/point_lights.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
 #include "ro/render/sun_shadow_map.h"
@@ -104,10 +105,14 @@ class ModelRenderer {
   //
   // `opacities` écarte les poses qui ne sont plus pleines : c'est `DrawVeiled`
   // qui les peint, plus tard.
+  //
+  // `points` sont les lumières ponctuelles que le décor reçoit, en plus de
+  // celles de la carte.
   void Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
             const ModelStages& stages = ModelStages(), const ModelClock* clock = nullptr,
             const SceneFog& fog = SceneFog(), const ModelOpacities* opacities = nullptr,
-            const SunShadowView& sun = SunShadowView()) const;
+            const SunShadowView& sun = SunShadowView(),
+            const PointLightSet& points = PointLightSet()) const;
 
   // LE DÉCOR DANS LA CARTE D'OMBRE : sa seule profondeur, vue du soleil, toutes
   // poses pleines, posées par `clock` comme dans `Draw`.
@@ -123,7 +128,8 @@ class ModelRenderer {
   // même sans aucune pose voilée.
   void DrawVeiled(const Camera& camera, const SceneLight& light, float aspect_ratio,
                   const std::vector<ModelInstances>& models, std::span<const VeiledPose> veiled,
-                  const ModelClock* clock = nullptr, const SceneFog& fog = SceneFog()) const;
+                  const ModelClock* clock = nullptr, const SceneFog& fog = SceneFog(),
+                  const PointLightSet& points = PointLightSet()) const;
 
   [[nodiscard]] std::size_t instance_count() const noexcept { return instance_count_; }
 
@@ -207,11 +213,12 @@ class ModelRenderer {
   static void UploadSides(std::size_t vertex_count, std::span<const FaceSide> sides);
   static void Release(VertexStore& store);
   void Use(const glm::mat4& view_projection, const SceneLight& light, const ModelStages& stages,
-           const SceneFog& fog, const SunShadowView& sun) const;
+           const SceneFog& fog, const SunShadowView& sun, const PointLightSet& points) const;
   // La passe opaque, vue par `view_projection` : la caméra ou le soleil.
   void DrawOpaque(const glm::mat4& view_projection, const SceneLight& light,
                   const ModelStages& stages, const ModelClock* clock, const SceneFog& fog,
-                  const ModelOpacities* opacities, const SunShadowView& sun) const;
+                  const ModelOpacities* opacities, const SunShadowView& sun,
+                  const PointLightSet& points) const;
   // Lie la texture et son échantillonneur ; rend la texture liée, nulle pour le
   // repli.
   const GlTexture* BindTexture(const Batch& batch, std::int32_t texture_index, bool filtered) const;

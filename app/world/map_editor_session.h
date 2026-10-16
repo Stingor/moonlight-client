@@ -111,6 +111,15 @@ class MapEditorSession {
   [[nodiscard]] std::optional<std::pair<std::size_t, std::size_t>> selected_vertex() const {
     return vertex_;
   }
+  // LE CERCLE D'UNE LUMIÈRE à l'écran, et son rang dans le document : un clic
+  // dessus la désigne.
+  struct LightDot {
+    glm::vec2 at{0.0F, 0.0F};
+    std::size_t slot = 0;
+  };
+  void SetLightDots(std::vector<LightDot> dots) { light_dots_ = std::move(dots); }
+  // Les cercles des lumières, la réglée distinguée.
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> LightTrace() const;
   // Les points des sommets, le désigné distingué.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> VertexTrace() const;
 
@@ -141,6 +150,12 @@ class MapEditorSession {
   // Le rang dans la liste des ajouts du modèle désigné, s'il en est un.
   [[nodiscard]] std::optional<std::size_t> AddedSlot(const ro::render::MapScene& scene) const;
   void Save(MapEditStore& store);
+  // LES LUMIÈRES PONCTUELLES : voir map_editor_lights.cpp.
+  Outcome AddLight(MapEditStore& store);
+  Outcome SetLight(const ro::ui::map_editor::SetLight& set, MapEditStore& store);
+  Outcome RemoveLight(std::size_t slot, MapEditStore& store);
+  // Ce que la vue montre des lumières.
+  void ViewLights(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
   // Retient un geste dans l'historique, s'il a changé quelque chose.
   void Record(std::string label, const ro::mapedit::MapEdit& before,
               const ro::mapedit::MapEdit& after);
@@ -160,6 +175,14 @@ class MapEditorSession {
   std::vector<std::string> model_files_;
   ro::ui::MapEditorTool tool_ = ro::ui::MapEditorTool::kMove;
   std::array<float, 3> drop_point_{};
+  // La lumière qu'on règle, par son rang dans le document, et les cercles de
+  // toutes à l'écran.
+  std::optional<std::size_t> selected_light_;
+  std::vector<LightDot> light_dots_;
+  // La saisie d'une poignée ou d'un sommet du modèle désigné ; puis celle d'un
+  // cercle de lumière.
+  [[nodiscard]] bool GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  [[nodiscard]] bool GrabLight(glm::vec2 pointer);
   // Le nombre de modèles du RSW d'origine : les ajouts prennent rang après.
   std::size_t original_count_ = 0;
   GizmoFrame gizmo_frame_;

@@ -32,6 +32,17 @@ struct MapEditorModelRow {
   bool added = false;
 };
 
+// UNE LUMIÈRE PONCTUELLE DU DOCUMENT, telle que le panneau la montre et la
+// rend : position dans le repère du RSW, couleur qui porte l'intensité, rayon
+// où elle s'éteint, en unités du RSW.
+struct MapEditorLight {
+  std::array<float, 3> position{};
+  std::array<float, 3> color{1.0F, 1.0F, 1.0F};
+  float range = 0.0F;
+  bool night_only = false;
+  std::string why;
+};
+
 // CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres : des segments
 // déjà projetés, en pixels de fenêtre.
 enum class MapEditorLineKind : std::uint8_t {
@@ -47,6 +58,9 @@ enum class MapEditorLineKind : std::uint8_t {
   // `from` seul.
   kVertex = 5,
   kVertexSelected = 6,
+  // Une lumière ponctuelle, et la lumière désignée : des cercles, en `from`.
+  kLight = 7,
+  kLightSelected = 8,
 };
 
 // L'OUTIL DES POIGNÉES : déplacer, tourner ou mettre à l'échelle.
@@ -94,6 +108,9 @@ struct MapEditorView {
   // LA BIBLIOTHÈQUE : les fichiers de modèles de l'installation, relatifs à
   // data\model\, triés. Partagée et non recopiée : elle en compte des milliers.
   std::shared_ptr<const std::vector<std::string>> library;
+  // LES LUMIÈRES PONCTUELLES du document, et celle qu'on règle.
+  std::vector<MapEditorLight> lights;
+  std::optional<std::size_t> selected_light;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
@@ -148,13 +165,29 @@ struct SetTool {
   MapEditorTool tool = MapEditorTool::kMove;
 };
 struct Save {};
+// Ajouter une lumière ponctuelle, là où l'appelant pose ce qu'on ajoute.
+struct AddLight {};
+// Régler la lumière de rang `slot`, ou plus aucune.
+struct SelectLight {
+  std::optional<std::size_t> slot;
+};
+// La lumière de rang `slot` devient `light`. `released`, comme pour `Place`.
+struct SetLight {
+  std::size_t slot = 0;
+  MapEditorLight light;
+  bool released = true;
+};
+struct RemoveLight {
+  std::size_t slot = 0;
+};
 }  // namespace map_editor
 
 using MapEditorIntent =
     std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
                  map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
                  map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
-                 map_editor::RevertVertex, map_editor::SetAllPoses>;
+                 map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
+                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -175,6 +208,9 @@ struct MapEditorPanelState {
   std::array<char, kWhyCapacity> why{};
   // Le modèle dont `why` est la saisie : un autre modèle la recharge.
   std::optional<std::size_t> why_of;
+  // La raison de la lumière réglée, et la lumière dont c'est la saisie.
+  std::array<char, kWhyCapacity> light_why{};
+  std::optional<std::size_t> light_why_of;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

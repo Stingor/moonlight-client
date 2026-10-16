@@ -51,6 +51,12 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
                  "l'éditeur."),
 };
 
+// Le rayon du cercle d'une lumière ponctuelle, en pixels.
+constexpr float kLightMarkerPixels = 7.0F;
+// Les pas des glissières d'une lumière : sa portée, et sa couleur.
+constexpr float kLightRangeStep = 0.5F;
+constexpr float kLightColorStep = 0.01F;
+
 // La hauteur de l'arbre de la scène, en lignes : au-delà, il défile.
 constexpr float kTreeRows = 12.0F;
 // L'épaisseur des traits tracés par-dessus la vue, en pixels.
@@ -78,8 +84,10 @@ ImU32 ColorOf(MapEditorLineKind kind) {
       return kAxisZColor;
     case MapEditorLineKind::kActive:
     case MapEditorLineKind::kVertexSelected:
+    case MapEditorLineKind::kLightSelected:
       return kActiveColor;
     case MapEditorLineKind::kVertex:
+    case MapEditorLineKind::kLight:
       return kSelectionColor;
   }
   return kSelectionColor;
@@ -209,6 +217,11 @@ void DrawLines(const MapEditorView& view) {
                           ImVec2(line.from.x + half, line.from.y + half), ColorOf(line.kind));
       continue;
     }
+    if (line.kind == MapEditorLineKind::kLight || line.kind == MapEditorLineKind::kLightSelected) {
+      list->AddCircle(ImVec2(line.from.x, line.from.y), kLightMarkerPixels, ColorOf(line.kind), 0,
+                      kLineThicknessPixels);
+      continue;
+    }
     list->AddLine(ImVec2(line.from.x, line.from.y), ImVec2(line.to.x, line.to.y),
                   ColorOf(line.kind), kLineThicknessPixels);
   }
@@ -300,6 +313,67 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
   }
 }
 
+// LES LUMIÈRES PONCTUELLES : la liste, l'ajout, et la lumière désignée — ses
+// glissières, sa raison, son retrait.
+void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
+                std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  if (SkinButton(core::Tr("Ajouter une lumière"), art)) {
+    intents.emplace_back(map_editor::AddLight{});
+  }
+  for (std::size_t slot = 0; slot < view.lights.size(); ++slot) {
+    const MapEditorLight& light = view.lights[slot];
+    // Elle se reconnaît à sa position, en unités du RSW.
+    const std::string label =
+        std::format("{} {} — {:.1f} {:.1f} {:.1f}##lumiere{}", core::Tr("Lumière"), slot,
+                    light.position[0], light.position[1], light.position[2], slot);
+    const bool chosen = view.selected_light == slot;
+    if (ImGui::Selectable(label.c_str(), chosen)) {
+      intents.emplace_back(map_editor::SelectLight{chosen ? std::nullopt : std::optional(slot)});
+    }
+  }
+  if (!view.selected_light.has_value() || *view.selected_light >= view.lights.size()) {
+    return;
+  }
+  const std::size_t slot = *view.selected_light;
+  // Ses glissières portent les noms de celles du modèle : un autre espace d'ID.
+  ImGui::PushID("lumiere");
+  map_editor::SetLight set{.slot = slot, .light = view.lights[slot], .released = false};
+  bool changed = false;
+  bool released = false;
+  changed |= ImGui::DragFloat3(core::Tr("Position"), set.light.position.data(), kPositionStep, 0.0F,
+                               0.0F, "%.3f");
+  released |= ImGui::IsItemDeactivatedAfterEdit();
+  changed |= ImGui::DragFloat3(core::Tr("Couleur"), set.light.color.data(), kLightColorStep, 0.0F,
+                               0.0F, "%.2f");
+  released |= ImGui::IsItemDeactivatedAfterEdit();
+  changed |= ImGui::DragFloat(core::Tr("Portée"), &set.light.range, kLightRangeStep,
+                              kLightRangeStep, 0.0F, "%.1f");
+  released |= ImGui::IsItemDeactivatedAfterEdit();
+  const bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
+  if (panel.light_why_of != view.selected_light) {
+    panel.light_why.fill('\0');
+    const std::size_t kept = std::min(set.light.why.size(), panel.light_why.size() - 1);
+    std::copy_n(set.light.why.begin(), kept, panel.light_why.begin());
+    panel.light_why_of = view.selected_light;
+  }
+  static_cast<void>(
+      ImGui::InputText(core::Tr("Pourquoi"), panel.light_why.data(), panel.light_why.size()));
+  if (ImGui::IsItemDeactivatedAfterEdit()) {
+    set.light.why = std::string(panel.light_why.data(),
+                                strnlen(panel.light_why.data(), panel.light_why.size()));
+    changed = true;
+    released = true;
+  }
+  if (changed || released || toggled) {
+    set.released = released || toggled || !ImGui::IsAnyItemActive();
+    intents.emplace_back(std::move(set));
+  }
+  if (SkinButton(core::Tr("Retirer la lumière"), art)) {
+    intents.emplace_back(map_editor::RemoveLight{slot});
+  }
+  ImGui::PopID();
+}
+
 }  // namespace
 
 void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
@@ -353,6 +427,9 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
 
   if (ImGui::CollapsingHeader(core::Tr("Bibliothèque"))) {
     DrawLibrary(view, panel, intents, art);
+  }
+  if (ImGui::CollapsingHeader(core::Tr("Lumières"))) {
+    DrawLights(view, panel, intents, art);
   }
 
   ImGui::Separator();
