@@ -10,6 +10,7 @@
 #include "ro/render/camera.h"
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
+#include "ro/render/point_lights.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/sun_shadow_map.h"
 
@@ -40,9 +41,13 @@ class ActorModelRenderer {
   //
   // `daylight` est ce que l'heure laisse de la lumière de midi : voir
   // `SceneLight::daylight`.
+  //
+  // `points` S'AJOUTENT à ce facteur, lues point par point comme sur le décor :
+  // un modèle est un volume. Voir `kPointLightFragmentGlsl`.
   void Draw(const Camera& camera, std::span<const DrawnActorModel> models, float aspect_ratio,
             const SceneFog& fog = SceneFog(), const SunShadowView& sun = SunShadowView(),
-            const glm::vec3& daylight = glm::vec3(1.0F));
+            const glm::vec3& daylight = glm::vec3(1.0F),
+            const PointLightSet& points = PointLightSet());
 
   // LES MODÈLES DANS LA CARTE D'OMBRE : leur seule profondeur, vue du soleil.
   void DrawDepth(const glm::mat4& light_view_projection, std::span<const DrawnActorModel> models);

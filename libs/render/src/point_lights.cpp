@@ -1,6 +1,7 @@
 #include "ro/render/point_lights.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <vector>
 
 namespace ro::render {
@@ -34,6 +35,22 @@ PointLightSet NearestPointLights(std::span<const PointLight> lights, glm::vec3 e
     set.lights[rank] = *shining[rank];
   }
   return set;
+}
+
+glm::vec3 PointLightingAt(const PointLightSet& set, glm::vec3 world_position) {
+  glm::vec3 sum(0.0F);
+  const std::size_t count = std::min(set.count, kMaxPointLights);
+  for (std::size_t rank = 0; rank < count; ++rank) {
+    const PointLight& light = set.lights[rank];
+    if (!Shines(light)) {
+      continue;
+    }
+    const float remaining =
+        std::clamp(1.0F - (glm::distance(world_position, light.world_position) / light.range_world),
+                   0.0F, 1.0F);
+    sum += light.color * remaining * remaining;
+  }
+  return sum;
 }
 
 }  // namespace ro::render

@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 
 #include "ro/render/fog_shader.h"
+#include "ro/render/point_light_shader.h"
 #include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
@@ -29,6 +30,7 @@ out float v_fog_kept;
 void main() {
     v_texture_uv = a_texture_uv;
     v_color = a_color;
+    v_world_position = a_position;
     gl_Position = u_view_projection * vec4(a_position, 1.0);
     v_fog_kept = FogKeptPart(gl_Position.w);
     // Les sommets ne portent pas de normale : le décalage se fait vers le ciel.
@@ -58,7 +60,10 @@ void main() {
     if (color.a < u_alpha_reference) {
         discard;
     }
-    color.rgb *= mix(u_sun_shade, vec3(1.0), SunVisibility()) * u_daylight;
+    // LA LUMIÈRE PONCTUELLE S'AJOUTE AU FACTEUR DU JOUR : ni la nuit ni l'ombre
+    // du soleil ne l'assombrissent.
+    color.rgb *= mix(u_sun_shade, vec3(1.0), SunVisibility()) * u_daylight +
+                 PointLighting(v_world_position);
     frag_color = vec4(Fogged(color.rgb, v_fog_kept), color.a);
 }
 )GLSL";
@@ -115,8 +120,11 @@ void ActorModelRenderer::Release() noexcept {
 
 core::Result<ActorModelRenderer> ActorModelRenderer::Create() {
   auto program = GlProgram::Link(
-      WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
-      WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl));
+      WithPointLights(WithFog(WithSunShadow(kVertexShader, kSunShadowVertexGlsl), kFogVertexGlsl),
+                      kPointLightVertexGlsl),
+      WithPointLights(
+          WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl),
+          kPointLightFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -164,7 +172,7 @@ const GlTexture* ActorModelRenderer::TextureFor(const ActorModelTexture& texture
 
 void ActorModelRenderer::Draw(const Camera& camera, std::span<const DrawnActorModel> models,
                               float aspect_ratio, const SceneFog& fog, const SunShadowView& sun,
-                              const glm::vec3& daylight) {
+                              const glm::vec3& daylight, const PointLightSet& points) {
   if (models.empty()) {
     return;
   }
@@ -182,6 +190,7 @@ void ActorModelRenderer::Draw(const Camera& camera, std::span<const DrawnActorMo
   SetSunShadowUniforms(program_, sun, SunShadowLayer::kWorld);
   program_.SetVector3("u_sun_shade", sun.sprite_shade);
   program_.SetVector3("u_daylight", daylight);
+  SetPointLightUniforms(program_, points);
   DrawMeshes(models);
   glDisable(GL_BLEND);
 }
@@ -203,6 +212,7 @@ void ActorModelRenderer::DrawDepth(const glm::mat4& light_view_projection,
   SetSunShadowUniforms(program_, SunShadowView());
   program_.SetVector3("u_sun_shade", glm::vec3(1.0F));
   program_.SetVector3("u_daylight", glm::vec3(1.0F));
+  SetPointLightUniforms(program_, PointLightSet());
   DrawMeshes(models);
 }
 

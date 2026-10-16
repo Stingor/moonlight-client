@@ -37,4 +37,10 @@ struct PointLightSet {
 // elle ne prend pas de place.
 [[nodiscard]] PointLightSet NearestPointLights(std::span<const PointLight> lights, glm::vec3 eye);
 
+// LA LUMIÈRE QUE `set` DÉPOSE EN `world_position` : la somme, par source, de sa
+// couleur atténuée par le carré de ce qui reste de sa portée. C'est la règle de
+// `PointLighting` dans `kPointLightFragmentGlsl`, évaluée une fois pour un point
+// entier — les pieds d'un acteur plat. Une source sans portée n'éclaire rien.
+[[nodiscard]] glm::vec3 PointLightingAt(const PointLightSet& set, glm::vec3 world_position);
+
 }  // namespace ro::render

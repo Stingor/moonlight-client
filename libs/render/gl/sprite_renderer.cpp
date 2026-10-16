@@ -27,8 +27,10 @@ std::array<std::uint8_t, 4> Tinted(const std::array<std::uint8_t, 4>& layer,
   return product;
 }
 
-// Aucun éclairage : un sprite RO porte déjà ses ombres dans ses pixels, et lui
-// appliquer la lumière de la carte le noircirait deux fois.
+// Aucun éclairage de la carte : un sprite RO porte déjà ses ombres dans ses
+// pixels, et lui appliquer la lumière de la carte le noircirait deux fois. Les
+// lumières ponctuelles, elles, s'ajoutent : lues aux pieds de l'acteur, elles
+// arrivent par sommet, déjà sommées.
 constexpr std::string_view kVertexShader = R"GLSL(
 #version 330 core
 layout(location = 0) in vec3 a_position;
@@ -44,6 +46,9 @@ layout(location = 6) in vec3 a_sun_anchor;
 // Le même sommet sur le panneau d'ombre de l'acteur : voir
 // `kSunShadowSpriteFragmentGlsl`.
 layout(location = 7) in vec3 a_sun_panel;
+// LA LUMIÈRE PONCTUELLE AUX PIEDS DE L'ACTEUR, la même pour tout son sprite ;
+// zéro pour une ombre ronde.
+layout(location = 8) in vec3 a_point_light;
 
 uniform mat4 u_view_projection;
 // Ce que la profondeur normalisée gagne par unité d'inverse de distance : le
@@ -58,6 +63,7 @@ out float v_sun_visibility;
 out vec3 v_sun_panel;
 // La hauteur sous laquelle le panneau d'ombre ne se lit pas : celle des pieds.
 out float v_sun_floor;
+out vec3 v_point_light;
 
 // Les pieds se lisent un peu au-dessus du sol : à sa hauteur exacte, le sol
 // s'ombrerait lui-même.
@@ -83,6 +89,7 @@ void main() {
     v_sun_visibility = SunVisibilityAround(a_sun_anchor + vec3(0.0, kSunAnchorLift, 0.0));
     v_sun_panel = a_sun_panel;
     v_sun_floor = a_sun_anchor.y + kSunAnchorLift;
+    v_point_light = a_point_light;
 }
 )GLSL";
 
@@ -94,6 +101,7 @@ in float v_fog_kept;
 in float v_sun_visibility;
 in vec3 v_sun_panel;
 in float v_sun_floor;
+in vec3 v_point_light;
 
 uniform sampler2D u_texture;
 uniform float u_alpha_floor;
@@ -120,7 +128,9 @@ void main() {
     // terrain le masquerait, et l'acteur s'ombrerait lui-même.
     vec3 sun_panel = vec3(v_sun_panel.x, max(v_sun_panel.y, v_sun_floor), v_sun_panel.z);
     float sun_visibility = v_sun_visibility * ActorVisibilityAt(sun_panel);
-    texel.rgb *= mix(u_sun_shade, vec3(1.0), sun_visibility) * u_daylight;
+    // LA LUMIÈRE PONCTUELLE S'AJOUTE AU FACTEUR DU JOUR : ni la nuit ni l'ombre
+    // du soleil ne l'assombrissent.
+    texel.rgb *= mix(u_sun_shade, vec3(1.0), sun_visibility) * u_daylight + v_point_light;
     frag_color = vec4(Fogged(texel.rgb, v_fog_kept), texel.a);
 }
 )GLSL";
@@ -157,6 +167,8 @@ constexpr std::size_t kVerticesPerQuad = 6;
 constexpr GLuint kSunAnchorAttribute = 6;
 // Celui du sommet sur le panneau d'ombre, voir `a_sun_panel`.
 constexpr GLuint kSunPanelAttribute = 7;
+// Celui de la lumière ponctuelle aux pieds, voir `a_point_light`.
+constexpr GLuint kPointLightAttribute = 8;
 
 // Le carré de la distance entre deux points.
 //
@@ -182,6 +194,7 @@ struct SpriteRenderer::SpriteVertex {
   float depth_bias;
   glm::vec3 sun_anchor;
   glm::vec3 sun_panel;
+  glm::vec3 point_light;
 };
 
 // Un quad prêt à dessiner : sa géométrie, et la texture à lui lier.
@@ -198,6 +211,8 @@ struct SpriteRenderer::PreparedQuad {
   // Les coins sur le panneau d'ombre de l'acteur : ceux de `corners` pour une
   // silhouette, ceux où le sprite dessiné lit l'ombre des autres sinon.
   std::array<glm::vec3, 4> panel_corners{};
+  // La lumière ponctuelle reçue aux pieds de l'acteur ; zéro pour son ombre.
+  glm::vec3 point_light{0.0F};
 };
 
 SpriteRenderer::SpriteRenderer() = default;
@@ -285,6 +300,9 @@ core::Result<SpriteRenderer> SpriteRenderer::Create() {
   glEnableVertexAttribArray(kSunPanelAttribute);
   glVertexAttribPointer(kSunPanelAttribute, 3, GL_FLOAT, GL_FALSE, stride,
                         reinterpret_cast<void*>(offsetof(SpriteVertex, sun_panel)));
+  glEnableVertexAttribArray(kPointLightAttribute);
+  glVertexAttribPointer(kPointLightAttribute, 3, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(offsetof(SpriteVertex, point_light)));
   glBindVertexArray(0);
   return renderer;
 }
@@ -316,7 +334,7 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
                           float aspect_ratio, Blending blending, DepthWrite depth_write,
                           DepthTest depth_test, const SceneFog& fog, DrawOrder order,
                           BodySilhouette silhouette, const SunShadowView& sun,
-                          const glm::vec3& daylight) {
+                          const glm::vec3& daylight, const PointLightSet& points) {
   if (actors.empty()) {
     return;
   }
@@ -352,7 +370,8 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
   // passe de profondeur a dressé.
   const bool sun_read = sun.map != nullptr && sun.map->valid() && sun.strength > 0.0F;
   const BillboardBasis panel_basis = ShadowPanelBasis(sun.toward_sun, basis);
-  PrepareQuads(camera, basis, blending, /*silhouettes=*/false, sun_read ? &panel_basis : nullptr);
+  PrepareQuads(camera, basis, blending, /*silhouettes=*/false, sun_read ? &panel_basis : nullptr,
+               points.count > 0 ? &points : nullptr);
   if (prepared_.empty()) {
     return;
   }
@@ -475,7 +494,7 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
 
 void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& basis,
                                   Blending blending, bool silhouettes,
-                                  const BillboardBasis* panel_basis) {
+                                  const BillboardBasis* panel_basis, const PointLightSet* points) {
   prepared_.clear();
   // LA HAUTEUR DE LA VUE EN PIXELS, que seul un élargissement en pixels d'écran
   // consulte.
@@ -490,6 +509,14 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
     LayerDrawsOf(composed, layered ? drawn.shown_parts : kAllActorParts,
                  layered ? drawn.additive_parts : ActorPartSet{0}, layered && drawn.doubles_weapon,
                  layer_draws_);
+    // L'OMBRE SE POSE AU SOL : son porteur peut être soulevé, elle non.
+    const glm::vec3 on_ground(drawn.ground_position.x,
+                              drawn.shadow_ground_height.value_or(drawn.ground_position.y),
+                              drawn.ground_position.z);
+    // LA LUMIÈRE PONCTUELLE SE LIT UNE FOIS PAR ACTEUR, à ses pieds posés au
+    // sol — là où il lit aussi l'ombre du soleil. Son ombre n'en reçoit rien.
+    const glm::vec3 point_light =
+        layered && points != nullptr ? PointLightingAt(*points, on_ground) : glm::vec3(0.0F);
     for (const LayerDraw& layer : layer_draws_) {
       const std::size_t index = layer.quad;
       const SpriteQuad& quad = composed.quads[index];
@@ -551,11 +578,8 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
             scaled, drawn.grow_screen_pixels *
                         SpritePixelsPerScreenPixel(camera, drawn.ground_position, viewport_height));
       }
-      // L'OMBRE SE POSE AU SOL et garde la couleur de son calque : ni la teinte
-      // ni la transparence de son porteur ne la touchent.
-      const glm::vec3 on_ground(drawn.ground_position.x,
-                                drawn.shadow_ground_height.value_or(drawn.ground_position.y),
-                                drawn.ground_position.z);
+      // L'OMBRE garde la couleur de son calque : ni la teinte ni la
+      // transparence de son porteur ne la touchent.
       const glm::vec3 anchor = layered ? drawn.ground_position : on_ground;
       const std::array<glm::vec3, 4> corners = BillboardCorners(scaled, anchor, basis);
       const std::array<glm::vec3, 4> panel_corners =
@@ -574,7 +598,8 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
                        blending == Blending::kAdditive || layer.additive,
                        drawn.depth_bias,
                        on_ground,
-                       panel_corners});
+                       panel_corners,
+                       point_light});
     }
   };
   for (const DrawnActor* drawn : ordered_) {
@@ -628,7 +653,8 @@ void SpriteRenderer::UploadPrepared() {
     for (const std::size_t corner : kOrder) {
       vertices_.push_back(SpriteVertex{quad.corners[corner], quad.texture_uv[corner], quad.tint,
                                        quad.depth_corners[corner], quad.fogged, quad.depth_bias,
-                                       quad.sun_anchor, quad.panel_corners[corner]});
+                                       quad.sun_anchor, quad.panel_corners[corner],
+                                       quad.point_light});
     }
   }
 

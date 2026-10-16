@@ -289,9 +289,10 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   using Silhouette = ro::render::SpriteRenderer::BodySilhouette;
   // `shaded` : ce qui se tient au sol, que l'ombre du soleil assombrit et que
   // l'heure du ciel baisse. ⚠ L'HEURE SEULEMENT QUAND LE CIEL EN A UNE : la nuit
-  // du serveur, elle, n'assombrit pas les corps, comme dans le jeu.
+  // du serveur, elle, n'assombrit pas les corps, comme dans le jeu. Les lumières
+  // ponctuelles n'éclairent qu'eux aussi : ni halos, ni effets, ni nombres.
   const glm::vec3 body_daylight = sky.body_shown ? sky.light.daylight : glm::vec3(1.0F);
-  const auto paint = [this, &fog, &sun, &body_daylight](
+  const auto paint = [this, &fog, &sun, &body_daylight, &points](
                          std::span<const ro::render::DrawnActor> actors_to_draw,
                          ro::render::SpriteRenderer::DepthWrite depth,
                          ro::render::SpriteRenderer::BodySilhouette silhouette =
@@ -302,7 +303,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
           camera_, actors_to_draw, aspect_ratio_, ro::render::SpriteRenderer::Blending::kOver,
           depth, ro::render::SpriteRenderer::DepthTest::kOn, fog,
           ro::render::SpriteRenderer::DrawOrder::kFarthestFirst, silhouette,
-          shaded ? sun : ro::render::SunShadowView(), shaded ? body_daylight : glm::vec3(1.0F));
+          shaded ? sun : ro::render::SunShadowView(), shaded ? body_daylight : glm::vec3(1.0F),
+          shaded ? points : ro::render::PointLightSet());
     }
   };
   // LES EFFETS QUI PASSENT DERRIÈRE LES CORPS, avant tout le reste.
@@ -330,7 +332,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (link_.is_open() && pieces_.actor_models.has_value() &&
       pieces_.actor_model_renderer.has_value()) {
     pieces_.actor_model_renderer->Draw(camera_, pieces_.actor_models->drawn(), aspect_ratio_, fog,
-                                       sun, sky.light.daylight);
+                                       sun, sky.light.daylight, points);
   }
   // LES CORPS ET LEURS OMBRES laissent leur silhouette, que l'eau plonge et que
   // les halos évitent.

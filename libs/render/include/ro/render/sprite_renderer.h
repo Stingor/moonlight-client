@@ -15,6 +15,7 @@
 #include "ro/render/camera.h"
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
+#include "ro/render/point_lights.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/sprite_billboard.h"
 #include "ro/render/sun_shadow_map.h"
@@ -272,13 +273,17 @@ class SpriteRenderer {
   //
   // `daylight` multiplie leur couleur : ce que l'heure du ciel laisse de la
   // lumière de midi — voir `SceneLight::daylight`. Un sans ciel à l'heure.
+  //
+  // `points` S'AJOUTENT à ce facteur, lues aux PIEDS de chaque acteur et non
+  // pixel par pixel : un sprite est un panneau plat, qu'une torche éclaire d'un
+  // seul tenant. Son ombre ronde n'en reçoit rien. Voir `PointLightingAt`.
   void Draw(const Camera& camera, std::span<const DrawnActor> actors, float aspect_ratio,
             Blending blending = Blending::kOver, DepthWrite depth_write = DepthWrite::kOff,
             DepthTest depth_test = DepthTest::kOn, const SceneFog& fog = SceneFog(),
             DrawOrder order = DrawOrder::kFarthestFirst,
             BodySilhouette silhouette = BodySilhouette::kIgnored,
-            const SunShadowView& sun = SunShadowView(),
-            const glm::vec3& daylight = glm::vec3(1.0F));
+            const SunShadowView& sun = SunShadowView(), const glm::vec3& daylight = glm::vec3(1.0F),
+            const PointLightSet& points = PointLightSet());
 
   // LES SILHOUETTES DANS LA CARTE D'OMBRE : la seule profondeur des calques
   // opaques, sur un panneau debout parallèle à l'écran — voir
@@ -315,8 +320,10 @@ class SpriteRenderer {
   // additif, et la profondeur prise sur le panneau lui-même.
   // `panel_basis`, quand une ombre se lit, pose aussi chaque quad dessiné sur
   // le panneau d'ombre de son acteur.
+  // `points`, quand il y en a, éclairent chaque acteur à ses pieds.
   void PrepareQuads(const Camera& camera, const BillboardBasis& basis, Blending blending,
-                    bool silhouettes, const BillboardBasis* panel_basis = nullptr);
+                    bool silhouettes, const BillboardBasis* panel_basis = nullptr,
+                    const PointLightSet* points = nullptr);
   // Glisse sous les pieds le panneau d'ombre des `quads` d'un acteur ancré à
   // la hauteur `anchor_height` : voir `ShadowFootShift`. Des `silhouettes` se
   // déplacent avec lui.
