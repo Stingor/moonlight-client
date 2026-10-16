@@ -286,13 +286,18 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
 // champ se quitte.
 void DrawWhy(const MapEditorView& view, MapEditorPanelState& panel,
              std::vector<MapEditorIntent>& intents) {
-  if (panel.why_of != view.selected) {
+  // LA SAISIE SE RECHARGE quand le modèle change, ou quand le document change la
+  // raison sous un champ qu'on ne tape pas : une annulation, l'outil Sommets
+  // qui montre celle du maillage.
+  const std::string_view typed(panel.why.data(), strnlen(panel.why.data(), panel.why.size()));
+  if (panel.why_of != view.selected || (!panel.why_typing && typed != view.why)) {
     panel.why.fill('\0');
     const std::size_t kept = std::min(view.why.size(), panel.why.size() - 1);
     std::copy_n(view.why.begin(), kept, panel.why.begin());
     panel.why_of = view.selected;
   }
   static_cast<void>(ImGui::InputText(core::Tr("Pourquoi"), panel.why.data(), panel.why.size()));
+  panel.why_typing = ImGui::IsItemActive();
   if (ImGui::IsItemDeactivatedAfterEdit()) {
     intents.emplace_back(map_editor::SetWhy{
         std::string(panel.why.data(), strnlen(panel.why.data(), panel.why.size()))});
