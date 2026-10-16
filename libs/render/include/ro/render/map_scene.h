@@ -12,9 +12,9 @@
 #include "ro/formats/gnd.h"
 #include "ro/formats/image.h"
 #include "ro/formats/rsw.h"
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/lightmap_atlas.h"
 #include "ro/render/map_effect_table.h"
-#include "ro/render/map_fix.h"
 #include "ro/render/map_fog.h"
 #include "ro/render/map_smoke.h"
 #include "ro/render/model_mesh.h"
@@ -153,20 +153,26 @@ struct MapSceneOptions {
   // ⚠ C'EST AU CHARGEMENT, parce que le maillage du terrain se bâtit sur les
   // hauteurs. Changer d'avis demande de relire la carte.
   bool flatten_relief = false;
-  // LES RETOUCHES À POSER au lieu de celles de l'installation — voir
-  // `LoadMapFixes`. Un banc ou un outil y met celles d'une table qu'il éprouve.
-  std::optional<MapFixes> fixes;
+  // L'ÉDITION À POSER au lieu de celle de l'installation — voir `LoadMapEdit`.
+  // L'éditeur y met le document qu'il tient ; un banc ou un outil, celui qu'il
+  // éprouve.
+  std::optional<mapedit::MapEdit> edit;
 };
 
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                                   const MapSceneOptions& options = {});
 
-// REPOSE LE DÉCOR DE `scene` SELON `fixes`, sans relire la carte : les modèles
+// L'ÉDITION DE `map_name` dans l'installation : voir docs/adr/0118. Une carte
+// sans document n'en a aucune ; un document illisible n'en donne aucune, et le
+// journal le dit.
+[[nodiscard]] mapedit::MapEdit LoadMapEdit(vfs::Vfs& vfs, std::string_view map_name);
+
+// REPOSE LE DÉCOR DE `scene` SELON `edit`, sans relire la carte : les modèles
 // reprennent leur placement d'origine, les retouches se posent, et les poses se
-// recalculent sur les maillages déjà chargés. C'est ce qui rend la retouche en
+// recalculent sur les maillages déjà chargés. C'est ce qui rend l'édition en
 // direct immédiate. Un modèle que la carte n'a pas pu lire ne revient pas.
 //
 // À téléverser ensuite au renderer, comme au chargement.
-MapFixReport ReplaceSceneModels(MapScene& scene, const MapFixes& fixes);
+mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdit& edit);
 
 }  // namespace ro::render

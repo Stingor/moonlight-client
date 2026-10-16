@@ -36,6 +36,7 @@
 #include "world/actor_view.h"
 #include "world/click_action.h"
 #include "world/entity_menu.h"
+#include "world/map_editor_session.h"
 #include "world/map_stage.h"
 #include "world/quick_cast.h"
 #include "world/targeting.h"
@@ -182,9 +183,9 @@ struct EventRouting {
   // visite. Éteint, il faut un double-clic. Voir `ShopOptions`.
   bool shop_one_click = true;
   EffectBenchPanel* bench = nullptr;
-  // LA RETOUCHE DE CARTE QUI ATTEND SON MODÈLE : armée, elle prend le clic
-  // suivant dans le monde. Nulle sans le droit de l'établi.
-  ro::ui::StaffMapFixEditor* map_fix = nullptr;
+  // LE MODE ÉDITEUR DE CARTE, quand il est ouvert : un clic dans le monde y
+  // désigne un modèle, et Échap en sort. Nul sinon, ou sans le droit.
+  MapEditorSession* map_editor = nullptr;
   // Où part une ligne validée. Le routage ne l'envoie pas lui-même : c'est la
   // même séparation qu'entre `HandleKey` et la boucle.
   const ChatDispatch* chat_dispatch = nullptr;

@@ -19,6 +19,8 @@
 #include "ro/sim/world_fwd.h"
 #include "ro/vfs/vfs.h"
 
+#include "world/map_edit_store.h"
+
 namespace moonclient {
 
 // La carte en cours, avec tout ce que le jeu lui demande.
@@ -66,11 +68,11 @@ struct MapStage {
 // DÉRIVE AVANT, du relief d'origine : c'est celle du serveur, et un sol aplati
 // sous le niveau d'eau changerait sinon des cellules en eau.
 //
-// `fixes`, quand il est donné, pose ses retouches au lieu de celles de
-// l'installation : c'est la table que l'établi tient.
-[[nodiscard]] ro::core::Result<MapStage> LoadMapStage(
-    ro::vfs::Vfs& vfs, std::string_view map_name, bool flatten_relief = false,
-    const ro::render::MapFixTable* fixes = nullptr);
+// `edits`, quand il est donné, pose le document qu'il tient pour cette carte,
+// lu à sa première entrée, au lieu de celui de l'installation.
+[[nodiscard]] ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
+                                                      bool flatten_relief = false,
+                                                      MapEditStore* edits = nullptr);
 
 // Où se pose un acteur, en coordonnées du monde.
 //
@@ -154,8 +156,8 @@ struct MapArrival {
   std::string* attempted = nullptr;
   // Le relief aplati de GreyWorld : voir `LoadMapStage`.
   bool flatten_relief = false;
-  // La table de retouches que l'établi tient : voir `LoadMapStage`.
-  const ro::render::MapFixTable* map_fixes = nullptr;
+  // Les documents d'édition que le jeu tient : voir `LoadMapStage`.
+  MapEditStore* map_edits = nullptr;
 };
 
 // Charge la carte que le monde annonce, la téléverse, et vise sa grille.

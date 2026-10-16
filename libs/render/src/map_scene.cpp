@@ -13,9 +13,9 @@
 #include "ro/formats/rsm.h"
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effects.h"
-#include "ro/render/map_fix.h"
 #include "ro/render/map_sky.h"
 #include "ro/render/map_weather.h"
+#include "ro/vfs/encoding.h"
 
 namespace ro::render {
 
@@ -180,6 +180,10 @@ std::vector<ModelInstances> LoadSceneModels(vfs::Vfs& vfs, const formats::RswSce
   return models;
 }
 
+// Le nom en UTF-8 d'un fichier que le RSW cite en CP949 : ce que l'édition
+// compare à celui qu'elle désigne.
+std::string CitedFileName(std::string_view raw) { return vfs::Cp949ToUtf8Lossy(raw); }
+
 // Pose les modèles du RSW de `scene` sur les maillages chargés : une pose par
 // modèle, sauf les masqués, ceux dont le fichier manque et ceux posés hors de
 // la carte. Les poses d'avant s'effacent, et les compteurs se refont.
@@ -223,12 +227,26 @@ void PlaceSceneInstances(MapScene& scene) {
 
 }  // namespace
 
-MapFixReport ReplaceSceneModels(MapScene& scene, const MapFixes& fixes) {
+mapedit::MapEdit LoadMapEdit(vfs::Vfs& vfs, std::string_view map_name) {
+  auto bytes = vfs.Read(mapedit::MapEditPath(map_name));
+  if (!bytes) {
+    return {};
+  }
+  auto edit = mapedit::ParseMapEdit(
+      std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()), map_name);
+  if (!edit) {
+    core::LogWarning("{} — {} s'ouvre sans édition", core::Describe(edit.error()), map_name);
+    return {};
+  }
+  return std::move(*edit);
+}
+
+mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdit& edit) {
   for (std::size_t rank = 0; rank < scene.unfixed_models.size(); ++rank) {
     const formats::RswModel& original = scene.unfixed_models[rank];
     scene.rsw.PlaceModel(rank, original.position, original.rotation, original.scale);
   }
-  MapFixReport report = ApplyMapFixes(fixes, scene.rsw);
+  mapedit::MapEditReport report = mapedit::ApplyMapEdit(edit, scene.rsw, &CitedFileName);
   scene.hidden_models = report.hidden;
   PlaceSceneInstances(scene);
   return report;
@@ -254,15 +272,15 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
     return std::unexpected(rsw.error());
   }
   // LES RETOUCHES DU STAFF, sur les données lues et avant tout le reste : voir
-  // map_fix.h. Le placement d'origine se garde pour l'établi.
+  // docs/adr/0118. Le placement d'origine se garde pour l'éditeur.
   std::vector<formats::RswModel> unfixed_models = rsw->models();
-  const MapFixReport fixed =
-      ApplyMapFixes(options.fixes.has_value() ? *options.fixes : LoadMapFixes(vfs, map_name), *rsw);
+  const mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(
+      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name), *rsw, &CitedFileName);
   for (const std::string& refusal : fixed.refused) {
-    core::LogWarning("retouche de {} refusée — {}", map_name, refusal);
+    core::LogWarning("édition de {} refusée — {}", map_name, refusal);
   }
   if (fixed.applied > 0) {
-    core::LogInfo("{} : {} retouche(s) du staff posée(s)", map_name, fixed.applied);
+    core::LogInfo("{} : {} opération(s) d'édition posée(s)", map_name, fixed.applied);
   }
 
   // ReadRaw : `ground_file` vient du RSW, donc c'est déjà du CP949.

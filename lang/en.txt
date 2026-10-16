@@ -18619,29 +18619,11 @@ tr: Element:
 fr: Étourdissement
 tr: Stun
 
-fr: Aucun modèle désigné.
-tr: No model selected.
-
 fr: Aucun modèle sous le clic.
 tr: No model under the click.
 
 fr: Chaque retouche vérifie le rang, le fichier et la position d'origine du modèle : une carte changée par un patch n'est pas retouchée de travers.
 tr: Each fix checks the model's rank, file and original position: a map changed by a patch is never fixed the wrong way.
-
-fr: Cliquez sur un modèle…
-tr: Click a model…
-
-fr: Désigne un modèle du décor d'un clic, puis règle sa position, sa rotation et son échelle : le décor se repose aussitôt. Une case le masque.
-tr: Select a scenery model with a click, then adjust its position, rotation and scale: the scenery is rebuilt at once. A checkbox hides it.
-
-fr: Désigner d'un clic
-tr: Select with a click
-
-fr: Enregistrer les retouches
-tr: Save the fixes
-
-fr: La retouche du rang %zu n'a pas de raison.
-tr: The fix of rank %zu has no reason.
 
 fr: Masquer
 tr: Hide
@@ -18652,23 +18634,56 @@ tr: Origin
 fr: Pourquoi
 tr: Why
 
-fr: Retouches de carte
-tr: Map fixes
-
-fr: Retouches enregistrées.
-tr: Fixes saved.
-
 fr: Rotation (°)
 tr: Rotation (°)
 
 fr: Rétablir le modèle
 tr: Restore the model
 
-fr: « Enregistrer » écrit data/yaml_files/map_fix.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
-tr: “Save” writes data/yaml_files/map_fix.yml in the client folder. Visuals only: walking stays the server's.
-
-fr: « Pourquoi » est obligatoire : la table refuse une retouche sans raison.
-tr: “Why” is required: the table refuses a fix without a reason.
-
 fr: Échelle
 tr: Scale
+
+fr: Aucune.
+tr: None.
+
+fr: Cliquez sur un modèle du décor pour le désigner.
+tr: Click a scenery model to select it.
+
+fr: Enregistré.
+tr: Saved.
+
+fr: La retouche du modèle %zu n'a pas de raison.
+tr: The fix of model %zu has no reason.
+
+fr: Modèle désigné
+tr: Selected model
+
+fr: Ouvrir l'éditeur de carte
+tr: Open the map editor
+
+fr: Placer le modèle %zu
+tr: Place model %zu
+
+fr: Quitter l'éditeur
+tr: Leave the editor
+
+fr: Raison du modèle %zu
+tr: Reason for model %zu
+
+fr: Retouches de cette carte
+tr: Fixes on this map
+
+fr: Rétablir le modèle %zu
+tr: Restore model %zu
+
+fr: Un clic dans le monde désigne le modèle du décor sous la souris : la plus petite boîte traversée gagne. Ses retouches se redésignent aussi depuis la liste.
+tr: A click in the world selects the scenery model under the mouse: the smallest box crossed wins. Its fixes can also be selected again from the list.
+
+fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
+tr: “Save” writes data/map_edits/<map>.yml in the client folder. Visuals only: walking stays the server's.
+
+fr: « Pourquoi » est obligatoire : le document refuse une retouche sans raison.
+tr: “Why” is required: the document refuses a fix without a reason.
+
+fr: Éditeur de carte
+tr: Map editor

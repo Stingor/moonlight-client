@@ -18619,29 +18619,11 @@ tr: Elemento:
 fr: Étourdissement
 tr: Aturdimiento
 
-fr: Aucun modèle désigné.
-tr: Ningún modelo designado.
-
 fr: Aucun modèle sous le clic.
 tr: Ningún modelo bajo el clic.
 
 fr: Chaque retouche vérifie le rang, le fichier et la position d'origine du modèle : une carte changée par un patch n'est pas retouchée de travers.
 tr: Cada retoque comprueba el rango, el archivo y la posición original del modelo: un mapa cambiado por un parche no se retoca mal.
-
-fr: Cliquez sur un modèle…
-tr: Haz clic en un modelo…
-
-fr: Désigne un modèle du décor d'un clic, puis règle sa position, sa rotation et son échelle : le décor se repose aussitôt. Une case le masque.
-tr: Designa un modelo del decorado con un clic y ajusta su posición, rotación y escala: el decorado se recoloca al instante. Una casilla lo oculta.
-
-fr: Désigner d'un clic
-tr: Designar con un clic
-
-fr: Enregistrer les retouches
-tr: Guardar los retoques
-
-fr: La retouche du rang %zu n'a pas de raison.
-tr: El retoque del rango %zu no tiene motivo.
 
 fr: Masquer
 tr: Ocultar
@@ -18652,23 +18634,56 @@ tr: Origen
 fr: Pourquoi
 tr: Motivo
 
-fr: Retouches de carte
-tr: Retoques de mapa
-
-fr: Retouches enregistrées.
-tr: Retoques guardados.
-
 fr: Rotation (°)
 tr: Rotación (°)
 
 fr: Rétablir le modèle
 tr: Restablecer el modelo
 
-fr: « Enregistrer » écrit data/yaml_files/map_fix.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
-tr: «Guardar» escribe data/yaml_files/map_fix.yml en la carpeta del cliente. Solo lo visual: el paso sigue siendo el del servidor.
-
-fr: « Pourquoi » est obligatoire : la table refuse une retouche sans raison.
-tr: «Motivo» es obligatorio: la tabla rechaza un retoque sin motivo.
-
 fr: Échelle
 tr: Escala
+
+fr: Aucune.
+tr: Ninguno.
+
+fr: Cliquez sur un modèle du décor pour le désigner.
+tr: Haz clic en un modelo del decorado para designarlo.
+
+fr: Enregistré.
+tr: Guardado.
+
+fr: La retouche du modèle %zu n'a pas de raison.
+tr: El retoque del modelo %zu no tiene motivo.
+
+fr: Modèle désigné
+tr: Modelo designado
+
+fr: Ouvrir l'éditeur de carte
+tr: Abrir el editor de mapas
+
+fr: Placer le modèle %zu
+tr: Colocar el modelo %zu
+
+fr: Quitter l'éditeur
+tr: Salir del editor
+
+fr: Raison du modèle %zu
+tr: Motivo del modelo %zu
+
+fr: Retouches de cette carte
+tr: Retoques de este mapa
+
+fr: Rétablir le modèle %zu
+tr: Restablecer el modelo %zu
+
+fr: Un clic dans le monde désigne le modèle du décor sous la souris : la plus petite boîte traversée gagne. Ses retouches se redésignent aussi depuis la liste.
+tr: Un clic en el mundo designa el modelo del decorado bajo el ratón: gana la caja más pequeña atravesada. Sus retoques también se designan desde la lista.
+
+fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
+tr: «Guardar» escribe data/map_edits/<mapa>.yml en la carpeta del cliente. Solo lo visual: el paso sigue siendo el del servidor.
+
+fr: « Pourquoi » est obligatoire : le document refuse une retouche sans raison.
+tr: «Motivo» es obligatorio: el documento rechaza un retoque sin motivo.
+
+fr: Éditeur de carte
+tr: Editor de mapas

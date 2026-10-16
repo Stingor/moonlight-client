@@ -118,7 +118,6 @@ add_library(ro_render STATIC
     src/map_effect_table.cpp
     src/map_effects.cpp
     src/map_emitter.cpp
-    src/map_fix.cpp
     src/map_fog.cpp
     src/map_scene.cpp
     src/map_smoke.cpp
@@ -583,7 +582,7 @@ find_package(yaml-cpp CONFIG REQUIRED)
 
 target_include_directories(ro_render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ro_render
-    PUBLIC ro_core ro_formats ro_vfs glm::glm
+    PUBLIC ro_core ro_formats ro_vfs ro_mapedit glm::glm
     PRIVATE freetype yaml-cpp::yaml-cpp ro_warnings)
 
 # ---------------------------------------------------------------------------

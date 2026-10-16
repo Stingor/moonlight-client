@@ -12,6 +12,7 @@
 #include "ro/core/i18n.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/sky_clock.h"
+#include "ro/ui/map_editor_panel.h"
 #include "ro/ui/quick_cast_look.h"
 #include "ro/ui/skin_art.h"
 
@@ -172,42 +173,6 @@ struct StaffSkyClock {
   [[nodiscard]] float HoursPerMinute() const noexcept;
 };
 
-// LA RETOUCHE D'UN MODÈLE DU DÉCOR, en direct : voir docs/adr/0117.
-//
-// L'établi règle ; c'est l'appelant qui pose la retouche dans sa table, repose
-// le décor et enregistre. ⚠ PAS DANS `look` : rien n'est retenu d'un lancement
-// à l'autre, sinon la table enregistrée.
-struct StaffMapFixEditor {
-  // La place réservée à la raison d'une retouche, zéro final compris.
-  static constexpr std::size_t kWhyCapacity = 256;
-
-  // Le prochain clic dans le monde désigne un modèle, au lieu d'agir.
-  bool picking = false;
-  // Le modèle désigné, par son rang dans le RSW de la carte.
-  std::optional<std::size_t> model_index;
-  // Ce que le staff règle, dans le repère du RSW.
-  std::array<float, 3> position{};
-  std::array<float, 3> rotation{};
-  std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
-  bool hidden = false;
-  std::array<char, kWhyCapacity> why{};
-  // Les gestes de l'image, que l'appelant consomme : rendre au modèle son
-  // placement d'origine, et écrire la table.
-  bool revert_asked = false;
-  bool save_asked = false;
-
-  // ── Posé par l'appelant avant le dessin ──
-  // Le fichier du modèle désigné, en UTF-8, et sa position d'origine.
-  std::string model_file;
-  std::array<float, 3> origin{};
-  // Les rangs que la table retouche sur cette carte.
-  std::vector<std::size_t> fixed_models;
-  // La table diffère du fichier enregistré.
-  bool unsaved = false;
-  // La dernière nouvelle : enregistré, refusé, et pourquoi.
-  std::string status;
-};
-
 // Ce que le joueur a réglé, et qui doit survivre d'une image à la suivante.
 struct StaffToolsState {
   bool open = false;
@@ -217,7 +182,12 @@ struct StaffToolsState {
   // remonte après, comme `look`.
   QuickCastLook quick_cast;
   StaffSkyClock sky;
-  StaffMapFixEditor map_fix;
+  // L'ÉDITEUR DE CARTE : sa vue, posée par l'appelant avant le dessin ; ce que
+  // le panneau garde de la saisie en cours ; et les intentions de l'image, que
+  // l'appelant consomme. Voir `DrawMapEditor`.
+  MapEditorView map_editor;
+  MapEditorPanelState map_editor_panel;
+  std::vector<MapEditorIntent> map_editor_intents;
   // LES BRUITAGES SONNENT-ILS ? Posé par l'appelant avant le dessin : l'établi
   // ne connaît pas l'audio.
   //

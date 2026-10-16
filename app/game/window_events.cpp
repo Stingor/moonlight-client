@@ -184,6 +184,11 @@ struct WindowPixels {
 }
 
 void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_input) {
+  // ÉCHAP FERME LE MODE ÉDITEUR, avant toute autre fenêtre.
+  if (to.map_editor != nullptr && key.key == SDLK_ESCAPE && !key.repeat) {
+    to.map_editor->Leave();
+    return;
+  }
   KeyPress press = KeyPressOf(to);
   press.text_input = text_input;
   const std::optional<std::string> said = HandleKey(press, key, FramedMapOf(to));
@@ -321,16 +326,15 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
                       window.width, window.height, to.now_ms)) {
     return;
   }
-  // LA RETOUCHE DE CARTE ARMÉE désigne le modèle sous le clic, et rien d'autre.
-  if (to.map_fix != nullptr && to.map_fix->picking && window.height > 0.0F) {
-    to.map_fix->picking = false;
-    const ro::render::ScreenRay ray =
-        ro::render::MakeScreenRay(*to.camera, window.width / window.height, pointer.x, pointer.y,
-                                  window.width, window.height);
-    to.map_fix->model_index = ro::render::PickSceneModel(to.stage->scene, ray);
-    to.map_fix->status = to.map_fix->model_index.has_value()
-                             ? std::string()
-                             : ro::core::Tr("Aucun modèle sous le clic.");
+  // LE MODE ÉDITEUR : un clic dans le monde y désigne le modèle sous la souris,
+  // et ne fait rien d'autre — ni marcher, ni viser.
+  if (to.map_editor != nullptr) {
+    if (window.height > 0.0F) {
+      const ro::render::ScreenRay ray =
+          ro::render::MakeScreenRay(*to.camera, window.width / window.height, pointer.x, pointer.y,
+                                    window.width, window.height);
+      to.map_editor->Pick(ro::render::PickSceneModel(to.stage->scene, ray));
+    }
     return;
   }
   if (!to.link->is_open() || to.chat_room_form_open) {

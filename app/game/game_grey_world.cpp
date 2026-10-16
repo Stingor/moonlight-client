@@ -35,7 +35,7 @@ ro::core::Result<void> Game::FollowGreyWorldRelief() {
                            .background = &background_,
                            .attempted = &attempted_map_,
                            .flatten_relief = wanted,
-                           .map_fixes = &map_fixes_};
+                           .map_edits = &map_edits_};
   const ro::core::Result<bool> reloaded = ReloadStageRelief(arrival);
   if (!reloaded) {
     return std::unexpected(reloaded.error());

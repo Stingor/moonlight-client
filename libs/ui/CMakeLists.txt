@@ -229,6 +229,7 @@ add_library(ro_ui STATIC
     src/party_grid.cpp
     src/party_grid_tile.cpp
     src/sound_zones.cpp
+    src/map_editor_panel.cpp
     src/staff_tools.cpp
     src/staff_skill_id.cpp
     src/unlock_notice.cpp
