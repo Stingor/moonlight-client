@@ -14,6 +14,7 @@
 #include "ro/net/actor_name.h"
 #include "ro/net/movement.h"
 #include "ro/render/actor_sprite.h"
+#include "ro/render/edited_map_effects.h"
 #include "ro/render/ground_cursor.h"
 #include "ro/render/ground_pick.h"
 #include "ro/render/map_point_lights.h"
@@ -161,6 +162,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   }
   // LE CIEL DE L'IMAGE : la lumière de la carte, à l'heure que l'établi impose.
   const ro::render::SkyLight sky = SkyOfFrame(now_ms);
+  // La nuit de cette image décide des effets « nuit seulement » de la suivante.
+  effect_night_ = ro::render::NightStrength(sky.light, MapClosedToSky());
   const ro::render::SunShadowView sun = DrawSunShadowIfAsked(sun_asked, models_shown, carts, sky);
   if (sun.map != nullptr) {
     stages.shadowmap = false;

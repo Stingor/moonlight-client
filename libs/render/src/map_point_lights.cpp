@@ -1,7 +1,8 @@
 #include "ro/render/map_point_lights.h"
 
-#include <algorithm>
 #include <cmath>
+
+#include "ro/render/edited_map_effects.h"
 
 namespace ro::render {
 namespace {
@@ -42,9 +43,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(const ro::mapedit::MapEdit& 
 PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
                              const MapEffectFrame& frame, const SceneLight& sky, bool always_night,
                              glm::vec3 eye, double time_ms) {
-  const glm::vec3 day = sky.daylight * sky.tint;
-  const float brightest = std::max({day.r, day.g, day.b});
-  const float night = always_night ? 1.0F : 1.0F - std::clamp(brightest, 0.0F, 1.0F);
+  const float night = NightStrength(sky, always_night);
   std::vector<PointLight> placed;
   placed.reserve(lights.size());
   for (std::size_t slot = 0; slot < lights.size(); ++slot) {

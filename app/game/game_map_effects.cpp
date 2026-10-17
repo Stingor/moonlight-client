@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include "ro/render/edited_map_effects.h"
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effect_lots.h"
 #include "ro/sim/actor.h"
@@ -75,9 +76,17 @@ void Game::RaiseMapSky(std::uint32_t now_ms) {
 }
 
 void Game::AdvanceMapEffects(std::uint32_t now_ms) {
+  // LES OBJETS D'EFFET : ceux du RSW et ceux que l'édition ajoute, les « nuit
+  // seulement » tant que la nuit de l'image précédente le veut. La liste qui
+  // change — un document retouché, la nuit qui tombe ou se lève — se relève.
+  std::vector<ro::formats::RswEffect> wanted = ro::render::ActiveMapEffects(
+      stage_->scene.rsw.effects(), map_edits_.Document(stage_->name).effects(), effect_night_);
+  if (!map_effects_raised_ || !ro::render::SameMapEffects(wanted, raised_effects_)) {
+    map_effects_.Raise(stage_->scene.effect_table, wanted, stage_->scene.gnd.width(),
+                       stage_->scene.gnd.height());
+    raised_effects_ = std::move(wanted);
+  }
   if (!map_effects_raised_) {
-    map_effects_.Raise(stage_->scene.effect_table, stage_->scene.rsw.effects(),
-                       stage_->scene.gnd.width(), stage_->scene.gnd.height());
     // LES SOURCES DE SON, au même instant : le client les crée dans la même
     // passe que les objets d'effet, juste après eux.
     if (actor_sounds_.has_value()) {

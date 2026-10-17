@@ -741,6 +741,10 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // Les effets de la carte ont-ils été montés sur CETTE scène ? Remis à faux au
   // seul changement de carte : un téléport sur place ne les recrée pas.
   bool map_effects_raised_ = false;
+  // Les objets d'effet levés, et la nuit de l'image précédente qui décide de
+  // ceux « nuit seulement » : voir `AdvanceMapEffects`.
+  std::vector<ro::formats::RswEffect> raised_effects_;
+  float effect_night_ = 0.0F;
 
   // ⚠ EN DERNIER, ET IL LE FAUT : il garde l'adresse de presque tout ce qui
   // précède. Détruit le premier, il ne pend sur rien.

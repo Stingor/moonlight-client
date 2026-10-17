@@ -130,9 +130,11 @@ add_library(ro_render STATIC
     src/ground_unit_pose.cpp
     src/model_bake.cpp
     src/model_mesh.cpp
+    src/edited_map_effects.cpp
     src/map_point_lights.cpp
     src/model_mesh_identity.cpp
     src/point_lights.cpp
+    src/point_shadow.cpp
     src/model_pick.cpp
     src/model_pose.cpp
     src/model_sight.cpp
@@ -617,6 +619,8 @@ add_library(ro_render_gl STATIC
     gl/inset_paint.cpp
     gl/model_renderer.cpp
     gl/point_light_shader.cpp
+    gl/point_shadow_maps.cpp
+    gl/point_shadow_pass.cpp
     gl/offscreen_target.cpp
     gl/scene_post_process.cpp
     gl/screen_grab.cpp
