@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "ro/sim/long_walk.h"
+#include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
 namespace ro::sim {
@@ -36,6 +38,37 @@ bool SameCell(const std::optional<CellPosition>& kept, CellPosition cell) {
 // compare : le quadruple, puis une division par trois.
 inline constexpr std::uint32_t kSpeedRatioNumerator = 4;
 inline constexpr std::uint32_t kSpeedRatioDenominator = 3;
+
+// LA CIBLE AU-DELÀ D'UNE MARCHE : on s'en approche par étapes, chacune une
+// marche que le serveur accepte, la suivante demandée à la fin de la
+// précédente. Rien quand la case d'approche est à portée d'une marche :
+// l'approche ordinaire reprend la main.
+std::optional<PendingMove> ApproachByLegs(const World& world, WalkPlanner& planner,
+                                          const WalkMap& walk, PendingAction& action,
+                                          ApproachWalkClock& clock, CellPosition standing,
+                                          CellPosition approach, std::uint32_t now_ms) {
+  const Actor& self = *world.player();
+  if (action.leg_to.has_value()) {
+    const bool taken = LegTaken(self, *action.leg_to, action.leg_sent_ms);
+    // Pas encore partie : le serveur la fait partir, ou l'aura refusée au
+    // terme du délai. Partie : elle court encore.
+    if ((!taken && now_ms - action.leg_sent_ms < kLegConfirmMs) ||
+        (taken && LegStillRunning(self, planner.PathFor(self), now_ms))) {
+      return PendingMove{PendingStep::kWait, *action.leg_to};
+    }
+  }
+  const CellPosition toward = WalkStopToward(walk, standing, approach, LegSteps(world));
+  if (toward.x == approach.x && toward.y == approach.y) {
+    action.leg_to.reset();
+    return std::nullopt;
+  }
+  if (!AdmitWalkRequest(world, clock, now_ms)) {
+    return PendingMove{PendingStep::kWait, toward};
+  }
+  action.leg_to = toward;
+  action.leg_sent_ms = now_ms;
+  return PendingMove{PendingStep::kApproach, toward};
+}
 
 }  // namespace
 
@@ -134,6 +167,10 @@ PendingMove AdvancePendingAction(const World& world, WalkPlanner& planner, const
   }
 
   const CellPosition toward = ApproachCell(here, there, action.range_cells, walk);
+  if (const std::optional<PendingMove> leg =
+          ApproachByLegs(world, planner, walk, action, clock, standing, toward, now_ms)) {
+    return *leg;
+  }
   // ⚠ LA COMPÉTENCE N'A AUCUNE CADENCE : le cas de la compétence ciblée ne
   // compare aucune horloge — seul le
   // changement de case visée relance la marche. La cadence est celle de

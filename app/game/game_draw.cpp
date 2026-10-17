@@ -685,6 +685,9 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
     static_cast<void>(ReleaseDeferredWalk(link_, world_, grimoire_.approach_clock(),
                                           world_mouse_.deferred_walk, scene_actors_.player_gesture,
                                           now_ms));
+    // ET L'ÉTAPE SUIVANTE D'UN CLIC LOINTAIN, quand la précédente s'achève.
+    ContinueLongWalk(link_, world_, planner_, grimoire_.approach_clock(),
+                     world_mouse_.deferred_walk, now_ms);
     ReportMissingSprites(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
                          reported_missing_);
     NoteScreenTargets();

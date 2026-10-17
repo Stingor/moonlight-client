@@ -7,6 +7,7 @@
 #include "ro/core/i18n.h"
 #include "ro/net/action.h"
 #include "ro/net/movement.h"
+#include "ro/net/npc_dialog.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
@@ -47,6 +48,26 @@ ro::sim::PendingAction ArmAttack(const ro::sim::World& world, const ro::sim::Act
   const ro::sim::Actor* self = world.player();
   action.chase_repeat_ms = ro::sim::ChaseRepeatMs(self != nullptr ? self->speed_ms_per_cell : 0,
                                                   target.speed_ms_per_cell);
+  return action;
+}
+
+ro::sim::PendingAction ArmNpcContact(const ro::sim::World& world, const ro::sim::Actor& npc) {
+  ro::sim::PendingAction action;
+  action.target_id = npc.id;
+  action.deed = ro::sim::PendingDeed::kTalk;
+  // Une case de moins que la portée du jeu : la tolérance du test de portée
+  // ne doit pas faire parler de la case où le serveur refuse encore.
+  action.range_cells = static_cast<std::uint16_t>(std::max(1, world.session().GameAreaCells() - 1));
+  return action;
+}
+
+ro::sim::PendingAction ArmFarPickup(const ro::sim::Actor& item) {
+  ro::sim::PendingAction action;
+  action.target_id = item.id;
+  action.deed = ro::sim::PendingDeed::kPickUp;
+  // Une case : avec la tolérance du test de portée, c'est encore à portée de
+  // ramassage, qui en compte deux.
+  action.range_cells = 1;
   return action;
 }
 
@@ -95,6 +116,16 @@ bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world, ro::sim::Wa
       // poursuit pas frappe aussi sans relâche tant que le bouton est tenu :
       // voir `BasicAttackAction`.
       const std::uint32_t target_id = attack->target_id;
+      if (attack->deed == ro::sim::PendingDeed::kTalk) {
+        attack.reset();
+        ReportRefusal(ro::net::ContactNpc(link, target_id));
+        break;
+      }
+      if (attack->deed == ro::sim::PendingDeed::kPickUp) {
+        attack.reset();
+        ReportRefusal(ro::net::RequestPickup(link, target_id));
+        break;
+      }
       const int asked = engagement != nullptr
                             ? BasicAttackAction(attack->repeat, engagement->action, target_id)
                             : (attack->repeat ? kAttackActionRepeat : kAttackActionOnce);

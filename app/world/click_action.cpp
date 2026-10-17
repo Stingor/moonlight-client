@@ -16,6 +16,7 @@
 #include "ro/render/map_scene.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/guild.h"
+#include "ro/sim/long_walk.h"
 #include "ro/sim/map_mode.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/party_roster.h"
@@ -193,12 +194,34 @@ MouseRoute MouseRouteOf(const ro::sim::World& world, const SkillBookPanel& skill
           .suspended = skills.aim() == SkillAim::kGround};
 }
 
+namespace {
+
+// La cible est-elle au-delà de ce qu'une seule marche atteint ?
+bool OutOfOneWalk(const ro::sim::World& world, const ro::sim::Actor& self,
+                  const ro::sim::Actor& target) {
+  return ro::sim::StepsApart(ro::sim::StandingCell(self), target.position) >
+         static_cast<std::size_t>(world.session().max_walk_path_steps);
+}
+
+// La marche d'un clic au sol part. Au-delà de ce que le serveur accepte, c'est
+// sa première étape, et la suite se demande à chaque image : voir
+// `ContinueLongWalk`. Sans marche retenue, la destination part telle quelle.
+void SendGroundWalk(ro::net::Connection& link, const ro::sim::World& world, DeferredWalk* deferred,
+                    ro::sim::CellPosition destination, std::uint32_t now_ms) {
+  const ro::sim::CellPosition toward =
+      deferred != nullptr ? ro::sim::BeginLongWalk(world, deferred->legs, destination, now_ms)
+                          : destination;
+  ReportRefusal(ro::net::RequestMove(link, toward));
+}
+
+}  // namespace
+
 void RequestGroundWalk(ro::net::Connection& link, const ro::sim::World& world,
                        ro::sim::ApproachWalkClock& clock, DeferredWalk* deferred,
                        std::optional<PlayerGesture> player_gesture,
                        ro::sim::CellPosition destination, std::uint32_t now_ms) {
   if (const auto due = GroundWalkDue(world, clock, deferred, player_gesture, destination, now_ms)) {
-    ReportRefusal(ro::net::RequestMove(link, *due));
+    SendGroundWalk(link, world, deferred, *due, now_ms);
   }
 }
 
@@ -209,8 +232,16 @@ bool ReleaseDeferredWalk(ro::net::Connection& link, const ro::sim::World& world,
   if (!released.has_value()) {
     return false;
   }
-  ReportRefusal(ro::net::RequestMove(link, *released));
+  SendGroundWalk(link, world, &deferred, *released, now_ms);
   return true;
+}
+
+void ContinueLongWalk(ro::net::Connection& link, const ro::sim::World& world,
+                      ro::sim::WalkPlanner& planner, ro::sim::ApproachWalkClock& clock,
+                      DeferredWalk& deferred, std::uint32_t now_ms) {
+  if (const auto next = ro::sim::AdvanceLongWalk(world, planner, deferred.legs, clock, now_ms)) {
+    ReportRefusal(ro::net::RequestMove(link, *next));
+  }
 }
 
 ro::core::Result<void> ClickOn(ro::net::Connection& link, const ro::sim::World& world,
@@ -248,6 +279,12 @@ ro::core::Result<void> ClickOn(ro::net::Connection& link, const ro::sim::World& 
       if (ro::sim::WithinPickupReach(ro::sim::StandingCell(*self), target.position)) {
         return ro::net::RequestPickup(link, target.id);
       }
+      // AU-DELÀ D'UNE MARCHE, la marche vers l'objet serait refusée : on s'en
+      // approche par étapes, comme d'un monstre.
+      if (OutOfOneWalk(world, *self, target)) {
+        intents.attack = ArmFarPickup(target);
+        return {};
+      }
       // La marche vers l'objet passe le plancher ; retenue, elle attend dans
       // l'intention que le tic la redemande — voir `ro::sim::DuePickupWalk`.
       intents.pickup = ro::sim::PickupIntent{
@@ -270,6 +307,14 @@ ro::core::Result<void> ClickOn(ro::net::Connection& link, const ro::sim::World& 
       }
       // Un compagnon ne parle pas : rien ne part — voir `ClickContactsNpc`.
       if (!ClickContactsNpc(target)) {
+        return {};
+      }
+      // PLUS LOIN QUE LA PORTÉE DU JEU, le serveur ne l'ouvrirait pas : on
+      // s'en approche d'abord, et on lui parle en arrivant.
+      if (const ro::sim::Actor* self = world.player();
+          self != nullptr && ro::sim::StepsApart(ro::sim::StandingCell(*self), target.position) >
+                                 static_cast<std::size_t>(world.session().GameAreaCells())) {
+        intents.attack = ArmNpcContact(world, target);
         return {};
       }
       // Tout le reste : on lui parle. C'est le seul geste qui ouvre un

@@ -142,6 +142,12 @@ void RequestGroundWalk(ro::net::Connection& link, const ro::sim::World& world,
 
 // Libère la marche retenue quand le geste qui la retenait a changé : voir
 // `ReleasedWalk`. Rend vrai si une marche est partie.
+// L'étape suivante d'un clic au sol lointain, quand elle est due : voir
+// `ro::sim::AdvanceLongWalk`. Une fois par image.
+void ContinueLongWalk(ro::net::Connection& link, const ro::sim::World& world,
+                      ro::sim::WalkPlanner& planner, ro::sim::ApproachWalkClock& clock,
+                      DeferredWalk& deferred, std::uint32_t now_ms);
+
 bool ReleaseDeferredWalk(ro::net::Connection& link, const ro::sim::World& world,
                          ro::sim::ApproachWalkClock& clock, DeferredWalk& deferred,
                          std::optional<PlayerGesture> player_gesture, std::uint32_t now_ms);

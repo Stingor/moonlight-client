@@ -47,6 +47,14 @@ inline constexpr std::uint16_t kDefaultAttackRangeCells = 1;
 [[nodiscard]] ro::sim::PendingAction ArmAttack(const ro::sim::World& world,
                                                const ro::sim::Actor& target, bool repeat);
 
+// UN PNJ OU UN OBJET HORS DE PORTÉE de ce que le serveur accepte : on s'en
+// approche comme d'un monstre, puis on lui parle ou on le ramasse. Le PNJ
+// s'ouvre à la portée du JEU (`SessionSettings::GameAreaCells`), plus courte
+// que la vue de moonclient.
+[[nodiscard]] ro::sim::PendingAction ArmNpcContact(const ro::sim::World& world,
+                                                   const ro::sim::Actor& npc);
+[[nodiscard]] ro::sim::PendingAction ArmFarPickup(const ro::sim::Actor& item);
+
 // LA PORTÉE D'APPROCHE D'UNE UNITÉ AU SOL qu'on frappe, en cases : le client ne
 // s'approche pas plus près, quelle que soit l'arme, et ne va plus loin que si
 // la portée d'attaque le dépasse.

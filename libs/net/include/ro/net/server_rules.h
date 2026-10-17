@@ -30,6 +30,12 @@ enum class ServerRuleKey : std::uint16_t {
   kHomunculusTeleportHoldMs = 4,
   kVendingTaxPermyriad = 5,
   kVendingTaxMinZeny = 6,
+  // La portée du JEU, `area_size` : la clé 1 est celle de la VUE de ce joueur,
+  // plus grande pour moonclient ; celle-ci borne ce que le serveur tolère hors
+  // de la vue (laisse d'un compagnon, distance d'un PNJ ou d'une échoppe).
+  kGameAreaCells = 7,
+  // Le plus long chemin que le serveur accepte pour une marche, en pas.
+  kMaxWalkPathSteps = 8,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

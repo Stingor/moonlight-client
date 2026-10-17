@@ -125,6 +125,9 @@ inline constexpr std::array<CellStep, 8> kApproachFallbacks = {
     CellStep{1, 0},  CellStep{1, 1},   CellStep{1, -1}, CellStep{-1, 0},
     CellStep{-1, 1}, CellStep{-1, -1}, CellStep{0, 1},  CellStep{0, -1}};
 
+// Ce qu'une action ordinaire fait en arrivant.
+enum class PendingDeed : std::uint8_t { kStrike, kTalk, kPickUp };
+
 // Ce qu'une action en attente garde entre deux tics.
 struct PendingAction {
   std::uint32_t target_id = 0;
@@ -154,6 +157,11 @@ struct PendingAction {
   // L'instant de la dernière marche demandée, dans l'horloge de l'APPELANT.
   // Il n'a de sens que lorsque `walking_to` porte une case.
   std::uint32_t approached_ms = 0;
+  // L'ÉTAPE demandée en dernier quand la cible est au-delà d'une marche, et
+  // l'instant de la demande : voir `ro::sim::LongWalk`. Distincte de
+  // `walking_to`, parce qu'arriver sur une étape ne fait pas tirer.
+  std::optional<CellPosition> leg_to;
+  std::uint32_t leg_sent_ms = 0;
   // SANS RELÂCHE, ou un seul coup.
   //
   // 🔴 RETENU À L'INSTANT DU CLIC, ET NON RELU AU MOMENT DU COUP. Le coup ne
@@ -169,6 +177,11 @@ struct PendingAction {
   // ⚠ SANS EFFET POUR UNE COMPÉTENCE : elle se lance une fois, et le champ ne
   // se lit que sur le chemin de l'attaque ordinaire.
   bool repeat = true;
+
+  // CE QUI PART À L'ARRIVÉE, quand ce n'est pas une compétence : un coup, ou,
+  // pour une cible au-delà de ce que le serveur accepte d'ouvrir de loin, la
+  // parole à un PNJ ou le ramassage d'un objet.
+  PendingDeed deed = PendingDeed::kStrike;
 
   // LA CASE VISÉE PAR UNE COMPÉTENCE AU SOL, à la place d'une entité.
   //

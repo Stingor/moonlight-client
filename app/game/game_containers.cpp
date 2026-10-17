@@ -70,8 +70,8 @@ void Game::StageContainers() {
       pieces_.homunculus, pieces_.mercenary,
       pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr, windows_.companion_tactic,
       windows_.companion_tactic_view);
-  // Ses distances s'arrêtent au rayon de vue que le serveur annonce.
-  windows_.companion_tactic_view.view_cells = world_.session().view_cells;
+  // Ses distances s'arrêtent à la portée du jeu que le serveur annonce.
+  windows_.companion_tactic_view.view_cells = world_.session().GameAreaCells();
   // LA FENÊTRE « IA DU COMPAGNON ».
   pieces_.companion_ai.StageAiWindow(
       pieces_.homunculus, pieces_.mercenary,

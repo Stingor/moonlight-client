@@ -50,6 +50,15 @@ struct SessionSettings {
   // connaître au client que les acteurs à cette distance. Au-delà, un compagnon
   // disparaît du monde connu, et une cible n'y figure pas.
   int view_cells = kDefaultViewCells;
+  // LA PORTÉE DU JEU, en cases : ce que le serveur tolère hors de la vue — un
+  // compagnon plus loin du maître est ramené, un PNJ ou une échoppe plus loin
+  // refuse de s'ouvrir. Un client d'origine voit exactement à cette portée ;
+  // moonclient voit plus loin. Zéro : le serveur n'a rien dit, et elle se
+  // confond avec la vue.
+  int game_area_cells = 0;
+  // LE PLUS LONG CHEMIN qu'une marche peut demander, en pas : au-delà, le
+  // serveur la refuse sans rien dire.
+  int max_walk_path_steps = kDefaultMaxWalkPathSteps;
   // Les niveaux maximum d'un homoncule, et d'une forme mutée (« S »).
   int homunculus_max_level = kDefaultHomunculusMaxLevel;
   int homunculus_s_max_level = kDefaultHomunculusSMaxLevel;
@@ -66,6 +75,7 @@ struct SessionSettings {
   std::int64_t vending_tax_min_zeny = kDefaultVendingTaxMinZeny;
 
   static constexpr int kDefaultViewCells = 14;
+  static constexpr int kDefaultMaxWalkPathSteps = 17;
   static constexpr int kDefaultHomunculusMaxLevel = 99;
   static constexpr int kDefaultHomunculusSMaxLevel = 275;
   static constexpr std::uint32_t kDefaultHomunculusTeleportHoldMs = 5000;
@@ -73,6 +83,11 @@ struct SessionSettings {
   static constexpr std::int64_t kDefaultVendingTaxMinZeny = 100'000'000;
   // La taxe entière : le vendeur ne touche rien.
   static constexpr int kMaxVendingTaxPermyriad = 10'000;
+
+  // La portée du jeu, ou la vue tant que le serveur ne l'a pas dite.
+  [[nodiscard]] int GameAreaCells() const noexcept {
+    return game_area_cells > 0 ? game_area_cells : view_cells;
+  }
 };
 
 }  // namespace ro::sim

@@ -58,6 +58,16 @@ void Keep(sim::SessionSettings& session, const proto::ZcMoonlightServerRulesEntr
         session.vending_tax_min_zeny = rule.value;
       }
       return;
+    case ServerRuleKey::kGameAreaCells:
+      if (rule.value > 0) {
+        session.game_area_cells = rule.value;
+      }
+      return;
+    case ServerRuleKey::kMaxWalkPathSteps:
+      if (rule.value > 0) {
+        session.max_walk_path_steps = rule.value;
+      }
+      return;
   }
   // Une clé que ce client ne connaît pas : le serveur en a ajouté une.
 }

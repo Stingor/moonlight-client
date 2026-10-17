@@ -5,6 +5,7 @@
 
 #include "ro/render/sprite_frame.h"
 #include "ro/sim/actor.h"
+#include "ro/sim/long_walk.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/pending_action.h"
 #include "ro/sim/world_fwd.h"
@@ -42,6 +43,9 @@ struct DeferredWalk {
   std::uint32_t held_since_ms = 0;
   // L'entrée sur carte où elle a été gardée : changer de carte l'oublie.
   std::uint32_t map_entry = 0;
+  // LE CLIC LOINTAIN EN COURS DE ROUTE, une fois sa première étape partie :
+  // voir `ro::sim::LongWalk`.
+  std::optional<ro::sim::LongWalk> legs;
 };
 
 // Vrai pour les trois gestes qui retiennent une marche : l'attaque ordinaire,

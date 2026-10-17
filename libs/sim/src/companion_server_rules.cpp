@@ -18,7 +18,9 @@ constexpr std::array<int CompanionAiSettings::*, 5> kViewBoundCells = {
 
 std::optional<CompanionAiSettings> SettingsUnderServerRules(const CompanionAiSettings& settings,
                                                             const SessionSettings& session) {
-  const int view_cells = session.view_cells;
+  // Un compagnon plus loin que la portée du JEU est ramené à son maître, même
+  // quand la vue porte plus loin.
+  const int view_cells = session.GameAreaCells();
   const bool beyond_view =
       view_cells > 0 && std::ranges::any_of(kViewBoundCells, [&](int CompanionAiSettings::* field) {
         return settings.*field > view_cells;

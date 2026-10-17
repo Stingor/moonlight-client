@@ -434,6 +434,7 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // de chemins. Elle doit donc lui être redonnée à chaque carte, sous peine de
   // viser celle d'avant.
   void SetWalkMap(const WalkMap* map) noexcept { walk_map_ = map; }
+  [[nodiscard]] const WalkMap* walk_map() const noexcept { return walk_map_; }
 
   // Vide le monde. Un changement de carte remplace TOUT : garder les acteurs de
   // l'ancienne les ferait apparaître sur la nouvelle.
