@@ -23,6 +23,10 @@ namespace ro::render {
                                            const MapEffectFrame& frame, const SceneLight& sky,
                                            bool always_night, glm::vec3 eye, double time_ms = 0.0);
 
+// TOUTES LES LUMIÈRES DU DOCUMENT : les siennes, puis la lueur de chaque effet
+// qui en porte une, à sa place, avec la règle de nuit de l'effet.
+[[nodiscard]] std::vector<ro::mapedit::AddedLight> DocumentLights(const ro::mapedit::MapEdit& edit);
+
 // LE VACILLEMENT d'une lumière à l'instant `time_ms`, facteur de son intensité
 // entre `1 − kFlickerDepth` et 1 : deux ondes de périodes premières entre
 // elles, décalées par le rang `slot` pour que deux torches voisines ne

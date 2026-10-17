@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -90,6 +91,37 @@ struct AddedLight {
   friend bool operator==(const AddedLight&, const AddedLight&) = default;
 };
 
+// LA LUEUR D'UN EFFET : la lumière ponctuelle qu'il porte, à sa place, et qui
+// suit la même règle de nuit que lui.
+struct EffectGlow {
+  std::array<float, 3> color{2.0F, 1.4F, 0.7F};
+  // En unités du RSW ; strictement positive.
+  float range = 50.0F;
+  bool flicker = true;
+
+  friend bool operator==(const EffectGlow&, const EffectGlow&) = default;
+};
+
+// UN EFFET DE CARTE ajouté par l'éditeur : un objet d'effet comme ceux du RSW
+// — son numéro, sa place, sa cadence et ses paramètres —, que le jeu lève avec
+// eux. Les flammes de pvp_n_5-5 sont l'effet 47, cadence 125, paramètres
+// [0.6, 1, 0, 0].
+struct AddedEffect {
+  std::int32_t number = 0;
+  // Sa position, dans le repère du RSW.
+  std::array<float, 3> position{};
+  // Tous les combien l'effet se relance, et ses quatre paramètres, comme le RSW
+  // les porte.
+  float emit_speed = 0.0F;
+  std::array<float, 4> param{};
+  // Vrai : il ne se lève qu'à la nuit.
+  bool night_only = false;
+  std::optional<EffectGlow> glow;
+  std::string why;
+
+  friend bool operator==(const AddedEffect&, const AddedEffect&) = default;
+};
+
 // UN SOMMET DÉPLACÉ : son nœud, son rang dans le nœud, sa position dans le
 // fichier et la nouvelle, toutes deux dans le repère du nœud.
 struct VertexMove {
@@ -135,8 +167,16 @@ class MapEdit {
   // Les retouches de modèles, rangées par rang.
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
   [[nodiscard]] bool empty() const noexcept {
-    return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty();
+    return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
+           effects_.empty();
   }
+  // Les effets ajoutés, dans l'ordre du document.
+  [[nodiscard]] const std::vector<AddedEffect>& effects() const noexcept { return effects_; }
+  void AddEffect(AddedEffect effect) { effects_.push_back(std::move(effect)); }
+  // Remplace l'effet de rang `slot` ; hors de la liste, rien.
+  void SetEffect(std::size_t slot, AddedEffect effect);
+  // Retire l'effet de rang `slot` : les suivants remontent.
+  void RemoveEffect(std::size_t slot);
   // Les lumières ajoutées, dans l'ordre du document.
   [[nodiscard]] const std::vector<AddedLight>& lights() const noexcept { return lights_; }
   void AddLight(AddedLight light) { lights_.push_back(std::move(light)); }
@@ -173,6 +213,7 @@ class MapEdit {
   std::vector<AddedModel> added_;
   std::vector<MeshEdit> meshes_;
   std::vector<AddedLight> lights_;
+  std::vector<AddedEffect> effects_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

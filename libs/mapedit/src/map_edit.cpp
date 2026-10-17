@@ -148,6 +148,18 @@ void MapEdit::SetAdded(std::size_t slot, AddedModel model) {
   }
 }
 
+void MapEdit::SetEffect(std::size_t slot, AddedEffect effect) {
+  if (slot < effects_.size()) {
+    effects_[slot] = std::move(effect);
+  }
+}
+
+void MapEdit::RemoveEffect(std::size_t slot) {
+  if (slot < effects_.size()) {
+    effects_.erase(effects_.begin() + static_cast<std::ptrdiff_t>(slot));
+  }
+}
+
 void MapEdit::SetLight(std::size_t slot, AddedLight light) {
   if (slot < lights_.size()) {
     lights_[slot] = std::move(light);

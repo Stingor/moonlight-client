@@ -24,6 +24,21 @@ float FlickerFactor(std::size_t slot, double time_ms) {
   return 1.0F - kFlickerDepth * (0.5F + 0.5F * wave);
 }
 
+std::vector<ro::mapedit::AddedLight> DocumentLights(const ro::mapedit::MapEdit& edit) {
+  std::vector<ro::mapedit::AddedLight> lights = edit.lights();
+  for (const ro::mapedit::AddedEffect& effect : edit.effects()) {
+    if (effect.glow.has_value()) {
+      lights.push_back(ro::mapedit::AddedLight{.position = effect.position,
+                                               .color = effect.glow->color,
+                                               .range = effect.glow->range,
+                                               .night_only = effect.night_only,
+                                               .flicker = effect.glow->flicker,
+                                               .why = effect.why});
+    }
+  }
+  return lights;
+}
+
 PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
                              const MapEffectFrame& frame, const SceneLight& sky, bool always_night,
                              glm::vec3 eye, double time_ms) {
