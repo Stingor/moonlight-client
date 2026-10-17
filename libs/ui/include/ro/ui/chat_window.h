@@ -360,8 +360,8 @@ struct ChatWindows {
   // est ici parce qu'un geste traverse les fenêtres : il part de l'une et tombe
   // dans l'autre.
   ChatDragBoard board;
-  // Le catalogue du vote shop, posé à chaque image et rendu au fil de chaque bande.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance, posé à chaque image et rendu au fil de chaque bande.
+  ItemLinkFacts link_facts;
   // ── LES LIENS ET LES IMAGES DU FIL ────────────────────────────
   // De quoi peindre le texte riche, posé à chaque image et prêté au fil de
   // chaque fenêtre par `ChatAppearance::rich`.
@@ -419,8 +419,8 @@ struct ChatTabPowers {
     // LES LIENS DEJA POSES DANS LA SAISIE, dans l'ordre de pose. Vide pour une
     // fenetre detachee : elle n'a pas de saisie.
     std::span<const ChatInputLink> input_links = {},
-    // Le catalogue du vote shop, pour l'entrée du menu d'un item du fil et des pastilles.
-    std::span<const VoteShopOffer> vote_shop = {},
+    // Ce que le menu d'un item du fil et des pastilles sait d'avance.
+    ItemLinkFacts link_facts = {},
     // LE COMPTEUR DE DÉGÂTS, peint à la place du fil quand l'onglet montré est
     // le sien — voir `ChatStripTab::meter`. Nul s'il n'est rangé nulle part.
     const DamageMeterView* meter = nullptr);

@@ -110,7 +110,7 @@ ChatLinkGesture DrawItemLinkCell(const ItemLinkCell& cell, ItemLinkMenu& menu, C
 }
 
 void DrawItemLinkMenu(const char* popup_id, ItemLinkMenu& menu, ChatLinkAsk& asked,
-                      std::span<const VoteShopOffer> vote_shop) {
+                      ItemLinkFacts link_facts) {
   if (std::exchange(menu.describe_at_once, false)) {
     asked.gesture = ChatLinkGesture::kDescribe;
     asked.kind = menu.kind;
@@ -122,7 +122,7 @@ void DrawItemLinkMenu(const char* popup_id, ItemLinkMenu& menu, ChatLinkAsk& ask
     ImGui::OpenPopup(popup_id);
   }
   const ChatLinkAsk chosen =
-      DrawChatLinkMenu(popup_id, menu.kind, menu.item_id, menu.token, menu.label, vote_shop);
+      DrawChatLinkMenu(popup_id, menu.kind, menu.item_id, menu.token, menu.label, link_facts);
   if (chosen.gesture != ChatLinkGesture::kNothing) {
     asked.gesture = chosen.gesture;
     asked.kind = chosen.kind;

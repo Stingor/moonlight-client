@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <utility>
 
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
@@ -283,6 +284,30 @@ void ChangeView(CardAlbumWindowState& state) {
   state.first = 0;
 }
 
+// LA POCHETTE DEMANDÉE DOIT ÊTRE DANS LES PAGES : sinon le saut, qui ne
+// cherche que dans l'ordre affiché, ne la trouverait pas. Les filtres se lèvent
+// alors tous — tri compris, il ne cache rien —, et l'ordre se refait.
+//
+// ⚠ AVANT LE SAUT, QUI CONSOMME LE NUMÉRO DE SÉRIE : c'est lui qui tournera les
+// pages, dans l'ordre refait.
+void RevealHighlight(CardAlbumWindowState& state, const CardAlbumView& view) {
+  if (!view.highlight_reveal || view.highlight_serial == state.highlight_seen ||
+      view.highlight_card == 0 || PocketOf(view, view.highlight_card) == nullptr) {
+    return;
+  }
+  for (const int rank : state.order) {
+    if (view.pockets[static_cast<std::size_t>(rank)].card_id == view.highlight_card) {
+      return;
+    }
+  }
+  state.filter[0] = '\0';
+  state.show_filter = kShowAll;
+  state.slot_tab_asked = state.slot_filter != 0;
+  state.slot_filter = 0;
+  state.nature_mask = 0;
+  RebuildOrder(state, view);
+}
+
 void DrawHeader(CardAlbumWindowState& state, const CardAlbumView& view, const SkinArt& art,
                 CardAlbumWindowAction& action) {
   constexpr float kFilterPixels = 215.0F;
@@ -370,10 +395,13 @@ void DrawTabs(CardAlbumWindowState& state, const CardAlbumView& view, const Skin
   if (!BeginSkinTabBar("##album_intercalaires", art)) {
     return;
   }
+  const bool forced = std::exchange(state.slot_tab_asked, false);
   for (std::size_t rank = 0; rank < kSlotFilters.size(); ++rank) {
     const char* label = rank == 0 ? core::Tr("Tous") : kSlotFilters[rank].label;
-    if (ImGui::BeginTabItem(label)) {
-      if (state.slot_filter != static_cast<int>(rank)) {
+    const ImGuiTabItemFlags flags =
+        forced && state.slot_filter == static_cast<int>(rank) ? ImGuiTabItemFlags_SetSelected : 0;
+    if (ImGui::BeginTabItem(label, nullptr, flags)) {
+      if (!forced && state.slot_filter != static_cast<int>(rank)) {
         state.slot_filter = static_cast<int>(rank);
         ChangeView(state);
       }
@@ -580,6 +608,7 @@ CardAlbumWindowAction DrawCardAlbumWindow(CardAlbumWindowState& state, const Car
   if (state.order_dirty || state.order_for != view.revision) {
     RebuildOrder(state, view);
   }
+  RevealHighlight(state, view);
 
   // Le titre porte la complétion. ⚠ `###` FIGE L'IDENTITÉ : sans lui, la
   // fenêtre perdrait sa place et sa taille à chaque carte débloquée.

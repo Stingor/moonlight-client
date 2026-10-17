@@ -559,8 +559,7 @@ bool NpcShopSaleNeedsConfirmation(const NpcShopWindowState& state, const NpcShop
 }
 
 NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state, const NpcShopView& view,
-                                      const SkinArt& art,
-                                      std::span<const VoteShopOffer> vote_shop) {
+                                      const SkinArt& art, ItemLinkFacts link_facts) {
   NpcShopWindowAction action;
   if (!state.open) {
     return action;
@@ -620,7 +619,7 @@ NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state, const NpcShopVi
       AskModal(kSaleConfirmId);
     }
     DrawSaleConfirmation(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_id = chosen.item_id;
       action.describe_slot = static_cast<std::uint16_t>(chosen.token);

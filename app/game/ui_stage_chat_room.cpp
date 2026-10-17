@@ -16,8 +16,7 @@ constexpr float kPercent = 100.0F;
 void UiStage::DrawChatRoomWindows(ChatRoomWindows& chat_room, ro::ui::ChatWindowState& chat,
                                   const ro::ui::ChatLinePreview& preview, const ChatTabsView& tabs,
                                   std::span<const ro::ui::ChatInputLink> links,
-                                  std::span<const ro::ui::VoteShopOffer> vote_shop,
-                                  Answers& answers) {
+                                  ro::ui::ItemLinkFacts link_facts, Answers& answers) {
   if (chat_room.make_view != nullptr) {
     chat_room.make_answer =
         ro::ui::DrawChatRoomMakeWindow(chat_room.make, *chat_room.make_view, skin_);
@@ -33,12 +32,12 @@ void UiStage::DrawChatRoomWindows(ChatRoomWindows& chat_room, ro::ui::ChatWindow
         ImGui::GetFontSize() * static_cast<float>(look.font_percent) / kPercent;
     view.log_style.line_gap = static_cast<float>(look.line_gap_pixels);
     view.log_style.timestamps = look.timestamps;
-    view.log_style.vote_shop = vote_shop;
+    view.log_style.link_facts = link_facts;
     // Le texte riche et les vignettes, comme dans le fil.
     view.log_style.rich = look.rich;
     view.log_style.staff_warp = look.staff_warp;
     view.log_style.font_percent = look.font_percent;
-    view.vote_shop = vote_shop;
+    view.link_facts = link_facts;
     view.input = &chat.input;
     // À L'ENTRÉE DANS UN SALON, LA BARRE GARDE LE CLAVIER : elle vient de
     // changer de fenêtre, et le joueur va écrire.

@@ -172,8 +172,8 @@ struct CraftAtlasView {
   // Partager la recette est possible : l'item en a une, et le chat peut
   // recevoir un lien.
   bool can_share_recipe = false;
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
   // LE STAFF PEUT SE FAIRE DONNER LES INGRÉDIENTS : la ligne « fabrications »
   // paraît sous la recette. Faux, elle n'existe pas — rien n'est grisé, rien
   // n'est dit. Voir `StaffToolsAllowed`.

@@ -128,9 +128,10 @@ bool OpenBuyingStoreSellOn(BuyingStoreSellState& state, std::uint32_t buyer_acco
 int AddToBuyingStoreSale(BuyingStoreSellState& state, std::span<const BuyingStoreWantedView> wanted,
                          const BuyingStoreOfferView& offer, int amount);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
-[[nodiscard]] BuyingStoreSellAction DrawBuyingStoreSellWindow(
-    BuyingStoreSellState& state, const BuyingStoreSellView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'un item sait d'avance — vote shop, album.
+[[nodiscard]] BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
+                                                              const BuyingStoreSellView& view,
+                                                              const SkinArt& art,
+                                                              ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

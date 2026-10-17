@@ -82,7 +82,7 @@ bool NoteTradeItemLink(const TradeItemGesture& gesture, const TradeItemView& ite
 // table et de tout enfant. Rend ce qu'on y a choisi, avec l'item et le jeton de
 // la ligne ; `kNothing` sinon.
 [[nodiscard]] ChatLinkAsk DrawTradeItemMenu(const char* popup_id, ItemLinkMenu& menu,
-                                            std::span<const VoteShopOffer> vote_shop);
+                                            ItemLinkFacts link_facts);
 
 // UN PRIX : « base -> facturé » quand ils diffèrent, sinon le prix seul.
 //

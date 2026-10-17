@@ -73,8 +73,8 @@ struct NpcDialogView {
   std::size_t text_limit = 0;
   // Le champ de recherche des longs menus, que le joueur peut couper.
   bool menu_search = true;
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.

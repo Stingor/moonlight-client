@@ -338,8 +338,7 @@ bool BuyingStoreSetupHasDearPrice(const BuyingStoreSetupState& state) {
 
 BuyingStoreSetupAction DrawBuyingStoreSetupWindow(BuyingStoreSetupState& state,
                                                   const BuyingStoreSetupView& view,
-                                                  const SkinArt& art,
-                                                  std::span<const VoteShopOffer> vote_shop) {
+                                                  const SkinArt& art, ItemLinkFacts link_facts) {
   BuyingStoreSetupAction action;
   if (!state.open) {
     return action;
@@ -401,7 +400,7 @@ BuyingStoreSetupAction DrawBuyingStoreSetupWindow(BuyingStoreSetupState& state,
     DrawFooter(state, view, art, action);
     state.footer_pixels = ImGui::GetCursorPosY() - footer_top;
     DrawDearConfirmation(art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_id = chosen.item_id;
       action.item_gesture = chosen.gesture;

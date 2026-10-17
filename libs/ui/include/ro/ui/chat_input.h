@@ -332,9 +332,11 @@ struct ChatInputLink {
 
 // `links` sont les liens posés, DANS L'ORDRE DE POSE : le balayage les consomme
 // de gauche à droite, un à la fois, exactement comme la substitution à l'envoi.
-[[nodiscard]] std::optional<std::string> DrawChatInput(
-    ChatInputState& state, const ChatLinePreview& preview, ChatInputAsk* asked, const SkinArt& art,
-    std::span<const ChatInputLink> links = {}, std::span<const VoteShopOffer> vote_shop = {});
+[[nodiscard]] std::optional<std::string> DrawChatInput(ChatInputState& state,
+                                                       const ChatLinePreview& preview,
+                                                       ChatInputAsk* asked, const SkinArt& art,
+                                                       std::span<const ChatInputLink> links = {},
+                                                       ItemLinkFacts link_facts = {});
 
 // CE QUE LA BARRE FAIT DES TOUCHES QU'ELLE A REÇUES HORS DU DESSIN.
 //

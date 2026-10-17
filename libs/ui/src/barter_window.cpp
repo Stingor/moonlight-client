@@ -437,7 +437,7 @@ void OpenBarterOn(BarterWindowState& state, std::uint32_t opening_seq) {
 }
 
 BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& view,
-                                    const SkinArt& art, std::span<const VoteShopOffer> vote_shop) {
+                                    const SkinArt& art, ItemLinkFacts link_facts) {
   BarterWindowAction action;
   if (!state.open) {
     // Une question laissée en suspens ne survit pas à la fenêtre qui la posait.
@@ -493,7 +493,7 @@ BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& 
         "%s",
         core::Tr("Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat"));
     DrawConfirmation(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_id = chosen.item_id;
       action.item_gesture = chosen.gesture;

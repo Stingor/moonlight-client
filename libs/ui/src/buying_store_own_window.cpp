@@ -33,7 +33,7 @@ void OpenBuyingStoreOwnOn(BuyingStoreOwnState& state, std::uint32_t opening_seq)
 
 BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
                                               const BuyingStoreOwnView& view, const SkinArt& art,
-                                              std::span<const VoteShopOffer> vote_shop) {
+                                              ItemLinkFacts link_facts) {
   BuyingStoreOwnAction action;
   // UN INTERRUPTEUR BAISSÉ par la pile d'Échap : la fenêtre revient, et
   // demande.
@@ -125,7 +125,7 @@ BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
       case ModalAnswer::kWaiting:
         break;
     }
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_id = chosen.item_id;
       action.item_gesture = chosen.gesture;

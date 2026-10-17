@@ -8,6 +8,7 @@
 // `game_item_drag.cpp`.
 
 #include <cstdint>
+#include <initializer_list>
 
 #include "ro/core/i18n.h"
 #include "ro/vfs/item_table.h"
@@ -132,6 +133,11 @@ void Game::StageContainers() {
   // cents cartes pour personne serait du gaspillage. Fermée, la fenêtre garde
   // la dernière — elle n'en lit rien, elle rend seulement son verrou.
   windows_.inventory_view.album_open = windows_.card_album.open;
+  // « VOIR DANS L'ALBUM » au menu d'une carte, dans les trois contenants.
+  const ro::ui::CardAlbumLinkFacts album_links = card_album_.LinkFacts(link_.is_open());
+  windows_.inventory_view.album_links = album_links;
+  windows_.cart_view.album_links = album_links;
+  windows_.storage_view.album_links = album_links;
   // LE COURRIER EN COURS D'ÉCRITURE : une pièce jointe peut partir du menu.
   windows_.inventory_view.mail_writing = pieces_.mail.writing();
   // LE BOUTON « Vider » DE LA BARRE DE TITRE, pour le staff seulement.
@@ -259,6 +265,11 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
   }
   if (answers.inventory.album_withdraw != 0) {
     windows_.card_album.withdraw_asked = answers.inventory.album_withdraw;
+  }
+  for (const std::uint32_t card_id :
+       {answers.inventory.see_in_album_id, answers.cart.see_in_album_id,
+        answers.storage.see_in_album_id}) {
+    ShowCardInAlbum(card_id, now_ms);
   }
   if (answers.inventory.market_item_id != 0) {
     pieces_.trade.market().AskOpen(answers.inventory.market_item_id);

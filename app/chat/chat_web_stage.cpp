@@ -360,6 +360,7 @@ void ChatWebStage::Follow(const ro::ui::ChatLinkAsk& asked, std::string_view wri
     case ro::ui::ChatLinkGesture::kWhereIs:
     case ro::ui::ChatLinkGesture::kAddToMvpLog:
     case ro::ui::ChatLinkGesture::kInviteMvp:
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
     case ro::ui::ChatLinkGesture::kPostWhereToFind:
     case ro::ui::ChatLinkGesture::kGoThere:
       break;

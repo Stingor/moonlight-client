@@ -16,6 +16,7 @@
 #include "ro/render/item_icons.h"
 #include "ro/sim/card_album.h"
 #include "ro/sim/world_fwd.h"
+#include "ro/ui/card_album_link.h"
 #include "ro/ui/card_album_window.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/package_items.h"
@@ -75,7 +76,28 @@ class CardAlbumView {
   // Le raccourci : ouvrir — et demander l'état — ou refermer.
   void Toggle(ro::ui::CardAlbumWindowState& state, ro::net::Connection& link, std::uint32_t now_ms);
 
+  // « VOIR DANS L'ALBUM » : ouvrir l'album, puis en tourner les pages jusqu'à la
+  // pochette de cette carte, surlignée — scellée comprise.
+  //
+  // ⚠ UN ALBUM QUI CHARGE FAIT ATTENDRE LE SAUT : ouvrir demande l'état au
+  // serveur comme le raccourci, et c'est sa réponse qui tourne les pages. Une
+  // carte que le catalogue ne range nulle part se dit dans l'album.
+  void Show(std::uint32_t card_id, ro::ui::CardAlbumWindowState& state, ro::net::Connection& link,
+            std::uint32_t now_ms);
+
+  // Les cartes que les tables de l'installation connaissent, dans n'importe
+  // quel ordre : elles décident où « Voir dans l'album » paraît.
+  void NoteCardItems(std::vector<std::uint32_t> card_ids);
+  // Ce que le menu d'un objet lit pour cette entrée. ⚠ DES VUES SUR CETTE VUE :
+  // elles ne valent que jusqu'à la prochaine trame d'album. `available` : l'album
+  // s'ouvre dans cette partie.
+  [[nodiscard]] ro::ui::CardAlbumLinkFacts LinkFacts(bool available) const noexcept;
+
  private:
+  // Le saut lui-même, catalogue en main.
+  void ShowNow(std::uint32_t card_id, std::uint32_t now_ms);
+  // Le saut qu'une réponse attendait, s'il y en a un.
+  void ServePendingShow(std::uint32_t now_ms);
   void Send(ro::net::CardAlbumCommand command, std::uint32_t arg, std::uint16_t amount,
             std::uint32_t card_id, ro::net::Connection& link);
   void Report(std::string text, ro::ui::CardAlbumTone tone, std::uint32_t now_ms);
@@ -120,6 +142,15 @@ class CardAlbumView {
   std::uint32_t highlight_card_ = 0;
   std::uint32_t highlight_ms_ = 0;
   std::uint32_t highlight_serial_ = 0;
+  // La pochette surlignée a été DEMANDÉE : voir `CardAlbumView::highlight_reveal`.
+  bool highlight_reveal_ = false;
+  // « Voir dans l'album » attend la réponse du serveur pour cette carte.
+  std::uint32_t pending_show_ = 0;
+
+  // ── Ce que les menus d'objet lisent ───────────────────────────────────────
+  // Les deux triés par identifiant.
+  std::vector<std::uint32_t> card_ids_;
+  std::vector<std::uint32_t> pocket_ids_;
 
   // ── Ce que la fenêtre reçoit ──────────────────────────────────────────────
   std::vector<ro::ui::CardAlbumPocketView> pockets_;

@@ -397,12 +397,13 @@ void Game::DrawInterface(std::uint32_t now_ms) {
       .status_preview = status_view_->Preview(hovered_status_),
       .illustration = pieces_.npc_illustration.Stage(
           pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr)};
-  // LE CATALOGUE DU VOTE SHOP, pour le menu d'un item de la conversation et du
-  // dialogue. ⚠ APRÈS `Refresh`, qui remet la vue du dialogue à zéro.
-  const std::span<const ro::ui::VoteShopOffer> vote_shop = pieces_.cash_shop.offers();
-  dialogue_->NoteVoteShop(vote_shop);
+  // CE QUE LE MENU D'UN ITEM SAIT D'AVANCE — vote shop, album —, pour la
+  // conversation et le dialogue. ⚠ APRÈS `Refresh`, qui remet la vue du
+  // dialogue à zéro.
+  const ro::ui::ItemLinkFacts link_facts = ItemLinkFactsNow();
+  dialogue_->NoteLinkFacts(link_facts);
   dialogue_->SeesSettingReach(SettingReachOf(pieces_));
-  windows_.chat.vote_shop = vote_shop;
+  windows_.chat.link_facts = link_facts;
   // ⚠ LA PILE SE PREND ICI, ET NON PLUS TÔT : c'est le même appel qui purge les
   // lignes expirées et compose les vues. Les prendre en avance laisserait une
   // ligne morte à l'écran une image de plus, et les vues désigneraient une pile

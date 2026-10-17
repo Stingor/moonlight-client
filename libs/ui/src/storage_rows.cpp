@@ -95,6 +95,9 @@ void DrawRowMenu(const InventoryCellView& cell, StorageWindowState& state,
     action.describe_id = cell.item_id;
     action.describe_slot = cell.client_slot;
   }
+  if (SeeInAlbumMenuItem(CardAlbumEntryOf(view.album_links, cell.item_id, cell.card))) {
+    action.see_in_album_id = cell.item_id;
+  }
   ImGui::Separator();
 
   // UNE ÉCHOPPE EN PRÉPARATION : les entrées restent, grisées sous le bandeau

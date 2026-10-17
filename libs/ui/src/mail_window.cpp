@@ -698,7 +698,7 @@ std::vector<MailRef> MailDeleteTargets(std::span<const MailRowView> rows,
 }
 
 MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& view,
-                                const SkinArt& art, std::span<const VoteShopOffer> vote_shop) {
+                                const SkinArt& art, ItemLinkFacts link_facts) {
   MailboxAction action;
   if (!state.open) {
     Forget(state);
@@ -738,7 +738,7 @@ MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& vi
       ImGui::TextDisabled("%s", core::Tr("Clique sur un courrier pour le lire."));
     }
     DrawConfirmation(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.described_item = static_cast<int>(chosen.token);
       action.item_gesture = chosen.gesture;

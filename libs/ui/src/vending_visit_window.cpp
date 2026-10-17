@@ -295,7 +295,7 @@ void FitVendingBasket(std::vector<VendingBasketEntry>& basket,
 
 VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
                                           const VendingVisitView& view, const SkinArt& art,
-                                          std::span<const VoteShopOffer> vote_shop) {
+                                          ItemLinkFacts link_facts) {
   VendingVisitAction action;
   if (!state.open) {
     return action;
@@ -372,7 +372,7 @@ VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
       state.open = false;
     }
     DrawConfirmation(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_slot = static_cast<std::uint16_t>(chosen.token);
       action.item_gesture = chosen.gesture;

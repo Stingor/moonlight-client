@@ -26,6 +26,7 @@
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
 #include "game/game.h"
+#include "game/store_search_catalogue.h"
 
 namespace moonclient {
 
@@ -473,6 +474,12 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.trade.deal().SeeApproachClock(&grimoire_.approach_clock());
   pieces_.trade.store_search().SeeCards(
       {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});
+  // LES MÊMES CARTES portent « Voir dans l'album » à leur menu.
+  if (pieces_.wardrobe.has_value()) {
+    card_album_.NoteCardItems(CardItemIdsOf(
+        pieces_.wardrobe->catalog().items, pieces_.item_words,
+        {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items}));
+  }
   pieces_.trade.market().SeeRandomOptions(&pieces_.random_option_names);
   // LA BASE DE DONNÉES : ses tables ne se lisent qu'à la première ouverture de
   // la base ou d'une description. Sa fiche d'objet emprunte celle de la

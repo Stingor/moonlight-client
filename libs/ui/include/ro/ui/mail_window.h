@@ -226,10 +226,9 @@ void SettleMailboxTab(MailboxWindowState& state, const MailboxTabs& tabs);
 [[nodiscard]] std::vector<MailRef> MailDeleteTargets(std::span<const MailRowView> rows,
                                                      const MailboxWindowState& state);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'une pièce jointe.
+// `link_facts` : ce que le menu d'une pièce jointe sait d'avance — vote shop, album.
 [[nodiscard]] MailboxAction DrawMailboxWindow(MailboxWindowState& state, const MailboxView& view,
-                                              const SkinArt& art,
-                                              std::span<const VoteShopOffer> vote_shop = {});
+                                              const SkinArt& art, ItemLinkFacts link_facts = {});
 
 // ── L'ÉCRITURE ──────────────────────────────────────────────────────────────
 
@@ -358,9 +357,10 @@ void OpenMailCompose(MailComposeWindowState& state, std::string_view recipient);
 [[nodiscard]] std::string MailSendRecapText(const MailComposeWindowState& state,
                                             const MailComposeView& view);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'une pièce jointe.
-[[nodiscard]] MailComposeAction DrawMailComposeWindow(
-    MailComposeWindowState& state, const MailComposeView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'une pièce jointe sait d'avance — vote shop, album.
+[[nodiscard]] MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state,
+                                                      const MailComposeView& view,
+                                                      const SkinArt& art,
+                                                      ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

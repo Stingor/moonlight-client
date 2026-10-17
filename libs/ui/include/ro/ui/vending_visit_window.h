@@ -116,9 +116,10 @@ bool AddToVendingBasket(std::vector<VendingBasketEntry>& basket, std::uint16_t s
 void FitVendingBasket(std::vector<VendingBasketEntry>& basket,
                       std::span<const VendingOfferView> offers);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
-[[nodiscard]] VendingVisitAction DrawVendingVisitWindow(
-    VendingVisitWindowState& state, const VendingVisitView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'un item sait d'avance — vote shop, album.
+[[nodiscard]] VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
+                                                        const VendingVisitView& view,
+                                                        const SkinArt& art,
+                                                        ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

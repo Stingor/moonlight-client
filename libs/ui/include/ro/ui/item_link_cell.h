@@ -75,9 +75,9 @@ ChatLinkGesture DrawItemLinkCell(const ItemLinkCell& cell, ItemLinkMenu& menu, C
 // fenêtre — hors de tout `PushID`, de toute table et de tout groupe : un
 // surgissant se nomme dans la pile d'identifiants, et celui que la cellule
 // aurait ouvert sous la sienne ne se retrouverait pas. Ce qu'on y choisit
-// s'écrit dans `asked`. `vote_shop` : le catalogue du vote shop, quand la
-// surface le connaît.
+// s'écrit dans `asked`. `link_facts` : ce que le menu sait d'avance —
+// vote shop, album —, quand la surface le connaît.
 void DrawItemLinkMenu(const char* popup_id, ItemLinkMenu& menu, ChatLinkAsk& asked,
-                      std::span<const VoteShopOffer> vote_shop = {});
+                      ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

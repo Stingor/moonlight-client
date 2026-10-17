@@ -139,7 +139,7 @@ void DropCell(MonsterSheetWindowState& state, const MonsterSheetDropView& drop, 
 // d'ids, et le surgissant ne s'y retrouverait pas.
 void DrawDropMenu(MonsterSheetWindowState& state, const MonsterSheetView& view,
                   MonsterSheetAnswer& answer) {
-  DrawItemLinkMenu(kDropMenuId, state.menu, answer.item, view.vote_shop);
+  DrawItemLinkMenu(kDropMenuId, state.menu, answer.item, view.link_facts);
 }
 
 }  // namespace

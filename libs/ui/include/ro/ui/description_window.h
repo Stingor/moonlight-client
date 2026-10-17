@@ -250,8 +250,8 @@ enum class ItemSheetHost : std::uint8_t { kDescriptionWindow, kDatabase };
 
 struct DescriptionView {
   std::uint32_t item_id = 0;
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
   // Le nom DÉCORÉ, prêt à montrer : raffinement, cartes, emplacements. `app` le
   // compose quand l'objet est encore là, et se rabat sur le nom de base sinon.
   std::string_view name;

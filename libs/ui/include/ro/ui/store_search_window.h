@@ -169,9 +169,10 @@ struct StoreSearchPriceInk {
 };
 [[nodiscard]] StoreSearchPriceInk StoreSearchPriceInkOf(std::int64_t price_zeny);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un objet.
-[[nodiscard]] StoreSearchAction DrawStoreSearchWindow(
-    StoreSearchWindowState& state, const StoreSearchView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'un objet sait d'avance — vote shop, album.
+[[nodiscard]] StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state,
+                                                      const StoreSearchView& view,
+                                                      const SkinArt& art,
+                                                      ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

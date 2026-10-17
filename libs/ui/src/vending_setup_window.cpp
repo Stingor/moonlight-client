@@ -581,7 +581,7 @@ std::vector<std::size_t> VendingHighPricedLines(const VendingSetupWindowState& s
 
 VendingSetupAction DrawVendingSetupWindow(VendingSetupWindowState& state,
                                           const VendingSetupView& view, const SkinArt& art,
-                                          std::span<const VoteShopOffer> vote_shop) {
+                                          ItemLinkFacts link_facts) {
   VendingSetupAction action;
   if (!state.open) {
     return action;
@@ -675,7 +675,7 @@ VendingSetupAction DrawVendingSetupWindow(VendingSetupWindowState& state,
     DrawFooter(state, view, art, action);
     DrawConfirmation(state, view, art, action);
     state.footer_pixels = ImGui::GetCursorPosY() - footer_top;
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_slot = static_cast<std::uint16_t>(chosen.token);
       action.item_gesture = chosen.gesture;

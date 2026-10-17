@@ -159,6 +159,9 @@ void Game::AdvanceViewEquip(std::uint32_t now_ms) {
         static_cast<void>(
             pieces_.cash_shop.OpenWithItem(aimed.item->item_id, windows_.cash_shop.state, link_));
         break;
+      case ro::ui::ChatLinkGesture::kSeeInAlbum:
+        ShowCardInAlbum(aimed.item->item_id, now_ms);
+        break;
       case ro::ui::ChatLinkGesture::kNothing:
       case ro::ui::ChatLinkGesture::kMenu:
       case ro::ui::ChatLinkGesture::kTryStyle:
@@ -190,7 +193,7 @@ void Game::AdvanceViewEquip(std::uint32_t now_ms) {
 
   // ── LA FICHE REÇUE, et la vue qui la montre ───────────────────────────────
   viewed_equipment_->Refresh(inspected_, world_, styles_, Rights().staff_tools, state, now_ms);
-  viewed_equipment_->NoteVoteShop(pieces_.cash_shop.offers());
+  viewed_equipment_->NoteLinkFacts(ItemLinkFactsNow());
   windows_.view_equip.view = sheet.has_value() ? &viewed_equipment_->view() : nullptr;
 }
 

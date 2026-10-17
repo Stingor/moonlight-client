@@ -199,9 +199,15 @@ ro::net::FrameOutcome CardAlbumView::ApplyFrame(const ro::net::Frame& frame,
   // dernière carte rangée à la main : on le dit d'après ce qui a CHANGÉ.
   const bool unsolicited = !in_flight_;
   in_flight_ = false;
+  pocket_ids_.clear();
+  for (const ro::sim::CardAlbumCard& card : album_.cards()) {
+    pocket_ids_.push_back(card.card_id);
+  }
+  std::ranges::sort(pocket_ids_);
   if (album_.blocked()) {
     chain_card_ = 0;
     chained_deposit_ = false;
+    pending_show_ = 0;
     Report(ResultText(CardAlbumResult::kInUse), CardAlbumTone::kRefusal, now_ms);
     return outcome;
   }
@@ -210,6 +216,7 @@ ro::net::FrameOutcome CardAlbumView::ApplyFrame(const ro::net::Frame& frame,
     unsolicited_unlocked_ = album_.unlocked_count() - unlocked_before;
     unsolicited_reserve_ = album_.total_reserve() - reserve_before;
     ReportAnswer(now_ms);
+    ServePendingShow(now_ms);
     return outcome;
   }
   unsolicited_unlocked_ = 0;
@@ -243,8 +250,73 @@ ro::net::FrameOutcome CardAlbumView::ApplyFrame(const ro::net::Frame& frame,
     highlight_card_ = last_card_;
     highlight_ms_ = now_ms;
     ++highlight_serial_;
+    highlight_reveal_ = false;
   }
+  // 🔴 APRÈS L'ORDRE : la demande la plus récente du joueur l'emporte sur le
+  // surlignage de l'ordre, qui garde son compte rendu. Un dépôt enchaîné, lui,
+  // la fait attendre sa propre réponse.
+  ServePendingShow(now_ms);
   return outcome;
+}
+
+void CardAlbumView::ServePendingShow(std::uint32_t now_ms) {
+  if (pending_show_ != 0) {
+    ShowNow(std::exchange(pending_show_, 0), now_ms);
+  }
+}
+
+void CardAlbumView::Show(std::uint32_t card_id, ro::ui::CardAlbumWindowState& state,
+                         ro::net::Connection& link, std::uint32_t now_ms) {
+  if (card_id == 0) {
+    return;
+  }
+  if (state.open) {
+    state.raise = true;
+  } else {
+    Toggle(state, link, now_ms);
+  }
+  // Une réponse est attendue — l'état que l'ouverture vient de demander, ou un
+  // ordre en vol : c'est elle qui portera le catalogue à jour.
+  if (loading_ || in_flight_ || album_.arrival() == 0) {
+    pending_show_ = card_id;
+    return;
+  }
+  ShowNow(card_id, now_ms);
+}
+
+void CardAlbumView::ShowNow(std::uint32_t card_id, std::uint32_t now_ms) {
+  if (album_.Find(card_id) == nullptr) {
+    const char* warning = Tr("Cette carte n'a pas de pochette dans l'album");
+    // UN ORDRE VIENT DE RÉPONDRE DANS LA MÊME IMAGE : son compte rendu reste, et
+    // l'avertissement se lit sur la ligne suivante, du ton le plus grave.
+    if (notice_live_ && notice_ms_ == now_ms && !notice_.empty()) {
+      notice_ += '\n';
+      notice_ += warning;
+      notice_tone_ = std::max(notice_tone_, CardAlbumTone::kWarning);
+      return;
+    }
+    Report(warning, CardAlbumTone::kWarning, now_ms);
+    return;
+  }
+  // UN NOUVEAU NUMÉRO DE SÉRIE : la fenêtre tourne ses pages une fois.
+  highlight_card_ = card_id;
+  highlight_ms_ = now_ms;
+  ++highlight_serial_;
+  highlight_reveal_ = true;
+}
+
+void CardAlbumView::NoteCardItems(std::vector<std::uint32_t> card_ids) {
+  card_ids_ = std::move(card_ids);
+  std::ranges::sort(card_ids_);
+  const auto repeated = std::ranges::unique(card_ids_);
+  card_ids_.erase(repeated.begin(), repeated.end());
+}
+
+ro::ui::CardAlbumLinkFacts CardAlbumView::LinkFacts(bool available) const noexcept {
+  return ro::ui::CardAlbumLinkFacts{.available = available,
+                                    .card_ids = card_ids_,
+                                    .pocket_ids = pocket_ids_,
+                                    .pockets_known = album_.arrival() != 0 && !album_.blocked()};
 }
 
 void CardAlbumView::ReportAnswer(std::uint32_t now_ms) {
@@ -585,6 +657,7 @@ void CardAlbumView::Compose(const CardAlbumPieces& pieces, const ro::sim::World&
   }
   view_.highlight_card = highlight_card_;
   view_.highlight_serial = highlight_serial_;
+  view_.highlight_reveal = highlight_reveal_;
   view_.staff = staff;
 }
 

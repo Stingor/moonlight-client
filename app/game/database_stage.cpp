@@ -371,7 +371,7 @@ void DatabaseStage::Advance(DatabaseWindows& windows, const DatabaseContext& con
   Load();
   view_.loading = loading_.valid();
   view_.status = status_;
-  view_.vote_shop = context.vote_shop;
+  view_.link_facts = context.link_facts;
   if (db_.known()) {
     ComposeRows(windows.state);
     view_.rows = rows_;

@@ -170,8 +170,7 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
                                 const ChatTabLook& tuned, std::span<const ChatEmotion> emotions,
                                 std::span<const ChatEmojiGroup> emojis, ChatDragBoard& board,
                                 const SkinArt& art, std::span<const ChatInputLink> input_links,
-                                std::span<const VoteShopOffer> vote_shop,
-                                const DamageMeterView* meter) {
+                                ItemLinkFacts link_facts, const DamageMeterView* meter) {
   ChatWindowAction asked;
   if (!state.open) {
     return asked;
@@ -209,7 +208,7 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
   log_style.font_size = ImGui::GetFontSize() * static_cast<float>(look.font_percent) / kPercent;
   log_style.line_gap = static_cast<float>(look.line_gap_pixels);
   log_style.timestamps = look.timestamps;
-  log_style.vote_shop = vote_shop;
+  log_style.link_facts = link_facts;
   log_style.rich = look.rich;
   log_style.staff_warp = look.staff_warp;
   log_style.font_percent = look.font_percent;
@@ -426,7 +425,7 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
   if (draws_input) {
     ChatInputAsk from_row;
     from_row.chose_mode = asked.chose_mode;
-    asked.said = DrawChatInput(state.input, preview, &from_row, art, input_links, vote_shop);
+    asked.said = DrawChatInput(state.input, preview, &from_row, art, input_links, link_facts);
     asked.chose_mode = from_row.chose_mode;
     // ⚠ LA SAISIE L'EMPORTE SUR LE FIL, et l'ordre ne décide de rien : le joueur
     // n'a qu'une souris, et les deux surfaces ne se recouvrent pas.

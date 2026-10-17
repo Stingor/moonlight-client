@@ -16,8 +16,7 @@ constexpr float kPercent = 100.0F;
 void UiStage::DrawWhisperWindows(WhisperWindows& whispers, const ChatTabsView& tabs,
                                  std::span<const ro::ui::ChatEmotion> emotions,
                                  std::span<const ro::ui::ChatEmojiGroup> emojis,
-                                 std::span<const ro::ui::VoteShopOffer> vote_shop,
-                                 Answers& answers) {
+                                 ro::ui::ItemLinkFacts link_facts, Answers& answers) {
   // ⚠ L'APPARENCE DU FIL EST CELLE DE LA CONVERSATION PRINCIPALE : une
   // conversation à part n'a pas de réglage à elle, et le joueur a déjà réglé
   // celle-là une fois.
@@ -34,7 +33,7 @@ void UiStage::DrawWhisperWindows(WhisperWindows& whispers, const ChatTabsView& t
         ImGui::GetFontSize() * static_cast<float>(look.font_percent) / kPercent;
     view.log_style.line_gap = static_cast<float>(look.line_gap_pixels);
     view.log_style.timestamps = look.timestamps;
-    view.log_style.vote_shop = vote_shop;
+    view.log_style.link_facts = link_facts;
     // Le texte riche et les vignettes, comme dans le fil.
     view.log_style.rich = look.rich;
     view.log_style.staff_warp = look.staff_warp;
@@ -44,7 +43,7 @@ void UiStage::DrawWhisperWindows(WhisperWindows& whispers, const ChatTabsView& t
     // tient ses liens posés.
     view.emotions = emotions;
     view.emojis = emojis;
-    view.vote_shop = vote_shop;
+    view.link_facts = link_facts;
     ro::ui::WhisperWindowAction asked = ro::ui::DrawWhisperWindow(state->second, view, skin_);
     // UN GESTE SUR UN LIEN DU FIL se suit comme dans la conversation : ses
     // jetons sont ceux des onglets.

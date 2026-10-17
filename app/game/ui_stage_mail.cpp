@@ -6,15 +6,15 @@
 
 namespace moonclient {
 
-void UiStage::DrawMailWindows(MailWindows& mail, std::span<const ro::ui::VoteShopOffer> vote_shop) {
+void UiStage::DrawMailWindows(MailWindows& mail, ro::ui::ItemLinkFacts link_facts) {
   // LA BOÎTE, puis l'écriture, qu'on ouvre depuis elle : la seconde se pose
   // par-dessus la première.
   if (mail.box_view != nullptr) {
-    mail.box_answer = ro::ui::DrawMailboxWindow(mail.box, *mail.box_view, skin_, vote_shop);
+    mail.box_answer = ro::ui::DrawMailboxWindow(mail.box, *mail.box_view, skin_, link_facts);
   }
   if (mail.compose_view != nullptr) {
     mail.compose_answer =
-        ro::ui::DrawMailComposeWindow(mail.compose, *mail.compose_view, skin_, vote_shop);
+        ro::ui::DrawMailComposeWindow(mail.compose, *mail.compose_view, skin_, link_facts);
   }
 }
 

@@ -382,8 +382,7 @@ std::string MailSendRecapText(const MailComposeWindowState& state, const MailCom
 }
 
 MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state, const MailComposeView& view,
-                                        const SkinArt& art,
-                                        std::span<const VoteShopOffer> vote_shop) {
+                                        const SkinArt& art, ItemLinkFacts link_facts) {
   MailComposeAction action;
   if (!state.open) {
     // Une question laissée en suspens ne survit pas à la fenêtre qui la posait.
@@ -406,7 +405,7 @@ MailComposeAction DrawMailComposeWindow(MailComposeWindowState& state, const Mai
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, mail::kChildRoundingPixels * scale);
     DrawBody(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.described_item = static_cast<int>(chosen.token);
       action.item_gesture = chosen.gesture;

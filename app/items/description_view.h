@@ -91,11 +91,9 @@ class DescriptionView {
 
   [[nodiscard]] const ro::ui::DescriptionView& view() const noexcept { return view_; }
 
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item. ⚠ À POSER APRÈS
+  // Ce que le menu d'un item sait d'avance : vote shop, album. ⚠ À POSER APRÈS
   // `Refresh`, qui remet la vue à zéro.
-  void NoteVoteShop(std::span<const ro::ui::VoteShopOffer> offers) noexcept {
-    view_.vote_shop = offers;
-  }
+  void NoteLinkFacts(ro::ui::ItemLinkFacts facts) noexcept { view_.link_facts = facts; }
 
   // L'ÉTIQUETTE « CRAFT » de l'item montré, APRÈS `Refresh` — qui l'efface. Deux
   // textes vides : l'item n'a rien à voir avec la fabrication.

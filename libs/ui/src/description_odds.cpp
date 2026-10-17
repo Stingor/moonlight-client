@@ -75,7 +75,7 @@ void FinishItemSheetLinks(DescriptionWindowState& state, const DescriptionView& 
                           ItemSheetHost host, DescriptionWindowAction& action) {
   // Le menu, hors des tables : une cellule change la pile d'identifiants, et le
   // surgissant ne s'y retrouverait pas.
-  DrawItemLinkMenu(kLinkMenuId, state.link_menu, action.link, view.vote_shop);
+  DrawItemLinkMenu(kLinkMenuId, state.link_menu, action.link, view.link_facts);
   // 🔴 DÉCRIRE UN OBJET NE SORT PAS DE LA FICHE : c'est une surface de
   // description, et le clic y REMPLACE l'objet affiché — la fenêtre par son fil
   // « < Retour », la base par le sien. Un monstre, lui, a sa propre fiche.

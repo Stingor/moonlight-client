@@ -4,6 +4,7 @@
 // objet avec son nom, et, pour une carte, le mot qu'elle pose. Se juge sur un
 // banc, sans fenêtre ni réseau.
 
+#include <cstdint>
 #include <vector>
 
 #include "ro/sim/store_search.h"
@@ -32,5 +33,11 @@ struct StoreSearchCardTables {
 [[nodiscard]] std::vector<ro::sim::StoreSearchCatalogueEntry> StoreSearchCatalogueOf(
     const ro::vfs::ItemTable& table, const ro::vfs::ItemWords& words,
     const StoreSearchCardTables& cards);
+
+// LES CARTES DE LA TABLE, au même sens que le catalogue : c'est elles que le
+// menu d'un objet propose de voir dans l'album. Dans l'ordre de la table.
+[[nodiscard]] std::vector<std::uint32_t> CardItemIdsOf(const ro::vfs::ItemTable& table,
+                                                       const ro::vfs::ItemWords& words,
+                                                       const StoreSearchCardTables& cards);
 
 }  // namespace moonclient

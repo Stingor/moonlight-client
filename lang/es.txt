@@ -13888,6 +13888,12 @@ tr: Una card ligada o alquilada no se puede guardar.
 fr: Vers l'album
 tr: Al álbum
 
+fr: Voir dans l'album
+tr: Ver en el álbum
+
+fr: Cette carte n'a pas de pochette dans l'album
+tr: Esta card no tiene funda en el álbum
+
 fr: Voir dans la base de données
 tr: Ver en la base de datos
 

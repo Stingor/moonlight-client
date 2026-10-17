@@ -81,8 +81,7 @@ void DrawShopLines(VendingShopWindowState& state, const VendingShopView& view,
 }  // namespace
 
 VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const VendingShopView& view,
-                                        const SkinArt& art,
-                                        std::span<const VoteShopOffer> vote_shop) {
+                                        const SkinArt& art, ItemLinkFacts link_facts) {
   VendingShopAction action;
   // 🔴 UNE FENÊTRE BAISSÉE N'EST PAS UNE ÉCHOPPE FERMÉE : la croix ou Échap ne
   // font que POSER LA QUESTION. La fenêtre se relève, et c'est la réponse qui
@@ -134,7 +133,7 @@ VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const Ven
           break;
       }
     }
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kShopItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kShopItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_slot = static_cast<std::uint16_t>(chosen.token);
       action.item_gesture = chosen.gesture;
@@ -145,8 +144,7 @@ VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const Ven
 }
 
 VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state, const VendingLogView& view,
-                                      const SkinArt& art,
-                                      std::span<const VoteShopOffer> vote_shop) {
+                                      const SkinArt& art, ItemLinkFacts link_facts) {
   VendingLogAction action;
   if (!state.open) {
     return action;
@@ -219,7 +217,7 @@ VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state, const Vendin
     if (SkinButton(core::Tr("Fermer"), art)) {
       state.open = false;
     }
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kLogItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kLogItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_rank = chosen.token;
       action.item_gesture = chosen.gesture;

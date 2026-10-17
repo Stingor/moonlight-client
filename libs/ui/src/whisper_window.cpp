@@ -142,7 +142,7 @@ void DrawInputRow(WhisperWindowState& state, const WhisperWindowView& view,
   action.input_active = active;
   state.input.was_active = active;
   action.input_link = PaintInputLinkChips(state.input, view.input_links, field, field_at,
-                                          field_size, 0.0F, active, hovered, view.vote_shop);
+                                          field_size, 0.0F, active, hovered, view.link_facts);
   // ⚠ DE QUELLE SAISIE : chaque conversation a ses propres liens posés.
   action.input_link.input_peer = view.peer;
   if (inserted) {

@@ -138,7 +138,7 @@ struct CardAlbumArtAsk {
   bool silhouette = false;
 };
 
-// LE TON D'UN COMPTE RENDU.
+// LE TON D'UN COMPTE RENDU, du plus doux au plus grave : `std::max` garde le pire.
 enum class CardAlbumTone : std::uint8_t { kDone, kWarning, kRefusal };
 
 struct CardAlbumView {
@@ -177,6 +177,10 @@ struct CardAlbumView {
   // tourne alors ses pages jusqu'à elle, UNE fois.
   std::uint32_t highlight_card = 0;
   std::uint32_t highlight_serial = 0;
+  // LE JOUEUR A DEMANDÉ À VOIR CETTE POCHETTE (« Voir dans l'album ») : si la
+  // recherche, l'intercalaire ou un filtre la cachent, ils se lèvent. Un ordre
+  // abouti, lui, laisse la vue telle que le joueur l'a réglée.
+  bool highlight_reveal = false;
 
   // L'édition des albums d'objets est-elle ouverte à ce joueur ?
   bool staff = false;
@@ -272,6 +276,10 @@ struct CardAlbumWindowState {
   int sort_mode = 0;
   int show_filter = 0;
   int slot_filter = 0;
+  // L'INTERCALAIRE A ÉTÉ POSÉ D'AILLEURS que par la barre : elle sélectionne
+  // `slot_filter` à l'image suivante. ⚠ JUSQUE-LÀ, l'onglet qu'elle montre
+  // encore ne réécrit pas le filtre.
+  bool slot_tab_asked = false;
   // Un bit par nature (1 << rang) ; zéro = toutes.
   std::uint8_t nature_mask = 0;
 

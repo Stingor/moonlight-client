@@ -391,7 +391,7 @@ int AddToBuyingStoreSale(BuyingStoreSellState& state, std::span<const BuyingStor
 
 BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
                                                 const BuyingStoreSellView& view, const SkinArt& art,
-                                                std::span<const VoteShopOffer> vote_shop) {
+                                                ItemLinkFacts link_facts) {
   BuyingStoreSellAction action;
   if (!state.open) {
     return action;
@@ -430,7 +430,7 @@ BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
     DrawCart(state, view, art, footer, action);
     DrawFooter(state, view, art);
     DrawSaleConfirmation(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_id = chosen.item_id;
       action.describe_slot = static_cast<std::uint16_t>(chosen.token);

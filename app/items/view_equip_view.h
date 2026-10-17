@@ -55,11 +55,9 @@ class ViewedEquipmentView {
 
   [[nodiscard]] const ro::ui::ViewEquipView& view() const noexcept { return view_; }
 
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item. ⚠ À POSER APRÈS
+  // Ce que le menu d'un item sait d'avance : vote shop, album. ⚠ À POSER APRÈS
   // `Refresh`, qui remet la vue à zéro.
-  void NoteVoteShop(std::span<const ro::ui::VoteShopOffer> offers) noexcept {
-    view_.vote_shop = offers;
-  }
+  void NoteLinkFacts(ro::ui::ItemLinkFacts facts) noexcept { view_.link_facts = facts; }
 
   // Le joueur affiché : zéro quand la fiche n'a pas été demandée par nous.
   [[nodiscard]] std::uint32_t shown_id() const noexcept { return shown_id_; }

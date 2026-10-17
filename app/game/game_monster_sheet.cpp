@@ -148,7 +148,7 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   }
   const ro::ui::MonsterSheetView& view =
       sheet.Refresh(state, world_.player_status(), options.animate(), true, now_ms);
-  sheet.NoteVoteShop(pieces_.cash_shop.offers());
+  sheet.NoteLinkFacts(ItemLinkFactsNow());
   // « Base de données » dans la fiche seule, que la base reprendrait.
   sheet.NoteDatabaseLink(state.open && !sheet.shown_by_view());
   windows_.monster_sheet.view = state.open ? &view : nullptr;
@@ -217,6 +217,9 @@ void Game::FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now
     case ro::ui::ChatLinkGesture::kVoteShop:
       // Le vote shop : la boutique s'ouvre, l'item au panier.
       static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop.state, link_));
+      break;
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
+      ShowCardInAlbum(item_id, now_ms);
       break;
     case ro::ui::ChatLinkGesture::kNothing:
     case ro::ui::ChatLinkGesture::kMenu:

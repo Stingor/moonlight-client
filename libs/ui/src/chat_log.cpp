@@ -639,7 +639,7 @@ ChatLogAction DrawChatLog(std::span<const ChatLineView> lines, const ChatLogStyl
     }
   }
   if (const ChatLinkAsk chosen =
-          DrawChatLinkMenu(kLinkMenuId, target_kind, target_item, wanted, label, style.vote_shop,
+          DrawChatLinkMenu(kLinkMenuId, target_kind, target_item, wanted, label, style.link_facts,
                            target_refusals, target_mvp, target_navi, target_url, style.staff_warp);
       chosen.gesture != ChatLinkGesture::kNothing) {
     asked.gesture = chosen.gesture;

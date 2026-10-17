@@ -93,6 +93,7 @@ void Game::FollowMonsterGesture(ro::ui::ChatLinkGesture gesture, const MonsterLi
     case ro::ui::ChatLinkGesture::kShowImageOnce:
     case ro::ui::ChatLinkGesture::kAllowImageHost:
     case ro::ui::ChatLinkGesture::kViewImage:
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
     case ro::ui::ChatLinkGesture::kGoThere:
       break;
   }
@@ -157,6 +158,7 @@ void Game::FollowNaviSearchLink(const ro::ui::ChatLinkAsk& asked, const NaviSear
     case ro::ui::ChatLinkGesture::kShowImageOnce:
     case ro::ui::ChatLinkGesture::kAllowImageHost:
     case ro::ui::ChatLinkGesture::kViewImage:
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
     case ro::ui::ChatLinkGesture::kPostWhereToFind:
       break;
   }

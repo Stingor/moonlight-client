@@ -157,10 +157,11 @@ void TakeFromVendingSetup(VendingSetupWindowState& state, std::uint16_t cart_slo
 // Les rangs des lignes dont le prix se confirme.
 [[nodiscard]] std::vector<std::size_t> VendingHighPricedLines(const VendingSetupWindowState& state);
 
-// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
-// shop, pour le menu d'un item.
-[[nodiscard]] VendingSetupAction DrawVendingSetupWindow(
-    VendingSetupWindowState& state, const VendingSetupView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// Dessine la fenêtre si elle est ouverte. `link_facts` : ce que le
+// menu d'un item sait d'avance — vote shop, album.
+[[nodiscard]] VendingSetupAction DrawVendingSetupWindow(VendingSetupWindowState& state,
+                                                        const VendingSetupView& view,
+                                                        const SkinArt& art,
+                                                        ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

@@ -499,8 +499,8 @@ UiStage::Answers UiStage::Draw(
     windows.cash_shop.answer =
         ro::ui::DrawCashShopWindow(windows.cash_shop.state, *windows.cash_shop.view, skin_);
   }
-  DrawTradeWindows(windows.trade, windows.chat.vote_shop);
-  DrawMailWindows(windows.mail, windows.chat.vote_shop);
+  DrawTradeWindows(windows.trade, windows.chat.link_facts);
+  DrawMailWindows(windows.mail, windows.chat.link_facts);
   DrawQuestWindows(windows.quests, windows.tracker);
   DrawAchievementWindows(windows.achievements);
   DrawRankingWindows(windows.ranking_board);

@@ -188,10 +188,10 @@ struct BarterRecap {
 // Remet la fenêtre à l'état d'une ouverture neuve.
 void OpenBarterOn(BarterWindowState& state, std::uint32_t opening_seq);
 
-// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
-// shop, pour le menu d'un item.
+// Dessine la fenêtre si elle est ouverte. `link_facts` : ce que le
+// menu d'un item sait d'avance — vote shop, album.
 [[nodiscard]] BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& view,
                                                   const SkinArt& art,
-                                                  std::span<const VoteShopOffer> vote_shop = {});
+                                                  ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

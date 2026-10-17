@@ -182,10 +182,10 @@ bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine&
                                                 const NpcShopView& view,
                                                 std::span<const NpcShopCartLine> lines);
 
-// Dessine la fenêtre si elle est ouverte. `vote_shop` : le catalogue du vote
-// shop, pour le menu d'un item.
+// Dessine la fenêtre si elle est ouverte. `link_facts` : ce que le
+// menu d'un item sait d'avance — vote shop, album.
 [[nodiscard]] NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state,
                                                     const NpcShopView& view, const SkinArt& art,
-                                                    std::span<const VoteShopOffer> vote_shop = {});
+                                                    ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

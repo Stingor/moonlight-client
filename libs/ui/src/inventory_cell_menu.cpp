@@ -70,6 +70,10 @@ void DrawInventoryCellMenu(const InventoryCellView& cell, ImVec2 menu_padding, I
     if (ImGui::MenuItem(core::Tr("Ouvrir dans la base de données"))) {
       action.database_item_id = cell.item_id;
     }
+    // UNE CARTE : sa pochette dans l'album, qui ne touche à rien non plus.
+    if (SeeInAlbumMenuItem(CardAlbumEntryOf(view.album_links, cell.item_id, cell.card))) {
+      action.see_in_album_id = cell.item_id;
+    }
     ImGui::Separator();
     if (cell.worn) {
       if (ImGui::MenuItem(core::Tr("Retirer"))) {

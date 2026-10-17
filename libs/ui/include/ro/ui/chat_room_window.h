@@ -179,7 +179,7 @@ struct ChatRoomView {
   ChatInputState* input = nullptr;
   const ChatLinePreview* preview = nullptr;
   std::span<const ChatInputLink> input_links;
-  std::span<const VoteShopOffer> vote_shop;
+  ItemLinkFacts link_facts;
 };
 
 struct ChatRoomWindowState {

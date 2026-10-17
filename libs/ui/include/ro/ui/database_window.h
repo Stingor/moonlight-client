@@ -237,8 +237,8 @@ struct DatabaseView {
   // fiche de la fenêtre de description (`DrawItemSheetBody`).
   const DescriptionView* item = nullptr;
   const MonsterSheetView* monster = nullptr;
-  // Le catalogue du vote shop, pour le menu d'une ligne de la liste.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'une ligne de la liste sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
 };
 
 struct DatabaseAnswer {

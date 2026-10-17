@@ -580,7 +580,7 @@ void DrawConfirmation(DealWindowState& state, const DealView& view, const SkinAr
 }
 
 void DrawBody(DealWindowState& state, const DealView& view, const SkinArt& art,
-              std::span<const VoteShopOffer> vote_shop, DealWindowAction& action) {
+              ItemLinkFacts link_facts, DealWindowAction& action) {
   const float scale = Scale();
   const float gap = kColumnGapPixels * scale;
   const float column = std::max(0.0F, (ImGui::GetContentRegionAvail().x - gap) * 0.5F);
@@ -607,7 +607,7 @@ void DrawBody(DealWindowState& state, const DealView& view, const SkinArt& art,
   ImGui::TextDisabled(
       "%s", core::Tr("Survol : aperçu   -   Clic droit : menu   -   Maj+clic : lien dans le chat"));
   DrawConfirmation(state, view, art, action);
-  NoteMenuChoice(DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop), action);
+  NoteMenuChoice(DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts), action);
 }
 
 }  // namespace
@@ -711,7 +711,7 @@ void OpenDealOn(DealWindowState& state, std::uint32_t opening_seq) {
 }
 
 DealWindowAction DrawDealWindow(DealWindowState& state, const DealView& view, const SkinArt& art,
-                                std::span<const VoteShopOffer> vote_shop) {
+                                ItemLinkFacts link_facts) {
   DealWindowAction action;
   if (!state.open) {
     // Une question laissée en suspens ne survit pas à la fenêtre qui la posait.
@@ -733,7 +733,7 @@ DealWindowAction DrawDealWindow(DealWindowState& state, const DealView& view, co
                                              ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kChildRoundingPixels * scale);
-    DrawBody(state, view, art, vote_shop, action);
+    DrawBody(state, view, art, link_facts, action);
     ImGui::PopStyleVar();
   }
   EndSkinnedWindow();

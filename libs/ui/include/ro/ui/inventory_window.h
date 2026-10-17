@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/card_album_link.h"
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_art.h"
 
@@ -251,6 +252,9 @@ struct InventoryWindowView {
   bool cart_open = false;
   // L'ALBUM DE CARTES EST-IL OUVERT ? Alors une carte peut y aller par le menu.
   bool album_open = false;
+  // « Voir dans l'album » au menu d'une carte. ⚠ DES VUES, qui ne valent que
+  // pour l'image.
+  CardAlbumLinkFacts album_links;
   // UN COURRIER S'ÉCRIT-IL ? Alors un objet du sac peut y être joint par le
   // menu.
   bool mail_writing = false;
@@ -429,6 +433,8 @@ struct InventoryWindowAction {
   // combien —, ou la pochette de cette carte vient d'être lâchée sur le sac.
   std::uint16_t to_album_slot = 0;
   std::uint32_t album_withdraw = 0;
+  // « Voir dans l'album » : la carte dont il veut la pochette ; zéro sinon.
+  std::uint32_t see_in_album_id = 0;
 
   // LE MARCHÉ, ouvert sur l'identifiant de cet item ; zéro sinon.
   std::uint32_t market_item_id = 0;

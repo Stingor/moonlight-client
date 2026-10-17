@@ -13888,6 +13888,12 @@ tr: A bound or rented card cannot be filed away.
 fr: Vers l'album
 tr: To the album
 
+fr: Voir dans l'album
+tr: See in the album
+
+fr: Cette carte n'a pas de pochette dans l'album
+tr: This card has no sleeve in the album
+
 fr: Voir dans la base de données
 tr: View in the database
 

@@ -32,12 +32,23 @@ DatabaseContext Game::DatabaseContextNow(std::uint32_t now_ms) {
                          .world = world_,
                          .market = pieces_.trade.market().market(),
                          .online = link_.is_open(),
-                         .vote_shop = pieces_.cash_shop.offers(),
+                         .link_facts = ItemLinkFactsNow(),
                          .now_ms = now_ms};
 }
 
+ro::ui::ItemLinkFacts Game::ItemLinkFactsNow() {
+  // L'ALBUM S'OUVRE PARTOUT EN PARTIE : c'est au serveur qu'il demande son état,
+  // et le lien seul le permet.
+  return ro::ui::ItemLinkFacts{.vote_shop = pieces_.cash_shop.offers(),
+                               .album = card_album_.LinkFacts(link_.is_open())};
+}
+
+void Game::ShowCardInAlbum(std::uint32_t card_id, std::uint32_t now_ms) {
+  card_album_.Show(card_id, windows_.card_album, link_, now_ms);
+}
+
 void Game::DecorateItemSheet(DescriptionView& sheet, std::uint32_t item_id) {
-  sheet.NoteVoteShop(pieces_.cash_shop.offers());
+  sheet.NoteLinkFacts(ItemLinkFactsNow());
   sheet.NoteHatEffect(pieces_.cash_shop.hat_effects().OrdinalOf(item_id) != 0);
   // L'ÉTIQUETTE « CRAFT », que seul l'Atlas sait composer.
   std::string craft_label;

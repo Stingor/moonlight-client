@@ -66,8 +66,7 @@ void UiStage::DrawConversation(Windows& windows, const ro::ui::ChatLinePreview& 
             emojis, windows.chat.board, skin_,
             // ⚠ À LA PRINCIPALE SEULEMENT : une flottante n'a pas de saisie, et
             // lui donner les pastilles la ferait peindre par-dessus son fil.
-            group == 0 ? links : std::span<const ro::ui::ChatInputLink>(),
-            std::span<const ro::ui::VoteShopOffer>(),
+            group == 0 ? links : std::span<const ro::ui::ChatInputLink>(), windows.chat.link_facts,
             windows.damage_meter_view.look.shown ? &windows.damage_meter_view : nullptr)});
   }
   // 🔴 ICI, ET PAS DANS LA BANDE QUI A VU LE LÂCHER : c'est le seul moment
@@ -75,8 +74,8 @@ void UiStage::DrawConversation(Windows& windows, const ro::ui::ChatLinePreview& 
   // dessinées.
   answers.chat_drop = ro::ui::DecideChatDrop(windows.chat.board);
   DrawChatRoomWindows(windows.chat_room, windows.chat.main, preview, tabs, links,
-                      windows.chat.vote_shop, answers);
-  DrawWhisperWindows(windows.whispers, tabs, emotions, emojis, windows.chat.vote_shop, answers);
+                      windows.chat.link_facts, answers);
+  DrawWhisperWindows(windows.whispers, tabs, emotions, emojis, windows.chat.link_facts, answers);
   // LES CONFIRMATIONS D'UN LIEN WEB ET LA VISIONNEUSE, après toutes les
   // fenêtres qui portent des liens : elles passent devant celle d'où vient le
   // clic. ⚠ DESSINÉES MÊME SANS QUESTION : une boîte congédiée rend sa réponse

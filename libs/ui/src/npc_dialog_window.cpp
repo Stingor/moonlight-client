@@ -707,7 +707,7 @@ NpcDialogAnswer DrawNpcDialogWindow(NpcDialogWindowState& state, const NpcDialog
     // en entier.
     const ChatLinkKind menu_kind = DialogTargetMenuKind(aimed.kind).value_or(ChatLinkKind::kItem);
     if (const ChatLinkAsk chosen = DrawChatLinkMenu(kTargetMenuId, menu_kind, aimed.id, aimed.id,
-                                                    aimed.label, view.vote_shop);
+                                                    aimed.label, view.link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       answer.target = aimed;
       answer.gesture = chosen.gesture;

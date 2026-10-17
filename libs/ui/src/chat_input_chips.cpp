@@ -73,8 +73,7 @@ constexpr char kEmoteTokenMark = ':';
 
 ChatLinkAsk PaintInputLinkChips(const ChatInputState& state, std::span<const ChatInputLink> links,
                                 ImGuiID field, ImVec2 field_at, ImVec2 field_size, float wrap_width,
-                                bool active, bool hovered,
-                                std::span<const VoteShopOffer> vote_shop) {
+                                bool active, bool hovered, ItemLinkFacts link_facts) {
   ChatLinkAsk asked;
   // ⚠ D'ICI, TOUJOURS : c'est la surface qui le dit, pas `app` qui le devine.
   asked.from_input = true;
@@ -85,7 +84,8 @@ ChatLinkAsk PaintInputLinkChips(const ChatInputState& state, std::span<const Cha
     // ⚠ LE MENU SE DESSINE QUAND MÊME : fermé, il ne coûte rien, et sauter son
     // appel le jour où la saisie se vide le laisserait ouvert sur du vide.
     return DrawChatLinkMenu(kChipMenuId, ChatLinkKind::kItem, 0,
-                            static_cast<std::uint32_t>(kept->GetInt(target_key, 0)), {}, vote_shop);
+                            static_cast<std::uint32_t>(kept->GetInt(target_key, 0)), {},
+                            link_facts);
   }
   const ImGuiStyle& style = ImGui::GetStyle();
   const float font_size = ImGui::GetFontSize();
@@ -179,7 +179,7 @@ ChatLinkAsk PaintInputLinkChips(const ChatInputState& state, std::span<const Cha
   into->PopClipRect();
 
   if (const ChatLinkAsk chosen =
-          DrawChatLinkMenu(kChipMenuId, menu_kind, menu_item, wanted, menu_label, vote_shop,
+          DrawChatLinkMenu(kChipMenuId, menu_kind, menu_item, wanted, menu_label, link_facts,
                            nullptr, menu_mvp, menu_navi);
       chosen.gesture != ChatLinkGesture::kNothing) {
     asked.gesture = chosen.gesture;

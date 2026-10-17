@@ -122,9 +122,10 @@ bool AddBuyingStoreSetupLine(BuyingStoreSetupState& state, std::uint32_t item_id
 // Vrai si une ligne demande un prix qui se confirme.
 [[nodiscard]] bool BuyingStoreSetupHasDearPrice(const BuyingStoreSetupState& state);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
-[[nodiscard]] BuyingStoreSetupAction DrawBuyingStoreSetupWindow(
-    BuyingStoreSetupState& state, const BuyingStoreSetupView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'un item sait d'avance — vote shop, album.
+[[nodiscard]] BuyingStoreSetupAction DrawBuyingStoreSetupWindow(BuyingStoreSetupState& state,
+                                                                const BuyingStoreSetupView& view,
+                                                                const SkinArt& art,
+                                                                ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

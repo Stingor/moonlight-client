@@ -161,6 +161,8 @@ struct StorageWindowView {
   // UNE ÉCHOPPE SE PRÉPARE : le coffre ne rend plus rien, ni au sac ni à la
   // charrette. Le fermer reste permis.
   bool transfers_frozen = false;
+  // « Voir dans l'album » au menu d'une carte. ⚠ DES VUES, pour l'image.
+  CardAlbumLinkFacts album_links;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -318,6 +320,8 @@ struct StorageWindowAction {
   // est là.
   std::uint32_t describe_id = 0;
   std::uint16_t describe_slot = 0;
+  // « Voir dans l'album » : la carte dont il veut la pochette ; zéro sinon.
+  std::uint32_t see_in_album_id = 0;
 
   // LE COFFRE QU'ON VIENT DE DEMANDER, par son NUMÉRO ; moins de zéro si aucun.
   //

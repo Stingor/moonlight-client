@@ -40,7 +40,7 @@ struct DatabaseContext {
   ro::sim::Market& market;
   // Connecté à un serveur qui comprend le Marché : « Vendu chez » se demande.
   bool online = false;
-  std::span<const ro::ui::VoteShopOffer> vote_shop;
+  ro::ui::ItemLinkFacts link_facts;
   std::uint32_t now_ms = 0;
 };
 

@@ -137,10 +137,9 @@ bool NoteTradeItemLink(const TradeItemGesture& gesture, const TradeItemView& ite
   return gesture.repost;
 }
 
-ChatLinkAsk DrawTradeItemMenu(const char* popup_id, ItemLinkMenu& menu,
-                              std::span<const VoteShopOffer> vote_shop) {
+ChatLinkAsk DrawTradeItemMenu(const char* popup_id, ItemLinkMenu& menu, ItemLinkFacts link_facts) {
   ChatLinkAsk chosen;
-  DrawItemLinkMenu(popup_id, menu, chosen, vote_shop);
+  DrawItemLinkMenu(popup_id, menu, chosen, link_facts);
   return chosen;
 }
 

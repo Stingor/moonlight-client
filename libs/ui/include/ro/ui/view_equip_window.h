@@ -57,8 +57,8 @@ struct ViewEquipSectionView {
 };
 
 struct ViewEquipView {
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
   // DÉJÀ COMPOSÉ, identité `###` comprise : inspecter quelqu'un d'autre change
   // le titre, pas la place ni la taille de la fenêtre.
   std::string title;

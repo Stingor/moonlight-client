@@ -506,7 +506,7 @@ bool AppendPendingInsert(ChatInputState& state, std::string_view piece) {
 std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePreview& preview,
                                          ChatInputAsk* asked, const SkinArt& art,
                                          std::span<const ChatInputLink> links,
-                                         std::span<const VoteShopOffer> vote_shop) {
+                                         ItemLinkFacts link_facts) {
   // ⚠ UN APPELANT QUI N'ÉCOUTE PAS REÇOIT UNE RÉPONSE QU'ON JETTE : la boîte des
   // chuchotements et la destination écrivent dedans sans tester, et le reste
   // de la fonction testait. Un seul point de garde vaut mieux que deux règles.
@@ -669,7 +669,7 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
   const bool field_hovered = ImGui::IsItemHovered();
   if (asked != nullptr) {
     asked->link = PaintInputLinkChips(state, links, field, field_corner, field_extent, wrap_width,
-                                      active, field_hovered, vote_shop);
+                                      active, field_hovered, link_facts);
   }
   if (inserted) {
     // 🔴 ON PRÉVIENT LE CHAMP. Écrire dans son tampon sans le lui dire

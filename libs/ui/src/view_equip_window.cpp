@@ -189,7 +189,7 @@ void DrawPieceList(ViewEquipWindowState& state, const ViewEquipView& view,
   // 🔴 L'OUVERTURE SE FAIT ICI, PAS AU CLIC, et dans le MÊME enfant que les
   // cellules : un surgissant appartient à sa fenêtre, et son identifiant se
   // hache avec la pile d'ids.
-  DrawItemLinkMenu(kItemMenuId, state.menu, answer.link, view.vote_shop);
+  DrawItemLinkMenu(kItemMenuId, state.menu, answer.link, view.link_facts);
   for (std::size_t rank = 0; rank < view.sections.size(); ++rank) {
     DrawSection(state, view.sections[rank], static_cast<int>(rank), answer);
   }

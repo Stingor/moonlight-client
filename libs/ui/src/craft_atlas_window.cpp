@@ -638,7 +638,7 @@ void DrawSheet(CraftAtlasWindowState& state, const CraftAtlasView& view, const S
 // d'ids, et le surgissant ne s'y retrouverait pas.
 void DrawRowMenu(CraftAtlasWindowState& state, const CraftAtlasView& view,
                  CraftAtlasAnswer& answer) {
-  DrawItemLinkMenu(kRowMenuId, state.menu, answer.item, view.vote_shop);
+  DrawItemLinkMenu(kRowMenuId, state.menu, answer.item, view.link_facts);
 }
 
 void DrawBody(CraftAtlasWindowState& state, const CraftAtlasView& view, const SkinArt& art,

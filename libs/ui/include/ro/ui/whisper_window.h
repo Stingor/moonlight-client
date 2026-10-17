@@ -61,8 +61,8 @@ struct WhisperWindowView {
   // verraient, jamais le correspondant.
   std::span<const ChatEmotion> emotions;
   std::span<const ChatEmojiGroup> emojis;
-  // Le catalogue du vote shop, pour le menu d'une pastille.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'une pastille sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
 };
 
 struct WhisperWindowState {

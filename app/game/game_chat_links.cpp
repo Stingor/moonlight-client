@@ -443,6 +443,9 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
       static_cast<void>(
           pieces_.cash_shop.OpenWithItem(asked.item_id, windows_.cash_shop.state, link_));
       break;
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
+      ShowCardInAlbum(asked.item_id, now_ms);
+      break;
     case ro::ui::ChatLinkGesture::kNothing:
     case ro::ui::ChatLinkGesture::kMenu:
     case ro::ui::ChatLinkGesture::kTryStyle:
@@ -529,6 +532,7 @@ void Game::FollowStyleLink(const ChatLinkTarget& aimed, ro::ui::ChatLinkGesture 
     case ro::ui::ChatLinkGesture::kShowImageOnce:
     case ro::ui::ChatLinkGesture::kAllowImageHost:
     case ro::ui::ChatLinkGesture::kViewImage:
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
     case ro::ui::ChatLinkGesture::kPostWhereToFind:
     case ro::ui::ChatLinkGesture::kGoThere:
       break;

@@ -459,7 +459,7 @@ DatabaseAnswer DrawDatabaseWindow(DatabaseWindowState& state, const DatabaseView
     }
     // LES MENUS, HORS de la table et des panneaux : une cellule change la pile
     // d'identifiants. Celui d'une ligne de la liste, puis ceux de la fiche.
-    DrawItemLinkMenu(kListMenuId, state.list_menu, answer.list, view.vote_shop);
+    DrawItemLinkMenu(kListMenuId, state.list_menu, answer.list, view.link_facts);
     if (view.item != nullptr) {
       FinishItemSheetLinks(state.item_sheet, *view.item, ItemSheetHost::kDatabase, answer.item);
       FollowSheetLink(state, *view.item, answer.item.link);

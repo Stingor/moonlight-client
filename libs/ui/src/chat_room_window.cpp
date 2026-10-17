@@ -290,7 +290,7 @@ ChatRoomWindowAction DrawChatRoomWindow(ChatRoomWindowState& state, const ChatRo
     // ── LA BARRE DE LA CONVERSATION ─────────────────────────────────────────
     if (view.input != nullptr && view.preview != nullptr) {
       action.said = DrawChatInput(*view.input, *view.preview, &action.input, art, view.input_links,
-                                  view.vote_shop);
+                                  view.link_facts);
     } else {
       ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
       ImGui::TextUnformatted(core::Tr("La conversation est fermée : rien ne peut s'écrire ici."));

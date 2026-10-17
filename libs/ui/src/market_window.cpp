@@ -413,7 +413,7 @@ void DrawFooter(MarketWindowState& state, const MarketView& view, const SkinArt&
 
 // LE CONTENU D'UNE ÉCHOPPE, dans sa fenêtre : rien ne s'y achète.
 void DrawStoreWindow(MarketWindowState& state, const MarketView& view, const SkinArt& art,
-                     std::span<const VoteShopOffer> vote_shop, MarketAction& action) {
+                     ItemLinkFacts link_facts, MarketAction& action) {
   if (!state.store_open) {
     return;
   }
@@ -461,7 +461,7 @@ void DrawStoreWindow(MarketWindowState& state, const MarketView& view, const Ski
       ImGui::EndTable();
     }
     if (const ChatLinkAsk chosen =
-            DrawTradeItemMenu(kStoreItemMenuId, state.store_item_menu, vote_shop);
+            DrawTradeItemMenu(kStoreItemMenuId, state.store_item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_row = static_cast<int>(chosen.token);
       action.describe_in_store = true;
@@ -488,7 +488,7 @@ void OpenMarketOn(MarketWindowState& state, std::string_view query) {
 }
 
 MarketAction DrawMarketWindow(MarketWindowState& state, const MarketView& view, const SkinArt& art,
-                              std::span<const VoteShopOffer> vote_shop) {
+                              ItemLinkFacts link_facts) {
   MarketAction action;
   if (!state.open) {
     return action;
@@ -513,7 +513,7 @@ MarketAction DrawMarketWindow(MarketWindowState& state, const MarketView& view, 
     ImGui::Separator();
     DrawResults(state, view, art, action);
     DrawFooter(state, view, art);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_row = static_cast<int>(chosen.token);
       action.describe_in_store = false;
@@ -527,7 +527,7 @@ MarketAction DrawMarketWindow(MarketWindowState& state, const MarketView& view, 
     action.close = true;
     return action;
   }
-  DrawStoreWindow(state, view, art, vote_shop, action);
+  DrawStoreWindow(state, view, art, link_facts, action);
   return action;
 }
 

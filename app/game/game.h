@@ -244,6 +244,10 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // Le lien d'un monstre de la base : son rang et son nom, quand elle le sait.
   [[nodiscard]] MonsterLink DatabaseMonsterLink(std::uint32_t monster_id) const;
   [[nodiscard]] DatabaseContext DatabaseContextNow(std::uint32_t now_ms);
+  // CE QUE LE MENU D'UN OBJET SAIT D'AVANCE — vote shop, album —, le même pour
+  // toutes les surfaces ; puis « Voir dans l'album », d'où que vienne le geste.
+  [[nodiscard]] ro::ui::ItemLinkFacts ItemLinkFactsNow();
+  void ShowCardInAlbum(std::uint32_t card_id, std::uint32_t now_ms);
   // LA FICHE D'UN OBJET, dans ses deux hôtes : `game_item_sheet.cpp`. Ce que la
   // fiche a demandé se route de même d'où qu'elle vienne ; `sheet` est la vue
   // qui l'a dessinée, `item_id` l'objet qu'elle montrait.

@@ -55,9 +55,10 @@ struct BuyingStoreLogAction {
   ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
-[[nodiscard]] BuyingStoreLogAction DrawBuyingStoreLogWindow(
-    BuyingStoreLogState& state, const BuyingStoreLogView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'un item sait d'avance — vote shop, album.
+[[nodiscard]] BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
+                                                            const BuyingStoreLogView& view,
+                                                            const SkinArt& art,
+                                                            ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

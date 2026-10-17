@@ -7,6 +7,8 @@
 
 #include <imgui.h>
 
+#include "ro/ui/card_album_link.h"
+
 namespace ro::ui {
 
 // Ce qu'on sait d'une adresse web montrée : voir `chat_rich_art.h`.
@@ -302,6 +304,11 @@ enum class ChatLinkGesture : std::uint8_t {
   kAllowImageHost,
   // L'image ouverte en grand dans la visionneuse.
   kViewImage,
+
+  // ── CE QU'UNE CARTE PROPOSE EN PLUS ───────────────────────────────────────
+  //
+  // L'album de cartes ouvert sur sa pochette. Voir `card_album_link.h`.
+  kSeeInAlbum,
 };
 
 // UN ITEM EN VENTE AU VOTE SHOP, et son prix.
@@ -318,6 +325,16 @@ struct VoteShopOffer {
 // PAR IDENTIFIANT : c'est `app` qui la compose ainsi.
 [[nodiscard]] std::optional<std::int32_t> VoteShopPriceOf(std::span<const VoteShopOffer> offers,
                                                           std::uint32_t item_id);
+
+// CE QUE LE MENU D'UN OBJET SAIT D'AVANCE de la partie, composé par `app` une
+// fois par image et prêté à toute surface qui porte des liens d'objet. Vide —
+// une surface qui ne le reçoit pas —, il ne propose ni le panier du vote shop
+// ni l'album.
+struct ItemLinkFacts {
+  // Le catalogue du vote shop.
+  std::span<const VoteShopOffer> vote_shop;
+  CardAlbumLinkFacts album;
+};
 
 // Ce qu'une surface portant des liens rapporte de son image.
 struct ChatLinkAsk {
@@ -363,10 +380,11 @@ struct ChatLinkAsk {
 // LE MENU D'UN LIEN, le même partout. Rend ce que le joueur y a choisi.
 //
 // ⚠ LE PANIER DU VOTE SHOP N'Y PARAÎT QUE POUR UN ITEM À SON CATALOGUE :
-// `vote_shop` est ce catalogue, et une surface qui ne le reçoit pas ne le
-// propose pas. Les deux commandes, elles, passent par le chat comme une ligne
-// tapée. ⚠ LA LISTE DE RAMASSAGE AUTOMATIQUE N'Y EST PAS : elle se règle
-// depuis la description.
+// `link_facts.vote_shop` est ce catalogue, et une surface qui ne le reçoit pas
+// ne le propose pas. « Voir dans l'album » suit `link_facts.album` de même.
+// Les deux commandes, elles, passent par le chat comme une ligne tapée.
+// ⚠ LA LISTE DE RAMASSAGE AUTOMATIQUE N'Y EST PAS : elle se règle depuis la
+// description.
 //
 // ⚠ LE GENRE DÉCIDE DES ENTRÉES, et il vient du morceau visé — jamais d'une
 // devinette sur l'identifiant : un style n'en a pas, et « identifiant nul donc
@@ -379,7 +397,7 @@ struct ChatLinkAsk {
 // `@warp` du staff sur un lieu.
 [[nodiscard]] ChatLinkAsk DrawChatLinkMenu(
     const char* popup_id, ChatLinkKind kind, std::uint32_t item_id, std::uint32_t token,
-    std::string_view label, std::span<const VoteShopOffer> vote_shop = {},
+    std::string_view label, ItemLinkFacts link_facts = {},
     const PlayerLinkRefusals* refusals = nullptr, const MvpLinkMenuFacts* mvp = nullptr,
     NaviSearchMenuFacts navi = {}, const ChatUrlFacts* url = nullptr, bool staff_warp = false);
 

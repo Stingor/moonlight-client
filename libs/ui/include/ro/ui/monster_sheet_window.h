@@ -131,8 +131,8 @@ struct MonsterSheetWrittenExpView {
 
 struct MonsterSheetView {
   MonsterSheetPhase phase = MonsterSheetPhase::kAsking;
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
   // L'identifiant demandé, celui qu'on montre en « #… ».
   std::uint32_t shown_id = 0;
 

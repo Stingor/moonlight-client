@@ -36,7 +36,7 @@ namespace {
 constexpr std::size_t kVoteShopLabelBytes = 96;
 
 // Les entrées d'un lien d'OBJET.
-void ItemEntries(ChatLinkAsk& asked, std::span<const VoteShopOffer> vote_shop) {
+void ItemEntries(ChatLinkAsk& asked, const ItemLinkFacts& link_facts) {
   if (ImGui::MenuItem(core::Tr("Description"))) {
     asked.gesture = ChatLinkGesture::kDescribe;
   }
@@ -52,10 +52,15 @@ void ItemEntries(ChatLinkAsk& asked, std::span<const VoteShopOffer> vote_shop) {
   if (ImGui::MenuItem(core::Tr("Ouvrir dans la base de données"))) {
     asked.gesture = ChatLinkGesture::kGameDatabase;
   }
+  // UNE CARTE : sa pochette dans l'album.
+  if (SeeInAlbumMenuItem(CardAlbumEntryOf(link_facts.album, asked.item_id))) {
+    asked.gesture = ChatLinkGesture::kSeeInAlbum;
+  }
   // LE VOTE SHOP : l'entrée n'existe QUE si l'item y est vendu — sa présence
   // EST l'information. Le prix y figure parce que la question d'après est
   // toujours « combien ? ».
-  if (const std::optional<std::int32_t> price = VoteShopPriceOf(vote_shop, asked.item_id);
+  if (const std::optional<std::int32_t> price =
+          VoteShopPriceOf(link_facts.vote_shop, asked.item_id);
       price.has_value()) {
     ImGui::Separator();
     std::array<char, kVoteShopLabelBytes> text{};
@@ -423,8 +428,7 @@ std::optional<std::int32_t> VoteShopPriceOf(std::span<const VoteShopOffer> offer
 }
 
 ChatLinkAsk DrawChatLinkMenu(const char* popup_id, ChatLinkKind kind, std::uint32_t item_id,
-                             std::uint32_t token, std::string_view label,
-                             std::span<const VoteShopOffer> vote_shop,
+                             std::uint32_t token, std::string_view label, ItemLinkFacts link_facts,
                              const PlayerLinkRefusals* refusals, const MvpLinkMenuFacts* mvp,
                              NaviSearchMenuFacts navi, const ChatUrlFacts* url, bool staff_warp) {
   ChatLinkAsk asked;
@@ -457,7 +461,7 @@ ChatLinkAsk DrawChatLinkMenu(const char* popup_id, ChatLinkKind kind, std::uint3
       PlayerEntries(asked, refusals);
       break;
     case ChatLinkKind::kItem:
-      ItemEntries(asked, vote_shop);
+      ItemEntries(asked, link_facts);
       break;
     case ChatLinkKind::kMvp:
       MvpEntries(asked, mvp);

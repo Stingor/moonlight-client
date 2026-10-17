@@ -85,6 +85,9 @@ void Game::AdvanceCraftAtlas(std::uint32_t now_ms) {
       // Le vote shop : la boutique s'ouvre, l'item au panier.
       static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop.state, link_));
       break;
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
+      ShowCardInAlbum(item_id, now_ms);
+      break;
     case ro::ui::ChatLinkGesture::kNothing:
     case ro::ui::ChatLinkGesture::kMenu:
     case ro::ui::ChatLinkGesture::kTryStyle:
@@ -135,7 +138,7 @@ void Game::AdvanceCraftAtlas(std::uint32_t now_ms) {
                         CraftAtlasFilters{.show_unlearnable = options.show_unlearnable(),
                                           .only_craftable = options.only_craftable(),
                                           .can_share = windows_.chat.main.open});
-  craft_atlas_->NoteVoteShop(pieces_.cash_shop.offers());
+  craft_atlas_->NoteLinkFacts(ItemLinkFactsNow());
   craft_atlas_->NoteStaff(Rights().staff_tools, pieces_.item_properties.stacking(),
                           StaffFreeBagSlots(world_.inventory()));
   window.view = &craft_atlas_->view();

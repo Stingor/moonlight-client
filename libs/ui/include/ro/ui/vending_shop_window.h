@@ -60,10 +60,11 @@ struct VendingShopAction {
   ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
-[[nodiscard]] VendingShopAction DrawVendingShopWindow(
-    VendingShopWindowState& state, const VendingShopView& view, const SkinArt& art,
-    std::span<const VoteShopOffer> vote_shop = {});
+// `link_facts` : ce que le menu d'un item sait d'avance — vote shop, album.
+[[nodiscard]] VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state,
+                                                      const VendingShopView& view,
+                                                      const SkinArt& art,
+                                                      ItemLinkFacts link_facts = {});
 
 // UNE VENTE DU JOURNAL.
 struct VendingLogLineView {
@@ -103,9 +104,9 @@ struct VendingLogAction {
   ChatLinkGesture item_gesture = ChatLinkGesture::kDescribe;
 };
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un item.
+// `link_facts` : ce que le menu d'un item sait d'avance — vote shop, album.
 [[nodiscard]] VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state,
                                                     const VendingLogView& view, const SkinArt& art,
-                                                    std::span<const VoteShopOffer> vote_shop = {});
+                                                    ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

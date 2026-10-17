@@ -736,24 +736,24 @@ class UiStage {
   // Glisse le rappel dans la liste de fond, puis rend à l'interface l'état
   // qu'il a changé.
   static void PaintOverWorld(const OverWorldPaint& over_world);
-  // LES COMMERCES : leur dessin, le catalogue du vote shop pour le menu d'un
-  // item, et leur place dans la pile d'Échap. Voir `ui_stage_trade.cpp`.
-  void DrawTradeWindows(TradeWindows& trade, std::span<const ro::ui::VoteShopOffer> vote_shop);
+  // LES COMMERCES : leur dessin, ce que le menu d'un item sait d'avance, et
+  // leur place dans la pile d'Échap. Voir `ui_stage_trade.cpp`.
+  void DrawTradeWindows(TradeWindows& trade, ro::ui::ItemLinkFacts link_facts);
   void RegisterTradeEscapes(TradeWindows& trade);
   // LE COURRIER, de même : voir `ui_stage_mail.cpp`.
-  void DrawMailWindows(MailWindows& mail, std::span<const ro::ui::VoteShopOffer> vote_shop);
+  void DrawMailWindows(MailWindows& mail, ro::ui::ItemLinkFacts link_facts);
   void RegisterMailEscapes(MailWindows& mail);
   // LES SALONS, de même : voir `ui_stage_chat_room.cpp`. La salle porte la barre
   // de la conversation : ce qu'elle rend s'ajoute à celui des conversations.
   void DrawChatRoomWindows(ChatRoomWindows& chat_room, ro::ui::ChatWindowState& chat,
                            const ro::ui::ChatLinePreview& preview, const ChatTabsView& tabs,
                            std::span<const ro::ui::ChatInputLink> links,
-                           std::span<const ro::ui::VoteShopOffer> vote_shop, Answers& answers);
+                           ro::ui::ItemLinkFacts link_facts, Answers& answers);
   void RegisterChatRoomEscapes(ChatRoomWindows& chat_room);
   void DrawWhisperWindows(WhisperWindows& whispers, const ChatTabsView& tabs,
                           std::span<const ro::ui::ChatEmotion> emotions,
                           std::span<const ro::ui::ChatEmojiGroup> emojis,
-                          std::span<const ro::ui::VoteShopOffer> vote_shop, Answers& answers);
+                          ro::ui::ItemLinkFacts link_facts, Answers& answers);
   void RegisterWhisperEscapes(WhisperWindows& whispers);  // 1:1 : `ui_stage_whisper.cpp`
   // LA CONVERSATION, ses salons et ses 1:1 : voir `ui_stage_chat.cpp`.
   void DrawConversation(Windows& windows, const ro::ui::ChatLinePreview& preview,

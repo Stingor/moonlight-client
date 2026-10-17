@@ -116,11 +116,9 @@ class MonsterSheet {
       const ro::ui::MonsterSheetWindowState& state, const ro::sim::PlayerStatus& status,
       bool animate, bool can_post_link, std::uint32_t now_ms);
 
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item. ⚠ À POSER APRÈS
+  // Ce que le menu d'un item sait d'avance : vote shop, album. ⚠ À POSER APRÈS
   // `Refresh`, qui remet la vue à zéro.
-  void NoteVoteShop(std::span<const ro::ui::VoteShopOffer> offers) noexcept {
-    view_.vote_shop = offers;
-  }
+  void NoteLinkFacts(ro::ui::ItemLinkFacts facts) noexcept { view_.link_facts = facts; }
 
   [[nodiscard]] std::uint32_t shown_id() const noexcept { return shown_id_; }
   [[nodiscard]] const ro::sim::MonsterSheet* shown() const { return book_.Find(shown_id_); }

@@ -23,8 +23,7 @@ namespace ro::ui {
 [[nodiscard]] ChatLinkAsk PaintInputLinkChips(const ChatInputState& state,
                                               std::span<const ChatInputLink> links, ImGuiID field,
                                               ImVec2 field_at, ImVec2 field_size, float wrap_width,
-                                              bool active, bool hovered,
-                                              std::span<const VoteShopOffer> vote_shop);
+                                              bool active, bool hovered, ItemLinkFacts link_facts);
 
 // LE NOM `:nom:` D'UNE ÉMOTICONE, tel qu'il s'écrit dans une saisie.
 [[nodiscard]] std::string EmoteTokenText(std::string_view token);

@@ -126,8 +126,8 @@ struct ChatLogStyle {
   // L'interligne qui s'ajoute au pas, en pixels.
   float line_gap = 0.0F;
   bool timestamps = false;
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item.
-  std::span<const VoteShopOffer> vote_shop;
+  // Ce que le menu d'un item sait d'avance : vote shop, album.
+  ItemLinkFacts link_facts;
   // De quoi peindre le texte riche, posé à chaque image. Nul : le texte nu.
   const ChatRichArt* rich = nullptr;
   // Le menu d'un lieu offre le `@warp` du staff.

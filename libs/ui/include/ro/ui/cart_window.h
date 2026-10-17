@@ -62,6 +62,8 @@ struct CartWindowView {
   bool transfers_frozen = false;
   // ⚠ L'ÉTAT DU SAC, pour que son raccourci dise ce que le clic VA faire.
   bool inventory_open = false;
+  // « Voir dans l'album » au menu d'une carte. ⚠ DES VUES, pour l'image.
+  CardAlbumLinkFacts album_links;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -140,6 +142,8 @@ struct CartWindowAction {
   // est là.
   std::uint32_t describe_id = 0;
   std::uint16_t describe_slot = 0;
+  // « Voir dans l'album » : la carte dont il veut la pochette ; zéro sinon.
+  std::uint32_t see_in_album_id = 0;
 
   // LA PLACE DONT IL VEUT POSER LE LIEN DANS LA CONVERSATION, ou zéro.
   //

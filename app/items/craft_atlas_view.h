@@ -60,11 +60,9 @@ class CraftAtlasView {
                const CraftAtlasFilters& filters);
   [[nodiscard]] const ro::ui::CraftAtlasView& view() const noexcept { return view_; }
 
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item. ⚠ À POSER APRÈS
+  // Ce que le menu d'un item sait d'avance : vote shop, album. ⚠ À POSER APRÈS
   // `Refresh`, qui remet la vue à zéro.
-  void NoteVoteShop(std::span<const ro::ui::VoteShopOffer> offers) noexcept {
-    view_.vote_shop = offers;
-  }
+  void NoteLinkFacts(ro::ui::ItemLinkFacts facts) noexcept { view_.link_facts = facts; }
   // Le droit du staff, pour la ligne « fabrications », et ce qui borne ses
   // demandes : l'empilement de chaque ingrédient de la fiche et les cases libres
   // du sac — vides quand on ne les sait pas. Même règle : après `Refresh`.

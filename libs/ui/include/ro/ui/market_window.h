@@ -160,9 +160,8 @@ struct MarketAction {
 // Remet la fenêtre à neuf, ouverte au premier plan, la saisie remplie de `query`.
 void OpenMarketOn(MarketWindowState& state, std::string_view query);
 
-// `vote_shop` : le catalogue du vote shop, pour le menu d'un objet.
+// `link_facts` : ce que le menu d'un objet sait d'avance — vote shop, album.
 [[nodiscard]] MarketAction DrawMarketWindow(MarketWindowState& state, const MarketView& view,
-                                            const SkinArt& art,
-                                            std::span<const VoteShopOffer> vote_shop = {});
+                                            const SkinArt& art, ItemLinkFacts link_facts = {});
 
 }  // namespace ro::ui

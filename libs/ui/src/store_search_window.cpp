@@ -336,8 +336,7 @@ StoreSearchPriceInk StoreSearchPriceInkOf(std::int64_t price_zeny) {
 }
 
 StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state, const StoreSearchView& view,
-                                        const SkinArt& art,
-                                        std::span<const VoteShopOffer> vote_shop) {
+                                        const SkinArt& art, ItemLinkFacts link_facts) {
   StoreSearchAction action;
   if (!state.open) {
     return action;
@@ -355,7 +354,7 @@ StoreSearchAction DrawStoreSearchWindow(StoreSearchWindowState& state, const Sto
     DrawResults(state, view, action);
     DrawFooter(state, view, art, action);
     DrawConfirmation(state, view, art, action);
-    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, vote_shop);
+    if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_row = static_cast<int>(chosen.token);
       action.item_gesture = chosen.gesture;

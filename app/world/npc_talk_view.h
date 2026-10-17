@@ -50,11 +50,9 @@ class NpcTalkView {
   [[nodiscard]] const ro::ui::NpcDialogView* Refresh(const ro::sim::World& world,
                                                      std::uint32_t now_ms, bool menu_search);
 
-  // Le catalogue du vote shop, pour l'entrée du menu d'un item. ⚠ À POSER APRÈS
+  // Ce que le menu d'un item sait d'avance : vote shop, album. ⚠ À POSER APRÈS
   // `Refresh`, qui remet la vue à zéro.
-  void NoteVoteShop(std::span<const ro::ui::VoteShopOffer> offers) noexcept {
-    view_.vote_shop = offers;
-  }
+  void NoteLinkFacts(ro::ui::ItemLinkFacts facts) noexcept { view_.link_facts = facts; }
 
   // CE QUE LE LECTEUR A, qui décide qu'un `<SETL>` forme un lien : l'onglet d'un
   // compagnon absent reste en texte simple, comme dans la conversation.

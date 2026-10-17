@@ -194,6 +194,7 @@ void Game::FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link,
     case ro::ui::ChatLinkGesture::kShowImageOnce:
     case ro::ui::ChatLinkGesture::kAllowImageHost:
     case ro::ui::ChatLinkGesture::kViewImage:
+    case ro::ui::ChatLinkGesture::kSeeInAlbum:
     case ro::ui::ChatLinkGesture::kPostWhereToFind:
     case ro::ui::ChatLinkGesture::kGoThere:
       break;
