@@ -81,6 +81,11 @@ class DatabaseStage {
   void FillItemSheet(ro::ui::ItemSheetHost host, std::uint32_t item_id,
                      const DatabaseContext& context, DescriptionView& sheet);
 
+  // LA LECTURE DE LA BASE, DEMANDÉE SANS RIEN OUVRIR : le bloc de faits d'un
+  // aperçu au survol en dépend. Lancée au premier appel, elle se décode à côté
+  // de la boucle ; chaque appel suivant relève le résultat quand il est prêt.
+  void Read() { Load(); }
+
   // La base, lue ; nulle tant qu'elle ne l'est pas.
   [[nodiscard]] const ro::vfs::ServerDb* db() const noexcept {
     return db_.known() ? &db_ : nullptr;

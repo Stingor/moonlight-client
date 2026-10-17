@@ -141,6 +141,14 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
   // ⚠ L'APERÇU NE SE BÂTIT QUE S'IL SE MONTRE : sans le réglage, il n'a rien à
   // composer, et une description entière par image de survol serait payée pour
   // rien.
+  //
+  // 🔴 LE SURVOL DEMANDE LA BASE DU SERVEUR : les faits d'un objet — type,
+  // attaque, défense, poids, niveaux, prérequis — ne sont plus dans le texte de
+  // la table, mais dans le bloc qu'elle compose. La fenêtre de description la
+  // demande à son ouverture ; l'aperçu, qui peut venir avant, la demande aussi.
+  if (hovered_item_ != 0) {
+    database_.Read();
+  }
   description_preview_->Refresh(world_, hovered_item_, hovered_holder_, hovered_slot_);
   skill_description_->Refresh(windows_.skill_description.skill_id, world_);
 }
