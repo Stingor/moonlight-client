@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstddef>
 #include <numeric>
 #include <string_view>
@@ -38,34 +37,6 @@ constexpr int kInventoryBaseSize = 200;
 // L'emplacement d'un accessoire de pet : aucun. Le serveur ne lit pas ce champ
 // pour lui.
 constexpr std::uint32_t kNoEquipLocation = 0;
-
-// Une comparaison de texte qui ignore la casse et les accents ? Non : la casse
-// seulement. Chercher « epee » pour trouver « épée » demanderait un pliage
-// Unicode, et ce n'est pas ce que fait le client.
-[[nodiscard]] bool NameContains(std::string_view name, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto lower = [](char c) {
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-  };
-  if (needle.size() > name.size()) {
-    return false;
-  }
-  for (std::size_t start = 0; start + needle.size() <= name.size(); ++start) {
-    bool same = true;
-    for (std::size_t at = 0; at < needle.size(); ++at) {
-      if (lower(name[start + at]) != lower(needle[at])) {
-        same = false;
-        break;
-      }
-    }
-    if (same) {
-      return true;
-    }
-  }
-  return false;
-}
 
 // LES DEUX TYPES QUI OFFRENT LE SERTISSAGE RAPIDE, tels que le fil les porte :
 // l'armure et l'arme, et elles seules. Le serveur refuse de toute façon une
@@ -385,7 +356,7 @@ void BuildItemCells(const ro::sim::Inventory& holder, const ItemCellsAsk& ask,
       ask.creators.Fill(facts);
       name = ro::vfs::ItemNameText(ro::vfs::ComposeItemName(facts, *items, *words));
     }
-    if (!NameContains(name, ask.filter)) {
+    if (!ro::core::AsciiContainsFolded(name, ask.filter)) {
       continue;
     }
     names.push_back(std::move(name));

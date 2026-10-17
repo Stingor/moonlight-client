@@ -16,6 +16,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ro/core/ascii.h"
 #include "ro/formats/rathena_db_text.h"
 
 namespace ro::vfs {
@@ -69,13 +70,6 @@ core::Error Refused(std::string detail) {
   return lowered;
 }
 
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::ranges::equal(left, right, [](unsigned char a, unsigned char b) {
-           return std::tolower(a) == std::tolower(b);
-         });
-}
-
 // Un entier écrit comme le serveur le lit ; `fallback` s'il ne se lit pas, et
 // borné à la largeur de `Number`.
 template <typename Number>
@@ -111,14 +105,15 @@ template <typename Number>
 }
 
 [[nodiscard]] bool FieldTrue(const Field& field) {
-  return field.shape == formats::RathenaShape::kText && SameText(field.text, kTrueText);
+  return field.shape == formats::RathenaShape::kText &&
+         core::AsciiEqualsFolded(field.text, kTrueText);
 }
 
 // Les clés levées d'une table de booléens, dans l'ordre écrit.
 [[nodiscard]] std::vector<std::string> FieldRaised(const Field& field) {
   std::vector<std::string> raised;
   for (const formats::RathenaPair& pair : field.map) {
-    if (SameText(pair.value, kTrueText)) {
+    if (core::AsciiEqualsFolded(pair.value, kTrueText)) {
       raised.emplace_back(pair.key);
     }
   }
@@ -129,7 +124,7 @@ template <typename Number>
 [[nodiscard]] std::vector<std::string> FieldLowered(const Field& field) {
   std::vector<std::string> lowered;
   for (const formats::RathenaPair& pair : field.map) {
-    if (!SameText(pair.value, kTrueText)) {
+    if (!core::AsciiEqualsFolded(pair.value, kTrueText)) {
       lowered.emplace_back(pair.key);
     }
   }
@@ -218,17 +213,18 @@ ServerItem ItemOf(const formats::RathenaEntry& entry) {
   if (item.gender.empty()) {
     item.gender = kServerItemDefaultGender;
   }
-  const bool weapon = SameText(item.type, kWeaponType);
+  const bool weapon = core::AsciiEqualsFolded(item.type, kWeaponType);
   if (item.sub_type.empty() && weapon) {
     item.sub_type = kServerWeaponDefaultSubType;
-  } else if (item.sub_type.empty() && SameText(item.type, kCardType)) {
+  } else if (item.sub_type.empty() && core::AsciiEqualsFolded(item.type, kCardType)) {
     item.sub_type = kServerCardDefaultSubType;
   }
   // Le genre que le serveur impose, écrit ou non.
-  if (item.item_id == kWeddingRingMale || (weapon && SameText(item.sub_type, kMaleOnlySubType))) {
+  if (item.item_id == kWeddingRingMale ||
+      (weapon && core::AsciiEqualsFolded(item.sub_type, kMaleOnlySubType))) {
     item.gender = kMaleGender;
   } else if (item.item_id == kWeddingRingFemale ||
-             (weapon && SameText(item.sub_type, kFemaleOnlySubType))) {
+             (weapon && core::AsciiEqualsFolded(item.sub_type, kFemaleOnlySubType))) {
     item.gender = kFemaleGender;
   }
   return item;
@@ -243,10 +239,10 @@ std::vector<ServerDrop> DropsOf(const Field& field, const AegisIndex& items) {
     if (found == items.end()) {
       continue;
     }
-    drops.push_back(
-        ServerDrop{.item_id = found->second,
-                   .written_rate = NumberIn<std::uint32_t>(PairValue(line, "Rate"), 0),
-                   .steal_protected = SameText(PairValue(line, "StealProtected"), kTrueText)});
+    drops.push_back(ServerDrop{
+        .item_id = found->second,
+        .written_rate = NumberIn<std::uint32_t>(PairValue(line, "Rate"), 0),
+        .steal_protected = core::AsciiEqualsFolded(PairValue(line, "StealProtected"), kTrueText)});
   }
   return drops;
 }
@@ -303,7 +299,7 @@ ServerMonster MonsterOf(const formats::RathenaEntry& entry, const AegisIndex& it
       monster.walk_ms_per_cell = FieldNumber<std::uint16_t>(value, kServerMonsterDefaultWalkMs);
     } else if (key == "RaceGroups") {
       monster.treasure = std::ranges::any_of(FieldRaised(value), [](const std::string& group) {
-        return SameText(group, kTreasureGroup);
+        return core::AsciiEqualsFolded(group, kTreasureGroup);
       });
     } else if (key == "Drops") {
       monster.drops = DropsOf(value, items);
@@ -330,7 +326,7 @@ ServerMonster MonsterOf(const formats::RathenaEntry& entry, const AegisIndex& it
     if (bonus.value_rank == kServerStatusFixedValue || bonus.value_rank > kServerStatusValueCount) {
       return std::nullopt;
     }
-    bonus.negated = SameText(PairValue(line, "Negated"), kTrueText);
+    bonus.negated = core::AsciiEqualsFolded(PairValue(line, "Negated"), kTrueText);
     return bonus;
   }
   const std::string_view fixed = PairValue(line, "Value");

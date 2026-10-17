@@ -1,7 +1,6 @@
 #include "skill_list.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <numeric>
@@ -10,6 +9,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -50,18 +50,6 @@ constexpr float kElbowDotIdle = 2.0F;
 // L'icône d'une compétence non apprise est assombrie, comme en grille.
 constexpr ImU32 kUnlearnedTint = IM_COL32(110, 110, 110, 160);
 constexpr ImVec4 kReservedColor(0.85F, 0.65F, 0.20F, 1.0F);
-
-[[nodiscard]] bool Contains(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto same = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), same) !=
-         haystack.end();
-}
 
 // Le rang d'une compétence dans l'onglet, ou moins un quand il ne la porte pas.
 [[nodiscard]] int RankOf(std::span<const SkillCellView> cells, std::uint16_t skill_id) {
@@ -187,7 +175,7 @@ void DrawSkillList(SkillWindowState& state, const SkillGroupView& group, std::st
 
   for (const std::size_t rank : order) {
     const SkillCellView& cell = cells[rank];
-    if (!Contains(cell.name, filter)) {
+    if (!core::AsciiContainsFolded(cell.name, filter)) {
       continue;
     }
     ImGui::PushID(static_cast<int>(cell.skill_id));

@@ -1,7 +1,6 @@
 #include "ro/ui/craft_atlas_window.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cfloat>
 #include <cstdint>
 #include <cstdio>
@@ -11,6 +10,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/skin_palette.h"
@@ -67,31 +67,17 @@ constexpr std::size_t kIdTextBytes = 16;
 
 // ── LA RECHERCHE ────────────────────────────────────────────────────────────
 
-// Insensible à la casse, sur de l'ASCII. Un octet de continuation UTF-8 n'est
-// jamais confondu avec une lettre ASCII, donc la comparaison reste juste pour
-// ce à quoi elle sert : trouver « jellopy » en tapant « JELL ».
-[[nodiscard]] bool ContainsFolded(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto folded_equal = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return !std::ranges::search(haystack, needle, folded_equal).empty();
-}
-
 // Le filtre retient-il cette ligne ? Par le nom ET par l'identifiant : on
 // cherche « Jellopy » comme « 909 », et les deux se croisent dans les mêmes
 // conversations.
 [[nodiscard]] bool Matches(const CraftAtlasWindowState& state, const CraftAtlasRow& row) {
   const std::string_view filter(state.filter.data());
-  if (filter.empty() || ContainsFolded(row.name, filter)) {
+  if (filter.empty() || core::AsciiContainsFolded(row.name, filter)) {
     return true;
   }
   std::array<char, kIdTextBytes> id_text{};
   std::snprintf(id_text.data(), id_text.size(), "%u", static_cast<unsigned>(row.item_id));
-  return ContainsFolded(id_text.data(), filter);
+  return core::AsciiContainsFolded(id_text.data(), filter);
 }
 
 // ── LE TEXTE GRIS D'UN ÉTAT VIDE, une fois ──────────────────────────────────

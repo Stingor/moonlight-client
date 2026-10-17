@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_tooltip.h"
@@ -160,32 +161,16 @@ namespace {
 
 using namespace card_album;
 
-// La recherche porte sur le NOM ou sur l'IDENTIFIANT, dans le même champ :
-// celui qui vient de la base du site tape « 4001 », celui qui joue tape
-// « Poring ». L'identifiant se compare comme du TEXTE : « 40 » ramène donc 4001
-// comme 1940, et se resserre en tapant l'identifiant entier.
-//
-// 🔴 L'IDENTIFIANT SAUVE AUSSI LES CARTES SANS NOM : un nom vide n'a rien à
-// comparer, et la pochette disparaîtrait en silence dès qu'un filtre est tapé.
-[[nodiscard]] bool ContainsFolded(std::string_view haystack, std::string_view needle) {
-  const auto folded = [](char a, char b) {
-    return std::tolower(static_cast<unsigned char>(a)) ==
-           std::tolower(static_cast<unsigned char>(b));
-  };
-  return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), folded) !=
-         haystack.end();
-}
-
 [[nodiscard]] bool MatchesFilter(const CardAlbumWindowState& state,
                                  const CardAlbumPocketView& pocket) {
   const std::string_view typed(state.filter);
   if (typed.empty()) {
     return true;
   }
-  if (!pocket.name.empty() && ContainsFolded(pocket.name, typed)) {
+  if (!pocket.name.empty() && core::AsciiContainsFolded(pocket.name, typed)) {
     return true;
   }
-  return ContainsFolded(std::to_string(pocket.card_id), typed);
+  return core::AsciiContainsFolded(std::to_string(pocket.card_id), typed);
 }
 
 [[nodiscard]] std::uint8_t SlotMask(int slot_filter) {

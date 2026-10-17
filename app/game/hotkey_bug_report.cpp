@@ -2,13 +2,13 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstddef>
 #include <cstdio>
 #include <format>
 #include <string>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 
 namespace moonclient {
@@ -27,19 +27,6 @@ constexpr std::size_t kFieldsBytes = 760;
 template <std::size_t kBytes>
 [[nodiscard]] std::string_view Text(const char (&buffer)[kBytes]) {
   return {buffer, static_cast<std::size_t>(std::find(buffer, buffer + kBytes, '\0') - buffer)};
-}
-
-// La recherche de la fenêtre : sans casse, sur l'action ou sur la touche.
-[[nodiscard]] bool Contains(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto same = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), same) !=
-         haystack.end();
 }
 
 // Le nom d'une ligne dans le rapport : sa clé stable, sinon son libellé.
@@ -94,7 +81,8 @@ BugReportContext HotkeyBugReport(const HotkeyBugScene& scene) {
     if (row.hidden || (window.tab != ro::ui::kAllHotkeyTabs && row.tab != window.tab)) {
       continue;
     }
-    if (!Contains(row.action, filter) && !Contains(row.key, filter)) {
+    if (!ro::core::AsciiContainsFolded(row.action, filter) &&
+        !ro::core::AsciiContainsFolded(row.key, filter)) {
       continue;
     }
     ++shown_total;

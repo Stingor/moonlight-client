@@ -10,13 +10,13 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdio>
 #include <string>
 #include <string_view>
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -42,18 +42,6 @@ constexpr const char* kLinkMenuId = "##menu_lien_description";
 
 [[nodiscard]] int Compare(double left, double right) {
   return left < right ? -1 : (left > right ? 1 : 0);
-}
-
-[[nodiscard]] int CompareFolded(std::string_view left, std::string_view right) {
-  const std::size_t shortest = std::min(left.size(), right.size());
-  for (std::size_t at = 0; at < shortest; ++at) {
-    const int a = std::tolower(static_cast<unsigned char>(left[at]));
-    const int b = std::tolower(static_cast<unsigned char>(right[at]));
-    if (a != b) {
-      return a < b ? -1 : 1;
-    }
-  }
-  return Compare(static_cast<double>(left.size()), static_cast<double>(right.size()));
 }
 
 }  // namespace
@@ -190,7 +178,7 @@ void DrawOddsTab(DescriptionWindowState& state, const DescriptionView& view,
         } else if (spec.ColumnIndex == kDrawColumn) {
           compared = Compare(a.group, b.group);
         } else {
-          compared = CompareFolded(a.name, b.name);
+          compared = core::AsciiCompareFolded(a.name, b.name);
         }
         return ascending ? compared < 0 : compared > 0;
       });

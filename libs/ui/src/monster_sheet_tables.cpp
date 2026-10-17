@@ -2,7 +2,6 @@
 // apparitions, compétences.
 
 #include <algorithm>
-#include <cctype>
 #include <cstddef>
 #include <initializer_list>
 #include <numeric>
@@ -13,6 +12,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -70,21 +70,6 @@ constexpr int kSkillIdColumn = 2;
 template <typename T>
 [[nodiscard]] int Compare(const T& left, const T& right) {
   return left < right ? -1 : (right < left ? 1 : 0);
-}
-
-// Sans égard à la casse ASCII. Les octets d'un texte
-// accentué se comparent tels quels.
-[[nodiscard]] int CompareFolded(std::string_view left, std::string_view right) {
-  const auto fold = [](char c) {
-    return static_cast<unsigned char>(std::tolower(static_cast<unsigned char>(c)));
-  };
-  const std::size_t common = std::min(left.size(), right.size());
-  for (std::size_t at = 0; at < common; ++at) {
-    if (const int said = Compare(fold(left[at]), fold(right[at])); said != 0) {
-      return said;
-    }
-  }
-  return Compare(left.size(), right.size());
 }
 
 // Un lien se suit au RELÂCHEMENT, comme tout lien du client : la fenêtre qu'il
@@ -211,7 +196,7 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
                if (column == kDropKindColumn) {
                  return Compare(left.mvp_reward, right.mvp_reward);
                }
-               return CompareFolded(left.name, right.name);
+               return core::AsciiCompareFolded(left.name, right.name);
              });
 
     for (const int rank : state.drop_order) {
@@ -261,8 +246,9 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
     std::iota(state.spawn_order.begin(), state.spawn_order.end(), 0);
     SortRows(state.spawn_order, view.spawns,
              [](const MonsterSheetSpawnView& left, const MonsterSheetSpawnView& right, int column) {
-               return column == kSpawnCountColumn ? Compare(left.count, right.count)
-                                                  : CompareFolded(left.label, right.label);
+               return column == kSpawnCountColumn
+                          ? Compare(left.count, right.count)
+                          : core::AsciiCompareFolded(left.label, right.label);
              });
     for (const int rank : state.spawn_order) {
       const MonsterSheetSpawnView& spawn = view.spawns[static_cast<std::size_t>(rank)];
@@ -327,7 +313,7 @@ void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
              if (column == kSkillIdColumn) {
                return Compare(left.skill_id, right.skill_id);
              }
-             return CompareFolded(left.name, right.name);
+             return core::AsciiCompareFolded(left.name, right.name);
            });
   for (const int rank : state.skill_order) {
     const MonsterSheetSkillView& skill = view.skills[static_cast<std::size_t>(rank)];

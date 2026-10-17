@@ -1,10 +1,10 @@
 #include "chat/navigation_command.h"
 
-#include <algorithm>
-#include <cctype>
 #include <charconv>
 #include <optional>
 #include <utility>
+
+#include "ro/core/ascii.h"
 
 namespace moonclient {
 namespace {
@@ -13,15 +13,6 @@ constexpr std::string_view kNaviCommand = "/navi";
 constexpr std::string_view kNavigationCommand = "/navigation";
 constexpr std::string_view kBlanks = " \t";
 constexpr std::string_view kCoordinateSeparators = "/, \t";
-
-[[nodiscard]] char Folded(char letter) {
-  return static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
-}
-
-[[nodiscard]] bool SameWord(std::string_view word, std::string_view command) {
-  return std::ranges::equal(word, command,
-                            [](char left, char right) { return Folded(left) == Folded(right); });
-}
 
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
   const std::size_t first = text.find_first_not_of(kBlanks);
@@ -59,8 +50,7 @@ constexpr std::string_view kCoordinateSeparators = "/, \t";
     return std::nullopt;
   }
   PlaceLink place;
-  place.map = std::string(args.substr(0, map_end));
-  std::ranges::transform(place.map, place.map.begin(), Folded);
+  place.map = ro::core::AsciiLower(args.substr(0, map_end));
   place.x = *x;
   place.y = *y;
   return place;
@@ -71,8 +61,8 @@ constexpr std::string_view kCoordinateSeparators = "/, \t";
 NavigationCommand ReadNavigationCommand(std::string_view line) {
   const std::string_view trimmed = Trimmed(line);
   const std::string_view word = trimmed.substr(0, trimmed.find_first_of(kBlanks));
-  const bool coordinates_allowed = SameWord(word, kNaviCommand);
-  if (!coordinates_allowed && !SameWord(word, kNavigationCommand)) {
+  const bool coordinates_allowed = ro::core::AsciiEqualsFolded(word, kNaviCommand);
+  if (!coordinates_allowed && !ro::core::AsciiEqualsFolded(word, kNavigationCommand)) {
     return {};
   }
   const std::string_view args = Trimmed(trimmed.substr(word.size()));

@@ -37,11 +37,21 @@ namespace ro::core {
 // tri plutôt que du nom.
 [[nodiscard]] bool AsciiLess(std::string_view left, std::string_view right);
 
+// LE MÊME ORDRE, EN TROIS ISSUES : -1, 0 ou 1 selon que `left` vient avant
+// `right`, l'égale ou le suit. `AsciiLess` s'en déduit ; celle-ci sert au tri
+// qu'on renverse d'un clic d'en-tête sans réécrire la comparaison.
+[[nodiscard]] int AsciiCompareFolded(std::string_view left, std::string_view right);
+
 // L'ÉGALITÉ QUI IGNORE LA CASSE, ASCII seulement : « /BC » vaut « /bc », mais
 // un octet hors ASCII ne se compare qu'à lui-même.
 [[nodiscard]] bool AsciiEqualsFolded(std::string_view left, std::string_view right);
 
 // `text` commence par `prefix`, à la casse ASCII près.
 [[nodiscard]] bool AsciiStartsWithFolded(std::string_view text, std::string_view prefix);
+
+// `haystack` contient `needle`, à la casse ASCII près : le filtre d'une liste.
+// ⚠ UN `needle` VIDE EST CONTENU PARTOUT, même dans un texte vide — un filtre
+// qu'on n'a pas encore tapé ne cache rien.
+[[nodiscard]] bool AsciiContainsFolded(std::string_view haystack, std::string_view needle);
 
 }  // namespace ro::core

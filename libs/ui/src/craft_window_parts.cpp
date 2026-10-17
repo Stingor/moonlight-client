@@ -1,23 +1,10 @@
 #include "craft_window_parts.h"
 
-#include <algorithm>
-#include <cctype>
 #include <cfloat>
 
 #include "ro/ui/skin_tooltip.h"
 
 namespace ro::ui::craft_parts {
-
-bool ContainsFolded(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto folded_equal = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return !std::ranges::search(haystack, needle, folded_equal).empty();
-}
 
 void ColoredWrapped(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, color);

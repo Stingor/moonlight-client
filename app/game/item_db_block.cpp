@@ -4,11 +4,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstddef>
 #include <cstdio>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/vfs/item_table.h"
 
@@ -27,91 +27,85 @@ constexpr std::string_view kAllKey = "All";
 constexpr std::string_view kPlaceSeparator = " / ";
 constexpr std::string_view kListSeparator = ", ";
 
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::ranges::equal(left, right, [](unsigned char a, unsigned char b) {
-           return std::tolower(a) == std::tolower(b);
-         });
-}
-
 [[nodiscard]] bool Has(const std::vector<std::string>& keys, std::string_view key) {
-  return std::ranges::any_of(keys, [key](const std::string& held) { return SameText(held, key); });
+  return std::ranges::any_of(
+      keys, [key](const std::string& held) { return ro::core::AsciiEqualsFolded(held, key); });
 }
 
 // ── LES LIBELLÉS, traduits à la lecture : la langue change en cours de partie
 
 // Les sous-types d'une arme (`SubType` d'un `Weapon`).
 [[nodiscard]] const char* WeaponKindLabel(std::string_view key) {
-  if (SameText(key, "Fist")) {
+  if (ro::core::AsciiEqualsFolded(key, "Fist")) {
     return Tr("Mains nues");
   }
-  if (SameText(key, "Dagger")) {
+  if (ro::core::AsciiEqualsFolded(key, "Dagger")) {
     return Tr("Dague");
   }
-  if (SameText(key, "1hSword")) {
+  if (ro::core::AsciiEqualsFolded(key, "1hSword")) {
     return Tr("Épée à une main");
   }
-  if (SameText(key, "2hSword")) {
+  if (ro::core::AsciiEqualsFolded(key, "2hSword")) {
     return Tr("Épée à deux mains");
   }
-  if (SameText(key, "1hSpear")) {
+  if (ro::core::AsciiEqualsFolded(key, "1hSpear")) {
     return Tr("Lance à une main");
   }
-  if (SameText(key, "2hSpear")) {
+  if (ro::core::AsciiEqualsFolded(key, "2hSpear")) {
     return Tr("Lance à deux mains");
   }
-  if (SameText(key, "1hAxe")) {
+  if (ro::core::AsciiEqualsFolded(key, "1hAxe")) {
     return Tr("Hache à une main");
   }
-  if (SameText(key, "2hAxe")) {
+  if (ro::core::AsciiEqualsFolded(key, "2hAxe")) {
     return Tr("Hache à deux mains");
   }
-  if (SameText(key, "Mace")) {
+  if (ro::core::AsciiEqualsFolded(key, "Mace")) {
     return Tr("Masse");
   }
-  if (SameText(key, "2hMace")) {
+  if (ro::core::AsciiEqualsFolded(key, "2hMace")) {
     return Tr("Masse à deux mains");
   }
-  if (SameText(key, "Staff")) {
+  if (ro::core::AsciiEqualsFolded(key, "Staff")) {
     return Tr("Bâton");
   }
-  if (SameText(key, "2hStaff")) {
+  if (ro::core::AsciiEqualsFolded(key, "2hStaff")) {
     return Tr("Bâton à deux mains");
   }
-  if (SameText(key, "Bow")) {
+  if (ro::core::AsciiEqualsFolded(key, "Bow")) {
     return Tr("Arc");
   }
-  if (SameText(key, "Knuckle")) {
+  if (ro::core::AsciiEqualsFolded(key, "Knuckle")) {
     return Tr("Poing");
   }
-  if (SameText(key, "Musical")) {
+  if (ro::core::AsciiEqualsFolded(key, "Musical")) {
     return Tr("Instrument de musique");
   }
-  if (SameText(key, "Whip")) {
+  if (ro::core::AsciiEqualsFolded(key, "Whip")) {
     return Tr("Fouet");
   }
-  if (SameText(key, "Book")) {
+  if (ro::core::AsciiEqualsFolded(key, "Book")) {
     return Tr("Livre");
   }
-  if (SameText(key, "Katar")) {
+  if (ro::core::AsciiEqualsFolded(key, "Katar")) {
     return Tr("Katar");
   }
-  if (SameText(key, "Revolver")) {
+  if (ro::core::AsciiEqualsFolded(key, "Revolver")) {
     return Tr("Revolver");
   }
-  if (SameText(key, "Rifle")) {
+  if (ro::core::AsciiEqualsFolded(key, "Rifle")) {
     return Tr("Fusil");
   }
-  if (SameText(key, "Gatling")) {
+  if (ro::core::AsciiEqualsFolded(key, "Gatling")) {
     return Tr("Gatling");
   }
-  if (SameText(key, "Shotgun")) {
+  if (ro::core::AsciiEqualsFolded(key, "Shotgun")) {
     return Tr("Fusil à pompe");
   }
-  if (SameText(key, "Grenade")) {
+  if (ro::core::AsciiEqualsFolded(key, "Grenade")) {
     return Tr("Lance-grenades");
   }
-  if (SameText(key, "Huuma")) {
+  if (ro::core::AsciiEqualsFolded(key, "Huuma")) {
     return Tr("Shuriken Huuma");
   }
   return nullptr;
@@ -119,31 +113,31 @@ constexpr std::string_view kListSeparator = ", ";
 
 // Les sous-types d'une munition (`SubType` d'un `Ammo`).
 [[nodiscard]] const char* AmmoKindLabel(std::string_view key) {
-  if (SameText(key, "Arrow")) {
+  if (ro::core::AsciiEqualsFolded(key, "Arrow")) {
     return Tr("Flèche");
   }
-  if (SameText(key, "Dagger")) {
+  if (ro::core::AsciiEqualsFolded(key, "Dagger")) {
     return Tr("Dague de lancer");
   }
-  if (SameText(key, "Bullet")) {
+  if (ro::core::AsciiEqualsFolded(key, "Bullet")) {
     return Tr("Balle");
   }
-  if (SameText(key, "Shell")) {
+  if (ro::core::AsciiEqualsFolded(key, "Shell")) {
     return Tr("Cartouche");
   }
-  if (SameText(key, "Grenade")) {
+  if (ro::core::AsciiEqualsFolded(key, "Grenade")) {
     return Tr("Grenade");
   }
-  if (SameText(key, "Shuriken")) {
+  if (ro::core::AsciiEqualsFolded(key, "Shuriken")) {
     return Tr("Shuriken");
   }
-  if (SameText(key, "Kunai")) {
+  if (ro::core::AsciiEqualsFolded(key, "Kunai")) {
     return Tr("Kunai");
   }
-  if (SameText(key, "CannonBall")) {
+  if (ro::core::AsciiEqualsFolded(key, "CannonBall")) {
     return Tr("Boulet de canon");
   }
-  if (SameText(key, "ThrowWeapon")) {
+  if (ro::core::AsciiEqualsFolded(key, "ThrowWeapon")) {
     return Tr("Arme de lancer");
   }
   return nullptr;
@@ -151,28 +145,28 @@ constexpr std::string_view kListSeparator = ", ";
 
 // Les autres types, au singulier.
 [[nodiscard]] const char* ItemKindLabel(std::string_view key) {
-  if (SameText(key, "Healing")) {
+  if (ro::core::AsciiEqualsFolded(key, "Healing")) {
     return Tr("Soin");
   }
-  if (SameText(key, "Usable")) {
+  if (ro::core::AsciiEqualsFolded(key, "Usable")) {
     return Tr("Consommable");
   }
-  if (SameText(key, "DelayConsume")) {
+  if (ro::core::AsciiEqualsFolded(key, "DelayConsume")) {
     return Tr("Consommable différé");
   }
-  if (SameText(key, "Etc")) {
+  if (ro::core::AsciiEqualsFolded(key, "Etc")) {
     return Tr("Divers");
   }
-  if (SameText(key, "PetEgg")) {
+  if (ro::core::AsciiEqualsFolded(key, "PetEgg")) {
     return Tr("Œuf de familier");
   }
-  if (SameText(key, "PetArmor")) {
+  if (ro::core::AsciiEqualsFolded(key, "PetArmor")) {
     return Tr("Équipement de familier");
   }
-  if (SameText(key, "ShadowGear")) {
+  if (ro::core::AsciiEqualsFolded(key, "ShadowGear")) {
     return Tr("Équipement d'ombre");
   }
-  if (SameText(key, "Cash")) {
+  if (ro::core::AsciiEqualsFolded(key, "Cash")) {
     return Tr("Item de la boutique");
   }
   return nullptr;
@@ -180,25 +174,25 @@ constexpr std::string_view kListSeparator = ", ";
 
 // Les classes de l'objet (`Classes`) : la naissance du personnage.
 [[nodiscard]] const char* ClassLabel(std::string_view key) {
-  if (SameText(key, "Normal")) {
+  if (ro::core::AsciiEqualsFolded(key, "Normal")) {
     return Tr("Normale");
   }
-  if (SameText(key, "Upper")) {
+  if (ro::core::AsciiEqualsFolded(key, "Upper")) {
     return Tr("Transcendante");
   }
-  if (SameText(key, "Baby")) {
+  if (ro::core::AsciiEqualsFolded(key, "Baby")) {
     return Tr("Bébé");
   }
-  if (SameText(key, "Third")) {
+  if (ro::core::AsciiEqualsFolded(key, "Third")) {
     return Tr("Troisième");
   }
-  if (SameText(key, "Third_Upper")) {
+  if (ro::core::AsciiEqualsFolded(key, "Third_Upper")) {
     return Tr("Troisième transcendante");
   }
-  if (SameText(key, "Third_Baby")) {
+  if (ro::core::AsciiEqualsFolded(key, "Third_Baby")) {
     return Tr("Troisième bébé");
   }
-  if (SameText(key, "Fourth")) {
+  if (ro::core::AsciiEqualsFolded(key, "Fourth")) {
     return Tr("Quatrième");
   }
   return nullptr;
@@ -310,7 +304,7 @@ struct Worn {
   };
   for (const std::string& location : item.locations) {
     for (const Place& place : kPlaces) {
-      if (SameText(place.key, location)) {
+      if (ro::core::AsciiEqualsFolded(place.key, location)) {
         wear(place.piece, place.layer);
       }
     }
@@ -375,7 +369,7 @@ struct Worn {
 }
 
 [[nodiscard]] bool IsType(const ServerItem& item, std::string_view type) {
-  return SameText(item.type, type);
+  return ro::core::AsciiEqualsFolded(item.type, type);
 }
 
 [[nodiscard]] std::string KindOf(const ServerItem& item, const Worn& worn) {
@@ -387,7 +381,8 @@ struct Worn {
   } else if (IsType(item, "Armor")) {
     label = ArmorKindOf(worn);
   } else if (IsType(item, "Card")) {
-    label = SameText(item.sub_type, "Enchant") ? Tr("Enchantement") : Tr("Carte");
+    label =
+        ro::core::AsciiEqualsFolded(item.sub_type, "Enchant") ? Tr("Enchantement") : Tr("Carte");
   } else {
     label = ItemKindLabel(item.type);
   }
@@ -451,12 +446,12 @@ constexpr std::array<Job, 4> kLaterJobs = {{
 
 [[nodiscard]] std::string_view ShownJob(std::string_view key) {
   for (const Job& job : kOriginalJobs) {
-    if (SameText(job.key, key)) {
+    if (ro::core::AsciiEqualsFolded(job.key, key)) {
       return job.shown;
     }
   }
   for (const Job& job : kLaterJobs) {
-    if (SameText(job.key, key)) {
+    if (ro::core::AsciiEqualsFolded(job.key, key)) {
       return job.shown;
     }
   }
@@ -464,8 +459,8 @@ constexpr std::array<Job, 4> kLaterJobs = {{
 }
 
 [[nodiscard]] bool IsOriginal(std::string_view key) {
-  return std::ranges::any_of(kOriginalJobs,
-                             [key](const Job& job) { return SameText(job.key, key); });
+  return std::ranges::any_of(
+      kOriginalJobs, [key](const Job& job) { return ro::core::AsciiEqualsFolded(job.key, key); });
 }
 
 [[nodiscard]] std::string Joined(const std::vector<std::string>& parts, std::string_view between) {
@@ -540,7 +535,7 @@ struct JobList {
     }
   }
   for (const std::string& key : keys) {
-    if (!IsOriginal(key) && !SameText(key, kAllKey)) {
+    if (!IsOriginal(key) && !ro::core::AsciiEqualsFolded(key, kAllKey)) {
       list.singles.emplace_back(ShownJob(key));
     }
   }
@@ -723,9 +718,9 @@ std::vector<std::string> ItemDbBlockOf(const ServerItem& item, const ItemDbNames
   if (std::string classes = ClassesText(item); !classes.empty()) {
     needs.push_back(std::move(classes));
   }
-  if (SameText(item.gender, "Female")) {
+  if (ro::core::AsciiEqualsFolded(item.gender, "Female")) {
     needs.emplace_back(Tr("Femmes seulement"));
-  } else if (SameText(item.gender, "Male")) {
+  } else if (ro::core::AsciiEqualsFolded(item.gender, "Male")) {
     needs.emplace_back(Tr("Hommes seulement"));
   }
   if (!needs.empty()) {

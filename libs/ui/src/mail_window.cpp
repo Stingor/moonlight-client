@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdio>
 #include <string>
 #include <utility>
@@ -10,6 +9,7 @@
 
 #include <imgui_internal.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
@@ -59,16 +59,6 @@ constexpr std::string_view kConfirmId = "rodex_confirm";
 constexpr const char* kItemMenuId = "##rodex_item_menu";
 // Les boutons de la confirmation.
 constexpr float kConfirmButtonPixels = 110.0F;
-
-[[nodiscard]] char Folded(char letter) {
-  return static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
-}
-
-[[nodiscard]] bool ContainsFolded(std::string_view haystack, std::string_view needle) {
-  const auto found = std::ranges::search(
-      haystack, needle, [](char left, char right) { return Folded(left) == Folded(right); });
-  return !found.empty() || needle.empty();
-}
 
 [[nodiscard]] std::string_view FilterOf(const MailboxWindowState& state) {
   return std::string_view(state.filter.data());
@@ -641,7 +631,8 @@ bool MailRowShown(const MailRowView& row, MailboxTab tab, std::string_view filte
   if (tab != MailboxTab::kAll && static_cast<MailboxTab>(row.ref.box) != tab) {
     return false;
   }
-  return filter.empty() || ContainsFolded(row.sender, filter) || ContainsFolded(row.title, filter);
+  return filter.empty() || core::AsciiContainsFolded(row.sender, filter) ||
+         core::AsciiContainsFolded(row.title, filter);
 }
 
 std::string MailExpiryLabel(std::optional<std::int64_t> seconds_left) {

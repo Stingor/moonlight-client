@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdarg>
 #include <cstdio>
 #include <ctime>
@@ -14,6 +13,7 @@
 #include <string>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/text.h"
 #include "ro/ui/skin_tooltip.h"
@@ -87,16 +87,6 @@ constexpr unsigned kUtf8ContinuationBits = 0x80U;
 #else
   return localtime_r(&instant, into) != nullptr;
 #endif
-}
-
-// Le filtre est-il dans ce texte, sans tenir compte de la casse ASCII ?
-[[nodiscard]] bool ContainsFolded(std::string_view haystack, std::string_view needle) {
-  const auto folded = [](char a, char b) {
-    return std::tolower(static_cast<unsigned char>(a)) ==
-           std::tolower(static_cast<unsigned char>(b));
-  };
-  return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), folded) !=
-         haystack.end();
 }
 
 // La comparaison à trois voies de deux textes, octet par octet, comme `strcmp`.
@@ -370,8 +360,9 @@ bool MvpMatchesFilter(const MvpSlotView& slot, std::string_view filter) {
   if (filter.empty()) {
     return true;
   }
-  return ContainsFolded(slot.label, filter) || ContainsFolded(slot.map, filter) ||
-         ContainsFolded(slot.map_label, filter);
+  return core::AsciiContainsFolded(slot.label, filter) ||
+         core::AsciiContainsFolded(slot.map, filter) ||
+         core::AsciiContainsFolded(slot.map_label, filter);
 }
 
 float MvpTableRowHeight(bool show_sprites, const MvpTrackerView& view, const SkinArt& art) {

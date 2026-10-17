@@ -9,6 +9,7 @@
 #include <ctime>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/core/decimal_text.h"
 
 namespace moonclient {
@@ -65,12 +66,6 @@ constexpr unsigned char kContinuationMark = 0x80;
   return static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
 }
 
-[[nodiscard]] bool ContainsFolded(std::string_view haystack, std::string_view needle) {
-  const auto found = std::ranges::search(
-      haystack, needle, [](char left, char right) { return Folded(left) == Folded(right); });
-  return !found.empty();
-}
-
 [[nodiscard]] bool FoldedLess(std::string_view left, std::string_view right) {
   return std::ranges::lexicographical_compare(
       left, right, [](char first, char second) { return Folded(first) < Folded(second); });
@@ -107,11 +102,12 @@ bool MatchesAchievementSearch(const AchievementInfo& info, std::string_view sear
   if (search.empty()) {
     return true;
   }
-  if (ContainsFolded(info.name, search) || ContainsFolded(info.summary, search)) {
+  if (ro::core::AsciiContainsFolded(info.name, search) ||
+      ro::core::AsciiContainsFolded(info.summary, search)) {
     return true;
   }
   return std::ranges::any_of(info.objectives, [search](const ro::vfs::AchievementObjective& line) {
-    return ContainsFolded(line.text, search);
+    return ro::core::AsciiContainsFolded(line.text, search);
   });
 }
 

@@ -2,13 +2,13 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdio>
 #include <string>
 #include <utility>
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 
@@ -24,23 +24,6 @@ constexpr std::size_t kTagBytes = 128;
   std::array<char, kNumberBytes> text{};
   std::snprintf(text.data(), text.size(), "#%u", number);
   return text.data();
-}
-
-// Deux noms comparés sans la casse, sur de l'ASCII : l'ordre d'une liste ne
-// doit pas mettre « emperium » après « Zargon ».
-[[nodiscard]] int CompareFolded(std::string_view left, std::string_view right) {
-  const std::size_t common = std::min(left.size(), right.size());
-  for (std::size_t rank = 0; rank < common; ++rank) {
-    const int a = std::tolower(static_cast<unsigned char>(left[rank]));
-    const int b = std::tolower(static_cast<unsigned char>(right[rank]));
-    if (a != b) {
-      return a < b ? -1 : 1;
-    }
-  }
-  if (left.size() == right.size()) {
-    return 0;
-  }
-  return left.size() < right.size() ? -1 : 1;
 }
 
 [[nodiscard]] ro::ui::CraftAtlasYieldMode ModeOf(CraftYieldMode mode) {
@@ -232,7 +215,7 @@ void CraftAtlasView::BuildIndex() {
   }
   // PAR NOM, puis par identifiant pour départager deux homonymes.
   const auto by_name = [this](std::uint32_t left, std::uint32_t right) {
-    const int compared = CompareFolded(NameOf(left), NameOf(right));
+    const int compared = ro::core::AsciiCompareFolded(NameOf(left), NameOf(right));
     return compared != 0 ? compared < 0 : left < right;
   };
   for (std::vector<std::uint32_t>* sorted :

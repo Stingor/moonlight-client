@@ -10,13 +10,13 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdio>
 #include <string>
 #include <string_view>
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -51,18 +51,6 @@ constexpr int kKindColumn = 2;
 
 [[nodiscard]] int Compare(std::uint32_t left, std::uint32_t right) {
   return left < right ? -1 : (left > right ? 1 : 0);
-}
-
-[[nodiscard]] int CompareFolded(std::string_view left, std::string_view right) {
-  const std::size_t shortest = std::min(left.size(), right.size());
-  for (std::size_t at = 0; at < shortest; ++at) {
-    const int a = std::tolower(static_cast<unsigned char>(left[at]));
-    const int b = std::tolower(static_cast<unsigned char>(right[at]));
-    if (a != b) {
-      return a < b ? -1 : 1;
-    }
-  }
-  return Compare(static_cast<std::uint32_t>(left.size()), static_cast<std::uint32_t>(right.size()));
 }
 
 // « Chargement... » en attendant, l'appel au serveur quand personne n'a pu
@@ -137,7 +125,7 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
           compared = a.mvp_reward != b.mvp_reward ? (a.mvp_reward ? 1 : -1)
                                                   : -Compare(a.rate_hundredths, b.rate_hundredths);
         } else {
-          compared = CompareFolded(a.name, b.name);
+          compared = core::AsciiCompareFolded(a.name, b.name);
         }
         return ascending ? compared < 0 : compared > 0;
       });

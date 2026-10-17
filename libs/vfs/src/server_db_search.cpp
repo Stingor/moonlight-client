@@ -6,17 +6,11 @@
 #include <cctype>
 #include <charconv>
 
+#include "ro/core/ascii.h"
 #include "ro/core/search_key.h"
 
 namespace ro::vfs {
 namespace {
-
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::ranges::equal(left, right, [](unsigned char a, unsigned char b) {
-           return std::tolower(a) == std::tolower(b);
-         });
-}
 
 // La saisie, nettoyée de ses blancs autour.
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
@@ -69,13 +63,14 @@ std::vector<std::size_t> SearchItems(const ServerDb& db, std::span<const std::st
     if (id.has_value() ? item.item_id != *id : !KeyMatches(name_keys, rank, needle)) {
       continue;
     }
-    if (!search.type.empty() && !SameText(item.type, search.type)) {
+    if (!search.type.empty() && !core::AsciiEqualsFolded(item.type, search.type)) {
       continue;
     }
     if (!search.locations.empty() &&
         std::ranges::none_of(item.locations, [&](const std::string& raised) {
-          return std::ranges::any_of(
-              search.locations, [&](std::string_view wanted) { return SameText(raised, wanted); });
+          return std::ranges::any_of(search.locations, [&](std::string_view wanted) {
+            return core::AsciiEqualsFolded(raised, wanted);
+          });
         })) {
       continue;
     }

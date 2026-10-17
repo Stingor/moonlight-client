@@ -1,11 +1,11 @@
 #include "world/follow_rules.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cmath>
 #include <string_view>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/walk_field.h"
 #include "ro/sim/walk_map.h"
@@ -15,13 +15,6 @@ namespace moonclient {
 namespace {
 
 constexpr std::string_view kFollowCommand = "/follow";
-
-[[nodiscard]] bool SameWord(std::string_view typed, std::string_view word) {
-  return std::ranges::equal(typed, word, [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  });
-}
 
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
   const std::size_t first = text.find_first_not_of(' ');
@@ -121,7 +114,7 @@ FollowDecision AdvanceFollow(FollowState& state, const ro::sim::World& world,
 
 std::optional<std::string> ReadFollowCommand(std::string_view line) {
   const std::size_t space = line.find(' ');
-  if (!SameWord(line.substr(0, space), kFollowCommand)) {
+  if (!ro::core::AsciiEqualsFolded(line.substr(0, space), kFollowCommand)) {
     return std::nullopt;
   }
   return std::string(space == std::string_view::npos ? std::string_view()

@@ -2,32 +2,24 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <optional>
 #include <string>
 
+#include "ro/core/ascii.h"
+
 namespace moonclient {
-namespace {
-
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return std::ranges::equal(left, right, [](char one, char other) {
-    return std::tolower(static_cast<unsigned char>(one)) ==
-           std::tolower(static_cast<unsigned char>(other));
-  });
-}
-
-}  // namespace
 
 bool IsLocalHost(std::string_view host) {
   using std::string_view_literals::operator""sv;
   static constexpr std::array kLocalNames = {"127.0.0.1"sv, "localhost"sv, "::1"sv, "[::1]"sv};
-  return std::ranges::any_of(kLocalNames,
-                             [host](std::string_view local) { return SameText(host, local); });
+  return std::ranges::any_of(kLocalNames, [host](std::string_view local) {
+    return ro::core::AsciiEqualsFolded(host, local);
+  });
 }
 
 bool SameServer(const ServerAddress& left, const ServerAddress& right) {
-  return left.port == right.port &&
-         (SameText(left.host, right.host) || (IsLocalHost(left.host) && IsLocalHost(right.host)));
+  return left.port == right.port && (ro::core::AsciiEqualsFolded(left.host, right.host) ||
+                                     (IsLocalHost(left.host) && IsLocalHost(right.host)));
 }
 
 std::string WebLoginOriginOf(std::string_view declared, bool test,

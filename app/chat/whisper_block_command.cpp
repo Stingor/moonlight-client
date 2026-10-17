@@ -1,7 +1,6 @@
 #include "chat/whisper_block_command.h"
 
-#include <algorithm>
-#include <cctype>
+#include "ro/core/ascii.h"
 
 namespace moonclient {
 namespace {
@@ -11,13 +10,6 @@ constexpr std::string_view kAllowWord = "/in";
 constexpr std::string_view kBlockEveryoneWord = "/exall";
 constexpr std::string_view kAllowEveryoneWord = "/inall";
 constexpr std::string_view kBlanks = " \t";
-
-[[nodiscard]] bool SameWord(std::string_view typed, std::string_view word) {
-  return std::ranges::equal(typed, word, [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  });
-}
 
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
   const std::size_t first = text.find_first_not_of(kBlanks);
@@ -34,18 +26,18 @@ WhisperBlockCommand ReadWhisperBlockCommand(std::string_view line) {
   const std::string_view word = line.substr(0, space);
   const std::string_view name =
       Trimmed(space == std::string_view::npos ? std::string_view() : line.substr(space + 1));
-  if (SameWord(word, kBlockEveryoneWord)) {
+  if (ro::core::AsciiEqualsFolded(word, kBlockEveryoneWord)) {
     return {.kind = WhisperBlockCommandKind::kBlockEveryone};
   }
-  if (SameWord(word, kAllowEveryoneWord)) {
+  if (ro::core::AsciiEqualsFolded(word, kAllowEveryoneWord)) {
     return {.kind = WhisperBlockCommandKind::kAllowEveryone};
   }
-  if (SameWord(word, kBlockWord)) {
+  if (ro::core::AsciiEqualsFolded(word, kBlockWord)) {
     return name.empty() ? WhisperBlockCommand{.kind = WhisperBlockCommandKind::kList}
                         : WhisperBlockCommand{.kind = WhisperBlockCommandKind::kBlock,
                                               .name = std::string(name)};
   }
-  if (SameWord(word, kAllowWord)) {
+  if (ro::core::AsciiEqualsFolded(word, kAllowWord)) {
     return name.empty() ? WhisperBlockCommand{.kind = WhisperBlockCommandKind::kAllowWithoutName}
                         : WhisperBlockCommand{.kind = WhisperBlockCommandKind::kAllow,
                                               .name = std::string(name)};

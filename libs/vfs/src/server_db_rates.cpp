@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/ascii.h"
 #include "ro/vfs/server_db.h"
 
 namespace ro::vfs {
@@ -35,24 +36,19 @@ constexpr std::int64_t kLeastRate = 1;
 // serveur l'a déjà converti en fin de chargement.
 enum class Family : std::uint8_t { kCommon, kHeal, kUse, kEquip, kCard };
 
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::ranges::equal(left, right, [](unsigned char a, unsigned char b) {
-           return std::tolower(a) == std::tolower(b);
-         });
-}
-
 [[nodiscard]] Family FamilyOf(std::string_view type) {
-  if (SameText(type, "Healing")) {
+  if (core::AsciiEqualsFolded(type, "Healing")) {
     return Family::kHeal;
   }
-  if (SameText(type, "Usable") || SameText(type, "Cash") || SameText(type, "DelayConsume")) {
+  if (core::AsciiEqualsFolded(type, "Usable") || core::AsciiEqualsFolded(type, "Cash") ||
+      core::AsciiEqualsFolded(type, "DelayConsume")) {
     return Family::kUse;
   }
-  if (SameText(type, "Weapon") || SameText(type, "Armor") || SameText(type, "PetArmor")) {
+  if (core::AsciiEqualsFolded(type, "Weapon") || core::AsciiEqualsFolded(type, "Armor") ||
+      core::AsciiEqualsFolded(type, "PetArmor")) {
     return Family::kEquip;
   }
-  if (SameText(type, "Card")) {
+  if (core::AsciiEqualsFolded(type, "Card")) {
     return Family::kCard;
   }
   return Family::kCommon;

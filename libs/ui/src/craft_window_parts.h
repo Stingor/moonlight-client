@@ -26,9 +26,6 @@ inline constexpr float kLinkIconPixels = 16.0F;
 // Le voile d'une liste que le serveur n'honore plus : elle reste lisible.
 inline constexpr float kStaleAlpha = 0.5F;
 
-// Insensible à la casse, sur de l'ASCII.
-[[nodiscard]] bool ContainsFolded(std::string_view haystack, std::string_view needle);
-
 // Un texte coloré qui s'enroule. La couleur est poussée et retirée ENSEMBLE.
 void ColoredWrapped(ImU32 color, const char* text);
 void ColoredText(ImU32 color, const char* text);

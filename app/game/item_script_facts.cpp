@@ -12,6 +12,8 @@
 #include <system_error>
 #include <utility>
 
+#include "ro/core/ascii.h"
+
 namespace moonclient {
 namespace {
 
@@ -23,17 +25,6 @@ struct Fragment {
   std::string text;
   int depth = 0;
 };
-
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::ranges::equal(left, right, [](unsigned char a, unsigned char b) {
-           return std::tolower(a) == std::tolower(b);
-         });
-}
-
-[[nodiscard]] bool StartsWithText(std::string_view text, std::string_view prefix) {
-  return text.size() >= prefix.size() && SameText(text.substr(0, prefix.size()), prefix);
-}
 
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
   const auto blank = [](char letter) { return std::isspace(static_cast<unsigned char>(letter)); };
@@ -168,7 +159,7 @@ void CopyString(std::string_view script, std::size_t& at, std::string& into) {
 // n'est pas cette commande suivie d'un blanc.
 [[nodiscard]] std::optional<std::vector<std::string_view>> ArgumentsOf(std::string_view text,
                                                                        std::string_view command) {
-  if (!StartsWithText(text, command)) {
+  if (!ro::core::AsciiStartsWithFolded(text, command)) {
     return std::nullopt;
   }
   std::string_view rest = text.substr(command.size());
@@ -185,7 +176,7 @@ void CopyString(std::string_view script, std::size_t& at, std::string& into) {
 // le morceau, ou ceux de l'instruction `commande a,b,…`.
 [[nodiscard]] std::optional<std::vector<std::string_view>> CallArgumentsOf(
     std::string_view text, std::string_view command) {
-  if (!StartsWithText(text, command)) {
+  if (!ro::core::AsciiStartsWithFolded(text, command)) {
     return std::nullopt;
   }
   const std::string_view rest = Trimmed(text.substr(command.size()));
@@ -230,7 +221,7 @@ struct Range {
   }
   constexpr std::string_view kRand = "rand(";
   text = Trimmed(text);
-  if (!StartsWithText(text, kRand) || !text.ends_with(')')) {
+  if (!ro::core::AsciiStartsWithFolded(text, kRand) || !text.ends_with(')')) {
     return std::nullopt;
   }
   const std::string_view inside = text.substr(kRand.size(), text.size() - kRand.size() - 1);
@@ -355,11 +346,12 @@ struct Reading {
 // L'élément d'un `bonus bAtkEle,Ele_X` ou `bonus bDefEle,Ele_X` exact.
 [[nodiscard]] std::uint8_t ElementOf(std::string_view text, std::string_view bonus) {
   const auto arguments = ArgumentsOf(text, "bonus");
-  if (!arguments.has_value() || arguments->size() != 2 || !SameText((*arguments)[0], bonus)) {
+  if (!arguments.has_value() || arguments->size() != 2 ||
+      !ro::core::AsciiEqualsFolded((*arguments)[0], bonus)) {
     return kNoScriptElement;
   }
   for (std::size_t rank = 0; rank < kElementNames.size(); ++rank) {
-    if (SameText((*arguments)[1], kElementNames[rank])) {
+    if (ro::core::AsciiEqualsFolded((*arguments)[1], kElementNames[rank])) {
       return static_cast<std::uint8_t>(rank);
     }
   }
@@ -391,7 +383,8 @@ constexpr std::size_t kFirstValueArgument = 2;
     if (!arguments.has_value()) {
       continue;
     }
-    if (arguments->size() != form.arguments || !StartsWithText((*arguments)[0], kStatusPrefix)) {
+    if (arguments->size() != form.arguments ||
+        !ro::core::AsciiStartsWithFolded((*arguments)[0], kStatusPrefix)) {
       return std::nullopt;
     }
     StartRead read;
@@ -477,8 +470,8 @@ constexpr std::size_t kSummonCountArgument = 5;
 [[nodiscard]] std::optional<std::string> GroupOf(std::string_view text, std::string_view prefix) {
   text = Trimmed(text);
   const std::vector<std::string_view> words = WordsOf(text);
-  if (words.size() != 1 || words.front() != text || !StartsWithText(text, prefix) ||
-      text.size() == prefix.size()) {
+  if (words.size() != 1 || words.front() != text ||
+      !ro::core::AsciiStartsWithFolded(text, prefix) || text.size() == prefix.size()) {
     return std::nullopt;
   }
   return std::string(text.substr(prefix.size()));
@@ -579,7 +572,7 @@ void ReadStatement(Reading& reading, std::string_view text, std::span<const Fami
       case Family::kCure: {
         const auto arguments = ArgumentsOf(text, "sc_end");
         if (!arguments.has_value() || arguments->size() != 1 ||
-            !StartsWithText((*arguments)[0], kStatusPrefix) ||
+            !ro::core::AsciiStartsWithFolded((*arguments)[0], kStatusPrefix) ||
             WordsOf((*arguments)[0]).size() != 1) {
           reading.Mute(family);
           break;
@@ -668,13 +661,13 @@ ItemScriptFacts ReadItemScript(std::string_view script) {
     bool breaks = false;
     for (const std::string_view word : WordsOf(fragment.text)) {
       for (const FamilyWord& family_word : kFamilyWords) {
-        if (SameText(word, family_word.word) &&
+        if (ro::core::AsciiEqualsFolded(word, family_word.word) &&
             std::ranges::find(named, family_word.family) == named.end()) {
           named.push_back(family_word.family);
         }
       }
       breaks = breaks || std::ranges::any_of(kBreakWords, [word](std::string_view stop) {
-                 return SameText(word, stop);
+                 return ro::core::AsciiEqualsFolded(word, stop);
                });
     }
     // 🔴 HORS BLOC ET AVANT TOUTE RUPTURE, OU RIEN : ailleurs, l'instruction

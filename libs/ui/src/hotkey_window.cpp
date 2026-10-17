@@ -1,11 +1,10 @@
 #include "ro/ui/hotkey_window.h"
 
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdio>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/chat_link_offer.h"
 #include "ro/ui/skin_art.h"
@@ -28,19 +27,6 @@ constexpr int kBugReportRank = 0;
 // L'intertitre d'une famille de lignes : une couleur choisie pour le corps clair
 // du jeu, traduite pour celui de l'habillage.
 constexpr ImU32 kGroupTextColor = IM_COL32(86, 96, 124, 255);
-
-// Une recherche sans casse, sur des vues.
-[[nodiscard]] bool Contains(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto same = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), same) !=
-         haystack.end();
-}
 
 // Le texte secondaire de l'habillage, que sa palette a posé.
 void FaintText(const char* text) {
@@ -156,7 +142,8 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
         if (row.hidden || (state.tab != kAllHotkeyTabs && row.tab != state.tab)) {
           continue;
         }
-        if (!Contains(row.action, state.filter) && !Contains(row.key, state.filter)) {
+        if (!core::AsciiContainsFolded(row.action, state.filter) &&
+            !core::AsciiContainsFolded(row.key, state.filter)) {
           continue;
         }
         // Un intertitre qui répète le nom de l'onglet ne s'affiche pas.

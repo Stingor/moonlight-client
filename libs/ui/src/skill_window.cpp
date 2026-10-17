@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cmath>
 #include <cstdio>
 #include <utility>
@@ -10,6 +9,7 @@
 
 #include <imgui_internal.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_text.h"
@@ -117,23 +117,6 @@ constexpr ImU32 kKeyboardNoticeText = IM_COL32(255, 215, 130, 255);
 // L'échelle courante : c'est elle qui décide de la taille des cases, comme elle
 // décide de celle du texte.
 [[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
-
-// Une recherche sans casse, sur des vues : le filtre se tape en minuscules et
-// les noms du client sont capitalisés.
-[[nodiscard]] bool Contains(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  if (needle.size() > haystack.size()) {
-    return false;
-  }
-  const auto same = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), same) !=
-         haystack.end();
-}
 
 // La case survolée est-elle reliée à celle-ci ? Dans les deux sens : ce qu'elle
 // réclame, et ce qu'elle ouvre.
@@ -512,7 +495,7 @@ void DrawGrid(SkillWindowState& state, const SkillGroupView& group, std::string_
 
   for (std::size_t rank = 0; rank < group.cells.size(); ++rank) {
     const SkillCellView& cell = group.cells[rank];
-    if (!Contains(cell.name, filter)) {
+    if (!core::AsciiContainsFolded(cell.name, filter)) {
       continue;
     }
     const int row = cell.position / kColumns;

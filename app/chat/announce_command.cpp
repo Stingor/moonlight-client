@@ -1,9 +1,9 @@
 #include "chat/announce_command.h"
 
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <format>
+
+#include "ro/core/ascii.h"
 
 namespace moonclient {
 namespace {
@@ -22,13 +22,6 @@ constexpr auto kSpellings = std::to_array<Spelling>({
     {.word = "/nlb", .kind = AnnounceCommandKind::kLocalBroadcast, .named = false},
 });
 
-[[nodiscard]] bool SameWord(std::string_view typed, std::string_view word) {
-  return std::ranges::equal(typed, word, [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  });
-}
-
 }  // namespace
 
 AnnounceCommand ReadAnnounceCommand(std::string_view line) {
@@ -37,7 +30,7 @@ AnnounceCommand ReadAnnounceCommand(std::string_view line) {
   const std::string_view rest =
       space == std::string_view::npos ? std::string_view() : line.substr(space + 1);
   for (const Spelling& spelling : kSpellings) {
-    if (SameWord(word, spelling.word)) {
+    if (ro::core::AsciiEqualsFolded(word, spelling.word)) {
       return AnnounceCommand{.kind = spelling.kind,
                              .named = spelling.named,
                              .message = spelling.kind == AnnounceCommandKind::kWhere

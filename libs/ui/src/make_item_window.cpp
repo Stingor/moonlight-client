@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/ui/list_keys.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_tooltip.h"
@@ -80,7 +81,7 @@ void DrawLines(std::span<const CraftTextLine> lines) {
   std::array<char, kLabelBytes> searched{};
   std::snprintf(searched.data(), searched.size(), "%.*s %u", static_cast<int>(row.name.size()),
                 row.name.data(), static_cast<unsigned>(row.item_id));
-  return craft_parts::ContainsFolded(searched.data(), filter);
+  return core::AsciiContainsFolded(searched.data(), filter);
 }
 
 [[nodiscard]] int CompareNames(std::string_view left, std::string_view right) {

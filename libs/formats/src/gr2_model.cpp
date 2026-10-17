@@ -49,10 +49,6 @@ constexpr std::uint32_t kDeepestMaterial = 16;
 constexpr double kWeightScale = 255.0;
 constexpr float kLargestByte = 255.0F;
 
-bool SameText(std::string_view left, std::string_view right) {
-  return core::AsciiLower(left) == core::AsciiLower(right);
-}
-
 // Le sous-objet rangé EN LIGNE dans `object` sous ce nom.
 Gr2Object Inline(Gr2File& file, const Gr2Object& object, std::string_view name) {
   const std::optional<Gr2Member> member = file.Field(object, name);
@@ -206,8 +202,9 @@ Gr2Object DiffuseTexture(Gr2File& file, const Gr2Object& material) {
       continue;
     }
     const std::string usage = file.String(map, "Usage");
-    if (std::any_of(kDiffuseUsages.begin(), kDiffuseUsages.end(),
-                    [&](std::string_view diffuse) { return SameText(usage, diffuse); })) {
+    if (std::any_of(kDiffuseUsages.begin(), kDiffuseUsages.end(), [&](std::string_view diffuse) {
+          return core::AsciiEqualsFolded(usage, diffuse);
+        })) {
       return texture;
     }
   }

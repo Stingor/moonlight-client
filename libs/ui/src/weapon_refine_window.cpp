@@ -9,6 +9,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_tooltip.h"
@@ -88,7 +89,7 @@ constexpr std::size_t kLabelBytes = 192;
 }
 
 [[nodiscard]] bool Shown(const WeaponRefineWindowState& state, const WeaponRefineRowView& row) {
-  return craft_parts::ContainsFolded(row.full_name, state.filter.data());
+  return core::AsciiContainsFolded(row.full_name, state.filter.data());
 }
 
 void DrawList(WeaponRefineWindowState& state, const WeaponRefineView& view,

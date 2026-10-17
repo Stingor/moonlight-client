@@ -4,11 +4,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdio>
 #include <string>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/core/case_fold.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/inventory_window.h"
@@ -28,13 +28,6 @@ constexpr std::uint32_t kTenths = 10;
 constexpr int kMatkLeastDivisor = 7;
 constexpr int kMatkMostDivisor = 5;
 constexpr int kMdefVitDivisor = 2;
-
-[[nodiscard]] bool SameText(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::ranges::equal(left, right, [](unsigned char a, unsigned char b) {
-           return std::tolower(a) == std::tolower(b);
-         });
-}
 
 [[nodiscard]] std::string Printed(const char* format, unsigned value) {
   std::array<char, kLineBytes> text{};
@@ -153,9 +146,9 @@ std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
   if (IsEquipment(item) || JobsRestricted(item)) {
     add(ro::core::Tr("Jobs"), JobsSummaryOf(item));
   }
-  if (SameText(item.gender, "Female")) {
+  if (ro::core::AsciiEqualsFolded(item.gender, "Female")) {
     add(ro::core::Tr("Sexe"), ro::core::Tr("Femmes seulement"));
-  } else if (SameText(item.gender, "Male")) {
+  } else if (ro::core::AsciiEqualsFolded(item.gender, "Male")) {
     add(ro::core::Tr("Sexe"), ro::core::Tr("Hommes seulement"));
   }
   if (IsEquipment(item)) {
