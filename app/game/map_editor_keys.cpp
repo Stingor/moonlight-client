@@ -44,6 +44,9 @@ bool TakeMapEditorKey(MapEditorSession& editor, const SDL_KeyboardEvent& key, bo
   if (key.repeat) {
     return false;
   }
+  if (key.key == SDLK_ESCAPE && editor.Deselect()) {
+    return true;
+  }
   // SUPPR, sans Ctrl : retirer ou masquer ce qui est désigné.
   if (key.key == SDLK_DELETE && !ctrl_held) {
     editor.Queue(ro::ui::map_editor::Delete{});

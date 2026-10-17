@@ -70,6 +70,11 @@ class MapEditorSession {
   // Le modèle sous un clic dans le monde, ou rien.
   void Pick(std::optional<std::size_t> model_index);
 
+  // DÉSIGNER MOINS, d'un cran : un sommet désigné se lâche seul, son modèle
+  // reste ; sinon le modèle, la lumière ou l'effet désigné se lâche. Rien
+  // pendant un glissé. Faux quand il n'y avait rien à lâcher.
+  [[nodiscard]] bool Deselect() noexcept;
+
   // OÙ SE POSE UN MODÈLE AJOUTÉ, dans le repère du RSW : posé par l'appelant à
   // chaque image — le point que la caméra regarde.
   void SetDropPoint(const std::array<float, 3>& rsw_position) { drop_point_ = rsw_position; }

@@ -127,6 +127,23 @@ void MapEditorSession::ChooseModel(std::optional<std::size_t> model_index) {
   }
 }
 
+bool MapEditorSession::Deselect() noexcept {
+  if (!active_ || drag_.has_value()) {
+    return false;
+  }
+  if (vertex_.has_value()) {
+    vertex_.reset();
+    return true;
+  }
+  const bool held = !selection_.empty() || selected_light_.has_value() ||
+                    selected_effect_.has_value() || selected_map_effect_.has_value();
+  selection_.Clear();
+  selected_light_.reset();
+  selected_effect_.reset();
+  selected_map_effect_.reset();
+  return held;
+}
+
 MapEditorSession::Outcome MapEditorSession::Focus(const ro::render::MapScene& scene,
                                                   const MapEditStore& store) {
   const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
