@@ -1,8 +1,12 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <span>
 #include <vector>
+
+#include "ro/sim/inventory.h"
 
 namespace ro::sim {
 
@@ -34,6 +38,31 @@ enum class CardInsertVerdict : std::uint8_t {
   kInserted,
   kRefused,
 };
+
+// UNE DEMANDE DE SERTISSAGE PARTIE : les deux objets tels qu'ils étaient au
+// départ. Chacun porte sa place du sac, qui est ce que l'accusé rappelle.
+struct CardInsertAsk {
+  InventoryItem card;
+  InventoryItem equip;
+};
+
+// CE QU'UN ACCUSÉ RAPPORTE, pour la ligne de conversation.
+//
+// ⚠ LES DEUX OBJETS SONT CEUX D'AVANT CE SERTISSAGE : la carte n'est pas
+// encore retirée du sac, la pièce ne l'a pas encore reçue. C'est ce qui permet
+// de dire « Poring Card sertie dans Knife [3] » et non dans « Poring Knife ».
+struct CardInsertReport {
+  CardInsertVerdict verdict = CardInsertVerdict::kInserted;
+  // Une demande retenue répond à cet accusé. Faux : la ligne ne sait nommer
+  // ni la carte ni la pièce.
+  bool matched = false;
+  InventoryItem card;
+  InventoryItem equip;
+};
+
+// COMBIEN DE DEMANDES, ET D'ACCUSÉS NON LUS, SE RETIENNENT. Le plus long lot
+// de la fenêtre en émet quatre ; au-delà, le plus ancien s'oublie.
+inline constexpr std::size_t kMostCardInsertAsks = 16;
 
 // LES CARTES QUE LE SERVEUR ACCEPTERAIT SUR UNE PIÈCE — le sertissage RAPIDE.
 //
@@ -72,14 +101,34 @@ class CardComposition {
   // sertissage ressemble souvent à la précédente —, et c'est lui qui le dit.
   [[nodiscard]] std::uint64_t offer_seq() const noexcept { return offer_seq_; }
 
-  // L'accusé d'un sertissage. ⚠ LE RANG SUIT LA MÊME RÈGLE : deux refus de
-  // suite sont deux lignes à écrire.
-  void TellVerdict(CardInsertVerdict verdict) noexcept {
-    verdict_ = verdict;
-    ++verdict_seq_;
-  }
+  // UNE DEMANDE DE SERTISSAGE VIENT DE PARTIR : ses deux objets se retiennent,
+  // puisque l'accusé ne rappelle que leurs places et que la carte sera
+  // consommée. Rien ne se retient si l'une des deux places est vide : la
+  // réponse n'aurait rien à nommer.
+  void AskInsert(std::uint16_t card_slot, std::uint16_t equip_slot, const Inventory& bag);
+
+  // L'accusé d'un sertissage, sur ces deux places. ⚠ LE RANG SUIT LA MÊME
+  // RÈGLE : deux refus de suite sont deux lignes à écrire.
+  //
+  // `bag` est le sac AVANT que l'accusé ne le change. La demande qui répond est
+  // la PREMIÈRE retenue sur les mêmes places : le serveur traite dans l'ordre,
+  // et celles qui la précèdent sont des refus qu'il a tus — ses gardes de
+  // compatibilité ne répondent pas. Elles s'oublient.
+  //
+  // 🔴 LES OBJETS SE RELISENT DANS LE SAC quand ils y sont encore sous la même
+  // identité : dans un lot, le deuxième sertissage part d'une pièce qui porte
+  // déjà la première carte, et c'est cet état-là qui est « l'avant ». Un objet
+  // d'une AUTRE identité à l'une des places — une place réattribuée — fait un
+  // rapport sans noms.
+  void TellVerdict(CardInsertVerdict verdict, std::uint16_t equip_slot, std::uint16_t card_slot,
+                   const Inventory& bag);
   [[nodiscard]] CardInsertVerdict verdict() const noexcept { return verdict_; }
   [[nodiscard]] std::uint64_t verdict_seq() const noexcept { return verdict_seq_; }
+
+  // LES ACCUSÉS PAS ENCORE ÉCRITS, dans l'ordre d'arrivée. Les rend et les
+  // oublie : plusieurs accusés d'une même image font chacun leur ligne.
+  [[nodiscard]] std::vector<CardInsertReport> TakeReports();
+  [[nodiscard]] std::size_t pending_asks() const noexcept { return asks_.size(); }
 
   // ── LE SERTISSAGE RAPIDE ──────────────────────────────────────────────────
   //
@@ -100,6 +149,8 @@ class CardComposition {
   std::uint64_t offer_seq_ = 0;
   CardInsertVerdict verdict_ = CardInsertVerdict::kInserted;
   std::uint64_t verdict_seq_ = 0;
+  std::deque<CardInsertAsk> asks_;
+  std::deque<CardInsertReport> reports_;
   CompatibleCards compatible_;
 };
 

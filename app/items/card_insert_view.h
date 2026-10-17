@@ -54,7 +54,8 @@ class CardInsertView {
   static void AskCompatible(std::uint16_t equip_slot, ro::net::Connection& link,
                             ro::sim::World& world);
 
-  // LA LIGNE DU DERNIER ACCUSÉ, écrite une fois dans la conversation.
+  // UNE LIGNE PAR ACCUSÉ ARRIVÉ, écrite une fois dans la conversation : quelle
+  // carte dans quelle pièce (voir `CardInsertLine`).
   void NoteVerdict(ro::sim::World& world, std::uint32_t now_ms);
 
  private:
@@ -74,8 +75,6 @@ class CardInsertView {
   std::vector<std::string> quick_names_;
   std::vector<ro::ui::QuickInsertCardView> quick_cards_;
   ro::ui::CardInsertView view_;
-  // Le rang du dernier accusé déjà écrit. Zéro : aucun.
-  std::uint64_t said_verdict_ = 0;
 };
 
 }  // namespace moonclient

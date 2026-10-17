@@ -15517,6 +15517,12 @@ tr: Compounding has failed.
 fr: L'insertion de la carte a réussi.
 tr: Compounding has completed successfully.
 
+fr: %s sertie dans %s (emplacement %d/%d).
+tr: %s compounded into %s (slot %d/%d).
+
+fr: %s n'a pas pu être sertie dans %s.
+tr: %s could not be compounded into %s.
+
 fr: %s %d vendu(s).
 tr: %s %d sold.
 

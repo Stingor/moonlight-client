@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <utility>
+#include <vector>
 
 #include "ro/core/log.h"
 #include "ro/net/card_composition.h"
@@ -9,8 +10,10 @@
 #include "ro/sim/chat_line.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
+#include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
+#include "items/card_insert_line.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -171,7 +174,9 @@ void CardInsertView::Apply(const ro::ui::CardInsertWindowAction& asked,
   for (int sent = 0; sent < times; ++sent) {
     if (auto done = ro::net::RequestInsertCard(link, card_slot, asked.equip_slot); !done) {
       ro::core::LogWarning("sertissage : demande non émise — {}", ro::core::Describe(done.error()));
+      continue;
     }
+    world.composition().AskInsert(card_slot, asked.equip_slot, world.inventory());
   }
   // IL RESTE DES CARTES : on redemande la liste, et la fenêtre reste ouverte
   // sur une liste à jour. ⚠ LE SERVEUR TRAITE DANS L'ORDRE : la liste qu'il
@@ -202,26 +207,35 @@ void CardInsertView::AskCompatible(std::uint16_t equip_slot, ro::net::Connection
 }
 
 void CardInsertView::NoteVerdict(ro::sim::World& world, std::uint32_t now_ms) {
-  const std::uint64_t rank = world.composition().verdict_seq();
-  if (rank == said_verdict_) {
-    return;
-  }
-  said_verdict_ = rank;
-  const bool inserted = world.composition().verdict() == ro::sim::CardInsertVerdict::kInserted;
+  // ⚠ CHAQUE ACCUSÉ A SA LIGNE, même arrivés dans la même image : un lot de
+  // trois sertissages en écrit trois.
+  const std::vector<ro::sim::CardInsertReport> reports = world.composition().TakeReports();
   // ⚠ SANS LES MOTS, LA LIGNE SE TAIT : une ligne vide n'apprend rien au
   // joueur.
   if (words_ == nullptr) {
     return;
   }
-  const std::string_view said = ro::vfs::CardInsertText(*words_, inserted);
-  if (said.empty()) {
-    return;
+  // ⚠ SANS TABLE, AUCUN LIEN : la balise demande le nombre d'emplacements de
+  // l'objet, et la ligne retombe sur la phrase générale.
+  ItemTagOf tag_of;
+  if (items_ != nullptr) {
+    tag_of = [this](const ro::sim::InventoryItem& item) {
+      const ro::vfs::ItemEntry* entry = items_->Find(item.item_id);
+      return ro::vfs::BuildItemLink(ItemLinkOf(item), entry != nullptr ? entry->card_slots : 0);
+    };
   }
-  // ⚠ L'ALLURE DES « OBJETS » — c'est un mouvement du sac, une carte en sort,
-  // une pièce change —, mais la case générale : ce n'est ni un ramassage ni
-  // un jet.
-  world.RecordChat(ro::sim::ChatKind::kItem, ro::sim::ChatType::kPublic, 0, std::string(said),
-                   now_ms, inserted ? kInsertedColor : kRefusedColor);
+  for (const ro::sim::CardInsertReport& report : reports) {
+    std::string said = CardInsertLine(report, items_, *words_, tag_of);
+    if (said.empty()) {
+      continue;
+    }
+    const bool inserted = report.verdict == ro::sim::CardInsertVerdict::kInserted;
+    // ⚠ L'ALLURE DES « OBJETS » — c'est un mouvement du sac, une carte en
+    // sort, une pièce change —, mais la case générale : ce n'est ni un
+    // ramassage ni un jet.
+    world.RecordChat(ro::sim::ChatKind::kItem, ro::sim::ChatType::kPublic, 0, std::move(said),
+                     now_ms, inserted ? kInsertedColor : kRefusedColor);
+  }
 }
 
 }  // namespace moonclient

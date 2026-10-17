@@ -15517,6 +15517,12 @@ tr: La inserción de la carta ha fallado.
 fr: L'insertion de la carte a réussi.
 tr: La inserción de la carta se ha completado.
 
+fr: %s sertie dans %s (emplacement %d/%d).
+tr: %s insertada en %s (ranura %d/%d).
+
+fr: %s n'a pas pu être sertie dans %s.
+tr: %s no se ha podido insertar en %s.
+
 fr: %s %d vendu(s).
 tr: %s %d vendido(s).
 

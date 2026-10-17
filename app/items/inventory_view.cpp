@@ -325,6 +325,11 @@ void InventoryView::Apply(const ro::ui::InventoryWindowAction& asked, ro::net::C
         return;
       }
       sent = ro::net::RequestInsertCard(link, asked.insert_card_slot, item->client_slot);
+      if (sent) {
+        // 🔴 LES DEUX OBJETS SE RETIENNENT AVANT LA RÉPONSE : elle ne rappelle
+        // que leurs places, et la carte sera consommée.
+        world.composition().AskInsert(asked.insert_card_slot, item->client_slot, world.inventory());
+      }
       // ⚠ LA LISTE NE VAUT PLUS : la pièce a une case de moins, et la carte
       // une unité de moins. Le prochain sous-menu la redemandera.
       world.composition().ForgetCompatible();

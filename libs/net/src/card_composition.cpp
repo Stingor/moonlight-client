@@ -69,7 +69,8 @@ FrameOutcome ApplyCardCompositionFrame(const Frame& frame, sim::World& world) {
     case proto::ZcAckItemcomposition::kOpcode:
       return Decoded<proto::ZcAckItemcomposition>(frame, [&world](const auto& packet) {
         if (packet.result == kCardRefused) {
-          world.composition().TellVerdict(sim::CardInsertVerdict::kRefused);
+          world.composition().TellVerdict(sim::CardInsertVerdict::kRefused, packet.equipIndex,
+                                          packet.cardIndex, world.inventory());
           return FrameOutcome::kApplied;
         }
         if (packet.result != kCardInserted) {
@@ -78,7 +79,11 @@ FrameOutcome ApplyCardCompositionFrame(const Frame& frame, sim::World& world) {
         // ⚠ LE VERDICT S'ÉCRIT MÊME SI L'UNE DES DEUX PLACES EST VIDE : le
         // client dit « réussi » avant de chercher les objets, et ne dit rien
         // de plus s'il ne les trouve pas.
-        world.composition().TellVerdict(sim::CardInsertVerdict::kInserted);
+        //
+        // 🔴 ET IL S'ÉCRIT AVANT LE SAC : le rapport relit la carte et la pièce
+        // telles qu'elles étaient avant ce sertissage.
+        world.composition().TellVerdict(sim::CardInsertVerdict::kInserted, packet.equipIndex,
+                                        packet.cardIndex, world.inventory());
         static_cast<void>(world.inventory().InsertCard(packet.equipIndex, packet.cardIndex));
         return FrameOutcome::kApplied;
       });
