@@ -13,6 +13,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/list_keys.h"
 #include "ro/ui/map_editor_effects_panel.h"
+#include "ro/ui/map_editor_ground_panel.h"
+#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/wheel_drag.h"
@@ -58,7 +60,7 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
-                 "Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
+                 "Ctrl+5 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
                  "Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. "
                  "Ctrl+clic fait marcher le personnage."),
 };
@@ -87,6 +89,8 @@ constexpr ImU32 kAxisXColor = IM_COL32(230, 70, 70, 255);
 constexpr ImU32 kAxisYColor = IM_COL32(80, 210, 80, 255);
 constexpr ImU32 kAxisZColor = IM_COL32(80, 130, 240, 255);
 constexpr ImU32 kActiveColor = IM_COL32(255, 255, 255, 255);
+// Le cercle de la brosse de relief : un cyan, qui ne se confond avec aucun axe.
+constexpr ImU32 kBrushColor = IM_COL32(90, 230, 230, 230);
 
 ImU32 ColorOf(MapEditorLineKind kind) {
   switch (kind) {
@@ -108,6 +112,8 @@ ImU32 ColorOf(MapEditorLineKind kind) {
       return kSelectionColor;
     case MapEditorLineKind::kEffect:
       return kAxisXColor;
+    case MapEditorLineKind::kBrush:
+      return kBrushColor;
   }
   return kSelectionColor;
 }
@@ -126,6 +132,16 @@ void DrawToolbar(const MapEditorView& view, std::vector<MapEditorIntent>& intent
   offer(MapEditorTool::kScale, core::Tr("Échelle"));
   ImGui::SameLine();
   offer(MapEditorTool::kVertices, core::Tr("Sommets"));
+  ImGui::SameLine();
+  // LE RELIEF RETOUCHÉ ne se voit qu'avec les ombres en temps réel : l'ombre
+  // cuite ne suit pas un sol retouché.
+  ImGui::BeginDisabled(!view.ground.allowed);
+  offer(MapEditorTool::kRelief, core::Tr("Relief"));
+  ImGui::EndDisabled();
+  if (!view.ground.allowed && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    SkinTooltipFormat("%s", core::Tr("Le relief retouché ne se voit qu'avec « Ombres en temps "
+                                     "réel », page Graphics."));
+  }
 }
 
 // Le modèle passe-t-il le filtre ? Un morceau de son fichier, sans égard à la
@@ -575,8 +591,12 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
 
   DrawToolbar(view, intents);
 
-  ImGui::SeparatorText(core::Tr("Modèle désigné"));
-  DrawSelection(view, panel, intents, art);
+  if (view.tool == MapEditorTool::kRelief) {
+    DrawGround(view, panel, intents, art);
+  } else {
+    ImGui::SeparatorText(core::Tr("Modèle désigné"));
+    DrawSelection(view, panel, intents, art);
+  }
 
   if (ImGui::CollapsingHeader(core::Tr("Arbre de la scène"), ImGuiTreeNodeFlags_DefaultOpen)) {
     DrawSceneTree(view, panel, intents, art);

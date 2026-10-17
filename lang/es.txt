@@ -18817,8 +18817,8 @@ tr: Restablecer un vértice del modelo %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extender la malla del modelo %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
-tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+5 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
+tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+5 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje.
 
 fr: Ajouter une lumière
 tr: Añadir una luz
@@ -19290,3 +19290,48 @@ tr: nombre del preajuste
 
 fr: plafond du serveur : il manquera %lld
 tr: tope del servidor: faltarán %lld
+
+fr: Lever
+tr: Elevar
+
+fr: Aplanir
+tr: Aplanar
+
+fr: Adoucir
+tr: Suavizar
+
+fr: Rayon (cases)
+tr: Radio (casillas)
+
+fr: Force (unités par seconde)
+tr: Fuerza (unidades por segundo)
+
+fr: Glisser sur le sol le lève ; Maj tenue, l'abaisse. Ctrl+clic fait toujours marcher le personnage.
+tr: Arrastrar sobre el suelo lo eleva; con Mayús pulsada, lo baja. Ctrl+clic sigue haciendo caminar al personaje.
+
+fr: Points retouchés
+tr: Puntos retocados
+
+fr: Remaillage du sol
+tr: Remallado del suelo
+
+fr: en direct
+tr: en directo
+
+fr: au relâcher
+tr: al soltar
+
+fr: Rétablir le relief
+tr: Restablecer el relieve
+
+fr: Retoucher le relief
+tr: Retocar el relieve
+
+fr: Raison du relief
+tr: Motivo del relieve
+
+fr: Retouche du relief
+tr: Retoque del relieve
+
+fr: Le relief retouché ne se voit qu'avec « Ombres en temps réel », page Graphics.
+tr: El relieve retocado solo se ve con «Sombras en tiempo real», página Graphics.

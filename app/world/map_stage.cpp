@@ -1,5 +1,6 @@
 #include "world/map_stage.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <string>
@@ -8,6 +9,7 @@
 #include "ro/core/build_stamp.h"
 #include "ro/core/log.h"
 #include "ro/formats/gat.h"
+#include "ro/mapedit/ground_edit.h"
 #include "ro/render/map_fog.h"
 #include "ro/render/map_sky.h"
 #include "ro/render/terrain_mesh.h"
@@ -51,12 +53,20 @@ std::string WindowTitle(bool names_shown, const ro::sim::World& world, bool test
 }
 
 ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
-                                        bool flatten_relief, MapEditStore* edits) {
+                                        bool flatten_relief, MapEditStore* edits,
+                                        bool real_time_shadows) {
   const std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
   ro::render::MapSceneOptions options{.flatten_relief = flatten_relief};
   if (edits != nullptr) {
     edits->Load(map_name, vfs);
     options.edit = edits->Document(map_name);
+  } else {
+    options.edit = ro::render::LoadMapEdit(vfs, map_name);
+  }
+  // LE RELIEF RETOUCHÉ, seulement sous les ombres en temps réel : la scène
+  // reçoit un document sans lui, le magasin garde le sien entier.
+  if (!real_time_shadows) {
+    options.edit->ClearGround();
   }
   auto scene = ro::render::LoadMapScene(vfs, map_name, options);
   if (!scene) {
@@ -80,6 +90,14 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
       if (stage.scene.relief_level.has_value()) {
         gat->LevelCornerHeights(*stage.scene.relief_level);
       }
+      // Les hauteurs du fichier se gardent pour l'éditeur, puis le relief
+      // retouché que porte le sol se pose aussi sur elles.
+      stage.file_walk_heights.reserve(gat->cells().size());
+      for (const ro::formats::GatCell& cell : gat->cells()) {
+        stage.file_walk_heights.push_back(cell.corner_height);
+      }
+      ro::mapedit::LiftWalkHeights(stage.scene.ground_edits, stage.scene.gnd.width(),
+                                   stage.scene.gnd.height(), *gat);
       stage.ground_light = ro::render::BuildGroundLight(stage.scene.gnd, *gat);
       stage.ground_laid_light = ro::render::BuildGroundLight(
           stage.scene.gnd, *gat, ro::render::GroundLightTerms::kLaidLightOnly);
@@ -140,6 +158,67 @@ ro::core::Result<void> SyncStageGround(MapStage& stage, ro::render::TerrainRende
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - started)
                         .count());
+  return {};
+}
+
+bool ReshapeStageGround(MapStage& stage, std::span<const ro::mapedit::GroundEdit> edits) {
+  // UN RELIEF APLATI n'en porte aucune : voir `ro::render::ReshapeSceneGround`.
+  if (stage.scene.relief_level.has_value() || std::ranges::equal(stage.scene.ground_edits, edits)) {
+    return false;
+  }
+  const ro::mapedit::MapEditReport report = ro::render::ReshapeSceneGround(stage.scene, edits);
+  for (const std::string& refusal : report.refused) {
+    ro::core::LogWarning("édition de {} refusée — {}", stage.name, refusal);
+  }
+  if (stage.gat.has_value()) {
+    ro::formats::GatMap& gat = *stage.gat;
+    std::size_t rank = 0;
+    for (std::int32_t y = 0; y < gat.height(); ++y) {
+      for (std::int32_t x = 0; x < gat.width(); ++x) {
+        if (rank < stage.file_walk_heights.size()) {
+          gat.SetCornerHeights(x, y, stage.file_walk_heights[rank]);
+        }
+        ++rank;
+      }
+    }
+    ro::mapedit::LiftWalkHeights(stage.scene.ground_edits, stage.scene.gnd.width(),
+                                 stage.scene.gnd.height(), gat);
+  }
+  stage.ground_mesh_stale = true;
+  return true;
+}
+
+std::span<const ro::mapedit::GroundEdit> ShownGroundEdits(const ro::mapedit::MapEdit& document,
+                                                          bool real_time_shadows) {
+  if (!real_time_shadows) {
+    return {};
+  }
+  return document.ground();
+}
+
+bool RemeshesWhileStroking(const MapStage& stage) {
+  return !stage.ground_mesh_ms.has_value() || *stage.ground_mesh_ms <= kLiveGroundRemeshMs;
+}
+
+ro::core::Result<void> RemeshStageGround(MapStage& stage, ro::render::TerrainRenderer& terrain) {
+  if (!stage.ground_mesh_stale) {
+    return {};
+  }
+  const std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
+  stage.ground_mesh_stale = false;
+  ro::render::RebuildSceneTerrain(stage.scene);
+  if (stage.gat.has_value()) {
+    stage.ground_light = ro::render::BuildGroundLight(stage.scene.gnd, *stage.gat);
+    stage.ground_laid_light = ro::render::BuildGroundLight(
+        stage.scene.gnd, *stage.gat, ro::render::GroundLightTerms::kLaidLightOnly);
+  }
+  auto uploaded =
+      terrain.Upload(stage.scene.terrain, stage.scene.terrain_textures, stage.scene.atlas.image);
+  stage.ground_mesh_ms =
+      std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started).count();
+  if (!uploaded) {
+    return std::unexpected(uploaded.error());
+  }
   return {};
 }
 
@@ -213,8 +292,8 @@ ro::core::Result<void> EnterAnnouncedMap(const MapArrival& arrival) {
   }
   *arrival.attempted = arrival.world->map_name();
 
-  auto arrived =
-      LoadMapStage(*arrival.vfs, *arrival.attempted, arrival.flatten_relief, arrival.map_edits);
+  auto arrived = LoadMapStage(*arrival.vfs, *arrival.attempted, arrival.flatten_relief,
+                              arrival.map_edits, arrival.real_time_shadows);
   if (!arrived) {
     // ⚠ CE QUI RESTE À L'ÉCRAN : on rend un succès juste après, sans toucher à la
     // scène. Le client garde donc la géométrie de la carte PRÉCÉDENTE pendant
@@ -255,8 +334,8 @@ ro::core::Result<bool> ReloadStageRelief(const MapArrival& arrival) {
   // ⚠ LA DEMANDE EST NOTÉE AVANT LA LECTURE, succès ou non : un échec ne se
   // retente pas à chaque image.
   arrival.stage->flatten_asked = arrival.flatten_relief;
-  auto reread =
-      LoadMapStage(*arrival.vfs, arrival.stage->name, arrival.flatten_relief, arrival.map_edits);
+  auto reread = LoadMapStage(*arrival.vfs, arrival.stage->name, arrival.flatten_relief,
+                             arrival.map_edits, arrival.real_time_shadows);
   if (!reread) {
     ro::core::LogError("carte {} : {} — le relief reste celui d'avant", arrival.stage->name,
                        ro::core::Describe(reread.error()));

@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -98,6 +99,12 @@ struct MapScene {
   std::vector<std::uint8_t> invisible_tiles;
   // Le découpage dont `terrain` est bâti : voir `BuildTerrainMesh`.
   std::int32_t ground_subdivisions = kFlatGroundSubdivisions;
+  // LES HAUTEURS DU SOL TELLES QUE LE FICHIER LES PORTE, cube par cube, avant
+  // les retouches du relief — aplanies si la carte l'est : de quoi reposer le
+  // relief sans relire la carte. Voir `ReshapeSceneGround`.
+  std::vector<std::array<float, 4>> file_corner_heights;
+  // Les retouches du relief que `gnd` porte.
+  std::vector<mapedit::GroundEdit> ground_edits;
   std::vector<ModelInstances> models;
   SceneLight light;
 
@@ -204,6 +211,21 @@ struct MapSceneOptions {
 // arrondi » quand il change. Rien n'est fait quand le sol l'est déjà. À
 // téléverser ensuite au renderer.
 void RebuildSceneGround(MapScene& scene, std::int32_t subdivisions);
+
+// REPOSE LE RELIEF DE `scene` SELON `edits`, sans relire la carte : les
+// hauteurs du fichier reviennent, puis les retouches se posent — voir
+// `mapedit::ApplyGroundEdits`. Sur un relief aplati, aucune ne se pose : elles
+// lèveraient des bosses dans un monde qu'on a voulu plat.
+//
+// ⚠ LE MAILLAGE N'EST PAS REBÂTI, parce que c'est lui qui coûte : l'éditeur
+// repose les hauteurs à chaque image d'un glissé, et ne remaille que quand il
+// en a le temps. Voir `RebuildSceneTerrain`.
+mapedit::MapEditReport ReshapeSceneGround(MapScene& scene,
+                                          std::span<const mapedit::GroundEdit> edits);
+
+// REBÂTIT LE MAILLAGE DU SOL sur les hauteurs que `scene.gnd` porte, au
+// découpage du moment. À téléverser ensuite au renderer.
+void RebuildSceneTerrain(MapScene& scene);
 
 // L'ÉDITION DE `map_name` dans l'installation : voir docs/adr/0118. Une carte
 // sans document n'en a aucune ; un document illisible n'en donne aucune, et le

@@ -53,6 +53,8 @@ std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_he
       return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kScale};
     case '4':
       return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kVertices};
+    case '5':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRelief};
     default:
       return std::nullopt;
   }
@@ -75,6 +77,7 @@ void MapEditorSession::Leave() noexcept {
   view_point_.reset();
   gesture_before_.reset();
   drag_.reset();
+  ground_stroke_.reset();
   handles_.clear();
 }
 
@@ -91,6 +94,10 @@ std::vector<ro::ui::MapEditorLine> MapEditorSession::GizmoTrace() const {
 }
 
 bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
+  // LA BROSSE DE RELIEF prend tout appui sur le sol : elle n'a pas de poignée.
+  if (active_ && tool_ == ro::ui::MapEditorTool::kRelief) {
+    return GrabGround();
+  }
   return active_ && ((view.selected.has_value() && GrabTool(pointer, view)) ||
                      GrabLightHandle(pointer, view) || GrabEffectHandle(pointer, view) ||
                      GrabMapEffectHandle(pointer, view) || GrabLight(pointer) ||
@@ -160,6 +167,11 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
 }
 
 void MapEditorSession::Release() {
+  if (ground_stroke_.has_value()) {
+    ground_stroke_.reset();
+    queued_.emplace_back(ro::ui::map_editor::EndGroundStroke{});
+    return;
+  }
   if (!drag_.has_value()) {
     return;
   }
@@ -209,6 +221,7 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
   selected_effect_.reset();
   selected_map_effect_.reset();
   gesture_before_.reset();
+  ground_stroke_.reset();
   pending_why_.clear();
   status_.clear();
 }
@@ -263,8 +276,12 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
         } else if constexpr (std::is_same_v<Asked, intents::Revert>) {
           return Revert(store);
         } else if constexpr (std::is_same_v<Asked, intents::SetTool>) {
+          if (asked.tool == ro::ui::MapEditorTool::kRelief && !ground_allowed_) {
+            return {};
+          }
           tool_ = asked.tool;
           drag_.reset();
+          ground_stroke_.reset();
           return {};
         } else if constexpr (std::is_same_v<Asked, intents::AddModel>) {
           return AddModel(asked.file, scene, store);
@@ -313,7 +330,20 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return MoveEffect(asked, store);
         } else if constexpr (std::is_same_v<Asked, intents::RemoveLight>) {
           return RemoveLight(asked.slot, store);
+        } else if constexpr (std::is_same_v<Asked, intents::SetBrush>) {
+          SetBrush(asked.brush);
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::EndGroundStroke>) {
+          EndGroundStroke(store);
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::RevertGround>) {
+          RevertGround(store);
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::SetGroundWhy>) {
+          SetGroundWhy(asked.why, store);
+          return {};
         } else {
+          static_assert(std::is_same_v<Asked, intents::Save>, "une intention n'est pas routée");
           Save(store);
           return {};
         }
@@ -674,6 +704,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   ViewLights(document, view);
   ViewEffects(document, view);
   ViewMapEffects(scene, document, view);
+  ViewGround(document, view);
   if (selection_.empty()) {
     return view;
   }

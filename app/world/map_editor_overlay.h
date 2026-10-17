@@ -1,8 +1,10 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <vector>
 
+#include "ro/formats/gnd.h"
 #include "ro/render/camera.h"
 #include "ro/render/map_scene.h"
 #include "ro/ui/map_editor_panel.h"
@@ -55,5 +57,20 @@ namespace moonclient {
                                                                 float aspect_ratio,
                                                                 float viewport_width,
                                                                 float viewport_height);
+
+// LE POINT DE LA GRILLE DES COINS sous un point du monde : colonne et rangée,
+// fractionnaires — voir `ro::mapedit::GroundEdit`.
+[[nodiscard]] std::array<float, 2> CornerPointOf(const ro::formats::GndMap& gnd, float world_x,
+                                                 float world_z);
+
+// LE CERCLE DE LA BROSSE DE RELIEF : son rayon, en cubes, autour de
+// `corner_point`, posé sur le sol, en segments projetés. Un segment dont un
+// bout passe derrière l'œil ne se trace pas.
+[[nodiscard]] std::vector<ro::ui::MapEditorLine> BrushRing(const ro::render::MapScene& scene,
+                                                           const std::array<float, 2>& corner_point,
+                                                           float radius_cubes,
+                                                           const ro::render::Camera& camera,
+                                                           float aspect_ratio, float viewport_width,
+                                                           float viewport_height);
 
 }  // namespace moonclient

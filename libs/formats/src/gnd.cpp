@@ -236,4 +236,14 @@ void GndMap::LevelCornerHeights(float height) noexcept {
   }
 }
 
+void GndMap::SetCornerHeights(std::int32_t x, std::int32_t y,
+                              const std::array<float, 4>& heights) noexcept {
+  if (x < 0 || x >= width_ || y < 0 || y >= height_) {
+    return;
+  }
+  cubes_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+         static_cast<std::size_t>(x)]
+      .corner_height = heights;
+}
+
 }  // namespace ro::formats

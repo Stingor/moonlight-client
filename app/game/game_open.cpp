@@ -127,9 +127,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LES DOCUMENTS D'ÉDITION, lus carte par carte à leur entrée : voir
   // `MapEditStore`.
   map_edits_.Open(client_root_);
-  auto first_map = LoadMapStage(
-      *vfs_, map_name,
-      ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look()), &map_edits_);
+  auto first_map =
+      LoadMapStage(*vfs_, map_name,
+                   ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look()),
+                   &map_edits_, settings_->options().graphics().real_time_shadows());
   if (!first_map) {
     return std::unexpected(first_map.error());
   }

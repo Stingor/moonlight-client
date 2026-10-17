@@ -58,6 +58,14 @@ void Game::ServeMapEditor() {
   }
   const auto width = static_cast<float>(shell_.width());
   const auto height = static_cast<float>(shell_.height());
+  // LE CERCLE DE LA BROSSE, au sol sous la souris.
+  if (const std::optional<std::array<float, 2>>& pointer = map_editor_.ground_pointer();
+      pointer.has_value()) {
+    const std::vector<ro::ui::MapEditorLine> ring =
+        BrushRing(stage_->scene, *pointer, map_editor_.Brush().radius_cubes, camera_, aspect_ratio_,
+                  width, height);
+    view.lines.insert(view.lines.end(), ring.begin(), ring.end());
+  }
   map_editor_.SetEffectDots(EffectDots(view, stage_->scene, camera_, aspect_ratio_, width, height));
   const std::vector<ro::ui::MapEditorLine> effect_marks = map_editor_.EffectTrace();
   view.lines.insert(view.lines.end(), effect_marks.begin(), effect_marks.end());
@@ -129,6 +137,9 @@ void Game::ServeMapEditorTools() {
   // UN MODÈLE AJOUTÉ SE POSE où regarde la caméra.
   const glm::vec3 drop = map_frame.ToNative(camera_.look_at);
   map_editor_.SetDropPoint({drop.x, drop.y, drop.z});
+  // LA BROSSE DE RELIEF, avant les intentions : un relâcher de cette image
+  // clôt le glissé après son dernier pas.
+  ServeGroundBrush();
   bool replace = false;
   for (const ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
     replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
@@ -141,6 +152,9 @@ void Game::ServeMapEditorTools() {
   if (replace) {
     ReplaceMapModels();
   }
+  // LE SOL SUIT LE DOCUMENT, quel que soit le geste qui l'a changé : un pas de
+  // brosse, une annulation, un retour au relief de la carte.
+  FollowMapGround();
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
   // LA BIBLIOTHÈQUE, lue une fois dans l'installation, à la première ouverture.
   if (map_editor_.active() && model_library_ == nullptr) {
@@ -164,6 +178,11 @@ void Game::ServeMapEditorTools() {
   map_editor_.SetVertexContext(std::nullopt);
   map_editor_.SetVertexDots({});
   vertex_context_.Forget();
+  // LA BROSSE DE RELIEF n'a pas de poignée : le modèle désigné garde sa boîte.
+  if (map_editor_.tool() == ro::ui::MapEditorTool::kRelief) {
+    map_editor_.SetGizmo(GizmoFrame(), {});
+    return;
+  }
   // LES POIGNÉES, sur le pivot du placement que montre la vue.
   const GizmoFrame frame = GizmoFrameOf(map_frame, tools.map_editor.position, camera_);
   map_editor_.SetGizmo(

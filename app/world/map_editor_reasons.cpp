@@ -70,6 +70,9 @@ ro::mapedit::MapEdit WithReasons(ro::mapedit::MapEdit document) {
       document.SetAdded(slot, std::move(added));
     }
   }
+  if (!document.ground().empty() && document.ground_why().empty()) {
+    document.SetGroundWhy(ro::core::Tr("Retouche du relief"));
+  }
   return document;
 }
 

@@ -7,7 +7,12 @@
 
 #include "ro/mapedit/map_edit.h"
 
+#include "ground_yaml.h"
+
 namespace ro::mapedit {
+
+using detail::DoubleQuoted;
+
 namespace {
 
 constexpr int kSupportedVersion = 1;
@@ -65,6 +70,13 @@ constexpr std::string_view kMapEditHeader =
 #    vertices : les sommets déplacés — node (le nom du nœud), vertex (son rang
 #               dans le nœud), origin et position, dans le repère du nœud ;
 #    why      : pourquoi, obligatoire.
+#  ground : les retouches du relief, à la brosse :
+#    why      : pourquoi, obligatoire — une raison pour tout le relief ;
+#    points   : [colonne, rangée, levée] — un point de la grille des coins du
+#               sol, (largeur + 1) × (hauteur + 1) points, le coin bas-gauche
+#               du cube (x, y) étant le point (x, y) ; la levée en unités du
+#               monde, positive vers le haut. Elle lève tous les coins de cube
+#               qui touchent le point : une falaise garde sa marche.
 #  Une opération dont la cible ne correspond plus n'est pas posée, et le
 #  journal le dit.
 #
@@ -463,23 +475,6 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
   return quoted + "'";
 }
 
-// Une chaîne entre guillemets, ses guillemets, barres obliques inverses et
-// sauts de ligne échappés.
-[[nodiscard]] std::string DoubleQuoted(std::string_view text) {
-  std::string quoted = "\"";
-  for (const char letter : text) {
-    if (letter == '"' || letter == '\\') {
-      quoted += '\\';
-      quoted += letter;
-    } else if (letter == '\n') {
-      quoted += "\\n";
-    } else {
-      quoted += letter;
-    }
-  }
-  return quoted + "\"";
-}
-
 // Un vecteur, chaque composante à son écriture la plus courte qui se relit à
 // l'identique.
 [[nodiscard]] std::string VectorText(const std::array<float, 3>& vector) {
@@ -603,6 +598,11 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
         edit.AddModel(std::move(*model));
       }
     }
+    if (const YAML::Node ground = whole["ground"]) {
+      if (std::string refusal = detail::ReadGround(ground, edit); !refusal.empty()) {
+        return std::unexpected(Refused(map_name, std::move(refusal)));
+      }
+    }
   } catch (const YAML::Exception& failure) {
     return std::unexpected(Refused(map_name, failure.what()));
   }
@@ -718,6 +718,7 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     }
     text += std::format("    why: {}\n", DoubleQuoted(light.why));
   }
+  text += detail::GroundYaml(edit);
   return text;
 }
 

@@ -16,7 +16,14 @@ ro::core::Result<void> Game::FollowMapRelief() {
     return followed;
   }
   // ⚠ APRÈS GREYWORLD, qui relit la carte avec son sol d'origine.
-  return SyncStageGround(*stage_, terrain_, settings_->options().graphics().rounded_ground());
+  if (auto rounded =
+          SyncStageGround(*stage_, terrain_, settings_->options().graphics().rounded_ground());
+      !rounded) {
+    return rounded;
+  }
+  // LE RELIEF RETOUCHÉ suit « Ombres en temps réel » : voir `ShownGroundEdits`.
+  FollowMapGround();
+  return {};
 }
 
 ro::core::Result<void> Game::FollowGreyWorldRelief() {
@@ -34,17 +41,19 @@ ro::core::Result<void> Game::FollowGreyWorldRelief() {
   if (!stage_.has_value() || stage_->flatten_asked == wanted) {
     return {};
   }
-  const MapArrival arrival{.vfs = &*vfs_,
-                           .stage = &*stage_,
-                           .planner = &planner_,
-                           .world = &world_,
-                           .terrain = &terrain_,
-                           .water = &water_,
-                           .models = &models_,
-                           .background = &background_,
-                           .attempted = &attempted_map_,
-                           .flatten_relief = wanted,
-                           .map_edits = &map_edits_};
+  const MapArrival arrival{
+      .vfs = &*vfs_,
+      .stage = &*stage_,
+      .planner = &planner_,
+      .world = &world_,
+      .terrain = &terrain_,
+      .water = &water_,
+      .models = &models_,
+      .background = &background_,
+      .attempted = &attempted_map_,
+      .flatten_relief = wanted,
+      .map_edits = &map_edits_,
+      .real_time_shadows = settings_->options().graphics().real_time_shadows()};
   const ro::core::Result<bool> reloaded = ReloadStageRelief(arrival);
   if (!reloaded) {
     return std::unexpected(reloaded.error());

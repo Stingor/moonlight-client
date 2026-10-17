@@ -113,4 +113,14 @@ void GatMap::LevelCornerHeights(float height) noexcept {
   }
 }
 
+void GatMap::SetCornerHeights(std::int32_t x, std::int32_t y,
+                              const std::array<float, 4>& heights) noexcept {
+  if (!InBounds(x, y)) {
+    return;
+  }
+  cells_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+         static_cast<std::size_t>(x)]
+      .corner_height = heights;
+}
+
 }  // namespace ro::formats

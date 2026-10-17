@@ -217,6 +217,9 @@ ro::ui::map_editor::Place Snapped(ro::ui::MapEditorTool tool,
     case ro::ui::MapEditorTool::kScale:
       snap(placed.scale, start.scale, kSnapScale);
       break;
+    case ro::ui::MapEditorTool::kRelief:
+      // La brosse n'a pas de poignée : rien ne s'aimante.
+      break;
   }
   return placed;
 }

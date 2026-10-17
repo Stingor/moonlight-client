@@ -212,6 +212,22 @@ struct MeshEdit {
   friend bool operator==(const MeshEdit&, const MeshEdit&) = default;
 };
 
+// UNE RETOUCHE DU RELIEF : un point de la GRILLE DES COINS du sol, qui compte
+// (largeur + 1) × (hauteur + 1) points — le coin bas-gauche du cube (x, y) est
+// le point (x, y), son coin haut-droit le point (x + 1, y + 1) —, et sa levée,
+// en unités du monde, positive vers le haut. Voir ro/mapedit/ground_edit.h.
+struct GroundEdit {
+  std::int32_t corner_x = 0;
+  std::int32_t corner_y = 0;
+  float lift = 0.0F;
+
+  friend bool operator==(const GroundEdit&, const GroundEdit&) = default;
+};
+
+// Une levée plus petite que cela, en unités du monde, ne relève plus rien : son
+// point quitte le document.
+inline constexpr float kGroundLiftEpsilon = 1.0e-4F;
+
 // Le document d'une carte.
 class MapEdit {
  public:
@@ -219,7 +235,21 @@ class MapEdit {
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
   [[nodiscard]] bool empty() const noexcept {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
-           effects_.empty() && effect_edits_.empty();
+           effects_.empty() && effect_edits_.empty() && ground_.empty();
+  }
+  // LES RETOUCHES DU RELIEF : une seule par point, rangées par rangée puis par
+  // colonne. Une seule raison les couvre toutes : un relief se retouche d'un
+  // geste de brosse, pas point par point.
+  [[nodiscard]] const std::vector<GroundEdit>& ground() const noexcept { return ground_; }
+  [[nodiscard]] const std::string& ground_why() const noexcept { return ground_why_; }
+  void SetGroundWhy(std::string why) { ground_why_ = std::move(why); }
+  // Ajoute la levée de `edit` à celle de son point, ou lui en donne une ; une
+  // levée qui retombe sous `kGroundLiftEpsilon` quitte le document.
+  void LiftGround(const GroundEdit& edit);
+  // Retire toutes les retouches du relief, et leur raison.
+  void ClearGround() {
+    ground_.clear();
+    ground_why_.clear();
   }
   // Les effets ajoutés, dans l'ordre du document.
   [[nodiscard]] const std::vector<AddedEffect>& effects() const noexcept { return effects_; }
@@ -273,6 +303,8 @@ class MapEdit {
   std::vector<AddedLight> lights_;
   std::vector<AddedEffect> effects_;
   std::vector<EffectEdit> effect_edits_;
+  std::vector<GroundEdit> ground_;
+  std::string ground_why_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

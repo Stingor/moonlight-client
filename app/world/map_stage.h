@@ -3,11 +3,14 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ro/core/error.h"
 #include "ro/formats/gat.h"
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/ground_light.h"
 #include "ro/render/map_scene.h"
 #include "ro/render/model_renderer.h"
@@ -42,6 +45,16 @@ struct MapStage {
   // La même, SANS l'ombre cuite : celle des acteurs quand l'ombre du soleil
   // remplace celle de la carte.
   ro::render::GroundLight ground_laid_light;
+  // LES HAUTEURS DE LA GRILLE TELLES QUE LE FICHIER LES PORTE, cellule par
+  // cellule, avant les retouches du relief — aplanies si la carte l'est. Voir
+  // `ReshapeStageGround`.
+  std::vector<std::array<float, 4>> file_walk_heights;
+  // LE MAILLAGE DU SOL NE PORTE PAS ENCORE le relief des hauteurs : un glissé
+  // de brosse trop coûteux à remailler image par image attend son relâcher.
+  bool ground_mesh_stale = false;
+  // Ce qu'a coûté le dernier remaillage du relief, en millisecondes ; rien
+  // avant le premier.
+  std::optional<double> ground_mesh_ms;
   // LE RELIEF QU'ON A DEMANDÉ À LA LECTURE : aplati (GreyWorld) ou non.
   //
   // ⚠ PAS FORCÉMENT CELUI QU'ON A : une carte sans aucun sol ne s'aplatit pas,
@@ -70,9 +83,13 @@ struct MapStage {
 //
 // `edits`, quand il est donné, pose le document qu'il tient pour cette carte,
 // lu à sa première entrée, au lieu de celui de l'installation.
+//
+// `real_time_shadows` : « Ombres en temps réel » est allumé, et le relief
+// retouché du document se pose — voir `ShownGroundEdits`.
 [[nodiscard]] ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
                                                       bool flatten_relief = false,
-                                                      MapEditStore* edits = nullptr);
+                                                      MapEditStore* edits = nullptr,
+                                                      bool real_time_shadows = false);
 
 // Où se pose un acteur, en coordonnées du monde.
 //
@@ -93,6 +110,36 @@ struct MapStage {
 [[nodiscard]] ro::core::Result<void> SyncStageGround(MapStage& stage,
                                                      ro::render::TerrainRenderer& terrain,
                                                      bool rounded);
+
+// LE RELIEF SELON L'ÉDITION : quand `edits` diffère de ce que la scène porte,
+// repose les hauteurs du sol et celles de la grille de marche — pour que les
+// pieds suivent —, et marque le maillage périmé. Bon marché : seules des
+// hauteurs se recopient, et l'éditeur l'appelle à chaque image. Rend vrai
+// quand le relief a changé. La marchabilité ne bouge jamais.
+bool ReshapeStageGround(MapStage& stage, std::span<const ro::mapedit::GroundEdit> edits);
+
+// LES RETOUCHES DU RELIEF QUI SE VOIENT : celles du document sous « Ombres en
+// temps réel », aucune sinon. L'ombre cuite de la carte est peinte pour le sol
+// d'origine et ne suit pas un relief retouché ; les ombres en temps réel le
+// suivent. Sans elles, le sol reste celui du fichier, cohérent avec ses ombres.
+// Le document, lui, garde toujours ses retouches.
+[[nodiscard]] std::span<const ro::mapedit::GroundEdit> ShownGroundEdits(
+    const ro::mapedit::MapEdit& document, bool real_time_shadows);
+
+// LE REMAILLAGE EN DIRECT : un glissé de brosse remaille le sol à chaque image
+// tant que le dernier remaillage a coûté moins que cela, en millisecondes —
+// deux images à 60 par seconde. Au-delà, le sol ne se remaille qu'au
+// relâcher : les pieds et la brosse suivent déjà les hauteurs, seul le dessin
+// attend. Le sol arrondi d'une carte de 200 × 200 cubes coûte environ 230 ms
+// en Release ; le sol d'origine, une quinzaine.
+inline constexpr double kLiveGroundRemeshMs = 33.0;
+[[nodiscard]] bool RemeshesWhileStroking(const MapStage& stage);
+
+// REMAILLE LE SOL PÉRIMÉ sur ses hauteurs, rebâtit la lumière que les acteurs
+// reçoivent du sol, téléverse, et mesure ce que cela a coûté. Rien quand le
+// maillage est à jour. L'erreur rendue est celle du téléversement.
+[[nodiscard]] ro::core::Result<void> RemeshStageGround(MapStage& stage,
+                                                       ro::render::TerrainRenderer& terrain);
 
 // LE NOM QUE LE JOUEUR VOIT, et celui du fichier qu'il lance.
 //
@@ -175,6 +222,8 @@ struct MapArrival {
   bool flatten_relief = false;
   // Les documents d'édition que le jeu tient : voir `LoadMapStage`.
   MapEditStore* map_edits = nullptr;
+  // « Ombres en temps réel » : le relief retouché se pose. Voir `LoadMapStage`.
+  bool real_time_shadows = false;
 };
 
 // Charge la carte que le monde annonce, la téléverse, et vise sa grille.

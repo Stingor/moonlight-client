@@ -18817,8 +18817,8 @@ tr: Restore a vertex of model %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extend the mesh of model %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
-tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+4 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+5 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
+tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+5 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character.
 
 fr: Ajouter une lumière
 tr: Add a light
@@ -19290,3 +19290,48 @@ tr: preset name
 
 fr: plafond du serveur : il manquera %lld
 tr: server cap: %lld short
+
+fr: Lever
+tr: Raise
+
+fr: Aplanir
+tr: Flatten
+
+fr: Adoucir
+tr: Smooth
+
+fr: Rayon (cases)
+tr: Radius (cells)
+
+fr: Force (unités par seconde)
+tr: Strength (units per second)
+
+fr: Glisser sur le sol le lève ; Maj tenue, l'abaisse. Ctrl+clic fait toujours marcher le personnage.
+tr: Dragging over the ground raises it; with Shift held, lowers it. Ctrl+click still walks the character.
+
+fr: Points retouchés
+tr: Edited points
+
+fr: Remaillage du sol
+tr: Ground remesh
+
+fr: en direct
+tr: live
+
+fr: au relâcher
+tr: on release
+
+fr: Rétablir le relief
+tr: Restore the relief
+
+fr: Retoucher le relief
+tr: Edit the relief
+
+fr: Raison du relief
+tr: Reason for the relief
+
+fr: Retouche du relief
+tr: Relief edit
+
+fr: Le relief retouché ne se voit qu'avec « Ombres en temps réel », page Graphics.
+tr: The edited relief only shows with “Real-time shadows”, Graphics page.

@@ -94,6 +94,12 @@ class GndMap {
   // les lightmaps et l'eau ne bougent pas.
   void LevelCornerHeights(float height) noexcept;
 
+  // LES QUATRE HAUTEURS DU CUBE (x, y), dans l'ordre et le sens du fichier :
+  // c'est par là que l'éditeur de carte retouche le relief. Un cube hors de la
+  // carte n'est pas touché. Les faces, les tuiles et l'eau ne bougent pas.
+  void SetCornerHeights(std::int32_t x, std::int32_t y,
+                        const std::array<float, 4>& heights) noexcept;
+
   // Lightmaps conservées brutes : chacune fait
   // lightmap_width × lightmap_height × 4 octets. Leur découpage en textures
   // relève du rendu, pas du parseur.

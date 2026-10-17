@@ -10,6 +10,7 @@
 #include "ro/render/actor_pick.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/model_pick.h"
+#include "ro/render/terrain_mesh.h"
 
 namespace moonclient {
 namespace {
@@ -100,6 +101,51 @@ std::vector<ro::ui::MapEditorLine> LightRangeRing(const ro::ui::MapEditorLight& 
       ring.push_back(ro::ui::MapEditorLine{
           .from = *from, .to = *to, .kind = ro::ui::MapEditorLineKind::kSelection});
     }
+  }
+  return ring;
+}
+
+std::array<float, 2> CornerPointOf(const ro::formats::GndMap& gnd, float world_x, float world_z) {
+  // Les rangées descendent en Z : voir `ro::render::CubePointAt`.
+  const float depth = static_cast<float>(gnd.height()) * ro::render::kWorldUnitsPerCube;
+  return {world_x / ro::render::kWorldUnitsPerCube,
+          (depth + ro::render::kWorldUnitsPerCube - world_z) / ro::render::kWorldUnitsPerCube};
+}
+
+std::vector<ro::ui::MapEditorLine> BrushRing(const ro::render::MapScene& scene,
+                                             const std::array<float, 2>& corner_point,
+                                             float radius_cubes, const ro::render::Camera& camera,
+                                             float aspect_ratio, float viewport_width,
+                                             float viewport_height) {
+  // Le cercle en segments : assez pour paraître rond, et suivre le sol qu'il
+  // épouse.
+  constexpr int kRingSegments = 64;
+  // Un peu au-dessus du sol, en unités du monde : posé dessus, il s'y
+  // enfoncerait à moitié.
+  constexpr float kRingLift = 0.5F;
+  const float depth = static_cast<float>(scene.gnd.height()) * ro::render::kWorldUnitsPerCube;
+  const auto point_at = [&](int segment) {
+    const float angle =
+        glm::two_pi<float>() * static_cast<float>(segment) / static_cast<float>(kRingSegments);
+    const float column = corner_point[0] + std::cos(angle) * radius_cubes;
+    const float row = corner_point[1] + std::sin(angle) * radius_cubes;
+    const float world_x = column * ro::render::kWorldUnitsPerCube;
+    const float world_z =
+        depth + ro::render::kWorldUnitsPerCube - row * ro::render::kWorldUnitsPerCube;
+    return glm::vec3(world_x, ro::render::GroundHeightAt(scene.gnd, world_x, world_z) + kRingLift,
+                     world_z);
+  };
+  std::vector<ro::ui::MapEditorLine> ring;
+  std::optional<glm::vec2> from = ro::render::ProjectToScreen(camera, aspect_ratio, point_at(0),
+                                                              viewport_width, viewport_height);
+  for (int segment = 1; segment <= kRingSegments; ++segment) {
+    const std::optional<glm::vec2> to = ro::render::ProjectToScreen(
+        camera, aspect_ratio, point_at(segment), viewport_width, viewport_height);
+    if (from.has_value() && to.has_value()) {
+      ring.push_back(ro::ui::MapEditorLine{
+          .from = *from, .to = *to, .kind = ro::ui::MapEditorLineKind::kBrush});
+    }
+    from = to;
   }
   return ring;
 }

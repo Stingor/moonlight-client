@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "ro/mapedit/edit_history.h"
+#include "ro/mapedit/ground_edit.h"
 #include "ro/mapedit/map_edit.h"
 #include "ro/render/map_scene.h"
 #include "ro/ui/map_editor_panel.h"
@@ -22,7 +23,7 @@
 namespace moonclient {
 
 // LES RACCOURCIS DU MODE ÉDITEUR, Ctrl tenu : Z annule, Y — ou Maj+Z — rétablit,
-// S enregistre, D duplique, F centre la caméra, et 1 à 4 choisissent l'outil. `key` est la touche,
+// S enregistre, D duplique, F centre la caméra, et 1 à 5 choisissent l'outil. `key` est la touche,
 // en minuscule ASCII ; rien pour une autre.
 [[nodiscard]] std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held);
 
@@ -113,7 +114,9 @@ class MapEditorSession {
   // Un appui en `pointer` saisit-il une poignée ? Le placement de départ est
   // celui que montre `view`, la vue de l'image.
   [[nodiscard]] bool Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view);
-  [[nodiscard]] bool dragging() const noexcept { return drag_.has_value(); }
+  [[nodiscard]] bool dragging() const noexcept {
+    return drag_.has_value() || ground_stroke_.has_value();
+  }
   // Le glissé de la poignée saisie jusqu'en `pointer`, puis son relâcher : ils
   // deviennent des intentions de placement, que `TakeQueued` rend.
   // `snap` : Maj tenue, le placement s'aimante — voir `Snapped`.
@@ -174,6 +177,37 @@ class MapEditorSession {
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> LightTrace() const;
   // Les points des sommets, le désigné distingué.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> VertexTrace() const;
+
+  // L'OUTIL RELIEF : voir map_editor_ground.cpp.
+  //
+  // Le point du sol sous la souris, dans la grille des coins — colonne, rangée,
+  // fractionnaires —, posé par l'appelant à chaque image ; rien hors du sol.
+  void SetGroundPointer(std::optional<std::array<float, 2>> corner_point) {
+    ground_pointer_ = corner_point;
+  }
+  [[nodiscard]] const std::optional<std::array<float, 2>>& ground_pointer() const noexcept {
+    return ground_pointer_;
+  }
+  // LE RELIEF RETOUCHÉ SE VOIT-IL ? Posé par l'appelant à chaque image : vrai
+  // sous « Ombres en temps réel ». Faux, l'outil Relief se refuse, et le quitte
+  // s'il était en main.
+  void SetGroundAllowed(bool allowed);
+  // La brosse, son rayon compté en points de la grille des coins.
+  [[nodiscard]] ro::mapedit::GroundBrush Brush() const;
+  // Un glissé de la brosse est-il en cours ?
+  [[nodiscard]] bool stroking_ground() const noexcept { return ground_stroke_.has_value(); }
+  // UN PAS DE BROSSE, à chaque image d'un glissé : il dure depuis le pas
+  // précédent, `now_ms` sur une horloge qui ne recule pas. `lower` : Maj tenue,
+  // la brosse Lever abaisse. Le document change ; il ne devient une entrée de
+  // l'historique qu'au relâcher.
+  void StrokeGround(double now_ms, bool lower, const ro::render::MapScene& scene,
+                    MapEditStore& store);
+  // Ce qu'a coûté le dernier remaillage du sol, et s'il suit le glissé en
+  // direct : ce que le panneau en dit.
+  void SetGroundRemesh(std::optional<double> remesh_ms, bool live) {
+    ground_remesh_ms_ = remesh_ms;
+    ground_remesh_live_ = live;
+  }
 
   [[nodiscard]] Outcome Apply(const ro::ui::MapEditorIntent& intent,
                               const ro::render::MapScene& scene, MapEditStore& store);
@@ -325,6 +359,25 @@ class MapEditorSession {
   bool all_poses_ = false;
   // Les raisons saisies pour un maillage pas encore retouché.
   std::map<std::size_t, std::string> pending_mesh_why_;
+  // L'OUTIL RELIEF : voir map_editor_ground.cpp.
+  [[nodiscard]] bool GrabGround();
+  void EndGroundStroke(MapEditStore& store);
+  void RevertGround(MapEditStore& store);
+  void SetGroundWhy(std::string why, MapEditStore& store);
+  void SetBrush(const ro::ui::MapEditorBrush& brush);
+  void ViewGround(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
+  // LE GLISSÉ DE LA BROSSE : la hauteur que vise Aplanir, prise sous le centre
+  // au premier pas, et l'heure du pas précédent.
+  struct GroundStroke {
+    std::optional<float> flatten_height;
+    std::optional<double> last_ms;
+  };
+  std::optional<GroundStroke> ground_stroke_;
+  std::optional<std::array<float, 2>> ground_pointer_;
+  ro::ui::MapEditorBrush brush_;
+  std::optional<double> ground_remesh_ms_;
+  bool ground_remesh_live_ = true;
+  bool ground_allowed_ = true;
 };
 
 }  // namespace moonclient

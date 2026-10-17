@@ -107,6 +107,13 @@ class GatMap {
   // d'eau compris, ne bougent pas.
   void LevelCornerHeights(float height) noexcept;
 
+  // LES QUATRE HAUTEURS DE LA CELLULE (x, y), dans l'ordre et le sens du
+  // fichier : c'est par là que les pieds suivent le relief que retouche
+  // l'éditeur de carte. Le type, qui porte la marchabilité, ne bouge pas. Une
+  // cellule hors de la grille n'est pas touchée.
+  void SetCornerHeights(std::int32_t x, std::int32_t y,
+                        const std::array<float, 4>& heights) noexcept;
+
  private:
   GatMap() = default;
 

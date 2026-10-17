@@ -113,10 +113,62 @@ enum class MapEditorLineKind : std::uint8_t {
   // Un effet de carte, et l'effet désigné : des losanges, en `from`.
   kEffect = 9,
   kEffectSelected = 10,
+  // Le cercle de la brosse de relief, tracé au sol sous la souris.
+  kBrush = 11,
 };
 
-// L'OUTIL DES POIGNÉES : déplacer, tourner ou mettre à l'échelle.
-enum class MapEditorTool : std::uint8_t { kMove = 0, kRotate = 1, kScale = 2, kVertices = 3 };
+// L'OUTIL DE LA VUE : les poignées qui déplacent, tournent ou mettent à
+// l'échelle, les sommets d'un maillage, ou la brosse de relief.
+enum class MapEditorTool : std::uint8_t {
+  kMove = 0,
+  kRotate = 1,
+  kScale = 2,
+  kVertices = 3,
+  kRelief = 4,
+};
+
+// LA BROSSE DE RELIEF, telle que le panneau la montre et la règle.
+enum class MapEditorBrushMode : std::uint8_t {
+  // Lever ; Maj tenue, abaisser.
+  kRaise = 0,
+  // Tirer vers la hauteur sous le centre au premier appui.
+  kFlatten = 1,
+  // Tirer vers la moyenne des voisins.
+  kSmooth = 2,
+};
+struct MapEditorBrush {
+  // Le rayon, en cases.
+  float radius_cells = kDefaultRadiusCells;
+  // Ce que la brosse déplace au centre, en unités du monde par seconde de
+  // glissé.
+  float units_per_second = kDefaultUnitsPerSecond;
+  MapEditorBrushMode mode = MapEditorBrushMode::kRaise;
+
+  static constexpr float kDefaultRadiusCells = 6.0F;
+  static constexpr float kDefaultUnitsPerSecond = 10.0F;
+  static constexpr float kLeastRadiusCells = 1.0F;
+  static constexpr float kGreatestRadiusCells = 60.0F;
+  static constexpr float kLeastUnitsPerSecond = 0.1F;
+  static constexpr float kGreatestUnitsPerSecond = 200.0F;
+
+  friend bool operator==(const MapEditorBrush&, const MapEditorBrush&) = default;
+};
+
+// LE RELIEF DE LA CARTE, tel que le panneau le montre : la brosse, ce que le
+// document retouche, et ce que coûte un remaillage.
+struct MapEditorGround {
+  // Le relief retouché se voit : « Ombres en temps réel » est allumé. Sinon,
+  // l'outil Relief est grisé.
+  bool allowed = true;
+  MapEditorBrush brush;
+  // Les points de la grille des coins que le document lève ou abaisse.
+  std::size_t edited_points = 0;
+  std::string why;
+  // Le dernier remaillage du sol, en millisecondes, et si un glissé remaille
+  // en direct ou seulement au relâcher ; rien avant le premier remaillage.
+  std::optional<double> remesh_ms;
+  bool remesh_live = true;
+};
 struct MapEditorLine {
   glm::vec2 from{0.0F, 0.0F};
   glm::vec2 to{0.0F, 0.0F};
@@ -174,6 +226,8 @@ struct MapEditorView {
   // LES EFFETS DE LA CARTE, dans l'ordre du RSW, et celui qu'on règle.
   std::vector<MapEditorMapEffect> map_effects;
   std::optional<std::size_t> selected_map_effect;
+  // LE RELIEF : la brosse, et ce que le document retouche.
+  MapEditorGround ground;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
@@ -305,17 +359,32 @@ struct MoveLight {
   std::array<float, 3> native{};
   bool released = true;
 };
+// Régler la brosse de relief.
+struct SetBrush {
+  MapEditorBrush brush;
+};
+// Le glissé de la brosse est fini : il devient UNE entrée de l'historique.
+struct EndGroundStroke {};
+// Retirer toutes les retouches du relief de la carte.
+struct RevertGround {};
+// Dire pourquoi le relief est retouché.
+struct SetGroundWhy {
+  std::string why;
+};
 }  // namespace map_editor
 
-using MapEditorIntent = std::variant<
-    map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select, map_editor::Place,
-    map_editor::SetWhy, map_editor::Revert, map_editor::Save, map_editor::SetTool,
-    map_editor::AddModel, map_editor::MoveVertex, map_editor::RevertVertex, map_editor::SetAllPoses,
-    map_editor::AddLight, map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
-    map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus, map_editor::Delete,
-    map_editor::Nudge, map_editor::AddEffect, map_editor::SelectEffect, map_editor::SetEffect,
-    map_editor::RemoveEffect, map_editor::MoveEffect, map_editor::SelectMapEffect,
-    map_editor::SetMapEffect, map_editor::RevertMapEffect, map_editor::MoveMapEffect>;
+using MapEditorIntent =
+    std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
+                 map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
+                 map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
+                 map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
+                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
+                 map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus,
+                 map_editor::Delete, map_editor::Nudge, map_editor::AddEffect,
+                 map_editor::SelectEffect, map_editor::SetEffect, map_editor::RemoveEffect,
+                 map_editor::MoveEffect, map_editor::SelectMapEffect, map_editor::SetMapEffect,
+                 map_editor::RevertMapEffect, map_editor::MoveMapEffect, map_editor::SetBrush,
+                 map_editor::EndGroundStroke, map_editor::RevertGround, map_editor::SetGroundWhy>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -358,6 +427,9 @@ struct MapEditorPanelState {
   std::array<char, kWhyCapacity> map_effect_why{};
   std::optional<std::size_t> map_effect_why_of;
   bool map_effect_why_typing = false;
+  // La raison du relief, comme celle d'un modèle.
+  std::array<char, kWhyCapacity> ground_why{};
+  bool ground_why_typing = false;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

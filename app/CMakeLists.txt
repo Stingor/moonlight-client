@@ -768,6 +768,7 @@ add_library(moonclient_graphics STATIC
     world/map_editor_gizmo.cpp
     world/map_editor_effects.cpp
     world/map_editor_gestures.cpp
+    world/map_editor_ground.cpp
     world/map_editor_lights.cpp
     world/map_editor_map_effects.cpp
     world/map_editor_mesh.cpp
@@ -1632,6 +1633,7 @@ add_executable(moonclient
     game/game_sky.cpp
     game/game_grey_world.cpp
     game/game_map_editor.cpp
+    game/game_map_ground.cpp
     game/game_map_effects.cpp
     game/over_world_layer.cpp
     game/game_cursor.cpp

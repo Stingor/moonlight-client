@@ -14,6 +14,7 @@
 #include "ro/core/log.h"
 #include "ro/formats/grf.h"
 #include "ro/formats/rsm.h"
+#include "ro/mapedit/ground_edit.h"
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effects.h"
 #include "ro/render/map_sky.h"
@@ -468,6 +469,31 @@ void RebuildSceneGround(MapScene& scene, std::int32_t subdivisions) {
   scene.terrain = BuildTerrainMesh(scene.gnd, scene.atlas, scene.invisible_tiles, subdivisions);
 }
 
+mapedit::MapEditReport ReshapeSceneGround(MapScene& scene,
+                                          std::span<const mapedit::GroundEdit> edits) {
+  formats::GndMap& gnd = scene.gnd;
+  std::size_t rank = 0;
+  for (std::int32_t y = 0; y < gnd.height(); ++y) {
+    for (std::int32_t x = 0; x < gnd.width(); ++x) {
+      if (rank < scene.file_corner_heights.size()) {
+        gnd.SetCornerHeights(x, y, scene.file_corner_heights[rank]);
+      }
+      ++rank;
+    }
+  }
+  scene.ground_edits.clear();
+  if (scene.relief_level.has_value()) {
+    return {};
+  }
+  scene.ground_edits.assign(edits.begin(), edits.end());
+  return mapedit::ApplyGroundEdits(edits, gnd);
+}
+
+void RebuildSceneTerrain(MapScene& scene) {
+  scene.terrain =
+      BuildTerrainMesh(scene.gnd, scene.atlas, scene.invisible_tiles, scene.ground_subdivisions);
+}
+
 core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                     const MapSceneOptions& options) {
   auto rsw_bytes = vfs.Read(vfs.res_names().MapFilePath(std::string(map_name) + ".rsw"));
@@ -529,6 +555,16 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
       scene.gnd.LevelCornerHeights(*level);
       scene.relief_level = level;
     }
+  }
+  // LE RELIEF RETOUCHÉ, sur les hauteurs du fichier, que l'éditeur garde pour
+  // le reposer sans relire la carte.
+  scene.file_corner_heights.reserve(scene.gnd.cubes().size());
+  for (const formats::GndCube& cube : scene.gnd.cubes()) {
+    scene.file_corner_heights.push_back(cube.corner_height);
+  }
+  const mapedit::MapEditReport reshaped = ReshapeSceneGround(scene, edit.ground());
+  for (const std::string& refusal : reshaped.refused) {
+    core::LogWarning("édition de {} refusée — {}", map_name, refusal);
   }
 
   // Les textures AVANT le maillage : c'est en les lisant que l'on sait quels

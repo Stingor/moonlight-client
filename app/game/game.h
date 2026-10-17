@@ -325,6 +325,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void ReplaceMapModels();
   // L'outil Sommets de l'image : voir game_map_editor.cpp.
   void ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height);
+  // L'outil Relief et le sol qui suit le document : voir game_map_ground.cpp.
+  void ServeGroundBrush();
+  void FollowMapGround();
   void DrawInterface(std::uint32_t now_ms);
 
   // ── L'INTERFACE, PAR FAMILLE DE FENÊTRES ──────────────────────────────────
