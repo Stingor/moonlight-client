@@ -95,6 +95,10 @@ struct ActorLook {
   // remplacent ceux du métier — désarmé, il la tient encore —, et la traînée
   // de l'arme s'éteint. La tête, les coiffes, le bouclier et la cape restent
   // ceux du métier, comme dans le client.
+  //
+  // 🔴 L'HABIT GARDE LES COULEURS DE SON .SPR : ni la couleur de vêtement ni la
+  // recette de style ne le teignent. Leurs index sont ceux du corps du métier,
+  // et sur l'habit ils peindraient au hasard.
   bool gm_outfit = false;
   // L'ACCESSOIRE D'UN PET : l'apparence que le serveur annonce, zéro pour
   // rien. Il ne pose pas de coiffe : il remplace le .act du corps — voir

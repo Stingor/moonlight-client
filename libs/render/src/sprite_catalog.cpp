@@ -612,7 +612,7 @@ std::vector<std::string> ShieldSpritePaths(const SpriteCatalog& catalog, const A
 }
 
 std::string BodyPalettePath(const ActorLook& look) {
-  if (look.body_palette <= 0) {
+  if (look.body_palette <= 0 || WearsGmOutfit(look)) {
     return {};
   }
   const std::string number = std::to_string(catalog_internal::BodyPaletteFileNumber(look));

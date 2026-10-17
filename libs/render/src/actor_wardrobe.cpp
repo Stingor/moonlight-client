@@ -358,7 +358,8 @@ std::vector<ActorPiece> ActorWardrobe::Dress(const ActorLook& look) {
     std::uint32_t palette_serial = 0;
     // LE STYLE NE REPEINT QUE LE CORPS : une recette est tirée de SA palette,
     // et les index n'ont aucune signification commune d'une pièce à l'autre.
-    if (files.part == ActorPart::kBody && look.style != 0) {
+    // Pas davantage d'un corps à l'autre : l'habit du GM garde ses couleurs.
+    if (files.part == ActorPart::kBody && look.style != 0 && !(look.player && look.gm_outfit)) {
       if (const StyledPalette* styled = StylePalette(look, *loaded, palette)) {
         palette = &styled->palette;
         palette_serial = styled->serial;
