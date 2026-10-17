@@ -3,7 +3,10 @@
 #include <array>
 #include <cstddef>
 #include <optional>
+#include <span>
 #include <vector>
+
+#include <glm/glm.hpp>
 
 #include "ro/formats/gnd.h"
 #include "ro/render/camera.h"
@@ -78,5 +81,21 @@ namespace moonclient {
                                                            const ro::render::Camera& camera,
                                                            float aspect_ratio, float viewport_width,
                                                            float viewport_height);
+
+// LES POINTS DE LA GRILLE DES COINS du mode Sommets, à l'écran : ceux qui
+// tombent dans `radius_cubes` autour de `corner_point`, plus ceux de `always`
+// où qu'ils soient — la sélection ne disparaît pas quand la souris s'éloigne.
+// Chacun se pose à la hauteur du sol dessiné ; un point derrière l'œil n'en a
+// pas. `edited` dit ceux que `document_ground` retouche.
+[[nodiscard]] std::vector<MapEditorSession::GroundDot> GroundPointDots(
+    const ro::render::MapScene& scene, std::span<const ro::mapedit::GroundEdit> document_ground,
+    const std::array<float, 2>& corner_point, float radius_cubes,
+    std::span<const MapEditorSession::CornerPoint> always, const ro::render::Camera& camera,
+    float aspect_ratio, float viewport_width, float viewport_height);
+
+// Le point du monde du point (x, y) de la grille des coins, à la hauteur du
+// sol dessiné ; rien hors de la grille.
+[[nodiscard]] std::optional<glm::vec3> CornerPointWorld(const ro::formats::GndMap& gnd,
+                                                        const MapEditorSession::CornerPoint& point);
 
 }  // namespace moonclient

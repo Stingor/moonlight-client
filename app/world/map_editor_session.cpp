@@ -93,7 +93,12 @@ std::vector<ro::ui::MapEditorLine> MapEditorSession::GizmoTrace() const {
                     drag_.has_value() ? std::optional<std::size_t>(drag_->handle) : std::nullopt);
 }
 
-bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
+bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view, bool extend) {
+  // LE MODE SOMMETS DU RELIEF prend tout appui : sa poignée, un point, ou le
+  // vide qui vide la sélection.
+  if (active_ && ground_points_mode()) {
+    return GrabGroundPoint(pointer, extend);
+  }
   // LA BROSSE DE RELIEF prend tout appui sur le sol : elle n'a pas de poignée.
   if (active_ && tool_ == ro::ui::MapEditorTool::kRelief) {
     return GrabGround();
@@ -133,14 +138,18 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   // UN SOMMET, UNE LUMIÈRE se déplacent comme une pose, à la flèche.
   const ro::ui::MapEditorTool tool = drag_->vertex.has_value() || drag_->light.has_value() ||
                                              drag_->effect.has_value() ||
-                                             drag_->map_effect.has_value()
+                                             drag_->map_effect.has_value() || drag_->ground_points
                                          ? ro::ui::MapEditorTool::kMove
                                          : tool_;
   drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
-  if (snap) {
+  if (snap && !drag_->ground_points) {
     drag_->last = Snapped(tool, drag_->start, drag_->last);
   }
   drag_->last.released = false;
+  if (drag_->ground_points) {
+    DragGroundPoints(snap);
+    return;
+  }
   if (drag_->map_effect.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveMapEffect{
         .index = *drag_->map_effect, .native = drag_->last.position, .released = false});
@@ -177,7 +186,10 @@ void MapEditorSession::Release() {
   }
   ro::ui::map_editor::Place last = drag_->last;
   last.released = true;
-  if (drag_->map_effect.has_value()) {
+  if (drag_->ground_points) {
+    queued_.emplace_back(
+        ro::ui::map_editor::LiftGroundPoints{.lift = last.position[1], .released = true});
+  } else if (drag_->map_effect.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveMapEffect{
         .index = *drag_->map_effect, .native = last.position, .released = true});
   } else if (drag_->effect.has_value()) {
@@ -222,6 +234,9 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
   selected_map_effect_.reset();
   gesture_before_.reset();
   ground_stroke_.reset();
+  designated_point_.reset();
+  selected_points_.clear();
+  ground_dots_.clear();
   pending_why_.clear();
   status_.clear();
 }
@@ -342,6 +357,12 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
         } else if constexpr (std::is_same_v<Asked, intents::SetGroundWhy>) {
           SetGroundWhy(asked.why, store);
           return {};
+        } else if constexpr (std::is_same_v<Asked, intents::LiftGroundPoints>) {
+          return LiftGroundPoints(asked, store);
+        } else if constexpr (std::is_same_v<Asked, intents::SetGroundPointHeight>) {
+          return SetGroundPointHeight(asked, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::RevertGroundPoints>) {
+          return RevertGroundPoints(store);
         } else {
           static_assert(std::is_same_v<Asked, intents::Save>, "une intention n'est pas routée");
           Save(store);
@@ -705,6 +726,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   ViewEffects(document, view);
   ViewMapEffects(scene, document, view);
   ViewGround(document, view);
+  ViewGroundPoints(scene, document, view);
   if (selection_.empty()) {
     return view;
   }

@@ -93,6 +93,9 @@ constexpr ImU32 kAxisZColor = IM_COL32(80, 130, 240, 255);
 constexpr ImU32 kActiveColor = IM_COL32(255, 255, 255, 255);
 // Le cercle de la brosse de relief : un cyan, qui ne se confond avec aucun axe.
 constexpr ImU32 kBrushColor = IM_COL32(90, 230, 230, 230);
+// Un point du sol que le document retouche : un magenta, distinct du cyan des
+// points intacts, du jaune des sélectionnés et du blanc du désigné.
+constexpr ImU32 kEditedPointColor = IM_COL32(240, 110, 220, 240);
 
 ImU32 ColorOf(MapEditorLineKind kind) {
   switch (kind) {
@@ -115,7 +118,14 @@ ImU32 ColorOf(MapEditorLineKind kind) {
     case MapEditorLineKind::kEffect:
       return kAxisXColor;
     case MapEditorLineKind::kBrush:
+    case MapEditorLineKind::kGroundPoint:
       return kBrushColor;
+    case MapEditorLineKind::kGroundPointEdited:
+      return kEditedPointColor;
+    case MapEditorLineKind::kGroundPointSelected:
+      return kSelectionColor;
+    case MapEditorLineKind::kGroundPointDesignated:
+      return kActiveColor;
   }
   return kSelectionColor;
 }
@@ -340,10 +350,16 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
 void DrawLines(const MapEditorView& view) {
   ImDrawList* list = ImGui::GetBackgroundDrawList();
   for (const MapEditorLine& line : view.lines) {
+    const bool ground_point = line.kind == MapEditorLineKind::kGroundPoint ||
+                              line.kind == MapEditorLineKind::kGroundPointEdited ||
+                              line.kind == MapEditorLineKind::kGroundPointSelected ||
+                              line.kind == MapEditorLineKind::kGroundPointDesignated;
     if (line.kind == MapEditorLineKind::kVertex ||
-        line.kind == MapEditorLineKind::kVertexSelected) {
-      const float half =
-          line.kind == MapEditorLineKind::kVertex ? kVertexHalfPixels : kSelectedVertexHalfPixels;
+        line.kind == MapEditorLineKind::kVertexSelected || ground_point) {
+      const bool small = line.kind == MapEditorLineKind::kVertex ||
+                         line.kind == MapEditorLineKind::kGroundPoint ||
+                         line.kind == MapEditorLineKind::kGroundPointEdited;
+      const float half = small ? kVertexHalfPixels : kSelectedVertexHalfPixels;
       list->AddRectFilled(ImVec2(line.from.x - half, line.from.y - half),
                           ImVec2(line.from.x + half, line.from.y + half), ColorOf(line.kind));
       continue;

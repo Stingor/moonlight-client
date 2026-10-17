@@ -1,12 +1,16 @@
 #include "world/map_editor_overlay.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
+#include <functional>
 #include <optional>
 #include <utility>
 
 #include <glm/gtc/constants.hpp>
 
+#include "ro/mapedit/ground_edit.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/model_pick.h"
@@ -165,6 +169,71 @@ std::vector<ro::ui::MapEditorLine> BrushRing(const ro::render::MapScene& scene,
     from = to;
   }
   return ring;
+}
+
+std::optional<glm::vec3> CornerPointWorld(const ro::formats::GndMap& gnd,
+                                          const MapEditorSession::CornerPoint& point) {
+  const std::optional<float> height = ro::mapedit::CornerPointHeight(gnd, point[0], point[1]);
+  if (!height.has_value()) {
+    return std::nullopt;
+  }
+  // Les rangées descendent en Z : voir `CornerPointOf`.
+  const float depth = static_cast<float>(gnd.height()) * ro::render::kWorldUnitsPerCube;
+  return glm::vec3(static_cast<float>(point[0]) * ro::render::kWorldUnitsPerCube, *height,
+                   depth + ro::render::kWorldUnitsPerCube -
+                       static_cast<float>(point[1]) * ro::render::kWorldUnitsPerCube);
+}
+
+std::vector<MapEditorSession::GroundDot> GroundPointDots(
+    const ro::render::MapScene& scene, std::span<const ro::mapedit::GroundEdit> document_ground,
+    const std::array<float, 2>& corner_point, float radius_cubes,
+    std::span<const MapEditorSession::CornerPoint> always, const ro::render::Camera& camera,
+    float aspect_ratio, float viewport_width, float viewport_height) {
+  using CornerPoint = MapEditorSession::CornerPoint;
+  // Le document range ses levées par rangée puis par colonne.
+  const auto edited = [&document_ground](const CornerPoint& point) {
+    const auto found =
+        std::ranges::lower_bound(document_ground, CornerPoint{point[1], point[0]}, std::less<>(),
+                                 [](const ro::mapedit::GroundEdit& edit) {
+                                   return CornerPoint{edit.corner_y, edit.corner_x};
+                                 });
+    return found != document_ground.end() && found->corner_x == point[0] &&
+           found->corner_y == point[1];
+  };
+  std::vector<MapEditorSession::GroundDot> dots;
+  const auto add = [&](const CornerPoint& point) {
+    const std::optional<glm::vec3> world = CornerPointWorld(scene.gnd, point);
+    if (!world.has_value()) {
+      return;
+    }
+    if (const std::optional<glm::vec2> at = ro::render::ProjectToScreen(
+            camera, aspect_ratio, *world, viewport_width, viewport_height)) {
+      dots.push_back(MapEditorSession::GroundDot{
+          .at = *at, .point = point, .height = world->y, .edited = edited(point)});
+    }
+  };
+  const float radius = std::max(radius_cubes, 0.0F);
+  const auto first_x = static_cast<std::int32_t>(std::ceil(corner_point[0] - radius));
+  const auto last_x = static_cast<std::int32_t>(std::floor(corner_point[0] + radius));
+  const auto first_y = static_cast<std::int32_t>(std::ceil(corner_point[1] - radius));
+  const auto last_y = static_cast<std::int32_t>(std::floor(corner_point[1] + radius));
+  for (std::int32_t y = std::max(first_y, 0); y <= std::min(last_y, scene.gnd.height()); ++y) {
+    for (std::int32_t x = std::max(first_x, 0); x <= std::min(last_x, scene.gnd.width()); ++x) {
+      const float across = static_cast<float>(x) - corner_point[0];
+      const float along = static_cast<float>(y) - corner_point[1];
+      if (std::hypot(across, along) <= radius) {
+        add({x, y});
+      }
+    }
+  }
+  for (const CornerPoint& point : always) {
+    const float across = static_cast<float>(point[0]) - corner_point[0];
+    const float along = static_cast<float>(point[1]) - corner_point[1];
+    if (std::hypot(across, along) > radius) {
+      add(point);
+    }
+  }
+  return dots;
 }
 
 std::vector<MapEditorSession::LightDot> EffectDots(const ro::ui::MapEditorView& view,

@@ -16,6 +16,16 @@ struct MapCubes {
 
 // Une case vaut cinq unités du RSW.
 inline constexpr float kRswUnitsPerCell = 5.0F;
+// Un cube du sol vaut deux cases de côté.
+inline constexpr float kCellsPerCube = 2.0F;
+
+// LE POINT (x, y) DE LA GRILLE DES COINS DU SOL, en cases depuis le coin de la
+// carte : le coin bas-gauche de la case (2x, 2y).
+[[nodiscard]] constexpr std::array<float, 2> CellsOfCornerPoint(std::int32_t corner_x,
+                                                                std::int32_t corner_y) {
+  return {static_cast<float>(corner_x) * kCellsPerCube,
+          static_cast<float>(corner_y) * kCellsPerCube};
+}
 
 // UNE POSITION DU RSW LUE DEPUIS LE COIN DE LA CARTE, comme la minicarte : x et
 // y en cases, avec leurs décimales — la case entière est leur plancher —, puis

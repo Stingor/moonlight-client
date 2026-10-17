@@ -1,7 +1,8 @@
 // L'OUTIL RELIEF DU MODE ÉDITEUR, dans la boucle du jeu : voir docs/adr/0118
 // et map_editor_ground.cpp.
 //
-// La brosse suit la souris sur le sol ; le sol suit le document — ses hauteurs
+// La brosse suit la souris sur le sol, et le mode Sommets y montre les points
+// de la grille avec la poignée du désigné ; le sol suit le document — ses hauteurs
 // à chaque image, son maillage quand il en a le temps : voir
 // `kLiveGroundRemeshMs` —, et seulement sous « Ombres en temps réel » : voir
 // `ShownGroundEdits`. Le suivi vaut pour tout joueur, éditeur ouvert ou non :
@@ -10,6 +11,8 @@
 #include <array>
 #include <chrono>
 #include <optional>
+#include <utility>
+#include <vector>
 
 #include <SDL3/SDL.h>
 
@@ -18,6 +21,7 @@
 #include "ro/render/ground_pick.h"
 
 #include "game/game.h"
+#include "world/map_editor_gizmo.h"
 #include "world/map_editor_overlay.h"
 
 namespace moonclient {
@@ -43,6 +47,38 @@ void Game::ServeGroundBrush() {
           .count();
   const bool lower = (SDL_GetModState() & SDL_KMOD_SHIFT) != 0;
   map_editor_.StrokeGround(now_ms, lower, stage_->scene, map_edits_);
+}
+
+void Game::ServeGroundPoints(float width, float height) {
+  if (!map_editor_.ground_points_mode()) {
+    map_editor_.SetGroundDots({});
+    return;
+  }
+  ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
+  // LES POINTS AUTOUR DE LA SOURIS, ou du point que regarde la caméra quand la
+  // souris n'est pas sur le sol, dans le rayon de la brosse.
+  const std::array<float, 2> center = map_editor_.ground_pointer().value_or(
+      CornerPointOf(stage_->scene.gnd, camera_.look_at.x, camera_.look_at.z));
+  map_editor_.SetGroundDots(
+      GroundPointDots(stage_->scene, map_edits_.Document(stage_->name).ground(), center,
+                      map_editor_.Brush().radius_cubes, map_editor_.selected_ground_points(),
+                      camera_, aspect_ratio_, width, height));
+  // LA POIGNÉE VERTICALE, sur le point désigné.
+  GizmoFrame frame;
+  std::vector<GizmoHandle> handles;
+  if (const std::optional<MapEditorSession::CornerPoint>& designated =
+          map_editor_.designated_ground_point();
+      designated.has_value()) {
+    if (const std::optional<glm::vec3> world = CornerPointWorld(stage_->scene.gnd, *designated)) {
+      frame = VerticalGizmoFrame(*world, camera_);
+      handles = VerticalGizmoHandles(frame, camera_, aspect_ratio_, width, height);
+    }
+  }
+  map_editor_.SetGizmo(frame, std::move(handles));
+  const std::vector<ro::ui::MapEditorLine> dots = map_editor_.GroundPointTrace();
+  const std::vector<ro::ui::MapEditorLine> arrows = map_editor_.GizmoTrace();
+  view.lines.insert(view.lines.end(), dots.begin(), dots.end());
+  view.lines.insert(view.lines.end(), arrows.begin(), arrows.end());
 }
 
 void Game::FollowMapGround() {

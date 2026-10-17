@@ -58,6 +58,9 @@ void Game::ServeMapEditor() {
   }
   const auto width = static_cast<float>(shell_.width());
   const auto height = static_cast<float>(shell_.height());
+  // EN MODE SOMMETS DU RELIEF, la seule poignée est celle du point désigné :
+  // les flèches des lumières et des effets ne se montrent pas.
+  const bool ground_points = map_editor_.ground_points_mode();
   // LE CERCLE DE LA BROSSE, au sol sous la souris.
   if (const std::optional<std::array<float, 2>>& pointer = map_editor_.ground_pointer();
       pointer.has_value()) {
@@ -75,7 +78,7 @@ void Game::ServeMapEditor() {
   view.lines.insert(view.lines.end(), map_effect_marks.begin(), map_effect_marks.end());
   // L'EFFET DE LA CARTE DÉSIGNÉ a aussi la flèche de déplacement.
   if (view.selected_map_effect.has_value() && *view.selected_map_effect < view.map_effects.size() &&
-      !view.selected.has_value()) {
+      !view.selected.has_value() && !ground_points) {
     const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
                                                stage_->scene.gnd.height()};
     const GizmoFrame frame =
@@ -87,7 +90,7 @@ void Game::ServeMapEditor() {
   }
   // L'EFFET DÉSIGNÉ a la flèche de déplacement, comme une lumière.
   if (view.selected_effect.has_value() && *view.selected_effect < view.effects.size() &&
-      !view.selected.has_value()) {
+      !view.selected.has_value() && !ground_points) {
     const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
                                                stage_->scene.gnd.height()};
     const GizmoFrame frame =
@@ -105,7 +108,7 @@ void Game::ServeMapEditor() {
   // LA LUMIÈRE DÉSIGNÉE a la flèche de déplacement, comme une pose : aucun
   // modèle n'est alors désigné.
   if (view.selected_light.has_value() && *view.selected_light < view.lights.size() &&
-      !view.selected.has_value()) {
+      !view.selected.has_value() && !ground_points) {
     const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
                                                stage_->scene.gnd.height()};
     const GizmoFrame frame =
@@ -121,6 +124,7 @@ void Game::ServeMapEditor() {
                        static_cast<float>(shell_.width()), static_cast<float>(shell_.height()));
     view.lines.insert(view.lines.end(), ring.begin(), ring.end());
   }
+  ServeGroundPoints(width, height);
 }
 
 void Game::ServeMapEditorTools() {

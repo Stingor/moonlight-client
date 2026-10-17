@@ -123,6 +123,22 @@ std::vector<GizmoHandle> GizmoHandles(ro::ui::MapEditorTool tool, const GizmoFra
   return handles;
 }
 
+GizmoFrame VerticalGizmoFrame(const glm::vec3& world, const ro::render::Camera& camera) {
+  return GizmoFrame{.origin = world,
+                    .axes = {glm::vec3(1.0F, 0.0F, 0.0F), glm::vec3(0.0F, 1.0F, 0.0F),
+                             glm::vec3(0.0F, 0.0F, 1.0F)},
+                    .length = camera.distance * kGizmoLengthShare};
+}
+
+std::vector<GizmoHandle> VerticalGizmoHandles(const GizmoFrame& frame,
+                                              const ro::render::Camera& camera, float aspect_ratio,
+                                              float viewport_width, float viewport_height) {
+  std::vector<GizmoHandle> handles = GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera,
+                                                  aspect_ratio, viewport_width, viewport_height);
+  std::erase_if(handles, [](const GizmoHandle& handle) { return handle.axis != GizmoAxis::kY; });
+  return handles;
+}
+
 std::optional<std::size_t> GrabbedHandle(const std::vector<GizmoHandle>& handles,
                                          glm::vec2 pointer) {
   std::optional<std::size_t> grabbed;

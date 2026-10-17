@@ -17,9 +17,6 @@
 namespace moonclient {
 namespace {
 
-// Une cellule de la grille de marche vaut un demi-cube : le rayon se règle en
-// cases et se compte en cubes.
-constexpr float kCellsPerCube = 2.0F;
 // Le plus long pas de brosse, en secondes : une image qui a traîné ne lève pas
 // d'un coup tout ce qu'elle a manqué.
 constexpr double kLongestStrokeSeconds = 0.1;
@@ -28,7 +25,8 @@ constexpr double kMillisecondsPerSecond = 1000.0;
 }  // namespace
 
 ro::mapedit::GroundBrush MapEditorSession::Brush() const {
-  ro::mapedit::GroundBrush brush{.radius_cubes = brush_.radius_cells / kCellsPerCube,
+  // Le rayon se règle en cases et se compte en cubes.
+  ro::mapedit::GroundBrush brush{.radius_cubes = brush_.radius_cells / ro::ui::kCellsPerCube,
                                  .units_per_second = brush_.units_per_second};
   switch (brush_.mode) {
     case ro::ui::MapEditorBrushMode::kRaise:
@@ -39,6 +37,10 @@ ro::mapedit::GroundBrush MapEditorSession::Brush() const {
       break;
     case ro::ui::MapEditorBrushMode::kSmooth:
       brush.mode = ro::mapedit::GroundBrushMode::kSmooth;
+      break;
+    case ro::ui::MapEditorBrushMode::kPoints:
+      // Le mode Sommets ne brosse pas : son rayon borne seulement les points
+      // qu'il montre.
       break;
   }
   return brush;
@@ -51,8 +53,9 @@ void MapEditorSession::SetGroundAllowed(bool allowed) {
   }
   // UN GLISSÉ EN COURS s'abandonne : son relief ne se voit plus, et le document
   // garde ce qu'il a déjà reçu.
-  if (ground_stroke_.has_value()) {
+  if (ground_stroke_.has_value() || (drag_.has_value() && drag_->ground_points)) {
     ground_stroke_.reset();
+    drag_.reset();
     gesture_before_.reset();
   }
   tool_ = ro::ui::MapEditorTool::kMove;

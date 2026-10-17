@@ -73,6 +73,18 @@ struct GizmoHandle {
                                                     float aspect_ratio, float viewport_width,
                                                     float viewport_height);
 
+// LA POIGNÉE VERTICALE d'un point du sol, en `world` : l'axe du monde qui
+// monte, seul, de la longueur des autres poignées. Glissée, elle donne en
+// `Place::position[1]` l'écart en unités du monde, positif vers le haut. Rien
+// quand elle passe derrière l'œil.
+[[nodiscard]] GizmoFrame VerticalGizmoFrame(const glm::vec3& world,
+                                            const ro::render::Camera& camera);
+[[nodiscard]] std::vector<GizmoHandle> VerticalGizmoHandles(const GizmoFrame& frame,
+                                                            const ro::render::Camera& camera,
+                                                            float aspect_ratio,
+                                                            float viewport_width,
+                                                            float viewport_height);
+
 // La poignée qu'un appui en `pointer` saisit : la plus proche, à moins de
 // `kGizmoGrabPixels`.
 [[nodiscard]] std::optional<std::size_t> GrabbedHandle(const std::vector<GizmoHandle>& handles,

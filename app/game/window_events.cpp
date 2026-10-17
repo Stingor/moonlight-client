@@ -336,8 +336,9 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
   }
   if (to.map_editor != nullptr && !through_editor) {
     // Une poignée sous l'appui se saisit, avant de désigner quoi que ce soit.
-    if (to.map_editor->Grab(pointer, to.map_editor_view != nullptr ? *to.map_editor_view
-                                                                   : ro::ui::MapEditorView())) {
+    if (to.map_editor->Grab(
+            pointer, to.map_editor_view != nullptr ? *to.map_editor_view : ro::ui::MapEditorView(),
+            (SDL_GetModState() & SDL_KMOD_SHIFT) != 0)) {
       return;
     }
     if (window.height > 0.0F) {

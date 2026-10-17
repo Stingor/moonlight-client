@@ -328,6 +328,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // L'outil Relief et le sol qui suit le document : voir game_map_ground.cpp.
   void ServeGroundBrush();
   void FollowMapGround();
+  // Le mode Sommets de l'outil Relief : ses points et sa poignée à l'écran.
+  void ServeGroundPoints(float width, float height);
   void DrawInterface(std::uint32_t now_ms);
 
   // ── L'INTERFACE, PAR FAMILLE DE FENÊTRES ──────────────────────────────────

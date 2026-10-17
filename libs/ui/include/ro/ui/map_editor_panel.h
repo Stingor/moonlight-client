@@ -115,6 +115,12 @@ enum class MapEditorLineKind : std::uint8_t {
   kEffectSelected = 10,
   // Le cercle de la brosse de relief, tracé au sol sous la souris.
   kBrush = 11,
+  // Un point de la grille des coins du sol, un point que le document retouche,
+  // un point sélectionné et le point désigné : des points, en `from`.
+  kGroundPoint = 12,
+  kGroundPointEdited = 13,
+  kGroundPointSelected = 14,
+  kGroundPointDesignated = 15,
 };
 
 // L'OUTIL DE LA VUE : les poignées qui déplacent, tournent ou mettent à
@@ -135,6 +141,8 @@ enum class MapEditorBrushMode : std::uint8_t {
   kFlatten = 1,
   // Tirer vers la moyenne des voisins.
   kSmooth = 2,
+  // Désigner les points de la grille un à un, et les lever à la poignée.
+  kPoints = 3,
 };
 struct MapEditorBrush {
   // Le rayon, en cases.
@@ -154,6 +162,15 @@ struct MapEditorBrush {
   friend bool operator==(const MapEditorBrush&, const MapEditorBrush&) = default;
 };
 
+// LE POINT DÉSIGNÉ du mode Sommets : sa place en cases depuis le coin de la
+// carte, sa hauteur en unités du monde, vers le haut, et si le document le
+// retouche.
+struct MapEditorGroundPoint {
+  std::array<float, 2> cells{};
+  float height = 0.0F;
+  bool edited = false;
+};
+
 // LE RELIEF DE LA CARTE, tel que le panneau le montre : la brosse, ce que le
 // document retouche, et ce que coûte un remaillage.
 struct MapEditorGround {
@@ -168,6 +185,11 @@ struct MapEditorGround {
   // en direct ou seulement au relâcher ; rien avant le premier remaillage.
   std::optional<double> remesh_ms;
   bool remesh_live = true;
+  // LE MODE SOMMETS : le point désigné, le nombre de points sélectionnés — le
+  // désigné compris —, et combien d'entre eux le document retouche.
+  std::optional<MapEditorGroundPoint> designated;
+  std::size_t selected_points = 0;
+  std::size_t selected_edited = 0;
 };
 struct MapEditorLine {
   glm::vec2 from{0.0F, 0.0F};
@@ -378,20 +400,34 @@ struct RevertGround {};
 struct SetGroundWhy {
   std::string why;
 };
+// LE MODE SOMMETS : lever les points sélectionnés de `lift` unités du monde
+// depuis le début du geste. `released`, comme pour `Place`.
+struct LiftGroundPoints {
+  float lift = 0.0F;
+  bool released = true;
+};
+// Porter le point désigné à la hauteur `height`, en unités du monde ; les
+// autres points sélectionnés bougent d'autant. `released`, comme pour `Place`.
+struct SetGroundPointHeight {
+  float height = 0.0F;
+  bool released = true;
+};
+// Retirer les retouches des points sélectionnés.
+struct RevertGroundPoints {};
 }  // namespace map_editor
 
-using MapEditorIntent =
-    std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
-                 map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
-                 map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
-                 map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
-                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
-                 map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus,
-                 map_editor::Delete, map_editor::Nudge, map_editor::AddEffect,
-                 map_editor::SelectEffect, map_editor::SetEffect, map_editor::RemoveEffect,
-                 map_editor::MoveEffect, map_editor::SelectMapEffect, map_editor::SetMapEffect,
-                 map_editor::RevertMapEffect, map_editor::MoveMapEffect, map_editor::SetBrush,
-                 map_editor::EndGroundStroke, map_editor::RevertGround, map_editor::SetGroundWhy>;
+using MapEditorIntent = std::variant<
+    map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select, map_editor::Place,
+    map_editor::SetWhy, map_editor::Revert, map_editor::Save, map_editor::SetTool,
+    map_editor::AddModel, map_editor::MoveVertex, map_editor::RevertVertex, map_editor::SetAllPoses,
+    map_editor::AddLight, map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
+    map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus, map_editor::Delete,
+    map_editor::Nudge, map_editor::AddEffect, map_editor::SelectEffect, map_editor::SetEffect,
+    map_editor::RemoveEffect, map_editor::MoveEffect, map_editor::SelectMapEffect,
+    map_editor::SetMapEffect, map_editor::RevertMapEffect, map_editor::MoveMapEffect,
+    map_editor::SetBrush, map_editor::EndGroundStroke, map_editor::RevertGround,
+    map_editor::SetGroundWhy, map_editor::LiftGroundPoints, map_editor::SetGroundPointHeight,
+    map_editor::RevertGroundPoints>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

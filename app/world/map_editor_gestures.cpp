@@ -32,6 +32,11 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
     }
     return position;
   };
+  // EN MODE SOMMETS DU RELIEF, haut et bas lèvent ou abaissent les points
+  // sélectionnés ; gauche et droite ne font rien.
+  if (ground_points_mode() && !selected_points_.empty()) {
+    return NudgeGroundPoints(delta[2], store);
+  }
   if (selected_map_effect_.has_value()) {
     return NudgeMapEffect(delta, scene, store);
   }

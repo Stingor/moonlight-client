@@ -149,6 +149,9 @@ bool MapEditorSession::Deselect() noexcept {
   if (!active_ || drag_.has_value()) {
     return false;
   }
+  if (ground_points_mode() && DeselectGroundPoints()) {
+    return true;
+  }
   if (vertex_.has_value()) {
     vertex_.reset();
     return true;

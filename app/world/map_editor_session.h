@@ -96,8 +96,9 @@ class MapEditorSession {
                      const std::array<float, 3>& here, const ro::render::MapScene& scene,
                      MapEditStore& store);
 
-  // DÉSIGNER MOINS, d'un cran : un sommet désigné se lâche seul, son modèle
-  // reste ; sinon le modèle, la lumière ou l'effet désigné se lâche. Rien
+  // DÉSIGNER MOINS, d'un cran : en mode Sommets du relief, les points du sol
+  // sélectionnés se lâchent d'abord ; un sommet désigné se lâche seul, son
+  // modèle reste ; sinon le modèle, la lumière ou l'effet désigné se lâche. Rien
   // pendant un glissé. Faux quand il n'y avait rien à lâcher.
   [[nodiscard]] bool Deselect() noexcept;
 
@@ -112,8 +113,10 @@ class MapEditorSession {
   // Les traits des poignées, la saisie distinguée.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> GizmoTrace() const;
   // Un appui en `pointer` saisit-il une poignée ? Le placement de départ est
-  // celui que montre `view`, la vue de l'image.
-  [[nodiscard]] bool Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  // celui que montre `view`, la vue de l'image. `extend` : Maj tenue, un point
+  // du sol s'ajoute à la sélection, ou s'en retire.
+  [[nodiscard]] bool Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view,
+                          bool extend = false);
   [[nodiscard]] bool dragging() const noexcept {
     return drag_.has_value() || ground_stroke_.has_value();
   }
@@ -208,6 +211,37 @@ class MapEditorSession {
     ground_remesh_ms_ = remesh_ms;
     ground_remesh_live_ = live;
   }
+
+  // LE MODE SOMMETS DE L'OUTIL RELIEF : voir map_editor_ground_points.cpp.
+  //
+  // Un point de la grille des coins : colonne, rangée.
+  using CornerPoint = std::array<std::int32_t, 2>;
+  // L'outil Relief est en main, en mode Sommets.
+  [[nodiscard]] bool ground_points_mode() const noexcept {
+    return tool_ == ro::ui::MapEditorTool::kRelief &&
+           brush_.mode == ro::ui::MapEditorBrushMode::kPoints;
+  }
+  // Le point d'un point de la grille à l'écran, posé par l'appelant à chaque
+  // image : un clic dessus le désigne. `height` : sa hauteur dans le sens du
+  // monde ; `edited` : le document le retouche.
+  struct GroundDot {
+    glm::vec2 at{0.0F, 0.0F};
+    CornerPoint point{};
+    float height = 0.0F;
+    bool edited = false;
+  };
+  void SetGroundDots(std::vector<GroundDot> dots) { ground_dots_ = std::move(dots); }
+  // Le point désigné — celui qui porte la poignée —, et la sélection entière,
+  // le désigné compris, rangée par rangée puis par colonne.
+  [[nodiscard]] const std::optional<CornerPoint>& designated_ground_point() const noexcept {
+    return designated_point_;
+  }
+  [[nodiscard]] const std::vector<CornerPoint>& selected_ground_points() const noexcept {
+    return selected_points_;
+  }
+  // Les points de la grille, le retouché, le sélectionné et le désigné
+  // distingués.
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> GroundPointTrace() const;
 
   [[nodiscard]] Outcome Apply(const ro::ui::MapEditorIntent& intent,
                               const ro::render::MapScene& scene, MapEditStore& store);
@@ -351,6 +385,10 @@ class MapEditorSession {
     std::optional<std::size_t> light;
     std::optional<std::size_t> effect;
     std::optional<std::size_t> map_effect;
+    // La poignée lève les points du sol sélectionnés ; la hauteur du désigné à
+    // l'appui, d'où l'aimantation compte.
+    bool ground_points = false;
+    float ground_height = 0.0F;
   };
   std::optional<Drag> drag_;
   std::vector<ro::ui::MapEditorIntent> queued_;
@@ -379,6 +417,24 @@ class MapEditorSession {
   std::optional<double> ground_remesh_ms_;
   bool ground_remesh_live_ = true;
   bool ground_allowed_ = true;
+  // LE MODE SOMMETS DE L'OUTIL RELIEF : voir map_editor_ground_points.cpp.
+  [[nodiscard]] bool GrabGroundPoint(glm::vec2 pointer, bool extend);
+  // Le glissé de la poignée verticale, déjà projeté sur son axe : il devient
+  // une levée de la sélection. `snap` : Maj tenue.
+  void DragGroundPoints(bool snap);
+  Outcome LiftGroundPoints(const ro::ui::map_editor::LiftGroundPoints& lift, MapEditStore& store);
+  Outcome SetGroundPointHeight(const ro::ui::map_editor::SetGroundPointHeight& set,
+                               const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome RevertGroundPoints(MapEditStore& store);
+  // Ctrl+flèches haut et bas : lever la sélection de `lift` unités du monde.
+  Outcome NudgeGroundPoints(float lift, MapEditStore& store);
+  // Lâcher les points du sol désignés ; faux quand il n'y en avait pas.
+  bool DeselectGroundPoints() noexcept;
+  void ViewGroundPoints(const ro::render::MapScene& scene, const ro::mapedit::MapEdit& document,
+                        ro::ui::MapEditorView& view) const;
+  std::vector<GroundDot> ground_dots_;
+  std::optional<CornerPoint> designated_point_;
+  std::vector<CornerPoint> selected_points_;
 };
 
 }  // namespace moonclient

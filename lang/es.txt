@@ -19344,3 +19344,27 @@ tr: Añadir una luz aquí
 
 fr: Copier la position
 tr: Copiar la posición
+
+fr: Aucun point désigné.
+tr: Ningún punto designado.
+
+fr: Point désigné (cases)
+tr: Punto designado (casillas)
+
+fr: Points sélectionnés
+tr: Puntos seleccionados
+
+fr: Rétablir des points du relief
+tr: Restablecer puntos del relieve
+
+fr: Rétablir les points
+tr: Restablecer los puntos
+
+fr: Un clic désigne un point du sol ; Maj+clic l'ajoute à la sélection ou l'en retire ; Échap la vide. La poignée verte lève la sélection, Maj l'aimante à l'unité ; Ctrl+flèches haut et bas la poussent. Ctrl+clic fait toujours marcher le personnage.
+tr: Un clic designa un punto del suelo; Mayús+clic lo añade a la selección o lo quita; Escape la vacía. El asa verde eleva la selección, Mayús la ajusta a la unidad; Ctrl+flechas arriba y abajo la empujan. Ctrl+clic sigue haciendo caminar al personaje.
+
+fr: retouché
+tr: retocado
+
+fr: retouché(s)
+tr: retocado(s)

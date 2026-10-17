@@ -19344,3 +19344,27 @@ tr: Add a light here
 
 fr: Copier la position
 tr: Copy the position
+
+fr: Aucun point désigné.
+tr: No point selected.
+
+fr: Point désigné (cases)
+tr: Selected point (cells)
+
+fr: Points sélectionnés
+tr: Selected points
+
+fr: Rétablir des points du relief
+tr: Restore relief points
+
+fr: Rétablir les points
+tr: Restore the points
+
+fr: Un clic désigne un point du sol ; Maj+clic l'ajoute à la sélection ou l'en retire ; Échap la vide. La poignée verte lève la sélection, Maj l'aimante à l'unité ; Ctrl+flèches haut et bas la poussent. Ctrl+clic fait toujours marcher le personnage.
+tr: A click selects a ground point; Shift+click adds it to the selection or removes it; Escape clears it. The green handle raises the selection, Shift snaps it to whole units; Ctrl+Up and Down arrows nudge it. Ctrl+click still makes the character walk.
+
+fr: retouché
+tr: edited
+
+fr: retouché(s)
+tr: edited
