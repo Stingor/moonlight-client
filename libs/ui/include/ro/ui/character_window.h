@@ -613,6 +613,9 @@ struct CharacterWindowAction {
   // « Signaler un bug » : `app` joint ce que la fiche montre — l'onglet, le
   // métier et les niveaux, et ce qui est propre à l'onglet.
   bool report_bug = false;
+  // LE BOUTON « PRÉRÉGLAGES » DU VOLET DES STATS a été cliqué. ⚠ LA FENÊTRE
+  // N'EST PAS À LA FICHE : `app` route le clic par `RouteStatPresetDoors`.
+  bool toggle_stat_presets = false;
 
   // Ce que le grimoire a demandé, quand c'est lui qui était à l'écran.
   SkillWindowAction grimoire;

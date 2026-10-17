@@ -258,8 +258,7 @@ UiStage::Answers UiStage::Draw(
 
   DrawConversation(windows, chat_preview, chat_tabs, chat_links, emotions, emojis, answers);
 
-  // LA FICHE DE PERSONNAGE : le mannequin, les costumes, les nombres, et le
-  // grimoire.
+  // LA FICHE : le mannequin, les costumes, les nombres, et le grimoire.
   answers.character = ro::ui::DrawCharacterWindow(
       windows.character, windows.character_view, sheet.header, sheet.slots, sheet.stats,
       sheet.presets, sheet.titles, sheet.guild, skills, points, skin_, sheet.companions);
@@ -274,10 +273,13 @@ UiStage::Answers UiStage::Draw(
   if (answers.character.presets.escape_spent) {
     escape_.Suppress();
   }
-  // LA PETITE FENÊTRE DE STATUT, juste après la fiche : on monte un personnage
-  // en regardant l'une ou l'autre.
+  // LE STATUT, puis les préréglages de stats : deux portes, une fenêtre (`hud_rounds.h`).
   windows.status.answer =
       ro::ui::DrawStatusWindow(windows.status.state, windows.status.view, skin_);
+  ro::ui::RouteStatPresetDoors(windows.stat_presets.state, {windows.status.answer.toggle_presets,
+                                                            answers.character.toggle_stat_presets});
+  windows.stat_presets.answer =
+      ro::ui::DrawStatPresetWindow(windows.stat_presets.state, windows.stat_presets.view, skin_);
   if (!sheet.guild_invitation.empty()) {
     bool accepted = false;
     if (ro::ui::DrawGuildInvitation(sheet.guild_invitation, accepted, skin_)) {

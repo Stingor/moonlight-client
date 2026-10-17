@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "ro/ui/stat_preset_window.h"
 #include "ro/ui/status_portrait.h"
 #include "ro/ui/status_window.h"
 #include "ro/ui/target_hud.h"
@@ -39,6 +40,15 @@ struct StatusWindowRound {
   // LE NOM DE GUILDE QUE LA VUE DÉSIGNE, copié à chaque composition : la vue
   // ne pointe jamais dans le livre de guilde, que le réseau réécrit.
   std::string guild_name;
+};
+
+// LA FENÊTRE DES PRÉRÉGLAGES DE STATS, même aller-retour. ⚠ ELLE N'EST NI AU
+// STATUT NI À LA FICHE : chacune y ouvre une porte, et c'est cet état unique
+// qu'elles basculent. Fermer l'une ou l'autre la laisse donc ouverte.
+struct StatPresetRound {
+  ro::ui::StatPresetWindowState state;
+  ro::ui::StatPresetWindowView view;
+  ro::ui::StatPresetAction answer;
 };
 
 }  // namespace moonclient

@@ -297,15 +297,15 @@ class UiStage {
     ro::ui::ChatMacroState macros;
     // LES DIX LIBELLÉS DE TOUCHE DES MACROS, composés par `app`.
     //
-    // ⚠ `ui` NE SAIT PAS NOMMER UN CODE DE TOUCHE, et la table des raccourcis
-    // est la seule source de ce qu'ils valent. Même frontière que pour les
-    // lignes de la fenêtre de configuration — ils descendent ici, remplis
-    // seulement quand la fenêtre est ouverte.
+    // ⚠ `ui` NE SAIT PAS NOMMER UN CODE DE TOUCHE : seule la table des
+    // raccourcis dit ce qu'ils valent, même frontière que pour la fenêtre de
+    // configuration. Remplis seulement quand la fenêtre est ouverte.
     std::array<std::string, ro::ui::kChatMacroCount> macro_keys;
-    // LE HUD DE CIBLE, LE PORTRAIT ET LA FENÊTRE DE STATUT : `game/hud_rounds.h`.
+    // LA CIBLE, LE PORTRAIT, LE STATUT ET SES PRÉRÉGLAGES : `game/hud_rounds.h`.
     TargetHudRound target_hud;
     StatusPortraitRound status_portrait;
     StatusWindowRound status;
+    StatPresetRound stat_presets;
     // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, même aller-retour : sa vue descend
     // d'`app` à l'ouverture, sa réponse remonte à l'image suivante.
     struct EntityMenu {

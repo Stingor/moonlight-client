@@ -222,6 +222,12 @@ void PoseStatPresetButton() {
                            core::Tr("Enregistrer et appliquer des préréglages de stats"), true);
 }
 
+void RouteStatPresetDoors(StatPresetWindowState& state, StatPresetDoors doors) {
+  if (doors.from_status || doors.from_sheet) {
+    state.open = !state.open;
+  }
+}
+
 StatPresetAction DrawStatPresetWindow(StatPresetWindowState& state,
                                       const StatPresetWindowView& view, const SkinArt& art) {
   StatPresetAction action;

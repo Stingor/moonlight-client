@@ -263,6 +263,29 @@ void AttributeRow(std::size_t rank, const CharacterAttributeView& attribute,
   ImGui::PopID();
 }
 
+// La largeur du bouton des préréglages, mesurée sur son libellé traduit.
+[[nodiscard]] float StatPresetButtonWidth(const SkinArt& art) {
+  const std::array<const char*, 1> label = {core::Tr("Préréglages")};
+  return SkinWidestButton(label, art);
+}
+
+// LA PORTE DES PRÉRÉGLAGES DE STATS, au bout de la rangée des points : c'est
+// eux qu'un préréglage dépense.
+//
+// ⚠ CALÉE À DROITE, sur le bord où finissent les « + » : à la suite du texte,
+// elle bougerait avec le nombre de points.
+void StatPresetButton(const SkinArt& art, CharacterWindowAction& action) {
+  const float width = StatPresetButtonWidth(art);
+  ImGui::SameLine();
+  ImGui::SetCursorPosX(std::max(ImGui::GetCursorPosX(), ImGui::GetContentRegionMax().x - width));
+  if (SkinButton(core::Tr("Préréglages"), art, ImVec2(width, 0.0F))) {
+    action.toggle_stat_presets = true;
+  }
+  if (ImGui::IsItemHovered()) {
+    SkinTooltipFormat("%s", core::Tr("Enregistrer et appliquer des préréglages de stats"));
+  }
+}
+
 }  // namespace
 
 int AttributeRaiseAmount(const CharacterAttributeView& attribute, bool to_next_step) {
@@ -293,8 +316,11 @@ float CharacterStatsPaneWidth(const SkinArt& art) {
   // tous les autres.
   const float derived = value_x + ImGui::CalcTextSize(kWidestDerivedValue).x;
 
-  const float points =
-      ImGui::CalcTextSize(core::Tr("Points de statut :")).x + ImGui::CalcTextSize(" 9999").x;
+  // ⚠ LE BOUTON DES PRÉRÉGLAGES PARTAGE CETTE RANGÉE, et il compte : traduit,
+  // il peut l'emporter sur celle d'une caractéristique.
+  const float points = ImGui::CalcTextSize(core::Tr("Points de statut :")).x +
+                       ImGui::CalcTextSize(" 9999").x + style.ItemSpacing.x +
+                       StatPresetButtonWidth(art);
 
   const float content = std::max(std::max(attribute, derived), points);
   // ⚠ ET L'ASCENSEUR EST COMPTÉ, même quand rien ne défile aujourd'hui : il
@@ -321,7 +347,11 @@ void DrawCharacterStats(const CharacterStatsView& stats, const SkinArt& art,
   char line[64] = {};
   std::snprintf(line, sizeof(line), "%s %lld", core::Tr("Points de statut :"),
                 static_cast<long long>(stats.status_point));
+  // ⚠ CALÉ SUR LE BOUTON qui partage la rangée : sans cela, le texte flotterait
+  // au-dessus de son centre.
+  ImGui::AlignTextToFramePadding();
   ImGui::TextUnformatted(line);
+  StatPresetButton(art, action);
   ImGui::Separator();
 
   // LES NEUF DÉRIVÉES, AUX FORMATS DU CLIENT.

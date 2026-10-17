@@ -13,6 +13,7 @@
 #include "ro/ui/rich_text.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/stat_preset_window.h"
 #include "ro/ui/window_name.h"
 
 #include "achievement_paint.h"
@@ -364,9 +365,6 @@ float StatusArrowTopPixels(std::size_t rank) {
 StatusWindowAction DrawStatusWindow(StatusWindowState& state, const StatusWindowView& view,
                                     const SkinArt& art) {
   StatusWindowAction action;
-  // LES PRÉRÉGLAGES SE DESSINENT MÊME STATUT FERMÉ : une application lancée se
-  // suit et s'arrête depuis leur fenêtre.
-  action.presets = DrawStatPresetWindow(state.presets, view.presets, art);
   if (!state.open) {
     return action;
   }
@@ -394,7 +392,7 @@ StatusWindowAction DrawStatusWindow(StatusWindowState& state, const StatusWindow
   PoseStatPresetButton();
   if (BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar, kFlags)) {
     if (TitleActionClicked(kPresetButtonRank)) {
-      state.presets.open = !state.presets.open;
+      action.toggle_presets = true;
     }
     ImGuiWindow* const window = ImGui::GetCurrentWindow();
     // L'ORIGINE EST LE HAUT DU FOND, là où la barre réelle s'arrête.

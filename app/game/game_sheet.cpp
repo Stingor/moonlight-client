@@ -51,14 +51,15 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   }
   // LES PRÉRÉGLAGES DE STATS : ce que leur fenêtre a demandé, puis la montée
   // suivante de l'application en cours, s'il y en a une.
-  stat_presets_->Apply(asked.presets, world_, now_ms);
+  StatPresetRound& stat_presets = windows_.stat_presets;
+  stat_presets_->Apply(std::exchange(stat_presets.answer, {}), world_, now_ms);
   stat_presets_->Tick(link_, world_, now_ms);
   // ⚠ LE NOM SE COPIE DANS LE PORTEUR : la vue de l'onglet de guilde date de
   // l'image précédente, et le réseau a pu réécrire depuis la chaîne qu'elle
   // désigne.
   status.guild_name = GuildNameOf(guild_book_);
   status.view = StatusWindowViewOf(character_->stats(), status.guild_name);
-  stat_presets_->Compose(world_, status.view.presets);
+  stat_presets_->Compose(world_, stat_presets.view);
   // Fiche ouverte, et pas seulement sur son onglet : un clic sur l'onglet ne le
   // montre qu'à l'image suivante, que ses lignes doivent déjà servir.
   presets_->Refresh(windows_.character.open, settings_->bindings());

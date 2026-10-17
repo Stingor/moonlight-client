@@ -12,9 +12,15 @@
 
 namespace ro::ui {
 
-// LA PETITE FENÊTRE DES PRÉRÉGLAGES DE CARACTÉRISTIQUES, ouverte depuis la
-// fenêtre de statut : la liste du compte, l'enregistrement des valeurs
-// actuelles, et l'aperçu qui précède toute application.
+// LA PETITE FENÊTRE DES PRÉRÉGLAGES DE CARACTÉRISTIQUES : la liste du compte,
+// l'enregistrement des valeurs actuelles, et l'aperçu qui précède toute
+// application.
+//
+// 🔴 UNE SEULE FENÊTRE, DEUX PORTES : le bouton de la barre de titre du statut
+// et celui du volet des stats de la fiche. Toutes deux basculent LE MÊME
+// interrupteur, qu'aucune des deux fenêtres ne possède. Fermer la fiche ou le
+// statut ne la ferme donc pas — une application lancée se suit et s'arrête
+// depuis elle seule : sa croix, ou une des deux portes, la referme.
 //
 // ⚠ ELLE NE POSSÈDE AUCUN ÉTAT DE JEU : la liste, l'aperçu et le compte rendu
 // lui arrivent composés, et elle rend ce que le joueur demande. C'est `app` qui
@@ -109,6 +115,15 @@ struct StatPresetAction {
 // Le bouton de la barre de titre de la fenêtre de statut qui ouvre celle-ci.
 // À poser avant son `BeginSkinnedWindow`.
 void PoseStatPresetButton();
+
+// CE QUE LES DEUX PORTES ONT DEMANDÉ À CETTE IMAGE.
+struct StatPresetDoors {
+  bool from_status = false;
+  bool from_sheet = false;
+};
+
+// Un clic sur l'une ou l'autre bascule l'interrupteur, UNE fois.
+void RouteStatPresetDoors(StatPresetWindowState& state, StatPresetDoors doors);
 
 [[nodiscard]] StatPresetAction DrawStatPresetWindow(StatPresetWindowState& state,
                                                     const StatPresetWindowView& view,
