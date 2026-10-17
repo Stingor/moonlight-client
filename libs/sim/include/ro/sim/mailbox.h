@@ -6,6 +6,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "ro/sim/inventory.h"
@@ -227,6 +228,14 @@ enum class MailDraftStanding : std::uint8_t {
   kOutcomeUnknown,
 };
 
+// CE QUE LE SERVEUR ORDONNE À LA BOÎTE, de lui-même — la commande `@mail`, un
+// script de PNJ. L'ouverture est celle de l'icône du menu : la liste est
+// demandée.
+enum class MailWindowOrder : std::uint8_t {
+  kOpen,
+  kClose,
+};
+
 // CE QUE LA FENÊTRE ET LA CONVERSATION DOIVENT DIRE, une fois chacun.
 enum class MailNewsKind : std::uint8_t {
   // `code` : le résultat de l'envoi, `kMailSilent` s'il n'est pas venu.
@@ -317,6 +326,13 @@ class Mailbox {
   // La boîte s'ouvre, et sa liste est demandée.
   void NoteOpened(std::uint32_t now_ms);
   void Close() noexcept { open_ = false; }
+
+  // L'ordre du serveur sur la boîte, gardé jusqu'à ce que la boucle le prenne.
+  // Un ordre plus récent remplace celui qui n'a pas encore été pris.
+  void TellWindowOrder(MailWindowOrder order) noexcept { window_order_ = order; }
+  [[nodiscard]] std::optional<MailWindowOrder> TakeWindowOrder() noexcept {
+    return std::exchange(window_order_, std::nullopt);
+  }
 
   // Une liste est demandée — ouverture ou rafraîchissement.
   void NoteListRequested(std::uint32_t now_ms) noexcept;
@@ -507,6 +523,7 @@ class Mailbox {
   [[nodiscard]] bool Engages(std::uint16_t client_slot) const noexcept;
 
   bool open_ = false;
+  std::optional<MailWindowOrder> window_order_;
   bool list_requested_ = false;
   bool list_received_ = false;
   std::uint32_t list_requested_ms_ = 0;

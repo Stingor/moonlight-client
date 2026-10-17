@@ -67,7 +67,8 @@ class MailStage {
                                                  std::int64_t now_unix_s);
 
   // L'ICÔNE DU MENU ET SA TOUCHE : ouvrir la boîte — et demander sa liste —,
-  // ou la refermer, ce qui n'émet rien. Joué à l'image suivante.
+  // ou la refermer, ce qui n'émet rien. Joué à l'image suivante. L'ordre du
+  // serveur (`@mail`) prend le même chemin (`MailBoxMoveFor`).
   void Toggle() noexcept { toggle_asked_ = true; }
 
   // « ENVOYER UN COURRIER… » : une écriture adressée à ce personnage, demandée

@@ -14,7 +14,12 @@
 
 namespace ro::net {
 
-// LE COURRIER (RODEX) : douze paquets reçus, douze émis. Voir `ro/sim/mailbox.h`.
+// LE COURRIER (RODEX) : treize paquets reçus, douze émis. Voir `ro/sim/mailbox.h`.
+//
+// L'ORDRE D'OUVRIR OU DE FERMER LA BOÎTE (`ZC_MAIL_WINDOWS`) vient de l'ancien
+// courrier, mais c'est celui que le serveur envoie pour `@mail` : il commande
+// la boîte RODEX. Son type suit le serveur, seul à l'émettre — zéro ouvre, un
+// ferme ; toute autre valeur rend la trame indécodable, sans ordre.
 //
 // 🔴 LE TITRE, LE CORPS ET L'EXPÉDITEUR VIENNENT D'AUTRES JOUEURS. Chaque
 // longueur annoncée est confrontée à la trame avant toute lecture ; une trame

@@ -18,6 +18,7 @@
 #include "ro/sim/world.h"
 
 #include "chat/banned_input.h"
+#include "game/mail_box_move.h"
 #include "game/mail_bug_report.h"
 #include "items/inventory_view.h"
 
@@ -419,15 +420,19 @@ void MailStage::Send(const ro::ui::MailComposeSend& send, const TradeContext& co
 // ── LES FENÊTRES ───────────────────────────────────────────────────────────
 
 void MailStage::FollowAsks(MailWindows& windows, const TradeContext& context) {
-  if (std::exchange(toggle_asked_, false)) {
-    if (mailbox_.open()) {
-      // ⚠ REFERMER N'ÉMET RIEN : le serveur ne tient aucune session de boîte.
-      mailbox_.Close();
-    } else {
+  switch (MailBoxMoveFor(mailbox_.open(), std::exchange(toggle_asked_, false),
+                         mailbox_.TakeWindowOrder())) {
+    case MailBoxMove::kNone:
+      break;
+    case MailBoxMove::kOpen:
       mailbox_.NoteOpened(context.now_ms);
       windows.box.open = true;
       RequestList(context);
-    }
+      break;
+    case MailBoxMove::kClose:
+      // ⚠ REFERMER N'ÉMET RIEN : le serveur ne tient aucune session de boîte.
+      mailbox_.Close();
+      break;
   }
   if (compose_asked_.has_value()) {
     const std::string recipient = std::move(*compose_asked_);

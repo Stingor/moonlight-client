@@ -626,6 +626,7 @@ target_include_directories(moonclient_profiles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 # d'écriture. Une annulation oubliée laisse le joueur figé, une saisie effacée
 # après un échec se refait à la main : deux pannes qu'un banc voit avant le jeu.
 add_library(moonclient_mail STATIC
+    game/mail_box_move.cpp
     game/mail_bug_report.cpp
     game/mail_write_flow.cpp
     items/mail_withheld.cpp)

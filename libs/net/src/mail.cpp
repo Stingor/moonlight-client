@@ -23,6 +23,7 @@ using core::ErrorCode;
 constexpr std::uint16_t kListOpcode = 0x0AC2;
 constexpr std::uint16_t kZenyClaimedOpcode = 0x09F2;
 constexpr std::uint16_t kItemsClaimedOpcode = 0x09F4;
+constexpr std::uint16_t kWindowOrderOpcode = 0x0260;
 
 constexpr std::uint16_t kOpenMailboxOpcode = 0x0AC1;
 constexpr std::uint16_t kReadMailOpcode = 0x09EA;
@@ -57,6 +58,10 @@ constexpr std::size_t kContentItemBytes = 60;
 constexpr std::size_t kClaimAckBytes = kOpcodeBytes + 8 + 1 + 1;
 // La pastille « non lu ».
 constexpr std::size_t kUnreadBytes = kOpcodeBytes + 1;
+// L'ordre sur la boîte : son type, sur trente-deux bits.
+constexpr std::size_t kWindowOrderBytes = kOpcodeBytes + 4;
+constexpr std::uint32_t kWireWindowOpen = 0;
+constexpr std::uint32_t kWireWindowClose = 1;
 
 // L'envoi : en-tête variable, destinataire, expéditeur (ignoré), zeny, deux
 // longueurs, identifiant du destinataire (ignoré) — puis titre et corps.
@@ -377,6 +382,28 @@ core::Result<void> RequestClaim(Connection& link, sim::Mailbox& mailbox, std::in
   return {};
 }
 
+FrameOutcome ApplyWindowOrder(const Frame& frame, sim::Mailbox& mailbox) {
+  if (frame.bytes.size() != kWindowOrderBytes) {
+    return FrameOutcome::kUndecodable;
+  }
+  core::ByteReader reader(frame.bytes);
+  reader.Skip(kOpcodeBytes);
+  const std::uint32_t wire = reader.U32();
+  if (!reader.ok()) {
+    return FrameOutcome::kUndecodable;
+  }
+  switch (wire) {
+    case kWireWindowOpen:
+      mailbox.TellWindowOrder(sim::MailWindowOrder::kOpen);
+      return FrameOutcome::kApplied;
+    case kWireWindowClose:
+      mailbox.TellWindowOrder(sim::MailWindowOrder::kClose);
+      return FrameOutcome::kApplied;
+    default:
+      return FrameOutcome::kUndecodable;
+  }
+}
+
 }  // namespace
 
 FrameOutcome ApplyMailFrame(const Frame& frame, sim::Mailbox& mailbox, std::int64_t now_unix_s) {
@@ -446,6 +473,9 @@ FrameOutcome ApplyMailFrame(const Frame& frame, sim::Mailbox& mailbox, std::int6
       mailbox.TellUnreadBadge(frame.bytes[kOpcodeBytes] != 0);
       return FrameOutcome::kApplied;
     }
+
+    case kWindowOrderOpcode:
+      return ApplyWindowOrder(frame, mailbox);
 
     case kZenyClaimedOpcode:
       return ApplyClaimAck(frame, mailbox, sim::MailClaim::kZeny);
