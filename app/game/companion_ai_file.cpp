@@ -122,6 +122,20 @@ void EmitTactic(YAML::Emitter& out, const CompanionTactic& tactic) {
   out << YAML::EndMap;
 }
 
+std::optional<std::string> ReadWhole(const std::filesystem::path& path) {
+  std::error_code missing;
+  if (!std::filesystem::exists(path, missing)) {
+    return std::string();
+  }
+  std::ifstream file(path, std::ios::binary);
+  if (!file) {
+    return std::nullopt;
+  }
+  std::ostringstream text;
+  text << file.rdbuf();
+  return text.str();
+}
+
 }  // namespace companion_yaml
 
 namespace {
@@ -303,21 +317,6 @@ void ReadCharacters(const YAML::Node& characters, CompanionAiFileRead& into) {
     }
     into.profiles.characters.push_back(std::move(*character));
   }
-}
-
-// Le texte du fichier ; vide s'il est absent, rien s'il ne s'ouvre pas.
-[[nodiscard]] std::optional<std::string> ReadWhole(const std::filesystem::path& path) {
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return std::string();
-  }
-  std::ifstream file(path, std::ios::binary);
-  if (!file) {
-    return std::nullopt;
-  }
-  std::ostringstream text;
-  text << file.rdbuf();
-  return text.str();
 }
 
 }  // namespace

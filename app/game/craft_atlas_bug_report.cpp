@@ -36,11 +36,6 @@ constexpr int kCraftsMeasured = 1;
 
 [[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
-// Un texte borné, sans caractère coupé en queue.
-[[nodiscard]] std::string Clipped(std::string_view text, std::size_t most_bytes) {
-  return JsonEscaped(ro::core::WithoutDanglingUtf8(text.substr(0, most_bytes)));
-}
-
 [[nodiscard]] const char* TabWord(CraftAtlasTab tab) {
   switch (tab) {
     case CraftAtlasTab::kSkills:
@@ -76,7 +71,7 @@ constexpr int kCraftsMeasured = 1;
   std::string fields = std::format(
       R"("recipe":{{"skill_id":{},"skill":"{}","skill_level":{},"item_level":{},"learnable":{},)"
       R"("yield":{{"mode":"{}","least":{},"most":{})",
-      recipe.skill_id, Clipped(recipe.skill_label, kSkillBytes), recipe.skill_level,
+      recipe.skill_id, JsonClipped(recipe.skill_label, kSkillBytes), recipe.skill_level,
       recipe.item_level, Flag(recipe.learnable), YieldWord(recipe.yield_mode), recipe.yield_least,
       recipe.yield_most);
   // Le bonus ne vaut que pour le tirage qui le porte.
@@ -101,7 +96,7 @@ constexpr int kCraftsMeasured = 1;
 [[nodiscard]] std::string SheetFields(const CraftAtlasSheet& sheet) {
   std::string fields =
       std::format(R"("sheet":{{"item_id":{},"name":"{}","owned":{},)", sheet.item.item_id,
-                  Clipped(sheet.item.name, kNameBytes), sheet.item.owned);
+                  JsonClipped(sheet.item.name, kNameBytes), sheet.item.owned);
   if (sheet.recipe.has_value()) {
     fields += RecipeFields(*sheet.recipe);
   } else {
@@ -123,7 +118,7 @@ BugReportContext CraftAtlasBugReport(const ro::ui::CraftAtlasWindowState& window
   std::string fields =
       std::format(R"("craft_atlas":{{"available":{},"tab":"{}","search":"{}","only_craftable":{},)"
                   R"("selected_id":{},"back":{},"staff":{},"free_bag_slots":{})",
-                  Flag(view.available), TabWord(window.tab), Clipped(search, kSearchBytes),
+                  Flag(view.available), TabWord(window.tab), JsonClipped(search, kSearchBytes),
                   Flag(view.only_craftable), window.selected_id, window.back.size(),
                   Flag(view.staff_items), free_slots);
   // Le nombre de fabrications que le staff prépare : ce que « Obtenir » demande.

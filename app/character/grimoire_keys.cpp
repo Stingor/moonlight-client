@@ -7,30 +7,14 @@
 
 #include "ro/core/i18n.h"
 
+#include "input/key_gate.h"
+
 namespace moonclient {
 namespace {
 
 [[nodiscard]] bool Active(const ro::ui::CharacterWindowState& sheet) {
   return sheet.open && sheet.tab == ro::ui::CharacterTab::kGrimoire &&
          sheet.grimoire.keyboard_layout;
-}
-
-// Une touche qui ne fait que modifier une autre n'est pas une touche de barre :
-// Ctrl tenu pour viser Ctrl+F1 ne doit rien prendre.
-[[nodiscard]] bool IsModifierKey(SDL_Keycode key) {
-  switch (key) {
-    case SDLK_LCTRL:
-    case SDLK_RCTRL:
-    case SDLK_LSHIFT:
-    case SDLK_RSHIFT:
-    case SDLK_LALT:
-    case SDLK_RALT:
-    case SDLK_LGUI:
-    case SDLK_RGUI:
-      return true;
-    default:
-      return false;
-  }
 }
 
 // La case que cette touche déclenche, ou rien.

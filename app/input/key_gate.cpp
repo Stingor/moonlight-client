@@ -1,11 +1,8 @@
 #include "input/key_gate.h"
 
 namespace moonclient {
-namespace {
 
-// Une touche qui ne sert QU'À en modifier une autre n'est pas un raccourci :
-// tenir Alt pour faire « Alt+E » ne doit pas, à lui seul, réveiller le jeu.
-[[nodiscard]] bool IsModifierKey(SDL_Keycode key) {
+bool IsModifierKey(SDL_Keycode key) {
   switch (key) {
     case SDLK_LCTRL:
     case SDLK_RCTRL:
@@ -20,8 +17,6 @@ namespace {
       return false;
   }
 }
-
-}  // namespace
 
 bool GameOnlyKey(SDL_Keycode key, SDL_Keymod held) {
   if (IsModifierKey(key)) {

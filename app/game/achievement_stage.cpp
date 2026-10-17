@@ -3,9 +3,9 @@
 #include "game/achievement_stage.h"
 
 #include <algorithm>
-#include <cctype>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/achievement.h"
@@ -50,14 +50,6 @@ constexpr std::uint32_t kClaimSilenceMs = 10000;
 
 // Les cinq rangées qu'on voit à la fois dans la liste.
 constexpr int kVisibleRows = 5;
-
-[[nodiscard]] std::string Lowered(std::string_view text) {
-  std::string lowered(text);
-  std::ranges::transform(lowered, lowered.begin(), [](char letter) {
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
-  });
-  return lowered;
-}
 
 [[nodiscard]] ro::ui::AchievementChest ChestOf(const AchievementInfo& info,
                                                const ro::sim::AchievementProgress* progress) {
@@ -443,7 +435,7 @@ ro::ui::SkinImage AchievementStage::PaperArtAt(std::string_view leaf,
 ro::ui::SkinImage AchievementStage::IconOf(const AchievementInfo& info) const {
   std::string leaf(kArtFolder);
   leaf += kIconPrefix;
-  leaf += Lowered(info.group);
+  leaf += ro::core::AsciiLower(info.group);
   leaf += kBitmapExtension;
   // Un pictogramme dans sa bulle, peint sur du blanc comme le reste de l'art.
   return PaperArtAt(leaf, &ro::render::GameImages::GetOursForDarkPaper);

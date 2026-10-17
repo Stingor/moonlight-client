@@ -9,7 +9,6 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
-#include "ro/core/text.h"
 
 namespace moonclient {
 namespace {
@@ -29,11 +28,6 @@ constexpr std::size_t kSearchBytes = 32;
 constexpr std::size_t kRefusalBytes = 80;
 
 [[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
-
-// Un texte borné, sans caractère coupé en queue.
-[[nodiscard]] std::string Clipped(std::string_view text, std::size_t most_bytes) {
-  return JsonEscaped(ro::core::WithoutDanglingUtf8(text.substr(0, most_bytes)));
-}
 
 [[nodiscard]] const char* PurchaseWord(CashShopPurchaseNote note) {
   switch (note) {
@@ -84,16 +78,16 @@ BugReportContext CashShopBugReport(const ro::ui::CashShopWindowState& window,
       R"("cash_shop":{{"title":"{}","tab":{},"tab_cards":{},"slot":{},"sort":{},"ascending":{},)"
       R"("search":"{}","vote_points":{},"event_points":{},"use_event_points":{},)"
       R"("event_points_spent":{},"purchase":"{}",)",
-      Clipped(view.title, kTitleBytes), window.tab, tab_cards, window.slot, window.sort,
-      Flag(window.ascending), Clipped(search, kSearchBytes), view.vote_points, view.event_points,
-      Flag(window.use_event_points),
+      JsonClipped(view.title, kTitleBytes), window.tab, tab_cards, window.slot, window.sort,
+      Flag(window.ascending), JsonClipped(search, kSearchBytes), view.vote_points,
+      view.event_points, Flag(window.use_event_points),
       ro::ui::CashShopEventPointsToSpend(CartTotal(window), view.event_points,
                                          window.use_event_points),
       PurchaseWord(view.purchase));
   // ⚠ LE REFUS NE SE CITE QUE QUAND LA FENÊTRE L'AFFICHE : ailleurs, le texte
   // restant serait celui d'un achat que le joueur n'a pas vu échouer.
   if (view.purchase == CashShopPurchaseNote::kRefused) {
-    fields += std::format(R"("refusal":"{}",)", Clipped(view.refusal, kRefusalBytes));
+    fields += std::format(R"("refusal":"{}",)", JsonClipped(view.refusal, kRefusalBytes));
   }
   fields += CartFields(window, view);
   fields += '}';

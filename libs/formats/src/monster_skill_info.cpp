@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/ascii.h"
+
 namespace ro::formats {
 namespace {
 
@@ -34,14 +36,6 @@ std::int32_t LeadingInteger(std::string_view text) {
   std::int32_t value = 0;
   std::from_chars(text.data(), text.data() + text.size(), value);
   return value;
-}
-
-std::string Lowered(std::string_view text) {
-  std::string lowered(text);
-  std::ranges::transform(lowered, lowered.begin(), [](char c) {
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-  });
-  return lowered;
 }
 
 // Le nom d'une balise ouvrante, sans ses attributs.
@@ -129,7 +123,7 @@ MonsterSkillInfo MonsterSkillInfo::Parse(std::span<const std::uint8_t> bytes) {
 
 std::optional<MonsterSkillAction> MonsterSkillInfo::Find(std::string_view resource_name,
                                                          std::uint32_t skill_id) const {
-  const std::string espece = Lowered(resource_name);
+  const std::string espece = core::AsciiLower(resource_name);
   const auto bloc = std::ranges::find(monsters_, espece);
   if (bloc == monsters_.end()) {
     return std::nullopt;

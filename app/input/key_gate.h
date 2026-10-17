@@ -52,6 +52,11 @@ namespace moonclient {
 // UNE TOUCHE DE FONCTION, de F1 à F12, quels que soient les modificateurs tenus.
 [[nodiscard]] bool FunctionKey(SDL_Keycode key);
 
+// UNE TOUCHE QUI NE SERT QU'À EN MODIFIER UNE AUTRE — Ctrl, Maj, Alt, la touche
+// système — n'est pas un raccourci : tenir Alt pour faire « Alt+E » ne doit
+// pas, à lui seul, déclencher quoi que ce soit.
+[[nodiscard]] bool IsModifierKey(SDL_Keycode key);
+
 // UN PRESET D'ÉQUIPEMENT SE REMET-IL PENDANT UNE SAISIE ?
 //
 // 🔴 SUR UNE TOUCHE DE FONCTION, OUI : F1 à F12 appartiennent au jeu même quand

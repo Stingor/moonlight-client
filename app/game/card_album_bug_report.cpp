@@ -30,11 +30,6 @@ constexpr std::size_t kNoticeBytes = 80;
 
 [[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
-// Un texte borné, sans caractère coupé en queue.
-[[nodiscard]] std::string Clipped(std::string_view text, std::size_t most_bytes) {
-  return JsonEscaped(ro::core::WithoutDanglingUtf8(text.substr(0, most_bytes)));
-}
-
 [[nodiscard]] const char* ToneWord(CardAlbumTone tone) {
   switch (tone) {
     case CardAlbumTone::kDone:
@@ -86,14 +81,14 @@ BugReportContext CardAlbumBugReport(const ro::ui::CardAlbumWindowState& window,
       R"("shown":{},"family":{{"unlocked":{},"total":{}}},)",
       view.pockets.size(), view.unlocked_count, view.total_reserve, view.hand.size(),
       Flag(view.blocked), Flag(view.loading), Flag(view.staff), Flag(view.dropper_known),
-      Flag(window.look.auto_sacrifice), Clipped(search, kSearchBytes), window.sort_mode,
+      Flag(window.look.auto_sacrifice), JsonClipped(search, kSearchBytes), window.sort_mode,
       window.show_filter, window.slot_filter, window.nature_mask, window.order.size(),
       window.family_unlocked, window.family_total);
   fields += SpreadFields(window, view);
   // Le compte rendu que la fenêtre affichait, et la pochette qu'il désigne.
   if (!view.notice.empty()) {
     fields += std::format(R"(,"notice":{{"text":"{}","tone":"{}","card_id":{}}})",
-                          Clipped(view.notice, kNoticeBytes), ToneWord(view.notice_tone),
+                          JsonClipped(view.notice, kNoticeBytes), ToneWord(view.notice_tone),
                           view.highlight_card);
   }
   fields += '}';

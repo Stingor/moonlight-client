@@ -4,9 +4,7 @@
 
 #include <algorithm>
 #include <chrono>
-#include <fstream>
 #include <optional>
-#include <sstream>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -224,20 +222,6 @@ void EmitCharacters(YAML::Emitter& out, const YAML::Node& existing, const Charac
     return !failed;
   }
   return false;
-}
-
-[[nodiscard]] std::optional<std::string> ReadWhole(const std::filesystem::path& path) {
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return std::string();
-  }
-  std::ifstream file(path, std::ios::binary);
-  if (!file) {
-    return std::nullopt;
-  }
-  std::ostringstream text;
-  text << file.rdbuf();
-  return text.str();
 }
 
 }  // namespace

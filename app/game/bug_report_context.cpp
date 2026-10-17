@@ -6,6 +6,7 @@
 
 #include "ro/core/build_stamp.h"
 #include "ro/core/i18n.h"
+#include "ro/core/text.h"
 #include "ro/net/bug_report.h"
 
 namespace moonclient {
@@ -68,6 +69,10 @@ std::string JsonEscaped(std::string_view text) {
     }
   }
   return out;
+}
+
+std::string JsonClipped(std::string_view text, std::size_t most_bytes) {
+  return JsonEscaped(ro::core::WithoutDanglingUtf8(text.substr(0, most_bytes)));
 }
 
 BugReportContext ItemBugReport(std::uint32_t item_id, std::string_view name, int refine,

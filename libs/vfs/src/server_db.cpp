@@ -62,14 +62,6 @@ core::Error Refused(std::string detail) {
 [[nodiscard]] bool IsMapNode(const YAML::Node& node) { return node && node.IsMap(); }
 [[nodiscard]] bool IsSequenceNode(const YAML::Node& node) { return node && node.IsSequence(); }
 
-[[nodiscard]] std::string Lowered(std::string_view text) {
-  std::string lowered(text);
-  std::ranges::transform(lowered, lowered.begin(), [](unsigned char letter) {
-    return static_cast<char>(std::tolower(letter));
-  });
-  return lowered;
-}
-
 // Un entier écrit comme le serveur le lit ; `fallback` s'il ne se lit pas, et
 // borné à la largeur de `Number`.
 template <typename Number>
@@ -235,7 +227,7 @@ using AegisIndex = std::unordered_map<std::string, std::uint32_t>;
 std::vector<ServerDrop> DropsOf(const Field& field, const AegisIndex& items) {
   std::vector<ServerDrop> drops;
   for (const Pairs& line : field.list) {
-    const auto found = items.find(Lowered(PairValue(line, "Item")));
+    const auto found = items.find(core::AsciiLower(PairValue(line, "Item")));
     if (found == items.end()) {
       continue;
     }
@@ -465,7 +457,8 @@ core::Result<ServerDb> ParseServerDb(std::string_view item_db_text, std::string_
                                              if (item.item_id == 0) {
                                                return;
                                              }
-                                             aegis.emplace(Lowered(item.aegis_name), item.item_id);
+                                             aegis.emplace(core::AsciiLower(item.aegis_name),
+                                                           item.item_id);
                                              items.push_back(std::move(item));
                                            });
         !read) {

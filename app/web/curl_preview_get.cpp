@@ -7,6 +7,7 @@
 #include <string_view>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/core/web_address.h"
 
 #include "web/curl_handle.h"
@@ -51,14 +52,6 @@ struct TextFree {
 };
 using CurlText = std::unique_ptr<char, TextFree>;
 
-[[nodiscard]] std::string Lowered(std::string_view text) {
-  std::string lowered(text);
-  std::transform(lowered.begin(), lowered.end(), lowered.begin(), [](char letter) {
-    return (letter >= 'A' && letter <= 'Z') ? static_cast<char>(letter - 'A' + 'a') : letter;
-  });
-  return lowered;
-}
-
 // 🔴 L'ADRESSE DÉCOUPÉE PAR LIBCURL, SEULEMENT SI SON HÔTE EST CELUI QUE LA
 // LISTE BLANCHE A JUGÉ. Deux lecteurs d'adresse divergent sur les formes
 // tordues ; quand ils divergent, rien ne part. Et c'est CE découpage-là qui
@@ -86,7 +79,8 @@ using CurlText = std::unique_ptr<char, TextFree>;
     return nullptr;
   }
   const CurlText held_host(host);
-  if (Lowered(held_scheme.get()) != kSecureScheme || Lowered(held_host.get()) != judged.host) {
+  if (ro::core::AsciiLower(held_scheme.get()) != kSecureScheme ||
+      ro::core::AsciiLower(held_host.get()) != judged.host) {
     return nullptr;
   }
   return parsed;
@@ -110,7 +104,7 @@ std::size_t TakeHeader(char* data, std::size_t size, std::size_t count, void* us
   const std::size_t bytes = size * count;
   const std::string_view line(data, bytes);
   if (line.size() > kLocationHeader.size() && line.size() <= kMostHeaderBytes &&
-      Lowered(line.substr(0, kLocationHeader.size())) == kLocationHeader) {
+      ro::core::AsciiLower(line.substr(0, kLocationHeader.size())) == kLocationHeader) {
     std::string_view value = line.substr(kLocationHeader.size());
     while (!value.empty() && (value.front() == ' ' || value.front() == '\t')) {
       value.remove_prefix(1);

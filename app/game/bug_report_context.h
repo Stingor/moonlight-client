@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -65,5 +66,7 @@ void AskBugReport(ro::ui::BugReportWindowState& window, std::optional<BugReportC
 
 // Une chaîne prête à entrer entre guillemets dans le JSON.
 [[nodiscard]] std::string JsonEscaped(std::string_view text);
+// La même, bornée à `most_bytes` octets, sans caractère coupé en queue.
+[[nodiscard]] std::string JsonClipped(std::string_view text, std::size_t most_bytes);
 
 }  // namespace moonclient

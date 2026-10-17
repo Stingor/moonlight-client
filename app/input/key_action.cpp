@@ -93,25 +93,6 @@ struct Modifiers {
                    .alt = (key.mod & SDL_KMOD_ALT) != 0};
 }
 
-// Une touche qui ne sert QU'À en modifier une autre ne fait pas un raccourci.
-// Sans ce test, poser un raccourci deviendrait impossible : appuyer sur Alt pour
-// faire « Alt+S » lierait l'action à Alt tout seul.
-[[nodiscard]] bool IsModifierKey(SDL_Keycode key) {
-  switch (key) {
-    case SDLK_LCTRL:
-    case SDLK_RCTRL:
-    case SDLK_LSHIFT:
-    case SDLK_RSHIFT:
-    case SDLK_LALT:
-    case SDLK_RALT:
-    case SDLK_LGUI:
-    case SDLK_RGUI:
-      return true;
-    default:
-      return false;
-  }
-}
-
 void PoseCaptured(ro::ui::HotkeyWindowState* hotkeys, Hotkeys* bindings, ActionRef action,
                   Binding wanted, PresetView* presets) {
   const std::optional<ActionRef> robbed = bindings->Bind(action, wanted);

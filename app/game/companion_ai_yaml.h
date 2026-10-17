@@ -8,6 +8,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -292,5 +293,9 @@ void EmitConducts(YAML::Emitter& out, const YAML::Node& existing,
 // de profils, qui s'appliquent à toutes. Les fiches neuves vont à la fin.
 void EmitCharacters(YAML::Emitter& out, const YAML::Node& existing,
                     const CompanionProfileEdits& edits);
+
+// LE FICHIER ENTIER, en octets. Vide quand il n'existe pas encore — un premier
+// lancement n'est pas une panne —, absent quand il existe sans se laisser lire.
+[[nodiscard]] std::optional<std::string> ReadWhole(const std::filesystem::path& path);
 
 }  // namespace moonclient::companion_yaml
