@@ -74,6 +74,7 @@ void Game::AdvanceZoneMove(std::uint32_t now_ms) {
       reported_handshake_ = ro::net::MoonclientHandshakeState::kUnsent;
       // Ce serveur n'a jamais entendu nos surfaces non plus.
       pieces_.surfaces.Rearm();
+      pieces_.gm_outfit.Rearm();
       // Ni ceux qu'on bloquait : il repart d'une liste vide.
       pieces_.whispers.blocks().Clear();
       ro::core::LogInfo("serveur de zone : entrée acceptée");

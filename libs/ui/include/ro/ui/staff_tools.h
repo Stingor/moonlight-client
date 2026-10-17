@@ -144,6 +144,9 @@ struct StaffToolsLook {
   // différence de l'heure : elle ne change que sous la main du staff.
   bool sky_course_tuned = false;
   render::SkyCourse sky_course;
+  // L'HABIT DU GM sur notre personnage, pour l'administrateur seul. Voir
+  // `StaffToolsState::admin`.
+  bool gm_outfit = false;
 
   // Engendrée : un champ ajouté entre de lui-même dans le relevé.
   friend bool operator==(const StaffToolsLook&, const StaffToolsLook&) = default;
@@ -196,6 +199,9 @@ struct StaffToolsState {
   // bruitages sont coupés. La case se grise alors, cochée ou non, plutôt que de
   // promettre un dessin qui ne viendra pas.
   bool sound_audible = true;
+  // L'ADMINISTRATEUR, posé par l'appelant avant le dessin : la case de l'habit
+  // du GM ne se montre qu'à lui. Revérifié à chaque image, comme `allowed`.
+  bool admin = false;
 
   // LA CONSOLE DE MISE AU POINT, allumée par sa case. ⚠ PAS DANS `look` : elle
   // n'est pas retenue, et chaque lancement la trouve éteinte.
@@ -211,6 +217,10 @@ struct StaffToolsState {
 // ⚠ UNE SEULE RÈGLE pour la composition et le dessin : deux conditions écrites
 // à part finiraient par ne plus dire la même chose.
 [[nodiscard]] bool SoundZonesShown(const StaffToolsState& state) noexcept;
+
+// NOTRE PERSONNAGE PORTE-T-IL L'HABIT DU GM ? La case, ET l'administrateur :
+// une case héritée d'un compte qui ne l'est plus n'habille personne.
+[[nodiscard]] bool GmOutfitWorn(const StaffToolsState& state) noexcept;
 
 // ⚠ LE TITRE PORTE TROIS DIÈSES : ce qui suit est l'IDENTITÉ, que la langue ne
 // change pas ; ce qui précède est le titre montré. Sans cela, traduire

@@ -274,11 +274,12 @@ bool ActorLookOrder::operator()(const ActorLook& left, const ActorLook& right) c
   return std::tie(left.player, left.item, left.job, left.sex, left.hair, left.body_style,
                   left.headgears, left.weapon, left.shield, left.robe, left.cash_mount,
                   left.hair_palette, left.body_palette, left.body_palette_names_file, left.style,
-                  left.orc_head, left.madogear_suit, left.pet_accessory) <
+                  left.orc_head, left.madogear_suit, left.pet_accessory, left.gm_outfit) <
          std::tie(right.player, right.item, right.job, right.sex, right.hair, right.body_style,
                   right.headgears, right.weapon, right.shield, right.robe, right.cash_mount,
                   right.hair_palette, right.body_palette, right.body_palette_names_file,
-                  right.style, right.orc_head, right.madogear_suit, right.pet_accessory);
+                  right.style, right.orc_head, right.madogear_suit, right.pet_accessory,
+                  right.gm_outfit);
 }
 
 ActorWardrobe::ActorWardrobe(vfs::Vfs& vfs, SpriteCatalog catalog)

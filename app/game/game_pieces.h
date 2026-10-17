@@ -61,6 +61,7 @@
 #include "game/companion_ai_stage.h"
 #include "game/craft_stage.h"
 #include "game/damage_meter_stage.h"
+#include "game/gm_outfit_announcer.h"
 #include "game/homunculus_stage.h"
 #include "game/mail_stage.h"
 #include "game/memorial_stage.h"
@@ -525,6 +526,8 @@ struct GamePieces {
   MusicPlayerStage music_player;
   // CE QUE CE CLIENT SAIT MONTRER, annoncé au serveur : voir `SurfaceAnnouncer`.
   SurfaceAnnouncer surfaces;
+  // L'HABIT DU GM DE L'ADMINISTRATEUR, dit au serveur : voir `GmOutfitAnnouncer`.
+  GmOutfitAnnouncer gm_outfit;
 };
 
 // Charge les accessoires DANS la structure, plutôt que d'en rendre une.

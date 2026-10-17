@@ -12110,6 +12110,60 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightGmOutfit& packet) {
+  if (frame.size() != CzMoonlightGmOutfit::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightGmOutfit::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.worn = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightGmOutfit& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightGmOutfit::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightGmOutfit::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U8(static_cast<std::uint8_t>(packet.worn));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightGmOutfit& packet) {
+  if (frame.size() < ZcMoonlightGmOutfit::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightGmOutfit::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.GID = static_cast<std::uint32_t>(reader.U32());
+  packet.worn = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightGmOutfit& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightGmOutfit::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightGmOutfit::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U32(static_cast<std::uint32_t>(packet.GID));
+  writer.U8(static_cast<std::uint8_t>(packet.worn));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

@@ -19059,3 +19059,15 @@ tr: [Lista de emoticonos]
 
 fr: Échanges
 tr: Intercambios
+
+fr: Habit du GM
+tr: Atuendo de GM
+
+fr: Habille notre personnage du corps et de l'épée du GM, à la place de ceux du job. Le reste de la tenue ne change pas.
+tr: Viste a nuestro personaje con el cuerpo y la espada del GM, en lugar de los de su job. El resto del atuendo no cambia.
+
+fr: Les autres joueurs le voient aussi, s'ils jouent sur moonclient : le serveur retient le choix avec le personnage.
+tr: Los demás jugadores también lo ven, si juegan en moonclient: el servidor guarda la elección con el personaje.
+
+fr: Réservé aux administrateurs.
+tr: Reservado a los administradores.

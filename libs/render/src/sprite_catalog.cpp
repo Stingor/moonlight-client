@@ -47,6 +47,7 @@ using catalog_internal::TableName;
 using catalog_internal::WeaponClassOf;
 using catalog_internal::WeaponFamilyClass;
 using catalog_internal::WearsAlternateOutfit;
+using catalog_internal::WearsGmOutfit;
 
 namespace {
 
@@ -415,6 +416,9 @@ std::optional<std::string> BodySpritePath(const SpriteCatalog& catalog, const Ac
     }
     return Join({kSpriteRoot, kItemFolder, kSeparator, *resource});
   }
+  if (WearsGmOutfit(look)) {
+    return catalog_internal::GmBodyPath(look.sex);
+  }
   if (look.player) {
     const std::string_view sex = SexToken(look.sex);
     const std::string_view name = catalog_internal::ShownBodyName(look);
@@ -451,7 +455,7 @@ std::vector<std::string> BodySpritePaths(const SpriteCatalog& catalog, const Act
     return {};
   }
   std::vector<std::string> candidates{std::move(*path)};
-  if (WearsAlternateOutfit(look)) {
+  if (WearsAlternateOutfit(look) && !WearsGmOutfit(look)) {
     // Une tenue alternative que l'installation n'a pas ne doit pas effacer son
     // porteur : le corps ordinaire du métier qu'elle habille prend le relais.
     ActorLook ordinary = look;
@@ -487,6 +491,12 @@ std::vector<std::string> HeadgearSpritePaths(const SpriteCatalog& catalog, const
 }
 
 std::vector<std::string> WeaponSpritePaths(const SpriteCatalog& catalog, const ActorLook& look) {
+  // L'ÉPÉE DU GM, en main même désarmé, Madogear compris ; une monture vide les
+  // mains, la sienne aussi.
+  if (WearsGmOutfit(look)) {
+    return look.cash_mount ? std::vector<std::string>()
+                           : std::vector{catalog_internal::GmSwordPath(look.sex)};
+  }
   if (HoldsNothing(look)) {
     return {};
   }
@@ -531,6 +541,10 @@ std::vector<std::string> WeaponSpritePaths(const SpriteCatalog& catalog, const A
 }
 
 std::vector<std::string> WeaponTrailPaths(const SpriteCatalog& catalog, const ActorLook& look) {
+  // L'HABIT DU GM ÉTEINT LA TRAÎNÉE, et la lueur du Madogear avec elle.
+  if (WearsGmOutfit(look)) {
+    return {};
+  }
   // LE MADOGEAR PORTE LA LUEUR DE SA MACHINE, arme en main ou non.
   if (look.player && !look.cash_mount && IsMadogearJob(BodyClass(look))) {
     client_tables::WeaponSpriteClass machine = WeaponSpriteClassOf(BodyClass(look));

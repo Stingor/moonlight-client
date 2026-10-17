@@ -501,6 +501,14 @@ class World : public WorldHoldings, public WorldNpcDialog {
   [[nodiscard]] std::uint32_t player_id() const noexcept { return player_id_; }
   // Le personnage du joueur. Nul tant que le serveur ne l'a pas nommé.
   [[nodiscard]] const Actor* player() const { return Find(player_id_); }
+  // HABILLE LE JOUEUR EN GM, ou le rend à son métier. Voir `Actor::gm_outfit`.
+  //
+  // ⚠ À REPOSER À CHAQUE IMAGE : un personnage qui réapparaît, à chaque
+  // changement de carte, repart sans l'habit.
+  void DressPlayerAsGameMaster(bool dressed);
+  // CE QUE LE SERVEUR DIT DE L'HABIT D'UN JOUEUR EN VUE. Faux, sans rien
+  // changer, pour un acteur inconnu.
+  bool TellGmOutfit(std::uint32_t id, bool worn);
 
   // ── LA SÉLECTION : ce que le joueur a DÉSIGNÉ en dernier ──────────────────
   //

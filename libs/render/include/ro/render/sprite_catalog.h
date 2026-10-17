@@ -91,6 +91,11 @@ struct ActorLook {
   // au lieu de « 마도기어 », MEISTER_MADOGEAR2 au lieu de 1), et l'ombre
   // s'élargit. Un ÉTAT encore : la valeur d'EFST_MADOGEAR_TYPE.
   bool madogear_suit = false;
+  // L'HABIT DU GM, sur un joueur : le corps et l'épée du personnage GM
+  // remplacent ceux du métier — désarmé, il la tient encore —, et la traînée
+  // de l'arme s'éteint. La tête, les coiffes, le bouclier et la cape restent
+  // ceux du métier, comme dans le client.
+  bool gm_outfit = false;
   // L'ACCESSOIRE D'UN PET : l'apparence que le serveur annonce, zéro pour
   // rien. Il ne pose pas de coiffe : il remplace le .act du corps — voir
   // `PetAccessoryAnimationPath`. Ignoré hors d'un pet.

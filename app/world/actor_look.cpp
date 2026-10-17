@@ -86,6 +86,7 @@ ro::render::ActorLook LookOf(const ro::sim::Actor& actor) {
   const auto madogear = actor.status_values.find(ro::sim::kStatusMadogear);
   look.madogear_suit =
       madogear != actor.status_values.end() && madogear->second == ro::sim::kMadogearSuitValue;
+  look.gm_outfit = look.player && actor.gm_outfit;
   // L'ACCESSOIRE D'UN PET vit dans sa coiffe basse : le serveur l'y pose à
   // l'apparition, et son changement d'état l'y remplace.
   if (actor.familiar == ro::sim::Familiar::kPet) {

@@ -233,6 +233,7 @@ constexpr const char* kExpandedZoomKey = "camera_zoom_extended";
 constexpr const char* kStaffFreeCameraKey = "staff_camera_free";
 constexpr const char* kStaffCameraHudKey = "staff_camera_raised";
 constexpr const char* kStaffSoundZonesKey = "staff_zones_sound";
+constexpr const char* kStaffGmOutfitKey = "staff_gm_outfit";
 constexpr const char* kStaffPickBoxesKey = "staff_zones_clickable";
 constexpr const char* kStaffPickFloorForcedKey = "staff_zones_floor_forced";
 constexpr const char* kStaffPickFloorPixelsKey = "staff_zones_floor_px";
@@ -700,6 +701,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Declare(kStaffFreeCameraKey, &staff_tools_.free_camera);
   into.Declare(kStaffCameraHudKey, &staff_tools_.camera_hud);
   into.Declare(kStaffSoundZonesKey, &staff_tools_.sound_zones);
+  into.Declare(kStaffGmOutfitKey, &staff_tools_.gm_outfit);
   into.Declare(kStaffPickBoxesKey, &staff_tools_.picking.boxes_shown);
   into.Declare(kStaffPickFloorForcedKey, &staff_tools_.picking.actor_floor_forced);
   into.Declare(kStaffPickFloorPixelsKey, &staff_tools_.picking.actor_floor_pixels);

@@ -14,6 +14,7 @@
 #include "ro/net/craft_session.h"
 #include "ro/net/discord_relay.h"
 #include "ro/net/flag_graffiti.h"
+#include "ro/net/gm_outfit.h"
 #include "ro/net/inventory.h"
 #include "ro/net/map_mode.h"
 #include "ro/net/player_bonuses.h"
@@ -221,6 +222,11 @@ FrameOutcome RelayFrame(const Frame& frame, sim::World& world, std::uint32_t now
   }
   // LE MAÎTRE D'UN MONSTRE INVOQUÉ — voir ro/net/unit_master.h.
   if (const FrameOutcome outcome = ApplyUnitMasterFrame(frame, world);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  // L'HABIT DU GM D'UN JOUEUR — voir ro/net/gm_outfit.h.
+  if (const FrameOutcome outcome = ApplyGmOutfitFrame(frame, world);
       outcome != FrameOutcome::kUnhandled) {
     return outcome;
   }

@@ -476,6 +476,21 @@ void World::set_player_id(std::uint32_t id) noexcept {
   pending_player_hp_.reset();
 }
 
+void World::DressPlayerAsGameMaster(bool dressed) {
+  if (const auto found = actors_.find(player_id_); found != actors_.end()) {
+    found->second.gm_outfit = dressed;
+  }
+}
+
+bool World::TellGmOutfit(std::uint32_t id, bool worn) {
+  const auto found = actors_.find(id);
+  if (found == actors_.end()) {
+    return false;
+  }
+  found->second.gm_outfit = worn;
+  return true;
+}
+
 bool World::SetPlayerAttribute(std::uint16_t parameter, std::int64_t base, std::int64_t bonus) {
   // ⚠ `ZC_COUPLESTATUS` NUMÉROTE COMME `enum _sp`, et non de zéro à cinq : son
   // `statusType` vaut SP_STR pour la force. La base passe donc par la même

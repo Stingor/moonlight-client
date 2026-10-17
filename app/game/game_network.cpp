@@ -49,6 +49,19 @@
 
 namespace moonclient {
 
+void Game::FollowGmOutfit() {
+  windows_.staff_tools.admin = Rights().staff_tools && world_.group_level() >= kAdminMinGroupLevel;
+  const bool worn = ro::ui::GmOutfitWorn(windows_.staff_tools);
+  // 🔴 LE NÔTRE SUIT LA CASE, ET NON L'ÉCHO DU SERVEUR : il se voit dès le clic,
+  // et chaque réapparition le pose de nouveau.
+  world_.DressPlayerAsGameMaster(worn);
+  if (link_.is_open()) {
+    pieces_.gm_outfit.Pump(link_,
+                           handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
+                           windows_.staff_tools.admin, worn);
+  }
+}
+
 ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // Le réseau AVANT le dessin : une image doit montrer l'état le plus récent,
   // pas celui d'avant la lecture.

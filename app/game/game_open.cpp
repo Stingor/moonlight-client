@@ -608,6 +608,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LA POIGNÉE DE MAIN EST NEUVE : nos surfaces se ré-annoncent, même si le
   // serveur nous reconnaît dès la première image.
   pieces_.surfaces.Rearm();
+  pieces_.gm_outfit.Rearm();
   viewed_equipment_.emplace(
       pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
       &pieces_.item_words, pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,

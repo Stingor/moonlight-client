@@ -19059,3 +19059,15 @@ tr: [Emoticon list]
 
 fr: Échanges
 tr: Trades
+
+fr: Habit du GM
+tr: GM outfit
+
+fr: Habille notre personnage du corps et de l'épée du GM, à la place de ceux du job. Le reste de la tenue ne change pas.
+tr: Dresses our character in the GM body and sword, instead of the job's. The rest of the outfit does not change.
+
+fr: Les autres joueurs le voient aussi, s'ils jouent sur moonclient : le serveur retient le choix avec le personnage.
+tr: Other players see it too, if they play on moonclient: the server keeps the choice with the character.
+
+fr: Réservé aux administrateurs.
+tr: Administrators only.

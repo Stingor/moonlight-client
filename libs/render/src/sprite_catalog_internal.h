@@ -109,6 +109,12 @@ void AppendMercenaryPieces(std::uint32_t job, std::vector<ActorPieceFiles>& file
 // alors dans le dossier des costumes.
 [[nodiscard]] bool WearsAlternateOutfit(const ActorLook& look);
 
+// L'HABIT DU GM, voir `ActorLook::gm_outfit` : un joueur seulement.
+[[nodiscard]] bool WearsGmOutfit(const ActorLook& look);
+// Le corps de l'habit, et l'épée qu'il tient, sans extension.
+[[nodiscard]] std::string GmBodyPath(std::uint8_t sex);
+[[nodiscard]] std::string GmSwordPath(std::uint8_t sex);
+
 // LE FICHIER QUE LE CLIENT LIT POUR UNE COULEUR DE VÊTEMENT : le n de
 // body_<n>.pal. Pour une couleur positive seulement — zéro ne charge rien.
 //

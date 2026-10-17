@@ -559,6 +559,7 @@ add_library(ro_render STATIC
     src/sprite_shadow.cpp
     src/sprite_catalog_load.cpp
     src/sprite_catalog_dual.cpp
+    src/sprite_catalog_gm.cpp
     src/sprite_catalog_head.cpp
     src/sprite_catalog_mercenary.cpp
     src/sprite_catalog_mount.cpp

@@ -16,7 +16,9 @@ namespace ro::render {
 
 std::optional<DualWieldFiles> DualWieldSpritePaths(const SpriteCatalog& catalog,
                                                    const ActorLook& look) {
-  if (look.shield == 0 || catalog_internal::WeaponClassOf(catalog, look.shield) <= 0) {
+  // L'HABIT DU GM ne tient que son épée, dans une seule main.
+  if (catalog_internal::WearsGmOutfit(look) || look.shield == 0 ||
+      catalog_internal::WeaponClassOf(catalog, look.shield) <= 0) {
     return std::nullopt;
   }
   ActorLook left_alone = look;

@@ -663,6 +663,7 @@ add_library(moonclient_mvptracker STATIC
     game/mvp_alert_sound.cpp
     game/mvp_tracker_bug_report.cpp
     game/surface_announcer.cpp
+    game/gm_outfit_announcer.cpp
     mvp/mvp_line_file.cpp
     mvp/mvp_tracker_compose.cpp
     mvp/mvp_tracker_results.cpp

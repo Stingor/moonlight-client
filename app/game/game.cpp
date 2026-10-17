@@ -56,6 +56,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   if (auto ok = PumpNetwork(now_ms); !ok) {
     return ok;
   }
+  FollowGmOutfit();  // Après le réseau, qui a pu faire réapparaître le joueur.
   // LES QUÊTES SUIVENT LA LANGUE, si le joueur vient d'en changer.
   FollowQuestLanguage(*vfs_, pieces_);
   // ET L'INTERFACE SUIT LE SKIN, s'il vient d'en choisir un autre — les

@@ -66,6 +66,9 @@ inline constexpr std::uint32_t kUiCapInstanceInfo = 0x00004000;
 // Le serveur ne répond qu'à qui l'annonce, et un catalogue lui ouvre le Marché
 // au lieu de la recherche d'échoppes d'origine.
 inline constexpr std::uint32_t kUiCapMarket = 0x00008000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait dessiner l'habit du GM d'un joueur
+// (`ZC 0x0F44`). Même règle : le serveur ne l'envoie qu'à qui l'annonce.
+inline constexpr std::uint32_t kUiCapGmOutfit = 0x00010000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

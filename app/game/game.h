@@ -181,6 +181,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // dans une fonction avec quarante variables locales.
   void PumpEvents(std::uint32_t now_ms);
   [[nodiscard]] ro::core::Result<void> PumpNetwork(std::uint32_t now_ms);
+  // L'HABIT DU GM : sur notre personnage, et dit au serveur. Voir
+  // `GmOutfitAnnouncer`.
+  void FollowGmOutfit();
   // CE QUI VIT HORS DU MONDE LIT LA TRAME APRÈS LUI, et rend l'issue retenue :
   // voir `game_frame_beyond_world.cpp`.
   [[nodiscard]] ro::net::FrameOutcome ApplyFrameBeyondWorld(const ro::net::Frame& received,

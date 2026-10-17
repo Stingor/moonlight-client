@@ -91,6 +91,24 @@ void DrawDebugCamera(StaffToolsLook& look, const SkinArt& art) {
   SkinHelpMarker(core::Tr("Relevé de la caméra"), kCameraHudHelp);
 }
 
+constexpr std::array<const char*, 3> kGmOutfitHelp = {
+    core::TrText("Habille notre personnage du corps et de l'épée du GM, à la place de ceux du "
+                 "job. Le reste de la tenue ne change pas."),
+    core::TrText("Les autres joueurs le voient aussi, s'ils jouent sur moonclient : le serveur "
+                 "retient le choix avec le personnage."),
+    core::TrText("Réservé aux administrateurs."),
+};
+
+void DrawGmOutfit(StaffToolsState& state, const SkinArt& art) {
+  if (!state.admin) {
+    return;
+  }
+  ImGui::SeparatorText(core::Tr("Apparence"));
+  static_cast<void>(SkinCheckBox(core::Tr("Habit du GM"), &state.look.gm_outfit, art));
+  ImGui::SameLine();
+  SkinHelpMarker(core::Tr("Habit du GM"), kGmOutfitHelp);
+}
+
 constexpr std::array<const char*, 4> kSoundZonesHelp = {
     core::TrText("Dessine autour du joueur les sources de son posées par la carte : leur emprise "
                  "en bleu, et le cercle d'où l'on entend leur bruit en vert."),
@@ -348,6 +366,10 @@ bool SoundZonesShown(const StaffToolsState& state) noexcept {
   return state.look.sound_zones && state.sound_audible;
 }
 
+bool GmOutfitWorn(const StaffToolsState& state) noexcept {
+  return state.look.gm_outfit && state.admin;
+}
+
 StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool allowed) {
   StaffToolsAction action;
   // 🔴 LE DROIT SE REVÉRIFIE ICI, À CHAQUE IMAGE. Il n'est ni mémorisé ni
@@ -387,6 +409,7 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
 
   ImGui::PushItemWidth(kControlWidthPixels * ImGui::GetStyle().FontScaleMain);
   DrawCaptureBackdrop(state.look.flat_ground, art);
+  DrawGmOutfit(state, art);
   // Juste avant la caméra.
   static_cast<void>(DrawQuickCastSettings(state.quick_cast, art, allowed));
   DrawDebugCamera(state.look, art);
