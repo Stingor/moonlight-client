@@ -1,5 +1,6 @@
 #include "ro/net/chat_target.h"
 
+#include <array>
 #include <utility>
 #include <vector>
 
@@ -36,6 +37,27 @@ template <typename Packet>
 // seul vise le champ et ne dit rien.
 [[nodiscard]] constexpr std::string_view BattlefieldCommandWord() {
   return kBattlefieldCommand.substr(0, kBattlefieldCommand.find(' '));
+}
+
+// UN MOT DE COMMANDE QUI ADRESSE LA PHRASE, et où elle va.
+struct AddressingWord {
+  std::string_view word;
+  ChatTarget target = ChatTarget::kPublic;
+};
+
+constexpr std::array<AddressingWord, 5> kAddressingWords = {{
+    {.word = BattlefieldCommandWord(), .target = ChatTarget::kBattlefield},
+    {.word = kGuildCommand, .target = ChatTarget::kGuild},
+    {.word = kGuildCommandLong, .target = ChatTarget::kGuild},
+    {.word = kClanCommand, .target = ChatTarget::kClan},
+    {.word = kClanCommandLong, .target = ChatTarget::kClan},
+}};
+
+// La ligne commence par ce mot, seul ou suivi d'une espace : « /bcast » n'est
+// pas « /bc ».
+[[nodiscard]] bool OpensWith(std::string_view line, std::string_view word) {
+  return core::AsciiStartsWithFolded(line, word) &&
+         (line.size() == word.size() || line[word.size()] == ' ');
 }
 
 // CE QUE DIT UNE LIGNE SANS SIGIL : la barre décide, box « Pseudo » d'abord,
@@ -102,12 +124,14 @@ ChatIntent ReadChatIntent(std::string_view line, const ChatArming& armed) {
     return intent;
   }
 
-  // « /bc texte » parle au champ sans toucher au mode de la barre.
-  if (core::AsciiStartsWithFolded(line, kBattlefieldCommand) ||
-      core::AsciiEqualsFolded(line, BattlefieldCommandWord())) {
-    intent.target = ChatTarget::kBattlefield;
-    intent.text = std::string(Trimmed(line.substr(BattlefieldCommandWord().size())));
-    return intent;
+  // « /bc texte », « /gc texte », « /cl texte » parlent au champ, à la guilde,
+  // au clan, sans toucher au mode de la barre.
+  for (const AddressingWord& addressing : kAddressingWords) {
+    if (OpensWith(line, addressing.word)) {
+      intent.target = addressing.target;
+      intent.text = std::string(Trimmed(line.substr(addressing.word.size())));
+      return intent;
+    }
   }
 
   // ⚠ « & » N'EST UN SIGIL QUE SUR UNE CARTE DE CHAMP : ailleurs, la ligne ne

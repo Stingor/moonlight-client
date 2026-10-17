@@ -3,7 +3,10 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <string>
 #include <string_view>
+
+#include "ro/core/i18n.h"
 
 namespace moonclient {
 namespace {
@@ -17,13 +20,17 @@ constexpr unsigned char kFirstNonAscii = 0x80;
   return byte < kFirstNonAscii ? static_cast<char>(std::tolower(byte)) : letter;
 }
 
-// LES COMMANDES QUE LE CLIENT DU JOUEUR CONNAÎT : celles de sa table fixe et
-// celles de sa table dynamique, qu'il traite sans rien envoyer. Rangées dans
-// l'ordre des octets UTF-8.
+// LES COMMANDES QUE LE CLIENT DU JOUEUR CONNAÎT : celles de sa table fixe —
+// noms écrits en clair comme noms comparés octet par octet — et celles de sa
+// table dynamique. Rangées dans l'ordre des octets UTF-8, la forme de la
+// saisie.
+//
+// ⚠ LES MONTÉES DE CARACTÉRISTIQUE N'Y SONT PAS : « /dex+ » sans nombre n'est
+// pas reconnu par le client, et se dit — voir `stat_raise_command.h`.
 //
 // ⚠ LES ÉMOTICÔNES N'Y SONT PAS : le client les tient des fichiers de
 // l'installation, et `EmotionCommand` les prend avant qu'on arrive ici.
-constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
+constexpr std::array<std::string_view, 354> kNativeSlashCommands = {{
     "/Eka",
     "/MacroChecker",
     "/ProbabilityTest",
@@ -40,10 +47,12 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/aura2",
     "/automsg",
     "/autosavechat",
+    "/b",
     "/bangbang",
     "/battlechat",
     "/battlemode",
     "/bawi",
+    "/bb",
     "/bgm",
     "/bingbing",
     "/blacksmith",
@@ -51,6 +60,7 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/bo",
     "/breakguild",
     "/buildinfo",
+    "/bv",
     "/call",
     "/camera",
     "/cashshop",
@@ -64,6 +74,7 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/cmt",
     "/cn",
     "/coxldqkd",
+    "/deal",
     "/delight",
     "/dice",
     "/dkdlxpatmsoq",
@@ -114,10 +125,13 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/font",
     "/fret",
     "/gawi",
+    "/gc",
     "/ghk",
     "/gkxm",
     "/gocp",
     "/goldpc",
+    "/guild",
+    "/guildchat",
     "/guildinvite",
     "/gyrhkdma",
     "/h",
@@ -128,11 +142,14 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/hoai",
     "/hum",
     "/hw",
+    "/in",
     "/inall",
     "/invite",
     "/item",
     "/itemsnap",
+    "/kill",
     "/killall",
+    "/lb",
     "/leave",
     "/li",
     "/lightmap",
@@ -145,6 +162,7 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/macro_register",
     "/macrochecker",
     "/mapmove",
+    "/mb",
     "/md",
     "/memo",
     "/merai",
@@ -162,7 +180,9 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/navigation",
     "/navigation2",
     "/naviopen",
+    "/nb",
     "/nc",
+    "/nlb",
     "/nm",
     "/nm2",
     "/nocosplay",
@@ -193,6 +213,7 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/rc",
     "/rct",
     "/recall",
+    "/red",
     "/refuse",
     "/remove",
     "/removeoff",
@@ -200,13 +221,16 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/resetcooltime",
     "/resetskill",
     "/resetstate",
+    "/rjfo",
     "/rkdnl",
     "/rkfanfl",
     "/rlQma",
     "/rldjr",
+    "/rlfem",
     "/rlfemcheo",
     "/roulette",
     "/ruftjd",
+    "/ryghks",
     "/savechat",
     "/set1",
     "/set2",
@@ -245,6 +269,7 @@ constexpr std::array<std::string_view, 336> kNativeSlashCommands = {{
     "/tp",
     "/traceai",
     "/twitter",
+    "/v",
     "/viewpointvalue",
     "/w",
     "/web",
@@ -370,6 +395,13 @@ bool NativeKnowsSlashCommand(std::string_view line) {
   return std::ranges::any_of(kNativeSlashCommands, [word](std::string_view known) {
     return std::ranges::equal(known, word, [](char a, char b) { return Folded(a) == Folded(b); });
   });
+}
+
+std::span<const std::string_view> NativeSlashCommandNames() { return kNativeSlashCommands; }
+
+std::string SilencedCommandNotice(std::string_view line) {
+  return std::string(ro::core::Tr("Commande non prise en charge, rien n'est parti :")) + " " +
+         std::string(line);
 }
 
 }  // namespace moonclient

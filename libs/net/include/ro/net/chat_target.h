@@ -64,9 +64,9 @@ inline constexpr char kCharCommandSymbol = '#';
 
 // Ce qu'une ligne de saisie vise.
 // ⚠ LE CLAN N'A PAS DE SIGIL, et c'est voulu : le client ne lui en donne pas
-// non plus. Il ne s'atteint que par le sélecteur de mode — un caractère de plus
-// à retenir pour une appartenance qu'on ne choisit même pas serait un mauvais
-// échange.
+// non plus. Il s'atteint par le sélecteur de mode ou par « /cl texte » — un
+// caractère de plus à retenir pour une appartenance qu'on ne choisit même pas
+// serait un mauvais échange.
 enum class ChatTarget : std::uint8_t {
   kPublic,
   kParty,
@@ -96,6 +96,18 @@ enum class ChatTarget : std::uint8_t {
 // l'ennemi.
 inline constexpr char kBattlefieldSigil = '&';
 inline constexpr std::string_view kBattlefieldCommand = "/bc ";
+
+// LA GUILDE ET LE CLAN PAR COMMANDE : « /gc texte » ou « /guildchat texte »,
+// « /cl texte » ou « /clanchat texte ». Même lecture que « /bc » : le mot à la
+// casse ASCII près, puis le texte, sans toucher au mode de la barre.
+//
+// 🔴 UNE PAROLE ADRESSÉE, PAS UNE COMMANDE À TAIRE NI À DIRE : la ligne non
+// reconnue partirait en parole PUBLIQUE, et un message de guilde serait lu par
+// tous ceux qui passent.
+inline constexpr std::string_view kGuildCommand = "/gc";
+inline constexpr std::string_view kGuildCommandLong = "/guildchat";
+inline constexpr std::string_view kClanCommand = "/cl";
+inline constexpr std::string_view kClanCommandLong = "/clanchat";
 
 // Ce que la ligne de saisie veut dire, une fois son sigil retiré.
 struct ChatIntent {
@@ -154,7 +166,8 @@ struct ChatArming {
 
 // Vrai pour une ligne qui part au serveur comme une parole : tout ce qui ne
 // commence pas par une barre oblique, et les barres obliques qui ADRESSENT la
-// phrase (`/w nom texte`, `/bc texte`). Les autres sont des commandes du client.
+// phrase (`/w nom texte`, `/bc texte`, `/gc texte`, `/cl texte`). Les autres
+// sont des commandes du client.
 [[nodiscard]] bool IsSpokenLine(std::string_view line);
 
 // Envoie ce que l'intention dit, à qui elle dit. `speaker` est le nom du

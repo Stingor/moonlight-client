@@ -18885,3 +18885,6 @@ tr: Desde (hora)
 
 fr: À (heure)
 tr: Hasta (hora)
+
+fr: Commande non prise en charge, rien n'est parti :
+tr: Comando no admitido, no se ha enviado nada:

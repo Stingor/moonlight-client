@@ -18885,3 +18885,6 @@ tr: From (hour)
 
 fr: À (heure)
 tr: To (hour)
+
+fr: Commande non prise en charge, rien n'est parti :
+tr: Unsupported command, nothing was sent:

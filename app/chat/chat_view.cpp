@@ -779,7 +779,7 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
   }
   // 🔴 CE QUE LE CLIENT DU JOUEUR NE CONNAÎT PAS PART AU SERVEUR, comme une
   // parole ordinaire et barre oblique comprise : tous la lisent. Ce qu'il
-  // connaît et que nous n'avons pas repris se tait. Voir
+  // connaît et que nous n'avons pas repris se tait, et le dit en gris. Voir
   // `NativeKnowsSlashCommand`.
   if (!NativeKnowsSlashCommand(line)) {
     if (to.link->is_open()) {
@@ -787,7 +787,8 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     }
     return;
   }
-  to.world->RecordChat(ro::sim::ChatKind::kServer, 0, "commande inconnue : " + line, said_ms);
+  to.world->RecordChat(ro::sim::ChatKind::kServer, 0, SilencedCommandNotice(line), said_ms,
+                       kSilencedCommandColor);
 }
 
 }  // namespace moonclient
