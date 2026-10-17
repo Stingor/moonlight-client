@@ -58,8 +58,15 @@ class TextureGlowCache {
 // à sa taille de pleine lueur.
 inline constexpr float kEffectLightGain = 1.2F;
 // Le plafond de chaque canal d'une lumière d'effet : au-delà, toute la couleur
-// baisse ensemble, et la teinte reste.
-inline constexpr float kEffectLightPeak = 2.0F;
+// baisse ensemble, et la teinte reste. Un grand sort l'atteint d'un bout à
+// l'autre : au-delà, le sol qu'il éclaire vire au blanc.
+inline constexpr float kEffectLightPeak = 1.2F;
+// L'OMBRE D'UN SORT EST DOUCE : un sort est un volume de lumière, non une
+// flamme, et un obstacle ne le cache jamais tout entier. Son ombre ne retire
+// que cette part de sa lumière, avec une pénombre de cette part de la distance
+// — voir `PointLight::shadow_depth` et `PointLight::shadow_spread`.
+inline constexpr float kEffectShadowDepth = 0.6F;
+inline constexpr float kEffectShadowSpread = 0.06F;
 // Le demi-diamètre d'une couche, en unités du monde, à partir duquel elle luit
 // de toute son intensité : une couche plus petite luit en proportion. Une
 // étincelle ou un flocon n'éclaire pas le sol.

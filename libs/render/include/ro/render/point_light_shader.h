@@ -75,6 +75,9 @@ uniform int u_point_shadowed;
 uniform samplerCubeShadow u_point_shadow_0;
 uniform samplerCubeShadow u_point_shadow_1;
 uniform float u_point_shadow_far[kMaxShadowedPointLights];
+// Voir `PointLight::shadow_depth` et `PointLight::shadow_spread`.
+uniform float u_point_shadow_depth[kMaxShadowedPointLights];
+uniform float u_point_shadow_spread[kMaxShadowedPointLights];
 // Le plan proche de chaque face : voir `kPointShadowClearanceWorld`.
 uniform float u_point_shadow_clearance;
 // Le côté d'un texel à une unité de la lumière.
@@ -86,6 +89,9 @@ const float kPointShadowPullTexels = 1.5;
 // qui sépare le point du centre de celui qui le couvre.
 const float kPointShadowLiftTexels = 3.0;
 const int kPointTapRadius = 1;
+// Une ombre à pénombre se lit sur un carré plus large, aux lectures écartées :
+// sans quoi l'écart ferait des marches.
+const int kPointSoftTapRadius = 2;
 // Sous ce cosinus, le rayon est trop près de la verticale pour en tirer un côté.
 const float kPointUprightCosine = 0.9;
 
@@ -107,7 +113,7 @@ float PointShadowReference(vec3 from_light, float far_world) {
 // `surface_normal` : la normale de la face qui reçoit, de signe quelconque, ou
 // zéro pour un point sans face.
 float PointShadowTaps(samplerCubeShadow map, vec3 from_light, float far_world, float pull,
-                      vec3 surface_normal) {
+                      vec3 surface_normal, float spread) {
     if (PointShadowAxis(from_light) <= u_point_shadow_clearance) {
         return 1.0;
     }
@@ -124,14 +130,22 @@ float PointShadowTaps(samplerCubeShadow map, vec3 from_light, float far_world, f
     way = lifted / lifted_world;
     vec3 nearer = way * max(lifted_world - pull - texel_world * kPointShadowPullTexels,
                             u_point_shadow_clearance);
-    vec3 other = abs(way.y) < kPointUprightCosine ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
-    vec3 side = normalize(cross(way, other));
-    vec3 lift = cross(way, side);
+    // L'écart entre deux lectures : un texel, ou la pénombre partagée entre
+    // elles quand elle est plus large.
+    int radius = spread > 0.0 ? kPointSoftTapRadius : kPointTapRadius;
+    float step_world = max(texel_world, distance_world * spread / float(radius));
+    // LE CARRÉ SE POSE perpendiculairement au rayon ; celui d'une pénombre, à
+    // plat sur la face qui reçoit. Écartées en travers du rayon, ses lectures
+    // passeraient derrière une face inclinée, qui s'ombrerait elle-même.
+    vec3 across = spread > 0.0 && length(facing) > 0.0 ? facing : way;
+    vec3 other = abs(across.y) < kPointUprightCosine ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+    vec3 side = normalize(cross(across, other));
+    vec3 lift = cross(across, side);
     float lit = 0.0;
     float taps = 0.0;
-    for (int row = -kPointTapRadius; row <= kPointTapRadius; ++row) {
-        for (int column = -kPointTapRadius; column <= kPointTapRadius; ++column) {
-            vec3 tap = nearer + (side * float(column) + lift * float(row)) * texel_world;
+    for (int row = -radius; row <= radius; ++row) {
+        for (int column = -radius; column <= radius; ++column) {
+            vec3 tap = nearer + (side * float(column) + lift * float(row)) * step_world;
             lit += texture(map, vec4(tap, PointShadowReference(tap, far_world)));
             taps += 1.0;
         }
@@ -140,17 +154,18 @@ float PointShadowTaps(samplerCubeShadow map, vec3 from_light, float far_world, f
 }
 
 // La part de la lumière `index` qui atteint `world_position` : un sans carte.
+// L'ombre n'en retire que sa profondeur.
 float PointVisibility(int index, vec3 world_position, float pull, vec3 surface_normal) {
     if (index >= u_point_shadowed) {
         return 1.0;
     }
     vec3 from_light = world_position - u_point_position[index];
-    if (index == 0) {
-        return PointShadowTaps(u_point_shadow_0, from_light, u_point_shadow_far[0], pull,
-                               surface_normal);
-    }
-    return PointShadowTaps(u_point_shadow_1, from_light, u_point_shadow_far[1], pull,
-                           surface_normal);
+    float lit = index == 0
+                    ? PointShadowTaps(u_point_shadow_0, from_light, u_point_shadow_far[0], pull,
+                                      surface_normal, u_point_shadow_spread[0])
+                    : PointShadowTaps(u_point_shadow_1, from_light, u_point_shadow_far[1], pull,
+                                      surface_normal, u_point_shadow_spread[1]);
+    return mix(1.0, lit, u_point_shadow_depth[index]);
 }
 
 vec3 PointLightingOf(vec3 world_position, vec3 surface_normal, float pull) {

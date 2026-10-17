@@ -66,11 +66,13 @@ class GlowSum {
     if (brightest > kEffectLightPeak) {
       color *= kEffectLightPeak / brightest;
     }
-    out.push_back(PointLight{
-        .world_position = weighted_centre_ / weight_,
-        .color = color,
-        .range_world = std::clamp(weighted_size_ / weight_ * kEffectLightRangePerSize,
-                                  kEffectLightMinRangeWorld, kEffectLightMaxRangeWorld)});
+    out.push_back(
+        PointLight{.world_position = weighted_centre_ / weight_,
+                   .color = color,
+                   .range_world = std::clamp(weighted_size_ / weight_ * kEffectLightRangePerSize,
+                                             kEffectLightMinRangeWorld, kEffectLightMaxRangeWorld),
+                   .shadow_depth = kEffectShadowDepth,
+                   .shadow_spread = kEffectShadowSpread});
   }
 
  private:

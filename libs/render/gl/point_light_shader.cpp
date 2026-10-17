@@ -82,14 +82,20 @@ void SetPointLightUniforms(const GlProgram& program, const PointLightSet& set) {
   const std::size_t shadowed =
       maps ? std::min({set.shadowed_count, count, kMaxShadowedPointLights}) : 0;
   std::array<float, kMaxShadowedPointLights> fars{};
+  std::array<float, kMaxShadowedPointLights> depths{};
+  std::array<float, kMaxShadowedPointLights> spreads{};
   for (std::size_t rank = 0; rank < kMaxShadowedPointLights; ++rank) {
     const int unit = kPointShadowFirstTextureUnit + static_cast<int>(rank);
     program.SetInt(kShadowSamplers[rank], unit);
     if (rank < shadowed) {
       fars[rank] = PointShadowFar(set.lights[rank].range_world);
+      depths[rank] = std::clamp(set.lights[rank].shadow_depth, 0.0F, 1.0F);
+      spreads[rank] = std::max(set.lights[rank].shadow_spread, 0.0F);
       set.shadow_maps->Bind(unit, rank);
     }
   }
+  program.SetFloatArray("u_point_shadow_depth", std::span(depths));
+  program.SetFloatArray("u_point_shadow_spread", std::span(spreads));
   if (shadowed > 0) {
     glActiveTexture(GL_TEXTURE0);
   }

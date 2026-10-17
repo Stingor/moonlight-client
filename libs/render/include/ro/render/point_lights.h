@@ -20,6 +20,14 @@ struct PointLight {
   glm::vec3 color{0};
   // Le rayon où elle s'éteint, en unités du monde.
   float range_world = 0;
+  // CE QUE SON OMBRE LUI RETIRE, de zéro à un. Un : l'ombre éteint toute sa
+  // lumière, comme celle d'une flamme. Moins : une part passe, comme autour
+  // d'une source large qu'un obstacle ne cache jamais tout entière.
+  float shadow_depth = 1.0F;
+  // LA PÉNOMBRE de son ombre : la demi-largeur du carré où la carte se lit, en
+  // part de la distance à la lumière. Zéro : le bord le plus net que la carte
+  // permet.
+  float shadow_spread = 0.0F;
 };
 
 // Le plafond des lumières qu'un dessin reçoit : la taille des tableaux
