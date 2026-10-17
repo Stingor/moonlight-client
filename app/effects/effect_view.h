@@ -484,6 +484,8 @@ class EffectsInPlay {
   // ⚠ IL FAUT DONC AVOIR APPELÉ `Drawn` À CETTE IMAGE. L'appelant le fait déjà
   // — il dessine ce lot avant les acteurs et l'autre après —, et un lot vide est
   // ce que rend une image où rien n'est passé derrière.
+  // Et ceux qui passent entre les deux : ce que le dernier `Drawn` a rendu.
+  [[nodiscard]] std::span<const ro::render::DrawnEffect> DrawnAmongActors() const { return drawn_; }
   [[nodiscard]] std::span<const ro::render::DrawnEffect> DrawnBehindActors() const {
     return behind_;
   }

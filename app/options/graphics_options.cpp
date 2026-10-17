@@ -21,6 +21,7 @@ using ro::ui::OptionRowView;
 constexpr const char* kLightmapsKey = "shadows_of_the_map";
 constexpr const char* kColdLightKey = "light_cold";
 constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
+constexpr const char* kEffectLightsKey = "light_from_effects";
 constexpr const char* kDayNightCycleKey = "cycle_day_night";
 constexpr const char* kFogKey = "fog";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
@@ -57,6 +58,7 @@ enum class GraphicsRow : int {
   kLightmaps = 0,
   kColdLight,
   kSunShadows,
+  kEffectLights,
   kDayNightCycle,
   kFog,
   kDecorVeil,
@@ -199,6 +201,7 @@ ro::render::ModelTextureFilter GraphicsOptions::decor_filter() const {
 void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kLightmapsKey, &lightmaps_);
   into.Declare(kColdLightKey, &cold_light_);
+  into.Declare(kEffectLightsKey, &effect_lights_);
   into.Declare(kDayNightCycleKey, &day_night_cycle_);
   into.Declare(kFogKey, &fog_);
   into.Declare(kDecorVeilKey, &decor_veil_);
@@ -257,6 +260,11 @@ void GraphicsOptions::Compose() {
       nullptr, sun_shadows_));
   rows_.back().indented = true;
   rows_.back().disabled = !lightmaps_;
+  rows_.push_back(Toggle(GraphicsRow::kEffectLights, Tr("Les sorts éclairent"),
+                         Tr("Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et "
+                            "les personnages autour de lui, de la couleur de ses flammes.\n\nLe "
+                            "client d'origine ne le fait pas."),
+                         nullptr, effect_lights_));
   rows_.push_back(Toggle(GraphicsRow::kDayNightCycle, Tr("Cycle jour/nuit"),
                          Tr("Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : "
                             "lumière du matin, du midi et du soir, puis une nuit plus sombre et "
@@ -452,6 +460,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kSunShadows:
       sun_shadows_ = asked.on;
+      break;
+    case GraphicsRow::kEffectLights:
+      effect_lights_ = asked.on;
       break;
     case GraphicsRow::kDayNightCycle:
       day_night_cycle_ = asked.on;

@@ -171,14 +171,17 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   }
   // LES LUMIÈRES PONCTUELLES DU DOCUMENT D'ÉDITION, les plus proches de ce que
   // la caméra regarde : voir docs/adr/0119.
-  // Leurs ombres se peignent ici, avant la passe de couleur.
-  const ro::render::PointLightSet points = DrawPointShadowsIfAsked(
-      ro::render::MapPointLights(
-          ro::render::DocumentLights(map_edits_.Document(stage_->name),
-                                     stage_->scene.rsw.effects()),
-          ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
-          sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms), sky.hour),
-      models_shown, carts);
+  // Leurs ombres se peignent ici, avant la passe de couleur. Celles des effets
+  // suivent, sans ombre : voir docs/adr/0120.
+  const ro::render::PointLightSet points = ro::render::WithEffectLights(
+      DrawPointShadowsIfAsked(
+          ro::render::MapPointLights(
+              ro::render::DocumentLights(map_edits_.Document(stage_->name),
+                                         stage_->scene.rsw.effects()),
+              ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
+              sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms), sky.hour),
+          models_shown, carts),
+      effect_lights_, camera_.look_at);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());
@@ -427,6 +430,11 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   DrawEffectLayers(*effects_, *effect_nodes_, *actor_sounds_, footprints_, drops_, scene, sprites_,
                    effect_renderer_, pieces_.effect_ground, aspect_ratio_,
                    static_cast<float>(size_.width), static_cast<float>(size_.height), fog);
+  // LES LUMIÈRES DES SORTS QUI VIENNENT DE SE PEINDRE, pour l'image suivante.
+  effect_lights_.clear();
+  if (settings_->options().graphics().effect_lights()) {
+    GatherEffectLights(*effects_, *effect_nodes_, camera_, effect_glows_, effect_lights_);
+  }
   if (const std::optional<std::uint32_t> quake = effects_->TakeScreenQuake()) {
     aim_.shake.Request(*quake);
   }
@@ -701,6 +709,7 @@ void Game::ForgetWhatPlayed() {
   if (effects_.has_value()) {
     effects_->Forget();
   }
+  effect_lights_.clear();
   if (effect_nodes_.has_value()) {
     effect_nodes_->Forget();
   }

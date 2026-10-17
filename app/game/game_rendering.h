@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "ro/render/effect_lights.h"
 #include "ro/render/effect_renderer.h"
 #include "ro/render/map_effects.h"
 #include "ro/render/model_clock.h"
@@ -35,6 +36,10 @@ class GameRendering {
   // qui en demande ; même refus retenu.
   ro::render::PointShadowMaps point_maps_;
   bool point_maps_refused_ = false;
+  // LES LUMIÈRES DES EFFETS DE L'IMAGE PRÉCÉDENTE, que la suivante reçoit : les
+  // effets se composent après le sol qu'elles éclairent. Voir docs/adr/0120.
+  std::vector<ro::render::PointLight> effect_lights_;
+  ro::render::TextureGlowCache effect_glows_;
   // LE VIDE SOUS LE MONDE, assombri par l'heure ; créé à la première nuit.
   ro::render::VoidShade void_shade_;
   bool void_shade_refused_ = false;

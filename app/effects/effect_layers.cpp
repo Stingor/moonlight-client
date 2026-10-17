@@ -210,6 +210,19 @@ void PaintEffectsLast(EffectsInPlay& effects, EffectNodesInPlay& nodes, const Ef
   }
 }
 
+void GatherEffectLights(const EffectsInPlay& effects, const EffectNodesInPlay& nodes,
+                        const ro::render::Camera& camera, ro::render::TextureGlowCache& glows,
+                        std::vector<ro::render::PointLight>& out) {
+  out.clear();
+  const ro::render::BillboardBasis basis = ro::render::MakeBillboardBasis(camera);
+  for (const std::span<const ro::render::DrawnEffect> files :
+       {effects.DrawnBehindActors(), effects.DrawnAmongActors(), effects.DrawnOverEverything()}) {
+    ro::render::EffectLightsOf(files, {}, basis, glows, out);
+  }
+  ro::render::EffectLightsOf({}, effects.LaidOnGround(), basis, glows, out);
+  ro::render::EffectLightsOf({}, nodes.WorldQuads(), basis, glows, out);
+}
+
 // ⚠ L'ORDRE DES COUCHES EST UN CHOIX PAR PRIMITIVE CHEZ LE CLIENT, PAS UN ORDRE
 // GLOBAL — et c'est pourquoi cette fonction ne peut pas encore le rendre.
 //

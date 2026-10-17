@@ -3,6 +3,7 @@
 #include <span>
 
 #include "ro/render/camera.h"
+#include "ro/render/effect_lights.h"
 #include "ro/render/effect_renderer.h"
 #include "ro/render/effect_track_motion.h"
 #include "ro/render/ground_quad_renderer.h"
@@ -87,6 +88,13 @@ void PaintStrEffects(EffectsInPlay& effects, EffectNodesInPlay& nodes,
 // Le reste : les quads du monde tardifs, les cases de terrain, ce qui passe
 // par-dessus tout, et ce qui se peint en pixels d'écran.
 void PaintEffectsLast(EffectsInPlay& effects, EffectNodesInPlay& nodes, const EffectPainters& to);
+
+// LES LUMIÈRES DES EFFETS que cette image vient de peindre, rangées dans `out`
+// qu'elle vide d'abord : les fichiers des trois files, ce qu'une méthode nommée
+// couche au sol, et les quads du monde des nœuds. Voir docs/adr/0120.
+void GatherEffectLights(const EffectsInPlay& effects, const EffectNodesInPlay& nodes,
+                        const ro::render::Camera& camera, ro::render::TextureGlowCache& glows,
+                        std::vector<ro::render::PointLight>& out);
 
 // INSCRIT SUR LES ACTEURS les effets que `EffectsInPlay::TakeActorEffects` a
 // rendus, et en retire ceux qu'une levée d'état emporte.

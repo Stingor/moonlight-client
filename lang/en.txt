@@ -18888,3 +18888,9 @@ tr: To (hour)
 
 fr: Commande non prise en charge, rien n'est parti :
 tr: Unsupported command, nothing was sent:
+
+fr: Les sorts éclairent
+tr: Spells cast light
+
+fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes.\n\nLe client d'origine ne le fait pas.
+tr: A fire, lightning or holy spell lights the ground, the scenery and the characters around it, in the colour of its flames.\n\nThe original client does not.
