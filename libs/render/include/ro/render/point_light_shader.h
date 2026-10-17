@@ -92,6 +92,7 @@ const int kPointTapRadius = 1;
 // Une ombre à pénombre se lit sur un carré plus large, aux lectures écartées :
 // sans quoi l'écart ferait des marches.
 const int kPointSoftTapRadius = 2;
+const float kPointSoftPullShare = 1.5;
 // Sous ce cosinus, le rayon est trop près de la verticale pour en tirer un côté.
 const float kPointUprightCosine = 0.9;
 
@@ -128,12 +129,17 @@ float PointShadowTaps(samplerCubeShadow map, vec3 from_light, float far_world, f
     vec3 lifted = from_light + facing * (slant * kPointShadowLiftTexels * texel_world);
     float lifted_world = length(lifted);
     way = lifted / lifted_world;
-    vec3 nearer = way * max(lifted_world - pull - texel_world * kPointShadowPullTexels,
-                            u_point_shadow_clearance);
     // L'écart entre deux lectures : un texel, ou la pénombre partagée entre
     // elles quand elle est plus large.
     int radius = spread > 0.0 ? kPointSoftTapRadius : kPointTapRadius;
     float step_world = max(texel_world, distance_world * spread / float(radius));
+    // UNE PÉNOMBRE AVANCE ENCORE de sa demi-largeur fois `kPointSoftPullShare` :
+    // ses lectures débordent de la face qui reçoit, et la face voisine — le
+    // mur au pied duquel est le sol, l'autre triangle d'un pli — ne doit pas
+    // l'ombrer. Un obstacle plus loin ombre toujours.
+    float soft_pull = spread > 0.0 ? kPointSoftPullShare * float(radius) * step_world : 0.0;
+    vec3 nearer = way * max(lifted_world - pull - texel_world * kPointShadowPullTexels - soft_pull,
+                            u_point_shadow_clearance);
     // LE CARRÉ SE POSE perpendiculairement au rayon ; celui d'une pénombre, à
     // plat sur la face qui reçoit. Écartées en travers du rayon, ses lectures
     // passeraient derrière une face inclinée, qui s'ombrerait elle-même.
