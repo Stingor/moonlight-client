@@ -18867,3 +18867,9 @@ tr: Restore effect %zu
 
 fr: La retouche de l'effet %zu n'a pas de raison.
 tr: The edit of effect %zu has no reason.
+
+fr: Ombres des lumières ponctuelles
+tr: Shadows of point lights
+
+fr: Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du décor et des personnages : les deux plus proches de la caméra. La carte graphique travaille davantage ; coupées, ces lumières éclairent sans ombre.
+tr: Lights placed with the map editor — lanterns, braziers — cast the shadows of the scenery and the characters: the two nearest the camera. The graphics card works harder; turned off, these lights shine without shadows.

@@ -58,6 +58,7 @@ enum class GraphicsRow : int {
   kLightmaps = 0,
   kColdLight,
   kSunShadows,
+  kPointLightShadows,
   kDayNightCycle,
   kFog,
   kDecorVeil,
@@ -259,6 +260,12 @@ void GraphicsOptions::Compose() {
                          nullptr, sun_shadows_));
   rows_.back().indented = true;
   rows_.back().disabled = !lightmaps_;
+  rows_.push_back(Toggle(
+      GraphicsRow::kPointLightShadows, Tr("Ombres des lumières ponctuelles"),
+      Tr("Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du "
+         "décor et des personnages : les deux plus proches de la caméra. La carte graphique "
+         "travaille davantage ; coupées, ces lumières éclairent sans ombre."),
+      nullptr, point_light_shadows_));
   rows_.push_back(Toggle(GraphicsRow::kDayNightCycle, Tr("Cycle jour/nuit"),
                          Tr("Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : "
                             "lumière du matin, du midi et du soir, puis une nuit plus sombre et "
@@ -454,6 +461,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kSunShadows:
       sun_shadows_ = asked.on;
+      break;
+    case GraphicsRow::kPointLightShadows:
+      point_light_shadows_ = asked.on;
       break;
     case GraphicsRow::kDayNightCycle:
       day_night_cycle_ = asked.on;
