@@ -45,12 +45,8 @@ void Game::FollowCraftGestures(const CraftGestures& asked, std::uint32_t now_ms)
     }
   }
   if (described != 0) {
-    windows_.description.item_id = described;
-    windows_.description.from_slot = from_slot;
-    windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-    windows_.description.open = true;
-    windows_.description.place_at_mouse = true;
-    windows_.description.raise = true;
+    ro::ui::OpenItemDescription(windows_.description, described, from_slot,
+                                ro::ui::ItemHolder::kInventory);
   }
 
   // L'APERÇU AU SURVOL, si aucune autre fenêtre ne l'a pris.

@@ -8,9 +8,6 @@
 #include <string>
 #include <utility>
 
-#include "ro/vfs/item_link.h"
-#include "ro/vfs/item_table.h"
-
 #include "game/game.h"
 
 namespace moonclient {
@@ -37,84 +34,16 @@ void Game::AdvanceCraftAtlas(std::uint32_t now_ms) {
   if (answer.only_craftable.has_value()) {
     options.SetOnlyCraftable(*answer.only_craftable, &settings_->file());
   }
-  // L'APERÇU AU SURVOL, comme sur une case — quand le réglage le veut.
-  if (answer.item.hovered_id != 0 && options.preview()) {
-    hovered_item_ = answer.item.hovered_id;
-    hovered_slot_ = 0;
-    hovered_holder_ = ro::ui::ItemHolder::kInventory;
-  }
-
   // ── LES GESTES SUR UNE LIGNE, les mêmes que partout où un item se montre ──
   //
-  // ⚠ UNE LIGNE D'ATLAS EST UN ITEM DE CATALOGUE : ni raffinement, ni cartes.
-  // Il se décrit, se relaie et s'interroge par son seul identifiant — et le
-  // clic gauche, lui, est resté dans la fenêtre : il y navigue.
-  const std::uint32_t item_id = answer.item.item_id;
-  switch (item_id == 0 ? ro::ui::ChatLinkGesture::kNothing : answer.item.gesture) {
-    case ro::ui::ChatLinkGesture::kDescribe:
-      windows_.description.item_id = item_id;
-      windows_.description.from_slot = 0;
-      windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-      windows_.description.open = true;
-      windows_.description.place_at_mouse = true;
-      windows_.description.raise = true;
-      break;
-    case ro::ui::ChatLinkGesture::kRepost:
-      PostChatLink(ro::vfs::ItemLink{.item_id = item_id});
-      break;
-    case ro::ui::ChatLinkGesture::kOpenDatabase:
-      FollowDescriptionLink(
-          ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(item_id)}, now_ms);
-      break;
-    case ro::ui::ChatLinkGesture::kMarketSearch:
-      pieces_.trade.market().AskOpen(item_id);
-      break;
-    case ro::ui::ChatLinkGesture::kGameDatabase:
-      database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = item_id});
-      break;
-    case ro::ui::ChatLinkGesture::kItemInfo:
-    case ro::ui::ChatLinkGesture::kWhoDrops: {
-      const char* const verb =
-          answer.item.gesture == ro::ui::ChatLinkGesture::kItemInfo ? "@iteminfo " : "@whodrops ";
-      if (chat_dispatch_.has_value()) {
-        SubmitChat(*chat_dispatch_, verb + std::to_string(item_id), now_ms);
-      }
-      break;
-    }
-    case ro::ui::ChatLinkGesture::kVoteShop:
-      // Le vote shop : la boutique s'ouvre, l'item au panier.
-      static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop.state, link_));
-      break;
-    case ro::ui::ChatLinkGesture::kSeeInAlbum:
-      ShowCardInAlbum(item_id, now_ms);
-      break;
-    case ro::ui::ChatLinkGesture::kNothing:
-    case ro::ui::ChatLinkGesture::kMenu:
-    case ro::ui::ChatLinkGesture::kTryStyle:
-    case ro::ui::ChatLinkGesture::kCopyCode:
-    case ro::ui::ChatLinkGesture::kOpenBestiary:
-    case ro::ui::ChatLinkGesture::kOpenInNavigation:
-    case ro::ui::ChatLinkGesture::kPlaceContents:
-    case ro::ui::ChatLinkGesture::kStaffWarp:
-    case ro::ui::ChatLinkGesture::kWhisperWindow:
-    case ro::ui::ChatLinkGesture::kInviteParty:
-    case ro::ui::ChatLinkGesture::kInviteGuild:
-    case ro::ui::ChatLinkGesture::kAddFriend:
-    case ro::ui::ChatLinkGesture::kMonsterSheet:
-    case ro::ui::ChatLinkGesture::kShareRespawn:
-    case ro::ui::ChatLinkGesture::kGuideToTomb:
-    case ro::ui::ChatLinkGesture::kWhereToFind:
-    case ro::ui::ChatLinkGesture::kMobInfo:
-    case ro::ui::ChatLinkGesture::kWhereIs:
-    case ro::ui::ChatLinkGesture::kAddToMvpLog:
-    case ro::ui::ChatLinkGesture::kInviteMvp:
-    case ro::ui::ChatLinkGesture::kShowImageOnce:
-    case ro::ui::ChatLinkGesture::kAllowImageHost:
-    case ro::ui::ChatLinkGesture::kViewImage:
-    case ro::ui::ChatLinkGesture::kPostWhereToFind:
-    case ro::ui::ChatLinkGesture::kGoThere:
-      break;
+  // ⚠ UNE LIGNE D'ATLAS EST UN ITEM DE CATALOGUE : ni raffinement, ni cartes. Et
+  // le clic gauche, lui, est resté dans la fenêtre : il y navigue. L'aperçu au
+  // survol, comme sur une case, seulement quand le réglage le veut.
+  ro::ui::ChatLinkAsk item = answer.item;
+  if (!options.preview()) {
+    item.hovered_id = 0;
   }
+  FollowCatalogItem(item, now_ms);
 
   // « Obtenir tout » et « Obtenir le manque » du staff : le droit se relit ici,
   // au geste.

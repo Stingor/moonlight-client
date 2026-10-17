@@ -576,6 +576,11 @@ void NoteDescriptionNavigation(DescriptionWindowState& state);
 // Décrit cet objet À LA PLACE de celui qu'on lit, et empile celui-ci — le geste
 // d'un lien suivi DEPUIS la description.
 void NavigateDescription(DescriptionWindowState& state, std::uint32_t item_id);
+// OUVRE LA DESCRIPTION D'UN OBJET sous le curseur, et la pose devant : le geste
+// de tout clic qui décrit. `from_slot` et `from_holder` disent d'où l'objet
+// sort, ce qui décore son nom ; zéro et le sac pour un objet de catalogue.
+void OpenItemDescription(DescriptionWindowState& state, std::uint32_t item_id,
+                         std::uint16_t from_slot, ItemHolder from_holder);
 
 // LA LARGEUR MAXIMALE DE L'APERÇU.
 //

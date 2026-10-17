@@ -620,6 +620,16 @@ void DrawDescriptionTab(DescriptionWindowState& state, const DescriptionView& vi
   }
 }
 
+void OpenItemDescription(DescriptionWindowState& state, std::uint32_t item_id,
+                         std::uint16_t from_slot, ItemHolder from_holder) {
+  state.item_id = item_id;
+  state.from_slot = from_slot;
+  state.from_holder = from_holder;
+  state.open = true;
+  state.place_at_mouse = true;
+  state.raise = true;
+}
+
 DescriptionWindowAction DrawDescriptionWindow(DescriptionWindowState& state,
                                               const DescriptionView& view, const SkinArt& art) {
   DescriptionWindowAction action;

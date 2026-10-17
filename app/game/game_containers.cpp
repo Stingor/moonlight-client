@@ -279,12 +279,8 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
                                              .id = answers.inventory.database_item_id});
   }
   if (asked.describe_id != 0) {
-    windows_.description.item_id = asked.describe_id;
-    windows_.description.from_slot = 0;
-    windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-    windows_.description.open = true;
-    windows_.description.place_at_mouse = true;
-    windows_.description.raise = true;
+    ro::ui::OpenItemDescription(windows_.description, asked.describe_id, 0,
+                                ro::ui::ItemHolder::kInventory);
   }
   if (asked.database_id != 0) {
     FollowDescriptionLink(

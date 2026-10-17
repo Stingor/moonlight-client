@@ -61,6 +61,7 @@
 #include "game/game_rendering.h"
 #include "game/game_settings.h"
 #include "game/game_ui_buffers.h"
+#include "game/item_gesture.h"
 #include "game/ui_stage.h"
 #include "guild/guild_emblems.h"
 #include "guild/guild_panel.h"
@@ -716,6 +717,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link, std::string_view sender,
                      std::uint32_t now_ms);
   void FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms);
+  void FollowItemGesture(ro::ui::ChatLinkGesture gesture, const ItemGestureTarget& item,
+                         std::uint32_t now_ms);
   void FollowTradeItem(const TradeItemFocus& focus, std::uint32_t now_ms);
   // UN NOM DE MONSTRE d'où qu'il vienne, puis une recherche `<NAVS>` et son ouverture.
   void FollowMonsterGesture(ro::ui::ChatLinkGesture gesture, const MonsterLink& monster,

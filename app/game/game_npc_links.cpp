@@ -39,12 +39,8 @@ void Game::FollowNpcDialogLink(const ro::ui::NpcDialogAnswer& answer, std::uint3
       // script parle d'un objet, pas d'un exemplaire qu'on posséderait.
       const auto item_id = static_cast<std::uint32_t>(std::atoi(answer.followed_payload.c_str()));
       if (item_id != 0) {
-        windows_.description.item_id = item_id;
-        windows_.description.from_slot = 0;
-        windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-        windows_.description.open = true;
-        windows_.description.place_at_mouse = true;
-        windows_.description.raise = true;
+        ro::ui::OpenItemDescription(windows_.description, item_id, 0,
+                                    ro::ui::ItemHolder::kInventory);
       }
       break;
     }

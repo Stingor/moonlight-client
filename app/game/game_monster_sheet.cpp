@@ -14,7 +14,6 @@
 #include "ro/sim/bank.h"
 #include "ro/sim/card_composition.h"
 #include "ro/sim/inventory.h"
-#include "ro/vfs/item_table.h"
 
 #include "chat/chat_view.h"
 #include "game/bug_report_context.h"
@@ -173,80 +172,6 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
       }
       audio_.PlaySound(name, kSheetSoundGain, kSheetSoundPan, ro::audio::SoundChannel::kSprites);
     }
-  }
-}
-
-void Game::FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms) {
-  if (asked.hovered_id != 0) {
-    hovered_item_ = asked.hovered_id;
-    hovered_slot_ = 0;
-    hovered_holder_ = ro::ui::ItemHolder::kInventory;
-  }
-  const std::uint32_t item_id = asked.item_id;
-  switch (item_id == 0 ? ro::ui::ChatLinkGesture::kNothing : asked.gesture) {
-    case ro::ui::ChatLinkGesture::kDescribe:
-      windows_.description.item_id = item_id;
-      windows_.description.from_slot = 0;
-      windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-      windows_.description.open = true;
-      windows_.description.place_at_mouse = true;
-      windows_.description.raise = true;
-      break;
-    case ro::ui::ChatLinkGesture::kRepost:
-      PostChatLink(ro::vfs::ItemLink{.item_id = item_id});
-      break;
-    case ro::ui::ChatLinkGesture::kOpenDatabase:
-      FollowDescriptionLink(
-          ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(item_id)}, now_ms);
-      break;
-    case ro::ui::ChatLinkGesture::kMarketSearch:
-      pieces_.trade.market().AskOpen(item_id);
-      break;
-    case ro::ui::ChatLinkGesture::kGameDatabase:
-      database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = item_id});
-      break;
-    case ro::ui::ChatLinkGesture::kItemInfo:
-    case ro::ui::ChatLinkGesture::kWhoDrops: {
-      const char* const verb =
-          asked.gesture == ro::ui::ChatLinkGesture::kItemInfo ? "@iteminfo " : "@whodrops ";
-      if (chat_dispatch_.has_value()) {
-        SubmitChat(*chat_dispatch_, verb + std::to_string(item_id), now_ms);
-      }
-      break;
-    }
-    case ro::ui::ChatLinkGesture::kVoteShop:
-      // Le vote shop : la boutique s'ouvre, l'item au panier.
-      static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop.state, link_));
-      break;
-    case ro::ui::ChatLinkGesture::kSeeInAlbum:
-      ShowCardInAlbum(item_id, now_ms);
-      break;
-    case ro::ui::ChatLinkGesture::kNothing:
-    case ro::ui::ChatLinkGesture::kMenu:
-    case ro::ui::ChatLinkGesture::kTryStyle:
-    case ro::ui::ChatLinkGesture::kCopyCode:
-    case ro::ui::ChatLinkGesture::kOpenBestiary:
-    case ro::ui::ChatLinkGesture::kOpenInNavigation:
-    case ro::ui::ChatLinkGesture::kPlaceContents:
-    case ro::ui::ChatLinkGesture::kStaffWarp:
-    case ro::ui::ChatLinkGesture::kWhisperWindow:
-    case ro::ui::ChatLinkGesture::kInviteParty:
-    case ro::ui::ChatLinkGesture::kInviteGuild:
-    case ro::ui::ChatLinkGesture::kAddFriend:
-    case ro::ui::ChatLinkGesture::kMonsterSheet:
-    case ro::ui::ChatLinkGesture::kShareRespawn:
-    case ro::ui::ChatLinkGesture::kGuideToTomb:
-    case ro::ui::ChatLinkGesture::kWhereToFind:
-    case ro::ui::ChatLinkGesture::kMobInfo:
-    case ro::ui::ChatLinkGesture::kWhereIs:
-    case ro::ui::ChatLinkGesture::kAddToMvpLog:
-    case ro::ui::ChatLinkGesture::kInviteMvp:
-    case ro::ui::ChatLinkGesture::kShowImageOnce:
-    case ro::ui::ChatLinkGesture::kAllowImageHost:
-    case ro::ui::ChatLinkGesture::kViewImage:
-    case ro::ui::ChatLinkGesture::kPostWhereToFind:
-    case ro::ui::ChatLinkGesture::kGoThere:
-      break;
   }
 }
 

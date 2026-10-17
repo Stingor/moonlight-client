@@ -390,61 +390,72 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     pieces_.whispers.FollowPlayer(aimed->player, asked.gesture, link_, windows_.chat.main.input);
     return;
   }
-  if (asked.item_id == 0) {
+  // ── UN OBJET : la balise entière voyage ──────────────────────────────────
+  FollowItemGesture(asked.gesture,
+                    ItemGestureTarget{.item_id = asked.item_id,
+                                      .from_holder = ro::ui::ItemHolder::kChatLink,
+                                      .link = aimed->item},
+                    now_ms);
+}
+
+// CE QU'UN GESTE SUR UN OBJET DEMANDE, d'où que vienne l'objet.
+//
+// 🔴 UN SEUL AIGUILLAGE POUR TOUTES LES SURFACES : un geste ajouté au menu des
+// objets vaut aussitôt partout, et le `switch` sans `default` désigne ici, et
+// ici seulement, l'endroit où le jouer.
+void Game::FollowItemGesture(ro::ui::ChatLinkGesture gesture, const ItemGestureTarget& item,
+                             std::uint32_t now_ms) {
+  if (item.item_id == 0) {
     return;
   }
-  const ro::vfs::ItemLink* carried = &aimed->item;
-
-  switch (asked.gesture) {
+  switch (gesture) {
     case ro::ui::ChatLinkGesture::kDescribe:
-      // ⚠ SANS PLACE : on ne possède pas forcément ce qu'un autre joueur a lié.
-      // Le nom, les cartes et les options se composent de ce que la balise porte.
-      item_description_->NoteLinked(*carried);
-      windows_.description.item_id = asked.item_id;
-      windows_.description.from_slot = 0;
-      windows_.description.from_holder = ro::ui::ItemHolder::kChatLink;
-      windows_.description.open = true;
-      windows_.description.place_at_mouse = true;
-      windows_.description.raise = true;
+      // ⚠ UN OBJET LIÉ SE DÉCRIT DE CE QUE SA BALISE PORTE — nom, cartes,
+      // options : on ne possède pas forcément ce qu'un autre joueur a lié.
+      if (item.from_holder == ro::ui::ItemHolder::kChatLink && item_description_.has_value()) {
+        item_description_->NoteLinked(item.link);
+      }
+      ro::ui::OpenItemDescription(windows_.description, item.item_id, item.from_slot,
+                                  item.from_holder);
       break;
     case ro::ui::ChatLinkGesture::kRepost:
-      // 🔴 LA BALISE EST RÉ-ENCODÉE DEPUIS CE QUE LE LIEN PORTAIT : raffinement,
+      // 🔴 LA BALISE EST RÉ-ENCODÉE DEPUIS CE QUE L'OBJET PORTE : raffinement,
       // cartes, grade et options survivent au relais. C'est bien le MÊME objet
       // qu'on repasse, pas l'entrée de catalogue qui porte son nom.
-      if (carried != nullptr) {
-        PostChatLink(*carried);
-      }
+      PostChatLink(item.link);
       break;
     case ro::ui::ChatLinkGesture::kOpenDatabase:
       // ⚠ PAR LE MÊME GUICHET QUE LE LIEN DE LA DESCRIPTION : lui seul décide
       // qu'une adresse s'ouvre, et il en garde les gardes.
       FollowDescriptionLink(
-          ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(asked.item_id)},
+          ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(item.item_id)},
           now_ms);
       break;
     case ro::ui::ChatLinkGesture::kMarketSearch:
-      pieces_.trade.market().AskOpen(asked.item_id);
+      pieces_.trade.market().AskOpen(item.item_id);
       break;
     case ro::ui::ChatLinkGesture::kGameDatabase:
       database_.AskOpen(
-          ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = asked.item_id});
+          ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = item.item_id});
       break;
     case ro::ui::ChatLinkGesture::kItemInfo:
     case ro::ui::ChatLinkGesture::kWhoDrops: {
       // ⚠ ENVOYÉES COMME UNE LIGNE TAPÉE : leur réponse revient dans le fil, et
       // le serveur applique les mêmes droits qu'à une commande écrite à la main.
       const char* const verb =
-          asked.gesture == ro::ui::ChatLinkGesture::kItemInfo ? "@iteminfo " : "@whodrops ";
-      SubmitChat(*chat_dispatch_, verb + std::to_string(asked.item_id), now_ms);
+          gesture == ro::ui::ChatLinkGesture::kItemInfo ? "@iteminfo " : "@whodrops ";
+      if (chat_dispatch_.has_value()) {
+        SubmitChat(*chat_dispatch_, verb + std::to_string(item.item_id), now_ms);
+      }
       break;
     }
     case ro::ui::ChatLinkGesture::kVoteShop:
       // Le vote shop : la boutique s'ouvre, l'item au panier.
       static_cast<void>(
-          pieces_.cash_shop.OpenWithItem(asked.item_id, windows_.cash_shop.state, link_));
+          pieces_.cash_shop.OpenWithItem(item.item_id, windows_.cash_shop.state, link_));
       break;
     case ro::ui::ChatLinkGesture::kSeeInAlbum:
-      ShowCardInAlbum(asked.item_id, now_ms);
+      ShowCardInAlbum(item.item_id, now_ms);
       break;
     case ro::ui::ChatLinkGesture::kNothing:
     case ro::ui::ChatLinkGesture::kMenu:
@@ -473,6 +484,21 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     case ro::ui::ChatLinkGesture::kGoThere:
       break;
   }
+}
+
+// UN ITEM DE CATALOGUE — un butin, un matériau, une ligne de base : ni
+// raffinement, ni cartes. Il se décrit, se relaie et s'interroge par son seul
+// identifiant.
+void Game::FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms) {
+  if (asked.hovered_id != 0) {
+    hovered_item_ = asked.hovered_id;
+    hovered_slot_ = 0;
+    hovered_holder_ = ro::ui::ItemHolder::kInventory;
+  }
+  FollowItemGesture(asked.gesture,
+                    ItemGestureTarget{.item_id = asked.item_id,
+                                      .link = ro::vfs::ItemLink{.item_id = asked.item_id}},
+                    now_ms);
 }
 
 // CE QU'UN GESTE SUR UN LIEN DE STYLE DEMANDE.

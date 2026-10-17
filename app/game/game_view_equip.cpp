@@ -18,7 +18,6 @@
 #include "ro/net/inventory.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
-#include "ro/vfs/item_table.h"
 #include "ro/vfs/item_words.h"
 
 #include "chat/chat_view.h"
@@ -119,76 +118,17 @@ void Game::AdvanceViewEquip(std::uint32_t now_ms) {
           ? ViewedEquipmentView::Designated{}
           : ViewedEquipmentView::PieceOf(inspected_, world_, answer.link.token);
   if (aimed.item != nullptr) {
-    switch (answer.link.gesture) {
-      case ro::ui::ChatLinkGesture::kDescribe:
-        // 🔴 SA PIÈCE SE DÉCRIT DEPUIS LA FICHE, la mienne depuis mon sac : c'est
-        // le contenant qui décore le nom, et chacune a le sien.
-        windows_.description.item_id = aimed.item->item_id;
-        windows_.description.from_slot = aimed.item->client_slot;
-        windows_.description.from_holder =
-            aimed.theirs ? ro::ui::ItemHolder::kViewedEquipment : ro::ui::ItemHolder::kEquipment;
-        windows_.description.open = true;
-        windows_.description.place_at_mouse = true;
-        windows_.description.raise = true;
-        break;
-      case ro::ui::ChatLinkGesture::kRepost:
-        // La pièce ENTIÈRE part dans le lien : raffinement, cartes, grade.
-        PostChatLink(ItemLinkOf(*aimed.item));
-        break;
-      case ro::ui::ChatLinkGesture::kOpenDatabase:
-        FollowDescriptionLink(ro::ui::DescriptionWindowAction{.followed = ro::vfs::ItemDatabaseUrl(
-                                                                  aimed.item->item_id)},
-                              now_ms);
-        break;
-      case ro::ui::ChatLinkGesture::kMarketSearch:
-        pieces_.trade.market().AskOpen(aimed.item->item_id);
-        break;
-      case ro::ui::ChatLinkGesture::kGameDatabase:
-        database_.AskOpen(
-            ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = aimed.item->item_id});
-        break;
-      case ro::ui::ChatLinkGesture::kItemInfo:
-      case ro::ui::ChatLinkGesture::kWhoDrops: {
-        const char* const verb =
-            answer.link.gesture == ro::ui::ChatLinkGesture::kItemInfo ? "@iteminfo " : "@whodrops ";
-        SubmitChat(*chat_dispatch_, verb + std::to_string(aimed.item->item_id), now_ms);
-        break;
-      }
-      case ro::ui::ChatLinkGesture::kVoteShop:
-        // Le vote shop : la boutique s'ouvre, l'item au panier.
-        static_cast<void>(
-            pieces_.cash_shop.OpenWithItem(aimed.item->item_id, windows_.cash_shop.state, link_));
-        break;
-      case ro::ui::ChatLinkGesture::kSeeInAlbum:
-        ShowCardInAlbum(aimed.item->item_id, now_ms);
-        break;
-      case ro::ui::ChatLinkGesture::kNothing:
-      case ro::ui::ChatLinkGesture::kMenu:
-      case ro::ui::ChatLinkGesture::kTryStyle:
-      case ro::ui::ChatLinkGesture::kCopyCode:
-      case ro::ui::ChatLinkGesture::kOpenBestiary:
-      case ro::ui::ChatLinkGesture::kOpenInNavigation:
-      case ro::ui::ChatLinkGesture::kPlaceContents:
-      case ro::ui::ChatLinkGesture::kStaffWarp:
-      case ro::ui::ChatLinkGesture::kWhisperWindow:
-      case ro::ui::ChatLinkGesture::kInviteParty:
-      case ro::ui::ChatLinkGesture::kInviteGuild:
-      case ro::ui::ChatLinkGesture::kAddFriend:
-      case ro::ui::ChatLinkGesture::kMonsterSheet:
-      case ro::ui::ChatLinkGesture::kShareRespawn:
-      case ro::ui::ChatLinkGesture::kGuideToTomb:
-      case ro::ui::ChatLinkGesture::kWhereToFind:
-      case ro::ui::ChatLinkGesture::kMobInfo:
-      case ro::ui::ChatLinkGesture::kWhereIs:
-      case ro::ui::ChatLinkGesture::kAddToMvpLog:
-      case ro::ui::ChatLinkGesture::kInviteMvp:
-      case ro::ui::ChatLinkGesture::kShowImageOnce:
-      case ro::ui::ChatLinkGesture::kAllowImageHost:
-      case ro::ui::ChatLinkGesture::kViewImage:
-      case ro::ui::ChatLinkGesture::kPostWhereToFind:
-      case ro::ui::ChatLinkGesture::kGoThere:
-        break;
-    }
+    // 🔴 SA PIÈCE SE DÉCRIT DEPUIS LA FICHE, la mienne depuis mon sac : c'est le
+    // contenant qui décore le nom, et chacune a le sien. Et la pièce ENTIÈRE
+    // part dans le lien : raffinement, cartes, grade.
+    FollowItemGesture(
+        answer.link.gesture,
+        ItemGestureTarget{.item_id = aimed.item->item_id,
+                          .from_slot = aimed.item->client_slot,
+                          .from_holder = aimed.theirs ? ro::ui::ItemHolder::kViewedEquipment
+                                                      : ro::ui::ItemHolder::kEquipment,
+                          .link = ItemLinkOf(*aimed.item)},
+        now_ms);
   }
 
   // ── LA FICHE REÇUE, et la vue qui la montre ───────────────────────────────

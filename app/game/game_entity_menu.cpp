@@ -564,12 +564,8 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kItemDescription:
       // ⚠ L'IDENTIFIANT DE BASE SEULEMENT : le fil ne donne ni raffinement ni
       // cartes pour un objet au sol.
-      windows_.description.item_id = menu_target_.item_id;
-      windows_.description.from_slot = 0;
-      windows_.description.from_holder = ro::ui::ItemHolder::kInventory;
-      windows_.description.open = true;
-      windows_.description.place_at_mouse = true;
-      windows_.description.raise = true;
+      ro::ui::OpenItemDescription(windows_.description, menu_target_.item_id, 0,
+                                  ro::ui::ItemHolder::kInventory);
       return;
     case EntityVerb::kItemLink:
       // La balise est POSÉE dans la barre, jamais envoyée : le joueur relit et
