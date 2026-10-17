@@ -114,6 +114,7 @@ SkyLight SkyLightAt(const SceneLight& map_light, float hour, const SkyCourse& co
   SkyLight sky;
   sky.moon = moon;
   sky.body_shown = true;
+  sky.hour = Wrapped(hour);
   // ⚠ MIDI SUR LA COURSE D'ORIGINE GARDE LA DIRECTION DE LA CARTE TELLE
   // QUELLE : la recomposer par sinus et cosinus la décalerait d'un arrondi.
   const bool untouched_noon = !moon && progress == kNoonProgress &&

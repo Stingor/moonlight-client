@@ -18873,3 +18873,15 @@ tr: Shadows of point lights
 
 fr: Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du décor et des personnages : les deux plus proches de la caméra. La carte graphique travaille davantage ; coupées, ces lumières éclairent sans ombre.
 tr: Lights placed with the map editor — lanterns, braziers — cast the shadows of the scenery and the characters: the two nearest the camera. The graphics card works harder; turned off, these lights shine without shadows.
+
+fr: Plage d'heures
+tr: Hour range
+
+fr: Suit l'heure du serveur quand le ciel en a une — le cycle jour et nuit ; sinon, la nuit du serveur décide.
+tr: Follows the server's hour when the sky has one — the day and night cycle; otherwise, the server's night decides.
+
+fr: De (heure)
+tr: From (hour)
+
+fr: À (heure)
+tr: To (hour)

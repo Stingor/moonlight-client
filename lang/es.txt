@@ -18873,3 +18873,15 @@ tr: Sombras de las luces puntuales
 
 fr: Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du décor et des personnages : les deux plus proches de la caméra. La carte graphique travaille davantage ; coupées, ces lumières éclairent sans ombre.
 tr: Las luces colocadas con el editor de mapas — farolillos, braseros — proyectan la sombra del decorado y de los personajes: las dos más cercanas a la cámara. La tarjeta gráfica trabaja más; desactivadas, estas luces iluminan sin sombra.
+
+fr: Plage d'heures
+tr: Franja horaria
+
+fr: Suit l'heure du serveur quand le ciel en a une — le cycle jour et nuit ; sinon, la nuit du serveur décide.
+tr: Sigue la hora del servidor cuando el cielo la tiene — el ciclo de día y noche; si no, decide la noche del servidor.
+
+fr: De (heure)
+tr: Desde (hora)
+
+fr: À (heure)
+tr: Hasta (hora)

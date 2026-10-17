@@ -54,6 +54,7 @@ void MapEditorSession::ViewMapEffects(const ro::render::MapScene& scene,
       row.position = retouch->position.value_or(row.origin);
       row.hidden = retouch->hidden;
       row.night_only = retouch->night_only;
+      row.hours = ShownHours(retouch->hours);
       row.glows = retouch->glow.has_value();
       if (retouch->glow.has_value()) {
         row.glow_color = retouch->glow->color;
@@ -148,6 +149,7 @@ MapEditorSession::Outcome MapEditorSession::SetMapEffect(
                                   .position = std::nullopt,
                                   .hidden = set.effect.hidden,
                                   .night_only = set.effect.night_only,
+                                  .hours = DocumentHours(set.effect.hours),
                                   .glow = std::nullopt,
                                   .why = set.effect.why};
   if (!SamePlace(set.effect.position, object.position)) {
@@ -257,6 +259,7 @@ MapEditorSession::Outcome MapEditorSession::DuplicateMapEffect(const ro::render:
                                 .emit_speed = object.emit_speed,
                                 .param = object.param,
                                 .night_only = shown.night_only,
+                                .hours = DocumentHours(shown.hours),
                                 .glow = std::nullopt,
                                 .why = {}};
   copy.position[0] += kDuplicateShift;

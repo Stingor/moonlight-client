@@ -12,6 +12,7 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/wheel_drag.h"
 
@@ -36,6 +37,13 @@ constexpr WheelDrag kGlowRangeDrag{.drag_step = 0.5F,
                                    .highest = kLargestGlowRange,
                                    .format = "%.1f"};
 constexpr float kParamStep = 0.01F;
+// Une borne de plage d'heures : un cran de molette vaut un quart d'heure.
+constexpr float kHoursPerDay = 24.0F;
+constexpr WheelDrag kHourDrag{.drag_step = 0.05F,
+                              .wheel_step = 0.25F,
+                              .lowest = 0.0F,
+                              .highest = kHoursPerDay,
+                              .format = "%.2f h"};
 
 // LES EFFETS DE LA CARTE : la liste des objets d'effet du RSW, et celui qu'on
 // règle — sa place, masqué, la nuit, sa lueur, sa raison.
@@ -75,6 +83,12 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
   released |= moved.released;
   bool toggled = SkinCheckBox(core::Tr("Masquer"), &set.effect.hidden, art);
   toggled |= SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
+  if (set.effect.night_only) {
+    WheelDragResult hours_moved;
+    toggled |= LitHoursFields(set.effect.hours, art, hours_moved);
+    changed |= hours_moved.changed;
+    released |= hours_moved.released;
+  }
   toggled |= SkinCheckBox(core::Tr("Éclaire"), &set.effect.glows, art);
   if (set.effect.glows) {
     changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.effect.glow_color.data(),
@@ -122,6 +136,24 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
 
 }  // namespace
 
+bool LitHoursFields(MapEditorHours& hours, const SkinArt& art, WheelDragResult& moved) {
+  const bool toggled = SkinCheckBox(core::Tr("Plage d'heures"), &hours.chosen, art);
+  if (ImGui::IsItemHovered()) {
+    SkinTooltipFormat("%s", core::Tr("Suit l'heure du serveur quand le ciel en a une — le cycle "
+                                     "jour et nuit ; sinon, la nuit du serveur décide."));
+  }
+  if (!hours.chosen) {
+    return toggled;
+  }
+  for (const WheelDragResult field :
+       {WheelDragFloat(core::Tr("De (heure)"), hours.from_hour, kHourDrag),
+        WheelDragFloat(core::Tr("À (heure)"), hours.to_hour, kHourDrag)}) {
+    moved.changed |= field.changed;
+    moved.released |= field.released;
+  }
+  return toggled;
+}
+
 void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
                  std::vector<MapEditorIntent>& intents, const SkinArt& art) {
   // Les effets de la carte d'abord : ce sont eux qu'on vient d'abord régler.
@@ -163,6 +195,12 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
   changed |= ImGui::DragFloat4(core::Tr("Paramètres"), set.effect.param.data(), kParamStep);
   released |= ImGui::IsItemDeactivatedAfterEdit();
   bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
+  if (set.effect.night_only) {
+    WheelDragResult hours_moved;
+    toggled |= LitHoursFields(set.effect.hours, art, hours_moved);
+    changed |= hours_moved.changed;
+    released |= hours_moved.released;
+  }
   toggled |= SkinCheckBox(core::Tr("Éclaire"), &set.effect.glows, art);
   if (set.effect.glows) {
     changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.effect.glow_color.data(),

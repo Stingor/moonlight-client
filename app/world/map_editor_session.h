@@ -39,6 +39,12 @@ enum class NudgeDirection : std::uint8_t { kLeft, kRight, kUp, kDown };
 // ouvert ou non, la sélection, l'historique, le geste en cours. Le document
 // lui-même est dans `MapEditStore`. Elle ne dessine rien et ne touche à aucun
 // renderer : elle dit seulement quand le décor doit se reposer.
+// LA PLAGE D'HEURES, du document au panneau et retour : une plage absente se
+// montre décochée, à ses bornes par défaut.
+[[nodiscard]] ro::ui::MapEditorHours ShownHours(const std::optional<ro::mapedit::LitHours>& hours);
+[[nodiscard]] std::optional<ro::mapedit::LitHours> DocumentHours(
+    const ro::ui::MapEditorHours& hours);
+
 class MapEditorSession {
  public:
   // Ce qu'une intention demande à l'appelant.

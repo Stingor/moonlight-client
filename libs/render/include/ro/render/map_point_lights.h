@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -19,10 +20,13 @@ namespace ro::render {
 // Une lumière « la nuit seulement » vaut `1 − jour`, où le jour est la
 // composante la plus claire de `daylight × tint` : le ciel à l'heure ET la
 // nuit que le serveur pose. Sur une carte fermée au ciel — intérieur, donjon,
-// `always_night` —, elle brille pleinement : rien n'y fait le jour.
+// `always_night` —, elle brille pleinement : rien n'y fait le jour. Sa plage
+// d'heures, quand elle en a une, se juge à l'heure du ciel `hour` : voir
+// `NightGlow`.
 [[nodiscard]] PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
                                            const MapEffectFrame& frame, const SceneLight& sky,
-                                           bool always_night, glm::vec3 eye, double time_ms = 0.0);
+                                           bool always_night, glm::vec3 eye, double time_ms = 0.0,
+                                           std::optional<float> hour = std::nullopt);
 
 // TOUTES LES LUMIÈRES DU DOCUMENT : les siennes, puis la lueur de chaque effet
 // qui en porte une, à sa place, avec la règle de nuit de l'effet — ceux qu'il

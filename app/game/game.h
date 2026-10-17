@@ -756,6 +756,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // ceux « nuit seulement » : voir `AdvanceMapEffects`.
   std::vector<ro::formats::RswEffect> raised_effects_;
   float effect_night_ = 0.0F;
+  // L'heure du ciel de l'image précédente, pour les plages d'heures.
+  std::optional<float> effect_hour_;
 
   // ⚠ EN DERNIER, ET IL LE FAUT : il garde l'adresse de presque tout ce qui
   // précède. Détruit le premier, il ne pend sur rien.

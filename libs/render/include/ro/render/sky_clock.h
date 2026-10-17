@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <glm/glm.hpp>
 
 #include "ro/render/scene_light.h"
@@ -90,6 +92,8 @@ struct SkyLight {
   // L'ASTRE SE MONTRE-T-IL : vrai pour un ciel à l'heure, faux pour la lumière
   // fixe de la carte, qui n'a pas d'astre.
   bool body_shown = false;
+  // L'heure du ciel, dans [0, 24) ; rien pour la lumière fixe de la carte.
+  std::optional<float> hour;
 
   // LA LUMIÈRE QUI PORTE OMBRE : celle de la carte, venue de l'astre quand le
   // ciel en a un.

@@ -47,6 +47,7 @@ constexpr std::string_view kMapEditHeader =
 #    color    : [r, g, b], 1 pour la pleine intensité — au-delà, plus fort ;
 #    range    : le rayon où elle s'éteint, en unités du RSW ;
 #    night_only : vrai pour ne l'allumer qu'à la nuit ;
+#    hours    : facultatif, [de, à] — sa plage d'heures du serveur, de 0 à 24 ;
 #    flicker  : vrai pour qu'elle vacille, comme une torche ;
 #    why      : pourquoi, obligatoire.
 #  effects : les effets de carte ajoutés, chacun :
@@ -54,6 +55,7 @@ constexpr std::string_view kMapEditHeader =
 #    position : [x, y, z], dans le repère du RSW ;
 #    emit_speed, param : sa cadence et ses quatre paramètres, comme le RSW ;
 #    night_only : vrai pour ne le lever qu'à la nuit ;
+#    hours    : facultatif, [de, à] — sa plage d'heures du serveur, de 0 à 24 ;
 #    glow     : facultatif, la lumière qu'il porte — color, range, flicker ;
 #    why      : pourquoi, obligatoire.
 #  meshes : les retouches de maillages, chacune :
@@ -193,6 +195,27 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
   return added;
 }
 
+// La plage d'heures sous la clé « hours » : deux heures de 0 à 24 ; rien sans
+// la clé.
+core::Result<std::optional<LitHours>> HoursFrom(const YAML::Node& entry, std::string_view map_name,
+                                                const std::string& where) {
+  const YAML::Node hours = entry["hours"];
+  if (!hours) {
+    return std::optional<LitHours>();
+  }
+  constexpr std::size_t kBounds = 2;
+  if (!hours.IsSequence() || hours.size() != kBounds) {
+    return std::unexpected(Refused(map_name, where + " : « hours » n'a pas deux heures"));
+  }
+  const LitHours read{.from_hour = hours[0].as<float>(), .to_hour = hours[1].as<float>()};
+  for (const float hour : {read.from_hour, read.to_hour}) {
+    if (!(hour >= 0.0F && hour <= kLitHoursPerDay)) {
+      return std::unexpected(Refused(map_name, where + " : « hours » sort de 0 à 24"));
+    }
+  }
+  return std::optional<LitHours>(read);
+}
+
 core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_view map_name,
                                         const std::string& where) {
   if (!entry.IsMap()) {
@@ -229,6 +252,11 @@ core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_vie
   if (const YAML::Node night_only = entry["night_only"]) {
     light.night_only = night_only.as<bool>();
   }
+  auto hours = HoursFrom(entry, map_name, where);
+  if (!hours) {
+    return std::unexpected(hours.error());
+  }
+  light.hours = *hours;
   if (const YAML::Node flicker = entry["flicker"]) {
     light.flicker = flicker.as<bool>();
   }
@@ -297,6 +325,11 @@ core::Result<AddedEffect> AddedEffectFrom(const YAML::Node& entry, std::string_v
   if (const YAML::Node night_only = entry["night_only"]) {
     effect.night_only = night_only.as<bool>();
   }
+  auto hours = HoursFrom(entry, map_name, where);
+  if (!hours) {
+    return std::unexpected(hours.error());
+  }
+  effect.hours = *hours;
   if (const YAML::Node glow = entry["glow"]) {
     core::Result<EffectGlow> lit = GlowFrom(glow, map_name, where);
     if (!lit) {
@@ -343,6 +376,11 @@ core::Result<EffectEdit> EffectEditFrom(const YAML::Node& entry, std::string_vie
   if (const YAML::Node night_only = entry["night_only"]) {
     edit.night_only = night_only.as<bool>();
   }
+  auto hours = HoursFrom(entry, map_name, where);
+  if (!hours) {
+    return std::unexpected(hours.error());
+  }
+  edit.hours = *hours;
   if (const YAML::Node glow = entry["glow"]) {
     core::Result<EffectGlow> lit = GlowFrom(glow, map_name, where);
     if (!lit) {
@@ -446,6 +484,14 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
 // l'identique.
 [[nodiscard]] std::string VectorText(const std::array<float, 3>& vector) {
   return std::format("[{}, {}, {}]", vector[0], vector[1], vector[2]);
+}
+
+// La plage d'heures, sous sa clé ; rien sans plage.
+[[nodiscard]] std::string HoursText(const std::optional<LitHours>& hours) {
+  if (!hours.has_value()) {
+    return {};
+  }
+  return std::format("    hours: [{}, {}]\n", hours->from_hour, hours->to_hour);
 }
 
 // La lueur d'un effet, sous sa clé ; rien sans lueur.
@@ -632,6 +678,7 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     if (effect.night_only) {
       text += "    night_only: true\n";
     }
+    text += HoursText(effect.hours);
     text += GlowText(effect.glow);
     text += std::format("    why: {}\n", DoubleQuoted(effect.why));
   }
@@ -651,6 +698,7 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     if (effect.night_only) {
       text += "    night_only: true\n";
     }
+    text += HoursText(effect.hours);
     text += GlowText(effect.glow);
     text += std::format("    why: {}\n", DoubleQuoted(effect.why));
   }
@@ -664,6 +712,7 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     if (light.night_only) {
       text += "    night_only: true\n";
     }
+    text += HoursText(light.hours);
     if (light.flicker) {
       text += "    flicker: true\n";
     }

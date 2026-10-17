@@ -254,4 +254,37 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
   return report;
 }
 
+namespace {
+
+// L'heure ramenée dans [0, 24).
+float WrappedHour(float hour) {
+  const float wrapped = std::fmod(hour, kLitHoursPerDay);
+  return wrapped < 0.0F ? wrapped + kLitHoursPerDay : wrapped;
+}
+
+// La longueur de la plage, en heures ; deux bornes égales, tout le jour.
+float SpanHours(const LitHours& hours) {
+  const float span = WrappedHour(hours.to_hour - hours.from_hour);
+  return span == 0.0F ? kLitHoursPerDay : span;
+}
+
+}  // namespace
+
+bool LitHoursCover(const LitHours& hours, float hour) {
+  return WrappedHour(hour - hours.from_hour) <= SpanHours(hours);
+}
+
+float LitHoursStrength(const LitHours& hours, float hour) {
+  const float span = SpanHours(hours);
+  if (span >= kLitHoursPerDay) {
+    return 1.0F;
+  }
+  const float since_start = WrappedHour(hour - hours.from_hour);
+  if (since_start > span) {
+    return 0.0F;
+  }
+  const float fade = std::min(kLitHoursFadeHours, span / 2.0F);
+  return std::clamp(std::min(since_start, span - since_start) / fade, 0.0F, 1.0F);
+}
+
 }  // namespace ro::mapedit

@@ -34,6 +34,7 @@ ro::ui::MapEditorEffect ShownEffect(const ro::mapedit::AddedEffect& effect) {
                                 .emit_speed = effect.emit_speed,
                                 .param = effect.param,
                                 .night_only = effect.night_only,
+                                .hours = ShownHours(effect.hours),
                                 .glows = effect.glow.has_value(),
                                 .why = effect.why};
   if (effect.glow.has_value()) {
@@ -50,6 +51,7 @@ ro::mapedit::AddedEffect DocumentEffect(const ro::ui::MapEditorEffect& shown) {
                                   .emit_speed = shown.emit_speed,
                                   .param = shown.param,
                                   .night_only = shown.night_only,
+                                  .hours = DocumentHours(shown.hours),
                                   .glow = std::nullopt,
                                   .why = shown.why};
   if (shown.glows) {

@@ -45,6 +45,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
         .color = retouch.glow->color,
         .range = retouch.glow->range,
         .night_only = retouch.night_only,
+        .hours = retouch.hours,
         .flicker = retouch.glow->flicker,
         .why = retouch.why});
   }
@@ -54,6 +55,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
                                                .color = effect.glow->color,
                                                .range = effect.glow->range,
                                                .night_only = effect.night_only,
+                                               .hours = effect.hours,
                                                .flicker = effect.glow->flicker,
                                                .why = effect.why});
     }
@@ -63,14 +65,15 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
 
 PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
                              const MapEffectFrame& frame, const SceneLight& sky, bool always_night,
-                             glm::vec3 eye, double time_ms) {
+                             glm::vec3 eye, double time_ms, std::optional<float> hour) {
   const float night = NightStrength(sky, always_night);
   std::vector<PointLight> placed;
   placed.reserve(lights.size());
   for (std::size_t slot = 0; slot < lights.size(); ++slot) {
     const ro::mapedit::AddedLight& light = lights[slot];
+    const float dark = always_night ? night : NightGlow(light.hours, night, hour);
     const float strength =
-        (light.night_only ? night : 1.0F) * (light.flicker ? FlickerFactor(slot, time_ms) : 1.0F);
+        (light.night_only ? dark : 1.0F) * (light.flicker ? FlickerFactor(slot, time_ms) : 1.0F);
     placed.push_back(PointLight{
         .world_position =
             frame.ToWorld(glm::vec3(light.position[0], light.position[1], light.position[2])),

@@ -80,7 +80,7 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
   // seulement » tant que la nuit de l'image précédente le veut. La liste qui
   // change — un document retouché, la nuit qui tombe ou se lève — se relève.
   std::vector<ro::formats::RswEffect> wanted = ro::render::ActiveMapEffects(
-      stage_->scene.rsw.effects(), map_edits_.Document(stage_->name), effect_night_);
+      stage_->scene.rsw.effects(), map_edits_.Document(stage_->name), effect_night_, effect_hour_);
   if (!map_effects_raised_ || !ro::render::SameMapEffects(wanted, raised_effects_)) {
     map_effects_.Raise(stage_->scene.effect_table, wanted, stage_->scene.gnd.width(),
                        stage_->scene.gnd.height());

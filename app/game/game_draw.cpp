@@ -164,6 +164,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   const ro::render::SkyLight sky = SkyOfFrame(now_ms);
   // La nuit de cette image décide des effets « nuit seulement » de la suivante.
   effect_night_ = ro::render::NightStrength(sky.light, MapClosedToSky());
+  effect_hour_ = sky.hour;
   const ro::render::SunShadowView sun = DrawSunShadowIfAsked(sun_asked, models_shown, carts, sky);
   if (sun.map != nullptr) {
     stages.shadowmap = false;
@@ -176,7 +177,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
           ro::render::DocumentLights(map_edits_.Document(stage_->name),
                                      stage_->scene.rsw.effects()),
           ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
-          sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms)),
+          sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms), sky.hour),
       models_shown, carts);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);

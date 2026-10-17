@@ -491,6 +491,12 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   changed |= reach.changed;
   released |= reach.released;
   bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
+  if (set.light.night_only) {
+    WheelDragResult hours_moved;
+    toggled |= LitHoursFields(set.light.hours, art, hours_moved);
+    changed |= hours_moved.changed;
+    released |= hours_moved.released;
+  }
   toggled |= SkinCheckBox(core::Tr("Vacille"), &set.light.flicker, art);
   const std::string_view typed(panel.light_why.data(),
                                strnlen(panel.light_why.data(), panel.light_why.size()));

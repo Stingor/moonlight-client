@@ -35,6 +35,14 @@ struct MapEditorModelRow {
   bool added = false;
 };
 
+// LA PLAGE D'HEURES d'un objet « la nuit seulement », telle que le panneau la
+// montre et la rend : choisie ou non, et ses bornes en heures du serveur.
+struct MapEditorHours {
+  bool chosen = false;
+  float from_hour = 0.0F;
+  float to_hour = 0.0F;
+};
+
 // UNE LUMIÈRE PONCTUELLE DU DOCUMENT, telle que le panneau la montre et la
 // rend : position dans le repère du RSW, couleur qui porte l'intensité, rayon
 // où elle s'éteint, en unités du RSW.
@@ -43,6 +51,7 @@ struct MapEditorLight {
   std::array<float, 3> color{1.0F, 1.0F, 1.0F};
   float range = 0.0F;
   bool night_only = false;
+  MapEditorHours hours;
   bool flicker = false;
   std::string why;
 };
@@ -56,6 +65,7 @@ struct MapEditorEffect {
   float emit_speed = 0.0F;
   std::array<float, 4> param{};
   bool night_only = false;
+  MapEditorHours hours;
   bool glows = false;
   std::array<float, 3> glow_color{2.0F, 1.4F, 0.7F};
   float glow_range = 50.0F;
@@ -74,6 +84,7 @@ struct MapEditorMapEffect {
   bool edited = false;
   bool hidden = false;
   bool night_only = false;
+  MapEditorHours hours;
   bool glows = false;
   std::array<float, 3> glow_color{2.0F, 1.4F, 0.7F};
   float glow_range = 50.0F;

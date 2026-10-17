@@ -73,6 +73,32 @@ struct AddedModel {
   friend bool operator==(const AddedModel&, const AddedModel&) = default;
 };
 
+// LA PLAGE D'HEURES d'un objet « la nuit seulement », en heures du serveur,
+// de 0 à 24 : il luit de `from_hour` à `to_hour`, la plage passant minuit
+// quand elle commence après sa fin ; deux bornes égales couvrent tout le jour.
+// Elle ne vaut que si le ciel a une heure — le cycle jour et nuit, ou l'heure
+// que force l'établi ; sinon, la nuit que le serveur pose décide.
+struct LitHours {
+  float from_hour = kDefaultFromHour;
+  float to_hour = kDefaultToHour;
+
+  static constexpr float kDefaultFromHour = 20.0F;
+  static constexpr float kDefaultToHour = 6.0F;
+
+  friend bool operator==(const LitHours&, const LitHours&) = default;
+};
+
+inline constexpr float kLitHoursPerDay = 24.0F;
+// Une lumière monte et descend sur tant d'heures, au-dedans de sa plage ; une
+// plage plus courte que deux fondus fond sur sa moitié.
+inline constexpr float kLitHoursFadeHours = 0.5F;
+
+// L'heure `hour` tombe-t-elle dans la plage, bornes comprises ?
+[[nodiscard]] bool LitHoursCover(const LitHours& hours, float hour);
+// Combien une lumière luit à l'heure `hour`, de 0 hors de sa plage à 1 en son
+// cœur, par un fondu de `kLitHoursFadeHours` à chaque borne.
+[[nodiscard]] float LitHoursStrength(const LitHours& hours, float hour);
+
 // UNE LUMIÈRE PONCTUELLE ajoutée par l'éditeur : elle éclaire le sol et le
 // décor autour d'elle, jusqu'à sa portée, où elle s'éteint. La couleur porte
 // l'intensité : une composante au-delà de 1 éclaire plus fort.
@@ -82,8 +108,10 @@ struct AddedLight {
   std::array<float, 3> color{1.0F, 1.0F, 1.0F};
   // Le rayon où elle s'éteint, en unités du RSW ; strictement positif.
   float range = 0.0F;
-  // Vrai : elle ne s'allume qu'à la nuit, et plus fort à mesure qu'elle tombe.
+  // Vrai : elle ne s'allume qu'à la nuit, et plus fort à mesure qu'elle tombe
+  // — ou dans sa plage d'heures, quand elle en a une.
   bool night_only = false;
+  std::optional<LitHours> hours;
   // Vrai : elle vacille, comme une torche ou un feu.
   bool flicker = false;
   std::string why;
@@ -114,8 +142,9 @@ struct AddedEffect {
   // les porte.
   float emit_speed = 0.0F;
   std::array<float, 4> param{};
-  // Vrai : il ne se lève qu'à la nuit.
+  // Vrai : il ne se lève qu'à la nuit — ou dans sa plage d'heures.
   bool night_only = false;
+  std::optional<LitHours> hours;
   std::optional<EffectGlow> glow;
   std::string why;
 
@@ -133,6 +162,7 @@ struct EffectEdit {
   std::optional<std::array<float, 3>> position;
   bool hidden = false;
   bool night_only = false;
+  std::optional<LitHours> hours;
   std::optional<EffectGlow> glow;
   std::string why;
 

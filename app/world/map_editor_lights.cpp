@@ -40,6 +40,7 @@ ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light) {
                                 .color = light.color,
                                 .range = light.range,
                                 .night_only = light.night_only,
+                                .hours = ShownHours(light.hours),
                                 .flicker = light.flicker,
                                 .why = light.why};
 }
@@ -49,11 +50,27 @@ ro::mapedit::AddedLight DocumentLight(const ro::ui::MapEditorLight& light) {
                                  .color = light.color,
                                  .range = light.range,
                                  .night_only = light.night_only,
+                                 .hours = DocumentHours(light.hours),
                                  .flicker = light.flicker,
                                  .why = light.why};
 }
 
 }  // namespace
+
+ro::ui::MapEditorHours ShownHours(const std::optional<ro::mapedit::LitHours>& hours) {
+  const ro::mapedit::LitHours shown = hours.value_or(ro::mapedit::LitHours());
+  return ro::ui::MapEditorHours{
+      .chosen = hours.has_value(), .from_hour = shown.from_hour, .to_hour = shown.to_hour};
+}
+
+std::optional<ro::mapedit::LitHours> DocumentHours(const ro::ui::MapEditorHours& hours) {
+  if (!hours.chosen) {
+    return std::nullopt;
+  }
+  return ro::mapedit::LitHours{
+      .from_hour = std::clamp(hours.from_hour, 0.0F, ro::mapedit::kLitHoursPerDay),
+      .to_hour = std::clamp(hours.to_hour, 0.0F, ro::mapedit::kLitHoursPerDay)};
+}
 
 std::vector<ro::ui::MapEditorLine> MapEditorSession::LightTrace() const {
   std::vector<ro::ui::MapEditorLine> marks;
