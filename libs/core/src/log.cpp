@@ -91,8 +91,21 @@ constexpr std::uintmax_t kPreviousHeadBytes = 1024;
 //
 // C'est elle que tient le logger, et non le fichier lui-même : la fermer, c'est
 // vider la porte, sous son verrou, sans toucher à la liste des puits du logger.
-[[nodiscard]] const std::shared_ptr<spdlog::sinks::dist_sink_mt>& FileGate() {
-  static const auto gate = std::make_shared<spdlog::sinks::dist_sink_mt>();
+//
+// 🔴 ELLE VIDE SUR DISQUE CHAQUE LIGNE QU'ELLE REÇOIT, avant que le logger ne
+// passe au puits suivant. Le vidage du logger, lui, n'a lieu qu'après que TOUS
+// ses puits ont écrit : une console qui bloque ou qui plante laissait la ligne
+// dans le tampon du fichier, et le journal restait vide.
+class FlushingGate final : public spdlog::sinks::dist_sink_mt {
+ protected:
+  void sink_it_(const spdlog::details::log_msg& msg) override {
+    spdlog::sinks::dist_sink_mt::sink_it_(msg);
+    flush_();
+  }
+};
+
+[[nodiscard]] const std::shared_ptr<FlushingGate>& FileGate() {
+  static const auto gate = std::make_shared<FlushingGate>();
   return gate;
 }
 
@@ -211,7 +224,8 @@ Result<void> InitLogging(const std::filesystem::path& file_path) {
   PreviousLog previous;
   std::vector<spdlog::sink_ptr> sinks;
   // 🔴 LE FICHIER EN PREMIER : les puits s'appellent dans l'ordre, et c'est lui
-  // qui doit tenir une ligne si la console, derrière, ne rend pas la main.
+  // qui doit tenir une ligne si la console, derrière, ne rend pas la main — ce
+  // que seul garantit le vidage de sa porte, voir `FlushingGate`.
   sinks.push_back(FileGate());
   if (!file_path.empty()) {
     previous = SetPreviousLogAside(file_path);
