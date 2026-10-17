@@ -630,7 +630,7 @@ std::string BodyPalettePath(const ActorLook& look) {
 }
 
 std::string HairPalettePath(const ActorLook& look) {
-  if (look.hair_palette <= 0) {
+  if (look.hair_palette <= 0 || WearsGmOutfit(look)) {
     return {};
   }
   const std::string number = std::to_string(look.hair_palette);
