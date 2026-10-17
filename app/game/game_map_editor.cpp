@@ -46,6 +46,7 @@ void Game::ServeMapEditor() {
   if (!map_editor_.active() || !stage_.has_value()) {
     map_editor_.SetLightDots({});
     map_editor_.SetEffectDots({});
+    map_editor_.SetMapEffectDots({});
     return;
   }
   const auto width = static_cast<float>(shell_.width());
@@ -53,6 +54,22 @@ void Game::ServeMapEditor() {
   map_editor_.SetEffectDots(EffectDots(view, stage_->scene, camera_, aspect_ratio_, width, height));
   const std::vector<ro::ui::MapEditorLine> effect_marks = map_editor_.EffectTrace();
   view.lines.insert(view.lines.end(), effect_marks.begin(), effect_marks.end());
+  map_editor_.SetMapEffectDots(
+      MapEffectDots(view, stage_->scene, camera_, aspect_ratio_, width, height));
+  const std::vector<ro::ui::MapEditorLine> map_effect_marks = map_editor_.MapEffectTrace();
+  view.lines.insert(view.lines.end(), map_effect_marks.begin(), map_effect_marks.end());
+  // L'EFFET DE LA CARTE DÉSIGNÉ a aussi la flèche de déplacement.
+  if (view.selected_map_effect.has_value() && *view.selected_map_effect < view.map_effects.size() &&
+      !view.selected.has_value()) {
+    const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
+                                               stage_->scene.gnd.height()};
+    const GizmoFrame frame =
+        GizmoFrameOf(map_frame, view.map_effects[*view.selected_map_effect].position, camera_);
+    map_editor_.SetGizmo(frame, GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera_,
+                                             aspect_ratio_, width, height));
+    const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
+    view.lines.insert(view.lines.end(), handles.begin(), handles.end());
+  }
   // L'EFFET DÉSIGNÉ a la flèche de déplacement, comme une lumière.
   if (view.selected_effect.has_value() && *view.selected_effect < view.effects.size() &&
       !view.selected.has_value()) {

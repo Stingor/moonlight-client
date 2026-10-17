@@ -1,7 +1,9 @@
 #include "ro/render/edited_map_effects.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <string_view>
+#include <utility>
 
 #include "ro/render/scene_light.h"
 
@@ -22,11 +24,23 @@ float NightStrength(const SceneLight& sky, bool always_night) {
 }
 
 std::vector<formats::RswEffect> ActiveMapEffects(std::span<const formats::RswEffect> map_objects,
-                                                 const std::vector<mapedit::AddedEffect>& added,
-                                                 float night) {
-  std::vector<formats::RswEffect> objects(map_objects.begin(), map_objects.end());
-  for (const mapedit::AddedEffect& effect : added) {
-    if (effect.night_only && night < kEffectNightThreshold) {
+                                                 const mapedit::MapEdit& document, float night) {
+  const bool is_night = night >= kEffectNightThreshold;
+  std::vector<formats::RswEffect> objects;
+  objects.reserve(map_objects.size() + document.effects().size());
+  for (std::size_t rank = 0; rank < map_objects.size(); ++rank) {
+    formats::RswEffect object = map_objects[rank];
+    const mapedit::EffectEdit* edit = document.EffectEditAt(rank);
+    if (edit != nullptr && mapedit::EffectEditTargets(*edit, object)) {
+      if (edit->hidden || (edit->night_only && !is_night)) {
+        continue;
+      }
+      object.position = edit->position.value_or(object.position);
+    }
+    objects.push_back(std::move(object));
+  }
+  for (const mapedit::AddedEffect& effect : document.effects()) {
+    if (effect.night_only && !is_night) {
       continue;
     }
     objects.push_back(formats::RswEffect{.name = std::string(kAddedEffectName),

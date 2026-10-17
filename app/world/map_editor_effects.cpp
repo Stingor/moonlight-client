@@ -118,6 +118,7 @@ void MapEditorSession::ChooseEffect(std::optional<std::size_t> slot) {
     selection_.Clear();
     vertex_.reset();
     selected_light_.reset();
+    selected_map_effect_.reset();
   }
 }
 

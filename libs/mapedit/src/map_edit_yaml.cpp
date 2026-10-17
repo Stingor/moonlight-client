@@ -235,6 +235,30 @@ core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_vie
   return light;
 }
 
+// La lueur d'un effet : couleur, portée strictement positive, vacillement.
+core::Result<EffectGlow> GlowFrom(const YAML::Node& glow, std::string_view map_name,
+                                  const std::string& where) {
+  EffectGlow lit;
+  if (const YAML::Node color = glow["color"]) {
+    core::Result<std::array<float, 3>> tinted =
+        VectorFrom(color, map_name, where + " : « glow.color »");
+    if (!tinted) {
+      return std::unexpected(tinted.error());
+    }
+    lit.color = *tinted;
+  }
+  if (const YAML::Node range = glow["range"]) {
+    lit.range = range.as<float>();
+  }
+  if (!(lit.range > 0.0F)) {
+    return std::unexpected(Refused(map_name, where + " : « glow.range » doit être positive"));
+  }
+  if (const YAML::Node flicker = glow["flicker"]) {
+    lit.flicker = flicker.as<bool>();
+  }
+  return lit;
+}
+
 core::Result<AddedEffect> AddedEffectFrom(const YAML::Node& entry, std::string_view map_name,
                                           const std::string& where) {
   if (!entry.IsMap()) {
@@ -274,27 +298,59 @@ core::Result<AddedEffect> AddedEffectFrom(const YAML::Node& entry, std::string_v
     effect.night_only = night_only.as<bool>();
   }
   if (const YAML::Node glow = entry["glow"]) {
-    EffectGlow lit;
-    if (const YAML::Node color = glow["color"]) {
-      core::Result<std::array<float, 3>> tinted =
-          VectorFrom(color, map_name, where + " : « glow.color »");
-      if (!tinted) {
-        return std::unexpected(tinted.error());
-      }
-      lit.color = *tinted;
+    core::Result<EffectGlow> lit = GlowFrom(glow, map_name, where);
+    if (!lit) {
+      return std::unexpected(lit.error());
     }
-    if (const YAML::Node range = glow["range"]) {
-      lit.range = range.as<float>();
-    }
-    if (!(lit.range > 0.0F)) {
-      return std::unexpected(Refused(map_name, where + " : « glow.range » doit être positive"));
-    }
-    if (const YAML::Node flicker = glow["flicker"]) {
-      lit.flicker = flicker.as<bool>();
-    }
-    effect.glow = lit;
+    effect.glow = *lit;
   }
   return effect;
+}
+
+core::Result<EffectEdit> EffectEditFrom(const YAML::Node& entry, std::string_view map_name,
+                                        const std::string& where) {
+  if (!entry.IsMap()) {
+    return std::unexpected(Refused(map_name, where + " n'est pas une table"));
+  }
+  const YAML::Node index = entry["index"];
+  const YAML::Node number = entry["number"];
+  const YAML::Node origin = entry["origin"];
+  const YAML::Node why = entry["why"];
+  if (!index || !number || !origin || !why) {
+    return std::unexpected(
+        Refused(map_name, where + " : « index », « number », « origin » et « why » sont dus"));
+  }
+  EffectEdit edit;
+  edit.effect_index = index.as<std::size_t>();
+  edit.number = number.as<std::int32_t>();
+  edit.why = why.as<std::string>();
+  if (edit.why.empty()) {
+    return std::unexpected(Refused(map_name, where + " : « why » est vide"));
+  }
+  core::Result<std::array<float, 3>> from = VectorFrom(origin, map_name, where + " : « origin »");
+  if (!from) {
+    return std::unexpected(from.error());
+  }
+  edit.origin = *from;
+  auto position = OptionalVectorFrom(entry, "position", map_name, where);
+  if (!position) {
+    return std::unexpected(position.error());
+  }
+  edit.position = *position;
+  if (const YAML::Node hidden = entry["hidden"]) {
+    edit.hidden = hidden.as<bool>();
+  }
+  if (const YAML::Node night_only = entry["night_only"]) {
+    edit.night_only = night_only.as<bool>();
+  }
+  if (const YAML::Node glow = entry["glow"]) {
+    core::Result<EffectGlow> lit = GlowFrom(glow, map_name, where);
+    if (!lit) {
+      return std::unexpected(lit.error());
+    }
+    edit.glow = *lit;
+  }
+  return edit;
 }
 
 core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view map_name,
@@ -392,6 +448,19 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
   return std::format("[{}, {}, {}]", vector[0], vector[1], vector[2]);
 }
 
+// La lueur d'un effet, sous sa clé ; rien sans lueur.
+[[nodiscard]] std::string GlowText(const std::optional<EffectGlow>& glow) {
+  if (!glow.has_value()) {
+    return {};
+  }
+  std::string text = std::format("    glow:\n      color: {}\n      range: {}\n",
+                                 VectorText(glow->color), glow->range);
+  if (glow->flicker) {
+    text += "      flicker: true\n";
+  }
+  return text;
+}
+
 }  // namespace
 
 core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view map_name) {
@@ -434,6 +503,19 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
           return std::unexpected(mesh.error());
         }
         edit.SetMesh(std::move(*mesh));
+      }
+    }
+    if (const YAML::Node edits = whole["map_effects"]) {
+      if (!edits.IsSequence()) {
+        return std::unexpected(Refused(map_name, "« map_effects » n'est pas une liste"));
+      }
+      for (std::size_t rank = 0; rank < edits.size(); ++rank) {
+        core::Result<EffectEdit> retouch =
+            EffectEditFrom(edits[rank], map_name, std::format("retouche d'effet {}", rank));
+        if (!retouch) {
+          return std::unexpected(retouch.error());
+        }
+        edit.SetEffectEdit(std::move(*retouch));
       }
     }
     if (const YAML::Node effects = whole["effects"]) {
@@ -550,13 +632,26 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     if (effect.night_only) {
       text += "    night_only: true\n";
     }
-    if (effect.glow.has_value()) {
-      text += std::format("    glow:\n      color: {}\n      range: {}\n",
-                          VectorText(effect.glow->color), effect.glow->range);
-      if (effect.glow->flicker) {
-        text += "      flicker: true\n";
-      }
+    text += GlowText(effect.glow);
+    text += std::format("    why: {}\n", DoubleQuoted(effect.why));
+  }
+  if (!edit.effect_edits().empty()) {
+    text += "map_effects:\n";
+  }
+  for (const EffectEdit& effect : edit.effect_edits()) {
+    text += std::format("  - index: {}\n", effect.effect_index);
+    text += std::format("    number: {}\n", effect.number);
+    text += std::format("    origin: {}\n", VectorText(effect.origin));
+    if (effect.position.has_value()) {
+      text += std::format("    position: {}\n", VectorText(*effect.position));
     }
+    if (effect.hidden) {
+      text += "    hidden: true\n";
+    }
+    if (effect.night_only) {
+      text += "    night_only: true\n";
+    }
+    text += GlowText(effect.glow);
     text += std::format("    why: {}\n", DoubleQuoted(effect.why));
   }
   if (!edit.lights().empty()) {

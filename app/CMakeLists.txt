@@ -762,6 +762,7 @@ add_library(moonclient_graphics STATIC
     world/map_editor_effects.cpp
     world/map_editor_gestures.cpp
     world/map_editor_lights.cpp
+    world/map_editor_map_effects.cpp
     world/map_editor_mesh.cpp
     world/map_editor_overlay.cpp
     world/map_editor_session.cpp

@@ -37,10 +37,96 @@ constexpr WheelDrag kGlowRangeDrag{.drag_step = 0.5F,
                                    .format = "%.1f"};
 constexpr float kParamStep = 0.01F;
 
+// LES EFFETS DE LA CARTE : la liste des objets d'effet du RSW, et celui qu'on
+// règle — sa place, masqué, la nuit, sa lueur, sa raison.
+void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
+                    std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  ImGui::SeparatorText(core::Tr("Effets de la carte"));
+  if (view.map_effects.empty()) {
+    ImGui::TextDisabled("%s", core::Tr("Cette carte n'a aucun effet."));
+    return;
+  }
+  for (const MapEditorMapEffect& effect : view.map_effects) {
+    const std::array<float, 3> cells = CellsOfNative(effect.position, view.map_cubes);
+    const std::string label =
+        std::format("{}{} — #{} — {:.1f} {:.1f} {:.1f}{}##effet_carte{}", effect.edited ? "✎ " : "",
+                    effect.effect_index, effect.number, cells[0], cells[1], cells[2],
+                    effect.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
+                    effect.effect_index);
+    const bool chosen = view.selected_map_effect == effect.effect_index;
+    if (ImGui::Selectable(label.c_str(), chosen)) {
+      intents.emplace_back(
+          map_editor::SelectMapEffect{chosen ? std::nullopt : std::optional(effect.effect_index)});
+    }
+  }
+  if (!view.selected_map_effect.has_value() ||
+      *view.selected_map_effect >= view.map_effects.size()) {
+    return;
+  }
+  const std::size_t index = *view.selected_map_effect;
+  ImGui::PushID("effet_carte");
+  map_editor::SetMapEffect set{
+      .index = index, .effect = view.map_effects[index], .released = false};
+  bool changed = false;
+  bool released = false;
+  const WheelDragResult moved =
+      PositionInCells(core::Tr("Position (cases, hauteur)"), set.effect.position, view.map_cubes);
+  changed |= moved.changed;
+  released |= moved.released;
+  bool toggled = SkinCheckBox(core::Tr("Masquer"), &set.effect.hidden, art);
+  toggled |= SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
+  toggled |= SkinCheckBox(core::Tr("Éclaire"), &set.effect.glows, art);
+  if (set.effect.glows) {
+    changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.effect.glow_color.data(),
+                                 ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
+    released |= ImGui::IsItemDeactivatedAfterEdit();
+    const WheelDragResult reach =
+        WheelDragFloat(core::Tr("Portée"), set.effect.glow_range, kGlowRangeDrag);
+    changed |= reach.changed;
+    released |= reach.released;
+    toggled |= SkinCheckBox(core::Tr("Vacille"), &set.effect.glow_flicker, art);
+  }
+  const std::string_view typed(panel.map_effect_why.data(),
+                               strnlen(panel.map_effect_why.data(), panel.map_effect_why.size()));
+  if (panel.map_effect_why_of != view.selected_map_effect ||
+      (!panel.map_effect_why_typing && typed != set.effect.why)) {
+    panel.map_effect_why.fill('\0');
+    const std::size_t kept = std::min(set.effect.why.size(), panel.map_effect_why.size() - 1);
+    std::copy_n(set.effect.why.begin(), kept, panel.map_effect_why.begin());
+    panel.map_effect_why_of = view.selected_map_effect;
+  }
+  static_cast<void>(ImGui::InputText(core::Tr("Pourquoi"), panel.map_effect_why.data(),
+                                     panel.map_effect_why.size()));
+  panel.map_effect_why_typing = ImGui::IsItemActive();
+  if (ImGui::IsItemDeactivatedAfterEdit()) {
+    set.effect.why = std::string(panel.map_effect_why.data(),
+                                 strnlen(panel.map_effect_why.data(), panel.map_effect_why.size()));
+    changed = true;
+    released = true;
+  }
+  if (changed || released || toggled) {
+    set.released = released || toggled || !ImGui::IsAnyItemActive();
+    intents.emplace_back(std::move(set));
+  }
+  ImGui::BeginDisabled(!view.map_effects[index].edited);
+  if (SkinButton(core::Tr("Rétablir l'effet"), art)) {
+    intents.emplace_back(map_editor::RevertMapEffect{index});
+  }
+  ImGui::EndDisabled();
+  ImGui::SameLine();
+  if (SkinButton(core::Tr("Centrer"), art)) {
+    intents.emplace_back(map_editor::Focus{});
+  }
+  ImGui::PopID();
+}
+
 }  // namespace
 
 void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
                  std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  // Les effets de la carte d'abord : ce sont eux qu'on vient d'abord régler.
+  DrawMapEffects(view, panel, intents, art);
+  ImGui::SeparatorText(core::Tr("Effets ajoutés"));
   static_cast<void>(ImGui::InputInt(core::Tr("Numéro de l'effet"), &panel.effect_number));
   if (SkinButton(core::Tr("Ajouter un effet"), art)) {
     intents.emplace_back(map_editor::AddEffect{panel.effect_number});

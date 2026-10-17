@@ -36,6 +36,32 @@ const ModelEdit* MapEdit::ModelAt(std::size_t model_index) const {
   return found == models_.end() ? nullptr : &*found;
 }
 
+bool EffectEditTargets(const EffectEdit& edit, const formats::RswEffect& object) {
+  return edit.number == object.number && NearOrigin(edit.origin, object.position);
+}
+
+const EffectEdit* MapEdit::EffectEditAt(std::size_t effect_index) const {
+  const auto found =
+      std::ranges::lower_bound(effect_edits_, effect_index, {}, &EffectEdit::effect_index);
+  return found != effect_edits_.end() && found->effect_index == effect_index ? &*found : nullptr;
+}
+
+void MapEdit::SetEffectEdit(EffectEdit edit) {
+  const auto place =
+      std::ranges::lower_bound(effect_edits_, edit.effect_index, {}, &EffectEdit::effect_index);
+  if (place != effect_edits_.end() && place->effect_index == edit.effect_index) {
+    *place = std::move(edit);
+  } else {
+    effect_edits_.insert(place, std::move(edit));
+  }
+}
+
+void MapEdit::RemoveEffectEdit(std::size_t effect_index) {
+  std::erase_if(effect_edits_, [effect_index](const EffectEdit& edit) {
+    return edit.effect_index == effect_index;
+  });
+}
+
 void MapEdit::SetModel(ModelEdit edit) {
   const auto place =
       std::ranges::lower_bound(models_, edit.model_index, {}, &ModelEdit::model_index);

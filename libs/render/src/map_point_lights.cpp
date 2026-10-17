@@ -25,8 +25,22 @@ float FlickerFactor(std::size_t slot, double time_ms) {
   return 1.0F - kFlickerDepth * (0.5F + 0.5F * wave);
 }
 
-std::vector<ro::mapedit::AddedLight> DocumentLights(const ro::mapedit::MapEdit& edit) {
+std::vector<ro::mapedit::AddedLight> DocumentLights(
+    const ro::mapedit::MapEdit& edit, std::span<const ro::formats::RswEffect> map_objects) {
   std::vector<ro::mapedit::AddedLight> lights = edit.lights();
+  for (const ro::mapedit::EffectEdit& retouch : edit.effect_edits()) {
+    if (!retouch.glow.has_value() || retouch.hidden || retouch.effect_index >= map_objects.size() ||
+        !ro::mapedit::EffectEditTargets(retouch, map_objects[retouch.effect_index])) {
+      continue;
+    }
+    lights.push_back(ro::mapedit::AddedLight{
+        .position = retouch.position.value_or(map_objects[retouch.effect_index].position),
+        .color = retouch.glow->color,
+        .range = retouch.glow->range,
+        .night_only = retouch.night_only,
+        .flicker = retouch.glow->flicker,
+        .why = retouch.why});
+  }
   for (const ro::mapedit::AddedEffect& effect : edit.effects()) {
     if (effect.glow.has_value()) {
       lights.push_back(ro::mapedit::AddedLight{.position = effect.position,

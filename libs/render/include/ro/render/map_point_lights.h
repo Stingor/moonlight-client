@@ -1,5 +1,6 @@
 #pragma once
 
+#include <span>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -24,8 +25,11 @@ namespace ro::render {
                                            bool always_night, glm::vec3 eye, double time_ms = 0.0);
 
 // TOUTES LES LUMIÈRES DU DOCUMENT : les siennes, puis la lueur de chaque effet
-// qui en porte une, à sa place, avec la règle de nuit de l'effet.
-[[nodiscard]] std::vector<ro::mapedit::AddedLight> DocumentLights(const ro::mapedit::MapEdit& edit);
+// qui en porte une, à sa place, avec la règle de nuit de l'effet — ceux qu'il
+// ajoute, et les effets de la carte `map_objects` que ses retouches font luire
+// là où elles les posent ; un effet masqué ne luit pas.
+[[nodiscard]] std::vector<ro::mapedit::AddedLight> DocumentLights(
+    const ro::mapedit::MapEdit& edit, std::span<const ro::formats::RswEffect> map_objects = {});
 
 // LE VACILLEMENT d'une lumière à l'instant `time_ms`, facteur de son intensité
 // entre `1 − kFlickerDepth` et 1 : deux ondes de périodes premières entre

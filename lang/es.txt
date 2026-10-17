@@ -18846,3 +18846,24 @@ tr: invoca %u monstruo(s) al azar (grupo %s)
 
 fr: Position (cases, hauteur)
 tr: Posición (casillas, altura)
+
+fr: Effets de la carte
+tr: Efectos del mapa
+
+fr: Effets ajoutés
+tr: Efectos añadidos
+
+fr: Cette carte n'a aucun effet.
+tr: Este mapa no tiene ningún efecto.
+
+fr: Rétablir l'effet
+tr: Restablecer el efecto
+
+fr: Retoucher l'effet %zu
+tr: Retocar el efecto %zu
+
+fr: Rétablir l'effet %zu
+tr: Restablecer el efecto %zu
+
+fr: La retouche de l'effet %zu n'a pas de raison.
+tr: El retoque del efecto %zu no tiene motivo.

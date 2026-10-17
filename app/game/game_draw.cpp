@@ -173,7 +173,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // Leurs ombres se peignent ici, avant la passe de couleur.
   const ro::render::PointLightSet points = DrawPointShadowsIfAsked(
       ro::render::MapPointLights(
-          ro::render::DocumentLights(map_edits_.Document(stage_->name)),
+          ro::render::DocumentLights(map_edits_.Document(stage_->name),
+                                     stage_->scene.rsw.effects()),
           ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
           sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms)),
       models_shown, carts);

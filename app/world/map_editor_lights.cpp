@@ -111,6 +111,7 @@ void MapEditorSession::ChooseLight(std::optional<std::size_t> slot) {
     selection_.Clear();
     vertex_.reset();
     selected_effect_.reset();
+    selected_map_effect_.reset();
   }
 }
 
@@ -122,6 +123,7 @@ void MapEditorSession::ChooseModel(std::optional<std::size_t> model_index) {
   if (model_index.has_value()) {
     selected_light_.reset();
     selected_effect_.reset();
+    selected_map_effect_.reset();
   }
 }
 
@@ -129,7 +131,13 @@ MapEditorSession::Outcome MapEditorSession::Focus(const ro::render::MapScene& sc
                                                   const MapEditStore& store) {
   const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
   const std::vector<ro::mapedit::AddedEffect>& effects = store.Document(map_name_).effects();
-  if (selected_effect_.has_value() && *selected_effect_ < effects.size()) {
+  if (selected_map_effect_.has_value() && *selected_map_effect_ < scene.rsw.effects().size()) {
+    const ro::mapedit::EffectEdit* retouch =
+        store.Document(map_name_).EffectEditAt(*selected_map_effect_);
+    view_point_ = retouch != nullptr && retouch->position.has_value()
+                      ? *retouch->position
+                      : scene.rsw.effects()[*selected_map_effect_].position;
+  } else if (selected_effect_.has_value() && *selected_effect_ < effects.size()) {
     view_point_ = effects[*selected_effect_].position;
   } else if (selected_light_.has_value() && *selected_light_ < lights.size()) {
     view_point_ = lights[*selected_light_].position;

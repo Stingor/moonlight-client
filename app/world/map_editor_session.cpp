@@ -91,7 +91,8 @@ std::vector<ro::ui::MapEditorLine> MapEditorSession::GizmoTrace() const {
 bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
   return active_ && ((view.selected.has_value() && GrabTool(pointer, view)) ||
                      GrabLightHandle(pointer, view) || GrabEffectHandle(pointer, view) ||
-                     GrabLight(pointer) || GrabEffect(pointer));
+                     GrabMapEffectHandle(pointer, view) || GrabLight(pointer) ||
+                     GrabEffect(pointer) || GrabMapEffect(pointer));
 }
 
 bool MapEditorSession::GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
@@ -121,15 +122,21 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
     return;
   }
   // UN SOMMET, UNE LUMIÈRE se déplacent comme une pose, à la flèche.
-  const ro::ui::MapEditorTool tool =
-      drag_->vertex.has_value() || drag_->light.has_value() || drag_->effect.has_value()
-          ? ro::ui::MapEditorTool::kMove
-          : tool_;
+  const ro::ui::MapEditorTool tool = drag_->vertex.has_value() || drag_->light.has_value() ||
+                                             drag_->effect.has_value() ||
+                                             drag_->map_effect.has_value()
+                                         ? ro::ui::MapEditorTool::kMove
+                                         : tool_;
   drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
   if (snap) {
     drag_->last = Snapped(tool, drag_->start, drag_->last);
   }
   drag_->last.released = false;
+  if (drag_->map_effect.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveMapEffect{
+        .index = *drag_->map_effect, .native = drag_->last.position, .released = false});
+    return;
+  }
   if (drag_->effect.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveEffect{
         .slot = *drag_->effect, .native = drag_->last.position, .released = false});
@@ -156,7 +163,10 @@ void MapEditorSession::Release() {
   }
   ro::ui::map_editor::Place last = drag_->last;
   last.released = true;
-  if (drag_->effect.has_value()) {
+  if (drag_->map_effect.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveMapEffect{
+        .index = *drag_->map_effect, .native = last.position, .released = true});
+  } else if (drag_->effect.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveEffect{
         .slot = *drag_->effect, .native = last.position, .released = true});
   } else if (drag_->light.has_value()) {
@@ -195,6 +205,7 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
   selection_.Clear();
   selected_light_.reset();
   selected_effect_.reset();
+  selected_map_effect_.reset();
   gesture_before_.reset();
   pending_why_.clear();
   status_.clear();
@@ -278,6 +289,15 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return MoveLight(asked, store);
         } else if constexpr (std::is_same_v<Asked, intents::SetLight>) {
           return SetLight(asked, store);
+        } else if constexpr (std::is_same_v<Asked, intents::SelectMapEffect>) {
+          ChooseMapEffect(asked.index);
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::SetMapEffect>) {
+          return SetMapEffect(asked, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::RevertMapEffect>) {
+          return RevertMapEffect(asked.index, store);
+        } else if constexpr (std::is_same_v<Asked, intents::MoveMapEffect>) {
+          return MoveMapEffect(asked, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddEffect>) {
           return AddEffect(asked.number, store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectEffect>) {
@@ -520,6 +540,16 @@ void MapEditorSession::Save(MapEditStore& store) {
       return;
     }
   }
+  for (const ro::mapedit::EffectEdit& retouch : store.Document(map_name_).effect_edits()) {
+    if (retouch.why.empty()) {
+      Line refused{};
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche de l'effet %zu n'a pas de raison."),
+                    retouch.effect_index);
+      status_ = refused.data();
+      return;
+    }
+  }
   const std::vector<ro::mapedit::AddedEffect>& effects = store.Document(map_name_).effects();
   for (std::size_t slot = 0; slot < effects.size(); ++slot) {
     if (effects[slot].why.empty()) {
@@ -641,6 +671,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.edited = edited_ranks_;
   ViewLights(document, view);
   ViewEffects(document, view);
+  ViewMapEffects(scene, document, view);
   if (selection_.empty()) {
     return view;
   }

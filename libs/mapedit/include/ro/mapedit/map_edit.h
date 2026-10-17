@@ -122,6 +122,27 @@ struct AddedEffect {
   friend bool operator==(const AddedEffect&, const AddedEffect&) = default;
 };
 
+// LA RETOUCHE D'UN EFFET DE LA CARTE, un objet d'effet du RSW : déplacé,
+// masqué, réservé à la nuit, ou doté d'une lueur. Elle désigne son objet par
+// son rang, son numéro et sa position d'origine, et ne vaut plus si la carte a
+// changé sous elle.
+struct EffectEdit {
+  std::size_t effect_index = 0;
+  std::int32_t number = 0;
+  std::array<float, 3> origin{};
+  std::optional<std::array<float, 3>> position;
+  bool hidden = false;
+  bool night_only = false;
+  std::optional<EffectGlow> glow;
+  std::string why;
+
+  friend bool operator==(const EffectEdit&, const EffectEdit&) = default;
+};
+
+// La retouche vise-t-elle encore cet objet : même numéro, même position
+// d'origine, à la tolérance du document ?
+[[nodiscard]] bool EffectEditTargets(const EffectEdit& edit, const formats::RswEffect& object);
+
 // UN SOMMET DÉPLACÉ : son nœud, son rang dans le nœud, sa position dans le
 // fichier et la nouvelle, toutes deux dans le repère du nœud.
 struct VertexMove {
@@ -168,11 +189,18 @@ class MapEdit {
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
   [[nodiscard]] bool empty() const noexcept {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
-           effects_.empty();
+           effects_.empty() && effect_edits_.empty();
   }
   // Les effets ajoutés, dans l'ordre du document.
   [[nodiscard]] const std::vector<AddedEffect>& effects() const noexcept { return effects_; }
   void AddEffect(AddedEffect effect) { effects_.push_back(std::move(effect)); }
+  // Les retouches des effets de la carte, rangées par rang.
+  [[nodiscard]] const std::vector<EffectEdit>& effect_edits() const noexcept {
+    return effect_edits_;
+  }
+  [[nodiscard]] const EffectEdit* EffectEditAt(std::size_t effect_index) const;
+  void SetEffectEdit(EffectEdit edit);
+  void RemoveEffectEdit(std::size_t effect_index);
   // Remplace l'effet de rang `slot` ; hors de la liste, rien.
   void SetEffect(std::size_t slot, AddedEffect effect);
   // Retire l'effet de rang `slot` : les suivants remontent.
@@ -214,6 +242,7 @@ class MapEdit {
   std::vector<MeshEdit> meshes_;
   std::vector<AddedLight> lights_;
   std::vector<AddedEffect> effects_;
+  std::vector<EffectEdit> effect_edits_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

@@ -122,4 +122,22 @@ std::vector<MapEditorSession::LightDot> EffectDots(const ro::ui::MapEditorView& 
   return dots;
 }
 
+std::vector<MapEditorSession::LightDot> MapEffectDots(const ro::ui::MapEditorView& view,
+                                                      const ro::render::MapScene& scene,
+                                                      const ro::render::Camera& camera,
+                                                      float aspect_ratio, float viewport_width,
+                                                      float viewport_height) {
+  const ro::render::MapEffectFrame frame{scene.gnd.width(), scene.gnd.height()};
+  std::vector<MapEditorSession::LightDot> dots;
+  for (const ro::ui::MapEditorMapEffect& effect : view.map_effects) {
+    const std::array<float, 3>& native = effect.position;
+    if (const std::optional<glm::vec2> at = ro::render::ProjectToScreen(
+            camera, aspect_ratio, frame.ToWorld(glm::vec3(native[0], native[1], native[2])),
+            viewport_width, viewport_height)) {
+      dots.push_back(MapEditorSession::LightDot{.at = *at, .slot = effect.effect_index});
+    }
+  }
+  return dots;
+}
+
 }  // namespace moonclient

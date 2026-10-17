@@ -31,6 +31,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
     }
     return position;
   };
+  if (selected_map_effect_.has_value()) {
+    return NudgeMapEffect(delta, scene, store);
+  }
   if (selected_effect_.has_value()) {
     return NudgeEffect(delta, store);
   }
@@ -68,6 +71,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
 
 MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene& scene,
                                                       MapEditStore& store) {
+  if (selected_map_effect_.has_value()) {
+    return DuplicateMapEffect(scene, store);
+  }
   if (selected_effect_.has_value()) {
     return DuplicateEffect(store);
   }
@@ -109,6 +115,9 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
 
 MapEditorSession::Outcome MapEditorSession::Delete(const ro::render::MapScene& scene,
                                                    MapEditStore& store) {
+  if (selected_map_effect_.has_value()) {
+    return HideMapEffect(scene, store);
+  }
   if (selected_effect_.has_value()) {
     return RemoveEffect(*selected_effect_, store);
   }

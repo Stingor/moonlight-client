@@ -63,6 +63,24 @@ struct MapEditorEffect {
   std::string why;
 };
 
+// UN EFFET DE LA CARTE — un objet d'effet du RSW —, tel que le panneau le
+// montre et le rend : son rang et son numéro, sa place d'origine et celle que
+// l'édition lui donne, et ce qu'elle en fait.
+struct MapEditorMapEffect {
+  std::size_t effect_index = 0;
+  std::int32_t number = 0;
+  std::array<float, 3> origin{};
+  std::array<float, 3> position{};
+  bool edited = false;
+  bool hidden = false;
+  bool night_only = false;
+  bool glows = false;
+  std::array<float, 3> glow_color{2.0F, 1.4F, 0.7F};
+  float glow_range = 50.0F;
+  bool glow_flicker = true;
+  std::string why;
+};
+
 // CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres : des segments
 // déjà projetés, en pixels de fenêtre.
 enum class MapEditorLineKind : std::uint8_t {
@@ -142,6 +160,9 @@ struct MapEditorView {
   // LES EFFETS DE CARTE du document, et celui qu'on règle.
   std::vector<MapEditorEffect> effects;
   std::optional<std::size_t> selected_effect;
+  // LES EFFETS DE LA CARTE, dans l'ordre du RSW, et celui qu'on règle.
+  std::vector<MapEditorMapEffect> map_effects;
+  std::optional<std::size_t> selected_map_effect;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
@@ -220,6 +241,27 @@ struct SetEffect {
 struct RemoveEffect {
   std::size_t slot = 0;
 };
+// Régler l'effet de la carte de rang `index`, ou plus aucun.
+struct SelectMapEffect {
+  std::optional<std::size_t> index;
+};
+// L'effet de la carte de rang `index` devient `effect`. `released`, comme pour
+// `Place`.
+struct SetMapEffect {
+  std::size_t index = 0;
+  MapEditorMapEffect effect;
+  bool released = true;
+};
+// Rendre à l'effet de la carte de rang `index` ce que le RSW en dit.
+struct RevertMapEffect {
+  std::size_t index = 0;
+};
+// Déplacer l'effet de la carte de rang `index` en `native`, à la flèche.
+struct MoveMapEffect {
+  std::size_t index = 0;
+  std::array<float, 3> native{};
+  bool released = true;
+};
 // Déplacer l'effet de rang `slot` en `native`, à la flèche.
 struct MoveEffect {
   std::size_t slot = 0;
@@ -261,7 +303,8 @@ using MapEditorIntent = std::variant<
     map_editor::AddLight, map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
     map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus, map_editor::Delete,
     map_editor::Nudge, map_editor::AddEffect, map_editor::SelectEffect, map_editor::SetEffect,
-    map_editor::RemoveEffect, map_editor::MoveEffect>;
+    map_editor::RemoveEffect, map_editor::MoveEffect, map_editor::SelectMapEffect,
+    map_editor::SetMapEffect, map_editor::RevertMapEffect, map_editor::MoveMapEffect>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -300,6 +343,10 @@ struct MapEditorPanelState {
   std::array<char, kWhyCapacity> effect_why{};
   std::optional<std::size_t> effect_why_of;
   bool effect_why_typing = false;
+  // La raison de l'effet de la carte réglé, comme celle d'un effet ajouté.
+  std::array<char, kWhyCapacity> map_effect_why{};
+  std::optional<std::size_t> map_effect_why_of;
+  bool map_effect_why_typing = false;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

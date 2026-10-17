@@ -137,6 +137,8 @@ class MapEditorSession {
   void SetLightDots(std::vector<LightDot> dots) { light_dots_ = std::move(dots); }
   // LE LOSANGE D'UN EFFET à l'écran, et son rang : un clic dessus le désigne.
   void SetEffectDots(std::vector<LightDot> dots) { effect_dots_ = std::move(dots); }
+  void SetMapEffectDots(std::vector<LightDot> dots) { map_effect_dots_ = std::move(dots); }
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> MapEffectTrace() const;
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> EffectTrace() const;
   // Les cercles des lumières, la réglée distinguée.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> LightTrace() const;
@@ -209,6 +211,25 @@ class MapEditorSession {
   // L'effet qu'on règle, et les losanges de tous à l'écran.
   std::optional<std::size_t> selected_effect_;
   std::vector<LightDot> effect_dots_;
+  // L'effet de la carte qu'on règle, et les losanges de tous à l'écran.
+  std::optional<std::size_t> selected_map_effect_;
+  std::vector<LightDot> map_effect_dots_;
+  // LES EFFETS DE LA CARTE : voir map_editor_map_effects.cpp.
+  void ViewMapEffects(const ro::render::MapScene& scene, const ro::mapedit::MapEdit& document,
+                      ro::ui::MapEditorView& view) const;
+  Outcome SetMapEffect(const ro::ui::map_editor::SetMapEffect& set,
+                       const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome RevertMapEffect(std::size_t index, MapEditStore& store);
+  Outcome MoveMapEffect(const ro::ui::map_editor::MoveMapEffect& move,
+                        const ro::render::MapScene& scene, MapEditStore& store);
+  void ChooseMapEffect(std::optional<std::size_t> index);
+  [[nodiscard]] bool GrabMapEffect(glm::vec2 pointer);
+  [[nodiscard]] bool GrabMapEffectHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  // Les gestes du clavier sur l'effet de la carte désigné.
+  Outcome NudgeMapEffect(const std::array<float, 3>& delta, const ro::render::MapScene& scene,
+                         MapEditStore& store);
+  Outcome HideMapEffect(const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome DuplicateMapEffect(const ro::render::MapScene& scene, MapEditStore& store);
   // LES EFFETS : voir map_editor_effects.cpp.
   void ViewEffects(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
   Outcome AddEffect(std::int32_t number, MapEditStore& store);
@@ -264,6 +285,7 @@ class MapEditorSession {
     // La lumière que la poignée déplace, ou l'effet.
     std::optional<std::size_t> light;
     std::optional<std::size_t> effect;
+    std::optional<std::size_t> map_effect;
   };
   std::optional<Drag> drag_;
   std::vector<ro::ui::MapEditorIntent> queued_;

@@ -18846,3 +18846,24 @@ tr: summons %u random monster(s) (group %s)
 
 fr: Position (cases, hauteur)
 tr: Position (cells, height)
+
+fr: Effets de la carte
+tr: Map effects
+
+fr: Effets ajoutés
+tr: Added effects
+
+fr: Cette carte n'a aucun effet.
+tr: This map has no effect.
+
+fr: Rétablir l'effet
+tr: Restore the effect
+
+fr: Retoucher l'effet %zu
+tr: Edit effect %zu
+
+fr: Rétablir l'effet %zu
+tr: Restore effect %zu
+
+fr: La retouche de l'effet %zu n'a pas de raison.
+tr: The edit of effect %zu has no reason.
