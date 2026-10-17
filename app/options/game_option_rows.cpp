@@ -531,6 +531,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
              nullptr, speak_frost_joke_));
   // L'APPEL D'URGENCE : un réglage que le serveur tient — voir `call_options.h`.
   pages_.call.ComposeInto(game_rows_);
+  pages_.deal_refusal.ComposeInto(game_rows_);
   pages_.battleground.ComposeInto(game_rows_);
 
   game_rows_.push_back(

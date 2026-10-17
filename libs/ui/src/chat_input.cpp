@@ -679,6 +679,12 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     ReloadField(field);
   }
 
+  // ALT+ENTRÉE VALIDE, dans les deux formes du champ : ImGui ne lit Entrée
+  // qu'avec Ctrl, Maj ou rien.
+  const ImGuiIO& keys_io = ImGui::GetIO();
+  const bool enter_down = ImGui::IsKeyPressed(ImGuiKey_Enter, false) ||
+                          ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false);
+  submitted = submitted || (active && keys_io.KeyAlt && enter_down);
   if (wrap_width > 0.0F && active) {
     const ImGuiIO& io = ImGui::GetIO();
     // Ctrl+Entrée et Maj+Entrée VALIDENT aussi, comme en ligne unique. En
@@ -737,6 +743,9 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     if (state.text[0] != '\0') {
       said = std::string(state.text.data());
       RememberTypedLine(state.history, *said);
+      if (asked != nullptr) {
+        asked->keys = ChatSubmitKeys{.ctrl = keys_io.KeyCtrl, .alt = keys_io.KeyAlt};
+      }
       state.text[0] = '\0';
       ReloadEmptiedField(field);
       // ⚠ LE CLAVIER RESTE À LA BARRE APRÈS ENVOI, comme dans le jeu : on dit

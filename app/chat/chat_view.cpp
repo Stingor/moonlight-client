@@ -65,88 +65,6 @@ constexpr std::string_view kSkillFailCommand = "/skillfail";
 // part à l'équipe.
 constexpr std::string_view kBattleChatCommand = "/battlechat";
 
-// La fraction de fin de vie sur laquelle une bulle s'efface. ⚠ LA FIN SEULE :
-// une bulle qui pâlit dès son apparition se lit comme un défaut d'affichage.
-constexpr float kBubbleFadeFraction = 0.25F;
-
-}  // namespace
-
-namespace {
-
-// Un agrégat plutôt qu'une paire : le constructeur d'une paire prend ses
-// arguments par valeur, et un littéral entier y passe par un int qu'il faut
-// rétrécir. Écrit ainsi, chaque numéro est vérifié à la compilation.
-struct Command {
-  std::string_view name;
-  std::uint16_t emotion;
-};
-
-// Les commandes d'émoticône du jeu, et le numéro qu'elles envoient.
-//
-// D'OÙ ELLES VIENNENT. Les numéros sont ceux de emotion_type, dans
-// src/map/clif.hpp ; le serveur y écrit lui-même la commande de vingt-deux
-// d'entre elles, en commentaire. Les autres sont celles de la liste classique
-// du jeu, qui suit exactement le même ordre — de la deuxième à la
-// trente-quatrième, sans trou.
-constexpr std::array<Command, 66> kEmotionCommands = {{
-    {"/!", 0},        {"/?", 1},       {"/ho", 2},      {"/delight", 2},   {"/lv", 3},
-    {"/heart", 3},    {"/swt", 4},     {"/sweat", 4},   {"/ic", 5},        {"/aha", 5},
-    {"/an", 6},       {"/fret", 6},    {"/ag", 7},      {"/anger", 7},     {"/$", 8},
-    {"/money", 8},    {"/...", 9},     {"/gawi", 10},   {"/scissors", 10}, {"/bawi", 11},
-    {"/rock", 11},    {"/bo", 12},     {"/paper", 12},  {"/korea", 13},    {"/lv2", 14},
-    {"/thx", 15},     {"/thk", 15},    {"/wah", 16},    {"/sry", 17},      {"/heh", 18},
-    {"/swt2", 19},    {"/hmm", 20},    {"/no1", 21},    {"/??", 22},       {"/omg", 23},
-    {"/oh", 24},      {"/X", 25},      {"/hlp", 26},    {"/go", 27},       {"/sob", 28},
-    {"/gg", 29},      {"/kis", 30},    {"/kis2", 31},   {"/pif", 32},      {"/ok", 33},
-    {"/bzz", 36},     {"/stare", 36},  {"/awsm", 38},   {"/cool", 38},     {"/pat", 41},
-    {"/goodboy", 41}, {"/mp", 42},     {"/sptime", 42}, {"/com", 44},      {"/comeon", 44},
-    {"/yawn", 45},    {"/sleepy", 45}, {"/grat", 46},   {"/congrats", 46}, {"/hp", 47},
-    {"/hptime", 47},  {"/fsh", 52},    {"/spin", 53},   {"/dum", 55},      {"/crwd", 56},
-    {"/otl", 57},
-}};
-
-// La commande de NUMÉRO, qui n'existe pas dans le jeu : elle est à nous, pour
-// atteindre les quatre-vingt-dix-huit émoticônes du sprite, y compris celles
-// qu'aucune commande ne nomme.
-constexpr std::string_view kNumberedEmotion = "/e ";
-
-// Le premier octet d'un caractère UTF-8 n'a jamais la forme 10xxxxxx : c'est à
-// cela qu'on reconnaît les octets de CONTINUATION.
-constexpr std::uint8_t kContinuationMask = 0xC0;
-constexpr std::uint8_t kContinuationBits = 0x80;
-
-// Ce que le journal montre : blanc pour une parole, jaune pâle pour ce que le
-// serveur écrit — cela ne vient de personne et ne doit pas se lire comme une
-// voix.
-constexpr std::array<std::uint8_t, 4> kSpokenColor = {255, 255, 255, 255};
-constexpr std::array<std::uint8_t, 4> kServerColor = {255, 235, 160, 255};
-// La ligne en cours de saisie, et son signe d'attente.
-constexpr std::array<std::uint8_t, 4> kTypedColor = {180, 230, 255, 255};
-constexpr std::string_view kPrompt = "> ";
-constexpr std::string_view kCaret = "_";
-
-// Le numéro que porte une commande numérotée, ou rien.
-std::optional<std::uint16_t> NumberedEmotion(std::string_view line) {
-  if (!line.starts_with(kNumberedEmotion)) {
-    return std::nullopt;
-  }
-  const std::string_view digits = line.substr(kNumberedEmotion.size());
-  if (digits.empty()) {
-    return std::nullopt;
-  }
-  unsigned value = 0;
-  for (const char digit : digits) {
-    if (digit < '0' || digit > '9') {
-      return std::nullopt;
-    }
-    value = value * 10 + static_cast<unsigned>(digit - '0');
-    if (value > 255) {
-      return std::nullopt;
-    }
-  }
-  return static_cast<std::uint16_t>(value);
-}
-
 }  // namespace
 
 bool IsCraftAtlasCommand(std::string_view line) {
@@ -159,24 +77,6 @@ bool IsCraftAtlasCommand(std::string_view line) {
   return std::ranges::any_of(kCraftAtlasCommands, [&](std::string_view command) {
     return std::ranges::equal(name, command, folded_equal);
   });
-}
-
-std::optional<std::uint16_t> EmotionCommand(std::string_view line) {
-  for (const Command& command : kEmotionCommands) {
-    if (line == command.name) {
-      return command.emotion;
-    }
-  }
-  return NumberedEmotion(line);
-}
-
-std::string_view EmotionCommandOf(std::uint16_t emotion) {
-  for (const Command& command : kEmotionCommands) {
-    if (command.emotion == emotion) {
-      return command.name;
-    }
-  }
-  return {};
 }
 
 std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
@@ -445,8 +345,10 @@ void ToggleBattleChat(const ChatDispatch& to, std::uint32_t said_ms) {
 // ⚠ LA MÊME LECTURE QUE CELLE DE L'ÉTIQUETTE, avec le même mode armé : c'est ce
 // qui garantit que la phrase part là où la barre l'annonçait. Et un chuchotement
 // parti attend son accusé : c'est lui qui en composera l'écho.
-void SendLine(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms) {
+void SendLine(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms,
+              ro::net::ChatKeys keys = {}) {
   ro::net::ChatArming armed = to.armed != nullptr ? *to.armed : ro::net::ChatArming{};
+  armed.keys = keys;
   // ⚠ LA CARTE SE RELIT ICI, au moment de l'envoi : une macro peut parler sans
   // que la barre ait été recomposée depuis le dernier changement de carte.
   armed.on_battlefield = to.world->map_mode().battlefield;
@@ -516,7 +418,8 @@ void SaveChatAndSay(const ChatTabsView& tabs, const ChatRoomStage* rooms, bool t
                    said_ms);
 }
 
-void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms) {
+void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms,
+                ro::net::ChatKeys keys) {
   if (line.empty()) {
     return;
   }
@@ -527,7 +430,7 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     // À QUI, C'EST LA LIGNE QUI LE DIT : les sigils du jeu, pas un sélecteur.
     // Voir ro/net/chat_target.h, qui porte la table et ce que le serveur en fait.
     if (to.link->is_open()) {
-      SendLine(to, line, said_ms);
+      SendLine(to, line, said_ms, keys);
     }
     return;
   }
@@ -542,6 +445,12 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     if (RunDevelopmentCommand(to, line, said_ms)) {
       return;
     }
+  }
+  // S'ASSEOIR, ÉCHANGER, LE GROUPE, LA GUILDE, LES VOLUMES : voir
+  // `player_command.h`.
+  if (PlayerCommand command = ReadPlayerCommand(line); command.kind != PlayerCommandKind::kNone) {
+    RunPlayerCommand(to, std::move(command), said_ms);
+    return;
   }
   // À la casse près, comme toute la table des commandes du jeu.
   if (ro::core::AsciiEqualsFolded(line, kBattleChatCommand) && to.arming != nullptr) {

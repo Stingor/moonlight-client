@@ -738,7 +738,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .line_preview = &chat_preview_,
       .follow = &world_mouse_.follow,
       .own_config = &own_config_,
-      .banned = &pieces_.banned_words});
+      .banned = &pieces_.banned_words,
+      .player_asks = &player_asks_});
   // ⚠ LA SECONDE PASSE, et la coquille a déjà fait la première.
   //
   // Elle en fait davantage, et c'est pourquoi les deux existent : la musique,

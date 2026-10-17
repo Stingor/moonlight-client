@@ -30,6 +30,8 @@
 
 #include "chat/chat_item_link.h"
 #include "chat/chat_rich_decor.h"
+#include "chat/emotion_commands.h"
+#include "chat/player_command.h"
 #include "effects/effect_view.h"
 #include "game/ui_stage.h"
 #include "options/game_options.h"
@@ -56,28 +58,6 @@ class DatabaseStage;
 class ChatTabsView;
 struct FollowState;
 class NaviSession;
-
-// L'émoticône qu'une ligne demande, ou rien si elle n'en demande aucune.
-//
-// Les commandes viennent du jeu lui-même : celles que le serveur documente dans
-// son énumération emotion_type (src/map/clif.hpp) et celles de la liste
-// classique, dans le même ordre qu'elle. Une commande inconnue n'est PAS
-// envoyée au serveur — le jeu les traite chez lui.
-[[nodiscard]] std::optional<std::uint16_t> EmotionCommand(std::string_view line);
-
-// LE CHEMIN INVERSE : la commande qui joue cette émoticône-là, ou une vue vide.
-//
-// 🔴 LA MÊME TABLE QUE CI-DESSUS, LUE À L'ENVERS, et c'est ce qui les garde
-// d'accord. Une seconde liste finirait par proposer une commande que le routage
-// ne reconnaît pas — donc une macro qui ne joue rien et se dit tout haut.
-//
-// ⚠ LA PREMIÈRE FORME L'EMPORTE quand plusieurs nomment la même : « /ho » avant
-// « /delight ». C'est la courte, celle que le client écrit lui-même.
-//
-// ⚠ ET UNE ÉMOTICÔNE PEUT N'EN AVOIR AUCUNE : le sprite en porte près de cent,
-// la liste du jeu n'en nomme qu'une partie. Ce qui n'a pas de commande n'a rien
-// à faire dans une macro — elle ne jouerait rien chez les autres clients.
-[[nodiscard]] std::string_view EmotionCommandOf(std::uint16_t emotion);
 
 // Ce à quoi une ligne tapée peut s'adresser.
 //
@@ -160,6 +140,10 @@ struct ChatDispatch {
   // LES MOTS INTERDITS, masqués dans toute parole qui part. Nul : rien ne se
   // masque.
   const ro::sim::BannedWords* banned = nullptr;
+  // LES COMMANDES DU JOUEUR QUI VISENT LE GROUPE, LA GUILDE OU UN ÉCHANGE : le
+  // routage les lit, la partie les exécute — elle seule tient ce qu'elles
+  // touchent. Nul : elles se taisent. Voir `RunPlayerCommand`.
+  std::vector<PlayerCommand>* player_asks = nullptr;
 };
 
 // LA COMMANDE QUI COLLE LA CAMÉRA AU PERSONNAGE, ou la laisse le rattraper.
@@ -311,7 +295,17 @@ inline constexpr std::string_view kBattleModeCommandLong = "/battlemode";
 // joue CHEZ NOUS, sans rien demander à personne ; une commande inconnue se dit
 // tout haut à soi-même. Tout le reste part au serveur — les commandes
 // d'administration y comprises, qu'il reconnaît dans le texte.
-void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms);
+//
+// `keys` sont les touches tenues à la validation : Ctrl+Entrée et Alt+Entrée
+// retournent la destination d'une parole sans sigil — voir
+// `ro::net::ChatArming::keys`. Une macro ou un menu n'en tiennent aucune.
+void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms,
+                ro::net::ChatKeys keys = {});
+
+// UNE COMMANDE DU JOUEUR, lue par `ReadPlayerCommand`. Celles qui ne touchent
+// que la liaison, les options ou la conversation s'exécutent ici ; les autres
+// rejoignent `player_asks`. Une forme fausse dit la bonne.
+void RunPlayerCommand(const ChatDispatch& to, PlayerCommand command, std::uint32_t said_ms);
 
 // CE QUE `/savechat` ÉCRIT : les onglets, et en salon le fil du salon. Le menu
 // d'un membre n'écrit que le salon (`tabs_too` faux). Le dossier, ou l'absence

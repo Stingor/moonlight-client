@@ -100,6 +100,10 @@ SocialLine PartyNoticeLine(const sim::PartyNotice& notice) {
     case PartyNoticeKind::kLeaveNeedsHandOver:
       return Plain(Tr("Vous pourrez quitter le groupe une fois la direction déléguée."),
                    SocialTone::kRefusal);
+    case PartyNoticeKind::kOwnInvitationsAllowed:
+      return Plain(Tr("Toutes les invitations de groupe sont acceptées."), SocialTone::kParty);
+    case PartyNoticeKind::kOwnInvitationsRefused:
+      return Plain(Tr("Toutes les invitations de groupe sont bloquées."), SocialTone::kParty);
   }
   return Plain(Tr("Résultat inconnu."), SocialTone::kRefusal);
 }

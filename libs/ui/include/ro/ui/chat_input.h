@@ -295,9 +295,19 @@ struct ChatInputState {
 // n'est que des champs clairs sur un cadre sombre, comme dans le client.
 // CE QUE LA RANGÉE DEMANDE. ⚠ REND DES INTENTIONS, N'APPLIQUE RIEN : `ui` ne
 // sait pas ce qu'un mode veut dire, et ne possède pas la liste des récents.
+// LES MODIFICATEURS TENUS QUAND LA LIGNE A ÉTÉ VALIDÉE. ⚠ DES TOUCHES, PAS UNE
+// DESTINATION : ce qu'elles veulent dire se décide chez l'appelant.
+struct ChatSubmitKeys {
+  bool ctrl = false;
+  bool alt = false;
+};
+
 struct ChatInputAsk {
   // Le rang du mode qu'on vient d'armer, ou moins de zéro.
   int chose_mode = -1;
+  // Les touches tenues quand la ligne rendue a été validée. Alt+Entrée valide
+  // aussi : ImGui ne le fait pas de lui-même.
+  ChatSubmitKeys keys;
   // Le joueur a demandé à oublier les destinataires récents.
   bool forget_whispers = false;
   // ÉCHAP VIENT DE QUITTER L'UNE DES DEUX BOÎTES : en battle mode, c'est la

@@ -276,7 +276,13 @@ FrameOutcome ApplyPartyFrameAt(const Frame& frame, sim::PartyRoster& party,
 
     case proto::ZcPartyConfig::kOpcode:
       return Decoded<proto::ZcPartyConfig>(frame, [&party](const auto& packet) {
-        party.TellRefusesInvitations(packet.denyPartyInvites != 0);
+        const bool refuses = packet.denyPartyInvites != 0;
+        party.TellRefusesInvitations(refuses);
+        // ⚠ CHAQUE ÉCHO SE DIT, celui de la connexion compris : c'est ce que
+        // fait le client du joueur.
+        party.Notify(sim::PartyNotice{.kind = refuses
+                                                  ? sim::PartyNoticeKind::kOwnInvitationsRefused
+                                                  : sim::PartyNoticeKind::kOwnInvitationsAllowed});
         return FrameOutcome::kApplied;
       });
 

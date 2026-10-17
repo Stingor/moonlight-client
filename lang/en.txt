@@ -18957,3 +18957,105 @@ tr: Spells cast light
 
 fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes.\n\nLe client d'origine ne le fait pas.
 tr: A fire, lightning or holy spell lights the ground, the scenery and the characters around it, in the colour of its flames.\n\nThe original client does not.
+
+fr: a reçu une invitation à rejoindre le groupe.
+tr: has received an invitation to join your party.
+
+fr: /breakguild (nom de la guilde) : dissout la guilde
+tr: /breakguild (guild name): disbands the guild
+
+fr: /deal (nom du personnage) : propose un échange à un joueur visible
+tr: /deal (character name): offers a trade to a visible player
+
+fr: /deal nom : proposer un échange — /notrade : refuser d'office les échanges
+tr: /deal name: offer a trade — /notrade: decline trades automatically
+
+fr: /ex nom, /in nom : bloquer ou rétablir les chuchotements d'un joueur
+tr: /ex name, /in name: block or allow a player's whispers
+
+fr: /expel (nom du personnage) : exclut du groupe
+tr: /expel (character name): expels from the party
+
+fr: /guild (nom de la guilde) : fonde une guilde
+tr: /guild (guild name): founds a guild
+
+fr: /guild nom, /guildinvite nom, /breakguild nom : la guilde
+tr: /guild name, /guildinvite name, /breakguild name: the guild
+
+fr: /guildinvite (nom du personnage) : invite dans la guilde
+tr: /guildinvite (character name): invites into the guild
+
+fr: /invite (nom du personnage) : invite dans le groupe
+tr: /invite (character name): invites into the party
+
+fr: /organize (nom du groupe) : fonde un groupe
+tr: /organize (party name): founds a party
+
+fr: /organize nom, /invite nom, /leave, /expel nom : le groupe — /accept, /refuse : les invitations
+tr: /organize name, /invite name, /leave, /expel name: the party — /accept, /refuse: invitations
+
+fr: /savechat : enregistrer la conversation — /battlemode : replier la barre
+tr: /savechat: save the conversation — /battlemode: fold the bar
+
+fr: /sit, /stand : s'asseoir ou se lever
+tr: /sit, /stand: sit down or stand up
+
+fr: /v N, /bv N : volume des bruitages et de la musique, de 0 à 127 — /sound, /bgm : les couper
+tr: /v N, /bv N: sound effects and music volume, from 0 to 127 — /sound, /bgm: mute them
+
+fr: /w nom message, %message (groupe), $message (guilde), /gc, /cl, /bc : parler à quelqu'un ou à un canal
+tr: /w name message, %message (party), $message (guild), /gc, /cl, /bc: talk to someone or to a channel
+
+fr: /who : joueurs connectés — /emotion : les émoticônes — /where : sa position
+tr: /who: players online — /emotion: the emoticons — /where: your position
+
+fr: Aucun joueur de ce nom n'est en vue :
+tr: No player by that name is in sight:
+
+fr: Ce nom est trop long : vingt-trois caractères au plus.
+tr: This name is too long: twenty-three characters at most.
+
+fr: Commandes du client :
+tr: Client commands:
+
+fr: Ctrl+Entrée : au groupe — Alt+Entrée : à la guilde
+tr: Ctrl+Enter: to the party — Alt+Enter: to the guild
+
+fr: Invitation à la guilde envoyée à
+tr: Guild invitation sent to
+
+fr: Joueurs actuellement connectés :
+tr: Players currently online:
+
+fr: La dissolution de la guilde a échoué : ce n'est pas son nom.
+tr: Disbanding the guild failed: that is not its name.
+
+fr: Les demandes d'échange sont de nouveau accueillies. [/nt OFF]
+tr: Trade requests are allowed again. [/nt OFF]
+
+fr: Les demandes d'échange sont refusées d'office. [/nt ON]
+tr: Trade requests are declined automatically. [/nt ON]
+
+fr: Refuser d'office les échanges
+tr: Decline trades automatically
+
+fr: Toute demande d'échange reçue se refuse d'elle-même, sans que la boîte ne paraisse. Celui qui la propose l'apprend comme un refus.
+tr: Every trade request you receive is declined on its own, without showing the box. Whoever proposed it learns it as a refusal.
+
+fr: Toutes les invitations de groupe sont acceptées.
+tr: All party invitations are allowed.
+
+fr: Toutes les invitations de groupe sont bloquées.
+tr: All party invitations are blocked.
+
+fr: Un nom de groupe ne peut pas porter de symbole spécial.
+tr: A party name cannot contain a special symbol.
+
+fr: Un nom de guilde ne peut pas porter d'espace.
+tr: A guild name cannot contain a space.
+
+fr: [Liste des émoticônes]
+tr: [Emoticon list]
+
+fr: Échanges
+tr: Trades

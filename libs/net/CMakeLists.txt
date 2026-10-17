@@ -124,6 +124,7 @@ add_library(ro_net STATIC
     src/warp_list.cpp
     src/rank_notices.cpp
     src/warp_memo.cpp
+    src/user_count.cpp
     src/world_update.cpp
     src/zone_move.cpp)
 add_library(ro::net ALIAS ro_net)

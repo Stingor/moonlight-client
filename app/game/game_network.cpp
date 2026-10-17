@@ -435,6 +435,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // LES COMMERCES : ce que leurs fenêtres ont rendu, et les vues qu'elles
   // dessineront. Un objet du sac se décrit par sa case, qui dit raffinement et
   // cartes ; un objet de la boutique, par son seul identifiant.
+  pieces_.trade.deal().RefuseProposals(settings_->options().pages().deal_refusal.refuses_deals());
   pieces_.trade.Advance(
       windows_.trade, link_, world_, pieces_.item_words,
       item_description_.has_value() ? item_description_->creator_names() : CreatorNames(),

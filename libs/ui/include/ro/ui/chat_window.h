@@ -258,8 +258,9 @@ struct ChatWindowState {
 // Ce que le joueur a demandé. ⚠ TOUT EST FACULTATIF : une image ordinaire ne
 // demande rien du tout.
 struct ChatWindowAction {
-  // La ligne validée, déjà vidée de la saisie.
+  // La ligne validée, déjà vidée de la saisie, et les touches tenues alors.
   std::optional<std::string> said;
+  ChatSubmitKeys said_keys;
   // CE QU'IL VIENT DE FAIRE D'UN LIEN — dans le fil ou sur une pastille de la
   // saisie, c'est la même convention et le même menu.
   ChatLinkAsk link;

@@ -99,6 +99,8 @@ void OptionPages::Declare(SettingsFile& into) {
   }
   into.Section("Le carnet de chasse MVP");
   DeclareOn(into, OptionSection::kMvpTracker, mvp_tracker);
+  into.Section("Les échanges");
+  DeclareOn(into, OptionSection::kGameplay, deal_refusal);
   into.Section("Le champ de bataille");
   DeclareOn(into, OptionSection::kGameplay, battleground);
   into.Section("La fiche du pet");
@@ -158,7 +160,7 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
          grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
          battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
          chat_web.Change(asked) || talk_filter.Change(asked) || portrait.Change(asked) ||
-         balloons.Change(asked) || signboards.Change(asked);
+         balloons.Change(asked) || signboards.Change(asked) || deal_refusal.Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {

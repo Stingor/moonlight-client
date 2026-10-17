@@ -131,6 +131,15 @@ core::Result<void> RequestGuildInvite(Connection& link, std::string_view name) {
   return {};
 }
 
+core::Result<void> RequestGuildDisband(Connection& link, std::string_view key) {
+  // ⚠ LE NOM PART DANS L'ENCODAGE DE LA BASE : le serveur le compare octet par
+  // octet à celui de la guilde.
+  proto::CzReqDisorganizeGuild request;
+  request.key = core::Cp1252FromUtf8(key);
+  link.Send(proto::Encode(request));
+  return {};
+}
+
 core::Result<void> RequestGuildAlliance(Connection& link, std::uint32_t target_account_id,
                                         std::uint32_t own_account_id, std::uint32_t own_char_id) {
   proto::GuildAllianceRequest request;

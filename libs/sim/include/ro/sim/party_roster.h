@@ -127,6 +127,10 @@ enum class PartyNoticeKind : std::uint8_t {
   kExpShareRefused,
   // Un refus du client lui-même : un chef ne quitte qu'après avoir délégué.
   kLeaveNeedsHandOver,
+  // LE RÉGLAGE D'INVITATION DU JOUEUR, que le serveur redit à la connexion et
+  // à chaque `/accept` ou `/refuse`.
+  kOwnInvitationsAllowed,
+  kOwnInvitationsRefused,
 };
 
 struct PartyNotice {

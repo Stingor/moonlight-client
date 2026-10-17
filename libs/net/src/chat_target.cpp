@@ -60,6 +60,28 @@ constexpr std::array<AddressingWord, 5> kAddressingWords = {{
          (line.size() == word.size() || line[word.size()] == ' ');
 }
 
+// LE MODE QUE LES TOUCHES DE LA VALIDATION LAISSENT : voir `ChatArming::keys`.
+[[nodiscard]] ChatTarget KeyedMode(const ChatArming& armed) {
+  switch (armed.mode) {
+    case ChatTarget::kPublic:
+      if (armed.keys.party && armed.in_party) {
+        return ChatTarget::kParty;
+      }
+      return armed.keys.guild ? ChatTarget::kGuild : ChatTarget::kPublic;
+    case ChatTarget::kParty:
+      return armed.keys.party ? ChatTarget::kPublic : ChatTarget::kParty;
+    case ChatTarget::kGuild:
+      return armed.keys.guild ? ChatTarget::kPublic : ChatTarget::kGuild;
+    case ChatTarget::kAlly:
+    case ChatTarget::kClan:
+    case ChatTarget::kWhisper:
+    case ChatTarget::kChannel:
+    case ChatTarget::kBattlefield:
+      break;
+  }
+  return armed.mode;
+}
+
 // CE QUE DIT UNE LIGNE SANS SIGIL : la barre décide, box « Pseudo » d'abord,
 // mode armé ensuite.
 [[nodiscard]] ChatIntent ArmedIntent(std::string_view line, const ChatArming& armed) {
@@ -89,7 +111,7 @@ constexpr std::array<AddressingWord, 5> kAddressingWords = {{
     intent.recipient = std::string(armed.channel);
     return intent;
   }
-  intent.target = armed.mode;
+  intent.target = KeyedMode(armed);
   return intent;
 }
 

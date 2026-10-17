@@ -14,6 +14,7 @@
 #include <string>
 #include <string_view>
 
+#include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/adoption.h"
 #include "ro/net/bug_report.h"
@@ -41,6 +42,7 @@
 #include "ro/net/spell_list.h"
 #include "ro/net/status_chat.h"
 #include "ro/net/title.h"
+#include "ro/net/user_count.h"
 #include "ro/net/warp_memo.h"
 #include "ro/net/world_update.h"
 #include "ro/sim/world.h"
@@ -251,6 +253,15 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
     if (memo_ack.has_value() || map_refusal.has_value()) {
       outcome = ro::net::FrameOutcome::kApplied;
     }
+  }
+  // ET LE COMPTE DES JOUEURS CONNECTÉS, que `/who` a demandé.
+  if (const std::optional<std::int32_t> users = ro::net::ReadUserCount(received);
+      users.has_value()) {
+    world_.RecordChat(ro::sim::ChatKind::kServer, 0,
+                      std::string(ro::core::Tr("Joueurs actuellement connectés :")) + " " +
+                          std::to_string(*users),
+                      now_ms);
+    outcome = ro::net::FrameOutcome::kApplied;
   }
   // ET L'ACCUSÉ D'UN RAPPORT DE BUG, que la boîte montre cinq secondes.
   if (const std::optional<std::uint8_t> ack = ro::net::ReadBugReportAck(received);

@@ -253,6 +253,8 @@ void Game::StageChat(std::uint32_t now_ms) {
   // « & » n'est un sigil que sur une carte de champ : l'aperçu et l'envoi le
   // lisent tous deux d'ici.
   armed_chat_.on_battlefield = world_.map_mode().battlefield;
+  // Ctrl+Entrée ne vise le groupe que si l'on en a un.
+  armed_chat_.in_party = party_.in_party();
   // ⚠ LE CHAMP DE BATAILLE NE RESTE PAS ARMÉ HORS DE SA CARTE : le serveur n'y a
   // plus d'équipe à qui relayer, et chaque ligne sans sigil serait refusée.
   if (armed_chat_.mode == ro::net::ChatTarget::kBattlefield && !world_.map_mode().battlefield) {
@@ -282,7 +284,9 @@ void Game::SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms) 
       world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(*settled.held_notice), now_ms,
                         kHeldChatColor);
     } else if (settled.outgoing.has_value()) {
-      SubmitChat(*chat_dispatch_, *settled.outgoing, now_ms);
+      SubmitChat(
+          *chat_dispatch_, *settled.outgoing, now_ms,
+          ro::net::ChatKeys{.party = ask.asked.said_keys.ctrl, .guild = ask.asked.said_keys.alt});
       // ⚠ LE DESTINATAIRE SE RETIENT D'APRÈS CE QUI PART VRAIMENT, pas d'après
       // la box : une ligne peut nommer quelqu'un d'autre par son `/w`, et c'est
       // celui-là qu'on voudra retrouver dans la liste.

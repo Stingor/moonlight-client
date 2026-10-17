@@ -427,6 +427,7 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
     from_row.chose_mode = asked.chose_mode;
     asked.said = DrawChatInput(state.input, preview, &from_row, art, input_links, link_facts);
     asked.chose_mode = from_row.chose_mode;
+    asked.said_keys = from_row.keys;
     // ⚠ LA SAISIE L'EMPORTE SUR LE FIL, et l'ordre ne décide de rien : le joueur
     // n'a qu'une souris, et les deux surfaces ne se recouvrent pas.
     if (from_row.link.gesture != ChatLinkGesture::kNothing) {

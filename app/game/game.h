@@ -330,6 +330,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void StageChat(std::uint32_t now_ms);
   void SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms);
   void ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  // Les commandes du joueur que le routage a confiées : `game_player_commands.cpp`.
+  void RunPlayerAsks(std::uint32_t now_ms);
   // Le sac, la charrette, le coffre, la banque et l'album : `game_containers.cpp`.
   void StageContainers();
   void ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
@@ -762,6 +764,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   float effect_night_ = 0.0F;
   // L'heure du ciel de l'image précédente, pour les plages d'heures.
   std::optional<float> effect_hour_;
+  // CE QUE LE ROUTAGE DU CHAT CONFIE À LA PARTIE, vidé à chaque image.
+  std::vector<PlayerCommand> player_asks_;
 
   // ⚠ EN DERNIER, ET IL LE FAUT : il garde l'adresse de presque tout ce qui
   // précède. Détruit le premier, il ne pend sur rien.

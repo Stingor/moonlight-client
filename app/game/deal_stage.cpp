@@ -248,8 +248,10 @@ void DealStage::FollowProposal(DealWindows& windows, const TradeContext& context
       if (deal_.answer_sent()) {
         return;
       }
-      if (answer.accept || refused) {
-        if (auto sent = ro::net::AnswerDealProposal(context.link, deal_, answer.accept && !closed);
+      // REFUSÉE D'OFFICE sous `/notrade`, avant que la boîte ne paraisse.
+      if (answer.accept || refused || refuse_proposals_) {
+        if (auto sent = ro::net::AnswerDealProposal(context.link, deal_,
+                                                    answer.accept && !closed && !refuse_proposals_);
             !sent) {
           ro::core::LogError("échange : {}", ro::core::Describe(sent.error()));
         }

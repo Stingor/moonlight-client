@@ -253,7 +253,9 @@ add_library(moonclient_chatlinks STATIC
     chat/whisper_block_command.cpp
     chat/show_equipment_command.cpp
     chat/stat_raise_command.cpp
-    chat/native_slash_commands.cpp)
+    chat/native_slash_commands.cpp
+    chat/emotion_commands.cpp
+    chat/player_command.cpp)
 
 # ⚠ `ro_sim` EST PUBLIC : une ligne de conversation porte deux
 # espèces de balise, et celle d'un STYLE se lit — donc se valide — avec
@@ -1532,6 +1534,7 @@ add_executable(moonclient
     chat/chat_room_lines.cpp
     chat/chat_whisper_lines.cpp
     chat/chat_view.cpp
+    chat/player_command_run.cpp
     chat/opening_commands.cpp
     chat/talk_filter_command.cpp
     chat/dev_commands.cpp
@@ -1672,6 +1675,7 @@ add_executable(moonclient
     game/game_balloons.cpp
     game/game_guild.cpp
     game/game_party.cpp
+    game/game_player_commands.cpp
     party/party_panel.cpp
     guild/guild_emblem_editor.cpp
     guild/guild_emblems.cpp
@@ -1707,6 +1711,7 @@ add_executable(moonclient
     options/card_album_options.cpp
     options/description_options.cpp
     options/option_pages.cpp
+    options/deal_refusal_options.cpp
     options/pet_options.cpp
     options/bug_report_options.cpp
     options/menu_icons_options.cpp

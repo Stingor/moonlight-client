@@ -18957,3 +18957,105 @@ tr: Los hechizos iluminan
 
 fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes.\n\nLe client d'origine ne le fait pas.
 tr: Un hechizo de fuego, de rayo o de luz ilumina el suelo, el decorado y los personajes a su alrededor, con el color de sus llamas.\n\nEl cliente original no lo hace.
+
+fr: a reçu une invitation à rejoindre le groupe.
+tr: ha recibido una invitación para unirse al grupo.
+
+fr: /breakguild (nom de la guilde) : dissout la guilde
+tr: /breakguild (nombre del gremio): disuelve el gremio
+
+fr: /deal (nom du personnage) : propose un échange à un joueur visible
+tr: /deal (nombre del personaje): propone un intercambio a un jugador visible
+
+fr: /deal nom : proposer un échange — /notrade : refuser d'office les échanges
+tr: /deal nombre: proponer un intercambio — /notrade: rechazar los intercambios automáticamente
+
+fr: /ex nom, /in nom : bloquer ou rétablir les chuchotements d'un joueur
+tr: /ex nombre, /in nombre: bloquear o permitir los susurros de un jugador
+
+fr: /expel (nom du personnage) : exclut du groupe
+tr: /expel (nombre del personaje): expulsa del grupo
+
+fr: /guild (nom de la guilde) : fonde une guilde
+tr: /guild (nombre del gremio): funda un gremio
+
+fr: /guild nom, /guildinvite nom, /breakguild nom : la guilde
+tr: /guild nombre, /guildinvite nombre, /breakguild nombre: el gremio
+
+fr: /guildinvite (nom du personnage) : invite dans la guilde
+tr: /guildinvite (nombre del personaje): invita al gremio
+
+fr: /invite (nom du personnage) : invite dans le groupe
+tr: /invite (nombre del personaje): invita al grupo
+
+fr: /organize (nom du groupe) : fonde un groupe
+tr: /organize (nombre del grupo): funda un grupo
+
+fr: /organize nom, /invite nom, /leave, /expel nom : le groupe — /accept, /refuse : les invitations
+tr: /organize nombre, /invite nombre, /leave, /expel nombre: el grupo — /accept, /refuse: las invitaciones
+
+fr: /savechat : enregistrer la conversation — /battlemode : replier la barre
+tr: /savechat: guardar la conversación — /battlemode: plegar la barra
+
+fr: /sit, /stand : s'asseoir ou se lever
+tr: /sit, /stand: sentarse o levantarse
+
+fr: /v N, /bv N : volume des bruitages et de la musique, de 0 à 127 — /sound, /bgm : les couper
+tr: /v N, /bv N: volumen de los efectos y de la música, de 0 a 127 — /sound, /bgm: silenciarlos
+
+fr: /w nom message, %message (groupe), $message (guilde), /gc, /cl, /bc : parler à quelqu'un ou à un canal
+tr: /w nombre mensaje, %mensaje (grupo), $mensaje (gremio), /gc, /cl, /bc: hablar a alguien o a un canal
+
+fr: /who : joueurs connectés — /emotion : les émoticônes — /where : sa position
+tr: /who: jugadores conectados — /emotion: los emoticonos — /where: tu posición
+
+fr: Aucun joueur de ce nom n'est en vue :
+tr: Ningún jugador con ese nombre está a la vista:
+
+fr: Ce nom est trop long : vingt-trois caractères au plus.
+tr: Este nombre es demasiado largo: veintitrés caracteres como máximo.
+
+fr: Commandes du client :
+tr: Comandos del cliente:
+
+fr: Ctrl+Entrée : au groupe — Alt+Entrée : à la guilde
+tr: Ctrl+Intro: al grupo — Alt+Intro: al gremio
+
+fr: Invitation à la guilde envoyée à
+tr: Invitación al gremio enviada a
+
+fr: Joueurs actuellement connectés :
+tr: Jugadores conectados actualmente:
+
+fr: La dissolution de la guilde a échoué : ce n'est pas son nom.
+tr: La disolución del gremio ha fallado: ese no es su nombre.
+
+fr: Les demandes d'échange sont de nouveau accueillies. [/nt OFF]
+tr: Las solicitudes de intercambio vuelven a admitirse. [/nt OFF]
+
+fr: Les demandes d'échange sont refusées d'office. [/nt ON]
+tr: Las solicitudes de intercambio se rechazan automáticamente. [/nt ON]
+
+fr: Refuser d'office les échanges
+tr: Rechazar los intercambios automáticamente
+
+fr: Toute demande d'échange reçue se refuse d'elle-même, sans que la boîte ne paraisse. Celui qui la propose l'apprend comme un refus.
+tr: Toda solicitud de intercambio recibida se rechaza sola, sin que aparezca el cuadro. Quien la propone lo recibe como un rechazo.
+
+fr: Toutes les invitations de groupe sont acceptées.
+tr: Se admiten todas las invitaciones de grupo.
+
+fr: Toutes les invitations de groupe sont bloquées.
+tr: Se bloquean todas las invitaciones de grupo.
+
+fr: Un nom de groupe ne peut pas porter de symbole spécial.
+tr: Un nombre de grupo no puede llevar un símbolo especial.
+
+fr: Un nom de guilde ne peut pas porter d'espace.
+tr: Un nombre de gremio no puede llevar espacios.
+
+fr: [Liste des émoticônes]
+tr: [Lista de emoticonos]
+
+fr: Échanges
+tr: Intercambios

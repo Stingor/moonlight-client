@@ -22,6 +22,7 @@
 #include "options/context_menu_options.h"
 #include "options/craft_atlas_options.h"
 #include "options/damage_meter_options.h"
+#include "options/deal_refusal_options.h"
 #include "options/description_options.h"
 #include "options/factory_layout.h"
 #include "options/graphics_options.h"
@@ -69,6 +70,8 @@ static_assert(kMakeItemRowBase + static_cast<int>(MakeItemRow::kCount) <= kWeapo
               "la plage de la fabrication chevauche celle du refine");
 static_assert(kMapSignRowBase + static_cast<int>(MapSignRow::kCount) <= kPartyFriendRowBase,
               "la plage du bandeau de carte chevauche celle de la fenêtre Groupe / Amis");
+static_assert(kBalloonRowBase + static_cast<int>(BalloonRow::kCount) <= kDealRefusalRowBase,
+              "la plage du refus des échanges chevauche celle des bulles d'annonce");
 static_assert(kGreyWorldRowBase + static_cast<int>(GreyWorldRow::kCount) <= kCallRowBase,
               "la plage de l'appel d'urgence chevauche celle de GreyWorld");
 static_assert(kSpriteSoundRowBase + static_cast<int>(SpriteSoundRow::kCount) <= kMvpTrackerRowBase,
@@ -130,6 +133,8 @@ struct OptionPages {
   QuestTrackerOptions quest_tracker;
   // ⚠ SANS DÉCLARATION AU FICHIER : c'est le serveur qui tient ce réglage.
   CallOptions call;
+  // `/notrade` : les demandes d'échange refusées d'office.
+  DealRefusalOptions deal_refusal;
   // Les liens, les images et les mentions du chat.
   ChatWebOptions chat_web;
   // `/notalkmsg` et `/notalkmsg2`.

@@ -117,6 +117,13 @@ struct ChatIntent {
   std::string text;
 };
 
+// LES TOUCHES TENUES QUAND LA LIGNE A ÉTÉ VALIDÉE : Ctrl+Entrée vise le
+// groupe, Alt+Entrée la guilde, comme au client du joueur.
+struct ChatKeys {
+  bool party = false;
+  bool guild = false;
+};
+
 // CE QUE LA BARRE A ARMÉ, hors de la ligne elle-même.
 //
 // ⚠ LES DEUX SONT DES RÉGLAGES DE BARRE, pas du texte : le mode vient du
@@ -137,6 +144,15 @@ struct ChatArming {
   // « /bc », lui, reste lu comme le champ partout — c'est une commande qu'on
   // tape exprès, et son refus hors carte s'explique.
   bool on_battlefield = false;
+  // LES TOUCHES DE LA VALIDATION, et le groupe qui les rend utiles.
+  //
+  // 🔴 ELLES RETOURNENT LE MODE, ELLES NE L'ÉCRASENT PAS, et c'est la règle du
+  // client du joueur. Barre à voix haute : Ctrl parle au groupe — si l'on en a
+  // un, sinon Alt décide —, Alt à la guilde. Barre armée sur le groupe, Ctrl
+  // revient à la voix haute ; sur la guilde, Alt aussi. Les autres modes les
+  // ignorent, et un sigil tapé ou la box « Pseudo » passent devant.
+  ChatKeys keys;
+  bool in_party = false;
 };
 
 // Lit la destination d'une ligne. Une ligne vide, ou un sigil seul, rend une

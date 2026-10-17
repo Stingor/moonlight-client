@@ -54,6 +54,7 @@ add_library(ro_proto STATIC
     src/staff_packets.cpp
     src/store_search_packets.cpp
     src/title_packets.cpp
+    src/user_count_packet.cpp
     src/vending_packets.cpp
     src/frame_reader.cpp
     src/framing.cpp)

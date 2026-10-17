@@ -586,6 +586,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // 🔴 LA LIGNE VALIDÉE D'ABORD, avant tout ce qui écrit dans la saisie — un
   // Maj+clic, un menu, le carnet : voir `SettleChatLine`.
   SendTypedChat(answers, now_ms);
+  RunPlayerAsks(now_ms);
   // ⚠ UNE JAUGE DÉPLACÉE S'ÉCRIT, MAIS PAS À CHAQUE IMAGE. `Touch` arme
   // l'anti-rebond du fichier : un glisser de deux secondes ne produit qu'une
   // écriture, et celle qui attend part au plus tard à la fermeture.

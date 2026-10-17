@@ -97,6 +97,11 @@ struct GuildPositionEdit {
 // INVITER PAR LE NOM : le serveur cherche le personnage, qui doit être en ligne.
 [[nodiscard]] core::Result<void> RequestGuildInvite(Connection& link, std::string_view name);
 
+// DISSOUDRE LA GUILDE, en la nommant : `key` est le nom de la guilde, que le
+// serveur compare au sien avant de rien défaire. Réservé au maître d'une
+// guilde vide ; la réponse dit le refus.
+[[nodiscard]] core::Result<void> RequestGuildDisband(Connection& link, std::string_view key);
+
 // PROPOSER UNE ALLIANCE, ou DÉCLARER ENNEMIE, la guilde de ce joueur. Réservés
 // au maître, et le serveur le revérifie : un autre compte n'obtient rien.
 //

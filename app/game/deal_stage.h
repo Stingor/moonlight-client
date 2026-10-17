@@ -51,6 +51,9 @@ class DealStage {
   // ADRESSE NE BOUGE PAS d'une partie à l'autre : on la donne une fois.
   void SeeApproachClock(ro::sim::ApproachWalkClock* clock) noexcept { approach_clock_ = clock; }
 
+  // `/notrade` : toute proposition reçue se refuse d'elle-même, sans boîte.
+  void RefuseProposals(bool refuse) noexcept { refuse_proposals_ = refuse; }
+
   // Une partie commence : rien de la précédente ne survit.
   void StartSession();
 
@@ -110,6 +113,7 @@ class DealStage {
   ro::sim::Deal deal_;
   ro::sim::ApproachWalkClock* approach_clock_ = nullptr;
   std::optional<Approach> approach_;
+  bool refuse_proposals_ = false;
   std::uint32_t news_said_ = 0;
   // Le nom du partenaire, gardé au-delà de la fermeture : les nouvelles qui la
   // disent le nomment encore.
