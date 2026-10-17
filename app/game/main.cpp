@@ -8,8 +8,10 @@
 // Ce fichier ne doit plus grossir : ce qui s'ajoute au client s'ajoute à la
 // partie, pas au démarrage du programme.
 
+#include <chrono>
 #include <filesystem>
 #include <format>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -33,8 +35,11 @@
 #include "game/client_shell.h"
 #include "game/command_line.h"
 #include "game/game.h"
+#include "game/server_choice.h"
+#include "lobby/server_probe.h"
 #include "patcher/patch_stage.h"
 #include "shell/lobby_screen.h"
+#include "web/web_login.h"
 
 namespace {
 
@@ -103,19 +108,13 @@ int ReportError(const ro::core::Error& error) {
   if (!config) {
     return std::unexpected(config.error());
   }
-  const moonclient::ServerEntry& server = config->servers.front();
-  launch.host = server.address;
-  launch.port = server.port;
+  launch.servers = config->servers;
+  launch.test_server = config->test_server;
   launch.web = config->web;
   launch.server_time_zone = config->server_time_zone;
   launch.archives = config->archives;
   launch.patcher = config->patcher;
 
-  // ⚠ LE JOURNAL DIT LEQUEL, et ce n'est pas du bavardage : la production et le
-  // serveur d'essai peuvent ne différer QUE par le port. Rien à l'écran ne
-  // distinguerait l'un de l'autre.
-  ro::core::LogInfo("serveur : {} — {}:{} (sur {} déclaré(s))", server.name, server.address,
-                    server.port, config->servers.size());
   ro::core::LogInfo("installation : {} — {} archive(s) déclarée(s), lues dans {}",
                     ro::core::Utf8FromPath(launch.install_folder), launch.archives.size(),
                     ro::core::Utf8FromPath(launch.archive_folder));
@@ -152,12 +151,12 @@ int Play(moonclient::ClientShell& shell, const std::string& map_name, ro::net::C
 // 🔴 UNE LIAISON PERDUE RAMÈNE AU FORMULAIRE, et non à la tablée : sans
 // serveur, les jetons de la connexion ne valent plus rien. Le motif s'affiche
 // sous les champs.
-int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
+int Connect(moonclient::ClientShell& shell, moonclient::ServerOffer servers) {
   std::optional<moonclient::lobby::Comeback> comeback;
   std::string link_lost;
   ro::ui::LoginDoor door = ro::ui::LoginDoor::kMoonlight;
   while (true) {
-    moonclient::LobbyScreen lobby(shell, std::string(launch.host), launch.port);
+    moonclient::LobbyScreen lobby(shell, servers);
     // Chaque passage par l'écran ouvre une liaison de zone neuve, donc un
     // fichier de capture à elle : voir `ZoneStreamCapture`.
     lobby.ObserveZone(shell.ObserveZoneLink());
@@ -178,6 +177,8 @@ int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
     }
     const moonclient::lobby::Comeback next = lobby.comeback();
     door = lobby.door();
+    // Le serveur que le joueur a choisi : c'est lui que l'écran rouvre.
+    servers = lobby.servers();
     bool back_to_characters = false;
     const int played = Play(shell, lobby.map_name(), lobby.TakeLink(), lobby.TakeWorld(),
                             lobby.ticket(), back_to_characters, link_lost);
@@ -191,6 +192,29 @@ int Connect(moonclient::ClientShell& shell, const moonclient::Launch& launch) {
     ro::core::LogInfo("retour à la sélection du personnage");
     comeback = next;
   }
+}
+
+// LE SERVEUR QUE L'ÉCRAN DE CONNEXION VISE EN S'OUVRANT : le dernier choisi,
+// sinon le premier du fichier. Voir `game/server_choice.h`.
+//
+// ⚠ LE JOURNAL DIT LEQUEL, et ce n'est pas du bavardage : la production et le
+// serveur d'essai peuvent ne différer QUE par le port. Rien à l'écran ne
+// distinguerait l'un de l'autre, sans la marque TEST.
+moonclient::ServerOffer ChooseServer(moonclient::ClientShell& shell,
+                                     const moonclient::Launch& launch,
+                                     const moonclient::lobby::ProbeInFlight& probe) {
+  const bool detected =
+      probe.Detected(std::chrono::milliseconds(moonclient::lobby::kTestServerProbeMs));
+  ro::core::LogInfo("serveur test {}:{} : {}", launch.test_server.host, launch.test_server.port,
+                    detected ? "détecté" : "absent");
+  moonclient::ServerOffer offer = moonclient::OfferServers(
+      launch.servers, launch.test_server, detected,
+      shell.settings().options().login_memory().server, moonclient::web::kWebLoginOrigin);
+  const moonclient::ServerChoice& server = offer.current();
+  ro::core::LogInfo("serveur : {} — {}:{}{} (sur {} proposé(s))",
+                    server.probed ? "serveur test" : server.name, server.address.host,
+                    server.address.port, server.test ? " [TEST]" : "", offer.entries.size());
+  return offer;
 }
 
 // Un dossier qui refuse l'écriture n'arrête pas le client, mais le joueur doit
@@ -219,6 +243,11 @@ int Run(int argc, char** argv) {
   if (auto resolved = ResolveInstall(*launch); !resolved) {
     return ReportError(resolved.error());
   }
+  // 🔴 LA SONDE PART TOUT DE SUITE, EN FOND : le patch et les archives lui
+  // laissent largement son délai avant que l'écran de connexion ne la lise.
+  const moonclient::lobby::ProbeInFlight test_probe = moonclient::lobby::ProbeInFlight::Launch(
+      std::make_shared<moonclient::lobby::TcpServerProbe>(), launch->test_server.host,
+      launch->test_server.port);
   if (auto writable = ro::core::ProbeWritableFolder(launch->install_folder); !writable) {
     WarnUnwritable(writable.error());
   }
@@ -253,7 +282,7 @@ int Run(int argc, char** argv) {
     return ReportError(archived.error());
   }
   ro::core::LogInfo("démarrage : terminé, écran de connexion");
-  return Connect(shell, *launch);
+  return Connect(shell, ChooseServer(shell, *launch, test_probe));
 }
 
 }  // namespace

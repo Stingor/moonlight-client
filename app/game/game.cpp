@@ -66,7 +66,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   }
   // LE TITRE, après le réseau qui a pu changer la carte. ⚠ À CHAQUE IMAGE, et
   // sans coût : la fenêtre ne change que si le texte a changé.
-  gl_->SetTitle(WindowTitle(settings_->options().pages().window_title.names_shown(), world_));
+  gl_->SetTitle(WindowTitle(settings_->options().pages().window_title.names_shown(), world_,
+                            shell_.test_server()));
   // 🔴 LE CARNET MVP AVANCE À CHAQUE IMAGE, LIAISON FERMÉE COMPRISE : sa
   // fenêtre et ses lignes détachées se dessinent hors ligne, leurs gestes sont
   // locaux, et les faits des liens prêtés au chat ne se vident qu'ici. Après le
@@ -231,7 +232,7 @@ void Game::Close() {
   // Le suivi des quêtes aussi : ses réglages vivent avec la partie.
   settings_->options().pages().quest_tracker.Entrust(nullptr);
   // Le pseudo et la carte quittent le titre avec la partie.
-  gl_->SetTitle(WindowTitle());
+  gl_->SetTitle(WindowTitle(shell_.test_server()));
 }
 
 void Game::PumpEvents(std::uint32_t now_ms) {

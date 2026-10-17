@@ -8,6 +8,17 @@ namespace moonclient::lobby {
 
 void LobbyFlow::OpenBackdrop(std::uint32_t now_ms) { backdrop_.Open(now_ms); }
 
+bool LobbyFlow::Retarget(std::string host, std::uint16_t port) {
+  if (screen_ != LobbyScreenKind::kForm || pending_.has_value() || pending_comeback_.has_value()) {
+    return false;
+  }
+  host_ = std::move(host);
+  port_ = port;
+  message_.clear();
+  backdrop_.Retarget(host_, port_);
+  return true;
+}
+
 void LobbyFlow::Submit(std::string account, std::string password) {
   if (screen_ != LobbyScreenKind::kForm) {
     return;

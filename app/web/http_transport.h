@@ -73,6 +73,13 @@ class HttpTransport final : public WebTransport {
   [[nodiscard]] bool busy() const override { return pending_ != nullptr; }
   void Abandon() override;
 
+  // CHANGE DE SITE : la requête en cours s'abandonne, la suivante part vers
+  // `origin`. Même règle de schéma qu'à la construction.
+  void SetOrigin(std::string origin) {
+    Abandon();
+    origin_ = std::move(origin);
+  }
+
  private:
   // LE CASIER QUE LE FIL REMPLIT.
   //

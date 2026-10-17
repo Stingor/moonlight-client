@@ -320,7 +320,8 @@ target_include_directories(moonclient_chatpreview PUBLIC ${CMAKE_CURRENT_SOURCE_
 # parce qu'elle ne connaît que `core` et yaml-cpp, et qu'un lecteur qui vit dans
 # l'exécutable ne s'éprouve pas.
 add_library(moonclient_config STATIC
-    game/client_config.cpp)
+    game/client_config.cpp
+    game/server_choice.cpp)
 
 target_link_libraries(moonclient_config
     PUBLIC ro_core
@@ -1360,6 +1361,7 @@ add_library(moonclient_lobby STATIC
     lobby/backdrop_session.cpp
     lobby/enter_veil.cpp
     lobby/lobby_flow.cpp
+    lobby/server_probe.cpp
     lobby/session_drive.cpp)
 
 target_link_libraries(moonclient_lobby
@@ -1559,6 +1561,7 @@ add_executable(moonclient
     shell/lobby_banquet.cpp
     shell/lobby_layout.cpp
     shell/lobby_screen.cpp
+    shell/lobby_servers.cpp
     shell/lobby_web_door.cpp
     shell/login_settings.cpp
     patcher/patch_stage.cpp

@@ -156,6 +156,13 @@ class BackdropSession {
   // donc aucune place à laisser reprendre : on part tout de suite.
   void Relaunch(std::uint32_t now_ms);
 
+  // CHANGE DE SERVEUR, quand le joueur en choisit un autre : la session en
+  // cours se rend, le monde se vide, et toute ouverture suivante vise la
+  // nouvelle adresse. Revient à `kAsleep`.
+  //
+  // ⚠ ELLE N'OUVRE RIEN : savoir si le joueur veut une ville regarde l'écran.
+  void Retarget(std::string host, std::uint16_t port);
+
   [[nodiscard]] BackdropState state() const noexcept { return state_; }
   [[nodiscard]] const ro::sim::World& world() const noexcept { return world_; }
 
@@ -185,9 +192,10 @@ class BackdropSession {
 
   SessionDrive drive_;
   BackdropState state_ = BackdropState::kAsleep;
-  // Le serveur, reçu à la construction : toute ouverture s'y refait.
-  const std::string host_;
-  const std::uint16_t port_;
+  // Le serveur, reçu à la construction : toute ouverture s'y refait. Seul
+  // `Retarget` le change.
+  std::string host_;
+  std::uint16_t port_;
   // Quand la relance a commencé à attendre, et combien d'essais il lui reste.
   // ⚠ ZÉRO HORS RELANCE : un refus ordinaire ne se retente pas.
   std::uint32_t relaunch_since_ms_ = 0;

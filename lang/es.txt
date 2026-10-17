@@ -19071,3 +19071,9 @@ tr: Los demás jugadores también lo ven, si juegan en moonclient: el servidor g
 
 fr: Réservé aux administrateurs.
 tr: Reservado a los administradores.
+
+fr: Serveur
+tr: Servidor
+
+fr: Serveur test (local)
+tr: Servidor de prueba (local)

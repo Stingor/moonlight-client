@@ -215,6 +215,7 @@ void LobbyScreen::EnterWithWebToken() {
   // 🔴 CE QUI SORT DU PARCOURS WEB EST UN COUPLE ORDINAIRE, et c'est ce qui
   // fait que rien en aval ne connaît ce parcours : un identifiant, et un mot
   // de passe qui se trouve être à usage unique.
+  NoteConnectingServer();
   flow_.Submit(web_.userid(), web_.otp());
   // 🔴 ET L'OTP S'EFFACE AUSSITÔT : il vaut un mot de passe, il a servi, et le
   // site en posera un neuf à la prochaine demande.

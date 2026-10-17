@@ -92,17 +92,23 @@ struct MapStage {
 // c'est sous ce nom-là que les mises à jour livrent l'exécutable.
 inline constexpr std::string_view kWindowTitle = "Moonlight-Destiny";
 
-// LE TITRE DE LA FENÊTRE : le nom, puis la version du client.
+// LA MARQUE D'UN SERVEUR TEST, en tête du titre : on la voit jusque dans la
+// barre des tâches, où une fenêtre de production lui ressemble trait pour trait.
+inline constexpr std::string_view kTestServerTitleMark = "[TEST] ";
+
+// LE TITRE DE LA FENÊTRE : le nom, puis la version du client — précédés de
+// `kTestServerTitleMark` quand `test_server`.
 //
 // ⚠ LA VERSION NE VA PAS DANS `kWindowTitle` : celui-là est aussi le nom du
 // fichier sur le disque, et l'exécutable que le joueur lance ne change pas de
 // nom d'une publication à l'autre.
-[[nodiscard]] std::string WindowTitle();
+[[nodiscard]] std::string WindowTitle(bool test_server);
 
 // LE TITRE EN PARTIE : le pseudo et la carte en tête quand `names_shown`, et
 // tant que le monde les connaît — « Stingor - prontera - Moonlight-Destiny
 // 1.2.3 ». Sans eux, le titre seul. Voir `WindowTitleOptions`.
-[[nodiscard]] std::string WindowTitle(bool names_shown, const ro::sim::World& world);
+[[nodiscard]] std::string WindowTitle(bool names_shown, const ro::sim::World& world,
+                                      bool test_server);
 
 // Ce qu'une carte chargée pèse, pour le journal.
 void ReportMapStage(const MapStage& stage);

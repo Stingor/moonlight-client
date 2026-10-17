@@ -36,6 +36,7 @@
 #include "options/factory_layout.h"
 #include "options/game_option_ids.h"
 #include "options/languages.h"
+#include "options/login_memory.h"
 #include "options/option_pages.h"
 #include "options/option_sections.h"
 #include "options/option_targets.h"
@@ -423,12 +424,10 @@ class GameOptions {
   void ReadResolutions(const OptionTargets& to);
   [[nodiscard]] std::string_view language() const noexcept { return language_; }
 
-  // LE COMPTE QUE L'ÉCRAN DE CONNEXION REPROPOSE, ou vide. 🔴 LE COMPTE, ET LUI
-  // SEUL : ce fichier est en clair, à côté du jeu. ⚠ Et il n'a pas d'entrée
-  // dans `GameOption` — c'est une case de l'écran de connexion, pas un réglage
-  // qu'on vient chercher dans une fenêtre.
-  [[nodiscard]] const std::string& login_account() const noexcept { return login_account_; }
-  void SetLoginAccount(std::string account) { login_account_ = std::move(account); }
+  // LE COMPTE ET LE SERVEUR QUE L'ÉCRAN DE CONNEXION REPROPOSE : voir
+  // `LoginMemory`. ⚠ Pas d'entrée dans `GameOption` — ce sont des cases de
+  // l'écran de connexion, pas des réglages qu'on vient chercher dans une fenêtre.
+  [[nodiscard]] LoginMemory& login_memory() noexcept { return login_memory_; }
 
  private:
   void Apply(GameOption which, const OptionTargets& to);
@@ -574,7 +573,7 @@ class GameOptions {
   // ⚠ ALLUMÉ PAR DÉFAUT : c'est la mise en scène du client, et celui qui n'en
   // veut pas le dira. Voir `backdrop_wanted`.
   bool backdrop_wanted_ = true;
-  std::string login_account_;
+  LoginMemory login_memory_;
   bool fixed_camera_ = false;
   bool expanded_zoom_ = false;
   // ── LES DEUX MODIFICATEURS DE CIBLAGE ─────────────────────────────────────

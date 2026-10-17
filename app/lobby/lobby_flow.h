@@ -69,6 +69,14 @@ class LobbyFlow {
   // c'est la seule relance permise.
   void RelaunchBackdrop(std::uint32_t now_ms) { backdrop_.Relaunch(now_ms); }
 
+  // LE JOUEUR A CHOISI UN AUTRE SERVEUR : la prochaine connexion y part, et le
+  // décor, rendu, s'y rouvrira à la demande. Le motif du dernier refus
+  // s'efface — il venait de l'autre serveur. Voir `BackdropSession::Retarget`.
+  //
+  // ⚠ SEULEMENT AU FORMULAIRE, sans demande en attente : une connexion lancée
+  // ne change pas d'adresse en route. Rend faux quand il refuse.
+  [[nodiscard]] bool Retarget(std::string host, std::uint16_t port);
+
   // Fait tourner les deux sessions. À appeler une fois par tour de boucle.
   void Advance(std::uint32_t now_ms);
 

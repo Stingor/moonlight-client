@@ -33,12 +33,12 @@ struct Launch {
   // Où enregistrer le flux du serveur de zone ; vide pour ne rien enregistrer.
   std::filesystem::path capture_file;
 
-  // Ce que `moonclient.yml` déclare, lu par l'appelant.
+  // Ce que `moonclient.yml` déclare, lu par l'appelant : les serveurs dans
+  // l'ordre du fichier, et le serveur test à sonder.
   //
-  // ⚠ UNE CHAÎNE POSSÉDÉE pour l'hôte : une vue sur le fichier mourrait avec
-  // lui.
-  std::string host;
-  std::uint16_t port = 0;
+  // ⚠ DES CHAÎNES POSSÉDÉES : une vue sur le fichier mourrait avec lui.
+  std::vector<ServerEntry> servers;
+  ServerAddress test_server;
   // L'adresse du service web du serveur. Vide quand on la tait : la partie se
   // joue alors sans emblèmes de guilde.
   std::string web;

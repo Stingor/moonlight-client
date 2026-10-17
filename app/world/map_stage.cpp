@@ -29,23 +29,25 @@ std::string GatFilePath(const ro::vfs::ResNameTable& res_names, std::string_view
 
 }  // namespace
 
-std::string WindowTitle() {
-  return std::string(kWindowTitle) + " " + std::string(ro::core::kBuildVersion);
+std::string WindowTitle(bool test_server) {
+  return std::string(test_server ? kTestServerTitleMark : std::string_view()) +
+         std::string(kWindowTitle) + " " + std::string(ro::core::kBuildVersion);
 }
 
-std::string WindowTitle(bool names_shown, const ro::sim::World& world) {
+std::string WindowTitle(bool names_shown, const ro::sim::World& world, bool test_server) {
   if (!names_shown) {
-    return WindowTitle();
+    return WindowTitle(test_server);
   }
   constexpr std::string_view kSeparator = " - ";
-  std::string title;
+  std::string title(test_server ? kTestServerTitleMark : std::string_view());
   const std::array<std::string_view, 2> parts = {world.player_name(), world.map_name()};
   for (const std::string_view part : parts) {
     if (!part.empty()) {
       title.append(part).append(kSeparator);
     }
   }
-  return title + WindowTitle();
+  // La marque est déjà en tête : elle ne se répète pas avant le nom.
+  return title + WindowTitle(/*test_server=*/false);
 }
 
 ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,

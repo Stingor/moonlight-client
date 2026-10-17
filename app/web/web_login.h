@@ -137,6 +137,14 @@ class WebLogin {
   // l'OTP est parti : voir ce que vaut un OTP.
   void Forget() noexcept;
 
+  // CHANGE DE SITE, quand le joueur change de serveur : le parcours en cours
+  // s'oublie comme par `Forget`, et les adresses suivantes se composent sur
+  // `origin`. ⚠ LE TRANSPORT SE RÈGLE À PART : il possède sa propre origine.
+  void Retarget(std::string origin) {
+    Forget();
+    origin_ = std::move(origin);
+  }
+
   // Fait avancer le parcours. À appeler une fois par tour de boucle.
   void Advance(std::uint32_t now_ms);
 

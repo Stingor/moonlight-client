@@ -12,6 +12,15 @@ servers:
   # - name: Local
     # address: 127.0.0.1
     # port: 6900
+    # Le site qui identifie sur CE serveur (https:// imposé). Un serveur TEST
+    # sans cette clé n'offre que le formulaire classique : le site de la
+    # production écrit son mot de passe à usage unique dans la base de la
+    # production. Un autre serveur sans elle emploie le site de la production.
+    # web_login: https://127.0.0.1:8443
+
+# Le serveur test, sondé au lancement sans rien lui envoyer : s'il répond,
+# l'écran de connexion le propose, marqué TEST. Absent : 127.0.0.1:6900.
+# test_server: 127.0.0.1:6900
 
 # Le service web du serveur (emblèmes de guilde). Sans schéma, c'est du http.
 web: moonlight-destiny.fr:8888

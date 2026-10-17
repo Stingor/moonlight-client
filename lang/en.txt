@@ -19071,3 +19071,9 @@ tr: Other players see it too, if they play on moonclient: the server keeps the c
 
 fr: Réservé aux administrateurs.
 tr: Administrators only.
+
+fr: Serveur
+tr: Server
+
+fr: Serveur test (local)
+tr: Test server (local)

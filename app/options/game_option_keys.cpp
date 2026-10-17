@@ -46,6 +46,7 @@ constexpr const char* kMinimalEffectsKey = "effects_minimal";
 constexpr const char* kSkyEffectsShownKey = "effects_sky_shown";
 constexpr const char* kLanguageKey = "language";
 constexpr const char* kLoginAccountKey = "count_held";
+constexpr const char* kLoginServerKey = "login_server";
 constexpr const char* kScreenNameKey = "display_screen";
 constexpr const char* kScreenRankKey = "display_screen_rank";
 constexpr const char* kDisplayModeKey = "display_mode";
@@ -532,12 +533,13 @@ void GameOptions::Declare(SettingsFile& into) {
   no_page();
   into.Section("La langue et l'échelle de l'interface");
   {
-    // LA LANGUE, LE COMPTE ET L'ÉCHELLE TIENNENT À LA MACHINE.
+    // LA LANGUE, LE COMPTE, LE SERVEUR ET L'ÉCHELLE TIENNENT À LA MACHINE.
     const SettingsFile::MachineScope machine(into);
     into.Declare(kLanguageKey, &language_);
-    // ⚠ LE COMPTE RETENU VIT ICI et non dans une fenêtre d'options : voir
-    // `GameOptions::login_account`. Le mot de passe, lui, n'a aucune clé.
-    into.Declare(kLoginAccountKey, &login_account_);
+    // ⚠ LE COMPTE ET LE SERVEUR RETENUS VIVENT ICI, hors des options : voir
+    // `LoginMemory`. Le mot de passe, lui, n'a aucune clé.
+    into.Declare(kLoginAccountKey, &login_memory_.account);
+    into.Declare(kLoginServerKey, &login_memory_.server);
     page(OptionSection::kInterface);
     into.Declare(kInterfaceScaleKey, &interface_scale_);
   }

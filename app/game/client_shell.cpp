@@ -108,7 +108,7 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   // ⚠ ET SUR L'ÉCRAN CHOISI, ou le principal s'il a été débranché.
   const ScreenChoice saved_screen = settings_->options().saved_screen();
   auto context = ro::render::GlContext::CreateWindowed(
-      WindowTitle(), first_width, first_height,
+      WindowTitle(test_server_), first_width, first_height,
       [&saved_screen](std::span<const ro::render::ScreenInfo> connected) {
         return PickScreen(saved_screen, connected);
       });

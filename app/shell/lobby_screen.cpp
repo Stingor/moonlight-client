@@ -69,11 +69,14 @@ constexpr std::uint32_t kBackdropWaitLimitMs = 8'000;
 constexpr std::array<float, 4> kLoadingClearColor = {0.0F, 0.0F, 0.0F, 1.0F};
 }  // namespace
 
-LobbyScreen::LobbyScreen(ClientShell& shell, std::string host, std::uint16_t port)
-    : shell_(shell), flow_(std::move(host), port) {}
+LobbyScreen::LobbyScreen(ClientShell& shell, ServerOffer servers)
+    : shell_(shell),
+      servers_(std::move(servers)),
+      flow_(servers_.current().address.host, servers_.current().address.port) {}
 
 ro::core::Result<void> LobbyScreen::Open(std::uint32_t now_ms) {
   opened_ms_ = now_ms;
+  ShowServer();
   // La mise en page de la tablée : un petit fichier, lu une fois.
   LoadLayout();
   // 🔴 DÉCOCHÉ, ON NE MONTE RIEN DU TOUT, et c'est là que ce réglage rend ce
@@ -93,7 +96,7 @@ ro::core::Result<void> LobbyScreen::Open(std::uint32_t now_ms) {
 
   // Le compte retenu, s'il y en a un. ⚠ LE MOT DE PASSE DU JEU, JAMAIS : voir
   // `LoginWindowState`.
-  const std::string& remembered = shell_.settings().options().login_account();
+  const std::string& remembered = shell_.settings().options().login_memory().account;
   if (!remembered.empty()) {
     Fill(form_.account, remembered);
     form_.remember_account = true;
@@ -312,9 +315,12 @@ ro::ui::LoginWindowView LobbyScreen::Compose() {
   // (`kEnteringGame`), pas la porte elle-même.
   //
   // ⚠ LE CODE PIN EST L'EXCEPTION, et c'est une question du serveur DE JEU à
-  // laquelle aucune porte ne répond. Il prend l'écran.
-  view.web_door_offered = flow_.screen() != lobby::LobbyScreenKind::kPincode;
+  // laquelle aucune porte ne répond. Il prend l'écran. Et un serveur sans site
+  // qui l'identifie n'a pas de porte : voir `WebLoginOriginOf`.
+  view.web_door_offered =
+      flow_.screen() != lobby::LobbyScreenKind::kPincode && !servers_.current().web_origin.empty();
   view.web = ComposeWebDoor();
+  ComposeServers(view);
   // ── LES TROIS RÉGLAGES DU PREMIER ÉCRAN ──────────────────────────────────
   const GameOptions& settings = shell_.settings().options();
   const std::span<const Language> languages = KnownLanguages();
@@ -419,8 +425,9 @@ void LobbyScreen::Route(const ro::ui::LoginWindowAction& asked) {
       // ⚠ LE COMPTE SE RETIENT ICI, À L'ENVOI, et non à la frappe : ce que le
       // joueur retient est le compte avec lequel il SE CONNECTE, pas celui
       // qu'il a commencé à taper puis effacé.
-      shell_.settings().options().SetLoginAccount(
-          form_.remember_account ? std::string(form_.account.data()) : std::string());
+      shell_.settings().options().login_memory().account =
+          form_.remember_account ? std::string(form_.account.data()) : std::string();
+      NoteConnectingServer();
       flow_.Submit(std::string(form_.account.data()), std::string(form_.password.data()));
       // 🔴 LE MOT DE PASSE S'EFFACE DU FORMULAIRE À L'INSTANT OÙ IL PART. Il ne
       // sert plus à rien — la demande le porte —, et le laisser dans un tampon
@@ -671,6 +678,7 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
       }
       settings_.Route(settings_asked, shell_.settings(), SettingsTargets(), now_ms);
       Route(asked);
+      RouteServer(asked.server, now_ms);
       RouteWebDoor(asked.web);
       break;
     }

@@ -22,6 +22,7 @@
 #include "ro/ui/login_window.h"
 
 #include "game/client_shell.h"
+#include "game/server_choice.h"
 #include "lobby/enter_veil.h"
 #include "lobby/lobby_flow.h"
 #include "shell/backdrop_lens.h"
@@ -50,7 +51,9 @@ namespace moonclient {
 // machine à états répond — et dessine.
 class LobbyScreen : public Screen {
  public:
-  LobbyScreen(ClientShell& shell, std::string host, std::uint16_t port);
+  // `servers` : ce que le sélecteur propose, et le serveur que l'écran vise
+  // en s'ouvrant. Voir `server_choice.h`.
+  LobbyScreen(ClientShell& shell, ServerOffer servers);
 
   // Demande le décor vivant, et ouvre l'écran sur le chargement.
   //
@@ -114,8 +117,22 @@ class LobbyScreen : public Screen {
   [[nodiscard]] const std::string& map_name() const noexcept { return map_name_; }
   // De quoi rentrer sur un AUTRE serveur de zone : voir `ro::net::ZoneTicket`.
   [[nodiscard]] const ro::net::ZoneTicket& ticket() const noexcept { return ticket_; }
+  // Les serveurs, et celui que le joueur a choisi en dernier : un retour depuis
+  // la partie rouvre l'écran sur lui.
+  [[nodiscard]] const ServerOffer& servers() const noexcept { return servers_; }
 
  private:
+  // ── LE SERVEUR ── vit dans `lobby_servers.cpp`.
+  //
+  // Applique le serveur choisi : la marque TEST du titre, le site de la porte.
+  void ShowServer();
+  // Dit au journal vers quel serveur la connexion part.
+  void NoteConnectingServer() const;
+  // Ce que le sélecteur montre.
+  void ComposeServers(ro::ui::LoginWindowView& view) const;
+  // Le joueur a choisi le serveur de ce rang, ou -1 : la connexion suivante et
+  // le décor y partiront.
+  void RouteServer(int rank, std::uint32_t now_ms);
   // Ce que la souris et le clavier ont fait de cette image.
   void PumpEvents();
   // Compose le monde de départ, prend la liaison, et rend la main à la partie.
@@ -238,6 +255,8 @@ class LobbyScreen : public Screen {
   void FollowSettings(std::uint32_t now_ms);
 
   ClientShell& shell_;
+  // ⚠ AVANT `flow_`, QUI NAÎT SUR LE SERVEUR CHOISI.
+  ServerOffer servers_;
   lobby::LobbyFlow flow_;
   BackdropScene backdrop_;
   // LE POST-TRAITEMENT DU JOUEUR ET LA VIGNETTE, entre la ville et le

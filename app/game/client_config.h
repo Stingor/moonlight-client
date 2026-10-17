@@ -27,8 +27,10 @@ namespace moonclient {
 //     - name: Moonlight-Destiny
 //       address: moonlight-destiny.fr
 //       port: 16900
+//       web_login: https://moonlight-destiny.fr
 //   web: moonlight-destiny.fr:8888
 //   server_time_zone: Europe/Paris
+//   test_server: 127.0.0.1:6900
 //   archives:
 //     - moonlight.grf
 //     - data.grf
@@ -45,7 +47,24 @@ struct ServerEntry {
   std::string name;
   std::string address;
   std::uint16_t port = 0;
+  // L'ORIGINE DU SITE QUI IDENTIFIE SUR CE SERVEUR, `https://hôte[:port]`, sans
+  // barre finale. Vide : non déclarée — voir `ComposeServerChoices`.
+  //
+  // 🔴 LE SITE ÉCRIT LE MOT DE PASSE À USAGE UNIQUE DANS LA BASE DE SON
+  // SERVEUR : celui de la production ne vaut rien sur un serveur test.
+  std::string web_login;
 };
+
+// UNE ADRESSE DE SERVEUR SANS NOM : `hôte:port`.
+struct ServerAddress {
+  std::string host;
+  std::uint16_t port = 0;
+};
+
+// LE SERVEUR TEST PAR DÉFAUT : le serveur de connexion d'un rAthena lancé sur
+// la machine du joueur, à son port d'usine.
+inline constexpr std::string_view kDefaultTestServerHost = "127.0.0.1";
+inline constexpr std::uint16_t kDefaultTestServerPort = 6900;
 
 // UN SERVEUR DE PATCHS : où lire la liste, où prendre les archives.
 //
@@ -99,6 +118,11 @@ struct ClientConfig {
   // Absent : le client ne se patche pas — c'est le cas d'un arbre de
   // développement, qui pointe sur un serveur local.
   std::optional<PatcherConfig> patcher;
+  // LE SERVEUR TEST, que le lancement sonde sans rien lui envoyer : présent,
+  // l'écran de connexion le propose. Écrit `test_server: hôte:port` ; absent
+  // du fichier, le serveur local par défaut. Voir `server_choice.h`.
+  ServerAddress test_server{.host = std::string(kDefaultTestServerHost),
+                            .port = kDefaultTestServerPort};
 };
 
 // Le nom du fichier, à la racine de l'installation.
@@ -113,7 +137,12 @@ inline constexpr std::string_view kClientConfigFileName = "moonclient.yml";
 //
 // ⚠ ET UN FICHIER SANS ARCHIVE AUSSI : sans elles, il n'y a rien à dessiner.
 // Un nom d'archive qui sortirait de l'installation — absolu, ou par `..` —
-// est refusé.
+// est refusé. De même d'un `test_server` qui n'est pas `hôte:port`, et d'un
+// `web_login` qui n'est pas une origine `https://`.
 [[nodiscard]] ro::core::Result<ClientConfig> ParseClientConfig(std::string_view text);
+
+// Lit `hôte:port`. Une adresse IPv6 s'écrit entre crochets : `[::1]:6900`.
+// Rien si l'hôte manque ou si le port n'est pas un nombre de 1 à 65535.
+[[nodiscard]] std::optional<ServerAddress> ParseServerAddress(std::string_view text);
 
 }  // namespace moonclient

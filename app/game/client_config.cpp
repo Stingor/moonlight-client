@@ -1,9 +1,11 @@
 #include "game/client_config.h"
 
 #include <algorithm>
+#include <charconv>
 #include <cstddef>
 #include <expected>
 #include <limits>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -20,6 +22,8 @@ constexpr const char* kAddressKey = "address";
 constexpr const char* kPortKey = "port";
 constexpr const char* kWebKey = "web";
 constexpr const char* kServerTimeZoneKey = "server_time_zone";
+constexpr const char* kTestServerKey = "test_server";
+constexpr const char* kWebLoginKey = "web_login";
 // Au premier niveau, la liste des GRF ; dans une fiche de serveur de patchs,
 // le dossier des archives de patch. Même mot, deux étages.
 constexpr const char* kGameArchivesKey = "archives";
@@ -128,6 +132,29 @@ constexpr std::string_view kSecureScheme = "https://";
 
 }  // namespace
 
+std::optional<ServerAddress> ParseServerAddress(std::string_view text) {
+  const std::size_t colon = text.rfind(':');
+  if (colon == std::string_view::npos) {
+    return std::nullopt;
+  }
+  std::string_view host = text.substr(0, colon);
+  if (host.size() >= 2 && host.front() == '[' && host.back() == ']') {
+    host = host.substr(1, host.size() - 2);
+  } else if (host.find(':') != std::string_view::npos) {
+    // Une adresse IPv6 sans crochets : son dernier « : » n'annonce pas un port.
+    return std::nullopt;
+  }
+  const std::string_view digits = text.substr(colon + 1);
+  int port = 0;
+  if (host.empty() || digits.empty() ||
+      std::from_chars(digits.data(), digits.data() + digits.size(), port).ptr !=
+          digits.data() + digits.size() ||
+      port <= 0 || port > std::numeric_limits<std::uint16_t>::max()) {
+    return std::nullopt;
+  }
+  return ServerAddress{.host = std::string(host), .port = static_cast<std::uint16_t>(port)};
+}
+
 ro::core::Result<ClientConfig> ParseClientConfig(std::string_view text) {
   YAML::Node file;
   try {
@@ -167,6 +194,16 @@ ro::core::Result<ClientConfig> ParseClientConfig(std::string_view text) {
     if (server.name.empty()) {
       server.name = server.address;
     }
+    if (const YAML::Node web_login = entry[kWebLoginKey]; web_login) {
+      std::string origin = web_login.IsScalar() ? web_login.as<std::string>() : std::string();
+      if (origin.ends_with('/')) {
+        origin.pop_back();
+      }
+      if (!IsSecureUrl(origin) || origin.find('/', kSecureScheme.size()) != std::string::npos) {
+        return Broken(which + " : « web_login » doit être une origine https://hôte[:port]");
+      }
+      server.web_login = std::move(origin);
+    }
     config.servers.push_back(std::move(server));
   }
 
@@ -175,6 +212,14 @@ ro::core::Result<ClientConfig> ParseClientConfig(std::string_view text) {
   }
   if (const YAML::Node zone = file[kServerTimeZoneKey]; zone && zone.IsScalar()) {
     config.server_time_zone = zone.as<std::string>();
+  }
+  if (const YAML::Node test = file[kTestServerKey]; test) {
+    const std::optional<ServerAddress> address =
+        test.IsScalar() ? ParseServerAddress(test.as<std::string>()) : std::nullopt;
+    if (!address.has_value()) {
+      return Broken("« test_server » n'est pas une adresse hôte:port");
+    }
+    config.test_server = *address;
   }
   auto archives = ParseArchives(file[kGameArchivesKey]);
   if (!archives) {

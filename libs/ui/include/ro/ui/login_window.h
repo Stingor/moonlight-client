@@ -124,8 +124,26 @@ struct LoginFirstScreenView {
   bool backdrop_live = false;
 };
 
+// UN SERVEUR DU SÉLECTEUR, tel que la fenêtre le montre.
+struct LoginServer {
+  // ⚠ DÉJÀ TRADUIT, quand c'est un libellé du client et non un nom déclaré.
+  std::string name;
+  // Porte la pastille TEST.
+  bool test = false;
+};
+
+// LA PASTILLE D'UN SERVEUR TEST. ⚠ ELLE NE SE TRADUIT PAS : c'est la même
+// marque que le titre de la fenêtre, et on la cherche des yeux telle quelle.
+inline constexpr const char* kTestServerBadge = "TEST";
+
 // CE QUE LA FENÊTRE SAIT, recopié par l'appelant.
 struct LoginWindowView {
+  // LES SERVEURS QU'ON PEUT REJOINDRE, et le rang de celui qui est choisi.
+  //
+  // ⚠ MOINS DE DEUX, PAS DE SÉLECTEUR : une liste d'un seul serveur n'offre
+  // aucun choix, et l'écran reste celui d'un client qui n'en connaît qu'un.
+  std::vector<LoginServer> servers;
+  int server = 0;
   // LA PORTE MOONLIGHT EST-ELLE OUVERTE DU TOUT ?
   //
   // ⚠ ELLE DEMANDE UN SITE, et un client bâti sans son transport — ou lancé
@@ -231,6 +249,8 @@ struct LoginWindowAction {
   // LE BOUTON « RÉGLAGES » DE LA BARRE DE TITRE a été cliqué : voir
   // `DrawLoginSettingsWindow`.
   bool open_settings = false;
+  // Le rang du serveur que le joueur vient de choisir, ou -1.
+  int server = -1;
   // Ce que la porte Moonlight a demandé, quand c'est elle qui répond.
   WebDoorAction web;
   LoginFirstScreenAction first_screen;

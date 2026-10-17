@@ -104,6 +104,18 @@ void BackdropSession::Relaunch(std::uint32_t now_ms) {
   state_ = BackdropState::kRelaunching;
 }
 
+void BackdropSession::Retarget(std::string host, std::uint16_t port) {
+  Release();
+  host_ = std::move(host);
+  port_ = port;
+  lost_ = false;
+  peopled_told_ = false;
+  relaunch_left_ = 0;
+  map_name_.clear();
+  world_ = ro::sim::World();
+  state_ = BackdropState::kAsleep;
+}
+
 void BackdropSession::GiveUp(std::string_view why) {
   // ⚠ AU JOURNAL ET NULLE PART AILLEURS. Le refus du serveur est une
   // information d'exploitation — décor éteint, ou place déjà prise par un autre

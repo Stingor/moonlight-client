@@ -208,6 +208,82 @@ void DrawPickers(const LoginFirstScreenView& first, const SkinArt& art,
   }
 }
 
+// LA PASTILLE TEST : un fond orangé, arrondi, et la marque en blanc.
+constexpr ImU32 kTestBadgeColor = IM_COL32(214, 112, 32, 255);
+constexpr ImU32 kTestBadgeTextColor = IM_COL32(255, 255, 255, 255);
+
+// La place que prend la pastille, marges comprises.
+[[nodiscard]] ImVec2 TestBadgeSize() {
+  const ImVec2 text = ImGui::CalcTextSize(kTestServerBadge);
+  const ImGuiStyle& style = ImGui::GetStyle();
+  return {text.x + style.FramePadding.x * 2.0F, text.y + style.FramePadding.y};
+}
+
+// Peint la pastille à cet endroit, centrée sur une rangée de `row_height`.
+void PaintTestBadge(ImDrawList* draw, ImVec2 left_top, float row_height) {
+  const ImVec2 size = TestBadgeSize();
+  const ImVec2 top(left_top.x, left_top.y + std::max((row_height - size.y) * 0.5F, 0.0F));
+  const ImVec2 bottom(top.x + size.x, top.y + size.y);
+  draw->AddRectFilled(top, bottom, kTestBadgeColor, size.y * 0.5F);
+  const ImVec2 text = ImGui::CalcTextSize(kTestServerBadge);
+  draw->AddText(ImVec2(top.x + (size.x - text.x) * 0.5F, top.y + (size.y - text.y) * 0.5F),
+                kTestBadgeTextColor, kTestServerBadge);
+}
+
+// LE SÉLECTEUR DE SERVEUR, AU-DESSUS DES IDENTIFIANTS, sous les deux portes.
+//
+// ⚠ PAS DE MOLETTE : changer de serveur relance le décor, et un cran égaré en
+// survolant la fenêtre coûterait la ville qu'on regarde. Au clavier, Entrée
+// prend l'entrée marquée — même raison.
+//
+// ⚠ INERTE HORS DU FORMULAIRE : une connexion lancée ne change pas d'adresse.
+void DrawServerRow(const LoginWindowView& view, const SkinArt& art, LoginWindowAction& action) {
+  const int count = static_cast<int>(view.servers.size());
+  if (count < 2) {
+    return;
+  }
+  const bool known = view.server >= 0 && view.server < count;
+  const bool test_shown = known && view.servers[static_cast<std::size_t>(view.server)].test;
+  const char* label = core::Tr("Serveur");
+  const ImGuiStyle& style = ImGui::GetStyle();
+  const float badge = test_shown ? TestBadgeSize().x + style.ItemSpacing.x : 0.0F;
+  const float field = std::max(FormWidth() - ImGui::CalcTextSize(label, nullptr, true).x -
+                                   style.ItemInnerSpacing.x - SkinComboChromeWidth(art) - badge,
+                               kComboMinWidth);
+  ImGui::BeginDisabled(view.stage != LoginStage::kForm);
+  ImGui::SetNextItemWidth(field);
+  if (BeginSkinCombo(label,
+                     known ? view.servers[static_cast<std::size_t>(view.server)].name.c_str() : "",
+                     art)) {
+    ComboKeys keys(known ? view.server : kListNoEntry, count, {}, ComboKeyChoice::kOnEnter);
+    for (int rank = 0; rank < count; ++rank) {
+      const LoginServer& one = view.servers[static_cast<std::size_t>(rank)];
+      ImGui::PushID(rank);
+      const bool clicked = ImGui::Selectable(one.name.c_str(), rank == keys.marked());
+      ImGui::PopID();
+      if (one.test) {
+        const ImVec2 item = ImGui::GetItemRectMin();
+        PaintTestBadge(
+            ImGui::GetWindowDrawList(),
+            ImVec2(item.x + ImGui::CalcTextSize(one.name.c_str()).x + style.ItemSpacing.x, item.y),
+            ImGui::GetItemRectSize().y);
+      }
+      if (keys.Took(rank, clicked) && rank != view.server) {
+        action.server = rank;
+      }
+    }
+    EndSkinCombo();
+  }
+  if (test_shown) {
+    ImGui::SameLine();
+    const ImVec2 at = ImGui::GetCursorScreenPos();
+    PaintTestBadge(ImGui::GetWindowDrawList(), at, ImGui::GetFrameHeight());
+    ImGui::Dummy(ImVec2(TestBadgeSize().x, ImGui::GetFrameHeight()));
+  }
+  ImGui::EndDisabled();
+  ImGui::Spacing();
+}
+
 // LES TROIS RÉGLAGES DU PREMIER ÉCRAN.
 //
 // 🔴 HORS DU SWITCH, ET DONC VISIBLES À TOUTES LES ÉTAPES — y compris sur un
@@ -383,6 +459,7 @@ LoginWindowAction DrawLoginWindow(LoginWindowState& state, const LoginWindowView
   // après la porte Moonlight les aurait rendus invisibles à qui s'y trouve —
   // c'est-à-dire, justement, à qui vient de recevoir un refus qu'il ne
   // comprend peut-être pas.
+  DrawServerRow(view, art, action);
   if (moonlight) {
     action.web = DrawWebDoor(state.web, view.web, art, FormWidth());
     // 🔴 LE CHANGEMENT DE PORTE SE CONSOMME ICI, et n'atteint jamais `app` :

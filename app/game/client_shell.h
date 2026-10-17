@@ -128,6 +128,10 @@ class ClientShell {
   // `ClientConfig::server_time_zone`.
   void SetServerTimeZone(std::string zone) { server_time_zone_ = std::move(zone); }
   [[nodiscard]] const std::string& server_time_zone() const noexcept { return server_time_zone_; }
+  // LE SERVEUR CHOISI EST-IL UN SERVEUR TEST ? Le titre de la fenêtre le dit,
+  // sur tous les écrans. Posé par l'écran de connexion. Voir `WindowTitle`.
+  void SetTestServer(bool test_server) noexcept { test_server_ = test_server; }
+  [[nodiscard]] bool test_server() const noexcept { return test_server_; }
 
   // L'ENREGISTREMENT DU FLUX DE ZONE, quand une option d'essai le demande.
   // Voir `ZoneStreamCapture`.
@@ -232,6 +236,7 @@ class ClientShell {
   std::vector<std::string> archives_;
   std::string web_;
   std::string server_time_zone_ = std::string(kDefaultServerTimeZone);
+  bool test_server_ = false;
   std::optional<ZoneStreamCapture> zone_capture_;
   std::optional<ro::vfs::Vfs> vfs_;
   std::optional<GameSettings> settings_;
