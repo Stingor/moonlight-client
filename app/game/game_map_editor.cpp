@@ -4,15 +4,22 @@
 // Le panneau rend des intentions ; ici, elles passent à la session, le décor se
 // repose quand le document change, et le panneau reçoit sa vue de l'image.
 
+#include <array>
 #include <chrono>
+#include <cstdint>
+#include <format>
 #include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/render/map_scene.h"
+#include "ro/render/terrain_mesh.h"
+#include "ro/ui/entity_menu.h"
+#include "ro/vfs/encoding.h"
 
 #include "game/game.h"
 #include "world/map_editor_mesh.h"
@@ -230,6 +237,118 @@ void Game::ReplaceMapModels() {
         stage_->name, replace_tally_.count, replace_tally_.average_ms(), replace_tally_.worst_ms,
         replace_tally_.baked_batches, scene.models.size());
     replace_tally_ = ReplaceTally();
+  }
+}
+
+namespace {
+
+// LES LIGNES DU MENU D'UN MODÈLE, que `PlayMapModelVerb` reconnaît.
+enum class MapModelVerb : int {
+  kOpenEditor = 1,
+  kToggleHidden,
+  kMoveHere,
+  kRevert,
+  kSave,
+};
+
+}  // namespace
+
+void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
+  if (!stage_.has_value() || model_index >= stage_->scene.rsw.models().size()) {
+    return;
+  }
+  map_editor_.FollowMap(stage_->name, stage_->scene);
+  const ro::mapedit::MapEdit& document = map_edits_.Document(stage_->name);
+  // UN MODÈLE AJOUTÉ prend rang après ceux de la carte : il se retire au lieu
+  // de se masquer ou de se restaurer.
+  const bool added = model_index >= stage_->scene.unfixed_models.size();
+  const ro::mapedit::ModelEdit* edit = added ? nullptr : document.ModelAt(model_index);
+  const bool unsaved = map_edits_.Unsaved(stage_->name);
+  ro::ui::EntityMenuView built;
+  built.subject = static_cast<std::uint32_t>(model_index);
+  built.name =
+      std::format("#{} {}", model_index,
+                  ro::vfs::Cp949ToUtf8Lossy(stage_->scene.rsw.models()[model_index].model_name));
+  built.family = ro::core::Tr("Modèle de la carte");
+  built.items.push_back(ro::ui::EntityMenuItem{.label = ro::core::Tr("Ouvrir avec l'éditeur"),
+                                               .verb = static_cast<int>(MapModelVerb::kOpenEditor),
+                                               .staff = true});
+  if (!added) {
+    built.items.push_back(ro::ui::EntityMenuItem{
+        .label = edit != nullptr && edit->hidden ? ro::core::Tr("Afficher le modèle")
+                                                 : ro::core::Tr("Masquer le modèle"),
+        .verb = static_cast<int>(MapModelVerb::kToggleHidden),
+        .staff = true});
+  }
+  built.items.push_back(ro::ui::EntityMenuItem{.label = ro::core::Tr("Déplacer le modèle sur moi"),
+                                               .verb = static_cast<int>(MapModelVerb::kMoveHere),
+                                               .staff = true});
+  if (added) {
+    built.items.push_back(ro::ui::EntityMenuItem{.label = ro::core::Tr("Retirer le modèle ajouté"),
+                                                 .verb = static_cast<int>(MapModelVerb::kRevert),
+                                                 .staff = true,
+                                                 .danger = true});
+  } else {
+    built.items.push_back(ro::ui::EntityMenuItem{
+        .label = ro::core::Tr("Restaurer le modèle"),
+        .verb = static_cast<int>(MapModelVerb::kRevert),
+        .staff = true,
+        .disabled = edit == nullptr,
+        .tip = edit == nullptr ? ro::core::Tr("Le modèle n'est pas retouché.") : std::string()});
+  }
+  built.items.push_back(
+      ro::ui::EntityMenuItem{.label = ro::core::Tr("Enregistrer la carte"),
+                             .verb = static_cast<int>(MapModelVerb::kSave),
+                             .separator = true,
+                             .staff = true,
+                             .disabled = !unsaved,
+                             .tip = unsaved ? std::string() : ro::core::Tr("Rien à enregistrer.")});
+  menu_model_ = model_index;
+  menu_view_ = std::move(built);
+  windows_.entity_menu.state.open_requested = true;
+  menu_asked_ms_ = now_ms;
+}
+
+void Game::PlayMapModelVerb(int verb) {
+  const std::optional<std::size_t> model = std::exchange(menu_model_, std::nullopt);
+  if (!model.has_value() || !stage_.has_value()) {
+    return;
+  }
+  // OÙ SE TIENT LE PERSONNAGE : le centre de sa case, dans le repère du RSW.
+  std::array<float, 3> here{};
+  if (const ro::sim::Actor* self = world_.player(); self != nullptr) {
+    const std::array<float, 3> ground = ro::render::CellCenterPosition(
+        stage_->scene.gnd, static_cast<std::int32_t>(self->position.x),
+        static_cast<std::int32_t>(self->position.y));
+    const glm::vec3 native =
+        ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}.ToNative(
+            glm::vec3(ground[0], ground[1], ground[2]));
+    here = {native.x, native.y, native.z};
+  }
+  MapEditorSession::Outcome outcome;
+  switch (static_cast<MapModelVerb>(verb)) {
+    case MapModelVerb::kOpenEditor:
+      outcome = map_editor_.QuickModel(QuickModelAction::kOpenEditor, *model, here, stage_->scene,
+                                       map_edits_);
+      break;
+    case MapModelVerb::kToggleHidden:
+      outcome = map_editor_.QuickModel(QuickModelAction::kToggleHidden, *model, here, stage_->scene,
+                                       map_edits_);
+      break;
+    case MapModelVerb::kMoveHere:
+      outcome = map_editor_.QuickModel(QuickModelAction::kMoveHere, *model, here, stage_->scene,
+                                       map_edits_);
+      break;
+    case MapModelVerb::kRevert:
+      outcome = map_editor_.QuickModel(QuickModelAction::kRevert, *model, here, stage_->scene,
+                                       map_edits_);
+      break;
+    case MapModelVerb::kSave:
+      outcome = map_editor_.Apply(ro::ui::map_editor::Save{}, stage_->scene, map_edits_);
+      break;
+  }
+  if (outcome.replace_models) {
+    ReplaceMapModels();
   }
 }
 

@@ -19077,3 +19077,57 @@ tr: Server
 
 fr: Serveur test (local)
 tr: Test server (local)
+
+fr: Retouche de %s
+tr: Edit of %s
+
+fr: Retouche du maillage de %s
+tr: Mesh edit of %s
+
+fr: Retouche de l'effet #%d
+tr: Edit of effect #%d
+
+fr: Ajout de l'effet #%d
+tr: Added effect #%d
+
+fr: Ajout d'une lumière
+tr: Added light
+
+fr: Ajout de %s
+tr: Added %s
+
+fr: Modèle de la carte
+tr: Map model
+
+fr: Ouvrir avec l'éditeur
+tr: Open in the editor
+
+fr: Afficher le modèle
+tr: Show the model
+
+fr: Masquer le modèle
+tr: Hide the model
+
+fr: Déplacer le modèle sur moi
+tr: Move the model to me
+
+fr: Restaurer le modèle
+tr: Restore the model
+
+fr: Le modèle n'est pas retouché.
+tr: The model is not edited.
+
+fr: Enregistrer la carte
+tr: Save the map
+
+fr: Rien à enregistrer.
+tr: Nothing to save.
+
+fr: Heure fixe
+tr: Fixed hour
+
+fr: Le ciel reste à l'heure choisie au lieu de suivre celle du serveur : toujours le matin, toujours le soir, ou toujours la nuit. Le soleil, la lune et les ombres s'y tiennent.
+tr: The sky stays at the chosen hour instead of following the server's: always morning, always evening, or always night. The sun, the moon and the shadows hold to it.
+
+fr: Heure du ciel
+tr: Sky hour

@@ -12,6 +12,7 @@
 
 #include "ro/core/i18n.h"
 
+#include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
 
 namespace moonclient {
@@ -133,7 +134,7 @@ MapEditorSession::Outcome MapEditorSession::MoveVertex(const ro::ui::map_editor:
   }
   Outcome outcome;
   if (!(after == before)) {
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     outcome.replace_models = true;
   }
   if (move.released) {
@@ -165,7 +166,7 @@ MapEditorSession::Outcome MapEditorSession::RevertVertex(MapEditStore& store) {
   } else {
     after.SetMesh(std::move(mesh));
   }
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   std::array<char, kLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Rétablir un sommet du modèle %zu"),
                 *selection_.model_index);
@@ -187,7 +188,7 @@ MapEditorSession::Outcome MapEditorSession::SetAllPoses(bool all, MapEditStore& 
   mesh.all_poses = all;
   ro::mapedit::MapEdit after = before;
   after.SetMesh(std::move(mesh));
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   std::array<char, kLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Étendre le maillage du modèle %zu"),
                 *selection_.model_index);

@@ -491,6 +491,19 @@ void OnRightRelease(const EventRouting& to, const SDL_MouseButtonEvent& button,
   if (to.entity_menu == nullptr || !to.link->is_open() || to.scene_actors == nullptr) {
     return;
   }
+  // CTRL+ALT+CLIC DROIT, pour le staff : le menu des actions rapides sur le
+  // modèle de la carte sous la souris, avant toute entité.
+  const SDL_Keymod held = SDL_GetModState();
+  if (to.entity_menu->staff_models && (held & SDL_KMOD_CTRL) != 0 && (held & SDL_KMOD_ALT) != 0) {
+    const WindowPixels window = PointerSpaceOf(*to.gl);
+    if (window.height > 0.0F) {
+      const ro::render::ScreenRay ray =
+          ro::render::MakeScreenRay(*to.camera, window.width / window.height, button.x, button.y,
+                                    window.width, window.height);
+      to.entity_menu->model_ask = ro::render::PickSceneModel(to.stage->scene, ray);
+    }
+    return;
+  }
   // ⚠ UNE ENSEIGNE COUVRE L'ACTEUR QU'ELLE SURMONTE : le bouton relâché sur
   // elle ne vise que son marchand, celui d'une échoppe ; un salon, personne.
   // Sous `/shopping`, l'appui a en outre refermé la visite en cours.

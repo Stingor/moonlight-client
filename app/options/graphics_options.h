@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>
@@ -63,6 +64,13 @@ class GraphicsOptions {
   // sur le serveur, en plein air. Éteint par défaut : le client d'origine garde
   // la lumière de la carte à toute heure.
   [[nodiscard]] bool day_night_cycle() const noexcept { return day_night_cycle_; }
+  // L'HEURE FIXE DU JOUEUR, sous le cycle : le ciel s'y tient au lieu de suivre
+  // l'heure du serveur. Rien quand le ciel suit le serveur. Midi tant qu'on
+  // n'en a pas choisi d'autre.
+  static constexpr float kNoonSkyHour = 12.0F;
+  [[nodiscard]] std::optional<float> fixed_sky_hour() const noexcept {
+    return fixed_sky_ ? std::optional<float>(fixed_sky_hour_) : std::nullopt;
+  }
   // Le brouillard des cartes qui en déclarent un. `/fog`, allumé par défaut
   // comme chez le client.
   [[nodiscard]] bool fog() const noexcept { return fog_; }
@@ -119,6 +127,8 @@ class GraphicsOptions {
   bool sun_shadows_ = false;
   bool effect_lights_ = true;
   bool day_night_cycle_ = false;
+  bool fixed_sky_ = false;
+  float fixed_sky_hour_ = kNoonSkyHour;
   bool fog_ = true;
   bool decor_veil_ = false;
   bool summon_translucent_ = false;

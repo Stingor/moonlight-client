@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 
+#include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
 
 namespace moonclient {
@@ -213,7 +214,7 @@ MapEditorSession::Outcome MapEditorSession::AddLight(MapEditStore& store) {
       .range = kNewLightRange,
       .night_only = false,
       .why = {}});
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   ChooseLight(after.lights().size() - 1);
   Record(ro::core::Tr("Ajouter une lumière"), before, after);
   return {};
@@ -236,7 +237,7 @@ MapEditorSession::Outcome MapEditorSession::SetLight(const ro::ui::map_editor::S
   }
   after.SetLight(set.slot, std::move(light));
   if (!(after == before)) {
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
   }
   if (set.released) {
     std::array<char, kLabelCapacity> label{};
@@ -254,7 +255,7 @@ MapEditorSession::Outcome MapEditorSession::RemoveLight(std::size_t slot, MapEdi
   }
   ro::mapedit::MapEdit after = before;
   after.RemoveLight(slot);
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   selected_light_.reset();
   std::array<char, kLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Retirer la lumière %zu"), slot);

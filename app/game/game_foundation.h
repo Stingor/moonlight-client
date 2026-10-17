@@ -116,6 +116,9 @@ class GameFoundation {
   EntityMenuGestures menu_gestures_;
   EntityMenuFacts menu_target_;
   ro::ui::EntityMenuView menu_view_;
+  // LE MODÈLE DE LA CARTE que vise le menu, quand c'est lui qui est ouvert :
+  // ses lignes vont alors à l'éditeur, voir `Game::PlayMapModelVerb`.
+  std::optional<std::size_t> menu_model_;
   // L'instant de la demande d'ouverture. ⚠ ELLE PÉRIT : l'interface peut ne pas
   // être dessinée — la veille la cache —, et un menu qui surgirait au réveil
   // viserait une entité cliquée il y a longtemps.

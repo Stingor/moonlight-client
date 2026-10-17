@@ -45,6 +45,18 @@ enum class NudgeDirection : std::uint8_t { kLeft, kRight, kUp, kDown };
 [[nodiscard]] std::optional<ro::mapedit::LitHours> DocumentHours(
     const ro::ui::MapEditorHours& hours);
 
+// LES ACTIONS RAPIDES du menu de Ctrl+Alt+clic droit sur un modèle de la carte.
+enum class QuickModelAction : std::uint8_t {
+  // Ouvre l'éditeur, le modèle désigné.
+  kOpenEditor,
+  // Masque un modèle de la carte, ou le démasque.
+  kToggleHidden,
+  // Le pose là où se tient le personnage.
+  kMoveHere,
+  // Rend son placement d'origine ; retire un modèle ajouté.
+  kRevert,
+};
+
 class MapEditorSession {
  public:
   // Ce qu'une intention demande à l'appelant.
@@ -75,6 +87,13 @@ class MapEditorSession {
 
   // Le modèle sous un clic dans le monde, ou rien.
   void Pick(std::optional<std::size_t> model_index);
+
+  // UNE ACTION RAPIDE sur le modèle de rang `model_index`, qui devient le modèle
+  // désigné, éditeur ouvert ou non. `here` : où se tient le personnage, dans le
+  // repère du RSW.
+  Outcome QuickModel(QuickModelAction action, std::size_t model_index,
+                     const std::array<float, 3>& here, const ro::render::MapScene& scene,
+                     MapEditStore& store);
 
   // DÉSIGNER MOINS, d'un cran : un sommet désigné se lâche seul, son modèle
   // reste ; sinon le modèle, la lumière ou l'effet désigné se lâche. Rien

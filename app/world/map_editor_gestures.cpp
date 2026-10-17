@@ -9,6 +9,7 @@
 #include "ro/core/i18n.h"
 #include "ro/vfs/encoding.h"
 
+#include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
 
 namespace moonclient {
@@ -87,7 +88,7 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
     copy.position[0] += kDuplicateShift;
     ro::mapedit::MapEdit after = before;
     after.AddLight(std::move(copy));
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     ChooseLight(after.lights().size() - 1);
     Record(ro::core::Tr("Ajouter une lumière"), before, after);
     return {};
@@ -104,7 +105,7 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
       .position = {placed.position[0] + kDuplicateShift, placed.position[1], placed.position[2]},
       .rotation = placed.rotation,
       .scale = placed.scale});
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   std::array<char, kDuplicateLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Dupliquer le modèle %zu"), rank);
   Record(label.data(), before, after);
@@ -171,9 +172,34 @@ MapEditorSession::Outcome MapEditorSession::DuplicateEffect(MapEditStore& store)
   copy.position[0] += kDuplicateShift;
   ro::mapedit::MapEdit after = before;
   after.AddEffect(std::move(copy));
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   ChooseEffect(after.effects().size() - 1);
   Record(ro::core::Tr("Ajouter un effet"), before, after);
+  return {};
+}
+
+MapEditorSession::Outcome MapEditorSession::QuickModel(QuickModelAction action,
+                                                       std::size_t model_index,
+                                                       const std::array<float, 3>& here,
+                                                       const ro::render::MapScene& scene,
+                                                       MapEditStore& store) {
+  if (model_index >= scene.rsw.models().size()) {
+    return {};
+  }
+  ChooseModel(model_index);
+  switch (action) {
+    case QuickModelAction::kOpenEditor:
+      active_ = true;
+      return {};
+    case QuickModelAction::kToggleHidden:
+      return Delete(scene, store);
+    case QuickModelAction::kMoveHere: {
+      const std::array<float, 3>& placed = scene.rsw.models()[model_index].position;
+      return Nudge({here[0] - placed[0], here[1] - placed[1], here[2] - placed[2]}, scene, store);
+    }
+    case QuickModelAction::kRevert:
+      return Revert(store);
+  }
   return {};
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -135,6 +136,11 @@ class BlockedNpcs;
 struct EntityMenuGestures {
   // Posé au relâchement du bouton droit, consommé par la partie.
   std::optional<EntityMenuAsk> ask;
+  // CTRL+ALT+CLIC DROIT, pour le staff : le modèle de la carte sous la souris,
+  // dont la partie ouvre le menu des actions rapides. `staff_models`, posé par
+  // la partie : le compte a le droit, et une carte est chargée.
+  std::optional<std::size_t> model_ask;
+  bool staff_models = false;
   // Lus par le clic gauche : un PNJ bloqué ne répond plus. Nul hors partie.
   BlockedNpcs* blocked = nullptr;
   bool npc_block = true;

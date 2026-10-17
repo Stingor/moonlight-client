@@ -236,6 +236,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   void OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std::uint32_t now_ms);
   void PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::uint32_t now_ms);
   void ToggleNpcBlock(std::uint32_t id, const std::string& name, std::uint32_t now_ms);
+  // LE MENU D'UN MODÈLE DE LA CARTE, Ctrl+Alt+clic droit : game_map_editor.cpp.
+  void OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms);
+  void PlayMapModelVerb(int verb);
   // « VOIR L'ÉQUIPEMENT », après le menu qui la demande : `game_view_equip.cpp`.
   void AdvanceViewEquip(std::uint32_t now_ms);
   // LA FICHE D'UN MONSTRE, même aller-retour, dans `game_monster_sheet.cpp`.

@@ -15,6 +15,7 @@
 
 #include "ro/core/i18n.h"
 
+#include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
 
 namespace moonclient {
@@ -161,16 +162,17 @@ MapEditorSession::Outcome MapEditorSession::SetMapEffect(
                                            .flicker = set.effect.glow_flicker};
   }
   ro::mapedit::MapEdit after = before;
+  // Une raison seule ne garde pas la retouche : elle reçoit d'office une raison
+  // générique, voir `WithReasons`.
   const bool changes_nothing = !retouch.position.has_value() && !retouch.hidden &&
-                               !retouch.night_only && !retouch.glow.has_value() &&
-                               retouch.why.empty();
+                               !retouch.night_only && !retouch.glow.has_value();
   if (changes_nothing) {
     after.RemoveEffectEdit(set.index);
   } else {
     after.SetEffectEdit(std::move(retouch));
   }
   if (!(after == before)) {
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
   }
   if (set.released) {
     std::array<char, kLabelCapacity> label{};
@@ -189,7 +191,7 @@ MapEditorSession::Outcome MapEditorSession::RevertMapEffect(std::size_t index,
   }
   ro::mapedit::MapEdit after = before;
   after.RemoveEffectEdit(index);
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   std::array<char, kLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Rétablir l'effet %zu"), index);
   Record(label.data(), before, after);
@@ -268,7 +270,7 @@ MapEditorSession::Outcome MapEditorSession::DuplicateMapEffect(const ro::render:
         .color = shown.glow_color, .range = shown.glow_range, .flicker = shown.glow_flicker};
   }
   after.AddEffect(std::move(copy));
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   ChooseEffect(after.effects().size() - 1);
   Record(ro::core::Tr("Ajouter un effet"), before, after);
   return {};

@@ -19077,3 +19077,57 @@ tr: Servidor
 
 fr: Serveur test (local)
 tr: Servidor de prueba (local)
+
+fr: Retouche de %s
+tr: Retoque de %s
+
+fr: Retouche du maillage de %s
+tr: Retoque de la malla de %s
+
+fr: Retouche de l'effet #%d
+tr: Retoque del efecto #%d
+
+fr: Ajout de l'effet #%d
+tr: Efecto #%d añadido
+
+fr: Ajout d'une lumière
+tr: Luz añadida
+
+fr: Ajout de %s
+tr: %s añadido
+
+fr: Modèle de la carte
+tr: Modelo del mapa
+
+fr: Ouvrir avec l'éditeur
+tr: Abrir con el editor
+
+fr: Afficher le modèle
+tr: Mostrar el modelo
+
+fr: Masquer le modèle
+tr: Ocultar el modelo
+
+fr: Déplacer le modèle sur moi
+tr: Mover el modelo hasta mí
+
+fr: Restaurer le modèle
+tr: Restaurar el modelo
+
+fr: Le modèle n'est pas retouché.
+tr: El modelo no está retocado.
+
+fr: Enregistrer la carte
+tr: Guardar el mapa
+
+fr: Rien à enregistrer.
+tr: Nada que guardar.
+
+fr: Heure fixe
+tr: Hora fija
+
+fr: Le ciel reste à l'heure choisie au lieu de suivre celle du serveur : toujours le matin, toujours le soir, ou toujours la nuit. Le soleil, la lune et les ombres s'y tiennent.
+tr: El cielo se queda a la hora elegida en lugar de seguir la del servidor: siempre por la mañana, siempre al atardecer o siempre de noche. El sol, la luna y las sombras se atienen a ella.
+
+fr: Heure du ciel
+tr: Hora del cielo

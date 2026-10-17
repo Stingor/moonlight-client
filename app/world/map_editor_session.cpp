@@ -13,6 +13,8 @@
 #include "ro/core/utf8_path.h"
 #include "ro/vfs/encoding.h"
 
+#include "world/map_editor_reasons.h"
+
 namespace moonclient {
 
 std::array<float, 3> MapEditorNudge(NudgeDirection direction, bool shift_held) {
@@ -368,7 +370,7 @@ MapEditorSession::Outcome MapEditorSession::Place(const ro::ui::map_editor::Plac
   }
   Outcome outcome;
   if (!(after == before)) {
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     outcome.replace_models = true;
   }
   if (place.released) {
@@ -399,7 +401,7 @@ MapEditorSession::Outcome MapEditorSession::PlaceAdded(std::size_t slot,
   after.SetAdded(slot, std::move(added));
   Outcome outcome;
   if (!(after == before)) {
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     outcome.replace_models = true;
   }
   if (place.released) {
@@ -418,7 +420,7 @@ MapEditorSession::Outcome MapEditorSession::AddModel(std::string file,
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;
   after.AddModel(ro::mapedit::AddedModel{.model_file = std::move(file), .position = drop_point_});
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   Record(ro::core::Tr("Ajouter un modèle"), before, after);
   // LE NOUVEAU EST DÉSIGNÉ : c'est lui qu'on va placer.
   selection_.model_index = scene.unfixed_models.size() + after.added().size() - 1;
@@ -453,7 +455,7 @@ MapEditorSession::Outcome MapEditorSession::SetWhy(std::string why, MapEditStore
     edited.why = std::move(why);
     ro::mapedit::MapEdit after = before;
     after.SetMesh(std::move(edited));
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     Line label{};
     std::snprintf(label.data(), label.size(), ro::core::Tr("Raison du maillage %zu"), rank);
     Record(label.data(), before, after);
@@ -468,7 +470,7 @@ MapEditorSession::Outcome MapEditorSession::SetWhy(std::string why, MapEditStore
     added.why = std::move(why);
     ro::mapedit::MapEdit after = before;
     after.SetAdded(slot, std::move(added));
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     Line label{};
     std::snprintf(label.data(), label.size(), ro::core::Tr("Raison du modèle %zu"), rank);
     Record(label.data(), before, after);
@@ -487,7 +489,7 @@ MapEditorSession::Outcome MapEditorSession::SetWhy(std::string why, MapEditStore
   edit.why = std::move(why);
   ro::mapedit::MapEdit after = before;
   after.SetModel(std::move(edit));
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   Line label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Raison du modèle %zu"), rank);
   Record(label.data(), before, after);
@@ -509,7 +511,7 @@ MapEditorSession::Outcome MapEditorSession::Revert(MapEditStore& store) {
     }
     ro::mapedit::MapEdit after = before;
     after.RemoveAdded(slot);
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
     Line label{};
     std::snprintf(label.data(), label.size(), ro::core::Tr("Retirer le modèle %zu"), rank);
     Record(label.data(), before, after);
@@ -521,7 +523,7 @@ MapEditorSession::Outcome MapEditorSession::Revert(MapEditStore& store) {
   }
   ro::mapedit::MapEdit after = before;
   after.RemoveModel(rank);
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   Line label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Rétablir le modèle %zu"), rank);
   Record(label.data(), before, after);

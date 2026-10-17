@@ -23,6 +23,10 @@ constexpr const char* kColdLightKey = "light_cold";
 constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
 constexpr const char* kEffectLightsKey = "light_from_effects";
 constexpr const char* kDayNightCycleKey = "cycle_day_night";
+constexpr const char* kFixedSkyKey = "cycle_day_night_fixed";
+constexpr const char* kFixedSkyHourKey = "cycle_day_night_hour";
+
+constexpr float kHoursPerDay = 24.0F;
 constexpr const char* kFogKey = "fog";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
 constexpr const char* kSummonTranslucentKey = "summons_translucent";
@@ -60,6 +64,8 @@ enum class GraphicsRow : int {
   kSunShadows,
   kEffectLights,
   kDayNightCycle,
+  kFixedSky,
+  kFixedSkyHour,
   kFog,
   kDecorVeil,
   kSummonTranslucent,
@@ -203,6 +209,8 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kColdLightKey, &cold_light_);
   into.Declare(kEffectLightsKey, &effect_lights_);
   into.Declare(kDayNightCycleKey, &day_night_cycle_);
+  into.Declare(kFixedSkyKey, &fixed_sky_);
+  into.Declare(kFixedSkyHourKey, &fixed_sky_hour_);
   into.Declare(kFogKey, &fog_);
   into.Declare(kDecorVeilKey, &decor_veil_);
   into.Declare(kSummonTranslucentKey, &summon_translucent_);
@@ -272,6 +280,24 @@ void GraphicsOptions::Compose() {
                             "les ombres tournent avec lui. Le client d'origine garde la lumière de "
                             "la carte à toute heure."),
                          nullptr, day_night_cycle_));
+  // ⚠ GRISÉE SANS CYCLE : sans lui, le ciel garde la lumière de la carte, et
+  // il n'y a pas d'heure à figer.
+  rows_.push_back(Toggle(GraphicsRow::kFixedSky, Tr("Heure fixe"),
+                         Tr("Le ciel reste à l'heure choisie au lieu de suivre celle du serveur : "
+                            "toujours le matin, toujours le soir, ou toujours la nuit. Le soleil, "
+                            "la lune et les ombres s'y tiennent."),
+                         nullptr, fixed_sky_));
+  rows_.back().indented = true;
+  rows_.back().disabled = !day_night_cycle_;
+  rows_.push_back(OptionRowView{.id = IdOf(GraphicsRow::kFixedSkyHour),
+                                .label = Tr("Heure du ciel"),
+                                .kind = OptionKind::kSlider,
+                                .value = fixed_sky_hour_,
+                                .lowest = 0.0F,
+                                .highest = kHoursPerDay,
+                                .format = "%.1f h"});
+  rows_.back().indented = true;
+  rows_.back().disabled = !day_night_cycle_ || !fixed_sky_;
   rows_.push_back(Toggle(GraphicsRow::kFog, Tr("Brouillard"),
                          Tr("La brume que certaines cartes posent au loin : le décor et les "
                             "personnages s'effacent dans sa couleur à mesure qu'ils s'éloignent."),
@@ -466,6 +492,12 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kDayNightCycle:
       day_night_cycle_ = asked.on;
+      break;
+    case GraphicsRow::kFixedSky:
+      fixed_sky_ = asked.on;
+      break;
+    case GraphicsRow::kFixedSkyHour:
+      fixed_sky_hour_ = std::clamp(asked.value, 0.0F, kHoursPerDay);
       break;
     case GraphicsRow::kFog:
       fog_ = asked.on;

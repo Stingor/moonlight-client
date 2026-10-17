@@ -127,11 +127,17 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
   menu_gestures_.npc_block = settings.npc_block;
   page.NoteStaff(Rights().staff_tools);
   windows_.entity_menu.view = &menu_view_;
+  menu_gestures_.staff_models = Rights().staff_tools && stage_.has_value();
 
-  const ro::ui::EntityMenuAnswer answer = std::exchange(windows_.entity_menu.answer, {});
+  ro::ui::EntityMenuAnswer answer = std::exchange(windows_.entity_menu.answer, {});
   if (!link_.is_open()) {
     menu_gestures_.ask.reset();
+    menu_gestures_.model_ask.reset();
     return;
+  }
+  // LE MENU D'UN MODÈLE DE LA CARTE : sa ligne choisie va à l'éditeur.
+  if (menu_model_.has_value() && answer.chosen != 0) {
+    PlayMapModelVerb(std::exchange(answer.chosen, 0));
   }
   // L'INSPECTEUR DU STAFF : sa fenêtre, puis la demande qu'elle attend.
   windows_.entity_inspector.view = &pieces_.entity_inspector.view();
@@ -261,6 +267,13 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
     }
   }
 
+  // ── CTRL+ALT+CLIC DROIT SUR UN MODÈLE, pour le staff ─────────────────────
+  if (const std::optional<std::size_t> model =
+          std::exchange(menu_gestures_.model_ask, std::nullopt);
+      model.has_value()) {
+    OpenMapModelMenu(*model, now_ms);
+  }
+
   if (windows_.entity_menu.state.open_requested && now_ms - menu_asked_ms_ > kMenuAskLifeMs) {
     windows_.entity_menu.state.open_requested = false;
   }
@@ -378,6 +391,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
     return;
   }
   menu_target_ = std::move(facts);
+  menu_model_.reset();
   menu_view_ = std::move(built);
   windows_.entity_menu.state.open_requested = true;
   menu_asked_ms_ = now_ms;

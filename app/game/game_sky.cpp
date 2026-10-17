@@ -37,6 +37,11 @@ ro::render::SkyLight Game::SkyOfFrame(std::uint32_t now_ms) {
     // intérieur, une caverne ou un donjon n'a ni soleil ni lune.
     const bool closed = MapClosedToSky();
     if (settings_->options().graphics().day_night_cycle() && !closed) {
+      // L'HEURE FIXE du joueur, s'il en a choisi une ; sinon celle du serveur.
+      if (const std::optional<float> fixed = settings_->options().graphics().fixed_sky_hour();
+          fixed.has_value()) {
+        return ro::render::SkyLightAt(map_light, *fixed, course);
+      }
       if (const std::optional<float> hour =
               ServerSkyHour(shell_.server_time_zone(), std::chrono::system_clock::now());
           hour.has_value()) {

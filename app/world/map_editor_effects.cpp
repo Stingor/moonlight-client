@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 
+#include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
 
 namespace moonclient {
@@ -145,7 +146,7 @@ MapEditorSession::Outcome MapEditorSession::AddEffect(std::int32_t number, MapEd
                                            .night_only = false,
                                            .glow = std::nullopt,
                                            .why = {}});
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   ChooseEffect(after.effects().size() - 1);
   Record(ro::core::Tr("Ajouter un effet"), before, after);
   return {};
@@ -163,7 +164,7 @@ MapEditorSession::Outcome MapEditorSession::SetEffect(const ro::ui::map_editor::
   ro::mapedit::MapEdit after = before;
   after.SetEffect(set.slot, DocumentEffect(set.effect));
   if (!(after == before)) {
-    store.Set(map_name_, after);
+    store.Set(map_name_, WithReasons(after));
   }
   if (set.released) {
     std::array<char, kLabelCapacity> label{};
@@ -193,7 +194,7 @@ MapEditorSession::Outcome MapEditorSession::RemoveEffect(std::size_t slot, MapEd
   }
   ro::mapedit::MapEdit after = before;
   after.RemoveEffect(slot);
-  store.Set(map_name_, after);
+  store.Set(map_name_, WithReasons(after));
   selected_effect_.reset();
   std::array<char, kLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Retirer l'effet %zu"), slot);
