@@ -23,6 +23,7 @@
 #include "ro/render/gl_context.h"
 #include "ro/render/screen_tint.h"
 #include "ro/render/sky_clock.h"
+#include "ro/render/sun_shadow_pass.h"
 #include "ro/sim/character_ledger.h"
 #include "ro/sim/pending_action.h"
 #include "ro/sim/pickup_intent.h"
@@ -275,6 +276,16 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   [[nodiscard]] ro::render::SunShadowView DrawSunShadowIfAsked(
       bool asked, bool models_shown, std::span<const ro::render::DrawnActor> carts,
       const ro::render::SkyLight& sky);
+  // LES OMBRES DES LUMIÈRES PONCTUELLES de l'image, peintes par les mêmes porteurs
+  // que celle du soleil : `points` avec leurs cartes, ou sans ombre quand le
+  // réglage les coupe ou qu'aucune lumière n'éclaire.
+  [[nodiscard]] ro::render::PointLightSet DrawPointShadowsIfAsked(
+      const ro::render::PointLightSet& points, bool models_shown,
+      std::span<const ro::render::DrawnActor> carts);
+  // CE QUI PORTE OMBRE dans l'image : le sol, le décor quand il se montre, les
+  // acteurs composés, `carts` et les acteurs en modèle.
+  [[nodiscard]] ro::render::SunShadowCasters ShadowCastersOfFrame(
+      bool models_shown, std::span<const ro::render::DrawnActor> carts);
   // LE CIEL DE L'IMAGE : la lumière de la carte, teintée par la nuit du
   // serveur, et placée à l'heure que l'établi impose quand il en impose une —
   // voir `StaffSkyClock` —, sinon à l'heure du serveur quand le joueur veut le

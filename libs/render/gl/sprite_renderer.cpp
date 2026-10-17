@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 
 #include "ro/render/fog_shader.h"
+#include "ro/render/point_light_shader.h"
 #include "ro/render/sun_shadow_map.h"
 
 namespace ro::render {
@@ -29,8 +30,8 @@ std::array<std::uint8_t, 4> Tinted(const std::array<std::uint8_t, 4>& layer,
 
 // Aucun éclairage de la carte : un sprite RO porte déjà ses ombres dans ses
 // pixels, et lui appliquer la lumière de la carte le noircirait deux fois. Les
-// lumières ponctuelles, elles, s'ajoutent : lues aux pieds de l'acteur, elles
-// arrivent par sommet, déjà sommées.
+// lumières ponctuelles, elles, s'ajoutent : sommées aux pieds de l'acteur, ombres
+// comprises, par le nuanceur de sommets.
 constexpr std::string_view kVertexShader = R"GLSL(
 #version 330 core
 layout(location = 0) in vec3 a_position;
@@ -46,9 +47,8 @@ layout(location = 6) in vec3 a_sun_anchor;
 // Le même sommet sur le panneau d'ombre de l'acteur : voir
 // `kSunShadowSpriteFragmentGlsl`.
 layout(location = 7) in vec3 a_sun_panel;
-// LA LUMIÈRE PONCTUELLE AUX PIEDS DE L'ACTEUR, la même pour tout son sprite ;
-// zéro pour une ombre ronde.
-layout(location = 8) in vec3 a_point_light;
+// Un pour un calque qui reçoit les lumières ponctuelles, zéro pour une ombre ronde.
+layout(location = 8) in float a_point_lit;
 
 uniform mat4 u_view_projection;
 // Ce que la profondeur normalisée gagne par unité d'inverse de distance : le
@@ -68,6 +68,10 @@ out vec3 v_point_light;
 // Les pieds se lisent un peu au-dessus du sol : à sa hauteur exacte, le sol
 // s'ombrerait lui-même.
 const float kSunAnchorLift = 0.5;
+// LES PIEDS LISENT LES OMBRES PONCTUELLES PLUS PRÈS DE LA LUMIÈRE, en unités du
+// monde : moins d'une case, mais au-delà du panneau que l'acteur lui-même
+// dresse dans la carte, et qui passe par ses pieds.
+const float kPointFootPull = 3.0;
 
 void main() {
     v_texture_uv = a_texture_uv;
@@ -89,7 +93,9 @@ void main() {
     v_sun_visibility = SunVisibilityAround(a_sun_anchor + vec3(0.0, kSunAnchorLift, 0.0));
     v_sun_panel = a_sun_panel;
     v_sun_floor = a_sun_anchor.y + kSunAnchorLift;
-    v_point_light = a_point_light;
+    // LA LUMIÈRE PONCTUELLE, la même pour tout le sprite : lue à ses pieds.
+    v_point_light = a_point_lit *
+                    PointLightingPulled(a_sun_anchor + vec3(0.0, kSunAnchorLift, 0.0), kPointFootPull);
 }
 )GLSL";
 
@@ -167,7 +173,7 @@ constexpr std::size_t kVerticesPerQuad = 6;
 constexpr GLuint kSunAnchorAttribute = 6;
 // Celui du sommet sur le panneau d'ombre, voir `a_sun_panel`.
 constexpr GLuint kSunPanelAttribute = 7;
-// Celui de la lumière ponctuelle aux pieds, voir `a_point_light`.
+// Celui qui dit si le calque reçoit les lumières ponctuelles, voir `a_point_lit`.
 constexpr GLuint kPointLightAttribute = 8;
 
 // Le carré de la distance entre deux points.
@@ -194,7 +200,7 @@ struct SpriteRenderer::SpriteVertex {
   float depth_bias;
   glm::vec3 sun_anchor;
   glm::vec3 sun_panel;
-  glm::vec3 point_light;
+  float point_lit;
 };
 
 // Un quad prêt à dessiner : sa géométrie, et la texture à lui lier.
@@ -211,8 +217,8 @@ struct SpriteRenderer::PreparedQuad {
   // Les coins sur le panneau d'ombre de l'acteur : ceux de `corners` pour une
   // silhouette, ceux où le sprite dessiné lit l'ombre des autres sinon.
   std::array<glm::vec3, 4> panel_corners{};
-  // La lumière ponctuelle reçue aux pieds de l'acteur ; zéro pour son ombre.
-  glm::vec3 point_light{0.0F};
+  // Un si le calque reçoit les lumières ponctuelles ; zéro pour l'ombre ronde.
+  float point_lit = 0.0F;
 };
 
 SpriteRenderer::SpriteRenderer() = default;
@@ -262,7 +268,9 @@ void SpriteRenderer::Release() noexcept {
 
 core::Result<SpriteRenderer> SpriteRenderer::Create() {
   auto program = GlProgram::Link(
-      WithFog(WithSunShadow(kVertexShader, kSunShadowSpriteVertexGlsl), kFogVertexGlsl),
+      WithPointLights(
+          WithFog(WithSunShadow(kVertexShader, kSunShadowSpriteVertexGlsl), kFogVertexGlsl),
+          kPointLightGlsl),
       WithFog(WithSunShadow(kFragmentShader, kSunShadowSpriteFragmentGlsl), kFogFragmentGlsl));
   if (!program) {
     return std::unexpected(program.error());
@@ -301,8 +309,8 @@ core::Result<SpriteRenderer> SpriteRenderer::Create() {
   glVertexAttribPointer(kSunPanelAttribute, 3, GL_FLOAT, GL_FALSE, stride,
                         reinterpret_cast<void*>(offsetof(SpriteVertex, sun_panel)));
   glEnableVertexAttribArray(kPointLightAttribute);
-  glVertexAttribPointer(kPointLightAttribute, 3, GL_FLOAT, GL_FALSE, stride,
-                        reinterpret_cast<void*>(offsetof(SpriteVertex, point_light)));
+  glVertexAttribPointer(kPointLightAttribute, 1, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(offsetof(SpriteVertex, point_lit)));
   glBindVertexArray(0);
   return renderer;
 }
@@ -410,6 +418,7 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
   SetSunSpriteShadowUniforms(program_, sun);
   program_.SetVector3("u_sun_shade", sun.sprite_shade);
   program_.SetVector3("u_daylight", daylight);
+  SetPointLightUniforms(program_, points);
 
   // ⚠ LES QUADS VOISINS D'UNE MÊME TEXTURE PARTENT ENSEMBLE : leurs sommets se
   // suivent déjà dans le tampon, et l'ordre de dessin ne change pas — seul le
@@ -515,8 +524,7 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
                               drawn.ground_position.z);
     // LA LUMIÈRE PONCTUELLE SE LIT UNE FOIS PAR ACTEUR, à ses pieds posés au
     // sol — là où il lit aussi l'ombre du soleil. Son ombre n'en reçoit rien.
-    const glm::vec3 point_light =
-        layered && points != nullptr ? PointLightingAt(*points, on_ground) : glm::vec3(0.0F);
+    const float point_lit = layered && points != nullptr ? 1.0F : 0.0F;
     for (const LayerDraw& layer : layer_draws_) {
       const std::size_t index = layer.quad;
       const SpriteQuad& quad = composed.quads[index];
@@ -599,7 +607,7 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
                        drawn.depth_bias,
                        on_ground,
                        panel_corners,
-                       point_light});
+                       point_lit});
     }
   };
   for (const DrawnActor* drawn : ordered_) {
@@ -654,7 +662,7 @@ void SpriteRenderer::UploadPrepared() {
       vertices_.push_back(SpriteVertex{quad.corners[corner], quad.texture_uv[corner], quad.tint,
                                        quad.depth_corners[corner], quad.fogged, quad.depth_bias,
                                        quad.sun_anchor, quad.panel_corners[corner],
-                                       quad.point_light});
+                                       quad.point_lit});
     }
   }
 
@@ -696,6 +704,7 @@ void SpriteRenderer::DrawDepth(const glm::mat4& light_view_projection, const glm
   SetSunSpriteShadowUniforms(program_, SunShadowView());
   program_.SetVector3("u_sun_shade", glm::vec3(1.0F));
   program_.SetVector3("u_daylight", glm::vec3(1.0F));
+  SetPointLightUniforms(program_, PointLightSet());
   // LA SILHOUETTE COUPE OÙ COUPE CELLE DES CORPS : voir `kSpriteDepthAlphaFloor`.
   program_.SetFloat("u_alpha_floor", kSpriteDepthAlphaFloor);
   for (std::size_t first = 0; first < prepared_.size();) {

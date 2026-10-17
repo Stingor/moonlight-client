@@ -6,6 +6,7 @@
 #include "ro/render/map_effects.h"
 #include "ro/render/model_clock.h"
 #include "ro/render/model_renderer.h"
+#include "ro/render/point_shadow_maps.h"
 #include "ro/render/scene_post_process.h"
 #include "ro/render/sprite_renderer.h"
 #include "ro/render/sun_shadow_map.h"
@@ -30,6 +31,10 @@ class GameRendering {
   // `sun_map_refused_` retient un échec : il ne se retente pas à chaque image.
   ro::render::SunShadowMap sun_map_;
   bool sun_map_refused_ = false;
+  // LES CARTES D'OMBRE DES LUMIÈRES PONCTUELLES, créées à la première lumière
+  // qui en demande ; même refus retenu.
+  ro::render::PointShadowMaps point_maps_;
+  bool point_maps_refused_ = false;
   // LE VIDE SOUS LE MONDE, assombri par l'heure ; créé à la première nuit.
   ro::render::VoidShade void_shade_;
   bool void_shade_refused_ = false;

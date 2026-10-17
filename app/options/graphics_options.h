@@ -54,6 +54,10 @@ class GraphicsOptions {
   // a cuite — sur les cartes en plein air, et seulement sous `lightmaps`.
   // Éteinte par défaut : le client d'origine n'en a pas.
   [[nodiscard]] bool sun_shadows() const noexcept { return sun_shadows_; }
+  // LES OMBRES DES LUMIÈRES PONCTUELLES de l'édition de carte, sur toute carte.
+  // Allumées par défaut ; la page « Graphics » ne les montre pas encore, le
+  // fichier de réglages les coupe.
+  [[nodiscard]] bool point_light_shadows() const noexcept { return point_light_shadows_; }
   // LE CYCLE JOUR ET NUIT : le soleil, puis la lune, suivent l'heure qu'il fait
   // sur le serveur, en plein air. Éteint par défaut : le client d'origine garde
   // la lumière de la carte à toute heure.
@@ -112,6 +116,7 @@ class GraphicsOptions {
   bool lightmaps_ = true;
   bool cold_light_ = false;
   bool sun_shadows_ = false;
+  bool point_light_shadows_ = true;
   bool day_night_cycle_ = false;
   bool fog_ = true;
   bool decor_veil_ = false;

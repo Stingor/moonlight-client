@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "ro/core/log.h"
+#include "ro/render/point_shadow_pass.h"
 #include "ro/render/sky_body.h"
 #include "ro/render/sky_clock.h"
 #include "ro/render/sun_shadow_pass.h"
@@ -74,9 +75,38 @@ ro::render::SunShadowView Game::DrawSunShadowIfAsked(bool asked, bool models_sho
     }
     sun_map_ = std::move(*created);
   }
+  // L'ASTRE DU CIEL porte l'ombre, et la lune la porte plus légère.
+  return ro::render::DrawSunShadow(sun_map_, ShadowCastersOfFrame(models_shown, carts),
+                                   stage_->scene.terrain, sky.CastingLight(), camera_,
+                                   aspect_ratio_, ro::render::kFullSunShadow * sky.shadow_strength);
+}
+
+ro::render::PointLightSet Game::DrawPointShadowsIfAsked(
+    const ro::render::PointLightSet& points, bool models_shown,
+    std::span<const ro::render::DrawnActor> carts) {
+  if (points.count == 0 || point_maps_refused_ ||
+      !settings_->options().graphics().point_light_shadows()) {
+    return points;
+  }
+  if (!point_maps_.valid()) {
+    auto created = ro::render::PointShadowMaps::Create(ro::render::kPointShadowMapTexels);
+    if (!created) {
+      point_maps_refused_ = true;
+      ro::core::LogWarning("ombres des lumières ponctuelles refusées : {}",
+                           ro::core::Describe(created.error()));
+      return points;
+    }
+    point_maps_ = std::move(*created);
+  }
+  return ro::render::DrawPointShadows(point_maps_, ShadowCastersOfFrame(models_shown, carts),
+                                      points, camera_);
+}
+
+ro::render::SunShadowCasters Game::ShadowCastersOfFrame(
+    bool models_shown, std::span<const ro::render::DrawnActor> carts) {
   const bool actor_models_shown = link_.is_open() && pieces_.actor_models.has_value() &&
                                   pieces_.actor_model_renderer.has_value();
-  const ro::render::SunShadowCasters casters{
+  return ro::render::SunShadowCasters{
       .terrain = &terrain_,
       .models = models_shown ? &models_ : nullptr,
       .clock = &model_clock_,
@@ -85,10 +115,6 @@ ro::render::SunShadowView Game::DrawSunShadowIfAsked(bool asked, bool models_sho
       .actor_model_renderer = actor_models_shown ? &*pieces_.actor_model_renderer : nullptr,
       .actor_models = actor_models_shown ? pieces_.actor_models->drawn()
                                          : std::span<const ro::render::DrawnActorModel>()};
-  // L'ASTRE DU CIEL porte l'ombre, et la lune la porte plus légère.
-  return ro::render::DrawSunShadow(sun_map_, casters, stage_->scene.terrain, sky.CastingLight(),
-                                   camera_, aspect_ratio_,
-                                   ro::render::kFullSunShadow * sky.shadow_strength);
 }
 
 void Game::ShadeVoid(const ro::render::SkyLight& sky) {

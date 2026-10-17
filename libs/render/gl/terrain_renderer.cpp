@@ -206,7 +206,7 @@ core::Result<TerrainRenderer> TerrainRenderer::Create() {
                       kPointLightVertexGlsl),
       WithPointLights(
           WithFog(WithSunShadow(kFragmentShader, kSunShadowFragmentGlsl), kFogFragmentGlsl),
-          kPointLightFragmentGlsl));
+          kPointLightFragmentGlsl, kPointLightGlsl));
   if (!program) {
     return std::unexpected(program.error());
   }

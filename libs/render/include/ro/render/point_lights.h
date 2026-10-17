@@ -26,10 +26,17 @@ struct PointLight {
 // d'uniformes des nuanceurs.
 inline constexpr std::size_t kMaxPointLights = 8;
 
+class PointShadowMaps;
+
 // Les lumières d'un dessin : les `count` premières de `lights` comptent.
 struct PointLightSet {
   std::array<PointLight, kMaxPointLights> lights{};
   std::size_t count = 0;
+  // LEURS OMBRES : les `shadowed_count` premières lumières lisent chacune la
+  // carte cubique de même rang dans `shadow_maps`. Sans carte, aucune lumière
+  // n'est masquée. Voir `DrawPointShadows`.
+  const PointShadowMaps* shadow_maps = nullptr;
+  std::size_t shadowed_count = 0;
 };
 
 // Les kMaxPointLights lumières de `lights` les plus proches de `eye`, plus
@@ -40,7 +47,8 @@ struct PointLightSet {
 // LA LUMIÈRE QUE `set` DÉPOSE EN `world_position` : la somme, par source, de sa
 // couleur atténuée par le carré de ce qui reste de sa portée. C'est la règle de
 // `PointLighting` dans `kPointLightFragmentGlsl`, évaluée une fois pour un point
-// entier — les pieds d'un acteur plat. Une source sans portée n'éclaire rien.
+// entier. Une source sans portée n'éclaire rien. ⚠ SANS OMBRE : la carte qui
+// masquerait une source ne se lit que sur le GPU.
 [[nodiscard]] glm::vec3 PointLightingAt(const PointLightSet& set, glm::vec3 world_position);
 
 }  // namespace ro::render

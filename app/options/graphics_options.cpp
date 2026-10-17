@@ -21,6 +21,7 @@ using ro::ui::OptionRowView;
 constexpr const char* kLightmapsKey = "shadows_of_the_map";
 constexpr const char* kColdLightKey = "light_cold";
 constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
+constexpr const char* kPointLightShadowsKey = "render_shadows_of_point_lights";
 constexpr const char* kDayNightCycleKey = "cycle_day_night";
 constexpr const char* kFogKey = "fog";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
@@ -215,6 +216,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
     into.Declare(kRenderScaleKey, &render_scale_percent_);
     into.Declare(kDecorFilterKey, &decor_filter_rank_);
     into.Declare(kSunShadowsKey, &sun_shadows_);
+    into.Declare(kPointLightShadowsKey, &point_light_shadows_);
   }
   into.Declare(kPostFxKey, &post_fx_.enabled);
   into.Declare(kBrightnessKey, &post_fx_.brightness);

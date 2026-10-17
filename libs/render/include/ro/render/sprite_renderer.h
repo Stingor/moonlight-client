@@ -276,7 +276,8 @@ class SpriteRenderer {
   //
   // `points` S'AJOUTENT à ce facteur, lues aux PIEDS de chaque acteur et non
   // pixel par pixel : un sprite est un panneau plat, qu'une torche éclaire d'un
-  // seul tenant. Son ombre ronde n'en reçoit rien. Voir `PointLightingAt`.
+  // seul tenant, masquée par leurs cartes d'ombre. Son ombre ronde n'en reçoit
+  // rien. Voir `kPointLightGlsl`.
   void Draw(const Camera& camera, std::span<const DrawnActor> actors, float aspect_ratio,
             Blending blending = Blending::kOver, DepthWrite depth_write = DepthWrite::kOff,
             DepthTest depth_test = DepthTest::kOn, const SceneFog& fog = SceneFog(),
