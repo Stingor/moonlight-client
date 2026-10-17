@@ -18775,6 +18775,12 @@ tr: No model in the installation.
 fr: Bibliothèque
 tr: Library
 
+fr: Aperçu…
+tr: Preview…
+
+fr: Ce modèle ne se lit pas.
+tr: This model cannot be read.
+
 fr: Modèle ajouté : dites pourquoi avant d'enregistrer.
 tr: Model added: say why before saving.
 

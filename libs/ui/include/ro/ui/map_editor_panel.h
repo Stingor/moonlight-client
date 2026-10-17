@@ -191,6 +191,18 @@ struct MapEditorGround {
   std::size_t selected_points = 0;
   std::size_t selected_edited = 0;
 };
+// L'APERÇU D'UN MODÈLE SURVOLÉ dans l'arbre de la scène ou la bibliothèque :
+// la vignette que l'appelant a rendue pour le fichier que le panneau survolait
+// à l'image précédente.
+struct MapEditorPreview {
+  // Relatif à data\model\, en UTF-8 ; vide sans survol.
+  std::string file;
+  // La vignette, une fois rendue.
+  SkinImage image;
+  // Le fichier ne se lit pas, ou n'a rien à montrer.
+  bool failed = false;
+};
+
 struct MapEditorLine {
   glm::vec2 from{0.0F, 0.0F};
   glm::vec2 to{0.0F, 0.0F};
@@ -254,6 +266,8 @@ struct MapEditorView {
   std::optional<std::size_t> selected_map_effect;
   // LE RELIEF : la brosse, et ce que le document retouche.
   MapEditorGround ground;
+  // L'aperçu du modèle survolé.
+  MapEditorPreview preview;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
@@ -448,6 +462,9 @@ struct MapEditorPanelState {
   // Le filtre de la bibliothèque, et le fichier qu'on y a choisi.
   std::array<char, kFilterCapacity> library_filter{};
   std::string library_choice;
+  // LE FICHIER SURVOLÉ dans l'arbre ou la bibliothèque, relatif à data\model\ ;
+  // vide sans survol. Refait à chaque image : l'appelant en rend l'aperçu.
+  std::string hovered_model;
 
   std::array<char, kWhyCapacity> why{};
   // Le modèle dont `why` est la saisie : un autre modèle la recharge.

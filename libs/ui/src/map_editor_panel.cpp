@@ -194,6 +194,34 @@ class NamesFont {
   bool pushed_;
 };
 
+// L'APERÇU AU SURVOL de la ligne qu'on vient de poser : le fichier survolé est
+// noté pour l'appelant, et la bulle montre sa vignette si la vue la porte —
+// sinon qu'elle vient, ou que le fichier ne se lit pas.
+void PreviewOnHover(const MapEditorView& view, MapEditorPanelState& panel,
+                    const std::string& file) {
+  if (!ImGui::IsItemHovered()) {
+    return;
+  }
+  panel.hovered_model = file;
+  const MapEditorPreview& preview = view.preview;
+  const bool ready = preview.file == file;
+  if (!BeginSkinTooltip(ready && preview.image.usable() ? preview.image.width : 0.0F)) {
+    return;
+  }
+  {
+    const NamesFont names(panel.names_font);
+    ImGui::TextUnformatted(file.c_str());
+  }
+  if (ready && preview.image.usable()) {
+    ImGui::Image(preview.image.id, ImVec2(preview.image.width, preview.image.height));
+  } else if (ready && preview.failed) {
+    ImGui::TextDisabled("%s", core::Tr("Ce modèle ne se lit pas."));
+  } else {
+    ImGui::TextDisabled("%s", core::Tr("Aperçu…"));
+  }
+  EndSkinTooltip();
+}
+
 // LE CLAVIER D'UNE LISTE de l'éditeur, dans sa fenêtre fille focalisée — les
 // gestes de toute liste du jeu, voir `PressedListKey` : le rang visé parmi
 // `count` lignes, depuis `current`, ou `kListNoEntry`.
@@ -266,6 +294,7 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
         if (ImGui::Selectable(label.c_str(), selected)) {
           intents.emplace_back(map_editor::Select{row.model_index});
         }
+        PreviewOnHover(view, panel, row.file);
         // UN MODÈLE DE LA CARTE se masque ; un modèle ajouté se retire.
         const char* remove_label = core::Tr("Supprimer");
         if (!row.added) {
@@ -331,6 +360,7 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
         if (ImGui::Selectable(file.c_str(), panel.library_choice == file)) {
           panel.library_choice = file;
         }
+        PreviewOnHover(view, panel, file);
         if (line == keyed) {
           KeepLastItemInView();
         }
@@ -601,6 +631,7 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
 
 void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
                    std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  panel.hovered_model.clear();
   if (!view.active) {
     return;
   }

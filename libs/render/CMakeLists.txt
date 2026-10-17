@@ -141,6 +141,7 @@ add_library(ro_render STATIC
     src/model_sight.cpp
     src/model_veil.cpp
     src/model_vignette.cpp
+    src/decor_vignette.cpp
     src/sight_quad_tree.cpp
     src/veiled_prims.cpp
     src/scene_light.cpp

@@ -1634,6 +1634,7 @@ add_executable(moonclient
     game/game_sky.cpp
     game/game_grey_world.cpp
     game/game_map_editor.cpp
+    world/model_previews.cpp
     game/game_map_ground.cpp
     game/game_map_effects.cpp
     game/over_world_layer.cpp

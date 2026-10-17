@@ -132,6 +132,7 @@ void Game::ServeMapEditorTools() {
   // SANS LE DROIT, le mode se ferme : il peut se perdre en cours de session.
   if (!Rights().staff_tools || !stage_.has_value()) {
     map_editor_.Leave();
+    model_previews_.Clear();
     tools.map_editor_intents.clear();
     tools.map_editor = ro::ui::MapEditorView();
     return;
@@ -165,6 +166,13 @@ void Game::ServeMapEditorTools() {
     model_library_ = std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));
   }
   tools.map_editor.library = model_library_;
+  // L'APERÇU DU MODÈLE que le panneau survolait à l'image précédente.
+  if (map_editor_.active()) {
+    model_previews_.BeginFrame();
+    tools.map_editor.preview = model_previews_.Show(*vfs_, tools.map_editor_panel.hovered_model);
+  } else {
+    model_previews_.Clear();
+  }
   if (!map_editor_.active() || !map_editor_.selected().has_value()) {
     map_editor_.SetGizmo(GizmoFrame(), {});
     map_editor_.SetVertexContext(std::nullopt);
@@ -226,8 +234,10 @@ void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float wi
   // LA VUE SE RECOMPOSE : elle a été faite avant le contexte, et ne savait pas
   // encore nommer le sommet désigné. Ses traits gardent la boîte du modèle.
   std::vector<ro::ui::MapEditorLine> lines = std::move(view.lines);
+  ro::ui::MapEditorPreview preview = std::move(view.preview);
   view = map_editor_.View(stage_->scene, map_edits_);
   view.library = model_library_;
+  view.preview = std::move(preview);
   const std::vector<ro::ui::MapEditorLine> dots = map_editor_.VertexTrace();
   const std::vector<ro::ui::MapEditorLine> arrows = map_editor_.GizmoTrace();
   lines.insert(lines.end(), dots.begin(), dots.end());

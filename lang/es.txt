@@ -18775,6 +18775,12 @@ tr: Ningún modelo en la instalación.
 fr: Bibliothèque
 tr: Biblioteca
 
+fr: Aperçu…
+tr: Vista previa…
+
+fr: Ce modèle ne se lit pas.
+tr: Este modelo no se puede leer.
+
 fr: Modèle ajouté : dites pourquoi avant d'enregistrer.
 tr: Modelo añadido: di por qué antes de guardar.
 

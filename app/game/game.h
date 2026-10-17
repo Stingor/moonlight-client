@@ -93,6 +93,7 @@
 #include "world/map_editor_session.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
+#include "world/model_previews.h"
 #include "world/monster_sheet.h"
 #include "world/name_card_asker.h"
 #include "world/native_marker.h"
@@ -554,6 +555,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   MapEditorSession map_editor_;
   // La bibliothèque de l'éditeur, lue à sa première ouverture.
   std::shared_ptr<const std::vector<std::string>> model_library_;
+  // Les vignettes que l'éditeur montre au survol d'un modèle.
+  ModelPreviews model_previews_;
   // Ce que l'outil Sommets sait du modèle désigné, et les fichiers qu'il a lus.
   VertexContextCache vertex_context_;
   // Le bilan par seconde du décor que l'éditeur repose.
