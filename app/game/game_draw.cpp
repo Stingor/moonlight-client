@@ -171,17 +171,18 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   }
   // LES LUMIÈRES PONCTUELLES DU DOCUMENT D'ÉDITION, les plus proches de ce que
   // la caméra regarde : voir docs/adr/0119.
-  // Leurs ombres se peignent ici, avant la passe de couleur. Celles des effets
-  // suivent, sans ombre : voir docs/adr/0120.
-  const ro::render::PointLightSet points = ro::render::WithEffectLights(
-      DrawPointShadowsIfAsked(
+  // Celles des effets les suivent, et prennent les places ombrées qu'elles
+  // laissent : voir docs/adr/0120. Leurs ombres se peignent ici, avant la passe
+  // de couleur.
+  const ro::render::PointLightSet points = DrawPointShadowsIfAsked(
+      ro::render::WithEffectLights(
           ro::render::MapPointLights(
               ro::render::DocumentLights(map_edits_.Document(stage_->name),
                                          stage_->scene.rsw.effects()),
               ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
               sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms), sky.hour),
-          models_shown, carts),
-      effect_lights_, camera_.look_at);
+          effect_lights_, camera_.look_at),
+      models_shown, carts);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());
