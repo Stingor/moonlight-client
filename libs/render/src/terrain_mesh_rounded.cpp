@@ -114,6 +114,7 @@ void EmitWall(TerrainBatch& out, const TerrainFace& face, std::int32_t steps, bo
 }  // namespace
 
 TerrainMesh BuildRoundedTerrainMesh(const formats::GndMap& gnd, const TerrainFaces& faces,
+                                    std::span<const std::uint8_t> invisible_tiles,
                                     std::int32_t subdivisions) {
   const std::int32_t width = gnd.width();
   const std::int32_t height = gnd.height();
@@ -123,7 +124,7 @@ TerrainMesh BuildRoundedTerrainMesh(const formats::GndMap& gnd, const TerrainFac
   reliefs.reserve(static_cast<std::size_t>(width) * static_cast<std::size_t>(height));
   for (std::int32_t y = 0; y < height; ++y) {
     for (std::int32_t x = 0; x < width; ++x) {
-      reliefs.push_back(CubeReliefOf(gnd, x, y));
+      reliefs.push_back(CubeReliefOf(gnd, x, y, invisible_tiles));
     }
   }
   const auto relief_at = [&reliefs, width](std::int32_t x, std::int32_t y) -> const CubeRelief& {

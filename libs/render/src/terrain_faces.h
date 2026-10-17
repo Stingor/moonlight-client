@@ -63,6 +63,7 @@ struct TerrainBatch {
 // La construction du sol arrondi : voir `BuildTerrainMesh`.
 [[nodiscard]] TerrainMesh BuildRoundedTerrainMesh(const formats::GndMap& gnd,
                                                   const TerrainFaces& faces,
+                                                  std::span<const std::uint8_t> invisible_tiles,
                                                   std::int32_t subdivisions);
 
 }  // namespace ro::render

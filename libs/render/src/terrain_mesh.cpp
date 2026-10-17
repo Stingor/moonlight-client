@@ -113,7 +113,7 @@ TerrainMesh BuildTerrainMesh(const GndMap& gnd, const LightmapAtlas& atlas,
                              std::int32_t subdivisions) {
   const TerrainFaces faces(gnd, atlas, invisible_tiles);
   if (subdivisions > kFlatGroundSubdivisions) {
-    return BuildRoundedTerrainMesh(gnd, faces, subdivisions);
+    return BuildRoundedTerrainMesh(gnd, faces, invisible_tiles, subdivisions);
   }
 
   // Regroupement par texture : une carte porte quelques dizaines de textures

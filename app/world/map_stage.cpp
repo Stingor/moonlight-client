@@ -130,11 +130,12 @@ std::array<float, 3> GroundPositionAt(const MapStage& stage, float cell_x, float
     const float walkable = ro::render::WalkableHeightAt(*stage.gat, cell_x, cell_y);
     // LE SOL DESSINÉ, quand il s'arrondit : sans quoi les pieds flottent au
     // creux d'une dune et s'enfoncent sur sa crête.
-    ground[1] =
-        rounded ? ro::render::RoundedStandingHeight(stage.scene.gnd, walkable, ground[0], ground[2])
-                : walkable;
+    ground[1] = rounded ? ro::render::RoundedStandingHeight(stage.scene.gnd, walkable, ground[0],
+                                                            ground[2], stage.scene.invisible_tiles)
+                        : walkable;
   } else if (rounded) {
-    ground[1] = ro::render::RoundedGroundHeightAt(stage.scene.gnd, ground[0], ground[2]);
+    ground[1] = ro::render::RoundedGroundHeightAt(stage.scene.gnd, ground[0], ground[2],
+                                                  stage.scene.invisible_tiles);
   }
   return ground;
 }

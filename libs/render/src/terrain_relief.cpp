@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <optional>
+#include <span>
 
 #include "ro/render/terrain_mesh.h"
 
@@ -46,6 +47,22 @@ bool IsInside(const GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y) {
   return cube_x >= 0 && cube_y >= 0 && cube_x < gnd.width() && cube_y < gnd.height();
 }
 
+// Vrai si le cube a un dessus que l'on DESSINE : un carreau, une texture, et
+// pas tout transparent. Un trou de la carte porte des hauteurs, souvent celles
+// du bord qu'il prolonge vers le vide ; s'y fier ferait plonger le bord d'une
+// île vers le bas, en lame suspendue au-dessus de rien.
+bool HasDrawnTop(const GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y,
+                 std::span<const std::uint8_t> invisible_tiles) {
+  const std::int32_t tile_index = gnd.at(cube_x, cube_y).tile_up;
+  const auto& tiles = gnd.tiles();
+  if (tile_index < 0 || static_cast<std::size_t>(tile_index) >= tiles.size() ||
+      tiles[static_cast<std::size_t>(tile_index)].texture_index < 0) {
+    return false;
+  }
+  const auto tile = static_cast<std::size_t>(tile_index);
+  return tile >= invisible_tiles.size() || invisible_tiles[tile] == 0;
+}
+
 // La hauteur que le cube donne au point (i, j) de la grille des coins, qui doit
 // être l'un de ses quatre.
 float CornerOf(const GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y, std::int32_t point_i,
@@ -58,15 +75,17 @@ float CornerOf(const GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y, std:
 // La hauteur au bout du segment de grille qui part de (i, j) d'un pas
 // (step_i, step_j), si le sol s'y PROLONGE sans paroi depuis `height`.
 //
-// Deux cubes bordent un segment. Seul compte celui qui touche le point de
-// départ à la même hauteur : l'autre est de l'autre côté d'une paroi. S'ils y
+// Deux cubes bordent un segment. Seul compte celui qui a un dessus et touche le
+// point de départ à la même hauteur : l'autre est de l'autre côté d'une paroi. S'ils y
 // touchent tous deux mais divergent au bout, une falaise naît là, et le sol ne
 // se prolonge pas.
 //
 // La réponse ne dépend que du segment et de la hauteur de départ, jamais du
 // cube qui la demande : deux cubes qui partagent une arête y lisent donc la
 // même pente, et leurs bords arrondis se rejoignent.
-std::optional<float> ContinuedHeight(const GndMap& gnd, std::int32_t point_i, std::int32_t point_j,
+std::optional<float> ContinuedHeight(const GndMap& gnd,
+                                     std::span<const std::uint8_t> invisible_tiles,
+                                     std::int32_t point_i, std::int32_t point_j,
                                      std::int32_t step_i, std::int32_t step_j, float height) {
   const std::int32_t low_i = std::min(point_i, point_i + step_i);
   const std::int32_t low_j = std::min(point_j, point_j + step_j);
@@ -78,7 +97,7 @@ std::optional<float> ContinuedHeight(const GndMap& gnd, std::int32_t point_i, st
           : std::array<std::array<std::int32_t, 2>, 2>{{{point_i, low_j}, {point_i - 1, low_j}}};
   std::optional<float> found;
   for (const auto& [cube_x, cube_y] : borders) {
-    if (!IsInside(gnd, cube_x, cube_y) ||
+    if (!IsInside(gnd, cube_x, cube_y) || !HasDrawnTop(gnd, cube_x, cube_y, invisible_tiles) ||
         CornerOf(gnd, cube_x, cube_y, point_i, point_j) != height) {
       continue;
     }
@@ -91,15 +110,34 @@ std::optional<float> ContinuedHeight(const GndMap& gnd, std::int32_t point_i, st
   return found;
 }
 
+// La pente en un point, connaissant la montée du segment d'avant et celle du
+// segment d'après — en hauteur par cube.
+//
+// LE SOL NE DÉBORDE PAS DE SES COINS. La différence centrée seule fait bomber
+// un plateau au-dessus de lui-même au bord d'une marche, et creuser son pied :
+// sept pour cent de la marche, douze unités relevées sur gonryun, de quoi
+// recouvrir le socle d'une statue. D'où la règle de Fritsch et Carlson : une
+// pente nulle là où le sol change de sens ou cesse de monter, et partout
+// ailleurs une pente bornée à trois fois la plus faible des deux montées.
+float MonotoneSlope(float rise_before, float rise_after) {
+  if (rise_before * rise_after <= 0.0F) {
+    return 0.0F;
+  }
+  constexpr float kMonotoneBound = 3.0F;
+  const float central = (rise_before + rise_after) / 2.0F;
+  const float bound = kMonotoneBound * std::min(std::abs(rise_before), std::abs(rise_after));
+  return std::clamp(central, -bound, bound);
+}
+
 // La pente au coin `corner` du cube, le long d'un axe : colonnes (`along_rows`
 // faux) ou rangées.
 //
-// Différence centrée entre le coin voisin dans le cube et celui que le sol
-// atteint de l'autre côté. Sans sol continu de ce côté-là, le point manquant se
+// Entre le coin voisin dans le cube et celui que le sol atteint de l'autre côté,
+// bornée par `MonotoneSlope`. Sans sol continu de ce côté-là, le point manquant se
 // prend en miroir : la pente vaut alors celle de l'arête du cube, et le bord
 // d'une falaise garde sa ligne au lieu de se courber vers le pied.
-float CornerSlope(const GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y, std::size_t corner,
-                  bool along_rows) {
+float CornerSlope(const GndMap& gnd, std::span<const std::uint8_t> invisible_tiles,
+                  std::int32_t cube_x, std::int32_t cube_y, std::size_t corner, bool along_rows) {
   const std::array<float, 4>& heights = gnd.at(cube_x, cube_y).corner_height;
   const std::size_t stride = along_rows ? kCornersPerRow : 1;
   const bool at_end = ((along_rows ? corner / kCornersPerRow : corner % kCornersPerRow)) != 0;
@@ -110,10 +148,12 @@ float CornerSlope(const GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y, s
   const auto row = static_cast<std::int32_t>(corner / kCornersPerRow);
   // On sort du cube par le côté du coin.
   const std::int32_t outward = at_end ? 1 : -1;
-  const float beyond = ContinuedHeight(gnd, cube_x + column, cube_y + row, along_rows ? 0 : outward,
-                                       along_rows ? outward : 0, height)
+  const float beyond = ContinuedHeight(gnd, invisible_tiles, cube_x + column, cube_y + row,
+                                       along_rows ? 0 : outward, along_rows ? outward : 0, height)
                            .value_or(2.0F * height - inside);
-  return at_end ? (beyond - inside) / 2.0F : (inside - beyond) / 2.0F;
+  const float before = at_end ? inside : beyond;
+  const float after = at_end ? beyond : inside;
+  return MonotoneSlope(height - before, after - height);
 }
 
 }  // namespace
@@ -139,12 +179,13 @@ CubePoint CubePointAt(const formats::GndMap& gnd, float world_x, float world_z) 
   return point;
 }
 
-CubeRelief CubeReliefOf(const formats::GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y) {
+CubeRelief CubeReliefOf(const formats::GndMap& gnd, std::int32_t cube_x, std::int32_t cube_y,
+                        std::span<const std::uint8_t> invisible_tiles) {
   CubeRelief relief;
   relief.corner_height = gnd.at(cube_x, cube_y).corner_height;
   for (std::size_t corner = 0; corner < relief.corner_height.size(); ++corner) {
-    relief.slope_across[corner] = CornerSlope(gnd, cube_x, cube_y, corner, false);
-    relief.slope_along[corner] = CornerSlope(gnd, cube_x, cube_y, corner, true);
+    relief.slope_across[corner] = CornerSlope(gnd, invisible_tiles, cube_x, cube_y, corner, false);
+    relief.slope_along[corner] = CornerSlope(gnd, invisible_tiles, cube_x, cube_y, corner, true);
   }
   return relief;
 }
@@ -188,22 +229,24 @@ std::array<float, 3> ReliefNormalIn(const CubeRelief& relief, float across, floa
   return {-rise_x / length, 1.0F / length, -rise_z / length};
 }
 
-float RoundedGroundHeightAt(const formats::GndMap& gnd, float world_x, float world_z) {
+float RoundedGroundHeightAt(const formats::GndMap& gnd, float world_x, float world_z,
+                            std::span<const std::uint8_t> invisible_tiles) {
   if (gnd.width() <= 0 || gnd.height() <= 0) {
     return 0.0F;
   }
   const CubePoint point = CubePointAt(gnd, world_x, world_z);
   // L'axe vertical du monde monte, celui du fichier descend.
-  return -ReliefHeightIn(CubeReliefOf(gnd, point.cube_x, point.cube_y), point.across, point.along);
+  return -ReliefHeightIn(CubeReliefOf(gnd, point.cube_x, point.cube_y, invisible_tiles),
+                         point.across, point.along);
 }
 
 float RoundedStandingHeight(const formats::GndMap& gnd, float walkable_height, float world_x,
-                            float world_z) {
+                            float world_z, std::span<const std::uint8_t> invisible_tiles) {
   const float flat = GroundHeightAt(gnd, world_x, world_z);
   if (std::abs(walkable_height - flat) > kWalkOnTerrainTolerance) {
     return walkable_height;
   }
-  return walkable_height + (RoundedGroundHeightAt(gnd, world_x, world_z) - flat);
+  return walkable_height + (RoundedGroundHeightAt(gnd, world_x, world_z, invisible_tiles) - flat);
 }
 
 }  // namespace ro::render
