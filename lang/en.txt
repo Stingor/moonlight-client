@@ -19191,3 +19191,102 @@ tr: Some spells, hits and map events shake the camera for a moment. Untick to ke
 
 fr: /monsterhp, /emblem, /window, /miss, /sf, /quake : basculer le réglage de la page d'options
 tr: /monsterhp, /emblem, /window, /miss, /sf, /quake: toggle the option page setting
+
+fr: %zu / %zu
+tr: %zu / %zu
+
+fr: Actuelles : %s
+tr: Current: %s
+
+fr: Aperçu : %.*s
+tr: Preview: %.*s
+
+fr: Application arrêtée à ta demande après %zu / %zu.
+tr: Stopped at your request after %zu / %zu.
+
+fr: Application en cours : %zu / %zu
+tr: Applying: %zu / %zu
+
+fr: Aucun préréglage enregistré.
+tr: No preset saved.
+
+fr: Ce préréglage n'existe plus.
+tr: This preset no longer exists.
+
+fr: Donne un nom au préréglage.
+tr: Give the preset a name.
+
+fr: Enregistrer et appliquer des préréglages de stats
+tr: Save and apply stat presets
+
+fr: Le carnet est plein (%zu préréglages).
+tr: The list is full (%zu presets).
+
+fr: Le fichier des préréglages n'a pas pu être écrit.
+tr: The preset file could not be written.
+
+fr: Le serveur a refusé une montée : arrêt après %zu / %zu.
+tr: The server refused a raise: stopped after %zu / %zu.
+
+fr: Le serveur ne répond pas : arrêt après %zu / %zu.
+tr: The server is not answering: stopped after %zu / %zu.
+
+fr: Les points de statut ont changé en cours : arrêt après %zu / %zu.
+tr: Status points changed meanwhile: stopped after %zu / %zu.
+
+fr: Les valeurs ne sont pas encore connues.
+tr: The values are not known yet.
+
+fr: Montée non envoyée (hors ligne ou personnage mort) : arrêt après %zu / %zu.
+tr: Raise not sent (offline or character dead): stopped after %zu / %zu.
+
+fr: Plus assez de points pour la montée suivante : arrêt après %zu / %zu.
+tr: Not enough points for the next raise: stopped after %zu / %zu.
+
+fr: Points de statut : %lld -> %lld (%lld montées)
+tr: Status points: %lld -> %lld (%lld raises)
+
+fr: Préréglage renommé en « %s ».
+tr: Preset renamed to “%s”.
+
+fr: Préréglage « %s » appliqué : %zu montées.
+tr: Preset “%s” applied: %zu raises.
+
+fr: Préréglage « %s » enregistré.
+tr: Preset “%s” saved.
+
+fr: Préréglage « %s » supprimé.
+tr: Preset “%s” deleted.
+
+fr: Préréglages de stats
+tr: Stat presets
+
+fr: Rien à monter : aucun point ne rapproche de la cible.
+tr: Nothing to raise: no point brings you closer to the target.
+
+fr: Supprimer ?
+tr: Delete?
+
+fr: Un autre préréglage porte déjà ce nom.
+tr: Another preset already has this name.
+
+fr: Une stat a changé en cours : arrêt après %zu / %zu.
+tr: A stat changed meanwhile: stopped after %zu / %zu.
+
+fr: atteinte
+tr: reached
+
+fr: au-dessus de la cible, inchangée
+tr: above target, unchanged
+
+fr: cible %lld
+tr: target %lld
+
+fr: il manquera %lld (%lld points)
+tr: %lld short (%lld points)
+
+fr: nom du préréglage
+tr: preset name
+
+fr: plafond du serveur : il manquera %lld
+tr: server cap: %lld short

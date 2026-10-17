@@ -46,6 +46,7 @@ add_library(ro_ui STATIC
     src/align_grid.cpp
     src/bank_window.cpp
     src/status_window.cpp
+    src/stat_preset_window.cpp
     src/entry_queue_prompts.cpp
     src/entry_queue_window.cpp
     src/memorial_dungeon_window.cpp

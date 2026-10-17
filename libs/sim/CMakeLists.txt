@@ -95,6 +95,8 @@ add_library(ro_sim STATIC
     src/storage_facts.cpp
     src/store_search.cpp
     src/style.cpp
+    src/stat_presets.cpp
+    src/stat_raise_run.cpp
     src/style_code.cpp
     src/summon_master.cpp
     src/title_book.cpp

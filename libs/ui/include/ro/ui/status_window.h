@@ -8,6 +8,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/character_window.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/stat_preset_window.h"
 
 namespace ro::ui {
 
@@ -85,12 +86,16 @@ struct StatusWindowView {
   // Le nom de la guilde, VIDE sans guilde. ⚠ IL VIT AUSSI LONGTEMPS QUE LA
   // VUE : c'est l'appelant qui le garde.
   std::string_view guild_name;
+
+  // La fenêtre des préréglages qu'ouvre le bouton de la barre de titre.
+  StatPresetWindowView presets;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre : son interrupteur, que la
-// croix baisse elle-même.
+// croix baisse elle-même, et celui des préréglages.
 struct StatusWindowState {
   bool open = false;
+  StatPresetWindowState presets;
 };
 
 enum class StatusVerb : std::uint8_t {
@@ -104,6 +109,8 @@ struct StatusWindowAction {
   // De zéro à cinq, dans l'ordre de `StatusWindowView::attributes`.
   std::uint8_t attribute = 0;
   int amount = 0;
+  // Ce que la fenêtre des préréglages a demandé.
+  StatPresetAction presets;
 };
 
 // LA FLÈCHE SE MONTRE-T-ELLE ? Quand le cran suivant a un coût, et que les

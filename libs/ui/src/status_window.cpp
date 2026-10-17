@@ -37,6 +37,8 @@ constexpr float kTextGuild = 12.0F;
 constexpr float kGuildLowerPixels = 1.0F;
 // Le haut d'un texte, au-dessus du centre de sa rangée.
 constexpr float kTextAboveCenterPixels = 6.0F;
+// Le seul bouton que la fenêtre pose dans sa barre de titre : les préréglages.
+constexpr int kPresetButtonRank = 0;
 
 // ── LES COLONNES, en pixels d'art depuis le bord gauche du fond ─────────────
 
@@ -362,6 +364,9 @@ float StatusArrowTopPixels(std::size_t rank) {
 StatusWindowAction DrawStatusWindow(StatusWindowState& state, const StatusWindowView& view,
                                     const SkinArt& art) {
   StatusWindowAction action;
+  // LES PRÉRÉGLAGES SE DESSINENT MÊME STATUT FERMÉ : une application lancée se
+  // suit et s'arrête depuis leur fenêtre.
+  action.presets = DrawStatPresetWindow(state.presets, view.presets, art);
   if (!state.open) {
     return action;
   }
@@ -386,7 +391,11 @@ StatusWindowAction DrawStatusWindow(StatusWindowState& state, const StatusWindow
   constexpr ImGuiWindowFlags kFlags =
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
   static WindowName name(kStatusWindowTitle, kStatusWindowId);
+  PoseStatPresetButton();
   if (BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar, kFlags)) {
+    if (TitleActionClicked(kPresetButtonRank)) {
+      state.presets.open = !state.presets.open;
+    }
     ImGuiWindow* const window = ImGui::GetCurrentWindow();
     // L'ORIGINE EST LE HAUT DU FOND, là où la barre réelle s'arrête.
     const Painter paint(window->DrawList,

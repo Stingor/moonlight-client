@@ -45,15 +45,20 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   // LA FLÈCHE CLIQUÉE À L'IMAGE PRÉCÉDENTE part par la route du « + » de la
   // fiche. ⚠ CONSOMMÉE : laissée en place, elle remonterait la caractéristique
   // à chaque image.
-  if (const ro::ui::StatusWindowAction asked = std::exchange(status.answer, {});
-      asked.verb != ro::ui::StatusVerb::kNothing) {
+  const ro::ui::StatusWindowAction asked = std::exchange(status.answer, {});
+  if (asked.verb != ro::ui::StatusVerb::kNothing) {
     character_->Apply(SheetActionOf(asked), link_, world_);
   }
+  // LES PRÉRÉGLAGES DE STATS : ce que leur fenêtre a demandé, puis la montée
+  // suivante de l'application en cours, s'il y en a une.
+  stat_presets_->Apply(asked.presets, world_, now_ms);
+  stat_presets_->Tick(link_, world_, now_ms);
   // ⚠ LE NOM SE COPIE DANS LE PORTEUR : la vue de l'onglet de guilde date de
   // l'image précédente, et le réseau a pu réécrire depuis la chaîne qu'elle
   // désigne.
   status.guild_name = GuildNameOf(guild_book_);
   status.view = StatusWindowViewOf(character_->stats(), status.guild_name);
+  stat_presets_->Compose(world_, status.view.presets);
   // Fiche ouverte, et pas seulement sur son onglet : un clic sur l'onglet ne le
   // montre qu'à l'image suivante, que ses lignes doivent déjà servir.
   presets_->Refresh(windows_.character.open, settings_->bindings());

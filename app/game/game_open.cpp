@@ -404,6 +404,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                    &pieces_.item_words,
                    pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr, client_root_,
                    ticket_.character_id);
+  // Les préréglages de stats, sous l'identifiant du COMPTE.
+  stat_presets_.emplace(client_root_, ticket_.account.account_id);
   title_view_.emplace(
       pieces_.achievement_titles.has_value() ? &*pieces_.achievement_titles : nullptr,
       pieces_.titles.has_value() ? &*pieces_.titles : nullptr);

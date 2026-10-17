@@ -399,7 +399,8 @@ target_include_directories(moonclient_companionai PUBLIC ${CMAKE_CURRENT_SOURCE_
 # disparaît au lieu de revenir.
 add_library(moonclient_presets STATIC
     character/equip_preset_file.cpp
-    character/equip_presets.cpp)
+    character/equip_presets.cpp
+    character/stat_preset_file.cpp)
 
 target_link_libraries(moonclient_presets
     PUBLIC moonclient_hotkeys ro_sim
@@ -1604,6 +1605,7 @@ add_executable(moonclient
     character/character_view.cpp
     character/doll_gif_export.cpp
     character/preset_view.cpp
+    character/stat_preset_desk.cpp
     character/staff_jobs.cpp
     character/staff_view.cpp
     capture/capture_clipboard.cpp

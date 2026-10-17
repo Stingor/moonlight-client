@@ -479,6 +479,10 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // ou refusé — lève l'attente, l'entrée sur une carte aussi.
   [[nodiscard]] bool stat_raise_awaited() const noexcept { return stat_raise_awaited_; }
   void AwaitStatRaise(bool awaited) noexcept { stat_raise_awaited_ = awaited; }
+  // LES MONTÉES REFUSÉES depuis la connexion : un refus ne change aucune
+  // valeur, et c'est ce compte seul qui le distingue d'une réponse en retard.
+  [[nodiscard]] std::uint32_t stat_raise_refusals() const noexcept { return stat_raise_refusals_; }
+  void CountStatRaiseRefusal() noexcept { ++stat_raise_refusals_; }
 
   // LE CLASSEMENT PVP DE CETTE CARTE. Le chronomètre du premier et le carnet des
   // rangs vivent dans `PvpStanding` ; ne reste ici que ce qui touche aux acteurs.
@@ -617,6 +621,7 @@ class World : public WorldHoldings, public WorldNpcDialog {
   MapMode map_mode_;
   std::uint16_t map_type_ = 0;
   bool stat_raise_awaited_ = false;
+  std::uint32_t stat_raise_refusals_ = 0;
   PvpStanding pvp_standing_;
   ServerClock server_clock_;
 };

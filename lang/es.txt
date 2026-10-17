@@ -19191,3 +19191,102 @@ tr: Algunos hechizos, golpes y eventos de mapa hacen temblar la cámara un insta
 
 fr: /monsterhp, /emblem, /window, /miss, /sf, /quake : basculer le réglage de la page d'options
 tr: /monsterhp, /emblem, /window, /miss, /sf, /quake: alternar el ajuste de la página de opciones
+
+fr: %zu / %zu
+tr: %zu / %zu
+
+fr: Actuelles : %s
+tr: Actuales: %s
+
+fr: Aperçu : %.*s
+tr: Vista previa: %.*s
+
+fr: Application arrêtée à ta demande après %zu / %zu.
+tr: Detenido a petición tuya tras %zu / %zu.
+
+fr: Application en cours : %zu / %zu
+tr: Aplicando: %zu / %zu
+
+fr: Aucun préréglage enregistré.
+tr: Ningún preajuste guardado.
+
+fr: Ce préréglage n'existe plus.
+tr: Este preajuste ya no existe.
+
+fr: Donne un nom au préréglage.
+tr: Dale un nombre al preajuste.
+
+fr: Enregistrer et appliquer des préréglages de stats
+tr: Guardar y aplicar preajustes de stats
+
+fr: Le carnet est plein (%zu préréglages).
+tr: La lista está llena (%zu preajustes).
+
+fr: Le fichier des préréglages n'a pas pu être écrit.
+tr: No se pudo escribir el archivo de preajustes.
+
+fr: Le serveur a refusé une montée : arrêt après %zu / %zu.
+tr: El servidor rechazó una subida: detenido tras %zu / %zu.
+
+fr: Le serveur ne répond pas : arrêt après %zu / %zu.
+tr: El servidor no responde: detenido tras %zu / %zu.
+
+fr: Les points de statut ont changé en cours : arrêt après %zu / %zu.
+tr: Los puntos de estado cambiaron entretanto: detenido tras %zu / %zu.
+
+fr: Les valeurs ne sont pas encore connues.
+tr: Los valores aún no se conocen.
+
+fr: Montée non envoyée (hors ligne ou personnage mort) : arrêt après %zu / %zu.
+tr: Subida no enviada (desconectado o personaje muerto): detenido tras %zu / %zu.
+
+fr: Plus assez de points pour la montée suivante : arrêt après %zu / %zu.
+tr: No quedan puntos para la siguiente subida: detenido tras %zu / %zu.
+
+fr: Points de statut : %lld -> %lld (%lld montées)
+tr: Puntos de estado: %lld -> %lld (%lld subidas)
+
+fr: Préréglage renommé en « %s ».
+tr: Preajuste renombrado a «%s».
+
+fr: Préréglage « %s » appliqué : %zu montées.
+tr: Preajuste «%s» aplicado: %zu subidas.
+
+fr: Préréglage « %s » enregistré.
+tr: Preajuste «%s» guardado.
+
+fr: Préréglage « %s » supprimé.
+tr: Preajuste «%s» eliminado.
+
+fr: Préréglages de stats
+tr: Preajustes de stats
+
+fr: Rien à monter : aucun point ne rapproche de la cible.
+tr: Nada que subir: ningún punto acerca al objetivo.
+
+fr: Supprimer ?
+tr: ¿Eliminar?
+
+fr: Un autre préréglage porte déjà ce nom.
+tr: Otro preajuste ya tiene este nombre.
+
+fr: Une stat a changé en cours : arrêt après %zu / %zu.
+tr: Una stat cambió entretanto: detenido tras %zu / %zu.
+
+fr: atteinte
+tr: alcanzada
+
+fr: au-dessus de la cible, inchangée
+tr: por encima del objetivo, sin cambios
+
+fr: cible %lld
+tr: objetivo %lld
+
+fr: il manquera %lld (%lld points)
+tr: faltarán %lld (%lld puntos)
+
+fr: nom du préréglage
+tr: nombre del preajuste
+
+fr: plafond du serveur : il manquera %lld
+tr: tope del servidor: faltarán %lld

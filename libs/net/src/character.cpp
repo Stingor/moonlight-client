@@ -204,7 +204,9 @@ FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world) {
           // numéro hors des six, plafond du personnage atteint, points
           // insuffisants — et n'en nomme aucune. Rien ne change, donc rien ne
           // se montre : les points qu'on croyait dépenser sont toujours là, et
-          // c'est cela qui se voit.
+          // c'est cela qui se voit — et le compte des refus, que l'application
+          // d'un préréglage lit pour s'arrêter.
+          world.CountStatRaiseRefusal();
           return FrameOutcome::kApplied;
         }
         // ⚠ LA VALEUR EST BORNÉE À 255 PAR LE SERVEUR. Au-delà, il envoie tout

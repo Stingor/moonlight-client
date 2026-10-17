@@ -42,6 +42,7 @@
 #include "character/skill_description_view.h"
 #include "character/skill_facts_asker.h"
 #include "character/skill_view.h"
+#include "character/stat_preset_desk.h"
 #include "character/status_view.h"
 #include "character/style_preview.h"
 #include "character/style_view.h"
@@ -619,7 +620,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // L'APPARENCE QUE SON PANTIN MONTRE, habillée avant le dessin : c'est elle que
   // le GIF photographie, au clic qui suit.
   ro::render::ActorLook sheet_look_;
-  std::optional<PresetView> presets_;  // son onglet des presets, et leur fichier
+  std::optional<PresetView> presets_;           // son onglet des presets, et leur fichier
+  std::optional<StatPresetDesk> stat_presets_;  // les préréglages de stats du compte
   // SON ONGLET DES TITRES, croisé avec les deux tables qui les nomment.
   std::optional<TitleView> title_view_;
   // SON ONGLET DE GUILDE, et les emblèmes qu'il montre et qu'il dépose.
