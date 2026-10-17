@@ -14,6 +14,7 @@
 #include "ro/ui/list_keys.h"
 #include "ro/ui/map_editor_effects_panel.h"
 #include "ro/ui/map_editor_ground_panel.h"
+#include "ro/ui/map_editor_row_menu.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -255,6 +256,18 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
         if (ImGui::Selectable(label.c_str(), selected)) {
           intents.emplace_back(map_editor::Select{row.model_index});
         }
+        // UN MODÈLE DE LA CARTE se masque ; un modèle ajouté se retire.
+        const char* remove_label = core::Tr("Supprimer");
+        if (!row.added) {
+          remove_label = row.hidden ? core::Tr("Afficher") : core::Tr("Masquer");
+        }
+        DrawMapEditorRowMenu(
+            MapEditorRowMenu{.select = map_editor::Select{row.model_index},
+                             .remove_label = remove_label,
+                             .revert = row.edited && !row.added
+                                           ? std::optional<MapEditorIntent>(map_editor::Revert{})
+                                           : std::nullopt},
+            intents);
         if (line == keyed) {
           KeepLastItemInView();
         }
@@ -497,6 +510,10 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectLight{chosen ? std::nullopt : std::optional(slot)});
     }
+    DrawMapEditorRowMenu(MapEditorRowMenu{.select = map_editor::SelectLight{slot},
+                                          .remove_label = core::Tr("Supprimer"),
+                                          .cells = CellsOfNative(light.position, view.map_cubes)},
+                         intents);
   }
   if (!view.selected_light.has_value() || *view.selected_light >= view.lights.size()) {
     return;

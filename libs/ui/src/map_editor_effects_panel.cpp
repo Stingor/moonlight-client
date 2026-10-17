@@ -12,6 +12,7 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/map_editor_row_menu.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/wheel_drag.h"
@@ -66,6 +67,15 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
       intents.emplace_back(
           map_editor::SelectMapEffect{chosen ? std::nullopt : std::optional(effect.effect_index)});
     }
+    DrawMapEditorRowMenu(
+        MapEditorRowMenu{.select = map_editor::SelectMapEffect{effect.effect_index},
+                         .remove_label = effect.hidden ? core::Tr("Afficher") : core::Tr("Masquer"),
+                         .revert = effect.edited
+                                       ? std::optional<MapEditorIntent>(
+                                             map_editor::RevertMapEffect{effect.effect_index})
+                                       : std::nullopt,
+                         .cells = cells},
+        intents);
   }
   if (!view.selected_map_effect.has_value() ||
       *view.selected_map_effect >= view.map_effects.size()) {
@@ -188,6 +198,10 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectEffect{chosen ? std::nullopt : std::optional(slot)});
     }
+    DrawMapEditorRowMenu(MapEditorRowMenu{.select = map_editor::SelectEffect{slot},
+                                          .remove_label = core::Tr("Supprimer"),
+                                          .cells = cells},
+                         intents);
   }
   if (!view.selected_effect.has_value() || *view.selected_effect >= view.effects.size()) {
     return;

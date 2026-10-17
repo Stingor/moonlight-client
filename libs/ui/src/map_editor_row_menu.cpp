@@ -1,0 +1,39 @@
+#include "ro/ui/map_editor_row_menu.h"
+
+#include "ro/core/i18n.h"
+#include "ro/ui/skin_popup.h"
+#include "ro/ui/triple_clipboard.h"
+
+#include "imgui.h"
+
+namespace ro::ui {
+
+void DrawMapEditorRowMenu(const MapEditorRowMenu& menu, std::vector<MapEditorIntent>& intents) {
+  if (!BeginSkinPopupContextItem("menu_ligne")) {
+    return;
+  }
+  // Désigner, puis agir : la session joue les intentions dans l'ordre.
+  const auto act = [&](MapEditorIntent action) {
+    intents.push_back(menu.select);
+    intents.push_back(std::move(action));
+  };
+  if (ImGui::MenuItem(core::Tr("Dupliquer"))) {
+    act(map_editor::Duplicate{});
+  }
+  if (menu.remove_label != nullptr && ImGui::MenuItem(menu.remove_label)) {
+    act(map_editor::Delete{});
+  }
+  if (menu.revert.has_value() && ImGui::MenuItem(core::Tr("Rétablir"))) {
+    act(*menu.revert);
+  }
+  ImGui::Separator();
+  if (ImGui::MenuItem(core::Tr("Centrer"))) {
+    act(map_editor::Focus{});
+  }
+  if (ImGui::MenuItem(core::Tr("Copier la position"))) {
+    ImGui::SetClipboardText(TripleText(menu.cells).c_str());
+  }
+  EndSkinPopup();
+}
+
+}  // namespace ro::ui

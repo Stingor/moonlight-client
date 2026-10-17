@@ -19341,3 +19341,6 @@ tr: Pegar
 
 fr: Ajouter une lumière ici
 tr: Añadir una luz aquí
+
+fr: Copier la position
+tr: Copiar la posición

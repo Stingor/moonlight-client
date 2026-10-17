@@ -19341,3 +19341,6 @@ tr: Paste
 
 fr: Ajouter une lumière ici
 tr: Add a light here
+
+fr: Copier la position
+tr: Copy the position

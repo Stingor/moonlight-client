@@ -11,7 +11,9 @@
 namespace ro::render {
 
 PointLightSet DrawPointShadows(PointShadowMaps& maps, const SunShadowCasters& casters,
-                               const PointLightSet& points, const Camera& camera) {
+                               const PointLightSet& nearest, const Camera& camera) {
+  // Une lumière déjà ombrée garde sa carte : voir `KeepShadowedOrder`.
+  const PointLightSet points = KeepShadowedOrder(nearest, maps.painted(), camera.look_at);
   PointLightSet shadowed = points;
   shadowed.shadow_maps = nullptr;
   shadowed.shadowed_count = 0;

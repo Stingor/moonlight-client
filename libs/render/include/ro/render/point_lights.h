@@ -31,8 +31,11 @@ struct PointLight {
 };
 
 // Le plafond des lumières qu'un dessin reçoit : la taille des tableaux
-// d'uniformes des nuanceurs.
-inline constexpr std::size_t kMaxPointLights = 8;
+// d'uniformes des nuanceurs. Assez pour une place éclairée de lanternes ET les
+// sorts qui s'y lancent : les `kMaxEffectLights` des sorts n'y chassent pas
+// les lumières du document tant qu'elles tiennent dans le reste. Un pixel ne
+// paie que les lumières de l'image, pas le plafond.
+inline constexpr std::size_t kMaxPointLights = 16;
 
 class PointShadowMaps;
 

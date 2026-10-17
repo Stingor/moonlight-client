@@ -63,7 +63,7 @@ vec3 PointSurfaceLighting(vec3 surface_normal) {
 // de l'axe de sa face, n'est pas ombré : voir `kPointShadowClearanceWorld`.
 inline constexpr std::string_view kPointLightGlsl = R"GLSL(
 // La même borne que `kMaxPointLights` côté C++.
-const int kMaxPointLights = 8;
+const int kMaxPointLights = 16;
 // La même que `kMaxShadowedPointLights` : une carte par branche de `PointVisibility`.
 const int kMaxShadowedPointLights = 2;
 uniform int u_point_count;

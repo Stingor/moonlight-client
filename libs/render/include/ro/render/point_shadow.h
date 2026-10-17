@@ -62,6 +62,19 @@ inline constexpr std::size_t kPointShadowRepaintPeriod = 2;
     const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
     const PointLightSet& set, std::size_t count, std::uint64_t frame);
 
+// UNE OMBRE NE SAUTE PAS D'UNE LUMIÈRE À L'AUTRE pour un pas de la caméra.
+// Les lumières les plus proches de `eye` portent ombre ; mais une lumière qui
+// en porte déjà une — celle que `painted` dit peinte, à sa place et à sa
+// portée — la garde tant que les lumières sans ombre nettement plus proches
+// qu'elle, à moins de `kShadowSwapRatio` fois sa distance, ne suffisent pas à
+// remplir les cartes. Elle garde aussi son rang, donc sa carte : rien à
+// repeindre. Rend `set` réordonné, ses lumières ombrées d'abord.
+inline constexpr float kShadowSwapRatio = 0.7F;
+[[nodiscard]] PointLightSet KeepShadowedOrder(
+    const PointLightSet& set,
+    const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
+    glm::vec3 eye);
+
 // Les lumières de `set` qui portent ombre : ses `kMaxShadowedPointLights`
 // premières, déjà rangées de la plus proche de l'œil à la plus lointaine.
 [[nodiscard]] std::size_t ShadowedPointLightCount(const PointLightSet& set);
