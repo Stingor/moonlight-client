@@ -11,6 +11,8 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/list_keys.h"
+#include "ro/ui/map_editor_effects_panel.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/wheel_drag.h"
@@ -62,7 +64,7 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
                  "Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
                  "Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. "
-                 "Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur."),
+                 "Ctrl+clic fait marcher le personnage."),
 };
 
 // Le rayon du cercle d'une lumière ponctuelle, en pixels.
@@ -103,10 +105,13 @@ ImU32 ColorOf(MapEditorLineKind kind) {
     case MapEditorLineKind::kActive:
     case MapEditorLineKind::kVertexSelected:
     case MapEditorLineKind::kLightSelected:
+    case MapEditorLineKind::kEffectSelected:
       return kActiveColor;
     case MapEditorLineKind::kVertex:
     case MapEditorLineKind::kLight:
       return kSelectionColor;
+    case MapEditorLineKind::kEffect:
+      return kAxisXColor;
   }
   return kSelectionColor;
 }
@@ -143,6 +148,43 @@ bool PassesFilter(const MapEditorModelRow& row, std::string_view filter) {
   return !found.empty();
 }
 
+// LES NOMS DE FICHIERS DANS LEUR POLICE, le temps d'un bloc : voir
+// `MapEditorPanelState::names_font`.
+class NamesFont {
+ public:
+  explicit NamesFont(ImFont* font) : pushed_(font != nullptr) {
+    if (pushed_) {
+      // Taille nulle : celle du texte courant.
+      ImGui::PushFont(font, 0.0F);
+    }
+  }
+  NamesFont(const NamesFont&) = delete;
+  NamesFont& operator=(const NamesFont&) = delete;
+  ~NamesFont() {
+    if (pushed_) {
+      ImGui::PopFont();
+    }
+  }
+
+ private:
+  bool pushed_;
+};
+
+// LE CLAVIER D'UNE LISTE de l'éditeur, dans sa fenêtre fille focalisée — les
+// gestes de toute liste du jeu, voir `PressedListKey` : le rang visé parmi
+// `count` lignes, depuis `current`, ou `kListNoEntry`.
+int KeyedRank(int current, int count) {
+  if (!ImGui::IsWindowFocused()) {
+    return kListNoEntry;
+  }
+  const ListKeyMove move = PressedListKey(/*arrows_only=*/ImGui::GetIO().WantTextInput);
+  if (move == ListKeyMove::kNone) {
+    return kListNoEntry;
+  }
+  return ListKeyTarget(current, count, VisibleListRows(ImGui::GetTextLineHeightWithSpacing()),
+                       move);
+}
+
 // L'ARBRE DE LA SCÈNE : tous les modèles de la carte, filtrables. Un clic
 // désigne ; les retouchés sont marqués, et les masqués le disent.
 void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
@@ -169,21 +211,44 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
     ImGui::EndChild();
     return;
   }
-  ImGuiListClipper clipper;
-  clipper.Begin(static_cast<int>(shown.size()));
-  while (clipper.Step()) {
-    for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
-      const MapEditorModelRow& row = rows[shown[static_cast<std::size_t>(line)]];
-      const std::string label = std::format(
-          "{}{} — {}{}##modele{}", row.added ? "+ " : (row.edited ? "✎ " : ""), row.model_index,
-          row.file, row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
-          row.model_index);
-      const bool selected = view.selected == row.model_index;
-      if (ImGui::Selectable(label.c_str(), selected)) {
-        intents.emplace_back(map_editor::Select{row.model_index});
+  int current = kListNoEntry;
+  for (std::size_t line = 0; line < shown.size(); ++line) {
+    if (view.selected == rows[shown[line]].model_index) {
+      current = static_cast<int>(line);
+    }
+  }
+  const int keyed = KeyedRank(current, static_cast<int>(shown.size()));
+  if (keyed != kListNoEntry && keyed != current) {
+    intents.emplace_back(
+        map_editor::Select{rows[shown[static_cast<std::size_t>(keyed)]].model_index});
+  }
+  {
+    const NamesFont names(panel.names_font);
+    ImGuiListClipper clipper;
+    clipper.Begin(static_cast<int>(shown.size()));
+    // La ligne qu'une touche vient de choisir se pose même hors de la vue, pour
+    // que la liste la rejoigne.
+    if (keyed != kListNoEntry) {
+      clipper.IncludeItemByIndex(keyed);
+    }
+    while (clipper.Step()) {
+      for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
+        const MapEditorModelRow& row = rows[shown[static_cast<std::size_t>(line)]];
+        const std::string label = std::format(
+            "{}{} — {}{}##modele{}", row.added ? "+ " : (row.edited ? "✎ " : ""), row.model_index,
+            row.file, row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
+            row.model_index);
+        const bool selected = view.selected == row.model_index || line == keyed;
+        if (ImGui::Selectable(label.c_str(), selected)) {
+          intents.emplace_back(map_editor::Select{row.model_index});
+        }
+        if (line == keyed) {
+          KeepLastItemInView();
+        }
       }
     }
   }
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
 }
 
@@ -208,17 +273,35 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
   }
   const float height = ImGui::GetTextLineHeightWithSpacing() * kTreeRows;
   if (ImGui::BeginChild("##bibliotheque", ImVec2(0.0F, height), ImGuiChildFlags_Borders)) {
+    int current = kListNoEntry;
+    for (std::size_t line = 0; line < shown.size(); ++line) {
+      if ((*view.library)[shown[line]] == panel.library_choice) {
+        current = static_cast<int>(line);
+      }
+    }
+    const int keyed = KeyedRank(current, static_cast<int>(shown.size()));
+    if (keyed != kListNoEntry) {
+      panel.library_choice = (*view.library)[shown[static_cast<std::size_t>(keyed)]];
+    }
+    const NamesFont names(panel.names_font);
     ImGuiListClipper clipper;
     clipper.Begin(static_cast<int>(shown.size()));
+    if (keyed != kListNoEntry) {
+      clipper.IncludeItemByIndex(keyed);
+    }
     while (clipper.Step()) {
       for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
         const std::string& file = (*view.library)[shown[static_cast<std::size_t>(line)]];
         if (ImGui::Selectable(file.c_str(), panel.library_choice == file)) {
           panel.library_choice = file;
         }
+        if (line == keyed) {
+          KeepLastItemInView();
+        }
       }
     }
   }
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
   ImGui::BeginDisabled(panel.library_choice.empty());
   if (SkinButton(core::Tr("Ajouter à la carte"), art)) {
@@ -237,6 +320,15 @@ void DrawLines(const MapEditorView& view) {
           line.kind == MapEditorLineKind::kVertex ? kVertexHalfPixels : kSelectedVertexHalfPixels;
       list->AddRectFilled(ImVec2(line.from.x - half, line.from.y - half),
                           ImVec2(line.from.x + half, line.from.y + half), ColorOf(line.kind));
+      continue;
+    }
+    if (line.kind == MapEditorLineKind::kEffect ||
+        line.kind == MapEditorLineKind::kEffectSelected) {
+      const ImVec2 at(line.from.x, line.from.y);
+      list->AddQuad(
+          ImVec2(at.x, at.y - kLightMarkerPixels), ImVec2(at.x + kLightMarkerPixels, at.y),
+          ImVec2(at.x, at.y + kLightMarkerPixels), ImVec2(at.x - kLightMarkerPixels, at.y),
+          ColorOf(line.kind), kLineThicknessPixels);
       continue;
     }
     if (line.kind == MapEditorLineKind::kLight || line.kind == MapEditorLineKind::kLightSelected) {
@@ -322,8 +414,11 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
     ImGui::TextDisabled("%s", core::Tr("Cliquez sur un modèle du décor pour le désigner."));
     return;
   }
-  ImGui::TextUnformatted(
-      std::format("{} {} — {}", core::Tr("Rang"), *view.selected, view.selected_file).c_str());
+  {
+    const NamesFont names(panel.names_font);
+    ImGui::TextUnformatted(
+        std::format("{} {} — {}", core::Tr("Rang"), *view.selected, view.selected_file).c_str());
+  }
   ImGui::TextDisabled("%s", std::format("{} {:.3f} {:.3f} {:.3f}", core::Tr("Origine"),
                                         view.origin[0], view.origin[1], view.origin[2])
                                 .c_str());
@@ -473,14 +568,18 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
   ImGui::SeparatorText(core::Tr("Modèle désigné"));
   DrawSelection(view, panel, intents, art);
 
-  ImGui::SeparatorText(core::Tr("Arbre de la scène"));
-  DrawSceneTree(view, panel, intents, art);
+  if (ImGui::CollapsingHeader(core::Tr("Arbre de la scène"), ImGuiTreeNodeFlags_DefaultOpen)) {
+    DrawSceneTree(view, panel, intents, art);
+  }
 
   if (ImGui::CollapsingHeader(core::Tr("Bibliothèque"))) {
     DrawLibrary(view, panel, intents, art);
   }
   if (ImGui::CollapsingHeader(core::Tr("Lumières"))) {
     DrawLights(view, panel, intents, art);
+  }
+  if (ImGui::CollapsingHeader(core::Tr("Effets"))) {
+    DrawEffects(view, panel, intents, art);
   }
 
   ImGui::Separator();

@@ -20,6 +20,15 @@ namespace moonclient {
     const ro::render::MapScene& scene, std::size_t rsw_rank, const ro::render::Camera& camera,
     float aspect_ratio, float viewport_width, float viewport_height);
 
+// Le point de chaque effet de carte de la vue, en pixels de fenêtre. Un effet
+// derrière l'œil n'en a pas.
+[[nodiscard]] std::vector<MapEditorSession::LightDot> EffectDots(const ro::ui::MapEditorView& view,
+                                                                 const ro::render::MapScene& scene,
+                                                                 const ro::render::Camera& camera,
+                                                                 float aspect_ratio,
+                                                                 float viewport_width,
+                                                                 float viewport_height);
+
 // Le point de chaque lumière ponctuelle de la vue, en pixels de fenêtre. Une
 // lumière derrière l'œil n'en a pas.
 [[nodiscard]] std::vector<MapEditorSession::LightDot> LightDots(const ro::ui::MapEditorView& view,

@@ -31,6 +31,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
     }
     return position;
   };
+  if (selected_effect_.has_value()) {
+    return NudgeEffect(delta, store);
+  }
   if (selected_light_.has_value()) {
     const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
     if (*selected_light_ >= lights.size()) {
@@ -65,6 +68,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
 
 MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene& scene,
                                                       MapEditStore& store) {
+  if (selected_effect_.has_value()) {
+    return DuplicateEffect(store);
+  }
   // UNE LUMIÈRE DÉSIGNÉE se duplique comme un modèle : à côté d'elle.
   if (selected_light_.has_value()) {
     const ro::mapedit::MapEdit before = store.Document(map_name_);
@@ -103,6 +109,9 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
 
 MapEditorSession::Outcome MapEditorSession::Delete(const ro::render::MapScene& scene,
                                                    MapEditStore& store) {
+  if (selected_effect_.has_value()) {
+    return RemoveEffect(*selected_effect_, store);
+  }
   if (selected_light_.has_value()) {
     return RemoveLight(*selected_light_, store);
   }
@@ -126,6 +135,37 @@ MapEditorSession::Outcome MapEditorSession::Delete(const ro::render::MapScene& s
                                          .hidden = edit == nullptr || !edit->hidden,
                                          .released = true},
                scene, store);
+}
+
+MapEditorSession::Outcome MapEditorSession::NudgeEffect(const std::array<float, 3>& delta,
+                                                        MapEditStore& store) {
+  const std::vector<ro::mapedit::AddedEffect>& effects = store.Document(map_name_).effects();
+  if (!selected_effect_.has_value() || *selected_effect_ >= effects.size()) {
+    return {};
+  }
+  std::array<float, 3> position = effects[*selected_effect_].position;
+  for (std::size_t axis = 0; axis < position.size(); ++axis) {
+    position[axis] += delta[axis];
+  }
+  return MoveEffect(
+      ro::ui::map_editor::MoveEffect{
+          .slot = *selected_effect_, .native = position, .released = true},
+      store);
+}
+
+MapEditorSession::Outcome MapEditorSession::DuplicateEffect(MapEditStore& store) {
+  const ro::mapedit::MapEdit before = store.Document(map_name_);
+  if (!selected_effect_.has_value() || *selected_effect_ >= before.effects().size()) {
+    return {};
+  }
+  ro::mapedit::AddedEffect copy = before.effects()[*selected_effect_];
+  copy.position[0] += kDuplicateShift;
+  ro::mapedit::MapEdit after = before;
+  after.AddEffect(std::move(copy));
+  store.Set(map_name_, after);
+  ChooseEffect(after.effects().size() - 1);
+  Record(ro::core::Tr("Ajouter un effet"), before, after);
+  return {};
 }
 
 }  // namespace moonclient

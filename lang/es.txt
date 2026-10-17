@@ -18748,8 +18748,8 @@ tr: Restablecer un vértice del modelo %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extender la malla del modelo %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
-tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje, Escape sale del editor.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
+tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+4 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje.
 
 fr: Ajouter une lumière
 tr: Añadir una luz
@@ -18783,3 +18783,33 @@ tr: Centrar
 
 fr: Vacille
 tr: Parpadea
+
+fr: Effet
+tr: Efecto
+
+fr: Numéro de l'effet
+tr: Número del efecto
+
+fr: Ajouter un effet
+tr: Añadir un efecto
+
+fr: Cadence
+tr: Cadencia
+
+fr: Paramètres
+tr: Parámetros
+
+fr: Éclaire
+tr: Ilumina
+
+fr: Retirer l'effet
+tr: Quitar el efecto
+
+fr: L'effet %zu n'a pas de raison.
+tr: El efecto %zu no tiene motivo.
+
+fr: Régler l'effet %zu
+tr: Ajustar el efecto %zu
+
+fr: Retirer l'effet %zu
+tr: Quitar el efecto %zu

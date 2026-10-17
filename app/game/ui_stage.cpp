@@ -5,6 +5,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -25,6 +26,8 @@ namespace moonclient {
 namespace {
 
 constexpr const char* kPartyDisbandId = "groupe_dissolution";
+// La famille de police qui dessine le hangeul : voir system_fonts.cpp.
+constexpr std::string_view kHangulFontFamily = "Malgun Gothic";
 constexpr const char* kAdoptionId = "adoption_demande";
 
 }  // namespace
@@ -204,6 +207,10 @@ UiStage::Answers UiStage::Draw(
   // MONDE, qui est déjà peint quand cette image d'interface commence.
   // Ses boutons « Journal » et « Trames » basculent leurs fenêtres, qui se
   // dessineront à l'image suivante.
+  // Les noms de fichiers de l'éditeur de carte sont coréens : leur police les
+  // dessine, quelle que soit celle de l'interface.
+  windows.staff_tools.map_editor_panel.names_font =
+      ui_->FontNamed(kHangulFontFamily, ro::ui::FontStyle::kRegular);
   const ro::ui::StaffToolsAction staff_action =
       ro::ui::DrawStaffTools(windows.staff_tools, skin_, rights.staff_tools);
   if (staff_action.toggle_log) {

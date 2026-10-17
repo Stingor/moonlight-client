@@ -13,6 +13,8 @@
 
 #include "ro/ui/skin_art.h"
 
+struct ImFont;
+
 namespace ro::ui {
 
 // LE PANNEAU DE L'ÉDITEUR DE CARTE : voir docs/adr/0118.
@@ -44,6 +46,22 @@ struct MapEditorLight {
   std::string why;
 };
 
+// UN EFFET DE CARTE DU DOCUMENT, tel que le panneau le montre et le rend :
+// numéro, position dans le repère du RSW, cadence et paramètres comme le RSW
+// les porte ; et sa lueur, quand il en a une.
+struct MapEditorEffect {
+  std::int32_t number = 0;
+  std::array<float, 3> position{};
+  float emit_speed = 0.0F;
+  std::array<float, 4> param{};
+  bool night_only = false;
+  bool glows = false;
+  std::array<float, 3> glow_color{2.0F, 1.4F, 0.7F};
+  float glow_range = 50.0F;
+  bool glow_flicker = true;
+  std::string why;
+};
+
 // CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres : des segments
 // déjà projetés, en pixels de fenêtre.
 enum class MapEditorLineKind : std::uint8_t {
@@ -62,6 +80,9 @@ enum class MapEditorLineKind : std::uint8_t {
   // Une lumière ponctuelle, et la lumière désignée : des cercles, en `from`.
   kLight = 7,
   kLightSelected = 8,
+  // Un effet de carte, et l'effet désigné : des losanges, en `from`.
+  kEffect = 9,
+  kEffectSelected = 10,
 };
 
 // L'OUTIL DES POIGNÉES : déplacer, tourner ou mettre à l'échelle.
@@ -114,6 +135,9 @@ struct MapEditorView {
   // LES LUMIÈRES PONCTUELLES du document, et celle qu'on règle.
   std::vector<MapEditorLight> lights;
   std::optional<std::size_t> selected_light;
+  // LES EFFETS DE CARTE du document, et celui qu'on règle.
+  std::vector<MapEditorEffect> effects;
+  std::optional<std::size_t> selected_effect;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
@@ -175,6 +199,29 @@ struct Focus {};
 // Le geste de la touche Suppr sur ce qui est désigné : une lumière ou un modèle
 // ajouté se retirent, un modèle de la carte se masque, ou se démasque.
 struct Delete {};
+// Ajouter l'effet de numéro `number`, là où l'appelant pose ce qu'on ajoute.
+struct AddEffect {
+  std::int32_t number = 0;
+};
+// Régler l'effet de rang `slot`, ou plus aucun.
+struct SelectEffect {
+  std::optional<std::size_t> slot;
+};
+// L'effet de rang `slot` devient `effect`. `released`, comme pour `Place`.
+struct SetEffect {
+  std::size_t slot = 0;
+  MapEditorEffect effect;
+  bool released = true;
+};
+struct RemoveEffect {
+  std::size_t slot = 0;
+};
+// Déplacer l'effet de rang `slot` en `native`, à la flèche.
+struct MoveEffect {
+  std::size_t slot = 0;
+  std::array<float, 3> native{};
+  bool released = true;
+};
 // Pousser ce qui est désigné de `delta`, dans le repère du RSW.
 struct Nudge {
   std::array<float, 3> delta{};
@@ -203,14 +250,14 @@ struct MoveLight {
 };
 }  // namespace map_editor
 
-using MapEditorIntent =
-    std::variant<map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select,
-                 map_editor::Place, map_editor::SetWhy, map_editor::Revert, map_editor::Save,
-                 map_editor::SetTool, map_editor::AddModel, map_editor::MoveVertex,
-                 map_editor::RevertVertex, map_editor::SetAllPoses, map_editor::AddLight,
-                 map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
-                 map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus,
-                 map_editor::Delete, map_editor::Nudge>;
+using MapEditorIntent = std::variant<
+    map_editor::Toggle, map_editor::Undo, map_editor::Redo, map_editor::Select, map_editor::Place,
+    map_editor::SetWhy, map_editor::Revert, map_editor::Save, map_editor::SetTool,
+    map_editor::AddModel, map_editor::MoveVertex, map_editor::RevertVertex, map_editor::SetAllPoses,
+    map_editor::AddLight, map_editor::SelectLight, map_editor::SetLight, map_editor::RemoveLight,
+    map_editor::Duplicate, map_editor::MoveLight, map_editor::Focus, map_editor::Delete,
+    map_editor::Nudge, map_editor::AddEffect, map_editor::SelectEffect, map_editor::SetEffect,
+    map_editor::RemoveEffect, map_editor::MoveEffect>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -224,6 +271,10 @@ struct MapEditorPanelState {
   std::array<char, kFilterCapacity> filter{};
   // N'y montrer que les modèles retouchés.
   bool edited_only = false;
+  // LA POLICE DES NOMS DE FICHIERS, posée par l'appelant : les modèles portent
+  // des noms coréens, que la famille choisie par le joueur ne dessine pas
+  // toujours — Verdana n'a aucun hangeul. Nulle : la police courante.
+  ImFont* names_font = nullptr;
   // Le filtre de la bibliothèque, et le fichier qu'on y a choisi.
   std::array<char, kFilterCapacity> library_filter{};
   std::string library_choice;
@@ -238,6 +289,13 @@ struct MapEditorPanelState {
   std::optional<std::size_t> light_why_of;
   // On tape dans ce champ : le document ne le recharge pas sous les doigts.
   bool light_why_typing = false;
+  // LES EFFETS : le numéro qu'ajoute le bouton — les flammes de pvp_n_5-5 —,
+  // et la raison de l'effet réglé, comme celle d'une lumière.
+  static constexpr std::int32_t kFlameEffect = 47;
+  std::int32_t effect_number = kFlameEffect;
+  std::array<char, kWhyCapacity> effect_why{};
+  std::optional<std::size_t> effect_why_of;
+  bool effect_why_typing = false;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

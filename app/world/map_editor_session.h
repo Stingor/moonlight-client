@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <optional>
@@ -134,6 +135,9 @@ class MapEditorSession {
     std::size_t slot = 0;
   };
   void SetLightDots(std::vector<LightDot> dots) { light_dots_ = std::move(dots); }
+  // LE LOSANGE D'UN EFFET à l'écran, et son rang : un clic dessus le désigne.
+  void SetEffectDots(std::vector<LightDot> dots) { effect_dots_ = std::move(dots); }
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> EffectTrace() const;
   // Les cercles des lumières, la réglée distinguée.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> LightTrace() const;
   // Les points des sommets, le désigné distingué.
@@ -202,6 +206,21 @@ class MapEditorSession {
   // toutes à l'écran.
   std::optional<std::size_t> selected_light_;
   std::vector<LightDot> light_dots_;
+  // L'effet qu'on règle, et les losanges de tous à l'écran.
+  std::optional<std::size_t> selected_effect_;
+  std::vector<LightDot> effect_dots_;
+  // LES EFFETS : voir map_editor_effects.cpp.
+  void ViewEffects(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
+  Outcome AddEffect(std::int32_t number, MapEditStore& store);
+  Outcome SetEffect(const ro::ui::map_editor::SetEffect& set, MapEditStore& store);
+  Outcome RemoveEffect(std::size_t slot, MapEditStore& store);
+  Outcome MoveEffect(const ro::ui::map_editor::MoveEffect& move, MapEditStore& store);
+  void ChooseEffect(std::optional<std::size_t> slot);
+  [[nodiscard]] bool GrabEffect(glm::vec2 pointer);
+  [[nodiscard]] bool GrabEffectHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  // Les gestes du clavier sur l'effet désigné : voir map_editor_gestures.cpp.
+  Outcome NudgeEffect(const std::array<float, 3>& delta, MapEditStore& store);
+  Outcome DuplicateEffect(MapEditStore& store);
   // Le cache de `RefreshSceneRows`, et ce dont il a été bâti.
   mutable std::shared_ptr<const std::vector<ro::ui::MapEditorModelRow>> scene_rows_;
   mutable std::vector<std::size_t> edited_ranks_;
@@ -242,8 +261,9 @@ class MapEditorSession {
     ro::ui::map_editor::Place last;
     // Le sommet que la poignée déplace, avec l'outil Sommets.
     std::optional<std::pair<std::size_t, std::size_t>> vertex;
-    // La lumière que la poignée déplace.
+    // La lumière que la poignée déplace, ou l'effet.
     std::optional<std::size_t> light;
+    std::optional<std::size_t> effect;
   };
   std::optional<Drag> drag_;
   std::vector<ro::ui::MapEditorIntent> queued_;

@@ -90,7 +90,8 @@ std::vector<ro::ui::MapEditorLine> MapEditorSession::GizmoTrace() const {
 
 bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
   return active_ && ((view.selected.has_value() && GrabTool(pointer, view)) ||
-                     GrabLightHandle(pointer, view) || GrabLight(pointer));
+                     GrabLightHandle(pointer, view) || GrabEffectHandle(pointer, view) ||
+                     GrabLight(pointer) || GrabEffect(pointer));
 }
 
 bool MapEditorSession::GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& view) {
@@ -121,12 +122,19 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   }
   // UN SOMMET, UNE LUMIÈRE se déplacent comme une pose, à la flèche.
   const ro::ui::MapEditorTool tool =
-      drag_->vertex.has_value() || drag_->light.has_value() ? ro::ui::MapEditorTool::kMove : tool_;
+      drag_->vertex.has_value() || drag_->light.has_value() || drag_->effect.has_value()
+          ? ro::ui::MapEditorTool::kMove
+          : tool_;
   drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
   if (snap) {
     drag_->last = Snapped(tool, drag_->start, drag_->last);
   }
   drag_->last.released = false;
+  if (drag_->effect.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveEffect{
+        .slot = *drag_->effect, .native = drag_->last.position, .released = false});
+    return;
+  }
   if (drag_->light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveLight{
         .slot = *drag_->light, .native = drag_->last.position, .released = false});
@@ -148,7 +156,10 @@ void MapEditorSession::Release() {
   }
   ro::ui::map_editor::Place last = drag_->last;
   last.released = true;
-  if (drag_->light.has_value()) {
+  if (drag_->effect.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveEffect{
+        .slot = *drag_->effect, .native = last.position, .released = true});
+  } else if (drag_->light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveLight{
         .slot = *drag_->light, .native = last.position, .released = true});
   } else if (drag_->vertex.has_value()) {
@@ -183,6 +194,7 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
   history_.Clear();
   selection_.Clear();
   selected_light_.reset();
+  selected_effect_.reset();
   gesture_before_.reset();
   pending_why_.clear();
   status_.clear();
@@ -266,6 +278,17 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return MoveLight(asked, store);
         } else if constexpr (std::is_same_v<Asked, intents::SetLight>) {
           return SetLight(asked, store);
+        } else if constexpr (std::is_same_v<Asked, intents::AddEffect>) {
+          return AddEffect(asked.number, store);
+        } else if constexpr (std::is_same_v<Asked, intents::SelectEffect>) {
+          ChooseEffect(asked.slot);
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::SetEffect>) {
+          return SetEffect(asked, store);
+        } else if constexpr (std::is_same_v<Asked, intents::RemoveEffect>) {
+          return RemoveEffect(asked.slot, store);
+        } else if constexpr (std::is_same_v<Asked, intents::MoveEffect>) {
+          return MoveEffect(asked, store);
         } else if constexpr (std::is_same_v<Asked, intents::RemoveLight>) {
           return RemoveLight(asked.slot, store);
         } else {
@@ -497,6 +520,16 @@ void MapEditorSession::Save(MapEditStore& store) {
       return;
     }
   }
+  const std::vector<ro::mapedit::AddedEffect>& effects = store.Document(map_name_).effects();
+  for (std::size_t slot = 0; slot < effects.size(); ++slot) {
+    if (effects[slot].why.empty()) {
+      Line refused{};
+      std::snprintf(refused.data(), refused.size(), ro::core::Tr("L'effet %zu n'a pas de raison."),
+                    slot);
+      status_ = refused.data();
+      return;
+    }
+  }
   const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
   for (std::size_t slot = 0; slot < lights.size(); ++slot) {
     if (lights[slot].why.empty() || !(lights[slot].range > 0.0F)) {
@@ -606,6 +639,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.models = scene_rows_;
   view.edited = edited_ranks_;
   ViewLights(document, view);
+  ViewEffects(document, view);
   if (selection_.empty()) {
     return view;
   }

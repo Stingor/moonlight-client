@@ -28,11 +28,6 @@ std::optional<NudgeDirection> ArrowOf(SDL_Keycode key) {
 }  // namespace
 
 bool TakeMapEditorKey(MapEditorSession& editor, const SDL_KeyboardEvent& key, bool text_input) {
-  // ÉCHAP FERME LE MODE ÉDITEUR, avant toute autre fenêtre.
-  if (key.key == SDLK_ESCAPE && !key.repeat) {
-    editor.Leave();
-    return true;
-  }
   if (text_input) {
     return false;
   }

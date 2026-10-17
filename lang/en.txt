@@ -18748,8 +18748,8 @@ tr: Restore a vertex of model %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extend the mesh of model %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage, Échap quitte l'éditeur.
-tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+4 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character, Escape leaves the editor.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+4 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
+tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+4 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character.
 
 fr: Ajouter une lumière
 tr: Add a light
@@ -18783,3 +18783,33 @@ tr: Centre
 
 fr: Vacille
 tr: Flickers
+
+fr: Effet
+tr: Effect
+
+fr: Numéro de l'effet
+tr: Effect number
+
+fr: Ajouter un effet
+tr: Add an effect
+
+fr: Cadence
+tr: Rate
+
+fr: Paramètres
+tr: Parameters
+
+fr: Éclaire
+tr: Gives light
+
+fr: Retirer l'effet
+tr: Remove the effect
+
+fr: L'effet %zu n'a pas de raison.
+tr: Effect %zu has no reason.
+
+fr: Régler l'effet %zu
+tr: Adjust effect %zu
+
+fr: Retirer l'effet %zu
+tr: Remove effect %zu
