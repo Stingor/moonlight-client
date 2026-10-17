@@ -962,20 +962,20 @@ tr: Añade todo lo que se puede vender; la tienda se cerrará tras la venta.
 fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
 tr: La hora que es en el servidor, la que sigue el ciclo día/noche — y no la de tu ordenador.
 
-fr: Le sol et le décor reçoivent l'ombre du soleil de la carte, calculée à chaque image au lieu de celle que la carte a peinte : les arbres et les bâtiments s'ombrent aussi eux-mêmes. En plein air seulement.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
-tr: El suelo y el decorado reciben la sombra del sol del mapa, calculada en cada imagen en lugar de la que el mapa tiene pintada: los árboles y los edificios también se sombrean a sí mismos. Solo al aire libre.\n\nEl cliente original no la tiene, y la tarjeta gráfica trabaja más.
+fr: Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes —, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
+tr: Sombras calculadas en cada imagen: la del sol del mapa, al aire libre, en lugar de la que el mapa tiene pintada — los árboles y los edificios también se sombrean a sí mismos —, y la de las luces que coloca el editor de mapas, farolillos y braseros, en cualquier mapa.\n\nEl cliente original no las tiene, y la tarjeta gráfica trabaja más.
 
-fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres du soleil en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
-tr: El sol, y luego la luna, siguen la hora que es en el servidor: luz de la mañana, del mediodía y de la tarde, y luego una noche más oscura y azulada. Solo al aire libre.\n\nCon «Sombras del sol en tiempo real», las sombras giran con él. El cliente original mantiene la luz del mapa a cualquier hora.
+fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
+tr: El sol, y luego la luna, siguen la hora que es en el servidor: luz de la mañana, del mediodía y de la tarde, y luego una noche más oscura y azulada. Solo al aire libre.\n\nCon «Sombras en tiempo real», las sombras giran con él. El cliente original mantiene la luz del mapa a cualquier hora.
 
 fr: Lever (h)
 tr: Salida (h)
 
-fr: Ombres du soleil en temps réel
-tr: Sombras del sol en tiempo real
+fr: Ombres en temps réel
+tr: Sombras en tiempo real
 
-fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée dans Graphics.
-tr: Coloca el sol, o la luna, a la hora elegida: la luz del suelo y del decorado la sigue, y también las sombras cuando «Sombras del sol en tiempo real» está marcada en Graphics.
+fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
+tr: Coloca el sol, o la luna, a la hora elegida: la luz del suelo y del decorado la sigue, y también las sombras cuando «Sombras en tiempo real» está marcada en Graphics.
 
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: No se guarda nada: cada inicio devuelve el cielo del mapa.
@@ -5091,8 +5091,8 @@ tr: Recuperación (objetos, regen., robo de vida…)
 fr: Ombre
 tr: Sombra
 
-fr: Ombres de la carte
-tr: Sombras del mapa
+fr: Ombres
+tr: Sombras
 
 fr: Opacité de la carte
 tr: Opacidad del mapa
@@ -15979,8 +15979,8 @@ tr: El servidor aún no ha dicho si la llamada de emergencia puede alcanzarte: i
 fr: Retirer aussi leurs ombres (lightmap)
 tr: Quitar también sus sombras (lightmap)
 
-fr: L'ombre et la lumière cuites dans le sol, dont celles des décors : sans elles, les arbres masqués ne laissent plus leur ombre par terre.\nComme « Ombres de la carte » décoché, mais seulement tant que GreyWorld masque les décors.
-tr: La sombra y la luz horneadas en el suelo, incluidas las de los decorados: sin ellas, los árboles ocultos ya no dejan su sombra en el suelo.\nComo desmarcar «Sombras del mapa», pero solo mientras GreyWorld oculta los decorados.
+fr: L'ombre et la lumière cuites dans le sol, dont celles des décors : sans elles, les arbres masqués ne laissent plus leur ombre par terre.\nComme « Ombres » décoché, mais seulement tant que GreyWorld masque les décors.
+tr: La sombra y la luz horneadas en el suelo, incluidas las de los decorados: sin ellas, los árboles ocultos ya no dejan su sombra en el suelo.\nComo desmarcar «Sombras», pero solo mientras GreyWorld oculta los decorados.
 
 fr: Vous ne pouvez pas équiper cet item.
 tr: No puedes equipar este objeto.
@@ -18867,12 +18867,6 @@ tr: Restablecer el efecto %zu
 
 fr: La retouche de l'effet %zu n'a pas de raison.
 tr: El retoque del efecto %zu no tiene motivo.
-
-fr: Ombres des lumières ponctuelles
-tr: Sombras de las luces puntuales
-
-fr: Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du décor et des personnages : les deux plus proches de la caméra. La carte graphique travaille davantage ; coupées, ces lumières éclairent sans ombre.
-tr: Las luces colocadas con el editor de mapas — farolillos, braseros — proyectan la sombra del decorado y de los personajes: las dos más cercanas a la cámara. La tarjeta gráfica trabaja más; desactivadas, estas luces iluminan sin sombra.
 
 fr: Plage d'heures
 tr: Franja horaria

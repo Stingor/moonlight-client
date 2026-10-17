@@ -962,20 +962,20 @@ tr: Adds everything sellable; the shop closes after the sale.
 fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
 tr: The time of day on the server, the one the day/night cycle follows — not your computer's.
 
-fr: Le sol et le décor reçoivent l'ombre du soleil de la carte, calculée à chaque image au lieu de celle que la carte a peinte : les arbres et les bâtiments s'ombrent aussi eux-mêmes. En plein air seulement.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
-tr: The ground and scenery receive the shadow of the map's sun, computed every frame instead of the one painted into the map: trees and buildings also shade themselves. Outdoors only.\n\nThe original client has none, and the graphics card works harder.
+fr: Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes —, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
+tr: Shadows computed every frame: the map's sun, outdoors, instead of the one painted into the map — trees and buildings also shade themselves —, and the lights the map editor places, lanterns and braziers, on any map.\n\nThe original client has none, and the graphics card works harder.
 
-fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres du soleil en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
-tr: The sun, then the moon, follow the time of day on the server: morning, noon and evening light, then a darker, bluish night. Outdoors only.\n\nWith “Real-time sun shadows”, the shadows turn with it. The original client keeps the map's light at every hour.
+fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
+tr: The sun, then the moon, follow the time of day on the server: morning, noon and evening light, then a darker, bluish night. Outdoors only.\n\nWith “Real-time shadows”, the shadows turn with it. The original client keeps the map's light at every hour.
 
 fr: Lever (h)
 tr: Sunrise (h)
 
-fr: Ombres du soleil en temps réel
-tr: Real-time sun shadows
+fr: Ombres en temps réel
+tr: Real-time shadows
 
-fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée dans Graphics.
-tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time sun shadows” is checked in Graphics.
+fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
+tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time shadows” is checked in Graphics.
 
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: Nothing is saved: every launch brings back the map's own sky.
@@ -5091,8 +5091,8 @@ tr: Recovery (items, regen, life steal…)
 fr: Ombre
 tr: Shadow
 
-fr: Ombres de la carte
-tr: Map shadows
+fr: Ombres
+tr: Shadows
 
 fr: Opacité de la carte
 tr: Map opacity
@@ -15979,8 +15979,8 @@ tr: The server has not yet said whether Emergency Call can reach you: try again 
 fr: Retirer aussi leurs ombres (lightmap)
 tr: Also remove their shadows (lightmap)
 
-fr: L'ombre et la lumière cuites dans le sol, dont celles des décors : sans elles, les arbres masqués ne laissent plus leur ombre par terre.\nComme « Ombres de la carte » décoché, mais seulement tant que GreyWorld masque les décors.
-tr: The shadow and light baked into the ground, including the decor's: without them, hidden trees no longer leave their shadow on the floor.\nLike unchecking "Map shadows", but only while GreyWorld hides the decor.
+fr: L'ombre et la lumière cuites dans le sol, dont celles des décors : sans elles, les arbres masqués ne laissent plus leur ombre par terre.\nComme « Ombres » décoché, mais seulement tant que GreyWorld masque les décors.
+tr: The shadow and light baked into the ground, including the decor's: without them, hidden trees no longer leave their shadow on the floor.\nLike unchecking "Shadows", but only while GreyWorld hides the decor.
 
 fr: Vous ne pouvez pas équiper cet item.
 tr: You can't put this item on.
@@ -18867,12 +18867,6 @@ tr: Restore effect %zu
 
 fr: La retouche de l'effet %zu n'a pas de raison.
 tr: The edit of effect %zu has no reason.
-
-fr: Ombres des lumières ponctuelles
-tr: Shadows of point lights
-
-fr: Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du décor et des personnages : les deux plus proches de la caméra. La carte graphique travaille davantage ; coupées, ces lumières éclairent sans ombre.
-tr: Lights placed with the map editor — lanterns, braziers — cast the shadows of the scenery and the characters: the two nearest the camera. The graphics card works harder; turned off, these lights shine without shadows.
 
 fr: Plage d'heures
 tr: Hour range

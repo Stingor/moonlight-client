@@ -106,8 +106,7 @@ void GreyWorldOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .label = Tr("Retirer aussi leurs ombres (lightmap)"),
       .help = Tr("L'ombre et la lumière cuites dans le sol, dont celles des décors : sans "
                  "elles, les arbres masqués ne laissent plus leur ombre par terre.\nComme « "
-                 "Ombres de la carte » décoché, mais seulement tant que GreyWorld masque les "
-                 "décors."),
+                 "Ombres » décoché, mais seulement tant que GreyWorld masque les décors."),
       .kind = OptionKind::kToggle,
       .on = look_.hide_lightmap,
       .indented = true,

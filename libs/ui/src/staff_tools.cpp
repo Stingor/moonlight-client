@@ -116,8 +116,8 @@ void DrawSound(StaffToolsState& state, const SkinArt& art) {
 
 constexpr std::array<const char*, 4> kSkyHelp = {
     core::TrText("Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor "
-                 "suit, et les ombres aussi quand « Ombres du soleil en temps réel » est cochée "
-                 "dans Graphics."),
+                 "suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans "
+                 "Graphics."),
     core::TrText("Le soleil se lève et se couche aux heures que règle la course des astres ; "
                  "la lune prend la nuit, plus faible et bleutée."),
     core::TrText("Seul ce client voit ce ciel : rien ne part au serveur."),

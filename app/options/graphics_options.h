@@ -50,14 +50,12 @@ class GraphicsOptions {
   [[nodiscard]] bool lightmaps() const noexcept { return lightmaps_; }
   // La lumière posée, rouge et bleu échangés. Voir `TerrainStages::cold_light`.
   [[nodiscard]] bool cold_light() const noexcept { return cold_light_; }
-  // L'OMBRE DU SOLEIL, calculée à chaque image à la place de celle que la carte
-  // a cuite — sur les cartes en plein air, et seulement sous `lightmaps`.
-  // Éteinte par défaut : le client d'origine n'en a pas.
+  // LES OMBRES EN TEMPS RÉEL, calculées à chaque image, seulement sous
+  // `lightmaps` : celle du soleil, à la place de celle que la carte a cuite, sur
+  // les cartes en plein air ; et celles des lumières ponctuelles de l'édition de
+  // carte, sur toute carte. Éteintes par défaut : le client d'origine n'en a pas.
   [[nodiscard]] bool sun_shadows() const noexcept { return sun_shadows_; }
-  // LES OMBRES DES LUMIÈRES PONCTUELLES de l'édition de carte, sur toute carte.
-  // Allumées par défaut ; la page « Graphics » ne les montre pas encore, le
-  // fichier de réglages les coupe.
-  [[nodiscard]] bool point_light_shadows() const noexcept { return point_light_shadows_; }
+  [[nodiscard]] bool real_time_shadows() const noexcept { return lightmaps_ && sun_shadows_; }
   // LE CYCLE JOUR ET NUIT : le soleil, puis la lune, suivent l'heure qu'il fait
   // sur le serveur, en plein air. Éteint par défaut : le client d'origine garde
   // la lumière de la carte à toute heure.
@@ -116,7 +114,6 @@ class GraphicsOptions {
   bool lightmaps_ = true;
   bool cold_light_ = false;
   bool sun_shadows_ = false;
-  bool point_light_shadows_ = true;
   bool day_night_cycle_ = false;
   bool fog_ = true;
   bool decor_veil_ = false;

@@ -21,7 +21,6 @@ using ro::ui::OptionRowView;
 constexpr const char* kLightmapsKey = "shadows_of_the_map";
 constexpr const char* kColdLightKey = "light_cold";
 constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
-constexpr const char* kPointLightShadowsKey = "render_shadows_of_point_lights";
 constexpr const char* kDayNightCycleKey = "cycle_day_night";
 constexpr const char* kFogKey = "fog";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
@@ -58,7 +57,6 @@ enum class GraphicsRow : int {
   kLightmaps = 0,
   kColdLight,
   kSunShadows,
-  kPointLightShadows,
   kDayNightCycle,
   kFog,
   kDecorVeil,
@@ -217,7 +215,6 @@ void GraphicsOptions::Declare(SettingsFile& into) {
     into.Declare(kRenderScaleKey, &render_scale_percent_);
     into.Declare(kDecorFilterKey, &decor_filter_rank_);
     into.Declare(kSunShadowsKey, &sun_shadows_);
-    into.Declare(kPointLightShadowsKey, &point_light_shadows_);
   }
   into.Declare(kPostFxKey, &post_fx_.enabled);
   into.Declare(kBrightnessKey, &post_fx_.brightness);
@@ -236,7 +233,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
 
 void GraphicsOptions::Compose() {
   rows_.clear();
-  rows_.push_back(Toggle(GraphicsRow::kLightmaps, Tr("Ombres de la carte"),
+  rows_.push_back(Toggle(GraphicsRow::kLightmaps, Tr("Ombres"),
                          Tr("L'ombre et la lumière que la carte a peintes sur le sol, et qui "
                             "assombrissent ou colorent les personnages qui s'y tiennent."),
                          "/lightmap", lightmaps_));
@@ -251,27 +248,21 @@ void GraphicsOptions::Compose() {
   rows_.back().disabled = !lightmaps_;
   // ⚠ GRISÉE SANS OMBRES, comme la lumière froide : c'est l'ombre de la carte
   // qu'elle remplace.
-  rows_.push_back(Toggle(GraphicsRow::kSunShadows, Tr("Ombres du soleil en temps réel"),
-                         Tr("Le sol et le décor reçoivent l'ombre du soleil de la carte, "
-                            "calculée à chaque image au lieu de celle que la carte a peinte : "
-                            "les arbres et les bâtiments s'ombrent aussi eux-mêmes. En plein "
-                            "air seulement.\n\nLe client d'origine n'en a pas, et la carte "
-                            "graphique travaille davantage."),
-                         nullptr, sun_shadows_));
+  rows_.push_back(Toggle(
+      GraphicsRow::kSunShadows, Tr("Ombres en temps réel"),
+      Tr("Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu "
+         "de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes "
+         "—, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute "
+         "carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage."),
+      nullptr, sun_shadows_));
   rows_.back().indented = true;
   rows_.back().disabled = !lightmaps_;
-  rows_.push_back(Toggle(
-      GraphicsRow::kPointLightShadows, Tr("Ombres des lumières ponctuelles"),
-      Tr("Les lumières posées par l'éditeur de carte — lanternes, braseros — projettent l'ombre du "
-         "décor et des personnages : les deux plus proches de la caméra. La carte graphique "
-         "travaille davantage ; coupées, ces lumières éclairent sans ombre."),
-      nullptr, point_light_shadows_));
   rows_.push_back(Toggle(GraphicsRow::kDayNightCycle, Tr("Cycle jour/nuit"),
                          Tr("Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : "
                             "lumière du matin, du midi et du soir, puis une nuit plus sombre et "
-                            "bleutée. En plein air seulement.\n\nAvec « Ombres du soleil en temps "
-                            "réel », les ombres tournent avec lui. Le client d'origine garde la "
-                            "lumière de la carte à toute heure."),
+                            "bleutée. En plein air seulement.\n\nAvec « Ombres en temps réel », "
+                            "les ombres tournent avec lui. Le client d'origine garde la lumière de "
+                            "la carte à toute heure."),
                          nullptr, day_night_cycle_));
   rows_.push_back(Toggle(GraphicsRow::kFog, Tr("Brouillard"),
                          Tr("La brume que certaines cartes posent au loin : le décor et les "
@@ -461,9 +452,6 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kSunShadows:
       sun_shadows_ = asked.on;
-      break;
-    case GraphicsRow::kPointLightShadows:
-      point_light_shadows_ = asked.on;
       break;
     case GraphicsRow::kDayNightCycle:
       day_night_cycle_ = asked.on;

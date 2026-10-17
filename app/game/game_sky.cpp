@@ -85,7 +85,7 @@ ro::render::PointLightSet Game::DrawPointShadowsIfAsked(
     const ro::render::PointLightSet& points, bool models_shown,
     std::span<const ro::render::DrawnActor> carts) {
   if (points.count == 0 || point_maps_refused_ ||
-      !settings_->options().graphics().point_light_shadows()) {
+      !settings_->options().graphics().real_time_shadows()) {
     return points;
   }
   if (!point_maps_.valid()) {
