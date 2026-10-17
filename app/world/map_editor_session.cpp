@@ -630,6 +630,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.active = active_;
   view.tool = tool_;
   view.map_name = map_name_;
+  view.map_cubes = ro::ui::MapCubes{.width = scene.gnd.width(), .height = scene.gnd.height()};
   view.undo_label = history_.UndoLabel();
   view.redo_label = history_.RedoLabel();
   view.unsaved = store.Unsaved(map_name_);

@@ -18843,3 +18843,6 @@ tr: invoca %u × %s
 
 fr: invoque %u monstre(s) au hasard (groupe %s)
 tr: invoca %u monstruo(s) al azar (grupo %s)
+
+fr: Position (cases, hauteur)
+tr: Posición (casillas, altura)

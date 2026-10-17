@@ -11,6 +11,7 @@
 
 #include <glm/glm.hpp>
 
+#include "ro/ui/map_cells.h"
 #include "ro/ui/skin_art.h"
 
 struct ImFont;
@@ -99,6 +100,9 @@ struct MapEditorView {
   bool active = false;
   MapEditorTool tool = MapEditorTool::kMove;
   std::string map_name;
+  // La taille de la carte : les positions se montrent en cases depuis son
+  // coin — voir `CellsOfNative`.
+  MapCubes map_cubes;
   // L'historique : ce qu'annuler et rétablir déferaient, vide sans geste.
   std::string undo_label;
   std::string redo_label;

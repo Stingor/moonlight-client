@@ -5,6 +5,7 @@
 #include "ro/ui/map_editor_effects_panel.h"
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <format>
 #include <string>
@@ -19,9 +20,8 @@
 namespace ro::ui {
 namespace {
 
-// Ce que vaut un pixel glissé et un cran de molette, sur la position d'un
-// effet, sur sa cadence et sur la portée de sa lueur.
-constexpr WheelDrag kEffectPositionDrag{.drag_step = 0.05F, .wheel_step = 1.0F, .format = "%.3f"};
+// Ce que vaut un pixel glissé et un cran de molette, sur la cadence d'un effet
+// et sur la portée de sa lueur.
 constexpr float kLargestEmitSpeed = 10000.0F;
 constexpr WheelDrag kEmitSpeedDrag{.drag_step = 1.0F,
                                    .wheel_step = 5.0F,
@@ -47,9 +47,11 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
   }
   for (std::size_t slot = 0; slot < view.effects.size(); ++slot) {
     const MapEditorEffect& effect = view.effects[slot];
-    const std::string label = std::format(
-        "{} {} — #{} — {:.1f} {:.1f} {:.1f}##effet{}", core::Tr("Effet"), slot, effect.number,
-        effect.position[0], effect.position[1], effect.position[2], slot);
+    // Il se reconnaît à sa case, comme sur la minicarte.
+    const std::array<float, 3> cells = CellsOfNative(effect.position, view.map_cubes);
+    const std::string label =
+        std::format("{} {} — #{} — {:.1f} {:.1f} {:.1f}##effet{}", core::Tr("Effet"), slot,
+                    effect.number, cells[0], cells[1], cells[2], slot);
     const bool chosen = view.selected_effect == slot;
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectEffect{chosen ? std::nullopt : std::optional(slot)});
@@ -67,7 +69,7 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
   changed |= ImGui::InputInt(core::Tr("Numéro de l'effet"), &set.effect.number);
   released |= ImGui::IsItemDeactivatedAfterEdit();
   for (const WheelDragResult field :
-       {WheelDragFloat3(core::Tr("Position"), set.effect.position, kEffectPositionDrag),
+       {PositionInCells(core::Tr("Position (cases, hauteur)"), set.effect.position, view.map_cubes),
         WheelDragFloat(core::Tr("Cadence"), set.effect.emit_speed, kEmitSpeedDrag)}) {
     changed |= field.changed;
     released |= field.released;

@@ -18843,3 +18843,6 @@ tr: summons %u × %s
 
 fr: invoque %u monstre(s) au hasard (groupe %s)
 tr: summons %u random monster(s) (group %s)
+
+fr: Position (cases, hauteur)
+tr: Position (cells, height)

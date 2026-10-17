@@ -32,18 +32,14 @@ constexpr float kFirstHeight = 420.0F;
 // leurs libellés d'elle-même.
 constexpr float kControlWidthPixels = 220.0F;
 
-// Le pas des glissières, par pixel de souris : en unités du RSW, en degrés, et
-// en facteur d'échelle.
-constexpr float kPositionStep = 0.05F;
+// Le pas des glissières de rotation et d'échelle, par pixel de souris : en
+// degrés, en facteur d'échelle. La position a les siens : voir `PositionInCells`.
 constexpr float kRotationStep = 0.5F;
 constexpr float kScaleStep = 0.005F;
-// Et ce que vaut un cran de molette, dix avec Majuscule : une unité du RSW, un
-// degré, un centième d'échelle.
-constexpr float kPositionWheelStep = 1.0F;
+// Et ce que vaut un cran de molette, dix avec Majuscule : un degré, un
+// centième d'échelle.
 constexpr float kRotationWheelStep = 1.0F;
 constexpr float kScaleWheelStep = 0.01F;
-constexpr WheelDrag kPositionDrag{
-    .drag_step = kPositionStep, .wheel_step = kPositionWheelStep, .format = "%.3f"};
 constexpr WheelDrag kRotationDrag{
     .drag_step = kRotationStep, .wheel_step = kRotationWheelStep, .format = "%.2f"};
 constexpr WheelDrag kScaleDrag{
@@ -371,9 +367,14 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
                           .hidden = view.hidden};
   bool changed = false;
   bool released = false;
+  {
+    const WheelDragResult field =
+        PositionInCells(core::Tr("Position (cases, hauteur)"), place.position, view.map_cubes);
+    changed |= field.changed;
+    released |= field.released;
+  }
   for (const auto& [label, values, drag] :
-       {std::tuple(core::Tr("Position"), &place.position, &kPositionDrag),
-        std::tuple(core::Tr("Rotation (°)"), &place.rotation, &kRotationDrag),
+       {std::tuple(core::Tr("Rotation (°)"), &place.rotation, &kRotationDrag),
         std::tuple(core::Tr("Échelle"), &place.scale, &kScaleDrag)}) {
     const WheelDragResult field = WheelDragFloat3(label, *values, *drag);
     changed |= field.changed;
@@ -419,8 +420,9 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
     ImGui::TextUnformatted(
         std::format("{} {} — {}", core::Tr("Rang"), *view.selected, view.selected_file).c_str());
   }
-  ImGui::TextDisabled("%s", std::format("{} {:.3f} {:.3f} {:.3f}", core::Tr("Origine"),
-                                        view.origin[0], view.origin[1], view.origin[2])
+  const std::array<float, 3> origin = CellsOfNative(view.origin, view.map_cubes);
+  ImGui::TextDisabled("%s", std::format("{} {:.2f} {:.2f} {:.2f}", core::Tr("Origine"), origin[0],
+                                        origin[1], origin[2])
                                 .c_str());
   DrawPlacement(view, intents, art);
   DrawWhy(view, panel, intents);
@@ -454,7 +456,9 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
     // Elle se reconnaît à sa position, en unités du RSW.
     const std::string label =
         std::format("{} {} — {:.1f} {:.1f} {:.1f}##lumiere{}", core::Tr("Lumière"), slot,
-                    light.position[0], light.position[1], light.position[2], slot);
+                    CellsOfNative(light.position, view.map_cubes)[0],
+                    CellsOfNative(light.position, view.map_cubes)[1],
+                    CellsOfNative(light.position, view.map_cubes)[2], slot);
     const bool chosen = view.selected_light == slot;
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectLight{chosen ? std::nullopt : std::optional(slot)});
@@ -470,7 +474,7 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   bool changed = false;
   bool released = false;
   const WheelDragResult moved =
-      WheelDragFloat3(core::Tr("Position"), set.light.position, kPositionDrag);
+      PositionInCells(core::Tr("Position (cases, hauteur)"), set.light.position, view.map_cubes);
   changed |= moved.changed;
   released |= moved.released;
   // UNE PASTILLE ET SON SÉLECTEUR : la couleur se choisit à l'œil. Au-delà de
