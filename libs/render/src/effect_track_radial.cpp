@@ -1,20 +1,12 @@
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float SinOfDegrees(std::int32_t degrees) {
-  return std::sin(static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F);
-}
-
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t degrees) {
-  const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
-  return remainder < 0 ? remainder + kEffectTrackFullTurnDegrees : remainder;
-}
 
 // CE QUE LES GROUPES RADIAUX POSENT EN DUR.
 

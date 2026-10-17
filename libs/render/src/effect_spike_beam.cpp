@@ -2,30 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
-namespace {
-
-[[nodiscard]] float DegreesToRadians(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
-
-// Un angle ramené dans le tour, comme le client le fait : une seule correction,
-// parce qu'il sait que l'écart ne dépasse jamais un tour.
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t angle) {
-  if (angle < 0) {
-    return angle + kEffectTrackFullTurnDegrees;
-  }
-  if (angle >= kEffectTrackFullTurnDegrees) {
-    return angle - kEffectTrackFullTurnDegrees;
-  }
-  return angle;
-}
-
-}  // namespace
 
 std::vector<EffectWorldQuad> ComposeSpikeBeamQuads(const EffectTrack& track, glm::vec3 node_origin,
                                                    const EffectOwnerTint& owner) {
@@ -36,22 +18,22 @@ std::vector<EffectWorldQuad> ComposeSpikeBeamQuads(const EffectTrack& track, glm
 
   const float radius = track.lift_key;
   const float height = track.value[kSlotOfSpikeBeamHeight];
-  const float cap = DegreesToRadians(track.azimuth_degrees);
+  const float cap = RadiansOfDegrees(track.azimuth_degrees);
   const float vers_x = std::cos(cap);
   const float vers_y = std::sin(cap);
-  const float le_long_x = std::cos(DegreesToRadians(track.tilt_degrees));
-  const float le_long_z = std::sin(DegreesToRadians(track.tilt_degrees));
+  const float le_long_x = std::cos(RadiansOfDegrees(track.tilt_degrees));
+  const float le_long_z = std::sin(RadiansOfDegrees(track.tilt_degrees));
 
   // LA SECTION DU FAISCEAU, calculée UNE FOIS : elle ne dépend pas du segment.
   // Chaque coin porte son écart au cap et sa hauteur ; c'est la portée qui les
   // fait avancer.
   std::array<glm::vec3, 4> section{};
   for (std::size_t corner = 0; corner < section.size(); ++corner) {
-    const std::int32_t angle = WithinFullTurn(static_cast<std::int32_t>(track.tilt_degrees) +
-                                              kSpikeBeamCornerDegrees[corner]);
-    const float carries = radius * std::cos(DegreesToRadians(angle));
+    const std::int32_t angle = WithinFullTurnOnce(static_cast<std::int32_t>(track.tilt_degrees) +
+                                                  kSpikeBeamCornerDegrees[corner]);
+    const float carries = radius * std::cos(RadiansOfDegrees(angle));
     section[corner] = {carries * vers_x, carries * vers_y + height,
-                       radius * std::sin(DegreesToRadians(angle))};
+                       radius * std::sin(RadiansOfDegrees(angle))};
   }
 
   const auto alpha = static_cast<std::uint8_t>(std::clamp<std::int16_t>(track.alpha, 0, 255));

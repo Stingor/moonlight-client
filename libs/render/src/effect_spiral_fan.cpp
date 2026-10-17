@@ -2,11 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -85,10 +86,6 @@ constexpr std::array<std::uint8_t, 3> kBlueAura = {5, 5, 255};
 // styles qui s'ouvrent resserrent de dix degrés vers l'horizontale.
 constexpr std::array<std::int32_t, kCornerCount> kSquareCorners = {45, 135, 225, 315};
 constexpr std::array<std::int32_t, kCornerCount> kFlattenedCorners = {35, 145, 215, 325};
-
-[[nodiscard]] float RadiansOfDegrees(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
 
 // UN QUAD DE LAME, coins posés à plat puis tournés puis élevés.
 [[nodiscard]] EffectWorldQuad LameOuAura(const std::array<std::int32_t, kCornerCount>& angles,

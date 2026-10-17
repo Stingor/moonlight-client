@@ -2,18 +2,15 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_scene.h"
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_trail_palette.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
 
 // LA VARIANTE DE LA PREMIÈRE PASSE, écrite juste avant l'appel. Ce n'est pas une
 // passe SANS teinte : c'est une passe teintée par la variante zéro.

@@ -2,11 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -61,15 +62,6 @@ constexpr float kTextureAtLastCorners = 0.0F;
 // LA MARQUE QUI DÉLÈGUE À UNE SOUS-MARQUE. Elle seule lit `sub_mark`, et ses
 // six branches sont six teintes de plus.
 constexpr std::uint8_t kMarkThatDelegates = 9;
-
-[[nodiscard]] float RadiansOfDegrees(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
-
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t degrees) {
-  const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
-  return remainder < 0 ? remainder + kEffectTrackFullTurnDegrees : remainder;
-}
 
 // Ce que la sous-marque de la marque neuf demande. Les six branches ne diffèrent
 // que par leur teinte et, pour la dernière, par un mélange ADDITIF.

@@ -2,16 +2,13 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
 
 constexpr std::int16_t kAddedBlend = 0;
 constexpr std::int16_t kOrdinaryBlend = 1;

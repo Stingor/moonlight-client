@@ -2,16 +2,13 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
 
 constexpr std::int16_t kAddedBlend = 0;
 constexpr std::int16_t kOrdinaryBlend = 1;
@@ -39,18 +36,6 @@ constexpr std::array<WedgeRow, 5> kWedgeRows = {{
 // absence de teinte — c'est la variante la plus contrastée de toutes.
 constexpr WedgeRow kDefaultRow = {0.0F,        {0, 250, 250}, {250, 0, 0},
                                   kAddedBlend, kAddedBlend,   false};
-
-// Un angle ramené dans le tour, comme le client le fait : une seule correction,
-// parce qu'il sait que l'écart ne dépasse jamais un tour.
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t angle) {
-  if (angle < 0) {
-    return angle + kEffectTrackFullTurnDegrees;
-  }
-  if (angle >= kEffectTrackFullTurnDegrees) {
-    return angle - kEffectTrackFullTurnDegrees;
-  }
-  return angle;
-}
 
 }  // namespace
 
@@ -82,9 +67,9 @@ std::vector<EffectWorldQuad> ComposeConeWedgeQuads(const EffectTrack& track, glm
   const auto place = [&](std::int32_t ouverture, const std::array<std::uint8_t, 3>& tint,
                          std::int16_t blend) {
     const float before = static_cast<float>(
-        WithinFullTurn(static_cast<std::int32_t>(track.tilt_degrees) - ouverture));
+        WithinFullTurnOnce(static_cast<std::int32_t>(track.tilt_degrees) - ouverture));
     const float after = static_cast<float>(
-        WithinFullTurn(static_cast<std::int32_t>(track.tilt_degrees) + ouverture));
+        WithinFullTurnOnce(static_cast<std::int32_t>(track.tilt_degrees) + ouverture));
     const float reach_before = radius * std::cos(DegreesToRadians(before));
     const float reach_after = radius * std::cos(DegreesToRadians(after));
     // LES FORMULES SONT CELLES DU CLIENT, dans son repère : l'apex négatif du

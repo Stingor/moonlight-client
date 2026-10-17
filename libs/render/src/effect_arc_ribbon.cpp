@@ -2,11 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -67,15 +68,6 @@ constexpr std::array<EffectArcRibbonLayer, 2> kGreenThenPale = {
     {{{5, 255, 5}, 0}, {{155, 255, 155}, 0}}};
 constexpr std::array<EffectArcRibbonLayer, 2> kRedThenPale = {
     {{{255, 5, 5}, 0}, {{255, 155, 155}, 0}}};
-
-[[nodiscard]] float RadiansOfDegrees(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
-
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t degrees) {
-  const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
-  return remainder < 0 ? remainder + kEffectTrackFullTurnDegrees : remainder;
-}
 
 // Le jeu d'écarts que la piste demande. Le carré par défaut : le bâtisseur ne
 // pose que trois valeurs, et toute autre laisserait les quatre coins au même

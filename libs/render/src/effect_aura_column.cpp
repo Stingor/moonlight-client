@@ -2,10 +2,11 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -18,10 +19,6 @@ constexpr std::array<std::int32_t, 4> kCornerDegrees = {135, 45, 315, 225};
 
 // LE MÉLANGE : zéro est l'ADDITION, dans la numérotation de la voie A.
 constexpr std::int16_t kAddedBlend = 0;
-
-[[nodiscard]] float DegreesToRadians(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
 
 }  // namespace
 
@@ -57,7 +54,7 @@ std::vector<EffectWorldQuad> ComposeAuraColumnQuads(const EffectTrack& track,
 
     EffectParticleQuadRequest request;
     for (std::size_t corner = 0; corner < request.corners.size(); ++corner) {
-      const float angle = DegreesToRadians(kCornerDegrees[corner]);
+      const float angle = RadiansOfDegrees(kCornerDegrees[corner]);
       request.corners[corner] = {radius * std::cos(angle) + offset, 0.0F, radius * std::sin(angle)};
     }
     // ⚠ LES COINS SE TOURNENT AVANT DE MONTER, et non l'inverse : le client

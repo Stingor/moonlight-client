@@ -6,15 +6,15 @@
 
 #include "ro/render/effect_track_fwd.h"
 
-// LES ANGLES DE LA FAMILLE PROCÉDURALE, en un seul endroit.
+// LES ANGLES DES EFFETS, en un seul endroit.
 //
 // En-tête PRIVÉ : il vit à côté des sources qui l'emploient et ne sort pas de
 // `libs/render/src`. Rien de public n'en dépend.
 //
-// ⚠ IL EXISTE PARCE QUE LES MOUVEMENTS ONT DÛ SE COUPER EN DEUX FICHIERS, au
-// plafond de huit cents lignes. Recopier ces quatre fonctions dans le second
-// aurait suffi à les faire diverger à la première correction — c'est déjà arrivé
-// dans ce dépôt, sur des lecteurs de valeur dupliqués.
+// 🔴 AUCUNE COPIE LOCALE. Un effet qui recopie l'une de ces fonctions la fait
+// diverger à la première correction — c'est déjà arrivé dans ce dépôt, sur des
+// lecteurs de valeur dupliqués. Une variante qui ne fait PAS la même chose porte
+// un autre nom : `WithinFullTurnOnce` ne se confond pas avec `WithinFullTurn`.
 //
 // ⚠ ET LE CLIENT LIT DES TABLES DE TROIS CENT SOIXANTE ENTRÉES, indexées par un
 // degré ENTIER. Nous calculons la même valeur ; le résultat ne se distingue pas
@@ -24,6 +24,11 @@ namespace ro::render {
 
 [[nodiscard]] inline float DegreesToRadians(float degrees) {
   return degrees * std::numbers::pi_v<float> / 180.0F;
+}
+
+// Un angle ENTIER de degrés, en radians : celui que les tables du client indexent.
+[[nodiscard]] inline float RadiansOfDegrees(std::int32_t degrees) {
+  return DegreesToRadians(static_cast<float>(degrees));
 }
 
 // Le sinus d'un angle ENTIER de degrés, comme le client l'indexe.
@@ -47,6 +52,19 @@ namespace ro::render {
 [[nodiscard]] inline std::int32_t WithinFullTurn(std::int32_t degrees) {
   const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
   return remainder < 0 ? remainder + kEffectTrackFullTurnDegrees : remainder;
+}
+
+// Ramène un angle dans un tour par UNE SEULE correction, comme le client là où
+// il sait que l'écart ne dépasse jamais un tour. ⚠ Au-delà, l'angle reste hors
+// du tour : c'est ce que fait le client, et `WithinFullTurn` le corrigerait.
+[[nodiscard]] inline std::int32_t WithinFullTurnOnce(std::int32_t degrees) {
+  if (degrees < 0) {
+    return degrees + kEffectTrackFullTurnDegrees;
+  }
+  if (degrees >= kEffectTrackFullTurnDegrees) {
+    return degrees - kEffectTrackFullTurnDegrees;
+  }
+  return degrees;
 }
 
 // LE CAP D'UN VECTEUR À PLAT, en degrés ENTIERS, à la façon du client.

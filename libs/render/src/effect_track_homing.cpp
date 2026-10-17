@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_track.h"
@@ -82,10 +81,6 @@ constexpr std::int16_t kHomingTolerance = 4;
 // tiré au sort d'un côté ou de l'autre.
 constexpr float kSpeedFactorOnBurst = 3.0F;
 constexpr std::int32_t kBurstAngleSpread = 45;
-
-[[nodiscard]] float RadiansOfDegrees(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
 
 [[nodiscard]] std::int16_t WrappedDegrees(std::int32_t degrees) {
   std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;

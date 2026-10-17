@@ -1,8 +1,9 @@
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -47,10 +48,6 @@ constexpr float kLiftAboveOwner = 6.0F;
 // LA SEULE MARQUE QUI FAIT TOURNER LA TÊTE, et de combien par tic.
 constexpr std::uint8_t kMarkThatSpins = 7;
 constexpr std::int16_t kSpinDegreesPerTick = 10;
-
-[[nodiscard]] float RadiansOfDegrees(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
 
 [[nodiscard]] std::int16_t WrappedDegrees(std::int32_t degrees) {
   return static_cast<std::int16_t>(

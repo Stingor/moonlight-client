@@ -1,15 +1,12 @@
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float SinOfDegrees(std::int32_t degrees) {
-  return std::sin(static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F);
-}
 
 // CE QUE LA GERBE POSE EN DUR.
 

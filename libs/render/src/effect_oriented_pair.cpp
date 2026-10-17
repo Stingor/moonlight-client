@@ -1,18 +1,15 @@
 #include "ro/render/effect_oriented_pair.h"
 
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
 
 // OÙ LA FIGURE LIT SES DEUX ALPHAS et sa seconde position.
 constexpr std::size_t kSlotOfFirstAlpha = 12;

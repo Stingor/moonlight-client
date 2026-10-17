@@ -10,12 +10,10 @@
 #include "ro/render/effect_scene.h"
 #include "ro/render/map_effect_math.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
 
 [[nodiscard]] std::uint8_t Clamped(float channel) {
   return static_cast<std::uint8_t>(std::clamp(channel, 0.0F, kEffectNodeChannelMax) + 0.5F);

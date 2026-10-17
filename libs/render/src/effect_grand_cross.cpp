@@ -2,24 +2,16 @@
 
 #include <array>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_scene.h"
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_trail_palette.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
-
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t angle_degrees) {
-  const std::int32_t remainder = angle_degrees % kEffectTrackFullTurnDegrees;
-  return remainder < 0 ? remainder + kEffectTrackFullTurnDegrees : remainder;
-}
 
 [[nodiscard]] float Cosinus(std::int32_t angle_degrees) {
   return std::cos(DegreesToRadians(static_cast<float>(WithinFullTurn(angle_degrees))));

@@ -1,10 +1,11 @@
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_track_motion.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -100,10 +101,6 @@ constexpr float kDriftSideways = 0.2F;
 
 constexpr float kLastDegreeOfTurn = 359.0F;
 
-[[nodiscard]] float RadiansOfDegrees(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
-
 // Un tirage entier dans [0, bound), comme le modulo du client.
 [[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
   return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
@@ -111,7 +108,7 @@ constexpr float kLastDegreeOfTurn = 359.0F;
 }
 
 // Le sinus d'un angle rangé en flottant, comme le client indexe sa table.
-[[nodiscard]] float SineOfSlot(float degrees) { return std::sin(RadiansOfDegrees(degrees)); }
+[[nodiscard]] float SineOfSlot(float degrees) { return std::sin(DegreesToRadians(degrees)); }
 
 // L'altitude absolue d'un style, hors celui qui suit le relief.
 [[nodiscard]] float AbsoluteHeightOfStyle(float style, std::uint32_t& generator) {

@@ -1,5 +1,4 @@
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_scene.h"
@@ -7,12 +6,10 @@
 #include "ro/render/effect_track_figures.h"
 #include "ro/render/effect_trail_palette.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
-}
 
 // COMMENT LE RUBAN LIT SA PISTE.
 //

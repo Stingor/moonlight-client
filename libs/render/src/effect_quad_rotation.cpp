@@ -1,23 +1,18 @@
 #include "ro/render/effect_quad_rotation.h"
 
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
 
-// Ramène un angle dans un tour, y compris quand il est négatif — le reste de la
-// division entière du C++ garde le signe du dividende, et un angle négatif
+// L'angle d'abord ramené dans le tour, puis en radians : un angle négatif
 // indexerait avant le début de la table du client.
-[[nodiscard]] std::int32_t WithinFullTurn(std::int32_t degrees) {
-  const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
-  return remainder < 0 ? remainder + kEffectTrackFullTurnDegrees : remainder;
-}
-
-[[nodiscard]] float RadiansOfDegrees(std::int16_t degrees) {
-  return static_cast<float>(WithinFullTurn(degrees)) * std::numbers::pi_v<float> / 180.0F;
+[[nodiscard]] float RadiansWithinTurn(std::int16_t degrees) {
+  return RadiansOfDegrees(WithinFullTurn(degrees));
 }
 
 // Une rotation dans le plan de deux composantes, telle que le client l'écrit :
@@ -33,12 +28,12 @@ void TurnPair(float& first, float& second, float cosinus, float sinus) {
 
 glm::vec3 RotateEffectQuadPoint(glm::vec3 point, std::int16_t turn_degrees,
                                 std::int16_t tilt_degrees) {
-  const float tilt = RadiansOfDegrees(tilt_degrees);
+  const float tilt = RadiansWithinTurn(tilt_degrees);
   // L'INCLINAISON D'ABORD : voir l'avertissement de l'en-tête. Le tour travaille
   // ensuite sur la profondeur qu'elle vient de changer.
   TurnPair(point.z, point.y, std::cos(tilt), std::sin(tilt));
 
-  const float tour = RadiansOfDegrees(turn_degrees);
+  const float tour = RadiansWithinTurn(turn_degrees);
   TurnPair(point.x, point.z, std::cos(tour), std::sin(tour));
   return point;
 }

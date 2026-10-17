@@ -2,11 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -54,16 +55,6 @@ constexpr float kTextureAtRight = 1.0F;
 constexpr float kTextureAtNear = 1.0F;
 constexpr float kTextureAtFar = 0.0F;
 
-[[nodiscard]] float RadiansOfDegrees(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F;
-}
-
-[[nodiscard]] std::int16_t WithinFullTurn(std::int32_t degrees) {
-  const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
-  return static_cast<std::int16_t>(remainder < 0 ? remainder + kEffectTrackFullTurnDegrees
-                                                 : remainder);
-}
-
 // LE CENTRE DU CARRÉ : un point de la sphère que le rayon de la piste fait
 // grandir. L'inclinaison y tient la longitude et l'angle la latitude — deux
 // noms que seule cette figure justifie.
@@ -89,11 +80,13 @@ EffectParticleAppearance EffectRisingParticleAppearance(std::uint8_t mark) {
 // Le lacet du client est l'opposé du nôtre, son altitude l'opposé de notre
 // élévation : `360 − (−lacet)` et `450 − (−élévation)`.
 std::int16_t EffectBillboardTurnDegrees(const Camera& camera) {
-  return WithinFullTurn(kTurnComplementDegrees + static_cast<std::int32_t>(camera.yaw_degrees));
+  return static_cast<std::int16_t>(
+      WithinFullTurn(kTurnComplementDegrees + static_cast<std::int32_t>(camera.yaw_degrees)));
 }
 
 std::int16_t EffectBillboardTiltDegrees(const Camera& camera) {
-  return WithinFullTurn(kTiltComplementDegrees + static_cast<std::int32_t>(camera.pitch_degrees));
+  return static_cast<std::int16_t>(
+      WithinFullTurn(kTiltComplementDegrees + static_cast<std::int32_t>(camera.pitch_degrees)));
 }
 
 std::optional<EffectWorldQuad> ComposeRisingParticleQuad(const EffectTrack& track,
@@ -110,8 +103,8 @@ std::optional<EffectWorldQuad> ComposeRisingParticleQuad(const EffectTrack& trac
 
   const glm::vec3 centre = CentreOfParticle(track);
   const float half = track.value[kSlotOfHalfDiagonal];
-  const float rotation = RadiansOfDegrees(static_cast<std::int32_t>(
-      WithinFullTurn(static_cast<std::int32_t>(track.value[kSlotOfSpinDegrees]))));
+  const float rotation =
+      RadiansOfDegrees(WithinFullTurn(static_cast<std::int32_t>(track.value[kSlotOfSpinDegrees])));
 
   std::array<glm::vec3, kCornerCount> corners;
   for (std::size_t corner = 0; corner < kCornerCount; ++corner) {

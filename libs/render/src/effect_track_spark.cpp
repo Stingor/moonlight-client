@@ -1,25 +1,12 @@
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float CosOfDegrees(std::int32_t degrees) {
-  return std::cos(static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F);
-}
-
-[[nodiscard]] float SinOfDegrees(std::int32_t degrees) {
-  return std::sin(static_cast<float>(degrees) * std::numbers::pi_v<float> / 180.0F);
-}
-
-[[nodiscard]] std::int16_t WithinFullTurn(std::int32_t degrees) {
-  const std::int32_t remainder = degrees % kEffectTrackFullTurnDegrees;
-  return static_cast<std::int16_t>(remainder < 0 ? remainder + kEffectTrackFullTurnDegrees
-                                                 : remainder);
-}
 
 // CE QUE LE CAS CINQUANTE-NEUF POSE EN DUR.
 
@@ -89,7 +76,7 @@ void AdvanceRisingSparkTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
     if (track.ticks <= 0) {
       continue;
     }
-    track.degrees = WithinFullTurn(track.degrees - kSpinPerTick);
+    track.degrees = static_cast<std::int16_t>(WithinFullTurn(track.degrees - kSpinPerTick));
     if (track.ticks == 1) {
       // LE CAP SE TIRE AU PREMIER TIC, pas au semis : le bâtisseur laisse
       // l'azimut à zéro et c'est le mouvement qui le choisit.

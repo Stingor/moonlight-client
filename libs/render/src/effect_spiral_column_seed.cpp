@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 #include <string>
 
 #include "ro/render/effect_node.h"
@@ -10,6 +9,8 @@
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_spiral_column.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -66,10 +67,6 @@ constexpr std::int16_t kUpright = 90;
 [[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
   return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
                                    static_cast<std::uint32_t>(exclusive_bound));
-}
-
-[[nodiscard]] float DegreesToRadians(float degrees) {
-  return degrees * std::numbers::pi_v<float> / 180.0F;
 }
 
 }  // namespace
