@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
+#include <optional>
 
 #include <glm/glm.hpp>
 
@@ -40,6 +42,25 @@ inline constexpr float kPointShadowClearanceWorld = 10.0F;
 // LE PLAN LOINTAIN d'une lumière de portée `range_world` : sa portée, jamais
 // plus près que deux fois le dégagement, où la profondeur perdrait son sens.
 [[nodiscard]] float PointShadowFar(float range_world);
+
+// CE QU'UNE CARTE PORTE DÉJÀ : la lumière pour laquelle elle a été peinte.
+struct PaintedPointLight {
+  glm::vec3 world_position{0.0F};
+  float range_world = 0.0F;
+
+  friend bool operator==(const PaintedPointLight&, const PaintedPointLight&) = default;
+};
+
+// TOUTES LES CARTES NE SE REPEIGNENT PAS À CHAQUE IMAGE. Une lumière nouvelle
+// ou déplacée se repeint aussitôt ; une lumière immobile, une image sur
+// `kPointShadowRepaintPeriod`, à tour de rôle avec les autres — ce qui bouge
+// devant elle, un personnage, voit son ombre suivre à cette cadence. Rend,
+// pour chacune des `count` premières lumières de `set`, s'il faut la
+// repeindre à l'image `frame`, sachant ce que `painted` porte déjà.
+inline constexpr std::size_t kPointShadowRepaintPeriod = 2;
+[[nodiscard]] std::array<bool, kMaxShadowedPointLights> PointShadowRepaints(
+    const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
+    const PointLightSet& set, std::size_t count, std::uint64_t frame);
 
 // Les lumières de `set` qui portent ombre : ses `kMaxShadowedPointLights`
 // premières, déjà rangées de la plus proche de l'œil à la plus lointaine.

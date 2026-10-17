@@ -19,8 +19,10 @@ namespace ro::render {
 // À appeler AVANT la passe de couleur. `camera` ne sert qu'aux élargissements
 // des sprites comptés en pixels d'écran.
 //
-// LE COÛT : six passes de profondeur par lumière ombrée, chacune sur tout ce
-// que porte `casters` — douze au plus, à `kPointShadowMapTexels` de côté.
+// LE COÛT : six passes de profondeur par carte repeinte, chacune sur tout ce
+// que porte `casters`, à `kPointShadowMapTexels` de côté. Une lumière immobile
+// ne se repeint qu'une image sur `kPointShadowRepaintPeriod` : voir
+// `PointShadowRepaints`. Deux lumières fixes coûtent six passes par image.
 [[nodiscard]] PointLightSet DrawPointShadows(PointShadowMaps& maps, const SunShadowCasters& casters,
                                              const PointLightSet& points, const Camera& camera);
 

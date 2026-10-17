@@ -65,4 +65,18 @@ float PointShadowDepth(float axis_distance_world, float far_world) {
   return (normalized * 0.5F) + 0.5F;
 }
 
+std::array<bool, kMaxShadowedPointLights> PointShadowRepaints(
+    const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
+    const PointLightSet& set, std::size_t count, std::uint64_t frame) {
+  std::array<bool, kMaxShadowedPointLights> repaint{};
+  for (std::size_t rank = 0; rank < std::min(count, kMaxShadowedPointLights); ++rank) {
+    const PaintedPointLight wanted{.world_position = set.lights[rank].world_position,
+                                   .range_world = set.lights[rank].range_world};
+    const bool moved = painted[rank] != wanted;
+    const bool its_turn = rank % kPointShadowRepaintPeriod == frame % kPointShadowRepaintPeriod;
+    repaint[rank] = moved || its_turn;
+  }
+  return repaint;
+}
+
 }  // namespace ro::render

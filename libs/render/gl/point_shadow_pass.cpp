@@ -19,9 +19,16 @@ PointLightSet DrawPointShadows(PointShadowMaps& maps, const SunShadowCasters& ca
   if (!maps.valid() || count == 0) {
     return shadowed;
   }
+  const std::array<bool, kMaxShadowedPointLights> repaint =
+      PointShadowRepaints(maps.painted(), points, count, maps.TakeFrame());
   maps.BeginDepthPass();
   for (std::size_t rank = 0; rank < count; ++rank) {
     const PointLight& light = points.lights[rank];
+    if (!repaint[rank]) {
+      continue;
+    }
+    maps.NotePainted(rank, PaintedPointLight{.world_position = light.world_position,
+                                             .range_world = light.range_world});
     const std::array<glm::mat4, kCubeFaceCount> faces =
         PointShadowFaceViewProjections(light.world_position, PointShadowFar(light.range_world));
     for (std::size_t face = 0; face < kCubeFaceCount; ++face) {

@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
+#include <optional>
 
 #include "ro/core/error.h"
 #include "ro/render/point_shadow.h"
@@ -41,6 +43,15 @@ class PointShadowMaps {
   void Bind(int unit, std::size_t rank) const;
 
   [[nodiscard]] bool valid() const noexcept { return framebuffer_ != 0; }
+
+  // CE QUE CHAQUE CARTE PORTE DÉJÀ, et le compte des passes : voir
+  // `PointShadowRepaints`.
+  [[nodiscard]] const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>&
+  painted() const noexcept {
+    return painted_;
+  }
+  void NotePainted(std::size_t rank, const PaintedPointLight& light) { painted_.at(rank) = light; }
+  [[nodiscard]] std::uint64_t TakeFrame() noexcept { return frames_++; }
   [[nodiscard]] int side_texels() const noexcept { return side_texels_; }
 
  private:
@@ -51,6 +62,8 @@ class PointShadowMaps {
   int side_texels_ = 0;
   int previous_framebuffer_ = 0;
   int previous_viewport_[kViewportValues] = {};
+  std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights> painted_{};
+  std::uint64_t frames_ = 0;
 };
 
 }  // namespace ro::render
