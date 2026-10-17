@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include "ro/ui/map_editor_panel.h"
@@ -10,6 +12,10 @@ namespace ro::ui {
 
 // La section « Effets » du panneau de l'éditeur de carte : voir
 // map_editor_effects_panel.cpp.
+// LA RAISON D'UNE RETOUCHE au bout de sa ligne de liste, « — raison » ; rien
+// sans raison. Un « ## » y est rompu : ImGui y lirait la fin du libellé.
+[[nodiscard]] std::string WhyTag(std::string_view why);
+
 // LA PLAGE D'HEURES d'un objet « la nuit seulement », sous sa case : une case
 // qui la choisit, puis ses deux bornes. Vrai quand la case a basculé ; les
 // bornes disent leur glissé dans `moved`.

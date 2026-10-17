@@ -455,10 +455,10 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
     const MapEditorLight& light = view.lights[slot];
     // Elle se reconnaît à sa position, en unités du RSW.
     const std::string label =
-        std::format("{} {} — {:.1f} {:.1f} {:.1f}##lumiere{}", core::Tr("Lumière"), slot,
+        std::format("{} {} — {:.1f} {:.1f} {:.1f}{}##lumiere{}", core::Tr("Lumière"), slot,
                     CellsOfNative(light.position, view.map_cubes)[0],
                     CellsOfNative(light.position, view.map_cubes)[1],
-                    CellsOfNative(light.position, view.map_cubes)[2], slot);
+                    CellsOfNative(light.position, view.map_cubes)[2], WhyTag(light.why), slot);
     const bool chosen = view.selected_light == slot;
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectLight{chosen ? std::nullopt : std::optional(slot)});

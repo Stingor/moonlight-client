@@ -56,11 +56,11 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
   }
   for (const MapEditorMapEffect& effect : view.map_effects) {
     const std::array<float, 3> cells = CellsOfNative(effect.position, view.map_cubes);
-    const std::string label =
-        std::format("{}{} — #{} — {:.1f} {:.1f} {:.1f}{}##effet_carte{}", effect.edited ? "✎ " : "",
-                    effect.effect_index, effect.number, cells[0], cells[1], cells[2],
-                    effect.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
-                    effect.effect_index);
+    const std::string label = std::format(
+        "{}{} — #{} — {:.1f} {:.1f} {:.1f}{}{}##effet_carte{}", effect.edited ? "✎ " : "",
+        effect.effect_index, effect.number, cells[0], cells[1], cells[2],
+        effect.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
+        WhyTag(effect.why), effect.effect_index);
     const bool chosen = view.selected_map_effect == effect.effect_index;
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(
@@ -136,6 +136,20 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
 
 }  // namespace
 
+std::string WhyTag(std::string_view why) {
+  if (why.empty()) {
+    return {};
+  }
+  std::string tag = " — ";
+  for (const char letter : why) {
+    tag += letter;
+    if (letter == '#' && tag.ends_with("##")) {
+      tag.insert(tag.size() - 1, " ");
+    }
+  }
+  return tag;
+}
+
 bool LitHoursFields(MapEditorHours& hours, const SkinArt& art, WheelDragResult& moved) {
   const bool toggled = SkinCheckBox(core::Tr("Plage d'heures"), &hours.chosen, art);
   if (ImGui::IsItemHovered()) {
@@ -168,8 +182,8 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
     // Il se reconnaît à sa case, comme sur la minicarte.
     const std::array<float, 3> cells = CellsOfNative(effect.position, view.map_cubes);
     const std::string label =
-        std::format("{} {} — #{} — {:.1f} {:.1f} {:.1f}##effet{}", core::Tr("Effet"), slot,
-                    effect.number, cells[0], cells[1], cells[2], slot);
+        std::format("{} {} — #{} — {:.1f} {:.1f} {:.1f}{}##effet{}", core::Tr("Effet"), slot,
+                    effect.number, cells[0], cells[1], cells[2], WhyTag(effect.why), slot);
     const bool chosen = view.selected_effect == slot;
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectEffect{chosen ? std::nullopt : std::optional(slot)});
