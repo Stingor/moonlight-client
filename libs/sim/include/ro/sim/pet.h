@@ -84,10 +84,6 @@ enum class PetEvolutionRefusal : std::uint8_t {
 [[nodiscard]] PetEvolutionRefusal PetEvolutionRefusalOf(int intimacy, bool wears_accessory,
                                                         bool has_materials) noexcept;
 
-// LE NOMBRE D'EXEMPLAIRES D'UN ITEM DANS LE SAC, toutes piles additionnées —
-// comme le serveur compte les matériaux.
-[[nodiscard]] std::int64_t CountInBag(const Inventory& bag, std::uint32_t item_id) noexcept;
-
 // L'ŒUF DU FAMILIER SORTI : celui que le serveur marque « éclos » dans le sac.
 // Zéro quand le sac n'en porte aucun.
 [[nodiscard]] std::uint32_t HatchedEggOf(const Inventory& bag) noexcept;

@@ -72,7 +72,7 @@ constexpr std::uint32_t kPlainColor = 0;
   std::array<char, kFoodLineBytes> line = {};
   std::snprintf(line.data(), line.size(),
                 ro::core::Tr("Votre pet a été nourri. %s (il en reste %d)"), food_name.c_str(),
-                static_cast<int>(ro::sim::CountInBag(bag, feeding.food_item_id)));
+                bag.AmountOf(feeding.food_item_id));
   return line.data();
 }
 
@@ -335,7 +335,7 @@ void PetStage::ComposeWindow(const ro::sim::World& world, GamePieces& pieces,
     view.food_item_id = food;
     view.food_icon = IconOf(pieces, food);
     view.food_name = ItemName(pieces, food);
-    view.food_in_bag = ro::sim::CountInBag(world.inventory(), food);
+    view.food_in_bag = world.inventory().AmountOf(food);
   }
 
   if (sprite_.has_value()) {
@@ -400,7 +400,7 @@ void PetStage::ComposePanel(const ro::sim::World& world, GamePieces& pieces,
   panel.target_species = std::string(tables_->SpeciesOf(target_class));
   bool has_materials = true;
   for (const ro::vfs::PetEvolutionMaterial& material : recipe->materials) {
-    const std::int64_t owned = ro::sim::CountInBag(world.inventory(), material.item_id);
+    const std::int64_t owned = world.inventory().AmountOf(material.item_id);
     has_materials = has_materials && owned >= material.amount;
     panel.materials.push_back(
         ro::ui::PetEvolutionMaterialView{.item_id = material.item_id,
@@ -477,7 +477,7 @@ void PetStage::FeedIfFood(ro::net::Connection& link, ro::sim::World& world) {
   // LE JEU REFUSE SANS RIEN ENVOYER quand la nourriture de l'espèce manque au
   // sac. ⚠ SANS TABLE, la nourriture est inconnue : le serveur tranchera.
   const std::uint32_t food = tables_.has_value() ? tables_->FoodOf(pet_.pet_class()) : 0;
-  if (food != 0 && ro::sim::CountInBag(world.inventory(), food) <= 0) {
+  if (food != 0 && world.inventory().AmountOf(food) <= 0) {
     Say(world, NoFoodLine(items_, food), kNoFoodColor);
     return;
   }

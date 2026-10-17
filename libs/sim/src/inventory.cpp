@@ -409,6 +409,16 @@ const InventoryItem* Inventory::Find(std::uint16_t client_slot) const {
   return &*at;
 }
 
+std::int32_t Inventory::AmountOf(std::uint32_t item_id) const noexcept {
+  std::int32_t amount = 0;
+  for (const InventoryItem& item : items_) {
+    if (item.item_id == item_id) {
+      amount += std::max<std::int32_t>(item.amount, 0);
+    }
+  }
+  return amount;
+}
+
 const InventoryItem* Inventory::WornAt(std::uint32_t location) const {
   if (location == 0) {
     return nullptr;

@@ -364,6 +364,11 @@ class Inventory {
 
   [[nodiscard]] const InventoryItem* Find(std::uint16_t client_slot) const;
 
+  // COMBIEN D'EXEMPLAIRES DE CET OBJET, toutes piles additionnées, pièces
+  // portées comprises — comme le serveur compte les matériaux. ⚠ UNE PILE
+  // NÉGATIVE NE RETRANCHE RIEN : seule une trame fautive en poserait une.
+  [[nodiscard]] std::int32_t AmountOf(std::uint32_t item_id) const noexcept;
+
   // LA PIÈCE PORTÉE À CET EMPLACEMENT, nulle s'il est libre.
   //
   // ⚠ ELLE DOIT COUVRIR TOUS LES BITS DEMANDÉS, et non un seul : demander les

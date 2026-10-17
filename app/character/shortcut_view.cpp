@@ -44,17 +44,6 @@ namespace {
   return nullptr;
 }
 
-// Combien il en reste EN TOUT, toutes piles confondues.
-[[nodiscard]] int RemainingInBag(const ro::sim::World& world, std::uint32_t item_id) {
-  int total = 0;
-  for (const ro::sim::InventoryItem& item : world.inventory().items()) {
-    if (item.item_id == item_id) {
-      total += item.amount;
-    }
-  }
-  return total;
-}
-
 }  // namespace
 
 ShortcutBarView::ShortcutBarView(std::filesystem::path client_root, const ro::sim::SkillTree* tree,
@@ -170,7 +159,7 @@ void ShortcutBarView::Refresh(const ro::sim::World& world, const Hotkeys& bindin
             .width = static_cast<float>(icon.width_px),
             .height = static_cast<float>(icon.height_px)};
       }
-      view.amount = RemainingInBag(world, slot.item_id);
+      view.amount = world.inventory().AmountOf(slot.item_id);
       view.known = view.amount > 0;
       slots_.push_back(view);
       continue;

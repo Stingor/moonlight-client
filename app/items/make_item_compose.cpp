@@ -45,16 +45,6 @@ constexpr std::size_t kLineBytes = 512;
   return chance >= kGoodChance ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kWarn;
 }
 
-[[nodiscard]] int Stock(const ro::sim::World& world, std::uint32_t item_id) {
-  int stock = 0;
-  for (const ro::sim::InventoryItem& item : world.inventory().items()) {
-    if (item.item_id == item_id) {
-      stock += item.amount;
-    }
-  }
-  return stock;
-}
-
 [[nodiscard]] int LearnedLevel(const ro::sim::World& world, int skill_id) {
   if (skill_id <= 0) {
     return 0;
@@ -295,7 +285,7 @@ void MakeItemFlow::ComposeStale(const ro::sim::World& world) {
         continue;
       }
       const int need = material.kept ? 1 : material.quantity;
-      const int have = Stock(world, material.item_id);
+      const int have = world.inventory().AmountOf(material.item_id);
       if (have >= need) {
         continue;
       }
@@ -345,7 +335,7 @@ void MakeItemFlow::ComposeRecipe(const ro::sim::World& world, const Entry& chose
   material_labels_.clear();
   materials_.clear();
   for (const Material& material : chosen.materials) {
-    const int have = Stock(world, material.item_id);
+    const int have = world.inventory().AmountOf(material.item_id);
     std::string name = ItemName(material.item_id);
     if (name.empty()) {
       std::array<char, kLineBytes> numbered{};
@@ -493,7 +483,7 @@ void MakeItemFlow::ComposeChance(const ro::sim::World& world, const Entry& chose
       }
     }
     for (const Anvil& anvil : kAnvils) {
-      if (Stock(world, anvil.item_id) > 0) {
+      if (world.inventory().AmountOf(anvil.item_id) > 0) {
         forge.anvil_bonus = anvil.bonus;
         break;
       }
@@ -537,7 +527,7 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
       if (item_id >= kSkippedForgeFirst && item_id <= kSkippedForgeLast) {
         continue;
       }
-      const int have = Stock(world, item_id);
+      const int have = world.inventory().AmountOf(item_id);
       if (have <= 0) {
         continue;
       }
@@ -595,7 +585,7 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
   const Anvil* kept = nullptr;
   int others = 0;
   for (const Anvil& anvil : kAnvils) {
-    if (Stock(world, anvil.item_id) <= 0) {
+    if (world.inventory().AmountOf(anvil.item_id) <= 0) {
       continue;
     }
     if (kept == nullptr) {
@@ -630,7 +620,7 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
       continue;
     }
     const int asked = static_cast<int>(std::ranges::count(forge_slots_, item_id));
-    const int have = Stock(world, item_id);
+    const int have = world.inventory().AmountOf(item_id);
     if (asked > have) {
       std::snprintf(line.data(), line.size(), Tr("%s : %d demandés, %d dans l'inventory"),
                     ItemName(item_id).c_str(), asked, have);
@@ -650,7 +640,8 @@ void MakeItemFlow::ComposeFooter(const ro::sim::World& world,
                    state.selected != 0 && EntryOf(state.selected) != nullptr;
   view_.spent = state.open && !list_armed_ && !awaiting_ && !relaunch_coming;
   view_.can_relaunch =
-      from_item_ ? (source_item_id_ != 0 && Stock(world, source_item_id_) > 0) : skill_id_ > 0;
+      from_item_ ? (source_item_id_ != 0 && world.inventory().AmountOf(source_item_id_) > 0)
+                 : skill_id_ > 0;
   std::array<char, kLineBytes> line{};
   if (!view_.can_relaunch) {
     relaunch_tip_ = from_item_ ? Tr("Il ne te reste plus l'item qui a ouvert cette liste.")

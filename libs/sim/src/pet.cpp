@@ -125,16 +125,6 @@ PetEvolutionRefusal PetEvolutionRefusalOf(int intimacy, bool wears_accessory,
   return has_materials ? PetEvolutionRefusal::kNone : PetEvolutionRefusal::kMaterials;
 }
 
-std::int64_t CountInBag(const Inventory& bag, std::uint32_t item_id) noexcept {
-  std::int64_t count = 0;
-  for (const InventoryItem& item : bag.items()) {
-    if (item.item_id == item_id && item.amount > 0) {
-      count += item.amount;
-    }
-  }
-  return count;
-}
-
 std::uint32_t HatchedEggOf(const Inventory& bag) noexcept {
   for (const InventoryItem& item : bag.items()) {
     if (IsPetEgg(item.item_id) && item.damaged) {

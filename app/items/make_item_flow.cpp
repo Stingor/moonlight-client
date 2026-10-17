@@ -73,16 +73,6 @@ constexpr std::size_t kLineBytes = 512;
   return text.data();
 }
 
-[[nodiscard]] int Stock(const ro::sim::World& world, std::uint32_t item_id) {
-  int stock = 0;
-  for (const ro::sim::InventoryItem& item : world.inventory().items()) {
-    if (item.item_id == item_id) {
-      stock += item.amount;
-    }
-  }
-  return stock;
-}
-
 }  // namespace
 
 MakeItemFlow::MakeItemFlow(const ro::vfs::ItemTable* items, const ro::vfs::ItemWords* words,
@@ -217,7 +207,7 @@ void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& 
   // LES EMPLACEMENTS DE FORGE dont l'objet a quitté le sac se vident.
   for (std::size_t slot = 0; slot < forge_slots_.size(); ++slot) {
     const std::uint32_t item_id = forge_slots_[slot];
-    if (item_id == 0 || Stock(world, item_id) > 0) {
+    if (item_id == 0 || world.inventory().AmountOf(item_id) > 0) {
       continue;
     }
     forge_slots_[slot] = 0;
@@ -344,7 +334,7 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
   }
   const std::uint32_t elapsed = now_ms - sent_at_;
   if (elapsed > kProbeAfterMs) {
-    const int now_owned = Stock(world, last_sent_id_);
+    const int now_owned = world.inventory().AmountOf(last_sent_id_);
     // ⚠ DANS UN SENS OU DANS L'AUTRE : pour les flèches, l'objet envoyé est le
     // MATÉRIAU, qui baisse.
     if (now_owned != sent_owned_) {
@@ -373,7 +363,7 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
     // LE PRODUIT N'A PAS BOUGÉ MAIS LE MATÉRIAU A BAISSÉ : le serveur a traité
     // la demande, et le tirage a raté.
     if (sent_material_ != 0 && sent_material_owned_ >= 0 &&
-        Stock(world, sent_material_) < sent_material_owned_) {
+        world.inventory().AmountOf(sent_material_) < sent_material_owned_) {
       awaiting_ = false;
       sent_owned_ = -1;
       sent_material_ = 0;
@@ -470,7 +460,8 @@ void MakeItemFlow::RetryRelaunch(const MakeItemSettings& settings, const ro::sim
       return;
     }
     // L'EXEMPLAIRE EST PARTI SANS LISTE EN RETOUR : on n'entame pas davantage.
-    if (reuse_owned_before_ >= 0 && Stock(world, source_item_id_) < reuse_owned_before_) {
+    if (reuse_owned_before_ >= 0 &&
+        world.inventory().AmountOf(source_item_id_) < reuse_owned_before_) {
       std::array<char, kLineBytes> line{};
       std::snprintf(line.data(), line.size(),
                     Tr("%s consommé mais aucune liste n'est revenue : relance arrêtée (le stock ne "
@@ -528,14 +519,14 @@ void MakeItemFlow::RequestMake(ro::ui::MakeItemWindowState& state, bool selectio
   sent_at_ = now_ms == 0 ? 1 : now_ms;
   last_sent_id_ = chosen->item_id;
   last_sent_name_ = chosen->name;
-  sent_owned_ = Stock(world, chosen->item_id);
+  sent_owned_ = world.inventory().AmountOf(chosen->item_id);
   // LA SONDE DU MATÉRIAU : le premier qui est vraiment consommé.
   sent_material_ = 0;
   sent_material_owned_ = -1;
   for (const Material& material : chosen->materials) {
     if (material.item_id != 0 && material.quantity > 0 && !material.kept && !material.output) {
       sent_material_ = material.item_id;
-      sent_material_owned_ = Stock(world, material.item_id);
+      sent_material_owned_ = world.inventory().AmountOf(material.item_id);
       break;
     }
   }
@@ -674,7 +665,7 @@ void MakeItemFlow::Flush(ro::ui::MakeItemWindowState& state, const MakeItemSetti
     }
     case Pending::kReuseItem:
       auto_ours_ = true;
-      reuse_owned_before_ = Stock(world, source_item_id_);
+      reuse_owned_before_ = world.inventory().AmountOf(source_item_id_);
       SendReuseItem(settings, link, world);
       if (auto_ours_) {
         relaunch_sent_at_ = now_ms == 0 ? 1 : now_ms;

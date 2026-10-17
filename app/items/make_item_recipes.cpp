@@ -10,20 +10,6 @@
 #include "items/make_item_odds.h"
 
 namespace moonclient {
-namespace {
-
-[[nodiscard]] int Stock(const ro::sim::World& world, std::uint32_t item_id) {
-  int stock = 0;
-  for (const ro::sim::InventoryItem& item : world.inventory().items()) {
-    if (item.item_id == item_id) {
-      stock += item.amount;
-    }
-  }
-  return stock;
-}
-
-}  // namespace
-
 // ── LES RECETTES ────────────────────────────────────────────────────────────
 
 void MakeItemFlow::ResolveMaterials(Entry& entry) const {
@@ -54,7 +40,7 @@ void MakeItemFlow::ResolveMaterials(Entry& entry) const {
 
 void MakeItemFlow::RecountOwned(const ro::sim::World& world) {
   for (Entry& entry : entries_) {
-    entry.owned = Stock(world, entry.item_id);
+    entry.owned = world.inventory().AmountOf(entry.item_id);
     entry.craftable = Craftable(entry, world);
   }
 }
@@ -69,12 +55,12 @@ int MakeItemFlow::Craftable(const Entry& entry, const ro::sim::World& world) con
       continue;
     }
     if (material.kept) {
-      if (Stock(world, material.item_id) <= 0) {
+      if (world.inventory().AmountOf(material.item_id) <= 0) {
         return -1;
       }
       continue;
     }
-    const int possible = Stock(world, material.item_id) / material.quantity;
+    const int possible = world.inventory().AmountOf(material.item_id) / material.quantity;
     best = best < 0 ? possible : std::min(best, possible);
   }
   // 🔴 ZÉRO EST NOTRE ERREUR, pas la vérité : le serveur n'a proposé le produit

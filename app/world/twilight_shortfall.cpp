@@ -75,17 +75,6 @@ constexpr std::array<RecipeLine, 6> kTwilight3 = {{
   }
 }
 
-// Combien d'exemplaires de l'objet le sac porte, toutes cases réunies.
-[[nodiscard]] std::int32_t Owned(std::uint32_t item_id, const ro::sim::Inventory& inventory) {
-  std::int32_t owned = 0;
-  for (const ro::sim::InventoryItem& item : inventory.items()) {
-    if (item.item_id == item_id) {
-      owned += std::max<std::int32_t>(item.amount, 0);
-    }
-  }
-  return owned;
-}
-
 }  // namespace
 
 bool IsTwilightAlchemy(std::uint16_t skill_id) noexcept { return !RecipeOf(skill_id).empty(); }
@@ -94,7 +83,7 @@ std::vector<TwilightNeed> TwilightShortfall(std::uint16_t skill_id,
                                             const ro::sim::Inventory& inventory) {
   std::vector<TwilightNeed> missing;
   for (const RecipeLine& line : RecipeOf(skill_id)) {
-    const std::int32_t owned = Owned(line.item_id, inventory);
+    const std::int32_t owned = inventory.AmountOf(line.item_id);
     if (owned < line.required) {
       missing.push_back(
           TwilightNeed{.item_id = line.item_id, .required = line.required, .owned = owned});

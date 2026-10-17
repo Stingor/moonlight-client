@@ -19,16 +19,6 @@ namespace {
 constexpr std::uint32_t kRepairedColor = 0x00FFFF;
 constexpr std::uint32_t kFailedColor = 0xFF0000;
 
-[[nodiscard]] int OwnedCount(const ro::sim::World& world, std::uint32_t item_id) {
-  int owned = 0;
-  for (const ro::sim::InventoryItem& item : world.inventory().items()) {
-    if (item.item_id == item_id && item.amount > 0) {
-      owned += item.amount;
-    }
-  }
-  return owned;
-}
-
 }  // namespace
 
 void RepairStage::See(const ro::vfs::ItemTable* items, const ro::vfs::ItemWords* words,
@@ -85,12 +75,12 @@ void RepairStage::Stage(const ro::sim::World& world, ro::ui::RepairWindowState& 
   }
   for (std::size_t rank = 0; rank < names_.size(); ++rank) {
     const std::uint32_t material = material_ids[rank];
-    rows_.push_back(
-        ro::ui::RepairRowView{.name = names_[rank],
-                              .icon = IconOf(offer_.items()[rank].item_id),
-                              .material = materials_[rank],
-                              .material_icon = IconOf(material),
-                              .material_owned = material != 0 ? OwnedCount(world, material) : 0});
+    rows_.push_back(ro::ui::RepairRowView{
+        .name = names_[rank],
+        .icon = IconOf(offer_.items()[rank].item_id),
+        .material = materials_[rank],
+        .material_icon = IconOf(material),
+        .material_owned = material != 0 ? world.inventory().AmountOf(material) : 0});
   }
   view = ro::ui::RepairView{.rows = rows_};
 }

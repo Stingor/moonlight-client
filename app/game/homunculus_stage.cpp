@@ -56,17 +56,6 @@ void Complain(const ro::core::Result<void>& sent, const char* what) {
   return std::to_string(item_id);
 }
 
-// Combien le sac en porte encore.
-[[nodiscard]] int CountInBag(const ro::sim::World& world, std::uint32_t item_id) {
-  int count = 0;
-  for (const ro::sim::InventoryItem& item : world.inventory().items()) {
-    if (item.item_id == item_id) {
-      count += item.amount;
-    }
-  }
-  return count;
-}
-
 void Say(ro::sim::World& world, std::string text, std::uint32_t color, std::uint32_t now_ms) {
   world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), now_ms, color);
 }
@@ -84,9 +73,9 @@ void WriteEcho(const ro::net::HomunculusEcho& echo, ro::sim::World& world, const
     case ro::net::HomunculusEchoKind::kFed:
       // ⚠ LE SAC A DÉJÀ PERDU LA NOURRITURE : le serveur la retire avant
       // d'accuser, et le compte dit ce qui reste.
-      std::snprintf(line.data(), line.size(),
-                    ro::core::Tr("L'homoncule a été nourri. [%s] - il en reste %d"),
-                    ItemName(pieces, echo.item_id).c_str(), CountInBag(world, echo.item_id));
+      std::snprintf(
+          line.data(), line.size(), ro::core::Tr("L'homoncule a été nourri. [%s] - il en reste %d"),
+          ItemName(pieces, echo.item_id).c_str(), world.inventory().AmountOf(echo.item_id));
       Say(world, line.data(), kFedColor, now_ms);
       return;
     case ro::net::HomunculusEchoKind::kNotFed:

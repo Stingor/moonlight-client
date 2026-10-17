@@ -24,18 +24,6 @@ namespace {
 constexpr std::uint32_t kInsertedColor = 0x00FFFF;
 constexpr std::uint32_t kRefusedColor = 0xFF0000;
 
-// Toutes les piles de cet objet dans le sac. ⚠ TOUTES, et pas seulement celle
-// qu'on sertit : c'est le compte que la fenêtre annonce.
-[[nodiscard]] int StockOf(const ro::sim::Inventory& bag, std::uint32_t item_id) {
-  int stock = 0;
-  for (const ro::sim::InventoryItem& item : bag.items()) {
-    if (item.item_id == item_id) {
-      stock += item.amount;
-    }
-  }
-  return stock;
-}
-
 }  // namespace
 
 CardInsertView::CardInsertView(const ro::vfs::ItemTable* items, const ro::vfs::ItemWords* words,
@@ -106,7 +94,7 @@ void CardInsertView::Refresh(ro::sim::World& world) {
     card_name_ = NameOf(*card);
     view_.card_name = card_name_;
     view_.card_icon = IconOf(card->item_id);
-    view_.stock = StockOf(bag, card->item_id);
+    view_.stock = bag.AmountOf(card->item_id);
   }
 
   // Les pièces qu'on RETROUVE, et combien — pleines comprises.

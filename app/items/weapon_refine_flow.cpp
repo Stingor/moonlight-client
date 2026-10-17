@@ -81,16 +81,6 @@ constexpr std::size_t kLineBytes = 320;
   return text.data();
 }
 
-[[nodiscard]] int Stock(const ro::sim::Inventory& bag, std::uint32_t item_id) {
-  int stock = 0;
-  for (const ro::sim::InventoryItem& item : bag.items()) {
-    if (item.item_id == item_id) {
-      stock += item.amount;
-    }
-  }
-  return stock;
-}
-
 // LE NOM D'UNE ARME DU SAC : ce que `vfs` sait composer, depuis ce que `sim`
 // porte. ⚠ LE FORGERON N'EST PAS SUR LE FIL : `CreatorNames` le pose ensuite.
 [[nodiscard]] ro::vfs::ItemNameFacts FactsOf(const ro::sim::InventoryItem& item) {
@@ -274,7 +264,7 @@ void WeaponRefineFlow::TakeRefusal(const WeaponRefineSettings& settings, bool wi
 const char* WeaponRefineFlow::AutoStopCause(const ro::sim::World& world) const {
   const ro::sim::Inventory& bag = world.inventory();
   const bool no_ore =
-      std::ranges::all_of(kOres, [&](std::uint32_t ore) { return Stock(bag, ore) <= 0; });
+      std::ranges::all_of(kOres, [&](std::uint32_t ore) { return bag.AmountOf(ore) <= 0; });
   if (no_ore) {
     return Tr("Plus aucun minerai : chaîne arrêtée.");
   }
@@ -679,7 +669,7 @@ void WeaponRefineFlow::Compose(const ro::sim::World& world,
     view_.ores[rank] = ro::ui::RefineOreView{.item_id = kOres[rank],
                                              .name = ore_names_[rank],
                                              .icon = IconOf(kOres[rank]),
-                                             .owned = Stock(world.inventory(), kOres[rank])};
+                                             .owned = world.inventory().AmountOf(kOres[rank])};
   }
   view_.cap = cap;
 
