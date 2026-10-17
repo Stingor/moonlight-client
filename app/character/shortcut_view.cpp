@@ -283,6 +283,10 @@ void ShortcutBarView::Cast(std::size_t slot, SkillBookPanel& book, ro::net::Conn
     return;
   }
   if (guild != nullptr) {
+    // Le serveur la jette comme toute autre sous un état qui interdit.
+    if (book.RefuseIfBlocked(world, what.skill_id, now_ms)) {
+      return;
+    }
     const int level = what.level > 0 && what.level <= guild->level ? what.level : guild->level;
     if (auto sent = ro::net::RequestSkillOnTarget(
             link, what.skill_id, static_cast<std::uint16_t>(level), world.player_id());
@@ -290,6 +294,7 @@ void ShortcutBarView::Cast(std::size_t slot, SkillBookPanel& book, ro::net::Conn
       ro::core::LogWarning("barre : demande non émise — {}", ro::core::Describe(sent.error()));
     } else {
       ++guild_casts_;
+      book.NoteSent();
     }
     return;
   }

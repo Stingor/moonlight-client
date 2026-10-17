@@ -80,7 +80,32 @@ inline constexpr std::uint16_t kGraffitiSkill = 220;
 // Une compétence PASSIVE, qui ne se lance pas du tout.
 [[nodiscard]] bool SkillIsPassive(const KnownSkill& skill);
 
-// UN LANCER QUE LE SERVEUR A REFUSÉ, tel que son paquet le dit.
+// UN REFUS QUE LE SERVEUR N'ÉCRIT PAS, mais que le client SAIT.
+//
+// 🔴 LE SERVEUR REFUSE CERTAINS LANCERS SANS AUCUN PAQUET : assis, sous
+// Silence, sous Berserk… Le lancer ne part pas, et rien ne dit pourquoi. Le
+// client, lui, voit ces états sur son propre personnage : il ne demande alors
+// rien, et il dit la cause. Voir `ro/sim/skill_use_block.h`.
+//
+// L'INTERRUPTION, elle, a son paquet (`ZC_DISPEL`), mais pas de motif.
+enum class LocalRefusal : std::uint8_t {
+  // Le refus vient du serveur : `cause` est son motif.
+  kNone,
+  // L'incantation du joueur a été coupée avant son terme.
+  kInterrupted,
+  // Le personnage est assis.
+  kSitting,
+  // Un état l'interdit : `blocking_status` le nomme (un EFST).
+  kStatus,
+  // Les bonnes manières sont négatives : le serveur coupe les skills avec la
+  // parole.
+  kMuted,
+  // Chase Walk tient le personnage, et il n'autorise que lui-même.
+  kChaseWalk,
+};
+
+// UN LANCER QUE LE SERVEUR A REFUSÉ, tel que son paquet le dit — ou que le
+// client a retenu lui-même, quand `local` le dit.
 //
 // 🔴 LE MOTIF NE SUFFIT PAS TOUJOURS : pour un objet manquant, le paquet porte
 // AUSSI l'objet et la quantité — un Medicine Bowl pour Prepare Potion. Les
@@ -95,6 +120,10 @@ struct SkillRefusal {
   // L'objet que le motif nomme, ou zéro.
   std::uint32_t item_id = 0;
   std::uint32_t refused_ms = 0;  // l'horloge de l'appelant
+  // D'où vient le refus. `cause` n'a de sens que pour `LocalRefusal::kNone`.
+  LocalRefusal local = LocalRefusal::kNone;
+  // L'état qui interdit le lancer, pour `LocalRefusal::kStatus`.
+  std::uint16_t blocking_status = 0;
 };
 
 // COMBIEN DE REFUS ON GARDE : ils s'écrivent dans la conversation à chaque

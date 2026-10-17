@@ -23,6 +23,8 @@ enum class RefusalHole : std::uint8_t {
   kSkillOfCount,
   // `%d` : le motif lui-même, pour celui que la table ignore.
   kCause,
+  // `%s` : l'état qui interdit le lancer — voir `BlockingStatusName`.
+  kBlockingStatus,
 };
 
 // LA PHRASE D'UN REFUS, avant traduction : `french` est la clé du catalogue,
@@ -36,6 +38,9 @@ struct RefusalPhrase {
 
 // La phrase que le client écrit pour ce refus — choisie par le motif, et pour
 // quelques motifs par la compétence ou le nombre que le paquet porte aussi.
+//
+// 🔴 UN REFUS RETENU PAR LE CLIENT (`SkillRefusal::local`) se dit par sa
+// raison, jamais par son motif, qui n'en est pas un.
 //
 // ⚠ CERTAINS MOTIFS SE TAISENT, comme chez le client : ceux que le serveur ne
 // dit plus, et celui qui accompagne un message que le serveur a déjà envoyé
@@ -56,6 +61,10 @@ struct RefusalPhrase {
 // réutilisation. Les autres motifs disent ce qui manque, et le jeu les écrit
 // toujours.
 [[nodiscard]] bool RefusalFollowsSkillFailSwitch(const ro::sim::SkillRefusal& refusal);
+
+// LE NOM DE L'ÉTAT QUI INTERDIT un refus que le client a retenu lui-même, en
+// jargon du jeu, donc sans traduction — ou nul quand le refus n'en nomme pas.
+[[nodiscard]] const char* BlockingStatusName(const ro::sim::SkillRefusal& refusal);
 
 // La ligne entière, « compétence : phrase », avant traduction : la ponctuation
 // change d'une langue à l'autre.

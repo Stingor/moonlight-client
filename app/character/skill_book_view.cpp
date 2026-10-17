@@ -177,6 +177,15 @@ void SkillBookPanel::ChooseSkill(ro::net::Connection& link, ro::sim::World& worl
     Disarm();
     return;
   }
+  if (chosen.id != lent_skill_id_) {
+    lent_skill_id_ = 0;
+  }
+  // ⚠ AVANT D'ARMER : viser une cible pour un lancer qui ne partira pas ferait
+  // marcher le personnage pour rien.
+  if (RefuseIfBlocked(world, chosen.id, now_ms)) {
+    Disarm();
+    return;
+  }
   if (ro::sim::SkillCastsOnSelf(chosen)) {
     // Rien à désigner : elle part tout de suite. La cible écrite est la nôtre,
     // et le serveur la remplacerait de toute façon par elle.
@@ -203,6 +212,7 @@ void SkillBookPanel::ChooseSkill(ro::net::Connection& link, ro::sim::World& worl
         ro::net::RequestSkillOnTarget(link, chosen.id, chosen.level, world.player_id());
     if (sent) {
       ++entity_casts_;
+      NoteSent();
     }
     Sent(world, sent, ShownName(chosen), now_ms);
     return;
@@ -260,6 +270,7 @@ void SkillBookPanel::AdvancePending(ro::net::Connection& link, ro::sim::World& w
   // `ro::sim::SkillBook::OfferItemSkill`.
   if (std::optional<KnownSkill> offered = world.skill_book().TakeOfferedSkill()) {
     Disarm();
+    lent_skill_id_ = offered->id;
     ChooseSkill(link, world, *offered, now_ms);
   }
   // Sans grille de franchissement — le temps qu'une carte se charge — la case
@@ -280,9 +291,17 @@ void SkillBookPanel::AdvancePending(ro::net::Connection& link, ro::sim::World& w
       const std::uint32_t target_id = pending_->target_id;
       const std::optional<ro::sim::CellPosition> cell = pending_->ground_cell;
       CancelPending();
+      // L'état a pu changer pendant l'approche : il se relit au départ.
+      if (RefuseIfBlocked(world, chosen.id, now_ms)) {
+        return;
+      }
       if (cell.has_value()) {
-        Sent(world, ro::net::RequestSkillOnGround(link, chosen.id, chosen.level, *cell),
-             ShownName(chosen), now_ms);
+        const ro::core::Result<void> sent =
+            ro::net::RequestSkillOnGround(link, chosen.id, chosen.level, *cell);
+        if (sent) {
+          NoteSent();
+        }
+        Sent(world, sent, ShownName(chosen), now_ms);
         return;
       }
       const ro::core::Result<void> sent =
@@ -290,6 +309,7 @@ void SkillBookPanel::AdvancePending(ro::net::Connection& link, ro::sim::World& w
       if (sent) {
         launched_target_ = target_id;
         ++entity_casts_;
+        NoteSent();
       }
       Sent(world, sent, ShownName(chosen), now_ms);
       return;

@@ -17,6 +17,7 @@
 #include "ro/sim/pending_action.h"
 #include "ro/sim/skill_book.h"
 #include "ro/sim/skill_tree.h"
+#include "ro/sim/skill_use_block.h"
 #include "ro/sim/walk_map.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
@@ -98,6 +99,21 @@ class SkillBookPanel {
   // sur une ligne du panneau.
   void ChooseSkill(ro::net::Connection& link, ro::sim::World& world,
                    const ro::sim::KnownSkill& chosen, std::uint32_t now_ms);
+
+  // VRAI QUAND UN ÉTAT DU PERSONNAGE INTERDIT CE LANCER, que le serveur jetterait
+  // sans un mot : rien ne doit partir, et la conversation dit pourquoi — voir
+  // `ro::sim::SkillBlockGate`.
+  [[nodiscard]] bool RefuseIfBlocked(ro::sim::World& world, std::uint16_t skill_id,
+                                     std::uint32_t now_ms) {
+    return block_gate_.Refuse(world, skill_id, skill_id == lent_skill_id_, now_ms);
+  }
+
+  // Un lancer est parti : le prochain blocage se dira de nouveau, et le skill
+  // qu'un objet prêtait ne l'est plus — le serveur l'oublie au lancer suivant.
+  void NoteSent() noexcept {
+    block_gate_.NoteSent();
+    lent_skill_id_ = 0;
+  }
 
   // Un clic dans la fenêtre. Vrai si le panneau l'a PRIS : le monde derrière
   // lui ne doit alors rien en faire.
@@ -247,6 +263,10 @@ class SkillBookPanel {
   // vers la cible, et le tableau se réarrange alors sous un pointeur.
   std::optional<ro::sim::PendingAction> pending_;
   std::optional<ro::sim::KnownSkill> pending_skill_;
+  // LE SKILL QU'UN OBJET PRÊTE, tant qu'il n'est pas parti : le serveur lui
+  // passe certains états qui interdisent les autres. Zéro sinon.
+  std::uint16_t lent_skill_id_ = 0;
+  ro::sim::SkillBlockGate block_gate_;
   std::uint32_t launched_target_ = 0;
   std::uint32_t entity_casts_ = 0;
   bool cart_choice_asked_ = false;

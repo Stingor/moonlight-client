@@ -70,6 +70,14 @@ bool World::CancelCast(std::uint32_t id, std::uint32_t now_ms) {
   if (played_ms < cast.duration_ms) {
     cast.duration_ms = std::max<std::uint32_t>(played_ms, 1);
     cast.cancelled = true;
+    // 🔴 LE JOUEUR DONT L'INCANTATION TOMBE NE LIT RIEN D'AUTRE : le paquet
+    // n'a pas de motif, et aucun refus ne suit. Le grimoire le note comme un
+    // refus, pour que la conversation le dise. Auto Counter, lui, coupe sa
+    // jauge en se déclenchant : c'est sa réussite.
+    if (id == player_id_ && cast.skill_id != kAutoCounterSkill) {
+      skill_book().RecordRefusal(SkillRefusal{
+          .skill_id = cast.skill_id, .refused_ms = now_ms, .local = LocalRefusal::kInterrupted});
+    }
   }
   return true;
 }

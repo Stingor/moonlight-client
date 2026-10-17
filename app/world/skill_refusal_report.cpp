@@ -79,7 +79,9 @@ std::string ServerMessageText(std::uint32_t message_id) {
 std::string TwilightShortfallLine(const ro::sim::SkillRefusal& refusal, const ro::sim::World& world,
                                   const ro::sim::SkillTree* skills,
                                   const ro::vfs::ItemTable* items) {
-  if (refusal.item_id != 0 || !IsTwilightAlchemy(refusal.skill_id)) {
+  // Un refus que le client a retenu lui-même dit déjà sa cause.
+  if (refusal.local != ro::sim::LocalRefusal::kNone || refusal.item_id != 0 ||
+      !IsTwilightAlchemy(refusal.skill_id)) {
     return {};
   }
   const std::vector<TwilightNeed> missing = TwilightShortfall(refusal.skill_id, world.inventory());
@@ -148,6 +150,11 @@ std::string SkillRefusalLine(const ro::sim::SkillRefusal& refusal, const ro::sim
       break;
     case RefusalHole::kCause:
       Fill(said, kNumberHole, std::to_string(refusal.cause));
+      break;
+    case RefusalHole::kBlockingStatus:
+      if (const char* status = BlockingStatusName(refusal); status != nullptr) {
+        Fill(said, kTextHole, status);
+      }
       break;
   }
   if (phrase.then_french != nullptr) {

@@ -19137,3 +19137,18 @@ tr: Suelo redondeado
 
 fr: Les dunes, les collines et les talus s'arrondissent au lieu de se plier en arêtes droites : chaque carreau du sol se découpe en seize, posés sur une surface lisse. Les falaises restent nettes, et les personnages suivent le sol dessiné.\n\nLe client d'origine dessine le sol en facettes, et la carte graphique travaille un peu plus.
 tr: Las dunas, las colinas y los taludes se redondean en lugar de plegarse en aristas rectas: cada baldosa del suelo se divide en dieciséis, colocadas sobre una superficie lisa. Los acantilados siguen nítidos, y los personajes siguen el suelo dibujado.\n\nEl cliente original dibuja el suelo en facetas, y la tarjeta gráfica trabaja un poco más.
+
+fr: Impossible d'utiliser un skill sous %s.
+tr: No puedes usar un skill bajo %s.
+
+fr: Incantation interrompue.
+tr: Lanzamiento interrumpido.
+
+fr: Impossible d'utiliser un skill en étant assis.
+tr: No puedes usar un skill estando sentado.
+
+fr: Impossible d'utiliser un skill : vos bonnes manières sont négatives.
+tr: No puedes usar un skill: tus puntos de modales son negativos.
+
+fr: Impossible d'utiliser un skill sur cette monture.
+tr: No puedes usar un skill sobre esta montura.

@@ -10,6 +10,9 @@
 #include <cstdint>
 
 #include "ro/core/i18n.h"
+#include "ro/sim/actor.h"
+#include "ro/sim/skill_use_block.h"
+#include "ro/sim/status_effects.h"
 
 namespace moonclient {
 namespace {
@@ -202,6 +205,8 @@ constexpr std::uint8_t kWeaponClassCause = 78;
 constexpr std::uint8_t kCurrencyCause = 85;
 // Celui dont le paquet porte, à la place du nombre, le numéro d'un message.
 constexpr std::uint8_t kMessageByNumberCause = 86;
+// « Ce skill ne peut pas être utilisé dans cet état. »
+constexpr std::uint8_t kStateCause = 23;
 
 // Les compétences que le motif zéro nomme à part.
 constexpr std::uint16_t kBasicSkill = 1;
@@ -243,6 +248,52 @@ constexpr std::array kWeaponClassPhrases = {
     WeaponClassPhrase{22, TrText("[Shuriken] doit être équipé.")},
 };
 
+// LES ÉTATS QUI INTERDISENT DE LANCER, sous le nom que le jeu leur donne.
+struct BlockingStatus {
+  ro::sim::StatusEffectId status = 0;
+  const char* name = nullptr;
+};
+constexpr std::array kBlockingStatuses = {
+    BlockingStatus{ro::sim::kEfstStoneCurse, "Stone Curse"},
+    BlockingStatus{ro::sim::kEfstFreezing, "Frozen"},
+    BlockingStatus{ro::sim::kEfstStun, "Stun"},
+    BlockingStatus{ro::sim::kEfstSleep, "Sleep"},
+    BlockingStatus{ro::sim::kEfstImprison, "White Imprison"},
+    BlockingStatus{ro::sim::kEfstSilence, "Silence"},
+    BlockingStatus{ro::sim::kEfstBerserk, "Berserk"},
+    BlockingStatus{ro::sim::kEfstSteelBody, "Steel Body"},
+    BlockingStatus{ro::sim::kEfstDeepSleep, "Deep Sleep"},
+    BlockingStatus{ro::sim::kEfstSaturdayNightFever, "Saturday Night Fever"},
+    BlockingStatus{ro::sim::kEfstTrickDead, "Play Dead"},
+};
+constexpr const char* kChaseWalkName = "Chase Walk";
+
+// La phrase d'un refus que le client a retenu lui-même.
+RefusalPhrase LocalPhrase(const ro::sim::SkillRefusal& refusal) {
+  constexpr RefusalPhrase kUnderStatus{.french = TrText("Impossible d'utiliser un skill sous %s."),
+                                       .hole = RefusalHole::kBlockingStatus};
+  switch (refusal.local) {
+    case ro::sim::LocalRefusal::kNone:
+      break;
+    case ro::sim::LocalRefusal::kInterrupted:
+      return RefusalPhrase{.french = TrText("Incantation interrompue.")};
+    case ro::sim::LocalRefusal::kSitting:
+      return RefusalPhrase{.french = TrText("Impossible d'utiliser un skill en étant assis.")};
+    case ro::sim::LocalRefusal::kMuted:
+      return RefusalPhrase{
+          .french = TrText("Impossible d'utiliser un skill : vos bonnes manières sont négatives.")};
+    case ro::sim::LocalRefusal::kChaseWalk:
+      return kUnderStatus;
+    case ro::sim::LocalRefusal::kStatus:
+      if (refusal.blocking_status == ro::sim::kStatusAllRiding) {
+        return RefusalPhrase{.french = TrText("Impossible d'utiliser un skill sur cette monture.")};
+      }
+      // Un état que la table ne nomme pas dit encore que c'est un état.
+      return BlockingStatusName(refusal) != nullptr ? kUnderStatus : kRefusalPhrases[kStateCause];
+  }
+  return {};
+}
+
 RefusalPhrase LevelPhrase(const ro::sim::SkillRefusal& refusal) {
   switch (refusal.skill_id) {
     case kBasicSkill: {
@@ -269,6 +320,9 @@ RefusalPhrase LevelPhrase(const ro::sim::SkillRefusal& refusal) {
 }  // namespace
 
 RefusalPhrase RefusalPhraseOf(const ro::sim::SkillRefusal& refusal) {
+  if (refusal.local != ro::sim::LocalRefusal::kNone) {
+    return LocalPhrase(refusal);
+  }
   switch (refusal.cause) {
     case kLevelCause:
       return LevelPhrase(refusal);
@@ -303,7 +357,28 @@ RefusalPhrase RefusalPhraseOf(const ro::sim::SkillRefusal& refusal) {
 
 const char* RefusalLineFrench() { return TrText("%s : %s"); }
 
+const char* BlockingStatusName(const ro::sim::SkillRefusal& refusal) {
+  switch (refusal.local) {
+    case ro::sim::LocalRefusal::kChaseWalk:
+      return kChaseWalkName;
+    case ro::sim::LocalRefusal::kStatus:
+      for (const BlockingStatus& blocking : kBlockingStatuses) {
+        if (blocking.status == refusal.blocking_status) {
+          return blocking.name;
+        }
+      }
+      return nullptr;
+    default:
+      return nullptr;
+  }
+}
+
 bool RefusalFollowsSkillFailSwitch(const ro::sim::SkillRefusal& refusal) {
+  // ⚠ L'INTERRUPTION NE DIT PAS POURQUOI, comme l'échec sans motif : elle se
+  // tait avec lui. Les autres refus du client disent ce qui manque.
+  if (refusal.local != ro::sim::LocalRefusal::kNone) {
+    return refusal.local == ro::sim::LocalRefusal::kInterrupted;
+  }
   switch (refusal.cause) {
     case kLevelCause:
       // Seule la phrase générale : Basic Skill, Warp Portal, Steal et Envenom

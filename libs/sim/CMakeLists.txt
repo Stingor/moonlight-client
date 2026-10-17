@@ -87,6 +87,7 @@ add_library(ro_sim STATIC
     src/party_booking.cpp
     src/skill_book.cpp
     src/skill_tree.cpp
+    src/skill_use_block.cpp
     src/status_effects.cpp
     src/strike_log.cpp
     src/skill_facts.cpp
