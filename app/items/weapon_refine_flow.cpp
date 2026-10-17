@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 #include "ro/net/craft_session.h"
 #include "ro/net/skill.h"
@@ -72,15 +73,9 @@ constexpr std::size_t kLineBytes = 320;
 [[nodiscard]] std::string ClockNow() {
   const std::time_t stamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &stamp) != 0) {
+  if (!ro::core::ToLocalTime(stamp, local)) {
     return {};
   }
-#else
-  if (localtime_r(&stamp, &local) == nullptr) {
-    return {};
-  }
-#endif
   std::array<char, kTimeBytes> text{};
   std::strftime(text.data(), text.size(), "%H:%M:%S", &local);
   return text.data();

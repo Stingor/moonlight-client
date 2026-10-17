@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/core/text.h"
 #include "ro/net/mvp_tracker.h"
 
@@ -228,15 +229,9 @@ std::string MvpClockText(std::int64_t unix_s) {
   }
   const auto seconds = static_cast<std::time_t>(unix_s);
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &seconds) != 0) {
+  if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-#else
-  if (localtime_r(&seconds, &local) == nullptr) {
-    return {};
-  }
-#endif
   std::array<char, kClockBytes> text{};
   std::snprintf(text.data(), text.size(), "%02d:%02d", local.tm_hour, local.tm_min);
   return text.data();

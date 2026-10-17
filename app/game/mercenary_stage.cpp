@@ -9,6 +9,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 #include "ro/net/mercenary_frames.h"
 #include "ro/net/skill.h"
@@ -38,15 +39,9 @@ std::string ExpiryDateText(std::uint32_t unix_s) {
   }
   const auto seconds = static_cast<std::time_t>(unix_s);
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &seconds) != 0) {
+  if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-#else
-  if (localtime_r(&seconds, &local) == nullptr) {
-    return {};
-  }
-#endif
   std::array<char, kExpiryDateBytes> text{};
   if (std::strftime(text.data(), text.size(), kExpiryDateFormat, &local) == 0) {
     return {};

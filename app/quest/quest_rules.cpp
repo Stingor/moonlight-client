@@ -12,6 +12,7 @@
 
 #include "ro/core/decimal_text.h"
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/monster_words.h"
 
@@ -313,15 +314,9 @@ std::string QuestDateText(std::int64_t unix_s) {
   }
   const auto seconds = static_cast<std::time_t>(unix_s);
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &seconds) != 0) {
+  if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-#else
-  if (localtime_r(&seconds, &local) == nullptr) {
-    return {};
-  }
-#endif
   std::array<char, kDateBytes> text{};
   std::snprintf(text.data(), text.size(), "%04d/%02d/%02d %02d:%02d", local.tm_year + kFirstYear,
                 local.tm_mon + kFirstMonth, local.tm_mday, local.tm_hour, local.tm_min);

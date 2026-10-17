@@ -14,6 +14,7 @@
 #include <SDL3/SDL.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/net/player_settings.h"
 #include "ro/sim/pvp_rank.h"
 
@@ -29,15 +30,9 @@ constexpr std::uint32_t kMinutesPerHour = 60;
 [[nodiscard]] std::string LocalHourAndMinute() {
   const std::time_t now = std::time(nullptr);
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &now) != 0) {
+  if (!ro::core::ToLocalTime(now, local)) {
     return {};
   }
-#else
-  if (localtime_r(&now, &local) == nullptr) {
-    return {};
-  }
-#endif
   std::array<char, 16> written{};
   // ⚠ `strftime` REND ZÉRO QUAND ÇA NE TIENT PAS, et laisse alors le tampon
   // dans un état qu'on ne doit pas lire.

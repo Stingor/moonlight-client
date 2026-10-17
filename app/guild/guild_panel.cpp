@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 #include "ro/net/chat_target.h"
 #include "ro/net/guild.h"
@@ -75,15 +76,9 @@ void Complain(const ro::core::Result<void>& sent, std::string_view what) {
   }
   const auto moment = static_cast<std::time_t>(stamp);
   std::tm local = {};
-#ifdef _WIN32
-  if (localtime_s(&local, &moment) != 0) {
+  if (!ro::core::ToLocalTime(moment, local)) {
     return {};
   }
-#else
-  if (localtime_r(&moment, &local) == nullptr) {
-    return {};
-  }
-#endif
   // ⚠ L'ANNÉE SUR DEUX CHIFFRES S'ÉCRIT À LA MAIN : `%y` de `strftime` fait
   // refuser la bâtisse par g++ (-Wformat-y2k), qui y voit un piège de l'an 2000.
   constexpr int kCentury = 100;

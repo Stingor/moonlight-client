@@ -4,6 +4,7 @@
 #include <ctime>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 
 namespace moonclient {
 namespace {
@@ -136,15 +137,9 @@ const char* VendingBasketFaultText(ro::sim::VendingBasketFault fault) {
 std::string VendingSoldAtText(std::uint32_t sold_at_unix_s) {
   const auto stamp = static_cast<std::time_t>(sold_at_unix_s);
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &stamp) != 0) {
+  if (!ro::core::ToLocalTime(stamp, local)) {
     return "-";
   }
-#else
-  if (localtime_r(&stamp, &local) == nullptr) {
-    return "-";
-  }
-#endif
   std::array<char, 32> text{};
   if (std::strftime(text.data(), text.size(), "%d/%m %H:%M:%S", &local) == 0) {
     return "-";

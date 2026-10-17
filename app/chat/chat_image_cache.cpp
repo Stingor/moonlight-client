@@ -15,6 +15,7 @@
 
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
+#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 #include "ro/formats/web_picture.h"
 
@@ -120,11 +121,7 @@ struct Prepared {
 [[nodiscard]] std::string SavedStamp() {
   const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   std::tm local = {};
-#ifdef _WIN32
-  const bool readable = localtime_s(&local, &now) == 0;
-#else
-  const bool readable = localtime_r(&now, &local) != nullptr;
-#endif
+  const bool readable = ro::core::ToLocalTime(now, local);
   std::array<char, kSavedStampCapacity> stamp = {};
   if (!readable || std::strftime(stamp.data(), stamp.size(), kSavedStampFormat, &local) == 0) {
     return std::to_string(static_cast<long long>(now));

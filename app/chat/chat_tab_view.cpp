@@ -17,6 +17,7 @@
 
 #include "ro/core/decimal_text.h"
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 
 #include "chat/chat_line_color.h"
@@ -120,11 +121,7 @@ constexpr std::uint32_t kMsPerSecond = 1000;
 // illisible — une date absente vaut mieux qu'une date inventée.
 [[nodiscard]] bool LocalNow(std::tm* into) {
   const std::time_t stamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-#ifdef _WIN32
-  return localtime_s(into, &stamp) == 0;
-#else
-  return localtime_r(&stamp, into) != nullptr;
-#endif
+  return ro::core::ToLocalTime(stamp, *into);
 }
 
 // La date et l'heure, telles que le fichier les écrit et que le repère les

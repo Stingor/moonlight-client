@@ -7,6 +7,7 @@
 #include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 
 namespace moonclient {
 namespace {
@@ -93,15 +94,9 @@ std::string ClockText(const std::tm& local) {
 std::string LocalClockText(std::uint32_t unix_s) {
   const auto seconds = static_cast<std::time_t>(unix_s);
   std::tm local{};
-#ifdef _WIN32
-  if (localtime_s(&local, &seconds) != 0) {
+  if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-#else
-  if (localtime_r(&seconds, &local) == nullptr) {
-    return {};
-  }
-#endif
   return ClockText(local);
 }
 

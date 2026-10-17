@@ -15,6 +15,7 @@
 
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
+#include "ro/core/local_time.h"
 #include "ro/core/text.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -78,16 +79,6 @@ constexpr unsigned kUtf8ContinuationBits = 0x80U;
 
 [[nodiscard]] bool IsUtf8Continuation(char byte) {
   return (static_cast<unsigned char>(byte) & kUtf8ContinuationMask) == kUtf8ContinuationBits;
-}
-
-// L'heure LOCALE d'un instant. Faux quand la bibliothèque ne sait pas la
-// donner.
-[[nodiscard]] bool LocalTimeOf(std::time_t instant, std::tm* into) {
-#if defined(_WIN32)
-  return localtime_s(into, &instant) == 0;
-#else
-  return localtime_r(&instant, into) != nullptr;
-#endif
 }
 
 // La comparaison à trois voies de deux textes, octet par octet, comme `strcmp`.
@@ -176,7 +167,7 @@ std::int64_t ParseMvpKillTime(std::string_view text, std::int64_t server_now_s) 
     return 0;
   }
   std::tm local{};
-  if (!LocalTimeOf(static_cast<std::time_t>(server_now_s), &local)) {
+  if (!core::ToLocalTime(static_cast<std::time_t>(server_now_s), local)) {
     return 0;
   }
   local.tm_hour = hour;
@@ -437,8 +428,8 @@ std::string MvpKillTimeEcho(std::int64_t kill_time_s, std::int64_t server_now_s)
   // compris évite d'envoyer au groupe une mort décalée d'un jour.
   std::tm kill{};
   std::tm now{};
-  if (!LocalTimeOf(static_cast<std::time_t>(kill_time_s), &kill) ||
-      !LocalTimeOf(static_cast<std::time_t>(server_now_s), &now)) {
+  if (!core::ToLocalTime(static_cast<std::time_t>(kill_time_s), kill) ||
+      !core::ToLocalTime(static_cast<std::time_t>(server_now_s), now)) {
     return {};
   }
   const std::string clock = std::format("{:02}:{:02}", kill.tm_hour, kill.tm_min);
