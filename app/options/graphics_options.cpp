@@ -29,6 +29,7 @@ constexpr const char* kFixedSkyHourKey = "cycle_day_night_hour";
 
 constexpr float kHoursPerDay = 24.0F;
 constexpr const char* kFogKey = "fog";
+constexpr const char* kScreenQuakeKey = "screen_quake";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
 constexpr const char* kSummonTranslucentKey = "summons_translucent";
 constexpr const char* kCorpseFadeKey = "corpses_duration";
@@ -57,46 +58,6 @@ constexpr const char* kSharpenKey = "post_fx_sharpness";
 constexpr const char* kFxaaKey = "post_fx_fxaa";
 constexpr const char* kFxaaStrengthKey = "post_fx_fxaa_forced";
 
-// Le rang de chaque ligne dans la plage de la page. ⚠ RIEN N'EN EST ÉCRIT : ce
-// sont les CLÉS qui vont au fichier, et ces rangs peuvent se réordonner.
-enum class GraphicsRow : int {
-  kLightmaps = 0,
-  kColdLight,
-  kSunShadows,
-  kEffectLights,
-  kRoundedGround,
-  kDayNightCycle,
-  kFixedSky,
-  kFixedSkyHour,
-  kFog,
-  kDecorVeil,
-  kSummonTranslucent,
-  kCorpseFade,
-  kAppearFade,
-  kLeaveFade,
-  kSkillGestureFloor,
-  kCastSpansBar,
-  kMsaa,
-  kRenderScale,
-  kDecorFilter,
-  kPostFx,
-  kPreset,
-  kBrightness,
-  kContrast,
-  kGamma,
-  kSaturation,
-  kTemperature,
-  kFilter,
-  kVignette,
-  kGrain,
-  kAberration,
-  kSharpen,
-  kFxaa,
-  kFxaaStrength,
-  kReset,
-  kCount,
-};
-
 // Le premier rang de la liste des préréglages dit qu'aucun ne correspond.
 constexpr int kCustomPresetRank = 0;
 
@@ -106,7 +67,7 @@ constexpr int kPercent = 100;
 // se lit mieux que « 6120 ms ».
 constexpr float kMillisecondsPerSecond = 1000.0F;
 
-int IdOf(GraphicsRow row) { return kGraphicsRowBase + static_cast<int>(row); }
+int IdOf(GraphicsRow row) { return GraphicsRowId(row); }
 
 OptionRowView Toggle(GraphicsRow row, const char* label, const char* help, const char* command,
                      bool on) {
@@ -215,6 +176,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kFixedSkyKey, &fixed_sky_);
   into.Declare(kFixedSkyHourKey, &fixed_sky_hour_);
   into.Declare(kFogKey, &fog_);
+  into.Declare(kScreenQuakeKey, &screen_quake_);
   into.Declare(kDecorVeilKey, &decor_veil_);
   into.Declare(kSummonTranslucentKey, &summon_translucent_);
   into.Declare(kCorpseFadeKey, &corpse_fade_ms_);
@@ -318,6 +280,10 @@ void GraphicsOptions::Compose() {
                             "te laisser voir, puis revient.\n\nLe client d'origine ne le "
                             "fait qu'avec un correctif de son exécutable."),
                          nullptr, decor_veil_));
+  rows_.push_back(Toggle(GraphicsRow::kScreenQuake, Tr("Tremblements d'écran"),
+                         Tr("Certains sorts, coups et évènements de carte font trembler la "
+                            "caméra un instant. Décoche pour qu'elle reste immobile."),
+                         "/quake", screen_quake_));
   rows_.push_back(Toggle(GraphicsRow::kSummonTranslucent, Tr("Invocations translucides"),
                          Tr("Le faucon qui accompagne un chasseur se peint presque transparent : "
                             "il ne cache plus ce qui se passe derrière lui."),
@@ -517,6 +483,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kDecorVeil:
       decor_veil_ = asked.on;
+      break;
+    case GraphicsRow::kScreenQuake:
+      screen_quake_ = asked.on;
       break;
     case GraphicsRow::kSummonTranslucent:
       summon_translucent_ = asked.on;

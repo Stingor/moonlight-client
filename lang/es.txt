@@ -19152,3 +19152,42 @@ tr: No puedes usar un skill: tus puntos de modales son negativos.
 
 fr: Impossible d'utiliser un skill sur cette monture.
 tr: No puedes usar un skill sobre esta montura.
+
+fr: La barre de vie d'un monstre attaqué s'affiche.
+tr: Se muestra la barra de HP del monstruo atacado.
+
+fr: La barre de vie d'un monstre attaqué ne s'affiche plus.
+tr: Ya no se muestra la barra de HP del monstruo atacado.
+
+fr: Emblème de guilde affiché
+tr: Emblema de guild activado
+
+fr: Emblème de guilde masqué
+tr: Emblema de guild desactivado
+
+fr: Aimantation des fenêtres activée. [/wi ON]
+tr: Imantado de ventanas activado. [/wi ON]
+
+fr: Aimantation des fenêtres désactivée. [/wi OFF]
+tr: Imantado de ventanas desactivado. [/wi OFF]
+
+fr: Affichage de « Miss » activé
+tr: Mostrar «Miss» activado
+
+fr: Affichage de « Miss » désactivé
+tr: Mostrar «Miss» desactivado
+
+fr: Tremblements d'écran activés
+tr: Temblores de pantalla activados
+
+fr: Tremblements d'écran désactivés
+tr: Temblores de pantalla desactivados
+
+fr: Tremblements d'écran
+tr: Temblores de pantalla
+
+fr: Certains sorts, coups et évènements de carte font trembler la caméra un instant. Décoche pour qu'elle reste immobile.
+tr: Algunos hechizos, golpes y eventos de mapa hacen temblar la cámara un instante. Desmárcalo para que se quede quieta.
+
+fr: /monsterhp, /emblem, /window, /miss, /sf, /quake : basculer le réglage de la page d'options
+tr: /monsterhp, /emblem, /window, /miss, /sf, /quake: alternar el ajuste de la página de opciones

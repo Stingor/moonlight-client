@@ -350,7 +350,9 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
   }
 
-  // La caméra suit le personnage, et tremble quand un effet le demande.
+  // La caméra suit le personnage, et tremble quand un effet le demande — si
+  // `/quake` le permet.
+  aim_.shake.enabled = settings_->options().graphics().screen_quake();
   AimCamera(camera_, (*stage_), world_, planner_, now_ms, aim_);
   // L'ÉDITEUR DE CARTE peut regarder ailleurs que le personnage : voir
   // `MapEditorSession::view_point`.

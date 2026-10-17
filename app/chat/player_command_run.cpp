@@ -3,6 +3,7 @@
 // pour les autres.
 
 #include <array>
+#include <cstddef>
 #include <format>
 #include <string>
 #include <utility>
@@ -12,9 +13,11 @@
 #include "ro/net/party.h"
 #include "ro/net/user_count.h"
 #include "ro/sim/world.h"
+#include "ro/ui/entity_bars.h"
 
 #include "chat/chat_view.h"
 #include "chat/emotion_commands.h"
+#include "chat/setting_toggle_command.h"
 #include "options/deal_refusal_options.h"
 #include "options/percent.h"
 #include "world/click_action.h"
@@ -56,7 +59,7 @@ void Say(const ChatDispatch& to, std::string text, std::uint32_t said_ms, std::u
 
 // CE QUE `/help` ÉCRIT : les commandes que ce client prend en charge.
 void SayHelp(const ChatDispatch& to, std::uint32_t said_ms) {
-  const std::array<const char*, 11> lines = {
+  const std::array<const char*, 12> lines = {
       Tr("Commandes du client :"),
       Tr("/w nom message, %message (groupe), $message (guilde), /gc, /cl, /bc : parler à "
          "quelqu'un ou à un canal"),
@@ -71,6 +74,8 @@ void SayHelp(const ChatDispatch& to, std::uint32_t said_ms) {
       Tr("/who : joueurs connectés — /emotion : les émoticônes — /where : sa position"),
       Tr("/ex nom, /in nom : bloquer ou rétablir les chuchotements d'un joueur"),
       Tr("/savechat : enregistrer la conversation — /battlemode : replier la barre"),
+      Tr("/monsterhp, /emblem, /window, /miss, /sf, /quake : basculer le réglage de la page "
+         "d'options"),
   };
   for (const char* line : lines) {
     Say(to, line, said_ms, kEchoColor);
@@ -126,7 +131,39 @@ void ToggleDealRefusal(const ChatDispatch& to, std::uint32_t said_ms) {
       said_ms, kEchoColor);
 }
 
+// L'ÉTAT EN COURS de ce qu'une bascule inverse, tel que sa case le montre.
+[[nodiscard]] bool SettingToggleIsOn(const GameOptions& options, SettingToggle toggle) {
+  switch (toggle) {
+    case SettingToggle::kMonsterHp:
+      return options.entity_bars()
+          .kinds[static_cast<std::size_t>(ro::ui::EntityBarKind::kMonster)]
+          .shown;
+    case SettingToggle::kGuildEmblem:
+      return options.entity_names().guild_emblem;
+    case SettingToggle::kWindowSnap:
+      return options.align_grid().magnetic;
+    case SettingToggle::kMissShown:
+      return options.damage_look().miss;
+    case SettingToggle::kSkillFailShown:
+      return options.skill_fail_shown();
+    case SettingToggle::kScreenQuake:
+      return options.graphics().screen_quake();
+  }
+  return false;
+}
+
 }  // namespace
+
+void RunSettingToggle(const ChatDispatch& to, SettingToggle toggle, std::uint32_t said_ms) {
+  if (to.options == nullptr) {
+    return;
+  }
+  const bool on = !SettingToggleIsOn(*to.options, toggle);
+  for (const ro::ui::OptionsWindowAction& change : SettingToggleChanges(toggle, on)) {
+    to.options->Change(change, to.option_targets, said_ms);
+  }
+  Say(to, SettingToggleEcho(toggle, on), said_ms, kSettingToggleEchoColor);
+}
 
 void RunPlayerCommand(const ChatDispatch& to, PlayerCommand command, std::uint32_t said_ms) {
   if (command.malformed) {

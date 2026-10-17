@@ -32,6 +32,7 @@
 #include "chat/chat_rich_decor.h"
 #include "chat/emotion_commands.h"
 #include "chat/player_command.h"
+#include "chat/setting_toggle_command.h"
 #include "effects/effect_view.h"
 #include "game/ui_stage.h"
 #include "options/game_options.h"
@@ -306,6 +307,10 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
 // que la liaison, les options ou la conversation s'exécutent ici ; les autres
 // rejoignent `player_asks`. Une forme fausse dit la bonne.
 void RunPlayerCommand(const ChatDispatch& to, PlayerCommand command, std::uint32_t said_ms);
+
+// UNE BASCULE « / » D'UNE CASE DES OPTIONS, lue par `ReadSettingToggle` : le
+// réglage s'inverse par le chemin de la case, puis l'écho s'écrit.
+void RunSettingToggle(const ChatDispatch& to, SettingToggle toggle, std::uint32_t said_ms);
 
 // CE QUE `/savechat` ÉCRIT : les onglets, et en salon le fil du salon. Le menu
 // d'un membre n'écrit que le salon (`tabs_too` faux). Le dossier, ou l'absence

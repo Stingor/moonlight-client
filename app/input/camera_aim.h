@@ -54,6 +54,11 @@ class ScreenShake {
   // Secoue la caméra si un effet en cours le demande, et ne fait rien sinon.
   void Apply(ro::render::Camera& camera, const ro::sim::World& world, std::uint32_t now_ms);
 
+  // LES TREMBLEMENTS PERMIS, que `/quake` bascule. Faux : `Apply` ne pose
+  // RIEN sur la caméra, quoi qu'un effet ou une compétence ait demandé, et la
+  // demande en cours s'oublie au lieu de reprendre quand on les rallume.
+  bool enabled = true;
+
  private:
   glm::vec3 look_at_offset_{0.0F, 0.0F, 0.0F};
   float distance_offset_ = 0.0F;

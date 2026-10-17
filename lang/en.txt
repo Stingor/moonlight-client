@@ -19152,3 +19152,42 @@ tr: Can't use a skill: your manner points are negative.
 
 fr: Impossible d'utiliser un skill sur cette monture.
 tr: Can't use a skill on this mount.
+
+fr: La barre de vie d'un monstre attaqué s'affiche.
+tr: Show monster HP bar when attacking.
+
+fr: La barre de vie d'un monstre attaqué ne s'affiche plus.
+tr: Hide monster HP bar when attacking.
+
+fr: Emblème de guilde affiché
+tr: Guild Emblem On
+
+fr: Emblème de guilde masqué
+tr: Guild Emblem Off
+
+fr: Aimantation des fenêtres activée. [/wi ON]
+tr: Display window docking enabled. [/wi ON]
+
+fr: Aimantation des fenêtres désactivée. [/wi OFF]
+tr: Display window docking disabled. [/wi OFF]
+
+fr: Affichage de « Miss » activé
+tr: Shows ''Miss'' On
+
+fr: Affichage de « Miss » désactivé
+tr: Shows ''Miss'' Off
+
+fr: Tremblements d'écran activés
+tr: Screen shake ON
+
+fr: Tremblements d'écran désactivés
+tr: Screen shake OFF
+
+fr: Tremblements d'écran
+tr: Screen shake
+
+fr: Certains sorts, coups et évènements de carte font trembler la caméra un instant. Décoche pour qu'elle reste immobile.
+tr: Some spells, hits and map events shake the camera for a moment. Untick to keep it still.
+
+fr: /monsterhp, /emblem, /window, /miss, /sf, /quake : basculer le réglage de la page d'options
+tr: /monsterhp, /emblem, /window, /miss, /sf, /quake: toggle the option page setting

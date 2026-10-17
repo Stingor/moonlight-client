@@ -25,6 +25,53 @@ inline constexpr std::uint32_t kCorpseFadeShortenedMs = 100;
 // CELLES DU MENU DU CLIC DROIT (5200 et 5300).
 inline constexpr int kGraphicsRowBase = 5400;
 
+// Le rang de chaque ligne dans la plage de la page. ⚠ RIEN N'EN EST ÉCRIT : ce
+// sont les CLÉS qui vont au fichier, et ces rangs peuvent se réordonner.
+enum class GraphicsRow : int {
+  kLightmaps = 0,
+  kColdLight,
+  kSunShadows,
+  kEffectLights,
+  kRoundedGround,
+  kDayNightCycle,
+  kFixedSky,
+  kFixedSkyHour,
+  kFog,
+  kDecorVeil,
+  kScreenQuake,
+  kSummonTranslucent,
+  kCorpseFade,
+  kAppearFade,
+  kLeaveFade,
+  kSkillGestureFloor,
+  kCastSpansBar,
+  kMsaa,
+  kRenderScale,
+  kDecorFilter,
+  kPostFx,
+  kPreset,
+  kBrightness,
+  kContrast,
+  kGamma,
+  kSaturation,
+  kTemperature,
+  kFilter,
+  kVignette,
+  kGrain,
+  kAberration,
+  kSharpen,
+  kFxaa,
+  kFxaaStrength,
+  kReset,
+  kCount,
+};
+
+// L'identifiant que la fenêtre promène pour cette ligne : une commande qui
+// bascule un réglage de la page passe par lui, comme la case.
+[[nodiscard]] constexpr int GraphicsRowId(GraphicsRow row) {
+  return kGraphicsRowBase + static_cast<int>(row);
+}
+
 // LES ÉCHANTILLONS PAR PIXEL qu'on propose à l'anticrénelage matériel. Zéro :
 // aucun. ⚠ UNE LISTE ET NON UN CURSEUR : les cartes graphiques n'acceptent que
 // des puissances de deux.
@@ -77,6 +124,9 @@ class GraphicsOptions {
   // Le brouillard des cartes qui en déclarent un. `/fog`, allumé par défaut
   // comme chez le client.
   [[nodiscard]] bool fog() const noexcept { return fog_; }
+  // LES TREMBLEMENTS D'ÉCRAN que des sorts et des effets demandent. `/quake`,
+  // allumés par défaut comme chez le client : éteints, la caméra ne bouge plus.
+  [[nodiscard]] bool screen_quake() const noexcept { return screen_quake_; }
   // Le décor qui se tient entre la caméra et le personnage s'efface. Éteint par
   // défaut, comme le client d'origine : voir `DecorVeilView`.
   [[nodiscard]] bool decor_veil() const noexcept { return decor_veil_; }
@@ -134,6 +184,7 @@ class GraphicsOptions {
   bool fixed_sky_ = false;
   float fixed_sky_hour_ = kNoonSkyHour;
   bool fog_ = true;
+  bool screen_quake_ = true;
   bool decor_veil_ = false;
   bool summon_translucent_ = false;
   // ⚠ CENT MILLISECONDES SOUS LE CLIENT : le réglage d'usine que le joueur a

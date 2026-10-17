@@ -128,6 +128,10 @@ void ScreenShake::Undo(ro::render::Camera& camera) {
 void ScreenShake::Apply(ro::render::Camera& camera, const ro::sim::World& world,
                         std::uint32_t now_ms) {
   look_at_offset_ = glm::vec3(0.0F, 0.0F, 0.0F);
+  if (!enabled) {
+    requested_until_ms_ = 0;
+    return;
+  }
   if (!Requested(world, now_ms) && now_ms >= requested_until_ms_) {
     return;
   }

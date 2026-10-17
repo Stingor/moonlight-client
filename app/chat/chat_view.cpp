@@ -57,10 +57,6 @@ namespace {
 // ces échos, en `0xRRGGBB`.
 constexpr std::uint32_t kSettingEchoColor = 0xFFFF64;
 
-// LA BASCULE DES REFUS DE SKILL : éteinte, le jeu tait l'échec sans motif
-// précis et le délai de réutilisation — voir `SkillRefusalLine`.
-constexpr std::string_view kSkillFailCommand = "/skillfail";
-
 // LA BASCULE DU CHAT DE CHAMP DE BATAILLE : armée, tout ce qu'on tape sans sigil
 // part à l'équipe.
 constexpr std::string_view kBattleChatCommand = "/battlechat";
@@ -452,6 +448,13 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     RunPlayerCommand(to, std::move(command), said_ms);
     return;
   }
+  // LES BASCULES D'UNE CASE DES OPTIONS : voir `setting_toggle_command.h`.
+  // ⚠ LA LIGNE SE PREND MÊME SANS OPTIONS : une commande du client du joueur
+  // ne part jamais au serveur.
+  if (const std::optional<SettingToggle> toggle = ReadSettingToggle(line); toggle.has_value()) {
+    RunSettingToggle(to, *toggle, said_ms);
+    return;
+  }
   // À la casse près, comme toute la table des commandes du jeu.
   if (ro::core::AsciiEqualsFolded(line, kBattleChatCommand) && to.arming != nullptr) {
     ToggleBattleChat(to, said_ms);
@@ -515,20 +518,6 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
                           "d'un simple clic droit. [/sh ON]")
            : ro::core::Tr("Une échoppe s'ouvre par un double-clic. [/sh OFF]"),
         said_ms, kSettingEchoColor);
-    return;
-  }
-  if (line == kSkillFailCommand && to.options != nullptr) {
-    const bool shown = !to.options->skill_fail_shown();
-    to.options->Change(
-        ro::ui::OptionsWindowAction{.changed = static_cast<int>(GameOption::kSkillFailShown),
-                                    .on = shown},
-        to.option_targets, said_ms);
-    to.world->RecordChat(ro::sim::ChatKind::kServer, 0,
-                         shown ? ro::core::Tr("Les messages d'échec de skill seront affichés. "
-                                              "[Affichage ON]")
-                               : ro::core::Tr("Les messages d'échec de skill ne seront plus "
-                                              "affichés. [Affichage OFF]"),
-                         said_ms, kSettingEchoColor);
     return;
   }
   if (const std::optional<TalkFilterRow> talk = ReadTalkFilterCommand(line);

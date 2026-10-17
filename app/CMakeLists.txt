@@ -83,6 +83,7 @@ target_include_directories(moonclient_effect_nodes PUBLIC ${CMAKE_CURRENT_SOURCE
 # avec leur seul appelant : ils lisent la pose des acteurs, qui y vit encore.
 # Les ranger ici ferait une bibliothèque qui ne se lie qu'avec lui.
 add_library(moonclient_stage STATIC
+    input/camera_aim.cpp
     world/decor_veil_view.cpp
     world/night_light_view.cpp
     world/map_stage.cpp
@@ -782,6 +783,18 @@ target_link_libraries(moonclient_graphics
     PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# LES BASCULES « / » QUI COCHENT UNE CASE DES OPTIONS, en bibliothèque : le mot
+# lu, la case qu'il coche et l'écho qu'il écrit s'essaient sur un banc. Une
+# commande qui cocherait la case voisine ne se verrait qu'en jeu.
+add_library(moonclient_settingtoggles STATIC
+    chat/setting_toggle_command.cpp)
+
+target_link_libraries(moonclient_settingtoggles
+    PUBLIC ro_ui
+    PRIVATE ro_core moonclient_graphics ro_warnings)
+
+target_include_directories(moonclient_settingtoggles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LES RÈGLES DE LA CAMÉRA, en bibliothèque pour la raison habituelle : bornes,
 # pas des gestes et tables par carte se vérifient sur un banc. Une borne
@@ -1527,7 +1540,6 @@ add_executable(moonclient
     world/actor_view.cpp
     world/battle_log.cpp
     world/swing_replay.cpp
-    input/camera_aim.cpp
     input/camera_rig.cpp
     chat/chat_image_cache.cpp
     chat/chat_mentions.cpp
@@ -1786,7 +1798,7 @@ add_executable(moonclient
 
 target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
-            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
+            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
             moonclient_portraitoptions moonclient_factorylayout
