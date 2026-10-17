@@ -1721,6 +1721,7 @@ add_executable(moonclient
     options/pick_precision_options.cpp
     options/damage_meter_options.cpp
     options/shop_options.cpp
+    options/signboard_options.cpp
     options/talk_filter_options.cpp
     options/whisper_options.cpp
     options/grey_world_options.cpp

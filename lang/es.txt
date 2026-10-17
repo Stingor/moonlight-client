@@ -230,14 +230,32 @@ tr: 5 min / min
 fr: Afficher l'heure du serveur
 tr: Mostrar la hora del servidor
 
+fr: Afficher les enseignes des salons de discussion
+tr: Mostrar los letreros de las salas de chat
+
 fr: Balayage (°)
 tr: Barrido (°)
+
+fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
+tr: Se aplica a todo el letrero, marco y título. El cliente los pinta opacos; más transparentes, una calle de mercaderes tapa menos el mapa.
+
+fr: Celle du dernier résultat cliqué dans la recherche d'échoppes.
+tr: La del último resultado pulsado en la búsqueda de tiendas.
+
+fr: Celle du jeu
+tr: La del juego
+
+fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
+tr: La del juego es la fuente del cliente original. El título conserva su espacio: una fuente más ancha se corta antes con «...», y pasar el ratón por el título lo muestra entero.
 
 fr: Ciel
 tr: Cielo
 
 fr: Coucher (h)
 tr: Ocaso (h)
+
+fr: Couleur du titre
+tr: Color del título
 
 fr: Cycle jour/nuit
 tr: Ciclo día/noche
@@ -248,11 +266,26 @@ tr: Desfase de acimut (°)
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Desmarcada, es el recorrido sacado de la luz del mapa.
 
+fr: Enseignes
+tr: Letreros
+
 fr: Faire tourner le temps
 tr: Hacer correr el tiempo
 
+fr: Filet des échoppes
+tr: Contorno de las tiendas
+
+fr: Fond de l'échoppe recherchée
+tr: Fondo de la tienda buscada
+
+fr: Fond des échoppes
+tr: Fondo de las tiendas
+
 fr: Forcer l'heure du ciel
 tr: Forzar la hora del cielo
+
+fr: Gras
+tr: Negrita
 
 fr: Hauteur de midi (°)
 tr: Altura de mediodía (°)
@@ -965,8 +998,17 @@ tr: La hora que es en el servidor, la que sigue el ciclo día/noche — y no la 
 fr: Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes —, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
 tr: Sombras calculadas en cada imagen: la del sol del mapa, al aire libre, en lugar de la que el mapa tiene pintada — los árboles y los edificios también se sombrean a sí mismos —, y la de las luces que coloca el editor de mapas, farolillos y braseros, en cualquier mapa.\n\nEl cliente original no las tiene, y la tarjeta gráfica trabaja más.
 
+fr: Le cadre d'un salon est une image du jeu : la teinte la multiplie. Blanche, il reste tel quel.
+tr: El marco de una sala es una imagen del juego: el tinte la multiplica. Blanco, queda tal cual.
+
+fr: Le client écrit en douze pixels. Au-delà de seize, le bas des lettres sortirait de l'enseigne.
+tr: El cliente escribe en doce píxeles. Por encima de dieciséis, la parte baja de las letras saldría del letrero.
+
 fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
 tr: El sol, y luego la luna, siguen la hora que es en el servidor: luz de la mañana, del mediodía y de la tarde, y luego una noche más oscura y azulada. Solo al aire libre.\n\nCon «Sombras en tiempo real», las sombras giran con él. El cliente original mantiene la luz del mapa a cualquier hora.
+
+fr: Lesquelles se montrent
+tr: Cuáles se muestran
 
 fr: Lever (h)
 tr: Salida (h)
@@ -974,8 +1016,17 @@ tr: Salida (h)
 fr: Ombres en temps réel
 tr: Sombras en tiempo real
 
+fr: Opacité, couleurs et police reviennent à ceux du jeu. Ce qui se montre ne change pas.
+tr: La opacidad, los colores y la fuente vuelven a los del juego. Lo que se muestra no cambia.
+
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Coloca el sol, o la luna, a la hora elegida: la luz del suelo y del decorado la sigue, y también las sombras cuando «Sombras en tiempo real» está marcada en Graphics.
+
+fr: Police du titre
+tr: Fuente del título
+
+fr: Rendre le dessin du client
+tr: Restaurar el aspecto del cliente
 
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: No se guarda nada: cada inicio devuelve el cielo del mapa.
@@ -994,6 +1045,9 @@ tr: Servidor %.*s
 
 fr: Seul ce client voit ce ciel : rien ne part au serveur.
 tr: Solo este cliente ve este cielo: nada se envía al servidor.
+
+fr: Teinte du cadre des salons
+tr: Tinte del marco de las salas
 
 fr: Temps réel (1 min / min)
 tr: Tiempo real (1 min / min)
@@ -4292,6 +4346,9 @@ tr: este sitio
 
 fr: Étape franchie
 tr: Etapa superada
+
+fr: Éteint, les bulles des salons ouverts par les joueurs disparaissent — et ne se cliquent plus : on n'y entre alors que par l'annuaire des salons.
+tr: Desactivado, las burbujas de las salas abiertas por los jugadores desaparecen — y ya no se pueden pulsar: solo se entra entonces por el directorio de salas.
 
 fr: Étiquettes
 tr: Etiquetas

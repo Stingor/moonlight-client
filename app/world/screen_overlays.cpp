@@ -111,10 +111,17 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   // ⚠ SON CADRE SE RELÈVE EN PEIGNANT, pour le clic qui ouvre l'échoppe : une
   // enseigne qu'on ne voit pas ne se clique pas.
   pieces.trade.signboards().clear();
-  if (what.connected && !actors.drawn.empty() && font != nullptr) {
+  const ro::render::FontAtlas* board_font = EnsureSignboardFont(pieces, what.signboards);
+  if (what.connected && !actors.drawn.empty() && board_font != nullptr) {
+    // ⚠ LES COULEURS D'UNE ÉCHOPPE SONT PEINTES DANS SA SURFACE : repeintes
+    // quand le réglage change, et la texture qui y était attachée oubliée.
+    if (pieces.signboards.shop_colors != what.signboards.look.shop) {
+      ForgetShopSignboards(pieces);
+      ro::render::RecolorShopSurfaces(pieces.signboards, what.signboards.look.shop);
+    }
     const std::vector<ro::render::ScreenQuad> boards =
-        DrawnSignboards(camera, aspect_ratio, actors.drawn, actors.ids, world, party, *font,
-                        pieces.signboards, what.entity_bars, what.shop_signboards_shown,
+        DrawnSignboards(camera, aspect_ratio, actors.drawn, actors.ids, world, party, *board_font,
+                        pieces.signboards, what.entity_bars, what.signboards.look,
                         pieces.trade.store_search().spotlit_owner_aid(), viewport_width,
                         viewport_height, &pieces.banned_words, &pieces.trade.signboards());
     pieces.overlay.Draw(boards, viewport_width, viewport_height);

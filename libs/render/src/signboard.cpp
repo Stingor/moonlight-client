@@ -20,9 +20,6 @@ constexpr std::uint8_t kOpaque = 255;
 // tombé — la forme que `ApplyMagentaColorKey` donne aux pixels qu'il efface.
 constexpr std::array<std::uint8_t, kChannels> kBlankPixel = {255, 0, 255, 0};
 
-// Le titre s'écrit en noir, sans ombre.
-constexpr std::array<std::uint8_t, 4> kSignboardTitleColor = {0, 0, 0, 255};
-
 // La marge des bords haut et bas d'un cadre de salon, de chaque côté : c'est
 // elle que les coins occupent, et le compte des répétitions la retranche.
 constexpr int kChatRoomFrameMarginPixels = kChatRoomFrameStepPixels;
@@ -198,14 +195,15 @@ formats::Image ComposeChatRoomSurface(const ChatRoomFrame& frame, const formats:
 }
 
 formats::Image ComposeShopSurface(const formats::Image& icon,
-                                  const std::array<std::uint8_t, 3>& fill) {
+                                  const std::array<std::uint8_t, 3>& fill,
+                                  const std::array<std::uint8_t, 3>& edge) {
   formats::Image surface = BlankSurface();
   const int width = kSignboardWidthPixels;
   const int panel_height = kSignboardHeightPixels - kShopSignBottomRoomPixels;
   RoundedFill(surface, 0, 0, width, panel_height, fill);
   RoundedOutline(surface, kShopSignEdgeInsetPixels, kShopSignEdgeInsetPixels,
                  width - 2 * kShopSignEdgeInsetPixels, panel_height - 2 * kShopSignEdgeInsetPixels,
-                 kShopSignEdge);
+                 edge);
   Blit(surface, icon, kSignboardIconAt.x, kSignboardIconAt.y, true);
   return surface;
 }
@@ -220,16 +218,23 @@ SignboardSurfaces LoadSignboardSurfaces(vfs::Vfs& vfs) {
       .bottom = LoadPiece(vfs, kChatRoomFrameBottomPath),
       .tail = LoadPiece(vfs, kChatRoomFrameTailPath),
   };
-  const formats::Image vending_icon = LoadPiece(vfs, kVendingIconPath);
-  const formats::Image buying_icon = LoadPiece(vfs, kBuyingIconPath);
   SignboardSurfaces surfaces;
   surfaces.open_room = ComposeChatRoomSurface(frame, LoadPiece(vfs, kOpenRoomIconPath));
   surfaces.locked_room = ComposeChatRoomSurface(frame, LoadPiece(vfs, kLockedRoomIconPath));
-  surfaces.vending = ComposeShopSurface(vending_icon, kShopSignFill);
-  surfaces.buying = ComposeShopSurface(buying_icon, kShopSignFill);
-  surfaces.spotlit_vending = ComposeShopSurface(vending_icon, kSpotlitShopSignFill);
-  surfaces.spotlit_buying = ComposeShopSurface(buying_icon, kSpotlitShopSignFill);
+  surfaces.vending_icon = LoadPiece(vfs, kVendingIconPath);
+  surfaces.buying_icon = LoadPiece(vfs, kBuyingIconPath);
+  RecolorShopSurfaces(surfaces, ShopSignColors{});
   return surfaces;
+}
+
+void RecolorShopSurfaces(SignboardSurfaces& surfaces, const ShopSignColors& colors) {
+  surfaces.vending = ComposeShopSurface(surfaces.vending_icon, colors.fill, colors.edge);
+  surfaces.buying = ComposeShopSurface(surfaces.buying_icon, colors.fill, colors.edge);
+  surfaces.spotlit_vending =
+      ComposeShopSurface(surfaces.vending_icon, colors.spotlit_fill, colors.edge);
+  surfaces.spotlit_buying =
+      ComposeShopSurface(surfaces.buying_icon, colors.spotlit_fill, colors.edge);
+  surfaces.shop_colors = colors;
 }
 
 std::string FitSignboardTitle(const FontAtlas& font, std::string_view title) {
@@ -262,15 +267,18 @@ ScreenRect SignboardRect(glm::vec2 top_left) {
                                                 static_cast<float>(kSignboardHeightPixels)}};
 }
 
-ScreenRect SignboardTitleRect(glm::vec2 top_left) {
+ScreenRect SignboardTitleRect(glm::vec2 top_left, float line_height) {
   const glm::vec2 min = top_left + glm::vec2{kSignboardTitleAt};
+  const float height =
+      std::clamp(std::ceil(line_height), static_cast<float>(kSignboardTitleHeightPixels),
+                 static_cast<float>(kSignboardTitleTallestPixels));
   return ScreenRect{.min = min,
-                    .max = min + glm::vec2{static_cast<float>(kSignboardTitleWidthPixels),
-                                           static_cast<float>(kSignboardTitleHeightPixels)}};
+                    .max = min + glm::vec2{static_cast<float>(kSignboardTitleWidthPixels), height}};
 }
 
 std::vector<ScreenQuad> ComposeSignboard(const FontAtlas& font, const formats::Image& surface,
-                                         std::string_view shown_title, glm::vec2 top_left) {
+                                         std::string_view shown_title, glm::vec2 top_left,
+                                         const SignboardPaint& paint) {
   std::vector<ScreenQuad> quads;
   if (!surface.empty()) {
     // ⚠ À SA TAILLE ET SUR LA GRILLE DES PIXELS : chaque pixel de l'écran tombe
@@ -280,12 +288,13 @@ std::vector<ScreenQuad> ComposeSignboard(const FontAtlas& font, const formats::I
     panel.max =
         top_left + glm::vec2{static_cast<float>(surface.width), static_cast<float>(surface.height)};
     panel.atlas = &surface;
+    panel.tint = paint.surface_tint;
     quads.push_back(panel);
   }
-  const ScreenRect zone = SignboardTitleRect(top_left);
+  const ScreenRect zone = SignboardTitleRect(top_left, font.line_height());
   for (const ScreenQuad& glyph :
        ComposeText(font, shown_title, glm::vec2{zone.min.x, zone.min.y + font.ascent()},
-                   kSignboardTitleColor)) {
+                   paint.title_color)) {
     if (const std::optional<ScreenQuad> kept = ClipToZone(glyph, zone); kept.has_value()) {
       quads.push_back(*kept);
     }

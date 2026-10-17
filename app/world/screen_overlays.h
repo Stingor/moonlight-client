@@ -30,6 +30,7 @@
 #include "options/setting_links.h"
 #include "world/actor_view.h"
 #include "world/ground_unit_pick.h"
+#include "world/signboard_style.h"
 
 namespace moonclient {
 
@@ -95,9 +96,9 @@ struct ScreenOverlays {
   // comme les bulles.
   ro::ui::EntityBarsLook entity_bars;
   std::vector<ro::ui::EntityBarView>* entity_bars_on_screen = nullptr;
-  // `/showshop` : les enseignes des échoppes se peignent-elles ? Celles des
-  // salons, toujours. ⚠ REÇU et non gardé.
-  bool shop_signboards_shown = true;
+  // LES ENSEIGNES : lesquelles se peignent — `/showshop` pour les échoppes —,
+  // leurs couleurs et la police de leur titre. ⚠ REÇU et non gardé.
+  SignboardStyle signboards;
   // Le panneau d'options est ouvert : le mode réglage des barres peut jouer.
   bool options_open = false;
   // LES BARRES D'INCANTATION : récoltées ici, peintes par l'étage d'interface.

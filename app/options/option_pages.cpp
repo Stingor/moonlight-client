@@ -74,6 +74,12 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kDamageMeter, damage_meter);
   into.Section("Les échoppes des autres");
   DeclareOn(into, OptionSection::kGameplay, shops);
+  into.Section("Les enseignes des salons et des échoppes");
+  {
+    const SettingsFile::PageScope scope(into, SettingsPage(OptionSection::kEntityBars));
+    shops.DeclareSignboards(into);
+    signboards.Declare(into);
+  }
   into.Section("La parole tue dans la conversation");
   DeclareOn(into, OptionSection::kChat, talk_filter);
   into.Section("Les conversations 1:1");
@@ -152,7 +158,7 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
          grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
          battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
          chat_web.Change(asked) || talk_filter.Change(asked) || portrait.Change(asked) ||
-         balloons.Change(asked);
+         balloons.Change(asked) || signboards.Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {

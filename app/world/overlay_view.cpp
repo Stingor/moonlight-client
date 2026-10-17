@@ -142,6 +142,29 @@ const ro::formats::Image& SurfaceOf(const ro::sim::Signboard& board,
   return board.status == ro::sim::kRoomPrivate ? surfaces.locked_room : surfaces.open_room;
 }
 
+// Une enseigne de cette sorte se peint-elle ?
+bool SignboardShown(const ro::sim::Signboard& board, const ro::render::SignboardLook& look) {
+  return SignboardOpensStore(board.kind) ? look.shops_shown : look.chat_rooms_shown;
+}
+
+// COMMENT ELLE SE PEINT : la teinte du cadre d'un salon — une échoppe porte ses
+// couleurs dans sa surface —, et l'opacité réglée, sur la surface comme sur le
+// titre.
+ro::render::SignboardPaint PaintOf(const ro::sim::Signboard& board,
+                                   const ro::render::SignboardLook& look) {
+  constexpr int kWholeAlpha = 255;
+  ro::render::SignboardPaint paint;
+  if (!SignboardOpensStore(board.kind)) {
+    paint.surface_tint = {look.chat_room_tint[0], look.chat_room_tint[1], look.chat_room_tint[2],
+                          kWholeAlpha};
+  }
+  paint.surface_tint[3] = look.alpha;
+  paint.title_color = look.title_color;
+  paint.title_color[3] =
+      static_cast<std::uint8_t>(static_cast<int>(look.title_color[3]) * look.alpha / kWholeAlpha);
+  return paint;
+}
+
 // De combien l'enseigne monte au-dessus de la tête.
 int LiftOf(const ro::sim::Signboard& board) {
   return board.kind == ro::sim::SignboardKind::kChatRoom ? ro::render::kChatRoomSignLiftPixels
@@ -364,9 +387,9 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
     const ro::sim::World& world, const ro::sim::PartyRoster& party,
     const ro::render::FontAtlas& font, const ro::render::SignboardSurfaces& surfaces,
-    const ro::ui::EntityBarsLook& bars, bool shops_shown, std::uint32_t spotlit_owner_id,
-    float viewport_width, float viewport_height, const ro::sim::BannedWords* banned,
-    std::vector<SignboardHit>* hits) {
+    const ro::ui::EntityBarsLook& bars, const ro::render::SignboardLook& look,
+    std::uint32_t spotlit_owner_id, float viewport_width, float viewport_height,
+    const ro::sim::BannedWords* banned, std::vector<SignboardHit>* hits) {
   std::vector<ro::render::ScreenQuad> quads;
   if (hits != nullptr) {
     hits->clear();
@@ -378,7 +401,7 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
   for (std::size_t index = 0; index < drawn.size() && index < ids.size(); ++index) {
     const ro::sim::Actor* actor = world.Find(ids[index]);
     if (actor == nullptr || !actor->signboard.has_value() ||
-        (!shops_shown && SignboardOpensStore(actor->signboard->kind))) {
+        !SignboardShown(*actor->signboard, look)) {
       continue;
     }
     const std::optional<glm::vec2> feet = ro::render::ProjectToScreen(
@@ -404,14 +427,15 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
     const std::string text = SignboardText(*actor->signboard, banned);
     const std::string shown = ro::render::FitSignboardTitle(font, text);
     const bool spotlit = spotlit_owner_id != 0 && actor->id == spotlit_owner_id;
-    Append(quads, ro::render::ComposeSignboard(
-                      font, SurfaceOf(*actor->signboard, surfaces, spotlit), shown, top_left));
+    Append(quads,
+           ro::render::ComposeSignboard(font, SurfaceOf(*actor->signboard, surfaces, spotlit),
+                                        shown, top_left, PaintOf(*actor->signboard, look)));
     if (hits != nullptr) {
       hits->push_back(SignboardHit{
           .owner_id = actor->id,
           .kind = actor->signboard->kind,
           .rect = ro::render::SignboardRect(top_left),
-          .title_rect = ro::render::SignboardTitleRect(top_left),
+          .title_rect = ro::render::SignboardTitleRect(top_left, font.line_height()),
           .cut_title = shown == text ? std::string() : text,
       });
     }

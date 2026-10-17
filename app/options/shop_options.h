@@ -45,8 +45,14 @@ class ShopOptions {
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
 
-  // Ajoute ses lignes à celles d'une section.
+  // ⚠ LE RÉGLAGE DES ENSEIGNES SE DÉCLARE À PART : il se montre dans l'onglet
+  // « Enseignes » de la page « Entités », et c'est elle qui le rétablit.
+  void DeclareSignboards(SettingsFile& into);
+
+  // Ajoute ses lignes à celles d'une section — sans celle des enseignes.
   void ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const;
+  // La ligne des enseignes, pour l'onglet qui les règle.
+  void ComposeSignboardsRow(std::vector<ro::ui::OptionRowView>& rows) const;
 
   // Rend vrai quand la ligne était la sienne.
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);

@@ -177,8 +177,11 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
   // rendait à la suivante venue : l'atlas des polices s'affichait à sa place,
   // par éclairs. Les réglages, eux, se copient : ils ne changent qu'entre deux
   // images.
+  // ⚠ SAUF SUR LES ENSEIGNES : elles n'ont pas d'entité d'essai, et se
+  // regardent sur la carte, derrière le panneau.
   pages_.entity_pinned_rows.clear();
-  if (entity_bars_.tuning) {
+  const bool signboards = tab == EntityPageTab::kSignboards;
+  if (entity_bars_.tuning && !signboards) {
     const ro::ui::EntitySample* sample = &pages_.entity_sample;
     const ro::ui::EntityBarsLook bars = entity_bars_;
     const ro::render::EntityNamesLook names = entity_names_;
@@ -434,7 +437,7 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
     entity_name_rows_.front().fold = Tr("Nom");
     entity_bar_rows_.insert(entity_bar_rows_.end(), entity_name_rows_.begin(),
                             entity_name_rows_.end());
-  } else {
+  } else if (!signboards) {
     push(OptionRowView{.id = kEntityNameNoteRow,
                        .label = Tr("Les noms du groupe se règlent avec ceux des joueurs, dans "
                                    "l'onglet « Joueurs » : leur carte de nom est la même."),
@@ -448,6 +451,11 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
     const std::size_t cast_first = entity_bar_rows_.size();
     entity_bar_rows_.insert(entity_bar_rows_.end(), cast.begin(), cast.end());
     entity_bar_rows_[cast_first].fold = Tr("Cast");
+  }
+
+  // ── LES ENSEIGNES ─────────────────────────────────────────────────────────
+  if (signboards) {
+    pages_.signboards.ComposeInto(entity_bar_rows_, pages_.shops);
   }
 
   // ── CE QUI VAUT POUR TOUS LES ONGLETS : barres, noms, cast ───────────────

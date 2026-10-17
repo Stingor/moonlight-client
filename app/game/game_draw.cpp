@@ -568,7 +568,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .setting_reach = SettingReachOf(pieces_),
       .entity_bars = settings_->options().entity_bars(),
       .entity_bars_on_screen = &entity_bars_,
-      .shop_signboards_shown = settings_->options().shops().signboards_shown(),
+      .signboards = settings_->options().pages().signboards.Style(
+          settings_->options().shops().signboards_shown()),
       .options_open = windows_.options.open,
       .cast_bars_on_screen = &cast_bars_,
       .entity_names = settings_->options().entity_names(),

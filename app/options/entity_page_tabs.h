@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <optional>
 
+#include "ro/core/i18n.h"
 #include "ro/render/entity_names.h"
 #include "ro/ui/entity_bars.h"
 #include "ro/ui/entity_sample.h"
@@ -24,6 +25,10 @@ namespace moonclient {
 //
 // ⚠ L'ORDRE EST CELUI DES ONGLETS À L'ÉCRAN, et il n'est pas persisté : le
 // fichier de réglages range par espèce de barre et de nom, pas par onglet.
+//
+// ⚠ LE DERNIER N'EST NI UNE BARRE NI UN NOM : les enseignes des salons et des
+// échoppes se posent elles aussi au-dessus des têtes, mais n'ont pas d'espèce.
+// Voir `SignboardOptions`.
 enum class EntityPageTab : std::size_t {
   kOwn = 0,
   kParty,
@@ -32,6 +37,7 @@ enum class EntityPageTab : std::size_t {
   kBoss,
   kOther,
   kGroundItem,
+  kSignboards,
   kCount,
 };
 inline constexpr std::size_t kEntityPageTabCount = static_cast<std::size_t>(EntityPageTab::kCount);
@@ -60,6 +66,8 @@ inline constexpr std::size_t kEntityPageTabCount = static_cast<std::size_t>(Enti
       return {.bars = EntityBarKind::kBoss, .name = NamePlateKind::kBoss};
     case EntityPageTab::kOther:
       return {.bars = EntityBarKind::kOther, .name = NamePlateKind::kNonPlayer};
+    case EntityPageTab::kSignboards:
+      return {.bars = std::nullopt, .name = std::nullopt};
     case EntityPageTab::kGroundItem:
     case EntityPageTab::kCount:
       break;
@@ -77,6 +85,9 @@ inline constexpr std::size_t kEntityPageTabCount = static_cast<std::size_t>(Enti
 
 // LE NOM DE L'ONGLET. ⚠ DÉJÀ TRADUIT.
 [[nodiscard]] inline const char* EntityPageTabName(EntityPageTab tab) {
+  if (tab == EntityPageTab::kSignboards) {
+    return ro::core::Tr("Enseignes");
+  }
   if (tab == EntityPageTab::kGroundItem) {
     return ro::render::EntityNameKindName(ro::render::NamePlateKind::kGroundItem);
   }

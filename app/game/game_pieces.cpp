@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <format>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -14,6 +15,7 @@
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 #include "ro/formats/image.h"
 #include "ro/render/ailment_sprites.h"
 #include "ro/render/battlefield_art.h"
@@ -26,6 +28,7 @@
 #include "ro/render/pvp_hud.h"
 #include "ro/render/sleep_bubbles.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/ui/system_fonts.h"
 #include "ro/vfs/achievement_database.h"
 #include "ro/vfs/card_illustrations.h"
 #include "ro/vfs/card_item_list.h"
@@ -37,6 +40,7 @@
 #include "game/skin_reload.h"
 #include "quest/quest_rules.h"
 #include "world/overlay_view.h"
+#include "world/signboard_style.h"
 
 namespace moonclient {
 namespace {
@@ -572,6 +576,60 @@ const ro::render::FontAtlas* EnsureNameFont(GamePieces& pieces, float pixels) {
     return &*pieces.name_font;
   }
   return pieces.font.has_value() ? &*pieces.font : nullptr;
+}
+
+namespace {
+
+// LE FICHIER D'UNE FAMILLE NOMMÉE — son gras quand on le veut et qu'elle en a
+// un —, ou vide quand la machine ne la porte pas.
+[[nodiscard]] std::string SignboardFontFile(const SignboardStyle& style) {
+  for (const ro::ui::FontFamilySpec& family : ro::ui::SystemFontFamilies()) {
+    if (family.label == style.font_name) {
+      return std::string(style.font_bold && !family.bold.empty() ? family.bold : family.regular);
+    }
+  }
+  return {};
+}
+
+}  // namespace
+
+const ro::render::FontAtlas* EnsureSignboardFont(GamePieces& pieces, const SignboardStyle& style) {
+  const ro::render::FontAtlas* game_font = pieces.font.has_value() ? &*pieces.font : nullptr;
+  if (UsesGameFont(style)) {
+    return game_font;
+  }
+  const std::string file = style.font_name.empty() ? ro::core::Utf8FromPath(DefaultFontPath())
+                                                   : SignboardFontFile(style);
+  if (file.empty()) {
+    return game_font;
+  }
+  const int pixels =
+      std::clamp(style.font_pixels, kSmallestSignboardFontPixels, kLargestSignboardFontPixels);
+  const std::string key = std::format("{}|{}", file, pixels);
+  if (pieces.signboard_font_key != key) {
+    // ⚠ LE CHOIX EST RETENU MÊME EN ÉCHEC, pour la raison de `EnsureNameFont` :
+    // sans quoi une police illisible se relirait à chaque image.
+    pieces.signboard_font_key = key;
+    if (pieces.signboard_font.has_value()) {
+      pieces.overlay.ForgetAtlas(pieces.signboard_font->image());
+      pieces.signboard_font.reset();
+    }
+    auto loaded = ro::render::FontAtlas::Load(ro::core::PathFromUtf8(file), pixels);
+    if (loaded) {
+      pieces.signboard_font = std::move(*loaded);
+    } else {
+      ro::core::LogWarning("police des enseignes : {} — elles garderont la police du jeu",
+                           ro::core::Describe(loaded.error()));
+    }
+  }
+  return pieces.signboard_font.has_value() ? &*pieces.signboard_font : game_font;
+}
+
+void ForgetShopSignboards(GamePieces& pieces) {
+  pieces.overlay.ForgetAtlas(pieces.signboards.vending);
+  pieces.overlay.ForgetAtlas(pieces.signboards.buying);
+  pieces.overlay.ForgetAtlas(pieces.signboards.spotlit_vending);
+  pieces.overlay.ForgetAtlas(pieces.signboards.spotlit_buying);
 }
 
 void LoadShellPieces(ro::vfs::Vfs& vfs, GamePieces& pieces) {

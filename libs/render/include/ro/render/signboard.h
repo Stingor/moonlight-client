@@ -80,6 +80,45 @@ inline constexpr std::array<std::uint8_t, 3> kShopSignEdge = {195, 195, 195};
 inline constexpr int kShopSignEdgeInsetPixels = 2;
 inline constexpr int kShopSignBottomRoomPixels = 6;
 
+// LA ZONE DU TITRE LA PLUS HAUTE : elle descend jusqu'au bas du corps de
+// l'enseigne, au-dessus des six pixels de la queue. Une police plus grande que
+// celle du client y tient encore ; au-delà, elle est rognée.
+inline constexpr int kSignboardTitleTallestPixels =
+    kSignboardHeightPixels - kShopSignBottomRoomPixels - kSignboardTitleAt.y;
+
+// Le titre s'écrit en noir, sans ombre.
+inline constexpr std::array<std::uint8_t, 4> kSignboardTitleColor = {0, 0, 0, 255};
+
+// ── CE QUE LE JOUEUR RÈGLE D'UNE ENSEIGNE ───────────────────────────────────
+//
+// ⚠ LE DÉFAUT EST LE DESSIN DU CLIENT, au pixel : un joueur qui n'a rien touché
+// ne voit rien changer.
+
+// LES COULEURS D'UNE ÉCHOPPE. Elles sont PEINTES dans sa surface, et non
+// teintées par-dessus : une teinte multiplierait aussi la bourse de l'icône.
+struct ShopSignColors {
+  std::array<std::uint8_t, 3> fill = kShopSignFill;
+  // Celle que la recherche d'échoppes désigne.
+  std::array<std::uint8_t, 3> spotlit_fill = kSpotlitShopSignFill;
+  std::array<std::uint8_t, 3> edge = kShopSignEdge;
+
+  friend bool operator==(const ShopSignColors&, const ShopSignColors&) = default;
+};
+
+struct SignboardLook {
+  bool chat_rooms_shown = true;
+  // `/showshop` : les enseignes de vente ET d'achat.
+  bool shops_shown = true;
+  // L'OPACITÉ DE L'ENSEIGNE ENTIÈRE, surface et titre, de 0 à 255.
+  std::uint8_t alpha = 255;
+  // La teinte du cadre d'un salon. ⚠ ELLE MULTIPLIE LES PIÈCES DU CADRE, qui
+  // sont des bitmaps de l'installation : blanche, elle les laisse intactes.
+  std::array<std::uint8_t, 3> chat_room_tint = {255, 255, 255};
+  ShopSignColors shop;
+  // La transparence du titre se compose avec celle de l'enseigne.
+  std::array<std::uint8_t, 4> title_color = kSignboardTitleColor;
+};
+
 // Les pièces de l'installation. ⚠ UN HABILLAGE PEUT LES COUVRIR : celles du
 // cadre sont redessinées par l'archive du serveur, qui passe avant `data.grf`.
 inline constexpr std::string_view kChatRoomFrameTopLeftPath =
@@ -126,8 +165,9 @@ struct ChatRoomFrame {
                                                     const formats::Image& icon);
 
 // LA SURFACE D'UNE ÉCHOPPE : l'aplat arrondi, le filet, l'icône par-dessus.
-[[nodiscard]] formats::Image ComposeShopSurface(const formats::Image& icon,
-                                                const std::array<std::uint8_t, 3>& fill);
+[[nodiscard]] formats::Image ComposeShopSurface(
+    const formats::Image& icon, const std::array<std::uint8_t, 3>& fill,
+    const std::array<std::uint8_t, 3>& edge = kShopSignEdge);
 
 // LES SURFACES DONT LE JEU A BESOIN, composées au chargement.
 //
@@ -142,11 +182,21 @@ struct SignboardSurfaces {
   // Celles que la recherche d'échoppes désigne : le même dessin sur fond jaune.
   formats::Image spotlit_vending;
   formats::Image spotlit_buying;
+  // Les icônes des échoppes, gardées pour les recomposer, et les couleurs dont
+  // leurs quatre surfaces sont peintes.
+  formats::Image vending_icon;
+  formats::Image buying_icon;
+  ShopSignColors shop_colors;
 };
 
 // Lit les pièces et compose les six surfaces. Une pièce absente se dit au
 // journal et manque au dessin, sans rien empêcher d'autre.
 [[nodiscard]] SignboardSurfaces LoadSignboardSurfaces(vfs::Vfs& vfs);
+
+// REPEINT LES QUATRE SURFACES D'ÉCHOPPE à ces couleurs. ⚠ ELLES GARDENT LEUR
+// ADRESSE : l'appelant doit faire oublier à la couche d'écran la texture
+// qu'elle y attachait, sans quoi elle peindrait l'ancienne.
+void RecolorShopSurfaces(SignboardSurfaces& surfaces, const ShopSignColors& colors);
 
 // LE TITRE TEL QU'IL S'ÉCRIT : entier s'il tient dans sa zone, sinon raccourci
 // caractère par caractère par la fin, jusqu'à ce que lui et « ... » y tiennent.
@@ -163,14 +213,24 @@ struct SignboardSurfaces {
 [[nodiscard]] ScreenRect SignboardRect(glm::vec2 top_left);
 
 // La zone où le titre s'écrit, à l'écran : c'est elle que la souris survole
-// pour lire en entier un titre coupé.
-[[nodiscard]] ScreenRect SignboardTitleRect(glm::vec2 top_left);
+// pour lire en entier un titre coupé. Elle grandit vers le bas avec la hauteur
+// de ligne de la police, de `kSignboardTitleHeightPixels` à
+// `kSignboardTitleTallestPixels`.
+[[nodiscard]] ScreenRect SignboardTitleRect(glm::vec2 top_left, float line_height = 0.0F);
+
+// Comment une enseigne se peint : la teinte de sa surface, transparence
+// comprise, et la couleur de son titre.
+struct SignboardPaint {
+  std::array<std::uint8_t, 4> surface_tint = {255, 255, 255, 255};
+  std::array<std::uint8_t, 4> title_color = kSignboardTitleColor;
+};
 
 // Les quads d'une enseigne : sa surface, puis son titre. `shown_title` est ce
 // que rend `FitSignboardTitle`. Une surface vide ne pose que le titre.
 [[nodiscard]] std::vector<ScreenQuad> ComposeSignboard(const FontAtlas& font,
                                                        const formats::Image& surface,
                                                        std::string_view shown_title,
-                                                       glm::vec2 top_left);
+                                                       glm::vec2 top_left,
+                                                       const SignboardPaint& paint = {});
 
 }  // namespace ro::render

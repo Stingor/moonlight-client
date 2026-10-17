@@ -154,8 +154,9 @@ inline constexpr int kNameFontPixels = 12;
 // qu'ils ont ouvert. Chacune au-dessus du sien, dans la surface que `surfaces`
 // tient pour sa sorte. Voir `ro/render/signboard.h`.
 //
-// `shops_shown` éteint, celles des échoppes ne se peignent pas — ni ne se
-// cliquent, puisqu'elles ne laissent pas de cadre. Voir `ShopOptions`.
+// `look` dit lesquelles se peignent et comment. Une sorte éteinte — les
+// échoppes, les salons — ne se peint pas, ni ne se clique, puisqu'elle ne
+// laisse pas de cadre.
 //
 // `spotlit_owner_id` désigne le marchand du dernier résultat cliqué dans la
 // recherche d'échoppes : son enseigne se peint en jaune pâle. Zéro : aucune.
@@ -169,9 +170,9 @@ inline constexpr int kNameFontPixels = 12;
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
     const ro::sim::World& world, const ro::sim::PartyRoster& party,
     const ro::render::FontAtlas& font, const ro::render::SignboardSurfaces& surfaces,
-    const ro::ui::EntityBarsLook& bars, bool shops_shown, std::uint32_t spotlit_owner_id,
-    float viewport_width, float viewport_height, const ro::sim::BannedWords* banned,
-    std::vector<SignboardHit>* hits = nullptr);
+    const ro::ui::EntityBarsLook& bars, const ro::render::SignboardLook& look,
+    std::uint32_t spotlit_owner_id, float viewport_width, float viewport_height,
+    const ro::sim::BannedWords* banned, std::vector<SignboardHit>* hits = nullptr);
 
 // ⚠ LES JAUGES DE VIE NE SONT PLUS ICI. Elles se règlent espèce par espèce et
 // écrivent parfois leurs nombres : elles sont donc passées en ImGui, où vit la

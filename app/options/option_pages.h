@@ -39,6 +39,7 @@
 #include "options/quest_tracker_options.h"
 #include "options/quick_cast_options.h"
 #include "options/shop_options.h"
+#include "options/signboard_options.h"
 #include "options/skill_view_options.h"
 #include "options/skin_look_options.h"
 #include "options/skin_options.h"
@@ -116,6 +117,8 @@ struct OptionPages {
   PickPrecisionOptions pick_precision;
   DamageMeterOptions damage_meter;
   ShopOptions shops;
+  // L'onglet « Enseignes » de la page « Entités ».
+  SignboardOptions signboards;
   WhisperOptions whispers;
   GreyWorldOptions grey_world;
   GrimoireKeyOptions grimoire_keys;

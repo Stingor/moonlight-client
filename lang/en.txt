@@ -230,14 +230,32 @@ tr: 5 min / min
 fr: Afficher l'heure du serveur
 tr: Show the server time
 
+fr: Afficher les enseignes des salons de discussion
+tr: Show chat room signboards
+
 fr: Balayage (°)
 tr: Sweep (°)
+
+fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
+tr: Applies to the whole signboard, frame and title. The client paints them solid; more transparent, a street of merchants hides less of the map.
+
+fr: Celle du dernier résultat cliqué dans la recherche d'échoppes.
+tr: The one of the last result clicked in the shop search.
+
+fr: Celle du jeu
+tr: The game's
+
+fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
+tr: The game's is the original client's font. The title keeps its room: a wider font gets cut into "..." sooner, and hovering the title shows it in full.
 
 fr: Ciel
 tr: Sky
 
 fr: Coucher (h)
 tr: Sunset (h)
+
+fr: Couleur du titre
+tr: Title color
 
 fr: Cycle jour/nuit
 tr: Day/night cycle
@@ -248,11 +266,26 @@ tr: Azimuth offset (°)
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Unchecked, it is the course drawn from the map's light.
 
+fr: Enseignes
+tr: Signboards
+
 fr: Faire tourner le temps
 tr: Let time run
 
+fr: Filet des échoppes
+tr: Shop outline
+
+fr: Fond de l'échoppe recherchée
+tr: Searched shop background
+
+fr: Fond des échoppes
+tr: Shop background
+
 fr: Forcer l'heure du ciel
 tr: Force the sky's hour
+
+fr: Gras
+tr: Bold
 
 fr: Hauteur de midi (°)
 tr: Noon altitude (°)
@@ -965,8 +998,17 @@ tr: The time of day on the server, the one the day/night cycle follows — not y
 fr: Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes —, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
 tr: Shadows computed every frame: the map's sun, outdoors, instead of the one painted into the map — trees and buildings also shade themselves —, and the lights the map editor places, lanterns and braziers, on any map.\n\nThe original client has none, and the graphics card works harder.
 
+fr: Le cadre d'un salon est une image du jeu : la teinte la multiplie. Blanche, il reste tel quel.
+tr: A chat room frame is a game image: the tint multiplies it. White leaves it unchanged.
+
+fr: Le client écrit en douze pixels. Au-delà de seize, le bas des lettres sortirait de l'enseigne.
+tr: The client writes in twelve pixels. Above sixteen, the bottom of the letters would leave the signboard.
+
 fr: Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : lumière du matin, du midi et du soir, puis une nuit plus sombre et bleutée. En plein air seulement.\n\nAvec « Ombres en temps réel », les ombres tournent avec lui. Le client d'origine garde la lumière de la carte à toute heure.
 tr: The sun, then the moon, follow the time of day on the server: morning, noon and evening light, then a darker, bluish night. Outdoors only.\n\nWith “Real-time shadows”, the shadows turn with it. The original client keeps the map's light at every hour.
+
+fr: Lesquelles se montrent
+tr: Which ones show
 
 fr: Lever (h)
 tr: Sunrise (h)
@@ -974,8 +1016,17 @@ tr: Sunrise (h)
 fr: Ombres en temps réel
 tr: Real-time shadows
 
+fr: Opacité, couleurs et police reviennent à ceux du jeu. Ce qui se montre ne change pas.
+tr: Opacity, colors and font return to the game's. What is shown does not change.
+
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time shadows” is checked in Graphics.
+
+fr: Police du titre
+tr: Title font
+
+fr: Rendre le dessin du client
+tr: Restore the client's look
 
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: Nothing is saved: every launch brings back the map's own sky.
@@ -994,6 +1045,9 @@ tr: Server %.*s
 
 fr: Seul ce client voit ce ciel : rien ne part au serveur.
 tr: Only this client sees this sky: nothing is sent to the server.
+
+fr: Teinte du cadre des salons
+tr: Chat room frame tint
 
 fr: Temps réel (1 min / min)
 tr: Real time (1 min / min)
@@ -4292,6 +4346,9 @@ tr: this site
 
 fr: Étape franchie
 tr: Step cleared
+
+fr: Éteint, les bulles des salons ouverts par les joueurs disparaissent — et ne se cliquent plus : on n'y entre alors que par l'annuaire des salons.
+tr: When off, the bubbles of chat rooms opened by players disappear — and can no longer be clicked: you can then only join through the chat room directory.
 
 fr: Étiquettes
 tr: Labels

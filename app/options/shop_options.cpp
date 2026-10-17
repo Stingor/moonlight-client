@@ -19,8 +19,11 @@ constexpr const char* kConfirmSellAllKey = "npc_shop_confirm_sell_all";
 
 void ShopOptions::Declare(SettingsFile& into) {
   into.Declare(kOneClickKey, &one_click_);
-  into.Declare(kSignboardsShownKey, &signboards_shown_);
   into.Declare(kConfirmSellAllKey, &confirm_sell_all_);
+}
+
+void ShopOptions::DeclareSignboards(SettingsFile& into) {
+  into.Declare(kSignboardsShownKey, &signboards_shown_);
 }
 
 void ShopOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const {
@@ -33,14 +36,6 @@ void ShopOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const {
       .kind = ro::ui::OptionKind::kToggle,
       .on = one_click_});
   rows.push_back(ro::ui::OptionRowView{
-      .id = IdOf(ShopRow::kSignboardsShown),
-      .label = Tr("Afficher les enseignes des échoppes"),
-      .help = Tr("Éteint, les enseignes des vendeurs et des acheteurs disparaissent ; celles des "
-                 "salons de discussion restent."),
-      .command = "/showshop",
-      .kind = ro::ui::OptionKind::kToggle,
-      .on = signboards_shown_});
-  rows.push_back(ro::ui::OptionRowView{
       .id = IdOf(ShopRow::kConfirmSellAll),
       .label = Tr("Confirmer « Tout ajouter au panier » chez un PNJ"),
       .help = Tr("Avant de vendre tout l'inventory à un PNJ, une boîte rappelle le nombre de "
@@ -48,6 +43,17 @@ void ShopOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const {
                  "se confirme encore."),
       .kind = ro::ui::OptionKind::kToggle,
       .on = confirm_sell_all_});
+}
+
+void ShopOptions::ComposeSignboardsRow(std::vector<ro::ui::OptionRowView>& rows) const {
+  rows.push_back(ro::ui::OptionRowView{
+      .id = IdOf(ShopRow::kSignboardsShown),
+      .label = Tr("Afficher les enseignes des échoppes"),
+      .help = Tr("Éteint, les enseignes des vendeurs et des acheteurs disparaissent ; celles des "
+                 "salons de discussion restent."),
+      .command = "/showshop",
+      .kind = ro::ui::OptionKind::kToggle,
+      .on = signboards_shown_});
 }
 
 bool ShopOptions::Change(const ro::ui::OptionsWindowAction& asked) {

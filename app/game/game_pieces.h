@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <span>
+#include <string>
 #include <vector>
 
 #include "ro/formats/image.h"
@@ -110,6 +111,8 @@
 // LES ACCESSOIRES DU CLIENT : ce qui se charge UNE FOIS, et dont l'absence
 // n'empêche pas de jouer.
 namespace moonclient {
+
+struct SignboardStyle;
 
 // Ils ont tous la même forme — lire des sprites, en faire un objet, et se
 // plaindre UNE SEULE FOIS quand le fichier manque. Un client qui refuserait de
@@ -299,6 +302,11 @@ struct GamePieces {
   // chargement. ⚠ MÊME RÈGLE : elles ne se recopient pas, la couche d'écran les
   // reconnaît par leur adresse.
   ro::render::SignboardSurfaces signboards;
+  // LA POLICE DU TITRE DES ENSEIGNES, quand le joueur en a choisi une autre que
+  // celle du jeu, et le choix d'où elle est gravée — vide tant qu'aucun. Voir
+  // `EnsureSignboardFont`.
+  std::optional<ro::render::FontAtlas> signboard_font;
+  std::string signboard_font_key;
 
   // L'ARBRE DES COMPÉTENCES : les cases, les rangs maximaux, les prérequis. Le
   // serveur n'envoie que ce qui est APPRIS ; sans cet arbre le grimoire n'aurait
@@ -580,6 +588,16 @@ void FollowQuestLanguage(ro::vfs::Vfs& vfs, GamePieces& pieces);
 // Rend la police à employer — celle des noms, ou celle de l'interface quand la
 // gravure a échoué, ou nul quand aucune des deux n'existe.
 [[nodiscard]] const ro::render::FontAtlas* EnsureNameFont(GamePieces& pieces, float pixels);
+
+// LA POLICE DU TITRE DES ENSEIGNES : celle du jeu tant que le joueur n'en a pas
+// choisi d'autre, sinon gravée à son choix — et regravée quand il change
+// seulement. Une famille introuvable ou illisible retombe sur celle du jeu.
+[[nodiscard]] const ro::render::FontAtlas* EnsureSignboardFont(GamePieces& pieces,
+                                                               const SignboardStyle& style);
+
+// Fait oublier à la couche d'écran les quatre surfaces d'échoppe, avant qu'on
+// les repeigne à la même adresse.
+void ForgetShopSignboards(GamePieces& pieces);
 
 // LES SPRITES-ENFANTS QUI TIENNENT au-dessus des acteurs dessinés — bulles du
 // sommeil, points du silence, étoiles de l'étourdi, marques de quête, marqueur

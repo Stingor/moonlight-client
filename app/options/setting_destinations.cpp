@@ -125,6 +125,8 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     PageTab("entities_npc", TrText("PNJ"), OptionSection::kEntityBars, EntityPageTab::kOther),
     PageTab("entities_ground_items", TrText("Items au sol"), OptionSection::kEntityBars,
             EntityPageTab::kGroundItem),
+    PageTab("entities_signboards", TrText("Enseignes"), OptionSection::kEntityBars,
+            EntityPageTab::kSignboards),
     Page("capture", TrText("Capture d'écran"), OptionSection::kCapture),
     // L'enregistreur de zone : chez nous, c'est la section qui règle ce que
     // l'écran rend.
@@ -259,7 +261,7 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
 // pourrait se lier, et une clé de trop ouvrirait un onglet absent.
 static_assert(ro::ui::kShortcutBarCount == 8);
 static_assert(ro::ui::kStatBarCount == 7);
-static_assert(kEntityPageTabCount == 7);
+static_assert(kEntityPageTabCount == 8);
 static_assert(static_cast<std::size_t>(DamageTab::kCount) == 3);
 static_assert(kHotkeyTabCount == 6);
 static_assert(ro::ui::kAchievementTabCount == kAchievementFeatTab + 1);
