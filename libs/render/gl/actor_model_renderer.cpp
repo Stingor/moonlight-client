@@ -56,6 +56,7 @@ uniform vec3 u_daylight;
 out vec4 frag_color;
 
 void main() {
+    vec3 surface_normal = PointSurfaceNormal();
     vec4 color = texture(u_texture, v_texture_uv) * v_color;
     if (color.a < u_alpha_reference) {
         discard;
@@ -63,7 +64,7 @@ void main() {
     // LA LUMIÈRE PONCTUELLE S'AJOUTE AU FACTEUR DU JOUR : ni la nuit ni l'ombre
     // du soleil ne l'assombrissent.
     color.rgb *= mix(u_sun_shade, vec3(1.0), SunVisibility()) * u_daylight +
-                 PointLighting(v_world_position);
+                 PointSurfaceLighting(surface_normal);
     frag_color = vec4(Fogged(color.rgb, v_fog_kept), color.a);
 }
 )GLSL";

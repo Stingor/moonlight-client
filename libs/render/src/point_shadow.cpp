@@ -39,13 +39,13 @@ std::size_t ShadowedPointLightCount(const PointLightSet& set) {
 
 float PointShadowFar(float range_world) {
   constexpr float kNearestFarShare = 2.0F;
-  return std::max(range_world, kPointShadowNearWorld * kNearestFarShare);
+  return std::max(range_world, kPointShadowClearanceWorld * kNearestFarShare);
 }
 
 std::array<glm::mat4, kCubeFaceCount> PointShadowFaceViewProjections(glm::vec3 light_position,
                                                                      float far_world) {
   const glm::mat4 projection = glm::perspective(glm::radians(kFaceFieldDegrees), kFaceAspectRatio,
-                                                kPointShadowNearWorld, far_world);
+                                                kPointShadowClearanceWorld, far_world);
   std::array<glm::mat4, kCubeFaceCount> faces{};
   for (std::size_t face = 0; face < kCubeFaceCount; ++face) {
     faces[face] = projection * glm::lookAt(light_position, light_position + kFaceAxes[face].forward,
@@ -58,7 +58,7 @@ glm::vec3 CubeFaceForward(std::size_t face) { return kFaceAxes.at(face).forward;
 
 float PointShadowDepth(float axis_distance_world, float far_world) {
   // La profondeur normalisée d'une perspective, de −1 à 1, ramenée de 0 à 1.
-  const float near_world = kPointShadowNearWorld;
+  const float near_world = kPointShadowClearanceWorld;
   const float normalized =
       ((far_world + near_world) / (far_world - near_world)) -
       ((2.0F * far_world * near_world) / ((far_world - near_world) * axis_distance_world));

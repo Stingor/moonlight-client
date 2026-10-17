@@ -46,7 +46,7 @@ struct PointLightSet {
 
 // LA LUMIÈRE QUE `set` DÉPOSE EN `world_position` : la somme, par source, de sa
 // couleur atténuée par le carré de ce qui reste de sa portée. C'est la règle de
-// `PointLighting` dans `kPointLightFragmentGlsl`, évaluée une fois pour un point
+// `PointLightingOf` dans `kPointLightGlsl`, évaluée une fois pour un point
 // entier. Une source sans portée n'éclaire rien. ⚠ SANS OMBRE : la carte qui
 // masquerait une source ne se lit que sur le GPU.
 [[nodiscard]] glm::vec3 PointLightingAt(const PointLightSet& set, glm::vec3 world_position);

@@ -133,6 +133,7 @@ uniform float u_translucent;
 out vec4 frag_color;
 
 void main() {
+    vec3 surface_normal = PointSurfaceNormal();
     // UNE FACE SIMPLE VUE DE DOS NE SE DESSINE PAS. Le sens trigonométrique à
     // l'écran est celui qu'OpenGL dit « de face ».
     if (u_one_sided != 0 &&
@@ -147,7 +148,8 @@ void main() {
         discard;
     }
     vec4 color = texture(u_texture, v_texture_uv);
-    vec3 light = mix(v_shaded_light, v_light, SunVisibility()) + PointLighting(v_world_position);
+    vec3 light = mix(v_shaded_light, v_light, SunVisibility()) +
+                 PointSurfaceLighting(surface_normal);
     frag_color = vec4(Fogged(color.rgb * light, v_fog_kept),
                       mix(1.0, color.a * u_opacity, u_translucent));
 }

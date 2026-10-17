@@ -28,13 +28,17 @@ inline constexpr int kPointShadowMapTexels = 512;
 
 inline constexpr std::size_t kCubeFaceCount = 6;
 
-// LE PLAN PROCHE de chaque face, en unités du monde : ce qui touche la lumière
-// de plus près ne l'ombre pas. Le plan lointain est la portée de la lumière,
-// au-delà de laquelle elle n'éclaire rien.
-inline constexpr float kPointShadowNearWorld = 0.5F;
+// LE DÉGAGEMENT d'une lumière, en unités du monde : le plan proche de chaque
+// face. Ce qui se tient à moins de cet écart de la lumière, le long de l'axe
+// d'une face, n'est pas peint dans sa carte et n'ombre donc rien ; ce qui s'y
+// tient n'est pas ombré non plus. C'est le verre d'une lanterne, la vasque
+// d'un brasero où l'on pose la flamme : ils entourent la lumière sans la
+// boucher. Le plan lointain est la portée de la lumière, au-delà de laquelle
+// elle n'éclaire rien.
+inline constexpr float kPointShadowClearanceWorld = 10.0F;
 
 // LE PLAN LOINTAIN d'une lumière de portée `range_world` : sa portée, jamais
-// plus près que deux fois le plan proche, où la profondeur perdrait son sens.
+// plus près que deux fois le dégagement, où la profondeur perdrait son sens.
 [[nodiscard]] float PointShadowFar(float range_world);
 
 // Les lumières de `set` qui portent ombre : ses `kMaxShadowedPointLights`
@@ -43,7 +47,7 @@ inline constexpr float kPointShadowNearWorld = 0.5F;
 
 // LES SIX VUES D'UNE LUMIÈRE posée en `light_position`, dans l'ordre des faces
 // d'OpenGL : +X, −X, +Y, −Y, +Z, −Z. Chacune projette son quart de l'espace
-// sur sa face entière, de `kPointShadowNearWorld` à `far_world`.
+// sur sa face entière, de `kPointShadowClearanceWorld` à `far_world`.
 [[nodiscard]] std::array<glm::mat4, kCubeFaceCount> PointShadowFaceViewProjections(
     glm::vec3 light_position, float far_world);
 

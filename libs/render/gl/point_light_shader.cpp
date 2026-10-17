@@ -95,7 +95,7 @@ void SetPointLightUniforms(const GlProgram& program, const PointLightSet& set) {
   }
   program.SetInt("u_point_shadowed", static_cast<int>(shadowed));
   program.SetFloatArray("u_point_shadow_far", std::span(fars));
-  program.SetFloat("u_point_shadow_near", kPointShadowNearWorld);
+  program.SetFloat("u_point_shadow_clearance", kPointShadowClearanceWorld);
   // Une face couvre deux unités de large à une unité de la lumière.
   constexpr float kFaceWidthAtUnitDistance = 2.0F;
   program.SetFloat(

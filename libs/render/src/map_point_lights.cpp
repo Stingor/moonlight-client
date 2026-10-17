@@ -1,5 +1,6 @@
 #include "ro/render/map_point_lights.h"
 
+#include <array>
 #include <cmath>
 
 #include "ro/render/edited_map_effects.h"
@@ -14,6 +15,12 @@ constexpr double kSlowWave = 0.0047;
 constexpr float kFastWeight = 0.6F;
 constexpr float kSlowWeight = 0.4F;
 constexpr double kSlotPhase = 2.399963;
+
+// Une position du RSW soulevée à la hauteur d'une flamme : un y négatif monte.
+std::array<float, 3> Lifted(std::array<float, 3> anchor) {
+  anchor[1] -= kEffectGlowLiftWorld;
+  return anchor;
+}
 
 }  // namespace
 
@@ -34,7 +41,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
       continue;
     }
     lights.push_back(ro::mapedit::AddedLight{
-        .position = retouch.position.value_or(map_objects[retouch.effect_index].position),
+        .position = Lifted(retouch.position.value_or(map_objects[retouch.effect_index].position)),
         .color = retouch.glow->color,
         .range = retouch.glow->range,
         .night_only = retouch.night_only,
@@ -43,7 +50,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
   }
   for (const ro::mapedit::AddedEffect& effect : edit.effects()) {
     if (effect.glow.has_value()) {
-      lights.push_back(ro::mapedit::AddedLight{.position = effect.position,
+      lights.push_back(ro::mapedit::AddedLight{.position = Lifted(effect.position),
                                                .color = effect.glow->color,
                                                .range = effect.glow->range,
                                                .night_only = effect.night_only,

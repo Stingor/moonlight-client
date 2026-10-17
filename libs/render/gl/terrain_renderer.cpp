@@ -111,6 +111,7 @@ uniform float u_alpha_reference;
 out vec4 frag_color;
 
 void main() {
+    vec3 surface_normal = PointSurfaceNormal();
     vec4 texel = texture(u_texture, v_texture_uv);
     // Les textures RO emploient le magenta comme couleur de transparence ; le
     // rejet franc évite d'avoir à trier les faces en profondeur. Son seuil
@@ -140,7 +141,7 @@ void main() {
     result *= max(lightmap.a, 1.0 - u_shadowmap_strength);
     // LES LUMIÈRES PONCTUELLES S'AJOUTENT À L'ÉCLAIRAGE DU CARREAU, sur sa
     // texture, sans que la nuit ni l'ombre cuite ne les assombrissent.
-    result += texel.rgb * PointLighting(v_world_position);
+    result += texel.rgb * PointSurfaceLighting(surface_normal);
     vec3 laid_light = mix(lightmap.rgb, lightmap.bgr, u_cold_light);
     result += clamp(laid_light, 0.0, 1.0) * u_lightmap_strength;
 
