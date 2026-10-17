@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -21,13 +23,6 @@ constexpr std::string_view kExpelHandler = "clif_parse_KickFromChat";
 // Le nom, juste après l'opcode.
 constexpr std::array<std::uint16_t, 1> kExpelOffsets = {2};
 constexpr std::string_view kExitHandler = "clif_parse_ChatLeave";
-
-template <typename Request, typename Offsets>
-bool FixedLayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
 
 [[nodiscard]] std::unexpected<core::Error> LayoutChanged(std::string_view what) {
   return core::Fail(ErrorCode::kUnsupportedVersion,

@@ -11,6 +11,7 @@
 #include "ro/proto/social_packets.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -51,14 +52,6 @@ FrameOutcome ApplyAddResult(const proto::FriendAddResult& result, sim::FriendLis
   }
   friends.Notify(sim::FriendNotice{.kind = verdict->kind, .name = std::move(name)});
   return FrameOutcome::kApplied;
-}
-
-core::Result<void> SendEncoded(Connection& link, core::Result<std::vector<std::uint8_t>> frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 }  // namespace

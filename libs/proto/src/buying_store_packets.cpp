@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -28,23 +30,6 @@ constexpr std::array<std::uint16_t, 4> kTradeOffsets = {2, 4, 8, 12};
 
 // La plus longue trame qu'une longueur sur deux octets puisse annoncer.
 constexpr std::size_t kMostVariableFrameBytes = 0xFFFF;
-
-// Une demande de taille FIXE : le gestionnaire, les décalages et la longueur
-// que la table du serveur déclare doivent tous concorder.
-template <typename Request, typename Offsets>
-bool FixedLayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
-
-// Une demande de taille VARIABLE : la table doit la déclarer comme telle.
-template <typename Request, typename Offsets>
-bool VariableLayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         *length == kVariableLength;
-}
 
 // Ouvre la lecture d'un paquet reçu de taille fixe : opcode et taille exacts.
 template <typename Packet>

@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -23,13 +25,6 @@ constexpr std::array<std::uint16_t, 1> kAnswerOffsets = {2};
 constexpr std::string_view kLockHandler = "clif_parse_TradeOk";
 constexpr std::string_view kCancelHandler = "clif_parse_TradeCancel";
 constexpr std::string_view kExecuteHandler = "clif_parse_TradeCommit";
-
-template <typename Request, typename Offsets>
-bool FixedLayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
 
 template <typename Request>
 core::Result<std::vector<std::uint8_t>> EncodeOpcodeOnly(std::string_view handler,

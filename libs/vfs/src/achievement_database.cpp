@@ -12,6 +12,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "yaml_required.h"
+
 namespace ro::vfs {
 namespace {
 
@@ -27,16 +29,6 @@ constexpr std::string_view kCountsGauge = "counts";
 
 core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData, "table des succès : " + std::move(detail)};
-}
-
-// Un champ obligatoire d'une table YAML, absent : une exception, comme yaml-cpp
-// signale un champ qui n'entre pas dans son type.
-[[nodiscard]] YAML::Node Required(const YAML::Node& map, const char* key) {
-  YAML::Node value = map[key];
-  if (!value) {
-    throw YAML::KeyNotFound(map.Mark(), std::string(key));
-  }
-  return value;
 }
 
 // Un entier entre `least` et `most`, ou une exception.

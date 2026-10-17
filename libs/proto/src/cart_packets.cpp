@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -22,17 +24,10 @@ constexpr std::string_view kSelectCartHandler = "clif_parse_SelectCart";
 // L'identité, puis le type sur un octet.
 constexpr std::array<std::uint16_t, 2> kSelectCartOffsets = {2, 6};
 
-template <typename Request, typename Offsets>
-bool LayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
-
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const ChangeCartRequest& request) {
-  if (!LayoutHolds<ChangeCartRequest>(kChangeCartHandler, kChangeCartOffsets)) {
+  if (!FixedLayoutHolds<ChangeCartRequest>(kChangeCartHandler, kChangeCartOffsets)) {
     return core::Fail(ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour le changement de charrette ne correspond plus "
                       "à ce que le serveur déclare lire");
@@ -46,7 +41,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const ChangeCartRequest& request)
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const SelectCartRequest& request) {
-  if (!LayoutHolds<SelectCartRequest>(kSelectCartHandler, kSelectCartOffsets)) {
+  if (!FixedLayoutHolds<SelectCartRequest>(kSelectCartHandler, kSelectCartOffsets)) {
     return core::Fail(ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour le choix de charrette ne correspond plus à ce "
                       "que le serveur déclare lire");

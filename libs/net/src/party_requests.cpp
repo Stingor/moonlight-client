@@ -8,6 +8,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/social_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -15,14 +17,6 @@ constexpr std::uint8_t kWireYes = 1;
 constexpr std::uint8_t kWireNo = 0;
 
 [[nodiscard]] std::uint8_t Flag(bool value) { return value ? kWireYes : kWireNo; }
-
-core::Result<void> SendEncoded(Connection& link, core::Result<std::vector<std::uint8_t>> frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
 
 }  // namespace
 

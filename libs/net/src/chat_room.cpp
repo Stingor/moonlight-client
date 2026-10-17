@@ -13,6 +13,7 @@
 #include "ro/proto/map_packets.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -21,15 +22,6 @@ namespace {
 constexpr std::uint16_t kPlayerChatOpcode = 0x008e;
 // Le premier octet qui n'est plus de l'ASCII.
 constexpr unsigned char kFirstNonAscii = 0x80;
-
-core::Result<void> SendEncoded(Connection& link,
-                               const core::Result<std::vector<std::uint8_t>>& frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
 
 core::Result<void> SendFrame(Connection& link, std::vector<std::uint8_t> frame,
                              std::string_view what) {

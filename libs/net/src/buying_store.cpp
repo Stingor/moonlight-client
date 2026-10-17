@@ -12,6 +12,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/sim/world.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -31,15 +33,6 @@ std::vector<sim::BuyingStoreLine> LinesOf(const std::vector<Listed>& listed) {
                                          .price = entry.price});
   }
   return lines;
-}
-
-core::Result<void> SendEncoded(Connection& link,
-                               const core::Result<std::vector<std::uint8_t>>& frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 }  // namespace

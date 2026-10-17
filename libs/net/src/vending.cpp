@@ -10,6 +10,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/vending_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -35,15 +37,6 @@ sim::VendingLine LineFrom(const Entry& entry, std::int16_t amount) {
   line.item.refine_level = entry.refine;
   line.item.grade = entry.grade;
   return line;
-}
-
-core::Result<void> SendEncoded(Connection& link,
-                               const core::Result<std::vector<std::uint8_t>>& frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 }  // namespace

@@ -9,6 +9,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "yaml_required.h"
+
 namespace ro::vfs {
 namespace {
 
@@ -24,14 +26,6 @@ constexpr std::int64_t kMostWide = std::numeric_limits<std::uint32_t>::max();
 core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData,
                      "arbres des compétences : " + std::move(detail)};
-}
-
-[[nodiscard]] YAML::Node Required(const YAML::Node& map, const char* key) {
-  YAML::Node value = map[key];
-  if (!value) {
-    throw YAML::KeyNotFound(map.Mark(), std::string(key));
-  }
-  return value;
 }
 
 [[nodiscard]] std::int64_t Whole(const YAML::Node& node, std::int64_t least, std::int64_t most) {

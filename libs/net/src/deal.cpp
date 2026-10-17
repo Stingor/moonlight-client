@@ -17,19 +17,12 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/skill_text_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
 using core::ErrorCode;
-
-core::Result<void> SendEncoded(Connection& link,
-                               const core::Result<std::vector<std::uint8_t>>& frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
 
 // L'item que le partenaire dépose, dans la forme du sac.
 sim::InventoryItem ItemFrom(const proto::ZcAddExchangeItem& packet) {

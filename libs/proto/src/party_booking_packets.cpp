@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -28,13 +30,6 @@ constexpr std::array<std::uint16_t, 0> kDeleteOffsets = {};
 // Les six métiers, à la suite.
 constexpr std::string_view kUpdateHandler = "clif_parse_PartyBookingUpdateReq";
 constexpr std::array<std::uint16_t, 1> kUpdateOffsets = {2};
-
-template <typename Request, std::size_t kCount>
-bool LayoutHolds(std::string_view handler, const std::array<std::uint16_t, kCount>& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
 
 core::Result<std::vector<std::uint8_t>> RefuseLayout(std::string_view what) {
   return core::Fail(ErrorCode::kUnsupportedVersion,
@@ -100,7 +95,7 @@ std::vector<std::uint8_t> Start(std::uint16_t opcode, std::size_t wire_size) {
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const PartyBookingRegisterRequest& request) {
-  if (!LayoutHolds<PartyBookingRegisterRequest>(kRegisterHandler, kRegisterOffsets)) {
+  if (!FixedLayoutHolds<PartyBookingRegisterRequest>(kRegisterHandler, kRegisterOffsets)) {
     return RefuseLayout("la publication d'une annonce de groupe");
   }
   std::vector<std::uint8_t> frame =
@@ -113,7 +108,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const PartyBookingRegisterRequest
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const PartyBookingSearchRequest& request) {
-  if (!LayoutHolds<PartyBookingSearchRequest>(kSearchHandler, kSearchOffsets)) {
+  if (!FixedLayoutHolds<PartyBookingSearchRequest>(kSearchHandler, kSearchOffsets)) {
     return RefuseLayout("la recherche d'annonces de groupe");
   }
   std::vector<std::uint8_t> frame =
@@ -128,14 +123,14 @@ core::Result<std::vector<std::uint8_t>> Encode(const PartyBookingSearchRequest& 
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const PartyBookingDeleteRequest& /*request*/) {
-  if (!LayoutHolds<PartyBookingDeleteRequest>(kDeleteHandler, kDeleteOffsets)) {
+  if (!FixedLayoutHolds<PartyBookingDeleteRequest>(kDeleteHandler, kDeleteOffsets)) {
     return RefuseLayout("le retrait d'une annonce de groupe");
   }
   return Start(PartyBookingDeleteRequest::kOpcode, PartyBookingDeleteRequest::kWireSize);
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const PartyBookingUpdateRequest& request) {
-  if (!LayoutHolds<PartyBookingUpdateRequest>(kUpdateHandler, kUpdateOffsets)) {
+  if (!FixedLayoutHolds<PartyBookingUpdateRequest>(kUpdateHandler, kUpdateOffsets)) {
     return RefuseLayout("la modification d'une annonce de groupe");
   }
   std::vector<std::uint8_t> frame =

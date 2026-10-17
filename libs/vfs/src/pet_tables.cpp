@@ -10,6 +10,8 @@
 
 #include "ro/core/log.h"
 
+#include "yaml_required.h"
+
 namespace ro::vfs {
 namespace {
 
@@ -44,16 +46,6 @@ core::Error RefusedInfo(std::string detail) {
     into[pair.first.as<std::uint32_t>()] = pair.second.as<std::string>();
   }
   return true;
-}
-
-// Un champ obligatoire d'une table YAML, absent : une exception, comme yaml-cpp
-// signale un champ qui n'entre pas dans son type.
-[[nodiscard]] YAML::Node Required(const YAML::Node& map, const char* key) {
-  YAML::Node value = map[key];
-  if (!value) {
-    throw YAML::KeyNotFound(map.Mark(), std::string(key));
-  }
-  return value;
 }
 
 [[nodiscard]] PetEvolutionRecipe ParseEvolution(const YAML::Node& node) {

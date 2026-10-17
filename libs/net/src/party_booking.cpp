@@ -8,6 +8,8 @@
 #include "ro/core/text.h"
 #include "ro/proto/party_booking_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -23,15 +25,6 @@ sim::PartyBookingAd AdFrom(const proto::PartyBookingEntry& entry) {
   ad.map_code = entry.map_code;
   ad.jobs = entry.jobs;
   return ad;
-}
-
-core::Result<void> SendEncoded(Connection& link,
-                               const core::Result<std::vector<std::uint8_t>>& frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 core::Result<void> RefuseFault(sim::PartyBookingFault fault) {

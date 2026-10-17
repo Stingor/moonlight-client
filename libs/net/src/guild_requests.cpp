@@ -9,6 +9,8 @@
 #include "ro/proto/guild_packets.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -21,14 +23,6 @@ constexpr std::array<proto::GuildMenuRequest::Part, 5> kWindowParts = {
 // Une invitation acceptée ou refusée, telle que le serveur la lit.
 constexpr std::int32_t kInvitationAccepted = 1;
 constexpr std::int32_t kInvitationRefused = 0;
-
-core::Result<void> SendEncoded(Connection& link, core::Result<std::vector<std::uint8_t>> frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
 
 }  // namespace
 

@@ -8,6 +8,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "yaml_required.h"
+
 namespace ro::vfs {
 namespace {
 
@@ -30,16 +32,6 @@ constexpr double kWholePercent = 100.0;
 
 core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData, "table des conteneurs : " + std::move(detail)};
-}
-
-// Un champ obligatoire d'une table YAML, absent : une exception, comme yaml-cpp
-// signale un champ qui n'entre pas dans son type.
-[[nodiscard]] YAML::Node Required(const YAML::Node& map, const char* key) {
-  YAML::Node value = map[key];
-  if (!value) {
-    throw YAML::KeyNotFound(map.Mark(), std::string(key));
-  }
-  return value;
 }
 
 [[noreturn]] void Reject(const YAML::Node& node, const char* why) {

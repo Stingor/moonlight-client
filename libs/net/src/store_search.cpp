@@ -10,6 +10,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/store_search_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -32,15 +34,6 @@ sim::StoreSearchResult ResultFrom(const proto::ZcSearchStoreInfoAckSub& entry) {
   result.item.refine_level = entry.refine;
   result.item.grade = entry.grade;
   return result;
-}
-
-core::Result<void> SendEncoded(Connection& link,
-                               const core::Result<std::vector<std::uint8_t>>& frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 core::Result<void> RefuseClosed() {

@@ -7,6 +7,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -20,13 +22,6 @@ constexpr std::string_view kCloseHandler = "clif_parse_CloseVending";
 constexpr std::string_view kListHandler = "clif_parse_VendingListReq";
 // Le vendeur, juste après l'opcode.
 constexpr std::array<std::uint16_t, 1> kListOffsets = {2};
-
-template <typename Request, typename Offsets>
-bool FixedLayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
 
 bool OpenLayoutHolds() {
   const auto length = PacketLength(VendingOpenRequest::kOpcode);

@@ -13,6 +13,7 @@
 #include "ro/sim/world.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -74,14 +75,6 @@ void Say(sim::World& world, std::string line, std::uint32_t color, std::uint32_t
   }
   return failed ? Tr("Échec : aucun chuchotement n'était bloqué.")
                 : Tr("Les chuchotements de tous les personnages sont autorisés.");
-}
-
-core::Result<void> SendEncoded(Connection& link, core::Result<std::vector<std::uint8_t>> frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 }  // namespace

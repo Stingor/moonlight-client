@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "layout_holds.h"
+
 namespace ro::proto {
 namespace {
 
@@ -23,13 +25,6 @@ constexpr std::string_view kPointBuyHandler = "clif_parse_npccashshop_buy";
 constexpr std::array<std::uint16_t, 4> kPointBuyOffsets = {2, 4, 8, 10};
 constexpr std::string_view kTradeQuitHandler = "clif_parse_NPCShopClosed";
 constexpr std::string_view kMarketCloseHandler = "clif_parse_NPCMarketClosed";
-
-template <typename Request, typename Offsets>
-bool VariableLayoutHolds(std::string_view handler, const Offsets& offsets) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, offsets) && length.has_value() &&
-         *length == kVariableLength;
-}
 
 template <typename Request>
 bool OpcodeOnlyHolds(std::string_view handler) {
