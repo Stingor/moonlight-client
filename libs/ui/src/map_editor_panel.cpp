@@ -6,12 +6,14 @@
 #include <format>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/wheel_drag.h"
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
@@ -33,6 +35,17 @@ constexpr float kControlWidthPixels = 220.0F;
 constexpr float kPositionStep = 0.05F;
 constexpr float kRotationStep = 0.5F;
 constexpr float kScaleStep = 0.005F;
+// Et ce que vaut un cran de molette, dix avec Majuscule : une unité du RSW, un
+// degré, un centième d'échelle.
+constexpr float kPositionWheelStep = 1.0F;
+constexpr float kRotationWheelStep = 1.0F;
+constexpr float kScaleWheelStep = 0.01F;
+constexpr WheelDrag kPositionDrag{
+    .drag_step = kPositionStep, .wheel_step = kPositionWheelStep, .format = "%.3f"};
+constexpr WheelDrag kRotationDrag{
+    .drag_step = kRotationStep, .wheel_step = kRotationWheelStep, .format = "%.2f"};
+constexpr WheelDrag kScaleDrag{
+    .drag_step = kScaleStep, .wheel_step = kScaleWheelStep, .format = "%.3f"};
 
 constexpr const char* kMapEditorTitle = core::TrText("Éditeur de carte");
 constexpr const char* kMapEditorId = "map_editor";
@@ -56,6 +69,8 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
 constexpr float kLightMarkerPixels = 7.0F;
 // Les pas des glissières d'une lumière : sa portée, et sa couleur.
 constexpr float kLightRangeStep = 0.5F;
+// Un cran de molette sur la portée : une unité, dix avec Majuscule.
+constexpr float kLightRangeWheelStep = 1.0F;
 // La plus grande portée : une portée reste positive — le document refuse une
 // portée nulle —, et la glissière la borne de ce côté aussi.
 constexpr float kLightRangeMax = 2000.0F;
@@ -264,15 +279,14 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
                           .hidden = view.hidden};
   bool changed = false;
   bool released = false;
-  changed |= ImGui::DragFloat3(core::Tr("Position"), place.position.data(), kPositionStep, 0.0F,
-                               0.0F, "%.3f");
-  released |= ImGui::IsItemDeactivatedAfterEdit();
-  changed |= ImGui::DragFloat3(core::Tr("Rotation (°)"), place.rotation.data(), kRotationStep, 0.0F,
-                               0.0F, "%.2f");
-  released |= ImGui::IsItemDeactivatedAfterEdit();
-  changed |=
-      ImGui::DragFloat3(core::Tr("Échelle"), place.scale.data(), kScaleStep, 0.0F, 0.0F, "%.3f");
-  released |= ImGui::IsItemDeactivatedAfterEdit();
+  for (const auto& [label, values, drag] :
+       {std::tuple(core::Tr("Position"), &place.position, &kPositionDrag),
+        std::tuple(core::Tr("Rotation (°)"), &place.rotation, &kRotationDrag),
+        std::tuple(core::Tr("Échelle"), &place.scale, &kScaleDrag)}) {
+    const WheelDragResult field = WheelDragFloat3(label, *values, *drag);
+    changed |= field.changed;
+    released |= field.released;
+  }
   const bool toggled = SkinCheckBox(core::Tr("Masquer"), &place.hidden, art);
   if (changed || released || toggled) {
     place.released = released || toggled || !ImGui::IsAnyItemActive();
@@ -360,18 +374,23 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   map_editor::SetLight set{.slot = slot, .light = view.lights[slot], .released = false};
   bool changed = false;
   bool released = false;
-  changed |= ImGui::DragFloat3(core::Tr("Position"), set.light.position.data(), kPositionStep, 0.0F,
-                               0.0F, "%.3f");
-  released |= ImGui::IsItemDeactivatedAfterEdit();
+  const WheelDragResult moved =
+      WheelDragFloat3(core::Tr("Position"), set.light.position, kPositionDrag);
+  changed |= moved.changed;
+  released |= moved.released;
   // UNE PASTILLE ET SON SÉLECTEUR : la couleur se choisit à l'œil. Au-delà de
   // 1, une composante éclaire plus fort ; la session borne ce que l'on tape.
   changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.light.color.data(),
                                ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
   released |= ImGui::IsItemDeactivatedAfterEdit();
-  changed |=
-      ImGui::DragFloat(core::Tr("Portée"), &set.light.range, kLightRangeStep, kLightRangeStep,
-                       kLightRangeMax, "%.1f", ImGuiSliderFlags_AlwaysClamp);
-  released |= ImGui::IsItemDeactivatedAfterEdit();
+  const WheelDragResult reach = WheelDragFloat(core::Tr("Portée"), set.light.range,
+                                               WheelDrag{.drag_step = kLightRangeStep,
+                                                         .wheel_step = kLightRangeWheelStep,
+                                                         .lowest = kLightRangeStep,
+                                                         .highest = kLightRangeMax,
+                                                         .format = "%.1f"});
+  changed |= reach.changed;
+  released |= reach.released;
   bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
   toggled |= SkinCheckBox(core::Tr("Vacille"), &set.light.flicker, art);
   const std::string_view typed(panel.light_why.data(),
