@@ -460,6 +460,14 @@ std::string GroundFilePath(const vfs::ResNameTable& res_names, const formats::Rs
   return res_names.MapFilePath(ground_file);
 }
 
+void RebuildSceneGround(MapScene& scene, std::int32_t subdivisions) {
+  if (scene.ground_subdivisions == subdivisions) {
+    return;
+  }
+  scene.ground_subdivisions = subdivisions;
+  scene.terrain = BuildTerrainMesh(scene.gnd, scene.atlas, scene.invisible_tiles, subdivisions);
+}
+
 core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                     const MapSceneOptions& options) {
   auto rsw_bytes = vfs.Read(vfs.res_names().MapFilePath(std::string(map_name) + ".rsw"));
@@ -526,13 +534,14 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   // Les textures AVANT le maillage : c'est en les lisant que l'on sait quels
   // carreaux sont des trous, et un trou ne s'émet pas.
   scene.terrain_textures = LoadTerrainTextures(vfs, scene.gnd, scene.missing_terrain_textures);
-  const std::vector<std::uint8_t> invisible_tiles =
-      FindInvisibleTiles(scene.gnd, scene.terrain_textures);
-  scene.terrain = BuildTerrainMesh(scene.gnd, scene.atlas, invisible_tiles);
+  scene.invisible_tiles = FindInvisibleTiles(scene.gnd, scene.terrain_textures);
+  scene.ground_subdivisions = options.ground_subdivisions;
+  scene.terrain =
+      BuildTerrainMesh(scene.gnd, scene.atlas, scene.invisible_tiles, scene.ground_subdivisions);
   // 🔴 L'EAU PARTAGE LA LISTE DES TROUS AVEC LE TERRAIN, et il le faut : le
   // client ne pose d'eau que là où le sol a dessiné un quad. Sans elle, une
   // carte trouée se couvre d'une nappe par-dessus le vide.
-  scene.water = BuildWaterPlane(scene.gnd, scene.rsw, invisible_tiles);
+  scene.water = BuildWaterPlane(scene.gnd, scene.rsw, scene.invisible_tiles);
   scene.water_animations = LoadWaterAnimations(vfs, scene.water, scene.missing_water_textures);
   // Le décor est chargé APRÈS le terrain : s'il échoue, la carte reste
   // affichable, ce qui vaut mieux qu'un écran noir.

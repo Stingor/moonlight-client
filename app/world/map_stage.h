@@ -80,8 +80,19 @@ struct MapStage {
 // acteur ne se tient pas sur le décor mais sur le sol que le serveur lui
 // donne, et les deux diffèrent là où l'on marche AU-DESSUS du terrain. Sans
 // grille, celle du terrain visible, qui vaut mieux que rien.
+//
+// Sur le SOL ARRONDI, l'acteur suit le sol dessiné là où la grille suit le
+// terrain : voir `ro::render::RoundedStandingHeight`.
 [[nodiscard]] std::array<float, 3> GroundPositionAt(const MapStage& stage, float cell_x,
                                                     float cell_y);
+
+// LE SOL ARRONDI SELON LE RÉGLAGE : rebâtit le maillage du sol de `stage` et le
+// téléverse dans `terrain` quand `rounded` ne correspond plus à ce qu'il porte.
+// Rien sinon, ce qui permet de l'appeler à chaque image. L'erreur rendue est
+// celle du téléversement.
+[[nodiscard]] ro::core::Result<void> SyncStageGround(MapStage& stage,
+                                                     ro::render::TerrainRenderer& terrain,
+                                                     bool rounded);
 
 // LE NOM QUE LE JOUEUR VOIT, et celui du fichier qu'il lance.
 //

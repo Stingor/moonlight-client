@@ -104,6 +104,11 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   if (!stage_.has_value()) {
     return;
   }
+  // LE SOL ARRONDI comme en partie. Un refus de la carte graphique laisse le sol
+  // d'avant : le fond reste debout.
+  if (auto rounded = SyncStageGround(*stage_, terrain_, graphics.rounded_ground()); !rounded) {
+    ro::core::LogWarning("fond : sol non rebâti — {}", ro::core::Describe(rounded.error()));
+  }
   const ro::render::Camera camera = BackdropCamera(LookAt(), elapsed_ms);
   // LES ÉTAGES QUE LE JOUEUR RÈGLE, et eux seuls : le sol uni de l'établi du
   // staff ne passe pas par ici. Voir l'en-tête.

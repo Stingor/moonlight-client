@@ -1,5 +1,6 @@
 #include "ro/render/terrain_renderer.h"
 
+#include <cstdint>
 #include <string_view>
 #include <utility>
 
@@ -25,6 +26,7 @@ layout(location = 1) in vec2 a_texture_uv;
 layout(location = 2) in vec2 a_lightmap_uv;
 layout(location = 3) in vec4 a_color;
 layout(location = 4) in vec3 a_normal;
+layout(location = 5) in vec3 a_shape_normal;
 
 uniform mat4 u_view_projection;
 uniform vec3 u_light_direction;
@@ -38,6 +40,8 @@ out vec3 v_light;
 // L'éclairement sans le soleil : celui d'un point à l'ombre.
 out vec3 v_shaded_light;
 out float v_fog_kept;
+// La normale de la forme, nulle sur le sol d'origine : voir `TerrainVertex`.
+out vec3 v_shape_normal;
 
 void main() {
     v_texture_uv = a_texture_uv;
@@ -46,7 +50,10 @@ void main() {
     v_world_position = a_position;
     gl_Position = u_view_projection * vec4(a_position, 1.0);
     v_fog_kept = FogKeptPart(gl_Position.w);
-    SunShadowProject(a_position, normalize(a_normal));
+    v_shape_normal = a_shape_normal;
+    // L'OMBRE CALCULÉE LIT LA FORME, quand le sol en porte une.
+    vec3 shape_normal = dot(a_shape_normal, a_shape_normal) > 0.0 ? a_shape_normal : a_normal;
+    SunShadowProject(a_position, normalize(shape_normal));
 
     // Incidence mesurée contre la direction TELLE QUELLE, sans la négliger.
     //
@@ -85,6 +92,7 @@ in vec4 v_color;
 in vec3 v_light;
 in vec3 v_shaded_light;
 in float v_fog_kept;
+in vec3 v_shape_normal;
 
 uniform sampler2D u_texture;
 uniform sampler2D u_lightmap;
@@ -111,7 +119,10 @@ uniform float u_alpha_reference;
 out vec4 frag_color;
 
 void main() {
-    vec3 surface_normal = PointSurfaceNormal();
+    // LE SOL ARRONDI S'ÉCLAIRE PAR SA FORME LISSE, interpolée d'un sommet à
+    // l'autre : la normale géométrique montrerait chaque sous-carreau en facette.
+    vec3 surface_normal = dot(v_shape_normal, v_shape_normal) > 0.0 ? normalize(v_shape_normal)
+                                                                    : PointSurfaceNormal();
     vec4 texel = texture(u_texture, v_texture_uv);
     // Les textures RO emploient le magenta comme couleur de transparence ; le
     // rejet franc évite d'avoir à trier les faces en profondeur. Son seuil
@@ -170,11 +181,15 @@ TerrainRenderer::TerrainRenderer(TerrainRenderer&& other) noexcept
       lightmap_(std::move(other.lightmap_)),
       surfaces_(std::move(other.surfaces_)),
       has_lightmap_(other.has_lightmap_),
+      indexed_(other.indexed_),
       vertex_array_(other.vertex_array_),
-      vertex_buffer_(other.vertex_buffer_) {
+      vertex_buffer_(other.vertex_buffer_),
+      index_buffer_(other.index_buffer_) {
   other.vertex_array_ = 0;
   other.vertex_buffer_ = 0;
+  other.index_buffer_ = 0;
   other.has_lightmap_ = false;
+  other.indexed_ = false;
 }
 
 TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
@@ -186,8 +201,10 @@ TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
     lightmap_ = std::move(other.lightmap_);
     surfaces_ = std::move(other.surfaces_);
     std::swap(has_lightmap_, other.has_lightmap_);
+    std::swap(indexed_, other.indexed_);
     std::swap(vertex_array_, other.vertex_array_);
     std::swap(vertex_buffer_, other.vertex_buffer_);
+    std::swap(index_buffer_, other.index_buffer_);
   }
   return *this;
 }
@@ -195,6 +212,9 @@ TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
 TerrainRenderer::~TerrainRenderer() {
   if (vertex_buffer_ != 0) {
     glDeleteBuffers(1, &vertex_buffer_);
+  }
+  if (index_buffer_ != 0) {
+    glDeleteBuffers(1, &index_buffer_);
   }
   if (vertex_array_ != 0) {
     glDeleteVertexArrays(1, &vertex_array_);
@@ -251,6 +271,7 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
   if (vertex_array_ == 0) {
     glGenVertexArrays(1, &vertex_array_);
     glGenBuffers(1, &vertex_buffer_);
+    glGenBuffers(1, &index_buffer_);
   }
 
   glBindVertexArray(vertex_array_);
@@ -258,6 +279,12 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
   glBufferData(GL_ARRAY_BUFFER,
                static_cast<GLsizeiptr>(mesh.vertices.size() * sizeof(TerrainVertex)),
                mesh.vertices.data(), GL_STATIC_DRAW);
+  // Les indices restent liés au tableau de sommets, qui les retient.
+  indexed_ = !mesh.indices.empty();
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(std::uint32_t)),
+               mesh.indices.data(), GL_STATIC_DRAW);
 
   const auto stride = static_cast<GLsizei>(sizeof(TerrainVertex));
   glEnableVertexAttribArray(0);
@@ -275,6 +302,9 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
   glEnableVertexAttribArray(4);
   glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, stride,
                         reinterpret_cast<void*>(offsetof(TerrainVertex, normal)));
+  glEnableVertexAttribArray(5);
+  glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(offsetof(TerrainVertex, shape_normal)));
   glBindVertexArray(0);
 
   return {};
@@ -337,8 +367,14 @@ void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const Scene
     (usable ? textures_[index] : placeholder_).Bind(0);
     program_.SetFloat("u_alpha_reference",
                       usable ? alpha_references_[index] : kBlendedCutoutAlphaReference);
-    glDrawArrays(GL_TRIANGLES, static_cast<GLint>(surface.first_vertex),
-                 static_cast<GLsizei>(surface.vertex_count));
+    if (indexed_) {
+      glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(surface.index_count), GL_UNSIGNED_INT,
+                     reinterpret_cast<void*>(static_cast<std::uintptr_t>(surface.first_index) *
+                                             sizeof(std::uint32_t)));
+    } else {
+      glDrawArrays(GL_TRIANGLES, static_cast<GLint>(surface.first_vertex),
+                   static_cast<GLsizei>(surface.vertex_count));
+    }
   }
   glBindVertexArray(0);
 }

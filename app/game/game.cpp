@@ -150,7 +150,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // pas être écrasée par lui.
   AdvanceAfk(now_ms);
   // LE RELIEF D'ABORD : la caméra, le voile et le dessin le lisent tous.
-  if (auto followed = FollowGreyWorldRelief(); !followed) {
+  if (auto followed = FollowMapRelief(); !followed) {
     return followed;
   }
   // L'ÉDITEUR DE CARTE, sur le décor de cette image : voir game_map_editor.cpp.

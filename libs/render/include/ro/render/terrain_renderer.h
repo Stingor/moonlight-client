@@ -116,8 +116,12 @@ class TerrainRenderer {
   GlTexture lightmap_;
   std::vector<TerrainSurface> surfaces_;
   bool has_lightmap_ = false;
+  // Le maillage téléversé a des indices : le sol arrondi. Voir
+  // `TerrainMesh::indices`.
+  bool indexed_ = false;
   unsigned int vertex_array_ = 0;
   unsigned int vertex_buffer_ = 0;
+  unsigned int index_buffer_ = 0;
 };
 
 }  // namespace ro::render

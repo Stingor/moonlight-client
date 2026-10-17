@@ -569,7 +569,10 @@ add_library(ro_render STATIC
     src/item_view_names.cpp
     src/shown_job.cpp
     src/sprite_frame.cpp
+    src/terrain_faces.cpp
     src/terrain_mesh.cpp
+    src/terrain_mesh_rounded.cpp
+    src/terrain_relief.cpp
     src/texture_bleed.cpp
     src/vanish_fade.cpp
     src/afterimage_blur.cpp

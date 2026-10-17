@@ -313,7 +313,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // image, les faire vivre, les peindre.
   void AdvanceMapEffects(std::uint32_t now_ms);
   void DrawMapEffects();
-  // Le relief suit GreyWorld, relu sur place : voir `ReloadStageRelief`.
+  // Le relief suit GreyWorld, relu sur place : voir `ReloadStageRelief`. Puis
+  // le sol s'arrondit ou non selon le réglage : voir `SyncStageGround`.
+  [[nodiscard]] ro::core::Result<void> FollowMapRelief();
   [[nodiscard]] ro::core::Result<void> FollowGreyWorldRelief();
   // LE MODE ÉDITEUR DE CARTE : voir game_map_editor.cpp.
   void ServeMapEditor();

@@ -107,10 +107,40 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
 
 std::array<float, 3> GroundPositionAt(const MapStage& stage, float cell_x, float cell_y) {
   std::array<float, 3> ground = ro::render::CellPositionAt(stage.scene.gnd, cell_x, cell_y);
+  const bool rounded = stage.scene.ground_subdivisions > ro::render::kFlatGroundSubdivisions;
   if (stage.gat.has_value()) {
-    ground[1] = ro::render::WalkableHeightAt(*stage.gat, cell_x, cell_y);
+    const float walkable = ro::render::WalkableHeightAt(*stage.gat, cell_x, cell_y);
+    // LE SOL DESSINÉ, quand il s'arrondit : sans quoi les pieds flottent au
+    // creux d'une dune et s'enfoncent sur sa crête.
+    ground[1] =
+        rounded ? ro::render::RoundedStandingHeight(stage.scene.gnd, walkable, ground[0], ground[2])
+                : walkable;
+  } else if (rounded) {
+    ground[1] = ro::render::RoundedGroundHeightAt(stage.scene.gnd, ground[0], ground[2]);
   }
   return ground;
+}
+
+ro::core::Result<void> SyncStageGround(MapStage& stage, ro::render::TerrainRenderer& terrain,
+                                       bool rounded) {
+  const std::int32_t wanted =
+      rounded ? ro::render::kRoundedGroundSubdivisions : ro::render::kFlatGroundSubdivisions;
+  if (stage.scene.ground_subdivisions == wanted) {
+    return {};
+  }
+  const std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
+  ro::render::RebuildSceneGround(stage.scene, wanted);
+  if (auto uploaded = terrain.Upload(stage.scene.terrain, stage.scene.terrain_textures,
+                                     stage.scene.atlas.image);
+      !uploaded) {
+    return std::unexpected(uploaded.error());
+  }
+  ro::core::LogInfo("carte {} : sol {}, {} sommets, rebâti en {} ms", stage.name,
+                    rounded ? "arrondi" : "d'origine", stage.scene.terrain.vertices.size(),
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - started)
+                        .count());
+  return {};
 }
 
 void ReportMapStage(const MapStage& stage) {

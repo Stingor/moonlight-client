@@ -93,6 +93,11 @@ struct MapScene {
   LightmapAtlas atlas;
   TerrainMesh terrain;
   std::vector<formats::Image> terrain_textures;
+  // Les carreaux que le maillage n'émet pas : voir `FindInvisibleTiles`.
+  // Gardés pour rebâtir le sol sans relire ses textures.
+  std::vector<std::uint8_t> invisible_tiles;
+  // Le découpage dont `terrain` est bâti : voir `BuildTerrainMesh`.
+  std::int32_t ground_subdivisions = kFlatGroundSubdivisions;
   std::vector<ModelInstances> models;
   SceneLight light;
 
@@ -182,6 +187,9 @@ struct MapSceneOptions {
   // ⚠ C'EST AU CHARGEMENT, parce que le maillage du terrain se bâtit sur les
   // hauteurs. Changer d'avis demande de relire la carte.
   bool flatten_relief = false;
+  // LE SOL ARRONDI : les sous-carreaux par côté de cube. Voir
+  // `BuildTerrainMesh` ; `RebuildSceneGround` en change sans relire la carte.
+  std::int32_t ground_subdivisions = kFlatGroundSubdivisions;
   // L'ÉDITION À POSER au lieu de celle de l'installation — voir `LoadMapEdit`.
   // L'éditeur y met le document qu'il tient ; un banc ou un outil, celui qu'il
   // éprouve.
@@ -190,6 +198,12 @@ struct MapSceneOptions {
 
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                                   const MapSceneOptions& options = {});
+
+// REBÂTIT LE MAILLAGE DU SOL de `scene` en `subdivisions` sous-carreaux par côté
+// de cube, sans relire la carte : c'est ce que demande le réglage « Sol
+// arrondi » quand il change. Rien n'est fait quand le sol l'est déjà. À
+// téléverser ensuite au renderer.
+void RebuildSceneGround(MapScene& scene, std::int32_t subdivisions);
 
 // L'ÉDITION DE `map_name` dans l'installation : voir docs/adr/0118. Une carte
 // sans document n'en a aucune ; un document illisible n'en donne aucune, et le

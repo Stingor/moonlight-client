@@ -22,6 +22,7 @@ constexpr const char* kLightmapsKey = "shadows_of_the_map";
 constexpr const char* kColdLightKey = "light_cold";
 constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
 constexpr const char* kEffectLightsKey = "light_from_effects";
+constexpr const char* kRoundedGroundKey = "ground_rounded";
 constexpr const char* kDayNightCycleKey = "cycle_day_night";
 constexpr const char* kFixedSkyKey = "cycle_day_night_fixed";
 constexpr const char* kFixedSkyHourKey = "cycle_day_night_hour";
@@ -63,6 +64,7 @@ enum class GraphicsRow : int {
   kColdLight,
   kSunShadows,
   kEffectLights,
+  kRoundedGround,
   kDayNightCycle,
   kFixedSky,
   kFixedSkyHour,
@@ -208,6 +210,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kLightmapsKey, &lightmaps_);
   into.Declare(kColdLightKey, &cold_light_);
   into.Declare(kEffectLightsKey, &effect_lights_);
+  into.Declare(kRoundedGroundKey, &rounded_ground_);
   into.Declare(kDayNightCycleKey, &day_night_cycle_);
   into.Declare(kFixedSkyKey, &fixed_sky_);
   into.Declare(kFixedSkyHourKey, &fixed_sky_hour_);
@@ -273,6 +276,13 @@ void GraphicsOptions::Compose() {
                             "les personnages autour de lui, de la couleur de ses flammes.\n\nLe "
                             "client d'origine ne le fait pas."),
                          nullptr, effect_lights_));
+  rows_.push_back(Toggle(GraphicsRow::kRoundedGround, Tr("Sol arrondi"),
+                         Tr("Les dunes, les collines et les talus s'arrondissent au lieu de se "
+                            "plier en arêtes droites : chaque carreau du sol se découpe en seize, "
+                            "posés sur une surface lisse. Les falaises restent nettes, et les "
+                            "personnages suivent le sol dessiné.\n\nLe client d'origine dessine "
+                            "le sol en facettes, et la carte graphique travaille un peu plus."),
+                         nullptr, rounded_ground_));
   rows_.push_back(Toggle(GraphicsRow::kDayNightCycle, Tr("Cycle jour/nuit"),
                          Tr("Le soleil, puis la lune, suivent l'heure qu'il fait sur le serveur : "
                             "lumière du matin, du midi et du soir, puis une nuit plus sombre et "
@@ -489,6 +499,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kEffectLights:
       effect_lights_ = asked.on;
+      break;
+    case GraphicsRow::kRoundedGround:
+      rounded_ground_ = asked.on;
       break;
     case GraphicsRow::kDayNightCycle:
       day_night_cycle_ = asked.on;

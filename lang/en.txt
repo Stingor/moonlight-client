@@ -19131,3 +19131,9 @@ tr: The sky stays at the chosen hour instead of following the server's: always m
 
 fr: Heure du ciel
 tr: Sky hour
+
+fr: Sol arrondi
+tr: Rounded ground
+
+fr: Les dunes, les collines et les talus s'arrondissent au lieu de se plier en arêtes droites : chaque carreau du sol se découpe en seize, posés sur une surface lisse. Les falaises restent nettes, et les personnages suivent le sol dessiné.\n\nLe client d'origine dessine le sol en facettes, et la carte graphique travaille un peu plus.
+tr: Dunes, hills and banks curve instead of folding along straight edges: each ground tile is cut into sixteen, laid on a smooth surface. Cliffs stay sharp, and characters follow the drawn ground.\n\nThe original client draws the ground in facets, and the graphics card works a little harder.

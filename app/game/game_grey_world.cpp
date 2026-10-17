@@ -1,4 +1,5 @@
-// GREYWORLD CÔTÉ PARTIE : le relief de la carte suit le réglage.
+// GREYWORLD CÔTÉ PARTIE : le relief de la carte suit le réglage, et le sol
+// arrondi aussi.
 
 #include <utility>
 #include <vector>
@@ -9,6 +10,14 @@
 #include "world/grey_world_view.h"
 
 namespace moonclient {
+
+ro::core::Result<void> Game::FollowMapRelief() {
+  if (auto followed = FollowGreyWorldRelief(); !followed) {
+    return followed;
+  }
+  // ⚠ APRÈS GREYWORLD, qui relit la carte avec son sol d'origine.
+  return SyncStageGround(*stage_, terrain_, settings_->options().graphics().rounded_ground());
+}
 
 ro::core::Result<void> Game::FollowGreyWorldRelief() {
   GreyWorldOptions& page = settings_->options().pages().grey_world;

@@ -9,6 +9,7 @@
 #include "ro/formats/gnd.h"
 #include "ro/formats/image.h"
 #include "ro/render/lightmap_atlas.h"
+#include "ro/render/terrain_relief.h"
 
 namespace ro::render {
 
@@ -33,19 +34,32 @@ struct TerrainVertex {
   std::array<float, 2> lightmap_uv{};
   // Couleur du carreau, en RGBA normalisé.
   std::array<float, 4> color{};
-  // Normale de la face, normalisée.
+  // Normale de la face, normalisée : la verticale sur le dessus, qui porte la
+  // lumière de la carte.
   std::array<float, 3> normal{};
+  // La normale de la FORME, pour l'éclairage calculé : lumières ponctuelles et
+  // ombres en temps réel. Celle du sol arrondi sur le dessus, celle de la paroi
+  // sur une paroi. NULLE sur le sol d'origine : le nuanceur prend alors la
+  // normale géométrique de la face.
+  std::array<float, 3> shape_normal{};
 };
 
 // Un lot de dessin : les sommets partageant une même texture sont contigus.
+// Leurs indices aussi, quand le maillage en a.
 struct TerrainSurface {
   std::int16_t texture_index = 0;
   std::uint32_t first_vertex = 0;
   std::uint32_t vertex_count = 0;
+  std::uint32_t first_index = 0;
+  std::uint32_t index_count = 0;
 };
 
 struct TerrainMesh {
   std::vector<TerrainVertex> vertices;
+  // VIDE SUR LE SOL D'ORIGINE, dont les sommets se lisent trois par trois. Le
+  // sol arrondi partage les sommets de sa grille : seize sous-carreaux par cube
+  // en coûteraient sinon six chacun.
+  std::vector<std::uint32_t> indices;
   std::vector<TerrainSurface> surfaces;
   std::array<float, 3> bounds_min{};
   std::array<float, 3> bounds_max{};
@@ -80,8 +94,13 @@ struct TerrainMesh {
 // rendu se passe simplement d'ombres.
 //
 // `invisible_tiles` vient de FindInvisibleTiles. Vide, tout est émis.
+//
+// `subdivisions` découpe chaque cube en autant de sous-carreaux par côté, posés
+// sur le sol arrondi — voir `terrain_relief.h`. Un seul rend le sol d'origine,
+// au triangle près.
 [[nodiscard]] TerrainMesh BuildTerrainMesh(const formats::GndMap& gnd, const LightmapAtlas& atlas,
-                                           std::span<const std::uint8_t> invisible_tiles = {});
+                                           std::span<const std::uint8_t> invisible_tiles = {},
+                                           std::int32_t subdivisions = kFlatGroundSubdivisions);
 
 // L'altitude du sol en un point du monde, dans le repère du maillage.
 //
