@@ -10,6 +10,7 @@
 #include <limits>
 #include <span>
 #include <system_error>
+#include <utility>
 
 namespace moonclient {
 namespace {
@@ -135,8 +136,36 @@ void CopyString(std::string_view script, std::size_t& at, std::string& into) {
 
 // ── LES ARGUMENTS ───────────────────────────────────────────────────────────
 
-// Les arguments d'une instruction `commande a,b,…`, coupés aux virgules hors
-// parenthèses. Vide quand le morceau n'est pas cette commande suivie d'un blanc.
+// Des arguments coupés aux virgules hors parenthèses et hors chaînes.
+[[nodiscard]] std::vector<std::string_view> SplitArguments(std::string_view rest) {
+  std::vector<std::string_view> arguments;
+  int nesting = 0;
+  bool quoted = false;
+  std::size_t start = 0;
+  for (std::size_t at = 0; at < rest.size(); ++at) {
+    if (quoted) {
+      if (rest[at] == '\\') {
+        ++at;
+      } else if (rest[at] == '"') {
+        quoted = false;
+      }
+    } else if (rest[at] == '"') {
+      quoted = true;
+    } else if (rest[at] == '(') {
+      ++nesting;
+    } else if (rest[at] == ')') {
+      --nesting;
+    } else if (rest[at] == ',' && nesting == 0) {
+      arguments.push_back(Trimmed(rest.substr(start, at - start)));
+      start = at + 1;
+    }
+  }
+  arguments.push_back(Trimmed(rest.substr(start)));
+  return arguments;
+}
+
+// Les arguments d'une instruction `commande a,b,…`. Vide quand le morceau
+// n'est pas cette commande suivie d'un blanc.
 [[nodiscard]] std::optional<std::vector<std::string_view>> ArgumentsOf(std::string_view text,
                                                                        std::string_view command) {
   if (!StartsWithText(text, command)) {
@@ -149,22 +178,32 @@ void CopyString(std::string_view script, std::size_t& at, std::string& into) {
   if (!std::isspace(static_cast<unsigned char>(rest.front()))) {
     return std::nullopt;
   }
-  rest = Trimmed(rest);
-  std::vector<std::string_view> arguments;
+  return SplitArguments(Trimmed(rest));
+}
+
+// Les arguments d'un appel `commande(a,b,…)`, la parenthèse fermante finissant
+// le morceau, ou ceux de l'instruction `commande a,b,…`.
+[[nodiscard]] std::optional<std::vector<std::string_view>> CallArgumentsOf(
+    std::string_view text, std::string_view command) {
+  if (!StartsWithText(text, command)) {
+    return std::nullopt;
+  }
+  const std::string_view rest = Trimmed(text.substr(command.size()));
+  if (rest.empty() || rest.front() != '(') {
+    return ArgumentsOf(text, command);
+  }
   int nesting = 0;
-  std::size_t start = 0;
   for (std::size_t at = 0; at < rest.size(); ++at) {
     if (rest[at] == '(') {
       ++nesting;
-    } else if (rest[at] == ')') {
-      --nesting;
-    } else if (rest[at] == ',' && nesting == 0) {
-      arguments.push_back(Trimmed(rest.substr(start, at - start)));
-      start = at + 1;
+    } else if (rest[at] == ')' && --nesting == 0) {
+      if (at + 1 != rest.size()) {
+        return std::nullopt;
+      }
+      return SplitArguments(rest.substr(1, at - 1));
     }
   }
-  arguments.push_back(Trimmed(rest.substr(start)));
-  return arguments;
+  return std::nullopt;
 }
 
 // Un entier littéral, signe compris.
@@ -219,9 +258,11 @@ enum class Family : std::uint8_t {
   kAttackElement,
   kDefenseElement,
   kCapture,
-  kStart
+  kStart,
+  kGift,
+  kSummon
 };
-inline constexpr std::size_t kFamilyCount = 6;
+inline constexpr std::size_t kFamilyCount = 8;
 
 struct FamilyWord {
   std::string_view word;
@@ -229,7 +270,7 @@ struct FamilyWord {
 };
 
 // Les mots qui désignent une famille, où qu'ils paraissent.
-constexpr std::array<FamilyWord, 10> kFamilyWords = {{
+constexpr std::array<FamilyWord, 14> kFamilyWords = {{
     {"itemheal", Family::kHeal},
     {"percentheal", Family::kHeal},
     {"heal", Family::kHeal},
@@ -240,6 +281,10 @@ constexpr std::array<FamilyWord, 10> kFamilyWords = {{
     {"sc_start", Family::kStart},
     {"sc_start2", Family::kStart},
     {"sc_start4", Family::kStart},
+    {"getitem", Family::kGift},
+    {"getgroupitem", Family::kGift},
+    {"getrandgroupitem", Family::kGift},
+    {"monster", Family::kSummon},
 }};
 
 // Les mots après lesquels la suite du script peut ne pas s'exécuter.
@@ -388,6 +433,135 @@ void ReadElement(Reading& reading, std::string_view text, Family family, std::st
   into = element;
 }
 
+// ── LES DONS ET LES INVOCATIONS ─────────────────────────────────────────────
+
+constexpr std::string_view kItemGroupPrefix = "IG_";
+constexpr std::string_view kMonsterGroupPrefix = "MOBG_";
+// Le monstre d'un tirage dans un groupe s'écrit `-1-MOBG_X`.
+constexpr std::string_view kMonsterGroupDraw = "-1-";
+// La seule carte qu'une invocation d'objet vise : celle du porteur.
+constexpr std::string_view kBearerMap = "\"this\"";
+// `monster` : carte, x, y, nom, monstre, nombre, puis l'événement facultatif.
+constexpr std::size_t kSummonArguments = 6;
+constexpr std::size_t kSummonArgumentsWithEvent = 7;
+constexpr std::size_t kSummonMonsterArgument = 4;
+constexpr std::size_t kSummonCountArgument = 5;
+
+// Un entier littéral strictement positif, dans la largeur d'un identifiant.
+[[nodiscard]] std::optional<std::uint32_t> PositiveOf(std::string_view text) {
+  const std::optional<std::int64_t> value = IntegerOf(text);
+  if (!value.has_value() || *value <= 0 || *value > std::numeric_limits<std::uint32_t>::max()) {
+    return std::nullopt;
+  }
+  return static_cast<std::uint32_t>(*value);
+}
+
+[[nodiscard]] bool IsQuoted(std::string_view text) {
+  return text.size() >= 2 && text.front() == '"' && text.back() == '"';
+}
+
+// Le mot d'une chaîne qui ne porte qu'un mot, entre guillemets : un nom Aegis.
+[[nodiscard]] std::optional<std::string> QuotedWord(std::string_view text) {
+  if (!IsQuoted(text)) {
+    return std::nullopt;
+  }
+  const std::string_view inside = text.substr(1, text.size() - 2);
+  const std::vector<std::string_view> words = WordsOf(inside);
+  if (words.size() != 1 || words.front() != inside) {
+    return std::nullopt;
+  }
+  return std::string(inside);
+}
+
+// Le nom d'un groupe, constante seule, sans son préfixe : « BlueBox ».
+[[nodiscard]] std::optional<std::string> GroupOf(std::string_view text, std::string_view prefix) {
+  text = Trimmed(text);
+  const std::vector<std::string_view> words = WordsOf(text);
+  if (words.size() != 1 || words.front() != text || !StartsWithText(text, prefix) ||
+      text.size() == prefix.size()) {
+    return std::nullopt;
+  }
+  return std::string(text.substr(prefix.size()));
+}
+
+[[nodiscard]] std::optional<ScriptGift> GiftOf(std::string_view text) {
+  if (const auto arguments = CallArgumentsOf(text, "getrandgroupitem"); arguments.has_value()) {
+    if (arguments->size() != 2) {
+      return std::nullopt;
+    }
+    const std::optional<std::string> group = GroupOf((*arguments)[0], kItemGroupPrefix);
+    const std::optional<std::uint32_t> count = PositiveOf((*arguments)[1]);
+    if (!group.has_value() || !count.has_value()) {
+      return std::nullopt;
+    }
+    return ScriptGift{.kind = ScriptGiftKind::kRandomGroup, .group = *group, .count = *count};
+  }
+  if (const auto arguments = CallArgumentsOf(text, "getgroupitem"); arguments.has_value()) {
+    if (arguments->size() != 1) {
+      return std::nullopt;
+    }
+    const std::optional<std::string> group = GroupOf((*arguments)[0], kItemGroupPrefix);
+    if (!group.has_value()) {
+      return std::nullopt;
+    }
+    return ScriptGift{.kind = ScriptGiftKind::kGroup, .group = *group};
+  }
+  const auto arguments = CallArgumentsOf(text, "getitem");
+  if (!arguments.has_value() || arguments->size() != 2) {
+    return std::nullopt;
+  }
+  const std::optional<std::uint32_t> count = PositiveOf((*arguments)[1]);
+  if (!count.has_value()) {
+    return std::nullopt;
+  }
+  if (const std::optional<std::uint32_t> item_id = PositiveOf((*arguments)[0]);
+      item_id.has_value()) {
+    return ScriptGift{.kind = ScriptGiftKind::kItem, .item_id = *item_id, .count = *count};
+  }
+  if (std::optional<std::string> aegis = QuotedWord((*arguments)[0]); aegis.has_value()) {
+    return ScriptGift{
+        .kind = ScriptGiftKind::kItem, .aegis_name = std::move(*aegis), .count = *count};
+  }
+  return std::nullopt;
+}
+
+[[nodiscard]] std::optional<ScriptSummon> SummonOf(std::string_view text) {
+  const auto arguments = ArgumentsOf(text, "monster");
+  if (!arguments.has_value() ||
+      (arguments->size() != kSummonArguments && arguments->size() != kSummonArgumentsWithEvent)) {
+    return std::nullopt;
+  }
+  const std::vector<std::string_view>& given = *arguments;
+  if (given[0] != kBearerMap || !IntegerOf(given[1]).has_value() ||
+      !IntegerOf(given[2]).has_value() || !IsQuoted(given[3]) ||
+      (given.size() == kSummonArgumentsWithEvent && !IsQuoted(given.back()))) {
+    return std::nullopt;
+  }
+  const std::optional<std::uint32_t> count = PositiveOf(given[kSummonCountArgument]);
+  if (!count.has_value()) {
+    return std::nullopt;
+  }
+  const std::string_view monster = given[kSummonMonsterArgument];
+  if (const std::optional<std::uint32_t> monster_id = PositiveOf(monster); monster_id.has_value()) {
+    return ScriptSummon{.monster_id = *monster_id, .count = *count};
+  }
+  std::string packed;
+  for (const char letter : monster) {
+    if (!std::isspace(static_cast<unsigned char>(letter))) {
+      packed += letter;
+    }
+  }
+  if (!packed.starts_with(kMonsterGroupDraw)) {
+    return std::nullopt;
+  }
+  std::optional<std::string> group =
+      GroupOf(std::string_view(packed).substr(kMonsterGroupDraw.size()), kMonsterGroupPrefix);
+  if (!group.has_value()) {
+    return std::nullopt;
+  }
+  return ScriptSummon{.group = std::move(*group), .count = *count};
+}
+
 // Une instruction posée hors bloc, avant toute rupture : chaque famille qu'elle
 // nomme se lit par son motif exact, ou se tait.
 void ReadStatement(Reading& reading, std::string_view text, std::span<const Family> named) {
@@ -466,6 +640,20 @@ void ReadStatement(Reading& reading, std::string_view text, std::span<const Fami
         facts.effect_duration_ms = read->tick_ms;
         break;
       }
+      case Family::kGift:
+        if (std::optional<ScriptGift> gift = GiftOf(text); gift.has_value()) {
+          facts.gifts.push_back(std::move(*gift));
+        } else {
+          reading.Mute(family);
+        }
+        break;
+      case Family::kSummon:
+        if (std::optional<ScriptSummon> summon = SummonOf(text); summon.has_value()) {
+          facts.summons.push_back(std::move(*summon));
+        } else {
+          reading.Mute(family);
+        }
+        break;
     }
   }
 }
@@ -523,6 +711,12 @@ ItemScriptFacts ReadItemScript(std::string_view script) {
   }
   if (reading.Muted(Family::kStart) || reading.starts_unread) {
     facts.starts.clear();
+  }
+  if (reading.Muted(Family::kGift)) {
+    facts.gifts.clear();
+  }
+  if (reading.Muted(Family::kSummon)) {
+    facts.summons.clear();
   }
   return facts;
 }

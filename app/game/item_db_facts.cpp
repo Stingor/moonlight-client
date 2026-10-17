@@ -2,6 +2,8 @@
 // `item_db_block.h`.
 
 #include <array>
+#include <cctype>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <limits>
@@ -267,7 +269,177 @@ constexpr std::uint8_t kBonusCommandLevel = 1;
   return Joined(parts);
 }
 
+// ── LE TYPE, LES DONS ET LES INVOCATIONS ────────────────────────────────────
+
+// Un texte réduit à ses lettres et chiffres, sans casse : « Container » et
+// « container » se valent, « Dead-Branch » et « DeadBranch » aussi.
+[[nodiscard]] std::string Packed(std::string_view text) {
+  std::string packed;
+  for (const char letter : text) {
+    if (std::isalnum(static_cast<unsigned char>(letter))) {
+      packed += static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
+    }
+  }
+  return packed;
+}
+
+// Les drapeaux de `Flags` qui qualifient le type de l'objet ; les autres —
+// achat en boutique d'achat… — n'en disent rien.
+[[nodiscard]] const char* FlagLabel(std::string_view flag) {
+  const std::string packed = Packed(flag);
+  if (packed == "container") {
+    return Tr("Conteneur");
+  }
+  if (packed == "deadbranch") {
+    return Tr("Invocation");
+  }
+  if (packed == "noconsume") {
+    return Tr("Non consommé");
+  }
+  return nullptr;
+}
+
+// Le lien d'objet du texte balisé (`ro/ui/rich_text.h`).
+constexpr std::string_view kItemLinkOpen = "<ITEM>";
+constexpr std::string_view kItemLinkInfo = "<INFO>";
+constexpr std::string_view kItemLinkClose = "</INFO></ITEM>";
+
+[[nodiscard]] std::string ItemLink(std::uint32_t item_id, const std::string& shown) {
+  std::string link(kItemLinkOpen);
+  link += shown;
+  link += kItemLinkInfo;
+  link += std::to_string(item_id);
+  link += kItemLinkClose;
+  return link;
+}
+
+// L'objet que le serveur nomme ainsi par son nom Aegis, sans égard à la casse.
+[[nodiscard]] const ServerItem* ItemByAegis(std::string_view aegis_name, const ItemDbNames& names) {
+  if (names.db == nullptr) {
+    return nullptr;
+  }
+  const std::string wanted = Packed(aegis_name);
+  for (const ServerItem& item : names.db->items()) {
+    if (item.aegis_name.size() == aegis_name.size() && Packed(item.aegis_name) == wanted) {
+      return &item;
+    }
+  }
+  return nullptr;
+}
+
+// Le nom lisible d'un groupe, tiré de sa constante : « BlueBox » donne
+// « Blue Box » ; un trait bas sépare deux mots comme un blanc.
+[[nodiscard]] std::string ReadableGroup(std::string_view constant) {
+  std::string shown;
+  for (std::size_t at = 0; at < constant.size(); ++at) {
+    const auto letter = static_cast<unsigned char>(constant[at]);
+    const bool cut = letter == '_' || (at > 0 && std::isupper(letter) &&
+                                       std::islower(static_cast<unsigned char>(constant[at - 1])));
+    if (cut && !shown.empty() && shown.back() != ' ') {
+      shown += ' ';
+    }
+    if (letter != '_') {
+      shown += static_cast<char>(letter);
+    }
+  }
+  while (!shown.empty() && shown.back() == ' ') {
+    shown.pop_back();
+  }
+  return shown;
+}
+
+[[nodiscard]] ItemDbGiftEffect GiftEffectOf(const ScriptGift& gift, const ItemDbNames& names) {
+  Text text{};
+  ItemDbGiftEffect effect{.count = gift.count};
+  const auto count = static_cast<unsigned>(gift.count);
+  switch (gift.kind) {
+    case ScriptGiftKind::kItem: {
+      effect.kind = ItemDbGiftKind::kItem;
+      std::uint32_t item_id = gift.item_id;
+      if (item_id == 0) {
+        const ServerItem* const named = ItemByAegis(gift.aegis_name, names);
+        item_id = named != nullptr ? named->item_id : 0;
+      }
+      effect.name = item_id != 0 ? ItemName(item_id, names) : gift.aegis_name;
+      const std::string shown = item_id != 0 ? ItemLink(item_id, effect.name) : effect.name;
+      std::snprintf(text.data(), text.size(), Tr("donne %u × %s"), count, shown.c_str());
+      break;
+    }
+    case ScriptGiftKind::kGroup:
+      effect.kind = ItemDbGiftKind::kGroup;
+      effect.name = ReadableGroup(gift.group);
+      std::snprintf(text.data(), text.size(), Tr("donne des items du groupe %s"),
+                    effect.name.c_str());
+      break;
+    case ScriptGiftKind::kRandomGroup:
+      effect.kind = ItemDbGiftKind::kRandomGroup;
+      effect.name = ReadableGroup(gift.group);
+      std::snprintf(text.data(), text.size(), Tr("donne %u item(s) au hasard (groupe %s)"), count,
+                    effect.name.c_str());
+      break;
+  }
+  effect.text = text.data();
+  return effect;
+}
+
+[[nodiscard]] ItemDbGiftEffect SummonEffectOf(const ScriptSummon& summon,
+                                              const ItemDbNames& names) {
+  Text text{};
+  ItemDbGiftEffect effect{.count = summon.count};
+  const auto count = static_cast<unsigned>(summon.count);
+  if (summon.monster_id != 0) {
+    effect.kind = ItemDbGiftKind::kSummon;
+    effect.name = MonsterName(summon.monster_id, names);
+    std::snprintf(text.data(), text.size(), Tr("invoque %u × %s"), count, effect.name.c_str());
+  } else {
+    effect.kind = ItemDbGiftKind::kSummonGroup;
+    effect.name = ReadableGroup(summon.group);
+    std::snprintf(text.data(), text.size(), Tr("invoque %u monstre(s) au hasard (groupe %s)"),
+                  count, effect.name.c_str());
+  }
+  effect.text = text.data();
+  return effect;
+}
+
 }  // namespace
+
+std::string QualifiedKind(std::string_view kind, const ServerItem& item) {
+  std::vector<std::string> qualifiers;
+  std::string category = item.category;
+  for (const std::string& flag : item.flags) {
+    if (const char* const label = FlagLabel(flag); label != nullptr) {
+      qualifiers.emplace_back(label);
+      // Le drapeau le dit en clair, et traduit : la catégorie se tait.
+      if (Packed(category) == Packed(flag)) {
+        category.clear();
+      }
+    }
+  }
+  Text text{};
+  std::string shown(kind);
+  if (!category.empty()) {
+    std::snprintf(text.data(), text.size(), Tr("%s — %s"), shown.c_str(), category.c_str());
+    shown = text.data();
+  }
+  if (!qualifiers.empty()) {
+    const std::string joined = Joined(qualifiers);
+    std::snprintf(text.data(), text.size(), Tr("%s (%s)"), shown.c_str(), joined.c_str());
+    shown = text.data();
+  }
+  return shown;
+}
+
+std::vector<ItemDbGiftEffect> GiftEffectsOf(const ItemScriptFacts& facts,
+                                            const ItemDbNames& names) {
+  std::vector<ItemDbGiftEffect> effects;
+  for (const ScriptGift& gift : facts.gifts) {
+    effects.push_back(GiftEffectOf(gift, names));
+  }
+  for (const ScriptSummon& summon : facts.summons) {
+    effects.push_back(SummonEffectOf(summon, names));
+  }
+  return effects;
+}
 
 void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ServerItem& item,
                              const ItemScriptFacts& facts, const ItemDbNames& names) {
@@ -294,6 +466,9 @@ void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ServerItem& 
   }
   if (const std::string effect = EffectText(facts, names); !effect.empty()) {
     lines.push_back(ItemDbLabelled(Tr("Effet :"), effect));
+  }
+  for (const ItemDbGiftEffect& gift : GiftEffectsOf(facts, names)) {
+    lines.push_back(ItemDbLabelled(Tr("Effet :"), gift.text));
   }
   if (item.reuse_delay_ms > 0) {
     lines.push_back(

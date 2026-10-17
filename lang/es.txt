@@ -18813,3 +18813,33 @@ tr: Ajustar el efecto %zu
 
 fr: Retirer l'effet %zu
 tr: Quitar el efecto %zu
+
+fr: %s — %s
+tr: %s — %s
+
+fr: %s (%s)
+tr: %s (%s)
+
+fr: Conteneur
+tr: Contenedor
+
+fr: Invocation
+tr: Invocación
+
+fr: Non consommé
+tr: No se consume
+
+fr: donne %u × %s
+tr: da %u × %s
+
+fr: donne des items du groupe %s
+tr: da objetos del grupo %s
+
+fr: donne %u item(s) au hasard (groupe %s)
+tr: da %u objeto(s) al azar (grupo %s)
+
+fr: invoque %u × %s
+tr: invoca %u × %s
+
+fr: invoque %u monstre(s) au hasard (groupe %s)
+tr: invoca %u monstruo(s) al azar (grupo %s)

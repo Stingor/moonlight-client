@@ -160,6 +160,10 @@ ServerItem ItemOf(const formats::RathenaEntry& entry) {
       item.type = FieldText(value);
     } else if (key == "SubType") {
       item.sub_type = FieldText(value);
+    } else if (key == "Category") {
+      item.category = FieldText(value);
+    } else if (key == "Flags") {
+      item.flags = FieldRaised(value);
     } else if (key == "Buy") {
       item.buy_zeny = FieldNumber<std::uint32_t>(value, 0);
     } else if (key == "Sell") {

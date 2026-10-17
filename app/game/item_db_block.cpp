@@ -667,7 +667,9 @@ std::vector<std::string> ItemDbBlockOf(const ServerItem& item, const ItemDbNames
 
   // Un appât se dit item de capture, quel que soit son type.
   lines.push_back(ItemDbLabelled(
-      Tr("Type :"), facts.captures ? std::string(Tr("Item de capture")) : KindOf(item, worn)));
+      Tr("Type :"),
+      QualifiedKind(facts.captures ? std::string(Tr("Item de capture")) : KindOf(item, worn),
+                    item)));
   if (item.attack > 0) {
     lines.push_back(ItemDbLabelled(Tr("Attaque :"), NumberText(item.attack)));
   }

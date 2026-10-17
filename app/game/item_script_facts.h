@@ -3,7 +3,9 @@
 // CE QUE LE SCRIPT D'UN OBJET DIT DE LUI, LU PAR MOTIFS EXACTS : le soin
 // (`itemheal`, `percentheal`, `heal`), les états levés (`sc_end`), l'élément
 // d'attaque et d'armure (`bonus bAtkEle` / `bDefEle`), la capture (`pet`), la
-// durée commune des états posés (`sc_start`) et les valeurs que chacun reçoit.
+// durée commune des états posés (`sc_start`) et les valeurs que chacun reçoit,
+// les objets donnés (`getitem`, `getgroupitem`, `getrandgroupitem`) et les
+// monstres invoqués (`monster "this",…`).
 //
 // 🔴 UN FAIT SE LIT ENTIER OU PAS DU TOUT. Une instruction ne compte que posée
 // hors de toute accolade, seule, et écrite sous la forme exacte du motif, avec
@@ -46,6 +48,32 @@ struct ScriptStart {
   std::array<std::int32_t, kScriptStartValueCount> values{};
 };
 
+// CE QU'UN OBJET DONNE : un objet nommé (`getitem <id | "Aegis">,<n>`), les
+// objets d'un groupe (`getgroupitem(IG_X)`, le groupe fixe leur nombre), ou n
+// objets tirés dans un groupe (`getrandgroupitem(IG_X,n)`).
+enum class ScriptGiftKind : std::uint8_t { kItem, kGroup, kRandomGroup };
+
+struct ScriptGift {
+  ScriptGiftKind kind = ScriptGiftKind::kItem;
+  // L'objet donné ; zéro quand le script le nomme par son nom Aegis.
+  std::uint32_t item_id = 0;
+  std::string aegis_name;
+  // La constante du groupe sans `IG_` : « BlueBox ».
+  std::string group;
+  // Zéro pour `getgroupitem`.
+  std::uint32_t count = 0;
+};
+
+// UN MONSTRE INVOQUÉ par `monster "this",x,y,"nom",<monstre>,<n>` : un
+// identifiant, ou un tirage dans un groupe (`-1-MOBG_X`).
+struct ScriptSummon {
+  // Zéro pour un tirage.
+  std::uint32_t monster_id = 0;
+  // La constante du groupe sans `MOBG_`, telle qu'écrite.
+  std::string group;
+  std::uint32_t count = 0;
+};
+
 // Le rang d'un élément dans l'ordre du serveur, du neutre (0) au mort-vivant
 // (9).
 inline constexpr std::uint8_t kNoScriptElement = 0xFF;
@@ -69,6 +97,10 @@ struct ItemScriptFacts {
   // Les états posés, dans l'ordre écrit ; vide quand un seul `sc_start` ne se
   // lit pas, comme la durée.
   std::vector<ScriptStart> starts;
+  // Les dons et les invocations, dans l'ordre écrit ; chaque liste est vide
+  // quand une seule instruction de sa famille ne se lit pas.
+  std::vector<ScriptGift> gifts;
+  std::vector<ScriptSummon> summons;
 };
 
 [[nodiscard]] ItemScriptFacts ReadItemScript(std::string_view script);

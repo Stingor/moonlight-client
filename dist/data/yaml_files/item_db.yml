@@ -11,6 +11,12 @@
 #  formules d'armes et d'armures de Moonlight, prix déduit de l'autre, et
 #  revente ramenée à 1 zeny quand elle permettrait de gagner de l'argent.
 #
+#  Category n'est pas un champ du serveur : c'est la catégorie que la
+#  description du jeu donnait à l'objet, plus précise que son type, versée
+#  dans scripts/yaml_tables/item_categories.yml depuis la traduction
+#  ROenglishRE (zackdreaver, llchrisll : https://github.com/llchrisll/ROenglishRE).
+#  Elle ne s'écrit pas quand un drapeau de Flags dit la même chose.
+#
 #  Un champ égal au défaut que le serveur pose sur une entrée neuve n'est pas
 #  écrit (scripts/yaml_tables/server_db_defaults.py).
 #
@@ -819,6 +825,7 @@ Body:
     AegisName: Wurst
     Name: Brusti
     Type: Delayconsume
+    Category: Restorative
     Buy: 2
     Sell: 1
     Weight: 40
@@ -950,6 +957,7 @@ Body:
     AegisName: Wing_Of_Fly
     Name: Fly Wing
     Type: Delayconsume
+    Category: Supportive
     Buy: 60
     Sell: 30
     Weight: 50
@@ -960,6 +968,7 @@ Body:
     AegisName: Wing_Of_Butterfly
     Name: Butterfly Wing
     Type: Delayconsume
+    Category: Supportive
     Buy: 1500
     Sell: 750
     Weight: 50
@@ -990,6 +999,7 @@ Body:
     AegisName: Anodyne
     Name: Anodyne
     Type: Delayconsume
+    Category: Supportive
     Buy: 2000
     Sell: 1000
     Weight: 100
@@ -1000,6 +1010,7 @@ Body:
     AegisName: Aloebera
     Name: Aloevera
     Type: Delayconsume
+    Category: Supportive
     Buy: 1500
     Sell: 750
     Weight: 100
@@ -1040,6 +1051,7 @@ Body:
     AegisName: Leaf_Of_Yggdrasil
     Name: Yggdrasil Leaf
     Type: Delayconsume
+    Category: Restorative
     Buy: 4000
     Sell: 2000
     Weight: 100
@@ -1050,6 +1062,7 @@ Body:
     AegisName: Spectacles
     Name: Magnifier
     Type: Delayconsume
+    Category: Tool
     Buy: 40
     Sell: 20
     Weight: 50
@@ -1060,6 +1073,7 @@ Body:
     AegisName: Portable_Furnace
     Name: Mini Furnace
     Type: Usable
+    Category: Tool
     Buy: 150
     Sell: 75
     Weight: 200
@@ -1070,6 +1084,7 @@ Body:
     AegisName: Iron_Hammer
     Name: Iron Hammer
     Type: Usable
+    Category: Tool
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -1080,6 +1095,7 @@ Body:
     AegisName: Golden_Hammer
     Name: Golden Hammer
     Type: Usable
+    Category: Tool
     Buy: 3000
     Sell: 1500
     Weight: 300
@@ -1090,6 +1106,7 @@ Body:
     AegisName: Oridecon_Hammer
     Name: Oridecon Hammer
     Type: Usable
+    Category: Tool
     Buy: 5000
     Sell: 2500
     Weight: 400
@@ -1368,6 +1385,7 @@ Body:
     AegisName: Pet_Incubator
     Name: Pet Incubator
     Type: Usable
+    Category: Tool
     Buy: 3500
     Sell: 1750
     Weight: 30
@@ -1388,6 +1406,7 @@ Body:
     AegisName: Center_Potion
     Name: Concentration Potion
     Type: Usable
+    Category: Stat booster
     Buy: 1200
     Sell: 600
     Weight: 100
@@ -1398,6 +1417,7 @@ Body:
     AegisName: Awakening_Potion
     Name: Awakening Potion
     Type: Usable
+    Category: Stat booster
     Buy: 2200
     Sell: 1100
     Weight: 150
@@ -1410,6 +1430,7 @@ Body:
     AegisName: Berserk_Potion
     Name: Berserk Potion
     Type: Usable
+    Category: Stat booster
     Buy: 4500
     Sell: 2250
     Weight: 200
@@ -1422,6 +1443,7 @@ Body:
     AegisName: Union_Of_Tribe
     Name: Union of Tribe
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 500
@@ -1462,6 +1484,7 @@ Body:
     AegisName: Inspector_Certificate
     Name: Authoritative Badge
     Type: Usable
+    Category: Supportive
     Buy: 1450
     Sell: 725
     Weight: 30
@@ -1521,6 +1544,7 @@ Body:
     AegisName: Handsei
     Name: Red Envelope
     Type: Usable
+    Category: Container
     Weight: 20
     Flags: {BuyingStore: true}
     Script: |
@@ -1529,6 +1553,7 @@ Body:
     AegisName: Rice_Cake_Soup
     Name: Tempting Rice-Cake Soup
     Type: Healing
+    Category: Supportive
     Buy: 500
     Sell: 250
     Weight: 100
@@ -1594,6 +1619,7 @@ Body:
     AegisName: Poison_Bottle
     Name: Poison Bottle
     Type: Usable
+    Category: Skill necessity
     Buy: 5000
     Sell: 2500
     Weight: 100
@@ -1631,6 +1657,7 @@ Body:
     AegisName: Realgar_Wine
     Name: Distilled Fighting Spirit
     Type: Usable
+    Category: Supportive
     Weight: 100
     Flags: {BuyingStore: true}
     Script: |
@@ -1639,6 +1666,7 @@ Body:
     AegisName: Exorcize_Herb
     Name: Herb of Incantation
     Type: Usable
+    Category: Supportive
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -1647,6 +1675,7 @@ Body:
     AegisName: Durian
     Name: Durian
     Type: Usable
+    Category: Stat booster
     Buy: 15000
     Sell: 7500
     Weight: 300
@@ -1666,6 +1695,7 @@ Body:
     AegisName: Earth_Scroll_1_3
     Name: Level 3 Earth Spike
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1676,6 +1706,7 @@ Body:
     AegisName: Earth_Scroll_1_5
     Name: Level 5 Earth Spike
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1686,6 +1717,7 @@ Body:
     AegisName: Cold_Scroll_1_3
     Name: Level 3 Cold Bolt
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1696,6 +1728,7 @@ Body:
     AegisName: Cold_Scroll_1_5
     Name: Level 5 Cold Bolt
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1706,6 +1739,7 @@ Body:
     AegisName: Fire_Scroll_1_3
     Name: Level 3 Fire Bolt
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1716,6 +1750,7 @@ Body:
     AegisName: Fire_Scroll_1_5
     Name: Level 5 Fire Bolt
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1726,6 +1761,7 @@ Body:
     AegisName: Wind_Scroll_1_3
     Name: Level 3 Lightening Bolt
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1736,6 +1772,7 @@ Body:
     AegisName: Wind_Scroll_1_5
     Name: Level 5 Lightening Bolt
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1746,6 +1783,7 @@ Body:
     AegisName: Ghost_Scroll_1_3
     Name: Level 3 Soul Strike
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1756,6 +1794,7 @@ Body:
     AegisName: Ghost_Scroll_1_5
     Name: Level 5 Soul Strike
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1766,6 +1805,7 @@ Body:
     AegisName: Fire_Scroll_2_1
     Name: Level 1 Fire Ball
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1776,6 +1816,7 @@ Body:
     AegisName: Fire_Scroll_2_5
     Name: Level 5 Fire Ball
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1786,6 +1827,7 @@ Body:
     AegisName: Fire_Scroll_3_1
     Name: Level 1 Fire Wall
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1796,6 +1838,7 @@ Body:
     AegisName: Fire_Scroll_3_5
     Name: Level 5 Fire Wall
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -1806,6 +1849,7 @@ Body:
     AegisName: Cold_Scroll_2_1
     Name: Level 1 Frost Diver
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1815,6 +1859,7 @@ Body:
   - Id: 701
     AegisName: Ora_Ora
     Name: Ora Ora
+    Category: Valuable
     Buy: 55000
     Sell: 27500
     Weight: 200
@@ -1822,6 +1867,7 @@ Body:
   - Id: 702
     AegisName: Animal_Blood
     Name: Animal Gore
+    Category: Collectible
     Buy: 450
     Sell: 225
     Weight: 100
@@ -1829,6 +1875,7 @@ Body:
   - Id: 703
     AegisName: Hinalle
     Name: Hinalle
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -1836,6 +1883,7 @@ Body:
   - Id: 704
     AegisName: Aloe
     Name: Aloe
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -1843,6 +1891,7 @@ Body:
   - Id: 705
     AegisName: Clover
     Name: Clover
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
@@ -1850,6 +1899,7 @@ Body:
   - Id: 706
     AegisName: Four_Leaf_Clover
     Name: Four Leaf Clover
+    Category: Valuable
     Buy: 80000
     Sell: 40000
     Weight: 10
@@ -1857,6 +1907,7 @@ Body:
   - Id: 707
     AegisName: Singing_Plant
     Name: Singing Plant
+    Category: Valuable
     Buy: 500
     Sell: 250
     Weight: 10
@@ -1864,6 +1915,7 @@ Body:
   - Id: 708
     AegisName: Ment
     Name: Ment
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -1871,6 +1923,7 @@ Body:
   - Id: 709
     AegisName: Izidor
     Name: Izidor
+    Category: Valuable
     Buy: 500
     Sell: 250
     Weight: 10
@@ -1878,6 +1931,7 @@ Body:
   - Id: 710
     AegisName: Illusion_Flower
     Name: Illusion Flower
+    Category: Valuable
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -1885,6 +1939,7 @@ Body:
   - Id: 711
     AegisName: Shoot
     Name: Shoot
+    Category: Collectible
     Buy: 16
     Sell: 8
     Weight: 10
@@ -1892,6 +1947,7 @@ Body:
   - Id: 712
     AegisName: Flower
     Name: Flower
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 10
@@ -1899,6 +1955,7 @@ Body:
   - Id: 713
     AegisName: Empty_Bottle
     Name: Empty Bottle
+    Category: Essential
     Buy: 6
     Sell: 3
     Weight: 20
@@ -1906,6 +1963,7 @@ Body:
   - Id: 714
     AegisName: Emperium
     Name: Emperium
+    Category: Valuable
     Buy: 2
     Sell: 1
     Weight: 1000
@@ -1913,6 +1971,7 @@ Body:
   - Id: 715
     AegisName: Yellow_Gemstone
     Name: Yellow Gemstone
+    Category: Essential
     Buy: 600
     Sell: 300
     Weight: 30
@@ -1920,6 +1979,7 @@ Body:
   - Id: 716
     AegisName: Red_Gemstone
     Name: Red Gemstone
+    Category: Essential
     Buy: 600
     Sell: 300
     Weight: 30
@@ -1927,6 +1987,7 @@ Body:
   - Id: 717
     AegisName: Blue_Gemstone
     Name: Blue Gemstone
+    Category: Essential
     Buy: 600
     Sell: 300
     Weight: 30
@@ -1934,6 +1995,7 @@ Body:
   - Id: 718
     AegisName: Dark_Red_Jewel
     Name: Garnet
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1941,6 +2003,7 @@ Body:
   - Id: 719
     AegisName: Violet_Jewel
     Name: Amethyst
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1948,6 +2011,7 @@ Body:
   - Id: 720
     AegisName: Skyblue_Jewel
     Name: Aquamarine
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1955,6 +2019,7 @@ Body:
   - Id: 721
     AegisName: Azure_Jewel
     Name: Emerald
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1962,6 +2027,7 @@ Body:
   - Id: 722
     AegisName: Scarlet_Jewel
     Name: Pearl
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1969,6 +2035,7 @@ Body:
   - Id: 723
     AegisName: Cardinal_Jewel
     Name: Ruby
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1976,6 +2043,7 @@ Body:
   - Id: 724
     AegisName: Cardinal_Jewel_
     Name: Cursed Ruby
+    Category: Valuable
     Buy: 600
     Sell: 300
     Weight: 100
@@ -1983,6 +2051,7 @@ Body:
   - Id: 725
     AegisName: Red_Jewel
     Name: Sardonyx
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1990,6 +2059,7 @@ Body:
   - Id: 726
     AegisName: Blue_Jewel
     Name: Sapphire
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -1997,6 +2067,7 @@ Body:
   - Id: 727
     AegisName: White_Jewel
     Name: Opal
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -2004,6 +2075,7 @@ Body:
   - Id: 728
     AegisName: Golden_Jewel
     Name: Topaz
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -2011,6 +2083,7 @@ Body:
   - Id: 729
     AegisName: Bluish_Green_Jewel
     Name: Zircon
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -2018,6 +2091,7 @@ Body:
   - Id: 730
     AegisName: Crystal_Jewel
     Name: 1carat Diamond
+    Category: Collectible
     Buy: 10000
     Sell: 5000
     Weight: 100
@@ -2025,6 +2099,7 @@ Body:
   - Id: 731
     AegisName: Crystal_Jewel_
     Name: 2carat Diamond
+    Category: Collectible
     Buy: 25000
     Sell: 12500
     Weight: 100
@@ -2032,6 +2107,7 @@ Body:
   - Id: 732
     AegisName: Crystal_Jewel__
     Name: 3carat Diamond
+    Category: Collectible
     Buy: 55000
     Sell: 27500
     Weight: 100
@@ -2039,6 +2115,7 @@ Body:
   - Id: 733
     AegisName: Crystal_Jewel___
     Name: Cracked Diamond
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 100
@@ -2046,6 +2123,7 @@ Body:
   - Id: 734
     AegisName: Red_Frame
     Name: Red Frame
+    Category: Collectible
     Buy: 3000
     Sell: 1500
     Weight: 200
@@ -2053,6 +2131,7 @@ Body:
   - Id: 735
     AegisName: Blue_Porcelain
     Name: Chung Jah
+    Category: Collectible
     Buy: 5000
     Sell: 2500
     Weight: 500
@@ -2060,6 +2139,7 @@ Body:
   - Id: 736
     AegisName: White_Platter
     Name: China
+    Category: Collectible
     Buy: 1000
     Sell: 500
     Weight: 300
@@ -2067,6 +2147,7 @@ Body:
   - Id: 737
     AegisName: Black_Ladle
     Name: Black Ladle
+    Category: Collectible
     Buy: 400
     Sell: 200
     Weight: 50
@@ -2074,6 +2155,7 @@ Body:
   - Id: 738
     AegisName: Pencil_Case
     Name: Pencil Case
+    Category: Collectible
     Buy: 400
     Sell: 200
     Weight: 100
@@ -2081,6 +2163,7 @@ Body:
   - Id: 739
     AegisName: Rouge
     Name: Rouge
+    Category: Collectible
     Buy: 10000
     Sell: 5000
     Weight: 10
@@ -2088,6 +2171,7 @@ Body:
   - Id: 740
     AegisName: Stuffed_Doll
     Name: Puppet
+    Category: Collectible
     Buy: 1000
     Sell: 500
     Weight: 100
@@ -2095,6 +2179,7 @@ Body:
   - Id: 741
     AegisName: Poring_Doll
     Name: Poring Doll
+    Category: Collectible
     Buy: 1800
     Sell: 900
     Weight: 100
@@ -2102,6 +2187,7 @@ Body:
   - Id: 742
     AegisName: Chonchon_Doll
     Name: Chonchon Doll
+    Category: Collectible
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -2109,6 +2195,7 @@ Body:
   - Id: 743
     AegisName: Spore_Doll
     Name: Spore Doll
+    Category: Collectible
     Buy: 5500
     Sell: 2750
     Weight: 100
@@ -2116,6 +2203,7 @@ Body:
   - Id: 744
     AegisName: Bunch_Of_Flowers
     Name: Bouquet
+    Category: Collectible
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -2123,6 +2211,7 @@ Body:
   - Id: 745
     AegisName: Wedding_Bouquet
     Name: Wedding Bouquet
+    Category: Collectible
     Buy: 12000
     Sell: 6000
     Weight: 50
@@ -2130,6 +2219,7 @@ Body:
   - Id: 746
     AegisName: Glass_Bead
     Name: Glass Bead
+    Category: Collectible
     Buy: 1400
     Sell: 700
     Weight: 50
@@ -2137,6 +2227,7 @@ Body:
   - Id: 747
     AegisName: Crystal_Mirror
     Name: Crystal Mirror
+    Category: Collectible
     Buy: 15000
     Sell: 7500
     Weight: 50
@@ -2144,6 +2235,7 @@ Body:
   - Id: 748
     AegisName: Witherless_Rose
     Name: Witherless Rose
+    Category: Collectible
     Buy: 55000
     Sell: 27500
     Weight: 10
@@ -2151,6 +2243,7 @@ Body:
   - Id: 749
     AegisName: Frozen_Rose
     Name: Frozen Rose
+    Category: Collectible
     Buy: 35000
     Sell: 17500
     Weight: 10
@@ -2158,6 +2251,7 @@ Body:
   - Id: 750
     AegisName: Baphomet_Doll
     Name: Baphomet Doll
+    Category: Collectible
     Buy: 18000
     Sell: 9000
     Weight: 100
@@ -2165,6 +2259,7 @@ Body:
   - Id: 751
     AegisName: Osiris_Doll
     Name: Osiris Doll
+    Category: Collectible
     Buy: 14000
     Sell: 7000
     Weight: 100
@@ -2172,6 +2267,7 @@ Body:
   - Id: 752
     AegisName: Grasshopper_Doll
     Name: Rocker Doll
+    Category: Collectible
     Buy: 4000
     Sell: 2000
     Weight: 100
@@ -2179,6 +2275,7 @@ Body:
   - Id: 753
     AegisName: Monkey_Doll
     Name: Yoyo Doll
+    Category: Collectible
     Buy: 6000
     Sell: 3000
     Weight: 100
@@ -2186,6 +2283,7 @@ Body:
   - Id: 754
     AegisName: Raccoondog_Doll
     Name: Raccoon Doll
+    Category: Collectible
     Buy: 5000
     Sell: 2500
     Weight: 100
@@ -2193,6 +2291,7 @@ Body:
   - Id: 756
     AegisName: Oridecon_Stone
     Name: Rough Oridecon
+    Category: Forging material
     Buy: 550
     Sell: 275
     Weight: 200
@@ -2200,6 +2299,7 @@ Body:
   - Id: 757
     AegisName: Elunium_Stone
     Name: Rough Elunium
+    Category: Forging material
     Buy: 650
     Sell: 325
     Weight: 200
@@ -2207,6 +2307,7 @@ Body:
   - Id: 901
     AegisName: Danggie
     Name: Daenggie
+    Category: Collectible
     Buy: 260
     Sell: 130
     Weight: 10
@@ -2214,6 +2315,7 @@ Body:
   - Id: 902
     AegisName: Tree_Root
     Name: Tree Root
+    Category: Collectible
     Buy: 12
     Sell: 6
     Weight: 10
@@ -2221,6 +2323,7 @@ Body:
   - Id: 903
     AegisName: Reptile_Tongue
     Name: Reptile Tongue
+    Category: Collectible
     Buy: 140
     Sell: 70
     Weight: 10
@@ -2228,6 +2331,7 @@ Body:
   - Id: 904
     AegisName: Scorpion's_Tail
     Name: Scorpion Tail
+    Category: Collectible
     Buy: 124
     Sell: 62
     Weight: 10
@@ -2235,6 +2339,7 @@ Body:
   - Id: 905
     AegisName: Stem
     Name: Stem
+    Category: Collectible
     Buy: 46
     Sell: 23
     Weight: 10
@@ -2242,6 +2347,7 @@ Body:
   - Id: 906
     AegisName: Pointed_Scale
     Name: Pointed Scale
+    Category: Collectible
     Buy: 68
     Sell: 34
     Weight: 10
@@ -2249,6 +2355,7 @@ Body:
   - Id: 907
     AegisName: Resin
     Name: Resin
+    Category: Collectible
     Buy: 120
     Sell: 60
     Weight: 10
@@ -2256,6 +2363,7 @@ Body:
   - Id: 908
     AegisName: Spawn
     Name: Spawn
+    Category: Collectible
     Buy: 140
     Sell: 70
     Weight: 10
@@ -2263,6 +2371,7 @@ Body:
   - Id: 909
     AegisName: Jellopy
     Name: Jellopy
+    Category: Collectible
     Buy: 6
     Sell: 3
     Weight: 10
@@ -2270,6 +2379,7 @@ Body:
   - Id: 910
     AegisName: Garlet
     Name: Garlet
+    Category: Collectible
     Buy: 40
     Sell: 20
     Weight: 10
@@ -2277,6 +2387,7 @@ Body:
   - Id: 911
     AegisName: Scell
     Name: Scell
+    Category: Collectible
     Buy: 160
     Sell: 80
     Weight: 10
@@ -2284,6 +2395,7 @@ Body:
   - Id: 912
     AegisName: Zargon
     Name: Zargon
+    Category: Collectible
     Buy: 480
     Sell: 240
     Weight: 10
@@ -2291,6 +2403,7 @@ Body:
   - Id: 913
     AegisName: Tooth_Of_Bat
     Name: Tooth of Bat
+    Category: Collectible
     Buy: 34
     Sell: 17
     Weight: 10
@@ -2298,6 +2411,7 @@ Body:
   - Id: 914
     AegisName: Fluff
     Name: Fluff
+    Category: Collectible
     Buy: 8
     Sell: 4
     Weight: 10
@@ -2305,6 +2419,7 @@ Body:
   - Id: 915
     AegisName: Chrysalis
     Name: Chrysalis
+    Category: Collectible
     Buy: 8
     Sell: 4
     Weight: 10
@@ -2312,6 +2427,7 @@ Body:
   - Id: 916
     AegisName: Feather_Of_Birds
     Name: Feather of Birds
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
@@ -2319,6 +2435,7 @@ Body:
   - Id: 917
     AegisName: Talon
     Name: Talon
+    Category: Collectible
     Buy: 20
     Sell: 10
     Weight: 10
@@ -2326,6 +2443,7 @@ Body:
   - Id: 918
     AegisName: Sticky_Webfoot
     Name: Sticky Webfoot
+    Category: Collectible
     Buy: 20
     Sell: 10
     Weight: 10
@@ -2333,6 +2451,7 @@ Body:
   - Id: 919
     AegisName: Animal's_Skin
     Name: Animal Skin
+    Category: Collectible
     Buy: 36
     Sell: 18
     Weight: 10
@@ -2340,6 +2459,7 @@ Body:
   - Id: 920
     AegisName: Claw_Of_Wolves
     Name: Wolf Claw
+    Category: Collectible
     Buy: 58
     Sell: 29
     Weight: 10
@@ -2347,6 +2467,7 @@ Body:
   - Id: 921
     AegisName: Mushroom_Spore
     Name: Mushroom Spore
+    Category: Collectible
     Buy: 36
     Sell: 18
     Weight: 10
@@ -2354,6 +2475,7 @@ Body:
   - Id: 922
     AegisName: Orcish_Cuspid
     Name: Orc's Fang
+    Category: Collectible
     Buy: 220
     Sell: 110
     Weight: 10
@@ -2361,6 +2483,7 @@ Body:
   - Id: 923
     AegisName: Evil_Horn
     Name: Evil Horn
+    Category: Collectible
     Buy: 1200
     Sell: 600
     Weight: 10
@@ -2368,6 +2491,7 @@ Body:
   - Id: 924
     AegisName: Powder_Of_Butterfly
     Name: Powder of Butterfly
+    Category: Collectible
     Buy: 90
     Sell: 45
     Weight: 10
@@ -2375,6 +2499,7 @@ Body:
   - Id: 925
     AegisName: Bill_Of_Birds
     Name: Bill of Birds
+    Category: Collectible
     Buy: 64
     Sell: 32
     Weight: 10
@@ -2382,6 +2507,7 @@ Body:
   - Id: 926
     AegisName: Scale_Of_Snakes
     Name: Snake Scale
+    Category: Collectible
     Buy: 82
     Sell: 41
     Weight: 10
@@ -2389,6 +2515,7 @@ Body:
   - Id: 928
     AegisName: Insect_Feeler
     Name: Insect Feeler
+    Category: Collectible
     Buy: 114
     Sell: 57
     Weight: 10
@@ -2396,6 +2523,7 @@ Body:
   - Id: 929
     AegisName: Immortal_Heart
     Name: Immortal Heart
+    Category: Collectible
     Buy: 374
     Sell: 187
     Weight: 10
@@ -2403,6 +2531,7 @@ Body:
   - Id: 930
     AegisName: Rotten_Bandage
     Name: Rotten Bandage
+    Category: Collectible
     Buy: 350
     Sell: 175
     Weight: 10
@@ -2410,6 +2539,7 @@ Body:
   - Id: 931
     AegisName: Orcish_Voucher
     Name: Orcish Voucher
+    Category: Collectible
     Buy: 142
     Sell: 71
     Weight: 10
@@ -2417,6 +2547,7 @@ Body:
   - Id: 932
     AegisName: Skel_Bone
     Name: Skel-Bone
+    Category: Collectible
     Buy: 232
     Sell: 116
     Weight: 10
@@ -2424,6 +2555,7 @@ Body:
   - Id: 934
     AegisName: Mementos
     Name: Memento
+    Category: Collectible
     Buy: 600
     Sell: 300
     Weight: 10
@@ -2431,6 +2563,7 @@ Body:
   - Id: 935
     AegisName: Shell
     Name: Shell
+    Category: Collectible
     Buy: 14
     Sell: 7
     Weight: 10
@@ -2438,6 +2571,7 @@ Body:
   - Id: 936
     AegisName: Scales_Shell
     Name: Scale Shell
+    Category: Collectible
     Buy: 466
     Sell: 233
     Weight: 10
@@ -2445,6 +2579,7 @@ Body:
   - Id: 937
     AegisName: Posionous_Canine
     Name: Venom Canine
+    Category: Collectible
     Buy: 148
     Sell: 74
     Weight: 10
@@ -2452,6 +2587,7 @@ Body:
   - Id: 938
     AegisName: Sticky_Mucus
     Name: Sticky Mucus
+    Category: Collectible
     Buy: 70
     Sell: 35
     Weight: 10
@@ -2459,6 +2595,7 @@ Body:
   - Id: 939
     AegisName: Bee_Sting
     Name: Bee Sting
+    Category: Collectible
     Buy: 32
     Sell: 16
     Weight: 10
@@ -2466,6 +2603,7 @@ Body:
   - Id: 940
     AegisName: Grasshopper's_Leg
     Name: Grasshopper's Leg
+    Category: Collectible
     Buy: 36
     Sell: 18
     Weight: 10
@@ -2473,6 +2611,7 @@ Body:
   - Id: 941
     AegisName: Nose_Ring
     Name: Nose Ring
+    Category: Collectible
     Buy: 568
     Sell: 284
     Weight: 10
@@ -2480,6 +2619,7 @@ Body:
   - Id: 942
     AegisName: Yoyo_Tail
     Name: Yoyo Tail
+    Category: Collectible
     Buy: 114
     Sell: 57
     Weight: 10
@@ -2487,6 +2627,7 @@ Body:
   - Id: 943
     AegisName: Solid_Shell
     Name: Solid Shell
+    Category: Collectible
     Buy: 448
     Sell: 224
     Weight: 10
@@ -2494,6 +2635,7 @@ Body:
   - Id: 944
     AegisName: Horseshoe
     Name: Horseshoe
+    Category: Collectible
     Buy: 588
     Sell: 294
     Weight: 10
@@ -2501,6 +2643,7 @@ Body:
   - Id: 945
     AegisName: Raccoon_Leaf
     Name: Raccoon Leaf
+    Category: Collectible
     Buy: 106
     Sell: 53
     Weight: 10
@@ -2508,6 +2651,7 @@ Body:
   - Id: 946
     AegisName: Snail's_Shell
     Name: Snail's Shell
+    Category: Collectible
     Buy: 64
     Sell: 32
     Weight: 10
@@ -2515,6 +2659,7 @@ Body:
   - Id: 947
     AegisName: Horn
     Name: Horn
+    Category: Collectible
     Buy: 116
     Sell: 58
     Weight: 10
@@ -2522,6 +2667,7 @@ Body:
   - Id: 948
     AegisName: Bear's_Foot
     Name: Bear's Footskin
+    Category: Collectible
     Buy: 174
     Sell: 87
     Weight: 10
@@ -2529,6 +2675,7 @@ Body:
   - Id: 949
     AegisName: Feather
     Name: Feather
+    Category: Collectible
     Buy: 20
     Sell: 10
     Weight: 10
@@ -2536,6 +2683,7 @@ Body:
   - Id: 950
     AegisName: Heart_Of_Mermaid
     Name: Heart of Mermaid
+    Category: Collectible
     Buy: 264
     Sell: 132
     Weight: 10
@@ -2543,6 +2691,7 @@ Body:
   - Id: 951
     AegisName: Fin
     Name: Fin
+    Category: Collectible
     Buy: 412
     Sell: 206
     Weight: 10
@@ -2550,6 +2699,7 @@ Body:
   - Id: 952
     AegisName: Cactus_Needle
     Name: Cactus Needle
+    Category: Collectible
     Buy: 82
     Sell: 41
     Weight: 10
@@ -2557,6 +2707,7 @@ Body:
   - Id: 953
     AegisName: Stone_Heart
     Name: Stone Heart
+    Category: Collectible
     Buy: 184
     Sell: 92
     Weight: 10
@@ -2564,6 +2715,7 @@ Body:
   - Id: 954
     AegisName: Shining_Scales
     Name: Shining Scale
+    Category: Collectible
     Buy: 466
     Sell: 233
     Weight: 10
@@ -2571,6 +2723,7 @@ Body:
   - Id: 955
     AegisName: Worm_Peelings
     Name: Worm Peeling
+    Category: Collectible
     Buy: 52
     Sell: 26
     Weight: 10
@@ -2578,6 +2731,7 @@ Body:
   - Id: 956
     AegisName: Gill
     Name: Gill
+    Category: Collectible
     Buy: 342
     Sell: 171
     Weight: 10
@@ -2585,6 +2739,7 @@ Body:
   - Id: 957
     AegisName: Decayed_Nail
     Name: Decayed Nail
+    Category: Collectible
     Buy: 82
     Sell: 41
     Weight: 10
@@ -2592,6 +2747,7 @@ Body:
   - Id: 958
     AegisName: Horrendous_Mouth
     Name: Horrendous Mouth
+    Category: Collectible
     Buy: 390
     Sell: 195
     Weight: 10
@@ -2599,6 +2755,7 @@ Body:
   - Id: 959
     AegisName: Rotten_Scale
     Name: Stinky Scale
+    Category: Collectible
     Buy: 168
     Sell: 84
     Weight: 10
@@ -2606,6 +2763,7 @@ Body:
   - Id: 960
     AegisName: Nipper
     Name: Nipper
+    Category: Collectible
     Buy: 114
     Sell: 57
     Weight: 10
@@ -2613,6 +2771,7 @@ Body:
   - Id: 961
     AegisName: Conch
     Name: Conch
+    Category: Collectible
     Buy: 158
     Sell: 79
     Weight: 10
@@ -2620,6 +2779,7 @@ Body:
   - Id: 962
     AegisName: Tentacle
     Name: Tentacle
+    Category: Collectible
     Buy: 70
     Sell: 35
     Weight: 10
@@ -2627,6 +2787,7 @@ Body:
   - Id: 963
     AegisName: Sharp_Scale
     Name: Sharp Scale
+    Category: Collectible
     Buy: 250
     Sell: 125
     Weight: 10
@@ -2634,6 +2795,7 @@ Body:
   - Id: 964
     AegisName: Crap_Shell
     Name: Crab Shell
+    Category: Collectible
     Buy: 90
     Sell: 45
     Weight: 10
@@ -2641,6 +2803,7 @@ Body:
   - Id: 965
     AegisName: Clam_Shell
     Name: Clam Shell
+    Category: Collectible
     Buy: 56
     Sell: 28
     Weight: 10
@@ -2648,6 +2811,7 @@ Body:
   - Id: 966
     AegisName: Flesh_Of_Clam
     Name: Clam Flesh
+    Category: Collectible
     Buy: 158
     Sell: 79
     Weight: 10
@@ -2655,6 +2819,7 @@ Body:
   - Id: 967
     AegisName: Turtle_Shell
     Name: Turtle Shell
+    Category: Collectible
     Buy: 680
     Sell: 340
     Weight: 10
@@ -2662,6 +2827,7 @@ Body:
   - Id: 968
     AegisName: Voucher_Of_Orcish_Hero
     Name: Heroic Emblem
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 10
@@ -2669,6 +2835,7 @@ Body:
   - Id: 969
     AegisName: Gold
     Name: Gold
+    Category: Valuable
     Buy: 200000
     Sell: 100000
     Weight: 200
@@ -2676,6 +2843,7 @@ Body:
   - Id: 970
     AegisName: Alchol
     Name: Alcohol
+    Category: Essential
     Buy: 400
     Sell: 200
     Weight: 30
@@ -2683,6 +2851,7 @@ Body:
   - Id: 971
     AegisName: Detrimindexta
     Name: Detrimindexta
+    Category: Essential
     Buy: 400
     Sell: 200
     Weight: 30
@@ -2690,6 +2859,7 @@ Body:
   - Id: 972
     AegisName: Karvodailnirol
     Name: Karvodailnirol
+    Category: Essential
     Buy: 400
     Sell: 200
     Weight: 30
@@ -2697,6 +2867,7 @@ Body:
   - Id: 973
     AegisName: Counteragent
     Name: Counteragent
+    Category: Essential
     Buy: 800
     Sell: 400
     Weight: 70
@@ -2704,6 +2875,7 @@ Body:
   - Id: 974
     AegisName: Mixture
     Name: Mixture
+    Category: Essential
     Buy: 800
     Sell: 400
     Weight: 70
@@ -2711,6 +2883,7 @@ Body:
   - Id: 975
     AegisName: Scarlet_Dyestuffs
     Name: Scarlet Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2718,6 +2891,7 @@ Body:
   - Id: 976
     AegisName: Lemon_Dyestuffs
     Name: Lemon Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2725,6 +2899,7 @@ Body:
   - Id: 978
     AegisName: Cobaltblue_Dyestuffs
     Name: Cobaltblue Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2732,6 +2907,7 @@ Body:
   - Id: 979
     AegisName: Darkgreen_Dyestuffs
     Name: Darkgreen Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2739,6 +2915,7 @@ Body:
   - Id: 980
     AegisName: Orange_Dyestuffs
     Name: Orange Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2746,6 +2923,7 @@ Body:
   - Id: 981
     AegisName: Violet_Dyestuffs
     Name: Violet Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2753,6 +2931,7 @@ Body:
   - Id: 982
     AegisName: White_Dyestuffs
     Name: White Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2760,6 +2939,7 @@ Body:
   - Id: 983
     AegisName: Black_Dyestuffs
     Name: Black Dyestuffs
+    Category: Essential
     Buy: 8000
     Sell: 4000
     Weight: 150
@@ -2767,6 +2947,7 @@ Body:
   - Id: 984
     AegisName: Oridecon
     Name: Oridecon
+    Category: Forging material
     Buy: 1100
     Sell: 550
     Weight: 200
@@ -2774,6 +2955,7 @@ Body:
   - Id: 985
     AegisName: Elunium
     Name: Elunium
+    Category: Forging material
     Buy: 1100
     Sell: 550
     Weight: 200
@@ -2781,6 +2963,7 @@ Body:
   - Id: 986
     AegisName: Anvil
     Name: Anvil
+    Category: Forging material
     Buy: 30000
     Sell: 15000
     Weight: 500
@@ -2788,6 +2971,7 @@ Body:
   - Id: 987
     AegisName: Oridecon_Anvil
     Name: Oridecon Anvil
+    Category: Forging material
     Buy: 120000
     Sell: 60000
     Weight: 700
@@ -2795,6 +2979,7 @@ Body:
   - Id: 988
     AegisName: Golden_Anvil
     Name: Golden Anvil
+    Category: Forging material
     Buy: 300000
     Sell: 150000
     Weight: 900
@@ -2802,6 +2987,7 @@ Body:
   - Id: 989
     AegisName: Emperium_Anvil
     Name: Emperium Anvil
+    Category: Forging material
     Buy: 600000
     Sell: 300000
     Weight: 1000
@@ -2809,6 +2995,7 @@ Body:
   - Id: 990
     AegisName: Boody_Red
     Name: Red Blood
+    Category: Essential
     Buy: 1000
     Sell: 500
     Weight: 50
@@ -2816,6 +3003,7 @@ Body:
   - Id: 991
     AegisName: Crystal_Blue
     Name: Crystal Blue
+    Category: Essential
     Buy: 1000
     Sell: 500
     Weight: 50
@@ -2823,6 +3011,7 @@ Body:
   - Id: 992
     AegisName: Wind_Of_Verdure
     Name: Wind of Verdure
+    Category: Essential
     Buy: 1000
     Sell: 500
     Weight: 50
@@ -2830,6 +3019,7 @@ Body:
   - Id: 993
     AegisName: Yellow_Live
     Name: Green Live
+    Category: Essential
     Buy: 1000
     Sell: 500
     Weight: 50
@@ -2837,6 +3027,7 @@ Body:
   - Id: 994
     AegisName: Flame_Heart
     Name: Flame Heart
+    Category: Essential
     Buy: 3000
     Sell: 1500
     Weight: 300
@@ -2844,6 +3035,7 @@ Body:
   - Id: 995
     AegisName: Mistic_Frozen
     Name: Mystic Frozen
+    Category: Essential
     Buy: 3000
     Sell: 1500
     Weight: 300
@@ -2851,6 +3043,7 @@ Body:
   - Id: 996
     AegisName: Rough_Wind
     Name: Rough Wind
+    Category: Essential
     Buy: 3000
     Sell: 1500
     Weight: 300
@@ -2858,6 +3051,7 @@ Body:
   - Id: 997
     AegisName: Great_Nature
     Name: Great Nature
+    Category: Essential
     Buy: 3000
     Sell: 1500
     Weight: 300
@@ -2865,6 +3059,7 @@ Body:
   - Id: 998
     AegisName: Iron
     Name: Iron
+    Category: Forging material
     Buy: 100
     Sell: 50
     Weight: 50
@@ -2872,6 +3067,7 @@ Body:
   - Id: 999
     AegisName: Steel
     Name: Steel
+    Category: Forging material
     Buy: 1000
     Sell: 500
     Weight: 100
@@ -2879,6 +3075,7 @@ Body:
   - Id: 1000
     AegisName: Star_Crumb
     Name: Star Crumb
+    Category: Forging material
     Buy: 4500
     Sell: 2250
     Weight: 100
@@ -2886,6 +3083,7 @@ Body:
   - Id: 1001
     AegisName: Sparkling_Dust
     Name: Star Dust
+    Category: Forging material
     Buy: 1500
     Sell: 750
     Weight: 10
@@ -2893,6 +3091,7 @@ Body:
   - Id: 1002
     AegisName: Iron_Ore
     Name: Iron Ore
+    Category: Forging material
     Buy: 50
     Sell: 25
     Weight: 150
@@ -2900,6 +3099,7 @@ Body:
   - Id: 1003
     AegisName: Coal
     Name: Coal
+    Category: Forging material
     Buy: 500
     Sell: 250
     Weight: 50
@@ -2907,6 +3107,7 @@ Body:
   - Id: 1004
     AegisName: Patriotism_Marks
     Name: Chivalry Emblem
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 100
@@ -2914,6 +3115,7 @@ Body:
   - Id: 1005
     AegisName: Hammer_Of_Blacksmith
     Name: Hammer of Blacksmith
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 800
@@ -2921,6 +3123,7 @@ Body:
   - Id: 1006
     AegisName: Old_Magic_Book
     Name: Old Magicbook
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 30
@@ -2928,6 +3131,7 @@ Body:
   - Id: 1007
     AegisName: Penetration
     Name: Necklace of Wisdom
+    Category: Essential
     Buy: 2
     Sell: 1
     Weight: 40
@@ -2935,6 +3139,7 @@ Body:
   - Id: 1008
     AegisName: Frozen_Heart
     Name: Necklace of Oblivion
+    Category: Essential
     Buy: 2
     Sell: 1
     Weight: 100
@@ -2942,6 +3147,7 @@ Body:
   - Id: 1009
     AegisName: Sacred_Marks
     Name: Hand of God
+    Category: Valuable
     Buy: 2
     Sell: 1
     Weight: 20
@@ -2949,6 +3155,7 @@ Body:
   - Id: 1010
     AegisName: Phracon
     Name: Phracon
+    Category: Forging material
     Buy: 200
     Sell: 100
     Weight: 200
@@ -2956,6 +3163,7 @@ Body:
   - Id: 1011
     AegisName: Emveretarcon
     Name: Emveretarcon
+    Category: Forging material
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -2963,6 +3171,7 @@ Body:
   - Id: 1012
     AegisName: Lizard_Scruff
     Name: Frill
+    Category: Collectible
     Buy: 250
     Sell: 125
     Weight: 10
@@ -2970,6 +3179,7 @@ Body:
   - Id: 1013
     AegisName: Colorful_Shell
     Name: Rainbow Shell
+    Category: Collectible
     Buy: 90
     Sell: 45
     Weight: 10
@@ -2977,6 +3187,7 @@ Body:
   - Id: 1014
     AegisName: Jaws_Of_Ant
     Name: Ant Jaw
+    Category: Collectible
     Buy: 232
     Sell: 116
     Weight: 10
@@ -2984,6 +3195,7 @@ Body:
   - Id: 1015
     AegisName: Thin_N'_Long_Tongue
     Name: Tongue
+    Category: Collectible
     Buy: 528
     Sell: 264
     Weight: 10
@@ -2991,6 +3203,7 @@ Body:
   - Id: 1016
     AegisName: Rat_Tail
     Name: Rat Tail
+    Category: Collectible
     Buy: 52
     Sell: 26
     Weight: 10
@@ -2998,6 +3211,7 @@ Body:
   - Id: 1017
     AegisName: Moustache_Of_Mole
     Name: Mole Whiskers
+    Category: Collectible
     Buy: 106
     Sell: 53
     Weight: 10
@@ -3005,6 +3219,7 @@ Body:
   - Id: 1018
     AegisName: Nail_Of_Mole
     Name: Mole Claw
+    Category: Collectible
     Buy: 210
     Sell: 105
     Weight: 10
@@ -3012,6 +3227,7 @@ Body:
   - Id: 1019
     AegisName: Wooden_Block
     Name: Trunk
+    Category: Collectible
     Buy: 60
     Sell: 30
     Weight: 10
@@ -3019,6 +3235,7 @@ Body:
   - Id: 1020
     AegisName: Long_Hair
     Name: Black Hair
+    Category: Collectible
     Buy: 292
     Sell: 146
     Weight: 10
@@ -3026,6 +3243,7 @@ Body:
   - Id: 1021
     AegisName: Dokkaebi_Horn
     Name: Dokebi Horn
+    Category: Collectible
     Buy: 292
     Sell: 146
     Weight: 10
@@ -3033,6 +3251,7 @@ Body:
   - Id: 1022
     AegisName: Fox_Tail
     Name: Nine Tails
+    Category: Collectible
     Buy: 650
     Sell: 325
     Weight: 10
@@ -3040,6 +3259,7 @@ Body:
   - Id: 1023
     AegisName: Fish_Tail
     Name: Fish Tail
+    Category: Collectible
     Buy: 196
     Sell: 98
     Weight: 10
@@ -3047,6 +3267,7 @@ Body:
   - Id: 1024
     AegisName: Chinese_Ink
     Name: Squid Ink
+    Category: Collectible
     Buy: 264
     Sell: 132
     Weight: 10
@@ -3054,6 +3275,7 @@ Body:
   - Id: 1025
     AegisName: Spiderweb
     Name: Cobweb
+    Category: Collectible
     Buy: 184
     Sell: 92
     Weight: 10
@@ -3061,6 +3283,7 @@ Body:
   - Id: 1026
     AegisName: Acorn
     Name: Acorn
+    Category: Collectible
     Buy: 98
     Sell: 49
     Weight: 10
@@ -3068,6 +3291,7 @@ Body:
   - Id: 1027
     AegisName: Porcupine_Spike
     Name: Porcupine Quill
+    Category: Collectible
     Buy: 158
     Sell: 79
     Weight: 10
@@ -3075,6 +3299,7 @@ Body:
   - Id: 1028
     AegisName: Wild_Boar's_Mane
     Name: Mane
+    Category: Collectible
     Buy: 196
     Sell: 98
     Weight: 10
@@ -3082,6 +3307,7 @@ Body:
   - Id: 1029
     AegisName: Tiger's_Skin
     Name: Tiger Skin
+    Category: Collectible
     Buy: 548
     Sell: 274
     Weight: 10
@@ -3089,6 +3315,7 @@ Body:
   - Id: 1030
     AegisName: Tiger_Footskin
     Name: Tiger's Footskin
+    Category: Valuable
     Buy: 1500
     Sell: 750
     Weight: 10
@@ -3096,6 +3323,7 @@ Body:
   - Id: 1031
     AegisName: Limb_Of_Mantis
     Name: Mantis Scythe
+    Category: Collectible
     Buy: 196
     Sell: 98
     Weight: 10
@@ -3103,6 +3331,7 @@ Body:
   - Id: 1032
     AegisName: Blossom_Of_Maneater
     Name: Maneater Blossom
+    Category: Collectible
     Buy: 196
     Sell: 98
     Weight: 10
@@ -3110,6 +3339,7 @@ Body:
   - Id: 1033
     AegisName: Root_Of_Maneater
     Name: Maneater Root
+    Category: Collectible
     Buy: 208
     Sell: 104
     Weight: 10
@@ -3117,6 +3347,7 @@ Body:
   - Id: 1034
     AegisName: Cobold_Hair
     Name: Blue Hair
+    Category: Collectible
     Buy: 342
     Sell: 171
     Weight: 10
@@ -3124,6 +3355,7 @@ Body:
   - Id: 1035
     AegisName: Dragon_Canine
     Name: Dragon Canine
+    Category: Collectible
     Buy: 484
     Sell: 242
     Weight: 10
@@ -3131,6 +3363,7 @@ Body:
   - Id: 1036
     AegisName: Dragon_Scale
     Name: Dragon Scale
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -3138,6 +3371,7 @@ Body:
   - Id: 1037
     AegisName: Dragon_Train
     Name: Dragon Tail
+    Category: Collectible
     Buy: 1200
     Sell: 600
     Weight: 10
@@ -3145,6 +3379,7 @@ Body:
   - Id: 1038
     AegisName: Petite_DiablOfs_Horn
     Name: Little Evil Horn
+    Category: Collectible
     Buy: 528
     Sell: 264
     Weight: 10
@@ -3152,6 +3387,7 @@ Body:
   - Id: 1039
     AegisName: Petite_DiablOfs_Wing
     Name: Little Evil Wing
+    Category: Collectible
     Buy: 2000
     Sell: 1000
     Weight: 10
@@ -3159,6 +3395,7 @@ Body:
   - Id: 1040
     AegisName: Elder_Pixie's_Beard
     Name: Elder Pixie's Moustache
+    Category: Collectible
     Buy: 232
     Sell: 116
     Weight: 10
@@ -3166,6 +3403,7 @@ Body:
   - Id: 1041
     AegisName: Lantern
     Name: Lantern
+    Category: Collectible
     Buy: 250
     Sell: 125
     Weight: 10
@@ -3173,6 +3411,7 @@ Body:
   - Id: 1042
     AegisName: Short_Leg
     Name: Bug Leg
+    Category: Collectible
     Buy: 430
     Sell: 215
     Weight: 10
@@ -3180,6 +3419,7 @@ Body:
   - Id: 1043
     AegisName: Nail_Of_Orc
     Name: Orc Claw
+    Category: Collectible
     Buy: 168
     Sell: 84
     Weight: 10
@@ -3187,6 +3427,7 @@ Body:
   - Id: 1044
     AegisName: Tooth_Of_
     Name: Zenorc's Fang
+    Category: Collectible
     Buy: 264
     Sell: 132
     Weight: 10
@@ -3194,6 +3435,7 @@ Body:
   - Id: 1045
     AegisName: Sacred_Masque
     Name: Cultish Masque
+    Category: Collectible
     Buy: 412
     Sell: 206
     Weight: 10
@@ -3201,6 +3443,7 @@ Body:
   - Id: 1046
     AegisName: Tweezer
     Name: Scorpion Nipper
+    Category: Collectible
     Buy: 614
     Sell: 307
     Weight: 10
@@ -3208,6 +3451,7 @@ Body:
   - Id: 1047
     AegisName: Head_Of_Medusa
     Name: Dead Medusa
+    Category: Collectible
     Buy: 548
     Sell: 274
     Weight: 10
@@ -3215,6 +3459,7 @@ Body:
   - Id: 1048
     AegisName: Slender_Snake
     Name: Horrendous Hair
+    Category: Collectible
     Buy: 800
     Sell: 400
     Weight: 10
@@ -3222,6 +3467,7 @@ Body:
   - Id: 1049
     AegisName: Skirt_Of_Virgin
     Name: Skirt of Virgin
+    Category: Collectible
     Buy: 1700
     Sell: 850
     Weight: 10
@@ -3229,6 +3475,7 @@ Body:
   - Id: 1050
     AegisName: Tendon
     Name: Tendon
+    Category: Collectible
     Buy: 220
     Sell: 110
     Weight: 10
@@ -3236,6 +3483,7 @@ Body:
   - Id: 1051
     AegisName: Detonator
     Name: Detonator
+    Category: Collectible
     Buy: 450
     Sell: 225
     Weight: 10
@@ -3243,6 +3491,7 @@ Body:
   - Id: 1052
     AegisName: Single_Cell
     Name: Single Cell
+    Category: Collectible
     Buy: 46
     Sell: 23
     Weight: 10
@@ -3250,6 +3499,7 @@ Body:
   - Id: 1053
     AegisName: Tooth_Of_Ancient_Fish
     Name: Ancient Tooth
+    Category: Collectible
     Buy: 548
     Sell: 274
     Weight: 10
@@ -3257,6 +3507,7 @@ Body:
   - Id: 1054
     AegisName: Lip_Of_Ancient_Fish
     Name: Ancient Lips
+    Category: Collectible
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -3264,6 +3515,7 @@ Body:
   - Id: 1055
     AegisName: Earthworm_Peeling
     Name: Earthworm Peeling
+    Category: Collectible
     Buy: 196
     Sell: 98
     Weight: 10
@@ -3271,6 +3523,7 @@ Body:
   - Id: 1056
     AegisName: Grit
     Name: Grit
+    Category: Collectible
     Buy: 306
     Sell: 153
     Weight: 10
@@ -3278,6 +3531,7 @@ Body:
   - Id: 1057
     AegisName: Moth_Dust
     Name: Moth Dust
+    Category: Collectible
     Buy: 138
     Sell: 69
     Weight: 10
@@ -3285,6 +3539,7 @@ Body:
   - Id: 1058
     AegisName: Wing_Of_Moth
     Name: Moth Wings
+    Category: Collectible
     Buy: 200
     Sell: 100
     Weight: 10
@@ -3292,6 +3547,7 @@ Body:
   - Id: 1059
     AegisName: Transparent_Cloth
     Name: Fabric
+    Category: Collectible
     Buy: 306
     Sell: 153
     Weight: 10
@@ -3299,6 +3555,7 @@ Body:
   - Id: 1060
     AegisName: Golden_Hair
     Name: Golden Hair
+    Category: Collectible
     Buy: 430
     Sell: 215
     Weight: 10
@@ -3306,6 +3563,7 @@ Body:
   - Id: 1061
     AegisName: Starsand_Of_Witch
     Name: Witched Starsand
+    Category: Collectible
     Buy: 484
     Sell: 242
     Weight: 10
@@ -3313,6 +3571,7 @@ Body:
   - Id: 1062
     AegisName: Pumpkin_Head
     Name: Jack o' Pumpkin
+    Category: Collectible
     Buy: 374
     Sell: 187
     Weight: 10
@@ -3320,6 +3579,7 @@ Body:
   - Id: 1063
     AegisName: Sharpened_Cuspid
     Name: Fang
+    Category: Collectible
     Buy: 680
     Sell: 340
     Weight: 10
@@ -3327,6 +3587,7 @@ Body:
   - Id: 1064
     AegisName: Reins
     Name: Reins
+    Category: Collectible
     Buy: 802
     Sell: 401
     Weight: 10
@@ -3334,6 +3595,7 @@ Body:
   - Id: 1065
     AegisName: Booby_Trap
     Name: Trap
+    Category: Skill necessity
     Buy: 100
     Sell: 50
     Weight: 10
@@ -3341,6 +3603,7 @@ Body:
   - Id: 1066
     AegisName: Tree_Of_Archer_1
     Name: Fine-grained Trunk
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 10
@@ -3348,6 +3611,7 @@ Body:
   - Id: 1067
     AegisName: Tree_Of_Archer_2
     Name: Solid Trunk
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 10
@@ -3355,6 +3619,7 @@ Body:
   - Id: 1068
     AegisName: Tree_Of_Archer_3
     Name: Barren Trunk
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 10
@@ -3362,104 +3627,128 @@ Body:
   - Id: 1069
     AegisName: Mushroom_Of_Thief_1
     Name: Orange Net Mushroom
+    Category: Quest
     Buy: 2
     Sell: 1
     Weight: 10
   - Id: 1070
     AegisName: Mushroom_Of_Thief_2
     Name: Orange Gooey Mushroom
+    Category: Quest
     Buy: 2
     Sell: 1
     Weight: 10
   - Id: 1071
     AegisName: Mage_Test_1
     Name: Unknown Test Tube
+    Category: Quest
     Weight: 10
   - Id: 1072
     AegisName: Delivery_Message
     Name: Delivery Message
+    Category: Quest
     Weight: 10
   - Id: 1073
     AegisName: Merchant_Voucher_1
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1074
     AegisName: Merchant_Voucher_2
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1075
     AegisName: Merchant_Voucher_3
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1076
     AegisName: Merchant_Voucher_4
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1077
     AegisName: Merchant_Voucher_5
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1078
     AegisName: Merchant_Voucher_6
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1079
     AegisName: Merchant_Voucher_7
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1080
     AegisName: Merchant_Voucher_8
     Name: Voucher
+    Category: Quest
     Weight: 10
   - Id: 1081
     AegisName: Merchant_Box_1
     Name: Delivery Box
+    Category: Quest
     Weight: 1200
   - Id: 1082
     AegisName: Merchant_Box_2
     Name: Delivery Box
+    Category: Quest
     Weight: 1200
   - Id: 1083
     AegisName: Merchant_Box_3
     Name: Delivery Box
+    Category: Quest
     Weight: 1200
   - Id: 1084
     AegisName: Kapra's_Pass
     Name: Kafra Pass
+    Category: Quest
     Weight: 10
   - Id: 1085
     AegisName: Mage_Test_2
     Name: Unknown Test Tube
+    Category: Quest
     Weight: 10
   - Id: 1086
     AegisName: Mage_Test_3
     Name: Unknown Test Tube
+    Category: Quest
     Weight: 10
   - Id: 1087
     AegisName: Mage_Test_4
     Name: Unknown Test Tube
+    Category: Quest
     Weight: 10
   - Id: 1088
     AegisName: Morocc_Potion
     Name: Morocc Solution
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 1089
     AegisName: Payon_Potion
     Name: Payon Solution
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 1090
     AegisName: Mage_Test_Etc
     Name: Unknown Test Tube
+    Category: Quest
     Weight: 10
   - Id: 1091
     AegisName: Merchant_Box_Etc
     Name: Delivery Box
+    Category: Quest
     Weight: 10
   - Id: 1092
     AegisName: Empty_Cylinder
     Name: Empty Test Tube
+    Category: Collectible
     Buy: 3
     Sell: 1
     Weight: 10
@@ -3467,6 +3756,7 @@ Body:
   - Id: 1093
     AegisName: Empty_Potion
     Name: Empty Potion Bottle
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
@@ -3474,6 +3764,7 @@ Body:
   - Id: 1094
     AegisName: Short_Daenggie
     Name: Short Daenggie
+    Category: Collectible
     Buy: 278
     Sell: 139
     Weight: 10
@@ -3481,6 +3772,7 @@ Body:
   - Id: 1095
     AegisName: Needle_Of_Alarm
     Name: Needle of Alarm
+    Category: Collectible
     Buy: 546
     Sell: 273
     Weight: 10
@@ -3488,6 +3780,7 @@ Body:
   - Id: 1096
     AegisName: Round_Shell
     Name: Round Shell
+    Category: Collectible
     Buy: 780
     Sell: 390
     Weight: 10
@@ -3495,6 +3788,7 @@ Body:
   - Id: 1097
     AegisName: Worn_Out_Page
     Name: Worn Out Page
+    Category: Collectible
     Buy: 948
     Sell: 474
     Weight: 10
@@ -3502,6 +3796,7 @@ Body:
   - Id: 1098
     AegisName: Manacles
     Name: Manacles
+    Category: Collectible
     Buy: 658
     Sell: 329
     Weight: 10
@@ -3509,6 +3804,7 @@ Body:
   - Id: 1099
     AegisName: Worn_Out_Prison_Uniform
     Name: Worn-out Prison Uniform
+    Category: Collectible
     Buy: 680
     Sell: 340
     Weight: 10
@@ -49026,25 +49322,30 @@ Body:
   - Id: 6000
     AegisName: Dark_Ashes
     Name: Ashes of Darkness
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6001
     AegisName: Essence_Of_Fire
     Name: Essence of Fire
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 6002
     AegisName: Token_Of_Apostle
     Name: Token of Apostle
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 6003
     AegisName: Soul_Pendant
     Name: Pendant of Spirit
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 6004
     AegisName: Bapho_Doll
     Name: Cursed Baphomet Doll
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 6005
@@ -49065,6 +49366,7 @@ Body:
   - Id: 6008
     AegisName: Wood
     Name: Wood
+    Category: Quest
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 6009
@@ -49113,6 +49415,7 @@ Body:
   - Id: 6020
     AegisName: Fur
     Name: Fur
+    Category: Collectible
     Buy: 704
     Sell: 352
     Weight: 10
@@ -49120,6 +49423,7 @@ Body:
   - Id: 6021
     AegisName: Peaked_Hat
     Name: Peaked Hat
+    Category: Collectible
     Buy: 433
     Sell: 216
     Weight: 10
@@ -49127,6 +49431,7 @@ Body:
   - Id: 6022
     AegisName: Hard_Skin
     Name: Hard Skin
+    Category: Collectible
     Buy: 884
     Sell: 442
     Weight: 10
@@ -49134,6 +49439,7 @@ Body:
   - Id: 6023
     AegisName: Mystic_Horn
     Name: Mystic Horn
+    Category: Collectible
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49171,6 +49477,7 @@ Body:
   - Id: 6032
     AegisName: Horn_Of_Hilsrion
     Name: Horn of Hillslion
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -49178,6 +49485,7 @@ Body:
   - Id: 6033
     AegisName: Horn_Of_Tendrilion
     Name: Horn of Tendrilion
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -49210,6 +49518,7 @@ Body:
   - Id: 6041
     AegisName: Strong_Bine
     Name: Strong Vine
+    Category: Collectible
     Buy: 30
     Sell: 15
     Weight: 50
@@ -49380,26 +49689,32 @@ Body:
   - Id: 6077
     AegisName: Rough_Mineral
     Name: Rough Mineral
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6078
     AegisName: Stone_Fragments
     Name: Stone Fragment
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6079
     AegisName: Flower_Of_Alfheim
     Name: Flower Of Alfheim
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6080
     AegisName: Manuk_Coin
     Name: Manuk Coin
+    Category: Valuable
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6081
     AegisName: Splendide_Coin
     Name: Splendide Coin
+    Category: Valuable
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6082
     AegisName: Spirit_Of_Alfheim
     Name: Spirit Of Alfheim
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6083
     AegisName: Dolly_Capsule
@@ -49408,10 +49723,12 @@ Body:
   - Id: 6084
     AegisName: Bradium_Fragments
     Name: Bradium Fragments
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6085
     AegisName: Shaggy_Muffler
     Name: Shaggy Muffler
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6086
     AegisName: Withered_Flower
@@ -49465,12 +49782,14 @@ Body:
   - Id: 6094
     AegisName: Traditional_Cookie
     Name: Traditional Sweets
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6095
     AegisName: Flavored_Alcohol
     Name: Flavored Alcohol
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49478,6 +49797,7 @@ Body:
   - Id: 6096
     AegisName: Fish_With_Blue_Back
     Name: Fish With Blue Back
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49485,6 +49805,7 @@ Body:
   - Id: 6097
     AegisName: Pumpkin_Pie_
     Name: Pumpkin Pie
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49492,6 +49813,7 @@ Body:
   - Id: 6098
     AegisName: Small_Snow_Flower
     Name: Small Snow Flower
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49499,6 +49821,7 @@ Body:
   - Id: 6099
     AegisName: Grilled_Rice_Cake
     Name: Grilled Rice Cake
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49506,6 +49829,7 @@ Body:
   - Id: 6100
     AegisName: Damp_Darkness
     Name: Damp Darkness
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49516,12 +49840,15 @@ Body:
   - Id: 6102
     AegisName: Report_On_Splendide
     Name: Report On Splendide
+    Category: Quest
   - Id: 6103
     AegisName: Report_On_Manuk
     Name: Report On Manuk
+    Category: Quest
   - Id: 6104
     AegisName: Big_Cell
     Name: Big Cell
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49529,6 +49856,7 @@ Body:
   - Id: 6105
     AegisName: Morning_Dew
     Name: Morning Dew
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49536,6 +49864,7 @@ Body:
   - Id: 6106
     AegisName: Well_Ripened_Berry
     Name: Well Ripened Berry
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49543,6 +49872,7 @@ Body:
   - Id: 6107
     AegisName: Sunset_On_The_Rock
     Name: Sunset On The Rock
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49550,6 +49880,7 @@ Body:
   - Id: 6108
     AegisName: Apple_Pudding
     Name: Apple Pudding
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49557,6 +49888,7 @@ Body:
   - Id: 6109
     AegisName: Plant_Neutrient
     Name: Plant Neutrient
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -49564,6 +49896,7 @@ Body:
   - Id: 6110
     AegisName: Vital_Flower
     Name: Vital Flower
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49571,6 +49904,7 @@ Body:
   - Id: 6111
     AegisName: Mystic_Stone
     Name: Mystic Stone
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49578,6 +49912,7 @@ Body:
   - Id: 6112
     AegisName: Fresh_Plant
     Name: Fresh Plant
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49585,6 +49920,7 @@ Body:
   - Id: 6113
     AegisName: Vital_Flower_
     Name: Vital Flower
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49592,6 +49928,7 @@ Body:
   - Id: 6114
     AegisName: Flame_Gemstone
     Name: Flame Gemstone
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49599,6 +49936,7 @@ Body:
   - Id: 6115
     AegisName: Bun_
     Name: Bun
+    Category: Pet Food
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -49618,6 +49956,7 @@ Body:
   - Id: 6120
     AegisName: Face_Paint
     Name: Face Paint
+    Category: Skill necessity
     Buy: 120
     Sell: 60
     Weight: 20
@@ -49625,16 +49964,19 @@ Body:
   - Id: 6121
     AegisName: Makeover_Brush
     Name: Makeover Brush
+    Category: Skill necessity
     Buy: 10
     Sell: 5
   - Id: 6122
     AegisName: Paint_Brush
     Name: Paint Brush
+    Category: Skill necessity
     Buy: 10
     Sell: 5
   - Id: 6123
     AegisName: Surface_Paint
     Name: Surface Paint
+    Category: Skill necessity
     Buy: 200
     Sell: 100
     Weight: 30
@@ -49642,6 +49984,7 @@ Body:
   - Id: 6124
     AegisName: Wolf's_Flute
     Name: Wolf Flute
+    Category: Skill necessity
     Buy: 10
     Sell: 5
   - Id: 6125
@@ -49660,6 +50003,7 @@ Body:
   - Id: 6128
     AegisName: Guillotine_Antidote
     Name: Antidote
+    Category: Skill necessity
     Flags: {BuyingStore: true}
   - Id: 6129
     AegisName: Ticket_Nightmare
@@ -50027,6 +50371,7 @@ Body:
   - Id: 6219
     AegisName: Para_Team_Mark
     Name: Eden Group Mark
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
   - Id: 6220
     AegisName: Mysterious_Dyestuff
@@ -50043,6 +50388,7 @@ Body:
   - Id: 6223
     AegisName: Carnium
     Name: Carnium
+    Category: Forging material
     Buy: 2000
     Sell: 1000
     Weight: 150
@@ -50050,6 +50396,7 @@ Body:
   - Id: 6224
     AegisName: Bradium
     Name: Bradium
+    Category: Forging material
     Buy: 2000
     Sell: 1000
     Weight: 150
@@ -50057,10 +50404,12 @@ Body:
   - Id: 6225
     AegisName: HD_Carnium
     Name: HD Carnium
+    Category: Forging material
     Weight: 10
   - Id: 6226
     AegisName: HD_Bradium
     Name: HD Bradium
+    Category: Forging material
     Weight: 10
   - Id: 6228
     AegisName: Guarantee_Weapon_9Up
@@ -50102,18 +50451,21 @@ Body:
   - Id: 6240
     AegisName: HD_Oridecon
     Name: HD Oridecon
+    Category: Forging material
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6241
     AegisName: HD_Elunium
     Name: HD Elunium
+    Category: Forging material
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6242
     AegisName: Midgard_Coin
     Name: Midgard Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
@@ -50249,6 +50601,7 @@ Body:
   - Id: 6262
     AegisName: Cool_Gravy
     Name: Cool Gravy
+    Category: Cooking ingredient
     Buy: 400
     Sell: 200
     Weight: 10
@@ -50256,6 +50609,7 @@ Body:
   - Id: 6263
     AegisName: Coconut_Fruit
     Name: Coconut Fruit
+    Category: Cooking ingredient
     Buy: 100
     Sell: 50
     Weight: 10
@@ -50263,6 +50617,7 @@ Body:
   - Id: 6264
     AegisName: Melon
     Name: Melon
+    Category: Cooking ingredient
     Buy: 100
     Sell: 50
     Weight: 10
@@ -50270,6 +50625,7 @@ Body:
   - Id: 6265
     AegisName: Pineapple
     Name: Pineapple
+    Category: Cooking ingredient
     Buy: 100
     Sell: 50
     Weight: 10
@@ -50277,45 +50633,58 @@ Body:
   - Id: 6266
     AegisName: Cheat_Key
     Name: Key Of Deception
+    Category: Quest
   - Id: 6267
     AegisName: Virtual_Key
     Name: Key Of Illusion
+    Category: Quest
   - Id: 6268
     AegisName: Mirth_Key
     Name: Key Of Gaiety
+    Category: Quest
   - Id: 6269
     AegisName: Master_Brush
     Name: A Master's Blush
+    Category: Quest
   - Id: 6270
     AegisName: Mins_Picture
     Name: A Picture Of Minstrel Song
+    Category: Quest
   - Id: 6271
     AegisName: Mins_Receipt
     Name: Receipt
   - Id: 6272
     AegisName: Experiment_Seed
     Name: Experiment Seed
+    Category: Quest
   - Id: 6273
     AegisName: Altered_Seed
     Name: Seed For Experiment
+    Category: Quest
   - Id: 6274
     AegisName: Saint_Cloth_Piece
     Name: A Piece Of Cloth Of A Saint
+    Category: Quest
   - Id: 6275
     AegisName: King_Shield
     Name: Shield Of King
+    Category: Quest
   - Id: 6276
     AegisName: Clear_Reagent
     Name: Clear Reagent
+    Category: Quest
   - Id: 6277
     AegisName: Red_Reagent
     Name: Red Reagent
+    Category: Quest
   - Id: 6278
     AegisName: Black_Reagent
     Name: Black Reagent
+    Category: Quest
   - Id: 6279
     AegisName: Apple_Bomb_CB
     Name: Apple Bomb Guidebook
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50323,6 +50692,7 @@ Body:
   - Id: 6280
     AegisName: Pinepple_Bomb_CB
     Name: Pineapple Bomb Guidebook
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50330,6 +50700,7 @@ Body:
   - Id: 6281
     AegisName: Coconut_Bomb_CB
     Name: Coconut Fruit Bomb Guidebook
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50337,6 +50708,7 @@ Body:
   - Id: 6282
     AegisName: Melon_Bomb_CB
     Name: Melon Bomb Guidebook
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50344,6 +50716,7 @@ Body:
   - Id: 6283
     AegisName: Banana_Bomb_CB
     Name: Banana Bomb Guidebook
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50351,6 +50724,7 @@ Body:
   - Id: 6284
     AegisName: Plant_Genetic_Grow
     Name: How To Grow Plant Genes
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50358,6 +50732,7 @@ Body:
   - Id: 6285
     AegisName: Quality_Potion_Book
     Name: "Manual: How To Make High Quality Potion"
+    Category: Alchemist item
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -50385,12 +50760,14 @@ Body:
   - Id: 6291
     AegisName: F_Enriched_Elunium
     Name: F Enriched Elunium
+    Category: Forging material
     Buy: 2
     Sell: 1
     Weight: 10
   - Id: 6292
     AegisName: F_Enriched_Oridecon
     Name: F Enriched Oridecon
+    Category: Forging material
     Buy: 2
     Sell: 1
     Weight: 10
@@ -50453,15 +50830,19 @@ Body:
   - Id: 6304
     AegisName: Sapa_Feat_Cert
     Name: Proof Of Sapha's Honor
+    Category: Quest
   - Id: 6305
     AegisName: Frozen_Skin_Piece
     Name: Frozen Piece Of Skin
+    Category: Quest
   - Id: 6306
     AegisName: Solid_Bloodstain
     Name: Hard Bloodstain
+    Category: Quest
   - Id: 6307
     AegisName: Suspicious_Magic_Stone
     Name: Cursed Magical Stone
+    Category: Quest
   - Id: 6308
     AegisName: Unidentified_Relic
     Name: Unidentified Relic
@@ -50519,11 +50900,13 @@ Body:
   - Id: 6320
     AegisName: Premium_Reset_Stone
     Name: Premium Reset Stone
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6321
     AegisName: Rakehorn_Helm
     Name: Rakehorn Helm
+    Category: Collectible
     Buy: 822
     Sell: 411
     Weight: 10
@@ -50531,6 +50914,7 @@ Body:
   - Id: 6322
     AegisName: Antler_Helm
     Name: Antler Helmet
+    Category: Collectible
     Buy: 800
     Sell: 400
     Weight: 10
@@ -50538,6 +50922,7 @@ Body:
   - Id: 6323
     AegisName: Twinhorn_Helm
     Name: Two-Horned Helmet
+    Category: Collectible
     Buy: 728
     Sell: 364
     Weight: 10
@@ -50545,6 +50930,7 @@ Body:
   - Id: 6324
     AegisName: Singlehorn_Helm
     Name: Single Horned Helmet
+    Category: Collectible
     Buy: 702
     Sell: 351
     Weight: 10
@@ -50552,6 +50938,7 @@ Body:
   - Id: 6325
     AegisName: White_Spider_Limb
     Name: White Spider Limb
+    Category: Collectible
     Buy: 1004
     Sell: 502
     Weight: 10
@@ -50559,6 +50946,7 @@ Body:
   - Id: 6326
     AegisName: Queen_Wing_Piece
     Name: Queen Wing Piece
+    Category: Collectible
     Buy: 1630
     Sell: 815
     Weight: 10
@@ -50719,6 +51107,7 @@ Body:
   - Id: 6360
     AegisName: Scarlet_Pts
     Name: Scarlet Point
+    Category: Skill necessity
     Buy: 100
     Sell: 50
     Weight: 5
@@ -50726,6 +51115,7 @@ Body:
   - Id: 6361
     AegisName: Indigo_Pts
     Name: Indigo Point
+    Category: Skill necessity
     Buy: 100
     Sell: 50
     Weight: 5
@@ -50733,6 +51123,7 @@ Body:
   - Id: 6362
     AegisName: Yellow_Wish_Pts
     Name: Yellow Wish Point
+    Category: Skill necessity
     Buy: 100
     Sell: 50
     Weight: 5
@@ -50740,6 +51131,7 @@ Body:
   - Id: 6363
     AegisName: Lime_Green_Pts
     Name: Lime Green Point
+    Category: Skill necessity
     Buy: 100
     Sell: 50
     Weight: 5
@@ -50747,18 +51139,23 @@ Body:
   - Id: 6364
     AegisName: Woe_Coin
     Name: GvG Coin
+    Category: Valuable
   - Id: 6365
     AegisName: Arena_Coin
     Name: Arena Coin
+    Category: Valuable
   - Id: 6366
     AegisName: Turbo_Track_Coin
     Name: Turbo Track Coin
+    Category: Valuable
   - Id: 6367
     AegisName: Kafra_Coin
     Name: Kafra Coin
+    Category: Valuable
   - Id: 6368
     AegisName: Endless_Coin
     Name: Endless Tower Coin
+    Category: Valuable
   - Id: 6369
     AegisName: Amatsu_Bead_A
     Name: Amatsu Bead A
@@ -50798,12 +51195,14 @@ Body:
   - Id: 6379
     AegisName: Card_Coin
     Name: Card Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6380
     AegisName: Mora_Coin
     Name: Mora Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6381
@@ -50823,38 +51222,46 @@ Body:
   - Id: 6383
     AegisName: Clue_Of_Lope
     Name: Lope's Clue
+    Category: Quest
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6384
     AegisName: Ring_Of_Lope
     Name: Lope's Ring
+    Category: Quest
   - Id: 6385
     AegisName: Research_Tool_Bag
     Name: Research Tool Bag
+    Category: Quest
   - Id: 6386
     AegisName: Bathtub_R_Sample
     Name: Bath Water Sample
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6387
     AegisName: Teeth_Sample
     Name: Teeth Sample
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6388
     AegisName: Scale_Sample
     Name: Scale Sample
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6389
     AegisName: Puddle_R_Sample
     Name: Sample Of Puddle Research
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6390
     AegisName: Small_Pocket
     Name: Small Pocket
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6391
@@ -50969,6 +51376,7 @@ Body:
   - Id: 6412
     AegisName: Special_Medal
     Name: Special Medal
+    Category: Quest
   - Id: 6413
     AegisName: New_Insurance
     Name: New Insurance
@@ -50987,84 +51395,103 @@ Body:
   - Id: 6416
     AegisName: Pet_Exchange
     Name: Pet Exchange
+    Category: Quest
   - Id: 6417
     AegisName: Silvervine
     Name: Silvervine Fruit
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6418
     AegisName: Agrade_Coin
     Name: A Grade Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6419
     AegisName: Bgrade_Coin
     Name: B Grade Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6420
     AegisName: Cgrade_Coin
     Name: C Grade Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6421
     AegisName: Dgrade_Coin
     Name: D Grade Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6422
     AegisName: Egrade_Coin
     Name: E Grade Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6423
     AegisName: Anger_Seagod
     Name: Sea God's Wrath
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 6424
     AegisName: Halloween_Fragment
     Name: Spirit Piece
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6425
     AegisName: Halloween_Certificate
     Name: Halloween Certificate
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6426
     AegisName: Bad_Can
     Name: Bad Canned Food
+    Category: Quest
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6427
     AegisName: Bad_Can_Sack
     Name: Bad Canned Food Sack
+    Category: Quest
   - Id: 6428
     AegisName: Bravery_Card_A
     Name: Adventure Card A
+    Category: Valuable
   - Id: 6429
     AegisName: Bravery_Card_B
     Name: Adventure Card B
+    Category: Valuable
   - Id: 6430
     AegisName: Picture_Piece
     Name: Picture Fragment
+    Category: Quest
   - Id: 6431
     AegisName: Bucket
     Name: Pail
+    Category: Quest
     Weight: 100
   - Id: 6432
     AegisName: Full_Bucket
     Name: Full Pail
+    Category: Quest
     Weight: 3000
   - Id: 6433
     AegisName: Clean_Brush
     Name: Cleaning Brush
+    Category: Quest
     Weight: 300
   - Id: 6434
     AegisName: Fix_Kit
     Name: Fix Kit
+    Category: Quest
     Weight: 1000
   - Id: 6435
     AegisName: Fresh_Fruit
@@ -51081,10 +51508,12 @@ Body:
   - Id: 6438
     AegisName: Unbreakable_Weap
     Name: Unbreakable Weapon
+    Category: Forging material
     Weight: 10
   - Id: 6439
     AegisName: Unbreakable_Def
     Name: Unbreakable Armor
+    Category: Forging material
     Weight: 10
   - Id: 6440
     AegisName: General_Lubricant
@@ -51178,9 +51607,11 @@ Body:
   - Id: 6464
     AegisName: Hate_Bundle
     Name: Hate Crate
+    Category: Quest
   - Id: 6465
     AegisName: Guard_Coin
     Name: Guard Coin
+    Category: Valuable
     Weight: 10
   - Id: 6466
     AegisName: Clean_Water
@@ -51203,18 +51634,21 @@ Body:
   - Id: 6469
     AegisName: Will_Of_Warrior
     Name: Warrior's Will
+    Category: Valuable
     Buy: 1000
     Sell: 500
     Weight: 10
   - Id: 6470
     AegisName: Blood_Thirst
     Name: Blood Thirst
+    Category: Valuable
     Buy: 1200
     Sell: 600
     Weight: 10
   - Id: 6471
     AegisName: Goast_Chill
     Name: Chills Of Death
+    Category: Valuable
     Buy: 1600
     Sell: 800
     Weight: 10
@@ -51300,9 +51734,11 @@ Body:
   - Id: 6494
     AegisName: Kafra_Coin2
     Name: Kafra Coin
+    Category: Valuable
   - Id: 6495
     AegisName: Para_Logro_Badge
     Name: Eden Merit Badge
+    Category: Valuable
   - Id: 6496
     AegisName: Tikbalang_Thick_Spine
     Name: Tikbalang's Thick Spine
@@ -51428,6 +51864,7 @@ Body:
   - Id: 6520
     AegisName: Lost_Belongings
     Name: Lost Belongings
+    Category: Quest
   - Id: 6521
     AegisName: Royal_Certificate
     Name: Royal Certificate
@@ -51545,6 +51982,7 @@ Body:
   - Id: 6549
     AegisName: Courtesy_Ticket
     Name: Courtesy Ticket
+    Category: Quest
   - Id: 6550
     AegisName: Brownie_Ticket
     Name: Brownie Ticket
@@ -51638,6 +52076,7 @@ Body:
   - Id: 6593
     AegisName: Cryptura_Hair_Coupon
     Name: Cryptura Hair Coupon
+    Category: Quest
   - Id: 6594
     AegisName: Magic_Bronze_Bullion
     Name: Magic Bronze Bullion
@@ -51691,6 +52130,7 @@ Body:
   - Id: 6607
     AegisName: Temporal_Crystal
     Name: Temporal Crystal
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
@@ -51698,6 +52138,7 @@ Body:
   - Id: 6608
     AegisName: Coagulated_Spell
     Name: Coagulated Spell
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
@@ -51705,12 +52146,14 @@ Body:
   - Id: 6609
     AegisName: Glast_Decayed_Nail
     Name: Glast Decayed Nail
+    Category: Collectible
     Buy: 2800
     Sell: 1400
     Weight: 10
   - Id: 6610
     AegisName: Glast_Horrendous_Mouth
     Name: Glast Horrendous Mouth
+    Category: Collectible
     Buy: 3200
     Sell: 1600
     Weight: 10
@@ -51735,6 +52178,7 @@ Body:
   - Id: 6615
     AegisName: Siege_Guild_Coin
     Name: Siege Guild Coin
+    Category: Valuable
     Weight: 10
   - Id: 6616
     AegisName: Lmtd_Manny_Card
@@ -51924,11 +52368,13 @@ Body:
   - Id: 6671
     AegisName: Geffen_Coin_Magic_Tournament
     Name: Geffen Coin Magic Tournament
+    Category: Valuable
     Buy: 10
     Sell: 5
   - Id: 6672
     AegisName: Shard_of_Gray
     Name: Shard of Gray
+    Category: Valuable
     Buy: 100000
     Sell: 50000
   - Id: 6673
@@ -51961,44 +52407,52 @@ Body:
   - Id: 6684
     AegisName: TokenOfHero
     Name: Token Of Hero
+    Category: Valuable
     Buy: 10
     Sell: 5
   - Id: 6685
     AegisName: Morocc_Certification
     Name: Morocc Certification
+    Category: Valuable
     Buy: 10
     Sell: 5
   - Id: 6686
     AegisName: Brick
     Name: Brick
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 2000
   - Id: 6687
     AegisName: Rope__
     Name: Rope
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 2000
   - Id: 6688
     AegisName: Wood_
     Name: Wood
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 2000
   - Id: 6689
     AegisName: BurningSkin
     Name: Burning Bug Skin
+    Category: Collectible
     Buy: 10
     Sell: 5
   - Id: 6690
     AegisName: YummyStem
     Name: Yummy Stem
+    Category: Collectible
     Buy: 10
     Sell: 5
   - Id: 6691
     AegisName: BurningFeather
     Name: Burning Feather
+    Category: Collectible
     Buy: 10
     Sell: 5
   - Id: 6692
@@ -52010,24 +52464,28 @@ Body:
   - Id: 6693
     AegisName: Stone_Of_Blessing
     Name: Stone Of Blessing
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6694
     AegisName: Monster_Blood
     Name: Monster Blood
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6695
     AegisName: ToothOfFlameGolem
     Name: Golem's Fiery Stone Tooth
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 100
   - Id: 6696
     AegisName: ToothOfFlameFrilldora
     Name: Frilldora's Fiery Nape
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
@@ -52040,6 +52498,7 @@ Body:
   - Id: 6698
     AegisName: Wooden_Axe
     Name: Wooden Axe
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 1000
@@ -52092,6 +52551,7 @@ Body:
   - Id: 6708
     AegisName: Mana_crystal
     Name: Mana Crystal
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6709
@@ -52118,6 +52578,7 @@ Body:
   - Id: 6715
     AegisName: P_Of_Evil_Soul
     Name: Darklord Soulpiece
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6716
@@ -52307,11 +52768,13 @@ Body:
   - Id: 6748
     AegisName: Daily_Report_He_And_His_Team
     Name: Daily Report He And His Team
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6749
     AegisName: Operation_Control_Device
     Name: Operation Control Device
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6750
@@ -52329,33 +52792,39 @@ Body:
   - Id: 6752
     AegisName: Charleston_Parts
     Name: Charleston Parts
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6753
     AegisName: Token_Of_Destruction
     Name: Token Of Destruction
+    Category: Valuable
     Buy: 10
     Sell: 5
   - Id: 6754
     AegisName: Collected_Medicinal_Herbs
     Name: Collected Medicinal Herbs
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6755
     AegisName: Polluted_Spell
     Name: Contaminated Magic
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 6756
     AegisName: Cohesive_Energy
     Name: Cohesive Energy
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6757
     AegisName: The_Memory_Recorder
     Name: The Memory Recorder
+    Category: Quest
     Buy: 20
     Sell: 10
   - Id: 6762
@@ -52512,9 +52981,11 @@ Body:
   - Id: 6797
     AegisName: 11th_Coin
     Name: 11th Anniversary Coin
+    Category: Valuable
   - Id: 6803
     AegisName: Fragments_Of_Gigan
     Name: Fragments Of Gigan
+    Category: Valuable
     Buy: 10
     Sell: 5
     Weight: 10
@@ -52539,36 +53010,42 @@ Body:
   - Id: 6814
     AegisName: Swordman_Soul
     Name: Swordman Soul
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6815
     AegisName: Merchant_Soul
     Name: Merchant Soul
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6816
     AegisName: Thief_Soul
     Name: Thief Soul
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6817
     AegisName: Mage_Soul
     Name: Mage Soul
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6818
     AegisName: Archer_Soul
     Name: Archer Soul
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6819
     AegisName: Acolyte_Soul
     Name: Acolyte Soul
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
@@ -52582,6 +53059,7 @@ Body:
   - Id: 6824
     AegisName: Experimental_Dong_Memory_Record
     Name: Experimental Dong Memory Record
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
@@ -52600,11 +53078,13 @@ Body:
   - Id: 6827
     AegisName: Complete_Machine_Parts
     Name: Complete Machine Parts
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6828
     AegisName: Gravity_Safety_Device
     Name: Gravity Safety Device
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 100
@@ -52938,11 +53418,13 @@ Body:
   - Id: 6904
     AegisName: Piece_Of_Soul_Snake
     Name: Piece Of Soul Snake
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6905
     AegisName: Shattered_Rune
     Name: Broken Magic Stone
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6906
@@ -52989,117 +53471,139 @@ Body:
   - Id: 6913
     AegisName: Holy_Rosary
     Name: Holy Rosary
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6914
     AegisName: Black_Horn
     Name: Black Horn
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6915
     AegisName: Captured_Soul
     Name: Captured Soul
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6916
     AegisName: Piece_Of_Soul_Monkey
     Name: Piece Of Soul Monkey
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6917
     AegisName: Piece_Of_Soul_Chicken
     Name: Piece Of Soul Chicken
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6919
     AegisName: Honor_Proof
     Name: Honor Token
+    Category: Valuable
     Buy: 10
     Sell: 5
   - Id: 6920
     AegisName: Rune_Magic_Powder
     Name: Rune Magic Powder
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6921
     AegisName: Dehumidifiers
     Name: Dehumidifiers
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6922
     AegisName: Sandpaper
     Name: Sandpaper
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6923
     AegisName: Bright_Fire_Lights
     Name: Bright Fire Lights
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6924
     AegisName: Red_Eye
     Name: Red Eye
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 6925
     AegisName: Letter_Of_Prisoner
     Name: Letter Of Prisoner
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6926
     AegisName: Midgards_Histories
     Name: Rune-Midgarts History Book
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6927
     AegisName: Stone_That_Contained_Sea
     Name: Stone That Contained Sea
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6928
     AegisName: Poring_Scourer
     Name: Poring Scourer
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6929
     AegisName: Letter_With_Stamped_Seal
     Name: Letter With Stamped Seal
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6930
     AegisName: Samples_New_Business_Items
     Name: Samples New Business Items
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6931
     AegisName: Secret_Documents
     Name: Secret Documents
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6932
     AegisName: Rare_Book
     Name: Rare Book
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6933
     AegisName: Banquet_Invitation_Letter
     Name: Banquet Invitation Letter
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6934
     AegisName: Magnificent_Dish
     Name: Magnificent Dish
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 1000
   - Id: 6935
     AegisName: Advanced_Dish
     Name: Advanced Dish
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 6936
@@ -53375,6 +53879,7 @@ Body:
   - Id: 7001
     AegisName: Mould_Powder
     Name: Mould Powder
+    Category: Collectible
     Buy: 466
     Sell: 233
     Weight: 10
@@ -53382,6 +53887,7 @@ Body:
   - Id: 7002
     AegisName: Ogre_Tooth
     Name: Ogre Tooth
+    Category: Collectible
     Buy: 658
     Sell: 329
     Weight: 10
@@ -53389,6 +53895,7 @@ Body:
   - Id: 7003
     AegisName: Anolian_Skin
     Name: Anolian Skin
+    Category: Collectible
     Buy: 968
     Sell: 484
     Weight: 10
@@ -53396,6 +53903,7 @@ Body:
   - Id: 7004
     AegisName: Mud_Lump
     Name: Mud Lump
+    Category: Collectible
     Buy: 876
     Sell: 438
     Weight: 10
@@ -53403,6 +53911,7 @@ Body:
   - Id: 7005
     AegisName: Skull
     Name: Skull
+    Category: Collectible
     Buy: 1044
     Sell: 522
     Weight: 10
@@ -53410,6 +53919,7 @@ Body:
   - Id: 7006
     AegisName: Wing_Of_Red_Bat
     Name: Wing of Red Bat
+    Category: Collectible
     Buy: 168
     Sell: 84
     Weight: 10
@@ -53417,6 +53927,7 @@ Body:
   - Id: 7007
     AegisName: Claw_Of_Rat
     Name: Claw of Rat
+    Category: Collectible
     Buy: 748
     Sell: 374
     Weight: 10
@@ -53424,6 +53935,7 @@ Body:
   - Id: 7008
     AegisName: Stiff_Horn
     Name: Stiff Horn
+    Category: Collectible
     Buy: 636
     Sell: 318
     Weight: 10
@@ -53431,6 +53943,7 @@ Body:
   - Id: 7009
     AegisName: Glitter_Shell
     Name: Glitter Shell
+    Category: Collectible
     Buy: 528
     Sell: 264
     Weight: 10
@@ -53438,6 +53951,7 @@ Body:
   - Id: 7010
     AegisName: Tail_Of_Steel_Scorpion
     Name: Tail of Steel Scorpion
+    Category: Collectible
     Buy: 548
     Sell: 274
     Weight: 10
@@ -53445,6 +53959,7 @@ Body:
   - Id: 7011
     AegisName: Claw_Of_Monkey
     Name: Claw of Monkey
+    Category: Collectible
     Buy: 466
     Sell: 233
     Weight: 10
@@ -53452,6 +53967,7 @@ Body:
   - Id: 7012
     AegisName: Tough_Scalelike_Stem
     Name: Tough Scalelike Stem
+    Category: Collectible
     Buy: 412
     Sell: 206
     Weight: 10
@@ -53459,6 +53975,7 @@ Body:
   - Id: 7013
     AegisName: Coral_Reef
     Name: Coral Reef
+    Category: Collectible
     Buy: 772
     Sell: 386
     Weight: 10
@@ -53466,6 +53983,7 @@ Body:
   - Id: 7014
     AegisName: Old_Portrait
     Name: Old Portrait
+    Category: Collectible
     Buy: 1500
     Sell: 750
     Weight: 100
@@ -53473,6 +53991,7 @@ Body:
   - Id: 7015
     AegisName: Bookclip_In_Memory
     Name: Bookclip in Memory
+    Category: Collectible
     Buy: 3000
     Sell: 1500
     Weight: 20
@@ -53480,6 +53999,7 @@ Body:
   - Id: 7016
     AegisName: Spoon_Stub
     Name: Spoon Stub
+    Category: Collectible
     Buy: 2500
     Sell: 1250
     Weight: 20
@@ -53487,6 +54007,7 @@ Body:
   - Id: 7017
     AegisName: Executioner's_Mitten
     Name: Executioner's Mitten
+    Category: Valuable
     Buy: 4500
     Sell: 2250
     Weight: 30
@@ -53494,6 +54015,7 @@ Body:
   - Id: 7018
     AegisName: Young_Twig
     Name: Young Twig
+    Category: Valuable
     Buy: 50
     Sell: 25
     Weight: 10
@@ -53501,6 +54023,7 @@ Body:
   - Id: 7019
     AegisName: Loki's_Whispers
     Name: Loki's Whispers
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
@@ -53508,6 +54031,7 @@ Body:
   - Id: 7020
     AegisName: Mother's_Nightmare
     Name: Mother's Nightmare
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
@@ -53515,6 +54039,7 @@ Body:
   - Id: 7021
     AegisName: Foolishness_Of_Blind
     Name: Foolishness of the Blind
+    Category: Valuable
     Buy: 20
     Sell: 10
     Weight: 10
@@ -53522,6 +54047,7 @@ Body:
   - Id: 7022
     AegisName: Old_Hilt
     Name: Old Hilt
+    Category: Valuable
     Buy: 150
     Sell: 75
     Weight: 30
@@ -53529,6 +54055,7 @@ Body:
   - Id: 7023
     AegisName: Blade_Lost_In_Darkness
     Name: Blade Lost in Darkness
+    Category: Valuable
     Buy: 12000
     Sell: 6000
     Weight: 40
@@ -53536,6 +54063,7 @@ Body:
   - Id: 7024
     AegisName: Bloody_Edge
     Name: Bloody Edge
+    Category: Valuable
     Buy: 10000
     Sell: 5000
     Weight: 40
@@ -53543,6 +54071,7 @@ Body:
   - Id: 7025
     AegisName: Lucifer's_Lament
     Name: Lucifer's Lament
+    Category: Quest
     Buy: 30000
     Sell: 15000
     Weight: 50
@@ -53550,6 +54079,7 @@ Body:
   - Id: 7026
     AegisName: Key_Of_Clock_Tower
     Name: Key of Clock Tower
+    Category: Collectible
     Buy: 100
     Sell: 50
     Weight: 30
@@ -53557,6 +54087,7 @@ Body:
   - Id: 7027
     AegisName: Underground_Key
     Name: Key of Underground
+    Category: Collectible
     Buy: 100
     Sell: 50
     Weight: 30
@@ -53570,6 +54101,7 @@ Body:
   - Id: 7030
     AegisName: Claw_Of_Desert_Wolf
     Name: Claw of Desert Wolf
+    Category: Collectible
     Buy: 208
     Sell: 104
     Weight: 10
@@ -53577,6 +54109,7 @@ Body:
   - Id: 7031
     AegisName: Old_Frying_Pan
     Name: Old Frying Pan
+    Category: Collectible
     Buy: 196
     Sell: 98
     Weight: 10
@@ -53584,6 +54117,7 @@ Body:
   - Id: 7032
     AegisName: Piece_Of_Egg_Shell
     Name: Piece of Egg Shell
+    Category: Collectible
     Buy: 168
     Sell: 84
     Weight: 10
@@ -53591,6 +54125,7 @@ Body:
   - Id: 7033
     AegisName: Poison_Spore
     Name: Poison Spore
+    Category: Collectible
     Buy: 114
     Sell: 57
     Weight: 10
@@ -53598,6 +54133,7 @@ Body:
   - Id: 7034
     AegisName: Red_Socks_With_Holes
     Name: Red Stocking
+    Category: Collectible
     Buy: 100
     Sell: 50
     Weight: 10
@@ -53605,6 +54141,7 @@ Body:
   - Id: 7035
     AegisName: Matchstick
     Name: Matchstick
+    Category: Valuable
     Buy: 100
     Sell: 50
     Weight: 10
@@ -53612,6 +54149,7 @@ Body:
   - Id: 7036
     AegisName: Fang_Of_Garm
     Name: Fang of Hatii
+    Category: Valuable
     Buy: 100
     Sell: 50
     Weight: 10
@@ -53629,6 +54167,7 @@ Body:
   - Id: 7038
     AegisName: Yarn
     Name: Yarn
+    Category: Collectible
     Buy: 100
     Sell: 50
     Weight: 10
@@ -53645,6 +54184,7 @@ Body:
   - Id: 7041
     AegisName: Fine_Grit
     Name: Fine Grit
+    Category: Collectible
     Buy: 120
     Sell: 60
     Weight: 10
@@ -53657,6 +54197,7 @@ Body:
   - Id: 7043
     AegisName: Fine_Sand
     Name: Fine Sand
+    Category: Collectible
     Buy: 100
     Sell: 50
     Weight: 10
@@ -53679,6 +54220,7 @@ Body:
   - Id: 7047
     AegisName: Alice's_Apron
     Name: Alice's Apron
+    Category: Collectible
     Buy: 2424
     Sell: 1212
     Weight: 10
@@ -53686,6 +54228,7 @@ Body:
   - Id: 7048
     AegisName: Talon_Of_Griffin
     Name: Talon of Griffon
+    Category: Collectible
     Buy: 5418
     Sell: 2709
     Weight: 10
@@ -53693,6 +54236,7 @@ Body:
   - Id: 7049
     AegisName: Stone
     Name: Stone
+    Category: Collectible
     Weight: 30
     Flags: {BuyingStore: true}
   - Id: 7050
@@ -53716,6 +54260,7 @@ Body:
   - Id: 7053
     AegisName: Cyfar
     Name: Cyfar
+    Category: Collectible
     Buy: 772
     Sell: 386
     Weight: 10
@@ -53723,6 +54268,7 @@ Body:
   - Id: 7054
     AegisName: Brigan
     Name: Brigan
+    Category: Collectible
     Buy: 746
     Sell: 373
     Weight: 10
@@ -53767,12 +54313,14 @@ Body:
   - Id: 7062
     AegisName: Broken_Turtle_Shell
     Name: Broken Turtle Shell
+    Category: Collectible
     Buy: 280
     Sell: 140
     Weight: 10
   - Id: 7063
     AegisName: Soft_Feather
     Name: Soft Feather
+    Category: Collectible
     Buy: 280
     Sell: 140
     Weight: 10
@@ -53780,6 +54328,7 @@ Body:
   - Id: 7064
     AegisName: Dragon_Fly_Wing
     Name: Wing of Dragonfly
+    Category: Collectible
     Buy: 520
     Sell: 260
     Weight: 10
@@ -53787,6 +54336,7 @@ Body:
   - Id: 7065
     AegisName: Sea_Otter_Leather
     Name: Sea-Otter Fur
+    Category: Collectible
     Buy: 820
     Sell: 410
     Weight: 10
@@ -53794,6 +54344,7 @@ Body:
   - Id: 7066
     AegisName: Ice_Piece
     Name: Ice Cubic
+    Category: Collectible
     Buy: 660
     Sell: 330
     Weight: 10
@@ -53801,6 +54352,7 @@ Body:
   - Id: 7067
     AegisName: Stone_Piece
     Name: Stone Fragment
+    Category: Collectible
     Buy: 640
     Sell: 320
     Weight: 10
@@ -53808,6 +54360,7 @@ Body:
   - Id: 7068
     AegisName: Burn_Tree
     Name: Burnt Tree
+    Category: Collectible
     Buy: 722
     Sell: 361
     Weight: 10
@@ -53815,6 +54368,7 @@ Body:
   - Id: 7069
     AegisName: Broken_Armor_Piece
     Name: Destroyed Armor
+    Category: Collectible
     Buy: 1042
     Sell: 521
     Weight: 10
@@ -53822,6 +54376,7 @@ Body:
   - Id: 7070
     AegisName: Broken_Shell
     Name: Broken Shell
+    Category: Collectible
     Buy: 900
     Sell: 450
     Weight: 10
@@ -53829,6 +54384,7 @@ Body:
   - Id: 7071
     AegisName: Tatters_Clothes
     Name: Tattered Clothes
+    Category: Collectible
     Buy: 1280
     Sell: 640
     Weight: 10
@@ -53836,6 +54392,7 @@ Body:
   - Id: 7072
     AegisName: Rust_Suriken
     Name: Old Shuriken
+    Category: Collectible
     Buy: 1780
     Sell: 890
     Weight: 10
@@ -53963,6 +54520,7 @@ Body:
   - Id: 7093
     AegisName: Wheel
     Name: Cogwheel
+    Category: Collectible
     Buy: 1512
     Sell: 756
     Weight: 10
@@ -53970,6 +54528,7 @@ Body:
   - Id: 7094
     AegisName: Mystery_Piece
     Name: Fragment
+    Category: Collectible
     Buy: 1344
     Sell: 672
     Weight: 10
@@ -53977,6 +54536,7 @@ Body:
   - Id: 7095
     AegisName: Broken_Steel_Piece
     Name: Metal Fragment
+    Category: Collectible
     Buy: 1075
     Sell: 537
     Weight: 10
@@ -53984,6 +54544,7 @@ Body:
   - Id: 7096
     AegisName: Cold_Magma
     Name: Lava
+    Category: Collectible
     Buy: 1109
     Sell: 554
     Weight: 10
@@ -53991,6 +54552,7 @@ Body:
   - Id: 7097
     AegisName: Burning_Heart
     Name: Burning Heart
+    Category: Collectible
     Buy: 924
     Sell: 462
     Weight: 10
@@ -53998,6 +54560,7 @@ Body:
   - Id: 7098
     AegisName: Live_Coal
     Name: Live Coal
+    Category: Collectible
     Buy: 638
     Sell: 319
     Weight: 10
@@ -54005,6 +54568,7 @@ Body:
   - Id: 7099
     AegisName: Old_Magic_Circle
     Name: Worn-out Magic Scroll
+    Category: Collectible
     Buy: 773
     Sell: 386
     Weight: 10
@@ -54012,6 +54576,7 @@ Body:
   - Id: 7100
     AegisName: Sharp_Leaf
     Name: Sharp Leaf
+    Category: Collectible
     Buy: 806
     Sell: 403
     Weight: 10
@@ -54019,6 +54584,7 @@ Body:
   - Id: 7101
     AegisName: Peco_Wing_Feather
     Name: Peco Peco Feather
+    Category: Collectible
     Buy: 454
     Sell: 227
     Weight: 10
@@ -54026,6 +54592,7 @@ Body:
   - Id: 7102
     AegisName: Hideous_Dream
     Name: Nightmare
+    Category: Collectible
     Buy: 1075
     Sell: 537
     Weight: 10
@@ -54033,6 +54600,7 @@ Body:
   - Id: 7103
     AegisName: Unknown_Liquid_Bottle
     Name: Unknown Liquid Bottle
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
@@ -54040,6 +54608,7 @@ Body:
   - Id: 7104
     AegisName: Fake_Angel_Wing
     Name: False Angel Wing
+    Category: Collectible
     Buy: 756
     Sell: 378
     Weight: 10
@@ -54047,6 +54616,7 @@ Body:
   - Id: 7105
     AegisName: Fake_Angel_Loop
     Name: False Heaven Ring
+    Category: Collectible
     Buy: 924
     Sell: 462
     Weight: 10
@@ -54054,6 +54624,7 @@ Body:
   - Id: 7106
     AegisName: Goat's_Horn
     Name: Antelope Horn
+    Category: Collectible
     Buy: 672
     Sell: 336
     Weight: 10
@@ -54061,6 +54632,7 @@ Body:
   - Id: 7107
     AegisName: Gaoat's_Skin
     Name: Antelope Skin
+    Category: Collectible
     Buy: 756
     Sell: 378
     Weight: 10
@@ -54068,6 +54640,7 @@ Body:
   - Id: 7108
     AegisName: Boroken_Shiled_Piece
     Name: Piece of Shield
+    Category: Collectible
     Buy: 1680
     Sell: 840
     Weight: 10
@@ -54075,6 +54648,7 @@ Body:
   - Id: 7109
     AegisName: Shine_Spear_Blade
     Name: Shining Spear Blade
+    Category: Collectible
     Buy: 840
     Sell: 420
     Weight: 10
@@ -54082,6 +54656,7 @@ Body:
   - Id: 7110
     AegisName: Vroken_Sword
     Name: Broken Sword
+    Category: Collectible
     Buy: 588
     Sell: 294
     Weight: 10
@@ -54089,6 +54664,7 @@ Body:
   - Id: 7111
     AegisName: Smooth_Paper
     Name: Slick Paper
+    Category: Collectible
     Buy: 706
     Sell: 353
     Weight: 10
@@ -54096,6 +54672,7 @@ Body:
   - Id: 7112
     AegisName: Fright_Paper_Blade
     Name: Sharp Paper
+    Category: Collectible
     Buy: 907
     Sell: 453
     Weight: 10
@@ -54103,6 +54680,7 @@ Body:
   - Id: 7113
     AegisName: Broken_Pharaoh_Symbol
     Name: Broken Pharaoh Emblem
+    Category: Collectible
     Buy: 2016
     Sell: 1008
     Weight: 10
@@ -54110,6 +54688,7 @@ Body:
   - Id: 7114
     AegisName: Tutankhamen's_Mask
     Name: Masque of Tutankhamen
+    Category: Collectible
     Buy: 10
     Sell: 5
     Weight: 10
@@ -54117,6 +54696,7 @@ Body:
   - Id: 7115
     AegisName: Harpy's_Feather
     Name: Harpy Feather
+    Category: Collectible
     Buy: 1142
     Sell: 571
     Weight: 10
@@ -54124,6 +54704,7 @@ Body:
   - Id: 7116
     AegisName: Harpy's_Claw
     Name: Harpy Talon
+    Category: Collectible
     Buy: 1210
     Sell: 605
     Weight: 10
@@ -54131,6 +54712,7 @@ Body:
   - Id: 7117
     AegisName: Rent_Spell_Book
     Name: Torn Magic Book
+    Category: Collectible
     Buy: 1142
     Sell: 571
     Weight: 10
@@ -54138,6 +54720,7 @@ Body:
   - Id: 7118
     AegisName: Rent_Scroll
     Name: Torn Scroll
+    Category: Collectible
     Buy: 1361
     Sell: 680
     Weight: 10
@@ -54145,6 +54728,7 @@ Body:
   - Id: 7119
     AegisName: Spawns
     Name: Bacillus
+    Category: Collectible
     Buy: 1025
     Sell: 512
     Weight: 10
@@ -54152,6 +54736,7 @@ Body:
   - Id: 7120
     AegisName: Burning_Horse_Shoe
     Name: Burning Horseshoe
+    Category: Collectible
     Buy: 823
     Sell: 411
     Weight: 10
@@ -54159,6 +54744,7 @@ Body:
   - Id: 7121
     AegisName: Honey_Jar
     Name: Honey Pot
+    Category: Collectible
     Buy: 622
     Sell: 311
     Weight: 10
@@ -54166,6 +54752,7 @@ Body:
   - Id: 7122
     AegisName: Hot_Hair
     Name: Burning Hair
+    Category: Collectible
     Buy: 974
     Sell: 487
     Weight: 10
@@ -54173,6 +54760,7 @@ Body:
   - Id: 7123
     AegisName: Dragon's_Skin
     Name: Dragon Skin
+    Category: Collectible
     Buy: 1025
     Sell: 512
     Weight: 10
@@ -54180,6 +54768,7 @@ Body:
   - Id: 7124
     AegisName: Sand_Lump
     Name: Sand Clump
+    Category: Collectible
     Buy: 706
     Sell: 353
     Weight: 10
@@ -54187,6 +54776,7 @@ Body:
   - Id: 7125
     AegisName: Scropion's_Nipper
     Name: Scorpion Claw
+    Category: Collectible
     Buy: 706
     Sell: 353
     Weight: 10
@@ -54194,6 +54784,7 @@ Body:
   - Id: 7126
     AegisName: Large_Jellopy
     Name: Large Jellopy
+    Category: Collectible
     Buy: 840
     Sell: 420
     Weight: 10
@@ -54201,6 +54792,7 @@ Body:
   - Id: 7127
     AegisName: Alcol_Create_Book
     Name: Alcohol Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54208,6 +54800,7 @@ Body:
   - Id: 7128
     AegisName: FireBottle_Create_Book
     Name: Bottle Grenade Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54215,6 +54808,7 @@ Body:
   - Id: 7129
     AegisName: Acid_Create_Book
     Name: Acid Bottle Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54222,6 +54816,7 @@ Body:
   - Id: 7130
     AegisName: Plant_Create_Book
     Name: Plant Bottle Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54229,6 +54824,7 @@ Body:
   - Id: 7131
     AegisName: Mine_Create_Book
     Name: Marine Sphere Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54236,6 +54832,7 @@ Body:
   - Id: 7132
     AegisName: Coating_Create_Book
     Name: Glistening Coat Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54243,6 +54840,7 @@ Body:
   - Id: 7133
     AegisName: Slim_Potion_Create_Book
     Name: Condensed Potion Creation Guide
+    Category: Skill necessity
     Buy: 240000
     Sell: 120000
     Weight: 10
@@ -54250,6 +54848,7 @@ Body:
   - Id: 7134
     AegisName: Medicine_Bowl
     Name: Medicine Bowl
+    Category: Skill necessity
     Buy: 8
     Sell: 4
     Weight: 10
@@ -54257,31 +54856,37 @@ Body:
   - Id: 7135
     AegisName: Fire_Bottle
     Name: Bottle Grenade
+    Category: Skill necessity
     Buy: 200
     Sell: 100
   - Id: 7136
     AegisName: Acid_Bottle
     Name: Acid Bottle
+    Category: Skill necessity
     Buy: 200
     Sell: 100
   - Id: 7137
     AegisName: MenEater_Plant_Bottle
     Name: Plant Bottle
+    Category: Skill necessity
     Buy: 200
     Sell: 100
   - Id: 7138
     AegisName: Mini_Bottle
     Name: Marine Sphere Bottle
+    Category: Skill necessity
     Buy: 200
     Sell: 100
   - Id: 7139
     AegisName: Coating_Bottle
     Name: Glistening Coat
+    Category: Skill necessity
     Buy: 200
     Sell: 100
   - Id: 7140
     AegisName: Seed_Of_Life
     Name: Seed of Life
+    Category: Skill necessity
     Buy: 60000
     Sell: 30000
     Weight: 10
@@ -54289,6 +54894,7 @@ Body:
   - Id: 7141
     AegisName: Yggdrasilberry_Dew
     Name: Morning Dew of Yggdrasil
+    Category: Skill necessity
     Buy: 20000
     Sell: 10000
     Weight: 10
@@ -54296,12 +54902,14 @@ Body:
   - Id: 7142
     AegisName: Germination_Breed
     Name: Embryo
+    Category: Skill necessity
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 7143
     AegisName: Life_Force_Pot
     Name: Glass Tube
+    Category: Skill necessity
     Buy: 5000
     Sell: 2500
     Weight: 10
@@ -54309,6 +54917,7 @@ Body:
   - Id: 7144
     AegisName: Normal_Potion_Book
     Name: Potion Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -54337,6 +54946,7 @@ Body:
   - Id: 7149
     AegisName: Yellow_Plate
     Name: Yellow Plate
+    Category: Collectible
     Buy: 220
     Sell: 110
     Weight: 10
@@ -54344,6 +54954,7 @@ Body:
   - Id: 7150
     AegisName: Bamboo_Cut
     Name: Piece of Bamboo
+    Category: Collectible
     Buy: 310
     Sell: 155
     Weight: 10
@@ -54351,6 +54962,7 @@ Body:
   - Id: 7151
     AegisName: Oil_Paper
     Name: Oil Paper
+    Category: Collectible
     Buy: 210
     Sell: 105
     Weight: 10
@@ -54358,6 +54970,7 @@ Body:
   - Id: 7152
     AegisName: Glossy_Hair
     Name: Glossy Hair
+    Category: Collectible
     Buy: 340
     Sell: 170
     Weight: 10
@@ -54365,6 +54978,7 @@ Body:
   - Id: 7153
     AegisName: Old_Japaness_Clothes
     Name: Worn-out Kimono
+    Category: Collectible
     Buy: 590
     Sell: 295
     Weight: 10
@@ -54372,6 +54986,7 @@ Body:
   - Id: 7154
     AegisName: Poison_Powder
     Name: Poisonous Powder
+    Category: Collectible
     Buy: 160
     Sell: 80
     Weight: 10
@@ -54379,6 +54994,7 @@ Body:
   - Id: 7155
     AegisName: Poison_Toad's_Skin
     Name: Poisonous Toad Skin
+    Category: Collectible
     Buy: 280
     Sell: 140
     Weight: 10
@@ -54386,6 +55002,7 @@ Body:
   - Id: 7156
     AegisName: Broken_Shuriken
     Name: Broken Shuriken
+    Category: Collectible
     Buy: 470
     Sell: 235
     Weight: 10
@@ -54393,6 +55010,7 @@ Body:
   - Id: 7157
     AegisName: Black_Mask
     Name: Dark Mask
+    Category: Collectible
     Buy: 315
     Sell: 157
     Weight: 10
@@ -54400,6 +55018,7 @@ Body:
   - Id: 7158
     AegisName: Broken_Wine_Vessel
     Name: Broken Liquor Jar
+    Category: Collectible
     Buy: 160
     Sell: 80
     Weight: 10
@@ -54407,6 +55026,7 @@ Body:
   - Id: 7159
     AegisName: Tengu's_Nose
     Name: Tengu Nose
+    Category: Collectible
     Buy: 400
     Sell: 200
     Weight: 10
@@ -54414,12 +55034,14 @@ Body:
   - Id: 7160
     AegisName: Lord's_Passable_Ticket
     Name: Feudal Lord Permit
+    Category: Quest
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7161
     AegisName: Black_Bear's_Skin
     Name: Black Bear Skin
+    Category: Collectible
     Buy: 384
     Sell: 192
     Weight: 10
@@ -54427,6 +55049,7 @@ Body:
   - Id: 7162
     AegisName: Cloud_Piece
     Name: Cloud Crumb
+    Category: Collectible
     Buy: 390
     Sell: 195
     Weight: 10
@@ -54434,6 +55057,7 @@ Body:
   - Id: 7163
     AegisName: Sharp_Feeler
     Name: Hard Feeler
+    Category: Collectible
     Buy: 570
     Sell: 285
     Weight: 10
@@ -54441,6 +55065,7 @@ Body:
   - Id: 7164
     AegisName: Hard_Peach
     Name: Solid Peach
+    Category: Collectible
     Buy: 400
     Sell: 200
     Weight: 10
@@ -54448,6 +55073,7 @@ Body:
   - Id: 7165
     AegisName: Limpid_Celestial_Robe
     Name: Transparent Celestial Robe
+    Category: Collectible
     Buy: 650
     Sell: 325
     Weight: 10
@@ -54455,6 +55081,7 @@ Body:
   - Id: 7166
     AegisName: Soft_Silk_Cloth
     Name: Soft Silk
+    Category: Collectible
     Buy: 1200
     Sell: 600
     Weight: 10
@@ -54462,6 +55089,7 @@ Body:
   - Id: 7167
     AegisName: Mystery_Iron_Bit
     Name: Strange Steel Piece
+    Category: Collectible
     Buy: 430
     Sell: 215
     Weight: 10
@@ -54469,6 +55097,7 @@ Body:
   - Id: 7168
     AegisName: Great_Wing
     Name: Giant Butterfly Wing
+    Category: Collectible
     Buy: 614
     Sell: 307
     Weight: 10
@@ -54476,6 +55105,7 @@ Body:
   - Id: 7169
     AegisName: Taegeuk_Plate
     Name: Ba Gua
+    Category: Collectible
     Buy: 2800
     Sell: 1400
     Weight: 10
@@ -54498,6 +55128,7 @@ Body:
   - Id: 7171
     AegisName: Leopard_Skin
     Name: Leopard Skin
+    Category: Collectible
     Buy: 282
     Sell: 141
     Weight: 10
@@ -54505,6 +55136,7 @@ Body:
   - Id: 7172
     AegisName: Leopard_Talon
     Name: Leopard Claw
+    Category: Collectible
     Buy: 290
     Sell: 145
     Weight: 10
@@ -54516,11 +55148,13 @@ Body:
   - Id: 7174
     AegisName: Packing_Ribbon
     Name: Wrapping Lace
+    Category: Collectible
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7175
     AegisName: Packing_Paper
     Name: Wrapping Paper
+    Category: Collectible
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7176
@@ -54530,10 +55164,12 @@ Body:
   - Id: 7177
     AegisName: Part_Of_Star's_Sob
     Name: Crumb of Sobbing Starlight
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7178
     AegisName: Star's_Sob
     Name: Sobbing Starlight
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7179
     AegisName: Donation_Card
@@ -54546,6 +55182,7 @@ Body:
   - Id: 7181
     AegisName: Receipt_01
     Name: Receipt
+    Category: Quest
     Weight: 10
   - Id: 7182
     AegisName: Cacao
@@ -54557,6 +55194,7 @@ Body:
   - Id: 7183
     AegisName: Sister_Letter
     Name: Letter from Sister
+    Category: Quest
     Weight: 10
   - Id: 7184
     AegisName: Piano_Keyboard
@@ -54576,6 +55214,7 @@ Body:
   - Id: 7187
     AegisName: Festival_Mask
     Name: Festival Mask
+    Category: Collectible
     Buy: 100
     Sell: 50
     Weight: 10
@@ -54583,6 +55222,7 @@ Body:
   - Id: 7188
     AegisName: Browny_Root
     Name: Brown Root
+    Category: Collectible
     Buy: 560
     Sell: 280
     Weight: 10
@@ -54590,6 +55230,7 @@ Body:
   - Id: 7189
     AegisName: Heart_Of_Tree
     Name: Wooden Heart
+    Category: Collectible
     Buy: 680
     Sell: 340
     Weight: 10
@@ -54597,6 +55238,7 @@ Body:
   - Id: 7190
     AegisName: Solid_Peeling
     Name: Solid Husk
+    Category: Collectible
     Buy: 140
     Sell: 70
     Weight: 10
@@ -54604,11 +55246,13 @@ Body:
   - Id: 7191
     AegisName: Lamplight
     Name: Lamp
+    Category: Collectible
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7192
     AegisName: Blade_Of_Pinwheel
     Name: Vane
+    Category: Collectible
     Buy: 160
     Sell: 80
     Weight: 10
@@ -54616,6 +55260,7 @@ Body:
   - Id: 7193
     AegisName: Germinating_Sprout
     Name: Sprout
+    Category: Collectible
     Buy: 230
     Sell: 115
     Weight: 10
@@ -54623,6 +55268,7 @@ Body:
   - Id: 7194
     AegisName: Soft_Leaf
     Name: Soft Blade of Grass
+    Category: Collectible
     Buy: 400
     Sell: 200
     Weight: 10
@@ -54630,6 +55276,7 @@ Body:
   - Id: 7195
     AegisName: Air_Rifle
     Name: Slingshot
+    Category: Collectible
     Buy: 210
     Sell: 105
     Weight: 10
@@ -54637,6 +55284,7 @@ Body:
   - Id: 7196
     AegisName: Shoulder_Protection
     Name: Shoulder Protector
+    Category: Collectible
     Buy: 230
     Sell: 115
     Weight: 10
@@ -54644,6 +55292,7 @@ Body:
   - Id: 7197
     AegisName: Tough_Vines
     Name: Tough Vines
+    Category: Collectible
     Buy: 500
     Sell: 250
     Weight: 10
@@ -54651,6 +55300,7 @@ Body:
   - Id: 7198
     AegisName: Great_Leaf
     Name: Huge Leaf
+    Category: Collectible
     Buy: 610
     Sell: 305
     Weight: 10
@@ -54662,6 +55312,7 @@ Body:
   - Id: 7200
     AegisName: Flexible_String
     Name: Elastic Band
+    Category: Collectible
     Buy: 380
     Sell: 190
     Weight: 10
@@ -54669,6 +55320,7 @@ Body:
   - Id: 7201
     AegisName: Log
     Name: Log
+    Category: Collectible
     Buy: 250
     Sell: 125
     Weight: 10
@@ -54676,6 +55328,7 @@ Body:
   - Id: 7202
     AegisName: Beetle_Nipper
     Name: Pincher of Beetle
+    Category: Collectible
     Buy: 290
     Sell: 145
     Weight: 10
@@ -54683,6 +55336,7 @@ Body:
   - Id: 7203
     AegisName: Solid_Twig
     Name: Strong Branch
+    Category: Collectible
     Buy: 190
     Sell: 95
     Weight: 10
@@ -54690,6 +55344,7 @@ Body:
   - Id: 7204
     AegisName: Gunpowder
     Name: Gunpowder
+    Category: Collectible
     Buy: 320
     Sell: 160
     Weight: 10
@@ -54697,6 +55352,7 @@ Body:
   - Id: 7205
     AegisName: Piece_Of_Black_Cloth
     Name: Piece of Black Cloth
+    Category: Collectible
     Buy: 526
     Sell: 263
     Weight: 10
@@ -54704,6 +55360,7 @@ Body:
   - Id: 7206
     AegisName: Black_Kitty_Doll
     Name: Black Cat Doll
+    Category: Collectible
     Buy: 1440
     Sell: 720
     Weight: 10
@@ -54711,6 +55368,7 @@ Body:
   - Id: 7207
     AegisName: Old_Manteau
     Name: Old Manteau
+    Category: Collectible
     Buy: 1050
     Sell: 525
     Weight: 10
@@ -54718,6 +55376,7 @@ Body:
   - Id: 7208
     AegisName: Rusty_Cleaver
     Name: Rusty Kitchen Knife
+    Category: Collectible
     Buy: 1780
     Sell: 890
     Weight: 10
@@ -54725,6 +55384,7 @@ Body:
   - Id: 7209
     AegisName: Dullahan's_Helm
     Name: Helm of Dullahan
+    Category: Collectible
     Buy: 1350
     Sell: 675
     Weight: 10
@@ -54732,6 +55392,7 @@ Body:
   - Id: 7210
     AegisName: Dullahan_Armor
     Name: Armor Piece of Dullahan
+    Category: Collectible
     Buy: 790
     Sell: 395
     Weight: 10
@@ -54739,6 +55400,7 @@ Body:
   - Id: 7211
     AegisName: Rojerta_Piece
     Name: Fragment of Rossata Stone
+    Category: Collectible
     Buy: 2600
     Sell: 1300
     Weight: 10
@@ -54746,6 +55408,7 @@ Body:
   - Id: 7212
     AegisName: Hanging_Doll
     Name: Hung Doll
+    Category: Collectible
     Buy: 1020
     Sell: 510
     Weight: 10
@@ -54753,6 +55416,7 @@ Body:
   - Id: 7213
     AegisName: Needle_Pouch
     Name: Needle Packet
+    Category: Collectible
     Buy: 832
     Sell: 416
     Weight: 10
@@ -54760,6 +55424,7 @@ Body:
   - Id: 7214
     AegisName: Bat_Cage
     Name: Bat Cage
+    Category: Collectible
     Buy: 880
     Sell: 440
     Weight: 10
@@ -54767,6 +55432,7 @@ Body:
   - Id: 7215
     AegisName: Broken_Needle
     Name: Broken Needle
+    Category: Collectible
     Buy: 690
     Sell: 345
     Weight: 10
@@ -54774,6 +55440,7 @@ Body:
   - Id: 7216
     AegisName: Red_Scarf
     Name: Red Muffler
+    Category: Collectible
     Buy: 660
     Sell: 330
     Weight: 10
@@ -54781,6 +55448,7 @@ Body:
   - Id: 7217
     AegisName: Spool
     Name: Spool
+    Category: Collectible
     Buy: 424
     Sell: 212
     Weight: 10
@@ -54788,6 +55456,7 @@ Body:
   - Id: 7218
     AegisName: Rotten_Rope
     Name: Decomposed Rope
+    Category: Collectible
     Buy: 390
     Sell: 195
     Weight: 10
@@ -54795,6 +55464,7 @@ Body:
   - Id: 7219
     AegisName: Striped_Socks
     Name: Striped Sock
+    Category: Collectible
     Buy: 920
     Sell: 460
     Weight: 10
@@ -54802,6 +55472,7 @@ Body:
   - Id: 7220
     AegisName: Ectoplasm
     Name: Ectoplasm
+    Category: Collectible
     Buy: 322
     Sell: 161
     Weight: 10
@@ -54809,6 +55480,7 @@ Body:
   - Id: 7221
     AegisName: Tangled_Chain
     Name: Tangled Chains
+    Category: Collectible
     Buy: 740
     Sell: 370
     Weight: 10
@@ -54816,6 +55488,7 @@ Body:
   - Id: 7222
     AegisName: Tree_Knot
     Name: Wooden Gnarl
+    Category: Collectible
     Buy: 468
     Sell: 234
     Weight: 10
@@ -54823,6 +55496,7 @@ Body:
   - Id: 7223
     AegisName: Distorted_Portrait
     Name: Contorted Self-Portrait
+    Category: Collectible
     Buy: 2032
     Sell: 1016
     Weight: 10
@@ -54830,10 +55504,12 @@ Body:
   - Id: 7224
     AegisName: Stone_Of_Intelligence
     Name: Stone of Sage
+    Category: Collectible
     Weight: 10
   - Id: 7225
     AegisName: Pumpkin_Bucket
     Name: Pumpkin Lantern
+    Category: Collectible
     Buy: 486
     Sell: 243
     Weight: 10
@@ -54841,6 +55517,7 @@ Body:
   - Id: 7226
     AegisName: Pill
     Name: Pellet
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 10
@@ -54852,6 +55529,7 @@ Body:
   - Id: 7228
     AegisName: Gold_Bullion
     Name: Gold Bullion
+    Category: Collectible
     Buy: 100000
     Sell: 50000
     Weight: 300
@@ -54859,6 +55537,7 @@ Body:
   - Id: 7229
     AegisName: Silver_Bullion
     Name: Silver Bullion
+    Category: Collectible
     Buy: 50000
     Sell: 25000
     Weight: 300
@@ -54866,6 +55545,7 @@ Body:
   - Id: 7230
     AegisName: White_Gold_Bullion
     Name: Platinum Bullion
+    Category: Collectible
     Buy: 200000
     Sell: 100000
     Weight: 300
@@ -54873,18 +55553,21 @@ Body:
   - Id: 7231
     AegisName: Gold_Ore
     Name: Gold Ore
+    Category: Collectible
     Buy: 20
     Sell: 10
     Weight: 150
   - Id: 7232
     AegisName: Silver_Ore
     Name: Silver Ore
+    Category: Collectible
     Buy: 20
     Sell: 10
     Weight: 150
   - Id: 7233
     AegisName: Mithril_Ore
     Name: Mithril Ore
+    Category: Collectible
     Buy: 20
     Sell: 10
     Weight: 150
@@ -55003,6 +55686,7 @@ Body:
   - Id: 7262
     AegisName: Fan
     Name: Folding Fan of Cat Ghost
+    Category: Collectible
     Buy: 466
     Sell: 233
     Weight: 10
@@ -55010,6 +55694,7 @@ Body:
   - Id: 7263
     AegisName: Cat_Eyed_Stone
     Name: Cat's Eye
+    Category: Collectible
     Buy: 954
     Sell: 477
     Weight: 10
@@ -55017,6 +55702,7 @@ Body:
   - Id: 7264
     AegisName: Dried_Sand
     Name: Dry Sand
+    Category: Collectible
     Buy: 322
     Sell: 161
     Weight: 10
@@ -55024,6 +55710,7 @@ Body:
   - Id: 7265
     AegisName: Dragon_Horn
     Name: Dragon Horn
+    Category: Collectible
     Buy: 544
     Sell: 272
     Weight: 10
@@ -55031,6 +55718,7 @@ Body:
   - Id: 7266
     AegisName: Dragon_Fang
     Name: Denture from Dragon Mask
+    Category: Collectible
     Buy: 436
     Sell: 218
     Weight: 10
@@ -55038,6 +55726,7 @@ Body:
   - Id: 7267
     AegisName: Tiger_Skin_Panties
     Name: Tiger Panty
+    Category: Collectible
     Buy: 298
     Sell: 149
     Weight: 10
@@ -55045,6 +55734,7 @@ Body:
   - Id: 7268
     AegisName: Little_Blacky_Ghost
     Name: Little Ghost Doll
+    Category: Collectible
     Buy: 1210
     Sell: 605
     Weight: 10
@@ -55052,6 +55742,7 @@ Body:
   - Id: 7269
     AegisName: Bib
     Name: Pinafore
+    Category: Collectible
     Buy: 960
     Sell: 480
     Weight: 10
@@ -55059,6 +55750,7 @@ Body:
   - Id: 7270
     AegisName: Milk_Bottle
     Name: Nursing Bottle
+    Category: Collectible
     Buy: 1100
     Sell: 550
     Weight: 10
@@ -55084,17 +55776,21 @@ Body:
   - Id: 7274
     AegisName: Ancient_Translator
     Name: Translated Ancient Language
+    Category: Quest
     Weight: 10
   - Id: 7275
     AegisName: Ancient_Document
     Name: Record of Ancient Language
+    Category: Quest
     Weight: 10
   - Id: 7276
     AegisName: Picture_Letter
     Name: Doodled Message
+    Category: Quest
   - Id: 7277
     AegisName: Munak_Doll
     Name: Munak Doll
+    Category: Collectible
     Buy: 8900
     Sell: 4450
     Weight: 10
@@ -55102,6 +55798,7 @@ Body:
   - Id: 7278
     AegisName: Wellbeing_Letter
     Name: Letter to Wife
+    Category: Quest
     Weight: 10
   - Id: 7279
     AegisName: Vita500_Lid
@@ -55138,6 +55835,7 @@ Body:
   - Id: 7286
     AegisName: Chilli
     Name: Red Chile
+    Category: Cooking ingredient
     Buy: 20
     Sell: 10
     Weight: 10
@@ -55157,6 +55855,7 @@ Body:
   - Id: 7289
     AegisName: Olivine
     Name: Peridot
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55164,6 +55863,7 @@ Body:
   - Id: 7290
     AegisName: Phlogopite
     Name: Phlogopite
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55171,6 +55871,7 @@ Body:
   - Id: 7291
     AegisName: Agate
     Name: Agate
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55178,6 +55879,7 @@ Body:
   - Id: 7292
     AegisName: Muscovite
     Name: Muscovite
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55185,6 +55887,7 @@ Body:
   - Id: 7293
     AegisName: Rose_Quartz
     Name: Rose Quartz
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55192,6 +55895,7 @@ Body:
   - Id: 7294
     AegisName: Turquoise
     Name: Turquoise
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55199,6 +55903,7 @@ Body:
   - Id: 7295
     AegisName: Citrine
     Name: Citrin
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55206,6 +55911,7 @@ Body:
   - Id: 7296
     AegisName: Pyroxene
     Name: Pyroxene
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55213,6 +55919,7 @@ Body:
   - Id: 7297
     AegisName: Biotite
     Name: Biotite
+    Category: Valuable
     Buy: 3000
     Sell: 1500
     Weight: 100
@@ -55259,26 +55966,32 @@ Body:
   - Id: 7304
     AegisName: Witch's_Spell_Book
     Name: Witch's Spell Scroll
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7305
     AegisName: Authority_Of_Nine_World
     Name: Symbol of the Nine Realms
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7306
     AegisName: Fragment_Of_Soul
     Name: Piece of Spirit
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7307
     AegisName: Whisper_Of_Soul
     Name: Spiritual Whispers
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7308
     AegisName: Witch's_Potion
     Name: Witch's Tonic
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7309
     AegisName: Wing_Of_Crow
     Name: Crow Wing
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7310
     AegisName: Free_Peco_Ticket
@@ -55294,6 +56007,7 @@ Body:
   - Id: 7312
     AegisName: Jubilee
     Name: Jubilee
+    Category: Collectible
     Buy: 32
     Sell: 16
     Weight: 10
@@ -55301,17 +56015,20 @@ Body:
   - Id: 7313
     AegisName: Seal_Of_Witch
     Name: Witch's Medal
+    Category: Quest
     Buy: 2
     Sell: 1
   - Id: 7314
     AegisName: The_Sign
     Name: The Sign
+    Category: Quest
     Buy: 2
     Sell: 1
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7315
     AegisName: Dark_Crystal_Fragment
     Name: Dark Crystal Fragment
+    Category: Collectible
     Buy: 422
     Sell: 211
     Weight: 10
@@ -55319,6 +56036,7 @@ Body:
   - Id: 7316
     AegisName: Long_Limb
     Name: Insect Leg
+    Category: Collectible
     Buy: 658
     Sell: 329
     Weight: 10
@@ -55326,6 +56044,7 @@ Body:
   - Id: 7317
     AegisName: Screw
     Name: Rusty Screw
+    Category: Collectible
     Buy: 534
     Sell: 267
     Weight: 10
@@ -55333,6 +56052,7 @@ Body:
   - Id: 7318
     AegisName: Old_Pick
     Name: Old Pick
+    Category: Collectible
     Buy: 512
     Sell: 256
     Weight: 10
@@ -55340,6 +56060,7 @@ Body:
   - Id: 7319
     AegisName: Old_Steel_Plate
     Name: Used Iron Plate
+    Category: Collectible
     Buy: 1024
     Sell: 512
     Weight: 10
@@ -55347,6 +56068,7 @@ Body:
   - Id: 7320
     AegisName: Air_Pollutant
     Name: Dust Pollutant
+    Category: Collectible
     Buy: 256
     Sell: 128
     Weight: 10
@@ -55354,6 +56076,7 @@ Body:
   - Id: 7321
     AegisName: Fragment_Of_Crystal
     Name: Crystal Fragment
+    Category: Collectible
     Buy: 552
     Sell: 276
     Weight: 10
@@ -55361,6 +56084,7 @@ Body:
   - Id: 7322
     AegisName: Poisonous_Gas
     Name: Toxic Gas
+    Category: Collectible
     Buy: 666
     Sell: 333
     Weight: 10
@@ -55368,6 +56092,7 @@ Body:
   - Id: 7323
     AegisName: Battered_Kettle
     Name: Battered Kettle
+    Category: Collectible
     Buy: 256
     Sell: 128
     Weight: 10
@@ -55375,6 +56100,7 @@ Body:
   - Id: 7325
     AegisName: Tube
     Name: Flexible Tube
+    Category: Collectible
     Buy: 102
     Sell: 51
     Weight: 10
@@ -55382,6 +56108,7 @@ Body:
   - Id: 7326
     AegisName: Fluorescent_Liquid
     Name: Fluorescent Liquid
+    Category: Collectible
     Buy: 712
     Sell: 356
     Weight: 10
@@ -55389,6 +56116,7 @@ Body:
   - Id: 7327
     AegisName: Headlamp
     Name: Flashlight
+    Category: Collectible
     Buy: 1024
     Sell: 512
     Weight: 10
@@ -55444,6 +56172,7 @@ Body:
   - Id: 7340
     AegisName: Will_Of_Darkness
     Name: Will of the Darkness
+    Category: Collectible
     Buy: 734
     Sell: 367
     Weight: 50
@@ -55475,6 +56204,7 @@ Body:
   - Id: 7345
     AegisName: Armlet_Of_Prisoner
     Name: Handcuffs
+    Category: Collectible
     Buy: 724
     Sell: 362
     Weight: 10
@@ -55488,6 +56218,7 @@ Body:
   - Id: 7347
     AegisName: Lab_Staff_Record
     Name: Research Chart
+    Category: Collectible
     Buy: 840
     Sell: 420
     Weight: 10
@@ -55507,12 +56238,14 @@ Body:
   - Id: 7350
     AegisName: Pass
     Name: Pass
+    Category: Quest
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 7351
     AegisName: Friend's_Diary
     Name: Friend's Diary
+    Category: Quest
     Buy: 20
     Sell: 10
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
@@ -55547,6 +56280,7 @@ Body:
   - Id: 7356
     AegisName: Piece_Of_Crest1
     Name: Crest Piece
+    Category: Collectible
     Buy: 5000
     Sell: 2500
     Weight: 10
@@ -55554,6 +56288,7 @@ Body:
   - Id: 7357
     AegisName: Piece_Of_Crest2
     Name: Crest Piece
+    Category: Collectible
     Buy: 5000
     Sell: 2500
     Weight: 10
@@ -55561,6 +56296,7 @@ Body:
   - Id: 7358
     AegisName: Piece_Of_Crest3
     Name: Crest Piece
+    Category: Collectible
     Buy: 5000
     Sell: 2500
     Weight: 10
@@ -55568,6 +56304,7 @@ Body:
   - Id: 7359
     AegisName: Piece_Of_Crest4
     Name: Crest Piece
+    Category: Collectible
     Buy: 5000
     Sell: 2500
     Weight: 10
@@ -55845,6 +56582,7 @@ Body:
   - Id: 7419
     AegisName: Embryo_HandBook
     Name: Embryo Creation Guide
+    Category: Skill necessity
     Buy: 48000
     Sell: 24000
     Weight: 10
@@ -55855,22 +56593,27 @@ Body:
   - Id: 7421
     AegisName: Key_Red
     Name: Red Key
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7422
     AegisName: Key_Yellow
     Name: Yellow Key
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7423
     AegisName: Key_Blue
     Name: Blue Key
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7424
     AegisName: Key_Green
     Name: Green Key
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7425
     AegisName: Key_Black
     Name: Black Key
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7426
     AegisName: Magic_Gem_Red
@@ -55895,6 +56638,7 @@ Body:
   - Id: 7431
     AegisName: Several_Books
     Name: Pile of Books
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7432
     AegisName: Leather_Pouch
@@ -55910,6 +56654,7 @@ Body:
   - Id: 7434
     AegisName: Elemental_Potion_Book
     Name: Elemental Potion Creation Guide
+    Category: Skill necessity
     Buy: 100000
     Sell: 50000
     Weight: 10
@@ -55917,6 +56662,7 @@ Body:
   - Id: 7435
     AegisName: Golden_Bracelet
     Name: Golden Ornament
+    Category: Valuable
     Buy: 1907
     Sell: 953
     Weight: 10
@@ -55924,6 +56670,7 @@ Body:
   - Id: 7436
     AegisName: Piece_Of_Memory_Green
     Name: Fragment of Agony
+    Category: Collectible
     Buy: 1506
     Sell: 753
     Weight: 10
@@ -55931,6 +56678,7 @@ Body:
   - Id: 7437
     AegisName: Piece_Of_Memory_Purple
     Name: Fragment of Misery
+    Category: Collectible
     Buy: 1506
     Sell: 753
     Weight: 10
@@ -55938,6 +56686,7 @@ Body:
   - Id: 7438
     AegisName: Piece_Of_Memory_Blue
     Name: Fragment of Hatred
+    Category: Collectible
     Buy: 1506
     Sell: 753
     Weight: 10
@@ -55945,6 +56694,7 @@ Body:
   - Id: 7439
     AegisName: Piece_Of_Memory_Red
     Name: Fragment of Despair
+    Category: Collectible
     Buy: 1506
     Sell: 753
     Weight: 10
@@ -55952,6 +56702,7 @@ Body:
   - Id: 7440
     AegisName: Red_Feather
     Name: Red Feather
+    Category: Valuable
     Buy: 1335
     Sell: 667
     Weight: 10
@@ -55959,6 +56710,7 @@ Body:
   - Id: 7441
     AegisName: Blue_Feather
     Name: Blue Feather
+    Category: Valuable
     Buy: 1408
     Sell: 704
     Weight: 10
@@ -55966,6 +56718,7 @@ Body:
   - Id: 7442
     AegisName: Cursed_Seal
     Name: Cursed Seal
+    Category: Valuable
     Buy: 1332
     Sell: 666
     Weight: 10
@@ -55973,6 +56726,7 @@ Body:
   - Id: 7443
     AegisName: Tri_Headed_Dragon_Head
     Name: Three-Headed Dragon's Head
+    Category: Valuable
     Buy: 956
     Sell: 478
     Weight: 10
@@ -55980,6 +56734,7 @@ Body:
   - Id: 7444
     AegisName: Treasure_Box
     Name: Treasure Box
+    Category: Valuable
     Buy: 300000
     Sell: 150000
     Weight: 10
@@ -55987,6 +56742,7 @@ Body:
   - Id: 7445
     AegisName: Dragonball_Green
     Name: Green Bijou
+    Category: Collectible
     Buy: 887
     Sell: 443
     Weight: 10
@@ -55994,6 +56750,7 @@ Body:
   - Id: 7446
     AegisName: Dragonball_Blue
     Name: Blue Bijou
+    Category: Collectible
     Buy: 887
     Sell: 443
     Weight: 10
@@ -56001,6 +56758,7 @@ Body:
   - Id: 7447
     AegisName: Dragonball_Red
     Name: Red Bijou
+    Category: Collectible
     Buy: 887
     Sell: 443
     Weight: 10
@@ -56008,6 +56766,7 @@ Body:
   - Id: 7448
     AegisName: Dragonball_Yellow
     Name: Yellow Bijou
+    Category: Collectible
     Buy: 887
     Sell: 443
     Weight: 10
@@ -56015,6 +56774,7 @@ Body:
   - Id: 7449
     AegisName: Bloody_Page
     Name: Bloody Page
+    Category: Collectible
     Buy: 681
     Sell: 340
     Weight: 10
@@ -56022,6 +56782,7 @@ Body:
   - Id: 7450
     AegisName: Piece_Of_Bone_Armor
     Name: Skeletal Armor Piece
+    Category: Collectible
     Buy: 2050
     Sell: 1025
     Weight: 10
@@ -56029,6 +56790,7 @@ Body:
   - Id: 7451
     AegisName: Scale_Of_Red_Dragon
     Name: Fire Dragon Scale
+    Category: Collectible
     Buy: 1852
     Sell: 926
     Weight: 10
@@ -56036,6 +56798,7 @@ Body:
   - Id: 7452
     AegisName: Yellow_Spice
     Name: Yellow Spice
+    Category: Cooking ingredient
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -56043,6 +56806,7 @@ Body:
   - Id: 7453
     AegisName: Sweet_Sauce
     Name: Sweet Sauce
+    Category: Cooking ingredient
     Buy: 700
     Sell: 350
     Weight: 10
@@ -56050,6 +56814,7 @@ Body:
   - Id: 7454
     AegisName: Plain_Sauce
     Name: Savory Sauce
+    Category: Cooking ingredient
     Buy: 700
     Sell: 350
     Weight: 10
@@ -56057,6 +56822,7 @@ Body:
   - Id: 7455
     AegisName: Hot_Sauce
     Name: Spicy Sauce
+    Category: Cooking ingredient
     Buy: 700
     Sell: 350
     Weight: 10
@@ -56064,6 +56830,7 @@ Body:
   - Id: 7456
     AegisName: Red_Spice
     Name: Red Spice
+    Category: Cooking ingredient
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -56071,6 +56838,7 @@ Body:
   - Id: 7457
     AegisName: Cooking_Oil
     Name: Cooking Oil
+    Category: Cooking ingredient
     Buy: 500
     Sell: 250
     Weight: 10
@@ -56216,6 +56984,7 @@ Body:
   - Id: 7482
     AegisName: Pot
     Name: Pot
+    Category: Cooking ingredient
     Buy: 200
     Sell: 100
     Weight: 10
@@ -56321,6 +57090,7 @@ Body:
   - Id: 7507
     AegisName: Sturdy_Iron_Piece
     Name: Solid Iron Piece
+    Category: Collectible
     Buy: 842
     Sell: 421
     Weight: 10
@@ -56590,6 +57360,7 @@ Body:
   - Id: 7561
     AegisName: Ice_Heart
     Name: Glacial Heart
+    Category: Collectible
     Buy: 606
     Sell: 303
     Weight: 10
@@ -56597,6 +57368,7 @@ Body:
   - Id: 7562
     AegisName: Ice_Scale
     Name: Ice Scale
+    Category: Collectible
     Buy: 3020
     Sell: 1510
     Weight: 10
@@ -56604,6 +57376,7 @@ Body:
   - Id: 7563
     AegisName: Bloody_Rune
     Name: Bloody Rune
+    Category: Collectible
     Buy: 2016
     Sell: 1008
     Weight: 10
@@ -56611,6 +57384,7 @@ Body:
   - Id: 7564
     AegisName: Rotten_Meat
     Name: Rotten Meat
+    Category: Pet Food
     Buy: 102
     Sell: 51
     Weight: 10
@@ -56618,6 +57392,7 @@ Body:
   - Id: 7565
     AegisName: Sticky_Poison
     Name: Sticky Poison
+    Category: Collectible
     Buy: 350
     Sell: 175
     Weight: 10
@@ -56625,6 +57400,7 @@ Body:
   - Id: 7566
     AegisName: Will_Of_Darkness_
     Name: Will of Red Darkness
+    Category: Collectible
     Buy: 1530
     Sell: 765
     Weight: 10
@@ -56632,6 +57408,7 @@ Body:
   - Id: 7567
     AegisName: Suspicious_Hat
     Name: Suspicious Hat
+    Category: Collectible
     Buy: 1290
     Sell: 645
     Weight: 10
@@ -56639,6 +57416,7 @@ Body:
   - Id: 7568
     AegisName: White_Mask
     Name: White Mask
+    Category: Collectible
     Buy: 1060
     Sell: 530
     Weight: 10
@@ -56936,6 +57714,7 @@ Body:
   - Id: 7621
     AegisName: Token_Of_Siegfried
     Name: Token Of Siegfried
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -57023,17 +57802,20 @@ Body:
   - Id: 7642
     AegisName: Bloody_Coin
     Name: Bloody Coin
+    Category: Valuable
     Buy: 2500
     Sell: 1250
   - Id: 7643
     AegisName: Bloody_Letter
     Name: Bloody Letter
+    Category: Quest
     Buy: 10
     Sell: 5
     Weight: 10
   - Id: 7644
     AegisName: Unsent_Letter
     Name: Unsent Letter
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 7646
@@ -57066,18 +57848,21 @@ Body:
   - Id: 7663
     AegisName: Full_Metal_Jacket
     Name: Full Metal Jacket
+    Category: Skill necessity
     Buy: 200
     Sell: 100
     Weight: 2
   - Id: 7664
     AegisName: Shooting_Mine
     Name: Grenade Launcher
+    Category: Skill necessity
     Buy: 450
     Sell: 225
     Weight: 3
   - Id: 7665
     AegisName: Dragon_Tail_Missile
     Name: Dragon Tail Missile
+    Category: Skill necessity
     Buy: 1500
     Sell: 750
     Weight: 100
@@ -57391,6 +58176,7 @@ Body:
   - Id: 7751
     AegisName: Old_White_Cloth
     Name: Old White Cloth
+    Category: Collectible
     Buy: 550
     Sell: 275
     Weight: 10
@@ -57398,6 +58184,7 @@ Body:
   - Id: 7752
     AegisName: Clattering_Skull
     Name: Clattering Skull
+    Category: Collectible
     Buy: 840
     Sell: 420
     Weight: 10
@@ -57405,6 +58192,7 @@ Body:
   - Id: 7753
     AegisName: Broken_Farming_Utensil
     Name: Broken Farming Utensil
+    Category: Collectible
     Buy: 330
     Sell: 165
     Weight: 10
@@ -57412,6 +58200,7 @@ Body:
   - Id: 7754
     AegisName: Broken_Crown
     Name: Broken Crown
+    Category: Collectible
     Buy: 3000
     Sell: 1500
     Weight: 10
@@ -57486,6 +58275,7 @@ Body:
   - Id: 7766
     AegisName: Bok_Choy
     Name: Bok Choy
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -57725,24 +58515,28 @@ Body:
   - Id: 7821
     AegisName: Green_Apple
     Name: Green Apple
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 7822
     AegisName: Whole_Barbecue
     Name: Whole Barbecue
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 7823
     AegisName: Meat_Veg_Skewer
     Name: Meat Veg Skewer
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 7824
     AegisName: Spirit_Liquor
     Name: Spirit Liquor
+    Category: Pet Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -57750,12 +58544,14 @@ Body:
   - Id: 7825
     AegisName: Heroic_Stone
     Name: Heroic Stone
+    Category: Quest
     Buy: 20
     Sell: 10
     Weight: 10
   - Id: 7826
     AegisName: Continental_Guard_Paper
     Name: Continental Guard Paper
+    Category: Quest
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 7827
     AegisName: Mineral_Report
@@ -58255,48 +59051,56 @@ Body:
   - Id: 7931
     AegisName: Poison_Kit
     Name: Poison Kit
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7932
     AegisName: Poison_Herb_Nerium
     Name: Poison Herb Nerium
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7933
     AegisName: Poison_Herb_Rantana
     Name: Poison Herb Rantana
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7934
     AegisName: Poison_Herb_Makulata
     Name: Poison Herb Makulata
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7935
     AegisName: Poison_Herb_Seratum
     Name: Poison Herb Seratum
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7936
     AegisName: Poison_Herb_Scopolia
     Name: Poison Herb Scoporia
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7937
     AegisName: Poison_Herb_Amoena
     Name: Poison Herb Amoena
+    Category: Skill necessity
     Buy: 1
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 7938
     AegisName: Light_Granule
     Name: Light Granule
+    Category: Skill necessity
     Buy: 1500
     Sell: 750
     Weight: 10
@@ -58304,6 +59108,7 @@ Body:
   - Id: 7939
     AegisName: Elder_Branch
     Name: Elder Branch
+    Category: Skill necessity
     Buy: 1500
     Sell: 750
     Weight: 10
@@ -58311,6 +59116,7 @@ Body:
   - Id: 7940
     AegisName: Special_Alloy_Trap
     Name: Special Alloy Trap
+    Category: Skill necessity
     Buy: 300
     Sell: 150
     Weight: 2
@@ -58474,6 +59280,7 @@ Body:
   - Id: 7976
     AegisName: Gf_Magic_Coin
     Name: Gf Magic Coin
+    Category: Valuable
     Buy: 20
     Sell: 10
   - Id: 7977
@@ -60401,6 +61208,7 @@ Body:
     AegisName: Savory_Herb_Salad
     Name: Savory Herb Salad
     Type: Healing
+    Category: Cooked Food
     Weight: 10
     Script: |
       itemheal rand(20,30),0; sc_start SC_STRFOOD,180000,1;
@@ -60408,6 +61216,7 @@ Body:
     AegisName: Apple_Carrot_Salad
     Name: Apple Carrot Salad
     Type: Healing
+    Category: Cooked Food
     Weight: 10
     Script: |
       itemheal rand(20,30),0; sc_start SC_AGIFOOD,180000,1;
@@ -60415,6 +61224,7 @@ Body:
     AegisName: Casual_Stew
     Name: Casual Stew
     Type: Healing
+    Category: Cooked Food
     Weight: 10
     Script: |
       itemheal rand(20,30),0; sc_start SC_VITFOOD,180000,1;
@@ -60422,6 +61232,7 @@ Body:
     AegisName: Golden_Roasted_Apple
     Name: Golden Roasted Apple
     Type: Healing
+    Category: Cooked Food
     Weight: 10
     Script: |
       itemheal rand(20,30),0; sc_start SC_DEXFOOD,180000,1;
@@ -60560,12 +61371,14 @@ Body:
   - Id: 11575
     AegisName: Lucky_Cookie_B
     Name: Lucky Cookie
+    Category: Restorative
     Buy: 10
     Sell: 5
     Weight: 30
   - Id: 11576
     AegisName: Lucky_Candy_Cane_B
     Name: Lucky Lollipop
+    Category: Restorative
     Buy: 10
     Sell: 5
     Weight: 30
@@ -60590,6 +61403,7 @@ Body:
   - Id: 11579
     AegisName: Lucky_Candy_B
     Name: Lucky Candy
+    Category: Restorative
     Buy: 10
     Sell: 5
     Weight: 30
@@ -60795,6 +61609,7 @@ Body:
     AegisName: Yummy_Meat
     Name: Delicious Meat
     Type: Healing
+    Category: Pet Food
     Buy: 1400
     Sell: 700
     Weight: 50
@@ -61070,6 +61885,7 @@ Body:
     AegisName: Speed_Up_Potion
     Name: Speed Potion
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 100
@@ -61080,6 +61896,7 @@ Body:
     AegisName: Slow_Down_Potion
     Name: Slow Potion
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 100
@@ -61107,6 +61924,7 @@ Body:
     AegisName: Water_Of_Darkness
     Name: Cursed Water
     Type: Delayconsume
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 30
@@ -61171,6 +61989,7 @@ Body:
     AegisName: Giggling_Box
     Name: Giggling Box
     Type: Usable
+    Category: Restorative
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61181,6 +62000,7 @@ Body:
     AegisName: Box_Of_Thunder
     Name: Box of Thunder
     Type: Usable
+    Category: Supportive
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61191,6 +62011,7 @@ Body:
     AegisName: Gloomy_Box
     Name: Box of Gloom
     Type: Delayconsume
+    Category: Supportive
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61201,6 +62022,7 @@ Body:
     AegisName: Box_Of_Grudge
     Name: Box of Resentment
     Type: Usable
+    Category: Stat booster
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61211,6 +62033,7 @@ Body:
     AegisName: Sleepy_Box
     Name: Box of Drowsiness
     Type: Usable
+    Category: Stat booster
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61221,6 +62044,7 @@ Body:
     AegisName: Box_Of_Storm
     Name: Box of Storms
     Type: Delayconsume
+    Category: Supportive
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61231,6 +62055,7 @@ Body:
     AegisName: Box_Of_Sunlight
     Name: Box of Sunlight
     Type: Usable
+    Category: Supportive
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61241,6 +62066,7 @@ Body:
     AegisName: Painting_Box
     Name: Box of Panting
     Type: Usable
+    Category: Restorative
     Buy: 1000
     Sell: 500
     Weight: 200
@@ -61297,6 +62123,7 @@ Body:
     AegisName: Str_Dish01
     Name: Fried Grasshopper Legs
     Type: Healing
+    Category: Cooked Food
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -61307,6 +62134,7 @@ Body:
     AegisName: Str_Dish02
     Name: Seasoned Sticky Webfoot
     Type: Healing
+    Category: Cooked Food
     Buy: 4000
     Sell: 2000
     Weight: 50
@@ -61317,6 +62145,7 @@ Body:
     AegisName: Str_Dish03
     Name: Bomber Steak
     Type: Healing
+    Category: Cooked Food
     Buy: 6000
     Sell: 3000
     Weight: 50
@@ -61327,6 +62156,7 @@ Body:
     AegisName: Str_Dish04
     Name: Herb Marinade Beef
     Type: Healing
+    Category: Cooked Food
     Buy: 8000
     Sell: 4000
     Weight: 50
@@ -61337,6 +62167,7 @@ Body:
     AegisName: Str_Dish05
     Name: Lutie Lady's Pancake
     Type: Healing
+    Category: Cooked Food
     Buy: 10000
     Sell: 5000
     Weight: 50
@@ -61347,6 +62178,7 @@ Body:
     AegisName: Int_Dish01
     Name: Grape Juice Herbal Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -61357,6 +62189,7 @@ Body:
     AegisName: Int_Dish02
     Name: Autumn Red Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 4000
     Sell: 2000
     Weight: 50
@@ -61367,6 +62200,7 @@ Body:
     AegisName: Int_Dish03
     Name: Honey Herbal Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 6000
     Sell: 3000
     Weight: 50
@@ -61377,6 +62211,7 @@ Body:
     AegisName: Int_Dish04
     Name: Morocc Fruit Wine
     Type: Healing
+    Category: Cooked Food
     Buy: 8000
     Sell: 4000
     Weight: 50
@@ -61387,6 +62222,7 @@ Body:
     AegisName: Int_Dish05
     Name: Mastela Fruit Wine
     Type: Healing
+    Category: Cooked Food
     Buy: 10000
     Sell: 5000
     Weight: 50
@@ -61397,6 +62233,7 @@ Body:
     AegisName: Vit_Dish01
     Name: Steamed Crab Nippers
     Type: Healing
+    Category: Cooked Food
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -61407,6 +62244,7 @@ Body:
     AegisName: Vit_Dish02
     Name: Assorted Seafood
     Type: Healing
+    Category: Cooked Food
     Buy: 4000
     Sell: 2000
     Weight: 50
@@ -61417,6 +62255,7 @@ Body:
     AegisName: Vit_Dish03
     Name: Clam Soup
     Type: Healing
+    Category: Cooked Food
     Buy: 6000
     Sell: 3000
     Weight: 50
@@ -61427,6 +62266,7 @@ Body:
     AegisName: Vit_Dish04
     Name: Seasoned Jellyfish
     Type: Healing
+    Category: Cooked Food
     Buy: 8000
     Sell: 4000
     Weight: 50
@@ -61437,6 +62277,7 @@ Body:
     AegisName: Vit_Dish05
     Name: Spicy Fried Bao
     Type: Healing
+    Category: Cooked Food
     Buy: 10000
     Sell: 5000
     Weight: 50
@@ -61447,6 +62288,7 @@ Body:
     AegisName: Agi_Dish01
     Name: Frog Egg Squid Ink Soup
     Type: Healing
+    Category: Cooked Food
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -61457,6 +62299,7 @@ Body:
     AegisName: Agi_Dish02
     Name: Smooth Noodle
     Type: Healing
+    Category: Cooked Food
     Buy: 4000
     Sell: 2000
     Weight: 50
@@ -61467,6 +62310,7 @@ Body:
     AegisName: Agi_Dish03
     Name: Tentacle Cheese Gratin
     Type: Healing
+    Category: Cooked Food
     Buy: 6000
     Sell: 3000
     Weight: 50
@@ -61477,6 +62321,7 @@ Body:
     AegisName: Agi_Dish04
     Name: Lutie Cold Noodle
     Type: Healing
+    Category: Cooked Food
     Buy: 8000
     Sell: 4000
     Weight: 50
@@ -61487,6 +62332,7 @@ Body:
     AegisName: Agi_Dish05
     Name: Steamed Bat Wing in Pumpkin
     Type: Healing
+    Category: Cooked Food
     Buy: 10000
     Sell: 5000
     Weight: 50
@@ -61497,6 +62343,7 @@ Body:
     AegisName: Dex_Dish01
     Name: Honey Grape Juice
     Type: Healing
+    Category: Cooked Food
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -61507,6 +62354,7 @@ Body:
     AegisName: Dex_Dish02
     Name: Chocolate Mousse Cake
     Type: Healing
+    Category: Cooked Food
     Buy: 4000
     Sell: 2000
     Weight: 50
@@ -61517,6 +62365,7 @@ Body:
     AegisName: Dex_Dish03
     Name: Fruit Mix
     Type: Healing
+    Category: Cooked Food
     Buy: 6000
     Sell: 3000
     Weight: 50
@@ -61527,6 +62376,7 @@ Body:
     AegisName: Dex_Dish04
     Name: Cream Sandwich
     Type: Healing
+    Category: Cooked Food
     Buy: 8000
     Sell: 4000
     Weight: 50
@@ -61537,6 +62387,7 @@ Body:
     AegisName: Dex_Dish05
     Name: Green Salad
     Type: Healing
+    Category: Cooked Food
     Buy: 10000
     Sell: 5000
     Weight: 50
@@ -61547,6 +62398,7 @@ Body:
     AegisName: Luk_Dish01
     Name: Fried Monkey Tails
     Type: Healing
+    Category: Cooked Food
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -61557,6 +62409,7 @@ Body:
     AegisName: Luk_Dish02
     Name: Mixed Juice
     Type: Healing
+    Category: Cooked Food
     Buy: 4000
     Sell: 2000
     Weight: 50
@@ -61567,6 +62420,7 @@ Body:
     AegisName: Luk_Dish03
     Name: Fried Sweet Potato
     Type: Healing
+    Category: Cooked Food
     Buy: 6000
     Sell: 3000
     Weight: 50
@@ -61577,6 +62431,7 @@ Body:
     AegisName: Luk_Dish04
     Name: Steamed Ancient Lips
     Type: Healing
+    Category: Cooked Food
     Buy: 8000
     Sell: 4000
     Weight: 50
@@ -61587,6 +62442,7 @@ Body:
     AegisName: Luk_Dish05
     Name: Fried Scorpion Tails
     Type: Healing
+    Category: Cooked Food
     Buy: 10000
     Sell: 5000
     Weight: 50
@@ -61597,6 +62453,7 @@ Body:
     AegisName: Str_Dish06
     Name: Shiny Marinade Beef
     Type: Healing
+    Category: Cooked Food
     Buy: 20000
     Sell: 10000
     Weight: 50
@@ -61607,6 +62464,7 @@ Body:
     AegisName: Str_Dish07
     Name: Whole Roast
     Type: Healing
+    Category: Cooked Food
     Buy: 40000
     Sell: 20000
     Weight: 50
@@ -61617,6 +62475,7 @@ Body:
     AegisName: Str_Dish08
     Name: Bearfoot Special
     Type: Healing
+    Category: Cooked Food
     Buy: 60000
     Sell: 30000
     Weight: 50
@@ -61627,6 +62486,7 @@ Body:
     AegisName: Str_Dish09
     Name: Tendon Satay
     Type: Healing
+    Category: Cooked Food
     Buy: 80000
     Sell: 40000
     Weight: 50
@@ -61637,6 +62497,7 @@ Body:
     AegisName: Str_Dish10
     Name: Steamed Tongue
     Type: Healing
+    Category: Cooked Food
     Buy: 100000
     Sell: 50000
     Weight: 50
@@ -61647,6 +62508,7 @@ Body:
     AegisName: Int_Dish06
     Name: Red Mushroom Wine
     Type: Healing
+    Category: Cooked Food
     Buy: 20000
     Sell: 10000
     Weight: 50
@@ -61657,6 +62519,7 @@ Body:
     AegisName: Int_Dish07
     Name: Special Royal Jelly Herbal Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 40000
     Sell: 20000
     Weight: 50
@@ -61667,6 +62530,7 @@ Body:
     AegisName: Int_Dish08
     Name: Royal Family Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 60000
     Sell: 30000
     Weight: 50
@@ -61677,6 +62541,7 @@ Body:
     AegisName: Int_Dish09
     Name: Tristan XII
     Type: Healing
+    Category: Cooked Food
     Buy: 80000
     Sell: 40000
     Weight: 50
@@ -61687,6 +62552,7 @@ Body:
     AegisName: Int_Dish10
     Name: Dragon Breath Cocktail
     Type: Healing
+    Category: Cooked Food
     Buy: 100000
     Sell: 50000
     Weight: 50
@@ -61697,6 +62563,7 @@ Body:
     AegisName: Vit_Dish06
     Name: Awfully Bitter Bracer
     Type: Healing
+    Category: Cooked Food
     Buy: 20000
     Sell: 10000
     Weight: 50
@@ -61707,6 +62574,7 @@ Body:
     AegisName: Vit_Dish07
     Name: Sumptuous Feast
     Type: Healing
+    Category: Cooked Food
     Buy: 40000
     Sell: 20000
     Weight: 50
@@ -61717,6 +62585,7 @@ Body:
     AegisName: Vit_Dish08
     Name: Giant Burito
     Type: Healing
+    Category: Cooked Food
     Buy: 60000
     Sell: 30000
     Weight: 50
@@ -61727,6 +62596,7 @@ Body:
     AegisName: Vit_Dish09
     Name: Ascending Dragon Soup
     Type: Healing
+    Category: Cooked Food
     Buy: 80000
     Sell: 40000
     Weight: 50
@@ -61737,6 +62607,7 @@ Body:
     AegisName: Vit_Dish10
     Name: Immortal Stew
     Type: Healing
+    Category: Cooked Food
     Buy: 100000
     Sell: 50000
     Weight: 50
@@ -61747,6 +62618,7 @@ Body:
     AegisName: Agi_Dish06
     Name: Chile Shrimp Gratin
     Type: Healing
+    Category: Cooked Food
     Buy: 20000
     Sell: 10000
     Weight: 50
@@ -61757,6 +62629,7 @@ Body:
     AegisName: Agi_Dish07
     Name: Steamed Alligator with Vegetable
     Type: Healing
+    Category: Cooked Food
     Buy: 40000
     Sell: 20000
     Weight: 50
@@ -61767,6 +62640,7 @@ Body:
     AegisName: Agi_Dish08
     Name: Incredibly Spicy Curry
     Type: Healing
+    Category: Cooked Food
     Buy: 60000
     Sell: 30000
     Weight: 50
@@ -61777,6 +62651,7 @@ Body:
     AegisName: Agi_Dish09
     Name: Special Meat Stew
     Type: Healing
+    Category: Cooked Food
     Buy: 80000
     Sell: 40000
     Weight: 50
@@ -61787,6 +62662,7 @@ Body:
     AegisName: Agi_Dish10
     Name: Steamed Desert Scorpions
     Type: Healing
+    Category: Cooked Food
     Buy: 100000
     Sell: 50000
     Weight: 50
@@ -61797,6 +62673,7 @@ Body:
     AegisName: Dex_Dish06
     Name: Peach Cake
     Type: Healing
+    Category: Cooked Food
     Buy: 20000
     Sell: 10000
     Weight: 50
@@ -61807,6 +62684,7 @@ Body:
     AegisName: Dex_Dish07
     Name: Soul Haunted Bread
     Type: Healing
+    Category: Cooked Food
     Buy: 40000
     Sell: 20000
     Weight: 50
@@ -61817,6 +62695,7 @@ Body:
     AegisName: Dex_Dish08
     Name: Special Toast
     Type: Healing
+    Category: Cooked Food
     Buy: 60000
     Sell: 30000
     Weight: 50
@@ -61827,6 +62706,7 @@ Body:
     AegisName: Dex_Dish09
     Name: Heavenly Fruit Juice
     Type: Healing
+    Category: Cooked Food
     Buy: 80000
     Sell: 40000
     Weight: 50
@@ -61837,6 +62717,7 @@ Body:
     AegisName: Dex_Dish10
     Name: Hwergelmir's Tonic
     Type: Healing
+    Category: Cooked Food
     Buy: 100000
     Sell: 50000
     Weight: 50
@@ -61847,6 +62728,7 @@ Body:
     AegisName: Luk_Dish06
     Name: Lucky Soup
     Type: Healing
+    Category: Cooked Food
     Buy: 20000
     Sell: 10000
     Weight: 50
@@ -61857,6 +62739,7 @@ Body:
     AegisName: Luk_Dish07
     Name: Assorted Shish Kebob
     Type: Healing
+    Category: Cooked Food
     Buy: 40000
     Sell: 20000
     Weight: 50
@@ -61867,6 +62750,7 @@ Body:
     AegisName: Luk_Dish08
     Name: Strawberry Flavored Rice Ball
     Type: Healing
+    Category: Cooked Food
     Buy: 60000
     Sell: 30000
     Weight: 50
@@ -61877,6 +62761,7 @@ Body:
     AegisName: Luk_Dish09
     Name: Blood Flavored Soda
     Type: Healing
+    Category: Cooked Food
     Buy: 80000
     Sell: 40000
     Weight: 50
@@ -61887,6 +62772,7 @@ Body:
     AegisName: Luk_Dish10
     Name: Cooked Nine Tail's Tails
     Type: Healing
+    Category: Cooked Food
     Buy: 100000
     Sell: 50000
     Weight: 50
@@ -61917,6 +62803,7 @@ Body:
     AegisName: Bloody_Dead_Branch
     Name: Bloody Branch
     Type: Usable
+    Category: Supportive
     Buy: 10000
     Sell: 5000
     Weight: 200
@@ -62029,6 +62916,7 @@ Body:
     AegisName: Elemental_Fire
     Name: Elemental Converter
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62039,6 +62927,7 @@ Body:
     AegisName: Elemental_Water
     Name: Elemental Converter
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62049,6 +62938,7 @@ Body:
     AegisName: Elemental_Earth
     Name: Elemental Converter
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62059,6 +62949,7 @@ Body:
     AegisName: Elemental_Wind
     Name: Elemental Converter
     Type: Delayconsume
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62069,6 +62960,7 @@ Body:
     AegisName: Resist_Fire
     Name: Fireproof Potion
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62079,6 +62971,7 @@ Body:
     AegisName: Resist_Water
     Name: Coldproof Potion
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62089,6 +62982,7 @@ Body:
     AegisName: Resist_Earth
     Name: Earthproof Potion
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62099,6 +62993,7 @@ Body:
     AegisName: Resist_Wind
     Name: Thunderproof Potion
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62109,6 +63004,7 @@ Body:
     AegisName: Sesame_Pastry
     Name: Sesame Pastry
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -62119,6 +63015,7 @@ Body:
     AegisName: Honey_Pastry
     Name: Honey Pastry
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -62129,6 +63026,7 @@ Body:
     AegisName: Rainbow_Cake
     Name: Rainbow Cake
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -62139,6 +63037,7 @@ Body:
     AegisName: Outdoor_Cooking_Kits
     Name: Outdoor Cooking Kit
     Type: Usable
+    Category: Cooking Tool
     Buy: 500
     Sell: 250
     Weight: 20
@@ -62149,6 +63048,7 @@ Body:
     AegisName: Indoor_Cooking_Kits
     Name: Home Cooking Kit
     Type: Usable
+    Category: Cooking Tool
     Buy: 1000
     Sell: 500
     Weight: 30
@@ -62159,6 +63059,7 @@ Body:
     AegisName: High_end_Cooking_Kits
     Name: Professional Cooking Kit
     Type: Usable
+    Category: Cooking Tool
     Buy: 2000
     Sell: 1000
     Weight: 50
@@ -62169,6 +63070,7 @@ Body:
     AegisName: Imperial_Cooking_Kits
     Name: Royal Cooking Kit
     Type: Usable
+    Category: Cooking Tool
     Buy: 5000
     Sell: 2500
     Weight: 70
@@ -62179,6 +63081,7 @@ Body:
     AegisName: Fantastic_Cooking_Kits
     Name: Fantastic Cooking Kit
     Type: Usable
+    Category: Cooking Tool
     Buy: 10000
     Sell: 5000
     Weight: 70
@@ -62767,6 +63670,7 @@ Body:
     AegisName: Brezel
     Name: Pretzel
     Type: Usable
+    Category: Restorative
     Buy: 20
     Sell: 10
     Weight: 20
@@ -62816,6 +63720,7 @@ Body:
     AegisName: Lucky_Rice_Cake
     Name: Lucky Rice Cake
     Type: Usable
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 100
@@ -62847,6 +63752,7 @@ Body:
     AegisName: Str_Dish10_
     Name: Steamed Tongue
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62856,6 +63762,7 @@ Body:
     AegisName: Agi_Dish10_
     Name: Steamed Scorpion
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62865,6 +63772,7 @@ Body:
     AegisName: Int_Dish10_
     Name: Dragon Breath Cocktail
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62874,6 +63782,7 @@ Body:
     AegisName: Dex_Dish10_
     Name: Hwergelmir's Tonic
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62883,6 +63792,7 @@ Body:
     AegisName: Luk_Dish10_
     Name: Cooked Nine Tail's Tails
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62892,6 +63802,7 @@ Body:
     AegisName: Vit_Dish10_
     Name: Stew Of Immortality
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62901,6 +63812,7 @@ Body:
     AegisName: Battle_Manual
     Name: Battle Manual
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62911,6 +63823,7 @@ Body:
     AegisName: Insurance
     Name: Life Insurance
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62920,6 +63833,7 @@ Body:
     AegisName: Bubble_Gum
     Name: Bubble Gum X2
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62931,6 +63845,7 @@ Body:
     AegisName: Kafra_Card
     Name: Kafra Card
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62940,6 +63855,7 @@ Body:
     AegisName: Giant_Fly_Wing
     Name: Giant Fly Wing
     Type: Usable
+    Category: Supportive
     Buy: 5000
     Sell: 2500
     Weight: 10
@@ -62967,6 +63883,7 @@ Body:
     AegisName: Blessing_10_Scroll
     Name: LV10 Blessing Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62976,6 +63893,7 @@ Body:
     AegisName: Inc_Agi_10_Scroll
     Name: LV10 Agil Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62985,6 +63903,7 @@ Body:
     AegisName: Aspersio_5_Scroll
     Name: LV5 Aspersio Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -62994,6 +63913,7 @@ Body:
     AegisName: Assumptio_5_Scroll
     Name: LV5 Assumptio Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -63003,6 +63923,7 @@ Body:
     AegisName: Wind_Walk_10_Scroll
     Name: LV10 Wind Walker Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -63012,6 +63933,7 @@ Body:
     AegisName: Adrenaline_Scroll
     Name: LV5 Adrenaline Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -63094,6 +64016,7 @@ Body:
     AegisName: Gingerbread
     Name: Ginger Bread
     Type: Usable
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 150
@@ -63260,6 +64183,7 @@ Body:
     AegisName: Str_Dish10_M
     Name: Steamed Tongue
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start SC_STRFOOD,3600000,10; percentheal 20,20;
@@ -63267,6 +64191,7 @@ Body:
     AegisName: Agi_Dish10_M
     Name: Steamed Desert Scorpions
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start SC_AGIFOOD,3600000,10; percentheal 15,5;
@@ -63274,6 +64199,7 @@ Body:
     AegisName: Int_Dish10_M
     Name: Dragon Breath Cocktail
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start SC_INTFOOD,3600000,10; percentheal 10,20;
@@ -63281,6 +64207,7 @@ Body:
     AegisName: Dex_Dish10_M
     Name: Hwergelmir's Tonic
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start SC_DEXFOOD,3600000,10; percentheal 10,10;
@@ -63288,6 +64215,7 @@ Body:
     AegisName: Luk_Dish10_M
     Name: Cooked Nine Tail
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start SC_LUKFOOD,3600000,10; percentheal 14,8;
@@ -63295,6 +64223,7 @@ Body:
     AegisName: Vit_Dish10_M
     Name: Immortal Stew
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start SC_VITFOOD,3600000,10; percentheal 25,0;
@@ -63324,6 +64253,7 @@ Body:
     AegisName: Miracle_Medicine
     Name: Miracle Tonic
     Type: Usable
+    Category: Supportive
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       getexp2(3000000,1500000);
@@ -63341,6 +64271,7 @@ Body:
     AegisName: Secret_Medicine
     Name: Leap of Fantasy
     Type: Usable
+    Category: Supportive
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       getexp2(2000000,1000000);
@@ -63348,6 +64279,7 @@ Body:
     AegisName: Inspector_Certificate_
     Name: Authoritative Badge
     Type: Usable
+    Category: Supportive
     Weight: 10
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
@@ -63356,6 +64288,7 @@ Body:
     AegisName: Comp_Battle_Manual
     Name: Field Manual
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -63366,6 +64299,7 @@ Body:
     AegisName: Comp_Bubble_Gum
     Name: Bubble Gum X4
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -63376,6 +64310,7 @@ Body:
     AegisName: Comp_Insurance
     Name: Life Insurrance
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -63386,6 +64321,7 @@ Body:
     AegisName: Sesame_Pastry_
     Name: Sesame Pastry
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63396,6 +64332,7 @@ Body:
     AegisName: Honey_Pastry_
     Name: Honey Pastry
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63406,6 +64343,7 @@ Body:
     AegisName: Rainbow_Cake_
     Name: Rainbow Cake
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63416,6 +64354,7 @@ Body:
     AegisName: Tasty_Colonel
     Name: Tasty Pink Ration
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63425,6 +64364,7 @@ Body:
     AegisName: Tasty_Major
     Name: Tasty White Ration
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63443,6 +64383,7 @@ Body:
     AegisName: Mre_B
     Name: Military Ration B
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63452,6 +64393,7 @@ Body:
     AegisName: Mre_C
     Name: Military Ration C
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 70
@@ -63461,6 +64403,7 @@ Body:
     AegisName: Gold_Pill_1
     Name: Daehwandan
     Type: Healing
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start2 SC_INCREASE_MAXHP,3600000,5,10; percentheal 10,0;
@@ -63468,6 +64411,7 @@ Body:
     AegisName: Gold_Pill_2
     Name: Taecheongdan
     Type: Healing
+    Category: Stat booster
     Weight: 10
     Script: |
       sc_start2 SC_INCREASE_MAXSP,3600000,5,10; percentheal 0,10;
@@ -63502,6 +64446,7 @@ Body:
     AegisName: Undead_Element_Scroll
     Name: Undead Elemental Scroll
     Type: Usable
+    Category: Supportive
     Weight: 10
     Script: |
       sc_start4 SC_ARMOR_RESIST,300000,20,20,20,20;
@@ -63509,6 +64454,7 @@ Body:
     AegisName: Holy_Element_Scroll
     Name: Holy Elemental Scroll
     Type: Usable
+    Category: Supportive
     Weight: 10
     Script: |
       specialeffect2 EF_BENEDICTIO; sc_start SC_BENEDICTIO,300000,1;
@@ -63795,6 +64741,7 @@ Body:
     AegisName: Strawberry_Cake
     Name: Rune Strawberry Cake
     Type: Usable
+    Category: Stat booster
     Weight: 300
     Script: |
       sc_start SC_ATKPOTION,600000,5; sc_start SC_MATKPOTION,600000,5;
@@ -63802,6 +64749,7 @@ Body:
     AegisName: Pineapple_Juice
     Name: Schwarzwald Pine Jubilee
     Type: Usable
+    Category: Stat booster
     Weight: 300
     Script: |
       sc_start SC_HITFOOD,600000,10; sc_start SC_FLEEFOOD,600000,20;
@@ -63809,6 +64757,7 @@ Body:
     AegisName: Spicy_Sandwich
     Name: Arunafeltz Desert Sandwich
     Type: Usable
+    Category: Stat booster
     Weight: 300
     Script: |
       sc_start SC_INCCRI,600000,7;
@@ -63823,6 +64772,7 @@ Body:
     AegisName: N_Fly_Wing
     Name: Novice Fly Wing
     Type: Delayconsume
+    Category: Supportive
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
     Script: |
       itemskill "AL_TELEPORT",1;
@@ -63830,6 +64780,7 @@ Body:
     AegisName: N_Butterfly_Wing
     Name: Novice Butterfly Wing
     Type: Delayconsume
+    Category: Supportive
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
     Script: |
       itemskill "AL_TELEPORT",3;
@@ -63837,6 +64788,7 @@ Body:
     AegisName: N_Magnifier
     Name: Novice Magnifier
     Type: Delayconsume
+    Category: Supportive
     Trade: {NoDrop: true, NoTrade: true, NoGuildStorage: true}
     Script: |
       itemskill "MC_IDENTIFY",1;
@@ -63899,6 +64851,7 @@ Body:
     AegisName: Ansila
     Name: Ancilla
     Type: Usable
+    Category: Restorative
     Weight: 10
     Stack: {Amount: 3, Inventory: true}
     Script: |
@@ -63942,6 +64895,7 @@ Body:
     AegisName: Grilled_Corn
     Name: Grilled Corn
     Type: Usable
+    Category: Stat booster
     Buy: 100
     Sell: 50
     Weight: 100
@@ -64046,6 +65000,7 @@ Body:
     AegisName: Angeling_Potion
     Name: Angeling Potion
     Type: Delayconsume
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 100
@@ -64056,6 +65011,7 @@ Body:
     AegisName: Shout_Megaphone
     Name: Scream Megaphone
     Type: Delayconsume
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 50
@@ -64073,6 +65029,7 @@ Body:
     AegisName: Tiny_Waterbottle
     Name: Small Bottle
     Type: Usable
+    Category: Supportive
     Buy: 800
     Sell: 400
     Weight: 10
@@ -64083,6 +65040,7 @@ Body:
     AegisName: Buche_De_Noel
     Name: Buche De Noel
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 50
@@ -64286,6 +65244,7 @@ Body:
     AegisName: Acaraje
     Name: Akaraje
     Type: Usable
+    Category: Stat booster
     Weight: 80
     Script: |
       specialeffect2 EF_STEAL; bonus_script "{ bonus bHit,5; bonus bAspdRate,10; }",1200,0,0,EFST_ACARAJE;
@@ -64599,6 +65558,7 @@ Body:
     AegisName: Guarana_Candy
     Name: Guarana Candy
     Type: Usable
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 10
@@ -64670,6 +65630,7 @@ Body:
     AegisName: HP_Increase_PotionS
     Name: HP Increase Potion (Small)
     Type: Usable
+    Category: Restorative
     Buy: 100
     Sell: 50
     Weight: 20
@@ -64680,6 +65641,7 @@ Body:
     AegisName: HP_Increase_PotionM
     Name: HP Increase Potion (Medium)
     Type: Usable
+    Category: Restorative
     Buy: 100
     Sell: 50
     Weight: 40
@@ -64690,6 +65652,7 @@ Body:
     AegisName: HP_Increase_PotionL
     Name: HP Increase Potion (Large)
     Type: Usable
+    Category: Restorative
     Buy: 100
     Sell: 50
     Weight: 80
@@ -64700,6 +65663,7 @@ Body:
     AegisName: SP_Increase_PotionS
     Name: SP Increase Potion (Small)
     Type: Usable
+    Category: Restorative
     Buy: 100
     Sell: 50
     Weight: 20
@@ -64710,6 +65674,7 @@ Body:
     AegisName: SP_Increase_PotionM
     Name: SP Increase Potion (Medium)
     Type: Usable
+    Category: Restorative
     Buy: 100
     Sell: 50
     Weight: 40
@@ -64720,6 +65685,7 @@ Body:
     AegisName: SP_Increase_PotionL
     Name: SP Increase Potion (Large)
     Type: Usable
+    Category: Restorative
     Buy: 100
     Sell: 50
     Weight: 80
@@ -64740,6 +65706,7 @@ Body:
     AegisName: Savage_BBQ
     Name: Savage Full Roast
     Type: Usable
+    Category: Cooked Food
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -64748,6 +65715,7 @@ Body:
     AegisName: Wug_Blood_Cocktail
     Name: Cocktail Warg Blood
     Type: Usable
+    Category: Cooked Food
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -64756,6 +65724,7 @@ Body:
     AegisName: Minor_Brisket
     Name: Minor Stew
     Type: Usable
+    Category: Cooked Food
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -64764,6 +65733,7 @@ Body:
     AegisName: Siroma_Icetea
     Name: Siroma Iced Tea
     Type: Usable
+    Category: Cooked Food
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -64772,6 +65742,7 @@ Body:
     AegisName: Drocera_Herb_Stew
     Name: Drosera Herb Salad
     Type: Usable
+    Category: Cooked Food
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -64780,6 +65751,7 @@ Body:
     AegisName: Petti_Tail_Noodle
     Name: Petite Tail Noodles
     Type: Usable
+    Category: Cooked Food
     Weight: 50
     Flags: {BuyingStore: true}
     Script: |
@@ -64805,6 +65777,7 @@ Body:
     AegisName: Enrich_Celermine_Juice
     Name: Concentrated Ceromain Soup
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -64815,6 +65788,7 @@ Body:
     AegisName: F_Giant_Fly_Wing
     Name: F Giant Fly Wing
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64863,6 +65837,7 @@ Body:
     AegisName: F_Str_Dish10_
     Name: F Str Dish10
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64872,6 +65847,7 @@ Body:
     AegisName: F_Agi_Dish10_
     Name: F Agi Dish10
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64881,6 +65857,7 @@ Body:
     AegisName: F_Int_Dish10_
     Name: F Int Dish10
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64890,6 +65867,7 @@ Body:
     AegisName: F_Dex_Dish10_
     Name: F Dex Dish10
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64899,6 +65877,7 @@ Body:
     AegisName: F_Luk_Dish10_
     Name: F Luk Dish10
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64908,6 +65887,7 @@ Body:
     AegisName: F_Vit_Dish10_
     Name: F Vit Dish10
     Type: Usable
+    Category: Stat booster
     Buy: 2
     Sell: 1
     Weight: 10
@@ -64947,6 +65927,7 @@ Body:
     AegisName: F_Abrasive
     Name: F Abrasive
     Type: Usable
+    Category: Stat booster
     Weight: 10
   - Id: 12459
     AegisName: F_Med_Life_Potion
@@ -64999,6 +65980,7 @@ Body:
     AegisName: F_Blessing_10_Scroll
     Name: F Blessing 10 Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65006,6 +65988,7 @@ Body:
     AegisName: F_Inc_Agi_10_Scroll
     Name: F Inc Agi 10 Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65013,6 +65996,7 @@ Body:
     AegisName: F_Aspersio_5_Scroll
     Name: F Aspersio 5 Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65020,6 +66004,7 @@ Body:
     AegisName: F_Wind_Walk_10_Scroll
     Name: F Wind Walk 10 Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65027,6 +66012,7 @@ Body:
     AegisName: F_Adrenaline_Scroll
     Name: F Adrenaline Scroll
     Type: Usable
+    Category: Magic scroll
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65059,6 +66045,7 @@ Body:
     AegisName: Cure_Free
     Name: Cure Free
     Type: Usable
+    Category: Restorative
     Buy: 20
     Sell: 10
     Weight: 50
@@ -65185,6 +66172,7 @@ Body:
     AegisName: E_Battle_Manual
     Name: E Battle Manual
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65199,6 +66187,7 @@ Body:
     AegisName: E_Bubble_Gum
     Name: E Bubble Gum
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65224,6 +66213,7 @@ Body:
     AegisName: E_Str_Dish10_
     Name: Steamed Tongue
     Type: Usable
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65233,6 +66223,7 @@ Body:
     AegisName: E_Agi_Dish10_
     Name: Steamed Desert Scorpions
     Type: Usable
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65242,6 +66233,7 @@ Body:
     AegisName: E_Int_Dish10_
     Name: Dragon Breath Cocktail
     Type: Usable
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65251,6 +66243,7 @@ Body:
     AegisName: E_Dex_Dish10_
     Name: Hwergelmir's Tonic
     Type: Usable
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65260,6 +66253,7 @@ Body:
     AegisName: E_Luk_Dish10_
     Name: Cooked Nine Tail
     Type: Usable
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65269,6 +66263,7 @@ Body:
     AegisName: E_Vit_Dish10_
     Name: Immortal Stew
     Type: Usable
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -65430,48 +66425,56 @@ Body:
     AegisName: White_Slim_Potion_Box
     Name: White Slim Potion Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 547,200;
   - Id: 12530
     AegisName: Mastela_Fruit_Box
     Name: Mastela Fruit Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 522,200;
   - Id: 12531
     AegisName: White_Potion_Box
     Name: White Potion Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 504,100;
   - Id: 12532
     AegisName: Royal_Jelly_Box2
     Name: Royal Jelly Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 526,100;
   - Id: 12533
     AegisName: Blue_Herb_Box2
     Name: Blue Herb Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 510,100;
   - Id: 12534
     AegisName: Yggdrasil_Seed_Box
     Name: Yggdrasil Seed Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 608,30;
   - Id: 12535
     AegisName: Iggdrasilberry_Box
     Name: Iggdrasilberry Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 607,15;
   - Id: 12536
     AegisName: NY_Rice_Cake_Soup
     Name: NY Rice Cake Soup
     Type: Usable
+    Category: Restorative
     Buy: 20
     Sell: 10
     Weight: 100
@@ -65581,12 +66584,14 @@ Body:
     AegisName: White_Slim_Pot_Box2
     Name: White Slim Pot Box2
     Type: Usable
+    Category: Container
     Script: |
       getitem 547,100;
   - Id: 12550
     AegisName: Poison_Bottle_Box2
     Name: Deadly Poison Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 678,30;
   - Id: 12551
@@ -66108,6 +67113,7 @@ Body:
     AegisName: Boarding_Halter
     Name: Reins Of Mount
     Type: Usable
+    Category: Supportive
     Trade: {Override: 99, NoDrop: true, TradePartner: true, NoSell: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       setmounting();
@@ -66263,6 +67269,7 @@ Body:
     AegisName: Fruit_Of_Mastela_Box2
     Name: Fruit Of Mastela 100 Box
     Type: Usable
+    Category: Container
     Script: |
       getitem 522,100;
   - Id: 12643
@@ -66291,6 +67298,7 @@ Body:
     AegisName: Takoyaki
     Name: Fried Octopus Legs
     Type: Usable
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 30
@@ -66859,6 +67867,7 @@ Body:
     AegisName: Poison_Paralysis
     Name: Paralyze
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66867,6 +67876,7 @@ Body:
     AegisName: Poison_Leech
     Name: Leech End
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66875,6 +67885,7 @@ Body:
     AegisName: Poison_Oblivion
     Name: Oblivion Curse
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66883,6 +67894,7 @@ Body:
     AegisName: Poison_Contamination
     Name: Disheart
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66891,6 +67903,7 @@ Body:
     AegisName: Poison_Numb
     Name: Toxin
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66899,6 +67912,7 @@ Body:
     AegisName: Poison_Fever
     Name: Pyrexia
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66907,6 +67921,7 @@ Body:
     AegisName: Poison_Laughing
     Name: Magic Mushroom
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66915,6 +67930,7 @@ Body:
     AegisName: Poison_Fatigue
     Name: Venom Bleed
     Type: Usable
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 20
@@ -66923,6 +67939,7 @@ Body:
     AegisName: Runstone_Nosiege
     Name: Nauthiz Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66933,6 +67950,7 @@ Body:
     AegisName: Runstone_Rhydo
     Name: Raido Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66943,6 +67961,7 @@ Body:
     AegisName: Runstone_Verkana
     Name: Berkana Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66953,6 +67972,7 @@ Body:
     AegisName: Runstone_Isia
     Name: Isa Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66963,6 +67983,7 @@ Body:
     AegisName: Runstone_Asir
     Name: Othila Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66972,6 +67993,7 @@ Body:
     AegisName: Runstone_Urj
     Name: Uruz Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66982,6 +68004,7 @@ Body:
     AegisName: Runstone_Turisus
     Name: Thurisaz Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -66991,6 +68014,7 @@ Body:
     AegisName: Runstone_Pertz
     Name: Wyrd Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -67000,6 +68024,7 @@ Body:
     AegisName: Runstone_Hagalas
     Name: Hagalaz Rune
     Type: Usable
+    Category: Runestone
     Buy: 100
     Sell: 50
     Weight: 100
@@ -67010,6 +68035,7 @@ Body:
     AegisName: Runstone_Quality
     Name: Luxurious Rune
     Type: Healing
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 100
@@ -67021,6 +68047,7 @@ Body:
     AegisName: Runstone_Ancient
     Name: Ancient Rune
     Type: Healing
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 100
@@ -67032,6 +68059,7 @@ Body:
     AegisName: Runstone_Mystic
     Name: Mystic Rune
     Type: Healing
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 100
@@ -67043,6 +68071,7 @@ Body:
     AegisName: Runstone_Ordinary
     Name: General Rune
     Type: Healing
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 100
@@ -67054,6 +68083,7 @@ Body:
     AegisName: Runstone_Rare
     Name: Rare Rune
     Type: Healing
+    Category: Skill necessity
     Buy: 2
     Sell: 1
     Weight: 100
@@ -67395,6 +68425,7 @@ Body:
     AegisName: Juicy_Fruit
     Name: Juicy Fruit
     Type: Usable
+    Category: Pet item
     Buy: 2
     Sell: 1
     Weight: 100
@@ -67786,6 +68817,7 @@ Body:
     AegisName: Combination_Kit
     Name: Combination Kit
     Type: Usable
+    Category: Supportive
     Buy: 40
     Sell: 20
     Weight: 10
@@ -67925,6 +68957,7 @@ Body:
     AegisName: Infinite_Concentration_Potion
     Name: Infinite Concentration Potion
     Type: Delayconsume
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Script: |
@@ -67933,6 +68966,7 @@ Body:
     AegisName: Infinite_Awakening_Potion
     Name: Infinite Awakening Potion
     Type: Delayconsume
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Script: |
@@ -67941,6 +68975,7 @@ Body:
     AegisName: Infinite_Berserk_Potion
     Name: Infinite Berserk Potion
     Type: Delayconsume
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Script: |
@@ -67949,6 +68984,7 @@ Body:
     AegisName: C_Wing_Of_Fly
     Name: Infinite Flywing
     Type: Usable
+    Category: Supportive
     Flags: {NoConsume: true}
     Trade: {Override: 99, NoDrop: true, NoTrade: true, TradePartner: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
@@ -68039,6 +69075,7 @@ Body:
     AegisName: Battle_Manual_Box
     Name: Battle Manual Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68048,6 +69085,7 @@ Body:
     AegisName: Insurance_Package
     Name: Insurance Package
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68057,6 +69095,7 @@ Body:
     AegisName: Bubble_Gum_Box
     Name: Bubble Gum Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68066,6 +69105,7 @@ Body:
     AegisName: Str_Dish_Box
     Name: Steamed Tongue Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68075,6 +69115,7 @@ Body:
     AegisName: Agi_Dish_Box
     Name: Steamed Scorpion Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68084,6 +69125,7 @@ Body:
     AegisName: Int_Dish_Box
     Name: Dragon Breath Cocktail Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68093,6 +69135,7 @@ Body:
     AegisName: Dex_Dish_Box
     Name: Hwergelmir's Tonic Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68102,6 +69145,7 @@ Body:
     AegisName: Luk_Dish_Box
     Name: Nine Tail Dish Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -68111,6 +69155,7 @@ Body:
     AegisName: Vit_Dish_Box
     Name: Stew Of Immortality Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74137,6 +75182,7 @@ Body:
     AegisName: Grape_Box
     Name: Grape Box
     Type: Cash
+    Category: Restorative
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74146,6 +75192,7 @@ Body:
     AegisName: Royal_Jelly_Box
     Name: Royal Jelly Box
     Type: Cash
+    Category: Restorative
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74155,6 +75202,7 @@ Body:
     AegisName: Yggdrasilberry_Box
     Name: Yggdrasil Berry Box
     Type: Cash
+    Category: Restorative
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74317,6 +75365,7 @@ Body:
     AegisName: Light_Center_Pot_Box
     Name: Light Concentration Potion Box
     Type: Cash
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74326,6 +75375,7 @@ Body:
     AegisName: Light_Awakening_Pot_Box
     Name: Light Awakening Potion Box
     Type: Cash
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74335,6 +75385,7 @@ Body:
     AegisName: Light_Berserk_Pot_Box
     Name: Light Berserk Potion Box
     Type: Cash
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74610,6 +75661,7 @@ Body:
     AegisName: Giant_Fly_Wing_Box50
     Name: Giant Fly Wing 50 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74619,6 +75671,7 @@ Body:
     AegisName: Giant_Fly_Wing_Box100
     Name: Giant Fly Wing 100 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74628,6 +75681,7 @@ Body:
     AegisName: Dex_Dish_Box30
     Name: Hwergelmir's Tonic 30 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74637,6 +75691,7 @@ Body:
     AegisName: Dex_Dish_Box50
     Name: Hwergelmir's Tonic 50 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74646,6 +75701,7 @@ Body:
     AegisName: Luk_Dish_Box30
     Name: Nine Tail Dish 30 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74655,6 +75711,7 @@ Body:
     AegisName: Luk_Dish_Box50
     Name: Nine Tail Dish 50 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74664,6 +75721,7 @@ Body:
     AegisName: Inc_Agi_10_Box30
     Name: Increase Agility Scroll 30 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74673,6 +75731,7 @@ Body:
     AegisName: Inc_Agi_10_Box50
     Name: Increase Agility Scroll 50 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74682,6 +75741,7 @@ Body:
     AegisName: Vit_Dish_Box30
     Name: Stew of Immortality 30 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74691,6 +75751,7 @@ Body:
     AegisName: Vit_Dish_Box50
     Name: Stew of Immortality 50 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74700,6 +75761,7 @@ Body:
     AegisName: Insurance_Package30
     Name: Life Insurrance 30 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74709,6 +75771,7 @@ Body:
     AegisName: Insurance_Package50
     Name: Life Insurrance 50 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74736,6 +75799,7 @@ Body:
     AegisName: Blessing10_Box30
     Name: Blessing Scroll 30 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74745,6 +75809,7 @@ Body:
     AegisName: Blessing10_Box50
     Name: Blessing Scroll 50 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74754,6 +75819,7 @@ Body:
     AegisName: Adrenaline10_Box30
     Name: Adrenaline Rush Scroll 30 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74763,6 +75829,7 @@ Body:
     AegisName: Adrenaline10_Box50
     Name: Adrenaline Rush Scroll 50 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74772,6 +75839,7 @@ Body:
     AegisName: Assumptio_5_Box30
     Name: Assumptio Scroll 30 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74781,6 +75849,7 @@ Body:
     AegisName: Assumptio_5_Box50
     Name: Assumptio Scroll 50 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74790,6 +75859,7 @@ Body:
     AegisName: Aspersio_5_Box30
     Name: Aspersio Scroll 30 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74799,6 +75869,7 @@ Body:
     AegisName: Aspersio_5_Box50
     Name: Aspersio Scroll 50 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74808,6 +75879,7 @@ Body:
     AegisName: Agi_Dish_Box30
     Name: Steamed Scorpion 30 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74817,6 +75889,7 @@ Body:
     AegisName: Agi_Dish_Box50
     Name: Steamed Scorpion 50 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74826,6 +75899,7 @@ Body:
     AegisName: Wind_Walk10_Box30
     Name: Wind Walk Scroll 30 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74835,6 +75909,7 @@ Body:
     AegisName: Wind_Walk10_Box50
     Name: Wind Walk Scroll 50 Box
     Type: Cash
+    Category: Magic scroll
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74844,6 +75919,7 @@ Body:
     AegisName: Int_Dish_Box30
     Name: Dragon Breath Cocktail 30 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74853,6 +75929,7 @@ Body:
     AegisName: Int_Dish_Box50
     Name: Dragon Breath Cocktail 50 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74862,6 +75939,7 @@ Body:
     AegisName: Battle_Manual_Box1
     Name: Field Manual Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74871,6 +75949,7 @@ Body:
     AegisName: Battle_Manual_Box5
     Name: Field Manual 5 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74880,6 +75959,7 @@ Body:
     AegisName: Siegfried_Box5
     Name: Token of Siegfried 5 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74889,6 +75969,7 @@ Body:
     AegisName: Siegfried_Box20
     Name: Token of Siegfried 20 Box
     Type: Cash
+    Category: Supportive
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74916,6 +75997,7 @@ Body:
     AegisName: Str_Dish_Box30
     Name: Steamed Tongue 30 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -74925,6 +76007,7 @@ Body:
     AegisName: Str_Dish_Box50
     Name: Steamed Tongue 50 Box
     Type: Cash
+    Category: Cooked Food
     Buy: 20
     Sell: 10
     Weight: 10
@@ -81904,6 +82987,7 @@ Body:
     AegisName: Light_Center_Pot
     Name: Light Concentration Potion
     Type: Usable
+    Category: Stat booster
     Buy: 800
     Sell: 400
     Weight: 20
@@ -81913,6 +82997,7 @@ Body:
     AegisName: Light_Awakening_Pot
     Name: Light Awakening Potion
     Type: Usable
+    Category: Stat booster
     Buy: 1500
     Sell: 750
     Weight: 20
@@ -81924,6 +83009,7 @@ Body:
     AegisName: Light_Berserk_Pot
     Name: Light Berserk Potion
     Type: Usable
+    Category: Stat booster
     Buy: 3000
     Sell: 1500
     Weight: 20
@@ -82087,6 +83173,7 @@ Body:
     AegisName: Battle_Manual_X2
     Name: "Field Manual +100%"
     Type: Usable
+    Category: Supportive
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82175,6 +83262,7 @@ Body:
     AegisName: Battle_Manual_X4
     Name: "Field Manual +300%"
     Type: Usable
+    Category: Supportive
     Weight: 10
     Trade: {Override: 99, NoDrop: true, NoTrade: true, TradePartner: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
@@ -82218,6 +83306,7 @@ Body:
     AegisName: Str_Dish01_
     Name: Fried Grasshopper Legs
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82227,6 +83316,7 @@ Body:
     AegisName: Str_Dish02_
     Name: Seasoned Sticky Webfoot
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82236,6 +83326,7 @@ Body:
     AegisName: Str_Dish03_
     Name: Bomber Steak
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82245,6 +83336,7 @@ Body:
     AegisName: Int_Dish01_
     Name: Grape Juice Herbal Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82254,6 +83346,7 @@ Body:
     AegisName: Int_Dish02_
     Name: Autumn Red Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82263,6 +83356,7 @@ Body:
     AegisName: Int_Dish03_
     Name: Honey Herbal Tea
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82272,6 +83366,7 @@ Body:
     AegisName: Vit_Dish01_
     Name: Steamed Crab Nippers
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82281,6 +83376,7 @@ Body:
     AegisName: Vit_Dish02_
     Name: Assorted Seafood
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82290,6 +83386,7 @@ Body:
     AegisName: Vit_Dish03_
     Name: Clam Soup
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82299,6 +83396,7 @@ Body:
     AegisName: Agi_Dish01_
     Name: Frog Egg Squid Ink Soup
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82308,6 +83406,7 @@ Body:
     AegisName: Agi_Dish02_
     Name: Smooth Noodle
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82317,6 +83416,7 @@ Body:
     AegisName: Agi_Dish03_
     Name: Tentacle Cheese Gratin
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82326,6 +83426,7 @@ Body:
     AegisName: Dex_Dish01_
     Name: Honey Grape Juice
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82335,6 +83436,7 @@ Body:
     AegisName: Dex_Dish02_
     Name: Chocolate Mousse Cake
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82344,6 +83446,7 @@ Body:
     AegisName: Dex_Dish03_
     Name: Fruit Mix
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82353,6 +83456,7 @@ Body:
     AegisName: Luk_Dish01_
     Name: Fried Monkey Tails
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82362,6 +83466,7 @@ Body:
     AegisName: Luk_Dish02_
     Name: Mixed Juice
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82371,6 +83476,7 @@ Body:
     AegisName: Luk_Dish03_
     Name: Fried Sweet Potato
     Type: Healing
+    Category: Cooked Food
     Buy: 2
     Sell: 1
     Weight: 10
@@ -82630,6 +83736,7 @@ Body:
     AegisName: Mental_Potion
     Name: Mental Potion
     Type: Usable
+    Category: Stat booster
     Weight: 10
     Script: |
       specialeffect2 EF_SPELLBREAKER; bonus_script "{ bonus bUseSPrate,-10; bonus bMaxSPrate,10; }",1800;
@@ -89633,6 +90740,7 @@ Body:
     AegisName: Empty_Bottle_Box10
     Name: Empty Bottle Box10
     Type: Cash
+    Category: Essential
     Buy: 20
     Sell: 10
     Weight: 10
@@ -89642,6 +90750,7 @@ Body:
     AegisName: Empty_Bottle_Box100
     Name: Empty Bottle Box100
     Type: Cash
+    Category: Essential
     Buy: 20
     Sell: 10
     Weight: 10
@@ -89651,6 +90760,7 @@ Body:
     AegisName: Empty_Bottle_Box500
     Name: Empty Bottle Box500
     Type: Cash
+    Category: Essential
     Buy: 20
     Sell: 10
     Weight: 10
@@ -90301,6 +91411,7 @@ Body:
     AegisName: Infinite_Flywing_Box
     Name: Infinite Flywing Box
     Type: Cash
+    Category: Supportive
     Buy: 10
     Sell: 5
     Weight: 10
@@ -109589,6 +110700,7 @@ Body:
     AegisName: Para_Team_Mark_
     Name: Eden Group Mark
     Type: Usable
+    Category: Supportive
     Script: |
       warp "moc_para01",171,115;
   - Id: 22510
@@ -109818,6 +110930,7 @@ Body:
     AegisName: Runstone_Lux
     Name: Lux Anima Runestone
     Type: Delayconsume
+    Category: Runestone
     Buy: 2
     Sell: 1
     Weight: 100
@@ -109834,6 +110947,7 @@ Body:
     AegisName: Center_Potion_B
     Name: Concentration Potion
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 100
@@ -109843,6 +110957,7 @@ Body:
     AegisName: Berserk_Potion_B
     Name: Berserk Potion
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 200
@@ -109853,6 +110968,7 @@ Body:
     AegisName: Awakening_Potion_B
     Name: Awakening Potion
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 150
@@ -109862,6 +110978,7 @@ Body:
     AegisName: Speed_Potion
     Name: Speed Potion
     Type: Usable
+    Category: Supportive
     Buy: 10
     Sell: 5
     Weight: 100
@@ -109871,6 +110988,7 @@ Body:
     AegisName: Slow_Potion
     Name: Slow Potion
     Type: Usable
+    Category: Supportive
     Buy: 10
     Sell: 5
     Weight: 100
@@ -109880,6 +110998,7 @@ Body:
     AegisName: Anti-Payne_Moment
     Name: Anti-Payne Moment
     Type: Usable
+    Category: Supportive
     Buy: 10
     Sell: 5
     Weight: 100
@@ -109887,6 +111006,7 @@ Body:
     AegisName: Wed_Cursed
     Name: Wed Cursed
     Type: Usable
+    Category: Supportive
     Buy: 10
     Sell: 5
     Weight: 30
@@ -109894,6 +111014,7 @@ Body:
     AegisName: Poison_Bottle_
     Name: Poison Bottle
     Type: Usable
+    Category: Skill necessity
     Buy: 10
     Sell: 5
     Weight: 100
@@ -109910,6 +111031,7 @@ Body:
     AegisName: Sesame_Pastry_B
     Name: Teacake
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 70
@@ -109917,6 +111039,7 @@ Body:
     AegisName: Honey_Pastry_B
     Name: Fried Pastry
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 70
@@ -109924,6 +111047,7 @@ Body:
     AegisName: Rainbow_Cake_B
     Name: Rainbow Bread
     Type: Usable
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 70
@@ -110303,6 +111427,7 @@ Body:
     AegisName: Cow_Steamed_Ribs
     Name: Cow Steamed Ribs
     Type: Healing
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 100
@@ -110312,6 +111437,7 @@ Body:
     AegisName: Pig_Steamed_Ribs
     Name: Pig Steamed Ribs
     Type: Healing
+    Category: Stat booster
     Buy: 20
     Sell: 10
     Weight: 100
@@ -110422,30 +111548,35 @@ Body:
     AegisName: Record_Fragment1
     Name: Record Fragment
     Type: Healing
+    Category: Quest
     Script: |
       warp "un_bk_q",98,143; if (callfunc("F_time_limit_recorder") == 1) { recorder_quest_type = 1; }
   - Id: 22692
     AegisName: Record_Fragment2
     Name: Record Fragment
     Type: Healing
+    Category: Quest
     Script: |
       warp "un_bk_q",45,276; if (callfunc("F_time_limit_recorder") == 1) { recorder_quest_type = 2; }
   - Id: 22693
     AegisName: Record_Fragment3
     Name: Record Fragment
     Type: Healing
+    Category: Quest
     Script: |
       warp "un_bk_q",217,346; if (callfunc("F_time_limit_recorder") == 1) { recorder_quest_type = 3; }
   - Id: 22694
     AegisName: Record_Fragment4
     Name: Record Fragment
     Type: Healing
+    Category: Quest
     Script: |
       warp "un_bk_q",273,235; if (callfunc("F_time_limit_recorder") == 1) { recorder_quest_type = 4; }
   - Id: 22695
     AegisName: Record_Fragment5
     Name: Record Fragment
     Type: Healing
+    Category: Quest
     Script: |
       warp "un_bk_q",275,290; if (callfunc("F_time_limit_recorder") == 1) { recorder_quest_type = 5; }
   - Id: 22699
@@ -110827,6 +111958,7 @@ Body:
     AegisName: Bluefin_Tuna_Skewer
     Name: Bluefin Tuna Skewer
     Type: Healing
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -110836,6 +111968,7 @@ Body:
     AegisName: Sea_Bream_Skewer
     Name: Sea Bream Skewer
     Type: Healing
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -110845,6 +111978,7 @@ Body:
     AegisName: Piranha_Skewer
     Name: Piranha Skewer
     Type: Healing
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -110854,6 +111988,7 @@ Body:
     AegisName: Salmon_Skewer
     Name: Salmon Skewer
     Type: Healing
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -110863,6 +111998,7 @@ Body:
     AegisName: Eels_Skewer
     Name: Eels Skewer
     Type: Healing
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -110872,6 +112008,7 @@ Body:
     AegisName: Carp_Skewer
     Name: Carp Skewer
     Type: Healing
+    Category: Stat booster
     Buy: 10
     Sell: 5
     Weight: 10
@@ -111546,6 +112683,7 @@ Body:
     AegisName: Small_Leather_Bag
     Name: Small Leather Bag
     Type: Usable
+    Category: Container
     Script: |
       getitem 25180,1; getitem 25181,1; getitem 25182,1; getitem 25183,1; getitem 25184,1; getitem 25185,1;
   - Id: 23123
@@ -111703,6 +112841,7 @@ Body:
     AegisName: N_Fly_Wing_
     Name: Novice Fly Wing
     Type: Delayconsume
+    Category: Supportive
     Buy: 10
     Sell: 5
     EquipLevelMax: 98
@@ -111712,6 +112851,7 @@ Body:
     AegisName: Compressed_Wing_Of_Fly
     Name: Compressed Fly Wing
     Type: Delayconsume
+    Category: Supportive
     Buy: 1000
     Sell: 500
     Weight: 10
@@ -111764,22 +112904,27 @@ Body:
   - Id: 25127
     AegisName: Silent_Energy_Particle
     Name: Silent Energy Particle
+    Category: Quest
     Flags: {BuyingStore: true}
   - Id: 25128
     AegisName: Weak_Energy_Particle
     Name: Weak Energy Particle
+    Category: Quest
     Flags: {BuyingStore: true}
   - Id: 25129
     AegisName: Unstable_Energy_Particle
     Name: Unstable Energy Particle
+    Category: Quest
     Flags: {BuyingStore: true}
   - Id: 25130
     AegisName: Sinister_Energy_Particle
     Name: Sinister Energy Particle
+    Category: Quest
     Flags: {BuyingStore: true}
   - Id: 25131
     AegisName: Fallen_Energy_Particle
     Name: Fallen Energy Particle
+    Category: Quest
     Flags: {BuyingStore: true}
   - Id: 25132
     AegisName: Pumpkin_Deco
@@ -111830,6 +112975,7 @@ Body:
   - Id: 25155
     AegisName: Swz_Honor_Token
     Name: Schwartz's Honor Token
+    Category: Valuable
   - Id: 25156
     AegisName: Piece_of_Chimera
     Name: Piece of Chimera
@@ -111873,24 +113019,31 @@ Body:
   - Id: 25179
     AegisName: Blessing_Star
     Name: Blessing Star
+    Category: Quest
   - Id: 25180
     AegisName: Old_Rings
     Name: Old Rings
+    Category: Quest
   - Id: 25181
     AegisName: Wood_Rosary
     Name: Wood Rosary
+    Category: Quest
   - Id: 25182
     AegisName: Assassins_Mark_Dagger
     Name: Assassin's Mark Dagger
+    Category: Quest
   - Id: 25183
     AegisName: Decorated_Archers_Thimble
     Name: Decorated Archer's Thimble
+    Category: Quest
   - Id: 25184
     AegisName: Portable_Sewingbox
     Name: Portable Sewingbox
+    Category: Quest
   - Id: 25185
     AegisName: Locket_Pendant
     Name: Locket Pendant
+    Category: Quest
   - Id: 25187
     AegisName: Slug_Bullet
     Name: Slug Bullet
@@ -111900,39 +113053,50 @@ Body:
   - Id: 25223
     AegisName: Para_Team_Coin
     Name: Eden Group Coin
+    Category: Valuable
   - Id: 25231
     AegisName: Suspicious_Bottle
     Name: Suspicious Bottle
+    Category: Pet Food
     Weight: 10
   - Id: 25232
     AegisName: Cheap_Lubricant
     Name: Cheap Lubricant
+    Category: Pet Food
     Weight: 10
   - Id: 25233
     AegisName: Cotton_Tufts
     Name: Cotton Tufts
+    Category: Pet Food
     Weight: 10
   - Id: 25238
     AegisName: New_Normal_Lubricant
     Name: New Normal Lubricant
+    Category: Valuable
   - Id: 25239
     AegisName: New_Advanced_Lubricant
     Name: New Advanced Lubricant
+    Category: Valuable
   - Id: 25246
     AegisName: Juice_Mix_Package
     Name: Juice Mix Package
+    Category: Quest
   - Id: 25247
     AegisName: Purple_Ore
     Name: Purple Ore
+    Category: Quest
   - Id: 25248
     AegisName: Purple_Ore_Crate
     Name: Purple Ore Crate
+    Category: Quest
   - Id: 25249
     AegisName: Buffalo_Bandit_Mane
     Name: Buffalo Bandit Mane
+    Category: Quest
   - Id: 25250
     AegisName: Rock_Ridge_Coin
     Name: Rock Ridge Coin
+    Category: Valuable
   - Id: 25256
     AegisName: Hazy_Dream_Fragment
     Name: Hazy Dream Fragment
@@ -111952,9 +113116,11 @@ Body:
   - Id: 25260
     AegisName: Fragment_of_Purple_Ore
     Name: Fragment of Purple Ore
+    Category: Quest
   - Id: 25271
     AegisName: Illusion_Stone
     Name: Illusion Stone
+    Category: Quest
     Buy: 10
     Sell: 5
   - Id: 25272
@@ -111964,54 +113130,65 @@ Body:
   - Id: 25276
     AegisName: Clean_Bone
     Name: Clean Bone
+    Category: Collectible
     Buy: 248
     Sell: 124
     Weight: 10
   - Id: 25277
     AegisName: Deadly_Poison_Powder
     Name: Deadly Poison Powder
+    Category: Collectible
     Weight: 10
   - Id: 25278
     AegisName: Bandits_Scarf
     Name: Bandit's Scarf
+    Category: Collectible
     Buy: 330
     Sell: 165
     Weight: 10
   - Id: 25279
     AegisName: Crude_Ammo
     Name: Crude Ammo
+    Category: Collectible
     Buy: 300
     Sell: 150
     Weight: 10
   - Id: 25280
     AegisName: Broken_Shotgun
     Name: Broken Shotgun
+    Category: Collectible
     Weight: 10
   - Id: 25281
     AegisName: Crude_Scimitar
     Name: Crude Scimitar
+    Category: Collectible
     Weight: 10
   - Id: 25282
     AegisName: Worn_Revolver
     Name: Worn Revolver
+    Category: Collectible
     Weight: 10
   - Id: 25283
     AegisName: Brown_Muffler
     Name: Brown Muffler
+    Category: Collectible
     Buy: 420
     Sell: 210
     Weight: 10
   - Id: 25284
     AegisName: Swamp_Bug_Shell
     Name: Swamp Bug Shell
+    Category: Collectible
     Weight: 10
   - Id: 25285
     AegisName: Brown_Rat_Tail
     Name: Brown Rat Tail
+    Category: Collectible
     Weight: 10
   - Id: 25290
     AegisName: Sweets_Festival_Coin
     Name: Sweets Festival Coin
+    Category: Valuable
   - Id: 25375
     AegisName: Powerful_Soul_Essence
     Name: Powerful Soul Essence
@@ -112020,6 +113197,7 @@ Body:
   - Id: 25377
     AegisName: Luxurious_Pet_Food
     Name: Luxurious Pet Food
+    Category: Pet Food
     Weight: 10
   - Id: 25464
     AegisName: World_Moving_Rights
@@ -118169,6 +119347,7 @@ Body:
   - Id: 30001
     AegisName: Moonlight_Coin
     Name: Moonlight Coin
+    Category: Collectible
     Buy: 2
     Sell: 1
     Weight: 10

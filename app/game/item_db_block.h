@@ -1,8 +1,9 @@
 #pragma once
 
-// LE BLOC DE FAITS D'UN OBJET, COMPOSÉ DEPUIS L'ITEM_DB DU SERVEUR : type,
-// attaque, défense, emplacement, ce que son script dit par motifs exacts
-// (élément, soin, guérison, durée, effet, capture), délai, familier, poids,
+// LE BLOC DE FAITS D'UN OBJET, COMPOSÉ DEPUIS L'ITEM_DB DU SERVEUR : type
+// qualifié (catégorie, drapeaux), attaque, défense, emplacement, ce que son
+// script dit par motifs exacts (élément, soin, guérison, durée, effet, dons et
+// invocations, capture), délai, familier, poids,
 // niveaux, raffinement, emplacements de carte, puis les prérequis — niveau,
 // jobs, classes, sexe.
 //
@@ -71,12 +72,40 @@ struct ItemDbNames {
 // parmi les jobs d'origine se dit par le complément. Traduit.
 [[nodiscard]] std::string JobsSummaryOf(const ro::vfs::ServerItem& item);
 
+// LE TYPE MONTRÉ : le type du bloc, puis la catégorie que la base porte
+// (`Category`, « Divers — Collectible »), puis, entre parenthèses, les
+// drapeaux qui qualifient le type — conteneur, invocation, non consommé. Un
+// drapeau que la catégorie dit déjà ne se répète pas. Traduit, sauf la
+// catégorie, texte de la description du jeu.
+[[nodiscard]] std::string QualifiedKind(std::string_view kind, const ro::vfs::ServerItem& item);
+
+// CE QU'UN DON OU UNE INVOCATION DU SCRIPT DÉSIGNE, et le texte de sa ligne
+// « Effet : ».
+enum class ItemDbGiftKind : std::uint8_t { kItem, kGroup, kRandomGroup, kSummon, kSummonGroup };
+
+struct ItemDbGiftEffect {
+  ItemDbGiftKind kind = ItemDbGiftKind::kItem;
+  // Zéro quand le groupe fixe le nombre.
+  std::uint32_t count = 0;
+  // Le nom lisible de l'objet, du monstre ou du groupe : « Blue Box ».
+  std::string name;
+  // La valeur de la ligne, balisage compris : un objet nommé y est un lien.
+  std::string text;
+};
+
+// Les dons et les invocations du script, dans l'ordre écrit : objets donnés
+// (lien vers l'objet), objets d'un groupe ou tirés dans un groupe, monstres
+// invoqués ou tirés dans un groupe. Le nom d'un groupe se lit dans sa
+// constante. Traduit.
+[[nodiscard]] std::vector<ItemDbGiftEffect> GiftEffectsOf(const ItemScriptFacts& facts,
+                                                          const ItemDbNames& names);
+
 // LES FAITS QUE DONNENT LE SCRIPT ET LA PET_DB (`item_script_facts.h`) :
 // élément d'attaque et d'armure, soin, états guéris, durée, effet des états
 // posés — les bonus que leur script dans la status_db de `names.db` donne,
-// quand chacun se lit entier —, délai de réutilisation, monstres capturés,
-// familier d'un œuf et sa nourriture, familiers qu'un objet nourrit ou qui le
-// portent. Traduit.
+// quand chacun se lit entier —, une ligne « Effet : » par don ou invocation,
+// délai de réutilisation, monstres capturés, familier d'un œuf et sa
+// nourriture, familiers qu'un objet nourrit ou qui le portent. Traduit.
 void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ro::vfs::ServerItem& item,
                              const ItemScriptFacts& facts, const ItemDbNames& names);
 

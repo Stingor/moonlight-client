@@ -83,6 +83,10 @@ struct ServerItem {
   std::string name;
   std::string type{kServerItemDefaultType};
   std::string sub_type;
+  // `Category` : un champ du CLIENT, que le serveur ne connaît pas — la
+  // catégorie que la description du jeu donne à l'objet (« Collectible »,
+  // « Cooked Food »), plus précise que son type. Vide sans elle.
+  std::string category;
   std::uint32_t buy_zeny = 0;
   std::uint32_t sell_zeny = 0;
   std::uint32_t weight_tenths = 0;
@@ -110,6 +114,8 @@ struct ServerItem {
   // `Delay: {Duration}` : le temps avant de pouvoir réemployer l'objet. Zéro :
   // aucun délai.
   std::uint32_t reuse_delay_ms = 0;
+  // Les drapeaux LEVÉS de `Flags`, dans l'ordre écrit : « Container »…
+  std::vector<std::string> flags;
   std::string script;
   std::string equip_script;
   std::string unequip_script;

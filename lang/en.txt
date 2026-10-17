@@ -18813,3 +18813,33 @@ tr: Adjust effect %zu
 
 fr: Retirer l'effet %zu
 tr: Remove effect %zu
+
+fr: %s — %s
+tr: %s — %s
+
+fr: %s (%s)
+tr: %s (%s)
+
+fr: Conteneur
+tr: Container
+
+fr: Invocation
+tr: Summoning
+
+fr: Non consommé
+tr: Not consumed
+
+fr: donne %u × %s
+tr: gives %u × %s
+
+fr: donne des items du groupe %s
+tr: gives items from group %s
+
+fr: donne %u item(s) au hasard (groupe %s)
+tr: gives %u random item(s) (group %s)
+
+fr: invoque %u × %s
+tr: summons %u × %s
+
+fr: invoque %u monstre(s) au hasard (groupe %s)
+tr: summons %u random monster(s) (group %s)
