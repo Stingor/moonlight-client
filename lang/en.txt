@@ -19335,3 +19335,9 @@ tr: Relief edit
 
 fr: Le relief retouché ne se voit qu'avec « Ombres en temps réel », page Graphics.
 tr: The edited relief only shows with “Real-time shadows”, Graphics page.
+
+fr: Coller
+tr: Paste
+
+fr: Ajouter une lumière ici
+tr: Add a light here

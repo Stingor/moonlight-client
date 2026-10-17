@@ -205,11 +205,13 @@ void MapEditorSession::ViewLights(const ro::mapedit::MapEdit& document,
   }
 }
 
-MapEditorSession::Outcome MapEditorSession::AddLight(MapEditStore& store) {
+MapEditorSession::Outcome MapEditorSession::AddLight(
+    const std::optional<std::array<float, 3>>& position, MapEditStore& store) {
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;
   after.AddLight(ro::mapedit::AddedLight{
-      .position = {drop_point_[0], drop_point_[1] - kNewLightHeight, drop_point_[2]},
+      .position = position.value_or(
+          std::array<float, 3>{drop_point_[0], drop_point_[1] - kNewLightHeight, drop_point_[2]}),
       .color = kNewLightColor,
       .range = kNewLightRange,
       .night_only = false,

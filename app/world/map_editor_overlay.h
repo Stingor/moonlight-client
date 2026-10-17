@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <optional>
 #include <vector>
 
 #include "ro/formats/gnd.h"
@@ -21,6 +22,11 @@ namespace moonclient {
 [[nodiscard]] std::vector<ro::ui::MapEditorLine> SelectionOutline(
     const ro::render::MapScene& scene, std::size_t rsw_rank, const ro::render::Camera& camera,
     float aspect_ratio, float viewport_width, float viewport_height);
+
+// LE CENTRE DE LA BOÎTE du modèle `rsw_rank`, dans le repère du RSW ; rien
+// pour un modèle qui ne se dessine pas.
+[[nodiscard]] std::optional<std::array<float, 3>> SelectionCenter(const ro::render::MapScene& scene,
+                                                                  std::size_t rsw_rank);
 
 // Le point de chaque effet de la carte — un objet d'effet du RSW, là où
 // l'édition le pose —, en pixels de fenêtre. Un effet derrière l'œil n'en a

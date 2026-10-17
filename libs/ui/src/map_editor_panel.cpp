@@ -17,6 +17,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/triple_clipboard.h"
 #include "ro/ui/wheel_drag.h"
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
@@ -383,11 +384,20 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
                           .hidden = view.hidden};
   bool changed = false;
   bool released = false;
+  // CHAQUE LIGNE SE COPIE ET SE COLLE, en texte : voir `CopyPasteTriple`. Un
+  // collage est un geste entier. La position se copie en cases, comme elle se
+  // montre.
+  bool pasted = false;
   {
     const WheelDragResult field =
         PositionInCells(core::Tr("Position (cases, hauteur)"), place.position, view.map_cubes);
     changed |= field.changed;
     released |= field.released;
+    std::array<float, 3> cells = CellsOfNative(place.position, view.map_cubes);
+    if (CopyPasteTriple("position", cells, art)) {
+      place.position = NativeOfCells(cells, view.map_cubes);
+      pasted = true;
+    }
   }
   for (const auto& [label, values, drag] :
        {std::tuple(core::Tr("Rotation (°)"), &place.rotation, &kRotationDrag),
@@ -395,8 +405,16 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
     const WheelDragResult field = WheelDragFloat3(label, *values, *drag);
     changed |= field.changed;
     released |= field.released;
+    pasted |= CopyPasteTriple(label, *values, art);
   }
-  const bool toggled = SkinCheckBox(core::Tr("Masquer"), &place.hidden, art);
+  const bool toggled = SkinCheckBox(core::Tr("Masquer"), &place.hidden, art) || pasted;
+  // UNE LUMIÈRE ANCRÉE AU MODÈLE, au centre de sa boîte : un lampion, une
+  // lanterne, un brasero s'allument d'un clic.
+  ImGui::SameLine();
+  if (SkinButton(core::Tr("Ajouter une lumière ici"), art)) {
+    intents.emplace_back(
+        map_editor::AddLight{.position = view.selected_center.value_or(view.position)});
+  }
   if (changed || released || toggled) {
     place.released = released || toggled || !ImGui::IsAnyItemActive();
     intents.emplace_back(place);

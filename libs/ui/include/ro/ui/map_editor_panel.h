@@ -204,6 +204,10 @@ struct MapEditorView {
   std::array<float, 3> position{};
   std::array<float, 3> rotation{};
   std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
+  // LE CENTRE DE LA BOÎTE du modèle désigné, dans le repère du RSW : là
+  // qu'« Ajouter une lumière ici » ancre la sienne — au cœur d'un lampion, et
+  // non à son pivot. Rien pour un modèle qui ne se dessine pas.
+  std::optional<std::array<float, 3>> selected_center;
   bool hidden = false;
   std::string why;
   // Les rangs que le document retouche sur cette carte.
@@ -337,8 +341,11 @@ struct MoveEffect {
 struct Nudge {
   std::array<float, 3> delta{};
 };
-// Ajouter une lumière ponctuelle, là où l'appelant pose ce qu'on ajoute.
-struct AddLight {};
+// Ajouter une lumière ponctuelle à `position`, dans le repère du RSW ; sans
+// position, là où l'appelant pose ce qu'on ajoute.
+struct AddLight {
+  std::optional<std::array<float, 3>> position;
+};
 // Régler la lumière de rang `slot`, ou plus aucune.
 struct SelectLight {
   std::optional<std::size_t> slot;

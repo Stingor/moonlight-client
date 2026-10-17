@@ -300,7 +300,7 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
         } else if constexpr (std::is_same_v<Asked, intents::Nudge>) {
           return Nudge(asked.delta, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
-          return AddLight(store);
+          return AddLight(asked.position, store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {
           ChooseLight(asked.slot);
           return {};

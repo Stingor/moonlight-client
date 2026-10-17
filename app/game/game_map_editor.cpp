@@ -171,6 +171,7 @@ void Game::ServeMapEditorTools() {
   const auto height = static_cast<float>(shell_.height());
   tools.map_editor.lines = SelectionOutline(stage_->scene, *map_editor_.selected(), camera_,
                                             aspect_ratio_, width, height);
+  tools.map_editor.selected_center = SelectionCenter(stage_->scene, *map_editor_.selected());
   if (map_editor_.tool() == ro::ui::MapEditorTool::kVertices) {
     ServeVertexTool(map_frame, width, height);
     return;

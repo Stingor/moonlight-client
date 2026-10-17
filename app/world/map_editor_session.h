@@ -239,7 +239,8 @@ class MapEditorSession {
   [[nodiscard]] std::optional<std::size_t> AddedSlot(const ro::render::MapScene& scene) const;
   void Save(MapEditStore& store);
   // LES LUMIÈRES PONCTUELLES : voir map_editor_lights.cpp.
-  Outcome AddLight(MapEditStore& store);
+  // Une lumière à `position`, ou au-dessus du point de pose sans position.
+  Outcome AddLight(const std::optional<std::array<float, 3>>& position, MapEditStore& store);
   Outcome SetLight(const ro::ui::map_editor::SetLight& set, MapEditStore& store);
   Outcome RemoveLight(std::size_t slot, MapEditStore& store);
   // LES LIGNES DE L'ARBRE DE LA SCÈNE, rebâties seulement quand le document, la

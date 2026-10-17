@@ -19335,3 +19335,9 @@ tr: Retoque del relieve
 
 fr: Le relief retouché ne se voit qu'avec « Ombres en temps réel », page Graphics.
 tr: El relieve retocado solo se ve con «Sombras en tiempo real», página Graphics.
+
+fr: Coller
+tr: Pegar
+
+fr: Ajouter une lumière ici
+tr: Añadir una luz aquí

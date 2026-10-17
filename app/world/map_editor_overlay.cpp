@@ -58,6 +58,23 @@ std::vector<ro::ui::MapEditorLine> SelectionOutline(const ro::render::MapScene& 
   return lines;
 }
 
+std::optional<std::array<float, 3>> SelectionCenter(const ro::render::MapScene& scene,
+                                                    std::size_t rsw_rank) {
+  const std::optional<ro::render::ScenePose> pose = ro::render::FindScenePose(scene, rsw_rank);
+  if (!pose.has_value()) {
+    return std::nullopt;
+  }
+  glm::vec3 sum{0.0F};
+  const std::array<glm::vec3, 8> corners = ro::render::PoseCorners(*pose);
+  for (const glm::vec3& corner : corners) {
+    sum += corner;
+  }
+  const glm::vec3 native =
+      ro::render::MapEffectFrame{scene.gnd.width(), scene.gnd.height()}.ToNative(
+          sum / static_cast<float>(corners.size()));
+  return std::array<float, 3>{native.x, native.y, native.z};
+}
+
 std::vector<MapEditorSession::LightDot> LightDots(const ro::ui::MapEditorView& view,
                                                   const ro::render::MapScene& scene,
                                                   const ro::render::Camera& camera,
