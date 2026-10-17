@@ -20,11 +20,10 @@
 #include "ro/ui/wheel_gate.h"
 
 #include "character_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Les quatre rangées de cases donnent leur hauteur à l'avatar. ⚠ LA MÊME SUR
 // LES DEUX ONGLETS : l'onglet Costume ne montre que deux rangées, mais l'avatar

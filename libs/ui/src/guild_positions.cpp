@@ -16,6 +16,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -93,21 +94,21 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
   const auto flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter |
                      ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_ScrollY;
   // La place des boutons du bas, pour le maître seul.
-  const float reserved = view.master ? SkinFooterHeight(art) + GuildPx(kButtonsSlackPixels) : 0.0F;
+  const float reserved = view.master ? SkinFooterHeight(art) + Px(kButtonsSlackPixels) : 0.0F;
   const float rows_height =
-      std::max(GuildPx(kRowsLeastPixels), ImGui::GetContentRegionAvail().y - reserved);
+      std::max(Px(kRowsLeastPixels), ImGui::GetContentRegionAvail().y - reserved);
   if (ImGui::BeginTable("postes", kPositionColumnCount, flags, ImVec2(0.0F, rows_height))) {
     ImGui::TableSetupScrollFreeze(0, 1);
-    ImGui::TableSetupColumn("#", ImGuiTableColumnFlags_WidthFixed, GuildPx(kNumberColumnPixels));
+    ImGui::TableSetupColumn("#", ImGuiTableColumnFlags_WidthFixed, Px(kNumberColumnPixels));
     ImGui::TableSetupColumn(core::Tr("Nom"), ImGuiTableColumnFlags_WidthStretch);
     ImGui::TableSetupColumn(core::Tr("Inviter"), ImGuiTableColumnFlags_WidthFixed,
-                            GuildPx(kInviteColumnPixels));
+                            Px(kInviteColumnPixels));
     ImGui::TableSetupColumn(core::Tr("Expulser"), ImGuiTableColumnFlags_WidthFixed,
-                            GuildPx(kExpelColumnPixels));
+                            Px(kExpelColumnPixels));
     ImGui::TableSetupColumn(core::Tr("Storage"), ImGuiTableColumnFlags_WidthFixed,
-                            GuildPx(kStorageColumnPixels));
+                            Px(kStorageColumnPixels));
     ImGui::TableSetupColumn(core::Tr("Part exp"), ImGuiTableColumnFlags_WidthFixed,
-                            GuildPx(kPayColumnPixels));
+                            Px(kPayColumnPixels));
     ImGui::TableHeadersRow();
     for (std::size_t index = 0; index < state.positions.size() && index < view.positions.size();
          ++index) {

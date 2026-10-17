@@ -12,6 +12,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -31,8 +33,6 @@ constexpr float kHatchButtonPixels = 110.0F;
 constexpr float kCancelButtonPixels = 80.0F;
 
 constexpr const char* kWindowId = "###pet_hatch_window";
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 void TextColored(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, color);

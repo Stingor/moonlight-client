@@ -6,11 +6,10 @@
 #include "ro/ui/skin_art.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-// L'échelle courante de l'interface : elle décide de la taille des pièces.
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Blitte une pièce du cadre au papier dans un rectangle, ou rien sans l'art.
 void Blit(ImDrawList* into, const SkinArt& art, const SkinImage& piece, ImVec2 from, ImVec2 to) {

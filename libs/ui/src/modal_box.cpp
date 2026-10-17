@@ -10,6 +10,8 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -29,8 +31,6 @@ constexpr float kBoxWidthPixels = 300.0F;
 // Ce qui sépare le texte du cadre, et le texte des boutons.
 constexpr float kBoxPaddingPixels = 14.0F;
 constexpr float kQuestionGapPixels = 10.0F;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] bool Paintable(const SkinArt& art) {
   return std::ranges::all_of(kFramePieces,

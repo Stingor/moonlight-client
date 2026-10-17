@@ -11,11 +11,10 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "character_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Ce qui sépare la colonne des libellés de celle des valeurs.
 constexpr float kStatValueGap = 12.0F;

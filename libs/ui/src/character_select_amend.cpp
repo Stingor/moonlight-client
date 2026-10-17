@@ -10,6 +10,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -30,8 +32,6 @@ constexpr float kNameFieldPoints = 220.0F;
 constexpr ImU32 kRefusalColor = IM_COL32(255, 96, 96, 255);
 constexpr ImU32 kPendingColor = IM_COL32(216, 209, 115, 255);
 constexpr ImU32 kWarningColor = IM_COL32(200, 60, 60, 255);
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 }  // namespace
 

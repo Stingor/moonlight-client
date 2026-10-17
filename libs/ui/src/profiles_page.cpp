@@ -10,14 +10,14 @@
 #include "ro/ui/list_keys.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
 // La largeur de la liste et du champ du nom, en pixels d'interface.
 constexpr float kFieldPixels = 200.0F;
 constexpr std::size_t kLineBytes = 160;
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] bool InRange(const ProfilesPageView& view, int rank) {
   return rank >= 0 && static_cast<std::size_t>(rank) < view.labels.size() &&

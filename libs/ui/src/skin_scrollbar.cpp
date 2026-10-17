@@ -6,12 +6,10 @@
 
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-// L'échelle courante : c'est elle qui décide de la taille des pièces, comme
-// elle décide de celle du texte.
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES DE L'ASCENSEUR ──────────────────────────────────────────────
 //

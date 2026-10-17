@@ -14,6 +14,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -41,8 +43,6 @@ constexpr ImVec4 kQuietColor{0.60F, 0.60F, 0.60F, 1.0F};
 constexpr float kGaugeLines = 0.5F;
 // L'écart entre les libellés et la colonne des valeurs, en espacements.
 constexpr float kColumnGaps = 2.0F;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] ImVec4 HardModeColor(int hard_mode) {
   const float span = static_cast<float>(kHardModeHardest - kHardModeEasiest);

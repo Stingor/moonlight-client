@@ -20,6 +20,7 @@
 #include "ro/ui/window_name.h"
 
 #include "entry_queue_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -51,8 +52,6 @@ using Text = std::array<char, kTextCapacity>;
 
 constexpr std::uint32_t kSecondsPerMinute = 60;
 constexpr std::uint32_t kSecondsPerHour = 3600;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] std::string Owned(std::string_view text) { return std::string(text); }
 

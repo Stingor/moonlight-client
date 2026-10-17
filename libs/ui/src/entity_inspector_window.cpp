@@ -10,10 +10,10 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES ─────────────────────────────────────────────────────────────
 constexpr float kFirstWidthPixels = 380.0F;

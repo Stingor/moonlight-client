@@ -10,10 +10,10 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // La largeur du champ, en points d'interface : une adresse
 // de courriel est longue, et la voir en entier fait partie de la vérification.

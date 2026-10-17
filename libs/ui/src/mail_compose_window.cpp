@@ -17,11 +17,10 @@
 
 #include "item_grid.h"
 #include "mail_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-using mail::Scale;
 
 // ── LES MESURES ─────────────────────────────────────────────────────────────
 //

@@ -13,10 +13,10 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES POIGNÉES ─────────────────────────────────────────────────────────────
 constexpr float kAnchorGrabPixels = 18.0F;

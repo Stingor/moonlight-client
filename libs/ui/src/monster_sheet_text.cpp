@@ -24,8 +24,6 @@ constexpr std::size_t kPrintedBytes = 256;
 
 }  // namespace
 
-float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
-
 const char* BossBadge(std::uint8_t rank) {
   if (rank == kBossRankMini) {
     return core::Tr("Mini-boss");

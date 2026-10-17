@@ -10,9 +10,6 @@
 // l'ordre ; les lignes et les boîtes décident du contenu.
 namespace ro::ui {
 
-// Une longueur de référence, mise à l'échelle de l'interface.
-[[nodiscard]] float PartyPx(float pixels);
-
 // Le membre qui porte le joueur, ou nul.
 [[nodiscard]] const PartyMemberView* PartyMe(const PartyFriendView& view);
 

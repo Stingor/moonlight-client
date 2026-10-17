@@ -6,10 +6,10 @@
 
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // LE DÉCALAGE PROPRE À CHAQUE TYPE, dans sa case : de combien le bouton glisse
 // à droite, et à quelle hauteur de sa rangée il commence. Le client le règle

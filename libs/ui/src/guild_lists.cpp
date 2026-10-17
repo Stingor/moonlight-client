@@ -9,6 +9,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -42,10 +43,10 @@ void DrawGuildRelations(GuildTabState& state, const GuildView& view, const SkinA
         state.ask_relation = true;
       };
       ImGui::PushID(static_cast<int>(index));
-      const float cross = GuildPx(kCrossPixels);
-      const float width = std::max(
-          GuildPx(kRowLeastPixels),
-          ImGui::GetContentRegionAvail().x - (may_break ? cross + GuildPx(kCrossGapPixels) : 0.0F));
+      const float cross = Px(kCrossPixels);
+      const float width =
+          std::max(Px(kRowLeastPixels), ImGui::GetContentRegionAvail().x -
+                                            (may_break ? cross + Px(kCrossGapPixels) : 0.0F));
       const std::string name(relation.name);
       ImGui::Selectable(name.c_str(), false, 0, ImVec2(width, 0.0F));
       if (may_break) {
@@ -94,7 +95,7 @@ void DrawGuildBans(const GuildView& view) {
     return;
   }
   ImGui::TableSetupColumn(core::Tr("Personnage"), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kBanNameColumnPixels));
+                          Px(kBanNameColumnPixels));
   ImGui::TableSetupColumn(core::Tr("Motif"), ImGuiTableColumnFlags_WidthStretch);
   ImGui::TableHeadersRow();
   for (const GuildBanView& ban : view.bans) {

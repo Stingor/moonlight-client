@@ -13,10 +13,10 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // UNE LIGNE : l'icône et le nom à gauche, le matériau et sa quantité à droite.
 void DrawRow(const RepairRowView& row, ImVec2 top, float right_edge, float scale, ImU32 text) {

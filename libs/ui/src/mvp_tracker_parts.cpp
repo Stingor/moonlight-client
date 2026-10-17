@@ -19,6 +19,8 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 
 namespace {
@@ -28,7 +30,6 @@ using mvp_tracker::kMvpCollapsedWindowFreshS;
 using mvp_tracker::kMvpSecondsPerHour;
 using mvp_tracker::kMvpSecondsPerMinute;
 using mvp_tracker::Printed;
-using mvp_tracker::Px;
 
 // Une heure saisie tient en quatre chiffres au plus : « hhmm », ou « hmm ».
 constexpr std::size_t kKillTimeMostDigits = 4;

@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 #include "party_grid_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -22,8 +23,6 @@ constexpr int kPercentScale = 100;
 constexpr std::size_t kCaptionBytes = 48;
 // Arrondi au plus proche d'un nombre de colonnes déduit d'une largeur.
 constexpr float kNearestColumn = 0.5F;
-
-[[nodiscard]] float InterfaceScale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] bool Inside(ImVec2 point, ImVec2 top_left, ImVec2 bottom_right) {
   return point.x >= top_left.x && point.y >= top_left.y && point.x < bottom_right.x &&
@@ -155,7 +154,7 @@ PartyGridAnswer DrawPartyGrid(const PartyGridView& view, PartyGridLook& look, Pa
     return answer;
   }
 
-  const float scale = InterfaceScale();
+  const float scale = Scale();
   const PartyGridLayout layout = PartyGridLayoutOf(look, shown.size(), scale);
   // La largeur suit la souris pendant qu'on tire le cadre ; relâché, elle
   // reprend la valeur que les colonnes déduites donnent. La hauteur suit

@@ -7,9 +7,6 @@
 
 namespace ro::ui::commands_page {
 
-// Ce qu'une mesure en pixels vaut à l'échelle de l'interface.
-[[nodiscard]] float Px(float pixels);
-
 // Une case d'un réglage de commande, son marqueur d'aide à la suite.
 void Toggle(const char* label, bool value, const char* help, CommandsField field,
             const SkinArt& art, CommandsPageAction& asked);

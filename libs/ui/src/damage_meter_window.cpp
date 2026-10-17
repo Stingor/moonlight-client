@@ -12,6 +12,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "damage_meter_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -21,7 +22,6 @@ using damage_meter::kLabelTextScale;
 using damage_meter::kUnitTextScale;
 using damage_meter::NumberFont;
 using damage_meter::PaintText;
-using damage_meter::Px;
 using damage_meter::TextWidth;
 using damage_meter::Tint;
 

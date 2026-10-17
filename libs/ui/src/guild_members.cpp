@@ -15,6 +15,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -223,7 +224,7 @@ void DrawMemberRow(GuildTabState& state, const GuildView& view, const GuildMembe
     state.selected_char = member.char_id;
   }
   if (member.online) {
-    DrawHead(member.head, ImVec2(cell.x, cell.y - GuildPx(kHeadRisePixels)), row_height);
+    DrawHead(member.head, ImVec2(cell.x, cell.y - Px(kHeadRisePixels)), row_height);
   }
   DrawMemberMenu(state, view, member, positions, action);
 
@@ -273,18 +274,17 @@ void DrawGuildMembers(GuildTabState& state, const GuildView& view, float list_he
   ImGui::TableSetupColumn(core::Tr("Nom"),
                           ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultSort);
   ImGui::TableSetupColumn(core::Tr("Classe"), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kJobColumnPixels));
-  ImGui::TableSetupColumn(core::Tr("Nv"), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kLevelColumnPixels));
+                          Px(kJobColumnPixels));
+  ImGui::TableSetupColumn(core::Tr("Nv"), ImGuiTableColumnFlags_WidthFixed, Px(kLevelColumnPixels));
   ImGui::TableSetupColumn(core::Tr("Poste"), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kPositionColumnPixels));
+                          Px(kPositionColumnPixels));
   ImGui::TableSetupColumn(core::Tr("Contrib."), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kContributionColumnPixels));
+                          Px(kContributionColumnPixels));
   ImGui::TableSetupColumn(core::Tr("Connexion"), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kLoginColumnPixels));
+                          Px(kLoginColumnPixels));
   ImGui::TableHeadersRow();
   SortMembers(state, view.members);
-  const float row_height = ImGui::GetTextLineHeight() + GuildPx(kHeadRowSlackPixels);
+  const float row_height = ImGui::GetTextLineHeight() + Px(kHeadRowSlackPixels);
   for (const int rank : state.member_order) {
     DrawMemberRow(state, view, view.members[static_cast<std::size_t>(rank)], positions, row_height,
                   action);

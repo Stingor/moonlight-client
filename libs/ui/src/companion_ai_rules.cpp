@@ -19,6 +19,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "companion_ai_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::companion_ai_parts {
 
@@ -50,8 +51,6 @@ constexpr float kSearchedListPixels = 380.0F;
 // qu'elle continue.
 constexpr std::size_t kSearchedRowsShown = 14;
 constexpr float kSearchedRowsMargin = 0.5F;
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 }  // namespace
 

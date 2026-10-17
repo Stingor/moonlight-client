@@ -18,6 +18,7 @@
 
 #include "monster_sheet_parts.h"
 #include "table_cells.h"
+#include "ui_scale.h"
 
 namespace ro::ui::monster_sheet {
 namespace {

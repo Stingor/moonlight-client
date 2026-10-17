@@ -18,6 +18,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "craft_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -25,7 +26,6 @@ namespace {
 using craft_parts::BulletWrapped;
 using craft_parts::ColoredText;
 using craft_parts::ColoredWrapped;
-using craft_parts::Px;
 
 // ── LES MESURES, en pixels d'interface ──────────────────────────────────────
 constexpr float kWindowPixels = 320.0F;

@@ -17,12 +17,12 @@
 #include "ro/ui/skinned_window.h"
 
 #include "chat_room_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
 
 using chat_room::Owned;
-using chat_room::Scale;
 using chat_room::Typed;
 
 // Les mesures de la salle.

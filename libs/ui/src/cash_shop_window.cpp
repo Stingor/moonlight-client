@@ -17,10 +17,10 @@
 #include "ro/ui/trade_widgets.h"
 #include "ro/ui/wheel_gate.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES, en pixels d'interface ──────────────────────────────────────
 // La place de la toute première ouverture ; ImGui retient ensuite celle du joueur.

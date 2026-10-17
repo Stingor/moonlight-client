@@ -22,8 +22,6 @@
 // position fixe, pas une disposition qui coule.
 namespace ro::ui::achievement {
 
-[[nodiscard]] inline float Scale() { return ImGui::GetStyle().FontScaleMain; }
-
 // ── LES COULEURS ────────────────────────────────────────────────────────────
 
 inline constexpr ImU32 kWhite = IM_COL32(0xFF, 0xFF, 0xFF, 0xFF);

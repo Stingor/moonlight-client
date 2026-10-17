@@ -16,6 +16,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "navigation_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -231,7 +232,7 @@ bool TrailIconButton(const NavigationWindowState& state, const NavigationView& v
 void DrawTrailPicker(NavigationWindowState& state, const NavigationView& view, const SkinArt& art,
                      NavigationAnswer& answer) {
   state.trail_icon = std::clamp(state.trail_icon, 1, kNavigationTrailIconCount);
-  if (TrailIconButton(state, view, art, state.trail_icon, NavigationPx(kCurrentIconPixels),
+  if (TrailIconButton(state, view, art, state.trail_icon, Px(kCurrentIconPixels),
                       "##navi_icon_cur")) {
     ImGui::OpenPopup(kIconPopupId);
   }
@@ -242,7 +243,7 @@ void DrawTrailPicker(NavigationWindowState& state, const NavigationView& view, c
   for (int icon = 1; icon <= kNavigationTrailIconCount; ++icon) {
     std::array<char, kIdBytes> id{};
     std::snprintf(id.data(), id.size(), "##navi_icon%d", icon);
-    if (TrailIconButton(state, view, art, icon, NavigationPx(kPickedIconPixels), id.data())) {
+    if (TrailIconButton(state, view, art, icon, Px(kPickedIconPixels), id.data())) {
       state.trail_icon = icon;
       answer.trail_icon = icon;
       ImGui::CloseCurrentPopup();
@@ -289,7 +290,7 @@ void DrawRoute(NavigationWindowState& state, const NavigationView& view, const S
 
 // La place de l'itinéraire : une hauteur de base, plus une ligne par ajout.
 [[nodiscard]] float FooterHeight(const NavigationView& view) {
-  float height = NavigationPx(kFooterPixels);
+  float height = Px(kFooterPixels);
   const float line = ImGui::GetTextLineHeightWithSpacing();
   if (view.route.distance_cells >= 0) {
     height += line;
@@ -321,14 +322,14 @@ void DrawBody(NavigationWindowState& state, const NavigationView& view, const Sk
   ImGui::Separator();
 
   const float footer = FooterHeight(view);
-  const float detail_width = NavigationPx(kDetailWidthPixels);
+  const float detail_width = Px(kDetailWidthPixels);
   if (ImGui::BeginChild("##navi_results", ImVec2(-detail_width, -footer),
                         ImGuiChildFlags_Borders)) {
     DrawNavigationResults(state, view, answer);
   }
   ImGui::EndChild();
   ImGui::SameLine();
-  state.preview_side = NavigationPx(kNavigationPreviewPixels);
+  state.preview_side = Px(kNavigationPreviewPixels);
   if (ImGui::BeginChild("##navi_detail", ImVec2(0.0F, -footer), ImGuiChildFlags_Borders)) {
     DrawNavigationDetail(state, view, art, answer);
   }
@@ -338,8 +339,6 @@ void DrawBody(NavigationWindowState& state, const NavigationView& view, const Sk
 }
 
 }  // namespace
-
-float NavigationPx(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 bool NavigationGroupShown(NavigationFilter filter, NavigationKind kind) {
   switch (filter) {
@@ -467,12 +466,11 @@ NavigationAnswer DrawNavigationWindow(NavigationWindowState& state, const Naviga
     state.raise = false;
   }
   const ImGuiViewport* screen = ImGui::GetMainViewport();
-  ImGui::SetNextWindowPos(ImVec2(screen->WorkPos.x + NavigationPx(kFirstLeftPixels),
-                                 screen->WorkPos.y + NavigationPx(kFirstTopPixels)),
-                          ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(
-      ImVec2(NavigationPx(kFirstWidthPixels), NavigationPx(kFirstHeightPixels)),
+  ImGui::SetNextWindowPos(
+      ImVec2(screen->WorkPos.x + Px(kFirstLeftPixels), screen->WorkPos.y + Px(kFirstTopPixels)),
       ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(Px(kFirstWidthPixels), Px(kFirstHeightPixels)),
+                           ImGuiCond_FirstUseEver);
   // ⚠ L'IDENTITÉ, PAS LE TITRE : la place se retient sous un nom qui ne dépend
   // pas de la langue.
   const std::string title = std::string(core::Tr("Navigation")) + "###" + kNavigationWindowId;

@@ -19,6 +19,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/wheel_gate.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -33,8 +35,6 @@ constexpr float kArrowSidePixels = 16.0F;
 constexpr float kFallbackArrowHalfWidth = 3.0F;
 constexpr float kFallbackArrowRise = 2.0F;
 constexpr float kFallbackArrowDrop = 3.0F;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Le bouton flèche : la largeur de son art, ou celle du repli.
 [[nodiscard]] float ArrowWidth(const SkinArt& art) {

@@ -13,8 +13,6 @@
 // `src/`, rien hors de cette couche n'en a besoin.
 namespace ro::ui::chat_room {
 
-[[nodiscard]] inline float Scale() { return ImGui::GetStyle().FontScaleMain; }
-
 // Un mot du client, terminé par son zéro : ImGui veut une chaîne C.
 [[nodiscard]] inline std::string Owned(std::string_view text) { return std::string(text); }
 

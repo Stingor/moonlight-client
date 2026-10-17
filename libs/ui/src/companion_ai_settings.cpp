@@ -16,6 +16,7 @@
 #include "ro/ui/staff_skill_id.h"
 
 #include "companion_ai_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::companion_ai_parts {
 namespace {
@@ -47,8 +48,6 @@ constexpr std::array<const char*, kTacticRankChoices> kRankLabels = {
 constexpr std::array<const char*, kTacticTriggerChoices> kTriggerLabels = {
     core::TrText("Toujours"), core::TrText("S'il attaque"),
     core::TrText("S'il attaque le compagnon")};
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 // L'INFOBULLE D'UN RÉGLAGE QUI DÉPEND D'UN AUTRE : grisé quand l'autre le rend
 // sans effet, il dit alors pourquoi. ⚠ LE SURVOL SE TESTE MÊME GRISÉ, sans

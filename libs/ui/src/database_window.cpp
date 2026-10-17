@@ -18,6 +18,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/trade_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 
 // La place du texte d'une liste de filtre fermée : un nom et une entrée.
@@ -32,8 +34,6 @@ std::string DatabaseFilterShown(const char* filter_name, int chosen,
 }
 
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 constexpr float kWindowWidthPixels = 940.0F;
 constexpr float kWindowHeightPixels = 600.0F;

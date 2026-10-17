@@ -19,6 +19,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -45,8 +47,6 @@ constexpr std::size_t kMostHostBytes = 253;
 // habillée pousse ses propres couleurs par-dessus, qu'il ne faut pas dépiler à
 // sa place.
 constexpr ImU32 kNoVeil = IM_COL32(0, 0, 0, 0);
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Un texte replié, dans une couleur.
 void WrappedText(std::string_view text, ImU32 color) {

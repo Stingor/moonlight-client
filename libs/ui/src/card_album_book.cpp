@@ -16,6 +16,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "card_album_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::card_album {
 namespace {

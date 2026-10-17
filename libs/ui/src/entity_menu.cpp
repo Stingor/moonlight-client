@@ -12,6 +12,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -35,8 +37,6 @@ const ImVec4 kAsideColor(0.35F, 0.35F, 0.35F, 1.0F);
 
 // Assez pour un nom de personnage et sa phrase.
 constexpr std::size_t kLineBytes = 256;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // 🔴 LE TITRE VISIBLE DÉPEND DE LA QUESTION, L'IDENTITÉ NON : seul ce qui suit
 // `###` est haché. Une seule boîte sert donc toutes les questions, et les trois

@@ -90,9 +90,6 @@ inline constexpr float kPillPaddingX = 4.0F;
 inline constexpr float kPillPaddingY = 1.0F;
 inline constexpr float kPillRounding = 3.0F;
 
-[[nodiscard]] inline float Scale() { return achievement::Scale(); }
-[[nodiscard]] inline float Px(float pixels) { return pixels * Scale(); }
-
 [[nodiscard]] inline float PillWidth(const Painter& paint, std::string_view text, float size) {
   return paint.TextWidth(text, size) + 2.0F * kPillPaddingX;
 }

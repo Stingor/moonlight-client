@@ -17,6 +17,7 @@
 #include "ro/ui/window_bounds.h"
 
 #include "mvp_tracker_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 

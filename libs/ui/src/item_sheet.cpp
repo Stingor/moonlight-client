@@ -20,6 +20,7 @@
 
 #include "description_odds.h"
 #include "table_cells.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -36,8 +37,6 @@ constexpr std::array<ItemSheetTab, 8> kTabs = {
     ItemSheetTab::kMonsters,    ItemSheetTab::kBoss,    ItemSheetTab::kScript,
     ItemSheetTab::kCombos,      ItemSheetTab::kSellers,
 };
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 void TextOf(std::string_view text) {
   ImGui::TextUnformatted(text.data(), text.data() + text.size());

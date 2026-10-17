@@ -10,10 +10,10 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Ce dont la barre se décolle du haut de l'écran et de la grille d'icônes, la
 // toute première fois.

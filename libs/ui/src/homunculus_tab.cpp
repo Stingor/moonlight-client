@@ -24,6 +24,7 @@
 #include "ro/ui/staff_skill_id.h"
 
 #include "homunculus_staff.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -65,8 +66,6 @@ constexpr int kHomunculusIntimacyGaugeMost = 1000;
 constexpr int kStatColumns = 4;
 constexpr int kStatRows = 8;
 constexpr int kSkillColumns = 3;
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 void TextColored(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, color);

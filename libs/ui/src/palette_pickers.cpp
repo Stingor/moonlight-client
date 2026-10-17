@@ -9,11 +9,10 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "thumbnail_grid.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES GRILLES DE VIGNETTES ────────────────────────────────────────────────
 //

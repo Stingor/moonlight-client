@@ -7,9 +7,6 @@ namespace ro::ui {
 // Le côté de l'aperçu du détail, en pixels d'interface.
 inline constexpr float kNavigationPreviewPixels = 150.0F;
 
-// Des pixels de référence, à l'échelle de l'interface.
-[[nodiscard]] float NavigationPx(float pixels);
-
 // Le groupe passe-t-il le filtre des pastilles ?
 [[nodiscard]] bool NavigationGroupShown(NavigationFilter filter, NavigationKind kind);
 

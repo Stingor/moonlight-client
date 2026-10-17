@@ -16,6 +16,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "commands_page_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::commands_page {
 namespace {

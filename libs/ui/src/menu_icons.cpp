@@ -10,6 +10,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_bounds.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -81,8 +83,6 @@ constexpr ImU32 kDotRing = IM_COL32(255, 255, 255, 255);
 // Un octet de SUITE en UTF-8 s'écrit `10xxxxxx`.
 constexpr unsigned kUtf8LeadMask = 0xC0U;
 constexpr unsigned kUtf8Continuation = 0x80U;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // L'IMAGE À PEINDRE pour cet état, et si c'est le « nouveau ». Elle est vide
 // quand l'installation n'a pas l'icône.

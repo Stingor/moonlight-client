@@ -13,11 +13,10 @@
 #include "ro/ui/skinned_window.h"
 
 #include "chat_input_chips.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // LE BORD SAUTE PAR PAS, entre ses deux bornes : c'est la conduite de la
 // fenêtre du client, et c'est ce qui garde le fil aligné sur ses rangées.

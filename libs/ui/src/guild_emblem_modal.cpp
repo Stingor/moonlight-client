@@ -15,6 +15,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -34,15 +35,14 @@ constexpr float kResumePixels = 160.0F;
 constexpr float kClosePixels = 90.0F;
 
 void CloseButton(const SkinArt& art) {
-  if (SkinButton(core::Tr("Fermer"), art, ImVec2(GuildPx(kClosePixels), 0.0F))) {
+  if (SkinButton(core::Tr("Fermer"), art, ImVec2(Px(kClosePixels), 0.0F))) {
     ImGui::CloseCurrentPopup();
   }
 }
 
 void DrawFileList(GuildTabState& state, const GuildView& view) {
-  const float row =
-      std::max(ImGui::GetTextLineHeight() + GuildPx(kRowSlackPixels), GuildPx(kRowLeastPixels));
-  const float item = row - GuildPx(kRowInsetPixels);
+  const float row = std::max(ImGui::GetTextLineHeight() + Px(kRowSlackPixels), Px(kRowLeastPixels));
+  const float item = row - Px(kRowInsetPixels);
   // LA HAUTEUR EXACTE DU CONTENU : la calculer au jugé faisait paraître un
   // ascenseur dès la première ligne, qui décalait tout le contenu.
   const ImGuiStyle& style = ImGui::GetStyle();
@@ -51,8 +51,8 @@ void DrawFileList(GuildTabState& state, const GuildView& view) {
                        static_cast<float>(rows - 1) * style.ItemSpacing.y +
                        style.WindowPadding.y * 2.0F + style.ChildBorderSize * 2.0F;
   if (ImGui::BeginChild("fichiers", ImVec2(0.0F, height), ImGuiChildFlags_Borders)) {
-    const float thumb = row - GuildPx(kThumbInsetPixels);
-    const float text_x = thumb + GuildPx(kTextAfterThumbPixels);
+    const float thumb = row - Px(kThumbInsetPixels);
+    const float text_x = thumb + Px(kTextAfterThumbPixels);
     for (std::size_t index = 0; index < view.emblem_files.size(); ++index) {
       const EmblemFileView& file = view.emblem_files[index];
       ImGui::PushID(static_cast<int>(index));
@@ -71,7 +71,7 @@ void DrawFileList(GuildTabState& state, const GuildView& view) {
       }
       ImDrawList* into = ImGui::GetWindowDrawList();
       if (file.preview.usable()) {
-        const ImVec2 low(at.x + GuildPx(kRowInsetPixels), at.y + (item - thumb) * 0.5F);
+        const ImVec2 low(at.x + Px(kRowInsetPixels), at.y + (item - thumb) * 0.5F);
         const ImVec2 high(low.x + thumb, low.y + thumb);
         into->AddImage(file.preview.id, low, high);
         into->AddRect(low, high, kThumbBorder);
@@ -126,13 +126,13 @@ void DrawFileTab(GuildTabState& state, const GuildView& view, const SkinArt& art
   ImGui::Spacing();
   const bool may_send = chosen != nullptr && chosen->usable && view.guild_id > 0;
   ImGui::BeginDisabled(!may_send);
-  if (SkinButton(core::Tr("Envoyer"), art, ImVec2(GuildPx(kSendPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Envoyer"), art, ImVec2(Px(kSendPixels), 0.0F))) {
     action.verb = GuildVerb::kUploadEmblemFile;
     action.file = chosen_index;
   }
   ImGui::EndDisabled();
   ImGui::SameLine();
-  if (SkinButton(core::Tr("Relire le dossier"), art, ImVec2(GuildPx(kRescanPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Relire le dossier"), art, ImVec2(Px(kRescanPixels), 0.0F))) {
     action.verb = GuildVerb::kScanEmblemFolder;
     state.emblem.chosen_file = -1;
     state.emblem.error.clear();
@@ -140,7 +140,7 @@ void DrawFileTab(GuildTabState& state, const GuildView& view, const SkinArt& art
   ImGui::SameLine();
   // La passerelle vers l'éditeur : retoucher un emblème plutôt que le refaire.
   ImGui::BeginDisabled(chosen == nullptr || chosen->bytes == 0);
-  if (SkinButton(core::Tr("Reprendre au dessin"), art, ImVec2(GuildPx(kResumePixels), 0.0F))) {
+  if (SkinButton(core::Tr("Reprendre au dessin"), art, ImVec2(Px(kResumePixels), 0.0F))) {
     action.verb = GuildVerb::kLoadFileIntoCanvas;
     action.file = chosen_index;
   }

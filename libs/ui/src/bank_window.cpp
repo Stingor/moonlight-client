@@ -15,12 +15,12 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
 using render::SkinPiece;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LA GÉOMÉTRIE DU FOND, MESURÉE SUR LE BITMAP ─────────────────────────────
 //

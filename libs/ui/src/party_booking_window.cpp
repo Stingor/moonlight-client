@@ -17,6 +17,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -29,8 +31,6 @@ constexpr float kLevelsColumnPixels = 70.0F;
 // Le pas des boutons d'un champ de niveau : un niveau, puis dix.
 constexpr int kLevelStep = 1;
 constexpr int kLevelFastStep = 10;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 std::string Labelled(const char* text, const char* id) { return std::string(text) + "###" + id; }
 

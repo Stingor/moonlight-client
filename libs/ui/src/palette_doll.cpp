@@ -10,12 +10,9 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
-namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
-
-}  // namespace
 
 void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look) {
   const ImVec2 at = ImGui::GetCursorScreenPos();

@@ -17,8 +17,6 @@
 
 namespace ro::ui::craft_parts {
 
-[[nodiscard]] inline float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
-
 // L'icône d'un objet dans une liste, et celle d'un matériau ou d'un minerai.
 inline constexpr float kRowIconPixels = 24.0F;
 inline constexpr float kLinkIconPixels = 16.0F;

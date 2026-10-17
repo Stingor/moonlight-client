@@ -11,13 +11,13 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
 constexpr std::array<RankingTab, kRankingTabCount> kRankingTabOrder = {
     RankingTab::kBlacksmith, RankingTab::kAlchemist, RankingTab::kTaekwon};
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // LES ONGLETS. Celui qu'`app` a posé s'impose ; un clic du joueur se lit et
 // devient la demande de son classement.

@@ -18,6 +18,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 
 bool ItemDroppedOnNothing(ItemDrag* carried) {
@@ -75,8 +77,6 @@ constexpr float kSmallestLabelSize = 7.0F;
 constexpr float kCountdownShare = 0.42F;
 constexpr std::uint32_t kMillisecondsPerSecond = 1000;
 constexpr std::uint32_t kSecondsPerMinute = 60;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // UN TEXTE DE CASE, avec l'ombre que la barre a choisie.
 //

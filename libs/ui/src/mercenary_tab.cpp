@@ -16,6 +16,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/staff_skill_id.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -48,8 +50,6 @@ constexpr float kPercent = 100.0F;
 // Les statistiques vont par paires « libellé / valeur » sur chaque ligne.
 constexpr int kStatColumns = 4;
 constexpr int kStatsPerRow = 2;
-
-float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 void TextColored(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, color);

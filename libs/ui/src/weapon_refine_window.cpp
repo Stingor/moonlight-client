@@ -18,6 +18,7 @@
 #include "ro/ui/window_name.h"
 
 #include "craft_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -25,7 +26,6 @@ namespace {
 using craft_parts::BulletWrapped;
 using craft_parts::ColoredText;
 using craft_parts::ColoredWrapped;
-using craft_parts::Px;
 
 // ── LES MESURES DE LA FENÊTRE, en pixels d'interface ────────────────────────
 constexpr float kRefineButtonPixels = 100.0F;

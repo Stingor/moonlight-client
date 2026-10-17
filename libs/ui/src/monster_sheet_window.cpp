@@ -16,6 +16,7 @@
 
 #include "monster_sheet_parts.h"
 #include "table_cells.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace monster_sheet {
@@ -115,8 +116,6 @@ constexpr std::uint32_t kModeBits[] = {
       return "?";
   }
 }
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] int HitChancePercent(int attacker_hit, int defender_flee) {
   const int rate = kHitBasePercent + attacker_hit - defender_flee;

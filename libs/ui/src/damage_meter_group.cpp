@@ -10,6 +10,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "damage_meter_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace damage_meter {

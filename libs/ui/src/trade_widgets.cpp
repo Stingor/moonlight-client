@@ -12,10 +12,10 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // L'écart entre la base grisée, la flèche et le prix facturé.
 constexpr float kPriceGapPixels = 3.0F;

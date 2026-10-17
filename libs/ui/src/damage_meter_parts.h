@@ -14,8 +14,6 @@
 
 namespace ro::ui::damage_meter {
 
-[[nodiscard]] inline float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
-
 // Les tailles de texte, en multiples de la police courante. Le gros nombre se
 // lit en périphérie, pendant qu'on regarde le combat et pas le compteur.
 inline constexpr float kBigTextScale = 1.85F;

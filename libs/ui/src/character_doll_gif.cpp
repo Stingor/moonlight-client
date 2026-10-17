@@ -13,11 +13,10 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "character_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Le jour entre la ligne des poses et celle de l'échelle.
 constexpr float kToolsLineGap = 4.0F;

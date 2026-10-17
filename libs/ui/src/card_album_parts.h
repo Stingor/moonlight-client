@@ -14,9 +14,6 @@
 
 namespace ro::ui::card_album {
 
-[[nodiscard]] inline float Scale() { return ImGui::GetStyle().FontScaleMain; }
-[[nodiscard]] inline float Px(float pixels) { return pixels * Scale(); }
-
 // ── Le classeur, en pixels à l'échelle 100 % ────────────────────────────────
 inline constexpr float kSpinePixels = 18.0F;
 inline constexpr float kPagePadPixels = 12.0F;

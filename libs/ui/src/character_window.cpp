@@ -12,11 +12,10 @@
 #include "ro/ui/window_name.h"
 
 #include "character_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // La hauteur d'ouverture, et le PLANCHER sous lequel la fenêtre ne descend pas.
 //

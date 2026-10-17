@@ -22,6 +22,7 @@
 
 #include "card_album_parts.h"
 #include "item_grid.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace card_album {

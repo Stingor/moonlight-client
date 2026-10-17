@@ -16,6 +16,7 @@
 
 #include "achievement_paint.h"
 #include "quest_paint.h"
+#include "ui_scale.h"
 
 // LE PANNEAU DE SUIVI : des sections repliables — les quêtes, les succès —, et
 // sous chacune des entrées repliables. Sans fond par défaut : seul le texte se
@@ -541,7 +542,7 @@ TrackerSettingsAnswer DrawTrackerSettingsItems(const TrackerLook& look, const Sk
   static_cast<void>(
       SkinCheckBox(core::Tr("Quêtes de la carte d'abord"), &changed.current_map_first, skin));
   int most = std::clamp(changed.most_quests, kTrackerFewestQuests, kTrackerMostQuests);
-  ImGui::SetNextItemWidth(kMostQuestsFieldWidth * paint_kit::Scale());
+  ImGui::SetNextItemWidth(kMostQuestsFieldWidth * Scale());
   if (SkinInputInt(core::Tr("Quêtes montrées"), &most, kTrackerFewestQuests, kTrackerMostQuests, 1,
                    kMostQuestsFastStep, skin)) {
     changed.most_quests = most;
@@ -574,7 +575,7 @@ TrackerPanelAction DrawTrackerPanel(const char* window_id, TrackerPanelState& st
   if (!state.shown || std::ranges::none_of(sections, SectionShown)) {
     return action;
   }
-  const float scale = paint_kit::Scale();
+  const float scale = Scale();
   const ImVec2 screen = ImGui::GetIO().DisplaySize;
   const ImVec2 size(kPanelWidth * scale, TrackerPanelHeight(state, sections) * scale);
   const ImVec2 first_place(screen.x - kTrackerRightGap * scale,

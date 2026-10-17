@@ -22,11 +22,10 @@
 
 #include "description_odds.h"
 #include "table_cells.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 constexpr float kFilterWidthPixels = 180.0F;
 constexpr ImU32 kHeaderColor = IM_COL32(206, 198, 172, 255);

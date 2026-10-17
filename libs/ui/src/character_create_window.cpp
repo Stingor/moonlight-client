@@ -13,11 +13,10 @@
 #include "ro/ui/window_name.h"
 
 #include "thumbnail_grid.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // LES MESURES DES GRILLES, en points d'interface. Les mêmes que celles de
 // l'éditeur de style, et pour la même raison : la case doit montrer la coupe.

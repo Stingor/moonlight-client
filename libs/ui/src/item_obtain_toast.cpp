@@ -12,12 +12,10 @@
 #include "ro/ui/chat_link.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-// L'échelle courante de l'interface : c'est elle qui décide de la taille des
-// pièces, comme elle décide de celle du texte.
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // La largeur d'une vue de texte. ⚠ PAR SES DEUX BORNES : une vue n'est pas
 // terminée par un zéro, et la mesurer sans sa fin lirait ce qui suit.

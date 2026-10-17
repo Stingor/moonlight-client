@@ -2,6 +2,8 @@
 
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -16,8 +18,6 @@ constexpr const char* kCloseButtonId = "X##npc_illustration_close";
 // droit et du haut, en pixels d'interface — la place que lui donne le client.
 constexpr float kCloseInsetRight = 16.0F;
 constexpr float kCloseInsetTop = 3.0F;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] bool IsBottom(IllustrationAnchor anchor) {
   return anchor == IllustrationAnchor::kBottomLeft || anchor == IllustrationAnchor::kBottomMiddle ||

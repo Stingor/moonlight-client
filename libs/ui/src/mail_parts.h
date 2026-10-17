@@ -16,8 +16,6 @@
 // à dessiner une demi-fenêtre de courrier.
 namespace ro::ui::mail {
 
-[[nodiscard]] inline float Scale() { return ImGui::GetStyle().FontScaleMain; }
-
 // L'arrondi des volets.
 inline constexpr float kChildRoundingPixels = 6.0F;
 // La couleur d'un refus, plus vive que celle des fenêtres de commerce : la

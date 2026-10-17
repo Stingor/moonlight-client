@@ -17,6 +17,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "party_friend_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -94,17 +95,16 @@ void DrawStatusBadge(const char* text, ImU32 fill, const char* tooltip) {
   ImGui::SameLine();
   const float rest = ImGui::GetContentRegionAvail().x;
   const ImVec2 text_size = ImGui::CalcTextSize(text);
-  const float pad_x = PartyPx(kBadgePadXPixels);
-  const float pad_y = PartyPx(kBadgePadYPixels);
+  const float pad_x = Px(kBadgePadXPixels);
+  const float pad_y = Px(kBadgePadYPixels);
   const ImVec2 size(text_size.x + pad_x * 2.0F, text_size.y + pad_y * 2.0F);
-  const float margin = PartyPx(kBadgeMarginPixels);
+  const float margin = Px(kBadgeMarginPixels);
   if (rest > size.x + margin) {
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + rest - size.x - margin);
   }
   const ImVec2 at = Floor(ImGui::GetCursorScreenPos());
   ImDrawList* into = ImGui::GetWindowDrawList();
-  into->AddRectFilled(at, ImVec2(at.x + size.x, at.y + size.y), fill,
-                      PartyPx(kBadgeRoundingPixels));
+  into->AddRectFilled(at, ImVec2(at.x + size.x, at.y + size.y), fill, Px(kBadgeRoundingPixels));
   into->AddText(ImVec2(at.x + pad_x, at.y + pad_y), IM_COL32_WHITE, text);
   ImGui::Dummy(size);
   if (ImGui::IsItemHovered()) {
@@ -117,19 +117,19 @@ void DrawStatusBadge(const char* text, ImU32 fill, const char* tooltip) {
 float DrawShareMark(float right, float top, const std::string& why, bool& hovered) {
   constexpr const char* kMark = "-EXP";
   const ImVec2 text_size = ImGui::CalcTextSize(kMark);
-  const float pad_x = PartyPx(kBadgePadXPixels);
-  const float pad_y = PartyPx(kBadgePadYPixels);
+  const float pad_x = Px(kBadgePadXPixels);
+  const float pad_y = Px(kBadgePadYPixels);
   const ImVec2 size(text_size.x + pad_x * 2.0F, text_size.y + pad_y * 2.0F);
   const ImVec2 low = Floor(ImVec2(right - size.x, top));
   const ImVec2 high(low.x + size.x, low.y + size.y);
   ImDrawList* into = ImGui::GetWindowDrawList();
-  into->AddRectFilled(low, high, kShareMark, PartyPx(kBadgeRoundingPixels));
+  into->AddRectFilled(low, high, kShareMark, Px(kBadgeRoundingPixels));
   into->AddText(ImVec2(low.x + pad_x, low.y + pad_y), IM_COL32_WHITE, kMark);
   hovered = ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(low, high);
   if (hovered) {
     SkinTooltipFormat("%s\n%s", core::Tr("Ne reçoit pas d'EXP de vos kills"), why.c_str());
   }
-  return size.x + PartyPx(kMarkGapPixels);
+  return size.x + Px(kMarkGapPixels);
 }
 
 // Les états, de droite à gauche depuis `right`, les plus RÉCENTS gardés quand il
@@ -141,7 +141,7 @@ bool DrawRowEffects(const PartyMemberView& member, float right, float top,
     return false;
   }
   const std::vector<StatusCellView> newest(member.statuses.rbegin(), member.statuses.rend());
-  const float side = PartyPx(std::max(kLeastBuffPixels, static_cast<float>(look.buff_px)));
+  const float side = Px(std::max(kLeastBuffPixels, static_cast<float>(look.buff_px)));
 
   StatusCellStyle style;
   style.sweep = static_cast<StatusSweep>(
@@ -149,8 +149,8 @@ bool DrawRowEffects(const PartyMemberView& member, float right, float top,
   style.sweep_color = look.buff_sweep_color;
   style.icon_background = look.buff_icon_background;
   const float countdown =
-      look.buff_time_auto ? std::max(PartyPx(kLeastCountdownPixels), side * kCountdownShare)
-                          : PartyPx(static_cast<float>(std::clamp(
+      look.buff_time_auto ? std::max(Px(kLeastCountdownPixels), side * kCountdownShare)
+                          : Px(static_cast<float>(std::clamp(
                                 look.buff_time_px, static_cast<int>(kSmallestStatusCountdownPixels),
                                 static_cast<int>(kLargestStatusCountdownPixels))));
   style.countdown_pixels = look.buff_time ? countdown : 0.0F;
@@ -159,7 +159,7 @@ bool DrawRowEffects(const PartyMemberView& member, float right, float top,
 
   StatusRowLayout layout;
   layout.side = side;
-  layout.gap = PartyPx(kBuffGapPixels);
+  layout.gap = Px(kBuffGapPixels);
   layout.below = style.countdown_pixels;
   layout.most = std::max(1, look.buff_max);
   layout.rows = std::max(1, look.buff_rows);
@@ -192,10 +192,10 @@ void DrawRowBar(int current, int most, ImU32 fill, int text_mode, bool stacked_n
   const float fraction =
       std::clamp(static_cast<float>(current) / static_cast<float>(most), 0.0F, 1.0F);
   const std::string text = PartyGaugeCaption(current, most, text_mode);
-  const float width = PartyPx(std::max(kLeastBarWidthPixels, static_cast<float>(look.bar_w)));
-  const float height = PartyPx(std::max(kLeastBarHeightPixels, static_cast<float>(look.bar_h)));
+  const float width = Px(std::max(kLeastBarWidthPixels, static_cast<float>(look.bar_w)));
+  const float height = Px(std::max(kLeastBarHeightPixels, static_cast<float>(look.bar_h)));
   const float font_size =
-      look.text_px > 0 ? PartyPx(static_cast<float>(look.text_px)) : ImGui::GetFontSize();
+      look.text_px > 0 ? Px(static_cast<float>(look.text_px)) : ImGui::GetFontSize();
   ImDrawList* into = ImGui::GetWindowDrawList();
   const ImVec2 low = ImGui::GetCursorScreenPos();
   const ImVec2 high(low.x + width, low.y + height);
@@ -217,7 +217,7 @@ void DrawRowBar(int current, int most, ImU32 fill, int text_mode, bool stacked_n
   }
   ImGui::Dummy(ImVec2(width, height));
   if (!text.empty() && !inside) {
-    ImGui::SameLine(0.0F, PartyPx(kBarTextGapPixels));
+    ImGui::SameLine(0.0F, Px(kBarTextGapPixels));
     ImGui::TextUnformatted(text.c_str());
   }
 }
@@ -265,7 +265,7 @@ void DrawRowTooltip(const PartyFriendView& view, const PartyMemberView& member) 
   if (!member.map_raw.empty() && member.position_known) {
     const SkinImage& map = member.minimap;
     if (map.usable()) {
-      const float width = PartyPx(kMinimapPixels);
+      const float width = Px(kMinimapPixels);
       const float height = width * (map.height / map.width);
       const ImVec2 low = ImGui::GetCursorScreenPos();
       ImGui::Image(map.id, ImVec2(width, height));
@@ -277,8 +277,8 @@ void DrawRowTooltip(const PartyFriendView& view, const PartyMemberView& member) 
                                       0.0F, 1.0F);
         const ImVec2 dot(low.x + width * across, low.y + height * down);
         ImDrawList* into = ImGui::GetWindowDrawList();
-        into->AddCircleFilled(dot, PartyPx(kMinimapDotOuterPixels), kMinimapDotHalo);
-        into->AddCircleFilled(dot, PartyPx(kMinimapDotInnerPixels), kMinimapDot);
+        into->AddCircleFilled(dot, Px(kMinimapDotOuterPixels), kMinimapDotHalo);
+        into->AddCircleFilled(dot, Px(kMinimapDotInnerPixels), kMinimapDot);
       }
     }
     ImGui::TextDisabled("%d, %d", member.x, member.y);
@@ -353,7 +353,7 @@ void DrawGauges(const PartyMemberView& member, const PartyFriendLook& look) {
 void DrawPartyRow(PartyFriendWindowState& state, const PartyFriendView& view,
                   const PartyMemberView& member, const PartyFriendLook& look,
                   PartyFriendAction& action) {
-  const float icon = PartyPx(std::max(kLeastIconPixels, static_cast<float>(look.icon_px)));
+  const float icon = Px(std::max(kLeastIconPixels, static_cast<float>(look.icon_px)));
   const ImVec2 origin = ImGui::GetCursorScreenPos();
   const float row_width = ImGui::GetContentRegionAvail().x;
 
@@ -415,14 +415,13 @@ void DrawPartyRow(PartyFriendWindowState& state, const PartyFriendView& view,
     const std::string why =
         PartyShareReason(PartyShareFlags(view, member), view.share_idle_seconds);
     if (!why.empty()) {
-      share_width =
-          DrawShareMark(badge_left - PartyPx(kMarkGapPixels), badge_top, why, share_hovered);
+      share_width = DrawShareMark(badge_left - Px(kMarkGapPixels), badge_top, why, share_hovered);
     }
   }
   bool state_hovered = false;
   if (look.show_buffs && !member.offline) {
     state_hovered =
-        DrawRowEffects(member, badge_left - PartyPx(kMarkGapPixels) - share_width, badge_top, look);
+        DrawRowEffects(member, badge_left - Px(kMarkGapPixels) - share_width, badge_top, look);
   }
 
   const float bottom = ImGui::GetCursorScreenPos().y;
@@ -477,7 +476,7 @@ void DrawFriendRow(PartyFriendWindowState& state, const PartyFriendView& view,
   // réservé.
   const bool head_here =
       (look.head_mode & kPartyHeadInFriends) != 0 && row.online && row.head.usable();
-  const float head_box = ImGui::GetTextLineHeight() + PartyPx(kHeadSlackPixels);
+  const float head_box = ImGui::GetTextLineHeight() + Px(kHeadSlackPixels);
   std::string label = head_here ? "      " : "";
   label += row.name;
   if (row.online) {
@@ -486,7 +485,7 @@ void DrawFriendRow(PartyFriendWindowState& state, const PartyFriendView& view,
     ImGui::TextDisabled("%s", label.c_str());
   }
   if (head_here) {
-    DrawHead(row.head, ImVec2(origin.x, origin.y - PartyPx(kHeadDropPixels)), head_box);
+    DrawHead(row.head, ImVec2(origin.x, origin.y - Px(kHeadDropPixels)), head_box);
   }
   DrawStatusBadge(row.online ? "ON" : "OFF", row.online ? kBadgeOnline : kBadgeOffline,
                   row.online ? core::Tr("En ligne") : core::Tr("Hors ligne"));

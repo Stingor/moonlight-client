@@ -10,6 +10,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -53,8 +55,6 @@ constexpr int kOtherRowIdBase = 1000;
 constexpr int kEmptyRowIdBase = 2000;
 
 constexpr const char* kItemMenuId = "##equipement_vu_menu";
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 void FaintText(const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));

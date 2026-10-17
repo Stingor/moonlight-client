@@ -16,11 +16,10 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "character_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Le champ d'un ajusteur, mesuré sur le PLUS GRAND montant saisissable — le
 // zeny — et non sur celui de la rangée.

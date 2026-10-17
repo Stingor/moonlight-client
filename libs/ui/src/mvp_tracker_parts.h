@@ -17,9 +17,6 @@
 
 namespace ro::ui::mvp_tracker {
 
-[[nodiscard]] inline float Scale() { return ImGui::GetStyle().FontScaleMain; }
-[[nodiscard]] inline float Px(float pixels) { return pixels * Scale(); }
-
 // ── LES COULEURS ────────────────────────────────────────────────────────────
 // Le bandeau du dernier refus.
 inline constexpr ImVec4 kMvpRefusalTextColor(0.60F, 0.12F, 0.12F, 1.0F);

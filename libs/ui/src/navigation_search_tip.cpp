@@ -12,6 +12,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "navigation_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -34,13 +35,13 @@ void DrawNavigationSearchTip(const NavigationSearchTip& tip) {
   if (!tip.plan_map_name.empty()) {
     if (tip.npc_image.usable()) {
       DrawNavigationMapThumbnail(tip.npc_image,
-                                 NavigationPx(static_cast<float>(kNavigationSearchTipNpcSidePx)));
+                                 Px(static_cast<float>(kNavigationSearchTipNpcSidePx)));
       ImGui::SameLine();
     }
     // ⚠ LE PLAN ET SON NOM INTERNE FORMENT UN BLOC : sans lui, le nom repasserait
     // sous la silhouette.
     ImGui::BeginGroup();
-    DrawNavigationMapThumbnail(tip.map_image, NavigationPx(kPlanSidePixels));
+    DrawNavigationMapThumbnail(tip.map_image, Px(kPlanSidePixels));
     ImGui::TextDisabled("%s", tip.plan_map_name.c_str());
     ImGui::EndGroup();
   }

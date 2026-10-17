@@ -4,6 +4,8 @@
 
 #include "ro/ui/skin_tooltip.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui::craft_parts {
 
 void ColoredWrapped(ImU32 color, const char* text) {

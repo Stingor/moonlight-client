@@ -21,6 +21,7 @@
 #include "guild_panes.h"
 #include "skill_cell.h"
 #include "skill_chain.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -177,7 +178,7 @@ void DragSource(const GuildSkillView& skill) {
                           .level = static_cast<std::uint16_t>(skill.cell.learned)};
   ImGui::SetDragDropPayload(kSkillDragPayload, &carried, sizeof(carried));
   if (skill.cell.icon.usable()) {
-    ImGui::Image(skill.cell.icon.id, ImVec2(GuildPx(kDragIconPixels), GuildPx(kDragIconPixels)));
+    ImGui::Image(skill.cell.icon.id, ImVec2(Px(kDragIconPixels), Px(kDragIconPixels)));
     ImGui::SameLine();
   }
   ImGui::TextUnformatted(Label(skill).c_str());
@@ -239,10 +240,10 @@ void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, bo
     ImGui::EndChild();
     return;
   }
-  const float cell_w = GuildPx(kCellWidthPixels);
-  const float cell_h = GuildPx(kCellHeightPixels);
-  const float icon = GuildPx(kIconPixels);
-  const float gap = GuildPx(kCellGapPixels);
+  const float cell_w = Px(kCellWidthPixels);
+  const float cell_h = Px(kCellHeightPixels);
+  const float icon = Px(kIconPixels);
+  const float gap = Px(kCellGapPixels);
   ImDrawList* into = ImGui::GetWindowDrawList();
   const ImVec2 origin = ImGui::GetCursorScreenPos();
   const std::span<const GuildSkillView> skills = view.skills;
@@ -269,19 +270,19 @@ void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, bo
     ImGui::SetCursorScreenPos(low);
     ImGui::InvisibleButton("case", ImVec2(cell_w - gap, cell_h - gap));
     const bool hot = ImGui::IsItemHovered();
-    const float rounding = GuildPx(kCellRounding);
+    const float rounding = Px(kCellRounding);
     if (hot) {
       hovered = static_cast<int>(index);
       into->AddRectFilled(low, high, kHotFill, rounding);
     }
     if (skill.cell.skill_id == focus) {
-      into->AddRect(low, high, kFocusEdge, rounding, 0, GuildPx(kFocusEdgePixels));
+      into->AddRect(low, high, kFocusEdge, rounding, 0, Px(kFocusEdgePixels));
     } else if (LinkedToFocus(skills, focus, skill.cell.skill_id)) {
-      into->AddRect(low, high, kLinkedEdge, rounding, 0, GuildPx(kFocusEdgePixels));
+      into->AddRect(low, high, kLinkedEdge, rounding, 0, Px(kFocusEdgePixels));
     } else if (!skill.locked && skill.cell.raisable && view.skill_points > 0) {
-      into->AddRect(low, high, kRaisableEdge, rounding, 0, GuildPx(kRaisableEdgePixels));
+      into->AddRect(low, high, kRaisableEdge, rounding, 0, Px(kRaisableEdgePixels));
     }
-    const ImVec2 icon_at(low.x + (cell_w - gap - icon) * 0.5F, low.y + GuildPx(kIconTopPixels));
+    const ImVec2 icon_at(low.x + (cell_w - gap - icon) * 0.5F, low.y + Px(kIconTopPixels));
     if (skill.cell.icon.usable()) {
       into->AddImage(skill.cell.icon.id, icon_at, ImVec2(icon_at.x + icon, icon_at.y + icon),
                      ImVec2(0.0F, 0.0F), ImVec2(1.0F, 1.0F),
@@ -301,7 +302,7 @@ void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, bo
     const ImVec2 size = ImGui::CalcTextSize(level.data());
     AddTextCrossHalo(
         into,
-        ImVec2(low.x + (cell_w - gap - size.x) * 0.5F, icon_at.y + icon + GuildPx(kLevelGapPixels)),
+        ImVec2(low.x + (cell_w - gap - size.x) * 0.5F, icon_at.y + icon + Px(kLevelGapPixels)),
         skill.cell.learned > 0 ? kLearnedLevel : kUnlearnedLevel, level.data(), kLevelHalo);
 
     DragSource(skill);
@@ -360,11 +361,11 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
   }
   ImGui::TableSetupColumn(core::Tr("Skill"), ImGuiTableColumnFlags_WidthStretch);
   ImGui::TableSetupColumn(core::Tr("Level"), ImGuiTableColumnFlags_WidthFixed,
-                          GuildPx(kLevelColumnPixels));
+                          Px(kLevelColumnPixels));
   // La nature ou le coût : « Passif » à la place du SP, comme le client.
-  ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, GuildPx(kCostColumnPixels));
-  ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, GuildPx(kUseColumnPixels));
-  ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, GuildPx(kRaiseColumnPixels));
+  ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, Px(kCostColumnPixels));
+  ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, Px(kUseColumnPixels));
+  ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, Px(kRaiseColumnPixels));
   ImGui::TableHeadersRow();
 
   const std::span<const GuildSkillView> skills = view.skills;
@@ -395,7 +396,7 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
 
     ImGui::TableNextColumn();
     const float indent =
-        GuildPx(kTreeGutterPixels) + static_cast<float>(skill.depth) * GuildPx(kTreeStepPixels);
+        Px(kTreeGutterPixels) + static_cast<float>(skill.depth) * Px(kTreeStepPixels);
     ImGui::Indent(indent);
     const ImVec2 at = ImGui::GetCursorScreenPos();
     anchors[index] = ImVec2(at.x, at.y + icon * 0.5F);
@@ -411,16 +412,15 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
       const float thickness = hot ? kHotLinkThickness : kColdLinkThickness;
       // ⚠ LA DESCENTE À GAUCHE DE L'ICÔNE SOURCE, d'un demi-pas : sous son
       // centre, elle traverserait les icônes des voisines de même palier.
-      const float x = from.x - GuildPx(kTreeStepPixels) * 0.5F;
-      into->AddLine(ImVec2(from.x - GuildPx(kLinkStubPixels), from.y), ImVec2(x, from.y), color,
+      const float x = from.x - Px(kTreeStepPixels) * 0.5F;
+      into->AddLine(ImVec2(from.x - Px(kLinkStubPixels), from.y), ImVec2(x, from.y), color,
                     thickness);
       into->AddLine(ImVec2(x, from.y), ImVec2(x, anchors[index].y), color, thickness);
       into->AddLine(ImVec2(x, anchors[index].y),
-                    ImVec2(anchors[index].x - GuildPx(kLinkStubPixels), anchors[index].y), color,
+                    ImVec2(anchors[index].x - Px(kLinkStubPixels), anchors[index].y), color,
                     thickness);
-      into->AddCircleFilled(
-          ImVec2(anchors[index].x - GuildPx(kLinkDotOffsetPixels), anchors[index].y),
-          hot ? kHotDotRadius : kColdDotRadius, color);
+      into->AddCircleFilled(ImVec2(anchors[index].x - Px(kLinkDotOffsetPixels), anchors[index].y),
+                            hot ? kHotDotRadius : kColdDotRadius, color);
     }
     if (skill.cell.icon.usable()) {
       into->AddImage(skill.cell.icon.id, at, ImVec2(at.x + icon, at.y + icon), ImVec2(0.0F, 0.0F),
@@ -485,7 +485,7 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
       CooldownLabel(skill.cell.cooldown_ms, use);
     }
     ImGui::BeginDisabled(!skill.cell.castable || skill.cell.cooldown_ms > 0);
-    if (SkinSmallButton(use.data(), art, ImVec2(GuildPx(kUseButtonPixels), 0.0F))) {
+    if (SkinSmallButton(use.data(), art, ImVec2(Px(kUseButtonPixels), 0.0F))) {
       action.verb = GuildVerb::kUseSkill;
       action.skill_id = id;
       action.skill_level = skill.cell.learned;
@@ -518,7 +518,7 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
     ImGui::TableNextColumn();
     const bool may_raise = !skill.locked && skill.cell.raisable && view.skill_points > 0;
     ImGui::BeginDisabled(!may_raise);
-    if (SkinSmallButton("+", art, ImVec2(GuildPx(kRaiseButtonPixels), 0.0F))) {
+    if (SkinSmallButton("+", art, ImVec2(Px(kRaiseButtonPixels), 0.0F))) {
       action.verb = GuildVerb::kSkillUp;
       action.skill_id = id;
     }
@@ -556,7 +556,7 @@ void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_i
   ImGui::TextUnformatted(line.data());
   ImGui::SameLine();
   if (SkinButton(state.skill_grid ? core::Tr("Grille") : core::Tr("Liste"), art,
-                 ImVec2(GuildPx(kToggleButtonPixels), 0.0F))) {
+                 ImVec2(Px(kToggleButtonPixels), 0.0F))) {
     state.skill_grid = !state.skill_grid;
   }
   GuildTooltip(

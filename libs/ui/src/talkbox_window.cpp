@@ -12,10 +12,10 @@
 #include "ro/ui/bitmap_button.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Le client écrit la ligne en noir, puis la même en blanc un pixel plus bas et
 // plus à droite, dessous : une ombre claire.

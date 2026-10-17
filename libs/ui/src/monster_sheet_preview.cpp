@@ -10,6 +10,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "monster_sheet_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {

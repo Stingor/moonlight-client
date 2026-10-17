@@ -16,6 +16,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -38,20 +39,20 @@ constexpr float kFieldPixels = 240.0F;
 }
 
 [[nodiscard]] bool ConfirmButton(const char* label, const SkinArt& art) {
-  return SkinButton(label, art, ImVec2(GuildPx(kConfirmButtonPixels), 0.0F));
+  return SkinButton(label, art, ImVec2(Px(kConfirmButtonPixels), 0.0F));
 }
 
 // « Annuler », qui referme la boîte.
 void CancelButton(const SkinArt& art) {
   ImGui::SameLine();
-  if (SkinButton(core::Tr("Annuler"), art, ImVec2(GuildPx(kCancelButtonPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Annuler"), art, ImVec2(Px(kCancelButtonPixels), 0.0F))) {
     ImGui::CloseCurrentPopup();
   }
 }
 
 void ReasonField(GuildTabState& state, const char* id) {
   GuildTextColored(kGuildLabelColor, core::Tr("Motif (facultatif) :"));
-  ImGui::SetNextItemWidth(GuildPx(kFieldPixels));
+  ImGui::SetNextItemWidth(Px(kFieldPixels));
   ImGui::InputText(id, state.reason.data(), state.reason.size());
   ImGui::Spacing();
 }
@@ -125,7 +126,7 @@ void DrawDisbandBox(GuildTabState& state, const GuildView& view, const SkinArt& 
                    core::Tr("L'instance fait échouer la dissolution SANS aucun message."));
   ImGui::Spacing();
   GuildTextColored(kGuildLabelColor, core::Tr("Retape le nom de la guilde pour confirmer :"));
-  ImGui::SetNextItemWidth(GuildPx(kFieldPixels));
+  ImGui::SetNextItemWidth(Px(kFieldPixels));
   ImGui::InputTextWithHint("##dissolution", core::Tr("Nom exact de la guilde"),
                            state.disband_confirm.data(), state.disband_confirm.size());
   ImGui::Spacing();
@@ -187,7 +188,7 @@ void DrawTransferBox(GuildTabState& state, const GuildView& view, const SkinArt&
   ImGui::BulletText("%s", core::Tr("une instance de guilde est en cours — refus SANS message."));
   ImGui::Spacing();
   GuildTextColored(kGuildLabelColor, core::Tr("Retape le nom du membre pour confirmer :"));
-  ImGui::SetNextItemWidth(GuildPx(kFieldPixels));
+  ImGui::SetNextItemWidth(Px(kFieldPixels));
   ImGui::InputTextWithHint("##transfert", core::Tr("Nom exact du membre"),
                            state.transfer_confirm.data(), state.transfer_confirm.size());
   ImGui::Spacing();

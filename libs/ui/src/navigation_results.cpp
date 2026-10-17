@@ -11,6 +11,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "navigation_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -74,7 +75,7 @@ void MapTooltip(const NavigationEntryView& entry) {
     return;
   }
   ImGui::TextUnformatted(entry.map_name.data(), entry.map_name.data() + entry.map_name.size());
-  DrawNavigationMapThumbnail(entry.map_image, NavigationPx(kThumbnailPixels));
+  DrawNavigationMapThumbnail(entry.map_image, Px(kThumbnailPixels));
   EndSkinTooltip();
 }
 
@@ -157,7 +158,7 @@ void DrawSprite(const SkinImage& sprite, float side) {
 
 void DrawPreview(const NavigationEntryView& entry, const NavigationRowRef& row,
                  NavigationAnswer& answer) {
-  const float side = NavigationPx(kNavigationPreviewPixels);
+  const float side = Px(kNavigationPreviewPixels);
   if (!entry.sprite.usable() && entry.sprite_expected) {
     ImGui::Dummy(ImVec2(side, side));
     return;
@@ -184,7 +185,7 @@ void DrawPreview(const NavigationEntryView& entry, const NavigationRowRef& row,
     }
     if (!entry.map_name.empty()) {
       ImGui::TextUnformatted(entry.map_name.data(), entry.map_name.data() + entry.map_name.size());
-      DrawNavigationMapThumbnail(entry.map_image, NavigationPx(kThumbnailPixels));
+      DrawNavigationMapThumbnail(entry.map_image, Px(kThumbnailPixels));
     }
     if (clickable) {
       ImGui::TextDisabled("%s", core::Tr("Ouvrir la fiche du monstre"));
@@ -201,7 +202,7 @@ void DrawNavigationPlaceTip(const NavigationPlaceTip& tip) {
   }
   ImGui::TextUnformatted(tip.label.empty() ? tip.map_name.c_str() : tip.label.c_str());
   ImGui::Separator();
-  DrawNavigationMapThumbnail(tip.map_image, NavigationPx(kThumbnailPixels));
+  DrawNavigationMapThumbnail(tip.map_image, Px(kThumbnailPixels));
   // Le nom INTERNE, celui qu'une commande accepte.
   if (tip.x > 0 && tip.y > 0) {
     ImGui::TextDisabled("%s  (%d, %d)", tip.map_name.c_str(), tip.x, tip.y);

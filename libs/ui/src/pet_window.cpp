@@ -21,6 +21,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -75,8 +77,6 @@ constexpr float kArrowThicknessPixels = 2.0F;
 
 constexpr const char* kWindowId = "###pet_window";
 constexpr const char* kLinkMenuId = "##pet_link_menu";
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 void TextColored(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, InkOn(color, PaintingLook().body));

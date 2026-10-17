@@ -17,6 +17,7 @@
 #include "ro/ui/window_name.h"
 
 #include "achievement_paint.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -231,8 +232,6 @@ constexpr std::array<FallbackLabel, 17> kFallbackLabels = {{
   }
   return "";
 }
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] float TextTop(std::size_t row) {
   return kStatusRowCenterPixels[row] - kTextAboveCenterPixels;

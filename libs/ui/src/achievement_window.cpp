@@ -18,12 +18,12 @@
 #include "ro/ui/skinned_window.h"
 
 #include "achievement_paint.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
 
 using achievement::Painter;
-using achievement::Scale;
 namespace paint_kit = achievement;
 
 // ── LA DISPOSITION, en pixels d'art depuis le coin de la fenêtre ────────────

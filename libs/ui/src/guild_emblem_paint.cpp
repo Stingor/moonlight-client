@@ -14,6 +14,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -203,7 +204,7 @@ void PaintGesture(EmblemCanvas& canvas, ImDrawList* into, ImVec2 origin, float c
 }
 
 void DrawCanvas(EmblemCanvas& canvas) {
-  const float cell = GuildPx(kCellPixels);
+  const float cell = Px(kCellPixels);
   const ImVec2 origin = ImGui::GetCursorScreenPos();
   const float side = cell * static_cast<float>(kEmblemCanvasSide);
   ImGui::InvisibleButton("##canevas", ImVec2(side, side),
@@ -229,7 +230,7 @@ void DrawCanvas(EmblemCanvas& canvas) {
   PaintGesture(canvas, into, origin, cell, hovered);
 
   // L'APERÇU À L'ÉCHELLE UN, ce que verront les autres joueurs.
-  const ImVec2 preview(origin.x + side + GuildPx(kPreviewGapPixels), origin.y);
+  const ImVec2 preview(origin.x + side + Px(kPreviewGapPixels), origin.y);
   for (std::size_t index = 0; index < kEmblemCanvasPixels; ++index) {
     const std::uint32_t color = canvas.pixel[index];
     if (color == kEmblemCanvasClear) {
@@ -255,7 +256,7 @@ void DrawTools(EmblemCanvas& canvas, const SkinArt& art) {
     ImGui::PushID(static_cast<int>(rank));
     // L'outil courant reste enfoncé, son libellé en gras.
     if (SkinToggleButton(ToolName(tool), canvas.tool == tool, art,
-                         ImVec2(GuildPx(kToolButtonPixels), 0.0F))) {
+                         ImVec2(Px(kToolButtonPixels), 0.0F))) {
       canvas.tool = tool;
     }
     GuildTooltip(ToolHint(tool));
@@ -268,7 +269,7 @@ void DrawTools(EmblemCanvas& canvas, const SkinArt& art) {
   ImGui::SameLine();
   GuildTextColored(kGuildLabelColor, core::Tr("(clic droit = efface)"));
 
-  ImGui::SetNextItemWidth(GuildPx(kBrushSliderPixels));
+  ImGui::SetNextItemWidth(Px(kBrushSliderPixels));
   static_cast<void>(
       SkinSliderInt(core::Tr("Épaisseur"), &canvas.brush, 1, kEmblemBrushMost, art, "%d px"));
   ImGui::SameLine();
@@ -318,7 +319,7 @@ void DrawColors(EmblemCanvas& canvas, const SkinArt& art) {
   }
   GuildTextColored(kGuildLabelColor, core::Tr("Palette :"));
   ImGui::SameLine();
-  const float side = ImGui::GetFrameHeight() - GuildPx(kSwatchInsetPixels);
+  const float side = ImGui::GetFrameHeight() - Px(kSwatchInsetPixels);
   for (std::size_t index = 0; index < kSwatches.size(); ++index) {
     const std::uint32_t color = kSwatches[index];
     ImGui::PushID(static_cast<int>(index));
@@ -341,7 +342,7 @@ void DrawColors(EmblemCanvas& canvas, const SkinArt& art) {
 
 void DrawGallery(GuildTabState& state, const GuildView& view, GuildAction& action) {
   const ImGuiStyle& style = ImGui::GetStyle();
-  const float cell = GuildPx(kGalleryCellPixels);
+  const float cell = Px(kGalleryCellPixels);
   const float inner = ImGui::GetContentRegionAvail().x - style.WindowPadding.x * 2.0F -
                       style.ChildBorderSize * 2.0F;
   const std::size_t per_row = static_cast<std::size_t>(
@@ -394,7 +395,7 @@ void DrawItemImport(GuildTabState& state, const GuildView& view, const SkinArt& 
   ImGui::AlignTextToFramePadding();
   GuildTextColored(kGuildLabelColor, core::Tr("Partir d'une icône d'item :"));
   ImGui::SameLine();
-  ImGui::SetNextItemWidth(GuildPx(kItemFieldPixels));
+  ImGui::SetNextItemWidth(Px(kItemFieldPixels));
   ImGui::InputInt("##objet", &state.emblem.item_id, 0, 0);
   state.emblem.item_id = std::max(state.emblem.item_id, 0);
   // L'aperçu à côté du champ : on voit ce qu'on va importer avant de perdre le
@@ -409,7 +410,7 @@ void DrawItemImport(GuildTabState& state, const GuildView& view, const SkinArt& 
   }
   ImGui::SameLine();
   ImGui::BeginDisabled(!view.typed_item_icon.usable());
-  if (SkinButton(core::Tr("Importer"), art, ImVec2(GuildPx(kImportPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Importer"), art, ImVec2(Px(kImportPixels), 0.0F))) {
     action.verb = GuildVerb::kImportItemIcon;
     action.item_id = static_cast<std::uint32_t>(state.emblem.item_id);
   }
@@ -421,7 +422,7 @@ void DrawItemImport(GuildTabState& state, const GuildView& view, const SkinArt& 
   }
   ImGui::SameLine();
   if (SkinToggleButton(core::Tr("Inventory"), state.emblem.gallery_open, art,
-                       ImVec2(GuildPx(kGalleryTogglePixels), 0.0F))) {
+                       ImVec2(Px(kGalleryTogglePixels), 0.0F))) {
     state.emblem.gallery_open = !state.emblem.gallery_open;
   }
   GuildTooltip(core::Tr("Choisir l'icône dans son inventory, sans connaître les numéros."));
@@ -454,7 +455,7 @@ void DrawSend(GuildTabState& state, const GuildView& view, const SkinArt& art,
   const std::string file =
       (typed.empty() ? std::string(core::Tr("mon_embleme")) : std::string(typed)) + ".bmp";
   ImGui::BeginDisabled(!may_send);
-  if (SkinButton(core::Tr("Envoyer ce dessin"), art, ImVec2(GuildPx(kSendPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Envoyer ce dessin"), art, ImVec2(Px(kSendPixels), 0.0F))) {
     action.verb = GuildVerb::kUploadCanvas;
     action.text = file;
   }
@@ -467,12 +468,12 @@ void DrawSend(GuildTabState& state, const GuildView& view, const SkinArt& art,
     GuildTextColored(kGuildRedColor, line.data());
   }
   ImGui::SameLine();
-  ImGui::SetNextItemWidth(GuildPx(kSaveNamePixels));
+  ImGui::SetNextItemWidth(Px(kSaveNamePixels));
   ImGui::InputTextWithHint("##nom_fichier", core::Tr("mon_embleme"), state.emblem.save_name.data(),
                            state.emblem.save_name.size());
   ImGui::SameLine();
   // Garder le .bmp sous la main : il rejoint le dossier que lit aussi le client.
-  if (SkinButton(core::Tr("Enregistrer dans emblem"), art, ImVec2(GuildPx(kSavePixels), 0.0F))) {
+  if (SkinButton(core::Tr("Enregistrer dans emblem"), art, ImVec2(Px(kSavePixels), 0.0F))) {
     action.verb = GuildVerb::kSaveCanvas;
     action.text = file;
   }
@@ -492,19 +493,19 @@ void DrawEmblemPaintTab(GuildTabState& state, const GuildView& view, const SkinA
 
   ImGui::Spacing();
   ImGui::BeginDisabled(canvas.undo.empty());
-  if (SkinButton(core::Tr("Annuler"), art, ImVec2(GuildPx(kUndoPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Annuler"), art, ImVec2(Px(kUndoPixels), 0.0F))) {
     static_cast<void>(UndoEmblemCanvas(canvas));
   }
   ImGui::EndDisabled();
   ImGui::SameLine();
-  if (SkinButton(core::Tr("Tout effacer"), art, ImVec2(GuildPx(kClearAllPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Tout effacer"), art, ImVec2(Px(kClearAllPixels), 0.0F))) {
     PushEmblemUndo(canvas);
     ClearEmblemCanvas(canvas);
   }
   ImGui::SameLine();
   // REPARTIR DE L'EMBLÈME EN PLACE sans refermer la boîte.
   ImGui::BeginDisabled(view.guild_id <= 0);
-  if (SkinButton(core::Tr("Emblème actuel"), art, ImVec2(GuildPx(kCurrentPixels), 0.0F))) {
+  if (SkinButton(core::Tr("Emblème actuel"), art, ImVec2(Px(kCurrentPixels), 0.0F))) {
     action.verb = GuildVerb::kLoadCurrentEmblem;
   }
   ImGui::EndDisabled();

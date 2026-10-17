@@ -8,10 +8,10 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES (« Mon shop ») ──────────────────────────────────────────────
 constexpr float kLeastWidthPixels = 260.0F;

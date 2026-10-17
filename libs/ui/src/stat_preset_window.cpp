@@ -12,6 +12,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -25,8 +27,6 @@ constexpr ImVec4 kAboveInk = ImVec4(0.55F, 0.55F, 0.55F, 1.0F);
 constexpr int kPreviewColumns = 4;
 // Les colonnes de la liste : le nom, les six valeurs, les gestes.
 constexpr int kListColumns = 3;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ⚠ UN AIGUILLAGE DE LITTÉRAUX : `core::Tr` veut voir sa chaîne à l'appel.
 [[nodiscard]] const char* StatLabel(std::size_t rank) {

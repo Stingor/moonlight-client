@@ -14,10 +14,10 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 constexpr ImVec4 kNameColor(0.0F, 0.0F, 0.0F, 1.0F);
 constexpr ImVec4 kLabelColor(0.35F, 0.35F, 0.42F, 1.0F);

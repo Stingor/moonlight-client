@@ -17,6 +17,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "companion_ai_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::companion_ai_parts {
 namespace {
@@ -30,8 +31,6 @@ constexpr std::size_t kLineBytes = 160;
 constexpr ImU32 kBannerColor = IM_COL32(70, 110, 160, 90);
 
 constexpr std::array<const char*, kCompanionAiContexts> kContextLabels = {"PvE", "PvP", "WoE"};
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] const char* LabelAt(const CompanionProfilesView& profiles, int rank) {
   return rank >= 0 && static_cast<std::size_t>(rank) < profiles.profiles.size()

@@ -15,11 +15,10 @@
 #include "ro/ui/skinned_window.h"
 
 #include "item_grid.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES ─────────────────────────────────────────────────────────────
 //

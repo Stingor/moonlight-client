@@ -17,6 +17,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -45,8 +47,6 @@ constexpr int kDefaultFloatDecimals = 2;
 constexpr int kDefaultIntStep = 1;
 // Maintenir Majuscule multiplie le pas : c'est le geste du jeu.
 constexpr float kShiftMultiplier = 10.0F;
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] bool Paintable(const SkinArt& art) {
   return std::ranges::all_of(kSliderPieces,

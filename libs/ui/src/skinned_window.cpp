@@ -12,6 +12,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/window_bounds.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -37,10 +39,6 @@ struct Painting {
   float frame_bottom = 0.0F;
 };
 Painting g_painting;
-
-// L'échelle courante de l'interface : c'est elle qui décide de la taille des
-// pièces, comme elle décide de celle du texte.
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Peint une bande en trois morceaux : deux bouts à leur taille, un milieu étiré.
 // LE CADRE D'UNE DESCRIPTION : les deux côtés et le bas, en pièces `sysbox`.

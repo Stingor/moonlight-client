@@ -17,11 +17,10 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "commands_page_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace commands_page {
-
-float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 void Toggle(const char* label, bool value, const char* help, CommandsField field,
             const SkinArt& art, CommandsPageAction& asked) {
@@ -44,7 +43,6 @@ void FaintText(const char* text) {
 
 namespace {
 
-using commands_page::Px;
 using commands_page::Toggle;
 
 // La largeur de la liste de `@noks`, en pixels d'interface.

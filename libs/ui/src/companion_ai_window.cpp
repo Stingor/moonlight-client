@@ -17,6 +17,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "companion_ai_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -37,8 +38,6 @@ constexpr float kFriendFieldPixels = 260.0F;
 // comme dans les outils du staff. Celle d'ImGui suit la fenêtre, et une
 // fenêtre élargie étirait chaque contrôle sur toute sa largeur.
 constexpr float kControlWidthPixels = 190.0F;
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] bool Present(const CompanionAiView& view, int companion) {
   return companion == kCompanionAiHomunculus ? view.homunculus_present : view.mercenary_present;

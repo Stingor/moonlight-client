@@ -14,6 +14,8 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -27,10 +29,6 @@ constexpr const char* kSwatchPopup = "##nuancier";
 
 // Ce qu'il reste d'un écart vertical dans un panneau resserré.
 constexpr float kCompactRatio = 0.60F;
-
-// L'échelle courante : c'est elle qui décide de la taille des pièces, comme
-// elle décide de celle du texte.
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ⛔ PAS DE RABATTEMENT SUR LA HAUTEUR DU CADRE. Le texte d'un bouton est
 // celui de l'interface, point — c'est ce que fait le jeu. L'art du PETIT

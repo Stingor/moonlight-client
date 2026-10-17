@@ -13,6 +13,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "companion_ai_window_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::companion_ai_parts {
 namespace {
@@ -22,8 +23,6 @@ constexpr float kConductComboPixels = 130.0F;
 // La liste des classes, dont les noms sont plus longs qu'un rang.
 constexpr float kJobComboPixels = 2.0F * kConductComboPixels;
 constexpr int kConductTableColumns = 4;
-
-[[nodiscard]] float Px(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 [[nodiscard]] const char* ConductGenericLabel(int generic) {
   return generic == kConductGenericOwnerGuild ? core::Tr("Membres de la guilde du maître")

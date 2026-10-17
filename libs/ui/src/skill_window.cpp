@@ -21,6 +21,7 @@
 #include "skill_cell.h"
 #include "skill_chain.h"
 #include "skill_list.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -113,10 +114,6 @@ constexpr float kKeyboardNoticeOffset = 12.0F;
 constexpr float kKeyboardNoticeRounding = 3.0F;
 constexpr ImU32 kKeyboardNoticeBody = IM_COL32(15, 15, 20, 215);
 constexpr ImU32 kKeyboardNoticeText = IM_COL32(255, 215, 130, 255);
-
-// L'échelle courante : c'est elle qui décide de la taille des cases, comme elle
-// décide de celle du texte.
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // La case survolée est-elle reliée à celle-ci ? Dans les deux sens : ce qu'elle
 // réclame, et ce qu'elle ouvre.

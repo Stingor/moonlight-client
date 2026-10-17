@@ -12,6 +12,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "guild_panes.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -43,10 +44,9 @@ void DrawEmblemBox(ImDrawList* into, const GuildView& view, ImVec2 low, ImVec2 h
   if (!view.emblem.usable()) {
     return;
   }
-  into->AddRectFilled(low, high, kEmblemBackdrop, GuildPx(kEmblemRounding));
+  into->AddRectFilled(low, high, kEmblemBackdrop, Px(kEmblemRounding));
   into->AddImage(view.emblem.id, low, high);
-  into->AddRect(low, high, kEmblemBorder, GuildPx(kEmblemRounding), 0,
-                GuildPx(kEmblemBorderPixels));
+  into->AddRect(low, high, kEmblemBorder, Px(kEmblemRounding), 0, Px(kEmblemBorderPixels));
 }
 
 // SANS GUILDE : la création directe, comme le « Guild Companion » du client.
@@ -64,7 +64,7 @@ void DrawNoGuild(GuildTabState& state, const GuildView& view, const SkinArt& art
   GuildTextColored(kGuildLabelColor,
                    core::Tr("Un Emperium dans l'inventory est nécessaire, et la carte ne "
                             "doit pas interdire les guildes."));
-  ImGui::SetNextItemWidth(GuildPx(kCreateFieldPixels));
+  ImGui::SetNextItemWidth(Px(kCreateFieldPixels));
   const bool submitted =
       ImGui::InputText("##guild_create", state.create_name.data(), state.create_name.size(),
                        ImGuiInputTextFlags_EnterReturnsTrue);
@@ -93,7 +93,7 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
   // « ACTUALISER », ANCRÉ EN HAUT À DROITE : posé avant l'en-tête, curseur
   // rendu ensuite, si bien que l'en-tête se dessine comme s'il n'y était pas.
   {
-    const float width = GuildPx(kRefreshButtonPixels);
+    const float width = Px(kRefreshButtonPixels);
     const ImVec2 kept = ImGui::GetCursorPos();
     ImGui::SetCursorPosX(kept.x + ImGui::GetContentRegionAvail().x - width);
     if (SkinButton(core::Tr("Actualiser"), art, ImVec2(width, 0.0F))) {
@@ -102,8 +102,8 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
     GuildTooltip(core::Tr("Redemande au serveur membres, postes et infos de guilde."));
     ImGui::SetCursorPos(kept);
   }
-  const float side = GuildPx(kEmblemPixels);
-  const ImVec2 low(header.x, header.y + GuildPx(kEmblemDropPixels));
+  const float side = Px(kEmblemPixels);
+  const ImVec2 low(header.x, header.y + Px(kEmblemDropPixels));
   const ImVec2 high(low.x + side, low.y + side);
   ImDrawList* into = ImGui::GetWindowDrawList();
   DrawEmblemBox(into, view, low, high);
@@ -118,14 +118,13 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
       state.emblem.load_current = true;
     }
     if (ImGui::IsItemHovered()) {
-      into->AddRect(low, high, kEmblemHoverBorder, GuildPx(kEmblemRounding), 0,
-                    GuildPx(kEmblemHoverPixels));
+      into->AddRect(low, high, kEmblemHoverBorder, Px(kEmblemRounding), 0, Px(kEmblemHoverPixels));
       SkinTooltipFormat("%s", core::Tr("Modifier cet emblème dans l'éditeur…"));
     }
     ImGui::SetCursorPos(kept);
   }
 
-  const float indent = side + GuildPx(kEmblemGapPixels);
+  const float indent = side + Px(kEmblemGapPixels);
   ImGui::Indent(indent);
   const std::string name(view.name);
   GuildTextColored(kGuildBlackColor, name.c_str());
@@ -178,7 +177,7 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
     std::snprintf(line.data(), line.size(), "EXP %lld / %lld  (%.1f %%)",
                   static_cast<long long>(view.exp), static_cast<long long>(view.next_exp),
                   static_cast<double>(ratio * kPercent));
-    ImGui::ProgressBar(ratio, ImVec2(-1.0F, GuildPx(kExpGaugePixels)), line.data());
+    ImGui::ProgressBar(ratio, ImVec2(-1.0F, Px(kExpGaugePixels)), line.data());
   }
 }
 
@@ -205,7 +204,7 @@ void DrawNotice(GuildTabState& state, const GuildView& view, const SkinArt& art,
     ImGui::SetNextItemWidth(-1.0F);
     ImGui::InputTextWithHint("##guild_body", core::Tr("Contenu du message"),
                              state.notice_body.data(), state.notice_body.size());
-    if (SkinButton(core::Tr("Enregistrer"), art, ImVec2(GuildPx(kSaveNoticePixels), 0.0F))) {
+    if (SkinButton(core::Tr("Enregistrer"), art, ImVec2(Px(kSaveNoticePixels), 0.0F))) {
       action.verb = GuildVerb::kSaveNotice;
       action.subject = std::string(BufferText(state.notice_subject));
       action.body = std::string(BufferText(state.notice_body));
@@ -213,7 +212,7 @@ void DrawNotice(GuildTabState& state, const GuildView& view, const SkinArt& art,
       state.status = core::Tr("Annonce envoyée.");
     }
     ImGui::SameLine();
-    if (SkinButton(core::Tr("Annuler"), art, ImVec2(GuildPx(kCancelNoticePixels), 0.0F))) {
+    if (SkinButton(core::Tr("Annuler"), art, ImVec2(Px(kCancelNoticePixels), 0.0F))) {
       state.notice_editing = false;
     }
   } else if (!view.notice_subject.empty() || !view.notice_body.empty()) {
@@ -269,7 +268,7 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
     ImGui::AlignTextToFramePadding();
     GuildTextColored(kGuildBlackColor, core::Tr("Inviter :"));
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(GuildPx(kInviteFieldPixels));
+    ImGui::SetNextItemWidth(Px(kInviteFieldPixels));
     ImGui::InputText("##guild_invite", state.invite_name.data(), state.invite_name.size());
     GuildTooltip(core::Tr("Nom exact du personnage à inviter (il doit être connecté)."));
     ImGui::SameLine();
@@ -301,10 +300,6 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
 }
 
 }  // namespace
-
-float GuildScale() { return ImGui::GetStyle().FontScaleMain; }
-
-float GuildPx(float pixels) { return pixels * GuildScale(); }
 
 ImVec4 GuildInk(ImU32 color) { return ImGui::ColorConvertU32ToFloat4(color); }
 
@@ -353,9 +348,9 @@ GuildAction DrawGuildTab(GuildTabState& state, const GuildView& view, bool& smoo
   // LA HAUTEUR LAISSÉE AUX LISTES : tout, sauf la barre d'actions du bas — un
   // bouton du jeu et la ligne du compte rendu.
   const auto list_height = [&art]() {
-    const float actions = SkinFooterHeight(art) + ImGui::GetTextLineHeightWithSpacing() +
-                          GuildPx(kActionBarSlackPixels);
-    return std::max(GuildPx(kListLeastPixels), ImGui::GetContentRegionAvail().y - actions);
+    const float actions =
+        SkinFooterHeight(art) + ImGui::GetTextLineHeightWithSpacing() + Px(kActionBarSlackPixels);
+    return std::max(Px(kListLeastPixels), ImGui::GetContentRegionAvail().y - actions);
   };
   if (BeginSkinTabBar("guilde", art)) {
     if (view.members_tab && ImGui::BeginTabItem(core::Tr("Membres"))) {

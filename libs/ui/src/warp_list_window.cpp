@@ -11,10 +11,10 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // Le nom ImGui : la fenêtre n'a pas de barre, donc pas de titre à traduire.
 constexpr const char* kWindowName = "###destinations";

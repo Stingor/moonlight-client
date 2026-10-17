@@ -8,10 +8,10 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/window_bounds.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // L'épaisseur de la zone de saisie d'un bord. Assez large pour se viser sans
 // soin, assez étroite pour ne pas manger le contenu.

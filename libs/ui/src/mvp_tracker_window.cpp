@@ -20,6 +20,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "mvp_tracker_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 

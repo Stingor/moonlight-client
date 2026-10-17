@@ -18,6 +18,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "mvp_tracker_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui::mvp_tracker {
 

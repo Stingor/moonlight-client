@@ -15,6 +15,7 @@
 #include "ro/ui/window_name.h"
 
 #include "party_friend_parts.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -157,7 +158,7 @@ void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
     action.booking_asked = true;
   }
   if (!view.in_party) {
-    ImGui::SetNextItemWidth(PartyPx(kNameFieldPixels));
+    ImGui::SetNextItemWidth(Px(kNameFieldPixels));
     ImGui::InputText("##partyname", state.new_party_name.data(), state.new_party_name.size());
     ImGui::SameLine();
     const std::string_view name = Typed(state.new_party_name);
@@ -182,7 +183,7 @@ void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
   // Le serveur n'accepte d'invitation que du chef : le champ n'est qu'à lui, et
   // « Quitter » reprend alors le début de la ligne.
   if (view.i_am_leader) {
-    ImGui::SetNextItemWidth(PartyPx(kNameFieldPixels));
+    ImGui::SetNextItemWidth(Px(kNameFieldPixels));
     const bool submitted =
         ImGui::InputText("##invitename", state.invite_name.data(), state.invite_name.size(),
                          ImGuiInputTextFlags_EnterReturnsTrue);
@@ -209,7 +210,7 @@ void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
   // L'espace entre lignes EST l'espacement d'ImGui : à zéro, elles se touchent.
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
                       ImVec2(ImGui::GetStyle().ItemSpacing.x,
-                             PartyPx(static_cast<float>(std::max(0, look.row_spacing)))));
+                             Px(static_cast<float>(std::max(0, look.row_spacing)))));
   for (std::size_t rank = 0; rank < view.members.size(); ++rank) {
     ImGui::PushID(static_cast<int>(rank));
     DrawPartyRow(state, view, view.members[rank], look, action);
@@ -225,7 +226,7 @@ void DrawFriendTab(PartyFriendWindowState& state, const PartyFriendView& view,
                    const PartyFriendLook& look, const SkinArt& art, PartyFriendAction& action) {
   // Le serveur refuse l'ajout quand la liste est pleine : on ne le propose pas.
   const bool full = static_cast<int>(view.friends.size()) >= kFriendsMost;
-  ImGui::SetNextItemWidth(PartyPx(kNameFieldPixels));
+  ImGui::SetNextItemWidth(Px(kNameFieldPixels));
   const bool submitted =
       ImGui::InputText("##friendname", state.friend_name.data(), state.friend_name.size(),
                        ImGuiInputTextFlags_EnterReturnsTrue);
@@ -280,7 +281,7 @@ void DrawBody(PartyFriendWindowState& state, const PartyFriendView& view,
   // lui. Recentrée sur la hauteur du bouton qui la précède.
   if (state.tab == PartyFriendTab::kParty && view.grid_offered) {
     const float row_height = ImGui::GetItemRectSize().y;
-    const float box_height = std::max(PartyPx(kLeastCheckBoxPixels), ImGui::GetTextLineHeight());
+    const float box_height = std::max(Px(kLeastCheckBoxPixels), ImGui::GetTextLineHeight());
     ImGui::SameLine();
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + std::max(0.0F, (row_height - box_height) * 0.5F));
     bool grid = view.grid_enabled;
@@ -304,8 +305,6 @@ void DrawBody(PartyFriendWindowState& state, const PartyFriendView& view,
 }
 
 }  // namespace
-
-float PartyPx(float pixels) { return pixels * ImGui::GetStyle().FontScaleMain; }
 
 const PartyMemberView* PartyMe(const PartyFriendView& view) {
   for (const PartyMemberView& member : view.members) {
@@ -429,7 +428,7 @@ PartyFriendAction DrawPartyFriendWindow(PartyFriendWindowState& state, const Par
                         SkinCheckBoxWidth(core::Tr("Grille"), art) + style.ItemSpacing.x * 2.0F +
                         style.WindowPadding.x * 2.0F;
   ImGui::SetNextWindowSizeConstraints(
-      ImVec2(std::max(PartyPx(kLeastWidthPixels), top_row), PartyPx(kLeastHeightPixels)),
+      ImVec2(std::max(Px(kLeastWidthPixels), top_row), Px(kLeastHeightPixels)),
       ImVec2(FLT_MAX, FLT_MAX));
   SetNextWindowBulletClickable(core::Tr("Réglages Groupe / Amis"));
   SetNextWindowPinnable(&state.pinned);

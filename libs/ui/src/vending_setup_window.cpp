@@ -15,10 +15,10 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
-
-[[nodiscard]] float Scale() { return ImGui::GetStyle().FontScaleMain; }
 
 // ── LES MESURES DE LA FENÊTRE ───────────────────────────────────────────────
 // ⚠ TOUTES À L'ÉCHELLE de l'interface, jamais en pixels bruts.

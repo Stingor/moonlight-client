@@ -46,9 +46,6 @@ void DrawBossBadge(std::uint8_t rank);
 // Le relevé de Sense qui diffère de la base.
 inline constexpr ImU32 kSenseNoteColor = IM_COL32(179, 140, 51, 255);
 
-// Une longueur de référence, mise à l'échelle de l'interface.
-[[nodiscard]] float Px(float pixels);
-
 // Un texte à la manière de `printf`, pour une ligne.
 //
 // ⚠ UNE VRAIE FONCTION VARIADIQUE, MARQUÉE COMME `printf` : c'est ce qui fait
