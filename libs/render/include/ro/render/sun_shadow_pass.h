@@ -25,6 +25,9 @@ struct SunShadowCasters {
   const ModelRenderer* models = nullptr;
   // La pose des modèles animés, comme dans la passe de couleur.
   const ModelClock* clock = nullptr;
+  // Les poses du décor qui portent ombre, pleines, les autres à zéro ; nul :
+  // toutes. Voir `ShadowCastingOpacities`.
+  const ModelOpacities* model_casting = nullptr;
   SpriteRenderer* sprites = nullptr;
   // Les lots d'acteurs — les corps, puis les charrettes —, dont la silhouette va
   // dans la couche des acteurs.

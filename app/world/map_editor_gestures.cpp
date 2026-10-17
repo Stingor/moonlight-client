@@ -104,12 +104,23 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
   const std::size_t rank = *selection_.model_index;
   const ro::formats::RswModel& placed = scene.rsw.models()[rank];
   const ro::mapedit::MapEdit before = store.Document(map_name_);
+  // LA COPIE GARDE L'OPACITÉ du modèle, comme son placement.
+  std::optional<float> opacity;
+  if (rank >= original_count_) {
+    const std::size_t slot = rank - original_count_;
+    if (slot < before.added().size()) {
+      opacity = before.added()[slot].opacity;
+    }
+  } else if (const ro::mapedit::ModelEdit* edit = before.ModelAt(rank)) {
+    opacity = edit->opacity;
+  }
   ro::mapedit::MapEdit after = before;
   after.AddModel(ro::mapedit::AddedModel{
       .model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
       .position = {placed.position[0] + kDuplicateShift, placed.position[1], placed.position[2]},
       .rotation = placed.rotation,
-      .scale = placed.scale});
+      .scale = placed.scale,
+      .opacity = opacity});
   store.Set(map_name_, WithReasons(after));
   std::array<char, kDuplicateLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Dupliquer le modèle %zu"), rank);

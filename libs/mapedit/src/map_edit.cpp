@@ -25,10 +25,24 @@ constexpr std::string_view kMapEditExtension = ".yml";
   return true;
 }
 
+// Note l'opacité d'un modèle posé, s'il n'est pas plein.
+void NoteOpacity(std::size_t rank, const std::optional<float>& opacity, MapEditReport& report) {
+  if (opacity.has_value() && *opacity < kFullOpacity) {
+    report.opacities.push_back(ModelOpacity{.model_index = rank, .opacity = *opacity});
+  }
+}
+
 }  // namespace
 
 std::string MapEditPath(std::string_view map_name) {
   return std::string(kMapEditFolder) + std::string(map_name) + std::string(kMapEditExtension);
+}
+
+std::optional<float> DocumentOpacity(float opacity) noexcept {
+  if (!(opacity < kFullOpacity)) {
+    return std::nullopt;
+  }
+  return std::max(opacity, kNoOpacity);
 }
 
 const ModelEdit* MapEdit::ModelAt(std::size_t model_index) const {
@@ -233,6 +247,7 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
       rsw.PlaceModel(model_edit.model_index, model_edit.position.value_or(model.position),
                      model_edit.rotation.value_or(model.rotation),
                      model_edit.scale.value_or(model.scale));
+      NoteOpacity(model_edit.model_index, model_edit.opacity, report);
     }
     ++report.applied;
   }
@@ -247,10 +262,13 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
     const std::size_t rank = rsw.AddModel(std::move(model));
     if (added.hidden) {
       report.hidden.push_back(rank);
+    } else {
+      NoteOpacity(rank, added.opacity, report);
     }
     ++report.applied;
   }
   std::ranges::sort(report.hidden);
+  std::ranges::sort(report.opacities, {}, &ModelOpacity::model_index);
   return report;
 }
 

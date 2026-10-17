@@ -37,6 +37,20 @@ inline constexpr float kOriginTolerance = 0.01F;
 // Le chemin du document d'une carte, nommée sans extension.
 [[nodiscard]] std::string MapEditPath(std::string_view map_name);
 
+// L'OPACITÉ D'UN MODÈLE, de 0 (invisible) à 1 (plein) : absente du document,
+// elle est pleine, et le document refuse une valeur hors de ces bornes.
+inline constexpr float kNoOpacity = 0.0F;
+inline constexpr float kFullOpacity = 1.0F;
+
+// Une opacité tient-elle dans ses bornes ? Faux pour NaN.
+[[nodiscard]] constexpr bool OpacityInBounds(float opacity) noexcept {
+  return opacity >= kNoOpacity && opacity <= kFullOpacity;
+}
+
+// Ce que le document écrit d'une opacité réglée : rien quand elle est pleine,
+// sinon elle, ramenée dans ses bornes.
+[[nodiscard]] std::optional<float> DocumentOpacity(float opacity) noexcept;
+
 // LA RETOUCHE D'UN MODÈLE : se reposer, ou ne plus se dessiner. Les champs
 // absents gardent la valeur du RSW.
 struct ModelEdit {
@@ -51,6 +65,8 @@ struct ModelEdit {
   std::optional<std::array<float, 3>> scale;
   // Vrai : le modèle n'est pas dessiné.
   bool hidden = false;
+  // Translucide, de 0 à 1 ; rien : plein.
+  std::optional<float> opacity;
   // Pourquoi : le document refuse une opération qui ne le dit pas.
   std::string why;
 
@@ -67,6 +83,8 @@ struct AddedModel {
   std::array<float, 3> rotation{};
   std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
   bool hidden = false;
+  // Translucide, de 0 à 1 ; rien : plein.
+  std::optional<float> opacity;
   // Pourquoi : le document refuse un ajout qui ne le dit pas.
   std::string why;
 
@@ -318,13 +336,25 @@ class MapEdit {
 // l'identique : c'est ce que l'éditeur enregistre.
 [[nodiscard]] std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name);
 
+// L'opacité qu'une opération posée donne au modèle de rang `model_index`.
+struct ModelOpacity {
+  std::size_t model_index = 0;
+  float opacity = kFullOpacity;
+
+  friend bool operator==(const ModelOpacity&, const ModelOpacity&) = default;
+};
+
 // Ce que l'application a fait : les opérations posées, une ligne par
-// opération refusée qui dit pourquoi, et les rangs des modèles masqués.
+// opération refusée qui dit pourquoi, les rangs des modèles masqués et
+// l'opacité des translucides.
 struct MapEditReport {
   std::size_t applied = 0;
   std::vector<std::string> refused;
   // Les rangs des modèles à ne pas dessiner, croissants.
   std::vector<std::size_t> hidden;
+  // Les modèles translucides, par rangs croissants : ni les pleins, ni les
+  // masqués.
+  std::vector<ModelOpacity> opacities;
 };
 
 // LES NOMS DE FICHIERS, de l'encodage du RSW à l'UTF-8 et retour : `mapedit` ne

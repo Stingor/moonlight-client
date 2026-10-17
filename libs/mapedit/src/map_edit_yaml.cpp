@@ -40,12 +40,14 @@ constexpr std::string_view kMapEditHeader =
 #    position, rotation, scale : ce qui change, [x, y, z], dans le repère du
 #               fichier — un champ absent garde la valeur du RSW ;
 #    hidden   : vrai pour ne plus le dessiner ;
+#    opacity  : facultatif, de 0 (invisible) à 1 (plein) — absent, plein ;
 #    why      : pourquoi, obligatoire.
 #  added  : les modèles ajoutés, qui prennent rang après ceux du RSW, chacun :
 #    file     : son fichier, relatif à data\model\ ;
 #    position, rotation, scale : son placement, [x, y, z], dans le repère du
 #               fichier — position est obligatoire ;
 #    hidden   : vrai pour ne pas le dessiner ;
+#    opacity  : facultatif, de 0 (invisible) à 1 (plein) — absent, plein ;
 #    why      : pourquoi, obligatoire.
 #  lights : les lumières ponctuelles ajoutées, chacune :
 #    position : [x, y, z], dans le repère du RSW ;
@@ -124,6 +126,20 @@ core::Result<std::optional<std::array<float, 3>>> OptionalVectorFrom(const YAML:
   return std::optional<std::array<float, 3>>(*vector);
 }
 
+// L'opacité sous la clé « opacity », de 0 à 1 ; rien sans la clé.
+core::Result<std::optional<float>> OpacityFrom(const YAML::Node& entry, std::string_view map_name,
+                                               const std::string& where) {
+  const YAML::Node node = entry["opacity"];
+  if (!node) {
+    return std::optional<float>();
+  }
+  const float opacity = node.as<float>();
+  if (!OpacityInBounds(opacity)) {
+    return std::unexpected(Refused(map_name, where + " : « opacity » sort de 0 à 1"));
+  }
+  return std::optional<float>(opacity);
+}
+
 core::Result<ModelEdit> ModelEditFrom(const YAML::Node& entry, std::string_view map_name,
                                       const std::string& where) {
   if (!entry.IsMap()) {
@@ -164,6 +180,11 @@ core::Result<ModelEdit> ModelEditFrom(const YAML::Node& entry, std::string_view 
   if (const YAML::Node hidden = entry["hidden"]) {
     edit.hidden = hidden.as<bool>();
   }
+  auto opacity = OpacityFrom(entry, map_name, where);
+  if (!opacity) {
+    return std::unexpected(opacity.error());
+  }
+  edit.opacity = *opacity;
   return edit;
 }
 
@@ -204,6 +225,11 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
   if (const YAML::Node hidden = entry["hidden"]) {
     added.hidden = hidden.as<bool>();
   }
+  auto opacity = OpacityFrom(entry, map_name, where);
+  if (!opacity) {
+    return std::unexpected(opacity.error());
+  }
+  added.opacity = *opacity;
   return added;
 }
 
@@ -632,6 +658,9 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     if (model.hidden) {
       text += "    hidden: true\n";
     }
+    if (model.opacity.has_value()) {
+      text += std::format("    opacity: {}\n", *model.opacity);
+    }
     text += std::format("    why: {}\n", DoubleQuoted(model.why));
   }
   if (!edit.meshes().empty()) {
@@ -663,6 +692,9 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     text += std::format("    scale: {}\n", VectorText(added.scale));
     if (added.hidden) {
       text += "    hidden: true\n";
+    }
+    if (added.opacity.has_value()) {
+      text += std::format("    opacity: {}\n", *added.opacity);
     }
     text += std::format("    why: {}\n", DoubleQuoted(added.why));
   }

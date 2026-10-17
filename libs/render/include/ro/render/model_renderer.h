@@ -114,8 +114,10 @@ class ModelRenderer {
             const PointLightSet& points = PointLightSet()) const;
 
   // LE DÉCOR DANS LA CARTE D'OMBRE : sa seule profondeur, vue du soleil, toutes
-  // poses pleines, posées par `clock` comme dans `Draw`.
-  void DrawDepth(const glm::mat4& light_view_projection, const ModelClock* clock) const;
+  // poses pleines, posées par `clock` comme dans `Draw`. `casting` écarte les
+  // poses qui n'y sont pas pleines : voir `ShadowCastingOpacities`.
+  void DrawDepth(const glm::mat4& light_view_projection, const ModelClock* clock,
+                 const ModelOpacities* casting = nullptr) const;
 
   // LA PASSE TRANSLUCIDE DES POSES VOILÉES, par-dessus tout ce qui est peint :
   // leurs suites de faces triées de la plus lointaine à la plus proche, mêlées

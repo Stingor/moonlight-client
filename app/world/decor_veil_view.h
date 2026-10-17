@@ -6,6 +6,7 @@
 #include <string>
 
 #include "ro/render/camera.h"
+#include "ro/render/decor_opacity.h"
 #include "ro/render/model_clock.h"
 #include "ro/render/model_renderer.h"
 #include "ro/render/model_veil.h"
@@ -41,14 +42,26 @@ struct DecorVeilFrame {
 // test mais le laisse éteint. C'est un correctif de son exécutable qui l'allume,
 // et il ne l'allume que pour la première famille de modèles ; ici les deux
 // familles se voilent. Voir la fiche 0084.
+//
+// Le voile se MÊLE ICI À L'OPACITÉ QUE LE DOCUMENT D'ÉDITION donne aux modèles
+// (`MapScene::model_opacities`), voir `ro/render/decor_opacity.h` : l'option
+// éteinte, ce sont celles du document seules.
 class DecorVeilView {
  public:
   void Advance(const DecorVeilFrame& frame);
 
   // Les opacités à passer au dessin opaque du décor ; rien quand l'option est
-  // éteinte.
+  // éteinte et que le document ne rend rien translucide.
   [[nodiscard]] const ro::render::ModelOpacities* opacities() const noexcept {
+    if (composed_) {
+      return &decor_.opacities;
+    }
     return enabled_ ? &veils_.opacities() : nullptr;
+  }
+
+  // Les poses du décor qui portent ombre ; rien quand toutes en portent.
+  [[nodiscard]] const ro::render::ModelOpacities* shadow_casting() const noexcept {
+    return casting_.empty() ? nullptr : &casting_;
   }
 
   // LA PASSE TRANSLUCIDE, par-dessus les personnages et les effets.
@@ -64,6 +77,11 @@ class DecorVeilView {
   [[nodiscard]] const ro::render::ModelVeils& veils() const noexcept { return veils_; }
 
  private:
+  // Le voile seul, de cette image.
+  void AdvanceVeil(const DecorVeilFrame& frame);
+  // Le document mêlé au voile.
+  void Compose(const MapStage* stage);
+
   // LA CARTE DONT LES BOÎTES SONT PRÊTES : un changement de carte refait tout, un
   // téléport sur la même carte ne touche à rien.
   struct Prepared {
@@ -76,6 +94,12 @@ class DecorVeilView {
   std::optional<Prepared> prepared_;
   bool enabled_ = false;
   std::optional<std::uint32_t> last_ms_;
+  // Les opacités du document, pose par pose, et ce qu'elles font au voile et
+  // aux ombres. `composed_` : le document rend au moins une pose translucide.
+  ro::render::ModelOpacities document_;
+  ro::render::DecorOpacity decor_;
+  ro::render::ModelOpacities casting_;
+  bool composed_ = false;
 };
 
 }  // namespace moonclient

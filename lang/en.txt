@@ -19374,3 +19374,9 @@ tr: edited
 
 fr: retouché(s)
 tr: edited
+
+fr: Opacité (%)
+tr: Opacity (%)
+
+fr: translucide
+tr: translucent

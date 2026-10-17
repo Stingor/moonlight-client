@@ -48,6 +48,16 @@ constexpr WheelDrag kRotationDrag{
     .drag_step = kRotationStep, .wheel_step = kRotationWheelStep, .format = "%.2f"};
 constexpr WheelDrag kScaleDrag{
     .drag_step = kScaleStep, .wheel_step = kScaleWheelStep, .format = "%.3f"};
+// L'OPACITÉ SE RÈGLE EN POUR CENT, de 0 à 100 : un demi-point par pixel, un
+// point par cran de molette.
+constexpr float kPercentPerUnit = 100.0F;
+constexpr float kOpacityStepPercent = 0.5F;
+constexpr float kOpacityWheelPercent = 1.0F;
+constexpr WheelDrag kOpacityDrag{.drag_step = kOpacityStepPercent,
+                                 .wheel_step = kOpacityWheelPercent,
+                                 .lowest = 0.0F,
+                                 .highest = kPercentPerUnit,
+                                 .format = "%.0f %%"};
 
 constexpr const char* kMapEditorTitle = core::TrText("Éditeur de carte");
 constexpr const char* kMapEditorId = "map_editor";
@@ -286,10 +296,15 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
     while (clipper.Step()) {
       for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
         const MapEditorModelRow& row = rows[shown[static_cast<std::size_t>(line)]];
-        const std::string label = std::format(
-            "{}{} — {}{}##modele{}", row.added ? "+ " : (row.edited ? "✎ " : ""), row.model_index,
-            row.file, row.hidden ? std::format(" ({})", core::Tr("masqué")) : std::string(),
-            row.model_index);
+        std::string mark;
+        if (row.hidden) {
+          mark = std::format(" ({})", core::Tr("masqué"));
+        } else if (row.translucent) {
+          mark = std::format(" ({})", core::Tr("translucide"));
+        }
+        const std::string label =
+            std::format("{}{} — {}{}##modele{}", row.added ? "+ " : (row.edited ? "✎ " : ""),
+                        row.model_index, row.file, mark, row.model_index);
         const bool selected = view.selected == row.model_index || line == keyed;
         if (ImGui::Selectable(label.c_str(), selected)) {
           intents.emplace_back(map_editor::Select{row.model_index});
@@ -440,7 +455,8 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
   map_editor::Place place{.position = view.position,
                           .rotation = view.rotation,
                           .scale = view.scale,
-                          .hidden = view.hidden};
+                          .hidden = view.hidden,
+                          .opacity = view.opacity};
   bool changed = false;
   bool released = false;
   // CHAQUE LIGNE SE COPIE ET SE COLLE, en texte : voir `CopyPasteTriple`. Un
@@ -465,6 +481,15 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
     changed |= field.changed;
     released |= field.released;
     pasted |= CopyPasteTriple(label, *values, art);
+  }
+  {
+    float percent = view.opacity * kPercentPerUnit;
+    const WheelDragResult field = WheelDragFloat(core::Tr("Opacité (%)"), percent, kOpacityDrag);
+    changed |= field.changed;
+    released |= field.released;
+    if (field.changed) {
+      place.opacity = percent / kPercentPerUnit;
+    }
   }
   const bool toggled = SkinCheckBox(core::Tr("Masquer"), &place.hidden, art) || pasted;
   // UNE LUMIÈRE ANCRÉE AU MODÈLE, au centre de sa boîte : un lampion, une

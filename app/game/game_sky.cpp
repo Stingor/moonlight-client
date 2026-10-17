@@ -115,6 +115,7 @@ ro::render::SunShadowCasters Game::ShadowCastersOfFrame(
       .terrain = &terrain_,
       .models = models_shown ? &models_ : nullptr,
       .clock = &model_clock_,
+      .model_casting = pieces_.decor_veil.shadow_casting(),
       .sprites = &sprites_,
       .actor_lots = {scene_actors_.drawn, carts},
       .actor_model_renderer = actor_models_shown ? &*pieces_.actor_model_renderer : nullptr,

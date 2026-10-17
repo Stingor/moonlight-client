@@ -19374,3 +19374,9 @@ tr: retocado
 
 fr: retouché(s)
 tr: retocado(s)
+
+fr: Opacité (%)
+tr: Opacidad (%)
+
+fr: translucide
+tr: translúcido

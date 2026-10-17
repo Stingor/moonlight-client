@@ -408,11 +408,15 @@ MapEditorSession::Outcome MapEditorSession::Place(const ro::ui::map_editor::Plac
   const ro::mapedit::ModelEdit* existing = before.ModelAt(rank);
   if (existing != nullptr) {
     wanted.why = existing->why;
+    wanted.opacity = existing->opacity;
   } else if (const auto pending = pending_why_.find(rank); pending != pending_why_.end()) {
     wanted.why = pending->second;
   }
+  if (place.opacity.has_value()) {
+    wanted.opacity = ro::mapedit::DocumentOpacity(*place.opacity);
+  }
   const bool idle = !wanted.position.has_value() && !wanted.rotation.has_value() &&
-                    !wanted.scale.has_value() && !wanted.hidden;
+                    !wanted.scale.has_value() && !wanted.hidden && !wanted.opacity.has_value();
   ro::mapedit::MapEdit after = before;
   if (idle) {
     after.RemoveModel(rank);
@@ -448,6 +452,9 @@ MapEditorSession::Outcome MapEditorSession::PlaceAdded(std::size_t slot,
   added.rotation = place.rotation;
   added.scale = place.scale;
   added.hidden = place.hidden;
+  if (place.opacity.has_value()) {
+    added.opacity = ro::mapedit::DocumentOpacity(*place.opacity);
+  }
   ro::mapedit::MapEdit after = before;
   after.SetAdded(slot, std::move(added));
   Outcome outcome;
@@ -675,6 +682,7 @@ void MapEditorSession::RefreshSceneRows(const ro::mapedit::MapEdit& document) co
     if (edit.model_index < rows->size()) {
       (*rows)[edit.model_index].edited = true;
       (*rows)[edit.model_index].hidden = edit.hidden;
+      (*rows)[edit.model_index].translucent = edit.opacity.has_value();
     }
   }
   // UN MAILLAGE RETOUCHÉ compte aussi : celui de sa pose, ou celui de toutes
@@ -699,7 +707,8 @@ void MapEditorSession::RefreshSceneRows(const ro::mapedit::MapEdit& document) co
                                               .file = added.model_file,
                                               .edited = true,
                                               .hidden = added.hidden,
-                                              .added = true});
+                                              .added = true,
+                                              .translucent = added.opacity.has_value()});
   }
   scene_rows_ = std::move(rows);
   rows_document_ = document;
@@ -751,6 +760,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
     view.rotation = added.rotation;
     view.scale = added.scale;
     view.hidden = added.hidden;
+    view.opacity = added.opacity.value_or(ro::mapedit::kFullOpacity);
     view.why = added.why;
     return view;
   }
@@ -768,6 +778,8 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
       edit != nullptr ? edit->rotation.value_or(original->rotation) : original->rotation;
   view.scale = edit != nullptr ? edit->scale.value_or(original->scale) : original->scale;
   view.hidden = edit != nullptr && edit->hidden;
+  view.opacity = edit != nullptr ? edit->opacity.value_or(ro::mapedit::kFullOpacity)
+                                 : ro::mapedit::kFullOpacity;
   if (tool_ == ro::ui::MapEditorTool::kVertices) {
     if (mesh != nullptr) {
       view.why = mesh->why;

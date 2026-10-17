@@ -9,6 +9,30 @@
 namespace moonclient {
 
 void DecorVeilView::Advance(const DecorVeilFrame& frame) {
+  AdvanceVeil(frame);
+  Compose(frame.stage);
+}
+
+void DecorVeilView::Compose(const MapStage* stage) {
+  composed_ = false;
+  if (stage == nullptr) {
+    document_.clear();
+    casting_.clear();
+    return;
+  }
+  const std::vector<ro::render::ModelInstances>& models = stage->scene.models;
+  ro::render::DocumentOpacities(models, stage->scene.model_opacities, document_);
+  ro::render::ShadowCastingOpacities(document_, casting_);
+  if (document_.empty()) {
+    return;
+  }
+  ro::render::ComposeDecorOpacity(
+      models, document_, enabled_ ? &veils_.opacities() : nullptr,
+      enabled_ ? veils_.veiled() : std::span<const ro::render::VeiledPose>(), decor_);
+  composed_ = true;
+}
+
+void DecorVeilView::AdvanceVeil(const DecorVeilFrame& frame) {
   if (!frame.enabled || frame.stage == nullptr || frame.camera == nullptr) {
     // ÉTEINTE, L'OPTION REND TOUT PLEIN d'un coup : un voile figé à mi-course
     // resterait translucide jusqu'à ce qu'on la rallume.
@@ -55,8 +79,12 @@ void DecorVeilView::Draw(const ro::render::ModelRenderer& models, const ro::rend
                          float aspect_ratio, const ro::render::ModelClock* clock,
                          const ro::render::SceneFog& fog,
                          const ro::render::PointLightSet& points) const {
-  const std::span<const ro::render::VeiledPose> veiled =
-      enabled_ ? veils_.veiled() : std::span<const ro::render::VeiledPose>();
+  std::span<const ro::render::VeiledPose> veiled;
+  if (composed_) {
+    veiled = decor_.translucent;
+  } else if (enabled_) {
+    veiled = veils_.veiled();
+  }
   models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veiled, clock, fog, points);
 }
 

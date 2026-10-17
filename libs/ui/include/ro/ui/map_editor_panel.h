@@ -29,10 +29,12 @@ struct MapEditorModelRow {
   // Son rang dans le RSW, et son fichier en UTF-8.
   std::size_t model_index = 0;
   std::string file;
-  // Le document le retouche ; il le masque ; il l'a ajouté.
+  // Le document le retouche ; il le masque ; il l'a ajouté ; il le rend
+  // translucide.
   bool edited = false;
   bool hidden = false;
   bool added = false;
+  bool translucent = false;
 };
 
 // LA PLAGE D'HEURES d'un objet « la nuit seulement », telle que le panneau la
@@ -243,6 +245,8 @@ struct MapEditorView {
   // non à son pivot. Rien pour un modèle qui ne se dessine pas.
   std::optional<std::array<float, 3>> selected_center;
   bool hidden = false;
+  // De 0 (invisible) à 1 (plein).
+  float opacity = 1.0F;
   std::string why;
   // Les rangs que le document retouche sur cette carte.
   std::vector<std::size_t> edited;
@@ -291,6 +295,8 @@ struct Place {
   std::array<float, 3> rotation{};
   std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
   bool hidden = false;
+  // L'opacité, de 0 à 1 ; rien : celle que le document lui donne déjà.
+  std::optional<float> opacity;
   bool released = true;
 };
 struct SetWhy {

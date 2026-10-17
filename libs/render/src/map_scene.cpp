@@ -448,6 +448,7 @@ mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdi
     LoadMissingSceneModels(*vfs, scene);
   }
   scene.hidden_models = report.hidden;
+  scene.model_opacities = report.opacities;
   PlaceSceneInstances(scene);
   return report;
 }
@@ -542,6 +543,7 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
       .rsw = std::move(*rsw),
       .unfixed_models = std::move(unfixed_models),
       .hidden_models = fixed.hidden,
+      .model_opacities = fixed.opacities,
       .mesh_edits = std::move(mesh_edits),
       .atlas = std::move(atlas),
       .light = light,

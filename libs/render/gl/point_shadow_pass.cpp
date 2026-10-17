@@ -40,7 +40,7 @@ PointLightSet DrawPointShadows(PointShadowMaps& maps, const SunShadowCasters& ca
         casters.terrain->DrawDepth(view_projection);
       }
       if (casters.models != nullptr) {
-        casters.models->DrawDepth(view_projection, casters.clock);
+        casters.models->DrawDepth(view_projection, casters.clock, casters.model_casting);
       }
       // UN CORPS PLAT se dresse face à la lumière, le long de l'axe de la face :
       // ses panneaux, dressés pour le soleil, ne savent tourner que vers une

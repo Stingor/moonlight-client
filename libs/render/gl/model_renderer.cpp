@@ -604,13 +604,13 @@ void ModelRenderer::Draw(const Camera& camera, const SceneLight& light, float as
              opacities, sun, points);
 }
 
-void ModelRenderer::DrawDepth(const glm::mat4& light_view_projection,
-                              const ModelClock* clock) const {
+void ModelRenderer::DrawDepth(const glm::mat4& light_view_projection, const ModelClock* clock,
+                              const ModelOpacities* casting) const {
   // LES DEUX CÔTÉS D'UNE FACE PORTENT OMBRE, et une face mêlée aussi, découpée
   // à son seuil : un feuillage ombre le sol par ses seules feuilles.
   DrawOpaque(light_view_projection, SceneLight(),
              ModelStages{.light = true, .one_sided = false, .blended_apart = false}, clock,
-             SceneFog(), nullptr, SunShadowView(), PointLightSet());
+             SceneFog(), casting, SunShadowView(), PointLightSet());
 }
 
 void ModelRenderer::DrawOpaque(const glm::mat4& view_projection, const SceneLight& light,

@@ -25,7 +25,7 @@ SunShadowView DrawSunShadow(SunShadowMap& map, const SunShadowCasters& casters,
     casters.terrain->DrawDepth(frame.view_projection);
   }
   if (casters.models != nullptr) {
-    casters.models->DrawDepth(frame.view_projection, casters.clock);
+    casters.models->DrawDepth(frame.view_projection, casters.clock, casters.model_casting);
   }
   map.BeginActorLayer();
   if (casters.sprites != nullptr) {
