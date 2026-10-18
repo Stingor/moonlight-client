@@ -8,13 +8,17 @@
 #include <array>
 #include <cstring>
 #include <format>
+#include <optional>
 #include <string>
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/hour_range_text.h"
 #include "ro/ui/map_editor_row_menu.h"
+#include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/triple_clipboard.h"
 #include "ro/ui/wheel_drag.h"
 
 #include "imgui.h"
@@ -46,6 +50,28 @@ constexpr WheelDrag kHourDrag{.drag_step = 0.05F,
                               .highest = kHoursPerDay,
                               .format = "%.2f h"};
 
+// LE MENU DU CLIC DROIT SUR LA PLAGE D'HEURES qu'on vient de poser : la copier
+// en texte, « 20:00-06:00 », ou coller celle que porte le presse-papiers, qui
+// choisit la plage. Chaque entrée est grisée quand elle n'a rien à faire. Vrai
+// quand Coller a changé `hours`.
+[[nodiscard]] bool HourRangeMenu(MapEditorHours& hours) {
+  if (!BeginSkinPopupContextItem("##plage_heures")) {
+    return false;
+  }
+  if (ImGui::MenuItem(core::Tr("Copier la plage"), nullptr, false, hours.chosen)) {
+    ImGui::SetClipboardText(
+        HourRangeText(HourRange{.from_hour = hours.from_hour, .to_hour = hours.to_hour}).c_str());
+  }
+  bool pasted = false;
+  const std::optional<HourRange> read = ClipboardHourRange();
+  if (ImGui::MenuItem(core::Tr("Coller la plage"), nullptr, false, read.has_value())) {
+    hours = MapEditorHours{.chosen = true, .from_hour = read->from_hour, .to_hour = read->to_hour};
+    pasted = true;
+  }
+  EndSkinPopup();
+  return pasted;
+}
+
 // LES EFFETS DE LA CARTE : la liste des objets d'effet du RSW, et celui qu'on
 // règle — sa place, masqué, la nuit, sa lueur, sa raison.
 void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
@@ -74,7 +100,14 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
                                        ? std::optional<MapEditorIntent>(
                                              map_editor::RevertMapEffect{effect.effect_index})
                                        : std::nullopt,
-                         .cells = cells},
+                         .cells = cells,
+                         .move_to = [&effect, cubes = view.map_cubes](
+                                        const std::array<float, 3>& pasted) -> MapEditorIntent {
+                           map_editor::SetMapEffect set{
+                               .index = effect.effect_index, .effect = effect, .released = true};
+                           set.effect.position = NativeOfCells(pasted, cubes);
+                           return set;
+                         }},
         intents);
   }
   if (!view.selected_map_effect.has_value() ||
@@ -91,7 +124,8 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
       PositionInCells(core::Tr("Position (cases, hauteur)"), set.effect.position, view.map_cubes);
   changed |= moved.changed;
   released |= moved.released;
-  bool toggled = SkinCheckBox(core::Tr("Masquer"), &set.effect.hidden, art);
+  bool toggled = PositionClipboardMenu("position", set.effect.position, view.map_cubes);
+  toggled |= SkinCheckBox(core::Tr("Masquer"), &set.effect.hidden, art);
   toggled |= SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
   if (set.effect.night_only) {
     WheelDragResult hours_moved;
@@ -161,20 +195,24 @@ std::string WhyTag(std::string_view why) {
 }
 
 bool LitHoursFields(MapEditorHours& hours, const SkinArt& art, WheelDragResult& moved) {
-  const bool toggled = SkinCheckBox(core::Tr("Plage d'heures"), &hours.chosen, art);
+  // La case et ses bornes forment un groupe : le clic droit sur l'un d'eux ouvre
+  // le menu de la plage.
+  ImGui::BeginGroup();
+  bool toggled = SkinCheckBox(core::Tr("Plage d'heures"), &hours.chosen, art);
   if (ImGui::IsItemHovered()) {
     SkinTooltipFormat("%s", core::Tr("Suit l'heure du serveur quand le ciel en a une — le cycle "
                                      "jour et nuit ; sinon, la nuit du serveur décide."));
   }
-  if (!hours.chosen) {
-    return toggled;
+  if (hours.chosen) {
+    for (const WheelDragResult field :
+         {WheelDragFloat(core::Tr("De (heure)"), hours.from_hour, kHourDrag),
+          WheelDragFloat(core::Tr("À (heure)"), hours.to_hour, kHourDrag)}) {
+      moved.changed |= field.changed;
+      moved.released |= field.released;
+    }
   }
-  for (const WheelDragResult field :
-       {WheelDragFloat(core::Tr("De (heure)"), hours.from_hour, kHourDrag),
-        WheelDragFloat(core::Tr("À (heure)"), hours.to_hour, kHourDrag)}) {
-    moved.changed |= field.changed;
-    moved.released |= field.released;
-  }
+  ImGui::EndGroup();
+  toggled |= HourRangeMenu(hours);
   return toggled;
 }
 
@@ -198,10 +236,18 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectEffect{chosen ? std::nullopt : std::optional(slot)});
     }
-    DrawMapEditorRowMenu(MapEditorRowMenu{.select = map_editor::SelectEffect{slot},
-                                          .remove_label = core::Tr("Supprimer"),
-                                          .cells = cells},
-                         intents);
+    DrawMapEditorRowMenu(
+        MapEditorRowMenu{.select = map_editor::SelectEffect{slot},
+                         .remove_label = core::Tr("Supprimer"),
+                         .cells = cells,
+                         .move_to = [&effect, slot, cubes = view.map_cubes](
+                                        const std::array<float, 3>& pasted) -> MapEditorIntent {
+                           map_editor::SetEffect set{
+                               .slot = slot, .effect = effect, .released = true};
+                           set.effect.position = NativeOfCells(pasted, cubes);
+                           return set;
+                         }},
+        intents);
   }
   if (!view.selected_effect.has_value() || *view.selected_effect >= view.effects.size()) {
     return;
@@ -214,15 +260,16 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
   bool released = false;
   changed |= ImGui::InputInt(core::Tr("Numéro de l'effet"), &set.effect.number);
   released |= ImGui::IsItemDeactivatedAfterEdit();
-  for (const WheelDragResult field :
-       {PositionInCells(core::Tr("Position (cases, hauteur)"), set.effect.position, view.map_cubes),
-        WheelDragFloat(core::Tr("Cadence"), set.effect.emit_speed, kEmitSpeedDrag)}) {
-    changed |= field.changed;
-    released |= field.released;
-  }
+  const WheelDragResult moved =
+      PositionInCells(core::Tr("Position (cases, hauteur)"), set.effect.position, view.map_cubes);
+  bool toggled = PositionClipboardMenu("position", set.effect.position, view.map_cubes);
+  const WheelDragResult paced =
+      WheelDragFloat(core::Tr("Cadence"), set.effect.emit_speed, kEmitSpeedDrag);
+  changed |= moved.changed || paced.changed;
+  released |= moved.released || paced.released;
   changed |= ImGui::DragFloat4(core::Tr("Paramètres"), set.effect.param.data(), kParamStep);
   released |= ImGui::IsItemDeactivatedAfterEdit();
-  bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
+  toggled |= SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
   if (set.effect.night_only) {
     WheelDragResult hours_moved;
     toggled |= LitHoursFields(set.effect.hours, art, hours_moved);

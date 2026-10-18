@@ -1,5 +1,9 @@
 #include "ro/ui/map_editor_row_menu.h"
 
+#include <array>
+#include <optional>
+#include <utility>
+
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/triple_clipboard.h"
@@ -32,8 +36,13 @@ void DrawMapEditorRowMenu(const MapEditorRowMenu& menu, std::vector<MapEditorInt
   if (ImGui::MenuItem(core::Tr("Centrer"))) {
     act(map_editor::Focus{});
   }
-  if (ImGui::MenuItem(core::Tr("Copier la position"))) {
-    ImGui::SetClipboardText(TripleText(menu.cells).c_str());
+  if (ImGui::MenuItem(core::Tr("Copier la position"), nullptr, false, menu.cells.has_value())) {
+    ImGui::SetClipboardText(TripleText(*menu.cells).c_str());
+  }
+  const std::optional<std::array<float, 3>> pasted = ClipboardTriple();
+  if (ImGui::MenuItem(core::Tr("Coller la position"), nullptr, false,
+                      menu.move_to != nullptr && pasted.has_value())) {
+    act(menu.move_to(*pasted));
   }
   EndSkinPopup();
 }

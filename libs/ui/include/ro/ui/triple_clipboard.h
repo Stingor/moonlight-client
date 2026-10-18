@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-#include "ro/ui/skin_art.h"
+#include "ro/ui/map_cells.h"
 
 namespace ro::ui {
 
@@ -18,10 +18,18 @@ namespace ro::ui {
 // points-virgules ; rien quand il n'y en a pas exactement trois.
 [[nodiscard]] std::optional<std::array<float, 3>> ParseTriple(std::string_view text);
 
-// « Copier » et « Coller », deux petits boutons à la suite de la ligne. Copier
-// met `values` au presse-papiers ; Coller les remplace par ce qu'il porte,
-// s'il porte trois nombres. Vrai quand Coller a changé `values`.
-[[nodiscard]] bool CopyPasteTriple(const char* id, std::array<float, 3>& values,
-                                   const SkinArt& art);
+// Les trois nombres que porte le presse-papiers, s'il en porte trois.
+[[nodiscard]] std::optional<std::array<float, 3>> ClipboardTriple();
+
+// LE MENU DU CLIC DROIT sur le champ à trois valeurs qu'on vient de poser :
+// « Copier » met `values` au presse-papiers ; « Coller », grisé quand le
+// presse-papiers ne porte pas trois nombres, les remplace. `id` distingue les
+// menus d'une même fenêtre. Vrai quand Coller a changé `values`.
+[[nodiscard]] bool TripleClipboardMenu(const char* id, std::array<float, 3>& values);
+
+// Le même menu sur un champ « Position » en cases (voir `PositionInCells`) : le
+// texte porte des cases, `native` reste dans le repère du RSW.
+[[nodiscard]] bool PositionClipboardMenu(const char* id, std::array<float, 3>& native,
+                                         MapCubes cubes);
 
 }  // namespace ro::ui

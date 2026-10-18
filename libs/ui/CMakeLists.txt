@@ -289,6 +289,7 @@ add_library(ro_ui STATIC
     src/window_bounds.cpp
     src/window_places.cpp
     src/triple_clipboard.cpp
+    src/hour_range_text.cpp
     src/wheel_drag.cpp
     src/wheel_gate.cpp
     src/window_name.cpp)

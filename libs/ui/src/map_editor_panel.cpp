@@ -4,6 +4,8 @@
 #include <array>
 #include <cstring>
 #include <format>
+#include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -248,6 +250,21 @@ int KeyedRank(int current, int count) {
                        move);
 }
 
+// LE MODÈLE DÉSIGNÉ PORTÉ À DES CASES, son placement gardé pour le reste : la
+// pose qu'émet son champ « Position ». Seul le désigné a son placement dans la
+// vue ; les autres lignes n'ont ni position à copier, ni collage.
+std::function<MapEditorIntent(const std::array<float, 3>&)> PlaceAtCells(
+    const MapEditorView& view) {
+  return [&view](const std::array<float, 3>& cells) -> MapEditorIntent {
+    return map_editor::Place{.position = NativeOfCells(cells, view.map_cubes),
+                             .rotation = view.rotation,
+                             .scale = view.scale,
+                             .hidden = view.hidden,
+                             .opacity = view.opacity,
+                             .released = true};
+  };
+}
+
 // L'ARBRE DE LA SCÈNE : tous les modèles de la carte, filtrables. Un clic
 // désigne ; les retouchés sont marqués, et les masqués le disent.
 void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
@@ -317,11 +334,16 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
           remove_label = row.hidden ? core::Tr("Afficher") : core::Tr("Masquer");
         }
         DrawMapEditorRowMenu(
-            MapEditorRowMenu{.select = map_editor::Select{row.model_index},
-                             .remove_label = remove_label,
-                             .revert = row.edited && !row.added
-                                           ? std::optional<MapEditorIntent>(map_editor::Revert{})
-                                           : std::nullopt},
+            MapEditorRowMenu{
+                .select = map_editor::Select{row.model_index},
+                .remove_label = remove_label,
+                .revert = row.edited && !row.added
+                              ? std::optional<MapEditorIntent>(map_editor::Revert{})
+                              : std::nullopt,
+                .cells = view.selected == row.model_index
+                             ? std::optional(CellsOfNative(view.position, view.map_cubes))
+                             : std::nullopt,
+                .move_to = view.selected == row.model_index ? PlaceAtCells(view) : nullptr},
             intents);
         if (line == keyed) {
           KeepLastItemInView();
@@ -460,20 +482,16 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
                           .opacity = view.opacity};
   bool changed = false;
   bool released = false;
-  // CHAQUE LIGNE SE COPIE ET SE COLLE, en texte : voir `CopyPasteTriple`. Un
-  // collage est un geste entier. La position se copie en cases, comme elle se
-  // montre.
+  // CHAQUE LIGNE SE COPIE ET SE COLLE par son clic droit, en texte : voir
+  // `TripleClipboardMenu`. Un collage est un geste entier. La position se copie
+  // en cases, comme elle se montre.
   bool pasted = false;
   {
     const WheelDragResult field =
         PositionInCells(core::Tr("Position (cases, hauteur)"), place.position, view.map_cubes);
     changed |= field.changed;
     released |= field.released;
-    std::array<float, 3> cells = CellsOfNative(place.position, view.map_cubes);
-    if (CopyPasteTriple("position", cells, art)) {
-      place.position = NativeOfCells(cells, view.map_cubes);
-      pasted = true;
-    }
+    pasted |= PositionClipboardMenu("position", place.position, view.map_cubes);
   }
   for (const auto& [label, values, drag] :
        {std::tuple(core::Tr("Rotation (°)"), &place.rotation, &kRotationDrag),
@@ -481,7 +499,7 @@ void DrawPlacement(const MapEditorView& view, std::vector<MapEditorIntent>& inte
     const WheelDragResult field = WheelDragFloat3(label, *values, *drag);
     changed |= field.changed;
     released |= field.released;
-    pasted |= CopyPasteTriple(label, *values, art);
+    pasted |= TripleClipboardMenu(label, *values);
   }
   {
     float percent = view.opacity * kPercentPerUnit;
@@ -582,10 +600,17 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
     if (ImGui::Selectable(label.c_str(), chosen)) {
       intents.emplace_back(map_editor::SelectLight{chosen ? std::nullopt : std::optional(slot)});
     }
-    DrawMapEditorRowMenu(MapEditorRowMenu{.select = map_editor::SelectLight{slot},
-                                          .remove_label = core::Tr("Supprimer"),
-                                          .cells = CellsOfNative(light.position, view.map_cubes)},
-                         intents);
+    DrawMapEditorRowMenu(
+        MapEditorRowMenu{.select = map_editor::SelectLight{slot},
+                         .remove_label = core::Tr("Supprimer"),
+                         .cells = CellsOfNative(light.position, view.map_cubes),
+                         .move_to = [&light, slot, cubes = view.map_cubes](
+                                        const std::array<float, 3>& pasted) -> MapEditorIntent {
+                           map_editor::SetLight set{.slot = slot, .light = light, .released = true};
+                           set.light.position = NativeOfCells(pasted, cubes);
+                           return set;
+                         }},
+        intents);
   }
   if (!view.selected_light.has_value() || *view.selected_light >= view.lights.size()) {
     return;
@@ -600,6 +625,7 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
       PositionInCells(core::Tr("Position (cases, hauteur)"), set.light.position, view.map_cubes);
   changed |= moved.changed;
   released |= moved.released;
+  const bool pasted = PositionClipboardMenu("position", set.light.position, view.map_cubes);
   // UNE PASTILLE ET SON SÉLECTEUR : la couleur se choisit à l'œil. Au-delà de
   // 1, une composante éclaire plus fort ; la session borne ce que l'on tape.
   changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.light.color.data(),
@@ -614,6 +640,7 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
   changed |= reach.changed;
   released |= reach.released;
   bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
+  toggled |= pasted;
   if (set.light.night_only) {
     WheelDragResult hours_moved;
     toggled |= LitHoursFields(set.light.hours, art, hours_moved);

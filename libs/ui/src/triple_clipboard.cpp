@@ -6,7 +6,7 @@
 #include <system_error>
 
 #include "ro/core/i18n.h"
-#include "ro/ui/skin_widgets.h"
+#include "ro/ui/skin_popup.h"
 
 #include "imgui.h"
 
@@ -51,26 +51,40 @@ std::optional<std::array<float, 3>> ParseTriple(std::string_view text) {
   return values;
 }
 
-bool CopyPasteTriple(const char* id, std::array<float, 3>& values, const SkinArt& art) {
-  ImGui::PushID(id);
-  ImGui::SameLine();
-  if (SkinSmallButton(core::Tr("Copier"), art)) {
-    ImGui::SetClipboardText(TripleText(values).c_str());
+std::optional<std::array<float, 3>> ClipboardTriple() {
+  const char* clipboard = ImGui::GetClipboardText();
+  if (clipboard == nullptr) {
+    return std::nullopt;
   }
-  ImGui::SameLine();
+  return ParseTriple(clipboard);
+}
+
+bool TripleClipboardMenu(const char* id, std::array<float, 3>& values) {
+  // Le champ est un groupe, sans identifiant : le menu prend un nom, sous `id`.
+  ImGui::PushID(id);
   bool pasted = false;
-  if (SkinSmallButton(core::Tr("Coller"), art)) {
-    const char* clipboard = ImGui::GetClipboardText();
-    if (clipboard != nullptr) {
-      if (const std::optional<std::array<float, 3>> read = ParseTriple(clipboard);
-          read.has_value()) {
-        values = *read;
-        pasted = true;
-      }
+  if (BeginSkinPopupContextItem("##presse_papiers")) {
+    if (ImGui::MenuItem(core::Tr("Copier"))) {
+      ImGui::SetClipboardText(TripleText(values).c_str());
     }
+    const std::optional<std::array<float, 3>> read = ClipboardTriple();
+    if (ImGui::MenuItem(core::Tr("Coller"), nullptr, false, read.has_value())) {
+      values = *read;
+      pasted = true;
+    }
+    EndSkinPopup();
   }
   ImGui::PopID();
   return pasted;
+}
+
+bool PositionClipboardMenu(const char* id, std::array<float, 3>& native, MapCubes cubes) {
+  std::array<float, 3> cells = CellsOfNative(native, cubes);
+  if (!TripleClipboardMenu(id, cells)) {
+    return false;
+  }
+  native = NativeOfCells(cells, cubes);
+  return true;
 }
 
 }  // namespace ro::ui

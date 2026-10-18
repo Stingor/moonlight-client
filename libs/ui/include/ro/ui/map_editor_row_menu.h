@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -20,8 +21,13 @@ struct MapEditorRowMenu {
   const char* remove_label = nullptr;
   // Rendre l'objet à la carte ; rien : pas de ligne.
   std::optional<MapEditorIntent> revert;
-  // Sa position en cases, pour « Copier la position ».
-  std::array<float, 3> cells{};
+  // Sa position en cases, pour « Copier la position » ; rien : l'entrée est
+  // grisée.
+  std::optional<std::array<float, 3>> cells;
+  // L'intention qui porte l'objet à ces cases — celle qu'émet son champ
+  // « Position » —, pour « Coller la position » ; nulle, ou un presse-papiers
+  // sans trois nombres : l'entrée est grisée.
+  std::function<MapEditorIntent(const std::array<float, 3>& cells)> move_to;
 };
 
 // Le menu de la ligne que l'on vient de dessiner, s'il est ouvert ; ses choix

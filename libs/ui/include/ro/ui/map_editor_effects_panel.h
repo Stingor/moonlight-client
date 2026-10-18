@@ -17,8 +17,9 @@ namespace ro::ui {
 [[nodiscard]] std::string WhyTag(std::string_view why);
 
 // LA PLAGE D'HEURES d'un objet « la nuit seulement », sous sa case : une case
-// qui la choisit, puis ses deux bornes. Vrai quand la case a basculé ; les
-// bornes disent leur glissé dans `moved`.
+// qui la choisit, puis ses deux bornes ; le clic droit sur elles copie ou colle
+// la plage en texte, voir `HourRangeText`. Vrai quand la case a basculé ou
+// qu'une plage a été collée ; les bornes disent leur glissé dans `moved`.
 [[nodiscard]] bool LitHoursFields(MapEditorHours& hours, const SkinArt& art,
                                   WheelDragResult& moved);
 

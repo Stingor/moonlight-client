@@ -19351,6 +19351,15 @@ tr: Añadir una luz aquí
 fr: Copier la position
 tr: Copiar la posición
 
+fr: Coller la position
+tr: Pegar la posición
+
+fr: Copier la plage
+tr: Copiar el intervalo
+
+fr: Coller la plage
+tr: Pegar el intervalo
+
 fr: Aucun point désigné.
 tr: Ningún punto designado.
 

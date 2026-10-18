@@ -19351,6 +19351,15 @@ tr: Add a light here
 fr: Copier la position
 tr: Copy the position
 
+fr: Coller la position
+tr: Paste the position
+
+fr: Copier la plage
+tr: Copy the range
+
+fr: Coller la plage
+tr: Paste the range
+
 fr: Aucun point désigné.
 tr: No point selected.
 
