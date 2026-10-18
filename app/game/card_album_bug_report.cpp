@@ -16,10 +16,6 @@ namespace {
 
 using ro::ui::CardAlbumPocketView;
 using ro::ui::CardAlbumTone;
-
-// Le libellé d'un rapport — « Album de cartes : recherche « poring » » —,
-// jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Les pochettes de la double page que le rapport cite. ⚠ UNE BORNE ET NON LA
 // PAGE ENTIÈRE : une fenêtre agrandie en montre des dizaines, et le contexte
 // tient en un kilo-octet côté serveur.
@@ -27,8 +23,6 @@ constexpr std::size_t kSpreadPocketsCited = 5;
 // La recherche et le compte rendu, en octets avant échappement.
 constexpr std::size_t kSearchBytes = 24;
 constexpr std::size_t kNoticeBytes = 80;
-
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
 [[nodiscard]] const char* ToneWord(CardAlbumTone tone) {
   switch (tone) {
@@ -62,7 +56,7 @@ constexpr std::size_t kNoticeBytes = 80;
     }
     const CardAlbumPocketView& pocket = view.pockets[static_cast<std::size_t>(rank)];
     fields += std::format(R"({}{{"card_id":{},"unlocked":{},"reserve":{}}})", written ? "," : "",
-                          pocket.card_id, Flag(pocket.unlocked), pocket.reserve);
+                          pocket.card_id, JsonFlag(pocket.unlocked), pocket.reserve);
     written = true;
   }
   fields += std::format(R"(],"more":{}}})", shown - cited);
@@ -80,10 +74,10 @@ BugReportContext CardAlbumBugReport(const ro::ui::CardAlbumWindowState& window,
       R"("search":"{}","sort_mode":{},"show_filter":{},"slot_filter":{},"nature_mask":{},)"
       R"("shown":{},"family":{{"unlocked":{},"total":{}}},)",
       view.pockets.size(), view.unlocked_count, view.total_reserve, view.hand.size(),
-      Flag(view.blocked), Flag(view.loading), Flag(view.staff), Flag(view.dropper_known),
-      Flag(window.look.auto_sacrifice), JsonClipped(search, kSearchBytes), window.sort_mode,
-      window.show_filter, window.slot_filter, window.nature_mask, window.order.size(),
-      window.family_unlocked, window.family_total);
+      JsonFlag(view.blocked), JsonFlag(view.loading), JsonFlag(view.staff),
+      JsonFlag(view.dropper_known), JsonFlag(window.look.auto_sacrifice),
+      JsonClipped(search, kSearchBytes), window.sort_mode, window.show_filter, window.slot_filter,
+      window.nature_mask, window.order.size(), window.family_unlocked, window.family_total);
   fields += SpreadFields(window, view);
   // Le compte rendu que la fenêtre affichait, et la pochette qu'il désigne.
   if (!view.notice.empty()) {
@@ -94,7 +88,7 @@ BugReportContext CardAlbumBugReport(const ro::ui::CardAlbumWindowState& window,
   fields += '}';
 
   // Le libellé : la recherche quand il y en a une, sinon la complétion.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (!search.empty()) {
     std::snprintf(
         label.data(), label.size(), ro::core::Tr("Album de cartes : recherche « %s »"),

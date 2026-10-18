@@ -18,17 +18,11 @@ namespace {
 using ro::ui::MvpSlotView;
 using ro::ui::MvpTrackerView;
 using ro::ui::MvpTrackerWindowState;
-
-// Le libellé d'un rapport — « Carnet MVP : Baphomet sur prt_maze03 (créneau
-// 12) » —, jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Les premières rangées dans l'ordre montré : assez pour reconnaître un tri,
 // trop peu pour peser.
 constexpr std::size_t kMostRowsReported = 4;
 // Le plus long texte repris d'un créneau : un nom de MVP, un nom de carte.
 constexpr std::size_t kMostTextBytes = 48;
-
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
 // Un texte borné, coupé sur une frontière de caractère, prêt pour le JSON.
 [[nodiscard]] std::string Bounded(std::string_view text) {
@@ -52,10 +46,11 @@ constexpr std::size_t kMostTextBytes = 48;
       R"("delay_ms":[{},{}],"window":{{"known":{},"from_s":{},"to_s":{},"exact":{}}},)"
       R"("observed":{},"source":{},"kill_time_s":{},"exact_respawn_s":{},"tomb":[{},{}],)"
       R"("reported_at_s":{}}})",
-      why, slot.slot_id, slot.mob_id, Bounded(slot.label), Bounded(slot.map), Flag(slot.favorite),
-      slot.delay1_ms, slot.delay2_ms, Flag(slot.window_known), slot.window_from_s, slot.window_to_s,
-      Flag(slot.exact), Flag(slot.observed), slot.source_raw, slot.kill_time_s,
-      slot.exact_respawn_s, slot.tomb_x, slot.tomb_y, slot.reported_at_s);
+      why, slot.slot_id, slot.mob_id, Bounded(slot.label), Bounded(slot.map),
+      JsonFlag(slot.favorite), slot.delay1_ms, slot.delay2_ms, JsonFlag(slot.window_known),
+      slot.window_from_s, slot.window_to_s, JsonFlag(slot.exact), JsonFlag(slot.observed),
+      slot.source_raw, slot.kill_time_s, slot.exact_respawn_s, slot.tomb_x, slot.tomb_y,
+      slot.reported_at_s);
 }
 
 // LE GROUPE, le dernier refus, l'invitation : ce que le panneau du haut disait.
@@ -66,9 +61,9 @@ constexpr std::size_t kMostTextBytes = 48;
       R"("group":{{"group_id":{},"members":{},"online":{},"owner_known":{},"i_own":{}}},)"
       R"("result":{{"code":{},"shown":{}}},)"
       R"("invite":{{"pending":{},"waiting":{},"refusal":{},"gone":{}}})",
-      view.group_id, view.members.size(), online, Flag(view.owner_known), Flag(view.i_own),
-      view.result_code, Flag(view.result_shown), view.pending_invite, Flag(view.invite_waiting),
-      view.invite_refusal, Flag(view.invite_gone));
+      view.group_id, view.members.size(), online, JsonFlag(view.owner_known), JsonFlag(view.i_own),
+      view.result_code, JsonFlag(view.result_shown), view.pending_invite,
+      JsonFlag(view.invite_waiting), view.invite_refusal, JsonFlag(view.invite_gone));
 }
 
 // Les premières rangées dans l'ordre montré, par créneau.
@@ -100,10 +95,11 @@ BugReportContext MvpTrackerBugReport(const MvpTrackerWindowState& window,
       R"("mvp_tracker":{{"enabled":{},"link_ready":{},"catalog_known":{},"collapsed":{},)"
       R"("server_now_s":{},"slots":{},"rows":{},"favorites":{},"sort":"{}","filter":"{}",)"
       R"("delay_column":{},"lines":{},"alerts":{},"first_rows":{},)",
-      Flag(view.enabled), Flag(view.link_ready), Flag(view.catalog_known),
-      Flag(window.was_collapsed), view.server_now_s, view.slots.size(), window.order.size(),
+      JsonFlag(view.enabled), JsonFlag(view.link_ready), JsonFlag(view.catalog_known),
+      JsonFlag(window.was_collapsed), view.server_now_s, view.slots.size(), window.order.size(),
       favorites, ro::ui::MvpSortWord(window.sort_key), Bounded(filter),
-      Flag(window.look.show_delay), view.lines.size(), view.alerts.size(), FirstRows(window, view));
+      JsonFlag(window.look.show_delay), view.lines.size(), view.alerts.size(),
+      FirstRows(window, view));
   fields += GroupFields(view);
 
   // Le créneau sur lequel le carnet vient de s'ouvrir, sinon le dernier dont le
@@ -121,7 +117,7 @@ BugReportContext MvpTrackerBugReport(const MvpTrackerWindowState& window,
   fields += '}';
 
   // Le libellé : le créneau visé, sinon le filtre, sinon le compte des rangées.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (slot != nullptr) {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Carnet MVP : %s sur %s (créneau %u)"),
                   slot->label.empty() ? "?" : std::string(slot->label).c_str(),

@@ -16,10 +16,6 @@ using ro::sim::NaviGoalKind;
 using ro::sim::NaviGuideStatus;
 using ro::sim::NaviHitKind;
 
-// Le libellé d'un rapport — « Navigation : Jean-Mich (gonryun 46,255) » —,
-// jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
-
 [[nodiscard]] std::string_view MapName(const NaviData& data, ro::formats::NaviMapIndex map) {
   return map < data.maps.size() ? std::string_view(data.maps[map].name) : std::string_view();
 }
@@ -152,7 +148,7 @@ BugReportContext NavigationBugReport(const NaviBugScene& scene) {
   }
   if (subject.empty() && scene.guide != nullptr && scene.guide->active() && scene.navi != nullptr)
     subject = MapName(*scene.navi, scene.guide->goal_map());
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (subject.empty()) {
     std::snprintf(label.data(), label.size(), "%s", ro::core::Tr("Navigation"));
   } else {

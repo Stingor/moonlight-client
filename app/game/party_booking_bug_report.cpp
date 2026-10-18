@@ -20,10 +20,6 @@ using ro::ui::PartyBookingRowView;
 using ro::ui::PartyBookingSlots;
 using ro::ui::PartyBookingView;
 using ro::ui::PartyBookingWindowState;
-
-// Le libellé d'un rapport — « Recherche de groupe : 12 annonces » —, jamais
-// plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Les premières annonces de la liste : assez pour reconnaître une ligne mal
 // composée, trop peu pour peser.
 constexpr std::size_t kMostRowsReported = 3;
@@ -31,8 +27,6 @@ constexpr std::size_t kMostRowsReported = 3;
 // début suffit à reconnaître la ligne ; le contexte entier doit tenir loin
 // sous la borne du serveur.
 constexpr std::size_t kMostTextBytes = 32;
-
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
 // Un texte borné, coupé sur une frontière de caractère, prêt pour le JSON.
 [[nodiscard]] std::string Bounded(std::string_view text) {
@@ -81,8 +75,8 @@ constexpr std::size_t kMostTextBytes = 32;
   std::string fields = std::format(
       R"("search":{{"level":{},"filter":"{}","map_code":{},"job":{},"searching":{},)"
       R"("searched":{},"more_on_server":{},"rows":{},"first_rows":[)",
-      asked.level, FilterWord(window.filter), asked.map_code, asked.job, Flag(view.searching),
-      Flag(view.searched), Flag(view.more_on_server), view.rows.size());
+      asked.level, FilterWord(window.filter), asked.map_code, asked.job, JsonFlag(view.searching),
+      JsonFlag(view.searched), JsonFlag(view.more_on_server), view.rows.size());
   const std::size_t shown = std::min(view.rows.size(), kMostRowsReported);
   for (std::size_t rank = 0; rank < shown; ++rank) {
     if (rank > 0) {
@@ -106,7 +100,8 @@ constexpr std::size_t kMostTextBytes = 32;
   }
   const ro::ui::PartyBookingAction draft = ro::ui::PartyBookingRegisterAsked(window, view);
   return std::format(R"("draft":{{"level":{},"map_code":{},"jobs":{},"registering":{}}})",
-                     draft.level, draft.map_code, SlotCodes(draft.jobs), Flag(view.registering));
+                     draft.level, draft.map_code, SlotCodes(draft.jobs),
+                     JsonFlag(view.registering));
 }
 
 }  // namespace
@@ -118,7 +113,7 @@ BugReportContext PartyBookingBugReport(const PartyBookingWindowState& window,
                   view.most_level, SearchFields(window, view), MineFields(window, view));
 
   // Le libellé : l'annonce du joueur, sinon la liste reçue, sinon la fenêtre.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (view.has_mine) {
     std::snprintf(label.data(), label.size(),
                   ro::core::Tr("Recherche de groupe : mon annonce (%s)"),

@@ -13,10 +13,6 @@ namespace {
 using ro::sim::BattleSide;
 using ro::sim::EntryQueuePhase;
 
-// Le libellé d'un rapport — « Champ de bataille : file « Flavius » » —, jamais
-// plus long.
-constexpr std::size_t kLabelBytes = 192;
-
 [[nodiscard]] const char* PhaseWord(EntryQueuePhase phase) {
   switch (phase) {
     case EntryQueuePhase::kIdle:
@@ -47,8 +43,6 @@ constexpr std::size_t kLabelBytes = 192;
   return "?";
 }
 
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
-
 // La file : ce que le serveur en a dit, et ce que le client en a déduit.
 [[nodiscard]] std::string QueueFields(const ro::sim::EntryQueue& queue, std::uint32_t now_ms) {
   return std::format(
@@ -65,8 +59,8 @@ constexpr std::size_t kLabelBytes = 192;
       R"("field":{{"server_name":"{}","display_name":"{}","team":{{"min":{},"max":{}}},)"
       R"("apply":{{"solo":{},"party":{},"guild":{}}},"level":{{"min":{},"max":{}}}}})",
       JsonEscaped(field.server_name), JsonEscaped(field.name.In(ro::core::CurrentLanguage())),
-      field.team_min, field.team_max, Flag(field.solo_apply), Flag(field.party_apply),
-      Flag(field.guild_apply), field.level_min, field.level_max);
+      field.team_min, field.team_max, JsonFlag(field.solo_apply), JsonFlag(field.party_apply),
+      JsonFlag(field.guild_apply), field.level_min, field.level_max);
 }
 
 [[nodiscard]] std::string BattleFields(const ro::sim::Battlefield& battlefield) {
@@ -83,8 +77,8 @@ BugReportContext BattlegroundBugReport(const BattlegroundBugScene& scene) {
   std::string fields =
       std::format(R"("battleground":{{"map":"{}","on_battlefield":{},"link_ready":{},)"
                   R"("table":{{"loaded":{},"fields":{}}})",
-                  JsonEscaped(scene.map_name), Flag(scene.on_battlefield), Flag(scene.link_ready),
-                  Flag(scene.table_loaded), scene.table_fields);
+                  JsonEscaped(scene.map_name), JsonFlag(scene.on_battlefield),
+                  JsonFlag(scene.link_ready), JsonFlag(scene.table_loaded), scene.table_fields);
   if (scene.queue != nullptr) {
     fields += ',';
     fields += QueueFields(*scene.queue, scene.now_ms);
@@ -100,7 +94,7 @@ BugReportContext BattlegroundBugReport(const BattlegroundBugScene& scene) {
   fields += '}';
 
   // Le libellé : la bataille en cours, sinon la file, sinon le terrain choisi.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   const bool in_queue = scene.queue != nullptr && scene.queue->phase() != EntryQueuePhase::kIdle;
   if (scene.on_battlefield) {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Champ de bataille : en bataille (%s)"),

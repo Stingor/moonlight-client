@@ -1,11 +1,10 @@
 #include "options/broadcast_balloon_options.h"
 
-#include <algorithm>
-
 #include "ro/core/i18n.h"
 #include "ro/ui/item_obtain_toast.h"
 
 #include "options/bubble_samples.h"
+#include "options/option_row_kinds.h"
 
 namespace moonclient {
 namespace {
@@ -40,18 +39,6 @@ constexpr const char* kHuntYKey = "hunt_balloons_top_y";
   return OptionRowView{.id = RowId(row), .label = label, .help = help, .on = on};
 }
 
-[[nodiscard]] OptionRowView Steps(BalloonRow row, const char* label, const char* help, int value,
-                                  int lowest, int highest, const char* format) {
-  return OptionRowView{.id = RowId(row),
-                       .label = label,
-                       .help = help,
-                       .kind = OptionKind::kSlider,
-                       .value = static_cast<float>(value),
-                       .lowest = static_cast<float>(lowest),
-                       .highest = static_cast<float>(highest),
-                       .format = format};
-}
-
 [[nodiscard]] OptionRowView Swatch(BalloonRow row, const char* label, ImU32 color) {
   return OptionRowView{
       .id = RowId(row), .label = label, .kind = OptionKind::kColor, .color = color};
@@ -59,11 +46,6 @@ constexpr const char* kHuntYKey = "hunt_balloons_top_y";
 
 [[nodiscard]] OptionRowView Button(BalloonRow row, const char* label, const char* help) {
   return OptionRowView{.id = RowId(row), .label = label, .help = help, .kind = OptionKind::kAction};
-}
-
-// Une valeur de curseur, entière et bornée.
-[[nodiscard]] int Stepped(float value, int lowest, int highest) {
-  return std::clamp(static_cast<int>(value + 0.5F), lowest, highest);
 }
 
 }  // namespace
@@ -101,41 +83,43 @@ void BroadcastBalloonOptions::Compose() {
     row.disabled = off;
     rows.push_back(row);
   };
-  added(Steps(BalloonRow::kDurationMs, Tr("Durée (ms)"),
-              Tr("Le jeu tient une bulle 20000 ms, sans réglage possible."), look_.duration_ms,
-              ro::ui::kShortestBalloonMs, ro::ui::kLongestBalloonMs, "%.0f"));
-  added(Steps(BalloonRow::kMostPerFamily, Tr("Bulles à la fois"),
-              Tr("Au-delà, la plus ancienne part pour la nouvelle. Le jeu en garde trois. "
-                 "L'avancée des chasses n'en montre toujours qu'une : chacune remplace la "
-                 "précédente."),
-              look_.most_per_family, ro::ui::kLeastBalloonsPerFamily,
-              ro::ui::kMostBalloonsPerFamily, "%.0f"));
+  added(WholeSlider(RowId(BalloonRow::kDurationMs), Tr("Durée (ms)"),
+                    Tr("Le jeu tient une bulle 20000 ms, sans réglage possible."),
+                    look_.duration_ms, ro::ui::kShortestBalloonMs, ro::ui::kLongestBalloonMs,
+                    "%.0f"));
+  added(WholeSlider(RowId(BalloonRow::kMostPerFamily), Tr("Bulles à la fois"),
+                    Tr("Au-delà, la plus ancienne part pour la nouvelle. Le jeu en garde trois. "
+                       "L'avancée des chasses n'en montre toujours qu'une : chacune remplace la "
+                       "précédente."),
+                    look_.most_per_family, ro::ui::kLeastBalloonsPerFamily,
+                    ro::ui::kMostBalloonsPerFamily, "%.0f"));
   added(Toggle(BalloonRow::kFade, Tr("Fondu de sortie"),
                Tr("La bulle s'efface en fin de vie au lieu de disparaître d'un coup comme "
                   "dans le jeu."),
                look_.fade));
-  OptionRowView fade_ms = Steps(BalloonRow::kFadeMs, Tr("Durée du fondu (ms)"), nullptr,
-                                look_.fade_ms, 0, ro::ui::kLongestBalloonFadeMs, "%.0f");
+  OptionRowView fade_ms =
+      WholeSlider(RowId(BalloonRow::kFadeMs), Tr("Durée du fondu (ms)"), nullptr, look_.fade_ms, 0,
+                  ro::ui::kLongestBalloonFadeMs, "%.0f");
   fade_ms.indented = true;
   added(fade_ms);
   rows.back().disabled = off || !look_.fade;
-  added(Steps(BalloonRow::kFontScale, Tr("Taille police"),
-              Tr("En pourcentage du corps du jeu : douze pixels pour une annonce, quatorze "
-                 "pour l'avis d'étoile, et ce que l'annonce colorée demande."),
-              look_.font_scale_percent, ro::ui::kLeastBalloonFontPercent,
-              ro::ui::kMostBalloonFontPercent, "%.0f %%"));
-  added(Steps(BalloonRow::kWrapPx, Tr("Largeur avant retour à la ligne"),
-              Tr("Une annonce simple plus large se replie. Le jeu la coupe tous les 72 "
-                 "octets, ce qui coupe un caractère accentué en deux ; ce client replie à la "
-                 "largeur, et 380 pixels valent ses 72 caractères."),
-              look_.wrap_px, ro::ui::kLeastBalloonWrapPixels, ro::ui::kMostBalloonWrapPixels,
-              "%.0f px"));
+  added(WholeSlider(RowId(BalloonRow::kFontScale), Tr("Taille police"),
+                    Tr("En pourcentage du corps du jeu : douze pixels pour une annonce, quatorze "
+                       "pour l'avis d'étoile, et ce que l'annonce colorée demande."),
+                    look_.font_scale_percent, ro::ui::kLeastBalloonFontPercent,
+                    ro::ui::kMostBalloonFontPercent, "%.0f %%"));
+  added(WholeSlider(RowId(BalloonRow::kWrapPx), Tr("Largeur avant retour à la ligne"),
+                    Tr("Une annonce simple plus large se replie. Le jeu la coupe tous les 72 "
+                       "octets, ce qui coupe un caractère accentué en deux ; ce client replie à la "
+                       "largeur, et 380 pixels valent ses 72 caractères."),
+                    look_.wrap_px, ro::ui::kLeastBalloonWrapPixels, ro::ui::kMostBalloonWrapPixels,
+                    "%.0f px"));
   added(Swatch(BalloonRow::kBackgroundColor, Tr("Couleur du fond"), look_.background));
-  added(Steps(BalloonRow::kBackgroundAlpha, Tr("Opacité du fond"),
-              Tr("Le jeu pose un voile noir au quart d'opacité, qui laisse le texte se perdre "
-                 "sur un sol clair. Plus dense, il se lit partout."),
-              ro::ui::ColorAlphaPercent(look_.background), 0, ro::ui::kWholeAlphaPercent,
-              "%.0f %%"));
+  added(WholeSlider(
+      RowId(BalloonRow::kBackgroundAlpha), Tr("Opacité du fond"),
+      Tr("Le jeu pose un voile noir au quart d'opacité, qui laisse le texte se perdre "
+         "sur un sol clair. Plus dense, il se lit partout."),
+      ro::ui::ColorAlphaPercent(look_.background), 0, ro::ui::kWholeAlphaPercent, "%.0f %%"));
   added(Swatch(BalloonRow::kBorderColor, Tr("Couleur de la bordure"), look_.border));
 
   // ── LES DEUX BANDEAUX, chacun sa poignée ─────────────────────────────────

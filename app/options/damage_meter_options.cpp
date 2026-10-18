@@ -6,6 +6,8 @@
 
 #include "ro/core/i18n.h"
 
+#include "options/option_row_kinds.h"
+
 namespace moonclient {
 namespace {
 
@@ -44,18 +46,6 @@ constexpr const char* kShareFormat = "%.2f";
                        .help = help,
                        .kind = OptionKind::kToggle,
                        .on = on};
-}
-
-[[nodiscard]] OptionRowView Slider(DamageMeterRow row, const char* label, const char* help,
-                                   int value, int lowest, int highest, const char* format) {
-  return OptionRowView{.id = DamageMeterRowId(row),
-                       .label = label,
-                       .help = help,
-                       .kind = OptionKind::kSlider,
-                       .value = static_cast<float>(value),
-                       .lowest = static_cast<float>(lowest),
-                       .highest = static_cast<float>(highest),
-                       .format = format};
 }
 
 [[nodiscard]] int Rounded(float value, int lowest, int highest) {
@@ -164,21 +154,22 @@ void DamageMeterOptions::Compose() {
                                 .highest = 1.0F,
                                 .format = kShareFormat});
 
-  rows_.push_back(Slider(DamageMeterRow::kSlotMs, Tr("Résolution (ms/slot)"),
-                         Tr("Largeur de chaque colonne du graphique en millisecondes.\nValeur "
-                            "plus basse = graphique plus précis mais moins lisse.\nLe changer "
-                            "remet le graphique à zéro."),
-                         static_cast<int>(bounded.slot_ms), kFinestSlotMs, kCoarsestSlotMs,
-                         kMillisecondsFormat));
+  rows_.push_back(WholeSlider(DamageMeterRowId(DamageMeterRow::kSlotMs), Tr("Résolution (ms/slot)"),
+                              Tr("Largeur de chaque colonne du graphique en millisecondes.\nValeur "
+                                 "plus basse = graphique plus précis mais moins lisse.\nLe changer "
+                                 "remet le graphique à zéro."),
+                              static_cast<int>(bounded.slot_ms), kFinestSlotMs, kCoarsestSlotMs,
+                              kMillisecondsFormat));
   rows_.back().heading = Tr("Mesure");
-  rows_.push_back(Slider(DamageMeterRow::kWindowSecs, Tr("Fenêtre DPS (s)"),
-                         Tr("Fenêtre de temps pour calculer le DPS courant affiché."),
-                         static_cast<int>(bounded.window_secs), kShortestWindowSecs,
-                         kLongestWindowSecs, kSecondsFormat));
-  rows_.push_back(Slider(DamageMeterRow::kCombatTimeout, Tr("Timeout combat (s)"),
-                         Tr("Secondes sans dégâts avant de quitter le mode combat."),
-                         static_cast<int>(bounded.combat_timeout_secs), kShortestCombatTimeoutSecs,
-                         kLongestCombatTimeoutSecs, kSecondsFormat));
+  rows_.push_back(WholeSlider(DamageMeterRowId(DamageMeterRow::kWindowSecs), Tr("Fenêtre DPS (s)"),
+                              Tr("Fenêtre de temps pour calculer le DPS courant affiché."),
+                              static_cast<int>(bounded.window_secs), kShortestWindowSecs,
+                              kLongestWindowSecs, kSecondsFormat));
+  rows_.push_back(
+      WholeSlider(DamageMeterRowId(DamageMeterRow::kCombatTimeout), Tr("Timeout combat (s)"),
+                  Tr("Secondes sans dégâts avant de quitter le mode combat."),
+                  static_cast<int>(bounded.combat_timeout_secs), kShortestCombatTimeoutSecs,
+                  kLongestCombatTimeoutSecs, kSecondsFormat));
   rows_.push_back(OptionRowView{.id = DamageMeterRowId(DamageMeterRow::kResetFight),
                                 .label = Tr("Reset graphique"),
                                 .help = Tr("Oublie le combat en cours et son graphique. Le "

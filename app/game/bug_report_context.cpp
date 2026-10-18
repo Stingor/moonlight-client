@@ -13,9 +13,6 @@ namespace moonclient {
 namespace {
 
 using ro::net::BugReportCategory;
-
-// Le libellé d'un contexte — « Item : Knife (#1201) » —, jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Au-dessous, un caractère de contrôle : il devient une espace.
 constexpr unsigned char kFirstPrintable = 0x20;
 
@@ -86,7 +83,7 @@ BugReportContext ItemBugReport(std::uint32_t item_id, std::string_view name, int
   }
   // ⚠ LE FORMAT EST ÉCRIT À CHAQUE APPEL, et c'est voulu : un littéral traduit
   // se vérifie contre ses arguments, un format passé en paramètre non.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Item : %s (#%u)"), Shown(name).c_str(),
                 static_cast<unsigned>(item_id));
   return Entity(BugReportCategory::kItem, label.data(), "item_id", item_id, name, extra);
@@ -94,14 +91,14 @@ BugReportContext ItemBugReport(std::uint32_t item_id, std::string_view name, int
 
 BugReportContext SkillBugReport(std::uint16_t skill_id, std::string_view name, int level) {
   const std::string extra = level > 0 ? std::format(R"(,"level":{})", level) : std::string();
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Skill : %s (#%u)"), Shown(name).c_str(),
                 static_cast<unsigned>(skill_id));
   return Entity(BugReportCategory::kSkill, label.data(), "skill_id", skill_id, name, extra);
 }
 
 BugReportContext NpcBugReport(std::uint32_t npc_gid, std::string_view name) {
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("PNJ : %s (GID %u)"), Shown(name).c_str(),
                 static_cast<unsigned>(npc_gid));
   return Entity(BugReportCategory::kNpc, label.data(), "npc_gid", npc_gid, name, "");
@@ -116,7 +113,7 @@ BugReportContext MonsterBugReport(const MonsterBugScene& scene) {
   if (!scene.seen_map.empty()) {
     extra += std::format(R"(,"seen_map":"{}")", JsonEscaped(scene.seen_map));
   }
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Monstre : %s (#%u)"),
                 Shown(scene.name).c_str(), static_cast<unsigned>(scene.monster_id));
   return Entity(BugReportCategory::kGeneric, label.data(),

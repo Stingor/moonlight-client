@@ -64,6 +64,11 @@ void AskBugReport(ro::ui::BugReportWindowState& window, BugReportContext context
 // De même, s'il y a un rapport : celui qu'un étage rend une fois, ou rien.
 void AskBugReport(ro::ui::BugReportWindowState& window, std::optional<BugReportContext> context);
 
+// Le libellé d'un contexte — « Item : Knife (#1201) » —, jamais plus long.
+inline constexpr std::size_t kBugReportLabelBytes = 192;
+
+// Un booléen tel que le JSON l'écrit.
+[[nodiscard]] inline const char* JsonFlag(bool value) { return value ? "true" : "false"; }
 // Une chaîne prête à entrer entre guillemets dans le JSON.
 [[nodiscard]] std::string JsonEscaped(std::string_view text);
 // La même, bornée à `most_bytes` octets, sans caractère coupé en queue.

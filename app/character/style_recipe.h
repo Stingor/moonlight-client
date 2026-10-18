@@ -29,6 +29,7 @@ namespace moonclient {
 // du personnage reste alors en place. Un pantin doit montrer la coupe qu'on
 // ESSAIE, sans revendiquer un choix qu'on n'a pas fait.
 void Impose(const ro::render::PaletteRecipe& recipe, ro::render::ActorLook& look);
+void Impose(const ro::sim::StyleRecipe& recipe, ro::render::ActorLook& look);
 
 // ⚠ CHAMP PAR CHAMP : comparer des champs ne collisionne jamais.
 [[nodiscard]] bool SameRecipe(const ro::render::PaletteRecipe& left,

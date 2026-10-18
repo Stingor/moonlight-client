@@ -15,10 +15,6 @@ namespace {
 
 using ro::ui::CashShopCartLine;
 using ro::ui::CashShopPurchaseNote;
-
-// Le libellé d'un rapport — « Boutique de vote : panier de 3 lignes » —,
-// jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Les lignes du panier que le rapport cite. ⚠ UNE BORNE : le contexte tient en
 // un kilo-octet côté serveur.
 constexpr std::size_t kCartLinesCited = 4;
@@ -26,8 +22,6 @@ constexpr std::size_t kCartLinesCited = 4;
 constexpr std::size_t kTitleBytes = 32;
 constexpr std::size_t kSearchBytes = 32;
 constexpr std::size_t kRefusalBytes = 80;
-
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
 [[nodiscard]] const char* PurchaseWord(CashShopPurchaseNote note) {
   switch (note) {
@@ -57,7 +51,7 @@ constexpr std::size_t kRefusalBytes = 80;
   const long long spendable =
       ro::ui::CashShopSpendable(view.vote_points, view.event_points, window.use_event_points);
   std::string fields = std::format(R"("cart":{{"total":{},"affordable":{},"lines":[)", total,
-                                   Flag(total <= spendable));
+                                   JsonFlag(total <= spendable));
   const std::size_t cited = std::min(window.cart.size(), kCartLinesCited);
   for (std::size_t index = 0; index < cited; ++index) {
     const CashShopCartLine& line = window.cart[index];
@@ -79,8 +73,8 @@ BugReportContext CashShopBugReport(const ro::ui::CashShopWindowState& window,
       R"("search":"{}","vote_points":{},"event_points":{},"use_event_points":{},)"
       R"("event_points_spent":{},"purchase":"{}",)",
       JsonClipped(view.title, kTitleBytes), window.tab, tab_cards, window.slot, window.sort,
-      Flag(window.ascending), JsonClipped(search, kSearchBytes), view.vote_points,
-      view.event_points, Flag(window.use_event_points),
+      JsonFlag(window.ascending), JsonClipped(search, kSearchBytes), view.vote_points,
+      view.event_points, JsonFlag(window.use_event_points),
       ro::ui::CashShopEventPointsToSpend(CartTotal(window), view.event_points,
                                          window.use_event_points),
       PurchaseWord(view.purchase));
@@ -93,7 +87,7 @@ BugReportContext CashShopBugReport(const ro::ui::CashShopWindowState& window,
   fields += '}';
 
   // Le libellé : le panier quand il est rempli, sinon l'onglet.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (!window.cart.empty()) {
     std::snprintf(label.data(), label.size(),
                   ro::core::Tr("Boutique de vote : panier de %d ligne(s), %lld pts"),

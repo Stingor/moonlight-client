@@ -22,16 +22,10 @@ using ro::ui::MailboxWindowState;
 using ro::ui::MailComposeView;
 using ro::ui::MailComposeWindowState;
 using ro::ui::MailRowView;
-
-// Le libellé d'un rapport — « Courrier : « Bienvenue » de Kafra (#42) » —,
-// jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Le plus long texte repris : un nom, un sujet, un filtre.
 constexpr std::size_t kMostTextBytes = 48;
 // Le plus long refus repris : une phrase entière du client.
 constexpr std::size_t kMostErrorBytes = 96;
-
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
 // Un texte borné, coupé sur une frontière de caractère, prêt pour le JSON.
 [[nodiscard]] std::string Bounded(std::string_view text, std::size_t most_bytes = kMostTextBytes) {
@@ -112,9 +106,9 @@ template <typename Line, typename ItemOf>
   std::string fields = std::format(
       R"("selected":{{"mail_id":{},"box":{},"read":{},"carried":{},"sender":"{}","title":"{}",)"
       R"("expire_s":{},"content_ready":{},"content_unanswered":{})",
-      row.ref.mail_id, static_cast<int>(row.ref.box), Flag(row.read), row.carried,
-      Bounded(row.sender), Bounded(row.title), expires, Flag(row.content_ready),
-      Flag(row.content_unanswered));
+      row.ref.mail_id, static_cast<int>(row.ref.box), JsonFlag(row.read), row.carried,
+      Bounded(row.sender), Bounded(row.title), expires, JsonFlag(row.content_ready),
+      JsonFlag(row.content_unanswered));
   // ⚠ UN CONTENU D'UN AUTRE COURRIER NE SE MONTRE PAS : il ne se rapporte pas.
   if (view.content != nullptr && view.content->ref == row.ref) {
     fields += std::format(
@@ -146,7 +140,7 @@ BugReportContext MailboxBugReport(const MailboxWindowState& window, const Mailbo
       std::format(R"("mailbox":{{"tab":"{}","filter":"{}","rows":{},"shown":{},"counts":{},)"
                   R"("unread":{},"loading":{},"confirm":"{}")",
                   TabWord(window.tab), Bounded(filter), view.rows.size(), shown, counts,
-                  view.unread, Flag(view.list_loading), ConfirmWord(window.confirm));
+                  view.unread, JsonFlag(view.list_loading), ConfirmWord(window.confirm));
 
   const MailRowView* selected = nullptr;
   if (window.selected.has_value()) {
@@ -161,7 +155,7 @@ BugReportContext MailboxBugReport(const MailboxWindowState& window, const Mailbo
   fields += '}';
 
   // Le libellé : le courrier ouvert, sinon l'onglet.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (selected != nullptr) {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Courrier : « %s » de %s (#%lld)"),
                   std::string(selected->title).c_str(), std::string(selected->sender).c_str(),
@@ -184,15 +178,15 @@ BugReportContext MailComposeBugReport(const MailComposeWindowState& window,
       Bounded(recipient), CheckWord(view.check), Bounded(view.checked_name),
       Bounded(view.checked_job), view.checked_level, Bounded(Typed(window.subject)),
       view.subject_wire_bytes, view.message_wire_bytes, window.zeny, view.fee, view.total_debit,
-      Flag(view.purse_short),
+      JsonFlag(view.purse_short),
       Items(view.attachments,
             [](const ro::ui::MailAttachmentView& attached) -> const ro::ui::MailItemView& {
               return attached.line;
             }),
-      view.attachment_capacity, Flag(view.send_in_flight), Flag(window.confirming_send),
-      Flag(window.asking_amount), Bounded(view.error, kMostErrorBytes));
+      view.attachment_capacity, JsonFlag(view.send_in_flight), JsonFlag(window.confirming_send),
+      JsonFlag(window.asking_amount), Bounded(view.error, kMostErrorBytes));
 
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (!recipient.empty()) {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Courrier : écriture à %s"),
                   std::string(recipient).c_str());

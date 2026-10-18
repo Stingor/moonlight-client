@@ -13,6 +13,7 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/trade_words.h"
 
+#include "game/braces_filled.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -26,23 +27,6 @@ using ro::vfs::TradeWord;
 constexpr std::uint32_t kSucceededColor = 0x00FFFF;
 constexpr std::uint32_t kFailedColor = 0xFF0000;
 constexpr std::uint32_t kWarningColor = 0xFFAA00;
-
-// Le gabarit de nos propres phrases : chaque « {} » reçoit la valeur suivante.
-std::string Fill(std::string_view pattern, std::initializer_list<std::string_view> values) {
-  std::string out;
-  out.reserve(pattern.size());
-  auto next = values.begin();
-  for (std::size_t at = 0; at < pattern.size(); ++at) {
-    if (pattern[at] == '{' && at + 1 < pattern.size() && pattern[at + 1] == '}' &&
-        next != values.end()) {
-      out.append(*next++);
-      ++at;
-      continue;
-    }
-    out.push_back(pattern[at]);
-  }
-  return out;
-}
 
 // LE MOT DU JEU, sinon le nôtre : une installation sans la clé ne laisse pas le
 // joueur sans réponse.
@@ -67,7 +51,7 @@ std::string AnswerText(std::uint8_t code, std::string_view partner,
       return GameOr(words, TradeWord::kDealNoCharacter, ro::core::Tr("Ce joueur n'est pas là."));
     case ro::sim::kDealAnswerCancelled:
       return GameOr(words, TradeWord::kDealRejected,
-                    Fill(ro::core::Tr("{} a refusé l'échange."), {partner}).c_str());
+                    BracesFilled(ro::core::Tr("{} a refusé l'échange."), {partner}).c_str());
     case ro::sim::kDealAnswerFailed:
     case ro::sim::kDealAnswerBusy:
     default:
@@ -82,19 +66,22 @@ std::string AddRefusalText(std::uint8_t code, std::string_view item, std::string
     case ro::sim::kDealAddOverWeight:
       return GameOr(
           words, TradeWord::kDealPartnerOverWeight,
-          Fill(ro::core::Tr("{} ne peut pas porter autant de poids."), {partner}).c_str());
+          BracesFilled(ro::core::Tr("{} ne peut pas porter autant de poids."), {partner}).c_str());
     case ro::sim::kDealAddBagFull:
-      return Fill(ro::core::Tr("L'inventory de {} n'a plus de place pour {}."), {partner, item});
+      return BracesFilled(ro::core::Tr("L'inventory de {} n'a plus de place pour {}."),
+                          {partner, item});
     case ro::sim::kDealAddStackOverflow:
-      return Fill(ro::core::Tr("{} ne peut pas recevoir autant de {} : la pile déborderait."),
-                  {partner, item});
+      return BracesFilled(
+          ro::core::Tr("{} ne peut pas recevoir autant de {} : la pile déborderait."),
+          {partner, item});
     case ro::sim::kDealAddSilent:
-      return Fill(ro::core::Tr("Le serveur n'a pas répondu au dépôt de {} : il est tenu pour "
-                               "refusé."),
-                  {item});
+      return BracesFilled(
+          ro::core::Tr("Le serveur n'a pas répondu au dépôt de {} : il est tenu pour "
+                       "refusé."),
+          {item});
     case ro::sim::kDealAddRefused:
     default:
-      return Fill(ro::core::Tr("{} ne peut pas être échangé."), {item});
+      return BracesFilled(ro::core::Tr("{} ne peut pas être échangé."), {item});
   }
 }
 
@@ -307,8 +294,8 @@ void DealStage::AdvanceApproach(const TradeContext& context) {
   }
   if (context.now_ms - approach.since_ms >= kDealApproachGiveUpMs) {
     Say(context,
-        Fill(ro::core::Tr("Impossible de rejoindre {} pour lui proposer un échange."),
-             {approach.name}),
+        BracesFilled(ro::core::Tr("Impossible de rejoindre {} pour lui proposer un échange."),
+                     {approach.name}),
         kFailedColor);
     approach_.reset();
     return;
@@ -418,14 +405,14 @@ void DealStage::SayNews(const TradeContext& context) {
         break;
       }
       case ro::sim::DealNewsKind::kPartnerLocked:
-        Say(context, Fill(ro::core::Tr("{} a verrouillé son offre."), {partner_name_}),
+        Say(context, BracesFilled(ro::core::Tr("{} a verrouillé son offre."), {partner_name_}),
             kSucceededColor);
         break;
       case ro::sim::DealNewsKind::kPartnerChangedAfterMyLock:
         Say(context,
-            Fill(ro::core::Tr("{} a changé son offre après votre verrou : relisez-la avant "
-                              "d'échanger."),
-                 {partner_name_}),
+            BracesFilled(ro::core::Tr("{} a changé son offre après votre verrou : relisez-la avant "
+                                      "d'échanger."),
+                         {partner_name_}),
             kWarningColor);
         break;
       case ro::sim::DealNewsKind::kCancelled:

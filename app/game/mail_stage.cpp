@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <initializer_list>
 #include <optional>
 #include <string>
 #include <utility>
@@ -18,6 +17,7 @@
 #include "ro/sim/world.h"
 
 #include "chat/banned_input.h"
+#include "game/braces_filled.h"
 #include "game/mail_box_move.h"
 #include "game/mail_bug_report.h"
 #include "items/inventory_view.h"
@@ -31,23 +31,6 @@ namespace {
 constexpr std::uint32_t kSucceededColor = 0x00FFFF;
 constexpr std::uint32_t kFailedColor = 0xFF0000;
 constexpr std::uint32_t kWarningColor = 0xFFAA00;
-
-// Le gabarit de nos propres phrases : chaque « {} » reçoit la valeur suivante.
-std::string Fill(std::string_view pattern, std::initializer_list<std::string_view> values) {
-  std::string out;
-  out.reserve(pattern.size());
-  auto next = values.begin();
-  for (std::size_t at = 0; at < pattern.size(); ++at) {
-    if (pattern[at] == '{' && at + 1 < pattern.size() && pattern[at + 1] == '}' &&
-        next != values.end()) {
-      out.append(*next++);
-      ++at;
-      continue;
-    }
-    out.push_back(pattern[at]);
-  }
-  return out;
-}
 
 void Say(const TradeContext& context, std::string text, std::uint32_t color) {
   if (!text.empty()) {
@@ -165,19 +148,19 @@ std::string SendResultText(std::uint8_t code) {
 std::string AttachRefusalText(std::uint8_t code, std::string_view item) {
   switch (code) {
     case ro::sim::kMailAttachOverWeight:
-      return Fill(ro::core::Tr("{} ne peut pas être joint : le courrier serait trop lourd."),
-                  {item});
+      return BracesFilled(
+          ro::core::Tr("{} ne peut pas être joint : le courrier serait trop lourd."), {item});
     case ro::sim::kMailAttachNoRoom:
       return ro::core::Tr("Plus de place pour une pièce jointe.");
     case ro::sim::kMailAttachNotTradable:
-      return Fill(ro::core::Tr("{} ne peut pas être envoyé par courrier."), {item});
+      return BracesFilled(ro::core::Tr("{} ne peut pas être envoyé par courrier."), {item});
     case ro::sim::kMailSilent:
-      return Fill(
+      return BracesFilled(
           ro::core::Tr("Le serveur n'a pas répondu à l'ajout de {} : il est tenu pour refusé."),
           {item});
     case ro::sim::kMailAttachFailed:
     default:
-      return Fill(ro::core::Tr("Le serveur a refusé de joindre {}."), {item});
+      return BracesFilled(ro::core::Tr("Le serveur a refusé de joindre {}."), {item});
   }
 }
 

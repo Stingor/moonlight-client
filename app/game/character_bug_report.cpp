@@ -15,10 +15,6 @@ namespace moonclient {
 namespace {
 
 using ro::ui::CharacterTab;
-
-// Le libellé d'un rapport — « Personnage : onglet Grimoire » —, jamais plus
-// long.
-constexpr std::size_t kLabelBytes = 192;
 // LE PLAFOND DES CHAMPS, en octets : les listes s'arrêtent avant lui. Avec la
 // révision du client, le contexte reste loin des 1024 octets que le serveur
 // garde.
@@ -80,10 +76,9 @@ constexpr std::array<const char*, ro::ui::kEquipSlotCount> kSlotWords = {
   return "?";
 }
 
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
-
-[[nodiscard]] std::string Flag(const std::optional<bool>& value) {
-  return value.has_value() ? std::string(Flag(*value)) : std::string("null");
+// Un drapeau qu'on ne connaît pas encore s'écrit `null`.
+[[nodiscard]] std::string JsonFlagOrNull(const std::optional<bool>& value) {
+  return value.has_value() ? std::string(JsonFlag(*value)) : std::string("null");
 }
 
 // Un texte libre, coupé à `kNoteBytes` sur une frontière de caractère, puis
@@ -133,7 +128,7 @@ class BoundedList {
 
   // `"clé":[…],"clé_cut":…`
   [[nodiscard]] std::string Close(std::string_view key) const {
-    return std::format(R"("{}":[{}],"{}_cut":{})", key, items_, key, Flag(cut_));
+    return std::format(R"("{}":[{}],"{}_cut":{})", key, items_, key, JsonFlag(cut_));
   }
 
  private:
@@ -145,10 +140,11 @@ class BoundedList {
 // Le mannequin, commun à l'équipement et au costume.
 void DollFields(const CharacterBugScene& scene, std::string& fields) {
   const ro::ui::CharacterWindowState& window = *scene.window;
-  fields += std::format(R"(,"stats_shown":{})", Flag(window.stats_shown));
+  fields += std::format(R"(,"stats_shown":{})", JsonFlag(window.stats_shown));
   if (scene.view != nullptr) {
     fields += std::format(R"(,"equipment_shown":{},"costumes_shown":{})",
-                          Flag(scene.view->equipment_shown), Flag(scene.view->costumes_shown));
+                          JsonFlagOrNull(scene.view->equipment_shown),
+                          JsonFlagOrNull(scene.view->costumes_shown));
   }
   fields += R"(,"slots":{)";
   bool first = true;
@@ -191,7 +187,7 @@ void PresetFields(const CharacterBugScene& scene, std::string& fields) {
   BoundedList rows(fields);
   for (const ro::ui::PresetRowView& row : scene.presets->presets) {
     rows.Add(std::format(R"(["{}",{},{},"{}"])", Note(row.name), row.pieces.size(),
-                         Flag(row.with_costumes), Note(row.hotkey)));
+                         JsonFlag(row.with_costumes), Note(row.hotkey)));
   }
   fields += rows.Close("presets");
 }
@@ -210,7 +206,7 @@ void GuildFields(const CharacterBugScene& scene, std::string& fields) {
     return;
   }
   const ro::ui::GuildView& guild = *scene.guild;
-  fields += std::format(R"(,"in_guild":{})", Flag(guild.in_guild));
+  fields += std::format(R"(,"in_guild":{})", JsonFlag(guild.in_guild));
   if (!guild.in_guild) {
     return;
   }
@@ -218,7 +214,7 @@ void GuildFields(const CharacterBugScene& scene, std::string& fields) {
       R"(,"guild_id":{},"name":"{}","level":{},"members":[{},{}],"online":{},"master":{},)"
       R"("position":"{}","skill_points":{})",
       guild.guild_id, Note(guild.name), guild.level, guild.member_count, guild.member_most,
-      guild.online, Flag(guild.master), Note(guild.my_position), guild.skill_points);
+      guild.online, JsonFlag(guild.master), Note(guild.my_position), guild.skill_points);
 }
 
 void GrimoireFields(const CharacterBugScene& scene, std::string& fields) {
@@ -232,7 +228,7 @@ void GrimoireFields(const CharacterBugScene& scene, std::string& fields) {
                   R"("points_reserved":{},"grid":{},"keyboard":{},)",
                   grimoire.group, Note(group_label), scene.groups.size(),
                   Note(Text(grimoire.filter)), scene.points.left, scene.points.reserved,
-                  Flag(grimoire.grid), Flag(grimoire.keyboard_layout));
+                  JsonFlag(grimoire.grid), JsonFlag(grimoire.keyboard_layout));
   // LES RÉSERVATIONS : `[skill, appris, visé]`, tous groupes confondus — ce sont
   // elles que « Appliquer » enverra.
   BoundedList reserved(fields);
@@ -252,12 +248,13 @@ void HomunculusFields(const CharacterBugScene& scene, std::string& fields) {
     return;
   }
   const ro::ui::HomunculusTabView& homunculus = scene.companions->homunculus;
-  fields += std::format(
-      R"(,"name":"{}","species":"{}","level":{},"alive":{},"resting":{},"hp":[{},{}],)"
-      R"("sp":[{},{}],"hunger":{},"intimacy":{},"skill_points":{},"ai_profile":"{}")",
-      Note(homunculus.name), Note(homunculus.species), homunculus.level, Flag(homunculus.alive),
-      Flag(homunculus.resting), homunculus.hp, homunculus.max_hp, homunculus.sp, homunculus.max_sp,
-      homunculus.hunger, homunculus.intimacy, homunculus.skill_points, Note(homunculus.ai_profile));
+  fields +=
+      std::format(R"(,"name":"{}","species":"{}","level":{},"alive":{},"resting":{},"hp":[{},{}],)"
+                  R"("sp":[{},{}],"hunger":{},"intimacy":{},"skill_points":{},"ai_profile":"{}")",
+                  Note(homunculus.name), Note(homunculus.species), homunculus.level,
+                  JsonFlag(homunculus.alive), JsonFlag(homunculus.resting), homunculus.hp,
+                  homunculus.max_hp, homunculus.sp, homunculus.max_sp, homunculus.hunger,
+                  homunculus.intimacy, homunculus.skill_points, Note(homunculus.ai_profile));
 }
 
 void MercenaryFields(const CharacterBugScene& scene, std::string& fields) {
@@ -279,7 +276,7 @@ void MercenaryFields(const CharacterBugScene& scene, std::string& fields) {
 BugReportContext CharacterBugReport(const CharacterBugScene& scene) {
   const ro::ui::CharacterWindowState& window = *scene.window;
   std::string fields = std::format(R"("character":{{"tab":"{}","staff_pane":{})",
-                                   TabWord(window.tab), Flag(window.staff_shown));
+                                   TabWord(window.tab), JsonFlag(window.staff_shown));
   if (scene.header != nullptr) {
     const ro::ui::CharacterHeaderView& header = *scene.header;
     fields += std::format(R"(,"job":"{}","base_level":{},"job_level":{},"hp":[{},{}],"sp":[{},{}])",
@@ -319,7 +316,7 @@ BugReportContext CharacterBugReport(const CharacterBugScene& scene) {
   }
   fields += "}}";
 
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Personnage : onglet %s"),
                 TabLabel(window.tab));
   return FieldsBugReport(label.data(), fields);

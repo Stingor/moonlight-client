@@ -15,7 +15,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <span>
 #include <string>
 #include <string_view>
@@ -138,15 +137,6 @@ void FillDamageChoices(DamagePageNames& names) {
                        .lowest = lowest * kPercent,
                        .highest = highest * kPercent,
                        .format = "%.0f %%"};
-}
-
-[[nodiscard]] OptionRowView Swatch(GameOption which, const char* label, const char* help,
-                                   std::uint32_t color) {
-  return OptionRowView{.id = static_cast<int>(which),
-                       .label = label,
-                       .help = help,
-                       .kind = OptionKind::kColor,
-                       .color = color};
 }
 
 // ── CE QUI SE MONTRE ──────────────────────────────────────────────────────────

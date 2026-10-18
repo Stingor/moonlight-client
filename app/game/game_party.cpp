@@ -1,8 +1,6 @@
 // LE GROUPE ET LES AMIS DANS LA PARTIE : la fenêtre Groupe / Amis, la grille de
 // groupe, et ce que leurs gestes demandent au serveur ou au reste du jeu.
 
-#include <algorithm>
-#include <array>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -17,6 +15,7 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/party_booking_bug_report.h"
+#include "game/whisper_stage.h"
 #include "options/option_sections.h"
 #include "world/click_action.h"
 #include "world/map_stage.h"
@@ -32,20 +31,6 @@ namespace {
   const std::uint32_t green = (color >> kChannelBits) & kChannelMask;
   const std::uint32_t blue = (color >> (2 * kChannelBits)) & kChannelMask;
   return (red << (2 * kChannelBits)) | (green << kChannelBits) | blue;
-}
-
-// Le nom part dans la case du destinataire, et le clavier dans la phrase : la
-// barre se déplie, comme pour un lien qu'on vient de poser.
-void WhisperTo(ro::ui::ChatInputState& input, std::string_view name) {
-  if (name.empty()) {
-    return;
-  }
-  std::array<char, ro::ui::kChatWhisperNameSize>& box = input.whisper_to;
-  box.fill('\0');
-  std::copy_n(name.begin(), std::min(name.size(), box.size() - 1), box.begin());
-  input.unfolded = true;
-  input.focus_on_whisper = false;
-  input.wants_focus = true;
 }
 
 }  // namespace
@@ -123,7 +108,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
     if (whisper->own_window) {
       pieces_.whispers.Open(whisper->name);
     } else {
-      WhisperTo(windows_.chat.main.input, whisper->name);
+      ArmWhisper(windows_.chat.main.input, whisper->name);
     }
   }
   if (asked.grid_toggled) {
@@ -159,7 +144,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
     case ro::ui::PartyFriendVerb::kNothing:
       break;
     case ro::ui::PartyFriendVerb::kWhisper:
-      WhisperTo(windows_.chat.main.input, asked.name);
+      ArmWhisper(windows_.chat.main.input, asked.name);
       break;
     case ro::ui::PartyFriendVerb::kWhisperWindow:
       pieces_.whispers.Open(asked.name);
@@ -230,7 +215,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       open_menu(tile.verb_account_id);
       break;
     case ro::ui::PartyGridVerb::kWhisper:
-      WhisperTo(windows_.chat.main.input, tile.verb_name);
+      ArmWhisper(windows_.chat.main.input, tile.verb_name);
       break;
     case ro::ui::PartyGridVerb::kWhisperWindow:
       pieces_.whispers.Open(tile.verb_name);

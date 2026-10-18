@@ -3,7 +3,6 @@
 // ⚠ À PART DE LA BOUCLE : la guilde n'y coûte que trois appels — ouvrir,
 // rafraîchir avant le dessin, appliquer après.
 
-#include <algorithm>
 #include <optional>
 #include <string>
 #include <utility>
@@ -16,6 +15,7 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/save_folder.h"
+#include "game/whisper_stage.h"
 
 namespace moonclient {
 namespace {
@@ -105,15 +105,7 @@ void Game::ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_
                                                        world_, *guild_emblems_, link_, player);
   // CHUCHOTER : le nom part dans la case du destinataire, et le clavier dans la
   // phrase — comme un lien qu'on vient de poser, la barre se déplie.
-  if (!elsewhere.whisper_to.empty()) {
-    std::array<char, ro::ui::kChatWhisperNameSize>& box = windows_.chat.main.input.whisper_to;
-    box.fill('\0');
-    std::copy_n(elsewhere.whisper_to.begin(), std::min(elsewhere.whisper_to.size(), box.size() - 1),
-                box.begin());
-    windows_.chat.main.input.unfolded = true;
-    windows_.chat.main.input.focus_on_whisper = false;
-    windows_.chat.main.input.wants_focus = true;
-  }
+  ArmWhisper(windows_.chat.main.input, elsewhere.whisper_to);
   // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant.
   if (!elsewhere.whisper_window.empty()) {
     pieces_.whispers.Open(elsewhere.whisper_window);

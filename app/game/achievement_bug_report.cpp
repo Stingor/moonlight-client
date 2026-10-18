@@ -17,10 +17,6 @@ using ro::ui::AchievementFilter;
 using ro::ui::AchievementSort;
 using ro::vfs::AchievementInfo;
 
-// Le libellé d'un rapport — « Succès : Premier sacrifice (#900001) » —, jamais
-// plus long.
-constexpr std::size_t kLabelBytes = 192;
-
 [[nodiscard]] const char* FilterWord(AchievementFilter filter) {
   switch (filter) {
     case AchievementFilter::kAll:
@@ -49,8 +45,6 @@ constexpr std::size_t kLabelBytes = 192;
   return "?";
 }
 
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
-
 // Une récompense, ou `null` quand le catalogue n'en donne pas.
 [[nodiscard]] std::string Reward(const std::optional<std::int32_t>& reward) {
   return reward.has_value() ? std::to_string(*reward) : std::string("null");
@@ -64,8 +58,9 @@ constexpr std::size_t kLabelBytes = 192;
       R"("score":{},"counted":{},"reward":{{"item":{},"title":{},"script":{},"buff":{}}},)"
       R"("objectives":[)",
       info.achievement_id, JsonEscaped(info.name), JsonEscaped(info.group), info.major, info.minor,
-      info.score, Flag(info.gauge == ro::vfs::AchievementGauge::kCounts), Reward(info.reward_item),
-      Reward(info.reward_title), Flag(info.reward_script), Reward(info.reward_buff));
+      info.score, JsonFlag(info.gauge == ro::vfs::AchievementGauge::kCounts),
+      Reward(info.reward_item), Reward(info.reward_title), JsonFlag(info.reward_script),
+      Reward(info.reward_buff));
   const ro::sim::AchievementProgress* progress = book.Find(info.achievement_id);
   const std::size_t shown = std::min(info.objectives.size(), ro::sim::kAchievementCounterCount);
   for (std::size_t index = 0; index < shown; ++index) {
@@ -82,11 +77,11 @@ constexpr std::size_t kLabelBytes = 192;
   } else {
     fields += std::format(
         R"(,"progress":{{"known":true,"completed":{},"completed_at":{},"rewarded":{}}})",
-        Flag(progress->completed), progress->completed_at, Flag(progress->rewarded));
+        JsonFlag(progress->completed), progress->completed_at, JsonFlag(progress->rewarded));
   }
   fields += std::format(R"(,"tracked":{},"claim_pending":{}}})",
-                        Flag(book.IsTracked(info.achievement_id)),
-                        Flag(book.ClaimPending(info.achievement_id)));
+                        JsonFlag(book.IsTracked(info.achievement_id)),
+                        JsonFlag(book.ClaimPending(info.achievement_id)));
   return fields;
 }
 
@@ -122,7 +117,7 @@ BugReportContext AchievementBugReport(const AchievementBugScene& scene) {
 
   // Le libellé : le succès choisi, sinon la recherche ou l'onglet, sinon le
   // résumé.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (selected != nullptr) {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Succès : %s (#%u)"),
                   selected->name.empty() ? "?" : selected->name.c_str(),

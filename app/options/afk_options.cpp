@@ -47,20 +47,6 @@ constexpr const char* kAnnounceDelayKey = "afk_announce_delay";
 constexpr const char* kAnnounceSleepKey = "afk_announce_sleep";
 constexpr const char* kAnnounceTagKey = "afk_announce_label";
 
-// Un curseur de cette page : même forme que `Measure`, mais son libellé et son
-// infobulle voyagent ensemble.
-[[nodiscard]] OptionRowView Slider(GameOption which, const char* label, const char* help,
-                                   float value, float lowest, float highest, const char* format) {
-  return OptionRowView{.id = static_cast<int>(which),
-                       .label = label,
-                       .help = help,
-                       .kind = OptionKind::kSlider,
-                       .value = value,
-                       .lowest = lowest,
-                       .highest = highest,
-                       .format = format};
-}
-
 }  // namespace
 
 void AfkOptions::Declare(SettingsFile& into) {
@@ -106,12 +92,12 @@ void AfkOptions::Compose() {
   // joueur cherche ce qu'il vient de perdre.
   const bool off = !settings_.enabled;
 
-  rows_.push_back(Slider(GameOption::kAfkDelay, Tr("Délai"),
-                         Tr("Temps sans toucher au clavier ni à la souris avant que la veille "
-                            "ne commence."),
-                         static_cast<float>(settings_.delay_s),
-                         static_cast<float>(kLeastAfkDelaySeconds),
-                         static_cast<float>(kMostAfkDelaySeconds), "%.0f s"));
+  rows_.push_back(Measure(GameOption::kAfkDelay, Tr("Délai"),
+                          Tr("Temps sans toucher au clavier ni à la souris avant que la veille "
+                             "ne commence."),
+                          static_cast<float>(settings_.delay_s),
+                          static_cast<float>(kLeastAfkDelaySeconds),
+                          static_cast<float>(kMostAfkDelaySeconds), "%.0f s"));
 
   wake_names_.clear();
   wake_names_.push_back(Tr("Clavier et souris"));
@@ -126,39 +112,39 @@ void AfkOptions::Compose() {
                             "ne vois pas."),
                          wake_names_, settings_.wake_on));
 
-  rows_.push_back(Slider(GameOption::kAfkSpin, Tr("Rotation"),
-                         Tr("Vitesse de l'orbite autour du personnage. Une valeur négative "
-                            "tourne dans l'autre sens ; zéro fige la vue, ce qui donne un "
-                            "simple plan large."),
-                         settings_.spin_deg_s, -kMostAfkSpinDegreesPerSecond,
-                         kMostAfkSpinDegreesPerSecond, "%.1f °/s"));
+  rows_.push_back(Measure(GameOption::kAfkSpin, Tr("Rotation"),
+                          Tr("Vitesse de l'orbite autour du personnage. Une valeur négative "
+                             "tourne dans l'autre sens ; zéro fige la vue, ce qui donne un "
+                             "simple plan large."),
+                          settings_.spin_deg_s, -kMostAfkSpinDegreesPerSecond,
+                          kMostAfkSpinDegreesPerSecond, "%.1f °/s"));
   rows_.back().heading = Tr("Caméra");
 
   // 🔴 « CINQUANTE » ET NON « QUARANTE-CINQ ». Notre vue de jeu est mesurée à
   // cinquante — par superposition d'images contre une capture, voir
   // `ro/render/camera.h` —, et c'est le nombre que le joueur reconnaîtra sur ce
   // curseur. Le défaut suit le même repère : voir `kAfkTiltBelowGameDegrees`.
-  rows_.push_back(Slider(GameOption::kAfkTilt, Tr("Plongée"),
-                         Tr("Hauteur du regard au-dessus de l'horizon. Le jeu se joue à 50° ; "
-                            "plus haut, la caméra domine la scène, et tout en haut elle est "
-                            "presque à la verticale."),
-                         settings_.tilt_deg, kLeastAfkTiltDegrees, kMostAfkTiltDegrees, "%.0f °"));
+  rows_.push_back(Measure(GameOption::kAfkTilt, Tr("Plongée"),
+                          Tr("Hauteur du regard au-dessus de l'horizon. Le jeu se joue à 50° ; "
+                             "plus haut, la caméra domine la scène, et tout en haut elle est "
+                             "presque à la verticale."),
+                          settings_.tilt_deg, kLeastAfkTiltDegrees, kMostAfkTiltDegrees, "%.0f °"));
 
   // 🔴 LE RECUL NE COMPTE PAS DEPUIS LA MOLETTE : compté depuis la distance où
   // elle se trouve au moment de la bascule, la veille ne cadrerait jamais deux
   // fois pareil. Il part du recul de JEU, qui ne bouge pas, et l'infobulle dit
   // ce qu'il mesure vraiment.
-  rows_.push_back(Slider(GameOption::kAfkZoom, Tr("Recul"),
-                         Tr("De combien la caméra s'éloigne, en multiples du recul de jeu. "
-                            "C'est une distance FIXE : la veille cadre pareil que tu te sois "
-                            "rapproché ou éloigné juste avant. Un la pose exactement au recul "
-                            "de jeu."),
-                         settings_.zoom_factor, kLeastAfkZoom, kMostAfkZoom, "%.2f x"));
+  rows_.push_back(Measure(GameOption::kAfkZoom, Tr("Recul"),
+                          Tr("De combien la caméra s'éloigne, en multiples du recul de jeu. "
+                             "C'est une distance FIXE : la veille cadre pareil que tu te sois "
+                             "rapproché ou éloigné juste avant. Un la pose exactement au recul "
+                             "de jeu."),
+                          settings_.zoom_factor, kLeastAfkZoom, kMostAfkZoom, "%.2f x"));
 
-  rows_.push_back(Slider(GameOption::kAfkEase, Tr("Transition"),
-                         Tr("Durée du basculement en veille. Le retour, lui, va trois fois "
-                            "plus vite : il répond à un geste que tu viens de faire."),
-                         settings_.ease_s, kLeastAfkEaseSeconds, kMostAfkEaseSeconds, "%.1f s"));
+  rows_.push_back(Measure(GameOption::kAfkEase, Tr("Transition"),
+                          Tr("Durée du basculement en veille. Le retour, lui, va trois fois "
+                             "plus vite : il répond à un geste que tu viens de faire."),
+                          settings_.ease_s, kLeastAfkEaseSeconds, kMostAfkEaseSeconds, "%.1f s"));
 
   // 🔴 « TOUTE L'INTERFACE » EST NOMMÉE POUR CE CLIENT-CI : il n'a qu'un jeu de
   // fenêtres, et l'infobulle dit ce qui s'efface.
@@ -174,12 +160,12 @@ void AfkOptions::Compose() {
                             "premier geste, en même temps que l'interface."),
                          nullptr, settings_.hide_cursor));
 
-  rows_.push_back(Slider(GameOption::kAfkVignette, Tr("Vignette"), nullptr, settings_.vignette,
-                         0.0F, 1.0F, "%.2f"));
-  rows_.push_back(Slider(GameOption::kAfkDesaturate, Tr("Noir et blanc"), nullptr,
-                         settings_.desaturate, 0.0F, 1.0F, "%.2f"));
+  rows_.push_back(Measure(GameOption::kAfkVignette, Tr("Vignette"), nullptr, settings_.vignette,
+                          0.0F, 1.0F, "%.2f"));
+  rows_.push_back(Measure(GameOption::kAfkDesaturate, Tr("Noir et blanc"), nullptr,
+                          settings_.desaturate, 0.0F, 1.0F, "%.2f"));
   rows_.push_back(
-      Slider(GameOption::kAfkGrain, Tr("Grain"), nullptr, settings_.grain, 0.0F, 1.0F, "%.2f"));
+      Measure(GameOption::kAfkGrain, Tr("Grain"), nullptr, settings_.grain, 0.0F, 1.0F, "%.2f"));
 
   rows_.push_back(Toggle(GameOption::kAfkShowClock, Tr("Afficher l'heure"), nullptr, nullptr,
                          settings_.show_clock));
@@ -207,23 +193,21 @@ void AfkOptions::Compose() {
   rows_.push_back(Choice(GameOption::kAfkClockAnchor, Tr("Position"), nullptr, anchor_names_,
                          settings_.clock_anchor));
 
-  rows_.push_back(Slider(GameOption::kAfkClockMargin, Tr("Marge"),
-                         Tr("Distance au bord de l'écran. Sans effet sur une position centrée, "
-                            "qui n'a pas de bord dont s'écarter."),
-                         static_cast<float>(settings_.clock_margin), 0.0F,
-                         static_cast<float>(ro::ui::kMostAfkClockMargin), "%.0f px"));
+  rows_.push_back(Measure(GameOption::kAfkClockMargin, Tr("Marge"),
+                          Tr("Distance au bord de l'écran. Sans effet sur une position centrée, "
+                             "qui n'a pas de bord dont s'écarter."),
+                          static_cast<float>(settings_.clock_margin), 0.0F,
+                          static_cast<float>(ro::ui::kMostAfkClockMargin), "%.0f px"));
 
-  rows_.push_back(Slider(GameOption::kAfkClockScale, Tr("Taille du texte"),
-                         Tr("Taille de l'heure. La ligne d'absence suit, en plus petit."),
-                         settings_.clock_scale, ro::ui::kLeastAfkClockScale,
-                         ro::ui::kMostAfkClockScale, "%.1fx"));
+  rows_.push_back(Measure(GameOption::kAfkClockScale, Tr("Taille du texte"),
+                          Tr("Taille de l'heure. La ligne d'absence suit, en plus petit."),
+                          settings_.clock_scale, ro::ui::kLeastAfkClockScale,
+                          ro::ui::kMostAfkClockScale, "%.1fx"));
 
   // ⚠ AVANT L'OMBRE ET APRÈS LA TAILLE : le nuancier s'ouvre vers le bas et ne
   // recouvre ainsi qu'une case.
-  rows_.push_back(OptionRowView{.id = static_cast<int>(GameOption::kAfkClockColor),
-                                .label = Tr("Couleur du texte"),
-                                .kind = OptionKind::kColor,
-                                .color = settings_.clock_color});
+  rows_.push_back(
+      Swatch(GameOption::kAfkClockColor, Tr("Couleur du texte"), nullptr, settings_.clock_color));
 
   rows_.push_back(Toggle(GameOption::kAfkClockShadow, Tr("Ombrage du texte"),
                          Tr("Une ombre d'un pixel sous le texte. C'est elle qui le garde "
@@ -263,12 +247,12 @@ void AfkOptions::Compose() {
 
   const bool mute = !settings_.announce;
 
-  rows_.push_back(Slider(GameOption::kAfkAnnounceDelay, Tr("Délai d'absence"),
-                         Tr("Temps sans toucher au clavier ni à la souris avant que ton "
-                            "absence ne soit annoncée. Le premier geste la retire aussitôt."),
-                         static_cast<float>(settings_.announce_delay_s),
-                         static_cast<float>(kLeastAfkDelaySeconds),
-                         static_cast<float>(kMostAfkAnnounceSeconds), "%.0f s"));
+  rows_.push_back(Measure(GameOption::kAfkAnnounceDelay, Tr("Délai d'absence"),
+                          Tr("Temps sans toucher au clavier ni à la souris avant que ton "
+                             "absence ne soit annoncée. Le premier geste la retire aussitôt."),
+                          static_cast<float>(settings_.announce_delay_s),
+                          static_cast<float>(kLeastAfkDelaySeconds),
+                          static_cast<float>(kMostAfkAnnounceSeconds), "%.0f s"));
   rows_.back().disabled = mute;
 
   rows_.push_back(

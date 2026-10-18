@@ -31,6 +31,7 @@
 
 #include "chat/player_link_judge.h"
 #include "game/game.h"
+#include "game/whisper_stage.h"
 #include "world/blocked_npcs.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
@@ -449,20 +450,9 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kGuildOpposition:
       ReportRefusal(ro::net::RequestGuildOpposition(link_, id));
       return;
-    case EntityVerb::kWhisper: {
-      // Le nom part dans la case du destinataire, et le clavier dans la phrase :
-      // la barre se déplie, comme pour un lien qu'on vient de poser.
-      if (name.empty()) {
-        return;
-      }
-      std::array<char, ro::ui::kChatWhisperNameSize>& box = windows_.chat.main.input.whisper_to;
-      box.fill('\0');
-      std::copy_n(name.begin(), std::min(name.size(), box.size() - 1), box.begin());
-      windows_.chat.main.input.unfolded = true;
-      windows_.chat.main.input.focus_on_whisper = false;
-      windows_.chat.main.input.wants_focus = true;
+    case EntityVerb::kWhisper:
+      ArmWhisper(windows_.chat.main.input, name);
       return;
-    }
     case EntityVerb::kWhisperBlock:
     case EntityVerb::kWhisperAllow:
       // La liste ne change qu'à la réponse du serveur : le menu suivant la lira.

@@ -7,6 +7,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/system_fonts.h"
 
+#include "options/option_row_kinds.h"
+
 namespace moonclient {
 namespace {
 
@@ -41,23 +43,6 @@ constexpr int kWholeAlpha = 255;
                                    ImU32 color) {
   return OptionRowView{
       .id = RowId(row), .label = label, .help = help, .kind = OptionKind::kColor, .color = color};
-}
-
-[[nodiscard]] OptionRowView Steps(SignboardRow row, const char* label, const char* help, int value,
-                                  int lowest, int highest, const char* format) {
-  return OptionRowView{.id = RowId(row),
-                       .label = label,
-                       .help = help,
-                       .kind = OptionKind::kSlider,
-                       .value = static_cast<float>(value),
-                       .lowest = static_cast<float>(lowest),
-                       .highest = static_cast<float>(highest),
-                       .format = format};
-}
-
-// Une valeur de curseur, entière et bornée.
-[[nodiscard]] int Stepped(float value, int lowest, int highest) {
-  return std::clamp(static_cast<int>(value + 0.5F), lowest, highest);
 }
 
 [[nodiscard]] std::uint8_t ChannelOf(ImU32 color, int shift) {
@@ -155,11 +140,12 @@ void SignboardOptions::ComposeInto(std::vector<OptionRowView>& rows, const ShopO
       .on = chat_rooms_shown_});
 
   // ── LEUR DESSIN ───────────────────────────────────────────────────────────
-  rows.push_back(Steps(SignboardRow::kOpacity, Tr("Opacité"),
-                       Tr("Celle de l'enseigne entière, cadre et titre. Le client les peint "
-                          "pleines ; plus transparentes, une rue de marchands couvre moins la "
-                          "carte."),
-                       opacity_percent_, kLeastOpacityPercent, kWholePercent, "%.0f %%"));
+  rows.push_back(
+      WholeSlider(RowId(SignboardRow::kOpacity), Tr("Opacité"),
+                  Tr("Celle de l'enseigne entière, cadre et titre. Le client les peint "
+                     "pleines ; plus transparentes, une rue de marchands couvre moins la "
+                     "carte."),
+                  opacity_percent_, kLeastOpacityPercent, kWholePercent, "%.0f %%"));
   rows.back().heading = Tr("Apparence");
   rows.push_back(Swatch(SignboardRow::kChatRoomTint, Tr("Teinte du cadre des salons"),
                         Tr("Le cadre d'un salon est une image du jeu : la teinte la multiplie. "
@@ -190,11 +176,11 @@ void SignboardOptions::ComposeInto(std::vector<OptionRowView>& rows, const ShopO
                                .on = font_bold_,
                                .indented = true,
                                .disabled = game_font});
-  rows.push_back(Steps(SignboardRow::kFontPixels, Tr("Taille"),
-                       Tr("Le client écrit en douze pixels. Au-delà de seize, le bas des lettres "
-                          "sortirait de l'enseigne."),
-                       font_pixels_, kSmallestSignboardFontPixels, kLargestSignboardFontPixels,
-                       "%.0f px"));
+  rows.push_back(WholeSlider(
+      RowId(SignboardRow::kFontPixels), Tr("Taille"),
+      Tr("Le client écrit en douze pixels. Au-delà de seize, le bas des lettres "
+         "sortirait de l'enseigne."),
+      font_pixels_, kSmallestSignboardFontPixels, kLargestSignboardFontPixels, "%.0f px"));
   rows.push_back(OptionRowView{.id = RowId(SignboardRow::kRestore),
                                .label = Tr("Rendre le dessin du client"),
                                .help = Tr("Opacité, couleurs et police reviennent à ceux du "

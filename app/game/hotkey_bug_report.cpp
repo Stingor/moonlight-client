@@ -15,9 +15,6 @@ namespace moonclient {
 namespace {
 
 using ro::ui::HotkeyRowView;
-
-// Le libellé d'un rapport — « Raccourcis : onglet Barres » —, jamais plus long.
-constexpr std::size_t kLabelBytes = 192;
 // LE PLAFOND DES CHAMPS, en octets : la liste des lignes s'arrête avant lui. Avec
 // la révision du client, le contexte reste loin des 1024 octets que le serveur
 // garde.
@@ -99,9 +96,9 @@ BugReportContext HotkeyBugReport(const HotkeyBugScene& scene) {
     shown += entry;
   }
   fields += std::format(R"(,"shown":[{}],"shown_total":{},"shown_cut":{}}})", shown, shown_total,
-                        cut ? "true" : "false");
+                        JsonFlag(cut));
 
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (window.capturing >= 0 &&
       static_cast<std::size_t>(window.capturing) < scene.view.rows.size()) {
     const std::string action(scene.view.rows[static_cast<std::size_t>(window.capturing)].action);

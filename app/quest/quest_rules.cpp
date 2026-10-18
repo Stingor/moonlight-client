@@ -16,6 +16,8 @@
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/monster_words.h"
 
+#include "game/braces_filled.h"
+
 namespace moonclient {
 namespace {
 
@@ -206,19 +208,7 @@ bool QuestTextContains(std::string_view haystack, std::string_view needle) {
 }
 
 std::string QuestFill(std::string_view pattern, std::initializer_list<std::string_view> values) {
-  std::string out;
-  out.reserve(pattern.size());
-  auto next = values.begin();
-  for (std::size_t at = 0; at < pattern.size(); ++at) {
-    if (pattern[at] == '{' && at + 1 < pattern.size() && pattern[at + 1] == '}' &&
-        next != values.end()) {
-      out.append(*next++);
-      ++at;
-      continue;
-    }
-    out.push_back(pattern[at]);
-  }
-  return out;
+  return BracesFilled(pattern, values);
 }
 
 std::string HuntTargetName(const QuestHunt& hunt) {

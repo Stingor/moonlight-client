@@ -19,10 +19,6 @@ using ro::ui::CraftAtlasRow;
 using ro::ui::CraftAtlasSheet;
 using ro::ui::CraftAtlasTab;
 using ro::ui::CraftAtlasYieldMode;
-
-// Le libellé d'un rapport — « Atlas des recettes : Steel (#999) » —, jamais
-// plus long.
-constexpr std::size_t kLabelBytes = 192;
 // Les ingrédients que le rapport cite. ⚠ UNE BORNE : le contexte tient en un
 // kilo-octet côté serveur, et une recette en compte rarement davantage.
 constexpr std::size_t kIngredientsCited = 4;
@@ -33,8 +29,6 @@ constexpr std::size_t kNameBytes = 32;
 constexpr std::size_t kSkillBytes = 24;
 // Le manque se mesure pour UNE fabrication : celle que la fiche annonce.
 constexpr int kCraftsMeasured = 1;
-
-[[nodiscard]] const char* Flag(bool value) { return value ? "true" : "false"; }
 
 [[nodiscard]] const char* TabWord(CraftAtlasTab tab) {
   switch (tab) {
@@ -72,8 +66,8 @@ constexpr int kCraftsMeasured = 1;
       R"("recipe":{{"skill_id":{},"skill":"{}","skill_level":{},"item_level":{},"learnable":{},)"
       R"("yield":{{"mode":"{}","least":{},"most":{})",
       recipe.skill_id, JsonClipped(recipe.skill_label, kSkillBytes), recipe.skill_level,
-      recipe.item_level, Flag(recipe.learnable), YieldWord(recipe.yield_mode), recipe.yield_least,
-      recipe.yield_most);
+      recipe.item_level, JsonFlag(recipe.learnable), YieldWord(recipe.yield_mode),
+      recipe.yield_least, recipe.yield_most);
   // Le bonus ne vaut que pour le tirage qui le porte.
   if (recipe.yield_mode == CraftAtlasYieldMode::kBonusRoll) {
     fields += std::format(R"(,"bonus_permille":{})", recipe.yield_bonus_permille);
@@ -118,9 +112,9 @@ BugReportContext CraftAtlasBugReport(const ro::ui::CraftAtlasWindowState& window
   std::string fields =
       std::format(R"("craft_atlas":{{"available":{},"tab":"{}","search":"{}","only_craftable":{},)"
                   R"("selected_id":{},"back":{},"staff":{},"free_bag_slots":{})",
-                  Flag(view.available), TabWord(window.tab), JsonClipped(search, kSearchBytes),
-                  Flag(view.only_craftable), window.selected_id, window.back.size(),
-                  Flag(view.staff_items), free_slots);
+                  JsonFlag(view.available), TabWord(window.tab), JsonClipped(search, kSearchBytes),
+                  JsonFlag(view.only_craftable), window.selected_id, window.back.size(),
+                  JsonFlag(view.staff_items), free_slots);
   // Le nombre de fabrications que le staff prépare : ce que « Obtenir » demande.
   if (view.staff_items) {
     fields += std::format(R"(,"staff_crafts":{})", window.staff_crafts);
@@ -133,7 +127,7 @@ BugReportContext CraftAtlasBugReport(const ro::ui::CraftAtlasWindowState& window
   fields += '}';
 
   // Le libellé : l'item choisi, sinon la recherche, sinon l'Atlas seul.
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (sheet_shown) {
     const std::string name(
         ro::core::WithoutDanglingUtf8(view.sheet.item.name.substr(0, kNameBytes)));

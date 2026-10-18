@@ -15,10 +15,6 @@ namespace {
 using ro::ui::OptionKind;
 using ro::ui::OptionRowView;
 using ro::ui::OptionSectionView;
-
-// Le libellé d'un rapport — « Options : Gameplay, onglet Barre 3 » —, jamais
-// plus long.
-constexpr std::size_t kLabelBytes = 192;
 // LE PLAFOND DE LA LISTE DES VALEURS, en octets : avec la page, l'onglet et la
 // révision du client, le contexte reste loin des 1024 octets que le serveur
 // garde.
@@ -81,7 +77,7 @@ BugReportContext OptionsBugReport(const OptionsBugScene& scene) {
   std::string fields = std::format(R"("options":{{"section":{})", window.section);
   if (!known) {
     fields += "}";
-    std::array<char, kLabelBytes> label{};
+    std::array<char, kBugReportLabelBytes> label{};
     std::snprintf(label.data(), label.size(), ro::core::Tr("Options : page %d"), window.section);
     return FieldsBugReport(label.data(), fields);
   }
@@ -110,7 +106,7 @@ BugReportContext OptionsBugReport(const OptionsBugScene& scene) {
   }
   fields += '}';
 
-  std::array<char, kLabelBytes> label{};
+  std::array<char, kBugReportLabelBytes> label{};
   if (tab_title != nullptr) {
     std::snprintf(label.data(), label.size(), ro::core::Tr("Options : %s, onglet %s"),
                   Shown(section.title), Shown(tab_title));
