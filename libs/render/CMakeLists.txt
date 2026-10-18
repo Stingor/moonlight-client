@@ -237,7 +237,6 @@ add_library(ro_render STATIC
     src/effect_trail_history.cpp
     src/effect_track_billboard.cpp
     src/effect_track_ground_disc.cpp
-    src/effect_track_emitter_frame.cpp
     src/effect_track_growing_sprite.cpp
     src/effect_track_grid_plane.cpp
     src/effect_track_cascade.cpp

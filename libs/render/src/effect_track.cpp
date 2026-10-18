@@ -340,7 +340,10 @@ void AdvanceUndulatingRingTrack(EffectTrack& track, std::size_t rank, std::int32
   AdvanceWavingRing(track, rank, life_ticks);
 }
 
-void AdvanceScrollingBandTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks) {
+void AdvanceLiveTrackTicks(std::array<EffectTrack, kEffectTracksPerNode>& tracks) {
+  // ⚠ CHAQUE PISTE VIVE, ET CELLES-LÀ SEULEMENT : le client teste l'allumage de
+  // chacune des quatre avant d'avancer son compteur. Une piste éteinte ne
+  // vieillit pas.
   for (EffectTrack& track : tracks) {
     if (track.active) {
       ++track.ticks;

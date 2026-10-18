@@ -294,7 +294,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR et ne tire rien : le client recopie sa
       // position avant d'avancer les compteurs.
       pooled.ground_position = pooled.owner_position;
-      AdvanceEmitterFrameTracks(pooled.tracks);
+      AdvanceLiveTrackTicks(pooled.tracks);
       return;
     case PooledNodeShape::kThrownItem:
       // ⚠ CE MOUVEMENT NE SUIT PAS SON PORTEUR ET NE TIRE RIEN. Le client recopie
@@ -340,7 +340,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
       // famille à ne rien demander de tel. Une cascade est posée sur la carte et
       // n'appartient à personne : la faire suivre un acteur la décrocherait de
       // la falaise où elle coule.
-      AdvanceScrollingBandTracks(pooled.tracks);
+      AdvanceLiveTrackTicks(pooled.tracks);
       return;
     case PooledNodeShape::kDarkVeil:
       // ⚠ LE VOILE SUIT CELUI QUI LE PORTE : le client recopie la position de

@@ -107,7 +107,7 @@ enum class PooledNodeShape : std::uint8_t {
   //
   // ⚠ SON MOUVEMENT EST LE PLUS COURT DE LA FAMILLE : il suit son porteur et
   // avance le compteur de chaque piste vive, rien d'autre. Tout le reste est
-  // dans le SEMIS, qui disperse les quartiers. Voir `AdvanceEmitterFrameTracks`.
+  // dans le SEMIS, qui disperse les quartiers. Voir `AdvanceLiveTrackTicks`.
   kPieWedge,
   // UN FAISCEAU EN PIQUE, sous-type 164 : un ruban plat qui part de l ancre et
   // file droit, en jusqu a six segments. Douze d entre eux ferment le tour, semes
@@ -192,7 +192,7 @@ enum class PooledNodeShape : std::uint8_t {
   //
   // ⚠ SON MOUVEMENT EST LE PLUS COURT DE LA FAMILLE — il n'avance qu'un compteur
   // par piste —, et c'est la FIGURE qui fait tout le reste à partir de ce
-  // compteur. Voir `AdvanceScrollingBandTracks`.
+  // compteur. Voir `AdvanceLiveTrackTicks`.
   kScrollingBand,
   // UN VOILE SOMBRE, sous-type 71 : un disque clair en quatre quadrants, cerné
   // de noir, qui s'épaissit d'une unité d'alpha par tic. Ce client le peint à

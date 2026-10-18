@@ -363,16 +363,9 @@ void AdvanceHomingTrailTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
 // `aim_point` est le point que le bâtisseur a rangé dans le nœud — là où l'objet
 // tombe. Le nombre de pas du vol, lui, vit dans la piste : le bâtisseur l'a
 // compté et rangé dans sa deuxième marque.
-// LE COMPTEUR QUI AVANCE, et rien d'autre : le mouvement du sous-type 162.
-//
-// Il recopie la position du porteur — ce que la troupe fait
-// a cote — puis avance le compteur de tics de CHAQUE piste vive.
-//
-// ⚠ C'EST LE PLUS COURT DE LA FAMILLE, ET CE N'EST PAS UN MANQUE. Le quartier de
-// tarte ne bouge pas : ce qui le disperse est son SEMIS, et le compteur ne sert
-// qu'a le faire vieillir. Lui preter un mouvement qu'il n'a pas ferait tourner
-// un eclat que le client laisse immobile.
-void AdvanceEmitterFrameTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks);
+void AdvanceThrownItemTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks,
+                             glm::vec3 aim_point, std::int16_t billboard_turn_degrees,
+                             std::int16_t billboard_tilt_degrees);
 
 // LA COLONNE QUI S OUVRE COUCHE PAR COUCHE : le mouvement du sous-type 131.
 //
@@ -450,10 +443,6 @@ void AdvanceGrowingSpriteTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
 void AdvanceParticleFrameTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks,
                                 std::int16_t billboard_turn_degrees,
                                 std::int16_t billboard_tilt_degrees);
-
-void AdvanceThrownItemTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks,
-                             glm::vec3 aim_point, std::int16_t billboard_turn_degrees,
-                             std::int16_t billboard_tilt_degrees);
 
 // LA TRAÎNÉE QUI RETOMBE : une tête qui tourne, descend et s'efface, suivie de
 // trois crans de plus en plus pâles.
@@ -683,17 +672,21 @@ void AdvanceScatteringParticleTracks(std::array<EffectTrack, kEffectTracksPerNod
                                      std::int16_t billboard_tilt_degrees,
                                      const EffectScatterWorld& world, std::uint32_t& generator);
 
-// LE DÉFILEMENT : un compteur par piste, et rien d'autre.
+// LE COMPTEUR QUI AVANCE, et rien d'autre : le mouvement des sous-types 79 ET
+// 162, le plus court de la famille.
 //
-// Transcrit le cas 79 du répartiteur de mouvement, qui ne délègue à
-// aucune fonction nommée et tient en six instructions : pour chacune des quatre
-// pistes, si elle est vive, son compteur avance d'un tic. Puis il rejoint la
-// queue commune, qui vieillit le nœud — ce que la troupe fait déjà.
+// Pour chacune des quatre pistes, si elle est vive, son compteur avance d'un
+// tic. Le nœud vieillit ensuite dans la queue commune, que la troupe porte. Ce
+// qui entoure l'appel est l'affaire de l'appelant : le 162 recopie d'abord la
+// position de son porteur, le 79 ne suit personne.
 //
-// ⚠ AUCUNE PISTE NE BOUGE ICI, et ce n'est pas un oubli : la bande qui défile
-// tire TOUTE sa géométrie de ce compteur, ramené dans le cycle que son semis lui
-// a donné. Déplacer les jointures en plus les ferait glisser deux fois.
-void AdvanceScrollingBandTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks);
+// ⚠ AUCUNE PISTE NE BOUGE ICI, et ce n'est un manque pour aucun des deux. La
+// bande qui défile (79) tire TOUTE sa géométrie de ce compteur, ramené dans le
+// cycle que son semis lui a donné : déplacer les jointures en plus les ferait
+// glisser deux fois. Le quartier de tarte (162) ne bouge pas : ce qui le
+// disperse est son SEMIS, et le compteur ne sert qu'à le faire vieillir. Lui
+// prêter un mouvement ferait tourner un éclat que le client laisse immobile.
+void AdvanceLiveTrackTicks(std::array<EffectTrack, kEffectTracksPerNode>& tracks);
 
 // LA NUIT QUI VIENT : un compteur et un alpha, par piste vive.
 //
