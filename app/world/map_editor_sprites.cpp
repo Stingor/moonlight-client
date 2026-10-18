@@ -127,6 +127,7 @@ void MapEditorSession::ChooseSprite(std::optional<std::size_t> slot) {
     selected_light_.reset();
     selected_effect_.reset();
     selected_map_effect_.reset();
+    selected_sound_.reset();
   }
 }
 

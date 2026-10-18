@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -58,6 +59,23 @@ enum class QuickModelAction : std::uint8_t {
   kRevert,
 };
 
+// Les intentions de la section « Sons » : voir map_editor_sounds.cpp.
+template <typename Intent>
+inline constexpr bool kIsSoundIntent = std::is_same_v<Intent, ro::ui::map_editor::SelectSound> ||
+                                       std::is_same_v<Intent, ro::ui::map_editor::SetSound> ||
+                                       std::is_same_v<Intent, ro::ui::map_editor::MoveSound> ||
+                                       std::is_same_v<Intent, ro::ui::map_editor::RevertSound> ||
+                                       std::is_same_v<Intent, ro::ui::map_editor::AddSound> ||
+                                       std::is_same_v<Intent, ro::ui::map_editor::ListenSound>;
+
+// LES BIBLIOTHÈQUES DE L'ÉDITEUR, lues dans l'installation à sa première
+// ouverture : les modèles, relatifs à data\model\, et les sons, relatifs à
+// data\wav\.
+struct MapEditorLibraries {
+  std::shared_ptr<const std::vector<std::string>> models;
+  std::shared_ptr<const std::vector<std::string>> sounds;
+};
+
 class MapEditorSession {
  public:
   // Ce qu'une intention demande à l'appelant.
@@ -75,6 +93,8 @@ class MapEditorSession {
       kReload,
     };
     Publication publication = Publication::kNone;
+    // Un son à écouter une fois, hors du monde : « Écouter ».
+    std::optional<ro::ui::map_editor::ListenSound> listen;
   };
 
   [[nodiscard]] bool active() const noexcept { return active_; }
@@ -101,6 +121,7 @@ class MapEditorSession {
     selected_effect_.reset();
     selected_map_effect_.reset();
     selected_sprite_.reset();
+    selected_sound_.reset();
     gesture_before_.reset();
     ground_stroke_.reset();
     designated_point_.reset();
@@ -209,6 +230,15 @@ class MapEditorSession {
   // désigne. Les carrés, le désigné distingué.
   void SetSpriteDots(std::vector<LightDot> dots) { sprite_dots_ = std::move(dots); }
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> SpriteTrace() const;
+  // LE REPÈRE D'UN SON à l'écran, et ce qui le désigne : un clic dessus le
+  // désigne.
+  struct SoundDot {
+    glm::vec2 at{0.0F, 0.0F};
+    ro::ui::MapEditorSoundKey key;
+  };
+  void SetSoundDots(std::vector<SoundDot> dots) { sound_dots_ = std::move(dots); }
+  // Les repères des sons, le désigné distingué.
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> SoundTrace() const;
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> EffectTrace() const;
   // Les cercles des lumières, la réglée distinguée.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> LightTrace() const;
@@ -390,6 +420,43 @@ class MapEditorSession {
   // Le sprite qu'on règle, et les carrés de tous à l'écran.
   std::optional<std::size_t> selected_sprite_;
   std::vector<LightDot> sprite_dots_;
+  // LES SONS D'AMBIANCE : voir map_editor_sounds.cpp.
+  // Une autre carte lâche le son désigné et relit les fichiers de ses sources.
+  void FollowMapSounds(std::string_view map_name, const ro::render::MapScene& scene);
+  void ViewSounds(const ro::render::MapScene& scene, const ro::mapedit::MapEdit& document,
+                  ro::ui::MapEditorView& view) const;
+  Outcome ApplySound(const ro::ui::map_editor::SelectSound& select,
+                     const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplySound(const ro::ui::map_editor::SetSound& set, const ro::render::MapScene& scene,
+                     MapEditStore& store);
+  Outcome ApplySound(const ro::ui::map_editor::MoveSound& move, const ro::render::MapScene& scene,
+                     MapEditStore& store);
+  Outcome ApplySound(const ro::ui::map_editor::RevertSound& revert,
+                     const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplySound(const ro::ui::map_editor::AddSound& add, const ro::render::MapScene& scene,
+                     MapEditStore& store);
+  Outcome ApplySound(const ro::ui::map_editor::ListenSound& listen,
+                     const ro::render::MapScene& scene, MapEditStore& store);
+  void ChooseSound(std::optional<ro::ui::MapEditorSoundKey> key);
+  [[nodiscard]] bool GrabSound(glm::vec2 pointer);
+  [[nodiscard]] bool GrabSoundHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  // Les gestes du clavier sur le son désigné ; rien quand aucun ne l'est.
+  [[nodiscard]] std::optional<Outcome> NudgeSound(const std::array<float, 3>& delta,
+                                                  const ro::render::MapScene& scene,
+                                                  MapEditStore& store);
+  [[nodiscard]] std::optional<Outcome> DuplicateSound(const ro::render::MapScene& scene,
+                                                      MapEditStore& store);
+  [[nodiscard]] std::optional<Outcome> DeleteSound(const ro::render::MapScene& scene,
+                                                   MapEditStore& store);
+  // Le point que « Centrer » regarde pour le son désigné ; rien sans lui.
+  [[nodiscard]] std::optional<std::array<float, 3>> SoundFocus(const ro::render::MapScene& scene,
+                                                               const MapEditStore& store) const;
+  std::optional<ro::ui::MapEditorSoundKey> selected_sound_;
+  std::vector<SoundDot> sound_dots_;
+  // Le fichier de chaque source de son du RSW, en UTF-8, et la carte dont ils
+  // viennent : convertis une fois par carte.
+  std::vector<std::string> sound_files_;
+  std::string sound_files_map_;
   // Le cache de `RefreshSceneRows`, et ce dont il a été bâti.
   mutable std::shared_ptr<const std::vector<ro::ui::MapEditorModelRow>> scene_rows_;
   mutable std::vector<std::size_t> edited_ranks_;
@@ -435,6 +502,7 @@ class MapEditorSession {
     std::optional<std::size_t> effect;
     std::optional<std::size_t> map_effect;
     std::optional<std::size_t> sprite;
+    std::optional<ro::ui::MapEditorSoundKey> sound;
     // La poignée lève les points du sol sélectionnés ; la hauteur du désigné à
     // l'appui, d'où l'aimantation compte.
     bool ground_points = false;

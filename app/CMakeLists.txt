@@ -797,6 +797,8 @@ add_library(moonclient_graphics STATIC
     world/map_editor_reasons.cpp
     world/map_editor_save.cpp
     world/map_editor_session.cpp
+    world/map_editor_sound_marks.cpp
+    world/map_editor_sounds.cpp
     world/map_editor_sprites.cpp
     world/map_editor_vertices.cpp
     world/map_sprites.cpp

@@ -133,6 +133,7 @@ void MapEditorSession::ChooseLight(std::optional<std::size_t> slot) {
     selected_effect_.reset();
     selected_map_effect_.reset();
     selected_sprite_.reset();
+    selected_sound_.reset();
   }
 }
 
@@ -146,6 +147,7 @@ void MapEditorSession::ChooseModel(std::optional<std::size_t> model_index) {
     selected_effect_.reset();
     selected_map_effect_.reset();
     selected_sprite_.reset();
+    selected_sound_.reset();
   }
 }
 
@@ -162,12 +164,13 @@ bool MapEditorSession::Deselect() noexcept {
   }
   const bool held = !selection_.empty() || selected_light_.has_value() ||
                     selected_effect_.has_value() || selected_map_effect_.has_value() ||
-                    selected_sprite_.has_value();
+                    selected_sprite_.has_value() || selected_sound_.has_value();
   selection_.Clear();
   selected_light_.reset();
   selected_effect_.reset();
   selected_map_effect_.reset();
   selected_sprite_.reset();
+  selected_sound_.reset();
   return held;
 }
 
@@ -178,6 +181,8 @@ MapEditorSession::Outcome MapEditorSession::Focus(const ro::render::MapScene& sc
   const std::vector<ro::mapedit::MapSprite>& sprites = store.Document(map_name_).sprites();
   if (selected_sprite_.has_value() && *selected_sprite_ < sprites.size()) {
     view_point_ = sprites[*selected_sprite_].position;
+  } else if (const std::optional<std::array<float, 3>> sound = SoundFocus(scene, store)) {
+    view_point_ = sound;
   } else if (selected_map_effect_.has_value() &&
              *selected_map_effect_ < scene.rsw.effects().size()) {
     const ro::mapedit::EffectEdit* retouch =

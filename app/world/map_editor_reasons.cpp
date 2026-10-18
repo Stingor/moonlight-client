@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdio>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ro/core/i18n.h"
@@ -82,7 +83,98 @@ ro::mapedit::MapEdit WithReasons(ro::mapedit::MapEdit document) {
   if (!document.ground().empty() && document.ground_why().empty()) {
     document.SetGroundWhy(ro::core::Tr("Retouche du relief"));
   }
+  const std::vector<ro::mapedit::SoundEdit> sound_retouches = document.sound_edits();
+  for (ro::mapedit::SoundEdit retouch : sound_retouches) {
+    if (retouch.why.empty()) {
+      std::snprintf(reason.data(), reason.size(), ro::core::Tr("Retouche du son %s"),
+                    retouch.wave_file.c_str());
+      retouch.why = reason.data();
+      document.SetSoundEdit(std::move(retouch));
+    }
+  }
+  for (std::size_t slot = 0; slot < document.sounds().size(); ++slot) {
+    if (document.sounds()[slot].why.empty()) {
+      ro::mapedit::AddedSound sound = document.sounds()[slot];
+      std::snprintf(reason.data(), reason.size(), ro::core::Tr("Ajout du son %s"),
+                    sound.wave_file.c_str());
+      sound.why = reason.data();
+      document.SetSound(slot, std::move(sound));
+    }
+  }
   return document;
+}
+
+std::string SaveRefusal(const ro::mapedit::MapEdit& document, std::size_t original_count) {
+  Reason refused{};
+  for (const ro::mapedit::ModelEdit& edit : document.models()) {
+    if (edit.why.empty()) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche du modèle %zu n'a pas de raison."), edit.model_index);
+      return refused.data();
+    }
+  }
+  for (const ro::mapedit::EffectEdit& retouch : document.effect_edits()) {
+    if (retouch.why.empty()) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche de l'effet %zu n'a pas de raison."),
+                    retouch.effect_index);
+      return refused.data();
+    }
+  }
+  for (std::size_t slot = 0; slot < document.effects().size(); ++slot) {
+    if (document.effects()[slot].why.empty()) {
+      std::snprintf(refused.data(), refused.size(), ro::core::Tr("L'effet %zu n'a pas de raison."),
+                    slot);
+      return refused.data();
+    }
+  }
+  for (std::size_t slot = 0; slot < document.lights().size(); ++slot) {
+    if (document.lights()[slot].why.empty() || !(document.lights()[slot].range > 0.0F)) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La lumière %zu n'a pas de raison, ou pas de portée."), slot);
+      return refused.data();
+    }
+  }
+  for (const ro::mapedit::MeshEdit& mesh : document.meshes()) {
+    if (mesh.why.empty()) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche du maillage %zu n'a pas de raison."),
+                    mesh.model_index);
+      return refused.data();
+    }
+  }
+  for (std::size_t slot = 0; slot < document.added().size(); ++slot) {
+    if (document.added()[slot].why.empty()) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche du modèle %zu n'a pas de raison."),
+                    original_count + slot);
+      return refused.data();
+    }
+  }
+  for (std::size_t slot = 0; slot < document.sprites().size(); ++slot) {
+    if (document.sprites()[slot].why.empty()) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("Le sprite %zu n'a pas de raison."), slot);
+      return refused.data();
+    }
+  }
+  for (const ro::mapedit::SoundEdit& retouch : document.sound_edits()) {
+    if (retouch.why.empty()) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("La retouche du son %zu n'a pas de raison."), retouch.sound_index);
+      return refused.data();
+    }
+  }
+  for (std::size_t slot = 0; slot < document.sounds().size(); ++slot) {
+    const ro::mapedit::AddedSound& sound = document.sounds()[slot];
+    if (sound.why.empty() || !(sound.range > 0.0F) || !(sound.cycle_seconds > 0.0F)) {
+      std::snprintf(refused.data(), refused.size(),
+                    ro::core::Tr("Le son ajouté %zu n'a pas de raison, de portée ou de cycle."),
+                    slot);
+      return refused.data();
+    }
+  }
+  return {};
 }
 
 }  // namespace moonclient

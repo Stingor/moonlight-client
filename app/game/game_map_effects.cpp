@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ro/render/edited_map_effects.h"
+#include "ro/render/edited_map_sounds.h"
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effect_lots.h"
 #include "ro/sim/actor.h"
@@ -86,15 +87,22 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
                        stage_->scene.gnd.height());
     raised_effects_ = std::move(wanted);
   }
-  if (!map_effects_raised_) {
-    // LES SOURCES DE SON, au même instant : le client les crée dans la même
-    // passe que les objets d'effet, juste après eux.
-    if (actor_sounds_.has_value()) {
+  // LES SOURCES DE SON, au même instant : le client les crée dans la même passe
+  // que les objets d'effet, juste après eux. Celles du RSW et celles que
+  // l'édition ajoute, comme les effets ; la liste qui change se relève, chaque
+  // source gardant sa cadence.
+  if (actor_sounds_.has_value()) {
+    const std::vector<ro::formats::RswSound> sounds = ro::render::ActiveMapSounds(
+        stage_->scene.rsw.sounds(), map_edits_.Document(stage_->name), effect_night_, effect_hour_);
+    if (!map_effects_raised_) {
       actor_sounds_->RaiseMapAmbience(
-          stage_->scene.rsw.sounds(),
-          ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
+          sounds, ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
           now_ms);
+    } else if (!ro::render::SameMapSounds(sounds, actor_sounds_->raised_ambience())) {
+      actor_sounds_->ReraiseMapAmbience(sounds, now_ms);
     }
+  }
+  if (!map_effects_raised_) {
     // LE BANDEAU DU NOM, au même instant : le client le lève en entrant dans le
     // monde de la carte, juste après ses objets.
     pieces_.map_sign.Enter(pieces_.map_display_names.has_value()

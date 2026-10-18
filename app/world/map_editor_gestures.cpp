@@ -40,6 +40,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
   if (selected_sprite_.has_value()) {
     return NudgeSprite(delta, store);
   }
+  if (std::optional<Outcome> sound = NudgeSound(delta, scene, store)) {
+    return *sound;
+  }
   if (selected_map_effect_.has_value()) {
     return NudgeMapEffect(delta, scene, store);
   }
@@ -82,6 +85,9 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
                                                       MapEditStore& store) {
   if (selected_sprite_.has_value()) {
     return DuplicateSprite(store);
+  }
+  if (std::optional<Outcome> sound = DuplicateSound(scene, store)) {
+    return *sound;
   }
   if (selected_map_effect_.has_value()) {
     return DuplicateMapEffect(scene, store);
@@ -140,6 +146,9 @@ MapEditorSession::Outcome MapEditorSession::Delete(const ro::render::MapScene& s
                                                    MapEditStore& store) {
   if (selected_sprite_.has_value()) {
     return RemoveSprite(*selected_sprite_, store);
+  }
+  if (std::optional<Outcome> sound = DeleteSound(scene, store)) {
+    return *sound;
   }
   if (selected_map_effect_.has_value()) {
     return HideMapEffect(scene, store);

@@ -12,6 +12,8 @@
 #include <glm/glm.hpp>
 
 #include "ro/ui/map_cells.h"
+#include "ro/ui/map_editor_hours.h"
+#include "ro/ui/map_editor_sounds.h"
 #include "ro/ui/map_editor_sprite_view.h"
 #include "ro/ui/skin_art.h"
 
@@ -36,14 +38,6 @@ struct MapEditorModelRow {
   bool hidden = false;
   bool added = false;
   bool translucent = false;
-};
-
-// LA PLAGE D'HEURES d'un objet « la nuit seulement », telle que le panneau la
-// montre et la rend : choisie ou non, et ses bornes en heures du serveur.
-struct MapEditorHours {
-  bool chosen = false;
-  float from_hour = 0.0F;
-  float to_hour = 0.0F;
 };
 
 // UNE LUMIÈRE PONCTUELLE DU DOCUMENT, telle que le panneau la montre et la
@@ -130,6 +124,9 @@ enum class MapEditorLineKind : std::uint8_t {
   // Un sprite de décor, et le sprite désigné : des carrés, en `from`.
   kSprite = 16,
   kSpriteSelected = 17,
+  // Un son d'ambiance, et le son désigné : des carrés, en `from`.
+  kSound = 18,
+  kSoundSelected = 19,
 };
 
 // L'OUTIL DE LA VUE : les poignées qui déplacent, tournent ou mettent à
@@ -278,6 +275,12 @@ struct MapEditorView {
   // LES SPRITES DE DÉCOR du document, et celui qu'on règle.
   std::vector<MapEditorSprite> sprites;
   std::optional<std::size_t> selected_sprite;
+  // LES SONS D'AMBIANCE : ceux du RSW dans son ordre, puis ceux que le document
+  // ajoute ; celui qu'on règle ; et les `.wav` de l'installation, relatifs à
+  // data\wav\, triés et partagés comme la bibliothèque.
+  std::vector<MapEditorSound> sounds;
+  std::optional<MapEditorSoundKey> selected_sound;
+  std::shared_ptr<const std::vector<std::string>> sound_library;
   // LE RELIEF : la brosse, et ce que le document retouche.
   MapEditorGround ground;
   // L'aperçu du modèle survolé.
@@ -466,7 +469,8 @@ using MapEditorIntent = std::variant<
     map_editor::SetGroundWhy, map_editor::LiftGroundPoints, map_editor::SetGroundPointHeight,
     map_editor::RevertGroundPoints, map_editor::Overwrite, map_editor::Reload,
     map_editor::AddSprite, map_editor::SelectSprite, map_editor::SetSprite,
-    map_editor::RemoveSprite, map_editor::MoveSprite>;
+    map_editor::RemoveSprite, map_editor::MoveSprite, map_editor::SelectSound, map_editor::SetSound,
+    map_editor::MoveSound, map_editor::RevertSound, map_editor::AddSound, map_editor::ListenSound>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -525,6 +529,8 @@ struct MapEditorPanelState {
   std::array<char, kFilterCapacity> sprite_name{};
   std::optional<std::size_t> sprite_name_of;
   bool sprite_name_typing = false;
+  // La section « Sons ».
+  MapEditorSoundPanelState sounds;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

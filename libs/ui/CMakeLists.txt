@@ -243,6 +243,7 @@ add_library(ro_ui STATIC
     src/map_editor_ground_panel.cpp
     src/map_editor_panel.cpp
     src/map_editor_row_menu.cpp
+    src/map_editor_sounds_panel.cpp
     src/staff_tools.cpp
     src/staff_skill_id.cpp
     src/unlock_notice.cpp

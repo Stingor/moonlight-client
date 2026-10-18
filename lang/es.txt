@@ -19783,3 +19783,72 @@ tr: Editor
 
 fr: Ouvrir ou refermer l'éditeur de carte.
 tr: Abrir o cerrar el editor de mapas.
+
+fr: Ajout du son %s
+tr: Sonido añadido %s
+
+fr: Ajouter un son
+tr: Añadir un sonido
+
+fr: Aucun son dans l'installation.
+tr: No hay ningún sonido en la instalación.
+
+fr: Cette carte n'a aucun son.
+tr: Este mapa no tiene ningún sonido.
+
+fr: Cycle
+tr: Ciclo
+
+fr: Emprise
+tr: Extensión
+
+fr: La retouche du son %zu n'a pas de raison.
+tr: El retoque del sonido %zu no tiene motivo.
+
+fr: Le son ajouté %zu n'a pas de raison, de portée ou de cycle.
+tr: El sonido añadido %zu no tiene motivo, alcance o ciclo.
+
+fr: Prendre le fichier choisi
+tr: Usar el archivo elegido
+
+fr: Retirer le son
+tr: Quitar el sonido
+
+fr: Retirer le son %zu
+tr: Quitar el sonido %zu
+
+fr: Retouche du son %s
+tr: Retoque del sonido %s
+
+fr: Retoucher le son %zu
+tr: Retocar el sonido %zu
+
+fr: Régler le son ajouté %zu
+tr: Ajustar el sonido añadido %zu
+
+fr: Rétablir le son
+tr: Restablecer el sonido
+
+fr: Rétablir le son %zu
+tr: Restablecer el sonido %zu
+
+fr: Son ajouté désigné
+tr: Sonido añadido seleccionado
+
+fr: Son de la carte désigné
+tr: Sonido del mapa seleccionado
+
+fr: Sons
+tr: Sonidos
+
+fr: Sons ajoutés
+tr: Sonidos añadidos
+
+fr: Sons de la carte
+tr: Sonidos del mapa
+
+fr: Volume
+tr: Volumen
+
+fr: Écouter le fichier choisi
+tr: Escuchar el archivo elegido

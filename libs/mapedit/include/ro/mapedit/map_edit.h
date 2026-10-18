@@ -197,6 +197,74 @@ struct EffectEdit {
 // d'origine, à la tolérance du document ?
 [[nodiscard]] bool EffectEditTargets(const EffectEdit& edit, const formats::RswEffect& object);
 
+// LES SONS D'AMBIANCE : les sources de son du RSW — l'eau, le vent, la foule —
+// retouchées, et celles que l'éditeur ajoute. Une source rejoue son bruit tous
+// les `cycle_seconds` tant que le joueur est à portée ; voir
+// ro/audio/ambient_sound.h. Les grandeurs sont celles du RSW : unités du
+// fichier pour la place, l'emprise et la portée, de 0 à 1 pour le volume.
+inline constexpr float kSoundVolumeLeast = 0.0F;
+inline constexpr float kSoundVolumeMost = 1.0F;
+
+// Un volume tient-il dans ses bornes ? Faux pour NaN.
+[[nodiscard]] constexpr bool SoundVolumeInBounds(float volume) noexcept {
+  return volume >= kSoundVolumeLeast && volume <= kSoundVolumeMost;
+}
+
+// UN SON AJOUTÉ par l'éditeur : un `.wav` de l'installation, posé là où le
+// staff l'a voulu, que le jeu lève avec les sources du RSW.
+struct AddedSound {
+  // Son fichier, relatif à data\wav\, en UTF-8.
+  std::string wave_file;
+  // Sa place, dans le repère du RSW.
+  std::array<float, 3> position{};
+  float volume = kSoundVolumeMost;
+  // L'emprise, un rectangle centré sur sa place, en unités entières comme le
+  // RSW les range : une largeur nulle ne sonne jamais.
+  std::int32_t width = kDefaultFootprint;
+  std::int32_t height = kDefaultFootprint;
+  // Jusqu'où il s'entend ; strictement positive.
+  float range = kDefaultRange;
+  // Tous les combien de secondes il se rejoue ; strictement positif.
+  float cycle_seconds = formats::kRswDefaultSoundCycleSeconds;
+  // Vrai : il ne sonne qu'à la nuit — ou dans sa plage d'heures.
+  bool night_only = false;
+  std::optional<LitHours> hours;
+  std::string why;
+
+  // Une emprise d'un carreau, une portée de dix carreaux : ce que prend un son
+  // neuf.
+  static constexpr std::int32_t kDefaultFootprint = 10;
+  static constexpr float kDefaultRange = 100.0F;
+
+  friend bool operator==(const AddedSound&, const AddedSound&) = default;
+};
+
+// LA RETOUCHE D'UNE SOURCE DE SON DU RSW : déplacée, masquée, son volume, sa
+// portée ou son cycle changés, réservée à la nuit. Elle désigne sa source par
+// son rang, son fichier et sa position d'origine, et ne vaut plus si la carte a
+// changé sous elle. Les champs absents gardent la valeur du RSW.
+struct SoundEdit {
+  std::size_t sound_index = 0;
+  // Le fichier de la source, relatif à data\wav\, en UTF-8.
+  std::string wave_file;
+  std::array<float, 3> origin{};
+  std::optional<std::array<float, 3>> position;
+  bool hidden = false;
+  std::optional<float> volume;
+  std::optional<float> range;
+  std::optional<float> cycle_seconds;
+  bool night_only = false;
+  std::optional<LitHours> hours;
+  std::string why;
+
+  friend bool operator==(const SoundEdit&, const SoundEdit&) = default;
+};
+
+// La retouche vise-t-elle encore cette source : même fichier, en UTF-8, et même
+// position d'origine, à la tolérance du document ?
+[[nodiscard]] bool SoundEditTargets(const SoundEdit& edit, std::string_view wave_file,
+                                    const std::array<float, 3>& position);
+
 // UN SOMMET DÉPLACÉ : son nœud, son rang dans le nœud, sa position dans le
 // fichier et la nouvelle, toutes deux dans le repère du nœud.
 struct VertexMove {
@@ -259,8 +327,21 @@ class MapEdit {
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
   [[nodiscard]] bool empty() const noexcept {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
-           effects_.empty() && effect_edits_.empty() && ground_.empty() && sprites_.empty();
+           effects_.empty() && effect_edits_.empty() && ground_.empty() && sprites_.empty() &&
+           sounds_.empty() && sound_edits_.empty();
   }
+  // Les sons ajoutés, dans l'ordre du document.
+  [[nodiscard]] const std::vector<AddedSound>& sounds() const noexcept { return sounds_; }
+  void AddSound(AddedSound sound) { sounds_.push_back(std::move(sound)); }
+  // Remplace le son de rang `slot` ; hors de la liste, rien.
+  void SetSound(std::size_t slot, AddedSound sound);
+  // Retire le son de rang `slot` : les suivants remontent.
+  void RemoveSound(std::size_t slot);
+  // Les retouches des sources de son du RSW, rangées par rang.
+  [[nodiscard]] const std::vector<SoundEdit>& sound_edits() const noexcept { return sound_edits_; }
+  [[nodiscard]] const SoundEdit* SoundEditAt(std::size_t sound_index) const;
+  void SetSoundEdit(SoundEdit edit);
+  void RemoveSoundEdit(std::size_t sound_index);
   // LES RETOUCHES DU RELIEF : une seule par point, rangées par rangée puis par
   // colonne. Une seule raison les couvre toutes : un relief se retouche d'un
   // geste de brosse, pas point par point.
@@ -337,6 +418,8 @@ class MapEdit {
   std::vector<GroundEdit> ground_;
   std::string ground_why_;
   std::vector<MapSprite> sprites_;
+  std::vector<AddedSound> sounds_;
+  std::vector<SoundEdit> sound_edits_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

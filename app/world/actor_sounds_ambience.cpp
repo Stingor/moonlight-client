@@ -5,8 +5,11 @@
 // acteurs sans corps. Elles partagent seulement le cache des bruits et
 // l'auditeur. Le calcul de chaque source vit dans `ro/audio/ambient_sound.h`.
 
+#include <algorithm>
+#include <cstddef>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "ro/audio/sound_placement.h"
 #include "ro/vfs/encoding.h"
@@ -19,6 +22,7 @@ void ActorSounds::RaiseMapAmbience(std::span<const ro::formats::RswSound> sounds
                                    const ro::render::MapEffectFrame& frame, std::uint32_t now_ms) {
   ambience_.clear();
   ambience_frame_ = frame;
+  raised_ambience_.assign(sounds.begin(), sounds.end());
   for (const ro::formats::RswSound& sound : sounds) {
     // UNE SOURCE SANS FICHIER NE SONNE JAMAIS : le client la crée, puis vérifie
     // à chaque image que son nom n'est pas vide. Ne pas la créer revient au même.
@@ -38,6 +42,19 @@ void ActorSounds::RaiseMapAmbience(std::span<const ro::formats::RswSound> sounds
     auto utf8 = ro::vfs::Cp949ToUtf8(sound.wave_name);
     ambience_.push_back(MapAmbientSource{utf8 ? std::move(*utf8) : sound.wave_name,
                                          ro::audio::AmbientSoundEmitter(source, now_ms)});
+  }
+}
+
+void ActorSounds::ReraiseMapAmbience(std::span<const ro::formats::RswSound> sounds,
+                                     std::uint32_t now_ms) {
+  std::vector<MapAmbientSource> earlier = std::move(ambience_);
+  RaiseMapAmbience(sounds, ambience_frame_, now_ms);
+  // ⚠ PAR RANG, ET NON PAR NOM : une source qu'on glisse change de place, pas
+  // de rang. Une source masquée décale les suivantes, qui reprennent alors une
+  // cadence voisine — au pire un bruit avancé, jamais un bruit par image.
+  const std::size_t kept = std::min(earlier.size(), ambience_.size());
+  for (std::size_t rank = 0; rank < kept; ++rank) {
+    ambience_[rank].emitter.KeepPaceOf(earlier[rank].emitter);
   }
 }
 

@@ -19783,3 +19783,72 @@ tr: Editor
 
 fr: Ouvrir ou refermer l'éditeur de carte.
 tr: Open or close the map editor.
+
+fr: Ajout du son %s
+tr: Added sound %s
+
+fr: Ajouter un son
+tr: Add a sound
+
+fr: Aucun son dans l'installation.
+tr: No sound in the installation.
+
+fr: Cette carte n'a aucun son.
+tr: This map has no sound.
+
+fr: Cycle
+tr: Cycle
+
+fr: Emprise
+tr: Footprint
+
+fr: La retouche du son %zu n'a pas de raison.
+tr: The edit of sound %zu has no reason.
+
+fr: Le son ajouté %zu n'a pas de raison, de portée ou de cycle.
+tr: Added sound %zu has no reason, range or cycle.
+
+fr: Prendre le fichier choisi
+tr: Use the chosen file
+
+fr: Retirer le son
+tr: Remove the sound
+
+fr: Retirer le son %zu
+tr: Remove sound %zu
+
+fr: Retouche du son %s
+tr: Edit of sound %s
+
+fr: Retoucher le son %zu
+tr: Edit sound %zu
+
+fr: Régler le son ajouté %zu
+tr: Adjust added sound %zu
+
+fr: Rétablir le son
+tr: Restore the sound
+
+fr: Rétablir le son %zu
+tr: Restore sound %zu
+
+fr: Son ajouté désigné
+tr: Selected added sound
+
+fr: Son de la carte désigné
+tr: Selected map sound
+
+fr: Sons
+tr: Sounds
+
+fr: Sons ajoutés
+tr: Added sounds
+
+fr: Sons de la carte
+tr: Map sounds
+
+fr: Volume
+tr: Volume
+
+fr: Écouter le fichier choisi
+tr: Listen to the chosen file

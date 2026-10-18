@@ -557,8 +557,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LES DOCUMENTS D'ÉDITION DES CARTES, et le mode éditeur : voir docs/adr/0118.
   MapEditStore map_edits_;
   MapEditorSession map_editor_;
-  // La bibliothèque de l'éditeur, lue à sa première ouverture.
-  std::shared_ptr<const std::vector<std::string>> model_library_;
+  // Les bibliothèques de l'éditeur, lues à sa première ouverture.
+  MapEditorLibraries editor_libraries_;
   // Les vignettes que l'éditeur montre au survol d'un modèle.
   ModelPreviews model_previews_;
   // Ce que l'outil Sommets sait du modèle désigné, et les fichiers qu'il a lus.

@@ -12,9 +12,12 @@ add_library(ro_mapedit STATIC
     src/ground_edit.cpp
     src/ground_edit_yaml.cpp
     src/map_edit.cpp
+    src/map_edit_header.cpp
     src/map_edit_sprite_yaml.cpp
     src/map_edit_yaml.cpp
-    src/map_sprite.cpp)
+    src/map_sprite.cpp
+    src/sound_edit.cpp
+    src/sound_edit_yaml.cpp)
 add_library(ro::mapedit ALIAS ro_mapedit)
 
 target_include_directories(ro_mapedit PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -131,6 +131,7 @@ add_library(ro_render STATIC
     src/model_bake.cpp
     src/model_mesh.cpp
     src/edited_map_effects.cpp
+    src/edited_map_sounds.cpp
     src/map_point_lights.cpp
     src/effect_lights.cpp
     src/actor_lights.cpp

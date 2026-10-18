@@ -231,6 +231,14 @@ class ActorSounds {
   // `ro/audio/ambient_sound.h`.
   void RaiseMapAmbience(std::span<const ro::formats::RswSound> sounds,
                         const ro::render::MapEffectFrame& frame, std::uint32_t now_ms);
+  // LA LISTE A CHANGÉ sur la même carte — un document retouché, la nuit qui
+  // tombe : les sources se relèvent, et chacune reprend la cadence de celle de
+  // même rang. Une source qu'on glisse ne se rejoue donc pas à chaque image.
+  void ReraiseMapAmbience(std::span<const ro::formats::RswSound> sounds, std::uint32_t now_ms);
+  // Les sources que la dernière levée a posées, telles qu'elle les a reçues.
+  [[nodiscard]] std::span<const ro::formats::RswSound> raised_ambience() const noexcept {
+    return raised_ambience_;
+  }
 
   // AU DÉPART POUR UNE AUTRE CARTE : ses sources s'en vont, et les bruits
   // qu'elles avaient lancés se taisent avec elles. Un bruit d'eau ou de foule
@@ -320,6 +328,7 @@ class ActorSounds {
   std::unordered_map<std::string, bool> tried_;
 
   std::vector<MapAmbientSource> ambience_;
+  std::vector<ro::formats::RswSound> raised_ambience_;
   ro::render::MapEffectFrame ambience_frame_;
   // Où l'auditeur se tenait à la dernière écoute des sources, dans NOTRE repère.
   std::array<float, 3> ambience_listener_{0.0F, 0.0F, 0.0F};

@@ -131,6 +131,7 @@ void MapEditorSession::ChooseMapEffect(std::optional<std::size_t> index) {
     selected_light_.reset();
     selected_effect_.reset();
     selected_sprite_.reset();
+    selected_sound_.reset();
   }
 }
 

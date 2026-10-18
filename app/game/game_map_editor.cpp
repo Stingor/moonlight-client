@@ -4,6 +4,7 @@
 // Le panneau rend des intentions ; ici, elles passent à la session, le décor se
 // repose quand le document change, et le panneau reçoit sa vue de l'image.
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -15,9 +16,11 @@
 #include <variant>
 #include <vector>
 
+#include "ro/audio/audio_engine.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/render/map_scene.h"
+#include "ro/render/skill_sound_table.h"
 #include "ro/render/terrain_mesh.h"
 #include "ro/ui/entity_menu.h"
 #include "ro/vfs/encoding.h"
@@ -25,6 +28,7 @@
 #include "game/game.h"
 #include "world/map_editor_mesh.h"
 #include "world/map_editor_overlay.h"
+#include "world/map_editor_sound_marks.h"
 #include "world/map_sprites.h"
 
 namespace moonclient {
@@ -58,6 +62,44 @@ void NameMapSprite(ro::ui::MapEditorIntent& intent, const ro::render::SpriteCata
   }
 }
 
+constexpr std::string_view kSoundExtension = ".wav";
+
+// LES SONS DE L'INSTALLATION, relatifs à data\wav\ : ce que la section « Sons »
+// propose.
+std::vector<std::string> SoundLibrary(ro::vfs::Vfs& vfs) {
+  std::vector<std::string> files = vfs.List(ro::render::kSoundFolder, kSoundExtension);
+  for (std::string& file : files) {
+    if (file.size() > ro::render::kSoundFolder.size()) {
+      file.erase(0, ro::render::kSoundFolder.size());
+    }
+  }
+  return files;
+}
+
+// « ÉCOUTER » : le son une fois, au centre, à son volume, dans la famille des
+// sons d'ambiance — sous le nom que leur donnent les sources de la carte, si
+// bien qu'un son écouté n'est pas lu deux fois.
+void Listen(ro::audio::AudioEngine& audio, ro::vfs::Vfs& vfs,
+            const ro::ui::map_editor::ListenSound& listen) {
+  if (!audio.is_open() || listen.file.empty()) {
+    return;
+  }
+  if (!audio.KnowsSound(listen.file)) {
+    auto bytes = vfs.Read(std::string(ro::render::kSoundFolder) + listen.file);
+    if (!bytes) {
+      ro::core::LogWarning("éditeur : son {} absent", listen.file);
+      return;
+    }
+    if (auto held = audio.LoadSound(listen.file, *bytes); !held) {
+      ro::core::LogWarning("éditeur : son {} illisible — {}", listen.file,
+                           ro::core::Describe(held.error()));
+      return;
+    }
+  }
+  constexpr float kCentered = 0.0F;
+  audio.PlaySound(listen.file, listen.volume, kCentered, ro::audio::SoundChannel::kAmbience);
+}
+
 }  // namespace
 
 void Game::ServeMapEditor() {
@@ -70,6 +112,7 @@ void Game::ServeMapEditor() {
     map_editor_.SetEffectDots({});
     map_editor_.SetMapEffectDots({});
     map_editor_.SetSpriteDots({});
+    map_editor_.SetSoundDots({});
     return;
   }
   const auto width = static_cast<float>(shell_.width());
@@ -155,6 +198,27 @@ void Game::ServeMapEditor() {
                        static_cast<float>(shell_.width()), static_cast<float>(shell_.height()));
     view.lines.insert(view.lines.end(), ring.begin(), ring.end());
   }
+  // LES SONS : un carré sur chacun ; le désigné a la flèche, le cercle de sa
+  // portée et son emprise.
+  map_editor_.SetSoundDots(SoundDots(view, stage_->scene, camera_, aspect_ratio_, width, height));
+  const std::vector<ro::ui::MapEditorLine> sound_marks = map_editor_.SoundTrace();
+  view.lines.insert(view.lines.end(), sound_marks.begin(), sound_marks.end());
+  if (view.selected_sound.has_value() && !view.selected.has_value() && !ground_points) {
+    const auto shown =
+        std::ranges::find(view.sounds, *view.selected_sound, &ro::ui::MapEditorSound::key);
+    if (shown != view.sounds.end()) {
+      const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
+                                                 stage_->scene.gnd.height()};
+      const GizmoFrame frame = GizmoFrameOf(map_frame, shown->position, camera_);
+      map_editor_.SetGizmo(frame, GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera_,
+                                               aspect_ratio_, width, height));
+      const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
+      view.lines.insert(view.lines.end(), handles.begin(), handles.end());
+      const std::vector<ro::ui::MapEditorLine> reach =
+          SoundReach(*shown, stage_->scene, camera_, aspect_ratio_, width, height);
+      view.lines.insert(view.lines.end(), reach.begin(), reach.end());
+    }
+  }
   ServeGroundPoints(width, height);
 }
 
@@ -183,14 +247,21 @@ void Game::ServeMapEditorTools() {
   // clôt le glissé après son dernier pas.
   ServeGroundBrush();
   bool replace = false;
+  const auto apply = [&](const ro::ui::MapEditorIntent& intent) {
+    const MapEditorSession::Outcome outcome = map_editor_.Apply(intent, stage_->scene, map_edits_);
+    replace |= PublishMapEdit(outcome);
+    if (outcome.listen.has_value()) {
+      Listen(audio_, *vfs_, *outcome.listen);
+    }
+  };
   for (ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
     NameMapSprite(intent, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog() : nullptr);
-    replace |= PublishMapEdit(map_editor_.Apply(intent, stage_->scene, map_edits_));
+    apply(intent);
   }
   tools.map_editor_intents.clear();
   // LES GESTES DES POIGNÉES ET DU CLAVIER, mis en file.
   for (const ro::ui::MapEditorIntent& intent : map_editor_.TakeQueued()) {
-    replace |= PublishMapEdit(map_editor_.Apply(intent, stage_->scene, map_edits_));
+    apply(intent);
   }
   if (replace) {
     ReplaceMapModels();
@@ -209,11 +280,16 @@ void Game::ServeMapEditorTools() {
       sprite.frame_count = counts.frame_count;
     }
   }
-  // LA BIBLIOTHÈQUE, lue une fois dans l'installation, à la première ouverture.
-  if (map_editor_.active() && model_library_ == nullptr) {
-    model_library_ = std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));
+  // LES BIBLIOTHÈQUES, lues une fois dans l'installation, à la première
+  // ouverture.
+  if (map_editor_.active() && editor_libraries_.models == nullptr) {
+    editor_libraries_.models =
+        std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));
+    editor_libraries_.sounds =
+        std::make_shared<const std::vector<std::string>>(SoundLibrary(*vfs_));
   }
-  tools.map_editor.library = model_library_;
+  tools.map_editor.library = editor_libraries_.models;
+  tools.map_editor.sound_library = editor_libraries_.sounds;
   // L'APERÇU DU MODÈLE que le panneau survolait à l'image précédente.
   if (map_editor_.active()) {
     model_previews_.BeginFrame();
@@ -284,7 +360,8 @@ void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float wi
   std::vector<ro::ui::MapEditorLine> lines = std::move(view.lines);
   ro::ui::MapEditorPreview preview = std::move(view.preview);
   view = map_editor_.View(stage_->scene, map_edits_);
-  view.library = model_library_;
+  view.library = editor_libraries_.models;
+  view.sound_library = editor_libraries_.sounds;
   view.preview = std::move(preview);
   const std::vector<ro::ui::MapEditorLine> dots = map_editor_.VertexTrace();
   const std::vector<ro::ui::MapEditorLine> arrows = map_editor_.GizmoTrace();

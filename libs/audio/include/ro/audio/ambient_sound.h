@@ -72,6 +72,12 @@ class AmbientSoundEmitter {
   // L'instant du dernier bruit — ou celui, fictif, d'un cycle avant la
   // naissance.
   [[nodiscard]] std::uint32_t last_played_ms() const noexcept { return last_played_ms_; }
+  // REPREND LA CADENCE d'une source qu'elle remplace : son prochain bruit part
+  // un cycle après le dernier bruit de `earlier`, et non tout de suite. Une
+  // source qu'on retouche ne se rejoue pas à chaque retouche.
+  void KeepPaceOf(const AmbientSoundEmitter& earlier) noexcept {
+    last_played_ms_ = earlier.last_played_ms_;
+  }
 
  private:
   AmbientSoundSource source_;

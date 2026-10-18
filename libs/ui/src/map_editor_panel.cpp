@@ -17,6 +17,7 @@
 #include "ro/ui/map_editor_effects_panel.h"
 #include "ro/ui/map_editor_ground_panel.h"
 #include "ro/ui/map_editor_row_menu.h"
+#include "ro/ui/map_editor_sounds_panel.h"
 #include "ro/ui/map_editor_sprites_panel.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
@@ -83,9 +84,8 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
 
 // Le rayon du cercle d'une lumière ponctuelle, en pixels.
 constexpr float kLightMarkerPixels = 7.0F;
-// Les pas des glissières d'une lumière : sa portée, et sa couleur.
+// Le pas de la portée d'une lumière, par pixel puis par cran de molette (dix avec Majuscule).
 constexpr float kLightRangeStep = 0.5F;
-// Un cran de molette sur la portée : une unité, dix avec Majuscule.
 constexpr float kLightRangeWheelStep = 1.0F;
 // La plus grande portée : une portée reste positive — le document refuse une
 // portée nulle —, et la glissière la borne de ce côté aussi.
@@ -126,12 +126,15 @@ ImU32 ColorOf(MapEditorLineKind kind) {
     case MapEditorLineKind::kLightSelected:
     case MapEditorLineKind::kEffectSelected:
     case MapEditorLineKind::kSpriteSelected:
+    case MapEditorLineKind::kSoundSelected:
       return kActiveColor;
     case MapEditorLineKind::kVertex:
     case MapEditorLineKind::kLight:
       return kSelectionColor;
     case MapEditorLineKind::kSprite:
       return kAxisYColor;
+    case MapEditorLineKind::kSound:
+      return kAxisZColor;
     case MapEditorLineKind::kEffect:
       return kAxisXColor;
     case MapEditorLineKind::kBrush:
@@ -447,7 +450,8 @@ void DrawLines(const MapEditorView& view) {
       continue;
     }
     if (line.kind == MapEditorLineKind::kSprite ||
-        line.kind == MapEditorLineKind::kSpriteSelected) {
+        line.kind == MapEditorLineKind::kSpriteSelected || line.kind == MapEditorLineKind::kSound ||
+        line.kind == MapEditorLineKind::kSoundSelected) {
       list->AddRect(ImVec2(line.from.x - kLightMarkerPixels, line.from.y - kLightMarkerPixels),
                     ImVec2(line.from.x + kLightMarkerPixels, line.from.y + kLightMarkerPixels),
                     ColorOf(line.kind), 0.0F, 0, kLineThicknessPixels);
@@ -762,6 +766,9 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
   }
   if (ImGui::CollapsingHeader(core::Tr("Sprites"))) {
     DrawSprites(view, panel, intents, art);
+  }
+  if (ImGui::CollapsingHeader(core::Tr("Sons"))) {
+    DrawSounds(view, panel, intents, art);
   }
 
   ImGui::Separator();
