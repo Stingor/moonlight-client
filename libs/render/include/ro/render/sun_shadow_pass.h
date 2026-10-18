@@ -29,7 +29,8 @@ struct SunShadowCasters {
   // toutes. Voir `ShadowCastingOpacities`.
   const ModelOpacities* model_casting = nullptr;
   SpriteRenderer* sprites = nullptr;
-  // Les lots d'acteurs — les corps, puis les charrettes —, dont la silhouette va
+  // Les lots d'acteurs — les corps, puis les compagnons, charrettes et faucons —,
+  // dont la silhouette va
   // dans la couche des acteurs.
   std::array<std::span<const DrawnActor>, kSunShadowActorLots> actor_lots{};
   // Les acteurs en modèle — Emperium, gardiens, drapeaux —, dans la même couche.

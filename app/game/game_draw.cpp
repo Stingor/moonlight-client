@@ -8,6 +8,7 @@
 #include <optional>
 #include <span>
 #include <utility>
+#include <vector>
 
 #include <SDL3/SDL.h>
 
@@ -160,12 +161,25 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
                                            now_ms, graphics.summon_translucent(), actor_ground,
                                            graphics.cold_light(), !sun_asked});
   }
+  // LES FAUCONS AUSSI, avant les ombres : leur silhouette en porte une, comme
+  // celle d'une charrette. Ils se peignent plus bas, après les corps.
+  std::span<const ro::render::DrawnActor> falcons;
+  if (link_.is_open()) {
+    const GraphicsOptions& graphics = settings_->options().graphics();
+    falcons = pieces_.falcons.Update(
+        FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
+                    graphics.summon_translucent(), actor_ground, graphics.cold_light()});
+  }
+  // LES COMPAGNONS QUI PORTENT OMBRE, réunis en un lot.
+  std::vector<ro::render::DrawnActor> companions(carts.begin(), carts.end());
+  companions.insert(companions.end(), falcons.begin(), falcons.end());
   // LE CIEL DE L'IMAGE : la lumière de la carte, à l'heure que l'établi impose.
   const ro::render::SkyLight sky = SkyOfFrame(now_ms);
   // La nuit de cette image décide des effets « nuit seulement » de la suivante.
   effect_night_ = ro::render::NightStrength(sky.light, MapClosedToSky());
   effect_hour_ = sky.hour;
-  const ro::render::SunShadowView sun = DrawSunShadowIfAsked(sun_asked, models_shown, carts, sky);
+  const ro::render::SunShadowView sun =
+      DrawSunShadowIfAsked(sun_asked, models_shown, companions, sky);
   if (sun.map != nullptr) {
     stages.shadowmap = false;
   }
@@ -182,7 +196,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
               ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
               sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms), sky.hour),
           effect_lights_, camera_.look_at),
-      models_shown, carts);
+      models_shown, companions);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);
   models_.SetTextureFilter(settings_->options().graphics().decor_filter());
@@ -382,13 +396,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   paint(scene_actors_.front, ro::render::SpriteRenderer::DepthWrite::kOff);
   // LES FAUCONS, après les corps : un oiseau translucide peint avant son maître
   // en serait découpé.
-  if (link_.is_open()) {
-    const GraphicsOptions& graphics = settings_->options().graphics();
-    paint(pieces_.falcons.Update(
-              FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
-                          graphics.summon_translucent(), actor_ground, graphics.cold_light()}),
-          ro::render::SpriteRenderer::DepthWrite::kOff);
-  }
+  paint(falcons, ro::render::SpriteRenderer::DepthWrite::kOff);
   // LA FLÈCHE DE LA CIBLE, un nœud de la scène comme les acteurs qu'elle surmonte.
   DrawSelectionMarker(now_ms);
 

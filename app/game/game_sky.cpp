@@ -66,9 +66,9 @@ ro::render::SkyLight Game::SkyOfFrame(std::uint32_t now_ms) {
   return ro::render::SkyLightAt(map_light, clock.hour, course);
 }
 
-ro::render::SunShadowView Game::DrawSunShadowIfAsked(bool asked, bool models_shown,
-                                                     std::span<const ro::render::DrawnActor> carts,
-                                                     const ro::render::SkyLight& sky) {
+ro::render::SunShadowView Game::DrawSunShadowIfAsked(
+    bool asked, bool models_shown, std::span<const ro::render::DrawnActor> companions,
+    const ro::render::SkyLight& sky) {
   if (!asked) {
     return ro::render::SunShadowView();
   }
@@ -81,14 +81,14 @@ ro::render::SunShadowView Game::DrawSunShadowIfAsked(bool asked, bool models_sho
     sun_map_ = std::move(*created);
   }
   // L'ASTRE DU CIEL porte l'ombre, et la lune la porte plus légère.
-  return ro::render::DrawSunShadow(sun_map_, ShadowCastersOfFrame(models_shown, carts),
+  return ro::render::DrawSunShadow(sun_map_, ShadowCastersOfFrame(models_shown, companions),
                                    stage_->scene.terrain, sky.CastingLight(), camera_,
                                    aspect_ratio_, ro::render::kFullSunShadow * sky.shadow_strength);
 }
 
 ro::render::PointLightSet Game::DrawPointShadowsIfAsked(
     const ro::render::PointLightSet& points, bool models_shown,
-    std::span<const ro::render::DrawnActor> carts) {
+    std::span<const ro::render::DrawnActor> companions) {
   if (points.count == 0 || point_maps_refused_ ||
       !settings_->options().graphics().real_time_shadows()) {
     return points;
@@ -103,12 +103,12 @@ ro::render::PointLightSet Game::DrawPointShadowsIfAsked(
     }
     point_maps_ = std::move(*created);
   }
-  return ro::render::DrawPointShadows(point_maps_, ShadowCastersOfFrame(models_shown, carts),
+  return ro::render::DrawPointShadows(point_maps_, ShadowCastersOfFrame(models_shown, companions),
                                       points, camera_);
 }
 
 ro::render::SunShadowCasters Game::ShadowCastersOfFrame(
-    bool models_shown, std::span<const ro::render::DrawnActor> carts) {
+    bool models_shown, std::span<const ro::render::DrawnActor> companions) {
   const bool actor_models_shown = link_.is_open() && pieces_.actor_models.has_value() &&
                                   pieces_.actor_model_renderer.has_value();
   return ro::render::SunShadowCasters{
@@ -117,7 +117,7 @@ ro::render::SunShadowCasters Game::ShadowCastersOfFrame(
       .clock = &model_clock_,
       .model_casting = pieces_.decor_veil.shadow_casting(),
       .sprites = &sprites_,
-      .actor_lots = {scene_actors_.drawn, carts},
+      .actor_lots = {scene_actors_.drawn, companions},
       .actor_model_renderer = actor_models_shown ? &*pieces_.actor_model_renderer : nullptr,
       .actor_models = actor_models_shown ? pieces_.actor_models->drawn()
                                          : std::span<const ro::render::DrawnActorModel>()};
