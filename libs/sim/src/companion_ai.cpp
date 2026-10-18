@@ -420,6 +420,7 @@ std::optional<CompanionOrder> CompanionBrain::StepMoveOrder(const Situation& s) 
     return std::nullopt;
   }
   // Arrivé, ou arrêté en chemin. Le reste d'un long trajet attend dans la file.
+  held_cell_ = s.self_cell;
   mode_ = (s.settings.move_order_holds_cell && reserved_.empty()) ? Mode::kHoldCell : Mode::kIdle;
   return std::nullopt;
 }

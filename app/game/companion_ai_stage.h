@@ -141,6 +141,11 @@ class CompanionAiStage {
       ro::sim::AiCompanion companion) const noexcept {
     return SlotOf(companion).brain;
   }
+  // Les réglages que son IA applique : ceux de son profil en vigueur.
+  [[nodiscard]] const ro::sim::CompanionAiSettings& settings_of(
+      ro::sim::AiCompanion companion) const noexcept {
+    return SlotOf(companion).settings;
+  }
 
   // ── LES GESTES DE LA SOURIS ───────────────────────────────────────────────
   //

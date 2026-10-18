@@ -108,6 +108,10 @@ enum class GroundUnitClick : std::uint8_t {
 //
 // ⚠ SAUF LE QUADRILLAGE DE GREYWORLD, qui le précède : il habille le sol
 // lui-même, et toute autre marque doit se lire par-dessus.
+//
+// ⚠ LES ZONES DE L'IA DU COMPAGNON PASSENT AVANT CELLES DES SORTS : elles
+// entourent le maître en permanence quand on les garde, et une zone de sort,
+// brève, doit se lire par-dessus.
 enum class GroundPaint : std::uint8_t {
   kSkillAreas,
   kNaviTrail,
@@ -115,10 +119,12 @@ enum class GroundPaint : std::uint8_t {
   kGroundUnits,
   kGraffiti,
   kGreyWorld,
+  kCompanionZones,
 };
-inline constexpr std::array<GroundPaint, 6> kGroundPaintOrder = {
-    GroundPaint::kGreyWorld, GroundPaint::kGraffiti,   GroundPaint::kSkillAreas,
-    GroundPaint::kNaviTrail, GroundPaint::kCellCursor, GroundPaint::kGroundUnits};
+inline constexpr std::array<GroundPaint, 7> kGroundPaintOrder = {
+    GroundPaint::kGreyWorld,  GroundPaint::kGraffiti,  GroundPaint::kCompanionZones,
+    GroundPaint::kSkillAreas, GroundPaint::kNaviTrail, GroundPaint::kCellCursor,
+    GroundPaint::kGroundUnits};
 
 // Vrai quand `first` se peint avant `then` dans `kGroundPaintOrder`.
 [[nodiscard]] constexpr bool PaintsBefore(GroundPaint first, GroundPaint then) {

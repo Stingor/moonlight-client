@@ -19,6 +19,7 @@
 #include "options/card_album_options.h"
 #include "options/cast_bar_options.h"
 #include "options/chat_web_options.h"
+#include "options/companion_zones_memory.h"
 #include "options/context_menu_options.h"
 #include "options/craft_atlas_options.h"
 #include "options/damage_meter_options.h"
@@ -98,6 +99,7 @@ struct OptionPages {
   StatusPortraitOptions portrait{FactoryStatusPortrait()};
   ContextMenuOptions context_menu;
   ViewEquipMemory view_equip;
+  CompanionZonesMemory companion_zones;
   GraphicsOptions graphics;
   MonsterSheetOptions monster_sheet;
   CraftAtlasOptions craft_atlas;

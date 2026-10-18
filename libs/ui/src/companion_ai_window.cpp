@@ -173,6 +173,7 @@ void DrawSections(CompanionAiWindowState& state, const CompanionAiView& view, co
                                               : ImGuiTabItemFlags_None;
   };
   if (ImGui::BeginTabItem(core::Tr("Réglages"), nullptr, flags(CompanionAiSection::kSettings))) {
+    companion_ai_parts::DrawGroundZonesToggle(view, art, action);
     ImGui::BeginDisabled(locked);
     DrawSettingsSection(view, art, action);
     ImGui::EndDisabled();

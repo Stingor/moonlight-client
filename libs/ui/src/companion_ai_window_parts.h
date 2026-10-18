@@ -18,6 +18,10 @@ void WrappedNote(const char* text);
 
 void DrawSettingsSection(const CompanionAiView& view, const SkinArt& art,
                          CompanionAiWindowAction& action);
+// LA CASE « MONTRER LES ZONES AU SOL » : un réglage du client, pas du profil,
+// donc jamais grisée avec lui.
+void DrawGroundZonesToggle(const CompanionAiView& view, const SkinArt& art,
+                           CompanionAiWindowAction& action);
 void DrawTacticsSection(CompanionAiWindowState& state, const CompanionAiView& view,
                         const SkinArt& art, CompanionAiWindowAction& action);
 void DrawRulesSection(CompanionAiWindowState& state, const CompanionAiView& view,

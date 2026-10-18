@@ -88,6 +88,7 @@
 #include "world/battle_log.h"
 #include "world/broadcast_balloons.h"
 #include "world/chat_block_log.h"
+#include "world/companion_zones_view.h"
 #include "world/damage_path_sample.h"
 #include "world/decor_veil_view.h"
 #include "world/entity_inspector.h"
@@ -187,6 +188,8 @@ struct GamePieces {
   MercenaryStage mercenary;
   // L'IA DE CES DEUX DERNIERS : voir `CompanionAiStage`.
   CompanionAiStage companion_ai;
+  // SES ZONES AU SOL, autour du maître : voir `CompanionZonesView`.
+  CompanionZonesView companion_zones;
   // LA CONSOLE DE MISE AU POINT, servie à chaque image : voir
   // `debug/debug_console.h`.
   DebugConsole debug_console;

@@ -316,6 +316,17 @@ inline constexpr int kCompanionAiMercenary = 1;
 // LES SECTIONS. L'onglet « Joueurs » se montre après « Tactiques ».
 enum class CompanionAiSection : std::uint8_t { kSettings, kTactics, kRules, kFriends, kPlayers };
 
+// LE CURSEUR DE DISTANCE que la souris survole ou tient, dans « Réglages » :
+// `app` ne montre alors au sol que la zone qu'il règle, plus épaisse.
+enum class CompanionAiZoneSlider : std::uint8_t {
+  kNone,
+  kFollow,
+  kLeashStill,
+  kLeashWalking,
+  kEngageStill,
+  kEngageWalking,
+};
+
 struct CompanionAiView {
   bool homunculus_present = false;
   bool mercenary_present = false;
@@ -357,6 +368,9 @@ struct CompanionAiView {
   // le défaut d'un rAthena (quatorze) tant qu'il n'a rien dit. `app` le pose
   // toujours ; zéro, la valeur d'une vue non remplie, laisse le plafond seul.
   int view_cells = 0;
+  // LA CASE « MONTRER LES ZONES AU SOL », lue des réglages par `app` : cochée,
+  // les zones restent au sol fenêtre fermée.
+  bool ground_zones_shown = false;
 
   std::span<const RuleRowView> rules;
   // Les règles que la lecture du fichier a écartées, chacune en une phrase qui
@@ -480,6 +494,10 @@ struct CompanionAiWindowAction {
   bool closed = false;
   // Le bouton « signaler un bug » de la barre de titre a été cliqué.
   bool report_bug = false;
+  // À CHAQUE IMAGE, et non au seul geste : le curseur de distance survolé ou
+  // tenu, et la case « Montrer les zones au sol » cliquée.
+  CompanionAiZoneSlider hovered_zone = CompanionAiZoneSlider::kNone;
+  bool ground_zones_toggled = false;
 };
 
 [[nodiscard]] CompanionAiWindowAction DrawCompanionAiWindow(CompanionAiWindowState& state,

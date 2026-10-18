@@ -86,6 +86,9 @@ void Game::StageContainers() {
       windows_.companion_ai, windows_.companion_ai_view);
   // Le droit du staff, relu à chaque image : l'identifiant d'un skill au survol.
   windows_.companion_ai_view.staff_allowed = Rights().staff_tools;
+  // La case « Montrer les zones au sol », tenue par les réglages.
+  windows_.companion_ai_view.ground_zones_shown =
+      settings_->options().pages().companion_zones.kept_shown;
   // 🔴 LE COFFRE MANGE L'ÉCHANGE SAC <-> CHARRETTE, et le serveur le refuse
   // sans un mot (`pc_cant_act2` compte `storage_flag`). Les deux fenêtres
   // doivent donc le savoir : l'une grise son entrée, l'autre change de

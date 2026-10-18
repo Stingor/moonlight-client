@@ -19647,3 +19647,9 @@ tr: An empty cart cannot be saved.
 
 fr: nom du panier
 tr: cart name
+
+fr: Montrer les zones au sol
+tr: Show the zones on the ground
+
+fr: Fenêtre ouverte, les zones de suivi (bleu), d'éloignement (orange) et d'engagement (rouge) se dessinent au sol autour du maître, avec la case qu'il garde. Cochée, elles y restent fenêtre fermée.
+tr: While this window is open, the follow (blue), maximum distance (orange) and engagement (red) zones are drawn on the ground around the owner, along with the cell it guards. Ticked, they stay there with the window closed.

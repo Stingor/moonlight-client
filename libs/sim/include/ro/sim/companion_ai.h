@@ -351,6 +351,14 @@ class CompanionBrain {
   [[nodiscard]] std::size_t reserved_count() const noexcept { return reserved_.size(); }
   // La cible du combat en cours, zéro sans combat.
   [[nodiscard]] std::uint32_t target_id() const noexcept { return target_id_; }
+  // LA CASE QU'IL GARDE après « aller ici », tant qu'il la tient — combat
+  // parti de la case compris. Rien sinon.
+  [[nodiscard]] std::optional<CellPosition> held_cell() const noexcept {
+    if (mode_ == Mode::kHoldCell || (mode_ == Mode::kFight && fight_from_hold_)) {
+      return held_cell_;
+    }
+    return std::nullopt;
+  }
   // LA DERNIÈRE RÈGLE QUI A DÉCIDÉ, pour la fenêtre qui la surligne.
   [[nodiscard]] const std::optional<DecidingRule>& deciding_rule() const noexcept {
     return deciding_rule_;
@@ -639,6 +647,9 @@ class CompanionBrain {
 
   // L'ordre direct en cours : la case d'un « aller ici », le skill.
   CellPosition move_destination_;
+  // La case où il s'est arrêté : celle qu'il garde. ⚠ PAS FORCÉMENT LA
+  // DESTINATION, un trajet pouvant s'arrêter en chemin.
+  CellPosition held_cell_;
   bool move_sent_ = false;
   DirectOrder skill_order_;
 

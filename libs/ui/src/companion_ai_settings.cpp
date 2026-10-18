@@ -63,6 +63,15 @@ void DependentTooltip(const char* tip, bool live, const char* why) {
   }
 }
 
+// LE CURSEUR QUI VIENT D'ÊTRE DESSINÉ, survolé ou tenu : sa zone seule se
+// montre au sol. ⚠ TENU AUSSI, parce qu'un glisser sort vite du cadre ; et
+// grisé aussi, comme son infobulle.
+void NoteZoneHover(CompanionAiZoneSlider zone, CompanionAiWindowAction& action) {
+  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) || ImGui::IsItemActive()) {
+    action.hovered_zone = zone;
+  }
+}
+
 void DrawSkillPermissions(CompanionBaseFields& fields, const CompanionAiView& view,
                           const SkinArt& art, bool& changed) {
   if (view.offensive_skills.empty()) {
@@ -134,6 +143,16 @@ std::span<const char* const> TacticRankLabels() { return kRankLabels; }
 
 std::span<const char* const> TacticTriggerLabels() { return kTriggerLabels; }
 
+void DrawGroundZonesToggle(const CompanionAiView& view, const SkinArt& art,
+                           CompanionAiWindowAction& action) {
+  bool shown = view.ground_zones_shown;
+  action.ground_zones_toggled = SkinCheckBox(core::Tr("Montrer les zones au sol"), &shown, art);
+  SkinTooltip(
+      core::Tr("Fenêtre ouverte, les zones de suivi (bleu), d'éloignement (orange) et "
+               "d'engagement (rouge) se dessinent au sol autour du maître, avec la case "
+               "qu'il garde. Cochée, elles y restent fenêtre fermée."));
+}
+
 void DrawSettingsSection(const CompanionAiView& view, const SkinArt& art,
                          CompanionAiWindowAction& action) {
   CompanionBaseFields fields = view.base;
@@ -141,8 +160,11 @@ void DrawSettingsSection(const CompanionAiView& view, const SkinArt& art,
   // ⚠ LES DISTANCES S'ARRÊTENT AU RAYON DE VUE DU SERVEUR, pas au plafond du
   // fichier : au-delà, l'IA les borne de toute façon.
   const int most_cells = CompanionAiCellsShown(view.view_cells, kCompanionAiCellsMost);
-  const auto cells = [&changed, &art, most_cells](const char* label, int* value, const char* tip) {
+  const auto cells = [&changed, &art, &action, most_cells](const char* label, int* value,
+                                                           const char* tip,
+                                                           CompanionAiZoneSlider zone) {
     changed |= SkinSliderInt(label, value, 0, most_cells, art);
+    NoteZoneHover(zone, action);
     SkinTooltip(tip);
   };
   const auto percent = [&changed, &art](const char* label, int* value, const char* tip) {
@@ -161,11 +183,14 @@ void DrawSettingsSection(const CompanionAiView& view, const SkinArt& art,
   ImGui::PushID("follow");
   ImGui::SeparatorText(core::Tr("Suivi"));
   cells(core::Tr("Distance de suivi (cases)"), &fields.follow_cells,
-        core::Tr("Au-delà de cette distance au maître, il le rejoint."));
+        core::Tr("Au-delà de cette distance au maître, il le rejoint."),
+        CompanionAiZoneSlider::kFollow);
   cells(core::Tr("Éloignement maximum, maître immobile"), &fields.leash_still_cells,
-        core::Tr("Au-delà de ces cases, il revient au maître quoi qu'il fasse. 0 : aucun."));
+        core::Tr("Au-delà de ces cases, il revient au maître quoi qu'il fasse. 0 : aucun."),
+        CompanionAiZoneSlider::kLeashStill);
   cells(core::Tr("Éloignement maximum, maître en marche"), &fields.leash_walking_cells,
-        core::Tr("Au-delà de ces cases, il revient au maître quoi qu'il fasse. 0 : aucun."));
+        core::Tr("Au-delà de ces cases, il revient au maître quoi qu'il fasse. 0 : aucun."),
+        CompanionAiZoneSlider::kLeashWalking);
   ImGui::PopID();
 
   // 🔴 LES RÉGLAGES QUI DÉPENDENT D'UN AUTRE SE GRISENT quand l'autre les rend
@@ -199,9 +224,11 @@ void DrawSettingsSection(const CompanionAiView& view, const SkinArt& art,
   ImGui::BeginDisabled(!chase_matters);
   changed |= SkinSliderInt(core::Tr("Rayon d'engagement, maître immobile"),
                            &fields.engage_still_cells, 0, most_cells, art);
+  NoteZoneHover(CompanionAiZoneSlider::kEngageStill, action);
   DependentTooltip(engage_tip, chase_matters, without_chase);
   changed |= SkinSliderInt(core::Tr("Rayon d'engagement, maître en marche"),
                            &fields.engage_walking_cells, 0, most_cells, art);
+  NoteZoneHover(CompanionAiZoneSlider::kEngageWalking, action);
   DependentTooltip(engage_tip, chase_matters, without_chase);
   ImGui::EndDisabled();
   check(core::Tr("Attaquer de lui-même"), &fields.attack_on_own,

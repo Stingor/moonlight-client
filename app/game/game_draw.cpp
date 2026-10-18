@@ -221,7 +221,6 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
           .has_value();
   const std::optional<ro::sim::CellPosition> marked_cell =
       CellCursorOf(hovered_cell, over_unit, cell_cursor_);
-
   // CE QUI SE PEINT SUR LE SOL, dans l'ordre de `kGroundPaintOrder`. L'eau n'en
   // est pas : elle passe après les corps, qu'elle plonge — voir plus bas.
   for (const GroundPaint pass : kGroundPaintOrder) {
@@ -236,8 +235,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
           const auto scribbles = graffiti_->Compose(
               world_, *stage_, guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
               now_ms);
-          if (!scribbles.empty())
-            pieces_.effect_ground.Draw(camera_, scribbles, aspect_ratio_, fog);
+          pieces_.effect_ground.Draw(camera_, scribbles, aspect_ratio_, fog);
         }
         break;
       case GroundPaint::kSkillAreas:
@@ -246,14 +244,16 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
         // se tient dessus doit la couvrir. ⚠ AVANT le curseur, pour qu'une case
         // désignée reste lisible par-dessus une zone.
         if (skill_areas_.has_value()) {
-          const std::span<const ro::render::DrawnGroundQuads> zones =
+          pieces_.effect_ground.Draw(
+              camera_,
               skill_areas_->Areas(settings_->options().skill_area(), world_,
                                   pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                                  *stage_, now_ms, grimoire_.armed(), hovered_cell);
-          if (!zones.empty()) {
-            pieces_.effect_ground.Draw(camera_, zones, aspect_ratio_, fog);
-          }
+                                  *stage_, now_ms, grimoire_.armed(), hovered_cell),
+              aspect_ratio_, fog);
         }
+        break;
+      case GroundPaint::kCompanionZones:
+        pieces_.effect_ground.Draw(camera_, pieces_.companion_zones.lots(), aspect_ratio_, fog);
         break;
       case GroundPaint::kNaviTrail:
         // Par le renderer des lots : chaque direction de flèche apporte son image.

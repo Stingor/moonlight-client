@@ -19647,3 +19647,9 @@ tr: Un carrito vacío no se puede guardar.
 
 fr: nom du panier
 tr: nombre del carrito
+
+fr: Montrer les zones au sol
+tr: Mostrar las zonas en el suelo
+
+fr: Fenêtre ouverte, les zones de suivi (bleu), d'éloignement (orange) et d'engagement (rouge) se dessinent au sol autour du maître, avec la case qu'il garde. Cochée, elles y restent fenêtre fermée.
+tr: Con la ventana abierta, las zonas de seguimiento (azul), de distancia máxima (naranja) y de enfrentamiento (rojo) se dibujan en el suelo alrededor del amo, con la casilla que guarda. Marcada, se quedan con la ventana cerrada.

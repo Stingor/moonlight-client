@@ -395,6 +395,7 @@ add_library(moonclient_companionai STATIC
     game/homunculus_staff_words.cpp
     game/companion_ai_profile_gestures.cpp
     game/companion_ai_window_compose.cpp
+    game/companion_ai_zones.cpp
     game/companion_ai_profile_yaml.cpp
     game/companion_ai_settings_yaml.cpp
     game/companion_rule_monsters.cpp
@@ -1613,6 +1614,7 @@ add_executable(moonclient
     game/command_line.cpp
     world/overlay_view.cpp
     world/skill_area_view.cpp
+    world/companion_zones_view.cpp
     world/grey_world_view.cpp
     world/graffiti_view.cpp
     world/hit_popups.cpp

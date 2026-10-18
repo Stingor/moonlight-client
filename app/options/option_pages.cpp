@@ -29,6 +29,8 @@ void OptionPages::Declare(SettingsFile& into) {
   // AUCUNE PAGE : ce que la fenêtre retient d'une ouverture à l'autre.
   into.Section("La fenêtre « Voir l'équipement »");
   view_equip.Declare(into);
+  into.Section("Les zones de l'IA du compagnon");
+  companion_zones.Declare(into);
   into.Section("La fiche d'un monstre");
   DeclareOn(into, OptionSection::kMonsterSheet, monster_sheet);
   into.Section("L'atlas des recettes");

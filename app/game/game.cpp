@@ -701,6 +701,19 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                                         *answers.character.mercenary.ai_proposal_answer);
   }
   pieces_.companion_ai.ApplyAiWindow(answers.companion_ai, windows_.companion_ai, now_ms);
+  // SES ZONES AU SOL, pour le dessin qui suit, et la case qui les garde
+  // fenêtre fermée : `Touch` arme l'anti-rebond du fichier.
+  CompanionZonesMemory& zones_memory = settings_->options().pages().companion_zones;
+  if (zones_memory.Follow(answers.companion_ai.ground_zones_toggled)) settings_->file().Touch();
+  pieces_.companion_zones.Compose(
+      CompanionZonesFrame{.world = world_,
+                          .stage = stage_.has_value() ? &*stage_ : nullptr,
+                          .companions = pieces_.companion_ai,
+                          .window = windows_.companion_ai,
+                          .view = windows_.companion_ai_view,
+                          .answer = answers.companion_ai,
+                          .kept_shown = zones_memory.kept_shown,
+                          .now_ms = now_ms});
   ServeDebugConsole(pieces_.debug_console, windows_.staff_tools, Rights().staff_tools, world_,
                     frame_tally_, pieces_.companion_ai, now_ms);
   pieces_.npc_illustration.Apply(answers.npc_illustration);
