@@ -10,6 +10,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "trade_gestures.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -71,27 +72,12 @@ std::string WeightText(std::int64_t tenths) {
 
 std::string CountSuffix(std::int64_t amount) { return "x" + TradeAmountText(amount, {}); }
 
-// Le geste d'une ligne. ⚠ L'ITEM SE DÉSIGNE PAR `item_id`, celui de la ligne :
-// le jeton du menu reste nul, un item de troc n'est à personne.
-void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint32_t item_id,
-              ItemLinkMenu& menu, BarterWindowAction& action) {
-  if (gesture.hovered) {
-    action.hovered_id = item_id;
-  }
-  TradeItemView aimed = item;
-  aimed.item_id = item_id;
-  if (NoteTradeItemLink(gesture, aimed, 0, menu)) {
-    action.describe_id = item_id;
-    action.item_gesture = ChatLinkGesture::kRepost;
-  }
-}
-
 // UNE DEVISE : l'icône, le nom raffinement compris, la quantité, puis ce que le
 // joueur en tient — vert s'il suffit à `needed`, rouge sinon.
 void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& menu,
                BarterWindowAction& action) {
   const std::string suffix = CountSuffix(needed);
-  NoteItem(DrawTradeItem(price.item, suffix), price.item, price.item_id, menu, action);
+  NoteItemById(DrawTradeItem(price.item, suffix), price.item, price.item_id, menu, action);
   if (ImGui::IsItemHovered() && price.refine_level > 0) {
     std::array<char, 96> tip{};
     std::snprintf(tip.data(), tip.size(), core::Tr("Raffinement exigé : +%d ou plus"),
@@ -133,7 +119,7 @@ void DrawOfferRow(BarterWindowState& state, const BarterView& view, const Barter
                   const SkinArt& art, BarterWindowAction& action) {
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
-  NoteItem(DrawTradeItem(offer.item), offer.item, offer.item.item_id, state.item_menu, action);
+  NoteItemById(DrawTradeItem(offer.item), offer.item, offer.item.item_id, state.item_menu, action);
 
   ImGui::TableNextColumn();
   for (const BarterPriceView& price : offer.prices) {

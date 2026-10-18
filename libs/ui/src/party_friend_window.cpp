@@ -16,6 +16,7 @@
 
 #include "party_friend_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -32,11 +33,6 @@ constexpr float kLeastHeightPixels = 150.0F;
 constexpr float kLeastCheckBoxPixels = 10.0F;
 constexpr float kNameFieldPixels = 150.0F;
 constexpr float kPercent = 100.0F;
-
-[[nodiscard]] std::string_view Typed(const std::array<char, 64>& buffer) {
-  const auto end = std::find(buffer.begin(), buffer.end(), '\0');
-  return {buffer.data(), static_cast<std::size_t>(end - buffer.begin())};
-}
 
 void Clear(std::array<char, 64>& buffer) { buffer.fill('\0'); }
 
@@ -162,7 +158,7 @@ void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
     ImGui::SetNextItemWidth(Px(kNameFieldPixels));
     ImGui::InputText("##partyname", state.new_party_name.data(), state.new_party_name.size());
     ImGui::SameLine();
-    const std::string_view name = Typed(state.new_party_name);
+    const std::string_view name = TypedText(state.new_party_name);
     ImGui::BeginDisabled(name.empty());
     if (SkinButton(core::Tr("Créer un groupe"), art)) {
       action.verb = PartyFriendVerb::kCreateParty;
@@ -189,7 +185,7 @@ void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
         ImGui::InputText("##invitename", state.invite_name.data(), state.invite_name.size(),
                          ImGuiInputTextFlags_EnterReturnsTrue);
     ImGui::SameLine();
-    const std::string_view name = Typed(state.invite_name);
+    const std::string_view name = TypedText(state.invite_name);
     ImGui::BeginDisabled(name.empty());
     const bool clicked = SkinButton(core::Tr("Inviter"), art);
     ImGui::EndDisabled();
@@ -232,7 +228,7 @@ void DrawFriendTab(PartyFriendWindowState& state, const PartyFriendView& view,
       ImGui::InputText("##friendname", state.friend_name.data(), state.friend_name.size(),
                        ImGuiInputTextFlags_EnterReturnsTrue);
   ImGui::SameLine();
-  const std::string_view name = Typed(state.friend_name);
+  const std::string_view name = TypedText(state.friend_name);
   const bool can_add = !name.empty() && !full;
   ImGui::BeginDisabled(!can_add);
   const bool clicked = SkinButton(core::Tr("Ajouter un ami"), art);

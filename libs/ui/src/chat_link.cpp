@@ -12,6 +12,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -388,13 +389,6 @@ void SettingEntries(ChatLinkAsk& asked) {
 constexpr std::size_t kUrlMenuHeadChars = 60;
 constexpr std::string_view kCutMark = "…";
 
-// Un octet de suite d'UTF-8, qui ne commence pas de caractère.
-[[nodiscard]] bool ContinuesUtf8(char byte) {
-  constexpr unsigned kContinuationMask = 0xC0U;
-  constexpr unsigned kContinuationBits = 0x80U;
-  return (static_cast<unsigned char>(byte) & kContinuationMask) == kContinuationBits;
-}
-
 // Le libellé tel que la tête le montre : entier, ou coupé ENTRE deux
 // caractères avec sa marque.
 [[nodiscard]] std::string MenuHead(ChatLinkKind kind, std::string_view label) {
@@ -403,7 +397,7 @@ constexpr std::string_view kCutMark = "…";
   }
   std::size_t chars = 0;
   for (std::size_t at = 0; at < label.size(); ++at) {
-    if (ContinuesUtf8(label[at])) {
+    if (IsUtf8Continuation(label[at])) {
       continue;
     }
     if (chars == kUrlMenuHeadChars) {

@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/monster_sheet_window.h"
 #include "ro/ui/skinned_window.h"
 
@@ -29,7 +30,7 @@ void DrawMonsterSheetPreview(MonsterSheetPreviewState& state, const MonsterSheet
   }
   switch (preview.phase) {
     case MonsterSheetPhase::kUnknown:
-      Label(Printed(core::Tr("Monstre inconnu du serveur (#%u)."), preview.shown_id).c_str());
+      Label(core::Printed(core::Tr("Monstre inconnu du serveur (#%u)."), preview.shown_id).c_str());
       break;
     case MonsterSheetPhase::kAsking:
       Label(core::Tr("Chargement de la fiche…"));

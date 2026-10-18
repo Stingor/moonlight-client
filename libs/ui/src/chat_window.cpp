@@ -10,12 +10,14 @@
 
 #include <imgui_internal.h>
 
+#include "ro/core/ascii.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/window_name.h"
 
 #include "chat_input_chips.h"
 #include "chat_tab_menu.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -34,24 +36,6 @@ constexpr float kSearchFieldShare = 0.45F;
 // Le gris du mot qui remplace la barre prêtée : il se lit sans se prendre pour
 // une ligne du fil.
 constexpr ImU32 kLentInputColor = IM_COL32(160, 160, 160, 255);
-
-// CE TEXTE CONTIENT-IL CELUI-LÀ, la casse mise de côté ?
-//
-// ⚠ LA CASSE NE SE MET DE CÔTÉ QUE POUR L'ASCII, et c'est assumé : replier « É »
-// sur « é » demande une table Unicode que rien d'autre ici ne justifie. Une
-// recherche accentuée se tape donc avec ses accents, comme dans le client.
-[[nodiscard]] bool ContainsNoCase(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto folded = [](char letter) {
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
-  };
-  const auto found =
-      std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(),
-                  [&folded](char one, char other) { return folded(one) == folded(other); });
-  return found != haystack.end();
-}
 
 // LA RANGÉE DE RECHERCHE, sous la bande. Elle ne paraît que dépliée.
 //
@@ -96,13 +80,6 @@ void DrawSelectableLog(ChatWindowState& state, std::span<const ChatLineView> lin
   ImGui::InputTextMultiline("##fil_nu", &state.selected[0], state.selected.size() + 1,
                             ImVec2(-FLT_MIN, height), ImGuiInputTextFlags_ReadOnly);
   ImGui::PopStyleColor();
-}
-
-// Pose le nom d'un onglet dans le tampon de saisie, tronqué s'il déborde.
-void PutName(std::array<char, kChatTabNameSize>& into, std::string_view name) {
-  const std::size_t kept = std::min(name.size(), into.size() - 1);
-  std::memcpy(into.data(), name.data(), kept);
-  into[kept] = '\0';
 }
 
 // LE MOT QUI TIENT LA PLACE DE LA BARRE PRÊTÉE À UN SALON. Il dit où l'on
@@ -316,7 +293,7 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
   }
   if (strip.configure >= 0) {
     state.configuring = strip.configure;
-    PutName(state.tab_name, tabs[static_cast<std::size_t>(strip.configure)].name);
+    CopyBounded(state.tab_name, tabs[static_cast<std::size_t>(strip.configure)].name);
     ImGui::OpenPopup(kChatTabMenuId);
   }
   // L'émoticone choisie remonte telle quelle : `ui` ne sait pas l'envoyer.
@@ -344,7 +321,7 @@ ChatWindowAction DrawChatWindow(ChatWindowState& state, const ChatAppearance& lo
     const std::string_view needle(state.search.data());
     state.shown.clear();
     for (const ChatLineView& line : lines) {
-      if (ContainsNoCase(line.text, needle)) {
+      if (core::AsciiContainsFolded(line.text, needle)) {
         state.shown.push_back(line);
       }
     }

@@ -1,10 +1,18 @@
 #pragma once
 
+#include <array>
+
 #include <imgui.h>
 
 #include "ro/ui/minimap_window.h"
 
 namespace ro::ui {
+
+// Les quatre pointes d'un losange, dans le sens des aiguilles d'une montre.
+[[nodiscard]] inline std::array<ImVec2, 4> Diamond(ImVec2 center, float half) {
+  return {ImVec2(center.x, center.y - half), ImVec2(center.x + half, center.y),
+          ImVec2(center.x, center.y + half), ImVec2(center.x - half, center.y)};
+}
 
 // LE CADRAGE D'UNE IMAGE DE LA MINIMAP : où tombe la carte à l'écran, et
 // quelle portion on en voit.

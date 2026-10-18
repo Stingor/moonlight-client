@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+#include "ui_color.h"
+
 namespace ro::ui {
 namespace {
 
@@ -66,21 +68,12 @@ constexpr ImU32 kListSelfColor = IM_COL32(240, 128, 128, 255);
 constexpr ImU32 kListOtherColor = IM_COL32(255, 255, 255, 255);
 constexpr float kListFontPixels = 12.0F;
 
-[[nodiscard]] ImVec2 ToScreen(const WorldMapFit& fit, ImVec2 point) {
-  return {fit.origin.x + point.x * fit.scale, fit.origin.y + point.y * fit.scale};
-}
-
 [[nodiscard]] ImVec2 TopLeft(const WorldMapFit& fit, const WorldMapRect& rect) {
   return ToScreen(fit, ImVec2(rect.left, rect.top));
 }
 
 [[nodiscard]] ImVec2 BottomRight(const WorldMapFit& fit, const WorldMapRect& rect) {
   return ToScreen(fit, ImVec2(rect.right, rect.bottom));
-}
-
-[[nodiscard]] ImVec2 CenterOnScreen(const WorldMapFit& fit, const WorldMapRect& rect) {
-  return ToScreen(fit, ImVec2((rect.right - rect.left) * 0.5F + rect.left,
-                              (rect.bottom - rect.top) * 0.5F + rect.top));
 }
 
 // Le bas droit de l'image sur l'écran : ce qui déborde au-delà se replie.
@@ -96,11 +89,6 @@ void Stretch(ImDrawList* into, const SkinImage& image, ImVec2 from, ImVec2 to, I
   if (image.usable()) {
     into->AddImage(image.id, from, to, ImVec2(0.0F, 0.0F), ImVec2(1.0F, 1.0F), tint);
   }
-}
-
-// La même couleur, opaque.
-[[nodiscard]] ImU32 Opaque(ImU32 color) {
-  return (color & ~IM_COL32_A_MASK) | IM_COL32(0, 0, 0, 255);
 }
 
 // Du blanc, à l'opacité d'une couleur.

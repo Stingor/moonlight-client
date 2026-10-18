@@ -57,25 +57,12 @@ constexpr ImU32 kStopTextOutline = IM_COL32(0, 0, 0, 255);
 constexpr ImVec2 kStopTextOffset(2.0F, 5.0F);
 constexpr float kStopFontPixels = 12.0F;
 
-[[nodiscard]] ImVec2 CenterOf(const WorldMapRect& rect) {
-  return {(rect.right - rect.left) * 0.5F + rect.left, (rect.bottom - rect.top) * 0.5F + rect.top};
-}
-
 [[nodiscard]] float Distance(ImVec2 from, ImVec2 to) {
   return std::hypot(to.x - from.x, to.y - from.y);
 }
 
 [[nodiscard]] ImVec2 Plus(ImVec2 point, ImVec2 offset, float times = 1.0F) {
   return {point.x + offset.x * times, point.y + offset.y * times};
-}
-
-[[nodiscard]] ImVec2 ToScreen(const WorldMapFit& fit, ImVec2 point) {
-  return {fit.origin.x + point.x * fit.scale, fit.origin.y + point.y * fit.scale};
-}
-
-// Le centre d'un rectangle de l'image, sur l'écran.
-[[nodiscard]] ImVec2 CenterOnScreen(const WorldMapFit& fit, const WorldMapRect& rect) {
-  return ToScreen(fit, CenterOf(rect));
 }
 
 // Le quadrilatère, déjà sur l'écran, l'image dans l'ordre de ses coins.

@@ -16,6 +16,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -152,7 +153,7 @@ void DrawFileTab(GuildTabState& state, const GuildView& view, const SkinArt& art
 
 void DrawGuildEmblemModal(GuildTabState& state, const GuildView& view, const SkinArt& art,
                           GuildAction& action) {
-  const std::string id = GuildModalName(core::Tr("Changer l'emblème"), kGuildEmblemModalId);
+  const std::string id = SuffixedLabel(core::Tr("Changer l'emblème"), kGuildEmblemModalId);
   if (!BeginSkinnedModal(id.c_str(), art)) {
     return;
   }

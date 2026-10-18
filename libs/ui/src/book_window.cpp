@@ -12,6 +12,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "description_odds.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -43,18 +44,14 @@ constexpr ImU32 kRecitalBorder = IM_COL32(0x5C, 0x5C, 0x5C, 255);
 constexpr ImU32 kRecitalInk = IM_COL32(0xFF, 0xE4, 0xE1, 255);
 constexpr ImU32 kRecitalShadow = IM_COL32(0, 0, 0, 255);
 
-[[nodiscard]] bool IsHex(char letter) {
-  return (letter >= '0' && letter <= '9') || (letter >= 'a' && letter <= 'f') ||
-         (letter >= 'A' && letter <= 'F');
-}
-
 // Une marque de couleur commence-t-elle ici ?
 [[nodiscard]] bool ColorTokenAt(std::string_view text, std::size_t at) {
   if (at + kColorTokenLength > text.size() || text[at] != kColorMark) {
     return false;
   }
   return std::all_of(text.begin() + static_cast<std::ptrdiff_t>(at + 1),
-                     text.begin() + static_cast<std::ptrdiff_t>(at + kColorTokenLength), IsHex);
+                     text.begin() + static_cast<std::ptrdiff_t>(at + kColorTokenLength),
+                     IsHexDigit);
 }
 
 // Le texte sans ses marques, tel qu'il se mesure et se lit.

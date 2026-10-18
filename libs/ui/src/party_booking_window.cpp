@@ -18,6 +18,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -32,8 +33,6 @@ constexpr float kLevelsColumnPixels = 70.0F;
 // Le pas des boutons d'un champ de niveau : un niveau, puis dix.
 constexpr int kLevelStep = 1;
 constexpr int kLevelFastStep = 10;
-
-std::string Labelled(const char* text, const char* id) { return std::string(text) + "###" + id; }
 
 // LE NOM D'UN MÉTIER, vide pour un code que la vue ne connaît pas.
 std::string_view JobName(const PartyBookingView& view, std::int16_t code) {
@@ -354,11 +353,11 @@ PartyBookingAction DrawPartyBookingWindow(PartyBookingWindowState& state,
     action.report_bug = report_bug;
     return action;
   }
-  if (ImGui::CollapsingHeader(Labelled(core::Tr("Annonces"), "booking_ads").c_str(),
+  if (ImGui::CollapsingHeader(HiddenIdLabel(core::Tr("Annonces"), "booking_ads").c_str(),
                               ImGuiTreeNodeFlags_DefaultOpen)) {
     DrawSearch(state, view, art, action);
   }
-  if (ImGui::CollapsingHeader(Labelled(core::Tr("Mon annonce"), "booking_mine").c_str(),
+  if (ImGui::CollapsingHeader(HiddenIdLabel(core::Tr("Mon annonce"), "booking_mine").c_str(),
                               ImGuiTreeNodeFlags_DefaultOpen)) {
     if (view.has_mine) {
       DrawMine(state, view, art, action);

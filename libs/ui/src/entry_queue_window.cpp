@@ -20,6 +20,7 @@
 
 #include "entry_queue_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -52,8 +53,6 @@ using Text = std::array<char, kTextCapacity>;
 
 constexpr std::uint32_t kSecondsPerMinute = 60;
 constexpr std::uint32_t kSecondsPerHour = 3600;
-
-[[nodiscard]] std::string Owned(std::string_view text) { return std::string(text); }
 
 [[nodiscard]] bool IsApply(EntryQueueVerb verb) {
   return verb == EntryQueueVerb::kApplySolo || verb == EntryQueueVerb::kApplyParty ||

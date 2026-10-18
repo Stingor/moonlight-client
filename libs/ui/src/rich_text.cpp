@@ -11,6 +11,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_tooltip.h"
 
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -33,10 +34,6 @@ constexpr std::string_view kOpenTip = "<TIPBOX>";
 constexpr std::string_view kCloseTip = "</TIPBOX>";
 constexpr std::string_view kOpenPayload = "<INFO>";
 constexpr std::string_view kClosePayload = "</INFO>";
-
-[[nodiscard]] bool StartsWith(std::string_view text, std::size_t at, std::string_view tag) {
-  return text.compare(at, tag.size(), tag) == 0;
-}
 
 // Le token de couleur commence-t-il ici ? ⚠ IL FAUT LES SIX CHIFFRES : un
 // accent circonflexe suivi d'autre chose est du texte, et s'affiche.
@@ -104,7 +101,7 @@ constexpr std::array<LinkTag, 3> kLinkTags = {
 // La balise de lien qui s'ouvre ici, ou rien.
 [[nodiscard]] const LinkTag* LinkOpeningAt(std::string_view line, std::size_t at) {
   for (const LinkTag& tag : kLinkTags) {
-    if (StartsWith(line, at, tag.open)) {
+    if (StartsWithAt(line, at, tag.open)) {
       return &tag;
     }
   }
@@ -114,7 +111,7 @@ constexpr std::array<LinkTag, 3> kLinkTags = {
 // La balise de lien qui se ferme ici, ou rien.
 [[nodiscard]] const LinkTag* LinkClosingAt(std::string_view line, std::size_t at) {
   for (const LinkTag& tag : kLinkTags) {
-    if (StartsWith(line, at, tag.close)) {
+    if (StartsWithAt(line, at, tag.close)) {
       return &tag;
     }
   }
@@ -290,18 +287,18 @@ RichText LayOutRichText(std::span<const std::string> lines, ImU32 default_color,
         at += closing->close.size();
         continue;
       }
-      if (StartsWith(line, at, kOpenTip) || StartsWith(line, at, kCloseTip)) {
+      if (StartsWithAt(line, at, kOpenTip) || StartsWithAt(line, at, kCloseTip)) {
         flush_word();
-        at += StartsWith(line, at, kOpenTip) ? kOpenTip.size() : kCloseTip.size();
+        at += StartsWithAt(line, at, kOpenTip) ? kOpenTip.size() : kCloseTip.size();
         continue;
       }
-      if (StartsWith(line, at, kOpenPayload)) {
+      if (StartsWithAt(line, at, kOpenPayload)) {
         flush_word();
         inside_payload = true;
         at += kOpenPayload.size();
         continue;
       }
-      if (StartsWith(line, at, kClosePayload)) {
+      if (StartsWithAt(line, at, kClosePayload)) {
         inside_payload = false;
         at += kClosePayload.size();
         continue;

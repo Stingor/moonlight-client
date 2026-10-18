@@ -8,6 +8,8 @@
 #include "ro/core/text.h"
 #include "ro/ui/npc_dialog_text.h"
 
+#include "ui_strings.h"
+
 namespace ro::ui {
 namespace {
 
@@ -18,10 +20,6 @@ constexpr std::size_t kColorTokenLength = 7;
 // se remplace par une espace ordinaire : gardé tel quel, il se dessine en carré
 // dans une police qui ne le porte pas, et il empêche le repli à cet endroit.
 constexpr std::string_view kNoBreakSpace = "\xC2\xA0";
-
-[[nodiscard]] bool StartsWith(std::string_view text, std::size_t at, std::string_view tag) {
-  return text.compare(at, tag.size(), tag) == 0;
-}
 
 [[nodiscard]] std::string UpperAscii(std::string_view text) {
   std::string upper(text);
@@ -72,7 +70,7 @@ constexpr std::string_view kNoBreakSpace = "\xC2\xA0";
 // texte reste tel quel, plutôt que d'avaler la fin de la ligne.
 [[nodiscard]] bool TagBody(std::string_view line, std::size_t at, std::string_view open,
                            std::string_view close, std::string_view* body, std::size_t* after) {
-  if (!StartsWith(line, at, open)) {
+  if (!StartsWithAt(line, at, open)) {
     return false;
   }
   const std::size_t start = at + open.size();
@@ -401,7 +399,7 @@ std::vector<DialogRun> ParseDialogLine(std::string_view line, const DialogVocabu
         }
       }
     }
-    if (StartsWith(line, at, kNoBreakSpace)) {
+    if (StartsWithAt(line, at, kNoBreakSpace)) {
       (inside_payload ? current.payload : current.text).push_back(' ');
       at += kNoBreakSpace.size();
       continue;

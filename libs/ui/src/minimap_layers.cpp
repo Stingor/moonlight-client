@@ -123,12 +123,6 @@ void DrawImageQuad(ImDrawList* into, const SkinImage& image, const std::array<Im
                      ImVec2(1.0F, 0.0F), ImVec2(1.0F, 1.0F), ImVec2(0.0F, 1.0F), tint);
 }
 
-// Un losange, forme qu'aucun autre marqueur n'emploie.
-[[nodiscard]] std::array<ImVec2, 4> Diamond(ImVec2 center, float half) {
-  return {ImVec2(center.x, center.y - half), ImVec2(center.x + half, center.y),
-          ImVec2(center.x, center.y + half), ImVec2(center.x - half, center.y)};
-}
-
 // ── LE FOND ─────────────────────────────────────────────────────────────────
 
 void DrawBackdrop(ImDrawList* into, const MinimapFrame& frame, const MinimapView& view,

@@ -17,6 +17,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -34,7 +35,7 @@ constexpr float kButtonsSlackPixels = 4.0F;
 [[nodiscard]] bool SameAsLive(const GuildPositionDraft& draft, const GuildPositionView& live) {
   return draft.may_invite == live.may_invite && draft.may_expel == live.may_expel &&
          draft.may_storage == live.may_storage && draft.pay_rate == live.pay_rate &&
-         BufferText(draft.name) == live.name;
+         TypedText(draft.name) == live.name;
 }
 
 void Resync(GuildTabState& state, const GuildView& view) {
@@ -124,7 +125,7 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
         ImGui::SetNextItemWidth(-1.0F);
         edited = ImGui::InputText("##nom", draft.name.data(), draft.name.size());
       } else {
-        const std::string_view name = BufferText(draft.name);
+        const std::string_view name = TypedText(draft.name);
         ColoredText(kGuildBlackColor, name.empty() ? "—" : std::string(name).c_str());
       }
       const std::array<bool*, 3> rights = {&draft.may_invite, &draft.may_expel, &draft.may_storage};
@@ -165,7 +166,7 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
     }
     changed.push_back(GuildPositionEditView{
         .position = static_cast<std::int32_t>(index),
-        .name = std::string(BufferText(draft.name)),
+        .name = std::string(TypedText(draft.name)),
         .may_invite = draft.may_invite,
         .may_expel = draft.may_expel,
         .may_storage = draft.may_storage,

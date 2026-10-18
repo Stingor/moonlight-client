@@ -12,6 +12,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/hud_frame.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/window_bounds.h"
@@ -69,10 +70,10 @@ void DrawAlerts(const MvpTrackerView& view, MvpTrackerAction& action) {
       const std::string map(alert.map);
       // Un instant exact dit l'HEURE du retour ; une fenêtre dit qu'elle s'ouvre.
       const std::string text =
-          alert.exact
-              ? Printed(core::Tr("%s (%s) : de retour à %s."), label.c_str(), map.c_str(),
-                        std::string(alert.at_clock).c_str())
-              : Printed(core::Tr("%s (%s) entre dans sa fenêtre."), label.c_str(), map.c_str());
+          alert.exact ? core::Printed(core::Tr("%s (%s) : de retour à %s."), label.c_str(),
+                                      map.c_str(), std::string(alert.at_clock).c_str())
+                      : core::Printed(core::Tr("%s (%s) entre dans sa fenêtre."), label.c_str(),
+                                      map.c_str());
       ImGui::PushID(static_cast<int>(alert.slot_id));
       if (ImGui::Selectable(text.c_str())) {
         action.alert_slot = alert.slot_id;

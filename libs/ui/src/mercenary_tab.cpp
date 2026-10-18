@@ -16,6 +16,7 @@
 #include "ro/ui/staff_skill_id.h"
 
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -50,11 +51,6 @@ constexpr float kPercent = 100.0F;
 // Les statistiques vont par paires « libellé / valeur » sur chaque ligne.
 constexpr int kStatColumns = 4;
 constexpr int kStatsPerRow = 2;
-
-std::string_view BufferText(const std::array<char, kMercenaryConfirmSize>& buffer) {
-  const auto end = std::ranges::find(buffer, '\0');
-  return {buffer.data(), static_cast<std::size_t>(end - buffer.begin())};
-}
 
 // UNE JAUGE : le libellé s'écrit par-dessus, centré, et non à la mode d'ImGui
 // qui le pose au bord du remplissage, sur le fond sombre où il se perd.
@@ -169,7 +165,7 @@ void DrawDismissConfirmation(MercenaryTabState& state, const MercenaryTabView& v
   ColoredWrapped(kValueColor, core::Tr("Retape le nom du mercenaire pour confirmer :"));
   ImGui::SetNextItemWidth(-1.0F);
   ImGui::InputText("##merc_dismiss", state.dismiss_confirm.data(), state.dismiss_confirm.size());
-  const bool matches = !view.name.empty() && BufferText(state.dismiss_confirm) == view.name;
+  const bool matches = !view.name.empty() && TypedText(state.dismiss_confirm) == view.name;
   ImGui::BeginDisabled(!matches);
   if (SkinSmallButton(core::Tr("Renvoyer"), art, ImVec2(Px(kDismissButtonPixels), 0.0F))) {
     action.dismiss = true;

@@ -17,6 +17,7 @@
 #include "ro/ui/inventory_window.h"
 
 #include "item_grid.h"
+#include "ui_values.h"
 
 namespace ro::ui {
 namespace {
@@ -24,9 +25,6 @@ namespace {
 // De quoi écrire un nom court, deux nombres de soixante-quatre bits groupés et
 // leur pour cent.
 constexpr std::size_t kCaptionRoom = 112;
-
-// Cent, pour une part en pour cent.
-constexpr std::int64_t kPercent = 100;
 
 // L'identité ImGui de chaque jauge. ⚠ STABLE ET UNIQUE : c'est elle qui tient la
 // prise d'un geste d'une image à l'autre.
@@ -402,10 +400,7 @@ void PaintCentered(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const
 
 // La part en pour cent, ou zéro quand il n'y a rien à diviser.
 [[nodiscard]] std::int64_t PercentOf(const StatBarValue& value) {
-  if (!value.known || value.most <= 0) {
-    return 0;
-  }
-  return std::clamp<std::int64_t>(value.current * kPercent / value.most, 0, kPercent);
+  return GaugePercent(value.known, value.current, value.most);
 }
 
 }  // namespace

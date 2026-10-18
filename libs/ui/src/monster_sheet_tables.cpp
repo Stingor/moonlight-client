@@ -14,12 +14,14 @@
 
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "monster_sheet_parts.h"
 #include "table_cells.h"
 #include "ui_scale.h"
 #include "ui_text.h"
+#include "ui_values.h"
 
 namespace ro::ui::monster_sheet {
 namespace {
@@ -67,11 +69,6 @@ constexpr int kSkillIdColumn = 2;
     return ImGui::GetColorU32(ImGuiCol_Text);
   }
   return kRedColor;
-}
-
-template <typename T>
-[[nodiscard]] int Compare(const T& left, const T& right) {
-  return left < right ? -1 : (right < left ? 1 : 0);
 }
 
 // Un lien se suit au RELÂCHEMENT, comme tout lien du client : la fenêtre qu'il
@@ -149,7 +146,7 @@ void DrawResistTab(const MonsterSheetView& view) {
     const std::string label(view.words.resist[element_rank]);
     Label(label.c_str());
     const int percent = view.resist_percent[element_rank];
-    Colored(ResistColor(percent), Printed("%d %%", percent).c_str());
+    Colored(ResistColor(percent), core::Printed("%d %%", percent).c_str());
   }
   ImGui::EndTable();
 }
@@ -193,10 +190,10 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
     SortRows(state.drop_order, view.drops,
              [](const MonsterSheetDropView& left, const MonsterSheetDropView& right, int column) {
                if (column == kDropRateColumn) {
-                 return Compare(left.rate_hundredths, right.rate_hundredths);
+                 return CompareValues(left.rate_hundredths, right.rate_hundredths);
                }
                if (column == kDropKindColumn) {
-                 return Compare(left.mvp_reward, right.mvp_reward);
+                 return CompareValues(left.mvp_reward, right.mvp_reward);
                }
                return core::AsciiCompareFolded(left.name, right.name);
              });
@@ -208,8 +205,9 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
       DropCell(state, drop, rank, answer);
       ImGui::TableNextColumn();
       // Deux décimales, en centièmes de pour cent, comme la fiche d'objet.
-      CellText(Printed("%.2f%%", static_cast<double>(static_cast<float>(drop.rate_hundredths) /
-                                                     kHundredthsPerPercent)));
+      CellText(core::Printed(
+          "%.2f%%",
+          static_cast<double>(static_cast<float>(drop.rate_hundredths) / kHundredthsPerPercent)));
       ImGui::TableNextColumn();
       if (drop.mvp_reward) {
         Colored(kAmberColor, mvp_reward);
@@ -249,7 +247,7 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
     SortRows(state.spawn_order, view.spawns,
              [](const MonsterSheetSpawnView& left, const MonsterSheetSpawnView& right, int column) {
                return column == kSpawnCountColumn
-                          ? Compare(left.count, right.count)
+                          ? CompareValues(left.count, right.count)
                           : core::AsciiCompareFolded(left.label, right.label);
              });
     for (const int rank : state.spawn_order) {
@@ -276,7 +274,7 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
       }
       ImGui::PopID();
       ImGui::TableNextColumn();
-      CellText(Printed("%u", static_cast<unsigned>(spawn.count)));
+      CellText(core::Printed("%u", static_cast<unsigned>(spawn.count)));
     }
     PaintWindowScrollbar(art);
     ImGui::EndTable();
@@ -310,10 +308,10 @@ void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
   SortRows(state.skill_order, view.skills,
            [](const MonsterSheetSkillView& left, const MonsterSheetSkillView& right, int column) {
              if (column == kSkillLevelColumn) {
-               return Compare(left.level, right.level);
+               return CompareValues(left.level, right.level);
              }
              if (column == kSkillIdColumn) {
-               return Compare(left.skill_id, right.skill_id);
+               return CompareValues(left.skill_id, right.skill_id);
              }
              return core::AsciiCompareFolded(left.name, right.name);
            });
@@ -337,9 +335,9 @@ void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
     }
     ImGui::PopID();
     ImGui::TableNextColumn();
-    CellText(Printed("%u", static_cast<unsigned>(skill.level)));
+    CellText(core::Printed("%u", static_cast<unsigned>(skill.level)));
     ImGui::TableNextColumn();
-    Label(Printed("%u", static_cast<unsigned>(skill.skill_id)).c_str());
+    Label(core::Printed("%u", static_cast<unsigned>(skill.skill_id)).c_str());
   }
   PaintWindowScrollbar(art);
   ImGui::EndTable();

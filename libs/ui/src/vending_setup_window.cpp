@@ -15,6 +15,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "trade_gestures.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -67,17 +68,6 @@ int& StockAmountFor(VendingSetupWindowState& state, std::uint16_t cart_slot, int
   }
   found->second = std::clamp(found->second, std::min(1, remaining), std::max(remaining, 0));
   return found->second;
-}
-
-void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint16_t cart_slot,
-              ItemLinkMenu& menu, VendingSetupAction& action) {
-  if (gesture.hovered) {
-    action.hovered_slot = cart_slot;
-  }
-  if (NoteTradeItemLink(gesture, item, cart_slot, menu)) {
-    action.describe_slot = cart_slot;
-    action.item_gesture = ChatLinkGesture::kRepost;
-  }
 }
 
 // Ce que le joueur a demandé pendant l'image, appliqué APRÈS les tables : une
@@ -166,7 +156,7 @@ void DrawStockList(VendingSetupWindowState& state, const VendingSetupView& view,
     ImGui::PushID(row.cart_slot);
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    NoteItem(DrawTradeItem(row.item), row.item, row.cart_slot, state.item_menu, action);
+    NoteItemBySlot(DrawTradeItem(row.item), row.item, row.cart_slot, state.item_menu, action);
     if (row.refusal.empty() && remaining > 0 &&
         ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
       ImGui::SetDragDropPayload(kStockPayload, &row.cart_slot, sizeof(row.cart_slot));
@@ -210,7 +200,7 @@ void DrawStockGrid(VendingSetupWindowState& state, const VendingSetupView& view,
     }
     ImGui::PushID(kTileIdBase + row.cart_slot);
     const TradeItemGesture tile = DrawTradeTile(row.item, row.refine_level, remaining);
-    NoteItem(tile, row.item, row.cart_slot, state.item_menu, action);
+    NoteItemBySlot(tile, row.item, row.cart_slot, state.item_menu, action);
     const bool can = CanPlace(state, view, row, remaining);
     if (can && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
       ImGui::SetDragDropPayload(kStockPayload, &row.cart_slot, sizeof(row.cart_slot));
@@ -252,7 +242,7 @@ void DrawLines(VendingSetupWindowState& state, const VendingSetupView& view, con
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     if (row != nullptr) {
-      NoteItem(DrawTradeItem(row->item), row->item, line.cart_slot, state.item_menu, action);
+      NoteItemBySlot(DrawTradeItem(row->item), row->item, line.cart_slot, state.item_menu, action);
     } else {
       ImGui::AlignTextToFramePadding();
       ImGui::TextDisabled("%s", core::Tr("(n'est plus dans le cart)"));

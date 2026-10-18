@@ -8,6 +8,21 @@
 
 namespace ro::ui {
 
+// Le centre d'un rectangle de l'image, en pixels de l'image.
+[[nodiscard]] inline ImVec2 CenterOf(const WorldMapRect& rect) {
+  return {(rect.right - rect.left) * 0.5F + rect.left, (rect.bottom - rect.top) * 0.5F + rect.top};
+}
+
+// Un point de l'image, sur l'écran.
+[[nodiscard]] inline ImVec2 ToScreen(const WorldMapFit& fit, ImVec2 point) {
+  return {fit.origin.x + point.x * fit.scale, fit.origin.y + point.y * fit.scale};
+}
+
+// Le centre d'un rectangle de l'image, sur l'écran.
+[[nodiscard]] inline ImVec2 CenterOnScreen(const WorldMapFit& fit, const WorldMapRect& rect) {
+  return ToScreen(fit, CenterOf(rect));
+}
+
 // LES MARQUES DE LA CARTE DU MONDE, chacune sa couche, dans l'ordre où la
 // fenêtre les pose.
 

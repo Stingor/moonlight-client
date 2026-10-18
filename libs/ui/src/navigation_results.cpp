@@ -12,6 +12,7 @@
 
 #include "navigation_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -66,8 +67,6 @@ void MvpBadge() {
   }
   return "";
 }
-
-[[nodiscard]] std::string Owned(std::string_view text) { return std::string(text); }
 
 // Le plan de la map au survol : l'en-tête d'un groupe n'y a droit que s'il
 // désigne UNE seule map — un monstre groupé par nom vit souvent sur plusieurs.

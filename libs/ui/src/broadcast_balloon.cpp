@@ -9,6 +9,7 @@
 #include "ro/ui/chat_log.h"
 
 #include "chat_log_parts.h"
+#include "ui_color.h"
 
 namespace ro::ui {
 namespace {
@@ -21,26 +22,6 @@ using chat_log_detail::PlaceTarget;
 constexpr int kWholePercent = 100;
 
 [[nodiscard]] float SnapToPixel(float value) { return std::floor(value + 0.5F); }
-
-// Ce qui reste d'une couleur multipliée par `alpha`.
-[[nodiscard]] ImU32 Faded(ImU32 color, float alpha) {
-  const auto kept =
-      static_cast<ImU32>(static_cast<float>((color >> IM_COL32_A_SHIFT) & 0xFFU) * alpha);
-  return (color & ~IM_COL32_A_MASK) | (kept << IM_COL32_A_SHIFT);
-}
-
-// Fond tout ce qui s'est peint depuis `first_vertex`.
-//
-// ⚠ APRÈS COUP, SUR LES SOMMETS : le moteur du fil peint ses couleurs propres —
-// un lien, une suite colorée, une emote — et n'a pas d'opacité à recevoir.
-void FadeSince(ImDrawList* into, int first_vertex, float alpha) {
-  if (alpha >= 1.0F) {
-    return;
-  }
-  for (int rank = first_vertex; rank < into->VtxBuffer.Size; ++rank) {
-    into->VtxBuffer[rank].col = Faded(into->VtxBuffer[rank].col, alpha);
-  }
-}
 
 // NOIRCIT tout ce qui s'est peint depuis `first_vertex`, en gardant l'opacité de
 // chaque sommet : c'est ce qui fait d'une copie décalée du texte son ombre,

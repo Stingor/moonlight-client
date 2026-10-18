@@ -17,6 +17,8 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "chat_input_chips.h"
+#include "ui_input.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -46,13 +48,6 @@ struct CursorProbe {
   int row = 0;
   int rows = 1;
 };
-
-// Copie bornée, zéro terminal garanti.
-void CopyInto(std::array<char, kChatInputSize>& into, std::string_view text) {
-  const std::size_t kept = std::min(text.size(), into.size() - 1);
-  std::memcpy(into.data(), text.data(), kept);
-  into[kept] = '\0';
-}
 
 // COMBIEN DE RANGÉES CE TEXTE OCCUPE, et sur laquelle tombe le curseur.
 //
@@ -158,19 +153,6 @@ namespace {
   }
   *into = history.at >= count ? history.draft : history.lines[static_cast<std::size_t>(history.at)];
   return true;
-}
-
-// Écrit dans le tampon ET prévient le widget, qui tient sa propre copie pendant
-// l'édition. Sans ce mot-là, ce qu'on vient d'écrire serait écrasé à l'image
-// suivante par l'état interne d'ImGui.
-void ReloadField(ImGuiID field) {
-  if (ImGuiInputTextState* state = ImGui::GetInputTextState(field)) {
-    // Le curseur part en FIN plutôt que de tout sélectionner : la phrase
-    // rappelée se COMPLÈTE. Une sélection totale la ferait disparaître à la
-    // première touche, ce qui est le contraire de l'usage — on rappelle pour
-    // corriger un mot.
-    state->ReloadUserBufAndMoveToEnd();
-  }
 }
 
 // Recharge un champ qu'on vient de VIDER, curseur à zéro.
@@ -476,7 +458,7 @@ struct WhisperBoxGesture {
         // s'il était plus long, le curseur dépasse la fin et la première image qui
         // redessine le champ franchit une assertion d'ImGui — ce qui TUE le
         // programme.
-        ReloadField(box);
+        ReloadInputField(box);
         // Le nom est choisi : on veut ÉCRIRE la phrase, pas cliquer — et c'est
         // à elle que le clavier va, pas à la box qu'on vient de remplir.
         state.focus_on_whisper = false;
@@ -675,7 +657,7 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     // laisse son curseur posé sur l'ancien texte ; s'il était plus long, le
     // curseur dépasse la fin et la première image qui redessine le champ
     // franchit une assertion d'ImGui — ce qui TUE le programme.
-    ReloadField(field);
+    ReloadInputField(field);
   }
 
   // ALT+ENTRÉE VALIDE, dans les deux formes du champ : ImGui ne lit Entrée
@@ -717,8 +699,8 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     const bool down = mine && ImGui::IsKeyPressed(ImGuiKey_DownArrow) &&
                       cursor_row_before >= cursor_rows_before - 1;
     if ((up || down) && Recall(state.history, up ? -1 : 1, state.text.data(), &recalled)) {
-      CopyInto(state.text, recalled);
-      ReloadField(field);
+      CopyBounded(state.text, recalled);
+      ReloadInputField(field);
     }
   }
   ImGui::PopStyleColor(1 + field_colors);

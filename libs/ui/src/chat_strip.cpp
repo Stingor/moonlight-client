@@ -11,6 +11,8 @@
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 
+#include "ui_color.h"
+
 namespace ro::ui {
 namespace {
 
@@ -27,15 +29,6 @@ constexpr double kMsPerSecond = 1000.0;
 constexpr int kEmotionsPerRow = 10;
 // Le cote d'une case, en hauteurs de texte. Assez pour reconnaitre un visage.
 constexpr float kEmotionCellRatio = 1.6F;
-
-// Une couleur éclaircie d'autant, son opacité inchangée.
-[[nodiscard]] ImU32 Lighten(ImU32 color, int amount) {
-  const auto channel = [color, amount](int shift) {
-    return std::min(255, static_cast<int>((color >> shift) & 0xFFU) + amount);
-  };
-  return IM_COL32(channel(IM_COL32_R_SHIFT), channel(IM_COL32_G_SHIFT), channel(IM_COL32_B_SHIFT),
-                  (color >> IM_COL32_A_SHIFT) & 0xFFU);
-}
 
 // Le nom d'une languette, en chaîne C. ImGui en veut une, et la vue qu'on reçoit
 // n'en est pas une.
@@ -111,8 +104,8 @@ void DrawSearchButton(ImVec2 at, float side, ImU32 tab_color, bool on, ChatStrip
   }
   ImDrawList* into = ImGui::GetWindowDrawList();
   const ImVec2 to(at.x + side, at.y + side);
-  const ImU32 body = on ? Lighten(tab_color, kChatTabActiveLift)
-                        : (hovered ? Lighten(tab_color, kChatTabHoverLift) : tab_color);
+  const ImU32 body = on ? Lighter(tab_color, kChatTabActiveLift)
+                        : (hovered ? Lighter(tab_color, kChatTabHoverLift) : tab_color);
   into->AddRectFilled(at, to, body);
   into->AddRect(at, to, kChatTabEdgeColor);
   // La loupe : un cercle et son manche, calés sur le côté du bouton pour
@@ -358,7 +351,7 @@ void DrawChatEmotePicker(ChatStripState& state, ImVec2 at, float side, ImU32 tab
   ImDrawList* into = ImGui::GetWindowDrawList();
   const ImVec2 to(at.x + side, at.y + side);
   const ImU32 ink = faded(kChatTabTextColor);
-  into->AddRectFilled(at, to, faded(hovered ? Lighten(tab_color, kChatTabHoverLift) : tab_color));
+  into->AddRectFilled(at, to, faded(hovered ? Lighter(tab_color, kChatTabHoverLift) : tab_color));
   into->AddRect(at, to, faded(kChatTabEdgeColor));
   // Un visage : deux yeux et une bouche, calés sur le côté du bouton pour
   // suivre l'échelle sans qu'aucune longueur ne soit écrite en dur.
@@ -501,8 +494,8 @@ float DrawChatStrip(ChatStripState& state, std::span<const ChatStripTab> tabs, i
   // ⚠ MESURÉE AVANT DE DÉPLACER LE CURSEUR : après la première languette,
   // l'espace « restant » ne serait plus celui de la bande mais celui d'après.
   const float strip_width = ImGui::GetContentRegionAvail().x;
-  const ImU32 active_color = Lighten(tab_color, kChatTabActiveLift);
-  const ImU32 hover_color = Lighten(tab_color, kChatTabHoverLift);
+  const ImU32 active_color = Lighter(tab_color, kChatTabActiveLift);
+  const ImU32 hover_color = Lighter(tab_color, kChatTabHoverLift);
 
   // Les bords de chaque languette DESSINÉE, relevés au passage : c'est ce qui
   // dit, au moment du lâcher, entre quels deux voisins le curseur se trouve. Un

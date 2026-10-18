@@ -15,6 +15,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -452,7 +453,7 @@ void DrawSend(GuildTabState& state, const GuildView& view, const SkinArt& art,
   const bool may_send = has_ink && view.guild_id > 0;
   // 🔴 UN NOM DE FICHIER, PAS UN LIBELLÉ D'ÉCRAN : sa traduction reste en ASCII
   // pur, parce qu'il s'écrit dans le dossier de l'installation.
-  const std::string_view typed = BufferText(state.emblem.save_name);
+  const std::string_view typed = TypedText(state.emblem.save_name);
   const std::string file =
       (typed.empty() ? std::string(core::Tr("mon_embleme")) : std::string(typed)) + ".bmp";
   ImGui::BeginDisabled(!may_send);

@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/inventory_window.h"
 #include "ro/ui/skin_tooltip.h"
@@ -185,10 +186,10 @@ void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, bool bug_rep
   // Le qualificatif fait partie du TITRE : c'est là qu'il faut lever le doute.
   if (view.qualifier != nullptr) {
     ImGui::SameLine(0.0F, Px(kTightGapPixels));
-    Colored(kTitleColor, Printed("(%s)", view.qualifier).c_str());
+    Colored(kTitleColor, core::Printed("(%s)", view.qualifier).c_str());
   }
   ImGui::SameLine();
-  Label(Printed("#%u", view.shown_id).c_str());
+  Label(core::Printed("#%u", view.shown_id).c_str());
   DrawBossBadge(view.boss_rank);
   // ── POSER LE MONSTRE DANS LA BARRE DE CHAT ────────────────────────────────
   //
@@ -229,7 +230,7 @@ void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, bool bug_rep
               static_cast<int>(words.element_value.size()), words.element_value.data());
   ImGui::SameLine();
   // Le niveau élémentaire, que le paquet de Sense ne transporte pas.
-  Label(Printed(core::Tr("niv. %u"), static_cast<unsigned>(view.element_level)).c_str());
+  Label(core::Printed(core::Tr("niv. %u"), static_cast<unsigned>(view.element_level)).c_str());
   ImGui::Text("%.*s : %.*s", static_cast<int>(words.size.size()), words.size.data(),
               static_cast<int>(words.size_value.size()), words.size_value.data());
 
@@ -253,7 +254,7 @@ void DrawIdentity(const MonsterSheetView& view, const SkinArt& art, bool bug_rep
         continue;
       }
       ImGui::TableNextColumn();
-      Colored(kBlueColor, Printed("[%s]", ModeWord(bit)).c_str());
+      Colored(kBlueColor, core::Printed("[%s]", ModeWord(bit)).c_str());
     }
     ImGui::EndTable();
   }
@@ -271,15 +272,15 @@ void DrawNamesakeNote(const MonsterSheetView& view, const SkinArt& art,
     return;
   }
   ImGui::Separator();
-  Colored(kAmberColor, Printed(core::Tr("%u monstres portent le nom « %s »."),
-                               static_cast<unsigned>(view.namesake_count), view.name.c_str())
+  Colored(kAmberColor, core::Printed(core::Tr("%u monstres portent le nom « %s »."),
+                                     static_cast<unsigned>(view.namesake_count), view.name.c_str())
                            .c_str());
   if (!view.aegis_name.empty()) {
     ImGui::TextUnformatted(core::Tr("Celui-ci est"));
     ImGui::SameLine(0.0F, Px(kTightGapPixels));
     Colored(kBlueColor, view.aegis_name.c_str());
     ImGui::SameLine(0.0F, Px(kTightGapPixels));
-    Label(Printed("#%u", view.shown_id).c_str());
+    Label(core::Printed("#%u", view.shown_id).c_str());
   }
   // ⚠ ABSENT QUAND C'EST LUI : un bouton qui recharge la page courante est un
   // piège.
@@ -313,9 +314,10 @@ void DrawSenseNote(const MonsterSheetView& view) {
   const std::string def(words.def);
   const std::string mdef(words.mdef);
   Colored(kSenseNoteColor,
-          Printed(core::Tr("Relevé Sense (exemplaire croisé) : niveau %u, PV %u, %s %u, %s %u"),
-                  static_cast<unsigned>(sense.level), sense.hp, def.c_str(),
-                  static_cast<unsigned>(sense.def), mdef.c_str(), static_cast<unsigned>(sense.mdef))
+          core::Printed(
+              core::Tr("Relevé Sense (exemplaire croisé) : niveau %u, PV %u, %s %u, %s %u"),
+              static_cast<unsigned>(sense.level), sense.hp, def.c_str(),
+              static_cast<unsigned>(sense.def), mdef.c_str(), static_cast<unsigned>(sense.mdef))
               .c_str());
   if (ImGui::IsItemHovered()) {
     SkinTooltipFormat("%s", core::Tr("Ces chiffres viennent du monstre effectivement visé par "
@@ -349,8 +351,8 @@ void DrawHeader(MonsterSheetWindowState& state, const MonsterSheetView& view, co
   if (hundredths == 0 && got > 0) {
     return "< 0,01 %";
   }
-  return Printed("%" PRIu64 ",%02" PRIu64 " %%", hundredths / kHundredthsPerPercent,
-                 hundredths % kHundredthsPerPercent);
+  return core::Printed("%" PRIu64 ",%02" PRIu64 " %%", hundredths / kHundredthsPerPercent,
+                       hundredths % kHundredthsPerPercent);
 }
 
 // Combien de monstres pour un niveau ENTIER : le client ne sait pas où en est
@@ -361,7 +363,7 @@ void DrawHeader(MonsterSheetWindowState& state, const MonsterSheetView& view, co
     return "-";
   }
   const std::uint64_t kills = (static_cast<std::uint64_t>(next) + got - 1) / got;
-  return Printed("%" PRIu64, kills);
+  return core::Printed("%" PRIu64, kills);
 }
 
 void DrawExpGain(const MonsterSheetView& view) {
@@ -491,7 +493,8 @@ void ExpRows(const MonsterSheetView& view) {
   }
   const auto per_cell = static_cast<unsigned>(walk_ms_per_cell);
   const unsigned tenths = (kTenthCellMilliseconds + per_cell / 2) / per_cell;
-  return Printed(core::Tr("%u,%u case/s"), tenths / kTenthsPerPercent, tenths % kTenthsPerPercent);
+  return core::Printed(core::Tr("%u,%u case/s"), tenths / kTenthsPerPercent,
+                       tenths % kTenthsPerPercent);
 }
 
 void DrawVersus(const MonsterSheetView& view, int mob_hit, int mob_flee) {
@@ -522,7 +525,7 @@ void DrawVersus(const MonsterSheetView& view, int mob_hit, int mob_flee) {
                 "la moitié du calcul vient donc de votre niveau, pas de vos points. Le serveur "
                 "plafonne la part du niveau (600 actuellement), au-delà seule la DEX compte "
                 "encore.\n\nNe tient compte ni des skills, ni des cartes conditionnelles."),
-       Printed("%d %%", you_hit),
+       core::Printed("%d %%", you_hit),
        you_hit >= kHitSurePercent ? kGreenColor
                                   : (you_hit <= kHitPoorPercent ? kRedColor : kAmberColor));
 
@@ -535,7 +538,7 @@ void DrawVersus(const MonsterSheetView& view, int mob_hit, int mob_flee) {
        core::Tr("Chance qu'une attaque soit un coup critique. Ce n'est PAS un multiplicateur de "
                 "dégâts.\n\nVotre CRIT moins 0,2 point par LUK du monstre. Un critique remplace "
                 "le jet de précision (il ne rate jamais) et ignore la DEF."),
-       Printed("%d,%d %%", crit_tenths / kTenthsPerPercent, crit_tenths % kTenthsPerPercent),
+       core::Printed("%d,%d %%", crit_tenths / kTenthsPerPercent, crit_tenths % kTenthsPerPercent),
        crit_tenths > 0 ? kBlueColor : kLabelColor);
 
   // L'esquive parfaite est DÉDUITE du chiffre : elle se joue avant tout le
@@ -554,7 +557,7 @@ void DrawVersus(const MonsterSheetView& view, int mob_hit, int mob_flee) {
                 "serveur plafonne la part du niveau (600 actuellement), au-delà seule l'AGI "
                 "compte encore.\n\nVotre FLEE chute par ailleurs de 10 % par monstre au-delà du "
                 "deuxième qui vous prend pour cible : en pack, le chiffre réel est plus élevé."),
-       Printed("%d %%", net),
+       core::Printed("%d %%", net),
        net <= kStruckRarelyPercent ? kGreenColor
                                    : (net >= kStruckOftenPercent ? kRedColor : kAmberColor));
   ImGui::EndTable();
@@ -568,18 +571,20 @@ void DrawStatsTab(const MonsterSheetView& view) {
     // EXP. Partout ailleurs ce serait du bruit.
     StatRow(core::Tr("PV"), GroupThousands(view.hp), core::Tr("SP"), GroupThousands(view.sp));
     ExpRows(view);
-    StatRow(core::Tr("ATK"), Printed("%d ~ %d", view.atk_min, view.atk_max), core::Tr("MATK"),
-            Printed("%d ~ %d", view.matk_min, view.matk_max));
+    StatRow(core::Tr("ATK"), core::Printed("%d ~ %d", view.atk_min, view.atk_max), core::Tr("MATK"),
+            core::Printed("%d ~ %d", view.matk_min, view.matk_max));
     const std::string def(view.words.def);
     const std::string mdef(view.words.mdef);
-    StatRow(def.c_str(), Printed("%d%% (+%d)", view.def, view.def_bonus), mdef.c_str(),
-            Printed("%d%% (+%d)", view.mdef, view.mdef_bonus));
-    StatRow(core::Tr("STR"), Printed("%d", view.str), core::Tr("AGI"), Printed("%d", view.agi));
-    StatRow(core::Tr("VIT"), Printed("%d", view.vit), core::Tr("INT"),
-            Printed("%d", view.int_stat));
-    StatRow(core::Tr("DEX"), Printed("%d", view.dex), core::Tr("LUK"), Printed("%d", view.luk));
+    StatRow(def.c_str(), core::Printed("%d%% (+%d)", view.def, view.def_bonus), mdef.c_str(),
+            core::Printed("%d%% (+%d)", view.mdef, view.mdef_bonus));
+    StatRow(core::Tr("STR"), core::Printed("%d", view.str), core::Tr("AGI"),
+            core::Printed("%d", view.agi));
+    StatRow(core::Tr("VIT"), core::Printed("%d", view.vit), core::Tr("INT"),
+            core::Printed("%d", view.int_stat));
+    StatRow(core::Tr("DEX"), core::Printed("%d", view.dex), core::Tr("LUK"),
+            core::Printed("%d", view.luk));
     StatRow(core::Tr("Portée d'attaque"),
-            Printed(core::Tr("%u case(s)"), static_cast<unsigned>(view.attack_range_cells)),
+            core::Printed(core::Tr("%u case(s)"), static_cast<unsigned>(view.attack_range_cells)),
             core::Tr("Vitesse de dépl."), WalkSpeed(view.walk_ms_per_cell));
     if (view.mvp_exp > 0) {
       ImGui::TableNextRow();
@@ -658,18 +663,18 @@ void DrawTabs(MonsterSheetWindowState& state, const MonsterSheetView& view, cons
   }
   // ⚠ LE COMPTE FAIT PARTIE DU LIBELLÉ, l'identité non : `###` la fige, sans
   // quoi l'onglet choisi sauterait à chaque fiche d'une autre longueur.
-  const std::string drops = Printed("Drops (%zu)###mi_drops", view.drops.size());
+  const std::string drops = core::Printed("Drops (%zu)###mi_drops", view.drops.size());
   if (ImGui::BeginTabItem(drops.c_str())) {
     DrawDropsTab(state, view, art, answer);
     ImGui::EndTabItem();
   }
-  const std::string spawns = Printed("Spawns (%zu)###mi_spawns", view.spawns.size());
+  const std::string spawns = core::Printed("Spawns (%zu)###mi_spawns", view.spawns.size());
   if (ImGui::BeginTabItem(spawns.c_str())) {
     DrawSpawnsTab(state, view, art, answer);
     ImGui::EndTabItem();
   }
   if (!view.skills.empty()) {
-    const std::string skills = Printed("Skills (%zu)###mi_skills", view.skills.size());
+    const std::string skills = core::Printed("Skills (%zu)###mi_skills", view.skills.size());
     if (ImGui::BeginTabItem(skills.c_str())) {
       DrawSkillsTab(state, view, art, answer);
       ImGui::EndTabItem();
@@ -737,7 +742,8 @@ MonsterSheetAnswer DrawMonsterSheetBody(MonsterSheetWindowState& state,
       break;
     case MonsterSheetPhase::kUnknown:
       Colored(kRedColor,
-              Printed(core::Tr("Monstre inconnu du serveur (classe %u)."), view.shown_id).c_str());
+              core::Printed(core::Tr("Monstre inconnu du serveur (classe %u)."), view.shown_id)
+                  .c_str());
       // Le relevé de Sense, s'il vise ce monstre : mieux que rien.
       if (view.sense.has_value() && view.sense->sprite_class == view.shown_id) {
         ImGui::Separator();

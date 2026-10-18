@@ -12,6 +12,7 @@
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -108,16 +109,6 @@ constexpr std::array<core::LogLevel, 4> kLevels = {core::LogLevel::kDebug, core:
                                                    core::LogLevel::kWarning,
                                                    core::LogLevel::kError};
 
-// Le filtre tel qu'il est saisi, borné à ce que le tampon porte vraiment.
-//
-// ⚠ LA FIN SE CHERCHE, ELLE NE SE SUPPOSE PAS : un tampon qu'ImGui n'aurait
-// pas terminé — ou qu'un état fabriqué à la main aurait rempli entièrement —
-// ferait lire au-delà avec un `strlen`. On borne à la taille du tableau.
-[[nodiscard]] std::string_view TypedFilter(const std::array<char, kLogFilterSize>& filter) {
-  const auto stop = std::ranges::find(filter, '\0');
-  return {filter.data(), static_cast<std::size_t>(stop - filter.begin())};
-}
-
 }  // namespace
 
 std::string JoinLogLines(std::span<const core::LoggedLine> lines) {
@@ -172,7 +163,7 @@ std::vector<core::LoggedLine> SelectLogLines(std::span<const core::LoggedLine> l
                                              const LogWindowState& state) {
   std::vector<core::LoggedLine> kept;
   kept.reserve(lines.size());
-  const std::string_view wanted = TypedFilter(state.filter);
+  const std::string_view wanted = TypedText(state.filter);
   for (const core::LoggedLine& line : lines) {
     const auto rank = static_cast<std::size_t>(line.level);
     if (rank >= state.shown.size() || !state.shown[rank]) {

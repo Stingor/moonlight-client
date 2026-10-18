@@ -21,6 +21,7 @@
 
 #include "ui_scale.h"
 #include "ui_text.h"
+#include "ui_values.h"
 
 namespace ro::ui {
 namespace {
@@ -39,10 +40,6 @@ constexpr int kChanceColumn = 1;
 constexpr int kDrawColumn = 2;
 
 constexpr const char* kLinkMenuId = "##menu_lien_description";
-
-[[nodiscard]] int Compare(double left, double right) {
-  return left < right ? -1 : (left > right ? 1 : 0);
-}
 
 }  // namespace
 
@@ -171,9 +168,9 @@ void DrawOddsTab(DescriptionWindowState& state, const DescriptionView& view,
         const DescriptionOddsRow& b = view.odds[static_cast<std::size_t>(right)];
         int compared = 0;
         if (spec.ColumnIndex == kChanceColumn) {
-          compared = Compare(a.percent, b.percent);
+          compared = CompareValues(a.percent, b.percent);
         } else if (spec.ColumnIndex == kDrawColumn) {
-          compared = Compare(a.group, b.group);
+          compared = CompareValues(a.group, b.group);
         } else {
           compared = core::AsciiCompareFolded(a.name, b.name);
         }

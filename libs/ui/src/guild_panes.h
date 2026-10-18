@@ -34,16 +34,10 @@ inline constexpr ImU32 kGuildOnlineRowColor = IM_COL32(198, 232, 198, 160);
 
 [[nodiscard]] ImVec4 GuildInk(ImU32 color);
 
-// Le texte d'un tampon de saisie, jusqu'au premier zéro.
-[[nodiscard]] std::string_view BufferText(std::span<const char> buffer);
 // Copie un texte dans un tampon, sans couper un caractère en deux.
 void CopyIntoBuffer(std::span<char> buffer, std::string_view text);
 
 // ── LES IDENTIFIANTS DES BOÎTES ─────────────────────────────────────────────
-//
-// ⚠ LE TITRE SE TRADUIT, L'IDENTIFIANT NON : une boîte s'ouvre et se dessine
-// sous le même identifiant, quelle que soit la langue.
-[[nodiscard]] std::string GuildModalName(const char* title, std::string_view id);
 inline constexpr std::string_view kGuildLeaveModalId = "###guild_leave";
 inline constexpr std::string_view kGuildDisbandModalId = "###guild_disband";
 inline constexpr std::string_view kGuildExpelModalId = "###guild_expel";

@@ -14,16 +14,13 @@
 #include "ro/ui/skinned_window.h"
 
 #include "party_friend_parts.h"
+#include "ui_strings.h"
 
 namespace ro::ui {
 namespace {
 
 constexpr const char* kConfirmId = "###party_confirm";
 constexpr const char* kInviteId = "###party_invite";
-
-[[nodiscard]] std::string ModalName(const char* title, const char* id) {
-  return std::string(title) + id;
-}
 
 void CopyName(std::string_view name) { ImGui::SetClipboardText(std::string(name).c_str()); }
 
@@ -173,7 +170,7 @@ void DrawFriendRowMenu(PartyFriendWindowState& state, const PartyFriendView& vie
 
 void DrawPartyConfirm(PartyFriendWindowState& state, const SkinArt& art,
                       PartyFriendAction& action) {
-  const std::string id = ModalName(core::Tr("Confirmation"), kConfirmId);
+  const std::string id = SuffixedLabel(core::Tr("Confirmation"), kConfirmId);
   if (state.ask_confirm) {
     AskModal(id.c_str());
     state.ask_confirm = false;
@@ -210,7 +207,7 @@ void DrawPartyConfirm(PartyFriendWindowState& state, const SkinArt& art,
 
 void DrawPartyInvite(const PartyFriendView& view, const SkinArt& art, PartyFriendAction& action) {
   const PartyInviteView& invite = view.invite;
-  const std::string id = ModalName(core::Tr("Demande reçue"), kInviteId);
+  const std::string id = SuffixedLabel(core::Tr("Demande reçue"), kInviteId);
   if (invite.active && !ImGui::IsPopupOpen(id.c_str())) {
     AskModal(id.c_str());
   }

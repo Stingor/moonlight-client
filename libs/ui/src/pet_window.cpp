@@ -22,6 +22,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_strings.h"
 
 namespace ro::ui {
 namespace {
@@ -88,14 +89,6 @@ void WrappedColored(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, InkOn(color, PaintingLook().body));
   ImGui::TextWrapped("%s", text);
   ImGui::PopStyleColor();
-}
-
-// Un libellé de bouton suivi d'un identifiant fixe : deux boutons de même texte
-// ne partagent pas leur identité.
-[[nodiscard]] std::string Labelled(const char* text, const char* id) {
-  std::string label = text;
-  label += id;
-  return label;
 }
 
 const char* IntimacyText(PetIntimacyLabel label) {
@@ -191,7 +184,7 @@ void DrawRenameRow(PetWindowState& state, const PetWindowView& view, const SkinA
       }
     }
     ImGui::SameLine();
-    if (SkinSmallButton(Labelled(core::Tr("Annuler"), "##pet_rename_cancel").c_str(), art,
+    if (SkinSmallButton(SuffixedLabel(core::Tr("Annuler"), "##pet_rename_cancel").c_str(), art,
                         ImVec2(Px(kRenameButtonPixels), 0.0F))) {
       state.renaming = false;
     }
@@ -207,7 +200,7 @@ void DrawRenameRow(PetWindowState& state, const PetWindowView& view, const SkinA
   const std::string shown = view.name.empty() ? std::string("?") : view.name;
   if (view.renameable) {
     // LE NOM EST LE BOUTON, tant que le serveur accepte encore.
-    if (SkinSmallButton(Labelled(shown.c_str(), "##pet_rename").c_str(), art)) {
+    if (SkinSmallButton(SuffixedLabel(shown.c_str(), "##pet_rename").c_str(), art)) {
       std::fill(state.rename_buffer.begin(), state.rename_buffer.end(), '\0');
       std::copy_n(shown.begin(), std::min(shown.size(), state.rename_buffer.size() - 1),
                   state.rename_buffer.begin());
@@ -278,7 +271,7 @@ void DrawFeed(PetWindowState& state, const PetWindowView& view, const SkinArt& a
 void DrawFeedConfirmation(PetWindowState& state, const PetWindowView& view, const SkinArt& art,
                           PetWindowAction& action) {
   WrappedColored(kValueColor, core::Tr("Voulez-vous vraiment nourrir votre pet ?"));
-  if (SkinSmallButton(Labelled(core::Tr("Confirmer"), "##pet_feed_ok").c_str(), art,
+  if (SkinSmallButton(SuffixedLabel(core::Tr("Confirmer"), "##pet_feed_ok").c_str(), art,
                       ImVec2(Px(kConfirmButtonPixels), 0.0F))) {
     state.feed_confirming = false;
     // Seconde garde, à la CONFIRMATION.
@@ -289,7 +282,7 @@ void DrawFeedConfirmation(PetWindowState& state, const PetWindowView& view, cons
     }
   }
   ImGui::SameLine();
-  if (SkinSmallButton(Labelled(core::Tr("Annuler"), "##pet_feed_cancel").c_str(), art,
+  if (SkinSmallButton(SuffixedLabel(core::Tr("Annuler"), "##pet_feed_cancel").c_str(), art,
                       ImVec2(Px(kConfirmButtonPixels), 0.0F))) {
     state.feed_confirming = false;
   }
@@ -314,7 +307,7 @@ void DrawReturnToEgg(PetWindowState& state, const SkinArt& art, PetWindowAction&
     action.order = PetOrder::kReturnToEgg;
   }
   ImGui::SameLine();
-  if (SkinSmallButton(Labelled(core::Tr("Annuler"), "##pet_egg_cancel").c_str(), art,
+  if (SkinSmallButton(SuffixedLabel(core::Tr("Annuler"), "##pet_egg_cancel").c_str(), art,
                       ImVec2(Px(kConfirmButtonPixels), 0.0F))) {
     state.return_confirming = false;
   }
@@ -398,14 +391,14 @@ void DrawEvolutionPanel(PetWindowState& state, const PetWindowView& view, const 
     WrappedColored(kRedColor, refusal.c_str());
   }
   ImGui::BeginDisabled(!refusal.empty());
-  if (SkinSmallButton(Labelled(core::Tr("Faire évoluer"), "##pet_evo_ok").c_str(), art,
+  if (SkinSmallButton(SuffixedLabel(core::Tr("Faire évoluer"), "##pet_evo_ok").c_str(), art,
                       ImVec2(Px(kEvolveButtonPixels), 0.0F))) {
     action.evolve_to = panel.target_egg_id;
     state.evolution_target = 0;
   }
   ImGui::EndDisabled();
   ImGui::SameLine();
-  if (SkinSmallButton(Labelled(core::Tr("Annuler"), "##pet_evo_cancel").c_str(), art,
+  if (SkinSmallButton(SuffixedLabel(core::Tr("Annuler"), "##pet_evo_cancel").c_str(), art,
                       ImVec2(Px(kConfirmButtonPixels), 0.0F))) {
     state.evolution_target = 0;
   }
@@ -435,7 +428,7 @@ void DrawEvolutions(PetWindowState& state, const PetWindowView& view, const Skin
                   target.species.empty() ? "?" : target.species.c_str());
     const std::string id = "##pet_evo" + std::to_string(rank++);
     // Recliquer la même cible replie le panneau.
-    if (SkinSmallButton(Labelled(text.data(), id.c_str()).c_str(), art)) {
+    if (SkinSmallButton(SuffixedLabel(text.data(), id.c_str()).c_str(), art)) {
       state.evolution_target = state.evolution_target == target.egg_id ? 0 : target.egg_id;
     }
   }

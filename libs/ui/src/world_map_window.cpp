@@ -14,6 +14,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_color.h"
 #include "world_map_flight.h"
 #include "world_map_marks.h"
 
@@ -37,11 +38,6 @@ constexpr const char* kStaffMenuId = "##wm_staff_menu";
 [[nodiscard]] bool Contains(const WorldMapRect& rect, ImVec2 point) {
   return point.x >= rect.left && point.x <= rect.right && point.y >= rect.top &&
          point.y <= rect.bottom;
-}
-
-// La même couleur, opaque.
-[[nodiscard]] ImU32 Opaque(ImU32 color) {
-  return (color & ~IM_COL32_A_MASK) | IM_COL32(0, 0, 0, 255);
 }
 
 // Le niveau, s'il y en a un, sur sa ligne.

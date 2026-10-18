@@ -11,7 +11,9 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "trade_gestures.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -57,30 +59,6 @@ bool Placed(const BuyingStoreSetupState& state, std::uint32_t item_id) {
          state.lines.end();
 }
 
-void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint32_t item_id,
-              ItemLinkMenu& menu, BuyingStoreSetupAction& action) {
-  if (gesture.hovered) {
-    action.hovered_id = item_id;
-  }
-  TradeItemView aimed = item;
-  aimed.item_id = item_id;
-  if (NoteTradeItemLink(gesture, aimed, 0, menu)) {
-    action.describe_id = item_id;
-    action.item_gesture = ChatLinkGesture::kRepost;
-  }
-}
-
-std::string JoinedReasons(std::span<const std::string_view> reasons) {
-  std::string joined;
-  for (const std::string_view reason : reasons) {
-    if (!joined.empty()) {
-      joined.push_back('\n');
-    }
-    joined.append(reason);
-  }
-  return joined;
-}
-
 void DrawName(BuyingStoreSetupState& state, const BuyingStoreSetupView& view) {
   ImGui::AlignTextToFramePadding();
   ImGui::TextUnformatted(core::Tr("Nom"));
@@ -121,8 +99,8 @@ void DrawCandidates(BuyingStoreSetupState& state, const BuyingStoreSetupView& vi
       ImGui::PushID(kCandidateIdBase + static_cast<int>(index));
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      NoteItem(DrawTradeItem(candidate.item), candidate.item, candidate.item.item_id,
-               state.item_menu, action);
+      NoteItemById(DrawTradeItem(candidate.item), candidate.item, candidate.item.item_id,
+                   state.item_menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
       ImGui::TextColored(kTradeBlackText, "%d", candidate.owned);
@@ -183,7 +161,7 @@ void DrawLines(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, c
       ImGui::TableNextColumn();
       const TradeItemView item =
           candidate != nullptr ? candidate->item : TradeItemView{.item_id = line.item_id};
-      NoteItem(DrawTradeItem(item), item, line.item_id, state.item_menu, action);
+      NoteItemById(DrawTradeItem(item), item, line.item_id, state.item_menu, action);
       // LA LIGNE EN CAUSE SE DÉSIGNE : le serveur refuserait l'échoppe entière
       // sans dire laquelle.
       if (rank < view.line_notes.size() && !view.line_notes[rank].empty()) {
@@ -287,7 +265,7 @@ void DrawFooter(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, 
     ImGui::EndDisabled();
   }
   if (!view.blockers.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(JoinedReasons(view.blockers).c_str());
+    SkinTooltip(JoinedLines(view.blockers).c_str());
   }
   ImGui::SameLine();
   if (SkinButton(core::Tr("Annuler"), art)) {

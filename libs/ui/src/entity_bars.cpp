@@ -13,11 +13,10 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/gauge_fill.h"
 
+#include "ui_values.h"
+
 namespace ro::ui {
 namespace {
-
-// Cent, pour dire une part en pour cent.
-constexpr std::int64_t kPercent = 100;
 
 // L'ombre portée du texte : une part de sa hauteur, jamais moins d'un pixel.
 constexpr float kShadowShare = 0.09F;
@@ -52,12 +51,7 @@ constexpr float kFullChannel = 255.0F;
 
 // La part en pour cent, ou zéro quand il n'y a rien à diviser.
 [[nodiscard]] std::int64_t PercentOf(const EntityGauge& gauge) {
-  if (!gauge.known || gauge.most <= 0) {
-    return 0;
-  }
-  const auto current = static_cast<std::int64_t>(gauge.current);
-  const auto most = static_cast<std::int64_t>(gauge.most);
-  return std::clamp<std::int64_t>(current * kPercent / most, 0, kPercent);
+  return GaugePercent(gauge.known, gauge.current, gauge.most);
 }
 
 // LE TEXTE D'UNE BARRE, CENTRÉ ET POSÉ SUR LE TEXEL.

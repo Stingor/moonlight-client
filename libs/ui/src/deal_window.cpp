@@ -15,6 +15,7 @@
 #include "item_grid.h"
 #include "ui_popup.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -114,21 +115,9 @@ void TextOf(ImVec4 color, std::string_view text) {
   ImGui::PopStyleColor();
 }
 
-// Les raisons qui retiennent un bouton, une par ligne, pour son infobulle.
-[[nodiscard]] std::string Joined(std::span<const std::string_view> reasons) {
-  std::string joined;
-  for (const std::string_view reason : reasons) {
-    if (!joined.empty()) {
-      joined.push_back('\n');
-    }
-    joined.append(reason);
-  }
-  return joined;
-}
-
 void TipWhenHeld(std::span<const std::string_view> reasons) {
   if (!reasons.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(Joined(reasons).c_str());
+    SkinTooltip(JoinedLines(reasons).c_str());
   }
 }
 

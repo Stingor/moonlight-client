@@ -18,13 +18,11 @@
 
 #include "chat_room_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
 namespace {
-
-using chat_room::Owned;
-using chat_room::Typed;
 
 // Les mesures de la salle.
 constexpr float kFirstWidthPixels = 460.0F;
@@ -92,7 +90,7 @@ void DrawMembers(ChatRoomWindowState& state, const ChatRoomView& view,
     // la barre, où le joueur LIT à qui il parle. Le client d'origine détournait
     // la saisie sans rien montrer.
     if (!member.me) {
-      const std::string id = "##chatroom_member_" + chat_room::Shown(name);
+      const std::string id = "##chatroom_member_" + Unhashed(name);
       if (ImGui::Selectable(id.c_str(), false, ImGuiSelectableFlags_AllowOverlap,
                             ImVec2(0.0F, ImGui::GetTextLineHeight())) &&
           view.input != nullptr) {
@@ -189,8 +187,8 @@ void DrawSettingsPane(ChatRoomWindowState& state, const ChatRoomView& view, cons
     ColoredText(PaintingLook().bad_text, view.settings_error);
   }
 
-  const std::string_view title = Typed(state.settings_title);
-  const std::size_t password = chat_room::PasswordBytes(Typed(state.settings_password));
+  const std::string_view title = TypedText(state.settings_title);
+  const std::size_t password = chat_room::PasswordBytes(TypedText(state.settings_password));
   const bool ok =
       !title.empty() && title.size() <= view.limits.title_bytes && chat_room::IsAscii(title) &&
       (state.settings_public ||

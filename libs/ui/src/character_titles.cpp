@@ -9,6 +9,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 
@@ -28,16 +29,6 @@ constexpr ImVec4 kTitleFaintColor(0.35F, 0.35F, 0.42F, 1.0F);
 // LA MARQUE DE LA LIGNE PORTÉE, et le blanc qui aligne les autres sur elle.
 constexpr std::string_view kEquippedMark = "> ";
 constexpr std::string_view kUnequippedMark = "   ";
-
-// Le filtre ignore la casse — des lettres latines, les seules qu'un libellé de
-// titre emploie.
-[[nodiscard]] bool ContainsIgnoringCase(std::string_view haystack, std::string_view needle) {
-  const auto folded = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return !std::ranges::search(haystack, needle, folded).empty() || needle.empty();
-}
 
 }  // namespace
 
@@ -82,7 +73,7 @@ void DrawCharacterTitles(std::span<char> filter, const CharacterTitlesView& titl
   }
 
   for (const CharacterTitleView& title : titles.owned) {
-    if (filtering && !ContainsIgnoringCase(title.label, needle)) {
+    if (filtering && !core::AsciiContainsFolded(title.label, needle)) {
       continue;
     }
     ImGui::PushID(title.title_id);

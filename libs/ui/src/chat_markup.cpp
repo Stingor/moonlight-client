@@ -13,6 +13,8 @@
 #include "ro/core/web_address.h"
 #include "ro/ui/chat_emote_names.h"
 
+#include "ui_strings.h"
+
 namespace ro::ui {
 namespace {
 
@@ -55,11 +57,6 @@ constexpr char kEmoteMark = ':';
 // Les deux « : » qui encadrent un nom d'emote.
 constexpr std::size_t kEmoteColons = 2;
 constexpr std::size_t kLongestEmoteName = 24;
-
-[[nodiscard]] bool IsHexDigit(char letter) {
-  return (letter >= '0' && letter <= '9') || (letter >= 'a' && letter <= 'f') ||
-         (letter >= 'A' && letter <= 'F');
-}
 
 [[nodiscard]] bool IsDigit(char letter) { return letter >= '0' && letter <= '9'; }
 

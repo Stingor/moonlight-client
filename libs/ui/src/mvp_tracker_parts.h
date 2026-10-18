@@ -105,24 +105,12 @@ inline constexpr int kMvpColumnCount = 8;
 inline constexpr int kMvpSortKeysPerColumn = 2;
 // La table des membres : nom, niveau, état, action.
 inline constexpr int kMvpMemberColumnCount = 4;
-// Un texte composé d'une ligne : une phrase, un en-tête, un titre.
-inline constexpr std::size_t kMvpPrintedBytes = 256;
 // Les unités.
 inline constexpr std::int64_t kMvpSecondsPerHour = 3600;
 inline constexpr std::int64_t kMvpSecondsPerMinute = 60;
 inline constexpr std::uint32_t kMvpMsPerMinute = 60000;
 
 // ── LES AIDES PARTAGÉES ─────────────────────────────────────────────────────
-
-// Un texte à la manière de `printf`, pour une ligne.
-//
-// ⚠ UNE VRAIE FONCTION VARIADIQUE, MARQUÉE COMME `printf` : c'est ce qui fait
-// vérifier ses arguments contre le littéral français que `Tr` a reçu.
-#if defined(__GNUC__) || defined(__clang__)
-[[nodiscard]] __attribute__((format(printf, 1, 2))) std::string Printed(const char* format, ...);
-#else
-[[nodiscard]] std::string Printed(const char* format, ...);
-#endif
 
 // L'INFOBULLE D'UN GESTE GRISÉ faute de liaison vérifiée, posée sur l'élément
 // qu'on vient de dessiner ; rien si la liaison l'est.

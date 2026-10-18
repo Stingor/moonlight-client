@@ -11,6 +11,8 @@
 #include "ro/ui/entity_bars.h"
 #include "ro/ui/gauge_fill.h"
 
+#include "ui_color.h"
+
 namespace ro::ui {
 namespace {
 
@@ -40,12 +42,6 @@ constexpr int kPercentWhole = 100;
 // Le cadre du client : un pixel tout autour du creux.
 constexpr float kClientFramePixels = 1.0F;
 
-[[nodiscard]] ImU32 Faded(ImU32 color, float share) {
-  const auto alpha = static_cast<float>((color >> IM_COL32_A_SHIFT) & 0xFFU);
-  const auto kept = static_cast<ImU32>(std::lround(alpha * std::clamp(share, 0.0F, 1.0F)));
-  return (color & ~IM_COL32_A_MASK) | (kept << IM_COL32_A_SHIFT);
-}
-
 [[nodiscard]] std::uint32_t RemainingMs(const CastBarView& what) {
   return what.total_ms > what.elapsed_ms ? what.total_ms - what.elapsed_ms : 0;
 }
@@ -73,7 +69,7 @@ void PaintReplacedBar(ImDrawList& into, const CastBarView& what, const CastBarLo
                         std::round(what.head.y + look.offset_pixels));
   const ImVec2 bottom_right(top_left.x + width, top_left.y + height);
 
-  into.AddRectFilled(top_left, bottom_right, Faded(look.background, opacity), rounding);
+  into.AddRectFilled(top_left, bottom_right, ScaledAlpha(look.background, opacity), rounding);
   // ⚠ LA PART PLEINE DANS L'INTÉRIEUR DU CADRE, découpée dans sa forme arrondie :
   // voir `gauge_fill.h`. Le front qui avance reste une arête franche, sans quoi
   // il « fond » à mesure qu'il progresse, et ne suit la courbe qu'au bout.
@@ -81,10 +77,11 @@ void PaintReplacedBar(ImDrawList& into, const CastBarView& what, const CastBarLo
       GaugeInterior(top_left, bottom_right, rounding, look.border ? kBorderPixels : 0.0F);
   const float share = CastBarProgress(what);
   if ((interior.max.x - interior.min.x) * share >= kLeastFillPixels) {
-    PaintGaugeFill(into, interior, share, GaugeGrowth::kRightward, Faded(look.fill, opacity));
+    PaintGaugeFill(into, interior, share, GaugeGrowth::kRightward, ScaledAlpha(look.fill, opacity));
   }
   if (look.border) {
-    into.AddRect(top_left, bottom_right, Faded(kBorderColor, opacity), rounding, kBorderPixels);
+    into.AddRect(top_left, bottom_right, ScaledAlpha(kBorderColor, opacity), rounding,
+                 kBorderPixels);
   }
 
   const std::string caption = CastBarCaption(look, what);
@@ -108,8 +105,8 @@ void PaintReplacedBar(ImDrawList& into, const CastBarView& what, const CastBarLo
           ? ImVec2(bottom_right.x + kCaptionAsidePixels, top_left.y + (height - size.y) * 0.5F)
           : ImVec2(what.head.x - size.x * 0.5F, top_left.y - size.y - kCaptionLiftPixels);
   const ImVec2 relief(at.x + kCaptionReliefOffset.x, at.y + kCaptionReliefOffset.y);
-  into.AddText(font, pixels, relief, Faded(kCaptionRelief, opacity), caption.c_str());
-  into.AddText(font, pixels, at, Faded(kCaptionColor, opacity), caption.c_str());
+  into.AddText(font, pixels, relief, ScaledAlpha(kCaptionRelief, opacity), caption.c_str());
+  into.AddText(font, pixels, at, ScaledAlpha(kCaptionColor, opacity), caption.c_str());
 }
 
 }  // namespace

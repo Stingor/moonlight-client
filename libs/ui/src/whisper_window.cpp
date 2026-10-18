@@ -13,7 +13,9 @@
 #include "ro/ui/skinned_window.h"
 
 #include "chat_input_chips.h"
+#include "ui_input.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 
 namespace ro::ui {
 namespace {
@@ -33,26 +35,6 @@ void SnapToSteps(ImGuiSizeCallbackData* data) {
       snapped(data->DesiredSize.y, kWhisperFirstHeightPixels, kWhisperMostHeightPixels);
 }
 
-// UN NOM D'AUTRE JOUEUR DANS UN TITRE, sans que ses « ## » deviennent des
-// identifiants d'ImGui : ils couperaient le titre.
-[[nodiscard]] std::string Unhashed(std::string_view text) {
-  std::string out;
-  out.reserve(text.size());
-  for (const char letter : text) {
-    if (letter == '#' && !out.empty() && out.back() == '#') {
-      out.push_back(' ');
-    }
-    out.push_back(letter);
-  }
-  return out;
-}
-
-// La saisie, jusqu'à son zéro.
-[[nodiscard]] std::string_view Typed(const std::array<char, kChatInputSize>& buffer) {
-  const auto end = std::ranges::find(buffer, '\0');
-  return std::string_view(buffer.data(), static_cast<std::size_t>(end - buffer.begin()));
-}
-
 // Ce que le dépôt a laissé — un emoji, un `:nom:`, un lien posé — écrit au
 // bout du texte. Rien n'est tronqué : la moitié d'un emoji s'afficherait en
 // losanges. Rend vrai quand le texte a changé.
@@ -66,15 +48,6 @@ void SnapToSteps(ImGuiSizeCallbackData* data) {
   }
   input.pending_insert.clear();
   return fits;
-}
-
-// 🔴 ÉCRIRE DANS LE TAMPON D'UN CHAMP SANS LE LUI DIRE laisse son curseur posé
-// sur l'ancien texte ; et le champ actif tient sa propre copie, qui écraserait
-// la nôtre à l'image suivante.
-void ReloadField(ImGuiID field) {
-  if (ImGuiInputTextState* edited = ImGui::GetInputTextState(field)) {
-    edited->ReloadUserBufAndMoveToEnd();
-  }
 }
 
 // CE QUE LA PALETTE A RENDU : le `:nom:` cliqué part au correspondant, l'emoji et
@@ -145,10 +118,10 @@ void DrawInputRow(WhisperWindowState& state, const WhisperWindowView& view,
   // ⚠ DE QUELLE SAISIE : chaque conversation a ses propres liens posés.
   action.input_link.input_peer = view.peer;
   if (inserted) {
-    ReloadField(field);
+    ReloadInputField(field);
   }
   if (submitted) {
-    const std::string_view typed = Typed(state.input.text);
+    const std::string_view typed = TypedText(state.input.text);
     if (!typed.empty()) {
       action.said = std::string(typed);
     }

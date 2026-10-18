@@ -13,6 +13,7 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_color.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -35,14 +36,6 @@ constexpr int kTabHoverLift = 14;
 constexpr auto kTabColors = std::to_array<ImGuiCol>(
     {ImGuiCol_Tab, ImGuiCol_TabHovered, ImGuiCol_TabSelected, ImGuiCol_TabDimmed,
      ImGuiCol_TabDimmedSelected, ImGuiCol_TabSelectedOverline, ImGuiCol_TabDimmedSelectedOverline});
-
-[[nodiscard]] ImU32 Lighter(ImU32 color, int by) {
-  const auto clamp = [](int channel) { return channel > 255 ? 255 : channel; };
-  return IM_COL32(clamp(static_cast<int>((color >> IM_COL32_R_SHIFT) & 0xFF) + by),
-                  clamp(static_cast<int>((color >> IM_COL32_G_SHIFT) & 0xFF) + by),
-                  clamp(static_cast<int>((color >> IM_COL32_B_SHIFT) & 0xFF) + by),
-                  static_cast<int>((color >> IM_COL32_A_SHIFT) & 0xFF));
-}
 
 // Peint un MORCEAU d'une pièce : un rectangle de l'écran, un rectangle de la
 // texture.

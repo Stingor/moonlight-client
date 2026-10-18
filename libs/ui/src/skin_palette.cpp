@@ -5,20 +5,10 @@
 #include <tuple>
 #include <utility>
 
+#include "ui_color.h"
+
 namespace ro::ui {
 namespace {
-
-// Une couleur éclaircie d'autant sur chaque canal : c'est ainsi que le jeu
-// marque le survol d'un champ ou d'un onglet, plutôt qu'avec une seconde teinte
-// à tenir à jour.
-[[nodiscard]] constexpr ImU32 Lighter(ImU32 color, int by) {
-  const auto clamp = [](int channel) { return channel > 255 ? 255 : channel; };
-  const int red = clamp(static_cast<int>((color >> IM_COL32_R_SHIFT) & 0xFF) + by);
-  const int green = clamp(static_cast<int>((color >> IM_COL32_G_SHIFT) & 0xFF) + by);
-  const int blue = clamp(static_cast<int>((color >> IM_COL32_B_SHIFT) & 0xFF) + by);
-  const int alpha = static_cast<int>((color >> IM_COL32_A_SHIFT) & 0xFF);
-  return IM_COL32(red, green, blue, alpha);
-}
 
 constexpr int kHoverLift = 10;
 constexpr int kActiveLift = 22;

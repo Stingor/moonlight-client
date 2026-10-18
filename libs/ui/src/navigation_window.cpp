@@ -17,6 +17,7 @@
 
 #include "navigation_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -48,8 +49,6 @@ constexpr float kUnderlineDrop = 1.0F;
 constexpr const char* kIconPopupId = "##navi_icon_pick";
 constexpr const char* kStepSeparator = "  >  ";
 constexpr std::size_t kIdBytes = 32;
-
-[[nodiscard]] std::string Owned(std::string_view text) { return std::string(text); }
 
 void ForgetSelection(NavigationWindowState& state) {
   state.selected_group = -1;

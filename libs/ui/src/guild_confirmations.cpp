@@ -17,6 +17,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -59,7 +60,7 @@ void ReasonField(GuildTabState& state, const char* id) {
 }
 
 void DrawRelationBox(GuildTabState& state, const SkinArt& art, GuildAction& action) {
-  const std::string id = GuildModalName(core::Tr("Rompre la relation"), kGuildRelationModalId);
+  const std::string id = SuffixedLabel(core::Tr("Rompre la relation"), kGuildRelationModalId);
   if (!BeginSkinnedModal(id.c_str(), art)) {
     return;
   }
@@ -84,7 +85,7 @@ void DrawRelationBox(GuildTabState& state, const SkinArt& art, GuildAction& acti
 }
 
 void DrawLeaveBox(GuildTabState& state, const SkinArt& art, GuildAction& action) {
-  const std::string id = GuildModalName(core::Tr("Quitter la guilde"), kGuildLeaveModalId);
+  const std::string id = SuffixedLabel(core::Tr("Quitter la guilde"), kGuildLeaveModalId);
   if (!BeginSkinnedModal(id.c_str(), art)) {
     return;
   }
@@ -94,7 +95,7 @@ void DrawLeaveBox(GuildTabState& state, const SkinArt& art, GuildAction& action)
   ReasonField(state, "##motif_depart");
   if (ConfirmButton(core::Tr("Quitter"), art)) {
     action.verb = GuildVerb::kLeave;
-    action.text = std::string(BufferText(state.reason));
+    action.text = std::string(TypedText(state.reason));
     state.status = core::Tr("Départ envoyé.");
     ImGui::CloseCurrentPopup();
   }
@@ -104,7 +105,7 @@ void DrawLeaveBox(GuildTabState& state, const SkinArt& art, GuildAction& action)
 
 void DrawDisbandBox(GuildTabState& state, const GuildView& view, const SkinArt& art,
                     GuildAction& action) {
-  const std::string id = GuildModalName(core::Tr("Dissoudre la guilde"), kGuildDisbandModalId);
+  const std::string id = SuffixedLabel(core::Tr("Dissoudre la guilde"), kGuildDisbandModalId);
   if (!BeginSkinnedModal(id.c_str(), art)) {
     return;
   }
@@ -131,7 +132,7 @@ void DrawDisbandBox(GuildTabState& state, const GuildView& view, const SkinArt& 
   ImGui::InputTextWithHint("##dissolution", core::Tr("Nom exact de la guilde"),
                            state.disband_confirm.data(), state.disband_confirm.size());
   ImGui::Spacing();
-  const bool matches = !view.name.empty() && BufferText(state.disband_confirm) == view.name;
+  const bool matches = !view.name.empty() && TypedText(state.disband_confirm) == view.name;
   ImGui::BeginDisabled(!matches);
   if (ConfirmButton(core::Tr("Dissoudre"), art)) {
     action.verb = GuildVerb::kDisband;
@@ -145,7 +146,7 @@ void DrawDisbandBox(GuildTabState& state, const GuildView& view, const SkinArt& 
 }
 
 void DrawExpelBox(GuildTabState& state, const SkinArt& art, GuildAction& action) {
-  const std::string id = GuildModalName(core::Tr("Expulser de la guilde"), kGuildExpelModalId);
+  const std::string id = SuffixedLabel(core::Tr("Expulser de la guilde"), kGuildExpelModalId);
   if (!BeginSkinnedModal(id.c_str(), art)) {
     return;
   }
@@ -159,7 +160,7 @@ void DrawExpelBox(GuildTabState& state, const SkinArt& art, GuildAction& action)
     action.verb = GuildVerb::kExpel;
     action.account_id = state.target_account;
     action.char_id = state.target_char;
-    action.text = std::string(BufferText(state.reason));
+    action.text = std::string(TypedText(state.reason));
     state.status = Reported(core::Tr("%s : expulsion envoyée."), state.target_name);
     ImGui::CloseCurrentPopup();
   }
@@ -169,7 +170,7 @@ void DrawExpelBox(GuildTabState& state, const SkinArt& art, GuildAction& action)
 
 void DrawTransferBox(GuildTabState& state, const GuildView& view, const SkinArt& art,
                      GuildAction& action) {
-  const std::string id = GuildModalName(core::Tr("Transférer la direction"), kGuildTransferModalId);
+  const std::string id = SuffixedLabel(core::Tr("Transférer la direction"), kGuildTransferModalId);
   if (!BeginSkinnedModal(id.c_str(), art)) {
     return;
   }
@@ -194,7 +195,7 @@ void DrawTransferBox(GuildTabState& state, const GuildView& view, const SkinArt&
                            state.transfer_confirm.data(), state.transfer_confirm.size());
   ImGui::Spacing();
   const bool matches =
-      !state.target_name.empty() && BufferText(state.transfer_confirm) == state.target_name;
+      !state.target_name.empty() && TypedText(state.transfer_confirm) == state.target_name;
   ImGui::BeginDisabled(!matches);
   if (ConfirmButton(core::Tr("Transférer"), art)) {
     action.verb = GuildVerb::kTransferMaster;
@@ -217,15 +218,15 @@ void DrawGuildConfirmations(GuildTabState& state, const GuildView& view, const S
   // l'identifiant soit celui de la boîte.
   if (state.ask_expel) {
     state.ask_expel = false;
-    AskModal(GuildModalName(core::Tr("Expulser de la guilde"), kGuildExpelModalId).c_str());
+    AskModal(SuffixedLabel(core::Tr("Expulser de la guilde"), kGuildExpelModalId).c_str());
   }
   if (state.ask_relation) {
     state.ask_relation = false;
-    AskModal(GuildModalName(core::Tr("Rompre la relation"), kGuildRelationModalId).c_str());
+    AskModal(SuffixedLabel(core::Tr("Rompre la relation"), kGuildRelationModalId).c_str());
   }
   if (state.ask_transfer) {
     state.ask_transfer = false;
-    AskModal(GuildModalName(core::Tr("Transférer la direction"), kGuildTransferModalId).c_str());
+    AskModal(SuffixedLabel(core::Tr("Transférer la direction"), kGuildTransferModalId).c_str());
   }
   DrawRelationBox(state, art, action);
   DrawLeaveBox(state, art, action);

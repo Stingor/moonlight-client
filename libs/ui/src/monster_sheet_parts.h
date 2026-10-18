@@ -46,17 +46,6 @@ void DrawBossBadge(std::uint8_t rank);
 // Le relevé de Sense qui diffère de la base.
 inline constexpr ImU32 kSenseNoteColor = IM_COL32(179, 140, 51, 255);
 
-// Un texte à la manière de `printf`, pour une ligne.
-//
-// ⚠ UNE VRAIE FONCTION VARIADIQUE, MARQUÉE COMME `printf` : c'est ce qui fait
-// vérifier ses arguments contre le littéral français que `Tr` a reçu. Un
-// gabarit de fonction perdrait ce contrôle.
-#if defined(__GNUC__) || defined(__clang__)
-[[nodiscard]] __attribute__((format(printf, 1, 2))) std::string Printed(const char* format, ...);
-#else
-[[nodiscard]] std::string Printed(const char* format, ...);
-#endif
-
 // Un libellé, dans la couleur des libellés.
 void Label(const char* text);
 // Une PHRASE, qui s'enroule au bord de la fenêtre au lieu d'y être coupée.

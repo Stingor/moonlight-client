@@ -16,10 +16,13 @@
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
+#include "ro/core/printed.h"
 #include "ro/core/text.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "ui_scale.h"
+#include "ui_strings.h"
+#include "ui_values.h"
 
 namespace ro::ui {
 
@@ -29,7 +32,6 @@ using mvp_tracker::kMvpCollapsedExactFreshS;
 using mvp_tracker::kMvpCollapsedWindowFreshS;
 using mvp_tracker::kMvpSecondsPerHour;
 using mvp_tracker::kMvpSecondsPerMinute;
-using mvp_tracker::Printed;
 
 // Une heure saisie tient en quatre chiffres au plus : « hhmm », ou « hmm ».
 constexpr std::size_t kKillTimeMostDigits = 4;
@@ -72,23 +74,10 @@ enum class MvpResult : std::uint8_t {
 
 [[nodiscard]] int DigitValue(char digit) { return digit - '0'; }
 
-// Un octet de suite UTF-8, « 10xxxxxx » : jamais le début d'un caractère.
-constexpr unsigned kUtf8ContinuationMask = 0xC0U;
-constexpr unsigned kUtf8ContinuationBits = 0x80U;
-
-[[nodiscard]] bool IsUtf8Continuation(char byte) {
-  return (static_cast<unsigned char>(byte) & kUtf8ContinuationMask) == kUtf8ContinuationBits;
-}
-
 // La comparaison à trois voies de deux textes, octet par octet, comme `strcmp`.
 [[nodiscard]] int CompareBytes(std::string_view a, std::string_view b) {
   const int said = a.compare(b);
   return said < 0 ? -1 : (said > 0 ? 1 : 0);
-}
-
-template <typename T>
-[[nodiscard]] int CompareValues(T a, T b) {
-  return a < b ? -1 : (a > b ? 1 : 0);
 }
 
 // La hauteur d'une étoile de favori : son art, ou à défaut le petit bouton
@@ -128,9 +117,10 @@ std::string FormatMvpDuration(std::int64_t seconds) {
                        (seconds % kMvpSecondsPerHour) / kMvpSecondsPerMinute);
   }
   if (seconds >= kMvpSecondsPerMinute) {
-    return Printed(core::Tr("%lld min"), static_cast<long long>(seconds / kMvpSecondsPerMinute));
+    return core::Printed(core::Tr("%lld min"),
+                         static_cast<long long>(seconds / kMvpSecondsPerMinute));
   }
-  return Printed(core::Tr("%lld s"), static_cast<long long>(seconds));
+  return core::Printed(core::Tr("%lld s"), static_cast<long long>(seconds));
 }
 
 std::int64_t ParseMvpKillTime(std::string_view text, std::int64_t server_now_s) {
@@ -226,16 +216,16 @@ std::string MvpCollapsedTitle(std::span<const MvpSlotView> slots, std::int64_t s
   // retour », une fenêtre close est « passée », une fenêtre ouverte est
   // « possible ».
   if (best->exact && best->window_from_s <= server_now_s) {
-    return Printed(core::Tr("MVP : %s de retour"), label.c_str());
+    return core::Printed(core::Tr("MVP : %s de retour"), label.c_str());
   }
   if (!best->exact && best->window_to_s <= server_now_s) {
-    return Printed(core::Tr("MVP : %s, fenêtre passée"), label.c_str());
+    return core::Printed(core::Tr("MVP : %s, fenêtre passée"), label.c_str());
   }
   if (best->window_from_s <= server_now_s) {
-    return Printed(core::Tr("MVP : %s possible"), label.c_str());
+    return core::Printed(core::Tr("MVP : %s possible"), label.c_str());
   }
-  return Printed(core::Tr("MVP : %s dans %s"), label.c_str(),
-                 FormatMvpDuration(best->window_from_s - server_now_s).c_str());
+  return core::Printed(core::Tr("MVP : %s dans %s"), label.c_str(),
+                       FormatMvpDuration(best->window_from_s - server_now_s).c_str());
 }
 
 const char* MvpResultText(std::uint8_t code) {
@@ -390,13 +380,15 @@ std::string MvpReturnText(const MvpSlotView& slot, std::int64_t server_now_s) {
     if (from <= server_now_s) {
       return core::Tr("de retour");
     }
-    return Printed(core::Tr("dans %s (exact)"), FormatMvpDuration(from - server_now_s).c_str());
+    return core::Printed(core::Tr("dans %s (exact)"),
+                         FormatMvpDuration(from - server_now_s).c_str());
   }
   if (to <= server_now_s) {
     return core::Tr("fenêtre passée");
   }
   if (from <= server_now_s) {
-    return Printed(core::Tr("possible (encore %s)"), FormatMvpDuration(to - server_now_s).c_str());
+    return core::Printed(core::Tr("possible (encore %s)"),
+                         FormatMvpDuration(to - server_now_s).c_str());
   }
   return std::format("{} – {}", FormatMvpDuration(from - server_now_s),
                      FormatMvpDuration(to - server_now_s));
@@ -417,9 +409,9 @@ std::string MvpGroupHeader(std::string_view group_name, int accounts) {
   // son pli quand le groupe passe d'un à deux membres.
   const std::string name(group_name);
   if (accounts == 1) {
-    return Printed(core::Tr("Groupe « %s » — 1 membre###mvp_group"), name.c_str());
+    return core::Printed(core::Tr("Groupe « %s » — 1 membre###mvp_group"), name.c_str());
   }
-  return Printed(core::Tr("Groupe « %s » — %d membres###mvp_group"), name.c_str(), accounts);
+  return core::Printed(core::Tr("Groupe « %s » — %d membres###mvp_group"), name.c_str(), accounts);
 }
 
 std::string MvpKillTimeEcho(std::int64_t kill_time_s, std::int64_t server_now_s) {
@@ -433,9 +425,9 @@ std::string MvpKillTimeEcho(std::int64_t kill_time_s, std::int64_t server_now_s)
   }
   const std::string clock = std::format("{:02}:{:02}", kill.tm_hour, kill.tm_min);
   if (kill.tm_year == now.tm_year && kill.tm_yday == now.tm_yday) {
-    return Printed(core::Tr("%s aujourd'hui"), clock.c_str());
+    return core::Printed(core::Tr("%s aujourd'hui"), clock.c_str());
   }
-  return Printed(core::Tr("%s hier"), clock.c_str());
+  return core::Printed(core::Tr("%s hier"), clock.c_str());
 }
 
 std::size_t MvpWireCut(std::string_view utf8, std::size_t most_wire_bytes) {
@@ -489,22 +481,6 @@ MvpWireExcess MvpWireExcessOf(std::string_view utf8, std::size_t cursor,
 }
 
 namespace mvp_tracker {
-
-std::string Printed(const char* format, ...) {
-  std::array<char, kMvpPrintedBytes> text{};
-  std::va_list arguments;
-  va_start(arguments, format);
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-  std::vsnprintf(text.data(), text.size(), format, arguments);
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-  va_end(arguments);
-  return text.data();
-}
 
 void TellLinkPending(const MvpTrackerView& view) {
   if (!view.link_ready) {

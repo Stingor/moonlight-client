@@ -15,6 +15,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "quest_paint.h"
+#include "ui_strings.h"
 
 // LES PIÈCES QUE LES TROIS FICHIERS DU JOURNAL DES QUÊTES SE PARTAGENT : sa
 // palette, ses mesures communes, et les deux volets.
@@ -160,8 +161,5 @@ void DrawListColumn(QuestWindowState& state, const QuestWindowView& view, const 
 // LE DÉTAIL de la quête choisie, ou le filigrane quand rien ne l'est.
 void DrawDetail(const QuestWindowView& view, const QuestArt& art, const SkinArt& skin,
                 QuestWindowAction& action, PaneRequests& requests);
-
-// Le texte d'une vue, terminé par un zéro pour les fonctions d'ImGui.
-[[nodiscard]] inline std::string Owned(std::string_view text) { return std::string(text); }
 
 }  // namespace ro::ui::quest_window

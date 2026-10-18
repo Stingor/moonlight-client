@@ -23,6 +23,7 @@
 #include "table_cells.h"
 #include "ui_scale.h"
 #include "ui_text.h"
+#include "ui_values.h"
 
 namespace ro::ui {
 namespace {
@@ -47,10 +48,6 @@ constexpr std::size_t kRateBytes = 16;
 
 constexpr int kRateColumn = 1;
 constexpr int kKindColumn = 2;
-
-[[nodiscard]] int Compare(std::uint32_t left, std::uint32_t right) {
-  return left < right ? -1 : (left > right ? 1 : 0);
-}
 
 // « Chargement... » en attendant, l'appel au serveur quand personne n'a pu
 // demander.
@@ -116,11 +113,12 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
         const DescriptionDropRow& b = drops.rows[static_cast<std::size_t>(right)];
         int compared = 0;
         if (spec.ColumnIndex == kRateColumn) {
-          compared = Compare(a.rate_hundredths, b.rate_hundredths);
+          compared = CompareValues(a.rate_hundredths, b.rate_hundredths);
         } else if (spec.ColumnIndex == kKindColumn) {
           // Le mécanisme, puis le taux décroissant à mécanisme égal.
-          compared = a.mvp_reward != b.mvp_reward ? (a.mvp_reward ? 1 : -1)
-                                                  : -Compare(a.rate_hundredths, b.rate_hundredths);
+          compared = a.mvp_reward != b.mvp_reward
+                         ? (a.mvp_reward ? 1 : -1)
+                         : -CompareValues(a.rate_hundredths, b.rate_hundredths);
         } else {
           compared = core::AsciiCompareFolded(a.name, b.name);
         }

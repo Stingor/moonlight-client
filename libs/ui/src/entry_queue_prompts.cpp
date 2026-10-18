@@ -19,6 +19,7 @@
 
 #include "entry_queue_parts.h"
 #include "ui_popup.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -37,13 +38,6 @@ constexpr ImVec4 kHurryColor(0.80F, 0.10F, 0.10F, 1.0F);
 
 constexpr std::size_t kTextCapacity = 256;
 using Text = std::array<char, kTextCapacity>;
-
-[[nodiscard]] std::string Owned(std::string_view text) { return std::string(text); }
-
-// Le nom d'une modale : son titre traduit et son identité, qui ne bouge pas.
-[[nodiscard]] std::string ModalName(const char* title, const char* id) {
-  return std::string(title) + "###" + id;
-}
 
 // POURQUOI « Annuler l'inscription » est éteint ; nul s'il peut partir.
 //
@@ -167,7 +161,7 @@ EntryQueueAction DrawEntryQueueStandby(EntryQueueWindowState& state, const Entry
 EntryQueueAction DrawEntryQueueReady(EntryQueueWindowState& state, const EntryQueueView& view,
                                      const SkinArt& art) {
   EntryQueueAction action;
-  const std::string name = ModalName(core::Tr("Terrain prêt"), kEntryQueueReadyId);
+  const std::string name = HiddenIdLabel(core::Tr("Terrain prêt"), kEntryQueueReadyId);
   // 🔴 ELLE NE S'OUVRE QUE SUR UNE PILE VIDE : un surgissant déjà ouvert — une
   // confirmation, une saisie — serait fermé par elle. Elle attend donc qu'il se
   // ferme ; le compte à rebours, lui, court déjà dans « en attente ».
@@ -246,7 +240,7 @@ EntryQueueAction DrawEntryQueueReady(EntryQueueWindowState& state, const EntryQu
 EntryQueueAction DrawEntryQueueNotice(EntryQueueWindowState& state, const EntryQueueView& view,
                                       const SkinArt& art) {
   EntryQueueAction action;
-  const std::string name = ModalName(core::Tr("Champ de bataille"), kNoticeId);
+  const std::string name = HiddenIdLabel(core::Tr("Champ de bataille"), kNoticeId);
   if (view.notice.empty()) {
     state.asked_notice = false;
   } else if (!state.asked_notice && !AnyPopupOpen()) {

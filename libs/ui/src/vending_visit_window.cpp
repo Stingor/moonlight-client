@@ -14,6 +14,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "trade_gestures.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -49,17 +50,6 @@ int& OfferAmountFor(VendingVisitWindowState& state, std::uint16_t shop_slot, int
   }
   found->second = std::clamp(found->second, 1, std::max(stock, 1));
   return found->second;
-}
-
-void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::uint16_t shop_slot,
-              ItemLinkMenu& menu, VendingVisitAction& action) {
-  if (gesture.hovered) {
-    action.hovered_slot = shop_slot;
-  }
-  if (NoteTradeItemLink(gesture, item, shop_slot, menu)) {
-    action.describe_slot = shop_slot;
-    action.item_gesture = ChatLinkGesture::kRepost;
-  }
 }
 
 // Un achat part, ou attend sa confirmation s'il coûte assez pour mériter
@@ -104,7 +94,7 @@ void DrawOffers(VendingVisitWindowState& state, const VendingVisitView& view, co
     ImGui::PushID(offer.shop_slot);
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    NoteItem(DrawTradeItem(offer.item), offer.item, offer.shop_slot, state.item_menu, action);
+    NoteItemBySlot(DrawTradeItem(offer.item), offer.item, offer.shop_slot, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     ImGui::Text("%d", offer.stock);
@@ -174,7 +164,8 @@ void DrawBasket(VendingVisitWindowState& state, const VendingVisitView& view, co
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     if (offer != nullptr) {
-      NoteItem(DrawTradeItem(offer->item), offer->item, entry.shop_slot, state.item_menu, action);
+      NoteItemBySlot(DrawTradeItem(offer->item), offer->item, entry.shop_slot, state.item_menu,
+                     action);
     } else {
       ImGui::AlignTextToFramePadding();
       ImGui::TextDisabled("%s", core::Tr("(n'est plus en vente)"));

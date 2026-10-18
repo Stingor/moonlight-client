@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/skin_tooltip.h"
 
 #include "monster_sheet_parts.h"
@@ -18,9 +19,6 @@ namespace {
 
 // La largeur d'une bulle d'aide, en caractères de la police.
 constexpr float kHelpWrapChars = 32.0F;
-
-// La plus longue ligne qu'on imprime ; au-delà, elle est tronquée.
-constexpr std::size_t kPrintedBytes = 256;
 
 }  // namespace
 
@@ -37,24 +35,8 @@ const char* BossBadge(std::uint8_t rank) {
 void DrawBossBadge(std::uint8_t rank) {
   if (const char* badge = BossBadge(rank); badge != nullptr) {
     ImGui::SameLine();
-    Colored(rank == kBossRankMvp ? kRedColor : kAmberColor, Printed("[%s]", badge).c_str());
+    Colored(rank == kBossRankMvp ? kRedColor : kAmberColor, core::Printed("[%s]", badge).c_str());
   }
-}
-
-std::string Printed(const char* format, ...) {
-  char text[kPrintedBytes] = {};
-  std::va_list arguments;
-  va_start(arguments, format);
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-  std::vsnprintf(text, sizeof(text), format, arguments);
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-  va_end(arguments);
-  return text;
 }
 
 void Label(const char* text) { Colored(kLabelColor, text); }

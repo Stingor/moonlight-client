@@ -16,13 +16,11 @@
 
 #include "chat_room_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
 namespace {
-
-using chat_room::Owned;
-using chat_room::Typed;
 
 // La largeur du formulaire ; sa hauteur suit le contenu.
 constexpr float kMakeWidthPixels = 330.0F;
@@ -76,7 +74,7 @@ void DrawTitleRow(ChatRoomMakeState& state, const ChatRoomMakeView& view, const 
     SkinTooltip(core::Tr("Les derniers titres"));
     if (BeginSkinPopup(kRecentPopup)) {
       for (const std::string& recent : view.recent_titles) {
-        if (ImGui::Selectable(chat_room::Shown(recent).c_str())) {
+        if (ImGui::Selectable(Unhashed(recent).c_str())) {
           const std::size_t kept = std::min(recent.size(), state.title.size() - 1);
           std::copy_n(recent.begin(), kept, state.title.begin());
           state.title[kept] = '\0';
@@ -89,7 +87,7 @@ void DrawTitleRow(ChatRoomMakeState& state, const ChatRoomMakeView& view, const 
 
   // LE COMPTEUR, SOUS LE CHAMP : le plafond du serveur est en octets, et le
   // client d'origine laisse découvrir la coupe après coup.
-  const std::string_view title = Typed(state.title);
+  const std::string_view title = TypedText(state.title);
   ImGui::SetCursorPosX(column);
   chat_room::DrawByteCounter(title.size(), view.limits.title_bytes);
   if (view.ascii_required && !chat_room::IsAscii(title)) {
@@ -153,7 +151,7 @@ void DrawAccessRows(ChatRoomMakeState& state, const ChatRoomMakeView& view, cons
   SkinTooltip(core::Tr("Afficher / masquer le mot de passe"));
   // LA RÈGLE DES QUATRE CARACTÈRES, dite AVANT le clic et non après.
   if (!state.is_public) {
-    const std::size_t typed = chat_room::PasswordBytes(Typed(state.password));
+    const std::size_t typed = chat_room::PasswordBytes(TypedText(state.password));
     ImGui::SetCursorPosX(column);
     if (typed < view.limits.fewest_password_bytes) {
       ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().warn_text);
@@ -188,7 +186,7 @@ void DrawNearby(const ChatRoomMakeView& view, ChatRoomMakeAction& action) {
   for (const ChatRoomNearbyView& room : view.nearby) {
     std::array<char, chat_room::kLineBytes> line{};
     const bool full = room.users >= room.limit && room.limit != 0;
-    const std::string title = chat_room::Shown(room.title);
+    const std::string title = Unhashed(room.title);
     std::snprintf(line.data(), line.size(), "%s (%u/%u)%s%s##nearby_%u", title.c_str(),
                   static_cast<unsigned>(room.users), static_cast<unsigned>(room.limit),
                   room.locked ? " - " : "", room.locked ? core::Tr("privé") : "",
@@ -260,8 +258,8 @@ ChatRoomMakeAction DrawChatRoomMakeWindow(ChatRoomMakeState& state, const ChatRo
     ImGui::Separator();
 
     // ── LES BOUTONS, à droite ───────────────────────────────────────────────
-    const std::string_view title = Typed(state.title);
-    const std::size_t password = chat_room::PasswordBytes(Typed(state.password));
+    const std::string_view title = TypedText(state.title);
+    const std::size_t password = chat_room::PasswordBytes(TypedText(state.password));
     const bool can_send = !view.waiting && view.blocker.empty() && !title.empty() &&
                           title.size() <= view.limits.title_bytes &&
                           (!view.ascii_required || chat_room::IsAscii(title)) &&

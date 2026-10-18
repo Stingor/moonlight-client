@@ -12,13 +12,11 @@
 
 #include "chat_room_parts.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
 namespace {
-
-using chat_room::Owned;
-using chat_room::Typed;
 
 constexpr float kWidthPixels = 300.0F;
 constexpr float kEyeFonts = 2.2F;
@@ -71,7 +69,7 @@ ChatRoomPasswordAction DrawChatRoomPasswordWindow(ChatRoomPasswordState& state,
     }
     SkinTooltip(core::Tr("Afficher / masquer le mot de passe"));
 
-    const std::size_t typed = chat_room::PasswordBytes(Typed(state.input));
+    const std::size_t typed = chat_room::PasswordBytes(TypedText(state.input));
     chat_room::DrawByteCounter(typed, view.limits.password_bytes);
     if (!view.error.empty()) {
       ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);

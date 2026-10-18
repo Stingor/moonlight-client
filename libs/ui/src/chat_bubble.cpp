@@ -10,6 +10,8 @@
 #include "ro/ui/chat_log.h"
 
 #include "chat_log_parts.h"
+#include "ui_color.h"
+#include "ui_strings.h"
 
 namespace ro::ui {
 namespace {
@@ -23,49 +25,16 @@ using chat_log_detail::PlaceTarget;
 // une bulle qui pâlit dès son apparition se lit comme un défaut d'affichage.
 constexpr float kFadeFraction = 0.25F;
 
-// Ce qui reste d'une couleur une fois le fondu appliqué.
-[[nodiscard]] ImU32 Faded(ImU32 color, float alpha) {
-  const auto kept =
-      static_cast<ImU32>(static_cast<float>((color >> IM_COL32_A_SHIFT) & 0xFFU) * alpha);
-  return (color & ~static_cast<ImU32>(0xFFU << IM_COL32_A_SHIFT)) | (kept << IM_COL32_A_SHIFT);
-}
-
-// Fond tout ce qui s'est peint depuis `first_vertex`.
-//
-// ⚠ APRÈS COUP, SUR LES SOMMETS : le moteur du fil peint ses couleurs propres —
-// celle d'un lien, d'une suite colorée, le masque d'un spoiler, une emote — et
-// n'a pas d'opacité à recevoir. La bulle s'efface pourtant d'un seul tenant.
-void FadeSince(ImDrawList* into, int first_vertex, float alpha) {
-  if (alpha >= 1.0F) {
-    return;
-  }
-  for (int rank = first_vertex; rank < into->VtxBuffer.Size; ++rank) {
-    ImDrawVert& vertex = into->VtxBuffer[rank];
-    vertex.col = Faded(vertex.col, alpha);
-  }
-}
-
-// Les octets de suite d'un point de code UTF-8 : `10xxxxxx`.
-constexpr unsigned char kUtf8TailMask = 0xC0U;
-constexpr unsigned char kUtf8TailBits = 0x80U;
-
-// Les points de code de `text` : chaque octet qui n'en continue pas un autre.
-[[nodiscard]] std::size_t CodePoints(std::string_view text) {
-  return static_cast<std::size_t>(std::ranges::count_if(text, [](char byte) {
-    return (static_cast<unsigned char>(byte) & kUtf8TailMask) != kUtf8TailBits;
-  }));
-}
-
 }  // namespace
 
 std::size_t ChatBubbleShownCharacters(std::string_view text,
                                       std::span<const ChatInlineImage> images) {
-  std::size_t shown = CodePoints(text);
+  std::size_t shown = Utf8CodePoints(text);
   for (const ChatInlineImage& image : images) {
     if (image.length == 0 || image.offset >= text.size()) {
       continue;
     }
-    const std::size_t covered = CodePoints(text.substr(image.offset, image.length));
+    const std::size_t covered = Utf8CodePoints(text.substr(image.offset, image.length));
     shown = shown - std::min(shown, covered) + 1;
   }
   return shown;

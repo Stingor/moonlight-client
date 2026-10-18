@@ -18,6 +18,7 @@
 #include "mail_parts.h"
 #include "ui_popup.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -44,12 +45,6 @@ constexpr const char* kItemMenuId = "##rodex_compose_item_menu";
 // Les octets de suite d'un caractère UTF-8 : 10xxxxxx.
 constexpr unsigned char kUtf8ContinuationMask = 0xC0;
 constexpr unsigned char kUtf8ContinuationBits = 0x80;
-
-// La saisie d'un tampon, jusqu'à son zéro.
-[[nodiscard]] std::string_view Typed(std::span<const char> buffer) {
-  const auto end = std::ranges::find(buffer, '\0');
-  return std::string_view(buffer.data(), static_cast<std::size_t>(end - buffer.begin()));
-}
 
 [[nodiscard]] const MailBagView* FindBag(std::span<const MailBagView> bag,
                                          std::uint16_t client_slot) {
@@ -78,7 +73,7 @@ constexpr unsigned char kUtf8ContinuationBits = 0x80;
 [[nodiscard]] std::string WhoLine(const MailComposeWindowState& state,
                                   const MailComposeView& view) {
   const std::string_view who =
-      view.checked_name.empty() ? Typed(state.recipient) : view.checked_name;
+      view.checked_name.empty() ? TypedText(state.recipient) : view.checked_name;
   std::array<char, kSentenceBytes> line{};
   if (!view.checked_job.empty()) {
     std::snprintf(line.data(), line.size(), core::Tr("%.*s — %.*s, niveau %d"),
@@ -110,7 +105,7 @@ void DrawRecipient(MailComposeWindowState& state, const MailComposeView& view, c
   ImGui::InputText("##rodex_to", state.recipient.data(), state.recipient.size());
   // Le nom se vérifie aussi tout seul, quand on quitte le champ après l'avoir
   // changé.
-  if (ImGui::IsItemDeactivatedAfterEdit() && !Typed(state.recipient).empty()) {
+  if (ImGui::IsItemDeactivatedAfterEdit() && !TypedText(state.recipient).empty()) {
     action.check = true;
   }
   ImGui::SameLine();
@@ -245,9 +240,9 @@ void DrawAskAmount(MailComposeWindowState& state, const MailComposeView& view, c
 }
 
 [[nodiscard]] MailComposeSend SendOf(const MailComposeWindowState& state) {
-  return MailComposeSend{.recipient = std::string(Typed(state.recipient)),
-                         .subject = std::string(Typed(state.subject)),
-                         .message = std::string(Typed(state.message)),
+  return MailComposeSend{.recipient = std::string(TypedText(state.recipient)),
+                         .subject = std::string(TypedText(state.subject)),
+                         .message = std::string(TypedText(state.message)),
                          .zeny = state.zeny};
 }
 
@@ -346,7 +341,7 @@ std::string MailSendRecapText(const MailComposeWindowState& state, const MailCom
   if (view.check == MailRecipientCheck::kFound) {
     AppendField(text, core::Tr("Destinataire :"), WhoLine(state, view));
   } else {
-    AppendField(text, core::Tr("Destinataire :"), Typed(state.recipient));
+    AppendField(text, core::Tr("Destinataire :"), TypedText(state.recipient));
     text.append("\n");
     text.append(core::Tr("(!) Destinataire non vérifié."));
   }

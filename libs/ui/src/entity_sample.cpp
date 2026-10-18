@@ -10,6 +10,8 @@
 #include "ro/render/name_plate.h"
 #include "ro/render/name_plate_layout.h"
 
+#include "ui_color.h"
+
 namespace ro::ui {
 namespace {
 
@@ -59,12 +61,6 @@ constexpr ImU32 kGamePickColor = IM_COL32(160, 160, 160, 110);
 constexpr ImU32 kPickColor = IM_COL32(255, 210, 60, 230);
 constexpr float kGamePickThickness = 1.0F;
 constexpr float kPickThickness = 2.0F;
-
-[[nodiscard]] ImU32 Faded(ImU32 color, float share) {
-  const auto alpha = static_cast<float>((color >> IM_COL32_A_SHIFT) & 0xFFU);
-  const auto kept = static_cast<ImU32>(std::lround(alpha * std::clamp(share, 0.0F, 1.0F)));
-  return (color & ~IM_COL32_A_MASK) | (kept << IM_COL32_A_SHIFT);
-}
 
 [[nodiscard]] const render::EntityNameLook* NameLookOf(const render::EntityNamesLook& names,
                                                        const EntitySampleShown& shown) {
@@ -198,10 +194,10 @@ void PaintName(ImDrawList& into, const EntitySamplePlace& place, const EntitySam
     const ImVec2 at(placed.lead_min.x, placed.lead_min.y);
     into.AddImage(sample.emblem.id, at,
                   ImVec2(at.x + sample.emblem.width, at.y + sample.emblem.height), ImVec2(0, 0),
-                  ImVec2(1, 1), Faded(IM_COL32_WHITE, how.opacity));
+                  ImVec2(1, 1), ScaledAlpha(IM_COL32_WHITE, how.opacity));
   }
-  const ImU32 color = Faded(how.color, how.opacity);
-  const ImU32 shadow = Faded(how.shadow_color, how.opacity);
+  const ImU32 color = ScaledAlpha(how.color, how.opacity);
+  const ImU32 shadow = ScaledAlpha(how.shadow_color, how.opacity);
   float y = placed.text_top_y;
   for (const std::string& line : lines) {
     const ImVec2 at(placed.text_left_x, y);

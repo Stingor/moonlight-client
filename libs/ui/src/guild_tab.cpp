@@ -13,6 +13,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -71,7 +72,7 @@ void DrawNoGuild(GuildTabState& state, const GuildView& view, const SkinArt& art
                        ImGuiInputTextFlags_EnterReturnsTrue);
   ImGui::SameLine();
   const bool clicked = SkinButton(core::Tr("Créer"), art);
-  const std::string_view name = BufferText(state.create_name);
+  const std::string_view name = TypedText(state.create_name);
   if ((submitted || clicked) && !name.empty()) {
     action.verb = GuildVerb::kCreate;
     action.text = std::string(name);
@@ -207,8 +208,8 @@ void DrawNotice(GuildTabState& state, const GuildView& view, const SkinArt& art,
                              state.notice_body.data(), state.notice_body.size());
     if (SkinButton(core::Tr("Enregistrer"), art, ImVec2(Px(kSaveNoticePixels), 0.0F))) {
       action.verb = GuildVerb::kSaveNotice;
-      action.subject = std::string(BufferText(state.notice_subject));
-      action.body = std::string(BufferText(state.notice_body));
+      action.subject = std::string(TypedText(state.notice_subject));
+      action.body = std::string(TypedText(state.notice_body));
       state.notice_editing = false;
       state.status = core::Tr("Annonce envoyée.");
     }
@@ -272,7 +273,7 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
     ImGui::InputText("##guild_invite", state.invite_name.data(), state.invite_name.size());
     SkinTooltip(core::Tr("Nom exact du personnage à inviter (il doit être connecté)."));
     ImGui::SameLine();
-    const std::string_view invited = BufferText(state.invite_name);
+    const std::string_view invited = TypedText(state.invite_name);
     if (SkinButton(core::Tr("Inviter"), art) && !invited.empty()) {
       action.verb = GuildVerb::kInvite;
       action.text = std::string(invited);
@@ -283,14 +284,14 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
   }
   if (SkinButton(core::Tr("Quitter…"), art)) {
     state.reason.fill('\0');
-    AskModal(GuildModalName(core::Tr("Quitter la guilde"), kGuildLeaveModalId).c_str());
+    AskModal(SuffixedLabel(core::Tr("Quitter la guilde"), kGuildLeaveModalId).c_str());
   }
   // Dissoudre : réservé au maître, comme la commande.
   if (view.master) {
     ImGui::SameLine();
     if (SkinButton(core::Tr("Dissoudre…"), art)) {
       state.disband_confirm.fill('\0');
-      AskModal(GuildModalName(core::Tr("Dissoudre la guilde"), kGuildDisbandModalId).c_str());
+      AskModal(SuffixedLabel(core::Tr("Dissoudre la guilde"), kGuildDisbandModalId).c_str());
     }
     SkinTooltip(core::Tr("Supprime définitivement la guilde (@breakguild)."));
   }
@@ -303,11 +304,6 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
 
 ImVec4 GuildInk(ImU32 color) { return ImGui::ColorConvertU32ToFloat4(color); }
 
-std::string_view BufferText(std::span<const char> buffer) {
-  const auto end = std::find(buffer.begin(), buffer.end(), '\0');
-  return {buffer.data(), static_cast<std::size_t>(end - buffer.begin())};
-}
-
 void CopyIntoBuffer(std::span<char> buffer, std::string_view text) {
   if (buffer.empty()) {
     return;
@@ -316,10 +312,6 @@ void CopyIntoBuffer(std::span<char> buffer, std::string_view text) {
       core::WithoutDanglingUtf8(text.substr(0, std::min(text.size(), buffer.size() - 1)));
   std::fill(buffer.begin(), buffer.end(), '\0');
   std::copy(kept.begin(), kept.end(), buffer.begin());
-}
-
-std::string GuildModalName(const char* title, std::string_view id) {
-  return std::string(title) + std::string(id);
 }
 
 GuildAction DrawGuildTab(GuildTabState& state, const GuildView& view, bool& smooth_icons,
@@ -389,7 +381,7 @@ GuildAction DrawGuildTab(GuildTabState& state, const GuildView& view, bool& smoo
       action.from_current = state.emblem.load_current;
     }
     state.emblem.load_current = false;
-    AskModal(GuildModalName(core::Tr("Changer l'emblème"), kGuildEmblemModalId).c_str());
+    AskModal(SuffixedLabel(core::Tr("Changer l'emblème"), kGuildEmblemModalId).c_str());
   }
   DrawGuildEmblemModal(state, view, art, action);
   return action;

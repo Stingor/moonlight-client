@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 #include "party_grid_parts.h"
 #include "ui_popup.h"
@@ -24,11 +25,6 @@ constexpr int kPercentScale = 100;
 constexpr std::size_t kCaptionBytes = 48;
 // Arrondi au plus proche d'un nombre de colonnes déduit d'une largeur.
 constexpr float kNearestColumn = 0.5F;
-
-[[nodiscard]] bool Inside(ImVec2 point, ImVec2 top_left, ImVec2 bottom_right) {
-  return point.x >= top_left.x && point.y >= top_left.y && point.x < bottom_right.x &&
-         point.y < bottom_right.y;
-}
 
 [[nodiscard]] bool Shown(const PartyGridTileView& tile, const PartyGridLook& look) {
   if (!look.show_self && tile.is_me) {
@@ -171,8 +167,9 @@ PartyGridAnswer DrawPartyGrid(const PartyGridView& view, PartyGridLook& look, Pa
   const ImVec2 mouse = ImGui::GetIO().MousePos;
   const HudRect on_screen = HudOnScreen(look.rect, ImGui::GetIO().DisplaySize);
   const bool over_frame =
-      Inside(mouse, ImVec2(on_screen.x, on_screen.y),
-             ImVec2(on_screen.x + on_screen.width, on_screen.y + on_screen.height));
+      ImRect(ImVec2(on_screen.x, on_screen.y),
+             ImVec2(on_screen.x + on_screen.width, on_screen.y + on_screen.height))
+          .Contains(mouse);
   const bool unlock_override = ImGui::GetIO().KeyShift && (over_frame || grip.Holds(kFrameId));
 
   HudFrameLook frame;
@@ -202,7 +199,7 @@ PartyGridAnswer DrawPartyGrid(const PartyGridView& view, PartyGridLook& look, Pa
       const ImVec2 bottom_right(top_left.x + layout.tile_width, top_left.y + layout.tile_height);
       // Un test de rectangle et non un survol ImGui : verrouillé, le cadre est
       // sourd, et la grille répond « sur qui ? » sans prendre le clic au jeu.
-      const bool here = Inside(mouse, top_left, bottom_right);
+      const bool here = ImRect(top_left, bottom_right).Contains(mouse);
       if (here) {
         hovered = shown[rank];
       }

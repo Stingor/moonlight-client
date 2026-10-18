@@ -24,6 +24,7 @@
 
 #include "homunculus_staff.h"
 #include "ui_scale.h"
+#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -78,17 +79,6 @@ constexpr int kSkillColumns = 3;
     joined += line;
   }
   return joined;
-}
-
-[[nodiscard]] std::string_view BufferText(std::span<const char> buffer) {
-  const auto end = std::ranges::find(buffer, '\0');
-  return {buffer.data(), static_cast<std::size_t>(end - buffer.begin())};
-}
-
-void CopyIntoBuffer(std::span<char> buffer, std::string_view text) {
-  const std::size_t kept = std::min(text.size(), buffer.size() - 1);
-  std::copy_n(text.begin(), kept, buffer.begin());
-  buffer[kept] = '\0';
 }
 
 // Le nom montré : celui de l'homoncule, ou à défaut celui de son espèce.
@@ -162,7 +152,7 @@ void DrawRenaming(HomunculusTabState& state, const SkinArt& art, HomunculusTabAc
   if (SkinSmallButton(core::Tr("Valider"), art, ImVec2(Px(kRenameButtonPixels), 0.0F)) &&
       state.new_name[0] != '\0') {
     action.verb = HomunculusVerb::kRename;
-    action.name = std::string(BufferText(state.new_name));
+    action.name = std::string(TypedText(state.new_name));
     state.status = core::Tr("Renommage envoyé.");
     state.renaming = false;
   }
@@ -188,7 +178,7 @@ void DrawHeader(HomunculusTabState& state, const HomunculusTabView& view, const 
       const std::string button = shown + "##homun_rename";
       ImGui::BeginDisabled(!view.active());
       if (SkinSmallButton(button.c_str(), art)) {
-        CopyIntoBuffer(state.new_name, view.name);
+        CopyBounded(state.new_name, view.name);
         state.renaming = true;
       }
       ImGui::EndDisabled();
@@ -296,7 +286,7 @@ void DrawActions(HomunculusTabState& state, const HomunculusTabView& view, const
     ImGui::SetNextItemWidth(-1.0F);
     ImGui::InputText("##homun_del", state.delete_confirm.data(), state.delete_confirm.size());
     const std::string_view expected = view.name.empty() ? view.species : view.name;
-    const bool confirmed = !expected.empty() && BufferText(state.delete_confirm) == expected;
+    const bool confirmed = !expected.empty() && TypedText(state.delete_confirm) == expected;
     ImGui::BeginDisabled(!confirmed || !view.active());
     if (SkinSmallButton(core::Tr("Abandonner"), art, ImVec2(Px(kAbandonButtonPixels), 0.0F))) {
       action.verb = HomunculusVerb::kDelete;

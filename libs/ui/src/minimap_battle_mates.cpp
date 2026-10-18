@@ -25,12 +25,6 @@ constexpr float kBattleMateLeast = 3.0F;
 constexpr ImU32 kBattleMateOutline = IM_COL32(20, 20, 20, 230);
 constexpr float kBattleMateOutlineWidth = 1.0F;
 
-// Les quatre pointes du losange, dans le sens des aiguilles d'une montre.
-[[nodiscard]] std::array<ImVec2, 4> Diamond(ImVec2 center, float half) {
-  return {ImVec2(center.x, center.y - half), ImVec2(center.x + half, center.y),
-          ImVec2(center.x, center.y + half), ImVec2(center.x - half, center.y)};
-}
-
 // Le point est-il DANS le losange ? La distance de Manhattan au centre le dit.
 [[nodiscard]] bool InsideDiamond(ImVec2 point, ImVec2 center, float half) {
   return std::fabs(point.x - center.x) + std::fabs(point.y - center.y) <= half;
