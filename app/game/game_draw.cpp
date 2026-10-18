@@ -399,9 +399,10 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
           ro::render::SpriteRenderer::DepthWrite::kOff);
   }
   paint(scene_actors_.front, ro::render::SpriteRenderer::DepthWrite::kOff);
-  // LES FAUCONS, après les corps : un oiseau translucide peint avant son maître
-  // en serait découpé.
-  paint(falcons, ro::render::SpriteRenderer::DepthWrite::kOff);
+  // LES FAUCONS, après les corps et ombrés comme eux : un oiseau translucide
+  // peint avant son maître en serait découpé.
+  paint(falcons, ro::render::SpriteRenderer::DepthWrite::kOff, Silhouette::kIgnored,
+        /*shaded=*/true);
   // LA FLÈCHE DE LA CIBLE, un nœud de la scène comme les acteurs qu'elle surmonte.
   DrawSelectionMarker(now_ms);
 
