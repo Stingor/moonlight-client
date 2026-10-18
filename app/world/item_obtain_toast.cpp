@@ -5,12 +5,10 @@
 #include <span>
 #include <utility>
 
-#include <imgui.h>
-
-#include "ro/render/icon_texture.h"
 #include "ro/sim/world.h"
 #include "ro/vfs/item_words.h"
 
+#include "game/skin_image_of.h"
 #include "items/inventory_view.h"
 #include "world/item_obtain_rules.h"
 
@@ -24,13 +22,7 @@ namespace {
   if (icons == nullptr) {
     return ro::ui::SkinImage{};
   }
-  const ro::render::IconTexture& icon = icons->Get(item_id);
-  if (!icon.usable()) {
-    return ro::ui::SkinImage{};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageOf(icons->Get(item_id));
 }
 
 }  // namespace

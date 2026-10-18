@@ -20,6 +20,7 @@
 #include "ro/formats/image.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "guild/guild_panel.h"
 
 namespace moonclient {
@@ -92,15 +93,6 @@ constexpr std::uint32_t kGalleryEveryMs = 1000;
          name.find("..") == std::string_view::npos;
 }
 
-[[nodiscard]] ro::ui::SkinImage ImageOf(const ro::render::IconTexture& icon) {
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
-}
-
 }  // namespace
 
 std::filesystem::path GuildPanel::EmblemFolder() const {
@@ -170,7 +162,7 @@ void GuildPanel::RefreshEmblemEditor(const ro::sim::World& world, ro::ui::GuildT
   view_.transparency_limit = ro::formats::kEmblemTransparencyLimit;
   if (state.emblem.item_id > 0 && pieces_.item_icons != nullptr) {
     view_.typed_item_icon =
-        ImageOf(pieces_.item_icons->Get(static_cast<std::uint32_t>(state.emblem.item_id)));
+        SkinImageOf(pieces_.item_icons->Get(static_cast<std::uint32_t>(state.emblem.item_id)));
   }
   // LA GALERIE : une icône par objet distinct du sac, rangées par numéro — un
   // ordre qui ne bouge pas sous le curseur au fil des ramassages.
@@ -193,7 +185,7 @@ void GuildPanel::RefreshEmblemEditor(const ro::sim::World& world, ro::ui::GuildT
       ro::ui::EmblemItemView item;
       item.item_id = id;
       if (pieces_.item_icons != nullptr) {
-        item.icon = ImageOf(pieces_.item_icons->Get(id));
+        item.icon = SkinImageOf(pieces_.item_icons->Get(id));
       }
       if (pieces_.items != nullptr) {
         if (const ro::vfs::ItemEntry* entry = pieces_.items->Find(id); entry != nullptr) {

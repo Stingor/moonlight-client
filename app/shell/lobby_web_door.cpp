@@ -16,10 +16,10 @@
 #include <SDL3/SDL.h>
 
 #include "ro/core/log.h"
-#include "ro/render/icon_texture.h"
-#include "ro/ui/skin_art.h"
+#include "ro/render/game_images.h"
 #include "ro/ui/web_door.h"
 
+#include "game/skin_image_of.h"
 #include "shell/lobby_screen.h"
 #include "web/web_credentials.h"
 
@@ -67,16 +67,9 @@ ro::ui::WebDoorView LobbyScreen::ComposeWebDoor() {
   // LE LOGO DE LA PORTE DISCORD. ⚠ SON ABSENCE N'EST PAS UNE PANNE : l'image
   // vit dans l'archive du serveur, et le bouton se rabat sur son libellé.
   if (shell_.pieces().game_images.has_value()) {
-    const auto image_of = [](const ro::render::IconTexture& texture) {
-      return texture.usable()
-                 ? ro::ui::SkinImage{.id = static_cast<ImTextureID>(texture.texture.name()),
-                                     .width = static_cast<float>(texture.width_px),
-                                     .height = static_cast<float>(texture.height_px)}
-                 : ro::ui::SkinImage{};
-    };
     ro::render::GameImages& images = *shell_.pieces().game_images;
-    view.discord = image_of(images.GetOurs(ro::ui::kDiscordMarkPath));
-    view.discord_shape = image_of(images.GetOursInkShape(ro::ui::kDiscordMarkPath));
+    view.discord = SkinImageOf(images.GetOurs(ro::ui::kDiscordMarkPath));
+    view.discord_shape = SkinImageOf(images.GetOursInkShape(ro::ui::kDiscordMarkPath));
   }
   for (const web::WebAccount& account : web_.accounts()) {
     view.accounts.push_back(ro::ui::WebAccountRow{.label = account.label,

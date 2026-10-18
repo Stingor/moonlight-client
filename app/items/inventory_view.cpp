@@ -18,6 +18,7 @@
 #include "ro/sim/world.h"
 
 #include "character/equip_slot_map.h"
+#include "game/skin_image_of.h"
 #include "items/mail_withheld.h"
 
 namespace moonclient {
@@ -395,10 +396,7 @@ void BuildItemCells(const ro::sim::Inventory& holder, const ItemCellsAsk& ask,
     cell.takes_cards = item.type == kWireArmorType || item.type == kWireWeaponType;
     if (icons != nullptr) {
       const ro::render::IconTexture& icon = icons->Get(item.item_id);
-      cell.icon = ro::ui::SkinImage{
-          .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-          .width = static_cast<float>(icon.width_px),
-          .height = static_cast<float>(icon.height_px)};
+      cell.icon = SizedSkinImageOf(icon);
     }
     cells.push_back(cell);
   }

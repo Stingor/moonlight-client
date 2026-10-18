@@ -6,6 +6,8 @@
 
 #include "ro/render/sprite_frame.h"
 
+#include "game/skin_image_of.h"
+
 namespace moonclient {
 namespace {
 
@@ -53,9 +55,7 @@ WorldMapWarpAgent::Shown WorldMapWarpAgent::Compose(std::uint32_t job, float sca
     return {};
   }
   const ro::render::VignetteFraming& framing = vignette_.framing();
-  return Shown{.image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(texture.texture.name()),
-                                          .width = static_cast<float>(texture.width_px),
-                                          .height = static_cast<float>(texture.height_px)},
+  return Shown{.image = SkinImageOf(texture),
                .feet = ImVec2(framing.origin.x, framing.origin.y),
                .height = -vignette_.drawn_bounds().min.y * framing.scale};
 }

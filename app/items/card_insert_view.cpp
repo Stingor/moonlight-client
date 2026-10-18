@@ -13,6 +13,7 @@
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
+#include "game/skin_image_of.h"
 #include "items/card_insert_line.h"
 #include "items/inventory_view.h"
 
@@ -40,14 +41,7 @@ std::string CardInsertView::NameOf(const ro::sim::InventoryItem& item) const {
 }
 
 ro::ui::SkinImage CardInsertView::IconOf(std::uint32_t item_id) const {
-  if (icons_ == nullptr) {
-    return {};
-  }
-  const ro::render::IconTexture& icon = icons_->Get(item_id);
-  return ro::ui::SkinImage{
-      .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-      .width = static_cast<float>(icon.width_px),
-      .height = static_cast<float>(icon.height_px)};
+  return ItemIconImage(icons_, item_id);
 }
 
 int CardInsertView::SlotsOf(std::uint32_t item_id) const {

@@ -149,8 +149,6 @@ class QuestStage {
   [[nodiscard]] std::string CatalogTitle(std::uint32_t quest_id) const;
   void LoadArt();
   [[nodiscard]] ro::ui::SkinImage ImageAt(std::string_view leaf) const;
-  // Une pièce peinte sur du blanc, avec sa variante pour un papier sombre.
-  [[nodiscard]] ro::ui::SkinImage PaperArtAt(std::string_view leaf) const;
   [[nodiscard]] ro::ui::SkinImage IconOf(std::string_view icon_key) const;
   void ComposeWindow(const QuestWindows& windows, std::int64_t now_unix_s);
   void ComposeRow(const ro::sim::QuestRecord* quest, const QuestHistoryEntry* left,

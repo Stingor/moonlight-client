@@ -14,6 +14,7 @@
 #include "ro/core/printed.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "guild/guild_panel.h"
 
 namespace moonclient {
@@ -172,9 +173,7 @@ void GuildPanel::RefreshSkills(const ro::sim::GuildBook& book, const ro::sim::Wo
       }
       const ro::render::IconTexture& icon = pieces_.skill_icons->Get(id, idname);
       if (icon.usable()) {
-        cell.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                      .width = static_cast<float>(icon.width_px),
-                                      .height = static_cast<float>(icon.height_px)};
+        cell.icon = SkinImageOf(icon);
       }
     }
     skills_.push_back(skill);

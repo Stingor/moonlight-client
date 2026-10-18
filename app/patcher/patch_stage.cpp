@@ -22,6 +22,7 @@
 #include "ro/ui/patch_screen.h"
 
 #include "game/client_shell.h"
+#include "game/skin_image_of.h"
 #include "patcher/http_patch_fetcher.h"
 #include "patcher/install_lock.h"
 #include "patcher/patcher_state.h"
@@ -125,15 +126,6 @@ struct PatchScreenText {
   return backdrop;
 }
 
-[[nodiscard]] ro::ui::SkinImage ImageOf(const ro::render::IconTexture& texture) {
-  if (!texture.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(texture.texture.name()),
-                           .width = static_cast<float>(texture.width_px),
-                           .height = static_cast<float>(texture.height_px)};
-}
-
 }  // namespace
 
 ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
@@ -143,7 +135,7 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
   // pendant qu'on les réécrit.
   const ro::render::IconTexture backdrop =
       LoadSkinBackdrop(shell.client_root(), shell.settings().options().pages().skin.active());
-  const ro::ui::SkinImage backdrop_image = ImageOf(backdrop);
+  const ro::ui::SkinImage backdrop_image = SkinImageOf(backdrop);
   while (true) {
     PatchProgressBoard board;
     WorkerResult result;

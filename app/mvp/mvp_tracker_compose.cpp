@@ -11,8 +11,8 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/printed.h"
-#include "ro/render/skin_pieces.h"
 
+#include "game/skin_image_of.h"
 #include "mvp/mvp_tracker_stage.h"
 
 namespace moonclient {
@@ -447,20 +447,7 @@ void MvpTrackerStage::ComposeSprites(const std::vector<std::uint16_t>& wanted,
 }
 
 ro::ui::SkinImage MvpTrackerStage::ImageAt(std::string_view path) {
-  if (pieces_.images == nullptr) {
-    return {};
-  }
-  std::string full(ro::render::kSkinRoot);
-  full += path;
-  // ⚠ `GetOurs` : le chemin est écrit dans nos sources, en UTF-8. L'absence
-  // est retenue par le cache, et ne coûte qu'une fois.
-  const ro::render::IconTexture& icon = pieces_.images->GetOurs(full);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageAt(pieces_.images, path);
 }
 
 }  // namespace moonclient

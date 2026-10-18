@@ -4,12 +4,12 @@
 #include <string>
 #include <utility>
 
-#include <imgui.h>
-
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -154,12 +154,7 @@ void CraftAtlasView::NoteDrawn(std::span<const std::uint32_t> item_ids) {
       continue;
     }
     const ro::render::IconTexture& icon = icons_->Get(item_id);
-    icons_seen_.emplace(
-        item_id,
-        ro::ui::SkinImage{
-            .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-            .width = static_cast<float>(icon.width_px),
-            .height = static_cast<float>(icon.height_px)});
+    icons_seen_.emplace(item_id, SizedSkinImageOf(icon));
   }
 }
 

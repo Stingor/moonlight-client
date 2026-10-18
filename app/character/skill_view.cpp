@@ -12,6 +12,7 @@
 #include "ro/sim/world.h"
 
 #include "game/homunculus_staff_words.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -228,11 +229,7 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
         .position = one.position,
         .name = node != nullptr ? std::string_view(node->display_name) : std::string_view(),
         .idname = node != nullptr ? std::string_view(node->idname) : std::string_view(),
-        .icon =
-            ro::ui::SkinImage{.id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name())
-                                                  : ImTextureID{0},
-                              .width = static_cast<float>(icon.width_px),
-                              .height = static_cast<float>(icon.height_px)},
+        .icon = SizedSkinImageOf(icon),
         .learned = learned,
         .reserved = reserved,
         .max_level = max_level,

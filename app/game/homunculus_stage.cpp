@@ -5,8 +5,6 @@
 #include <string>
 #include <utility>
 
-#include <imgui.h>
-
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
@@ -19,6 +17,7 @@
 #include "chat/banned_input.h"
 #include "game/game_pieces.h"
 #include "game/homunculus_staff_words.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -101,13 +100,7 @@ void WriteEcho(const ro::net::HomunculusEcho& echo, ro::sim::World& world, const
   if (!pieces.skill_icons.has_value() || node == nullptr) {
     return {};
   }
-  const ro::render::IconTexture& icon = pieces.skill_icons->Get(skill_id, node->idname);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageOf(pieces.skill_icons->Get(skill_id, node->idname));
 }
 
 }  // namespace

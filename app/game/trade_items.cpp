@@ -2,6 +2,8 @@
 
 #include "ro/vfs/item_name.h"
 
+#include "game/skin_image_of.h"
+#include "game/store_search_grade.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -14,14 +16,15 @@ void TradeItems::See(const ro::vfs::ItemTable* items, ro::render::ItemIcons* ico
 }
 
 ro::ui::SkinImage TradeItems::IconOf(std::uint32_t item_id) const {
-  if (icons_ == nullptr) {
+  return ItemIconImage(icons_, item_id);
+}
+
+ro::ui::SkinImage GradeBadgeOf(std::uint8_t grade, ro::render::GameImages* images) {
+  const std::string path = StoreSearchGradeBadgePath(grade);
+  if (path.empty()) {
     return {};
   }
-  const ro::render::IconTexture& icon = icons_->Get(item_id);
-  return ro::ui::SkinImage{
-      .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-      .width = static_cast<float>(icon.width_px),
-      .height = static_cast<float>(icon.height_px)};
+  return SkinImageAt(images, path);
 }
 
 std::string TradeItems::NameOf(std::uint32_t item_id) const {

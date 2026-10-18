@@ -14,6 +14,7 @@
 #include "ro/vfs/item_name.h"
 
 #include "character/equip_preset_file.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -240,13 +241,7 @@ ro::ui::SkinImage PresetView::PieceIcon(std::uint32_t item_id) const {
   if (icons_ == nullptr) {
     return ro::ui::SkinImage{};
   }
-  const ro::render::IconTexture& icon = icons_->Get(item_id);
-  if (!icon.usable()) {
-    return ro::ui::SkinImage{};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageOf(icons_->Get(item_id));
 }
 
 }  // namespace moonclient

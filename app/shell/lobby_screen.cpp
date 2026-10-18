@@ -23,11 +23,11 @@
 
 #include "ro/core/log.h"
 #include "ro/core/text.h"
-#include "ro/ui/skin_art.h"
 #include "ro/ui/system_fonts.h"
 
 #include "character/recent_characters.h"
 #include "game/connected_session.h"
+#include "game/skin_image_of.h"
 #include "options/game_options.h"
 #include "options/option_targets.h"
 #include "world/overlay_view.h"
@@ -303,9 +303,7 @@ ro::ui::LoginWindowView LobbyScreen::Compose() {
     const ro::render::IconTexture& art =
         shell_.pieces().game_images->GetOurs(ro::ui::kLoginArtPath);
     if (art.usable()) {
-      view.backdrop = ro::ui::SkinImage{.id = static_cast<ImTextureID>(art.texture.name()),
-                                        .width = static_cast<float>(art.width_px),
-                                        .height = static_cast<float>(art.height_px)};
+      view.backdrop = SkinImageOf(art);
     }
   }
   // 🔴 LA PORTE TIENT L'ÉCRAN JUSQU'AU BOUT, sauf devant le code PIN. Si elle

@@ -58,6 +58,10 @@ class TradeItems {
   const ro::vfs::ItemWords* words_ = nullptr;
 };
 
+// L'emblème du grade, pris dans l'habillage de l'installation ; vide sans
+// grade, sans images, ou quand l'installation ne l'a pas.
+[[nodiscard]] ro::ui::SkinImage GradeBadgeOf(std::uint8_t grade, ro::render::GameImages* images);
+
 // CE QU'UN ÉTAGE DE COMMERCE REÇOIT À CHAQUE IMAGE : le fil, le monde, les mots
 // du jeu, les forgerons connus, l'atelier des noms, et le verrou de vente des
 // favoris — un réglage du joueur, que le serveur ne connaît pas.

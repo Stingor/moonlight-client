@@ -10,6 +10,8 @@
 #include "ro/core/printed.h"
 #include "ro/vfs/monster_words.h"
 
+#include "game/skin_image_of.h"
+
 namespace moonclient {
 namespace {
 
@@ -340,9 +342,7 @@ const ro::ui::MonsterSheetView& MonsterSheet::Refresh(const ro::ui::MonsterSheet
     drop.icon = {};
     if (item_icons_ != nullptr) {
       if (const ro::render::IconTexture& icon = item_icons_->Get(drop.item_id); icon.usable()) {
-        drop.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                      .width = static_cast<float>(icon.width_px),
-                                      .height = static_cast<float>(icon.height_px)};
+        drop.icon = SkinImageOf(icon);
       }
     }
   }

@@ -10,12 +10,12 @@
 #include "ro/core/log.h"
 #include "ro/net/achievement.h"
 #include "ro/proto/map_packets.h"
-#include "ro/render/skin_pieces.h"
 #include "ro/sim/world.h"
 #include "ro/vfs/achievement_words.h"
 
 #include "game/achievement_bug_report.h"
 #include "game/achievement_rows.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -402,34 +402,7 @@ void AchievementStage::Advance(AchievementWindows& windows, ro::net::Connection&
 // ── L'ART ──────────────────────────────────────────────────────────────────
 
 ro::ui::SkinImage AchievementStage::ImageAt(std::string_view leaf) const {
-  if (images_ == nullptr) {
-    return {};
-  }
-  std::string path(ro::render::kSkinRoot);
-  path += leaf;
-  // ⚠ `GetOurs` ET NON `Get` : le chemin est écrit dans NOS sources, en UTF-8,
-  // et le dossier d'interface est en coréen.
-  const ro::render::IconTexture& icon = images_->GetOurs(path);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
-}
-
-ro::ui::SkinImage AchievementStage::PaperArtAt(std::string_view leaf,
-                                               DarkPaperVariant variant) const {
-  ro::ui::SkinImage image = ImageAt(leaf);
-  if (!image.usable()) {
-    return image;
-  }
-  std::string path(ro::render::kSkinRoot);
-  path += leaf;
-  if (const ro::render::IconTexture& turned = (images_->*variant)(path); turned.usable()) {
-    image.dark_paper_id = static_cast<ImTextureID>(turned.texture.name());
-  }
-  return image;
+  return SkinImageAt(images_, leaf);
 }
 
 ro::ui::SkinImage AchievementStage::IconOf(const AchievementInfo& info) const {
@@ -438,7 +411,7 @@ ro::ui::SkinImage AchievementStage::IconOf(const AchievementInfo& info) const {
   leaf += ro::core::AsciiLower(info.group);
   leaf += kBitmapExtension;
   // Un pictogramme dans sa bulle, peint sur du blanc comme le reste de l'art.
-  return PaperArtAt(leaf, &ro::render::GameImages::GetOursForDarkPaper);
+  return PaperArtAt(images_, leaf, &ro::render::GameImages::GetOursForDarkPaper);
 }
 
 void AchievementStage::LoadArt() {
@@ -455,10 +428,10 @@ void AchievementStage::LoadArt() {
   // Deux objets peints sur du blanc, le trophée et le tampon, s'en détourent.
   // Les autres objets ont déjà un fond transparent et se posent tels.
   const auto art = [&](std::string_view name) {
-    return PaperArtAt(leaf_of(name), &ro::render::GameImages::GetOursForDarkPaper);
+    return PaperArtAt(images_, leaf_of(name), &ro::render::GameImages::GetOursForDarkPaper);
   };
   const auto object = [&](std::string_view name) {
-    return PaperArtAt(leaf_of(name), &ro::render::GameImages::GetOursMatted);
+    return PaperArtAt(images_, leaf_of(name), &ro::render::GameImages::GetOursMatted);
   };
   const auto as_is = [&](std::string_view name) { return ImageAt(leaf_of(name)); };
   art_.bg_tab = art("bg_tab");
@@ -471,8 +444,8 @@ void AchievementStage::LoadArt() {
   art_.tab_subarrow = art("tab_subarrow");
   art_.bg_upper = art("bg_upper");
   art_.upper_trophy = object("upper_trophy");
-  art_.radio_on = PaperArtAt(kRadioOn, &ro::render::GameImages::GetOursForDarkPaper);
-  art_.radio_off = PaperArtAt(kRadioOff, &ro::render::GameImages::GetOursForDarkPaper);
+  art_.radio_on = PaperArtAt(images_, kRadioOn, &ro::render::GameImages::GetOursForDarkPaper);
+  art_.radio_off = PaperArtAt(images_, kRadioOff, &ro::render::GameImages::GetOursForDarkPaper);
   art_.bg_list = art("bg_list");
   art_.list_out = art("list_out");
   art_.list_press = art("list_press");

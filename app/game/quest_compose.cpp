@@ -6,10 +6,10 @@
 #include <string>
 
 #include "ro/core/i18n.h"
-#include "ro/render/skin_pieces.h"
 #include "ro/sim/world.h"
 
 #include "game/quest_stage.h"
+#include "game/skin_image_of.h"
 #include "quest/quest_rules.h"
 
 namespace moonclient {
@@ -72,33 +72,7 @@ constexpr std::string_view kBitmapExtension = ".bmp";
 // ── L'ART ──────────────────────────────────────────────────────────────────
 
 ro::ui::SkinImage QuestStage::ImageAt(std::string_view leaf) const {
-  if (images_ == nullptr) {
-    return {};
-  }
-  std::string path(ro::render::kSkinRoot);
-  path += leaf;
-  // ⚠ `GetOurs` ET NON `Get` : le chemin est écrit dans NOS sources, en UTF-8,
-  // et le dossier d'interface est en coréen.
-  const ro::render::IconTexture& icon = images_->GetOurs(path);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
-}
-
-ro::ui::SkinImage QuestStage::PaperArtAt(std::string_view leaf) const {
-  ro::ui::SkinImage image = ImageAt(leaf);
-  if (!image.usable()) {
-    return image;
-  }
-  std::string path(ro::render::kSkinRoot);
-  path += leaf;
-  if (const ro::render::IconTexture& turned = images_->GetOursForDarkPaper(path); turned.usable()) {
-    image.dark_paper_id = static_cast<ImTextureID>(turned.texture.name());
-  }
-  return image;
+  return SkinImageAt(images_, leaf);
 }
 
 ro::ui::SkinImage QuestStage::IconOf(std::string_view icon_key) const {
@@ -128,7 +102,7 @@ void QuestStage::LoadArt() {
     std::string leaf(kArtFolder);
     leaf += name;
     leaf += kBitmapExtension;
-    return PaperArtAt(leaf);
+    return PaperArtAt(images_, leaf, &ro::render::GameImages::GetOursForDarkPaper);
   };
   art_.row = art("bg_questlist");
   art_.row_selected = art("bg_questlist_check");

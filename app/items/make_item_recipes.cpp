@@ -6,6 +6,7 @@
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "items/make_item_flow.h"
 #include "items/make_item_odds.h"
 
@@ -80,14 +81,7 @@ std::string MakeItemFlow::ItemName(std::uint32_t item_id) const {
 }
 
 ro::ui::SkinImage MakeItemFlow::IconOf(std::uint32_t item_id) const {
-  if (icons_ == nullptr) {
-    return {};
-  }
-  const ro::render::IconTexture& icon = icons_->Get(item_id);
-  return ro::ui::SkinImage{
-      .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-      .width = static_cast<float>(icon.width_px),
-      .height = static_cast<float>(icon.height_px)};
+  return ItemIconImage(icons_, item_id);
 }
 
 // La forge seule, et pas les métaux : un Star Crumb ne se forge pas avec des

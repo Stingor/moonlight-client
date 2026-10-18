@@ -125,11 +125,6 @@ class AchievementStage {
                       ro::sim::World& world, std::uint32_t now_ms);
   void LoadArt();
   [[nodiscard]] ro::ui::SkinImage ImageAt(std::string_view leaf) const;
-  // UNE PIÈCE PEINTE SUR DU BLANC, avec ce qu'elle montre sur un papier sombre :
-  // l'art d'interface retourné, ou l'objet peint détouré.
-  using DarkPaperVariant =
-      const ro::render::IconTexture& (ro::render::GameImages::*)(std::string_view);
-  [[nodiscard]] ro::ui::SkinImage PaperArtAt(std::string_view leaf, DarkPaperVariant variant) const;
   [[nodiscard]] ro::ui::SkinImage IconOf(const ro::vfs::AchievementInfo& info) const;
   void ComposeWords();
   void ComposeWindow(const AchievementWindows& windows);

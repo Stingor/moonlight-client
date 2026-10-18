@@ -15,7 +15,6 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
-#include "ro/render/skin_pieces.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/navi_search.h"
 
@@ -23,6 +22,7 @@
 #include "chat/chat_place_link.h"
 #include "game/bug_report_context.h"
 #include "game/game.h"
+#include "game/skin_image_of.h"
 #include "world/battlefield_view.h"
 #include "world/map_stage.h"
 #include "world/minimap_compose.h"
@@ -254,14 +254,7 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
 
   // ── Les vues ───────────────────────────────────────────────────────────────
   const MinimapImageAt image_at = [this](std::string_view path) -> ro::ui::SkinImage {
-    if (!pieces_.game_images.has_value()) return {};
-    std::string full(ro::render::kSkinRoot);
-    full += path;
-    const ro::render::IconTexture& icon = pieces_.game_images->GetOurs(full);
-    if (!icon.usable()) return {};
-    return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                             .width = static_cast<float>(icon.width_px),
-                             .height = static_cast<float>(icon.height_px)};
+    return SkinImageAt(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, path);
   };
   std::string_view here_label;
   if (pieces_.map_display_names.has_value() && !here.empty())

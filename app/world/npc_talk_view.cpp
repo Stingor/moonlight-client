@@ -7,6 +7,7 @@
 #include "ro/sim/npc_dialog.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "options/setting_links.h"
 
 namespace moonclient {
@@ -167,13 +168,7 @@ ro::ui::NpcDialogArt NpcTalkView::art() {
     if (icons == nullptr) {
       return {};
     }
-    const ro::render::IconTexture& icon = icons->Get(item_id);
-    if (!icon.usable()) {
-      return {};
-    }
-    return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                             .width = static_cast<float>(icon.width_px),
-                             .height = static_cast<float>(icon.height_px)};
+    return SkinImageOf(icons->Get(item_id));
   };
 
   art.media_owner = this;

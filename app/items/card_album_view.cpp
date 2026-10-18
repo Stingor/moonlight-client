@@ -5,14 +5,14 @@
 #include <string>
 #include <utility>
 
-#include <imgui.h>
-
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
 #include "ro/sim/equip_location.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -140,12 +140,10 @@ constexpr std::array<AlbumSource, ro::ui::kCardAlbumSourceCount> kAlbumSources =
 }
 
 [[nodiscard]] ro::ui::SkinImage ImageOf(const ro::render::IconTexture* texture) {
-  if (texture == nullptr || !texture->usable()) {
+  if (texture == nullptr) {
     return {};
   }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(texture->texture.name()),
-                           .width = static_cast<float>(texture->width_px),
-                           .height = static_cast<float>(texture->height_px)};
+  return SkinImageOf(*texture);
 }
 
 }  // namespace

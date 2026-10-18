@@ -5,12 +5,12 @@
 #include <string_view>
 #include <utility>
 
-#include <imgui.h>
-
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
 #include "ro/net/cash_shop.h"
 #include "ro/vfs/cash_shop_words.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -206,12 +206,7 @@ void CashShopStage::NoteDrawn(const std::vector<std::uint32_t>& item_ids) {
     if (!icon->usable()) {
       icon = &icons_->Get(item_id);
     }
-    images_.emplace(
-        item_id,
-        ro::ui::SkinImage{
-            .id = icon->usable() ? static_cast<ImTextureID>(icon->texture.name()) : ImTextureID{0},
-            .width = static_cast<float>(icon->width_px),
-            .height = static_cast<float>(icon->height_px)});
+    images_.emplace(item_id, SizedSkinImageOf(*icon));
   }
 }
 

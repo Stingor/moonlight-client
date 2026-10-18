@@ -26,6 +26,7 @@
 #include "character/equip_attribute_lines.h"
 #include "character/equip_change_line.h"
 #include "character/equip_slot_map.h"
+#include "game/skin_image_of.h"
 #include "items/inventory_view.h"
 #include "world/actor_view.h"
 
@@ -160,9 +161,7 @@ void CharacterView::RefreshCompanions(const ro::sim::World& world) {
       if (skill_icons_ != nullptr) {
         const ro::render::IconTexture& drawn = skill_icons_->Get(skill, node->idname);
         if (drawn.usable()) {
-          icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(drawn.texture.name()),
-                                   .width = static_cast<float>(drawn.width_px),
-                                   .height = static_cast<float>(drawn.height_px)};
+          icon = SkinImageOf(drawn);
         }
       }
     }
@@ -221,10 +220,7 @@ void CharacterView::Refresh(bool open, const ro::sim::World& world, bool costume
     view.damaged = piece->damaged;
     if (icons_ != nullptr) {
       const ro::render::IconTexture& icon = icons_->Get(piece->item_id);
-      view.icon = ro::ui::SkinImage{
-          .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-          .width = static_cast<float>(icon.width_px),
-          .height = static_cast<float>(icon.height_px)};
+      view.icon = SizedSkinImageOf(icon);
     }
   }
   // ⚠ LES NOMS SE DÉSIGNENT APRÈS LA BOUCLE. Ici le tableau ne se réalloue

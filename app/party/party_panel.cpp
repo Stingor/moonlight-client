@@ -13,10 +13,10 @@
 #include "ro/net/party.h"
 #include "ro/net/social_text.h"
 #include "ro/net/target_info.h"
-#include "ro/render/skin_pieces.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "world/actor_styles.h"
 #include "world/actor_view.h"
 #include "world/click_action.h"
@@ -211,19 +211,7 @@ bool PartyPanel::ActorPresent(std::uint32_t account_id) const {
 }
 
 ro::ui::SkinImage PartyPanel::ImageAt(std::string_view path) {
-  if (pieces_.images == nullptr) {
-    return {};
-  }
-  std::string full(ro::render::kSkinRoot);
-  full += path;
-  // ⚠ `GetOurs` : le chemin est écrit dans NOS sources, en UTF-8.
-  const ro::render::IconTexture& icon = pieces_.images->GetOurs(full);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageAt(pieces_.images, path);
 }
 
 ro::ui::SkinImage PartyPanel::JobIcon(std::uint16_t job) {
@@ -279,13 +267,7 @@ ro::ui::SkinImage PartyPanel::Head(std::uint32_t account_id) {
   cell.look.hair_palette = look.hair_palette;
   cell.box.width = kHeadBoxPixels;
   cell.box.height = kHeadBoxPixels;
-  const ro::render::IconTexture& head = thumbnails_->Get(cell);
-  if (!head.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(head.texture.name()),
-                           .width = static_cast<float>(head.width_px),
-                           .height = static_cast<float>(head.height_px)};
+  return SkinImageOf(thumbnails_->Get(cell));
 }
 
 ro::ui::SkinImage PartyPanel::Crown() { return ImageAt(kCrownPath); }

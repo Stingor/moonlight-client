@@ -15,6 +15,7 @@
 
 #include "chat/banned_input.h"
 #include "game/game_pieces.h"
+#include "game/skin_image_of.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -70,13 +71,7 @@ constexpr std::uint32_t kPlainColor = 0;
   if (!pieces.item_icons.has_value() || item_id == 0) {
     return {};
   }
-  const ro::render::IconTexture& icon = pieces.item_icons->Get(item_id);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageOf(pieces.item_icons->Get(item_id));
 }
 
 [[nodiscard]] std::string ItemName(const GamePieces& pieces, std::uint32_t item_id) {

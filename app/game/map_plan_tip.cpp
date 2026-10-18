@@ -2,12 +2,11 @@
 
 #include <string>
 
-#include <imgui.h>
-
 #include "ro/render/game_images.h"
 #include "ro/render/skin_pieces.h"
 
 #include "game/game_pieces.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -25,13 +24,7 @@ ro::ui::SkinImage MapPlanOf(std::string_view map, GamePieces& pieces) {
   path += kMapPlanFolder;
   path += map;
   path += kMapPlanExtension;
-  const ro::render::IconTexture& plan = pieces.game_images->GetOurs(path);
-  if (!plan.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(plan.texture.name()),
-                           .width = static_cast<float>(plan.width_px),
-                           .height = static_cast<float>(plan.height_px)};
+  return SkinImageOf(pieces.game_images->GetOurs(path));
 }
 
 ro::ui::NavigationPlaceTip PlaceTipOf(const PlaceLink& place, GamePieces& pieces) {

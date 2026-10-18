@@ -10,6 +10,7 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/item_name.h"
 
+#include "game/skin_image_of.h"
 #include "items/inventory_view.h"
 #include "items/view_equip_rows.h"
 
@@ -104,9 +105,7 @@ ro::ui::ViewEquipPieceView ViewedEquipmentView::PieceView(const ro::sim::Invento
   if (icons_ != nullptr) {
     const ro::render::IconTexture& icon = icons_->Get(piece.item_id);
     if (icon.usable()) {
-      shown.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                     .width = static_cast<float>(icon.width_px),
-                                     .height = static_cast<float>(icon.height_px)};
+      shown.icon = SkinImageOf(icon);
     }
   }
   return shown;

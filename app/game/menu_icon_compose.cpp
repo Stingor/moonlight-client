@@ -9,6 +9,8 @@
 #include "ro/core/i18n.h"
 #include "ro/core/printed.h"
 
+#include "game/skin_image_of.h"
+
 namespace moonclient {
 namespace {
 
@@ -24,13 +26,7 @@ constexpr std::string_view kMapWithoutCashShopButton = "new_event";
   }
   // ⚠ `GetOurs` ET NON `Get` : le chemin est écrit dans NOS sources, en UTF-8,
   // et le dossier d'interface est en coréen.
-  const ro::render::IconTexture& icon = images->GetOurs(path);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageOf(images->GetOurs(path));
 }
 
 [[nodiscard]] ro::ui::SkinImage ImageOf(ro::render::GameImages* images, MenuCommand command,

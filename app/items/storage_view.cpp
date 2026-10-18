@@ -12,6 +12,7 @@
 #include "ro/sim/storage_shelf.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -85,10 +86,7 @@ void StorageView::Refresh(const ro::sim::World& world, ro::ui::ItemTab tab, std:
     }
     if (told != nullptr && told->icon_item_id != 0 && icons_ != nullptr) {
       const ro::render::IconTexture& icon = icons_->Get(told->icon_item_id);
-      view.icon = ro::ui::SkinImage{
-          .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-          .width = static_cast<float>(icon.width_px),
-          .height = static_cast<float>(icon.height_px)};
+      view.icon = SizedSkinImageOf(icon);
     }
     shelves_.push_back(view);
   }

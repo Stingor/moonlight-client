@@ -7,6 +7,8 @@
 
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
+
 namespace moonclient {
 namespace {
 
@@ -207,10 +209,7 @@ void StatusView::BuildCells() {
     ro::ui::StatusCellView cell;
     if (icons_ != nullptr) {
       const ro::render::IconTexture& icon = icons_->Get(held.effect);
-      cell.icon = ro::ui::SkinImage{
-          .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-          .width = static_cast<float>(icon.width_px),
-          .height = static_cast<float>(icon.height_px)};
+      cell.icon = SizedSkinImageOf(icon);
     }
     cell.abbreviation = abbreviations_[rank];
     // ⚠ NI IMAGE NI MOT : la case ne se dessinerait pas, et lui garder sa place
@@ -256,9 +255,7 @@ const ro::ui::StatusPreviewView& StatusView::Preview(ro::sim::StatusEffectId eff
   if (icons_ != nullptr) {
     const ro::render::IconTexture& icon = icons_->Get(effect);
     if (icon.usable()) {
-      preview_.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                        .width = static_cast<float>(icon.width_px),
-                                        .height = static_cast<float>(icon.height_px)};
+      preview_.icon = SkinImageOf(icon);
     }
   }
   return preview_;

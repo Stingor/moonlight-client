@@ -5,14 +5,12 @@
 #include <string>
 #include <string_view>
 
-#include <imgui.h>
-
 #include "ro/core/text.h"
-#include "ro/render/skin_pieces.h"
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
 
 #include "game/mail_stage.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -23,20 +21,6 @@ constexpr std::string_view kZenyIcon = "basic_interface\\rodexsystem\\renewal\\i
 constexpr std::string_view kItemsIcon = "basic_interface\\rodexsystem\\renewal\\icon_item.bmp";
 constexpr std::string_view kZenyAndItemsIcon =
     "basic_interface\\rodexsystem\\renewal\\icon_zeny_n_item.bmp";
-
-ro::ui::SkinImage ImageAt(ro::render::GameImages& images, std::string_view leaf) {
-  std::string path(ro::render::kSkinRoot);
-  path += leaf;
-  // ⚠ `GetOurs` ET NON `Get` : le chemin est écrit dans NOS sources, en UTF-8,
-  // et le dossier d'interface est en coréen.
-  const ro::render::IconTexture& icon = images.GetOurs(path);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
-}
 
 ro::ui::MailBox UiBoxOf(ro::sim::MailBox box) {
   switch (box) {
@@ -95,9 +79,9 @@ void MailStage::LoadIcons() {
   }
   icons_loaded_ = true;
   icons_generation_ = images_->generation();
-  icons_ = ro::ui::MailCarriedIcons{.zeny = ImageAt(*images_, kZenyIcon),
-                                    .items = ImageAt(*images_, kItemsIcon),
-                                    .zeny_and_items = ImageAt(*images_, kZenyAndItemsIcon)};
+  icons_ = ro::ui::MailCarriedIcons{.zeny = SkinImageAt(images_, kZenyIcon),
+                                    .items = SkinImageAt(images_, kItemsIcon),
+                                    .zeny_and_items = SkinImageAt(images_, kZenyAndItemsIcon)};
 }
 
 void MailStage::ComposeBox(const MailWindows& windows, const TradeContext& context) {

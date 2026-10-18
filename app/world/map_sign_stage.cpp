@@ -2,6 +2,8 @@
 
 #include "ro/render/skin_pieces.h"
 
+#include "game/skin_image_of.h"
+
 namespace moonclient {
 namespace {
 
@@ -70,13 +72,10 @@ std::optional<ro::ui::MapSignView> MapSignStage::Stage(ro::render::GameImages* i
   if (!image.usable()) {
     return std::nullopt;
   }
-  return ro::ui::MapSignView{
-      .background = ro::ui::SkinImage{.id = static_cast<ImTextureID>(image.texture.name()),
-                                      .width = static_cast<float>(image.width_px),
-                                      .height = static_cast<float>(image.height_px)},
-      .subtitle = shown_->subtitle,
-      .title = shown_->title,
-      .elapsed_ms = elapsed_ms};
+  return ro::ui::MapSignView{.background = SkinImageOf(image),
+                             .subtitle = shown_->subtitle,
+                             .title = shown_->title,
+                             .elapsed_ms = elapsed_ms};
 }
 
 }  // namespace moonclient

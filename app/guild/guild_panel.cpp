@@ -16,6 +16,7 @@
 #include "ro/net/skill.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "world/actor_styles.h"
 
 namespace moonclient {
@@ -146,9 +147,7 @@ void GuildPanel::RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::S
       cell.box.height = kHeadBoxPixels;
       const ro::render::IconTexture& head = thumbnails_->Get(cell);
       if (head.usable()) {
-        view.head = ro::ui::SkinImage{.id = static_cast<ImTextureID>(head.texture.name()),
-                                      .width = static_cast<float>(head.width_px),
-                                      .height = static_cast<float>(head.height_px)};
+        view.head = SkinImageOf(head);
       }
     }
     members_.push_back(view);

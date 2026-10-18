@@ -18,7 +18,6 @@
 #include "ro/net/player_config.h"
 #include "ro/net/skill_facts.h"
 #include "ro/net/world_update.h"
-#include "ro/render/skin_pieces.h"
 #include "ro/sim/damage_meter.h"
 #include "ro/sim/movement.h"
 #include "ro/vfs/cash_shop_words.h"
@@ -37,6 +36,7 @@
 #include "game/interface_sound.h"
 #include "game/menu_icon_route.h"
 #include "game/setting_destination_open.h"
+#include "game/skin_image_of.h"
 #include "game/warp_list_stage.h"
 #include "game/window_events.h"
 #include "items/inventory_view.h"
@@ -86,17 +86,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
           .guild = guild_book_,
           .vfs = vfs_,
           .image_at = [this](std::string_view path) -> ro::ui::SkinImage {
-            if (!pieces_.game_images.has_value()) {
-              return {};
-            }
-            const ro::render::IconTexture& icon =
-                pieces_.game_images->GetOurs(std::string(ro::render::kSkinRoot) += path);
-            if (!icon.usable()) {
-              return {};
-            }
-            return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                     .width = static_cast<float>(icon.width_px),
-                                     .height = static_cast<float>(icon.height_px)};
+            return SkinImageAt(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
+                               path);
           },
           .item_at = [this](std::uint32_t item_id) -> BattlegroundItemFace {
             const TradeItems& items = pieces_.trade.items();

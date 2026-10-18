@@ -1,7 +1,5 @@
 #include "game/repair_stage.h"
 
-#include <imgui.h>
-
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/repair_list.h"
@@ -9,6 +7,7 @@
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 
+#include "game/skin_image_of.h"
 #include "items/repair_piece_name.h"
 
 namespace moonclient {
@@ -41,13 +40,7 @@ ro::ui::SkinImage RepairStage::IconOf(std::uint32_t item_id) const {
   if (icons_ == nullptr || item_id == 0) {
     return {};
   }
-  const ro::render::IconTexture& icon = icons_->Get(item_id);
-  if (!icon.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                           .width = static_cast<float>(icon.width_px),
-                           .height = static_cast<float>(icon.height_px)};
+  return SkinImageOf(icons_->Get(item_id));
 }
 
 void RepairStage::Stage(const ro::sim::World& world, ro::ui::RepairWindowState& state,

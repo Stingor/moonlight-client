@@ -16,6 +16,7 @@
 #include "character/shortcut_file.h"
 #include "game/homunculus_stage.h"
 #include "game/mercenary_stage.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 
@@ -154,10 +155,7 @@ void ShortcutBarView::Refresh(const ro::sim::World& world, const Hotkeys& bindin
       }
       if (item_icons_ != nullptr) {
         const ro::render::IconTexture& icon = item_icons_->Get(slot.item_id);
-        view.icon = ro::ui::SkinImage{
-            .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-            .width = static_cast<float>(icon.width_px),
-            .height = static_cast<float>(icon.height_px)};
+        view.icon = SizedSkinImageOf(icon);
       }
       view.amount = world.inventory().AmountOf(slot.item_id);
       view.known = view.amount > 0;
@@ -174,10 +172,7 @@ void ShortcutBarView::Refresh(const ro::sim::World& world, const Hotkeys& bindin
       view.name = node->display_name;
       if (icons_ != nullptr) {
         const ro::render::IconTexture& icon = icons_->Get(slot.skill_id, node->idname);
-        view.icon = ro::ui::SkinImage{
-            .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-            .width = static_cast<float>(icon.width_px),
-            .height = static_cast<float>(icon.height_px)};
+        view.icon = SizedSkinImageOf(icon);
       }
     }
     // ⚠ LE RANG APPRIS VIENT DU SERVEUR, ET IL BORNE LE RÉGLAGE DE LA CASE :

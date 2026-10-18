@@ -14,6 +14,7 @@
 #include "ro/vfs/item_name.h"
 
 #include "game/item_db_block.h"
+#include "game/skin_image_of.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -321,9 +322,7 @@ void DescriptionView::ComposeInstance(const ro::sim::InventoryItem& held) {
       }
       if (row.id != 0 && icons_ != nullptr) {
         if (const ro::render::IconTexture& icon = icons_->Get(row.id); icon.usable()) {
-          row.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                       .width = static_cast<float>(icon.width_px),
-                                       .height = static_cast<float>(icon.height_px)};
+          row.icon = SkinImageOf(icon);
         }
       }
       cards_.push_back(row);
@@ -398,9 +397,7 @@ void DescriptionView::RefreshOdds(std::uint32_t item_id) {
       if (!entry.is_monster && icons_ != nullptr) {
         const ro::render::IconTexture& icon = icons_->Get(entry.id);
         if (icon.usable()) {
-          row.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                       .width = static_cast<float>(icon.width_px),
-                                       .height = static_cast<float>(icon.height_px)};
+          row.icon = SkinImageOf(icon);
         }
       }
       odds_.push_back(row);

@@ -19,6 +19,8 @@
 #include "ro/vfs/craft_words.h"
 #include "ro/vfs/item_name.h"
 
+#include "game/skin_image_of.h"
+
 namespace moonclient {
 namespace {
 
@@ -607,14 +609,7 @@ std::string WeaponRefineFlow::ItemName(std::uint32_t item_id) const {
 }
 
 ro::ui::SkinImage WeaponRefineFlow::IconOf(std::uint32_t item_id) const {
-  if (icons_ == nullptr) {
-    return {};
-  }
-  const ro::render::IconTexture& icon = icons_->Get(item_id);
-  return ro::ui::SkinImage{
-      .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-      .width = static_cast<float>(icon.width_px),
-      .height = static_cast<float>(icon.height_px)};
+  return ItemIconImage(icons_, item_id);
 }
 
 int WeaponRefineFlow::SlotsOf(std::uint32_t item_id) const {

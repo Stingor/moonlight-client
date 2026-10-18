@@ -5,8 +5,6 @@
 #include <ctime>
 #include <string_view>
 
-#include <imgui.h>
-
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
@@ -16,6 +14,7 @@
 #include "ro/sim/skill_book.h"
 
 #include "game/game_pieces.h"
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -141,9 +140,7 @@ void MercenaryStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
       const ro::render::IconTexture& icon =
           pieces.skill_icons->Get(skill.skill_id, node != nullptr ? node->idname : skill.name);
       if (icon.usable()) {
-        row.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                     .width = static_cast<float>(icon.width_px),
-                                     .height = static_cast<float>(icon.height_px)};
+        row.icon = SkinImageOf(icon);
       }
     }
     skill_rows_.push_back(row);

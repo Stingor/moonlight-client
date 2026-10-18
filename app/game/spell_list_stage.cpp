@@ -1,12 +1,12 @@
 #include "game/spell_list_stage.h"
 
-#include <imgui.h>
-
 #include "ro/core/log.h"
 #include "ro/net/spell_list.h"
 #include "ro/sim/skill_book.h"
 #include "ro/sim/status_effects.h"
 #include "ro/sim/world.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -40,9 +40,7 @@ void SpellListStage::Stage(const ro::sim::SkillTree* tree, ro::render::SkillIcon
     if (icons != nullptr && node != nullptr) {
       const ro::render::IconTexture& icon = icons->Get(skill_id, node->idname);
       if (icon.usable()) {
-        row.icon = ro::ui::SkinImage{.id = static_cast<ImTextureID>(icon.texture.name()),
-                                     .width = static_cast<float>(icon.width_px),
-                                     .height = static_cast<float>(icon.height_px)};
+        row.icon = SkinImageOf(icon);
       }
     }
     rows_.push_back(row);

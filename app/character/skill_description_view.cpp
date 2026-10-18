@@ -2,9 +2,9 @@
 
 #include <string_view>
 
-#include <imgui.h>
-
 #include "ro/sim/world.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 
@@ -75,10 +75,7 @@ void SkillDescriptionView::Refresh(std::uint16_t skill_id, const ro::sim::World&
   if (icons_ != nullptr) {
     const ro::render::IconTexture& icon = icons_->Get(
         skill_id, node != nullptr ? std::string_view(node->idname) : std::string_view());
-    view_.icon = ro::ui::SkinImage{
-        .id = icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : ImTextureID{0},
-        .width = static_cast<float>(icon.width_px),
-        .height = static_cast<float>(icon.height_px)};
+    view_.icon = SizedSkinImageOf(icon);
   }
 }
 

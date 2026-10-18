@@ -11,11 +11,8 @@
 #include "ro/core/printed.h"
 #include "ro/core/search_key.h"
 #include "ro/net/market.h"
-#include "ro/render/game_images.h"
-#include "ro/render/skin_pieces.h"
 
 #include "game/store_search_catalogue.h"
-#include "game/store_search_grade.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -23,21 +20,6 @@ namespace {
 
 // Les lettres des grades, du premier au quatrième.
 constexpr std::string_view kGradeLetters = "DCBA";
-
-ro::ui::SkinImage GradeBadgeOf(std::uint8_t grade, ro::render::GameImages* images) {
-  const std::string path = StoreSearchGradeBadgePath(grade);
-  if (path.empty() || images == nullptr) {
-    return {};
-  }
-  const ro::render::IconTexture& badge =
-      images->GetOurs(std::string(ro::render::kSkinRoot).append(path));
-  if (!badge.usable()) {
-    return {};
-  }
-  return ro::ui::SkinImage{.id = static_cast<ImTextureID>(badge.texture.name()),
-                           .width = static_cast<float>(badge.width_px),
-                           .height = static_cast<float>(badge.height_px)};
-}
 
 ro::sim::MarketColumn ColumnOf(int column) {
   switch (column) {
