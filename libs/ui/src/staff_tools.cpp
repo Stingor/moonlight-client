@@ -194,16 +194,6 @@ constexpr float kLowestNoonAltitudeDegrees = 5.0F;
 constexpr float kHighestNoonAltitudeDegrees = 90.0F;
 constexpr float kLatestSunriseHour = 12.0F;
 
-// L'ÉDITEUR DE CARTE : sa porte. Le mode lui-même a son panneau.
-void DrawMapEditorDoor(StaffToolsState& state, const SkinArt& art) {
-  ImGui::SeparatorText(core::Tr("Éditeur de carte"));
-  if (SkinButton(state.map_editor.active ? core::Tr("Quitter l'éditeur")
-                                         : core::Tr("Ouvrir l'éditeur de carte"),
-                 art)) {
-    state.map_editor_intents.emplace_back(map_editor::Toggle{});
-  }
-}
-
 // LA COURSE DES ASTRES : voir `render::SkyCourse`.
 void DrawSkyCourse(StaffToolsLook& look, const SkinArt& art) {
   static_cast<void>(
@@ -393,16 +383,21 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
   static WindowName name(kStaffToolsTitle, kStaffToolsId);
   ImGui::SetNextWindowSize(ImVec2(kFirstWidth, kFirstHeight), ImGuiCond_FirstUseEver);
   ConstrainNextWindowToScreen(name.Get());
-  // LE JOURNAL DU PROGRAMME ET L'INSPECTEUR DE TRAMES, à un clic : ce sont des
-  // outils du staff, et ces boutons sont leur seule porte.
+  // LE JOURNAL DU PROGRAMME, L'INSPECTEUR DE TRAMES ET L'ÉDITEUR DE CARTE, à un
+  // clic : ce sont des outils du staff, et ces boutons sont leur seule porte.
   SetNextWindowTitleAction(core::Tr("Journal"),
                            core::Tr("Ouvrir ou refermer le journal du programme."), true);
   SetNextWindowTitleAction(core::Tr("Trames"),
                            core::Tr("Ouvrir ou refermer l'inspecteur des trames reçues."), true);
+  SetNextWindowTitleAction(core::Tr("Éditeur"), core::Tr("Ouvrir ou refermer l'éditeur de carte."),
+                           true);
   const bool body_shown = BeginSkinnedWindow(name.Get(), &state.open, art);
   // ⚠ LUS AVANT DE SORTIR : repliée, la fenêtre garde ses deux boutons de barre.
   action.toggle_log = TitleActionClicked(0);
   action.toggle_packets = TitleActionClicked(1);
+  if (TitleActionClicked(2)) {
+    state.map_editor_intents.emplace_back(map_editor::Toggle{});
+  }
   if (!body_shown) {
     EndSkinnedWindow();
     return action;
@@ -417,7 +412,6 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
   DrawSky(state.sky, state.look.sky_course_tuned ? state.look.sky_course : render::SkyCourse(),
           art);
   DrawSkyCourse(state.look, art);
-  DrawMapEditorDoor(state, art);
   DrawSound(state, art);
   DrawPicking(state.look.picking, art);
   DrawDebugConsole(state, art);

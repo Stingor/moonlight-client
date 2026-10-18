@@ -28,6 +28,9 @@ struct ActorShadowKey {
   std::size_t action_index = 0;
   std::size_t frame_index = 0;
   std::size_t quad_count = 0;
+  // Le premier coin du premier calque : une image qui pivote sans changer
+  // d'action ni d'image — un sprite de décor qui roule — le déplace.
+  glm::vec2 lead_corner{0.0F};
   glm::vec3 ground_position{0.0F};
   float scale = 0.0F;
   float height_scale = 0.0F;

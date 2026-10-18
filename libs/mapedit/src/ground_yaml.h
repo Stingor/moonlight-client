@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <string_view>
 
@@ -22,5 +23,14 @@ namespace ro::mapedit::detail {
 // Une chaîne entre guillemets, ses guillemets, barres obliques inverses et
 // sauts de ligne échappés : l'écriture de toute raison du document.
 [[nodiscard]] std::string DoubleQuoted(std::string_view text);
+
+// Une chaîne entre apostrophes : rien ne s'y échappe, sauf l'apostrophe, qui
+// se double. C'est ce qui garde lisibles les barres obliques inverses d'un
+// chemin.
+[[nodiscard]] std::string SingleQuoted(std::string_view text);
+
+// Un vecteur, chaque composante à son écriture la plus courte qui se relit à
+// l'identique.
+[[nodiscard]] std::string VectorText(const std::array<float, 3>& vector);
 
 }  // namespace ro::mapedit::detail

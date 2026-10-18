@@ -17,6 +17,7 @@
 #include "ro/ui/map_editor_effects_panel.h"
 #include "ro/ui/map_editor_ground_panel.h"
 #include "ro/ui/map_editor_row_menu.h"
+#include "ro/ui/map_editor_sprites_panel.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -124,10 +125,13 @@ ImU32 ColorOf(MapEditorLineKind kind) {
     case MapEditorLineKind::kVertexSelected:
     case MapEditorLineKind::kLightSelected:
     case MapEditorLineKind::kEffectSelected:
+    case MapEditorLineKind::kSpriteSelected:
       return kActiveColor;
     case MapEditorLineKind::kVertex:
     case MapEditorLineKind::kLight:
       return kSelectionColor;
+    case MapEditorLineKind::kSprite:
+      return kAxisYColor;
     case MapEditorLineKind::kEffect:
       return kAxisXColor;
     case MapEditorLineKind::kBrush:
@@ -442,6 +446,13 @@ void DrawLines(const MapEditorView& view) {
           ColorOf(line.kind), kLineThicknessPixels);
       continue;
     }
+    if (line.kind == MapEditorLineKind::kSprite ||
+        line.kind == MapEditorLineKind::kSpriteSelected) {
+      list->AddRect(ImVec2(line.from.x - kLightMarkerPixels, line.from.y - kLightMarkerPixels),
+                    ImVec2(line.from.x + kLightMarkerPixels, line.from.y + kLightMarkerPixels),
+                    ColorOf(line.kind), 0.0F, 0, kLineThicknessPixels);
+      continue;
+    }
     if (line.kind == MapEditorLineKind::kLight || line.kind == MapEditorLineKind::kLightSelected) {
       list->AddCircle(ImVec2(line.from.x, line.from.y), kLightMarkerPixels, ColorOf(line.kind), 0,
                       kLineThicknessPixels);
@@ -748,6 +759,9 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
   }
   if (ImGui::CollapsingHeader(core::Tr("Effets"))) {
     DrawEffects(view, panel, intents, art);
+  }
+  if (ImGui::CollapsingHeader(core::Tr("Sprites"))) {
+    DrawSprites(view, panel, intents, art);
   }
 
   ImGui::Separator();

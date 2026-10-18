@@ -11,6 +11,7 @@
 #include "ro/core/error.h"
 #include "ro/formats/rsm.h"
 #include "ro/formats/rsw.h"
+#include "ro/mapedit/map_sprite.h"
 
 namespace ro::mapedit {
 
@@ -258,7 +259,7 @@ class MapEdit {
   [[nodiscard]] const std::vector<ModelEdit>& models() const noexcept { return models_; }
   [[nodiscard]] bool empty() const noexcept {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
-           effects_.empty() && effect_edits_.empty() && ground_.empty();
+           effects_.empty() && effect_edits_.empty() && ground_.empty() && sprites_.empty();
   }
   // LES RETOUCHES DU RELIEF : une seule par point, rangées par rangée puis par
   // colonne. Une seule raison les couvre toutes : un relief se retouche d'un
@@ -274,6 +275,13 @@ class MapEdit {
     ground_.clear();
     ground_why_.clear();
   }
+  // LES SPRITES DE DÉCOR, dans l'ordre du document : voir ro/mapedit/map_sprite.h.
+  [[nodiscard]] const std::vector<MapSprite>& sprites() const noexcept { return sprites_; }
+  void AddSprite(MapSprite sprite) { sprites_.push_back(std::move(sprite)); }
+  // Remplace le sprite de rang `slot` ; hors de la liste, rien.
+  void SetSprite(std::size_t slot, MapSprite sprite);
+  // Retire le sprite de rang `slot` : les suivants remontent.
+  void RemoveSprite(std::size_t slot);
   // Les effets ajoutés, dans l'ordre du document.
   [[nodiscard]] const std::vector<AddedEffect>& effects() const noexcept { return effects_; }
   void AddEffect(AddedEffect effect) { effects_.push_back(std::move(effect)); }
@@ -328,6 +336,7 @@ class MapEdit {
   std::vector<EffectEdit> effect_edits_;
   std::vector<GroundEdit> ground_;
   std::string ground_why_;
+  std::vector<MapSprite> sprites_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

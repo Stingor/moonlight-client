@@ -213,6 +213,18 @@ void MapEdit::RemoveLight(std::size_t slot) {
   }
 }
 
+void MapEdit::SetSprite(std::size_t slot, MapSprite sprite) {
+  if (slot < sprites_.size()) {
+    sprites_[slot] = std::move(sprite);
+  }
+}
+
+void MapEdit::RemoveSprite(std::size_t slot) {
+  if (slot < sprites_.size()) {
+    sprites_.erase(sprites_.begin() + static_cast<std::ptrdiff_t>(slot));
+  }
+}
+
 void MapEdit::RemoveAdded(std::size_t slot) {
   if (slot < added_.size()) {
     added_.erase(added_.begin() + static_cast<std::ptrdiff_t>(slot));

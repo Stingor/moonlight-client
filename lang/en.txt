@@ -18907,8 +18907,6 @@ tr: The fix of model %zu has no reason.
 fr: Modèle désigné
 tr: Selected model
 
-fr: Ouvrir l'éditeur de carte
-tr: Open the map editor
 
 fr: Placer le modèle %zu
 tr: Place model %zu
@@ -19698,3 +19696,90 @@ tr: Overwrite
 
 fr: Recharger
 tr: Reload
+
+fr: Ajouter un sprite
+tr: Add a sprite
+
+fr: Blessure
+tr: Hurt
+
+fr: Ce sprite ne se lit pas dans l'installation.
+tr: This sprite cannot be read from the installation.
+
+fr: De dos
+tr: Back
+
+fr: De face
+tr: Front
+
+fr: Est
+tr: East
+
+fr: Figée
+tr: Frozen
+
+fr: Le sprite %zu n'a pas de raison.
+tr: Sprite %zu has no reason.
+
+fr: Nord-est
+tr: North-east
+
+fr: Nord-ouest
+tr: North-west
+
+fr: Ouest
+tr: West
+
+fr: Rang d'animation
+tr: Animation rank
+
+fr: Retirer le sprite
+tr: Remove the sprite
+
+fr: Retirer le sprite %zu
+tr: Remove sprite %zu
+
+fr: Rotation (°/s)
+tr: Turning (°/s)
+
+fr: Roulis
+tr: Roll
+
+fr: Roulis (°/s)
+tr: Roll (°/s)
+
+fr: Régler le sprite %zu
+tr: Adjust sprite %zu
+
+fr: Sprite
+tr: Sprite
+
+fr: Sprite (nom ou numéro)
+tr: Sprite (name or number)
+
+fr: Sprite de décor %s
+tr: Scenery sprite %s
+
+fr: Sprite à ajouter
+tr: Sprite to add
+
+fr: Sprites
+tr: Sprites
+
+fr: Sud-est
+tr: South-east
+
+fr: Sud-ouest
+tr: South-west
+
+fr: Vitesse de l'animation
+tr: Animation speed
+
+fr: nom ou numéro de monstre
+tr: monster name or number
+
+fr: Éditeur
+tr: Editor
+
+fr: Ouvrir ou refermer l'éditeur de carte.
+tr: Open or close the map editor.

@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/ui/map_cells.h"
+#include "ro/ui/map_editor_sprite_view.h"
 #include "ro/ui/skin_art.h"
 
 struct ImFont;
@@ -126,6 +127,9 @@ enum class MapEditorLineKind : std::uint8_t {
   kGroundPointEdited = 13,
   kGroundPointSelected = 14,
   kGroundPointDesignated = 15,
+  // Un sprite de décor, et le sprite désigné : des carrés, en `from`.
+  kSprite = 16,
+  kSpriteSelected = 17,
 };
 
 // L'OUTIL DE LA VUE : les poignées qui déplacent, tournent ou mettent à
@@ -271,6 +275,9 @@ struct MapEditorView {
   // LES EFFETS DE LA CARTE, dans l'ordre du RSW, et celui qu'on règle.
   std::vector<MapEditorMapEffect> map_effects;
   std::optional<std::size_t> selected_map_effect;
+  // LES SPRITES DE DÉCOR du document, et celui qu'on règle.
+  std::vector<MapEditorSprite> sprites;
+  std::optional<std::size_t> selected_sprite;
   // LE RELIEF : la brosse, et ce que le document retouche.
   MapEditorGround ground;
   // L'aperçu du modèle survolé.
@@ -457,7 +464,9 @@ using MapEditorIntent = std::variant<
     map_editor::SetMapEffect, map_editor::RevertMapEffect, map_editor::MoveMapEffect,
     map_editor::SetBrush, map_editor::EndGroundStroke, map_editor::RevertGround,
     map_editor::SetGroundWhy, map_editor::LiftGroundPoints, map_editor::SetGroundPointHeight,
-    map_editor::RevertGroundPoints, map_editor::Overwrite, map_editor::Reload>;
+    map_editor::RevertGroundPoints, map_editor::Overwrite, map_editor::Reload,
+    map_editor::AddSprite, map_editor::SelectSprite, map_editor::SetSprite,
+    map_editor::RemoveSprite, map_editor::MoveSprite>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -506,6 +515,16 @@ struct MapEditorPanelState {
   // La raison du relief, comme celle d'un modèle.
   std::array<char, kWhyCapacity> ground_why{};
   bool ground_why_typing = false;
+  // LES SPRITES DE DÉCOR : le nom ou le numéro qu'ajoute le bouton, et la
+  // raison du sprite réglé, comme celle d'une lumière.
+  std::array<char, kFilterCapacity> sprite_input{};
+  std::array<char, kWhyCapacity> sprite_why{};
+  std::optional<std::size_t> sprite_why_of;
+  bool sprite_why_typing = false;
+  // Le nom du sprite réglé, saisi comme sa raison.
+  std::array<char, kFilterCapacity> sprite_name{};
+  std::optional<std::size_t> sprite_name_of;
+  bool sprite_name_typing = false;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

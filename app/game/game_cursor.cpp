@@ -21,6 +21,23 @@
 
 namespace moonclient {
 
+bool Game::CameraTurning() const {
+  // Seule la rotation change le curseur ; incliner ou reculer gardent le survol.
+  float x = 0.0F;
+  float y = 0.0F;
+  const SDL_MouseButtonFlags held = SDL_GetMouseState(&x, &y);
+  const SDL_Keymod mods = SDL_GetModState();
+  const auto turns = [&](MouseGesture gesture) {
+    const std::optional<ActionRef> action = settings_->bindings().ActionForGesture(
+        gesture, (mods & SDL_KMOD_CTRL) != 0, (mods & SDL_KMOD_SHIFT) != 0,
+        (mods & SDL_KMOD_ALT) != 0);
+    return action == ActionRef(GameAction::kCameraOrbit) ||
+           action == ActionRef(GameAction::kCameraOrbitZoom);
+  };
+  return ((held & SDL_BUTTON_RMASK) != 0 && turns(MouseGesture::kRightDrag)) ||
+         ((held & SDL_BUTTON_MMASK) != 0 && turns(MouseGesture::kMiddleDrag));
+}
+
 void Game::ComposeCursor(const ro::sim::Actor* designated,
                          const std::optional<ro::sim::CellPosition>& hovered_cell,
                          std::uint32_t now_ms) {

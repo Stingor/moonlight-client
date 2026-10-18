@@ -18907,8 +18907,6 @@ tr: El retoque del modelo %zu no tiene motivo.
 fr: Modèle désigné
 tr: Modelo designado
 
-fr: Ouvrir l'éditeur de carte
-tr: Abrir el editor de mapas
 
 fr: Placer le modèle %zu
 tr: Colocar el modelo %zu
@@ -19698,3 +19696,90 @@ tr: Sobrescribir
 
 fr: Recharger
 tr: Recargar
+
+fr: Ajouter un sprite
+tr: Añadir un sprite
+
+fr: Blessure
+tr: Herida
+
+fr: Ce sprite ne se lit pas dans l'installation.
+tr: Este sprite no se puede leer en la instalación.
+
+fr: De dos
+tr: De espaldas
+
+fr: De face
+tr: De frente
+
+fr: Est
+tr: Este
+
+fr: Figée
+tr: Fija
+
+fr: Le sprite %zu n'a pas de raison.
+tr: El sprite %zu no tiene motivo.
+
+fr: Nord-est
+tr: Noreste
+
+fr: Nord-ouest
+tr: Noroeste
+
+fr: Ouest
+tr: Oeste
+
+fr: Rang d'animation
+tr: Rango de animación
+
+fr: Retirer le sprite
+tr: Quitar el sprite
+
+fr: Retirer le sprite %zu
+tr: Quitar el sprite %zu
+
+fr: Rotation (°/s)
+tr: Giro (°/s)
+
+fr: Roulis
+tr: Balanceo
+
+fr: Roulis (°/s)
+tr: Balanceo (°/s)
+
+fr: Régler le sprite %zu
+tr: Ajustar el sprite %zu
+
+fr: Sprite
+tr: Sprite
+
+fr: Sprite (nom ou numéro)
+tr: Sprite (nombre o número)
+
+fr: Sprite de décor %s
+tr: Sprite de decorado %s
+
+fr: Sprite à ajouter
+tr: Sprite a añadir
+
+fr: Sprites
+tr: Sprites
+
+fr: Sud-est
+tr: Sureste
+
+fr: Sud-ouest
+tr: Suroeste
+
+fr: Vitesse de l'animation
+tr: Velocidad de la animación
+
+fr: nom ou numéro de monstre
+tr: nombre o número de monstruo
+
+fr: Éditeur
+tr: Editor
+
+fr: Ouvrir ou refermer l'éditeur de carte.
+tr: Abrir o cerrar el editor de mapas.

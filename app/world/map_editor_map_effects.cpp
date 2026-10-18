@@ -130,6 +130,7 @@ void MapEditorSession::ChooseMapEffect(std::optional<std::size_t> index) {
     vertex_.reset();
     selected_light_.reset();
     selected_effect_.reset();
+    selected_sprite_.reset();
   }
 }
 

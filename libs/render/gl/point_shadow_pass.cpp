@@ -52,6 +52,7 @@ struct ShadowActor {
                   .action_index = composed.action_index,
                   .frame_index = composed.frame_index,
                   .quad_count = composed.quads.size(),
+                  .lead_corner = composed.quads.front().corners[0],
                   .ground_position = drawn.ground_position,
                   .scale = drawn.scale,
                   .height_scale = drawn.height_scale},

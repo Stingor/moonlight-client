@@ -795,8 +795,11 @@ add_library(moonclient_graphics STATIC
     world/map_editor_mesh.cpp
     world/map_editor_overlay.cpp
     world/map_editor_reasons.cpp
+    world/map_editor_save.cpp
     world/map_editor_session.cpp
+    world/map_editor_sprites.cpp
     world/map_editor_vertices.cpp
+    world/map_sprites.cpp
     world/scene_graphics.cpp
     world/server_sky_hour.cpp)
 

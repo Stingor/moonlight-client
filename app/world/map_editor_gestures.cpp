@@ -37,6 +37,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
   if (ground_points_mode() && !selected_points_.empty()) {
     return NudgeGroundPoints(delta[2], store);
   }
+  if (selected_sprite_.has_value()) {
+    return NudgeSprite(delta, store);
+  }
   if (selected_map_effect_.has_value()) {
     return NudgeMapEffect(delta, scene, store);
   }
@@ -77,6 +80,9 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
 
 MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene& scene,
                                                       MapEditStore& store) {
+  if (selected_sprite_.has_value()) {
+    return DuplicateSprite(store);
+  }
   if (selected_map_effect_.has_value()) {
     return DuplicateMapEffect(scene, store);
   }
@@ -132,6 +138,9 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
 
 MapEditorSession::Outcome MapEditorSession::Delete(const ro::render::MapScene& scene,
                                                    MapEditStore& store) {
+  if (selected_sprite_.has_value()) {
+    return RemoveSprite(*selected_sprite_, store);
+  }
   if (selected_map_effect_.has_value()) {
     return HideMapEffect(scene, store);
   }

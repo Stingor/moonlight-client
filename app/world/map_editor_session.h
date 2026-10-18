@@ -100,6 +100,7 @@ class MapEditorSession {
     selected_light_.reset();
     selected_effect_.reset();
     selected_map_effect_.reset();
+    selected_sprite_.reset();
     gesture_before_.reset();
     ground_stroke_.reset();
     designated_point_.reset();
@@ -204,6 +205,10 @@ class MapEditorSession {
   void SetEffectDots(std::vector<LightDot> dots) { effect_dots_ = std::move(dots); }
   void SetMapEffectDots(std::vector<LightDot> dots) { map_effect_dots_ = std::move(dots); }
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> MapEffectTrace() const;
+  // LE CARRÉ D'UN SPRITE DE DÉCOR à l'écran, et son rang : un clic dessus le
+  // désigne. Les carrés, le désigné distingué.
+  void SetSpriteDots(std::vector<LightDot> dots) { sprite_dots_ = std::move(dots); }
+  [[nodiscard]] std::vector<ro::ui::MapEditorLine> SpriteTrace() const;
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> EffectTrace() const;
   // Les cercles des lumières, la réglée distinguée.
   [[nodiscard]] std::vector<ro::ui::MapEditorLine> LightTrace() const;
@@ -371,6 +376,20 @@ class MapEditorSession {
   // Les gestes du clavier sur l'effet désigné : voir map_editor_gestures.cpp.
   Outcome NudgeEffect(const std::array<float, 3>& delta, MapEditStore& store);
   Outcome DuplicateEffect(MapEditStore& store);
+  // LES SPRITES DE DÉCOR : voir map_editor_sprites.cpp.
+  void ViewSprites(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
+  Outcome AddSprite(std::string sprite, MapEditStore& store);
+  Outcome SetSprite(const ro::ui::map_editor::SetSprite& set, MapEditStore& store);
+  Outcome MoveSprite(const ro::ui::map_editor::MoveSprite& move, MapEditStore& store);
+  Outcome RemoveSprite(std::size_t slot, MapEditStore& store);
+  void ChooseSprite(std::optional<std::size_t> slot);
+  [[nodiscard]] bool GrabSprite(glm::vec2 pointer);
+  [[nodiscard]] bool GrabSpriteHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  Outcome NudgeSprite(const std::array<float, 3>& delta, MapEditStore& store);
+  Outcome DuplicateSprite(MapEditStore& store);
+  // Le sprite qu'on règle, et les carrés de tous à l'écran.
+  std::optional<std::size_t> selected_sprite_;
+  std::vector<LightDot> sprite_dots_;
   // Le cache de `RefreshSceneRows`, et ce dont il a été bâti.
   mutable std::shared_ptr<const std::vector<ro::ui::MapEditorModelRow>> scene_rows_;
   mutable std::vector<std::size_t> edited_ranks_;
@@ -415,6 +434,7 @@ class MapEditorSession {
     std::optional<std::size_t> light;
     std::optional<std::size_t> effect;
     std::optional<std::size_t> map_effect;
+    std::optional<std::size_t> sprite;
     // La poignée lève les points du sol sélectionnés ; la hauteur du désigné à
     // l'appui, d'où l'aimantation compte.
     bool ground_points = false;

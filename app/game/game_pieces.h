@@ -100,6 +100,7 @@
 #include "world/item_pickup_report.h"
 #include "world/map_edit_sync.h"
 #include "world/map_sign_stage.h"
+#include "world/map_sprites.h"
 #include "world/music_player_stage.h"
 #include "world/night_light_view.h"
 #include "world/npc_illustration_stage.h"
@@ -165,6 +166,9 @@ struct GamePieces {
   // Les charrettes des marchands, même règle : lues à la première naissance de
   // chaque type.
   ActorCarts carts;
+  // LES SPRITES DE DÉCOR du document d'édition de la carte : voir
+  // `world/map_sprites.h`. Composés par la garde-robe, sans elle rien.
+  MapSprites map_sprites;
   // LA LISTE DES CHARRETTES, et les images de ses boutons, lues à la première
   // liste qui les montre.
   CartChoiceStage cart_choice;

@@ -48,6 +48,15 @@ namespace moonclient {
                                                                  float viewport_width,
                                                                  float viewport_height);
 
+// Le point de chaque sprite de décor de la vue — ses pieds —, en pixels de
+// fenêtre. Un sprite derrière l'œil n'en a pas.
+[[nodiscard]] std::vector<MapEditorSession::LightDot> SpriteDots(const ro::ui::MapEditorView& view,
+                                                                 const ro::render::MapScene& scene,
+                                                                 const ro::render::Camera& camera,
+                                                                 float aspect_ratio,
+                                                                 float viewport_width,
+                                                                 float viewport_height);
+
 // Le point de chaque lumière ponctuelle de la vue, en pixels de fenêtre. Une
 // lumière derrière l'œil n'en a pas.
 [[nodiscard]] std::vector<MapEditorSession::LightDot> LightDots(const ro::ui::MapEditorView& view,

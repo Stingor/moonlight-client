@@ -70,6 +70,15 @@ ro::mapedit::MapEdit WithReasons(ro::mapedit::MapEdit document) {
       document.SetAdded(slot, std::move(added));
     }
   }
+  for (std::size_t slot = 0; slot < document.sprites().size(); ++slot) {
+    if (document.sprites()[slot].why.empty()) {
+      ro::mapedit::MapSprite sprite = document.sprites()[slot];
+      std::snprintf(reason.data(), reason.size(), ro::core::Tr("Sprite de décor %s"),
+                    sprite.sprite.c_str());
+      sprite.why = reason.data();
+      document.SetSprite(slot, std::move(sprite));
+    }
+  }
   if (!document.ground().empty() && document.ground_why().empty()) {
     document.SetGroundWhy(ro::core::Tr("Retouche du relief"));
   }

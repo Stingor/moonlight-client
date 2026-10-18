@@ -44,23 +44,6 @@ std::optional<ro::sim::CellPosition> Game::HoveredCell() const {
                       static_cast<float>(shell_.width()), static_cast<float>(shell_.height()));
 }
 
-bool Game::CameraTurning() const {
-  // Seule la rotation change le curseur ; incliner ou reculer gardent le survol.
-  float x = 0.0F;
-  float y = 0.0F;
-  const SDL_MouseButtonFlags held = SDL_GetMouseState(&x, &y);
-  const SDL_Keymod mods = SDL_GetModState();
-  const auto turns = [&](MouseGesture gesture) {
-    const std::optional<ActionRef> action = settings_->bindings().ActionForGesture(
-        gesture, (mods & SDL_KMOD_CTRL) != 0, (mods & SDL_KMOD_SHIFT) != 0,
-        (mods & SDL_KMOD_ALT) != 0);
-    return action == ActionRef(GameAction::kCameraOrbit) ||
-           action == ActionRef(GameAction::kCameraOrbitZoom);
-  };
-  return ((held & SDL_BUTTON_RMASK) != 0 && turns(MouseGesture::kRightDrag)) ||
-         ((held & SDL_BUTTON_MMASK) != 0 && turns(MouseGesture::kMiddleDrag));
-}
-
 ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // ⚠ LA TAILLE DE LA FENÊTRE SE LIT, ELLE NE SE MESURE PAS ICI : la coquille
   // la relève une fois par image, en tête de boucle. Voir `ClientShell::width`
@@ -170,9 +153,18 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
         FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
                     graphics.summon_translucent(), actor_ground, graphics.cold_light()});
   }
+  // LES SPRITES DE DÉCOR du document d'édition : peints avec les corps, ombrés
+  // comme eux, et portant ombre comme une charrette.
+  pieces_.map_sprites.Update(
+      MapSpriteFrame{&map_edits_.Document(stage_->name),
+                     pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+                     &stage_->scene.gnd, camera_.yaw_degrees, now_ms, actor_ground,
+                     settings_->options().graphics().cold_light(), !sun_asked});
   // LES COMPAGNONS QUI PORTENT OMBRE, réunis en un lot.
   std::vector<ro::render::DrawnActor> companions(carts.begin(), carts.end());
   companions.insert(companions.end(), falcons.begin(), falcons.end());
+  companions.insert(companions.end(), pieces_.map_sprites.all().begin(),
+                    pieces_.map_sprites.all().end());
   // LE CIEL DE L'IMAGE : la lumière de la carte, à l'heure que l'établi impose.
   const ro::render::SkyLight sky = SkyOfFrame(now_ms);
   // La nuit de cette image décide des effets « nuit seulement » de la suivante.
@@ -377,6 +369,12 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
         settings_->options().graphics().summon_translucent()
             ? ro::render::SpriteRenderer::DepthWrite::kOff
             : ro::render::SpriteRenderer::DepthWrite::kOn,
+        Silhouette::kLeft, /*shaded=*/true);
+  // LES SPRITES DE DÉCOR, comme les charrettes : les pleins écrivent leur
+  // profondeur, les translucides non.
+  paint(pieces_.map_sprites.opaque(), ro::render::SpriteRenderer::DepthWrite::kOn,
+        Silhouette::kLeft, /*shaded=*/true);
+  paint(pieces_.map_sprites.translucent(), ro::render::SpriteRenderer::DepthWrite::kOff,
         Silhouette::kLeft, /*shaded=*/true);
   // 🔴 LA NAPPE D'EAU APRÈS LES CORPS, LEURS OMBRES ET LES CHARRETTES : éprouvée contre
   // la profondeur qu'ils ont écrite, elle recouvre ce qui est SOUS sa surface — les pieds
@@ -748,6 +746,7 @@ void Game::ForgetWhatPlayed() {
   scene_actors_.corpses.clear();
   pieces_.falcons.Forget();
   pieces_.carts.Forget();
+  pieces_.map_sprites.Forget();
   pieces_.ailment_tints.Forget();
   pieces_.cart_choice.Forget();
   pieces_.talkbox.Forget();

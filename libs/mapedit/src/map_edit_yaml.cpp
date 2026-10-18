@@ -10,10 +10,13 @@
 #include "ro/mapedit/map_edit.h"
 
 #include "ground_yaml.h"
+#include "sprite_yaml.h"
 
 namespace ro::mapedit {
 
 using detail::DoubleQuoted;
+using detail::SingleQuoted;
+using detail::VectorText;
 
 namespace {
 
@@ -86,6 +89,22 @@ constexpr std::string_view kMapEditHeader =
 #               du cube (x, y) étant le point (x, y) ; la levée en unités du
 #               monde, positive vers le haut. Elle lève tous les coins de cube
 #               qui touchent le point : une falaise garde sa marche.
+#  sprites : les sprites de décor — une créature seulement peinte, que le
+#            serveur ne connaît pas et qu'on ne clique pas —, chacun :
+#    sprite   : son nom dans la table des classes (« SAVAGE »), ou le numéro de
+#               sa classe ;
+#    position : ses pieds, [x, y, z], dans le repère du RSW ;
+#    action   : le rang d'animation du .act — 0 attente, 1 marche, 2 attaque,
+#               3 blessure, 4 mort ;
+#    frame    : facultatif, l'image tenue — absent, l'animation boucle ;
+#    speed    : facultatif, la cadence de la boucle, en fois celle du .act ;
+#    direction : de 0 (de face) à 7, dans le sens des directions du .act ;
+#    turn     : facultatif, la rotation, en degrés par seconde ;
+#    roll, roll_speed : facultatifs, l'image pivotée dans son plan, en degrés
+#               et en degrés par seconde — une broche ;
+#    scale    : facultatif, l'échelle ; opacity : facultatif, de 0 à 1 ;
+#    hidden   : vrai pour ne pas le dessiner ;
+#    why      : pourquoi, obligatoire.
 #  Une opération dont la cible ne correspond plus n'est pas posée, et le
 #  journal le dit.
 #
@@ -500,26 +519,6 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
   return edit;
 }
 
-// Une chaîne entre apostrophes : rien ne s'y échappe, sauf l'apostrophe, qui
-// se double. C'est ce qui garde lisibles les barres obliques inverses d'un
-// chemin.
-[[nodiscard]] std::string SingleQuoted(std::string_view text) {
-  std::string quoted = "'";
-  for (const char letter : text) {
-    quoted += letter;
-    if (letter == '\'') {
-      quoted += '\'';
-    }
-  }
-  return quoted + "'";
-}
-
-// Un vecteur, chaque composante à son écriture la plus courte qui se relit à
-// l'identique.
-[[nodiscard]] std::string VectorText(const std::array<float, 3>& vector) {
-  return std::format("[{}, {}, {}]", vector[0], vector[1], vector[2]);
-}
-
 // La plage d'heures, sous sa clé ; rien sans plage.
 [[nodiscard]] std::string HoursText(const std::optional<LitHours>& hours) {
   if (!hours.has_value()) {
@@ -656,6 +655,11 @@ core::Result<RevisedMapEdit> ParseRevisedMapEdit(std::string_view yaml_text,
         return std::unexpected(Refused(map_name, std::move(refusal)));
       }
     }
+    if (const YAML::Node sprites = whole["sprites"]) {
+      if (std::string refusal = detail::ReadSprites(sprites, edit); !refusal.empty()) {
+        return std::unexpected(Refused(map_name, std::move(refusal)));
+      }
+    }
   } catch (const YAML::Exception& failure) {
     return std::unexpected(Refused(map_name, failure.what()));
   }
@@ -786,6 +790,7 @@ std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
     text += std::format("    why: {}\n", DoubleQuoted(light.why));
   }
   text += detail::GroundYaml(edit);
+  text += detail::SpritesYaml(edit);
   return text;
 }
 

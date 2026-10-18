@@ -12,6 +12,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
 #include "ro/core/i18n.h"
@@ -24,6 +25,7 @@
 #include "game/game.h"
 #include "world/map_editor_mesh.h"
 #include "world/map_editor_overlay.h"
+#include "world/map_sprites.h"
 
 namespace moonclient {
 namespace {
@@ -43,6 +45,19 @@ std::vector<std::string> ModelLibrary(ro::vfs::Vfs& vfs) {
   return files;
 }
 
+// UN SPRITE SAISI PAR SON NUMÉRO s'écrit sous son nom, quand la table des
+// classes le connaît : le document se relit mieux ainsi.
+void NameMapSprite(ro::ui::MapEditorIntent& intent, const ro::render::SpriteCatalog* catalog) {
+  if (catalog == nullptr) {
+    return;
+  }
+  if (auto* added = std::get_if<ro::ui::map_editor::AddSprite>(&intent)) {
+    added->sprite = MapSpriteName(*catalog, added->sprite);
+  } else if (auto* set = std::get_if<ro::ui::map_editor::SetSprite>(&intent)) {
+    set->sprite.sprite = MapSpriteName(*catalog, set->sprite.sprite);
+  }
+}
+
 }  // namespace
 
 void Game::ServeMapEditor() {
@@ -54,6 +69,7 @@ void Game::ServeMapEditor() {
     map_editor_.SetLightDots({});
     map_editor_.SetEffectDots({});
     map_editor_.SetMapEffectDots({});
+    map_editor_.SetSpriteDots({});
     return;
   }
   const auto width = static_cast<float>(shell_.width());
@@ -76,6 +92,21 @@ void Game::ServeMapEditor() {
       MapEffectDots(view, stage_->scene, camera_, aspect_ratio_, width, height));
   const std::vector<ro::ui::MapEditorLine> map_effect_marks = map_editor_.MapEffectTrace();
   view.lines.insert(view.lines.end(), map_effect_marks.begin(), map_effect_marks.end());
+  // LES SPRITES DE DÉCOR, un carré sur chacun ; le désigné a la flèche.
+  map_editor_.SetSpriteDots(SpriteDots(view, stage_->scene, camera_, aspect_ratio_, width, height));
+  const std::vector<ro::ui::MapEditorLine> sprite_marks = map_editor_.SpriteTrace();
+  view.lines.insert(view.lines.end(), sprite_marks.begin(), sprite_marks.end());
+  if (view.selected_sprite.has_value() && *view.selected_sprite < view.sprites.size() &&
+      !view.selected.has_value() && !ground_points) {
+    const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(),
+                                               stage_->scene.gnd.height()};
+    const GizmoFrame frame =
+        GizmoFrameOf(map_frame, view.sprites[*view.selected_sprite].position, camera_);
+    map_editor_.SetGizmo(frame, GizmoHandles(ro::ui::MapEditorTool::kMove, frame, camera_,
+                                             aspect_ratio_, width, height));
+    const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
+    view.lines.insert(view.lines.end(), handles.begin(), handles.end());
+  }
   // L'EFFET DE LA CARTE DÉSIGNÉ a aussi la flèche de déplacement.
   if (view.selected_map_effect.has_value() && *view.selected_map_effect < view.map_effects.size() &&
       !view.selected.has_value() && !ground_points) {
@@ -152,7 +183,8 @@ void Game::ServeMapEditorTools() {
   // clôt le glissé après son dernier pas.
   ServeGroundBrush();
   bool replace = false;
-  for (const ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
+  for (ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
+    NameMapSprite(intent, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog() : nullptr);
     replace |= PublishMapEdit(map_editor_.Apply(intent, stage_->scene, map_edits_));
   }
   tools.map_editor_intents.clear();
@@ -168,6 +200,15 @@ void Game::ServeMapEditorTools() {
   FollowMapGround();
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
   tools.map_editor.server_conflict = pieces_.map_edit_sync.Conflicted(stage_->name);
+  // CE QUE LE .act DE CHAQUE SPRITE PORTE, que le panneau borne.
+  if (pieces_.wardrobe.has_value()) {
+    for (ro::ui::MapEditorSprite& sprite : tools.map_editor.sprites) {
+      const MapSprites::ActCounts counts =
+          pieces_.map_sprites.CountsOf(*pieces_.wardrobe, sprite.sprite, sprite.action);
+      sprite.action_count = counts.action_count;
+      sprite.frame_count = counts.frame_count;
+    }
+  }
   // LA BIBLIOTHÈQUE, lue une fois dans l'installation, à la première ouverture.
   if (map_editor_.active() && model_library_ == nullptr) {
     model_library_ = std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));

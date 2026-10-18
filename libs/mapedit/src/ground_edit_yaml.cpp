@@ -27,6 +27,21 @@ std::string DoubleQuoted(std::string_view text) {
   return quoted + "\"";
 }
 
+std::string SingleQuoted(std::string_view text) {
+  std::string quoted = "'";
+  for (const char letter : text) {
+    quoted += letter;
+    if (letter == '\'') {
+      quoted += '\'';
+    }
+  }
+  return quoted + "'";
+}
+
+std::string VectorText(const std::array<float, 3>& vector) {
+  return std::format("[{}, {}, {}]", vector[0], vector[1], vector[2]);
+}
+
 std::string ReadGround(const YAML::Node& ground, MapEdit& edit) {
   if (!ground.IsMap()) {
     return "« ground » n'est pas une table";
