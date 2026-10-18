@@ -83,6 +83,7 @@ class NpcShopStage {
   // ⚠ LES VUES POINTENT DEDANS : elles se prennent une fois les vecteurs remplis.
   std::vector<std::string> offer_names_;
   std::vector<std::string> sell_names_;
+  std::vector<std::string> sell_kinds_;
   std::vector<ro::ui::NpcShopOfferView> offers_;
   std::vector<ro::ui::NpcShopSellView> sells_;
   std::vector<std::string> blocker_texts_;

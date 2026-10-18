@@ -11,6 +11,9 @@
 fr: %.*s — %.*s, niveau %d
 tr: %.*s — %.*s, nivel %d
 
+fr: %.*s — %d ligne(s) — %s
+tr: %.*s — %d línea(s) — %s
+
 fr: %.*s — niveau %d
 tr: %.*s — nivel %d
 
@@ -977,6 +980,9 @@ tr: Añade 60 minutos de silencio. Aplicado dos veces, se prolonga — no es un 
 fr: Ajoute au menu les actions et les identifiants réservés au staff.\nCoché, le menu s'ouvre alors sur TOUTES les entités sans attendre le réglage du dessus : monstres, NPC, unités de skill, items au sol. C'est justement sur les cibles inattendues qu'on en a besoin.
 tr: Añade al menú las acciones y los identificadores reservados al staff.\nMarcado, el menú se abre entonces sobre TODAS las entidades sin esperar al ajuste de arriba: monstruos, NPC, unidades de habilidad, objetos del suelo. Es justo en los objetivos inesperados donde hace falta.
 
+fr: Ajoute au panier toutes les lignes d'un type ; rien ne se vend avant « Vendre ».
+tr: Añade al carrito todas las líneas de un tipo; nada se vende antes de «Vender».
+
 fr: Ajoute cette ligne au rang « moyen ».
 tr: Añade esta línea con el rango «medio».
 
@@ -1081,6 +1087,9 @@ tr: Añadir como amigo
 
 fr: Ajouter la classe
 tr: Añadir la clase
+
+fr: Ajouter par type
+tr: Añadir por tipo
 
 fr: Ajouter un ami
 tr: Añadir un amigo

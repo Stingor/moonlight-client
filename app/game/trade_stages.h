@@ -53,6 +53,8 @@ class TradeStages {
   void SeeItemProperties(const ro::vfs::ItemProperties* properties) noexcept {
     item_properties_ = properties;
   }
+  // La base du serveur, lue ou non. Même règle : une adresse donnée une fois.
+  void SeeServerDb(const ro::vfs::ServerDb* db) noexcept { server_db_ = db; }
 
   // Une partie commence : rien de la précédente ne survit.
   void StartSession();
@@ -133,6 +135,7 @@ class TradeStages {
   TradeItems items_;
   const ro::sim::CommandSettings* commands_ = nullptr;
   const ro::vfs::ItemProperties* item_properties_ = nullptr;
+  const ro::vfs::ServerDb* server_db_ = nullptr;
   const ro::sim::BannedWords* banned_ = nullptr;
   ro::render::GameImages* images_ = nullptr;
   NpcShopStage npc_shop_;

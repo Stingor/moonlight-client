@@ -453,6 +453,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // LES COMMERCES : ce que leurs fenêtres ont rendu, et les vues qu'elles
   // dessineront. Un objet du sac se décrit par sa case, qui dit raffinement et
   // cartes ; un objet de la boutique, par son seul identifiant.
+  // L'ONGLET DE VENTE D'UN PNJ DEMANDE LA BASE DU SERVEUR : « Ajouter par type »
+  // range chaque ligne sous le type qu'elle lui donne.
+  if (windows_.trade.npc_shop.state.open &&
+      windows_.trade.npc_shop.state.tab == ro::ui::NpcShopTab::kSell) {
+    database_.Read();
+  }
   pieces_.trade.deal().RefuseProposals(settings_->options().pages().deal_refusal.refuses_deals());
   pieces_.trade.Advance(
       windows_.trade, link_, world_, pieces_.item_words,

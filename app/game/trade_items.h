@@ -14,6 +14,7 @@
 #include "ro/vfs/item_properties.h"
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/item_words.h"
+#include "ro/vfs/server_db.h"
 
 #include "items/creator_names.h"
 
@@ -78,6 +79,9 @@ struct TradeContext {
   // poids d'un achat et le drapeau de buying store ne se jugent pas, et le
   // serveur reste seul à les refuser.
   const ro::vfs::ItemProperties* item_properties = nullptr;
+  // LA BASE DU SERVEUR, lue ou non : elle nomme le type d'un objet à vendre.
+  // Nulle, ou pas encore lue : la famille que le client connaît en tient lieu.
+  const ro::vfs::ServerDb* server_db = nullptr;
   // LES MOTS INTERDITS : le titre d'une échoppe qui en porte un ne part pas.
   // Nuls : rien n'est éprouvé.
   const ro::sim::BannedWords* banned = nullptr;

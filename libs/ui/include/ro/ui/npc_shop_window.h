@@ -63,6 +63,20 @@ struct NpcShopSellView {
   // RAFFINÉ OU SERTI : il vaut sans doute plus que ce que le PNJ en donne, et sa
   // vente se confirme.
   bool precious = false;
+  // LE TYPE DE L'OBJET, déjà nommé par `app` : celui de l'item_db du serveur,
+  // ou la famille que le client lui connaît. Il range la ligne dans « Ajouter
+  // par type ».
+  std::string_view kind;
+  // Porté : aucun ajout en bloc ne le prend.
+  bool worn = false;
+};
+
+// UN TYPE DE LA LISTE DE VENTE : combien de lignes il range, et ce qu'elles
+// rapporteraient, quantité complète.
+struct NpcShopSellKind {
+  std::string_view kind;
+  int lines = 0;
+  std::int64_t total = 0;
 };
 
 // UNE LIGNE DU PANIER. ⚠ À L'ACHAT, L'OBJET FAIT L'IDENTITÉ ; À LA VENTE, LA
@@ -175,6 +189,21 @@ void OpenNpcShopOn(NpcShopWindowState& state, std::uint32_t opening_seq, bool bu
 // Ajoute au panier, ou à la ligne qui existe déjà, borné à `most`. Rend faux si
 // la ligne était déjà pleine — un équipement ne s'achète qu'un à la fois.
 bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine& line);
+
+// 🔴 LES LIGNES QU'UN AJOUT EN BLOC PREND — « Tout ajouter au panier » comme
+// « Ajouter par type » —, chacune pour toute sa pile, dans l'ordre de la liste.
+// Les favoris verrouillés n'y sont pas — `app` les a déjà retirés de la liste —,
+// et une pièce portée s'écarte ici. Une seule règle pour les deux boutons.
+[[nodiscard]] std::vector<NpcShopCartLine> NpcShopSellableLines(const NpcShopView& view);
+
+// Les types des lignes vendables, par ordre alphabétique de libellé. Un type
+// sans ligne vendable n'y paraît pas.
+[[nodiscard]] std::vector<NpcShopSellKind> NpcShopSellKinds(const NpcShopView& view);
+
+// Ajoute au panier toutes les lignes vendables d'un type, pile complète. Rien
+// ne se vend : « Vendre » reste à cliquer, et ses confirmations avec.
+void AddNpcShopSellKind(std::vector<NpcShopCartLine>& cart, const NpcShopView& view,
+                        std::string_view kind);
 
 // Une vente qui se confirme avant de partir : elle porte un objet précieux, ou
 // elle vend tout le sac et le joueur veut qu'on le lui demande.

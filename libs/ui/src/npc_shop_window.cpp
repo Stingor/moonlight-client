@@ -9,6 +9,8 @@
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
+#include "ro/ui/list_keys.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_widgets.h"
@@ -91,6 +93,18 @@ std::vector<std::size_t> SortedSells(std::span<const NpcShopSellView> sells) {
   });
   return order;
 }
+
+// La ligne du panier qui vend toute la pile.
+NpcShopCartLine WholeLineOf(const NpcShopSellView& sold) {
+  return NpcShopCartLine{.item_id = sold.item.item_id,
+                         .client_slot = sold.client_slot,
+                         .amount = sold.amount,
+                         .unit_price = sold.price,
+                         .most = sold.amount};
+}
+
+// Ce qu'un ajout en bloc prend : ni pièce portée, ni pile vide.
+bool SoldInBulk(const NpcShopSellView& sold) { return !sold.worn && sold.amount > 0; }
 
 void AskSale(NpcShopWindowState& state, const NpcShopView& view, std::vector<NpcShopCartLine> lines,
              bool immediate, NpcShopWindowAction& action) {
@@ -249,19 +263,52 @@ void DrawBuyList(NpcShopWindowState& state, const NpcShopView& view, const SkinA
   ImGui::EndTable();
 }
 
+// « AJOUTER PAR TYPE » : la liste des types vendables, chacun avec ses lignes et
+// sa recette. Un choix remplit le panier comme « Tout ajouter », restreint au
+// type ; grisée quand aucun type n'a de ligne vendable.
+//
+// ⚠ SANS MOLETTE, ET LE CLAVIER PREND À ENTRÉE : chaque entrée remplit le
+// panier, un cran ou une flèche de trop y mettrait un type entier.
+void DrawSellKinds(NpcShopWindowState& state, const NpcShopView& view, const SkinArt& art) {
+  const std::vector<NpcShopSellKind> kinds = NpcShopSellKinds(view);
+  const char* shown = core::Tr("Ajouter par type");
+  ImGui::SetNextItemWidth(ImGui::CalcTextSize(shown).x + SkinComboChromeWidth(art));
+  if (kinds.empty()) {
+    ImGui::BeginDisabled();
+  }
+  const bool open = BeginSkinCombo("##npc_shop_sell_kinds", shown, art);
+  if (kinds.empty()) {
+    ImGui::EndDisabled();
+  }
+  if (!open) {
+    if (!kinds.empty() && ImGui::IsItemHovered()) {
+      SkinTooltip(
+          core::Tr("Ajoute au panier toutes les lignes d'un type ; rien ne se vend avant "
+                   "« Vendre »."));
+    }
+    return;
+  }
+  ComboKeys keys(kListNoEntry, static_cast<int>(kinds.size()), {}, ComboKeyChoice::kOnEnter);
+  for (std::size_t index = 0; index < kinds.size(); ++index) {
+    const NpcShopSellKind& kind = kinds[index];
+    const std::string entry =
+        core::Printed(core::Tr("%.*s — %d ligne(s) — %s"), static_cast<int>(kind.kind.size()),
+                      kind.kind.data(), kind.lines, TradeAmountText(kind.total, view.unit).c_str());
+    ImGui::PushID(static_cast<int>(index));
+    if (keys.Took(static_cast<int>(index), ImGui::Selectable(entry.c_str(), false))) {
+      AddNpcShopSellKind(state.cart, view, kind.kind);
+    }
+    ImGui::PopID();
+  }
+  EndSkinCombo();
+}
+
 void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const SkinArt& art,
                   NpcShopWindowAction& action) {
   if (!view.sells.empty() && !view.awaiting) {
     if (SkinButton(core::Tr("Tout ajouter au panier"), art)) {
-      state.cart.clear();
-      for (const NpcShopSellView& sold : view.sells) {
-        state.cart.push_back(NpcShopCartLine{.item_id = sold.item.item_id,
-                                             .client_slot = sold.client_slot,
-                                             .amount = sold.amount,
-                                             .unit_price = sold.price,
-                                             .most = sold.amount});
-      }
-      state.close_after_sale = true;
+      state.cart = NpcShopSellableLines(view);
+      state.close_after_sale = !state.cart.empty();
     }
     if (ImGui::IsItemHovered()) {
       SkinTooltip(state.confirm_sell_all
@@ -270,6 +317,8 @@ void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const Skin
                       : core::Tr("Ajoute tout ce qui est vendable ; la boutique se fermera après "
                                  "la vente."));
     }
+    ImGui::SameLine();
+    DrawSellKinds(state, view, art);
   }
   if (view.hidden_favorites > 0) {
     if (!view.sells.empty()) {
@@ -370,11 +419,7 @@ void AcceptBagDrop(NpcShopWindowState& state, const NpcShopView& view,
     if (carried.from != ItemHolder::kInventory || carried.worn || sold == view.sells.end()) {
       action.drop_refused = true;
     } else {
-      AddToNpcShopCart(state.cart, NpcShopCartLine{.item_id = sold->item.item_id,
-                                                   .client_slot = sold->client_slot,
-                                                   .amount = sold->amount,
-                                                   .unit_price = sold->price,
-                                                   .most = sold->amount});
+      AddToNpcShopCart(state.cart, WholeLineOf(*sold));
     }
   }
   ImGui::EndDragDropTarget();
@@ -539,6 +584,43 @@ bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine&
   }
   same->amount = std::min(same->amount + line.amount, same->most);
   return true;
+}
+
+std::vector<NpcShopCartLine> NpcShopSellableLines(const NpcShopView& view) {
+  std::vector<NpcShopCartLine> lines;
+  lines.reserve(view.sells.size());
+  for (const NpcShopSellView& sold : view.sells) {
+    if (SoldInBulk(sold)) {
+      lines.push_back(WholeLineOf(sold));
+    }
+  }
+  return lines;
+}
+
+std::vector<NpcShopSellKind> NpcShopSellKinds(const NpcShopView& view) {
+  std::vector<NpcShopSellKind> kinds;
+  for (const NpcShopSellView& sold : view.sells) {
+    if (!SoldInBulk(sold)) {
+      continue;
+    }
+    auto held = std::ranges::find(kinds, sold.kind, &NpcShopSellKind::kind);
+    if (held == kinds.end()) {
+      held = kinds.insert(kinds.end(), NpcShopSellKind{.kind = sold.kind});
+    }
+    ++held->lines;
+    held->total += sold.price * sold.amount;
+  }
+  std::ranges::sort(kinds, {}, &NpcShopSellKind::kind);
+  return kinds;
+}
+
+void AddNpcShopSellKind(std::vector<NpcShopCartLine>& cart, const NpcShopView& view,
+                        std::string_view kind) {
+  for (const NpcShopSellView& sold : view.sells) {
+    if (SoldInBulk(sold) && sold.kind == kind) {
+      AddToNpcShopCart(cart, WholeLineOf(sold));
+    }
+  }
 }
 
 bool NpcShopSaleNeedsConfirmation(const NpcShopWindowState& state, const NpcShopView& view,

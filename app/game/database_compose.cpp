@@ -79,6 +79,38 @@ std::string ItemTypeLabel(std::string_view server_type) {
   return label != nullptr ? std::string(label) : std::string(server_type);
 }
 
+std::string_view ItemDbTypeOfCategory(ro::sim::ItemCategory category) {
+  switch (category) {
+    case ro::sim::ItemCategory::kConsumable:
+      return "Usable";
+    case ro::sim::ItemCategory::kWeapon:
+      return "Weapon";
+    case ro::sim::ItemCategory::kArmor:
+      return "Armor";
+    case ro::sim::ItemCategory::kAmmo:
+      return "Ammo";
+    case ro::sim::ItemCategory::kEtc:
+      return "Etc";
+    case ro::sim::ItemCategory::kCard:
+      return "Card";
+    case ro::sim::ItemCategory::kCash:
+      return "Cash";
+    case ro::sim::ItemCategory::kOther:
+      break;
+  }
+  return {};
+}
+
+std::string ItemTypeLabelOf(const ro::sim::InventoryItem& item, const ro::vfs::ServerDb* db) {
+  if (db != nullptr && db->known()) {
+    if (const ro::vfs::ServerItem* const known = db->FindItem(item.item_id); known != nullptr) {
+      return ItemTypeLabel(known->type);
+    }
+  }
+  const std::string_view type = ItemDbTypeOfCategory(ro::sim::ItemCategoryOf(item));
+  return type.empty() ? std::string(ro::core::Tr("Autre")) : ItemTypeLabel(type);
+}
+
 std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
   std::vector<ItemFactLine> lines;
   const auto add = [&](const char* label, std::string value) {

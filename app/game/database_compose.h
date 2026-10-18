@@ -12,6 +12,7 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/sim/inventory.h"
 #include "ro/sim/market.h"
 #include "ro/sim/monster_sheet.h"
 #include "ro/ui/database_window.h"
@@ -49,6 +50,18 @@ struct DropperRows {
 // Le libellé d'un `Type` de la base, ou le texte tel quel quand la fenêtre ne
 // le connaît pas. Traduit.
 [[nodiscard]] std::string ItemTypeLabel(std::string_view server_type);
+
+// LE `Type` DE LA BASE QUI RÉPOND À UNE FAMILLE DU CLIENT, pour l'objet que la
+// base ne connaît pas : les consommables y sont `Usable`. Vide pour `kOther`,
+// que la base ne nomme pas.
+[[nodiscard]] std::string_view ItemDbTypeOfCategory(ro::sim::ItemCategory category);
+
+// LE TYPE D'UN OBJET DU SAC, tel que `ItemTypeLabel` le nomme : celui que la
+// base donne à l'objet, lue et le connaissant ; à défaut, celui de la famille
+// que le fil a dite au client ; « Autre » pour une famille que la base ne
+// nomme pas. Traduit.
+[[nodiscard]] std::string ItemTypeLabelOf(const ro::sim::InventoryItem& item,
+                                          const ro::vfs::ServerDb* db);
 
 // Le nom d'un objet tel que le joueur le lit.
 using ItemNamer = std::function<std::string(std::uint32_t item_id)>;

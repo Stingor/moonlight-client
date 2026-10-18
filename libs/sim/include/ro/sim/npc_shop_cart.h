@@ -101,6 +101,13 @@ struct NpcShopVerdict {
                                              std::int64_t money, std::span<const InventoryItem> bag,
                                              std::int64_t weight, std::int64_t max_weight);
 
+// 🔴 CE QUE LA LISTE DE VENTE MONTRE d'une case que le serveur accepte : une
+// pile non vide, et pas un favori quand le verrou de vente des favoris est
+// posé — un réglage du joueur, que le serveur ignore. Les ajouts en bloc ne
+// prennent que dans cette liste : un favori verrouillé n'entre au panier par
+// aucun d'eux.
+[[nodiscard]] bool NpcShopListsForSale(const InventoryItem& item, bool favorites_locked) noexcept;
+
 // Le panier de vente, contre la liste que le serveur a envoyée et le sac.
 // `zeny` : ce que la bourse porte déjà.
 [[nodiscard]] NpcShopVerdict CheckNpcShopSell(const NpcShop& shop,

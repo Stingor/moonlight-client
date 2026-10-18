@@ -16,6 +16,8 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/trade_words.h"
 
+#include "game/database_compose.h"
+
 namespace moonclient {
 namespace {
 
@@ -460,18 +462,19 @@ void NpcShopStage::Compose(const ro::ui::NpcShopWindowState& state, const TradeC
   // rien. Posé, il retire les favoris de la liste — et le compte le dit, pour
   // qu'une ligne qui manque ne se lise pas comme un refus du PNJ.
   sell_names_.clear();
+  sell_kinds_.clear();
   sells_.clear();
   view_.hidden_favorites = 0;
   for (const ro::sim::NpcShopSellOffer& offer : shop_.sell_offers()) {
     const ro::sim::InventoryItem* item = BagItemAt(world, offer.client_slot);
-    if (item == nullptr || item->amount <= 0) {
-      continue;
-    }
-    if (context.sell_locked && item->favorite) {
-      ++view_.hidden_favorites;
+    if (item == nullptr || !ro::sim::NpcShopListsForSale(*item, context.sell_locked)) {
+      if (item != nullptr && item->amount > 0) {
+        ++view_.hidden_favorites;
+      }
       continue;
     }
     sell_names_.push_back(context.items.NameOf(*item, context.creators));
+    sell_kinds_.push_back(ItemTypeLabelOf(*item, context.server_db));
     ro::ui::NpcShopSellView shown;
     shown.item.item_id = item->item_id;
     shown.item.icon = context.items.IconOf(item->item_id);
@@ -481,10 +484,12 @@ void NpcShopStage::Compose(const ro::ui::NpcShopWindowState& state, const TradeC
     shown.base_price = offer.base_price;
     shown.price = offer.price;
     shown.precious = Precious(*item);
+    shown.worn = item->worn_at != 0;
     sells_.push_back(shown);
   }
   for (std::size_t index = 0; index < sells_.size(); ++index) {
     sells_[index].item.name = sell_names_[index];
+    sells_[index].kind = sell_kinds_[index];
   }
   view_.sells = sells_;
   view_.sells_listed = shop_.sell_seq() != 0;

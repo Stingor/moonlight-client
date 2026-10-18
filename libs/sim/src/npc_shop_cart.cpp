@@ -141,4 +141,8 @@ NpcShopVerdict CheckNpcShopSell(const NpcShop& shop, std::span<const NpcShopSell
   return verdict;
 }
 
+bool NpcShopListsForSale(const InventoryItem& item, bool favorites_locked) noexcept {
+  return item.amount > 0 && !(favorites_locked && item.favorite);
+}
+
 }  // namespace ro::sim
