@@ -8,6 +8,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
+#include "opcode_only.h"
+
 namespace ro::proto {
 namespace {
 
@@ -24,27 +26,11 @@ constexpr std::string_view kCloseHandler = "clif_parse_CloseSearchStoreInfo";
 // Le plus grand compte qu'un octet porte.
 constexpr std::size_t kMostIdsPerList = std::numeric_limits<std::uint8_t>::max();
 
-template <typename Request>
-bool BareLayoutHolds(std::string_view handler) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, std::array<std::uint16_t, 0>{}) &&
-         length.has_value() && static_cast<std::size_t>(*length) == Request::kWireSize;
-}
-
 bool SearchLayoutHolds() {
   const auto length = PacketLength(StoreSearchRequest::kOpcode);
   return MatchesServerLayout(StoreSearchRequest::kOpcode, kSearchHandler, kSearchOffsets) &&
          length.has_value() && *length == kVariableLength &&
          kSearchOffsets.back() == StoreSearchRequest::kHeaderSize;
-}
-
-template <typename Request>
-core::Result<std::vector<std::uint8_t>> EncodeBare() {
-  std::vector<std::uint8_t> frame;
-  frame.reserve(Request::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(Request::kOpcode);
-  return frame;
 }
 
 }  // namespace
@@ -82,21 +68,13 @@ core::Result<std::vector<std::uint8_t>> Encode(const StoreSearchRequest& request
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const StoreSearchNextPageRequest& /*request*/) {
-  if (!BareLayoutHolds<StoreSearchNextPageRequest>(kNextPageHandler)) {
-    return core::Fail(ErrorCode::kUnsupportedVersion,
-                      "la page suivante de la recherche d'échoppes ne correspond plus à ce que "
-                      "le serveur déclare lire");
-  }
-  return EncodeBare<StoreSearchNextPageRequest>();
+  return EncodeOpcodeOnly<StoreSearchNextPageRequest>(
+      kNextPageHandler, "la page suivante de la recherche d'échoppes");
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const StoreSearchCloseRequest& /*request*/) {
-  if (!BareLayoutHolds<StoreSearchCloseRequest>(kCloseHandler)) {
-    return core::Fail(ErrorCode::kUnsupportedVersion,
-                      "la fermeture de la recherche d'échoppes ne correspond plus à ce que le "
-                      "serveur déclare lire");
-  }
-  return EncodeBare<StoreSearchCloseRequest>();
+  return EncodeOpcodeOnly<StoreSearchCloseRequest>(kCloseHandler,
+                                                   "la fermeture de la recherche d'échoppes");
 }
 
 }  // namespace ro::proto

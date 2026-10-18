@@ -5,10 +5,10 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
 
 #include "layout_holds.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -26,13 +26,6 @@ constexpr std::array<std::uint16_t, 4> kPointBuyOffsets = {2, 4, 8, 10};
 constexpr std::string_view kTradeQuitHandler = "clif_parse_NPCShopClosed";
 constexpr std::string_view kMarketCloseHandler = "clif_parse_NPCMarketClosed";
 
-template <typename Request>
-bool OpcodeOnlyHolds(std::string_view handler) {
-  const auto length = PacketLength(Request::kOpcode);
-  return MatchesServerLayout(Request::kOpcode, handler, {}) && length.has_value() &&
-         static_cast<std::size_t>(*length) == Request::kWireSize;
-}
-
 template <typename Reply>
 bool ReplyLengthHolds() {
   const auto length = PacketLength(Reply::kOpcode);
@@ -49,15 +42,6 @@ core::Result<void> LinesFit(std::size_t line_count, std::size_t header_size,
                       "liste d'achat trop longue pour une trame de commerce");
   }
   return {};
-}
-
-template <typename Request>
-std::vector<std::uint8_t> OpcodeOnly() {
-  std::vector<std::uint8_t> frame;
-  frame.reserve(Request::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(Request::kOpcode);
-  return frame;
 }
 
 }  // namespace
@@ -115,20 +99,11 @@ core::Result<std::vector<std::uint8_t>> Encode(const PointShopBuyRequest& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const NpcTradeQuit& /*quit*/) {
-  if (!OpcodeOnlyHolds<NpcTradeQuit>(kTradeQuitHandler)) {
-    return core::Fail(ErrorCode::kUnsupportedVersion,
-                      "la fermeture de la boutique ne correspond plus à ce que le serveur déclare "
-                      "lire");
-  }
-  return OpcodeOnly<NpcTradeQuit>();
+  return EncodeOpcodeOnly<NpcTradeQuit>(kTradeQuitHandler, "la fermeture de la boutique");
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const NpcMarketClose& /*close*/) {
-  if (!OpcodeOnlyHolds<NpcMarketClose>(kMarketCloseHandler)) {
-    return core::Fail(ErrorCode::kUnsupportedVersion,
-                      "la fermeture du market ne correspond plus à ce que le serveur déclare lire");
-  }
-  return OpcodeOnly<NpcMarketClose>();
+  return EncodeOpcodeOnly<NpcMarketClose>(kMarketCloseHandler, "la fermeture du market");
 }
 
 core::Result<NpcSellResult> DecodeNpcSellResult(std::span<const std::uint8_t> frame) {

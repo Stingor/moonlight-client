@@ -7,8 +7,8 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -24,11 +24,6 @@ constexpr std::string_view kRenameHandler = "clif_parse_ChangeHomunculusName";
 constexpr std::array<std::uint16_t, 1> kRenameOffsets = {2};
 // Le type d'un ordre du menu : le serveur ne le lit pas, le client l'envoie nul.
 constexpr std::uint16_t kCommandType = 0;
-
-[[nodiscard]] bool LengthIs(std::uint16_t opcode, std::size_t wire_size) {
-  const auto length = PacketLength(opcode);
-  return length.has_value() && static_cast<std::size_t>(*length) == wire_size;
-}
 
 [[nodiscard]] core::Error Drift() {
   return core::Error{ErrorCode::kUnsupportedVersion,
@@ -128,8 +123,7 @@ std::vector<std::uint8_t> EncodeHomunculusParameter(const HomunculusParameter& p
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const HomunculusCommandRequest& request) {
-  if (!MatchesServerLayout(HomunculusCommandRequest::kOpcode, kCommandHandler, kCommandOffsets) ||
-      !LengthIs(HomunculusCommandRequest::kOpcode, HomunculusCommandRequest::kWireSize)) {
+  if (!FixedLayoutHolds<HomunculusCommandRequest>(kCommandHandler, kCommandOffsets)) {
     return std::unexpected(Drift());
   }
   std::vector<std::uint8_t> frame;
@@ -142,8 +136,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const HomunculusCommandRequest& r
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const HomunculusRenameRequest& request) {
-  if (!MatchesServerLayout(HomunculusRenameRequest::kOpcode, kRenameHandler, kRenameOffsets) ||
-      !LengthIs(HomunculusRenameRequest::kOpcode, HomunculusRenameRequest::kWireSize)) {
+  if (!FixedLayoutHolds<HomunculusRenameRequest>(kRenameHandler, kRenameOffsets)) {
     return std::unexpected(Drift());
   }
   std::vector<std::uint8_t> frame;

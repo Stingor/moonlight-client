@@ -5,8 +5,8 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -58,9 +58,7 @@ std::vector<std::uint8_t> EncodeProgressStart(const ProgressStart& start) {
 }
 
 core::Result<std::vector<std::uint8_t>> EncodeProgressDone() {
-  const auto length = PacketLength(ProgressDone::kOpcode);
-  if (!MatchesServerLayout(ProgressDone::kOpcode, kProgressDoneHandler, kProgressDoneOffsets) ||
-      !length.has_value() || static_cast<std::size_t>(*length) != ProgressDone::kWireSize) {
+  if (!FixedLayoutHolds<ProgressDone>(kProgressDoneHandler, kProgressDoneOffsets)) {
     return core::Fail(ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour la fin d'une barre de progression ne "
                       "correspond plus à ce que le serveur déclare lire");

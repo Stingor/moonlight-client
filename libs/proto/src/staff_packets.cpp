@@ -4,8 +4,8 @@
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -26,22 +26,10 @@ core::Error LayoutDrift() {
                      "que le serveur déclare lire"};
 }
 
-// Le gestionnaire, les décalages et la longueur fixe que le serveur déclare
-// sont-ils ceux que nous écrivons ?
-template <std::size_t N>
-[[nodiscard]] bool Agrees(std::uint16_t opcode, std::string_view handler,
-                          const std::array<std::uint16_t, N>& offsets, std::size_t wire_size) {
-  if (!MatchesServerLayout(opcode, handler, offsets)) {
-    return false;
-  }
-  const auto length = PacketLength(opcode);
-  return length.has_value() && static_cast<std::size_t>(*length) == wire_size;
-}
-
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const KickRequest& request) {
-  if (!Agrees(KickRequest::kOpcode, kKickHandler, kKickOffsets, KickRequest::kWireSize)) {
+  if (!FixedLayoutHolds<KickRequest>(kKickHandler, kKickOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -53,8 +41,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const KickRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const MannerPointRequest& request) {
-  if (!Agrees(MannerPointRequest::kOpcode, kMannerPointHandler, kMannerPointOffsets,
-              MannerPointRequest::kWireSize)) {
+  if (!FixedLayoutHolds<MannerPointRequest>(kMannerPointHandler, kMannerPointOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -68,8 +55,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const MannerPointRequest& request
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const FullStripRequest& request) {
-  if (!Agrees(FullStripRequest::kOpcode, kFullStripHandler, kFullStripOffsets,
-              FullStripRequest::kWireSize)) {
+  if (!FixedLayoutHolds<FullStripRequest>(kFullStripHandler, kFullStripOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;

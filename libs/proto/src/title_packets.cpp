@@ -5,8 +5,8 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -28,10 +28,7 @@ constexpr std::array<std::uint16_t, 0> kRewardOffsets = {};
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const AchievementRewardRequest& request) {
-  const auto length = PacketLength(AchievementRewardRequest::kOpcode);
-  if (!MatchesServerLayout(AchievementRewardRequest::kOpcode, kRewardHandler, kRewardOffsets) ||
-      !length.has_value() ||
-      static_cast<std::size_t>(*length) != AchievementRewardRequest::kWireSize) {
+  if (!FixedLayoutHolds<AchievementRewardRequest>(kRewardHandler, kRewardOffsets)) {
     return core::Fail(ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour la réclamation d'un succès ne correspond plus "
                       "à ce que le serveur déclare lire");
@@ -45,9 +42,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const AchievementRewardRequest& r
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const ChangeTitleRequest& request) {
-  const auto length = PacketLength(ChangeTitleRequest::kOpcode);
-  if (!MatchesServerLayout(ChangeTitleRequest::kOpcode, kChangeTitleHandler, kChangeTitleOffsets) ||
-      !length.has_value() || static_cast<std::size_t>(*length) != ChangeTitleRequest::kWireSize) {
+  if (!FixedLayoutHolds<ChangeTitleRequest>(kChangeTitleHandler, kChangeTitleOffsets)) {
     return core::Fail(ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour le changement de titre ne correspond plus à "
                       "ce que le serveur déclare lire");

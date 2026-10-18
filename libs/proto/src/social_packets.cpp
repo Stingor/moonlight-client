@@ -6,8 +6,10 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
 #include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -45,15 +47,6 @@ core::Error LayoutDrift() {
                      "plus à ce que le serveur déclare"};
 }
 
-[[nodiscard]] bool Declared(std::uint16_t opcode, std::string_view handler,
-                            std::span<const std::uint16_t> offsets, std::size_t wire_size) {
-  if (!MatchesServerLayout(opcode, handler, offsets)) {
-    return false;
-  }
-  const auto length = PacketLength(opcode);
-  return length.has_value() && static_cast<std::size_t>(*length) == wire_size;
-}
-
 // Une trame reçue de longueur fixe : le bon opcode, et la longueur que la table
 // du serveur déclare, qui doit être aussi celle qu'on sait lire.
 [[nodiscard]] core::Result<ByteReader> FixedFrame(std::span<const std::uint8_t> frame,
@@ -75,8 +68,7 @@ core::Error LayoutDrift() {
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const FriendAddRequest& request) {
-  if (!Declared(FriendAddRequest::kOpcode, kFriendAddHandler, kFriendAddOffsets,
-                FriendAddRequest::kWireSize)) {
+  if (!FixedLayoutHolds<FriendAddRequest>(kFriendAddHandler, kFriendAddOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -88,8 +80,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const FriendAddRequest& request) 
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const FriendRemoveRequest& request) {
-  if (!Declared(FriendRemoveRequest::kOpcode, kFriendRemoveHandler, kFriendRemoveOffsets,
-                FriendRemoveRequest::kWireSize)) {
+  if (!FixedLayoutHolds<FriendRemoveRequest>(kFriendRemoveHandler, kFriendRemoveOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -102,8 +93,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const FriendRemoveRequest& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const FriendAnswerRequest& request) {
-  if (!Declared(FriendAnswerRequest::kOpcode, kFriendAnswerHandler, kFriendAnswerOffsets,
-                FriendAnswerRequest::kWireSize)) {
+  if (!FixedLayoutHolds<FriendAnswerRequest>(kFriendAnswerHandler, kFriendAnswerOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -117,8 +107,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const FriendAnswerRequest& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const PartyLeaderRequest& request) {
-  if (!Declared(PartyLeaderRequest::kOpcode, kLeaderHandler, kLeaderOffsets,
-                PartyLeaderRequest::kWireSize)) {
+  if (!FixedLayoutHolds<PartyLeaderRequest>(kLeaderHandler, kLeaderOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -130,8 +119,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const PartyLeaderRequest& request
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const PartyOptionsRequest& request) {
-  if (!Declared(PartyOptionsRequest::kOpcode, kOptionsHandler, kOptionsOffsets,
-                PartyOptionsRequest::kWireSize)) {
+  if (!FixedLayoutHolds<PartyOptionsRequest>(kOptionsHandler, kOptionsOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -145,8 +133,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const PartyOptionsRequest& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockRequest& request) {
-  if (!Declared(WhisperBlockRequest::kOpcode, kWhisperBlockHandler, kWhisperBlockOffsets,
-                WhisperBlockRequest::kWireSize)) {
+  if (!FixedLayoutHolds<WhisperBlockRequest>(kWhisperBlockHandler, kWhisperBlockOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -159,20 +146,15 @@ core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockRequest& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const WhisperBlockListRequest& /*request*/) {
-  if (!Declared(WhisperBlockListRequest::kOpcode, kWhisperListHandler, {},
-                WhisperBlockListRequest::kWireSize)) {
+  if (!FixedLayoutHolds<WhisperBlockListRequest>(kWhisperListHandler,
+                                                 std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
-  std::vector<std::uint8_t> frame;
-  frame.reserve(WhisperBlockListRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(WhisperBlockListRequest::kOpcode);
-  return frame;
+  return OpcodeOnlyFrame<WhisperBlockListRequest>();
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const AdoptionRequest& request) {
-  if (!Declared(AdoptionRequest::kOpcode, kAdoptionHandler, kAdoptionOffsets,
-                AdoptionRequest::kWireSize)) {
+  if (!FixedLayoutHolds<AdoptionRequest>(kAdoptionHandler, kAdoptionOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;

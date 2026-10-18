@@ -7,8 +7,8 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -107,9 +107,7 @@ core::Result<MercenarySkillList> DecodeMercenarySkillList(std::span<const std::u
 }
 
 core::Result<std::vector<std::uint8_t>> EncodeMercenaryCommand(const MercenaryCommand& command) {
-  const auto length = PacketLength(MercenaryCommand::kOpcode);
-  if (!MatchesServerLayout(MercenaryCommand::kOpcode, kCommandHandler, kCommandOffsets) ||
-      !length.has_value() || static_cast<std::size_t>(*length) != MercenaryCommand::kWireSize) {
+  if (!FixedLayoutHolds<MercenaryCommand>(kCommandHandler, kCommandOffsets)) {
     return core::Fail(core::ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour l'ordre au mercenaire ne correspond plus à ce "
                       "que le serveur déclare lire");

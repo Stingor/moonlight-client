@@ -4,8 +4,8 @@
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -18,9 +18,7 @@ constexpr std::array<std::uint16_t, 0> kUserCountOffsets = {};
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> EncodeUserCountRequest() {
-  const auto length = PacketLength(UserCountRequest::kOpcode);
-  if (!MatchesServerLayout(UserCountRequest::kOpcode, kUserCountHandler, kUserCountOffsets) ||
-      !length.has_value() || static_cast<std::size_t>(*length) != UserCountRequest::kWireSize) {
+  if (!FixedLayoutHolds<UserCountRequest>(kUserCountHandler, kUserCountOffsets)) {
     return core::Fail(core::ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour le compte des joueurs connectés ne correspond "
                       "plus à ce que le serveur déclare lire");

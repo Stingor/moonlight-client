@@ -9,6 +9,7 @@
 #include "ro/proto/packet_lengths.h"
 
 #include "layout_holds.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -126,16 +127,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const BuyingStoreOpenRequest& req
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const BuyingStoreCloseRequest& /*request*/) {
-  if (!FixedLayoutHolds<BuyingStoreCloseRequest>(kCloseHandler, std::array<std::uint16_t, 0>{})) {
-    return core::Fail(ErrorCode::kUnsupportedVersion,
-                      "la fermeture d'échoppe d'achat ne correspond plus à ce que le serveur "
-                      "déclare lire");
-  }
-  std::vector<std::uint8_t> frame;
-  frame.reserve(BuyingStoreCloseRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(BuyingStoreCloseRequest::kOpcode);
-  return frame;
+  return EncodeOpcodeOnly<BuyingStoreCloseRequest>(kCloseHandler, "la fermeture d'échoppe d'achat");
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const BuyingStoreVisitRequest& request) {

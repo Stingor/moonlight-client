@@ -4,8 +4,8 @@
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -25,11 +25,7 @@ core::Error LayoutDrift() {
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const ViewEquipRequest& request) {
-  if (!MatchesServerLayout(ViewEquipRequest::kOpcode, kViewEquipHandler, kViewEquipOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(ViewEquipRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != ViewEquipRequest::kWireSize) {
+  if (!FixedLayoutHolds<ViewEquipRequest>(kViewEquipHandler, kViewEquipOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;

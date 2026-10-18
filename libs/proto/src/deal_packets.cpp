@@ -1,7 +1,6 @@
 #include "ro/proto/deal_packets.h"
 
 #include <array>
-#include <string>
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
@@ -9,6 +8,7 @@
 #include "ro/proto/packet_lengths.h"
 
 #include "layout_holds.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -25,20 +25,6 @@ constexpr std::array<std::uint16_t, 1> kAnswerOffsets = {2};
 constexpr std::string_view kLockHandler = "clif_parse_TradeOk";
 constexpr std::string_view kCancelHandler = "clif_parse_TradeCancel";
 constexpr std::string_view kExecuteHandler = "clif_parse_TradeCommit";
-
-template <typename Request>
-core::Result<std::vector<std::uint8_t>> EncodeOpcodeOnly(std::string_view handler,
-                                                         std::string_view what) {
-  if (!FixedLayoutHolds<Request>(handler, std::array<std::uint16_t, 0>{})) {
-    return core::Fail(ErrorCode::kUnsupportedVersion,
-                      std::string(what) + " ne correspond plus à ce que le serveur déclare lire");
-  }
-  std::vector<std::uint8_t> frame;
-  frame.reserve(Request::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(Request::kOpcode);
-  return frame;
-}
 
 }  // namespace
 

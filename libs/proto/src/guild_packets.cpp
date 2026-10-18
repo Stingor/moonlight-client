@@ -6,7 +6,9 @@
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
 #include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -53,16 +55,6 @@ core::Error LayoutDrift() {
                      "que le serveur déclare lire"};
 }
 
-// Le paquet est-il bien celui que le serveur lit, à la longueur qu'il déclare ?
-[[nodiscard]] bool Declared(std::uint16_t opcode, std::string_view handler,
-                            std::span<const std::uint16_t> offsets, std::size_t wire_size) {
-  if (!MatchesServerLayout(opcode, handler, offsets)) {
-    return false;
-  }
-  const auto length = PacketLength(opcode);
-  return length.has_value() && static_cast<std::size_t>(*length) == wire_size;
-}
-
 // Relit l'en-tête d'une trame variable et rend sa longueur annoncée, bornée à
 // ce que la trame porte vraiment.
 [[nodiscard]] core::Result<std::size_t> VariableLength(std::span<const std::uint8_t> frame,
@@ -82,8 +74,7 @@ core::Error LayoutDrift() {
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildMenuRequest& request) {
-  if (!Declared(GuildMenuRequest::kOpcode, kMenuHandler, kMenuOffsets,
-                GuildMenuRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildMenuRequest>(kMenuHandler, kMenuOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -95,20 +86,15 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildMenuRequest& request) 
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildMenuInterfaceRequest& /*request*/) {
-  if (!Declared(GuildMenuInterfaceRequest::kOpcode, kMenuInterfaceHandler,
-                std::array<std::uint16_t, 0>{}, GuildMenuInterfaceRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildMenuInterfaceRequest>(kMenuInterfaceHandler,
+                                                   std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
-  std::vector<std::uint8_t> frame;
-  frame.reserve(GuildMenuInterfaceRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(GuildMenuInterfaceRequest::kOpcode);
-  return frame;
+  return OpcodeOnlyFrame<GuildMenuInterfaceRequest>();
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildNoticeRequest& request) {
-  if (!Declared(GuildNoticeRequest::kOpcode, kNoticeHandler, kNoticeOffsets,
-                GuildNoticeRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildNoticeRequest>(kNoticeHandler, kNoticeOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -146,8 +132,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildPositionsRequest& requ
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildCreateRequest& request) {
-  if (!Declared(GuildCreateRequest::kOpcode, kCreateHandler, kCreateOffsets,
-                GuildCreateRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildCreateRequest>(kCreateHandler, kCreateOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -160,8 +145,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildCreateRequest& request
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildRelationDeleteRequest& request) {
-  if (!Declared(GuildRelationDeleteRequest::kOpcode, kRelationHandler, kRelationOffsets,
-                GuildRelationDeleteRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildRelationDeleteRequest>(kRelationHandler, kRelationOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -174,8 +158,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildRelationDeleteRequest&
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceRequest& request) {
-  if (!Declared(GuildAllianceRequest::kOpcode, kAllianceHandler, kAllianceOffsets,
-                GuildAllianceRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildAllianceRequest>(kAllianceHandler, kAllianceOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -189,8 +172,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceRequest& reque
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceAnswer& request) {
-  if (!Declared(GuildAllianceAnswer::kOpcode, kAllianceAnswerHandler, kAllianceAnswerOffsets,
-                GuildAllianceAnswer::kWireSize)) {
+  if (!FixedLayoutHolds<GuildAllianceAnswer>(kAllianceAnswerHandler, kAllianceAnswerOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;
@@ -203,8 +185,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const GuildAllianceAnswer& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const GuildOppositionRequest& request) {
-  if (!Declared(GuildOppositionRequest::kOpcode, kOppositionHandler, kOppositionOffsets,
-                GuildOppositionRequest::kWireSize)) {
+  if (!FixedLayoutHolds<GuildOppositionRequest>(kOppositionHandler, kOppositionOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;

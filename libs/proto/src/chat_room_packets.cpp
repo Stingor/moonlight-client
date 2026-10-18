@@ -9,6 +9,7 @@
 #include "ro/proto/packet_lengths.h"
 
 #include "layout_holds.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -63,14 +64,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const ChatRoomExpelRequest& reque
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const ChatRoomExitRequest& /*request*/) {
-  if (!FixedLayoutHolds<ChatRoomExitRequest>(kExitHandler, std::array<std::uint16_t, 0>{})) {
-    return LayoutChanged("la sortie d'un salon");
-  }
-  std::vector<std::uint8_t> frame;
-  frame.reserve(ChatRoomExitRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(ChatRoomExitRequest::kOpcode);
-  return frame;
+  return EncodeOpcodeOnly<ChatRoomExitRequest>(kExitHandler, "la sortie d'un salon");
 }
 
 }  // namespace ro::proto

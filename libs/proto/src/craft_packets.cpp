@@ -4,8 +4,8 @@
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -25,12 +25,7 @@ core::Error LayoutDrift() {
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const WeaponRefineRequest& request) {
-  if (!MatchesServerLayout(WeaponRefineRequest::kOpcode, kWeaponRefineHandler,
-                           kWeaponRefineOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(WeaponRefineRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != WeaponRefineRequest::kWireSize) {
+  if (!FixedLayoutHolds<WeaponRefineRequest>(kWeaponRefineHandler, kWeaponRefineOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   std::vector<std::uint8_t> frame;

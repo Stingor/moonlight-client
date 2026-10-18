@@ -5,8 +5,8 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -22,9 +22,7 @@ constexpr std::array<std::uint16_t, 2> kConfigOffsets = {2, 6};
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const ConfigRequest& request) {
-  const auto length = PacketLength(ConfigRequest::kOpcode);
-  if (!MatchesServerLayout(ConfigRequest::kOpcode, kConfigHandler, kConfigOffsets) ||
-      !length.has_value() || static_cast<std::size_t>(*length) != ConfigRequest::kWireSize) {
+  if (!FixedLayoutHolds<ConfigRequest>(kConfigHandler, kConfigOffsets)) {
     return core::Fail(ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour un réglage du personnage ne correspond plus à "
                       "ce que le serveur déclare lire");

@@ -6,8 +6,8 @@
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -21,11 +21,6 @@ constexpr std::array<std::uint16_t, 3> kAttackOffsets = {2, 6, 10};
 constexpr std::string_view kReturnHandler = "clif_parse_HomMoveToMaster";
 constexpr std::array<std::uint16_t, 1> kReturnOffsets = {2};
 
-[[nodiscard]] bool LengthIs(std::uint16_t opcode, std::size_t wire_size) {
-  const auto length = PacketLength(opcode);
-  return length.has_value() && static_cast<std::size_t>(*length) == wire_size;
-}
-
 [[nodiscard]] core::Error Drift() {
   return core::Error{ErrorCode::kUnsupportedVersion,
                      "la disposition écrite pour un ordre de compagnon ne correspond plus à ce "
@@ -35,8 +30,7 @@ constexpr std::array<std::uint16_t, 1> kReturnOffsets = {2};
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> Encode(const CompanionAttackRequest& request) {
-  if (!MatchesServerLayout(CompanionAttackRequest::kOpcode, kAttackHandler, kAttackOffsets) ||
-      !LengthIs(CompanionAttackRequest::kOpcode, CompanionAttackRequest::kWireSize)) {
+  if (!FixedLayoutHolds<CompanionAttackRequest>(kAttackHandler, kAttackOffsets)) {
     return std::unexpected(Drift());
   }
   std::vector<std::uint8_t> frame;
@@ -50,8 +44,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const CompanionAttackRequest& req
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const CompanionReturnRequest& request) {
-  if (!MatchesServerLayout(CompanionReturnRequest::kOpcode, kReturnHandler, kReturnOffsets) ||
-      !LengthIs(CompanionReturnRequest::kOpcode, CompanionReturnRequest::kWireSize)) {
+  if (!FixedLayoutHolds<CompanionReturnRequest>(kReturnHandler, kReturnOffsets)) {
     return std::unexpected(Drift());
   }
   std::vector<std::uint8_t> frame;

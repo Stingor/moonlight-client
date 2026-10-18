@@ -12,7 +12,9 @@
 #include "ro/proto/parsed_packets.h"
 #include "ro/proto/skill_text_packets.h"
 
+#include "layout_holds.h"
 #include "named_chat.h"
+#include "opcode_only.h"
 
 namespace ro::proto {
 namespace {
@@ -138,11 +140,7 @@ bool MatchesServerLayout(std::uint16_t opcode, std::string_view handler,
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const EnterMapRequest& request) {
-  if (!MatchesServerLayout(EnterMapRequest::kOpcode, kEnterMapHandler, kEnterMapOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(EnterMapRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != EnterMapRequest::kWireSize) {
+  if (!FixedLayoutHolds<EnterMapRequest>(kEnterMapHandler, kEnterMapOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -201,11 +199,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const ChatRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const SkillUpRequest& request) {
-  if (!MatchesServerLayout(SkillUpRequest::kOpcode, kSkillUpHandler, kSkillUpOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(SkillUpRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != SkillUpRequest::kWireSize) {
+  if (!FixedLayoutHolds<SkillUpRequest>(kSkillUpHandler, kSkillUpOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -220,11 +214,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const SkillUpRequest& request) {
 core::Result<std::vector<std::uint8_t>> Encode(const EmotionRequest& request) {
   // Aucun décalage déclaré : le gestionnaire du serveur lit ses deux champs en
   // dur. Seuls le gestionnaire et la longueur peuvent donc être recoupés.
-  if (!MatchesServerLayout(EmotionRequest::kOpcode, kEmotionHandler, {})) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(EmotionRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != EmotionRequest::kWireSize) {
+  if (!FixedLayoutHolds<EmotionRequest>(kEmotionHandler, std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -239,27 +229,14 @@ core::Result<std::vector<std::uint8_t>> Encode(const EmotionRequest& request) {
 
 core::Result<std::vector<std::uint8_t>> Encode(const MapLoadedNotice& /*notice*/) {
   // Aucun champ, donc aucun décalage à recouper : seule la longueur peut mentir.
-  if (!MatchesServerLayout(MapLoadedNotice::kOpcode, kMapLoadedHandler, {})) {
+  if (!FixedLayoutHolds<MapLoadedNotice>(kMapLoadedHandler, std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
-  const auto length = PacketLength(MapLoadedNotice::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != MapLoadedNotice::kWireSize) {
-    return std::unexpected(LayoutDrift());
-  }
-
-  std::vector<std::uint8_t> frame;
-  frame.reserve(MapLoadedNotice::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(MapLoadedNotice::kOpcode);
-  return frame;
+  return OpcodeOnlyFrame<MapLoadedNotice>();
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const RestartRequest& request) {
-  if (!MatchesServerLayout(RestartRequest::kOpcode, kRestartHandler, kRestartOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(RestartRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != RestartRequest::kWireSize) {
+  if (!FixedLayoutHolds<RestartRequest>(kRestartHandler, kRestartOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -273,45 +250,23 @@ core::Result<std::vector<std::uint8_t>> Encode(const RestartRequest& request) {
 
 core::Result<std::vector<std::uint8_t>> Encode(const AutoReviveRequest& /*request*/) {
   // Aucun champ, donc aucun décalage à recouper : seule la longueur peut mentir.
-  if (!MatchesServerLayout(AutoReviveRequest::kOpcode, kAutoReviveHandler, {})) {
+  if (!FixedLayoutHolds<AutoReviveRequest>(kAutoReviveHandler, std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
-  const auto length = PacketLength(AutoReviveRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != AutoReviveRequest::kWireSize) {
-    return std::unexpected(LayoutDrift());
-  }
-
-  std::vector<std::uint8_t> frame;
-  frame.reserve(AutoReviveRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(AutoReviveRequest::kOpcode);
-  return frame;
+  return OpcodeOnlyFrame<AutoReviveRequest>();
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const RememberWarpPointRequest& /*request*/) {
   // Aucun champ, donc aucun décalage à recouper : seule la longueur peut mentir.
-  if (!MatchesServerLayout(RememberWarpPointRequest::kOpcode, kRememberWarpPointHandler, {})) {
+  if (!FixedLayoutHolds<RememberWarpPointRequest>(kRememberWarpPointHandler,
+                                                  std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
-  const auto length = PacketLength(RememberWarpPointRequest::kOpcode);
-  if (!length.has_value() ||
-      static_cast<std::size_t>(*length) != RememberWarpPointRequest::kWireSize) {
-    return std::unexpected(LayoutDrift());
-  }
-
-  std::vector<std::uint8_t> frame;
-  frame.reserve(RememberWarpPointRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(RememberWarpPointRequest::kOpcode);
-  return frame;
+  return OpcodeOnlyFrame<RememberWarpPointRequest>();
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const WalkRequest& request) {
-  if (!MatchesServerLayout(WalkRequest::kOpcode, kWalkHandler, kWalkOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(WalkRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != WalkRequest::kWireSize) {
+  if (!FixedLayoutHolds<WalkRequest>(kWalkHandler, kWalkOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -326,11 +281,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const WalkRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const ActionRequest& request) {
-  if (!MatchesServerLayout(ActionRequest::kOpcode, kActionHandler, kActionOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(ActionRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != ActionRequest::kWireSize) {
+  if (!FixedLayoutHolds<ActionRequest>(kActionHandler, kActionOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -403,11 +354,7 @@ bool Decode(std::span<const std::uint8_t> frame, DevotionListNotice& packet) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const PickupRequest& request) {
-  if (!MatchesServerLayout(PickupRequest::kOpcode, kPickupHandler, kPickupOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(PickupRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != PickupRequest::kWireSize) {
+  if (!FixedLayoutHolds<PickupRequest>(kPickupHandler, kPickupOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -420,11 +367,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const PickupRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const TurnRequest& request) {
-  if (!MatchesServerLayout(TurnRequest::kOpcode, kTurnHandler, kTurnOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(TurnRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != TurnRequest::kWireSize) {
+  if (!FixedLayoutHolds<TurnRequest>(kTurnHandler, kTurnOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -442,11 +385,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const TurnRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const NameRequest& request) {
-  if (!MatchesServerLayout(NameRequest::kOpcode, kNameHandler, kNameOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(NameRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != NameRequest::kWireSize) {
+  if (!FixedLayoutHolds<NameRequest>(kNameHandler, kNameOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -459,11 +398,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const NameRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const CreatorNameRequest& request) {
-  if (!MatchesServerLayout(CreatorNameRequest::kOpcode, kCreatorNameHandler, kNameOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(CreatorNameRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != CreatorNameRequest::kWireSize) {
+  if (!FixedLayoutHolds<CreatorNameRequest>(kCreatorNameHandler, kNameOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -476,11 +411,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const CreatorNameRequest& request
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const BugReportRequest& request) {
-  if (!MatchesServerLayout(BugReportRequest::kOpcode, kBugReportHandler, {})) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto declared = PacketLength(BugReportRequest::kOpcode);
-  if (!declared.has_value() || *declared != kVariableLength) {
+  if (!VariableLayoutHolds<BugReportRequest>(kBugReportHandler, std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
   const std::size_t length =
@@ -506,11 +437,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const BugReportRequest& request) 
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const UseItemRequest& request) {
-  if (!MatchesServerLayout(UseItemRequest::kOpcode, kUseItemHandler, kUseItemOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(UseItemRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != UseItemRequest::kWireSize) {
+  if (!FixedLayoutHolds<UseItemRequest>(kUseItemHandler, kUseItemOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -524,11 +451,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const UseItemRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const UnequipItemRequest& request) {
-  if (!MatchesServerLayout(UnequipItemRequest::kOpcode, kUnequipHandler, kUnequipOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(UnequipItemRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != UnequipItemRequest::kWireSize) {
+  if (!FixedLayoutHolds<UnequipItemRequest>(kUnequipHandler, kUnequipOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -541,11 +464,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const UnequipItemRequest& request
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const DropItemRequest& request) {
-  if (!MatchesServerLayout(DropItemRequest::kOpcode, kDropItemHandler, kDropItemOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(DropItemRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != DropItemRequest::kWireSize) {
+  if (!FixedLayoutHolds<DropItemRequest>(kDropItemHandler, kDropItemOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -559,11 +478,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const DropItemRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const StatUpRequest& request) {
-  if (!MatchesServerLayout(StatUpRequest::kOpcode, kStatUpHandler, kStatUpOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(StatUpRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != StatUpRequest::kWireSize) {
+  if (!FixedLayoutHolds<StatUpRequest>(kStatUpHandler, kStatUpOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -596,11 +511,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const ClanChatRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const WhisperRequest& request) {
-  if (!MatchesServerLayout(WhisperRequest::kOpcode, kWhisperHandler, kWhisperOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto declared = PacketLength(WhisperRequest::kOpcode);
-  if (!declared.has_value() || *declared != kVariableLength) {
+  if (!VariableLayoutHolds<WhisperRequest>(kWhisperHandler, kWhisperOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   if (request.recipient.empty()) {
@@ -636,11 +547,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const WhisperRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const NpcNextRequest& request) {
-  if (!MatchesServerLayout(NpcNextRequest::kOpcode, kNpcNextHandler, kNpcNextOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(NpcNextRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != NpcNextRequest::kWireSize) {
+  if (!FixedLayoutHolds<NpcNextRequest>(kNpcNextHandler, kNpcNextOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -653,11 +560,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const NpcNextRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const NpcMenuChoice& request) {
-  if (!MatchesServerLayout(NpcMenuChoice::kOpcode, kNpcMenuHandler, kNpcMenuOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(NpcMenuChoice::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != NpcMenuChoice::kWireSize) {
+  if (!FixedLayoutHolds<NpcMenuChoice>(kNpcMenuHandler, kNpcMenuOffsets)) {
     return std::unexpected(LayoutDrift());
   }
   // ⚠ LE RANG NUL NE PART PAS D'ICI. Voir NpcMenuChoice : il fait éjecter le
@@ -679,12 +582,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const NpcMenuChoice& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const StorageStoreRequest& request) {
-  if (!MatchesServerLayout(StorageStoreRequest::kOpcode, kStorageStoreHandler,
-                           kStorageMoveOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(StorageStoreRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != StorageStoreRequest::kWireSize) {
+  if (!FixedLayoutHolds<StorageStoreRequest>(kStorageStoreHandler, kStorageMoveOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -698,11 +596,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const StorageStoreRequest& reques
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const StorageTakeRequest& request) {
-  if (!MatchesServerLayout(StorageTakeRequest::kOpcode, kStorageTakeHandler, kStorageMoveOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(StorageTakeRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != StorageTakeRequest::kWireSize) {
+  if (!FixedLayoutHolds<StorageTakeRequest>(kStorageTakeHandler, kStorageMoveOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -718,27 +612,15 @@ core::Result<std::vector<std::uint8_t>> Encode(const StorageTakeRequest& request
 core::Result<std::vector<std::uint8_t>> Encode(const CloseStorageRequest& request) {
   static_cast<void>(request);
   // Aucun champ : le recoupement ne porte que sur le gestionnaire et la taille.
-  if (!MatchesServerLayout(CloseStorageRequest::kOpcode, kCloseStorageHandler, {})) {
+  if (!FixedLayoutHolds<CloseStorageRequest>(kCloseStorageHandler,
+                                             std::array<std::uint16_t, 0>{})) {
     return std::unexpected(LayoutDrift());
   }
-  const auto length = PacketLength(CloseStorageRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != CloseStorageRequest::kWireSize) {
-    return std::unexpected(LayoutDrift());
-  }
-
-  std::vector<std::uint8_t> frame;
-  frame.reserve(CloseStorageRequest::kWireSize);
-  ByteWriter writer(frame);
-  writer.U16(CloseStorageRequest::kOpcode);
-  return frame;
+  return OpcodeOnlyFrame<CloseStorageRequest>();
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const TickRequest& request) {
-  if (!MatchesServerLayout(TickRequest::kOpcode, kTickHandler, kTickOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(TickRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != TickRequest::kWireSize) {
+  if (!FixedLayoutHolds<TickRequest>(kTickHandler, kTickOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -751,12 +633,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const TickRequest& request) {
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const SkillOnTargetRequest& request) {
-  if (!MatchesServerLayout(SkillOnTargetRequest::kOpcode, kSkillOnTargetHandler,
-                           kSkillOnTargetOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(SkillOnTargetRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != SkillOnTargetRequest::kWireSize) {
+  if (!FixedLayoutHolds<SkillOnTargetRequest>(kSkillOnTargetHandler, kSkillOnTargetOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -771,12 +648,7 @@ core::Result<std::vector<std::uint8_t>> Encode(const SkillOnTargetRequest& reque
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const SkillOnGroundRequest& request) {
-  if (!MatchesServerLayout(SkillOnGroundRequest::kOpcode, kSkillOnGroundHandler,
-                           kSkillOnGroundOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(SkillOnGroundRequest::kOpcode);
-  if (!length.has_value() || static_cast<std::size_t>(*length) != SkillOnGroundRequest::kWireSize) {
+  if (!FixedLayoutHolds<SkillOnGroundRequest>(kSkillOnGroundHandler, kSkillOnGroundOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 
@@ -793,13 +665,8 @@ core::Result<std::vector<std::uint8_t>> Encode(const SkillOnGroundRequest& reque
 }
 
 core::Result<std::vector<std::uint8_t>> Encode(const SkillOnGroundWithTextRequest& request) {
-  if (!MatchesServerLayout(SkillOnGroundWithTextRequest::kOpcode, kSkillOnGroundWithTextHandler,
-                           kSkillOnGroundOffsets)) {
-    return std::unexpected(LayoutDrift());
-  }
-  const auto length = PacketLength(SkillOnGroundWithTextRequest::kOpcode);
-  if (!length.has_value() ||
-      static_cast<std::size_t>(*length) != SkillOnGroundWithTextRequest::kWireSize) {
+  if (!FixedLayoutHolds<SkillOnGroundWithTextRequest>(kSkillOnGroundWithTextHandler,
+                                                      kSkillOnGroundOffsets)) {
     return std::unexpected(LayoutDrift());
   }
 

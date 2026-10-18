@@ -4,8 +4,8 @@
 #include <string_view>
 
 #include "ro/core/byte_writer.h"
-#include "ro/proto/manual_packets.h"
-#include "ro/proto/packet_lengths.h"
+
+#include "layout_holds.h"
 
 namespace ro::proto {
 namespace {
@@ -18,9 +18,7 @@ constexpr std::array<std::uint16_t, 0> kStopAttackOffsets = {};
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> EncodeStopAttack() {
-  const auto length = PacketLength(StopAttackRequest::kOpcode);
-  if (!MatchesServerLayout(StopAttackRequest::kOpcode, kStopAttackHandler, kStopAttackOffsets) ||
-      !length.has_value() || static_cast<std::size_t>(*length) != StopAttackRequest::kWireSize) {
+  if (!FixedLayoutHolds<StopAttackRequest>(kStopAttackHandler, kStopAttackOffsets)) {
     return core::Fail(core::ErrorCode::kUnsupportedVersion,
                       "la disposition écrite pour l'arrêt d'une attaque ne correspond plus à ce "
                       "que le serveur déclare lire");
