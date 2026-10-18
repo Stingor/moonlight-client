@@ -91,11 +91,7 @@ void AdvanceRingQuartetTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
     }
     ++track.ticks;
 
-    track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + 1);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, 1);
 
     // ⚠ SEUL LE STYLE UN VOIT SON ALPHA TOMBER. Les autres gardent le leur
     // jusqu'à ce que la vie du nœud les emporte.

@@ -9,6 +9,8 @@
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -158,12 +160,7 @@ void AdvanceCloudRingTracks(std::array<EffectTrack, kEffectTracksPerNode>& track
     }
 
     // L'AZIMUT TOURNE, et reboucle au tour.
-    track.azimuth_degrees =
-        static_cast<std::int16_t>(track.azimuth_degrees + kCloudRingSpinPerTick);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, kCloudRingSpinPerTick);
 
     // ⚠ LE BALAYAGE S'OUVRE DE TROIS PAR TIC, et c'est tout l'effet : l'anneau
     // se déroule au lieu de paraître entier.

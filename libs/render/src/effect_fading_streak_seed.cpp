@@ -55,10 +55,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFadingStreakTracks(
                                   NextEffectNodeDraw(generator) % kFadingStreakHeadingSpread));
     // ⚠ UNE SEULE SOUSTRACTION, ET PAS DE MODULO : le client retranche un tour
     // quand le cap l'atteint, une fois.
-    if (track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-      track.tilt_degrees =
-          static_cast<std::int16_t>(track.tilt_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.tilt_degrees);
     track.azimuth_degrees = static_cast<std::int16_t>(
         NextEffectNodeDraw(generator) % static_cast<std::uint32_t>(kEffectTrackFullTurnDegrees));
     track.mark[kMarkOfFadingStreakImage] = kFadingStreakImage;

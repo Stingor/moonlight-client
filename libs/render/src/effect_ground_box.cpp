@@ -114,11 +114,7 @@ void AdvanceGroundBoxTracks(std::array<EffectTrack, kEffectTracksPerNode>& track
     if (effect_track.ticks <= 0) {
       continue;
     }
-    effect_track.degrees = static_cast<std::int16_t>(effect_track.degrees + kBreathStepDegrees);
-    if (effect_track.degrees >= kEffectTrackFullTurnDegrees) {
-      effect_track.degrees =
-          static_cast<std::int16_t>(effect_track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(effect_track.degrees, kBreathStepDegrees);
     if (effect_track.ticks > effect_track.style) {
       effect_track.alpha =
           std::max<std::int16_t>(static_cast<std::int16_t>(effect_track.alpha - kAlphaFall), 0);

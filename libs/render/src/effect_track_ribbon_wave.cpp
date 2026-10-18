@@ -142,19 +142,10 @@ void AdvanceTurningRingTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
     // bien que deux anneaux ne pulsent pas d'accord — prendre le compteur de
     // tics les ferait battre d'un seul cœur. C'est l'ADR 0017 : le champ n'a de
     // sens que pour qui le lit.
-    effect_track.style = static_cast<std::int16_t>(effect_track.style + kPulsingStepPerTick);
-    if (effect_track.style >= kEffectTrackFullTurnDegrees) {
-      effect_track.style =
-          static_cast<std::int16_t>(effect_track.style - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(effect_track.style, kPulsingStepPerTick);
     effect_track.radius_at_anchor = SinOfDegrees(effect_track.style) + kPulsingRadiusOffset;
 
-    effect_track.azimuth_degrees =
-        static_cast<std::int16_t>(effect_track.azimuth_degrees + kPulsingAzimuthPerTick);
-    if (effect_track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      effect_track.azimuth_degrees =
-          static_cast<std::int16_t>(effect_track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(effect_track.azimuth_degrees, kPulsingAzimuthPerTick);
 
     // ⚠ ET IL NE TOUCHE NI À L'ALPHA NI À L'INCLINAISON, là où son frère fait
     // respirer l'un et descendre l'autre. Deux mouvements de la même figure, et

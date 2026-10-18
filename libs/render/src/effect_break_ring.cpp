@@ -31,10 +31,7 @@ void AdvanceBreakRingTracks(std::array<EffectTrack, kEffectTracksPerNode>& track
     if (effect_track.tilt_degrees < 0) {
       effect_track.tilt_degrees = 0;
     }
-    if (effect_track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      effect_track.azimuth_degrees =
-          static_cast<std::int16_t>(effect_track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(effect_track.azimuth_degrees);
     if (effect_track.ticks < kBreakRingRisesBeforeTick) {
       const bool living = effect_track.style == kBreakRingBrightStyle;
       effect_track.alpha = std::min<std::int16_t>(
@@ -77,9 +74,7 @@ void ComposeBreakRingQuads(const EffectTrack& track, std::uint8_t variant, glm::
     const bool referme =
         sweep_degrees == kEffectTrackFullTurnDegrees && segment == kBreakRingSegments;
     std::int32_t angle = track.azimuth_degrees + travelled;
-    if (angle >= kEffectTrackFullTurnDegrees) {
-      angle -= kEffectTrackFullTurnDegrees;
-    }
+    DropOneTurn(angle);
     if (referme) {
       angle = track.azimuth_degrees;
     }

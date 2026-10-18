@@ -9,6 +9,8 @@
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -119,11 +121,7 @@ void AdvanceFadingTwinDiscTracks(std::array<EffectTrack, kEffectTracksPerNode>& 
   for (std::size_t rang = 0; rang < kFadingTwinDiscLiveTracks; ++rang) {
     EffectTrack& track = tracks[rang];
     ++track.ticks;
-    track.tilt_degrees = static_cast<std::int16_t>(track.tilt_degrees + kFadingTwinDiscTiltPerTick);
-    if (track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-      track.tilt_degrees =
-          static_cast<std::int16_t>(track.tilt_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.tilt_degrees, kFadingTwinDiscTiltPerTick);
     // ⚠ STRICTEMENT AU-DELÀ du seuil : au tic `vie − 25`
     // lui-même, l'alpha tient encore.
     if (track.ticks > seuil) {

@@ -50,9 +50,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedRadialPetalTracks(
         kRadialPetalSizeFloor;
     track.alpha = 0;
     std::int32_t cap = base_heading_degrees + DrawBelow(generator, kRadialPetalHeadingSpread);
-    if (cap >= kEffectTrackFullTurnDegrees) {
-      cap -= kEffectTrackFullTurnDegrees;
-    }
+    DropOneTurn(cap);
     track.ticks = -DrawBelow(generator, kRadialPetalDelaySpread);
     track.tilt_degrees = static_cast<std::int16_t>(cap);
     track.lift_key = kRadialPetalSpeed;

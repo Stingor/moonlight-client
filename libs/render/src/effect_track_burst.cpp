@@ -535,10 +535,7 @@ void AdvanceSphereShellTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
     // ⚠ UNE SEULE SOUSTRACTION, ET PAS DE MODULO : le client retranche un tour
     // quand l'azimut l'atteint, une fois. Un angle de porteur hors du tour
     // ressortirait donc hors du tour, et c'est ce qu'il fait.
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.azimuth_degrees);
 
     if (track.ticks < kSphereShellAlphaRisesBeforeTick) {
       if (track.alpha < kSphereShellAlphaCeiling) {
@@ -568,12 +565,9 @@ void AdvanceGroundCurtainTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
     const std::int16_t step = track.value[kSlotOfStyle] == kGroundCurtainFastStyle
                                   ? kGroundCurtainFastStepDegrees
                                   : kGroundCurtainStepDegrees;
-    track.degrees = static_cast<std::int16_t>(track.degrees + step);
     // ⚠ UNE SEULE SOUSTRACTION, comme le client : il retranche un tour quand
     // l'angle l'atteint, et n'y revient pas.
-    if (track.degrees >= kEffectTrackFullTurnDegrees) {
-      track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.degrees, step);
     track.lift_key =
         kGroundCurtainHeightAmplitude * SinOfDegrees(track.degrees) + kGroundCurtainHeightMiddle;
   }
@@ -658,9 +652,7 @@ void AdvanceGlidingSlashTracks(std::array<EffectTrack, kEffectTracksPerNode>& tr
         // il retranche un tour s'il deborde, puis en ajoute un s'il est passe
         // sous zero. Un modulo donnerait le meme resultat ici, et cesserait de
         // le donner le jour ou la dispersion depasserait le tour.
-        if (cap >= kEffectTrackFullTurnDegrees) {
-          cap -= kEffectTrackFullTurnDegrees;
-        }
+        DropOneTurn(cap);
         if (cap < 0) {
           cap += kEffectTrackFullTurnDegrees;
         }

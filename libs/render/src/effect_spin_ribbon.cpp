@@ -131,8 +131,7 @@ void AdvanceSpinRibbonTracks(std::array<EffectTrack, kEffectTracksPerNode>& trac
     const std::int32_t rotated =
         static_cast<std::int32_t>(static_cast<float>(effect_track.azimuth_degrees) +
                                   effect_track.value[kSpinRibbonSlotOfSpinSpeed]);
-    effect_track.azimuth_degrees = static_cast<std::int16_t>(
-        rotated >= kEffectTrackFullTurnDegrees ? rotated - kEffectTrackFullTurnDegrees : rotated);
+    effect_track.azimuth_degrees = WrappedOnceToInt16(rotated);
   }
 }
 
@@ -165,14 +164,12 @@ void AdvanceRisingSpinRibbonTracks(std::array<EffectTrack, kEffectTracksPerNode>
     if (NextEffectNodeDraw(generator) % static_cast<std::uint32_t>(kTiltDrawSpread) == 0U) {
       ++tilt;
     }
-    effect_track.tilt_degrees = static_cast<std::int16_t>(
-        tilt >= kEffectTrackFullTurnDegrees ? tilt - kEffectTrackFullTurnDegrees : tilt);
+    effect_track.tilt_degrees = WrappedOnceToInt16(tilt);
 
     const std::int32_t rotated =
         static_cast<std::int32_t>(static_cast<float>(effect_track.azimuth_degrees) +
                                   effect_track.value[kSpinRibbonSlotOfSpinSpeed]);
-    effect_track.azimuth_degrees = static_cast<std::int16_t>(
-        rotated >= kEffectTrackFullTurnDegrees ? rotated - kEffectTrackFullTurnDegrees : rotated);
+    effect_track.azimuth_degrees = WrappedOnceToInt16(rotated);
   }
 }
 

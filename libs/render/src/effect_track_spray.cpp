@@ -68,12 +68,7 @@ void AdvanceDualModeSprayTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
     }
     ++track.ticks;
 
-    track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees +
-                                                      (lent ? kTurnPerTickWhenSlow : kTurnPerTick));
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, lent ? kTurnPerTickWhenSlow : kTurnPerTick);
 
     track.radius_at_anchor += lent ? kRadiusGrowthWhenSlow : kRadiusGrowth;
     track.tilt_degrees = std::max(static_cast<std::int16_t>(track.tilt_degrees - kTiltFallPerTick),

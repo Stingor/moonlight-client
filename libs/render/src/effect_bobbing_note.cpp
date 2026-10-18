@@ -37,11 +37,6 @@ constexpr std::array<glm::vec3, 4> kHaloOffsets = {{
 
 constexpr std::array<std::uint8_t, 3> kWhite = {255, 255, 255};
 
-[[nodiscard]] std::int16_t Wrapped(std::int32_t degrees) {
-  return static_cast<std::int16_t>(
-      degrees >= kEffectTrackFullTurnDegrees ? degrees - kEffectTrackFullTurnDegrees : degrees);
-}
-
 // LE COIN SUIVANT : quatre-vingt-cinq degrés plus un tirage, ramené dans le tour.
 [[nodiscard]] std::int32_t NextCorner(std::int32_t previous, std::uint32_t& generator) {
   const auto draw =
@@ -131,7 +126,7 @@ void AdvanceBobbingNoteTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
   if (frisson >= static_cast<float>(kEffectTrackFullTurnDegrees)) {
     frisson -= static_cast<float>(kEffectTrackFullTurnDegrees);
   }
-  leader.azimuth_degrees = Wrapped(leader.azimuth_degrees + kBobbingNoteSwayPerTick);
+  leader.azimuth_degrees = WrappedOnceToInt16(leader.azimuth_degrees + kBobbingNoteSwayPerTick);
   // ⚠ LE CLIENT AJOUTE le sinus à une ordonnée qui DESCEND : la note est au plus
   // bas quand le sinus vaut un.
   leader.anchor = node_position +

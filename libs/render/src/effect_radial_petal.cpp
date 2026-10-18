@@ -34,9 +34,7 @@ void AdvanceRadialPetalTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
       // LE SAUT : deux degrés par tic, replié une fois sur le tour. La hauteur
       // ne s'ACCUMULE pas : elle est RÉÉCRITE depuis la base à chaque tic.
       std::int32_t phase = kRadialPetalHopDegreesPerTick * effect_track.ticks;
-      if (phase >= kEffectTrackFullTurnDegrees) {
-        phase -= kEffectTrackFullTurnDegrees;
-      }
+      DropOneTurn(phase);
       effect_track.tail[kRadialPetalSlotOfDepthBelow] =
           effect_track.anchor.y - (speed * SinOfDegrees(phase) * kRadialPetalHopScale);
     }

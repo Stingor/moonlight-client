@@ -3,6 +3,8 @@
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_track_motion.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -45,10 +47,7 @@ void AdvanceCameraAlignedArcTracks(std::array<EffectTrack, kEffectTracksPerNode>
     // ⚠ L'INCLINAISON NE TOURNE PAS, ELLE SE REPLIE. Le client la borne sans
     // jamais l'avancer : c'est l'angle de caméra que le bâtisseur a figé à la
     // naissance, et l'arc garde donc son plan quoi que le joueur fasse ensuite.
-    if (track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-      track.tilt_degrees =
-          static_cast<std::int16_t>(track.tilt_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.tilt_degrees);
   }
 }
 

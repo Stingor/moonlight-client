@@ -75,20 +75,13 @@ void AdvanceRadialFanTracks(std::array<EffectTrack, kEffectTracksPerNode>& track
       }
     }
 
-    track.tilt_degrees = static_cast<std::int16_t>(track.tilt_degrees + kTurnPerTick);
-    if (track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-      track.tilt_degrees =
-          static_cast<std::int16_t>(track.tilt_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.tilt_degrees, kTurnPerTick);
 
     // ⚠ LE CLIENT TRONQUE APRÈS L'ADDITION, comme pour le bouclier qui fait
     // face : il ajoute le demi-tour au flottant du porteur et convertit le total.
     track.azimuth_degrees = static_cast<std::int16_t>(
         static_cast<std::int32_t>(owner_facing_degrees + kFacingOffsetDegrees));
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.azimuth_degrees);
 
     // L'AXE DE GLISSEMENT, recalculé à chaque tic : un vecteur horizontal
     // unitaire, perpendiculaire à l'azimut.

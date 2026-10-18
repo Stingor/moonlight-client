@@ -2,6 +2,8 @@
 
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -145,9 +147,7 @@ void StepAngleByStyle(EffectTrack& track, std::uint8_t style) {
   // ⚠ CHAQUE SENS NE REPLIE QUE SON CÔTÉ, comme le client : celui qui avance ne
   // teste que le tour entier, celui qui recule que le négatif.
   if (advance) {
-    if (track.degrees >= kEffectTrackFullTurnDegrees) {
-      track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.degrees);
     return;
   }
   if (track.degrees < 0) {

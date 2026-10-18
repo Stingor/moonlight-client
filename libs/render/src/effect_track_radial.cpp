@@ -98,10 +98,7 @@ void AdvanceRadialParticleGroupTracks(std::array<EffectTrack, kEffectTracksPerNo
       track.azimuth_degrees =
           static_cast<std::int16_t>(track.azimuth_degrees + rank_degrees + kTurnOfMediumMark);
     }
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.azimuth_degrees);
 
     // ⚠ LE STYLE EST UNE DURÉE, et négative elle veut dire « jamais ».
     const bool still_holds = track.ticks < track.style || track.style < kStyleThatNeverFades;

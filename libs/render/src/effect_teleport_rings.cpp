@@ -40,11 +40,7 @@ void AdvanceTeleportRingTracks(std::array<EffectTrack, kEffectTracksPerNode>& tr
     // tic visible.
     const std::int16_t step = static_cast<std::int16_t>(kTeleportRingTurnPerTickDegrees -
                                                         static_cast<std::int16_t>(rang));
-    std::int16_t azimuth = static_cast<std::int16_t>(track.azimuth_degrees + step);
-    if (azimuth >= kEffectTrackFullTurnDegrees) {
-      azimuth = static_cast<std::int16_t>(azimuth - kEffectTrackFullTurnDegrees);
-    }
-    track.azimuth_degrees = azimuth;
+    TurnOnward(track.azimuth_degrees, step);
 
     if (track.ticks <= 0) {
       continue;

@@ -75,9 +75,7 @@ std::vector<EffectWorldQuad> ComposeDoubleRibbonQuads(const EffectTrack& track,
     // ⚠ UNE SEULE SOUSTRACTION, ET PAS DE MODULO, comme partout dans cette
     // famille : le client retranche un tour quand la somme l'atteint.
     std::int32_t tour = track.tilt_degrees + travelled;
-    if (tour >= kEffectTrackFullTurnDegrees) {
-      tour -= kEffectTrackFullTurnDegrees;
-    }
+    DropOneTurn(tour);
     const glm::vec3 inner = node_origin + RingPoint(track, ouverture, tour, axe);
     const glm::vec3 outer = node_origin + RingPoint(track, edge_opening, tour, axe);
 

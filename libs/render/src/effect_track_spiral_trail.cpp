@@ -112,11 +112,7 @@ void AdvanceSwirlOrbitTracks(std::array<EffectTrack, kEffectTracksPerNode>& trac
     }
     PlaceSpark(track);
 
-    track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + kSpinPerTick);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, kSpinPerTick);
 
     if (track.mark[kMarkOfFlightState] == kStateClimbing) {
       // LA MONTÉE : rien d'autre que l'ordonnée. Le client la retranche dans son

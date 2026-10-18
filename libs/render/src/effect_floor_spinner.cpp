@@ -48,13 +48,6 @@ constexpr std::size_t kPathBufferSize = 64;
   return kDustImages;
 }
 
-// UN ANGLE RAMENÉ DANS LE TOUR après un pas positif : le client retranche un
-// tour une seule fois.
-[[nodiscard]] std::int16_t Wrapped(std::int32_t degrees) {
-  return static_cast<std::int16_t>(
-      degrees >= kEffectTrackFullTurnDegrees ? degrees - kEffectTrackFullTurnDegrees : degrees);
-}
-
 }  // namespace
 
 std::span<const EffectFloorSpinnerPattern> EffectFloorSpinnerPatternsFor(std::uint32_t effect_id) {
@@ -133,8 +126,9 @@ void AdvanceFloorSpinnerTracks(std::array<EffectTrack, kEffectTracksPerNode>& tr
     ++effect_track.ticks;
     if (effect_track.value[kFloorSpinnerSlotOfRest] == 0.0F) {
       effect_track.azimuth_degrees =
-          Wrapped(effect_track.azimuth_degrees + kFloorSpinnerTurnPerTick);
-      effect_track.tilt_degrees = Wrapped(effect_track.tilt_degrees + kFloorSpinnerBreathPerTick);
+          WrappedOnceToInt16(effect_track.azimuth_degrees + kFloorSpinnerTurnPerTick);
+      effect_track.tilt_degrees =
+          WrappedOnceToInt16(effect_track.tilt_degrees + kFloorSpinnerBreathPerTick);
     }
     float& image = effect_track.value[kFloorSpinnerSlotOfImage];
     if (effect_track.ticks % kFloorSpinnerTicksPerImage == 0) {

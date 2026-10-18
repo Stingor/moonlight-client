@@ -236,10 +236,7 @@ void AdvanceElectricArcTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
       }
       // ⚠ UNE SEULE SOUSTRACTION, comme le client : le cap ne sort jamais du
       // tour de plus d'un pas.
-      if (effect_track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-        effect_track.tilt_degrees =
-            static_cast<std::int16_t>(effect_track.tilt_degrees - kEffectTrackFullTurnDegrees);
-      }
+      DropOneTurn(effect_track.tilt_degrees);
     } else {
       if (rotated) {
         effect_track.tilt_degrees =

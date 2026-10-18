@@ -40,9 +40,7 @@ std::vector<EffectWorldQuad> ComposePentagonTrailQuads(const EffectTrack& track,
     std::int32_t angle = track.azimuth_degrees + kPentagonTrailStepDegrees * rang;
     // Le client ne ramène QU'UNE FOIS, et il lui suffit : l'azimut est déjà dans
     // le tour, et cinq pas de soixante-douze n'y ajoutent qu'un tour.
-    if (angle >= kEffectTrackFullTurnDegrees) {
-      angle -= kEffectTrackFullTurnDegrees;
-    }
+    DropOneTurn(angle);
     const float theta = DegreesToRadians(static_cast<float>(angle));
     // ⚠ LE CENTRE EST DANS NOTRE REPÈRE, l'écart au sommet s'écrit dans celui du
     // client : sa profondeur se retourne. La garder ferait du tube le miroir du

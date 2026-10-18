@@ -3,6 +3,8 @@
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_track_motion.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -35,10 +37,7 @@ void AdvanceFadingStreakTracks(std::array<EffectTrack, kEffectTracksPerNode>& tr
     // ⚠ L'ANGLE DU QUATRE-COINS TOURNE D'UN DEGRÉ PAR TIC : le flocon tourne sur
     // lui-même pendant qu'il vole. C'est la seule chose qui bouge en dehors de
     // l'alpha ; l'avance, elle, se RECALCULE depuis le compteur par la figure.
-    track.degrees = static_cast<std::int16_t>(track.degrees + 1);
-    if (track.degrees >= kEffectTrackFullTurnDegrees) {
-      track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.degrees, 1);
 
     if (track.ticks < kLastTickOfRise) {
       track.alpha = static_cast<std::int16_t>(track.alpha + kAlphaRise);

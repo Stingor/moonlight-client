@@ -9,6 +9,8 @@
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -107,10 +109,7 @@ void AdvanceRisingQuadTracks(std::array<EffectTrack, kEffectTracksPerNode>& trac
       own -= kFullTurnDegrees;
     }
     if (track.mark[kMarkOfMode] == kRisingQuadTurningMode) {
-      track.degrees = static_cast<std::int16_t>(track.degrees + kRisingQuadTurnPerTick);
-      if (track.degrees >= kEffectTrackFullTurnDegrees) {
-        track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-      }
+      TurnOnward(track.degrees, kRisingQuadTurnPerTick);
     }
   }
 }

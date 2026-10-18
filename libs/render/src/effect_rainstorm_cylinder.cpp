@@ -38,12 +38,7 @@ void AdvanceOne(EffectTrack& track, std::size_t rank, std::int32_t life_ticks,
     return;
   }
 
-  track.azimuth_degrees =
-      static_cast<std::int16_t>(track.azimuth_degrees + kRainstormCylinderTurnPerTick);
-  if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-    track.azimuth_degrees =
-        static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-  }
+  TurnOnward(track.azimuth_degrees, kRainstormCylinderTurnPerTick);
 
   if (track.ticks < kRainstormCylinderRiseTicks) {
     track.alpha = static_cast<std::int16_t>(track.alpha + kRainstormCylinderAlphaRisePerTick);

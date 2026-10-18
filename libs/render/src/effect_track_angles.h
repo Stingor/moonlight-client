@@ -67,6 +67,41 @@ namespace ro::render {
   return degrees;
 }
 
+// RETRANCHE UN TOUR, UNE SEULE FOIS, à un angle qui l'atteint, comme le client
+// là où l'angle ne déborde jamais que d'un pas. ⚠ Un angle négatif reste
+// négatif, et un angle de deux tours en garde un : ce n'est ni
+// `WithinFullTurnOnce` ni `WithinFullTurn`. La référence n'admet aucune
+// conversion, d'où une version par largeur : un angle de piste sur seize bits,
+// une locale sur trente-deux.
+inline void DropOneTurn(std::int16_t& degrees) {
+  if (degrees >= kEffectTrackFullTurnDegrees) {
+    degrees = static_cast<std::int16_t>(degrees - kEffectTrackFullTurnDegrees);
+  }
+}
+
+inline void DropOneTurn(std::int32_t& degrees) {
+  if (degrees >= kEffectTrackFullTurnDegrees) {
+    degrees -= kEffectTrackFullTurnDegrees;
+  }
+}
+
+// AVANCE UN ANGLE DE PISTE D'UN PAS, PUIS LUI RETRANCHE UN TOUR une seule fois.
+// ⚠ La somme est rangée sur seize bits AVANT d'être comparée, comme le client
+// range l'angle avant de le tester : ce n'est pas `WrappedOnceToInt16`.
+inline void TurnOnward(std::int16_t& degrees, std::int32_t step_degrees) {
+  degrees = static_cast<std::int16_t>(degrees + step_degrees);
+  DropOneTurn(degrees);
+}
+
+// UNE SOMME D'ANGLES RAMENÉE DANS LE TOUR, puis rangée sur seize bits : le
+// client retranche un tour une seule fois à la somme ENTIÈRE, et ne la tronque
+// qu'ensuite. ⚠ `TurnOnward` tronque d'abord : les deux divergent dès que la
+// somme sort de seize bits.
+[[nodiscard]] inline std::int16_t WrappedOnceToInt16(std::int32_t degrees) {
+  return static_cast<std::int16_t>(
+      degrees >= kEffectTrackFullTurnDegrees ? degrees - kEffectTrackFullTurnDegrees : degrees);
+}
+
 // LE CAP D'UN VECTEUR À PLAT, en degrés ENTIERS, à la façon du client.
 //
 // ⚠ IL NE PREND PAS UN ARC TANGENTE : il balaie sa table de cosinus du degré

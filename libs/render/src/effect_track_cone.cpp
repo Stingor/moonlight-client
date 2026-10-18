@@ -78,12 +78,7 @@ void AdvanceParticleConeSpawnTracks(std::array<EffectTrack, kEffectTracksPerNode
 
     if (rang < kLastTrack) {
       // ⚠ CHAQUE PISTE TOURNE À SA VITESSE. Voir `kTurnOfFirstTrack`.
-      track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + kTurnOfFirstTrack +
-                                                        static_cast<std::int16_t>(rang));
-      if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-        track.azimuth_degrees =
-            static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-      }
+      TurnOnward(track.azimuth_degrees, kTurnOfFirstTrack + static_cast<std::int16_t>(rang));
     }
 
     const bool waves = waves_last_track && rang == kLastTrack;

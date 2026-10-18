@@ -101,10 +101,7 @@ void AdvanceDriftingIconTracks(std::array<EffectTrack, kEffectTracksPerNode>& tr
       own -= kFullTurnDegrees;
     }
 
-    track.degrees = static_cast<std::int16_t>(track.degrees + kDriftingIconTurnPerTick);
-    if (track.degrees >= kEffectTrackFullTurnDegrees) {
-      track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.degrees, kDriftingIconTurnPerTick);
   }
 }
 

@@ -66,9 +66,7 @@ void AdvanceCameraFacingRadialTracks(std::array<EffectTrack, kEffectTracksPerNod
       track.alpha = 0;
       track.active = false;
     }
-    if (track.degrees >= kEffectTrackFullTurnDegrees) {
-      track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.degrees);
   }
 }
 

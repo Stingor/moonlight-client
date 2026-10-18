@@ -1,5 +1,7 @@
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
 
@@ -73,10 +75,7 @@ void AdvanceRisingParticleTrack(EffectTrack& track) {
   }
   // LE REPLI SE FAIT DANS LES DEUX CAS, marque ou non : le client le pose après
   // son test, et un azimut semé tout près du tour entier déborderait sinon.
-  if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-    track.azimuth_degrees =
-        static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-  }
+  DropOneTurn(track.azimuth_degrees);
 
   float& angle = track.value[kSlotOfSpinDegrees];
   angle += track.mark[kMarkOfColorCase] == kMarkThatTurnsSlowly ? kSpinStepForMarkedTrack

@@ -214,10 +214,7 @@ void AdvanceThunderFreezeTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
     if (shard.ticks <= 0) {
       continue;
     }
-    shard.degrees = static_cast<std::int16_t>(shard.degrees + kThunderFreezeShardSpinPerTick);
-    if (shard.degrees >= kEffectTrackFullTurnDegrees) {
-      shard.degrees = static_cast<std::int16_t>(shard.degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(shard.degrees, kThunderFreezeShardSpinPerTick);
     float base = shard.lift_key * kThunderFreezeShardGrowth;
     shard.lift_key = base;
     if (base > kThunderFreezeShardFadingSize) {

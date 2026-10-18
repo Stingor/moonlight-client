@@ -149,10 +149,7 @@ void AdvanceAnchoredSkirtTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
     const std::int32_t cap = WithinFullTurn(effect_track.azimuth_degrees + kDriftBehindDegrees);
     effect_track.tail[kAnchoredSkirtTailOfDriftX] += CosOfDegrees(cap);
     effect_track.tail[kAnchoredSkirtTailOfDriftZ] += SinOfDegrees(cap);
-    if (effect_track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      effect_track.azimuth_degrees =
-          static_cast<std::int16_t>(effect_track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(effect_track.azimuth_degrees);
 
     if (effect_track.ticks >= kFadeFromTick) {
       effect_track.alpha = static_cast<std::int16_t>(effect_track.alpha - kAlphaFall);

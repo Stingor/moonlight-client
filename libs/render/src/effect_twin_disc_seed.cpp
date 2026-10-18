@@ -9,6 +9,8 @@
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 
 std::span<const EffectTwinDiscPattern> EffectTwinDiscPatternsFor(std::uint32_t effect_id) {
@@ -69,11 +71,7 @@ void AdvanceTwinDiscTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks
   // client ajoute avant de regarder. Voir l'en-tête.
   for (std::size_t rang = 0; rang < kTwinDiscLiveTracks; ++rang) {
     EffectTrack& track = tracks[rang];
-    track.tilt_degrees = static_cast<std::int16_t>(track.tilt_degrees + kTwinDiscTiltPerTick);
-    if (track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-      track.tilt_degrees =
-          static_cast<std::int16_t>(track.tilt_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.tilt_degrees, kTwinDiscTiltPerTick);
   }
 }
 

@@ -196,11 +196,7 @@ void AdvanceTurningArchTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
     ++track.ticks;
 
     const std::int16_t tour = rang % 2 == 0 ? kArchTurnForEvenRanks : kArchTurnForOddRanks;
-    track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + tour);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, tour);
 
     if (track.ticks >= life_ticks - kArchFadeStartsBeforeDeath) {
       track.alpha = static_cast<std::int16_t>(track.alpha - kArchAlphaFallPerTick);
@@ -238,13 +234,8 @@ void AdvanceSpiralParticleTracks(std::array<EffectTrack, kEffectTracksPerNode>& 
     const bool a_part = rang == kSpiralSingularRank;
     const std::uint32_t draw = a_part ? kSpiralDriftDrawForSingularRank : kSpiralDriftDraw;
     const std::int16_t step = a_part ? kSpiralDriftForSingularRank : kSpiralDriftDegrees;
-    track.azimuth_degrees = static_cast<std::int16_t>(
-        track.azimuth_degrees + static_cast<std::int16_t>(NextEffectNodeDraw(generator) % draw) +
-        step);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees,
+               static_cast<std::int16_t>(NextEffectNodeDraw(generator) % draw) + step);
 
     if (track.ticks < kSpiralAlphaRisesBeforeTick) {
       track.alpha = static_cast<std::int16_t>(track.alpha + kSpiralAlphaRisePerTick);
@@ -423,11 +414,7 @@ void AdvanceSpinningRibbonTracks(std::array<EffectTrack, kEffectTracksPerNode>& 
       continue;
     }
 
-    track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + kSpinPerTick);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, kSpinPerTick);
     if (track.ticks < kRiseEndsAtTick) {
       track.alpha = static_cast<std::int16_t>(track.alpha + kRibbonAlphaRisePerTick);
       if (track.alpha > kAlphaCeiling) {
@@ -478,10 +465,7 @@ void AdvancePentagonTrailTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
     ++track.ticks;
     // ⚠ L'AZIMUT SE RAMÈNE, IL NE S'INCRÉMENTE PAS. Lui donner un pas ferait
     // tourner une figure que le client laisse immobile.
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.azimuth_degrees);
 
     const std::uint8_t mark = track.mark[0];
     if (mark == kMarkThatOnlyRises) {
@@ -545,10 +529,7 @@ void AdvancePaletteBillboardTracks(std::array<EffectTrack, kEffectTracksPerNode>
       continue;
     }
 
-    track.degrees = static_cast<std::int16_t>(track.degrees + kSweepPerTick);
-    if (track.degrees >= kEffectTrackFullTurnDegrees) {
-      track.degrees = static_cast<std::int16_t>(track.degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.degrees, kSweepPerTick);
     track.lift_key *= kKeyGrowthPerTick;
 
     if (track.lift_key > kKeyThatStartsTheFade) {
@@ -605,11 +586,7 @@ void AdvanceSpiralStackTracks(std::array<EffectTrack, kEffectTracksPerNode>& tra
     const auto step = static_cast<std::int16_t>(
         kSlowestSpin + static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
                                                  static_cast<std::uint32_t>(kSpinSpread)));
-    track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + step);
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    TurnOnward(track.azimuth_degrees, step);
 
     const std::uint8_t rythme = track.mark[kMarkOfRhythm];
     if (rythme != kRhythmNeverFades) {
@@ -662,10 +639,7 @@ void AdvanceBreathingQuadTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
                variant == kVariantTwelve) {
       track.azimuth_degrees = static_cast<std::int16_t>(track.azimuth_degrees + kSlowSpin);
     }
-    if (track.azimuth_degrees >= kEffectTrackFullTurnDegrees) {
-      track.azimuth_degrees =
-          static_cast<std::int16_t>(track.azimuth_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.azimuth_degrees);
 
     if (variant == kVariantThatTiltsSlowly) {
       track.tilt_degrees = static_cast<std::int16_t>(track.tilt_degrees + kSlowTilt);
@@ -678,10 +652,7 @@ void AdvanceBreathingQuadTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
     } else if (variant != kVariantEleven && variant != kVariantTwelve) {
       track.tilt_degrees = static_cast<std::int16_t>(track.tilt_degrees + kOrdinaryTilt);
     }
-    if (track.tilt_degrees >= kEffectTrackFullTurnDegrees) {
-      track.tilt_degrees =
-          static_cast<std::int16_t>(track.tilt_degrees - kEffectTrackFullTurnDegrees);
-    }
+    DropOneTurn(track.tilt_degrees);
   }
 }
 

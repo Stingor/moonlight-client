@@ -49,11 +49,6 @@ constexpr float kLiftAboveOwner = 6.0F;
 constexpr std::uint8_t kMarkThatSpins = 7;
 constexpr std::int16_t kSpinDegreesPerTick = 10;
 
-[[nodiscard]] std::int16_t WrappedDegrees(std::int32_t degrees) {
-  return static_cast<std::int16_t>(
-      degrees >= kEffectTrackFullTurnDegrees ? degrees - kEffectTrackFullTurnDegrees : degrees);
-}
-
 // UN SAUT DE LA CASCADE : ce que `vers` prend de `depuis`.
 //
 // Tout n'est pas recopié, comme chez le client : l'angle, le rayon,
@@ -102,7 +97,7 @@ void AdvanceCascadingTrailTracks(std::array<EffectTrack, kEffectTracksPerNode>& 
   if (head.value[kSlotOfSpinDegrees] >= static_cast<float>(kEffectTrackFullTurnDegrees)) {
     head.value[kSlotOfSpinDegrees] -= static_cast<float>(kEffectTrackFullTurnDegrees);
   }
-  head.azimuth_degrees = WrappedDegrees(head.azimuth_degrees + kAzimuthStepPerTick);
+  head.azimuth_degrees = WrappedOnceToInt16(head.azimuth_degrees + kAzimuthStepPerTick);
 
   // ⚠ LE RÉ-ANCRAGE, et LES DEUX SIGNES SE RETOURNENT ici, pas seulement un. Le
   // client élève sa tête en retranchant, puis la balance en ajoutant, le tout
@@ -119,7 +114,7 @@ void AdvanceCascadingTrailTracks(std::array<EffectTrack, kEffectTracksPerNode>& 
   // contentent du balancement, et les faire tourner leur donnerait un mouvement
   // que le client ne leur donne pas.
   if (head.mark[kMarkOfDrawing] == kMarkThatSpins) {
-    head.degrees = WrappedDegrees(head.degrees + kSpinDegreesPerTick);
+    head.degrees = WrappedOnceToInt16(head.degrees + kSpinDegreesPerTick);
   }
 }
 
