@@ -51,19 +51,30 @@ struct WheelGateState {
 [[nodiscard]] float WheelOver(WheelGateState& state, ImGuiID zone, bool hovered,
                               bool engaged = false);
 
-// LA MOLETTE SUR LE DERNIER ÉLÉMENT POSÉ, ou zéro — pour un élément qui n'a
-// nulle part où ranger un portail : une liste déroulante, que tant de fenêtres
-// posent sans lui prêter d'état.
+// LE PORTAIL DES CHAMPS À MOLETTE — curseurs, champs glissants, listes
+// déroulantes : des widgets que tant de fenêtres posent sans leur prêter
+// d'état. Ils partagent UN portail, celui du contexte d'ImGui : le pointeur
+// n'en survole qu'un à la fois.
 //
-// Les mêmes gardes que `WheelOver`, lues dans ce qu'ImGui mesure déjà : le
-// DÉLAI DE POSE sur le survol continu de l'élément, et le VERROU DE SALVE sur
-// la fenêtre qu'une molette est en train de faire défiler — tant que la salve
-// qui l'a VRAIMENT fait défiler dure, l'élément ne prend rien. Une salve qui ne
-// faisait rien défiler ne verrouille rien.
+// `UiContext` lui attache le sien à sa naissance ; il vit aussi longtemps que
+// lui. ⚠ IL OCCUPE `ImGuiIO::UserData` de ce contexte, qui n'a pas d'autre
+// usage ici.
+void AttachFieldWheelGate(WheelGateState& state);
+
+// LA MOLETTE SUR CE CHAMP, ou zéro — `WheelOver` sur le portail partagé.
 //
-// ⚠ À APPELER À CHAQUE IMAGE, juste après l'élément : la possession se
+// Sans portail attaché — un contexte d'ImGui nu —, les mêmes gardes se lisent
+// dans ce qu'ImGui mesure déjà : le DÉLAI DE POSE sur le survol continu du
+// champ, et le VERROU DE SALVE sur la fenêtre qu'une molette est en train de
+// faire défiler.
+//
+// ⚠ À APPELER À CHAQUE IMAGE où le champ est posé : la possession se
 // revendique d'avance, pour la même raison que chez `WheelOver`. Le cran rendu
 // est consommé.
+[[nodiscard]] float WheelOverField(ImGuiID zone, bool hovered);
+
+// LA MOLETTE SUR LE DERNIER ÉLÉMENT POSÉ, ou zéro : `WheelOverField` sur lui,
+// survolé au sens d'ImGui. À appeler juste après l'élément.
 [[nodiscard]] float WheelOverItem();
 
 }  // namespace ro::ui

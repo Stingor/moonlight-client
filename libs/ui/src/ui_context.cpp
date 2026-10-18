@@ -2,6 +2,7 @@
 
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_look.h"
+#include "ro/ui/wheel_gate.h"
 #include "ro/ui/window_bounds.h"
 
 #include "imgui.h"
@@ -45,9 +46,11 @@ constexpr const char* kSettingsEntry = "Windows";
 
 }  // namespace
 
-UiContext::UiContext() : context_(ImGui::CreateContext()) {
+UiContext::UiContext()
+    : context_(ImGui::CreateContext()), field_wheel_(std::make_unique<WheelGateState>()) {
   ImGui::SetCurrentContext(context_);
   ImGuiIO& io = ImGui::GetIO();
+  AttachFieldWheelGate(*field_wheel_);
   // LE BLEU DES LIENS DU JEU, MÊME HORS D'UNE FENÊTRE HABILLÉE : un lien lit la
   // couleur du style, que l'habillage pose dans ses fenêtres. Ailleurs, sans
   // ceci, ce serait le bleu d'ImGui.

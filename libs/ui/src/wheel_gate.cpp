@@ -74,27 +74,43 @@ float WheelOver(WheelGateState& state, ImGuiID zone, bool hovered, bool engaged)
   return wheel;
 }
 
-float WheelOverItem() {
+void AttachFieldWheelGate(WheelGateState& state) { ImGui::GetIO().UserData = &state; }
+
+float WheelOverField(ImGuiID zone, bool hovered) {
   const ImGuiContext* context = ImGui::GetCurrentContext();
-  const ImGuiID item = ImGui::GetItemID();
-  if (context == nullptr || item == 0 || !ImGui::IsItemHovered() || context->HoveredId != item) {
+  if (context == nullptr || zone == 0 || !hovered) {
     return 0.0F;
   }
-  // UNE SALVE EN COURS FAIT DÉFILER UNE FENÊTRE : ImGui retient la fenêtre à
-  // laquelle il applique un défilement, et la relâche après une courte pause ou
-  // un mouvement de la souris. Une salve sur une page qui n'a rien à faire
+  if (auto* shared = static_cast<WheelGateState*>(context->IO.UserData); shared != nullptr) {
+    return WheelOver(*shared, zone, hovered);
+  }
+  // SANS PORTAIL, CE QU'IMGUI MESURE DÉJÀ. Le survol continu est le chrono de
+  // l'élément survolé, qui repart à zéro quand l'élément change. Une salve en
+  // cours fait défiler une fenêtre : ImGui retient la fenêtre à laquelle il
+  // applique un défilement, et la relâche après une courte pause ou un
+  // mouvement de la souris. Une salve sur une page qui n'a rien à faire
   // défiler ne lui en fait retenir aucune.
   const bool page_scrolling = context->WheelingWindow != nullptr;
-  if (page_scrolling || static_cast<double>(context->HoveredIdTimer) < kHoverSettleSeconds) {
+  if (context->HoveredId != zone || page_scrolling ||
+      static_cast<double>(context->HoveredIdTimer) < kHoverSettleSeconds) {
     return 0.0F;
   }
-  ImGui::SetKeyOwner(ImGuiKey_MouseWheelY, item);
+  ImGui::SetKeyOwner(ImGuiKey_MouseWheelY, zone);
   const float wheel = ImGui::GetIO().MouseWheel;
   if (wheel == 0.0F) {
     return 0.0F;
   }
   ImGui::GetIO().MouseWheel = 0.0F;
   return wheel;
+}
+
+float WheelOverItem() {
+  const ImGuiContext* context = ImGui::GetCurrentContext();
+  if (context == nullptr) {
+    return 0.0F;
+  }
+  const ImGuiID item = ImGui::GetItemID();
+  return WheelOverField(item, ImGui::IsItemHovered() && context->HoveredId == item);
 }
 
 }  // namespace ro::ui

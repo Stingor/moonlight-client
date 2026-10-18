@@ -16,6 +16,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/wheel_gate.h"
 
 #include "ui_scale.h"
 
@@ -233,36 +234,14 @@ void Stretch(ImDrawList* into, const SkinImage& image, ImVec2 top_left, ImVec2 b
   // Un cran vaut un cran de flèche, et Majuscule avance par dizaines : c'est
   // le seul geste qui permette d'ajuster sans viser la poignée.
   //
-  // ⚠ ON S'APPROPRIE LA MOLETTE, ET À CHAQUE IMAGE. ImGui décide du défilement
-  // au DÉBUT de l'image, avant que ce widget ne s'exécute : une possession
-  // posée au moment où la molette tourne arriverait trop tard, et la barre de
-  // défilement emporterait la page pendant qu'on règle. Demandée en permanence
-  // dès le survol, elle vaut pour l'image suivante — celle où la molette
-  // tournera.
-  //
-  // TODO : LE VERROU QUI MANQUE — PARCOURIR UNE PAGE DE RÉGLAGES NE DOIT
-  // TOUCHER À AUCUNE BARRE TRAVERSÉE. S'approprier la molette dès le survol
-  // règle le problème du défilement qui emporte la page PENDANT qu'on ajuste,
-  // mais pas l'inverse : une barre effleurée en descendant la page prend le
-  // cran. Résoudre les deux demande deux choses de plus que ce qu'on a ici :
-  //
-  //   un DÉLAI DE POSE   la barre ne prend la molette qu'après un court moment
-  //                      de survol immobile — et le survol est NEUF aussi quand
-  //                      l'image précédente ne survolait pas, sinon revenir sur
-  //                      une barre quittée hérite de son ancien chrono ;
-  //   un VERROU DE PAGE  dès qu'un défilement a VRAIMENT eu lieu (ImGui le note
-  //                      lui-même dans `WheelingWindowScrolledFrame`), plus
-  //                      aucune barre ne prend la molette pendant la salve.
-  //                      Compter les crans ne suffirait pas : un cran sur une
-  //                      fenêtre qui n'a rien à défiler ne doit rien verrouiller.
-  //
-  // Cela demande un état qui survit d'une image à l'autre, que ce widget n'a
-  // pas : il vivra dans `UiContext`, qui est déjà ce qui tient l'image.
+  // 🔴 PARCOURIR UNE PAGE DE RÉGLAGES NE TOUCHE À AUCUNE BARRE TRAVERSÉE : la
+  // molette passe par le portail des champs (`WheelOverField`). La barre ne la
+  // prend qu'après un délai de pose, jamais pendant une salve qui fait
+  // vraiment défiler la page, et la garde tant qu'on la règle.
   //
   // ⚠ `SkinSliderWheel::kLeaves` : ni possession ni cran, la fenêtre défile.
   const bool takes_wheel = wheel == SkinSliderWheel::kTakes;
-  const bool owns_wheel = takes_wheel && ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
-  if (const float turned = context.IO.MouseWheel; owns_wheel && turned != 0.0F) {
+  if (const float turned = takes_wheel ? WheelOverField(id, hovered) : 0.0F; turned != 0.0F) {
     // ⚠ MAJUSCULE MULTIPLIE DANS `StepByArrow`, ET NULLE PART AILLEURS. Le
     // faire aussi ici multipliait DEUX FOIS — cent crans d'un coup au lieu de
     // dix.

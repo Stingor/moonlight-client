@@ -175,8 +175,9 @@ void SkinTooltip(const char* text);
 // blanc ne peut pas vivre dans le texte.
 void SkinHelpMarker(const char* title, std::span<const char* const> lines);
 
-// LA MOLETTE SUR UN CURSEUR. Par défaut il la prend au survol, et un cran vaut
-// un cran de flèche. `kLeaves` la laisse à la fenêtre : c'est le choix d'un
+// LA MOLETTE SUR UN CURSEUR. Par défaut il la prend au survol posé, par le
+// portail des champs (`WheelOverField`), et un cran vaut un cran de flèche.
+// `kLeaves` la laisse à la fenêtre : c'est le choix d'un
 // curseur dont chaque changement part au serveur, où un cran effleuré en
 // faisant défiler la page enverrait une commande.
 enum class SkinSliderWheel : std::uint8_t { kTakes, kLeaves };

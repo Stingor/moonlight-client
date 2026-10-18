@@ -19,6 +19,8 @@ struct ImGuiTextBuffer;
 
 namespace ro::ui {
 
+struct WheelGateState;
+
 // Le contexte d'interface : sa durée de vie, sa trame, et QUI reçoit le geste.
 //
 // POURQUOI UN OBJET PLUTÔT QUE LES APPELS NUS D'IMGUI
@@ -324,6 +326,11 @@ class UiContext {
   // en-tête ne l'inclut pas — il est lu par `app`, qui n'a pas à connaître
   // ImGui.
   std::unique_ptr<ImGuiStyle> base_style_;
+  // LE PORTAIL DE MOLETTE DES CHAMPS — curseurs, champs glissants, listes
+  // déroulantes : voir `WheelOverField`. Un seul pour tout le contexte, puisque
+  // le pointeur n'en survole qu'un à la fois. Opaque pour la même raison que le
+  // style.
+  std::unique_ptr<WheelGateState> field_wheel_;
   float interface_scale_ = 1.0F;
   // La place voulue de chaque fenêtre, et ce que la passe a posé. Voir
   // `WindowPlacer`.
