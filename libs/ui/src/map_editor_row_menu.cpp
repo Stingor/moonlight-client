@@ -9,7 +9,9 @@
 namespace ro::ui {
 
 void DrawMapEditorRowMenu(const MapEditorRowMenu& menu, std::vector<MapEditorIntent>& intents) {
-  if (!BeginSkinPopupContextItem("menu_ligne")) {
+  // Le menu porte l'identifiant de SA ligne : un nom commun ferait d'un clic
+  // droit le menu de toutes les lignes visibles, lumières et effets compris.
+  if (!BeginSkinPopupContextItem(nullptr)) {
     return;
   }
   // Désigner, puis agir : la session joue les intentions dans l'ordre.
