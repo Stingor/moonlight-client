@@ -16,6 +16,7 @@
 
 #include "table_cells.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -50,19 +51,11 @@ constexpr std::array<const char*, 8> kCategoryLabels = {
     core::TrText("Munitions"),      core::TrText("Familiers"),
 };
 
-void TextOf(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
-
-[[nodiscard]] float TextWidth(std::string_view text) {
-  return ImGui::CalcTextSize(text.data(), text.data() + text.size()).x;
-}
-
 void TextRightAligned(std::string_view text) {
   const bool overflows = OverflowsCell(text);
   ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
                        std::max(0.0F, ImGui::GetContentRegionAvail().x - TextWidth(text)));
-  TextOf(text);
+  Unformatted(text);
   if (overflows && ImGui::IsItemHovered()) {
     TooltipWhole(text);
   }
@@ -134,7 +127,7 @@ void DrawItemCell(const MarketRowView& row, int row_index, bool in_store, ItemLi
   DrawIcon(row);
   ImGui::SameLine();
   ImGui::AlignTextToFramePadding();
-  TextOf(row.item.name);
+  Unformatted(row.item.name);
   ImGui::EndGroup();
   TradeItemGesture gesture;
   AddLastItemGesture(gesture);
@@ -217,7 +210,7 @@ void DrawFilters(MarketWindowState& state, const SkinArt& art) {
   static_cast<void>(SkinCombo("##market_category", &state.category, kCategoryLabels, art));
   ImGui::SameLine();
   ImGui::AlignTextToFramePadding();
-  TextOf(core::Tr("Zeny"));
+  Unformatted(core::Tr("Zeny"));
   ImGui::SameLine();
   ImGui::SetNextItemWidth(kPriceFieldPixels * scale);
   ImGui::InputTextWithHint("##market_min_price", core::Tr("min"), state.min_price.data(),
@@ -232,7 +225,7 @@ void DrawFilters(MarketWindowState& state, const SkinArt& art) {
   // carte, ni option. Ces filtres n'y ont pas de sens.
   ImGui::BeginDisabled(state.tab != kMarketSellTab);
   ImGui::AlignTextToFramePadding();
-  TextOf(core::Tr("Raffinement"));
+  Unformatted(core::Tr("Raffinement"));
   ImGui::SameLine();
   ImGui::SetNextItemWidth(kRefineFieldPixels * scale);
   static_cast<void>(SkinInputInt("##market_refine_min", &state.refine_min, 0,
@@ -256,10 +249,9 @@ void DrawShopCell(const MarketRowView& row, bool npc) {
   ImGui::AlignTextToFramePadding();
   const bool overflows = OverflowsCell(row.shop_name);
   if (row.autotrade) {
-    ImGui::TextColored(kAutotradeText, "%.*s", static_cast<int>(row.shop_name.size()),
-                       row.shop_name.data());
+    ColoredText(kAutotradeText, row.shop_name);
   } else {
-    TextOf(row.shop_name);
+    Unformatted(row.shop_name);
   }
   if (!ImGui::IsItemHovered()) {
     return;
@@ -383,10 +375,9 @@ void DrawResults(MarketWindowState& state, const MarketView& view, const SkinArt
 
 void DrawFooter(MarketWindowState& state, const MarketView& view, const SkinArt& art) {
   if (!view.status.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.status.size()),
-                       view.status.data());
+    ColoredText(kTradeRefusedText, view.status);
   } else {
-    TextOf(view.summary);
+    Unformatted(view.summary);
   }
   state.page = std::clamp(state.page, 1, std::max(view.page_count, 1));
   std::array<char, kMarketQueryBytes> pages{};
@@ -425,7 +416,7 @@ void DrawStoreWindow(MarketWindowState& state, const MarketView& view, const Ski
                                              SkinnedTitle::kBar, ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.store_open) {
     if (!view.store_status.empty()) {
-      TextOf(view.store_status);
+      Unformatted(view.store_status);
     }
     constexpr int kColumns = 3;
     if (ImGui::BeginTable("##market_store", kColumns,

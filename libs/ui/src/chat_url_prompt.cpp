@@ -20,6 +20,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -48,13 +49,6 @@ constexpr std::size_t kMostHostBytes = 253;
 // sa place.
 constexpr ImU32 kNoVeil = IM_COL32(0, 0, 0, 0);
 
-// Un texte replié, dans une couleur.
-void WrappedText(std::string_view text, ImU32 color) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-  ImGui::PopStyleColor();
-}
-
 // UN TEXTE EN GRAS : le faux gras du client, le même texte repassé un pixel
 // plus loin. La police n'a qu'une graisse chargée.
 //
@@ -69,7 +63,7 @@ void BoldText(std::string_view text, ImU32 color) {
   const char* const end = begin + text.size();
   const ImVec2 at = ImGui::GetCursorScreenPos();
   const float wrap = ImGui::CalcWrapWidthForPos(at, ImGui::GetCurrentWindow()->DC.TextWrapPos);
-  WrappedText(text, color);
+  ColoredText(color, text);
   ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(),
                                       ImVec2(at.x + kFakeBoldPixels * Scale(), at.y), color, begin,
                                       end, wrap);
@@ -82,7 +76,7 @@ void WarningLine(const char* text, const SkinArt& art) {
   const ImVec2 at = ImGui::GetCursorScreenPos();
   PaintWarningMark(*ImGui::GetWindowDrawList(), at, side);
   ImGui::SetCursorScreenPos(ImVec2(at.x + side + ImGui::GetStyle().ItemSpacing.x, at.y));
-  WrappedText(text, art.look().warn_text);
+  ColoredText(art.look().warn_text, text);
 }
 
 // 🔴 SOUS LA SOURIS, LÀ OÙ LE JOUEUR VIENT DE CLIQUER, et toujours dans
@@ -198,7 +192,7 @@ void DrawChatUrlPrompt(ChatUrlPrompt& prompt, const SkinArt& art) {
   // 🔴 L'ADRESSE QUI PARTIRA VRAIMENT, schéma compris, et non celle qui est
   // écrite dans la ligne : le texte montré et la destination peuvent n'avoir
   // aucun rapport, et c'est tout l'objet de la boîte.
-  WrappedText(prompt.openable, art.look().link);
+  ColoredText(art.look().link, prompt.openable);
   ImGui::Spacing();
   // 🔴 L'HÔTE À PART, EN GRAS : c'est la seule partie de l'adresse qui dit OÙ
   // l'on va, et la plus facile à maquiller au milieu d'un long chemin.
@@ -279,7 +273,7 @@ void DrawChatHostPrompt(ChatHostPrompt& prompt, const SkinArt& art) {
   ImGui::TextUnformatted(
       core::Tr("Ce serveur pourra alors voir que vous êtes\nen ligne, et depuis quelle adresse."));
   ImGui::Spacing();
-  WrappedText(core::Tr("Réglages du chat pour revenir dessus."), art.look().faint_text);
+  ColoredText(art.look().faint_text, core::Tr("Réglages du chat pour revenir dessus."));
   ImGui::Spacing();
   if (SkinButton(core::Tr("Autoriser"), art)) {
     prompt.granted = true;

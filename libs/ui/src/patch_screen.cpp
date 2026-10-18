@@ -6,6 +6,8 @@
 
 #include "ro/ui/loading_screen.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -35,9 +37,7 @@ PatchScreenAnswers DrawPatchScreen(const PatchScreenView& view) {
                           ImGuiCond_Always, ImVec2(kCentered, kCentered));
   ImGui::SetNextWindowSize(ImVec2(panel_width, 0.0F));
   if (ImGui::Begin("##patch", nullptr, kPanelFlags)) {
-    ImGui::PushStyleColor(ImGuiCol_Text, kLoadingTextColor);
-    ImGui::TextUnformatted(view.headline);
-    ImGui::PopStyleColor();
+    ColoredText(kLoadingTextColor, view.headline);
     ImGui::Spacing();
     if (!view.failed) {
       // Indéterminé : une barre qui avance d'elle-même, pour dire que rien

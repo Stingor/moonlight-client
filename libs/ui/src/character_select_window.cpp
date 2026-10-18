@@ -20,6 +20,7 @@
 #include "character_select_amend.h"
 #include "character_select_bars.h"
 #include "character_select_customize.h"
+#include "ui_popup.h"
 
 namespace ro::ui {
 namespace {
@@ -420,10 +421,8 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   // ⚠ AVANT LA BARRE D'ACTION : Entrée, qu'elle lit, porte alors sur le
   // convive que la flèche vient de désigner. Et pas pendant une saisie, sous
   // une fenêtre ni pendant la personnalisation, pour les mêmes raisons que F10.
-  const bool arrows_ours =
-      !editing && !state.moving() && !view.busy && !view.dialog_open && !state.rename.open() &&
-      !ImGui::GetIO().WantTextInput &&
-      !ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+  const bool arrows_ours = !editing && !state.moving() && !view.busy && !view.dialog_open &&
+                           !state.rename.open() && !ImGui::GetIO().WantTextInput && !AnyPopupOpen();
   if (arrows_ours) {
     constexpr std::array<std::pair<ImGuiKey, SeatStep>, 4> kArrows = {{
         {ImGuiKey_LeftArrow, SeatStep::kLeft},
@@ -547,11 +546,9 @@ CharacterSelectAction DrawCharacterSelect(CharacterSelectState& state,
   // F10 EN DOUBLON DU BOUTON. ⚠ PAS PENDANT UNE SAISIE NI SOUS UNE FENÊTRE :
   // basculer le mode sous un formulaire de création laisserait le joueur
   // devant deux interactions concurrentes.
-  const bool any_popup =
-      ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-  if (!view.busy && !view.dialog_open && !state.moving() && !state.rename.open() && !any_popup &&
-      !ImGui::GetIO().WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F10, false) &&
-      action.verb == CharacterSelectVerb::kNothing) {
+  if (!view.busy && !view.dialog_open && !state.moving() && !state.rename.open() &&
+      !AnyPopupOpen() && !ImGui::GetIO().WantTextInput &&
+      ImGui::IsKeyPressed(ImGuiKey_F10, false) && action.verb == CharacterSelectVerb::kNothing) {
     action.verb = ToggleCustomizing(state);
   }
   DrawSeatPoseMenu(state, view, skin_padding);

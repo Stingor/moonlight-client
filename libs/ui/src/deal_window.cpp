@@ -6,8 +6,6 @@
 #include <cstring>
 #include <string>
 
-#include <imgui_internal.h>
-
 #include "ro/core/i18n.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/shortcut_bar.h"
@@ -15,7 +13,9 @@
 #include "ro/ui/skinned_window.h"
 
 #include "item_grid.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -96,10 +96,6 @@ void NoteMenuChoice(const ChatLinkAsk& chosen, DealWindowAction& action) {
   const auto found = std::ranges::find_if(
       bag, [client_slot](const DealBagView& on) { return on.client_slot == client_slot; });
   return found == bag.end() ? nullptr : &*found;
-}
-
-[[nodiscard]] bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
-  return filter.PassFilter(name.data(), name.data() + name.size());
 }
 
 // « 1,000,000z (1 million) » : les chiffres pour la lecture, les lettres pour
@@ -330,7 +326,7 @@ void DrawPartnerZeny(const DealView& view) {
 void DrawPartner(const DealView& view, float width, ItemLinkMenu& menu, DealWindowAction& action) {
   ImGui::BeginGroup();
   const std::string_view name = PartnerName(view);
-  ImGui::TextUnformatted(name.data(), name.data() + name.size());
+  Unformatted(name);
   ImGui::BeginChild("##deal_partner", ImVec2(width, kColumnHeightPixels * Scale()),
                     ImGuiChildFlags_Borders);
   for (std::size_t index = 0; index < view.partner.size(); ++index) {
@@ -362,9 +358,7 @@ void DrawBagRow(DealWindowState& state, const DealBagView& bag, const SkinArt& a
   }
   if (refused) {
     ImGui::EndDisabled();
-    if (!refusal.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltip(refusal.c_str());
-    }
+    SkinTooltip(refusal.c_str());
   }
   ImGui::SameLine();
   // ⚠ GRISÉE PAR L'OPACITÉ, NON DÉSACTIVÉE : son nom doit encore dire son
@@ -399,7 +393,7 @@ void DrawPicking(DealWindowState& state, const DealView& view, const SkinArt& ar
                     ImGuiChildFlags_Borders);
   bool any = false;
   for (const DealBagView& bag : view.bag) {
-    if (!Matches(state.filter, bag.item.name)) {
+    if (!PassesTextFilter(state.filter, bag.item.name)) {
       continue;
     }
     any = true;
@@ -530,18 +524,6 @@ void DrawStatus(const DealWindowState& state, const DealView& view) {
   }
   if (!state.flash.empty()) {
     TextOf(kTradeRefusedText, state.flash);
-  }
-}
-
-// Ferme la boîte `id` si elle est ouverte, dans la pile d'identités courante.
-void CloseModal(const char* id) {
-  const ImGuiContext& context = *GImGui;
-  const ImGuiID popup_id = ImGui::GetID(id);
-  for (int level = 0; level < context.OpenPopupStack.Size; ++level) {
-    if (context.OpenPopupStack[level].PopupId == popup_id) {
-      ImGui::ClosePopupToLevel(level, true);
-      return;
-    }
   }
 }
 

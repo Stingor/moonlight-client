@@ -10,6 +10,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -26,8 +27,8 @@ void DrawGuildRelations(GuildTabState& state, const GuildView& view, const SkinA
   // n'existent que pour lui, comme le « Delete » du client.
   const bool may_break = view.master;
   for (const bool enemies : {false, true}) {
-    GuildTextColored(enemies ? kGuildRedColor : kGuildGreenColor,
-                     enemies ? core::Tr("Ennemis") : core::Tr("Alliés"));
+    ColoredText(enemies ? kGuildRedColor : kGuildGreenColor,
+                enemies ? core::Tr("Ennemis") : core::Tr("Alliés"));
     int shown = 0;
     for (std::size_t index = 0; index < view.relations.size(); ++index) {
       const GuildRelationView& relation = view.relations[index];
@@ -51,7 +52,7 @@ void DrawGuildRelations(GuildTabState& state, const GuildView& view, const SkinA
       ImGui::Selectable(name.c_str(), false, 0, ImVec2(width, 0.0F));
       if (may_break) {
         if (BeginSkinPopupContextItem("relation")) {
-          GuildTextColored(kGuildLabelColor, name.c_str());
+          ColoredText(kGuildLabelColor, name.c_str());
           ImGui::Separator();
           if (ImGui::MenuItem(break_label)) {
             ask_break();
@@ -63,14 +64,14 @@ void DrawGuildRelations(GuildTabState& state, const GuildView& view, const SkinA
         if (SkinSmallButton("x", art, ImVec2(cross, 0.0F))) {
           ask_break();
         }
-        GuildTooltip(break_label);
+        SkinTooltip(break_label);
       }
       ImGui::PopID();
       ++shown;
     }
     if (shown == 0) {
       // ⚠ LE RETRAIT HORS DU TEXTE À TRADUIRE : une clé n'a pas de blanc au bord.
-      GuildTextColored(kGuildLabelColor, (std::string("   ") + core::Tr("aucune")).c_str());
+      ColoredText(kGuildLabelColor, (std::string("   ") + core::Tr("aucune")).c_str());
     }
     ImGui::Spacing();
   }
@@ -81,12 +82,11 @@ void DrawGuildRelations(GuildTabState& state, const GuildView& view, const SkinA
 // et le serveur ne garde ni date ni auteur.
 void DrawGuildBans(const GuildView& view) {
   if (!view.bans_known) {
-    GuildTextColored(kGuildLabelColor,
-                     core::Tr("Liste non encore reçue — clic sur « Actualiser »."));
+    ColoredText(kGuildLabelColor, core::Tr("Liste non encore reçue — clic sur « Actualiser »."));
     return;
   }
   if (view.bans.empty()) {
-    GuildTextColored(kGuildLabelColor, core::Tr("Aucune expulsion enregistrée."));
+    ColoredText(kGuildLabelColor, core::Tr("Aucune expulsion enregistrée."));
     return;
   }
   const auto flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter |
@@ -105,7 +105,7 @@ void DrawGuildBans(const GuildView& view) {
     ImGui::TextUnformatted(name.c_str());
     ImGui::TableNextColumn();
     if (ban.reason.empty()) {
-      GuildTextColored(kGuildLabelColor, core::Tr("(aucun motif)"));
+      ColoredText(kGuildLabelColor, core::Tr("(aucun motif)"));
     } else {
       const std::string reason(ban.reason);
       ImGui::TextUnformatted(reason.c_str());

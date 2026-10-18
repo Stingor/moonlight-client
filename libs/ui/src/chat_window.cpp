@@ -16,6 +16,7 @@
 
 #include "chat_input_chips.h"
 #include "chat_tab_menu.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -108,9 +109,7 @@ void PutName(std::array<char, kChatTabNameSize>& into, std::string_view name) {
 // écrit, et son clic ramène la salle devant.
 void DrawLentInputWord(ChatWindowAction* asked) {
   ImGui::AlignTextToFramePadding();
-  ImGui::PushStyleColor(ImGuiCol_Text, kLentInputColor);
-  ImGui::TextUnformatted(core::Tr("Tu écris dans le salon de chat."));
-  ImGui::PopStyleColor();
+  ColoredText(kLentInputColor, core::Tr("Tu écris dans le salon de chat."));
   if (ImGui::IsItemHovered()) {
     SkinTooltipFormat("%s\n%s", core::Tr("Dans un salon, tout ce que tu dis y part."),
                       core::Tr("Clic : ramener la fenêtre du salon devant."));

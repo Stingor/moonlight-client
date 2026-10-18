@@ -16,6 +16,7 @@
 
 #include "party_friend_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -177,7 +178,7 @@ void DrawPartyTab(PartyFriendWindowState& state, const PartyFriendView& view,
   if (!view.party_name.empty()) {
     ImGui::TextDisabled("%s", core::Tr("Groupe :"));
     ImGui::SameLine();
-    ImGui::TextUnformatted(view.party_name.data(), view.party_name.data() + view.party_name.size());
+    Unformatted(view.party_name);
   }
 
   // Le serveur n'accepte d'invitation que du chef : le champ n'est qu'à lui, et
@@ -236,8 +237,8 @@ void DrawFriendTab(PartyFriendWindowState& state, const PartyFriendView& view,
   ImGui::BeginDisabled(!can_add);
   const bool clicked = SkinButton(core::Tr("Ajouter un ami"), art);
   ImGui::EndDisabled();
-  if (full && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", core::Tr("Votre liste d'amis est pleine."));
+  if (full) {
+    SkinTooltip(core::Tr("Votre liste d'amis est pleine."));
   }
   if (can_add && (clicked || submitted)) {
     action.verb = PartyFriendVerb::kAddFriend;

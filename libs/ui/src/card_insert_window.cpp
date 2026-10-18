@@ -12,6 +12,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -79,7 +80,7 @@ void DrawRow(const CardInsertRowView& row, CardInsertWindowState& state,
                   row.used_slots);
     std::array<char, 72> used = {};
     std::snprintf(used.data(), used.size(), "  %s", counted.data());
-    const float after = ImGui::CalcTextSize(name.data(), name.data() + name.size()).x;
+    const float after = TextWidth(name);
     into->AddText(ImVec2(text_x + after, text_y), ImGui::GetColorU32(ImGuiCol_TextDisabled),
                   used.data());
   }
@@ -158,7 +159,7 @@ CardInsertWindowAction DrawCardInsertWindow(CardInsertWindowState& state,
       ImGui::AlignTextToFramePadding();
       const std::string_view card =
           view.card_name.empty() ? std::string_view(core::Tr("(carte)")) : view.card_name;
-      ImGui::TextUnformatted(card.data(), card.data() + card.size());
+      Unformatted(card);
       ImGui::SameLine();
       ImGui::TextDisabled("(x%d)", view.stock);
     } else {

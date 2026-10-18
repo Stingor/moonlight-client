@@ -19,6 +19,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 
@@ -479,7 +480,7 @@ void DrawOneBar(std::size_t bar, const ShortcutBarLayout& look, const ShortcutBa
       if (slot.icon.usable()) {
         ImGui::Image(slot.icon.id, ImVec2(side, side));
       } else if (!slot.name.empty()) {
-        ImGui::TextUnformatted(slot.name.data(), slot.name.data() + slot.name.size());
+        Unformatted(slot.name);
       }
       // 🔴 HORS DES BARRES, L'APERÇU SE BARRE DE ROUGE. Relâcher là VIDE la case,
       // sans confirmation — comme dans le jeu. Le prévenir pendant qu'il le fait
@@ -586,7 +587,7 @@ void DrawOneBar(std::size_t bar, const ShortcutBarLayout& look, const ShortcutBa
           if (slot.name.empty()) {
             ImGui::TextUnformatted(slot.item_id != 0 ? core::Tr("Item") : core::Tr("Skill"));
           } else {
-            ImGui::TextUnformatted(slot.name.data(), slot.name.data() + slot.name.size());
+            Unformatted(slot.name);
           }
           // 🔴 LE NUMÉRO EST CE QU'ON VIENT Y CHERCHER. Le nom, l'icône le dit
           // déjà ; l'identifiant ne se lit nulle part ailleurs, et c'est lui qu'on

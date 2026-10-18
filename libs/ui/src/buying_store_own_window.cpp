@@ -9,6 +9,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -55,8 +56,7 @@ BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
   if (body_shown && keep) {
     if (!view.store_title.empty()) {
-      ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(view.store_title.size()),
-                         view.store_title.data());
+      ColoredText(kTradeBlackText, view.store_title);
       ImGui::Separator();
     }
     if (view.lines.empty()) {

@@ -12,11 +12,11 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/companion_ai_window.h"
 #include "ro/ui/shortcut_bar.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/staff_skill_id.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -50,26 +50,6 @@ constexpr float kPercent = 100.0F;
 // Les statistiques vont par paires « libellé / valeur » sur chaque ligne.
 constexpr int kStatColumns = 4;
 constexpr int kStatsPerRow = 2;
-
-void TextColored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
-
-void WrappedColored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextWrapped("%s", text);
-  ImGui::PopStyleColor();
-}
-
-// L'infobulle du dernier élément, même grisé : c'est souvent elle qui dit
-// POURQUOI il l'est.
-void Tooltip(const char* text) {
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", text);
-  }
-}
 
 std::string_view BufferText(const std::array<char, kMercenaryConfirmSize>& buffer) {
   const auto end = std::ranges::find(buffer, '\0');
@@ -125,7 +105,7 @@ std::string ContractText(std::uint32_t seconds) {
 // d'intimité de l'homoncule. Le libellé traduit porte ses deux-points, que
 // chaque langue place à sa façon.
 void LabelledLine(const char* label, const std::string& value) {
-  TextColored(kValueColor, label);
+  ColoredText(kValueColor, label);
   ImGui::SameLine();
   ImGui::TextUnformatted(value.c_str());
 }
@@ -134,7 +114,7 @@ void LabelledLine(const char* label, const std::string& value) {
 void DrawHeader(MercenaryTabState& state, const MercenaryTabView& view, const SkinArt& art) {
   const std::string shown = view.name.empty() ? std::string("?") : std::string(view.name);
   ImGui::AlignTextToFramePadding();
-  TextColored(kValueColor, shown.c_str());
+  ColoredText(kValueColor, shown.c_str());
   // « Renvoyer » collé au bord droit : il est IRRÉVERSIBLE.
   const float width = Px(kDismissButtonPixels);
   ImGui::SameLine();
@@ -151,7 +131,7 @@ void DrawHeader(MercenaryTabState& state, const MercenaryTabView& view, const Sk
   const std::string kind(view.kind);
   std::snprintf(line.data(), line.size(), "%s  ·  %s %d", kind.c_str(), core::Tr("Niveau"),
                 view.level);
-  TextColored(kLabelColor, line.data());
+  ColoredText(kLabelColor, line.data());
   ImGui::Separator();
 }
 
@@ -159,18 +139,18 @@ void DrawHeader(MercenaryTabState& state, const MercenaryTabView& view, const Sk
 void DrawGaugesAndContract(const MercenaryTabView& view) {
   Gauge(core::Tr("PV"), view.hp, view.max_hp, kHpGaugeColor);
   Gauge(core::Tr("SP"), view.sp, view.max_sp, kSpGaugeColor);
-  TextColored(kValueColor, core::Tr("Expiration :"));
+  ColoredText(kValueColor, core::Tr("Expiration :"));
   ImGui::SameLine();
   const std::string left = ContractText(view.contract_left_s);
   if (view.contract_ending) {
-    TextColored(kRedColor, left.c_str());
+    ColoredText(kRedColor, left.c_str());
   } else {
     ImGui::TextUnformatted(left.c_str());
   }
   if (!view.expires_at.empty()) {
     const std::string tip =
         std::string(core::Tr("Fin du contrat :")) + " " + std::string(view.expires_at);
-    Tooltip(tip.c_str());
+    SkinTooltip(tip.c_str());
   }
   LabelledLine(core::Tr("Fidélité :"), std::to_string(view.faith));
   LabelledLine(core::Tr("Appels :"), std::to_string(view.calls));
@@ -184,9 +164,9 @@ void DrawDismissConfirmation(MercenaryTabState& state, const MercenaryTabView& v
     return;
   }
   ImGui::Spacing();
-  WrappedColored(kRedColor, core::Tr("Supprimer un mercenaire efface aussi son historique de "
+  ColoredWrapped(kRedColor, core::Tr("Supprimer un mercenaire efface aussi son historique de "
                                      "progression. Veux-tu vraiment le supprimer ?"));
-  WrappedColored(kValueColor, core::Tr("Retape le nom du mercenaire pour confirmer :"));
+  ColoredWrapped(kValueColor, core::Tr("Retape le nom du mercenaire pour confirmer :"));
   ImGui::SetNextItemWidth(-1.0F);
   ImGui::InputText("##merc_dismiss", state.dismiss_confirm.data(), state.dismiss_confirm.size());
   const bool matches = !view.name.empty() && BufferText(state.dismiss_confirm) == view.name;
@@ -254,9 +234,9 @@ void DrawStats(const MercenaryTabView& view) {
       }
       ++rank;
       ImGui::TableNextColumn();
-      TextColored(kLabelColor, row.label);
+      ColoredText(kLabelColor, row.label);
       if (!row.tip.empty()) {
-        Tooltip(row.tip.c_str());
+        SkinTooltip(row.tip.c_str());
       }
       // La valeur alignée à DROITE de sa moitié, collée au libellé suivant.
       ImGui::TableNextColumn();
@@ -267,15 +247,15 @@ void DrawStats(const MercenaryTabView& view) {
       }
       ImGui::TextUnformatted(value.c_str());
       if (!row.tip.empty()) {
-        Tooltip(row.tip.c_str());
+        SkinTooltip(row.tip.c_str());
       }
     }
     ImGui::EndTable();
   }
   std::array<char, 96> range = {};
   std::snprintf(range.data(), range.size(), core::Tr("Portée d'attaque : %d"), view.range_cells);
-  TextColored(kLabelColor, range.data());
-  Tooltip(
+  ColoredText(kLabelColor, range.data());
+  SkinTooltip(
       core::Tr("En cases. 1 = corps à corps ; au-delà, le mercenaire frappe à distance sans "
                "se déplacer."));
 }
@@ -348,7 +328,7 @@ void DrawSkills(MercenaryTabState& state, const MercenaryTabView& view,
     return;
   }
   if (view.skills.empty()) {
-    TextColored(kLabelColor, core::Tr("Aucun skill reçu du serveur."));
+    ColoredText(kLabelColor, core::Tr("Aucun skill reçu du serveur."));
     return;
   }
   if (ImGui::BeginChild("merc_skills", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders)) {
@@ -391,7 +371,7 @@ MercenaryTabAction DrawMercenaryTab(MercenaryTabState& state, const MercenaryTab
   DrawGaugesAndContract(view);
   DrawDismissConfirmation(state, view, art, action);
   if (!state.status.empty()) {
-    TextColored(kLabelColor, state.status.c_str());
+    ColoredText(kLabelColor, state.status.c_str());
   }
   switch (DrawCompanionAiLine(view.ai_profile, view.ai_proposal, art)) {
     case CompanionAiLineVerb::kOpen:

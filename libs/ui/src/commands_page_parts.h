@@ -11,9 +11,6 @@ namespace ro::ui::commands_page {
 void Toggle(const char* label, bool value, const char* help, CommandsField field,
             const SkinArt& art, CommandsPageAction& asked);
 
-// Un texte en gris : ce qui informe sans rien demander.
-void FaintText(const char* text);
-
 // L'onglet « Autoloots ».
 void DrawAutolootTab(const CommandsPageView& view, CommandsPageState& state, const SkinArt& art,
                      CommandsPageAction& asked);

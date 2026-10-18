@@ -3,13 +3,15 @@
 #include <algorithm>
 #include <string>
 
+#include <imgui.h>
+
 #include "ro/core/ascii.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
-#include "imgui.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -39,15 +41,13 @@ constexpr float kPlayingRowAlpha = 0.45F;
 
 // LA LIGNE D'ÉTAT : ce qui joue, et qui en a décidé.
 void DrawNowPlaying(const MusicPlayerView& view) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(core::Tr("En cours :"));
-  ImGui::PopStyleColor();
+  FaintText(core::Tr("En cours :"));
   ImGui::SameLine();
   const std::string_view playing = LabelAt(view, view.playing);
   if (playing.empty()) {
     ImGui::TextUnformatted(core::Tr("aucun morceau"));
   } else {
-    ImGui::TextUnformatted(playing.data(), playing.data() + playing.size());
+    Unformatted(playing);
   }
   ImGui::SameLine();
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
@@ -56,7 +56,7 @@ void DrawNowPlaying(const MusicPlayerView& view) {
   } else {
     ImGui::TextUnformatted(core::Tr("— musique de la carte"));
     ImGui::SameLine();
-    ImGui::TextUnformatted(view.map_name.data(), view.map_name.data() + view.map_name.size());
+    Unformatted(view.map_name);
   }
   ImGui::PopStyleColor();
   // ⚠ LA COUPURE SE DIT : sans elle, « Jouer » aurait l'air de ne rien faire.
@@ -105,7 +105,7 @@ void DrawNowPlaying(const MusicPlayerView& view) {
   if (row.maps.empty()) {
     ImGui::TextUnformatted(core::Tr("aucune carte"));
   } else {
-    ImGui::TextUnformatted(row.maps.data(), row.maps.data() + row.maps.size());
+    Unformatted(row.maps);
   }
   ImGui::PopStyleColor();
   return play;
@@ -180,11 +180,9 @@ MusicPlayerAsk DrawMusicPlayerWindow(MusicPlayerState& state, const MusicPlayerV
   if (SkinButton(core::Tr("Suivre la carte"), art, ImVec2(follow_width, 0.0F))) {
     asked.follow_map = true;
   }
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(
-        core::Tr("Rend la main à la carte : sa musique reprend, et la suit de nouveau "
-                 "d'une carte à l'autre."));
-  }
+  SkinTooltip(
+      core::Tr("Rend la main à la carte : sa musique reprend, et la suit de nouveau "
+               "d'une carte à l'autre."));
   ImGui::EndDisabled();
 
   EndSkinnedWindow();

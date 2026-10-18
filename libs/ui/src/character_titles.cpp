@@ -13,6 +13,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "character_panes.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -36,12 +37,6 @@ constexpr std::string_view kUnequippedMark = "   ";
            std::tolower(static_cast<unsigned char>(right));
   };
   return !std::ranges::search(haystack, needle, folded).empty() || needle.empty();
-}
-
-void ColoredText(const ImVec4& color, std::string_view text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-  ImGui::PopStyleColor();
 }
 
 }  // namespace

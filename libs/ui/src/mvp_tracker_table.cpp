@@ -19,6 +19,7 @@
 
 #include "mvp_tracker_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui::mvp_tracker {
 
@@ -225,9 +226,7 @@ void DrawReturn(const MvpSlotView& slot, std::int64_t now_s) {
     case MvpReturnTone::kPossible:
       // Vert FONCÉ : le corps d'une fenêtre est clair, un vert pastel y serait
       // presque blanc.
-      ImGui::PushStyleColor(ImGuiCol_Text, kMvpPossibleTextColor);
-      ImGui::TextUnformatted(text.c_str());
-      ImGui::PopStyleColor();
+      ColoredText(kMvpPossibleTextColor, text.c_str());
       break;
     case MvpReturnTone::kPlain:
       ImGui::TextUnformatted(text.c_str());

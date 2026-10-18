@@ -153,7 +153,8 @@ inline constexpr float kFakeBoldPixels = 1.0F;
 //
 // Le texte est déjà traduit quand il arrive ici : il est POSÉ tel quel, sans
 // passer par un gabarit, pour qu'un pourcent dans une traduction ne devienne
-// pas une conversion.
+// pas une conversion. Un texte nul ou vide ne pose rien : un refus facultatif
+// se passe tel quel, sans garde chez l'appelant.
 void SkinTooltip(const char* text);
 
 // LE MARQUEUR D'AIDE : un « (?) » grisé, et sa bulle au survol.

@@ -16,6 +16,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -125,7 +126,7 @@ void DrawMemberMenu(GuildTabState& state, const GuildView& view, const GuildMemb
   }
   state.selected_char = member.char_id;
   const std::string name(member.name);
-  GuildTextColored(kGuildLabelColor, name.c_str());
+  ColoredText(kGuildLabelColor, name.c_str());
   ImGui::Separator();
   if (ImGui::MenuItem(core::Tr("Copier le nom"))) {
     ImGui::SetClipboardText(name.c_str());
@@ -230,24 +231,24 @@ void DrawMemberRow(GuildTabState& state, const GuildView& view, const GuildMembe
 
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kJob));
   const std::string job(member.job);
-  GuildTextColored(kGuildBlackColor, job.c_str());
+  ColoredText(kGuildBlackColor, job.c_str());
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kLevel));
-  GuildTextColored(kGuildBlackColor, std::to_string(member.level).c_str());
+  ColoredText(kGuildBlackColor, std::to_string(member.level).c_str());
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kPosition));
   const std::string position(member.position_label);
   if (member.position == 0) {
-    GuildTextColored(kGuildBlueColor, position.empty() ? core::Tr("Maître") : position.c_str());
+    ColoredText(kGuildBlueColor, position.empty() ? core::Tr("Maître") : position.c_str());
   } else {
-    GuildTextColored(kGuildBlackColor, position.empty() ? "—" : position.c_str());
+    ColoredText(kGuildBlackColor, position.empty() ? "—" : position.c_str());
   }
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kContribution));
-  GuildTextColored(kGuildBlackColor, std::to_string(member.contribution).c_str());
+  ColoredText(kGuildBlackColor, std::to_string(member.contribution).c_str());
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kLogin));
   if (member.online) {
-    GuildTextColored(kGuildGreenColor, core::Tr("En ligne"));
+    ColoredText(kGuildGreenColor, core::Tr("En ligne"));
   } else {
     const std::string seen = member.last_seen.empty() ? "—" : std::string(member.last_seen);
-    GuildTextColored(kGuildLabelColor, seen.c_str());
+    ColoredText(kGuildLabelColor, seen.c_str());
   }
   ImGui::PopID();
 }

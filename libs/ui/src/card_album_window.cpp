@@ -23,6 +23,7 @@
 #include "card_album_parts.h"
 #include "item_grid.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace card_album {
@@ -327,10 +328,7 @@ void DrawHeader(CardAlbumWindowState& state, const CardAlbumView& view, const Sk
   // Le dernier geste du STAFF, à part du compte rendu du serveur.
   if (!view.staff_notice.empty()) {
     ImGui::SameLine();
-    ImGui::PushStyleColor(ImGuiCol_Text, view.staff_notice_ok ? kWarningColor : kRefusalColor);
-    ImGui::TextUnformatted(view.staff_notice.data(),
-                           view.staff_notice.data() + view.staff_notice.size());
-    ImGui::PopStyleColor();
+    ColoredText(view.staff_notice_ok ? kWarningColor : kRefusalColor, view.staff_notice);
   }
   // 🔴 LE SUCCÈS S'AFFICHE AUTANT QUE L'ÉCHEC. Pour un sacrifice, ne dire que
   // la carte perdue tairait ce qu'on a gagné ; un refus muet, lui, ferait croire
@@ -340,9 +338,7 @@ void DrawHeader(CardAlbumWindowState& state, const CardAlbumView& view, const Sk
     const ImVec4 tone = view.notice_tone == CardAlbumTone::kDone      ? kDoneColor
                         : view.notice_tone == CardAlbumTone::kWarning ? kWarningColor
                                                                       : kRefusalColor;
-    ImGui::PushStyleColor(ImGuiCol_Text, tone);
-    ImGui::TextUnformatted(view.notice.data(), view.notice.data() + view.notice.size());
-    ImGui::PopStyleColor();
+    ColoredText(tone, view.notice);
   }
 }
 

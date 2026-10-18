@@ -9,6 +9,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -48,7 +50,7 @@ void DrawStatusPreview(const StatusPreviewView& view, const SkinArt& art) {
   if (!view.description.empty()) {
     ImGui::Separator();
     for (const std::string_view line : view.description) {
-      ImGui::TextUnformatted(line.data(), line.data() + line.size());
+      Unformatted(line);
     }
   }
   ImGui::EndGroup();

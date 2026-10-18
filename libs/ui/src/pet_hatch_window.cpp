@@ -13,6 +13,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -33,12 +34,6 @@ constexpr float kHatchButtonPixels = 110.0F;
 constexpr float kCancelButtonPixels = 80.0F;
 
 constexpr const char* kWindowId = "###pet_hatch_window";
-
-void TextColored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
 
 const char* RankText(PetIntimacyLabel label) {
   switch (label) {
@@ -94,10 +89,10 @@ void DrawRow(PetHatchWindowState& state, const PetEggRowView& row, int rank,
   ImGui::Indent(side + Px(kRowGapPixels));
   switch (row.state) {
     case PetEggState::kMissing:
-      TextColored(kRedColor, core::Tr("Introuvable dans l'inventory."));
+      ColoredText(kRedColor, core::Tr("Introuvable dans l'inventory."));
       break;
     case PetEggState::kBlank:
-      TextColored(kRedColor, core::Tr("Œuf vierge : rien à éclore."));
+      ColoredText(kRedColor, core::Tr("Œuf vierge : rien à éclore."));
       break;
     case PetEggState::kInhabited: {
       std::string facts = row.intimacy.has_value() ? RankText(*row.intimacy) : "";
@@ -105,7 +100,7 @@ void DrawRow(PetHatchWindowState& state, const PetEggRowView& row, int rank,
         facts += "  ·  ";
         facts += core::Tr("déjà renommé");
       }
-      TextColored(kLabelColor, facts.c_str());
+      ColoredText(kLabelColor, facts.c_str());
       break;
     }
   }
@@ -145,7 +140,7 @@ PetHatchWindowAction DrawPetHatchWindow(PetHatchWindowState& state, const PetHat
   if (begun) {
     // Le serveur envoie la liste même vide.
     if (view.rows.empty()) {
-      TextColored(kLabelColor, core::Tr("Aucun œuf de familier dans l'inventory."));
+      ColoredText(kLabelColor, core::Tr("Aucun œuf de familier dans l'inventory."));
     }
     const PetEggRowView* chosen = nullptr;
     int rank = 0;
@@ -173,9 +168,7 @@ PetHatchWindowAction DrawPetHatchWindow(PetHatchWindowState& state, const PetHat
 
     ImGui::Separator();
     if (refusal != nullptr) {
-      ImGui::PushStyleColor(ImGuiCol_Text, kLabelColor);
-      ImGui::TextWrapped("%s", refusal);
-      ImGui::PopStyleColor();
+      ColoredWrapped(kLabelColor, refusal);
     }
     ImGui::BeginDisabled(refused);
     std::string hatch = core::Tr("Faire éclore");

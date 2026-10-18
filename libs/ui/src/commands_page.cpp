@@ -18,6 +18,7 @@
 
 #include "commands_page_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace commands_page {
@@ -31,12 +32,6 @@ void Toggle(const char* label, bool value, const char* help, CommandsField field
   }
   ImGui::SameLine();
   SkinHelpMarker(help);
-}
-
-void FaintText(const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
 }
 
 }  // namespace commands_page
@@ -183,7 +178,7 @@ CommandsPageAction DrawCommandsPage(const CommandsPageView& view, CommandsPageSt
   CommandsPageAction asked;
   // ⚠ UNE PAGE MUETTE SE DIT : grisée sans un mot, elle se lirait comme cassée.
   if (!view.told) {
-    commands_page::FaintText(
+    FaintText(
         core::Tr("Ces réglages sont ceux que le serveur tient pour ton personnage : ils "
                  "s'activent une fois en jeu."));
   }

@@ -12,6 +12,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "description_odds.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -83,10 +84,7 @@ constexpr ImU32 kRecitalShadow = IM_COL32(0, 0, 0, 255);
   return active;
 }
 
-[[nodiscard]] float VisibleWidth(std::string_view text) {
-  const std::string shown = Visible(text);
-  return ImGui::CalcTextSize(shown.c_str(), shown.c_str() + shown.size()).x;
-}
+[[nodiscard]] float VisibleWidth(std::string_view text) { return TextWidth(Visible(text)); }
 
 }  // namespace
 

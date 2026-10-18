@@ -5,6 +5,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -31,9 +33,7 @@ UnlockNoticeAnswer DrawUnlockNotice(std::span<const char* const> unlocked) {
       ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavFocus;
   if (ImGui::Begin("##unlock_notice", nullptr, kFlags)) {
-    ImGui::PushStyleColor(ImGuiCol_Text, kHeadlineColor);
-    ImGui::TextUnformatted(core::Tr("Interface déverrouillée"));
-    ImGui::PopStyleColor();
+    ColoredText(kHeadlineColor, core::Tr("Interface déverrouillée"));
     for (const char* name : unlocked) {
       ImGui::BulletText("%s", name);
     }

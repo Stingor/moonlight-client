@@ -10,6 +10,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_palette.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -121,10 +123,6 @@ void PaintOutlined(ImDrawList& into, ImFont* font, float height, ImVec2 at, cons
   return written;
 }
 
-void WriteLine(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
-
 // ── LE SKIN DE L'INFOBULLE, QU'ELLE IMPOSE ──────────────────────────────────
 //
 // 🔴 ELLE N'HÉRITE PAS DU BON. Une infobulle ImGui prend le style de la fenêtre
@@ -194,7 +192,7 @@ void DrawStatusTooltip(const StatusCellView& cell) {
 
   // Le nom. Sans lui, on montre au moins de QUOI on parle : un carré vide ne se
   // cherche pas.
-  WriteLine(cell.name.empty() ? std::string_view(core::Tr("État sans nom")) : cell.name);
+  Unformatted(cell.name.empty() ? std::string_view(core::Tr("État sans nom")) : cell.name);
 
   // ⚠ ZÉRO N'EST PAS UNE DURÉE ÉCOULÉE : un état sans échéance ne finit pas, et
   // écrire « 0 s » le ferait croire terminé.
@@ -220,7 +218,7 @@ void DrawStatusTooltip(const StatusCellView& cell) {
     if (rank == slot) {
       ImGui::TextDisabled("%s", left.c_str());
     }
-    WriteLine(cell.description[rank]);
+    Unformatted(cell.description[rank]);
   }
   // La place était en DERNIÈRE position : la boucle ne l'a pas atteinte.
   if (slot >= cell.description.size()) {

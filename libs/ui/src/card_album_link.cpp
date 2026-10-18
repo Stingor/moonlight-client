@@ -7,7 +7,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
-#include "ro/ui/skin_tooltip.h"
+#include "ro/ui/skin_widgets.h"
 
 namespace ro::ui {
 
@@ -34,8 +34,8 @@ bool SeeInAlbumMenuItem(CardAlbumEntry entry) {
   // l'entrée manquante passerait pour un menu qui l'a oubliée.
   const bool offered = entry == CardAlbumEntry::kOffered;
   const bool chosen = ImGui::MenuItem(core::Tr("Voir dans l'album"), nullptr, false, offered);
-  if (!offered && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", core::Tr("Cette carte n'a pas de pochette dans l'album"));
+  if (!offered) {
+    SkinTooltip(core::Tr("Cette carte n'a pas de pochette dans l'album"));
   }
   return chosen;
 }

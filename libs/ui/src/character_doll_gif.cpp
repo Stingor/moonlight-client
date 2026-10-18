@@ -14,6 +14,7 @@
 
 #include "character_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -121,7 +122,7 @@ void DrawDollGifTools(CharacterAvatarState& avatar, const DollGifView& gif, floa
   if (!gif.message.empty()) {
     ImGui::SetCursorPosX(start_x);
     ImGui::PushTextWrapPos(start_x + pane_width);
-    ImGui::TextUnformatted(gif.message.data(), gif.message.data() + gif.message.size());
+    Unformatted(gif.message);
     ImGui::PopTextWrapPos();
   }
 }

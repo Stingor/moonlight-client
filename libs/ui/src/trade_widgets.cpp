@@ -13,6 +13,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -172,7 +173,7 @@ float TradePriceWidth(std::int64_t base_price, std::int64_t price, std::string_v
 void DrawTradeHint(std::string_view text) {
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::PushTextWrapPos(0.0F);
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
+  Unformatted(text);
   ImGui::PopTextWrapPos();
   ImGui::PopStyleColor();
 }

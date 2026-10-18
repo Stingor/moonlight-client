@@ -17,6 +17,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -51,7 +52,7 @@ void CancelButton(const SkinArt& art) {
 }
 
 void ReasonField(GuildTabState& state, const char* id) {
-  GuildTextColored(kGuildLabelColor, core::Tr("Motif (facultatif) :"));
+  ColoredText(kGuildLabelColor, core::Tr("Motif (facultatif) :"));
   ImGui::SetNextItemWidth(Px(kFieldPixels));
   ImGui::InputText(id, state.reason.data(), state.reason.size());
   ImGui::Spacing();
@@ -68,8 +69,8 @@ void DrawRelationBox(GuildTabState& state, const SkinArt& art, GuildAction& acti
                                    : core::Tr("Rompre l'alliance avec %s ?"),
                 state.target_name.c_str());
   ImGui::TextUnformatted(line.data());
-  GuildTextColored(kGuildLabelColor, core::Tr("Refusé par le serveur pendant une guerre de "
-                                              "guildes\net sur les cartes verrouillées."));
+  ColoredText(kGuildLabelColor, core::Tr("Refusé par le serveur pendant une guerre de "
+                                         "guildes\net sur les cartes verrouillées."));
   ImGui::Spacing();
   if (ConfirmButton(state.target_enemy ? core::Tr("Retirer") : core::Tr("Rompre"), art)) {
     action.verb = GuildVerb::kEndRelation;
@@ -88,7 +89,7 @@ void DrawLeaveBox(GuildTabState& state, const SkinArt& art, GuildAction& action)
     return;
   }
   ImGui::TextUnformatted(core::Tr("Quitter définitivement la guilde ?"));
-  GuildTextColored(kGuildLabelColor, core::Tr("Il faudra une nouvelle invitation pour y revenir."));
+  ColoredText(kGuildLabelColor, core::Tr("Il faudra une nouvelle invitation pour y revenir."));
   ImGui::Spacing();
   ReasonField(state, "##motif_depart");
   if (ConfirmButton(core::Tr("Quitter"), art)) {
@@ -110,22 +111,22 @@ void DrawDisbandBox(GuildTabState& state, const GuildView& view, const SkinArt& 
   std::array<char, 256> line = {};
   const std::string name(view.name);
   std::snprintf(line.data(), line.size(), core::Tr("Dissoudre « %s » ?"), name.c_str());
-  GuildTextColored(kGuildRedColor, line.data());
-  GuildTextColored(kGuildLabelColor, core::Tr("Irréversible : la guilde, ses postes, son storage "
-                                              "et ses\nskills disparaissent."));
+  ColoredText(kGuildRedColor, line.data());
+  ColoredText(kGuildLabelColor, core::Tr("Irréversible : la guilde, ses postes, son storage "
+                                         "et ses\nskills disparaissent."));
   ImGui::Spacing();
   // LES CONDITIONS RÉELLES DU SERVEUR, dites AVANT : deux des refus sont peu
   // bavards, et l'un est muet.
-  GuildTextColored(kGuildBlackColor, core::Tr("Le serveur refusera si :"));
+  ColoredText(kGuildBlackColor, core::Tr("Le serveur refusera si :"));
   ImGui::BulletText("%s", core::Tr("tu n'es pas le maître de guilde ;"));
   ImGui::BulletText("%s", core::Tr("il reste un autre membre — il faut être SEUL ;"));
   ImGui::BulletText("%s", core::Tr("la carte interdit les modifications de guilde\n(mapflag "
                                    "guildlock) ;"));
   ImGui::BulletText("%s", core::Tr("une instance de guilde est en cours."));
-  GuildTextColored(kGuildLabelColor,
-                   core::Tr("L'instance fait échouer la dissolution SANS aucun message."));
+  ColoredText(kGuildLabelColor,
+              core::Tr("L'instance fait échouer la dissolution SANS aucun message."));
   ImGui::Spacing();
-  GuildTextColored(kGuildLabelColor, core::Tr("Retape le nom de la guilde pour confirmer :"));
+  ColoredText(kGuildLabelColor, core::Tr("Retape le nom de la guilde pour confirmer :"));
   ImGui::SetNextItemWidth(Px(kFieldPixels));
   ImGui::InputTextWithHint("##dissolution", core::Tr("Nom exact de la guilde"),
                            state.disband_confirm.data(), state.disband_confirm.size());
@@ -176,18 +177,18 @@ void DrawTransferBox(GuildTabState& state, const GuildView& view, const SkinArt&
   const std::string name(view.name);
   std::snprintf(line.data(), line.size(), core::Tr("Faire de %s le maître de « %s » ?"),
                 state.target_name.c_str(), name.c_str());
-  GuildTextColored(kGuildRedColor, line.data());
-  GuildTextColored(kGuildLabelColor,
-                   core::Tr("Tu perds le poste de maître sur-le-champ : postes, emblème,\n"
-                            "annonce, invitations et dissolution passent à ce membre.\n"
-                            "Lui seul pourra te rendre la direction."));
+  ColoredText(kGuildRedColor, line.data());
+  ColoredText(kGuildLabelColor,
+              core::Tr("Tu perds le poste de maître sur-le-champ : postes, emblème,\n"
+                       "annonce, invitations et dissolution passent à ce membre.\n"
+                       "Lui seul pourra te rendre la direction."));
   ImGui::Spacing();
-  GuildTextColored(kGuildBlackColor, core::Tr("Le serveur refusera si :"));
+  ColoredText(kGuildBlackColor, core::Tr("Le serveur refusera si :"));
   ImGui::BulletText("%s", core::Tr("une guerre de guildes est en cours ;"));
   ImGui::BulletText("%s", core::Tr("le précédent transfert est trop récent (délai serveur) ;"));
   ImGui::BulletText("%s", core::Tr("une instance de guilde est en cours — refus SANS message."));
   ImGui::Spacing();
-  GuildTextColored(kGuildLabelColor, core::Tr("Retape le nom du membre pour confirmer :"));
+  ColoredText(kGuildLabelColor, core::Tr("Retape le nom du membre pour confirmer :"));
   ImGui::SetNextItemWidth(Px(kFieldPixels));
   ImGui::InputTextWithHint("##transfert", core::Tr("Nom exact du membre"),
                            state.transfer_confirm.data(), state.transfer_confirm.size());

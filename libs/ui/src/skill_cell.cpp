@@ -17,6 +17,8 @@
 #include "ro/ui/staff_skill_id.h"
 #include "ro/ui/wheel_gate.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -160,7 +162,7 @@ void DrawUseLevelBadge(ImDrawList* into, const SkillCellView& cell, ImVec2 icon_
 void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> siblings,
                       bool staff_allowed) {
   if (BeginSkinTooltip()) {
-    ImGui::TextUnformatted(cell.name.data(), cell.name.data() + cell.name.size());
+    Unformatted(cell.name);
     if (cell.max_level > 0) {
       ImGui::Text(core::Tr("Niveau %d / %d"), cell.effective_level(), cell.max_level);
     }
@@ -280,7 +282,7 @@ void SkillCellGestures(const SkillCellView& cell, std::span<const SkillCellView>
       DrawUseLevelBadge(ImGui::GetWindowDrawList(), cell, icon_at, icon_side, /*always=*/true);
       ImGui::SameLine();
     }
-    ImGui::TextUnformatted(cell.name.data(), cell.name.data() + cell.name.size());
+    Unformatted(cell.name);
     if (LevelTunable(cell)) {
       ImGui::SameLine();
       ImGui::TextDisabled("%s", core::Tr("(molette : rang)"));

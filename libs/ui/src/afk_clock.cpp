@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -38,9 +40,7 @@ void ClockLine(const char* text, float base_font_size, float scale, ImU32 color,
   } else {
     ImGui::SetCursorPosX(left);
   }
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
+  ColoredText(color, text);
   ImGui::PopFont();
 }
 

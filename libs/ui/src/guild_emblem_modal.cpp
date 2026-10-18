@@ -16,6 +16,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -92,11 +93,11 @@ void DrawFileTab(GuildTabState& state, const GuildView& view, const SkinArt& art
   std::array<char, 512> line = {};
   const std::string folder(view.emblem_folder);
   std::snprintf(line.data(), line.size(), core::Tr("Fichiers .bmp de %s"), folder.c_str());
-  GuildTextColored(kGuildLabelColor, line.data());
-  GuildTextColored(kGuildLabelColor, core::Tr("Attendu : 24 bits ou 256 couleurs, non compressé."));
+  ColoredText(kGuildLabelColor, line.data());
+  ColoredText(kGuildLabelColor, core::Tr("Attendu : 24 bits ou 256 couleurs, non compressé."));
   ImGui::Spacing();
   if (view.emblem_files.empty()) {
-    GuildTextColored(kGuildRedColor, core::Tr("Aucun .bmp dans ce dossier."));
+    ColoredText(kGuildRedColor, core::Tr("Aucun .bmp dans ce dossier."));
   } else {
     DrawFileList(state, view);
   }
@@ -110,17 +111,17 @@ void DrawFileTab(GuildTabState& state, const GuildView& view, const SkinArt& art
   if (chosen != nullptr && chosen->usable) {
     std::snprintf(line.data(), line.size(), core::Tr("%zu octets, prêt à être envoyé."),
                   chosen->bytes);
-    GuildTextColored(kGuildLabelColor, line.data());
+    ColoredText(kGuildLabelColor, line.data());
     if (chosen->transparency > view.transparency_limit) {
       std::snprintf(line.data(), line.size(),
                     core::Tr("Transparence ~%d %% : au-delà de %d %% le serveur refuse."),
                     chosen->transparency, view.transparency_limit);
-      GuildTextColored(kGuildRedColor, line.data());
+      ColoredText(kGuildRedColor, line.data());
     }
   } else if (!state.emblem.error.empty()) {
-    GuildTextColored(kGuildRedColor, state.emblem.error.c_str());
+    ColoredText(kGuildRedColor, state.emblem.error.c_str());
   } else {
-    GuildTextColored(kGuildLabelColor, core::Tr("Choisis un fichier dans la liste."));
+    ColoredText(kGuildLabelColor, core::Tr("Choisis un fichier dans la liste."));
   }
 
   ImGui::Spacing();
@@ -159,12 +160,12 @@ void DrawGuildEmblemModal(GuildTabState& state, const GuildView& view, const Ski
   std::snprintf(line.data(), line.size(),
                 core::Tr("Format envoyé : %dx%d, magenta pur (255, 0, 255) = transparent."),
                 kEmblemCanvasSide, kEmblemCanvasSide);
-  GuildTextColored(kGuildLabelColor, line.data());
+  ColoredText(kGuildLabelColor, line.data());
   // Le serveur SE TAIT quand l'expéditeur n'est pas maître : autant l'annoncer
   // avant de laisser dessiner.
   if (!view.master) {
-    GuildTextColored(kGuildRedColor,
-                     core::Tr("Tu n'es pas maître de guilde : le serveur ignorera l'envoi."));
+    ColoredText(kGuildRedColor,
+                core::Tr("Tu n'es pas maître de guilde : le serveur ignorera l'envoi."));
   }
   ImGui::Spacing();
   if (!BeginSkinTabBar("embleme", art)) {
@@ -185,7 +186,7 @@ void DrawGuildEmblemModal(GuildTabState& state, const GuildView& view, const Ski
     ImGui::Separator();
     CloseButton(art);
     if (!state.emblem.report.empty()) {
-      GuildTextColored(kGuildLabelColor, state.emblem.report.c_str());
+      ColoredText(kGuildLabelColor, state.emblem.report.c_str());
     }
     EndSkinnedModal();
     return;
@@ -197,12 +198,12 @@ void DrawGuildEmblemModal(GuildTabState& state, const GuildView& view, const Ski
   ImGui::Separator();
   CloseButton(art);
   ImGui::SameLine();
-  GuildTextColored(kGuildLabelColor,
-                   core::Tr("L'envoi passe par le service web du serveur, comme la fenêtre "
-                            "native.\nL'emblème se met à jour dès que le serveur a publié la "
-                            "nouvelle version."));
+  ColoredText(kGuildLabelColor,
+              core::Tr("L'envoi passe par le service web du serveur, comme la fenêtre "
+                       "native.\nL'emblème se met à jour dès que le serveur a publié la "
+                       "nouvelle version."));
   if (!state.emblem.report.empty()) {
-    GuildTextColored(kGuildLabelColor, state.emblem.report.c_str());
+    ColoredText(kGuildLabelColor, state.emblem.report.c_str());
   }
   EndSkinnedModal();
 }

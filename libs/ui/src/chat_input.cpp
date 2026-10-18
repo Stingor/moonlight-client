@@ -17,6 +17,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "chat_input_chips.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -353,9 +354,7 @@ float ChatTargetBoxWidth(const ChatLinePreview& preview, const SkinArt& art) {
     if (mode.label.empty()) {
       continue;
     }
-    const float text =
-        ImGui::CalcTextSize(mode.label.data(), mode.label.data() + mode.label.size()).x;
-    widest = std::max(widest, text);
+    widest = std::max(widest, TextWidth(mode.label));
   }
   return widest + SkinComboChromeWidth(art) + (AnyRelayed(preview) ? DiscordMarkRoom() : 0.0F);
 }

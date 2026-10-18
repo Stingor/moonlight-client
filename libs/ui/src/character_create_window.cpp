@@ -14,6 +14,7 @@
 
 #include "thumbnail_grid.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -202,16 +203,12 @@ CharacterCreateAction DrawCharacterCreate(CharacterCreateState& state,
   ImGui::Spacing();
 
   if (view.pending) {
-    ImGui::PushStyleColor(ImGuiCol_Text, kPendingColor);
-    ImGui::TextUnformatted(core::Tr("Création en cours…"));
-    ImGui::PopStyleColor();
+    ColoredText(kPendingColor, core::Tr("Création en cours…"));
   } else if (!view.refusal.empty()) {
     // ⚠ IL S'ENROULE : le motif fourre-tout du serveur énumère quatre causes,
     // et une ligne qui traverse l'écran ferait grandir la fenêtre à sa mesure.
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + kFieldPoints * Scale());
-    ImGui::PushStyleColor(ImGuiCol_Text, kRefusalColor);
-    ImGui::TextUnformatted(view.refusal.c_str());
-    ImGui::PopStyleColor();
+    ColoredText(kRefusalColor, view.refusal.c_str());
     ImGui::PopTextWrapPos();
   }
 

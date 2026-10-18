@@ -10,6 +10,9 @@
 #include "ro/ui/chat_rich_art.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
+#include "ro/ui/skin_widgets.h"
+
+#include "ui_text.h"
 
 namespace ro::ui {
 
@@ -253,9 +256,7 @@ void OfferedEntry(ChatLinkAsk& asked, const char* label, const char* refusal,
   if (ImGui::MenuItem(label, nullptr, false, refusal == nullptr)) {
     asked.gesture = gesture;
   }
-  if (refusal != nullptr && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", refusal);
-  }
+  SkinTooltip(refusal);
 }
 
 // Les entrées d'un RESPAWN DE MVP, dans cet ordre.
@@ -487,9 +488,7 @@ bool MvpInviteMenuItem(const char* refusal) {
   const bool chosen =
       ImGui::MenuItem(core::Tr("Inviter dans mon carnet MVP"), nullptr, false, refusal == nullptr);
   if (refusal != nullptr) {
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltipFormat("%s", refusal);
-    }
+    SkinTooltip(refusal);
   } else if (ImGui::IsItemHovered()) {
     SkinTooltipFormat("%s", core::Tr("Guilde et liste d'amis uniquement.\nInviter quelqu'un, "
                                      "c'est inviter tous ses personnages et tous ses comptes de "
@@ -502,10 +501,8 @@ void DrawSettingLinkTip(std::string_view path) {
   if (!BeginSkinTooltip()) {
     return;
   }
-  ImGui::TextUnformatted(path.data(), path.data() + path.size());
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(core::Tr("Clic : ouvrir · Maj+clic : reposer"));
-  ImGui::PopStyleColor();
+  Unformatted(path);
+  FaintText(core::Tr("Clic : ouvrir · Maj+clic : reposer"));
   EndSkinTooltip();
 }
 

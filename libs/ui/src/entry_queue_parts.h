@@ -30,10 +30,6 @@ inline constexpr float kEntryQueueWrapFonts = 24.0F;
 // Pourquoi un bouton qui envoie est éteint hors liaison. Traduit.
 [[nodiscard]] const char* EntryQueueLinkPendingText();
 
-// L'INFOBULLE DU DERNIER BOUTON, grisé compris : un bouton éteint dit pourquoi.
-// Sans texte, rien.
-void TellEntryQueueWhy(const char* why);
-
 // LA CONFIRMATION D'UN VERBE, en deux temps : le bouton la DEMANDE, puis la
 // fenêtre la DESSINE à chaque image. Les deux appels se font au niveau de la
 // fenêtre, hors de tout enfant : la boîte et sa demande doivent partager la

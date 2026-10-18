@@ -16,6 +16,8 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -66,12 +68,6 @@ constexpr float kFoldGapPixels = 6.0F;
   ImGui::PopStyleColor(4);
   storage->SetBool(key, open);
   return open;
-}
-
-void FaintText(const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
 }
 
 [[nodiscard]] bool HasText(const char* text) { return text != nullptr && text[0] != '\0'; }

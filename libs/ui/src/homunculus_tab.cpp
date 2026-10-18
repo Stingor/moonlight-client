@@ -19,12 +19,12 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/companion_ai_window.h"
 #include "ro/ui/shortcut_bar.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/staff_skill_id.h"
 
 #include "homunculus_staff.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -66,26 +66,6 @@ constexpr int kHomunculusIntimacyGaugeMost = 1000;
 constexpr int kStatColumns = 4;
 constexpr int kStatRows = 8;
 constexpr int kSkillColumns = 3;
-
-void TextColored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
-
-void WrappedColored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextWrapped("%s", text);
-  ImGui::PopStyleColor();
-}
-
-// L'infobulle du dernier élément, même grisé : c'est souvent elle qui dit
-// pourquoi il l'est.
-void Tooltip(const char* text) {
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", text);
-  }
-}
 
 // UNE INFOBULLE DE PLUSIEURS LIGNES : chaque ligne est sa propre entrée du
 // catalogue de traduction.
@@ -191,7 +171,7 @@ void DrawRenaming(HomunculusTabState& state, const SkinArt& art, HomunculusTabAc
                       ImVec2(Px(kRenameButtonPixels), 0.0F))) {
     state.renaming = false;
   }
-  WrappedColored(kLabelColor, core::Tr("Donne à ton homoncule un nom de 23 lettres au plus."));
+  ColoredWrapped(kLabelColor, core::Tr("Donne à ton homoncule un nom de 23 lettres au plus."));
 }
 
 // L'EN-TÊTE : le nom est le bouton de renommage tant que le serveur l'accepte,
@@ -212,12 +192,13 @@ void DrawHeader(HomunculusTabState& state, const HomunculusTabView& view, const 
         state.renaming = true;
       }
       ImGui::EndDisabled();
-      Tooltip(view.active() ? core::Tr("Cliquer pour renommer.")
-                            : core::Tr("Impossible : l'homoncule est au repos ou hors de combat."));
+      SkinTooltip(view.active()
+                      ? core::Tr("Cliquer pour renommer.")
+                      : core::Tr("Impossible : l'homoncule est au repos ou hors de combat."));
     } else {
       ImGui::AlignTextToFramePadding();
-      TextColored(kValueColor, shown.c_str());
-      Tooltip(core::Tr("Le serveur n'accepte le renommage qu'UNE fois."));
+      ColoredText(kValueColor, shown.c_str());
+      SkinTooltip(core::Tr("Le serveur n'accepte le renommage qu'UNE fois."));
     }
     const float width = Px(kAbandonButtonPixels);
     ImGui::SameLine();
@@ -232,7 +213,7 @@ void DrawHeader(HomunculusTabState& state, const HomunculusTabView& view, const 
     }
     ImGui::EndDisabled();
     if (!view.active()) {
-      Tooltip(core::Tr("Impossible : l'homoncule est au repos ou hors de combat."));
+      SkinTooltip(core::Tr("Impossible : l'homoncule est au repos ou hors de combat."));
     }
   }
 
@@ -241,13 +222,13 @@ void DrawHeader(HomunculusTabState& state, const HomunculusTabView& view, const 
   std::snprintf(line.data(), line.size(), "%s  ·  %s %d",
                 view.species.empty() ? "?" : std::string(view.species).c_str(), core::Tr("Niveau"),
                 view.level);
-  TextColored(kLabelColor, line.data());
+  ColoredText(kLabelColor, line.data());
   if (view.resting || !view.alive) {
     ImGui::SameLine();
     if (view.resting) {
-      TextColored(kLabelColor, core::Tr("Au repos."));
+      ColoredText(kLabelColor, core::Tr("Au repos."));
     } else {
-      TextColored(kRedColor, core::Tr("Hors de combat (0 PV)."));
+      ColoredText(kRedColor, core::Tr("Hors de combat (0 PV)."));
     }
   }
   ImGui::Separator();
@@ -263,25 +244,25 @@ void DrawGauges(const HomunculusTabView& view) {
     std::array<char, 96> line = {};
     std::snprintf(line.data(), line.size(), "EXP : %lld  —  %s", static_cast<long long>(view.exp),
                   core::Tr("niveau maximum"));
-    TextColored(kGreenColor, line.data());
+    ColoredText(kGreenColor, line.data());
   }
   // Satiété : sur cent, comme le serveur.
   const bool hungry = view.hunger <= kHungryHunger;
   Gauge(core::Tr("Satiété"), view.hunger, kHomunculusHungerGaugeMost,
         hungry ? kHungryGaugeColor : kFedGaugeColor);
   if (hungry) {
-    WrappedColored(kRedColor, core::Tr("Ton homoncule meurt de faim. Nourris-le, sinon il te "
+    ColoredWrapped(kRedColor, core::Tr("Ton homoncule meurt de faim. Nourris-le, sinon il te "
                                        "quittera."));
   }
   // Intimité : le palier suffit, la valeur brute passe en infobulle.
   std::array<char, 64> label = {};
   std::snprintf(label.data(), label.size(), "%s :", core::Tr("Intimité"));
-  TextColored(kValueColor, label.data());
+  ColoredText(kValueColor, label.data());
   ImGui::SameLine();
   ImGui::TextUnformatted(IntimacyText(view.intimacy_label));
   std::array<char, 48> raw = {};
   std::snprintf(raw.data(), raw.size(), "%d / %d", view.intimacy, kHomunculusIntimacyGaugeMost);
-  Tooltip(raw.data());
+  SkinTooltip(raw.data());
 }
 
 void DrawActions(HomunculusTabState& state, const HomunculusTabView& view, const SkinArt& art,
@@ -303,15 +284,15 @@ void DrawActions(HomunculusTabState& state, const HomunculusTabView& view, const
     action.auto_feed = auto_feed;
   }
   ImGui::EndDisabled();
-  Tooltip(core::Tr("L'homoncule reçoit le dixième de l'expérience du maître."));
+  SkinTooltip(core::Tr("L'homoncule reçoit le dixième de l'expérience du maître."));
 
   if (state.delete_asked) {
     ImGui::Spacing();
-    WrappedColored(kRedColor,
+    ColoredWrapped(kRedColor,
                    core::Tr("Tu as décidé de supprimer cet homoncule. Une fois supprimé, "
                             "l'homoncule et son histoire seront effacés et ne pourront jamais être "
                             "restaurés. Veux-tu continuer ?"));
-    WrappedColored(kValueColor, core::Tr("Retape le nom de l'homoncule pour confirmer :"));
+    ColoredWrapped(kValueColor, core::Tr("Retape le nom de l'homoncule pour confirmer :"));
     ImGui::SetNextItemWidth(-1.0F);
     ImGui::InputText("##homun_del", state.delete_confirm.data(), state.delete_confirm.size());
     const std::string_view expected = view.name.empty() ? view.species : view.name;
@@ -330,7 +311,7 @@ void DrawActions(HomunculusTabState& state, const HomunculusTabView& view, const
     }
   }
   if (!state.status.empty()) {
-    TextColored(kLabelColor, state.status.c_str());
+    ColoredText(kLabelColor, state.status.c_str());
   }
 }
 
@@ -409,8 +390,8 @@ void DrawStats(const HomunculusTabView& view) {
     }
     // Libellé collé à sa valeur, valeur alignée à droite de sa moitié.
     ImGui::TableNextColumn();
-    TextColored(kLabelColor, row.label);
-    Tooltip(row.tip.c_str());
+    ColoredText(kLabelColor, row.label);
+    SkinTooltip(row.tip.c_str());
     ImGui::TableNextColumn();
     std::array<char, 16> value = {};
     std::snprintf(value.data(), value.size(), row.percent ? "%d %%" : "%d", row.value);
@@ -419,14 +400,14 @@ void DrawStats(const HomunculusTabView& view) {
       ImGui::SetCursorPosX(ImGui::GetCursorPosX() + slack);
     }
     ImGui::TextUnformatted(value.data());
-    Tooltip(row.tip.c_str());
+    SkinTooltip(row.tip.c_str());
   }
   ImGui::EndTable();
   std::array<char, 128> range = {};
   std::snprintf(range.data(), range.size(), core::Tr("Portée d'attaque : %d"),
                 view.attack_range_cells);
-  TextColored(kLabelColor, range.data());
-  Tooltip(
+  ColoredText(kLabelColor, range.data());
+  SkinTooltip(
       core::Tr("En cases. 1 = corps à corps ; au-delà, l'homoncule frappe à distance sans se "
                "déplacer."));
 }
@@ -536,10 +517,10 @@ void DrawSkillRows(HomunculusTabState& state, const HomunculusTabView& view, con
         action.skill_id = skill.skill_id;
         state.status = core::Tr("Montée envoyée.");
       }
-      Tooltip(Lines({core::Tr("Dépense un point (envoi immédiat)."),
-                     core::Tr("Le serveur exige en plus un niveau d'homoncule minimum, que le "
-                              "client ne connaît pas.")})
-                  .c_str());
+      SkinTooltip(Lines({core::Tr("Dépense un point (envoi immédiat)."),
+                         core::Tr("Le serveur exige en plus un niveau d'homoncule minimum, que le "
+                                  "client ne connaît pas.")})
+                      .c_str());
     }
     ImGui::PopID();
   }
@@ -566,7 +547,7 @@ void DrawSkills(HomunculusTabState& state, const HomunculusTabView& view, const 
     return;
   }
   if (view.skills.empty()) {
-    TextColored(kLabelColor, core::Tr("Aucun skill reçu du serveur."));
+    ColoredText(kLabelColor, core::Tr("Aucun skill reçu du serveur."));
     return;
   }
   if (ImGui::BeginChild("cs_homun_skills", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders)) {
@@ -581,9 +562,9 @@ HomunculusTabAction DrawHomunculusTab(HomunculusTabState& state, const Homunculu
                                       const SkinArt& art) {
   HomunculusTabAction action;
   if (!view.sheet_known) {
-    TextColored(kLabelColor, core::Tr("Aucun homoncule."));
+    ColoredText(kLabelColor, core::Tr("Aucun homoncule."));
     ImGui::Spacing();
-    WrappedColored(kValueColor,
+    ColoredWrapped(kValueColor,
                    core::Tr("Un Alchimiste ayant appris Bioéthique peut en invoquer un avec une "
                             "Embryon. Cet onglet reprend la fiche d'état (Alt+R) et l'arbre de "
                             "skills."));

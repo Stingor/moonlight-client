@@ -13,7 +13,6 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/list_keys.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "companion_ai_window_parts.h"
@@ -59,9 +58,7 @@ void Edit(CompanionAiWindowState& state, std::string key) {
   ImGui::BeginDisabled(refusal != nullptr);
   const bool clicked = SkinSmallButton(label, art);
   ImGui::EndDisabled();
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", refusal != nullptr ? refusal : tip);
-  }
+  SkinTooltip(refusal != nullptr ? refusal : tip);
   return clicked;
 }
 

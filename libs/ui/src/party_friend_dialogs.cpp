@@ -10,7 +10,6 @@
 #include "ro/ui/chat_link.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_popup.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
@@ -122,9 +121,7 @@ void DrawPartyRowMenu(PartyFriendWindowState& state, const PartyFriendView& view
       AskPartyConfirm(state, PartyFriendVerb::kMakeLeader, member.account_id, member.char_id,
                       member.name);
     }
-    if (refusal != nullptr && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltipFormat("%s", refusal);
-    }
+    SkinTooltip(refusal);
     if (ImGui::Selectable(core::Tr("Expulser du groupe"))) {
       AskPartyConfirm(state, PartyFriendVerb::kExpel, member.account_id, member.char_id,
                       member.name);

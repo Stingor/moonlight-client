@@ -21,6 +21,7 @@
 
 #include "character_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -222,7 +223,7 @@ void PaintBadge(ImDrawList* into, const EquipSlotView& piece, ImVec2 top_left, f
       PaintIcon(ImGui::GetWindowDrawList(), piece, ghost, icon_side, 0.0F);
       ImGui::SameLine();
     }
-    ImGui::TextUnformatted(piece.name.data(), piece.name.data() + piece.name.size());
+    Unformatted(piece.name);
     ImGui::EndDragDropSource();
   }
 

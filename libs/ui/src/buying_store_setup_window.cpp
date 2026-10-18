@@ -12,6 +12,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -42,10 +43,6 @@ constexpr std::int64_t kWireMostZeny = std::numeric_limits<std::int32_t>::max();
 
 constexpr const char* kDearConfirmId = "##buying_store_dear_confirm";
 constexpr const char* kItemMenuId = "##buying_store_setup_item_menu";
-
-bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
-  return filter.PassFilter(name.data(), name.data() + name.size());
-}
 
 const BuyingStoreCandidateView* CandidateOf(const BuyingStoreSetupView& view,
                                             std::uint32_t item_id) {
@@ -118,7 +115,7 @@ void DrawCandidates(BuyingStoreSetupState& state, const BuyingStoreSetupView& vi
     ImGui::TableHeadersRow();
     for (std::size_t index = 0; index < view.candidates.size(); ++index) {
       const BuyingStoreCandidateView& candidate = view.candidates[index];
-      if (!Matches(state.filter, candidate.item.name)) {
+      if (!PassesTextFilter(state.filter, candidate.item.name)) {
         continue;
       }
       ImGui::PushID(kCandidateIdBase + static_cast<int>(index));
@@ -141,7 +138,7 @@ void DrawCandidates(BuyingStoreSetupState& state, const BuyingStoreSetupView& vi
       if (barred) {
         ImGui::EndDisabled();
       }
-      if ((full || placed) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+      if (full || placed) {
         SkinTooltip(placed ? core::Tr("Déjà posé : un item ne tient qu'une ligne.")
                            : core::Tr("Toutes les lignes sont prises."));
       }
@@ -265,11 +262,9 @@ void DrawFooter(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, 
   // UNE LIGNE TOUJOURS ÉMISE, pour que le pied garde sa hauteur : le premier
   // refus en rouge, sinon l'avertissement, sinon rien.
   if (!view.blockers.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.blockers[0].size()),
-                       view.blockers[0].data());
+    ColoredText(kTradeRefusedText, view.blockers[0]);
   } else if (!view.warnings.empty()) {
-    ImGui::TextColored(kTradeWarningText, "%.*s", static_cast<int>(view.warnings[0].size()),
-                       view.warnings[0].data());
+    ColoredText(kTradeWarningText, view.warnings[0]);
   } else if (view.awaiting) {
     ImGui::TextDisabled("%s", core::Tr("En attente du serveur..."));
   } else {

@@ -15,6 +15,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -577,7 +578,7 @@ SkinColorPick SkinColorSwatch(const char* label, ImU32* color, const SkinArt& ar
     ImGui::SameLine();
     ImGui::SetCursorScreenPos(
         ImVec2(ImGui::GetCursorScreenPos().x, RowTextTop(top, side, ImGui::GetTextLineHeight())));
-    ImGui::TextUnformatted(shown.data(), shown.data() + shown.size());
+    Unformatted(shown);
   }
 
   told.open = BeginSkinPopup(kSwatchPopup);
@@ -630,13 +631,11 @@ void SkinHelpMarker(const char* help, const char* warning) {
   if (!has_help && !has_warning) {
     return;
   }
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted("(?)");
-  ImGui::PopStyleColor();
+  FaintText("(?)");
   // ⚠ LISIBLE SUR UNE RANGÉE GRISÉE : c'est souvent elle qui dit pourquoi la
   // rangée ne répond pas, et une aide muette là laisserait le joueur sans raison.
-  // ⚠ D'OÙ LA BULLE OUVERTE ICI, et non par `SkinTooltip` : celui-ci reteste le
-  // survol à sa façon, qui ne voit pas un item grisé.
+  // ⚠ LE SURVOL SE TESTE ICI : la bulle porte deux textes, et
+  // `SkinTooltipWarned`, à la différence de `SkinTooltip`, ne le teste pas.
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
     SkinTooltipWarned(help, warning);
   }
@@ -727,19 +726,9 @@ bool SkinHyperlink(const char* label) {
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextLink));
   ImGui::TextUnformatted(label);
   ImGui::PopStyleColor();
-  if (!ImGui::IsItemHovered()) {
-    return false;
-  }
-  ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-  // ⚠ LE TRAIT SE POSE SUR LE BAS DU RECTANGLE DE L'ITEM, et non à une
-  // distance choisie sous la ligne de base : la hauteur d'une ligne suit
-  // l'échelle de l'interface, un écart en dur ne la suivrait pas.
-  const ImVec2 corner_min = ImGui::GetItemRectMin();
-  const ImVec2 corner_max = ImGui::GetItemRectMax();
-  ImGui::GetWindowDrawList()->AddLine(ImVec2(corner_min.x, corner_max.y),
-                                      ImVec2(corner_max.x, corner_max.y),
-                                      ImGui::GetColorU32(ImGuiCol_TextLink));
-  return ImGui::IsItemClicked();
+  const bool hovered = ImGui::IsItemHovered();
+  DecorateLink(hovered);
+  return hovered && ImGui::IsItemClicked();
 }
 
 }  // namespace ro::ui

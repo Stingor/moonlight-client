@@ -90,13 +90,6 @@ void WrappedColored(ImU32 color, const char* text) {
   ImGui::PopStyleColor();
 }
 
-// L'infobulle du dernier élément, même grisé : c'est elle qui dit pourquoi.
-void Tooltip(const char* text) {
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", text);
-  }
-}
-
 // Un libellé de bouton suivi d'un identifiant fixe : deux boutons de même texte
 // ne partagent pas leur identité.
 [[nodiscard]] std::string Labelled(const char* text, const char* id) {
@@ -220,11 +213,11 @@ void DrawRenameRow(PetWindowState& state, const PetWindowView& view, const SkinA
                   state.rename_buffer.begin());
       state.renaming = true;
     }
-    Tooltip(core::Tr("Cliquer pour renommer — une seule fois, définitivement."));
+    SkinTooltip(core::Tr("Cliquer pour renommer — une seule fois, définitivement."));
   } else {
     ImGui::AlignTextToFramePadding();
     TextColored(kValueColor, shown.c_str());
-    Tooltip(core::Tr("Ce pet a déjà été renommé : le serveur n'accepte qu'une fois."));
+    SkinTooltip(core::Tr("Ce pet a déjà été renommé : le serveur n'accepte qu'une fois."));
   }
 }
 
@@ -277,7 +270,7 @@ void DrawFeed(PetWindowState& state, const PetWindowView& view, const SkinArt& a
       state.feed_confirming = true;
     }
   }
-  Tooltip(
+  SkinTooltip(
       core::Tr("Nourrir un pet qui n'a pas faim lui fait PERDRE de l'intimité. Sans "
                "nourriture dans l'inventory, le client refuse sans rien envoyer."));
 }
@@ -466,7 +459,7 @@ void DrawActions(PetWindowState& state, const PetWindowView& view, const SkinArt
   }
   ImGui::EndDisabled();
   if (!view.has_accessory) {
-    Tooltip(core::Tr("Ce pet ne porte aucun accessoire."));
+    SkinTooltip(core::Tr("Ce pet ne porte aucun accessoire."));
   }
   // CE QU'IL MANGE, ET COMBIEN IL EN RESTE, sous le bouton qui le nourrit : en
   // rouge quand l'inventory n'en a plus, puisque le repas sera refusé.
@@ -489,7 +482,7 @@ void DrawActions(PetWindowState& state, const PetWindowView& view, const SkinArt
     if (SkinCheckBox(core::Tr("Alimentation automatique"), &enabled, art)) {
       action.auto_feed = enabled;
     }
-    Tooltip(
+    SkinTooltip(
         core::Tr("Le serveur nourrit le pet tout seul sous un certain seuil de faim. L'état "
                  "affiché est celui que le SERVEUR confirme, pas la case cochée."));
   }

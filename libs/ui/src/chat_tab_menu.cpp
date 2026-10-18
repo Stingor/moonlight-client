@@ -12,6 +12,8 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -72,7 +74,7 @@ void DrawFilterMenu(std::span<const ChatTypeToggle> types, bool diagnostic, cons
       ImGui::Text("%.*s  %.*s", static_cast<int>(type.tag.size()), type.tag.data(),
                   static_cast<int>(type.label.size()), type.label.data());
     } else {
-      ImGui::TextUnformatted(type.label.data(), type.label.data() + type.label.size());
+      Unformatted(type.label);
     }
     if (type.waiting) {
       ImGui::PopStyleColor();
@@ -168,12 +170,10 @@ void DrawPlaceItems(const ChatWindowState& state, bool meter_tab, bool can_detac
     asked->detach_tab = state.configuring;
   }
   ImGui::EndDisabled();
-  // `AllowWhenDisabled` : sans ce drapeau, un élément grisé n'est jamais
-  // survolé, et l'infobulle qui EXPLIQUE le grisé ne s'afficherait jamais.
-  if (!can_detach && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", state.group == 0 ? core::Tr("Le dernier onglet de la conversation ne "
-                                                        "peut pas en sortir.")
-                                             : core::Tr("Il est déjà seul dans sa fenêtre."));
+  if (!can_detach) {
+    SkinTooltip(state.group == 0 ? core::Tr("Le dernier onglet de la conversation ne "
+                                            "peut pas en sortir.")
+                                 : core::Tr("Il est déjà seul dans sa fenêtre."));
   }
 }
 
@@ -275,8 +275,8 @@ void DrawChatTabMenu(ChatWindowState& state, const ChatAppearance& look,
     ImGui::CloseCurrentPopup();
   }
   ImGui::EndDisabled();
-  if (!powers.can_close && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", core::Tr("Il doit rester au moins un onglet dans la conversation."));
+  if (!powers.can_close) {
+    SkinTooltip(core::Tr("Il doit rester au moins un onglet dans la conversation."));
   }
   ImGui::Separator();
 

@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include <imgui_internal.h>
-
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
@@ -17,7 +15,9 @@
 #include "ro/ui/skinned_window.h"
 
 #include "mail_parts.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -67,22 +67,6 @@ constexpr float kConfirmButtonPixels = 110.0F;
   const auto found =
       std::ranges::find_if(rows, [&ref](const MailRowView& row) { return row.ref == ref; });
   return found == rows.end() ? nullptr : &*found;
-}
-
-void Unformatted(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
-
-void Colored(ImVec4 color, std::string_view text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  Unformatted(text);
-  ImGui::PopStyleColor();
-}
-
-void Disabled(std::string_view text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  Unformatted(text);
-  ImGui::PopStyleColor();
 }
 
 void SystemBadge(const MailRowView& row) {
@@ -184,17 +168,17 @@ void DrawRow(MailboxWindowState& state, const MailRowView& row, const MailCarrie
   ImGui::TableNextColumn();
   // Sujet grisé : déjà lu, selon le serveur.
   if (row.read) {
-    Disabled(row.title);
+    FaintText(row.title);
   } else {
-    Colored(kTradeBlackText, row.title);
+    ColoredText(kTradeBlackText, row.title);
   }
 
   ImGui::TableNextColumn();
   const std::string expiry = MailExpiryLabel(row.expire_seconds_left);
   if (MailExpiresSoon(row)) {
-    Colored(mail::kRefusalText, expiry);
+    ColoredText(mail::kRefusalText, expiry);
   } else {
-    Disabled(expiry);
+    FaintText(expiry);
   }
 }
 
@@ -501,7 +485,7 @@ void DrawConfirmation(MailboxWindowState& state, const MailboxView& view, const 
   }
   const std::string name = mail::ConfirmModalName(kConfirmId);
   if (state.confirm == MailConfirm::kNone) {
-    mail::CloseModal(name.c_str());
+    CloseModal(name.c_str());
     return;
   }
   if (!ImGui::IsPopupOpen(name.c_str())) {
@@ -556,17 +540,6 @@ TradeItemGesture DrawItemRow(const MailItemView& line) {
   ImGui::EndGroup();
   AddLastItemGesture(gesture);
   return gesture;
-}
-
-void CloseModal(const char* name) {
-  const ImGuiContext& context = *GImGui;
-  const ImGuiID popup_id = ImGui::GetID(name);
-  for (int level = 0; level < context.OpenPopupStack.Size; ++level) {
-    if (context.OpenPopupStack[level].PopupId == popup_id) {
-      ImGui::ClosePopupToLevel(level, true);
-      return;
-    }
-  }
 }
 
 std::string ConfirmModalName(std::string_view id) {

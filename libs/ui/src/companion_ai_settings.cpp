@@ -369,11 +369,8 @@ void DrawTacticsSection(CompanionAiWindowState& state, const CompanionAiView& vi
       action.generic = generic;
     }
     ImGui::EndDisabled();
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltipFormat("%s", view.tactics_full
-                                  ? core::Tr("La table des tactiques est pleine.")
+    SkinTooltip(view.tactics_full ? core::Tr("La table des tactiques est pleine.")
                                   : core::Tr("Ajoute cette ligne au rang « moyen »."));
-    }
     ImGui::PopID();
     ImGui::SameLine();
   }

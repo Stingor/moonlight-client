@@ -6,14 +6,9 @@
 
 #include "ro/ui/skin_tooltip.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
-namespace {
-
-[[nodiscard]] float TextWidth(std::string_view text) {
-  return ImGui::CalcTextSize(text.data(), text.data() + text.size()).x;
-}
-
-}  // namespace
 
 float WidestText(std::initializer_list<std::string_view> texts) {
   float widest = 0.0F;
@@ -41,7 +36,7 @@ void CellText(std::string_view text, ImU32 color) {
   if (color != 0) {
     ImGui::PushStyleColor(ImGuiCol_Text, color);
   }
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
+  Unformatted(text);
   if (color != 0) {
     ImGui::PopStyleColor();
   }

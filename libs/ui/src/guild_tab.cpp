@@ -13,6 +13,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -52,7 +53,7 @@ void DrawEmblemBox(ImDrawList* into, const GuildView& view, ImVec2 low, ImVec2 h
 // SANS GUILDE : la création directe, comme le « Guild Companion » du client.
 void DrawNoGuild(GuildTabState& state, const GuildView& view, const SkinArt& art,
                  GuildAction& action) {
-  GuildTextColored(kGuildLabelColor, core::Tr("Tu n'appartiens à aucune guilde."));
+  ColoredText(kGuildLabelColor, core::Tr("Tu n'appartiens à aucune guilde."));
   ImGui::Spacing();
   ImGui::TextWrapped("%s",
                      core::Tr("Rejoins-en une (invitation d'un maître de guilde) ou crée la tienne "
@@ -60,10 +61,10 @@ void DrawNoGuild(GuildTabState& state, const GuildView& view, const SkinArt& art
   ImGui::Spacing();
   ImGui::Separator();
   ImGui::Spacing();
-  GuildTextColored(kGuildBlackColor, core::Tr("Créer une guilde"));
-  GuildTextColored(kGuildLabelColor,
-                   core::Tr("Un Emperium dans l'inventory est nécessaire, et la carte ne "
-                            "doit pas interdire les guildes."));
+  ColoredText(kGuildBlackColor, core::Tr("Créer une guilde"));
+  ColoredText(kGuildLabelColor,
+              core::Tr("Un Emperium dans l'inventory est nécessaire, et la carte ne "
+                       "doit pas interdire les guildes."));
   ImGui::SetNextItemWidth(Px(kCreateFieldPixels));
   const bool submitted =
       ImGui::InputText("##guild_create", state.create_name.data(), state.create_name.size(),
@@ -80,9 +81,9 @@ void DrawNoGuild(GuildTabState& state, const GuildView& view, const SkinArt& art
   // ne pas laisser l'onglet muet.
   if (!view.creation_answer.empty()) {
     const std::string answer(view.creation_answer);
-    GuildTextColored(view.creation_succeeded ? kGuildGreenColor : kGuildRedColor, answer.c_str());
+    ColoredText(view.creation_succeeded ? kGuildGreenColor : kGuildRedColor, answer.c_str());
   } else if (!state.status.empty()) {
-    GuildTextColored(kGuildLabelColor, state.status.c_str());
+    ColoredText(kGuildLabelColor, state.status.c_str());
   }
 }
 
@@ -99,7 +100,7 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
     if (SkinButton(core::Tr("Actualiser"), art, ImVec2(width, 0.0F))) {
       action.verb = GuildVerb::kRefresh;
     }
-    GuildTooltip(core::Tr("Redemande au serveur membres, postes et infos de guilde."));
+    SkinTooltip(core::Tr("Redemande au serveur membres, postes et infos de guilde."));
     ImGui::SetCursorPos(kept);
   }
   const float side = Px(kEmblemPixels);
@@ -127,16 +128,16 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
   const float indent = side + Px(kEmblemGapPixels);
   ImGui::Indent(indent);
   const std::string name(view.name);
-  GuildTextColored(kGuildBlackColor, name.c_str());
+  ColoredText(kGuildBlackColor, name.c_str());
   const std::string master = view.master_name.empty() ? "?" : std::string(view.master_name);
   std::array<char, 256> line = {};
   std::snprintf(line.data(), line.size(), core::Tr("Niveau %d  ·  Maître : %s"), view.level,
                 master.c_str());
-  GuildTextColored(kGuildLabelColor, line.data());
+  ColoredText(kGuildLabelColor, line.data());
   std::snprintf(line.data(), line.size(),
                 core::Tr("Membres : %d / %d  ·  En ligne : %d  ·  Niveau moyen : %d"),
                 view.member_count, view.member_most, view.online, view.average_level);
-  GuildTextColored(kGuildLabelColor, line.data());
+  ColoredText(kGuildLabelColor, line.data());
   // LE POSTE ET SES DROITS : ils expliquent la présence — ou l'absence — des
   // gestes plus bas, au lieu de laisser le serveur refuser en silence.
   if (view.position_found) {
@@ -163,13 +164,13 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
     const std::string position = view.my_position.empty() ? "?" : std::string(view.my_position);
     std::snprintf(line.data(), line.size(), core::Tr("Ton poste : %s  ·  %s"), position.c_str(),
                   rights.c_str());
-    GuildTextColored(kGuildLabelColor, line.data());
+    ColoredText(kGuildLabelColor, line.data());
   }
   ImGui::Unindent(indent);
   if (!view.land.empty()) {
     const std::string land(view.land);
     std::snprintf(line.data(), line.size(), core::Tr("Territoire : %s"), land.c_str());
-    GuildTextColored(kGuildLabelColor, line.data());
+    ColoredText(kGuildLabelColor, line.data());
   }
   if (view.next_exp > 0) {
     const float ratio =
@@ -197,7 +198,7 @@ void DrawNotice(GuildTabState& state, const GuildView& view, const SkinArt& art,
   if (state.notice_editing) {
     // Le rappel « titre, puis message » vaut aussi en RÉÉDITION : les indices ne
     // s'affichent que sur un champ vide.
-    GuildTextColored(kGuildBlackColor, core::Tr("Annonce de la guilde — titre, puis message"));
+    ColoredText(kGuildBlackColor, core::Tr("Annonce de la guilde — titre, puis message"));
     ImGui::SetNextItemWidth(-1.0F);
     ImGui::InputTextWithHint("##guild_subject", core::Tr("Titre de l'annonce"),
                              state.notice_subject.data(), state.notice_subject.size());
@@ -218,7 +219,7 @@ void DrawNotice(GuildTabState& state, const GuildView& view, const SkinArt& art,
   } else if (!view.notice_subject.empty() || !view.notice_body.empty()) {
     const std::string subject =
         view.notice_subject.empty() ? core::Tr("Annonce") : std::string(view.notice_subject);
-    GuildTextColored(kGuildBlueColor, subject.c_str());
+    ColoredText(kGuildBlueColor, subject.c_str());
     if (!view.notice_body.empty()) {
       const std::string body(view.notice_body);
       ImGui::TextWrapped("%s", body.c_str());
@@ -255,9 +256,8 @@ void DrawNotice(GuildTabState& state, const GuildView& view, const SkinArt& art,
       state.status = core::Tr("Storage de guilde : ouverture demandée.");
     }
     ImGui::EndDisabled();
-    GuildTooltip(may_storage
-                     ? core::Tr("Ouvre — ou referme — le Storage de guilde (@guildstorage).")
-                     : core::Tr("Ton poste n'a pas le droit « storage »."));
+    SkinTooltip(may_storage ? core::Tr("Ouvre — ou referme — le Storage de guilde (@guildstorage).")
+                            : core::Tr("Ton poste n'a pas le droit « storage »."));
   }
 }
 
@@ -266,11 +266,11 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
                    GuildAction& action) {
   if (view.may_invite) {
     ImGui::AlignTextToFramePadding();
-    GuildTextColored(kGuildBlackColor, core::Tr("Inviter :"));
+    ColoredText(kGuildBlackColor, core::Tr("Inviter :"));
     ImGui::SameLine();
     ImGui::SetNextItemWidth(Px(kInviteFieldPixels));
     ImGui::InputText("##guild_invite", state.invite_name.data(), state.invite_name.size());
-    GuildTooltip(core::Tr("Nom exact du personnage à inviter (il doit être connecté)."));
+    SkinTooltip(core::Tr("Nom exact du personnage à inviter (il doit être connecté)."));
     ImGui::SameLine();
     const std::string_view invited = BufferText(state.invite_name);
     if (SkinButton(core::Tr("Inviter"), art) && !invited.empty()) {
@@ -292,28 +292,16 @@ void DrawActionBar(GuildTabState& state, const GuildView& view, const SkinArt& a
       state.disband_confirm.fill('\0');
       AskModal(GuildModalName(core::Tr("Dissoudre la guilde"), kGuildDisbandModalId).c_str());
     }
-    GuildTooltip(core::Tr("Supprime définitivement la guilde (@breakguild)."));
+    SkinTooltip(core::Tr("Supprime définitivement la guilde (@breakguild)."));
   }
   if (!state.status.empty()) {
-    GuildTextColored(kGuildLabelColor, state.status.c_str());
+    ColoredText(kGuildLabelColor, state.status.c_str());
   }
 }
 
 }  // namespace
 
 ImVec4 GuildInk(ImU32 color) { return ImGui::ColorConvertU32ToFloat4(color); }
-
-void GuildTextColored(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
-
-void GuildTooltip(const char* text) {
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", text);
-  }
-}
 
 std::string_view BufferText(std::span<const char> buffer) {
   const auto end = std::find(buffer.begin(), buffer.end(), '\0');

@@ -12,7 +12,6 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
@@ -147,10 +146,10 @@ void DrawFriendsSection(CompanionAiWindowState& state, const CompanionAiView& vi
   ImGui::BeginDisabled(refused);
   const bool added = SkinSmallButton(core::Tr("Ajouter"), art);
   ImGui::EndDisabled();
-  if (refused && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", full    ? core::Tr("La liste d'amis du compagnon est pleine.")
-                            : known ? core::Tr("Ce nom est déjà dans la liste.")
-                                    : core::Tr("Tapez le nom exact d'un personnage."));
+  if (refused) {
+    SkinTooltip(full    ? core::Tr("La liste d'amis du compagnon est pleine.")
+                : known ? core::Tr("Ce nom est déjà dans la liste.")
+                        : core::Tr("Tapez le nom exact d'un personnage."));
   }
   if ((added || entered) && !refused) {
     action.verb = CompanionAiVerb::kAddFriend;

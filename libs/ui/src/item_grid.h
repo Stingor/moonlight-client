@@ -301,10 +301,6 @@ void DrawActiveTabBridge(ImDrawList* into, const TabStripResult& strip, const Sk
 // ⚠ UNE FONCTION ET NON UNE CONSTANTE, pour que le texte reste un littéral
 // passé à `Tr` : le relevé des traductions ne lit que ceux-là, et il a raison de
 // n'en lire que ceux-là. Le mot vit donc à UN endroit, avec la règle qu'il dit.
-//
-// ⚠ ET PAS `SkinTooltip` : elle interroge `IsItemHovered` sans drapeau, et un
-// élément désactivé n'est jamais survolé à ce compte-là. L'explication ne
-// paraîtrait donc jamais, et c'est précisément sur celui-là qu'elle sert.
 void StorageBlocksTransferTooltip();
 
 // Ce que le joueur a répondu. `slot` nul tant qu'il n'a pas validé.

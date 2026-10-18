@@ -47,9 +47,7 @@ constexpr std::size_t kLineBytes = 160;
   ImGui::BeginDisabled(!usable);
   const bool clicked = SkinSmallButton(label, art);
   ImGui::EndDisabled();
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(tip);
-  }
+  SkinTooltip(tip);
   return clicked;
 }
 

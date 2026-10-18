@@ -15,6 +15,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -249,7 +250,7 @@ void DrawCanvas(EmblemCanvas& canvas) {
 void DrawTools(EmblemCanvas& canvas, const SkinArt& art) {
   ImGui::Spacing();
   ImGui::AlignTextToFramePadding();
-  GuildTextColored(kGuildLabelColor, core::Tr("Outil :"));
+  ColoredText(kGuildLabelColor, core::Tr("Outil :"));
   ImGui::SameLine();
   for (std::size_t rank = 0; rank < kEmblemToolCount; ++rank) {
     const auto tool = static_cast<EmblemTool>(rank);
@@ -259,7 +260,7 @@ void DrawTools(EmblemCanvas& canvas, const SkinArt& art) {
                          ImVec2(Px(kToolButtonPixels), 0.0F))) {
       canvas.tool = tool;
     }
-    GuildTooltip(ToolHint(tool));
+    SkinTooltip(ToolHint(tool));
     ImGui::PopID();
     // Deux rangées de trois : ce qui peint au fil du geste, puis ce qui se tire.
     if (tool != EmblemTool::kFill && tool != EmblemTool::kEllipse) {
@@ -267,14 +268,14 @@ void DrawTools(EmblemCanvas& canvas, const SkinArt& art) {
     }
   }
   ImGui::SameLine();
-  GuildTextColored(kGuildLabelColor, core::Tr("(clic droit = efface)"));
+  ColoredText(kGuildLabelColor, core::Tr("(clic droit = efface)"));
 
   ImGui::SetNextItemWidth(Px(kBrushSliderPixels));
   static_cast<void>(
       SkinSliderInt(core::Tr("Épaisseur"), &canvas.brush, 1, kEmblemBrushMost, art, "%d px"));
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Symétrie"), &canvas.mirror, art));
-  GuildTooltip(core::Tr("Chaque trait est répété en miroir gauche/droite."));
+  SkinTooltip(core::Tr("Chaque trait est répété en miroir gauche/droite."));
   ImGui::SameLine();
   // Grisée plutôt que cachée ailleurs que sur le rectangle et l'ellipse : la
   // barre d'outils ne saute pas d'un outil à l'autre.
@@ -293,7 +294,7 @@ void TakeInk(EmblemCanvas& canvas) {
 
 void DrawColors(EmblemCanvas& canvas, const SkinArt& art) {
   ImGui::AlignTextToFramePadding();
-  GuildTextColored(kGuildLabelColor, core::Tr("Couleur :"));
+  ColoredText(kGuildLabelColor, core::Tr("Couleur :"));
   ImGui::SameLine();
   if (SkinColorSwatch("##couleur", canvas.color, art)) {
     TakeInk(canvas);
@@ -302,7 +303,7 @@ void DrawColors(EmblemCanvas& canvas, const SkinArt& art) {
   // LA TRANSPARENCE EST UNE COULEUR : elle laisse l'outil tel quel, pour qu'on
   // puisse en remplir une zone ou en tracer une forme.
   ImGui::AlignTextToFramePadding();
-  GuildTextColored(kGuildLabelColor, core::Tr("Transparence :"));
+  ColoredText(kGuildLabelColor, core::Tr("Transparence :"));
   ImGui::SameLine();
   const float swatch = ImGui::GetFrameHeight();
   if (ImGui::ColorButton("##transparent", GuildInk(Opaque(kEmblemCanvasClear)),
@@ -310,14 +311,14 @@ void DrawColors(EmblemCanvas& canvas, const SkinArt& art) {
                          ImVec2(swatch * kClearSwatchStretch, swatch))) {
     canvas.color_clear = true;
   }
-  GuildTooltip(
+  SkinTooltip(
       core::Tr("Magenta pur (255, 0, 255) : ces pixels sont transparents en jeu.\n"
                "S'utilise avec n'importe quel outil (remplissage, formes…)."));
   if (canvas.color_clear) {
     ImGui::SameLine();
-    GuildTextColored(kActiveInkColor, core::Tr("couleur active"));
+    ColoredText(kActiveInkColor, core::Tr("couleur active"));
   }
-  GuildTextColored(kGuildLabelColor, core::Tr("Palette :"));
+  ColoredText(kGuildLabelColor, core::Tr("Palette :"));
   ImGui::SameLine();
   const float side = ImGui::GetFrameHeight() - Px(kSwatchInsetPixels);
   for (std::size_t index = 0; index < kSwatches.size(); ++index) {
@@ -352,7 +353,7 @@ void DrawGallery(GuildTabState& state, const GuildView& view, GuildAction& actio
                        style.WindowPadding.y * 2.0F + style.ChildBorderSize * 2.0F;
   if (ImGui::BeginChild("##galerie", ImVec2(0.0F, height), ImGuiChildFlags_Borders)) {
     if (view.gallery.empty()) {
-      GuildTextColored(kGuildLabelColor, core::Tr("Aucun item dans l'inventory."));
+      ColoredText(kGuildLabelColor, core::Tr("Aucun item dans l'inventory."));
     }
     ImDrawList* into = ImGui::GetWindowDrawList();
     for (std::size_t index = 0; index < view.gallery.size(); ++index) {
@@ -393,7 +394,7 @@ void DrawGallery(GuildTabState& state, const GuildView& view, GuildAction& actio
 void DrawItemImport(GuildTabState& state, const GuildView& view, const SkinArt& art,
                     GuildAction& action) {
   ImGui::AlignTextToFramePadding();
-  GuildTextColored(kGuildLabelColor, core::Tr("Partir d'une icône d'item :"));
+  ColoredText(kGuildLabelColor, core::Tr("Partir d'une icône d'item :"));
   ImGui::SameLine();
   ImGui::SetNextItemWidth(Px(kItemFieldPixels));
   ImGui::InputInt("##objet", &state.emblem.item_id, 0, 0);
@@ -415,17 +416,17 @@ void DrawItemImport(GuildTabState& state, const GuildView& view, const SkinArt& 
     action.item_id = static_cast<std::uint32_t>(state.emblem.item_id);
   }
   ImGui::EndDisabled();
-  GuildTooltip(core::Tr("Remplace le dessin par l'icône de l'item (annulable)."));
+  SkinTooltip(core::Tr("Remplace le dessin par l'icône de l'item (annulable)."));
   if (state.emblem.item_id > 0 && !view.typed_item_icon.usable()) {
     ImGui::SameLine();
-    GuildTextColored(kGuildRedColor, core::Tr("aucune icône"));
+    ColoredText(kGuildRedColor, core::Tr("aucune icône"));
   }
   ImGui::SameLine();
   if (SkinToggleButton(core::Tr("Inventory"), state.emblem.gallery_open, art,
                        ImVec2(Px(kGalleryTogglePixels), 0.0F))) {
     state.emblem.gallery_open = !state.emblem.gallery_open;
   }
-  GuildTooltip(core::Tr("Choisir l'icône dans son inventory, sans connaître les numéros."));
+  SkinTooltip(core::Tr("Choisir l'icône dans son inventory, sans connaître les numéros."));
   if (state.emblem.gallery_open) {
     DrawGallery(state, view, action);
   }
@@ -437,7 +438,7 @@ void DrawSend(GuildTabState& state, const GuildView& view, const SkinArt& art,
   std::array<char, 192> line = {};
   std::snprintf(line.data(), line.size(), core::Tr("%zu octets (BMP %dx%d, 24 bits)."),
                 view.canvas_bytes, kEmblemCanvasSide, kEmblemCanvasSide);
-  GuildTextColored(kGuildLabelColor, line.data());
+  ColoredText(kGuildLabelColor, line.data());
   // Le serveur refuse un emblème trop vide : mieux vaut le dire pendant qu'on
   // dessine qu'après un envoi rejeté.
   if (view.canvas_transparency > view.transparency_limit) {
@@ -445,7 +446,7 @@ void DrawSend(GuildTabState& state, const GuildView& view, const SkinArt& art,
                   core::Tr("Transparence ~%d %% : au-delà de %d %% le serveur refuse — "
                            "remplis davantage le fond."),
                   view.canvas_transparency, view.transparency_limit);
-    GuildTextColored(kGuildRedColor, line.data());
+    ColoredText(kGuildRedColor, line.data());
   }
   const bool has_ink = EmblemCanvasHasInk(state.emblem.canvas);
   const bool may_send = has_ink && view.guild_id > 0;
@@ -465,7 +466,7 @@ void DrawSend(GuildTabState& state, const GuildView& view, const SkinArt& art,
     ImGui::SameLine();
     std::snprintf(line.data(), line.size(), core::Tr("Envoi impossible : %s."),
                   has_ink ? core::Tr("guilde inconnue du client") : core::Tr("dessin vide"));
-    GuildTextColored(kGuildRedColor, line.data());
+    ColoredText(kGuildRedColor, line.data());
   }
   ImGui::SameLine();
   ImGui::SetNextItemWidth(Px(kSaveNamePixels));
@@ -509,7 +510,7 @@ void DrawEmblemPaintTab(GuildTabState& state, const GuildView& view, const SkinA
     action.verb = GuildVerb::kLoadCurrentEmblem;
   }
   ImGui::EndDisabled();
-  GuildTooltip(core::Tr("Repart de l'emblème que porte la guilde (annulable)."));
+  SkinTooltip(core::Tr("Repart de l'emblème que porte la guilde (annulable)."));
 
   DrawItemImport(state, view, art, action);
   DrawSend(state, view, art, action);

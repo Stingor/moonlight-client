@@ -18,6 +18,7 @@
 #include "ro/ui/wheel_gate.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -277,9 +278,7 @@ void DrawFilters(CashShopWindowState& state, std::span<const CashShopCard> cards
     if (!SlotMatches(card, state.slot)) {
       continue;
     }
-    // ⚠ PAR SES BORNES, sans copie : la liste se refiltre à chaque image, et
-    // un onglet compte des milliers de cartes.
-    if (state.filter.PassFilter(card.name.data(), card.name.data() + card.name.size())) {
+    if (PassesTextFilter(state.filter, card.name)) {
       shown.push_back(&card);
     }
   }

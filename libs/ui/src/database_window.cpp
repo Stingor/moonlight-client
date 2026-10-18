@@ -19,6 +19,7 @@
 #include "ro/ui/trade_widgets.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 
@@ -50,10 +51,6 @@ constexpr std::size_t kLineBytes = 64;
 constexpr float kFooterLines = 1.0F;
 constexpr const char* kListMenuId = "##database_list_menu";
 
-void TextOf(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
-
 // UNE LISTE DE FILTRE : « tous », puis la table. Fermée, elle se nomme devant
 // son choix. Rend vrai sur un changement.
 template <std::size_t Count>
@@ -76,7 +73,7 @@ std::array<const char*, Count> LabelsOf(const std::array<Entry, Count>& entries)
 void LevelBounds(const char* id_least, const char* id_most, int* least, int* most,
                  const SkinArt& art) {
   ImGui::AlignTextToFramePadding();
-  TextOf(core::Tr("Niveau"));
+  Unformatted(core::Tr("Niveau"));
   ImGui::SameLine();
   ImGui::SetNextItemWidth(kLevelFieldPixels * Scale());
   static_cast<void>(SkinInputInt(id_least, least, 0, kDatabaseHighestLevel, 1, 0, art));
@@ -244,7 +241,7 @@ void DrawList(DatabaseWindowState& state, const DatabaseView& view, const SkinAr
   }
   PaintWindowScrollbar(art);
   ImGui::EndTable();
-  TextOf(view.summary);
+  Unformatted(view.summary);
 }
 
 void DrawListPane(DatabaseWindowState& state, const DatabaseView& view, const SkinArt& art,
@@ -287,18 +284,14 @@ void DrawTabs(DatabaseWindowState& state, const SkinArt& art) {
     state.scroll_to_shown = true;
   }
   ImGui::EndDisabled();
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(core::Tr("Fiche précédente"));
-  }
+  SkinTooltip(core::Tr("Fiche précédente"));
   ImGui::SameLine();
   ImGui::BeginDisabled(!state.history.can_go_forward());
   if (SkinSmallButton(">##db_forward", art) && state.history.Forward()) {
     state.scroll_to_shown = true;
   }
   ImGui::EndDisabled();
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(core::Tr("Fiche suivante"));
-  }
+  SkinTooltip(core::Tr("Fiche suivante"));
 }
 
 void DrawSheetPane(DatabaseWindowState& state, const DatabaseView& view,
@@ -433,7 +426,7 @@ DatabaseAnswer DrawDatabaseWindow(DatabaseWindowState& state, const DatabaseView
       state.open) {
     DrawTabs(state, art);
     if (view.loading) {
-      TextOf(core::Tr("Lecture de la base de données…"));
+      Unformatted(core::Tr("Lecture de la base de données…"));
     } else if (!view.status.empty()) {
       ImGui::TextWrapped("%.*s", static_cast<int>(view.status.size()), view.status.data());
     } else if (ImGui::BeginTable("##db_split", kSplitColumns,

@@ -14,6 +14,8 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -27,13 +29,6 @@ constexpr int kBugReportRank = 0;
 // L'intertitre d'une famille de lignes : une couleur choisie pour le corps clair
 // du jeu, traduite pour celui de l'habillage.
 constexpr ImU32 kGroupTextColor = IM_COL32(86, 96, 124, 255);
-
-// Le texte secondaire de l'habillage, que sa palette a posé.
-void FaintText(const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
 
 // Choisir un autre onglet annule la capture : sa ligne peut n'être plus à
 // l'écran, et la prochaine touche lui irait sans que le joueur le voie.
@@ -109,9 +104,7 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
     // toujours hors de l'écran. Sans cette phrase, le joueur perd un raccourci
     // sans jamais l'apprendre. ⚠ PLUS SOUTENUE QUE LE TEXTE SECONDAIRE : c'est un
     // avertissement, pas une indication de routine.
-    ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().warn_text);
-    ImGui::TextWrapped("%s", state.robbed);
-    ImGui::PopStyleColor();
+    ColoredWrapped(PaintingLook().warn_text, state.robbed);
   } else {
     FaintText(core::Tr("Cliquez sur une touche pour la changer."));
   }
@@ -151,9 +144,7 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
             (!any_shown || row.group != shown_group)) {
           ImGui::TableNextRow();
           ImGui::TableNextColumn();
-          ImGui::PushStyleColor(ImGuiCol_Text, group_ink);
-          ImGui::TextUnformatted(row.group.data(), row.group.data() + row.group.size());
-          ImGui::PopStyleColor();
+          ColoredText(group_ink, row.group);
           ImGui::TableNextColumn();
         }
         shown_group = row.group;
@@ -161,7 +152,7 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
         ImGui::PushID(rank);
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        ImGui::TextUnformatted(row.action.data(), row.action.data() + row.action.size());
+        Unformatted(row.action);
 
         ImGui::TableNextColumn();
         // ⚠ LE BOUTON PORTE LA TOUCHE, et c'est lui qu'on clique pour la changer :

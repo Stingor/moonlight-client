@@ -11,6 +11,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -109,9 +110,7 @@ CharacterSelectAction DrawRenameWindow(CharacterSelectState& state, const Charac
   ImGui::TextUnformatted(question.data());
   // ⚠ LE PRIX SE DIT AVANT LE GESTE : le renommage se décompte, et le serveur
   // n'en rend pas.
-  ImGui::PushStyleColor(ImGuiCol_Text, kWarningColor);
-  ImGui::TextUnformatted(core::Tr("Le renommage utilise ton droit au changement de nom."));
-  ImGui::PopStyleColor();
+  ColoredText(kWarningColor, core::Tr("Le renommage utilise ton droit au changement de nom."));
 
   ImGui::SetNextItemWidth(field);
   if (ImGui::IsWindowAppearing()) {
@@ -123,14 +122,10 @@ CharacterSelectAction DrawRenameWindow(CharacterSelectState& state, const Charac
 
   ImGui::Spacing();
   if (view.amend_pending) {
-    ImGui::PushStyleColor(ImGuiCol_Text, kPendingColor);
-    ImGui::TextUnformatted(core::Tr("Renommage en cours…"));
-    ImGui::PopStyleColor();
+    ColoredText(kPendingColor, core::Tr("Renommage en cours…"));
   } else if (!view.rename_refusal.empty()) {
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + field);
-    ImGui::PushStyleColor(ImGuiCol_Text, kRefusalColor);
-    ImGui::TextUnformatted(view.rename_refusal.c_str());
-    ImGui::PopStyleColor();
+    ColoredText(kRefusalColor, view.rename_refusal.c_str());
     ImGui::PopTextWrapPos();
   }
 

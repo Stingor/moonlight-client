@@ -14,6 +14,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "description_odds.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -269,15 +270,11 @@ void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float wide
   } else if (view.damaged) {
     const ImVec2 at = ImGui::GetCursorPos();
     ImGui::SetCursorPos(ImVec2(at.x + kBrokenShadowPixels, at.y + kBrokenShadowPixels));
-    ImGui::PushStyleColor(ImGuiCol_Text, kDescriptionBrokenShadow);
-    ImGui::TextUnformatted(shown_name.c_str());
-    ImGui::PopStyleColor();
+    ColoredText(kDescriptionBrokenShadow, shown_name.c_str());
     ImGui::SetCursorPos(at);
   }
   if (view.name_pieces.empty()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ReadableOn(kDescriptionNameColor, art.look().paper));
-    ImGui::TextUnformatted(shown_name.c_str());
-    ImGui::PopStyleColor();
+    ColoredText(ReadableOn(kDescriptionNameColor, art.look().paper), shown_name.c_str());
   }
   ImGui::PopTextWrapPos();
 

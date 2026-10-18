@@ -18,6 +18,7 @@
 
 #include "chat_room_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -125,9 +126,7 @@ void DrawMembers(ChatRoomWindowState& state, const ChatRoomView& view,
     if (aimed == view.members.end()) {
       ImGui::CloseCurrentPopup();
     } else {
-      ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-      ImGui::TextUnformatted(state.menu_member.c_str());
-      ImGui::PopStyleColor();
+      FaintText(state.menu_member.c_str());
       ImGui::Separator();
       for (const ChatRoomMemberEntry& entry : ChatRoomMemberMenu(*aimed, view)) {
         if (ImGui::MenuItem(MemberVerbLabel(entry.verb, view).c_str(), nullptr, false,
@@ -187,10 +186,7 @@ void DrawSettingsPane(ChatRoomWindowState& state, const ChatRoomView& view, cons
   SkinTooltip(core::Tr("Afficher / masquer le mot de passe"));
   ImGui::EndDisabled();
   if (!view.settings_error.empty()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
-    ImGui::TextUnformatted(view.settings_error.data(),
-                           view.settings_error.data() + view.settings_error.size());
-    ImGui::PopStyleColor();
+    ColoredText(PaintingLook().bad_text, view.settings_error);
   }
 
   const std::string_view title = Typed(state.settings_title);
@@ -292,9 +288,8 @@ ChatRoomWindowAction DrawChatRoomWindow(ChatRoomWindowState& state, const ChatRo
       action.said = DrawChatInput(*view.input, *view.preview, &action.input, art, view.input_links,
                                   view.link_facts);
     } else {
-      ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
-      ImGui::TextUnformatted(core::Tr("La conversation est fermée : rien ne peut s'écrire ici."));
-      ImGui::PopStyleColor();
+      ColoredText(PaintingLook().bad_text,
+                  core::Tr("La conversation est fermée : rien ne peut s'écrire ici."));
     }
 
     // ── LES BOUTONS ─────────────────────────────────────────────────────────

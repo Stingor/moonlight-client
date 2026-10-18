@@ -5,12 +5,14 @@
 #include <cstdio>
 #include <string>
 
+#include <imgui.h>
+
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
-#include "imgui.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -246,10 +248,9 @@ std::size_t DrawLogWindow(LogWindowState& state, std::span<const core::LoggedLin
     if (shown.empty()) {
       // Sans ce mot, un filtre qui ne trouve rien donne une fenêtre VIDE, ce
       // qui ressemble à une panne plutôt qu'à un résultat.
-      ImGui::PushStyleColor(ImGuiCol_Text, ColorOf(core::LogLevel::kDebug));
-      ImGui::TextUnformatted(lines.empty() ? core::Tr("Le journal est vide.")
-                                           : core::Tr("Aucune ligne ne passe le filtre."));
-      ImGui::PopStyleColor();
+      ColoredText(ColorOf(core::LogLevel::kDebug),
+                  lines.empty() ? core::Tr("Le journal est vide.")
+                                : core::Tr("Aucune ligne ne passe le filtre."));
     }
     // ⚠ SEULES LES LIGNES VISIBLES SE METTENT EN PAGE : le journal en garde
     // quatre mille, et les dessiner toutes posait huit mille éléments ImGui à
@@ -283,9 +284,7 @@ std::size_t DrawLogWindow(LogWindowState& state, std::span<const core::LoggedLin
         ImGui::PopStyleColor();
         ImGui::PopID();
         ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Text, ColorOf(line.level));
-        ImGui::TextUnformatted(line.text.c_str());
-        ImGui::PopStyleColor();
+        ColoredText(ColorOf(line.level), line.text.c_str());
       }
     }
     // ⚠ ON NE REDESCEND QUE SI L'ON ÉTAIT DÉJÀ EN BAS. Sans cette condition, la

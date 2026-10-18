@@ -160,9 +160,10 @@ void DrawToolbar(const MapEditorView& view, std::vector<MapEditorIntent>& intent
   ImGui::BeginDisabled(!view.ground.allowed);
   offer(MapEditorTool::kRelief, core::Tr("Relief"));
   ImGui::EndDisabled();
-  if (!view.ground.allowed && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", core::Tr("Le relief retouché ne se voit qu'avec « Ombres en temps "
-                                     "réel », page Graphics."));
+  if (!view.ground.allowed) {
+    SkinTooltip(
+        core::Tr("Le relief retouché ne se voit qu'avec « Ombres en temps "
+                 "réel », page Graphics."));
   }
 }
 

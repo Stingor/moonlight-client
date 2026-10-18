@@ -18,6 +18,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -81,21 +83,7 @@ constexpr std::size_t kIdTextBytes = 16;
 }
 
 // ── LE TEXTE GRIS D'UN ÉTAT VIDE, une fois ──────────────────────────────────
-//
-// 🔴 L'ENJEU EST L'APPARIEMENT : une couleur poussée dont le retrait manque
-// déteint sur tout ce que la frame dessine ENSUITE, loin de sa cause. Ici les
-// deux vont ensemble par construction.
-void DimNotice(const char* message) {
-  ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().faint_text);
-  ImGui::TextWrapped("%s", message);
-  ImGui::PopStyleColor();
-}
-
-void ColoredWrapped(ImU32 color, const char* message) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextWrapped("%s", message);
-  ImGui::PopStyleColor();
-}
+void DimNotice(const char* message) { ColoredWrapped(PaintingLook().faint_text, message); }
 
 // ── LA NAVIGATION ───────────────────────────────────────────────────────────
 
@@ -521,9 +509,7 @@ void DrawSheet(CraftAtlasWindowState& state, const CraftAtlasView& view, const S
   }
   ImGui::SameLine();
   ImGui::BeginGroup();
-  ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().text);
-  ImGui::TextUnformatted(sheet.item.name.data(), sheet.item.name.data() + sheet.item.name.size());
-  ImGui::PopStyleColor();
+  ColoredText(PaintingLook().text, sheet.item.name);
   ImGui::TextColored(
       ImGui::ColorConvertU32ToFloat4(sheet.item.owned > 0 ? PaintingLook().good_text
                                                           : PaintingLook().faint_text),
@@ -693,13 +679,12 @@ void DrawCraftRecipePreview(const CraftRecipePreview& preview, const SkinArt& ar
     return;
   }
   ImGui::PushTextWrapPos(Em() * kPreviewWrapEm);
-  ImGui::TextUnformatted(preview.product_name.data(),
-                         preview.product_name.data() + preview.product_name.size());
+  Unformatted(preview.product_name);
   ImGui::Separator();
   const ImVec4 dim = ImGui::ColorConvertU32ToFloat4(PaintingLook().faint_text);
   const int label_bytes = static_cast<int>(preview.skill_label.size());
   if (preview.skill_id == 0) {
-    ImGui::TextColored(dim, "%.*s", label_bytes, preview.skill_label.data());
+    ColoredText(dim, preview.skill_label);
   } else {
     ImGui::TextColored(dim, core::Tr("%.*s  (niveau %d)"), label_bytes, preview.skill_label.data(),
                        preview.skill_level);

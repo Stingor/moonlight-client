@@ -10,6 +10,7 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_popup.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -32,6 +33,13 @@ constexpr float kBoxWidthPixels = 300.0F;
 constexpr float kBoxPaddingPixels = 14.0F;
 constexpr float kQuestionGapPixels = 10.0F;
 
+// Ni barre de titre, ni poignée de taille, ni barre de défilement, et rien de lu
+// ni d'écrit dans le .ini : il n'y a rien à retenir, puisque `BeginBox` recentre
+// la boîte à chaque ouverture et repose sa largeur à chaque image.
+constexpr ImGuiWindowFlags kBoxFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                       ImGuiWindowFlags_NoScrollbar |
+                                       ImGuiWindowFlags_NoSavedSettings;
+
 [[nodiscard]] bool Paintable(const SkinArt& art) {
   return std::ranges::all_of(kFramePieces,
                              [&art](render::SkinPiece piece) { return art.Get(piece).usable(); });
@@ -52,12 +60,11 @@ void Stretch(ImDrawList* into, const SkinArt& art, const SkinImage& image, ImVec
 // la raison d'un découpage : un cadre étiré en une seule image déforme ses
 // angles, et cela se voit au premier coup d'œil.
 void PaintFrame(ImDrawList* into, const SkinArt& art, ImVec2 top_left, ImVec2 bottom_right) {
-  const float scale = Scale();
   const SkinImage& corner = art.Get(render::SkinPiece::kFrameTopLeft);
   const SkinImage& bottom = art.Get(render::SkinPiece::kFrameBottomLeft);
-  const float wide = corner.width * scale;
-  const float high = corner.height * scale;
-  const float low = bottom.height * scale;
+  const float wide = Px(corner.width);
+  const float high = Px(corner.height);
+  const float low = Px(bottom.height);
 
   const float left = top_left.x;
   const float right = bottom_right.x;
@@ -108,11 +115,10 @@ struct BoxStyle {
   }
   style.skin = PushSkinStyle(art);
   // Le fond d'ImGui s'efface : c'est le cadre qu'on peint qui fait le corps.
-  const float scale = Scale();
   ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0, 0, 0, 0));
   ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
-                      ImVec2(kBoxPaddingPixels * scale, kBoxPaddingPixels * scale));
+                      ImVec2(Px(kBoxPaddingPixels), Px(kBoxPaddingPixels)));
   return style;
 }
 
@@ -125,9 +131,96 @@ void PopBoxStyle(BoxStyle style) {
   PopSkinStyle(style.skin);
 }
 
+// Ce que l'ouverture d'une boîte a posé, et ce qu'elle a trouvé.
+struct OpenedBox {
+  BoxStyle style;
+  // `BeginPopupModal` a rendu vrai : le contenu se dessine.
+  bool open = false;
+};
+
+// LA COQUE DES BOÎTES : centrée, habillée, à largeur fixe, son cadre peint.
+//
+// ⚠ `EndBox` S'APPELLE TOUJOURS, ouverte ou non : c'est lui qui dépile
+// l'habillage, posé AVANT de savoir si la boîte s'ouvrirait.
+[[nodiscard]] OpenedBox BeginBox(const char* id, const SkinArt& art) {
+  // ⚠ AU CENTRE, À CHAQUE FOIS. Une boîte qu'on doit chercher a manqué son but :
+  // elle interrompt, donc elle tombe sous les yeux.
+  const ImGuiViewport* screen = ImGui::GetMainViewport();
+  ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+
+  const float width = Px(kBoxWidthPixels);
+  OpenedBox box{.style = PushBoxStyle(art)};
+  ImGui::SetNextWindowSize(ImVec2(width, 0.0F), ImGuiCond_Always);
+
+  box.open = ImGui::BeginPopupModal(id, nullptr, kBoxFlags);
+  if (!box.open) {
+    return box;
+  }
+  ImGuiWindow* window = ImGui::GetCurrentWindow();
+  if (box.style.painted) {
+    // ⚠ LE CADRE SE PEINT SOUS LE CONTENU, donc AVANT lui : la liste de dessin
+    // est chronologique, et le peindre après l'aurait recouvert. La taille est
+    // celle de l'image PRÉCÉDENTE — la hauteur s'ajuste au texte —, ce qui ne
+    // se voit pas : ImGui la fixe dès la seconde image d'ouverture.
+    PaintFrame(window->DrawList, art, window->Pos,
+               ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y));
+  }
+  return box;
+}
+
+// Termine la coque ouverte par `BeginBox`, et dépile son style dans tous les
+// cas. Une réponse tombée retire la boîte de la pile des surgissants ; sans
+// réponse, elle reste ouverte pour l'image suivante.
+void EndBox(const OpenedBox& box, bool answered) {
+  if (box.open) {
+    if (answered) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+  PopBoxStyle(box.style);
+}
+
+// Pose le curseur pour qu'une rangée large de `row_width` tombe au milieu de la
+// boîte, sans jamais repasser à gauche de la marge.
+void CenterRow(float row_width) {
+  ImGui::SetCursorPosX(
+      std::max(ImGui::GetCursorPosX(), (ImGui::GetWindowSize().x - row_width) * 0.5F));
+}
+
+// LES DEUX BOUTONS, CENTRÉS ET DE MÊME LARGEUR — celle du plus long libellé,
+// mesurée dans la langue courante. Deux boutons de largeurs différentes se
+// lisent comme deux choses sans rapport, et c'est un choix qu'on présente.
+[[nodiscard]] ModalAnswer DrawAnswerButtons(const char* yes, const char* no, const SkinArt& art) {
+  const std::array<const char*, 2> labels = {yes, no};
+  const float button = SkinWidestButton(labels, art);
+  const float spacing = ImGui::GetStyle().ItemSpacing.x;
+  CenterRow(button * 2.0F + spacing);
+  ModalAnswer answer = ModalAnswer::kWaiting;
+  if (SkinButton(yes, art, ImVec2(button, 0.0F))) {
+    answer = ModalAnswer::kYes;
+  }
+  ImGui::SameLine();
+  if (SkinButton(no, art, ImVec2(button, 0.0F))) {
+    answer = ModalAnswer::kNo;
+  }
+  return answer;
+}
+
 }  // namespace
 
 void AskModal(const char* id) { ImGui::OpenPopup(id); }
+
+void CloseModal(const char* id) {
+  const ImGuiContext& context = *GImGui;
+  const ImGuiID popup_id = ImGui::GetID(id);
+  for (int level = 0; level < context.OpenPopupStack.Size; ++level) {
+    if (context.OpenPopupStack[level].PopupId == popup_id) {
+      ImGui::ClosePopupToLevel(level, true);
+      return;
+    }
+  }
+}
 
 namespace {
 // Y avait-il un surgissant ouvert au DÉBUT de l'image ?
@@ -144,63 +237,21 @@ namespace {
 bool g_popup_at_frame_start = false;
 }  // namespace
 
-void NotePopupsAtFrameStart() {
-  g_popup_at_frame_start =
-      ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-}
+void NotePopupsAtFrameStart() { g_popup_at_frame_start = AnyPopupOpen(); }
 
-bool PopupTakesEscape() {
-  return g_popup_at_frame_start ||
-         ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-}
+bool PopupTakesEscape() { return g_popup_at_frame_start || AnyPopupOpen(); }
 
 ModalAnswer DrawModalBox(const char* id, const char* question, const char* yes, const char* no,
                          const SkinArt& art, ModalEnter enter) {
-  // ⚠ AU CENTRE, À CHAQUE FOIS. Une boîte qu'on doit chercher a manqué son but :
-  // elle interrompt, donc elle tombe sous les yeux.
-  const ImGuiViewport* screen = ImGui::GetMainViewport();
-  ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
-
-  const float scale = Scale();
-  const BoxStyle style = PushBoxStyle(art);
-  ImGui::SetNextWindowSize(ImVec2(kBoxWidthPixels * scale, 0.0F), ImGuiCond_Always);
-
-  constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar |
-                                      ImGuiWindowFlags_NoSavedSettings;
+  const OpenedBox box = BeginBox(id, art);
   ModalAnswer answer = ModalAnswer::kWaiting;
-  if (ImGui::BeginPopupModal(id, nullptr, kFlags)) {
-    ImGuiWindow* window = ImGui::GetCurrentWindow();
-    if (style.painted) {
-      // ⚠ LE CADRE SE PEINT SOUS LE CONTENU, donc AVANT lui : la liste de dessin
-      // est chronologique, et le peindre après l'aurait recouvert. La taille est
-      // celle de l'image PRÉCÉDENTE — la hauteur s'ajuste au texte —, ce qui ne
-      // se voit pas : ImGui la fixe dès la seconde image d'ouverture.
-      PaintFrame(window->DrawList, art, window->Pos,
-                 ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y));
-    }
-
+  if (box.open) {
     ImGui::PushTextWrapPos(0.0F);
     ImGui::TextUnformatted(question);
     ImGui::PopTextWrapPos();
-    ImGui::Dummy(ImVec2(0.0F, kQuestionGapPixels * scale));
+    ImGui::Dummy(ImVec2(0.0F, Px(kQuestionGapPixels)));
 
-    // LES DEUX BOUTONS, CENTRÉS ET DE MÊME LARGEUR — celle du plus long libellé,
-    // mesurée dans la langue courante. Deux boutons de largeurs différentes se
-    // lisent comme deux choses sans rapport, et c'est un choix qu'on présente.
-    const std::array<const char*, 2> labels = {yes, no};
-    const float button = SkinWidestButton(labels, art);
-    const float spacing = ImGui::GetStyle().ItemSpacing.x;
-    const float total = button * 2.0F + spacing;
-    ImGui::SetCursorPosX(
-        std::max(ImGui::GetCursorPosX(), (ImGui::GetWindowSize().x - total) * 0.5F));
-    if (SkinButton(yes, art, ImVec2(button, 0.0F))) {
-      answer = ModalAnswer::kYes;
-    }
-    ImGui::SameLine();
-    if (SkinButton(no, art, ImVec2(button, 0.0F))) {
-      answer = ModalAnswer::kNo;
-    }
+    answer = DrawAnswerButtons(yes, no, art);
     // ⚠ ÉCHAP VAUT « NON », jamais « rien » : une boîte modale qu'on ne peut pas
     // congédier au clavier retient le jeu entier.
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
@@ -210,45 +261,24 @@ ModalAnswer DrawModalBox(const char* id, const char* question, const char* yes, 
                                       ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false))) {
       answer = ModalAnswer::kYes;
     }
-    if (answer != ModalAnswer::kWaiting) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
   }
-
-  PopBoxStyle(style);
+  EndBox(box, answer != ModalAnswer::kWaiting);
   return answer;
 }
 
 bool DrawNoticeBox(const char* id, const char* text, const char* ok, const SkinArt& art) {
-  const ImGuiViewport* screen = ImGui::GetMainViewport();
-  ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
-
-  const float scale = Scale();
-  const BoxStyle style = PushBoxStyle(art);
-  ImGui::SetNextWindowSize(ImVec2(kBoxWidthPixels * scale, 0.0F), ImGuiCond_Always);
-
-  constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar |
-                                      ImGuiWindowFlags_NoSavedSettings;
+  const OpenedBox box = BeginBox(id, art);
   bool acknowledged = false;
-  if (ImGui::BeginPopupModal(id, nullptr, kFlags)) {
-    ImGuiWindow* window = ImGui::GetCurrentWindow();
-    if (style.painted) {
-      PaintFrame(window->DrawList, art, window->Pos,
-                 ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y));
-    }
-
+  if (box.open) {
     ImGui::PushTextWrapPos(0.0F);
     ImGui::TextUnformatted(text);
     ImGui::PopTextWrapPos();
-    ImGui::Dummy(ImVec2(0.0F, kQuestionGapPixels * scale));
+    ImGui::Dummy(ImVec2(0.0F, Px(kQuestionGapPixels)));
 
     // LE BOUTON SEUL, CENTRÉ, à la largeur que prendrait chacun de deux.
     const std::array<const char*, 1> labels = {ok};
     const float button = SkinWidestButton(labels, art);
-    ImGui::SetCursorPosX(
-        std::max(ImGui::GetCursorPosX(), (ImGui::GetWindowSize().x - button) * 0.5F));
+    CenterRow(button);
     if (SkinButton(ok, art, ImVec2(button, 0.0F))) {
       acknowledged = true;
     }
@@ -261,36 +291,16 @@ bool DrawNoticeBox(const char* id, const char* text, const char* ok, const SkinA
                        ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false))) {
       acknowledged = true;
     }
-    if (acknowledged) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
   }
-
-  PopBoxStyle(style);
+  EndBox(box, acknowledged);
   return acknowledged;
 }
 
 ModalAnswer DrawRevertBox(const char* id, const char* question, const char* note, const char* yes,
                           const char* no, int seconds_left, const SkinArt& art) {
-  const ImGuiViewport* screen = ImGui::GetMainViewport();
-  ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
-
-  const float scale = Scale();
-  const BoxStyle style = PushBoxStyle(art);
-  ImGui::SetNextWindowSize(ImVec2(kBoxWidthPixels * scale, 0.0F), ImGuiCond_Always);
-
-  constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar |
-                                      ImGuiWindowFlags_NoSavedSettings;
+  const OpenedBox box = BeginBox(id, art);
   ModalAnswer answer = ModalAnswer::kWaiting;
-  if (ImGui::BeginPopupModal(id, nullptr, kFlags)) {
-    ImGuiWindow* window = ImGui::GetCurrentWindow();
-    if (style.painted) {
-      PaintFrame(window->DrawList, art, window->Pos,
-                 ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y));
-    }
-
+  if (box.open) {
     ImGui::PushTextWrapPos(0.0F);
     ImGui::TextUnformatted(question);
     // ⚠ CE QUE LE GESTE A DÉJÀ FAIT, entre la question et le délai. Le joueur
@@ -298,7 +308,7 @@ ModalAnswer DrawRevertBox(const char* id, const char* question, const char* note
     // ce que la disposition a subi ne se devine pas : elle est sous ses yeux,
     // mais rien ne lui dit qu'elle ne reviendra plus.
     if (note != nullptr && note[0] != '\0') {
-      ImGui::Dummy(ImVec2(0.0F, kQuestionGapPixels * scale));
+      ImGui::Dummy(ImVec2(0.0F, Px(kQuestionGapPixels)));
       ImGui::TextUnformatted(note);
     }
     // ⚠ LE DÉLAI EST DIT, pas seulement compté. Un nombre qui descend sans rien
@@ -307,21 +317,9 @@ ModalAnswer DrawRevertBox(const char* id, const char* question, const char* note
     ImGui::TextDisabled(core::Tr("Retour au réglage précédent dans %d s."),
                         seconds_left < 0 ? 0 : seconds_left);
     ImGui::PopTextWrapPos();
-    ImGui::Dummy(ImVec2(0.0F, kQuestionGapPixels * scale));
+    ImGui::Dummy(ImVec2(0.0F, Px(kQuestionGapPixels)));
 
-    const std::array<const char*, 2> labels = {yes, no};
-    const float button = SkinWidestButton(labels, art);
-    const float spacing = ImGui::GetStyle().ItemSpacing.x;
-    const float total = button * 2.0F + spacing;
-    ImGui::SetCursorPosX(
-        std::max(ImGui::GetCursorPosX(), (ImGui::GetWindowSize().x - total) * 0.5F));
-    if (SkinButton(yes, art, ImVec2(button, 0.0F))) {
-      answer = ModalAnswer::kYes;
-    }
-    ImGui::SameLine();
-    if (SkinButton(no, art, ImVec2(button, 0.0F))) {
-      answer = ModalAnswer::kNo;
-    }
+    answer = DrawAnswerButtons(yes, no, art);
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
       answer = ModalAnswer::kNo;
     }
@@ -331,13 +329,8 @@ ModalAnswer DrawRevertBox(const char* id, const char* question, const char* note
     if (seconds_left <= 0) {
       answer = ModalAnswer::kNo;
     }
-    if (answer != ModalAnswer::kWaiting) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
   }
-
-  PopBoxStyle(style);
+  EndBox(box, answer != ModalAnswer::kWaiting);
   return answer;
 }
 

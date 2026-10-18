@@ -7,6 +7,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -66,8 +67,7 @@ BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
-        ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(line.clock.size()),
-                           line.clock.data());
+        ColoredText(kTradeBlackText, line.clock);
         ImGui::TableNextColumn();
         const TradeItemGesture gesture = DrawTradeItem(line.item);
         if (gesture.hovered) {

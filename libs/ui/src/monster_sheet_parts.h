@@ -67,9 +67,6 @@ void Colored(ImU32 color, const char* text);
 // couleur des libellés, et sa bulle au survol.
 void Help(const char* text);
 
-// Le soulignement et la main d'un lien survolé.
-void DecorateLink(bool hovered);
-
 // Les onglets du second fichier.
 //
 // ⚠ LES TROIS TABLES QUI DÉFILENT REÇOIVENT L'HABILLAGE : chacune défile dans sa

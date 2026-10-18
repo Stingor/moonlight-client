@@ -19,13 +19,12 @@
 
 #include "craft_window_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
 
 using craft_parts::BulletWrapped;
-using craft_parts::ColoredText;
-using craft_parts::ColoredWrapped;
 
 // ── LES MESURES DE LA FENÊTRE, en pixels d'interface ────────────────────────
 constexpr float kRefineButtonPixels = 100.0F;
@@ -390,12 +389,10 @@ void DrawFooter(WeaponRefineWindowState& state, const WeaponRefineView& view, co
       state.chain_confirm_opened = true;
     }
     ImGui::EndDisabled();
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltip(
-          core::Tr("Refine TOUT SEUL, arme après arme, jusqu'à épuisement du SP, du minerai "
-                   "ou de la liste — sans confirmation à chaque tentative. Demande une "
-                   "confirmation, et ne vaut que pour cette fenêtre : rouverte, elle redemande."));
-    }
+    SkinTooltip(
+        core::Tr("Refine TOUT SEUL, arme après arme, jusqu'à épuisement du SP, du minerai "
+                 "ou de la liste — sans confirmation à chaque tentative. Demande une "
+                 "confirmation, et ne vaut que pour cette fenêtre : rouverte, elle redemande."));
     ImGui::SameLine();
   } else if (!view.relaunch_coming) {
     ImGui::BeginDisabled(view.awaiting);
@@ -403,13 +400,11 @@ void DrawFooter(WeaponRefineWindowState& state, const WeaponRefineView& view, co
       action.verb = WeaponRefineVerb::kRecast;
     }
     ImGui::EndDisabled();
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltip(
-          core::Tr("Relance le skill Upgrade Weapon pour obtenir une nouvelle liste. "
-                   "Le serveur n'autorise QU'UNE tentative par lancement : après chaque "
-                   "refine il faut relancer, et c'est ce que fait ce bouton — sans "
-                   "repasser par la barre d'action."));
-    }
+    SkinTooltip(
+        core::Tr("Relance le skill Upgrade Weapon pour obtenir une nouvelle liste. "
+                 "Le serveur n'autorise QU'UNE tentative par lancement : après chaque "
+                 "refine il faut relancer, et c'est ce que fait ce bouton — sans "
+                 "repasser par la barre d'action."));
     ImGui::SameLine();
   }
   if (SkinButton(core::Tr("Fermer"), art, ImVec2(Px(kCloseButtonPixels), 0.0F))) {

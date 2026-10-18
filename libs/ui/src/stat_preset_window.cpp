@@ -13,6 +13,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -205,7 +206,7 @@ void DrawList(StatPresetWindowState& state, const StatPresetWindowView& view, co
     ImGui::PushID(static_cast<int>(index));
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    ImGui::TextUnformatted(row.name.data(), row.name.data() + row.name.size());
+    Unformatted(row.name);
     ImGui::TableNextColumn();
     ImGui::TextUnformatted(ValuesText(row.stats).c_str());
     ImGui::TableNextColumn();

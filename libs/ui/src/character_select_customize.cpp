@@ -14,6 +14,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -109,12 +110,6 @@ constexpr const char* kPoseMenu = "##pose_siege";
   return core::Tr("livré avec le client");
 }
 
-void TextInColor(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextWrapped("%s", text);
-  ImGui::PopStyleColor();
-}
-
 // LA SECTION DES DÉCORS.
 void DrawBackgroundSection(CharacterSelectState& state, const CharacterSelectView& view,
                            const SkinArt& art, CharacterSelectAction& action) {
@@ -146,8 +141,8 @@ void DrawBackgroundSection(CharacterSelectState& state, const CharacterSelectVie
   ImGui::EndChild();
 
   if (!view.background_loaded) {
-    TextInColor(kFailureColor, core::Tr("Ce décor n'a pas pu être chargé (fichier absent ou "
-                                        "format refusé) — fond uni en attendant."));
+    ColoredWrapped(kFailureColor, core::Tr("Ce décor n'a pas pu être chargé (fichier absent ou "
+                                           "format refusé) — fond uni en attendant."));
   }
   if (SkinButton(core::Tr("Rafraîchir"), art, ImVec2(kRescanWidth * Scale(), 0.0F))) {
     action.verb = CharacterSelectVerb::kRescanBackgrounds;
@@ -170,7 +165,7 @@ void DrawBackgroundSection(CharacterSelectState& state, const CharacterSelectVie
                   core::Tr("%d image(s) se trouvent dans %s : le client ne lit pas ce dossier, "
                            "déplace-les vers data/texture/lobby/."),
                   view.misplaced_backgrounds, DisplayPath(view.misplaced_folder).c_str());
-    TextInColor(kMisplacedColor, misplaced.data());
+    ColoredWrapped(kMisplacedColor, misplaced.data());
   }
 }
 

@@ -5,6 +5,9 @@
 #include <cstdio>
 #include <cstring>
 
+#include <imgui.h>
+#include <imgui_internal.h>
+
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_popup.h"
@@ -13,8 +16,7 @@
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -110,9 +112,8 @@ void SwapRows(ChatMacroState& state, std::size_t first, std::size_t second) {
 
     const ImVec2 sprite_at(corner.x + (cell_width - kEmoteSpriteSide) * 0.5F, corner.y);
     PaintEmotion(into, emotion, sprite_at, kEmoteSpriteSide, now_s);
-    const ImVec2 measured = ImGui::CalcTextSize(emotion.command.data(),
-                                                emotion.command.data() + emotion.command.size());
-    into->AddText(ImVec2(corner.x + (cell_width - measured.x) * 0.5F,
+    const float command_width = TextWidth(emotion.command);
+    into->AddText(ImVec2(corner.x + (cell_width - command_width) * 0.5F,
                          corner.y + kEmoteSpriteSide + kEmoteTextGap),
                   text_color, emotion.command.data(),
                   emotion.command.data() + emotion.command.size());
@@ -314,14 +315,9 @@ void DrawChatMacros(ChatMacroState& state, std::span<const std::string> keys,
   // ── OÙ PART UNE MACRO ──────────────────────────────────────────────────────
   // Le renseignement que la fenêtre du client ne donne nulle part : la même
   // ligne part alentour, au groupe ou à la guilde selon ce que la barre a armé.
-  //
-  // ⚠ LE TEXTE SECONDAIRE DE L'HABILLAGE, que la palette de la fenêtre pose en
-  // `TextDisabled` — et non le gris éteint d'ImGui, illisible sur un corps clair.
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(core::Tr("Ces macros partent sur :"));
-  ImGui::PopStyleColor();
+  FaintText(core::Tr("Ces macros partent sur :"));
   ImGui::SameLine();
-  ImGui::TextUnformatted(target.data(), target.data() + target.size());
+  Unformatted(target);
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
         core::Tr("La destination suit la barre de saisie. Une macro qui commence par / "

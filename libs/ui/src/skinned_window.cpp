@@ -545,11 +545,7 @@ bool BeginSkinnedWindow(const char* name, bool* open, const SkinArt& art, Skinne
     g_title_action_clicked[static_cast<std::size_t>(rank)] =
         SkinSmallButton(asked.label, art, ImVec2(action_width, 0.0F));
     ImGui::EndDisabled();
-    // ⚠ `AllowWhenDisabled` : sans ce drapeau, un élément grisé n'est jamais
-    // survolé, et l'infobulle qui EXPLIQUE le grisé ne s'afficherait jamais.
-    if (asked.tooltip != nullptr && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltipFormat("%s", asked.tooltip);
-    }
+    SkinTooltip(asked.tooltip);
     ImGui::PopClipRect();
     window->DC.CursorPos = cursor;
     window->DC.CursorMaxPos = cursor_max;

@@ -14,6 +14,8 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -561,12 +563,10 @@ void DrawActiveTabBridge(ImDrawList* into, const TabStripResult& strip, const Sk
 }
 
 void StorageBlocksTransferTooltip() {
-  if (!ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    return;
-  }
-  SkinTooltipFormat("%s", core::Tr("Impossible tant que le storage est ouvert (règle du "
-                                   "serveur).\nFermez le storage, ou faites transiter "
-                                   "l'item par le storage."));
+  SkinTooltip(
+      core::Tr("Impossible tant que le storage est ouvert (règle du "
+               "serveur).\nFermez le storage, ou faites transiter "
+               "l'item par le storage."));
 }
 
 bool MouseOverWindow(const char* window_id) {
@@ -597,7 +597,7 @@ void DragItemFrom(const InventoryCellView& cell, ItemHolder mine, ImVec2 padding
     DrawIcon(ImGui::GetWindowDrawList(), cell, at, kDragGhostIconPixels);
     ImGui::SameLine();
   }
-  ImGui::TextUnformatted(cell.name.data(), cell.name.data() + cell.name.size());
+  Unformatted(cell.name);
   // 🔴 LE REFUS SE DIT PENDANT LE GLISSER, seul moment où l'on peut encore
   // renoncer. Après le lâcher, il ne reste qu'un geste qui n'a rien fait.
   if (refusal != nullptr) {
@@ -628,7 +628,7 @@ ItemTransferAsk AcceptItemDrop(ItemHolder mine, bool same) {
 void DrawCellTooltip(const InventoryCellView& cell, ImVec2 padding) {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);
   if (BeginSkinTooltip()) {
-    ImGui::TextUnformatted(cell.name.data(), cell.name.data() + cell.name.size());
+    Unformatted(cell.name);
     if (cell.amount > 1) {
       std::array<char, 64> quantity = {};
       std::snprintf(quantity.data(), quantity.size(), core::Tr("Quantité : %d"), cell.amount);

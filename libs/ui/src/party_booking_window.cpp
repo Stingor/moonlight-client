@@ -18,6 +18,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -166,13 +167,13 @@ void DrawJobPicker(const char* id, PartyBookingSlots& slots, const PartyBookingV
 
 void DrawRowCells(const PartyBookingRowView& row) {
   ImGui::TableNextColumn();
-  ImGui::TextUnformatted(row.levels.data(), row.levels.data() + row.levels.size());
+  Unformatted(row.levels);
   ImGui::TableNextColumn();
-  ImGui::TextUnformatted(row.place.data(), row.place.data() + row.place.size());
+  Unformatted(row.place);
   ImGui::TableNextColumn();
   ImGui::TextWrapped("%.*s", static_cast<int>(row.jobs.size()), row.jobs.data());
   ImGui::TableNextColumn();
-  ImGui::TextUnformatted(row.posted.data(), row.posted.data() + row.posted.size());
+  Unformatted(row.posted);
 }
 
 // LA LISTE DES ANNONCES. Un clic droit sur une ligne propose de chuchoter à son

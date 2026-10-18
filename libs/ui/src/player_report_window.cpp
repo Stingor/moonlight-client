@@ -14,6 +14,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -57,9 +58,8 @@ void DrawMessage(PlayerReportWindowState& state, const SkinArt& art, std::size_t
   if (too_long) {
     ImGui::PopStyleColor();
   }
-  ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
-  ImGui::TextWrapped("%s", core::Tr("Un usage abusif de cette fonction peut être sanctionné."));
-  ImGui::PopStyleColor();
+  ColoredWrapped(PaintingLook().bad_text,
+                 core::Tr("Un usage abusif de cette fonction peut être sanctionné."));
 }
 
 // LE PIED : « Envoyer » à gauche, « Annuler » à droite, du côté de la poignée.

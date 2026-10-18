@@ -11,10 +11,10 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/character_window.h"
 #include "ro/ui/skin_text.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -40,12 +40,6 @@ constexpr float kHotkeyGapPixels = 6.0F;
 constexpr float kRowEndPixels = 2.0F;
 constexpr float kNameFieldMinimumPixels = 80.0F;
 constexpr float kNameFieldGapPixels = 8.0F;
-
-void ColoredText(const ImVec4& color, std::string_view text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-  ImGui::PopStyleColor();
-}
 
 // Une pièce de la rangée : sa case, son icône, son raffinement, son nom au
 // survol. Elle ne réagit pas au clic.
@@ -255,13 +249,9 @@ void DrawSaveRow(PresetTabState& state, const PresetTabView& view, const SkinArt
     action.save_as = std::string(typed);
     state.name[0] = '\0';
   }
-  // Sans `AllowWhenDisabled`, un bouton grisé n'est jamais survolé.
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat(
-        "%s", full
+  SkinTooltip(full
                   ? core::Tr("Limite de 5 presets atteinte (renomme un existant ou supprime-en un)")
                   : core::Tr("Enregistre l'équipement porté actuellement sous ce nom"));
-  }
   ImGui::EndDisabled();
   if (state.status[0] != '\0') {
     ColoredText(kLabelColor, state.status.data());

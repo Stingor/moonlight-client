@@ -11,6 +11,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -55,12 +56,6 @@ constexpr int kOtherRowIdBase = 1000;
 constexpr int kEmptyRowIdBase = 2000;
 
 constexpr const char* kItemMenuId = "##equipement_vu_menu";
-
-void FaintText(const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
 
 // UNE CELLULE « icône + nom », gestes compris (`ro::ui::ItemLinkCell`), jeton
 // compris : la pièce garde son raffinement et ses cartes. Le même rendu pour la
@@ -245,10 +240,11 @@ void DrawHeader(const ViewEquipView& view, const SkinArt& art, ViewEquipAnswer& 
     answer.verb = ViewEquipVerb::kRefresh;
   }
   ImGui::EndDisabled();
-  if (!view.can_refresh && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", core::Tr("Cette fiche n'a pas été demandée depuis le menu "
-                                     "contextuel : le paquet ne porte pas l'identifiant du "
-                                     "joueur."));
+  if (!view.can_refresh) {
+    SkinTooltip(
+        core::Tr("Cette fiche n'a pas été demandée depuis le menu "
+                 "contextuel : le paquet ne porte pas l'identifiant du "
+                 "joueur."));
   }
 }
 

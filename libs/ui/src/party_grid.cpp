@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 #include "party_grid_parts.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -234,9 +235,7 @@ PartyGridAnswer DrawPartyGrid(const PartyGridView& view, PartyGridLook& look, Pa
 
   // Aucune infobulle par-dessus un menu ouvert, ni sur une icône d'état, qui
   // porte la sienne.
-  const bool popup_open =
-      ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-  if (look.show_tooltip && hovered != nullptr && !status_hovered && !popup_open) {
+  if (look.show_tooltip && hovered != nullptr && !status_hovered && !AnyPopupOpen()) {
     party_grid::DrawTileTooltip(*hovered, look);
   }
   party_grid::DrawMemberMenu(state, view, answer);

@@ -18,6 +18,8 @@
 #include "ro/ui/window_name.h"
 
 #include "entry_queue_parts.h"
+#include "ui_popup.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -37,11 +39,6 @@ constexpr std::size_t kTextCapacity = 256;
 using Text = std::array<char, kTextCapacity>;
 
 [[nodiscard]] std::string Owned(std::string_view text) { return std::string(text); }
-
-// Un surgissant est-il ouvert, où que ce soit ?
-[[nodiscard]] bool AnyPopupOpen() {
-  return ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-}
 
 // Le nom d'une modale : son titre traduit et son identité, qui ne bouge pas.
 [[nodiscard]] std::string ModalName(const char* title, const char* id) {
@@ -77,8 +74,7 @@ void DrawStandbyFacts(const EntryQueueView& view) {
 
   ImGui::TextUnformatted(labels[0]);
   ImGui::SameLine(column);
-  ImGui::TextUnformatted(view.queued_name.data(),
-                         view.queued_name.data() + view.queued_name.size());
+  Unformatted(view.queued_name);
 
   ImGui::TextUnformatted(labels[1]);
   ImGui::SameLine(column);
@@ -142,12 +138,12 @@ EntryQueueAction DrawEntryQueueStandby(EntryQueueWindowState& state, const Entry
     AskEntryQueueVerb(state, EntryQueueVerb::kCancel);
   }
   ImGui::EndDisabled();
-  TellEntryQueueWhy(blocker);
+  SkinTooltip(blocker);
   ImGui::SameLine();
   if (SkinButton(core::Tr("Fermer (rester en file)"), art)) {
     state.standby_open = false;
   }
-  TellEntryQueueWhy(
+  SkinTooltip(
       core::Tr("L'icône Champ de bataille du menu rouvre cette fenêtre tant que vous êtes en "
                "file."));
 
@@ -226,14 +222,14 @@ EntryQueueAction DrawEntryQueueReady(EntryQueueWindowState& state, const EntryQu
     action.verb = EntryQueueVerb::kAccept;
   }
   ImGui::EndDisabled();
-  TellEntryQueueWhy(blocker);
+  SkinTooltip(blocker);
   ImGui::SameLine();
   ImGui::BeginDisabled(blocker != nullptr);
   if (SkinButton(core::Tr("Refuser"), art)) {
     action.verb = EntryQueueVerb::kDecline;
   }
   ImGui::EndDisabled();
-  TellEntryQueueWhy(blocker);
+  SkinTooltip(blocker);
   // 🔴 UNE MODALE SANS RÉPONSE POSSIBLE OFFRE TOUJOURS UNE SORTIE : elle bloque
   // toute l'interface, chat compris. Fermée, elle se redemande depuis « en
   // attente » tant que l'invitation court.
@@ -264,7 +260,7 @@ EntryQueueAction DrawEntryQueueNotice(EntryQueueWindowState& state, const EntryQ
       return action;
     }
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kEntryQueueWrapFonts);
-    ImGui::TextUnformatted(view.notice.data(), view.notice.data() + view.notice.size());
+    Unformatted(view.notice);
     ImGui::PopTextWrapPos();
     ImGui::Spacing();
     if (SkinButton(core::Tr("Fermer"), art)) {

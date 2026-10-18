@@ -16,6 +16,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "description_odds.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -80,8 +81,7 @@ void DrawPetFacts(const DescriptionView& view) {
     if (!view.pet_intimacy.empty()) {
       ImGui::TextDisabled("%s", core::Tr("Intimité"));
       ImGui::SameLine();
-      ImGui::TextUnformatted(view.pet_intimacy.data(),
-                             view.pet_intimacy.data() + view.pet_intimacy.size());
+      Unformatted(view.pet_intimacy);
     }
     ImGui::TextDisabled(
         "%s", view.pet_renamed ? core::Tr("Déjà renommé") : core::Tr("Renommage disponible"));
@@ -329,7 +329,7 @@ void DrawPreviewInstance(const DescriptionView& view) {
       if (card.name.empty()) {
         ImGui::Text("#%u", static_cast<unsigned>(card.id));
       } else {
-        ImGui::TextUnformatted(card.name.data(), card.name.data() + card.name.size());
+        Unformatted(card.name);
       }
     }
   }

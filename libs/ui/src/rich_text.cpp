@@ -11,6 +11,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_tooltip.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -354,9 +356,7 @@ RichText LayOutRichText(std::span<const std::string> lines, ImU32 default_color,
 
 RichText LayOutRichTextHere(std::span<const std::string> lines, ImU32 default_color,
                             float wrap_width) {
-  const auto measure = [](std::string_view piece, void* /*owner*/) {
-    return ImGui::CalcTextSize(piece.data(), piece.data() + piece.size()).x;
-  };
+  const auto measure = [](std::string_view piece, void* /*owner*/) { return TextWidth(piece); };
   return LayOutRichText(lines, default_color, wrap_width, ImGui::GetTextLineHeightWithSpacing(),
                         measure, nullptr);
 }

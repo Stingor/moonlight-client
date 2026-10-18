@@ -17,6 +17,7 @@
 
 #include "navigation_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -186,9 +187,7 @@ void DrawSteps(const NavigationRouteView& route) {
     }
     if (step.current) {
       current = &step;
-      ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().good_text);
-      ImGui::TextUnformatted(label.c_str());
-      ImGui::PopStyleColor();
+      ColoredText(PaintingLook().good_text, label.c_str());
       const ImVec2 low = ImGui::GetItemRectMin();
       const ImVec2 high = ImGui::GetItemRectMax();
       ImGui::GetWindowDrawList()->AddLine(ImVec2(low.x, high.y - kUnderlineDrop),
@@ -263,9 +262,7 @@ void DrawRoute(NavigationWindowState& state, const NavigationView& view, const S
     // mener.
     ImGui::TextDisabled("%s", core::Tr("Vous êtes déjà sur cette carte."));
   } else if (route.steps.empty() && route.no_path) {
-    ImGui::PushStyleColor(ImGuiCol_Text, kNoPathColor);
-    ImGui::TextWrapped("%s", core::Tr("Aucun chemin jusqu'à cette destination."));
-    ImGui::PopStyleColor();
+    ColoredWrapped(kNoPathColor, core::Tr("Aucun chemin jusqu'à cette destination."));
     ImGui::TextWrapped("%s", core::Tr("Aucune liaison connue ne mène jusque-là."));
   } else if (route.steps.empty()) {
     // 🔴 « PAS D'ÉTAPE » N'EST PAS « PAS DE GUIDAGE » : une destination sur la

@@ -13,7 +13,6 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_text.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
@@ -21,6 +20,7 @@
 #include "skill_cell.h"
 #include "skill_chain.h"
 #include "skill_list.h"
+#include "ui_sampler.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -132,40 +132,6 @@ constexpr ImU32 kKeyboardNoticeText = IM_COL32(255, 215, 130, 255);
     }
   }
   return false;
-}
-
-// IMPOSE LE MODE D'ÉCHANTILLONNAGE DES ICÔNES, pour la suite de la liste de
-// dessin.
-//
-// 🔴 LE MODE NET NE SE DÉDUIT PAS DE LA TEXTURE, IL S'IMPOSE. Le moteur de rendu
-// d'ImGui lie un OBJET SAMPLER avant chaque lot de commandes, et un sampler lié
-// ÉCRASE les paramètres de filtrage de la texture : le `GL_NEAREST` posé au
-// téléversement ne décide de rien ici. Le sampler ambiant est le LINÉAIRE — donc
-// ne rien faire, c'est lisser.
-//
-// 🔴 ET C'EST POURQUOI ON POSE LE CALLBACK DANS LES DEUX CAS, pas seulement
-// quand le lissage est demandé : sans lui, la case à cocher paraîtrait morte
-// puisque son état décoché donnerait déjà ce que fait son état coché.
-//
-// ⚠ IL FAUT LE RENDRE, ET C'EST `RestoreSampler` : la liste de dessin continue
-// après la grille — l'ascenseur, l'habillage de la fenêtre — et hériterait sinon
-// du mode qu'on vient de poser.
-void ImposeIconSampler(ImDrawList* into, bool smooth) {
-  const ImGuiPlatformIO& platform = ImGui::GetPlatformIO();
-  const ImDrawCallback wanted =
-      smooth ? platform.DrawCallback_SetSamplerLinear : platform.DrawCallback_SetSamplerNearest;
-  // ⚠ UN MOTEUR DE RENDU PEUT NE PAS LES OFFRIR : on dessine alors comme avant,
-  // sans rien casser.
-  if (wanted != nullptr) {
-    into->AddCallback(wanted, nullptr);
-  }
-}
-
-void RestoreSampler(ImDrawList* into) {
-  const ImDrawCallback ambient = ImGui::GetPlatformIO().DrawCallback_SetSamplerLinear;
-  if (ambient != nullptr) {
-    into->AddCallback(ambient, nullptr);
-  }
 }
 
 // LE CÔTÉ D'UNE ICÔNE POUR QU'ELLE RESTE NETTE : le plus grand MULTIPLE ENTIER
@@ -390,14 +356,11 @@ void DrawMakeHomunculus(SkillWindowState& state, const GrimoireStaffView& staff,
     action.staff_homunculus_job = StaffHomunculusJobAt(staff.homunculi, state.staff_homunculus);
   }
   ImGui::EndDisabled();
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", staff.has_homunculus
-                                ? core::Tr("@makehomun : le personnage a déjà un homoncule, le "
-                                           "serveur n'en crée pas un second.")
-                                : core::Tr("@makehomun : crée l'homoncule choisi. Le "
-                                           "serveur refuse si le personnage en a déjà un, "
-                                           "même au repos ou mort."));
-  }
+  SkinTooltip(staff.has_homunculus ? core::Tr("@makehomun : le personnage a déjà un homoncule, le "
+                                              "serveur n'en crée pas un second.")
+                                   : core::Tr("@makehomun : crée l'homoncule choisi. Le "
+                                              "serveur refuse si le personnage en a déjà un, "
+                                              "même au repos ou mort."));
 }
 
 // LA LIGNE ELLE-MÊME : quatre atcommands qui REFONT l'arbre, un champ pour le
@@ -469,7 +432,7 @@ void DrawGrid(SkillWindowState& state, const SkillGroupView& group, std::string_
   // ⚠ UNE FOIS POUR LA GRILLE : le côté net ne dépend que de l'échelle, et le
   // recalculer par case donnerait le même nombre cinquante fois.
   const float icon_side = CrispIconSide(kIconSize * scale);
-  ImposeIconSampler(into, state.smooth_icons);
+  ImposeImageSampler(into, state.smooth_icons);
 
   // ⚠ LA CASE SURVOLÉE EST CELLE DE L'IMAGE PRÉCÉDENTE, et c'est sans
   // conséquence : le survol ne change pas sans que la souris bouge, et connaître
@@ -556,7 +519,7 @@ void DrawGrid(SkillWindowState& state, const SkillGroupView& group, std::string_
   state.hovered_skill = hovered_now;
   // ⚠ RENDU AVANT TOUT LE RESTE : les traits, les flèches et l'habillage de la
   // fenêtre partagent cette liste de dessin, et hériteraient du mode posé.
-  RestoreSampler(into);
+  RestoreAmbientSampler(into);
 
   PaintSplits(into, group, origin, scale);
 
@@ -617,10 +580,6 @@ void DrawKeyboardNotice(SkillWindowState& state) {
 }
 
 }  // namespace
-
-void ImposeSkillIconSampler(ImDrawList* into, bool smooth) { ImposeIconSampler(into, smooth); }
-
-void RestoreSkillIconSampler(ImDrawList* into) { RestoreSampler(into); }
 
 void PaintSkillCooldown(ImDrawList* into, const SkillCellView& cell, ImVec2 icon_at, float side) {
   PaintCooldown(into, cell, icon_at, side);

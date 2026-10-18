@@ -15,6 +15,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -91,10 +92,6 @@ std::vector<std::size_t> SortedSells(std::span<const NpcShopSellView> sells) {
   return order;
 }
 
-bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
-  return filter.PassFilter(name.data(), name.data() + name.size());
-}
-
 void AskSale(NpcShopWindowState& state, const NpcShopView& view, std::vector<NpcShopCartLine> lines,
              bool immediate, NpcShopWindowAction& action) {
   if (NpcShopSaleNeedsConfirmation(state, view, lines)) {
@@ -125,8 +122,7 @@ void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::u
 }
 
 void DrawHeader(const NpcShopView& view) {
-  ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(view.purse_line.size()),
-                     view.purse_line.data());
+  ColoredText(kTradeBlackText, view.purse_line);
   if (!view.outcome.empty()) {
     ImGui::SameLine();
     ImGui::TextColored(view.outcome_done ? kTradeDoneText : kTradeRefusedText, "  %.*s",
@@ -200,7 +196,7 @@ void DrawBuyList(NpcShopWindowState& state, const NpcShopView& view, const SkinA
 
   for (const std::size_t index : SortedOffers(view.offers)) {
     const NpcShopOfferView& offer = view.offers[index];
-    if (!Matches(state.filter, offer.item.name)) {
+    if (!PassesTextFilter(state.filter, offer.item.name)) {
       continue;
     }
     ImGui::PushID(static_cast<int>(index));
@@ -311,7 +307,7 @@ void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const Skin
 
   for (const std::size_t index : SortedSells(view.sells)) {
     const NpcShopSellView& sold = view.sells[index];
-    if (!Matches(state.filter, sold.item.name)) {
+    if (!PassesTextFilter(state.filter, sold.item.name)) {
       continue;
     }
     ImGui::PushID(static_cast<int>(sold.client_slot));
@@ -461,8 +457,7 @@ void DrawCart(NpcShopWindowState& state, const NpcShopView& view, const SkinArt&
   // serveur refuse l'achat ENTIER, ou tronque la recette. La première raison
   // s'écrit sous le total ; toutes se lisent au survol du bouton.
   if (!view.blockers.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.blockers[0].size()),
-                       view.blockers[0].data());
+    ColoredText(kTradeRefusedText, view.blockers[0]);
   }
   const bool blocked = state.cart.empty() || !view.blockers.empty() || view.awaiting;
   if (blocked) {

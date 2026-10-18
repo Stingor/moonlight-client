@@ -11,7 +11,6 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/modal_box.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
@@ -195,8 +194,8 @@ BugReportAction DrawBugReportWindow(BugReportWindowState& state, const SkinArt& 
   }
   ImGui::EndDisabled();
   // ⚠ SURVOLÉ MÊME GRISÉ : c'est là qu'il faut dire pourquoi il l'est.
-  if (paused && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", core::Tr("Patiente quelques secondes avant un nouveau rapport."));
+  if (paused) {
+    SkinTooltip(core::Tr("Patiente quelques secondes avant un nouveau rapport."));
   }
   ImGui::SameLine();
   if (SkinButton(core::Tr("Annuler"), art, ImVec2(kButtonWidthPixels, 0.0F))) {

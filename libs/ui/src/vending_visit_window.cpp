@@ -15,6 +15,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -133,7 +134,7 @@ void DrawOffers(VendingVisitWindowState& state, const VendingVisitView& view, co
       }
     }
     ImGui::EndDisabled();
-    if (too_dear && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    if (too_dear) {
       SkinTooltip(core::Tr("Toute la ligne coûte plus que vos zeny."));
     }
     ImGui::PopID();
@@ -321,12 +322,10 @@ VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
                                              ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.open) {
     if (!view.title.empty()) {
-      ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(view.title.size()),
-                         view.title.data());
+      ColoredText(kTradeBlackText, view.title);
     }
     if (!view.outcome.empty()) {
-      ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.outcome.size()),
-                         view.outcome.data());
+      ColoredText(kTradeRefusedText, view.outcome);
     }
     if (view.offers.empty()) {
       ImGui::TextDisabled("%s", core::Tr("Le shop est vide."));
@@ -346,8 +345,7 @@ VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
     // 🔴 « ACHETER » SE RETIENT tant que le serveur refuserait, ou ignorerait
     // l'achat sans un mot. La première raison s'écrit ici, toutes au survol.
     if (!state.basket.empty() && !view.blockers.empty()) {
-      ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.blockers[0].size()),
-                         view.blockers[0].data());
+      ColoredText(kTradeRefusedText, view.blockers[0]);
     } else if (view.awaiting) {
       ImGui::TextDisabled("%s", core::Tr("Achat envoyé : en attente de la liste..."));
     }

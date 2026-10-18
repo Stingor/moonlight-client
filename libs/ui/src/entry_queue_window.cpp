@@ -14,13 +14,13 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/modal_box.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
 #include "entry_queue_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -126,7 +126,7 @@ void DetailRow(const char* label, std::string_view value, float value_from_group
   ImGui::TextUnformatted(label);
   ImGui::SameLine(value_from_group);
   ImGui::PushTextWrapPos(wrap_at);
-  ImGui::TextUnformatted(value.data(), value.data() + value.size());
+  Unformatted(value);
   ImGui::PopTextWrapPos();
 }
 
@@ -156,7 +156,7 @@ void RewardRows(const char* label, std::span<const EntryQueueRewardView> rewards
       continue;
     }
     ImGui::PushTextWrapPos(wrap_at);
-    ImGui::TextUnformatted(reward.text.data(), reward.text.data() + reward.text.size());
+    Unformatted(reward.text);
     ImGui::PopTextWrapPos();
   }
 }
@@ -166,11 +166,7 @@ void DrawFieldList(EntryQueueWindowState& state, const EntryQueueView& view) {
   const float font = ImGui::GetFontSize();
   float widest = font * kListLeastFonts;
   for (const EntryQueueFieldView& field : view.fields) {
-    widest =
-        std::max(widest, ImGui::CalcTextSize(field.display_name.data(),
-                                             field.display_name.data() + field.display_name.size())
-                                 .x +
-                             font * kListMarginFonts);
+    widest = std::max(widest, TextWidth(field.display_name) + font * kListMarginFonts);
   }
   ImGui::BeginGroup();
   for (std::size_t rank = 0; rank < view.fields.size(); ++rank) {
@@ -296,7 +292,7 @@ void DrawFieldDetail(const EntryQueueFieldView& field, ItemLinkMenu& menu, ChatL
       }
     }
     ImGui::EndDisabled();
-    TellEntryQueueWhy(blocker != nullptr ? blocker : button.help);
+    SkinTooltip(blocker != nullptr ? blocker : button.help);
   }
   for (const ApplyButton& button : buttons) {
     if (state.confirming != button.verb) {
@@ -445,13 +441,6 @@ void Keep(EntryQueueAction& kept, const EntryQueueAction& found) {
 
 const char* EntryQueueLinkPendingText() {
   return core::Tr("Liaison avec le serveur en cours de vérification : réessayez dans un instant.");
-}
-
-void TellEntryQueueWhy(const char* why) {
-  if (why != nullptr && why[0] != '\0' &&
-      ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", why);
-  }
 }
 
 void AskEntryQueueVerb(EntryQueueWindowState& state, EntryQueueVerb verb) {

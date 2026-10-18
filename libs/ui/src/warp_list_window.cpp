@@ -12,6 +12,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -336,9 +337,7 @@ WarpListWindowAction DrawWarpListWindow(WarpListWindowState& state, const WarpLi
 
     // ── LA LIGNE DE TITRE ────────────────────────────────────────────────────
     ImGui::SetCursorPos(ImVec2(kWarpListTitlePixels.x * scale, kWarpListTitlePixels.y * scale));
-    ImGui::PushStyleColor(ImGuiCol_Text, kWarpListTextColor);
-    ImGui::TextUnformatted(view.title.data(), view.title.data() + view.title.size());
-    ImGui::PopStyleColor();
+    ColoredText(kWarpListTextColor, view.title);
 
     // ── LA LISTE ─────────────────────────────────────────────────────────────
     ImGui::SetCursorPos(ImVec2(kWarpListRowsPixels.x * scale, kWarpListRowsPixels.y * scale));

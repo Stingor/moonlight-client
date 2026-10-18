@@ -11,6 +11,7 @@
 #include "ro/ui/window_name.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -52,9 +53,7 @@ CharacterDeleteAction DrawCharacterDelete(CharacterDeleteState& state,
                 state.name.c_str());
   ImGui::TextUnformatted(question.data());
 
-  ImGui::PushStyleColor(ImGuiCol_Text, kWarningColor);
-  ImGui::TextUnformatted(core::Tr("Cette action est IRRÉVERSIBLE."));
-  ImGui::PopStyleColor();
+  ColoredText(kWarningColor, core::Tr("Cette action est IRRÉVERSIBLE."));
 
   // ⚠ « LE SECRET DU COMPTE » ET NON « TON EMAIL » DANS LE TEXTE DE TÊTE :
   // c'est `char_del_option` qui décide lequel des deux le serveur exige, et il
@@ -70,16 +69,12 @@ CharacterDeleteAction DrawCharacterDelete(CharacterDeleteState& state,
 
   ImGui::Spacing();
   if (view.pending) {
-    ImGui::PushStyleColor(ImGuiCol_Text, kPendingColor);
-    ImGui::TextUnformatted(core::Tr("Suppression en cours…"));
-    ImGui::PopStyleColor();
+    ColoredText(kPendingColor, core::Tr("Suppression en cours…"));
   } else if (!view.refusal.empty()) {
     // ⚠ IL S'ENROULE : le motif du serveur énumère ses causes, et une ligne
     // qui traverse l'écran ferait grandir la fenêtre à sa mesure.
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + field);
-    ImGui::PushStyleColor(ImGuiCol_Text, kRefusalColor);
-    ImGui::TextUnformatted(view.refusal.c_str());
-    ImGui::PopStyleColor();
+    ColoredText(kRefusalColor, view.refusal.c_str());
     ImGui::PopTextWrapPos();
   }
 

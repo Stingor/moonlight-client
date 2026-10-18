@@ -16,6 +16,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -169,7 +170,7 @@ void DrawStockList(VendingSetupWindowState& state, const VendingSetupView& view,
     if (row.refusal.empty() && remaining > 0 &&
         ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
       ImGui::SetDragDropPayload(kStockPayload, &row.cart_slot, sizeof(row.cart_slot));
-      ImGui::TextUnformatted(row.item.name.data(), row.item.name.data() + row.item.name.size());
+      Unformatted(row.item.name);
       ImGui::EndDragDropSource();
     }
     ImGui::TableNextColumn();
@@ -213,7 +214,7 @@ void DrawStockGrid(VendingSetupWindowState& state, const VendingSetupView& view,
     const bool can = CanPlace(state, view, row, remaining);
     if (can && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
       ImGui::SetDragDropPayload(kStockPayload, &row.cart_slot, sizeof(row.cart_slot));
-      ImGui::TextUnformatted(row.item.name.data(), row.item.name.data() + row.item.name.size());
+      Unformatted(row.item.name);
       ImGui::EndDragDropSource();
     }
     if (tile.hovered && can && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
@@ -330,7 +331,7 @@ void DrawAskPopup(VendingSetupWindowState& state, const VendingSetupView& view,
     EndSkinPopup();
     return;
   }
-  ImGui::TextUnformatted(row->item.name.data(), row->item.name.data() + row->item.name.size());
+  Unformatted(row->item.name);
   ImGui::TextDisabled(core::Tr("Reste : %d"), remaining);
   ImGui::Separator();
   // ⚠ LE CHAMP SANS PAS, ENTRE DEUX BOUTONS HABILLÉS : les flèches du champ à
@@ -438,8 +439,7 @@ void DrawFooter(VendingSetupWindowState& state, const VendingSetupView& view, co
   // 🔴 LE BOUTON SE RETIENT tant que le serveur refuserait, ou fausserait : la
   // première raison s'écrit ici, toutes se lisent au survol du bouton.
   if (!view.blockers.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.blockers[0].size()),
-                       view.blockers[0].data());
+    ColoredText(kTradeRefusedText, view.blockers[0]);
   } else if (view.awaiting) {
     ImGui::TextDisabled("%s", core::Tr("Demande envoyée : en attente du serveur..."));
   } else {

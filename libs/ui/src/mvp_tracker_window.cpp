@@ -20,7 +20,9 @@
 #include "ro/ui/skinned_window.h"
 
 #include "mvp_tracker_parts.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 
@@ -50,8 +52,7 @@ void DrawInvitePopup(MvpTrackerWindowState& state, const MvpTrackerView& view, c
   // ⚠ CARNET ÉTEINT, AUCUNE INVITATION : celle qu'on montrait se referme.
   const bool invited = view.enabled && view.pending_invite != 0;
   const std::string title = std::string(core::Tr("Invitation reçue")) + "###mvp_invite";
-  if (invited && !state.invite_deferred &&
-      !ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel)) {
+  if (invited && !state.invite_deferred && !AnyPopupOpen()) {
     AskModal(title.c_str());
   }
   if (!BeginSkinnedModal(title.c_str(), art, ImGuiWindowFlags_AlwaysAutoResize,
@@ -281,9 +282,8 @@ void DrawMembers(const MvpTrackerView& view, const SkinArt& art, MvpTrackerActio
       }
       ImGui::EndDisabled();
       TellLinkPending(view);
-      if (view.link_ready && forbidden &&
-          ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-        SkinTooltipFormat("%s", core::Tr("Seul le propriétaire du groupe peut exclure un membre."));
+      if (view.link_ready && forbidden) {
+        SkinTooltip(core::Tr("Seul le propriétaire du groupe peut exclure un membre."));
       }
     }
 

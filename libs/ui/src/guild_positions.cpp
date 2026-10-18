@@ -17,6 +17,7 @@
 
 #include "guild_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -60,7 +61,7 @@ void DrawRight(bool editable, bool& right, const SkinArt& art, bool& edited) {
     }
     return;
   }
-  GuildTextColored(kGuildBlackColor, right ? core::Tr("oui") : "-");
+  ColoredText(kGuildBlackColor, right ? core::Tr("oui") : "-");
 }
 
 }  // namespace
@@ -75,8 +76,7 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
     any = any || position.has_name || position.has_rights;
   }
   if (!any) {
-    GuildTextColored(kGuildLabelColor,
-                     core::Tr("Postes non encore reçus — clic sur « Actualiser »."));
+    ColoredText(kGuildLabelColor, core::Tr("Postes non encore reçus — clic sur « Actualiser »."));
     return;
   }
   std::array<char, 160> line = {};
@@ -85,10 +85,9 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
                   core::Tr("Nom, droits et part d'exp de chaque poste. Le serveur plafonne la "
                            "part d'exp à %d %%."),
                   kGuildTabPayRateMost);
-    GuildTextColored(kGuildLabelColor, line.data());
+    ColoredText(kGuildLabelColor, line.data());
   } else {
-    GuildTextColored(kGuildLabelColor,
-                     core::Tr("Seul le maître de guilde peut modifier les postes."));
+    ColoredText(kGuildLabelColor, core::Tr("Seul le maître de guilde peut modifier les postes."));
   }
 
   const auto flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter |
@@ -119,14 +118,14 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
       ImGui::PushID(static_cast<int>(index));
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
-      GuildTextColored(kGuildBlackColor, std::to_string(index).c_str());
+      ColoredText(kGuildBlackColor, std::to_string(index).c_str());
       ImGui::TableSetColumnIndex(1);
       if (editable) {
         ImGui::SetNextItemWidth(-1.0F);
         edited = ImGui::InputText("##nom", draft.name.data(), draft.name.size());
       } else {
         const std::string_view name = BufferText(draft.name);
-        GuildTextColored(kGuildBlackColor, name.empty() ? "—" : std::string(name).c_str());
+        ColoredText(kGuildBlackColor, name.empty() ? "—" : std::string(name).c_str());
       }
       const std::array<bool*, 3> rights = {&draft.may_invite, &draft.may_expel, &draft.may_storage};
       for (std::size_t right = 0; right < rights.size(); ++right) {
@@ -142,7 +141,7 @@ void DrawGuildPositions(GuildTabState& state, const GuildView& view, const SkinA
                  edited;
       } else {
         std::snprintf(line.data(), line.size(), "%d %%", draft.pay_rate);
-        GuildTextColored(kGuildBlackColor, line.data());
+        ColoredText(kGuildBlackColor, line.data());
       }
       state.positions_editing = state.positions_editing || edited;
       ImGui::PopID();

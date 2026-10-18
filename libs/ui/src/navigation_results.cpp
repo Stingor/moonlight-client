@@ -12,6 +12,7 @@
 
 #include "navigation_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -74,7 +75,7 @@ void MapTooltip(const NavigationEntryView& entry) {
   if (entry.map_name.empty() || !BeginSkinTooltip()) {
     return;
   }
-  ImGui::TextUnformatted(entry.map_name.data(), entry.map_name.data() + entry.map_name.size());
+  Unformatted(entry.map_name);
   DrawNavigationMapThumbnail(entry.map_image, Px(kThumbnailPixels));
   EndSkinTooltip();
 }
@@ -184,7 +185,7 @@ void DrawPreview(const NavigationEntryView& entry, const NavigationRowRef& row,
       ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
     }
     if (!entry.map_name.empty()) {
-      ImGui::TextUnformatted(entry.map_name.data(), entry.map_name.data() + entry.map_name.size());
+      Unformatted(entry.map_name);
       DrawNavigationMapThumbnail(entry.map_image, Px(kThumbnailPixels));
     }
     if (clickable) {

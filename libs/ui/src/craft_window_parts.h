@@ -24,10 +24,6 @@ inline constexpr float kLinkIconPixels = 16.0F;
 // Le voile d'une liste que le serveur n'honore plus : elle reste lisible.
 inline constexpr float kStaleAlpha = 0.5F;
 
-// Un texte coloré qui s'enroule. La couleur est poussée et retirée ENSEMBLE.
-void ColoredWrapped(ImU32 color, const char* text);
-void ColoredText(ImU32 color, const char* text);
-
 // Une puce dont le texte s'enroule sous lui-même.
 void BulletWrapped(const char* text);
 

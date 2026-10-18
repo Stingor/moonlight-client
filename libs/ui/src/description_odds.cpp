@@ -12,7 +12,6 @@
 #include <array>
 #include <cstdio>
 #include <string>
-#include <string_view>
 
 #include <imgui.h>
 
@@ -21,6 +20,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -134,10 +134,7 @@ void DrawOddsTab(DescriptionWindowState& state, const DescriptionView& view,
 
   state.odds_order.clear();
   for (std::size_t rank = 0; rank < view.odds.size(); ++rank) {
-    // ⚠ PAR SES BORNES, sans copie : une boîte peut compter mille lignes, et
-    // la liste se refiltre à chaque image.
-    const std::string_view name = view.odds[rank].name;
-    if (filter.PassFilter(name.data(), name.data() + name.size())) {
+    if (PassesTextFilter(filter, view.odds[rank].name)) {
       state.odds_order.push_back(static_cast<int>(rank));
     }
   }

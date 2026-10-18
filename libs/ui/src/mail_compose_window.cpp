@@ -11,13 +11,14 @@
 #include "ro/ui/mail_window.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/shortcut_bar.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
 #include "item_grid.h"
 #include "mail_parts.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -126,9 +127,7 @@ void DrawRecipient(MailComposeWindowState& state, const MailComposeView& view, c
       break;
     case MailRecipientCheck::kFound: {
       const std::string who = WhoLine(state, view);
-      ImGui::PushStyleColor(ImGuiCol_Text, kTradeBlackText);
-      ImGui::TextUnformatted(who.c_str());
-      ImGui::PopStyleColor();
+      ColoredText(kTradeBlackText, who.c_str());
       break;
     }
     case MailRecipientCheck::kNone:
@@ -265,11 +264,8 @@ void DrawSendButton(MailComposeWindowState& state, const MailComposeView& view, 
     }
   }
   ImGui::EndDisabled();
-  // ⚠ `SkinTooltip` REDEMANDE LE SURVOL SANS `AllowWhenDisabled`, et un bouton
-  // grisé n'est jamais survolé à ses yeux : la bulle se pose donc ici.
-  if (view.purse_short && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s",
-                      core::Tr("Ta bourse ne couvre pas le zeny joint et les frais d'envoi."));
+  if (view.purse_short) {
+    SkinTooltip(core::Tr("Ta bourse ne couvre pas le zeny joint et les frais d'envoi."));
   }
 }
 
@@ -282,7 +278,7 @@ void DrawSendConfirmation(MailComposeWindowState& state, const MailComposeView& 
   }
   const std::string name = mail::ConfirmModalName(kSendConfirmId);
   if (!state.confirming_send) {
-    mail::CloseModal(name.c_str());
+    CloseModal(name.c_str());
     return;
   }
   if (!ImGui::IsPopupOpen(name.c_str())) {
@@ -320,9 +316,7 @@ void DrawBody(MailComposeWindowState& state, const MailComposeView& view, const 
     return;
   }
   if (!view.error.empty()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, mail::kRefusalText);
-    ImGui::TextUnformatted(view.error.data(), view.error.data() + view.error.size());
-    ImGui::PopStyleColor();
+    ColoredText(mail::kRefusalText, view.error);
   }
   DrawSendConfirmation(state, view, art, action);
 }

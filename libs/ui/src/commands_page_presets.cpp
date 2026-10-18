@@ -17,6 +17,7 @@
 
 #include "commands_page_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui::commands_page {
 namespace {

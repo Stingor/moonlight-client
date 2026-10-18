@@ -27,9 +27,6 @@ inline constexpr ImVec4 kRefusalText = ImVec4(0.75F, 0.15F, 0.15F, 1.0F);
 // survol et le clic droit ne dépendent pas du seul libellé.
 [[nodiscard]] TradeItemGesture DrawItemRow(const MailItemView& line);
 
-// Ferme la boîte `name` si elle est ouverte, dans la pile d'identités courante.
-void CloseModal(const char* name);
-
 // LA CONFIRMATION DU COURRIER : une boîte modale à barre de titre
 // « Confirmation », la question, puis « Confirmer » et « Annuler ». Échap vaut
 // « non ».

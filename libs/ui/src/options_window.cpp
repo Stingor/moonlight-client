@@ -23,6 +23,7 @@
 #include "ro/ui/window_name.h"
 
 #include "options_rows.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -392,9 +393,7 @@ struct SettingsWindowWords {
   ImGui::EndChild();
 
   if (words.footnote != nullptr) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-    ImGui::TextUnformatted(words.footnote);
-    ImGui::PopStyleColor();
+    FaintText(words.footnote);
   }
 
   // ⚠ LE GESTE DESTRUCTEUR DEMANDE, IL N'AGIT PAS. Il rend au joueur les

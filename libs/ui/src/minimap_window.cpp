@@ -16,6 +16,7 @@
 #include "ro/ui/window_places.h"
 
 #include "minimap_parts.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -312,8 +313,7 @@ void DrawCaption(const MinimapSettings& settings, const MinimapView& view, bool 
                  float side) {
   if (named) {
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + side);
-    ImGui::TextUnformatted(view.display_name.data(),
-                           view.display_name.data() + view.display_name.size());
+    Unformatted(view.display_name);
     ImGui::PopTextWrapPos();
   }
   if (settings.show_coords) {

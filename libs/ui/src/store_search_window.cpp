@@ -15,6 +15,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -59,15 +60,11 @@ constexpr std::array<PriceTier, 10> kPriceTiers = {{
     {0, {kInkBlack, IM_COL32(0, 255, 255, 255)}},
 }};
 
-void TextOf(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
-
 void TextRightAligned(std::string_view text) {
-  const float width = ImGui::CalcTextSize(text.data(), text.data() + text.size()).x;
+  const float width = TextWidth(text);
   ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
                        std::max(0.0F, ImGui::GetContentRegionAvail().x - width));
-  TextOf(text);
+  Unformatted(text);
 }
 
 // UN PRIX, aligné à droite de sa colonne : l'ombre d'abord, décalée d'un
@@ -239,7 +236,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
     }
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
-    TextOf(row.item.name);
+    Unformatted(row.item.name);
     NoteItemCell(row_index, row.item, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
@@ -260,8 +257,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
 void DrawFooter(StoreSearchWindowState& state, const StoreSearchView& view, const SkinArt& art,
                 StoreSearchAction& action) {
   if (!view.status.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.status.size()),
-                       view.status.data());
+    ColoredText(kTradeRefusedText, view.status);
   } else {
     ImGui::NewLine();
   }

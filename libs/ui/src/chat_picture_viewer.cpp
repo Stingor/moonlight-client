@@ -10,6 +10,8 @@
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -181,9 +183,7 @@ void DrawChatPictureViewer(ChatPictureViewerState& state, const ChatPictureViewe
   }
   ImGui::SameLine();
   ImGui::AlignTextToFramePadding();
-  ImGui::PushStyleColor(ImGuiCol_Text, art.look().faint_text);
-  ImGui::TextUnformatted(core::Tr("Molette : zoom · double-clic : taille réelle"));
-  ImGui::PopStyleColor();
+  ColoredText(art.look().faint_text, core::Tr("Molette : zoom · double-clic : taille réelle"));
   EndSkinnedWindow();
 }
 

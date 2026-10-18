@@ -202,7 +202,7 @@ struct SkillWindowState {
   // moteur de rendu d'ImGui lie un objet SAMPLER avant chaque lot de commandes,
   // et un sampler lié écrase le filtrage de la texture : le `GL_NEAREST` du
   // téléversement ne décide de rien. Le sampler ambiant est le LINÉAIRE — donc
-  // ne rien faire, c'est lisser. Voir `ImposeIconSampler`.
+  // ne rien faire, c'est lisser.
   bool smooth_icons = false;
 
   // ── LE MODE CLAVIER ───────────────────────────────────────────────────────

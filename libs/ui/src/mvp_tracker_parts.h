@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <span>
 #include <string>
-#include <string_view>
 
 #include <imgui.h>
 
@@ -124,9 +123,6 @@ inline constexpr std::uint32_t kMvpMsPerMinute = 60000;
 #else
 [[nodiscard]] std::string Printed(const char* format, ...);
 #endif
-
-// Un texte de la vue, posé tel quel : il peut porter un pourcent.
-void Unformatted(std::string_view text);
 
 // L'INFOBULLE D'UN GESTE GRISÉ faute de liaison vérifiée, posée sur l'élément
 // qu'on vient de dessiner ; rien si la liaison l'est.

@@ -51,14 +51,8 @@ void SkillCellGestures(const SkillCellView& cell, std::span<const SkillCellView>
 
 // ── CE QUE LA GRILLE DU GRIMOIRE PRÊTE À CELLE DE LA GUILDE ────────────────
 //
-// ⚠ UNE SEULE PRÉFÉRENCE « ICÔNES DE COMPÉTENCE », et un seul voile d'attente :
-// deux grilles d'icônes qui les écriraient chacune à leur façon finiraient par
-// ne plus se ressembler.
-
-// Impose le lissage — ou la netteté — des icônes pour la suite de la liste de
-// dessin, puis le rend.
-void ImposeSkillIconSampler(ImDrawList* into, bool smooth);
-void RestoreSkillIconSampler(ImDrawList* into);
+// ⚠ UN SEUL VOILE D'ATTENTE : deux grilles d'icônes qui le peindraient chacune
+// à leur façon finiraient par ne plus se ressembler.
 
 // Le voile d'attente qui monte sur l'icône, et le décompte au milieu.
 void PaintSkillCooldown(ImDrawList* into, const SkillCellView& cell, ImVec2 icon_at, float side);

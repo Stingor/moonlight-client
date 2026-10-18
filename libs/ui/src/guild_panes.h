@@ -33,10 +33,6 @@ inline constexpr ImU32 kGuildRedColor = IM_COL32(153, 31, 31, 255);
 inline constexpr ImU32 kGuildOnlineRowColor = IM_COL32(198, 232, 198, 160);
 
 [[nodiscard]] ImVec4 GuildInk(ImU32 color);
-void GuildTextColored(ImU32 color, const char* text);
-// L'infobulle du dernier élément, même grisé : c'est souvent elle qui dit
-// POURQUOI il l'est.
-void GuildTooltip(const char* text);
 
 // Le texte d'un tampon de saisie, jusqu'au premier zéro.
 [[nodiscard]] std::string_view BufferText(std::span<const char> buffer);

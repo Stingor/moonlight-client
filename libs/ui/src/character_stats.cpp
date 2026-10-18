@@ -12,6 +12,7 @@
 
 #include "character_panes.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -86,11 +87,11 @@ constexpr std::size_t kDerivedCount = 9;
 // rangée. C'est ce qui laisse les valeurs lire comme une colonne.
 void PaintLabelBackground(std::string_view text) {
   const ImVec2 at = ImGui::GetCursorScreenPos();
-  const ImVec2 size = ImGui::CalcTextSize(text.data(), text.data() + text.size());
+  const float width = TextWidth(text);
   const float scale = Scale();
   ImGui::GetWindowDrawList()->AddRectFilled(
       ImVec2(at.x - kStatRowBleedLeft * scale, at.y),
-      ImVec2(at.x + size.x + kStatRowBleedRight * scale, at.y + ImGui::GetTextLineHeight()),
+      ImVec2(at.x + width + kStatRowBleedRight * scale, at.y + ImGui::GetTextLineHeight()),
       kCharacterStatRowBackground, kStatRowRounding * scale);
 }
 

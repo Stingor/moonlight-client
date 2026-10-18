@@ -12,6 +12,8 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -161,16 +163,6 @@ constexpr float kDiscordPaddingPixels = 6.0F;
   return clicked;
 }
 
-// UNE PHRASE QUI N'EST PAS UNE CONSIGNE : elle situe, elle n'ordonne rien.
-//
-// ⚠ LE TEXTE SECONDAIRE DE L'HABILLAGE, que la palette de la fenêtre pose en
-// `TextDisabled` — et non le gris éteint d'ImGui, illisible sur un corps clair.
-void DrawAside(const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
-
 // LE FORMULAIRE DU SITE.
 //
 // 🔴 CET ORDRE EST UNE HIÉRARCHIE, pas une suite de contrôles empilés. Ce que
@@ -245,7 +237,7 @@ void DrawAside(const char* text) {
   // et un bouton au milieu d'un formulaire promet une action DANS le
   // formulaire.
   ImGui::Spacing();
-  DrawAside(core::Tr("Plusieurs comptes à regrouper ?"));
+  FaintText(core::Tr("Plusieurs comptes à regrouper ?"));
   ImGui::SameLine();
   if (SkinHyperlink(core::Tr("Fusionner mes comptes"))) {
     action.verb = WebDoorVerb::kMergeAccounts;
@@ -260,7 +252,7 @@ void DrawAside(const char* text) {
   // lancement, sur une question qui n'a qu'une bonne réponse.
   ImGui::Spacing();
   ImGui::Separator();
-  DrawAside(core::Tr("Tu préfères te connecter à un compte Ragnarok ?"));
+  FaintText(core::Tr("Tu préfères te connecter à un compte Ragnarok ?"));
   if (SkinSmallButton(core::Tr("Utiliser le login classique"), art)) {
     action.verb = WebDoorVerb::kUseClassic;
   }
@@ -385,9 +377,7 @@ WebDoorAction DrawWebDoor(WebDoorState& state, const WebDoorView& view, const Sk
       return DrawSignIn(state, view, art, width);
 
     case WebDoorStage::kWaiting:
-      ImGui::PushStyleColor(ImGuiCol_Text, kWaitingColor);
-      ImGui::TextUnformatted(core::Tr("Connexion au site…"));
-      ImGui::PopStyleColor();
+      ColoredText(kWaitingColor, core::Tr("Connexion au site…"));
       return action;
 
     case WebDoorStage::kInBrowser:
@@ -412,16 +402,12 @@ WebDoorAction DrawWebDoor(WebDoorState& state, const WebDoorView& view, const Sk
       // ⚠ RIEN À ANNULER ICI : le jeton est parti, et ce qui répond est le
       // serveur de jeu. Son refus, s'il y en a un, s'écrira sous cette
       // ligne — voir `DrawRefusal`.
-      ImGui::PushStyleColor(ImGuiCol_Text, kWaitingColor);
-      ImGui::TextUnformatted(core::Tr("Connexion…"));
-      ImGui::PopStyleColor();
+      ColoredText(kWaitingColor, core::Tr("Connexion…"));
       return action;
 
     case WebDoorStage::kFailed:
       ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + width);
-      ImGui::PushStyleColor(ImGuiCol_Text, kRefusalColor);
-      ImGui::TextUnformatted(view.message.c_str());
-      ImGui::PopStyleColor();
+      ColoredText(kRefusalColor, view.message.c_str());
       ImGui::PopTextWrapPos();
       ImGui::Spacing();
       // 🔴 LE RETOUR AU CHOIX QUAND LE JETON VIT ENCORE : après « ce compte est

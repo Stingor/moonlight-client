@@ -12,6 +12,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -79,7 +80,7 @@ void DrawTable(const RankingView& view) {
     if (row.name.empty()) {
       ImGui::TextDisabled("%s", core::Tr("Sans nom"));
     } else {
-      ImGui::TextUnformatted(row.name.data(), row.name.data() + row.name.size());
+      Unformatted(row.name);
     }
     ImGui::TableNextColumn();
     ImGui::Text("%u", row.points);

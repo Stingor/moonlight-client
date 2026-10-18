@@ -21,7 +21,9 @@
 #include "guild_panes.h"
 #include "skill_cell.h"
 #include "skill_chain.h"
+#include "ui_sampler.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -255,7 +257,7 @@ void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, bo
   std::uint16_t hovered_now = 0;
   const std::uint16_t focus = state.skill_hover;
 
-  ImposeSkillIconSampler(into, smooth_icons);
+  ImposeImageSampler(into, smooth_icons);
   for (std::size_t index = 0; index < skills.size(); ++index) {
     const GuildSkillView& skill = skills[index];
     const int depth = std::clamp(skill.depth, 0, kDepthRows - 1);
@@ -314,7 +316,7 @@ void DrawGrid(GuildTabState& state, const GuildView& view, bool smooth_icons, bo
     DescribeOnRightClick(hot, skill.cell.skill_id, action);
     ImGui::PopID();
   }
-  RestoreSkillIconSampler(into);
+  RestoreAmbientSampler(into);
 
   // LES FLÈCHES AU SURVOL, en chaîne dans les deux sens, comme au grimoire.
   if (hovered >= 0) {
@@ -459,21 +461,21 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
         ImGui::TextUnformatted(text.data());
       } else {
         std::snprintf(text.data(), text.size(), "-/%d", skill.cell.max_level);
-        GuildTextColored(kGuildLabelColor, text.data());
+        ColoredText(kGuildLabelColor, text.data());
       }
     } else if (skill.cell.learned > 0) {
       ImGui::TextUnformatted(std::to_string(skill.cell.learned).c_str());
     } else {
-      GuildTextColored(kGuildLabelColor, "-");
+      ColoredText(kGuildLabelColor, "-");
     }
 
     ImGui::TableNextColumn();
     if (!skill.locked && !skill.active) {
-      GuildTextColored(kGuildLabelColor, core::Tr("Passif"));
+      ColoredText(kGuildLabelColor, core::Tr("Passif"));
     } else if (!skill.locked && skill.cell.sp_cost > 0) {
       ImGui::TextUnformatted(std::to_string(skill.cell.sp_cost).c_str());
     } else {
-      GuildTextColored(kGuildLabelColor, "-");
+      ColoredText(kGuildLabelColor, "-");
     }
 
     // LANCER — et, sous l'attente, le décompte à la place d'un « > » mort :
@@ -546,8 +548,7 @@ void DrawList(GuildTabState& state, const GuildView& view, bool staff_allowed, c
 void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_icons,
                      bool staff_allowed, const SkinArt& art, GuildAction& action) {
   if (!view.skills_known) {
-    GuildTextColored(kGuildLabelColor,
-                     core::Tr("Skills non encore reçus — clic sur « Actualiser »."));
+    ColoredText(kGuildLabelColor, core::Tr("Skills non encore reçus — clic sur « Actualiser »."));
     return;
   }
   std::array<char, 64> line = {};
@@ -559,27 +560,27 @@ void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_i
                  ImVec2(Px(kToggleButtonPixels), 0.0F))) {
     state.skill_grid = !state.skill_grid;
   }
-  GuildTooltip(
+  SkinTooltip(
       core::Tr("Bascule entre la grille d'icônes et la liste détaillée\n(niveau, SP, "
                "lancer, monter) — comme le Grimoire."));
   ImGui::SameLine();
   ImGui::TextDisabled("%s", core::Tr("Raccourcis"));
   // ⚠ UN SIMPLE MEMBRE NE FAIT QUE CONSULTER : lui promettre des gestes que le
   // serveur refusera serait l'envoyer chercher une panne.
-  GuildTooltip(view.master
-                   ? core::Tr("Clic gauche      monter d'un niveau (envoyé aussitôt au serveur)\n"
-                              "Double-clic      lancer le skill\n"
-                              "Clic droit       description du skill\n"
-                              "Glisser          pose le skill sur une barre d'action\n"
-                              "Survol           flèches de prérequis (ambre) et de suites (bleu)\n"
-                              "\n"
-                              "Pas de « Appliquer » ici : contrairement au Grimoire, un skill de\n"
-                              "guilde se monte immédiatement.")
-                   : core::Tr("Lecture seule : seul le maître de guilde monte, lance et pose\n"
-                              "ces skills.\n"
-                              "\n"
-                              "Clic droit       description du skill\n"
-                              "Survol           flèches de prérequis (ambre) et de suites (bleu)"));
+  SkinTooltip(view.master
+                  ? core::Tr("Clic gauche      monter d'un niveau (envoyé aussitôt au serveur)\n"
+                             "Double-clic      lancer le skill\n"
+                             "Clic droit       description du skill\n"
+                             "Glisser          pose le skill sur une barre d'action\n"
+                             "Survol           flèches de prérequis (ambre) et de suites (bleu)\n"
+                             "\n"
+                             "Pas de « Appliquer » ici : contrairement au Grimoire, un skill de\n"
+                             "guilde se monte immédiatement.")
+                  : core::Tr("Lecture seule : seul le maître de guilde monte, lance et pose\n"
+                             "ces skills.\n"
+                             "\n"
+                             "Clic droit       description du skill\n"
+                             "Survol           flèches de prérequis (ambre) et de suites (bleu)"));
   // ⚠ LA MÊME PRÉFÉRENCE QUE LE GRIMOIRE, et en grille seulement : en liste,
   // l'icône fait une hauteur de ligne et le filtre ne se voit pas.
   if (state.skill_grid) {
@@ -587,14 +588,14 @@ void DrawGuildSkills(GuildTabState& state, const GuildView& view, bool& smooth_i
     ImGui::TextDisabled("|");
     ImGui::SameLine();
     static_cast<void>(SkinCheckBox(core::Tr("Lisser les icônes"), &smooth_icons, art));
-    GuildTooltip(
+    SkinTooltip(
         core::Tr("Filtrage bilinéaire des icônes de la grille.\nDécoché (défaut) = pixels "
                  "nets, comme le client natif, qui ne filtre pas."));
   }
   // Sans l'arbre, seulement ce que le serveur envoie ; avec, les verrouillées
   // paraissent aussi, et la liste n'est jamais vide.
   if (!view.skill_tree_known && view.skills.empty()) {
-    GuildTextColored(kGuildLabelColor, core::Tr("Aucun skill disponible (prérequis non remplis)."));
+    ColoredText(kGuildLabelColor, core::Tr("Aucun skill disponible (prérequis non remplis)."));
     return;
   }
   if (state.skill_grid) {

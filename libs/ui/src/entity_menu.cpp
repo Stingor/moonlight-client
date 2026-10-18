@@ -8,7 +8,6 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_popup.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
@@ -290,9 +289,7 @@ void DrawQuestion(EntityMenuState& state, const SkinArt& art, EntityMenuAnswer& 
       answer.toggled = item.verb;
       answer.toggled_on = checked;
     }
-    if (!item.tip.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-      SkinTooltipFormat("%s", item.tip.c_str());
-    }
+    SkinTooltip(item.tip.c_str());
     ImGui::PopID();
     return false;
   }
@@ -308,11 +305,7 @@ void DrawQuestion(EntityMenuState& state, const SkinArt& art, EntityMenuAnswer& 
   if (colored) {
     ImGui::PopStyleColor();
   }
-  // 🔴 `AllowWhenDisabled` : sans lui, une ligne grisée ne compte pas comme
-  // survolée — et c'est justement celle dont il faut dire pourquoi.
-  if (!item.tip.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", item.tip.c_str());
-  }
+  SkinTooltip(item.tip.c_str());
   ImGui::PopID();
   if (!clicked) {
     return false;

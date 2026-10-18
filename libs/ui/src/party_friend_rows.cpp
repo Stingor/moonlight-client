@@ -17,6 +17,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "party_friend_parts.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -284,10 +285,6 @@ void DrawRowTooltip(const PartyFriendView& view, const PartyMemberView& member) 
     ImGui::TextDisabled("%d, %d", member.x, member.y);
   }
   EndSkinTooltip();
-}
-
-[[nodiscard]] bool AnyPopupOpen() {
-  return ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 }
 
 // La ligne 1 : « Lv.N Nom(Carte) ». La carte ne paraît que pour un membre en

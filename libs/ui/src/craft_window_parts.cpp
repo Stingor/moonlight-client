@@ -5,20 +5,9 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui::craft_parts {
-
-void ColoredWrapped(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextWrapped("%s", text);
-  ImGui::PopStyleColor();
-}
-
-void ColoredText(ImU32 color, const char* text) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
-}
 
 void BulletWrapped(const char* text) {
   ImGui::Bullet();
@@ -65,9 +54,7 @@ void DrawHistory(const char* id, std::span<const CraftLogLineView> lines, float 
   if (ImGui::BeginChild(id, ImVec2(-FLT_MIN, height), ImGuiChildFlags_Borders)) {
     for (const CraftLogLineView& line : lines) {
       if (show_time && !line.time.empty()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().faint_text);
-        ImGui::TextUnformatted(line.time.data(), line.time.data() + line.time.size());
-        ImGui::PopStyleColor();
+        ColoredText(PaintingLook().faint_text, line.time);
         ImGui::SameLine();
       }
       // L'ALPHA EST FORCÉ À UN : une ligne du journal ne s'estompe pas avec la
@@ -77,7 +64,7 @@ void DrawHistory(const char* id, std::span<const CraftLogLineView> lines, float 
       if (wrap) {
         ImGui::PushTextWrapPos(0.0F);
       }
-      ImGui::TextUnformatted(line.text.data(), line.text.data() + line.text.size());
+      Unformatted(line.text);
       if (wrap) {
         ImGui::PopTextWrapPos();
       }

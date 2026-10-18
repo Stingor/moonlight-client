@@ -15,6 +15,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -118,7 +119,7 @@ void DrawDetails(const MemorialDungeonView& view, float column) {
   if (view.owner_name.empty()) {
     ImGui::TextColored(kQuietColor, "%s", core::Tr("inconnu"));
   } else {
-    ImGui::TextUnformatted(view.owner_name.data(), view.owner_name.data() + view.owner_name.size());
+    Unformatted(view.owner_name);
   }
 
   if (!view.waiting) {
@@ -137,7 +138,7 @@ void DrawTimers(const MemorialDungeonView& view, float column) {
     ImGui::EndGroup();
     if (!view.end_clock.empty()) {
       Label(core::Tr("Fin prévue :"), column);
-      ImGui::TextUnformatted(view.end_clock.data(), view.end_clock.data() + view.end_clock.size());
+      Unformatted(view.end_clock);
     }
   }
   if (view.idle_seconds_left.has_value()) {
@@ -281,7 +282,7 @@ MemorialDungeonWindowAction DrawMemorialDungeonWindow(MemorialDungeonWindowState
     EndSkinnedWindow();
     return action;
   }
-  ImGui::TextUnformatted(view.name.data(), view.name.data() + view.name.size());
+  Unformatted(view.name);
   if (view.waiting) {
     ImGui::TextColored(kTurboOnColor, core::Tr("En préparation — place dans la file : %d"),
                        view.wait_position);

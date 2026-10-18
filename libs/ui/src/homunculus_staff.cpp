@@ -18,18 +18,10 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/list_keys.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
 namespace ro::ui {
 namespace {
-
-// L'infobulle du dernier élément, même grisé : elle dit pourquoi il l'est.
-void Tip(const char* text) {
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", text);
-  }
-}
 
 // UN CURSEUR QUI N'ENVOIE QU'AU TERME DU GESTE — voir `HomunculusStaffSettle`.
 // `shown` est ce qu'il montre hors geste.
@@ -79,7 +71,7 @@ void DrawSliders(HomunculusTabState& state, const HomunculusTabView& view, const
     Order(action, HomunculusStaffOrder::kSetHunger, *hunger);
     state.hunger_pending = HomunculusStaffPending{.value = *hunger, .sent_at_s = now_s};
   }
-  Tip(core::Tr("@homhungry : pose la faim de l'homoncule (0 à 100)."));
+  SkinTooltip(core::Tr("@homhungry : pose la faim de l'homoncule (0 à 100)."));
 
   if (const std::optional<int> intimacy =
           ReleasedSlider(core::Tr("Intimité"), Shown(state.intimacy_pending, view.intimacy, now_s),
@@ -87,7 +79,7 @@ void DrawSliders(HomunculusTabState& state, const HomunculusTabView& view, const
     Order(action, HomunculusStaffOrder::kSetIntimacy, *intimacy);
     state.intimacy_pending = HomunculusStaffPending{.value = *intimacy, .sent_at_s = now_s};
   }
-  Tip(core::Tr("@homfriendly : pose l'intimité de l'homoncule (0 à 1000)."));
+  SkinTooltip(core::Tr("@homfriendly : pose l'intimité de l'homoncule (0 à 1000)."));
 
   // ⚠ LE CURSEUR DIT LE NIVEAU VISÉ, LA COMMANDE AJOUTE DES NIVEAUX : on envoie
   // la différence, et rien quand elle est nulle. Il ne descend pas sous le
@@ -112,32 +104,34 @@ void DrawSliders(HomunculusTabState& state, const HomunculusTabView& view, const
       state.level_pending = HomunculusStaffPending{.value = *level, .sent_at_s = now_s};
     }
   }
-  Tip(level_awaited ? core::Tr("Un niveau est déjà demandé : le curseur attend que le serveur "
-                               "renvoie le nouveau niveau.")
-                    : core::Tr("@homlevel : ajoute à l'homoncule les niveaux qui le mènent au "
-                               "niveau visé."));
+  SkinTooltip(level_awaited
+                  ? core::Tr("Un niveau est déjà demandé : le curseur attend que le serveur "
+                             "renvoie le nouveau niveau.")
+                  : core::Tr("@homlevel : ajoute à l'homoncule les niveaux qui le mènent au "
+                             "niveau visé."));
 }
 
 void DrawButtons(const SkinArt& art, HomunculusTabAction& action) {
   if (SkinSmallButton(core::Tr("Rebrasser"), art)) {
     Order(action, HomunculusStaffOrder::kShuffle);
   }
-  Tip(core::Tr("@homshuffle : retire au sort les statistiques de croissance de l'homoncule."));
+  SkinTooltip(
+      core::Tr("@homshuffle : retire au sort les statistiques de croissance de l'homoncule."));
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Croissance"), art)) {
     Order(action, HomunculusStaffOrder::kStats);
   }
-  Tip(core::Tr("@homstats : écrit ses statistiques et les bornes de leur croissance."));
+  SkinTooltip(core::Tr("@homstats : écrit ses statistiques et les bornes de leur croissance."));
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Fiche"), art)) {
     Order(action, HomunculusStaffOrder::kInfo);
   }
-  Tip(core::Tr("@hominfo : écrit sa fiche résumée dans la conversation."));
+  SkinTooltip(core::Tr("@hominfo : écrit sa fiche résumée dans la conversation."));
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Évoluer"), art)) {
     Order(action, HomunculusStaffOrder::kEvolve);
   }
-  Tip(core::Tr("@homevolution : le fait évoluer, si le serveur l'accepte."));
+  SkinTooltip(core::Tr("@homevolution : le fait évoluer, si le serveur l'accepte."));
 }
 
 void DrawMutation(HomunculusTabState& state, const HomunculusTabView& view, const SkinArt& art,
@@ -158,7 +152,7 @@ void DrawMutation(HomunculusTabState& state, const HomunculusTabView& view, cons
     action.staff_job = StaffHomunculusJobAt(view.mutations, state.mutation_rank);
   }
   ImGui::EndDisabled();
-  Tip(core::Tr(
+  SkinTooltip(core::Tr(
       "@hommutate : mute vers la forme choisie un homoncule évolué de niveau 99 ou plus."));
 }
 
@@ -173,7 +167,7 @@ void DrawTalk(HomunculusTabState& state, const SkinArt& art, HomunculusTabAction
   ImGui::BeginDisabled(typed.empty());
   const bool clicked = SkinSmallButton(core::Tr("Dire"), art);
   ImGui::EndDisabled();
-  Tip(core::Tr("@homtalk : fait dire la phrase tapée à l'homoncule."));
+  SkinTooltip(core::Tr("@homtalk : fait dire la phrase tapée à l'homoncule."));
   if ((entered || clicked) && !typed.empty()) {
     Order(action, HomunculusStaffOrder::kTalk);
     action.staff_text = std::string(typed);

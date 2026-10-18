@@ -1,5 +1,5 @@
 // Les écritures que les fichiers de la fiche de monstre se partagent : mesures,
-// libellés, couleurs, aide et liens. Voir `monster_sheet_parts.h`.
+// libellés, couleurs et aide. Voir `monster_sheet_parts.h`.
 
 #include <cstdarg>
 #include <cstdio>
@@ -86,17 +86,6 @@ void Help(const char* text) {
   ImGui::TextUnformatted(text);
   ImGui::PopTextWrapPos();
   EndSkinTooltip();
-}
-
-void DecorateLink(bool hovered) {
-  if (!hovered) {
-    return;
-  }
-  ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-  const ImVec2 least = ImGui::GetItemRectMin();
-  const ImVec2 most = ImGui::GetItemRectMax();
-  ImGui::GetWindowDrawList()->AddLine(ImVec2(least.x, most.y), ImVec2(most.x, most.y),
-                                      ImGui::GetColorU32(ImGuiCol_TextLink));
 }
 
 }  // namespace ro::ui::monster_sheet

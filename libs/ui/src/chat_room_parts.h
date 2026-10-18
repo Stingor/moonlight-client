@@ -1,13 +1,19 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
+#include <cstdio>
 #include <initializer_list>
 #include <span>
 #include <string>
 #include <string_view>
 
 #include <imgui.h>
+
+#include "ro/ui/skin_tooltip.h"
+
+#include "ui_text.h"
 
 // CE QUE LES TROIS FENÊTRES DU SALON PARTAGENT. En-tête privé : il vit dans
 // `src/`, rien hors de cette couche n'en a besoin.
@@ -57,7 +63,7 @@ inline constexpr unsigned char kFirstNonAscii = 0x80;
 [[nodiscard]] inline float LabelColumn(std::initializer_list<std::string_view> labels) {
   float widest = 0.0F;
   for (const std::string_view label : labels) {
-    widest = std::max(widest, ImGui::CalcTextSize(label.data(), label.data() + label.size()).x);
+    widest = std::max(widest, TextWidth(label));
   }
   return widest + ImGui::GetFontSize();
 }
@@ -73,6 +79,18 @@ inline constexpr unsigned char kFirstNonAscii = 0x80;
   return static_cast<std::size_t>(std::ranges::count_if(utf8, [](char byte) {
     return (static_cast<unsigned char>(byte) & kUtf8ContinuationMask) != kUtf8ContinuationBits;
   }));
+}
+
+// « 12/36 » : les octets du fil saisis sur leur plafond, gris tant que ça
+// tient, rouge au-delà.
+inline void DrawByteCounter(std::size_t used, std::size_t most) {
+  std::array<char, kCounterBytes> text{};
+  std::snprintf(text.data(), text.size(), "%zu/%zu", used, most);
+  ImGui::PushStyleColor(ImGuiCol_Text, used > most
+                                           ? ImGui::ColorConvertU32ToFloat4(PaintingLook().bad_text)
+                                           : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+  ImGui::TextUnformatted(text.data());
+  ImGui::PopStyleColor();
 }
 
 }  // namespace ro::ui::chat_room

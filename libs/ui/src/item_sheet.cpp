@@ -21,6 +21,7 @@
 #include "description_odds.h"
 #include "table_cells.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -37,10 +38,6 @@ constexpr std::array<ItemSheetTab, 8> kTabs = {
     ItemSheetTab::kMonsters,    ItemSheetTab::kBoss,    ItemSheetTab::kScript,
     ItemSheetTab::kCombos,      ItemSheetTab::kSellers,
 };
-
-void TextOf(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
 
 // L'ONGLET EXISTE-T-IL pour cet objet ? Un onglet du serveur existe dès qu'on
 // peut lui répondre ; il se grise quand la réponse arrivée est vide.
@@ -127,7 +124,7 @@ void DrawFacts(const DescriptionView& view) {
     ImGui::TextDisabled("%.*s", static_cast<int>(fact.label.size()), fact.label.data());
     ImGui::TableNextColumn();
     ImGui::PushTextWrapPos(0.0F);
-    TextOf(fact.value);
+    Unformatted(fact.value);
     ImGui::PopTextWrapPos();
   }
   ImGui::EndTable();
@@ -142,7 +139,7 @@ void DrawSellers(const DescriptionView& view, const SkinArt& art, DescriptionWin
       ImGui::TextDisabled("%s", core::Tr("Demande au serveur…"));
       return;
     case ItemSheetSellersPhase::kRefused:
-      TextOf(view.sellers_status);
+      Unformatted(view.sellers_status);
       if (SkinSmallButton(core::Tr("Réessayer"), art)) {
         action.ask_sellers = true;
       }

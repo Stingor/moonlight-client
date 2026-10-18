@@ -17,7 +17,6 @@
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/text.h"
-#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "ui_scale.h"
@@ -507,13 +506,9 @@ std::string Printed(const char* format, ...) {
   return text.data();
 }
 
-void Unformatted(std::string_view text) {
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
-}
-
 void TellLinkPending(const MvpTrackerView& view) {
-  if (!view.link_ready && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltipFormat("%s", MvpLinkPendingText());
+  if (!view.link_ready) {
+    SkinTooltip(MvpLinkPendingText());
   }
 }
 

@@ -13,6 +13,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -96,8 +97,7 @@ VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const Ven
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
   if (body_shown) {
     if (!view.title.empty()) {
-      ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(view.title.size()),
-                         view.title.data());
+      ColoredText(kTradeBlackText, view.title);
       ImGui::Separator();
     }
     if (view.lines.empty()) {
@@ -177,7 +177,7 @@ VendingLogAction DrawVendingLogWindow(VendingLogWindowState& state, const Vendin
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(sale.sold_at.data(), sale.sold_at.data() + sale.sold_at.size());
+        Unformatted(sale.sold_at);
         ImGui::TableNextColumn();
         const TradeItemGesture gesture = DrawTradeItem(sale.item);
         if (gesture.hovered) {

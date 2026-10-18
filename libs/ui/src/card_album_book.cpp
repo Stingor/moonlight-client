@@ -16,6 +16,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "card_album_parts.h"
+#include "ui_popup.h"
 #include "ui_scale.h"
 
 namespace ro::ui::card_album {
@@ -684,7 +685,7 @@ void DrawBook(CardAlbumWindowState& state, const CardAlbumView& view, const Skin
   // La molette tourne les pages ; les flèches et Page↑/↓ aussi, quand la
   // fenêtre a le clavier et qu'aucun champ n'est en saisie.
   const ImGuiIO& io = ImGui::GetIO();
-  const bool popup = ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopup);
+  const bool popup = AnyPopupOpen();
   if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && io.MouseWheel != 0.0F && !popup) {
     Flip(state, io.MouseWheel < 0.0F ? 1 : -1);
   }

@@ -1,5 +1,4 @@
 #include <array>
-#include <cstdio>
 #include <string>
 
 #include <imgui.h>
@@ -13,6 +12,7 @@
 
 #include "chat_room_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -22,16 +22,6 @@ using chat_room::Typed;
 
 constexpr float kWidthPixels = 300.0F;
 constexpr float kEyeFonts = 2.2F;
-
-void Counter(std::size_t used, std::size_t most) {
-  std::array<char, chat_room::kCounterBytes> text{};
-  std::snprintf(text.data(), text.size(), "%zu/%zu", used, most);
-  ImGui::PushStyleColor(ImGuiCol_Text, used > most
-                                           ? ImGui::ColorConvertU32ToFloat4(PaintingLook().bad_text)
-                                           : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text.data());
-  ImGui::PopStyleColor();
-}
 
 }  // namespace
 
@@ -82,11 +72,11 @@ ChatRoomPasswordAction DrawChatRoomPasswordWindow(ChatRoomPasswordState& state,
     SkinTooltip(core::Tr("Afficher / masquer le mot de passe"));
 
     const std::size_t typed = chat_room::PasswordBytes(Typed(state.input));
-    Counter(typed, view.limits.password_bytes);
+    chat_room::DrawByteCounter(typed, view.limits.password_bytes);
     if (!view.error.empty()) {
       ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
       ImGui::PushTextWrapPos(0.0F);
-      ImGui::TextUnformatted(view.error.data(), view.error.data() + view.error.size());
+      Unformatted(view.error);
       ImGui::PopTextWrapPos();
       ImGui::PopStyleColor();
     }

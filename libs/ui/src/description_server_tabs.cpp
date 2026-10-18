@@ -12,7 +12,6 @@
 #include <array>
 #include <cstdio>
 #include <string>
-#include <string_view>
 
 #include <imgui.h>
 
@@ -23,6 +22,7 @@
 #include "description_odds.h"
 #include "table_cells.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -84,9 +84,7 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
 
   state.drops_order.clear();
   for (std::size_t rank = 0; rank < drops.rows.size(); ++rank) {
-    // Par ses bornes, sans copie : voir le filtre des probabilités.
-    const std::string_view name = drops.rows[rank].name;
-    if (filter.PassFilter(name.data(), name.data() + name.size())) {
+    if (PassesTextFilter(filter, drops.rows[rank].name)) {
       state.drops_order.push_back(static_cast<int>(rank));
     }
   }

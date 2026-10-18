@@ -19,6 +19,7 @@
 #include "monster_sheet_parts.h"
 #include "table_cells.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui::monster_sheet {
 namespace {
@@ -185,7 +186,7 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
 
     state.drop_order.clear();
     for (std::size_t rank = 0; rank < view.drops.size(); ++rank) {
-      if (state.drop_filter.PassFilter(view.drops[rank].name.c_str())) {
+      if (PassesTextFilter(state.drop_filter, view.drops[rank].name)) {
         state.drop_order.push_back(static_cast<int>(rank));
       }
     }

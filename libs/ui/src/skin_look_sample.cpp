@@ -10,6 +10,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -25,9 +27,7 @@ constexpr ImU32 kDescriptionBlue = IM_COL32(0, 0, 255, 255);
 
 // Un mot dans sa couleur, puis un blanc avant le suivant.
 void Word(const char* text, ImU32 color) {
-  ImGui::PushStyleColor(ImGuiCol_Text, color);
-  ImGui::TextUnformatted(text);
-  ImGui::PopStyleColor();
+  ColoredText(color, text);
   ImGui::SameLine();
 }
 

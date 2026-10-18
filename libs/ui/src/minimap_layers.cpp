@@ -14,6 +14,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "minimap_parts.h"
+#include "ui_sampler.h"
 
 namespace ro::ui {
 namespace {
@@ -92,28 +93,6 @@ constexpr int kPercent = 100;
 
 [[nodiscard]] float Fraction(float value, MinimapSpan span) {
   return span.high > span.low ? (value - span.low) / (span.high - span.low) : kHalf;
-}
-
-// IMPOSE LE FILTRAGE de l'image de carte pour la suite de la liste de dessin.
-//
-// 🔴 POSÉ DANS LES DEUX CAS : le moteur de rendu lie un échantillonneur avant
-// chaque lot, et l'ambiant est le linéaire — ne rien faire, c'est lisser, et la
-// case « Lisser l'image » paraîtrait morte.
-void ImposeSampler(ImDrawList* into, bool smooth) {
-  const ImGuiPlatformIO& platform = ImGui::GetPlatformIO();
-  const ImDrawCallback wanted =
-      smooth ? platform.DrawCallback_SetSamplerLinear : platform.DrawCallback_SetSamplerNearest;
-  if (wanted != nullptr) {
-    into->AddCallback(wanted, nullptr);
-  }
-}
-
-// Rend l'échantillonneur ambiant à ce qui suit dans la fenêtre.
-void RestoreSampler(ImDrawList* into) {
-  const ImDrawCallback ambient = ImGui::GetPlatformIO().DrawCallback_SetSamplerLinear;
-  if (ambient != nullptr) {
-    into->AddCallback(ambient, nullptr);
-  }
 }
 
 // Les quatre coins d'un quad pivoté de `degrees`, rotation d'écran USUELLE —
@@ -574,7 +553,7 @@ void DrawMinimapLayers(const MinimapFrame& frame, const MinimapView& view,
                        const MinimapSettings& settings, bool interactive, MinimapAnswer& answer) {
   ImDrawList* into = ImGui::GetWindowDrawList();
   // Posé avant l'image ET gardé pour les marqueurs : eux aussi sont des images.
-  ImposeSampler(into, settings.smooth);
+  ImposeImageSampler(into, settings.smooth);
   DrawBackdrop(into, frame, view, settings);
   // 🔴 LES MARQUEURS NE DÉPENDENT PAS DE L'IMAGE : une carte sans image garde
   // ses coéquipiers, ses commodités et son joueur.
@@ -610,7 +589,7 @@ void DrawMinimapLayers(const MinimapFrame& frame, const MinimapView& view,
     }
     DrawPlayer(into, view, settings, half, player);
   }
-  RestoreSampler(into);
+  RestoreAmbientSampler(into);
   into->AddRect(frame.low, frame.high, kFrameEdge);
 }
 

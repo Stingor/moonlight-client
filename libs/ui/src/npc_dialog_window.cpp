@@ -22,6 +22,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -65,7 +67,7 @@ constexpr float kClipSlackPixels = 260.0F;
 
 // La mesure d'un morceau de texte avec la police courante.
 [[nodiscard]] float MeasureHere(std::string_view piece, void* /*owner*/) {
-  return ImGui::CalcTextSize(piece.data(), piece.data() + piece.size()).x;
+  return TextWidth(piece);
 }
 
 // Les options que le filtre courant laisse passer. `lowered` est le libellé

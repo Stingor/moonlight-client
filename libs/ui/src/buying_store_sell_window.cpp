@@ -11,6 +11,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -254,8 +255,7 @@ void DrawFooter(BuyingStoreSellState& state, const BuyingStoreSellView& view, co
   // UNE LIGNE TOUJOURS ÉMISE : le pied a une hauteur réservée, une ligne qui
   // apparaîtrait décalerait les boutons.
   if (!view.blockers.empty() && !state.cart.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.blockers[0].size()),
-                       view.blockers[0].data());
+    ColoredText(kTradeRefusedText, view.blockers[0]);
   } else if (view.awaiting) {
     ImGui::TextDisabled("%s", core::Tr("En attente du serveur..."));
   } else {
@@ -412,15 +412,13 @@ BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
                                              ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.open) {
     if (!view.store_title.empty()) {
-      ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(view.store_title.size()),
-                         view.store_title.data());
+      ColoredText(kTradeBlackText, view.store_title);
     }
     if (!view.outcome.empty()) {
       if (!view.store_title.empty()) {
         ImGui::SameLine();
       }
-      ImGui::TextColored(view.outcome_done ? kTradeDoneText : kTradeRefusedText, "%.*s",
-                         static_cast<int>(view.outcome.size()), view.outcome.data());
+      ColoredText(view.outcome_done ? kTradeDoneText : kTradeRefusedText, view.outcome);
     }
     const float pane = ImGui::GetTextLineHeightWithSpacing() * kPaneRows;
     const float footer =

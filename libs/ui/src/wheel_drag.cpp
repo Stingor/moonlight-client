@@ -8,6 +8,8 @@
 
 #include "ro/ui/wheel_gate.h"
 
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -68,7 +70,7 @@ WheelDragResult WheelDragFloat3(const char* label, std::array<float, 3>& values,
   const std::string_view shown = whole.substr(0, whole.find(kHiddenLabelMark));
   if (!shown.empty()) {
     ImGui::SameLine(0.0F, spacing);
-    ImGui::TextUnformatted(shown.data(), shown.data() + shown.size());
+    Unformatted(shown);
   }
   ImGui::PopID();
   ImGui::EndGroup();

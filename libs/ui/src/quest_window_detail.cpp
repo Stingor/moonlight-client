@@ -24,6 +24,7 @@
 
 #include "quest_window_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui::quest_window {
 namespace {
@@ -71,10 +72,12 @@ void BoldText(std::string_view text, ImU32 color, float wrap) {
   ImGui::Dummy(ImVec2(extent.x + bold, extent.y));
 }
 
-void ColoredText(ImU32 color, std::string_view text) {
+// UN PARAGRAPHE COLORÉ, toujours replié au bord du volet — quel que soit le
+// repli que l'appelant a posé —, et borné par la fin de la vue.
+void ColoredParagraph(ImU32 color, std::string_view text) {
   ImGui::PushStyleColor(ImGuiCol_Text, color);
   ImGui::PushTextWrapPos(0.0F);
-  ImGui::TextUnformatted(text.data(), text.data() + text.size());
+  Unformatted(text);
   ImGui::PopTextWrapPos();
   ImGui::PopStyleColor();
 }
@@ -89,18 +92,6 @@ void SectionHeading(const char* title) {
   ImGui::Dummy(ImVec2(0.0F, Px(kBlockGap)));
   BoldText(title, PaperInk(kDetailTitleText), 0.0F);
   ImGui::Dummy(ImVec2(0.0F, Px(kBlockGap)));
-}
-
-// Un lien du détail : la main et le soulignement au survol.
-void DecorateLink(bool hovered) {
-  if (!hovered) {
-    return;
-  }
-  ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-  const ImVec2 least = ImGui::GetItemRectMin();
-  const ImVec2 most = ImGui::GetItemRectMax();
-  ImGui::GetWindowDrawList()->AddLine(ImVec2(least.x, most.y), ImVec2(most.x, most.y),
-                                      ImGui::GetColorU32(ImGuiCol_TextLink));
 }
 
 // ── LE DÉTAIL VIDE ──────────────────────────────────────────────────────────
@@ -128,7 +119,7 @@ void DrawNothingChosen(const SkinImage& mark, const char* text) {
   const float text_top = top + (shown_height > 0.0F ? shown_height + Px(kEmptyTextGap) : 0.0F);
   ImGui::SetCursorScreenPos(
       ImVec2(origin.x + std::max(0.0F, std::floor((room.x - text_size.x) * 0.5F)), text_top));
-  ColoredText(FaintInk(), text);
+  ColoredParagraph(FaintInk(), text);
 }
 
 // ── L'EN-TÊTE ───────────────────────────────────────────────────────────────
@@ -173,7 +164,7 @@ void DrawStatus(const QuestRowView& row) {
   if (invitation != nullptr) {
     ImGui::SameLine();
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + Px(kPillPaddingY));
-    ColoredText(ToneInk(SkinTone::kGood), invitation);
+    ColoredParagraph(ToneInk(SkinTone::kGood), invitation);
   }
 }
 
@@ -189,15 +180,13 @@ void DrawDeadline(const QuestRowView& row) {
   } else {
     std::snprintf(line.data(), line.size(), core::Tr("Échéance : %s"), Owned(row.deadline).c_str());
   }
-  ImGui::PushStyleColor(ImGuiCol_Text, row.waiting ? PaperInk(kTimeText) : ToneInk(SkinTone::kBad));
-  ImGui::TextUnformatted(line.data());
-  ImGui::PopStyleColor();
+  ColoredText(row.waiting ? PaperInk(kTimeText) : ToneInk(SkinTone::kBad), line.data());
   if (!row.time_left.empty() && !(row.waiting && row.expired)) {
     ImGui::SameLine();
     const ImU32 ink = row.expired  ? ToneInk(SkinTone::kBad)
                       : row.urgent ? ToneInk(SkinTone::kWarn)
                                    : PaperInk(kTimeText);
-    ColoredText(ink, "(" + Owned(row.time_left) + ")");
+    ColoredParagraph(ink, "(" + Owned(row.time_left) + ")");
   }
 }
 
@@ -208,10 +197,10 @@ void DrawNpc(const std::optional<QuestNpcView>& place, const SkinArt& skin,
   }
   const QuestNpcView& npc = *place;
   ImGui::AlignTextToFramePadding();
-  ColoredText(FaintInk(), core::Tr("PNJ :"));
+  ColoredParagraph(FaintInk(), core::Tr("PNJ :"));
   ImGui::SameLine();
   ImGui::AlignTextToFramePadding();
-  ImGui::TextUnformatted(npc.label.data(), npc.label.data() + npc.label.size());
+  Unformatted(npc.label);
   if (npc.map_name.empty()) {
     return;
   }
@@ -298,9 +287,7 @@ void DrawHunt(const QuestHuntView& hunt, std::size_t rank, QuestWindowAction& ac
   const float width = ImGui::GetContentRegionAvail().x;
   const std::string label = Owned(hunt.label);
   if (hunt.mob_id != 0) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextLink));
-    ImGui::TextUnformatted(label.c_str());
-    ImGui::PopStyleColor();
+    ColoredText(ImGui::GetStyleColorVec4(ImGuiCol_TextLink), label.c_str());
     const bool hovered = ImGui::IsItemHovered();
     DecorateLink(hovered);
     if (hovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
@@ -323,7 +310,7 @@ void DrawHunt(const QuestHuntView& hunt, std::size_t rank, QuestWindowAction& ac
     const float after_label =
         left + ImGui::CalcTextSize(label.c_str()).x + ImGui::GetStyle().ItemSpacing.x;
     ImGui::SameLine(std::max(after_label, left + width - count_width));
-    ColoredText(hunt.done ? ToneInk(SkinTone::kGood) : FaintInk(), count.data());
+    ColoredParagraph(hunt.done ? ToneInk(SkinTone::kGood) : FaintInk(), count.data());
   }
   if (hunt.total > 0) {
     const ImVec2 corner = ImGui::GetCursorScreenPos();
@@ -367,7 +354,7 @@ void DrawRewardItem(const QuestRewardView& reward, std::size_t rank, QuestWindow
     ImGui::SameLine();
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
                          std::floor((side - ImGui::GetTextLineHeight()) * 0.5F));
-    ColoredText(FaintInk(), count.data());
+    ColoredParagraph(FaintInk(), count.data());
   }
   ImGui::Dummy(ImVec2(0.0F, Px(kRewardRowGap)));
   ImGui::PopID();
@@ -438,7 +425,7 @@ void DrawRecommendedDetail(const QuestRecommendedView& entry, const SkinArt& ski
   ImGui::PushFont(nullptr, kDetailBodySize);
   ImGui::PushStyleColor(ImGuiCol_Text, BodyInk());
   if (!entry.summary.empty()) {
-    ColoredText(FaintInk(), entry.summary);
+    ColoredParagraph(FaintInk(), entry.summary);
   }
   ImGui::Dummy(ImVec2(0.0F, Px(kBlockGap)));
   DrawNpc(entry.npc, skin, action);
@@ -450,8 +437,9 @@ void DrawRecommendedDetail(const QuestRecommendedView& entry, const SkinArt& ski
     ImGui::PopID();
   }
   ImGui::Dummy(ImVec2(0.0F, Px(kSectionGap)));
-  ColoredText(FaintInk(),
-              core::Tr("Une recommandation n'est pas une quête : la lire ne vous engage à rien."));
+  ColoredParagraph(
+      FaintInk(),
+      core::Tr("Une recommandation n'est pas une quête : la lire ne vous engage à rien."));
   ImGui::PopStyleColor();
   ImGui::PopFont();
 }
@@ -488,7 +476,7 @@ void DrawDetail(const QuestWindowView& view, const QuestArt& art, const SkinArt&
     DrawNpc(row.npc, skin, action);
   }
   if (row.unknown) {
-    ColoredText(FaintInk(), core::Tr("Cette quête n'est pas dans le catalogue."));
+    ColoredParagraph(FaintInk(), core::Tr("Cette quête n'est pas dans le catalogue."));
   }
   DrawDescription(row, action, requests);
   DrawObjectives(row, action);

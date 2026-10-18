@@ -14,6 +14,9 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_popup.h"
+#include "ui_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -44,10 +47,6 @@ constexpr ImU32 kRefusalColor = IM_COL32(255, 96, 96, 255);
 // éteint, qui est exactement ce dont on essaie de se distinguer.
 constexpr ImU32 kCoverColor = IM_COL32(0, 0, 0, 205);
 constexpr ImU32 kCoverTextColor = IM_COL32(232, 232, 238, 255);
-
-[[nodiscard]] bool AnyPopupOpen() {
-  return ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-}
 
 // Vrai si le champ porte quelque chose.
 [[nodiscard]] bool Filled(const std::array<char, kLoginFieldBytes>& field) {
@@ -350,9 +349,7 @@ void DrawRefusal(const std::string& message) {
   }
   ImGui::Spacing();
   ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + FormWidth());
-  ImGui::PushStyleColor(ImGuiCol_Text, kRefusalColor);
-  ImGui::TextUnformatted(message.c_str());
-  ImGui::PopStyleColor();
+  ColoredText(kRefusalColor, message.c_str());
   ImGui::PopTextWrapPos();
 }
 
@@ -515,9 +512,7 @@ LoginWindowAction DrawLoginWindow(LoginWindowState& state, const LoginWindowView
   if (view.web_door_offered) {
     ImGui::Spacing();
     ImGui::Separator();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-    ImGui::TextUnformatted(core::Tr("Tu as un compte Moonlight ?"));
-    ImGui::PopStyleColor();
+    FaintText(core::Tr("Tu as un compte Moonlight ?"));
     if (SkinSmallButton(core::Tr("Utiliser le login Moonlight"), art)) {
       state.door = LoginDoor::kMoonlight;
     }

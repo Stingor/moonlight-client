@@ -16,6 +16,7 @@
 
 #include "chat_room_parts.h"
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -39,17 +40,6 @@ void Label(const char* text, float column) {
   ImGui::AlignTextToFramePadding();
   ImGui::TextUnformatted(text);
   ImGui::SameLine(column);
-}
-
-// « 12/36 », gris tant que ça tient, rouge au-delà.
-void Counter(std::size_t used, std::size_t most) {
-  std::array<char, chat_room::kCounterBytes> text{};
-  std::snprintf(text.data(), text.size(), "%zu/%zu", used, most);
-  ImGui::PushStyleColor(ImGuiCol_Text, used > most
-                                           ? ImGui::ColorConvertU32ToFloat4(PaintingLook().bad_text)
-                                           : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-  ImGui::TextUnformatted(text.data());
-  ImGui::PopStyleColor();
 }
 
 void DrawTitleRow(ChatRoomMakeState& state, const ChatRoomMakeView& view, const SkinArt& art,
@@ -101,12 +91,10 @@ void DrawTitleRow(ChatRoomMakeState& state, const ChatRoomMakeView& view, const 
   // client d'origine laisse découvrir la coupe après coup.
   const std::string_view title = Typed(state.title);
   ImGui::SetCursorPosX(column);
-  Counter(title.size(), view.limits.title_bytes);
+  chat_room::DrawByteCounter(title.size(), view.limits.title_bytes);
   if (view.ascii_required && !chat_room::IsAscii(title)) {
     ImGui::SameLine();
-    ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
-    ImGui::TextUnformatted(core::Tr("(caractères non anglais)"));
-    ImGui::PopStyleColor();
+    ColoredText(PaintingLook().bad_text, core::Tr("(caractères non anglais)"));
     ImGui::SameLine();
     SkinHelpMarker(Owned(view.words.english_only).c_str());
   }
@@ -114,8 +102,7 @@ void DrawTitleRow(ChatRoomMakeState& state, const ChatRoomMakeView& view, const 
     ImGui::SetCursorPosX(column);
     ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().warn_text);
     ImGui::PushTextWrapPos(0.0F);
-    ImGui::TextUnformatted(view.title_taken.data(),
-                           view.title_taken.data() + view.title_taken.size());
+    Unformatted(view.title_taken);
     ImGui::PopTextWrapPos();
     ImGui::PopStyleColor();
   }
@@ -176,7 +163,7 @@ void DrawAccessRows(ChatRoomMakeState& state, const ChatRoomMakeView& view, cons
       ImGui::TextUnformatted(rule.data());
       ImGui::PopStyleColor();
     } else {
-      Counter(typed, view.limits.password_bytes);
+      chat_room::DrawByteCounter(typed, view.limits.password_bytes);
     }
   }
   ImGui::EndDisabled();
@@ -189,9 +176,7 @@ void DrawNearby(const ChatRoomMakeView& view, ChatRoomMakeAction& action) {
     return;
   }
   if (view.nearby.empty()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-    ImGui::TextUnformatted(core::Tr("Aucun salon en vue."));
-    ImGui::PopStyleColor();
+    FaintText(core::Tr("Aucun salon en vue."));
     return;
   }
   const float row = ImGui::GetTextLineHeightWithSpacing();
@@ -258,7 +243,7 @@ ChatRoomMakeAction DrawChatRoomMakeWindow(ChatRoomMakeState& state, const ChatRo
       ImGui::Spacing();
       ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().bad_text);
       ImGui::PushTextWrapPos(0.0F);
-      ImGui::TextUnformatted(view.error.data(), view.error.data() + view.error.size());
+      Unformatted(view.error);
       ImGui::PopTextWrapPos();
       ImGui::PopStyleColor();
     }
@@ -266,7 +251,7 @@ ChatRoomMakeAction DrawChatRoomMakeWindow(ChatRoomMakeState& state, const ChatRo
       ImGui::Spacing();
       ImGui::PushStyleColor(ImGuiCol_Text, PaintingLook().warn_text);
       ImGui::PushTextWrapPos(0.0F);
-      ImGui::TextUnformatted(view.blocker.data(), view.blocker.data() + view.blocker.size());
+      Unformatted(view.blocker);
       ImGui::PopTextWrapPos();
       ImGui::PopStyleColor();
     }

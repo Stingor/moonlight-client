@@ -11,6 +11,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "ui_scale.h"
+#include "ui_text.h"
 
 namespace ro::ui {
 namespace {
@@ -46,10 +47,6 @@ constexpr std::int64_t kWeightTenths = 10;
 
 constexpr const char* kConfirmId = "##barter_confirm";
 constexpr const char* kItemMenuId = "##barter_item_menu";
-
-bool Matches(const ImGuiTextFilter& filter, std::string_view name) {
-  return filter.PassFilter(name.data(), name.data() + name.size());
-}
 
 const BarterOfferView* FindOffer(std::span<const BarterOfferView> offers,
                                  std::uint32_t shop_index) {
@@ -193,7 +190,7 @@ void DrawList(BarterWindowState& state, const BarterView& view, const SkinArt& a
   const float scale = Scale();
   const std::string_view heading =
       view.list_title.empty() ? std::string_view(core::Tr("Items à échanger")) : view.list_title;
-  ImGui::TextUnformatted(heading.data(), heading.data() + heading.size());
+  Unformatted(heading);
   constexpr int kColumns = 5;
   // Les paliers se règlent sur leur ligne la plus large ; un item qu'on ne
   // peut pas prendre garde son « +1 » grisé.
@@ -220,7 +217,7 @@ void DrawList(BarterWindowState& state, const BarterView& view, const SkinArt& a
   ImGui::TableHeadersRow();
   for (std::size_t index = 0; index < view.offers.size(); ++index) {
     const BarterOfferView& offer = view.offers[index];
-    if (!Matches(state.filter, offer.item.name)) {
+    if (!PassesTextFilter(state.filter, offer.item.name)) {
       continue;
     }
     ImGui::PushID(static_cast<int>(index));
@@ -309,8 +306,7 @@ void DrawCart(BarterWindowState& state, const BarterView& view, const SkinArt& a
   // 🔴 LE BOUTON SE RETIENT tant qu'une raison ferait refuser l'échange. La
   // première s'écrit au-dessus ; toutes se lisent au survol du bouton.
   if (!view.blockers.empty()) {
-    ImGui::TextColored(kTradeRefusedText, "%.*s", static_cast<int>(view.blockers[0].size()),
-                       view.blockers[0].data());
+    ColoredText(kTradeRefusedText, view.blockers[0]);
   }
   const bool blocked = view.cart.empty() || !view.blockers.empty();
   if (blocked) {
@@ -456,8 +452,7 @@ BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& 
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kChildRoundingPixels * scale);
     if (!view.purse_line.empty()) {
-      ImGui::TextColored(kTradeBlackText, "%.*s", static_cast<int>(view.purse_line.size()),
-                         view.purse_line.data());
+      ColoredText(kTradeBlackText, view.purse_line);
     }
     ImGui::SetNextItemWidth(-1.0F);
     if (ImGui::InputTextWithHint("##barter_filter", core::Tr("Filtrer..."), state.filter.InputBuf,
