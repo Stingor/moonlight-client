@@ -1,12 +1,10 @@
 #include "game/chat_room_memory.h"
 
 #include <algorithm>
-#include <system_error>
+#include <optional>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 
 #include "game/yaml_load.h"
@@ -48,29 +46,16 @@ std::filesystem::path ChatRoomMemoryPath(const std::filesystem::path& client_roo
 }
 
 void LoadChatRoomMemory(const std::filesystem::path& client_root, ChatRoomMemory& into) {
-  const std::filesystem::path path = ChatRoomMemoryPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    ro::core::LogWarning("salons : fichier illisible ({}) — les défauts s'appliquent",
-                         broken.what());
-    return;
-  }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lèverait
-  // hors du `try`.
-  if (!whole.IsMap()) {
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(ChatRoomMemoryPath(client_root), "salons", "les défauts s'appliquent");
+  if (!whole.has_value()) {
     return;
   }
   try {
-    into.title = whole[kTitleField].as<std::string>(into.title);
-    into.limit = whole[kLimitField].as<int>(into.limit);
-    into.is_public = whole[kPublicField].as<bool>(into.is_public);
-    const YAML::Node listed = whole[kRecentField];
+    into.title = (*whole)[kTitleField].as<std::string>(into.title);
+    into.limit = (*whole)[kLimitField].as<int>(into.limit);
+    into.is_public = (*whole)[kPublicField].as<bool>(into.is_public);
+    const YAML::Node listed = (*whole)[kRecentField];
     if (listed && listed.IsSequence()) {
       for (const YAML::Node& entry : listed) {
         if (into.recent_titles.size() >= kChatRoomRecentTitles) {
@@ -100,14 +85,7 @@ bool SaveChatRoomMemory(const std::filesystem::path& client_root, const ChatRoom
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(ChatRoomMemoryPath(client_root), text);
-      !written) {
-    ro::core::LogWarning("salons : écriture impossible ({})", ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(ChatRoomMemoryPath(client_root), kFileHeader, out, "salons");
 }
 
 }  // namespace moonclient

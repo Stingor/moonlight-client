@@ -1,15 +1,11 @@
 #include "chat/chat_tab_file.h"
 
 #include <cstddef>
+#include <optional>
 #include <string>
-#include <system_error>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>
-
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
-#include "ro/core/log.h"
 
 #include "game/save_folder.h"
 #include "game/yaml_load.h"
@@ -109,31 +105,15 @@ std::filesystem::path ChatTabFilePath(const std::filesystem::path& client_root) 
 }
 
 void LoadChatTabs(const std::filesystem::path& client_root, ChatTabs& into) {
-  const std::filesystem::path path = ChatTabFilePath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;  // première partie : ceux d'origine font l'affaire
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
-    // fichier abîmé ne doit pas empêcher de jouer.
-    ro::core::LogWarning(
-        "onglets de conversation : fichier illisible ({}) — les onglets d'origine sont rendus",
-        broken.what());
-    return;
-  }
-  // Une racine qui n'est pas une table n'a pas de champs : voir
-  // `LoadChatHistory`.
-  if (!whole.IsMap()) {
+  std::optional<YAML::Node> whole = LoadYamlMap(
+      ChatTabFilePath(client_root), "onglets de conversation", "les onglets d'origine sont rendus");
+  if (!whole.has_value()) {
     return;
   }
   // ⚠ UN FICHIER SANS `tabs` LAISSE CEUX D'ORIGINE — c'est aussi le cas d'un
   // fichier aux clés françaises, dont les filtres désignaient d'autres cases :
   // les relire rangerait chaque message ailleurs que là où le joueur l'attend.
-  const YAML::Node listed = whole[kTabsField];
+  const YAML::Node listed = (*whole)[kTabsField];
   if (!listed || !listed.IsSequence()) {
     return;
   }
@@ -218,19 +198,11 @@ bool SaveChatTabs(const std::filesystem::path& client_root, const ChatTabs& from
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(ChatTabFilePath(client_root), text);
-      !written) {
-    // ⚠ CE N'EST PAS LE VIDE QUI SURVIT, mais le fichier PRÉCÉDENT : l'écriture
-    // est atomique, donc elle n'a rien remplacé.
-    ro::core::LogWarning(
-        "onglets de conversation : écriture impossible ({}) — les onglets de cette partie ne "
-        "seront pas retenus, ceux d'avant reviendront",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  // ⚠ CE N'EST PAS LE VIDE QUI SURVIT, mais le fichier PRÉCÉDENT : l'écriture
+  // est atomique, donc elle n'a rien remplacé.
+  return SaveYamlFile(
+      ChatTabFilePath(client_root), kFileHeader, out, "onglets de conversation",
+      "les onglets de cette partie ne seront pas retenus, ceux d'avant reviendront");
 }
 
 }  // namespace moonclient

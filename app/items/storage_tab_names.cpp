@@ -1,12 +1,9 @@
 #include "items/storage_tab_names.h"
 
-#include <system_error>
+#include <optional>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
-#include "ro/core/log.h"
 #include "ro/core/text.h"
 
 #include "game/yaml_load.h"
@@ -81,29 +78,13 @@ std::filesystem::path StorageTabNamesPath(const std::filesystem::path& client_ro
 }
 
 void LoadStorageTabNames(const std::filesystem::path& client_root, StorageTabNames& into) {
-  const std::filesystem::path path = StorageTabNamesPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;  // première partie : les noms du serveur font l'affaire
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape : un fichier abîmé ne doit pas empêcher
-    // de jouer.
-    ro::core::LogWarning(
-        "onglets du coffre : fichier illisible ({}) — tous les coffres reprendront le nom du "
-        "serveur",
-        broken.what());
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(StorageTabNamesPath(client_root), "onglets du coffre",
+                  "tous les coffres reprendront le nom du serveur");
+  if (!whole.has_value()) {
     return;
   }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-  // hors du `try`, et le jeu ne se lancerait pas.
-  if (!whole.IsMap()) {
-    return;
-  }
-  const YAML::Node listed = whole[kTabsField];
+  const YAML::Node listed = (*whole)[kTabsField];
   if (!listed || !listed.IsSequence()) {
     return;
   }
@@ -142,17 +123,8 @@ bool SaveStorageTabNames(const std::filesystem::path& client_root, const Storage
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(StorageTabNamesPath(client_root), text);
-      !written) {
-    ro::core::LogWarning(
-        "onglets du coffre : écriture impossible ({}) — les noms donnés cette partie ne seront "
-        "pas retrouvés",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(StorageTabNamesPath(client_root), kFileHeader, out, "onglets du coffre",
+                      "les noms donnés cette partie ne seront pas retrouvés");
 }
 
 }  // namespace moonclient

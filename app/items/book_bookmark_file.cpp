@@ -1,14 +1,11 @@
 #include "items/book_bookmark_file.h"
 
 #include <algorithm>
-#include <string>
 #include <utility>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
 
@@ -153,15 +150,7 @@ bool SaveBookBookmarks(const std::filesystem::path& client_root, std::uint32_t c
     emit_mine();
   }
   out << YAML::EndSeq << YAML::EndMap;
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(BookBookmarkFilePath(client_root), text);
-      !written) {
-    ro::core::LogWarning("signets des livres : écriture impossible ({})",
-                         ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(BookBookmarkFilePath(client_root), kFileHeader, out, "signets des livres");
 }
 
 }  // namespace moonclient

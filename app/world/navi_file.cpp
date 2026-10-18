@@ -3,14 +3,12 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <optional>
 #include <string>
-#include <system_error>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 
 #include "game/minimap_layout_yaml.h"
@@ -78,29 +76,17 @@ std::filesystem::path NaviPrefsPath(const std::filesystem::path& client_root) {
 }
 
 void LoadNaviPrefs(const std::filesystem::path& client_root, NaviPrefs& into) {
-  const std::filesystem::path path = NaviPrefsPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) return;
-  YAML::Node whole;
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(NaviPrefsPath(client_root), "navigation", "les réglages par défaut restent");
+  if (!whole.has_value()) return;
   try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape : un fichier abîmé ne doit pas empêcher
-    // de jouer.
-    ro::core::LogWarning("navigation : fichier illisible ({}) — les réglages par défaut restent",
-                         broken.what());
-    return;
-  }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lèverait
-  // hors du `try`.
-  if (!whole.IsMap()) return;
-  try {
-    if (const YAML::Node minimap = whole[kMinimapField]; minimap && minimap.IsMap())
+    if (const YAML::Node minimap = (*whole)[kMinimapField]; minimap && minimap.IsMap())
       ReadMinimapLayout(minimap, into.legacy_minimap.emplace());
-    Read(whole, kTrailIconField, into.trail_icon);
+    Read(*whole, kTrailIconField, into.trail_icon);
     into.trail_icon = std::clamp(into.trail_icon, kLeastTrailIcon, kMostTrailIcon);
-    Read(whole, kGroundTrailField, into.ground_trail);
-    if (const YAML::Node memos = whole[kMemosField]; memos && memos.IsMap()) ReadMemos(memos, into);
+    Read(*whole, kGroundTrailField, into.ground_trail);
+    if (const YAML::Node memos = (*whole)[kMemosField]; memos && memos.IsMap())
+      ReadMemos(memos, into);
   } catch (const YAML::Exception& broken) {
     ro::core::LogWarning("navigation : valeur illisible ({}) — le reste garde son défaut",
                          broken.what());
@@ -131,17 +117,8 @@ bool SaveNaviPrefs(const std::filesystem::path& client_root, const NaviPrefs& fr
   }
   out << YAML::EndMap << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(NaviPrefsPath(client_root), text);
-      !written) {
-    ro::core::LogWarning(
-        "navigation : écriture impossible ({}) — réglages et marqueurs de cette partie ne seront "
-        "pas retrouvés",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(NaviPrefsPath(client_root), kFileHeader, out, "navigation",
+                      "réglages et marqueurs de cette partie ne seront pas retrouvés");
 }
 
 ro::ui::MinimapLayout InheritedMinimap(const std::filesystem::path& client_root) {

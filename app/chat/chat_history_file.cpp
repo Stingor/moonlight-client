@@ -7,9 +7,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
-#include "ro/core/log.h"
 #include "ro/core/printed.h"
 
 #include "chat/chat_tabs.h"
@@ -132,33 +129,16 @@ std::filesystem::path ChatHistoryPath(const std::filesystem::path& client_root) 
 
 PastChat LoadChatHistory(const std::filesystem::path& client_root) {
   PastChat past;
-  const std::filesystem::path path = ChatHistoryPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return past;  // première partie, ou option décochée : on joue sans
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
-    // fichier abîmé ne doit pas empêcher de jouer.
-    ro::core::LogWarning(
-        "historique de conversation : fichier illisible ({}) — la conversation de la partie "
-        "d'avant ne sera pas rendue",
-        broken.what());
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(ChatHistoryPath(client_root), "historique de conversation",
+                  "la conversation de la partie d'avant ne sera pas rendue");
+  if (!whole.has_value()) {
     return past;
   }
-  // 🔴 UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-  // `BadSubscript` HORS du `try`, et un fichier réduit à un mot empêchait de
-  // lancer le jeu.
-  if (!whole.IsMap()) {
-    return past;
-  }
-  past.saved_at = whole[kSavedAtField].as<std::string>(std::string());
-  ReadTexts(whole[kWhisperedField], &past.whispered);
-  ReadTexts(whole[kTypedField], &past.typed);
-  const YAML::Node listed = whole[kLinesField];
+  past.saved_at = (*whole)[kSavedAtField].as<std::string>(std::string());
+  ReadTexts((*whole)[kWhisperedField], &past.whispered);
+  ReadTexts((*whole)[kTypedField], &past.typed);
+  const YAML::Node listed = (*whole)[kLinesField];
   if (!listed || !listed.IsSequence()) {
     return past;
   }
@@ -223,17 +203,8 @@ bool SaveChatHistory(const std::filesystem::path& client_root,
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(ChatHistoryPath(client_root), text);
-      !written) {
-    ro::core::LogWarning(
-        "historique de conversation : écriture impossible ({}) — ce qui s'est dit cette partie "
-        "ne sera pas retrouvé à la prochaine",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(ChatHistoryPath(client_root), kFileHeader, out, "historique de conversation",
+                      "ce qui s'est dit cette partie ne sera pas retrouvé à la prochaine");
 }
 
 void ForgetChatHistory(const std::filesystem::path& client_root) {

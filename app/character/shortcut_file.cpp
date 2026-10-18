@@ -6,8 +6,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
 
@@ -333,15 +331,8 @@ bool SaveShortcutBar(const std::filesystem::path& client_root, std::string_view 
   // ⚠ ATOMIQUE, et il le faut d'autant plus ici : le fichier porte les barres
   // de TOUS les personnages du joueur. Une écriture tronquée ne perdrait pas
   // la dernière case posée, elle les perdrait toutes.
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written = ro::core::WriteFileAtomically(path, text); !written) {
-    ro::core::LogWarning(
-        "barre de raccourcis : écriture impossible ({}) — les cases posées cette partie ne "
-        "seront pas retrouvées",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(path, kFileHeader, out, "barre de raccourcis",
+                      "les cases posées cette partie ne seront pas retrouvées");
 }
 
 }  // namespace moonclient

@@ -1,13 +1,8 @@
 #include "items/storage_favorites.h"
 
-#include <string>
-#include <system_error>
+#include <optional>
 
 #include <yaml-cpp/yaml.h>
-
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
-#include "ro/core/log.h"
 
 #include "game/yaml_load.h"
 
@@ -53,28 +48,12 @@ std::filesystem::path StorageFavoritesPath(const std::filesystem::path& client_r
 }
 
 void LoadStorageFavorites(const std::filesystem::path& client_root, StorageFavorites& into) {
-  const std::filesystem::path path = StorageFavoritesPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;  // première partie : personne n'a encore rien marqué
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
-    // fichier abîmé ne doit pas empêcher de jouer.
-    ro::core::LogWarning(
-        "favoris du coffre : fichier illisible ({}) — l'onglet des favoris sera vide",
-        broken.what());
+  std::optional<YAML::Node> whole = LoadYamlMap(
+      StorageFavoritesPath(client_root), "favoris du coffre", "l'onglet des favoris sera vide");
+  if (!whole.has_value()) {
     return;
   }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-  // hors du `try`, et le jeu ne se lancerait pas.
-  if (!whole.IsMap()) {
-    return;
-  }
-  const YAML::Node listed = whole[kFavoritesField];
+  const YAML::Node listed = (*whole)[kFavoritesField];
   if (!listed || !listed.IsSequence()) {
     return;
   }
@@ -97,17 +76,8 @@ bool SaveStorageFavorites(const std::filesystem::path& client_root, const Storag
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(StorageFavoritesPath(client_root), text);
-      !written) {
-    ro::core::LogWarning(
-        "favoris du coffre : écriture impossible ({}) — les favoris de cette partie ne seront "
-        "pas retrouvés",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(StorageFavoritesPath(client_root), kFileHeader, out, "favoris du coffre",
+                      "les favoris de cette partie ne seront pas retrouvés");
 }
 
 }  // namespace moonclient

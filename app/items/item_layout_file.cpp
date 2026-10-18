@@ -1,14 +1,9 @@
 #include "items/item_layout_file.h"
 
 #include <cstdint>
-#include <string>
-#include <system_error>
+#include <optional>
 
 #include <yaml-cpp/yaml.h>
-
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
-#include "ro/core/log.h"
 
 #include "game/save_folder.h"
 #include "game/yaml_load.h"
@@ -43,29 +38,12 @@ std::filesystem::path ItemLayoutFilePath(const std::filesystem::path& client_roo
 }
 
 void LoadItemLayout(const std::filesystem::path& client_root, ItemLayout& into) {
-  const std::filesystem::path path = ItemLayoutFilePath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;  // première partie : le remplissage automatique fait l'affaire
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
-    // fichier abîmé ne doit pas empêcher de jouer.
-    ro::core::LogWarning(
-        "placement du sac : fichier illisible ({}) — la grille se remplira dans l'ordre du "
-        "serveur",
-        broken.what());
+  std::optional<YAML::Node> whole = LoadYamlMap(ItemLayoutFilePath(client_root), "placement du sac",
+                                                "la grille se remplira dans l'ordre du serveur");
+  if (!whole.has_value()) {
     return;
   }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-  // hors du `try`, et le jeu ne se lancerait pas.
-  if (!whole.IsMap()) {
-    return;
-  }
-  const YAML::Node listed = whole[kPlacesField];
+  const YAML::Node listed = (*whole)[kPlacesField];
   if (!listed || !listed.IsSequence()) {
     return;
   }
@@ -98,17 +76,8 @@ bool SaveItemLayout(const std::filesystem::path& client_root, const ItemLayout& 
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(ItemLayoutFilePath(client_root), text);
-      !written) {
-    ro::core::LogWarning(
-        "placement du sac : écriture impossible ({}) — la disposition de cette partie ne sera "
-        "pas retrouvée",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(ItemLayoutFilePath(client_root), kFileHeader, out, "placement du sac",
+                      "la disposition de cette partie ne sera pas retrouvée");
 }
 
 }  // namespace moonclient

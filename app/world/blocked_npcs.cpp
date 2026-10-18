@@ -1,14 +1,11 @@
 #include "world/blocked_npcs.h"
 
-#include <system_error>
+#include <optional>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/i18n.h"
-#include "ro/core/log.h"
 #include "ro/core/printed.h"
 #include "ro/sim/world.h"
 
@@ -93,27 +90,12 @@ std::filesystem::path BlockedNpcsPath(const std::filesystem::path& client_root) 
 }
 
 void LoadBlockedNpcs(const std::filesystem::path& client_root, BlockedNpcs& into) {
-  const std::filesystem::path path = BlockedNpcsPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;  // personne n'a encore rien bloqué
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
-    // fichier abîmé ne doit pas empêcher de jouer.
-    ro::core::LogWarning("PNJ bloqués : fichier illisible ({}) — aucun PNJ ne sera bloqué",
-                         broken.what());
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(BlockedNpcsPath(client_root), "PNJ bloqués", "aucun PNJ ne sera bloqué");
+  if (!whole.has_value()) {
     return;
   }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-  // hors du `try`, et le jeu ne se lancerait pas.
-  if (!whole.IsMap()) {
-    return;
-  }
-  const YAML::Node listed = whole[kListField];
+  const YAML::Node listed = (*whole)[kListField];
   if (!listed || !listed.IsSequence()) {
     return;
   }
@@ -142,16 +124,8 @@ bool SaveBlockedNpcs(const std::filesystem::path& client_root, const BlockedNpcs
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(BlockedNpcsPath(client_root), text);
-      !written) {
-    ro::core::LogWarning(
-        "PNJ bloqués : écriture impossible ({}) — le blocage ne survivra pas à cette partie",
-        ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(BlockedNpcsPath(client_root), kFileHeader, out, "PNJ bloqués",
+                      "le blocage ne survivra pas à cette partie");
 }
 
 }  // namespace moonclient

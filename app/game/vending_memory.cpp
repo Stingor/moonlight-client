@@ -1,12 +1,10 @@
 #include "game/vending_memory.h"
 
 #include <algorithm>
-#include <system_error>
+#include <optional>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/sim/vending.h"
 
@@ -91,28 +89,15 @@ std::filesystem::path VendingMemoryPath(const std::filesystem::path& client_root
 }
 
 void LoadVendingMemory(const std::filesystem::path& client_root, VendingMemory& into) {
-  const std::filesystem::path path = VendingMemoryPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    ro::core::LogWarning("échoppes : fichier illisible ({}) — les défauts s'appliquent",
-                         broken.what());
-    return;
-  }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lèverait
-  // hors du `try`.
-  if (!whole.IsMap()) {
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(VendingMemoryPath(client_root), "échoppes", "les défauts s'appliquent");
+  if (!whole.has_value()) {
     return;
   }
   try {
-    into.grid = whole[kGridField].as<bool>(into.grid);
-    into.confirm_high_prices = whole[kConfirmField].as<bool>(into.confirm_high_prices);
-    const YAML::Node listed = whole[kShopsField];
+    into.grid = (*whole)[kGridField].as<bool>(into.grid);
+    into.confirm_high_prices = (*whole)[kConfirmField].as<bool>(into.confirm_high_prices);
+    const YAML::Node listed = (*whole)[kShopsField];
     if (!listed || !listed.IsSequence()) {
       return;
     }
@@ -188,15 +173,7 @@ bool SaveVendingMemory(const std::filesystem::path& client_root, const VendingMe
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(VendingMemoryPath(client_root), text);
-      !written) {
-    ro::core::LogWarning("échoppes : écriture impossible ({})",
-                         ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(VendingMemoryPath(client_root), kFileHeader, out, "échoppes");
 }
 
 }  // namespace moonclient

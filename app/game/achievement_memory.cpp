@@ -1,13 +1,11 @@
 #include "game/achievement_memory.h"
 
 #include <algorithm>
-#include <system_error>
+#include <optional>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/sim/achievement_book.h"
 
@@ -99,28 +97,15 @@ std::filesystem::path AchievementMemoryPath(const std::filesystem::path& client_
 }
 
 void LoadAchievementMemory(const std::filesystem::path& client_root, AchievementMemory& into) {
-  const std::filesystem::path path = AchievementMemoryPath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;
-  }
-  YAML::Node whole;
-  try {
-    whole = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    ro::core::LogWarning("succès : fichier illisible ({}) — les défauts s'appliquent",
-                         broken.what());
-    return;
-  }
-  // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lèverait
-  // hors du `try`.
-  if (!whole.IsMap()) {
+  std::optional<YAML::Node> whole =
+      LoadYamlMap(AchievementMemoryPath(client_root), "succès", "les défauts s'appliquent");
+  if (!whole.has_value()) {
     return;
   }
   try {
-    into.banner = Bounded(whole[kBannerField].as<int>(0), ro::ui::kAchievementBannerStyleCount,
+    into.banner = Bounded((*whole)[kBannerField].as<int>(0), ro::ui::kAchievementBannerStyleCount,
                           ro::ui::AchievementBannerStyle::kNative);
-    const YAML::Node listed = whole[kCharactersField];
+    const YAML::Node listed = (*whole)[kCharactersField];
     if (!listed || !listed.IsSequence()) {
       return;
     }
@@ -164,14 +149,7 @@ bool SaveAchievementMemory(const std::filesystem::path& client_root,
   }
   out << YAML::EndSeq << YAML::EndMap;
 
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(AchievementMemoryPath(client_root), text);
-      !written) {
-    ro::core::LogWarning("succès : écriture impossible ({})", ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(AchievementMemoryPath(client_root), kFileHeader, out, "succès");
 }
 
 }  // namespace moonclient

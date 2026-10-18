@@ -1,14 +1,11 @@
 #include "character/equip_preset_file.h"
 
 #include <optional>
-#include <string>
 #include <utility>
 
 #include <SDL3/SDL_keycode.h>
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
 
@@ -253,15 +250,7 @@ bool SaveEquipPresets(const std::filesystem::path& client_root, std::uint32_t ch
     emit_mine();
   }
   out << YAML::EndSeq << YAML::EndMap;
-  const std::string text = std::string(kFileHeader) + out.c_str() + "\n";
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(EquipPresetFilePath(client_root), text);
-      !written) {
-    ro::core::LogWarning("presets d'équipement : écriture impossible ({})",
-                         ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return SaveYamlFile(EquipPresetFilePath(client_root), kFileHeader, out, "presets d'équipement");
 }
 
 int VirtualKeyOf(std::uint32_t key) {

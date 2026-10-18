@@ -1,5 +1,6 @@
 #include "input/hotkey_file.h"
 
+#include <optional>
 #include <string>
 
 #include <SDL3/SDL_keyboard.h>
@@ -53,29 +54,14 @@ std::filesystem::path HotkeyFilePath(const std::filesystem::path& client_root) {
 }
 
 void LoadHotkeys(const std::filesystem::path& client_root, Hotkeys& into) {
-  const std::filesystem::path path = HotkeyFilePath(client_root);
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return;  // première partie : les raccourcis d'origine font l'affaire
-  }
-  YAML::Node file;
-  try {
-    file = LoadYamlFile(path);
-  } catch (const YAML::Exception& broken) {
-    // ⚠ LA SEULE EXCEPTION QU'ON ATTRAPE DE TOUT LE PROGRAMME, et elle vient
-    // d'une bibliothèque qui n'offre pas d'autre voie. Un fichier de réglages
-    // abîmé ne doit pas empêcher de jouer : on le dit, et on garde les touches
-    // d'origine.
-    ro::core::LogWarning("raccourcis : fichier illisible ({}) — les touches d'origine restent",
-                         broken.what());
-    return;
-  }
-  if (!file.IsMap()) {
+  std::optional<YAML::Node> file =
+      LoadYamlMap(HotkeyFilePath(client_root), "raccourcis", "les touches d'origine restent");
+  if (!file.has_value()) {
     return;
   }
 
   for (const ActionRef action : AllBindableActions()) {
-    const YAML::Node entry = EntryOf(file, action);
+    const YAML::Node entry = EntryOf(*file, action);
     if (!entry) {
       continue;
     }
