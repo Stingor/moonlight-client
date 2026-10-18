@@ -110,6 +110,11 @@ void DrawCanvas(ChatPictureViewerState& state, const ChatPictureViewerView& view
       view.state == ChatPictureState::kReady && view.width_px > 0.0F && view.height_px > 0.0F;
   const float fit = FitZoom(view, size);
   if (ready) {
+    // LA TOILE SURVOLÉE SE RÉSERVE LA MOLETTE : Ctrl+molette y zoome l'image,
+    // et la caméra du jeu derrière la fenêtre n'en reçoit rien.
+    if (ImGui::IsItemHovered()) {
+      ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
+    }
     Handle(state, fit, middle, ImGui::IsItemHovered());
   }
   ImDrawList* into = ImGui::GetWindowDrawList();
