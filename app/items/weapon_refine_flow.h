@@ -2,7 +2,6 @@
 
 #include <array>
 #include <cstdint>
-#include <deque>
 #include <string>
 #include <vector>
 
@@ -15,6 +14,7 @@
 #include "ro/vfs/item_words.h"
 
 #include "items/craft_book.h"
+#include "items/craft_log.h"
 #include "items/creator_names.h"
 
 namespace moonclient {
@@ -73,12 +73,6 @@ class WeaponRefineFlow {
  private:
   enum class Pending : std::uint8_t { kNone, kRefine, kCancel, kRecast };
 
-  struct LogLine {
-    std::string text;
-    ro::ui::SkinTone tone = ro::ui::SkinTone::kText;
-    std::string time;
-  };
-
   void TakeList(ro::sim::World& world, ro::ui::WeaponRefineWindowState& state,
                 const WeaponRefineSettings& settings, std::uint32_t now_ms);
   void TakeResult(ro::sim::World& world, const WeaponRefineSettings& settings, bool window_open,
@@ -101,7 +95,6 @@ class WeaponRefineFlow {
   // Le motif qui interdit de continuer la chaîne, ou nul.
   [[nodiscard]] const char* AutoStopCause(const ro::sim::World& world) const;
   void ResetSession(ro::ui::WeaponRefineWindowState& state);
-  void Log(std::string text, ro::ui::SkinTone tone);
 
   [[nodiscard]] const ro::sim::RefinableWeapon* EntryAt(std::int32_t index) const;
   [[nodiscard]] std::string WeaponName(const ro::sim::World& world,
@@ -156,7 +149,7 @@ class WeaponRefineFlow {
 
   std::string last_result_;
   ro::ui::SkinTone last_result_tone_ = ro::ui::SkinTone::kText;
-  std::deque<LogLine> history_;
+  CraftLog log_;
 
   // ── LA VUE ─────────────────────────────────────────────────────────────────
   // ⚠ LES VUES POINTENT DANS CES CHAÎNES : elles se prennent une fois tout
@@ -165,7 +158,6 @@ class WeaponRefineFlow {
   std::vector<std::string> full_names_;
   std::vector<ro::ui::WeaponRefineRowView> rows_;
   std::array<std::string, ro::ui::kRefineOreCount> ore_names_;
-  std::vector<ro::ui::CraftLogLineView> history_view_;
   std::string confirm_name_;
   ro::ui::WeaponRefineView view_;
 };

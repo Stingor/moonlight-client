@@ -16,6 +16,7 @@
 #include "ro/vfs/item_words.h"
 
 #include "items/craft_book.h"
+#include "items/craft_log.h"
 
 namespace moonclient {
 
@@ -89,12 +90,6 @@ class MakeItemFlow {
     std::vector<Material> materials;
   };
 
-  struct LogLine {
-    std::string text;
-    ro::ui::SkinTone tone = ro::ui::SkinTone::kText;
-    std::string time;
-  };
-
   // ── LA LECTURE DU SERVEUR (make_item_flow.cpp) ─────────────────────────────
   void TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& state,
                 const MakeItemSettings& settings, std::uint32_t now_ms);
@@ -116,7 +111,6 @@ class MakeItemFlow {
                      bool window_open, std::uint32_t now_ms);
   void SendReuseItem(const MakeItemSettings& settings, ro::net::Connection& link,
                      ro::sim::World& world);
-  void Log(std::string text, ro::ui::SkinTone tone);
 
   void ResolveMaterials(Entry& entry) const;
   void RecountOwned(const ro::sim::World& world);
@@ -204,7 +198,7 @@ class MakeItemFlow {
 
   std::string last_result_;
   ro::ui::SkinTone last_result_tone_ = ro::ui::SkinTone::kText;
-  std::deque<LogLine> history_;
+  CraftLog log_;
 
   // ── LA VUE ─────────────────────────────────────────────────────────────────
   // ⚠ LES VUES POINTENT DANS CES CONTENEURS : elles se prennent une fois tout
@@ -227,7 +221,6 @@ class MakeItemFlow {
   std::array<std::string, ro::net::kProduceExtraSlots> chosen_labels_;
   std::string relaunch_tip_;
   std::string batch_progress_;
-  std::vector<ro::ui::CraftLogLineView> history_view_;
   ro::ui::MakeItemView view_;
 };
 

@@ -51,6 +51,13 @@ struct GroundUnitPick;
 // Définie, comme `ComposedAsPlayer` et `LayoutOf`, dans `actor_look.cpp`.
 [[nodiscard]] ro::render::ActorLook LookOf(const ro::sim::Actor& actor);
 
+// LE CORPS SEUL, POUR UN PANTIN : ni coiffe, ni cape, ni arme, ni bouclier. Un
+// chapeau volumineux rétrécirait le personnage tout en masquant les pièces
+// qu'on cherche justement à voir.
+void KeepBodyOnly(ro::render::ActorLook& look);
+// `LookOf`, réduit au corps seul.
+[[nodiscard]] ro::render::ActorLook BodyOnlyLookOf(const ro::sim::Actor& actor);
+
 // LE MÉTIER QUE L'ACTEUR MONTRE : celui de son corps monté ou de son costume,
 // que ses options et deux de ses états choisissent — voir
 // `ro::render::ShownJobFor`. Tout ce qui se lit sur le corps se lit sur lui ;

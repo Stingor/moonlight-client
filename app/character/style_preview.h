@@ -8,7 +8,6 @@
 #include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/palette_ramps.h"
-#include "ro/sim/actor.h"
 #include "ro/sim/bank.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/style_preview.h"
@@ -56,10 +55,6 @@ class StylePreview {
   void Close();
 
  private:
-  // L'apparence du pantin : le corps et la tête, rien d'autre — même règle que
-  // l'éditeur, une coiffe volumineuse masquerait ce qu'on vient regarder.
-  [[nodiscard]] ro::render::ActorLook DollLook(const ro::sim::Actor& player) const;
-
   ro::render::ActorWardrobe* wardrobe_ = nullptr;
   std::optional<ro::render::ActorVignette> doll_;
 

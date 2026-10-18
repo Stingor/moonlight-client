@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
@@ -12,9 +11,6 @@
 namespace moonclient {
 
 // ── CE QUE LES FICHIERS DE PROFILS PARTAGENT ───────────────────────────────
-
-// Le texte du fichier ; vide s'il est absent, rien s'il ne s'ouvre pas.
-[[nodiscard]] std::optional<std::string> ReadProfileFile(const std::filesystem::path& path);
 
 // La racine d'un fichier de profils de cette version ; un nœud nul pour un
 // texte vide. Rien pour un texte illisible ou d'une autre version.

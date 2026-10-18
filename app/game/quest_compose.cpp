@@ -8,6 +8,7 @@
 #include "ro/core/i18n.h"
 #include "ro/sim/world.h"
 
+#include "game/braces_filled.h"
 #include "game/quest_stage.h"
 #include "game/skin_image_of.h"
 #include "quest/quest_rules.h"
@@ -139,8 +140,8 @@ void QuestStage::ComposeRow(const ro::sim::QuestRecord* quest, const QuestHistor
     if (info->npc.has_value()) {
       into.npc = ro::ui::QuestNpcView{
           .label = texts_.emplace_back(
-              QuestFill("{} ({}, {})", {info->npc->map_name, std::to_string(info->npc->cell_x),
-                                        std::to_string(info->npc->cell_y)})),
+              BracesFilled("{} ({}, {})", {info->npc->map_name, std::to_string(info->npc->cell_x),
+                                           std::to_string(info->npc->cell_y)})),
           .map_name = info->npc->map_name,
           .cell_x = info->npc->cell_x,
           .cell_y = info->npc->cell_y};
@@ -250,8 +251,8 @@ ro::ui::QuestRecommendedView QuestStage::RecommendedRow(const RecommendedQuest& 
   if (entry.npc.has_value()) {
     row.npc = ro::ui::QuestNpcView{
         .label = texts_.emplace_back(
-            QuestFill("{} ({}, {})", {entry.npc->map_name, std::to_string(entry.npc->cell_x),
-                                      std::to_string(entry.npc->cell_y)})),
+            BracesFilled("{} ({}, {})", {entry.npc->map_name, std::to_string(entry.npc->cell_x),
+                                         std::to_string(entry.npc->cell_y)})),
         .map_name = entry.npc->map_name,
         .cell_x = entry.npc->cell_x,
         .cell_y = entry.npc->cell_y};
@@ -439,13 +440,13 @@ void QuestStage::ComposeTracker(const ro::sim::World& world, const ro::ui::Track
     const QuestInfo* info = catalog_ != nullptr ? catalog_->Find(quest->quest_id) : nullptr;
     std::vector<ro::ui::TrackerLine>& lines = tracker_line_lists_.emplace_back();
     if (quest->hunts.empty() && info != nullptr && !info->summary.empty()) {
-      lines.push_back(ro::ui::TrackerLine{
-          .text = tracker_texts_.emplace_back(QuestFill("- {}", {PlainQuestText(info->summary)}))});
+      lines.push_back(ro::ui::TrackerLine{.text = tracker_texts_.emplace_back(BracesFilled(
+                                              "- {}", {PlainQuestText(info->summary)}))});
     }
     for (const ro::sim::QuestHunt& hunt : quest->hunts) {
-      std::string text = QuestFill("- {}", {HuntLabel(hunt)});
+      std::string text = BracesFilled("- {}", {HuntLabel(hunt)});
       if (hunt.total > 0) {
-        text += QuestFill(" ({}/{})", {std::to_string(hunt.killed), std::to_string(hunt.total)});
+        text += BracesFilled(" ({}/{})", {std::to_string(hunt.killed), std::to_string(hunt.total)});
       }
       lines.push_back(ro::ui::TrackerLine{
           .text = tracker_texts_.emplace_back(std::move(text)),
@@ -481,8 +482,8 @@ void QuestStage::ComposeTracker(const ro::sim::World& world, const ro::ui::Track
   }
   tracker_total_ = tracked.size();
   if (tracked.size() > tracker_entries_.size()) {
-    tracker_more_ = QuestFill(ro::core::Tr("+{} autres"),
-                              {std::to_string(tracked.size() - tracker_entries_.size())});
+    tracker_more_ = BracesFilled(ro::core::Tr("+{} autres"),
+                                 {std::to_string(tracked.size() - tracker_entries_.size())});
   }
 }
 

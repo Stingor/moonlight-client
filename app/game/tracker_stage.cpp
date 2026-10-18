@@ -6,7 +6,7 @@
 
 #include "ro/core/i18n.h"
 
-#include "quest/quest_rules.h"
+#include "game/braces_filled.h"
 
 namespace moonclient {
 namespace {
@@ -112,9 +112,10 @@ void TrackerStage::Advance(TrackerWindows& tracker, QuestStage& quests, QuestWin
   const std::span<const ro::ui::TrackerEntry> quest_entries = quests.tracker_entries();
   const std::span<const ro::ui::TrackerEntry> achievement_entries =
       achievement_windows.tracker_entries;
-  quest_label_ = QuestFill(ro::core::Tr("Quêtes ({})"), {std::to_string(quests.tracker_total())});
+  quest_label_ =
+      BracesFilled(ro::core::Tr("Quêtes ({})"), {std::to_string(quests.tracker_total())});
   achievement_label_ =
-      QuestFill(ro::core::Tr("Succès ({})"), {std::to_string(achievement_entries.size())});
+      BracesFilled(ro::core::Tr("Succès ({})"), {std::to_string(achievement_entries.size())});
   const ro::ui::TrackerSection quest_section{.kind = ro::ui::TrackerKind::kQuest,
                                              .label = quest_label_,
                                              .entries = quest_entries,

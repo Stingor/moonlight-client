@@ -3,12 +3,12 @@
 #include <optional>
 #include <utility>
 
-#include <imgui.h>
-
 #include "ro/core/error.h"
 #include "ro/core/log.h"
 #include "ro/render/decor_vignette.h"
 #include "ro/render/gl_texture.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 
@@ -40,9 +40,7 @@ ro::ui::MapEditorPreview ModelPreviews::Show(ro::vfs::Vfs& vfs, const std::strin
   preview.file = file;
   preview.failed = shown.failed;
   if (shown.picture != nullptr) {
-    preview.image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(shown.picture->texture.name()),
-                                      .width = static_cast<float>(shown.picture->width_px),
-                                      .height = static_cast<float>(shown.picture->height_px)};
+    preview.image = SizedSkinImageOf(*shown.picture);
   }
   return preview;
 }

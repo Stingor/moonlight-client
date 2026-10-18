@@ -69,9 +69,6 @@ class BuyingStoreStage {
   void Note(std::uint32_t item_id, std::uint16_t slot, bool hovered,
             ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
 
-  // Ce que la conversation dit, en rouge ou dans sa couleur.
-  static void Say(const TradeContext& context, std::string text, std::uint32_t color);
-
   ro::sim::BuyingStore store_;
   TradeItemFocus hovered_;
   std::optional<TradeItemFocus> described_;

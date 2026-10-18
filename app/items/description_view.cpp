@@ -15,7 +15,6 @@
 
 #include "game/item_db_block.h"
 #include "game/skin_image_of.h"
-#include "items/inventory_view.h"
 
 namespace moonclient {
 
@@ -183,9 +182,7 @@ void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id
     const ro::render::ItemIcons::DescriptionPicture picture =
         icons_->GetDescriptionPicture(item_id);
     if (const ro::render::IconTexture* shown = picture.texture; shown != nullptr) {
-      view_.picture = ro::ui::SkinImage{.id = static_cast<ImTextureID>(shown->texture.name()),
-                                        .width = static_cast<float>(shown->width_px),
-                                        .height = static_cast<float>(shown->height_px)};
+      view_.picture = SizedSkinImageOf(*shown);
       // ⚠ C'EST ICI QU'ON SAIT SI C'EN EST UNE, et nulle part ailleurs : la
       // fenêtre en fait un survol à part, et `ui` n'a pas la table qui le dit.
       view_.picture_is_card = picture.card;

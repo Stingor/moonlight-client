@@ -1,10 +1,12 @@
 #include "game/trade_items.h"
 
+#include <utility>
+
+#include "ro/sim/world.h"
 #include "ro/vfs/item_name.h"
 
 #include "game/skin_image_of.h"
 #include "game/store_search_grade.h"
-#include "items/inventory_view.h"
 
 namespace moonclient {
 
@@ -52,6 +54,12 @@ int TradeItems::CardSlotsOf(std::uint32_t item_id) const {
   }
   const ro::vfs::ItemEntry* entry = items_->Find(item_id);
   return entry == nullptr ? 0 : entry->card_slots;
+}
+
+void Say(const TradeContext& context, std::string text, std::uint32_t color) {
+  if (!text.empty()) {
+    context.world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), context.now_ms, color);
+  }
 }
 
 }  // namespace moonclient

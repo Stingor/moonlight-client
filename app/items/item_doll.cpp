@@ -89,10 +89,7 @@ void ItemDoll::Refresh(const ro::sim::World& world, std::uint16_t view_id,
   if (wardrobe_ != nullptr) {
     dressing.Dress(world.player_id(), pose.look, *wardrobe_, world.styles());
   }
-  pose.look.headgears = {};
-  pose.look.weapon = 0;
-  pose.look.shield = 0;
-  pose.look.robe = 0;
+  KeepBodyOnly(pose.look);
   switch (layer) {
     case DollLayer::kTop:
       pose.look.headgears[kTopRank] = view_id;

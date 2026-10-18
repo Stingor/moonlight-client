@@ -2,12 +2,9 @@
 
 #include <algorithm>
 #include <array>
-#include <chrono>
-#include <ctime>
 #include <utility>
 
 #include "ro/core/i18n.h"
-#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
 #include "ro/net/craft_session.h"
@@ -46,7 +43,6 @@ constexpr int kMostRecastRetries = 3;
 constexpr std::uint32_t kLeastSendIntervalMs = 400;
 // Une tentative sans réponse cesse d'être attendue.
 constexpr std::uint32_t kAwaitTimeoutMs = 10000;
-constexpr std::size_t kMostHistoryLines = 200;
 
 // Le type d'objet d'une arme sur le fil. La liste ne le porte pas : elle ne
 // liste QUE des armes.
@@ -56,46 +52,6 @@ constexpr std::int32_t kWeaponItemType = 4;
 constexpr std::uint32_t kChatSucceededColor = 0x00FFFF;
 constexpr std::uint32_t kChatFailedColor = 0x00CDCD;
 constexpr std::uint32_t kChatRefusedColor = 0xFFC8C8;
-
-constexpr std::size_t kTimeBytes = 16;
-
-// ⚠ PAR SOUSTRACTION : l'horloge reboucle, et une échéance juste avant le
-// rebouclage doit rester échue juste après.
-[[nodiscard]] bool Due(std::uint32_t at, std::uint32_t now_ms) {
-  return at != 0 && static_cast<std::int32_t>(now_ms - at) >= 0;
-}
-
-// Une échéance ; zéro voulant dire « rien d'armé », elle n'en vaut jamais zéro.
-[[nodiscard]] std::uint32_t Deadline(std::uint32_t now_ms, std::uint32_t delay_ms) {
-  const std::uint32_t at = now_ms + delay_ms;
-  return at == 0 ? 1 : at;
-}
-
-[[nodiscard]] std::string ClockNow() {
-  const std::time_t stamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::tm local{};
-  if (!ro::core::ToLocalTime(stamp, local)) {
-    return {};
-  }
-  std::array<char, kTimeBytes> text{};
-  std::strftime(text.data(), text.size(), "%H:%M:%S", &local);
-  return text.data();
-}
-
-// LE NOM D'UNE ARME DU SAC : ce que `vfs` sait composer, depuis ce que `sim`
-// porte. ⚠ LE FORGERON N'EST PAS SUR LE FIL : `CreatorNames` le pose ensuite.
-[[nodiscard]] ro::vfs::ItemNameFacts FactsOf(const ro::sim::InventoryItem& item) {
-  static_assert(ro::sim::kItemCardSlots == ro::vfs::kItemNameCardSlots,
-                "le fil porte quatre cartes des deux côtés de la frontière");
-  ro::vfs::ItemNameFacts facts;
-  facts.item_id = item.item_id;
-  facts.type = item.type;
-  facts.refine_level = item.refine_level;
-  facts.grade = item.grade;
-  facts.cards = item.cards;
-  facts.identified = item.identified;
-  return facts;
-}
 
 [[nodiscard]] int LearnedLevel(const ro::sim::World& world) {
   const ro::sim::KnownSkill* skill = world.skill_book().Find(kWeaponRefineSkill);
@@ -179,7 +135,7 @@ void WeaponRefineFlow::TakeResult(ro::sim::World& world, const WeaponRefineSetti
                          : nullptr;
     std::string name;
     if (item != nullptr) {
-      ro::vfs::ItemNameFacts facts = FactsOf(*item);
+      ro::vfs::ItemNameFacts facts = ItemNameFactsOf(*item);
       facts.refine_level = 0;
       creators_.Fill(facts);
       if (items_ != nullptr && words_ != nullptr) {
@@ -233,7 +189,7 @@ void WeaponRefineFlow::TakeResult(ro::sim::World& world, const WeaponRefineSetti
   }
   last_result_ = prefix + body;
   last_result_tone_ = tone;
-  Log(last_result_, tone);
+  log_.Add(last_result_, tone);
   if (ours) {
     ScheduleAutoRecast(result.outcome, settings, world, window_open, now_ms);
   }
@@ -245,7 +201,8 @@ void WeaponRefineFlow::TakeRefusal(const WeaponRefineSettings& settings, bool wi
     // C'EST LA TENTATIVE QUI EST REFUSÉE : arme non affinable, coût absent de la
     // table du serveur, échange en cours. Rien n'a été consommé.
     awaiting_ = false;
-    Log(Tr("Tentative refusée par le serveur (aucun minerai consommé)."), ro::ui::SkinTone::kWarn);
+    log_.Add(Tr("Tentative refusée par le serveur (aucun minerai consommé)."),
+             ro::ui::SkinTone::kWarn);
     auto_recast_at_ = 0;
     stop_reason_ = Tr("Le serveur a refusé la tentative : relance arrêtée.");
     return;
@@ -318,14 +275,14 @@ void WeaponRefineFlow::RetryRecast(const WeaponRefineSettings& settings, bool wi
   }
   if (++recast_retries_ > kMostRecastRetries) {
     stop_reason_ = Tr("Le skill ne repart pas (délai de lancement) : relance arrêtée.");
-    Log(stop_reason_, ro::ui::SkinTone::kWarn);
+    log_.Add(stop_reason_, ro::ui::SkinTone::kWarn);
     return;
   }
   auto_recast_at_ = Deadline(now_ms, kAutoRecastDelayMs);
   stop_reason_ = nullptr;
-  Log(ro::core::Printed(Tr("Relance jetée par le délai de lancement : nouvel essai (%d/%d)."),
-                        recast_retries_, kMostRecastRetries),
-      ro::ui::SkinTone::kWarn);
+  log_.Add(ro::core::Printed(Tr("Relance jetée par le délai de lancement : nouvel essai (%d/%d)."),
+                             recast_retries_, kMostRecastRetries),
+           ro::ui::SkinTone::kWarn);
 }
 
 void WeaponRefineFlow::Tick(const ro::ui::WeaponRefineWindowAction& asked,
@@ -446,7 +403,7 @@ void WeaponRefineFlow::Apply(const ro::ui::WeaponRefineWindowAction& asked,
       WeaponRefineSettings chained = settings;
       chained.auto_refine = true;
       ScheduleAutoRefine(chained, world, state.open, now_ms);
-      Log(Tr("Chaîne automatique lancée."), ro::ui::SkinTone::kWarn);
+      log_.Add(Tr("Chaîne automatique lancée."), ro::ui::SkinTone::kWarn);
       break;
     }
     case WeaponRefineVerb::kStop:
@@ -458,7 +415,7 @@ void WeaponRefineFlow::Apply(const ro::ui::WeaponRefineWindowAction& asked,
         pending_ = Pending::kNone;
       }
       stop_reason_ = nullptr;
-      Log(Tr("Chaîne automatique arrêtée à la demande."), ro::ui::SkinTone::kWarn);
+      log_.Add(Tr("Chaîne automatique arrêtée à la demande."), ro::ui::SkinTone::kWarn);
       break;
     case WeaponRefineVerb::kClose:
       RequestClose(state);
@@ -534,9 +491,9 @@ void WeaponRefineFlow::CloseForOtherCraft(ro::ui::WeaponRefineWindowState& state
     }
     session_armed_ = false;
   }
-  Log(Tr("Session de refine abandonnée : une fabrication a été lancée (le serveur n'en garde "
-         "qu'une)."),
-      ro::ui::SkinTone::kWarn);
+  log_.Add(Tr("Session de refine abandonnée : une fabrication a été lancée (le serveur n'en garde "
+              "qu'une)."),
+           ro::ui::SkinTone::kWarn);
   ResetSession(state);
 }
 
@@ -562,13 +519,6 @@ void WeaponRefineFlow::ResetSession(ro::ui::WeaponRefineWindowState& state) {
   recast_retries_ = 0;
 }
 
-void WeaponRefineFlow::Log(std::string text, ro::ui::SkinTone tone) {
-  history_.push_back(LogLine{.text = std::move(text), .tone = tone, .time = ClockNow()});
-  while (history_.size() > kMostHistoryLines) {
-    history_.pop_front();
-  }
-}
-
 // ── LES NOMS ────────────────────────────────────────────────────────────────
 
 const ro::sim::RefinableWeapon* WeaponRefineFlow::EntryAt(std::int32_t index) const {
@@ -588,7 +538,7 @@ std::string WeaponRefineFlow::WeaponName(const ro::sim::World& world,
   if (const ro::sim::InventoryItem* item =
           world.inventory().Find(static_cast<std::uint16_t>(weapon.index));
       item != nullptr && item->item_id == weapon.item_id) {
-    facts = FactsOf(*item);
+    facts = ItemNameFactsOf(*item);
   } else {
     facts.item_id = weapon.item_id;
     facts.type = kWeaponItemType;
@@ -695,12 +645,7 @@ void WeaponRefineFlow::Compose(const ro::sim::World& world,
   view_.last_result = last_result_;
   view_.last_result_tone = last_result_tone_;
 
-  history_view_.clear();
-  for (const LogLine& line : history_) {
-    history_view_.push_back(
-        ro::ui::CraftLogLineView{.text = line.text, .tone = line.tone, .time = line.time});
-  }
-  view_.history = history_view_;
+  view_.history = log_.Views();
 
   if (const ro::sim::RefinableWeapon* aimed = EntryAt(state.confirm_index); aimed != nullptr) {
     confirm_name_ = WeaponName(world, *aimed, false);

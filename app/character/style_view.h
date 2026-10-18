@@ -8,7 +8,6 @@
 #include "ro/render/actor_thumbnails.h"
 #include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
-#include "ro/sim/actor.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/character_window.h"
 #include "ro/ui/palette_editor.h"
@@ -111,12 +110,6 @@ class StyleView {
   void TickDraft(const ro::ui::PaletteEditorState& state, std::uint32_t now_ms);
 
  private:
-  // L'apparence du pantin : le corps et la tête, rien d'autre.
-  //
-  // ⚠ NUE, SANS CE QUE LA RECETTE IMPOSE : c'est elle qui décide du CORPS,
-  // donc de la variante de style à retrouver, et la variante ne doit pas
-  // décider du corps. Ce que la recette impose se pose ensuite.
-  [[nodiscard]] ro::render::ActorLook DollLook(const ro::sim::Actor& player) const;
   // Recharge les pièces quand le corps ou la teinte de base ont changé.
   void ReloadRamps(const ro::render::ActorLook& look);
   // Compose le pantin, pulsation comprise.

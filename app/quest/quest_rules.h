@@ -5,7 +5,6 @@
 // Tout ce qui se trompe en silence est ici, là où un essai peut le voir.
 
 #include <cstdint>
-#include <initializer_list>
 #include <span>
 #include <string>
 #include <string_view>
@@ -23,11 +22,6 @@ namespace moonclient {
 // une quête qu'aucune autre catégorie ne réclame.
 inline constexpr std::string_view kQuestAllCategory = "all";
 inline constexpr std::string_view kQuestOtherCategory = "etc";
-
-// Le gabarit de nos phrases : chaque « {} » reçoit la valeur suivante. ⚠ PAS DE
-// `std::vformat` : une traduction mal formée lèverait une exception.
-[[nodiscard]] std::string QuestFill(std::string_view pattern,
-                                    std::initializer_list<std::string_view> values);
 
 // CE QU'UNE CHASSE VISE : le nom du monstre que le serveur donne ; pour une
 // chasse générique (sans monstre), ses critères dans la langue courante —

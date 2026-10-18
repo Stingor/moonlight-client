@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/core/text.h"
 
 namespace moonclient {
 namespace {
@@ -21,10 +22,6 @@ using ro::ui::CharacterTab;
 constexpr std::size_t kFieldsBytes = 760;
 // Un texte libre — un compte rendu du serveur, un refus — n'en garde pas plus.
 constexpr std::size_t kNoteBytes = 96;
-// Un octet de suite UTF-8 — ni le premier d'un caractère, ni un caractère
-// entier — a ses deux bits hauts à 10.
-constexpr unsigned char kUtf8ContinuationMask = 0xC0;
-constexpr unsigned char kUtf8Continuation = 0x80;
 
 // Les emplacements, au rang de `EquipSlot`.
 constexpr std::array<const char*, ro::ui::kEquipSlotCount> kSlotWords = {
@@ -84,12 +81,7 @@ constexpr std::array<const char*, ro::ui::kEquipSlotCount> kSlotWords = {
 // Un texte libre, coupé à `kNoteBytes` sur une frontière de caractère, puis
 // échappé.
 [[nodiscard]] std::string Note(std::string_view text) {
-  std::size_t kept = std::min(text.size(), kNoteBytes);
-  while (kept > 0 && kept < text.size() &&
-         (static_cast<unsigned char>(text[kept]) & kUtf8ContinuationMask) == kUtf8Continuation) {
-    --kept;
-  }
-  return JsonEscaped(text.substr(0, kept));
+  return JsonEscaped(ro::core::Utf8Prefix(text, kNoteBytes));
 }
 
 // Un tampon terminé par un zéro, jusqu'à lui et jamais au-delà.

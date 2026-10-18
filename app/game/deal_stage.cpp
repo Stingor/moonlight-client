@@ -21,24 +21,11 @@ namespace {
 
 using ro::vfs::TradeWord;
 
-// Les couleurs des lignes de conversation, celles des commerces : cyan pour ce
-// qui a réussi, rouge pour ce qui a échoué ; l'orangé des mises en garde du
-// client lui-même.
-constexpr std::uint32_t kSucceededColor = 0x00FFFF;
-constexpr std::uint32_t kFailedColor = 0xFF0000;
-constexpr std::uint32_t kWarningColor = 0xFFAA00;
-
 // LE MOT DU JEU, sinon le nôtre : une installation sans la clé ne laisse pas le
 // joueur sans réponse.
 std::string GameOr(const ro::vfs::ItemWords& words, TradeWord word, const char* ours) {
   const std::string_view said = ro::vfs::TradeText(words, word);
   return said.empty() ? std::string(ours) : std::string(said);
-}
-
-void Say(const TradeContext& context, std::string text, std::uint32_t color) {
-  if (!text.empty()) {
-    context.world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), context.now_ms, color);
-  }
 }
 
 std::string AnswerText(std::uint8_t code, std::string_view partner,
@@ -267,7 +254,7 @@ void DealStage::AdvanceApproach(const TradeContext& context) {
     approach.since_ms = context.now_ms;
   }
   if (deal_.open()) {
-    Say(context, ro::core::Tr("Terminez d'abord l'échange en cours."), kFailedColor);
+    Say(context, ro::core::Tr("Terminez d'abord l'échange en cours."), kTradeFailedColor);
     approach_.reset();
     return;
   }
@@ -275,7 +262,7 @@ void DealStage::AdvanceApproach(const TradeContext& context) {
   const ro::sim::Actor* partner = context.world.Find(approach.account_id);
   if (self == nullptr || partner == nullptr) {
     Say(context, AnswerText(ro::sim::kDealAnswerNoCharacter, approach.name, context.words),
-        kFailedColor);
+        kTradeFailedColor);
     approach_.reset();
     return;
   }
@@ -296,7 +283,7 @@ void DealStage::AdvanceApproach(const TradeContext& context) {
     Say(context,
         BracesFilled(ro::core::Tr("Impossible de rejoindre {} pour lui proposer un échange."),
                      {approach.name}),
-        kFailedColor);
+        kTradeFailedColor);
     approach_.reset();
     return;
   }
@@ -380,7 +367,7 @@ void DealStage::FollowWindow(DealWindows& windows, const TradeContext& context) 
     if (auto sent = ro::net::ExecuteDeal(context.link, deal_, answer.execute_revision, purse);
         !sent) {
       Say(context, DealExecuteFaultText(deal_.CheckExecute(answer.execute_revision, purse)),
-          kFailedColor);
+          kTradeFailedColor);
     }
   }
 }
@@ -396,47 +383,47 @@ void DealStage::SayNews(const TradeContext& context) {
     news_said_ = news.seq;
     switch (news.kind) {
       case ro::sim::DealNewsKind::kAnswered:
-        Say(context, AnswerText(news.code, partner_name_, words), kFailedColor);
+        Say(context, AnswerText(news.code, partner_name_, words), kTradeFailedColor);
         break;
       case ro::sim::DealNewsKind::kAddRefused: {
         const std::string item = context.items.NameOf(news.item, context.creators);
         last_refusal_ = AddRefusalText(news.code, item, partner_name_, words);
-        Say(context, last_refusal_, kFailedColor);
+        Say(context, last_refusal_, kTradeFailedColor);
         break;
       }
       case ro::sim::DealNewsKind::kPartnerLocked:
         Say(context, BracesFilled(ro::core::Tr("{} a verrouillé son offre."), {partner_name_}),
-            kSucceededColor);
+            kTradeSucceededColor);
         break;
       case ro::sim::DealNewsKind::kPartnerChangedAfterMyLock:
         Say(context,
             BracesFilled(ro::core::Tr("{} a changé son offre après votre verrou : relisez-la avant "
                                       "d'échanger."),
                          {partner_name_}),
-            kWarningColor);
+            kTradeWarningColor);
         break;
       case ro::sim::DealNewsKind::kCancelled:
         Say(context,
             GameOr(words, TradeWord::kDealCancelled, ro::core::Tr("L'échange a été annulé.")),
-            kFailedColor);
+            kTradeFailedColor);
         break;
       case ro::sim::DealNewsKind::kRefusedAtExecution:
         Say(context, GameOr(words, TradeWord::kDealNotDone, ro::core::Tr("L'échange a échoué.")),
-            kFailedColor);
+            kTradeFailedColor);
         Say(context,
             ro::core::Tr("Le serveur a refusé de l'exécuter : place, poids ou zeny insuffisants "
                          "chez l'un des deux. Rien n'a changé de main."),
-            kWarningColor);
+            kTradeWarningColor);
         break;
       case ro::sim::DealNewsKind::kExecuted:
         Say(context, GameOr(words, TradeWord::kDealDone, ro::core::Tr("L'échange a été effectué.")),
-            kSucceededColor);
+            kTradeSucceededColor);
         break;
       // ⚠ UNE SEULE LIGNE POUR TOUS LES DÉPÔTS RENDUS, qui ne s'annoncent pas
       // comme des gains : rien n'a été gagné.
       case ro::sim::DealNewsKind::kStakeReturned:
         Say(context, ro::core::Tr("Ce que vous aviez déposé dans l'échange vous a été rendu."),
-            kSucceededColor);
+            kTradeSucceededColor);
         break;
     }
   }
@@ -452,20 +439,20 @@ void DealStage::SayRefusedFrames(const TradeContext& context) {
             GameOr(context.words, TradeWord::kDealHoldsItems,
                    ro::core::Tr("Impossible d'utiliser, d'équiper, d'ôter, de jeter ou de ranger "
                                 "un item pendant un échange.")),
-            kFailedColor);
+            kTradeFailedColor);
         break;
       case ro::net::DealFrameRefusal::kSkillWithStake:
         Say(context,
             ro::core::Tr("Pas de skill pendant un échange où vous offrez quelque chose : il "
                          "pourrait consommer un item ou du zeny offert, ce que le serveur "
                          "tiendrait pour de la triche."),
-            kWarningColor);
+            kTradeWarningColor);
         break;
       case ro::net::DealFrameRefusal::kZenyWithStake:
         Say(context,
             ro::core::Tr("Pas de dépense de zeny pendant que vous en offrez dans un échange : le "
                          "serveur tiendrait l'offre pour de la triche."),
-            kWarningColor);
+            kTradeWarningColor);
         break;
     }
   }

@@ -16,6 +16,7 @@
 #include "game/minimap_layout_yaml.h"
 #include "game/profile_yaml.h"
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -215,7 +216,7 @@ bool ReadUiLayouts(std::string_view text, UiLayoutBook& into) {
 
 bool LoadUiLayouts(const std::filesystem::path& client_root, UiLayoutBook& into) {
   const std::filesystem::path path = UiLayoutPath(client_root);
-  const std::optional<std::string> text = ReadProfileFile(path);
+  const std::optional<std::string> text = ReadFileText(path);
   if (!text.has_value()) {
     ro::core::LogWarning("dispositions : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return false;

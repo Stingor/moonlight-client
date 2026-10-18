@@ -204,10 +204,6 @@ void BuildItemCells(const ro::sim::Inventory& holder, const ItemCellsAsk& ask,
                     ro::render::ItemIcons* icons, std::vector<std::string>& names,
                     std::vector<ro::ui::InventoryCellView>& cells);
 
-// Le nom composé d'un objet du sac : le pont entre ce que `sim` porte et ce que
-// `vfs` sait composer.
-[[nodiscard]] ro::vfs::ItemNameFacts ItemNameFactsOf(const ro::sim::InventoryItem& item);
-
 // LE NOM QU'UN JOURNAL ANNONCE : la conversation et le bandeau d'obtention.
 //
 // Complet, emplacements compris (« +7 Sword [3] »), et suivi de la marque

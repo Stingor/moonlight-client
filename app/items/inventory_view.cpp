@@ -124,24 +124,6 @@ bool ItemBelongsToTab(const InventoryItem& item, const ItemCellsAsk& ask) {
   return false;
 }
 
-ro::vfs::ItemNameFacts ItemNameFactsOf(const InventoryItem& item) {
-  // Les deux couches comptent les cartes de la même façon, mais chacune le
-  // déclare chez elle : `sim` ne connaît pas `vfs`. Que les deux nombres cessent
-  // d'être égaux doit se voir à la compilation, pas à l'écran.
-  static_assert(ro::sim::kItemCardSlots == ro::vfs::kItemNameCardSlots,
-                "le fil porte quatre cartes des deux côtés de la frontière");
-
-  ro::vfs::ItemNameFacts facts;
-  facts.item_id = item.item_id;
-  facts.type = item.type;
-  facts.refine_level = item.refine_level;
-  facts.grade = item.grade;
-  facts.cards = item.cards;
-  facts.identified = item.identified;
-  // ⚠ LE FORGERON N'EST PAS SUR LE FIL : voir `CreatorNames`, qui le pose.
-  return facts;
-}
-
 std::string ReportedItemName(const InventoryItem& item, const CreatorNames& creators,
                              const ro::vfs::ItemTable& items, const ro::vfs::ItemWords& words) {
   ro::vfs::ItemNameFacts facts = ItemNameFactsOf(item);

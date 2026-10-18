@@ -6,6 +6,7 @@
 #include <ios>
 #include <optional>
 #include <source_location>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -37,6 +38,23 @@ namespace moonclient {
     throw YAML::BadFile(ro::core::Utf8FromPath(path));
   }
   return YAML::Load(stream);
+}
+
+// LE TEXTE ENTIER D'UN FICHIER DU JOUEUR, en octets. Vide quand il n'existe pas
+// encore — un premier lancement n'est pas une panne —, absent quand il existe
+// sans se laisser lire.
+[[nodiscard]] inline std::optional<std::string> ReadFileText(const std::filesystem::path& path) {
+  std::error_code missing;
+  if (!std::filesystem::exists(path, missing)) {
+    return std::string();
+  }
+  std::ifstream file(path, std::ios::binary);
+  if (!file) {
+    return std::nullopt;
+  }
+  std::ostringstream text;
+  text << file.rdbuf();
+  return text.str();
 }
 
 // LIRE UNE TABLE DU JOUEUR, un fichier de `savedata` qu'il peut corriger à la

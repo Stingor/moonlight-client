@@ -16,7 +16,7 @@
 #include "chat/banned_input.h"
 #include "game/game_pieces.h"
 #include "game/skin_image_of.h"
-#include "items/inventory_view.h"
+#include "items/creator_names.h"
 
 namespace moonclient {
 namespace {

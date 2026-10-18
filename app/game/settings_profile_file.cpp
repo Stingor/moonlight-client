@@ -12,6 +12,7 @@
 
 #include "game/profile_yaml.h"
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -112,7 +113,7 @@ bool ReadSettingsProfiles(std::string_view text, SettingsProfileBook& into) {
 
 bool LoadSettingsProfiles(const std::filesystem::path& client_root, SettingsProfileBook& into) {
   const std::filesystem::path path = SettingsProfilePath(client_root);
-  const std::optional<std::string> text = ReadProfileFile(path);
+  const std::optional<std::string> text = ReadFileText(path);
   if (!text.has_value()) {
     ro::core::LogWarning("profils de réglages : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return false;

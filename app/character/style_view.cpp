@@ -127,18 +127,6 @@ StyleView::StyleView(ro::render::ActorWardrobe* wardrobe, std::filesystem::path 
   LoadStyleDrafts(client_root_, drafts_);
 }
 
-ro::render::ActorLook StyleView::DollLook(const ro::sim::Actor& player) const {
-  ro::render::ActorLook look = LookOf(player);
-  // 🔴 NI COIFFE, NI CAPE, NI ARME. On règle la palette du CORPS, et un
-  // chapeau volumineux rétrécirait le personnage tout en masquant les pièces
-  // qu'on cherche justement à voir.
-  look.headgears = {};
-  look.weapon = 0;
-  look.shield = 0;
-  look.robe = 0;
-  return look;
-}
-
 void StyleView::ReloadRamps(const ro::render::ActorLook& look) {
   if (wardrobe_ == nullptr) {
     return;
@@ -349,8 +337,9 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   // encore les couleurs nues du sprite.
   //
   // ⚠ LA CLÉ SE PREND SUR L'APPARENCE NUE : c'est le corps qui décide de la
-  // variante, et la variante ne doit pas décider du corps.
-  ro::render::ActorLook look = DollLook(*player);
+  // variante, et la variante ne doit pas décider du corps. Le pantin ne porte
+  // que son corps : on en règle la palette.
+  ro::render::ActorLook look = BodyOnlyLookOf(*player);
   const std::uint32_t worn_key = wardrobe_->BodyKeyFor(look);
   if (!seeded_ && !touched_) {
     if (const ro::sim::StyleRecipe* worn = WornRecipe(world, worn_key)) {

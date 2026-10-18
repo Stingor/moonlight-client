@@ -18,6 +18,7 @@
 
 #include "game/companion_ai_yaml.h"
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 namespace {
@@ -314,7 +315,7 @@ std::optional<std::string> MergeCompanionState(
 
 CompanionStateRead LoadCompanionState(const std::filesystem::path& client_root) {
   const std::filesystem::path path = CompanionStatePath(client_root);
-  const std::optional<std::string> text = ReadWhole(path);
+  const std::optional<std::string> text = ReadFileText(path);
   if (!text.has_value()) {
     ro::core::LogWarning("IA des compagnons : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return CompanionStateRead{.unreadable = true};
@@ -332,7 +333,7 @@ CompanionStateRead LoadCompanionState(const std::filesystem::path& client_root) 
 StateWrite SaveCompanionState(const std::filesystem::path& client_root, const CharacterKey& key,
                               const std::vector<StoredCompanionState>& companions) {
   const std::filesystem::path path = CompanionStatePath(client_root);
-  const std::optional<std::string> current = ReadWhole(path);
+  const std::optional<std::string> current = ReadFileText(path);
   if (!current.has_value()) {
     return StateWrite::kFailed;
   }

@@ -123,7 +123,7 @@ template <std::size_t kCount>
     if (!said.empty()) {
       said += kHuntCriterionSeparator;
     }
-    said += QuestFill(pattern, {value});
+    said += BracesFilled(pattern, {value});
   };
   if (criteria->race) {
     add(ro::core::Tr("race {}"), words.race[*criteria->race]);
@@ -140,7 +140,7 @@ template <std::size_t kCount>
   if (said.empty()) {
     return ro::core::Tr("Monstres de toute sorte");
   }
-  return QuestFill(ro::core::Tr("Monstres : {}"), {said});
+  return BracesFilled(ro::core::Tr("Monstres : {}"), {said});
 }
 
 constexpr std::int64_t kSecondsPerMinute = 60;
@@ -207,10 +207,6 @@ bool QuestTextContains(std::string_view haystack, std::string_view needle) {
   return ro::core::AsciiContainsFolded(haystack, needle);
 }
 
-std::string QuestFill(std::string_view pattern, std::initializer_list<std::string_view> values) {
-  return BracesFilled(pattern, values);
-}
-
 std::string HuntTargetName(const QuestHunt& hunt) {
   return hunt.mob_id == 0 ? GenericHuntName(hunt.mob_name) : hunt.mob_name;
 }
@@ -218,14 +214,14 @@ std::string HuntTargetName(const QuestHunt& hunt) {
 std::string QuestReceivedLine() { return ro::core::Tr("Vous avez reçu une nouvelle quête."); }
 
 std::string QuestDeletedLine(std::string_view title) {
-  return QuestFill(ro::core::Tr("La quête [{}] a été supprimée."), {title});
+  return BracesFilled(ro::core::Tr("La quête [{}] a été supprimée."), {title});
 }
 
 std::string QuestHuntLine(std::string_view title, const QuestHunt& hunt) {
   if (title.empty()) {
     return {};
   }
-  return QuestFill(
+  return BracesFilled(
       ro::core::Tr("Quête [{}] : vaincre [{}], progression ({}/{})."),
       {title, HuntTargetName(hunt), std::to_string(hunt.killed), std::to_string(hunt.total)});
 }
@@ -235,10 +231,10 @@ std::string HuntLabel(const QuestHunt& hunt) {
   const bool has_min = hunt.level_min > 0;
   const bool has_max = hunt.level_max > 0;
   if (has_min && has_max && hunt.level_min != hunt.level_max) {
-    label +=
-        QuestFill(" Lv.{}~Lv.{}", {std::to_string(hunt.level_min), std::to_string(hunt.level_max)});
+    label += BracesFilled(" Lv.{}~Lv.{}",
+                          {std::to_string(hunt.level_min), std::to_string(hunt.level_max)});
   } else if (has_min || has_max) {
-    label += QuestFill(" Lv.{}", {std::to_string(has_min ? hunt.level_min : hunt.level_max)});
+    label += BracesFilled(" Lv.{}", {std::to_string(has_min ? hunt.level_min : hunt.level_max)});
   }
   return label;
 }
@@ -247,10 +243,10 @@ std::string HuntBalloonLine(const QuestHunt& hunt) {
   // ⚠ « PLEIN » SE LIT À L'ÉGALITÉ, comme le client : un compte qui dépasse son
   // total garde ses chiffres.
   if (hunt.killed == hunt.total) {
-    return QuestFill("{} [ {} ]", {HuntLabel(hunt), ro::core::Tr("Terminé")});
+    return BracesFilled("{} [ {} ]", {HuntLabel(hunt), ro::core::Tr("Terminé")});
   }
-  return QuestFill("{} [ {} / {} ]",
-                   {HuntLabel(hunt), std::to_string(hunt.killed), std::to_string(hunt.total)});
+  return BracesFilled("{} [ {} / {} ]",
+                      {HuntLabel(hunt), std::to_string(hunt.killed), std::to_string(hunt.total)});
 }
 
 QuestTimeLeft TimeLeftOf(std::uint32_t expires_unix_s, std::int64_t now_unix_s) {
@@ -269,12 +265,13 @@ QuestTimeLeft TimeLeftOf(std::uint32_t expires_unix_s, std::int64_t now_unix_s) 
   const std::int64_t hours = seconds % kSecondsPerDay / kSecondsPerHour;
   const std::int64_t minutes = seconds % kSecondsPerHour / kSecondsPerMinute;
   if (days > 0) {
-    left.text = QuestFill(ro::core::Tr("{} j {} h"), {std::to_string(days), std::to_string(hours)});
+    left.text =
+        BracesFilled(ro::core::Tr("{} j {} h"), {std::to_string(days), std::to_string(hours)});
   } else if (hours > 0) {
     left.text =
-        QuestFill(ro::core::Tr("{} h {} min"), {std::to_string(hours), std::to_string(minutes)});
+        BracesFilled(ro::core::Tr("{} h {} min"), {std::to_string(hours), std::to_string(minutes)});
   } else if (minutes > 0) {
-    left.text = QuestFill(ro::core::Tr("{} min"), {std::to_string(minutes)});
+    left.text = BracesFilled(ro::core::Tr("{} min"), {std::to_string(minutes)});
   } else {
     left.text = ro::core::Tr("moins d'une minute");
   }

@@ -106,12 +106,6 @@ void BuyingStoreStage::Note(std::uint32_t item_id, std::uint16_t slot, bool hove
   }
 }
 
-void BuyingStoreStage::Say(const TradeContext& context, std::string text, std::uint32_t color) {
-  if (!text.empty()) {
-    context.world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), context.now_ms, color);
-  }
-}
-
 void BuyingStoreStage::FollowSetup(ro::ui::BuyingStoreSetupState& state,
                                    const ro::ui::BuyingStoreSetupAction& answer,
                                    const TradeContext& context) {

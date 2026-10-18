@@ -14,6 +14,7 @@
 #include "ro/net/quest_log.h"
 #include "ro/sim/world.h"
 
+#include "game/braces_filled.h"
 #include "quest/quest_rules.h"
 
 namespace moonclient {
@@ -220,15 +221,15 @@ std::string QuestStage::DepartureLine(std::uint32_t quest_id,
   const std::string title = TitleOf(quest_id);
   switch (ending->reason) {
     case ro::sim::QuestEndReason::kCompleted:
-      return QuestFill(ro::core::Tr("Quête « {} » achevée."), {title});
+      return BracesFilled(ro::core::Tr("Quête « {} » achevée."), {title});
     case ro::sim::QuestEndReason::kErased:
-      return QuestFill(ro::core::Tr("Quête « {} » abandonnée."), {title});
+      return BracesFilled(ro::core::Tr("Quête « {} » abandonnée."), {title});
     case ro::sim::QuestEndReason::kReplaced:
       if (ending->next_quest_id != 0) {
-        return QuestFill(ro::core::Tr("Quête « {} » : étape franchie, la suite est « {} »."),
-                         {title, TitleOf(ending->next_quest_id)});
+        return BracesFilled(ro::core::Tr("Quête « {} » : étape franchie, la suite est « {} »."),
+                            {title, TitleOf(ending->next_quest_id)});
       }
-      return QuestFill(ro::core::Tr("Quête « {} » : étape franchie."), {title});
+      return BracesFilled(ro::core::Tr("Quête « {} » : étape franchie."), {title});
     case ro::sim::QuestEndReason::kRetired:
       break;
   }
@@ -244,7 +245,7 @@ std::string QuestStage::TitleOf(std::uint32_t quest_id) const {
   if (std::string title = CatalogTitle(quest_id); !title.empty()) {
     return title;
   }
-  return QuestFill(ro::core::Tr("Quête {}"), {std::to_string(quest_id)});
+  return BracesFilled(ro::core::Tr("Quête {}"), {std::to_string(quest_id)});
 }
 
 // ── LES TRAMES ─────────────────────────────────────────────────────────────
@@ -281,8 +282,8 @@ void QuestStage::SayReadyWaits(QuestWindows& windows, ro::sim::World& world,
     } else if (pending) {
       Erase(pending_waits_, quest.quest_id);
       world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kQuestInfo, 0,
-                       QuestFill(ro::core::Tr("Quête « {} » prête : retournez voir le PNJ."),
-                                 {TitleOf(quest.quest_id)}),
+                       BracesFilled(ro::core::Tr("Quête « {} » prête : retournez voir le PNJ."),
+                                    {TitleOf(quest.quest_id)}),
                        now_ms, kQuestChatColor);
       windows.news_lit = true;
     }

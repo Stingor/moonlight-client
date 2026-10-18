@@ -11,7 +11,6 @@
 #include "ro/vfs/item_name.h"
 
 #include "game/skin_image_of.h"
-#include "items/inventory_view.h"
 #include "items/view_equip_rows.h"
 
 namespace moonclient {

@@ -27,7 +27,6 @@
 #include "character/equip_change_line.h"
 #include "character/equip_slot_map.h"
 #include "game/skin_image_of.h"
-#include "items/inventory_view.h"
 #include "world/actor_view.h"
 
 namespace moonclient {

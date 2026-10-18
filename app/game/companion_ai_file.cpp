@@ -2,10 +2,7 @@
 
 #include <algorithm>
 #include <array>
-#include <fstream>
 #include <optional>
-#include <sstream>
-#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -18,6 +15,7 @@
 
 #include "game/companion_ai_yaml.h"
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 
@@ -120,20 +118,6 @@ void EmitTactic(YAML::Emitter& out, const CompanionTactic& tactic) {
   out << YAML::Key << kShareField << YAML::Value << WordOf(kShareWords, tactic.share);
   out << YAML::Key << kChaseField << YAML::Value << WordOf(kChaseWords, tactic.chase);
   out << YAML::EndMap;
-}
-
-std::optional<std::string> ReadWhole(const std::filesystem::path& path) {
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return std::string();
-  }
-  std::ifstream file(path, std::ios::binary);
-  if (!file) {
-    return std::nullopt;
-  }
-  std::ostringstream text;
-  text << file.rdbuf();
-  return text.str();
 }
 
 }  // namespace companion_yaml
@@ -583,7 +567,7 @@ std::string FormatCompanionAi(const CompanionProfiles& profiles) {
 
 CompanionAiFileRead LoadCompanionAi(const std::filesystem::path& client_root) {
   const std::filesystem::path path = CompanionAiFilePath(client_root);
-  const std::optional<std::string> text = ReadWhole(path);
+  const std::optional<std::string> text = ReadFileText(path);
   if (!text.has_value()) {
     ro::core::LogWarning("IA des compagnons : {} ne s'ouvre pas", ro::core::Utf8FromPath(path));
     return CompanionAiFileRead{.unreadable = true};
@@ -610,7 +594,7 @@ std::optional<CompanionAiFileRead> SaveCompanionAiEdits(const std::filesystem::p
   const std::filesystem::path path = CompanionAiFilePath(client_root);
   // ⚠ RELU JUSTE AVANT D'ÉCRIRE : un autre client sur la même installation a pu
   // l'enregistrer entre-temps, et ses lignes survivent à la fusion.
-  const std::optional<std::string> current = ReadWhole(path);
+  const std::optional<std::string> current = ReadFileText(path);
   std::vector<CompanionRenameShift> shifts;
   const std::optional<std::string> merged =
       current.has_value() ? MergeCompanionAi(*current, edits, &shifts) : std::nullopt;

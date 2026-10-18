@@ -96,12 +96,6 @@ void VendingStage::Note(const ro::sim::InventoryItem* item, bool hovered, bool d
   }
 }
 
-void VendingStage::Say(const TradeContext& context, std::string text, std::uint32_t color) {
-  if (!text.empty()) {
-    context.world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), context.now_ms, color);
-  }
-}
-
 void VendingStage::SaveMemory() const {
   if (!client_root_.empty()) {
     static_cast<void>(SaveVendingMemory(client_root_, memory_));

@@ -7,6 +7,11 @@
 
 namespace moonclient {
 
+// Le nom composé d'un objet tenu : le pont entre ce que `sim` porte et ce que
+// `vfs` sait composer. ⚠ LE FORGERON N'EST PAS SUR LE FIL : `CreatorNames` le
+// pose ensuite.
+[[nodiscard]] ro::vfs::ItemNameFacts ItemNameFactsOf(const ro::sim::InventoryItem& item);
+
 // LE NOM DU FORGERON, POUR TOUTE SURFACE QUI NOMME UN ITEM.
 //
 // Un item forgé ou signé ne porte que l'identifiant de son créateur ; son nom

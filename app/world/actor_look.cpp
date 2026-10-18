@@ -95,6 +95,19 @@ ro::render::ActorLook LookOf(const ro::sim::Actor& actor) {
   return look;
 }
 
+void KeepBodyOnly(ro::render::ActorLook& look) {
+  look.headgears = {};
+  look.weapon = 0;
+  look.shield = 0;
+  look.robe = 0;
+}
+
+ro::render::ActorLook BodyOnlyLookOf(const ro::sim::Actor& actor) {
+  ro::render::ActorLook look = LookOf(actor);
+  KeepBodyOnly(look);
+  return look;
+}
+
 ro::render::SpriteLayout LayoutOf(const ro::sim::Actor& actor) {
   return ComposedAsPlayer(actor) ? ro::render::SpriteLayout::kPlayer
                                  : ro::render::SpriteLayout::kCreature;

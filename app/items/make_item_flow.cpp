@@ -4,13 +4,9 @@
 #include "items/make_item_flow.h"
 
 #include <algorithm>
-#include <array>
-#include <chrono>
-#include <ctime>
 #include <utility>
 
 #include "ro/core/i18n.h"
-#include "ro/core/local_time.h"
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
 #include "ro/net/inventory.h"
@@ -44,32 +40,9 @@ constexpr std::uint32_t kAutoRelaunchDelayMs = 300;
 // Sans liste après une relance, celle-ci est tenue pour jetée.
 constexpr std::uint32_t kRelaunchNoListMs = 1000;
 constexpr int kMostRelaunchRetries = 3;
-constexpr std::size_t kMostHistoryLines = 200;
-
-constexpr std::size_t kTimeBytes = 16;
-
-[[nodiscard]] bool Due(std::uint32_t at, std::uint32_t now_ms) {
-  return at != 0 && static_cast<std::int32_t>(now_ms - at) >= 0;
-}
-
-[[nodiscard]] std::uint32_t Deadline(std::uint32_t now_ms, std::uint32_t delay_ms) {
-  const std::uint32_t at = now_ms + delay_ms;
-  return at == 0 ? 1 : at;
-}
 
 [[nodiscard]] bool Recent(const ro::sim::CraftTrigger& trigger, std::uint32_t now_ms) {
   return trigger.seq != 0 && static_cast<std::uint32_t>(now_ms - trigger.at_ms) <= kTriggerWindowMs;
-}
-
-[[nodiscard]] std::string ClockNow() {
-  const std::time_t stamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::tm local{};
-  if (!ro::core::ToLocalTime(stamp, local)) {
-    return {};
-  }
-  std::array<char, kTimeBytes> text{};
-  std::strftime(text.data(), text.size(), "%H:%M:%S", &local);
-  return text.data();
 }
 
 }  // namespace
@@ -116,8 +89,8 @@ void MakeItemFlow::TakeMastery(const ro::sim::World& world) {
   if (before < 0 || before == told) {
     return;
   }
-  Log(ro::core::Printed(Tr("Maîtrise culinaire : %d -> %d."), before, told),
-      told > before ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kWarn);
+  log_.Add(ro::core::Printed(Tr("Maîtrise culinaire : %d -> %d."), before, told),
+           told > before ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kWarn);
 }
 
 void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& state,
@@ -144,7 +117,7 @@ void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& 
           "%s", Tr("Aucun produit proposé : une session de fabrication est déjà ouverte (le "
                    "serveur n'en garde qu'une). La liste affichée reste valable."));
     }
-    Log(line, ro::ui::SkinTone::kWarn);
+    log_.Add(line, ro::ui::SkinTone::kWarn);
     return;
   }
 
@@ -216,7 +189,7 @@ void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& 
       line = ro::core::Printed(Tr("Emplacement %d vidé : plus de %s en réserve."),
                                static_cast<int>(slot + 1), name.c_str());
     }
-    Log(line, ro::ui::SkinTone::kWarn);
+    log_.Add(line, ro::ui::SkinTone::kWarn);
   }
 
   if (from_item_ && Recent(craft.last_use(), now_ms) && craft.last_use_item() != 0) {
@@ -296,7 +269,7 @@ void MakeItemFlow::TakeResult(ro::sim::World& world, const MakeItemSettings& set
   }
   last_result_ = said;
   last_result_tone_ = succeeded ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kBad;
-  Log(said, last_result_tone_);
+  log_.Add(said, last_result_tone_);
   RecountOwned(world);
   if (ours) {
     ScheduleAutoRecast(settings, world, now_ms);
@@ -309,7 +282,7 @@ void MakeItemFlow::TakeRefusal(std::uint32_t now_ms) {
     return;
   }
   awaiting_ = false;
-  Log(Tr("Demande refusée par le serveur."), ro::ui::SkinTone::kWarn);
+  log_.Add(Tr("Demande refusée par le serveur."), ro::ui::SkinTone::kWarn);
   auto_recast_at_ = 0;
   batch_left_ = 0;
   batch_fire_ = false;
@@ -346,7 +319,7 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
       }
       last_result_ = line;
       last_result_tone_ = ro::ui::SkinTone::kGood;
-      Log(last_result_, last_result_tone_);
+      log_.Add(last_result_, last_result_tone_);
       if (batch_left_ > 0) {
         --batch_left_;
       }
@@ -364,7 +337,7 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
       last_result_ =
           ro::core::Printed(Tr("%s : échec, matériaux perdus."), last_sent_name_.c_str());
       last_result_tone_ = ro::ui::SkinTone::kWarn;
-      Log(last_result_, last_result_tone_);
+      log_.Add(last_result_, last_result_tone_);
       if (batch_left_ > 0) {
         --batch_left_;
       }
@@ -392,9 +365,9 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
                   "renvoient aucun message, ni en cas de succès ni en cas d'échec. Autre "
                   "possibilité : une demande refusée à la revalidation des matériaux, qui elle "
                   "n'aurait rien consommé.");
-    Log(dish ? Tr("Échec probable — la cuisine ne dit rien quand elle rate.")
-             : Tr("Aucune réponse du serveur — échec probable."),
-        ro::ui::SkinTone::kWarn);
+    log_.Add(dish ? Tr("Échec probable — la cuisine ne dit rien quand elle rate.")
+                  : Tr("Aucune réponse du serveur — échec probable."),
+             ro::ui::SkinTone::kWarn);
   }
 }
 
@@ -462,15 +435,15 @@ void MakeItemFlow::RetryRelaunch(const MakeItemSettings& settings, const ro::sim
   }
   if (++relaunch_retries_ > kMostRelaunchRetries) {
     stop_reason_ = Tr("La liste ne revient pas (délai de lancement) : relance arrêtée.");
-    Log(stop_reason_, ro::ui::SkinTone::kWarn);
+    log_.Add(stop_reason_, ro::ui::SkinTone::kWarn);
     batch_left_ = 0;
     return;
   }
   stop_reason_.clear();
   auto_recast_at_ = Deadline(now_ms, kAutoRelaunchDelayMs);
-  Log(ro::core::Printed(Tr("Relance sans réponse : nouvel essai (%d/%d)."), relaunch_retries_,
-                        kMostRelaunchRetries),
-      ro::ui::SkinTone::kWarn);
+  log_.Add(ro::core::Printed(Tr("Relance sans réponse : nouvel essai (%d/%d)."), relaunch_retries_,
+                             kMostRelaunchRetries),
+           ro::ui::SkinTone::kWarn);
 }
 
 void MakeItemFlow::Tick(const MakeItemSettings& settings, const ro::sim::World& world,
@@ -691,14 +664,7 @@ void MakeItemFlow::SendReuseItem(const MakeItemSettings& settings, ro::net::Conn
     line = ro::core::Printed(Tr("Relance : %s consommé (%d au total)."), source_item_name_.c_str(),
                              auto_items_used_);
   }
-  Log(line, ro::ui::SkinTone::kWarn);
-}
-
-void MakeItemFlow::Log(std::string text, ro::ui::SkinTone tone) {
-  history_.push_back(LogLine{.text = std::move(text), .tone = tone, .time = ClockNow()});
-  while (history_.size() > kMostHistoryLines) {
-    history_.pop_front();
-  }
+  log_.Add(line, ro::ui::SkinTone::kWarn);
 }
 
 }  // namespace moonclient

@@ -242,12 +242,7 @@ void MakeItemFlow::Compose(const ro::sim::World& world, const ro::ui::MakeItemWi
   }
   ComposeFooter(world, state, settings);
 
-  history_view_.clear();
-  for (const LogLine& line : history_) {
-    history_view_.push_back(
-        ro::ui::CraftLogLineView{.text = line.text, .tone = line.tone, .time = line.time});
-  }
-  view_.history = history_view_;
+  view_.history = log_.Views();
   view_.chance = chance_lines_;
   view_.forge_notes = forge_notes_;
   view_.footer_notes = footer_notes_;

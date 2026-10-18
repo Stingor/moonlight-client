@@ -83,7 +83,6 @@ class VendingStage {
   // `gesture` : ce que demande l'objet décrit, sans objet pour un survol.
   void Note(const ro::sim::InventoryItem* item, bool hovered, bool described,
             ro::ui::ChatLinkGesture gesture = ro::ui::ChatLinkGesture::kDescribe);
-  static void Say(const TradeContext& context, std::string text, std::uint32_t color);
 
   ro::sim::Vending vending_;
   std::filesystem::path client_root_;

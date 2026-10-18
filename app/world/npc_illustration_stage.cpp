@@ -2,9 +2,9 @@
 
 #include <string_view>
 
-#include <imgui.h>
-
 #include "ro/vfs/npc_illustration_paths.h"
+
+#include "game/skin_image_of.h"
 
 namespace moonclient {
 namespace {
@@ -51,11 +51,8 @@ std::optional<ro::ui::NpcIllustrationView> NpcIllustrationStage::Stage(
     return std::nullopt;
   }
   const ro::render::IconTexture& texture = images->Get(found_path_);
-  return ro::ui::NpcIllustrationView{
-      .image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(texture.texture.name()),
-                                 .width = static_cast<float>(texture.width_px),
-                                 .height = static_cast<float>(texture.height_px)},
-      .anchor = AnchorOf(shown->place)};
+  return ro::ui::NpcIllustrationView{.image = SizedSkinImageOf(texture),
+                                     .anchor = AnchorOf(shown->place)};
 }
 
 void NpcIllustrationStage::Apply(const ro::ui::NpcIllustrationAction& asked) {

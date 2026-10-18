@@ -25,19 +25,6 @@
 namespace moonclient {
 namespace {
 
-// Les couleurs des lignes de conversation, celles des commerces : cyan pour ce
-// qui a réussi, rouge pour ce qui a échoué ; l'orangé des mises en garde du
-// client lui-même.
-constexpr std::uint32_t kSucceededColor = 0x00FFFF;
-constexpr std::uint32_t kFailedColor = 0xFF0000;
-constexpr std::uint32_t kWarningColor = 0xFFAA00;
-
-void Say(const TradeContext& context, std::string text, std::uint32_t color) {
-  if (!text.empty()) {
-    context.world.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), context.now_ms, color);
-  }
-}
-
 void Report(const char* what, const ro::core::Result<void>& sent) {
   if (!sent) {
     ro::core::LogWarning("courrier : {} non émis — {}", what, ro::core::Describe(sent.error()));
@@ -297,7 +284,7 @@ void MailStage::RequestList(const TradeContext& context) {
 
 void MailStage::AskWrite(std::string_view recipient_wire, const TradeContext& context) {
   if (flow_.shown()) {
-    Say(context, ro::core::Tr("Un courrier est déjà en cours d'écriture."), kWarningColor);
+    Say(context, ro::core::Tr("Un courrier est déjà en cours d'écriture."), kTradeWarningColor);
     return;
   }
   // ⚠ UNE SEULE DEMANDE À LA FOIS : la seconde trouverait l'écriture déjà
@@ -310,7 +297,7 @@ void MailStage::AskWrite(std::string_view recipient_wire, const TradeContext& co
     Say(context,
         ro::core::Tr("Ce nom contient un caractère que le serveur ne connaît pas, ou dépasse 23 "
                      "caractères."),
-        kFailedColor);
+        kTradeFailedColor);
     return;
   }
   flow_.NoteAsked(context.now_ms);
@@ -344,7 +331,7 @@ void MailStage::Attach(std::uint16_t client_slot, int amount, const TradeContext
   if (const ro::sim::MailAttachFault fault = mailbox_.CheckAttach(*held, amount);
       fault != ro::sim::MailAttachFault::kNone) {
     compose_error_ = AttachFaultText(fault);
-    Say(context, compose_error_, kFailedColor);
+    Say(context, compose_error_, kTradeFailedColor);
     return;
   }
   if (auto sent = ro::net::RequestAttachItem(context.link, mailbox_, *held, amount, context.now_ms);
@@ -429,7 +416,7 @@ void MailStage::FollowAsks(MailWindows& windows, const TradeContext& context) {
       Say(context,
           ro::core::Tr("Ce nom contient un caractère que le serveur ne connaît pas, ou dépasse 23 "
                        "caractères."),
-          kFailedColor);
+          kTradeFailedColor);
     }
   }
   for (const QueuedAttach& queued : std::exchange(queued_attaches_, {})) {
@@ -484,7 +471,7 @@ void MailStage::FollowBox(MailWindows& windows, const TradeContext& context) {
             ro::net::RequestReturnMail(context.link, mailbox_, answer.return_to_sender->mail_id);
         !sent) {
       Report("retour", sent);
-      Say(context, ro::core::Tr("Ce courrier ne peut pas être retourné."), kFailedColor);
+      Say(context, ro::core::Tr("Ce courrier ne peut pas être retourné."), kTradeFailedColor);
     }
   }
   if (answer.erase.has_value()) {
@@ -494,7 +481,7 @@ void MailStage::FollowBox(MailWindows& windows, const TradeContext& context) {
         !sent) {
       Report("suppression", sent);
       Say(context, ro::core::Tr("Suppression refusée : récupère d'abord les pièces jointes."),
-          kFailedColor);
+          kTradeFailedColor);
     }
   }
   // « SUPPRIMER TOUT » : une demande par courrier, le serveur n'en a pas de
@@ -574,13 +561,13 @@ void MailStage::Obey(const MailWriteOrders& orders, MailWindows& windows,
       const std::string text = ro::core::Tr(
           "Sans réponse du serveur, le courrier a pu partir : vérifie ton inventory et ta bourse "
           "avant de renvoyer. Le zeny joint a été remis à zéro.");
-      Say(context, text, kWarningColor);
+      Say(context, text, kTradeWarningColor);
       compose_error_ += compose_error_.empty() ? text : "\n" + text;
     } else if (orders.redo_attachments) {
       const std::string text = ro::core::Tr(
           "Les items joints sont revenus dans l'inventory : joins-les de nouveau avant de "
           "renvoyer.");
-      Say(context, text, kWarningColor);
+      Say(context, text, kTradeWarningColor);
       compose_error_ += compose_error_.empty() ? text : "\n" + text;
     }
   }
@@ -592,7 +579,7 @@ void MailStage::Obey(const MailWriteOrders& orders, MailWindows& windows,
   if (orders.reopen_failed) {
     Say(context,
         ro::core::Tr("Le serveur n'a pas rouvert l'écriture : le courrier n'est pas parti."),
-        kFailedColor);
+        kTradeFailedColor);
   }
 }
 
@@ -626,7 +613,8 @@ void MailStage::SayNews(MailWindows& windows, const TradeContext& context) {
     switch (news.kind) {
       case ro::sim::MailNewsKind::kSendResult: {
         const bool succeeded = news.code == ro::sim::kMailSendSucceeded;
-        Say(context, SendResultText(news.code), succeeded ? kSucceededColor : kFailedColor);
+        Say(context, SendResultText(news.code),
+            succeeded ? kTradeSucceededColor : kTradeFailedColor);
         if (!succeeded) {
           compose_error_ = SendResultText(news.code);
         }
@@ -638,13 +626,14 @@ void MailStage::SayNews(MailWindows& windows, const TradeContext& context) {
       // si le courrier est parti, sans toucher à l'écriture en cours.
       case ro::sim::MailNewsKind::kSendResultLate: {
         const bool succeeded = news.code == ro::sim::kMailSendSucceeded;
-        Say(context, SendResultText(news.code), succeeded ? kSucceededColor : kFailedColor);
+        Say(context, SendResultText(news.code),
+            succeeded ? kTradeSucceededColor : kTradeFailedColor);
         break;
       }
       case ro::sim::MailNewsKind::kAttachRefused: {
         const std::string item = context.items.NameOf(news.item, context.creators);
         compose_error_ = AttachRefusalText(news.code, item);
-        Say(context, compose_error_, kFailedColor);
+        Say(context, compose_error_, kTradeFailedColor);
         break;
       }
       case ro::sim::MailNewsKind::kWriteRefused: {
@@ -654,25 +643,26 @@ void MailStage::SayNews(MailWindows& windows, const TradeContext& context) {
           Say(context,
               ro::core::Tr("Impossible d'écrire un courrier maintenant : ferme d'abord le "
                            "storage ou l'échange en cours."),
-              kFailedColor);
+              kTradeFailedColor);
         }
         Obey(orders, windows, context);
         break;
       }
       case ro::sim::MailNewsKind::kClaimed:
-        Say(context, ClaimText(news.claim), kSucceededColor);
+        Say(context, ClaimText(news.claim), kTradeSucceededColor);
         break;
       case ro::sim::MailNewsKind::kClaimRefused:
-        Say(context, ClaimRefusalText(news.claim, news.code), kFailedColor);
+        Say(context, ClaimRefusalText(news.claim, news.code), kTradeFailedColor);
         break;
       case ro::sim::MailNewsKind::kDeleted:
-        Say(context, ro::core::Tr("Courrier supprimé."), kSucceededColor);
+        Say(context, ro::core::Tr("Courrier supprimé."), kTradeSucceededColor);
         break;
       case ro::sim::MailNewsKind::kReturned:
-        Say(context, ro::core::Tr("Courrier retourné à son expéditeur."), kSucceededColor);
+        Say(context, ro::core::Tr("Courrier retourné à son expéditeur."), kTradeSucceededColor);
         break;
       case ro::sim::MailNewsKind::kReturnRefused:
-        Say(context, ro::core::Tr("Le serveur a refusé de retourner ce courrier."), kFailedColor);
+        Say(context, ro::core::Tr("Le serveur a refusé de retourner ce courrier."),
+            kTradeFailedColor);
         break;
     }
   }
@@ -681,13 +671,13 @@ void MailStage::SayNews(MailWindows& windows, const TradeContext& context) {
 void MailStage::SayHeld(const TradeContext& context) {
   if (std::exchange(item_use_held_, false)) {
     Say(context, ro::core::Tr("Impossible d'utiliser un item pendant l'écriture d'un courrier."),
-        kFailedColor);
+        kTradeFailedColor);
   }
   if (std::exchange(deal_held_, false)) {
     Say(context,
         ro::core::Tr("Pas d'échange pendant l'écriture d'un courrier : envoie-le ou annule-le "
                      "d'abord."),
-        kFailedColor);
+        kTradeFailedColor);
   }
 }
 

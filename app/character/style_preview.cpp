@@ -50,15 +50,6 @@ bool StylePreview::Open(std::string_view code, std::string_view owner,
   return true;
 }
 
-ro::render::ActorLook StylePreview::DollLook(const ro::sim::Actor& player) const {
-  ro::render::ActorLook look = LookOf(player);
-  look.headgears = {};
-  look.weapon = 0;
-  look.shield = 0;
-  look.robe = 0;
-  return look;
-}
-
 void StylePreview::Refresh(const ro::sim::World& world, ro::ui::StylePreviewState& state) {
   view_ = ro::ui::StylePreviewView{};
   state.doll.image = ro::ui::SkinImage{};
@@ -75,7 +66,7 @@ void StylePreview::Refresh(const ro::sim::World& world, ro::ui::StylePreviewStat
     return;
   }
 
-  ro::render::ActorLook look = DollLook(*player);
+  ro::render::ActorLook look = BodyOnlyLookOf(*player);
   // 🔴 CE QUE LA RECETTE IMPOSE, AVANT LA MESURE : la teinte de base décide de
   // la palette sur laquelle les rampes se détectent. La poser après donnerait
   // un pantin peint d'après le découpage d'un autre corps.

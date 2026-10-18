@@ -36,9 +36,9 @@
 #include "ro/vfs/job_names.h"
 #include "ro/vfs/status_table.h"
 
+#include "game/braces_filled.h"
 #include "game/skill_tree_load.h"
 #include "game/skin_reload.h"
-#include "quest/quest_rules.h"
 #include "world/overlay_view.h"
 #include "world/signboard_style.h"
 
@@ -429,7 +429,7 @@ void LoadQuestCatalog(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   const ro::core::Result<std::vector<std::uint8_t>> bytes = vfs.Read(kQuestCatalogPath);
   if (!bytes) {
     pieces.quest_catalog_problem =
-        QuestFill(ro::core::Tr("{} est introuvable."), {kQuestCatalogPath});
+        BracesFilled(ro::core::Tr("{} est introuvable."), {kQuestCatalogPath});
     ro::core::LogWarning("quêtes : {} illisible ({}) — le journal montrera des numéros",
                          kQuestCatalogPath, ro::core::Describe(bytes.error()));
     return;
@@ -438,7 +438,7 @@ void LoadQuestCatalog(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   auto catalog = QuestCatalog::Parse(text, pieces.quest_language);
   if (!catalog) {
     pieces.quest_catalog_problem =
-        QuestFill(ro::core::Tr("{} ne se lit pas."), {kQuestCatalogPath});
+        BracesFilled(ro::core::Tr("{} ne se lit pas."), {kQuestCatalogPath});
     ro::core::LogWarning("quêtes : {} — {}", kQuestCatalogPath,
                          ro::core::Describe(catalog.error()));
     return;

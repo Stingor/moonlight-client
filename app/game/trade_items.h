@@ -94,4 +94,15 @@ struct TradeContext {
   ro::render::GameImages* images = nullptr;
 };
 
+// Les couleurs des lignes de conversation, celles des commerces : cyan pour ce
+// qui a réussi, rouge pour ce qui a échoué ; l'orangé des mises en garde du
+// client lui-même.
+inline constexpr std::uint32_t kTradeSucceededColor = 0x00FFFF;
+inline constexpr std::uint32_t kTradeFailedColor = 0xFF0000;
+inline constexpr std::uint32_t kTradeWarningColor = 0xFFAA00;
+
+// CE QU'UN COMMERCE DIT : une ligne du serveur dans la conversation, à l'heure
+// de l'image et dans sa couleur. Un texte vide ne dit rien.
+void Say(const TradeContext& context, std::string text, std::uint32_t color);
+
 }  // namespace moonclient

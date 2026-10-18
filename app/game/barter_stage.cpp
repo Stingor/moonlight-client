@@ -18,19 +18,8 @@
 namespace moonclient {
 namespace {
 
-// Les couleurs des lignes de conversation, celles du client : cyan pour ce qui
-// a réussi, rouge pour ce qui a échoué.
-constexpr std::uint32_t kSucceededColor = 0x00FFFF;
-constexpr std::uint32_t kFailedColor = 0xFF0000;
-
 // Le nom montré d'un PNJ : ce qui précède le dièse.
 std::string_view ShownNpcName(std::string_view name) { return name.substr(0, name.find('#')); }
-
-void Say(const TradeContext& context, const std::string& text, std::uint32_t color) {
-  if (!text.empty()) {
-    context.world.RecordChat(ro::sim::ChatKind::kServer, 0, text, context.now_ms, color);
-  }
-}
 
 // LE POIDS D'UNE DEVISE, lu dans la table des items. Sans table, rien : le
 // contrôle garde alors les devises au sac, et le serveur tranche.
@@ -58,7 +47,7 @@ std::optional<TradeItemFocus> BarterStage::TakeDescribed() noexcept {
 
 void BarterStage::Refuse(const ro::sim::BarterCartCheck& check, const TradeContext& context) {
   Say(context, BarterCheckText(check, context.items.NameOf(check.item_id), context.words),
-      kFailedColor);
+      kTradeFailedColor);
 }
 
 void BarterStage::Edit(const ro::ui::BarterCartEdit& edit, const TradeContext& context) {
@@ -135,7 +124,7 @@ void BarterStage::Exchange(const ro::ui::BarterWindowAction& answer, const Trade
   // depuis, rien ne part, et il le lit.
   if (answer.cart_seq != barter_.cart_seq()) {
     Say(context, ro::core::Tr("Le panier a changé avant l'échange : rien n'est parti."),
-        kFailedColor);
+        kTradeFailedColor);
     return;
   }
   // ⚠ REJUGÉ ICI : la fenêtre a montré un verdict d'une image de retard.
@@ -194,7 +183,7 @@ void BarterStage::SayResult(const TradeContext& context) {
   result_said_ = barter_.result_seq();
   const std::uint8_t code = barter_.result();
   Say(context, BarterResultText(code, context.words),
-      SayingOfBarterResult(code).succeeded ? kSucceededColor : kFailedColor);
+      SayingOfBarterResult(code).succeeded ? kTradeSucceededColor : kTradeFailedColor);
 }
 
 void BarterStage::Advance(ro::ui::BarterWindowState& state,

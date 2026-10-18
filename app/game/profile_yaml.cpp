@@ -1,9 +1,5 @@
 #include "game/profile_yaml.h"
 
-#include <fstream>
-#include <sstream>
-#include <system_error>
-
 namespace moonclient {
 namespace {
 
@@ -12,20 +8,6 @@ constexpr const char* kCharacterField = "character";
 constexpr const char* kProfileField = "profile";
 
 }  // namespace
-
-std::optional<std::string> ReadProfileFile(const std::filesystem::path& path) {
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return std::string();
-  }
-  std::ifstream file(path, std::ios::binary);
-  if (!file) {
-    return std::nullopt;
-  }
-  std::ostringstream text;
-  text << file.rdbuf();
-  return text.str();
-}
 
 std::optional<YAML::Node> OpenProfileText(const std::string& text, int version) {
   YAML::Node whole;

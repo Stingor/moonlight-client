@@ -27,11 +27,6 @@ using ro::sim::NpcShopKind;
 using ro::sim::NpcShopSide;
 using ro::vfs::TradeWord;
 
-// Les couleurs des lignes de conversation, celles du client : cyan pour ce qui
-// a réussi, rouge pour ce qui a échoué.
-constexpr std::uint32_t kSucceededColor = 0x00FFFF;
-constexpr std::uint32_t kFailedColor = 0xFF0000;
-
 // Le résultat du market qui écrase tout échec.
 constexpr std::uint16_t kMarketFailed = 0xFFFF;
 
@@ -253,7 +248,7 @@ void NpcShopStage::Follow(ro::ui::NpcShopWindowState& state,
   if (answer.drop_refused) {
     context.world.RecordChat(ro::sim::ChatKind::kServer, 0,
                              ro::core::Tr("Ce PNJ n'achète pas cet item."), context.now_ms,
-                             kFailedColor);
+                             kTradeFailedColor);
   }
   if (answer.tab_changed) {
     AskList(state.tab == ro::ui::NpcShopTab::kSell ? NpcShopSide::kSell : NpcShopSide::kBuy,
@@ -274,7 +269,7 @@ void NpcShopStage::Follow(ro::ui::NpcShopWindowState& state,
     if (!verdict.clear()) {
       context.world.RecordChat(ro::sim::ChatKind::kServer, 0,
                                IssueText(verdict.issues.front(), points), context.now_ms,
-                               kFailedColor);
+                               kTradeFailedColor);
       return;
     }
     if (auto sent = ro::net::BuyFromNpcShop(context.link, shop_, lines); !sent) {
@@ -289,7 +284,7 @@ void NpcShopStage::Follow(ro::ui::NpcShopWindowState& state,
     if (!verdict.clear()) {
       context.world.RecordChat(ro::sim::ChatKind::kServer, 0,
                                IssueText(verdict.issues.front(), false), context.now_ms,
-                               kFailedColor);
+                               kTradeFailedColor);
       return;
     }
     if (auto sent = ro::net::SellToNpcShop(context.link, shop_, lines); !sent) {
@@ -313,7 +308,7 @@ void NpcShopStage::SayOutcome(ro::ui::NpcShopWindowState& state, const TradeCont
     outcome_text_ = std::string(ro::vfs::TradeText(context.words, *said.word));
     if (!outcome_text_.empty()) {
       context.world.RecordChat(ro::sim::ChatKind::kServer, 0, outcome_text_, context.now_ms,
-                               said.succeeded ? kSucceededColor : kFailedColor);
+                               said.succeeded ? kTradeSucceededColor : kTradeFailedColor);
     }
   }
   view_.outcome_done = said.succeeded;

@@ -13,6 +13,7 @@
 
 #include "game/profile_yaml.h"
 #include "game/save_folder.h"
+#include "game/yaml_load.h"
 
 namespace moonclient {
 
@@ -27,7 +28,7 @@ void SkinLookPort::Pose(const SettingsValues& profile) {
 }
 
 bool SkinLookPort::Load(SettingsProfileBook& into) {
-  const std::optional<std::string> text = ReadProfileFile(profile_path_);
+  const std::optional<std::string> text = ReadFileText(profile_path_);
   if (!text.has_value()) {
     ro::core::LogWarning("profils d'habillage : {} ne s'ouvre pas",
                          ro::core::Utf8FromPath(profile_path_));
