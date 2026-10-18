@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <tuple>
 
 #include <glm/trigonometric.hpp>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/skill_suite_table.h"
 
@@ -13,13 +13,10 @@ namespace ro::render {
 std::span<const SkillSuiteStep> SkillSuiteOf(std::uint16_t skill_id, SkillSuiteMoment moment) {
   // Une PLAGE : la table range les étapes d'une compétence et d'un moment
   // côte à côte, dans l'ordre du client.
-  const std::span<const SkillSuiteStep> table = SkillSuiteTable();
   const auto key = [](const SkillSuiteStep& step) {
     return std::tuple{step.skill_id, step.moment};
   };
-  const auto trouvees = std::ranges::equal_range(table, std::tuple{skill_id, moment}, {}, key);
-  return table.subspan(static_cast<std::size_t>(trouvees.begin() - table.begin()),
-                       static_cast<std::size_t>(trouvees.end() - trouvees.begin()));
+  return core::RowsWithKey(SkillSuiteTable(), std::tuple{skill_id, moment}, key);
 }
 
 std::optional<glm::vec3> SkillSuiteAimPoint(const SkillSuiteStep& step,

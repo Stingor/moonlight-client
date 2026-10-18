@@ -2,15 +2,14 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_scene.h"
 
+#include "effect_track_angles.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] float Radians(float degrees) { return degrees * std::numbers::pi_v<float> / 180.0F; }
 
 [[nodiscard]] std::uint8_t Clamped(float channel) {
   return static_cast<std::uint8_t>(std::clamp(channel, 0.0F, kEffectNodeChannelMax));
@@ -23,8 +22,8 @@ namespace {
 // quatre-vingt-dix est chez lui le pôle du BAS, et le reste ici — c'est ce qui
 // met le bas de l'image sous le sol et son haut dans le dôme.
 [[nodiscard]] glm::vec3 PointOn(float radius, float latitude_degrees, float longitude_degrees) {
-  const float latitude = Radians(latitude_degrees);
-  const float longitude = Radians(longitude_degrees);
+  const float latitude = DegreesToRadians(latitude_degrees);
+  const float longitude = DegreesToRadians(longitude_degrees);
   const float ring = radius * std::cos(latitude);
   return glm::vec3{ring * std::sin(longitude), radius * std::sin(latitude),
                    -ring * std::cos(longitude)};

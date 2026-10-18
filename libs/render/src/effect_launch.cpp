@@ -10,7 +10,6 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
-#include <numbers>
 #include <optional>
 
 #include "ro/render/effect_node_pool.h"
@@ -86,8 +85,8 @@ EffectLaunchDraw DrawEffectLaunch(const EffectNodeSeed& seed, float facing_degre
                                                   seed.launch_yaw_degrees, generator);
   const float tilt =
       PriseOuTiree(seed, EffectSpriteDraw::kLaunchPitch, seed.launch_pitch_degrees, generator);
-  const float cap_rad = cap * std::numbers::pi_v<float> / 180.0F;
-  const float pitch_rad = tilt * std::numbers::pi_v<float> / 180.0F;
+  const float cap_rad = DegreesToRadians(cap);
+  const float pitch_rad = DegreesToRadians(tilt);
   // 🔴 LA CONVENTION N'EST PAS CELLE QU'ON ÉCRIT DE TÊTE. Pour un cap de 211°
   // et une inclinaison de 13°, la direction du client vaut
   // (−0,515038 ; +0,192821 ; −0,835198).
@@ -309,7 +308,7 @@ namespace {
 // Un changement de repère à déterminant positif garde le sens des angles ; ce
 // qui se retourne, c'est l'AXE, et l'appelant le dit.
 [[nodiscard]] glm::vec3 RotatedAroundAxis(glm::vec3 axis, float angle_degrees, glm::vec3 v) {
-  const float angle = angle_degrees * std::numbers::pi_v<float> / 180.0F;
+  const float angle = DegreesToRadians(angle_degrees);
   const float c = std::cos(angle);
   const float s = std::sin(angle);
   return v * c + glm::cross(axis, v) * s + axis * glm::dot(axis, v) * (1.0F - c);
@@ -401,7 +400,7 @@ EffectRadialLane StartEffectRadialLane(const EffectNodeSeed& seed, float heading
   // —, et la vitesse suit la direction même du bras de dispersion tiré au même
   // angle. La vitesse d'après la bascule est une fraction de cette direction ;
   // la dérive, elle, ne dépend pas du cap.
-  const float cap = heading_degrees * std::numbers::pi_v<float> / 180.0F;
+  const float cap = DegreesToRadians(heading_degrees);
   const glm::vec3 direction{std::cos(cap), 0.0F, std::sin(cap)};
   voie.velocity = direction * seed.radial_speed;
   voie.velocity_after_switch = direction * seed.radial_speed_after_switch;

@@ -2,10 +2,11 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 #include "ro/formats/str.h"
 #include "ro/render/effect_node.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -16,9 +17,6 @@ constexpr float kMaxColor = 255.0F;
 std::uint8_t Clamped(float channel) {
   return static_cast<std::uint8_t>(std::clamp(channel, 0.0F, kMaxColor));
 }
-
-// Le quart de cercle qu'il faut pour passer des degrés aux radians.
-float Radians(float degrees) { return degrees * std::numbers::pi_v<float> / 180.0F; }
 
 }  // namespace
 
@@ -65,7 +63,7 @@ void ComposeEffect(const PreparedEffect& effect, std::int32_t frame,
     const float center_y = shown->offset_y - formats::kStrOriginY;
     // L'ordonnée DESCEND ici comme dans le fichier : l'angle tourne donc dans
     // le sens des aiguilles d'une montre, et le sinus ne change pas de signe.
-    const float angle = Radians(shown->angle_degrees);
+    const float angle = DegreesToRadians(shown->angle_degrees);
     const float cosine = std::cos(angle);
     const float sine = std::sin(angle);
     for (std::size_t corner = 0; corner < quad.corners.size(); ++corner) {
@@ -79,7 +77,7 @@ void ComposeEffect(const PreparedEffect& effect, std::int32_t frame,
 }
 
 EffectQuad ComposeEffectNodeBillboard(const EffectNode& node, glm::vec2 anchor) {
-  const float spin = Radians(node.spin_degrees);
+  const float spin = DegreesToRadians(node.spin_degrees);
   const float cosine = std::cos(spin);
   const float sine = std::sin(spin);
 

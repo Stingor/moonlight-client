@@ -100,8 +100,8 @@ constexpr float kTextureSpanPerSegment =
 }  // namespace
 
 EffectRingOrientation EffectNodeOriented(float yaw_degrees, float pitch_degrees) {
-  const float cap = yaw_degrees * std::numbers::pi_v<float> / 180.0F;
-  const float pitch = pitch_degrees * std::numbers::pi_v<float> / 180.0F;
+  const float cap = DegreesToRadians(yaw_degrees);
+  const float pitch = DegreesToRadians(pitch_degrees);
   const float cos_cap = std::cos(cap);
   const float sin_cap = std::sin(cap);
   const float cos_pitch = std::cos(pitch);
@@ -129,7 +129,7 @@ EffectRingOrientation EffectNodeOriented(float yaw_degrees, float pitch_degrees,
   // La rotation autour de l'axe local Z laisse la profondeur intacte et fait
   // tourner l'abscisse et la hauteur l'une dans l'autre : c'est exactement ce
   // qui couche un quad né debout.
-  const float roll = roll_degrees * std::numbers::pi_v<float> / 180.0F;
+  const float roll = DegreesToRadians(roll_degrees);
   const float cos_roll = std::cos(roll);
   const float sin_roll = std::sin(roll);
   return EffectRingOrientation{cos_roll * unrolled[0] + sin_roll * unrolled[1],
@@ -432,7 +432,7 @@ glm::vec3 EffectNodeInstanceOffset(EffectNodeInstancePlacement placement, std::u
       // donc sur deux axes perpendiculaires, et la boîte se ferme.
       //
       // Le rang pair passe d'un côté, l'impair de l'autre. Rien ne se tire.
-      const float cap = yaw_degrees * std::numbers::pi_v<float> / 180.0F;
+      const float cap = DegreesToRadians(yaw_degrees);
       const float sens = index % 2 == 0 ? 1.0F : -1.0F;
       return glm::vec3{std::cos(cap), 0.0F, -std::sin(cap)} * (sens * spacing);
     }
@@ -461,7 +461,7 @@ glm::vec3 EffectNodeInstanceOffset(EffectNodeInstancePlacement placement, std::u
       // également écartées, et les poser à soixante degrés d'intervalle ferait
       // une couronne trop régulière pour être la sienne.
       const auto cap = static_cast<float>(NextEffectNodeDraw(generator) % kFullTurnDegrees);
-      const float radians = cap * std::numbers::pi_v<float> / 180.0F;
+      const float radians = DegreesToRadians(cap);
       // ⚠ ET LE RAYON SE TIRE AUSSI, quand le patron porte une borne haute : le
       // client écrit « trois plus un tirage sur vingt-cinq » pour les cristaux
       // de Storm Gust, un DISQUE et non un cercle. Sans borne, rien ne se tire
@@ -482,7 +482,7 @@ glm::vec3 EffectNodeInstanceOffset(EffectNodeInstancePlacement placement, std::u
       // profondeur change de signe.
       const auto cap = static_cast<float>(NextEffectNodeDraw(generator) % kFullTurnDegrees);
       const float rang = static_cast<float>(index) - 0.5F * static_cast<float>(count - 1);
-      return {0.0F, 0.0F, rang * spacing * std::cos(cap * std::numbers::pi_v<float> / 180.0F)};
+      return {0.0F, 0.0F, rang * spacing * std::cos(DegreesToRadians(cap))};
     }
     case EffectNodeInstancePlacement::kSingle:
       break;
@@ -512,15 +512,15 @@ glm::vec3 EffectBirthSweepOffset(float radius, float degrees_per_tick, std::int3
 }
 
 glm::vec3 EffectNodeLeanAxis(float lean_degrees, float yaw_degrees) {
-  const float penchant = lean_degrees * std::numbers::pi_v<float> / 180.0F;
-  const float lacet = yaw_degrees * std::numbers::pi_v<float> / 180.0F;
+  const float penchant = DegreesToRadians(lean_degrees);
+  const float lacet = DegreesToRadians(yaw_degrees);
   return glm::vec3{-std::cos(lacet) * std::sin(penchant), std::cos(penchant),
                    std::sin(lacet) * std::sin(penchant)};
 }
 
 EffectRingOrientation EffectNodeLeaningOrientation(float lean_degrees, float yaw_degrees) {
-  const float penchant = lean_degrees * std::numbers::pi_v<float> / 180.0F;
-  const float lacet = yaw_degrees * std::numbers::pi_v<float> / 180.0F;
+  const float penchant = DegreesToRadians(lean_degrees);
+  const float lacet = DegreesToRadians(yaw_degrees);
   const float cp = std::cos(penchant);
   const float sp = std::sin(penchant);
   const float cl = std::cos(lacet);

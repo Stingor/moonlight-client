@@ -215,8 +215,8 @@ std::optional<std::size_t> ActionAnimationFor(std::int8_t action_state, SpriteLa
       core::RowWithKey(CastStateTable(), action_state, &CastStateEntry::state);
   if (found == nullptr) {
     // Un état que la table ne nomme pas ne joue rien chez le client : ses deux
-    // tables rendent alors le rang ZÉRO, et SetActionAnim n'a pas de cas pour
-    // lui. Mieux vaut laisser la posture en place que planter l'acteur debout.
+    // tables rendent alors le rang ZÉRO, et aucune animation ne répond à ce
+    // rang. Mieux vaut laisser la posture en place que planter l'acteur debout.
     return std::nullopt;
   }
   return std::size_t{found->animation};

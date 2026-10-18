@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <array>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_track_spread.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -72,13 +72,6 @@ constexpr std::array<EffectChasedDriftPattern, 3> kChasedDrifts = {{
 
 // Les angles se tirent sur un tour, en degrés entiers.
 constexpr std::int32_t kAngleSpread = kEffectTrackFullTurnDegrees;
-
-// Un tirage sous la borne, ou zéro SANS TIRER quand elle n'est pas positive.
-[[nodiscard]] std::int32_t DrawBelowIfPositive(std::uint32_t& rng_state, std::int32_t etendue) {
-  return etendue > 0 ? static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                                 static_cast<std::uint32_t>(etendue))
-                     : 0;
-}
 
 // UN POINT DU CARRÉ, sur un côté : `tirage(côté) − côté / 2`, en entiers.
 [[nodiscard]] float DrawAcrossSquare(std::uint32_t& generator, float side) {

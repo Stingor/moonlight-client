@@ -19,6 +19,14 @@ struct SpriteBounds {
   [[nodiscard]] bool empty() const noexcept { return max.x <= min.x || max.y <= min.y; }
 };
 
+// Fait grandir une emprise pour qu'elle couvre les coins d'un quad.
+//
+// ⚠ `grown` DIT SI ELLE A DÉJÀ ÉTÉ TOUCHÉE : partir de zéro inclurait l'origine
+// de l'acteur dans l'emprise, et un sprite entièrement au-dessus d'elle — ce
+// que sont tous les sprites de RO, dont l'origine est aux pieds — se
+// retrouverait avec une boîte deux fois trop haute.
+void GrowBounds(SpriteBounds& bounds, bool& grown, const SpriteQuad& quad);
+
 [[nodiscard]] SpriteBounds ComputeBounds(std::span<const SpriteQuad> quads);
 
 // Dessine des quads de sprite dans une image, par recouvrement alpha.

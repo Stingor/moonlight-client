@@ -5,6 +5,8 @@
 
 #include "ro/render/actor_effect_table.h"
 
+#include "actor_effect_writes.h"
+
 namespace ro::render {
 namespace {
 
@@ -61,15 +63,6 @@ inline constexpr ActorPartSet kVeiledParts =
 // Combien de fois le client soumet le voile teinté. Deux : le même quad, deux
 // fois de suite, ce qui l'épaissit.
 inline constexpr std::size_t kTimedVeilPasses = 2;
-
-const ActorFieldWrite* WriteOn(const ActorEffectChange& change, std::uint16_t field) {
-  for (const ActorFieldWrite& write : change.writes) {
-    if (write.field == field) {
-      return &write;
-    }
-  }
-  return nullptr;
-}
 
 // L'alpha du voile teinté à ce pas, ou rien quand il ne se dessine plus.
 std::optional<std::int32_t> TimedVeilAlpha(std::int32_t step) {

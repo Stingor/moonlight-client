@@ -3,6 +3,7 @@
 #include <cstddef>
 
 #include "ro/render/doll_animation.h"
+#include "ro/render/sprite_canvas.h"
 
 namespace ro::render {
 namespace {
@@ -10,21 +11,6 @@ namespace {
 constexpr float kHalf = 0.5F;
 // Un cadre a deux bords par axe, et l'écart se prend des deux côtés.
 constexpr float kEdgesPerAxis = 2.0F;
-
-// Fait grandir une boîte pour qu'elle couvre les coins d'un quad. `grown` dit
-// si elle a déjà été touchée : partir de zéro y ferait entrer l'origine.
-void Grow(SpriteBounds& bounds, bool& grown, const SpriteQuad& quad) {
-  for (const glm::vec2& corner : quad.corners) {
-    if (!grown) {
-      bounds.min = corner;
-      bounds.max = corner;
-      grown = true;
-      continue;
-    }
-    bounds.min = glm::min(bounds.min, corner);
-    bounds.max = glm::max(bounds.max, corner);
-  }
-}
 
 [[nodiscard]] bool IsHeadPart(ActorPart part) noexcept {
   return part == ActorPart::kHead || part == ActorPart::kHeadgearLow ||
@@ -68,9 +54,9 @@ PortraitBoxes MeasurePortraitBoxes(std::span<const SpriteQuad> quads,
   for (std::size_t index = 0; index < quads.size(); ++index) {
     const ActorPart part = index < parts.size() ? parts[index] : ActorPart::kBody;
     if (IsHeadPart(part)) {
-      Grow(boxes.head, boxes.has_head, quads[index]);
+      GrowBounds(boxes.head, boxes.has_head, quads[index]);
     } else if (part == ActorPart::kBody) {
-      Grow(boxes.body, boxes.has_body, quads[index]);
+      GrowBounds(boxes.body, boxes.has_body, quads[index]);
     }
   }
   return boxes;
@@ -84,9 +70,9 @@ PortraitBoxes MeasurePaintedPortraitBoxes(const ComposedActor& composed) {
     }
     const ActorPart part = PartOfQuad(composed, index);
     if (IsHeadPart(part)) {
-      Grow(boxes.head, boxes.has_head, composed.quads[index]);
+      GrowBounds(boxes.head, boxes.has_head, composed.quads[index]);
     } else if (part == ActorPart::kBody) {
-      Grow(boxes.body, boxes.has_body, composed.quads[index]);
+      GrowBounds(boxes.body, boxes.has_body, composed.quads[index]);
     }
   }
   return boxes;

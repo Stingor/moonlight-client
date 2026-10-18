@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <numbers>
+
+#include <glm/glm.hpp>
 
 #include "ro/render/effect_track_fwd.h"
 
@@ -132,6 +135,34 @@ inline void TurnOnward(std::int16_t& degrees, std::int32_t step_degrees) {
     degre = kEffectTrackFullTurnDegrees - degre;
   }
   return degre;
+}
+
+// LE CAP, dans le repère du CLIENT, d'un point de notre monde vers un autre.
+//
+// ⚠ LA PROFONDEUR SE RETOURNE : le client soustrait ses z (cible moins
+// source), et les nôtres sont opposés aux siens.
+[[nodiscard]] inline std::int32_t ClientHeadingToward(glm::vec3 from, glm::vec3 to) {
+  return HeadingOfVector(to.x - from.x, from.z - to.z);
+}
+
+// LA PHASE DE L'ONDE d'une piste à ce tic, en degrés ramenés dans le tour.
+//
+// ⚠ DEUX FORMULES, ET LE RANG CHOISIT. Le client tient deux compteurs : l'un
+// monte de quarante-cinq par piste, l'autre de quatre-vingt-dix. Tant que le
+// premier reste sous quatre-vingt-dix, la phase vaut le compteur de tics plus
+// le second ; au-delà, elle vaut le compteur plus le premier, DOUBLÉ. Les deux
+// premières pistes ondulent donc au pas du tic, les deux dernières deux fois
+// plus vite.
+[[nodiscard]] inline std::int32_t UndulationPhaseDegrees(std::size_t rank, std::int32_t ticks) {
+  constexpr std::int32_t kPhasePerRankDegrees = 90;
+  constexpr std::int32_t kRankStepDegrees = 45;
+  constexpr std::int32_t kRankThresholdDegrees = 90;
+  constexpr std::int32_t kFastPhaseFactor = 2;
+  const auto rang = static_cast<std::int32_t>(rank);
+  if (rang * kRankStepDegrees < kRankThresholdDegrees) {
+    return WithinFullTurn(ticks + rang * kPhasePerRankDegrees);
+  }
+  return WithinFullTurn((ticks + rang * kRankStepDegrees) * kFastPhaseFactor);
 }
 
 }  // namespace ro::render

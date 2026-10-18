@@ -56,14 +56,6 @@ constexpr std::int32_t kSpreadRiseUntilTick = 20;
 constexpr std::int16_t kSpreadAlphaRise = 8;
 constexpr std::int16_t kSpreadAlphaCeiling = 120;
 
-// LE CAP, dans le repère du CLIENT, d'un point de notre monde vers un autre.
-//
-// ⚠ LA PROFONDEUR SE RETOURNE : le client soustrait ses z, les nôtres sont
-// opposés. Voir l'en-tête.
-[[nodiscard]] std::int32_t ClientHeadingToward(glm::vec3 from, glm::vec3 to) {
-  return HeadingOfVector(to.x - from.x, from.z - to.z);
-}
-
 // UN CAP D'UN REPÈRE À L'AUTRE : il se nie, dans les deux sens.
 [[nodiscard]] std::int32_t ClientHeadingOf(const EffectTrack& track) {
   return WithinFullTurn(-static_cast<std::int32_t>(track.azimuth_degrees));

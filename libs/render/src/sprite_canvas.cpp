@@ -29,20 +29,24 @@ void BlendPixel(std::uint8_t* destination, const std::uint8_t* source,
 
 }  // namespace
 
+void GrowBounds(SpriteBounds& bounds, bool& grown, const SpriteQuad& quad) {
+  for (const glm::vec2& corner : quad.corners) {
+    if (!grown) {
+      bounds.min = corner;
+      bounds.max = corner;
+      grown = true;
+      continue;
+    }
+    bounds.min = glm::min(bounds.min, corner);
+    bounds.max = glm::max(bounds.max, corner);
+  }
+}
+
 SpriteBounds ComputeBounds(std::span<const SpriteQuad> quads) {
   SpriteBounds bounds;
-  bool first = true;
+  bool grown = false;
   for (const SpriteQuad& quad : quads) {
-    for (const glm::vec2& corner : quad.corners) {
-      if (first) {
-        bounds.min = corner;
-        bounds.max = corner;
-        first = false;
-        continue;
-      }
-      bounds.min = glm::min(bounds.min, corner);
-      bounds.max = glm::max(bounds.max, corner);
-    }
+    GrowBounds(bounds, grown, quad);
   }
   return bounds;
 }

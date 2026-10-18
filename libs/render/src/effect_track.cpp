@@ -33,24 +33,6 @@ constexpr std::int16_t kTiltAtRelightDegrees = 74;
 // rallumé au dernier tic n'aurait pas le temps de s'ouvrir, et l'on verrait une
 // figure naître et disparaître dans la même image.
 constexpr std::int32_t kTicksNeededToRelight = 30;
-// L'écart d'azimut que le client ajoute d'une piste à la suivante, et le seuil
-// de rang au-delà duquel il change de formule de phase.
-constexpr std::int32_t kPhaseStepPerRankDegrees = 90;
-constexpr std::int32_t kRankStepDegrees = 45;
-constexpr std::int32_t kRankThresholdDegrees = 90;
-constexpr std::int32_t kFastPhaseFactor = 2;
-
-// La phase de l'onde à ce tic, pour cette piste.
-//
-// ⚠ DEUX FORMULES, ET LE RANG CHOISIT. Voir l'avertissement de l'en-tête : le
-// client compare le rang à un seuil, et la seconde formule double la vitesse.
-[[nodiscard]] std::int32_t UndulationPhaseDegrees(std::size_t rank, std::int32_t ticks) {
-  const std::int32_t rang = static_cast<std::int32_t>(rank);
-  if (rang * kRankStepDegrees < kRankThresholdDegrees) {
-    return WithinFullTurn(ticks + rang * kPhaseStepPerRankDegrees);
-  }
-  return WithinFullTurn((ticks + rang * kRankStepDegrees) * kFastPhaseFactor);
-}
 
 // CE QUE LE SOUS-TYPE 139 AJOUTE, et lui seul : l'échelle du nœud RESPIRE.
 //

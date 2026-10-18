@@ -1,9 +1,11 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <numbers>
 
 #include "ro/render/actor_effect_table.h"
+
+#include "actor_effect_writes.h"
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -116,16 +118,7 @@ inline constexpr std::size_t kCrossArms = 4;
 
 float SineOfPhase(std::uint32_t age_ticks) {
   const auto degrees = static_cast<float>(age_ticks % kPhaseWrap);
-  return std::sin(degrees * std::numbers::pi_v<float> / 180.0F);
-}
-
-const ActorFieldWrite* WriteOn(const ActorEffectChange& change, std::uint16_t field) {
-  for (const ActorFieldWrite& write : change.writes) {
-    if (write.field == field) {
-      return &write;
-    }
-  }
-  return nullptr;
+  return std::sin(DegreesToRadians(degrees));
 }
 
 }  // namespace

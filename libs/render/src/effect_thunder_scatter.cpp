@@ -13,14 +13,6 @@ namespace {
 constexpr std::size_t kTrackThatTakesTheTurn = 0;
 constexpr std::size_t kTrackThatTakesTheTilt = 1;
 
-// LE CAP, dans le repère du CLIENT, d'un point de notre monde vers un autre.
-//
-// ⚠ LA PROFONDEUR SE RETOURNE : le client soustrait ses z (cible moins
-// source), et les nôtres sont opposés aux siens.
-[[nodiscard]] std::int32_t ClientHeadingToward(glm::vec3 from, glm::vec3 to) {
-  return HeadingOfVector(to.x - from.x, from.z - to.z);
-}
-
 }  // namespace
 
 void AdvanceThunderScatterTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks,

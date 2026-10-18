@@ -27,4 +27,10 @@ namespace ro::render {
                                    static_cast<std::uint32_t>(exclusive_bound));
 }
 
+// Un tirage sous la borne, ou zéro SANS TIRER quand elle n'est pas positive.
+[[nodiscard]] inline std::int32_t DrawBelowIfPositive(std::uint32_t& generator,
+                                                      std::int32_t exclusive_bound) {
+  return exclusive_bound > 0 ? DrawBelow(generator, exclusive_bound) : 0;
+}
+
 }  // namespace ro::render

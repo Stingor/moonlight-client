@@ -5,6 +5,8 @@
 
 #include "ro/render/actor_effect_table.h"
 
+#include "actor_effect_writes.h"
+
 namespace ro::render {
 namespace {
 
@@ -139,16 +141,6 @@ inline constexpr std::int32_t kSpinLastStep = 36;
 
 // Le champ dont le cercle tire son pas.
 inline constexpr std::uint16_t kSwingField = 0xF4;
-
-// Le champ que cet effet pousse sous ce décalage, ou rien.
-const ActorFieldWrite* WriteOn(const ActorEffectChange& change, std::uint16_t field) {
-  for (const ActorFieldWrite& write : change.writes) {
-    if (write.field == field) {
-      return &write;
-    }
-  }
-  return nullptr;
-}
 
 }  // namespace
 

@@ -28,10 +28,7 @@ std::int16_t AimedSpokeClientHeading(glm::vec3 node_position,
   if (!target.has_value()) {
     return 0;
   }
-  // ⚠ LA PROFONDEUR SE RETOURNE : le client prend `cible − instance` dans son
-  // repère, où notre z est opposé.
-  return static_cast<std::int16_t>(
-      HeadingOfVector(target->x - node_position.x, node_position.z - target->z));
+  return static_cast<std::int16_t>(ClientHeadingToward(node_position, *target));
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedAimedSpokeTracks(

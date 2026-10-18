@@ -8,26 +8,6 @@
 namespace ro::render {
 namespace {
 
-// LES DEUX FORMULES DE PHASE, et le rang qui choisit. Le mouvement tient deux
-// compteurs : l'un monte de quarante-cinq par piste, l'autre de
-// quatre-vingt-dix. Tant que le premier reste sous quatre-vingt-dix, la phase
-// vaut le compteur de tics plus le second ; au-delà, elle vaut le compteur
-// plus le premier, DOUBLÉ. Les deux
-// premières pistes ondulent donc au pas du tic, les deux dernières deux fois
-// plus vite.
-constexpr std::int32_t kPhasePerRankDegrees = 90;
-constexpr std::int32_t kRankStepDegrees = 45;
-constexpr std::int32_t kRankThresholdDegrees = 90;
-constexpr std::int32_t kFastPhaseFactor = 2;
-
-[[nodiscard]] std::int32_t PhaseOf(std::size_t rank, std::int32_t ticks) {
-  const auto rang = static_cast<std::int32_t>(rank);
-  if (rang * kRankStepDegrees < kRankThresholdDegrees) {
-    return WithinFullTurn(ticks + rang * kPhasePerRankDegrees);
-  }
-  return WithinFullTurn((ticks + rang * kRankStepDegrees) * kFastPhaseFactor);
-}
-
 void AdvanceOne(EffectTrack& track, std::size_t rank, std::int32_t life_ticks,
                 bool effects_reduced) {
   if (!track.active) {
@@ -58,7 +38,7 @@ void AdvanceOne(EffectTrack& track, std::size_t rank, std::int32_t life_ticks,
 
   // L'ONDE, sur les VINGT ET UNE cases : la boucle court jusqu'à la fin de la
   // table des sinus, par pas de neuf degrés.
-  const float le_long_du_temps = SinOfDegrees(PhaseOf(rank, track.ticks));
+  const float le_long_du_temps = SinOfDegrees(UndulationPhaseDegrees(rank, track.ticks));
   const float key = track.lift_key;
   for (std::size_t segment = 0; segment < kEffectTrackSlots; ++segment) {
     const auto along_ribbon =

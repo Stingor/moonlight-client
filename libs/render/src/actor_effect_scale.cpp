@@ -3,6 +3,8 @@
 #include "ro/render/actor_effect_table.h"
 #include "ro/render/actor_scale.h"
 
+#include "actor_effect_writes.h"
+
 namespace ro::render {
 namespace {
 
@@ -40,10 +42,8 @@ struct BitStep {
     if (change == nullptr || (RenderBitsAt(*change, play.age_ticks) & bit) == 0) {
       continue;
     }
-    for (const ActorFieldWrite& write : change->writes) {
-      if (write.field == field) {
-        return BitStep{ValueAt(write, play.age_ticks, change->life_ticks), true};
-      }
+    if (const ActorFieldWrite* write = WriteOn(*change, field)) {
+      return BitStep{ValueAt(*write, play.age_ticks, change->life_ticks), true};
     }
     // Un bit de taille levé sans compteur n'existe pas dans la table : les
     // cinq effets de taille écrivent tous le leur.

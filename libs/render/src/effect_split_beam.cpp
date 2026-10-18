@@ -7,8 +7,9 @@
 #include <cmath>
 
 #include "ro/core/sorted_table.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/map_effect_math.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -61,16 +62,6 @@ constexpr std::array<EffectSplitBeamPattern, 1> kSplitBeams = {{
 
 [[nodiscard]] float SinOfTruncatedDegrees(float degrees) {
   return std::sin(NativeTableRadians(static_cast<std::int32_t>(std::trunc(degrees))));
-}
-
-// Un tirage sous la borne, ou zéro SANS TIRER quand elle n'est pas positive.
-[[nodiscard]] std::int32_t DrawBelowIfPositive(std::uint32_t& rng_state,
-                                               std::int32_t exclusive_bound) {
-  if (exclusive_bound <= 0) {
-    return 0;
-  }
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
 }
 
 // UN ÉCLAT, à son rang dans l'étoile. L'ordre des tirages est celui du client.

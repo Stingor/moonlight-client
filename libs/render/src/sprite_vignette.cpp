@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "ro/render/sprite_canvas.h"
 #include "ro/render/sprite_frame.h"
 
 namespace ro::render {
@@ -13,25 +14,6 @@ namespace {
 // La moitié, pour les centrages. Nommée parce qu'elle sert des deux côtés d'un
 // cadrage où toute autre valeur serait un décentrage.
 constexpr float kHalf = 0.5F;
-
-// Fait grandir une emprise pour qu'elle couvre les coins donnés.
-//
-// ⚠ `grown` DIT SI ELLE A DÉJÀ ÉTÉ TOUCHÉE : partir de zéro inclurait l'origine
-// de l'acteur dans l'emprise, et un sprite entièrement au-dessus d'elle — ce
-// que sont tous les sprites de RO, dont l'origine est aux pieds — se
-// retrouverait avec une boîte deux fois trop haute.
-void Grow(SpriteBounds& bounds, bool& grown, const SpriteQuad& quad) {
-  for (const glm::vec2& corner : quad.corners) {
-    if (!grown) {
-      bounds.min = corner;
-      bounds.max = corner;
-      grown = true;
-      continue;
-    }
-    bounds.min = glm::min(bounds.min, corner);
-    bounds.max = glm::max(bounds.max, corner);
-  }
-}
 
 // Combien d'images porte l'animation du corps. Au moins une : une action sans
 // image ne se mesure pas, mais elle ne doit pas non plus faire une boucle vide
@@ -54,9 +36,9 @@ void Grow(SpriteBounds& bounds, bool& grown, const SpriteQuad& quad) {
 void GrowOver(const ComposedActor& composed, const formats::SprSprite* body_sprite,
               OutfitSpan& span, bool& grown_all, bool& grown_body) {
   for (std::size_t index = 0; index < composed.quads.size(); ++index) {
-    Grow(span.all, grown_all, composed.quads[index]);
+    GrowBounds(span.all, grown_all, composed.quads[index]);
     if (index < composed.sources.size() && composed.sources[index].sprite == body_sprite) {
-      Grow(span.body, grown_body, composed.quads[index]);
+      GrowBounds(span.body, grown_body, composed.quads[index]);
     }
   }
 }

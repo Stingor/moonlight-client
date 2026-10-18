@@ -1,10 +1,10 @@
 #include "ro/render/effect_haunt.h"
 
 #include <algorithm>
-#include <cmath>
-#include <numbers>
 
 #include "ro/render/effect_node.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 
@@ -32,11 +32,6 @@ constexpr std::uint32_t kBatRestPoseDraws = 1001;
 
 [[nodiscard]] std::int32_t WithinTurn(std::int32_t degrees) {
   return degrees >= kFullTurnDegrees ? degrees - kFullTurnDegrees : degrees;
-}
-
-[[nodiscard]] float Radians(std::int32_t degrees) {
-  return static_cast<float>(degrees) * std::numbers::pi_v<float> /
-         static_cast<float>(kHalfTurnDegrees);
 }
 
 // L'ACTION DU FANTÔME : il montre sa face quand l'angle sous lequel la caméra
@@ -90,9 +85,9 @@ glm::vec3 AdvanceEffectHaunt(EffectHaunt& haunt, std::int32_t camera_yaw_degrees
 
   // LE HUIT : la profondeur prend l'angle doublé.
   const std::int32_t depth = loop ? WithinTurn(2 * haunt.orbit_degrees) : haunt.orbit_degrees;
-  const glm::vec3 offset{haunt.radius * std::cos(Radians(haunt.orbit_degrees)),
-                         std::sin(Radians(haunt.bob_degrees)) * kEffectHauntBobHeight,
-                         haunt.radius * std::sin(Radians(depth))};
+  const glm::vec3 offset{haunt.radius * CosOfDegrees(haunt.orbit_degrees),
+                         SinOfDegrees(haunt.bob_degrees) * kEffectHauntBobHeight,
+                         haunt.radius * SinOfDegrees(depth)};
 
   if (haunt.flight == EffectHauntFlight::kGhost) {
     haunt.action = GhostActionFacing(camera_yaw_degrees, haunt.orbit_degrees);

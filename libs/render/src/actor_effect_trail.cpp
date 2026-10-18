@@ -1,8 +1,9 @@
 #include <cmath>
 #include <cstdint>
-#include <numbers>
 
 #include "ro/render/actor_effect_table.h"
+
+#include "effect_track_angles.h"
 
 namespace ro::render {
 namespace {
@@ -60,8 +61,7 @@ std::optional<std::int32_t> FootprintAzimuthDegrees(float dx, float dz) {
   std::int32_t degrees = 0;
   std::int32_t azimuth = kHalfTurnDegrees;
   bool found = true;
-  while (dx / length < std::cos(static_cast<float>(degrees) * std::numbers::pi_v<float> /
-                                static_cast<float>(kHalfTurnDegrees))) {
+  while (dx / length < CosOfDegrees(degrees)) {
     if (++degrees > kHalfTurnDegrees) {
       found = false;
       break;

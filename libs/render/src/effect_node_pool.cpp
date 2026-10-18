@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <numbers>
 #include <utility>
 
 #include "ro/render/effect_cross_spikes.h"
@@ -15,6 +14,7 @@
 #include "ro/render/effect_tinted_quad.h"
 
 #include "effect_node_motion.h"
+#include "effect_track_angles.h"
 
 namespace ro::render {
 
@@ -211,7 +211,7 @@ void OrbitPooledNode(PooledEffectNode& pooled) {
   pooled.orbit_degrees_per_tick += pooled.orbit_acceleration_per_tick;
   pooled.node.orbit_degrees += pooled.orbit_degrees_per_tick;
   const float travelled = std::trunc(pooled.node.orbit_degrees - pooled.orbit_start_degrees);
-  const float cap = (pooled.orbit_start_degrees + travelled) * std::numbers::pi_v<float> / 180.0F;
+  const float cap = DegreesToRadians(pooled.orbit_start_degrees + travelled);
   const float height = pooled.ground_position.y;
   pooled.ground_position =
       pooled.orbit_anchor +
