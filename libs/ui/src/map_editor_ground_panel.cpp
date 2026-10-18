@@ -124,6 +124,10 @@ void DrawGroundWhy(const MapEditorView& view, MapEditorPanelState& panel,
 void DrawGround(const MapEditorView& view, MapEditorPanelState& panel,
                 std::vector<MapEditorIntent>& intents, const SkinArt& art) {
   ImGui::SeparatorText(core::Tr("Relief"));
+  // SES IDENTIFIANTS À PART : « Sommets » nomme aussi l'outil des modèles, et
+  // « Pourquoi » le champ du modèle désigné, dans la même fenêtre ; ImGui
+  // confondrait les deux.
+  ImGui::PushID("relief");
   const bool points = view.ground.brush.mode == MapEditorBrushMode::kPoints;
   ImGui::TextDisabled(
       "%s", points ? core::Tr("Un clic désigne un point du sol ; Maj+clic l'ajoute à la sélection "
@@ -152,6 +156,7 @@ void DrawGround(const MapEditorView& view, MapEditorPanelState& panel,
     intents.emplace_back(map_editor::RevertGround{});
   }
   ImGui::EndDisabled();
+  ImGui::PopID();
 }
 
 }  // namespace ro::ui
