@@ -7,12 +7,11 @@
 // serveur reste seul juge d'une montée.
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/sim/world.h"
 
 #include "guild/guild_panel.h"
@@ -116,7 +115,6 @@ void GuildPanel::RefreshSkills(const ro::sim::GuildBook& book, const ro::sim::Wo
   // dedans, et ces vecteurs ne doivent plus bouger une fois visés.
   skill_needs_.assign(ids.size(), {});
   skill_requirements_.assign(ids.size(), {});
-  std::array<char, 96> part = {};
   for (std::size_t index = 0; index < ids.size(); ++index) {
     const GuildTreeNode* node = node_of(ids[index]);
     if (node == nullptr) {
@@ -126,12 +124,12 @@ void GuildPanel::RefreshSkills(const ro::sim::GuildBook& book, const ro::sim::Wo
       skill_needs_[index].push_back(
           ro::ui::SkillNeedView{.skill_id = need.skill_id, .level = need.level});
       const std::string label(label_of(need.skill_id));
-      std::snprintf(part.data(), part.size(), ro::core::Tr("%s Niv %d"),
-                    label.empty() ? "?" : label.c_str(), static_cast<int>(need.level));
       if (!skill_requirements_[index].empty()) {
         skill_requirements_[index] += ", ";
       }
-      skill_requirements_[index] += part.data();
+      skill_requirements_[index] +=
+          ro::core::Printed(ro::core::Tr("%s Niv %d"), label.empty() ? "?" : label.c_str(),
+                            static_cast<int>(need.level));
     }
   }
 

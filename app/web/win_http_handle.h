@@ -3,11 +3,11 @@
 // CE QUE PARTAGENT LES CLIENTS WINHTTP DU DÉPÔT : une poignée qui se referme,
 // le passage en UTF-16, et le motif d'un échec.
 
-#include <array>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <utility>
+
+#include "ro/core/printed.h"
 
 // clang-format off
 #include <windows.h>
@@ -31,9 +31,7 @@ namespace moonclient::web {
 // que le système rend pour ces codes sont en anglais et souvent vides ; le
 // numéro est ce qui permet de nous le rapporter.
 [[nodiscard]] inline std::string Mishap(unsigned long code) {
-  std::array<char, 64> text = {};
-  std::snprintf(text.data(), text.size(), "le site est injoignable (erreur %lu)", code);
-  return text.data();
+  return ro::core::Printed("le site est injoignable (erreur %lu)", code);
 }
 
 // Tient une poignée WinHTTP, et la referme quoi qu'il arrive.

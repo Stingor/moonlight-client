@@ -3,11 +3,10 @@
 #include "options/mvp_tracker_options.h"
 
 #include <algorithm>
-#include <array>
 #include <cmath>
-#include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -31,10 +30,6 @@ constexpr const char* kShowDelayKey = "mvp_tracker_show_delay";
 constexpr const char* kLineSpriteKey = "mvp_tracker_line_sprite";
 constexpr const char* kLineTextKey = "mvp_tracker_line_text";
 constexpr const char* kLineBackgroundKey = "mvp_tracker_line_background";
-
-// Les textes composés de la page : la porte de la touche, le compte des lignes
-// détachées et la question posée avant de les remettre.
-constexpr std::size_t kComposedBytes = 160;
 
 [[nodiscard]] int BoundedLead(int lead_min) {
   return std::clamp(lead_min, kMvpAlertLeadLeastMin, kMvpAlertLeadMostMin);
@@ -133,23 +128,18 @@ void MvpTrackerOptions::Compose() {
   // carnet, et éteint, « Ouvrir le carnet » n'ouvrirait rien.
   const bool off = !hunt.enabled;
 
-  std::array<char, kComposedBytes> text{};
   if (open_key_.empty()) {
-    std::snprintf(text.data(), text.size(), Tr("ou une touche à lier : « %s »"),
-                  Tr("Carnet de chasse MVP"));
+    open_hint_ = ro::core::Printed(Tr("ou une touche à lier : « %s »"), Tr("Carnet de chasse MVP"));
   } else {
-    std::snprintf(text.data(), text.size(), Tr("ou la touche %s"), open_key_.c_str());
+    open_hint_ = ro::core::Printed(Tr("ou la touche %s"), open_key_.c_str());
   }
-  open_hint_ = text.data();
-  std::snprintf(text.data(), text.size(), Tr("Tout remettre au carnet (%d)"), line_count_);
-  put_back_label_ = text.data();
+  put_back_label_ = ro::core::Printed(Tr("Tout remettre au carnet (%d)"), line_count_);
   // ⚠ UNE SEULE LIGNE SE DIT AU SINGULIER : « les 1 lignes » ne se lit pas.
   if (line_count_ == 1) {
     put_back_confirm_ = Tr("Remettre au carnet la ligne détachée ?");
   } else {
-    std::snprintf(text.data(), text.size(), Tr("Remettre au carnet les %d lignes détachées ?"),
-                  line_count_);
-    put_back_confirm_ = text.data();
+    put_back_confirm_ =
+        ro::core::Printed(Tr("Remettre au carnet les %d lignes détachées ?"), line_count_);
   }
 
   // ⚠ LES VUES APRÈS L'ÉCRITURE DES CHAÎNES : elles pointent dedans.

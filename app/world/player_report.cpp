@@ -1,19 +1,14 @@
 #include "world/player_report.h"
 
-#include <array>
-#include <cstdio>
-
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
 
 using ro::core::Tr;
 using ro::net::PlayerReportResult;
-
-// Assez pour la plus longue phrase, dans toutes les langues, et un nom.
-constexpr std::size_t kLineBytes = 256;
 
 }  // namespace
 
@@ -22,10 +17,7 @@ std::optional<std::string> PlayerReportLine(const ro::net::PlayerReportAck& ack)
     case PlayerReportResult::kCountLimit:
       return Tr("Le nombre de signalements du jour est dépassé : vous ne pouvez plus signaler.");
     case PlayerReportResult::kRecorded: {
-      std::array<char, kLineBytes> line{};
-      std::snprintf(line.data(), line.size(), Tr("Signalement de %s enregistré."),
-                    ack.target_name.c_str());
-      return std::string(line.data());
+      return ro::core::Printed(Tr("Signalement de %s enregistré."), ack.target_name.c_str());
     }
     case PlayerReportResult::kCoolTime:
       return Tr("Vous avez déjà signalé ce joueur récemment.");

@@ -3,15 +3,13 @@
 #include "game/achievement_rows.h"
 
 #include <algorithm>
-#include <array>
 #include <cctype>
-#include <cstdio>
 #include <ctime>
 #include <string_view>
 
 #include "ro/core/ascii.h"
-#include "ro/core/decimal_text.h"
 #include "ro/core/local_time.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -30,10 +28,6 @@ constexpr std::string_view kTrackerEllipsis = "...";
 // `tm_year` compte depuis 1900, `tm_mon` depuis zéro.
 constexpr int kFirstYear = 1900;
 constexpr int kFirstMonth = 1;
-// « 2026.10. 7 » : trois champs de `std::tm`, que le tampon tient même à leur
-// pire valeur.
-constexpr std::size_t kDateBytes = 3 * ro::core::kDecimalTextBytes<int>;
-constexpr std::size_t kCountBytes = 32;
 
 // L'octet qui CONTINUE un caractère UTF-8 : 10xxxxxx.
 constexpr unsigned char kContinuationMask = 0xC0;
@@ -242,10 +236,8 @@ std::string AchievementDateText(std::uint32_t unix_s) {
   if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-  std::array<char, kDateBytes> text{};
-  std::snprintf(text.data(), text.size(), "%4d.%2d.%2d", local.tm_year + kFirstYear,
-                local.tm_mon + kFirstMonth, local.tm_mday);
-  return text.data();
+  return ro::core::Printed("%4d.%2d.%2d", local.tm_year + kFirstYear, local.tm_mon + kFirstMonth,
+                           local.tm_mday);
 }
 
 std::uint32_t ObjectiveCount(const AchievementProgress* progress, std::size_t index) {
@@ -284,11 +276,9 @@ std::string ObjectiveText(const AchievementInfo& info, std::size_t index,
   if (info.gauge != AchievementGauge::kCounts) {
     return objective.text;
   }
-  std::array<char, kCountBytes> counts{};
-  std::snprintf(counts.data(), counts.size(), " ( %u / %u )",
-                static_cast<unsigned>(ObjectiveCount(progress, index)),
-                static_cast<unsigned>(objective.target));
-  return objective.text + counts.data();
+  return objective.text + ro::core::Printed(" ( %u / %u )",
+                                            static_cast<unsigned>(ObjectiveCount(progress, index)),
+                                            static_cast<unsigned>(objective.target));
 }
 
 std::string TrackerLineText(const AchievementInfo& info, std::size_t index,
@@ -299,11 +289,8 @@ std::string TrackerLineText(const AchievementInfo& info, std::size_t index,
   const std::string_view label = info.objectives[index].text;
   std::string tail;
   if (info.gauge == AchievementGauge::kCounts) {
-    std::array<char, kCountBytes> counts{};
-    std::snprintf(counts.data(), counts.size(), "(%u/%u)",
-                  static_cast<unsigned>(ObjectiveCount(progress, index)),
-                  static_cast<unsigned>(info.objectives[index].target));
-    tail = counts.data();
+    tail = ro::core::Printed("(%u/%u)", static_cast<unsigned>(ObjectiveCount(progress, index)),
+                             static_cast<unsigned>(info.objectives[index].target));
   }
   std::string line(kTrackerBullet);
   if (label.size() + tail.size() <= kTrackerLineBytes) {

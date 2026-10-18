@@ -3,12 +3,10 @@
 #include "game/battleground_rules.h"
 
 #include <algorithm>
-#include <array>
-#include <cstddef>
-#include <cstdio>
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -17,8 +15,6 @@ namespace {
 constexpr std::string_view kRequestSound = "se_btg_request.wav";
 constexpr std::string_view kReadySound = "se_btg_ready.wav";
 constexpr std::string_view kForwardSound = "se_btg_forward.wav";
-
-constexpr std::size_t kConditionCapacity = 128;
 
 // UN GROUPE ENTIER DOIT TENIR DANS UN CAMP : ses membres connectés partent
 // tous en file. Un terrain qui ne dit pas sa taille ne refuse rien.
@@ -125,33 +121,29 @@ const char* NoticeText(ro::sim::EntryQueueNoticeKind kind) {
 // compilateur ne vérifie les arguments que d'un format qu'il voit.
 
 std::string ConditionText(const BattlegroundField& field) {
-  std::array<char, kConditionCapacity> text{};
+  std::string text;
   if (field.level_min > 0 && field.level_max > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Base level %d à %d"), field.level_min,
-                  field.level_max);
+    text = ro::core::Printed(ro::core::Tr("Base level %d à %d"), field.level_min, field.level_max);
   } else if (field.level_min > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Base level %d au moins"),
-                  field.level_min);
+    text = ro::core::Printed(ro::core::Tr("Base level %d au moins"), field.level_min);
   } else if (field.level_max > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Base level %d au plus"), field.level_max);
+    text = ro::core::Printed(ro::core::Tr("Base level %d au plus"), field.level_max);
   }
-  return text.data();
+  return text;
 }
 
 std::string TeamText(const BattlegroundField& field) {
-  std::array<char, kConditionCapacity> text{};
+  std::string text;
   if (field.team_min > 0 && field.team_min == field.team_max) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("%d contre %d"), field.team_min,
-                  field.team_min);
+    text = ro::core::Printed(ro::core::Tr("%d contre %d"), field.team_min, field.team_min);
   } else if (field.team_min > 0 && field.team_max > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("%d à %d par camp"), field.team_min,
-                  field.team_max);
+    text = ro::core::Printed(ro::core::Tr("%d à %d par camp"), field.team_min, field.team_max);
   } else if (field.team_min > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("%d par camp au moins"), field.team_min);
+    text = ro::core::Printed(ro::core::Tr("%d par camp au moins"), field.team_min);
   } else if (field.team_max > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("%d par camp au plus"), field.team_max);
+    text = ro::core::Printed(ro::core::Tr("%d par camp au plus"), field.team_max);
   }
-  return text.data();
+  return text;
 }
 
 InterfaceSoundFile SoundFileOf(ro::sim::EntryQueueSound sound) {

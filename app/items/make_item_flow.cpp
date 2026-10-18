@@ -6,13 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdio>
 #include <ctime>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/inventory.h"
 #include "ro/net/skill.h"
 #include "ro/sim/inventory.h"
@@ -47,7 +47,6 @@ constexpr int kMostRelaunchRetries = 3;
 constexpr std::size_t kMostHistoryLines = 200;
 
 constexpr std::size_t kTimeBytes = 16;
-constexpr std::size_t kLineBytes = 512;
 
 [[nodiscard]] bool Due(std::uint32_t at, std::uint32_t now_ms) {
   return at != 0 && static_cast<std::int32_t>(now_ms - at) >= 0;
@@ -117,9 +116,8 @@ void MakeItemFlow::TakeMastery(const ro::sim::World& world) {
   if (before < 0 || before == told) {
     return;
   }
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), Tr("Maîtrise culinaire : %d -> %d."), before, told);
-  Log(line.data(), told > before ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kWarn);
+  Log(ro::core::Printed(Tr("Maîtrise culinaire : %d -> %d."), before, told),
+      told > before ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kWarn);
 }
 
 void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& state,
@@ -134,19 +132,19 @@ void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& 
   // UNE LISTE VIDE SUR UNE SESSION ENCORE ARMÉE ne remplace rien : le serveur
   // n'en garde qu'une, et celle qu'on montre reste valable.
   if (list.item_ids.empty() && list_armed_ && !arms_when_empty) {
-    std::array<char, kLineBytes> line{};
+    std::string line;
     if (Recent(craft.last_use(), now_ms)) {
       const std::string used = ItemName(craft.last_use_item());
-      std::snprintf(line.data(), line.size(),
-                    Tr("%s consommé sans effet : une session de fabrication est déjà ouverte, le "
-                       "serveur n'en garde qu'une. Terminez-la ou fermez-la d'abord."),
-                    used.empty() ? Tr("Item") : used.c_str());
+      line = ro::core::Printed(
+          Tr("%s consommé sans effet : une session de fabrication est déjà ouverte, le "
+             "serveur n'en garde qu'une. Terminez-la ou fermez-la d'abord."),
+          used.empty() ? Tr("Item") : used.c_str());
     } else {
-      std::snprintf(line.data(), line.size(), "%s",
-                    Tr("Aucun produit proposé : une session de fabrication est déjà ouverte (le "
-                       "serveur n'en garde qu'une). La liste affichée reste valable."));
+      line = ro::core::Printed(
+          "%s", Tr("Aucun produit proposé : une session de fabrication est déjà ouverte (le "
+                   "serveur n'en garde qu'une). La liste affichée reste valable."));
     }
-    Log(line.data(), ro::ui::SkinTone::kWarn);
+    Log(line, ro::ui::SkinTone::kWarn);
     return;
   }
 
@@ -186,9 +184,7 @@ void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& 
   for (Entry& entry : entries_) {
     entry.name = ItemName(entry.item_id);
     if (entry.name.empty()) {
-      std::array<char, kLineBytes> numbered{};
-      std::snprintf(numbered.data(), numbered.size(), "#%u", static_cast<unsigned>(entry.item_id));
-      entry.name = numbered.data();
+      entry.name = ro::core::Printed("#%u", static_cast<unsigned>(entry.item_id));
     }
     ResolveMaterials(entry);
   }
@@ -211,17 +207,16 @@ void MakeItemFlow::TakeList(ro::sim::World& world, ro::ui::MakeItemWindowState& 
       continue;
     }
     forge_slots_[slot] = 0;
-    std::array<char, kLineBytes> line{};
+    std::string line;
     const std::string name = ItemName(item_id);
     if (name.empty()) {
-      std::snprintf(line.data(), line.size(),
-                    Tr("Emplacement %d vidé : plus d'item #%u en réserve."),
-                    static_cast<int>(slot + 1), static_cast<unsigned>(item_id));
+      line = ro::core::Printed(Tr("Emplacement %d vidé : plus d'item #%u en réserve."),
+                               static_cast<int>(slot + 1), static_cast<unsigned>(item_id));
     } else {
-      std::snprintf(line.data(), line.size(), Tr("Emplacement %d vidé : plus de %s en réserve."),
-                    static_cast<int>(slot + 1), name.c_str());
+      line = ro::core::Printed(Tr("Emplacement %d vidé : plus de %s en réserve."),
+                               static_cast<int>(slot + 1), name.c_str());
     }
-    Log(line.data(), ro::ui::SkinTone::kWarn);
+    Log(line, ro::ui::SkinTone::kWarn);
   }
 
   if (from_item_ && Recent(craft.last_use(), now_ms) && craft.last_use_item() != 0) {
@@ -287,9 +282,7 @@ void MakeItemFlow::TakeResult(ro::sim::World& world, const MakeItemSettings& set
     name = last_sent_name_;
   }
   if (name.empty()) {
-    std::array<char, kLineBytes> numbered{};
-    std::snprintf(numbered.data(), numbered.size(), "#%u", static_cast<unsigned>(result.item_id));
-    name = numbered.data();
+    name = ro::core::Printed("#%u", static_cast<unsigned>(result.item_id));
   }
   const std::string_view pattern =
       words_ != nullptr ? ro::vfs::MakeResultTemplate(*words_, succeeded) : std::string_view();
@@ -343,15 +336,15 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
       sent_owned_ = -1;
       sent_material_ = 0;
       sent_material_owned_ = -1;
-      std::array<char, kLineBytes> line{};
+      std::string line;
       if (gained > 1) {
-        std::snprintf(line.data(), line.size(), Tr("%s créé ×%d"), last_sent_name_.c_str(), gained);
+        line = ro::core::Printed(Tr("%s créé ×%d"), last_sent_name_.c_str(), gained);
       } else if (gained == 1) {
-        std::snprintf(line.data(), line.size(), Tr("%s créé."), last_sent_name_.c_str());
+        line = ro::core::Printed(Tr("%s créé."), last_sent_name_.c_str());
       } else {
-        std::snprintf(line.data(), line.size(), Tr("%s transformé."), last_sent_name_.c_str());
+        line = ro::core::Printed(Tr("%s transformé."), last_sent_name_.c_str());
       }
-      last_result_ = line.data();
+      last_result_ = line;
       last_result_tone_ = ro::ui::SkinTone::kGood;
       Log(last_result_, last_result_tone_);
       if (batch_left_ > 0) {
@@ -368,10 +361,8 @@ void MakeItemFlow::Probe(const ro::sim::World& world, const MakeItemSettings& se
       sent_owned_ = -1;
       sent_material_ = 0;
       sent_material_owned_ = -1;
-      std::array<char, kLineBytes> line{};
-      std::snprintf(line.data(), line.size(), Tr("%s : échec, matériaux perdus."),
-                    last_sent_name_.c_str());
-      last_result_ = line.data();
+      last_result_ =
+          ro::core::Printed(Tr("%s : échec, matériaux perdus."), last_sent_name_.c_str());
       last_result_tone_ = ro::ui::SkinTone::kWarn;
       Log(last_result_, last_result_tone_);
       if (batch_left_ > 0) {
@@ -425,12 +416,9 @@ void MakeItemFlow::ScheduleAutoRecast(const MakeItemSettings& settings, const ro
       return;
     }
     if (settings.auto_reuse_max > 0 && auto_items_used_ >= settings.auto_reuse_max) {
-      std::array<char, kLineBytes> line{};
-      std::snprintf(line.data(), line.size(),
-                    Tr("Plafond atteint : %d %s consommés. Relance "
-                       "arrêtée."),
-                    auto_items_used_, source_item_name_.c_str());
-      stop_reason_ = line.data();
+      stop_reason_ = ro::core::Printed(Tr("Plafond atteint : %d %s consommés. Relance "
+                                          "arrêtée."),
+                                       auto_items_used_, source_item_name_.c_str());
       batch_left_ = 0;
       return;
     }
@@ -462,12 +450,10 @@ void MakeItemFlow::RetryRelaunch(const MakeItemSettings& settings, const ro::sim
     // L'EXEMPLAIRE EST PARTI SANS LISTE EN RETOUR : on n'entame pas davantage.
     if (reuse_owned_before_ >= 0 &&
         world.inventory().AmountOf(source_item_id_) < reuse_owned_before_) {
-      std::array<char, kLineBytes> line{};
-      std::snprintf(line.data(), line.size(),
-                    Tr("%s consommé mais aucune liste n'est revenue : relance arrêtée (le stock ne "
-                       "sera pas entamé davantage)."),
-                    source_item_name_.c_str());
-      stop_reason_ = line.data();
+      stop_reason_ = ro::core::Printed(
+          Tr("%s consommé mais aucune liste n'est revenue : relance arrêtée (le stock ne "
+             "sera pas entamé davantage)."),
+          source_item_name_.c_str());
       batch_left_ = 0;
       return;
     }
@@ -482,10 +468,9 @@ void MakeItemFlow::RetryRelaunch(const MakeItemSettings& settings, const ro::sim
   }
   stop_reason_.clear();
   auto_recast_at_ = Deadline(now_ms, kAutoRelaunchDelayMs);
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), Tr("Relance sans réponse : nouvel essai (%d/%d)."),
-                relaunch_retries_, kMostRelaunchRetries);
-  Log(line.data(), ro::ui::SkinTone::kWarn);
+  Log(ro::core::Printed(Tr("Relance sans réponse : nouvel essai (%d/%d)."), relaunch_retries_,
+                        kMostRelaunchRetries),
+      ro::ui::SkinTone::kWarn);
 }
 
 void MakeItemFlow::Tick(const MakeItemSettings& settings, const ro::sim::World& world,
@@ -691,24 +676,22 @@ void MakeItemFlow::SendReuseItem(const MakeItemSettings& settings, ro::net::Conn
     sent = static_cast<bool>(ro::net::RequestUseItem(link, held->client_slot, self));
   }
   if (!sent) {
-    std::array<char, kLineBytes> line{};
-    std::snprintf(line.data(), line.size(),
-                  Tr("Plus de %s dans l'inventory : relance arrêtée (%d consommés)."),
-                  source_item_name_.c_str(), auto_items_used_);
-    stop_reason_ = line.data();
+    stop_reason_ =
+        ro::core::Printed(Tr("Plus de %s dans l'inventory : relance arrêtée (%d consommés)."),
+                          source_item_name_.c_str(), auto_items_used_);
     auto_ours_ = false;
     return;
   }
   ++auto_items_used_;
-  std::array<char, kLineBytes> line{};
+  std::string line;
   if (settings.auto_reuse_max > 0) {
-    std::snprintf(line.data(), line.size(), Tr("Relance : %s consommé (%d/%d)."),
-                  source_item_name_.c_str(), auto_items_used_, settings.auto_reuse_max);
+    line = ro::core::Printed(Tr("Relance : %s consommé (%d/%d)."), source_item_name_.c_str(),
+                             auto_items_used_, settings.auto_reuse_max);
   } else {
-    std::snprintf(line.data(), line.size(), Tr("Relance : %s consommé (%d au total)."),
-                  source_item_name_.c_str(), auto_items_used_);
+    line = ro::core::Printed(Tr("Relance : %s consommé (%d au total)."), source_item_name_.c_str(),
+                             auto_items_used_);
   }
-  Log(line.data(), ro::ui::SkinTone::kWarn);
+  Log(line, ro::ui::SkinTone::kWarn);
 }
 
 void MakeItemFlow::Log(std::string text, ro::ui::SkinTone tone) {

@@ -1,23 +1,19 @@
 #include "character/title_view.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <string_view>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/actor_name.h"
 #include "ro/net/title.h"
 #include "ro/sim/world.h"
 
 namespace moonclient {
 namespace {
-
-// La place d'un libellé numéroté, terminateur compris.
-constexpr std::size_t kNumberedTitleBytes = 96;
 
 // Le libellé que la table donne, ou rien.
 [[nodiscard]] std::string_view TableLabel(std::int32_t title_id,
@@ -32,9 +28,7 @@ std::string ShownTitle(std::int32_t title_id, const ro::render::TitleTable* labe
   if (!named.empty()) {
     return std::string(named);
   }
-  std::array<char, kNumberedTitleBytes> numbered = {};
-  std::snprintf(numbered.data(), numbered.size(), ro::core::Tr("Titre #%d"), title_id);
-  return numbered.data();
+  return ro::core::Printed(ro::core::Tr("Titre #%d"), title_id);
 }
 
 std::vector<NamedTitle> OwnedTitles(std::span<const std::uint32_t> rewarded,

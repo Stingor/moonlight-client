@@ -3,9 +3,9 @@
 #include "game/companion_ai_names.h"
 
 #include <array>
-#include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/companion_ai.h"
 
 #include "game/companion_ai_file.h"
@@ -23,7 +23,6 @@ using ro::sim::kHomunculusLastUnevolvedType;
 using ro::sim::kHomunculusSpeciesPerLine;
 using ro::sim::kMercenaryJobBase;
 
-constexpr std::size_t kNameBytes = 64;
 constexpr int kGuildMercenaryLines = kGuildMercenaryCount / kGuildMercenaryRanks;
 constexpr int kMutatedHomunculusCount = kHomunculusLastType - kHomunculusFirstMutatedType + 1;
 
@@ -38,31 +37,30 @@ constexpr std::array<const char*, kGuildMercenaryLines> kMercenaryLineNames = {"
 }  // namespace
 
 std::string CompanionClassName(std::uint16_t job) {
-  std::array<char, kNameBytes> name{};
+  std::string name;
   const int homunculus_type = static_cast<int>(job) - kHomunculusJobBase;
   const int mercenary_type = static_cast<int>(job) - kMercenaryJobBase;
   if (mercenary_type >= 1 && mercenary_type <= kGuildMercenaryCount) {
-    std::snprintf(
-        name.data(), name.size(), ro::core::Tr("%s, rang %d"),
+    name = ro::core::Printed(
+        ro::core::Tr("%s, rang %d"),
         kMercenaryLineNames[static_cast<std::size_t>((mercenary_type - 1) / kGuildMercenaryRanks)],
         ((mercenary_type - 1) % kGuildMercenaryRanks) + 1);
   } else if (homunculus_type >= kHomunculusFirstMutatedType &&
              homunculus_type <= kHomunculusLastType) {
-    std::snprintf(
-        name.data(), name.size(), "%s",
-        kMutated[static_cast<std::size_t>(homunculus_type - kHomunculusFirstMutatedType)]);
+    name = ro::core::Printed(
+        "%s", kMutated[static_cast<std::size_t>(homunculus_type - kHomunculusFirstMutatedType)]);
   } else if (homunculus_type >= 1 && homunculus_type <= kHomunculusBasicTypeCount) {
     const char* species =
         kSpecies[static_cast<std::size_t>((homunculus_type - 1) % kHomunculusSpeciesPerLine)];
     if (homunculus_type > kHomunculusLastUnevolvedType) {
-      std::snprintf(name.data(), name.size(), ro::core::Tr("%s évolué"), species);
+      name = ro::core::Printed(ro::core::Tr("%s évolué"), species);
     } else {
-      std::snprintf(name.data(), name.size(), "%s", species);
+      name = ro::core::Printed("%s", species);
     }
   } else {
-    std::snprintf(name.data(), name.size(), ro::core::Tr("Classe %u"), static_cast<unsigned>(job));
+    name = ro::core::Printed(ro::core::Tr("Classe %u"), static_cast<unsigned>(job));
   }
-  return name.data();
+  return name;
 }
 
 std::string ProfileLabelOf(std::string_view key) {

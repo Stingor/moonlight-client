@@ -1,11 +1,9 @@
 #include "character/grimoire_keys.h"
 
-#include <array>
-#include <cstdio>
-
 #include <SDL3/SDL_keyboard.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 #include "input/key_gate.h"
 
@@ -86,10 +84,9 @@ void GrimoireKeys::Advance(ro::ui::CharacterWindowState& sheet, ShortcutBarView&
     bar.PlaceSkill(*slot, held_->skill_id, held_->level);
     return;
   }
-  std::array<char, 160> told{};
-  std::snprintf(told.data(), told.size(), ro::core::Tr("« %s » ne déclenche aucune case de barre"),
-                LabelOfBinding(held_->binding).c_str());
-  sheet.grimoire.keyboard_notice = told.data();
+  sheet.grimoire.keyboard_notice =
+      ro::core::Printed(ro::core::Tr("« %s » ne déclenche aucune case de barre"),
+                        LabelOfBinding(held_->binding).c_str());
   sheet.grimoire.keyboard_notice_fresh = true;
 }
 

@@ -5,12 +5,12 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdio>
 #include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/core/search_key.h"
 #include "ro/net/market.h"
 #include "ro/vfs/server_db_search.h"
@@ -18,7 +18,6 @@
 namespace moonclient {
 namespace {
 
-constexpr std::size_t kLineBytes = 96;
 // La clé de recherche d'une ligne joint ses noms : un séparateur que personne
 // ne tape empêche une saisie d'enjamber deux noms.
 constexpr std::string_view kKeySeparator = "\n";
@@ -42,16 +41,16 @@ constexpr std::string_view kKeySeparator = "\n";
 }
 
 [[nodiscard]] std::string MonsterNote(const ro::vfs::ServerMonster& monster) {
-  std::array<char, kLineBytes> text{};
+  std::string text;
   const auto level = static_cast<unsigned>(monster.level);
   if (monster.rank == ro::vfs::kServerMonsterMvp) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Niv. %u MVP"), level);
+    text = ro::core::Printed(ro::core::Tr("Niv. %u MVP"), level);
   } else if (monster.rank == ro::vfs::kServerMonsterBoss) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Niv. %u Boss"), level);
+    text = ro::core::Printed(ro::core::Tr("Niv. %u Boss"), level);
   } else {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Niv. %u"), level);
+    text = ro::core::Printed(ro::core::Tr("Niv. %u"), level);
   }
-  return text.data();
+  return text;
 }
 
 }  // namespace
@@ -224,11 +223,8 @@ void DatabaseStage::ComposeRows(const ro::ui::DatabaseWindowState& state) {
           .id = monster.monster_id, .name = monster.name, .note = row_notes_[row]});
     }
   }
-  std::array<char, kLineBytes> text_line{};
-  std::snprintf(text_line.data(), text_line.size(),
-                items ? ro::core::Tr("%d items") : ro::core::Tr("%d monstres"),
-                static_cast<int>(rows_.size()));
-  summary_ = text_line.data();
+  summary_ = ro::core::Printed(items ? ro::core::Tr("%d items") : ro::core::Tr("%d monstres"),
+                               static_cast<int>(rows_.size()));
 }
 
 void DatabaseStage::NoteSheetAsked(ro::ui::ItemSheetHost host,

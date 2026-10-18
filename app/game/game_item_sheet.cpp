@@ -6,26 +6,19 @@
 // vote shop, l'Atlas, « @item », « Vendu chez » — ne dépend pas de l'hôte qui
 // l'a dessinée. Une copie par hôte en laisserait un jour une sans un geste.
 
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <span>
 #include <string>
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 
 #include "game/game.h"
 
 namespace moonclient {
-namespace {
-
-// Le libellé du bouton du vote shop : son nom et un prix.
-constexpr std::size_t kVoteShopLabelBytes = 64;
-
-}  // namespace
 
 DatabaseContext Game::DatabaseContextNow(std::uint32_t now_ms) {
   return DatabaseContext{.link = link_,
@@ -60,9 +53,7 @@ void Game::DecorateItemSheet(DescriptionView& sheet, std::uint32_t item_id) {
   // quand l'item est à son catalogue.
   if (const std::optional<CashShopStage::Offer> offer = pieces_.cash_shop.Find(item_id);
       offer.has_value()) {
-    std::array<char, kVoteShopLabelBytes> label{};
-    std::snprintf(label.data(), label.size(), ro::core::Tr("Vote Shop : %d pts"), offer->price);
-    sheet.NoteVoteShopTag(label.data());
+    sheet.NoteVoteShopTag(ro::core::Printed(ro::core::Tr("Vote Shop : %d pts"), offer->price));
   }
   // LA LIGNE « @item », pour le staff seulement.
   sheet.NoteStaff(Rights().staff_tools, pieces_.item_properties.IsStackable(item_id),

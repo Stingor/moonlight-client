@@ -3,18 +3,15 @@
 #include "game/market_route.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 
 #include "ro/core/case_fold.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/trade_widgets.h"
 
 namespace moonclient {
 namespace {
 
-// La place d'un prix composé.
-constexpr std::size_t kPriceTextBytes = 96;
 // L'unité qui suit un prix en zeny, espace comprise.
 constexpr std::string_view kZenyUnit = " z";
 // Le stock illimité d'un PNJ.
@@ -88,28 +85,29 @@ std::string MarketOpeningQuery(std::optional<std::uint32_t> item_id) {
 std::string MarketPriceText(const ro::sim::MarketOffer& offer,
                             std::string_view currency_item_name) {
   const std::string amount = ro::ui::TradeAmountText(offer.price_zeny, {});
-  std::array<char, kPriceTextBytes> text{};
+  std::string text;
   switch (offer.currency) {
     case ro::sim::MarketCurrency::kCash:
-      std::snprintf(text.data(), text.size(), ro::core::Tr("%s cash"), amount.c_str());
+      text = ro::core::Printed(ro::core::Tr("%s cash"), amount.c_str());
       break;
     case ro::sim::MarketCurrency::kItem:
-      std::snprintf(text.data(), text.size(), "%s x %.*s", amount.c_str(),
-                    static_cast<int>(currency_item_name.size()), currency_item_name.data());
+      text =
+          ro::core::Printed("%s x %.*s", amount.c_str(),
+                            static_cast<int>(currency_item_name.size()), currency_item_name.data());
       break;
     case ro::sim::MarketCurrency::kPoints:
-      std::snprintf(text.data(), text.size(), "%s %s", amount.c_str(), offer.currency_name.c_str());
+      text = ro::core::Printed("%s %s", amount.c_str(), offer.currency_name.c_str());
       break;
     case ro::sim::MarketCurrency::kBarter:
       if (offer.price_zeny == 0) {
         return ro::core::Tr("troc");
       }
-      std::snprintf(text.data(), text.size(), ro::core::Tr("troc + %s z"), amount.c_str());
+      text = ro::core::Printed(ro::core::Tr("troc + %s z"), amount.c_str());
       break;
     case ro::sim::MarketCurrency::kZeny:
       return amount + std::string(kZenyUnit);
   }
-  return text.data();
+  return text;
 }
 
 std::string MarketAmountText(const ro::sim::MarketOffer& offer, ro::sim::MarketKind kind) {

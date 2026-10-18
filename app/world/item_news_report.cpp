@@ -1,12 +1,10 @@
 // Les nouvelles d'objets dans la conversation. Voir `ItemPickupReport::NoticeNews`.
 
-#include <array>
-#include <cstddef>
 #include <cstdint>
-#include <cstdio>
 #include <string>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/world.h"
 
 #include "items/inventory_view.h"
@@ -14,8 +12,6 @@
 
 namespace moonclient {
 namespace {
-
-constexpr std::size_t kNewsLineCapacity = 256;
 
 // Les parties qu'une pièce abîmée d'un membre du groupe nomme, par drapeau
 // d'emplacement. Les autres emplacements se taisent.
@@ -54,41 +50,40 @@ constexpr std::uint16_t kHeadTop = 0x0100;
 
 void ItemPickupReport::NoticeNews(ro::sim::ItemNews& news, ro::sim::World& world,
                                   const ro::sim::PartyRoster& party, const CreatorNames& creators) {
-  std::array<char, kNewsLineCapacity> line{};
   for (const ro::sim::PartyPickup& pickup : news.TakePartyPickups()) {
     const ro::sim::PartyMember* member = party.Find(pickup.account_id);
     if (pickup.account_id == world.player_id() || member == nullptr || items_ == nullptr) {
       continue;
     }
     const std::string name = ReportedItemName(pickup.item, creators, *items_, *words_);
-    std::snprintf(line.data(), line.size(), ro::core::Tr("%s a obtenu %s."), member->name.c_str(),
-                  name.c_str());
-    world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kPartyItem, 0, line.data(),
-                     pickup.heard_ms, kPickupGainColor);
+    world.RecordChat(
+        ro::sim::ChatKind::kServer, ro::sim::ChatType::kPartyItem, 0,
+        ro::core::Printed(ro::core::Tr("%s a obtenu %s."), member->name.c_str(), name.c_str()),
+        pickup.heard_ms, kPickupGainColor);
   }
   for (const ro::sim::EquipDamage& damage : news.TakeEquipDamages()) {
     if (damage.location == 0) {
       continue;
     }
+    std::string line;
     if (damage.account_id == world.player_id()) {
       const ro::sim::InventoryItem* worn = WornAt(world.inventory(), damage.location);
       if (worn == nullptr || items_ == nullptr) {
         continue;
       }
       const std::string name = ReportedItemName(*worn, creators, *items_, *words_);
-      std::snprintf(line.data(), line.size(), ro::core::Tr("L'équipement %s a été endommagé."),
-                    name.c_str());
+      line = ro::core::Printed(ro::core::Tr("L'équipement %s a été endommagé."), name.c_str());
     } else {
       const ro::sim::PartyMember* member = party.Find(damage.account_id);
       const char* part = DamagedPartLabel(damage.location);
       if (member == nullptr || part == nullptr) {
         continue;
       }
-      std::snprintf(line.data(), line.size(), ro::core::Tr("%s : équipement endommagé (%s)."),
-                    member->name.c_str(), part);
+      line = ro::core::Printed(ro::core::Tr("%s : équipement endommagé (%s)."),
+                               member->name.c_str(), part);
     }
-    world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kDamagedEquipment, 0,
-                     line.data(), damage.heard_ms, kPickupRefusalColor);
+    world.RecordChat(ro::sim::ChatKind::kServer, ro::sim::ChatType::kDamagedEquipment, 0, line,
+                     damage.heard_ms, kPickupRefusalColor);
   }
 }
 

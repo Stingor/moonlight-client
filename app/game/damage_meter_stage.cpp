@@ -1,12 +1,11 @@
 #include "game/damage_meter_stage.h"
 
 #include <algorithm>
-#include <array>
 #include <cmath>
-#include <cstdio>
 #include <span>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/chat_line.h"
 
 namespace moonclient {
@@ -152,10 +151,10 @@ void DamageMeterStage::WriteAreaCycles(ro::sim::World& world, const DamageMeterO
     return;
   }
   for (const std::int64_t damage : cycles) {
-    std::array<char, 96> line{};
-    std::snprintf(line.data(), line.size(), ro::core::Tr("Sort de zone : %s dégâts"),
-                  ro::ui::GroupDamageDigits(damage).c_str());
-    world.RecordChat(ro::sim::ChatKind::kBattle, 0, line.data(), now_ms, kAreaCycleChatColor);
+    world.RecordChat(ro::sim::ChatKind::kBattle, 0,
+                     ro::core::Printed(ro::core::Tr("Sort de zone : %s dégâts"),
+                                       ro::ui::GroupDamageDigits(damage).c_str()),
+                     now_ms, kAreaCycleChatColor);
   }
 }
 
@@ -173,10 +172,8 @@ std::string_view DamageMeterStage::SkillName(std::uint16_t key, const ro::sim::S
   if (node != nullptr && !node->display_name.empty()) {
     return node->display_name;
   }
-  std::array<char, 32> numbered{};
-  std::snprintf(numbered.data(), numbered.size(), ro::core::Tr("Skill n°%u"),
-                static_cast<unsigned>(key));
-  return names_.emplace_back(numbered.data());
+  return names_.emplace_back(
+      ro::core::Printed(ro::core::Tr("Skill n°%u"), static_cast<unsigned>(key)));
 }
 
 void DamageMeterStage::NameRecords(const ro::sim::DamageMeter& meter, ro::sim::MeterMode mode,

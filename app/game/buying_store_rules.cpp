@@ -4,10 +4,10 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -85,10 +85,8 @@ std::string SoldLineText(const ro::vfs::ItemWords& words, std::string_view item_
 }
 
 std::string ClockText(const std::tm& local) {
-  std::array<char, 32> text{};
-  std::snprintf(text.data(), text.size(), "%02d/%02d - %02d:%02d:%02d", local.tm_mday,
-                local.tm_mon + kFirstMonth, local.tm_hour, local.tm_min, local.tm_sec);
-  return text.data();
+  return ro::core::Printed("%02d/%02d - %02d:%02d:%02d", local.tm_mday, local.tm_mon + kFirstMonth,
+                           local.tm_hour, local.tm_min, local.tm_sec);
 }
 
 std::string LocalClockText(std::uint32_t unix_s) {

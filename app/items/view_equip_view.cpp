@@ -1,11 +1,10 @@
 #include "items/view_equip_view.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <span>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/sim/world.h"
@@ -35,9 +34,6 @@ constexpr int kDirections = 8;
 constexpr std::size_t kLookingAheadFrame = 0;
 
 constexpr std::uint32_t kMillisecondsPerSecond = 1000;
-
-// Assez pour « Équipement de » et un nom de personnage.
-constexpr std::size_t kTitleBytes = 160;
 
 }  // namespace
 
@@ -71,13 +67,13 @@ void ViewedEquipmentView::Refresh(const ro::sim::ViewedEquipmentBook& book,
   }
   const ro::sim::ViewedEquipment& sheet = *book.shown();
 
-  std::array<char, kTitleBytes> named{};
+  std::string named;
   if (sheet.name.empty()) {
-    std::snprintf(named.data(), named.size(), "%s", Tr("Équipement"));
+    named = ro::core::Printed("%s", Tr("Équipement"));
   } else {
-    std::snprintf(named.data(), named.size(), Tr("Équipement de %s"), sheet.name.c_str());
+    named = ro::core::Printed(Tr("Équipement de %s"), sheet.name.c_str());
   }
-  title_ = std::string(named.data()) + kWindowIdentity;
+  title_ = named + kWindowIdentity;
 
   view_.title = title_;
   view_.sex = sheet.look.sex == 1 ? Tr("Homme") : Tr("Femme");

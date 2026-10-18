@@ -4,7 +4,6 @@
 #include <array>
 #include <cctype>
 #include <cstdint>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -14,6 +13,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/core/text.h"
 #include "ro/net/chat_room.h"
 #include "ro/net/chat_target.h"
@@ -43,9 +43,6 @@ constexpr std::string_view kCommandBlanks = " \t";
 // Ce qui sépare deux destinations dans l'aide de la barre, comme dans sa phrase
 // traduite.
 constexpr std::string_view kHelpEntryGap = "    ";
-
-// La phrase traduite d'un envoi retenu et ses deux nombres y tiennent largement.
-constexpr std::size_t kHeldChatTextBytes = 256;
 
 // Le libellé d'une destination, traduit. Le chuchotement n'en a pas : c'est le
 // nom du correspondant qui s'affiche, et il n'est pas à traduire.
@@ -510,19 +507,16 @@ void ChatLinePreviewMaker::Refresh(const char* outgoing, const ChatWireSpeaker& 
   // annoncerait d'autres enverrait le joueur droit dans le mur. Le croisillon du
   // serveur devient d'ailleurs un accent circonflexe à la saisie, et c'est
   // exactement le genre de détail qu'on ne devine pas.
-  std::array<char, 320> help{};
-  std::snprintf(help.data(), help.size(),
-                ro::core::Tr("Où part ce que tu écris. En tête de phrase :\n"
-                             "  %c groupe    %c guilde    %c alliés    %s pseudo"),
-                ro::net::kPartySigil, ro::net::kGuildSigil, ro::net::kAllySigil,
-                std::string(ro::net::kWhisperCommand).c_str());
-  help_ = help.data();
+  help_ = ro::core::Printed(ro::core::Tr("Où part ce que tu écris. En tête de phrase :\n"
+                                         "  %c groupe    %c guilde    %c alliés    %s pseudo"),
+                            ro::net::kPartySigil, ro::net::kGuildSigil, ro::net::kAllySigil,
+                            std::string(ro::net::kWhisperCommand).c_str());
   // Le sigil du champ ne sert que sur sa carte : c'est là seulement qu'on l'annonce.
   if (speaker.battlefield) {
-    std::snprintf(help.data(), help.size(), ro::core::Tr("%c ou %s champ de bataille"),
-                  ro::net::kBattlefieldSigil, std::string(ro::net::kBattlefieldCommand).c_str());
     help_ += kHelpEntryGap;
-    help_ += help.data();
+    help_ +=
+        ro::core::Printed(ro::core::Tr("%c ou %s champ de bataille"), ro::net::kBattlefieldSigil,
+                          std::string(ro::net::kBattlefieldCommand).c_str());
   }
 
   preview_.target = target_;
@@ -566,19 +560,19 @@ ChatWireRoom ChatIntentRoomOf(const ro::net::ChatIntent& intent, const ChatWireS
 }
 
 std::string OverlongChatNotice(const ChatWireRoom& room) {
-  std::array<char, kHeldChatTextBytes> text{};
+  std::string text;
   if (room.overflow == ChatOverflow::kTruncated) {
-    std::snprintf(text.data(), text.size(),
-                  ro::core::Tr("Message trop long de %d (limite %d) : il arriverait tronqué. "
-                               "Raccourcis-le."),
-                  -room.bytes_left, room.text_max);
+    text = ro::core::Printed(
+        ro::core::Tr("Message trop long de %d (limite %d) : il arriverait tronqué. "
+                     "Raccourcis-le."),
+        -room.bytes_left, room.text_max);
   } else {
-    std::snprintf(text.data(), text.size(),
-                  ro::core::Tr("Message trop long de %d (limite %d) : le serveur le jetterait "
-                               "sans un mot. Raccourcis-le."),
-                  -room.bytes_left, room.text_max);
+    text = ro::core::Printed(
+        ro::core::Tr("Message trop long de %d (limite %d) : le serveur le jetterait "
+                     "sans un mot. Raccourcis-le."),
+        -room.bytes_left, room.text_max);
   }
-  return text.data();
+  return text;
 }
 
 std::optional<std::string> HoldIfOverlong(ro::ui::ChatInputState& input, const std::string& typed,

@@ -1,12 +1,11 @@
 #include "chat/chat_log_file.h"
 
-#include <array>
-#include <cstdio>
 #include <system_error>
 
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/core/utf8_path.h"
 
 namespace moonclient {
@@ -47,10 +46,9 @@ constexpr unsigned char kFirstPrintable = 0x20;
   std::error_code missing;
   for (int rank = 1; rank < kLargestChatDumpRotation && std::filesystem::exists(path, missing);
        ++rank) {
-    std::array<char, 16> suffix{};
-    std::snprintf(suffix.data(), suffix.size(), "_%03d", rank);
-    path = folder / ro::core::PathFromUtf8(std::string(kChatDumpPrefix) + std::string(stem) +
-                                           suffix.data() + std::string(kChatLogSuffix));
+    path = folder /
+           ro::core::PathFromUtf8(std::string(kChatDumpPrefix) + std::string(stem) +
+                                  ro::core::Printed("_%03d", rank) + std::string(kChatLogSuffix));
   }
   return path;
 }
@@ -104,10 +102,7 @@ std::string SafeFileStem(std::string_view name) {
 }
 
 std::string ChatLogLine(const PastChatLine& line) {
-  std::array<char, 16> stamp{};
-  std::snprintf(stamp.data(), stamp.size(), "[%02u:%02u:%02u] ", line.hour, line.minute,
-                line.second);
-  return std::string(stamp.data()) + line.text;
+  return ro::core::Printed("[%02u:%02u:%02u] ", line.hour, line.minute, line.second) + line.text;
 }
 
 ChatLogDump DumpChatLogs(const std::filesystem::path& client_root, std::span<const ChatTab> tabs,

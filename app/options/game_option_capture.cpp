@@ -11,12 +11,11 @@
 // note, qui les additionne.
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <string>
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/zone_capture.h"
 
 #include "options/game_options.h"
@@ -50,16 +49,15 @@ void GameOptions::BuildCaptureRows() {
   const ro::ui::ZoneCaptureSettings how = capture();
   capture_rows_.clear();
 
-  std::array<char, 160> text = {};
   if (how.zone.empty()) {
     capture_zone_label_ = Tr("Définir la zone");
   } else {
     // ⚠ LE RECTANGLE EST DIT EN TOUTES LETTRES, place comprise : deux zones de
     // même taille à deux endroits différents sont deux zones, et c'est
     // justement ce qu'on revient vérifier.
-    std::snprintf(text.data(), text.size(), Tr("Redéfinir la zone  (%d x %d en %d, %d)"),
-                  how.zone.width, how.zone.height, how.zone.left, how.zone.top);
-    capture_zone_label_ = text.data();
+    capture_zone_label_ =
+        ro::core::Printed(Tr("Redéfinir la zone  (%d x %d en %d, %d)"), how.zone.width,
+                          how.zone.height, how.zone.left, how.zone.top);
   }
   capture_rows_.push_back(OptionRowView{
       .id = static_cast<int>(GameOption::kCaptureZone),
@@ -127,10 +125,9 @@ void GameOptions::BuildCaptureRows() {
 
   const ro::ui::ZoneRect out = ro::ui::OutputSize(how.zone, how.widest_output);
   const std::size_t bytes = ro::ui::CaptureBytes(how);
-  std::snprintf(text.data(), text.size(), Tr("%d images en %d x %d — %.0f Mo en mémoire"),
-                how.frames_per_second * how.seconds, out.width, out.height,
-                static_cast<double>(bytes) / kBytesPerMegabyte);
-  capture_note_ = text.data();
+  capture_note_ = ro::core::Printed(Tr("%d images en %d x %d — %.0f Mo en mémoire"),
+                                    how.frames_per_second * how.seconds, out.width, out.height,
+                                    static_cast<double>(bytes) / kBytesPerMegabyte);
   if (bytes > ro::ui::kLargestCaptureBytes) {
     // ⚠ DIT AVANT LE DÉPART, ET NON APRÈS : les images sont réservées d'un bloc,
     // et un refus qui n'arriverait qu'au moment de filmer laisserait croire à

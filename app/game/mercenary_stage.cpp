@@ -2,7 +2,6 @@
 
 #include <array>
 #include <chrono>
-#include <cstdio>
 #include <ctime>
 #include <string_view>
 
@@ -11,6 +10,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/mercenary_frames.h"
 #include "ro/net/skill.h"
 #include "ro/sim/skill_book.h"
@@ -23,8 +23,6 @@ namespace {
 // La date de fin du contrat, comme le client l'écrit : mois/jour heure:minute.
 constexpr const char* kExpiryDateFormat = "%m/%d %H:%M";
 constexpr std::size_t kExpiryDateBytes = 32;
-// Assez pour la ligne du rappel de fin de contrat, dans toutes les langues.
-constexpr std::size_t kReminderLineBytes = 160;
 constexpr std::uint32_t kSecondsPerMinute = 60;
 
 std::int64_t NowUnixSeconds() {
@@ -186,11 +184,11 @@ void MercenaryStage::Apply(const ro::ui::MercenaryTabAction& asked, ro::net::Con
                            ro::ui::SkillDescriptionWindowState& description) {
   last_now_ms_ = now_ms;
   if (const std::uint32_t minutes = book_.TakeContractReminder(now_ms); minutes != 0) {
-    std::array<char, kReminderLineBytes> line{};
-    std::snprintf(line.data(), line.size(),
-                  ro::core::Tr("Le contrat du mercenaire prend fin dans %d min."),
-                  static_cast<int>(minutes));
-    world.RecordChat(ro::sim::ChatKind::kServer, 0, line.data(), now_ms);
+    world.RecordChat(
+        ro::sim::ChatKind::kServer, 0,
+        ro::core::Printed(ro::core::Tr("Le contrat du mercenaire prend fin dans %d min."),
+                          static_cast<int>(minutes)),
+        now_ms);
   }
   ro::ui::AskSkillDescription(description, asked.describe_skill_id);
   if (asked.cast.has_value()) {

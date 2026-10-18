@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdio>
 #include <mutex>
 #include <optional>
 #include <string_view>
@@ -15,6 +14,7 @@
 #include "ro/core/file_write.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/core/utf8_path.h"
 #include "ro/formats/gif.h"
 
@@ -72,39 +72,17 @@ void SDLCALL OnSaveChosen(void* userdata, const char* const* filelist, int /*fil
   delete held;
 }
 
-// UNE LIGNE COMPOSÉE PAR `print`, mesurée d'abord, écrite ensuite.
-//
-// ⚠ LE FORMAT SE TRADUIT DANS L'APPEL MÊME, à l'intérieur de `print` : c'est là
-// que le compilateur en vérifie les arguments.
-template <typename Print>
-[[nodiscard]] std::string Printed(const Print& print) {
-  const int needed = print(nullptr, 0);
-  if (needed <= 0) {
-    return {};
-  }
-  std::string line(static_cast<std::size_t>(needed), '\0');
-  print(line.data(), line.size() + 1);
-  return line;
-}
-
 [[nodiscard]] std::string SavedMessage(const std::string& file_name) {
-  return Printed([&file_name](char* into, std::size_t room) {
-    return std::snprintf(into, room, ro::core::Tr("GIF enregistré : %s"), file_name.c_str());
-  });
+  return ro::core::Printed(ro::core::Tr("GIF enregistré : %s"), file_name.c_str());
 }
 
 [[nodiscard]] std::string SavedChatLine(const std::string& shown_path) {
-  return Printed([&shown_path](char* into, std::size_t room) {
-    return std::snprintf(into, room, ro::core::Tr("GIF du personnage enregistré : %s"),
-                         shown_path.c_str());
-  });
+  return ro::core::Printed(ro::core::Tr("GIF du personnage enregistré : %s"), shown_path.c_str());
 }
 
 [[nodiscard]] std::string SavedUnderFreeNameMessage(const std::string& file_name) {
-  return Printed([&file_name](char* into, std::size_t room) {
-    return std::snprintf(into, room, ro::core::Tr("GIF enregistré sous un nom libre : %s"),
-                         file_name.c_str());
-  });
+  return ro::core::Printed(ro::core::Tr("GIF enregistré sous un nom libre : %s"),
+                           file_name.c_str());
 }
 
 // Le plus de numéros qu'on essaie pour trouver un nom libre.

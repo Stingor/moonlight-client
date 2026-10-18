@@ -1,7 +1,5 @@
 #include "world/blocked_npcs.h"
 
-#include <array>
-#include <cstdio>
 #include <system_error>
 #include <utility>
 
@@ -11,6 +9,7 @@
 #include "ro/core/file_write.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/sim/world.h"
 
 #include "game/yaml_load.h"
@@ -35,9 +34,6 @@ constexpr const char* kFileHeader =
     "#\n"
     "# Le menu du clic droit sur le PNJ, ou la page « Menu contextuel » des\n"
     "# réglages, les débloque.\n";
-
-// Assez pour une phrase et un nom de PNJ.
-constexpr std::size_t kLineBytes = 256;
 
 }  // namespace
 
@@ -69,9 +65,7 @@ std::string BlockedNpcLabel(std::uint32_t id, std::string_view name) {
   if (!name.empty()) {
     return std::string(name);
   }
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), ro::core::Tr("Le NPC %u"), id);
-  return line.data();
+  return ro::core::Printed(ro::core::Tr("Le NPC %u"), id);
 }
 
 bool SwallowsLeftClick(BlockedNpcs& blocked, bool enabled, const ro::sim::Actor& actor,
@@ -84,12 +78,12 @@ bool SwallowsLeftClick(BlockedNpcs& blocked, bool enabled, const ro::sim::Actor&
     const auto found = blocked.all().find(actor.id);
     const std::string who =
         BlockedNpcLabel(actor.id, found != blocked.all().end() ? found->second : actor.name);
-    std::array<char, kLineBytes> line{};
-    std::snprintf(line.data(), line.size(),
-                  ro::core::Tr("%s : vous avez bloqué le clic gauche sur ce NPC. Clic droit "
-                               "dessus pour le débloquer."),
-                  who.c_str());
-    world.RecordChat(ro::sim::ChatKind::kServer, 0, line.data(), now_ms, kClientSaysColor);
+    world.RecordChat(ro::sim::ChatKind::kServer, 0,
+                     ro::core::Printed(
+                         ro::core::Tr("%s : vous avez bloqué le clic gauche sur ce NPC. Clic droit "
+                                      "dessus pour le débloquer."),
+                         who.c_str()),
+                     now_ms, kClientSaysColor);
   }
   return true;
 }

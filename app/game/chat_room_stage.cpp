@@ -1,8 +1,6 @@
 #include "game/chat_room_stage.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <span>
 #include <string_view>
@@ -10,6 +8,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/friends.h"
 #include "ro/vfs/chat_room_words.h"
 #include "ro/vfs/trade_words.h"
@@ -50,9 +49,6 @@ constexpr std::uint32_t kRefusalColor = 0xFF0000;
   }
   return BannedInputRefusal(*banned, title, BannedInput::kSentence);
 }
-
-// La place d'une phrase composée d'un titre de salon.
-constexpr std::size_t kSentenceBytes = 192;
 
 [[nodiscard]] std::string_view Typed(std::span<const char> buffer) {
   const auto end = std::ranges::find(buffer, '\0');
@@ -289,7 +285,6 @@ void ChatRoomStage::Create(ChatRoomWindows& windows, const ChatRoomContext& cont
     SetError(*refused, ro::ui::ChatRoomField::kTitle);
     return;
   }
-  std::array<char, kSentenceBytes> sentence{};
   switch (ro::net::CheckChatRoomSettings(settings)) {
     case ro::net::ChatRoomSettingsFault::kNone:
       break;
@@ -302,10 +297,9 @@ void ChatRoomStage::Create(ChatRoomWindows& windows, const ChatRoomContext& cont
                ro::ui::ChatRoomField::kTitle);
       return;
     case ro::net::ChatRoomSettingsFault::kTitleTooLong:
-      std::snprintf(sentence.data(), sentence.size(),
-                    ro::core::Tr("Titre trop long : %zu octets pour %zu au maximum."),
-                    settings.title.size(), ro::sim::kChatRoomTitleMostBytes);
-      SetError(sentence.data(), ro::ui::ChatRoomField::kTitle);
+      SetError(ro::core::Printed(ro::core::Tr("Titre trop long : %zu octets pour %zu au maximum."),
+                                 settings.title.size(), ro::sim::kChatRoomTitleMostBytes),
+               ro::ui::ChatRoomField::kTitle);
       return;
     case ro::net::ChatRoomSettingsFault::kNoPassword:
       SetError(std::string(ChatRoomText(context.words, ChatRoomWord::kEnterPassword)),
@@ -511,11 +505,11 @@ void ChatRoomStage::SayNews(ro::sim::World& world, const ro::vfs::ItemWords& wor
       case ro::sim::ChatRoomNewsKind::kExpelRefused: {
         // LE SERVEUR SE TAIT sur un membre protégé, le client d'origine aussi :
         // sans cette ligne, le clic n'aurait aucun effet visible.
-        std::array<char, kSentenceBytes> text{};
-        std::snprintf(text.data(), text.size(),
-                      ro::core::Tr("%s n'a pas pu être expulsé : le serveur le protège."),
-                      news.name.c_str());
-        room_.RecordLine(ro::sim::ChatKind::kServer, 0, text.data(), kRefusalColor, now_ms);
+        room_.RecordLine(
+            ro::sim::ChatKind::kServer, 0,
+            ro::core::Printed(ro::core::Tr("%s n'a pas pu être expulsé : le serveur le protège."),
+                              news.name.c_str()),
+            kRefusalColor, now_ms);
         break;
       }
     }
@@ -565,11 +559,9 @@ void ChatRoomStage::Compose(ChatRoomWindows& windows, const ChatRoomContext& con
     // LE TITRE DÉJÀ PRIS SE DIT PENDANT LA FRAPPE, et non après le refus.
     title_taken_.clear();
     if (const int taken = ChatRoomTitleTaken(nearby_, Typed(windows.make.title)); taken >= 0) {
-      std::array<char, kSentenceBytes> sentence{};
-      std::snprintf(sentence.data(), sentence.size(),
-                    ro::core::Tr("Un salon visible porte déjà ce titre, à %d cases d'ici."),
-                    nearby_[static_cast<std::size_t>(taken)].distance_cells);
-      title_taken_ = sentence.data();
+      title_taken_ =
+          ro::core::Printed(ro::core::Tr("Un salon visible porte déjà ce titre, à %d cases d'ici."),
+                            nearby_[static_cast<std::size_t>(taken)].distance_cells);
     }
     make_view_ = ro::ui::ChatRoomMakeView{.limits = Limits(),
                                           .words = words_,

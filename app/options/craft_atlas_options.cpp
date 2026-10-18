@@ -1,9 +1,7 @@
 #include "options/craft_atlas_options.h"
 
-#include <array>
-#include <cstdio>
-
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -17,8 +15,6 @@ using ro::ui::OptionRowView;
 constexpr const char* kPreviewKey = "atlas_recipes_preview";
 constexpr const char* kOnlyCraftableKey = "atlas_recipes_doable";
 constexpr const char* kShowUnlearnableKey = "atlas_recipes_unplayable";
-
-constexpr std::size_t kTallyBytes = 192;
 
 [[nodiscard]] OptionRowView Toggle(CraftAtlasRow row, const char* label, const char* help,
                                    bool on) {
@@ -80,11 +76,9 @@ void CraftAtlasOptions::Compose() {
                        Tr("Dans les listes : clic gauche pour suivre un item, clic droit pour son "
                           "menu, Maj + clic pour poser son lien dans le chat.")));
   if (tally_.available) {
-    std::array<char, kTallyBytes> text{};
-    std::snprintf(text.data(), text.size(),
-                  Tr("%zu recettes, %zu matériaux, %zu transformations de flèches."),
-                  tally_.recipes, tally_.materials, tally_.arrows);
-    tally_text_ = text.data();
+    tally_text_ =
+        ro::core::Printed(Tr("%zu recettes, %zu matériaux, %zu transformations de flèches."),
+                          tally_.recipes, tally_.materials, tally_.arrows);
   } else {
     tally_text_ = Tr("Fichier de recettes absent : data\\yaml_files\\craft_recipes.yml");
   }

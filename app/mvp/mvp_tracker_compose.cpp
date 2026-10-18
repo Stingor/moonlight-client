@@ -4,13 +4,13 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/render/skin_pieces.h"
 
 #include "mvp/mvp_tracker_stage.h"
@@ -56,8 +56,6 @@ constexpr std::array<ScriptedSlotArt, 4> kScriptedSlotArt = {{
   return static_cast<std::uint16_t>(art.first_mob_id + (now_ms / kMvpScriptedSpriteTurnMs) % span);
 }
 
-// Les textes de l'aperçu d'un lien : assez pour une heure et un nom de carte.
-constexpr std::size_t kTipLineBytes = 160;
 constexpr std::int64_t kSecondsPerMinute = 60;
 // L'infobulle d'une tombe compose deux lignes : la fenêtre et l'âge.
 constexpr std::size_t kTombTextsPerTomb = 2;
@@ -108,35 +106,29 @@ ro::ui::MvpLinkTip MvpTrackerStage::TipOf(const MvpLink& link, std::int64_t loca
   ro::ui::MvpLinkTip tip;
   tip.name = link.name.empty() ? std::string(Tr("MVP")) : link.name;
   tip.map = link.map;
-  std::array<char, kTipLineBytes> text{};
   // UN INSTANT EXACT NE S'INVENTE PAS : quelqu'un a payé un Convex Mirror, et le
   // dire évite qu'on le prenne pour une supposition. À défaut, la fenêtre.
   const std::string exact = link.exact_respawn_s > 0 ? MvpClockText(link.exact_respawn_s) : "";
   if (!exact.empty()) {
-    std::snprintf(text.data(), text.size(), Tr("Retour à %s (Convex Mirror)"), exact.c_str());
-    tip.respawn_line = text.data();
+    tip.respawn_line = ro::core::Printed(Tr("Retour à %s (Convex Mirror)"), exact.c_str());
   } else if (link.kill_time_s > 0 && link.delay1_min > 0) {
     const std::int64_t from_s = link.kill_time_s + link.delay1_min * kSecondsPerMinute;
     const std::int64_t to_s = from_s + link.delay2_min * kSecondsPerMinute;
     const std::string from = MvpClockText(from_s);
     const std::string to = MvpClockText(to_s);
     if (!from.empty() && !to.empty()) {
-      std::snprintf(text.data(), text.size(), Tr("Retour entre %s et %s"), from.c_str(),
-                    to.c_str());
-      tip.respawn_line = text.data();
+      tip.respawn_line = ro::core::Printed(Tr("Retour entre %s et %s"), from.c_str(), to.c_str());
     }
   }
   if (link.kill_time_s > 0) {
     if (const std::string death = MvpClockText(link.kill_time_s); !death.empty()) {
-      std::snprintf(text.data(), text.size(), Tr("Mort à %s"), death.c_str());
-      tip.death_line = text.data();
+      tip.death_line = ro::core::Printed(Tr("Mort à %s"), death.c_str());
     }
   }
   // ⚠ -1 ET NON 0 : la cellule (0, 0) existe, et une tombe peut s'y trouver.
   if (link.tomb_x >= 0 && link.tomb_y >= 0) {
-    std::snprintf(text.data(), text.size(), Tr("Tombe en (%d, %d)"), static_cast<int>(link.tomb_x),
-                  static_cast<int>(link.tomb_y));
-    tip.tomb_line = text.data();
+    tip.tomb_line = ro::core::Printed(Tr("Tombe en (%d, %d)"), static_cast<int>(link.tomb_x),
+                                      static_cast<int>(link.tomb_y));
   }
   // L'ÉCHÉANCE SE JUGE À L'HEURE DU SERVEUR, celle du lecteur : un lien relu le
   // lendemain ne promet plus rien. Un instant exact passé est un retour SÛR ;
@@ -160,7 +152,6 @@ std::span<const ro::ui::MinimapTomb> MvpTrackerStage::TombsOn(std::string_view m
   // ⚠ RÉSERVÉ D'AVANCE : les tombes pointent dans ces textes, qu'un vecteur qui
   // grandit déplacerait.
   tomb_texts_.reserve(kTombTextsPerTomb * found.size());
-  std::array<char, kTipLineBytes> text{};
   for (const ro::sim::MvpTomb& tomb : found) {
     ro::ui::MinimapTomb shown_tomb{
         .cell = {.x = tomb.cell_x, .y = tomb.cell_y}, .exact = tomb.exact, .slot_id = tomb.slot_id};
@@ -172,22 +163,21 @@ std::span<const ro::ui::MinimapTomb> MvpTrackerStage::TombsOn(std::string_view m
         window.has_value()) {
       const std::string from = MvpClockText(window->from_s);
       const std::string to = MvpClockText(window->to_s);
-      text[0] = '\0';
+      std::string text;
       if (window->exact && !from.empty()) {
-        std::snprintf(text.data(), text.size(), Tr("Retour à %s (Convex Mirror)"), from.c_str());
+        text = ro::core::Printed(Tr("Retour à %s (Convex Mirror)"), from.c_str());
       } else if (!from.empty() && !to.empty()) {
-        std::snprintf(text.data(), text.size(), Tr("Retour entre %s et %s"), from.c_str(),
-                      to.c_str());
+        text = ro::core::Printed(Tr("Retour entre %s et %s"), from.c_str(), to.c_str());
       }
-      shown_tomb.window_line = tomb_texts_.emplace_back(text.data());
+      shown_tomb.window_line = tomb_texts_.emplace_back(text);
     }
     // L'ÂGE DU SIGNALEMENT : une tombe vue il y a une heure n'est plus une
     // nouvelle.
     if (const ro::sim::MvpObservation* observation = book_.FindObservation(tomb.slot_id);
         observation != nullptr && observation->reported_at_s > 0) {
       const std::string age = ro::ui::FormatMvpDuration(server_now_s - observation->reported_at_s);
-      std::snprintf(text.data(), text.size(), Tr("Signalée il y a %s"), age.c_str());
-      shown_tomb.age_line = tomb_texts_.emplace_back(text.data());
+      shown_tomb.age_line =
+          tomb_texts_.emplace_back(ro::core::Printed(Tr("Signalée il y a %s"), age.c_str()));
     }
     tombs_.push_back(shown_tomb);
   }

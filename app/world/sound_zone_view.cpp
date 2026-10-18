@@ -2,13 +2,13 @@
 
 #include <array>
 #include <cmath>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <utility>
 
 #include "ro/audio/ambient_sound.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/terrain_mesh.h"
 
@@ -23,8 +23,6 @@ constexpr float kShownMargin = 300.0F;
 constexpr std::size_t kHearingSegments = 48;
 // Combien de temps le tracé reste allumé après un bruit.
 constexpr std::uint32_t kSoundingFlashMs = 300;
-// Assez pour que l'étiquette tienne un nom de fichier et ses deux nombres.
-constexpr std::size_t kLabelBytes = 256;
 
 class ZoneProjector {
  public:
@@ -70,16 +68,15 @@ class ZoneProjector {
 
 [[nodiscard]] std::string LabelOf(const MapAmbientSource& source) {
   const ro::audio::AmbientSoundSource& data = source.emitter.source();
-  std::array<char, kLabelBytes> text{};
+  std::string text;
   if (data.width == 0) {
-    std::snprintf(text.data(), text.size(), "%s  (%s)", source.name.c_str(),
-                  ro::core::Tr("muette"));
+    text = ro::core::Printed("%s  (%s)", source.name.c_str(), ro::core::Tr("muette"));
   } else {
-    std::snprintf(text.data(), text.size(), "%s  ·  %s %.0f  ·  %s %.1f s", source.name.c_str(),
-                  ro::core::Tr("portée"), static_cast<double>(data.range), ro::core::Tr("cycle"),
-                  static_cast<double>(data.cycle_seconds));
+    text = ro::core::Printed("%s  ·  %s %.0f  ·  %s %.1f s", source.name.c_str(),
+                             ro::core::Tr("portée"), static_cast<double>(data.range),
+                             ro::core::Tr("cycle"), static_cast<double>(data.cycle_seconds));
   }
-  return std::string(text.data());
+  return text;
 }
 
 }  // namespace

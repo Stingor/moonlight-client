@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdio>
 #include <ctime>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/craft_session.h"
 #include "ro/net/skill.h"
 #include "ro/sim/chat_line.h"
@@ -56,7 +56,6 @@ constexpr std::uint32_t kChatFailedColor = 0x00CDCD;
 constexpr std::uint32_t kChatRefusedColor = 0xFFC8C8;
 
 constexpr std::size_t kTimeBytes = 16;
-constexpr std::size_t kLineBytes = 320;
 
 // ⚠ PAR SOUSTRACTION : l'horloge reboucle, et une échéance juste avant le
 // rebouclage doit rester échue juste après.
@@ -189,16 +188,10 @@ void WeaponRefineFlow::TakeResult(ro::sim::World& world, const WeaponRefineSetti
       name = sent_name_;
     }
     if (name.empty()) {
-      std::array<char, kLineBytes> numbered{};
-      std::snprintf(numbered.data(), numbered.size(), "id %u",
-                    static_cast<unsigned>(result.item_id));
-      name = numbered.data();
+      name = ro::core::Printed("id %u", static_cast<unsigned>(result.item_id));
     }
     if (result.outcome == RefineOutcome::kSucceeded && sent_refine_ >= 0) {
-      std::array<char, kLineBytes> climbed{};
-      std::snprintf(climbed.data(), climbed.size(), "%s +%d -> +%d", name.c_str(), sent_refine_,
-                    sent_refine_ + 1);
-      subject = climbed.data();
+      subject = ro::core::Printed("%s +%d -> +%d", name.c_str(), sent_refine_, sent_refine_ + 1);
     } else {
       subject = std::move(name);
     }
@@ -328,11 +321,9 @@ void WeaponRefineFlow::RetryRecast(const WeaponRefineSettings& settings, bool wi
   }
   auto_recast_at_ = Deadline(now_ms, kAutoRecastDelayMs);
   stop_reason_ = nullptr;
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(),
-                Tr("Relance jetée par le délai de lancement : nouvel essai (%d/%d)."),
-                recast_retries_, kMostRecastRetries);
-  Log(line.data(), ro::ui::SkinTone::kWarn);
+  Log(ro::core::Printed(Tr("Relance jetée par le délai de lancement : nouvel essai (%d/%d)."),
+                        recast_retries_, kMostRecastRetries),
+      ro::ui::SkinTone::kWarn);
 }
 
 void WeaponRefineFlow::Tick(const ro::ui::WeaponRefineWindowAction& asked,

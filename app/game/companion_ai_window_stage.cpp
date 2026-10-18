@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <limits>
 #include <map>
 #include <optional>
@@ -15,6 +14,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/sim/companion_skills.h"
 #include "ro/sim/monster_sheet.h"
 #include "ro/sim/skill_tree.h"
@@ -34,8 +34,6 @@ namespace {
 using ro::sim::AiCompanion;
 using ro::sim::CompanionRule;
 using ro::sim::CompanionTactic;
-
-constexpr std::size_t kNameBytes = 64;
 
 [[nodiscard]] int WindowIndexOf(AiCompanion companion) noexcept {
   return companion == AiCompanion::kHomunculus ? ro::ui::kCompanionAiHomunculus
@@ -93,9 +91,7 @@ struct OwnSkill {
       return entry->name;
     }
   }
-  std::array<char, kNameBytes> name{};
-  std::snprintf(name.data(), name.size(), ro::core::Tr("Monstre %u"), static_cast<unsigned>(job));
-  return name.data();
+  return ro::core::Printed(ro::core::Tr("Monstre %u"), static_cast<unsigned>(job));
 }
 
 }  // namespace

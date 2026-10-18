@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <string>
@@ -13,6 +12,7 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/skill_book.h"
 
 #include "game/companion_ai_fields.h"
@@ -33,7 +33,6 @@ using ro::ui::RuleListField;
 using ro::ui::RuleNumberField;
 using ro::ui::RuleNumberSlot;
 
-constexpr std::size_t kPhraseBytes = 256;
 constexpr int kAimCount = static_cast<int>(ro::sim::kLastRuleAim) + 1;
 constexpr std::uint32_t kMsPerSecond = 1000;
 // Les rangs d'un monstre que la fiche du serveur donne, avant le MVP.
@@ -166,152 +165,140 @@ constexpr int kBossRank = 1;
 }
 
 [[nodiscard]] std::string ConditionPhrase(const RuleCondition& condition, const RuleNames& names) {
-  std::array<char, kPhraseBytes> line{};
+  std::string line;
   const bool is = condition.comparison != RuleComparison::kIsNot;
   const bool owner = condition.subject == RuleSubject::kOwner;
   switch (condition.predicate) {
     case RulePredicate::kHpPercent:
       if (owner) {
-        std::snprintf(line.data(), line.size(), ro::core::Tr("PV du maître %s %d %%"),
-                      Sign(condition.comparison), condition.number);
+        line = ro::core::Printed(ro::core::Tr("PV du maître %s %d %%"), Sign(condition.comparison),
+                                 condition.number);
       } else if (condition.subject == RuleSubject::kCompanion) {
-        std::snprintf(line.data(), line.size(), ro::core::Tr("PV du compagnon %s %d %%"),
-                      Sign(condition.comparison), condition.number);
+        line = ro::core::Printed(ro::core::Tr("PV du compagnon %s %d %%"),
+                                 Sign(condition.comparison), condition.number);
       } else {
-        std::snprintf(line.data(), line.size(), ro::core::Tr("PV de la cible %s %d %%"),
-                      Sign(condition.comparison), condition.number);
+        line = ro::core::Printed(ro::core::Tr("PV de la cible %s %d %%"),
+                                 Sign(condition.comparison), condition.number);
       }
       break;
     case RulePredicate::kSpPercent:
-      std::snprintf(line.data(), line.size(), ro::core::Tr("SP du compagnon %s %d %%"),
-                    Sign(condition.comparison), condition.number);
+      line = ro::core::Printed(ro::core::Tr("SP du compagnon %s %d %%"), Sign(condition.comparison),
+                               condition.number);
       break;
     case RulePredicate::kSpPoints:
-      std::snprintf(line.data(), line.size(), ro::core::Tr("SP du compagnon %s %d"),
-                    Sign(condition.comparison), condition.number);
+      line = ro::core::Printed(ro::core::Tr("SP du compagnon %s %d"), Sign(condition.comparison),
+                               condition.number);
       break;
     case RulePredicate::kAttackedFor:
-      std::snprintf(line.data(), line.size(),
-                    owner ? ro::core::Tr("le maître est attaqué depuis %d s")
-                          : ro::core::Tr("le compagnon est attaqué depuis %d s"),
-                    condition.seconds);
+      line = ro::core::Printed(owner ? ro::core::Tr("le maître est attaqué depuis %d s")
+                                     : ro::core::Tr("le compagnon est attaqué depuis %d s"),
+                               condition.seconds);
       break;
     case RulePredicate::kAttackersWeight:
-      std::snprintf(line.data(), line.size(),
-                    owner ? ro::core::Tr("au moins %d monstres attaquent le maître")
-                          : ro::core::Tr("au moins %d monstres attaquent le compagnon"),
-                    condition.number);
+      line = ro::core::Printed(owner ? ro::core::Tr("au moins %d monstres attaquent le maître")
+                                     : ro::core::Tr("au moins %d monstres attaquent le compagnon"),
+                               condition.number);
       break;
     case RulePredicate::kHasStatus: {
       const std::string status =
           names.status ? names.status(condition.id) : std::to_string(condition.id);
       if (owner) {
-        std::snprintf(
-            line.data(), line.size(),
+        line = ro::core::Printed(
             is ? ro::core::Tr("le maître porte %s") : ro::core::Tr("le maître ne porte pas %s"),
             status.c_str());
       } else {
-        std::snprintf(line.data(), line.size(),
-                      is ? ro::core::Tr("le compagnon porte %s")
-                         : ro::core::Tr("le compagnon ne porte pas %s"),
-                      status.c_str());
+        line = ro::core::Printed(is ? ro::core::Tr("le compagnon porte %s")
+                                    : ro::core::Tr("le compagnon ne porte pas %s"),
+                                 status.c_str());
       }
       break;
     }
     case RulePredicate::kSitting:
       return is ? ro::core::Tr("le maître est assis") : ro::core::Tr("le maître n'est pas assis");
     case RulePredicate::kActivity:
-      std::snprintf(
-          line.data(), line.size(),
+      line = ro::core::Printed(
           is ? ro::core::Tr("le compagnon est %s") : ro::core::Tr("le compagnon n'est pas %s"),
           ActivityLabel(condition.choice));
       break;
     case RulePredicate::kCastWithin: {
       const std::string skill =
           names.skill ? names.skill(condition.id) : std::to_string(condition.id);
-      std::snprintf(line.data(), line.size(),
-                    is ? ro::core::Tr("%s lancé il y a moins de %d s")
-                       : ro::core::Tr("%s non lancé depuis %d s"),
-                    skill.c_str(), condition.seconds);
+      line = ro::core::Printed(is ? ro::core::Tr("%s lancé il y a moins de %d s")
+                                  : ro::core::Tr("%s non lancé depuis %d s"),
+                               skill.c_str(), condition.seconds);
       break;
     }
     case RulePredicate::kAppearedWithin:
-      std::snprintf(line.data(), line.size(),
-                    ro::core::Tr("le compagnon est arrivé il y a moins de %d s"),
-                    condition.seconds);
+      line = ro::core::Printed(ro::core::Tr("le compagnon est arrivé il y a moins de %d s"),
+                               condition.seconds);
       break;
     case RulePredicate::kFartherThan:
-      std::snprintf(line.data(), line.size(),
-                    ro::core::Tr("le compagnon est à plus de %d cases du maître"), condition.cells);
+      line = ro::core::Printed(ro::core::Tr("le compagnon est à plus de %d cases du maître"),
+                               condition.cells);
       break;
     case RulePredicate::kRace:
     case RulePredicate::kElement:
     case RulePredicate::kSize:
     case RulePredicate::kMonsterRank:
     case RulePredicate::kMonsterJob:
-      std::snprintf(line.data(), line.size(),
-                    is ? ro::core::Tr("la cible est %s") : ro::core::Tr("la cible n'est pas %s"),
-                    ChoiceWord(condition, names).c_str());
+      line = ro::core::Printed(
+          is ? ro::core::Tr("la cible est %s") : ro::core::Tr("la cible n'est pas %s"),
+          ChoiceWord(condition, names).c_str());
       break;
     case RulePredicate::kCasting:
       return is ? ro::core::Tr("la cible incante") : ro::core::Tr("la cible n'incante pas");
     case RulePredicate::kAttacks:
-      std::snprintf(
-          line.data(), line.size(),
+      line = ro::core::Printed(
           is ? ro::core::Tr("la cible attaque %s") : ro::core::Tr("la cible n'attaque pas %s"),
           WhomLabel(condition.choice));
       break;
     case RulePredicate::kEnemiesNear:
-      std::snprintf(line.data(), line.size(),
-                    ro::core::Tr("au moins %d ennemis à moins de %d cases %s"), condition.number,
-                    condition.cells, AroundLabel(condition.choice));
+      line = ro::core::Printed(ro::core::Tr("au moins %d ennemis à moins de %d cases %s"),
+                               condition.number, condition.cells, AroundLabel(condition.choice));
       break;
   }
-  return line.data();
+  return line;
 }
 
 [[nodiscard]] std::string ActionPhrase(const CompanionRule& rule, const RuleNames& names) {
-  std::array<char, kPhraseBytes> line{};
+  std::string line;
   switch (rule.action) {
     case RuleAction::kAttack:
-      std::snprintf(line.data(), line.size(), ro::core::Tr("attaquer %s"), AimLabel(rule.aim));
+      line = ro::core::Printed(ro::core::Tr("attaquer %s"), AimLabel(rule.aim));
       break;
     case RuleAction::kCastSkill: {
       const std::string skill =
           names.skill ? names.skill(rule.skill_id) : std::to_string(rule.skill_id);
       if (rule.skill_level == 0) {
-        std::snprintf(line.data(), line.size(), ro::core::Tr("lancer %s sur %s"), skill.c_str(),
-                      AimLabel(rule.aim));
+        line =
+            ro::core::Printed(ro::core::Tr("lancer %s sur %s"), skill.c_str(), AimLabel(rule.aim));
       } else {
-        std::snprintf(line.data(), line.size(), ro::core::Tr("lancer %s niv. %d sur %s"),
-                      skill.c_str(), static_cast<int>(rule.skill_level), AimLabel(rule.aim));
+        line = ro::core::Printed(ro::core::Tr("lancer %s niv. %d sur %s"), skill.c_str(),
+                                 static_cast<int>(rule.skill_level), AimLabel(rule.aim));
       }
       break;
     }
     case RuleAction::kReturnToOwner:
       return ro::core::Tr("revenir au maître");
     case RuleAction::kStepAway:
-      std::snprintf(line.data(), line.size(), ro::core::Tr("s'écarter de %s de %d cases"),
-                    AimLabel(rule.aim), rule.step_cells);
+      line = ro::core::Printed(ro::core::Tr("s'écarter de %s de %d cases"), AimLabel(rule.aim),
+                               rule.step_cells);
       break;
     case RuleAction::kDoNothing:
       return ro::core::Tr("rester passif");
   }
-  return line.data();
+  return line;
 }
 
 [[nodiscard]] std::string AttributesPhrase(const CompanionRule& rule) {
   std::vector<std::string> parts;
-  std::array<char, kPhraseBytes> line{};
   if (rule.own_delay_ms > 0) {
-    std::snprintf(line.data(), line.size(), ro::core::Tr("toutes les %u s au plus"),
-                  static_cast<unsigned>(rule.own_delay_ms / kMsPerSecond));
-    parts.emplace_back(line.data());
+    parts.emplace_back(ro::core::Printed(ro::core::Tr("toutes les %u s au plus"),
+                                         static_cast<unsigned>(rule.own_delay_ms / kMsPerSecond)));
   }
   if (rule.per_target_most > 0) {
-    std::snprintf(line.data(), line.size(), ro::core::Tr("%d fois au plus par cible"),
-                  rule.per_target_most);
-    parts.emplace_back(line.data());
+    parts.emplace_back(
+        ro::core::Printed(ro::core::Tr("%d fois au plus par cible"), rule.per_target_most));
   }
   if (rule.ignores_sp_reserve) {
     parts.emplace_back(ro::core::Tr("ignore la SP à garder"));
@@ -399,10 +386,8 @@ std::string RuleSentence(const CompanionRule& rule, const RuleNames& names) {
     conditions += ConditionPhrase(condition, names);
   }
   const std::string action = ActionPhrase(rule, names);
-  std::array<char, kPhraseBytes * 2> line{};
-  std::snprintf(line.data(), line.size(), ro::core::Tr("Si %s, alors %s"), conditions.c_str(),
-                action.c_str());
-  return line.data() + AttributesPhrase(rule);
+  return ro::core::Printed(ro::core::Tr("Si %s, alors %s"), conditions.c_str(), action.c_str()) +
+         AttributesPhrase(rule);
 }
 
 bool RuleVocabularyStore::Build(std::span<const RuleSkillFact> skills,

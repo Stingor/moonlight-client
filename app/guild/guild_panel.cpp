@@ -4,14 +4,13 @@
 
 #include "guild/guild_panel.h"
 
-#include <array>
-#include <cstdio>
 #include <ctime>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/chat_target.h"
 #include "ro/net/guild.h"
 #include "ro/net/skill.h"
@@ -82,10 +81,8 @@ void Complain(const ro::core::Result<void>& sent, std::string_view what) {
   // ⚠ L'ANNÉE SUR DEUX CHIFFRES S'ÉCRIT À LA MAIN : `%y` de `strftime` fait
   // refuser la bâtisse par g++ (-Wformat-y2k), qui y voit un piège de l'an 2000.
   constexpr int kCentury = 100;
-  std::array<char, 32> text = {};
-  std::snprintf(text.data(), text.size(), "%02d/%02d/%02d %02d:%02d", local.tm_mday,
-                local.tm_mon + 1, local.tm_year % kCentury, local.tm_hour, local.tm_min);
-  return text.data();
+  return ro::core::Printed("%02d/%02d/%02d %02d:%02d", local.tm_mday, local.tm_mon + 1,
+                           local.tm_year % kCentury, local.tm_hour, local.tm_min);
 }
 
 }  // namespace
@@ -418,19 +415,18 @@ GuildElsewhere GuildPanel::Apply(const ro::ui::GuildAction& action, ro::ui::Guil
 void GuildPanel::Settle(ro::ui::GuildTabState& state, const ro::sim::GuildBook& book,
                         GuildEmblems& emblems, ro::net::Connection& link) {
   if (auto outcome = emblems.TakeUploadOutcome()) {
-    std::array<char, 256> line = {};
+    std::string line;
     if (outcome->accepted()) {
       // 🔴 LE SERVICE A RANGÉ L'IMAGE, MAIS PERSONNE NE LE SAIT ENCORE : c'est
       // le serveur de carte qui publie la version, à notre annonce.
       Complain(ro::net::AnnounceGuildEmblem(link, outcome->guild_id, outcome->version),
                "annonce d'emblème");
-      std::snprintf(line.data(), line.size(),
-                    Tr("Emblème déposé (version %d) : le serveur le publie à la guilde."),
-                    outcome->version);
+      line = ro::core::Printed(
+          Tr("Emblème déposé (version %d) : le serveur le publie à la guilde."), outcome->version);
     } else {
-      std::snprintf(line.data(), line.size(), Tr("Envoi refusé : %s"), outcome->refusal.c_str());
+      line = ro::core::Printed(Tr("Envoi refusé : %s"), outcome->refusal.c_str());
     }
-    state.emblem.report = line.data();
+    state.emblem.report = line;
   }
   if (book.invite_answer().has_value() && book.invite_answer_seq() > invite_answer_seq_seen_) {
     invite_answer_seq_seen_ = book.invite_answer_seq();

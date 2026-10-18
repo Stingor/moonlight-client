@@ -2,12 +2,12 @@
 
 #include <algorithm>
 #include <bit>
-#include <cstdio>
 #include <utility>
 
 #include <SDL3/SDL_keycode.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/equip_location.h"
 
 namespace moonclient {
@@ -385,10 +385,7 @@ std::optional<std::size_t> EquipPresetBook::Release(Binding hotkey) {
 }
 
 std::string PresetOwnerLabel(std::string_view name) {
-  std::array<char, 160> named{};
-  std::snprintf(named.data(), named.size(), ro::core::Tr("le preset « %s »"),
-                std::string(name).c_str());
-  return std::string(named.data());
+  return ro::core::Printed(ro::core::Tr("le preset « %s »"), std::string(name).c_str());
 }
 
 std::optional<std::string> PresetKeyHolder(const Hotkeys& table, const EquipPresetBook& book,
@@ -401,10 +398,7 @@ std::optional<std::string> PresetKeyHolder(const Hotkeys& table, const EquipPres
   }
   if (const std::optional<ActionRef> action =
           table.ActionFor(wanted.key, wanted.ctrl, wanted.shift, wanted.alt)) {
-    std::array<char, 160> named{};
-    std::snprintf(named.data(), named.size(), ro::core::Tr("l'action « %s »"),
-                  NameOfAction(*action).c_str());
-    return std::string(named.data());
+    return ro::core::Printed(ro::core::Tr("l'action « %s »"), NameOfAction(*action).c_str());
   }
   return std::nullopt;
 }

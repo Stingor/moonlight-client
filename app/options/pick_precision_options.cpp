@@ -2,11 +2,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -17,10 +17,6 @@ using ro::ui::OptionRowView;
 
 // La clé du fichier.
 constexpr const char* kShiftKey = "targeting_precision_notch";
-
-// La place d'une phrase formatée, et d'un cran écrit avec sa taille.
-constexpr std::size_t kIntroRoom = 640;
-constexpr std::size_t kChoiceRoom = 96;
 
 }  // namespace
 
@@ -44,15 +40,14 @@ void PickPrecisionOptions::Compose(float viewport_width) {
   // ⚠ L'INFOBULLE DONNE LES CHIFFRES DE CET ÉCRAN, pas une généralité : le
   // minimum dépend de la fenêtre, et c'est justement ce que le joueur n'a aucun
   // moyen de deviner.
-  std::array<char, kIntroRoom> intro{};
-  std::snprintf(intro.data(), intro.size(),
-                Tr("Le jeu ÉLARGIT la surface qui répond au clic de chaque entité jusqu'à un "
-                   "minimum qui dépend de la largeur de la fenêtre — sur ton écran : %d px pour "
-                   "les monstres, les joueurs et les PNJ, %d px pour les items au sol et les "
-                   "unités de skill. Un petit monstre se défend donc sur une surface bien "
-                   "plus grande que lui, et deux entités proches se disputent le même clic."),
-                game_actor, game_ground);
-  help_ = std::string(intro.data()) + "\n\n" +
+  help_ = ro::core::Printed(
+              Tr("Le jeu ÉLARGIT la surface qui répond au clic de chaque entité jusqu'à un "
+                 "minimum qui dépend de la largeur de la fenêtre — sur ton écran : %d px pour "
+                 "les monstres, les joueurs et les PNJ, %d px pour les items au sol et les "
+                 "unités de skill. Un petit monstre se défend donc sur une surface bien "
+                 "plus grande que lui, et deux entités proches se disputent le même clic."),
+              game_actor, game_ground) +
+          "\n\n" +
           Tr("Réduit ce minimum : le ciblage devient plus précis — deux entités voisines "
              "cessent de se disputer le même clic — mais les petits monstres deviennent "
              "plus exigeants à viser.\n\n"
@@ -67,11 +62,10 @@ void PickPrecisionOptions::Compose(float viewport_width) {
   const std::array<const char*, kPickShiftCount> names = {
       Tr("Réglage d'origine du jeu"), Tr("Moitié"), Tr("Quart"), Tr("Huitième"), Tr("Seizième")};
   for (std::size_t shift = 0; shift < kPickShiftCount; ++shift) {
-    std::array<char, kChoiceRoom> text{};
-    std::snprintf(text.data(), text.size(), "%s (%d px)", names[shift],
-                  static_cast<int>(ro::render::PickFloorPixels(
-                      ro::render::kActorPickFloorFactor, viewport_width, static_cast<int>(shift))));
-    choice_texts_[shift] = text.data();
+    choice_texts_[shift] = ro::core::Printed(
+        "%s (%d px)", names[shift],
+        static_cast<int>(ro::render::PickFloorPixels(ro::render::kActorPickFloorFactor,
+                                                     viewport_width, static_cast<int>(shift))));
     choices_[shift] = choice_texts_[shift].c_str();
   }
   rows_.push_back(OptionRowView{.id = PickPrecisionRowId(PickPrecisionRow::kShift),

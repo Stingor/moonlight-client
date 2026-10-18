@@ -1,13 +1,12 @@
 #include "character/stat_preset_desk.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <utility>
 
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/character.h"
 #include "ro/sim/player_status.h"
 
@@ -20,9 +19,6 @@ static_assert(ro::ui::kStatPresetStatCount == ro::sim::kBaseStatCount,
               "la fenêtre et le carnet ne comptent pas les mêmes caractéristiques");
 static_assert(ro::ui::kStatPresetNameInputBytes == ro::sim::kStatPresetNameBytes,
               "la saisie et le carnet ne bornent pas le nom à la même taille");
-
-// La place d'un compte rendu, nom de préréglage compris.
-constexpr std::size_t kReportBytes = 256;
 
 [[nodiscard]] ro::sim::BaseStats BaseOf(const ro::sim::PlayerStatus& status) {
   return {status.str, status.agi, status.vit, status.int_, status.dex, status.luk};
@@ -80,11 +76,8 @@ constexpr std::size_t kReportBytes = 256;
     case ro::sim::StatPresetRefusal::kNameTaken:
       return ro::core::Tr("Un autre préréglage porte déjà ce nom.");
     case ro::sim::StatPresetRefusal::kFull: {
-      std::array<char, kReportBytes> text{};
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Le carnet est plein (%zu préréglages)."),
-                    ro::sim::kStatPresetLimit);
-      return text.data();
+      return ro::core::Printed(ro::core::Tr("Le carnet est plein (%zu préréglages)."),
+                               ro::sim::kStatPresetLimit);
     }
     case ro::sim::StatPresetRefusal::kUnknown:
       return ro::core::Tr("Ce préréglage n'existe plus.");
@@ -97,54 +90,51 @@ constexpr std::uint8_t kOneStep = 1;
 
 // LA RAISON D'UN ARRÊT, et où la file en était.
 [[nodiscard]] std::string StopText(const ro::sim::StatRaiseRun& run, const std::string& name) {
-  std::array<char, kReportBytes> text{};
+  std::string text;
   const std::size_t done = run.done();
   const std::size_t total = run.total();
   switch (run.stop()) {
     case ro::sim::StatRunStop::kNone:
       return {};
     case ro::sim::StatRunStop::kFinished:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Préréglage « %s » appliqué : %zu montées."), name.c_str(), done);
+      text = ro::core::Printed(ro::core::Tr("Préréglage « %s » appliqué : %zu montées."),
+                               name.c_str(), done);
       break;
     case ro::sim::StatRunStop::kRefused:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Le serveur a refusé une montée : arrêt après %zu / %zu."), done,
-                    total);
+      text = ro::core::Printed(
+          ro::core::Tr("Le serveur a refusé une montée : arrêt après %zu / %zu."), done, total);
       break;
     case ro::sim::StatRunStop::kPointsChanged:
-      std::snprintf(
-          text.data(), text.size(),
+      text = ro::core::Printed(
           ro::core::Tr("Les points de statut ont changé en cours : arrêt après %zu / %zu."), done,
           total);
       break;
     case ro::sim::StatRunStop::kStatsChanged:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Une stat a changé en cours : arrêt après %zu / %zu."), done,
-                    total);
+      text = ro::core::Printed(ro::core::Tr("Une stat a changé en cours : arrêt après %zu / %zu."),
+                               done, total);
       break;
     case ro::sim::StatRunStop::kShort:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Plus assez de points pour la montée suivante : arrêt après %zu / "
-                                 "%zu."),
-                    done, total);
+      text = ro::core::Printed(
+          ro::core::Tr("Plus assez de points pour la montée suivante : arrêt après %zu / "
+                       "%zu."),
+          done, total);
       break;
     case ro::sim::StatRunStop::kNoReply:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Le serveur ne répond pas : arrêt après %zu / %zu."), done, total);
+      text = ro::core::Printed(ro::core::Tr("Le serveur ne répond pas : arrêt après %zu / %zu."),
+                               done, total);
       break;
     case ro::sim::StatRunStop::kNotSent:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Montée non envoyée (hors ligne ou personnage mort) : arrêt après "
-                                 "%zu / %zu."),
-                    done, total);
+      text = ro::core::Printed(
+          ro::core::Tr("Montée non envoyée (hors ligne ou personnage mort) : arrêt après "
+                       "%zu / %zu."),
+          done, total);
       break;
     case ro::sim::StatRunStop::kCancelled:
-      std::snprintf(text.data(), text.size(),
-                    ro::core::Tr("Application arrêtée à ta demande après %zu / %zu."), done, total);
+      text = ro::core::Printed(ro::core::Tr("Application arrêtée à ta demande après %zu / %zu."),
+                               done, total);
       break;
   }
-  return text.data();
+  return text;
 }
 
 }  // namespace
@@ -196,7 +186,6 @@ void StatPresetDesk::Tick(ro::net::Connection& link, ro::sim::World& world, std:
 void StatPresetDesk::Apply(const ro::ui::StatPresetAction& asked, const ro::sim::World& world,
                            std::uint32_t now_ms) {
   const ro::sim::PlayerStatus& status = world.player_status();
-  std::array<char, kReportBytes> text{};
   switch (asked.verb) {
     case ro::ui::StatPresetVerb::kNothing:
       return;
@@ -210,9 +199,8 @@ void StatPresetDesk::Apply(const ro::ui::StatPresetAction& asked, const ro::sim:
         report_ = RefusalText(refusal);
         return;
       }
-      std::snprintf(text.data(), text.size(), ro::core::Tr("Préréglage « %s » enregistré."),
-                    ro::sim::TidyStatPresetName(asked.name).c_str());
-      report_ = text.data();
+      report_ = ro::core::Printed(ro::core::Tr("Préréglage « %s » enregistré."),
+                                  ro::sim::TidyStatPresetName(asked.name).c_str());
       Keep();
       return;
     }
@@ -223,9 +211,8 @@ void StatPresetDesk::Apply(const ro::ui::StatPresetAction& asked, const ro::sim:
         return;
       }
       previewed_.reset();
-      std::snprintf(text.data(), text.size(), ro::core::Tr("Préréglage renommé en « %s »."),
-                    ro::sim::TidyStatPresetName(asked.name).c_str());
-      report_ = text.data();
+      report_ = ro::core::Printed(ro::core::Tr("Préréglage renommé en « %s »."),
+                                  ro::sim::TidyStatPresetName(asked.name).c_str());
       Keep();
       return;
     }
@@ -238,9 +225,7 @@ void StatPresetDesk::Apply(const ro::ui::StatPresetAction& asked, const ro::sim:
         return;
       }
       previewed_.reset();
-      std::snprintf(text.data(), text.size(), ro::core::Tr("Préréglage « %s » supprimé."),
-                    name.c_str());
-      report_ = text.data();
+      report_ = ro::core::Printed(ro::core::Tr("Préréglage « %s » supprimé."), name.c_str());
       Keep();
       return;
     }

@@ -17,6 +17,7 @@
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/ui/system_fonts.h"
 #include "ro/ui/ui_context.h"
 
@@ -314,9 +315,7 @@ constexpr const char* kShortcutShowKeysKey = "bars_keys";
 constexpr const char* kShortcutStickyKey = "bars_magnetized";
 
 [[nodiscard]] std::string BarKey(std::size_t bar, const char* what) {
-  std::array<char, 48> text{};
-  std::snprintf(text.data(), text.size(), kShortcutBarKeys, bar + 1, what);
-  return std::string(text.data());
+  return ro::core::Printed(kShortcutBarKeys, bar + 1, what);
 }
 
 }  // namespace

@@ -18,13 +18,12 @@
 // réallocation du vecteur.
 
 #include <algorithm>
-#include <array>
 #include <cstddef>
-#include <cstdio>
 #include <string>
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/shortcut_bar.h"
 
 #include "options/game_options.h"
@@ -61,9 +60,7 @@ void FillShadowNames(std::vector<const char*>& shadows) {
 }
 
 [[nodiscard]] std::string BarName(std::size_t bar) {
-  std::array<char, 32> text{};
-  std::snprintf(text.data(), text.size(), "%s %zu", Tr("Barre"), bar + 1);
-  return std::string(text.data());
+  return ro::core::Printed("%s %zu", Tr("Barre"), bar + 1);
 }
 
 }  // namespace

@@ -1,9 +1,7 @@
 #include "options/sprite_sound_options.h"
 
-#include <array>
-#include <cstdio>
-
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -42,11 +40,9 @@ void SpriteSoundOptions::ComposeInto(std::vector<OptionRowView>& rows) {
   labels_.clear();
   labels_.reserve(kDeathSounds.size());
   for (const DeathSoundCandidate& sound : kDeathSounds) {
-    std::array<char, 160> label{};
-    std::snprintf(label.data(), label.size(), Tr("%s   %s — %d sprite(s)"),
-                  std::string(sound.file).c_str(), std::string(sound.monsters).c_str(),
-                  sound.sprites);
-    labels_.emplace_back(label.data());
+    labels_.emplace_back(ro::core::Printed(Tr("%s   %s — %d sprite(s)"),
+                                           std::string(sound.file).c_str(),
+                                           std::string(sound.monsters).c_str(), sound.sprites));
   }
 
   rows.push_back(OptionRowView{

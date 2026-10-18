@@ -3,14 +3,13 @@
 #include "game/database_compose.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <string>
 #include <utility>
 
 #include "ro/core/ascii.h"
 #include "ro/core/case_fold.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/inventory_window.h"
 
 #include "game/item_db_block.h"
@@ -19,7 +18,6 @@
 namespace moonclient {
 namespace {
 
-constexpr std::size_t kLineBytes = 96;
 // Le poids se compte en dixièmes.
 constexpr std::uint32_t kTenths = 10;
 // LES FORMULES D'AVANT LA REFONTE que le serveur applique à un monstre au
@@ -28,19 +26,6 @@ constexpr std::uint32_t kTenths = 10;
 constexpr int kMatkLeastDivisor = 7;
 constexpr int kMatkMostDivisor = 5;
 constexpr int kMdefVitDivisor = 2;
-
-[[nodiscard]] std::string Printed(const char* format, unsigned value) {
-  std::array<char, kLineBytes> text{};
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-  std::snprintf(text.data(), text.size(), format, value);
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-  return text.data();
-}
 
 [[nodiscard]] std::string Zeny(std::uint32_t amount) {
   return ro::ui::GroupThousands(static_cast<std::int64_t>(amount)) + " z";
@@ -64,25 +49,25 @@ constexpr int kMdefVitDivisor = 2;
 }
 
 [[nodiscard]] std::string WeightText(std::uint32_t tenths) {
-  std::array<char, kLineBytes> text{};
+  std::string text;
   if (tenths % kTenths == 0) {
-    std::snprintf(text.data(), text.size(), "%u", static_cast<unsigned>(tenths / kTenths));
+    text = ro::core::Printed("%u", static_cast<unsigned>(tenths / kTenths));
   } else {
-    std::snprintf(text.data(), text.size(), "%u,%u", static_cast<unsigned>(tenths / kTenths),
-                  static_cast<unsigned>(tenths % kTenths));
+    text = ro::core::Printed("%u,%u", static_cast<unsigned>(tenths / kTenths),
+                             static_cast<unsigned>(tenths % kTenths));
   }
-  return text.data();
+  return text;
 }
 
 [[nodiscard]] std::string LevelText(const ro::vfs::ServerItem& item) {
-  std::array<char, kLineBytes> text{};
+  std::string text;
   if (item.equip_level_max != 0 && item.equip_level_max >= item.equip_level_min) {
-    std::snprintf(text.data(), text.size(), "%u – %u", static_cast<unsigned>(item.equip_level_min),
-                  static_cast<unsigned>(item.equip_level_max));
+    text = ro::core::Printed("%u – %u", static_cast<unsigned>(item.equip_level_min),
+                             static_cast<unsigned>(item.equip_level_max));
   } else {
-    std::snprintf(text.data(), text.size(), "%u", static_cast<unsigned>(item.equip_level_min));
+    text = ro::core::Printed("%u", static_cast<unsigned>(item.equip_level_min));
   }
-  return text.data();
+  return text;
 }
 
 [[nodiscard]] bool IsEquipment(const ro::vfs::ServerItem& item) { return !item.locations.empty(); }
@@ -108,19 +93,21 @@ std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
   add(ro::core::Tr("Prix d'achat"), Zeny(item.buy_zeny));
   add(ro::core::Tr("Prix de revente"), Zeny(item.sell_zeny));
   if (item.attack > 0) {
-    add(ro::core::Tr("Attaque"), Printed("%u", item.attack));
+    add(ro::core::Tr("Attaque"), ro::core::Printed("%u", item.attack));
   }
   if (item.magic_attack > 0) {
-    add(ro::core::Tr("Attaque magique"), Printed("%u", item.magic_attack));
+    add(ro::core::Tr("Attaque magique"), ro::core::Printed("%u", item.magic_attack));
   }
   if (item.defense > 0) {
-    add(ro::core::Tr("Défense"), Printed("%u", item.defense));
+    add(ro::core::Tr("Défense"), ro::core::Printed("%u", item.defense));
   }
   if (item.range_cells > 0) {
-    add(ro::core::Tr("Portée"), Printed(ro::core::Tr("%u case(s)"), item.range_cells));
+    add(ro::core::Tr("Portée"),
+        ro::core::Printed(ro::core::Tr("%u case(s)"), static_cast<unsigned>(item.range_cells)));
   }
   if (item.slots > 0) {
-    add(ro::core::Tr("Emplacements de carte"), Printed("%u", item.slots));
+    add(ro::core::Tr("Emplacements de carte"),
+        ro::core::Printed("%u", static_cast<unsigned>(item.slots)));
   }
   if (IsEquipment(item)) {
     std::vector<std::string> places;
@@ -132,10 +119,12 @@ std::vector<ItemFactLine> ItemFactsOf(const ro::vfs::ServerItem& item) {
     add(ro::core::Tr("Se porte"), Joined(places));
   }
   if (item.weapon_level > 0) {
-    add(ro::core::Tr("Niveau d'arme"), Printed("%u", item.weapon_level));
+    add(ro::core::Tr("Niveau d'arme"),
+        ro::core::Printed("%u", static_cast<unsigned>(item.weapon_level)));
   }
   if (item.armor_level > 0) {
-    add(ro::core::Tr("Niveau d'armure"), Printed("%u", item.armor_level));
+    add(ro::core::Tr("Niveau d'armure"),
+        ro::core::Printed("%u", static_cast<unsigned>(item.armor_level)));
   }
   // Le niveau 1 ne restreint rien : la ligne ne paraît que pour une borne.
   if (item.equip_level_min > ro::vfs::kServerItemDefaultEquipLevelMin ||
@@ -316,13 +305,10 @@ std::vector<SellerLine> SellerLinesOf(std::span<const ro::sim::MarketOffer> offe
   std::vector<SellerLine> lines;
   lines.reserve(offers.size());
   for (const ro::sim::MarketOffer& offer : offers) {
-    std::array<char, kLineBytes> place{};
-    std::snprintf(place.data(), place.size(), "%s %d,%d", offer.map_name.c_str(), offer.cell_x,
-                  offer.cell_y);
     lines.push_back(SellerLine{
         .npc =
             std::string(ro::sim::MarketShownShopName(ro::sim::MarketKind::kNpc, offer.shop_name)),
-        .place = place.data(),
+        .place = ro::core::Printed("%s %d,%d", offer.map_name.c_str(), offer.cell_x, offer.cell_y),
         .price = MarketPriceText(
             offer, offer.currency_item != 0 ? item_name(offer.currency_item) : std::string())});
   }

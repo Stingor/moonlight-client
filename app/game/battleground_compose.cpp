@@ -1,10 +1,8 @@
 // La vue de l'inscription au champ de bataille, composée à chaque image. Voir
 // `battleground_stage.h`.
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <cstdio>
 #include <span>
 #include <string>
 #include <string_view>
@@ -12,6 +10,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 #include "game/battleground_rules.h"
 #include "game/battleground_stage.h"
@@ -29,8 +28,6 @@ constexpr std::uint32_t kMsPerSecond = 1000;
 [[nodiscard]] int SecondsLeft(std::uint32_t ms_left) {
   return static_cast<int>((ms_left + kMsPerSecond - 1) / kMsPerSecond);
 }
-
-constexpr std::size_t kRewardCapacity = 160;
 
 }  // namespace
 
@@ -53,10 +50,7 @@ ro::ui::EntryQueueRewardView BattlegroundStage::RewardView(const BattlegroundRew
   // Un texte écrit à côté de l'objet l'emporte sur son nom de la base.
   std::string shown = reward.text.empty() ? face.name : std::string(reward.text.In(language));
   if (reward.count > 1) {
-    std::array<char, kRewardCapacity> counted{};
-    std::snprintf(counted.data(), counted.size(), ro::core::Tr("%d × %s"), reward.count,
-                  shown.c_str());
-    shown = counted.data();
+    shown = ro::core::Printed(ro::core::Tr("%d × %s"), reward.count, shown.c_str());
   }
   reward_texts_.push_back(std::move(shown));
   return ro::ui::EntryQueueRewardView{

@@ -4,8 +4,6 @@
 // du compagnon » du menu d'entité d'un joueur. Le câblage de
 // `game/companion_ai_window_compose.h`. Voir `game/companion_ai_stage.h`.
 
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -14,6 +12,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 #include "game/companion_ai_names.h"
 #include "game/companion_ai_stage.h"
@@ -28,8 +27,6 @@ using ro::sim::AiCompanion;
 using ro::sim::CompanionPlayerConduct;
 using ro::sim::PlayerConductKey;
 using ro::sim::PlayerConductKeyKind;
-
-constexpr std::size_t kNameBytes = 64;
 
 [[nodiscard]] std::size_t SlotIndexOf(AiCompanion companion) noexcept {
   return companion == AiCompanion::kHomunculus ? 0 : 1;
@@ -75,10 +72,7 @@ void CompanionAiStage::ComposePlayers(const ro::sim::CompanionAiSettings& settin
         const std::string_view named =
             books.job_names != nullptr ? books.job_names->Find(line.key.job) : std::string_view();
         if (named.empty()) {
-          std::array<char, kNameBytes> number{};
-          std::snprintf(number.data(), number.size(), ro::core::Tr("Classe %u"),
-                        static_cast<unsigned>(line.key.job));
-          label = number.data();
+          label = ro::core::Printed(ro::core::Tr("Classe %u"), static_cast<unsigned>(line.key.job));
         } else {
           label = std::string(named);
         }

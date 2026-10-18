@@ -1,14 +1,13 @@
 #include "world/skill_refusal_report.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/net/server_message.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/skill_tree.h"
@@ -45,10 +44,7 @@ std::string SkillNameOf(std::uint16_t skill_id, const ro::sim::World& world,
       known != nullptr && !known->name.empty()) {
     return known->name;
   }
-  std::array<char, 32> numbered{};
-  std::snprintf(numbered.data(), numbered.size(), ro::core::Tr("Skill n°%u"),
-                static_cast<unsigned>(skill_id));
-  return numbered.data();
+  return ro::core::Printed(ro::core::Tr("Skill n°%u"), static_cast<unsigned>(skill_id));
 }
 
 // L'objet requis, en LIEN D'ITEM : la conversation le montre sous son nom, et

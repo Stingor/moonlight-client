@@ -5,11 +5,11 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
-#include <cstdio>
 #include <string_view>
 
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/vfs/item_table.h"
 
 namespace moonclient {
@@ -18,7 +18,6 @@ namespace {
 using ro::core::Tr;
 using ro::vfs::ServerItem;
 
-constexpr std::size_t kLineBytes = 256;
 // Le poids se compte en dixièmes.
 constexpr std::uint32_t kWeightTenths = 10;
 // La clé qui vaut tous les jobs, ou toutes les classes.
@@ -495,21 +494,16 @@ struct JobList {
     const std::string lineage_names = Joined(lineages, kListSeparator);
     const bool alone = place == ListPlace::kAlone;
     const bool several = lineages.size() > 1;
-    std::array<char, kLineBytes> line{};
+    std::string line;
     if (alone) {
-      std::snprintf(line.data(), line.size(), several ? Tr("Lignées %s") : Tr("Lignée %s"),
-                    lineage_names.c_str());
+      line = ro::core::Printed(several ? Tr("Lignées %s") : Tr("Lignée %s"), lineage_names.c_str());
     } else {
-      std::snprintf(line.data(), line.size(), several ? Tr("lignées %s") : Tr("lignée %s"),
-                    lineage_names.c_str());
+      line = ro::core::Printed(several ? Tr("lignées %s") : Tr("lignée %s"), lineage_names.c_str());
     }
     if (singles.empty()) {
-      return line.data();
+      return line;
     }
-    const std::string lineage_text = line.data();
-    std::snprintf(line.data(), line.size(), Tr("%s ; %s"), lineage_text.c_str(),
-                  single_names.c_str());
-    return line.data();
+    return ro::core::Printed(Tr("%s ; %s"), line.c_str(), single_names.c_str());
   }
 };
 
@@ -544,37 +538,33 @@ struct JobList {
 
 [[nodiscard]] std::string AllBut(const JobList& left_out) {
   const std::string names = left_out.Text(ListPlace::kAfterAllBut);
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), Tr("Tous les jobs sauf %s"), names.c_str());
-  return line.data();
+  return ro::core::Printed(Tr("Tous les jobs sauf %s"), names.c_str());
 }
 
 // ── LES LIGNES ──────────────────────────────────────────────────────────────
 
 [[nodiscard]] std::string WeightText(std::uint32_t tenths) {
-  std::array<char, kLineBytes> text{};
+  std::string text;
   if (tenths % kWeightTenths == 0) {
-    std::snprintf(text.data(), text.size(), "%u", static_cast<unsigned>(tenths / kWeightTenths));
+    text = ro::core::Printed("%u", static_cast<unsigned>(tenths / kWeightTenths));
   } else {
-    std::snprintf(text.data(), text.size(), Tr("%u,%u"),
-                  static_cast<unsigned>(tenths / kWeightTenths),
-                  static_cast<unsigned>(tenths % kWeightTenths));
+    text = ro::core::Printed(Tr("%u,%u"), static_cast<unsigned>(tenths / kWeightTenths),
+                             static_cast<unsigned>(tenths % kWeightTenths));
   }
-  return text.data();
+  return text;
 }
 
 // Le niveau requis, vide quand il ne borne rien.
 [[nodiscard]] std::string LevelText(const ServerItem& item) {
-  std::array<char, kLineBytes> text{};
+  std::string text;
   if (item.equip_level_max != 0 && item.equip_level_max >= item.equip_level_min) {
-    std::snprintf(text.data(), text.size(), Tr("Niveau de base %u à %u"),
-                  static_cast<unsigned>(item.equip_level_min),
-                  static_cast<unsigned>(item.equip_level_max));
+    text =
+        ro::core::Printed(Tr("Niveau de base %u à %u"), static_cast<unsigned>(item.equip_level_min),
+                          static_cast<unsigned>(item.equip_level_max));
   } else if (item.equip_level_min > ro::vfs::kServerItemDefaultEquipLevelMin) {
-    std::snprintf(text.data(), text.size(), Tr("Niveau de base %u"),
-                  static_cast<unsigned>(item.equip_level_min));
+    text = ro::core::Printed(Tr("Niveau de base %u"), static_cast<unsigned>(item.equip_level_min));
   }
-  return text.data();
+  return text;
 }
 
 // Les classes, vides quand toutes peuvent porter l'objet.
@@ -591,9 +581,7 @@ struct JobList {
     names.emplace_back(label != nullptr ? std::string(label) : kind);
   }
   const std::string joined = Joined(names, kListSeparator);
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), Tr("Classes : %s"), joined.c_str());
-  return line.data();
+  return ro::core::Printed(Tr("Classes : %s"), joined.c_str());
 }
 
 [[nodiscard]] std::string NumberText(std::uint32_t value) { return std::to_string(value); }
@@ -685,10 +673,9 @@ std::vector<std::string> ItemDbBlockOf(const ServerItem& item, const ItemDbNames
     }
   }
   if (weapon && item.range_cells > 0) {
-    std::array<char, kLineBytes> range{};
-    std::snprintf(range.data(), range.size(), Tr("%u case(s)"),
-                  static_cast<unsigned>(item.range_cells));
-    lines.push_back(ItemDbLabelled(Tr("Portée :"), range.data()));
+    lines.push_back(ItemDbLabelled(
+        Tr("Portée :"),
+        ro::core::Printed(Tr("%u case(s)"), static_cast<unsigned>(item.range_cells))));
   }
   AppendItemDbScriptFacts(lines, item, facts, names);
   if (item.weight_tenths > 0) {

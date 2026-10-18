@@ -1,7 +1,5 @@
 #include "character/shortcut_file.h"
 
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <vector>
@@ -11,6 +9,7 @@
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 #include "game/save_folder.h"
 #include "game/yaml_load.h"
@@ -34,11 +33,7 @@ constexpr const char* kJobsField = "jobs";
 // tête ce que les réglages appellent « barre 1 ».
 //
 // ⚠ GRAVÉ comme les champs ci-dessus.
-[[nodiscard]] std::string BarKey(std::size_t bar) {
-  std::array<char, 16> name{};
-  std::snprintf(name.data(), name.size(), "bar%zu", bar + 1);
-  return std::string(name.data());
-}
+[[nodiscard]] std::string BarKey(std::size_t bar) { return ro::core::Printed("bar%zu", bar + 1); }
 
 constexpr const char* kFileHeader =
     "# Les barres de raccourcis de moonclient, un jeu de barres par personnage.\n"

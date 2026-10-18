@@ -2,14 +2,12 @@
 
 #include "game/battleground_stage.h"
 
-#include <array>
-#include <cstddef>
-#include <cstdio>
 #include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/battleground.h"
 #include "ro/sim/world.h"
 
@@ -22,8 +20,6 @@ namespace {
 using ro::sim::EntryQueueNoticeKind;
 using ro::sim::EntryQueuePhase;
 using ro::ui::EntryQueueVerb;
-
-constexpr std::size_t kLineCapacity = 512;
 
 // LES AVIS QUI S'IMPOSENT DANS LA BOÎTE DE RÉSULTAT, en plus du chat : les
 // refus que le serveur explique, et l'annulation qu'il refuse. Le reste — en
@@ -311,10 +307,8 @@ void BattlegroundStage::CollectQueueNews() {
     // LE TERRAIN EN TÊTE, sous le nom que le joueur lit. ⚠ SAUF L'ENTRÉE
     // ACCORDÉE : elle nomme la carte, que la phrase n'a pas besoin de dire.
     if (!notice.field_name.empty() && notice.kind != EntryQueueNoticeKind::kAdmitted) {
-      std::array<char, kLineCapacity> text{};
-      std::snprintf(text.data(), text.size(), ro::core::Tr("« %s » : %s"),
-                    std::string(DisplayNameOf(notice.field_name)).c_str(), said);
-      line = text.data();
+      line = ro::core::Printed(ro::core::Tr("« %s » : %s"),
+                               std::string(DisplayNameOf(notice.field_name)).c_str(), said);
     } else {
       line = said;
     }

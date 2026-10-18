@@ -6,12 +6,12 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
-#include <cstdio>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/companion_rules.h"
 #include "ro/sim/companion_skills.h"
 
@@ -24,8 +24,6 @@ namespace {
 using ro::sim::CompanionRule;
 using ro::sim::CompanionTactic;
 using ro::ui::CompanionAiVerb;
-
-constexpr std::size_t kLineBytes = 160;
 
 [[nodiscard]] AiEditResult Accepted(AiEditSave save) {
   return AiEditResult{.accepted = true, .save = save};
@@ -153,9 +151,8 @@ struct RuleList {
   list.extras.resize(list.rules.size());
   const bool room = list.rules.size() < ro::sim::kCompanionRuleMost;
   const bool aimed = action.index < list.rules.size();
-  std::array<char, kLineBytes> cap{};
-  std::snprintf(cap.data(), cap.size(), ro::core::Tr("%d règles au plus par profil."),
-                static_cast<int>(ro::sim::kCompanionRuleMost));
+  const std::string cap = ro::core::Printed(ro::core::Tr("%d règles au plus par profil."),
+                                            static_cast<int>(ro::sim::kCompanionRuleMost));
   switch (action.verb) {
     case CompanionAiVerb::kEditRule: {
       if (!aimed) {
@@ -172,7 +169,7 @@ struct RuleList {
     }
     case CompanionAiVerb::kAddRule:
       if (!room) {
-        return Refused(cap.data());
+        return Refused(cap);
       }
       list.Insert(list.rules.size(), DefaultCompanionRule(), std::string());
       break;
@@ -187,7 +184,7 @@ struct RuleList {
         return AiEditResult{};
       }
       if (!room) {
-        return Refused(cap.data(), static_cast<int>(action.index));
+        return Refused(cap, static_cast<int>(action.index));
       }
       list.Insert(action.index + 1, list.rules[action.index], list.extras[action.index]);
       break;

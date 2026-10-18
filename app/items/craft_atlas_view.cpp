@@ -1,8 +1,6 @@
 #include "items/craft_atlas_view.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <string>
 #include <utility>
 
@@ -11,20 +9,12 @@
 #include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
 
-// « #4294967295 » et son zéro final.
-constexpr std::size_t kNumberBytes = 16;
-// Une ligne de l'étiquette « Craft ».
-constexpr std::size_t kTagBytes = 128;
-
-[[nodiscard]] std::string Numbered(unsigned number) {
-  std::array<char, kNumberBytes> text{};
-  std::snprintf(text.data(), text.size(), "#%u", number);
-  return text.data();
-}
+[[nodiscard]] std::string Numbered(unsigned number) { return ro::core::Printed("#%u", number); }
 
 [[nodiscard]] ro::ui::CraftAtlasYieldMode ModeOf(CraftYieldMode mode) {
   switch (mode) {
@@ -113,17 +103,17 @@ bool CraftAtlasView::CraftTagOf(std::uint32_t item_id, std::string* label, std::
   if (recipe == nullptr && used_in == 0 && !arrows) {
     return false;
   }
-  std::array<char, kTagBytes> text{};
+  std::string text;
   if (recipe != nullptr) {
     const std::string_view skill = SkillLabel(recipe->skill_id, recipe->item_level);
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Craft : %.*s"),
-                  static_cast<int>(skill.size()), skill.data());
+    text = ro::core::Printed(ro::core::Tr("Craft : %.*s"), static_cast<int>(skill.size()),
+                             skill.data());
   } else if (used_in > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Craft : %d recettes"), used_in);
+    text = ro::core::Printed(ro::core::Tr("Craft : %d recettes"), used_in);
   } else {
-    std::snprintf(text.data(), text.size(), "%s", ro::core::Tr("Craft : flèches"));
+    text = ro::core::Printed("%s", ro::core::Tr("Craft : flèches"));
   }
-  *label = text.data();
+  *label = text;
 
   // L'INFOBULLE DIT LES TROIS CHOSES D'UN COUP : un item peut être à la fois
   // fabricable, matériau et transformable en flèches.
@@ -138,8 +128,8 @@ bool CraftAtlasView::CraftTagOf(std::uint32_t item_id, std::string* label, std::
     *tip += ".\n";
   }
   if (used_in > 0) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Entre dans %d recettes."), used_in);
-    *tip += text.data();
+    text = ro::core::Printed(ro::core::Tr("Entre dans %d recettes."), used_in);
+    *tip += text;
     *tip += '\n';
   }
   if (arrows) {

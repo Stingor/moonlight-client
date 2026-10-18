@@ -5,11 +5,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 #include "ro/ui/skin_palette.h"
@@ -38,8 +38,6 @@ constexpr int kElementMalusPercent = 25;
 constexpr std::uint32_t kSkippedForgeFirst = 998;
 constexpr std::uint32_t kSkippedForgeLast = 999;
 constexpr int kAnvilScalePerPercent = 100;
-
-constexpr std::size_t kLineBytes = 512;
 
 [[nodiscard]] ro::ui::SkinTone ChanceTone(int chance) {
   return chance >= kGoodChance ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kWarn;
@@ -289,24 +287,20 @@ void MakeItemFlow::ComposeStale(const ro::sim::World& world) {
       if (have >= need) {
         continue;
       }
-      std::array<char, kLineBytes> part{};
-      std::snprintf(part.data(), part.size(), "%d %s", need - have,
-                    ItemName(material.item_id).c_str());
       if (!missing.empty()) {
         missing += ", ";
       }
-      missing += part.data();
+      missing += ro::core::Printed("%d %s", need - have, ItemName(material.item_id).c_str());
     }
-    std::array<char, kLineBytes> line{};
+    std::string line;
     if (missing.empty()) {
-      std::snprintf(line.data(), line.size(),
-                    Tr("%s : matériaux au complet — inventory plein ou niveau insuffisant"),
-                    entry.name.c_str());
+      line =
+          ro::core::Printed(Tr("%s : matériaux au complet — inventory plein ou niveau insuffisant"),
+                            entry.name.c_str());
     } else {
-      std::snprintf(line.data(), line.size(), Tr("%s : il manque %s"), entry.name.c_str(),
-                    missing.c_str());
+      line = ro::core::Printed(Tr("%s : il manque %s"), entry.name.c_str(), missing.c_str());
     }
-    stale_texts_.emplace_back(line.data());
+    stale_texts_.emplace_back(line);
   }
   for (const std::string& text : stale_texts_) {
     stale_lines_.push_back(ro::ui::MakeStaleLineView{.text = text});
@@ -338,27 +332,23 @@ void MakeItemFlow::ComposeRecipe(const ro::sim::World& world, const Entry& chose
     const int have = world.inventory().AmountOf(material.item_id);
     std::string name = ItemName(material.item_id);
     if (name.empty()) {
-      std::array<char, kLineBytes> numbered{};
-      std::snprintf(numbered.data(), numbered.size(), "#%u",
-                    static_cast<unsigned>(material.item_id));
-      name = numbered.data();
+      name = ro::core::Printed("#%u", static_cast<unsigned>(material.item_id));
     }
-    std::array<char, kLineBytes> label{};
+    std::string label;
     bool enough = material.kept ? have >= 1 : have >= material.quantity;
     if (material.output) {
       // CE QUE LA SOURCE REND : une ligne de résultat, jamais un manque.
-      std::snprintf(label.data(), label.size(), "-> %d %s", material.quantity, name.c_str());
+      label = ro::core::Printed("-> %d %s", material.quantity, name.c_str());
       enough = true;
     } else if (material.kept) {
-      std::snprintf(label.data(), label.size(), Tr("%s  (requis, non consommé)"), name.c_str());
+      label = ro::core::Printed(Tr("%s  (requis, non consommé)"), name.c_str());
     } else if (!enough) {
-      std::snprintf(label.data(), label.size(), Tr("%d %s  (%d — il en manque %d)"),
-                    material.quantity, name.c_str(), have, material.quantity - have);
+      label = ro::core::Printed(Tr("%d %s  (%d — il en manque %d)"), material.quantity,
+                                name.c_str(), have, material.quantity - have);
     } else {
-      std::snprintf(label.data(), label.size(), "%d %s  (%d)", material.quantity, name.c_str(),
-                    have);
+      label = ro::core::Printed("%d %s  (%d)", material.quantity, name.c_str(), have);
     }
-    material_labels_.emplace_back(label.data());
+    material_labels_.emplace_back(label);
     materials_.push_back(ro::ui::MakeMaterialView{
         .item_id = material.item_id, .icon = IconOf(material.item_id), .enough = enough});
   }
@@ -383,11 +373,10 @@ void MakeItemFlow::ComposeChance(const ro::sim::World& world, const Entry& chose
   const bool potion = !is_weapon && skill == kPharmacySkill;
   const bool cooking = !is_weapon && skill == kCraftByItemSkill && IsDishItemLevel(dish_level);
   const CrafterStats stats = StatsOf(world);
-  std::array<char, kLineBytes> line{};
 
   const auto chance_line = [&](int chance, const char* title, std::vector<const char*> help) {
-    std::snprintf(line.data(), line.size(), Tr("Chances : %d %%"), chance);
-    AddLine(chance_lines_, line.data(), ChanceTone(chance), false, title, std::move(help));
+    AddLine(chance_lines_, ro::core::Printed(Tr("Chances : %d %%"), chance), ChanceTone(chance),
+            false, title, std::move(help));
   };
 
   if (cooking) {
@@ -399,13 +388,11 @@ void MakeItemFlow::ComposeChance(const ro::sim::World& world, const Entry& chose
               ro::ui::SkinTone::kFaint, true);
       return;
     }
-    std::array<char, kLineBytes> inputs{};
-    std::snprintf(inputs.data(), inputs.size(),
-                  Tr("Entrées du calcul : kit niveau %d, plat niveau %d, base level %d, DEX %d, "
-                     "LUK %d, maîtrise %s."),
-                  kit, dish_level, stats.base_level, stats.dex, stats.luk,
-                  cook_mastery_ >= 0 ? Tr("reçue") : Tr("NON REÇUE"));
-    const std::string& inputs_text = line_texts_.emplace_back(inputs.data());
+    const std::string& inputs_text = line_texts_.emplace_back(ro::core::Printed(
+        Tr("Entrées du calcul : kit niveau %d, plat niveau %d, base level %d, DEX %d, "
+           "LUK %d, maîtrise %s."),
+        kit, dish_level, stats.base_level, stats.dex, stats.luk,
+        cook_mastery_ >= 0 ? Tr("reçue") : Tr("NON REÇUE")));
     const int chance = CookingChancePercent(kit, dish_level, cook_mastery_, stats);
     if (chance >= 0) {
       std::vector<const char*> help;
@@ -417,10 +404,8 @@ void MakeItemFlow::ComposeChance(const ro::sim::World& world, const Entry& chose
       help.push_back(inputs_text.c_str());
       chance_line(chance, title, std::move(help));
       if (cook_mastery_ >= 0 && kit < kSureCookingKit) {
-        std::array<char, kLineBytes> mastery{};
-        std::snprintf(mastery.data(), mastery.size(), Tr("(maîtrise %d / %d)"), cook_mastery_,
-                      kMostCookMastery);
-        chance_lines_.back().suffix = line_texts_.emplace_back(mastery.data());
+        chance_lines_.back().suffix = line_texts_.emplace_back(
+            ro::core::Printed(Tr("(maîtrise %d / %d)"), cook_mastery_, kMostCookMastery));
         chance_lines_.back().suffix_tone = ro::ui::SkinTone::kFaint;
       }
       return;
@@ -428,12 +413,13 @@ void MakeItemFlow::ComposeChance(const ro::sim::World& world, const Entry& chose
     const int worst = CookingChancePercent(kit, dish_level, kLeastCookMastery, stats);
     const int best = CookingChancePercent(kit, dish_level, kMostCookMastery, stats);
     if (worst >= 0 && best >= 0) {
+      std::string line;
       if (worst == best) {
-        std::snprintf(line.data(), line.size(), Tr("Chances : %d %%"), worst);
+        line = ro::core::Printed(Tr("Chances : %d %%"), worst);
       } else {
-        std::snprintf(line.data(), line.size(), Tr("Chances : entre %d %% et %d %%"), worst, best);
+        line = ro::core::Printed(Tr("Chances : entre %d %% et %d %%"), worst, best);
       }
-      AddLine(chance_lines_, line.data(), ChanceTone(worst), false, MasteryRangeTitle(),
+      AddLine(chance_lines_, line, ChanceTone(worst), false, MasteryRangeTitle(),
               {kMasteryRangeLine, inputs_text.c_str()});
       return;
     }
@@ -541,10 +527,8 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
       if (used_elsewhere >= have || (IsElementStone(item_id) && other_stone)) {
         continue;
       }
-      std::array<char, kLineBytes> label{};
-      std::snprintf(label.data(), label.size(), "%s  (%d)", ItemName(item_id).c_str(),
-                    have - used_elsewhere);
-      choice_labels_[slot].emplace_back(label.data());
+      choice_labels_[slot].emplace_back(
+          ro::core::Printed("%s  (%d)", ItemName(item_id).c_str(), have - used_elsewhere));
       choices_[slot].push_back(ro::ui::ForgeChoiceView{.item_id = item_id});
     }
     for (std::size_t rank = 0; rank < choices_[slot].size(); ++rank) {
@@ -562,23 +546,25 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
   // ── CE QUE LES EMPLACEMENTS COÛTENT ─────────────────────────────────────────
   const int crumbs = static_cast<int>(std::ranges::count(forge_slots_, kStarCrumb));
   const auto stone = std::ranges::find_if(forge_slots_, IsElementStone);
-  std::array<char, kLineBytes> line{};
   if (crumbs > 0) {
-    std::snprintf(line.data(), line.size(), Tr("%d Star Crumb : +%d ATK, -%d %% de réussite"),
-                  crumbs, crumbs * kStarCrumbAttack, crumbs * kStarCrumbMalusPercent);
-    AddLine(forge_notes_, line.data(), ro::ui::SkinTone::kWarn, false, StarCrumbTitle(),
+    AddLine(forge_notes_,
+            ro::core::Printed(Tr("%d Star Crumb : +%d ATK, -%d %% de réussite"), crumbs,
+                              crumbs * kStarCrumbAttack, crumbs * kStarCrumbMalusPercent),
+            ro::ui::SkinTone::kWarn, false, StarCrumbTitle(),
             {kStarCrumbHelp.begin(), kStarCrumbHelp.end()});
   }
   if (stone != forge_slots_.end()) {
-    std::snprintf(line.data(), line.size(), Tr("Élément %s : -%d %% de réussite"),
-                  ItemName(*stone).c_str(), kElementMalusPercent);
-    AddLine(forge_notes_, line.data(), ro::ui::SkinTone::kWarn, false, ElementTitle(),
+    AddLine(forge_notes_,
+            ro::core::Printed(Tr("Élément %s : -%d %% de réussite"), ItemName(*stone).c_str(),
+                              kElementMalusPercent),
+            ro::ui::SkinTone::kWarn, false, ElementTitle(),
             {kElementHelp.begin(), kElementHelp.end()});
   }
   if (crumbs > 0 && stone != forge_slots_.end()) {
-    std::snprintf(line.data(), line.size(), Tr("Total : -%d %% de réussite"),
-                  crumbs * kStarCrumbMalusPercent + kElementMalusPercent);
-    AddLine(forge_notes_, line.data(), ro::ui::SkinTone::kBad, false);
+    AddLine(forge_notes_,
+            ro::core::Printed(Tr("Total : -%d %% de réussite"),
+                              crumbs * kStarCrumbMalusPercent + kElementMalusPercent),
+            ro::ui::SkinTone::kBad, false);
   }
 
   // L'ENCLUME : la meilleure portée, et celles qui ne servent à rien.
@@ -595,18 +581,16 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
     }
   }
   if (kept != nullptr) {
-    std::snprintf(line.data(), line.size(), Tr("Enclume retenue : %s (+%d %%)"),
-                  ItemName(kept->item_id).c_str(), kept->bonus / kAnvilScalePerPercent);
-    AddLine(forge_notes_, line.data(),
+    AddLine(forge_notes_,
+            ro::core::Printed(Tr("Enclume retenue : %s (+%d %%)"), ItemName(kept->item_id).c_str(),
+                              kept->bonus / kAnvilScalePerPercent),
             kept->bonus > 0 ? ro::ui::SkinTone::kGood : ro::ui::SkinTone::kFaint, false,
             AnvilTitle(), {kAnvilHelp.begin(), kAnvilHelp.end()});
     if (others > 0) {
-      std::array<char, kLineBytes> rest{};
-      std::snprintf(rest.data(), rest.size(),
-                    others > 1 ? Tr("(%d autres dans l'inventory, sans effet)")
-                               : Tr("(%d autre dans l'inventory, sans effet)"),
-                    others);
-      forge_notes_.back().suffix = line_texts_.emplace_back(rest.data());
+      forge_notes_.back().suffix = line_texts_.emplace_back(
+          ro::core::Printed(others > 1 ? Tr("(%d autres dans l'inventory, sans effet)")
+                                       : Tr("(%d autre dans l'inventory, sans effet)"),
+                            others));
       forge_notes_.back().suffix_tone = ro::ui::SkinTone::kFaint;
     }
   } else {
@@ -622,9 +606,10 @@ void MakeItemFlow::ComposeForge(const ro::sim::World& world, std::uint32_t produ
     const int asked = static_cast<int>(std::ranges::count(forge_slots_, item_id));
     const int have = world.inventory().AmountOf(item_id);
     if (asked > have) {
-      std::snprintf(line.data(), line.size(), Tr("%s : %d demandés, %d dans l'inventory"),
-                    ItemName(item_id).c_str(), asked, have);
-      AddLine(forge_notes_, line.data(), ro::ui::SkinTone::kBad, false);
+      AddLine(forge_notes_,
+              ro::core::Printed(Tr("%s : %d demandés, %d dans l'inventory"),
+                                ItemName(item_id).c_str(), asked, have),
+              ro::ui::SkinTone::kBad, false);
       break;
     }
   }
@@ -642,16 +627,14 @@ void MakeItemFlow::ComposeFooter(const ro::sim::World& world,
   view_.can_relaunch =
       from_item_ ? (source_item_id_ != 0 && world.inventory().AmountOf(source_item_id_) > 0)
                  : skill_id_ > 0;
-  std::array<char, kLineBytes> line{};
   if (!view_.can_relaunch) {
     relaunch_tip_ = from_item_ ? Tr("Il ne te reste plus l'item qui a ouvert cette liste.")
                                : Tr("Skill d'origine inconnu : relance impossible.");
   } else if (from_item_) {
-    std::snprintf(line.data(), line.size(),
-                  Tr("Ré-utilise %s pour rouvrir une liste. L'item est CONSOMMÉ : le serveur le "
-                     "détruit avant d'exécuter son script, même si tu annules ensuite."),
-                  source_item_name_.c_str());
-    relaunch_tip_ = line.data();
+    relaunch_tip_ = ro::core::Printed(
+        Tr("Ré-utilise %s pour rouvrir une liste. L'item est CONSOMMÉ : le serveur le "
+           "détruit avant d'exécuter son script, même si tu annules ensuite."),
+        source_item_name_.c_str());
   } else {
     relaunch_tip_ =
         Tr("Relance le skill pour obtenir une nouvelle liste. Le serveur "
@@ -662,9 +645,8 @@ void MakeItemFlow::ComposeFooter(const ro::sim::World& world,
 
   batch_progress_.clear();
   if (batch_left_ > 0) {
-    std::snprintf(line.data(), line.size(), Tr("série : %d/%d"), state.batch_target - batch_left_,
-                  state.batch_target);
-    batch_progress_ = line.data();
+    batch_progress_ = ro::core::Printed(Tr("série : %d/%d"), state.batch_target - batch_left_,
+                                        state.batch_target);
   }
   view_.batch_progress = batch_progress_;
 
@@ -690,16 +672,18 @@ void MakeItemFlow::ComposeFooter(const ro::sim::World& world,
 
   // ── LA RELANCE ──────────────────────────────────────────────────────────────
   if (auto_chain_ > 0 && auto_recast_at_ != 0) {
+    std::string line;
     if (from_item_ && settings.auto_reuse_max > 0) {
-      std::snprintf(line.data(), line.size(), Tr("Relance automatique… %s consommé %d/%d"),
-                    source_item_name_.c_str(), auto_items_used_, settings.auto_reuse_max);
+      line =
+          ro::core::Printed(Tr("Relance automatique… %s consommé %d/%d"), source_item_name_.c_str(),
+                            auto_items_used_, settings.auto_reuse_max);
     } else if (from_item_) {
-      std::snprintf(line.data(), line.size(), Tr("Relance automatique… %s consommé ×%d"),
-                    source_item_name_.c_str(), auto_items_used_);
+      line = ro::core::Printed(Tr("Relance automatique… %s consommé ×%d"),
+                               source_item_name_.c_str(), auto_items_used_);
     } else {
-      std::snprintf(line.data(), line.size(), Tr("Relance automatique… (%d)"), auto_chain_);
+      line = ro::core::Printed(Tr("Relance automatique… (%d)"), auto_chain_);
     }
-    AddLine(footer_notes_, line.data(), ro::ui::SkinTone::kWarn, true);
+    AddLine(footer_notes_, line, ro::ui::SkinTone::kWarn, true);
   } else if (!stop_reason_.empty()) {
     AddLine(footer_notes_, stop_reason_, ro::ui::SkinTone::kFaint, true);
   }

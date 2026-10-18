@@ -9,7 +9,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <cstdio>
 #include <optional>
 #include <span>
 #include <string>
@@ -17,6 +16,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/printed.h"
 #include "ro/render/charge_count_effect.h"
 #include "ro/render/effect_laid.h"
 #include "ro/render/effect_scene.h"
@@ -35,15 +35,11 @@ namespace {
 
 // Le trou d'un nom que la valeur de l'état remplit, sur deux chiffres au moins.
 constexpr std::string_view kValueHole = "%02d";
-// De quoi écrire n'importe quel entier sur trente-deux bits.
-constexpr std::size_t kNumberBuffer = 16;
 
 [[nodiscard]] std::string WithValue(std::string_view name, std::int32_t value) {
   std::string forme(name);
   if (const std::size_t trou = forme.find(kValueHole); trou != std::string::npos) {
-    std::array<char, kNumberBuffer> chiffres{};
-    std::snprintf(chiffres.data(), chiffres.size(), "%02d", value);
-    forme.replace(trou, kValueHole.size(), chiffres.data());
+    forme.replace(trou, kValueHole.size(), ro::core::Printed("%02d", value));
   }
   return forme;
 }

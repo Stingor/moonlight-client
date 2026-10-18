@@ -1,10 +1,9 @@
 #include "options/context_menu_options.h"
 
-#include <array>
-#include <cstdio>
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -19,10 +18,6 @@ constexpr const char* kAllEntitiesKey = "menu_entity_everywhere";
 constexpr const char* kSelfMenuKey = "menu_entity_on_oneself";
 constexpr const char* kStaffExtrasKey = "menu_entity_staff";
 constexpr const char* kNpcBlockKey = "menu_entity_blocking_npc";
-
-// Assez pour « (3000099) », et pour « NPC 3000099 » dans toutes les langues.
-constexpr std::size_t kNoteBytes = 16;
-constexpr std::size_t kLabelBytes = 64;
 
 [[nodiscard]] OptionRowView Toggle(ContextMenuRow row, const char* label, const char* help,
                                    bool on) {
@@ -98,16 +93,14 @@ void ContextMenuOptions::Compose() {
       }
       listed_.push_back(id);
       // Le GID n'est dit à part que si le nom le cache : sinon il est déjà écrit.
-      std::array<char, kLabelBytes> label{};
-      std::array<char, kNoteBytes> note{};
+      std::string note;
       if (name.empty()) {
-        std::snprintf(label.data(), label.size(), Tr("NPC %u"), id);
-        names_.emplace_back(label.data());
+        names_.emplace_back(ro::core::Printed(Tr("NPC %u"), id));
       } else {
         names_.push_back(name);
-        std::snprintf(note.data(), note.size(), "(%u)", id);
+        note = ro::core::Printed("(%u)", id);
       }
-      notes_.emplace_back(note.data());
+      notes_.emplace_back(note);
     }
     // Une ligne par PNJ, avec de quoi le débloquer sans avoir à le retrouver en
     // jeu : il peut être sur une autre carte.

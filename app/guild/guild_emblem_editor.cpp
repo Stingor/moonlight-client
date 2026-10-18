@@ -6,8 +6,6 @@
 // verra aussi.
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -16,6 +14,7 @@
 #include "ro/core/ascii.h"
 #include "ro/core/file_write.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/formats/bmp.h"
 #include "ro/formats/emblem.h"
 #include "ro/formats/image.h"
@@ -59,7 +58,6 @@ constexpr std::uint32_t kGalleryEveryMs = 1000;
 // Le motif d'un refus, en clair — un emblème rejeté en silence par le serveur
 // serait indiscernable d'un serveur muet.
 [[nodiscard]] std::string FaultText(const ro::formats::EmblemVerdict& verdict) {
-  std::array<char, 192> text = {};
   switch (verdict.fault) {
     case ro::formats::EmblemFault::kNone:
       return {};
@@ -72,20 +70,16 @@ constexpr std::uint32_t kGalleryEveryMs = 1000;
     case ro::formats::EmblemFault::kPixelsOutside:
       return Tr("En-tête BMP incohérent (offset des pixels hors fichier).");
     case ro::formats::EmblemFault::kWrongSize:
-      std::snprintf(text.data(), text.size(),
-                    Tr("Dimensions %ldx%ld : le jeu n'affiche que du %dx%d."),
-                    static_cast<long>(verdict.width), static_cast<long>(verdict.height),
-                    ro::formats::kEmblemSide, ro::formats::kEmblemSide);
-      return text.data();
+      return ro::core::Printed(Tr("Dimensions %ldx%ld : le jeu n'affiche que du %dx%d."),
+                               static_cast<long>(verdict.width), static_cast<long>(verdict.height),
+                               ro::formats::kEmblemSide, ro::formats::kEmblemSide);
     case ro::formats::EmblemFault::kDepth:
       return Tr("Profondeur non gérée : utilise du 24 bits ou du 256 couleurs.");
     case ro::formats::EmblemFault::kCompressed:
       return Tr("BMP compressé (RLE) : enregistre-le sans compression.");
     case ro::formats::EmblemFault::kTooHeavy:
-      std::snprintf(text.data(), text.size(),
-                    Tr("Fichier de %zu octets : le serveur en accepte %zu au plus."), verdict.bytes,
-                    ro::formats::kEmblemMostBytes);
-      return text.data();
+      return ro::core::Printed(Tr("Fichier de %zu octets : le serveur en accepte %zu au plus."),
+                               verdict.bytes, ro::formats::kEmblemMostBytes);
   }
   return {};
 }
@@ -288,16 +282,15 @@ void GuildPanel::UploadFile(ro::ui::GuildTabState& state, GuildEmblems& emblems,
   const EmblemFile& chosen = files_[static_cast<std::size_t>(file)];
   const bool started =
       emblems.Upload(guild_id, std::string(chosen.bytes.begin(), chosen.bytes.end()));
-  std::array<char, 256> line = {};
+  std::string line;
   if (started) {
-    std::snprintf(line.data(), line.size(), Tr("Envoi au service web lancé (%s)."),
-                  chosen.name.c_str());
+    line = ro::core::Printed(Tr("Envoi au service web lancé (%s)."), chosen.name.c_str());
     state.status = std::string(Tr("Emblème envoyé : ")) + chosen.name;
   } else {
-    std::snprintf(line.data(), line.size(), "%s",
-                  Tr("Refusé : un envoi est déjà en cours, ou service indisponible."));
+    line = ro::core::Printed("%s",
+                             Tr("Refusé : un envoi est déjà en cours, ou service indisponible."));
   }
-  state.emblem.report = line.data();
+  state.emblem.report = line;
 }
 
 void GuildPanel::UploadCanvas(ro::ui::GuildTabState& state, GuildEmblems& emblems,
@@ -310,13 +303,10 @@ void GuildPanel::UploadCanvas(ro::ui::GuildTabState& state, GuildEmblems& emblem
     return;
   }
   const bool started = emblems.Upload(guild_id, std::string(bmp.begin(), bmp.end()));
-  std::array<char, 256> line = {};
   if (started) {
-    std::snprintf(line.data(), line.size(), Tr("Envoi au service web lancé (%s)."),
-                  file_name.c_str());
-    state.emblem.report = line.data();
-    std::snprintf(line.data(), line.size(), Tr("Emblème dessiné envoyé (%s)."), file_name.c_str());
-    state.status = line.data();
+    state.emblem.report =
+        ro::core::Printed(Tr("Envoi au service web lancé (%s)."), file_name.c_str());
+    state.status = ro::core::Printed(Tr("Emblème dessiné envoyé (%s)."), file_name.c_str());
   } else {
     state.emblem.report = Tr("Refusé : un envoi est déjà en cours, ou service indisponible.");
   }

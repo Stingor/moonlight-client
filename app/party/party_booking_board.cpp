@@ -2,9 +2,7 @@
 
 #include "party/party_booking_board.h"
 
-#include <array>
 #include <cstddef>
-#include <cstdio>
 #include <ctime>
 #include <string>
 #include <utility>
@@ -12,6 +10,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/party_booking.h"
 #include "ro/vfs/vfs.h"
 
@@ -76,10 +75,8 @@ const char* FamilyLabel(PartyBookingJobFamily family) {
 }
 
 std::string LevelsText(std::int16_t level) {
-  std::array<char, 32> text = {};
-  std::snprintf(text.data(), text.size(), "%d~%d", static_cast<int>(level),
-                static_cast<int>(level) + ro::sim::kPartyBookingLevelSpan);
-  return text.data();
+  return ro::core::Printed("%d~%d", static_cast<int>(level),
+                           static_cast<int>(level) + ro::sim::kPartyBookingLevelSpan);
 }
 
 }  // namespace
@@ -116,9 +113,7 @@ std::string PartyBookingClockText(std::uint32_t unix_s) {
   if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-  std::array<char, 16> text = {};
-  std::snprintf(text.data(), text.size(), "%02d:%02d", local.tm_hour, local.tm_min);
-  return text.data();
+  return ro::core::Printed("%02d:%02d", local.tm_hour, local.tm_min);
 }
 
 void PartyBookingBoard::StartSession() {
@@ -306,10 +301,7 @@ std::string PartyBookingBoard::PlaceText(std::int16_t map_code) const {
       return name;
     }
   }
-  std::array<char, 64> text = {};
-  std::snprintf(text.data(), text.size(), Tr("Lieu %d-%d"), static_cast<int>(region),
-                static_cast<int>(place));
-  return text.data();
+  return ro::core::Printed(Tr("Lieu %d-%d"), static_cast<int>(region), static_cast<int>(place));
 }
 
 std::string PartyBookingBoard::JobsText(const ro::sim::PartyBookingJobs& jobs) const {

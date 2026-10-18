@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <optional>
 
 #include <SDL3/SDL_keyboard.h>
@@ -10,6 +9,7 @@
 
 #include "ro/core/build_flavor.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -41,11 +41,9 @@ constexpr std::array<std::uint32_t, kChatMacroSlots> kMacroKeys = {
 // index à partir de zéro l'obligerait à traduire de tête entre deux écrans qui
 // parlent de la même case.
 [[nodiscard]] std::string ShortcutSlotName(std::size_t index) {
-  std::array<char, 64> text{};
-  std::snprintf(text.data(), text.size(), "bar%u_slot%u",
-                static_cast<unsigned>(ro::sim::ShortcutBarOfIndex(index) + 1),
-                static_cast<unsigned>(ro::sim::ShortcutRankOfIndex(index) + 1));
-  return std::string(text.data());
+  return ro::core::Printed("bar%u_slot%u",
+                           static_cast<unsigned>(ro::sim::ShortcutBarOfIndex(index) + 1),
+                           static_cast<unsigned>(ro::sim::ShortcutRankOfIndex(index) + 1));
 }
 
 [[nodiscard]] bool IsCameraAction(ActionRef action) {
@@ -168,16 +166,10 @@ std::span<const ActionRef> AllBindableActions() {
 
 std::string SavedKeyOfAction(ActionRef action) {
   if (action.is_macro()) {
-    std::array<char, 32> text{};
-    std::snprintf(text.data(), text.size(), "macro_%u",
-                  static_cast<unsigned>(action.macro_slot() + 1));
-    return std::string(text.data());
+    return ro::core::Printed("macro_%u", static_cast<unsigned>(action.macro_slot() + 1));
   }
   if (action.is_flag()) {
-    std::array<char, 32> text{};
-    std::snprintf(text.data(), text.size(), "flag_%u",
-                  static_cast<unsigned>(action.flag_slot() + 1));
-    return std::string(text.data());
+    return ro::core::Printed("flag_%u", static_cast<unsigned>(action.flag_slot() + 1));
   }
   if (action.is_shortcut()) {
     return ShortcutSlotName(action.shortcut_index());
@@ -200,10 +192,9 @@ std::string GroupOfAction(ActionRef action) {
   if (!action.is_shortcut()) {
     return {};
   }
-  std::array<char, 32> text{};
-  std::snprintf(text.data(), text.size(), "%s %u", ro::core::Tr("Barre"),
-                static_cast<unsigned>(ro::sim::ShortcutBarOfIndex(action.shortcut_index()) + 1));
-  return std::string(text.data());
+  return ro::core::Printed(
+      "%s %u", ro::core::Tr("Barre"),
+      static_cast<unsigned>(ro::sim::ShortcutBarOfIndex(action.shortcut_index()) + 1));
 }
 
 HotkeyTab TabOfAction(ActionRef action) {
@@ -305,26 +296,21 @@ std::string NameOfAction(ActionRef action) {
   if (action.is_macro()) {
     // ⚠ « Macro » Y EST AUSSI, alors que le groupe le porte déjà : c'est ce que
     // la RECHERCHE fouille, et taper « macro » doit rendre les dix lignes.
-    std::array<char, 48> text{};
-    std::snprintf(text.data(), text.size(), "%s %u", ro::core::Tr("Macro"),
-                  static_cast<unsigned>(action.macro_slot() + 1));
-    return std::string(text.data());
+    return ro::core::Printed("%s %u", ro::core::Tr("Macro"),
+                             static_cast<unsigned>(action.macro_slot() + 1));
   }
   if (action.is_flag()) {
-    std::array<char, 48> text{};
-    std::snprintf(text.data(), text.size(), "%s %u", ro::core::Tr("Drapeau"),
-                  static_cast<unsigned>(action.flag_slot() + 1));
-    return std::string(text.data());
+    return ro::core::Printed("%s %u", ro::core::Tr("Drapeau"),
+                             static_cast<unsigned>(action.flag_slot() + 1));
   }
   if (action.is_shortcut()) {
     // ⚠ LA BARRE Y EST AUSSI, alors que le groupe la porte déjà : c'est ce que
     // la RECHERCHE fouille, et taper « barre 6 » doit rendre ses douze cases.
-    std::array<char, 64> text{};
-    std::snprintf(text.data(), text.size(), "%s %u, %s %u", ro::core::Tr("Barre"),
-                  static_cast<unsigned>(ro::sim::ShortcutBarOfIndex(action.shortcut_index()) + 1),
-                  ro::core::Tr("case"),
-                  static_cast<unsigned>(ro::sim::ShortcutRankOfIndex(action.shortcut_index()) + 1));
-    return std::string(text.data());
+    return ro::core::Printed(
+        "%s %u, %s %u", ro::core::Tr("Barre"),
+        static_cast<unsigned>(ro::sim::ShortcutBarOfIndex(action.shortcut_index()) + 1),
+        ro::core::Tr("case"),
+        static_cast<unsigned>(ro::sim::ShortcutRankOfIndex(action.shortcut_index()) + 1));
   }
   // ⚠ UN SWITCH DE LITTÉRAUX, et non une table indexée : la traduction n'accepte
   // qu'un littéral — une chaîne prise dans un tableau n'entrerait dans aucun

@@ -7,7 +7,6 @@
 // événements, tient l'horloge, et porte au serveur ce que la veille veut dire.
 
 #include <array>
-#include <cstdio>
 #include <ctime>
 #include <string>
 
@@ -15,6 +14,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
+#include "ro/core/printed.h"
 #include "ro/net/player_settings.h"
 #include "ro/sim/pvp_rank.h"
 
@@ -148,18 +148,15 @@ ro::ui::AfkClockView Game::AfkClock(std::uint32_t now_ms) {
     // ⚠ LES TROIS GABARITS SONT GRAVÉS, au caractère près : le catalogue les
     // traduit déjà. Les réécrire « 3 minutes » plutôt que « 3 min » coûterait
     // trois traductions à refaire pour rien.
-    std::array<char, 96> written{};
     if (minutes < 1) {
       afk_away_text_ = ro::core::Tr("Absent à l'instant");
     } else if (minutes < kMinutesPerHour) {
-      std::snprintf(written.data(), written.size(), ro::core::Tr("Absent depuis %u min"),
-                    static_cast<unsigned>(minutes));
-      afk_away_text_ = written.data();
+      afk_away_text_ =
+          ro::core::Printed(ro::core::Tr("Absent depuis %u min"), static_cast<unsigned>(minutes));
     } else {
-      std::snprintf(written.data(), written.size(), ro::core::Tr("Absent depuis %uh%02u"),
-                    static_cast<unsigned>(minutes / kMinutesPerHour),
-                    static_cast<unsigned>(minutes % kMinutesPerHour));
-      afk_away_text_ = written.data();
+      afk_away_text_ = ro::core::Printed(ro::core::Tr("Absent depuis %uh%02u"),
+                                         static_cast<unsigned>(minutes / kMinutesPerHour),
+                                         static_cast<unsigned>(minutes % kMinutesPerHour));
     }
   }
 

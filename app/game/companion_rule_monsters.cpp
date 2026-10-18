@@ -1,17 +1,15 @@
 #include "game/companion_rule_monsters.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <string_view>
 
 #include "ro/core/case_fold.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
 
-constexpr std::size_t kLevelBytes = 32;
 constexpr std::string_view kSeparator = " · ";
 
 void Append(std::string& detail, std::string_view part) {
@@ -51,10 +49,7 @@ std::vector<std::uint16_t> MonstersByName(const ro::vfs::MonsterList& list) {
 
 std::string MonsterListDetail(const ro::vfs::MonsterListEntry& entry, const RuleNames& names) {
   std::string detail;
-  std::array<char, kLevelBytes> level{};
-  std::snprintf(level.data(), level.size(), ro::core::Tr("niv. %u"),
-                static_cast<unsigned>(entry.level));
-  Append(detail, level.data());
+  Append(detail, ro::core::Printed(ro::core::Tr("niv. %u"), static_cast<unsigned>(entry.level)));
   if (entry.rank == ro::vfs::kMonsterMvpRank) {
     Append(detail, ro::core::Tr("MVP"));
   } else if (entry.rank == ro::vfs::kMonsterBossRank) {

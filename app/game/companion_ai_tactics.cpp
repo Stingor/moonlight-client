@@ -2,13 +2,12 @@
 // fenêtre « Avancé… » changent dans le profil appliqué, et l'enregistrement des
 // profils. Voir `game/companion_ai_stage.h`.
 
-#include <array>
-#include <cstdio>
 #include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/sim/companion_skills.h"
 #include "ro/sim/skill_book.h"
 
@@ -25,9 +24,6 @@ using ro::sim::AiCompanion;
 using ro::sim::CompanionTactic;
 using ro::sim::TacticKey;
 using ro::sim::TacticKeyKind;
-
-// Assez pour « Tactique : » suivi d'un nom de monstre, dans toutes les langues.
-constexpr std::size_t kTitleBytes = 96;
 
 [[nodiscard]] TacticKey MonsterKey(std::uint16_t monster_job) noexcept {
   return TacticKey{.kind = TacticKeyKind::kMonster, .job = monster_job};
@@ -162,10 +158,7 @@ void CompanionAiStage::StageTacticWindow(const HomunculusStage& homunculus,
   }
   const bool homunculus_line = edited_->companion == AiCompanion::kHomunculus;
   CollectOpenings(edited_->companion, homunculus, mercenary, skill_tree, openings_);
-  std::array<char, kTitleBytes> title{};
-  std::snprintf(title.data(), title.size(), ro::core::Tr("Tactique : %s"),
-                edited_->monster_name.c_str());
-  window_title_ = title.data();
+  window_title_ = ro::core::Printed(ro::core::Tr("Tactique : %s"), edited_->monster_name.c_str());
   window_companion_ = homunculus_line ? ro::core::Tr("Homoncule") : ro::core::Tr("Mercenaire");
   const CompanionTactic line =
       TacticFor(edited_->companion, edited_->monster_job)

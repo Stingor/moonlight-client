@@ -1,11 +1,9 @@
 // Les faits d'un objet que son script et la pet_db donnent. Voir
 // `item_db_block.h`.
 
-#include <array>
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
-#include <cstdio>
 #include <limits>
 #include <span>
 #include <string>
@@ -14,6 +12,7 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/equip_attributes.h"
 #include "ro/ui/database_window.h"
 #include "ro/vfs/server_db.h"
@@ -27,7 +26,6 @@ namespace {
 using ro::core::Tr;
 using ro::vfs::ServerItem;
 
-constexpr std::size_t kLineBytes = 256;
 constexpr std::string_view kListSeparator = ", ";
 constexpr std::uint32_t kMsPerSecond = 1000;
 constexpr std::uint32_t kMsPerMinute = 60 * kMsPerSecond;
@@ -152,62 +150,53 @@ constexpr std::size_t kMostNamedPets = 6;
 // ⚠ CHAQUE FORMAT EST UN APPEL À `Tr` SUR UN LITTÉRAL : c'est ce qui laisse le
 // compilateur vérifier ses arguments.
 
-using Text = std::array<char, kLineBytes>;
-
 // « 325 ~ 405 PV, 40 ~ 60 SP », « 5 % des PV » ; vide pour un soin nul.
 [[nodiscard]] std::string HealText(const ScriptHeal& heal) {
   std::vector<std::string> parts;
-  Text text{};
   const auto hp_least = static_cast<unsigned>(heal.hp_least);
   const auto hp_most = static_cast<unsigned>(heal.hp_most);
   const auto sp_least = static_cast<unsigned>(heal.sp_least);
   const auto sp_most = static_cast<unsigned>(heal.sp_most);
   if (heal.percent) {
     if (hp_most > 0) {
-      std::snprintf(text.data(), text.size(), Tr("%u %% des PV"), hp_most);
-      parts.emplace_back(text.data());
+      parts.emplace_back(ro::core::Printed(Tr("%u %% des PV"), hp_most));
     }
     if (sp_most > 0) {
-      std::snprintf(text.data(), text.size(), Tr("%u %% des SP"), sp_most);
-      parts.emplace_back(text.data());
+      parts.emplace_back(ro::core::Printed(Tr("%u %% des SP"), sp_most));
     }
     return Joined(parts);
   }
   if (hp_most > 0) {
     if (hp_least == hp_most) {
-      std::snprintf(text.data(), text.size(), Tr("%u PV"), hp_most);
+      parts.emplace_back(ro::core::Printed(Tr("%u PV"), hp_most));
     } else {
-      std::snprintf(text.data(), text.size(), Tr("%u ~ %u PV"), hp_least, hp_most);
+      parts.emplace_back(ro::core::Printed(Tr("%u ~ %u PV"), hp_least, hp_most));
     }
-    parts.emplace_back(text.data());
   }
   if (sp_most > 0) {
     if (sp_least == sp_most) {
-      std::snprintf(text.data(), text.size(), Tr("%u SP"), sp_most);
+      parts.emplace_back(ro::core::Printed(Tr("%u SP"), sp_most));
     } else {
-      std::snprintf(text.data(), text.size(), Tr("%u ~ %u SP"), sp_least, sp_most);
+      parts.emplace_back(ro::core::Printed(Tr("%u ~ %u SP"), sp_least, sp_most));
     }
-    parts.emplace_back(text.data());
   }
   return Joined(parts);
 }
 
 // Une durée dans la plus grande unité qui la tombe juste.
 [[nodiscard]] std::string DurationText(std::uint32_t duration_ms) {
-  Text text{};
+  std::string text;
   if (duration_ms % kMsPerHour == 0) {
-    std::snprintf(text.data(), text.size(), Tr("%u heure(s)"),
-                  static_cast<unsigned>(duration_ms / kMsPerHour));
+    text = ro::core::Printed(Tr("%u heure(s)"), static_cast<unsigned>(duration_ms / kMsPerHour));
   } else if (duration_ms % kMsPerMinute == 0) {
-    std::snprintf(text.data(), text.size(), Tr("%u minute(s)"),
-                  static_cast<unsigned>(duration_ms / kMsPerMinute));
+    text = ro::core::Printed(Tr("%u minute(s)"), static_cast<unsigned>(duration_ms / kMsPerMinute));
   } else if (duration_ms % kMsPerSecond == 0) {
-    std::snprintf(text.data(), text.size(), Tr("%u seconde(s)"),
-                  static_cast<unsigned>(duration_ms / kMsPerSecond));
+    text =
+        ro::core::Printed(Tr("%u seconde(s)"), static_cast<unsigned>(duration_ms / kMsPerSecond));
   } else {
-    std::snprintf(text.data(), text.size(), Tr("%u ms"), static_cast<unsigned>(duration_ms));
+    text = ro::core::Printed(Tr("%u ms"), static_cast<unsigned>(duration_ms));
   }
-  return text.data();
+  return text;
 }
 
 // Le nom traduit d'un élément, celui du filtre de la base : son rang plus un,
@@ -224,9 +213,7 @@ constexpr std::uint8_t kBonusCommandLevel = 1;
 // Vrai quand le texte d'un bonus est celui d'un type que le client ne sait pas
 // nommer : « Bonus #n », suivi de sa valeur.
 [[nodiscard]] bool Unnamed(std::string_view text, std::uint16_t bonus_type) {
-  Text numbered{};
-  std::snprintf(numbered.data(), numbered.size(), Tr("Bonus #%d"), static_cast<int>(bonus_type));
-  const std::string_view prefix(numbered.data());
+  const std::string prefix = ro::core::Printed(Tr("Bonus #%d"), static_cast<int>(bonus_type));
   return text.starts_with(prefix) && (text.size() == prefix.size() || text[prefix.size()] == ' ');
 }
 
@@ -349,7 +336,7 @@ constexpr std::string_view kItemLinkClose = "</INFO></ITEM>";
 }
 
 [[nodiscard]] ItemDbGiftEffect GiftEffectOf(const ScriptGift& gift, const ItemDbNames& names) {
-  Text text{};
+  std::string text;
   ItemDbGiftEffect effect{.count = gift.count};
   const auto count = static_cast<unsigned>(gift.count);
   switch (gift.kind) {
@@ -362,42 +349,41 @@ constexpr std::string_view kItemLinkClose = "</INFO></ITEM>";
       }
       effect.name = item_id != 0 ? ItemName(item_id, names) : gift.aegis_name;
       const std::string shown = item_id != 0 ? ItemLink(item_id, effect.name) : effect.name;
-      std::snprintf(text.data(), text.size(), Tr("donne %u × %s"), count, shown.c_str());
+      text = ro::core::Printed(Tr("donne %u × %s"), count, shown.c_str());
       break;
     }
     case ScriptGiftKind::kGroup:
       effect.kind = ItemDbGiftKind::kGroup;
       effect.name = ReadableGroup(gift.group);
-      std::snprintf(text.data(), text.size(), Tr("donne des items du groupe %s"),
-                    effect.name.c_str());
+      text = ro::core::Printed(Tr("donne des items du groupe %s"), effect.name.c_str());
       break;
     case ScriptGiftKind::kRandomGroup:
       effect.kind = ItemDbGiftKind::kRandomGroup;
       effect.name = ReadableGroup(gift.group);
-      std::snprintf(text.data(), text.size(), Tr("donne %u item(s) au hasard (groupe %s)"), count,
-                    effect.name.c_str());
+      text = ro::core::Printed(Tr("donne %u item(s) au hasard (groupe %s)"), count,
+                               effect.name.c_str());
       break;
   }
-  effect.text = text.data();
+  effect.text = text;
   return effect;
 }
 
 [[nodiscard]] ItemDbGiftEffect SummonEffectOf(const ScriptSummon& summon,
                                               const ItemDbNames& names) {
-  Text text{};
+  std::string text;
   ItemDbGiftEffect effect{.count = summon.count};
   const auto count = static_cast<unsigned>(summon.count);
   if (summon.monster_id != 0) {
     effect.kind = ItemDbGiftKind::kSummon;
     effect.name = MonsterName(summon.monster_id, names);
-    std::snprintf(text.data(), text.size(), Tr("invoque %u × %s"), count, effect.name.c_str());
+    text = ro::core::Printed(Tr("invoque %u × %s"), count, effect.name.c_str());
   } else {
     effect.kind = ItemDbGiftKind::kSummonGroup;
     effect.name = ReadableGroup(summon.group);
-    std::snprintf(text.data(), text.size(), Tr("invoque %u monstre(s) au hasard (groupe %s)"),
-                  count, effect.name.c_str());
+    text = ro::core::Printed(Tr("invoque %u monstre(s) au hasard (groupe %s)"), count,
+                             effect.name.c_str());
   }
-  effect.text = text.data();
+  effect.text = text;
   return effect;
 }
 
@@ -415,16 +401,13 @@ std::string QualifiedKind(std::string_view kind, const ServerItem& item) {
       }
     }
   }
-  Text text{};
   std::string shown(kind);
   if (!category.empty()) {
-    std::snprintf(text.data(), text.size(), Tr("%s — %s"), shown.c_str(), category.c_str());
-    shown = text.data();
+    shown = ro::core::Printed(Tr("%s — %s"), shown.c_str(), category.c_str());
   }
   if (!qualifiers.empty()) {
     const std::string joined = Joined(qualifiers);
-    std::snprintf(text.data(), text.size(), Tr("%s (%s)"), shown.c_str(), joined.c_str());
-    shown = text.data();
+    shown = ro::core::Printed(Tr("%s (%s)"), shown.c_str(), joined.c_str());
   }
   return shown;
 }
@@ -501,9 +484,8 @@ void AppendItemDbScriptFacts(std::vector<std::string>& lines, const ServerItem& 
     if (fed.size() <= kMostNamedPets) {
       lines.push_back(ItemDbLabelled(Tr("Nourrit :"), MonsterNames(fed, names)));
     } else {
-      Text count{};
-      std::snprintf(count.data(), count.size(), Tr("%zu familiers"), fed.size());
-      lines.push_back(ItemDbLabelled(Tr("Nourrit :"), count.data()));
+      lines.push_back(
+          ItemDbLabelled(Tr("Nourrit :"), ro::core::Printed(Tr("%zu familiers"), fed.size())));
     }
   }
 }

@@ -1,11 +1,10 @@
 #include "game/adoption_stage.h"
 
-#include <array>
-#include <cstdio>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/adoption.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/world.h"
@@ -18,19 +17,14 @@ using ro::core::Tr;
 // La couleur d'un refus dans la conversation.
 constexpr std::uint32_t kFailedColor = 0xFF0000;
 
-// Assez pour la question et le plus long des noms.
-constexpr std::size_t kQuestionBytes = 512;
-
 }  // namespace
 
 std::string AdoptionQuestion(std::string_view parent_name) {
-  std::array<char, kQuestionBytes> question{};
   const std::string name(parent_name);
-  std::snprintf(question.data(), question.size(),
-                Tr("%s et son conjoint veulent vous adopter. Accepter, c'est devenir pour toujours "
-                   "un bébé de votre classe. Accepter ?"),
-                name.c_str());
-  return question.data();
+  return ro::core::Printed(
+      Tr("%s et son conjoint veulent vous adopter. Accepter, c'est devenir pour toujours "
+         "un bébé de votre classe. Accepter ?"),
+      name.c_str());
 }
 
 const char* AdoptionRefusalText(ro::sim::AdoptionRefusal refusal) {

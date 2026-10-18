@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <string>
 #include <utility>
 
@@ -10,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/sim/equip_location.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
@@ -326,12 +326,11 @@ void CardAlbumView::ReportAnswer(std::uint32_t now_ms) {
     if (last_chained_ && last_command_ == CardAlbumCommand::kPut) {
       // Le sacrifice a eu lieu, le dépôt qui suivait non : les deux se disent,
       // sinon le joueur croit avoir perdu sa carte pour rien.
-      std::array<char, 384> text = {};
-      std::snprintf(text.data(), text.size(),
-                    Tr("%s : pochette DÉBLOQUÉE, mais les copies restantes n'ont pas été rangées "
-                       ": %s"),
-                    name.c_str(), ResultText(result));
-      Report(text.data(), CardAlbumTone::kWarning, now_ms);
+      Report(ro::core::Printed(
+                 Tr("%s : pochette DÉBLOQUÉE, mais les copies restantes n'ont pas été rangées "
+                    ": %s"),
+                 name.c_str(), ResultText(result)),
+             CardAlbumTone::kWarning, now_ms);
     } else {
       Report(ResultText(result), CardAlbumTone::kRefusal, now_ms);
     }
@@ -344,39 +343,34 @@ void CardAlbumView::ReportAnswer(std::uint32_t now_ms) {
       if (unsolicited_reserve_ <= 0 && unsolicited_unlocked_ <= 0) {
         return;
       }
-      std::array<char, 256> text = {};
-      std::snprintf(text.data(), text.size(),
-                    Tr("Album mis à jour : %lld copie(s) rangée(s), %d pochette(s) ouverte(s)."),
-                    static_cast<long long>(unsolicited_reserve_), unsolicited_unlocked_);
-      Report(text.data(), CardAlbumTone::kDone, now_ms);
+      Report(ro::core::Printed(
+                 Tr("Album mis à jour : %lld copie(s) rangée(s), %d pochette(s) ouverte(s)."),
+                 static_cast<long long>(unsolicited_reserve_), unsolicited_unlocked_),
+             CardAlbumTone::kDone, now_ms);
       return;
     }
     case CardAlbumCommand::kUnlock: {
-      std::array<char, 256> text = {};
-      std::snprintf(text.data(), text.size(),
-                    Tr("%s : pochette DÉBLOQUÉE. Vous pouvez désormais y ranger vos copies."),
-                    name.c_str());
-      Report(text.data(), CardAlbumTone::kDone, now_ms);
+      Report(ro::core::Printed(
+                 Tr("%s : pochette DÉBLOQUÉE. Vous pouvez désormais y ranger vos copies."),
+                 name.c_str()),
+             CardAlbumTone::kDone, now_ms);
       return;
     }
     case CardAlbumCommand::kPut:
     case CardAlbumCommand::kGet: {
       // ⚠ LE FORMAT RESTE UN LITTÉRAL traduit, à même l'appel : c'est ce qui
       // laisse le compilateur vérifier ses arguments.
-      std::array<char, 256> text = {};
+      std::string text;
       const auto amount = static_cast<long long>(last_amount_);
       if (last_command_ == CardAlbumCommand::kGet) {
-        std::snprintf(text.data(), text.size(), Tr("%s : %lld reprise(s) de l'album."),
-                      name.c_str(), amount);
+        text = ro::core::Printed(Tr("%s : %lld reprise(s) de l'album."), name.c_str(), amount);
       } else if (last_chained_) {
-        std::snprintf(text.data(), text.size(),
-                      Tr("%s : pochette DÉBLOQUÉE, et %lld copie(s) rangée(s)."), name.c_str(),
-                      amount);
+        text = ro::core::Printed(Tr("%s : pochette DÉBLOQUÉE, et %lld copie(s) rangée(s)."),
+                                 name.c_str(), amount);
       } else {
-        std::snprintf(text.data(), text.size(), Tr("%s : %lld rangée(s) dans l'album."),
-                      name.c_str(), amount);
+        text = ro::core::Printed(Tr("%s : %lld rangée(s) dans l'album."), name.c_str(), amount);
       }
-      Report(text.data(), CardAlbumTone::kDone, now_ms);
+      Report(text, CardAlbumTone::kDone, now_ms);
       return;
     }
     case CardAlbumCommand::kClose:
@@ -464,12 +458,12 @@ void CardAlbumView::Apply(const ro::ui::CardAlbumWindowAction& asked, ro::net::C
   }
   const std::string card = ShortName(staff.card_id);
   bool written = false;
-  std::array<char, 256> text = {};
+  std::string text;
   if (staff.cancel) {
     written = delta_.Clear(staff.album_id, staff.card_id);
-    std::snprintf(text.data(), text.size(), "%s",
-                  written ? Tr("Demande annulée.")
-                          : Tr("Annulation NON écrite : voir le dossier savedata et le journal."));
+    text = ro::core::Printed(
+        "%s", written ? Tr("Demande annulée.")
+                      : Tr("Annulation NON écrite : voir le dossier savedata et le journal."));
   } else {
     const bool remove = staff.intent == ro::ui::CardAlbumIntent::kRemove;
     written = delta_.Set(AlbumDeltaEntry{
@@ -478,18 +472,17 @@ void CardAlbumView::Apply(const ro::ui::CardAlbumWindowAction& asked, ro::net::C
         .action = remove ? AlbumDeltaAction::kRemove : AlbumDeltaAction::kAdd,
         .rate = std::clamp(staff.rate, ro::ui::kCardAlbumRateLeast, ro::ui::kCardAlbumRateMost)});
     if (written) {
-      std::snprintf(text.data(), text.size(),
-                    remove ? Tr("Demandé : RETIRER %s de %s. Reste à lancer le script.")
-                           : Tr("Demandé : AJOUTER %s à %s. Reste à lancer le script."),
-                    card.c_str(), album_name.c_str());
+      text = ro::core::Printed(remove ? Tr("Demandé : RETIRER %s de %s. Reste à lancer le script.")
+                                      : Tr("Demandé : AJOUTER %s à %s. Reste à lancer le script."),
+                               card.c_str(), album_name.c_str());
     } else {
       // 🔴 LE DIRE : l'état d'avant est rétabli, le macaron d'attente ne
       // paraîtra donc pas — sans message, le geste aurait l'air ignoré.
-      std::snprintf(text.data(), text.size(), "%s",
-                    Tr("Bon de travail NON écrit : voir le dossier savedata et le journal."));
+      text = ro::core::Printed(
+          "%s", Tr("Bon de travail NON écrit : voir le dossier savedata et le journal."));
     }
   }
-  staff_notice_ = text.data();
+  staff_notice_ = text;
   staff_notice_ok_ = written;
   staff_notice_ms_ = now_ms;
   staff_notice_live_ = true;

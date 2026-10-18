@@ -6,11 +6,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <limits>
 #include <string>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 #include "game/companion_ai_yaml.h"
 
@@ -51,7 +51,6 @@ static_assert(kGenericKinds[ro::ui::kTacticGenericChests] == TacticKeyKind::kChe
 static_assert(kGenericKinds[ro::ui::kTacticGenericStill] == TacticKeyKind::kStill);
 static_assert(kGenericKinds[ro::ui::kTacticGenericMinions] == TacticKeyKind::kMinion);
 
-constexpr std::size_t kLineBytes = 192;
 // Un identifiant de skill, de statut ou de classe : seize bits.
 constexpr int kIdMost = std::numeric_limits<std::uint16_t>::max();
 // LA RÈGLE D'USINE : sous ce pour cent de ses PV, le compagnon revient.
@@ -242,20 +241,15 @@ CompanionRule DefaultCompanionRule() {
 
 std::string RejectedRuleLine(const RejectedRule& rejected) {
   std::string why;
-  std::array<char, kLineBytes> named{};
   switch (rejected.why) {
     case RuleRejection::kNotARule:
       why = ro::core::Tr("illisible");
       break;
     case RuleRejection::kUnknownWord:
-      std::snprintf(named.data(), named.size(), ro::core::Tr("mot inconnu pour « %s »"),
-                    rejected.field.c_str());
-      why = named.data();
+      why = ro::core::Printed(ro::core::Tr("mot inconnu pour « %s »"), rejected.field.c_str());
       break;
     case RuleRejection::kBadNumber:
-      std::snprintf(named.data(), named.size(), ro::core::Tr("nombre illisible pour « %s »"),
-                    rejected.field.c_str());
-      why = named.data();
+      why = ro::core::Printed(ro::core::Tr("nombre illisible pour « %s »"), rejected.field.c_str());
       break;
     case RuleRejection::kNoCondition:
       why = ro::core::Tr("aucune condition");
@@ -270,10 +264,8 @@ std::string RejectedRuleLine(const RejectedRule& rejected) {
       why = ro::core::Tr("au-delà de la dernière règle permise");
       break;
   }
-  std::array<char, kLineBytes> line{};
-  std::snprintf(line.data(), line.size(), ro::core::Tr("Règle %d du fichier : %s"),
-                static_cast<int>(rejected.position + 1), why.c_str());
-  return line.data();
+  return ro::core::Printed(ro::core::Tr("Règle %d du fichier : %s"),
+                           static_cast<int>(rejected.position + 1), why.c_str());
 }
 
 }  // namespace moonclient

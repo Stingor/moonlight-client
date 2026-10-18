@@ -2,12 +2,12 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/vfs/monster_words.h"
 
 namespace moonclient {
@@ -22,10 +22,6 @@ constexpr std::string_view kMapFileExtension = ".gat";
 
 // Les cinq Gardiens de forteresse que le jeu refuse de montrer.
 constexpr std::array<std::uint32_t, 5> kGuardianClasses = {1285, 1286, 1287, 1829, 1830};
-
-// Le nom qu'une compétence prend quand ni l'installation ni le serveur n'en
-// donnent : son numéro.
-constexpr std::size_t kSkillNumberBytes = 16;
 
 // Le rang d'arrivée d'une fiche tirée de la base, qu'aucune réponse ne porte.
 constexpr std::uint32_t kBaseArrival = UINT32_MAX;
@@ -291,9 +287,7 @@ void MonsterSheet::ComposeLists(const ro::sim::MonsterSheet& sheet) {
     } else if (!skill.server_name.empty()) {
       shown.name = skill.server_name;
     } else {
-      std::array<char, kSkillNumberBytes> number{};
-      std::snprintf(number.data(), number.size(), "#%u", static_cast<unsigned>(skill.skill_id));
-      shown.name = number.data();
+      shown.name = ro::core::Printed("#%u", static_cast<unsigned>(skill.skill_id));
     }
     // ⚠ LE NOM ET LA DESCRIPTION VIVENT DANS DEUX FICHIERS DIFFÉRENTS : une
     // compétence peut avoir l'un sans l'autre, et c'est le cas courant des

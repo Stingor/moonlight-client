@@ -1,8 +1,6 @@
 #include "game/cash_shop_stage.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <span>
 #include <string_view>
 #include <utility>
@@ -10,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/cash_shop.h"
 #include "ro/vfs/cash_shop_words.h"
 
@@ -30,8 +29,6 @@ constexpr std::uint32_t kMenuTab = 0;
 // Le préfixe que la boutique retire du nom : l'onglet et la vignette disent
 // déjà qu'on est dans les costumes.
 constexpr std::string_view kCostumePrefix = "Costume ";
-
-constexpr std::size_t kNumberBytes = 16;
 
 // ── LES RÉSULTATS D'ACHAT DU SERVEUR, et le message que le client en tire ───
 //
@@ -183,9 +180,7 @@ std::string_view CashShopStage::NameOf(std::uint32_t item_id) {
       }
       found->second = std::string(name);
     } else {
-      std::array<char, kNumberBytes> text{};
-      std::snprintf(text.data(), text.size(), "#%u", static_cast<unsigned>(item_id));
-      found->second = text.data();
+      found->second = ro::core::Printed("#%u", static_cast<unsigned>(item_id));
     }
   }
   return found->second;

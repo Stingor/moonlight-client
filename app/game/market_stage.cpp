@@ -2,14 +2,13 @@
 
 #include "game/market_stage.h"
 
-#include <array>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/core/search_key.h"
 #include "ro/net/market.h"
 #include "ro/render/game_images.h"
@@ -22,8 +21,6 @@
 namespace moonclient {
 namespace {
 
-// La place d'une ligne composée par `snprintf`.
-constexpr std::size_t kLineBytes = 160;
 // Les lettres des grades, du premier au quatrième.
 constexpr std::string_view kGradeLetters = "DCBA";
 
@@ -109,10 +106,7 @@ std::string RefusalText(ro::sim::MarketStatus status) {
 }
 
 std::string PlaceOf(const ro::sim::MarketOffer& offer) {
-  std::array<char, kLineBytes> text{};
-  std::snprintf(text.data(), text.size(), "%s %d,%d", offer.map_name.c_str(), offer.cell_x,
-                offer.cell_y);
-  return text.data();
+  return ro::core::Printed("%s %d,%d", offer.map_name.c_str(), offer.cell_x, offer.cell_y);
 }
 
 }  // namespace
@@ -120,21 +114,17 @@ std::string PlaceOf(const ro::sim::MarketOffer& offer) {
 std::vector<std::string> MarketDetailsOf(const ro::sim::MarketOffer& offer, const TradeItems& items,
                                          const ro::vfs::RandomOptionNames* options) {
   std::vector<std::string> lines;
-  std::array<char, kLineBytes> text{};
   if (!ro::sim::ItemIsForged(offer.item)) {
     for (const std::uint32_t card : offer.item.cards) {
       if (card == 0) {
         continue;
       }
-      std::snprintf(text.data(), text.size(), ro::core::Tr("Carte : %s"),
-                    items.NameOf(card).c_str());
-      lines.emplace_back(text.data());
+      lines.emplace_back(ro::core::Printed(ro::core::Tr("Carte : %s"), items.NameOf(card).c_str()));
     }
   }
   if (offer.item.grade > 0 && offer.item.grade <= kGradeLetters.size()) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("Grade : %c"),
-                  kGradeLetters[offer.item.grade - 1U]);
-    lines.emplace_back(text.data());
+    lines.emplace_back(
+        ro::core::Printed(ro::core::Tr("Grade : %c"), kGradeLetters[offer.item.grade - 1U]));
   }
   for (const ro::sim::ItemOption& option : offer.item.options) {
     if (!option.filled()) {
@@ -143,9 +133,8 @@ std::vector<std::string> MarketDetailsOf(const ro::sim::MarketOffer& offer, cons
     std::string shown =
         options != nullptr ? options->Format(option.id, option.value) : std::string();
     if (shown.empty()) {
-      std::snprintf(text.data(), text.size(), ro::core::Tr("Option %d : %d"),
-                    static_cast<int>(option.id), static_cast<int>(option.value));
-      shown = text.data();
+      shown = ro::core::Printed(ro::core::Tr("Option %d : %d"), static_cast<int>(option.id),
+                                static_cast<int>(option.value));
     }
     lines.push_back(std::move(shown));
   }
@@ -409,22 +398,17 @@ void MarketStage::Compose(const ro::ui::MarketWindowState& state, const TradeCon
   ComposeRows(offers, page_ranks_, market_.search().kind(), 0, context, rows_);
   ComposeRows(store, store_ranks_, market_.store().kind(), page_ranks_.size(), context,
               store_rows_);
-  std::array<char, kLineBytes> text{};
   if (market_.search().waiting()) {
     summary_ = ro::core::Tr("Recherche en cours…");
   } else if (comparing_.has_value() && !comparing_->owner_name.empty()) {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("%d offres, comparées à l'échoppe de %s"),
-                  static_cast<int>(offers.size()), comparing_->owner_name.c_str());
-    summary_ = text.data();
+    summary_ = ro::core::Printed(ro::core::Tr("%d offres, comparées à l'échoppe de %s"),
+                                 static_cast<int>(offers.size()), comparing_->owner_name.c_str());
   } else if (market_.search().truncated()) {
-    std::snprintf(text.data(), text.size(),
-                  ro::core::Tr("%d offres, les meilleures seulement : précisez la recherche."),
-                  static_cast<int>(offers.size()));
-    summary_ = text.data();
+    summary_ = ro::core::Printed(
+        ro::core::Tr("%d offres, les meilleures seulement : précisez la recherche."),
+        static_cast<int>(offers.size()));
   } else {
-    std::snprintf(text.data(), text.size(), ro::core::Tr("%d offres"),
-                  static_cast<int>(offers.size()));
-    summary_ = text.data();
+    summary_ = ro::core::Printed(ro::core::Tr("%d offres"), static_cast<int>(offers.size()));
   }
   view_ = ro::ui::MarketView{
       .rows = rows_,

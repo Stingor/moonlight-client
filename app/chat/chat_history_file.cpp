@@ -1,18 +1,16 @@
 #include "chat/chat_history_file.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <span>
 #include <system_error>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/decimal_text.h"
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 #include "chat/chat_tabs.h"
 #include "game/yaml_load.h"
@@ -210,12 +208,10 @@ bool SaveChatHistory(const std::filesystem::path& client_root,
   out << YAML::Key << kLinesField << YAML::Value << YAML::BeginSeq;
   for (std::size_t rank = first; rank < lines.size(); ++rank) {
     const PastChatLine& line = lines[rank];
-    // Trois nombres, que le tampon tient même à leur pire valeur.
-    std::array<char, 3 * ro::core::kDecimalTextBytes<int>> at{};
-    std::snprintf(at.data(), at.size(), "%02d:%02d:%02d", line.hour, line.minute, line.second);
     out << YAML::BeginMap;
     out << YAML::Key << kTypeField << YAML::Value << static_cast<int>(line.type);
-    out << YAML::Key << kTimeField << YAML::Value << std::string(at.data());
+    out << YAML::Key << kTimeField << YAML::Value
+        << ro::core::Printed("%02d:%02d:%02d", line.hour, line.minute, line.second);
     out << YAML::Key << kTextField << YAML::Value << line.text;
     // ⚠ ÉCRITE SEULEMENT QUAND IL Y EN A UNE. Un « couleur: 0 » sur chaque
     // ligne alourdirait un fichier que le joueur peut ouvrir, pour dire

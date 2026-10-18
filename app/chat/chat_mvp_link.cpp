@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
+#include "ro/core/printed.h"
 #include "ro/core/text.h"
 #include "ro/net/mvp_tracker.h"
 
@@ -38,10 +39,6 @@ constexpr std::int64_t kSecondsPerMinute = 60;
 constexpr std::int64_t kMsPerSecond = 1000;
 // Le libellé composé : le nom, la carte et deux heures y tiennent largement.
 constexpr std::size_t kMvpLabelBytes = 224;
-// « HH:MM » et son zéro final, avec de la marge.
-constexpr std::size_t kClockBytes = 16;
-// « , tombe en x,y » et son zéro final, avec de la marge.
-constexpr std::size_t kTombBytes = 48;
 constexpr std::string_view kSenderMark = " :";
 
 constexpr std::int64_t kDecimalBase = 10;
@@ -115,10 +112,8 @@ constexpr std::int64_t kDecimalBase = 10;
   if (link.tomb_x < 0 || link.tomb_y < 0 || text.empty() || text.back() != ']') {
     return text;
   }
-  std::array<char, kTombBytes> tomb{};
-  std::snprintf(tomb.data(), tomb.size(), ro::core::Tr(", tombe en %d,%d"), link.tomb_x,
-                link.tomb_y);
-  text.insert(text.size() - 1, tomb.data());
+  text.insert(text.size() - 1,
+              ro::core::Printed(ro::core::Tr(", tombe en %d,%d"), link.tomb_x, link.tomb_y));
   return text;
 }
 
@@ -232,9 +227,7 @@ std::string MvpClockText(std::int64_t unix_s) {
   if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-  std::array<char, kClockBytes> text{};
-  std::snprintf(text.data(), text.size(), "%02d:%02d", local.tm_hour, local.tm_min);
-  return text.data();
+  return ro::core::Printed("%02d:%02d", local.tm_hour, local.tm_min);
 }
 
 // CE QU'ON MET EN TÊTE, C'EST LE RETOUR : c'est la question posée. L'heure de

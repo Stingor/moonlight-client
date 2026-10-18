@@ -1,6 +1,5 @@
 #include "character/preset_view.h"
 
-#include <array>
 #include <cstdio>
 #include <optional>
 #include <span>
@@ -9,6 +8,7 @@
 #include "ro/core/error.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/inventory.h"
 #include "ro/sim/world.h"
 #include "ro/vfs/item_name.h"
@@ -233,9 +233,7 @@ std::string PresetView::PieceName(const PresetPiece& piece) const {
   if (piece.refine_level <= 0) {
     return bare;
   }
-  std::array<char, 16> refine = {};
-  std::snprintf(refine.data(), refine.size(), "+%d ", piece.refine_level);
-  return std::string(refine.data()) + bare;
+  return ro::core::Printed("+%d ", piece.refine_level) + bare;
 }
 
 ro::ui::SkinImage PresetView::PieceIcon(std::uint32_t item_id) const {

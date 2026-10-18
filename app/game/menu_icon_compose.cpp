@@ -3,20 +3,16 @@
 #include "game/menu_icon_compose.h"
 
 #include <algorithm>
-#include <array>
-#include <cstddef>
-#include <cstdio>
 #include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
 
 using ro::ui::MenuCommand;
-
-constexpr std::size_t kQueuedLabelCapacity = 128;
 
 // LA CARTE OÙ LE JEU NE POSE PAS LE BOUTON DU VOTE SHOP, quel que soit
 // `/cashshop` : celle de son évènement.
@@ -157,10 +153,8 @@ void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameI
     // infobulle nomme le terrain.
     if (entry.command == MenuCommand::kBattleground && facts.battleground_queued) {
       icon.dot_lit = true;
-      std::array<char, kQueuedLabelCapacity> label{};
-      std::snprintf(label.data(), label.size(), ro::core::Tr("En file : %s"),
-                    std::string(facts.battleground_queued_name).c_str());
-      icon.label = label.data();
+      icon.label = ro::core::Printed(ro::core::Tr("En file : %s"),
+                                     std::string(facts.battleground_queued_name).c_str());
     }
     // DES POINTS À PLACER : la même pastille, sans infobulle à elle.
     if ((entry.command == MenuCommand::kStatus && facts.status_points_waiting) ||

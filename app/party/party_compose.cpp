@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
-#include <cstdio>
 #include <span>
 #include <utility>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -244,10 +244,8 @@ void PartyViews::ComposeFakeTiles(const PartyComposeInput& input, PartyLens& len
   fake_names_.clear();
   fake_names_.reserve(kFakeMembers.size());
   for (std::size_t rank = 0; rank < kFakeMembers.size(); ++rank) {
-    std::array<char, 64> name{};
-    std::snprintf(name.data(), name.size(), ro::core::Tr("Membre fictif %d"),
-                  static_cast<int>(rank + 1));
-    fake_names_.emplace_back(name.data());
+    fake_names_.emplace_back(
+        ro::core::Printed(ro::core::Tr("Membre fictif %d"), static_cast<int>(rank + 1)));
   }
   for (std::size_t rank = 0; rank < kFakeMembers.size(); ++rank) {
     const FakeMember& fake = kFakeMembers[rank];

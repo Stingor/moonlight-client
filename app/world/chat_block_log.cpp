@@ -1,13 +1,12 @@
 #include "world/chat_block_log.h"
 
-#include <array>
-#include <cstdio>
 #include <ctime>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
@@ -19,10 +18,6 @@ using ro::ui::ChatBlockLogPhase;
 // `std::tm` compte les années depuis 1900 et les mois depuis zéro.
 constexpr int kFirstYear = 1900;
 constexpr int kFirstMonth = 1;
-// « 2026-10-11 15:41 », et de la marge.
-constexpr std::size_t kDateBytes = 32;
-// « 2147483647 min », traduit, et de la marge.
-constexpr std::size_t kDurationBytes = 48;
 
 [[nodiscard]] ChatBlockLogPhase PhaseOf(ChatBlocksStatus status) {
   switch (status) {
@@ -48,10 +43,8 @@ std::string ChatBlockDateText(std::uint32_t date_s) {
   if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-  std::array<char, kDateBytes> text{};
-  std::snprintf(text.data(), text.size(), "%04d-%02d-%02d %02d:%02d", local.tm_year + kFirstYear,
-                local.tm_mon + kFirstMonth, local.tm_mday, local.tm_hour, local.tm_min);
-  return text.data();
+  return ro::core::Printed("%04d-%02d-%02d %02d:%02d", local.tm_year + kFirstYear,
+                           local.tm_mon + kFirstMonth, local.tm_mday, local.tm_hour, local.tm_min);
 }
 
 ro::ui::ChatBlockLogRow ChatBlockRowOf(const ro::net::ChatBlock& block) {
@@ -63,9 +56,7 @@ ro::ui::ChatBlockLogRow ChatBlockRowOf(const ro::net::ChatBlock& block) {
     return row;
   }
   row.command = "@mute";
-  std::array<char, kDurationBytes> duration{};
-  std::snprintf(duration.data(), duration.size(), Tr("%d min"), block.minutes);
-  row.duration = duration.data();
+  row.duration = ro::core::Printed(Tr("%d min"), block.minutes);
   return row;
 }
 

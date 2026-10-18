@@ -1,8 +1,6 @@
 #include "game/homunculus_stage.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <utility>
@@ -11,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/core/text.h"
 #include "ro/net/chat_target.h"
 #include "ro/net/homunculus_frames.h"
@@ -29,8 +28,6 @@ constexpr std::uint32_t kStarvingColor = 0xFF0000;
 constexpr std::uint32_t kFedColor = 0x64FFFF;
 constexpr std::uint32_t kNotFedColor = 0xF51E1E;
 constexpr std::uint32_t kAutoFeedColor = 0xFFFF64;
-// Assez pour la fin de la ligne d'alerte de faim, dans toutes les langues.
-constexpr std::size_t kHungerLineBytes = 96;
 // L'émoticône que l'homoncule montre quand on n'a rien à lui donner : la
 // goutte de sueur, que le client joue lui-même.
 constexpr std::uint16_t kEmotionSweat = 4;
@@ -62,7 +59,6 @@ void Say(ro::sim::World& world, std::string text, std::uint32_t color, std::uint
 
 void WriteEcho(const ro::net::HomunculusEcho& echo, ro::sim::World& world, const GamePieces& pieces,
                std::uint32_t homunculus_id, std::uint32_t now_ms) {
-  std::array<char, 256> line = {};
   switch (echo.kind) {
     case ro::net::HomunculusEchoKind::kNone:
       return;
@@ -73,16 +69,17 @@ void WriteEcho(const ro::net::HomunculusEcho& echo, ro::sim::World& world, const
     case ro::net::HomunculusEchoKind::kFed:
       // ⚠ LE SAC A DÉJÀ PERDU LA NOURRITURE : le serveur la retire avant
       // d'accuser, et le compte dit ce qui reste.
-      std::snprintf(
-          line.data(), line.size(), ro::core::Tr("L'homoncule a été nourri. [%s] - il en reste %d"),
-          ItemName(pieces, echo.item_id).c_str(), world.inventory().AmountOf(echo.item_id));
-      Say(world, line.data(), kFedColor, now_ms);
+      Say(world,
+          ro::core::Printed(ro::core::Tr("L'homoncule a été nourri. [%s] - il en reste %d"),
+                            ItemName(pieces, echo.item_id).c_str(),
+                            world.inventory().AmountOf(echo.item_id)),
+          kFedColor, now_ms);
       return;
     case ro::net::HomunculusEchoKind::kNotFed:
-      std::snprintf(line.data(), line.size(),
-                    ro::core::Tr("La nourriture [%s] n'est pas disponible."),
-                    ItemName(pieces, echo.item_id).c_str());
-      Say(world, line.data(), kNotFedColor, now_ms);
+      Say(world,
+          ro::core::Printed(ro::core::Tr("La nourriture [%s] n'est pas disponible."),
+                            ItemName(pieces, echo.item_id).c_str()),
+          kNotFedColor, now_ms);
       if (homunculus_id != 0) {
         world.RecordEmotion(homunculus_id,
                             ro::sim::Emotion{ro::sim::kBaseEmotionPack, kEmotionSweat}, now_ms);
@@ -222,10 +219,11 @@ void HomunculusStage::Apply(const ro::ui::HomunculusTabAction& asked, ro::net::C
   // LA FAIM QUI DESCEND AU PALIER où il perd de l'intimité : le bandeau le dit.
   const ro::sim::HomunculusSheet& sheet = homunculus_.sheet();
   if (hunger_alarm_.Observe(homunculus_.present() && homunculus_.sheet_known(), sheet.hunger)) {
-    std::array<char, kHungerLineBytes> suffix{};
-    std::snprintf(suffix.data(), suffix.size(), ro::core::Tr("a faim : %d / %d."), sheet.hunger,
-                  ro::sim::kHomunculusHungerMost);
-    hunger_notice_ = ToastNotice{.name = sheet.name, .suffix = std::string(" ") + suffix.data()};
+    hunger_notice_ =
+        ToastNotice{.name = sheet.name,
+                    .suffix = std::string(" ") +
+                              ro::core::Printed(ro::core::Tr("a faim : %d / %d."), sheet.hunger,
+                                                ro::sim::kHomunculusHungerMost)};
   }
   switch (asked.verb) {
     case ro::ui::HomunculusVerb::kNothing:

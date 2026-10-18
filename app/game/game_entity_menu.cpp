@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/adoption.h"
 #include "ro/net/friends.h"
 #include "ro/net/guild.h"
@@ -44,7 +45,7 @@ using ro::core::Tr;
 // péri.
 constexpr std::uint32_t kMenuAskLifeMs = 500;
 
-// Assez pour l'identité de pick la plus longue, et pour une phrase de blocage.
+// Assez pour l'identité de pick la plus longue.
 constexpr std::size_t kLineBytes = 256;
 
 // La saisie des minutes d'un point de manière ne doit pas promettre plus que le
@@ -409,9 +410,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     // Les octets en clair : un caractère invisible ne se voit pas autrement.
     std::string bytes;
     for (const char byte : name) {
-      std::array<char, 4> hex{};
-      std::snprintf(hex.data(), hex.size(), "%02X ", static_cast<unsigned char>(byte));
-      bytes += hex.data();
+      bytes += ro::core::Printed("%02X ", static_cast<unsigned char>(byte));
     }
     ro::core::LogInfo("menu d'entité : demande par le nom pour {} — « {} » [{}], menu : « {} »", id,
                       name, bytes, menu_target_.name);
@@ -483,11 +482,11 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       // Le serveur ne répond qu'à trois refus ; une demande transmise ne se
       // voit que chez l'adopté. Le dire ici est donc la seule trace du geste.
       ReportRefusal(ro::net::RequestAdoption(link_, id));
-      std::array<char, kLineBytes> line{};
-      std::snprintf(line.data(), line.size(),
-                    Tr("Demande d'adoption envoyée à %s : il lui reste à l'accepter."),
-                    name.c_str());
-      world_.RecordChat(ro::sim::ChatKind::kServer, 0, line.data(), now_ms, kClientSaysColor);
+      world_.RecordChat(
+          ro::sim::ChatKind::kServer, 0,
+          ro::core::Printed(Tr("Demande d'adoption envoyée à %s : il lui reste à l'accepter."),
+                            name.c_str()),
+          now_ms, kClientSaysColor);
       return;
     }
     case EntityVerb::kAutolootAdd:
@@ -599,20 +598,20 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     }
     case EntityVerb::kInspect: {
       // En tête de la fenêtre : la famille, le nom, et l'identifiant demandé.
-      std::array<char, kLineBytes> subject{};
-      std::snprintf(subject.data(), subject.size(), Tr("%s — %s — identifiant %u"),
-                    EntityFamilyLabel(menu_target_.family),
-                    name.empty() ? Tr("(nom inconnu)") : name.c_str(), id);
-      pieces_.entity_inspector.Open(windows_.entity_inspector.state, id, subject.data(),
-                                    world_.map_name(), now_ms);
+      pieces_.entity_inspector.Open(
+          windows_.entity_inspector.state, id,
+          ro::core::Printed(Tr("%s — %s — identifiant %u"), EntityFamilyLabel(menu_target_.family),
+                            name.empty() ? Tr("(nom inconnu)") : name.c_str(), id),
+          world_.map_name(), now_ms);
       return;
     }
     case EntityVerb::kChatBlockLog: {
       // En tête de la fenêtre : le nom du personnage, et l'AID demandé.
-      std::array<char, kLineBytes> subject{};
-      std::snprintf(subject.data(), subject.size(), Tr("%s — AID %u"),
-                    name.empty() ? Tr("(nom inconnu)") : name.c_str(), id);
-      pieces_.chat_block_log.Open(windows_.chat_block_log.state, id, subject.data(), now_ms);
+      pieces_.chat_block_log.Open(
+          windows_.chat_block_log.state, id,
+          ro::core::Printed(Tr("%s — AID %u"), name.empty() ? Tr("(nom inconnu)") : name.c_str(),
+                            id),
+          now_ms);
       return;
     }
     case EntityVerb::kMarketCompare:
@@ -753,20 +752,18 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
 void Game::ToggleNpcBlock(std::uint32_t id, const std::string& name, std::uint32_t now_ms) {
   const bool blocked = settings_->ToggleBlockedNpc(id, name);
   const std::string who = BlockedNpcLabel(id, name);
-  std::array<char, kLineBytes> line{};
+  std::string line;
   if (blocked) {
     // Marqué comme déjà expliqué : la phrase qui suit dit tout, et le premier
     // clic de vérification ne doit pas la redire deux secondes plus tard.
     static_cast<void>(settings_->options().context_menu().blocked().FirstExplanation(id));
-    std::snprintf(line.data(), line.size(),
-                  Tr("%s : le clic gauche ne fait plus rien sur lui. Clic droit pour le "
-                     "débloquer ou lui parler."),
-                  who.c_str());
+    line = ro::core::Printed(Tr("%s : le clic gauche ne fait plus rien sur lui. Clic droit pour le "
+                                "débloquer ou lui parler."),
+                             who.c_str());
   } else {
-    std::snprintf(line.data(), line.size(), Tr("%s : le clic gauche est de nouveau actif."),
-                  who.c_str());
+    line = ro::core::Printed(Tr("%s : le clic gauche est de nouveau actif."), who.c_str());
   }
-  world_.RecordChat(ro::sim::ChatKind::kServer, 0, line.data(), now_ms, kClientSaysColor);
+  world_.RecordChat(ro::sim::ChatKind::kServer, 0, line, now_ms, kClientSaysColor);
 }
 
 }  // namespace moonclient

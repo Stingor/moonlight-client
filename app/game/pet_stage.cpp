@@ -1,13 +1,12 @@
 #include "game/pet_stage.h"
 
-#include <array>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/core/text.h"
 #include "ro/net/pet_frames.h"
 #include "ro/sim/pet_egg.h"
@@ -27,10 +26,6 @@ constexpr std::uint32_t kNoFoodColor = 0xF51E1E;
 constexpr std::uint32_t kRefusalColor = 0xFF0000;
 // Celle de l'accusé d'un repas pris.
 constexpr std::uint32_t kFedColor = 0x64FFFF;
-// Assez pour la fin de la ligne d'alerte de faim, dans toutes les langues.
-constexpr std::size_t kHungerLineBytes = 96;
-// Assez pour une ligne de repas et le nom ou le lien de sa nourriture.
-constexpr std::size_t kFoodLineBytes = 192;
 // Les lignes que le jeu écrit sans couleur particulière.
 constexpr std::uint32_t kPlainColor = 0;
 
@@ -51,10 +46,8 @@ constexpr std::uint32_t kPlainColor = 0;
   const std::string food_link =
       ro::vfs::BuildItemLink(ro::vfs::ItemLink{.item_id = food_item_id},
                              entry != nullptr ? entry->card_slots : std::uint8_t{0});
-  std::array<char, kFoodLineBytes> line = {};
-  std::snprintf(line.data(), line.size(),
-                ro::core::Tr("La nourriture du pet [%s] n'est pas disponible."), food_link.c_str());
-  return line.data();
+  return ro::core::Printed(ro::core::Tr("La nourriture du pet [%s] n'est pas disponible."),
+                           food_link.c_str());
 }
 
 // L'ACCUSÉ D'UN REPAS. Pris, il nomme la nourriture en clair et compte ce
@@ -69,11 +62,8 @@ constexpr std::uint32_t kPlainColor = 0;
   const ro::vfs::ItemEntry* entry = items != nullptr ? items->Find(feeding.food_item_id) : nullptr;
   const std::string food_name =
       entry != nullptr && !entry->name.empty() ? entry->name : std::to_string(feeding.food_item_id);
-  std::array<char, kFoodLineBytes> line = {};
-  std::snprintf(line.data(), line.size(),
-                ro::core::Tr("Votre pet a été nourri. %s (il en reste %d)"), food_name.c_str(),
-                bag.AmountOf(feeding.food_item_id));
-  return line.data();
+  return ro::core::Printed(ro::core::Tr("Votre pet a été nourri. %s (il en reste %d)"),
+                           food_name.c_str(), bag.AmountOf(feeding.food_item_id));
 }
 
 [[nodiscard]] ro::ui::SkinImage IconOf(GamePieces& pieces, std::uint32_t item_id) {
@@ -498,13 +488,11 @@ void PetStage::Apply(const ro::ui::PetWindowAction& asked,
   // LA FAIM QUI DESCEND AU PALIER où le pet perd de l'intimité : le bandeau le
   // dit, avec l'icône de ce qu'il mange.
   if (hunger_alarm_.Observe(pet_.known(), pet_.hunger())) {
-    std::array<char, kHungerLineBytes> suffix{};
-    std::snprintf(suffix.data(), suffix.size(), ro::core::Tr("a faim : %d / %d."), pet_.hunger(),
-                  ro::sim::kPetHungerMax);
-    hunger_notice_ =
-        ToastNotice{.icon_item_id = tables_.has_value() ? tables_->FoodOf(pet_.pet_class()) : 0,
-                    .name = pet_.name(),
-                    .suffix = std::string(" ") + suffix.data()};
+    hunger_notice_ = ToastNotice{
+        .icon_item_id = tables_.has_value() ? tables_->FoodOf(pet_.pet_class()) : 0,
+        .name = pet_.name(),
+        .suffix = std::string(" ") + ro::core::Printed(ro::core::Tr("a faim : %d / %d."),
+                                                       pet_.hunger(), ro::sim::kPetHungerMax)};
   }
   // LA BASCULE D'UNE TOUCHE OU DE L'ICÔNE DU MENU. Sans pet sorti, elle le dit :
   // une touche muette ne s'explique pas.

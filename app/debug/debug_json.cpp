@@ -1,13 +1,10 @@
 #include "debug/debug_json.h"
 
-#include <array>
-#include <cstdio>
+#include "ro/core/printed.h"
 
 namespace moonclient {
 namespace {
 
-// Les caractères de contrôle s'écrivent en \u00XX : six caractères et le nul.
-constexpr std::size_t kEscapeBytes = 7;
 constexpr unsigned char kFirstPrintable = 0x20;
 
 }  // namespace
@@ -81,9 +78,7 @@ JsonWriter& JsonWriter::String(std::string_view text) {
         break;
       default:
         if (byte < kFirstPrintable) {
-          std::array<char, kEscapeBytes> escaped{};
-          std::snprintf(escaped.data(), escaped.size(), "\\u%04x", static_cast<unsigned>(byte));
-          text_ += escaped.data();
+          text_ += ro::core::Printed("\\u%04x", static_cast<unsigned>(byte));
         } else {
           // L'UTF-8 passe tel quel : JSON l'accepte, et les accents restent lisibles.
           text_ += each;

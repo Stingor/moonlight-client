@@ -5,14 +5,13 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <cstdio>
 #include <ctime>
 #include <limits>
 #include <optional>
 
-#include "ro/core/decimal_text.h"
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
+#include "ro/core/printed.h"
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/monster_words.h"
 
@@ -148,9 +147,6 @@ constexpr std::int64_t kSecondsPerDay = 86400;
 // L'année et le mois de `std::tm` partent de 1900 et de zéro.
 constexpr int kFirstYear = 1900;
 constexpr int kFirstMonth = 1;
-// « 2026/10/07 18:00 » : cinq champs de `std::tm`, que le tampon tient même
-// à leur pire valeur.
-constexpr std::size_t kDateBytes = 5 * ro::core::kDecimalTextBytes<int>;
 
 // Le balisage du jeu : `^RRGGBB` change la couleur, `<TAG>texte<INFO>charge
 // </INFO></TAG>` fait un lien dont seul le texte se lit.
@@ -317,10 +313,8 @@ std::string QuestDateText(std::int64_t unix_s) {
   if (!ro::core::ToLocalTime(seconds, local)) {
     return {};
   }
-  std::array<char, kDateBytes> text{};
-  std::snprintf(text.data(), text.size(), "%04d/%02d/%02d %02d:%02d", local.tm_year + kFirstYear,
-                local.tm_mon + kFirstMonth, local.tm_mday, local.tm_hour, local.tm_min);
-  return text.data();
+  return ro::core::Printed("%04d/%02d/%02d %02d:%02d", local.tm_year + kFirstYear,
+                           local.tm_mon + kFirstMonth, local.tm_mday, local.tm_hour, local.tm_min);
 }
 
 float QuestProgress(const QuestRecord& quest) {

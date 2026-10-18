@@ -1,11 +1,10 @@
 // La vente à l'échoppe d'un acheteur, dans la boucle. Voir `buying_store_stage.h`.
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/buying_store.h"
 #include "ro/sim/buying_store_checks.h"
 #include "ro/sim/player_status.h"
@@ -207,11 +206,8 @@ void BuyingStoreStage::SaySaleOutcomes(ro::ui::BuyingStoreSellState& state,
                  : PrintedWord(context.words, *word, 0);
     }
     if (text.empty()) {
-      std::array<char, 128> printed{};
-      std::snprintf(printed.data(), printed.size(),
-                    ro::core::Tr("Le serveur a refusé la vente (code %d)."),
-                    static_cast<int>(code));
-      text = printed.data();
+      text = ro::core::Printed(ro::core::Tr("Le serveur a refusé la vente (code %d)."),
+                               static_cast<int>(code));
     }
     sale_outcome_ = text;
     sale_outcome_done_ = false;

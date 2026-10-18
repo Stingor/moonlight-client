@@ -3,8 +3,6 @@
 #include "game/npc_shop_stage.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -529,10 +527,8 @@ void NpcShopStage::ComposeVerdict(const ro::ui::NpcShopWindowState& state,
                                        points ? shop_.points() : status.zeny,
                                        world.inventory().items(), status.weight, status.max_weight);
     if (verdict.weight_known) {
-      std::array<char, 64> weight{};
-      std::snprintf(weight.data(), weight.size(), ro::core::Tr("+%lld poids"),
-                    static_cast<long long>(verdict.added_weight / kWeightTenths));
-      cart_weight_ = weight.data();
+      cart_weight_ = Printed(ro::core::Tr("+%lld poids"),
+                             static_cast<long long>(verdict.added_weight / kWeightTenths));
     }
   }
   for (const NpcShopIssue issue : verdict.issues) {

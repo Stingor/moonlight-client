@@ -2,9 +2,7 @@
 // le serveur leur rend, et ce qu'on en dit dans le chat.
 
 #include <algorithm>
-#include <array>
 #include <cstdint>
-#include <cstdio>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -13,6 +11,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/mvp_tracker.h"
 #include "ro/sim/mvp_tracker.h"
 #include "ro/ui/mvp_tracker_window.h"
@@ -24,11 +23,6 @@ namespace {
 
 using ro::core::Tr;
 using ro::net::MvpCommand;
-
-// Une ligne du chat : un nom ou un libellé, puis la raison d'un refus.
-constexpr std::size_t kNoticeBytes = 512;
-// La raison d'un code que le client ne connaît pas.
-constexpr std::size_t kReasonBytes = 96;
 
 constexpr auto kResultOk = static_cast<std::uint8_t>(ro::sim::MvpGroupResult::kOk);
 constexpr auto kResultNoInvite = static_cast<std::uint8_t>(ro::sim::MvpGroupResult::kNoInvite);
@@ -46,10 +40,7 @@ constexpr auto kResultObservationKept =
   if (const char* known = ro::ui::MvpResultText(code); known != nullptr) {
     return known;
   }
-  std::array<char, kReasonBytes> text{};
-  std::snprintf(text.data(), text.size(), Tr("Refusé par le serveur (code %u)."),
-                static_cast<unsigned>(code));
-  return text.data();
+  return ro::core::Printed(Tr("Refusé par le serveur (code %u)."), static_cast<unsigned>(code));
 }
 
 // LA LIGNE DU CHAT d'une invitation ou d'une saisie.
@@ -62,37 +53,34 @@ constexpr auto kResultObservationKept =
 [[nodiscard]] std::string NoticeOf(MvpCommand command, std::string_view subject, std::uint8_t code,
                                    bool extended) {
   const std::string name(subject);
-  std::array<char, kNoticeBytes> text{};
+  std::string text;
   if (code == kResultOk) {
     if (command == MvpCommand::kInvite) {
-      std::snprintf(text.data(), text.size(), Tr("Carnet MVP : invitation envoyée à %s."),
-                    name.c_str());
+      text = ro::core::Printed(Tr("Carnet MVP : invitation envoyée à %s."), name.c_str());
     } else if (extended) {
-      std::snprintf(text.data(), text.size(),
-                    Tr("Carnet MVP : heure de mort de %s ajoutée au carnet du groupe."),
-                    name.c_str());
+      text = ro::core::Printed(Tr("Carnet MVP : heure de mort de %s ajoutée au carnet du groupe."),
+                               name.c_str());
     } else {
-      std::snprintf(text.data(), text.size(),
-                    Tr("Carnet MVP : heure de mort de %s transmise au groupe."), name.c_str());
+      text = ro::core::Printed(Tr("Carnet MVP : heure de mort de %s transmise au groupe."),
+                               name.c_str());
     }
-    return text.data();
+    return text;
   }
   if (code == kResultObservationKept && command == MvpCommand::kReportManual) {
-    std::snprintf(text.data(), text.size(),
-                  Tr("Carnet MVP : saisie de %s sans effet — le groupe tient déjà une heure au "
-                     "moins aussi précise."),
-                  name.c_str());
-    return text.data();
+    return ro::core::Printed(
+        Tr("Carnet MVP : saisie de %s sans effet — le groupe tient déjà une heure au "
+           "moins aussi précise."),
+        name.c_str());
   }
   const std::string reason = RefusalText(code);
   if (command == MvpCommand::kInvite) {
-    std::snprintf(text.data(), text.size(), Tr("Carnet MVP : invitation à %s refusée — %s"),
-                  name.c_str(), reason.c_str());
+    text = ro::core::Printed(Tr("Carnet MVP : invitation à %s refusée — %s"), name.c_str(),
+                             reason.c_str());
   } else {
-    std::snprintf(text.data(), text.size(), Tr("Carnet MVP : saisie de %s refusée — %s"),
-                  name.c_str(), reason.c_str());
+    text = ro::core::Printed(Tr("Carnet MVP : saisie de %s refusée — %s"), name.c_str(),
+                             reason.c_str());
   }
-  return text.data();
+  return text;
 }
 
 }  // namespace
@@ -201,21 +189,19 @@ void MvpTrackerStage::SettleResult(std::uint8_t code, std::uint32_t now_ms,
 void MvpTrackerStage::NoteNotSent(MvpCommand command, std::string_view subject,
                                   const char* reason) {
   const std::string name(subject);
-  std::array<char, kNoticeBytes> text{};
+  std::string text;
   if (command == MvpCommand::kInvite) {
-    std::snprintf(text.data(), text.size(), Tr("Carnet MVP : invitation à %s non envoyée — %s"),
-                  name.c_str(), reason);
+    text = ro::core::Printed(Tr("Carnet MVP : invitation à %s non envoyée — %s"), name.c_str(),
+                             reason);
   } else {
-    std::snprintf(text.data(), text.size(), Tr("Carnet MVP : saisie de %s non envoyée — %s"),
-                  name.c_str(), reason);
+    text =
+        ro::core::Printed(Tr("Carnet MVP : saisie de %s non envoyée — %s"), name.c_str(), reason);
   }
-  notices_.emplace_back(text.data());
+  notices_.emplace_back(text);
 }
 
 void MvpTrackerStage::NoteGesturesNotSent(const char* reason) {
-  std::array<char, kNoticeBytes> text{};
-  std::snprintf(text.data(), text.size(), Tr("Carnet MVP : rien n'est parti — %s"), reason);
-  notices_.emplace_back(text.data());
+  notices_.emplace_back(ro::core::Printed(Tr("Carnet MVP : rien n'est parti — %s"), reason));
 }
 
 std::vector<std::string> MvpTrackerStage::TakeNotices() { return std::exchange(notices_, {}); }

@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdio>
 #include <ctime>
 #include <iterator>
 #include <limits>
@@ -15,10 +14,10 @@
 
 #include <imgui.h>
 
-#include "ro/core/decimal_text.h"
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 
 #include "chat/chat_line_color.h"
 #include "chat/chat_tab_file.h"
@@ -132,25 +131,21 @@ constexpr std::uint32_t kMsPerSecond = 1000;
   if (!LocalNow(&local)) {
     return {};
   }
-  // Six champs de `std::tm`, que le tampon tient même à leur pire valeur.
-  std::array<char, 6 * ro::core::kDecimalTextBytes<int>> text{};
-  std::snprintf(text.data(), text.size(), "%04d-%02d-%02d %02d:%02d:%02d", local.tm_year + 1900,
-                local.tm_mon + 1, local.tm_mday, local.tm_hour, local.tm_min, local.tm_sec);
-  return std::string(text.data());
+  return ro::core::Printed("%04d-%02d-%02d %02d:%02d:%02d", local.tm_year + 1900, local.tm_mon + 1,
+                           local.tm_mday, local.tm_hour, local.tm_min, local.tm_sec);
 }
 
 // Le repère qui coiffe une session, à l'écran comme dans le journal. ⚠ UNE
 // SEULE FORME : deux libellés pour la même chose se répondraient mal dans un
 // fichier que le joueur relit à côté de sa fenêtre.
 [[nodiscard]] std::string SessionMark(std::string_view stamp) {
-  std::array<char, 96> mark{};
+  std::string mark;
   if (stamp.empty()) {
-    std::snprintf(mark.data(), mark.size(), "%s", ro::core::Tr("---- session précédente ----"));
+    mark = ro::core::Printed("%s", ro::core::Tr("---- session précédente ----"));
   } else {
-    std::snprintf(mark.data(), mark.size(), ro::core::Tr("---- session du %s ----"),
-                  std::string(stamp).c_str());
+    mark = ro::core::Printed(ro::core::Tr("---- session du %s ----"), std::string(stamp).c_str());
   }
-  return std::string(mark.data());
+  return mark;
 }
 
 // La DATE seule d'un horodatage « AAAA-MM-JJ hh:mm:ss ». Le journal se range par
