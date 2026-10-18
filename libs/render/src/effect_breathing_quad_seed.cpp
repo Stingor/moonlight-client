@@ -1,8 +1,8 @@
 #include "ro/render/effect_breathing_quad_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -25,13 +25,8 @@ constexpr std::int16_t kFixedTilt = 360;
 
 std::span<const EffectBreathingQuadPattern> EffectBreathingQuadPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectBreathingQuadPattern> table = EffectBreathingQuadPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectBreathingQuadPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectBreathingQuadPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectBreathingQuadPatternTable(), effect_id,
+                           &EffectBreathingQuadPattern::effect_id);
 }
 
 EffectBreathingQuadSeed EffectBreathingQuadSeedFor(std::uint8_t builder_argument) {
@@ -83,10 +78,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectBreathingQuadTracks(
 PooledEffectNode SowEffectBreathingQuadNode(const EffectBreathingQuadPattern& pattern,
                                             glm::vec3 anchor, std::int32_t effect_life_ticks,
                                             std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kBreathingQuad;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kBreathingQuad, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectBreathingQuadTracks(pattern, generator);

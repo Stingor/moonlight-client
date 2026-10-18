@@ -1,8 +1,8 @@
 #include "ro/render/effect_spiral_stack_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -43,13 +43,8 @@ constexpr std::int16_t kStartsInvisible = 0;
 }  // namespace
 
 std::span<const EffectSpiralStackPattern> EffectSpiralStackPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSpiralStackPattern> table = EffectSpiralStackPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSpiralStackPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSpiralStackPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSpiralStackPatternTable(), effect_id,
+                           &EffectSpiralStackPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpiralStackTracks(
@@ -87,10 +82,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpiralStackTracks(
 PooledEffectNode SowEffectSpiralStackNode(const EffectSpiralStackPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks,
                                           std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpiralStack;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpiralStack, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectSpiralStackTracks(pattern, generator);

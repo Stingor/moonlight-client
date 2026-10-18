@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -13,10 +14,8 @@
 namespace ro::render {
 
 std::span<const EffectWalkingSowerPattern> EffectWalkingSowerPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectWalkingSowerPattern> table = EffectWalkingSowerPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectWalkingSowerPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectWalkingSowerPatternTable(), effect_id,
+                           &EffectWalkingSowerPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedWalkingSowerTracks(std::uint8_t byte,
@@ -57,10 +56,7 @@ PooledEffectNode SowWalkingSowerNode(const EffectWalkingSowerPattern& pattern,
                                      glm::vec3 instance_position,
                                      const std::optional<glm::vec3>& target,
                                      std::int32_t effect_life_ticks, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kWalkingSower;
-  pooled.ground_position = instance_position;
-  pooled.owner_position = instance_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kWalkingSower, instance_position);
   pooled.target_position = target;
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.tracks = SeedWalkingSowerTracks(pattern.byte, instance_position, generator);

@@ -1,9 +1,8 @@
 #include "ro/render/effect_magic_target_seed.h"
 
-#include <algorithm>
-#include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_magic_target.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -13,13 +12,8 @@
 namespace ro::render {
 
 std::span<const EffectMagicTargetPattern> EffectMagicTargetPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectMagicTargetPattern> table = EffectMagicTargetPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectMagicTargetPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectMagicTargetPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectMagicTargetPatternTable(), effect_id,
+                           &EffectMagicTargetPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectMagicTargetTracks() {
@@ -42,10 +36,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectMagicTargetTracks() {
 
 PooledEffectNode SowEffectMagicTargetNode(const EffectMagicTargetPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kMagicTargetGrid;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kMagicTargetGrid, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectMagicTargetTracks();

@@ -1,9 +1,9 @@
 #include "ro/render/effect_sprite_fan_seed.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_sprite_fan.h"
@@ -14,13 +14,8 @@
 namespace ro::render {
 
 std::span<const EffectSpriteFanPattern> EffectSpriteFanPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSpriteFanPattern> table = EffectSpriteFanPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSpriteFanPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSpriteFanPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSpriteFanPatternTable(), effect_id,
+                           &EffectSpriteFanPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpriteFanTracks(
@@ -51,10 +46,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpriteFanTracks(
 PooledEffectNode SowEffectSpriteFanNode(const EffectSpriteFanPattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks,
                                         std::int32_t effect_age_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpriteFan;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpriteFan, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   // L'ANIMATION JOUE UNE FOIS, une image tous les quatre tics, et sa dernière
   // image tue le nœud. Le compte d'images vient du `.act` : c'est l'appelant

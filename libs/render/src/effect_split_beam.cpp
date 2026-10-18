@@ -3,11 +3,10 @@
 
 #include "ro/render/effect_split_beam.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
-#include <cstddef>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/map_effect_math.h"
 
@@ -64,7 +63,9 @@ constexpr std::array<EffectSplitBeamPattern, 1> kSplitBeams = {{
   return std::sin(NativeTableRadians(static_cast<std::int32_t>(std::trunc(degrees))));
 }
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
+// Un tirage sous la borne, ou zéro SANS TIRER quand elle n'est pas positive.
+[[nodiscard]] std::int32_t DrawBelowIfPositive(std::uint32_t& rng_state,
+                                               std::int32_t exclusive_bound) {
   if (exclusive_bound <= 0) {
     return 0;
   }
@@ -95,17 +96,17 @@ constexpr std::array<EffectSplitBeamPattern, 1> kSplitBeams = {{
   // deux fois, comme cap et comme angle. Un éclat file donc dans la direction
   // où il pointe, et les séparer le ferait glisser de travers.
   const float cap = base + node_pattern.heading_bias_degrees +
-                    static_cast<float>(DrawBelow(rng_state, node_pattern.heading_spread));
+                    static_cast<float>(DrawBelowIfPositive(rng_state, node_pattern.heading_spread));
   effect_node.heading_degrees = cap;
   effect_node.turn_degrees = cap;
 
   effect_node.half_width = size.half_width;
-  effect_node.half_height =
-      size.half_height_floor + static_cast<float>(DrawBelow(rng_state, size.half_height_spread));
+  effect_node.half_height = size.half_height_floor + static_cast<float>(DrawBelowIfPositive(
+                                                         rng_state, size.half_height_spread));
 
   // ⚠ LE PAS SE TIRE PAR PALIERS, division ENTIÈRE comprise.
   effect_node.step =
-      size.step_floor + static_cast<float>(DrawBelow(rng_state, kSplitBeamStepSpread) /
+      size.step_floor + static_cast<float>(DrawBelowIfPositive(rng_state, kSplitBeamStepSpread) /
                                            static_cast<std::int32_t>(kSplitBeamStepDivisor));
   // ⚠ ET LE FREINAGE SE CALCULE, il ne se pose pas : une vie nulle ne freinerait
   // rien, et un diviseur nul non plus.
@@ -119,7 +120,8 @@ constexpr std::array<EffectSplitBeamPattern, 1> kSplitBeams = {{
   // BASE et non du cap. ⚠ L'ABSCISSE PREND LE SINUS ET L'ORDONNÉE PERD SON
   // COSINUS — les deux tables du client ont leurs noms échangés —, et le
   // décalage vertical s'ajoute par-dessus.
-  const auto radius = static_cast<float>(DrawBelow(rng_state, node_pattern.birth_radius_spread));
+  const auto radius =
+      static_cast<float>(DrawBelowIfPositive(rng_state, node_pattern.birth_radius_spread));
   effect_node.screen_offset = {
       SinOfTruncatedDegrees(base) * radius,
       -CosOfTruncatedDegrees(base) * radius + node_pattern.screen_offset_y};
@@ -185,13 +187,8 @@ std::vector<EffectScreenQuad> ComposeScreenSplitBeamQuads(const EffectScreenNode
 std::span<const EffectSplitBeamPattern> EffectSplitBeamPatternTable() { return kSplitBeams; }
 
 std::span<const EffectSplitBeamPattern> EffectSplitBeamPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSplitBeamPattern> table = EffectSplitBeamPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSplitBeamPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSplitBeamPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSplitBeamPatternTable(), effect_id,
+                           &EffectSplitBeamPattern::effect_id);
 }
 
 std::vector<EffectScreenNode> SowEffectSplitBeamNodes(const EffectSplitBeamPattern& pattern,

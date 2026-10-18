@@ -1,15 +1,15 @@
 #include "ro/render/effect_sheathed_bolt_seed.h"
 
-#include <algorithm>
 #include <cmath>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_sheathed_bolt.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -77,11 +77,6 @@ constexpr std::array<EffectSheathedBoltRecipe, 5> kRecettes = {{
      kSheathedBoltUnnamedStyle},
 }};
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 // UN TIRAGE DE RECETTE. Une largeur nulle rend le plancher SANS faire avancer
 // le générateur : c'est ce que fait le client, qui n'appelle alors pas `rand`.
 [[nodiscard]] float DrawFrom(const EffectSheathedBoltDraw& draw, std::uint32_t& rng_state) {
@@ -98,13 +93,8 @@ const EffectSheathedBoltRecipe& EffectSheathedBoltRecipeOf(EffectSheathedBoltBui
 }
 
 std::span<const EffectSheathedBoltPattern> EffectSheathedBoltPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSheathedBoltPattern> table = EffectSheathedBoltPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSheathedBoltPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSheathedBoltPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSheathedBoltPatternTable(), effect_id,
+                           &EffectSheathedBoltPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSheathedBoltTracks(
@@ -158,10 +148,7 @@ PooledEffectNode SowEffectSheathedBoltNode(const EffectSheathedBoltPattern& patt
                                            glm::vec3 anchor, glm::vec3 toward_target,
                                            std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSheathedBolt;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSheathedBolt, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectSheathedBoltTracks(pattern, anchor, toward_target, generator);

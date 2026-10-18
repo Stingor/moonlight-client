@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_expanding_ring.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -14,13 +15,8 @@ namespace ro::render {
 
 std::span<const EffectExpandingRingPattern> EffectExpandingRingPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectExpandingRingPattern> table = EffectExpandingRingPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectExpandingRingPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectExpandingRingPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectExpandingRingPatternTable(), effect_id,
+                           &EffectExpandingRingPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectExpandingRingTracks(
@@ -59,12 +55,9 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectExpandingRingTracks(
 PooledEffectNode SowEffectExpandingRingNode(const EffectExpandingRingPattern& pattern,
                                             glm::vec3 owner_position, std::int32_t age_ticks,
                                             std::int32_t life_ticks, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kExpandingRing;
   // ⚠ LE NŒUD NAÎT SUR L'INSTANCE, sans écart, et le mouvement l'y recale à
   // chaque tic. Voir `AdvanceTracksOf`.
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kExpandingRing, owner_position);
   pooled.node.life_ticks = std::max(life_ticks, 1);
   pooled.node.render_word = kExpandingRingRenderWord;
   pooled.resource_paths = {std::string(pattern.texture)};

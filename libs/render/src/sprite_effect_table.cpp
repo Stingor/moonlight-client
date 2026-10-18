@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/sprite_catalog.h"
 
 namespace ro::render {
@@ -244,9 +245,7 @@ template <std::size_t N>
 }  // namespace
 
 const SpriteEffectRecipe* SpriteEffectRecipeFor(std::uint32_t effect_id) {
-  const auto found =
-      std::ranges::lower_bound(kRecipes, effect_id, {}, &SpriteEffectRecipe::effect_id);
-  return found != kRecipes.end() && found->effect_id == effect_id ? &*found : nullptr;
+  return core::RowWithKey(kRecipes, effect_id, &SpriteEffectRecipe::effect_id);
 }
 
 std::span<const SpriteEffectRecipe> SpriteEffectRecipes() { return kRecipes; }

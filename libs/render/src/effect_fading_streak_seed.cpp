@@ -1,8 +1,8 @@
 #include "ro/render/effect_fading_streak_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_fading_streak.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -14,13 +14,8 @@
 namespace ro::render {
 
 std::span<const EffectFadingStreakPattern> EffectFadingStreakPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectFadingStreakPattern> table = EffectFadingStreakPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectFadingStreakPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectFadingStreakPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectFadingStreakPatternTable(), effect_id,
+                           &EffectFadingStreakPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFadingStreakTracks(
@@ -75,10 +70,7 @@ PooledEffectNode SowEffectFadingStreakNode(const EffectFadingStreakPattern& patt
                                            glm::vec3 source, glm::vec3 target,
                                            std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kFadingStreak;
-  pooled.ground_position = source;
-  pooled.owner_position = source;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kFadingStreak, source);
   pooled.target_position = target;
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths.clear();

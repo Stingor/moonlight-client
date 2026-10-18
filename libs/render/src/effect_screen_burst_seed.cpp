@@ -1,9 +1,8 @@
 #include "ro/render/effect_screen_burst_seed.h"
 
-#include <algorithm>
-#include <cstddef>
+#include "ro/core/sorted_table.h"
 
-#include "ro/render/effect_node.h"
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -14,11 +13,6 @@ namespace {
 // rien à faire dans la voie d'écran, et lier les deux ferait croire à une
 // parenté que la mesure ne donne pas.
 constexpr std::int32_t kTourComplet = 360;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
 
 // UN TIRAGE DU CLIENT, ou la valeur fixe qu'une étendue nulle désigne.
 [[nodiscard]] float DrawRange(const EffectScreenBurstDraw& plage, std::uint32_t& rng_state) {
@@ -90,13 +84,8 @@ constexpr std::int32_t kTourComplet = 360;
 }  // namespace
 
 std::span<const EffectScreenBurstPattern> EffectScreenBurstPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectScreenBurstPattern> table = EffectScreenBurstPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectScreenBurstPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectScreenBurstPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectScreenBurstPatternTable(), effect_id,
+                           &EffectScreenBurstPattern::effect_id);
 }
 
 std::vector<EffectScreenNode> SowEffectScreenBurstNodes(const EffectScreenBurstPattern& pattern,

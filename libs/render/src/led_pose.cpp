@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/sprite_catalog.h"
 
 namespace ro::render {
@@ -161,11 +162,10 @@ bool VariantApplies(LedVariant variant, std::uint8_t draw, std::uint32_t job) no
 
 const StateLedPose* StateLedPoseOf(std::int8_t action_state, std::uint8_t draw,
                                    std::uint32_t job) noexcept {
-  const auto [first, last] =
-      std::ranges::equal_range(kStateLedPoses, action_state, {}, &StateLedPose::state);
-  for (auto pose = first; pose != last; ++pose) {
-    if (VariantApplies(pose->variant, draw, job)) {
-      return &*pose;
+  for (const StateLedPose& pose :
+       core::RowsWithKey(kStateLedPoses, action_state, &StateLedPose::state)) {
+    if (VariantApplies(pose.variant, draw, job)) {
+      return &pose;
     }
   }
   return nullptr;

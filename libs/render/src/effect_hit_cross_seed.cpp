@@ -7,6 +7,7 @@
 #include <array>
 #include <cstddef>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 
 namespace ro::render {
@@ -64,13 +65,8 @@ constexpr std::array<EffectHitCrossPattern, 2> kHitCrosses = {{
 std::span<const EffectHitCrossPattern> EffectHitCrossPatternTable() { return kHitCrosses; }
 
 std::span<const EffectHitCrossPattern> EffectHitCrossPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectHitCrossPattern> table = EffectHitCrossPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectHitCrossPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectHitCrossPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectHitCrossPatternTable(), effect_id,
+                           &EffectHitCrossPattern::effect_id);
 }
 
 std::vector<EffectScreenNode> SowEffectHitCrossNodes(const EffectHitCrossPattern& pattern,

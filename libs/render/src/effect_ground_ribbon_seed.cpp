@@ -1,14 +1,14 @@
 #include "ro/render/effect_ground_ribbon_seed.h"
 
-#include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_render_word.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -65,11 +65,6 @@ constexpr std::int32_t kFourthDecade = 3;
 constexpr std::int32_t kRedrawnMarkOfThirdDecade = 33;
 constexpr std::int32_t kRedrawnMarkOfFourthDecade = 36;
 
-[[nodiscard]] std::int32_t RollBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
-
 [[nodiscard]] const RibbonFamily& FamilyOf(const EffectGroundRibbonPattern& pattern) {
   switch (pattern.builder) {
     case EffectGroundRibbonBuilder::kInitTextured:
@@ -89,13 +84,8 @@ constexpr std::int32_t kRedrawnMarkOfFourthDecade = 36;
 }  // namespace
 
 std::span<const EffectGroundRibbonPattern> EffectGroundRibbonPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectGroundRibbonPattern> table = EffectGroundRibbonPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectGroundRibbonPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectGroundRibbonPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectGroundRibbonPatternTable(), effect_id,
+                           &EffectGroundRibbonPattern::effect_id);
 }
 
 std::string_view EffectGroundRibbonTextureFor(const EffectGroundRibbonPattern& pattern) {
@@ -140,27 +130,27 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGroundRibbonTracks(
     // à la suite doivent différer comme chez lui, pas autrement.
     if (sens == 0) {
       track.value[kSlotOfRibbonSideways] =
-          -kSidewaysBase - static_cast<float>(RollBelow(generator, kSidewaysSpread));
+          -kSidewaysBase - static_cast<float>(DrawBelow(generator, kSidewaysSpread));
     } else if (sens == 1) {
       track.value[kSlotOfRibbonSideways] =
-          kSidewaysBase + static_cast<float>(RollBelow(generator, kSidewaysSpread));
+          kSidewaysBase + static_cast<float>(DrawBelow(generator, kSidewaysSpread));
     }
     // ⚠ UN AUTRE RESTE NE POSE RIEN, et la case garde son défaut : le ruban n'est
     // alors décalé d'aucun côté. Aucun des douze sites n'y tombe.
-    track.value[kSlotOfRibbonNearEnd] = static_cast<float>(RollBelow(generator, kNearEndSpread));
+    track.value[kSlotOfRibbonNearEnd] = static_cast<float>(DrawBelow(generator, kNearEndSpread));
     // ⚠ LE BÂTISSEUR À TRENTE NE TIRE RIEN DE PLUS pour un argument de dix ou
     // plus : la clé, l'étendue, la marque et le pas gardent alors leur zéro.
     const bool no_family = pattern.builder == EffectGroundRibbonBuilder::kInitLineBeam &&
                            pattern.builder_argument >= kDecade;
     if (!no_family) {
       track.lift_key =
-          static_cast<float>(RollBelow(generator, family.key_spread)) * 0.1F + family.key_base;
+          static_cast<float>(DrawBelow(generator, family.key_spread)) * 0.1F + family.key_base;
       track.value[kSlotOfRibbonSpan] =
-          static_cast<float>(RollBelow(generator, family.span_spread)) + family.span_base;
+          static_cast<float>(DrawBelow(generator, family.span_spread)) + family.span_base;
       track.mark[kMarkOfRibbonStyle] =
-          static_cast<std::uint8_t>(RollBelow(generator, kMarkSpread) + base_mark);
+          static_cast<std::uint8_t>(DrawBelow(generator, kMarkSpread) + base_mark);
       track.value[kSlotOfRibbonStep] =
-          static_cast<float>(RollBelow(generator, family.step_spread)) * 0.1F + family.step_base;
+          static_cast<float>(DrawBelow(generator, family.step_spread)) * 0.1F + family.step_base;
     }
     // 🔴 ET LE BÂTISSEUR TEXTURÉ TIRE UNE CINQUIÈME FOIS pour un argument de la
     // troisième ou de la quatrième dizaine : la marque est RETIRÉE dans la
@@ -170,7 +160,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGroundRibbonTracks(
       const std::int32_t dizaine = pattern.builder_argument / kDecade;
       if (dizaine == kThirdDecade || dizaine == kFourthDecade) {
         track.mark[kMarkOfRibbonStyle] = static_cast<std::uint8_t>(
-            RollBelow(generator, kMarkSpread) +
+            DrawBelow(generator, kMarkSpread) +
             (dizaine == kThirdDecade ? kRedrawnMarkOfThirdDecade : kRedrawnMarkOfFourthDecade));
       }
     }
@@ -189,10 +179,7 @@ PooledEffectNode SowEffectGroundRibbonNode(const EffectGroundRibbonPattern& patt
                                            glm::vec3 anchor, std::int16_t target_degrees,
                                            std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kGroundRibbon;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kGroundRibbon, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.node.render_word = EffectGroundRibbonRenderWord(pattern);
   pooled.resource_paths = {std::string(EffectGroundRibbonTextureFor(pattern))};

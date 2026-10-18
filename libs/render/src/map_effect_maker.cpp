@@ -22,7 +22,7 @@ constexpr float kFireflyCounterBias = 1.0F;
 //
 // ⚠ ET IL NE TIRE PAS DU TOUT dans ce cas : le `rand()` est à l'intérieur du
 // `if`. Tirer quand même décalerait tout le reste de la suite partagée.
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& draws, std::int32_t bound) {
+[[nodiscard]] std::int32_t SignedDrawBelowOrZero(std::uint32_t& draws, std::int32_t bound) {
   if (bound == 0) {
     return 0;
   }
@@ -58,15 +58,15 @@ MapEffectMaker::MapEffectMaker(glm::vec3 native_position, std::int32_t effect_id
     // tiré dans toute la période, non pas dans les vingt-quatre derniers pas.
     // Deux semeurs voisins ne battent donc jamais ensemble.
     const auto jitter = static_cast<std::int32_t>(emit_speed / kFireflyJitterDivisor);
-    const auto drawn = static_cast<float>(DrawBelow(draws, jitter));
+    const auto drawn = static_cast<float>(SignedDrawBelowOrZero(draws, jitter));
     period_ = NativeFloatToUnsigned(drawn + emit_speed - emit_speed / kFireflyPeriodDivisor);
     const auto span = static_cast<std::int32_t>(emit_speed + kFireflyCounterBias);
-    counter_ = static_cast<std::uint32_t>(DrawBelow(draws, span));
+    counter_ = static_cast<std::uint32_t>(SignedDrawBelowOrZero(draws, span));
     return;
   }
   period_ = NativeFloatToUnsigned(emit_speed);
-  counter_ =
-      NativeFloatToUnsigned(emit_speed - static_cast<float>(DrawBelow(draws, kStartLagSpread)));
+  counter_ = NativeFloatToUnsigned(
+      emit_speed - static_cast<float>(SignedDrawBelowOrZero(draws, kStartLagSpread)));
 }
 
 bool MapEffectMaker::Tick(glm::vec3 native_player) {

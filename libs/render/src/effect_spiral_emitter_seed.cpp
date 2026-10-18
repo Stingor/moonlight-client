@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -19,10 +20,8 @@ constexpr std::size_t kLeadingTrack = 0;
 
 std::span<const EffectSpiralEmitterPattern> EffectSpiralEmitterPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectSpiralEmitterPattern> table = EffectSpiralEmitterPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectSpiralEmitterPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectSpiralEmitterPatternTable(), effect_id,
+                           &EffectSpiralEmitterPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedSpiralEmitterTracks(
@@ -54,10 +53,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedSpiralEmitterTracks(
 PooledEffectNode SowSpiralEmitterNode(const EffectSpiralEmitterPattern& pattern,
                                       glm::vec3 owner_position, std::int32_t effect_life_ticks,
                                       std::uint32_t designated_actor_id, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpiralEmitter;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpiralEmitter, owner_position);
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.node.render_word = kSpiralEmitterRenderWord;
   // ⚠ L'IMAGE EST CHARGÉE ET JAMAIS PEINTE : elle reste nommée pour dire ce que

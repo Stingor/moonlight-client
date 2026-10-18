@@ -1,6 +1,6 @@
 #include "ro/render/skill_held_pose.h"
 
-#include <algorithm>
+#include "ro/core/sorted_table.h"
 
 namespace ro::render {
 
@@ -8,9 +8,7 @@ namespace {
 
 // Les poses d'une compétence, annonce et impact, côte à côte dans la table.
 std::span<const SkillHeldPose> PosesOf(std::uint16_t skill_id) {
-  const std::span<const SkillHeldPose> table = SkillHeldPoseTable();
-  const auto trouvees = std::ranges::equal_range(table, skill_id, {}, &SkillHeldPose::skill_id);
-  return {trouvees.begin(), trouvees.end()};
+  return core::RowsWithKey(SkillHeldPoseTable(), skill_id, &SkillHeldPose::skill_id);
 }
 
 }  // namespace

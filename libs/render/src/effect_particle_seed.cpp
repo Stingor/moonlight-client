@@ -3,11 +3,12 @@
 #include <string>
 #include <utility>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_render_word.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -35,12 +36,6 @@ constexpr std::size_t kMarkOfColorCase = 0;
 // `effect_render_word.h`.
 constexpr std::uint32_t kRenderWordOfRisingParticles =
     kEffectRenderWordOfConstructor | kEffectRenderWordOwnBlend;
-
-// Un tirage entier dans [0, bound), comme le modulo du client.
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 }  // namespace
 

@@ -1,14 +1,14 @@
 #include "ro/render/effect_spark_tube_seed.h"
 
-#include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_track_burst.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -74,11 +74,6 @@ constexpr std::int32_t kReachShortSpread = 5;
 constexpr float kReachFloor = 6.0F;
 constexpr std::int32_t kReachSpread = 6;
 constexpr std::int32_t kReachDirectedSpread = 7;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
 
 // LE RETARD D'UNE PISTE, en tics NÉGATIFS — et il diffère pour chacun des cinq
 // cas mesurés. C'est lui qui échelonne les quatre étincelles d'un nœud.
@@ -156,13 +151,8 @@ void PlayTickAhead(EffectTrack& track) {
 }  // namespace
 
 std::span<const EffectSparkTubePattern> EffectSparkTubePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSparkTubePattern> table = EffectSparkTubePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSparkTubePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSparkTubePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSparkTubePatternTable(), effect_id,
+                           &EffectSparkTubePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSparkTubeTracks(
@@ -239,10 +229,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSparkTubeTracks(
 PooledEffectNode SowEffectSparkTubeNode(const EffectSparkTubePattern& pattern, glm::vec3 anchor,
                                         glm::vec3 toward_target, std::int32_t effect_life_ticks,
                                         std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSparkTube;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSparkTube, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   // ⚠ L'IMAGE N'EST PAS DANS LE PATRON : les trois bâtisseurs l'écrivent en
   // dur, et aucun ne la reçoit de son site.

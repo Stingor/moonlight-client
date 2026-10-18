@@ -1,9 +1,9 @@
 #include "ro/render/effect_thrown_item_seed.h"
 
-#include <algorithm>
 #include <cmath>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -72,13 +72,8 @@ constexpr std::int32_t kStepCountCeiling = 100;
 }  // namespace
 
 std::span<const EffectThrownItemPattern> EffectThrownItemPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectThrownItemPattern> table = EffectThrownItemPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectThrownItemPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectThrownItemPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectThrownItemPatternTable(), effect_id,
+                           &EffectThrownItemPattern::effect_id);
 }
 
 std::int32_t EffectThrownItemBirthTick(std::uint8_t builder_argument) {
@@ -183,10 +178,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectThrownItemTracks(
 PooledEffectNode SowEffectThrownItemNode(const EffectThrownItemPattern& pattern, glm::vec3 source,
                                          glm::vec3 target, std::int32_t effect_life_ticks,
                                          std::int32_t instance_param) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kThrownItem;
-  pooled.ground_position = source;
-  pooled.owner_position = source;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kThrownItem, source);
   // OÙ L'OBJET TOMBE : le mouvement y prend son cap au premier tic.
   pooled.target_position = target;
   pooled.node.life_ticks = effect_life_ticks;

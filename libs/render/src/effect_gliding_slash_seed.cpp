@@ -1,13 +1,14 @@
 #include "ro/render/effect_gliding_slash_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_gliding_slash.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -16,21 +17,11 @@ namespace {
 constexpr std::size_t kSlotOfSpeed = 1;
 constexpr std::size_t kSlotOfPaintMark = 1;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 }  // namespace
 
 std::span<const EffectGlidingSlashPattern> EffectGlidingSlashPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectGlidingSlashPattern> table = EffectGlidingSlashPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectGlidingSlashPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectGlidingSlashPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectGlidingSlashPatternTable(), effect_id,
+                           &EffectGlidingSlashPattern::effect_id);
 }
 
 std::vector<std::string_view> EffectGlidingSlashTexturesOf(
@@ -79,15 +70,13 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGlidingSlashTracks(
 PooledEffectNode SowEffectGlidingSlashNode(const EffectGlidingSlashPattern& pattern,
                                            glm::vec3 anchor, std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
   // ⚠ DEUX FORMES POUR UNE SEULE FIGURE : rien dans l'état du nœud ne dit
   // lequel des deux sous-types vise sa cible, et le deviner ferait viser une
   // taillade sur deux à l'envers. Le patron le dit, et la forme le porte.
-  pooled.shape = pattern.builder == EffectGlidingSlashBuilder::kSonicWave
-                     ? PooledNodeShape::kAimedGlidingSlash
-                     : PooledNodeShape::kGlidingSlash;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(pattern.builder == EffectGlidingSlashBuilder::kSonicWave
+                                             ? PooledNodeShape::kAimedGlidingSlash
+                                             : PooledNodeShape::kGlidingSlash,
+                                         anchor);
   pooled.node.life_ticks = effect_life_ticks;
   for (const std::string_view image : EffectGlidingSlashTexturesOf(pattern)) {
     pooled.resource_paths.emplace_back(image);

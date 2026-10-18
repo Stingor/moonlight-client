@@ -1,15 +1,15 @@
 #include "ro/render/effect_swarm_seed.h"
 
-#include <algorithm>
 #include <cmath>
 #include <numbers>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -35,11 +35,6 @@ constexpr std::size_t kSlotOfTailZ = 5;
 
 constexpr float kFullTurn = 360.0F;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 // UN SEUL REPLI, comme le client : il compare une fois au-dessous de zéro et
 // une fois au-dessus du tour, et n'y revient pas. Un modulo ramènerait dans le
 // tour des valeurs que le client y laisse sortir.
@@ -60,11 +55,7 @@ std::int16_t EffectSwarmHeadingDegrees(float toward_x, float toward_z) {
 }
 
 std::span<const EffectSwarmPattern> EffectSwarmPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSwarmPattern> table = EffectSwarmPatternTable();
-  const auto first = std::ranges::lower_bound(table, effect_id, {}, &EffectSwarmPattern::effect_id);
-  const auto last = std::ranges::upper_bound(table, effect_id, {}, &EffectSwarmPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSwarmPatternTable(), effect_id, &EffectSwarmPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSwarmTracks(
@@ -135,10 +126,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSwarmTracks(
 PooledEffectNode SowEffectSwarmNode(const EffectSwarmPattern& pattern, glm::vec3 anchor,
                                     glm::vec3 toward_target, std::int32_t effect_life_ticks,
                                     std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kBillboardSwarm;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kBillboardSwarm, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectSwarmTracks(pattern, toward_target, generator);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdio>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_particle_quad.h"
@@ -51,10 +52,8 @@ constexpr std::size_t kPathBufferSize = 64;
 }  // namespace
 
 std::span<const EffectFloorSpinnerPattern> EffectFloorSpinnerPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectFloorSpinnerPattern> table = EffectFloorSpinnerPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectFloorSpinnerPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectFloorSpinnerPatternTable(), effect_id,
+                           &EffectFloorSpinnerPattern::effect_id);
 }
 
 std::vector<std::string> EffectFloorSpinnerTextures(std::uint8_t byte) {
@@ -101,10 +100,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedFloorSpinnerTracks(
 PooledEffectNode SowFloorSpinnerNode(const EffectFloorSpinnerPattern& pattern,
                                      glm::vec3 owner_position, float instance_first,
                                      float instance_second, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kFloorSpinner;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kFloorSpinner, owner_position);
   pooled.node.life_ticks = std::max(pattern.life_ticks, 1);
   pooled.node.render_word = kFloorSpinnerRenderWord;
   // ⚠ L'IMAGE EST CELLE DE LA PISTE, et le nœud n'avance pas la sienne : c'est

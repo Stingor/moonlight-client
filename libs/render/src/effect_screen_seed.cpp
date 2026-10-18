@@ -1,8 +1,8 @@
 #include "ro/render/effect_screen_seed.h"
 
-#include <algorithm>
 #include <cmath>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/map_effect_math.h"
 
@@ -41,12 +41,7 @@ namespace {
 }  // namespace
 
 std::span<const EffectScreenPattern> EffectScreenPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectScreenPattern> table = EffectScreenPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectScreenPattern::effect_id);
-  const auto last = std::ranges::upper_bound(table, effect_id, {}, &EffectScreenPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectScreenPatternTable(), effect_id, &EffectScreenPattern::effect_id);
 }
 
 EffectScreenNode SowEffectScreenNode(const EffectScreenPattern& pattern, std::uint32_t& generator) {

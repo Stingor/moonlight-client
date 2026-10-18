@@ -1,9 +1,9 @@
 #include "ro/render/effect_spinning_round_seed.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -22,13 +22,8 @@ namespace {
 
 std::span<const EffectSpinningRoundPattern> EffectSpinningRoundPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectSpinningRoundPattern> table = EffectSpinningRoundPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSpinningRoundPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSpinningRoundPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSpinningRoundPatternTable(), effect_id,
+                           &EffectSpinningRoundPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpinningRoundTracks(
@@ -64,10 +59,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpinningRoundTracks(
 PooledEffectNode SowEffectSpinningRoundNode(const EffectSpinningRoundPattern& pattern,
                                             glm::vec3 anchor, std::int32_t effect_life_ticks,
                                             std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpinningRound;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpinningRound, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectSpinningRoundTracks(pattern, generator);

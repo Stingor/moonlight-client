@@ -1,8 +1,8 @@
 #include "ro/render/effect_sphere_shell_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -18,13 +18,8 @@ constexpr std::size_t kSlotOfOuterGrowth = 0;
 }  // namespace
 
 std::span<const EffectSphereShellPattern> EffectSphereShellPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSphereShellPattern> table = EffectSphereShellPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSphereShellPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSphereShellPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSphereShellPatternTable(), effect_id,
+                           &EffectSphereShellPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSphereShellTracks(
@@ -48,10 +43,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSphereShellTracks(
 
 PooledEffectNode SowEffectSphereShellNode(const EffectSphereShellPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSphereShell;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSphereShell, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   // ⚠ L'ORDRE DES DEUX IMAGES EST CELUI DU BÂTISSEUR, et la figure s'en sert
   // comme d'un index : celle du site d'abord, `guardK2.tga` ensuite. Les

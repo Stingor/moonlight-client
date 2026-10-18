@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -12,13 +13,8 @@ namespace ro::render {
 
 std::span<const EffectRingStarburstPattern> EffectRingStarburstPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectRingStarburstPattern> table = EffectRingStarburstPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectRingStarburstPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectRingStarburstPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectRingStarburstPatternTable(), effect_id,
+                           &EffectRingStarburstPattern::effect_id);
 }
 
 std::int32_t EffectRingStarburstLastSowTick(std::uint32_t effect_id) {
@@ -60,10 +56,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRingStarburstTracks(
 
 PooledEffectNode SowEffectRingStarburstNode(const EffectRingStarburstPattern& pattern,
                                             glm::vec3 anchor, std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kRingStarburst;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRingStarburst, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.trail_variant =
       static_cast<std::uint8_t>(static_cast<std::int32_t>(pattern.trail_variant));

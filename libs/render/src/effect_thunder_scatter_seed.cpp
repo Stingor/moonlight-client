@@ -3,11 +3,13 @@
 #include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_thunder_scatter.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -28,19 +30,12 @@ constexpr std::size_t kSlotOfSpinDegrees = 8;
 // carré teinté, dont les lectures par piste s'arrêtent aux cases huit et neuf.
 constexpr std::size_t kUnreadSlot = 7;
 
-[[nodiscard]] std::int32_t DrawBelow(std::int32_t exclusive_bound, std::uint32_t& generator) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 }  // namespace
 
 std::span<const EffectThunderScatterPattern> EffectThunderScatterPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectThunderScatterPattern> table = EffectThunderScatterPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectThunderScatterPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectThunderScatterPatternTable(), effect_id,
+                           &EffectThunderScatterPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedThunderScatterTracks(glm::vec3 aim_point,
@@ -48,8 +43,8 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedThunderScatterTracks(glm::vec3
   std::array<EffectTrack, kEffectTracksPerNode> tracks;
   for (EffectTrack& track : tracks) {
     track.active = true;
-    track.ticks = DrawBelow(kThunderScatterDelayDraws, generator) + kThunderScatterDelayBase;
-    track.radius_at_anchor = static_cast<float>(DrawBelow(kThunderScatterRadiusDraws, generator)) *
+    track.ticks = DrawBelow(generator, kThunderScatterDelayDraws) + kThunderScatterDelayBase;
+    track.radius_at_anchor = static_cast<float>(DrawBelow(generator, kThunderScatterRadiusDraws)) *
                                  kThunderScatterRadiusStep +
                              kThunderScatterRadiusBase;
     track.value[kSlotOfSpinDegrees] = 0.0F;
@@ -58,11 +53,11 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedThunderScatterTracks(glm::vec3
     track.anchor = {aim_point.x, aim_point.y + kThunderScatterLiftAboveAim, aim_point.z};
     track.azimuth_degrees = 0;
     track.value[kThunderScatterSlotOfSpeed] =
-        static_cast<float>(DrawBelow(kThunderScatterSpeedDraws, generator)) *
+        static_cast<float>(DrawBelow(generator, kThunderScatterSpeedDraws)) *
             kThunderScatterDrawStep +
         kThunderScatterSpeedBase;
     track.value[kThunderScatterSlotOfRise] =
-        static_cast<float>(DrawBelow(kThunderScatterRiseDraws, generator)) *
+        static_cast<float>(DrawBelow(generator, kThunderScatterRiseDraws)) *
             kThunderScatterDrawStep +
         kThunderScatterRiseBase;
     track.degrees = 0;
@@ -86,12 +81,9 @@ std::optional<PooledEffectNode> SowThunderScatterNode(glm::vec3 owner_position,
   if (!aim_point.has_value()) {
     return std::nullopt;
   }
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kThunderScatter;
   // ⚠ LE NŒUD NAÎT SUR L'INSTANCE, sans écart, et prend sa place : celle du
   // porteur.
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kThunderScatter, owner_position);
   // LE POINT VISÉ, recopié dans le nœud.
   // Le mouvement n'en lit que l'abscisse et la cote.
   pooled.target_position = aim_point;

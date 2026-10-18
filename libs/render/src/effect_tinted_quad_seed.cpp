@@ -10,6 +10,8 @@
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
+
 namespace ro::render {
 namespace {
 
@@ -38,11 +40,6 @@ constexpr float kLiftAboveEffect = 6.0F;
 // L'UNIQUE PISTE VIVE : le bâtisseur allume la première et éteint les trois
 // autres, comme celui de l'arc.
 constexpr std::size_t kLivingTrack = 0;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 }  // namespace
 

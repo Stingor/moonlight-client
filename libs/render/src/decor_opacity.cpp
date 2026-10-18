@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "ro/core/sorted_table.h"
+
 namespace ro::render {
 namespace {
 
@@ -31,9 +33,9 @@ constexpr unsigned kHalfByteForRounding = 127U;
 // L'opacité que `by_rank` donne au rang `rank` du RSW, pleine s'il n'y est pas.
 [[nodiscard]] std::uint8_t OpacityOfRank(std::span<const mapedit::ModelOpacity> by_rank,
                                          std::size_t rank) {
-  const auto found =
-      std::ranges::lower_bound(by_rank, rank, {}, &mapedit::ModelOpacity::model_index);
-  if (found == by_rank.end() || found->model_index != rank) {
+  const mapedit::ModelOpacity* found =
+      core::RowWithKey(by_rank, rank, &mapedit::ModelOpacity::model_index);
+  if (found == nullptr) {
     return kVeilOpaque;
   }
   return OpacityByte(found->opacity);

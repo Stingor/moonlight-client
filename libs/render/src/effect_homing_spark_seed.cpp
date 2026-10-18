@@ -1,35 +1,21 @@
 #include "ro/render/effect_homing_spark_seed.h"
 
-#include <algorithm>
-#include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_homing_spark.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
-namespace {
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
-}  // namespace
 
 std::span<const EffectHomingSparkPattern> EffectHomingSparkPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectHomingSparkPattern> table = EffectHomingSparkPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectHomingSparkPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectHomingSparkPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectHomingSparkPatternTable(), effect_id,
+                           &EffectHomingSparkPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHomingSparkTracks(
@@ -67,10 +53,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHomingSparkTracks(
 PooledEffectNode SowEffectHomingSparkNode(const EffectHomingSparkPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks,
                                           std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kHomingSpark;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kHomingSpark, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectHomingSparkTracks(pattern, generator);

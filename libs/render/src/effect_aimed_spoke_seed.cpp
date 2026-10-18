@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_aimed_spoke.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -18,10 +19,8 @@ constexpr std::size_t kLeadingTrack = 0;
 }  // namespace
 
 std::span<const EffectAimedSpokePattern> EffectAimedSpokePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectAimedSpokePattern> table = EffectAimedSpokePatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectAimedSpokePattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectAimedSpokePatternTable(), effect_id,
+                           &EffectAimedSpokePattern::effect_id);
 }
 
 std::int16_t AimedSpokeClientHeading(glm::vec3 node_position,
@@ -56,10 +55,7 @@ PooledEffectNode SowAimedSpokeNode(const EffectAimedSpokePattern& pattern,
                                    glm::vec3 instance_position,
                                    const std::optional<glm::vec3>& target,
                                    std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kAimedSpokes;
-  pooled.ground_position = instance_position;
-  pooled.owner_position = instance_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kAimedSpokes, instance_position);
   pooled.target_position = target;
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.node.render_word = kAimedSpokeRenderWord;

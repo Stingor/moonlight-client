@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -10,13 +11,8 @@
 namespace ro::render {
 
 std::span<const EffectCameraFanPattern> EffectCameraFanPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectCameraFanPattern> table = EffectCameraFanPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectCameraFanPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectCameraFanPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectCameraFanPatternTable(), effect_id,
+                           &EffectCameraFanPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectCameraFanTracks(
@@ -49,10 +45,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectCameraFanTracks(
 
 PooledEffectNode SowEffectCameraFanNode(const EffectCameraFanPattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kCameraFan;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kCameraFan, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   const std::size_t allumees = std::min(pattern.trail_count, kCameraFanMostTrailsPerNode);
   pooled.resource_paths.reserve(allumees);

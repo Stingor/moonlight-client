@@ -1,8 +1,8 @@
 #include "ro/render/effect_ground_disc_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -51,13 +51,8 @@ constexpr std::uint8_t kOctetMapCircleBackwards = 14;
 }  // namespace
 
 std::span<const EffectGroundDiscPattern> EffectGroundDiscPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectGroundDiscPattern> table = EffectGroundDiscPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectGroundDiscPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectGroundDiscPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectGroundDiscPatternTable(), effect_id,
+                           &EffectGroundDiscPattern::effect_id);
 }
 
 EffectGroundDiscSeed EffectGroundDiscSeedFor(std::uint8_t builder_argument,
@@ -127,10 +122,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGroundDiscTracks(
 PooledEffectNode SowEffectGroundDiscNode(const EffectGroundDiscPattern& pattern, glm::vec3 anchor,
                                          std::int32_t effect_life_ticks,
                                          float radius_from_instance) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kGroundDisc;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kGroundDisc, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectGroundDiscTracks(pattern, radius_from_instance);

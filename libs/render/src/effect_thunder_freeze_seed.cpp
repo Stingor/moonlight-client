@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -27,10 +28,8 @@ constexpr float kFewestLaunchedNodes = 1.0F;
 
 std::span<const EffectThunderFreezePattern> EffectThunderFreezePatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectThunderFreezePattern> table = EffectThunderFreezePatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectThunderFreezePattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectThunderFreezePatternTable(), effect_id,
+                           &EffectThunderFreezePattern::effect_id);
 }
 
 std::int32_t ThunderFreezeNodeCount(float launched_count) {
@@ -85,12 +84,9 @@ std::vector<PooledEffectNode> SowThunderFreezeNodes(glm::vec3 owner_position, fl
   std::vector<PooledEffectNode> nodes;
   const std::int32_t count = ThunderFreezeNodeCount(launched_count);
   for (std::int32_t rang = 0; rang < count; ++rang) {
-    PooledEffectNode pooled;
-    pooled.shape = PooledNodeShape::kThunderFreeze;
     // ⚠ LE NŒUD NAÎT SUR L'INSTANCE, sans écart, et l'instance est à la place
     // du porteur.
-    pooled.ground_position = owner_position;
-    pooled.owner_position = owner_position;
+    PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kThunderFreeze, owner_position);
     pooled.node.life_ticks = std::max(effect_life_ticks, 1);
     pooled.node.render_word = kThunderFreezeRenderWord;
     pooled.resource_paths = {std::string(kThunderFreezeCoreImage),

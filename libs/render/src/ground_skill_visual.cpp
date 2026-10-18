@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iterator>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_class_registry.h"
 
 namespace ro::render {
@@ -25,9 +26,8 @@ namespace {
 template <typename Entry>
 [[nodiscard]] std::span<const Entry> EntriesOf(std::span<const Entry> table,
                                                std::uint32_t skill_id) {
-  const auto [first, last] = std::ranges::equal_range(
-      table, skill_id, {}, [](const Entry& entry) { return std::uint32_t{entry.skill_id}; });
-  return {first, last};
+  return core::RowsWithKey(table, skill_id,
+                           [](const Entry& entry) { return std::uint32_t{entry.skill_id}; });
 }
 
 }  // namespace

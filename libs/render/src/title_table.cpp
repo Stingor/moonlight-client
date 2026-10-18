@@ -9,6 +9,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ro/core/sorted_table.h"
+
 namespace ro::render {
 namespace {
 
@@ -61,9 +63,8 @@ core::Result<TitleTable> TitleTable::Parse(std::string_view yaml_text) {
 }
 
 std::string_view TitleTable::Find(std::int32_t title_id) const {
-  const auto found =
-      std::ranges::lower_bound(entries_, title_id, {}, [](const Entry& e) { return e.title_id; });
-  if (found == entries_.end() || found->title_id != title_id) {
+  const Entry* found = core::RowWithKey(entries_, title_id, &Entry::title_id);
+  if (found == nullptr) {
     return {};
   }
   return found->label;

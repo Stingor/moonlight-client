@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -28,12 +29,6 @@ constexpr float kBodyLiftRaise = 4.0F;
 // L'UNIQUE PISTE VIVE. Le bâtisseur allume la première et éteint les trois
 // autres, à chaque style.
 constexpr std::size_t kLivingTrack = 0;
-
-// Un tirage entier dans [0, bound), comme le modulo du client.
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 }  // namespace
 
@@ -106,11 +101,9 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectArcRibbonTracks(
 PooledEffectNode SowEffectArcRibbonNode(const EffectArcRibbonNodePattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks, std::uint32_t& generator,
                                         float instance_scale, float body_lift) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kArcRibbons;
-  pooled.ground_position = anchor;
-  // L'INSTANCE, que le mouvement relit à chaque tic : voir `kArcRibbonSlotOfHeightGap`.
-  pooled.owner_position = anchor;
+  // LE PORTEUR EST L'INSTANCE, que le mouvement relit à chaque tic : voir
+  // `kArcRibbonSlotOfHeightGap`.
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kArcRibbons, anchor);
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.node.life_ticks = effect_life_ticks;
   const EffectArcRibbonStyleSeed* style_seed = EffectArcRibbonStyleSeedFor(pattern.style);

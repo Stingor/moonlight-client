@@ -4,12 +4,12 @@
 #include <cmath>
 #include <cstddef>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_quad_burst.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
 #include "ro/render/effect_track_spread.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -58,11 +58,6 @@ constexpr std::array<std::array<float, 2>, kWanderingMoteParticles> kWanderSigns
 // emploient l'inégalité stricte ; c'est très probablement une recopie, mais
 // c'est ce qu'il fait et c'est ce qui décide à la limite exacte.
 constexpr std::array<bool, kWanderingMoteParticles> kEscapeIsStrict = {false, false, true, true};
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
 
 // LA DISTANCE QUE LE CLIENT MESURE : l'abscisse, ou la profondeur quand
 // l'abscisse est trop courte. Les deux sont tronquées en entier de seize bits

@@ -1,16 +1,13 @@
 #include "ro/render/str_effect_setup.h"
 
-#include <algorithm>
-
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_class_registry.h"
 #include "ro/render/effect_render_word.h"
 
 namespace ro::render {
 
 const StrEffectSetup* StrEffectSetupFor(std::uint32_t effect_id) {
-  const std::span<const StrEffectSetup> table = StrEffectSetupTable();
-  const auto found = std::ranges::lower_bound(table, effect_id, {}, &StrEffectSetup::effect_id);
-  return found != table.end() && found->effect_id == effect_id ? &*found : nullptr;
+  return core::RowWithKey(StrEffectSetupTable(), effect_id, &StrEffectSetup::effect_id);
 }
 
 float StrEffectLevelScale(const StrEffectSetup& setup, std::int32_t level) {

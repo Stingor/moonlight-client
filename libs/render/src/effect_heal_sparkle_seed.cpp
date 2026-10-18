@@ -1,13 +1,14 @@
 #include "ro/render/effect_heal_sparkle_seed.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -21,21 +22,11 @@ constexpr std::size_t kMarkOfQuadDrawing = 2;
 // rayon. Même case que l'arc de ruban et le carré teinté.
 constexpr std::size_t kSlotOfSpinDegrees = 8;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 }  // namespace
 
 std::span<const EffectHealSparklePattern> EffectHealSparklePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectHealSparklePattern> table = EffectHealSparklePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectHealSparklePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectHealSparklePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectHealSparklePatternTable(), effect_id,
+                           &EffectHealSparklePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHealSparkleTracks(
@@ -62,10 +53,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHealSparkleTracks(
 PooledEffectNode SowEffectHealSparkleNode(const EffectHealSparklePattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks,
                                           std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kHealSparkle;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kHealSparkle, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectHealSparkleTracks(pattern, generator);

@@ -1,19 +1,12 @@
 #include "ro/render/effect_duration.h"
 
-#include <algorithm>
-#include <ranges>
+#include "ro/core/sorted_table.h"
 
 namespace ro::render {
 namespace {
 
 [[nodiscard]] const EffectDurationEntry* Trouver(std::uint32_t effect_id) {
-  const std::span<const EffectDurationEntry> table = EffectDurationTable();
-  const auto found =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectDurationEntry::effect_id);
-  if (found == table.end() || found->effect_id != effect_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(EffectDurationTable(), effect_id, &EffectDurationEntry::effect_id);
 }
 
 }  // namespace

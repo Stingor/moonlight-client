@@ -1,8 +1,8 @@
 #include "ro/render/effect_fading_sprite_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_trail_history.h"
@@ -10,13 +10,8 @@
 namespace ro::render {
 
 std::span<const EffectFadingSpritePattern> EffectFadingSpritePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectFadingSpritePattern> table = EffectFadingSpritePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectFadingSpritePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectFadingSpritePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectFadingSpritePatternTable(), effect_id,
+                           &EffectFadingSpritePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFadingSpriteTracks(

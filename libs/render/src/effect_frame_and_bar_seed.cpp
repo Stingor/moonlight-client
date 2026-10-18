@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_frame_and_bar.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -112,13 +113,8 @@ EffectFrameAndBarRecipe EffectFrameAndBarRecipeOf(std::uint8_t style_byte) {
 }
 
 std::span<const EffectFrameAndBarPattern> EffectFrameAndBarPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectFrameAndBarPattern> table = EffectFrameAndBarPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectFrameAndBarPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectFrameAndBarPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectFrameAndBarPatternTable(), effect_id,
+                           &EffectFrameAndBarPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFrameAndBarTracks(
@@ -163,10 +159,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFrameAndBarTracks(
 
 PooledEffectNode SowEffectFrameAndBarNode(const EffectFrameAndBarPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kFrameAndBar;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kFrameAndBar, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectFrameAndBarTracks(pattern, effect_life_ticks);

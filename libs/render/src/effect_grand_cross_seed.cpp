@@ -1,8 +1,8 @@
 #include "ro/render/effect_grand_cross_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -10,13 +10,8 @@
 namespace ro::render {
 
 std::span<const EffectGrandCrossPattern> EffectGrandCrossPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectGrandCrossPattern> table = EffectGrandCrossPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectGrandCrossPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectGrandCrossPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectGrandCrossPatternTable(), effect_id,
+                           &EffectGrandCrossPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedGrandCrossRibbonTracks() {
@@ -59,10 +54,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedGrandCrossFrameTracks() {
 
 PooledEffectNode SowGrandCrossRibbonNode(const EffectGrandCrossPattern& pattern, glm::vec3 anchor,
                                          std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kGrandCrossRibbon;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kGrandCrossRibbon, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.node.render_word = kGrandCrossRenderWord;
   pooled.resource_paths = {std::string(pattern.ribbon_texture)};
@@ -73,10 +65,7 @@ PooledEffectNode SowGrandCrossRibbonNode(const EffectGrandCrossPattern& pattern,
 
 PooledEffectNode SowGrandCrossFrameNode(const EffectGrandCrossPattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kGrandCrossFrame;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kGrandCrossFrame, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.node.render_word = kGrandCrossRenderWord;
   pooled.resource_paths = {std::string(pattern.frame_texture)};

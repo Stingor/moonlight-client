@@ -1,8 +1,8 @@
 #include "ro/render/effect_cycling_skirt_seed.h"
 
-#include <algorithm>
 #include <format>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -37,13 +37,8 @@ constexpr std::size_t kFirstImageNumber = 1;
 }  // namespace
 
 std::span<const EffectCyclingSkirtPattern> EffectCyclingSkirtPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectCyclingSkirtPattern> table = EffectCyclingSkirtPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectCyclingSkirtPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectCyclingSkirtPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectCyclingSkirtPatternTable(), effect_id,
+                           &EffectCyclingSkirtPattern::effect_id);
 }
 
 std::vector<std::string> EffectCyclingSkirtTexturePaths(std::uint8_t builder_argument) {
@@ -102,10 +97,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectCyclingSkirtTracks(
 
 PooledEffectNode SowEffectCyclingSkirtNode(const EffectCyclingSkirtPattern& pattern,
                                            glm::vec3 anchor, std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kCyclingSkirt;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kCyclingSkirt, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   // L'IMAGE NE CHANGE PAS D'ELLE-MÊME : le mouvement la pose depuis le compteur.
   pooled.node.frame_hold_ticks = 0;

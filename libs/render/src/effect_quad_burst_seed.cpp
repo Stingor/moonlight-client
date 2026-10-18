@@ -1,13 +1,14 @@
 #include "ro/render/effect_quad_burst_seed.h"
 
-#include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_quad_burst.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -37,11 +38,6 @@ constexpr std::int32_t kWideScatterBias = 17;
 constexpr std::int32_t kScatteringStartSpread = 40;
 constexpr float kScatteringStartFloor = -40.0F;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 [[nodiscard]] bool IsFadingMark(std::uint8_t variant_value) {
   return variant_value == kVariantFadingFive || variant_value == kVariantFadingSeven ||
          variant_value == kVariantFadingEight;
@@ -62,13 +58,8 @@ constexpr float kScatteringStartFloor = -40.0F;
 }  // namespace
 
 std::span<const EffectQuadBurstPattern> EffectQuadBurstPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectQuadBurstPattern> table = EffectQuadBurstPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectQuadBurstPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectQuadBurstPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectQuadBurstPatternTable(), effect_id,
+                           &EffectQuadBurstPattern::effect_id);
 }
 
 std::string_view EffectQuadBurstTextureOf(std::uint8_t variant) {
@@ -184,10 +175,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectQuadBurstTracks(
 
 PooledEffectNode SowEffectQuadBurstNode(const EffectQuadBurstPattern& pattern, glm::vec3 anchor,
                                         std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kQuadBurst;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kQuadBurst, anchor);
   pooled.node.life_ticks = kQuadBurstEndlessLifeTicks;
   pooled.resource_paths = {std::string(EffectQuadBurstTextureOf(pattern.variant))};
   pooled.trail_variant = static_cast<std::uint8_t>(EffectQuadBurstScaleOf(pattern.variant));

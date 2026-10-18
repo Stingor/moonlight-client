@@ -1,6 +1,6 @@
-#include <algorithm>
 #include <cstddef>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_table.h"
 
 namespace ro::render {
@@ -14,8 +14,7 @@ constexpr std::uint32_t kFirstVariant = 1;
 
 // L'entrée d'un identifiant dans une table, ou nulle.
 const EffectEntry* Lookup(std::span<const EffectEntry> table, std::uint32_t effect_id) {
-  const auto found = std::ranges::lower_bound(table, effect_id, {}, &EffectEntry::id);
-  return found != table.end() && found->id == effect_id ? &*found : nullptr;
+  return core::RowWithKey(table, effect_id, &EffectEntry::id);
 }
 
 }  // namespace

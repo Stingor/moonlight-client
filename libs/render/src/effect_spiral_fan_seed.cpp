@@ -63,14 +63,11 @@ std::string_view EffectSpiralFanDrawnIcon(std::uint32_t& generator) {
 PooledEffectNode SowEffectSpiralFanNode(const EffectSpiralFanNodePattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks, std::int32_t delay_ticks,
                                         std::string_view texture) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpiralFan;
-  pooled.ground_position = anchor;
   // ⚠ LE PORTEUR EST D'ABORD L'ANCRE. Un semis dont la marque fait suivre le
   // porteur lira ce point tant que personne ne lui en donne un autre : il reste
   // alors où il est né, ce qui est faux si le porteur marche, mais jamais
   // inventé. Voir `FanTracksFollowTheirOwner`.
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpiralFan, anchor);
   pooled.resource_paths = {std::string(texture.empty() ? pattern.texture : texture)};
   // ⚠ LE RETARD S'AJOUTE À LA VIE, et il le faut : le nœud du client NAÎT au tic
   // de sa phase, et vit sa vie pleine à partir de là. Le nôtre naît tout de

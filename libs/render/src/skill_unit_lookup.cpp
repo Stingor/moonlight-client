@@ -4,6 +4,7 @@
 #include <optional>
 #include <string_view>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_case_table.h"
 #include "ro/render/effect_duration.h"
 #include "ro/render/effect_frame.h"
@@ -18,11 +19,7 @@ namespace {
 // le moment où on les consulte.
 const SkillUnitSoundEntry* Found(std::span<const SkillUnitSoundEntry> table,
                                  std::uint32_t unit_id) {
-  const auto found = std::ranges::lower_bound(table, unit_id, {}, &SkillUnitSoundEntry::unit_id);
-  if (found == table.end() || found->unit_id != unit_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(table, unit_id, &SkillUnitSoundEntry::unit_id);
 }
 
 // LES SONS DE POSE CHOISIS PAR LE JOUEUR, à l'écart du client d'origine, qui
@@ -46,21 +43,16 @@ const SkillUnitSoundEntry* SkillUnitSustainSound(std::uint32_t unit_id) {
 }
 
 std::uint16_t SkillUnitEffect(std::uint32_t unit_id) {
-  const std::span<const SkillUnitEffectEntry> table = SkillUnitEffectTable();
-  const auto found = std::ranges::lower_bound(table, unit_id, {}, &SkillUnitEffectEntry::unit_id);
-  if (found == table.end() || found->unit_id != unit_id) {
+  const SkillUnitEffectEntry* found =
+      core::RowWithKey(SkillUnitEffectTable(), unit_id, &SkillUnitEffectEntry::unit_id);
+  if (found == nullptr) {
     return 0;
   }
   return found->effect_id;
 }
 
 const SkillUnitVisualEntry* SkillUnitVisual(std::uint32_t unit_id) {
-  const std::span<const SkillUnitVisualEntry> table = SkillUnitVisualTable();
-  const auto found = std::ranges::lower_bound(table, unit_id, {}, &SkillUnitVisualEntry::unit_id);
-  if (found == table.end() || found->unit_id != unit_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(SkillUnitVisualTable(), unit_id, &SkillUnitVisualEntry::unit_id);
 }
 
 std::uint16_t SkillUnitLevelVisual(std::uint32_t unit_id, std::uint8_t skill_level) {
@@ -111,9 +103,9 @@ std::uint32_t SkillUnitVisualPeriodMs(const SkillUnitVisualEntry& visual) {
 }
 
 std::string SkillUnitModelPath(std::uint32_t unit_id) {
-  const std::span<const SkillUnitEntry> table = SkillUnitTable();
-  const auto found = std::ranges::lower_bound(table, unit_id, {}, &SkillUnitEntry::unit_id);
-  if (found == table.end() || found->unit_id != unit_id) {
+  const SkillUnitEntry* found =
+      core::RowWithKey(SkillUnitTable(), unit_id, &SkillUnitEntry::unit_id);
+  if (found == nullptr) {
     return {};
   }
   return std::string(kModelFolder) + std::string(found->model);
@@ -122,19 +114,16 @@ std::string SkillUnitModelPath(std::uint32_t unit_id) {
 std::span<const SkillUnitNamedEffectEntry> SkillUnitNamedEffects(std::uint32_t unit_id) {
   // Une PLAGE, et non une entrée : une fabrique en joue jusqu'à quatre par
   // moment, et leur ordre dans la table est celui de sa fonction.
-  const std::span<const SkillUnitNamedEffectEntry> table = SkillUnitNamedEffectTable();
-  const auto found = std::ranges::equal_range(table, static_cast<std::uint16_t>(unit_id), {},
-                                              &SkillUnitNamedEffectEntry::unit_id);
-  return {found.begin(), found.end()};
+  return core::RowsWithKey(SkillUnitNamedEffectTable(), static_cast<std::uint16_t>(unit_id),
+                           &SkillUnitNamedEffectEntry::unit_id);
 }
 
 std::span<const SkillUnitNamedEffectEntry> SkillUnitNamedEffects(std::uint32_t unit_id,
                                                                  SkillUnitNamedMoment moment) {
   // La table range les moments d'une unité dans l'ordre où elle les joue, donc
   // ceux d'un même moment sont CONTIGUS et se prennent en une seconde borne.
-  const std::span<const SkillUnitNamedEffectEntry> all = SkillUnitNamedEffects(unit_id);
-  const auto found = std::ranges::equal_range(all, moment, {}, &SkillUnitNamedEffectEntry::moment);
-  return {found.begin(), found.end()};
+  return core::RowsWithKey(SkillUnitNamedEffects(unit_id), moment,
+                           &SkillUnitNamedEffectEntry::moment);
 }
 
 }  // namespace ro::render

@@ -73,7 +73,8 @@ constexpr std::array<EffectChasedDriftPattern, 3> kChasedDrifts = {{
 // Les angles se tirent sur un tour, en degrés entiers.
 constexpr std::int32_t kAngleSpread = kEffectTrackFullTurnDegrees;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t etendue) {
+// Un tirage sous la borne, ou zéro SANS TIRER quand elle n'est pas positive.
+[[nodiscard]] std::int32_t DrawBelowIfPositive(std::uint32_t& rng_state, std::int32_t etendue) {
   return etendue > 0 ? static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
                                                  static_cast<std::uint32_t>(etendue))
                      : 0;
@@ -82,7 +83,7 @@ constexpr std::int32_t kAngleSpread = kEffectTrackFullTurnDegrees;
 // UN POINT DU CARRÉ, sur un côté : `tirage(côté) − côté / 2`, en entiers.
 [[nodiscard]] float DrawAcrossSquare(std::uint32_t& generator, float side) {
   const auto whole = static_cast<std::int32_t>(side);
-  return static_cast<float>(DrawBelow(generator, whole) - whole / 2);
+  return static_cast<float>(DrawBelowIfPositive(generator, whole) - whole / 2);
 }
 
 }  // namespace
@@ -107,22 +108,22 @@ EffectChasedDriftSowing SowEffectChasedDrift(const EffectChasedDriftPattern& pat
   // ⚠ UNE MONTÉE ENTIÈRE, puis multipliée : trois valeurs possibles, pas une
   // plage.
   drift.rise_per_tick =
-      static_cast<float>(DrawBelow(generator, pattern.rise_spread) + pattern.rise_floor) *
+      static_cast<float>(DrawBelowIfPositive(generator, pattern.rise_spread) + pattern.rise_floor) *
       pattern.rise_unit;
   // L'ÉCHELLE, entière avant la division.
-  sowing.sprite_scale =
-      static_cast<float>(DrawBelow(generator, pattern.scale_spread) + pattern.scale_floor) /
-      pattern.scale_divisor;
+  sowing.sprite_scale = static_cast<float>(DrawBelowIfPositive(generator, pattern.scale_spread) +
+                                           pattern.scale_floor) /
+                        pattern.scale_divisor;
   const bool square = pattern.birth_square_side > 0.0F;
   float across = 0.0F;
   std::int32_t circle = 0;
   if (!square) {
-    circle = DrawBelow(generator, kAngleSpread);
+    circle = DrawBelowIfPositive(generator, kAngleSpread);
   } else if (pattern.square_x_before_angles) {
     across = DrawAcrossSquare(generator, pattern.birth_square_side);
   }
   for (std::size_t case_ = 0; case_ < 2 * kChasedDriftAnglePairs; ++case_) {
-    drift.angles.value[case_] = static_cast<float>(DrawBelow(generator, kAngleSpread));
+    drift.angles.value[case_] = static_cast<float>(DrawBelowIfPositive(generator, kAngleSpread));
   }
   if (square) {
     if (!pattern.square_x_before_angles) {
@@ -132,7 +133,7 @@ EffectChasedDriftSowing SowEffectChasedDrift(const EffectChasedDriftPattern& pat
     const float depth = DrawAcrossSquare(generator, pattern.birth_square_side);
     sowing.birth_offset = {across, pattern.birth_lift, -depth};
   }
-  sowing.action = DrawBelow(generator, pattern.action_spread);
+  sowing.action = DrawBelowIfPositive(generator, pattern.action_spread);
   if (square) {
     return sowing;
   }

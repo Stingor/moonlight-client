@@ -1,8 +1,8 @@
 #include "ro/render/effect_rainbow_trail_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_rainbow_trail.h"
@@ -11,13 +11,8 @@
 namespace ro::render {
 
 std::span<const EffectRainbowTrailPattern> EffectRainbowTrailPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectRainbowTrailPattern> table = EffectRainbowTrailPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectRainbowTrailPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectRainbowTrailPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectRainbowTrailPatternTable(), effect_id,
+                           &EffectRainbowTrailPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRainbowTrailTracks(
@@ -49,10 +44,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRainbowTrailTracks(
 PooledEffectNode SowEffectRainbowTrailNode(const EffectRainbowTrailPattern& pattern,
                                            glm::vec3 anchor, std::int32_t effect_life_ticks,
                                            std::int16_t billboard_turn_degrees) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kRainbowTrail;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRainbowTrail, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectRainbowTrailTracks(billboard_turn_degrees);

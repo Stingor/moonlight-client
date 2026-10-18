@@ -1,8 +1,8 @@
 #include "ro/render/effect_triple_wall_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -23,13 +23,8 @@ constexpr std::size_t kSlotOfInnerRadius = 0;
 }  // namespace
 
 std::span<const EffectTripleWallPattern> EffectTripleWallPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectTripleWallPattern> table = EffectTripleWallPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectTripleWallPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectTripleWallPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectTripleWallPatternTable(), effect_id,
+                           &EffectTripleWallPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectTripleWallTracks(
@@ -55,10 +50,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectTripleWallTracks(
 PooledEffectNode SowEffectTripleWallNode(const EffectTripleWallPattern& pattern,
                                          std::int16_t node_azimuth_degrees, glm::vec3 anchor,
                                          std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kTripleWall;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kTripleWall, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.trail_variant = pattern.trail_variant;

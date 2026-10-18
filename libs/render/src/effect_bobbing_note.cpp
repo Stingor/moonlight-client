@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_particle_quad.h"
@@ -64,10 +65,8 @@ constexpr std::array<std::uint8_t, 3> kWhite = {255, 255, 255};
 }  // namespace
 
 std::span<const EffectBobbingNotePattern> EffectBobbingNotePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectBobbingNotePattern> table = EffectBobbingNotePatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectBobbingNotePattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectBobbingNotePatternTable(), effect_id,
+                           &EffectBobbingNotePattern::effect_id);
 }
 
 std::string_view EffectBobbingNoteTexture(const EffectBobbingNotePattern& pattern,
@@ -99,10 +98,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedBobbingNoteTracks(std::uint8_t
 PooledEffectNode SowBobbingNoteNode(const EffectBobbingNotePattern& pattern,
                                     glm::vec3 owner_position, bool minimal_effects,
                                     std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kBobbingNote;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kBobbingNote, owner_position);
   pooled.node.life_ticks = std::max(pattern.life_ticks, 1);
   pooled.node.render_word = kBobbingNoteRenderWord;
   pooled.node.frame_hold_ticks = 0;

@@ -1,9 +1,9 @@
 #include "ro/render/effect_shield_boomerang_seed.h"
 
-#include <algorithm>
 #include <cmath>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_life_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -44,10 +44,8 @@ constexpr std::size_t kMarkOfKind = 2;
 
 std::span<const EffectShieldBoomerangPattern> EffectShieldBoomerangPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectShieldBoomerangPattern> table = EffectShieldBoomerangPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectShieldBoomerangPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectShieldBoomerangPatternTable(), effect_id,
+                           &EffectShieldBoomerangPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectShieldBoomerangTracks(
@@ -104,11 +102,8 @@ std::optional<PooledEffectNode> SowEffectShieldBoomerangNode(
     return std::nullopt;
   }
 
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kHomingTrail;
-  pooled.ground_position = anchor;
   // LES DEUX BOUTS : le mouvement VISE le second et REVIRE vers le premier.
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kHomingTrail, anchor);
   pooled.target_position = target;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectShieldBoomerangTracks(pattern, anchor, *target, effect_param);

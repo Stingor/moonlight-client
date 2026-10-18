@@ -87,12 +87,9 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSeededRingTracks(
 PooledEffectNode SowEffectSeededRingNode(const EffectSeededRingPattern& pattern,
                                          glm::vec3 ground_position, std::uint32_t& generator,
                                          std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
   // ⚠ LA FORME VIENT DU PATRON, et le patron la tient du relevé des mouvements.
   // Le dessinateur est commun à tous ; le mouvement ne l'est pas.
-  pooled.shape = pattern.shape;
-  pooled.ground_position = ground_position;
-  pooled.owner_position = ground_position;
+  PooledEffectNode pooled = PooledNodeAt(pattern.shape, ground_position);
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.trail_variant = pattern.trail_variant;
   // 🔴 LA VIE VIENT DE L'INSTANCE, ET ELLE SE RELÈVE. Les onze bâtisseurs de

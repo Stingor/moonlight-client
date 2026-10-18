@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_arcing_light.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -18,10 +19,8 @@ constexpr std::size_t kLeadingTrack = 0;
 }  // namespace
 
 std::span<const EffectArcingLightPattern> EffectArcingLightPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectArcingLightPattern> table = EffectArcingLightPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectArcingLightPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectArcingLightPatternTable(), effect_id,
+                           &EffectArcingLightPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedArcingLightTracks(
@@ -53,10 +52,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedArcingLightTracks(
 PooledEffectNode SowArcingLightNode(const EffectArcingLightPattern& pattern,
                                     glm::vec3 owner_position, std::int32_t effect_life_ticks,
                                     std::uint32_t& generator, std::uint32_t designated_actor_id) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kArcingLight;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kArcingLight, owner_position);
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.node.render_word = kArcingLightRenderWord;
   pooled.resource_paths = {std::string(pattern.texture)};

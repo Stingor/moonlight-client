@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdio>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -37,13 +38,8 @@ constexpr int kFirstImageNumber = 1;
 }  // namespace
 
 std::span<const EffectTypedRibbonPattern> EffectTypedRibbonPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectTypedRibbonPattern> table = EffectTypedRibbonPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectTypedRibbonPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectTypedRibbonPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectTypedRibbonPatternTable(), effect_id,
+                           &EffectTypedRibbonPattern::effect_id);
 }
 
 std::vector<std::string> EffectTypedRibbonImagePaths(const EffectTypedRibbonPattern& pattern) {
@@ -98,10 +94,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectTypedRibbonTracks(
 
 PooledEffectNode SowEffectTypedRibbonNode(const EffectTypedRibbonPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kTypedRibbon;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kTypedRibbon, anchor);
   pooled.node.life_ticks = std::max(effect_life_ticks, kTypedRibbonShortestLifeTicks);
   pooled.resource_paths = EffectTypedRibbonImagePaths(pattern);
   pooled.tracks = SeedEffectTypedRibbonTracks(pattern);

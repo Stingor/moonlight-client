@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <utility>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/shown_job.h"
 #include "ro/vfs/encoding.h"
 
@@ -210,10 +211,9 @@ constexpr std::array<ClassRange, 3> kNoItemShieldRanges = {
 std::string_view RaceFolder(std::uint32_t job) { return IsDoram(job) ? kDoramRace : kHumanRace; }
 
 client_tables::WeaponSpriteClass WeaponSpriteClassOf(std::uint32_t job) {
-  const auto& classes = client_tables::kWeaponSpriteClasses;
-  const auto found =
-      std::ranges::lower_bound(classes, job, {}, &client_tables::WeaponSpriteClass::job);
-  if (found == classes.end() || found->job != job) {
+  const client_tables::WeaponSpriteClass* found = core::RowWithKey(
+      client_tables::kWeaponSpriteClasses, job, &client_tables::WeaponSpriteClass::job);
+  if (found == nullptr) {
     return client_tables::WeaponSpriteClass{job, client_tables::kDefaultWeaponSpriteClass,
                                             client_tables::kDefaultWeaponSpriteClass};
   }
@@ -383,9 +383,8 @@ constexpr std::uint32_t kWarpClass = 45;
 }  // namespace
 
 bool IsPlayerClass(std::uint32_t job) {
-  const auto& names = client_tables::kPlayerBodyNames;
-  const auto found = std::ranges::lower_bound(names, job, {}, &client_tables::PlayerBodyName::job);
-  return found != names.end() && found->job == job;
+  return core::RowWithKey(client_tables::kPlayerBodyNames, job,
+                          &client_tables::PlayerBodyName::job) != nullptr;
 }
 
 bool IsHomunculusJob(std::uint32_t job) {
@@ -756,9 +755,9 @@ std::string Join(std::initializer_list<std::string_view> parts) {
 }
 
 std::string_view PlayerBodyName(std::uint32_t job) {
-  const auto& names = client_tables::kPlayerBodyNames;
-  const auto found = std::ranges::lower_bound(names, job, {}, &client_tables::PlayerBodyName::job);
-  if (found == names.end() || found->job != job) {
+  const client_tables::PlayerBodyName* found =
+      core::RowWithKey(client_tables::kPlayerBodyNames, job, &client_tables::PlayerBodyName::job);
+  if (found == nullptr) {
     return client_tables::kDefaultPlayerBodyName;
   }
   return found->name;

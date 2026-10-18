@@ -1,8 +1,8 @@
 #include "ro/render/effect_pie_wedge_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -20,13 +20,8 @@ constexpr std::int16_t kFullAlpha = 255;
 }  // namespace
 
 std::span<const EffectPieWedgePattern> EffectPieWedgePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectPieWedgePattern> table = EffectPieWedgePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectPieWedgePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectPieWedgePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectPieWedgePatternTable(), effect_id,
+                           &EffectPieWedgePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectPieWedgeTracks(std::int32_t tick) {
@@ -52,10 +47,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectPieWedgeTracks(std::int3
 
 PooledEffectNode SowEffectPieWedgeNode(const EffectPieWedgePattern& pattern, glm::vec3 anchor,
                                        std::int32_t tick, std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kPieWedge;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kPieWedge, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectPieWedgeTracks(tick);

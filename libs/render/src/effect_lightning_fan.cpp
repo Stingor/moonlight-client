@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <cstddef>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -33,11 +33,6 @@ constexpr float kPhaseCeiling = 180.0F;
 constexpr float kPhaseHalf = 90.0F;
 // AU PREMIER TIC, ET SEULEMENT LÀ.
 constexpr std::int32_t kHistoryTick = 1;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
 
 [[nodiscard]] float DrawJitter(std::uint32_t& rng_state) {
   return static_cast<float>(DrawBelow(rng_state, kLightningFanJitterSpread)) *

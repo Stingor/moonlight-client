@@ -1,14 +1,14 @@
 #include "ro/render/effect_drifting_mote_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_drifting_mote.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -17,21 +17,11 @@ namespace {
 // COMBIEN D'ANGLES chaque piste porte : deux paires, donc quatre cases.
 constexpr std::size_t kAnglesPerTrack = 4;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 }  // namespace
 
 std::span<const EffectDriftingMotePattern> EffectDriftingMotePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectDriftingMotePattern> table = EffectDriftingMotePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectDriftingMotePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectDriftingMotePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectDriftingMotePatternTable(), effect_id,
+                           &EffectDriftingMotePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectDriftingMoteTracks(
@@ -91,10 +81,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectDriftingMoteTracks(
 PooledEffectNode SowEffectDriftingMoteNode(const EffectDriftingMotePattern& pattern,
                                            glm::vec3 anchor, std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kDriftingMote;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kDriftingMote, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectDriftingMoteTracks(pattern, generator);

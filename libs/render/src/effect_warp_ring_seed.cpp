@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -30,13 +31,8 @@ constexpr std::uint8_t kMarkAtBirth = 0;
 }  // namespace
 
 std::span<const EffectWarpRingPattern> EffectWarpRingPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectWarpRingPattern> table = EffectWarpRingPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectWarpRingPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectWarpRingPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectWarpRingPatternTable(), effect_id,
+                           &EffectWarpRingPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectWarpRingTracks(
@@ -61,10 +57,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectWarpRingTracks(
 
 PooledEffectNode SowEffectWarpRingNode(const EffectWarpRingPattern& pattern, glm::vec3 anchor,
                                        std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kWarpRings;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kWarpRings, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.trail_variant = pattern.trail_variant;

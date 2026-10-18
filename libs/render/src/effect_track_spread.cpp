@@ -4,21 +4,13 @@
 #include <cstdlib>
 
 #include "ro/render/effect_drifting_mote.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
-namespace {
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
-}  // namespace
 
 // LA POURSUITE D'ANGLES, et TROIS familles la demandent : un
 // courant, une cible, et un pas vers elle.

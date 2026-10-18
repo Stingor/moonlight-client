@@ -1,8 +1,8 @@
 #include "ro/render/effect_heart_ring_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -31,13 +31,8 @@ constexpr float kAnchorHeightThatMeansTurn = 1234.5F;
 std::span<const EffectHeartRingSeed> EffectHeartRingSeeds() { return kRings; }
 
 std::span<const EffectHeartRingPattern> EffectHeartRingPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectHeartRingPattern> table = EffectHeartRingPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectHeartRingPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectHeartRingPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectHeartRingPatternTable(), effect_id,
+                           &EffectHeartRingPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHeartRingTracks(
@@ -73,10 +68,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHeartRingTracks(
 PooledEffectNode SowEffectHeartRingNode(const EffectHeartRingPattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks,
                                         std::uint32_t& azimuth_seed) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kHeartRings;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kHeartRings, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.trail_variant = kHeartRingTrailVariant;
   pooled.resource_paths = {std::string(pattern.texture)};

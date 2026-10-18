@@ -1,23 +1,19 @@
 #include "ro/render/effect_electric_arc_seed.h"
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_lightning_fan.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
+
 namespace ro::render {
 namespace {
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
 
 // L'ALPHA DE NAISSANCE D'UNE PISTE, selon son rang.
 [[nodiscard]] std::int16_t BirthAlpha(std::size_t rang) {
@@ -31,13 +27,8 @@ namespace {
 }  // namespace
 
 std::span<const EffectElectricArcPattern> EffectElectricArcPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectElectricArcPattern> table = EffectElectricArcPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectElectricArcPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectElectricArcPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectElectricArcPatternTable(), effect_id,
+                           &EffectElectricArcPattern::effect_id);
 }
 
 std::int16_t ElectricArcStartTiltDegrees(float owner_facing_degrees) {
@@ -90,10 +81,7 @@ PooledEffectNode SowEffectElectricArcNode(const EffectElectricArcPattern& patter
                                           float owner_facing_degrees,
                                           std::int32_t effect_life_ticks,
                                           std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kElectricArc;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kElectricArc, anchor);
   pooled.owner_facing_degrees = owner_facing_degrees;
   // LA VIE DU NŒUD EST CELLE DE L'INSTANCE, relue par la queue commune du
   // répartiteur.

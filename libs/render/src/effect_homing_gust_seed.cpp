@@ -1,15 +1,16 @@
 #include "ro/render/effect_homing_gust_seed.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_ground_gust.h"
 #include "ro/render/effect_homing_gust.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -33,11 +34,6 @@ constexpr std::uint8_t kGreyColor = 3;
 constexpr std::uint8_t kLeftSide = 0;
 constexpr std::uint8_t kRightSide = 1;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 // CE QUE LES DEUX BÂTISSEURS POSENT À L'IDENTIQUE, piste par piste.
 //
 // Allumée, compteur à zéro, alpha nul, l'ancre au nœud relevée de dix, cap nul
@@ -59,13 +55,8 @@ void PlaceBase(EffectTrack& track, std::size_t rang, glm::vec3 anchor_point) {
 }  // namespace
 
 std::span<const EffectHomingGustPattern> EffectHomingGustPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectHomingGustPattern> table = EffectHomingGustPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectHomingGustPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectHomingGustPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectHomingGustPatternTable(), effect_id,
+                           &EffectHomingGustPattern::effect_id);
 }
 
 HomingGustSteeredStyle HomingGustSteeredStyleOf(std::uint8_t octet) {
@@ -139,13 +130,11 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectHomingGustSpreadTracks(
 PooledEffectNode SowEffectHomingGustNode(const EffectHomingGustPattern& pattern, glm::vec3 anchor,
                                          const std::optional<glm::vec3>& target, std::uint8_t octet,
                                          std::int32_t effect_life_ticks, std::uint32_t& generator) {
-  PooledEffectNode pooled;
   const bool dirige = pattern.kind == EffectHomingGustKind::kSteered;
-  pooled.shape = dirige ? PooledNodeShape::kHomingGustSteered : PooledNodeShape::kHomingGustSpread;
   // LA PLACE DU NŒUD (+16..+24) : l'origine du premier cap, et le point où le
   // 122 rentre. ⚠ ELLE NE SUIT PAS LE PORTEUR : le mouvement ne la recopie pas.
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(
+      dirige ? PooledNodeShape::kHomingGustSteered : PooledNodeShape::kHomingGustSpread, anchor);
   pooled.target_position = target;
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};

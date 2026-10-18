@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -30,12 +31,6 @@ constexpr float kFallStepPerTick = 3.0F;
 // potions lancées d'affilée ne tournent pas en phase. Le poser ferait tomber
 // toutes les lances de l'effet 930 dans la même orientation.
 constexpr std::int16_t kNoAzimuth = 0;
-
-// Un tirage entier dans [0, bound), comme le modulo du client.
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 }  // namespace
 

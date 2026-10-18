@@ -1,9 +1,9 @@
 #include "ro/render/effect_twin_disc_seed.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_breathing_quad.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -14,13 +14,8 @@
 namespace ro::render {
 
 std::span<const EffectTwinDiscPattern> EffectTwinDiscPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectTwinDiscPattern> table = EffectTwinDiscPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectTwinDiscPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectTwinDiscPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectTwinDiscPatternTable(), effect_id,
+                           &EffectTwinDiscPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectTwinDiscTracks(
@@ -46,10 +41,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectTwinDiscTracks(
 
 PooledEffectNode SowEffectTwinDiscNode(const EffectTwinDiscPattern& pattern, glm::vec3 anchor,
                                        std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kTwinDisc;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kTwinDisc, anchor);
   // LA VIE DU NŒUD EST CELLE DE L'INSTANCE.
   pooled.node.life_ticks = effect_life_ticks;
   // LE MOT DE RENDU, treize ou cinq : les deux ont le bit du mélange

@@ -65,16 +65,14 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectParticleRingTracks(
 
 PooledEffectNode SowEffectParticleRingNode(const EffectParticleRingNodePattern& pattern,
                                            glm::vec3 ground_position) {
-  PooledEffectNode pooled;
   // ⚠ MÊME FIGURE QUE LES DEUX AUTRES ANNEAUX, MOUVEMENT DIFFÉRENT. Le
   // dessinateur est le même, mais le répartiteur de mouvement donne au trente
   // et un sa propre cible, le mouvement de gerbe à deux modes. La forme porte
   // les deux.
-  pooled.shape = PooledNodeShape::kDualModeSprayRings;
-  pooled.ground_position = ground_position;
+  //
   // Le nœud naît là où il est semé ; le mouvement suivra son porteur dès que la
   // fenêtre saura le dire.
-  pooled.owner_position = ground_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kDualModeSprayRings, ground_position);
   pooled.resource_paths = {std::string(pattern.texture)};
   const EffectParticleRingStyleSeed* style_seed =
       EffectParticleRingStyleSeedAt(pattern.style_index);

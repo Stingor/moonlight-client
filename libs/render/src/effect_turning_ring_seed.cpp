@@ -3,10 +3,11 @@
 #include <string>
 
 #include "ro/render/effect_life_table.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -31,11 +32,6 @@ constexpr std::int32_t kAlphaDrawBound = 10;
 
 // L'UNIQUE PISTE VIVE : le bâtisseur éteint les quatre puis rallume la première.
 constexpr std::size_t kLivingTrack = 0;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 }  // namespace
 
@@ -69,16 +65,13 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectTurningRingTracks(
 
 PooledEffectNode SowEffectTurningRingNode(const EffectTurningRingPattern& pattern,
                                           glm::vec3 ground_position, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kTurningRing;
-  pooled.ground_position = ground_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kTurningRing, ground_position);
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.trail_variant = pattern.trail_variant;
   // 🔴 LA VIE EST CELLE DE L'INSTANCE, que le bâtisseur recopie
   // et que la table des durées porte depuis l'ADR 0042 : vingt-neuf mille
   // tics. Un défaut de cent tics éteindrait l'anneau qui tourne bien avant.
   pooled.node.life_ticks = EffectNodeLifeFor(pattern.effect_id);
-  pooled.owner_position = ground_position;
   pooled.tracks = SeedEffectTurningRingTracks(generator);
   return pooled;
 }

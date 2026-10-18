@@ -2,6 +2,7 @@
 #include <limits>
 #include <optional>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/actor_effect_table.h"
 #include "ro/render/effect_duration.h"
 #include "ro/render/effect_frame_beat.h"
@@ -100,12 +101,7 @@ struct LastTintWrite {
 }  // namespace
 
 const ActorEffectChange* ActorEffectChangeFor(std::uint32_t effect_id) {
-  const std::span<const ActorEffectChange> table = ActorEffectChangeTable();
-  const auto found = std::ranges::lower_bound(table, effect_id, {}, &ActorEffectChange::effect_id);
-  if (found == table.end() || found->effect_id != effect_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(ActorEffectChangeTable(), effect_id, &ActorEffectChange::effect_id);
 }
 
 bool ActsAt(const ActorEffectChange& change, std::uint32_t age_ticks) noexcept {

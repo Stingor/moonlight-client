@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -15,11 +16,6 @@ namespace {
 constexpr std::uint32_t kDrawMultiplier = 1103515245U;
 constexpr std::uint32_t kDrawIncrement = 12345U;
 constexpr int kDrawDiscardedLowBits = 16;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  const std::uint32_t draw = NextEffectNodeDraw(generator);
-  return static_cast<std::int32_t>(draw % static_cast<std::uint32_t>(bound));
-}
 
 // Fait avancer une composante de couleur d'un tic.
 //

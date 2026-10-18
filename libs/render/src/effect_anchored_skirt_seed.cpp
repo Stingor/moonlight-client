@@ -1,9 +1,9 @@
 #include "ro/render/effect_anchored_skirt_seed.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_anchored_skirt.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -16,13 +16,8 @@ namespace ro::render {
 
 std::span<const EffectAnchoredSkirtPattern> EffectAnchoredSkirtPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectAnchoredSkirtPattern> table = EffectAnchoredSkirtPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectAnchoredSkirtPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectAnchoredSkirtPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectAnchoredSkirtPatternTable(), effect_id,
+                           &EffectAnchoredSkirtPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectAnchoredSkirtTracks(
@@ -60,10 +55,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectAnchoredSkirtTracks(
 PooledEffectNode SowEffectAnchoredSkirtNode(const EffectAnchoredSkirtPattern& pattern,
                                             glm::vec3 anchor, glm::vec3 toward_target,
                                             std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kAnchoredSkirt;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kAnchoredSkirt, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths.reserve(pattern.textures.size());
   for (const std::string_view image : pattern.textures) {

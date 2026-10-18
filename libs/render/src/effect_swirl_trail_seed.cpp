@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -26,13 +27,8 @@ constexpr std::uint8_t kWhiteOrdinaryTint = 0;
 }  // namespace
 
 std::span<const EffectSwirlTrailPattern> EffectSwirlTrailPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSwirlTrailPattern> table = EffectSwirlTrailPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSwirlTrailPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSwirlTrailPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSwirlTrailPatternTable(), effect_id,
+                           &EffectSwirlTrailPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSwirlTrailTracks(glm::vec3 owner_position,
@@ -73,14 +69,11 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSwirlTrailTracks(glm::ve
 PooledEffectNode SowEffectSwirlTrailNode(const EffectSwirlTrailPattern& pattern,
                                          glm::vec3 owner_position, std::int32_t life_ticks,
                                          std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSwirlTrail;
   // ⚠ LA PLACE DU NŒUD N'ENTRE DANS AUCUN COIN : le carré teinté pose ses
   // coins sur l'ancre de la piste, déjà dans le monde. Le mouvement du client
   // y recopie pourtant le porteur à chaque tic — une écriture que ni ce
   // mouvement ni la figure ne relisent.
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSwirlTrail, owner_position);
   pooled.node.life_ticks = std::max(life_ticks, 1);
   pooled.node.render_word = kSwirlTrailRenderWord;
   pooled.resource_paths = {std::string(pattern.texture)};

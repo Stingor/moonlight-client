@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_tapered_sheet.h"
@@ -11,10 +12,8 @@
 namespace ro::render {
 
 std::span<const EffectTaperedSheetPattern> EffectTaperedSheetPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectTaperedSheetPattern> table = EffectTaperedSheetPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectTaperedSheetPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectTaperedSheetPatternTable(), effect_id,
+                           &EffectTaperedSheetPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedTaperedSheetTracks(glm::vec3 owner_position,
@@ -47,10 +46,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedTaperedSheetTracks(glm::vec3 o
 
 PooledEffectNode SowTaperedSheetNode(const EffectTaperedSheetPattern& pattern,
                                      glm::vec3 owner_position, std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kTaperedSheets;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kTaperedSheets, owner_position);
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.node.render_word = kTaperedSheetRenderWord;
   pooled.resource_paths = {std::string(pattern.texture)};

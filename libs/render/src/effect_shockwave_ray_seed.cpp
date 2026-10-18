@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -10,10 +11,8 @@
 namespace ro::render {
 
 std::span<const EffectShockwaveRayPattern> EffectShockwaveRayPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectShockwaveRayPattern> table = EffectShockwaveRayPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectShockwaveRayPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectShockwaveRayPatternTable(), effect_id,
+                           &EffectShockwaveRayPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedShockwaveRayTracks(std::int16_t base_degrees) {
@@ -34,10 +33,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedShockwaveRayTracks(std::int16_
 
 PooledEffectNode SowShockwaveRayNode(const EffectShockwaveRayPattern& pattern,
                                      glm::vec3 instance_position, std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kShockwaveRays;
-  pooled.ground_position = instance_position;
-  pooled.owner_position = instance_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kShockwaveRays, instance_position);
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.node.render_word = kShockwaveRayRenderWord;
   // ⚠ LES RAIS RESTENT OÙ ILS SONT NÉS : leur instance suit son porteur, mais

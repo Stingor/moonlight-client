@@ -6,9 +6,9 @@
 
 #include "ro/render/effect_launch.h"
 #include "ro/render/effect_lightning_fan.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -35,11 +35,6 @@ constexpr std::int16_t kFadePerTick = 6;
 
 // AU PREMIER TIC, ET SEULEMENT LÀ, l'historique s'écrit.
 constexpr std::int32_t kHistoryTick = 1;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
 
 // UN POINT DU REPÈRE DU CLIENT, relatif à l'ancre, posé dans le monde.
 [[nodiscard]] glm::vec3 ToWorld(const EffectTrack& effect_track, glm::vec3 client) {

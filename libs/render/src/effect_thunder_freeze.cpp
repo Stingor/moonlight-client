@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <optional>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_particle_quad.h"
 #include "ro/render/effect_quad_rotation.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -42,11 +42,6 @@ constexpr std::int16_t kOpaqueAlpha = 255;
   return static_cast<std::int32_t>(degrees);
 }
 
-[[nodiscard]] std::int32_t DrawBelow(std::int32_t bound, std::uint32_t& generator) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
-
 // UN PAS DU TREMBLEMENT sur un axe.
 //
 // ⚠ LA BRANCHE SE CHOISIT AVANT LE PAS : la cible AU-DESSUS fait monter, toute
@@ -58,7 +53,7 @@ void StepWanderAxis(float& current, float& target, std::uint32_t& generator) {
         std::min(current + kThunderFreezeWanderStepDegrees, kThunderFreezeWanderCeilingDegrees);
     if (current > target) {
       const std::int32_t angle = TruncatedDegrees(current);
-      target = static_cast<float>(angle == 0 ? 0 : DrawBelow(angle, generator));
+      target = static_cast<float>(angle == 0 ? 0 : DrawBelow(generator, angle));
     }
     return;
   }
@@ -67,7 +62,7 @@ void StepWanderAxis(float& current, float& target, std::uint32_t& generator) {
   // l'angle le laisse marcher.
   if (!(target < current)) {
     const std::int32_t angle = TruncatedDegrees(current);
-    const std::int32_t drawn = angle == 0 ? 0 : DrawBelow(angle, generator);
+    const std::int32_t drawn = angle == 0 ? 0 : DrawBelow(generator, angle);
     target = static_cast<float>(kThunderFreezeWanderRetargetTop - drawn);
   }
 }
@@ -200,7 +195,7 @@ void AdvanceThunderFreezeTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
   leader.anchor = {x_client, -y_client, -z_client};
 
   leader.value[kThunderFreezeSlotOfPulseDegrees] +=
-      static_cast<float>(DrawBelow(kThunderFreezePulseDraws, generator) + kThunderFreezePulseBase);
+      static_cast<float>(DrawBelow(generator, kThunderFreezePulseDraws) + kThunderFreezePulseBase);
   FoldFullTurn(leader.value[kThunderFreezeSlotOfPulseDegrees]);
 
   for (std::size_t rang = 0; rang < tracks.size(); ++rang) {
@@ -223,7 +218,7 @@ void AdvanceThunderFreezeTracks(std::array<EffectTrack, kEffectTracksPerNode>& t
       if (shard.tilt_degrees <= 0) {
         shard.lift_key = kThunderFreezeShardRebirthSize;
         shard.azimuth_degrees =
-            static_cast<std::int16_t>(DrawBelow(kThunderFreezeShardHeadingDraws, generator));
+            static_cast<std::int16_t>(DrawBelow(generator, kThunderFreezeShardHeadingDraws));
         shard.tilt_degrees = kThunderFreezeShardRebirthAlpha;
         base = shard.lift_key;
       }

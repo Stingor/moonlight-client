@@ -2,10 +2,11 @@
 
 #include <string>
 
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -26,12 +27,6 @@ constexpr std::size_t kSlotOfRadiusGrowth = 0;
 constexpr std::size_t kSlotOfHalfDiagonal = 1;
 constexpr std::size_t kSlotOfSpinDegrees = 2;
 constexpr std::size_t kMarkOfColorCase = 0;
-
-// Un tirage entier dans [0, bound), comme le modulo du client.
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 // UN TIRAGE QUI N'A QU'UNE ISSUE N'EST PAS UN TIRAGE. Le client écrit alors sa
 // constante sans toucher au générateur, et l'imiter est la seule façon de garder

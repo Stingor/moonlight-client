@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <ranges>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/class_hit_sound_table.h"
 
 #include "sprite_catalog_internal.h"
@@ -70,11 +71,8 @@ std::string_view ClassHitSound(std::int32_t job) {
   // indexe par la classe jusqu'à 3950, puis par `classe − 3950`. Les classes
   // avancées, qui commencent à 3999, tombent donc vers le haut du vecteur.
   const std::int32_t index = job <= kAdvancedClassIndexBase ? job : job - kAdvancedClassIndexBase;
-  const std::span<const ClassHitSoundEntry> table = ClassHitSoundTable();
-  const auto found = std::lower_bound(
-      table.begin(), table.end(), index,
-      [](const ClassHitSoundEntry& entry, std::int32_t wanted) { return entry.index < wanted; });
-  if (found != table.end() && found->index == index) {
+  if (const ClassHitSoundEntry* found =
+          core::RowWithKey(ClassHitSoundTable(), index, &ClassHitSoundEntry::index)) {
     return found->sound;
   }
   // Tout le reste garde ce dont le vecteur est rempli.

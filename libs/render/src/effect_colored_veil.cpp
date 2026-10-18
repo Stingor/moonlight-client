@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_particle_quad.h"
@@ -23,10 +24,8 @@ constexpr std::int16_t kOrdinaryBlend = 1;
 }  // namespace
 
 std::span<const EffectColoredVeilPattern> EffectColoredVeilPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectColoredVeilPattern> table = EffectColoredVeilPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectColoredVeilPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectColoredVeilPatternTable(), effect_id,
+                           &EffectColoredVeilPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedColoredVeilTracks(std::uint8_t byte) {
@@ -42,10 +41,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedColoredVeilTracks(std::uint8_t
 
 PooledEffectNode SowColoredVeilNode(const EffectColoredVeilPattern& pattern,
                                     glm::vec3 owner_position) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kColoredVeil;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kColoredVeil, owner_position);
   pooled.node.life_ticks = std::max(pattern.life_ticks, 1);
   pooled.node.render_word = kColoredVeilRenderWord;
   pooled.node.frame_hold_ticks = 0;

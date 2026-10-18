@@ -1,8 +1,8 @@
 #include "ro/render/effect_rain_particle_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -12,13 +12,8 @@
 namespace ro::render {
 
 std::span<const EffectRainParticlePattern> EffectRainParticlePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectRainParticlePattern> table = EffectRainParticlePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectRainParticlePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectRainParticlePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectRainParticlePatternTable(), effect_id,
+                           &EffectRainParticlePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRainParticleTracks(
@@ -58,10 +53,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRainParticleTracks(
 PooledEffectNode SowEffectRainParticleNode(const EffectRainParticlePattern& pattern,
                                            glm::vec3 anchor, std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kRainParticle;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRainParticle, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectRainParticleTracks(generator);

@@ -6,6 +6,7 @@
 #include <span>
 #include <vector>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/cast_bar.h"
 
 namespace ro::render {
@@ -210,9 +211,9 @@ std::optional<std::size_t> ActionAnimationFor(std::int8_t action_state, SpriteLa
   if (exception != by_job.end() && exception->state == action_state && exception->job == job_id) {
     return std::size_t{exception->animation};
   }
-  const std::span<const CastStateEntry> states = CastStateTable();
-  const auto found = std::ranges::lower_bound(states, action_state, {}, &CastStateEntry::state);
-  if (found == states.end() || found->state != action_state) {
+  const CastStateEntry* found =
+      core::RowWithKey(CastStateTable(), action_state, &CastStateEntry::state);
+  if (found == nullptr) {
     // Un état que la table ne nomme pas ne joue rien chez le client : ses deux
     // tables rendent alors le rang ZÉRO, et SetActionAnim n'a pas de cas pour
     // lui. Mieux vaut laisser la posture en place que planter l'acteur debout.

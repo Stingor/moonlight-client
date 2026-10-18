@@ -1,8 +1,8 @@
 #include "ro/render/effect_aura_column_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_aura_column.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -11,13 +11,8 @@
 namespace ro::render {
 
 std::span<const EffectAuraColumnPattern> EffectAuraColumnPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectAuraColumnPattern> table = EffectAuraColumnPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectAuraColumnPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectAuraColumnPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectAuraColumnPatternTable(), effect_id,
+                           &EffectAuraColumnPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectAuraColumnTracks() {
@@ -43,10 +38,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectAuraColumnTracks() {
 
 PooledEffectNode SowEffectAuraColumnNode(const EffectAuraColumnPattern& pattern, glm::vec3 anchor,
                                          std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kAuraColumn;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kAuraColumn, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectAuraColumnTracks();

@@ -84,12 +84,9 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRisingSparkTracks(
 
 PooledEffectNode SowEffectRisingSparkNode(const EffectRisingSparkPattern& pattern,
                                           glm::vec3 ground_position, std::uint32_t& generator) {
-  PooledEffectNode pooled;
   // ⚠ MÊME FIGURE QUE LES CARRÉS TEINTÉS, MOUVEMENT DIFFÉRENT — et c'est
   // pourquoi la forme les sépare. Voir `AdvanceRisingSparkTracks`.
-  pooled.shape = PooledNodeShape::kRisingSparks;
-  pooled.ground_position = ground_position;
-  pooled.owner_position = ground_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRisingSparks, ground_position);
   pooled.resource_paths = {std::string(pattern.texture)};
   if (!pattern.flash_texture.empty()) {
     pooled.resource_paths.emplace_back(pattern.flash_texture);

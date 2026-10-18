@@ -125,8 +125,8 @@ constexpr std::int32_t kQuarterDegrees = 90;
 constexpr std::uint32_t kBurstRadiusDraws = 20;
 constexpr std::int32_t kBurstSmallestRadius = 10;
 
-// Un entier tiré de zéro à `span` exclu.
-[[nodiscard]] std::uint32_t DrawBelow(std::uint32_t span, std::uint32_t& generator) {
+// Un entier tiré de zéro à `span` exclu, ou zéro SANS TIRER quand `span` est nul.
+[[nodiscard]] std::uint32_t DrawBelowOrZero(std::uint32_t span, std::uint32_t& generator) {
   return span == 0 ? 0U : NextEffectNodeDraw(generator) % span;
 }
 
@@ -136,7 +136,7 @@ constexpr std::int32_t kBurstSmallestRadius = 10;
     return low;
   }
   const auto span = static_cast<std::uint32_t>(high - low) + 1U;
-  return low + static_cast<float>(DrawBelow(span, generator));
+  return low + static_cast<float>(DrawBelowOrZero(span, generator));
 }
 
 // Les entiers de zéro à `count` exclu, dans un ordre tiré au sort — chacun une
@@ -145,7 +145,7 @@ constexpr std::int32_t kBurstSmallestRadius = 10;
   std::vector<std::int32_t> order(static_cast<std::size_t>(std::max(count, 0)));
   std::iota(order.begin(), order.end(), 0);
   for (std::size_t rang = order.size(); rang > 1; --rang) {
-    const std::uint32_t pris = DrawBelow(static_cast<std::uint32_t>(rang), generator);
+    const std::uint32_t pris = DrawBelowOrZero(static_cast<std::uint32_t>(rang), generator);
     std::swap(order[rang - 1], order[pris]);
   }
   return order;
@@ -225,8 +225,8 @@ void ShuffledGridByLevel(const SkillNamedEffectEntry& entry, std::int32_t level,
   }
   for (std::int32_t rang = 0; rang < cote; ++rang) {
     NamedSowing un;
-    un.name =
-        WithNumber(entry.name, static_cast<std::int32_t>(DrawBelow(kGridNameVariants, generator)));
+    un.name = WithNumber(entry.name,
+                         static_cast<std::int32_t>(DrawBelowOrZero(kGridNameVariants, generator)));
     const auto place = static_cast<std::size_t>(rang);
     un.client_offset =
         glm::vec3(static_cast<float>(deck.grid_x[place] - cote / 2) * kGridSpacing, 0.0F,
@@ -240,15 +240,15 @@ void ShuffledFanWaves(const SkillNamedEffectEntry& entry, std::uint32_t& generat
                       std::vector<NamedSowing>& sowing) {
   for (std::int32_t vague = 0; vague < kFanWaves; ++vague) {
     const std::int32_t radii =
-        kFanFewestRays + static_cast<std::int32_t>(DrawBelow(kFanRaysSpread, generator));
+        kFanFewestRays + static_cast<std::int32_t>(DrawBelowOrZero(kFanRaysSpread, generator));
     const float part = kFullTurnDegrees / static_cast<float>(radii);
     const std::vector<std::int32_t> departs = Shuffled(radii, generator);
     for (std::int32_t radius = 0; radius < radii; ++radius) {
       NamedSowing un;
       un.name = WithNumber(entry.name, vague);
       const auto entiere = static_cast<std::uint32_t>(static_cast<std::int32_t>(part));
-      un.turn_degrees =
-          static_cast<float>(radius) * part + static_cast<float>(DrawBelow(entiere, generator));
+      un.turn_degrees = static_cast<float>(radius) * part +
+                        static_cast<float>(DrawBelowOrZero(entiere, generator));
       un.start_delay_ms =
           kFanDelayStepMs * (kFanWaveSteps * vague + departs[static_cast<std::size_t>(radius)]);
       sowing.push_back(std::move(un));
@@ -260,10 +260,12 @@ void ScatteredRing(const SkillNamedEffectEntry& entry, std::uint32_t& generator,
                    std::vector<NamedSowing>& sowing) {
   for (std::int32_t tir = 0; tir < kRingShots; ++tir) {
     const auto angle = static_cast<float>(tir * kRingStepDegrees);
-    const std::int32_t vers_z = std::max(
-        static_cast<std::int32_t>(DrawBelow(kRingRadiusDraws, generator)), kRingSmallestRadiusDraw);
-    const std::int32_t vers_x = std::max(
-        static_cast<std::int32_t>(DrawBelow(kRingRadiusDraws, generator)), kRingSmallestRadiusDraw);
+    const std::int32_t vers_z =
+        std::max(static_cast<std::int32_t>(DrawBelowOrZero(kRingRadiusDraws, generator)),
+                 kRingSmallestRadiusDraw);
+    const std::int32_t vers_x =
+        std::max(static_cast<std::int32_t>(DrawBelowOrZero(kRingRadiusDraws, generator)),
+                 kRingSmallestRadiusDraw);
     NamedSowing un;
     un.name = std::string(entry.name);
     un.client_offset =
@@ -284,8 +286,10 @@ void ScatterByLevel(const SkillNamedEffectEntry& entry, std::int32_t level,
   const float moitie = static_cast<float>(etendue) * kScatterHalf;
   const auto tirages = static_cast<std::uint32_t>(etendue + 1);
   for (std::int32_t shard = 0; shard < eclats; ++shard) {
-    const float x = (static_cast<float>(DrawBelow(tirages, generator)) - moitie) * kScatterStep;
-    const float z = (static_cast<float>(DrawBelow(tirages, generator)) - moitie) * kScatterStep;
+    const float x =
+        (static_cast<float>(DrawBelowOrZero(tirages, generator)) - moitie) * kScatterStep;
+    const float z =
+        (static_cast<float>(DrawBelowOrZero(tirages, generator)) - moitie) * kScatterStep;
     NamedSowing un;
     un.name = std::string(entry.name);
     un.client_offset = glm::vec3(x, 0.0F, z);
@@ -299,14 +303,16 @@ void ScatterByLevel(const SkillNamedEffectEntry& entry, std::int32_t level,
 [[nodiscard]] glm::vec3 BurstInQuarter(std::int32_t quarter, std::uint32_t& generator) {
   const std::int32_t start = kQuarterDegrees * quarter;
   const auto etendue = static_cast<std::uint32_t>(start + kQuarterDegrees);
-  const auto radius_x = static_cast<float>(std::max(
-      static_cast<std::int32_t>(DrawBelow(kBurstRadiusDraws, generator)), kBurstSmallestRadius));
-  const auto angle_x =
-      static_cast<float>(std::max(static_cast<std::int32_t>(DrawBelow(etendue, generator)), start));
-  const auto radius_z = static_cast<float>(std::max(
-      static_cast<std::int32_t>(DrawBelow(kBurstRadiusDraws, generator)), kBurstSmallestRadius));
-  const auto angle_z =
-      static_cast<float>(std::max(static_cast<std::int32_t>(DrawBelow(etendue, generator)), start));
+  const auto radius_x = static_cast<float>(
+      std::max(static_cast<std::int32_t>(DrawBelowOrZero(kBurstRadiusDraws, generator)),
+               kBurstSmallestRadius));
+  const auto angle_x = static_cast<float>(
+      std::max(static_cast<std::int32_t>(DrawBelowOrZero(etendue, generator)), start));
+  const auto radius_z = static_cast<float>(
+      std::max(static_cast<std::int32_t>(DrawBelowOrZero(kBurstRadiusDraws, generator)),
+               kBurstSmallestRadius));
+  const auto angle_z = static_cast<float>(
+      std::max(static_cast<std::int32_t>(DrawBelowOrZero(etendue, generator)), start));
   return glm::vec3(SinOfClientDegrees(angle_x) * radius_x, 0.0F,
                    CosOfClientDegrees(angle_z) * radius_z);
 }
@@ -314,7 +320,7 @@ void ScatterByLevel(const SkillNamedEffectEntry& entry, std::int32_t level,
 void PairedQuarterBursts(const SkillNamedEffectEntry& entry, std::uint32_t& generator,
                          std::vector<NamedSowing>& sowing) {
   for (std::int32_t salve = 0; salve < kBurstSalvos; ++salve) {
-    const auto quart = static_cast<std::int32_t>(DrawBelow(kQuarters, generator));
+    const auto quart = static_cast<std::int32_t>(DrawBelowOrZero(kQuarters, generator));
     for (const std::int32_t pris :
          {quart, (quart + kOppositeQuarter) % static_cast<std::int32_t>(kQuarters)}) {
       NamedSowing un;
@@ -446,7 +452,7 @@ std::vector<NamedSowing> ExpandNamedEntry(const SkillNamedEffectEntry& entry,
     if (entry.start_delay_drawn_span_ms > 0) {
       un.start_delay_ms =
           std::max(un.start_delay_ms, 0) +
-          static_cast<std::int32_t>(DrawBelow(entry.start_delay_drawn_span_ms, generator));
+          static_cast<std::int32_t>(DrawBelowOrZero(entry.start_delay_drawn_span_ms, generator));
     }
     // L'ORIENTATION : celle de la recette, sinon celle de l'entrée.
     if (!un.turn_degrees.has_value()) {
@@ -462,7 +468,7 @@ std::vector<NamedSowing> ExpandNamedEntry(const SkillNamedEffectEntry& entry,
       }
       if (entry.turn_drawn_span > 0) {
         un.turn_degrees = un.turn_degrees.value_or(0.0F) +
-                          static_cast<float>(DrawBelow(entry.turn_drawn_span, generator));
+                          static_cast<float>(DrawBelowOrZero(entry.turn_drawn_span, generator));
       }
     }
     switch (entry.flip_x) {

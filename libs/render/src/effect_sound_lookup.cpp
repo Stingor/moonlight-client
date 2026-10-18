@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/effect_sound_table.h"
 #include "ro/render/skill_effect_table.h"
@@ -55,10 +56,7 @@ std::string EffectSoundFile(const EffectSoundEntry& entry, std::uint32_t draw) {
 
 std::span<const EffectSoundEntry> EffectSounds(std::uint32_t effect_id) {
   const auto among = [effect_id](std::span<const EffectSoundEntry> table) {
-    const auto first = std::ranges::lower_bound(table, effect_id, {}, &EffectSoundEntry::effect_id);
-    const auto last = std::ranges::upper_bound(table, effect_id, {}, &EffectSoundEntry::effect_id);
-    return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                         static_cast<std::size_t>(last - first));
+    return core::RowsWithKey(table, effect_id, &EffectSoundEntry::effect_id);
   };
   if (const std::span<const EffectSoundEntry> chosen = among(kPlayerChosenEffectSounds);
       !chosen.empty()) {

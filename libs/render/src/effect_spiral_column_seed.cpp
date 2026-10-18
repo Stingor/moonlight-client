@@ -1,15 +1,15 @@
 #include "ro/render/effect_spiral_column_seed.h"
 
-#include <algorithm>
 #include <cmath>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_spiral_column.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
@@ -64,21 +64,11 @@ constexpr float kRadiusStep = 0.015F;
 // L'INCLINAISON DES QUATRE PISTES : droite. C'est elle qui fait la colonne.
 constexpr std::int16_t kUpright = 90;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
 }  // namespace
 
 std::span<const EffectSpiralColumnPattern> EffectSpiralColumnPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSpiralColumnPattern> table = EffectSpiralColumnPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSpiralColumnPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSpiralColumnPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSpiralColumnPatternTable(), effect_id,
+                           &EffectSpiralColumnPattern::effect_id);
 }
 
 std::uint8_t EffectSpiralColumnVariantFor(std::uint8_t style, bool aims_at_target,
@@ -185,10 +175,7 @@ PooledEffectNode SowEffectSpiralColumnNode(const EffectSpiralColumnPattern& patt
                                            glm::vec3 anchor, glm::vec3 aim,
                                            std::int32_t effect_life_ticks,
                                            std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpiralColumn;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpiralColumn, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.trail_variant =

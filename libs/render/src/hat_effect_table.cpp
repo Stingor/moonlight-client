@@ -7,6 +7,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ro/core/sorted_table.h"
 #include "ro/vfs/encoding.h"
 
 namespace ro::render {
@@ -111,12 +112,7 @@ const HatEffect* HatEffectTable::FindByConcreteId(std::uint32_t effect_id) const
 }
 
 const HatEffect* HatEffectTable::Find(std::uint32_t hat_effect_id) const {
-  const auto found = std::ranges::lower_bound(entries_, hat_effect_id, {},
-                                              [](const HatEffect& e) { return e.hat_effect_id; });
-  if (found == entries_.end() || found->hat_effect_id != hat_effect_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(entries_, hat_effect_id, &HatEffect::hat_effect_id);
 }
 
 }  // namespace ro::render

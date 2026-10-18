@@ -4,11 +4,12 @@
 #include <string>
 
 #include "ro/render/effect_life_table.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_spinning_box.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -16,11 +17,6 @@ namespace {
 // L'UNIQUE PISTE VIVE : le bâtisseur allume la première et éteint les trois
 // autres.
 constexpr std::size_t kLivingTrack = 0;
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
 
 }  // namespace
 
@@ -55,10 +51,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpinningBoxTracks(
 
 PooledEffectNode SowEffectSpinningBoxNode(const EffectSpinningBoxPattern& pattern,
                                           glm::vec3 ground_position, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpinningBox;
-  pooled.ground_position = ground_position;
-  pooled.owner_position = ground_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpinningBox, ground_position);
   pooled.resource_paths = {std::string(pattern.texture)};
   // 🔴 LA VIE EST CELLE DE L'EFFET, que le bâtisseur recopie : vingt-neuf mille
   // tics. Un défaut de cent tics éteindrait la boîte au bout de deux secondes.

@@ -13,6 +13,7 @@
 #include <span>
 #include <string_view>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/shown_job.h"
 #include "ro/render/sprite_catalog.h"
 
@@ -91,14 +92,13 @@ constexpr std::array<BodySwap, 4> kMadogearOf = {
     {{4058, 4086}, {4064, 4087}, {4100, 4112}, {4253, 4279}}};
 
 std::uint32_t Swapped(std::span<const BodySwap> table, std::uint32_t job) {
-  const auto found = std::ranges::lower_bound(table, job, {}, &BodySwap::from);
-  return found == table.end() || found->from != job ? job : found->to;
+  const BodySwap* found = core::RowWithKey(table, job, &BodySwap::from);
+  return found == nullptr ? job : found->to;
 }
 
 const client_tables::CashMountClass* CashMountOf(std::uint32_t job) {
-  const auto& mounts = client_tables::kCashMountClasses;
-  const auto found = std::ranges::lower_bound(mounts, job, {}, &client_tables::CashMountClass::job);
-  return found == mounts.end() || found->job != job ? nullptr : &*found;
+  return core::RowWithKey(client_tables::kCashMountClasses, job,
+                          &client_tables::CashMountClass::job);
 }
 
 std::uint32_t CashMounted(std::uint32_t job) {

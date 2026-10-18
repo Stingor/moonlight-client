@@ -1,8 +1,8 @@
 #include "ro/render/effect_grid_plane_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_grid_plane.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -18,13 +18,8 @@ constexpr float kCellSide = 30.0F;
 }  // namespace
 
 std::span<const EffectGridPlanePattern> EffectGridPlanePatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectGridPlanePattern> table = EffectGridPlanePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectGridPlanePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectGridPlanePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectGridPlanePatternTable(), effect_id,
+                           &EffectGridPlanePattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGridPlaneTracks(
@@ -48,15 +43,12 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGridPlaneTracks(
 
 PooledEffectNode SowEffectGridPlaneNode(const EffectGridPlanePattern& pattern, glm::vec3 anchor,
                                         std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kGridPlane;
   // ⚠ L'ANCRE DESCEND DE NEUF AVANT LE BÂTI, et c'est l'effet ENTIER qui descend
   // chez le client. Nous n'en posons qu'un nœud, si bien que la descente se voit
   // ici ; le jour où un effet du sous-type 72 en pose deux, il faudra la remonter
   // d'un cran.
   const glm::vec3 pose{anchor.x, anchor.y + kGridPlaneAnchorDrop, anchor.z};
-  pooled.ground_position = pose;
-  pooled.owner_position = pose;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kGridPlane, pose);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.node.render_word = kGridPlaneRenderWord;
   pooled.resource_paths = {std::string(pattern.texture)};

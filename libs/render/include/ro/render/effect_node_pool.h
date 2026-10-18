@@ -351,6 +351,16 @@ struct PooledEffectNode {
   bool waves_last_track = false;
 };
 
+// UN NŒUD QUI NAÎT À SON ANCRE : sa forme, et le même point pour le sol d'où il
+// part et pour son porteur. Tout autre champ garde son défaut.
+[[nodiscard]] inline PooledEffectNode PooledNodeAt(PooledNodeShape shape, glm::vec3 anchor) {
+  PooledEffectNode pooled;
+  pooled.shape = shape;
+  pooled.ground_position = anchor;
+  pooled.owner_position = anchor;
+  return pooled;
+}
+
 // Au-delà de ce nombre de tics dus, la troupe abandonne le reste.
 //
 // Une pause au débogueur ou un chargement de carte laisse des secondes à

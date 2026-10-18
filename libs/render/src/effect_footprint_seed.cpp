@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_breathing_quad.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
@@ -13,13 +14,8 @@
 namespace ro::render {
 
 std::span<const EffectFootprintPattern> EffectFootprintPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectFootprintPattern> table = EffectFootprintPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectFootprintPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectFootprintPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectFootprintPatternTable(), effect_id,
+                           &EffectFootprintPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFootprintTracks(
@@ -43,10 +39,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectFootprintTracks(
 PooledEffectNode SowEffectFootprintNode(const EffectFootprintPattern& pattern, glm::vec3 anchor,
                                         std::int16_t azimuth_degrees,
                                         std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kFootprint;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kFootprint, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectFootprintTracks(pattern, azimuth_degrees);

@@ -1,6 +1,6 @@
 #include "ro/render/skill_unit_primer.h"
 
-#include <algorithm>
+#include "ro/core/sorted_table.h"
 
 namespace ro::render {
 namespace {
@@ -8,9 +8,8 @@ namespace {
 // L'amorce de cette table pour cette unité à ce niveau, ou ZÉRO.
 std::uint16_t PrimerIn(std::span<const SkillUnitPrimerEntry> table, std::uint32_t placed_unit_id,
                        std::uint8_t skill_level) {
-  const auto found =
-      std::ranges::equal_range(table, placed_unit_id, {}, &SkillUnitPrimerEntry::unit_id);
-  for (const SkillUnitPrimerEntry& entry : found) {
+  for (const SkillUnitPrimerEntry& entry :
+       core::RowsWithKey(table, placed_unit_id, &SkillUnitPrimerEntry::unit_id)) {
     if (skill_level >= entry.level_min && skill_level <= entry.level_max) {
       return entry.effect_id;
     }

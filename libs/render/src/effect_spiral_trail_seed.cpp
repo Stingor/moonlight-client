@@ -1,8 +1,8 @@
 #include "ro/render/effect_spiral_trail_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -20,13 +20,8 @@ constexpr std::size_t kMarkOfSparkDelay = 2;
 }  // namespace
 
 std::span<const EffectSpiralTrailPattern> EffectSpiralTrailPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectSpiralTrailPattern> table = EffectSpiralTrailPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectSpiralTrailPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectSpiralTrailPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectSpiralTrailPatternTable(), effect_id,
+                           &EffectSpiralTrailPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpiralTrailTracks(
@@ -77,10 +72,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectSpiralTrailTracks(
 PooledEffectNode SowEffectSpiralTrailNode(const EffectSpiralTrailPattern& pattern, glm::vec3 anchor,
                                           std::int32_t effect_life_ticks,
                                           std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kSpiralTrail;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kSpiralTrail, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths.clear();
   for (const std::string_view path : pattern.textures) {

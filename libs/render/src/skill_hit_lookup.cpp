@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/plain_hit_effect_table.h"
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
@@ -24,9 +25,9 @@ std::int32_t SkillDamageMsgEffect(std::uint16_t skill_id) {
   // ⚠ AUCUNE RÈGLE PAR DÉFAUT : l'absence vaut « rien à poser », et c'est ce que
   // fait le client — sa carte rend −1 pour un identifiant qu'elle ne nomme pas
   // comme pour un identifiant qu'elle met à −1.
-  const std::span<const SkillHitEffectEntry> table = SkillDamageMsgEffectTable();
-  const auto found = std::ranges::lower_bound(table, skill_id, {}, &SkillHitEffectEntry::skill_id);
-  return found != table.end() && found->skill_id == skill_id ? found->effect_id : -1;
+  const SkillHitEffectEntry* found =
+      core::RowWithKey(SkillDamageMsgEffectTable(), skill_id, &SkillHitEffectEntry::skill_id);
+  return found != nullptr ? found->effect_id : -1;
 }
 
 std::int32_t SkillHitEffect(std::uint16_t skill_id, bool any_damage, bool cast_by_me) {
@@ -38,9 +39,8 @@ std::int32_t SkillHitEffect(std::uint16_t skill_id, bool any_damage, bool cast_b
     const bool remplie = selon->when == SkillHitWhen::kAnyDamage ? any_damage : !cast_by_me;
     return remplie ? selon->then_effect : selon->otherwise;
   }
-  const std::span<const SkillHitEffectEntry> table = SkillHitEffectTable();
-  const auto found = std::ranges::lower_bound(table, skill_id, {}, &SkillHitEffectEntry::skill_id);
-  if (found != table.end() && found->skill_id == skill_id) {
+  if (const SkillHitEffectEntry* found =
+          core::RowWithKey(SkillHitEffectTable(), skill_id, &SkillHitEffectEntry::skill_id)) {
     return found->effect_id;
   }
   // LA RÈGLE PAR DÉFAUT, et elle n'est pas « rien » : la plupart des
@@ -54,9 +54,8 @@ std::int32_t SkillHitEffect(std::uint16_t skill_id, bool any_damage, bool cast_b
 }
 
 std::int32_t SkillUnitHitEffect(std::uint16_t skill_id) {
-  const std::span<const SkillHitEffectEntry> table = SkillUnitHitEffectTable();
-  const auto found = std::ranges::lower_bound(table, skill_id, {}, &SkillHitEffectEntry::skill_id);
-  if (found != table.end() && found->skill_id == skill_id) {
+  if (const SkillHitEffectEntry* found =
+          core::RowWithKey(SkillUnitHitEffectTable(), skill_id, &SkillHitEffectEntry::skill_id)) {
     return found->effect_id;
   }
   const SkillHitEffectDefault regle = SkillUnitHitEffectDefaults();
@@ -75,30 +74,19 @@ bool DamageTypeShowsHitEffect(std::uint8_t damage_type, std::uint16_t skill_id) 
   if (damage_type >= kDamageTypeBits) {
     return false;
   }
-  const std::span<const SplashHitSkill> table = SplashHitSkillTable();
-  const auto found = std::ranges::lower_bound(table, skill_id, {}, &SplashHitSkill::skill_id);
-  return found != table.end() && found->skill_id == skill_id &&
+  const SplashHitSkill* found =
+      core::RowWithKey(SplashHitSkillTable(), skill_id, &SplashHitSkill::skill_id);
+  return found != nullptr &&
          ((static_cast<std::uint32_t>(found->damage_types) >> damage_type) & 1U) != 0;
 }
 
 const SkillDamageEffectEntry* SkillDamageEffectOf(std::uint16_t skill_id) {
-  const std::span<const SkillDamageEffectEntry> table = SkillDamageEffectTable();
-  const auto found =
-      std::ranges::lower_bound(table, skill_id, {}, &SkillDamageEffectEntry::skill_id);
-  if (found == table.end() || found->skill_id != skill_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(SkillDamageEffectTable(), skill_id, &SkillDamageEffectEntry::skill_id);
 }
 
 const SkillAnnouncedEffectEntry* SkillAnnouncedEffectOf(std::uint16_t skill_id) {
-  const std::span<const SkillAnnouncedEffectEntry> table = SkillAnnouncedEffectTable();
-  const auto found =
-      std::ranges::lower_bound(table, skill_id, {}, &SkillAnnouncedEffectEntry::skill_id);
-  if (found == table.end() || found->skill_id != skill_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(SkillAnnouncedEffectTable(), skill_id,
+                          &SkillAnnouncedEffectEntry::skill_id);
 }
 
 std::int32_t PlainHitStrikeEffect(std::uint8_t damage_type) {

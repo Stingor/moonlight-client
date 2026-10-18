@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -12,14 +13,8 @@ namespace ro::render {
 
 std::span<const EffectRainstormCylinderPattern> EffectRainstormCylinderPatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectRainstormCylinderPattern> table =
-      EffectRainstormCylinderPatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectRainstormCylinderPattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectRainstormCylinderPattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectRainstormCylinderPatternTable(), effect_id,
+                           &EffectRainstormCylinderPattern::effect_id);
 }
 
 std::int32_t RainstormCylinderLifeTicks(const EffectRainstormCylinderPattern& pattern,
@@ -51,12 +46,9 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedRainstormCylinderTracks(
 PooledEffectNode SowRainstormCylinderNode(const EffectRainstormCylinderPattern& pattern,
                                           glm::vec3 owner_position,
                                           std::int32_t effect_life_ticks) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kRainstormCylinder;
   // ⚠ LE NŒUD NAÎT SUR L'INSTANCE, sans écart, et le mouvement l'y recale à
   // chaque tic. Voir `AdvanceTracksOf`.
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRainstormCylinder, owner_position);
   pooled.node.life_ticks = std::max(RainstormCylinderLifeTicks(pattern, effect_life_ticks), 1);
   pooled.node.render_word = kRainstormCylinderRenderWord;
   // ⚠ L'IMAGE NE CHANGE PAS D'ELLE-MÊME : c'est le compteur des pistes qui la

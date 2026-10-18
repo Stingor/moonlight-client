@@ -1,8 +1,8 @@
 #include "ro/render/effect_life_table.h"
 
 #include <algorithm>
-#include <ranges>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_case_table.h"
 #include "ro/render/effect_frame.h"
 #include "ro/render/effect_node.h"
@@ -13,11 +13,7 @@ namespace {
 // L'entrée de cet identifiant dans une table triée, ou rien.
 [[nodiscard]] const EffectLifeEntry* EntryIn(std::span<const EffectLifeEntry> table,
                                              std::uint32_t effect_id) {
-  const auto found = std::ranges::lower_bound(table, effect_id, {}, &EffectLifeEntry::effect_id);
-  if (found == table.end() || found->effect_id != effect_id) {
-    return nullptr;
-  }
-  return &*found;
+  return core::RowWithKey(table, effect_id, &EffectLifeEntry::effect_id);
 }
 
 }  // namespace

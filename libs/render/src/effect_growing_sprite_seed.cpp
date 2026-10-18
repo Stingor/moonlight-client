@@ -1,8 +1,8 @@
 #include "ro/render/effect_growing_sprite_seed.h"
 
-#include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
@@ -44,13 +44,8 @@ constexpr std::uint32_t kHeightSpread = 6;
 
 std::span<const EffectGrowingSpritePattern> EffectGrowingSpritePatternsFor(
     std::uint32_t effect_id) {
-  const std::span<const EffectGrowingSpritePattern> table = EffectGrowingSpritePatternTable();
-  const auto first =
-      std::ranges::lower_bound(table, effect_id, {}, &EffectGrowingSpritePattern::effect_id);
-  const auto last =
-      std::ranges::upper_bound(table, effect_id, {}, &EffectGrowingSpritePattern::effect_id);
-  return table.subspan(static_cast<std::size_t>(first - table.begin()),
-                       static_cast<std::size_t>(last - first));
+  return core::RowsWithKey(EffectGrowingSpritePatternTable(), effect_id,
+                           &EffectGrowingSpritePattern::effect_id);
 }
 
 std::uint8_t EffectGrowingSpriteVariantFor(std::uint8_t builder_argument) {
@@ -97,10 +92,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectGrowingSpriteTracks(
 PooledEffectNode SowEffectGrowingSpriteNode(const EffectGrowingSpritePattern& pattern,
                                             glm::vec3 anchor, std::int32_t effect_life_ticks,
                                             std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kGrowingSprite;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kGrowingSprite, anchor);
   pooled.node.life_ticks = effect_life_ticks;
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.tracks = SeedEffectGrowingSpriteTracks(pattern, generator);

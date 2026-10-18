@@ -3,23 +3,16 @@
 #include <algorithm>
 #include <string>
 
-#include "ro/render/effect_node.h"
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_radial_petal.h"
 #include "ro/render/effect_track.h"
 
+#include "effect_draw_below.h"
 #include "effect_track_angles.h"
 
 namespace ro::render {
-namespace {
-
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& rng_state, std::int32_t exclusive_bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(rng_state) %
-                                   static_cast<std::uint32_t>(exclusive_bound));
-}
-
-}  // namespace
 
 std::int32_t RadialPetalSowTick(std::int16_t variant) {
   if (variant == kRadialPetalLateVariant) {
@@ -32,10 +25,8 @@ std::int32_t RadialPetalSowTick(std::int16_t variant) {
 }
 
 std::span<const EffectRadialPetalPattern> EffectRadialPetalPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectRadialPetalPattern> table = EffectRadialPetalPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectRadialPetalPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectRadialPetalPatternTable(), effect_id,
+                           &EffectRadialPetalPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedRadialPetalTracks(
@@ -72,10 +63,7 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedRadialPetalTracks(
 
 PooledEffectNode SowRadialPetalNode(const EffectRadialPetalPattern& pattern, glm::vec3 anchor,
                                     std::int32_t effect_life_ticks, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kRadialPetal;
-  pooled.ground_position = anchor;
-  pooled.owner_position = anchor;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRadialPetal, anchor);
   pooled.node.render_word = kRadialPetalRenderWord;
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.resource_paths = {std::string(pattern.texture)};

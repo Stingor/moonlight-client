@@ -3,10 +3,11 @@
 #include <string>
 
 #include "ro/render/effect_life_table.h"
-#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
+
+#include "effect_draw_below.h"
 
 namespace ro::render {
 namespace {
@@ -33,11 +34,6 @@ constexpr std::int32_t kStartingAlphaBound = 100;
 // première, comme celui du carré teinté.
 constexpr std::size_t kLivingTrack = 0;
 
-[[nodiscard]] std::int32_t DrawBelow(std::uint32_t& generator, std::int32_t bound) {
-  return static_cast<std::int32_t>(NextEffectNodeDraw(generator) %
-                                   static_cast<std::uint32_t>(bound));
-}
-
 }  // namespace
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRibbonWaveTracks(std::uint32_t& generator) {
@@ -63,9 +59,9 @@ std::array<EffectTrack, kEffectTracksPerNode> SeedEffectRibbonWaveTracks(std::ui
 
 PooledEffectNode SowEffectRibbonWaveNode(const EffectRibbonWavePattern& pattern,
                                          glm::vec3 ground_position, std::uint32_t& generator) {
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kRibbonWave;
-  pooled.ground_position = ground_position;
+  // Le nœud naît là où il est semé ; c'est `app` qui dira où son porteur s'est
+  // rendu, et le mouvement l'y suivra.
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kRibbonWave, ground_position);
   pooled.resource_paths = {std::string(pattern.texture)};
   pooled.trail_variant = pattern.trail_variant;
   // 🔴 LA VIE EST CELLE DE L'INSTANCE, que le bâtisseur recopie et que la
@@ -73,9 +69,6 @@ PooledEffectNode SowEffectRibbonWaveNode(const EffectRibbonWavePattern& pattern,
   // cent tics éteindrait au bout d'une seconde et demie un anneau que le
   // mouvement rallume sans fin.
   pooled.node.life_ticks = EffectNodeLifeFor(pattern.effect_id);
-  // Le nœud naît là où il est semé ; c'est `app` qui dira où son porteur s'est
-  // rendu, et le mouvement l'y suivra.
-  pooled.owner_position = ground_position;
   pooled.tracks = SeedEffectRibbonWaveTracks(generator);
   return pooled;
 }

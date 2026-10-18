@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <string>
 
+#include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -60,10 +61,8 @@ bool EffectTetraVortexTintIsWritten(std::uint32_t effect_id) {
 }
 
 std::span<const EffectTetraVortexPattern> EffectTetraVortexPatternsFor(std::uint32_t effect_id) {
-  const std::span<const EffectTetraVortexPattern> table = EffectTetraVortexPatternTable();
-  const auto [first, last] =
-      std::ranges::equal_range(table, effect_id, {}, &EffectTetraVortexPattern::effect_id);
-  return {first, last};
+  return core::RowsWithKey(EffectTetraVortexPatternTable(), effect_id,
+                           &EffectTetraVortexPattern::effect_id);
 }
 
 std::array<EffectTrack, kEffectTracksPerNode> SeedTetraVortexTracks(std::uint32_t effect_id,
@@ -93,10 +92,7 @@ std::optional<PooledEffectNode> SowTetraVortexNode(std::uint32_t effect_id,
   if (!target_position.has_value()) {
     return std::nullopt;
   }
-  PooledEffectNode pooled;
-  pooled.shape = PooledNodeShape::kTetraVortex;
-  pooled.ground_position = owner_position;
-  pooled.owner_position = owner_position;
+  PooledEffectNode pooled = PooledNodeAt(PooledNodeShape::kTetraVortex, owner_position);
   pooled.node.render_word = kTetraVortexRenderWord;
   pooled.node.life_ticks = std::max(effect_life_ticks, 1);
   pooled.resource_paths.reserve(kTetraVortexFrames.size());
