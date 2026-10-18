@@ -226,4 +226,27 @@ void CardInsertView::NoteVerdict(ro::sim::World& world, std::uint32_t now_ms) {
   }
 }
 
+CardDropStep CardInsertView::StepCardDrop(const ro::ui::CardDropSeen& bag_seen,
+                                          const ro::ui::CardDropSeen& doll_seen,
+                                          const ro::sim::World& world, bool dealing,
+                                          std::uint32_t now_ms) {
+  const CardDropFacts facts{
+      .bag = &world.inventory(),
+      .compatible = &world.composition().compatible(),
+      .dealing = dealing,
+      .card_slots_of = [this](std::uint32_t item_id) { return SlotsOf(item_id); }};
+  CardDropStep step = card_drop_.Step(bag_seen, doll_seen, facts, now_ms);
+  card_drop_hint_ = step.hint;
+  return step;
+}
+
+void CardInsertView::NoteCardDropRefusal(const char* refusal, ro::sim::World& world,
+                                         std::uint32_t now_ms) {
+  if (refusal == nullptr) {
+    return;
+  }
+  world.RecordChat(ro::sim::ChatKind::kItem, ro::sim::ChatType::kPublic, 0, std::string(refusal),
+                   now_ms, kRefusedColor);
+}
+
 }  // namespace moonclient

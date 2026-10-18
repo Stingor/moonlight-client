@@ -9,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/card_album_link.h"
+#include "ro/ui/card_drop.h"
 #include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_art.h"
 
@@ -130,6 +131,9 @@ struct InventoryCellView {
   // porte pas : elle offre le sertissage rapide. ⚠ LE SERVEUR TRANCHE SEUL
   // quelles cartes y vont — ce drapeau ne dit que qu'il y a de la place.
   bool socket_free = false;
+  // UNE ARME OU UNE ARMURE : une carte lâchée dessus demande le sertissage.
+  // ⚠ PLEINE, FORGÉE OU PORTÉE COMPRISE : `app` dit alors pourquoi il refuse.
+  bool takes_cards = false;
   // L'identifiant de l'objet. ⚠ IL VOYAGE DANS UN GLISSER là où la place,
   // elle, se renumérote dès qu'on consomme.
   std::uint32_t item_id = 0;
@@ -266,6 +270,8 @@ struct InventoryWindowView {
   std::uint16_t quick_insert_equip = 0;
   bool quick_insert_answered = false;
   std::span<const QuickInsertCardView> quick_insert_cards;
+  // Le verdict sur la carte qui survolait une pièce à l'image précédente.
+  CardDropHint card_drop;
   // LE STAFF PEUT VIDER SON SAC : un bouton « Vider » paraît dans la barre de
   // titre. Faux, il n'existe pas.
   bool staff_tools = false;
@@ -391,6 +397,8 @@ struct InventoryWindowAction {
   // ⚠ RAPPORTÉE À CHAQUE IMAGE où il l'est : c'est `app` qui sait si la
   // question est déjà posée pour elle.
   std::uint16_t compatible_asked = 0;
+  // UNE CARTE QUI SURVOLE UNE PIÈCE DU SAC, ou qu'on y lâche.
+  CardDropSeen card_drop;
 
   // LA VARIANTE DU GESTE : Ctrl enfoncé pendant le double-clic. Elle ne veut
   // rien dire par elle-même — c'est l'appelant qui sait qu'une arme part alors

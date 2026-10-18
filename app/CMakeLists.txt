@@ -826,6 +826,7 @@ add_library(moonclient_items STATIC
     items/transfer_hold.cpp
     items/warp_memo_report.cpp
     items/card_insert_line.cpp
+    items/card_drop.cpp
     items/view_equip_rows.cpp)
 
 target_link_libraries(moonclient_items

@@ -28,8 +28,8 @@ void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipS
                        std::span<const CompanionCaseView> companions, CharacterAvatarState& avatar,
                        const SkinImage& avatar_image, const std::optional<bool>& equipment_shown,
                        const std::optional<bool>& costumes_shown, const DollGifView& gif,
-                       bool costume, bool preview, float pane_width, const SkinArt& art,
-                       CharacterWindowAction& action);
+                       bool costume, bool preview, const CardDropHint& card_drop, float pane_width,
+                       const SkinArt& art, CharacterWindowAction& action);
 
 // ── LE GIF DU PANTIN, sous la liste des poses ────────────────────────────────
 

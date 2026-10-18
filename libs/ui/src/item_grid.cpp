@@ -586,8 +586,11 @@ void DragItemFrom(const InventoryCellView& cell, ItemHolder mine, ImVec2 padding
     ImGui::PopStyleVar();
     return;
   }
-  const ItemDrag carried{
-      .item_id = cell.item_id, .client_slot = cell.client_slot, .from = mine, .worn = cell.worn};
+  const ItemDrag carried{.item_id = cell.item_id,
+                         .client_slot = cell.client_slot,
+                         .from = mine,
+                         .worn = cell.worn,
+                         .card = cell.card};
   ImGui::SetDragDropPayload(kItemDragPayload, &carried, sizeof(carried));
   // L'ICÔNE PUIS LE NOM, comme au client : c'est l'objet qu'on TIENT qu'il faut
   // reconnaître, et un nom seul ne se reconnaît pas d'un coup d'œil.

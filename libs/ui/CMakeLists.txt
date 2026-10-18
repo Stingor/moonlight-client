@@ -60,6 +60,7 @@ add_library(ro_ui STATIC
     src/card_album_dialogs.cpp
     src/card_album_link.cpp
     src/card_album_window.cpp
+    src/card_drop.cpp
     src/card_insert_window.cpp
     src/cart_choice_window.cpp
     src/party_booking_rules.cpp

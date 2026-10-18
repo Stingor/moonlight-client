@@ -25,11 +25,32 @@ void Game::StageCardInsert() {
   windows_.inventory_view.quick_insert_equip = compatible.equip_slot;
   windows_.inventory_view.quick_insert_answered = compatible.answered;
   windows_.inventory_view.quick_insert_cards = card_insert_->quick_cards();
+
+  // LE VERDICT DU GLISSER, le même pour les deux cibles : il ne vaut que pour
+  // la paire qu'il nomme.
+  windows_.inventory_view.card_drop = card_insert_->card_drop_hint();
+  windows_.character_view.card_drop = card_insert_->card_drop_hint();
+}
+
+void Game::ApplyCardDrop(const UiStage::Answers& answers, std::uint32_t now_ms) {
+  const bool dealing = pieces_.trade.deal().deal().open();
+  const CardDropStep step = card_insert_->StepCardDrop(
+      answers.inventory.card_drop, answers.character.card_drop, world_, dealing, now_ms);
+  CardInsertView::AskCompatible(step.ask_compatible, link_, world_);
+  // 🔴 LE MÊME CHEMIN QUE LE SERTISSAGE RAPIDE DU SAC : même verbe, même
+  // `Apply`, donc même demande, même file d'accusés, même ligne de conversation.
+  if (step.order.aimed()) {
+    bag_->Apply(CardDropAsQuickInsert(step.order), link_, world_);
+  }
+  CardInsertView::NoteCardDropRefusal(step.refusal, world_, now_ms);
 }
 
 void Game::ApplyCardInsert(const UiStage::Answers& answers, std::uint32_t now_ms) {
   CardInsertView::AskCompatible(answers.inventory.compatible_asked, link_, world_);
   card_insert_->Apply(answers.card_insert, windows_.card_insert, link_, world_);
+  // ⚠ AVANT LA LIGNE DES ACCUSÉS : un dépôt accepté retient sa demande, et un
+  // refus local s'écrit dans la même image que le geste.
+  ApplyCardDrop(answers, now_ms);
   // ⚠ À CHAQUE IMAGE, fenêtre ouverte ou non : le sertissage rapide n'en ouvre
   // aucune, et son accusé doit s'écrire quand même.
   card_insert_->NoteVerdict(world_, now_ms);

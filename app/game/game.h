@@ -390,6 +390,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // pas. Voir `items/card_insert_view.h`.
   void StageCardInsert();
   void ApplyCardInsert(const UiStage::Answers& answers, std::uint32_t now_ms);
+  // Une carte glissée sur une pièce : voir `items/card_drop.h`.
+  void ApplyCardDrop(const UiStage::Answers& answers, std::uint32_t now_ms);
 
   // SUIVRE UN LIEN D'UNE DESCRIPTION.
   //

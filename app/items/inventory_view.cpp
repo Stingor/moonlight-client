@@ -392,6 +392,7 @@ void BuildItemCells(const ro::sim::Inventory& holder, const ItemCellsAsk& ask,
     }
     cell.card = family == ItemCategory::kCard;
     cell.socket_free = OffersQuickInsert(item, cell.card_slots);
+    cell.takes_cards = item.type == kWireArmorType || item.type == kWireWeaponType;
     if (icons != nullptr) {
       const ro::render::IconTexture& icon = icons->Get(item.item_id);
       cell.icon = ro::ui::SkinImage{

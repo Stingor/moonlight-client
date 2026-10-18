@@ -19404,3 +19404,24 @@ tr: Casts shadows
 
 fr: Décochez pour une lumière posée DANS un modèle du décor — une lanterne, un lampion : le modèle la boucherait et noircirait ce qu'il cache. Seules les quatre lumières qui portent ombre les plus proches de la caméra en projettent une.
 tr: Untick for a light placed INSIDE a scenery model — a lantern, a paper lamp: the model would block it and blacken what it hides. Only the four shadow-casting lights nearest the camera cast one.
+
+fr: Impossible de sertir une carte pendant un échange.
+tr: Cards cannot be compounded during a trade.
+
+fr: Retirez d'abord cette pièce : une pièce portée ne reçoit pas de carte.
+tr: Take this piece off first: a worn piece cannot receive a card.
+
+fr: Cet item n'est pas identifié : il ne reçoit pas de carte.
+tr: This item is not identified: it cannot receive a card.
+
+fr: Un item forgé ou signé ne reçoit pas de carte.
+tr: A forged or signed item cannot receive a card.
+
+fr: Cet item n'a aucun emplacement de carte.
+tr: This item has no card slot.
+
+fr: Tous les emplacements de cet item sont occupés.
+tr: All of this item's card slots are taken.
+
+fr: Cette carte ne se sertit pas sur ce type d'équipement.
+tr: This card cannot be compounded into this type of equipment.

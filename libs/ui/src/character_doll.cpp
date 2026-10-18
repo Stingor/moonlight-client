@@ -168,7 +168,8 @@ void PaintBadge(ImDrawList* into, const EquipSlotView& piece, ImVec2 top_left, f
 
 // UNE CASE. Elle rend vrai quand le joueur vient de demander à la vider.
 [[nodiscard]] bool DrawSlot(EquipSlot slot, const EquipSlotView& piece, ImVec2 at, float side,
-                            bool preview, const SkinLook& look, CharacterWindowAction& action) {
+                            const CardDropHint& card_drop, bool preview, const SkinLook& look,
+                            CharacterWindowAction& action) {
   ImGui::PushID(static_cast<int>(slot));
   ImGui::SetCursorScreenPos(at);
   ImGui::InvisibleButton("case", ImVec2(side, side));
@@ -188,8 +189,14 @@ void PaintBadge(ImDrawList* into, const EquipSlotView& piece, ImVec2 top_left, f
   // serveur sait où la pièce va —, donc traîner un équipement d'une case à
   // l'autre ne demande rien de neuf, et l'enfiler une seconde fois enverrait un
   // paquet qui ne change rien.
+  //
+  // 🔴 UNE CARTE LÂCHÉE SUR UNE PIÈCE PORTÉE DEMANDE LE SERTISSAGE, pas
+  // l'enfilage : c'est `app` qui dira pourquoi il refuse.
   bool asked = false;
-  if (ImGui::BeginDragDropTarget()) {
+  const CardDropTaken card_aim = piece.filled()
+                                     ? TakeCardDrop(piece.client_slot, card_drop, action.card_drop)
+                                     : CardDropTaken{};
+  if (!card_aim.taken && ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* dropped = ImGui::AcceptDragDropPayload(kItemDragPayload);
         dropped != nullptr && dropped->DataSize == static_cast<int>(sizeof(ItemDrag))) {
       if (const auto& carried = *static_cast<const ItemDrag*>(dropped->Data); !carried.worn) {
@@ -232,6 +239,9 @@ void PaintBadge(ImDrawList* into, const EquipSlotView& piece, ImVec2 top_left, f
   } else {
     PaintIcon(into, piece, at, side, kEquipSlotPadding * Scale());
     PaintBadge(into, piece, at, side);
+    if (card_aim.taken) {
+      PaintCardDropFrame(into, at, corner, card_aim.look);
+    }
     if (hovered) {
       into->AddRectFilled(at, corner, kItemHoverVeil, rounding);
       // ⚠ LA MAIN, comme sur toute case du jeu : c'est ce qui dit qu'il y a un
@@ -518,8 +528,8 @@ void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipS
                        std::span<const CompanionCaseView> companions, CharacterAvatarState& avatar,
                        const SkinImage& avatar_image, const std::optional<bool>& equipment_shown,
                        const std::optional<bool>& costumes_shown, const DollGifView& gif,
-                       bool costume, bool preview, float pane_width, const SkinArt& art,
-                       CharacterWindowAction& action) {
+                       bool costume, bool preview, const CardDropHint& card_drop, float pane_width,
+                       const SkinArt& art, CharacterWindowAction& action) {
   DrawHeader(header, pane_width, art.look());
 
   const float scale = Scale();
@@ -554,31 +564,33 @@ void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipS
       const float y = top + offset + static_cast<float>(row) * step;
       const EquipSlot on_left = places[static_cast<std::size_t>(row)];
       const EquipSlot on_right = places[static_cast<std::size_t>(row) + 2];
-      static_cast<void>(DrawSlot(on_left, At(slots, on_left), ImVec2(left, y), side, preview,
-                                 art.look(), action));
-      static_cast<void>(DrawSlot(on_right, At(slots, on_right), ImVec2(right, y), side, preview,
-                                 art.look(), action));
+      static_cast<void>(DrawSlot(on_left, At(slots, on_left), ImVec2(left, y), side, card_drop,
+                                 preview, art.look(), action));
+      static_cast<void>(DrawSlot(on_right, At(slots, on_right), ImVec2(right, y), side, card_drop,
+                                 preview, art.look(), action));
     }
   } else {
     for (int row = 0; row < kDollRows; ++row) {
       const float y = top + static_cast<float>(row) * step;
       const EquipSlot on_left = kLeftColumn[static_cast<std::size_t>(row)];
       const EquipSlot on_right = kRightColumn[static_cast<std::size_t>(row)];
-      static_cast<void>(DrawSlot(on_left, At(slots, on_left), ImVec2(left, y), side, preview,
-                                 art.look(), action));
-      static_cast<void>(DrawSlot(on_right, At(slots, on_right), ImVec2(right, y), side, preview,
-                                 art.look(), action));
+      static_cast<void>(DrawSlot(on_left, At(slots, on_left), ImVec2(left, y), side, card_drop,
+                                 preview, art.look(), action));
+      static_cast<void>(DrawSlot(on_right, At(slots, on_right), ImVec2(right, y), side, card_drop,
+                                 preview, art.look(), action));
     }
     // LA RANGÉE DES MAINS, sous l'avatar : l'arme à gauche de lui, le bouclier
     // à droite, et la munition sous la colonne de droite.
     const float hands_y = top + static_cast<float>(kDollRows) * step;
     static_cast<void>(DrawSlot(EquipSlot::kWeapon, At(slots, EquipSlot::kWeapon),
-                               ImVec2(middle, hands_y), side, preview, art.look(), action));
+                               ImVec2(middle, hands_y), side, card_drop, preview, art.look(),
+                               action));
     static_cast<void>(DrawSlot(EquipSlot::kShield, At(slots, EquipSlot::kShield),
-                               ImVec2(middle + avatar_width - side, hands_y), side, preview,
-                               art.look(), action));
+                               ImVec2(middle + avatar_width - side, hands_y), side, card_drop,
+                               preview, art.look(), action));
     static_cast<void>(DrawSlot(EquipSlot::kAmmo, At(slots, EquipSlot::kAmmo),
-                               ImVec2(right, hands_y), side, preview, art.look(), action));
+                               ImVec2(right, hands_y), side, card_drop, preview, art.look(),
+                               action));
     used_height += step;
 
     // LES COMPAGNONS, EMPILÉS SOUS LA COLONNE DE GAUCHE et non mêlés au

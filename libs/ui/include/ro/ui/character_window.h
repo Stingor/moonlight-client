@@ -10,6 +10,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/card_drop.h"
 #include "ro/ui/character_staff.h"
 #include "ro/ui/doll_gif.h"
 #include "ro/ui/guild_tab.h"
@@ -461,6 +462,8 @@ struct CharacterWindowView {
   // n'a appris aucune des trois compétences — et la colonne ne paraît alors
   // pas du tout, ce qui est le cas de la plupart des métiers.
   std::span<const CompanionCaseView> companions;
+  // Le verdict sur la carte qui survolait une pièce portée à l'image précédente.
+  CardDropHint card_drop;
   // « MONTRER MON ÉQUIPEMENT » aux autres joueurs, tel que le serveur l'a dit.
   // Posé par `app` à chaque image ; rien tant qu'il ne l'a pas dit, et la case
   // se montre alors décochée.
@@ -592,6 +595,8 @@ struct CharacterWindowAction {
   // masquerait la case où l'on vise à lâcher.
   std::uint32_t hovered_id = 0;
   std::uint16_t hovered_slot = 0;
+  // UNE CARTE DU SAC QUI SURVOLE UNE PIÈCE PORTÉE, ou qu'on y lâche.
+  CardDropSeen card_drop;
   // LE COMPAGNON QU'ON VIENT DE BASCULER, par son rang ; moins de zéro si aucun.
   //
   // ⚠ BASCULER, ET NON APPELER : la case dit déjà s'il est là, et c'est le

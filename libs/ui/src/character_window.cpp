@@ -123,7 +123,7 @@ void DrawDollAndStats(CharacterWindowState& state, const CharacterWindowView& vi
   if (ImGui::BeginChild("mannequin", ImVec2(doll_width, 0.0F), ImGuiChildFlags_Borders)) {
     DrawCharacterDoll(header, slots, view.companions, state.avatar, view.avatar_image,
                       view.equipment_shown, view.costumes_shown, view.doll_gif,
-                      state.tab == CharacterTab::kCostume, state.hover_preview,
+                      state.tab == CharacterTab::kCostume, state.hover_preview, view.card_drop,
                       ImGui::GetContentRegionAvail().x, art, action);
     PaintWindowScrollbar(art);
   }

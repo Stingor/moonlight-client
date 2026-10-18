@@ -100,6 +100,9 @@ struct ItemDrag {
   // ⚠ ET C'EST AUSSI CE QUI FAIT QU'UN GESTE INUTILE N'ENVOIE RIEN : un objet
   // du sac lâché dans le sac, une pièce portée relâchée sur le mannequin.
   bool worn = false;
+  // UNE CARTE : lâchée sur une pièce, elle demande le sertissage (voir
+  // `ro/ui/card_drop.h`).
+  bool card = false;
 };
 
 // CE QU'ON VIENT DE LÂCHER HORS DE TOUTE FENÊTRE — donc sur le monde.

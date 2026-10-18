@@ -19404,3 +19404,24 @@ tr: Proyecta sombras
 
 fr: Décochez pour une lumière posée DANS un modèle du décor — une lanterne, un lampion : le modèle la boucherait et noircirait ce qu'il cache. Seules les quatre lumières qui portent ombre les plus proches de la caméra en projettent une.
 tr: Desmarca para una luz colocada DENTRO de un modelo del decorado — un farol, un farolillo: el modelo la taparía y ennegrecería lo que oculta. Solo las cuatro luces que proyectan sombra más cercanas a la cámara proyectan una.
+
+fr: Impossible de sertir une carte pendant un échange.
+tr: No se pueden insertar cartas durante un intercambio.
+
+fr: Retirez d'abord cette pièce : une pièce portée ne reçoit pas de carte.
+tr: Quítate primero esta pieza: una pieza equipada no admite cartas.
+
+fr: Cet item n'est pas identifié : il ne reçoit pas de carte.
+tr: Este item no está identificado: no admite cartas.
+
+fr: Un item forgé ou signé ne reçoit pas de carte.
+tr: Un item forjado o firmado no admite cartas.
+
+fr: Cet item n'a aucun emplacement de carte.
+tr: Este item no tiene ranuras para cartas.
+
+fr: Tous les emplacements de cet item sont occupés.
+tr: Todas las ranuras de este item están ocupadas.
+
+fr: Cette carte ne se sertit pas sur ce type d'équipement.
+tr: Esta carta no se puede insertar en este tipo de equipo.

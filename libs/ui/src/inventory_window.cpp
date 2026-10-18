@@ -410,9 +410,14 @@ InventoryWindowAction DrawInventoryWindow(InventoryWindowState& state,
       ImGui::InvisibleButton("case", ImVec2(cell_side, cell_side),
                              ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
       const ImVec2 bottom_right(top_left.x + cell_side, top_left.y + cell_side);
+      // UNE CARTE LÂCHÉE SUR UNE PIÈCE LA SERTIT, et passe avant le placement
+      // libre : sur une pièce, c'est le geste qu'on attend d'une carte.
+      const CardDropTaken card_drop =
+          cell.takes_cards ? TakeCardDrop(cell.client_slot, view.card_drop, action.card_drop)
+                           : CardDropTaken{};
       // UNE CASE PLEINE REÇOIT AUSSI, et c'est ce qui fait l'ÉCHANGE : l'objet
       // qui s'y trouvait prend la case que l'autre quitte.
-      if (state.free_layout) {
+      if (state.free_layout && !card_drop.taken) {
         TakeCellDrop(cell_rank, action);
       }
       if (cell.client_slot == 0) {
@@ -442,13 +447,19 @@ InventoryWindowAction DrawInventoryWindow(InventoryWindowState& state,
       // garde ses autres destinations.
       const bool over_container =
           MouseOverWindow(kCartWindowId) || MouseOverWindow(kStorageWindowId);
+      const bool card_refused = view.card_drop.look == CardDropLook::kRefused &&
+                                view.card_drop.card_slot == cell.client_slot;
       const char* refusal = view.transfers_frozen && over_container ? TransfersFrozenText()
                             : view.storage_open && MouseOverWindow(kCartWindowId)
                                 ? core::Tr("Storage ouvert : vers le cart impossible")
-                                : nullptr;
+                            : card_refused ? view.card_drop.refusal
+                                           : nullptr;
       DragItemFrom(cell, ItemHolder::kInventory, menu_padding, refusal);
       DrawIcon(into, cell, top_left, cell_side);
       DrawBadge(into, cell, top_left, bottom_right);
+      if (card_drop.taken) {
+        PaintCardDropFrame(into, top_left, bottom_right, card_drop.look);
+      }
       // ⚠ L'APERÇU REMPLACE CETTE INFOBULLE-CI, il ne s'y ajoute pas : c'est
       // l'étage qui le dessine, après toutes les fenêtres, parce qu'une
       // description n'appartient à aucune d'elles.

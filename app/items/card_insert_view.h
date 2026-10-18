@@ -14,6 +14,7 @@
 #include "ro/vfs/item_table.h"
 #include "ro/vfs/item_words.h"
 
+#include "items/card_drop.h"
 #include "items/creator_names.h"
 
 namespace moonclient {
@@ -58,6 +59,21 @@ class CardInsertView {
   // carte dans quelle pièce (voir `CardInsertLine`).
   void NoteVerdict(ro::sim::World& world, std::uint32_t now_ms);
 
+  // UNE CARTE GLISSÉE SUR UNE PIÈCE, du sac ou de la fiche du personnage :
+  // juge le survol et le dépôt (voir `items/card_drop.h`). Le verdict du survol
+  // se retient pour l'image suivante.
+  [[nodiscard]] CardDropStep StepCardDrop(const ro::ui::CardDropSeen& bag_seen,
+                                          const ro::ui::CardDropSeen& doll_seen,
+                                          const ro::sim::World& world, bool dealing,
+                                          std::uint32_t now_ms);
+  [[nodiscard]] const ro::ui::CardDropHint& card_drop_hint() const noexcept {
+    return card_drop_hint_;
+  }
+
+  // LE REFUS D'UN DÉPÔT, dans la conversation, de la couleur d'un sertissage
+  // refusé par le serveur. ⚠ RIEN N'EST PARTI : le geste s'arrête là.
+  static void NoteCardDropRefusal(const char* refusal, ro::sim::World& world, std::uint32_t now_ms);
+
  private:
   [[nodiscard]] std::string NameOf(const ro::sim::InventoryItem& item) const;
   [[nodiscard]] ro::ui::SkinImage IconOf(std::uint32_t item_id) const;
@@ -75,6 +91,9 @@ class CardInsertView {
   std::vector<std::string> quick_names_;
   std::vector<ro::ui::QuickInsertCardView> quick_cards_;
   ro::ui::CardInsertView view_;
+
+  CardDropFlow card_drop_;
+  ro::ui::CardDropHint card_drop_hint_;
 };
 
 }  // namespace moonclient
