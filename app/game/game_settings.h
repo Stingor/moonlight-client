@@ -11,7 +11,6 @@
 #include "ro/ui/game_menu.h"
 #include "ro/ui/hotkey_window.h"
 
-#include "chat/macro_commands.h"
 #include "game/settings_file.h"
 #include "game/settings_profiles.h"
 #include "game/ui_stage.h"
@@ -94,12 +93,6 @@ class GameSettings {
 
   [[nodiscard]] ro::ui::HotkeyWindowView hotkey_view() const noexcept {
     return ro::ui::HotkeyWindowView{.rows = rows_, .tabs = tab_names_};
-  }
-
-  // Ce que le menu du clic droit des macros propose, DÉJÀ TRADUIT. Recomposé
-  // par `Refresh`, et seulement quand cette fenêtre-là est ouverte.
-  [[nodiscard]] std::span<const ro::ui::ChatMacroCommandGroup> macro_commands() const noexcept {
-    return macro_commands_.groups();
   }
 
   // Fait ce que le joueur a demandé au menu, à la configuration et aux options.
@@ -235,9 +228,6 @@ class GameSettings {
   std::vector<std::string> groups_;
   std::vector<ro::ui::HotkeyRowView> rows_;
   std::array<std::string_view, kHotkeyTabCount> tab_names_{};
-
-  // Les commandes que le menu du clic droit des macros propose.
-  MacroCommandCatalogue macro_commands_;
 
   // ⚠ LE FICHIER AVANT LES OPTIONS : celles-ci s'y déclarent à la construction.
   SettingsFile file_;

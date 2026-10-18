@@ -186,13 +186,6 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
       windows.macro_keys[slot] = LabelOfBinding(bindings_.Of(ActionRef::OfMacro(slot)));
     }
   }
-  // ⚠ ET LE CATALOGUE DU CLIC DROIT, à la même condition et pour la même
-  // raison : composer une trentaine de phrases pour une fenêtre fermée serait
-  // du temps donné à rien. Il ne se refait de toute façon qu'au changement de
-  // langue.
-  if (windows.macros.open) {
-    macro_commands_.Refresh();
-  }
   windows.storage_view.inventory_open = windows.inventory.open;
   windows.storage_view.cart_open = windows.cart.open;
   windows.meter.shown = options_.frame_meter();

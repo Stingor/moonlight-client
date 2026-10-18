@@ -56,10 +56,6 @@ namespace {
 // ces échos, en `0xRRGGBB`.
 constexpr std::uint32_t kSettingEchoColor = 0xFFFF64;
 
-// LA BASCULE DU CHAT DE CHAMP DE BATAILLE : armée, tout ce qu'on tape sans sigil
-// part à l'équipe.
-constexpr std::string_view kBattleChatCommand = "/battlechat";
-
 }  // namespace
 
 bool IsCraftAtlasCommand(std::string_view line) {
@@ -414,6 +410,10 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
   if (line.empty()) {
     return;
   }
+  // 🔴 UNE COMMANDE PRISE ICI SE PROPOSE AUSSI : elle s'inscrit dans
+  // `slash_commands.cpp`, et l'oracle de `slash_commands_test.cpp` apprend à la
+  // lire. L'essai refuse un nom proposé que rien ne lit, et un nom lu qui ne
+  // se propose pas.
   // ⚠ « /bc texte » ET « /w nom texte » SONT DES PAROLES, pas des commandes du
   // client : elles partent comme les sigils, avant que la table des commandes
   // connues ne les taise.

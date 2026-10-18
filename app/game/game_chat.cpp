@@ -266,6 +266,10 @@ void Game::StageChat(std::uint32_t now_ms) {
   const std::string outgoing = ResolveChatLinks(typed, pending_links_);
   chat_preview_.Refresh(outgoing.c_str(), WireSpeakerOf(world_, chat_preview_), armed_chat_,
                         pieces_.chat_rooms.room().in_room());
+  // LES COMMANDES PROPOSÉES, à la mesure du groupe que le serveur a dit : un
+  // compte du staff voit les siennes dès que le niveau arrive.
+  chat_commands_.Refresh(world_.group_level());
+  chat_preview_.SetCommands(chat_commands_.hints());
 }
 
 void Game::SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms) {

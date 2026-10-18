@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <utility>
 
 #include <imgui_internal.h>
 
@@ -17,6 +18,8 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "chat_input_chips.h"
+#include "chat_input_commands.h"
+#include "chat_whisper_box.h"
 #include "ui_input.h"
 #include "ui_strings.h"
 #include "ui_text.h"
@@ -28,8 +31,6 @@ namespace {
 // l'état d'édition, le focus et le rechargement du tampon ne doivent pas voir la
 // différence quand le champ gagne sa deuxième ligne.
 constexpr const char* kFieldId = "##saisie";
-// Le menu des derniers destinataires, ouvert au clic droit sur la box.
-constexpr const char* kWhisperMenu = "##recents";
 // Ce qui sépare le champ du bord droit du cadre.
 constexpr float kFieldRightGap = 4.0F;
 // Le plus long libellé que la boîte de destination sache montrer en entier.
@@ -47,6 +48,13 @@ struct CursorProbe {
   float wrap_width = 1.0F;
   int row = 0;
   int rows = 1;
+};
+
+// CE QUE LE RAPPEL DU CHAMP MULTILIGNE TRANSPORTE : la sonde du curseur, et la
+// liste des commandes pour Tab.
+struct WrappedFieldHooks {
+  CursorProbe probe;
+  const CommandFieldHooks* commands = nullptr;
 };
 
 // COMBIEN DE RANGÉES CE TEXTE OCCUPE, et sur laquelle tombe le curseur.
@@ -365,115 +373,6 @@ float ChatInputHeight(ChatInputState& state, const ChatLinePreview& preview, flo
   return one + static_cast<float>(state.rows_drawn - 1) * line;
 }
 
-// LA BOX « PSEUDO », et le bouton qui déroule les derniers destinataires.
-//
-// ⚠ ELLE VIENT AVANT LE TEXTE, là où le client la met après. Notre champ de
-// saisie GRANDIT en hauteur quand la phrase est longue ; une box posée après
-// lui se retrouverait alignée sur le bas d'un champ à quatre lignes, loin de
-// l'œil. Le client n'a pas ce problème : sa barre ne grandit pas.
-// CE QUE LA BOX A VU PASSER. Relevé sur elle et rendu à la rangée : la rangée
-// seule sait quoi en faire, parce qu'elle voit AUSSI ce qu'a fait l'autre champ.
-struct WhisperBoxGesture {
-  // Entrée, tapée depuis la box.
-  bool submitted = false;
-  // Elle a le clavier cette image.
-  bool active = false;
-  // Échap vient de l'en faire sortir.
-  bool escaped = false;
-};
-
-[[nodiscard]] WhisperBoxGesture DrawWhisperBox(ChatInputState& state,
-                                               const ChatLinePreview& preview,
-                                               ChatInputAsk* asked) {
-  WhisperBoxGesture gesture;
-  ImGui::SetNextItemWidth(kChatWhisperBoxWidth * ImGui::GetStyle().FontScaleMain);
-  // ⚠ LE CLAVIER PEUT VENIR ICI, et pas seulement à la phrase : c'est le joueur
-  // qui décide où il laisse son curseur, et un envoi le lui rend là où il
-  // l'avait mis.
-  if (state.wants_focus && state.focus_on_whisper) {
-    ImGui::SetKeyboardFocusHere();
-    // Consommée seulement le geste fini — même raison que pour la phrase, plus
-    // bas : `SetKeyboardFocusHere` refuse sec tant qu'un bouton est enfoncé.
-    if (!ImGui::IsAnyMouseDown() && !ImGui::IsDragDropActive()) {
-      state.wants_focus = false;
-    }
-  }
-  // 🔴 ENTRÉE VAUT DEPUIS ICI AUSSI. Le client d'origine ne demande pas au
-  // joueur de savoir dans laquelle des deux boîtes il a laissé son curseur :
-  // Entrée envoie, ou referme si la phrase est vide, que le pseudo soit rempli
-  // ou non. Sans `EnterReturnsTrue`, la touche se perdait — et en battle mode
-  // la barre restait ouverte, sourde.
-  gesture.submitted =
-      ImGui::InputTextWithHint("##pseudo", core::Tr("Pseudo"), state.whisper_to.data(),
-                               state.whisper_to.size(), ImGuiInputTextFlags_EnterReturnsTrue);
-  // Relevé ICI : la liste écrit dans CE tampon, et il faudra le lui dire — le
-  // widget tient sa propre copie pendant l'édition.
-  const ImGuiID box = ImGui::GetItemID();
-  gesture.active = ImGui::IsItemActive();
-  // ⚠ RELEVÉ COLLÉ AU WIDGET : plus bas, « l'item » désignerait le dernier
-  // dessiné — une infobulle, un menu — et le test d'Échap porterait sur autre
-  // chose.
-  gesture.escaped = ImGui::IsItemDeactivated() && ImGui::IsKeyPressed(ImGuiKey_Escape, false);
-  // TABULATION → LA PHRASE. Elle est dessinée APRÈS, dans la même image : le
-  // clavier y bascule tout de suite, sans le battement d'une image.
-  if (gesture.active && ImGui::IsKeyPressed(ImGuiKey_Tab, false)) {
-    state.focus_on_whisper = false;
-    state.wants_focus = true;
-  }
-
-  // 🔴 CLIC DROIT = LES RÉCENTS, et c'est ce que fait le bouton « Select
-  // Receiver » du client avec sa liste. Le geste est le même que sur une
-  // languette, et il ne coûte pas un pixel d'une rangée déjà serrée — le bouton
-  // qu'on avait mis à côté prenait la largeur d'un carré pour un geste qui n'en
-  // demande aucune.
-  if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-    ImGui::OpenPopup(kWhisperMenu);
-  }
-  // ⚠ PAS PENDANT QUE LA LISTE EST OUVERTE : elle se déroule juste sous la box,
-  // et l'infobulle viendrait recouvrir les noms qu'on cherche à lire.
-  if (ImGui::IsItemHovered() && !ImGui::IsPopupOpen(kWhisperMenu)) {
-    SkinTooltipFormat("%s\n%s",
-                      core::Tr("À qui chuchoter. Rempli, tout ce que tu écris lui part "
-                               "— sauf ce qui porte déjà un sigil."),
-                      core::Tr("Clic droit : les récents."));
-  }
-
-  if (!BeginSkinPopup(kWhisperMenu)) {
-    return gesture;
-  }
-  if (preview.recent_whispers.empty()) {
-    // ⚠ UN MOT PLUTÔT QU'UNE LISTE VIDE : un popup qui s'ouvre sur rien se lit
-    // comme un défaut, alors que c'est simplement qu'on n'a chuchoté à personne.
-    ImGui::TextUnformatted(core::Tr("Aucun destinataire récent"));
-  } else {
-    for (const std::string_view name : preview.recent_whispers) {
-      // ⚠ UNE COPIE BORNÉE, jamais un `strcpy` : un nom plus long que la box —
-      // d'un fichier, d'un serveur modifié — déborderait le tampon.
-      if (ImGui::Selectable(std::string(name).c_str())) {
-        const std::size_t kept = std::min(name.size(), state.whisper_to.size() - 1);
-        std::memcpy(state.whisper_to.data(), name.data(), kept);
-        state.whisper_to[kept] = '\0';
-        // 🔴 ET ON PRÉVIENT LE CHAMP. Écrire dans le tampon d'un
-        // `InputText` sans le lui dire laisse son curseur posé sur l'ancien texte ;
-        // s'il était plus long, le curseur dépasse la fin et la première image qui
-        // redessine le champ franchit une assertion d'ImGui — ce qui TUE le
-        // programme.
-        ReloadInputField(box);
-        // Le nom est choisi : on veut ÉCRIRE la phrase, pas cliquer — et c'est
-        // à elle que le clavier va, pas à la box qu'on vient de remplir.
-        state.focus_on_whisper = false;
-        state.wants_focus = true;
-      }
-    }
-    ImGui::Separator();
-    if (ImGui::Selectable(core::Tr("Vider la liste"))) {
-      asked->forget_whispers = true;
-    }
-  }
-  EndSkinPopup();
-  return gesture;
-}
-
 bool AppendPendingInsert(ChatInputState& state, std::string_view piece) {
   const std::size_t typed_bytes = std::strlen(state.text.data());
   // Le zéro terminal compte : c'est la règle de pose de `DrawChatInput`.
@@ -501,10 +400,14 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
   // Ce que la bande a déposé : un emoji pioché dans le sélecteur.
   // ⚠ RIEN N'EST TRONQUÉ : poser la moitié d'un emoji laisserait des octets qui
   // ne forment plus un caractère, et le champ les rendrait en losanges.
-  const bool inserted =
+  // ⚠ UNE COMMANDE COMPLÉTÉE À LA SOURIS SE RECHARGE COMME LUI : voir
+  // `DrawCommandsOverField`.
+  const bool completed = std::exchange(state.commands.reload_field, false);
+  const bool appended =
       !state.pending_insert.empty() &&
       std::strlen(state.text.data()) + state.pending_insert.size() + 1 <= state.text.size();
-  if (inserted) {
+  const bool inserted = appended || completed;
+  if (appended) {
     std::memcpy(state.text.data() + std::strlen(state.text.data()), state.pending_insert.data(),
                 state.pending_insert.size() + 1);
   }
@@ -574,6 +477,12 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     }
   }
 
+  // LA LISTE DES COMMANDES prend ses touches AVANT le champ : voir
+  // `chat_input_commands.h`.
+  const ChatCommandListView commands =
+      TakeCommandKeysBeforeField(state, preview.commands, ImGui::GetID(kFieldId));
+  CommandFieldHooks hooks{.state = &state, .view = &commands, .hints = preview.commands};
+
   bool submitted = false;
   int cursor_row_before = -1;
   int cursor_rows_before = 1;
@@ -581,21 +490,31 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     // ↑/↓ rappellent l'historique. ImGui ne l'expose QUE par rappel : le tampon
     // appartient au widget pendant l'édition, l'écrire à côté serait écrasé par
     // son état interne à l'image suivante.
+    // ⚠ SAUF LISTE DES COMMANDES OUVERTE : elle les prend pour choisir.
     const auto recall = [](ImGuiInputTextCallbackData* data) -> int {
+      const auto* field_hooks = static_cast<const CommandFieldHooks*>(data->UserData);
+      if (CompleteOnTab(*field_hooks, data)) {
+        return 0;
+      }
       if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory) {
-        auto* history = static_cast<ChatInputHistory*>(data->UserData);
+        const bool up = data->EventKey == ImGuiKey_UpArrow;
+        if (NavigateCommands(*field_hooks, up)) {
+          return 0;
+        }
         std::string text;
-        if (Recall(*history, data->EventKey == ImGuiKey_UpArrow ? -1 : 1, data->Buf, &text)) {
+        if (Recall(field_hooks->state->history, up ? -1 : 1, data->Buf, &text)) {
           data->DeleteChars(0, data->BufTextLen);
           data->InsertChars(0, text.c_str());
+          DismissChatCommandList(field_hooks->state->commands, text);
         }
       }
       return 0;
     };
     submitted =
         ImGui::InputText(kFieldId, state.text.data(), state.text.size(),
-                         ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory,
-                         recall, &state.history);
+                         ImGuiInputTextFlags_EnterReturnsTrue |
+                             ImGuiInputTextFlags_CallbackHistory | CommandFieldFlags(commands),
+                         recall, &hooks);
   } else {
     // ── Le rectangle à retour à la ligne ─────────────────────────────────────
     // ⚠ PAS DE BARRE DE DÉFILEMENT. L'enfant du champ multiligne est créé en dur
@@ -611,9 +530,13 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
       if (data->EventFlag == ImGuiInputTextFlags_CallbackCharFilter) {
         return data->EventChar == '\n' ? 1 : 0;
       }
+      auto* wrapped = static_cast<WrappedFieldHooks*>(data->UserData);
+      if (CompleteOnTab(*wrapped->commands, data)) {
+        return 0;
+      }
       if (data->EventFlag == ImGuiInputTextFlags_CallbackAlways) {
-        auto* probe = static_cast<CursorProbe*>(data->UserData);
-        probe->rows = WrapRows(data->Buf, probe->wrap_width, data->CursorPos, &probe->row);
+        CursorProbe& probe = wrapped->probe;
+        probe.rows = WrapRows(data->Buf, probe.wrap_width, data->CursorPos, &probe.row);
       }
       return 0;
     };
@@ -621,7 +544,8 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     // le rappel tourne APRÈS le traitement des touches de cette image, donc lire
     // sa valeur ensuite ne dirait pas si la flèche a trouvé une rangée au-dessus
     // ou n'a rien pu faire.
-    CursorProbe probe;
+    WrappedFieldHooks wrapped{.commands = &hooks};
+    CursorProbe& probe = wrapped.probe;
     probe.wrap_width = wrap_width;
     probe.row = state.cursor_row;
     probe.rows = state.cursor_rows;
@@ -631,8 +555,8 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
         kFieldId, state.text.data(), state.text.size(), ImVec2(field_width, field_height),
         ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine |
             ImGuiInputTextFlags_WordWrap | ImGuiInputTextFlags_CallbackCharFilter |
-            ImGuiInputTextFlags_CallbackAlways,
-        refuse_newline, &probe);
+            ImGuiInputTextFlags_CallbackAlways | CommandFieldFlags(commands),
+        refuse_newline, &wrapped);
     ImGui::PopStyleVar();
     state.cursor_row = probe.row;
     state.cursor_rows = probe.rows;
@@ -695,15 +619,25 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     // doit pas remonter l'historique de l'autre champ.
     std::string recalled;
     const bool mine = ImGui::GetActiveID() == field;
-    const bool up = mine && ImGui::IsKeyPressed(ImGuiKey_UpArrow) && cursor_row_before == 0;
-    const bool down = mine && ImGui::IsKeyPressed(ImGuiKey_DownArrow) &&
-                      cursor_row_before >= cursor_rows_before - 1;
-    if ((up || down) && Recall(state.history, up ? -1 : 1, state.text.data(), &recalled)) {
-      CopyBounded(state.text, recalled);
+    const bool arrow_up = mine && ImGui::IsKeyPressed(ImGuiKey_UpArrow);
+    const bool arrow_down = mine && ImGui::IsKeyPressed(ImGuiKey_DownArrow);
+    // ⚠ LA LISTE DES COMMANDES OUVERTE PREND LES FLÈCHES, et le curseur qu'ImGui
+    // vient de déplacer revient en fin de ligne : on choisit une commande, on
+    // n'édite pas.
+    if ((arrow_up || arrow_down) && NavigateCommands(hooks, arrow_up)) {
       ReloadInputField(field);
+    } else {
+      const bool up = arrow_up && cursor_row_before == 0;
+      const bool down = arrow_down && cursor_row_before >= cursor_rows_before - 1;
+      if ((up || down) && Recall(state.history, up ? -1 : 1, state.text.data(), &recalled)) {
+        CopyBounded(state.text, recalled);
+        ReloadInputField(field);
+        DismissChatCommandList(state.commands, recalled);
+      }
     }
   }
   ImGui::PopStyleColor(1 + field_colors);
+  DrawCommandsOverField(state, preview.commands, active, field_corner, field_extent.x, art);
 
   // La place restante, dès que le champ a une deuxième rangée — c'est aussi le
   // moment où l'étiquette laisse, sous elle, la place de l'écrire.

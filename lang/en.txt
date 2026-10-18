@@ -230,14 +230,62 @@ tr: 5 days / min
 fr: 5 min / min
 tr: 5 min / min
 
+fr: Accepte les invitations de groupe.
+tr: Accepts party invitations.
+
+fr: Accepte ou refuse l'appel d'urgence.
+tr: Accepts or refuses the emergency call.
+
+fr: Active ou coupe les secousses d'écran.
+tr: Turns screen shakes on or off.
+
+fr: Affiche l'aide des commandes du jeu.
+tr: Shows the help for the game's commands.
+
 fr: Afficher l'heure du serveur
 tr: Show the server time
 
 fr: Afficher les enseignes des salons de discussion
 tr: Show chat room signboards
 
+fr: Aimante ou libère les fenêtres.
+tr: Snaps windows together, or frees them.
+
+fr: Allège ou rétablit les effets.
+tr: Lightens or restores the effects.
+
+fr: Annonce sur la carte, sans ton nom.
+tr: Announces on the map, without your name.
+
+fr: Annonce sur la carte, ton nom en tête.
+tr: Announces on the map, your name first.
+
+fr: Annonce à tout le serveur, sans ton nom.
+tr: Announces to the whole server, without your name.
+
+fr: Annonce à tout le serveur, ton nom en tête.
+tr: Announces to the whole server, your name first.
+
+fr: Autorise de nouveau ses chuchotements.
+tr: Allows their whispers again.
+
+fr: Autorise de nouveau tous les chuchotements.
+tr: Allows all whispers again.
+
 fr: Balayage (°)
 tr: Sweep (°)
+
+fr: Bascule le battle mode : la barre de saisie se replie.
+tr: Toggles battle mode: the input bar folds away.
+
+fr: Bascule le chat de champ de bataille : ce que tu tapes part à l'équipe.
+tr: Toggles battlefield chat: what you type goes to your team.
+
+fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
+tr: Blocks this player's whispers; alone, lists the blocked ones.
+
+fr: Bloque les chuchotements de tout le monde.
+tr: Blocks everyone's whispers.
 
 fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
 tr: Applies to the whole signboard, frame and title. The client paints them solid; more transparent, a street of merchants hides less of the map.
@@ -251,8 +299,20 @@ tr: The game's
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: The game's is the original client's font. The title keeps its room: a wider font gets cut into "..." sooner, and hovering the title shows it in full.
 
+fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
+tr: Whispers to a player; alone, counts the players online.
+
 fr: Ciel
 tr: Sky
+
+fr: Colle la caméra au personnage, ou la laisse rattraper.
+tr: Sticks the camera to the character, or lets it catch up.
+
+fr: Commandes du client
+tr: Client commands
+
+fr: Compte les joueurs connectés.
+tr: Counts the players online.
 
 fr: Coucher (h)
 tr: Sunset (h)
@@ -260,8 +320,44 @@ tr: Sunset (h)
 fr: Couleur du titre
 tr: Title color
 
+fr: Coupe ou rétablit la musique.
+tr: Mutes or restores the music.
+
+fr: Coupe ou rétablit les bruits.
+tr: Mutes or restores the sounds.
+
+fr: Coupe ou rétablit les effets du ciel.
+tr: Turns the sky effects off or back on.
+
+fr: Coupe ou rétablit les effets.
+tr: Turns the effects off or back on.
+
+fr: Crée un groupe.
+tr: Creates a party.
+
+fr: Crée un salon de discussion.
+tr: Creates a chat room.
+
+fr: Crée une guilde.
+tr: Creates a guild.
+
 fr: Cycle jour/nuit
 tr: Day/night cycle
+
+fr: Demande le classement des alchimistes.
+tr: Asks for the alchemist ranking.
+
+fr: Demande le classement des forgerons.
+tr: Asks for the blacksmith ranking.
+
+fr: Demande le classement des taekwons.
+tr: Asks for the taekwon ranking.
+
+fr: Dissout ta guilde.
+tr: Disbands your guild.
+
+fr: Dit ta position.
+tr: Tells your position.
 
 fr: Décalage d'azimut (°)
 tr: Azimuth offset (°)
@@ -269,8 +365,14 @@ tr: Azimuth offset (°)
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Unchecked, it is the course drawn from the map's light.
 
+fr: Enregistre le journal de conversation.
+tr: Saves the chat log.
+
 fr: Enseignes
 tr: Signboards
+
+fr: Exclut ce joueur de ton groupe.
+tr: Expels this player from your party.
 
 fr: Faire tourner le temps
 tr: Let time run
@@ -283,6 +385,9 @@ tr: Searched shop background
 
 fr: Fond des échoppes
 tr: Shop background
+
+fr: Force la cible sans tenir Maj.
+tr: Forces the target without holding Shift.
 
 fr: Forcer l'heure du ciel
 tr: Force the sky's hour
@@ -998,6 +1103,18 @@ tr: Adds everything sellable; the shop closes after the sale, which asks for con
 fr: Ajoute tout ce qui est vendable ; la boutique se fermera après la vente.
 tr: Adds everything sellable; the shop closes after the sale.
 
+fr: Invite ce joueur dans ta guilde.
+tr: Invites this player into your guild.
+
+fr: Invite ce joueur dans ton groupe.
+tr: Invites this player into your party.
+
+fr: Joue cette émoticône.
+tr: Plays this emoticon.
+
+fr: Joue l'émoticône de ce numéro.
+tr: Plays the emoticon with this number.
+
 fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
 tr: The time of day on the server, the one the day/night cycle follows — not your computer's.
 
@@ -1019,11 +1136,83 @@ tr: Which ones show
 fr: Lever (h)
 tr: Sunrise (h)
 
+fr: Liste les commandes d'émoticône.
+tr: Lists the emoticon commands.
+
+fr: Masque ou montre la parole dans la conversation.
+tr: Hides or shows speech in the chat.
+
+fr: Masque ou montre la parole, celle de la guilde comprise.
+tr: Hides or shows speech, guild speech included.
+
+fr: Monte cette caractéristique de ce nombre de points.
+tr: Raises this stat by this many points.
+
+fr: Montre ou cache la barre de vie d'un monstre attaqué.
+tr: Shows or hides the health bar of an attacked monster.
+
+fr: Montre ou cache le bouton du Vote Shop.
+tr: Shows or hides the Vote Shop button.
+
+fr: Montre ou cache le brouillard.
+tr: Shows or hides the fog.
+
+fr: Montre ou cache les emblèmes de guilde.
+tr: Shows or hides guild emblems.
+
+fr: Montre ou cache les messages d'échec de skill.
+tr: Shows or hides skill failure messages.
+
+fr: Montre ou cache les ombres de la carte.
+tr: Shows or hides the map's shadows.
+
+fr: Montre ou cache les panneaux d'échoppe.
+tr: Shows or hides shop signboards.
+
+fr: Montre ou cache les « Miss ».
+tr: Shows or hides the “Miss” texts.
+
+fr: Montre ou cache ton équipement aux autres.
+tr: Shows or hides your equipment to others.
+
+fr: Mémorise ce point de warp.
+tr: Memorizes this warp point.
+
 fr: Ombres en temps réel
 tr: Real-time shadows
 
 fr: Opacité, couleurs et police reviennent à ceux du jeu. Ce qui se montre ne change pas.
 tr: Opacity, colors and font return to the game's. What is shown does not change.
+
+fr: Ouvre l'atlas des recettes.
+tr: Opens the recipe atlas.
+
+fr: Ouvre la base de données, sur cette recherche.
+tr: Opens the database, on this search.
+
+fr: Ouvre la navigation, guide vers une case ou cherche.
+tr: Opens navigation, guides to a cell or searches.
+
+fr: Ouvre le marché.
+tr: Opens the market.
+
+fr: Ouvre le tableau des classements.
+tr: Opens the ranking board.
+
+fr: Ouvre ou ferme la fenêtre des macros.
+tr: Opens or closes the macro window.
+
+fr: Ouvre une échoppe d'un simple clic.
+tr: Opens a shop with a single click.
+
+fr: Parle à ta guilde.
+tr: Speaks to your guild.
+
+fr: Parle à ton clan.
+tr: Speaks to your clan.
+
+fr: Parle à ton équipe de champ de bataille.
+tr: Speaks to your battlefield team.
 
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time shadows” is checked in Graphics.
@@ -1031,14 +1220,41 @@ tr: Places the sun, or the moon, at the chosen hour: the light on the ground and
 fr: Police du titre
 tr: Title font
 
+fr: Poursuit l'attaque sans tenir Ctrl.
+tr: Keeps attacking without holding Ctrl.
+
+fr: Propose un échange à ce joueur.
+tr: Offers a trade to this player.
+
+fr: Quitte le salon de discussion.
+tr: Leaves the chat room.
+
+fr: Quitte ton groupe.
+tr: Leaves your party.
+
+fr: Refuse les invitations de groupe.
+tr: Refuses party invitations.
+
+fr: Refuse ou accepte de nouveau les demandes d'échange.
+tr: Refuses trade requests, or accepts them again.
+
 fr: Rendre le dessin du client
 tr: Restore the client's look
 
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: Nothing is saved: every launch brings back the map's own sky.
 
+fr: Règle l'échelle de l'interface ; seule, la dit.
+tr: Sets the interface scale; alone, tells it.
+
 fr: Règle le chemin du soleil et de la lune dans le ciel : d'où ils viennent, à quelle hauteur ils culminent à midi, et quelle part de l'horizon ils balaient.
 tr: Adjusts the path of the sun and moon across the sky: where they come from, how high they climb at noon, and how much of the horizon they sweep.
+
+fr: Règle le volume de la musique ; seule, le dit.
+tr: Sets the music volume; alone, tells it.
+
+fr: Règle le volume des bruits ; seule, le dit.
+tr: Sets the sound volume; alone, tells it.
 
 fr: Régler la course des astres
 tr: Adjust the course of the sky
@@ -1046,11 +1262,17 @@ tr: Adjust the course of the sky
 fr: Rétablir la course
 tr: Reset the course
 
+fr: S'assied, ou se relève.
+tr: Sits down, or stands up.
+
 fr: Serveur %.*s
 tr: Server %.*s
 
 fr: Seul ce client voit ce ciel : rien ne part au serveur.
 tr: Only this client sees this sky: nothing is sent to the server.
+
+fr: Suit un joueur en vue ; seule, cesse de suivre.
+tr: Follows a player in sight; alone, stops following.
 
 fr: Teinte du cadre des salons
 tr: Chat room frame tint
@@ -4358,6 +4580,9 @@ tr: Step cleared
 
 fr: Éteint, les bulles des salons ouverts par les joueurs disparaissent — et ne se cliquent plus : on n'y entre alors que par l'annuaire des salons.
 tr: When off, the bubbles of chat rooms opened by players disappear — and can no longer be clicked: you can then only join through the chat room directory.
+
+fr: Étend ou ramène le dézoom.
+tr: Extends or restores the zoom-out.
 
 fr: Étiquettes
 tr: Labels
@@ -7888,9 +8113,6 @@ tr: Bottom left
 fr: Bascule entre la grille d'icônes, à la place du client, et la liste détaillée — niveau, coût, portée, prérequis.
 tr: Switches between the icon grid, laid out as the client does, and the detailed list — level, cost, range, prerequisites.
 
-fr: Bascule la protection contre le vol de kill.
-tr: Toggles kill-steal protection.
-
 fr: Base
 tr: Base
 
@@ -8542,17 +8764,11 @@ tr: DEX
 fr: Dagger
 tr: Dagger
 
-fr: Date et heure du serveur.
-tr: The server's date and time.
-
 fr: Demande envoyée — en attente du serveur…
 tr: Request sent — waiting for the server…
 
 fr: Demande refusée par le serveur.
 tr: Request refused by the server.
-
-fr: Depuis combien de temps le serveur tourne.
-tr: How long the server has been running.
 
 fr: Des coups factices joués sur le personnage tant que cette fenêtre est ouverte : un coup sur un monstre, un skill, un coup multiple, un critique, un coup reçu, un coup des autres, « Miss », « LUCKY!! », la magie, un soin, la magie rendue — puis à nouveau. Ils suivent tous les réglages de la section.
 tr: Fake blows played on the character while this window is open: a blow on a monster, a skill, a multi-hit, a critical, a blow taken, someone else's blow, "Miss", "LUCKY!!", magic, a heal, magic restored — then again. They follow every setting in the section.
@@ -8874,12 +9090,6 @@ tr: Calculation inputs: kit level %d, dish level %d, base level %d, DEX %d, LUK 
 
 fr: Envoie la macro tout de suite, sans fermer la fenêtre.
 tr: Sends the macro right away, without closing the window.
-
-fr: Envoie tout l'inventory au storage alternatif %d.
-tr: Sends the whole inventory to alternate storage %d.
-
-fr: Envoie tout l'inventory au storage.
-tr: Sends the whole inventory to the storage.
 
 fr: Envoyer
 tr: Send
@@ -9306,9 +9516,6 @@ tr: Index
 
 fr: Inflige
 tr: Inflicts
-
-fr: Informations
-tr: Information
 
 fr: Interface
 tr: Interface
@@ -9751,9 +9958,6 @@ tr: Effect numbers
 fr: Les nombres qui montent au-dessus de ce qui est frappé, soigné ou manqué. Éteint, rien ne se montre — et rien ne se rejoue en rallumant.
 tr: The numbers rising above whatever is hit, healed or missed. Off, nothing shows — and nothing replays when switched back on.
 
-fr: Les items ramassés vont droit dans l'inventory.
-tr: Picked-up items go straight into the inventory.
-
 fr: Les onglets longent la grille, debout à sa gauche, comme la fenêtre du client. Décoche pour une rangée couchée au-dessus.\n\nLes deux jeux d'images viennent de l'installation : une rangée n'est pas la colonne tournée.
 tr: Tabs run down the left side of the grid, standing, like the client's own window. Uncheck for a row lying above it.\n\nBoth image sets come from the installation: a row is not the column turned on its side.
 
@@ -9786,9 +9990,6 @@ tr: Typed lines kept
 
 fr: Limite d'images
 tr: Frame cap
-
-fr: Liste les joueurs connectés, avec leur groupe et leur guilde.
-tr: Lists connected players, with their group and guild.
 
 fr: Liste non encore reçue — clic sur « Actualiser ».
 tr: List not received yet — click « Refresh ».
@@ -9970,12 +10171,6 @@ tr: Nature
 fr: Ne plus suivre
 tr: Stop tracking
 
-fr: Ne ramasse que les items rares listés par le serveur.
-tr: Only picks up the rare items the server lists.
-
-fr: Ne ramasse que les items valant au moins ce prix.
-tr: Only picks up items worth at least this price.
-
 fr: Ninja
 tr: Ninja
 
@@ -10134,18 +10329,6 @@ tr: Tool:
 
 fr: Ouvre l'écran des raccourcis, où ces dix touches se réaffectent.
 tr: Opens the hotkey screen, where these ten keys are reassigned.
-
-fr: Ouvre le storage alternatif %d.
-tr: Opens alternate storage %d.
-
-fr: Ouvre le storage alternatif 5, celui des cartes.
-tr: Opens alternate storage 5, the card one.
-
-fr: Ouvre le storage de guilde.
-tr: Opens the guild storage.
-
-fr: Ouvre le storage.
-tr: Opens the storage.
 
 fr: Ouvre les Options sur la section Conversation : la police, les couleurs et les bulles.
 tr: Opens Options at the Chat section: font, colours and bubbles.
@@ -10375,9 +10558,6 @@ tr: Extra per character
 fr: Ramassage
 tr: Looting
 
-fr: Ramasse aussi les récompenses des MVP.
-tr: Also picks up MVP rewards.
-
 fr: Rangement
 tr: Sort order
 
@@ -10557,9 +10737,6 @@ tr: Reserves one level; Ctrl: up to the maximum.
 
 fr: Réservée au maître de guilde.
 tr: Guild master only.
-
-fr: Resynchronise votre position à l'écran.
-tr: Resynchronises your position on screen.
 
 fr: Retape le nom de la guilde pour confirmer :
 tr: Type the guild's name again to confirm:
@@ -11175,9 +11352,6 @@ tr: Two-handed staff
 
 fr: Two-handed sword
 tr: Two-handed sword
-
-fr: Téléporte à votre point de sauvegarde.
-tr: Teleports to your save point.
 
 fr: UI
 tr: UI

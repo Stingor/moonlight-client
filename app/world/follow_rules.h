@@ -131,6 +131,7 @@ struct FollowDecision {
 //
 // Le mot se compare sans tenir compte de la casse ; `/followme` n'est pas
 // `/follow`. Rend le nom, vide pour `/follow` seul ; rien pour une autre ligne.
+inline constexpr std::string_view kFollowCommand = "/follow";
 [[nodiscard]] std::optional<std::string> ReadFollowCommand(std::string_view line);
 
 }  // namespace moonclient

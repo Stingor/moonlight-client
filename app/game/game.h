@@ -47,6 +47,7 @@
 #include "character/style_preview.h"
 #include "character/style_view.h"
 #include "character/title_view.h"
+#include "chat/chat_command_catalogue.h"
 #include "chat/chat_line_preview.h"
 #include "chat/chat_navi_search_link.h"
 #include "chat/chat_tab_view.h"
@@ -613,6 +614,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // Où part la ligne en cours de frappe, et ce qu'il en reste. Refait à chaque
   // image : c'est une lecture de la saisie, pas un état à tenir à jour.
   ChatLinePreviewMaker chat_preview_;
+  // Les commandes que la liste au-dessus du champ ET le menu des macros
+  // proposent : une seule liste pour les deux.
+  ChatCommandCatalogue chat_commands_;
   std::optional<SkillSheet> sheet_;
   std::optional<ShortcutBarView> shortcuts_;
   // LES ÉTATS DU JOUEUR, CROISÉS. Elle désigne la table des statuts et leurs

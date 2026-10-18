@@ -269,6 +269,22 @@ target_link_libraries(moonclient_chatlinks
 
 target_include_directories(moonclient_chatlinks PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LES COMMANDES QUE LE CHAT PROPOSE : la table « / » du client, celle « @ »
+# tirée du serveur (`generated/`, par `scripts/gen_server_atcommands.py`), et
+# leur composition pour la liste de la barre et le menu des macros. En
+# bibliothèque pour que leur accord avec les lecteurs de commandes s'essaie :
+# une commande proposée que rien ne lit partirait en public.
+add_library(moonclient_chatcommands STATIC
+    chat/chat_command_catalogue.cpp
+    chat/slash_commands.cpp
+    generated/server_atcommand_table.cpp)
+
+target_link_libraries(moonclient_chatcommands
+    PUBLIC ro_core ro_ui
+    PRIVATE moonclient_chatlinks ro_warnings)
+
+target_include_directories(moonclient_chatcommands PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LES REFUS DE COMPETENCE DANS LA CONVERSATION, en bibliotheque pour que leurs
 # phrases s'essaient sur un banc : un motif mal range dit au joueur autre chose
 # que ce que le serveur a refuse, et cela ne se voit qu'en jeu. Les lignes
@@ -1806,7 +1822,7 @@ add_executable(moonclient
     game/window_events.cpp)
 
 target_link_libraries(moonclient
-    PRIVATE moonclient_chatlinks moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
+    PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net

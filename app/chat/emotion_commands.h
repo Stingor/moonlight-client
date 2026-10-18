@@ -7,6 +7,16 @@
 
 namespace moonclient {
 
+// UNE COMMANDE D'ÉMOTICÔNE ET LE NUMÉRO QU'ELLE ENVOIE.
+//
+// Un agrégat plutôt qu'une paire : le constructeur d'une paire prend ses
+// arguments par valeur, et un littéral entier y passe par un int qu'il faut
+// rétrécir. Écrit ainsi, chaque numéro est vérifié à la compilation.
+struct EmotionCommandRow {
+  std::string_view name;
+  std::uint16_t emotion;
+};
+
 // L'émoticône qu'une ligne demande, ou rien si elle n'en demande aucune.
 //
 // Les commandes viennent du jeu lui-même : celles que le serveur documente dans
@@ -36,5 +46,10 @@ namespace moonclient {
 // CE QUE `/emotion` ÉCRIT SOUS SON TITRE : une commande par ligne, dans l'ordre
 // où le client du joueur les énumère. Les noms ne se traduisent pas.
 [[nodiscard]] std::span<const std::string_view> EmotionListLines();
+
+// TOUTE LA TABLE, dans son ordre : la liste des commandes du chat la propose
+// telle quelle, la première forme de chaque émoticône en tête, les autres en
+// alias. ⚠ LA COMMANDE NUMÉROTÉE « /e <n> » N'Y EST PAS : elle se lit à part.
+[[nodiscard]] std::span<const EmotionCommandRow> EmotionCommandRows();
 
 }  // namespace moonclient

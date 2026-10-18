@@ -236,6 +236,13 @@ class ChatLinePreviewMaker {
 
   [[nodiscard]] const ro::ui::ChatLinePreview& preview() const noexcept { return preview_; }
 
+  // Les commandes que la liste au-dessus du champ propose. ⚠ UNE VUE : ce
+  // qu'elle regarde appartient à `ChatCommandCatalogue`, qui la recompose au
+  // changement de langue ou de groupe — d'où une pose à chaque image.
+  void SetCommands(std::span<const ro::ui::ChatCommandHint> commands) noexcept {
+    preview_.commands = commands;
+  }
+
  private:
   ro::ui::ChatLinePreview preview_;
   ro::net::ChatIntent intent_;

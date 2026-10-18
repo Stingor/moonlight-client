@@ -5,14 +5,6 @@
 namespace moonclient {
 namespace {
 
-// Un agrégat plutôt qu'une paire : le constructeur d'une paire prend ses
-// arguments par valeur, et un littéral entier y passe par un int qu'il faut
-// rétrécir. Écrit ainsi, chaque numéro est vérifié à la compilation.
-struct Command {
-  std::string_view name;
-  std::uint16_t emotion;
-};
-
 // Les commandes d'émoticône du jeu, et le numéro qu'elles envoient.
 //
 // D'OÙ ELLES VIENNENT. Les numéros sont ceux de emotion_type, dans
@@ -26,7 +18,7 @@ struct Command {
 // ⚠ `/dice` ENVOIE LE PREMIER DÉ, et c'est le serveur qui tire le résultat
 // (`client_reshuffle_dice`, allumé sur Moonlight) : le client ne choisit pas
 // la face.
-constexpr auto kEmotionCommands = std::to_array<Command>({
+constexpr auto kEmotionCommands = std::to_array<EmotionCommandRow>({
     {"/!", 0},        {"/?", 1},       {"/ho", 2},      {"/delight", 2},   {"/lv", 3},
     {"/heart", 3},    {"/swt", 4},     {"/sweat", 4},   {"/ic", 5},        {"/aha", 5},
     {"/an", 6},       {"/fret", 6},    {"/ag", 7},      {"/anger", 7},     {"/$", 8},
@@ -98,7 +90,7 @@ std::optional<std::uint16_t> NumberedEmotion(std::string_view line) {
 }  // namespace
 
 std::optional<std::uint16_t> EmotionCommand(std::string_view line) {
-  for (const Command& command : kEmotionCommands) {
+  for (const EmotionCommandRow& command : kEmotionCommands) {
     if (line == command.name) {
       return command.emotion;
     }
@@ -107,7 +99,7 @@ std::optional<std::uint16_t> EmotionCommand(std::string_view line) {
 }
 
 std::string_view EmotionCommandOf(std::uint16_t emotion) {
-  for (const Command& command : kEmotionCommands) {
+  for (const EmotionCommandRow& command : kEmotionCommands) {
     if (command.emotion == emotion) {
       return command.name;
     }
@@ -116,5 +108,7 @@ std::string_view EmotionCommandOf(std::uint16_t emotion) {
 }
 
 std::span<const std::string_view> EmotionListLines() { return kEmotionListLines; }
+
+std::span<const EmotionCommandRow> EmotionCommandRows() { return kEmotionCommands; }
 
 }  // namespace moonclient

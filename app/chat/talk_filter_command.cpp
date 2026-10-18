@@ -9,15 +9,17 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/options_window.h"
 
+#include "chat/talk_filter_words.h"
+
 namespace moonclient {
 namespace {
 
 // LES QUATRE NOMS, l'alias court portant la même bascule que son nom long.
 constexpr std::array<std::pair<std::string_view, TalkFilterRow>, 4> kTalkFilterCommands = {{
-    {"/notalkmsg", TalkFilterRow::kTalkHidden},
-    {"/nm", TalkFilterRow::kTalkHidden},
-    {"/notalkmsg2", TalkFilterRow::kTalkAndGuildHidden},
-    {"/nm2", TalkFilterRow::kTalkAndGuildHidden},
+    {kTalkHiddenCommand, TalkFilterRow::kTalkHidden},
+    {kTalkHiddenShortCommand, TalkFilterRow::kTalkHidden},
+    {kTalkAndGuildHiddenCommand, TalkFilterRow::kTalkAndGuildHidden},
+    {kTalkAndGuildHiddenShortCommand, TalkFilterRow::kTalkAndGuildHidden},
 }};
 
 // L'ÉCHO DU JEU, selon la bascule et ce qu'elle vient de devenir. ⚠ « ON » ET

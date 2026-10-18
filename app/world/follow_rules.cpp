@@ -14,8 +14,6 @@
 namespace moonclient {
 namespace {
 
-constexpr std::string_view kFollowCommand = "/follow";
-
 [[nodiscard]] std::string_view Trimmed(std::string_view text) {
   const std::size_t first = text.find_first_not_of(' ');
   if (first == std::string_view::npos) {

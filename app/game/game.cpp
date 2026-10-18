@@ -576,7 +576,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                                        : std::span<const ro::ui::DamageTextView>(),
                           .font_name = settings_->options().damage_look().font_name,
                           .bold = settings_->options().damage_look().font_bold},
-      Rights(), MenuFacts(), settings_->macro_commands(),
+      Rights(), MenuFacts(), chat_commands_.macro_groups(),
       // ⚠ LE CADRE DE REPÉRAGE NE SE MONTRE QUE SUR SA PROPRE SECTION, et non
       // dès que le panneau est ouvert : c'est là qu'on règle la zone. Posé sur
       // les treize autres, il barre l'écran de quelqu'un venu changer son

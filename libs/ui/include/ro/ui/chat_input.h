@@ -11,6 +11,7 @@
 #include <imgui.h>
 
 #include "ro/ui/chat_bar.h"
+#include "ro/ui/chat_command_hints.h"
 #include "ro/ui/chat_link.h"
 #include "ro/ui/skin_art.h"
 
@@ -132,6 +133,9 @@ struct ChatLinePreview {
   bool budget_known = false;
   // Ce que dit l'infobulle de la marque Discord, DÉJÀ TRADUIT ; vide sans marque.
   std::string_view relay_tip;
+  // LES COMMANDES QUE LA LISTE AU-DESSUS DU CHAMP PROPOSE, déjà traduites et
+  // déjà filtrées par le groupe du joueur. Vide : la liste ne s'ouvre jamais.
+  std::span<const ChatCommandHint> commands;
   // CETTE LIGNE-CI PART AUSSI SUR DISCORD : la marque se peint.
   //
   // 🔴 C'EST LA DESTINATION RÉSOLUE QUI DÉCIDE, PAS LE MODE ARMÉ : un sigil
@@ -209,6 +213,8 @@ struct ChatInputState {
   // comme n'importe quelle frappe.
   std::vector<ImWchar> typed;
   ChatInputHistory history;
+  // La liste des commandes au-dessus du champ : voir `chat_command_hints.h`.
+  ChatCommandListState commands;
   // ── Mesures d'image ───────────────────────────────────────────────────────
   // Combien de rangées le texte DEMANDE, et combien la fenêtre peut en céder.
   // L'écart est ce que la fenêtre devra gagner, ou rendre.
