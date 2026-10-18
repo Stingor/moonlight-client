@@ -1,0 +1,185 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les cartes intérieures
+#
+#  Tiré de data\indoorrswtable.txt de l'installation (lu dans moonlight.grf) : une
+#  table de Gravity, que ce dépôt ne revendique pas comme sienne.
+#
+#  Fichier produit par scripts/yaml_tables/install_text_tables.py.
+#  Ne pas éditer à la main :
+#      python scripts/yaml_tables/install_text_tables.py --client <dossier client> \
+#          --table indoor_maps
+#
+#  maps : les cartes que la caméra traite en intérieur — recul et altitude
+#         resserrés, lacet tenu près de 45° —, par leur clé de table : en
+#         minuscules, sans extension, le numéro d'une carte d'instance déjà
+#         retiré (« 0011@infi » se cherche comme « 1@infi »).
+#
+#  Lu par moonclient (ro/vfs/indoor_maps.h).
+#  Absent, toute carte garde les bornes du plein air.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+maps:
+- 1@4mag
+- 1@ecl
+- 1@gef_in
+- 1@sthc
+- 1@thts
+- 1@vrcas
+- 1@vrgen
+- 2@vrclo
+- air_evt
+- airplane
+- airplane_01
+- airport
+- alberta_in
+- alde_alche
+- aldeba_in
+- ama_in01
+- ama_in02
+- arena_room
+- auction_01
+- auction_02
+- ayo_in01
+- ayo_in02
+- ba_in01
+- bat_room
+- bra_in01
+- ch1_gef_in
+- ch1_sf01
+- ch1_sf02
+- ch1_sf03
+- ch1_vrgef1
+- cmd_in01
+- cmd_in02
+- conch_in
+- d_mond01
+- dew_in01
+- dic_in01
+- ecl_in01
+- ecl_in02
+- ecl_in03
+- ecl_in04
+- ecl_tdun04
+- ein_in01
+- gef_tower
+- geffen_in
+- gon_in
+- har_in01
+- hu_in01
+- icas_in
+- icas_in2
+- in_orcs01
+- itemmall
+- iz_in_a
+- iz_in_b
+- iz_in_c
+- iz_in_d
+- iz_ng01
+- izlude_in
+- jalbe_in
+- jawaii_in
+- job3_guil01
+- job3_guil02
+- job4_bio
+- job4_mag
+- kh_mansion
+- kh_rossi
+- kh_school
+- kh_vila
+- landguild01
+- lasa_in01
+- lhz_airport
+- lhz_cu_evt
+- lhz_cube
+- lhz_in01
+- lhz_in02
+- lhz_in03
+- lhz_que01
+- lou_in01
+- lou_in02
+- ma_in01
+- ma_zif01
+- ma_zif02
+- ma_zif03
+- ma_zif04
+- ma_zif05
+- ma_zif06
+- ma_zif07
+- ma_zif08
+- ma_zif09
+- mal_in01
+- mal_in02
+- man_in01
+- mbase_in
+- memohall
+- mid_campin
+- moc_castle
+- moc_para01
+- moc_para0a
+- moc_para0b
+- moc_para0c
+- monk_in
+- morocc_in
+- mosk_in
+- nakhyang
+- nameless_in
+- new_1-2_evt
+- nif_in
+- paramk
+- payon_in01
+- payon_in02
+- payon_in03
+- prt_are_in
+- prt_cas
+- prt_cas_evt
+- prt_cas_q
+- prt_castle
+- prt_ch_evt
+- prt_church
+- prt_elib
+- prt_evt_in
+- prt_in
+- prt_in_evt
+- prt_pri00
+- pub_cat
+- que_avan01
+- que_ba
+- que_bingo
+- que_dan02
+- que_god01
+- que_god02
+- que_house_s
+- que_job01
+- que_ng
+- que_rachel
+- que_sign01
+- que_thor
+- ra_in01
+- ra_temin
+- rebel_in
+- s_atelier
+- sec_in01
+- spl_in01
+- spl_in02
+- sword_1-1
+- sword_2-1
+- sword_3-1
+- thana_step
+- um_in
+- un_bk_q
+- un_bunker
+- un_myst
+- ve_in
+- ve_in02
+- vr_cas
+- vr_clo2
+- vr_gen
+- x_prt_in
+- xmas_in
+- y_airport
+- ygg_fruit
+- yuno_in01
+- yuno_in03
+- yuno_in04
+- yuno_in05
+- yuno_pre

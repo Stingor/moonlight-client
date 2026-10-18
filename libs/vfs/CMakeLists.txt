@@ -29,9 +29,11 @@ add_library(ro_vfs STATIC
     src/item_properties.cpp
     src/item_stacking.cpp
     src/item_table.cpp
+    src/indoor_maps.cpp
     src/item_words.cpp
     src/job_names.cpp
     src/map_display_names.cpp
+    src/map_music_table.cpp
     src/message_word.cpp
     src/navi_library.cpp
     src/package_items.cpp
@@ -39,6 +41,7 @@ add_library(ro_vfs STATIC
     src/pet_talk_table.cpp
     src/monster_talk_table.cpp
     src/random_option_names.cpp
+    src/banned_word_list.cpp
     src/books.cpp
     src/monster_list.cpp
     src/server_db.cpp
@@ -52,8 +55,8 @@ add_library(ro_vfs STATIC
     src/skill_tree_rules.cpp
     src/skill_words.cpp
     src/status_table.cpp
+    src/talk_lines.cpp
     src/talkbox_words.cpp
-    src/text_table.cpp
     src/town_info.cpp
     src/world_view.cpp
     src/warp_agents.cpp

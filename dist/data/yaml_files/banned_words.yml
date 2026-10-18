@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les mots que le client masque
+#
+#  Tiré de data\manner.txt de l'installation (lu dans moonlight.grf) : une
+#  table de Gravity, que ce dépôt ne revendique pas comme sienne.
+#
+#  Fichier produit par scripts/yaml_tables/install_text_tables.py.
+#  Ne pas éditer à la main :
+#      python scripts/yaml_tables/install_text_tables.py --client <dossier client> \
+#          --table banned_words
+#
+#  words : les mots, dans l'ordre où le client les essaie. Là où l'un paraît
+#          dans un texte, sans égard à la casse ASCII et même au milieu d'un
+#          autre mot, il est remplacé par une étoile par caractère ; à une même
+#          place, le premier de la liste l'emporte. Un nom ou un titre qui en
+#          porte un se refuse. Une liste vide ne masque rien.
+#
+#  Lu par moonclient (ro/vfs/banned_word_list.h).
+#  Absent, rien ne se masque.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+words: []

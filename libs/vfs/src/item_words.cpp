@@ -5,6 +5,8 @@
 #include <cstdio>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/core/text.h"
@@ -13,7 +15,6 @@
 #include "ro/vfs/cash_shop_words.h"
 #include "ro/vfs/chat_room_words.h"
 #include "ro/vfs/craft_words.h"
-#include "ro/vfs/encoding.h"
 #include "ro/vfs/monster_words.h"
 #include "ro/vfs/talkbox_words.h"
 #include "ro/vfs/trade_words.h"
@@ -21,8 +22,8 @@
 #include "ro/vfs/warp_memo_words.h"
 #include "ro/vfs/whisper_words.h"
 
+#include "install_table.h"
 #include "message_word.h"
-#include "text_table.h"
 
 namespace ro::vfs {
 namespace {
@@ -45,37 +46,6 @@ constexpr std::size_t kObtainedTextCapacity = 256;
 constexpr std::size_t kForgeStarsOne = 5;
 constexpr std::size_t kForgeStarsTwo = 10;
 constexpr std::size_t kForgeStarsThree = 15;
-
-void ReadCardWords(ItemWords& words, std::string_view table) {
-  for (const std::string_view line : SplitLines(table)) {
-    std::uint32_t card_id = 0;
-    std::string_view word;
-    if (!SplitTableRow(line, card_id, word)) {
-      continue;
-    }
-    words.cards[card_id] = CardWord{.text = Cp949ToUtf8Lossy(word), .after_name = false};
-  }
-}
-
-// 🔴 CE FICHIER NE PORTE AUCUN MOT — il nomme ceux qui CHANGENT DE CÔTÉ. Le
-// chargeur du client fait exactement ce déplacement, et rien d'autre. Une carte
-// qu'il nomme sans qu'elle figure dans la table des mots n'a simplement rien à
-// déplacer.
-void ReadCardWordSides(ItemWords& words, std::string_view table) {
-  for (const std::string_view line : SplitLines(table)) {
-    // ⚠ CELLE-CI N'A PAS DE SECOND CHAMP — son dièse ferme une valeur toujours
-    // vide —, mais elle a la même tête : l'identifiant, puis un dièse.
-    std::uint32_t card_id = 0;
-    std::string_view unused;
-    if (!SplitTableRow(line, card_id, unused)) {
-      continue;
-    }
-    const auto found = words.cards.find(card_id);
-    if (found != words.cards.end()) {
-      found->second.after_name = true;
-    }
-  }
-}
 
 // Imprime un gabarit PRINTF dont `FormatTakesOneInt` a déjà dit qu'il ne porte
 // qu'une conversion entière. Rend une chaîne vide si la libc refuse d'écrire —
@@ -335,25 +305,65 @@ void FillMessageWords(ItemWords& words) {
   FillAchievementWords(words.achievement);
 }
 
+core::Result<std::unordered_map<std::uint32_t, CardWord>> ParseCardWords(
+    std::string_view yaml_text) {
+  std::unordered_map<std::uint32_t, CardWord> cards;
+  auto read = VisitTableSection(
+      yaml_text, kCardWordPath, "cards", YAML::NodeType::Map, [&cards](const YAML::Node& entries) {
+        for (const auto& pair : entries) {
+          cards[ItemIdOf(pair.first)] =
+              CardWord{.text = pair.second.as<std::string>(), .after_name = false};
+        }
+      });
+  if (!read) {
+    return std::unexpected(read.error());
+  }
+  return cards;
+}
+
+// 🔴 CETTE TABLE NE PORTE AUCUN MOT — elle nomme ceux qui CHANGENT DE CÔTÉ. Le
+// chargeur du client fait exactement ce déplacement, et rien d'autre.
+core::Result<void> ParseCardWordSides(std::string_view yaml_text,
+                                      std::unordered_map<std::uint32_t, CardWord>& cards) {
+  return VisitTableSection(yaml_text, kCardWordAfterPath, "cards", YAML::NodeType::Sequence,
+                           [&cards](const YAML::Node& entries) {
+                             for (const YAML::Node& card : entries) {
+                               if (const auto found = cards.find(ItemIdOf(card));
+                                   found != cards.end()) {
+                                 found->second.after_name = true;
+                               }
+                             }
+                           });
+}
+
 core::Result<ItemWords> ReadItemWords(Vfs& vfs) {
   ItemWords words;
 
   FillMessageWords(words);
 
-  auto card_words = ReadOptionalFile(vfs, kCardWordPath);
+  auto card_words = ReadOptionalTable(vfs, kCardWordPath);
   if (!card_words) {
     return std::unexpected(card_words.error());
   }
-  ReadCardWords(words, core::AsText(*card_words));
+  if (card_words->has_value()) {
+    auto cards = ParseCardWords(**card_words);
+    if (!cards) {
+      return std::unexpected(cards.error());
+    }
+    words.cards = std::move(*cards);
+  }
 
   // ⚠ L'ORDRE COMPTE : les côtés se posent sur des mots déjà lus. Inverser les
   // deux lectures perdrait tous les déplacements sans rien signaler.
-  auto sides = ReadOptionalFile(vfs, kCardWordAfterPath);
+  auto sides = ReadOptionalTable(vfs, kCardWordAfterPath);
   if (!sides) {
     return std::unexpected(sides.error());
   }
-  ReadCardWordSides(words, core::AsText(*sides));
-
+  if (sides->has_value()) {
+    if (auto moved = ParseCardWordSides(**sides, words.cards); !moved) {
+      return std::unexpected(moved.error());
+    }
+  }
   return words;
 }
 

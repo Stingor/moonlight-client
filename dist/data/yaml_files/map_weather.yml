@@ -1,0 +1,25 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  La météo des cartes
+#
+#  Tiré de data\etcinfo.txt de l'installation (lu dans moonlight.grf) : une
+#  table de Gravity, que ce dépôt ne revendique pas comme sienne.
+#
+#  Fichier produit par scripts/yaml_tables/install_text_tables.py.
+#  Ne pas éditer à la main :
+#      python scripts/yaml_tables/install_text_tables.py --client <dossier client> \
+#          --table map_weather
+#
+#  weather : les lignes « weather » du fichier, dans son ordre, chacune
+#    map     : la carte, en minuscules, sans extension ;
+#    weather : le temps, en minuscules — snow, sakura ou pokjuk (feux
+#              d'artifice) ; un autre nom ne pose rien.
+#  Une carte peut paraître plusieurs fois : chaque ligne pose son effet. Les
+#  deux cartes de Lutie ont la neige sans que la table le dise.
+#
+#  Lu par moonclient (ro/render/map_weather.h).
+#  Absent, seule Lutie a sa neige.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+weather:
+- {map: comodo, weather: pokjuk}
+- {map: prontera, weather: sakura}

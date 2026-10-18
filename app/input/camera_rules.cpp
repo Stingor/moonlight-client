@@ -222,16 +222,15 @@ std::string CameraTableKey(std::string_view map_name) {
   return key;
 }
 
-MapCameraTables MapCameraTables::Parse(std::string_view indoor_text,
+MapCameraTables MapCameraTables::Parse(std::span<const std::string> indoor_maps,
                                        std::string_view viewpoint_text) {
   MapCameraTables tables;
-  ForEachLine(indoor_text, [&tables](std::string_view line) {
-    for (const std::string_view field : FieldsOf(line)) {
-      if (!field.empty()) {
-        tables.indoor_.insert(CameraTableKey(field));
-      }
-    }
-  });
+  // ⚠ LA CLÉ SE RANGE TELLE QUE LA TABLE LA DONNE, l'extension remise : elle
+  // est déjà abaissée et privée de son numéro d'instance. Lui repasser
+  // `CameraTableKey` retirerait un second numéro à une clé qui porte deux `@`.
+  for (const std::string& map : indoor_maps) {
+    tables.indoor_.insert(map + std::string(kMapExtension));
+  }
   ForEachLine(viewpoint_text, [&tables](std::string_view line) {
     const std::vector<std::string_view> fields = FieldsOf(line);
     if (fields.empty() || fields.front().empty()) {

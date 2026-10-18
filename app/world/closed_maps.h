@@ -13,9 +13,9 @@ namespace moonclient {
 // pas. Le cycle jour/nuit du joueur ne s'y applique pas, et la lumière de la
 // carte reste telle que son RSW la déclare.
 //
-// Elles s'ajoutent aux intérieurs que l'installation déclare dans
-// `data\indoorrswtable.txt` : ceux-là changent aussi de caméra, une caverne
-// garde celle du plein air.
+// Elles s'ajoutent aux intérieurs que l'installation déclare, et que
+// `data\yaml_files\indoor_maps.yml` reprend : ceux-là changent aussi de
+// caméra, une caverne garde celle du plein air.
 //
 // La table est `data\yaml_files\closed_maps.yml`, tenue à la main.
 inline constexpr std::string_view kClosedMapsPath = "data\\yaml_files\\closed_maps.yml";

@@ -1,13 +1,14 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
-#include <span>
 #include <string>
 #include <string_view>
-#include <vector>
+#include <unordered_map>
 
+#include "ro/core/error.h"
 #include "ro/render/scene_fog.h"
 #include "ro/vfs/vfs.h"
 
@@ -15,9 +16,21 @@ namespace ro::render {
 
 // LE BROUILLARD QU'UNE CARTE DÉCLARE.
 //
-// Ni le RSW ni le GND n'en parlent : le client le lit dans un fichier texte à
-// part, une entrée par carte. Une carte qui n'y figure pas n'en a pas.
-inline constexpr std::string_view kFogTablePath = "data\\fogparametertable.txt";
+// Ni le RSW ni le GND n'en parlent : il vient d'une table à part, une entrée
+// par carte, que `scripts/yaml_tables/install_text_tables.py` tire de
+// `data\fogparametertable.txt` de l'installation :
+//
+//     version: 1
+//     maps:
+//       1@exds:
+//         near: 0.23
+//         far: 0.9
+//         color: [68, 153, 204, 255]
+//         density: 0.3
+//
+// La couleur s'écrit alpha, rouge, vert, bleu. Une carte qui n'y figure pas
+// n'a pas de brouillard.
+inline constexpr std::string_view kFogTablePath = "data\\yaml_files\\map_fog.yml";
 
 struct MapFog {
   // Où il commence et où il couvre tout, en FRACTIONS de la profondeur que la
@@ -32,27 +45,6 @@ struct MapFog {
   float density = 0.0F;
 };
 
-// UNE ENTRÉE DE LA TABLE : la clé, puis ses quatre valeurs dans l'ordre du
-// fichier — début, fin, couleur, densité.
-struct FogTableRow {
-  std::string map_key;
-  std::array<std::string, 4> values;
-};
-
-// DÉCOUPE LA TABLE COMME LE CLIENT.
-//
-// Chaque `#` ferme un mot, et un saut de ligne jette ce qui le précède sans
-// `#` : c'est ce qui fait tomber les commentaires. Le premier mot est la clé,
-// et la quatrième valeur ferme l'entrée. Un mot vide à la place d'une clé ne
-// compte pas : le mot suivant la prend.
-[[nodiscard]] std::vector<FogTableRow> ParseFogTable(std::string_view text);
-
-// LA COULEUR D'UNE ENTRÉE, lue comme le client : les deux premiers caractères
-// sont sautés — le « 0x » —, et chaque caractère suivant pèse quatre bits de
-// plus que celui qui le suit. Un caractère qui n'est pas hexadécimal compte
-// pour zéro, mais garde sa place.
-[[nodiscard]] std::uint32_t FogColorOf(std::string_view text);
-
 // LA CLÉ D'UNE CARTE : son nom de fichier RSW, extension comprise.
 //
 // ⚠ UNE CARTE D'INSTANCE PERD SON NUMÉRO : les trois caractères qui précèdent
@@ -60,13 +52,34 @@ struct FogTableRow {
 // — « 0011@exds » se cherche comme « 1@exds ».
 [[nodiscard]] std::string FogTableKeyOf(std::string_view map_name);
 
-// Le brouillard de `map_name`, ou rien quand la table ne le cite pas. La clé se
-// compare À LA LETTRE, casse comprise.
-[[nodiscard]] std::optional<MapFog> FogOfMap(std::span<const FogTableRow> rows,
-                                             std::string_view map_name);
+// La table entière.
+class MapFogTable {
+ public:
+  // Le texte de `map_fog.yml`. Refuse un texte qui n'est pas du YAML, dont
+  // `version` n'est pas 1, sans table `maps`, ou dont une carte n'a pas ses
+  // quatre champs bien formés : une couleur sans ses quatre octets, un nom qui
+  // ne s'écrit pas en CP949.
+  [[nodiscard]] static core::Result<MapFogTable> Parse(std::string_view yaml_text);
+
+  // Le brouillard de `map_name`, ou rien quand la table ne le cite pas. La clé se
+  // compare À LA LETTRE, casse comprise.
+  [[nodiscard]] std::optional<MapFog> FogOf(std::string_view map_name) const;
+
+  [[nodiscard]] std::size_t size() const noexcept { return by_key_.size(); }
+
+  // Toutes les entrées, par clé de carte — extension comprise, en CP949.
+  [[nodiscard]] const std::unordered_map<std::string, MapFog>& entries() const noexcept {
+    return by_key_;
+  }
+
+ private:
+  // Par clé de carte, extension comprise, en CP949.
+  std::unordered_map<std::string, MapFog> by_key_;
+};
 
 // Lit la table dans l'installation, puis y cherche la carte. Une table absente
-// ou vide laisse toutes les cartes sans brouillard.
+// laisse toutes les cartes sans brouillard ; illisible aussi, et le journal le
+// dit.
 [[nodiscard]] std::optional<MapFog> LoadMapFog(vfs::Vfs& vfs, std::string_view map_name);
 
 // LE BROUILLARD QUE LES RENDERERS PEIGNENT.

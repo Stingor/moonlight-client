@@ -4,6 +4,7 @@
 #include <map>
 #include <optional>
 #include <set>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -50,17 +51,25 @@ struct MapCameraRules {
   std::optional<ViewpointRow> viewpoint;
 };
 
-// `data\indoorrswtable.txt` et `data\viewpointtable.txt`. Un fichier absent
-// laisse toutes les cartes aux bornes ordinaires.
+// Les intérieurs de `vfs::ReadIndoorMaps`, et le texte de
+// `data\viewpointtable.txt`. Une table absente laisse toutes les cartes aux
+// bornes ordinaires.
 class MapCameraTables {
  public:
-  [[nodiscard]] static MapCameraTables Parse(std::string_view indoor_text,
+  // `indoor_maps` : les clés de table des intérieurs, sans leur extension,
+  // telles que la table les donne.
+  [[nodiscard]] static MapCameraTables Parse(std::span<const std::string> indoor_maps,
                                              std::string_view viewpoint_text);
 
   [[nodiscard]] MapCameraRules RulesFor(std::string_view map_name) const;
 
   [[nodiscard]] std::size_t indoor_count() const noexcept { return indoor_.size(); }
   [[nodiscard]] std::size_t viewpoint_count() const noexcept { return viewpoints_.size(); }
+
+  // Les intérieurs, par leur clé de table : minuscules, extension comprise.
+  [[nodiscard]] const std::set<std::string, std::less<>>& indoor_maps() const noexcept {
+    return indoor_;
+  }
 
  private:
   std::set<std::string, std::less<>> indoor_;

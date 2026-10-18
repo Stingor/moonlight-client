@@ -6,6 +6,7 @@
 
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
+#include "ro/vfs/map_music_table.h"
 
 #include "world/music_catalogue.h"
 
@@ -59,12 +60,13 @@ ro::audio::AudioEngine OpenAudio() {
 
 MapMusic::MapMusic(ro::vfs::Vfs& vfs, std::filesystem::path client_root)
     : client_root_(std::move(client_root)) {
-  auto bytes = vfs.Read(std::string(ro::formats::kBgmTablePath));
-  if (!bytes) {
-    ro::core::LogWarning("musique : table absente — {}", ro::formats::kBgmTablePath);
+  auto table = ro::vfs::ReadMapMusic(vfs);
+  if (!table) {
+    ro::core::LogWarning("musique : {} — toute carte se jouera en silence",
+                         ro::core::Describe(table.error()));
     return;
   }
-  table_ = ro::formats::BgmTable::Parse(*bytes);
+  table_ = std::move(*table);
   ro::core::LogInfo("musique : {} carte(s) nommée(s)", table_.size());
 }
 
@@ -90,7 +92,7 @@ void MapMusic::Follow(ro::audio::AudioEngine& audio, const std::string& map_name
     // pas une panne —, mais ce silence-là est trait pour trait celui d'une
     // musique cassée. Sans cette ligne, « les cartes ne lisent pas leur
     // musique » ne se distingue pas de « celle-ci n'en a pas », et trancher
-    // demande d'aller relire `mp3nametable.txt` à la main.
+    // demande d'aller relire `map_music.yml` à la main.
     //
     // ⚠ C'EST LE CAS DES CARTES AJOUTÉES PAR LE SERVEUR : une carte plate
     // d'administration, une arène, un lieu d'événement ne figurent pas dans

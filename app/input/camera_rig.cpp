@@ -8,27 +8,23 @@
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/vfs/indoor_maps.h"
 
 namespace moonclient {
 namespace {
 
-constexpr std::string_view kIndoorTablePath = "data\\indoorrswtable.txt";
-
 constexpr std::uint32_t kWheelQuietMs = 15;
-
-[[nodiscard]] std::string TextOf(ro::vfs::Vfs& vfs, std::string_view path) {
-  auto bytes = vfs.Read(path);
-  if (!bytes) {
-    return {};
-  }
-  return std::string(reinterpret_cast<const char*>(bytes->data()), bytes->size());
-}
 
 }  // namespace
 
 void CameraRig::LoadTables(ro::vfs::Vfs& vfs) {
+  auto indoor = ro::vfs::ReadIndoorMaps(vfs);
+  if (!indoor) {
+    ro::core::LogWarning("caméra : {} — toute carte garde les bornes du plein air",
+                         ro::core::Describe(indoor.error()));
+  }
   // `viewpointtable.txt` n'est pas lue : le jeu livré ne l'applique pas.
-  tables_ = MapCameraTables::Parse(TextOf(vfs, kIndoorTablePath), {});
+  tables_ = MapCameraTables::Parse(indoor ? *indoor : std::vector<std::string>{}, {});
   ro::core::LogInfo("caméra : {} carte(s) intérieure(s)", tables_.indoor_count());
 }
 

@@ -43,7 +43,7 @@ inline constexpr std::string_view kCollectionFolder = "collection\\";
 //
 // 🔴 SA CLÉ N'EST PAS LE NOM DE RESSOURCE DE L'OBJET, contrairement aux deux
 // dossiers ci-dessus. Toutes les cartes partagent la même ressource — le dos de
-// carte générique de la case de sac —, et c'est `num2cardillustnametable.txt`
+// carte générique de la case de sac —, et c'est `card_illustrations.yml`
 // qui nomme le dessin de chacune. Voir `vfs::CardIllustrations`.
 //
 // ⚠ MILLE QUATRE CENT VINGT ET UN FICHIERS pour mille cinq cent quatre entrées

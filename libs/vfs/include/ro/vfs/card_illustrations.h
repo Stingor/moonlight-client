@@ -36,9 +36,19 @@ struct CardIllustrations {
   [[nodiscard]] bool empty() const noexcept { return by_id.empty(); }
 };
 
-// ⚠ `num2…` ET NON `card…` : le fichier se nomme par sa clé numérique, et
-// `cardillustnametable` — qui semble le nom évident — n'existe pas.
-inline constexpr std::string_view kCardIllustrationTablePath = "data\\num2cardillustnametable.txt";
+// La table, que `scripts/yaml_tables/install_text_tables.py` tire de
+// `data\num2cardillustnametable.txt` de l'installation :
+//
+//     version: 1
+//     cards:
+//       4001: 포링카드
+inline constexpr std::string_view kCardIllustrationTablePath =
+    "data\\yaml_files\\card_illustrations.yml";
+
+// Le texte de `card_illustrations.yml`. Refuse un texte qui n'est pas du YAML,
+// dont `version` n'est pas 1, sans table `cards`, ou dont un nom ne s'écrit pas
+// en CP949.
+[[nodiscard]] core::Result<CardIllustrations> ParseCardIllustrations(std::string_view yaml_text);
 
 // Lit la table. ABSENTE, elle rend une table vide plutôt qu'une erreur : les
 // cartes montreront alors leur image de collection, comme les autres objets.

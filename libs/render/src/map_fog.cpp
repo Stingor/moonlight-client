@@ -1,31 +1,30 @@
 #include "ro/render/map_fog.h"
 
-#include <algorithm>
-#include <charconv>
 #include <cmath>
 #include <cstddef>
+#include <expected>
 #include <string>
-#include <system_error>
 #include <utility>
+
+#include <yaml-cpp/yaml.h>
+
+#include "ro/core/log.h"
+#include "ro/vfs/encoding.h"
 
 namespace ro::render {
 namespace {
 
-// Une entrée : la clé, puis ses quatre valeurs.
-constexpr std::size_t kValuesPerRow = 4;
-constexpr char kWordEnd = '#';
+constexpr int kSupportedVersion = 1;
 
 // La plage de vue du client, en unités du monde : ses plans proche et lointain.
 constexpr float kViewNearDepth = 10.0F;
 constexpr float kViewFarDepth = 1500.0F;
 
-// Le « 0x » qui ouvre une couleur, et que la lecture saute sans le regarder.
-constexpr std::size_t kHexPrefixLength = 2;
-constexpr unsigned kBitsPerHexDigit = 4;
-constexpr unsigned kHexLetterOffset = 10;
-// ⚠ AU-DELÀ DE HUIT CHIFFRES, LE DÉCALAGE REPART DE ZÉRO : le processeur du
-// client ne garde que cinq bits du nombre de rangs à décaler.
-constexpr unsigned kShiftModulo = 32;
+// Les quatre octets d'une couleur, dans l'ordre de la table : alpha, rouge,
+// vert, bleu.
+constexpr std::size_t kColorBytes = 4;
+constexpr unsigned kBitsPerByte = 8;
+constexpr int kByteMost = 255;
 
 // Le numéro d'une carte d'instance : trois caractères, qui finissent un rang
 // avant le `@`.
@@ -44,81 +43,39 @@ std::uint8_t ByteAt(std::uint32_t color, unsigned shift) {
   return static_cast<std::uint8_t>((color >> shift) & kByteMask);
 }
 
-// LE NOMBRE QUI OUVRE UN MOT, comme `atof` le lit : les blancs de tête sautent,
-// un signe plus aussi, et ce qui ne se lit pas vaut zéro.
-float LeadingFloat(std::string_view text) {
-  std::size_t first = 0;
-  while (first < text.size() && (text[first] == ' ' || text[first] == '\t')) {
-    ++first;
-  }
-  if (first < text.size() && text[first] == '+') {
-    ++first;
-  }
-  double value = 0.0;
-  const std::from_chars_result parsed =
-      std::from_chars(text.data() + first, text.data() + text.size(), value);
-  return parsed.ec == std::errc() ? static_cast<float>(value) : 0.0F;
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData,
+                     std::string(kFogTablePath) + " : " + std::move(detail)};
 }
 
-std::optional<unsigned> HexDigit(char character) {
-  if (character >= '0' && character <= '9') {
-    return static_cast<unsigned>(character - '0');
+// UNE FRACTION, lue en double puis ramenée à un float : le client lisait le
+// nombre ainsi, et la table l'écrit tel que le double le donne.
+[[nodiscard]] float FractionOf(const YAML::Node& map, const char* field) {
+  const YAML::Node value = map[field];
+  if (!value) {
+    throw YAML::KeyNotFound(map.Mark(), std::string(field));
   }
-  if (character >= 'A' && character <= 'F') {
-    return static_cast<unsigned>(character - 'A') + kHexLetterOffset;
+  return static_cast<float>(value.as<double>());
+}
+
+// La couleur : quatre octets, alpha d'abord.
+[[nodiscard]] std::uint32_t ColorOf(const YAML::Node& map) {
+  const YAML::Node color = map["color"];
+  if (!color || !color.IsSequence() || color.size() != kColorBytes) {
+    throw YAML::RepresentationException(map.Mark(), "une couleur sans ses quatre octets");
   }
-  if (character >= 'a' && character <= 'f') {
-    return static_cast<unsigned>(character - 'a') + kHexLetterOffset;
+  std::uint32_t argb = 0;
+  for (const YAML::Node& part : color) {
+    const int byte = part.as<int>();
+    if (byte < 0 || byte > kByteMost) {
+      throw YAML::RepresentationException(part.Mark(), "un octet hors de 0 à 255");
+    }
+    argb = (argb << kBitsPerByte) | static_cast<std::uint32_t>(byte);
   }
-  return std::nullopt;
+  return argb;
 }
 
 }  // namespace
-
-std::vector<FogTableRow> ParseFogTable(std::string_view text) {
-  std::vector<FogTableRow> rows;
-  std::string key;
-  std::vector<std::string> values;
-  std::size_t word_start = 0;
-  for (std::size_t index = 0; index < text.size(); ++index) {
-    const char character = text[index];
-    if (character == '\n' || character == '\r') {
-      word_start = index + 1;
-      continue;
-    }
-    if (character != kWordEnd) {
-      continue;
-    }
-    std::string word(text.substr(word_start, index - word_start));
-    word_start = index + 1;
-    if (key.empty()) {
-      key = std::move(word);
-      continue;
-    }
-    values.push_back(std::move(word));
-    if (values.size() == kValuesPerRow) {
-      FogTableRow row;
-      row.map_key = std::move(key);
-      std::ranges::move(values, row.values.begin());
-      rows.push_back(std::move(row));
-      key.clear();
-      values.clear();
-    }
-  }
-  return rows;
-}
-
-std::uint32_t FogColorOf(std::string_view text) {
-  std::uint32_t color = 0;
-  unsigned shift = 0;
-  for (std::size_t index = text.size(); index > kHexPrefixLength; --index) {
-    if (const std::optional<unsigned> digit = HexDigit(text[index - 1]); digit.has_value()) {
-      color += *digit << (shift % kShiftModulo);
-    }
-    shift += kBitsPerHexDigit;
-  }
-  return color;
-}
 
 std::string FogTableKeyOf(std::string_view map_name) {
   std::string key(map_name);
@@ -130,18 +87,49 @@ std::string FogTableKeyOf(std::string_view map_name) {
   return key;
 }
 
-std::optional<MapFog> FogOfMap(std::span<const FogTableRow> rows, std::string_view map_name) {
-  const std::string key = FogTableKeyOf(map_name);
-  const auto found = std::ranges::find(rows, key, &FogTableRow::map_key);
-  if (found == rows.end()) {
+core::Result<MapFogTable> MapFogTable::Parse(std::string_view yaml_text) {
+  MapFogTable table;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    }
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
+    }
+    const YAML::Node maps = whole["maps"];
+    if (!maps || !maps.IsMap()) {
+      return std::unexpected(Refused("« maps » n'est pas une table"));
+    }
+    for (const auto& pair : maps) {
+      auto key = vfs::Utf8ToCp949(pair.first.as<std::string>());
+      if (!key) {
+        return std::unexpected(Refused("un nom de carte qui ne s'écrit pas en CP949"));
+      }
+      if (!pair.second.IsMap()) {
+        return std::unexpected(Refused(*key + " n'est pas une table"));
+      }
+      MapFog fog;
+      fog.near_fraction = FractionOf(pair.second, "near");
+      fog.far_fraction = FractionOf(pair.second, "far");
+      fog.color_argb = ColorOf(pair.second);
+      fog.density = FractionOf(pair.second, "density");
+      table.by_key_.emplace(*key + std::string(kRswExtension), fog);
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
+  }
+  return table;
+}
+
+std::optional<MapFog> MapFogTable::FogOf(std::string_view map_name) const {
+  const auto found = by_key_.find(FogTableKeyOf(map_name));
+  if (found == by_key_.end()) {
     return std::nullopt;
   }
-  MapFog fog;
-  fog.near_fraction = LeadingFloat(found->values[0]);
-  fog.far_fraction = LeadingFloat(found->values[1]);
-  fog.color_argb = FogColorOf(found->values[2]);
-  fog.density = LeadingFloat(found->values[3]);
-  return fog;
+  return found->second;
 }
 
 std::optional<MapFog> LoadMapFog(vfs::Vfs& vfs, std::string_view map_name) {
@@ -149,8 +137,13 @@ std::optional<MapFog> LoadMapFog(vfs::Vfs& vfs, std::string_view map_name) {
   if (!bytes) {
     return std::nullopt;
   }
-  const std::string_view text(reinterpret_cast<const char*>(bytes->data()), bytes->size());
-  return FogOfMap(ParseFogTable(text), map_name);
+  auto table = MapFogTable::Parse(
+      std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
+  if (!table) {
+    core::LogWarning("{} — {} s'ouvre sans brouillard", core::Describe(table.error()), map_name);
+    return std::nullopt;
+  }
+  return table->FogOf(map_name);
 }
 
 SceneFog SceneFogOf(const MapFog& fog) {

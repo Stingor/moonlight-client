@@ -1,56 +1,63 @@
 #include "ro/render/map_weather.h"
 
+#include <expected>
 #include <string>
+#include <utility>
 
-#include "ro/core/ascii.h"
+#include <yaml-cpp/yaml.h>
+
+#include "ro/core/log.h"
+#include "ro/vfs/encoding.h"
 
 namespace ro::render {
 
 namespace {
 
-constexpr char kTokenEnd = '#';
-constexpr char kCarriageReturn = '\r';
-constexpr char kLineFeed = '\n';
-constexpr std::string_view kCommentMark = "//";
+constexpr int kSupportedVersion = 1;
 constexpr std::string_view kMapFileSuffix = ".rsw";
 
-// Le mot-clé de la météo, et combien de jetons il prend après lui.
-constexpr std::string_view kWeatherKeyword = "weather";
-constexpr std::size_t kWeatherArguments = 2;
+core::Error Refused(std::string detail) {
+  return core::Error{core::ErrorCode::kCorruptData,
+                     std::string(kMapWeatherPath) + " : " + std::move(detail)};
+}
 
-// Découpe le texte en jetons, comme le lecteur du client : un jeton finit à son
-// `#`, une fin de ligne jette ce qui n'a pas été terminé, et un début de jeton
-// en `//` fait taire les `#` jusqu'à la fin de la ligne.
-[[nodiscard]] std::vector<std::string_view> Tokens(std::string_view text) {
-  std::vector<std::string_view> tokens;
-  std::size_t start = 0;
-  for (std::size_t rank = 0; rank < text.size(); ++rank) {
-    const char lu = text[rank];
-    if (lu == kCarriageReturn || lu == kLineFeed) {
-      start = rank + 1;
-    } else if (lu == kTokenEnd && !text.substr(start).starts_with(kCommentMark)) {
-      tokens.push_back(text.substr(start, rank - start));
-      start = rank + 1;
-    }
+// Un champ texte d'une ligne, en CP949, ou une exception.
+[[nodiscard]] std::string ArchivedField(const YAML::Node& line, const char* field) {
+  const YAML::Node value = line[field];
+  if (!value) {
+    throw YAML::KeyNotFound(line.Mark(), std::string(field));
   }
-  return tokens;
+  auto archived = vfs::Utf8ToCp949(value.as<std::string>());
+  if (!archived) {
+    throw YAML::RepresentationException(value.Mark(), "un texte qui ne s'écrit pas en CP949");
+  }
+  return std::move(*archived);
 }
 
 }  // namespace
 
-std::vector<WeatherLine> ParseEtcInfoWeather(std::string_view text) {
+core::Result<std::vector<WeatherLine>> ParseMapWeather(std::string_view yaml_text) {
   std::vector<WeatherLine> lines_read;
-  const std::vector<std::string_view> tokens = Tokens(text);
-  for (std::size_t rank = 0; rank < tokens.size(); ++rank) {
-    const std::string_view word = tokens[rank];
-    if (word == kWeatherKeyword) {
-      if (rank + kWeatherArguments >= tokens.size()) {
-        break;
-      }
-      lines_read.push_back(WeatherLine{core::AsciiLower(tokens[rank + 1]),
-                                       core::AsciiLower(tokens[rank + kWeatherArguments])});
-      rank += kWeatherArguments;
+  // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
+  try {
+    const YAML::Node whole = YAML::Load(std::string(yaml_text));
+    if (!whole.IsMap()) {
+      return std::unexpected(Refused("le texte n'est pas une table YAML"));
     }
+    const YAML::Node version = whole["version"];
+    if (!version || version.as<int>() != kSupportedVersion) {
+      return std::unexpected(Refused("version non gérée"));
+    }
+    const YAML::Node weather = whole["weather"];
+    if (!weather || !weather.IsSequence()) {
+      return std::unexpected(Refused("« weather » n'est pas une liste"));
+    }
+    for (const YAML::Node& line : weather) {
+      lines_read.push_back(WeatherLine{ArchivedField(line, "map") + std::string(kMapFileSuffix),
+                                       ArchivedField(line, "weather")});
+    }
+  } catch (const YAML::Exception& failure) {
+    return std::unexpected(Refused(failure.what()));
   }
   return lines_read;
 }
@@ -72,7 +79,7 @@ std::vector<std::uint32_t> MapWeatherEffects(std::span<const WeatherLine> lines,
       effects.insert(effects.end(), kFireworksRockets, kFireworksRocketEffect);
     }
   }
-  // LUTIE, APRÈS LE FICHIER : le client vérifie ses deux cartes une fois la
+  // LUTIE, APRÈS LA TABLE : le client vérifie ses deux cartes une fois la
   // table parcourue.
   if (map_name == kLutieMap || map_name == kLutieFieldMap) {
     effects.push_back(kSnowEffect);
@@ -82,9 +89,15 @@ std::vector<std::uint32_t> MapWeatherEffects(std::span<const WeatherLine> lines,
 
 std::vector<std::uint32_t> LoadMapWeather(vfs::Vfs& vfs, std::string_view map_name) {
   std::vector<WeatherLine> lines_read;
-  if (auto bytes = vfs.Read(std::string(kEtcInfoPath))) {
-    const std::string_view text_view(reinterpret_cast<const char*>(bytes->data()), bytes->size());
-    lines_read = ParseEtcInfoWeather(text_view);
+  if (auto bytes = vfs.Read(kMapWeatherPath)) {
+    auto parsed = ParseMapWeather(
+        std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
+    if (parsed) {
+      lines_read = std::move(*parsed);
+    } else {
+      core::LogWarning("{} — {} n'a que la météo du client", core::Describe(parsed.error()),
+                       map_name);
+    }
   }
   return MapWeatherEffects(lines_read, map_name);
 }

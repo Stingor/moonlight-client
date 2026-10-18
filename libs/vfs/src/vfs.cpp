@@ -150,8 +150,8 @@ Result<Vfs> Vfs::Mount(const MountOptions& options) {
                 options.root.string() + " : ni dossier data\\ ni archive lisible");
   }
   // APRÈS les archives, et il le faut : la table se lit par ce même système de
-  // fichiers, et une installation la porte dans `moonlight.grf` comme sur le
-  // disque.
+  // fichiers, qui la trouve sous `data\yaml_files\` du disque comme dans une
+  // archive.
   mounted.res_names_ = ResNameTable::Load(mounted);
   return mounted;
 }

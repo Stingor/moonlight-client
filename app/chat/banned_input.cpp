@@ -1,7 +1,11 @@
 #include "chat/banned_input.h"
 
+#include <utility>
+
 #include "ro/core/i18n.h"
+#include "ro/core/log.h"
 #include "ro/core/text.h"
+#include "ro/vfs/banned_word_list.h"
 
 namespace moonclient {
 namespace {
@@ -27,13 +31,13 @@ ro::sim::BannedWords LoadBannedWords(ro::vfs::Vfs* vfs) {
   if (vfs == nullptr) {
     return {};
   }
-  auto bytes = vfs->Read(ro::sim::kBannedWordsPath);
-  if (!bytes) {
-    // ⚠ SANS FICHIER, RIEN NE SE MASQUE : le client d'origine fait de même.
+  // ⚠ SANS TABLE, RIEN NE SE MASQUE : le client d'origine fait de même.
+  auto words = ro::vfs::ReadBannedWordList(*vfs);
+  if (!words) {
+    ro::core::LogWarning("{} — rien ne se masquera", ro::core::Describe(words.error()));
     return {};
   }
-  return ro::sim::BannedWords::FromMannerText(
-      std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
+  return ro::sim::BannedWords(std::move(*words));
 }
 
 std::optional<std::string> BannedInputRefusal(const ro::sim::BannedWords& banned,

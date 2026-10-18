@@ -6,11 +6,22 @@
 #include <string>
 #include <string_view>
 
+#include "ro/core/error.h"
+
 namespace ro::vfs {
 
 class Vfs;
 
-// LE CLONAGE DES CARTES : `data\resnametable.txt`.
+// LE CLONAGE DES CARTES : `data\yaml_files\res_names.yml`, que
+// `scripts/yaml_tables/install_text_tables.py` tire de `data\resnametable.txt`
+// de l'installation :
+//
+//     version: 1
+//     files:
+//       pvp_n_1-1.gat: prt_maze02.gat
+//
+inline constexpr std::string_view kResNamesPath = "data\\yaml_files\\res_names.yml";
+
 //
 // Une carte que le serveur annonce peut n'avoir AUCUN fichier à son nom.
 // `pvp_n_1-1` en est une : ni `.rsw`, ni `.gnd`, ni `.gat` ne portent ce
@@ -36,11 +47,13 @@ class ResNameTable {
   //
   // Absente ou illisible, la table est VIDE : un client dont l'installation ne
   // la porte pas lit ses cartes en direct, ce qui est le cas de toutes celles
-  // qui ne sont pas des clones.
+  // qui ne sont pas des clones. Illisible, le journal le dit.
   [[nodiscard]] static ResNameTable Load(Vfs& vfs);
 
-  // Bâtit la table depuis le contenu du fichier.
-  [[nodiscard]] static ResNameTable Parse(std::string_view contents);
+  // Le texte de `res_names.yml`. Refuse un texte qui n'est pas du YAML, dont
+  // `version` n'est pas 1, sans table `files`, ou dont un nom ne s'écrit pas
+  // en CP949. Les noms se rangent en CP949, comme l'installation les écrit.
+  [[nodiscard]] static core::Result<ResNameTable> Parse(std::string_view yaml_text);
 
   // Le nom de rechange, ou le nom demandé — abaissé de casse — s'il n'est pas
   // cloné. C'est ce que rend le client, qui traduit sur son tampon déjà abaissé.
@@ -55,6 +68,11 @@ class ResNameTable {
   [[nodiscard]] std::string MapFilePath(std::string_view file_name) const;
 
   [[nodiscard]] std::size_t size() const noexcept { return clones_.size(); }
+
+  // Toutes les traductions, de la clé nue à son remplaçant, en CP949.
+  [[nodiscard]] const std::map<std::string, std::string, std::less<>>& clones() const noexcept {
+    return clones_;
+  }
 
  private:
   // `std::less<>` pour chercher sur une vue sans bâtir de chaîne.

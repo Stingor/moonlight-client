@@ -10,13 +10,14 @@
 
 #include "ro/net/connection.h"
 #include "ro/sim/world_fwd.h"
+#include "ro/vfs/talk_lines.h"
 #include "ro/vfs/vfs.h"
 
 // CE QUE LA PLAISANTERIE ET LE CRI FONT DIRE AU PERSONNAGE.
 //
 // Deux effets d'acteur ne dessinent rien et ne changent rien à l'apparence : ils
 // font PARLER. `EF_TALK_FROSTJOKE` et `EF_TALK_SCREAM` — les compétences du
-// barde et de la danseuse — tirent une réplique au sort dans un fichier du jeu
+// barde et de la danseuse — tirent une réplique au sort dans une table du jeu
 // et l'envoient au serveur comme une parole ordinaire.
 //
 // ⚠ C'EST LE SEUL EFFET DU LOT QUI ÉMETTE VERS LE SERVEUR. Tous les autres
@@ -26,10 +27,10 @@ namespace moonclient {
 
 // COMBIEN DE RÉPLIQUES LE CLIENT TIRE, dans l'un et dans l'autre.
 //
-// ⚠ CES DEUX NOMBRES SONT DANS L'EXÉCUTABLE, pas dans les fichiers, et ils n'en
-// disent pas la taille : `DC_scream.txt` porte cent dix-sept lignes et le client
-// n'en tire que cent quatorze. Les compter à la lecture du fichier changerait ce
-// que le jeu peut dire.
+// ⚠ CES DEUX NOMBRES SONT DANS L'EXÉCUTABLE, pas dans les tables, et ils n'en
+// disent pas la taille : `scream_lines.yml` porte cent seize répliques et le
+// client n'en tire que cent quatorze. Les compter à la lecture de la table
+// changerait ce que le jeu peut dire.
 inline constexpr std::size_t kFrostJokeLines = 0x75;
 inline constexpr std::size_t kScreamLines = 0x72;
 
@@ -60,11 +61,11 @@ class ActorTalk {
               const TalkSwitches& spoken, std::uint32_t now_ms);
 
  private:
-  // Le fichier lu une fois, gardé tel quel. Un fichier absent y entre vide : on
-  // ne le redemande pas à chaque réplique.
-  [[nodiscard]] const std::string& Contents(ro::vfs::Vfs& vfs, std::string_view path);
+  // La table lue une fois. Une table absente ou illisible y entre vide : on ne
+  // la redemande pas à chaque réplique.
+  [[nodiscard]] const ro::vfs::TalkLines& LinesOf(ro::vfs::Vfs& vfs, std::string_view path);
 
-  std::vector<std::pair<std::string, std::string>> files_;
+  std::vector<std::pair<std::string, ro::vfs::TalkLines>> files_;
   // Les couples (acteur, instant) déjà dits : le même effet rejoué plus tard
   // fait parler de nouveau, le même effet revu à l'image suivante non.
   //

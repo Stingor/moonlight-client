@@ -5,11 +5,12 @@
 
 #include "ro/vfs/encoding.h"
 
+#include "install_table.h"
+
 namespace ro::vfs {
 namespace {
 
 constexpr char kBackgroundMark = '%';
-constexpr char kIdEnd = '#';
 // « %RRGGBB » : la marque et six chiffres hexadécimaux.
 constexpr std::size_t kBackgroundLength = 7;
 constexpr int kHexBase = 16;
@@ -84,32 +85,26 @@ Book ParseBook(std::string_view cp949) {
   return book;
 }
 
-core::Result<BookList> ReadBookList(Vfs& vfs) {
+core::Result<BookList> ParseBookList(std::string_view yaml_text) {
   BookList list;
-  auto bytes = vfs.Read(kBookListPath);
-  if (!bytes) {
-    if (bytes.error().code == core::ErrorCode::kNotFound) {
-      return list;
-    }
-    return std::unexpected(bytes.error());
-  }
-  const std::string_view text(reinterpret_cast<const char*>(bytes->data()), bytes->size());
-  std::size_t from = 0;
-  while (from < text.size()) {
-    const std::size_t end = text.find('\n', from);
-    const std::string_view line =
-        Trimmed(text.substr(from, end == std::string_view::npos ? text.npos : end - from));
-    std::uint32_t item_id = 0;
-    const auto [stop, error] = std::from_chars(line.data(), line.data() + line.size(), item_id);
-    if (error == std::errc() && stop != line.data() + line.size() && *stop == kIdEnd) {
-      list.item_ids.insert(item_id);
-    }
-    if (end == std::string_view::npos) {
-      break;
-    }
-    from = end + 1;
+  auto read = VisitTableSection(yaml_text, kBookListPath, "books", YAML::NodeType::Sequence,
+                                [&list](const YAML::Node& books) {
+                                  for (const YAML::Node& book : books) {
+                                    list.item_ids.insert(ItemIdOf(book));
+                                  }
+                                });
+  if (!read) {
+    return std::unexpected(read.error());
   }
   return list;
+}
+
+core::Result<BookList> ReadBookList(Vfs& vfs) {
+  auto text = ReadOptionalTable(vfs, kBookListPath);
+  if (!text) {
+    return std::unexpected(text.error());
+  }
+  return text->has_value() ? ParseBookList(**text) : BookList{};
 }
 
 core::Result<Book> ReadBook(Vfs& vfs, std::uint32_t item_id) {

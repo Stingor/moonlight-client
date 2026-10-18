@@ -1,62 +1,53 @@
 #include "ro/vfs/res_name_table.h"
 
-#include <cstdint>
 #include <utility>
-#include <vector>
 
 #include "ro/core/ascii.h"
+#include "ro/core/log.h"
 #include "ro/vfs/vfs.h"
+
+#include "install_table.h"
 
 namespace ro::vfs {
 namespace {
 
-// Le fichier de l'installation, et la racine des fichiers d'une carte.
-constexpr std::string_view kTablePath = "data\\resnametable.txt";
+// La racine des fichiers d'une carte.
 constexpr std::string_view kMapRoot = "data\\";
-
-// Le séparateur du fichier. Une ligne porte `source#cible#`.
-constexpr char kFieldEnd = '#';
 
 }  // namespace
 
-ResNameTable ResNameTable::Parse(std::string_view contents) {
+core::Result<ResNameTable> ResNameTable::Parse(std::string_view yaml_text) {
   ResNameTable table;
-  std::string pending_source;
-  std::size_t token_start = 0;
-  for (std::size_t at = 0; at < contents.size(); ++at) {
-    const char letter = contents[at];
-    // ⚠ UNE FIN DE LIGNE TERMINE LE JETON SANS OUBLIER LA SOURCE EN ATTENTE :
-    // le client ne remet pas son compteur à zéro là, si bien qu'une ligne à un
-    // seul dièse s'apparie avec la suivante. Aucune ligne du fichier livré n'en
-    // porte un nombre autre que zéro ou deux, mais le porter autrement ferait
-    // diverger les deux clients sur un fichier que l'exploitant peut éditer.
-    if (letter == '\n' || letter == '\r') {
-      token_start = at + 1;
-      continue;
-    }
-    if (letter != kFieldEnd) {
-      continue;
-    }
-    const std::string_view token = contents.substr(token_start, at - token_start);
-    token_start = at + 1;
-    if (pending_source.empty()) {
-      pending_source = token;
-      continue;
-    }
-    // LE PREMIER L'EMPORTE : le client insère dans une table ordonnée, qui
-    // garde ce qu'elle a. Le fichier livré répète 97 de ses 2 274 entrées.
-    table.clones_.emplace(std::move(pending_source), std::string(token));
-    pending_source.clear();
+  auto read = VisitTableSection(
+      yaml_text, kResNamesPath, "files", YAML::NodeType::Map, [&table](const YAML::Node& files) {
+        for (const auto& pair : files) {
+          // LE PREMIER L'EMPORTE, comme dans la table ordonnée du
+          // client, qui garde ce qu'elle a.
+          table.clones_.emplace(ArchivedText(pair.first), ArchivedText(pair.second));
+        }
+      });
+  if (!read) {
+    return std::unexpected(read.error());
   }
   return table;
 }
 
 ResNameTable ResNameTable::Load(Vfs& vfs) {
-  auto bytes = vfs.Read(kTablePath);
-  if (!bytes) {
+  auto text = ReadOptionalTable(vfs, kResNamesPath);
+  if (!text || !text->has_value()) {
+    if (!text) {
+      core::LogWarning("{} — les cartes se lisent sous leur propre nom",
+                       core::Describe(text.error()));
+    }
     return {};
   }
-  return Parse(std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()));
+  auto table = Parse(**text);
+  if (!table) {
+    core::LogWarning("{} — les cartes se lisent sous leur propre nom",
+                     core::Describe(table.error()));
+    return {};
+  }
+  return std::move(*table);
 }
 
 std::string ResNameTable::CloneOf(std::string_view name) const {

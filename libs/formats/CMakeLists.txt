@@ -15,7 +15,6 @@ add_library(ro_formats STATIC
     src/act.cpp
     src/assist_address.cpp
     src/bgm_table.cpp
-    src/talk_lines.cpp
     src/bmp.cpp
     src/bson.cpp
     src/emblem.cpp

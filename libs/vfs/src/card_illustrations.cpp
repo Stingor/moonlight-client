@@ -2,9 +2,7 @@
 
 #include <string>
 
-#include "ro/core/text.h"
-
-#include "text_table.h"
+#include "install_table.h"
 
 namespace ro::vfs {
 
@@ -13,21 +11,26 @@ std::string_view CardIllustrations::Find(std::uint32_t item_id) const {
   return found != by_id.end() ? std::string_view(found->second) : std::string_view();
 }
 
-core::Result<CardIllustrations> ReadCardIllustrations(Vfs& vfs) {
+core::Result<CardIllustrations> ParseCardIllustrations(std::string_view yaml_text) {
   CardIllustrations cards;
-  auto bytes = ReadOptionalFile(vfs, kCardIllustrationTablePath);
-  if (!bytes) {
-    return std::unexpected(bytes.error());
-  }
-  for (const std::string_view line : SplitLines(core::AsText(*bytes))) {
-    std::uint32_t item_id = 0;
-    std::string_view resource;
-    if (!SplitTableRow(line, item_id, resource) || resource.empty()) {
-      continue;
-    }
-    cards.by_id[item_id] = std::string(resource);
+  auto read = VisitTableSection(yaml_text, kCardIllustrationTablePath, "cards", YAML::NodeType::Map,
+                                [&cards](const YAML::Node& entries) {
+                                  for (const auto& pair : entries) {
+                                    cards.by_id[ItemIdOf(pair.first)] = ArchivedText(pair.second);
+                                  }
+                                });
+  if (!read) {
+    return std::unexpected(read.error());
   }
   return cards;
+}
+
+core::Result<CardIllustrations> ReadCardIllustrations(Vfs& vfs) {
+  auto text = ReadOptionalTable(vfs, kCardIllustrationTablePath);
+  if (!text) {
+    return std::unexpected(text.error());
+  }
+  return text->has_value() ? ParseCardIllustrations(**text) : CardIllustrations{};
 }
 
 }  // namespace ro::vfs

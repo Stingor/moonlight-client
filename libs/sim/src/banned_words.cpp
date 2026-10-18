@@ -12,27 +12,11 @@
 namespace ro::sim {
 namespace {
 
-// Ce qui ferme un mot dans le fichier, et ce qui efface la ligne commencée.
-constexpr char kWordEnd = '\r';
-constexpr char kWordSeparator = '#';
-constexpr char kLineFeed = '\n';
-constexpr std::string_view kCommentStart = "//";
-
 // Le lien d'objet, en minuscules : il se saute en entier.
 constexpr std::string_view kItemLinkOpen = "<iteml>";
 constexpr std::string_view kItemLinkClose = "</iteml>";
 
 constexpr char kMaskStar = '*';
-
-// Le mot jusqu'au premier zéro, comme une chaîne C.
-[[nodiscard]] std::string_view UpToNul(std::string_view bytes) {
-  return bytes.substr(0, bytes.find('\0'));
-}
-
-// Vrai pour un mot fait seulement d'espaces et de tabulations.
-[[nodiscard]] bool IsBlank(std::string_view word) {
-  return word.find_first_not_of(" \t") == std::string_view::npos;
-}
 
 [[nodiscard]] std::size_t CodePointCount(std::string_view utf8) {
   std::size_t count = 0;
@@ -51,40 +35,6 @@ BannedWords::BannedWords(std::vector<std::string> words) {
       words_.push_back(core::AsciiLower(word));
     }
   }
-}
-
-BannedWords BannedWords::FromMannerText(std::string_view bytes) {
-  std::vector<std::string> words;
-  const auto keep = [&words](std::string_view token) {
-    const std::string_view word = UpToNul(token);
-    if (!IsBlank(word)) {
-      words.push_back(core::Utf8FromWire(word));
-    }
-  };
-  std::size_t start = 0;
-  for (std::size_t at = 0; at < bytes.size(); ++at) {
-    const std::string_view token = bytes.substr(start, at - start);
-    switch (bytes[at]) {
-      case kLineFeed:
-        start = at + 1;
-        break;
-      case kWordEnd:
-        if (!token.starts_with(kCommentStart)) {
-          keep(token);
-        }
-        start = at + 1;
-        break;
-      case kWordSeparator:
-        if (!token.starts_with(kCommentStart)) {
-          keep(token);
-          start = at + 1;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-  return BannedWords(std::move(words));
 }
 
 std::size_t BannedWords::SkipItemLink(std::string_view lower, std::size_t at) {

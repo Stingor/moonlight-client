@@ -3,7 +3,6 @@
 #include <random>
 
 #include "ro/core/log.h"
-#include "ro/formats/talk_lines.h"
 #include "ro/net/action.h"
 #include "ro/render/actor_effect_table.h"
 #include "ro/sim/world.h"
@@ -24,24 +23,22 @@ constexpr std::uint32_t kFrostJokeEffect = 295;
 
 }  // namespace
 
-const std::string& ActorTalk::Contents(ro::vfs::Vfs& vfs, std::string_view path) {
+const ro::vfs::TalkLines& ActorTalk::LinesOf(ro::vfs::Vfs& vfs, std::string_view path) {
   for (std::size_t rank = 0; rank < files_.size(); ++rank) {
     if (files_[rank].first == path) {
       return files_[rank].second;
     }
   }
-  // ⚠ LE CHEMIN EST CELUI DU CLIENT, en octets bruts : ces deux-là sont nommés
-  // en ASCII, mais ils vivent parmi des voisins coréens et le VFS ne doit pas
-  // les retraduire.
-  std::string contents;
-  if (auto bytes = vfs.ReadRaw(path); bytes) {
-    contents.assign(bytes->begin(), bytes->end());
+  ro::vfs::TalkLines lines;
+  if (auto read = ro::vfs::ReadTalkLines(vfs, path); read) {
+    lines = std::move(*read);
   } else {
-    // Un fichier absent ne fait pas taire le client : il fait taire l'effet, et
-    // le dit UNE FOIS. Une installation incomplète reste jouable.
-    ro::core::LogWarning("répliques : fichier absent ({}) — ces PNJ resteront muets", path);
+    // Une table absente ne fait pas taire le client : elle fait taire l'effet,
+    // et le dit UNE FOIS. Une installation incomplète reste jouable.
+    ro::core::LogWarning("répliques : {} — ces PNJ resteront muets",
+                         ro::core::Describe(read.error()));
   }
-  files_.emplace_back(std::string(path), std::move(contents));
+  files_.emplace_back(std::string(path), std::move(lines));
   return files_.back().second;
 }
 
@@ -73,14 +70,13 @@ void ActorTalk::Notice(const ro::sim::World& world, ro::vfs::Vfs& vfs, ro::net::
       if (joke ? !spoken.frost_joke : !spoken.scream) {
         continue;
       }
-      const std::string& contents =
-          Contents(vfs, joke ? ro::formats::kFrostJokeLinesPath : ro::formats::kScreamLinesPath);
-      if (contents.empty()) {
+      const ro::vfs::TalkLines& lines =
+          LinesOf(vfs, joke ? ro::vfs::kFrostJokeLinesPath : ro::vfs::kScreamLinesPath);
+      if (lines.lines.empty()) {
         continue;
       }
       const auto count = static_cast<std::uint32_t>(joke ? kFrostJokeLines : kScreamLines);
-      const std::string said =
-          ro::formats::TalkLine(contents, static_cast<std::size_t>(draw() % count) + 1);
+      const std::string_view said = lines.Line(static_cast<std::size_t>(draw() % count) + 1);
       if (said.empty()) {
         continue;
       }

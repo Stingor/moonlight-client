@@ -12,33 +12,18 @@ namespace ro::sim {
 //
 // L'installation porte une liste de mots que le client ne montre pas tels
 // quels : chacun est remplacé, là où il paraît, par autant d'étoiles qu'il a de
-// caractères. Elle vient de `kBannedWordsPath`, un texte simple.
+// caractères. Elle se lit par `vfs::ReadBannedWordList`.
 //
-// ⚠ LE FICHIER PEUT ÊTRE VIDE, et la liste ne masque alors rien : une archive
-// peut en livrer un vide pour éteindre le masquage.
-
-// Le fichier de la liste, dans l'installation.
-inline constexpr std::string_view kBannedWordsPath = "data\\manner.txt";
+// ⚠ LA LISTE PEUT ÊTRE VIDE, et elle ne masque alors rien : une installation
+// peut en livrer une vide pour éteindre le masquage.
 
 class BannedWords {
  public:
   BannedWords() = default;
   // Les mots en UTF-8, dans l'ordre où ils seront essayés. Ils sont abaissés
-  // en minuscules ASCII ; un mot vide ne s'ajoute pas.
+  // en minuscules ASCII ; un mot vide ne s'ajoute pas. Un mot garde ses
+  // espaces, de tête comme de queue, et ne se reconnaît qu'avec elles.
   explicit BannedWords(std::vector<std::string> words);
-
-  // LA LISTE LUE DANS LE FICHIER, octets tels quels (1252 ou UTF-8).
-  //
-  // 🔴 UN MOT S'ARRÊTE À UN RETOUR CHARIOT OU À UN « # », JAMAIS À UN SAUT DE
-  // LIGNE SEUL : un « \n » efface ce qui le précède sur la ligne. Une ligne
-  // sans « \r » final — la dernière d'un fichier, ou toutes celles d'un fichier
-  // aux fins de ligne Unix — ne donne donc aucun mot.
-  //
-  // ⚠ Un mot qui commence par « // » est un commentaire, jusqu'au retour
-  // chariot, « # » compris. Un mot fait seulement d'espaces et de tabulations
-  // ne compte pas ; un autre garde ses espaces, de tête comme de queue, et ne
-  // se reconnaît qu'avec elles.
-  [[nodiscard]] static BannedWords FromMannerText(std::string_view bytes);
 
   [[nodiscard]] bool empty() const noexcept { return words_.empty(); }
   [[nodiscard]] std::span<const std::string> words() const noexcept { return words_; }

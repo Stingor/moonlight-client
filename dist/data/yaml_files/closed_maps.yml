@@ -3,8 +3,9 @@
 #
 #  Cavernes, donjons, souterrains : le ciel ne s'y voit pas. Le cycle jour/nuit
 #  que le joueur active ne s'y applique pas, et la lumière de la carte reste
-#  celle que son RSW déclare. Les intérieurs que l'installation nomme dans
-#  data\indoorrswtable.txt en sont déjà retirés : inutile de les répéter ici.
+#  celle que son RSW déclare. Les intérieurs de indoor_maps.yml — ceux que
+#  l'installation nomme dans data\indoorrswtable.txt — en sont déjà retirés :
+#  inutile de les répéter ici.
 #
 #  TENU À LA MAIN. La liste de départ a retenu, dans map_names.yml, les cartes
 #  dont le nom dit une caverne, un donjon ou un souterrain, moins celles qu'on

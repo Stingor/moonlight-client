@@ -44,10 +44,10 @@ struct CardWord {
   std::string text;
 
   // 🔴 C'EST UNE LISTE D'IDENTIFIANTS QUI LE DIT, PAS UNE TABLE DE MOTS.
-  // `cardpostfixnametable.txt` n'apporte aucun texte — son second champ est
-  // toujours vide. Il NOMME les cartes dont le mot déménage de l'avant du nom
+  // `card_postfixes.yml` n'apporte aucun texte — elle n'est qu'une liste
+  // d'identifiants. Elle NOMME les cartes dont le mot déménage de l'avant du nom
   // vers l'arrière, et le chargeur du client fait littéralement ce déplacement.
-  // S'en tenir à la lecture naïve du fichier mettrait 509 mots du mauvais côté.
+  // L'ignorer mettrait 509 mots du mauvais côté.
   bool after_name = false;
 };
 
@@ -394,9 +394,27 @@ enum class ItemPickupRefusal {
 // demande.
 void FillMessageWords(ItemWords& words);
 
-// Les deux fichiers d'où sortent les mots de cartes.
-inline constexpr std::string_view kCardWordPath = "data\\cardprefixnametable.txt";
-inline constexpr std::string_view kCardWordAfterPath = "data\\cardpostfixnametable.txt";
+// Les deux tables d'où sortent les mots de cartes, que
+// `scripts/yaml_tables/install_text_tables.py` tire de
+// `data\cardprefixnametable.txt` et `data\cardpostfixnametable.txt` :
+//
+//     version: 1                    version: 1
+//     cards:                        cards:
+//       4001: Lucky                 - 4014
+//       4014: of Champion
+inline constexpr std::string_view kCardWordPath = "data\\yaml_files\\card_prefixes.yml";
+inline constexpr std::string_view kCardWordAfterPath = "data\\yaml_files\\card_postfixes.yml";
+
+// Le texte de `card_prefixes.yml` : le mot de chaque carte, posé devant le nom.
+// Refuse un texte qui n'est pas du YAML, dont `version` n'est pas 1, ou dont
+// `cards` n'associe pas un identifiant à un texte.
+[[nodiscard]] core::Result<std::unordered_map<std::uint32_t, CardWord>> ParseCardWords(
+    std::string_view yaml_text);
+
+// Le texte de `card_postfixes.yml` : les cartes de `cards` dont le mot passe
+// DERRIÈRE le nom. Une carte que `cards` ne connaît pas n'a rien à déplacer.
+[[nodiscard]] core::Result<void> ParseCardWordSides(
+    std::string_view yaml_text, std::unordered_map<std::uint32_t, CardWord>& cards);
 
 // Lit les mots de cartes, et pose ceux de l'interface dans la langue courante.
 // Un fichier ABSENT rend les mots de cartes vides plutôt qu'une erreur : sans
