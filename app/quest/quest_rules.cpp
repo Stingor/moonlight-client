@@ -9,6 +9,7 @@
 #include <limits>
 #include <optional>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/printed.h"
@@ -201,12 +202,7 @@ bool QuestInTab(const QuestRecord& quest, const QuestInfo* info, ro::ui::QuestTa
 // LA RECHERCHE IGNORE LA CASSE ASCII : un accent reste un accent, mais
 // « poring » trouve « Poring ».
 bool QuestTextContains(std::string_view haystack, std::string_view needle) {
-  if (needle.empty()) {
-    return true;
-  }
-  const auto found = std::ranges::search(
-      haystack, needle, [](char left, char right) { return Lower(left) == Lower(right); });
-  return !found.empty();
+  return ro::core::AsciiContainsFolded(haystack, needle);
 }
 
 std::string QuestFill(std::string_view pattern, std::initializer_list<std::string_view> values) {

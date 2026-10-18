@@ -2,7 +2,8 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
+
+#include "ro/core/ascii.h"
 
 namespace moonclient {
 namespace {
@@ -10,20 +11,12 @@ namespace {
 // Les trois noms de la commande, en minuscules. Le dernier est en UTF-8.
 constexpr std::array<std::string_view, 3> kMemoCommandNames = {"/memo", "/rldjr", "/기억"};
 
-// Le premier octet qui n'est plus de l'ASCII : au-delà, la casse ne compte pas.
-constexpr unsigned char kFirstNonAscii = 0x80;
-
-[[nodiscard]] char Folded(char letter) {
-  const auto byte = static_cast<unsigned char>(letter);
-  return byte < kFirstNonAscii ? static_cast<char>(std::tolower(byte)) : letter;
-}
-
 }  // namespace
 
 bool IsWarpMemoCommand(std::string_view line) {
   const std::string_view word = line.substr(0, line.find(' '));
   return std::ranges::any_of(kMemoCommandNames, [word](std::string_view name) {
-    return std::ranges::equal(name, word, [](char a, char b) { return Folded(a) == Folded(b); });
+    return ro::core::AsciiEqualsFolded(name, word);
   });
 }
 

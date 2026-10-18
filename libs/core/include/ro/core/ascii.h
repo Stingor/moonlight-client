@@ -49,6 +49,9 @@ namespace ro::core {
 // `text` commence par `prefix`, à la casse ASCII près.
 [[nodiscard]] bool AsciiStartsWithFolded(std::string_view text, std::string_view prefix);
 
+// `text` finit par `suffix`, à la casse ASCII près : l'extension d'un fichier.
+[[nodiscard]] bool AsciiEndsWithFolded(std::string_view text, std::string_view suffix);
+
 // `haystack` contient `needle`, à la casse ASCII près : le filtre d'une liste.
 // ⚠ UN `needle` VIDE EST CONTENU PARTOUT, même dans un texte vide — un filtre
 // qu'on n'a pas encore tapé ne cache rien.

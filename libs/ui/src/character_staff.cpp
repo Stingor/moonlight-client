@@ -2,13 +2,14 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <vector>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/ui/list_keys.h"
 #include "ro/ui/skin_popup.h"
@@ -169,10 +170,7 @@ void DrawJobPicker(StaffPaneState& state, const StaffPaneView& view, const SkinA
 
   // Le filtre est insensible à la casse et porte sur le libellé ET l'identifiant :
   // « 4054 » comme « rune » trouvent le Rune Knight.
-  std::string needle(state.job_filter.data());
-  std::ranges::transform(needle, needle.begin(), [](unsigned char letter) {
-    return static_cast<char>(std::tolower(letter));
-  });
+  const std::string_view needle(state.job_filter.data());
 
   // ⚠ UN EN-TÊTE AU CHANGEMENT, ET UN DRAPEAU POUR LA PREMIÈRE : la famille de
   // départ est une valeur comme une autre, et la comparer à elle-même sauterait
@@ -186,11 +184,7 @@ void DrawJobPicker(StaffPaneState& state, const StaffPaneView& view, const SkinA
     std::array<char, kJobRowBytes> row{};
     std::snprintf(row.data(), row.size(), "%.*s (%u)", static_cast<int>(one.label.size()),
                   one.label.data(), one.id);
-    std::string hay(row.data());
-    std::ranges::transform(hay, hay.begin(), [](unsigned char letter) {
-      return static_cast<char>(std::tolower(letter));
-    });
-    if (!needle.empty() && hay.find(needle) == std::string::npos) {
+    if (!core::AsciiContainsFolded(row.data(), needle)) {
       continue;
     }
     if (one.id == view.own_job) {

@@ -2,23 +2,14 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <string>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 
 namespace moonclient {
 namespace {
-
-// Le premier octet qui n'est plus de l'ASCII.
-constexpr unsigned char kFirstNonAscii = 0x80;
-
-// Une lettre latine en minuscule ; un octet non ASCII passe tel quel.
-[[nodiscard]] char Folded(char letter) {
-  const auto byte = static_cast<unsigned char>(letter);
-  return byte < kFirstNonAscii ? static_cast<char>(std::tolower(byte)) : letter;
-}
 
 // LES COMMANDES QUE LE CLIENT DU JOUEUR CONNAÎT : celles de sa table fixe —
 // noms écrits en clair comme noms comparés octet par octet — et celles de sa
@@ -393,7 +384,7 @@ bool NativeKnowsSlashCommand(std::string_view line) {
   // Le premier mot seul : une commande à paramètres se reconnaît à son nom.
   const std::string_view word = line.substr(0, line.find(' '));
   return std::ranges::any_of(kNativeSlashCommands, [word](std::string_view known) {
-    return std::ranges::equal(known, word, [](char a, char b) { return Folded(a) == Folded(b); });
+    return ro::core::AsciiEqualsFolded(known, word);
   });
 }
 

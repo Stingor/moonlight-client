@@ -8,6 +8,7 @@
 #include <SDL3/SDL.h>
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/log.h"
 #include "ro/core/utf8_path.h"
 #include "ro/core/web_address.h"
@@ -27,21 +28,12 @@ constexpr std::size_t kMostKnownUrls = 256;
 constexpr std::string_view kPlainPrefix = "http://";
 constexpr std::string_view kSecurePrefix = "https://";
 
-[[nodiscard]] char LowerAscii(char letter) {
-  return (letter >= 'A' && letter <= 'Z') ? static_cast<char>(letter - 'A' + 'a') : letter;
-}
-
-[[nodiscard]] bool StartsNoCase(std::string_view text, std::string_view lowered_prefix) {
-  return text.size() >= lowered_prefix.size() &&
-         std::equal(lowered_prefix.begin(), lowered_prefix.end(), text.begin(),
-                    [](char wanted, char letter) { return wanted == LowerAscii(letter); });
-}
-
 // 🔴 UNE ADRESSE OUVRE UN PROGRAMME DU SYSTÈME, et elle vient d'un autre
 // joueur : seuls `http://` et `https://`, majuscules ou non, partent au
 // navigateur. Un autre schéma ouvrirait ce que le système lui associe.
 [[nodiscard]] bool OpensInBrowser(std::string_view openable) {
-  return StartsNoCase(openable, kPlainPrefix) || StartsNoCase(openable, kSecurePrefix);
+  return ro::core::AsciiStartsWithFolded(openable, kPlainPrefix) ||
+         ro::core::AsciiStartsWithFolded(openable, kSecurePrefix);
 }
 
 void LaunchBrowser(const std::string& openable) {

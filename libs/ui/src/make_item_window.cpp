@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cfloat>
 #include <cstdio>
 #include <string>
@@ -83,18 +82,6 @@ void DrawLines(std::span<const CraftTextLine> lines) {
   return core::AsciiContainsFolded(searched.data(), filter);
 }
 
-[[nodiscard]] int CompareNames(std::string_view left, std::string_view right) {
-  const std::size_t common = std::min(left.size(), right.size());
-  for (std::size_t at = 0; at < common; ++at) {
-    const int a = std::tolower(static_cast<unsigned char>(left[at]));
-    const int b = std::tolower(static_cast<unsigned char>(right[at]));
-    if (a != b) {
-      return a - b;
-    }
-  }
-  return static_cast<int>(left.size()) - static_cast<int>(right.size());
-}
-
 [[nodiscard]] std::vector<const MakeItemRowView*> SortedRows(const MakeItemWindowState& state,
                                                              const MakeItemView& view,
                                                              const ImGuiTableSortSpecs* specs) {
@@ -113,7 +100,7 @@ void DrawLines(std::span<const CraftTextLine> lines) {
     int order = 0;
     switch (spec.ColumnIndex) {
       case kNameColumn:
-        order = CompareNames(left->name, right->name);
+        order = core::AsciiCompareFolded(left->name, right->name);
         break;
       case kOwnedColumn:
         order = left->owned - right->owned;

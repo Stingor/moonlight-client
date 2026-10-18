@@ -46,14 +46,6 @@ constexpr double kNormal8 = 255.0;
 constexpr double kBinormal16 = 32767.0;
 constexpr double kNormal16 = 65535.0;
 
-bool SameName(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::equal(left.begin(), left.end(), right.begin(), [](char a, char b) {
-           return core::AsciiLower(static_cast<std::uint8_t>(a)) ==
-                  core::AsciiLower(static_cast<std::uint8_t>(b));
-         });
-}
-
 bool IsNumeric(Gr2Kind kind) { return kind >= Gr2Kind::kReal32 && kind <= Gr2Kind::kUInt32; }
 
 }  // namespace
@@ -123,7 +115,7 @@ std::optional<Gr2Member> Gr2File::MemberNamed(std::uint32_t type, std::string_vi
     return std::nullopt;
   }
   for (const Gr2Member& member : Members(type)) {
-    if (SameName(member.name, name)) {
+    if (core::AsciiEqualsFolded(member.name, name)) {
       return member;
     }
   }

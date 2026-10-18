@@ -1,9 +1,9 @@
 #include "game/chat_room_rules.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cstdlib>
 
+#include "ro/core/ascii.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/skill_book.h"
 
@@ -18,13 +18,6 @@ namespace {
 [[nodiscard]] std::uint16_t LevelOf(const ro::sim::World& world, std::uint16_t skill_id) {
   const ro::sim::KnownSkill* known = world.skill_book().Find(skill_id);
   return known == nullptr ? 0 : known->level;
-}
-
-[[nodiscard]] bool SameLetters(std::string_view left, std::string_view right) {
-  return std::ranges::equal(left, right, [](char a, char b) {
-    return std::tolower(static_cast<unsigned char>(a)) ==
-           std::tolower(static_cast<unsigned char>(b));
-  });
 }
 
 }  // namespace
@@ -106,7 +99,7 @@ int ChatRoomTitleTaken(const std::vector<NearbyChatRoom>& rooms, std::string_vie
     return -1;
   }
   for (std::size_t rank = 0; rank < rooms.size(); ++rank) {
-    if (SameLetters(rooms[rank].title, title)) {
+    if (ro::core::AsciiEqualsFolded(rooms[rank].title, title)) {
       return static_cast<int>(rank);
     }
   }

@@ -28,10 +28,6 @@ constexpr const char* kWidestLabel = "0000";
 // que la sélection reste lisible par-dessus.
 constexpr float kPlayingRowAlpha = 0.45F;
 
-[[nodiscard]] bool Contains(std::string_view text, std::string_view lowered_filter) {
-  return ro::core::AsciiLower(text).find(lowered_filter) != std::string::npos;
-}
-
 [[nodiscard]] std::string_view LabelAt(const MusicPlayerView& view, int row) {
   if (row < 0 || static_cast<std::size_t>(row) >= view.rows.size()) {
     return {};
@@ -114,11 +110,8 @@ void DrawNowPlaying(const MusicPlayerView& view) {
 }  // namespace
 
 bool MusicRowMatches(const MusicPlayerRow& row, std::string_view filter) {
-  if (filter.empty()) {
-    return true;
-  }
-  const std::string lowered = ro::core::AsciiLower(filter);
-  return Contains(row.label, lowered) || Contains(row.maps, lowered);
+  return ro::core::AsciiContainsFolded(row.label, filter) ||
+         ro::core::AsciiContainsFolded(row.maps, filter);
 }
 
 MusicPlayerAsk DrawMusicPlayerWindow(MusicPlayerState& state, const MusicPlayerView& view,

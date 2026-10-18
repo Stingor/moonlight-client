@@ -2,17 +2,13 @@
 
 #include <algorithm>
 
+#include "ro/core/ascii.h"
+
 namespace moonclient {
 
 std::string SoundFileKey(std::string_view path) {
   const std::size_t cut = path.find_last_of("\\/");
-  std::string key(cut == std::string_view::npos ? path : path.substr(cut + 1));
-  for (char& letter : key) {
-    if (letter >= 'A' && letter <= 'Z') {
-      letter = static_cast<char>(letter - 'A' + 'a');
-    }
-  }
-  return key;
+  return ro::core::AsciiLower(cut == std::string_view::npos ? path : path.substr(cut + 1));
 }
 
 bool SilencesFile(const SpriteSoundMutes& mutes, std::string_view path) {

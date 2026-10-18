@@ -1,6 +1,5 @@
 #include "character/doll_gif_export.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <mutex>
 #include <optional>
@@ -10,6 +9,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/error.h"
 #include "ro/core/file_write.h"
 #include "ro/core/i18n.h"
@@ -90,17 +90,11 @@ constexpr int kMostFreeNameTries = 999;
 // Le premier numéro proposé : `avatar (2).gif`, le fichier existant étant le 1.
 constexpr int kFirstFreeNameNumber = 2;
 
-[[nodiscard]] char LowerAscii(char letter) {
-  return (letter >= 'A' && letter <= 'Z') ? static_cast<char>(letter - 'A' + 'a') : letter;
-}
-
 // L'extension est-elle `.gif`, quelle qu'en soit la casse ?
 [[nodiscard]] bool HasGifExtension(const std::filesystem::path& path) {
   const std::string extension = ro::core::Utf8FromPath(path.extension());
   const std::string wanted = "." + std::string(kGifExtension);
-  return extension.size() == wanted.size() &&
-         std::equal(extension.begin(), extension.end(), wanted.begin(),
-                    [](char letter, char expected) { return LowerAscii(letter) == expected; });
+  return ro::core::AsciiEqualsFolded(extension, wanted);
 }
 
 // LE PREMIER NOM LIBRE à côté de `taken` : `nom (2).gif`, `nom (3).gif`… Rien

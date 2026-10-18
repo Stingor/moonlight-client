@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstddef>
 #include <cstdlib>
 #include <deque>
@@ -277,10 +276,8 @@ std::vector<LooseFontFile> FindLooseFonts(const std::filesystem::path& folder) {
     if (!entry->is_regular_file(unread)) {
       continue;
     }
-    std::string extension = Utf8Of(entry->path().extension().u8string());
-    std::ranges::transform(extension, extension.begin(), [](char letter) {
-      return static_cast<char>(std::tolower(static_cast<unsigned char>(letter)));
-    });
+    const std::string extension =
+        ro::core::AsciiLower(Utf8Of(entry->path().extension().u8string()));
     if (std::ranges::find(kLooseFontExtensions, extension) == kLooseFontExtensions.end()) {
       continue;
     }

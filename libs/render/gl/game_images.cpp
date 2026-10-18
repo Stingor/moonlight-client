@@ -122,7 +122,7 @@ const IconTexture& GameImages::Fetch(std::string_view path, bool ours, Treatment
   // antérieur à l'alpha. Un JPEG, lui, code AVEC PERTE — le magenta n'y ressort
   // pas pur, et des couleurs qui n'en étaient pas s'en approchent : la clé y
   // percerait des trous au hasard et en manquerait ailleurs.
-  if (treatment != Treatment::kOpaque && core::AsciiLower(key).ends_with(kColorKeyedSuffix)) {
+  if (treatment != Treatment::kOpaque && core::AsciiEndsWithFolded(key, kColorKeyedSuffix)) {
     formats::ApplyMagentaColorKey(*decoded);
   }
   if (treatment == Treatment::kForDarkPaper) {

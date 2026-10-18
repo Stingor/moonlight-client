@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/ascii.h"
 #include "ro/core/web_address.h"
 
 #include "web/preview_get.h"
@@ -105,10 +106,7 @@ std::optional<WinHttpTarget> CrackJudgedUrl(std::string_view url) {
   path.resize(parts.dwUrlPathLength);
   extra.resize(parts.dwExtraInfoLength);
 
-  std::string cracked_host = Narrowed(host);
-  std::transform(cracked_host.begin(), cracked_host.end(), cracked_host.begin(), [](char letter) {
-    return (letter >= 'A' && letter <= 'Z') ? static_cast<char>(letter - 'A' + 'a') : letter;
-  });
+  const std::string cracked_host = ro::core::AsciiLower(Narrowed(host));
   if (judged.host != cracked_host) {
     return std::nullopt;
   }

@@ -71,7 +71,7 @@ BgmTable BgmTable::Parse(std::span<const std::uint8_t> bytes) {
     }
     // La clé porte l'extension d'une carte, que personne n'emploie ailleurs
     // pour la nommer.
-    if (core::AsciiLower(map).ends_with(kMapExtension)) {
+    if (core::AsciiEndsWithFolded(map, kMapExtension)) {
       map = map.substr(0, map.size() - kMapExtension.size());
     }
     // La DERNIÈRE ligne l'emporte : une table se lit de haut en bas, et ce

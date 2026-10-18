@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cfloat>
 #include <cmath>
 #include <cstdio>
@@ -547,14 +546,8 @@ std::string CardAlbumShortName(std::string_view full_name) {
   // 2. Le suffixe « Card », que TOUTES portent : dans un album de cartes il ne
   //    distingue rien, et il vole cinq caractères aux noms longs.
   constexpr std::string_view kSuffix = " Card";
-  if (length > kSuffix.size()) {
-    const std::string_view tail = full_name.substr(length - kSuffix.size(), kSuffix.size());
-    if (std::equal(tail.begin(), tail.end(), kSuffix.begin(), kSuffix.end(), [](char a, char b) {
-          return std::tolower(static_cast<unsigned char>(a)) ==
-                 std::tolower(static_cast<unsigned char>(b));
-        })) {
-      length -= kSuffix.size();
-    }
+  if (length > kSuffix.size() && core::AsciiEndsWithFolded(full_name.substr(0, length), kSuffix)) {
+    length -= kSuffix.size();
   }
   return std::string(full_name.substr(0, length));
 }

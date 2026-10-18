@@ -1,12 +1,11 @@
 // LE CORPS D'UN PET PARÉ : l'accessoire ne s'ajoute pas comme une coiffe, il
 // change l'animation du corps entier.
 
-#include <algorithm>
-#include <cctype>
 #include <optional>
 #include <string>
 #include <string_view>
 
+#include "ro/core/ascii.h"
 #include "ro/render/sprite_catalog.h"
 
 #include "sprite_catalog_internal.h"
@@ -17,17 +16,6 @@ namespace {
 // La table nomme le fichier AVEC son extension ; les chemins d'une pièce s'en
 // passent.
 constexpr std::string_view kAnimationSuffix = ".act";
-
-[[nodiscard]] bool EndsWithNoCase(std::string_view text, std::string_view suffix) {
-  if (text.size() < suffix.size()) {
-    return false;
-  }
-  return std::ranges::equal(text.substr(text.size() - suffix.size()), suffix,
-                            [](char left, char right) {
-                              return std::tolower(static_cast<unsigned char>(left)) ==
-                                     std::tolower(static_cast<unsigned char>(right));
-                            });
-}
 
 }  // namespace
 
@@ -42,7 +30,7 @@ std::string PetAccessoryAnimationPath(const SpriteCatalog& catalog, const ActorL
     return {};
   }
   std::string_view stem = *name;
-  if (EndsWithNoCase(stem, kAnimationSuffix)) {
+  if (core::AsciiEndsWithFolded(stem, kAnimationSuffix)) {
     stem.remove_suffix(kAnimationSuffix.size());
   }
   // LE DOSSIER EST CELUI DU CORPS : la table ne nomme que le fichier.

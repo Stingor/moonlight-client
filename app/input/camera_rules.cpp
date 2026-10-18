@@ -6,6 +6,8 @@
 #include <cmath>
 #include <vector>
 
+#include "ro/core/ascii.h"
+
 namespace moonclient {
 namespace {
 
@@ -210,12 +212,7 @@ void ApplyNativeView(ro::render::Camera& camera, const NativeView& view) {
 }
 
 std::string CameraTableKey(std::string_view map_name) {
-  std::string key(map_name);
-  for (char& letter : key) {
-    if (letter >= 'A' && letter <= 'Z') {
-      letter = static_cast<char>(letter - 'A' + 'a');
-    }
-  }
+  std::string key = ro::core::AsciiLower(map_name);
   if (const std::size_t at = key.rfind('@'); at != std::string::npos && at >= kInstanceAtLeast) {
     key.erase(at - kInstanceBack, kInstanceCut);
   }

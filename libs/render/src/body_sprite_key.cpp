@@ -18,20 +18,12 @@ std::uint32_t BodySpriteKey(std::string_view sprite_path) {
 
   // L'extension ne fait pas partie de l'identité : selon l'appelant, le chemin
   // est une BASE ou un fichier, et les deux désignent le même corps.
-  // ⚠ COMPARÉE PAR `AsciiLower` COMME TOUT LE RESTE : un `tolower` de la
+  // ⚠ COMPARÉE À LA CASSE ASCII PRÈS COMME TOUT LE RESTE : un `tolower` de la
   // bibliothèque dépend de la locale, et c'est précisément ce que cette
   // fonction existe pour éviter.
   std::string_view path = sprite_path;
-  if (path.size() > kSpriteSuffix.size()) {
-    const std::string_view tail = path.substr(path.size() - kSpriteSuffix.size());
-    bool matches = true;
-    for (std::size_t rank = 0; rank < kSpriteSuffix.size() && matches; ++rank) {
-      matches = core::AsciiLower(static_cast<std::uint8_t>(tail[rank])) ==
-                static_cast<std::uint8_t>(kSpriteSuffix[rank]);
-    }
-    if (matches) {
-      path.remove_suffix(kSpriteSuffix.size());
-    }
+  if (path.size() > kSpriteSuffix.size() && core::AsciiEndsWithFolded(path, kSpriteSuffix)) {
+    path.remove_suffix(kSpriteSuffix.size());
   }
   if (path.empty()) {
     return 0;

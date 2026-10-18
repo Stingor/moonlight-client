@@ -1,11 +1,11 @@
 #include "world/monster_sprite.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cmath>
 #include <string_view>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/formats/act.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/render/sprite_frame.h"
@@ -63,16 +63,6 @@ enum class PokeAudio : std::uint8_t {
   return utf8 ? std::move(*utf8) : std::string(cp949);
 }
 
-[[nodiscard]] bool IsWav(std::string_view name) {
-  if (name.size() < kWavSuffix.size()) {
-    return false;
-  }
-  const std::string_view tail = name.substr(name.size() - kWavSuffix.size());
-  return std::ranges::equal(tail, kWavSuffix, [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) == right;
-  });
-}
-
 // Le son, ou le marqueur, que porte une image ; vide pour une image muette.
 //
 // ⚠ LA TABLE DES SONS PORTE AUSSI DES MARQUEURS SANS EXTENSION — l'image où le
@@ -92,7 +82,7 @@ enum class PokeAudio : std::uint8_t {
   bool marker = false;
   for (const ro::formats::ActFrame& frame : action.frames) {
     const std::string_view cue = FrameCue(animation, frame);
-    if (IsWav(cue)) {
+    if (ro::core::AsciiEndsWithFolded(cue, kWavSuffix)) {
       return PokeAudio::kFrameWav;
     }
     marker = marker || !cue.empty();
@@ -260,7 +250,7 @@ void MonsterSprite::HearFrame(const ro::formats::ActAction& action, std::size_t 
     return;
   }
   const std::string_view cue = FrameCue(*body, action.frames[frame]);
-  if (IsWav(cue)) {
+  if (ro::core::AsciiEndsWithFolded(cue, kWavSuffix)) {
     sounds_.push_back(FromClientBytes(cue));
   } else if (hit_pending_ && !cue.empty()) {
     // L'action muette mais marquée : le son de coup part sur l'image du

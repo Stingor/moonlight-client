@@ -12,16 +12,6 @@ namespace ro::sim {
 
 namespace {
 
-// UNE CARTE SE COMPARE SANS LA CASSE, en ASCII seulement : un lien collé à la
-// main ou une carte relue ailleurs peut porter des majuscules que le catalogue
-// n'a pas.
-[[nodiscard]] bool SameMap(std::string_view left, std::string_view right) noexcept {
-  return std::ranges::equal(left, right, [](char a, char b) {
-    return core::AsciiLower(static_cast<std::uint8_t>(a)) ==
-           core::AsciiLower(static_cast<std::uint8_t>(b));
-  });
-}
-
 constexpr std::int64_t kMsPerSecond = 1000;
 constexpr std::int64_t kSecondsPerMinute = 60;
 
@@ -152,7 +142,10 @@ const MvpSlot* MvpTrackerBook::FindSlotFor(std::uint16_t mob_id,
   }
   const MvpSlot* scripted = nullptr;
   for (const MvpSlot& slot : slots_) {
-    if (!SameMap(slot.map, map)) {
+    // UNE CARTE SE COMPARE SANS LA CASSE, en ASCII seulement : un lien collé à
+    // la main ou une carte relue ailleurs peut porter des majuscules que le
+    // catalogue n'a pas.
+    if (!core::AsciiEqualsFolded(slot.map, map)) {
       continue;
     }
     // Le créneau du monstre lui-même passe avant le créneau scripté de la
@@ -209,7 +202,7 @@ std::vector<MvpTomb> MvpTombsOn(const MvpTrackerBook& book, std::string_view map
       continue;
     }
     const MvpSlot* slot = book.FindSlot(slot_id);
-    if (slot == nullptr || !SameMap(slot->map, map)) {
+    if (slot == nullptr || !core::AsciiEqualsFolded(slot->map, map)) {
       continue;
     }
     const std::optional<MvpWindow> window = book.WindowOf(slot_id);

@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <optional>
 #include <span>
-#include <string_view>
 #include <vector>
 
 #include <glm/gtc/type_ptr.hpp>
@@ -52,10 +51,6 @@ std::vector<double> ControlAt(const GrannyCurve& curve, std::size_t knot) {
     control[lane] = curve.controls[index * dimension + lane];
   }
   return control;
-}
-
-bool EqualIgnoringCase(std::string_view left, std::string_view right) {
-  return core::AsciiLower(left) == core::AsciiLower(right);
 }
 
 }  // namespace
@@ -134,7 +129,7 @@ std::optional<ActorModelAnimation> BindActorModelAnimation(
     const formats::GrannyScene& model, const formats::GrannyAnimation& animation) {
   const formats::GrannyTrackGroup* group = nullptr;
   for (const formats::GrannyTrackGroup& candidate : animation.track_groups) {
-    if (EqualIgnoringCase(candidate.name, model.model_name)) {
+    if (core::AsciiEqualsFolded(candidate.name, model.model_name)) {
       group = &candidate;
       break;
     }
@@ -147,7 +142,7 @@ std::optional<ActorModelAnimation> BindActorModelAnimation(
   bound.track_of_bone.assign(model.bones.size(), nullptr);
   for (std::size_t bone = 0; bone < model.bones.size(); ++bone) {
     for (const formats::GrannyTrack& track : group->tracks) {
-      if (EqualIgnoringCase(track.name, model.bones[bone].name)) {
+      if (core::AsciiEqualsFolded(track.name, model.bones[bone].name)) {
         bound.track_of_bone[bone] = &track;
         break;
       }
@@ -263,7 +258,7 @@ std::vector<std::int32_t> MeshBoneMap(const formats::GrannyScene& model,
   std::vector<std::int32_t> map(mesh.bone_names.size(), -1);
   for (std::size_t index = 0; index < mesh.bone_names.size(); ++index) {
     for (std::size_t bone = 0; bone < model.bones.size(); ++bone) {
-      if (EqualIgnoringCase(mesh.bone_names[index], model.bones[bone].name)) {
+      if (core::AsciiEqualsFolded(mesh.bone_names[index], model.bones[bone].name)) {
         map[index] = static_cast<std::int32_t>(bone);
         break;
       }

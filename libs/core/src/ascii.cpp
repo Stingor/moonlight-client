@@ -47,6 +47,11 @@ bool AsciiStartsWithFolded(std::string_view text, std::string_view prefix) {
   return text.size() >= prefix.size() && AsciiEqualsFolded(text.substr(0, prefix.size()), prefix);
 }
 
+bool AsciiEndsWithFolded(std::string_view text, std::string_view suffix) {
+  return text.size() >= suffix.size() &&
+         AsciiEqualsFolded(text.substr(text.size() - suffix.size()), suffix);
+}
+
 bool AsciiContainsFolded(std::string_view haystack, std::string_view needle) {
   for (std::size_t start = 0; start + needle.size() <= haystack.size(); ++start) {
     if (AsciiEqualsFolded(haystack.substr(start, needle.size()), needle)) {

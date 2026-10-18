@@ -1,13 +1,13 @@
 // LE SOUS-ONGLET « MEMBRES » : le tableau triable et le menu d'un membre.
 
 #include <algorithm>
-#include <cctype>
 #include <numeric>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/text.h"
 #include "ro/ui/chat_link.h"
@@ -50,19 +50,6 @@ constexpr std::string_view kHeadRoom = "      ";
   return text;
 }
 
-// Le nom, sans tenir compte de la casse — ASCII seulement, comme le client.
-[[nodiscard]] int CompareNames(std::string_view left, std::string_view right) {
-  const std::size_t common = std::min(left.size(), right.size());
-  for (std::size_t index = 0; index < common; ++index) {
-    const int a = std::tolower(static_cast<unsigned char>(left[index]));
-    const int b = std::tolower(static_cast<unsigned char>(right[index]));
-    if (a != b) {
-      return a < b ? -1 : 1;
-    }
-  }
-  return left.size() == right.size() ? 0 : (left.size() < right.size() ? -1 : 1);
-}
-
 [[nodiscard]] int CompareMembers(const GuildMemberView& a, const GuildMemberView& b, int column) {
   const auto by = [](auto left, auto right) { return left < right ? -1 : (left > right ? 1 : 0); };
   int order = 0;
@@ -77,9 +64,9 @@ constexpr std::string_view kHeadRoom = "      ";
   } else if (column == Rank(MemberColumn::kLogin)) {
     order = a.online != b.online ? (a.online ? 1 : -1) : by(a.last_login, b.last_login);
   } else {
-    order = CompareNames(a.name, b.name);
+    order = core::AsciiCompareFolded(a.name, b.name);
   }
-  return order != 0 ? order : CompareNames(a.name, b.name);
+  return order != 0 ? order : core::AsciiCompareFolded(a.name, b.name);
 }
 
 // ⚠ TRIÉ À CHAQUE IMAGE : soixante-seize membres au plus, et un ordre qui ne

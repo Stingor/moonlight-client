@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -12,6 +11,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/ascii.h"
 #include "ro/core/i18n.h"
 #include "ro/core/printed.h"
 #include "ro/core/text.h"
@@ -88,22 +88,13 @@ constexpr std::string_view kHelpEntryGap = "    ";
   return static_cast<int>(ro::core::Cp1252FromUtf8(utf8).size());
 }
 
-// Deux mots égaux à la casse ASCII près, comme le serveur compare les noms de
-// canal et de commande.
-[[nodiscard]] bool EqualsNoCase(std::string_view left, std::string_view right) {
-  return std::ranges::equal(left, right, [](char a, char b) {
-    return std::tolower(static_cast<unsigned char>(a)) ==
-           std::tolower(static_cast<unsigned char>(b));
-  });
-}
-
 // LE CANAL DE CE NOM parmi ceux que le serveur a poussés, ou rien. ⚠ SANS TENIR
 // COMPTE DE LA CASSE : le serveur range ses canaux ainsi, et « /w #Global »
 // atteint « #global ».
 [[nodiscard]] const ro::sim::ChatChannel* FindChannel(
     std::span<const ro::sim::ChatChannel> channels, std::string_view name) {
   const auto found = std::ranges::find_if(channels, [name](const ro::sim::ChatChannel& channel) {
-    return EqualsNoCase(channel.name, name);
+    return ro::core::AsciiEqualsFolded(channel.name, name);
   });
   return found != channels.end() ? &*found : nullptr;
 }
@@ -359,16 +350,17 @@ void ChatLinePreviewMaker::FollowSentCommand(std::string_view text,
   // ⚠ LE NOM DE LA COMMANDE SE COMPARE SANS CASSE, SON ALIAS À L'IDENTIQUE :
   // c'est ainsi que le serveur range l'un et l'autre.
   const std::string_view command = words[0];
-  if (!EqualsNoCase(command, kChannelCommand) && command != kChannelCommandAlias) {
+  if (!ro::core::AsciiEqualsFolded(command, kChannelCommand) && command != kChannelCommandAlias) {
     return;
   }
   const std::string_view verb = words[1];
-  if (EqualsNoCase(verb, kUnbindVerb)) {
+  if (ro::core::AsciiEqualsFolded(verb, kUnbindVerb)) {
     bound_channel_.clear();
     return;
   }
   const std::string_view named = words[2];
-  if (!EqualsNoCase(verb, kBindVerb) || named.empty() || named.front() != ro::sim::kChannelPrefix) {
+  if (!ro::core::AsciiEqualsFolded(verb, kBindVerb) || named.empty() ||
+      named.front() != ro::sim::kChannelPrefix) {
     return;
   }
   const std::string_view name = named.substr(1);

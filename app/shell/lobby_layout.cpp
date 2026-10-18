@@ -35,7 +35,7 @@ namespace {
     }
     const std::u8string name = walk->path().filename().u8string();
     std::string bytes(reinterpret_cast<const char*>(name.data()), name.size());
-    if (ro::core::AsciiLower(bytes).ends_with(kBackgroundSuffix)) {
+    if (ro::core::AsciiEndsWithFolded(bytes, kBackgroundSuffix)) {
       names.push_back(std::move(bytes));
     }
   }

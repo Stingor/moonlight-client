@@ -31,7 +31,7 @@ constexpr float kSameYaw = 1e-4F;
 }  // namespace
 
 bool MonsterModel::Load(std::string_view resource_name) {
-  if (ro::core::AsciiLower(resource_name) == ro::core::AsciiLower(name_)) {
+  if (ro::core::AsciiEqualsFolded(resource_name, name_)) {
     return scene_.has_value();
   }
   name_ = std::string(resource_name);

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cstddef>
 #include <format>
 #include <span>
@@ -66,12 +65,8 @@ constexpr std::string_view kBattleChatCommand = "/battlechat";
 bool IsCraftAtlasCommand(std::string_view line) {
   // Le nom s'arrête au premier blanc ; ce qui suit ne compte pas.
   const std::string_view name = line.substr(0, line.find_first_of(" \t"));
-  const auto folded_equal = [](char left, char right) {
-    return std::tolower(static_cast<unsigned char>(left)) ==
-           std::tolower(static_cast<unsigned char>(right));
-  };
-  return std::ranges::any_of(kCraftAtlasCommands, [&](std::string_view command) {
-    return std::ranges::equal(name, command, folded_equal);
+  return std::ranges::any_of(kCraftAtlasCommands, [name](std::string_view command) {
+    return ro::core::AsciiEqualsFolded(name, command);
   });
 }
 
