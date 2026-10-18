@@ -17,6 +17,7 @@
 #include "ro/vfs/trade_words.h"
 
 #include "game/database_compose.h"
+#include "game/npc_shop_cart_file.h"
 
 namespace moonclient {
 namespace {
@@ -190,7 +191,91 @@ std::vector<ro::sim::NpcShopSellLine> SellLinesOf(std::span<const ro::ui::NpcSho
   return lines;
 }
 
+std::string SavedCartRefusalText(ro::sim::SavedCartRefusal refusal) {
+  switch (refusal) {
+    case ro::sim::SavedCartRefusal::kNone:
+      break;
+    case ro::sim::SavedCartRefusal::kEmptyName:
+      return ro::core::Tr("Donne un nom au panier.");
+    case ro::sim::SavedCartRefusal::kEmptyCart:
+      return ro::core::Tr("Un panier vide ne s'enregistre pas.");
+    case ro::sim::SavedCartRefusal::kNameTaken:
+      return ro::core::Tr("Un autre panier porte déjà ce nom.");
+    case ro::sim::SavedCartRefusal::kFull:
+      return Printed(ro::core::Tr("Le carnet est plein (%zu paniers)."), ro::sim::kSavedCartLimit);
+    case ro::sim::SavedCartRefusal::kUnknown:
+      return ro::core::Tr("Ce panier n'existe plus.");
+  }
+  return {};
+}
+
 }  // namespace
+
+void NpcShopStage::SeeSaveRoot(std::filesystem::path client_root, std::uint32_t account_id) {
+  client_root_ = std::move(client_root);
+  account_id_ = account_id;
+  saved_carts_ = ro::sim::SavedCartBook(LoadSavedCarts(client_root_, account_id_));
+  saved_cart_report_.clear();
+}
+
+void NpcShopStage::FollowCartBook(const ro::ui::NpcShopWindowState& state,
+                                  const ro::ui::NpcShopCartBookAsk& asked,
+                                  const TradeContext& context) {
+  ro::sim::SavedCartRefusal refusal = ro::sim::SavedCartRefusal::kNone;
+  switch (asked.verb) {
+    case ro::ui::NpcShopCartBookVerb::kNothing:
+      return;
+    case ro::ui::NpcShopCartBookVerb::kSave: {
+      // Seul le panier d'ACHAT s'enregistre : celui de la vente désigne des
+      // cases du sac, qui ne valent que maintenant.
+      if (state.tab != ro::ui::NpcShopTab::kBuy) {
+        return;
+      }
+      std::vector<ro::sim::SavedCartLine> lines;
+      lines.reserve(state.cart.size());
+      for (const ro::ui::NpcShopCartLine& line : state.cart) {
+        lines.push_back({.item_id = line.item_id,
+                         .amount = line.amount,
+                         .item_name = context.items.NameOf(line.item_id)});
+      }
+      refusal = saved_carts_.Save(asked.name, lines);
+      break;
+    }
+    case ro::ui::NpcShopCartBookVerb::kRename:
+      refusal = saved_carts_.Rename(asked.index, asked.name);
+      break;
+    case ro::ui::NpcShopCartBookVerb::kRemove:
+      refusal = saved_carts_.Remove(asked.index);
+      break;
+  }
+  saved_cart_report_ = SavedCartRefusalText(refusal);
+  if (refusal != ro::sim::SavedCartRefusal::kNone) {
+    return;
+  }
+  // ⚠ SANS COMPTE, RIEN NE S'ÉCRIT : le carnet vaut pour la partie seule.
+  if (account_id_ != 0 && !SaveSavedCarts(client_root_, account_id_, saved_carts_.all())) {
+    saved_cart_report_ = ro::core::Tr("Le fichier des paniers n'a pas pu être écrit.");
+  }
+}
+
+void NpcShopStage::ComposeSavedCarts() {
+  const std::span<const ro::sim::SavedCart> carts = saved_carts_.all();
+  saved_cart_lines_.resize(carts.size());
+  saved_cart_views_.clear();
+  saved_cart_views_.reserve(carts.size());
+  for (std::size_t index = 0; index < carts.size(); ++index) {
+    std::vector<ro::ui::NpcShopSavedCartLineView>& lines = saved_cart_lines_[index];
+    lines.clear();
+    for (const ro::sim::SavedCartLine& line : carts[index].lines) {
+      lines.push_back(
+          {.item_id = line.item_id, .amount = line.amount, .item_name = line.item_name});
+    }
+    saved_cart_views_.push_back({.name = carts[index].name, .lines = lines});
+  }
+  view_.saved_carts = saved_cart_views_;
+  view_.saved_cart_capacity = ro::sim::kSavedCartLimit;
+  view_.saved_cart_report = saved_cart_report_;
+}
 
 void NpcShopStage::StartSession() {
   shop_.CloseSilently();
@@ -245,6 +330,7 @@ void NpcShopStage::Follow(ro::ui::NpcShopWindowState& state,
   if (!shown) {
     return;
   }
+  FollowCartBook(state, answer.cart_book, context);
   if (answer.drop_refused) {
     context.world.RecordChat(ro::sim::ChatKind::kServer, 0,
                              ro::core::Tr("Ce PNJ n'achète pas cet item."), context.now_ms,
@@ -362,6 +448,7 @@ void NpcShopStage::Advance(ro::ui::NpcShopWindowState& state,
                           shop_.deals() != ro::sim::NpcShopDeals::kSellOnly);
     close_after_sale_ = false;
     outcome_text_.clear();
+    saved_cart_report_.clear();
     // LA BOUTIQUE NOMMÉE S'OUVRE SUR L'ACHAT : sa liste se demande tout de
     // suite, sans passer par la fenêtre « Acheter / Vendre » du client
     // d'origine.
@@ -502,6 +589,7 @@ void NpcShopStage::Compose(const ro::ui::NpcShopWindowState& state, const TradeC
   view_.outcome = outcome_text_;
   view_.awaiting = shop_.awaiting_result();
   ComposeVerdict(state, context);
+  ComposeSavedCarts();
 }
 
 void NpcShopStage::ComposeVerdict(const ro::ui::NpcShopWindowState& state,

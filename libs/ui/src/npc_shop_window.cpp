@@ -17,6 +17,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "item_drag.h"
+#include "npc_shop_saved_carts_menu.h"
 #include "trade_gestures.h"
 #include "ui_scale.h"
 #include "ui_text.h"
@@ -160,6 +161,7 @@ void DrawTabs(NpcShopWindowState& state, const NpcShopView& view, const SkinArt&
       if (state.tab != which && !state.force_tab) {
         state.tab = which;
         state.cart.clear();
+        state.saved.load_note.clear();
         state.close_after_sale = false;
         action.tab_changed = true;
       }
@@ -178,6 +180,7 @@ void DrawTabs(NpcShopWindowState& state, const NpcShopView& view, const SkinArt&
 
 void DrawBuyList(NpcShopWindowState& state, const NpcShopView& view, const SkinArt& art,
                  NpcShopWindowAction& action) {
+  DrawNpcShopSavedCarts(state, view, art, action);
   const float scale = Scale();
   const bool market = view.kind == NpcShopWindowKind::kMarket;
   const int columns = market ? 4 : 3;
@@ -558,6 +561,11 @@ void OpenNpcShopOn(NpcShopWindowState& state, std::uint32_t opening_seq, bool bu
   state.cart.clear();
   state.close_after_sale = false;
   state.pending_sale.clear();
+  // Les saisies du menu des paniers survivent ; ce qu'un chargement a laissé
+  // parlait de l'autre boutique.
+  state.saved.load_note.clear();
+  state.saved.renaming = -1;
+  state.saved.removing = -1;
 }
 
 bool AddToNpcShopCart(std::vector<NpcShopCartLine>& cart, const NpcShopCartLine& line) {

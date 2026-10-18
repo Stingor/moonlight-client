@@ -494,6 +494,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   database_.BorrowSheetFrom(*item_description_,
                             pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
   pieces_.trade.vending().SeeSaveRoot(client_root_);
+  // Les paniers d'achat enregistrés, sous l'identifiant du COMPTE.
+  pieces_.trade.npc_shop().SeeSaveRoot(client_root_, ticket_.account.account_id);
   pieces_.trade.StartSession();
   windows_.trade = TradeWindows{};
   // LE COURRIER AUSSI : ni boîte, ni écriture ne survivent à la partie.

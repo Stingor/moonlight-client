@@ -5,12 +5,14 @@
 // gestes deviennent sur le fil.
 
 #include <cstdint>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "ro/sim/npc_shop.h"
+#include "ro/sim/npc_shop_saved_carts.h"
 #include "ro/ui/npc_shop_window.h"
 #include "ro/vfs/item_link.h"
 
@@ -39,7 +41,13 @@ class NpcShopStage {
   [[nodiscard]] ro::sim::NpcShop& shop() noexcept { return shop_; }
   [[nodiscard]] const ro::sim::NpcShop& shop() const noexcept { return shop_; }
 
-  // Une partie commence : rien de la précédente ne survit.
+  // LES PANIERS ENREGISTRÉS DE CE COMPTE, relus de `savedata\` : chaque
+  // changement du carnet y est aussitôt réécrit.
+  void SeeSaveRoot(std::filesystem::path client_root, std::uint32_t account_id);
+  [[nodiscard]] const ro::sim::SavedCartBook& saved_carts() const noexcept { return saved_carts_; }
+
+  // Une partie commence : rien de la précédente ne survit, que les paniers
+  // enregistrés.
   void StartSession();
 
   // L'IMAGE : la réponse de la fenêtre à l'image précédente, la fermeture due
@@ -64,8 +72,16 @@ class NpcShopStage {
   void Compose(const ro::ui::NpcShopWindowState& state, const TradeContext& context);
   void ComposeVerdict(const ro::ui::NpcShopWindowState& state, const TradeContext& context);
   void AskList(ro::sim::NpcShopSide side, const TradeContext& context);
+  void FollowCartBook(const ro::ui::NpcShopWindowState& state,
+                      const ro::ui::NpcShopCartBookAsk& asked, const TradeContext& context);
+  void ComposeSavedCarts();
 
   ro::sim::NpcShop shop_;
+  std::filesystem::path client_root_;
+  std::uint32_t account_id_ = 0;
+  ro::sim::SavedCartBook saved_carts_;
+  // Le dernier refus ou la dernière panne du carnet, montré sous son menu.
+  std::string saved_cart_report_;
   // Le rang du dernier résultat déjà dit dans la conversation.
   std::uint32_t outcome_said_ = 0;
   // La liste demandée pour cette ouverture, pour ne pas la redemander à chaque
@@ -93,6 +109,8 @@ class NpcShopStage {
   std::string unit_;
   std::string outcome_text_;
   std::string cart_weight_;
+  std::vector<std::vector<ro::ui::NpcShopSavedCartLineView>> saved_cart_lines_;
+  std::vector<ro::ui::NpcShopSavedCartView> saved_cart_views_;
   ro::ui::NpcShopView view_;
 };
 

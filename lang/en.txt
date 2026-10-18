@@ -19599,3 +19599,51 @@ tr: All of this item's card slots are taken.
 
 fr: Cette carte ne se sertit pas sur ce type d'équipement.
 tr: This card cannot be compounded into this type of equipment.
+
+fr: %.*s — %zu item(s)
+tr: %.*s — %zu item(s)
+
+fr: %zu item(s) absent(s) de cette boutique : %s
+tr: %zu item(s) not sold in this shop: %s
+
+fr: %zu item(s) non ajouté(s), pile déjà pleine : %s
+tr: %zu item(s) not added, stack already full: %s
+
+fr: Ajoute ces items au panier courant ; rien ne s'achète avant « Acheter ».
+tr: Adds these items to the current cart; nothing is bought until "Buy".
+
+fr: Aucun panier enregistré.
+tr: No saved cart.
+
+fr: Ce panier n'existe plus.
+tr: This cart no longer exists.
+
+fr: Donne un nom au panier.
+tr: Give the cart a name.
+
+fr: Enregistre le panier, ou recharge un panier enregistré.
+tr: Save the cart, or load a saved cart.
+
+fr: Enregistrer le panier
+tr: Save the cart
+
+fr: Le carnet est plein (%zu paniers).
+tr: The list is full (%zu carts).
+
+fr: Le fichier des paniers n'a pas pu être écrit.
+tr: The carts file could not be written.
+
+fr: Paniers
+tr: Carts
+
+fr: Un autre panier porte déjà ce nom.
+tr: Another cart already has this name.
+
+fr: Un nom déjà pris met ce panier à jour.
+tr: An existing name updates that cart.
+
+fr: Un panier vide ne s'enregistre pas.
+tr: An empty cart cannot be saved.
+
+fr: nom du panier
+tr: cart name

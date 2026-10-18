@@ -2,11 +2,13 @@
 
 #include <cstdint>
 #include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
 #include <imgui.h>
 
+#include "ro/ui/npc_shop_saved_carts.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/trade_widgets.h"
 
@@ -127,6 +129,13 @@ struct NpcShopView {
   std::span<const std::string_view> blockers;
   std::int64_t cart_total = 0;
   std::string_view cart_weight;
+
+  // LES PANIERS ENREGISTRÉS DU COMPTE, dans l'ordre du carnet, et combien il
+  // en tient. `saved_cart_report` : le dernier refus ou la dernière panne du
+  // carnet, déjà écrit ; vide sinon.
+  std::span<const NpcShopSavedCartView> saved_carts;
+  std::size_t saved_cart_capacity = 0;
+  std::string_view saved_cart_report;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -154,6 +163,8 @@ struct NpcShopWindowState {
   bool sale_asked = false;
   // Le menu qu'un clic droit sur un item a armé ; son jeton est la case du sac.
   ItemLinkMenu item_menu;
+  // « Paniers ▾ » : ses saisies, et ce que le dernier chargement a laissé.
+  NpcShopSavedCartsState saved;
 };
 
 struct NpcShopWindowAction {
@@ -180,6 +191,9 @@ struct NpcShopWindowAction {
   // UN ITEM DU SAC A ÉTÉ LÂCHÉ SUR LA VENTE, mais le PNJ ne l'achète pas —
   // ou il est porté : `app` le dit.
   bool drop_refused = false;
+  // Ce que « Paniers ▾ » demande au carnet. ⚠ « ENREGISTRER » PREND LE PANIER
+  // DE `state.cart` : `app` le lit là.
+  NpcShopCartBookAsk cart_book;
 };
 
 // Remet la fenêtre à l'état d'une ouverture neuve, sur l'onglet qu'offre la
@@ -210,6 +224,25 @@ void AddNpcShopSellKind(std::vector<NpcShopCartLine>& cart, const NpcShopView& v
 [[nodiscard]] bool NpcShopSaleNeedsConfirmation(const NpcShopWindowState& state,
                                                 const NpcShopView& view,
                                                 std::span<const NpcShopCartLine> lines);
+
+// CE QU'UN CHARGEMENT N'A PAS MIS AU PANIER, par le nom montré de chaque objet.
+struct NpcShopCartLoad {
+  // Les objets que cette boutique ne vend pas.
+  std::vector<std::string> absent;
+  // Les objets qu'elle vend, mais dont la pile du sac est déjà pleine.
+  std::vector<std::string> full;
+};
+
+// 🔴 CHARGE UN PANIER ENREGISTRÉ : chaque objet que la boutique vend AJOUTE sa
+// quantité au panier courant, par `AddToNpcShopCart` et avec les bornes de sa
+// ligne — exactement ce que ferait un clic. Les autres sont rendus, pour que la
+// fenêtre dise ce qui manque.
+[[nodiscard]] NpcShopCartLoad LoadNpcShopSavedCart(std::vector<NpcShopCartLine>& cart,
+                                                   const NpcShopView& view,
+                                                   const NpcShopSavedCartView& saved);
+
+// La ligne grise qui dit ce qu'un chargement a laissé ; vide s'il a tout pris.
+[[nodiscard]] std::string NpcShopCartLoadNote(const NpcShopCartLoad& load);
 
 // Dessine la fenêtre si elle est ouverte. `link_facts` : ce que le
 // menu d'un item sait d'avance — vote shop, album.

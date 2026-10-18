@@ -19599,3 +19599,51 @@ tr: Todas las ranuras de este item están ocupadas.
 
 fr: Cette carte ne se sertit pas sur ce type d'équipement.
 tr: Esta carta no se puede insertar en este tipo de equipo.
+
+fr: %.*s — %zu item(s)
+tr: %.*s — %zu item(s)
+
+fr: %zu item(s) absent(s) de cette boutique : %s
+tr: %zu item(s) que esta tienda no vende: %s
+
+fr: %zu item(s) non ajouté(s), pile déjà pleine : %s
+tr: %zu item(s) no añadido(s), pila ya llena: %s
+
+fr: Ajoute ces items au panier courant ; rien ne s'achète avant « Acheter ».
+tr: Añade estos items al carrito actual; nada se compra antes de «Comprar».
+
+fr: Aucun panier enregistré.
+tr: Ningún carrito guardado.
+
+fr: Ce panier n'existe plus.
+tr: Este carrito ya no existe.
+
+fr: Donne un nom au panier.
+tr: Ponle un nombre al carrito.
+
+fr: Enregistre le panier, ou recharge un panier enregistré.
+tr: Guarda el carrito, o carga un carrito guardado.
+
+fr: Enregistrer le panier
+tr: Guardar el carrito
+
+fr: Le carnet est plein (%zu paniers).
+tr: La lista está llena (%zu carritos).
+
+fr: Le fichier des paniers n'a pas pu être écrit.
+tr: No se pudo escribir el archivo de carritos.
+
+fr: Paniers
+tr: Carritos
+
+fr: Un autre panier porte déjà ce nom.
+tr: Otro carrito ya tiene este nombre.
+
+fr: Un nom déjà pris met ce panier à jour.
+tr: Un nombre ya usado actualiza ese carrito.
+
+fr: Un panier vide ne s'enregistre pas.
+tr: Un carrito vacío no se puede guardar.
+
+fr: nom du panier
+tr: nombre del carrito

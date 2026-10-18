@@ -125,6 +125,7 @@ add_library(ro_sim STATIC
     src/progress_bar.cpp
     src/npc_shop.cpp
     src/npc_shop_cart.cpp
+    src/npc_shop_saved_carts.cpp
     src/world_pvp_rings.cpp
     src/world_skill_unit_speech.cpp
     src/world_support.cpp)

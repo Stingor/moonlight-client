@@ -150,6 +150,7 @@ add_library(ro_ui STATIC
     src/npc_dialog_parse.cpp
     src/npc_dialog_window.cpp
     src/npc_shop_window.cpp
+    src/npc_shop_saved_carts.cpp
     src/minimap_battle_mates.cpp
     src/minimap_layers.cpp
     src/minimap_settings.cpp
