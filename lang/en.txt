@@ -19852,3 +19852,39 @@ tr: Volume
 
 fr: Écouter le fichier choisi
 tr: Listen to the chosen file
+
+fr: Bibliothèque de modèles
+tr: Model library
+
+fr: En images…
+tr: As pictures…
+
+fr: Ouvre la bibliothèque en grille de vignettes, rangée par dossiers.
+tr: Opens the library as a grid of thumbnails, sorted by folder.
+
+fr: Tous les modèles
+tr: All models
+
+fr: Récents
+tr: Recent
+
+fr: Modèles montrés
+tr: Models shown
+
+fr: Aucun favori : un clic droit sur une vignette l'y ajoute.
+tr: No favorites: right-click a thumbnail to add it.
+
+fr: Aucun modèle posé récemment.
+tr: No model placed recently.
+
+fr: Aucun modèle ne passe le filtre.
+tr: No model matches the filter.
+
+fr: Un clic choisit un modèle ; un double-clic, ou Entrée, l'ajoute à la carte, là où regarde la caméra.
+tr: A click picks a model; a double-click, or Enter, adds it to the map where the camera is looking.
+
+fr: Un clic droit sur une vignette l'ajoute aux favoris ou l'en retire. Les modèles posés récemment se retrouvent sous « Récents ».
+tr: Right-clicking a thumbnail adds it to or removes it from the favorites. Recently placed models are found under "Recent".
+
+fr: Le filtre cherche chaque mot dans le chemin du modèle. Les vignettes se gardent dans le dossier du client : elles reviennent aussitôt à l'ouverture suivante.
+tr: The filter looks for each word in the model's path. Thumbnails are kept in the client folder: they come back at once the next time it opens.

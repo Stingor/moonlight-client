@@ -2,12 +2,14 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/core/file_stamp.h"
 #include "ro/formats/grf.h"
 #include "ro/vfs/res_name_table.h"
 
@@ -78,6 +80,11 @@ class Vfs {
   // veut savoir ce que l'installation POSSÈDE n'a pas à décompresser douze mille
   // bitmaps pour le dire.
   [[nodiscard]] bool ContainsRaw(std::string_view cp949_path) const;
+
+  // L'ÉTAT DU FICHIER QUE `Read` SERVIRAIT, sans le lire : la copie du disque si
+  // elle existe, sinon l'entrée de la première archive qui le porte. Vide
+  // quand le fichier n'est nulle part. Voir `core::FileStamp`.
+  [[nodiscard]] std::optional<core::FileStamp> Stamp(std::string_view utf8_path) const;
 
   // Noms UTF-8, triés et dédoublonnés, du disque comme des archives.
   [[nodiscard]] std::vector<std::string> List(std::string_view utf8_prefix,

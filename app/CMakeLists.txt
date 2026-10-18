@@ -413,13 +413,15 @@ target_include_directories(moonclient_companionai PUBLIC ${CMAKE_CURRENT_SOURCE_
 # habituelle : ils ne connaissent que le sac, la table des raccourcis et
 # yaml-cpp. Ce qu'un preset retire et remet se décide ici, et une pièce
 # désignée deux fois ne se verrait sinon qu'en jeu, le jour où un accessoire
-# disparaît au lieu de revenir. Les fichiers des préréglages de stats et des
-# paniers d'achat enregistrés y logent aussi : même modèle, même yaml-cpp.
+# disparaît au lieu de revenir. Les fichiers des préréglages de stats, des
+# paniers d'achat enregistrés et des favoris de la bibliothèque de modèles y
+# logent aussi : même modèle, même yaml-cpp.
 add_library(moonclient_presets STATIC
     character/equip_preset_file.cpp
     character/equip_presets.cpp
     character/stat_preset_file.cpp
-    game/npc_shop_cart_file.cpp)
+    game/npc_shop_cart_file.cpp
+    world/model_shelf_file.cpp)
 
 target_link_libraries(moonclient_presets
     PUBLIC moonclient_hotkeys ro_sim
@@ -1663,6 +1665,7 @@ add_executable(moonclient
     game/game_sky.cpp
     game/game_grey_world.cpp
     game/game_map_editor.cpp
+    world/model_library_desk.cpp
     world/model_previews.cpp
     game/game_map_ground.cpp
     game/game_map_effects.cpp

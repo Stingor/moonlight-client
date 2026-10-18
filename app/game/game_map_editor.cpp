@@ -34,21 +34,6 @@
 namespace moonclient {
 namespace {
 
-constexpr std::string_view kModelFolder = "data\\model\\";
-constexpr std::string_view kModelExtension = ".rsm";
-
-// LES MODÈLES DE L'INSTALLATION, relatifs à data\model\ : ce que la
-// bibliothèque de l'éditeur propose.
-std::vector<std::string> ModelLibrary(ro::vfs::Vfs& vfs) {
-  std::vector<std::string> files = vfs.List(kModelFolder, kModelExtension);
-  for (std::string& file : files) {
-    if (file.size() > kModelFolder.size()) {
-      file.erase(0, kModelFolder.size());
-    }
-  }
-  return files;
-}
-
 // UN SPRITE SAISI PAR SON NUMÉRO s'écrit sous son nom, quand la table des
 // classes le connaît : le document se relit mieux ainsi.
 void NameMapSprite(ro::ui::MapEditorIntent& intent, const ro::render::SpriteCatalog* catalog) {
@@ -233,7 +218,7 @@ void Game::ServeMapEditorTools() {
   // SANS LE DROIT, le mode se ferme : il peut se perdre en cours de session.
   if (!Rights().staff_tools || !stage_.has_value()) {
     map_editor_.Leave();
-    model_previews_.Clear();
+    editor_libraries_.models.Clear();
     tools.map_editor_intents.clear();
     tools.map_editor = ro::ui::MapEditorView();
     return;
@@ -254,6 +239,7 @@ void Game::ServeMapEditorTools() {
       Listen(audio_, *vfs_, *outcome.listen);
     }
   };
+  editor_libraries_.models.NoteIntents(tools.map_editor_intents);
   for (ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
     NameMapSprite(intent, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog() : nullptr);
     apply(intent);
@@ -280,22 +266,18 @@ void Game::ServeMapEditorTools() {
       sprite.frame_count = counts.frame_count;
     }
   }
-  // LES BIBLIOTHÈQUES, lues une fois dans l'installation, à la première
-  // ouverture.
-  if (map_editor_.active() && editor_libraries_.models == nullptr) {
-    editor_libraries_.models =
-        std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));
+  // LES SONS, lus une fois dans l'installation, à la première ouverture.
+  if (map_editor_.active() && editor_libraries_.sounds == nullptr) {
     editor_libraries_.sounds =
         std::make_shared<const std::vector<std::string>>(SoundLibrary(*vfs_));
   }
-  tools.map_editor.library = editor_libraries_.models;
   tools.map_editor.sound_library = editor_libraries_.sounds;
-  // L'APERÇU DU MODÈLE que le panneau survolait à l'image précédente.
+  // LA BIBLIOTHÈQUE DE MODÈLES ET LES VIGNETTES que le panneau demandait à
+  // l'image précédente.
   if (map_editor_.active()) {
-    model_previews_.BeginFrame();
-    tools.map_editor.preview = model_previews_.Show(*vfs_, tools.map_editor_panel.hovered_model);
+    editor_libraries_.models.Serve(*vfs_, tools.map_editor, tools.map_editor_panel);
   } else {
-    model_previews_.Clear();
+    editor_libraries_.models.Clear();
   }
   if (!map_editor_.active() || !map_editor_.selected().has_value()) {
     map_editor_.SetGizmo(GizmoFrame(), {});
@@ -359,8 +341,9 @@ void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float wi
   // encore nommer le sommet désigné. Ses traits gardent la boîte du modèle.
   std::vector<ro::ui::MapEditorLine> lines = std::move(view.lines);
   ro::ui::MapEditorPreview preview = std::move(view.preview);
+  ro::ui::ModelLibraryView library = std::move(view.library);
   view = map_editor_.View(stage_->scene, map_edits_);
-  view.library = editor_libraries_.models;
+  view.library = std::move(library);
   view.sound_library = editor_libraries_.sounds;
   view.preview = std::move(preview);
   const std::vector<ro::ui::MapEditorLine> dots = map_editor_.VertexTrace();

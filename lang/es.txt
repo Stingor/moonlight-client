@@ -19852,3 +19852,39 @@ tr: Volumen
 
 fr: Écouter le fichier choisi
 tr: Escuchar el archivo elegido
+
+fr: Bibliothèque de modèles
+tr: Biblioteca de modelos
+
+fr: En images…
+tr: En imágenes…
+
+fr: Ouvre la bibliothèque en grille de vignettes, rangée par dossiers.
+tr: Abre la biblioteca en cuadrícula de miniaturas, ordenada por carpetas.
+
+fr: Tous les modèles
+tr: Todos los modelos
+
+fr: Récents
+tr: Recientes
+
+fr: Modèles montrés
+tr: Modelos mostrados
+
+fr: Aucun favori : un clic droit sur une vignette l'y ajoute.
+tr: Ningún favorito: un clic derecho en una miniatura lo añade.
+
+fr: Aucun modèle posé récemment.
+tr: Ningún modelo colocado recientemente.
+
+fr: Aucun modèle ne passe le filtre.
+tr: Ningún modelo pasa el filtro.
+
+fr: Un clic choisit un modèle ; un double-clic, ou Entrée, l'ajoute à la carte, là où regarde la caméra.
+tr: Un clic elige un modelo; un doble clic, o Intro, lo añade al mapa donde mira la cámara.
+
+fr: Un clic droit sur une vignette l'ajoute aux favoris ou l'en retire. Les modèles posés récemment se retrouvent sous « Récents ».
+tr: Un clic derecho en una miniatura la añade a los favoritos o la quita. Los modelos colocados recientemente están en «Recientes».
+
+fr: Le filtre cherche chaque mot dans le chemin du modèle. Les vignettes se gardent dans le dossier du client : elles reviennent aussitôt à l'ouverture suivante.
+tr: El filtro busca cada palabra en la ruta del modelo. Las miniaturas se guardan en la carpeta del cliente: vuelven al instante la próxima vez que se abre.

@@ -68,14 +68,6 @@ inline constexpr bool kIsSoundIntent = std::is_same_v<Intent, ro::ui::map_editor
                                        std::is_same_v<Intent, ro::ui::map_editor::AddSound> ||
                                        std::is_same_v<Intent, ro::ui::map_editor::ListenSound>;
 
-// LES BIBLIOTHÈQUES DE L'ÉDITEUR, lues dans l'installation à sa première
-// ouverture : les modèles, relatifs à data\model\, et les sons, relatifs à
-// data\wav\.
-struct MapEditorLibraries {
-  std::shared_ptr<const std::vector<std::string>> models;
-  std::shared_ptr<const std::vector<std::string>> sounds;
-};
-
 class MapEditorSession {
  public:
   // Ce qu'une intention demande à l'appelant.

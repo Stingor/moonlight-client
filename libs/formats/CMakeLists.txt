@@ -51,6 +51,7 @@ add_library(ro_formats STATIC
     src/strict_text.cpp
     src/tga.cpp
     src/thor.cpp
+    src/vignette_file.cpp
     src/water_field.cpp
     src/web_picture.cpp)
 add_library(ro::formats ALIAS ro_formats)

@@ -13,6 +13,7 @@
 
 #include "ro/ui/map_cells.h"
 #include "ro/ui/map_editor_hours.h"
+#include "ro/ui/map_editor_library.h"
 #include "ro/ui/map_editor_sounds.h"
 #include "ro/ui/map_editor_sprite_view.h"
 #include "ro/ui/skin_art.h"
@@ -197,18 +198,6 @@ struct MapEditorGround {
   std::size_t selected_points = 0;
   std::size_t selected_edited = 0;
 };
-// L'APERÇU D'UN MODÈLE SURVOLÉ dans l'arbre de la scène ou la bibliothèque :
-// la vignette que l'appelant a rendue pour le fichier que le panneau survolait
-// à l'image précédente.
-struct MapEditorPreview {
-  // Relatif à data\model\, en UTF-8 ; vide sans survol.
-  std::string file;
-  // La vignette, une fois rendue.
-  SkinImage image;
-  // Le fichier ne se lit pas, ou n'a rien à montrer.
-  bool failed = false;
-};
-
 struct MapEditorLine {
   glm::vec2 from{0.0F, 0.0F};
   glm::vec2 to{0.0F, 0.0F};
@@ -260,9 +249,9 @@ struct MapEditorView {
   std::shared_ptr<const std::vector<MapEditorModelRow>> models;
   // Ce que le mode trace par-dessus la vue.
   std::vector<MapEditorLine> lines;
-  // LA BIBLIOTHÈQUE : les fichiers de modèles de l'installation, relatifs à
-  // data\model\, triés. Partagée et non recopiée : elle en compte des milliers.
-  std::shared_ptr<const std::vector<std::string>> library;
+  // LA BIBLIOTHÈQUE : les modèles de l'installation, leurs dossiers, les
+  // favoris, les récents et les vignettes. Voir `ModelLibraryView`.
+  ModelLibraryView library;
   // LES LUMIÈRES PONCTUELLES du document, et celle qu'on règle.
   std::vector<MapEditorLight> lights;
   std::optional<std::size_t> selected_light;
@@ -283,7 +272,8 @@ struct MapEditorView {
   std::shared_ptr<const std::vector<std::string>> sound_library;
   // LE RELIEF : la brosse, et ce que le document retouche.
   MapEditorGround ground;
-  // L'aperçu du modèle survolé.
+  // L'aperçu du modèle survolé dans l'arbre, la liste ou la grille : la
+  // vignette du fichier que le panneau survolait à l'image précédente.
   MapEditorPreview preview;
   // Le document diffère de celui qui est enregistré.
   bool unsaved = false;
@@ -491,9 +481,12 @@ struct MapEditorPanelState {
   // Le filtre de la bibliothèque, et le fichier qu'on y a choisi.
   std::array<char, kFilterCapacity> library_filter{};
   std::string library_choice;
-  // LE FICHIER SURVOLÉ dans l'arbre ou la bibliothèque, relatif à data\model\ ;
-  // vide sans survol. Refait à chaque image : l'appelant en rend l'aperçu.
+  // LE FICHIER SURVOLÉ dans l'arbre, la liste ou la grille, relatif à
+  // data\model\ ; vide sans survol. Refait à chaque image : l'appelant en rend
+  // l'aperçu.
   std::string hovered_model;
+  // La fenêtre « Bibliothèque de modèles ».
+  ModelLibraryWindowState library_window;
 
   std::array<char, kWhyCapacity> why{};
   // Le modèle dont `why` est la saisie : un autre modèle la recharge.

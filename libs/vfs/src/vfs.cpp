@@ -8,6 +8,7 @@
 
 #include "ro/core/ascii.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 #include "ro/vfs/encoding.h"
 
 namespace ro::vfs {
@@ -245,6 +246,36 @@ bool Vfs::ContainsRaw(std::string_view cp949_path) const {
   }
   return std::ranges::any_of(
       archives_, [&key](const MountedArchive& mounted) { return mounted.archive.Contains(key); });
+}
+
+std::optional<core::FileStamp> Vfs::Stamp(std::string_view utf8_path) const {
+  const std::string key = ToLookupKey(utf8_path);
+  if (const std::filesystem::path on_disk = ResolveOnDisk(key); !on_disk.empty()) {
+    std::error_code failed;
+    const std::uintmax_t size = std::filesystem::file_size(on_disk, failed);
+    if (failed) {
+      return std::nullopt;
+    }
+    const std::filesystem::file_time_type written =
+        std::filesystem::last_write_time(on_disk, failed);
+    if (failed) {
+      return std::nullopt;
+    }
+    return core::FileStamp{.origin = core::FileStamp::Origin::kDisk,
+                           .stored_size = size,
+                           .size = size,
+                           .written_ticks = written.time_since_epoch().count()};
+  }
+  for (const MountedArchive& mounted : archives_) {
+    if (const formats::GrfEntry* entry = mounted.archive.Find(key); entry != nullptr) {
+      return core::FileStamp{.origin = core::FileStamp::Origin::kArchive,
+                             .container = core::Utf8FromPath(mounted.path.filename()),
+                             .offset = entry->data_offset,
+                             .stored_size = entry->compressed_size,
+                             .size = entry->real_size};
+    }
+  }
+  return std::nullopt;
 }
 
 bool Vfs::Contains(std::string_view utf8_path) const {

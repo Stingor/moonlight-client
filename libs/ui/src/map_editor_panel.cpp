@@ -28,6 +28,8 @@
 #include "ro/ui/window_name.h"
 
 #include "imgui.h"
+#include "map_editor_library_window.h"
+#include "map_editor_names_font.h"
 
 namespace ro::ui {
 namespace {
@@ -193,56 +195,6 @@ bool PassesFilter(const MapEditorModelRow& row, std::string_view filter) {
   return !found.empty();
 }
 
-// LES NOMS DE FICHIERS DANS LEUR POLICE, le temps d'un bloc : voir
-// `MapEditorPanelState::names_font`.
-class NamesFont {
- public:
-  explicit NamesFont(ImFont* font) : pushed_(font != nullptr) {
-    if (pushed_) {
-      // Taille nulle : celle du texte courant.
-      ImGui::PushFont(font, 0.0F);
-    }
-  }
-  NamesFont(const NamesFont&) = delete;
-  NamesFont& operator=(const NamesFont&) = delete;
-  ~NamesFont() {
-    if (pushed_) {
-      ImGui::PopFont();
-    }
-  }
-
- private:
-  bool pushed_;
-};
-
-// L'APERÇU AU SURVOL de la ligne qu'on vient de poser : le fichier survolé est
-// noté pour l'appelant, et la bulle montre sa vignette si la vue la porte —
-// sinon qu'elle vient, ou que le fichier ne se lit pas.
-void PreviewOnHover(const MapEditorView& view, MapEditorPanelState& panel,
-                    const std::string& file) {
-  if (!ImGui::IsItemHovered()) {
-    return;
-  }
-  panel.hovered_model = file;
-  const MapEditorPreview& preview = view.preview;
-  const bool ready = preview.file == file;
-  if (!BeginSkinTooltip(ready && preview.image.usable() ? preview.image.width : 0.0F)) {
-    return;
-  }
-  {
-    const NamesFont names(panel.names_font);
-    ImGui::TextUnformatted(file.c_str());
-  }
-  if (ready && preview.image.usable()) {
-    ImGui::Image(preview.image.id, ImVec2(preview.image.width, preview.image.height));
-  } else if (ready && preview.failed) {
-    ImGui::TextDisabled("%s", core::Tr("Ce modèle ne se lit pas."));
-  } else {
-    ImGui::TextDisabled("%s", core::Tr("Aperçu…"));
-  }
-  EndSkinTooltip();
-}
-
 // LE CLAVIER D'UNE LISTE de l'éditeur, dans sa fenêtre fille focalisée — les
 // gestes de toute liste du jeu, voir `PressedListKey` : le rang visé parmi
 // `count` lignes, depuis `current`, ou `kListNoEntry`.
@@ -367,7 +319,7 @@ void DrawSceneTree(const MapEditorView& view, MapEditorPanelState& panel,
 // s'ajoute à la carte, là où l'appelant le pose.
 void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
                  std::vector<MapEditorIntent>& intents, const SkinArt& art) {
-  if (view.library == nullptr || view.library->empty()) {
+  if (view.library.files == nullptr || view.library.files->empty()) {
     ImGui::TextDisabled("%s", core::Tr("Aucun modèle dans l'installation."));
     return;
   }
@@ -377,8 +329,8 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
   const std::string_view filter(panel.library_filter.data(),
                                 strnlen(panel.library_filter.data(), panel.library_filter.size()));
   std::vector<std::size_t> shown;
-  for (std::size_t slot = 0; slot < view.library->size(); ++slot) {
-    if (PassesFilter(MapEditorModelRow{.file = (*view.library)[slot]}, filter)) {
+  for (std::size_t slot = 0; slot < view.library.files->size(); ++slot) {
+    if (PassesFilter(MapEditorModelRow{.file = (*view.library.files)[slot]}, filter)) {
       shown.push_back(slot);
     }
   }
@@ -386,13 +338,13 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
   if (ImGui::BeginChild("##bibliotheque", ImVec2(0.0F, height), ImGuiChildFlags_Borders)) {
     int current = kListNoEntry;
     for (std::size_t line = 0; line < shown.size(); ++line) {
-      if ((*view.library)[shown[line]] == panel.library_choice) {
+      if ((*view.library.files)[shown[line]] == panel.library_choice) {
         current = static_cast<int>(line);
       }
     }
     const int keyed = KeyedRank(current, static_cast<int>(shown.size()));
     if (keyed != kListNoEntry) {
-      panel.library_choice = (*view.library)[shown[static_cast<std::size_t>(keyed)]];
+      panel.library_choice = (*view.library.files)[shown[static_cast<std::size_t>(keyed)]];
     }
     const NamesFont names(panel.names_font);
     ImGuiListClipper clipper;
@@ -402,7 +354,7 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
     }
     while (clipper.Step()) {
       for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
-        const std::string& file = (*view.library)[shown[static_cast<std::size_t>(line)]];
+        const std::string& file = (*view.library.files)[shown[static_cast<std::size_t>(line)]];
         if (ImGui::Selectable(file.c_str(), panel.library_choice == file)) {
           panel.library_choice = file;
         }
@@ -420,6 +372,12 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
     intents.emplace_back(map_editor::AddModel{panel.library_choice});
   }
   ImGui::EndDisabled();
+  ImGui::SameLine();
+  ModelLibraryWindowState& window = panel.library_window;
+  if (SkinToggleButton(core::Tr("En images…"), window.open, art)) {
+    window.open = !window.open;
+  }
+  SkinTooltip(core::Tr("Ouvre la bibliothèque en grille de vignettes, rangée par dossiers."));
 }
 
 // CE QUE LE MODE TRACE PAR-DESSUS LA VUE, sous les fenêtres.
@@ -704,9 +662,11 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
                    std::vector<MapEditorIntent>& intents, const SkinArt& art) {
   panel.hovered_model.clear();
   if (!view.active) {
+    ForgetModelLibraryWishes(panel.library_window);
     return;
   }
   DrawLines(view);
+  DrawModelLibraryWindow(view, panel, intents, art);
   // Recomposé au changement de langue seulement : voir `WindowName`.
   static WindowName name(kMapEditorTitle, kMapEditorId);
   ImGui::SetNextWindowSize(ImVec2(kFirstWidth, kFirstHeight), ImGuiCond_FirstUseEver);

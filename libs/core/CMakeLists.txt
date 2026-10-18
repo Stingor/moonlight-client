@@ -24,6 +24,7 @@ add_library(ro_core STATIC
     src/sha256.cpp
     src/startup_report.cpp
     src/text.cpp
+    src/user_cache_directory.cpp
     src/web_address.cpp
     src/web_preview_policy.cpp
     generated/case_fold_table.cpp)
@@ -47,9 +48,11 @@ target_include_directories(ro_core PUBLIC "${CMAKE_BINARY_DIR}/generated")
 # LE RAPPORT DE PLANTAGE parle au systeme : il lui demande les registres, les
 # modules charges, et un vidage qu'un debogueur rouvrira. Les trois viennent de
 # bibliotheques de Windows, et d'elles seules -- ailleurs, le rapport se
-# contente des signaux, qui sont du C standard.
+# contente des signaux, qui sont du C standard. Le DOSSIER DE CACHE de
+# l'utilisateur se demande aussi au systeme : shell32 le donne, ole32 libere
+# le texte qu'il rend.
 if(WIN32)
-    target_link_libraries(ro_core PRIVATE dbghelp)
+    target_link_libraries(ro_core PRIVATE dbghelp shell32 ole32)
 endif()
 
 # `std::stacktrace` N'EST PAS DANS LA libstdc++ ORDINAIRE : GCC 14 le range dans

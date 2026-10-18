@@ -95,7 +95,7 @@
 #include "world/map_editor_session.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
-#include "world/model_previews.h"
+#include "world/model_library_desk.h"
 #include "world/monster_sheet.h"
 #include "world/name_card_asker.h"
 #include "world/native_marker.h"
@@ -557,10 +557,8 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // LES DOCUMENTS D'ÉDITION DES CARTES, et le mode éditeur : voir docs/adr/0118.
   MapEditStore map_edits_;
   MapEditorSession map_editor_;
-  // Les bibliothèques de l'éditeur, lues à sa première ouverture.
+  // Les bibliothèques de l'éditeur : modèles, vignettes, favoris et sons.
   MapEditorLibraries editor_libraries_;
-  // Les vignettes que l'éditeur montre au survol d'un modèle.
-  ModelPreviews model_previews_;
   // Ce que l'outil Sommets sait du modèle désigné, et les fichiers qu'il a lus.
   VertexContextCache vertex_context_;
   // Le bilan par seconde du décor que l'éditeur repose.
