@@ -55,6 +55,7 @@ struct MapEditorLight {
   bool night_only = false;
   MapEditorHours hours;
   bool flicker = false;
+  bool shadow = true;
   std::string why;
 };
 
@@ -72,6 +73,7 @@ struct MapEditorEffect {
   std::array<float, 3> glow_color{2.0F, 1.4F, 0.7F};
   float glow_range = 50.0F;
   bool glow_flicker = true;
+  bool glow_shadow = true;
   std::string why;
 };
 
@@ -91,6 +93,7 @@ struct MapEditorMapEffect {
   std::array<float, 3> glow_color{2.0F, 1.4F, 0.7F};
   float glow_range = 50.0F;
   bool glow_flicker = true;
+  bool glow_shadow = true;
   std::string why;
 };
 

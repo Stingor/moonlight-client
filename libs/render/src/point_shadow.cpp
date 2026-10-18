@@ -34,7 +34,11 @@ constexpr std::array<FaceAxes, kCubeFaceCount> kFaceAxes = {{
 }  // namespace
 
 std::size_t ShadowedPointLightCount(const PointLightSet& set) {
-  return std::min({set.count, kMaxPointLights, kMaxShadowedPointLights});
+  const std::size_t count = std::min(set.count, kMaxPointLights);
+  const auto casting = static_cast<std::size_t>(
+      std::count_if(set.lights.begin(), set.lights.begin() + static_cast<std::ptrdiff_t>(count),
+                    [](const PointLight& light) { return light.casts_shadow; }));
+  return std::min(casting, kMaxShadowedPointLights);
 }
 
 float PointShadowFar(float range_world) {
@@ -108,12 +112,12 @@ PointLightSet KeepShadowedOrder(
   // garde sa carte si les plus proches qu'elle de façon nette ne la prennent pas.
   std::size_t kept = 0;
   for (std::size_t light = 0; light < count; ++light) {
-    if (!painted_rank[light].has_value()) {
+    if (!painted_rank[light].has_value() || !set.lights[light].casts_shadow) {
       continue;
     }
     std::size_t decisively_closer = 0;
     for (std::size_t other = 0; other < count; ++other) {
-      if (!painted_rank[other].has_value() &&
+      if (!painted_rank[other].has_value() && set.lights[other].casts_shadow &&
           distance[other] < kShadowSwapRatio * distance[light]) {
         ++decisively_closer;
       }
@@ -131,7 +135,7 @@ PointLightSet KeepShadowedOrder(
     if (slot[rank].has_value()) {
       continue;
     }
-    while (next < count && placed[next]) {
+    while (next < count && (placed[next] || !set.lights[next].casts_shadow)) {
       ++next;
     }
     if (next < count) {

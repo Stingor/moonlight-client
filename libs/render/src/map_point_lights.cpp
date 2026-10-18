@@ -47,6 +47,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
         .night_only = retouch.night_only,
         .hours = retouch.hours,
         .flicker = retouch.glow->flicker,
+        .shadow = retouch.glow->shadow,
         .why = retouch.why});
   }
   for (const ro::mapedit::AddedEffect& effect : edit.effects()) {
@@ -57,6 +58,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
                                                .night_only = effect.night_only,
                                                .hours = effect.hours,
                                                .flicker = effect.glow->flicker,
+                                               .shadow = effect.glow->shadow,
                                                .why = effect.why});
     }
   }
@@ -78,7 +80,8 @@ PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
         .world_position =
             frame.ToWorld(glm::vec3(light.position[0], light.position[1], light.position[2])),
         .color = glm::vec3(light.color[0], light.color[1], light.color[2]) * strength,
-        .range_world = light.range});
+        .range_world = light.range,
+        .casts_shadow = light.shadow});
   }
   return NearestPointLights(placed, eye);
 }

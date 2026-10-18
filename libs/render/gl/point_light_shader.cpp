@@ -24,7 +24,7 @@ constexpr std::size_t kDecimalBase = 10;
 
 // Le nom du lecteur de la carte cubique de rang `rank`.
 constexpr std::array<std::string_view, kMaxShadowedPointLights> kShadowSamplers = {
-    "u_point_shadow_0", "u_point_shadow_1"};
+    "u_point_shadow_0", "u_point_shadow_1", "u_point_shadow_2", "u_point_shadow_3"};
 
 // La borne que le GLSL déclare après `declaration`, lue dans son texte ; zéro
 // s'il n'en déclare pas.

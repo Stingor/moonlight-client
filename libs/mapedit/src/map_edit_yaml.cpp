@@ -56,6 +56,8 @@ constexpr std::string_view kMapEditHeader =
 #    night_only : vrai pour ne l'allumer qu'à la nuit ;
 #    hours    : facultatif, [de, à] — sa plage d'heures du serveur, de 0 à 24 ;
 #    flicker  : vrai pour qu'elle vacille, comme une torche ;
+#    shadow   : faux pour qu'elle ne projette pas d'ombre — une lumière dans
+#               une lanterne, que la lanterne boucherait ;
 #    why      : pourquoi, obligatoire.
 #  effects : les effets de carte ajoutés, chacun :
 #    number   : le numéro de l'effet, comme un objet d'effet du RSW ;
@@ -63,7 +65,8 @@ constexpr std::string_view kMapEditHeader =
 #    emit_speed, param : sa cadence et ses quatre paramètres, comme le RSW ;
 #    night_only : vrai pour ne le lever qu'à la nuit ;
 #    hours    : facultatif, [de, à] — sa plage d'heures du serveur, de 0 à 24 ;
-#    glow     : facultatif, la lumière qu'il porte — color, range, flicker ;
+#    glow     : facultatif, la lumière qu'il porte — color, range, flicker,
+#               shadow ;
 #    why      : pourquoi, obligatoire.
 #  meshes : les retouches de maillages, chacune :
 #    index, file, origin : la pose qu'elle désigne, comme une retouche de
@@ -298,6 +301,9 @@ core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_vie
   if (const YAML::Node flicker = entry["flicker"]) {
     light.flicker = flicker.as<bool>();
   }
+  if (const YAML::Node shadow = entry["shadow"]) {
+    light.shadow = shadow.as<bool>();
+  }
   return light;
 }
 
@@ -321,6 +327,9 @@ core::Result<EffectGlow> GlowFrom(const YAML::Node& glow, std::string_view map_n
   }
   if (const YAML::Node flicker = glow["flicker"]) {
     lit.flicker = flicker.as<bool>();
+  }
+  if (const YAML::Node shadow = glow["shadow"]) {
+    lit.shadow = shadow.as<bool>();
   }
   return lit;
 }
@@ -522,8 +531,13 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
   }
   std::string text = std::format("    glow:\n      color: {}\n      range: {}\n",
                                  VectorText(glow->color), glow->range);
-  if (glow->flicker) {
-    text += "      flicker: true\n";
+  // CE QUI S'ÉCARTE DU DÉFAUT s'écrit : une lueur vacille et porte ombre sans
+  // qu'on le dise.
+  if (!glow->flicker) {
+    text += "      flicker: false\n";
+  }
+  if (!glow->shadow) {
+    text += "      shadow: false\n";
   }
   return text;
 }
@@ -747,6 +761,9 @@ std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
     text += HoursText(light.hours);
     if (light.flicker) {
       text += "    flicker: true\n";
+    }
+    if (!light.shadow) {
+      text += "    shadow: false\n";
     }
     text += std::format("    why: {}\n", DoubleQuoted(light.why));
   }

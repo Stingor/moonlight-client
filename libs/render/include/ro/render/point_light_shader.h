@@ -65,7 +65,7 @@ inline constexpr std::string_view kPointLightGlsl = R"GLSL(
 // La même borne que `kMaxPointLights` côté C++.
 const int kMaxPointLights = 16;
 // La même que `kMaxShadowedPointLights` : une carte par branche de `PointVisibility`.
-const int kMaxShadowedPointLights = 2;
+const int kMaxShadowedPointLights = 4;
 uniform int u_point_count;
 uniform vec3 u_point_position[kMaxPointLights];
 uniform vec3 u_point_color[kMaxPointLights];
@@ -74,6 +74,8 @@ uniform float u_point_range[kMaxPointLights];
 uniform int u_point_shadowed;
 uniform samplerCubeShadow u_point_shadow_0;
 uniform samplerCubeShadow u_point_shadow_1;
+uniform samplerCubeShadow u_point_shadow_2;
+uniform samplerCubeShadow u_point_shadow_3;
 uniform float u_point_shadow_far[kMaxShadowedPointLights];
 // Voir `PointLight::shadow_depth` et `PointLight::shadow_spread`.
 uniform float u_point_shadow_depth[kMaxShadowedPointLights];
@@ -166,11 +168,22 @@ float PointVisibility(int index, vec3 world_position, float pull, vec3 surface_n
         return 1.0;
     }
     vec3 from_light = world_position - u_point_position[index];
-    float lit = index == 0
-                    ? PointShadowTaps(u_point_shadow_0, from_light, u_point_shadow_far[0], pull,
-                                      surface_normal, u_point_shadow_spread[0])
-                    : PointShadowTaps(u_point_shadow_1, from_light, u_point_shadow_far[1], pull,
-                                      surface_normal, u_point_shadow_spread[1]);
+    // UNE BRANCHE PAR CARTE : un lecteur de texture ne s'indexe pas par une
+    // variable en GLSL 3.30.
+    float lit;
+    if (index == 0) {
+        lit = PointShadowTaps(u_point_shadow_0, from_light, u_point_shadow_far[0], pull,
+                              surface_normal, u_point_shadow_spread[0]);
+    } else if (index == 1) {
+        lit = PointShadowTaps(u_point_shadow_1, from_light, u_point_shadow_far[1], pull,
+                              surface_normal, u_point_shadow_spread[1]);
+    } else if (index == 2) {
+        lit = PointShadowTaps(u_point_shadow_2, from_light, u_point_shadow_far[2], pull,
+                              surface_normal, u_point_shadow_spread[2]);
+    } else {
+        lit = PointShadowTaps(u_point_shadow_3, from_light, u_point_shadow_far[3], pull,
+                              surface_normal, u_point_shadow_spread[3]);
+    }
     return mix(1.0, lit, u_point_shadow_depth[index]);
 }
 

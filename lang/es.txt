@@ -18745,8 +18745,8 @@ tr: Un clic en el mundo designa el modelo del decorado bajo el ratón: gana la c
 fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
 tr: «Guardar» escribe data/map_edits/<mapa>.yml en la carpeta del cliente. Solo lo visual: el paso sigue siendo el del servidor.
 
-fr: « Pourquoi » est obligatoire : le document refuse une retouche sans raison.
-tr: «Motivo» es obligatorio: el documento rechaza un retoque sin motivo.
+fr: « Pourquoi » dit la raison d'une retouche ; sans saisie, une raison générique la dit — « Retouche de l'effet #47 ».
+tr: «Por qué» indica el motivo de un retoque; si se deja vacío, lo indica un motivo genérico — «Retoque del efecto #47».
 
 fr: Éditeur de carte
 tr: Editor de mapas
@@ -19389,3 +19389,9 @@ tr: Opacidad (%)
 
 fr: translucide
 tr: translúcido
+
+fr: Projette des ombres
+tr: Proyecta sombras
+
+fr: Décochez pour une lumière posée DANS un modèle du décor — une lanterne, un lampion : le modèle la boucherait et noircirait ce qu'il cache. Seules les quatre lumières qui portent ombre les plus proches de la caméra en projettent une.
+tr: Desmarca para una luz colocada DENTRO de un modelo del decorado — un farol, un farolillo: el modelo la taparía y ennegrecería lo que oculta. Solo las cuatro luces que proyectan sombra más cercanas a la cámara proyectan una.

@@ -28,6 +28,8 @@ struct PointLight {
   // part de la distance à la lumière. Zéro : le bord le plus net que la carte
   // permet.
   float shadow_spread = 0.0F;
+  // FAUX : elle n'a pas de carte d'ombre, et n'en prend aucune aux autres.
+  bool casts_shadow = true;
 };
 
 // Le plafond des lumières qu'un dessin reçoit : la taille des tableaux

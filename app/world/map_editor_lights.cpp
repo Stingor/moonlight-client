@@ -43,6 +43,7 @@ ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light) {
                                 .night_only = light.night_only,
                                 .hours = ShownHours(light.hours),
                                 .flicker = light.flicker,
+                                .shadow = light.shadow,
                                 .why = light.why};
 }
 
@@ -53,6 +54,7 @@ ro::mapedit::AddedLight DocumentLight(const ro::ui::MapEditorLight& light) {
                                  .night_only = light.night_only,
                                  .hours = DocumentHours(light.hours),
                                  .flicker = light.flicker,
+                                 .shadow = light.shadow,
                                  .why = light.why};
 }
 

@@ -18745,8 +18745,8 @@ tr: A click in the world selects the scenery model under the mouse: the smallest
 fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
 tr: “Save” writes data/map_edits/<map>.yml in the client folder. Visuals only: walking stays the server's.
 
-fr: « Pourquoi » est obligatoire : le document refuse une retouche sans raison.
-tr: “Why” is required: the document refuses a fix without a reason.
+fr: « Pourquoi » dit la raison d'une retouche ; sans saisie, une raison générique la dit — « Retouche de l'effet #47 ».
+tr: “Why” states the reason for an edit; when left empty, a generic reason states it — “Edit of effect #47”.
 
 fr: Éditeur de carte
 tr: Map editor
@@ -19389,3 +19389,9 @@ tr: Opacity (%)
 
 fr: translucide
 tr: translucent
+
+fr: Projette des ombres
+tr: Casts shadows
+
+fr: Décochez pour une lumière posée DANS un modèle du décor — une lanterne, un lampion : le modèle la boucherait et noircirait ce qu'il cache. Seules les quatre lumières qui portent ombre les plus proches de la caméra en projettent une.
+tr: Untick for a light placed INSIDE a scenery model — a lantern, a paper lamp: the model would block it and blacken what it hides. Only the four shadow-casting lights nearest the camera cast one.

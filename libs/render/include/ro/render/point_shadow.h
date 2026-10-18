@@ -21,9 +21,12 @@ namespace ro::render {
 // lumière désigne, lue telle quelle, le texel qui le couvre.
 
 // Les lumières qui portent ombre au plus : les plus proches de l'œil parmi
-// celles de l'image. Les suivantes éclairent sans ombre. ⚠ LA MÊME BORNE QUE
-// `kMaxShadowedPointLights` du GLSL, qui écrit une branche par carte.
-inline constexpr std::size_t kMaxShadowedPointLights = 2;
+// celles de l'image. Les suivantes éclairent sans ombre — et les personnages
+// qu'elles éclairent n'en projettent aucune : assez pour une place éclairée
+// de quelques braseros. Une carte ne se repeint qu'à son tour
+// (`kPointShadowRepaintPeriod`). ⚠ LA MÊME BORNE QUE `kMaxShadowedPointLights`
+// du GLSL, qui écrit une branche par carte.
+inline constexpr std::size_t kMaxShadowedPointLights = 4;
 
 // Le côté d'une face, en texels.
 inline constexpr int kPointShadowMapTexels = 512;
@@ -68,15 +71,17 @@ inline constexpr std::size_t kPointShadowRepaintPeriod = 2;
 // portée — la garde tant que les lumières sans ombre nettement plus proches
 // qu'elle, à moins de `kShadowSwapRatio` fois sa distance, ne suffisent pas à
 // remplir les cartes. Elle garde aussi son rang, donc sa carte : rien à
-// repeindre. Rend `set` réordonné, ses lumières ombrées d'abord.
+// repeindre. Rend `set` réordonné, ses lumières ombrées d'abord. Une lumière
+// qui ne porte pas d'ombre (`casts_shadow` faux) ne prend jamais de carte.
 inline constexpr float kShadowSwapRatio = 0.7F;
 [[nodiscard]] PointLightSet KeepShadowedOrder(
     const PointLightSet& set,
     const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
     glm::vec3 eye);
 
-// Les lumières de `set` qui portent ombre : ses `kMaxShadowedPointLights`
-// premières, déjà rangées de la plus proche de l'œil à la plus lointaine.
+// Les lumières de `set` qui portent ombre : ses premières, au plus
+// `kMaxShadowedPointLights`, autant qu'il y en a qui la projettent — voir
+// `KeepShadowedOrder`, qui les range en tête.
 [[nodiscard]] std::size_t ShadowedPointLightCount(const PointLightSet& set);
 
 // LES SIX VUES D'UNE LUMIÈRE posée en `light_position`, dans l'ordre des faces

@@ -70,7 +70,8 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
                  "liste."),
     core::TrText("Chaque retouche vérifie le rang, le fichier et la position d'origine du modèle : "
                  "une carte changée par un patch n'est pas retouchée de travers."),
-    core::TrText("« Pourquoi » est obligatoire : le document refuse une retouche sans raison."),
+    core::TrText("« Pourquoi » dit la raison d'une retouche ; sans saisie, une raison générique la "
+                 "dit — « Retouche de l'effet #47 »."),
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
                  "Le visuel seulement : la marche reste celle du serveur."),
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
@@ -648,6 +649,8 @@ void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
     released |= hours_moved.released;
   }
   toggled |= SkinCheckBox(core::Tr("Vacille"), &set.light.flicker, art);
+  toggled |= SkinCheckBox(core::Tr("Projette des ombres"), &set.light.shadow, art);
+  SkinTooltip(ShadowHelp());
   const std::string_view typed(panel.light_why.data(),
                                strnlen(panel.light_why.data(), panel.light_why.size()));
   if (panel.light_why_of != view.selected_light ||

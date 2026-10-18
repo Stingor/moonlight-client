@@ -143,6 +143,8 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
     changed |= reach.changed;
     released |= reach.released;
     toggled |= SkinCheckBox(core::Tr("Vacille"), &set.effect.glow_flicker, art);
+    toggled |= SkinCheckBox(core::Tr("Projette des ombres"), &set.effect.glow_shadow, art);
+    SkinTooltip(ShadowHelp());
   }
   const std::string_view typed(panel.map_effect_why.data(),
                                strnlen(panel.map_effect_why.data(), panel.map_effect_why.size()));
@@ -179,6 +181,13 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
 }
 
 }  // namespace
+
+const char* ShadowHelp() {
+  return core::Tr(
+      "Décochez pour une lumière posée DANS un modèle du décor — une lanterne, un lampion : le "
+      "modèle la boucherait et noircirait ce qu'il cache. Seules les quatre lumières qui portent "
+      "ombre les plus proches de la caméra en projettent une.");
+}
 
 std::string WhyTag(std::string_view why) {
   if (why.empty()) {
@@ -286,6 +295,8 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
     changed |= reach.changed;
     released |= reach.released;
     toggled |= SkinCheckBox(core::Tr("Vacille"), &set.effect.glow_flicker, art);
+    toggled |= SkinCheckBox(core::Tr("Projette des ombres"), &set.effect.glow_shadow, art);
+    SkinTooltip(ShadowHelp());
   }
   const std::string_view typed(panel.effect_why.data(),
                                strnlen(panel.effect_why.data(), panel.effect_why.size()));

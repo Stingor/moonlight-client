@@ -132,6 +132,9 @@ struct AddedLight {
   std::optional<LitHours> hours;
   // Vrai : elle vacille, comme une torche ou un feu.
   bool flicker = false;
+  // Vrai : elle projette l'ombre de ce qu'elle éclaire. Faux pour une lumière
+  // DANS un objet — une lanterne, un lampion — que l'objet boucherait.
+  bool shadow = true;
   std::string why;
 
   friend bool operator==(const AddedLight&, const AddedLight&) = default;
@@ -144,6 +147,8 @@ struct EffectGlow {
   // En unités du RSW ; strictement positive.
   float range = 50.0F;
   bool flicker = true;
+  // Voir `AddedLight::shadow`.
+  bool shadow = true;
 
   friend bool operator==(const EffectGlow&, const EffectGlow&) = default;
 };

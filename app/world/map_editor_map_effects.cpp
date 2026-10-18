@@ -61,6 +61,7 @@ void MapEditorSession::ViewMapEffects(const ro::render::MapScene& scene,
         row.glow_color = retouch->glow->color;
         row.glow_range = retouch->glow->range;
         row.glow_flicker = retouch->glow->flicker;
+        row.glow_shadow = retouch->glow->shadow;
       }
       row.why = retouch->why;
     }
@@ -159,7 +160,8 @@ MapEditorSession::Outcome MapEditorSession::SetMapEffect(
   if (set.effect.glows) {
     retouch.glow = ro::mapedit::EffectGlow{.color = set.effect.glow_color,
                                            .range = std::max(set.effect.glow_range, kBackHome),
-                                           .flicker = set.effect.glow_flicker};
+                                           .flicker = set.effect.glow_flicker,
+                                           .shadow = set.effect.glow_shadow};
   }
   ro::mapedit::MapEdit after = before;
   // Une raison seule ne garde pas la retouche : elle reçoit d'office une raison
@@ -266,8 +268,10 @@ MapEditorSession::Outcome MapEditorSession::DuplicateMapEffect(const ro::render:
                                 .why = {}};
   copy.position[0] += kDuplicateShift;
   if (shown.glows) {
-    copy.glow = ro::mapedit::EffectGlow{
-        .color = shown.glow_color, .range = shown.glow_range, .flicker = shown.glow_flicker};
+    copy.glow = ro::mapedit::EffectGlow{.color = shown.glow_color,
+                                        .range = shown.glow_range,
+                                        .flicker = shown.glow_flicker,
+                                        .shadow = shown.glow_shadow};
   }
   after.AddEffect(std::move(copy));
   store.Set(map_name_, WithReasons(after));

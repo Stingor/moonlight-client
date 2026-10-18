@@ -42,6 +42,7 @@ ro::ui::MapEditorEffect ShownEffect(const ro::mapedit::AddedEffect& effect) {
     shown.glow_color = effect.glow->color;
     shown.glow_range = effect.glow->range;
     shown.glow_flicker = effect.glow->flicker;
+    shown.glow_shadow = effect.glow->shadow;
   }
   return shown;
 }
@@ -58,7 +59,8 @@ ro::mapedit::AddedEffect DocumentEffect(const ro::ui::MapEditorEffect& shown) {
   if (shown.glows) {
     effect.glow = ro::mapedit::EffectGlow{.color = shown.glow_color,
                                           .range = std::max(shown.glow_range, kSmallestGlowRange),
-                                          .flicker = shown.glow_flicker};
+                                          .flicker = shown.glow_flicker,
+                                          .shadow = shown.glow_shadow};
   }
   return effect;
 }

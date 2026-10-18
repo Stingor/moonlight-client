@@ -12,6 +12,9 @@ namespace ro::ui {
 
 // La section « Effets » du panneau de l'éditeur de carte : voir
 // map_editor_effects_panel.cpp.
+// L'AIDE DE « Projette des ombres », sur une lumière comme sur une lueur.
+[[nodiscard]] const char* ShadowHelp();
+
 // LA RAISON D'UNE RETOUCHE au bout de sa ligne de liste, « — raison » ; rien
 // sans raison. Un « ## » y est rompu : ImGui y lirait la fin du libellé.
 [[nodiscard]] std::string WhyTag(std::string_view why);
