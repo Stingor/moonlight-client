@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "ro/render/actor_effect_table.h"
+#include "ro/render/actor_lights.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/creature_motion.h"
@@ -543,6 +544,9 @@ struct ComposedScene;
 struct ComposedScene {
   std::vector<ro::render::DrawnActor> drawn;
   std::vector<std::uint32_t> ids;
+  // LES CORPS PEINTS QUI PEUVENT PORTER UNE LUMIÈRE, copies qui s'effacent et
+  // cadavres compris : voir `ro::render::ActorLightsOf`.
+  std::vector<ro::render::ActorLightBearer> light_bearers;
   std::vector<ro::render::DrawnActor> behind;
   std::vector<ro::render::DrawnActor> front;
   // LES AUTRES ACTEURS DISSIMULÉS, hors de `drawn` : voir `ConcealedPlace`.
@@ -603,6 +607,7 @@ struct ComposedScene {
   void Clear() {
     drawn.clear();
     ids.clear();
+    light_bearers.clear();
     behind.clear();
     front.clear();
     concealed.clear();

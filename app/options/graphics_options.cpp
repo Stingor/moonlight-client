@@ -235,8 +235,10 @@ void GraphicsOptions::Compose() {
   rows_.back().disabled = !lightmaps_;
   rows_.push_back(Toggle(GraphicsRow::kEffectLights, Tr("Les sorts éclairent"),
                          Tr("Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et "
-                            "les personnages autour de lui, de la couleur de ses flammes.\n\nLe "
-                            "client d'origine ne le fait pas."),
+                            "les personnages autour de lui, de la couleur de ses flammes. Les "
+                            "monstres qui portent une flamme ou une lampe, et les feux de Sight "
+                            "et de Ruwach, éclairent aussi autour d'eux.\n\nLe client d'origine "
+                            "ne le fait pas."),
                          nullptr, effect_lights_));
   rows_.push_back(Toggle(GraphicsRow::kRoundedGround, Tr("Sol arrondi"),
                          Tr("Les dunes, les collines et les talus s'arrondissent au lieu de se "

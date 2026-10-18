@@ -18961,8 +18961,8 @@ tr: Comando no admitido, no se ha enviado nada:
 fr: Les sorts éclairent
 tr: Los hechizos iluminan
 
-fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes.\n\nLe client d'origine ne le fait pas.
-tr: Un hechizo de fuego, de rayo o de luz ilumina el suelo, el decorado y los personajes a su alrededor, con el color de sus llamas.\n\nEl cliente original no lo hace.
+fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes. Les monstres qui portent une flamme ou une lampe, et les feux de Sight et de Ruwach, éclairent aussi autour d'eux.\n\nLe client d'origine ne le fait pas.
+tr: Un hechizo de fuego, de rayo o de luz ilumina el suelo, el decorado y los personajes a su alrededor, con el color de sus llamas. Los monstruos que llevan una llama o una lámpara, y los fuegos de Sight y de Ruwach, también iluminan a su alrededor.\n\nEl cliente original no lo hace.
 
 fr: a reçu une invitation à rejoindre le groupe.
 tr: ha recibido una invitación para unirse al grupo.

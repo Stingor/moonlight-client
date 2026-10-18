@@ -639,6 +639,13 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     BlendLayers(pose, weapon_echo_frame, body);
     scene.drawn.push_back(body);
     scene.ids.push_back(scene_id);
+    scene.light_bearers.push_back(ro::render::ActorLightBearer{
+        .seed = id,
+        .job = look.job,
+        .option = actor.option,
+        .feet_world = feet,
+        .opacity = static_cast<float>(tint[kTintAlpha]) / static_cast<float>(kOpaqueAlpha),
+        .scale = scale});
   };
   for (const auto& [id, actor] : world.actors()) {
     compose(actor, id, static_cast<std::uint8_t>(kOpaqueAlpha), false);

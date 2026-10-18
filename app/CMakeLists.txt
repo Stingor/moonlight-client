@@ -861,8 +861,10 @@ target_include_directories(moonclient_versus PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # règle ne connaît que `sim` et `render`, et qu'elle peut être fausse sans que
 # rien ne le dise : le joueur caché resterait à l'écran. Et les effets d'office
 # d'une créature, qui se posent et s'ôtent selon cette même règle. Et l'ombre
-# au sol, que l'état de l'acteur retire ou laisse.
+# au sol, que l'état de l'acteur retire ou laisse. Et la lumière qu'il porte,
+# que le réglage des lumières allume ou coupe.
 add_library(moonclient_visibility STATIC
+    world/actor_lights_view.cpp
     world/actor_shadow.cpp
     world/actor_visibility.cpp
     world/monster_auras.cpp)

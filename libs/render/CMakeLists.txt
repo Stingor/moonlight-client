@@ -133,6 +133,8 @@ add_library(ro_render STATIC
     src/edited_map_effects.cpp
     src/map_point_lights.cpp
     src/effect_lights.cpp
+    src/actor_lights.cpp
+    src/actor_light_catalogue.cpp
     src/model_mesh_identity.cpp
     src/point_lights.cpp
     src/point_shadow.cpp

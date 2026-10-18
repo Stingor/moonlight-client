@@ -18961,8 +18961,8 @@ tr: Unsupported command, nothing was sent:
 fr: Les sorts éclairent
 tr: Spells cast light
 
-fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes.\n\nLe client d'origine ne le fait pas.
-tr: A fire, lightning or holy spell lights the ground, the scenery and the characters around it, in the colour of its flames.\n\nThe original client does not.
+fr: Un sort de feu, de foudre ou de lumière éclaire le sol, le décor et les personnages autour de lui, de la couleur de ses flammes. Les monstres qui portent une flamme ou une lampe, et les feux de Sight et de Ruwach, éclairent aussi autour d'eux.\n\nLe client d'origine ne le fait pas.
+tr: A fire, lightning or holy spell lights the ground, the scenery and the characters around it, in the colour of its flames. Monsters that carry a flame or a lamp, and the fires of Sight and Ruwach, light their surroundings too.\n\nThe original client does not.
 
 fr: a reçu une invitation à rejoindre le groupe.
 tr: has received an invitation to join your party.

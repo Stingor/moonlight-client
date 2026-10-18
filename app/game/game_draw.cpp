@@ -183,19 +183,24 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (sun.map != nullptr) {
     stages.shadowmap = false;
   }
-  // LES LUMIÈRES PONCTUELLES DU DOCUMENT D'ÉDITION, les plus proches de ce que
-  // la caméra regarde : voir docs/adr/0119.
-  // Celles des effets les suivent, et prennent les places ombrées qu'elles
-  // laissent : voir docs/adr/0120. Leurs ombres se peignent ici, avant la passe
-  // de couleur.
+  // LES LUMIÈRES PONCTUELLES : celles du document d'édition (docs/adr/0119),
+  // puis celles des effets et celles que portent les acteurs (docs/adr/0120).
+  // Leurs ombres se peignent ici, avant la passe de couleur (docs/adr/0123).
+  const std::span<const ro::render::PointLight> carried = actor_lights_.Gather(
+      scene_actors_.light_bearers,
+      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().tables : nullptr,
+      settings_->options().graphics().effect_lights(), static_cast<double>(now_ms));
   const ro::render::PointLightSet points = DrawPointShadowsIfAsked(
-      ro::render::WithEffectLights(
-          ro::render::MapPointLights(
-              ro::render::DocumentLights(map_edits_.Document(stage_->name),
-                                         stage_->scene.rsw.effects()),
-              ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
-              sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms), sky.hour),
-          effect_lights_, camera_.look_at),
+      ro::render::WithActorLights(
+          ro::render::WithEffectLights(
+              ro::render::MapPointLights(
+                  ro::render::DocumentLights(map_edits_.Document(stage_->name),
+                                             stage_->scene.rsw.effects()),
+                  ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
+                  sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms),
+                  sky.hour),
+              effect_lights_, camera_.look_at),
+          carried, camera_.look_at),
       models_shown, companions);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);

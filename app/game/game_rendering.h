@@ -15,6 +15,8 @@
 #include "ro/render/void_shade.h"
 #include "ro/render/water_renderer.h"
 
+#include "world/actor_lights_view.h"
+
 namespace moonclient {
 
 // LES RENDERERS DE LA PARTIE : le terrain, l'eau, les modèles, les sprites, les
@@ -40,6 +42,8 @@ class GameRendering {
   // effets se composent après le sol qu'elles éclairent. Voir docs/adr/0120.
   std::vector<ro::render::PointLight> effect_lights_;
   ro::render::TextureGlowCache effect_glows_;
+  // LES LUMIÈRES QUE PORTENT LES ACTEURS de l'image, de la composition même.
+  SceneActorLights actor_lights_;
   // LE VIDE SOUS LE MONDE, assombri par l'heure ; créé à la première nuit.
   ro::render::VoidShade void_shade_;
   bool void_shade_refused_ = false;
