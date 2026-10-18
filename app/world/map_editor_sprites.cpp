@@ -23,8 +23,6 @@ namespace {
 
 // La place d'un nom de geste, zéro final compris.
 constexpr std::size_t kLabelCapacity = 192;
-// UNE COPIE se pose à côté de l'original, sur l'axe x du RSW : deux carreaux.
-constexpr float kDuplicateShift = 20.0F;
 // La plus petite cadence et la plus petite échelle que garde un réglage : le
 // document refuse zéro.
 constexpr float kSmallestFrameSpeed = 0.05F;
@@ -232,7 +230,6 @@ MapEditorSession::Outcome MapEditorSession::DuplicateSprite(MapEditStore& store)
     return {};
   }
   ro::mapedit::MapSprite copy = before.sprites()[*selected_sprite_];
-  copy.position[0] += kDuplicateShift;
   ro::mapedit::MapEdit after = before;
   after.AddSprite(std::move(copy));
   store.Set(map_name_, WithReasons(after));

@@ -16,6 +16,8 @@
 #include <variant>
 #include <vector>
 
+#include <SDL3/SDL_clipboard.h>
+
 #include "ro/audio/audio_engine.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
@@ -23,6 +25,7 @@
 #include "ro/render/skill_sound_table.h"
 #include "ro/render/terrain_mesh.h"
 #include "ro/ui/entity_menu.h"
+#include "ro/ui/model_clipboard.h"
 #include "ro/vfs/encoding.h"
 
 #include "game/game.h"
@@ -391,6 +394,7 @@ enum class MapModelVerb : int {
   kMoveHere,
   kRevert,
   kSave,
+  kCopy,
 };
 
 }  // namespace
@@ -439,6 +443,13 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
         .disabled = edit == nullptr,
         .tip = edit == nullptr ? ro::core::Tr("Le modèle n'est pas retouché.") : std::string()});
   }
+  built.items.push_back(ro::ui::EntityMenuItem{
+      .label = ro::core::Tr("Copier ce modèle"),
+      .verb = static_cast<int>(MapModelVerb::kCopy),
+      .staff = true,
+      .tip =
+          ro::core::Tr("Pour le coller dans une autre carte : Ctrl+V dans l'éditeur, ou « Coller "
+                       "le modèle » dans sa bibliothèque.")});
   built.items.push_back(
       ro::ui::EntityMenuItem{.label = ro::core::Tr("Enregistrer la carte"),
                              .verb = static_cast<int>(MapModelVerb::kSave),
@@ -489,6 +500,21 @@ void Game::PlayMapModelVerb(int verb) {
     case MapModelVerb::kSave:
       outcome = map_editor_.Apply(ro::ui::map_editor::Save{}, stage_->scene, map_edits_);
       break;
+    case MapModelVerb::kCopy: {
+      const ro::formats::RswModel& placed = stage_->scene.rsw.models()[*model];
+      const ro::mapedit::MapEdit& document = map_edits_.Document(stage_->name);
+      ro::ui::ClipboardModel copied{.model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
+                                    .rotation = placed.rotation,
+                                    .scale = placed.scale};
+      const std::size_t originals = stage_->scene.unfixed_models.size();
+      if (*model >= originals && *model - originals < document.added().size()) {
+        copied.opacity = document.added()[*model - originals].opacity;
+      } else if (const ro::mapedit::ModelEdit* edit = document.ModelAt(*model)) {
+        copied.opacity = edit->opacity;
+      }
+      SDL_SetClipboardText(ro::ui::ModelClipboardText(copied).c_str());
+      break;
+    }
   }
   if (PublishMapEdit(outcome)) {
     ReplaceMapModels();

@@ -306,7 +306,7 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           ground_stroke_.reset();
           return {};
         } else if constexpr (std::is_same_v<Asked, intents::AddModel>) {
-          return AddModel(asked.file, scene, store);
+          return AddModel(asked, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::MoveVertex>) {
           return MoveVertex(asked, store);
         } else if constexpr (std::is_same_v<Asked, intents::RevertVertex>) {
@@ -496,12 +496,16 @@ MapEditorSession::Outcome MapEditorSession::PlaceAdded(std::size_t slot,
   return outcome;
 }
 
-MapEditorSession::Outcome MapEditorSession::AddModel(std::string file,
+MapEditorSession::Outcome MapEditorSession::AddModel(const ro::ui::map_editor::AddModel& asked,
                                                      const ro::render::MapScene& scene,
                                                      MapEditStore& store) {
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;
-  after.AddModel(ro::mapedit::AddedModel{.model_file = std::move(file), .position = drop_point_});
+  after.AddModel(ro::mapedit::AddedModel{.model_file = asked.file,
+                                         .position = drop_point_,
+                                         .rotation = asked.rotation,
+                                         .scale = asked.scale,
+                                         .opacity = asked.opacity});
   store.Set(map_name_, WithReasons(after));
   Record(ro::core::Tr("Ajouter un modèle"), before, after);
   // LE NOUVEAU EST DÉSIGNÉ : c'est lui qu'on va placer.

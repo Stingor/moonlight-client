@@ -19888,3 +19888,12 @@ tr: Un clic derecho en una miniatura la añade a los favoritos o la quita. Los m
 
 fr: Le filtre cherche chaque mot dans le chemin du modèle. Les vignettes se gardent dans le dossier du client : elles reviennent aussitôt à l'ouverture suivante.
 tr: El filtro busca cada palabra en la ruta del modelo. Las miniaturas se guardan en la carpeta del cliente: vuelven al instante la próxima vez que se abre.
+
+fr: Copier ce modèle
+tr: Copiar este modelo
+
+fr: Coller le modèle
+tr: Pegar el modelo
+
+fr: Pour le coller dans une autre carte : Ctrl+V dans l'éditeur, ou « Coller le modèle » dans sa bibliothèque.
+tr: Para pegarlo en otro mapa: Ctrl+V en el editor, o «Pegar el modelo» en su biblioteca.

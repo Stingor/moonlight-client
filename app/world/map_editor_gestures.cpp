@@ -15,9 +15,6 @@
 namespace moonclient {
 namespace {
 
-// UNE COPIE se pose à côté de l'original, sur l'axe x du RSW, pour se voir
-// tout de suite : deux carreaux du sol.
-constexpr float kDuplicateShift = 20.0F;
 // La place du nom de ce geste, zéro final compris.
 constexpr std::size_t kDuplicateLabelCapacity = 192;
 
@@ -102,7 +99,6 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
       return {};
     }
     ro::mapedit::AddedLight copy = before.lights()[*selected_light_];
-    copy.position[0] += kDuplicateShift;
     ro::mapedit::MapEdit after = before;
     after.AddLight(std::move(copy));
     store.Set(map_name_, WithReasons(after));
@@ -127,12 +123,11 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
     opacity = edit->opacity;
   }
   ro::mapedit::MapEdit after = before;
-  after.AddModel(ro::mapedit::AddedModel{
-      .model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
-      .position = {placed.position[0] + kDuplicateShift, placed.position[1], placed.position[2]},
-      .rotation = placed.rotation,
-      .scale = placed.scale,
-      .opacity = opacity});
+  after.AddModel(ro::mapedit::AddedModel{.model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
+                                         .position = placed.position,
+                                         .rotation = placed.rotation,
+                                         .scale = placed.scale,
+                                         .opacity = opacity});
   store.Set(map_name_, WithReasons(after));
   std::array<char, kDuplicateLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Dupliquer le modèle %zu"), rank);
@@ -203,7 +198,6 @@ MapEditorSession::Outcome MapEditorSession::DuplicateEffect(MapEditStore& store)
     return {};
   }
   ro::mapedit::AddedEffect copy = before.effects()[*selected_effect_];
-  copy.position[0] += kDuplicateShift;
   ro::mapedit::MapEdit after = before;
   after.AddEffect(std::move(copy));
   store.Set(map_name_, WithReasons(after));

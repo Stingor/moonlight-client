@@ -19888,3 +19888,12 @@ tr: Right-clicking a thumbnail adds it to or removes it from the favorites. Rece
 
 fr: Le filtre cherche chaque mot dans le chemin du modèle. Les vignettes se gardent dans le dossier du client : elles reviennent aussitôt à l'ouverture suivante.
 tr: The filter looks for each word in the model's path. Thumbnails are kept in the client folder: they come back at once the next time it opens.
+
+fr: Copier ce modèle
+tr: Copy this model
+
+fr: Coller le modèle
+tr: Paste the model
+
+fr: Pour le coller dans une autre carte : Ctrl+V dans l'éditeur, ou « Coller le modèle » dans sa bibliothèque.
+tr: To paste it into another map: Ctrl+V in the editor, or “Paste the model” in its library.

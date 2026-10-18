@@ -23,8 +23,6 @@ namespace {
 
 // La place d'un nom de geste, zéro final compris.
 constexpr std::size_t kLabelCapacity = 192;
-// Une copie se pose à côté de l'original : deux carreaux du sol.
-constexpr float kDuplicateShift = 20.0F;
 // En deçà, une position est tenue pour celle d'origine.
 constexpr float kBackHome = ro::mapedit::kOriginTolerance;
 
@@ -268,7 +266,6 @@ MapEditorSession::Outcome MapEditorSession::DuplicateMapEffect(const ro::render:
                                 .hours = DocumentHours(shown.hours),
                                 .glow = std::nullopt,
                                 .why = {}};
-  copy.position[0] += kDuplicateShift;
   if (shown.glows) {
     copy.glow = ro::mapedit::EffectGlow{.color = shown.glow_color,
                                         .range = shown.glow_range,

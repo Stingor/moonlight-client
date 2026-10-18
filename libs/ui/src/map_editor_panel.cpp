@@ -19,6 +19,7 @@
 #include "ro/ui/map_editor_row_menu.h"
 #include "ro/ui/map_editor_sounds_panel.h"
 #include "ro/ui/map_editor_sprites_panel.h"
+#include "ro/ui/model_clipboard.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -372,6 +373,19 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
     intents.emplace_back(map_editor::AddModel{panel.library_choice});
   }
   ImGui::EndDisabled();
+  // LE MODÈLE COPIÉ, d'une carte ou d'une autre : voir `ClipboardModel`.
+  ImGui::SameLine();
+  const char* clipboard = ImGui::GetClipboardText();
+  const std::optional<ClipboardModel> pasted =
+      clipboard != nullptr ? ParseModelClipboard(clipboard) : std::nullopt;
+  ImGui::BeginDisabled(!pasted.has_value());
+  if (SkinButton(core::Tr("Coller le modèle"), art)) {
+    intents.emplace_back(map_editor::AddModel{.file = pasted->model_file,
+                                              .rotation = pasted->rotation,
+                                              .scale = pasted->scale,
+                                              .opacity = pasted->opacity});
+  }
+  ImGui::EndDisabled();
   ImGui::SameLine();
   ModelLibraryWindowState& window = panel.library_window;
   if (SkinToggleButton(core::Tr("En images…"), window.open, art)) {
@@ -527,9 +541,24 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
     return;
   }
   {
+    // UN CHAMP EN LECTURE SEULE, et non un texte : il se sélectionne et se copie.
     const NamesFont names(panel.names_font);
-    ImGui::TextUnformatted(
-        std::format("{} {} — {}", core::Tr("Rang"), *view.selected, view.selected_file).c_str());
+    std::string title =
+        std::format("{} {} — {}", core::Tr("Rang"), *view.selected, view.selected_file);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.0F, 0.0F, 0.0F, 0.0F));
+    static_cast<void>(ImGui::InputText("##titre_modele", title.data(), title.size() + 1,
+                                       ImGuiInputTextFlags_ReadOnly));
+    ImGui::PopStyleColor();
+  }
+  if (SkinSmallButton(core::Tr("Copier ce modèle"), art)) {
+    ImGui::SetClipboardText(
+        ModelClipboardText(ClipboardModel{.model_file = view.selected_file,
+                                          .rotation = view.rotation,
+                                          .scale = view.scale,
+                                          .opacity = view.opacity < 1.0F
+                                                         ? std::optional<float>(view.opacity)
+                                                         : std::nullopt})
+            .c_str());
   }
   const std::array<float, 3> origin = CellsOfNative(view.origin, view.map_cubes);
   ImGui::TextDisabled("%s", std::format("{} {:.2f} {:.2f} {:.2f}", core::Tr("Origine"), origin[0],

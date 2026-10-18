@@ -313,7 +313,8 @@ class MapEditorSession {
                 MapEditStore& store);
   Outcome SetWhy(std::string why, MapEditStore& store);
   Outcome Revert(MapEditStore& store);
-  Outcome AddModel(std::string file, const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome AddModel(const ro::ui::map_editor::AddModel& asked, const ro::render::MapScene& scene,
+                   MapEditStore& store);
   // Une copie du modèle désigné, tel que l'édition le pose, décalée sur x.
   Outcome Duplicate(const ro::render::MapScene& scene, MapEditStore& store);
   // L'OUTIL SOMMETS : voir map_editor_vertices.cpp.

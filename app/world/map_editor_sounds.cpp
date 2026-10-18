@@ -28,8 +28,6 @@ namespace {
 // La place d'un nom de geste, zéro final compris.
 constexpr std::size_t kLabelCapacity = 192;
 using Label = std::array<char, kLabelCapacity>;
-// Une copie se pose à côté de l'original : deux carreaux du sol.
-constexpr float kDuplicateShift = 20.0F;
 // En deçà, une position est tenue pour celle d'origine.
 constexpr float kBackHome = ro::mapedit::kOriginTolerance;
 // La plus petite portée et le plus court cycle que garde un son : le document
@@ -376,7 +374,6 @@ std::optional<MapEditorSession::Outcome> MapEditorSession::DuplicateSound(
   // LA COPIE EST UN SON AJOUTÉ, même d'une source du RSW : elle garde son
   // fichier, ses réglages et sa nuit, à côté d'elle.
   ro::mapedit::AddedSound copy = DocumentAdded(*shown);
-  copy.position[0] += kDuplicateShift;
   copy.why.clear();
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;

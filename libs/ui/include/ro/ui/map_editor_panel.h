@@ -313,6 +313,10 @@ struct Revert {};
 // Ajouter à la carte un modèle de la bibliothèque, là où l'appelant le pose.
 struct AddModel {
   std::string file;
+  // Ce que porte un modèle collé ; sans eux, ceux d'un modèle neuf.
+  std::array<float, 3> rotation{};
+  std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
+  std::optional<float> opacity;
 };
 // Déplacer le sommet `vertex` du nœud `node`, dans le repère du RSW — comme
 // une pose. `released`, comme pour `Place`.
