@@ -6,6 +6,8 @@
 
 #include "ro/ui/skin_art.h"
 
+struct ImFont;
+
 namespace ro::ui {
 
 // ── LE MENU DU CLIC DROIT SUR UNE ENTITÉ ────────────────────────────────────
@@ -102,11 +104,17 @@ struct EntityMenuView {
   // Son nom, vide quand on ne le connaît pas ; et sa famille, déjà traduite.
   std::string name;
   std::string family;
+  // VRAI : le nom s'écrit dans la police coréenne de l'état — le fichier d'un
+  // modèle de la carte, que la police de l'interface ne sait pas dessiner.
+  bool hangul_name = false;
   std::vector<EntityMenuItem> items;
 };
 
 // Ce que le menu garde d'une image à l'autre.
 struct EntityMenuState {
+  // LA POLICE DES NOMS CORÉENS, posée par l'appelant ; nulle : celle de
+  // l'interface. Voir `EntityMenuView::hangul_name`.
+  ImFont* hangul_font = nullptr;
   // POSÉ PAR L'APPELANT : ouvrir à la prochaine image, sous la souris.
   bool open_requested = false;
   bool open = false;

@@ -207,9 +207,9 @@ UiStage::Answers UiStage::Draw(
   // MONDE, qui est déjà peint quand cette image d'interface commence.
   // Ses boutons « Journal » et « Trames » basculent leurs fenêtres, qui se
   // dessineront à l'image suivante.
-  // Les noms de fichiers de l'éditeur de carte sont coréens : leur police les
-  // dessine, quelle que soit celle de l'interface.
-  windows.staff_tools.map_editor_panel.names_font =
+  // Les noms de fichiers de l'éditeur de carte, et du menu d'un modèle, sont
+  // coréens : leur police les dessine, quelle que soit celle de l'interface.
+  windows.staff_tools.map_editor_panel.names_font = windows.entity_menu.state.hangul_font =
       ui_->FontNamed(kHangulFontFamily, ro::ui::FontStyle::kRegular);
   const ro::ui::StaffToolsAction staff_action =
       ro::ui::DrawStaffTools(windows.staff_tools, skin_, rights.staff_tools);

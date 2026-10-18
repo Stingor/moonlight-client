@@ -349,7 +349,15 @@ void DrawPopup(EntityMenuState& state, const EntityMenuView& view, const SkinArt
     if (view.name.empty()) {
       ImGui::TextUnformatted(view.family.c_str());
     } else {
+      const bool hangul = view.hangul_name && state.hangul_font != nullptr;
+      if (hangul) {
+        // Taille nulle : celle du texte courant.
+        ImGui::PushFont(state.hangul_font, 0.0F);
+      }
       ImGui::TextUnformatted(view.name.c_str());
+      if (hangul) {
+        ImGui::PopFont();
+      }
       ImGui::SameLine();
       ImGui::TextColored(kAsideColor, "· %s", view.family.c_str());
     }

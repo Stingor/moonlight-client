@@ -304,6 +304,7 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
       std::format("#{} {}", model_index,
                   ro::vfs::Cp949ToUtf8Lossy(stage_->scene.rsw.models()[model_index].model_name));
   built.family = ro::core::Tr("Modèle de la carte");
+  built.hangul_name = true;
   built.items.push_back(ro::ui::EntityMenuItem{.label = ro::core::Tr("Ouvrir avec l'éditeur"),
                                                .verb = static_cast<int>(MapModelVerb::kOpenEditor),
                                                .staff = true});
