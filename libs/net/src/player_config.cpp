@@ -7,6 +7,7 @@
 #include "ro/sim/equip_location.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -17,12 +18,7 @@ namespace {
 
 [[nodiscard]] core::Result<void> Request(Connection& link, proto::ConfigType setting,
                                          std::uint32_t value) {
-  const auto frame = proto::Encode(proto::ConfigRequest{.type = setting, .value = value});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::ConfigRequest{.type = setting, .value = value}));
 }
 
 }  // namespace

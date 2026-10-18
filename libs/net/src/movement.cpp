@@ -4,27 +4,19 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/play_ready_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 core::Result<void> NotifyMapLoaded(Connection& link) {
-  auto frame = proto::Encode(proto::MapLoadedNotice());
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::MapLoadedNotice()));
 }
 
 core::Result<void> AnswerMapProperty(const Frame& frame, Connection& link) {
   if (frame.opcode != proto::PacketMaptypeproperty2::kOpcode) {
     return {};
   }
-  auto ready = proto::EncodePlayReady();
-  if (!ready) {
-    return std::unexpected(ready.error());
-  }
-  link.Send(*ready);
-  return {};
+  return SendEncoded(link, proto::EncodePlayReady());
 }
 
 core::Result<void> RequestMove(Connection& link, sim::CellPosition destination) {
@@ -35,12 +27,7 @@ core::Result<void> RequestMove(Connection& link, sim::CellPosition destination) 
   destination.direction = 0;
   request.packed_destination = sim::PackPosition(destination);
 
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 }  // namespace ro::net

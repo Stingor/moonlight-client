@@ -7,6 +7,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 core::Result<void> SendBugReport(Connection& link, std::uint8_t category,
@@ -20,12 +22,7 @@ core::Result<void> SendBugReport(Connection& link, std::uint8_t category,
   if (request.message.size() > kBugReportMessageMostBytes) {
     request.message.resize(kBugReportMessageMostBytes);
   }
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 std::optional<std::uint8_t> ReadBugReportAck(const Frame& frame) {

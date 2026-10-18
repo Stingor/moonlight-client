@@ -14,6 +14,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -200,12 +202,7 @@ void RequestAutoloot(Connection& link, std::uint32_t item_id, bool listed) {
 core::Result<void> RequestCreatorName(Connection& link, std::uint32_t character_id) {
   proto::CreatorNameRequest request;
   request.character_id = character_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestItemScripts(Connection& link, std::uint32_t item_id) {

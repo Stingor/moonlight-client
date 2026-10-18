@@ -14,6 +14,8 @@
 #include "ro/sim/actor.h"
 #include "ro/sim/world.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -107,12 +109,7 @@ FrameOutcome ApplyActorNameFrame(const Frame& frame, sim::World& world) {
 core::Result<void> RequestActorName(Connection& link, std::uint32_t actor_id) {
   proto::NameRequest request;
   request.actor_id = actor_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 }  // namespace ro::net

@@ -1,13 +1,13 @@
 #include "ro/net/progress_bar.h"
 
 #include <cstdint>
-#include <vector>
 
 #include "ro/proto/map_packets.h"
 #include "ro/proto/progress_packets.h"
 #include "ro/sim/world.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 
@@ -46,12 +46,7 @@ core::Result<void> ReportProgressDone(Connection& link, const sim::World& world,
   if (!report.TakeDue()) {
     return {};
   }
-  core::Result<std::vector<std::uint8_t>> done = proto::EncodeProgressDone();
-  if (!done) {
-    return std::unexpected(done.error());
-  }
-  link.Send(*done);
-  return {};
+  return SendEncoded(link, proto::EncodeProgressDone());
 }
 
 }  // namespace ro::net

@@ -8,6 +8,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/skill_text_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -40,23 +42,13 @@ core::Result<void> RequestSkillOnTarget(Connection& link, std::uint16_t skill_id
   request.skill_id = skill_id;
   request.skill_level = skill_level;
   request.target_id = target_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestSkillUp(Connection& link, std::uint16_t skill_id) {
   proto::SkillUpRequest request;
   request.skill_id = skill_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestSkillOnGround(Connection& link, std::uint16_t skill_id,
@@ -66,12 +58,7 @@ core::Result<void> RequestSkillOnGround(Connection& link, std::uint16_t skill_id
   request.skill_level = skill_level;
   request.cell_x = where.x;
   request.cell_y = where.y;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestSkillOnGroundWithText(Connection& link, std::uint16_t skill_id,
@@ -95,12 +82,7 @@ core::Result<void> RequestSkillOnGroundWithText(Connection& link, std::uint16_t 
     }
   }
   request.text = std::move(wire);
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 FrameOutcome ApplySkillFrame(const Frame& frame, sim::SkillBook& book, std::uint32_t now_ms) {

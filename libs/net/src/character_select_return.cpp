@@ -3,6 +3,8 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -19,12 +21,7 @@ constexpr std::uint8_t kRestartGranted = 1;
 core::Result<void> RequestCharacterSelect(Connection& link) {
   proto::RestartRequest request;
   request.what = proto::RestartRequest::kCharacterSelect;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 CharacterSelectAnswer CharacterSelectAnswerOf(const Frame& frame) {

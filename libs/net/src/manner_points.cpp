@@ -15,6 +15,8 @@
 #include "ro/proto/staff_packets.h"
 #include "ro/sim/chat_line.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -89,12 +91,7 @@ core::Result<void> RequestMannerPoint(Connection& link, std::uint32_t account_id
   request.account_id = account_id;
   request.kind = static_cast<std::uint8_t>(way);
   request.minutes = static_cast<std::uint16_t>(std::clamp(minutes, 0, kMannerPointsMostMinutes));
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 FrameOutcome ApplyMannerPointFrame(const Frame& frame, sim::World& world, std::uint32_t now_ms) {

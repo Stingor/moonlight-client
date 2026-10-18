@@ -8,6 +8,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/title_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -101,11 +103,11 @@ core::Result<void> ClaimAchievementReward(Connection& link, sim::AchievementBook
                       "réclamation refusée d'avance : succès inachevé, déjà réclamé, en vol ou "
                       "sans récompense");
   }
-  auto frame = proto::Encode(proto::AchievementRewardRequest{.achievement_id = achievement_id});
-  if (!frame) {
-    return std::unexpected(frame.error());
+  if (auto sent = SendEncoded(
+          link, proto::Encode(proto::AchievementRewardRequest{.achievement_id = achievement_id}));
+      !sent) {
+    return sent;
   }
-  link.Send(*frame);
   static_cast<void>(book.NoteClaim(achievement_id, rewards));
   return {};
 }

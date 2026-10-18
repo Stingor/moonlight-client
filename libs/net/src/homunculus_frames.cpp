@@ -11,6 +11,7 @@
 #include "ro/proto/map_packets.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -85,17 +86,8 @@ FrameOutcome ApplyState(const proto::ZcChangestateMer& changed, sim::Homunculus&
   }
 }
 
-[[nodiscard]] core::Result<void> Send(Connection& link,
-                                      core::Result<std::vector<std::uint8_t>> frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
-
 [[nodiscard]] core::Result<void> Command(Connection& link, proto::HomunculusCommand command) {
-  return Send(link, proto::Encode(proto::HomunculusCommandRequest{.command = command}));
+  return SendEncoded(link, proto::Encode(proto::HomunculusCommandRequest{.command = command}));
 }
 
 }  // namespace
@@ -179,13 +171,14 @@ core::Result<void> RequestHomunculusDelete(Connection& link) {
 }
 
 core::Result<void> RequestHomunculusRename(Connection& link, std::string_view name) {
-  return Send(link,
-              proto::Encode(proto::HomunculusRenameRequest{.name = core::Cp1252FromUtf8(name)}));
+  return SendEncoded(
+      link, proto::Encode(proto::HomunculusRenameRequest{.name = core::Cp1252FromUtf8(name)}));
 }
 
 core::Result<void> RequestHomunculusAutoFeed(Connection& link, bool on) {
-  return Send(link, proto::Encode(proto::ConfigRequest{
-                        .type = proto::ConfigType::kHomunculusAutofeed, .value = on ? 1U : 0U}));
+  return SendEncoded(
+      link, proto::Encode(proto::ConfigRequest{.type = proto::ConfigType::kHomunculusAutofeed,
+                                               .value = on ? 1U : 0U}));
 }
 
 }  // namespace ro::net

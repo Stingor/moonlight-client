@@ -6,6 +6,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/title_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 FrameOutcome ApplyTitleFrame(const Frame& frame, sim::TitleBook& titles, std::uint32_t player_id) {
@@ -57,12 +59,7 @@ FrameOutcome ApplyTitleFrame(const Frame& frame, sim::TitleBook& titles, std::ui
 core::Result<void> RequestChangeTitle(Connection& link, std::int32_t title_id) {
   proto::ChangeTitleRequest request;
   request.title_id = title_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 }  // namespace ro::net

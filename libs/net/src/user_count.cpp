@@ -7,15 +7,12 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/user_count_packet.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 core::Result<void> RequestUserCount(Connection& link) {
-  auto frame = proto::EncodeUserCountRequest();
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::EncodeUserCountRequest());
 }
 
 std::optional<std::int32_t> ReadUserCount(const Frame& frame) {

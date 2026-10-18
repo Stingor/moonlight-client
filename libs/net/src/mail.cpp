@@ -13,6 +13,8 @@
 #include "ro/core/text.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -679,12 +681,9 @@ core::Result<void> RequestAttachItem(Connection& link, sim::Mailbox& mailbox,
       fault != sim::MailAttachFault::kNone) {
     return Refuse(std::string("ajout refusé : ") + AttachFaultText(fault));
   }
-  const core::Result<std::vector<std::uint8_t>> frame =
-      EncodeAttachItem(bag_item.client_slot, amount);
-  if (!frame) {
-    return std::unexpected(frame.error());
+  if (auto sent = SendEncoded(link, EncodeAttachItem(bag_item.client_slot, amount)); !sent) {
+    return sent;
   }
-  link.Send(*frame);
   mailbox.NoteAttachSent(bag_item, static_cast<std::int16_t>(amount), now_ms);
   return {};
 }
@@ -723,11 +722,9 @@ core::Result<void> RequestSendMail(Connection& link, sim::Mailbox& mailbox,
       fault != sim::MailSendFault::kNone) {
     return Refuse(std::string("envoi refusé : ") + SendFaultText(fault));
   }
-  const core::Result<std::vector<std::uint8_t>> frame = EncodeSendMail(fields, zeny);
-  if (!frame) {
-    return std::unexpected(frame.error());
+  if (auto sent = SendEncoded(link, EncodeSendMail(fields, zeny)); !sent) {
+    return sent;
   }
-  link.Send(*frame);
   mailbox.NoteSendSent(now_ms);
   return {};
 }

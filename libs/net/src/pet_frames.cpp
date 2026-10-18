@@ -5,7 +5,6 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "ro/core/text.h"
 #include "ro/proto/config_packets.h"
@@ -13,21 +12,13 @@
 #include "ro/sim/world.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
 
 // Le plus grand changement d'état que le familier connaisse.
 constexpr std::int8_t kLastStateChange = static_cast<std::int8_t>(sim::PetStateChange::kEgg);
-
-[[nodiscard]] core::Result<void> Sent(Connection& link,
-                                      core::Result<std::vector<std::uint8_t>> frame) {
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
 
 [[nodiscard]] std::uint32_t Unsigned(std::int16_t value) {
   return static_cast<std::uint32_t>(static_cast<std::uint16_t>(value));
@@ -143,28 +134,31 @@ bool ApplyPetAccessoryLook(const Frame& frame, sim::World& world) {
 }
 
 core::Result<void> RequestPetCommand(Connection& link, proto::PetCommand command) {
-  return Sent(link, proto::Encode(proto::PetCommandRequest{.command = command}));
+  return SendEncoded(link, proto::Encode(proto::PetCommandRequest{.command = command}));
 }
 
 core::Result<void> RequestPetRename(Connection& link, std::string_view name) {
-  return Sent(link, proto::Encode(proto::PetRenameRequest{.name = core::Cp1252FromUtf8(name)}));
+  return SendEncoded(link,
+                     proto::Encode(proto::PetRenameRequest{.name = core::Cp1252FromUtf8(name)}));
 }
 
 core::Result<void> RequestPetEgg(Connection& link, std::uint16_t client_slot) {
-  return Sent(link, proto::Encode(proto::PetEggChoice{.client_slot = client_slot}));
+  return SendEncoded(link, proto::Encode(proto::PetEggChoice{.client_slot = client_slot}));
 }
 
 core::Result<void> RequestPetEvolution(Connection& link, std::uint32_t target_egg_id) {
-  return Sent(link, proto::Encode(proto::PetEvolutionRequest{.target_egg_id = target_egg_id}));
+  return SendEncoded(link,
+                     proto::Encode(proto::PetEvolutionRequest{.target_egg_id = target_egg_id}));
 }
 
 core::Result<void> RequestPetAutoFeed(Connection& link, bool enabled) {
-  return Sent(link, proto::Encode(proto::ConfigRequest{.type = proto::ConfigType::kPetAutofeed,
-                                                       .value = enabled ? 1U : 0U}));
+  return SendEncoded(link,
+                     proto::Encode(proto::ConfigRequest{.type = proto::ConfigType::kPetAutofeed,
+                                                        .value = enabled ? 1U : 0U}));
 }
 
 core::Result<void> RequestPetAct(Connection& link, std::int32_t code) {
-  return Sent(link, proto::Encode(proto::PetActRequest{.data = code}));
+  return SendEncoded(link, proto::Encode(proto::PetActRequest{.data = code}));
 }
 
 }  // namespace ro::net

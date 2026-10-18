@@ -5,17 +5,17 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/sim/world.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 core::Result<void> TurnPlayer(Connection& link, sim::World& world, sim::Facing facing) {
   proto::TurnRequest request;
   request.direction = facing.direction;
   request.head_direction = facing.head_direction;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
+  if (auto sent = SendEncoded(link, proto::Encode(request)); !sent) {
+    return sent;
   }
-  link.Send(*frame);
   // POSÉ ICI, ET NULLE PART AILLEURS. `clif_changed_dir` diffuse en AREA_WOS :
   // la seule trame que le serveur renverra ira aux autres, jamais à nous.
   world.Turn(world.player_id(), facing.direction, facing.head_direction);

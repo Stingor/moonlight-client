@@ -16,6 +16,7 @@
 #include "ro/sim/world.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -164,12 +165,7 @@ core::Result<void> RequestProduce(Connection& link, std::uint32_t item_id,
 }
 
 core::Result<void> RequestWeaponRefine(Connection& link, std::int32_t index) {
-  const auto frame = proto::Encode(proto::WeaponRefineRequest{.index = index});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::WeaponRefineRequest{.index = index}));
 }
 
 }  // namespace ro::net

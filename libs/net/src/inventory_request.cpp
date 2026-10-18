@@ -10,6 +10,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/player_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 core::Result<void> RequestUseItem(Connection& link, std::uint16_t client_slot,
@@ -17,12 +19,7 @@ core::Result<void> RequestUseItem(Connection& link, std::uint16_t client_slot,
   proto::UseItemRequest request;
   request.client_slot = client_slot;
   request.account_id = account_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestEquip(Connection& link, std::uint16_t client_slot,
@@ -42,12 +39,7 @@ core::Result<void> RequestEquip(Connection& link, std::uint16_t client_slot,
 core::Result<void> RequestUnequip(Connection& link, std::uint16_t client_slot) {
   proto::UnequipItemRequest request;
   request.client_slot = client_slot;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestDropItem(Connection& link, std::uint16_t client_slot,
@@ -55,12 +47,7 @@ core::Result<void> RequestDropItem(Connection& link, std::uint16_t client_slot,
   proto::DropItemRequest request;
   request.client_slot = client_slot;
   request.amount = amount;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestInventoryToCart(Connection& link, std::uint16_t client_slot,
@@ -98,12 +85,7 @@ core::Result<void> RequestInventoryToStorage(Connection& link, std::uint16_t cli
   proto::StorageStoreRequest request;
   request.client_slot = client_slot;
   request.amount = amount;
-  const core::Result<std::vector<std::uint8_t>> frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestStorageToInventory(Connection& link, std::uint16_t client_slot,
@@ -111,12 +93,7 @@ core::Result<void> RequestStorageToInventory(Connection& link, std::uint16_t cli
   proto::StorageTakeRequest request;
   request.client_slot = client_slot;
   request.amount = amount;
-  const core::Result<std::vector<std::uint8_t>> frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestCartToStorage(Connection& link, std::uint16_t client_slot,
@@ -138,23 +115,13 @@ core::Result<void> RequestStorageToCart(Connection& link, std::uint16_t client_s
 }
 
 core::Result<void> RequestCloseStorage(Connection& link) {
-  const core::Result<std::vector<std::uint8_t>> frame = proto::Encode(proto::CloseStorageRequest{});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::CloseStorageRequest{}));
 }
 
 core::Result<void> RequestViewEquip(Connection& link, std::uint32_t account_id) {
   proto::ViewEquipRequest request;
   request.account_id = account_id;
-  const core::Result<std::vector<std::uint8_t>> frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 }  // namespace ro::net

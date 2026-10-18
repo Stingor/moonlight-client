@@ -9,6 +9,8 @@
 #include "ro/proto/hat_effect_packets.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 FrameOutcome ApplyCashShopFrame(const Frame& frame, sim::CashShop& shop) {
@@ -86,21 +88,11 @@ core::Result<void> RequestCashShopOpen(Connection& link, std::uint32_t tab) {
 }
 
 core::Result<void> RequestCashShopCatalogue(Connection& link) {
-  auto frame = proto::Encode(proto::CashShopCatalogueRequest{});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::CashShopCatalogueRequest{}));
 }
 
 core::Result<void> SayCashShopClosed(Connection& link) {
-  auto frame = proto::Encode(proto::CashShopCloseNotice{});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::CashShopCloseNotice{}));
 }
 
 core::Result<void> RequestCashShopPurchase(Connection& link, std::uint32_t event_points,

@@ -9,6 +9,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/npc_shop_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -22,16 +24,6 @@ constexpr std::uint32_t kMarketUnlimitedOnWire = 0xFFFFFFFF;
 // (`clif_parse_NpcBuySellSelected`).
 constexpr std::uint8_t kDealTypeBuy = 0;
 constexpr std::uint8_t kDealTypeSell = 1;
-
-template <typename Packet>
-core::Result<void> SendHandWritten(Connection& link, const Packet& packet) {
-  core::Result<std::vector<std::uint8_t>> frame = proto::Encode(packet);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
-}
 
 void SendDealChoice(Connection& link, std::uint32_t npc_id, sim::NpcShopSide side) {
   proto::CzAckSelectDealtype choice;
@@ -277,12 +269,11 @@ core::Result<void> BuyFromNpcShop(Connection& link, sim::NpcShop& shop,
     case sim::NpcShopKind::kPoints: {
       // Une boutique à points ou à objet-devise n'a pas de seconde monnaie :
       // rien à dépenser de ce côté.
-      const core::Result<std::vector<std::uint8_t>> frame =
-          proto::Encode(proto::PointShopBuyRequest{.secondary_points = 0, .lines = lines});
-      if (!frame) {
-        return std::unexpected(frame.error());
+      if (auto sent = SendEncoded(link, proto::Encode(proto::PointShopBuyRequest{
+                                            .secondary_points = 0, .lines = lines}));
+          !sent) {
+        return sent;
       }
-      link.Send(*frame);
       break;
     }
     case sim::NpcShopKind::kNone:
@@ -330,9 +321,9 @@ core::Result<void> SayNpcShopFarewell(Connection& link, sim::NpcShopFarewell far
     case sim::NpcShopFarewell::kNone:
       return {};
     case sim::NpcShopFarewell::kTradeQuit:
-      return SendHandWritten(link, proto::NpcTradeQuit{});
+      return SendEncoded(link, proto::Encode(proto::NpcTradeQuit{}));
     case sim::NpcShopFarewell::kMarketClose:
-      return SendHandWritten(link, proto::NpcMarketClose{});
+      return SendEncoded(link, proto::Encode(proto::NpcMarketClose{}));
   }
   return {};
 }

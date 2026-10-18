@@ -11,6 +11,7 @@
 #include "ro/proto/mercenary_packets.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -109,12 +110,8 @@ FrameOutcome ApplyVanish(const Frame& frame, sim::MercenaryBook& book) {
 }
 
 core::Result<void> SendCommand(Connection& link, std::uint8_t command) {
-  const auto frame = proto::EncodeMercenaryCommand(proto::MercenaryCommand{.command = command});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link,
+                     proto::EncodeMercenaryCommand(proto::MercenaryCommand{.command = command}));
 }
 
 }  // namespace

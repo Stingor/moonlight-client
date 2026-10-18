@@ -2,13 +2,14 @@
 
 #include <array>
 #include <utility>
-#include <vector>
 
 #include "ro/core/ascii.h"
 #include "ro/core/text.h"
 #include "ro/proto/battleground_packets.h"
 #include "ro/proto/manual_packets.h"
 #include "ro/sim/chat_channel.h"
+
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -21,16 +22,6 @@ using core::ErrorCode;
     text.remove_prefix(1);
   }
   return text;
-}
-
-template <typename Packet>
-[[nodiscard]] core::Result<void> Send(Connection& link, const Packet& packet) {
-  core::Result<std::vector<std::uint8_t>> frame = proto::Encode(packet);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 // LE MOT DE LA COMMANDE DU CHAMP, sans le blanc qui le sépare du texte : « /bc »
@@ -206,27 +197,27 @@ core::Result<void> SendChat(Connection& link, std::string_view speaker, const Ch
       proto::PartyChatRequest request;
       request.speaker = name;
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kClan: {
       proto::ClanChatRequest request;
       request.speaker = name;
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kGuild: {
       proto::GuildChatRequest request;
       request.speaker = name;
       request.text = text;
       request.battlefield = on_battlefield;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kAlly: {
       // Le canal passe par le chuchotement, et son destinataire est son NOM.
       proto::WhisperRequest request;
       request.recipient = std::string(proto::WhisperRequest::kAllyChannel);
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kChannel: {
       // ⚠ LE CROISILLON SE REMET ICI, et nulle part ailleurs : le monde range
@@ -240,19 +231,19 @@ core::Result<void> SendChat(Connection& link, std::string_view speaker, const Ch
       request.recipient =
           std::string(1, sim::kChannelPrefix) + core::Cp1252FromUtf8(intent.recipient);
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kWhisper: {
       proto::WhisperRequest request;
       request.recipient = core::Cp1252FromUtf8(intent.recipient);
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kPublic: {
       proto::ChatRequest request;
       request.speaker = name;
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
     case ChatTarget::kBattlefield: {
       // « Nom : texte », comme la parole publique : le serveur compare le nom
@@ -260,7 +251,7 @@ core::Result<void> SendChat(Connection& link, std::string_view speaker, const Ch
       proto::BattlefieldChatRequest request;
       request.speaker = name;
       request.text = text;
-      return Send(link, request);
+      return SendEncoded(link, proto::Encode(request));
     }
   }
   return std::unexpected(core::Error{ErrorCode::kInvalidArgument, "destination inconnue"});

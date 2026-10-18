@@ -11,6 +11,7 @@
 #include "ro/sim/world.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -229,11 +230,9 @@ core::Result<void> RequestStatUp(Connection& link, sim::World& world, std::uint1
   proto::StatUpRequest request;
   request.parameter = parameter;
   request.amount = amount;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
+  if (auto sent = SendEncoded(link, proto::Encode(request)); !sent) {
+    return sent;
   }
-  link.Send(*frame);
   world.AwaitStatRaise(true);
   return {};
 }

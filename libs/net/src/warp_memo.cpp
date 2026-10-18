@@ -7,15 +7,12 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 core::Result<void> RequestWarpMemo(Connection& link) {
-  auto frame = proto::Encode(proto::RememberWarpPointRequest{});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::RememberWarpPointRequest{}));
 }
 
 std::optional<std::uint8_t> ReadWarpMemoAck(const Frame& frame) {

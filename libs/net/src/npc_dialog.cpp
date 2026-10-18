@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <optional>
 #include <utility>
-#include <vector>
 
 #include "ro/core/text.h"
 #include "ro/proto/manual_packets.h"
@@ -12,6 +11,7 @@
 #include "ro/sim/world.h"
 
 #include "frame_apply.h"
+#include "send_encoded.h"
 
 namespace ro::net {
 namespace {
@@ -20,24 +20,6 @@ using core::ErrorCode;
 
 core::Error NoDialog() {
   return core::Error{ErrorCode::kInvalidArgument, "aucun dialogue de PNJ n'est ouvert"};
-}
-
-// Envoie un paquet ÉCRIT À LA MAIN, ou remonte son refus d'encoder.
-//
-// ⚠ DEUX FORMES D'`Encode` COEXISTENT, et elles ne se généralisent pas : celle
-// des paquets engendrés rend les octets, celle des paquets manuels rend un
-// `Result` parce qu'elle CONTRÔLE d'abord que la disposition écrite ici
-// correspond encore à ce que le serveur déclare lire. Ce contrôle est tout
-// l'intérêt d'un paquet manuel : sans lui, un changement de version enverrait
-// des octets bien formés au mauvais endroit.
-template <typename Packet>
-core::Result<void> SendHandWritten(Connection& link, const Packet& packet) {
-  core::Result<std::vector<std::uint8_t>> frame = proto::Encode(packet);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
 }
 
 // LE MOT QUI DÉLIE UN SCRIPT, dans ses deux formes.
@@ -55,7 +37,7 @@ core::Result<void> SendLeave(Connection& link, std::uint32_t npc_id, bool menu_p
     proto::NpcMenuChoice choice;
     choice.npc_id = npc_id;
     choice.choice = sim::kNpcMenuCancelled;
-    return SendHandWritten(link, choice);
+    return SendEncoded(link, proto::Encode(choice));
   }
   proto::CzCloseDialog packet;
   packet.GID = npc_id;
@@ -218,7 +200,7 @@ core::Result<void> AnswerNpcNext(Connection& link, sim::World& world) {
   }
   proto::NpcNextRequest request;
   request.npc_id = world.npc_dialog()->npc_id;
-  if (auto sent = SendHandWritten(link, request); !sent) {
+  if (auto sent = SendEncoded(link, proto::Encode(request)); !sent) {
     return sent;
   }
   world.AdvanceNpcDialog();
@@ -249,7 +231,7 @@ core::Result<void> AnswerNpcMenu(Connection& link, sim::World& world, std::size_
   proto::NpcMenuChoice choice;
   choice.npc_id = dialog.npc_id;
   choice.choice = rank;
-  if (auto sent = SendHandWritten(link, choice); !sent) {
+  if (auto sent = SendEncoded(link, proto::Encode(choice)); !sent) {
     return sent;
   }
   world.AnswerNpcMenu();

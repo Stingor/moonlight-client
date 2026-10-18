@@ -7,6 +7,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/social_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 FrameOutcome ApplyAdoptionFrame(const Frame& frame, sim::AdoptionDesk& desk) {
@@ -39,12 +41,7 @@ FrameOutcome ApplyAdoptionFrame(const Frame& frame, sim::AdoptionDesk& desk) {
 }
 
 core::Result<void> RequestAdoption(Connection& link, std::uint32_t account_id) {
-  auto frame = proto::Encode(proto::AdoptionRequest{.account_id = account_id});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::AdoptionRequest{.account_id = account_id}));
 }
 
 core::Result<void> AnswerAdoption(Connection& link, const sim::AdoptionInvitation& invitation,

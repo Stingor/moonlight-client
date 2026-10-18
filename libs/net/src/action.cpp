@@ -5,6 +5,8 @@
 #include "ro/proto/map_packets.h"
 #include "ro/proto/stop_attack_packet.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 namespace {
 
@@ -12,12 +14,7 @@ core::Result<void> SendAction(Connection& link, std::uint32_t target_id, std::ui
   proto::ActionRequest request;
   request.target_id = target_id;
   request.action = action;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 }  // namespace
@@ -29,34 +26,19 @@ core::Result<void> RequestAttack(Connection& link, std::uint32_t target_id, bool
 }
 
 core::Result<void> RequestStopAttack(Connection& link) {
-  auto frame = proto::EncodeStopAttack();
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::EncodeStopAttack());
 }
 
 core::Result<void> RequestTick(Connection& link, std::uint32_t client_tick) {
   proto::TickRequest request;
   request.client_tick = client_tick;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestPickup(Connection& link, std::uint32_t item_id) {
   proto::PickupRequest request;
   request.item_id = item_id;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestChat(Connection& link, std::string_view speaker, std::string_view text) {
@@ -68,44 +50,24 @@ core::Result<void> RequestChat(Connection& link, std::string_view speaker, std::
   // ⚠ LA PHRASE BASCULE, LE NOM JAMAIS : le serveur RELAIE l'une et COMPARE
   // l'autre, octet par octet, à ce que sa base contient.
   request.text = core::WireFromUtf8Text(text);
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestEmotion(Connection& link, std::uint16_t emotion) {
   proto::EmotionRequest request;
   request.pack_id = proto::EmotionRequest::kBasePack;
   request.emotion_id = emotion;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestRespawn(Connection& link) {
   proto::RestartRequest request;
   request.what = proto::RestartRequest::kSavePoint;
-  auto frame = proto::Encode(request);
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(request));
 }
 
 core::Result<void> RequestAutoRevive(Connection& link) {
-  auto frame = proto::Encode(proto::AutoReviveRequest{});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, proto::Encode(proto::AutoReviveRequest{}));
 }
 
 core::Result<void> RequestSit(Connection& link, bool sit) {

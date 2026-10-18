@@ -5,6 +5,8 @@
 
 #include "ro/proto/cart_packets.h"
 
+#include "send_encoded.h"
+
 namespace ro::net {
 
 FrameOutcome ApplyCartChoiceFrame(const Frame& frame, sim::CartChoice& choice) {
@@ -25,13 +27,9 @@ FrameOutcome ApplyCartChoiceFrame(const Frame& frame, sim::CartChoice& choice) {
 
 core::Result<void> RequestCartChoice(Connection& link, std::uint32_t identity,
                                      std::uint8_t cart_type) {
-  auto frame = identity == 0 ? proto::Encode(proto::ChangeCartRequest{cart_type})
-                             : proto::Encode(proto::SelectCartRequest{identity, cart_type});
-  if (!frame) {
-    return std::unexpected(frame.error());
-  }
-  link.Send(*frame);
-  return {};
+  return SendEncoded(link, identity == 0
+                               ? proto::Encode(proto::ChangeCartRequest{cart_type})
+                               : proto::Encode(proto::SelectCartRequest{identity, cart_type}));
 }
 
 }  // namespace ro::net
