@@ -763,6 +763,15 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
   if (!view.status.empty()) {
     ImGui::TextDisabled("%s", view.status.c_str());
   }
+  if (view.server_conflict) {
+    if (SkinButton(core::Tr("Écraser"), art)) {
+      intents.emplace_back(map_editor::Overwrite{});
+    }
+    ImGui::SameLine();
+    if (SkinButton(core::Tr("Recharger"), art)) {
+      intents.emplace_back(map_editor::Reload{});
+    }
+  }
   ImGui::PopItemWidth();
   EndSkinnedWindow();
 }

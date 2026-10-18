@@ -27,15 +27,16 @@ namespace moonclient {
 // CARNET S'ANNONCENT MÊME CARNET ÉTEINT, et le relais Discord même relais décoché : ces bits disent
 // seulement ce que ce client sait lire, et n'abonnent à rien.
 //
-// Et le Marché, qu'un catalogue ouvre à la place de la recherche d'échoppes, et
-// l'habit du GM d'un administrateur, qu'il sait dessiner.
+// Et le Marché, qu'un catalogue ouvre à la place de la recherche d'échoppes,
+// l'habit du GM d'un administrateur, qu'il sait dessiner, et les éditions de
+// carte que le serveur tient.
 inline constexpr std::uint32_t kAlwaysShownSurfaces =
     ro::net::kUiCapNpcDialog | ro::net::kUiCapChat | ro::net::kUiCapCardAlbum |
     ro::net::kUiCapCardAlbumDropper | ro::net::kUiCapFlagGraffiti | ro::net::kUiCapUnitMaster |
     ro::net::kUiCapServerRules | ro::net::kUiCapMvpTrackerExt | ro::net::kUiCapQuestEnd |
     ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich |
     ro::net::kUiCapEquipAttributes | ro::net::kUiCapInstanceInfo | ro::net::kUiCapMarket |
-    ro::net::kUiCapGmOutfit;
+    ro::net::kUiCapGmOutfit | ro::net::kUiCapMapEdits;
 [[nodiscard]] constexpr std::uint32_t ShownSurfaces(bool mvp_tracker_enabled) noexcept {
   return kAlwaysShownSurfaces | (mvp_tracker_enabled ? ro::net::kUiCapMvpTracker : 0U);
 }

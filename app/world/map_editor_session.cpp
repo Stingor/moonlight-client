@@ -227,17 +227,7 @@ void MapEditorSession::FollowMap(std::string_view map_name, const ro::render::Ma
     return;
   }
   map_name_ = std::string(map_name);
-  history_.Clear();
-  selection_.Clear();
-  selected_light_.reset();
-  selected_effect_.reset();
-  selected_map_effect_.reset();
-  gesture_before_.reset();
-  ground_stroke_.reset();
-  designated_point_.reset();
-  selected_points_.clear();
-  ground_dots_.clear();
-  pending_why_.clear();
+  ForgetDocument();
   status_.clear();
 }
 
@@ -363,10 +353,14 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return SetGroundPointHeight(asked, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::RevertGroundPoints>) {
           return RevertGroundPoints(store);
+        } else if constexpr (std::is_same_v<Asked, intents::Overwrite>) {
+          return {.publication = Outcome::Publication::kOverwrite};
+        } else if constexpr (std::is_same_v<Asked, intents::Reload>) {
+          return {.publication = Outcome::Publication::kReload};
         } else {
           static_assert(std::is_same_v<Asked, intents::Save>, "une intention n'est pas routée");
-          Save(store);
-          return {};
+          return {.publication =
+                      Save(store) ? Outcome::Publication::kPublish : Outcome::Publication::kNone};
         }
       },
       intent);
@@ -588,7 +582,7 @@ MapEditorSession::Outcome MapEditorSession::Revert(MapEditStore& store) {
   return {.replace_models = true};
 }
 
-void MapEditorSession::Save(MapEditStore& store) {
+bool MapEditorSession::Save(MapEditStore& store) {
   // UNE RETOUCHE SANS RAISON NE S'ÉCRIT PAS : le document la refuserait à la
   // relecture, et toutes les autres avec elle.
   for (const ro::mapedit::ModelEdit& edit : store.Document(map_name_).models()) {
@@ -597,7 +591,7 @@ void MapEditorSession::Save(MapEditStore& store) {
       std::snprintf(refused.data(), refused.size(),
                     ro::core::Tr("La retouche du modèle %zu n'a pas de raison."), edit.model_index);
       status_ = refused.data();
-      return;
+      return false;
     }
   }
   for (const ro::mapedit::EffectEdit& retouch : store.Document(map_name_).effect_edits()) {
@@ -607,7 +601,7 @@ void MapEditorSession::Save(MapEditStore& store) {
                     ro::core::Tr("La retouche de l'effet %zu n'a pas de raison."),
                     retouch.effect_index);
       status_ = refused.data();
-      return;
+      return false;
     }
   }
   const std::vector<ro::mapedit::AddedEffect>& effects = store.Document(map_name_).effects();
@@ -617,7 +611,7 @@ void MapEditorSession::Save(MapEditStore& store) {
       std::snprintf(refused.data(), refused.size(), ro::core::Tr("L'effet %zu n'a pas de raison."),
                     slot);
       status_ = refused.data();
-      return;
+      return false;
     }
   }
   const std::vector<ro::mapedit::AddedLight>& lights = store.Document(map_name_).lights();
@@ -627,7 +621,7 @@ void MapEditorSession::Save(MapEditStore& store) {
       std::snprintf(refused.data(), refused.size(),
                     ro::core::Tr("La lumière %zu n'a pas de raison, ou pas de portée."), slot);
       status_ = refused.data();
-      return;
+      return false;
     }
   }
   for (const ro::mapedit::MeshEdit& mesh : store.Document(map_name_).meshes()) {
@@ -637,7 +631,7 @@ void MapEditorSession::Save(MapEditStore& store) {
                     ro::core::Tr("La retouche du maillage %zu n'a pas de raison."),
                     mesh.model_index);
       status_ = refused.data();
-      return;
+      return false;
     }
   }
   const std::vector<ro::mapedit::AddedModel>& added = store.Document(map_name_).added();
@@ -648,17 +642,18 @@ void MapEditorSession::Save(MapEditStore& store) {
                     ro::core::Tr("La retouche du modèle %zu n'a pas de raison."),
                     original_count_ + slot);
       status_ = refused.data();
-      return;
+      return false;
     }
   }
   if (auto saved = store.Save(map_name_); !saved) {
     status_ = ro::core::Describe(saved.error());
     ro::core::LogError("édition de {} : {}", map_name_, status_);
-    return;
+    return false;
   }
   status_ = ro::core::Tr("Enregistré.");
   ro::core::LogInfo("édition de {} enregistrée dans {}", map_name_,
                     ro::core::Utf8FromPath(store.FileOf(map_name_)));
+  return true;
 }
 
 void MapEditorSession::Record(std::string label, const ro::mapedit::MapEdit& before,

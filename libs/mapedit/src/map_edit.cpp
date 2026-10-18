@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <expected>
 #include <format>
 #include <tuple>
 #include <utility>
@@ -303,6 +304,18 @@ float LitHoursStrength(const LitHours& hours, float hour) {
   }
   const float fade = std::min(kLitHoursFadeHours, span / 2.0F);
   return std::clamp(std::min(since_start, span - since_start) / fade, 0.0F, 1.0F);
+}
+
+core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view map_name) {
+  core::Result<RevisedMapEdit> revised = ParseRevisedMapEdit(yaml_text, map_name);
+  if (!revised) {
+    return std::unexpected(revised.error());
+  }
+  return std::move(revised->edit);
+}
+
+std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
+  return RevisedMapEditToYaml(edit, map_name, 0);
 }
 
 }  // namespace ro::mapedit

@@ -39,6 +39,7 @@ add_library(ro_proto STATIC
     src/ledger_packets.cpp
     src/quest_packets.cpp
     src/manual_packets.cpp
+    src/map_edit_packets.cpp
     src/navigation_packets.cpp
     src/npc_shop_packets.cpp
     src/autospell_packets.cpp

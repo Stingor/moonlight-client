@@ -84,8 +84,9 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // d'un membre, pièce abîmée), l'issue d'une alliance ou d'une hostilité,
   // l'adoption, les fiches du staff, l'accusé d'un signalement, les points de
   // manière, la ligne d'un état, l'équipement montré par un autre joueur,
-  // avec son refus, le jeu d'équipement de rechange, et la pièce posée ou
-  // retirée — son nom, puis ce qu'elle apporte.
+  // avec son refus, le jeu d'équipement de rechange, la pièce posée ou
+  // retirée — son nom, puis ce qu'elle apporte —, et les éditions de carte que
+  // le serveur tient.
   for (const ro::net::FrameOutcome told :
        {ro::net::ApplyFriendFrame(received, friends_),
         ro::net::ApplyViewEquipFrame(received, inspected_),
@@ -100,7 +101,8 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
         character_->SayEquipSwitch(received, world_, now_ms),
         character_->SayEquipChange(received, world_, now_ms),
-        character_->SayEquipAttributes(received, world_, now_ms)}) {
+        character_->SayEquipAttributes(received, world_, now_ms),
+        pieces_.map_edit_sync.ApplyFrame(received)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = told;
     }

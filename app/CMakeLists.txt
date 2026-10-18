@@ -784,6 +784,7 @@ add_library(moonclient_graphics STATIC
     options/graphics_options.cpp
     world/closed_maps.cpp
     world/map_edit_store.cpp
+    world/map_edit_sync.cpp
     world/map_editor_gizmo.cpp
     world/map_editor_effects.cpp
     world/map_editor_gestures.cpp
@@ -800,7 +801,7 @@ add_library(moonclient_graphics STATIC
     world/server_sky_hour.cpp)
 
 target_link_libraries(moonclient_graphics
-    PUBLIC ro_audio ro_core ro_formats ro_sim ro_vfs ro_render ro_ui moonclient_display
+    PUBLIC ro_audio ro_core ro_formats ro_net ro_sim ro_vfs ro_render ro_ui moonclient_display
            moonclient_settings
     PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 

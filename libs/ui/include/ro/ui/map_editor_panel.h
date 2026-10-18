@@ -279,6 +279,9 @@ struct MapEditorView {
   bool unsaved = false;
   // La dernière nouvelle : enregistré, refusé, et pourquoi.
   std::string status;
+  // Le dernier envoi au serveur a été devancé par une autre révision : il
+  // attend qu'on écrase celle-ci, ou qu'on la recharge.
+  bool server_conflict = false;
 };
 
 // LES INTENTIONS DU STAFF.
@@ -331,6 +334,10 @@ struct SetTool {
   MapEditorTool tool = MapEditorTool::kMove;
 };
 struct Save {};
+// Renvoyer le document au serveur, par-dessus la révision qui l'a devancé.
+struct Overwrite {};
+// Adopter la révision du serveur ; les retouches non enregistrées se perdent.
+struct Reload {};
 // Ajouter une copie du modèle désigné, un peu à côté de lui.
 struct Duplicate {};
 // Amener la caméra sur ce qui est désigné : le modèle, ou la lumière.
@@ -450,7 +457,7 @@ using MapEditorIntent = std::variant<
     map_editor::SetMapEffect, map_editor::RevertMapEffect, map_editor::MoveMapEffect,
     map_editor::SetBrush, map_editor::EndGroundStroke, map_editor::RevertGround,
     map_editor::SetGroundWhy, map_editor::LiftGroundPoints, map_editor::SetGroundPointHeight,
-    map_editor::RevertGroundPoints>;
+    map_editor::RevertGroundPoints, map_editor::Overwrite, map_editor::Reload>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

@@ -1,5 +1,7 @@
+#include <cstdint>
 #include <expected>
 #include <format>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -33,6 +35,8 @@ constexpr std::string_view kMapEditHeader =
 #  main.
 #
 #  map    : la carte, son nom sans extension — celui du fichier ;
+#  revision : facultatif, le numéro que le serveur a donné au document
+#             (docs/adr/0124) — absent, jamais servi ;
 #  models : les retouches de modèles du RSW, chacune :
 #    index    : le rang du modèle dans le RSW, compté à partir de zéro ;
 #    file     : son fichier, relatif à data\model\ ;
@@ -544,8 +548,10 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
 
 }  // namespace
 
-core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view map_name) {
-  MapEdit edit;
+core::Result<RevisedMapEdit> ParseRevisedMapEdit(std::string_view yaml_text,
+                                                 std::string_view map_name) {
+  RevisedMapEdit revised;
+  MapEdit& edit = revised.edit;
   // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
   try {
     const YAML::Node whole = YAML::Load(std::string(yaml_text));
@@ -559,6 +565,13 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
     const YAML::Node map = whole["map"];
     if (!map || map.as<std::string>() != map_name) {
       return std::unexpected(Refused(map_name, "« map » ne nomme pas cette carte"));
+    }
+    if (const YAML::Node revision = whole["revision"]) {
+      const auto value = revision.as<std::int64_t>();
+      if (value < 0 || value > std::numeric_limits<std::uint32_t>::max()) {
+        return std::unexpected(Refused(map_name, "« revision » n'est pas un entier positif"));
+      }
+      revised.revision = static_cast<std::uint32_t>(value);
     }
     if (const YAML::Node models = whole["models"]) {
       if (!models.IsSequence()) {
@@ -646,12 +659,17 @@ core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text, std::string_view 
   } catch (const YAML::Exception& failure) {
     return std::unexpected(Refused(map_name, failure.what()));
   }
-  return edit;
+  return revised;
 }
 
-std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name) {
+std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
+                                 std::uint32_t revision) {
   std::string text(kMapEditHeader);
-  text += std::format("version: {}\nmap: {}\nmodels:", kSupportedVersion, SingleQuoted(map_name));
+  text += std::format("version: {}\nmap: {}\n", kSupportedVersion, SingleQuoted(map_name));
+  if (revision != 0) {
+    text += std::format("revision: {}\n", revision);
+  }
+  text += "models:";
   if (edit.models().empty()) {
     text += " []";
   }

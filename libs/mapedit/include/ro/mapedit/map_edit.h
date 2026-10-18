@@ -341,6 +341,21 @@ class MapEdit {
 // l'identique : c'est ce que l'éditeur enregistre.
 [[nodiscard]] std::string MapEditToYaml(const MapEdit& edit, std::string_view map_name);
 
+// UN DOCUMENT ET SA RÉVISION : le numéro que le serveur lui a donné, 0 pour un
+// document jamais servi (docs/adr/0124). La révision ne fait pas partie du
+// document : l'historique de l'éditeur ne la reprend pas en annulant.
+struct RevisedMapEdit {
+  MapEdit edit;
+  std::uint32_t revision = 0;
+};
+// Comme `ParseMapEdit`, la révision en plus ; une révision qui n'est pas un
+// entier positif refuse le document.
+[[nodiscard]] core::Result<RevisedMapEdit> ParseRevisedMapEdit(std::string_view yaml_text,
+                                                               std::string_view map_name);
+// Comme `MapEditToYaml`, la révision écrite en tête quand elle n'est pas nulle.
+[[nodiscard]] std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
+                                               std::uint32_t revision);
+
 // L'opacité qu'une opération posée donne au modèle de rang `model_index`.
 struct ModelOpacity {
   std::size_t model_index = 0;

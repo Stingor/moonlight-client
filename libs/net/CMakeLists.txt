@@ -93,6 +93,7 @@ add_library(ro_net STATIC
     src/vending.cpp
     src/handshake.cpp
     src/map_guidance.cpp
+    src/map_edits.cpp
     src/map_name.cpp
     src/map_mode.cpp
     src/party.cpp
@@ -131,9 +132,11 @@ add_library(ro_net STATIC
 add_library(ro::net ALIAS ro_net)
 
 target_include_directories(ro_net PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# zlib compresse les documents d'édition de carte (ADR 0124) ; liée en PRIVATE,
+# elle n'apparaît dans aucun en-tête public.
 target_link_libraries(ro_net
     PUBLIC ro_core ro_proto ro_sim
-    PRIVATE ro_warnings)
+    PRIVATE ZLIB::ZLIB ro_warnings)
 
 # Winsock n'est pas dans la bibliothèque C du système : sans cette ligne, tous
 # les appels réseau manquent à l'édition de liens.

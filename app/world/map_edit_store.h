@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 #include <map>
 #include <string>
@@ -20,6 +21,11 @@ namespace moonclient {
 // fichiers lit le disque avant elles : ce qui vient d'être écrit est ce qui se
 // relit. Un client d'essai, qui lit une installation sans y écrire, garde
 // ainsi ses documents à part.
+//
+// LE SERVEUR TIENT LA RÉVISION (docs/adr/0124) : chaque document porte le
+// numéro que le serveur lui a donné, 0 s'il n'a jamais été servi. Elle vit à
+// côté du document et non dedans : l'historique de l'éditeur ne la reprend pas
+// en annulant.
 class MapEditStore {
  public:
   void Open(std::filesystem::path client_root) { client_root_ = std::move(client_root); }
@@ -35,6 +41,20 @@ class MapEditStore {
   // Le remplace ; il diffère alors de celui qui est enregistré.
   void Set(std::string_view map_name, ro::mapedit::MapEdit edit);
   [[nodiscard]] bool Unsaved(std::string_view map_name) const;
+  // La révision du document de `map_name` ; 0 s'il n'a jamais été servi.
+  [[nodiscard]] std::uint32_t Revision(std::string_view map_name) const;
+  // Le serveur a accepté le document sous `revision` : le prochain envoi s'y
+  // fonde. Rien ne s'écrit, et les retouches non enregistrées restent.
+  void SetRevision(std::string_view map_name, std::uint32_t revision);
+  // ADOPTE LE DOCUMENT SERVI : il s'écrit, sous sa révision, puis remplace celui
+  // que le jeu tient, retouches non enregistrées comprises.
+  [[nodiscard]] ro::core::Result<void> Adopt(std::string_view map_name, ro::mapedit::MapEdit edit,
+                                             std::uint32_t revision);
+  // Écrit le document servi sans toucher à celui que le jeu tient : le staff a
+  // des retouches non enregistrées, que l'adoption effacerait.
+  [[nodiscard]] ro::core::Result<void> WriteServed(std::string_view map_name,
+                                                   const ro::mapedit::MapEdit& edit,
+                                                   std::uint32_t revision) const;
 
   // Le fichier où s'écrit le document de `map_name`.
   [[nodiscard]] std::filesystem::path FileOf(std::string_view map_name) const;
@@ -44,6 +64,7 @@ class MapEditStore {
  private:
   struct Entry {
     ro::mapedit::MapEdit edit;
+    std::uint32_t revision = 0;
     bool unsaved = false;
   };
   std::filesystem::path client_root_;

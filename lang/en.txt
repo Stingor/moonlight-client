@@ -19653,3 +19653,48 @@ tr: Show the zones on the ground
 
 fr: Fenêtre ouverte, les zones de suivi (bleu), d'éloignement (orange) et d'engagement (rouge) se dessinent au sol autour du maître, avec la case qu'il garde. Cochée, elles y restent fenêtre fermée.
 tr: While this window is open, the follow (blue), maximum distance (orange) and engagement (red) zones are drawn on the ground around the owner, along with the cell it guards. Ticked, they stay there with the window closed.
+
+fr: Publié sur le serveur : révision %u.
+tr: Published on the server: revision %u.
+
+fr: La révision %u du serveur devance la vôtre : écrasez-la ou rechargez-la.
+tr: The server's revision %u is ahead of yours: overwrite it or reload it.
+
+fr: Le serveur refuse : votre niveau ne permet pas de publier.
+tr: The server refuses: your level does not allow publishing.
+
+fr: Le serveur n'a pas pu lire le document.
+tr: The server could not read the document.
+
+fr: Le serveur n'a pas pu ranger le document.
+tr: The server could not store the document.
+
+fr: La révision %u reçue du serveur est illisible : elle ne s'applique pas.
+tr: Revision %u received from the server is unreadable: it is not applied.
+
+fr: Révision %u de %s reçue : vos retouches non enregistrées la masquent.
+tr: Revision %u by %s received: your unsaved edits hide it.
+
+fr: Révision %u de %s appliquée.
+tr: Revision %u by %s applied.
+
+fr: Enregistré sur ce poste : le serveur ne tient pas les éditions de carte.
+tr: Saved on this computer: the server does not keep map edits.
+
+fr: Enregistré sur ce poste : votre niveau ne permet pas de publier.
+tr: Saved on this computer: your level does not allow publishing.
+
+fr: Enregistré, et envoyé au serveur.
+tr: Saved, and sent to the server.
+
+fr: Envoyé au serveur, pour écraser sa révision.
+tr: Sent to the server, to overwrite its revision.
+
+fr: Révision demandée au serveur.
+tr: Revision requested from the server.
+
+fr: Écraser
+tr: Overwrite
+
+fr: Recharger
+tr: Reload

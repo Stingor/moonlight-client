@@ -98,6 +98,7 @@
 #include "world/hit_popups.h"
 #include "world/item_obtain_toast.h"
 #include "world/item_pickup_report.h"
+#include "world/map_edit_sync.h"
 #include "world/map_sign_stage.h"
 #include "world/music_player_stage.h"
 #include "world/night_light_view.h"
@@ -531,6 +532,8 @@ struct GamePieces {
   SurfaceAnnouncer surfaces;
   // L'HABIT DU GM DE L'ADMINISTRATEUR, dit au serveur : voir `GmOutfitAnnouncer`.
   GmOutfitAnnouncer gm_outfit;
+  // LES ÉDITIONS DE CARTE QUE LE SERVEUR TIENT : voir `MapEditSync`.
+  MapEditSync map_edit_sync;
 };
 
 // Charge les accessoires DANS la structure, plutôt que d'en rendre une.

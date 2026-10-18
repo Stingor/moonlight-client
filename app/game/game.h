@@ -323,15 +323,15 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   [[nodiscard]] ro::core::Result<void> FollowGreyWorldRelief();
   // LE MODE ÉDITEUR DE CARTE : voir game_map_editor.cpp.
   void ServeMapEditor();
-  // Les intentions, la vue et les poignées : tout l'éditeur sauf les lumières.
+  // Tout l'éditeur sauf les lumières, et ce que le serveur en apprend ou en sert (ADR 0124).
   void ServeMapEditorTools();
   void ReplaceMapModels();
-  // L'outil Sommets de l'image : voir game_map_editor.cpp.
   void ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height);
-  // L'outil Relief et le sol qui suit le document : voir game_map_ground.cpp.
+  [[nodiscard]] bool PublishMapEdit(const MapEditorSession::Outcome& outcome);
+  void FollowServedMapEdit(const MapEditSync::Report& report);
+  // L'outil Relief, ses points, et le sol qui suit le document : voir game_map_ground.cpp.
   void ServeGroundBrush();
   void FollowMapGround();
-  // Le mode Sommets de l'outil Relief : ses points et sa poignée à l'écran.
   void ServeGroundPoints(float width, float height);
   void DrawInterface(std::uint32_t now_ms);
 

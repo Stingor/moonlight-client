@@ -5197,6 +5197,65 @@ struct ZcMoonlightGmOutfit {
   std::uint8_t worn = 0;
 };
 
+// PACKET_CZ_MOONCLIENT_MAP_EDIT_PUT
+struct CzMoonclientMapEditPut {
+  static constexpr std::uint16_t kOpcode = 0x0f45;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 36;
+
+  std::string map;
+  std::uint32_t base_revision = 0;
+  std::uint32_t zipped_size = 0;
+  std::uint32_t text_size = 0;
+  std::uint32_t offset = 0;
+};
+
+// PACKET_ZC_MOONCLIENT_MAP_EDIT_RESULT
+struct ZcMoonclientMapEditResult {
+  static constexpr std::uint16_t kOpcode = 0x0f46;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 25;
+
+  std::string map;
+  std::uint8_t result = 0;
+  std::uint32_t revision = 0;
+};
+
+// PACKET_ZC_MOONCLIENT_MAP_EDIT_DOC
+struct ZcMoonclientMapEditDoc {
+  static constexpr std::uint16_t kOpcode = 0x0f47;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 60;
+
+  std::string map;
+  std::uint32_t revision = 0;
+  std::uint32_t zipped_size = 0;
+  std::uint32_t text_size = 0;
+  std::uint32_t offset = 0;
+  std::string author;
+};
+
+// PACKET_ZC_MOONCLIENT_MAP_EDIT_REVISION
+struct ZcMoonclientMapEditRevision {
+  static constexpr std::uint16_t kOpcode = 0x0f48;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 25;
+
+  std::string map;
+  std::uint32_t revision = 0;
+  std::uint8_t can_publish = 0;
+};
+
+// PACKET_CZ_MOONCLIENT_MAP_EDIT_GET
+struct CzMoonclientMapEditGet {
+  static constexpr std::uint16_t kOpcode = 0x0f49;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 20;
+
+  std::int16_t packetLength = 0;
+  std::string map;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8345,6 +8404,11 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightGmOutfit& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightGmOutfit& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonclientMapEditPut& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditResult& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditDoc& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditRevision& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonclientMapEditGet& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -8948,6 +9012,11 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightGmOutfit& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightGmOutfit& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonclientMapEditPut& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditResult& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditDoc& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditRevision& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonclientMapEditGet& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

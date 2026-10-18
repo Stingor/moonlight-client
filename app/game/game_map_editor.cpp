@@ -129,6 +129,12 @@ void Game::ServeMapEditor() {
 
 void Game::ServeMapEditorTools() {
   ro::ui::StaffToolsState& tools = windows_.staff_tools;
+  // LES ÉDITIONS QUE LE SERVEUR TIENT, chez tout joueur, staff ou non.
+  if (stage_.has_value()) {
+    const MapEditSync::Report synced =
+        pieces_.map_edit_sync.Serve(stage_->name, map_edits_, *vfs_, link_);
+    FollowServedMapEdit(synced);
+  }
   // SANS LE DROIT, le mode se ferme : il peut se perdre en cours de session.
   if (!Rights().staff_tools || !stage_.has_value()) {
     map_editor_.Leave();
@@ -147,12 +153,12 @@ void Game::ServeMapEditorTools() {
   ServeGroundBrush();
   bool replace = false;
   for (const ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
-    replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
+    replace |= PublishMapEdit(map_editor_.Apply(intent, stage_->scene, map_edits_));
   }
   tools.map_editor_intents.clear();
   // LES GESTES DES POIGNÉES ET DU CLAVIER, mis en file.
   for (const ro::ui::MapEditorIntent& intent : map_editor_.TakeQueued()) {
-    replace |= map_editor_.Apply(intent, stage_->scene, map_edits_).replace_models;
+    replace |= PublishMapEdit(map_editor_.Apply(intent, stage_->scene, map_edits_));
   }
   if (replace) {
     ReplaceMapModels();
@@ -161,6 +167,7 @@ void Game::ServeMapEditorTools() {
   // brosse, une annulation, un retour au relief de la carte.
   FollowMapGround();
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
+  tools.map_editor.server_conflict = pieces_.map_edit_sync.Conflicted(stage_->name);
   // LA BIBLIOTHÈQUE, lue une fois dans l'installation, à la première ouverture.
   if (map_editor_.active() && model_library_ == nullptr) {
     model_library_ = std::make_shared<const std::vector<std::string>>(ModelLibrary(*vfs_));
@@ -382,8 +389,39 @@ void Game::PlayMapModelVerb(int verb) {
       outcome = map_editor_.Apply(ro::ui::map_editor::Save{}, stage_->scene, map_edits_);
       break;
   }
-  if (outcome.replace_models) {
+  if (PublishMapEdit(outcome)) {
     ReplaceMapModels();
+  }
+}
+
+bool Game::PublishMapEdit(const MapEditorSession::Outcome& outcome) {
+  using Publication = MapEditorSession::Outcome::Publication;
+  MapEditSync& sync = pieces_.map_edit_sync;
+  switch (outcome.publication) {
+    case Publication::kNone:
+      break;
+    case Publication::kPublish:
+      map_editor_.SetStatus(sync.Publish(stage_->name, map_edits_, link_));
+      break;
+    case Publication::kOverwrite:
+      map_editor_.SetStatus(sync.Overwrite(stage_->name, map_edits_, link_));
+      break;
+    case Publication::kReload:
+      FollowServedMapEdit(sync.Reload(stage_->name, stage_->name, map_edits_, link_));
+      break;
+  }
+  return outcome.replace_models;
+}
+
+void Game::FollowServedMapEdit(const MapEditSync::Report& report) {
+  // UN DOCUMENT REMPLACÉ : le décor se repose, le sol, les effets et les
+  // lumières le suivent d'eux-mêmes, et l'historique de l'éditeur ne vaut plus.
+  if (report.replaced) {
+    map_editor_.ForgetDocument();
+    ReplaceMapModels();
+  }
+  if (!report.status.empty()) {
+    map_editor_.SetStatus(report.status);
   }
 }
 

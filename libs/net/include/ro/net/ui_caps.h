@@ -69,6 +69,10 @@ inline constexpr std::uint32_t kUiCapMarket = 0x00008000;
 // 🔴 UNE CAPACITÉ DE LECTURE : ce client sait dessiner l'habit du GM d'un joueur
 // (`ZC 0x0F44`). Même règle : le serveur ne l'envoie qu'à qui l'annonce.
 inline constexpr std::uint32_t kUiCapGmOutfit = 0x00010000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire les éditions de carte que le
+// serveur tient (`ZC 0x0F46` à `0x0F48`), et les lui envoyer (`CZ 0x0F45`,
+// `0x0F49`). Même règle : le serveur ne les envoie qu'à qui l'annonce.
+inline constexpr std::uint32_t kUiCapMapEdits = 0x00020000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

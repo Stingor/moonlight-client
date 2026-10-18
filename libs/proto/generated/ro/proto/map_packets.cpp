@@ -12164,6 +12164,171 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightGmOutfit& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, CzMoonclientMapEditPut& packet) {
+  if (frame.size() < CzMoonclientMapEditPut::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonclientMapEditPut::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.map = reader.FixedString(16);
+  packet.base_revision = static_cast<std::uint32_t>(reader.U32());
+  packet.zipped_size = static_cast<std::uint32_t>(reader.U32());
+  packet.text_size = static_cast<std::uint32_t>(reader.U32());
+  packet.offset = static_cast<std::uint32_t>(reader.U32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonclientMapEditPut& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonclientMapEditPut::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonclientMapEditPut::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.FixedString(packet.map, 16);
+  writer.U32(static_cast<std::uint32_t>(packet.base_revision));
+  writer.U32(static_cast<std::uint32_t>(packet.zipped_size));
+  writer.U32(static_cast<std::uint32_t>(packet.text_size));
+  writer.U32(static_cast<std::uint32_t>(packet.offset));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditResult& packet) {
+  if (frame.size() < ZcMoonclientMapEditResult::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonclientMapEditResult::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.map = reader.FixedString(16);
+  packet.result = static_cast<std::uint8_t>(reader.U8());
+  packet.revision = static_cast<std::uint32_t>(reader.U32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditResult& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonclientMapEditResult::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonclientMapEditResult::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.FixedString(packet.map, 16);
+  writer.U8(static_cast<std::uint8_t>(packet.result));
+  writer.U32(static_cast<std::uint32_t>(packet.revision));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditDoc& packet) {
+  if (frame.size() < ZcMoonclientMapEditDoc::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonclientMapEditDoc::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.map = reader.FixedString(16);
+  packet.revision = static_cast<std::uint32_t>(reader.U32());
+  packet.zipped_size = static_cast<std::uint32_t>(reader.U32());
+  packet.text_size = static_cast<std::uint32_t>(reader.U32());
+  packet.offset = static_cast<std::uint32_t>(reader.U32());
+  packet.author = reader.FixedString(24);
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditDoc& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonclientMapEditDoc::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonclientMapEditDoc::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.FixedString(packet.map, 16);
+  writer.U32(static_cast<std::uint32_t>(packet.revision));
+  writer.U32(static_cast<std::uint32_t>(packet.zipped_size));
+  writer.U32(static_cast<std::uint32_t>(packet.text_size));
+  writer.U32(static_cast<std::uint32_t>(packet.offset));
+  writer.FixedString(packet.author, 24);
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditRevision& packet) {
+  if (frame.size() < ZcMoonclientMapEditRevision::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonclientMapEditRevision::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.map = reader.FixedString(16);
+  packet.revision = static_cast<std::uint32_t>(reader.U32());
+  packet.can_publish = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditRevision& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonclientMapEditRevision::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonclientMapEditRevision::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.FixedString(packet.map, 16);
+  writer.U32(static_cast<std::uint32_t>(packet.revision));
+  writer.U8(static_cast<std::uint8_t>(packet.can_publish));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonclientMapEditGet& packet) {
+  if (frame.size() != CzMoonclientMapEditGet::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonclientMapEditGet::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.map = reader.FixedString(16);
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonclientMapEditGet& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonclientMapEditGet::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonclientMapEditGet::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.FixedString(packet.map, 16);
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

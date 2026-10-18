@@ -64,6 +64,17 @@ class MapEditorSession {
   struct Outcome {
     // Le document a changé : le décor doit se reposer.
     bool replace_models = false;
+    // Ce que le serveur doit apprendre du document : voir docs/adr/0124.
+    enum class Publication {
+      kNone,
+      // Il vient de s'enregistrer : l'envoyer.
+      kPublish,
+      // Son envoi était périmé : le renvoyer, fondé sur la révision du serveur.
+      kOverwrite,
+      // Son envoi était périmé : adopter la révision du serveur.
+      kReload,
+    };
+    Publication publication = Publication::kNone;
   };
 
   [[nodiscard]] bool active() const noexcept { return active_; }
@@ -80,6 +91,24 @@ class MapEditorSession {
   // et le geste en cours, qui ne valent que pour la leur, et relit les noms de
   // ses modèles pour l'arbre de la scène.
   void FollowMap(std::string_view map_name, const ro::render::MapScene& scene);
+  // OUBLIE CE QUI VALAIT POUR LE DOCUMENT : l'historique, la sélection et le
+  // geste en cours. Le document a été remplacé par un autre, ou la carte a
+  // changé.
+  void ForgetDocument() noexcept {
+    history_.Clear();
+    selection_.Clear();
+    selected_light_.reset();
+    selected_effect_.reset();
+    selected_map_effect_.reset();
+    gesture_before_.reset();
+    ground_stroke_.reset();
+    designated_point_.reset();
+    selected_points_.clear();
+    ground_dots_.clear();
+    pending_why_.clear();
+  }
+  // Une nouvelle pour la barre d'état, venue d'ailleurs que de l'éditeur.
+  void SetStatus(std::string status) { status_ = std::move(status); }
 
   // Le modèle désigné, par son rang dans le RSW.
   [[nodiscard]] std::optional<std::size_t> selected() const noexcept {
@@ -271,7 +300,8 @@ class MapEditorSession {
   Outcome PlaceAdded(std::size_t slot, const ro::ui::map_editor::Place& place, MapEditStore& store);
   // Le rang dans la liste des ajouts du modèle désigné, s'il en est un.
   [[nodiscard]] std::optional<std::size_t> AddedSlot(const ro::render::MapScene& scene) const;
-  void Save(MapEditStore& store);
+  // Vrai quand le document s'est écrit.
+  [[nodiscard]] bool Save(MapEditStore& store);
   // LES LUMIÈRES PONCTUELLES : voir map_editor_lights.cpp.
   // Une lumière à `position`, ou au-dessus du point de pose sans position.
   Outcome AddLight(const std::optional<std::array<float, 3>>& position, MapEditStore& store);

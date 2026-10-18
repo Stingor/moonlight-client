@@ -498,6 +498,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.trade.npc_shop().SeeSaveRoot(client_root_, ticket_.account.account_id);
   pieces_.trade.StartSession();
   windows_.trade = TradeWindows{};
+  // NI CE QUE LE SERVEUR A DIT DES ÉDITIONS DE CARTE.
+  pieces_.map_edit_sync.StartSession();
   // LE COURRIER AUSSI : ni boîte, ni écriture ne survivent à la partie.
   pieces_.mail.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
                    pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
