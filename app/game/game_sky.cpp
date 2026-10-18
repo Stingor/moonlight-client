@@ -89,22 +89,24 @@ ro::render::SunShadowView Game::DrawSunShadowIfAsked(
 ro::render::PointLightSet Game::DrawPointShadowsIfAsked(
     const ro::render::PointLightSet& points, bool models_shown,
     std::span<const ro::render::DrawnActor> companions) {
-  if (points.count == 0 || point_maps_refused_ ||
-      !settings_->options().graphics().real_time_shadows()) {
-    return points;
+  if (points.lights.empty() || point_stage_refused_) {
+    return ro::render::PointLightSet();
   }
-  if (!point_maps_.valid()) {
-    auto created = ro::render::PointShadowMaps::Create(ro::render::kPointShadowMapTexels);
+  if (!point_stage_.valid()) {
+    auto created = ro::render::PointLightStage::Create();
     if (!created) {
-      point_maps_refused_ = true;
-      ro::core::LogWarning("ombres des lumières ponctuelles refusées : {}",
+      point_stage_refused_ = true;
+      ro::core::LogWarning("lumières ponctuelles refusées : {}",
                            ro::core::Describe(created.error()));
-      return points;
+      return ro::render::PointLightSet();
     }
-    point_maps_ = std::move(*created);
+    point_stage_ = std::move(*created);
   }
-  return ro::render::DrawPointShadows(point_maps_, ShadowCastersOfFrame(models_shown, companions),
-                                      points, camera_);
+  // SANS OMBRE, les lumières éclairent quand même.
+  const ro::render::SunShadowCasters casters = ShadowCastersOfFrame(models_shown, companions);
+  const bool shadowed = settings_->options().graphics().real_time_shadows();
+  return ro::render::DrawPointShadows(point_stage_, shadowed ? &casters : nullptr, points, camera_,
+                                      aspect_ratio_);
 }
 
 ro::render::SunShadowCasters Game::ShadowCastersOfFrame(

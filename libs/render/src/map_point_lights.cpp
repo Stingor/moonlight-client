@@ -83,7 +83,7 @@ PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
         .range_world = light.range,
         .casts_shadow = light.shadow});
   }
-  return NearestPointLights(placed, eye);
+  return PointLightsByDistance(placed, eye);
 }
 
 }  // namespace ro::render

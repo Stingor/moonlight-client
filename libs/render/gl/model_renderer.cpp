@@ -222,21 +222,7 @@ enum SamplerRank : std::size_t {
 
 }  // namespace
 
-ModelRenderer::ModelRenderer(ModelRenderer&& other) noexcept
-    : program_(std::move(other.program_)),
-      placeholder_(std::move(other.placeholder_)),
-      veiled_(std::exchange(other.veiled_, VertexStore())),
-      textures_(std::move(other.textures_)),
-      batches_(std::move(other.batches_)),
-      instance_count_(other.instance_count_),
-      uploaded_textures_(other.uploaded_textures_),
-      samplers_(std::exchange(other.samplers_, {})),
-      filter_(other.filter_),
-      max_anisotropy_(other.max_anisotropy_),
-      mipmaps_complete_(other.mipmaps_complete_) {
-  other.instance_count_ = 0;
-  other.uploaded_textures_ = 0;
-}
+ModelRenderer::ModelRenderer(ModelRenderer&& other) noexcept { *this = std::move(other); }
 
 ModelRenderer& ModelRenderer::operator=(ModelRenderer&& other) noexcept {
   if (this != &other) {
@@ -248,6 +234,8 @@ ModelRenderer& ModelRenderer::operator=(ModelRenderer&& other) noexcept {
     std::swap(veiled_, other.veiled_);
     std::swap(textures_, other.textures_);
     std::swap(batches_, other.batches_);
+    std::swap(pose_boxes_, other.pose_boxes_);
+    std::swap(uploads_, other.uploads_);
     std::swap(instance_count_, other.instance_count_);
     std::swap(uploaded_textures_, other.uploaded_textures_);
     std::swap(samplers_, other.samplers_);
@@ -377,6 +365,8 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
   uploaded_textures_ = 0;
   baked_batches_ = 0;
   batches_.reserve(models.size());
+  pose_boxes_.assign(models.size(), ModelPoseBoxes());
+  ++uploads_;
   // Les noms que ce téléversement cite : les autres textures se rendront au
   // pilote une fois tous les lots posés.
   std::set<std::string> cited;
@@ -440,6 +430,7 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
       }
     }
     batches_.push_back(std::move(batch));
+    pose_boxes_[model_index] = PoseBoxesOf(model);
   }
   for (Batch& batch : previous) {
     Release(batch.baked);
@@ -640,6 +631,16 @@ void ModelRenderer::DrawOpaque(const glm::mat4& view_projection, const SceneLigh
     const auto full = [&opacity](std::size_t slot) {
       return slot >= opacity.size() || opacity[slot] == kVeilOpaque;
     };
+    // UN LOT SANS POSE PLEINE se saute entier : c'est le cas de presque tous
+    // pour une face d'ombre ponctuelle, qui ne voit que ses voisins.
+    std::size_t slots = batch.still_poses;
+    for (const std::vector<glm::mat4>& group : batch.animated_transforms) {
+      slots += group.size();
+    }
+    if (opacity.size() >= slots &&
+        std::ranges::none_of(opacity, [](std::uint8_t kept) { return kept == kVeilOpaque; })) {
+      continue;
+    }
     program_.SetInt("u_shade_type", batch.shade_type);
     program_.SetMatrix4("u_node", identity);
     program_.SetInt("u_flip_sides", 0);

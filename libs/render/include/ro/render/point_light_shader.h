@@ -1,7 +1,11 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <string_view>
+#include <vector>
+
+#include <glm/glm.hpp>
 
 #include "ro/render/gl_program.h"
 #include "ro/render/point_lights.h"
@@ -62,28 +66,24 @@ vec3 PointSurfaceLighting(vec3 surface_normal) {
 // Ce qui se tient à moins de `u_point_shadow_clearance` de la lumière, le long
 // de l'axe de sa face, n'est pas ombré : voir `kPointShadowClearanceWorld`.
 inline constexpr std::string_view kPointLightGlsl = R"GLSL(
-// La même borne que `kMaxPointLights` côté C++.
-const int kMaxPointLights = 16;
-// La même que `kMaxShadowedPointLights` : une carte par branche de `PointVisibility`.
-const int kMaxShadowedPointLights = 4;
+// LES LUMIÈRES, sans borne de nombre : `kPointLightTexels` texels chacune dans
+// `u_point_lights`, voir `PointLightTexelsOf`.
+//   0 : position, portée ;
+//   1 : couleur, ce que l'ombre retire (`PointLight::shadow_depth`) ;
+//   2 : plan lointain de sa carte, pénombre (`PointLight::shadow_spread`),
+//       palier (négatif sans carte), couche dans le tableau du palier.
+const int kPointLightTexels = 3;
+// La même borne que `kPointShadowTierCount` côté C++ : un tableau de cubes par palier.
+const int kPointShadowTierCount = 3;
 uniform int u_point_count;
-uniform vec3 u_point_position[kMaxPointLights];
-uniform vec3 u_point_color[kMaxPointLights];
-uniform float u_point_range[kMaxPointLights];
-// Les `u_point_shadowed` premières lumières lisent leur carte.
-uniform int u_point_shadowed;
-uniform samplerCubeShadow u_point_shadow_0;
-uniform samplerCubeShadow u_point_shadow_1;
-uniform samplerCubeShadow u_point_shadow_2;
-uniform samplerCubeShadow u_point_shadow_3;
-uniform float u_point_shadow_far[kMaxShadowedPointLights];
-// Voir `PointLight::shadow_depth` et `PointLight::shadow_spread`.
-uniform float u_point_shadow_depth[kMaxShadowedPointLights];
-uniform float u_point_shadow_spread[kMaxShadowedPointLights];
+uniform samplerBuffer u_point_lights;
+uniform samplerCubeArrayShadow u_point_shadow_fine;
+uniform samplerCubeArrayShadow u_point_shadow_middle;
+uniform samplerCubeArrayShadow u_point_shadow_coarse;
 // Le plan proche de chaque face : voir `kPointShadowClearanceWorld`.
 uniform float u_point_shadow_clearance;
-// Le côté d'un texel à une unité de la lumière.
-uniform float u_point_shadow_texel;
+// Le côté d'un texel à une unité de la lumière, par palier.
+uniform float u_point_shadow_texel[kPointShadowTierCount];
 
 const float kPointShadowPullTexels = 1.5;
 // LE SOULÈVEMENT, en texels, d'une face que la lumière rase : il couvre la
@@ -113,16 +113,28 @@ float PointShadowReference(vec3 from_light, float far_world) {
     return normalized * 0.5 + 0.5;
 }
 
+// Une lecture comparée de la couche `layer` du tableau du palier `tier`.
+float PointShadowLookup(int tier, float layer, vec3 tap, float reference) {
+    vec4 at = vec4(tap, layer);
+    if (tier == 0) {
+        return texture(u_point_shadow_fine, at, reference);
+    }
+    if (tier == 1) {
+        return texture(u_point_shadow_middle, at, reference);
+    }
+    return texture(u_point_shadow_coarse, at, reference);
+}
+
 // `surface_normal` : la normale de la face qui reçoit, de signe quelconque, ou
 // zéro pour un point sans face.
-float PointShadowTaps(samplerCubeShadow map, vec3 from_light, float far_world, float pull,
+float PointShadowTaps(int tier, float layer, vec3 from_light, float far_world, float pull,
                       vec3 surface_normal, float spread) {
     if (PointShadowAxis(from_light) <= u_point_shadow_clearance) {
         return 1.0;
     }
     float distance_world = length(from_light);
     vec3 way = from_light / distance_world;
-    float texel_world = distance_world * u_point_shadow_texel;
+    float texel_world = distance_world * u_point_shadow_texel[tier];
     // Le sinus de l'angle entre la normale et la lumière : nul pour une face
     // vue de front, un pour une face rasée.
     vec3 facing = dot(surface_normal, way) > 0.0 ? -surface_normal : surface_normal;
@@ -154,47 +166,39 @@ float PointShadowTaps(samplerCubeShadow map, vec3 from_light, float far_world, f
     for (int row = -radius; row <= radius; ++row) {
         for (int column = -radius; column <= radius; ++column) {
             vec3 tap = nearer + (side * float(column) + lift * float(row)) * step_world;
-            lit += texture(map, vec4(tap, PointShadowReference(tap, far_world)));
+            lit += PointShadowLookup(tier, layer, tap, PointShadowReference(tap, far_world));
             taps += 1.0;
         }
     }
     return lit / taps;
 }
 
-// La part de la lumière `index` qui atteint `world_position` : un sans carte.
-// L'ombre n'en retire que sa profondeur.
-float PointVisibility(int index, vec3 world_position, float pull, vec3 surface_normal) {
-    if (index >= u_point_shadowed) {
+// La part de la lumière dont `first` est le premier texel qui atteint
+// `world_position` depuis `light_position` : un sans carte. L'ombre n'en
+// retire que sa profondeur.
+float PointVisibility(int first, vec3 light_position, float shadow_depth, vec3 world_position,
+                      float pull, vec3 surface_normal) {
+    vec4 shadow = texelFetch(u_point_lights, first + 2);
+    int tier = int(shadow.z);
+    if (tier < 0 || tier >= kPointShadowTierCount) {
         return 1.0;
     }
-    vec3 from_light = world_position - u_point_position[index];
-    // UNE BRANCHE PAR CARTE : un lecteur de texture ne s'indexe pas par une
-    // variable en GLSL 3.30.
-    float lit;
-    if (index == 0) {
-        lit = PointShadowTaps(u_point_shadow_0, from_light, u_point_shadow_far[0], pull,
-                              surface_normal, u_point_shadow_spread[0]);
-    } else if (index == 1) {
-        lit = PointShadowTaps(u_point_shadow_1, from_light, u_point_shadow_far[1], pull,
-                              surface_normal, u_point_shadow_spread[1]);
-    } else if (index == 2) {
-        lit = PointShadowTaps(u_point_shadow_2, from_light, u_point_shadow_far[2], pull,
-                              surface_normal, u_point_shadow_spread[2]);
-    } else {
-        lit = PointShadowTaps(u_point_shadow_3, from_light, u_point_shadow_far[3], pull,
-                              surface_normal, u_point_shadow_spread[3]);
-    }
-    return mix(1.0, lit, u_point_shadow_depth[index]);
+    float lit = PointShadowTaps(tier, shadow.w, world_position - light_position, shadow.x, pull,
+                                surface_normal, shadow.y);
+    return mix(1.0, lit, shadow_depth);
 }
 
 vec3 PointLightingOf(vec3 world_position, vec3 surface_normal, float pull) {
     vec3 sum = vec3(0.0);
     for (int index = 0; index < u_point_count; ++index) {
-        float remaining = clamp(1.0 - distance(world_position, u_point_position[index]) /
-                                          u_point_range[index], 0.0, 1.0);
+        int first = index * kPointLightTexels;
+        vec4 place = texelFetch(u_point_lights, first);
+        float remaining = clamp(1.0 - distance(world_position, place.xyz) / place.w, 0.0, 1.0);
         if (remaining > 0.0) {
-            sum += u_point_color[index] * remaining * remaining *
-                   PointVisibility(index, world_position, pull, surface_normal);
+            vec4 color = texelFetch(u_point_lights, first + 1);
+            sum += color.rgb * remaining * remaining *
+                   PointVisibility(first, place.xyz, color.a, world_position, pull,
+                                   surface_normal);
         }
     }
     return sum;
@@ -207,18 +211,31 @@ vec3 PointLightingPulled(vec3 world_position, float pull) {
 )GLSL";
 
 // `shader` avec `points` inséré juste après sa ligne `#version`, qui doit
-// rester la première.
+// rester la première. ⚠ ELLE PASSE À `kPointLightGlslVersion` : les tableaux de
+// cubes et les textures-tampons que lit `kPointLightGlsl` n'existent pas
+// avant.
 [[nodiscard]] std::string WithPointLights(std::string_view shader, std::string_view points);
 // Le même, avec `lighting` — `kPointLightGlsl` — inséré aussi.
 [[nodiscard]] std::string WithPointLights(std::string_view shader, std::string_view points,
                                           std::string_view lighting);
 
+// La ligne que `WithPointLights` met en tête du nuanceur.
+inline constexpr std::string_view kPointLightGlslVersion = "#version 430 core";
+
+// Les texels qu'une lumière occupe dans la texture-tampon des nuanceurs.
+inline constexpr std::size_t kPointLightTexels = 3;
+
+// LES LUMIÈRES DE `set` TELLES QUE LES NUANCEURS LES LISENT : `kPointLightTexels`
+// texels par lumière, dans l'ordre que décrit `kPointLightGlsl`.
+[[nodiscard]] std::vector<glm::vec4> PointLightTexelsOf(const PointLightSet& set);
+
 // Pose les uniformes des lumières ponctuelles sur le programme EN SERVICE, et
-// lie leurs cartes d'ombre. Un ensemble vide n'ajoute aucune lumière.
+// lie leurs lumières et leurs cartes d'ombre. Un ensemble vide, ou que son
+// `stage` n'a pas téléversé, n'ajoute aucune lumière.
 //
 // ⚠ À APPELER POUR TOUT PROGRAMME QUI PORTE `kPointLightGlsl`, même sans
-// lumière : ses lecteurs de cartes cubiques prennent alors leurs propres
-// unités, et non l'unité zéro, que la texture occupe sous un autre type.
+// lumière : ses lecteurs prennent alors leurs propres unités, et non l'unité
+// zéro, que la texture occupe sous un autre type.
 void SetPointLightUniforms(const GlProgram& program, const PointLightSet& set);
 
 }  // namespace ro::render

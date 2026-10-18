@@ -31,14 +31,120 @@ constexpr std::array<FaceAxes, kCubeFaceCount> kFaceAxes = {{
     {{0.0F, 0.0F, -1.0F}, {0.0F, -1.0F, 0.0F}},
 }};
 
+[[nodiscard]] PaintedPointLight PaintedOf(const PointLight& light) {
+  return PaintedPointLight{.world_position = light.world_position,
+                           .range_world = light.range_world};
+}
+
 }  // namespace
 
-std::size_t ShadowedPointLightCount(const PointLightSet& set) {
-  const std::size_t count = std::min(set.count, kMaxPointLights);
-  const auto casting = static_cast<std::size_t>(
-      std::count_if(set.lights.begin(), set.lights.begin() + static_cast<std::ptrdiff_t>(count),
-                    [](const PointLight& light) { return light.casts_shadow; }));
-  return std::min(casting, kMaxShadowedPointLights);
+std::size_t PointShadowTierOf(float distance_world, std::optional<std::size_t> held) {
+  std::size_t wanted = 0;
+  while (wanted < kPointShadowTierReachWorld.size() &&
+         distance_world >= kPointShadowTierReachWorld[wanted]) {
+    ++wanted;
+  }
+  if (!held.has_value() || *held == wanted || *held >= kPointShadowTierCount) {
+    return wanted;
+  }
+  // Les bornes du palier tenu, élargies de la marge des deux côtés.
+  const std::size_t tier = *held;
+  const float nearest =
+      tier == 0 ? 0.0F : kPointShadowTierReachWorld[tier - 1] * (1.0F - kPointShadowTierMargin);
+  const bool beyond =
+      tier < kPointShadowTierReachWorld.size() &&
+      distance_world >= kPointShadowTierReachWorld[tier] * (1.0F + kPointShadowTierMargin);
+  return distance_world >= nearest && !beyond ? tier : wanted;
+}
+
+std::vector<std::optional<PointShadowSlots::Assignment>> PointShadowSlots::Assign(
+    std::span<const PointLight> lights, glm::vec3 eye) {
+  ++round_;
+  std::vector<std::optional<Assignment>> assigned(lights.size());
+  const auto casts = [](const PointLight& light) {
+    return light.casts_shadow && light.shadow_depth > 0.0F && light.range_world > 0.0F;
+  };
+
+  // LES CARTES GARDÉES : une lumière qui tient déjà une carte d'un palier où
+  // elle a encore sa place la reprend telle quelle.
+  for (std::size_t rank = 0; rank < lights.size(); ++rank) {
+    if (!casts(lights[rank])) {
+      continue;
+    }
+    const PaintedPointLight painted = PaintedOf(lights[rank]);
+    const float distance_world = glm::length(lights[rank].world_position - eye);
+    for (std::size_t tier = 0; tier < kPointShadowTierCount && !assigned[rank]; ++tier) {
+      std::vector<Slot>& slots = tiers_[tier];
+      for (std::size_t layer = 0; layer < slots.size(); ++layer) {
+        Slot& slot = slots[layer];
+        if (slot.painted != painted || slot.last_round == round_) {
+          continue;
+        }
+        if (PointShadowTierOf(distance_world, tier) == tier) {
+          slot.last_round = round_;
+          assigned[rank] = Assignment{.slot = {.tier = static_cast<std::int32_t>(tier),
+                                               .layer = static_cast<std::uint32_t>(layer)},
+                                      .fresh = false};
+        }
+        break;
+      }
+    }
+  }
+
+  // LES CARTES DONNÉES, aux plus proches d'abord : dans le palier demandé, ou
+  // le suivant s'il est plein. Une carte libre passe avant la plus anciennement
+  // donnée, qu'aucune lumière de l'image n'a reprise.
+  for (std::size_t rank = 0; rank < lights.size(); ++rank) {
+    if (!casts(lights[rank]) || assigned[rank]) {
+      continue;
+    }
+    const PaintedPointLight painted = PaintedOf(lights[rank]);
+    const float distance_world = glm::length(lights[rank].world_position - eye);
+    for (std::size_t tier = PointShadowTierOf(distance_world); tier < kPointShadowTierCount;
+         ++tier) {
+      std::vector<Slot>& slots = tiers_[tier];
+      std::optional<std::size_t> chosen;
+      for (std::size_t layer = 0; layer < slots.size(); ++layer) {
+        const Slot& slot = slots[layer];
+        if (slot.last_round == round_) {
+          continue;
+        }
+        if (slot.painted == painted) {
+          chosen = layer;
+          break;
+        }
+        const auto older = [&slots](std::size_t left, std::size_t right) {
+          if (slots[left].painted.has_value() != slots[right].painted.has_value()) {
+            return !slots[left].painted.has_value();
+          }
+          return slots[left].last_round < slots[right].last_round;
+        };
+        if (!chosen.has_value() || older(layer, *chosen)) {
+          chosen = layer;
+        }
+      }
+      // UNE COUCHE NEUVE, tant que le palier n'est pas plein, plutôt que de
+      // reprendre une carte qui porte encore une lumière.
+      const bool reusable = chosen.has_value() && (slots[*chosen].painted == painted ||
+                                                   !slots[*chosen].painted.has_value());
+      if (!reusable && slots.size() < kPointShadowTierMaxLayers.at(tier)) {
+        slots.emplace_back();
+        chosen = slots.size() - 1;
+      }
+      if (!chosen.has_value()) {
+        continue;
+      }
+      Slot& slot = slots[*chosen];
+      const bool fresh = slot.painted != painted;
+      slot.painted = painted;
+      slot.last_round = round_;
+      assigned[rank] = Assignment{.slot = {.tier = static_cast<std::int32_t>(tier),
+                                           .layer = static_cast<std::uint32_t>(*chosen)},
+                                  .fresh = fresh};
+      break;
+    }
+  }
+  return assigned;
 }
 
 float PointShadowFar(float range_world) {
@@ -67,95 +173,6 @@ float PointShadowDepth(float axis_distance_world, float far_world) {
       ((far_world + near_world) / (far_world - near_world)) -
       ((2.0F * far_world * near_world) / ((far_world - near_world) * axis_distance_world));
   return (normalized * 0.5F) + 0.5F;
-}
-
-std::array<bool, kMaxShadowedPointLights> PointShadowRepaints(
-    const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
-    const PointLightSet& set, std::size_t count, std::uint64_t frame) {
-  std::array<bool, kMaxShadowedPointLights> repaint{};
-  for (std::size_t rank = 0; rank < std::min(count, kMaxShadowedPointLights); ++rank) {
-    const PaintedPointLight wanted{.world_position = set.lights[rank].world_position,
-                                   .range_world = set.lights[rank].range_world};
-    const bool moved = painted[rank] != wanted;
-    const bool its_turn = rank % kPointShadowRepaintPeriod == frame % kPointShadowRepaintPeriod;
-    repaint[rank] = moved || its_turn;
-  }
-  return repaint;
-}
-
-PointLightSet KeepShadowedOrder(
-    const PointLightSet& set,
-    const std::array<std::optional<PaintedPointLight>, kMaxShadowedPointLights>& painted,
-    glm::vec3 eye) {
-  const std::size_t shadowed = ShadowedPointLightCount(set);
-  if (shadowed == 0) {
-    return set;
-  }
-  const std::size_t count = std::min(set.count, kMaxPointLights);
-  std::array<float, kMaxPointLights> distance{};
-  // Le rang de la carte qu'une lumière porte déjà, ou rien.
-  std::array<std::optional<std::size_t>, kMaxPointLights> painted_rank{};
-  for (std::size_t light = 0; light < count; ++light) {
-    distance[light] = glm::length(set.lights[light].world_position - eye);
-    const PaintedPointLight here{.world_position = set.lights[light].world_position,
-                                 .range_world = set.lights[light].range_world};
-    for (std::size_t rank = 0; rank < shadowed; ++rank) {
-      if (painted[rank] == here) {
-        painted_rank[light] = rank;
-      }
-    }
-  }
-  // La lumière de chaque carte, puis celles qui n'en ont pas.
-  std::array<std::optional<std::size_t>, kMaxShadowedPointLights> slot{};
-  std::array<bool, kMaxPointLights> placed{};
-  // LES LUMIÈRES DÉJÀ OMBRÉES, de la plus proche à la plus lointaine : chacune
-  // garde sa carte si les plus proches qu'elle de façon nette ne la prennent pas.
-  std::size_t kept = 0;
-  for (std::size_t light = 0; light < count; ++light) {
-    if (!painted_rank[light].has_value() || !set.lights[light].casts_shadow) {
-      continue;
-    }
-    std::size_t decisively_closer = 0;
-    for (std::size_t other = 0; other < count; ++other) {
-      if (!painted_rank[other].has_value() && set.lights[other].casts_shadow &&
-          distance[other] < kShadowSwapRatio * distance[light]) {
-        ++decisively_closer;
-      }
-    }
-    if (kept + decisively_closer < shadowed) {
-      slot[*painted_rank[light]] = light;
-      placed[light] = true;
-      ++kept;
-    }
-  }
-  // LES CARTES LIBRES vont aux plus proches des autres : `set` est rangé de la
-  // plus proche à la plus lointaine.
-  std::size_t next = 0;
-  for (std::size_t rank = 0; rank < shadowed; ++rank) {
-    if (slot[rank].has_value()) {
-      continue;
-    }
-    while (next < count && (placed[next] || !set.lights[next].casts_shadow)) {
-      ++next;
-    }
-    if (next < count) {
-      slot[rank] = next;
-      placed[next] = true;
-    }
-  }
-  PointLightSet ordered = set;
-  std::size_t written = 0;
-  for (std::size_t rank = 0; rank < shadowed; ++rank) {
-    if (slot[rank].has_value()) {
-      ordered.lights[written++] = set.lights[*slot[rank]];
-    }
-  }
-  for (std::size_t light = 0; light < count; ++light) {
-    if (!placed[light]) {
-      ordered.lights[written++] = set.lights[light];
-    }
-  }
-  return ordered;
 }
 
 }  // namespace ro::render

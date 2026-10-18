@@ -7,7 +7,7 @@
 #include "ro/render/map_effects.h"
 #include "ro/render/model_clock.h"
 #include "ro/render/model_renderer.h"
-#include "ro/render/point_shadow_maps.h"
+#include "ro/render/point_light_stage.h"
 #include "ro/render/scene_post_process.h"
 #include "ro/render/sprite_renderer.h"
 #include "ro/render/sun_shadow_map.h"
@@ -32,10 +32,10 @@ class GameRendering {
   // `sun_map_refused_` retient un échec : il ne se retente pas à chaque image.
   ro::render::SunShadowMap sun_map_;
   bool sun_map_refused_ = false;
-  // LES CARTES D'OMBRE DES LUMIÈRES PONCTUELLES, créées à la première lumière
-  // qui en demande ; même refus retenu.
-  ro::render::PointShadowMaps point_maps_;
-  bool point_maps_refused_ = false;
+  // LES LUMIÈRES PONCTUELLES ET LEURS CARTES D'OMBRE, créées à la première
+  // lumière ; même refus retenu.
+  ro::render::PointLightStage point_stage_;
+  bool point_stage_refused_ = false;
   // LES LUMIÈRES DES EFFETS DE L'IMAGE PRÉCÉDENTE, que la suivante reçoit : les
   // effets se composent après le sol qu'elles éclairent. Voir docs/adr/0120.
   std::vector<ro::render::PointLight> effect_lights_;

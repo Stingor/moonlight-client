@@ -1,5 +1,6 @@
 #include "ro/render/terrain_renderer.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
 #include <utility>
@@ -173,24 +174,7 @@ void main() {
 
 }  // namespace
 
-TerrainRenderer::TerrainRenderer(TerrainRenderer&& other) noexcept
-    : program_(std::move(other.program_)),
-      textures_(std::move(other.textures_)),
-      alpha_references_(std::move(other.alpha_references_)),
-      placeholder_(std::move(other.placeholder_)),
-      lightmap_(std::move(other.lightmap_)),
-      surfaces_(std::move(other.surfaces_)),
-      has_lightmap_(other.has_lightmap_),
-      indexed_(other.indexed_),
-      vertex_array_(other.vertex_array_),
-      vertex_buffer_(other.vertex_buffer_),
-      index_buffer_(other.index_buffer_) {
-  other.vertex_array_ = 0;
-  other.vertex_buffer_ = 0;
-  other.index_buffer_ = 0;
-  other.has_lightmap_ = false;
-  other.indexed_ = false;
-}
+TerrainRenderer::TerrainRenderer(TerrainRenderer&& other) noexcept { *this = std::move(other); }
 
 TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
   if (this != &other) {
@@ -205,19 +189,24 @@ TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
     std::swap(vertex_array_, other.vertex_array_);
     std::swap(vertex_buffer_, other.vertex_buffer_);
     std::swap(index_buffer_, other.index_buffer_);
+    std::swap(depth_chunks_, other.depth_chunks_);
+    std::swap(depth_vertex_array_, other.depth_vertex_array_);
+    std::swap(depth_index_buffer_, other.depth_index_buffer_);
+    std::swap(uploads_, other.uploads_);
   }
   return *this;
 }
 
 TerrainRenderer::~TerrainRenderer() {
-  if (vertex_buffer_ != 0) {
-    glDeleteBuffers(1, &vertex_buffer_);
+  for (const unsigned int buffer : {vertex_buffer_, index_buffer_, depth_index_buffer_}) {
+    if (buffer != 0) {
+      glDeleteBuffers(1, &buffer);
+    }
   }
-  if (index_buffer_ != 0) {
-    glDeleteBuffers(1, &index_buffer_);
-  }
-  if (vertex_array_ != 0) {
-    glDeleteVertexArrays(1, &vertex_array_);
+  for (const unsigned int array : {vertex_array_, depth_vertex_array_}) {
+    if (array != 0) {
+      glDeleteVertexArrays(1, &array);
+    }
   }
 }
 
@@ -245,6 +234,7 @@ core::Result<TerrainRenderer> TerrainRenderer::Create() {
 core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
                                            const std::vector<formats::Image>& textures,
                                            const formats::Image& lightmap) {
+  ++uploads_;
   surfaces_ = mesh.surfaces;
 
   textures_.clear();
@@ -285,7 +275,27 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(std::uint32_t)),
                mesh.indices.data(), GL_STATIC_DRAW);
+  DescribeVertices();
 
+  TerrainDepthChunks chunks = BuildTerrainDepthChunks(mesh);
+  depth_chunks_ = std::move(chunks.chunks);
+  if (depth_vertex_array_ == 0) {
+    glGenVertexArrays(1, &depth_vertex_array_);
+    glGenBuffers(1, &depth_index_buffer_);
+  }
+  glBindVertexArray(depth_vertex_array_);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, depth_index_buffer_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(chunks.indices.size() * sizeof(std::uint32_t)),
+               chunks.indices.data(), GL_STATIC_DRAW);
+  DescribeVertices();
+  glBindVertexArray(0);
+
+  return {};
+}
+
+void TerrainRenderer::DescribeVertices() const {
   const auto stride = static_cast<GLsizei>(sizeof(TerrainVertex));
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
@@ -305,9 +315,6 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
   glEnableVertexAttribArray(5);
   glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, stride,
                         reinterpret_cast<void*>(offsetof(TerrainVertex, shape_normal)));
-  glBindVertexArray(0);
-
-  return {};
 }
 
 void TerrainRenderer::Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
@@ -322,14 +329,24 @@ void TerrainRenderer::Draw(const Camera& camera, const SceneLight& light, float 
                points);
 }
 
-void TerrainRenderer::DrawDepth(const glm::mat4& light_view_projection) const {
+void TerrainRenderer::DrawDepth(const glm::mat4& light_view_projection,
+                                const ShadowSight* sight) const {
   DrawSurfaces(light_view_projection, SceneLight(), TerrainStages(), SceneFog(), SunShadowView(),
-               PointLightSet());
+               PointLightSet(), sight);
+}
+
+void TerrainRenderer::BindSurface(std::size_t surface) const {
+  const auto index = static_cast<std::size_t>(surfaces_[surface].texture_index);
+  const bool usable = index < textures_.size() && textures_[index].valid();
+  (usable ? textures_[index] : placeholder_).Bind(0);
+  program_.SetFloat("u_alpha_reference",
+                    usable ? alpha_references_[index] : kBlendedCutoutAlphaReference);
 }
 
 void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const SceneLight& light,
                                    const TerrainStages& stages, const SceneFog& fog,
-                                   const SunShadowView& sun, const PointLightSet& points) const {
+                                   const SunShadowView& sun, const PointLightSet& points,
+                                   const ShadowSight* sight) const {
   glEnable(GL_DEPTH_TEST);
   // Pas d'élimination des faces arrière : les faces latérales du terrain ne
   // sont pas orientées de façon cohérente d'un dénivelé à l'autre, et en
@@ -360,13 +377,27 @@ void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const Scene
 
   (has_lightmap_ ? lightmap_ : placeholder_).Bind(1);
 
+  if (sight != nullptr) {
+    glBindVertexArray(depth_vertex_array_);
+    for (const TerrainDepthChunk& chunk : depth_chunks_) {
+      if (!sight->Sees(chunk.box)) {
+        continue;
+      }
+      for (const TerrainDepthRun& run : chunk.runs) {
+        BindSurface(run.surface);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(run.index_count), GL_UNSIGNED_INT,
+                       reinterpret_cast<void*>(static_cast<std::uintptr_t>(run.first_index) *
+                                               sizeof(std::uint32_t)));
+      }
+    }
+    glBindVertexArray(0);
+    return;
+  }
+
   glBindVertexArray(vertex_array_);
-  for (const TerrainSurface& surface : surfaces_) {
-    const auto index = static_cast<std::size_t>(surface.texture_index);
-    const bool usable = index < textures_.size() && textures_[index].valid();
-    (usable ? textures_[index] : placeholder_).Bind(0);
-    program_.SetFloat("u_alpha_reference",
-                      usable ? alpha_references_[index] : kBlendedCutoutAlphaReference);
+  for (std::size_t rank = 0; rank < surfaces_.size(); ++rank) {
+    const TerrainSurface& surface = surfaces_[rank];
+    BindSurface(rank);
     if (indexed_) {
       glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(surface.index_count), GL_UNSIGNED_INT,
                      reinterpret_cast<void*>(static_cast<std::uintptr_t>(surface.first_index) *

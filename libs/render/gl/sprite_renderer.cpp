@@ -379,7 +379,7 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
   const bool sun_read = sun.map != nullptr && sun.map->valid() && sun.strength > 0.0F;
   const BillboardBasis panel_basis = ShadowPanelBasis(sun.toward_sun, basis);
   PrepareQuads(camera, basis, blending, /*silhouettes=*/false, sun_read ? &panel_basis : nullptr,
-               points.count > 0 ? &points : nullptr);
+               !points.lights.empty() ? &points : nullptr);
   if (prepared_.empty()) {
     return;
   }

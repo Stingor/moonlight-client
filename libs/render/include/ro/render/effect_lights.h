@@ -97,15 +97,12 @@ void EffectLightsOf(std::span<const DrawnEffect> effects,
 inline constexpr std::size_t kMaxEffectLights = 4;
 
 // LE JEU DE L'IMAGE : les lumières du document `document`, déjà rangées par
-// `NearestPointLights`, D'ABORD, puis les `kMaxEffectLights` lumières
-// d'`effects` les plus proches de `eye`, sans dépasser `kMaxPointLights`. Une
-// lumière d'effet ne chasse une lumière du document que lorsque les deux
-// réunies débordent : le document garde alors
-// `kMaxPointLights − kMaxEffectLights` places au moins, les plus proches.
+// `PointLightsByDistance`, D'ABORD, puis les `kMaxEffectLights` lumières
+// d'`effects` les plus proches de `eye`.
 //
-// ⚠ LES OMBRES VONT AU DOCUMENT D'ABORD : `DrawPointShadows` ombre les
-// premières lumières du jeu, et une lumière d'effet n'en prend une place que
-// si le document la laisse libre.
+// ⚠ LES CARTES D'OMBRE VONT AU DOCUMENT D'ABORD : `DrawPointShadows` les
+// répartit dans l'ordre du jeu, et une lumière d'effet n'en prend une que si
+// le document en laisse.
 [[nodiscard]] PointLightSet WithEffectLights(const PointLightSet& document,
                                              std::span<const PointLight> effects, glm::vec3 eye);
 

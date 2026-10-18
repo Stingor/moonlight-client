@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
 
 #include "ro/render/effect_laid.h"
@@ -191,14 +192,11 @@ void EffectLightsOf(std::span<const DrawnEffect> effects,
 
 PointLightSet WithEffectLights(const PointLightSet& document, std::span<const PointLight> effects,
                                glm::vec3 eye) {
-  const PointLightSet nearest_effects = NearestPointLights(effects, eye);
-  const std::size_t effect_count = std::min(nearest_effects.count, kMaxEffectLights);
+  const PointLightSet nearest_effects = PointLightsByDistance(effects, eye);
+  const std::size_t effect_count = std::min(nearest_effects.lights.size(), kMaxEffectLights);
   PointLightSet merged = document;
-  merged.count = std::min(document.count, kMaxPointLights - effect_count);
-  merged.shadowed_count = std::min(merged.shadowed_count, merged.count);
-  for (std::size_t rank = 0; rank < effect_count; ++rank) {
-    merged.lights[merged.count++] = nearest_effects.lights[rank];
-  }
+  merged.lights.insert(merged.lights.end(), nearest_effects.lights.begin(),
+                       nearest_effects.lights.begin() + static_cast<std::ptrdiff_t>(effect_count));
   return merged;
 }
 

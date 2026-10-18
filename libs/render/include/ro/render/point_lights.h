@@ -1,8 +1,8 @@
 #pragma once
 
-#include <array>
-#include <cstddef>
+#include <cstdint>
 #include <span>
+#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -32,30 +32,39 @@ struct PointLight {
   bool casts_shadow = true;
 };
 
-// Le plafond des lumières qu'un dessin reçoit : la taille des tableaux
-// d'uniformes des nuanceurs. Assez pour une place éclairée de lanternes ET les
-// sorts qui s'y lancent : les `kMaxEffectLights` des sorts n'y chassent pas
-// les lumières du document tant qu'elles tiennent dans le reste. Un pixel ne
-// paie que les lumières de l'image, pas le plafond.
-inline constexpr std::size_t kMaxPointLights = 16;
-
-class PointShadowMaps;
-
-// Les lumières d'un dessin : les `count` premières de `lights` comptent.
-struct PointLightSet {
-  std::array<PointLight, kMaxPointLights> lights{};
-  std::size_t count = 0;
-  // LEURS OMBRES : les `shadowed_count` premières lumières lisent chacune la
-  // carte cubique de même rang dans `shadow_maps`. Sans carte, aucune lumière
-  // n'est masquée. Voir `DrawPointShadows`.
-  const PointShadowMaps* shadow_maps = nullptr;
-  std::size_t shadowed_count = 0;
+// LA CARTE D'OMBRE D'UNE LUMIÈRE : sa couche dans le tableau de cubes de son
+// palier. Un palier négatif : la lumière éclaire sans ombre. Voir
+// `PointShadowSlots`.
+inline constexpr std::int32_t kNoPointShadowTier = -1;
+struct PointShadowSlot {
+  std::int32_t tier = kNoPointShadowTier;
+  std::uint32_t layer = 0;
 };
 
-// Les kMaxPointLights lumières de `lights` les plus proches de `eye`, plus
-// proches d'abord. Une lumière sans couleur ou sans portée n'éclaire rien :
-// elle ne prend pas de place.
-[[nodiscard]] PointLightSet NearestPointLights(std::span<const PointLight> lights, glm::vec3 eye);
+class PointLightStage;
+
+// LES LUMIÈRES D'UN DESSIN, sans borne de nombre. Un pixel ne paie que celles
+// dont la portée l'atteint.
+struct PointLightSet {
+  std::vector<PointLight> lights;
+  // LEURS OMBRES, une par lumière dans le même ordre, ou aucune : sans elles,
+  // aucune lumière n'est masquée. Voir `DrawPointShadows`.
+  std::vector<PointShadowSlot> shadows;
+  // CE QUE LES NUANCEURS LISENT : les lumières téléversées et leurs cartes.
+  // Sans lui, un dessin ne reçoit aucune lumière ponctuelle.
+  const PointLightStage* stage = nullptr;
+};
+
+// Les lumières de `lights` rangées de la plus proche de `eye` à la plus
+// lointaine. Une lumière sans couleur ou sans portée n'éclaire rien : elle ne
+// prend pas de place.
+[[nodiscard]] PointLightSet PointLightsByDistance(std::span<const PointLight> lights,
+                                                  glm::vec3 eye);
+
+// Les lumières de `set` dont la portée touche ce que voit `view_projection`,
+// dans le même ordre : les autres n'éclairent aucun pixel de l'image.
+[[nodiscard]] PointLightSet VisiblePointLights(const PointLightSet& set,
+                                               const glm::mat4& view_projection);
 
 // LA LUMIÈRE QUE `set` DÉPOSE EN `world_position` : la somme, par source, de sa
 // couleur atténuée par le carré de ce qui reste de sa portée. C'est la règle de

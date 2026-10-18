@@ -14,7 +14,7 @@
 namespace ro::render {
 
 // LES LUMIÈRES PONCTUELLES DE L'IMAGE : celles du document, passées au monde,
-// leur intensité de l'instant, puis les plus proches de `eye`. Voir
+// leur intensité de l'instant, rangées de la plus proche de `eye` à la plus lointaine. Voir
 // docs/adr/0119.
 //
 // Une lumière « la nuit seulement » vaut `1 − jour`, où le jour est la

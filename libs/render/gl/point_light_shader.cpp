@@ -7,24 +7,22 @@
 #include <string>
 #include <string_view>
 
-#include <glad/glad.h>
-
 #include <glm/glm.hpp>
 
 #include "ro/render/fog_shader.h"
+#include "ro/render/point_light_stage.h"
 #include "ro/render/point_shadow.h"
-#include "ro/render/point_shadow_maps.h"
 
 namespace ro::render {
 namespace {
 
-constexpr std::string_view kGlslLightBound = "const int kMaxPointLights = ";
-constexpr std::string_view kGlslShadowBound = "const int kMaxShadowedPointLights = ";
+constexpr std::string_view kGlslTexelBound = "const int kPointLightTexels = ";
+constexpr std::string_view kGlslTierBound = "const int kPointShadowTierCount = ";
 constexpr std::size_t kDecimalBase = 10;
 
-// Le nom du lecteur de la carte cubique de rang `rank`.
-constexpr std::array<std::string_view, kMaxShadowedPointLights> kShadowSamplers = {
-    "u_point_shadow_0", "u_point_shadow_1", "u_point_shadow_2", "u_point_shadow_3"};
+// Le nom du lecteur du tableau de chaque palier, du plus fin au plus grossier.
+constexpr std::array<std::string_view, kPointShadowTierCount> kTierSamplers = {
+    "u_point_shadow_fine", "u_point_shadow_middle", "u_point_shadow_coarse"};
 
 // La borne que le GLSL déclare après `declaration`, lue dans son texte ; zéro
 // s'il n'en déclare pas.
@@ -43,70 +41,70 @@ constexpr std::size_t GlslBound(std::string_view declaration) {
   return bound;
 }
 
-// 🔴 LES TABLEAUX DU GLSL ONT LA TAILLE DE CEUX DU C++ : sinon les uniformes
-// s'écriraient au-delà, et OpenGL le refuserait sans bruit. Il a de même une
-// carte cubique par lumière ombrée.
-static_assert(GlslBound(kGlslLightBound) == kMaxPointLights,
-              "la borne GLSL des lumières ponctuelles diffère de kMaxPointLights");
-static_assert(GlslBound(kGlslShadowBound) == kMaxShadowedPointLights,
-              "la borne GLSL des lumières ombrées diffère de kMaxShadowedPointLights");
+// 🔴 LE GLSL LIT LES LUMIÈRES COMME LE C++ LES ÉCRIT, et il a un lecteur par
+// palier.
+static_assert(GlslBound(kGlslTexelBound) == kPointLightTexels,
+              "les texels d'une lumière diffèrent entre le GLSL et kPointLightTexels");
+static_assert(GlslBound(kGlslTierBound) == kPointShadowTierCount,
+              "les paliers d'ombre diffèrent entre le GLSL et kPointShadowTierCount");
+
+// La ligne `#version` de `shader` remplacée par `kPointLightGlslVersion`.
+std::string RaisedVersion(std::string_view shader) {
+  const std::size_t version = shader.find("#version");
+  if (version == std::string_view::npos) {
+    return std::string(shader);
+  }
+  const std::size_t line_end = shader.find('\n', version);
+  std::string raised(shader.substr(0, version));
+  raised += kPointLightGlslVersion;
+  if (line_end != std::string_view::npos) {
+    raised += shader.substr(line_end);
+  }
+  return raised;
+}
 
 }  // namespace
 
 std::string WithPointLights(std::string_view shader, std::string_view points) {
   // L'insertion après `#version` est la même que celle du brouillard.
-  return WithFog(shader, points);
+  return WithFog(RaisedVersion(shader), points);
 }
 
 std::string WithPointLights(std::string_view shader, std::string_view points,
                             std::string_view lighting) {
-  return WithFog(WithFog(shader, points), lighting);
+  return WithFog(WithFog(RaisedVersion(shader), points), lighting);
+}
+
+std::vector<glm::vec4> PointLightTexelsOf(const PointLightSet& set) {
+  std::vector<glm::vec4> texels;
+  texels.reserve(set.lights.size() * kPointLightTexels);
+  for (std::size_t rank = 0; rank < set.lights.size(); ++rank) {
+    const PointLight& light = set.lights[rank];
+    const PointShadowSlot slot = rank < set.shadows.size() ? set.shadows[rank] : PointShadowSlot();
+    texels.emplace_back(light.world_position, light.range_world);
+    texels.emplace_back(light.color, std::clamp(light.shadow_depth, 0.0F, 1.0F));
+    texels.emplace_back(PointShadowFar(light.range_world), std::max(light.shadow_spread, 0.0F),
+                        static_cast<float>(slot.tier), static_cast<float>(slot.layer));
+  }
+  return texels;
 }
 
 void SetPointLightUniforms(const GlProgram& program, const PointLightSet& set) {
-  const std::size_t count = std::min(set.count, kMaxPointLights);
-  std::array<glm::vec3, kMaxPointLights> positions{};
-  std::array<glm::vec3, kMaxPointLights> colors{};
-  std::array<float, kMaxPointLights> ranges{};
-  for (std::size_t rank = 0; rank < count; ++rank) {
-    positions[rank] = set.lights[rank].world_position;
-    colors[rank] = set.lights[rank].color;
-    ranges[rank] = set.lights[rank].range_world;
-  }
-  program.SetInt("u_point_count", static_cast<int>(count));
-  program.SetVector3Array("u_point_position", std::span(positions).first(count));
-  program.SetVector3Array("u_point_color", std::span(colors).first(count));
-  program.SetFloatArray("u_point_range", std::span(ranges).first(count));
-
-  const bool maps = set.shadow_maps != nullptr && set.shadow_maps->valid();
-  const std::size_t shadowed =
-      maps ? std::min({set.shadowed_count, count, kMaxShadowedPointLights}) : 0;
-  std::array<float, kMaxShadowedPointLights> fars{};
-  std::array<float, kMaxShadowedPointLights> depths{};
-  std::array<float, kMaxShadowedPointLights> spreads{};
-  for (std::size_t rank = 0; rank < kMaxShadowedPointLights; ++rank) {
-    const int unit = kPointShadowFirstTextureUnit + static_cast<int>(rank);
-    program.SetInt(kShadowSamplers[rank], unit);
-    if (rank < shadowed) {
-      fars[rank] = PointShadowFar(set.lights[rank].range_world);
-      depths[rank] = std::clamp(set.lights[rank].shadow_depth, 0.0F, 1.0F);
-      spreads[rank] = std::max(set.lights[rank].shadow_spread, 0.0F);
-      set.shadow_maps->Bind(unit, rank);
-    }
-  }
-  program.SetFloatArray("u_point_shadow_depth", std::span(depths));
-  program.SetFloatArray("u_point_shadow_spread", std::span(spreads));
-  if (shadowed > 0) {
-    glActiveTexture(GL_TEXTURE0);
-  }
-  program.SetInt("u_point_shadowed", static_cast<int>(shadowed));
-  program.SetFloatArray("u_point_shadow_far", std::span(fars));
-  program.SetFloat("u_point_shadow_clearance", kPointShadowClearanceWorld);
+  const bool lit = set.stage != nullptr && set.stage->Holds(set);
+  program.SetInt("u_point_count", lit ? static_cast<int>(set.lights.size()) : 0);
+  program.SetInt("u_point_lights", kPointLightBufferTextureUnit);
+  std::array<float, kPointShadowTierCount> texels{};
   // Une face couvre deux unités de large à une unité de la lumière.
   constexpr float kFaceWidthAtUnitDistance = 2.0F;
-  program.SetFloat(
-      "u_point_shadow_texel",
-      maps ? kFaceWidthAtUnitDistance / static_cast<float>(set.shadow_maps->side_texels()) : 0.0F);
+  for (std::size_t tier = 0; tier < kPointShadowTierCount; ++tier) {
+    program.SetInt(kTierSamplers[tier], kPointShadowFirstTextureUnit + static_cast<int>(tier));
+    texels[tier] = kFaceWidthAtUnitDistance / static_cast<float>(kPointShadowTierTexels[tier]);
+  }
+  program.SetFloatArray("u_point_shadow_texel", std::span(texels));
+  program.SetFloat("u_point_shadow_clearance", kPointShadowClearanceWorld);
+  if (lit) {
+    set.stage->Bind();
+  }
 }
 
 }  // namespace ro::render

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
+#include <cstdint>
 #include <optional>
 #include <vector>
 
@@ -13,7 +15,9 @@
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
 #include "ro/render/sun_shadow_map.h"
+#include "ro/render/terrain_depth_chunks.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/render/world_frustum.h"
 
 namespace ro::render {
 
@@ -99,13 +103,21 @@ class TerrainRenderer {
             const PointLightSet& points = PointLightSet()) const;
 
   // LE SOL DANS LA CARTE D'OMBRE : sa seule profondeur, vue du soleil, sans
-  // effacer. Les carreaux transparents n'y portent pas d'ombre.
-  void DrawDepth(const glm::mat4& light_view_projection) const;
+  // effacer. Les carreaux transparents n'y portent pas d'ombre. Avec `sight`,
+  // seuls les blocs qu'il voit : voir `TerrainDepthChunks`.
+  // Combien de fois le sol a été téléversé : ce qui dit qu'il a changé.
+  [[nodiscard]] std::uint64_t uploads() const noexcept { return uploads_; }
+
+  void DrawDepth(const glm::mat4& light_view_projection, const ShadowSight* sight = nullptr) const;
 
  private:
   void DrawSurfaces(const glm::mat4& view_projection, const SceneLight& light,
                     const TerrainStages& stages, const SceneFog& fog, const SunShadowView& sun,
-                    const PointLightSet& points) const;
+                    const PointLightSet& points, const ShadowSight* sight = nullptr) const;
+  // Lie la texture de la surface `surface` et pose son seuil de découpe.
+  void BindSurface(std::size_t surface) const;
+  // Décrit les sommets du tampon de sommets au tableau de sommets lié.
+  void DescribeVertices() const;
 
   GlProgram program_;
   std::vector<GlTexture> textures_;
@@ -122,6 +134,12 @@ class TerrainRenderer {
   unsigned int vertex_array_ = 0;
   unsigned int vertex_buffer_ = 0;
   unsigned int index_buffer_ = 0;
+  // LE SOL EN BLOCS, pour les cartes d'ombre ponctuelles : ses propres indices,
+  // sur les mêmes sommets.
+  std::vector<TerrainDepthChunk> depth_chunks_;
+  unsigned int depth_vertex_array_ = 0;
+  unsigned int depth_index_buffer_ = 0;
+  std::uint64_t uploads_ = 0;
 };
 
 }  // namespace ro::render

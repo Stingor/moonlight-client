@@ -19,11 +19,13 @@
 #include "ro/render/model_clock.h"
 #include "ro/render/model_mesh.h"
 #include "ro/render/model_mesh_identity.h"
+#include "ro/render/model_pose_boxes.h"
 #include "ro/render/model_veil.h"
 #include "ro/render/point_lights.h"
 #include "ro/render/scene_fog.h"
 #include "ro/render/scene_light.h"
 #include "ro/render/sun_shadow_map.h"
+#include "ro/render/world_frustum.h"
 
 namespace ro::render {
 
@@ -119,6 +121,13 @@ class ModelRenderer {
   void DrawDepth(const glm::mat4& light_view_projection, const ModelClock* clock,
                  const ModelOpacities* casting = nullptr) const;
 
+  // LES POSES QU'UNE FACE D'OMBRE PONCTUELLE VOIT, à passer à `DrawDepth` comme
+  // `casting` : voir `SightedCasting`. Rend vrai quand l'une d'elles s'anime.
+  bool Sighted(const ShadowSight& sight, const ModelOpacities* casting,
+               ModelOpacities& into) const {
+    return SightedCasting(pose_boxes_, casting, sight, into);
+  }
+
   // LA PASSE TRANSLUCIDE DES POSES VOILÉES, par-dessus tout ce qui est peint :
   // leurs suites de faces triées de la plus lointaine à la plus proche, mêlées
   // à ce qui est derrière, sans écrire la profondeur. `models` sont ceux
@@ -133,6 +142,8 @@ class ModelRenderer {
                   const PointLightSet& points = PointLightSet()) const;
 
   [[nodiscard]] std::size_t instance_count() const noexcept { return instance_count_; }
+  // Combien de fois le décor a été téléversé : ce qui dit qu'il a changé.
+  [[nodiscard]] std::uint64_t uploads() const noexcept { return uploads_; }
 
   // Pose le filtrage des textures. ⚠ À CHAQUE IMAGE SI L'ON VEUT : rien ne
   // se fait tant qu'il ne change pas. Les niveaux réduits se génèrent la
@@ -247,6 +258,9 @@ class ModelRenderer {
   // pointent dans ses nœuds, qu'un ajout ne déplace pas.
   std::map<std::string, GlTexture> textures_;
   std::vector<Batch> batches_;
+  // L'emprise de chaque pose, par modèle téléversé.
+  std::vector<ModelPoseBoxes> pose_boxes_;
+  std::uint64_t uploads_ = 0;
   std::size_t instance_count_ = 0;
   std::size_t uploaded_textures_ = 0;
   std::size_t baked_batches_ = 0;

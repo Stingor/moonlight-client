@@ -18,7 +18,10 @@ namespace {
 using core::ErrorCode;
 using core::Fail;
 
-constexpr int kGlMajorVersion = 3;
+// LA VERSION EXIGÉE : les tableaux de cartes cubiques des ombres ponctuelles, les
+// textures-tampons et la copie de texture à texture en ont besoin. Voir
+// docs/adr/0123.
+constexpr int kGlMajorVersion = 4;
 constexpr int kGlMinorVersion = 3;
 constexpr int kStencilBits = 8;
 
@@ -191,7 +194,7 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
   if (context->context_ == nullptr) {
     return Fail(ErrorCode::kIoFailure,
                 std::string("SDL_GL_CreateContext : ") + SDL_GetError() +
-                    " — pilote graphique absent, trop ancien, ou sans OpenGL 3.3");
+                    " — pilote graphique absent, trop ancien, ou sans OpenGL 4.3");
   }
 
   if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress)) == 0) {
@@ -208,13 +211,13 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
     core::LogInfo("vidéo : {} — {} — OpenGL {}", text_of(GL_VENDOR), text_of(GL_RENDERER),
                   text_of(GL_VERSION));
   }
-  // Un contexte 3.3 core demandé peut être honoré par un pilote qui rend moins :
+  // Un contexte 4.3 core demandé peut être honoré par un pilote qui rend moins :
   // mieux vaut le constater ici que sur un shader qui refuse de compiler.
   if (GLVersion.major < kGlMajorVersion ||
       (GLVersion.major == kGlMajorVersion && GLVersion.minor < kGlMinorVersion)) {
     return Fail(ErrorCode::kUnsupportedVersion, "OpenGL " + std::to_string(GLVersion.major) + "." +
                                                     std::to_string(GLVersion.minor) +
-                                                    " obtenu, 3.3 requis");
+                                                    " obtenu, 4.3 requis");
   }
 
   return context;
