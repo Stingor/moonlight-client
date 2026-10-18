@@ -72,14 +72,11 @@ core::Result<SkillLayout> ParseSkillLayout(std::string_view yaml_text) {
   SkillLayout layout;
   // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
   try {
-    const YAML::Node whole = YAML::Load(std::string(yaml_text));
-    if (!whole.IsMap()) {
-      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    const auto root = VersionedRoot(yaml_text, kSupportedVersion);
+    if (!root) {
+      return std::unexpected(Refused(root.error()));
     }
-    const YAML::Node version = whole["version"];
-    if (!version || version.as<int>() != kSupportedVersion) {
-      return std::unexpected(Refused("version non gérée"));
-    }
+    const YAML::Node& whole = *root;
     if (const YAML::Node grids = Section(whole, "grids"); grids && !grids.IsNull()) {
       for (const auto& pair : grids) {
         layout.grids.push_back(ReadGrid(pair.first, pair.second));

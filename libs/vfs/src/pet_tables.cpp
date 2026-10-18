@@ -146,14 +146,11 @@ core::Result<void> ParsePetInfo(std::string_view yaml_text, PetTables& tables) {
   PetTables read;
   // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
   try {
-    const YAML::Node whole = YAML::Load(std::string(yaml_text));
-    if (!whole.IsMap()) {
-      return std::unexpected(RefusedInfo("le texte n'est pas une table YAML"));
+    const auto root = VersionedRoot(yaml_text, kSupportedVersion);
+    if (!root) {
+      return std::unexpected(RefusedInfo(root.error()));
     }
-    const YAML::Node version = whole["version"];
-    if (!version || version.as<int>() != kSupportedVersion) {
-      return std::unexpected(RefusedInfo("version non gérée"));
-    }
+    const YAML::Node& whole = *root;
     if (!ReadNameMap(whole["species"], read.species_by_class)) {
       return std::unexpected(RefusedInfo("« species » n'est pas une table"));
     }
@@ -173,14 +170,11 @@ core::Result<void> ParsePetDatabase(std::string_view yaml_text, PetTables& table
   PetTables read;
   // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
   try {
-    const YAML::Node whole = YAML::Load(std::string(yaml_text));
-    if (!whole.IsMap()) {
-      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    const auto root = VersionedRoot(yaml_text, kSupportedVersion);
+    if (!root) {
+      return std::unexpected(Refused(root.error()));
     }
-    const YAML::Node version = whole["version"];
-    if (!version || version.as<int>() != kSupportedVersion) {
-      return std::unexpected(Refused("version non gérée"));
-    }
+    const YAML::Node& whole = *root;
     const YAML::Node pets = whole["pets"];
     if (!pets || !pets.IsMap()) {
       return std::unexpected(Refused("« pets » n'est pas une table"));

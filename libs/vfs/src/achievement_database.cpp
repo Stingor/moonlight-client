@@ -140,14 +140,11 @@ core::Result<AchievementDatabase> AchievementDatabase::Parse(std::string_view ya
   AchievementDatabase loaded;
   // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
   try {
-    const YAML::Node whole = YAML::Load(std::string(yaml_text));
-    if (!whole.IsMap()) {
-      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    const auto root = VersionedRoot(yaml_text, kSupportedVersion);
+    if (!root) {
+      return std::unexpected(Refused(root.error()));
     }
-    const YAML::Node version = whole["version"];
-    if (!version || version.as<int>() != kSupportedVersion) {
-      return std::unexpected(Refused("version non gérée"));
-    }
+    const YAML::Node& whole = *root;
     const YAML::Node achievements = whole["achievements"];
     if (!achievements || !achievements.IsMap()) {
       return std::unexpected(Refused("« achievements » n'est pas une table"));

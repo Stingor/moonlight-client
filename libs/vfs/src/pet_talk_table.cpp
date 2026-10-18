@@ -11,6 +11,8 @@
 
 #include "ro/core/log.h"
 
+#include "yaml_required.h"
+
 namespace ro::vfs {
 namespace {
 
@@ -84,14 +86,11 @@ core::Result<PetTalkTable> ParsePetTalkTable(std::string_view yaml_text) {
   PetTalkTable table;
   // yaml-cpp signale par exception : elle ne franchit pas cette fonction.
   try {
-    const YAML::Node whole = YAML::Load(std::string(yaml_text));
-    if (!whole.IsMap()) {
-      return std::unexpected(Refused("le texte n'est pas une table YAML"));
+    const auto root = VersionedRoot(yaml_text, kSupportedVersion);
+    if (!root) {
+      return std::unexpected(Refused(root.error()));
     }
-    const YAML::Node version = whole["version"];
-    if (!version || version.as<int>() != kSupportedVersion) {
-      return std::unexpected(Refused("version non gérée"));
-    }
+    const YAML::Node& whole = *root;
     const YAML::Node fallback = whole["default_species"];
     if (!fallback || !fallback.IsScalar() || fallback.as<std::string>().empty()) {
       return std::unexpected(Refused("pas d'espèce par défaut"));
