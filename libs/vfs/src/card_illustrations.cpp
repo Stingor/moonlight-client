@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "ro/core/text.h"
+
 #include "text_table.h"
 
 namespace ro::vfs {
@@ -17,7 +19,7 @@ core::Result<CardIllustrations> ReadCardIllustrations(Vfs& vfs) {
   if (!bytes) {
     return std::unexpected(bytes.error());
   }
-  for (const std::string_view line : SplitLines(AsText(*bytes))) {
+  for (const std::string_view line : SplitLines(core::AsText(*bytes))) {
     std::uint32_t item_id = 0;
     std::string_view resource;
     if (!SplitTableRow(line, item_id, resource) || resource.empty()) {

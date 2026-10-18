@@ -13,6 +13,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/trade_widgets.h"
 
 #include "ui_scale.h"
 #include "ui_text.h"
@@ -85,25 +86,6 @@ void DrawPrice(std::int64_t price_zeny) {
   }
   into->AddText(at, InkOn(ink.text, body), text.c_str());
   ImGui::Dummy(size);
-}
-
-// L'icône, et l'emblème du grade dans son coin bas gauche, à sa taille propre.
-void DrawIcon(const StoreSearchRowView& row) {
-  const float scale = Scale();
-  const float side = kTradeIconPixels * scale;
-  const ImVec2 at = ImGui::GetCursorScreenPos();
-  if (row.item.icon.usable()) {
-    ImGui::Image(row.item.icon.id, ImVec2(side, side));
-  } else {
-    ImGui::Dummy(ImVec2(side, side));
-  }
-  if (!row.grade_badge.usable()) {
-    return;
-  }
-  const ImVec2 badge(row.grade_badge.width * scale, row.grade_badge.height * scale);
-  const ImVec2 low(at.x, at.y + side - badge.y);
-  ImGui::GetWindowDrawList()->AddImage(row.grade_badge.id, low,
-                                       ImVec2(low.x + badge.x, low.y + badge.y));
 }
 
 // La bulle et les gestes d'une cellule qui montre l'objet : ceux d'un item de
@@ -211,7 +193,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
                              OnBackground(kHoveredRowColor, PaintingLook().body));
     }
     ImGui::TableNextColumn();
-    DrawIcon(row);
+    DrawGradedTradeIcon(row.item, row.grade_badge);
     NoteItemCell(row_index, row.item, state.item_menu, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();

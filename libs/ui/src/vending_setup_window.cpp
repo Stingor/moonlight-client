@@ -447,16 +447,7 @@ void DrawFooter(VendingSetupWindowState& state, const VendingSetupView& view, co
     }
   }
   ImGui::EndDisabled();
-  if (!view.blockers.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    std::string reasons;
-    for (const std::string_view reason : view.blockers) {
-      if (!reasons.empty()) {
-        reasons.push_back('\n');
-      }
-      reasons.append(reason);
-    }
-    SkinTooltip(reasons.c_str());
-  }
+  TipWhenHeld(view.blockers);
   if (!view.resume_title.empty()) {
     ImGui::SameLine();
     ImGui::BeginDisabled(view.awaiting);

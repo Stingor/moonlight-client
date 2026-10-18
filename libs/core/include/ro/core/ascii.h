@@ -57,4 +57,8 @@ namespace ro::core {
 // qu'on n'a pas encore tapé ne cache rien.
 [[nodiscard]] bool AsciiContainsFolded(std::string_view haystack, std::string_view needle);
 
+// `text` sans les espaces ni les tabulations de ses deux bouts : une vue sur le
+// texte donné, vide quand il n'y a que des blancs. Les fins de ligne restent.
+[[nodiscard]] std::string_view AsciiTrimmed(std::string_view text);
+
 }  // namespace ro::core

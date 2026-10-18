@@ -11,6 +11,7 @@
 #include "ro/ui/skin_tooltip.h"
 
 #include "ui_input.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -24,7 +25,7 @@ constexpr const char* kWhisperMenu = "##recents";
                                                const ChatLinePreview& preview,
                                                ChatInputAsk* asked) {
   WhisperBoxGesture gesture;
-  ImGui::SetNextItemWidth(kChatWhisperBoxWidth * ImGui::GetStyle().FontScaleMain);
+  ImGui::SetNextItemWidth(Px(kChatWhisperBoxWidth));
   // ⚠ LE CLAVIER PEUT VENIR ICI, et pas seulement à la phrase : c'est le joueur
   // qui décide où il laisse son curseur, et un envoi le lui rend là où il
   // l'avait mis.

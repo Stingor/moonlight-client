@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
-#include <cstring>
+#include <optional>
 #include <string>
 
 #include "ro/core/i18n.h"
@@ -12,10 +12,11 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "item_drag.h"
 #include "item_grid.h"
+#include "trade_gestures.h"
 #include "ui_popup.h"
 #include "ui_scale.h"
-#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -115,12 +116,6 @@ void TextOf(ImVec4 color, std::string_view text) {
   ImGui::PopStyleColor();
 }
 
-void TipWhenHeld(std::span<const std::string_view> reasons) {
-  if (!reasons.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(JoinedLines(reasons).c_str());
-  }
-}
-
 // Le recap d'un côté : chaque ligne, puis le zeny ; « rien » quand il n'y a ni
 // l'un ni l'autre.
 void AppendSide(std::string& text, std::span<const DealLineView> lines, std::int64_t zeny) {
@@ -201,10 +196,8 @@ void AcceptBagDrop(DealWindowState& state, const DealView& view, DealWindowActio
   if (!ImGui::BeginDragDropTarget()) {
     return;
   }
-  if (const ImGuiPayload* dropped = ImGui::AcceptDragDropPayload(kItemDragPayload);
-      dropped != nullptr && dropped->DataSize == sizeof(ItemDrag)) {
-    ItemDrag carried;
-    std::memcpy(&carried, dropped->Data, sizeof(carried));
+  if (const std::optional<ItemDrag> dropped = AcceptItemDrag()) {
+    const ItemDrag& carried = *dropped;
     const DealBagView* bag = FindBag(view.bag, carried.client_slot);
     if (carried.from != ItemHolder::kInventory || carried.worn) {
       state.flash = core::Tr("Seul un item de l'inventory, non porté, peut s'offrir.");

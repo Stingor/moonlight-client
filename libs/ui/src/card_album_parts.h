@@ -197,6 +197,11 @@ void AskSacrifice(CardAlbumWindowState& state, std::uint16_t slot, std::uint32_t
 // La pochette de cette carte, ou nul.
 [[nodiscard]] const CardAlbumPocketView* PocketOf(const CardAlbumView& view, std::uint32_t card_id);
 
+// La vignette que l'appelant a préparée pour cette carte, en couleur ou en
+// silhouette, ou nul.
+[[nodiscard]] const CardAlbumArt* ArtOf(const CardAlbumView& view, std::uint32_t card_id,
+                                        bool silhouette);
+
 // Les trois dialogues de la fenêtre : sacrifice, poids de tirage, quantité.
 void DrawDialogs(CardAlbumWindowState& state, const CardAlbumView& view, const SkinArt& art,
                  CardAlbumWindowAction& action);

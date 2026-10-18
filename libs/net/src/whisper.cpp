@@ -43,20 +43,6 @@ constexpr std::size_t kShortestNpcWhisperTarget = kNpcWhisperPrefix.size() + 1;
 constexpr std::string_view kAutotradeReplySuffix =
     " is in autotrade mode and cannot receive whispered messages.";
 
-// Les lettres d'un nom, sans égard pour la casse : le serveur compare les noms
-// des PNJ ainsi.
-[[nodiscard]] bool StartsWithNoCase(std::string_view text, std::string_view prefix) {
-  if (text.size() < prefix.size()) {
-    return false;
-  }
-  return std::ranges::equal(text.substr(0, prefix.size()), prefix, [](char left, char right) {
-    const auto lower = [](char letter) {
-      return letter >= 'A' && letter <= 'Z' ? static_cast<char>(letter - 'A' + 'a') : letter;
-    };
-    return lower(left) == lower(right);
-  });
-}
-
 [[nodiscard]] bool IsGuildMember(std::string_view name, const sim::GuildBook& guild) {
   return std::ranges::any_of(
       guild.members(), [name](const sim::GuildMember& member) { return member.name == name; });
@@ -172,8 +158,9 @@ bool NoteWhisperSent(sim::WhisperOutbox& outbox, const ChatIntent& intent, std::
       return false;
     }
   }
+  // UN PNJ : le serveur lit le préfixe sans égard pour la casse.
   if (intent.recipient.size() >= kShortestNpcWhisperTarget &&
-      StartsWithNoCase(intent.recipient, kNpcWhisperPrefix)) {
+      core::AsciiStartsWithFolded(intent.recipient, kNpcWhisperPrefix)) {
     return false;
   }
   // UNE COMMANDE : le serveur l'exécute et ne chuchote rien, donc n'accuse rien.

@@ -5,6 +5,8 @@
 
 #include "ro/core/byte_reader.h"
 
+#include "read_floats.h"
+
 namespace ro::formats {
 namespace {
 
@@ -71,14 +73,6 @@ constexpr std::uint8_t kQuadTreeMajorVersion = 2;
 
 // Bornes de cohérence : une carte officielle porte quelques milliers d'objets.
 constexpr std::int32_t kMaxObjects = 1 << 20;
-
-std::array<float, 3> ReadVector3(ByteReader& reader) {
-  std::array<float, 3> value{};
-  for (float& component : value) {
-    component = reader.F32();
-  }
-  return value;
-}
 
 RswModel ReadModel(ByteReader& reader, std::int32_t version, std::int32_t build_number) {
   RswModel model;
@@ -175,12 +169,8 @@ core::Result<RswScene> RswScene::Parse(std::span<const std::uint8_t> data) {
     RswLight light;
     light.longitude = reader.I32();
     light.latitude = reader.I32();
-    for (float& channel : light.diffuse) {
-      channel = reader.F32();
-    }
-    for (float& channel : light.ambient) {
-      channel = reader.F32();
-    }
+    ReadFloats(reader, light.diffuse);
+    ReadFloats(reader, light.ambient);
     if (version >= kVersionShadowIntensity) {
       light.shadow_intensity = reader.F32();
     }
@@ -265,9 +255,7 @@ core::Result<RswScene> RswScene::Parse(std::span<const std::uint8_t> data) {
         effect.position = ReadVector3(reader);
         effect.number = reader.I32();
         effect.emit_speed = reader.F32();
-        for (float& value : effect.param) {
-          value = reader.F32();
-        }
+        ReadFloats(reader, effect.param);
         if (!reader.ok()) {
           break;
         }

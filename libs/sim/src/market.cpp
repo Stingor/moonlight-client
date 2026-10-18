@@ -8,6 +8,7 @@
 #include <system_error>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/core/search_key.h"
 #include "ro/sim/navi_search.h"
 
@@ -25,16 +26,6 @@ std::optional<std::uint32_t> ReadItemId(std::string_view text) {
     return std::nullopt;
   }
   return item_id;
-}
-
-std::string_view Trimmed(std::string_view text) {
-  constexpr std::string_view kBlanks = " \t";
-  const std::size_t first = text.find_first_not_of(kBlanks);
-  if (first == std::string_view::npos) {
-    return {};
-  }
-  const std::size_t last = text.find_last_not_of(kBlanks);
-  return text.substr(first, last - first + 1);
 }
 
 std::uint8_t RefineOf(int refine) {
@@ -144,8 +135,10 @@ MarketPlan PlanMarketSearch(const MarketForm& form,
   }
   query.refine_min = RefineOf(form.refine_min);
   query.refine_max = RefineOf(form.refine_max);
-  const std::optional<std::int32_t> min_price = ReadStoreSearchPrice(Trimmed(form.min_price));
-  const std::optional<std::int32_t> max_price = ReadStoreSearchPrice(Trimmed(form.max_price));
+  const std::optional<std::int32_t> min_price =
+      ReadStoreSearchPrice(core::AsciiTrimmed(form.min_price));
+  const std::optional<std::int32_t> max_price =
+      ReadStoreSearchPrice(core::AsciiTrimmed(form.max_price));
   if (!min_price.has_value() || !max_price.has_value() || *min_price < 0 || *max_price < 0 ||
       (*max_price != 0 && *max_price < *min_price)) {
     plan.fault = MarketFault::kBadPrice;
@@ -162,7 +155,7 @@ MarketPlan PlanMarketSearch(const MarketForm& form,
     query.refine_max = kMarketHighestRefine;
     query.flags = 0;
   }
-  const std::string_view text = Trimmed(form.text);
+  const std::string_view text = core::AsciiTrimmed(form.text);
   if (text.empty()) {
     return plan;
   }

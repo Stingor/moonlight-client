@@ -14,14 +14,6 @@ constexpr std::string_view kNavigationCommand = "/navigation";
 constexpr std::string_view kBlanks = " \t";
 constexpr std::string_view kCoordinateSeparators = "/, \t";
 
-[[nodiscard]] std::string_view Trimmed(std::string_view text) {
-  const std::size_t first = text.find_first_not_of(kBlanks);
-  if (first == std::string_view::npos) {
-    return {};
-  }
-  return text.substr(first, text.find_last_not_of(kBlanks) - first + 1);
-}
-
 // Un entier positif ou nul, et rien d'autre dans le mot.
 [[nodiscard]] std::optional<int> CoordinateOf(std::string_view word) {
   int value = 0;
@@ -38,14 +30,14 @@ constexpr std::string_view kCoordinateSeparators = "/, \t";
   if (map_end == std::string_view::npos) {
     return std::nullopt;
   }
-  const std::string_view cells = Trimmed(args.substr(map_end));
+  const std::string_view cells = ro::core::AsciiTrimmed(args.substr(map_end));
   // Le séparateur : une barre, une virgule ou un blanc.
   const std::size_t split = cells.find_first_of(kCoordinateSeparators);
   if (split == std::string_view::npos) {
     return std::nullopt;
   }
   const std::optional<int> x = CoordinateOf(cells.substr(0, split));
-  const std::optional<int> y = CoordinateOf(Trimmed(cells.substr(split + 1)));
+  const std::optional<int> y = CoordinateOf(ro::core::AsciiTrimmed(cells.substr(split + 1)));
   if (!x.has_value() || !y.has_value()) {
     return std::nullopt;
   }
@@ -59,13 +51,13 @@ constexpr std::string_view kCoordinateSeparators = "/, \t";
 }  // namespace
 
 NavigationCommand ReadNavigationCommand(std::string_view line) {
-  const std::string_view trimmed = Trimmed(line);
+  const std::string_view trimmed = ro::core::AsciiTrimmed(line);
   const std::string_view word = trimmed.substr(0, trimmed.find_first_of(kBlanks));
   const bool coordinates_allowed = ro::core::AsciiEqualsFolded(word, kNaviCommand);
   if (!coordinates_allowed && !ro::core::AsciiEqualsFolded(word, kNavigationCommand)) {
     return {};
   }
-  const std::string_view args = Trimmed(trimmed.substr(word.size()));
+  const std::string_view args = ro::core::AsciiTrimmed(trimmed.substr(word.size()));
   NavigationCommand read;
   if (args.empty()) {
     read.kind = NavigationCommandKind::kOpen;

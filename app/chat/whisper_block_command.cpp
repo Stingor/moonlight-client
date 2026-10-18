@@ -9,23 +9,14 @@ constexpr std::string_view kBlockWord = "/ex";
 constexpr std::string_view kAllowWord = "/in";
 constexpr std::string_view kBlockEveryoneWord = "/exall";
 constexpr std::string_view kAllowEveryoneWord = "/inall";
-constexpr std::string_view kBlanks = " \t";
-
-[[nodiscard]] std::string_view Trimmed(std::string_view text) {
-  const std::size_t first = text.find_first_not_of(kBlanks);
-  if (first == std::string_view::npos) {
-    return {};
-  }
-  return text.substr(first, text.find_last_not_of(kBlanks) - first + 1);
-}
 
 }  // namespace
 
 WhisperBlockCommand ReadWhisperBlockCommand(std::string_view line) {
   const std::size_t space = line.find(' ');
   const std::string_view word = line.substr(0, space);
-  const std::string_view name =
-      Trimmed(space == std::string_view::npos ? std::string_view() : line.substr(space + 1));
+  const std::string_view name = ro::core::AsciiTrimmed(
+      space == std::string_view::npos ? std::string_view() : line.substr(space + 1));
   if (ro::core::AsciiEqualsFolded(word, kBlockEveryoneWord)) {
     return {.kind = WhisperBlockCommandKind::kBlockEveryone};
   }

@@ -41,16 +41,6 @@ void CenterNextBox(float width_pixels) {
                                                     : std::string(core::Tr("Cette carte"));
 }
 
-[[nodiscard]] const CardAlbumArt* ArtOf(const CardAlbumView& view, std::uint32_t card_id,
-                                        bool silhouette) {
-  for (const CardAlbumArt& art : view.art) {
-    if (art.card_id == card_id && art.silhouette == silhouette) {
-      return &art;
-    }
-  }
-  return nullptr;
-}
-
 // LA CONFIRMATION DU SACRIFICE.
 void DrawConfirmBox(CardAlbumWindowState& state, const CardAlbumView& view, const SkinArt& art,
                     CardAlbumWindowAction& action) {

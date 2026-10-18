@@ -1,12 +1,13 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
-#include <cstring>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/core/text.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/mail_window.h"
 #include "ro/ui/modal_box.h"
@@ -14,6 +15,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "item_drag.h"
 #include "item_grid.h"
 #include "mail_parts.h"
 #include "ui_popup.h"
@@ -42,29 +44,11 @@ constexpr std::size_t kSentenceBytes = 256;
 constexpr std::string_view kSendConfirmId = "rodex_send_confirm";
 constexpr const char* kItemMenuId = "##rodex_compose_item_menu";
 
-// Les octets de suite d'un caractère UTF-8 : 10xxxxxx.
-constexpr unsigned char kUtf8ContinuationMask = 0xC0;
-constexpr unsigned char kUtf8ContinuationBits = 0x80;
-
 [[nodiscard]] const MailBagView* FindBag(std::span<const MailBagView> bag,
                                          std::uint16_t client_slot) {
   const auto found = std::ranges::find_if(
       bag, [client_slot](const MailBagView& on) { return on.client_slot == client_slot; });
   return found == bag.end() ? nullptr : &*found;
-}
-
-// Le plus long début de `text` qui tient en `most` octets sans couper un
-// caractère UTF-8.
-[[nodiscard]] std::string_view Utf8Prefix(std::string_view text, std::size_t most) {
-  if (text.size() <= most) {
-    return text;
-  }
-  std::size_t end = most;
-  while (end > 0 &&
-         (static_cast<unsigned char>(text[end]) & kUtf8ContinuationMask) == kUtf8ContinuationBits) {
-    --end;
-  }
-  return text.substr(0, end);
 }
 
 // « Untel — Archbishop, niveau 99 » : le nom réémis par le serveur — une
@@ -168,10 +152,8 @@ void AcceptBagDrop(MailComposeWindowState& state, const MailComposeView& view,
   if (!ImGui::BeginDragDropTarget()) {
     return;
   }
-  if (const ImGuiPayload* dropped = ImGui::AcceptDragDropPayload(kItemDragPayload);
-      dropped != nullptr && dropped->DataSize == sizeof(ItemDrag)) {
-    ItemDrag carried;
-    std::memcpy(&carried, dropped->Data, sizeof(carried));
+  if (const std::optional<ItemDrag> dropped = AcceptItemDrag()) {
+    const ItemDrag& carried = *dropped;
     const MailBagView* bag = FindBag(view.bag, carried.client_slot);
     if (carried.from == ItemHolder::kInventory && !carried.worn && bag != nullptr &&
         bag->amount > 0) {
@@ -328,7 +310,7 @@ void AppendField(std::string& text, const char* label, std::string_view value) {
 void OpenMailCompose(MailComposeWindowState& state, std::string_view recipient) {
   state = MailComposeWindowState{};
   state.open = true;
-  const std::string_view kept = Utf8Prefix(recipient, state.recipient.size() - 1);
+  const std::string_view kept = core::Utf8Prefix(recipient, state.recipient.size() - 1);
   kept.copy(state.recipient.data(), kept.size());
 }
 

@@ -4,6 +4,8 @@
 
 #include "ro/core/byte_reader.h"
 
+#include "read_floats.h"
+
 namespace ro::formats {
 namespace {
 
@@ -133,12 +135,8 @@ core::Result<GndMap> GndMap::Parse(std::span<const std::uint8_t> data) {
     map.tiles_.resize(static_cast<std::size_t>(tile_count));
     for (GndTile& tile : map.tiles_) {
       // Les quatre U d'abord, puis les quatre V — pas quatre paires.
-      for (float& coordinate : tile.u) {
-        coordinate = reader.F32();
-      }
-      for (float& coordinate : tile.v) {
-        coordinate = reader.F32();
-      }
+      ReadFloats(reader, tile.u);
+      ReadFloats(reader, tile.v);
       tile.texture_index = reader.I16();
       tile.lightmap_index = reader.U16();
       for (std::uint8_t& channel : tile.color) {
@@ -162,9 +160,7 @@ core::Result<GndMap> GndMap::Parse(std::span<const std::uint8_t> data) {
 
   map.cubes_.resize(cube_count);
   for (GndCube& cube : map.cubes_) {
-    for (float& corner : cube.corner_height) {
-      corner = reader.F32();
-    }
+    ReadFloats(reader, cube.corner_height);
     if (wide_tile_indices) {
       cube.tile_up = reader.I32();
       cube.tile_front = reader.I32();

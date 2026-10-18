@@ -6,6 +6,8 @@
 
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -57,7 +59,7 @@ bool BeginSkinTooltip(float widest) {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, kSkinnedTooltipRounding);
   // ⚠ SA MARGE ET SON INTERLIGNE À ELLE : ce qui l'entoure peut les avoir mis à
   // zéro pour ses propres cases. Voir `kBareTooltipPaddingPixels`.
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
                       ImVec2(kBareTooltipPaddingPixels * scale, kBareTooltipPaddingPixels * scale));
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,

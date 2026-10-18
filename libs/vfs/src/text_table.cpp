@@ -32,10 +32,6 @@ std::vector<std::string_view> SplitLines(std::string_view text) {
   return lines;
 }
 
-std::string_view AsText(const std::vector<std::uint8_t>& bytes) {
-  return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
-}
-
 core::Result<std::vector<std::uint8_t>> ReadOptionalFile(Vfs& vfs, std::string_view path) {
   auto bytes = vfs.Read(std::string(path));
   if (!bytes && bytes.error().code == core::ErrorCode::kNotFound) {

@@ -31,15 +31,6 @@ core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData, "table des succès : " + std::move(detail)};
 }
 
-// Un entier entre `least` et `most`, ou une exception.
-[[nodiscard]] std::int64_t Whole(const YAML::Node& node, std::int64_t least, std::int64_t most) {
-  const auto value = node.as<std::int64_t>();
-  if (value < least || value > most) {
-    throw YAML::RepresentationException(node.Mark(), "un nombre hors de ses bornes");
-  }
-  return value;
-}
-
 [[nodiscard]] std::int32_t Number(const YAML::Node& node) {
   return static_cast<std::int32_t>(Whole(node, 0, kMostAchievementNumber));
 }

@@ -12,6 +12,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "pet_intimacy_text.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -34,28 +35,6 @@ constexpr float kHatchButtonPixels = 110.0F;
 constexpr float kCancelButtonPixels = 80.0F;
 
 constexpr const char* kWindowId = "###pet_hatch_window";
-
-const char* RankText(PetIntimacyLabel label) {
-  switch (label) {
-    case PetIntimacyLabel::kHateWithPassion:
-      return core::Tr("Haine profonde");
-    case PetIntimacyLabel::kHate:
-      return core::Tr("Haine");
-    case PetIntimacyLabel::kAwkward:
-      return core::Tr("Distant");
-    case PetIntimacyLabel::kShy:
-      return core::Tr("Timide");
-    case PetIntimacyLabel::kNeutral:
-      return core::Tr("Neutre");
-    case PetIntimacyLabel::kCordial:
-      return core::Tr("Cordial");
-    case PetIntimacyLabel::kLoyal:
-      return core::Tr("Loyal");
-    case PetIntimacyLabel::kUnknown:
-      break;
-  }
-  return core::Tr("Inconnue");
-}
 
 // Une rangée : l'icône, le nom à choisir, et sous lui ce que l'œuf contient.
 void DrawRow(PetHatchWindowState& state, const PetEggRowView& row, int rank,
@@ -95,7 +74,7 @@ void DrawRow(PetHatchWindowState& state, const PetEggRowView& row, int rank,
       ColoredText(kRedColor, core::Tr("Œuf vierge : rien à éclore."));
       break;
     case PetEggState::kInhabited: {
-      std::string facts = row.intimacy.has_value() ? RankText(*row.intimacy) : "";
+      std::string facts = row.intimacy.has_value() ? PetIntimacyText(*row.intimacy) : "";
       if (row.renamed) {
         facts += "  ·  ";
         facts += core::Tr("déjà renommé");

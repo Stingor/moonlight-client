@@ -10,6 +10,7 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/core/ascii.h"
 #include "ro/core/web_address.h"
 
 namespace ro::core {
@@ -36,16 +37,6 @@ constexpr std::string_view kAmpersandEntity = "&amp;";
 constexpr std::string_view kSchemeSeparator = "://";
 constexpr std::string_view kSecureScheme = "https";
 
-[[nodiscard]] char LowerAscii(char letter) {
-  return (letter >= 'A' && letter <= 'Z') ? static_cast<char>(letter - 'A' + 'a') : letter;
-}
-
-[[nodiscard]] std::string LoweredAscii(std::string_view text) {
-  std::string lowered(text);
-  std::transform(lowered.begin(), lowered.end(), lowered.begin(), LowerAscii);
-  return lowered;
-}
-
 [[nodiscard]] bool Blank(char letter) {
   return letter == ' ' || letter == '\t' || letter == '\n' || letter == '\r' || letter == '\f';
 }
@@ -71,7 +62,7 @@ constexpr std::string_view kSecureScheme = "https";
   }
   const std::string_view scheme = address.substr(0, colon);
   return std::all_of(scheme.begin(), scheme.end(), [](char letter) {
-    const char lower = LowerAscii(letter);
+    const char lower = static_cast<char>(AsciiLower(static_cast<std::uint8_t>(letter)));
     return (lower >= 'a' && lower <= 'z') || (lower >= '0' && lower <= '9') || letter == '+' ||
            letter == '-' || letter == '.';
   });
@@ -264,7 +255,7 @@ PreviewAllowList::PreviewAllowList(std::span<const std::string> user_hosts) {
     if (user_hosts_.size() >= kMostUserHosts) {
       break;
     }
-    std::string host = LoweredAscii(Trimmed(listed));
+    std::string host = AsciiLower(Trimmed(listed));
     if (!IsUsableHostRule(host) ||
         std::find(user_hosts_.begin(), user_hosts_.end(), host) != user_hosts_.end()) {
       continue;
@@ -316,7 +307,7 @@ bool IsMirrorPicture(std::string_view url) {
 
 PreviewBody ClassifyContentType(std::string_view content_type) {
   // « Image/PNG; charset=binary » : le type seul, sans ses paramètres ni sa casse.
-  const std::string media = LoweredAscii(Trimmed(content_type.substr(0, content_type.find(';'))));
+  const std::string media = AsciiLower(Trimmed(content_type.substr(0, content_type.find(';'))));
   const std::string_view media_view = media;
   if (media_view.size() > kImageMediaPrefix.size() && media_view.starts_with(kImageMediaPrefix)) {
     return PreviewBody::kImage;
@@ -380,7 +371,7 @@ std::optional<std::string> FindOgImage(std::string_view html, std::string_view p
   // Les balises OpenGraph vivent dans le <head> : la tête de la page suffit, et
   // on ne parcourt pas des centaines de kilo-octets pour une balise.
   const std::string_view head = html.substr(0, kPreviewHtmlScanBytes);
-  const std::string lowered = LoweredAscii(head);
+  const std::string lowered = AsciiLower(head);
   std::size_t from = 0;
   while (true) {
     const std::size_t marker = lowered.find(kOgImage, from);

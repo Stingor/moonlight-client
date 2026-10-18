@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/text.h"
 #include "ro/formats/strict_text.h"
 #include "ro/vfs/encoding.h"
 #include "ro/vfs/pet_tables.h"
@@ -403,10 +404,6 @@ std::string_view PathOf(SpriteTableFile file) {
   return {};
 }
 
-std::string_view AsText(const std::vector<std::uint8_t>& bytes) {
-  return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
-}
-
 }  // namespace
 
 core::Result<void> ParseSpriteTableText(SpriteTableFile file, std::string_view yaml_text,
@@ -458,7 +455,7 @@ core::Result<SpriteTables> ReadSpriteTables(vfs::Vfs& vfs) {
       }
       return std::unexpected(bytes.error());
     }
-    if (auto parsed = ParseSpriteTableText(known.file, AsText(*bytes), tables); !parsed) {
+    if (auto parsed = ParseSpriteTableText(known.file, core::AsText(*bytes), tables); !parsed) {
       return std::unexpected(parsed.error());
     }
   }
@@ -472,7 +469,7 @@ core::Result<SpriteTables> ReadSpriteTables(vfs::Vfs& vfs) {
     return tables;
   }
   vfs::PetTables pets;
-  if (auto parsed = vfs::ParsePetInfo(AsText(*pet_info), pets); !parsed) {
+  if (auto parsed = vfs::ParsePetInfo(core::AsText(*pet_info), pets); !parsed) {
     return std::unexpected(core::Error{
         parsed.error().code, std::string(vfs::kPetInfoPath) + " : " + parsed.error().detail});
   }

@@ -13,7 +13,6 @@
 
 #include "trade_gestures.h"
 #include "ui_scale.h"
-#include "ui_strings.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -264,9 +263,7 @@ void DrawFooter(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, 
   if (blocked) {
     ImGui::EndDisabled();
   }
-  if (!view.blockers.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    SkinTooltip(JoinedLines(view.blockers).c_str());
-  }
+  TipWhenHeld(view.blockers);
   ImGui::SameLine();
   if (SkinButton(core::Tr("Annuler"), art)) {
     state.open = false;

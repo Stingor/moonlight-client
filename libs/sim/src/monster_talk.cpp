@@ -2,23 +2,17 @@
 
 #include "ro/sim/monster_talk.h"
 
-#include <algorithm>
+#include "ro/core/ascii.h"
 
 namespace ro::sim {
 namespace {
 
 constexpr std::string_view kSpeakerSeparator = " : ";
 
-[[nodiscard]] char LowerAscii(char letter) noexcept {
-  return letter >= 'A' && letter <= 'Z' ? static_cast<char>(letter - 'A' + 'a') : letter;
-}
-
 }  // namespace
 
 std::string MonsterTalkSpecies(std::string_view resource_name) {
-  std::string species(resource_name);
-  std::ranges::transform(species, species.begin(), LowerAscii);
-  return species;
+  return core::AsciiLower(resource_name);
 }
 
 std::string MonsterLineShown(std::string_view speaker_name, std::string_view line) {

@@ -12,6 +12,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -113,17 +114,17 @@ void DrawLookMenu(const ChatTabLook& tuned, const SkinArt& art, ChatWindowAction
   ImGui::TextUnformatted(core::Tr("Une apparence à lui"));
 
   ImGui::BeginDisabled(!edited.own);
-  ImGui::SetNextItemWidth(kLookSliderWidth * ImGui::GetStyle().FontScaleMain);
+  ImGui::SetNextItemWidth(Px(kLookSliderWidth));
   if (SkinSliderInt(core::Tr("Taille du texte###taille_onglet"), &edited.font_percent,
                     kSmallestChatFontPercent, kLargestChatFontPercent, art, "%d %%")) {
     touched = true;
   }
-  ImGui::SetNextItemWidth(kLookSliderWidth * ImGui::GetStyle().FontScaleMain);
+  ImGui::SetNextItemWidth(Px(kLookSliderWidth));
   if (SkinSliderInt(core::Tr("Marges###marges_onglet"), &edited.padding_pixels, 0,
                     kLargestChatPaddingPixels, art, "%d px")) {
     touched = true;
   }
-  ImGui::SetNextItemWidth(kLookSliderWidth * ImGui::GetStyle().FontScaleMain);
+  ImGui::SetNextItemWidth(Px(kLookSliderWidth));
   if (SkinSliderInt(core::Tr("Interligne###interligne_onglet"), &edited.line_gap_pixels, 0,
                     kLargestChatLineGapPixels, art, "%d px")) {
     touched = true;

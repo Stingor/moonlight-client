@@ -7,6 +7,8 @@
 
 #include "ro/core/byte_reader.h"
 
+#include "read_floats.h"
+
 namespace ro::formats {
 namespace {
 
@@ -49,19 +51,13 @@ StrKeyFrame ReadKeyFrame(ByteReader& reader) {
   key.type = reader.I32();
   key.offset_x = reader.F32();
   key.offset_y = reader.F32();
-  for (float& value : key.uv) {
-    value = reader.F32();
-  }
-  for (float& value : key.corners) {
-    value = reader.F32();
-  }
+  ReadFloats(reader, key.uv);
+  ReadFloats(reader, key.corners);
   key.texture_index = reader.F32();
   key.animation = static_cast<StrAnimationType>(reader.I32());
   key.delay = Finite(reader.F32());
   key.angle_degrees = Finite(reader.F32()) * (kDegreesPerTurn / kAngleUnitsPerTurn);
-  for (float& value : key.color) {
-    value = reader.F32();
-  }
+  ReadFloats(reader, key.color);
   key.blend_source = reader.I32();
   key.blend_destination = reader.I32();
   key.multi_texture = reader.I32();

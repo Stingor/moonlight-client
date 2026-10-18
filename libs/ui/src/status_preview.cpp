@@ -9,6 +9,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -41,7 +42,7 @@ void DrawStatusPreview(const StatusPreviewView& view, const SkinArt& art) {
     return;
   }
   if (view.icon.usable()) {
-    const float side = kStatusPreviewIconPixels * ImGui::GetStyle().FontScaleMain;
+    const float side = Px(kStatusPreviewIconPixels);
     ImGui::Image(view.icon.id, ImVec2(side, side));
     ImGui::SameLine(0.0F, kIconGapPixels);
   }

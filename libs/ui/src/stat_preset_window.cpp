@@ -12,6 +12,7 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "attribute_names.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -29,31 +30,13 @@ constexpr int kPreviewColumns = 4;
 // Les colonnes de la liste : le nom, les six valeurs, les gestes.
 constexpr int kListColumns = 3;
 
-// ⚠ UN AIGUILLAGE DE LITTÉRAUX : `core::Tr` veut voir sa chaîne à l'appel.
-[[nodiscard]] const char* StatLabel(std::size_t rank) {
-  switch (rank) {
-    case 0:
-      return core::Tr("STR");
-    case 1:
-      return core::Tr("AGI");
-    case 2:
-      return core::Tr("VIT");
-    case 3:
-      return core::Tr("INT");
-    case 4:
-      return core::Tr("DEX");
-    default:
-      return core::Tr("LUK");
-  }
-}
-
 // « 90 / 99 / 1 / 1 / 40 / 1 », dans l'ordre de la fiche.
 [[nodiscard]] std::string ValuesText(const StatPresetValues& values) {
   std::string text;
   for (std::size_t rank = 0; rank < values.size(); ++rank) {
     std::array<char, 32> piece{};
-    std::snprintf(piece.data(), piece.size(), "%s%s %lld", rank == 0 ? "" : "  ", StatLabel(rank),
-                  static_cast<long long>(values[rank]));
+    std::snprintf(piece.data(), piece.size(), "%s%s %lld", rank == 0 ? "" : "  ",
+                  AttributeName(rank), static_cast<long long>(values[rank]));
     text += piece.data();
   }
   return text;
@@ -91,7 +74,7 @@ void DrawPreview(const StatPresetWindowView& view, const SkinArt& art, StatPrese
       const StatPresetPreviewRow& row = preview.rows[rank];
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      ImGui::TextUnformatted(StatLabel(rank));
+      ImGui::TextUnformatted(AttributeName(rank));
       ImGui::TableNextColumn();
       ImGui::Text("%lld -> %lld", static_cast<long long>(row.current),
                   static_cast<long long>(row.after));

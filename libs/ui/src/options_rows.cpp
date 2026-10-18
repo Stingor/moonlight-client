@@ -16,6 +16,7 @@
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -169,7 +170,7 @@ void DrawRowTail(const OptionRowView& row, float command_column, float* widest, 
   // ⚠ UNE LARGEUR FIXE, ET NON LA PLACE RESTANTE. Un contrôle étiré jusqu'au
   // bord repousserait son libellé hors de la fenêtre ; et une colonne de
   // contrôles de MÊME largeur aligne les libellés d'elle-même, sans tableau.
-  ImGui::SetNextItemWidth(kControlWidthPixels * ImGui::GetStyle().FontScaleMain);
+  ImGui::SetNextItemWidth(Px(kControlWidthPixels));
   switch (row.kind) {
     case OptionKind::kToggle: {
       bool on = row.on;

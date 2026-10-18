@@ -12,6 +12,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -170,7 +172,7 @@ CompanionTacticWindowAction DrawCompanionTacticWindow(CompanionTacticWindowState
     action.closed = true;
   }
   if (begun) {
-    ImGui::PushItemWidth(kControlWidthPixels * ImGui::GetStyle().FontScaleMain);
+    ImGui::PushItemWidth(Px(kControlWidthPixels));
     ImGui::TextUnformatted(view.companion.c_str());
     TacticAdvancedFields fields = view.fields;
     if (DrawTacticAdvancedFields(fields, view.openings, art, view.view_cells)) {

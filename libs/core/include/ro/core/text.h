@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -120,6 +121,27 @@ void AppendUtf8(std::string& out, char32_t code);
 [[nodiscard]] inline std::string_view WithoutDanglingUtf8(std::string_view bytes) {
   return bytes.substr(0, bytes.size() - DanglingUtf8TailLength(bytes));
 }
+
+// LE PLUS LONG DÉBUT DE `text` QUI TIENT EN `most_bytes` OCTETS, sans couper un
+// caractère : la coupe recule jusqu'à une tête de caractère.
+//
+// ⚠ CE N'EST PAS `WithoutDanglingUtf8(text.substr(0, most_bytes))` : celle-ci
+// laisse la queue telle quelle dès que l'erreur est ailleurs, alors qu'ici la
+// coupe ne tombe jamais sur un octet de suite, quel que soit le reste du texte.
+[[nodiscard]] std::string_view Utf8Prefix(std::string_view text, std::size_t most_bytes);
+
+// DES OCTETS VUS COMME DU TEXTE, sans copie. ⚠ AUCUN TRANSCODAGE : un fichier
+// de l'installation est en CP949, un champ du fil en 1252 ou en UTF-8, et c'est
+// au lecteur de décider ce qui est un texte à montrer et ce qui est un nom de
+// fichier à garder tel quel.
+[[nodiscard]] inline std::string_view AsText(std::span<const std::uint8_t> bytes) noexcept {
+  return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
+}
+
+// ⚠ LA VUE NE SURVIT PAS AUX OCTETS : un vecteur temporaire lui laisserait de
+// la mémoire libérée dès la fin de l'expression. Ce refus est une erreur de
+// compilation.
+std::string_view AsText(std::vector<std::uint8_t>&&) = delete;
 
 // DU TEXTE DU FIL VERS LE NÔTRE, quel que soit son encodage.
 //

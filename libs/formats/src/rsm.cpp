@@ -5,6 +5,8 @@
 
 #include "ro/core/byte_reader.h"
 
+#include "read_floats.h"
+
 namespace ro::formats {
 namespace {
 
@@ -63,14 +65,6 @@ std::string ReadPrefixedName(ByteReader& reader) {
 std::string ReadName(ByteReader& reader, std::int32_t version) {
   return version >= kVersionLengthPrefixedNames ? ReadPrefixedName(reader)
                                                 : std::string(reader.FixedString(kFixedNameLength));
-}
-
-std::array<float, 3> ReadVector3(ByteReader& reader) {
-  std::array<float, 3> value{};
-  for (float& component : value) {
-    component = reader.F32();
-  }
-  return value;
 }
 
 void ReadFaces(ByteReader& reader, std::int32_t version, std::size_t texture_count, RsmMesh& mesh) {
@@ -152,9 +146,7 @@ void ReadKeyFrames(ByteReader& reader, std::int32_t version, RsmMesh& mesh) {
   for (std::int32_t index = 0; index < rotation_count; ++index) {
     RsmRotationKey key;
     key.frame = reader.I32();
-    for (float& component : key.quaternion) {
-      component = reader.F32();
-    }
+    ReadFloats(reader, key.quaternion);
     mesh.rotation_keys.push_back(key);
   }
 
@@ -243,9 +235,7 @@ bool ReadMesh(ByteReader& reader, std::int32_t version, std::size_t model_textur
     texture_count = mesh.texture_indices.size();
   }
 
-  for (float& component : mesh.transform) {
-    component = reader.F32();
-  }
+  ReadFloats(reader, mesh.transform);
   mesh.local_position = ReadVector3(reader);
 
   // À partir de 2.2 la transformation globale disparaît : les images-clés de

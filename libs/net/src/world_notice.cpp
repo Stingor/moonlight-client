@@ -8,6 +8,7 @@
 #include <system_error>
 #include <utility>
 
+#include "ro/core/ascii.h"
 #include "ro/core/text.h"
 #include "ro/net/chat_author.h"
 #include "ro/net/refusal_text.h"
@@ -134,13 +135,7 @@ struct Announcement {
   if (message.size() < kBroadcastTagSize) {
     return {};
   }
-  std::string tag(message.substr(0, kBroadcastTagSize));
-  for (char& letter : tag) {
-    if (letter >= 'A' && letter <= 'Z') {
-      letter = static_cast<char>(letter - 'A' + 'a');
-    }
-  }
-  return tag;
+  return core::AsciiLower(message.substr(0, kBroadcastTagSize));
 }
 
 // « micc » : le nom, la couleur, puis le texte. Le texte se lit dans la charge

@@ -255,6 +255,17 @@ std::size_t DanglingUtf8TailLength(std::string_view bytes) {
   return 0;
 }
 
+std::string_view Utf8Prefix(std::string_view text, std::size_t most_bytes) {
+  if (text.size() <= most_bytes) {
+    return text;
+  }
+  std::size_t end = most_bytes;
+  while (end > 0 && IsContinuation(text, end)) {
+    --end;
+  }
+  return text.substr(0, end);
+}
+
 // Retire les sélecteurs de variante d'une chaîne déjà en UTF-8.
 [[nodiscard]] std::string WithoutVariationSelectors(std::string_view utf8) {
   std::string out;

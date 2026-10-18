@@ -20,6 +20,7 @@
 #include "ro/ui/skin_widgets.h"
 
 #include "description_odds.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -196,7 +197,7 @@ void DrawScriptCode(const char* box_id, std::string_view raw, const SkinArt& art
   if (SkinSmallButton(copy.c_str(), art)) {
     ImGui::SetClipboardText(code.c_str());
   }
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   ImDrawList* into = ImGui::GetWindowDrawList();
   ImFont* font = ImGui::GetFont();
   const float size = ImGui::GetFontSize();

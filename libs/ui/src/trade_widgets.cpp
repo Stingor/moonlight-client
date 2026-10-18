@@ -80,6 +80,24 @@ using StepLabel = std::array<char, kStepLabelBytes>;
 
 }  // namespace
 
+void DrawGradedTradeIcon(const TradeItemView& item, const SkinImage& grade_badge) {
+  const float scale = Scale();
+  const float side = kTradeIconPixels * scale;
+  const ImVec2 at = ImGui::GetCursorScreenPos();
+  if (item.icon.usable()) {
+    ImGui::Image(item.icon.id, ImVec2(side, side));
+  } else {
+    ImGui::Dummy(ImVec2(side, side));
+  }
+  if (!grade_badge.usable()) {
+    return;
+  }
+  const ImVec2 badge(grade_badge.width * scale, grade_badge.height * scale);
+  const ImVec2 low(at.x, at.y + side - badge.y);
+  ImGui::GetWindowDrawList()->AddImage(grade_badge.id, low,
+                                       ImVec2(low.x + badge.x, low.y + badge.y));
+}
+
 TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffix) {
   TradeItemGesture gesture;
   const float side = kTradeIconPixels * Scale();

@@ -21,6 +21,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "pet_intimacy_text.h"
 #include "ui_scale.h"
 #include "ui_strings.h"
 
@@ -89,28 +90,6 @@ void WrappedColored(ImU32 color, const char* text) {
   ImGui::PushStyleColor(ImGuiCol_Text, InkOn(color, PaintingLook().body));
   ImGui::TextWrapped("%s", text);
   ImGui::PopStyleColor();
-}
-
-const char* IntimacyText(PetIntimacyLabel label) {
-  switch (label) {
-    case PetIntimacyLabel::kHateWithPassion:
-      return core::Tr("Haine profonde");
-    case PetIntimacyLabel::kHate:
-      return core::Tr("Haine");
-    case PetIntimacyLabel::kAwkward:
-      return core::Tr("Distant");
-    case PetIntimacyLabel::kShy:
-      return core::Tr("Timide");
-    case PetIntimacyLabel::kNeutral:
-      return core::Tr("Neutre");
-    case PetIntimacyLabel::kCordial:
-      return core::Tr("Cordial");
-    case PetIntimacyLabel::kLoyal:
-      return core::Tr("Loyal");
-    case PetIntimacyLabel::kUnknown:
-      break;
-  }
-  return core::Tr("Inconnue");
 }
 
 // La jauge : le libellé dessiné à la main, centré, en blanc ombré — celui
@@ -250,7 +229,7 @@ void DrawGauges(const PetWindowView& view) {
     TextColored(falling ? kRedColor : kLabelColor, trend.c_str());
   }
   Gauge(core::Tr("Intimité"), view.intimacy, view.intimacy_most, kIntimacyGaugeColor);
-  TextColored(kValueColor, IntimacyText(view.intimacy_label));
+  TextColored(kValueColor, PetIntimacyText(view.intimacy_label));
 }
 
 void DrawFeed(PetWindowState& state, const PetWindowView& view, const SkinArt& art,

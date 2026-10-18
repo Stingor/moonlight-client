@@ -11,6 +11,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "yaml_required.h"
+
 namespace ro::vfs {
 namespace {
 
@@ -21,14 +23,6 @@ constexpr std::int64_t kMostJob = std::numeric_limits<std::uint32_t>::max();
 core::Error Refused(std::string detail) {
   return core::Error{core::ErrorCode::kCorruptData,
                      "disposition des compétences : " + std::move(detail)};
-}
-
-[[nodiscard]] std::int64_t Whole(const YAML::Node& node, std::int64_t least, std::int64_t most) {
-  const auto value = node.as<std::int64_t>();
-  if (value < least || value > most) {
-    throw YAML::RepresentationException(node.Mark(), "un nombre hors de ses bornes");
-  }
-  return value;
 }
 
 [[nodiscard]] std::uint32_t Job(const YAML::Node& node) {

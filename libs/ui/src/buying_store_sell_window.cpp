@@ -10,6 +10,7 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "trade_gestures.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -273,16 +274,7 @@ void DrawFooter(BuyingStoreSellState& state, const BuyingStoreSellView& view, co
   if (blocked) {
     ImGui::EndDisabled();
   }
-  if (!view.blockers.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    std::string reasons;
-    for (const std::string_view reason : view.blockers) {
-      if (!reasons.empty()) {
-        reasons.push_back('\n');
-      }
-      reasons.append(reason);
-    }
-    SkinTooltip(reasons.c_str());
-  }
+  TipWhenHeld(view.blockers);
   ImGui::SameLine();
   if (SkinButton(core::Tr("Fermer"), art)) {
     state.open = false;

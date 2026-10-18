@@ -134,29 +134,7 @@ std::vector<core::LoggedLine> SelectedLogLines(std::span<const core::LoggedLine>
 }
 
 bool LinePassesFilter(std::string_view text, std::string_view filter) {
-  if (filter.empty()) {
-    return true;
-  }
-  if (filter.size() > text.size()) {
-    return false;
-  }
-  // Recherche naïve, et c'est assez : le texte fait quelques dizaines
-  // d'octets, la liste quelques milliers de lignes, et le filtre ne se
-  // réévalue qu'à l'image où la fenêtre est ouverte.
-  for (std::size_t start = 0; start + filter.size() <= text.size(); ++start) {
-    bool same = true;
-    for (std::size_t index = 0; index < filter.size(); ++index) {
-      if (core::AsciiLower(static_cast<std::uint8_t>(text[start + index])) !=
-          core::AsciiLower(static_cast<std::uint8_t>(filter[index]))) {
-        same = false;
-        break;
-      }
-    }
-    if (same) {
-      return true;
-    }
-  }
-  return false;
+  return core::AsciiContainsFolded(text, filter);
 }
 
 std::vector<core::LoggedLine> SelectLogLines(std::span<const core::LoggedLine> lines,

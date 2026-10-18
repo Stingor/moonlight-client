@@ -16,6 +16,7 @@
 #include "ro/ui/window_places.h"
 
 #include "minimap_parts.h"
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -91,7 +92,7 @@ void KeepSquare(ImGuiSizeCallbackData* data) {
   const ImVec2 screen = ImGui::GetIO().DisplaySize;
   ImVec2 wanted;
   if (MinimapUnplaced(settings)) {
-    const float margin = kMinimapScreenMargin * ImGui::GetStyle().FontScaleMain;
+    const float margin = Px(kMinimapScreenMargin);
     wanted = ImVec2(screen.x - margin - size.x, margin);
   } else {
     const ScreenRect rect = RectFromPlace(WindowPlace{.across = settings.across,

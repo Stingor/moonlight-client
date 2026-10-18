@@ -14,6 +14,7 @@
 #include "ro/ui/window_name.h"
 
 #include "imgui.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -407,7 +408,7 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
     return action;
   }
 
-  ImGui::PushItemWidth(kControlWidthPixels * ImGui::GetStyle().FontScaleMain);
+  ImGui::PushItemWidth(Px(kControlWidthPixels));
   DrawCaptureBackdrop(state.look.flat_ground, art);
   DrawGmOutfit(state, art);
   // Juste avant la caméra.

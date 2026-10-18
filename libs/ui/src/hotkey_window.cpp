@@ -14,6 +14,7 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -121,7 +122,7 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
     if (ImGui::BeginTable("raccourcis", 2, kFlags)) {
       ImGui::TableSetupColumn(core::Tr("Action"), ImGuiTableColumnFlags_WidthStretch);
       ImGui::TableSetupColumn(core::Tr("Touche"), ImGuiTableColumnFlags_WidthFixed,
-                              kKeyColumnPixels * ImGui::GetStyle().FontScaleMain);
+                              Px(kKeyColumnPixels));
       ImGui::TableHeadersRow();
 
       // La famille de la dernière ligne MONTRÉE. ⚠ CELLE QUI EST MONTRÉE, et

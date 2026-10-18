@@ -6,12 +6,20 @@
 //
 // En-tête PRIVÉ de `libs/ui/src`. Les fenêtres ne diffèrent que par leur action
 // et par ce qui désigne l'objet : son identifiant de catalogue, ou sa place.
+// L'infobulle des empêchements est la même partout.
 
 #include <cstdint>
+#include <span>
+#include <string_view>
+
+#include <imgui.h>
 
 #include "ro/ui/chat_link.h"
 #include "ro/ui/item_link_cell.h"
+#include "ro/ui/skin_widgets.h"
 #include "ro/ui/trade_widgets.h"
+
+#include "ui_strings.h"
 
 namespace ro::ui {
 
@@ -41,6 +49,14 @@ void NoteItemBySlot(const TradeItemGesture& gesture, const TradeItemView& item, 
   if (NoteTradeItemLink(gesture, item, slot, menu)) {
     action.describe_slot = slot;
     action.item_gesture = ChatLinkGesture::kRepost;
+  }
+}
+
+// CE QUI EMPÊCHE LE BOUTON QU'ON VIENT DE POSER, une raison par ligne, au
+// survol — même grisé. Rien quand rien n'empêche.
+inline void TipWhenHeld(std::span<const std::string_view> reasons) {
+  if (!reasons.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    SkinTooltip(JoinedLines(reasons).c_str());
   }
 }
 

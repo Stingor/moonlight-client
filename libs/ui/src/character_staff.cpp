@@ -16,6 +16,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "attribute_names.h"
 #include "character_panes.h"
 #include "ui_scale.h"
 
@@ -34,27 +35,6 @@ constexpr std::size_t kJobRowBytes = 96;
 
 [[nodiscard]] float AmountFieldWidth() {
   return ImGui::CalcTextSize(kWidestAmount).x + ImGui::GetStyle().FramePadding.x * 2.0F;
-}
-
-// LES SIX NOMS, ET LA COMMANDE QUI VA AVEC. ⚠ CE SONT AUSSI LES NOMS DES
-// COMMANDES DU SERVEUR, en minuscules : `@str`, `@agi`… C'est `app` qui les
-// compose — ici on ne montre que le rang.
-[[nodiscard]] const char* AttributeName(std::size_t rank) {
-  // ⚠ DES LITTÉRAUX, un par branche : `core::Tr` veut voir sa chaîne à l'appel.
-  switch (rank) {
-    case 0:
-      return core::Tr("STR");
-    case 1:
-      return core::Tr("AGI");
-    case 2:
-      return core::Tr("VIT");
-    case 3:
-      return core::Tr("INT");
-    case 4:
-      return core::Tr("DEX");
-    default:
-      return core::Tr("LUK");
-  }
 }
 
 // POSE LE CURSEUR EN FACE D'UNE RANGÉE DU VOLET DES NOMBRES.

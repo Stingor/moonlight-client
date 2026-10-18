@@ -21,6 +21,7 @@
 #include "chat_input_commands.h"
 #include "chat_whisper_box.h"
 #include "ui_input.h"
+#include "ui_scale.h"
 #include "ui_strings.h"
 #include "ui_text.h"
 
@@ -94,7 +95,7 @@ struct WrappedFieldHooks {
 // récents s'ouvrent au CLIC DROIT, sans bouton à côté.
 [[nodiscard]] float WhisperBoxWidth() {
   const ImGuiStyle& style = ImGui::GetStyle();
-  return kChatWhisperBoxWidth * style.FontScaleMain + style.ItemSpacing.x;
+  return Px(kChatWhisperBoxWidth) + style.ItemSpacing.x;
 }
 
 // CE QUE LE CHAMP AURA, PRÉDIT AVANT QUE LA RANGÉE EXISTE.
@@ -339,7 +340,7 @@ void DrawBudget(const ChatLinePreview& preview, ImVec2 field_at, float field_hei
 }  // namespace
 
 float ChatTargetBoxWidth(const ChatLinePreview& preview, const SkinArt& art) {
-  float widest = kChatTargetLeastText * ImGui::GetStyle().FontScaleMain;
+  float widest = Px(kChatTargetLeastText);
   for (const ChatSendMode& mode : preview.modes) {
     if (mode.label.empty()) {
       continue;

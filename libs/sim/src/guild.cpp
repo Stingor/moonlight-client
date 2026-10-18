@@ -15,19 +15,6 @@ namespace {
 
 const std::string kNoLabel;
 
-[[nodiscard]] bool SameName(std::string_view left, std::string_view right) {
-  if (left.size() != right.size()) {
-    return false;
-  }
-  for (std::size_t index = 0; index < left.size(); ++index) {
-    if (core::AsciiLower(static_cast<std::uint8_t>(left[index])) !=
-        core::AsciiLower(static_cast<std::uint8_t>(right[index]))) {
-      return false;
-    }
-  }
-  return true;
-}
-
 }  // namespace
 
 void GuildBook::TellBelonging(GuildBelonging belonging) {
@@ -160,7 +147,7 @@ bool GuildBook::IsMaster(std::uint32_t char_id) const {
   }
   if (summary_.has_value() && !summary_->master_name.empty()) {
     const GuildMember* own = FindMember(char_id);
-    return own != nullptr && SameName(own->name, summary_->master_name);
+    return own != nullptr && core::AsciiEqualsFolded(own->name, summary_->master_name);
   }
   return belonging_->master;
 }

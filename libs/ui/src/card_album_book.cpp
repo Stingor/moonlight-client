@@ -26,17 +26,6 @@ namespace {
 // une texture de 24 sur 24, posée texel pour pixel.
 [[nodiscard]] float NameIconSide() { return std::floor(Px(kNameIconPixels)); }
 
-// La vignette que l'appelant a préparée pour cette pochette, ou rien.
-[[nodiscard]] const CardAlbumArt* ArtFor(const CardAlbumView& view, std::uint32_t card_id,
-                                         bool silhouette) {
-  for (const CardAlbumArt& art : view.art) {
-    if (art.card_id == card_id && art.silhouette == silhouette) {
-      return &art;
-    }
-  }
-  return nullptr;
-}
-
 // Un texte sur UNE ligne, centré dans [left, right], la police réduite pour
 // tenir — jusqu'à un plancher, au-delà duquel on coupe : un nom illisible ne
 // vaut pas mieux qu'un nom tronqué.
@@ -386,7 +375,7 @@ void DrawPocket(CardAlbumWindowState& state, const CardAlbumView& view, ImDrawLi
   // L'illustration — en couleur si la pochette est ouverte, en silhouette sinon.
   const bool silhouette = !pocket.unlocked;
   state.wanted.push_back(CardAlbumArtAsk{.card_id = pocket.card_id, .silhouette = silhouette});
-  const CardAlbumArt* art = ArtFor(view, pocket.card_id, silhouette);
+  const CardAlbumArt* art = ArtOf(view, pocket.card_id, silhouette);
   const bool picture_fits = art != nullptr && art->picture.usable() &&
                             view.art_width == static_cast<int>(layout.art_width) &&
                             view.art_height == static_cast<int>(layout.art_height);

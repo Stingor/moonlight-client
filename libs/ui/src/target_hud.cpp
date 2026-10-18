@@ -14,6 +14,8 @@
 #include "ro/ui/hud_caption.h"
 #include "ro/ui/status_bar.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -124,7 +126,7 @@ void PaintStatuses(ImVec2 top_left, ImVec2 bottom_right, const TargetView& targe
   if (target.statuses.empty()) {
     return;
   }
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   StatusRowLayout row;
   row.side = scale * static_cast<float>(std::max(8, look.status_icon_pixels));
   row.gap = scale * static_cast<float>(std::max(0, look.status_gap_pixels));

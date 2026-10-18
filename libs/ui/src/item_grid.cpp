@@ -4,7 +4,7 @@
 #include <array>
 #include <cmath>
 #include <cstdio>
-#include <cstring>
+#include <optional>
 #include <string>
 
 #include <imgui_internal.h>
@@ -14,6 +14,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "item_drag.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -183,10 +184,8 @@ TabDrawn DrawOneTab(ItemTab tab, bool active, const SkinArt& art, TabStripLook l
     // ⚠ LA MÊME CHARGE QUE LA BARRE DE RACCOURCIS, et c'est voulu : un objet
     // qu'on tire est un objet qu'on tire, et deux types de charge obligeraient
     // chaque case à choisir lequel émettre avant de savoir où on va le lâcher.
-    if (const ImGuiPayload* dropped = ImGui::AcceptDragDropPayload(kItemDragPayload);
-        dropped != nullptr && dropped->DataSize == sizeof(ItemDrag)) {
-      ItemDrag carried;
-      std::memcpy(&carried, dropped->Data, sizeof(carried));
+    if (const std::optional<ItemDrag> dropped = AcceptItemDrag()) {
+      const ItemDrag& carried = *dropped;
       drawn.dropped_slot = carried.client_slot;
     }
     ImGui::EndDragDropTarget();

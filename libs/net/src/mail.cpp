@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <limits>
-#include <span>
 #include <utility>
 
 #include "ro/core/byte_reader.h"
@@ -109,10 +108,6 @@ std::uint8_t WireFromBox(sim::MailBox box) noexcept {
   return kWireBoxNormal;
 }
 
-std::string_view AsText(std::span<const std::uint8_t> raw) noexcept {
-  return {reinterpret_cast<const char*>(raw.data()), raw.size()};
-}
-
 // Un champ de texte borné : coupé au premier nul.
 std::string_view UpToNul(std::string_view field) noexcept {
   return field.substr(0, std::min(field.find('\0'), field.size()));
@@ -163,7 +158,7 @@ FrameOutcome ApplyList(const Frame& frame, sim::Mailbox& mailbox, std::int64_t n
     if (title_bytes > reader.remaining()) {
       return FrameOutcome::kUndecodable;
     }
-    header.title = core::Utf8FromWire(UpToNul(AsText(reader.Bytes(title_bytes))));
+    header.title = core::Utf8FromWire(UpToNul(core::AsText(reader.Bytes(title_bytes))));
     if (!reader.ok()) {
       return FrameOutcome::kUndecodable;
     }
@@ -215,7 +210,7 @@ FrameOutcome ApplyContent(const Frame& frame, sim::Mailbox& mailbox) {
   if (!reader.ok() || declared != frame.bytes.size() || text_bytes > reader.remaining()) {
     return FrameOutcome::kUndecodable;
   }
-  content.body = core::Utf8FromWire(BodyFromWire(AsText(reader.Bytes(text_bytes))));
+  content.body = core::Utf8FromWire(BodyFromWire(core::AsText(reader.Bytes(text_bytes))));
   if (static_cast<std::size_t>(item_count) * kContentItemBytes > reader.remaining()) {
     return FrameOutcome::kUndecodable;
   }

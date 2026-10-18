@@ -1,5 +1,7 @@
 #include "ro/vfs/card_item_list.h"
 
+#include "ro/core/text.h"
+
 #include "text_table.h"
 
 namespace ro::vfs {
@@ -10,7 +12,7 @@ core::Result<CardItemList> ReadCardItemList(Vfs& vfs) {
   if (!bytes) {
     return std::unexpected(bytes.error());
   }
-  for (const std::string_view line : SplitLines(AsText(*bytes))) {
+  for (const std::string_view line : SplitLines(core::AsText(*bytes))) {
     std::uint32_t item_id = 0;
     // Le champ qui suit est toujours vide ; seule la tête compte.
     std::string_view unused;

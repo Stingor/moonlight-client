@@ -8,14 +8,13 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/text.h"
+
 namespace moonclient {
 namespace {
 
 using ro::sim::CompanionAiContext;
 
-// UN OCTET DE SUITE d'un caractère UTF-8 : 10xxxxxx.
-constexpr unsigned char kContinuationMask = 0xC0;
-constexpr unsigned char kContinuationBits = 0x80;
 // LE PREMIER SUFFIXE d'un nom pris : « (2) ».
 constexpr int kFirstSuffix = 2;
 
@@ -35,14 +34,7 @@ constexpr int kFirstSuffix = 2;
 // `text` raccourci à `most` octets au plus, sans couper un caractère UTF-8, et
 // sans espace au bout.
 [[nodiscard]] std::string CutTo(std::string text, std::size_t most) {
-  if (text.size() > most) {
-    std::size_t end = most;
-    while (end > 0 &&
-           (static_cast<unsigned char>(text[end]) & kContinuationMask) == kContinuationBits) {
-      --end;
-    }
-    text.resize(end);
-  }
+  text.resize(ro::core::Utf8Prefix(text, most).size());
   while (!text.empty() && text.back() == ' ') {
     text.pop_back();
   }

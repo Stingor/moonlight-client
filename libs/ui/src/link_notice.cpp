@@ -7,6 +7,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/modal_box.h"
 
+#include "ui_scale.h"
+
 namespace ro::ui {
 namespace {
 
@@ -23,7 +25,7 @@ constexpr float kShadowOffsetPixels = 1.0F;
 // clic ni touche, et ne se range derrière aucune fenêtre.
 void DrawUnsteadyBanner() {
   const char* text = core::Tr("Le serveur ne répond plus…");
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   const ImVec2 size = ImGui::CalcTextSize(text);
   const float padding = kLinkBannerPaddingPixels * scale;
   const float width = ImGui::GetIO().DisplaySize.x;

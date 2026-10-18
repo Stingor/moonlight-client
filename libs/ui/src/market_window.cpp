@@ -13,6 +13,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/trade_widgets.h"
 
 #include "table_cells.h"
 #include "ui_scale.h"
@@ -100,31 +101,12 @@ struct ResultColumns {
   return contents + chrome;
 }
 
-// L'icône, et l'emblème du grade dans son coin bas gauche.
-void DrawIcon(const MarketRowView& row) {
-  const float scale = Scale();
-  const float side = kTradeIconPixels * scale;
-  const ImVec2 at = ImGui::GetCursorScreenPos();
-  if (row.item.icon.usable()) {
-    ImGui::Image(row.item.icon.id, ImVec2(side, side));
-  } else {
-    ImGui::Dummy(ImVec2(side, side));
-  }
-  if (!row.grade_badge.usable()) {
-    return;
-  }
-  const ImVec2 badge(row.grade_badge.width * scale, row.grade_badge.height * scale);
-  const ImVec2 low(at.x, at.y + side - badge.y);
-  ImGui::GetWindowDrawList()->AddImage(row.grade_badge.id, low,
-                                       ImVec2(low.x + badge.x, low.y + badge.y));
-}
-
 // L'icône et le nom, maniés d'un bloc comme un item de commerce : la bulle
 // d'item au survol, Maj + clic pour le lien, clic droit pour le menu.
 void DrawItemCell(const MarketRowView& row, int row_index, bool in_store, ItemLinkMenu& menu,
                   MarketAction& action) {
   ImGui::BeginGroup();
-  DrawIcon(row);
+  DrawGradedTradeIcon(row.item, row.grade_badge);
   ImGui::SameLine();
   ImGui::AlignTextToFramePadding();
   Unformatted(row.item.name);

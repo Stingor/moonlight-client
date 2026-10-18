@@ -10,6 +10,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "attribute_names.h"
 #include "character_panes.h"
 #include "ui_scale.h"
 #include "ui_text.h"
@@ -61,27 +62,6 @@ constexpr float kButtonGap = 4.0F;
 // sans sortir de l'écran.
 constexpr std::size_t kAttributeCount = 6;
 constexpr std::size_t kDerivedCount = 9;
-
-// Les six, dans l'ordre du client.
-[[nodiscard]] const char* AttributeLabel(std::size_t rank) {
-  // ⚠ DES LITTÉRAUX, un par branche : `core::Tr` veut voir sa chaîne à l'appel.
-  // Et ces six-là ne se traduisent pas — ce sont les noms que les joueurs
-  // lisent depuis toujours.
-  switch (rank) {
-    case 0:
-      return core::Tr("STR");
-    case 1:
-      return core::Tr("AGI");
-    case 2:
-      return core::Tr("VIT");
-    case 3:
-      return core::Tr("INT");
-    case 4:
-      return core::Tr("DEX");
-    default:
-      return core::Tr("LUK");
-  }
-}
 
 // Le fond d'un libellé : il s'arrête au MOT et ne court pas jusqu'au bout de la
 // rangée. C'est ce qui laisse les valeurs lire comme une colonne.
@@ -135,7 +115,7 @@ void PaintLabelBackground(std::string_view text) {
 [[nodiscard]] float ValueColumnOffset() {
   float widest = 0.0F;
   for (std::size_t rank = 0; rank < kAttributeCount; ++rank) {
-    widest = std::max(widest, ImGui::CalcTextSize(AttributeLabel(rank)).x);
+    widest = std::max(widest, ImGui::CalcTextSize(AttributeName(rank)).x);
   }
   for (std::size_t rank = 0; rank < kDerivedCount; ++rank) {
     widest = std::max(widest, ImGui::CalcTextSize(DerivedLabel(rank)).x);
@@ -204,7 +184,7 @@ void DerivedRow(const char* label, const char* value) {
 void AttributeRow(std::size_t rank, const CharacterAttributeView& attribute,
                   std::int64_t status_point, const SkinArt& art, CharacterWindowAction& action) {
   ImGui::PushID(static_cast<int>(rank));
-  const char* label = AttributeLabel(rank);
+  const char* label = AttributeName(rank);
   const float start = ImGui::GetCursorPosX();
   PaintLabelBackground(label);
   ImGui::TextUnformatted(label);

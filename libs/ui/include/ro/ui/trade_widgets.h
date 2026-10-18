@@ -66,6 +66,10 @@ struct TradeItemGesture {
 // l'ombre rouge du client ; `suffix` s'écrit après le nom (« x3 »).
 TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffix = {});
 
+// L'icône seule, et l'emblème du grade dans son coin bas gauche, à sa taille
+// propre. Une icône absente laisse sa place vide.
+void DrawGradedTradeIcon(const TradeItemView& item, const SkinImage& grade_badge);
+
 // Ajoute à `gesture` ce que le DERNIER élément ImGui a vu passer : pour une
 // ligne qui groupe l'item avec ce qui l'accompagne, et se manie d'un bloc.
 void AddLastItemGesture(TradeItemGesture& gesture);

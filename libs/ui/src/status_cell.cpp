@@ -10,6 +10,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_palette.h"
 
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -142,7 +143,7 @@ constexpr int kTooltipColors = 4;
 constexpr int kTooltipStyleVars = 3;
 
 void PushTooltipSkin() {
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   ImGui::PushStyleColor(ImGuiCol_PopupBg, kSkinPopupColor);
   ImGui::PushStyleColor(ImGuiCol_Text, kSkinTextColor);
   ImGui::PushStyleColor(ImGuiCol_TextDisabled, kSkinFaintTextColor);

@@ -25,11 +25,6 @@ namespace ro::vfs {
 // même sans fin de ligne.
 [[nodiscard]] std::vector<std::string_view> SplitLines(std::string_view text);
 
-// Les octets d'un fichier, vus comme du texte. ⚠ AUCUN TRANSCODAGE : ces tables
-// sont en CP949, et c'est au lecteur de décider ce qui est un texte à montrer et
-// ce qui est un nom de fichier à garder tel quel.
-[[nodiscard]] std::string_view AsText(const std::vector<std::uint8_t>& bytes);
-
 // Lit un fichier de l'installation. Une ABSENCE rend des octets vides plutôt
 // qu'une erreur : ces tables ornent, elles ne conditionnent pas.
 [[nodiscard]] core::Result<std::vector<std::uint8_t>> ReadOptionalFile(Vfs& vfs,

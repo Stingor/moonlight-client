@@ -15,6 +15,7 @@
 
 #include "minimap_parts.h"
 #include "ui_sampler.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -296,7 +297,7 @@ void DrawBoss(ImDrawList* into, const MinimapFrame& frame, const MinimapView& vi
 // passent avant le haut et le bas.
 void DrawQuests(ImDrawList* into, const MinimapFrame& frame, const MinimapView& view,
                 bool interactive) {
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   for (const MinimapQuest& quest : view.quests) {
     // L'ICÔNE DE LA SORTE DE QUÊTE à sa taille, sinon la pastille.
     const bool kind = quest.kind_image.usable();
@@ -400,7 +401,7 @@ void DrawStoreSearch(ImDrawList* into, const MinimapFrame& frame, const MinimapV
   if (!view.store_search.has_value() || !view.store_search_icon.usable()) {
     return;
   }
-  const float icon = kStoreSearchMarkerHalfPixels * ImGui::GetStyle().FontScaleMain;
+  const float icon = Px(kStoreSearchMarkerHalfPixels);
   const ImVec2 at =
       ClampToFrame(frame,
                    CellOnMinimapUnbounded(frame, static_cast<float>(view.store_search->x),

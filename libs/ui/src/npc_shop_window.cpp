@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
-#include <cstring>
 #include <numeric>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -16,6 +16,8 @@
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
+#include "item_drag.h"
+#include "trade_gestures.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -409,10 +411,8 @@ void AcceptBagDrop(NpcShopWindowState& state, const NpcShopView& view,
   if (!ImGui::BeginDragDropTarget()) {
     return;
   }
-  if (const ImGuiPayload* dropped = ImGui::AcceptDragDropPayload(kItemDragPayload);
-      dropped != nullptr && dropped->DataSize == sizeof(ItemDrag)) {
-    ItemDrag carried;
-    std::memcpy(&carried, dropped->Data, sizeof(carried));
+  if (const std::optional<ItemDrag> dropped = AcceptItemDrag()) {
+    const ItemDrag& carried = *dropped;
     const auto sold = std::ranges::find_if(view.sells, [&carried](const NpcShopSellView& on) {
       return on.client_slot == carried.client_slot;
     });
@@ -519,16 +519,7 @@ void DrawCart(NpcShopWindowState& state, const NpcShopView& view, const SkinArt&
   if (blocked) {
     ImGui::EndDisabled();
   }
-  if (!view.blockers.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-    std::string reasons;
-    for (const std::string_view reason : view.blockers) {
-      if (!reasons.empty()) {
-        reasons.push_back('\n');
-      }
-      reasons.append(reason);
-    }
-    SkinTooltip(reasons.c_str());
-  }
+  TipWhenHeld(view.blockers);
   ImGui::EndChild();
 }
 

@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/core/text.h"
 #include "ro/vfs/achievement_words.h"
 #include "ro/vfs/battle_words.h"
 #include "ro/vfs/cash_shop_words.h"
@@ -343,7 +344,7 @@ core::Result<ItemWords> ReadItemWords(Vfs& vfs) {
   if (!card_words) {
     return std::unexpected(card_words.error());
   }
-  ReadCardWords(words, AsText(*card_words));
+  ReadCardWords(words, core::AsText(*card_words));
 
   // ⚠ L'ORDRE COMPTE : les côtés se posent sur des mots déjà lus. Inverser les
   // deux lectures perdrait tous les déplacements sans rien signaler.
@@ -351,7 +352,7 @@ core::Result<ItemWords> ReadItemWords(Vfs& vfs) {
   if (!sides) {
     return std::unexpected(sides.error());
   }
-  ReadCardWordSides(words, AsText(*sides));
+  ReadCardWordSides(words, core::AsText(*sides));
 
   return words;
 }

@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "ui_color.h"
+#include "ui_scale.h"
 
 namespace ro::ui {
 namespace {
@@ -95,7 +96,7 @@ float SkinFramePaddingY(const SkinArt& art) {
   // Les deux grandissent donc du même facteur, et la densité tient à toute
   // échelle. Jamais négatif : une police plus haute que la barre donnerait un
   // remplissage inversé, et ImGui n'en veut pas.
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   return std::max(0.0F, (bar * scale - ImGui::GetFontSize()) * 0.5F);
 }
 
@@ -105,7 +106,7 @@ SkinStylePushed PushSkinStyle(const SkinArt& art) {
   for (const auto& [which, color] : palette) {
     ImGui::PushStyleColor(which, color);
   }
-  const float scale = ImGui::GetStyle().FontScaleMain;
+  const float scale = Scale();
   const auto measures = MeasuresOf(look);
   for (const auto& [which, measure] : measures) {
     ImGui::PushStyleVar(which, measure * scale);

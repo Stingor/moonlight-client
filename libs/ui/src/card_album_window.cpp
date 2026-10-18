@@ -156,6 +156,15 @@ const CardAlbumPocketView* PocketOf(const CardAlbumView& view, std::uint32_t car
   return nullptr;
 }
 
+const CardAlbumArt* ArtOf(const CardAlbumView& view, std::uint32_t card_id, bool silhouette) {
+  for (const CardAlbumArt& art : view.art) {
+    if (art.card_id == card_id && art.silhouette == silhouette) {
+      return &art;
+    }
+  }
+  return nullptr;
+}
+
 }  // namespace card_album
 
 namespace {

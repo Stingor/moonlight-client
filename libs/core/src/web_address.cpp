@@ -3,11 +3,14 @@
 #include <algorithm>
 #include <charconv>
 #include <cstddef>
+#include <cstdint>
 #include <initializer_list>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <vector>
+
+#include "ro/core/ascii.h"
 
 namespace ro::core {
 namespace {
@@ -28,31 +31,6 @@ constexpr std::string_view kSecureScheme = "https";
 
 constexpr unsigned char kFirstNonAscii = 0x80;
 constexpr char kHostListSeparator = ';';
-
-[[nodiscard]] char LowerAscii(char letter) {
-  return (letter >= 'A' && letter <= 'Z') ? static_cast<char>(letter - 'A' + 'a') : letter;
-}
-
-[[nodiscard]] bool SameAsciiNoCase(std::string_view left, std::string_view right) {
-  return left.size() == right.size() &&
-         std::equal(left.begin(), left.end(), right.begin(),
-                    [](char one, char other) { return LowerAscii(one) == LowerAscii(other); });
-}
-
-[[nodiscard]] bool StartsNoCase(std::string_view text, std::string_view prefix) {
-  return text.size() >= prefix.size() && SameAsciiNoCase(text.substr(0, prefix.size()), prefix);
-}
-
-[[nodiscard]] bool EndsNoCase(std::string_view text, std::string_view suffix) {
-  return text.size() >= suffix.size() &&
-         SameAsciiNoCase(text.substr(text.size() - suffix.size()), suffix);
-}
-
-[[nodiscard]] std::string LoweredAscii(std::string_view text) {
-  std::string lowered(text);
-  std::transform(lowered.begin(), lowered.end(), lowered.begin(), LowerAscii);
-  return lowered;
-}
 
 [[nodiscard]] bool NonAscii(char letter) {
   return static_cast<unsigned char>(letter) >= kFirstNonAscii;
@@ -150,8 +128,8 @@ bool IsWebAddressStart(std::string_view text, std::size_t at) {
     return false;
   }
   const std::string_view rest = text.substr(at);
-  return StartsNoCase(rest, kPlainPrefix) || StartsNoCase(rest, kSecurePrefix) ||
-         StartsNoCase(rest, kBarePrefix);
+  return AsciiStartsWithFolded(rest, kPlainPrefix) || AsciiStartsWithFolded(rest, kSecurePrefix) ||
+         AsciiStartsWithFolded(rest, kBarePrefix);
 }
 
 std::size_t WebAddressEnd(std::string_view text, std::size_t at) {
@@ -188,17 +166,19 @@ std::size_t WebAddressEnd(std::string_view text, std::size_t at) {
 }
 
 std::string OpenableWebAddress(std::string_view written) {
-  if (StartsNoCase(written, kBarePrefix)) {
+  if (AsciiStartsWithFolded(written, kBarePrefix)) {
     return std::string(kSecurePrefix) + std::string(written);
   }
   std::string openable(written);
   // ⚠ LE SCHÉMA EN MINUSCULES : « HTTPS:// » et « https:// » sont une même
   // adresse, et les accords comme la liste blanche la comparent à l'octet.
   for (const std::string_view prefix : {kSecurePrefix, kPlainPrefix}) {
-    if (StartsNoCase(openable, prefix)) {
+    if (AsciiStartsWithFolded(openable, prefix)) {
       const std::size_t scheme_size = prefix.size() - kSchemeSeparator.size();
       std::transform(openable.begin(), openable.begin() + static_cast<std::ptrdiff_t>(scheme_size),
-                     openable.begin(), LowerAscii);
+                     openable.begin(), [](char letter) {
+                       return static_cast<char>(AsciiLower(static_cast<std::uint8_t>(letter)));
+                     });
       break;
     }
   }
@@ -208,10 +188,10 @@ std::string OpenableWebAddress(std::string_view written) {
 WebAddressParts ParseWebAddress(std::string_view openable) {
   WebAddressParts parts;
   std::size_t authority_begin = 0;
-  if (StartsNoCase(openable, kSecurePrefix)) {
+  if (AsciiStartsWithFolded(openable, kSecurePrefix)) {
     parts.scheme = kSecureScheme;
     authority_begin = kSecurePrefix.size();
-  } else if (StartsNoCase(openable, kPlainPrefix)) {
+  } else if (AsciiStartsWithFolded(openable, kPlainPrefix)) {
     parts.scheme = kPlainScheme;
     authority_begin = kPlainPrefix.size();
   } else {
@@ -262,7 +242,7 @@ WebAddressParts ParseWebAddress(std::string_view openable) {
     }
   }
 
-  parts.host = LoweredAscii(host);
+  parts.host = AsciiLower(host);
   if (parts.host.empty()) {
     return parts;
   }
@@ -279,7 +259,7 @@ WebAddressParts ParseWebAddress(std::string_view openable) {
 
 std::uint8_t WebAddressWarnings(std::string_view openable) {
   std::uint8_t warnings = 0;
-  if (StartsNoCase(openable, kPlainPrefix)) {
+  if (AsciiStartsWithFolded(openable, kPlainPrefix)) {
     warnings |= kWebWarnPlainHttp;
   }
   // « https://@evil.tld » n'a pas d'identité, mais son « @ » trompe l'œil
@@ -315,9 +295,9 @@ bool HostMatchesRule(std::string_view host, std::string_view rule) {
   if (rule.front() == '.') {
     // « .discordapp.com » vaut pour cdn.discordapp.com, pas pour
     // discordapp.com lui-même : la règle sans point le dit à part.
-    return host.size() > rule.size() && EndsNoCase(host, rule);
+    return host.size() > rule.size() && AsciiEndsWithFolded(host, rule);
   }
-  return SameAsciiNoCase(host, rule);
+  return AsciiEqualsFolded(host, rule);
 }
 
 std::vector<std::string> SplitHostList(std::string_view listed) {
@@ -331,7 +311,7 @@ std::vector<std::string> SplitHostList(std::string_view listed) {
     while (!piece.empty() && AsciiBlank(piece.back())) {
       piece.remove_suffix(1);
     }
-    std::string host = LoweredAscii(piece);
+    std::string host = AsciiLower(piece);
     if (IsUsableHostRule(host) && std::find(hosts.begin(), hosts.end(), host) == hosts.end()) {
       hosts.push_back(std::move(host));
     }

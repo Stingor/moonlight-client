@@ -10,6 +10,7 @@
 #include "ro/core/ascii.h"
 #include "ro/core/local_time.h"
 #include "ro/core/printed.h"
+#include "ro/core/text.h"
 
 namespace moonclient {
 namespace {
@@ -29,10 +30,6 @@ constexpr std::string_view kTrackerEllipsis = "...";
 constexpr int kFirstYear = 1900;
 constexpr int kFirstMonth = 1;
 
-// L'octet qui CONTINUE un caractère UTF-8 : 10xxxxxx.
-constexpr unsigned char kContinuationMask = 0xC0;
-constexpr unsigned char kContinuationMark = 0x80;
-
 [[nodiscard]] bool Completed(const AchievementProgress* progress) {
   return progress != nullptr && progress->completed;
 }
@@ -40,19 +37,6 @@ constexpr unsigned char kContinuationMark = 0x80;
 // Une récompense attend qu'on la réclame.
 [[nodiscard]] bool Unclaimed(const AchievementInfo& info, const AchievementProgress* progress) {
   return info.rewards() && Completed(progress) && !progress->rewarded;
-}
-
-// Le texte tronqué à `bytes` octets au plus, sur une frontière de caractère.
-[[nodiscard]] std::string_view CutAt(std::string_view text, std::size_t bytes) {
-  if (text.size() <= bytes) {
-    return text;
-  }
-  std::size_t end = bytes;
-  while (end > 0 &&
-         (static_cast<unsigned char>(text[end]) & kContinuationMask) == kContinuationMark) {
-    --end;
-  }
-  return text.substr(0, end);
 }
 
 // Une lettre latine en minuscule ; un octet non ASCII passe tel quel, et c'est
@@ -302,7 +286,7 @@ std::string TrackerLineText(const AchievementInfo& info, std::size_t index,
     return line;
   }
   const std::size_t room = kTrackerLineBytes > tail.size() ? kTrackerLineBytes - tail.size() : 0;
-  line += CutAt(label, room);
+  line += ro::core::Utf8Prefix(label, room);
   line += kTrackerEllipsis;
   line += tail;
   return line;

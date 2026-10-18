@@ -61,4 +61,13 @@ bool AsciiContainsFolded(std::string_view haystack, std::string_view needle) {
   return false;
 }
 
+std::string_view AsciiTrimmed(std::string_view text) {
+  constexpr std::string_view kBlanks = " \t";
+  const std::size_t first = text.find_first_not_of(kBlanks);
+  if (first == std::string_view::npos) {
+    return {};
+  }
+  return text.substr(first, text.find_last_not_of(kBlanks) - first + 1);
+}
+
 }  // namespace ro::core

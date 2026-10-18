@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "ro/core/text.h"
+
 namespace ro::sim {
 namespace {
 
@@ -15,16 +17,8 @@ constexpr std::int64_t kThirdTierFactor = 4;
 constexpr std::int64_t kCostDivisor = 10;
 constexpr std::int64_t kCostRoundUp = kCostDivisor - 1;
 
-// Un octet de suite UTF-8 : `10xxxxxx`.
-constexpr unsigned char kContinuationMask = 0xC0;
-constexpr unsigned char kContinuationBits = 0x80;
-
 [[nodiscard]] bool IsBlank(char letter) {
   return letter == ' ' || letter == '\t' || letter == '\n' || letter == '\r';
-}
-
-[[nodiscard]] bool IsContinuation(char letter) {
-  return (static_cast<unsigned char>(letter) & kContinuationMask) == kContinuationBits;
 }
 
 // Le coût de la marche qui part de `value`, le premier annoncé par le serveur
@@ -77,16 +71,9 @@ std::string TidyStatPresetName(std::string_view typed) {
     typed.remove_suffix(1);
   }
   constexpr std::size_t kRoom = kStatPresetNameBytes - 1;
-  if (typed.size() > kRoom) {
-    std::size_t cut = kRoom;
-    // On recule jusqu'au début d'un caractère : couper au milieu laisserait un
-    // octet orphelin, que ni l'écran ni le fichier ne savent lire.
-    while (cut > 0 && IsContinuation(typed[cut])) {
-      --cut;
-    }
-    typed = typed.substr(0, cut);
-  }
-  return std::string(typed);
+  // La coupe tombe au début d'un caractère : un octet orphelin, ni l'écran ni
+  // le fichier ne savent le lire.
+  return std::string(core::Utf8Prefix(typed, kRoom));
 }
 
 StatPresetRefusal StatPresetBook::Save(std::string_view name, const BaseStats& stats) {

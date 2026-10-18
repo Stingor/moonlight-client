@@ -23,6 +23,7 @@
 #include "ro/ui/window_name.h"
 
 #include "options_rows.h"
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -257,7 +258,7 @@ void DrawSidePanel(const OptionSectionView& section, const OptionsWindowState& s
   if (section.side_rows.empty()) {
     return;
   }
-  const float width = kSidePanelWidthPixels * ImGui::GetStyle().FontScaleMain;
+  const float width = Px(kSidePanelWidthPixels);
   float left = window_at.x + window_size.x;
   if (left + width > ImGui::GetIO().DisplaySize.x && window_at.x >= width) {
     left = window_at.x - width;
