@@ -18,12 +18,15 @@ constexpr std::uint32_t kJobBabyHunter = 4034;
 constexpr std::uint32_t kJobGangsi = 4050;
 constexpr std::uint32_t kJobDeathKnight = 4051;
 constexpr std::uint32_t kJobDarkCollector = 4052;
-constexpr std::uint32_t kJobRanger = 4062;
-constexpr std::uint32_t kJobRangerTrans = 4098;
+constexpr std::uint32_t kJobRanger = 4056;
+constexpr std::uint32_t kJobRangerTrans = 4062;
+constexpr std::uint32_t kJobBabyRanger = 4098;
 constexpr std::uint32_t kJobWindHawk = 4257;
 // Le Wind Hawk MONTÉ sur son loup : le corps que montre un Wind Hawk dont
 // l'option de monture est levée.
 constexpr std::uint32_t kJobWindHawkRiding = 4278;
+// La tenue alternative du ranger, que le style de corps peut porter.
+constexpr std::uint32_t kRangerAlternateOutfit = 4337;
 
 constexpr FalconArt kHawk = {"data\\sprite\\이팩트\\매.spr", "data\\sprite\\이팩트\\매.act"};
 constexpr FalconArt kSniperHawk = {"data\\sprite\\이팩트\\매2.spr",
@@ -149,6 +152,32 @@ FalconArt FalconArtFor(std::uint32_t job_id, std::uint32_t option) noexcept {
       return kLude;
     case kJobRanger:
     case kJobRangerTrans:
+    case kJobBabyRanger:
+      return kOwl;
+    case kJobWindHawk:
+    case kJobWindHawkRiding:
+      return kWindHawk;
+    default:
+      return kHawk;
+  }
+}
+
+FalconArt PlayerFalconArtFor(std::uint32_t body_style) noexcept {
+  switch (body_style) {
+    case kJobSniper:
+      return kSniperHawk;
+    case kJobBabyHunter:
+      return kBabyHawk;
+    case kJobGangsi:
+      return kPungus;
+    case kJobDeathKnight:
+      return kExplosion;
+    case kJobDarkCollector:
+      return kLude;
+    case kJobRanger:
+    case kJobRangerTrans:
+    case kJobBabyRanger:
+    case kRangerAlternateOutfit:
       return kOwl;
     case kJobWindHawk:
     case kJobWindHawkRiding:

@@ -38,17 +38,29 @@ struct FalconArt {
 // dans `shown_job.h`.
 inline constexpr std::uint32_t kOptionFalcon = 0x10;
 
-// L'OISEAU D'UN ACTEUR, d'après le métier qu'il MONTRE : le tireur d'élite a
-// son faucon à lui, le bébé chasseur le sien, le ranger sa chouette, le
-// Wind Hawk son épervier ; Gangsi, Death Knight et Dark Collector portent un
-// monstre en guise d'oiseau. Tout autre métier prend le faucon ordinaire.
+// L'OISEAU D'UN JOUEUR, d'après son STYLE DE CORPS tel que l'annonce le
+// serveur, et non d'après son métier : le tireur d'élite a son faucon à lui, le
+// bébé chasseur le sien, le ranger — transcendé, bébé ou en tenue alternative —
+// sa chouette, le Wind Hawk son épervier ; Gangsi, Death Knight et Dark
+// Collector portent un monstre en guise d'oiseau. Toute autre valeur prend le
+// faucon ordinaire.
+//
+// ⚠ LE STYLE DE CORPS EST UN MÉTIER : le serveur y met celui du personnage
+// quand il n'en porte aucun, et le styliste y pose le métier dont le joueur
+// emprunte l'apparence. Un tireur d'élite habillé en ranger porte donc la
+// chouette, habillé en Wind Hawk l'épervier. Aucune option n'y entre : ni
+// costume, ni monture, ni vol. Un style nul donne le faucon ordinaire.
+[[nodiscard]] FalconArt PlayerFalconArtFor(std::uint32_t body_style) noexcept;
+
+// L'OISEAU D'UN ACTEUR QUI N'EST PAS UN JOUEUR, d'après le métier qu'il
+// MONTRE. Mêmes oiseaux que pour un joueur, tenue alternative exceptée.
 //
 // ⚠ LE MÉTIER MONTRÉ N'EST PAS LE MÉTIER : un costume d'option — mariage, Noël,
 // été, hanbok, Oktoberfest — remplace le corps, et l'oiseau redevient alors le
 // faucon ordinaire. Le vol annule tous ces costumes sauf le mariage, qui passe
-// avant lui. Un ranger ou un ranger transcendé
-// monté sur son loup montre un autre corps, et reprend lui aussi le faucon
-// ordinaire — pas le Wind Hawk, dont le corps monté garde son épervier.
+// avant lui. Un ranger monté sur son loup montre un autre corps, et reprend lui
+// aussi le faucon ordinaire — pas le Wind Hawk, dont le corps monté garde son
+// épervier.
 [[nodiscard]] FalconArt FalconArtFor(std::uint32_t job_id, std::uint32_t option) noexcept;
 
 // LE MÉTIER QU'UN ACTEUR MONTRE (`ShownJobFor`), réduit à ce que les

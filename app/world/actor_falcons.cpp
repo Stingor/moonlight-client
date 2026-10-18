@@ -10,6 +10,7 @@
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "world/actor_view.h"
 #include "world/hit_popup_rules.h"
 
 namespace moonclient {
@@ -80,10 +81,13 @@ void ActorFalcons::Census(const FalconFrame& frame) {
     if (!ro::render::CarriesFalcon(actor.option) || falcons_.contains(id)) {
       continue;
     }
-    // L'OISEAU SE CHOISIT À LA NAISSANCE, et ne change plus tant qu'il vit.
+    // L'OISEAU SE CHOISIT À LA NAISSANCE, et ne change plus tant qu'il vit :
+    // sur le style de corps pour un joueur, sur le métier montré sinon.
     Kept born;
     born.falcon = ro::render::BornFalcon(MasterAt(frame, actor, frame.now_ms));
-    born.art = ArtFor(*frame.vfs, ro::render::FalconArtFor(actor.look.job, actor.option));
+    born.art = ArtFor(*frame.vfs, ComposedAsPlayer(actor)
+                                      ? ro::render::PlayerFalconArtFor(actor.look.body_style)
+                                      : ro::render::FalconArtFor(actor.look.job, actor.option));
     born.launched_ms = frame.now_ms;
     falcons_.emplace(id, std::move(born));
   }
