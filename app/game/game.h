@@ -611,11 +611,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // ── LES RÉGLAGES ET LA FICHE ───────────────────────────────────────────────
   // Les onglets de la conversation : ce qu'ils gardent, et ce qu'ils trient.
   std::optional<ChatTabsView> chat_tabs_;
-  // Où part la ligne en cours de frappe, et ce qu'il en reste. Refait à chaque
-  // image : c'est une lecture de la saisie, pas un état à tenir à jour.
+  // Où part la ligne en cours de frappe : relu de la saisie à chaque image.
   ChatLinePreviewMaker chat_preview_;
-  // Les commandes que la liste au-dessus du champ ET le menu des macros
-  // proposent : une seule liste pour les deux.
+  // Une seule liste pour l'autocomplétion du champ ET le menu des macros.
   ChatCommandCatalogue chat_commands_;
   std::optional<SkillSheet> sheet_;
   std::optional<ShortcutBarView> shortcuts_;
