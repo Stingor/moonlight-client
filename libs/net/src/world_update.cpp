@@ -728,6 +728,8 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
     case proto::ZcClearDialog::kOpcode:
     case proto::ZcOpenEditdlg::kOpcode:
     case proto::ZcOpenEditdlgstr::kOpcode:
+    case proto::ZcDialogWindowSize::kOpcode:
+    case proto::ZcDialogWindowPos::kOpcode:
       return ApplyNpcDialogFrame(frame, world, now_ms);
 
     case proto::PacketStatusChange::kOpcode:

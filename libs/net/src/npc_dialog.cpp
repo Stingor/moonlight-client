@@ -174,6 +174,15 @@ FrameOutcome ApplyNpcDialogFrame(const Frame& frame, sim::World& world, std::uin
                    : FrameOutcome::kIgnored;
       });
 
+    // ⚠ IGNORÉES, ET NON « NON TRAITÉES ». Un script peut imposer la taille et la
+    // position de la fenêtre de dialogue ; la nôtre se dispose comme toutes les
+    // autres fenêtres de l'interface, et c'est le joueur qui la place. La
+    // décision est prise : la ranger parmi le travail restant ferait chercher
+    // ce qu'il n'y a pas à faire.
+    case proto::ZcDialogWindowSize::kOpcode:
+    case proto::ZcDialogWindowPos::kOpcode:
+      return FrameOutcome::kIgnored;
+
     default:
       return FrameOutcome::kUnhandled;
   }
