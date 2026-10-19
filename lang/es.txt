@@ -9679,8 +9679,8 @@ tr: La MISMA zona, en una sola imagen tomada en el instante del clic: ni cuenta 
 fr: La banque est indisponible. Réessayez dans quelques minutes.
 tr: El banco no está disponible. Inténtalo de nuevo en unos minutos.
 
-fr: La banque est plafonnée à 2 147 483 647 z (INT32), côté client comme côté serveur (MAX_BANK_ZENY). Un dépôt qui ferait dépasser ce plafond est refusé en bloc, pas tronqué.
-tr: El banco tiene un tope de 2.147.483.647 z (INT32), tanto en el cliente como en el servidor (MAX_BANK_ZENY). Un depósito que lo superara se rechaza por completo, no se recorta.
+fr: La banque est plafonnée à %s z par le serveur. Un dépôt qui ferait dépasser ce plafond est refusé en bloc, pas tronqué.
+tr: El servidor limita el banco a %s z. Un depósito que superara ese tope se rechaza por completo, no se recorta.
 
 fr: La barre ne prend plus rien à la souris : on clique le monde au travers. Maintenir Maj la rend vivante le temps d'un geste — c'est ainsi qu'on la remplit ou qu'on la déplace encore.
 tr: La barra deja de captar el ratón: haces clic en el mundo a través de ella. Mantener Mayús la reactiva mientras dura un gesto — así es como todavía se rellena o se mueve.
@@ -9805,8 +9805,8 @@ tr: El registro está vacío.
 fr: Le minerai est consommé dans tous les cas. En cas de réussite l'arme passe de +%d à +%d.
 tr: El mineral se consume en todos los casos. Si sale bien, el arma pasa de +%d a +%d.
 
-fr: Le montant maximum est de 2 147 483 647 zeny.
-tr: La cantidad máxima es de 2.147.483.647 zeny.
+fr: La banque ne peut pas contenir plus de %s zeny.
+tr: El banco no puede contener más de %s zeny.
 
 fr: Le mot « Miss »
 tr: La palabra "Miss"

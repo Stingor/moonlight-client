@@ -57,6 +57,8 @@ constexpr float kFallbackWidthInFonts = 23.0F;
 
 // Ce que vaut un pour-cent, pour la jauge de remplissage.
 constexpr float kPercent = 100.0F;
+// La bulle d'aide du plafond, traduite et le plafond inséré.
+constexpr std::size_t kHelpBytes = 384;
 
 // LES DEUX TEINTES DU MESSAGE D'ÉTAT. ⚠ ELLES NE SONT PAS DANS LA PALETTE : la
 // palette dit ce qu'est une fenêtre du jeu, et ces deux-là ne servent qu'ici —
@@ -164,18 +166,18 @@ void SetBankStatus(BankWindowState& state, const char* utf8, bool is_error) {
   state.status_error = is_error;
 }
 
-std::int64_t BankMaxDeposit(std::int64_t vault, std::int64_t zeny) {
-  const std::int64_t room = kBankZenyMax - vault;
-  return std::max<std::int64_t>(0, std::min(zeny, room));
+std::int64_t BankMaxDeposit(std::int64_t vault, std::int64_t zeny, std::int64_t vault_max) {
+  const std::int64_t room = vault_max - vault;
+  return std::max<std::int64_t>(0, std::min({zeny, room, kBankRequestMostZeny}));
 }
 
 std::int64_t BankMaxWithdraw(std::int64_t vault, std::int64_t zeny) {
-  const std::int64_t room = kBankZenyMax - zeny;
-  return std::max<std::int64_t>(0, std::min(vault, room));
+  const std::int64_t room = kPocketZenyMax - zeny;
+  return std::max<std::int64_t>(0, std::min({vault, room, kBankRequestMostZeny}));
 }
 
 std::int64_t BankClampAmount(std::int64_t amount) {
-  return std::max<std::int64_t>(0, std::min(amount, kBankZenyMax));
+  return std::max<std::int64_t>(0, std::min(amount, kBankRequestMostZeny));
 }
 
 BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& view,
@@ -263,15 +265,21 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
   ImGui::SameLine(value_column);
   ImGui::TextUnformatted(Zeny(view.vault + (view.zeny_known ? view.zeny : 0)).c_str());
   ImGui::SameLine();
-  SkinHelpMarker(
-      core::Tr("La banque est plafonnée à 2 147 483 647 z (INT32), côté client comme côté "
-               "serveur (MAX_BANK_ZENY). Un dépôt qui ferait dépasser ce plafond est refusé "
-               "en bloc, pas tronqué."));
+  // ⚠ LE PLAFOND EST CELUI QUE LE SERVEUR ANNONCE, pas une constante : il le
+  // dit dans ses règles, et un serveur muet garde celui d'un rAthena d'usine.
+  std::array<char, kHelpBytes> help = {};
+  std::snprintf(help.data(), help.size(),
+                core::Tr("La banque est plafonnée à %s z par le serveur. Un dépôt qui ferait "
+                         "dépasser ce plafond est refusé en bloc, pas tronqué."),
+                GroupThousands(view.vault_max).c_str());
+  SkinHelpMarker(help.data());
 
   // La jauge de remplissage vis-à-vis du plafond : le client d'origine ne dit
   // rien tant qu'on ne bute pas dedans, et l'erreur tombe alors sans prévenir.
+  // ⚠ UN PLAFOND NUL OU NÉGATIF NE DIVISE RIEN : la jauge reste vide.
+  const double vault_max = static_cast<double>(std::max<std::int64_t>(view.vault_max, 1));
   const float filled =
-      static_cast<float>(static_cast<double>(view.vault) / static_cast<double>(kBankZenyMax));
+      static_cast<float>(std::clamp(static_cast<double>(view.vault) / vault_max, 0.0, 1.0));
   std::snprintf(text.data(), text.size(), core::Tr("%.1f %% du plafond"),
                 static_cast<double>(filled * kPercent));
   // Une hauteur nulle prend celle d'un cadre standard : c'est la seule qui
@@ -342,7 +350,8 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
   // `SameLine` : le petit bouton se resserre quand il suit un `SameLine`, le
   // grand non, et les deux rangées se décaleraient l'une par rapport à l'autre.
   const std::int64_t zeny = view.zeny_known ? view.zeny : 0;
-  const std::int64_t most_deposited = view.zeny_known ? BankMaxDeposit(view.vault, zeny) : 0;
+  const std::int64_t most_deposited =
+      view.zeny_known ? BankMaxDeposit(view.vault, zeny, view.vault_max) : 0;
   const std::int64_t most_withdrawn = view.zeny_known ? BankMaxWithdraw(view.vault, zeny) : 0;
 
   const float column_gap = ImGui::GetStyle().ItemSpacing.x;

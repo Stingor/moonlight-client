@@ -9679,8 +9679,8 @@ tr: The SAME zone, as a single picture taken the instant you press: no countdown
 fr: La banque est indisponible. Réessayez dans quelques minutes.
 tr: The bank is not available. Please try again in a few minutes.
 
-fr: La banque est plafonnée à 2 147 483 647 z (INT32), côté client comme côté serveur (MAX_BANK_ZENY). Un dépôt qui ferait dépasser ce plafond est refusé en bloc, pas tronqué.
-tr: The bank is capped at 2,147,483,647 z (INT32), on the client as on the server (MAX_BANK_ZENY). A deposit that would exceed the cap is refused outright, not truncated.
+fr: La banque est plafonnée à %s z par le serveur. Un dépôt qui ferait dépasser ce plafond est refusé en bloc, pas tronqué.
+tr: The bank is capped at %s z by the server. A deposit that would exceed the cap is refused outright, not truncated.
 
 fr: La barre ne prend plus rien à la souris : on clique le monde au travers. Maintenir Maj la rend vivante le temps d'un geste — c'est ainsi qu'on la remplit ou qu'on la déplace encore.
 tr: The bar stops taking anything from the mouse: you click the world straight through it. Holding Shift brings it back to life for the length of one gesture — that is how you still fill it, or move it.
@@ -9805,8 +9805,8 @@ tr: The log is empty.
 fr: Le minerai est consommé dans tous les cas. En cas de réussite l'arme passe de +%d à +%d.
 tr: The ore is consumed in every case. On success the weapon goes from +%d to +%d.
 
-fr: Le montant maximum est de 2 147 483 647 zeny.
-tr: The Maximum amount is 2,147,483,647 Zeny
+fr: La banque ne peut pas contenir plus de %s zeny.
+tr: The bank cannot hold more than %s zeny.
 
 fr: Le mot « Miss »
 tr: The "Miss" word

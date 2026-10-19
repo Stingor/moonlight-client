@@ -46,7 +46,7 @@ namespace ro::net {
 // qui bascule la nôtre.
 [[nodiscard]] core::Result<void> RequestBankCheck(Connection& link, std::uint32_t account_id);
 
-// ⚠ LE MONTANT EST BORNÉ À `INT32` DE BOUT EN BOUT — voir `sim::kBankZenyMax`.
+// ⚠ LE MONTANT D'UNE DEMANDE EST BORNÉ À `INT32` — voir `sim::kBankRequestMostZeny`.
 // Le champ du fil est signé côté serveur (`int32 Money`), qui refuse tout ce
 // qui est négatif ou nul.
 [[nodiscard]] core::Result<void> RequestBankDeposit(Connection& link, std::uint32_t account_id,

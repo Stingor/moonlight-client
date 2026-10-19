@@ -36,6 +36,12 @@ enum class ServerRuleKey : std::uint16_t {
   kGameAreaCells = 7,
   // Le plus long chemin que le serveur accepte pour une marche, en pas.
   kMaxWalkPathSteps = 8,
+  // LE PLAFOND DE LA BANQUE, un `int64` qu'une valeur de quatre octets ne porte
+  // pas : deux clés, chacune les trente-deux bits de sa moitié en motif brut.
+  // ⚠ ELLES NE VALENT QU'ENSEMBLE, DANS LA MÊME TRAME : une moitié seule, ou un
+  // plafond qui ne serait pas strictement positif, est ignoré.
+  kBankZenyMaxLow = 9,
+  kBankZenyMaxHigh = 10,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

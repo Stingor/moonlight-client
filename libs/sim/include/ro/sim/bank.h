@@ -9,15 +9,16 @@ namespace ro::sim {
 // Elle vit à part du monde pour la même raison que le dialogue d'un PNJ : c'est
 // une famille à elle, et `world.h` touchait son plafond de lignes.
 //
-// 🔴 LE PLAFOND EST LE MÊME DES DEUX CÔTÉS, ET IL EST EN TRENTE-DEUX BITS. Le
-// serveur range le solde dans un `int32` (`MAX_BANK_ZENY` = `SINT32_MAX`) et la
-// poche aussi (`MAX_ZENY`) ; le PAQUET, lui, porte le solde sur soixante-quatre.
-// C'est pourquoi le solde se lit large et se borne étroit — un dépôt qui ferait
-// passer la borne est refusé EN BLOC, jamais tronqué.
-//
-// ⚠ ET LE CLIENT D'ORIGINE LIT BIEN LES HUIT OCTETS : tronquer au mot de poids
-// faible rendrait un solde négatif sur un serveur qui dépasserait la borne.
-inline constexpr std::int64_t kBankZenyMax = 2147483647;
+// 🔴 TROIS PLAFONDS, ET AUCUN NE VAUT POUR UN AUTRE :
+//   · LA BANQUE tient au plus `SessionSettings::bank_zeny_max` — ce que le
+//     serveur annonce dans ses règles, sur soixante-quatre bits ;
+//   · LA POCHE tient au plus `kPocketZenyMax` (`MAX_ZENY` du serveur) ;
+//   · UNE DEMANDE de dépôt ou de retrait porte son montant dans un `int32`.
+// Le solde se lit sur soixante-quatre bits, comme le paquet. Un transfert qui
+// ferait passer la destination au-delà de son plafond est refusé EN BLOC,
+// jamais tronqué.
+inline constexpr std::int64_t kPocketZenyMax = 2147483647;
+inline constexpr std::int64_t kBankRequestMostZeny = 2147483647;
 
 // CE QUE LE SERVEUR A RÉPONDU À LA DERNIÈRE DEMANDE DE BANQUE.
 //
@@ -59,7 +60,7 @@ enum class BankVerdict : std::uint8_t {
 // serveur qui le redit, à chaque demande d'ouverture.
 class BankSession {
  public:
-  // ⚠ SUR SOIXANTE-QUATRE BITS, comme le paquet : voir `kBankZenyMax`.
+  // ⚠ SUR SOIXANTE-QUATRE BITS, comme le paquet : voir `kPocketZenyMax`.
   [[nodiscard]] std::int64_t vault() const noexcept { return vault_; }
   // Le serveur vient de dire le solde. ⚠ LES TROIS PAQUETS DE BANQUE LE DISENT,
   // et ils sont seuls à le dire : celui de la demande d'ouverture et les deux

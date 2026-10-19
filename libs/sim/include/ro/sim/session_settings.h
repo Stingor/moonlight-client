@@ -73,6 +73,11 @@ struct SessionSettings {
   // taxe nulle ne retient rien ; l'échoppe d'achat n'est jamais taxée.
   int vending_tax_permyriad = kDefaultVendingTaxPermyriad;
   std::int64_t vending_tax_min_zeny = kDefaultVendingTaxMinZeny;
+  // LE PLAFOND DE LA BANQUE, en zeny : le solde que le serveur accepte de
+  // tenir, au-delà duquel il refuse un dépôt en bloc. Le défaut est celui d'un
+  // rAthena d'usine, `INT32_MAX` ; le serveur Moonlight l'annonce sur
+  // soixante-quatre bits.
+  std::int64_t bank_zeny_max = kDefaultBankZenyMax;
 
   static constexpr int kDefaultViewCells = 14;
   static constexpr int kDefaultMaxWalkPathSteps = 17;
@@ -81,6 +86,7 @@ struct SessionSettings {
   static constexpr std::uint32_t kDefaultHomunculusTeleportHoldMs = 5000;
   static constexpr int kDefaultVendingTaxPermyriad = 500;
   static constexpr std::int64_t kDefaultVendingTaxMinZeny = 100'000'000;
+  static constexpr std::int64_t kDefaultBankZenyMax = 2'147'483'647;
   // La taxe entière : le vendeur ne touche rien.
   static constexpr int kMaxVendingTaxPermyriad = 10'000;
 

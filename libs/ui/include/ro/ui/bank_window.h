@@ -24,15 +24,21 @@ namespace ro::ui {
 // ⚠ ET IL N'Y A PAS DE BOUTON « RAFRAÎCHIR » : redemander le solde REFERMERAIT
 // la banque. Ce n'est pas un oubli, c'est le protocole.
 
-// LE PLAFOND DE LA BANQUE ET DE LA POCHE, en zeny.
+// LES PLAFONDS, en zeny. Trois notions, trois noms :
+//   · la POCHE tient au plus `kPocketZenyMax` (`MAX_ZENY` du serveur) ;
+//   · une DEMANDE porte son montant dans un `int32` : `kBankRequestMostZeny` ;
+//   · la BANQUE tient ce que le serveur annonce (`BankWindowView::vault_max`),
+//     ou `kBankVaultMaxUnannounced` tant qu'il n'a rien dit — le plafond d'un
+//     rAthena d'usine.
 //
-// 🔴 IL EST DÉCLARÉ DEUX FOIS, ICI ET DANS `ro/sim/bank.h`, ET CE N'EST PAS
-// UN OUBLI : `ui` ne connaît pas `sim` — le graphe des bibliothèques
-// l'interdit, et c'est une propriété qu'on tient. Les deux sont recoupés par
-// un `static_assert` dans `app/items/bank_view.cpp`, le seul endroit qui voit
-// les deux : leur divergence est une erreur de compilation, pas une remarque
-// en revue.
-inline constexpr std::int64_t kBankZenyMax = 2147483647;
+// 🔴 ILS SONT DÉCLARÉS DEUX FOIS, ICI ET DANS `sim`, ET CE N'EST PAS UN
+// OUBLI : `ui` ne connaît pas `sim` — le graphe des bibliothèques l'interdit,
+// et c'est une propriété qu'on tient. Ils sont recoupés par des `static_assert`
+// dans `app/items/bank_view.cpp`, le seul endroit qui voit les deux : leur
+// divergence est une erreur de compilation, pas une remarque en revue.
+inline constexpr std::int64_t kPocketZenyMax = 2147483647;
+inline constexpr std::int64_t kBankRequestMostZeny = 2147483647;
+inline constexpr std::int64_t kBankVaultMaxUnannounced = 2147483647;
 
 // LE TITRE ET L'IDENTITÉ. ⚠ L'IDENTITÉ NE SE TRADUIT PAS : c'est elle qui porte
 // la place que le joueur a donnée à la fenêtre.
@@ -42,8 +48,8 @@ inline constexpr const char* kBankWindowId = "bank";
 // CE QUE LA FENÊTRE SAIT DU MONDE, recopié par l'appelant. ⚠ `ui` NE CONNAÎT NI
 // `sim` NI LE PROTOCOLE : elle reçoit trois nombres et un drapeau.
 struct BankWindowView {
-  // Le solde en banque, et la poche. ⚠ LES DEUX SUR SOIXANTE-QUATRE BITS bien
-  // que le plafond soit en trente-deux : le paquet est large, et un total qui
+  // Le solde en banque, et la poche. ⚠ LES DEUX SUR SOIXANTE-QUATRE BITS : le
+  // solde dépasse un `int32` sur un serveur qui le permet, et un total qui
   // additionne les deux déborderait d'un `int32`.
   std::int64_t vault = 0;
   std::int64_t zeny = 0;
@@ -52,6 +58,8 @@ struct BankWindowView {
   // rien ne l'a posée, un zéro se lirait « vous n'avez rien » au lieu de « je
   // ne sais pas ». La fenêtre grise alors ses deux boutons.
   bool zeny_known = false;
+  // Le plafond de la banque que le serveur annonce. Voir `kPocketZenyMax`.
+  std::int64_t vault_max = kBankVaultMaxUnannounced;
 };
 
 // CE QUE LA FENÊTRE A DEMANDÉ.
@@ -109,14 +117,15 @@ inline constexpr int kBankStepCount = 5;
 // que l'appelant lui donne.
 void SetBankStatus(BankWindowState& state, const char* utf8, bool is_error);
 
-// Le plus grand dépôt et le plus grand retrait possibles, tels que le client
-// d'origine les calcule en mode « Max ».
+// Le plus grand dépôt et le plus grand retrait possibles, ceux du mode « Max ».
 //
 // 🔴 LE PLAFOND S'APPLIQUE À LA DESTINATION, jamais à la source : déposer est
-// borné par ce que la BANQUE peut encore recevoir, retirer par ce que la POCHE
-// peut encore contenir. Les intervertir laisse proposer un transfert que le
-// serveur refuse en bloc.
-[[nodiscard]] std::int64_t BankMaxDeposit(std::int64_t vault, std::int64_t zeny);
+// borné par ce que la BANQUE peut encore recevoir (`vault_max`), retirer par ce
+// que la POCHE peut encore contenir (`kPocketZenyMax`). Les intervertir laisse
+// proposer un transfert que le serveur refuse en bloc. Les deux sont bornés en
+// outre par ce qu'une demande porte, `kBankRequestMostZeny`.
+[[nodiscard]] std::int64_t BankMaxDeposit(std::int64_t vault, std::int64_t zeny,
+                                          std::int64_t vault_max);
 [[nodiscard]] std::int64_t BankMaxWithdraw(std::int64_t vault, std::int64_t zeny);
 
 // LA HAUTEUR DE LA BANDE GRISE DU FOND, en pixels d'art — quarante-huit
@@ -128,8 +137,8 @@ void SetBankStatus(BankWindowState& state, const char* utf8, bool is_error);
 // rétrécir déformerait le sac de zeny qu'elle porte.
 inline constexpr float kBankBandPixels = 48.0F;
 
-// Borne une saisie à `[0, INT32_MAX]`, comme le client d'origine à chaque
-// frappe et à chaque palier.
+// Borne une saisie à `[0, kBankRequestMostZeny]`, à chaque frappe et à chaque
+// palier : c'est ce qu'une demande peut porter.
 [[nodiscard]] std::int64_t BankClampAmount(std::int64_t amount);
 
 [[nodiscard]] BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& view,

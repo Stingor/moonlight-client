@@ -37,7 +37,7 @@ namespace ro::ui {
 // et l'échec ressemblerait alors à « mot de passe incorrect ».
 //
 // ⚠ DÉCLARÉE ICI ET RECOUPÉE DANS `app` : `ui` ne connaît pas le protocole, et
-// c'est une propriété qu'on tient. Même montage que `kBankZenyMax`.
+// c'est une propriété qu'on tient. Même montage que `kPocketZenyMax`.
 inline constexpr std::size_t kLoginFieldBytes = 24;
 
 // Le code PIN fait quatre chiffres, et le serveur coupe la liaison sans un mot
