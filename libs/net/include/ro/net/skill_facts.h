@@ -35,14 +35,20 @@ namespace ro::net {
 // relit, et lui écrire un rang qu'on n'a pas donnerait une estimation de ce
 // qu'on ne peut pas lancer.
 //
-// ⚠ ET LA CIBLE A TROIS SENS : zéro est le mannequin neutre sans défense,
-// `kDamageAgainstSelf` est soi-même, tout le reste est un vrai monstre.
+// ⚠ ET LA CIBLE A DEUX SENS : zéro est le mannequin neutre sans défense, tout
+// le reste est un vrai monstre de la base. Il n'y a pas de cible « soi-même » :
+// le serveur la refuse.
+//
+// 🔴 LE SERVEUR NE CALCULE QU'UNE DEMANDE TOUTES LES `kSkillDamageServerSpacingMs`
+// par session ; une demande plus rapprochée reçoit `kSkillDamageTooSoon`.
 [[nodiscard]] core::Result<void> RequestSkillDamage(Connection& link, std::uint32_t skill_id,
                                                     std::uint16_t level,
                                                     std::uint32_t target_mob_id);
 
-// La cible « soi-même » : le miroir du duel, où l'on encaisse son propre sort.
-inline constexpr std::uint32_t kDamageAgainstSelf = 0xFFFFFFFFU;
+inline constexpr std::uint32_t kSkillDamageServerSpacingMs = 200;
+// Le `status` d'une demande trop rapprochée de la précédente : rien n'a été
+// calculé, la question reste ouverte.
+inline constexpr std::uint8_t kSkillDamageTooSoon = 3;
 
 // Applique une réponse : la table de cast (`ZC 0x0F0C`) ou l'estimation de
 // dégâts (`ZC 0x0F0E`).

@@ -23,10 +23,13 @@ namespace ro::net {
 // fermée ne coûte rien. La contrepartie est que le dossier est toujours la
 // DERNIÈRE réponse, jamais un flux.
 //
-// 🔴 ET LA PORTE PVP EST DU JEU, PAS UN DÉFAUT. Sur un autre joueur, vie et
-// magie ne partent que s'il est de mon groupe, de ma guilde, ou moi-même. Un
-// adversaire renvoie son espèce et rien d'autre : le masque `known` le dit, et
-// `sim` le porte en champs facultatifs. Ne pas « compléter » ce silence.
+// 🔴 ET LA PORTE PVP EST DU JEU, PAS UN DÉFAUT. Sur un autre joueur, magie,
+// niveau et vie EXACTE ne partent que s'il est de mon groupe, de ma guilde, ou
+// moi-même. Ailleurs — un adversaire, un monstre dont le jeu ne montre pas les
+// PV — la vie arrive en POURCENTAGE (`kTargetKnowsHealthPercent`) : le masque
+// `known` le dit, et `sim` le porte. Ne pas « compléter » ce silence.
+//
+// Une cible cachée que je ne verrais pas en jeu répond « hors de vue ».
 
 [[nodiscard]] FrameOutcome ApplyTargetInfoFrame(const Frame& frame, sim::World& world);
 
@@ -61,6 +64,11 @@ inline constexpr std::uint8_t kTargetKnowsHealth = 1;
 inline constexpr std::uint8_t kTargetKnowsMagic = 2;
 inline constexpr std::uint8_t kTargetKnowsLevel = 4;
 inline constexpr std::uint8_t kTargetKnowsNature = 8;
+// Posé AVEC `kTargetKnowsHealth` : `hp` est un pourcentage entier (0..100) et
+// `maxhp` vaut `kTargetHealthPercentScale`. Le rapport remplit une jauge ; ce
+// ne sont PAS des points de vie, et rien ne doit les écrire comme tels.
+inline constexpr std::uint8_t kTargetKnowsHealthPercent = 16;
+inline constexpr std::uint32_t kTargetHealthPercentScale = 100;
 
 // `status` de la réponse : zéro est la seule valeur qui décrive une entité.
 inline constexpr std::uint8_t kTargetAnswerOk = 0;

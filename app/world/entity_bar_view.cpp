@@ -155,9 +155,12 @@ std::vector<ro::ui::EntityBarView> EntityBarsOnScreen(
     // 🔴 LE DOSSIER DE CIBLE PASSE DEVANT, quand il en dit plus. Il est la seule
     // source de la vie d'un joueur hors de mon groupe, et il ne s'écrit pas sur
     // l'acteur — les deux ne se contredisent donc jamais, l'un comble l'autre.
+    // Un POURCENTAGE ne passe pas devant une vie exacte que le client tient : il
+    // ne fait que combler son absence.
     if (what.targeted && told.id == actor->id && told.reachable) {
-      if (const ro::ui::EntityGauge from_record = ToldOptional(told.health, told.max_health);
-          from_record.known) {
+      ro::ui::EntityGauge from_record = ToldOptional(told.health, told.max_health);
+      from_record.in_percent = told.health_in_percent;
+      if (from_record.known && !(from_record.in_percent && what.health.known)) {
         what.health = from_record;
       }
       what.magic = ToldOptional(told.magic, told.max_magic);

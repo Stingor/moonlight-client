@@ -114,8 +114,9 @@ void PaintGauge(ImDrawList& into, ImVec2 top_left, ImVec2 bottom_right, const Ta
                                             look.border ? kHudFrameBorderPixels : 0.0F);
   PaintGaugeFill(into, interior, GaugeFill(known, now, full, is_magic), GaugeGrowth::kRightward,
                  fill_color);
-  const std::string caption = GaugeCaption(known, now, full, GaugeTextOf(look.gauge_text),
-                                           GaugeNumbersAllowed(target, is_magic, known), is_magic);
+  const std::string caption =
+      GaugeCaption(known, now, full, GaugeTextFor(target, is_magic, GaugeTextOf(look.gauge_text)),
+                   GaugeNumbersAllowed(target, is_magic, known), is_magic);
   if (!caption.empty()) {
     PaintHudCaption(into, top_left, bottom_right, caption.c_str(), kCaptionColor, pixels);
   }
@@ -236,6 +237,13 @@ float GaugeFill(bool known, std::uint32_t current, std::uint32_t most, bool is_m
 
 bool GaugeNumbersAllowed(const TargetView& target, bool is_magic, bool known) {
   return !(!is_magic && target.is_player && known && !target.ally);
+}
+
+GaugeText GaugeTextFor(const TargetView& target, bool is_magic, GaugeText chosen) {
+  if (is_magic || !target.health_in_percent || chosen == GaugeText::kNothing) {
+    return chosen;
+  }
+  return GaugeText::kPercent;
 }
 
 bool TargetPartApplies(TargetPart part, const TargetView& target) {

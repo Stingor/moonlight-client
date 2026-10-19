@@ -135,6 +135,9 @@ struct EntityGauge {
   bool known = false;
   std::int32_t current = 0;
   std::int32_t most = 0;
+  // `current` est un pourcentage et `most` cent : la part est juste, mais le
+  // texte ne s'écrit qu'en pour cent.
+  bool in_percent = false;
 };
 
 // LES COULEURS DU CLIENT, converties de COLORREF en `IM_COL32`.
@@ -413,7 +416,8 @@ inline constexpr float kNameBarGapPixels = 2.0F;
 [[nodiscard]] ImU32 EntityBarFillColor(const EntityBarLook& look, float fill);
 
 // LE TEXTE D'UNE BARRE dans le mode demandé. Vide en mode muet, et vide aussi
-// quand la valeur est inconnue — un « 0 % » inventé serait pire que rien.
+// quand la valeur est inconnue — un « 0 % » inventé serait pire que rien. Une
+// jauge `in_percent` s'écrit en pour cent dans tout mode chiffré.
 [[nodiscard]] std::string EntityBarCaption(const EntityGauge& gauge, EntityBarText mode);
 
 // LA HAUTEUR TOTALE que cette entité occupera, cadre compris : de quoi savoir

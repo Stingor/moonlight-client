@@ -635,7 +635,7 @@ struct SkillDamageView {
   // fenêtre doit dire qu'elle attend plutôt que d'écrire un compte inventé.
   bool told = false;
   // 0 : l'estimation vaut. 1 : la compétence ne fait pas de dégâts. 2 : cible
-  // introuvable.
+  // refusée ou introuvable.
   int status = 0;
   // Ce que le coup EST aux yeux du serveur : 1 arme, 2 magie, le reste divers.
   int attack_kind = 0;
@@ -644,16 +644,11 @@ struct SkillDamageView {
   std::int64_t least = 0;
   std::int64_t most = 0;
   std::int64_t average = 0;
-  // ⚠ TROIS CIBLES, ET LE ZÉRO N'EST PAS « AUCUNE » : zéro est le mannequin
-  // neutre sans défense, `kDamageAgainstSelf` est soi-même, le reste est un vrai
-  // monstre.
+  // ⚠ LE ZÉRO N'EST PAS « AUCUNE CIBLE » : c'est le mannequin neutre sans
+  // défense. Le reste est un vrai monstre.
   std::uint32_t target_mob_id = 0;
   std::string_view target_name;
 };
-
-// La cible « soi-même », le miroir du duel. ⚠ LA MÊME VALEUR QUE LE FIL, et elle
-// ne se déduit pas : c'est le serveur qui la définit.
-inline constexpr std::uint32_t kSkillDamageAgainstSelf = 0xFFFFFFFFU;
 
 // Ce que la fenêtre de compétence montre.
 struct SkillDescriptionView {
@@ -711,11 +706,10 @@ struct SkillDescriptionWindowState {
   // et changent d'une minute à l'autre. Le texte du jeu, lui, est écrit une fois
   // pour toutes. Deux natures différentes, deux onglets.
   int tab = 0;
-  // La cible de l'estimation : soi-même, ou le numéro de monstre saisi.
+  // La cible de l'estimation : le numéro de monstre saisi.
   //
   // ⚠ ZÉRO EST UNE CIBLE, pas une absence : c'est le mannequin neutre sans
   // défense, celui qui donne les dégâts BRUTS.
-  bool damage_self = false;
   int damage_target = 0;
 };
 

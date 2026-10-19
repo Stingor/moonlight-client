@@ -74,6 +74,13 @@ constexpr std::uint8_t kAsksAboutSkill = 1;
   if (!proto::Decode(frame.bytes, packet)) {
     return FrameOutcome::kUndecodable;
   }
+  // Un refus de cadence ne remplace pas l'estimation qu'on a : il se compte, et
+  // le demandeur relance. Voir `SkillFacts::NoteDamageTooSoon`.
+  if (packet.status == kSkillDamageTooSoon) {
+    world.NoteSkillDamageTooSoon(sim::SkillDamageQuestion{.skill_id = packet.skill_id,
+                                                          .target_mob_id = packet.target_mob_id});
+    return FrameOutcome::kApplied;
+  }
   sim::SkillDamageFacts facts;
   facts.skill_id = packet.skill_id;
   facts.level = packet.skill_lv;
@@ -85,7 +92,7 @@ constexpr std::uint8_t kAsksAboutSkill = 1;
   facts.most = packet.dmg_max;
   facts.average = packet.dmg_avg;
 
-  // ⚠ LE NOM EST FACULTATIF : le mannequin neutre et le miroir n'en ont pas, et
+  // ⚠ LE NOM EST FACULTATIF : le mannequin neutre n'en a pas, et
   // son absence n'est pas une trame tronquée.
   core::ByteReader reader(frame.bytes);
   reader.Seek(kSkillDamageFixedSize);

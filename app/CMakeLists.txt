@@ -932,6 +932,17 @@ target_link_libraries(moonclient_quickcast
     PRIVATE ro_warnings)
 target_include_directories(moonclient_quickcast PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LES DEMANDES DES ONGLETS TECHNIQUES D'UNE COMPÉTENCE : cast et estimation de
+# dégâts. En bibliothèque pour sa cadence — anti-rebond du champ de cible, écart
+# entre deux envois, relance d'un refus du serveur —, qui ne se vérifie pas en
+# tapant des chiffres.
+add_library(moonclient_skillfacts STATIC
+    character/skill_facts_asker.cpp)
+target_link_libraries(moonclient_skillfacts
+    PUBLIC ro_core ro_net ro_sim ro_ui
+    PRIVATE ro_warnings)
+target_include_directories(moonclient_skillfacts PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LA CONSOLE DE MISE AU POINT (ADR 0095) : une écoute sur 127.0.0.1 que le pont
 # MCP de `tools/moonclient_mcp` interroge. En bibliothèque pour la raison
 # habituelle : ses requêtes et son écrivain JSON se vérifient sur un monde
@@ -1800,7 +1811,6 @@ add_executable(moonclient
     character/shortcut_view.cpp
     character/grimoire_keys.cpp
     character/skill_description_view.cpp
-    character/skill_facts_asker.cpp
     character/skill_view.cpp
     character/style_preview.cpp
     character/style_view.cpp
@@ -1835,7 +1845,7 @@ add_executable(moonclient
     game/window_events.cpp)
 
 target_link_libraries(moonclient
-    PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
+    PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net

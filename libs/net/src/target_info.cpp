@@ -53,6 +53,7 @@ FrameOutcome ApplyTargetInfoFrame(const Frame& frame, sim::World& world) {
   if ((packet.known & kTargetKnowsHealth) != 0) {
     told.health = packet.hp;
     told.max_health = packet.maxhp;
+    told.health_in_percent = (packet.known & kTargetKnowsHealthPercent) != 0;
   }
   if ((packet.known & kTargetKnowsMagic) != 0) {
     told.magic = packet.sp;

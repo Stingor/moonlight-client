@@ -43,6 +43,7 @@ void TargetHudView::Refresh(const ro::sim::World& world, const Targeting& target
   view_.ally = facts_.ally;
   view_.health = facts_.health;
   view_.max_health = facts_.max_health;
+  view_.health_in_percent = facts_.health_in_percent;
   view_.magic = facts_.magic;
   view_.max_magic = facts_.max_magic;
   view_.species = facts_.species;

@@ -39,8 +39,8 @@ inline constexpr std::uint8_t kLastTargetKind = 7;
 //
 // 🔴 CHAQUE CHAMP EST FACULTATIF, ET CE N'EST PAS DE LA PRUDENCE. Le serveur
 // envoie un masque qui dit ce qu'il a RENSEIGNÉ, et il en tait délibérément :
-// sur un adversaire, ses points de vie et de magie ne partent pas — c'est une
-// information de jeu, elle ne se donne pas. « Zéro point de vie » et « points de
+// sur un adversaire, sa magie ne part pas et sa vie n'arrive qu'en pourcentage
+// — c'est une information de jeu, elle ne se donne pas. « Zéro point de vie » et « points de
 // vie inconnus » ne se ressemblent pas à l'écran : le premier annonce une mort
 // qui n'a pas eu lieu.
 //
@@ -65,6 +65,11 @@ struct TargetDetail {
   std::optional<std::int16_t> level;
   std::optional<std::uint32_t> health;
   std::optional<std::uint32_t> max_health;
+  // Vrai quand `health` est un POURCENTAGE et `max_health` cent : le serveur ne
+  // donne les PV exacts qu'à soi, au groupe, à la guilde, et pour un monstre
+  // dont le jeu les montre déjà. Le rapport reste juste pour une jauge ; les
+  // nombres ne sont pas des points de vie.
+  bool health_in_percent = false;
   std::optional<std::uint32_t> magic;
   std::optional<std::uint32_t> max_magic;
 

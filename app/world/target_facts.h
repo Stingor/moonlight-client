@@ -44,6 +44,9 @@ struct TargetFacts {
   std::optional<std::int16_t> level;
   std::optional<std::uint32_t> health;
   std::optional<std::uint32_t> max_health;
+  // `health` est un pourcentage et `max_health` cent : de quoi remplir la
+  // jauge, pas des points de vie.
+  bool health_in_percent = false;
   std::optional<std::uint32_t> magic;
   std::optional<std::uint32_t> max_magic;
 };

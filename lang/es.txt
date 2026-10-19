@@ -8236,9 +8236,6 @@ tr: Objetivo: monstruo n.º %u
 fr: Cible : neutre sans défense (dégâts bruts)
 tr: Objetivo: neutro sin defensa (daño bruto)
 
-fr: Cible : toi-même (miroir du duel)
-tr: Objetivo: tú mismo (espejo de duelo)
-
 fr: Classes étendues
 tr: Clases ampliadas
 
@@ -8268,9 +8265,6 @@ tr: Combate (animado)
 
 fr: Confirmer
 tr: Confirmar
-
-fr: Contre moi-même (PvP)
-tr: Contra mí mismo (PvP)
 
 fr: Contrib.
 tr: Contrib.

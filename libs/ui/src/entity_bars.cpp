@@ -275,6 +275,9 @@ std::string EntityBarCaption(const EntityGauge& gauge, EntityBarText mode) {
   if (!gauge.known || mode == EntityBarText::kNothing) {
     return {};
   }
+  if (gauge.in_percent) {
+    mode = EntityBarText::kPercent;
+  }
   std::array<char, 64> line{};
   switch (mode) {
     case EntityBarText::kPercent:

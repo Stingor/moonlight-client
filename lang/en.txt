@@ -8236,9 +8236,6 @@ tr: Target: monster no. %u
 fr: Cible : neutre sans défense (dégâts bruts)
 tr: Target: neutral, no defence (raw damage)
 
-fr: Cible : toi-même (miroir du duel)
-tr: Target: yourself (duel mirror)
-
 fr: Classes étendues
 tr: Expanded classes
 
@@ -8268,9 +8265,6 @@ tr: Combat (animated)
 
 fr: Confirmer
 tr: Confirm
-
-fr: Contre moi-même (PvP)
-tr: Against myself (PvP)
 
 fr: Contrib.
 tr: Contrib.

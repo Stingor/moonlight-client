@@ -143,7 +143,8 @@ FrameOutcome ApplyVitals(const proto::ZcMoonlightTargetInfo& packet, sim::PartyR
                   sim::PartyGauge{.current = static_cast<std::int32_t>(packet.sp),
                                   .max = static_cast<std::int32_t>(packet.maxsp)},
                   now_ms);
-  if ((packet.known & kTargetKnowsHealth) != 0) {
+  // Un pourcentage n'est pas une vie : la jauge du groupe chiffre des PV.
+  if ((packet.known & kTargetKnowsHealth) != 0 && (packet.known & kTargetKnowsHealthPercent) == 0) {
     party.TellHealth(packet.gid, sim::PartyGauge{.current = static_cast<std::int32_t>(packet.hp),
                                                  .max = static_cast<std::int32_t>(packet.maxhp)});
   }

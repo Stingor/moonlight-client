@@ -113,6 +113,9 @@ struct TargetView {
 
   std::optional<std::uint32_t> health;
   std::optional<std::uint32_t> max_health;
+  // `health` est un POURCENTAGE et `max_health` cent : la jauge se remplit
+  // juste, mais le texte ne s'écrit qu'en pour cent — voir `GaugeTextFor`.
+  bool health_in_percent = false;
   std::optional<std::uint32_t> magic;
   std::optional<std::uint32_t> max_magic;
 
@@ -154,6 +157,11 @@ struct TargetHudAnswer {
 // Les chiffres de PV se taisent devant un joueur qui n'est pas un allié, dès
 // qu'ils sont connus.
 [[nodiscard]] bool GaugeNumbersAllowed(const TargetView& target, bool is_magic, bool known);
+
+// Le mode que la jauge écrit vraiment. Des PV reçus en pourcentage ne
+// s'écrivent jamais « 37 / 100 » : tout mode chiffré devient « 37 % », et
+// « rien » reste rien.
+[[nodiscard]] GaugeText GaugeTextFor(const TargetView& target, bool is_magic, GaugeText chosen);
 
 // Ce cadre se dessine-t-il pour cette cible ?
 [[nodiscard]] bool TargetPartApplies(TargetPart part, const TargetView& target);

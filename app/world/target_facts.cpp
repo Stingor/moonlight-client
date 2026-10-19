@@ -131,9 +131,12 @@ TargetFacts FactsOfTarget(const ro::sim::World& world, const ro::vfs::ItemWords&
     facts.level = static_cast<std::int16_t>(*plate.level);
   }
 
-  // Trois sources de PV, par fiabilité décroissante : le serveur, la jauge que
-  // le client tient, puis la plaque.
-  if (told && detail.health.has_value() && detail.max_health.has_value()) {
+  // Les sources de PV, par fiabilité décroissante : les PV exacts du serveur,
+  // la jauge que le client tient, la plaque chiffrée, puis un pourcentage —
+  // celui du serveur, ou celui de la plaque. Un pourcentage ne passe jamais
+  // devant un chiffre exact : il ne dit que la jauge.
+  const bool told_health = told && detail.health.has_value() && detail.max_health.has_value();
+  if (told_health && !detail.health_in_percent) {
     facts.health = detail.health;
     facts.max_health = detail.max_health;
   } else if (actor->max_health > 0 && actor->health >= 0) {
@@ -142,9 +145,14 @@ TargetFacts FactsOfTarget(const ro::sim::World& world, const ro::vfs::ItemWords&
   } else if (plate.health.has_value() && plate.max_health.has_value()) {
     facts.health = plate.health;
     facts.max_health = plate.max_health;
+  } else if (told_health) {
+    facts.health = detail.health;
+    facts.max_health = detail.max_health;
+    facts.health_in_percent = true;
   } else if (plate.health_percent.has_value()) {
     facts.health = static_cast<std::uint32_t>(*plate.health_percent);
     facts.max_health = kPercentScale;
+    facts.health_in_percent = true;
   }
   if (told && detail.magic.has_value() && detail.max_magic.has_value()) {
     facts.magic = detail.magic;

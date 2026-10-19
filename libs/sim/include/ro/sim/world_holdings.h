@@ -109,6 +109,9 @@ class WorldHoldings {
     skill_facts_.TellCast(skill_id, std::move(levels));
   }
   void TellSkillDamageFacts(SkillDamageFacts told) { skill_facts_.TellDamage(std::move(told)); }
+  void NoteSkillDamageTooSoon(SkillDamageQuestion refused) {
+    skill_facts_.NoteDamageTooSoon(refused);
+  }
   [[nodiscard]] const SkillFacts& skill_facts() const noexcept { return skill_facts_; }
 
   // CE QUE LE SERVEUR DIT DES OBJETS DU COFFRE — prix de revente, sous-type,

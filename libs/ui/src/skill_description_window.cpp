@@ -99,25 +99,17 @@ void DrawCastTab(const SkillDescriptionView& view, const SkinArt& art,
 
 // ── L'ONGLET « DÉGÂTS » : CE QUE LA COMPÉTENCE FERAIT, ICI, MAINTENANT ──────
 //
-// 🔴 TROIS CIBLES, ET LE ZÉRO N'EST PAS « AUCUNE » : zéro est le mannequin
-// NEUTRE sans défense — les dégâts bruts, avant toute réduction —, le miroir est
-// soi-même, et tout le reste est un vrai monstre avec sa défense, son élément,
-// sa race et sa taille.
+// 🔴 LE ZÉRO N'EST PAS « AUCUNE CIBLE » : c'est le mannequin NEUTRE sans
+// défense — les dégâts bruts, avant toute réduction. Tout le reste est un vrai
+// monstre avec sa défense, son élément, sa race et sa taille. Il n'y a pas de
+// cible « soi-même » : le serveur la refuse.
+//
+// ⚠ LE CHAMP DEMANDE À CHAQUE IMAGE CE QU'IL PORTE, chiffre par chiffre : c'est
+// `app` qui attend que la frappe se pose avant d'envoyer.
 void DrawDamageTab(SkillDescriptionWindowState& state, const SkillDescriptionView& view,
                    const SkinArt& art, SkillDescriptionAction& action) {
-  // ⚠ LA CASE D'IMGUI, comme le champ et la table de cette fenêtre : l'habillage
-  // du jeu n'a pas de case à cocher, et en peindre une ici la rendrait seule de
-  // son espèce.
-  if (ImGui::Checkbox(core::Tr("Contre moi-même (PvP)"), &state.damage_self)) {
-    // ⚠ CHANGER DE CIBLE INVALIDE CE QU'ON MONTRE : l'estimation d'avant a été
-    // faite contre autre chose, et la garder à l'écran la ferait lire comme la
-    // nouvelle.
-    action.refresh = true;
-  }
-  ImGui::BeginDisabled(state.damage_self);
   ImGui::SetNextItemWidth(kDamageTargetFieldPixels);
   ImGui::InputInt(core::Tr("Cible : ID monstre (0 = neutre)"), &state.damage_target, 0, 0);
-  ImGui::EndDisabled();
   state.damage_target = std::max(state.damage_target, 0);
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Calculer"), art)) {
@@ -125,8 +117,7 @@ void DrawDamageTab(SkillDescriptionWindowState& state, const SkillDescriptionVie
   }
 
   action.want_damage = view.skill_id;
-  action.damage_target =
-      state.damage_self ? kSkillDamageAgainstSelf : static_cast<std::uint32_t>(state.damage_target);
+  action.damage_target = static_cast<std::uint32_t>(state.damage_target);
 
   if (!view.damage.told) {
     ImGui::TextDisabled("%s", core::Tr("Calcul en cours..."));
@@ -145,9 +136,7 @@ void DrawDamageTab(SkillDescriptionWindowState& state, const SkillDescriptionVie
     ImGui::TextDisabled("%s", core::Tr("Estimation indisponible."));
     return;
   }
-  if (told.target_mob_id == kSkillDamageAgainstSelf) {
-    ImGui::TextDisabled("%s", core::Tr("Cible : toi-même (miroir du duel)"));
-  } else if (told.target_mob_id == 0) {
+  if (told.target_mob_id == 0) {
     ImGui::TextDisabled("%s", core::Tr("Cible : neutre sans défense (dégâts bruts)"));
   } else if (!told.target_name.empty()) {
     ImGui::Text(core::Tr("Cible : %.*s (n° %u)"), static_cast<int>(told.target_name.size()),

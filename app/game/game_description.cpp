@@ -232,7 +232,7 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
     item_description_->books().NoteClosed(windows_.book.item_id, answers.book.page);
   }
   FollowSkillDescriptionLink(answers.skill_description, now_ms);
-  skill_facts_.Ask(answers.skill_description, link_);
+  skill_facts_.Ask(answers.skill_description, world_.skill_facts(), now_ms, link_);
   // CE QUE LA SOURIS SURVOLE, retenu pour l'image suivante. ⚠ PLUSIEURS
   // FENÊTRES RÉPONDENT, une seule est survolée : le joueur n'a qu'une souris.
   // Le sertissage et la conversation complètent ce relevé après lui.

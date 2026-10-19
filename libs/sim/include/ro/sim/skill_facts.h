@@ -41,13 +41,13 @@ struct SkillCastFacts {
 struct SkillDamageFacts {
   std::uint32_t skill_id = 0;
   std::uint16_t level = 0;
-  // ⚠ TROIS CIBLES POSSIBLES, ET LE ZÉRO N'EST PAS « AUCUNE » : zéro est le
-  // mannequin NEUTRE sans défense — les dégâts bruts —, `0xFFFFFFFF` est
-  // soi-même (le miroir du duel), et tout le reste est un vrai monstre avec sa
+  // ⚠ LE ZÉRO N'EST PAS « AUCUNE CIBLE » : c'est le mannequin NEUTRE sans
+  // défense — les dégâts bruts. Tout le reste est un vrai monstre avec sa
   // défense, son élément, sa race et sa taille.
   std::uint32_t target_mob_id = 0;
   // 0 : l'estimation vaut. 1 : la compétence ne fait pas de dégâts. 2 : cible
-  // introuvable.
+  // refusée ou introuvable. Le refus « trop rapproché » ne se pose pas ici :
+  // voir `SkillFacts::NoteDamageTooSoon`.
   std::uint8_t status = 0;
   // Ce que le coup EST, aux yeux du serveur : arme, magie, ou divers.
   std::uint8_t attack_kind = 0;
@@ -56,8 +56,15 @@ struct SkillDamageFacts {
   std::int64_t least = 0;
   std::int64_t most = 0;
   std::int64_t average = 0;
-  // Le nom du monstre visé, vide pour le mannequin et pour soi-même.
+  // Le nom du monstre visé, vide pour le mannequin.
   std::string target_name;
+};
+
+// UNE QUESTION D'ESTIMATION : quelle compétence, contre quelle cible.
+struct SkillDamageQuestion {
+  std::uint32_t skill_id = 0;
+  std::uint32_t target_mob_id = 0;
+  [[nodiscard]] bool operator==(const SkillDamageQuestion&) const = default;
 };
 
 // CE QUE LE SERVEUR A DIT, RANGÉ PAR COMPÉTENCE.
@@ -82,6 +89,21 @@ class SkillFacts {
 
   [[nodiscard]] const SkillDamageFacts* DamageOf(std::uint32_t skill_id) const;
 
+  // 🔴 UN REFUS « TROP RAPPROCHÉ » N'EST PAS UNE RÉPONSE. Le serveur ne calcule
+  // rien quand deux demandes se suivent de trop près ; poser ce refus comme une
+  // estimation effacerait la précédente et ferait écrire « indisponible ». Il se
+  // COMPTE, avec la question refusée, et c'est le demandeur qui relance.
+  void NoteDamageTooSoon(SkillDamageQuestion refused) {
+    ++damage_too_soon_count_;
+    last_damage_too_soon_ = refused;
+  }
+  [[nodiscard]] std::uint32_t damage_too_soon_count() const noexcept {
+    return damage_too_soon_count_;
+  }
+  [[nodiscard]] const SkillDamageQuestion& last_damage_too_soon() const noexcept {
+    return last_damage_too_soon_;
+  }
+
   void Clear() noexcept {
     cast_.clear();
     damage_.clear();
@@ -92,6 +114,8 @@ class SkillFacts {
   // mieux qu'un ordre de table de hachage quand on vient lire au débogueur.
   std::map<std::uint32_t, std::vector<SkillCastFacts>> cast_;
   std::map<std::uint32_t, SkillDamageFacts> damage_;
+  std::uint32_t damage_too_soon_count_ = 0;
+  SkillDamageQuestion last_damage_too_soon_;
 };
 
 }  // namespace ro::sim
