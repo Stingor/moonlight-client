@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/mapedit/model_light.h"
 
 #include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
@@ -39,6 +40,8 @@ constexpr float kSmallestLightRange = 0.5F;
 // intensité.
 constexpr float kLargestLightColor = 4.0F;
 
+}  // namespace
+
 ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light) {
   return ro::ui::MapEditorLight{.position = light.position,
                                 .color = light.color,
@@ -61,7 +64,27 @@ ro::mapedit::AddedLight DocumentLight(const ro::ui::MapEditorLight& light) {
                                  .why = light.why};
 }
 
-}  // namespace
+ro::mapedit::AddedLight NewLight(const std::array<float, 3>& position) {
+  return ro::mapedit::AddedLight{
+      .position = position,
+      .color = kNewLightColor,
+      .range = kNewLightRange,
+      .night_only = true,
+      .hours = ro::mapedit::LitHours{.from_hour = kNewLightFromHour, .to_hour = kNewLightToHour},
+      .why = {}};
+}
+
+std::array<float, 3> AboveDropPoint(const std::array<float, 3>& point) {
+  return {point[0], point[1] - kNewLightHeight, point[2]};
+}
+
+ro::mapedit::AddedLight BoundedLight(ro::mapedit::AddedLight light) {
+  light.range = std::max(light.range, kSmallestLightRange);
+  for (float& component : light.color) {
+    component = std::clamp(component, 0.0F, kLargestLightColor);
+  }
+  return light;
+}
 
 ro::ui::MapEditorHours ShownHours(const std::optional<ro::mapedit::LitHours>& hours) {
   const ro::mapedit::LitHours shown = hours.value_or(ro::mapedit::LitHours());
@@ -165,6 +188,11 @@ bool MapEditorSession::Deselect() noexcept {
     vertex_.reset();
     return true;
   }
+  // LA LUMIÈRE DE MODÈLE se lâche avant sa pose.
+  if (selected_model_light_.has_value() && !selection_.empty()) {
+    selected_model_light_.reset();
+    return true;
+  }
   const bool held = !selection_.empty() || selected_light_.has_value() ||
                     selected_effect_.has_value() || selected_map_effect_.has_value() ||
                     selected_sprite_.has_value() || selected_sound_.has_value();
@@ -197,6 +225,10 @@ MapEditorSession::Outcome MapEditorSession::Focus(const ro::render::MapScene& sc
     view_point_ = effects[*selected_effect_].position;
   } else if (selected_light_.has_value() && *selected_light_ < lights.size()) {
     view_point_ = lights[*selected_light_].position;
+  } else if (const std::optional<std::size_t> carried = ChosenModelLight(scene, store)) {
+    view_point_ = ro::mapedit::ModelLightPosition(
+        *SelectedPose(scene),
+        store.Document(ro::mapedit::kModelLightsDocument).model_lights()[*carried].light.position);
   } else if (!selection_.empty() && *selection_.model_index < scene.rsw.models().size()) {
     view_point_ = scene.rsw.models()[*selection_.model_index].position;
   }
@@ -230,14 +262,7 @@ MapEditorSession::Outcome MapEditorSession::AddLight(
     const std::optional<std::array<float, 3>>& position, MapEditStore& store) {
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;
-  after.AddLight(ro::mapedit::AddedLight{
-      .position = position.value_or(
-          std::array<float, 3>{drop_point_[0], drop_point_[1] - kNewLightHeight, drop_point_[2]}),
-      .color = kNewLightColor,
-      .range = kNewLightRange,
-      .night_only = true,
-      .hours = ro::mapedit::LitHours{.from_hour = kNewLightFromHour, .to_hour = kNewLightToHour},
-      .why = {}});
+  after.AddLight(NewLight(position.value_or(AboveDropPoint(drop_point_))));
   store.Set(map_name_, WithReasons(after));
   ChooseLight(after.lights().size() - 1);
   Record(ro::core::Tr("Ajouter une lumière"), before, after);
@@ -254,12 +279,7 @@ MapEditorSession::Outcome MapEditorSession::SetLight(const ro::ui::map_editor::S
     gesture_before_ = before;
   }
   ro::mapedit::MapEdit after = before;
-  ro::mapedit::AddedLight light = DocumentLight(set.light);
-  light.range = std::max(light.range, kSmallestLightRange);
-  for (float& component : light.color) {
-    component = std::clamp(component, 0.0F, kLargestLightColor);
-  }
-  after.SetLight(set.slot, std::move(light));
+  after.SetLight(set.slot, BoundedLight(DocumentLight(set.light)));
   if (!(after == before)) {
     store.Set(map_name_, WithReasons(after));
   }

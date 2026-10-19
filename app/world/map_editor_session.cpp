@@ -112,6 +112,9 @@ bool MapEditorSession::GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& 
   if (tool_ == ro::ui::MapEditorTool::kVertices) {
     return GrabVertex(pointer);
   }
+  if (view.selected_model_light.has_value()) {
+    return GrabModelLightHandle(pointer, view);
+  }
   const std::optional<std::size_t> grabbed = GrabbedHandle(handles_, pointer);
   if (!grabbed.has_value()) {
     return false;
@@ -136,9 +139,9 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   }
   // UN SOMMET, UNE LUMIÈRE se déplacent comme une pose, à la flèche.
   const ro::ui::MapEditorTool tool =
-      drag_->vertex.has_value() || drag_->light.has_value() || drag_->effect.has_value() ||
-              drag_->map_effect.has_value() || drag_->sprite.has_value() ||
-              drag_->sound.has_value() || drag_->ground_points
+      drag_->vertex.has_value() || drag_->light.has_value() || drag_->model_light.has_value() ||
+              drag_->effect.has_value() || drag_->map_effect.has_value() ||
+              drag_->sprite.has_value() || drag_->sound.has_value() || drag_->ground_points
           ? ro::ui::MapEditorTool::kMove
           : tool_;
   drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
@@ -173,6 +176,11 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   if (drag_->light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveLight{
         .slot = *drag_->light, .native = drag_->last.position, .released = false});
+    return;
+  }
+  if (drag_->model_light.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveModelLight{
+        .slot = *drag_->model_light, .native = drag_->last.position, .released = false});
     return;
   }
   if (drag_->vertex.has_value()) {
@@ -214,6 +222,9 @@ void MapEditorSession::Release() {
   } else if (drag_->light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveLight{
         .slot = *drag_->light, .native = last.position, .released = true});
+  } else if (drag_->model_light.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveModelLight{
+        .slot = *drag_->model_light, .native = last.position, .released = true});
   } else if (drag_->vertex.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveVertex{.node = drag_->vertex->first,
                                                         .vertex = drag_->vertex->second,
@@ -274,20 +285,9 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
             active_ = true;
           }
           return {};
-        } else if constexpr (std::is_same_v<Asked, intents::Undo>) {
-          std::optional<ro::mapedit::MapEdit> before = history_.Undo();
-          if (!before.has_value()) {
-            return {};
-          }
-          store.Set(map_name_, std::move(*before));
-          return {.replace_models = true};
-        } else if constexpr (std::is_same_v<Asked, intents::Redo>) {
-          std::optional<ro::mapedit::MapEdit> after = history_.Redo();
-          if (!after.has_value()) {
-            return {};
-          }
-          store.Set(map_name_, std::move(*after));
-          return {.replace_models = true};
+        } else if constexpr (std::is_same_v<Asked, intents::Undo> ||
+                             std::is_same_v<Asked, intents::Redo>) {
+          return StepHistory(std::is_same_v<Asked, intents::Redo>, store);
         } else if constexpr (std::is_same_v<Asked, intents::Select>) {
           ChooseModel(asked.model_index);
           return {};
@@ -363,6 +363,19 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return MoveSprite(asked, store);
         } else if constexpr (std::is_same_v<Asked, intents::RemoveLight>) {
           return RemoveLight(asked.slot, store);
+        } else if constexpr (std::is_same_v<Asked, intents::AddModelLight>) {
+          return AddModelLight(asked, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::SelectModelLight>) {
+          selected_model_light_ = asked.slot;
+          return {};
+        } else if constexpr (std::is_same_v<Asked, intents::SetModelLight>) {
+          return SetModelLight(asked, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::MoveModelLight>) {
+          return MoveModelLight(asked, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::RemoveModelLight>) {
+          return RemoveModelLight(asked.slot, store);
+        } else if constexpr (std::is_same_v<Asked, intents::SetModelUnlit>) {
+          return SetModelUnlit(asked.unlit, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::SetBrush>) {
           SetBrush(asked.brush);
           return {};
@@ -389,8 +402,10 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return ApplySound(asked, scene, store);
         } else {
           static_assert(std::is_same_v<Asked, intents::Save>, "une intention n'est pas routée");
+          std::vector<std::string> saved = Save(store);
           return {.publication =
-                      Save(store) ? Outcome::Publication::kPublish : Outcome::Publication::kNone};
+                      saved.empty() ? Outcome::Publication::kNone : Outcome::Publication::kPublish,
+                  .saved_documents = std::move(saved)};
         }
       },
       intent);
@@ -433,6 +448,7 @@ MapEditorSession::Outcome MapEditorSession::Place(const ro::ui::map_editor::Plac
   if (existing != nullptr) {
     wanted.why = existing->why;
     wanted.opacity = existing->opacity;
+    wanted.unlit = existing->unlit;
   } else if (const auto pending = pending_why_.find(rank); pending != pending_why_.end()) {
     wanted.why = pending->second;
   }
@@ -440,7 +456,8 @@ MapEditorSession::Outcome MapEditorSession::Place(const ro::ui::map_editor::Plac
     wanted.opacity = ro::mapedit::DocumentOpacity(*place.opacity);
   }
   const bool idle = !wanted.position.has_value() && !wanted.rotation.has_value() &&
-                    !wanted.scale.has_value() && !wanted.hidden && !wanted.opacity.has_value();
+                    !wanted.scale.has_value() && !wanted.hidden && !wanted.opacity.has_value() &&
+                    !wanted.unlit;
   ro::mapedit::MapEdit after = before;
   if (idle) {
     after.RemoveModel(rank);
@@ -675,7 +692,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.map_cubes = ro::ui::MapCubes{.width = scene.gnd.width(), .height = scene.gnd.height()};
   view.undo_label = history_.UndoLabel();
   view.redo_label = history_.RedoLabel();
-  view.unsaved = store.Unsaved(map_name_);
+  view.unsaved = store.Unsaved(map_name_) || store.Unsaved(ro::mapedit::kModelLightsDocument);
   view.status = status_;
   const ro::mapedit::MapEdit& document = store.Document(map_name_);
   RefreshSceneRows(document);
@@ -688,6 +705,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   ViewSounds(scene, document, view);
   ViewGround(document, view);
   ViewGroundPoints(scene, document, view);
+  ViewModelLights(scene, store, view);
   if (selection_.empty()) {
     return view;
   }

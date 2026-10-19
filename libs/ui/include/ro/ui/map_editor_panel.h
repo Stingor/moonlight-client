@@ -56,6 +56,15 @@ struct MapEditorLight {
   std::string why;
 };
 
+// UNE LUMIÈRE DE MODÈLE, telle que le panneau la montre et la rend : son rang
+// dans le document des lumières de modèle, et la lumière telle qu'elle luit
+// sur la pose désignée — sa position dans le repère du RSW. Voir
+// docs/adr/0126.
+struct MapEditorModelLight {
+  std::size_t slot = 0;
+  MapEditorLight light;
+};
+
 // UN EFFET DE CARTE DU DOCUMENT, tel que le panneau le montre et le rend :
 // numéro, position dans le repère du RSW, cadence et paramètres comme le RSW
 // les porte ; et sa lueur, quand il en a une.
@@ -259,6 +268,12 @@ struct MapEditorView {
   // LES LUMIÈRES PONCTUELLES du document, et celle qu'on règle.
   std::vector<MapEditorLight> lights;
   std::optional<std::size_t> selected_light;
+  // LES LUMIÈRES DU TYPE DU MODÈLE DÉSIGNÉ, communes à toutes ses poses sur
+  // toutes les cartes ; celle qu'on règle, par son rang dans leur document ; et
+  // si elles s'éteignent sur cette pose.
+  std::vector<MapEditorModelLight> model_lights;
+  std::optional<std::size_t> selected_model_light;
+  bool selected_unlit = false;
   // LES EFFETS DE CARTE du document, et celui qu'on règle.
   std::vector<MapEditorEffect> effects;
   std::optional<std::size_t> selected_effect;
@@ -430,6 +445,39 @@ struct MoveLight {
   std::array<float, 3> native{};
   bool released = true;
 };
+// LES LUMIÈRES DE MODÈLE : voir docs/adr/0126. Chacune se désigne par son rang
+// dans leur document, et se place sur la pose désignée.
+//
+// Assigner au type du modèle désigné une lumière à `position`, dans le repère
+// du RSW ; sans position, au-dessus de la pose.
+struct AddModelLight {
+  std::optional<std::array<float, 3>> position;
+};
+// Régler la lumière de modèle de rang `slot`, ou plus aucune.
+struct SelectModelLight {
+  std::optional<std::size_t> slot;
+};
+// La lumière de modèle de rang `slot` devient `light`, sa position telle
+// qu'elle luit sur la pose désignée. `released`, comme pour `Place`.
+struct SetModelLight {
+  std::size_t slot = 0;
+  MapEditorLight light;
+  bool released = true;
+};
+struct RemoveModelLight {
+  std::size_t slot = 0;
+};
+// Déplacer la lumière de modèle de rang `slot` en `native`, sur la pose
+// désignée, à la flèche. `released`, comme pour `Place`.
+struct MoveModelLight {
+  std::size_t slot = 0;
+  std::array<float, 3> native{};
+  bool released = true;
+};
+// Éteindre les lumières de modèle sur la pose désignée, ou les rallumer.
+struct SetModelUnlit {
+  bool unlit = false;
+};
 // Régler la brosse de relief.
 struct SetBrush {
   MapEditorBrush brush;
@@ -472,7 +520,9 @@ using MapEditorIntent = std::variant<
     map_editor::RevertGroundPoints, map_editor::Overwrite, map_editor::Reload,
     map_editor::AddSprite, map_editor::SelectSprite, map_editor::SetSprite,
     map_editor::RemoveSprite, map_editor::MoveSprite, map_editor::SelectSound, map_editor::SetSound,
-    map_editor::MoveSound, map_editor::RevertSound, map_editor::AddSound, map_editor::ListenSound>;
+    map_editor::MoveSound, map_editor::RevertSound, map_editor::AddSound, map_editor::ListenSound,
+    map_editor::AddModelLight, map_editor::SelectModelLight, map_editor::SetModelLight,
+    map_editor::RemoveModelLight, map_editor::MoveModelLight, map_editor::SetModelUnlit>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -510,6 +560,10 @@ struct MapEditorPanelState {
   std::optional<std::size_t> light_why_of;
   // On tape dans ce champ : le document ne le recharge pas sous les doigts.
   bool light_why_typing = false;
+  // La raison de la lumière de modèle réglée, comme celle d'une lumière.
+  std::array<char, kWhyCapacity> model_light_why{};
+  std::optional<std::size_t> model_light_why_of;
+  bool model_light_why_typing = false;
   // LES EFFETS : le numéro qu'ajoute le bouton — les flammes de pvp_n_5-5 —,
   // et la raison de l'effet réglé, comme celle d'une lumière.
   static constexpr std::int32_t kFlameEffect = 47;

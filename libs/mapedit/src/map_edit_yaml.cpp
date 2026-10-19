@@ -10,6 +10,7 @@
 #include "ro/mapedit/map_edit.h"
 
 #include "ground_yaml.h"
+#include "light_yaml.h"
 #include "map_edit_header.h"
 #include "sound_yaml.h"
 #include "sprite_yaml.h"
@@ -17,6 +18,7 @@
 namespace ro::mapedit {
 
 using detail::DoubleQuoted;
+using detail::HoursText;
 using detail::SingleQuoted;
 using detail::VectorText;
 
@@ -158,6 +160,9 @@ core::Result<ModelEdit> ModelEditFrom(const YAML::Node& entry, std::string_view 
     return std::unexpected(opacity.error());
   }
   edit.opacity = *opacity;
+  if (const YAML::Node unlit = entry["unlit"]) {
+    edit.unlit = unlit.as<bool>();
+  }
   return edit;
 }
 
@@ -198,6 +203,9 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
   if (const YAML::Node hidden = entry["hidden"]) {
     added.hidden = hidden.as<bool>();
   }
+  if (const YAML::Node unlit = entry["unlit"]) {
+    added.unlit = unlit.as<bool>();
+  }
   auto opacity = OpacityFrom(entry, map_name, where);
   if (!opacity) {
     return std::unexpected(opacity.error());
@@ -209,73 +217,20 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
   return added;
 }
 
-// La plage d'heures sous la clé « hours » : deux heures de 0 à 24 ; rien sans
-// la clé.
 core::Result<std::optional<LitHours>> HoursFrom(const YAML::Node& entry, std::string_view map_name,
                                                 const std::string& where) {
-  const YAML::Node hours = entry["hours"];
-  if (!hours) {
-    return std::optional<LitHours>();
+  std::optional<LitHours> hours;
+  if (std::string refusal = detail::ReadHours(entry, where, hours); !refusal.empty()) {
+    return std::unexpected(Refused(map_name, std::move(refusal)));
   }
-  constexpr std::size_t kBounds = 2;
-  if (!hours.IsSequence() || hours.size() != kBounds) {
-    return std::unexpected(Refused(map_name, where + " : « hours » n'a pas deux heures"));
-  }
-  const LitHours read{.from_hour = hours[0].as<float>(), .to_hour = hours[1].as<float>()};
-  for (const float hour : {read.from_hour, read.to_hour}) {
-    if (!(hour >= 0.0F && hour <= kLitHoursPerDay)) {
-      return std::unexpected(Refused(map_name, where + " : « hours » sort de 0 à 24"));
-    }
-  }
-  return std::optional<LitHours>(read);
+  return hours;
 }
 
 core::Result<AddedLight> AddedLightFrom(const YAML::Node& entry, std::string_view map_name,
                                         const std::string& where) {
-  if (!entry.IsMap()) {
-    return std::unexpected(Refused(map_name, where + " n'est pas une table"));
-  }
-  const YAML::Node position = entry["position"];
-  const YAML::Node color = entry["color"];
-  const YAML::Node range = entry["range"];
-  const YAML::Node why = entry["why"];
-  if (!position || !color || !range || !why) {
-    return std::unexpected(
-        Refused(map_name, where + " : « position », « color », « range » et « why » sont dus"));
-  }
   AddedLight light;
-  light.why = why.as<std::string>();
-  if (light.why.empty()) {
-    return std::unexpected(Refused(map_name, where + " : « why » est vide"));
-  }
-  light.range = range.as<float>();
-  if (!(light.range > 0.0F)) {
-    return std::unexpected(Refused(map_name, where + " : « range » doit être positive"));
-  }
-  core::Result<std::array<float, 3>> placed =
-      VectorFrom(position, map_name, where + " : « position »");
-  if (!placed) {
-    return std::unexpected(placed.error());
-  }
-  light.position = *placed;
-  core::Result<std::array<float, 3>> tinted = VectorFrom(color, map_name, where + " : « color »");
-  if (!tinted) {
-    return std::unexpected(tinted.error());
-  }
-  light.color = *tinted;
-  if (const YAML::Node night_only = entry["night_only"]) {
-    light.night_only = night_only.as<bool>();
-  }
-  auto hours = HoursFrom(entry, map_name, where);
-  if (!hours) {
-    return std::unexpected(hours.error());
-  }
-  light.hours = *hours;
-  if (const YAML::Node flicker = entry["flicker"]) {
-    light.flicker = flicker.as<bool>();
-  }
-  if (const YAML::Node shadow = entry["shadow"]) {
-    light.shadow = shadow.as<bool>();
+  if (std::string refusal = detail::ReadLight(entry, where, light); !refusal.empty()) {
+    return std::unexpected(Refused(map_name, std::move(refusal)));
   }
   return light;
 }
@@ -469,14 +424,6 @@ core::Result<MeshEdit> MeshEditFrom(const YAML::Node& entry, std::string_view ma
   return edit;
 }
 
-// La plage d'heures, sous sa clé ; rien sans plage.
-[[nodiscard]] std::string HoursText(const std::optional<LitHours>& hours) {
-  if (!hours.has_value()) {
-    return {};
-  }
-  return std::format("    hours: [{}, {}]\n", hours->from_hour, hours->to_hour);
-}
-
 // La lueur d'un effet, sous sa clé ; rien sans lueur.
 [[nodiscard]] std::string GlowText(const std::optional<EffectGlow>& glow) {
   if (!glow.has_value()) {
@@ -610,6 +557,9 @@ core::Result<RevisedMapEdit> ParseRevisedMapEdit(std::string_view yaml_text,
         return std::unexpected(Refused(map_name, std::move(refusal)));
       }
     }
+    if (std::string refusal = detail::ReadModelLights(whole, map_name, edit); !refusal.empty()) {
+      return std::unexpected(Refused(map_name, std::move(refusal)));
+    }
     if (std::string refusal = detail::ReadSounds(whole, edit); !refusal.empty()) {
       return std::unexpected(Refused(map_name, std::move(refusal)));
     }
@@ -650,6 +600,9 @@ std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
     if (model.opacity.has_value()) {
       text += std::format("    opacity: {}\n", *model.opacity);
     }
+    if (model.unlit) {
+      text += "    unlit: true\n";
+    }
     text += std::format("    why: {}\n", DoubleQuoted(model.why));
   }
   if (!edit.meshes().empty()) {
@@ -684,6 +637,9 @@ std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
     }
     if (added.opacity.has_value()) {
       text += std::format("    opacity: {}\n", *added.opacity);
+    }
+    if (added.unlit) {
+      text += "    unlit: true\n";
     }
     if (PlayWord(added.animation_type) != kPlayLooped) {
       text += std::format("    animation: {}\n", PlayWord(added.animation_type));
@@ -733,21 +689,9 @@ std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
     text += "lights:\n";
   }
   for (const AddedLight& light : edit.lights()) {
-    text += std::format("  - position: {}\n", VectorText(light.position));
-    text += std::format("    color: {}\n", VectorText(light.color));
-    text += std::format("    range: {}\n", light.range);
-    if (light.night_only) {
-      text += "    night_only: true\n";
-    }
-    text += HoursText(light.hours);
-    if (light.flicker) {
-      text += "    flicker: true\n";
-    }
-    if (!light.shadow) {
-      text += "    shadow: false\n";
-    }
-    text += std::format("    why: {}\n", DoubleQuoted(light.why));
+    text += detail::LightEntryText(light);
   }
+  text += detail::ModelLightsYaml(edit);
   text += detail::GroundYaml(edit);
   text += detail::SpritesYaml(edit);
   text += detail::SoundsYaml(edit);

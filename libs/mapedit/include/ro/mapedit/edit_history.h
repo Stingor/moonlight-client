@@ -24,13 +24,18 @@ class EditHistory {
   static constexpr std::size_t kMaxSteps = 200;
 
   // Retient un geste. Ce qui avait été annulé ne se rétablit plus.
-  void Record(std::string label, MapEdit before, MapEdit after);
+  // `document` : le document qu'il change — `kModelLightsDocument` —, vide
+  // pour celui de la carte.
+  void Record(std::string label, MapEdit before, MapEdit after, std::string document = {});
 
   [[nodiscard]] bool CanUndo() const noexcept { return !past_.empty(); }
   [[nodiscard]] bool CanRedo() const noexcept { return !future_.empty(); }
   // Le nom du geste que `Undo` défera, ou que `Redo` refera ; vide sinon.
   [[nodiscard]] std::string UndoLabel() const;
   [[nodiscard]] std::string RedoLabel() const;
+  // Le document que `Undo` ou `Redo` rendra, comme `Record` l'a reçu.
+  [[nodiscard]] std::string UndoDocument() const;
+  [[nodiscard]] std::string RedoDocument() const;
 
   // Le document d'avant le dernier geste, qui passe au futur ; rien sans geste.
   [[nodiscard]] std::optional<MapEdit> Undo();
@@ -45,6 +50,7 @@ class EditHistory {
     std::string label;
     MapEdit before;
     MapEdit after;
+    std::string document;
   };
   std::vector<Step> past_;
   std::vector<Step> future_;

@@ -18,6 +18,12 @@ constexpr std::size_t kStatusCapacity = 256;
 // le texte traduit au point d'appel : le compilateur en vérifie alors les arguments.
 using StatusLine = std::array<char, kStatusCapacity>;
 
+// LE DOCUMENT DE `map_name` VAUT-IL POUR LA CARTE AFFICHÉE ? Le sien, et celui
+// des lumières de modèle, qui vaut pour toutes.
+bool Shown(std::string_view map_name, std::string_view shown_map) {
+  return map_name == shown_map || map_name == ro::mapedit::kModelLightsDocument;
+}
+
 }  // namespace
 
 void MapEditSync::StartSession() {
@@ -118,7 +124,7 @@ void MapEditSync::Receive(ro::net::ServedMapEdit served, std::string_view shown_
   if (!revised) {
     ro::core::LogWarning("édition de {}, révision {} de {}, refusée — {}", served.map,
                          served.revision, served.author, ro::core::Describe(revised.error()));
-    if (served.map == shown_map) {
+    if (Shown(served.map, shown_map)) {
       StatusLine line{};
       std::snprintf(
           line.data(), line.size(),
@@ -153,7 +159,7 @@ void MapEditSync::Receive(ro::net::ServedMapEdit served, std::string_view shown_
         "édition de {} : révision {} de {} reçue, masquée par des retouches non "
         "enregistrées",
         served.map, served.revision, served.author);
-    if (served.map == shown_map) {
+    if (Shown(served.map, shown_map)) {
       StatusLine line{};
       std::snprintf(
           line.data(), line.size(),
@@ -178,7 +184,7 @@ void MapEditSync::Adopt(const std::string& map_name, ro::mapedit::MapEdit edit,
   masked_.erase(map_name);
   stale_.erase(map_name);
   ro::core::LogInfo("édition de {} : révision {} de {} adoptée", map_name, revision, author);
-  if (map_name == shown_map) {
+  if (Shown(map_name, shown_map)) {
     report.replaced = true;
     StatusLine line{};
     std::snprintf(line.data(), line.size(), ro::core::Tr("Révision %u de %s appliquée."),

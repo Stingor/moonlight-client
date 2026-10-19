@@ -19903,3 +19903,54 @@ tr: Empty cell
 
 fr: Aucun modèle n'a été copié.
 tr: No model has been copied.
+
+fr: Assigner une lumière à %s
+tr: Assign a light to %s
+
+fr: Assigner une lumière à ce type de modèle
+tr: Assign a light to this model type
+
+fr: Désignez d'abord un modèle.
+tr: Select a model first.
+
+fr: Lumière de %s
+tr: Light of %s
+
+fr: Lumière de modèle
+tr: Model light
+
+fr: Lumières de ce type de modèle
+tr: Lights of this model type
+
+fr: Rallumer les lumières du modèle %zu
+tr: Turn model %zu's lights back on
+
+fr: Rallumer ses lumières ici
+tr: Turn its lights back on here
+
+fr: Retirer la lumière de modèle
+tr: Remove the model light
+
+fr: Retirer la lumière de modèle %zu
+tr: Remove model light %zu
+
+fr: Régler la lumière de modèle %zu
+tr: Adjust model light %zu
+
+fr: Toutes les poses de %s portent cette lumière, sur toutes les cartes.
+tr: Every placement of %s carries this light, on every map.
+
+fr: Toutes les poses de ce fichier, sur toutes les cartes, la portent.
+tr: Every placement of this file, on every map, carries it.
+
+fr: Toutes les poses de ce fichier, sur toutes les cartes, la portent. Elle s'enregistre dans le document commun @model_lights, publié avec la carte.
+tr: Every placement of this file, on every map, carries it. It is saved in the shared @model_lights document, published with the map.
+
+fr: Éteindre les lumières du modèle %zu
+tr: Turn off model %zu's lights
+
+fr: Éteindre ses lumières ici
+tr: Turn its lights off here
+
+fr: Éteindre ses lumières sur cette pose
+tr: Turn its lights off on this placement

@@ -213,6 +213,18 @@ void MapEdit::RemoveLight(std::size_t slot) {
   }
 }
 
+void MapEdit::SetModelLight(std::size_t slot, ModelLight light) {
+  if (slot < model_lights_.size()) {
+    model_lights_[slot] = std::move(light);
+  }
+}
+
+void MapEdit::RemoveModelLight(std::size_t slot) {
+  if (slot < model_lights_.size()) {
+    model_lights_.erase(model_lights_.begin() + static_cast<std::ptrdiff_t>(slot));
+  }
+}
+
 void MapEdit::SetSprite(std::size_t slot, MapSprite sprite) {
   if (slot < sprites_.size()) {
     sprites_[slot] = std::move(sprite);
@@ -262,6 +274,9 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
                      model_edit.scale.value_or(model.scale));
       NoteOpacity(model_edit.model_index, model_edit.opacity, report);
     }
+    if (model_edit.unlit) {
+      report.unlit.push_back(model_edit.model_index);
+    }
     ++report.applied;
   }
   // LES AJOUTS, au bout de la liste, dans l'ordre du document.
@@ -280,9 +295,13 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
     } else {
       NoteOpacity(rank, added.opacity, report);
     }
+    if (added.unlit) {
+      report.unlit.push_back(rank);
+    }
     ++report.applied;
   }
   std::ranges::sort(report.hidden);
+  std::ranges::sort(report.unlit);
   std::ranges::sort(report.opacities, {}, &ModelOpacity::model_index);
   return report;
 }

@@ -68,6 +68,8 @@ struct ModelEdit {
   bool hidden = false;
   // Translucide, de 0 à 1 ; rien : plein.
   std::optional<float> opacity;
+  // Vrai : les lumières de son type de modèle ne s'allument pas sur lui.
+  bool unlit = false;
   // Pourquoi : le document refuse une opération qui ne le dit pas.
   std::string why;
 
@@ -90,6 +92,8 @@ struct AddedModel {
   // en boucle sauf avis contraire. Un fichier sans images clés ne bouge pas.
   std::int32_t animation_type = formats::kRswModelPlayLooped;
   float animation_speed = 1.0F;
+  // Vrai : les lumières de son type de modèle ne s'allument pas sur lui.
+  bool unlit = false;
   // Pourquoi : le document refuse un ajout qui ne le dit pas.
   std::string why;
 
@@ -143,6 +147,22 @@ struct AddedLight {
   std::string why;
 
   friend bool operator==(const AddedLight&, const AddedLight&) = default;
+};
+
+// LE DOCUMENT DES LUMIÈRES DE MODÈLE, partagé par toutes les cartes : voir
+// docs/adr/0126. Il se range, se sert et se publie comme le document d'une
+// carte, sous ce nom réservé, que nulle carte ne porte.
+inline constexpr std::string_view kModelLightsDocument = "@model_lights";
+
+// UNE LUMIÈRE DE MODÈLE : une lumière que porte chaque pose d'un fichier de
+// modèle, sur toutes les cartes. Sa position est dans le repère de la pose —
+// voir ro/mapedit/model_light.h — et la suit quand elle tourne ou grandit.
+struct ModelLight {
+  // Le fichier, relatif à data\model\, en UTF-8 ; voir `ModelFileKey`.
+  std::string model_file;
+  AddedLight light;
+
+  friend bool operator==(const ModelLight&, const ModelLight&) = default;
 };
 
 // LA LUEUR D'UN EFFET : la lumière ponctuelle qu'il porte, à sa place, et qui
@@ -332,8 +352,18 @@ class MapEdit {
   [[nodiscard]] bool empty() const noexcept {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
            effects_.empty() && effect_edits_.empty() && ground_.empty() && sprites_.empty() &&
-           sounds_.empty() && sound_edits_.empty();
+           sounds_.empty() && sound_edits_.empty() && model_lights_.empty();
   }
+  // LES LUMIÈRES DE MODÈLE, dans l'ordre du document : seul celui de
+  // `kModelLightsDocument` en porte.
+  [[nodiscard]] const std::vector<ModelLight>& model_lights() const noexcept {
+    return model_lights_;
+  }
+  void AddModelLight(ModelLight light) { model_lights_.push_back(std::move(light)); }
+  // Remplace la lumière de modèle de rang `slot` ; hors de la liste, rien.
+  void SetModelLight(std::size_t slot, ModelLight light);
+  // Retire la lumière de modèle de rang `slot` : les suivantes remontent.
+  void RemoveModelLight(std::size_t slot);
   // Les sons ajoutés, dans l'ordre du document.
   [[nodiscard]] const std::vector<AddedSound>& sounds() const noexcept { return sounds_; }
   void AddSound(AddedSound sound) { sounds_.push_back(std::move(sound)); }
@@ -424,12 +454,14 @@ class MapEdit {
   std::vector<MapSprite> sprites_;
   std::vector<AddedSound> sounds_;
   std::vector<SoundEdit> sound_edits_;
+  std::vector<ModelLight> model_lights_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la
-// version n'est pas gérée, qui nomme une autre carte que `map_name`, ou dont
-// une opération est malformée — un champ manquant, un vecteur qui n'a pas
-// trois composantes, une raison vide.
+// version n'est pas gérée, qui nomme une autre carte que `map_name`, dont une
+// opération est malformée — un champ manquant, un vecteur qui n'a pas trois
+// composantes, une raison vide —, ou qui porte des lumières de modèle sans être
+// `kModelLightsDocument`.
 [[nodiscard]] core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text,
                                                  std::string_view map_name);
 
@@ -471,6 +503,9 @@ struct MapEditReport {
   // Les modèles translucides, par rangs croissants : ni les pleins, ni les
   // masqués.
   std::vector<ModelOpacity> opacities;
+  // Les rangs des modèles où les lumières de modèle ne s'allument pas,
+  // croissants.
+  std::vector<std::size_t> unlit;
 };
 
 // LES NOMS DE FICHIERS, de l'encodage du RSW à l'UTF-8 et retour : `mapedit` ne

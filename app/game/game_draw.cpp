@@ -175,9 +175,9 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (sun.map != nullptr) {
     stages.shadowmap = false;
   }
-  // LES LUMIÈRES PONCTUELLES : celles du document d'édition (docs/adr/0119),
-  // puis celles des effets et celles que portent les acteurs (docs/adr/0120).
-  // Leurs ombres se peignent ici, avant la passe de couleur (docs/adr/0123).
+  // LES LUMIÈRES PONCTUELLES : celles du document d'édition (docs/adr/0119) et
+  // des modèles (0126), puis celles des effets et des acteurs (0120). Leurs
+  // ombres se peignent ici, avant la passe de couleur (docs/adr/0123).
   const std::span<const ro::render::PointLight> carried = actor_lights_.Gather(
       scene_actors_.light_bearers,
       pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().tables : nullptr,
@@ -186,8 +186,9 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       ro::render::WithActorLights(
           ro::render::WithEffectLights(
               ro::render::MapPointLights(
-                  ro::render::DocumentLights(map_edits_.Document(stage_->name),
-                                             stage_->scene.rsw.effects()),
+                  ro::render::SceneLights(map_edits_.Document(stage_->name),
+                                          map_edits_.Document(ro::mapedit::kModelLightsDocument),
+                                          stage_->scene),
                   ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
                   sky.light, MapClosedToSky(), camera_.look_at, static_cast<double>(now_ms),
                   sky.hour),

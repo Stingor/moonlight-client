@@ -46,6 +46,16 @@ enum class NudgeDirection : std::uint8_t { kLeft, kRight, kUp, kDown };
 [[nodiscard]] ro::ui::MapEditorHours ShownHours(const std::optional<ro::mapedit::LitHours>& hours);
 [[nodiscard]] std::optional<ro::mapedit::LitHours> DocumentHours(
     const ro::ui::MapEditorHours& hours);
+// UNE LUMIÈRE, du document au panneau et retour.
+[[nodiscard]] ro::ui::MapEditorLight ShownLight(const ro::mapedit::AddedLight& light);
+[[nodiscard]] ro::mapedit::AddedLight DocumentLight(const ro::ui::MapEditorLight& light);
+// UNE LUMIÈRE NEUVE à `position`, dans le repère du RSW — une lanterne qui ne
+// luit que la nuit —, et le point où elle se pose au-dessus de `point`.
+[[nodiscard]] ro::mapedit::AddedLight NewLight(const std::array<float, 3>& position);
+[[nodiscard]] std::array<float, 3> AboveDropPoint(const std::array<float, 3>& point);
+// La lumière, sa portée et sa couleur ramenées dans les bornes que le document
+// relit.
+[[nodiscard]] ro::mapedit::AddedLight BoundedLight(ro::mapedit::AddedLight light);
 
 // LES ACTIONS RAPIDES du menu de Ctrl+Alt+clic droit sur un modèle de la carte.
 enum class QuickModelAction : std::uint8_t {
@@ -85,6 +95,9 @@ class MapEditorSession {
       kReload,
     };
     Publication publication = Publication::kNone;
+    // Les documents que `kPublish` envoie : ceux qui viennent de s'écrire —
+    // celui de la carte, celui des lumières de modèle, ou les deux.
+    std::vector<std::string> saved_documents;
     // Un son à écouter une fois, hors du monde : « Écouter ».
     std::optional<ro::ui::map_editor::ListenSound> listen;
   };
@@ -110,11 +123,13 @@ class MapEditorSession {
     history_.Clear();
     selection_.Clear();
     selected_light_.reset();
+    selected_model_light_.reset();
     selected_effect_.reset();
     selected_map_effect_.reset();
     selected_sprite_.reset();
     selected_sound_.reset();
     gesture_before_.reset();
+    model_light_gesture_before_.reset();
     ground_stroke_.reset();
     designated_point_.reset();
     selected_points_.clear();
@@ -328,13 +343,39 @@ class MapEditorSession {
   Outcome PlaceAdded(std::size_t slot, const ro::ui::map_editor::Place& place, MapEditStore& store);
   // Le rang dans la liste des ajouts du modèle désigné, s'il en est un.
   [[nodiscard]] std::optional<std::size_t> AddedSlot(const ro::render::MapScene& scene) const;
-  // Vrai quand le document s'est écrit.
-  [[nodiscard]] bool Save(MapEditStore& store);
+  // Écrit le document de la carte et celui des lumières de modèle, ceux qui
+  // ont changé ; rend ceux qui se sont écrits.
+  [[nodiscard]] std::vector<std::string> Save(MapEditStore& store);
   // LES LUMIÈRES PONCTUELLES : voir map_editor_lights.cpp.
   // Une lumière à `position`, ou au-dessus du point de pose sans position.
   Outcome AddLight(const std::optional<std::array<float, 3>>& position, MapEditStore& store);
   Outcome SetLight(const ro::ui::map_editor::SetLight& set, MapEditStore& store);
   Outcome RemoveLight(std::size_t slot, MapEditStore& store);
+  // ANNULER, OU RÉTABLIR : le geste revient sur le document qu'il a changé.
+  Outcome StepHistory(bool redo, MapEditStore& store);
+  // LES LUMIÈRES DE MODÈLE : voir map_editor_model_lights.cpp.
+  // La pose désignée, telle que l'édition la place, et son fichier en UTF-8 ;
+  // rien sans pose désignée.
+  [[nodiscard]] const ro::formats::RswModel* SelectedPose(const ro::render::MapScene& scene) const;
+  [[nodiscard]] std::string SelectedFile(const ro::render::MapScene& scene) const;
+  // La lumière de modèle réglée, si elle appartient au fichier de la pose
+  // désignée.
+  [[nodiscard]] std::optional<std::size_t> ChosenModelLight(const ro::render::MapScene& scene,
+                                                            const MapEditStore& store) const;
+  Outcome AddModelLight(const ro::ui::map_editor::AddModelLight& asked,
+                        const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome SetModelLight(const ro::ui::map_editor::SetModelLight& set,
+                        const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome MoveModelLight(const ro::ui::map_editor::MoveModelLight& move,
+                         const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome RemoveModelLight(std::size_t slot, MapEditStore& store);
+  Outcome SetModelUnlit(bool unlit, const ro::render::MapScene& scene, MapEditStore& store);
+  void ViewModelLights(const ro::render::MapScene& scene, const MapEditStore& store,
+                       ro::ui::MapEditorView& view) const;
+  [[nodiscard]] bool GrabModelLightHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
+  // Retient un geste sur le document des lumières de modèle.
+  void RecordModelLights(std::string label, const ro::mapedit::MapEdit& before,
+                         const ro::mapedit::MapEdit& after);
   // LES LIGNES DE L'ARBRE DE LA SCÈNE, rebâties seulement quand le document, la
   // carte ou ses modèles changent : les recopier à chaque image coûtait une
   // chaîne par modèle.
@@ -365,6 +406,10 @@ class MapEditorSession {
   // toutes à l'écran.
   std::optional<std::size_t> selected_light_;
   std::vector<LightDot> light_dots_;
+  // La lumière de modèle qu'on règle, par son rang dans leur document, et ce
+  // document d'avant le geste qui la glisse.
+  std::optional<std::size_t> selected_model_light_;
+  std::optional<ro::mapedit::MapEdit> model_light_gesture_before_;
   // L'effet qu'on règle, et les losanges de tous à l'écran.
   std::optional<std::size_t> selected_effect_;
   std::vector<LightDot> effect_dots_;
@@ -492,6 +537,8 @@ class MapEditorSession {
     std::optional<std::pair<std::size_t, std::size_t>> vertex;
     // La lumière que la poignée déplace, ou l'effet.
     std::optional<std::size_t> light;
+    // La lumière de modèle que la poignée déplace, sur la pose désignée.
+    std::optional<std::size_t> model_light;
     std::optional<std::size_t> effect;
     std::optional<std::size_t> map_effect;
     std::optional<std::size_t> sprite;

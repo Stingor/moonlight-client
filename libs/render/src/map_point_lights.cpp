@@ -3,7 +3,9 @@
 #include <array>
 #include <cmath>
 
+#include "ro/mapedit/model_light.h"
 #include "ro/render/edited_map_effects.h"
+#include "ro/render/map_scene.h"
 
 namespace ro::render {
 namespace {
@@ -30,6 +32,16 @@ float FlickerFactor(std::size_t slot, double time_ms) {
                      kSlowWeight * static_cast<float>(std::sin(kSlowWave * time_ms + 2.0 * phase));
   // L'onde va de −1 à 1 : ramenée de 0 à 1, elle retire jusqu'à la profondeur.
   return 1.0F - kFlickerDepth * (0.5F + 0.5F * wave);
+}
+
+std::vector<ro::mapedit::AddedLight> SceneLights(const ro::mapedit::MapEdit& edit,
+                                                 const ro::mapedit::MapEdit& model_book,
+                                                 const MapScene& scene) {
+  std::vector<ro::mapedit::AddedLight> lights = DocumentLights(edit, scene.rsw.effects());
+  const std::vector<ro::mapedit::AddedLight> carried = ro::mapedit::ModelLightsOn(
+      model_book, scene.rsw.models(), scene.model_keys, scene.hidden_models, scene.unlit_models);
+  lights.insert(lights.end(), carried.begin(), carried.end());
+  return lights;
 }
 
 std::vector<ro::mapedit::AddedLight> DocumentLights(

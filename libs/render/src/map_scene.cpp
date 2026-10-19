@@ -15,6 +15,7 @@
 #include "ro/formats/grf.h"
 #include "ro/formats/rsm.h"
 #include "ro/mapedit/ground_edit.h"
+#include "ro/mapedit/model_light.h"
 #include "ro/render/grey_world.h"
 #include "ro/render/map_effects.h"
 #include "ro/render/map_sky.h"
@@ -63,6 +64,17 @@ std::string RawFileName(std::string_view utf8) {
 }
 
 constexpr mapedit::FileNameCodec kFileNames{.to_utf8 = &CitedFileName, .to_raw = &RawFileName};
+
+// LES CLÉS DES FICHIERS DE MODÈLE, par rang, au-delà de celles que la scène
+// tient déjà : les modèles du RSW ne changent pas de fichier, seuls les ajouts
+// se recalculent.
+void KeepModelKeys(MapScene& scene, std::size_t kept) {
+  scene.model_keys.resize(std::min(kept, scene.model_keys.size()));
+  for (std::size_t rank = scene.model_keys.size(); rank < scene.rsw.models().size(); ++rank) {
+    scene.model_keys.push_back(
+        mapedit::ModelFileKey(CitedFileName(scene.rsw.models()[rank].model_name)));
+  }
+}
 
 // Décode les textures du terrain, dans l'ordre du GND.
 //
@@ -449,6 +461,8 @@ mapedit::MapEditReport ReplaceSceneModels(MapScene& scene, const mapedit::MapEdi
   }
   scene.hidden_models = report.hidden;
   scene.model_opacities = report.opacities;
+  scene.unlit_models = report.unlit;
+  KeepModelKeys(scene, scene.unfixed_models.size());
   PlaceSceneInstances(scene);
   return report;
 }
@@ -544,10 +558,12 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
       .unfixed_models = std::move(unfixed_models),
       .hidden_models = fixed.hidden,
       .model_opacities = fixed.opacities,
+      .unlit_models = fixed.unlit,
       .mesh_edits = std::move(mesh_edits),
       .atlas = std::move(atlas),
       .light = light,
   };
+  KeepModelKeys(scene, 0);
 
   // L'APLATISSEMENT AVANT LE MAILLAGE, qui se bâtit sur les hauteurs. Les objets
   // d'effet se reposent d'abord : il leur faut le sol d'ORIGINE sous eux.

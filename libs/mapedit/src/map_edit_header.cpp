@@ -27,6 +27,7 @@ const std::string_view kMapEditHeader =
 #               fichier — un champ absent garde la valeur du RSW ;
 #    hidden   : vrai pour ne plus le dessiner ;
 #    opacity  : facultatif, de 0 (invisible) à 1 (plein) — absent, plein ;
+#    unlit    : vrai pour que les lumières de modèle ne s'y allument pas ;
 #    why      : pourquoi, obligatoire.
 #  added  : les modèles ajoutés, qui prennent rang après ceux du RSW, chacun :
 #    file     : son fichier, relatif à data\model\ ;
@@ -38,6 +39,7 @@ const std::string_view kMapEditHeader =
 #               loop en boucle, once une fois, still figé ; absent, loop ;
 #    animation_speed : facultatif, sa vitesse de jeu, de 0 exclu à 100 —
 #               absent, 1 ;
+#    unlit    : vrai pour que les lumières de modèle ne s'y allument pas ;
 #    why      : pourquoi, obligatoire.
 #  lights :les lumières ponctuelles ajoutées, chacune :
 #    position : [x, y, z], dans le repère du RSW ;
@@ -49,7 +51,14 @@ const std::string_view kMapEditHeader =
 #    shadow   : faux pour qu'elle ne projette pas d'ombre — une lumière dans
 #               une lanterne, que la lanterne boucherait ;
 #    why      : pourquoi, obligatoire.
-#  effects : les effets de carte ajoutés, chacun :
+#  model_lights : seul le document @model_lights, commun à toutes les cartes,
+#            les porte — les lumières que porte chaque pose d'un fichier de
+#            modèle, chacune :
+#    file     : le fichier, relatif à data\model\, sans égard à la casse ;
+#    position : [x, y, z], dans le repère de la pose — l'écart à sa position,
+#               tourné et mis à l'échelle avec elle ;
+#    color, range, night_only, hours, flicker, shadow, why : comme une lumière.
+#  effects :les effets de carte ajoutés, chacun :
 #    number   : le numéro de l'effet, comme un objet d'effet du RSW ;
 #    position : [x, y, z], dans le repère du RSW ;
 #    emit_speed, param : sa cadence et ses quatre paramètres, comme le RSW ;

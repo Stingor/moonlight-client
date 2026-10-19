@@ -62,6 +62,15 @@ ro::mapedit::MapEdit WithReasons(ro::mapedit::MapEdit document) {
       document.SetLight(slot, std::move(light));
     }
   }
+  for (std::size_t slot = 0; slot < document.model_lights().size(); ++slot) {
+    if (document.model_lights()[slot].light.why.empty()) {
+      ro::mapedit::ModelLight carried = document.model_lights()[slot];
+      std::snprintf(reason.data(), reason.size(), ro::core::Tr("Lumière de %s"),
+                    carried.model_file.c_str());
+      carried.light.why = reason.data();
+      document.SetModelLight(slot, std::move(carried));
+    }
+  }
   for (std::size_t slot = 0; slot < document.added().size(); ++slot) {
     if (document.added()[slot].why.empty()) {
       ro::mapedit::AddedModel added = document.added()[slot];

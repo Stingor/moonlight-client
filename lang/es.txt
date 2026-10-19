@@ -19903,3 +19903,54 @@ tr: Celda vacía
 
 fr: Aucun modèle n'a été copié.
 tr: No se ha copiado ningún modelo.
+
+fr: Assigner une lumière à %s
+tr: Asignar una luz a %s
+
+fr: Assigner une lumière à ce type de modèle
+tr: Asignar una luz a este tipo de modelo
+
+fr: Désignez d'abord un modèle.
+tr: Primero selecciona un modelo.
+
+fr: Lumière de %s
+tr: Luz de %s
+
+fr: Lumière de modèle
+tr: Luz de modelo
+
+fr: Lumières de ce type de modèle
+tr: Luces de este tipo de modelo
+
+fr: Rallumer les lumières du modèle %zu
+tr: Volver a encender las luces del modelo %zu
+
+fr: Rallumer ses lumières ici
+tr: Volver a encender sus luces aquí
+
+fr: Retirer la lumière de modèle
+tr: Quitar la luz de modelo
+
+fr: Retirer la lumière de modèle %zu
+tr: Quitar la luz de modelo %zu
+
+fr: Régler la lumière de modèle %zu
+tr: Ajustar la luz de modelo %zu
+
+fr: Toutes les poses de %s portent cette lumière, sur toutes les cartes.
+tr: Todas las colocaciones de %s llevan esta luz, en todos los mapas.
+
+fr: Toutes les poses de ce fichier, sur toutes les cartes, la portent.
+tr: Todas las colocaciones de este archivo, en todos los mapas, la llevan.
+
+fr: Toutes les poses de ce fichier, sur toutes les cartes, la portent. Elle s'enregistre dans le document commun @model_lights, publié avec la carte.
+tr: Todas las colocaciones de este archivo, en todos los mapas, la llevan. Se guarda en el documento común @model_lights, publicado con el mapa.
+
+fr: Éteindre les lumières du modèle %zu
+tr: Apagar las luces del modelo %zu
+
+fr: Éteindre ses lumières ici
+tr: Apagar sus luces aquí
+
+fr: Éteindre ses lumières sur cette pose
+tr: Apagar sus luces en esta colocación

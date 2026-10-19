@@ -4,9 +4,9 @@
 
 namespace ro::mapedit {
 
-void EditHistory::Record(std::string label, MapEdit before, MapEdit after) {
+void EditHistory::Record(std::string label, MapEdit before, MapEdit after, std::string document) {
   future_.clear();
-  past_.push_back(Step{std::move(label), std::move(before), std::move(after)});
+  past_.push_back(Step{std::move(label), std::move(before), std::move(after), std::move(document)});
   if (past_.size() > kMaxSteps) {
     past_.erase(past_.begin());
   }
@@ -18,6 +18,14 @@ std::string EditHistory::UndoLabel() const {
 
 std::string EditHistory::RedoLabel() const {
   return future_.empty() ? std::string() : future_.back().label;
+}
+
+std::string EditHistory::UndoDocument() const {
+  return past_.empty() ? std::string() : past_.back().document;
+}
+
+std::string EditHistory::RedoDocument() const {
+  return future_.empty() ? std::string() : future_.back().document;
 }
 
 std::optional<MapEdit> EditHistory::Undo() {

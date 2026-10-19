@@ -242,6 +242,7 @@ add_library(ro_ui STATIC
     src/map_editor_sprites_panel.cpp
     src/map_editor_ground_panel.cpp
     src/map_editor_library_window.cpp
+    src/map_editor_lights_panel.cpp
     src/map_editor_panel.cpp
     src/map_editor_row_menu.cpp
     src/map_editor_sounds_panel.cpp

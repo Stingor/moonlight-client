@@ -59,6 +59,8 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
   ro::render::MapSceneOptions options{.flatten_relief = flatten_relief};
   if (edits != nullptr) {
     edits->Load(map_name, vfs);
+    // Les lumières de modèle valent pour toutes les cartes : lues une fois.
+    edits->Load(ro::mapedit::kModelLightsDocument, vfs);
     options.edit = edits->Document(map_name);
   } else {
     options.edit = ro::render::LoadMapEdit(vfs, map_name);

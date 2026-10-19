@@ -11,11 +11,13 @@ add_library(ro_mapedit STATIC
     src/edit_history.cpp
     src/ground_edit.cpp
     src/ground_edit_yaml.cpp
+    src/light_yaml.cpp
     src/map_edit.cpp
     src/map_edit_header.cpp
     src/map_edit_sprite_yaml.cpp
     src/map_edit_yaml.cpp
     src/map_sprite.cpp
+    src/model_light.cpp
     src/sound_edit.cpp
     src/sound_edit_yaml.cpp)
 add_library(ro::mapedit ALIAS ro_mapedit)

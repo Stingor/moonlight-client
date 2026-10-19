@@ -13,6 +13,8 @@
 
 namespace ro::render {
 
+struct MapScene;
+
 // LES LUMIÈRES PONCTUELLES DE L'IMAGE : celles du document, passées au monde,
 // leur intensité de l'instant, rangées de la plus proche de `eye` à la plus lointaine. Voir
 // docs/adr/0119.
@@ -34,6 +36,13 @@ namespace ro::render {
 // là où elles les posent ; un effet masqué ne luit pas.
 [[nodiscard]] std::vector<ro::mapedit::AddedLight> DocumentLights(
     const ro::mapedit::MapEdit& edit, std::span<const ro::formats::RswEffect> map_objects = {});
+
+// LES LUMIÈRES DE LA CARTE AFFICHÉE : celles de son document `edit`, puis
+// celles que ses modèles portent selon le document des lumières de modèle
+// `model_book` — voir `mapedit::ModelLightsOn` et docs/adr/0126.
+[[nodiscard]] std::vector<ro::mapedit::AddedLight> SceneLights(
+    const ro::mapedit::MapEdit& edit, const ro::mapedit::MapEdit& model_book,
+    const MapScene& scene);
 
 // LA LUEUR D'UN EFFET LUIT À LA HAUTEUR DE SA FLAMME, pas à son ancre : un
 // effet s'ancre au pied du feu, souvent au ras du sol ou juste dessous, où sa

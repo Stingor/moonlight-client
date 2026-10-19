@@ -16,6 +16,7 @@
 #include "ro/ui/list_keys.h"
 #include "ro/ui/map_editor_effects_panel.h"
 #include "ro/ui/map_editor_ground_panel.h"
+#include "ro/ui/map_editor_lights_panel.h"
 #include "ro/ui/map_editor_row_menu.h"
 #include "ro/ui/map_editor_sounds_panel.h"
 #include "ro/ui/map_editor_sprites_panel.h"
@@ -87,12 +88,6 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
 
 // Le rayon du cercle d'une lumière ponctuelle, en pixels.
 constexpr float kLightMarkerPixels = 7.0F;
-// Le pas de la portée d'une lumière, par pixel puis par cran de molette (dix avec Majuscule).
-constexpr float kLightRangeStep = 0.5F;
-constexpr float kLightRangeWheelStep = 1.0F;
-// La plus grande portée : une portée reste positive — le document refuse une
-// portée nulle —, et la glissière la borne de ce côté aussi.
-constexpr float kLightRangeMax = 2000.0F;
 
 // La hauteur de l'arbre de la scène, en lignes : au-delà, il défile.
 constexpr float kTreeRows = 12.0F;
@@ -590,107 +585,7 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
   if (SkinButton(core::Tr("Centrer"), art)) {
     intents.emplace_back(map_editor::Focus{});
   }
-}
-
-// LES LUMIÈRES PONCTUELLES : la liste, l'ajout, et la lumière désignée — ses
-// glissières, sa raison, son retrait.
-void DrawLights(const MapEditorView& view, MapEditorPanelState& panel,
-                std::vector<MapEditorIntent>& intents, const SkinArt& art) {
-  if (SkinButton(core::Tr("Ajouter une lumière"), art)) {
-    intents.emplace_back(map_editor::AddLight{});
-  }
-  for (std::size_t slot = 0; slot < view.lights.size(); ++slot) {
-    const MapEditorLight& light = view.lights[slot];
-    // Elle se reconnaît à sa position, en unités du RSW.
-    const std::string label =
-        std::format("{} {} — {:.1f} {:.1f} {:.1f}{}##lumiere{}", core::Tr("Lumière"), slot,
-                    CellsOfNative(light.position, view.map_cubes)[0],
-                    CellsOfNative(light.position, view.map_cubes)[1],
-                    CellsOfNative(light.position, view.map_cubes)[2], WhyTag(light.why), slot);
-    const bool chosen = view.selected_light == slot;
-    if (ImGui::Selectable(label.c_str(), chosen)) {
-      intents.emplace_back(map_editor::SelectLight{chosen ? std::nullopt : std::optional(slot)});
-    }
-    DrawMapEditorRowMenu(
-        MapEditorRowMenu{.select = map_editor::SelectLight{slot},
-                         .remove_label = core::Tr("Supprimer"),
-                         .cells = CellsOfNative(light.position, view.map_cubes),
-                         .move_to = [&light, slot, cubes = view.map_cubes](
-                                        const std::array<float, 3>& pasted) -> MapEditorIntent {
-                           map_editor::SetLight set{.slot = slot, .light = light, .released = true};
-                           set.light.position = NativeOfCells(pasted, cubes);
-                           return set;
-                         }},
-        intents);
-  }
-  if (!view.selected_light.has_value() || *view.selected_light >= view.lights.size()) {
-    return;
-  }
-  const std::size_t slot = *view.selected_light;
-  // Ses glissières portent les noms de celles du modèle : un autre espace d'ID.
-  ImGui::PushID("lumiere");
-  map_editor::SetLight set{.slot = slot, .light = view.lights[slot], .released = false};
-  bool changed = false;
-  bool released = false;
-  const WheelDragResult moved =
-      PositionInCells(core::Tr("Position (cases, hauteur)"), set.light.position, view.map_cubes);
-  changed |= moved.changed;
-  released |= moved.released;
-  const bool pasted = PositionClipboardMenu("position", set.light.position, view.map_cubes);
-  // UNE PASTILLE ET SON SÉLECTEUR : la couleur se choisit à l'œil. Au-delà de
-  // 1, une composante éclaire plus fort ; la session borne ce que l'on tape.
-  changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.light.color.data(),
-                               ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
-  released |= ImGui::IsItemDeactivatedAfterEdit();
-  const WheelDragResult reach = WheelDragFloat(core::Tr("Portée"), set.light.range,
-                                               WheelDrag{.drag_step = kLightRangeStep,
-                                                         .wheel_step = kLightRangeWheelStep,
-                                                         .lowest = kLightRangeStep,
-                                                         .highest = kLightRangeMax,
-                                                         .format = "%.1f"});
-  changed |= reach.changed;
-  released |= reach.released;
-  bool toggled = SkinCheckBox(core::Tr("La nuit seulement"), &set.light.night_only, art);
-  toggled |= pasted;
-  if (set.light.night_only) {
-    WheelDragResult hours_moved;
-    toggled |= LitHoursFields(set.light.hours, art, hours_moved);
-    changed |= hours_moved.changed;
-    released |= hours_moved.released;
-  }
-  toggled |= SkinCheckBox(core::Tr("Vacille"), &set.light.flicker, art);
-  toggled |= SkinCheckBox(core::Tr("Projette des ombres"), &set.light.shadow, art);
-  SkinTooltip(ShadowHelp());
-  const std::string_view typed(panel.light_why.data(),
-                               strnlen(panel.light_why.data(), panel.light_why.size()));
-  if (panel.light_why_of != view.selected_light ||
-      (!panel.light_why_typing && typed != set.light.why)) {
-    panel.light_why.fill('\0');
-    const std::size_t kept = std::min(set.light.why.size(), panel.light_why.size() - 1);
-    std::copy_n(set.light.why.begin(), kept, panel.light_why.begin());
-    panel.light_why_of = view.selected_light;
-  }
-  static_cast<void>(
-      ImGui::InputText(core::Tr("Pourquoi"), panel.light_why.data(), panel.light_why.size()));
-  panel.light_why_typing = ImGui::IsItemActive();
-  if (ImGui::IsItemDeactivatedAfterEdit()) {
-    set.light.why = std::string(panel.light_why.data(),
-                                strnlen(panel.light_why.data(), panel.light_why.size()));
-    changed = true;
-    released = true;
-  }
-  if (changed || released || toggled) {
-    set.released = released || toggled || !ImGui::IsAnyItemActive();
-    intents.emplace_back(std::move(set));
-  }
-  if (SkinButton(core::Tr("Retirer la lumière"), art)) {
-    intents.emplace_back(map_editor::RemoveLight{slot});
-  }
-  ImGui::SameLine();
-  if (SkinButton(core::Tr("Centrer"), art)) {
-    intents.emplace_back(map_editor::Focus{});
-  }
-  ImGui::PopID();
+  DrawModelLights(view, panel, intents, art);
 }
 
 }  // namespace

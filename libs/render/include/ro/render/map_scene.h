@@ -68,6 +68,11 @@ struct MapScene {
   // Les modèles que les retouches rendent translucides, par rangs croissants :
   // voir `ro/render/decor_opacity.h`.
   std::vector<mapedit::ModelOpacity> model_opacities;
+  // LES LUMIÈRES DE MODÈLE (docs/adr/0126) : les rangs des modèles où elles ne
+  // s'allument pas, croissants, et la clé du fichier de chaque modèle du RSW —
+  // voir `mapedit::ModelFileKey` —, par rang.
+  std::vector<std::size_t> unlit_models;
+  std::vector<std::string> model_keys;
   // Les retouches de maillages dont la cible correspond : ce que le décor
   // dessine, variantes comprises.
   std::vector<mapedit::MeshEdit> mesh_edits;

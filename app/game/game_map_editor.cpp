@@ -21,6 +21,7 @@
 #include "ro/audio/audio_engine.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/mapedit/model_light.h"
 #include "ro/render/map_scene.h"
 #include "ro/render/skill_sound_table.h"
 #include "ro/render/terrain_mesh.h"
@@ -86,6 +87,38 @@ void Listen(ro::audio::AudioEngine& audio, ro::vfs::Vfs& vfs,
   }
   constexpr float kCentered = 0.0F;
   audio.PlaySound(listen.file, listen.volume, kCentered, ro::audio::SoundChannel::kAmbience);
+}
+
+// LES CERCLES DES LUMIÈRES DU TYPE de la pose désignée (docs/adr/0126), là où
+// elles y luisent, et le cercle de portée de la désignée d'entre elles, qu'il
+// rend : c'est elle qui prend la flèche. Nul sans elle.
+const ro::ui::MapEditorLight* MarkModelLights(ro::ui::MapEditorView& view,
+                                              const ro::render::MapScene& scene,
+                                              const ro::render::Camera& camera, float aspect_ratio,
+                                              float width, float height) {
+  ro::ui::MapEditorView carried;
+  const ro::ui::MapEditorLight* chosen = nullptr;
+  for (const ro::ui::MapEditorModelLight& shown : view.model_lights) {
+    carried.lights.push_back(shown.light);
+    if (view.selected_model_light == shown.slot) {
+      chosen = &shown.light;
+    }
+  }
+  for (const MapEditorSession::LightDot& dot :
+       LightDots(carried, scene, camera, aspect_ratio, width, height)) {
+    view.lines.push_back(
+        ro::ui::MapEditorLine{.from = dot.at,
+                              .to = dot.at,
+                              .kind = view.selected_model_light == view.model_lights[dot.slot].slot
+                                          ? ro::ui::MapEditorLineKind::kLightSelected
+                                          : ro::ui::MapEditorLineKind::kLight});
+  }
+  if (chosen != nullptr) {
+    const std::vector<ro::ui::MapEditorLine> ring =
+        LightRangeRing(*chosen, scene, camera, aspect_ratio, width, height);
+    view.lines.insert(view.lines.end(), ring.begin(), ring.end());
+  }
+  return chosen;
 }
 
 }  // namespace
@@ -259,7 +292,9 @@ void Game::ServeMapEditorTools() {
   // brosse, une annulation, un retour au relief de la carte.
   FollowMapGround();
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
-  tools.map_editor.server_conflict = pieces_.map_edit_sync.Conflicted(stage_->name);
+  tools.map_editor.server_conflict =
+      pieces_.map_edit_sync.Conflicted(stage_->name) ||
+      pieces_.map_edit_sync.Conflicted(ro::mapedit::kModelLightsDocument);
   // CE QUE LE .act DE CHAQUE SPRITE PORTE, que le panneau borne.
   if (pieces_.wardrobe.has_value()) {
     for (ro::ui::MapEditorSprite& sprite : tools.map_editor.sprites) {
@@ -305,10 +340,15 @@ void Game::ServeMapEditorTools() {
     map_editor_.SetGizmo(GizmoFrame(), {});
     return;
   }
-  // LES POIGNÉES, sur le pivot du placement que montre la vue.
-  const GizmoFrame frame = GizmoFrameOf(map_frame, tools.map_editor.position, camera_);
+  // LES POIGNÉES, sur le pivot du placement que montre la vue — ou, une
+  // lumière de son type désignée, la flèche sur elle.
+  const ro::ui::MapEditorLight* carried =
+      MarkModelLights(tools.map_editor, stage_->scene, camera_, aspect_ratio_, width, height);
+  const GizmoFrame frame = GizmoFrameOf(
+      map_frame, carried != nullptr ? carried->position : tools.map_editor.position, camera_);
   map_editor_.SetGizmo(
-      frame, GizmoHandles(map_editor_.tool(), frame, camera_, aspect_ratio_, width, height));
+      frame, GizmoHandles(carried != nullptr ? ro::ui::MapEditorTool::kMove : map_editor_.tool(),
+                          frame, camera_, aspect_ratio_, width, height));
   const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
   tools.map_editor.lines.insert(tools.map_editor.lines.end(), handles.begin(), handles.end());
 }
@@ -395,7 +435,20 @@ enum class MapModelVerb : int {
   kRevert,
   kSave,
   kCopy,
+  kAssignLight,
+  kToggleUnlit,
 };
+
+// LE TYPE DU MODÈLE DE RANG `rank` PORTE-T-IL DES LUMIÈRES ? Voir docs/adr/0126.
+bool CarriesModelLights(const ro::render::MapScene& scene, const ro::mapedit::MapEdit& book,
+                        std::size_t rank) {
+  return rank < scene.model_keys.size() &&
+         std::ranges::any_of(
+             book.model_lights(),
+             [&](const ro::mapedit::ModelLight& carried) {
+               return ro::mapedit::ModelFileKey(carried.model_file) == scene.model_keys[rank];
+             });
+}
 
 }  // namespace
 
@@ -409,7 +462,8 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
   // de se masquer ou de se restaurer.
   const bool added = model_index >= stage_->scene.unfixed_models.size();
   const ro::mapedit::ModelEdit* edit = added ? nullptr : document.ModelAt(model_index);
-  const bool unsaved = map_edits_.Unsaved(stage_->name);
+  const bool unsaved =
+      map_edits_.Unsaved(stage_->name) || map_edits_.Unsaved(ro::mapedit::kModelLightsDocument);
   ro::ui::EntityMenuView built;
   built.subject = static_cast<std::uint32_t>(model_index);
   built.name =
@@ -450,6 +504,23 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
       .tip =
           ro::core::Tr("Pour le coller dans une autre carte : Ctrl+V dans l'éditeur, ou « Coller "
                        "le modèle » dans sa bibliothèque.")});
+  // LES LUMIÈRES DE MODÈLE : en assigner une à toutes les poses de ce fichier,
+  // ou éteindre celles qu'il porte sur cette pose seule.
+  built.items.push_back(ro::ui::EntityMenuItem{
+      .label = ro::core::Tr("Assigner une lumière à ce type de modèle"),
+      .verb = static_cast<int>(MapModelVerb::kAssignLight),
+      .separator = true,
+      .staff = true,
+      .tip = ro::core::Tr("Toutes les poses de ce fichier, sur toutes les cartes, la portent.")});
+  if (CarriesModelLights(stage_->scene, map_edits_.Document(ro::mapedit::kModelLightsDocument),
+                         model_index)) {
+    built.items.push_back(ro::ui::EntityMenuItem{
+        .label = std::ranges::binary_search(stage_->scene.unlit_models, model_index)
+                     ? ro::core::Tr("Rallumer ses lumières ici")
+                     : ro::core::Tr("Éteindre ses lumières ici"),
+        .verb = static_cast<int>(MapModelVerb::kToggleUnlit),
+        .staff = true});
+  }
   built.items.push_back(
       ro::ui::EntityMenuItem{.label = ro::core::Tr("Enregistrer la carte"),
                              .verb = static_cast<int>(MapModelVerb::kSave),
@@ -518,6 +589,23 @@ void Game::PlayMapModelVerb(int verb) {
       SDL_SetClipboardText(ro::ui::ModelClipboardText(copied).c_str());
       break;
     }
+    case MapModelVerb::kAssignLight:
+      // L'ÉDITEUR S'OUVRE SUR LA POSE, qui reçoit la lumière au centre de sa
+      // boîte : on la règle aussitôt.
+      static_cast<void>(map_editor_.QuickModel(QuickModelAction::kOpenEditor, *model, here,
+                                               stage_->scene, map_edits_));
+      outcome = map_editor_.Apply(
+          ro::ui::map_editor::AddModelLight{.position = SelectionCenter(stage_->scene, *model)},
+          stage_->scene, map_edits_);
+      break;
+    case MapModelVerb::kToggleUnlit:
+      static_cast<void>(map_editor_.Apply(ro::ui::map_editor::Select{.model_index = *model},
+                                          stage_->scene, map_edits_));
+      outcome = map_editor_.Apply(
+          ro::ui::map_editor::SetModelUnlit{
+              .unlit = !std::ranges::binary_search(stage_->scene.unlit_models, *model)},
+          stage_->scene, map_edits_);
+      break;
   }
   if (PublishMapEdit(outcome)) {
     ReplaceMapModels();
@@ -591,17 +679,32 @@ void Game::PlayMapGroundVerb(int verb) {
 bool Game::PublishMapEdit(const MapEditorSession::Outcome& outcome) {
   using Publication = MapEditorSession::Outcome::Publication;
   MapEditSync& sync = pieces_.map_edit_sync;
+  // ÉCRASER ET RECHARGER visent les documents dont l'envoi a été devancé : celui
+  // de la carte, celui des lumières de modèle (docs/adr/0126), ou les deux.
+  std::vector<std::string> conflicted;
+  for (const std::string_view document :
+       {std::string_view(stage_->name), std::string_view(ro::mapedit::kModelLightsDocument)}) {
+    if (sync.Conflicted(document)) {
+      conflicted.emplace_back(document);
+    }
+  }
   switch (outcome.publication) {
     case Publication::kNone:
       break;
     case Publication::kPublish:
-      map_editor_.SetStatus(sync.Publish(stage_->name, map_edits_, link_));
+      for (const std::string& document : outcome.saved_documents) {
+        map_editor_.SetStatus(sync.Publish(document, map_edits_, link_));
+      }
       break;
     case Publication::kOverwrite:
-      map_editor_.SetStatus(sync.Overwrite(stage_->name, map_edits_, link_));
+      for (const std::string& document : conflicted) {
+        map_editor_.SetStatus(sync.Overwrite(document, map_edits_, link_));
+      }
       break;
     case Publication::kReload:
-      FollowServedMapEdit(sync.Reload(stage_->name, stage_->name, map_edits_, link_));
+      for (const std::string& document : conflicted) {
+        FollowServedMapEdit(sync.Reload(document, stage_->name, map_edits_, link_));
+      }
       break;
   }
   return outcome.replace_models;
