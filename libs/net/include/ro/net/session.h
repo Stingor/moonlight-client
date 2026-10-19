@@ -389,6 +389,13 @@ class CharacterPhase {
   // celui-là est faux » : le serveur emploie le même paquet pour les deux.
   [[nodiscard]] bool pincode_refused() const noexcept { return pincode_refused_; }
 
+  // LE SERVEUR DIT QU'AUCUNE CARTE N'EST ENCORE SERVIE : il démarre. Il répond
+  // alors à la demande d'entrée par la liste des cartes accessibles, toutes
+  // indisponibles, et attend que le joueur redemande. La phase revient à
+  // `kAwaitingSelection` ; l'appelant lit ce témoin puis `AcknowledgeZoneUnavailable`.
+  [[nodiscard]] bool zone_unavailable() const noexcept { return zone_unavailable_; }
+  void AcknowledgeZoneUnavailable() noexcept { zone_unavailable_ = false; }
+
   [[nodiscard]] Step step() const noexcept { return step_; }
   // LA LISTE, telle que la tablée la montre.
   //
@@ -445,6 +452,7 @@ class CharacterPhase {
   // ferait refuser un code pourtant juste.
   std::uint32_t pincode_seed_ = 0;
   bool pincode_refused_ = false;
+  bool zone_unavailable_ = false;
   // 🔴 LA LISTE EST-ELLE ARRIVÉE ? Un TÉMOIN, et non le nombre de personnages :
   // un compte qui vient d'être créé en a ZÉRO, et compter les lire rendait sa
   // liste indiscernable d'une liste jamais reçue. La phase repartait alors

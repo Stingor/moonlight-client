@@ -171,6 +171,9 @@ class LobbyFlow {
   // décor. Voir `BackdropSession::world`.
   [[nodiscard]] BackdropSession& backdrop() noexcept { return backdrop_; }
   [[nodiscard]] bool pincode_refused() const noexcept { return player_.pincode_refused(); }
+  // Le serveur démarre : il n'a pas encore de carte à servir. L'écran est revenu
+  // à la tablée, et le joueur peut redemander.
+  [[nodiscard]] bool zone_unavailable() const noexcept { return player_.zone_unavailable(); }
 
   // La liste des personnages. ⚠ VIDE EST UNE RÉPONSE : c'est celle d'un compte
   // qui vient d'être créé, et l'écran doit alors proposer d'en créer un.

@@ -14,6 +14,14 @@
 
 namespace moonclient::lobby {
 
+// Combien de temps une attente de réponse du serveur peut durer avant d'être
+// déclarée perdue : connexion, liste des personnages, entrée sur la carte.
+//
+// 🔴 UN SERVEUR EN COURS DE DÉMARRAGE ACCEPTE LA LIAISON ET NE RÉPOND PAS
+// ENCORE. Rien ne casse alors la socket, et sans borne l'écran d'entrée en jeu
+// reste noir pour toujours.
+inline constexpr std::uint32_t kStageTimeoutMs = 20'000;
+
 // Ce qu'il faut pour se présenter à un serveur.
 //
 // Le mot de passe s'arrête à `ro::net::LoginPhase` : rien de ce qui est ici ne
@@ -159,6 +167,9 @@ class SessionDrive {
   [[nodiscard]] Stage stage() const noexcept { return stage_; }
   // Ce qui s'est passé, en clair, quand l'étape est `kRefused` ou `kFailed`.
   [[nodiscard]] const std::string& message() const noexcept { return message_; }
+  // Vrai quand le serveur a répondu à l'entrée en jeu qu'aucune carte n'est
+  // encore servie : l'étape est revenue à `kChoosing`. S'efface au choix suivant.
+  [[nodiscard]] bool zone_unavailable() const noexcept { return zone_unavailable_; }
   // Vrai quand le serveur vient de rejeter le dernier code PIN proposé.
   [[nodiscard]] bool pincode_refused() const noexcept;
 
@@ -208,7 +219,17 @@ class SessionDrive {
   template <typename Phase>
   bool Broke(ro::net::PhaseState state, const Phase& phase, std::string_view what);
 
+  // Une étape d'attente a-t-elle dépassé `kStageTimeoutMs` ? Pose alors l'étape
+  // `kFailed` et son message. Voir sa définition.
+  bool TimedOut(std::uint32_t now_ms);
+
   Stage stage_ = Stage::kAsleep;
+  // L'étape d'attente que l'horloge ci-dessous mesure, et l'instant où l'appelant
+  // l'a vue pour la première fois : `Begin`, `Resume` et `Choose` ne reçoivent
+  // pas d'horloge, c'est donc `Advance` qui date l'arrivée.
+  bool zone_unavailable_ = false;
+  Stage timed_stage_ = Stage::kAsleep;
+  std::uint32_t timed_since_ms_ = 0;
   std::string message_;
   // L'horloge du client au moment de la demande d'entrée en carte. Le serveur
   // s'en sert pour caler la sienne ; nous ne la lisons pas.

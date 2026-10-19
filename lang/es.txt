@@ -12238,6 +12238,9 @@ tr: Entrar al juego
 fr: Revenir au login
 tr: Volver al inicio de sesión
 
+fr: Le serveur démarre : réessayez dans un instant.
+tr: El servidor está arrancando: inténtalo de nuevo en un momento.
+
 fr: Entrée en jeu…
 tr: Entrando al juego…
 

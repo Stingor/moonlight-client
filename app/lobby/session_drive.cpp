@@ -43,6 +43,28 @@ bool SessionDrive::Broke(PhaseState state, const Phase& phase, std::string_view 
   return true;
 }
 
+bool SessionDrive::TimedOut(std::uint32_t now_ms) {
+  const bool waiting =
+      stage_ == Stage::kConnecting || stage_ == Stage::kAwaitingList || stage_ == Stage::kEntering;
+  if (!waiting) {
+    timed_stage_ = Stage::kAsleep;
+    return false;
+  }
+  if (timed_stage_ != stage_) {
+    timed_stage_ = stage_;
+    timed_since_ms_ = now_ms;
+    return false;
+  }
+  // La soustraction non signée reste juste au passage de l'horloge par zéro.
+  if (now_ms - timed_since_ms_ < kStageTimeoutMs) {
+    return false;
+  }
+  message_ = stage_ == Stage::kEntering ? "entrée en jeu : le serveur ne répond pas"
+                                        : "le serveur ne répond pas";
+  stage_ = Stage::kFailed;
+  return true;
+}
+
 void SessionDrive::Begin(const Credentials& credentials) {
   // 🔴 PAS DE SECONDE SESSION PAR-DESSUS LA PREMIÈRE. Relancer sans rendre la
   // précédente laisserait une liaison ouverte que plus personne ne tient : le
@@ -80,6 +102,9 @@ void SessionDrive::Resume(const Comeback& comeback) {
 }
 
 void SessionDrive::Advance(std::uint32_t now_ms) {
+  if (TimedOut(now_ms)) {
+    return;
+  }
   switch (stage_) {
     case Stage::kAsleep:
     case Stage::kInWorld:
@@ -153,7 +178,18 @@ void SessionDrive::Advance(std::uint32_t now_ms) {
         return;
       }
       const PhaseState state = characters_->Advance();
-      if (Broke(state, *characters_, "entrée en jeu") || state != PhaseState::kDone) {
+      if (Broke(state, *characters_, "entrée en jeu")) {
+        return;
+      }
+      if (characters_->zone_unavailable()) {
+        // Le serveur démarre et n'a pas encore de carte : retour à la tablée,
+        // liaison gardée, pour que le joueur redemande.
+        characters_->AcknowledgeZoneUnavailable();
+        zone_unavailable_ = true;
+        stage_ = Stage::kChoosing;
+        return;
+      }
+      if (state != PhaseState::kDone) {
         return;
       }
       map_name_ = characters_->handoff().map_name;
@@ -183,6 +219,7 @@ void SessionDrive::Choose(std::uint8_t slot) {
     return;
   }
   chosen_slot_ = slot;
+  zone_unavailable_ = false;
   // ⚠ LA COPIE SE PREND ICI, avant que quoi que ce soit ne parte : voir
   // `chosen_`. Un emplacement qui ne correspond à personne ne pose rien, et
   // l'appelant le verra à son tour.
@@ -337,6 +374,8 @@ void SessionDrive::Release() noexcept {
   world_.reset();
   link_.Close();
   stage_ = Stage::kAsleep;
+  timed_stage_ = Stage::kAsleep;
+  zone_unavailable_ = false;
   message_.clear();
   chosen_slot_ = 0;
   chosen_.reset();

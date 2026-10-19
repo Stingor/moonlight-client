@@ -151,6 +151,9 @@ ro::ui::CharacterSelectView LobbyScreen::ComposeSeats(std::uint32_t now_ms) {
               flow_.screen() == lobby::LobbyScreenKind::kHandoff;
   view.entering_seconds = veil_.seconds(now_ms);
   view.message = flow_.message();
+  if (flow_.zone_unavailable()) {
+    view.message = ro::core::Tr("Le serveur démarre : réessayez dans un instant.");
+  }
   // ⚠ LE REFUS DE SUPPRESSION PREND LE BANDEAU, sauf quand c'est la fenêtre
   // de confirmation qui le montre déjà : le dire deux fois au même instant
   // ferait chercher deux problèmes là où il n'y en a qu'un.

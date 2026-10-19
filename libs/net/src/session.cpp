@@ -616,6 +616,16 @@ PhaseState CharacterPhase::Advance() {
       state_ = PhaseState::kRefused;
       return state_;
     }
+    if (frame.opcode == proto::HcNotifyAccessibleMapname::kOpcode) {
+      // Aucun serveur de carte n'est prêt : la liaison reste ouverte et le
+      // joueur peut redemander. Sans cette réponse lue, l'attente de l'adresse
+      // de zone ne finirait jamais.
+      if (step_ == Step::kAwaitingZoneAddress) {
+        step_ = Step::kAwaitingSelection;
+        zone_unavailable_ = true;
+      }
+      continue;
+    }
     if (TookBanNotice(frame, refusal_code_, refusal_text_)) {
       state_ = PhaseState::kRefused;
       return state_;
