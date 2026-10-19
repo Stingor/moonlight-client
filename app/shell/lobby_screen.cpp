@@ -10,9 +10,11 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <filesystem>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -31,6 +33,7 @@
 #include "options/game_options.h"
 #include "options/option_targets.h"
 #include "world/overlay_view.h"
+#include "world/server_sky_hour.h"
 
 namespace moonclient {
 namespace {
@@ -598,10 +601,20 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
     // ville est l'aperçu de ce que le joueur règle ici. Voir `BackdropLens`.
     const GraphicsOptions& graphics = shell_.settings().options().graphics();
     const ro::render::DrawableSize surface = shell_.gl().drawable_size();
+    // L'HEURE DU CIEL, comme en partie : l'heure fixe du joueur, sinon celle du
+    // serveur. Lue seulement quand le cycle jour/nuit est allumé.
+    std::optional<float> sky_hour;
+    if (graphics.day_night_cycle()) {
+      sky_hour = graphics.fixed_sky_hour();
+      if (!sky_hour.has_value()) {
+        sky_hour = ServerSkyHour(shell_.server_time_zone(), std::chrono::system_clock::now());
+      }
+    }
     lens_.Begin(shell_.gl(), graphics);
     backdrop_.Draw(aspect_ratio, now_ms - opened_ms_, wardrobe, &flow_.backdrop().world(),
                    flow_.backdrop().map_name(), now_ms, &shell_.audio(),
-                   static_cast<float>(surface.width), static_cast<float>(surface.height), graphics);
+                   static_cast<float>(surface.width), static_cast<float>(surface.height), graphics,
+                   sky_hour);
     // LE POST-TRAITEMENT PUIS LA VIGNETTE, ENTRE LA VILLE ET LE FORMULAIRE.
     //
     // ⚠ LA VIGNETTE N'HABILLE QUE LA VILLE VIVANTE, et c'est une conséquence

@@ -12,8 +12,14 @@
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/map_sky.h"
 #include "ro/render/model_renderer.h"
+#include "ro/render/point_light_stage.h"
+#include "ro/render/point_lights.h"
+#include "ro/render/sky_clock.h"
 #include "ro/render/sprite_renderer.h"
+#include "ro/render/sun_shadow_map.h"
+#include "ro/render/sun_shadow_pass.h"
 #include "ro/render/terrain_renderer.h"
+#include "ro/render/void_shade.h"
 #include "ro/render/water_renderer.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world.h"
@@ -49,9 +55,12 @@ inline constexpr std::string_view kLocalBackdropMap = "prontera";
 //
 // 🔴 IL SUIT LA PAGE « GRAPHICS » DU JOUEUR, SAUF LE BROUILLARD : ombres et
 // lumière de la carte, lumière froide, filtrage du décor, fondus et lumière
-// des passants — et, posés par l'appelant, la cible de la scène et son
+// des passants, ombres temps réel du soleil et des lumières ponctuelles,
+// cycle jour/nuit — et, posés par l'appelant, la cible de la scène et son
 // post-traitement. C'est l'aperçu de ce que le joueur règle depuis l'écran de
-// connexion. Le brouillard reste éteint : voir `kBackdropFogShown`.
+// connexion, et la vitrine du rendu : ce que le client sait faire s'y montre
+// quand le réglage est allumé, et s'éteint avec lui. Le brouillard reste
+// éteint : voir `kBackdropFogShown`.
 //
 // ⚠ ET IL NE CONSULTE PAS L'ÉTABLI DU STAFF. Un décor qui passerait par le
 // dessin du monde honorerait les réglages de l'établi — `staff_ground_solid` peint
@@ -122,13 +131,17 @@ class BackdropScene {
   // `viewport_width` et `viewport_height` sont la cible, en pixels : la voie
   // d'écran des effets y pose ses quads.
   //
+  // `sky_hour` est l'heure du ciel, dans [0, 24) : l'heure fixe du joueur ou
+  // celle du serveur. Rien garde la lumière du RSW, comme en partie quand le
+  // fuseau est inconnu. Seul le cycle jour/nuit allumé la lit.
+  //
   // 🔴 `graphics` SE RELIT À CHAQUE IMAGE, comme en partie : le joueur règle
   // depuis l'écran de connexion, et la ville est son seul aperçu. Voir
   // `kBackdropFogShown` pour l'unique réglage que le décor n'écoute pas.
   void Draw(float aspect_ratio, std::uint32_t elapsed_ms, ro::render::ActorWardrobe* wardrobe,
             const ro::sim::World* world, std::string_view world_map, std::uint32_t now_ms,
             ro::audio::AudioEngine* audio, float viewport_width, float viewport_height,
-            const GraphicsOptions& graphics);
+            const GraphicsOptions& graphics, std::optional<float> sky_hour);
 
   // Ce que la dernière image a constaté, rendu au monde des passants HORS du
   // dessin : les disparitions et les effets finis à `now_ms` (`SettleWorld`),
@@ -154,15 +167,50 @@ class BackdropScene {
   [[nodiscard]] std::string_view map_name() const noexcept;
 
  private:
+  // LA LUMIÈRE D'UNE IMAGE, une fois le ciel lu et les ombres peintes.
+  struct FrameLight {
+    ro::render::SkyLight sky;
+    ro::render::SunShadowView sun;
+    ro::render::PointLightSet points;
+    // Ce que l'heure retire aux corps : rien sans astre, comme en partie.
+    glm::vec3 body_daylight{1.0F};
+  };
+
   // Où la caméra regarde : la case surveillée, ou le centre de la carte tant
   // que personne n'en a désigné une.
   [[nodiscard]] glm::vec3 LookAt() const;
-  // Compose les passants de cette carte, les fait entendre, et peint leurs
-  // corps ; halos et voiles attendent que l'eau soit passée.
-  void DrawPassersby(const ro::render::Camera& camera, float aspect_ratio, std::uint32_t elapsed_ms,
-                     ro::render::ActorWardrobe& wardrobe, const ro::sim::World& world,
-                     std::uint32_t now_ms, ro::audio::AudioEngine* audio,
-                     const ro::render::SceneFog& fog, const GraphicsOptions& graphics);
+  // Compose les passants de cette carte et les fait entendre. ⚠ AVANT TOUTE
+  // PEINTURE : leur silhouette entre dans l'ombre du soleil, que le sol lit.
+  // Sous le soleil, un corps perd son ombre ronde.
+  void ComposePassersby(const ro::render::Camera& camera, std::uint32_t elapsed_ms,
+                        ro::render::ActorWardrobe& wardrobe, const ro::sim::World& world,
+                        std::uint32_t now_ms, ro::audio::AudioEngine* audio,
+                        const GraphicsOptions& graphics, bool sun_shadows);
+  // Peint les corps composés ; halos et voiles attendent que l'eau soit passée.
+  void DrawPassersby(const ro::render::Camera& camera, float aspect_ratio,
+                     const ro::render::SceneFog& fog, const FrameLight& lit);
+  // LE CIEL DE L'IMAGE : la lumière du RSW à l'heure `sky_hour` quand le joueur
+  // a le cycle et que la ville est en plein air ; celle du RSW sinon.
+  [[nodiscard]] ro::render::SkyLight SkyOf(const GraphicsOptions& graphics,
+                                           std::optional<float> sky_hour) const;
+  // L'OMBRE DE L'ASTRE, vide quand elle n'est pas demandée ou que la carte
+  // graphique a refusé sa carte d'ombre.
+  [[nodiscard]] ro::render::SunShadowView DrawSunShadow(bool asked,
+                                                        const ro::render::Camera& camera,
+                                                        float aspect_ratio,
+                                                        const ro::render::SkyLight& sky);
+  // LES LUMIÈRES DE LA CARTE, leurs ombres peintes quand le joueur a les
+  // ombres temps réel ; vide si la carte graphique a refusé leur étage.
+  [[nodiscard]] ro::render::PointLightSet DrawPointLights(const GraphicsOptions& graphics,
+                                                          const ro::render::Camera& camera,
+                                                          float aspect_ratio,
+                                                          const ro::render::SkyLight& sky,
+                                                          std::uint32_t now_ms);
+  // Le vide sous la ville prend l'heure du ciel, et l'astre s'y montre.
+  void ShadeVoid(const ro::render::SkyLight& sky, const ro::render::Camera& camera,
+                 float aspect_ratio);
+  // Ce qui porte ombre : le sol, le décor et les corps composés.
+  [[nodiscard]] ro::render::SunShadowCasters ShadowCasters();
 
   std::optional<MapStage> stage_;
   ro::render::TerrainRenderer terrain_;
@@ -177,6 +225,18 @@ class BackdropScene {
   // ⚠ POSÉE DÈS LA CONSTRUCTION ET NON À VIDE : un écran sans ville l'emploie
   // pour effacer, et quatre zéros y donneraient un noir transparent.
   std::array<float, 4> background_ = ro::render::kUnlistedMapClearColor;
+  // LA VILLE EST-ELLE FERMÉE AU CIEL : intérieur ou carte fermée. Ni astre ni
+  // heure — la lumière du RSW, comme en partie.
+  bool closed_to_sky_ = false;
+  // L'OMBRE DU SOLEIL, LES LUMIÈRES PONCTUELLES ET LE VIDE À L'HEURE, créés à
+  // leur première demande. Un refus de la carte graphique est retenu : il ne se
+  // retente pas à chaque image, et la ville reste debout sans eux.
+  ro::render::SunShadowMap sun_map_;
+  bool sun_map_refused_ = false;
+  ro::render::PointLightStage point_stage_;
+  bool point_stage_refused_ = false;
+  ro::render::VoidShade void_shade_;
+  bool void_shade_refused_ = false;
   // La case que la caméra vise, ou rien.
   std::optional<ro::sim::CellPosition> watched_;
   // Le premier convive peint a-t-il été annoncé au journal ? Remis à faux à

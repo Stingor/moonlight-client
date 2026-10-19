@@ -1,13 +1,23 @@
 #include "shell/backdrop_scene.h"
 
 #include <array>
+#include <optional>
 #include <span>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "ro/core/log.h"
+#include "ro/mapedit/map_edit.h"
+#include "ro/render/map_point_lights.h"
+#include "ro/render/point_shadow_pass.h"
+#include "ro/render/sky_body.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/vfs/indoor_maps.h"
 
+#include "input/camera_rules.h"
 #include "shell/backdrop_camera.h"
+#include "world/closed_maps.h"
 #include "world/scene_graphics.h"
 
 namespace moonclient {
@@ -69,6 +79,13 @@ ro::core::Result<void> BackdropScene::Open(ro::vfs::Vfs& vfs, std::string_view m
   effects_.reset();
   effects_.emplace(vfs);
   told_drawn_ = false;
+  // LE CIEL DE LA VILLE, par les mêmes tables que la partie. Une table illisible
+  // laisse la ville en plein air : c'est ce que sont les villes.
+  auto indoor = ro::vfs::ReadIndoorMaps(vfs);
+  const bool indoor_map = MapCameraTables::Parse(indoor ? *indoor : std::vector<std::string>{}, {})
+                              .RulesFor(stage_->name)
+                              .indoor;
+  closed_to_sky_ = indoor_map || LoadClosedMaps(vfs).Closes(stage_->name);
 
   ro::core::LogInfo("décor : {} montée", stage_->name);
   return {};
@@ -100,7 +117,7 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                          ro::render::ActorWardrobe* wardrobe, const ro::sim::World* world,
                          std::string_view world_map, std::uint32_t now_ms,
                          ro::audio::AudioEngine* audio, float viewport_width, float viewport_height,
-                         const GraphicsOptions& graphics) {
+                         const GraphicsOptions& graphics, std::optional<float> sky_hour) {
   if (!stage_.has_value()) {
     return;
   }
@@ -115,29 +132,46 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   //
   // 🔴 SANS BROUILLARD, quel que soit le réglage : voir `kBackdropFogShown`.
   const ro::render::SceneFog fog = FogOf(*stage_, kBackdropFogShown);
-  terrain_.Draw(camera, stage_->scene.light, aspect_ratio,
-                ClearColorOf(*stage_, background_, kBackdropFogShown),
-                TerrainStagesOf(graphics, /*lightmap_hidden=*/false), fog);
+  ro::render::TerrainStages stages = TerrainStagesOf(graphics, /*lightmap_hidden=*/false);
+  const bool sun_asked = !sun_map_refused_ && SunShadowsApply(graphics, stages, closed_to_sky_);
+  // Les modèles animés posés AVANT l'ombre du soleil, qui les peint dans la
+  // même pose que l'image.
   if (!model_clock_.started()) {
     model_clock_.Start(stage_->scene.models, elapsed_ms);
   }
   model_clock_.Advance(stage_->scene.models, elapsed_ms);
-  models_.SetTextureFilter(graphics.decor_filter());
-  // Les faces à texture mêlée attendent la passe translucide, après les passants.
-  models_.Draw(camera, stage_->scene.light, aspect_ratio,
-               ro::render::ModelStages{.blended_apart = true}, &model_clock_, fog);
-  // LES EFFETS QUI PASSENT DERRIÈRE LES CORPS, avant eux.
-  if (effects_.has_value()) {
-    effects_->DrawBehindActors(camera, aspect_ratio, fog, sprites_);
-  }
 
   actors_.Clear();
   // 🔴 PERSONNE NE SE PEINT SUR UNE AUTRE VILLE QUE LA SIENNE : voir l'en-tête.
   const bool peopled =
       wardrobe != nullptr && world != nullptr && !world_map.empty() && world_map == map_name();
   if (peopled) {
-    DrawPassersby(camera, aspect_ratio, elapsed_ms, *wardrobe, *world, now_ms, audio, fog,
-                  graphics);
+    ComposePassersby(camera, elapsed_ms, *wardrobe, *world, now_ms, audio, graphics, sun_asked);
+  }
+
+  FrameLight lit;
+  lit.sky = SkyOf(graphics, sky_hour);
+  lit.sun = DrawSunShadow(sun_asked, camera, aspect_ratio, lit.sky);
+  if (lit.sun.map != nullptr) {
+    stages.shadowmap = false;
+  }
+  lit.points = DrawPointLights(graphics, camera, aspect_ratio, lit.sky, now_ms);
+  // ⚠ L'HEURE N'ASSOMBRIT LES CORPS QUE SOUS UN ASTRE, comme en partie.
+  lit.body_daylight = lit.sky.body_shown ? lit.sky.light.daylight : glm::vec3(1.0F);
+
+  terrain_.Draw(camera, lit.sky.light, aspect_ratio,
+                ClearColorOf(*stage_, background_, kBackdropFogShown), stages, fog, lit.sun,
+                lit.points);
+  models_.SetTextureFilter(graphics.decor_filter());
+  // Les faces à texture mêlée attendent la passe translucide, après les passants.
+  models_.Draw(camera, lit.sky.light, aspect_ratio, ro::render::ModelStages{.blended_apart = true},
+               &model_clock_, fog, nullptr, lit.sun, lit.points);
+  // LES EFFETS QUI PASSENT DERRIÈRE LES CORPS, avant eux.
+  if (effects_.has_value()) {
+    effects_->DrawBehindActors(camera, aspect_ratio, fog, sprites_);
+  }
+  if (peopled) {
+    DrawPassersby(camera, aspect_ratio, fog, lit);
   }
   // L'eau APRÈS les corps des passants, comme dans la partie : elle plonge ce qui
   // est sous sa surface. C'est `elapsed_ms` qui l'anime, la même horloge que
@@ -154,9 +188,11 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                 SpriteRenderer::BodySilhouette::kAvoided);
   sprites_.Draw(camera, actors_.front, aspect_ratio, SpriteRenderer::Blending::kOver,
                 SpriteRenderer::DepthWrite::kOff, SpriteRenderer::DepthTest::kOn, fog);
+  // LE VIDE SOUS LA VILLE prend l'heure du ciel, avant les faces mêlées.
+  ShadeVoid(lit.sky, camera, aspect_ratio);
   // LA PASSE TRANSLUCIDE DU DÉCOR, sans pose voilée : ses faces mêlées.
-  models_.DrawVeiled(camera, stage_->scene.light, aspect_ratio, stage_->scene.models, {},
-                     &model_clock_, fog);
+  models_.DrawVeiled(camera, lit.sky.light, aspect_ratio, stage_->scene.models, {}, &model_clock_,
+                     fog, lit.points);
 
   // LES EFFETS APRÈS LES PASSANTS, comme dans la partie : ceux de la ville
   // toujours, ceux des passants quand ils sont sur cette carte.
@@ -182,21 +218,30 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                             viewport_width, viewport_height, fog);
 }
 
-void BackdropScene::DrawPassersby(const ro::render::Camera& camera, float aspect_ratio,
-                                  std::uint32_t elapsed_ms, ro::render::ActorWardrobe& wardrobe,
-                                  const ro::sim::World& world, std::uint32_t now_ms,
-                                  ro::audio::AudioEngine* audio, const ro::render::SceneFog& fog,
-                                  const GraphicsOptions& graphics) {
+void BackdropScene::ComposePassersby(const ro::render::Camera& camera, std::uint32_t elapsed_ms,
+                                     ro::render::ActorWardrobe& wardrobe,
+                                     const ro::sim::World& world, std::uint32_t now_ms,
+                                     ro::audio::AudioEngine* audio, const GraphicsOptions& graphics,
+                                     bool sun_shadows) {
   // ⚠ LA MÊME PORTE QUE LA PARTIE, et sans styles : les recettes de couleur
   // arrivent par des paquets de JEU, qu'une session spectateur ne reçoit pas.
   // Fondus, geste lisible et lumière de la carte suivent la page « Graphics »,
   // comme en partie ; les altérations n'ont pas de teinte ici.
   TimeComposedScene(graphics, actors_);
-  static_cast<void>(ComposeScene(&wardrobe, world, planner_, *stage_, camera.yaw_degrees, now_ms,
-                                 static_cast<float>(elapsed_ms),
-                                 /*styles=*/nullptr, actors_, ghosts_, drops_, frozen_poses_,
-                                 ActorLightingOf(graphics, &stage_->ground_light,
-                                                 /*ailment_tints=*/nullptr)));
+  static_cast<void>(ComposeScene(
+      &wardrobe, world, planner_, *stage_, camera.yaw_degrees, now_ms,
+      static_cast<float>(elapsed_ms),
+      /*styles=*/nullptr, actors_, ghosts_, drops_, frozen_poses_,
+      ActorLightingOf(graphics, sun_shadows ? &stage_->ground_laid_light : &stage_->ground_light,
+                      /*ailment_tints=*/nullptr)));
+  // SOUS LE SOLEIL, UN CORPS N'A PLUS D'OMBRE RONDE : sa silhouette en porte une.
+  if (sun_shadows) {
+    for (ro::render::DrawnActor& drawn : actors_.drawn) {
+      if (drawn.actor != nullptr) {
+        drawn.shadow = nullptr;
+      }
+    }
+  }
   // CE QUE LES PASSANTS FONT ENTENDRE À CETTE IMAGE.
   //
   // ⚠ APRÈS LA COMPOSITION, comme dans la partie : elle seule sait quelle image
@@ -223,14 +268,110 @@ void BackdropScene::DrawPassersby(const ro::render::Camera& camera, float aspect
     told_drawn_ = true;
     ro::core::LogInfo("décor : {} figure(s) peinte(s) sur {}", actors_.drawn.size(), stage_->name);
   }
+}
+
+void BackdropScene::DrawPassersby(const ro::render::Camera& camera, float aspect_ratio,
+                                  const ro::render::SceneFog& fog, const FrameLight& lit) {
   // 🔴 LES CORPS SEULS ÉCRIVENT LEUR PROFONDEUR, comme dans la partie, et
   // laissent leur silhouette à l'eau et aux halos, qui se peignent après eux :
-  // voir `Draw`.
-  sprites_.Draw(camera, actors_.drawn, aspect_ratio, ro::render::SpriteRenderer::Blending::kOver,
-                ro::render::SpriteRenderer::DepthWrite::kOn,
-                ro::render::SpriteRenderer::DepthTest::kOn, fog,
-                ro::render::SpriteRenderer::DrawOrder::kFarthestFirst,
-                ro::render::SpriteRenderer::BodySilhouette::kLeft);
+  // voir `Draw`. L'ombre du soleil, l'heure et les lumières ponctuelles
+  // n'éclairent qu'eux.
+  sprites_.Draw(
+      camera, actors_.drawn, aspect_ratio, ro::render::SpriteRenderer::Blending::kOver,
+      ro::render::SpriteRenderer::DepthWrite::kOn, ro::render::SpriteRenderer::DepthTest::kOn, fog,
+      ro::render::SpriteRenderer::DrawOrder::kFarthestFirst,
+      ro::render::SpriteRenderer::BodySilhouette::kLeft, lit.sun, lit.body_daylight, lit.points);
+}
+
+ro::render::SkyLight BackdropScene::SkyOf(const GraphicsOptions& graphics,
+                                          std::optional<float> sky_hour) const {
+  if (graphics.day_night_cycle() && !closed_to_sky_ && sky_hour.has_value()) {
+    return ro::render::SkyLightAt(stage_->scene.light, *sky_hour);
+  }
+  return ro::render::SkyLight{.light = stage_->scene.light};
+}
+
+ro::render::SunShadowCasters BackdropScene::ShadowCasters() {
+  return ro::render::SunShadowCasters{.terrain = &terrain_,
+                                      .models = &models_,
+                                      .clock = &model_clock_,
+                                      .sprites = &sprites_,
+                                      .actor_lots = {actors_.drawn, {}}};
+}
+
+ro::render::SunShadowView BackdropScene::DrawSunShadow(bool asked, const ro::render::Camera& camera,
+                                                       float aspect_ratio,
+                                                       const ro::render::SkyLight& sky) {
+  if (!asked) {
+    return ro::render::SunShadowView();
+  }
+  if (!sun_map_.valid()) {
+    auto created = ro::render::SunShadowMap::Create(ro::render::kSunShadowMapTexels);
+    if (!created) {
+      sun_map_refused_ = true;
+      ro::core::LogWarning("décor : ombre du soleil refusée — {}",
+                           ro::core::Describe(created.error()));
+      return ro::render::SunShadowView();
+    }
+    sun_map_ = std::move(*created);
+  }
+  // L'ASTRE DU CIEL porte l'ombre, et la lune la porte plus légère.
+  return ro::render::DrawSunShadow(sun_map_, ShadowCasters(), stage_->scene.terrain,
+                                   sky.CastingLight(), camera, aspect_ratio,
+                                   ro::render::kFullSunShadow * sky.shadow_strength);
+}
+
+ro::render::PointLightSet BackdropScene::DrawPointLights(const GraphicsOptions& graphics,
+                                                         const ro::render::Camera& camera,
+                                                         float aspect_ratio,
+                                                         const ro::render::SkyLight& sky,
+                                                         std::uint32_t now_ms) {
+  // LES LUEURS DES EFFETS DE LA CARTE, sans retouche : le décor n'ouvre pas le
+  // document d'édition.
+  const ro::render::PointLightSet points = ro::render::MapPointLights(
+      ro::render::DocumentLights(ro::mapedit::MapEdit(), stage_->scene.rsw.effects()),
+      ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}, sky.light,
+      closed_to_sky_, camera.look_at, static_cast<double>(now_ms), sky.hour);
+  if (points.lights.empty() || point_stage_refused_) {
+    return ro::render::PointLightSet();
+  }
+  if (!point_stage_.valid()) {
+    auto created = ro::render::PointLightStage::Create();
+    if (!created) {
+      point_stage_refused_ = true;
+      ro::core::LogWarning("décor : lumières ponctuelles refusées — {}",
+                           ro::core::Describe(created.error()));
+      return ro::render::PointLightSet();
+    }
+    point_stage_ = std::move(*created);
+  }
+  // SANS OMBRE, les lumières éclairent quand même.
+  const ro::render::SunShadowCasters casters = ShadowCasters();
+  return ro::render::DrawPointShadows(point_stage_,
+                                      graphics.real_time_shadows() ? &casters : nullptr, points,
+                                      camera, aspect_ratio);
+}
+
+void BackdropScene::ShadeVoid(const ro::render::SkyLight& sky, const ro::render::Camera& camera,
+                              float aspect_ratio) {
+  if ((sky.light.daylight == glm::vec3(1.0F) && !sky.body_shown) || void_shade_refused_) {
+    return;
+  }
+  if (!void_shade_.valid()) {
+    auto created = ro::render::VoidShade::Create();
+    if (!created) {
+      void_shade_refused_ = true;
+      return;
+    }
+    void_shade_ = std::move(*created);
+  }
+  void_shade_.Draw(sky.light.daylight);
+  if (sky.body_shown) {
+    void_shade_.DrawBody(ro::render::PlaceSkyBody(sky.body_direction, camera, aspect_ratio,
+                                                  sky.moon ? ro::render::kMoonAngularRadiusDegrees
+                                                           : ro::render::kSunAngularRadiusDegrees),
+                         sky.moon, aspect_ratio);
+  }
 }
 
 std::string_view BackdropScene::map_name() const noexcept {
