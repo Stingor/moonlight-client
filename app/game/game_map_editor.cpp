@@ -458,6 +458,7 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
                              .disabled = !unsaved,
                              .tip = unsaved ? std::string() : ro::core::Tr("Rien à enregistrer.")});
   menu_model_ = model_index;
+  menu_ground_.reset();
   menu_view_ = std::move(built);
   windows_.entity_menu.state.open_requested = true;
   menu_asked_ms_ = now_ms;
@@ -518,6 +519,70 @@ void Game::PlayMapModelVerb(int verb) {
       break;
     }
   }
+  if (PublishMapEdit(outcome)) {
+    ReplaceMapModels();
+  }
+}
+
+namespace {
+
+// LA LIGNE DU MENU D'UNE CELLULE VIDE, que `PlayMapGroundVerb` reconnaît.
+constexpr int kMapGroundVerbPaste = 1;
+
+// Le modèle que porte le presse-papiers, s'il en porte un.
+std::optional<ro::ui::ClipboardModel> ClipboardModelNow() {
+  char* clipboard = SDL_GetClipboardText();
+  std::optional<ro::ui::ClipboardModel> model =
+      clipboard != nullptr ? ro::ui::ParseModelClipboard(clipboard) : std::nullopt;
+  SDL_free(clipboard);
+  return model;
+}
+
+}  // namespace
+
+void Game::OpenMapGroundMenu(const std::array<float, 3>& world_point, std::uint32_t now_ms) {
+  if (!stage_.has_value()) {
+    return;
+  }
+  map_editor_.FollowMap(stage_->name, stage_->scene);
+  const ro::render::MapEffectFrame map_frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
+  const glm::vec3 native =
+      map_frame.ToNative(glm::vec3(world_point[0], world_point[1], world_point[2]));
+  const bool has_model = ClipboardModelNow().has_value();
+  ro::ui::EntityMenuView built;
+  built.name = ro::core::Tr("Cellule vide");
+  built.family = ro::core::Tr("Carte");
+  built.items.push_back(ro::ui::EntityMenuItem{
+      .label = ro::core::Tr("Coller le modèle"),
+      .verb = kMapGroundVerbPaste,
+      .staff = true,
+      .disabled = !has_model,
+      .tip = has_model ? std::string() : ro::core::Tr("Aucun modèle n'a été copié.")});
+  menu_model_.reset();
+  menu_ground_ = std::array<float, 3>{native.x, native.y, native.z};
+  menu_view_ = std::move(built);
+  windows_.entity_menu.state.open_requested = true;
+  menu_asked_ms_ = now_ms;
+}
+
+void Game::PlayMapGroundVerb(int verb) {
+  const std::optional<std::array<float, 3>> point = std::exchange(menu_ground_, std::nullopt);
+  if (!point.has_value() || !stage_.has_value() || verb != kMapGroundVerbPaste) {
+    return;
+  }
+  const std::optional<ro::ui::ClipboardModel> model = ClipboardModelNow();
+  if (!model.has_value()) {
+    return;
+  }
+  const MapEditorSession::Outcome outcome =
+      map_editor_.Apply(ro::ui::map_editor::AddModel{.file = model->model_file,
+                                                     .position = point,
+                                                     .rotation = model->rotation,
+                                                     .scale = model->scale,
+                                                     .opacity = model->opacity,
+                                                     .animation_type = model->animation_type,
+                                                     .animation_speed = model->animation_speed},
+                        stage_->scene, map_edits_);
   if (PublishMapEdit(outcome)) {
     ReplaceMapModels();
   }

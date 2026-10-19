@@ -135,11 +135,14 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
   if (!link_.is_open()) {
     menu_gestures_.ask.reset();
     menu_gestures_.model_ask.reset();
+    menu_gestures_.ground_ask.reset();
     return;
   }
   // LE MENU D'UN MODÈLE DE LA CARTE : sa ligne choisie va à l'éditeur.
   if (menu_model_.has_value() && answer.chosen != 0) {
     PlayMapModelVerb(std::exchange(answer.chosen, 0));
+  } else if (menu_ground_.has_value() && answer.chosen != 0) {
+    PlayMapGroundVerb(std::exchange(answer.chosen, 0));
   }
   // L'INSPECTEUR DU STAFF : sa fenêtre, puis la demande qu'elle attend.
   windows_.entity_inspector.view = &pieces_.entity_inspector.view();
@@ -275,6 +278,11 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
       model.has_value()) {
     OpenMapModelMenu(*model, now_ms);
   }
+  if (const std::optional<std::array<float, 3>> ground =
+          std::exchange(menu_gestures_.ground_ask, std::nullopt);
+      ground.has_value()) {
+    OpenMapGroundMenu(*ground, now_ms);
+  }
 
   if (windows_.entity_menu.state.open_requested && now_ms - menu_asked_ms_ > kMenuAskLifeMs) {
     windows_.entity_menu.state.open_requested = false;
@@ -394,6 +402,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   }
   menu_target_ = std::move(facts);
   menu_model_.reset();
+  menu_ground_.reset();
   menu_view_ = std::move(built);
   windows_.entity_menu.state.open_requested = true;
   menu_asked_ms_ = now_ms;

@@ -19897,3 +19897,9 @@ tr: Pegar el modelo
 
 fr: Pour le coller dans une autre carte : Ctrl+V dans l'éditeur, ou « Coller le modèle » dans sa bibliothèque.
 tr: Para pegarlo en otro mapa: Ctrl+V en el editor, o «Pegar el modelo» en su biblioteca.
+
+fr: Cellule vide
+tr: Celda vacía
+
+fr: Aucun modèle n'a été copié.
+tr: No se ha copiado ningún modelo.

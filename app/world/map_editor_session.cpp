@@ -502,7 +502,7 @@ MapEditorSession::Outcome MapEditorSession::AddModel(const ro::ui::map_editor::A
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;
   after.AddModel(ro::mapedit::AddedModel{.model_file = asked.file,
-                                         .position = drop_point_,
+                                         .position = asked.position.value_or(drop_point_),
                                          .rotation = asked.rotation,
                                          .scale = asked.scale,
                                          .opacity = asked.opacity,

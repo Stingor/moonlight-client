@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -140,6 +141,9 @@ struct EntityMenuGestures {
   // dont la partie ouvre le menu des actions rapides. `staff_models`, posé par
   // la partie : le compte a le droit, et une carte est chargée.
   std::optional<std::size_t> model_ask;
+  // Le même geste sur le sol, là où aucun modèle ne se trouve : le point visé,
+  // dans le repère du monde, où la partie propose de coller le modèle copié.
+  std::optional<std::array<float, 3>> ground_ask;
   bool staff_models = false;
   // Lus par le clic gauche : un PNJ bloqué ne répond plus. Nul hors partie.
   BlockedNpcs* blocked = nullptr;

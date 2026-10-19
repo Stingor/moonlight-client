@@ -29,6 +29,9 @@ constexpr std::size_t kLabelCapacity = 192;
 constexpr float kNewLightHeight = 15.0F;
 constexpr float kNewLightRange = 50.0F;
 constexpr std::array<float, 3> kNewLightColor{2.0F, 1.7F, 1.2F};
+// Une lumière neuve ne luit qu'à la nuit, du soir au matin.
+constexpr float kNewLightFromHour = 17.0F;
+constexpr float kNewLightToHour = 9.0F;
 // La plus petite portée qu'une lumière garde : le document refuse une portée
 // nulle, et la relecture rejetterait tout le document avec elle.
 constexpr float kSmallestLightRange = 0.5F;
@@ -232,7 +235,8 @@ MapEditorSession::Outcome MapEditorSession::AddLight(
           std::array<float, 3>{drop_point_[0], drop_point_[1] - kNewLightHeight, drop_point_[2]}),
       .color = kNewLightColor,
       .range = kNewLightRange,
-      .night_only = false,
+      .night_only = true,
+      .hours = ro::mapedit::LitHours{.from_hour = kNewLightFromHour, .to_hour = kNewLightToHour},
       .why = {}});
   store.Set(map_name_, WithReasons(after));
   ChooseLight(after.lights().size() - 1);

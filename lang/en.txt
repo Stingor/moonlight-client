@@ -19897,3 +19897,9 @@ tr: Paste the model
 
 fr: Pour le coller dans une autre carte : Ctrl+V dans l'éditeur, ou « Coller le modèle » dans sa bibliothèque.
 tr: To paste it into another map: Ctrl+V in the editor, or “Paste the model” in its library.
+
+fr: Cellule vide
+tr: Empty cell
+
+fr: Aucun modèle n'a été copié.
+tr: No model has been copied.

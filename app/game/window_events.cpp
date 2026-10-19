@@ -6,6 +6,7 @@
 #include "ro/core/i18n.h"
 #include "ro/net/action.h"
 #include "ro/render/actor_pick.h"
+#include "ro/render/ground_pick.h"
 #include "ro/render/model_pick.h"
 #include "ro/sim/world.h"
 
@@ -492,8 +493,7 @@ void OnRightRelease(const EventRouting& to, const SDL_MouseButtonEvent& button,
   if (to.entity_menu == nullptr || !to.link->is_open() || to.scene_actors == nullptr) {
     return;
   }
-  // CTRL+ALT+CLIC DROIT, pour le staff : le menu des actions rapides sur le
-  // modèle de la carte sous la souris, avant toute entité.
+  // CTRL+ALT+CLIC DROIT, pour le staff : le menu rapide du modèle, sinon du sol.
   const SDL_Keymod held = SDL_GetModState();
   if (to.entity_menu->staff_models && (held & SDL_KMOD_CTRL) != 0 && (held & SDL_KMOD_ALT) != 0) {
     const WindowPixels window = PointerSpaceOf(*to.gl);
@@ -502,6 +502,11 @@ void OnRightRelease(const EventRouting& to, const SDL_MouseButtonEvent& button,
           ro::render::MakeScreenRay(*to.camera, window.width / window.height, button.x, button.y,
                                     window.width, window.height);
       to.entity_menu->model_ask = ro::render::PickSceneModel(to.stage->scene, ray);
+      if (!to.entity_menu->model_ask.has_value()) {
+        to.entity_menu->ground_ask = ro::render::PickGround(
+            to.stage->scene.gnd, nullptr, *to.camera, window.width / window.height, button.x,
+            button.y, window.width, window.height);
+      }
     }
     return;
   }

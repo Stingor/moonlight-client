@@ -317,6 +317,8 @@ struct Revert {};
 // Ajouter à la carte un modèle de la bibliothèque, là où l'appelant le pose.
 struct AddModel {
   std::string file;
+  // Où il se pose, dans le repère du RSW ; sans elle, là où regarde la caméra.
+  std::optional<std::array<float, 3>> position;
   // Ce que porte un modèle collé ; sans eux, ceux d'un modèle neuf.
   std::array<float, 3> rotation{};
   std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
