@@ -125,15 +125,17 @@ SkyLight SkyLightAt(const SceneLight& map_light, float hour, const SkyCourse& co
   sky.shadow_strength = fade * (moon ? kMoonShadowStrength : 1.0F);
 
   // L'ÉCLAIRAGE RESTE CELUI DE MIDI, et l'heure le multiplie : ce que l'astre
-  // donnerait à un sol plat, sur ce que la carte lui donne à midi.
-  SceneLight body_light = map_light;
+  // donnerait à un sol plat, sur ce que la carte lui donne à midi. Les deux sous
+  // l'ambiante bornée : une ambiante pleine éclairerait seule le sol à minuit.
+  const SceneLight bound_light = SkyBoundLight(map_light);
+  SceneLight body_light = bound_light;
   body_light.direction = sky.body_direction;
   body_light.diffuse = map_light.diffuse * fade * (moon ? kMoonDiffuseShare : glm::vec3(1.0F));
   constexpr float kDarkestNoon = 1e-4F;
   sky.light = map_light;
   sky.light.daylight =
       glm::clamp(FlatGroundLightOf(body_light) /
-                     glm::max(FlatGroundLightOf(map_light), glm::vec3(kDarkestNoon)),
+                     glm::max(FlatGroundLightOf(bound_light), glm::vec3(kDarkestNoon)),
                  0.0F, 1.0F);
   return sky;
 }

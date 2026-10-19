@@ -45,4 +45,9 @@ SceneLight MakeSceneLight(const formats::RswLight& light) {
   return scene_light;
 }
 
+SceneLight SkyBoundLight(SceneLight light) {
+  light.ambient = glm::min(light.ambient, glm::vec3(kBrightestSkyAmbient));
+  return light;
+}
+
 }  // namespace ro::render

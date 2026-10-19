@@ -49,6 +49,8 @@ uniform vec2 u_texture_scale;
 uniform float u_texture_angle;
 uniform vec3 u_light_direction;
 uniform vec3 u_light_ambient;
+// L'ambiante que lit l'éclairement à l'ombre : voir `kBrightestSkyAmbient`.
+uniform vec3 u_shaded_ambient;
 uniform vec3 u_light_diffuse;
 // La nuit de la carte, en facteur : voir `SceneLight::tint`.
 uniform vec3 u_light_tint;
@@ -104,8 +106,11 @@ void main() {
     // ⚠ LA NUIT S'APPLIQUE MÊME ÉCLAIRAGE COUPÉ : elle teinte la couleur du
     // sommet, quelle qu'en soit l'origine.
     v_light = clamp(max(applied, vec3(1.0 - u_light_strength)), 0.0, 1.0) * u_light_tint * u_daylight;
-    v_shaded_light = clamp(max(min(ambient, ceiling), vec3(1.0 - u_light_strength)), 0.0, 1.0) *
-                     u_light_tint * u_daylight;
+    vec3 shaded_factor = (1.0 - u_shaded_ambient) * u_shaded_ambient;
+    vec3 shaded_ambient = u_shaded_ambient - shaded_factor + shaded_factor * u_light_diffuse;
+    v_shaded_light =
+        clamp(max(min(shaded_ambient, ceiling), vec3(1.0 - u_light_strength)), 0.0, 1.0) *
+        u_light_tint * u_daylight;
 }
 )GLSL";
 
@@ -561,6 +566,7 @@ void ModelRenderer::Use(const glm::mat4& view_projection, const SceneLight& ligh
   program_.SetInt("u_texture", 0);
   program_.SetVector3("u_light_direction", light.direction);
   program_.SetVector3("u_light_ambient", light.ambient);
+  program_.SetVector3("u_shaded_ambient", SkyBoundLight(light).ambient);
   program_.SetVector3("u_light_diffuse", light.diffuse);
   program_.SetVector3("u_light_tint", light.tint);
   program_.SetVector3("u_daylight", light.daylight);

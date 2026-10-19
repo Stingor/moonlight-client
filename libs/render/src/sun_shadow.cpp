@@ -38,11 +38,18 @@ struct FlatGround {
   glm::vec3 shaded;
 };
 
+// L'ambiante mêlée à la diffuse, par la formule du sol.
+[[nodiscard]] glm::vec3 MixedAmbientOf(const glm::vec3& ambient, const glm::vec3& diffuse) {
+  const glm::vec3 ambient_factor = (glm::vec3(1.0F) - ambient) * ambient;
+  return ambient - ambient_factor + ambient_factor * diffuse;
+}
+
+// ⚠ L'ÉCLAIREMENT À L'OMBRE LIT L'AMBIANTE BORNÉE : voir `kBrightestSkyAmbient`.
 [[nodiscard]] FlatGround FlatGroundOf(const SceneLight& light) {
   const glm::vec3 one(1.0F);
   const float incidence = std::clamp(glm::normalize(light.direction).y, 0.0F, 1.0F);
-  const glm::vec3 ambient_factor = (one - light.ambient) * light.ambient;
-  const glm::vec3 ambient = light.ambient - ambient_factor + ambient_factor * light.diffuse;
+  const glm::vec3 ambient = MixedAmbientOf(light.ambient, light.diffuse);
+  const glm::vec3 shaded_ambient = MixedAmbientOf(SkyBoundLight(light).ambient, light.diffuse);
   const glm::vec3 diffuse_factor = (one - light.diffuse) * light.diffuse;
   const glm::vec3 diffuse = light.diffuse - diffuse_factor + diffuse_factor * light.ambient;
   const glm::vec3 brightest = glm::max(light.diffuse, light.ambient);
@@ -51,7 +58,7 @@ struct FlatGround {
   return FlatGround{
       .lit =
           glm::clamp(glm::min(glm::min(incidence * diffuse + ambient, one), ceiling), 0.0F, 1.0F),
-      .shaded = glm::clamp(glm::min(ambient, ceiling), 0.0F, 1.0F)};
+      .shaded = glm::clamp(glm::min(shaded_ambient, ceiling), 0.0F, 1.0F)};
 }
 
 }  // namespace

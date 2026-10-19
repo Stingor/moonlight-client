@@ -32,6 +32,8 @@ layout(location = 5) in vec3 a_shape_normal;
 uniform mat4 u_view_projection;
 uniform vec3 u_light_direction;
 uniform vec3 u_light_ambient;
+// L'ambiante que lit l'éclairement à l'ombre : voir `kBrightestSkyAmbient`.
+uniform vec3 u_shaded_ambient;
 uniform vec3 u_light_diffuse;
 
 out vec2 v_texture_uv;
@@ -81,7 +83,9 @@ void main() {
                            min(u_light_diffuse, u_light_ambient),
                        1.0);
     v_light = clamp(min(lit, ceiling), 0.0, 1.0);
-    v_shaded_light = clamp(min(ambient, ceiling), 0.0, 1.0);
+    vec3 shaded_factor = (1.0 - u_shaded_ambient) * u_shaded_ambient;
+    vec3 shaded_ambient = u_shaded_ambient - shaded_factor + shaded_factor * u_light_diffuse;
+    v_shaded_light = clamp(min(shaded_ambient, ceiling), 0.0, 1.0);
 }
 )GLSL";
 
@@ -368,6 +372,7 @@ void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const Scene
   program_.SetVector3("u_flat_color", glm::vec3(flat[0], flat[1], flat[2]));
   program_.SetVector3("u_light_direction", light.direction);
   program_.SetVector3("u_light_ambient", light.ambient);
+  program_.SetVector3("u_shaded_ambient", SkyBoundLight(light).ambient);
   program_.SetVector3("u_light_diffuse", light.diffuse);
   program_.SetVector3("u_light_tint", light.tint);
   program_.SetVector3("u_daylight", light.daylight);

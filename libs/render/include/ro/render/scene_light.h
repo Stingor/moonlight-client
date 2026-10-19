@@ -21,6 +21,16 @@ struct SceneLight {
   glm::vec3 daylight{1.0F, 1.0F, 1.0F};
 };
 
+// L'AMBIANTE LA PLUS CLAIRE QUE RECONNAISSENT L'HEURE ET L'OMBRE DU SOLEIL : celle
+// des cartes en plein air les plus claires. Au-delà, l'ambiante sature seule le
+// sol, et ni la nuit ni l'ombre n'y retirent plus rien. Le rendu au soleil garde
+// l'ambiante déclarée ; seuls l'éclairement à l'ombre et la part de lumière que
+// laisse l'heure lisent l'ambiante bornée.
+inline constexpr float kBrightestSkyAmbient = 0.8F;
+
+// `light`, son ambiante bornée à `kBrightestSkyAmbient`, canal par canal.
+[[nodiscard]] SceneLight SkyBoundLight(SceneLight light);
+
 // LA LUMIÈRE DES MODÈLES D'UNITÉ AU SOL — un piège, un leurre : FIXE, la même
 // sur toute carte, et non celle du RSW. Diffuse pleine, ambiante moitié, et une
 // direction que le client ne normalise pas — (0,5 ; 0,7 ; 0,5) dans son repère,
