@@ -84,7 +84,7 @@ RswModel ReadModel(ByteReader& reader, std::int32_t version, std::int32_t build_
     // client la ramène à 1 en chargeant le modèle. Zéro en fait partie — il
     // ne fige pas l'objet —, et cent est gardé. Une valeur non numérique, qu'on
     // ne trouve dans aucune carte, retombe aussi à 1 là où le natif la garderait.
-    if (!(model.animation_speed > 0.0F) || model.animation_speed > 100.0F) {
+    if (!(model.animation_speed > 0.0F) || model.animation_speed > kRswMaxAnimationSpeed) {
       model.animation_speed = 1.0F;
     }
     model.block_type = reader.I32();

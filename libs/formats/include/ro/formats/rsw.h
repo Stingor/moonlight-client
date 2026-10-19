@@ -88,10 +88,18 @@ struct RswGround {
   std::int32_t right = 500;
 };
 
+// Comment un modèle posé joue les images clés de son .rsm : une fois, ou en
+// boucle. Toute autre valeur le fige.
+inline constexpr std::int32_t kRswModelStill = 0;
+inline constexpr std::int32_t kRswModelPlayOnce = 1;
+inline constexpr std::int32_t kRswModelPlayLooped = 2;
+// La plus grande vitesse de jeu qu'un .rsw garde ; au-delà, elle retombe à 1.
+inline constexpr float kRswMaxAnimationSpeed = 100.0F;
+
 // Un modèle 3D posé sur la carte : quel .rsm, et où.
 struct RswModel {
   std::string name;
-  std::int32_t animation_type = 0;
+  std::int32_t animation_type = kRswModelStill;
   float animation_speed = 1.0F;
   std::int32_t block_type = 0;
   // Chemin du .rsm, relatif à data\model\. Octets CP949 bruts, comme tous les

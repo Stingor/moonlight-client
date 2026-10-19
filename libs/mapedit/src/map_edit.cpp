@@ -272,6 +272,8 @@ MapEditReport ApplyMapEdit(const MapEdit& edit, formats::RswScene& rsw,
     model.position = added.position;
     model.rotation = added.rotation;
     model.scale = added.scale;
+    model.animation_type = added.animation_type;
+    model.animation_speed = added.animation_speed;
     const std::size_t rank = rsw.AddModel(std::move(model));
     if (added.hidden) {
       report.hidden.push_back(rank);

@@ -66,7 +66,9 @@ bool TakeMapEditorKey(MapEditorSession& editor, const SDL_KeyboardEvent& key, bo
       editor.Queue(ro::ui::map_editor::AddModel{.file = model->model_file,
                                                 .rotation = model->rotation,
                                                 .scale = model->scale,
-                                                .opacity = model->opacity});
+                                                .opacity = model->opacity,
+                                                .animation_type = model->animation_type,
+                                                .animation_speed = model->animation_speed});
       return true;
     }
   }

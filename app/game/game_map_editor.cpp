@@ -505,7 +505,9 @@ void Game::PlayMapModelVerb(int verb) {
       const ro::mapedit::MapEdit& document = map_edits_.Document(stage_->name);
       ro::ui::ClipboardModel copied{.model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
                                     .rotation = placed.rotation,
-                                    .scale = placed.scale};
+                                    .scale = placed.scale,
+                                    .animation_type = placed.animation_type,
+                                    .animation_speed = placed.animation_speed};
       const std::size_t originals = stage_->scene.unfixed_models.size();
       if (*model >= originals && *model - originals < document.added().size()) {
         copied.opacity = document.added()[*model - originals].opacity;

@@ -127,7 +127,9 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
                                          .position = placed.position,
                                          .rotation = placed.rotation,
                                          .scale = placed.scale,
-                                         .opacity = opacity});
+                                         .opacity = opacity,
+                                         .animation_type = placed.animation_type,
+                                         .animation_speed = placed.animation_speed});
   store.Set(map_name_, WithReasons(after));
   std::array<char, kDuplicateLabelCapacity> label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Dupliquer le modèle %zu"), rank);

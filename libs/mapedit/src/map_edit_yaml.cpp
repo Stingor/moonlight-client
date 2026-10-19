@@ -74,6 +74,45 @@ core::Result<std::optional<float>> OpacityFrom(const YAML::Node& entry, std::str
   return std::optional<float>(opacity);
 }
 
+// Les mots du document pour les façons de jouer d'un .rsw.
+constexpr std::string_view kPlayStill = "still";
+constexpr std::string_view kPlayOnce = "once";
+constexpr std::string_view kPlayLooped = "loop";
+
+// Le mot d'une façon de jouer ; toute valeur que le .rsw ne joue pas fige.
+std::string_view PlayWord(std::int32_t animation_type) {
+  if (animation_type == formats::kRswModelPlayLooped) {
+    return kPlayLooped;
+  }
+  return animation_type == formats::kRswModelPlayOnce ? kPlayOnce : kPlayStill;
+}
+
+// La façon de jouer et la vitesse d'un ajout, sous « animation » et
+// « animation_speed » ; une clé absente garde le défaut d'`AddedModel`.
+core::Result<void> PlaybackFrom(const YAML::Node& entry, std::string_view map_name,
+                                const std::string& where, AddedModel& added) {
+  if (const YAML::Node play = entry["animation"]) {
+    const std::string word = play.as<std::string>();
+    if (word == kPlayStill) {
+      added.animation_type = formats::kRswModelStill;
+    } else if (word == kPlayOnce) {
+      added.animation_type = formats::kRswModelPlayOnce;
+    } else if (word == kPlayLooped) {
+      added.animation_type = formats::kRswModelPlayLooped;
+    } else {
+      return std::unexpected(
+          Refused(map_name, where + " : « animation » n'est ni still, ni once, ni loop"));
+    }
+  }
+  if (const YAML::Node speed = entry["animation_speed"]) {
+    added.animation_speed = speed.as<float>();
+    if (!(added.animation_speed > 0.0F) || added.animation_speed > formats::kRswMaxAnimationSpeed) {
+      return std::unexpected(Refused(map_name, where + " : « animation_speed » sort de ]0, 100]"));
+    }
+  }
+  return {};
+}
+
 core::Result<ModelEdit> ModelEditFrom(const YAML::Node& entry, std::string_view map_name,
                                       const std::string& where) {
   if (!entry.IsMap()) {
@@ -164,6 +203,9 @@ core::Result<AddedModel> AddedModelFrom(const YAML::Node& entry, std::string_vie
     return std::unexpected(opacity.error());
   }
   added.opacity = *opacity;
+  if (core::Result<void> played = PlaybackFrom(entry, map_name, where, added); !played) {
+    return std::unexpected(played.error());
+  }
   return added;
 }
 
@@ -642,6 +684,12 @@ std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
     }
     if (added.opacity.has_value()) {
       text += std::format("    opacity: {}\n", *added.opacity);
+    }
+    if (PlayWord(added.animation_type) != kPlayLooped) {
+      text += std::format("    animation: {}\n", PlayWord(added.animation_type));
+    }
+    if (added.animation_speed != AddedModel{}.animation_speed) {
+      text += std::format("    animation_speed: {}\n", added.animation_speed);
     }
     text += std::format("    why: {}\n", DoubleQuoted(added.why));
   }

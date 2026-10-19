@@ -383,7 +383,9 @@ void DrawLibrary(const MapEditorView& view, MapEditorPanelState& panel,
     intents.emplace_back(map_editor::AddModel{.file = pasted->model_file,
                                               .rotation = pasted->rotation,
                                               .scale = pasted->scale,
-                                              .opacity = pasted->opacity});
+                                              .opacity = pasted->opacity,
+                                              .animation_type = pasted->animation_type,
+                                              .animation_speed = pasted->animation_speed});
   }
   ImGui::EndDisabled();
   ImGui::SameLine();
@@ -526,7 +528,11 @@ void DrawWhy(const MapEditorView& view, MapEditorPanelState& panel,
     std::copy_n(view.why.begin(), kept, panel.why.begin());
     panel.why_of = view.selected;
   }
-  static_cast<void>(ImGui::InputText(core::Tr("Pourquoi"), panel.why.data(), panel.why.size()));
+  {
+    // La raison cite souvent un fichier au nom coréen.
+    const NamesFont names(panel.names_font);
+    static_cast<void>(ImGui::InputText(core::Tr("Pourquoi"), panel.why.data(), panel.why.size()));
+  }
   panel.why_typing = ImGui::IsItemActive();
   if (ImGui::IsItemDeactivatedAfterEdit()) {
     intents.emplace_back(map_editor::SetWhy{
@@ -557,7 +563,9 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
                                           .scale = view.scale,
                                           .opacity = view.opacity < 1.0F
                                                          ? std::optional<float>(view.opacity)
-                                                         : std::nullopt})
+                                                         : std::nullopt,
+                                          .animation_type = view.animation_type,
+                                          .animation_speed = view.animation_speed})
             .c_str());
   }
   const std::array<float, 3> origin = CellsOfNative(view.origin, view.map_cubes);

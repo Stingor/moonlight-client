@@ -86,6 +86,10 @@ struct AddedModel {
   bool hidden = false;
   // Translucide, de 0 à 1 ; rien : plein.
   std::optional<float> opacity;
+  // Comment il joue les images clés de son fichier, comme le demande un .rsw :
+  // en boucle sauf avis contraire. Un fichier sans images clés ne bouge pas.
+  std::int32_t animation_type = formats::kRswModelPlayLooped;
+  float animation_speed = 1.0F;
   // Pourquoi : le document refuse un ajout qui ne le dit pas.
   std::string why;
 

@@ -505,7 +505,9 @@ MapEditorSession::Outcome MapEditorSession::AddModel(const ro::ui::map_editor::A
                                          .position = drop_point_,
                                          .rotation = asked.rotation,
                                          .scale = asked.scale,
-                                         .opacity = asked.opacity});
+                                         .opacity = asked.opacity,
+                                         .animation_type = asked.animation_type,
+                                         .animation_speed = asked.animation_speed});
   store.Set(map_name_, WithReasons(after));
   Record(ro::core::Tr("Ajouter un modèle"), before, after);
   // LE NOUVEAU EST DÉSIGNÉ : c'est lui qu'on va placer.
@@ -711,6 +713,8 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
     view.scale = added.scale;
     view.hidden = added.hidden;
     view.opacity = added.opacity.value_or(ro::mapedit::kFullOpacity);
+    view.animation_type = added.animation_type;
+    view.animation_speed = added.animation_speed;
     view.why = added.why;
     return view;
   }
@@ -730,6 +734,8 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   view.hidden = edit != nullptr && edit->hidden;
   view.opacity = edit != nullptr ? edit->opacity.value_or(ro::mapedit::kFullOpacity)
                                  : ro::mapedit::kFullOpacity;
+  view.animation_type = original->animation_type;
+  view.animation_speed = original->animation_speed;
   if (tool_ == ro::ui::MapEditorTool::kVertices) {
     if (mesh != nullptr) {
       view.why = mesh->why;

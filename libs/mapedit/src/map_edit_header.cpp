@@ -34,8 +34,12 @@ const std::string_view kMapEditHeader =
 #               fichier — position est obligatoire ;
 #    hidden   : vrai pour ne pas le dessiner ;
 #    opacity  : facultatif, de 0 (invisible) à 1 (plein) — absent, plein ;
+#    animation : facultatif, comment il joue les images clés de son fichier —
+#               loop en boucle, once une fois, still figé ; absent, loop ;
+#    animation_speed : facultatif, sa vitesse de jeu, de 0 exclu à 100 —
+#               absent, 1 ;
 #    why      : pourquoi, obligatoire.
-#  lights : les lumières ponctuelles ajoutées, chacune :
+#  lights :les lumières ponctuelles ajoutées, chacune :
 #    position : [x, y, z], dans le repère du RSW ;
 #    color    : [r, g, b], 1 pour la pleine intensité — au-delà, plus fort ;
 #    range    : le rayon où elle s'éteint, en unités du RSW ;

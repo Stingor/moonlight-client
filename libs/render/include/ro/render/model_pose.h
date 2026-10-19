@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/formats/rsm.h"
+#include "ro/formats/rsw.h"
 
 namespace ro::render {
 
@@ -92,9 +93,13 @@ struct FirstFamilyNode {
 // 16 ms. Un objet RSM1 avance d'un cran par pas.
 inline constexpr std::uint32_t kModelStepMs = 16;
 
-// Les deux façons de jouer que le natif connaît ; toute autre valeur fige.
-inline constexpr std::int32_t kModelPlayOnce = 1;
-inline constexpr std::int32_t kModelPlayLooped = 2;
+// Les deux façons de jouer que le natif connaît ; toute autre valeur fige,
+// comme `kModelStill`.
+inline constexpr std::int32_t kModelStill = formats::kRswModelStill;
+inline constexpr std::int32_t kModelPlayOnce = formats::kRswModelPlayOnce;
+inline constexpr std::int32_t kModelPlayLooped = formats::kRswModelPlayLooped;
+// La plus grande vitesse de jeu qu'un .rsw garde.
+inline constexpr float kModelMaxAnimationSpeed = formats::kRswMaxAnimationSpeed;
 
 // L'image d'après, un pas logique plus tard.
 //

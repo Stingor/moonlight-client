@@ -11,6 +11,7 @@
 
 #include <glm/glm.hpp>
 
+#include "ro/render/model_pose.h"
 #include "ro/ui/map_cells.h"
 #include "ro/ui/map_editor_hours.h"
 #include "ro/ui/map_editor_library.h"
@@ -240,6 +241,9 @@ struct MapEditorView {
   bool hidden = false;
   // De 0 (invisible) à 1 (plein).
   float opacity = 1.0F;
+  // Comment il joue, comme le .rsw l'écrit : ce que « Copier ce modèle » emporte.
+  std::int32_t animation_type = render::kModelPlayLooped;
+  float animation_speed = 1.0F;
   std::string why;
   // Les rangs que le document retouche sur cette carte.
   std::vector<std::size_t> edited;
@@ -317,6 +321,8 @@ struct AddModel {
   std::array<float, 3> rotation{};
   std::array<float, 3> scale{1.0F, 1.0F, 1.0F};
   std::optional<float> opacity;
+  std::int32_t animation_type = render::kModelPlayLooped;
+  float animation_speed = 1.0F;
 };
 // Déplacer le sommet `vertex` du nœud `node`, dans le repère du RSW — comme
 // une pose. `released`, comme pour `Place`.
