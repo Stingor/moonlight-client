@@ -157,6 +157,9 @@ struct TargetHudAnswer {
 // Les chiffres de PV se taisent devant un joueur qui n'est pas un allié, dès
 // qu'ils sont connus.
 [[nodiscard]] bool GaugeNumbersAllowed(const TargetView& target, bool is_magic, bool known);
+// La même règle pour qui ne tient pas de `TargetView` : la barre au-dessus
+// d'une entité.
+[[nodiscard]] bool GaugeNumbersAllowed(bool is_player, bool ally, bool is_magic, bool known);
 
 // Le mode que la jauge écrit vraiment. Des PV reçus en pourcentage ne
 // s'écrivent jamais « 37 / 100 » : tout mode chiffré devient « 37 % », et

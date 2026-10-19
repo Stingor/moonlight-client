@@ -4863,6 +4863,9 @@ tr: El servidor no respondió al envío.
 fr: Le serveur n'a pas répondu à la récupération.
 tr: El servidor no respondió a la recuperación.
 
+fr: Le serveur n'a pas répondu.
+tr: El servidor no respondió.
+
 fr: Le serveur n'accepte le renommage qu'UNE fois.
 tr: El servidor solo acepta cambiar el nombre UNA vez.
 

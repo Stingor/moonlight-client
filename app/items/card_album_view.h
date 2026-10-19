@@ -99,7 +99,9 @@ class CardAlbumView {
   // Le saut qu'une réponse attendait, s'il y en a un.
   void ServePendingShow(std::uint32_t now_ms);
   void Send(ro::net::CardAlbumCommand command, std::uint32_t arg, std::uint16_t amount,
-            std::uint32_t card_id, ro::net::Connection& link);
+            std::uint32_t card_id, ro::net::Connection& link, std::uint32_t now_ms);
+  // Abandonne la commande en vol dont la réponse n'est pas venue à temps.
+  void LosePatienceAt(std::uint32_t now_ms);
   void Report(std::string text, ro::ui::CardAlbumTone tone, std::uint32_t now_ms);
   void ReportAnswer(std::uint32_t now_ms);
   void RebuildPockets(const CardAlbumPieces& pieces);
@@ -115,7 +117,11 @@ class CardAlbumView {
   std::uint16_t last_amount_ = 0;
   // Une commande est partie et attend sa réponse. Un état reçu SANS commande en
   // vol vient d'ailleurs (`@storealbum`) et se formule d'après ce qui a changé.
+  //
+  // ⚠ ELLE N'ATTEND PAS INDÉFINIMENT : le serveur peut se taire, et un état reçu
+  // bien plus tard serait lu à tort comme sa réponse. Voir `LosePatienceAt`.
   bool in_flight_ = false;
+  std::uint32_t sent_ms_ = 0;
   // Une demande d'état est partie, et rien n'est revenu : « Chargement… ».
   bool loading_ = false;
   int unsolicited_unlocked_ = 0;

@@ -236,7 +236,11 @@ float GaugeFill(bool known, std::uint32_t current, std::uint32_t most, bool is_m
 }
 
 bool GaugeNumbersAllowed(const TargetView& target, bool is_magic, bool known) {
-  return !(!is_magic && target.is_player && known && !target.ally);
+  return GaugeNumbersAllowed(target.is_player, target.ally, is_magic, known);
+}
+
+bool GaugeNumbersAllowed(bool is_player, bool ally, bool is_magic, bool known) {
+  return !(!is_magic && is_player && known && !ally);
 }
 
 GaugeText GaugeTextFor(const TargetView& target, bool is_magic, GaugeText chosen) {

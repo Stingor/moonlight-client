@@ -150,6 +150,11 @@ std::vector<ro::ui::EntityBarView> EntityBarsOnScreen(
     what.dead = actor->posture == ro::sim::Posture::kDead;
     what.hovered = hovered_id != 0 && actor->id == hovered_id;
     what.targeted = world.selected_id() != 0 && actor->id == world.selected_id();
+    // Moi et mon groupe sont des alliés d'office ; un autre joueur ne l'est que
+    // si le serveur a livré son SP, comme pour la fenêtre de cible.
+    what.is_player = actor->kind == ro::sim::ActorKind::kPlayer;
+    what.ally =
+        what.kind == ro::ui::EntityBarKind::kOwn || what.kind == ro::ui::EntityBarKind::kParty;
 
     what.health = Told(actor->health, actor->max_health);
     // 🔴 LE DOSSIER DE CIBLE PASSE DEVANT, quand il en dit plus. Il est la seule
@@ -164,6 +169,7 @@ std::vector<ro::ui::EntityBarView> EntityBarsOnScreen(
         what.health = from_record;
       }
       what.magic = ToldOptional(told.magic, told.max_magic);
+      what.ally = what.ally || what.magic.known;
     }
     if (what.kind == ro::ui::EntityBarKind::kOwn) {
       // MA MAGIE VIENT DE MON ÉTAT, et de nulle part ailleurs : c'est la même

@@ -303,6 +303,10 @@ struct EntityBarView {
   bool hovered = false;
   bool targeted = false;
   bool dead = false;
+  // Un joueur, et s'il est des nôtres : un adversaire garde sa jauge, mais ses
+  // chiffres se taisent — voir `EntityBarHealthCaption`.
+  bool is_player = false;
+  bool ally = false;
 
   // COMBIEN LE MONDE PARAÎT PLUS GRAND QU'AU RECUL DE RÉFÉRENCE. Voir
   // `ro::render::ApparentScale` : c'est `app` qui le calcule, une fois par
@@ -419,6 +423,11 @@ inline constexpr float kNameBarGapPixels = 2.0F;
 // quand la valeur est inconnue — un « 0 % » inventé serait pire que rien. Une
 // jauge `in_percent` s'écrit en pour cent dans tout mode chiffré.
 [[nodiscard]] std::string EntityBarCaption(const EntityGauge& gauge, EntityBarText mode);
+
+// LE TEXTE DE LA BARRE DE VIE de cette entité. ⚠ LA RÈGLE EST CELLE DE LA
+// FENÊTRE DE CIBLE, `GaugeNumbersAllowed` : devant un joueur qui n'est pas un
+// allié, la jauge reste et les chiffres se taisent.
+[[nodiscard]] std::string EntityBarHealthCaption(const EntityBarView& what, EntityBarText mode);
 
 // LA HAUTEUR TOTALE que cette entité occupera, cadre compris : de quoi savoir
 // où poser ce qui vient au-dessus — une bulle de parole, un nom.

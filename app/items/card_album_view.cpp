@@ -26,6 +26,11 @@ using ro::ui::CardAlbumTone;
 // affichés.
 constexpr std::uint32_t kNoticeMs = 6000;
 
+// COMBIEN DE TEMPS UNE COMMANDE ATTEND SA RÉPONSE. Le serveur ne répond plus du
+// tout au-delà de sa cadence : passé ce délai, la commande est abandonnée, et ce
+// qui arrive ensuite n'est plus qu'un état reçu.
+constexpr std::uint32_t kAnswerPatienceMs = 3000;
+
 // LES DEUX ALBUMS D'OBJETS qui rendent des cartes, dans l'ordre des macarons.
 // Le nom de repli sert tant que la table des objets ne connaît pas l'objet : un
 // macaron sans nom ne dirait rien.
@@ -151,12 +156,13 @@ constexpr std::array<AlbumSource, ro::ui::kCardAlbumSourceCount> kAlbumSources =
 CardAlbumView::CardAlbumView(const std::filesystem::path& client_root) : delta_(client_root) {}
 
 void CardAlbumView::Send(CardAlbumCommand command, std::uint32_t arg, std::uint16_t amount,
-                         std::uint32_t card_id, ro::net::Connection& link) {
+                         std::uint32_t card_id, ro::net::Connection& link, std::uint32_t now_ms) {
   // Retenu AVANT l'envoi : la réponse ne redit pas ce qu'on a demandé.
   last_command_ = command;
   last_card_ = card_id;
   last_amount_ = amount;
   in_flight_ = true;
+  sent_ms_ = now_ms;
   if (command == CardAlbumCommand::kRefresh) {
     loading_ = true;
   }
@@ -165,6 +171,24 @@ void CardAlbumView::Send(CardAlbumCommand command, std::uint32_t arg, std::uint1
     in_flight_ = false;
     loading_ = false;
   }
+}
+
+void CardAlbumView::LosePatienceAt(std::uint32_t now_ms) {
+  if (!in_flight_ || now_ms - sent_ms_ < kAnswerPatienceMs) {
+    return;
+  }
+  // 🔴 TOUT CE QUI ATTENDAIT LA RÉPONSE TOMBE AVEC ELLE : un saut de page venu
+  // plus tard surprendrait le joueur, et un dépôt enchaîné ne part que sur une
+  // ouverture confirmée.
+  in_flight_ = false;
+  loading_ = false;
+  pending_show_ = 0;
+  chain_card_ = 0;
+  chain_slot_ = 0;
+  chain_amount_ = 0;
+  chained_deposit_ = false;
+  last_command_ = CardAlbumCommand::kRefresh;
+  Report(Tr("Le serveur n'a pas répondu."), CardAlbumTone::kWarning, now_ms);
 }
 
 void CardAlbumView::Report(std::string text, CardAlbumTone tone, std::uint32_t now_ms) {
@@ -185,6 +209,8 @@ std::string CardAlbumView::ShortName(std::uint32_t card_id) const {
 
 ro::net::FrameOutcome CardAlbumView::ApplyFrame(const ro::net::Frame& frame,
                                                 ro::net::Connection& link, std::uint32_t now_ms) {
+  // Une réponse arrivée après l'abandon n'est plus celle de la commande.
+  LosePatienceAt(now_ms);
   const int unlocked_before = album_.unlocked_count();
   const std::int64_t reserve_before = album_.total_reserve();
   const ro::net::FrameOutcome outcome = ro::net::ApplyCardAlbumFrame(frame, album_);
@@ -232,7 +258,7 @@ ro::net::FrameOutcome CardAlbumView::ApplyFrame(const ro::net::Frame& frame,
     chain_amount_ = 0;
     if (opened && rest > 0) {
       chained_deposit_ = true;
-      Send(CardAlbumCommand::kPut, slot, static_cast<std::uint16_t>(rest), card, link);
+      Send(CardAlbumCommand::kPut, slot, static_cast<std::uint16_t>(rest), card, link, now_ms);
       return outcome;  // le compte rendu viendra avec le dépôt
     }
   }
@@ -378,7 +404,6 @@ void CardAlbumView::ReportAnswer(std::uint32_t now_ms) {
 
 void CardAlbumView::Toggle(ro::ui::CardAlbumWindowState& state, ro::net::Connection& link,
                            std::uint32_t now_ms) {
-  (void)now_ms;
   if (state.open) {
     // ⚠ LA FENÊTRE RENDRA LE VERROU ELLE-MÊME à l'image suivante : c'est elle
     // qui voit qu'elle vient de se fermer, quelle que soit la main qui l'a
@@ -390,7 +415,7 @@ void CardAlbumView::Toggle(ro::ui::CardAlbumWindowState& state, ro::net::Connect
   state.raise = true;
   // On ne montre rien tant que le serveur n'a pas répondu : l'album est son
   // état, pas le nôtre.
-  Send(CardAlbumCommand::kRefresh, 0, 0, 0, link);
+  Send(CardAlbumCommand::kRefresh, 0, 0, 0, link, now_ms);
 }
 
 void CardAlbumView::Apply(const ro::ui::CardAlbumWindowAction& asked, ro::net::Connection& link,
@@ -405,11 +430,12 @@ void CardAlbumView::Apply(const ro::ui::CardAlbumWindowAction& asked, ro::net::C
   if (highlight_card_ != 0 && now_ms - highlight_ms_ >= kNoticeMs) {
     highlight_card_ = 0;
   }
+  LosePatienceAt(now_ms);
   switch (asked.verb) {
     case CardAlbumVerb::kNothing:
       break;
     case CardAlbumVerb::kRefresh:
-      Send(CardAlbumCommand::kRefresh, 0, 0, 0, link);
+      Send(CardAlbumCommand::kRefresh, 0, 0, 0, link, now_ms);
       break;
     case CardAlbumVerb::kClose:
       // Rendre le verrou : sans réponse, et rien à retenir.
@@ -426,15 +452,15 @@ void CardAlbumView::Apply(const ro::ui::CardAlbumWindowAction& asked, ro::net::C
       chain_slot_ = asked.slot;
       chain_card_ = asked.card_id;
       chain_amount_ = std::max(0, asked.rest);
-      Send(CardAlbumCommand::kUnlock, asked.slot, 1, asked.card_id, link);
+      Send(CardAlbumCommand::kUnlock, asked.slot, 1, asked.card_id, link, now_ms);
       break;
     case CardAlbumVerb::kDeposit:
       Send(CardAlbumCommand::kPut, asked.slot, static_cast<std::uint16_t>(asked.amount),
-           asked.card_id, link);
+           asked.card_id, link, now_ms);
       break;
     case CardAlbumVerb::kWithdraw:
       Send(CardAlbumCommand::kGet, asked.card_id, static_cast<std::uint16_t>(asked.amount),
-           asked.card_id, link);
+           asked.card_id, link, now_ms);
       break;
   }
   if (asked.refused_not_a_card) {

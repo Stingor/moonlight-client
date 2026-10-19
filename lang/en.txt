@@ -4863,6 +4863,9 @@ tr: The server did not answer the send.
 fr: Le serveur n'a pas répondu à la récupération.
 tr: The server did not answer the claim.
 
+fr: Le serveur n'a pas répondu.
+tr: The server did not answer.
+
 fr: Le serveur n'accepte le renommage qu'UNE fois.
 tr: The server accepts renaming only ONCE.
 

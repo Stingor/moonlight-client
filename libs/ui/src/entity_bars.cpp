@@ -12,6 +12,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/gauge_fill.h"
+#include "ro/ui/target_hud.h"
 
 #include "ui_values.h"
 
@@ -117,7 +118,7 @@ void PaintEntityBars(ImDrawList& into, const EntityBarView& what, const EntityBa
     const ImVec2 bottom_right(right, top + health_height);
     const float fill = EntityGaugeFill(what.health);
     PaintEntityBar(into, top_left, bottom_right, fill, EntityBarFillColor(look, fill), look);
-    const std::string caption = EntityBarCaption(what.health, look.text);
+    const std::string caption = EntityBarHealthCaption(what, look.text);
     if (!caption.empty()) {
       PaintCaption(into, top_left, bottom_right, caption.c_str(), EntityBarFontPixels(look),
                    Faded(look.text_color, std::clamp(look.opacity, 0.0F, 1.0F)));
@@ -297,6 +298,13 @@ std::string EntityBarCaption(const EntityGauge& gauge, EntityBarText mode) {
       return {};
   }
   return std::string(line.data());
+}
+
+std::string EntityBarHealthCaption(const EntityBarView& what, EntityBarText mode) {
+  if (!GaugeNumbersAllowed(what.is_player, what.ally, /*is_magic=*/false, what.health.known)) {
+    return {};
+  }
+  return EntityBarCaption(what.health, mode);
 }
 
 ImVec2 EntityBarTextOrigin(ImFont& font, float pixels, ImVec2 top_left, ImVec2 bottom_right,
