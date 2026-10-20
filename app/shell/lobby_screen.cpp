@@ -34,6 +34,7 @@
 #include "loading/loading_presenter.h"
 #include "options/game_options.h"
 #include "options/option_targets.h"
+#include "world/map_edit_store.h"
 #include "world/overlay_view.h"
 #include "world/server_sky_hour.h"
 
@@ -193,9 +194,17 @@ void LobbyScreen::MountNow(const PendingMount& mount) {
   // sans seuil ni fondu. Le sol arrondi se bâtit dans le montage.
   const bool rounded = shell_.settings().options().graphics().rounded_ground();
   LoadingPresenter loading(shell_, MapPlan(rounded), "décor", /*already_shown=*/true);
-  if (auto opened =
-          backdrop_.Open(shell_.vfs(), mount.map_name,
-                         MapStageRead{.rounded_ground = rounded, .progress = loading.progress()});
+  // LES DOCUMENTS D'ÉDITION QUE CE POSTE TIENT, relus à chaque montage : la
+  // partie a pu en adopter une révision depuis le précédent.
+  MapEditStore edits;
+  edits.Open(shell_.client_root());
+  if (auto opened = backdrop_.Open(
+          shell_.vfs(), mount.map_name,
+          MapStageRead{
+              .edits = &edits,
+              .real_time_shadows = shell_.settings().options().graphics().real_time_shadows(),
+              .rounded_ground = rounded,
+              .progress = loading.progress()});
       !opened) {
     // ⚠ MUET POUR LE JOUEUR, comme tout ce qui touche au décor : le repli local
     // prend la place d'une ville qui ne se monte pas, et l'illustration celle

@@ -29,6 +29,9 @@ ro::core::Result<void> BackdropScene::Open(ro::vfs::Vfs& vfs, std::string_view m
     return std::unexpected(loaded.error());
   }
   stage_ = std::move(*loaded);
+  document_ = read.edits != nullptr ? read.edits->Document(map_name) : ro::mapedit::MapEdit();
+  model_book_ = read.edits != nullptr ? read.edits->Document(ro::mapedit::kModelLightsDocument)
+                                      : ro::mapedit::MapEdit();
   background_ = BackgroundOf(*stage_);
 
   auto terrain = ro::render::TerrainRenderer::Create();
@@ -316,10 +319,9 @@ ro::render::PointLightSet BackdropScene::DrawPointLights(const GraphicsOptions& 
                                                          float aspect_ratio,
                                                          const ro::render::SkyLight& sky,
                                                          std::uint32_t now_ms) {
-  // LES LUEURS DES EFFETS DE LA CARTE, sans retouche : le décor n'ouvre pas le
-  // document d'édition.
+  // LES LUMIÈRES DE LA CARTE, retouches comprises, comme en partie.
   const ro::render::PointLightSet points = ro::render::MapPointLights(
-      ro::render::DocumentLights(ro::mapedit::MapEdit(), stage_->scene.rsw.effects()),
+      ro::render::SceneLights(document_, model_book_, stage_->scene),
       ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}, sky.light,
       closed_to_sky_, camera.look_at, static_cast<double>(now_ms), sky.hour);
   if (points.lights.empty() || point_stage_refused_) {

@@ -9,6 +9,7 @@
 
 #include "ro/audio/audio_engine.h"
 #include "ro/core/error.h"
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/map_sky.h"
 #include "ro/render/model_renderer.h"
@@ -91,7 +92,8 @@ class BackdropScene {
   // ⚠ ÉCHOUE PLUTÔT QUE DE SE TAIRE : un écran de connexion sans fond est un
   // écran noir, et un écran noir ne se distingue pas d'un plantage.
   //
-  // `read` dit le sol à bâtir et à qui dire l'avancement.
+  // `read` dit le sol à bâtir, à qui dire l'avancement, et le magasin des
+  // documents d'édition : la ville se montre retouchée comme en partie.
   [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, std::string_view map_name,
                                             const MapStageRead& read = {});
 
@@ -242,6 +244,10 @@ class BackdropScene {
   bool void_shade_refused_ = false;
   // La case que la caméra vise, ou rien.
   std::optional<ro::sim::CellPosition> watched_;
+  // LE DOCUMENT D'ÉDITION DE LA VILLE et celui des lumières de modèle, copiés au
+  // montage : leurs lumières s'allument comme en partie. Vides sans magasin.
+  ro::mapedit::MapEdit document_;
+  ro::mapedit::MapEdit model_book_;
   // Le premier convive peint a-t-il été annoncé au journal ? Remis à faux à
   // chaque montage : la question se repose pour chaque ville.
   bool told_drawn_ = false;
