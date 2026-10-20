@@ -238,6 +238,14 @@ struct StorageWindowState {
   std::vector<int> order;
   std::uint64_t sorted_for = 0;
 
+  // LA PLACE DE LA LIGNE QUI SE DESSINE MÊME HORS DE VUE — celle dont le menu
+  // est ouvert, ou que la souris tient : zéro si aucune.
+  //
+  // 🔴 SEULES LES LIGNES VISIBLES SE DESSINENT, et ImGui ferme un menu dont
+  // l'objet ne se pose plus, comme il lâche un glisser dont la source a
+  // disparu. Faire défiler la table sous l'un ou l'autre les perdrait.
+  std::uint16_t held_slot = 0;
+
   // La question en cours, quand une pile ne sort pas entière.
   ItemQuantityAsk ask;
   // 🔴 VERS OÙ ELLE PARTIRA. Deux destinations demandent « combien » — le sac et

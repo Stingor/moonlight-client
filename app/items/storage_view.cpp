@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <ranges>
 
+#include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/chat_target.h"
 #include "ro/net/inventory.h"
@@ -48,19 +49,26 @@ void StorageView::Refresh(const ro::sim::World& world, ro::ui::ItemTab tab, std:
                           const StorageFavorites* favorites, int sub_category,
                           const StorageTabNames* tab_names) {
   favorites_ = favorites;
-  const ro::sim::Inventory& storage = world.storage();
-  // 🔴 SES FAVORIS SONT À NOUS. Le serveur n'en marque aucun dans un coffre —
-  // sa structure n'a pas le champ —, alors qu'il retient ceux du sac. Sans cette
-  // liste-ci, l'onglet ne pourrait rien montrer et le drapeau venu du fil
-  // ferait disparaître des objets vers un onglet vide.
-  BuildItemCells(storage,
-                 ItemCellsAsk{.tab = tab,
-                              .filter = filter,
-                              .favorites_tab = true,
-                              .fine_tabs = true,
-                              .client_favorites = favorites_,
-                              .creators = creators_},
-                 items_, words_, icons_, names_, cells_);
+  // ⚠ TOUT CE QUI ENTRE DANS UNE CASE est nommé ici : la porte ne refait les
+  // cases que si l'une de ces entrées a bougé.
+  const StorageCellsInputs inputs{
+      .storage_revision = world.storage().revision(),
+      .tab = tab,
+      .filter = filter,
+      .sub_category = sub_category,
+      .favorites = favorites_ == nullptr ? nullptr : &favorites_->ids(),
+      .facts_generation = world.storage_facts().generation(),
+      .icons_generation = icons_ == nullptr ? 0 : icons_->generation(),
+      .creators_revision = creators_.revision(),
+      .language_serial = ro::core::LanguageSerial(),
+  };
+  if (cells_cache_.NeedsRebuild(inputs)) {
+    ComposeCells(world, tab, filter, sub_category);
+  } else {
+    for (const std::uint32_t creator : creators_pending_) {
+      creators_.Want(creator);
+    }
+  }
 
   // ⚠ DES VUES SUR LE MONDE, refaites à chaque image : la liste du monde change
   // à chaque ouverture, et une vue gardée d'une image à l'autre pendrait.
@@ -90,6 +98,25 @@ void StorageView::Refresh(const ro::sim::World& world, ro::ui::ItemTab tab, std:
     }
     shelves_.push_back(view);
   }
+}
+
+void StorageView::ComposeCells(const ro::sim::World& world, ro::ui::ItemTab tab,
+                               std::string_view filter, int sub_category) {
+  const ro::sim::Inventory& storage = world.storage();
+  // 🔴 SES FAVORIS SONT À NOUS. Le serveur n'en marque aucun dans un coffre —
+  // sa structure n'a pas le champ —, alors qu'il retient ceux du sac. Sans cette
+  // liste-ci, l'onglet ne pourrait rien montrer et le drapeau venu du fil
+  // ferait disparaître des objets vers un onglet vide.
+  creators_pending_.clear();
+  BuildItemCells(storage,
+                 ItemCellsAsk{.tab = tab,
+                              .filter = filter,
+                              .favorites_tab = true,
+                              .fine_tabs = true,
+                              .client_favorites = favorites_,
+                              .creators = creators_,
+                              .creators_pending = &creators_pending_},
+                 items_, words_, icons_, names_, cells_);
 
   // ── LES SOUS-TYPES, PUIS LE FILTRE QU'ILS OFFRENT ──────────────────────────
   //

@@ -117,8 +117,8 @@ class WorldHoldings {
   // CE QUE LE SERVEUR DIT DES OBJETS DU COFFRE — prix de revente, sous-type,
   // emplacement. ⚠ IL EST SEUL À LES CONNAÎTRE : ils vivent dans sa base, et la
   // table de l'installation n'en porte aucun. Voir `ro/sim/storage_facts.h`.
-  void TellStorageFacts(std::vector<StorageItemFacts> told) {
-    storage_facts_.Tell(std::move(told));
+  void TellStorageFacts(std::vector<StorageItemFacts> told, StorageFactsPart part) {
+    storage_facts_.Tell(std::move(told), part);
   }
   [[nodiscard]] const StorageFacts& storage_facts() const noexcept { return storage_facts_; }
 

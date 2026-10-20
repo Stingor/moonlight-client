@@ -41,30 +41,53 @@ struct StorageItemFacts {
   std::uint16_t card_slots = 0;
 };
 
-// LA TABLE, TELLE QUE LE SERVEUR VIENT DE L'ENVOYER.
+// CE QU'UNE TRAME FAIT DE LA TABLE.
+//
+// 🔴 UN COFFRE PEUT DÉPASSER UNE TRAME. La longueur du paquet tient sur seize
+// bits signés : au-delà de 2 183 entrées, le serveur coupe la liste en
+// plusieurs trames consécutives, et seule la première dit « repartir de zéro ».
+// Une trame qui remplacerait la table n'en laisserait que la dernière tranche.
+enum class StorageFactsPart : std::uint8_t {
+  // La première trame d'une liste neuve — une ouverture de coffre : la table
+  // repart de zéro, puis reçoit les entrées.
+  kStartsList,
+  // La suite d'une liste découpée, ou l'objet qui vient d'entrer dans le coffre
+  // ouvert : les entrées S'AJOUTENT à la table.
+  kExtendsList,
+};
+
+// LA TABLE, TELLE QUE LE SERVEUR L'A DITE DEPUIS L'OUVERTURE DU COFFRE.
 //
 // ⚠ UNE LISTE TRIÉE ET NON UNE TABLE DE HACHAGE : elle se refait en entier à
-// chaque ouverture de coffre, elle tient dans quelques centaines d'entrées, et
-// une recherche binaire y répond sans allouer. C'est aussi ce qui la rend
-// comparable d'une ouverture à l'autre dans un essai.
+// chaque ouverture de coffre, et une recherche binaire y répond sans allouer.
+// C'est aussi ce qui la rend comparable d'une ouverture à l'autre dans un essai.
 class StorageFacts {
  public:
-  // Remplace tout. ⚠ LES ENTRÉES ARRIVENT PAR PLACE et non par objet : le
-  // serveur en envoie une par ligne du coffre, donc le même identifiant peut
-  // revenir. La première gagne — elles portent la même chose.
-  void Tell(std::vector<StorageItemFacts> told);
+  // ⚠ LES ENTRÉES ARRIVENT PAR PLACE et non par objet : le serveur en envoie une
+  // par ligne du coffre, donc le même identifiant peut revenir, dans une trame
+  // comme d'une trame à l'autre. La première reçue gagne — elles portent la
+  // même chose.
+  void Tell(std::vector<StorageItemFacts> told, StorageFactsPart part);
 
   // Rend nul quand le serveur n'a rien dit de cet objet — ce qui est le cas
   // normal tant qu'aucun coffre n'a été ouvert.
   [[nodiscard]] const StorageItemFacts* Of(std::uint32_t item_id) const;
 
-  void Clear() noexcept { facts_.clear(); }
+  void Clear() noexcept {
+    facts_.clear();
+    ++generation_;
+  }
   [[nodiscard]] bool empty() const noexcept { return facts_.empty(); }
   [[nodiscard]] std::size_t size() const noexcept { return facts_.size(); }
   [[nodiscard]] std::span<const StorageItemFacts> entries() const noexcept { return facts_; }
 
+  // COMBIEN DE FOIS LA TABLE A ÉTÉ DITE. Un compte, pas un drapeau : celui qui
+  // en dérive une vue compare au sien et sait s'il doit la refaire.
+  [[nodiscard]] std::uint64_t generation() const noexcept { return generation_; }
+
  private:
   std::vector<StorageItemFacts> facts_;
+  std::uint64_t generation_ = 0;
 };
 
 }  // namespace ro::sim

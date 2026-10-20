@@ -34,6 +34,16 @@ bool CreatorNames::Fill(ro::vfs::ItemNameFacts& facts) const {
   return true;
 }
 
+void CreatorNames::Want(std::uint32_t character_id) const {
+  if (asker_ != nullptr) {
+    asker_->WantCreator(character_id);
+  }
+}
+
+std::uint64_t CreatorNames::revision() const noexcept {
+  return asker_ == nullptr ? 0 : asker_->facts().creators_revision();
+}
+
 bool AwaitsCreator(const ro::sim::Inventory& bag, std::uint64_t seen_seq,
                    const CreatorNames& creators, std::uint32_t now_ms) {
   for (const ro::sim::ObtainedItem& entry : bag.obtained()) {

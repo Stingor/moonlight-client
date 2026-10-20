@@ -849,6 +849,7 @@ add_library(moonclient_items STATIC
     items/item_subcategory.cpp
     items/item_layout_file.cpp
     items/storage_favorites.cpp
+    items/storage_cells_cache.cpp
     items/storage_tab_names.cpp
     items/pickup_refusal.cpp
     items/transfer_hold.cpp

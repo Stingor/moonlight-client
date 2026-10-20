@@ -158,6 +158,40 @@ void SetupColumns(const StorageWindowState& state) {
   ImGui::TableHeadersRow();
 }
 
+// LES LIGNES, DANS L'ORDRE DU TRI — celles que la vue montre, et elles seules.
+//
+// 🔴 UN COFFRE PEUT COMPTER DES MILLIERS DE LIGNES, et les poser toutes coûterait
+// des milliers d'objets ImGui par image pour en montrer vingt. Le découpeur
+// d'ImGui saute les autres en gardant leur hauteur : l'ascenseur, sa course et
+// l'alternance des fonds restent ceux de la table entière.
+//
+// ⚠ TOUTES LES LIGNES ONT LA MÊME HAUTEUR — celle de l'icône —, et c'est ce qui
+// permet de mesurer la première pour placer les autres.
+//
+// ⚠ LA LIGNE TENUE SE POSE MÊME HORS DE VUE : son menu ouvert ou son glisser en
+// cours mourraient avec elle. Elle est retenue d'une image à l'autre.
+void DrawVisibleRows(std::span<const InventoryCellView> cells, StorageWindowState& state,
+                     const StorageWindowView& view, StorageWindowAction& action) {
+  const std::uint16_t held_slot = state.held_slot;
+  state.held_slot = 0;
+  ImGuiListClipper clipper;
+  clipper.Begin(static_cast<int>(state.order.size()));
+  if (held_slot != 0) {
+    for (std::size_t line = 0; line < state.order.size(); ++line) {
+      if (cells[static_cast<std::size_t>(state.order[line])].client_slot == held_slot) {
+        clipper.IncludeItemByIndex(static_cast<int>(line));
+        break;
+      }
+    }
+  }
+  while (clipper.Step()) {
+    for (int line = clipper.DisplayStart; line < clipper.DisplayEnd; ++line) {
+      const int rank = state.order[static_cast<std::size_t>(line)];
+      DrawStorageRow(cells[static_cast<std::size_t>(rank)], state, view, action);
+    }
+  }
+}
+
 // ── CE QUE LA FENÊTRE SAIT FAIRE, ÉCRIT NOIR SUR BLANC ──────────────────────
 //
 // 🔴 ELLE NE LISTE QUE CE QUI MARCHE. Un geste annoncé qui ne répond pas est
@@ -533,9 +567,7 @@ StorageWindowAction DrawStorageWindow(StorageWindowState& state, const StorageWi
     }
     SetupColumns(state);
     SortRows(state, cells);
-    for (const int rank : state.order) {
-      DrawStorageRow(cells[static_cast<std::size_t>(rank)], state, view, action);
-    }
+    DrawVisibleRows(cells, state, view, action);
     PaintWindowScrollbar(art);
     ImGui::EndTable();
   }

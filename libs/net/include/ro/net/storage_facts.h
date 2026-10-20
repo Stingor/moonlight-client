@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 
 #include "ro/net/world_update.h"
 #include "ro/sim/world_fwd.h"
@@ -18,6 +19,11 @@ namespace ro::net {
 // ⚠ IL ARRIVE APRÈS LA LISTE, jamais avant : le serveur le bâtit sur le contenu
 // qu'il vient d'envoyer. La fenêtre doit donc savoir se dessiner sans lui — une
 // image, le temps qu'il arrive.
+//
+// 🔴 UNE LISTE PEUT TENIR EN PLUSIEURS TRAMES, et un objet qui entre dans le
+// coffre ouvert en envoie une à lui seul. Seule la première trame d'une
+// ouverture remet la table à zéro ; les autres s'y ajoutent. C'est l'octet de
+// drapeaux, en fin de trame, qui le dit.
 [[nodiscard]] FrameOutcome ApplyStorageFactsFrame(const Frame& frame, sim::World& world);
 
 // ── CE QUE LA STRUCTURE ENGENDRÉE NE PORTE PAS ──────────────────────────────
@@ -29,5 +35,12 @@ inline constexpr std::size_t kStorageFactsFixedSize = 6;
 // `[id:4][sell:4][subtype:1][equip:4][slots:2]`, dans cet ordre — celui où le
 // serveur écrit `ZC_MOONLIGHT_STORAGE_PRICES`.
 inline constexpr std::size_t kStorageFactsEntrySize = 15;
+
+// `[flags:1]`, APRÈS les entrées : un lecteur qui s'arrête à `count` entrées ne
+// le voit pas, et c'est ce qui garde la trame lisible par les anciens.
+inline constexpr std::size_t kStorageFactsFlagsSize = 1;
+
+// Le drapeau de la première trame d'une liste neuve : la table repart de zéro.
+inline constexpr std::uint8_t kStorageFactsFirstFrame = 0x01;
 
 }  // namespace ro::net

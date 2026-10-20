@@ -4,6 +4,7 @@
 #include "ro/net/storage_facts.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -46,9 +47,21 @@ FrameOutcome ApplyStorageFactsFrame(const Frame& frame, sim::World& world) {
     return FrameOutcome::kUndecodable;
   }
 
+  // L'OCTET DE DRAPEAUX SUIT LES ENTRÉES. ⚠ SANS LUI, la trame vient d'un
+  // serveur qui n'a jamais découpé sa liste : elle la porte entière, et la
+  // remplace. Une trame tronquée n'en a pas non plus — ce qui la suit n'est pas
+  // un drapeau mais le reste d'une entrée.
+  sim::StorageFactsPart part = sim::StorageFactsPart::kStartsList;
+  if (count == static_cast<std::size_t>(packet.count) &&
+      reader.remaining() >= kStorageFactsFlagsSize) {
+    const std::uint8_t flags = reader.U8();
+    part = (flags & kStorageFactsFirstFrame) != 0 ? sim::StorageFactsPart::kStartsList
+                                                  : sim::StorageFactsPart::kExtendsList;
+  }
+
   // ⚠ ON POSE MÊME UNE TABLE VIDE : un coffre vide en envoie une, et elle doit
   // faire disparaître les prix du coffre d'avant.
-  world.TellStorageFacts(std::move(told));
+  world.TellStorageFacts(std::move(told), part);
   return FrameOutcome::kApplied;
 }
 

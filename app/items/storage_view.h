@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <span>
 #include <string>
 #include <string_view>
@@ -14,6 +15,7 @@
 
 #include "items/creator_names.h"
 #include "items/item_subcategory.h"
+#include "items/storage_cells_cache.h"
 #include "items/storage_favorites.h"
 #include "items/storage_tab_names.h"
 
@@ -28,7 +30,10 @@ namespace moonclient {
 class StorageView {
  public:
   // LES NOMS DES FORGERONS, confiés une fois la description ouverte.
-  void SeeCreators(CreatorNames creators) noexcept { creators_ = creators; }
+  void SeeCreators(CreatorNames creators) noexcept {
+    creators_ = creators;
+    cells_cache_.Forget();
+  }
 
   StorageView(const ro::vfs::ItemTable* items, const ro::vfs::ItemWords* words,
               ro::render::ItemIcons* icons);
@@ -51,8 +56,8 @@ class StorageView {
   }
   [[nodiscard]] ro::ui::StorageTally tally() const noexcept { return tally_; }
   // LES SOUS-TYPES PRÉSENTS sous l'onglet courant, triés par clé. ⚠ REFAITS À
-  // CHAQUE IMAGE : leurs libellés sont traduits, et un texte traduit ne se garde
-  // pas d'une image à l'autre.
+  // CHAQUE CHANGEMENT DE LANGUE : leurs libellés sont traduits, et un texte
+  // traduit ne survit pas au catalogue qui l'a donné.
   [[nodiscard]] std::span<const ro::ui::StorageSubCategoryView> sub_categories() const noexcept {
     return sub_views_;
   }
@@ -80,6 +85,11 @@ class StorageView {
   void ToggleSession(ro::net::Connection& link, const ro::sim::World& world);
 
  private:
+  // Les cases, leurs sous-types, leurs valeurs et le compte : tout ce que la
+  // porte `cells_cache_` garde d'une image à l'autre.
+  void ComposeCells(const ro::sim::World& world, ro::ui::ItemTab tab, std::string_view filter,
+                    int sub_category);
+
   // ⚠ UN POINTEUR ET NON UNE COPIE : la liste est écrite ailleurs — au clic
   // suivant — et une copie montrerait l'étoile d'avant jusqu'au prochain
   // rafraîchissement.
@@ -90,6 +100,13 @@ class StorageView {
   CreatorNames creators_;
   ro::render::ItemIcons* icons_;
 
+  // 🔴 LES CASES, LEURS NOMS, LES SOUS-TYPES ET LE COMPTE NE SE REFONT QUE
+  // QUAND CE QU'ILS LISENT A CHANGÉ : un coffre de milliers d'objets coûterait
+  // sinon des millisecondes par image. `cells_cache_` en tient la porte.
+  StorageCellsCache cells_cache_;
+  // Les forgerons que la dernière composition n'a pas su nommer : leur demande
+  // se répète à chaque image, comme quand tout se recomposait.
+  std::vector<std::uint32_t> creators_pending_;
   std::vector<std::string> names_;
   std::vector<ro::ui::StorageShelfView> shelves_;
   std::vector<ro::ui::InventoryCellView> cells_;

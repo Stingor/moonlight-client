@@ -29,6 +29,7 @@ const ItemScripts* ItemFacts::ScriptsOf(std::uint32_t item_id) const {
 
 void ItemFacts::TellCreator(std::uint32_t character_id, std::string name) {
   creators_.insert_or_assign(character_id, std::move(name));
+  ++creators_revision_;
 }
 
 const std::string* ItemFacts::CreatorOf(std::uint32_t character_id) const {

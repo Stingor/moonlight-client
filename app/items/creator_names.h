@@ -32,6 +32,16 @@ class CreatorNames {
   // encore — la demande est alors partie.
   bool Fill(ro::vfs::ItemNameFacts& facts) const;
 
+  // Redemande un forgeron que `Fill` n'a pas su nommer. ⚠ LA DEMANDE DOIT SE
+  // RÉPÉTER À CHAQUE IMAGE : c'est ainsi qu'elle repart quand le serveur n'a pas
+  // répondu à temps. Une vue qui garde ses noms d'une image à l'autre la répète
+  // par ici, sans recomposer.
+  void Want(std::uint32_t character_id) const;
+
+  // CHANGE QUAND UN NOM ARRIVE : une vue qui garde des noms composés le compare
+  // au sien pour savoir s'ils sont à refaire.
+  [[nodiscard]] std::uint64_t revision() const noexcept;
+
  private:
   ItemFactsAsker* asker_ = nullptr;
 };

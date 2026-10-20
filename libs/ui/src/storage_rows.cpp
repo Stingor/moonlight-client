@@ -203,6 +203,9 @@ void DrawStorageRow(const InventoryCellView& cell, StorageWindowState& state,
       ImGui::OpenPopup("menu");
     }
   }
+  // ⚠ LU SUR LE NOM, AVANT QUE LE FANTÔME NE SE POSE : c'est lui que la souris
+  // tient pendant un glisser.
+  const bool held = ImGui::IsItemActive();
   // ⚠ AVANT L'INFOBULLE ET LE MENU : ImGui rattache la source au DERNIER objet
   // posé. La marge du fantôme est celle du style courant — la table du coffre ne
   // met pas la sienne à zéro, contrairement aux grilles.
@@ -241,6 +244,11 @@ void DrawStorageRow(const InventoryCellView& cell, StorageWindowState& state,
     action.nowhere_to_take = action.verb == StorageVerb::kNothing;
   } else {
     DrawRowMenu(cell, state, view, action);
+  }
+  // LA LIGNE QUI DOIT SE POSER À L'IMAGE SUIVANTE, même sortie de la vue : voir
+  // `StorageWindowState::held_slot`.
+  if (held || ImGui::IsPopupOpen("menu")) {
+    state.held_slot = cell.client_slot;
   }
   ImGui::PopID();
 

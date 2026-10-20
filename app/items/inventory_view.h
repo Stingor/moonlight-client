@@ -178,6 +178,10 @@ struct ItemCellsAsk {
   }
   // Les noms des forgerons : un item forgé se cherche aussi par eux.
   CreatorNames creators;
+  // LES FORGERONS QUE `creators` N'A PAS SU NOMMER, quand l'appelant garde ses
+  // cases d'une image à l'autre : il doit redemander leurs noms sans
+  // recomposer. Nul pour qui recompose à chaque image.
+  std::vector<std::uint32_t>* creators_pending = nullptr;
 };
 
 // L'onglet où tombe un objet, d'après le type que le serveur envoie.

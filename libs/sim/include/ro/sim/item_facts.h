@@ -78,6 +78,9 @@ class ItemFacts {
   void TellCreator(std::uint32_t character_id, std::string name);
   // Nul tant que le serveur n'a pas répondu.
   [[nodiscard]] const std::string* CreatorOf(std::uint32_t character_id) const;
+  // COMBIEN DE FOIS LES NOMS ONT CHANGÉ. Une vue qui a composé des noms d'objets
+  // forgés le compare au sien pour savoir s'ils sont à refaire.
+  [[nodiscard]] std::uint64_t creators_revision() const noexcept { return creators_revision_; }
 
   // LA LISTE DE RAMASSAGE AUTOMATIQUE du personnage, telle que le serveur l'a
   // dite en dernier — puis corrigée d'avance par nos propres gestes.
@@ -94,6 +97,7 @@ class ItemFacts {
     sources_.clear();
     scripts_.clear();
     creators_.clear();
+    ++creators_revision_;
     autoloot_.clear();
     autoloot_told_ = false;
   }
@@ -102,6 +106,7 @@ class ItemFacts {
   std::map<std::pair<std::uint32_t, ItemSourceScope>, ItemDropSources> sources_;
   std::map<std::uint32_t, ItemScripts> scripts_;
   std::map<std::uint32_t, std::string> creators_;
+  std::uint64_t creators_revision_ = 0;
   std::vector<std::uint32_t> autoloot_;
   bool autoloot_told_ = false;
 };

@@ -336,7 +336,9 @@ void BuildItemCells(const ro::sim::Inventory& holder, const ItemCellsAsk& ask,
     std::string name;
     if (items != nullptr && words != nullptr) {
       ro::vfs::ItemNameFacts facts = ItemNameFactsOf(item);
-      ask.creators.Fill(facts);
+      if (ask.creators.Fill(facts) && ask.creators_pending != nullptr) {
+        ask.creators_pending->push_back(ro::sim::CreatorIdOfCards(facts.cards));
+      }
       name = ro::vfs::ItemNameText(ro::vfs::ComposeItemName(facts, *items, *words));
     }
     if (!ro::core::AsciiContainsFolded(name, ask.filter)) {
