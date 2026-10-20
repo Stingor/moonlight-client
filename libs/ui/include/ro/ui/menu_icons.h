@@ -68,9 +68,10 @@ enum class MenuCommand : std::uint8_t {
   // ── LES ICÔNES DE CE CLIENT, que le jeu n'a pas ───────────────────────────
   //
   // ⚠ APRÈS CELLES DU JEU, et c'est l'ordre qui le dit : elles prennent les
-  // cases qui suivent la dernière icône du jeu, sans en déplacer aucune. Leur
-  // art suit les conventions de nom du jeu, livré dans le dossier `data\` de
-  // l'installation.
+  // cases qui suivent la dernière icône du jeu, sans en déplacer aucune.
+  //
+  // Les trois premières ont un bitmap dans l'installation, aux conventions de
+  // nom du jeu ; le nôtre passe avant lui — voir `OurMenuIconPath`.
   //
   // L'ALBUM DE CARTES, puis L'ATLAS DES RECETTES.
   kCardAlbum,
@@ -157,6 +158,8 @@ enum class MenuIconArt : std::uint8_t {
 // 🔴 ELLES SONT DESSINÉES À DOUBLE DENSITÉ : un pixel d'interface y vaut
 // `kOurIconDensity` pixels de côté. Elles prennent donc la place exacte du
 // bitmap du jeu, et restent nettes quand l'échelle d'interface grandit.
+//
+// Elles se redessinent par `scripts/ui_icons/draw_menu_icons.py`.
 inline constexpr std::string_view kOurIconFolder = "data\\ui_icons\\";
 inline constexpr float kOurIconDensity = 2.0F;
 
