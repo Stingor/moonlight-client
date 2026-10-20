@@ -58,6 +58,7 @@ void LoadWardrobe(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   // dizaines de milliers, et un sac plein n'en montre qu'une centaine.
   pieces.item_icons.emplace(vfs, pieces.wardrobe->catalog().items, &pieces.card_illustrations);
   pieces.card_thumbnails.emplace(vfs, &pieces.card_illustrations);
+  pieces.status_head.emplace(*pieces.wardrobe);
 }
 
 // CE QUE REND CHAQUE CONTENEUR. Absente, l'album de cartes se passe de ses

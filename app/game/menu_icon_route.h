@@ -1,12 +1,15 @@
 #pragma once
 
 #include <cstdint>
-#include <string_view>
+#include <optional>
 
 #include "ro/net/connection.h"
+#include "ro/render/actor_wardrobe.h"
+#include "ro/render/head_button.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/menu_icons.h"
 
+#include "game/game_pieces.h"
 #include "game/menu_icon_compose.h"
 #include "game/ui_stage.h"
 #include "items/bank_view.h"
@@ -29,11 +32,20 @@ class MvpTrackerStage;
 // vient de là, et un second chemin finirait par s'en écarter.
 
 // Ce que la partie et ses fenêtres disent à la grille, relevé pour
-// `ComposeMenuIcons`. ⚠ LES VUES PORTENT SUR LES FENÊTRES ET SUR
-// `cash_shop_name` : les faits ne survivent pas à l'image.
+// `ComposeMenuIcons`. ⚠ LES VUES PORTENT SUR LES FENÊTRES ET SUR LES PIÈCES :
+// les faits ne survivent pas à l'image.
+//
+// 🔴 ELLE REFAIT LA TÊTE DU STATUT quand l'apparence de `character_id` a changé
+// — voir `StatusHeadKeyOf` —, et seulement alors.
 [[nodiscard]] MenuIconFacts MenuIconFactsOf(const ro::sim::World& world,
-                                            const UiStage::Windows& windows,
-                                            std::string_view cash_shop_name);
+                                            const UiStage::Windows& windows, GamePieces& pieces,
+                                            std::uint32_t character_id);
+
+// CE QUI DÉCIDE DE LA TÊTE DU STATUT : celle du personnage du joueur, avec la
+// coiffure et la couleur que sa recette de style impose, comme sur la carte.
+// Rien tant qu'aucun personnage n'est chargé.
+[[nodiscard]] std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(
+    const ro::sim::World& world, ro::render::ActorWardrobe& wardrobe, std::uint32_t character_id);
 
 // Ce qu'un clic peut toucher.
 struct MenuIconTargets {

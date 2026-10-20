@@ -181,6 +181,7 @@ add_library(ro_render STATIC
     src/sprite_action_frames.cpp
     src/sprite_canvas.cpp
     src/sprite_vignette.cpp
+    src/head_button.cpp
     src/doll_animation.cpp
     src/portrait_framing.cpp
     src/effect_arc_ribbon.cpp
@@ -622,6 +623,7 @@ add_library(ro_render_gl STATIC
     gl/gl_texture.cpp
     gl/skin_textures.cpp
     gl/actor_thumbnails.cpp
+    gl/status_head_icon.cpp
     gl/actor_vignette.cpp
     gl/emotion_icons.cpp
     gl/fog_shader.cpp

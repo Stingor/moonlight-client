@@ -47,6 +47,11 @@ struct MenuIconFacts {
   // Le nom que la table du serveur donne à sa boutique : l'infobulle de son
   // icône le porte.
   std::string_view cash_shop_name;
+  // LA TÊTE DU PERSONNAGE, dans le bouton du Statut, à double densité — voir
+  // `ro::render::StatusHeadIcon`. Elle passe avant toute autre image du Statut ;
+  // vide — aucun personnage chargé, ou un rendu raté —, le Statut garde la sienne.
+  ro::ui::SkinImage status_head;
+  ro::ui::SkinImage status_head_pressed;
 };
 
 // Recompose les icônes MONTRÉES, dans l'ordre de la grille.

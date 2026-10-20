@@ -20,7 +20,6 @@
 #include "ro/net/world_update.h"
 #include "ro/sim/damage_meter.h"
 #include "ro/sim/movement.h"
-#include "ro/vfs/cash_shop_words.h"
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
@@ -435,10 +434,9 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                 pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, now_ms)
           : std::nullopt;
   AdvanceHoveredDollEffect(now_ms);
-  ComposeMenuIcons(windows_.menu_icons.icons,
-                   pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-                   settings_->bindings(),
-                   MenuIconFactsOf(world_, windows_, ro::vfs::CashShopName(pieces_.item_words)));
+  ComposeMenuIcons(
+      windows_.menu_icons.icons, pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
+      settings_->bindings(), MenuIconFactsOf(world_, windows_, pieces_, ticket_.character_id));
   // LES CADRES D'ESSAI, seulement quand leur page est sous les yeux : une
   // vignette animée se recompose à chaque image. Celui des entités, et celui des
   // dégâts — sur les onglets de l'allure, des trajectoires et des couleurs.

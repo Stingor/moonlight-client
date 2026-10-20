@@ -5,16 +5,37 @@
 #include "ro/render/camera.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/sim/world.h"
+#include "ro/vfs/cash_shop_words.h"
 
 #include "game/battleground_stage.h"
+#include "game/skin_image_of.h"
 #include "input/key_action.h"
+#include "world/actor_styles.h"
+#include "world/actor_view.h"
 
 namespace moonclient {
 
 using ro::ui::MenuCommand;
 
+std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& world,
+                                                         ro::render::ActorWardrobe& wardrobe,
+                                                         std::uint32_t character_id) {
+  const ro::sim::Actor* self = world.player();
+  if (self == nullptr) {
+    return std::nullopt;
+  }
+  ro::render::ActorLook look = LookOf(*self);
+  ImposeStyleNumbers(world.player_id(), look, wardrobe, world.styles());
+  return ro::render::StatusHeadKey{.character_id = character_id,
+                                   .job = look.job,
+                                   .sex = look.sex,
+                                   .hair = look.hair,
+                                   .hair_palette = look.hair_palette};
+}
+
 MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Windows& windows,
-                              std::string_view cash_shop_name) {
+                              GamePieces& pieces, std::uint32_t character_id) {
+  const std::string_view cash_shop_name = ro::vfs::CashShopName(pieces.item_words);
   const ro::sim::Actor* self = world.player();
   MenuIconFacts facts{
       .doram = self != nullptr && ro::render::IsDoramJob(self->look.job),
@@ -61,6 +82,13 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   lit_when(MenuCommand::kQuest, windows.quests.news_lit);
   // LE CARNET S'ALLUME quand un favori entre dans sa fenêtre.
   lit_when(MenuCommand::kMvpTracker, windows.mvp_tracker.badge_lit);
+  // LA TÊTE DU STATUT : refaite ici quand elle change, montrée tant qu'elle est
+  // rendue. Sans garde-robe, le Statut garde son art.
+  if (pieces.status_head.has_value() && pieces.wardrobe.has_value()) {
+    pieces.status_head->Refresh(StatusHeadKeyOf(world, *pieces.wardrobe, character_id));
+    facts.status_head = SkinImageOf(pieces.status_head->normal());
+    facts.status_head_pressed = SkinImageOf(pieces.status_head->pressed());
+  }
   return facts;
 }
 

@@ -9,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/printed.h"
+#include "ro/render/head_button.h"
 
 #include "game/skin_image_of.h"
 
@@ -44,6 +45,21 @@ constexpr std::string_view kMapWithoutCashShopButton = "new_event";
       SkinImageOf(images->GetOursIfShipped(ro::ui::OurMenuIconPath(stem, art)));
   return ro::ui::PreferredMenuIconArt(
       ours, ours.usable() ? ro::ui::SkinImage{} : ImageAt(images, ro::ui::MenuIconPath(stem, art)));
+}
+
+// 🔴 LA TÊTE DU STATUT EST DESSINÉE À LA DENSITÉ DE NOS ICÔNES : c'est elle qui
+// la ramène à la place du bitmap du jeu.
+static_assert(static_cast<float>(ro::render::kHeadButtonDensity) == ro::ui::kOurIconDensity);
+
+// L'ART DU STATUT : la tête du personnage quand ses deux états sont rendus,
+// sinon celui de tout le monde.
+void PreferStatusHead(ro::ui::MenuIconView& icon, const MenuIconFacts& facts) {
+  if (icon.command != MenuCommand::kStatus || !facts.status_head.usable() ||
+      !facts.status_head_pressed.usable()) {
+    return;
+  }
+  icon.normal = ro::ui::AtOurDensity(facts.status_head);
+  icon.pressed = ro::ui::AtOurDensity(facts.status_head_pressed);
 }
 
 [[nodiscard]] bool Holds(const std::vector<MenuCommand>& commands, MenuCommand command) {
@@ -157,6 +173,7 @@ void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameI
         .news_lit = Holds(facts.lit, entry.command),
         // Les bascules de ce client restent enfoncées fenêtre ouverte.
         .shows_open = Holds(facts.open, entry.command)};
+    PreferStatusHead(icon, facts);
     // LE CHAMP DE BATAILLE PORTE UNE PASTILLE TANT QU'ON EST EN FILE, et son
     // infobulle nomme le terrain.
     if (entry.command == MenuCommand::kBattleground && facts.battleground_queued) {

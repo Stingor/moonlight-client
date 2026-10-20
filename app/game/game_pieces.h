@@ -24,6 +24,7 @@
 #include "ro/render/signboard.h"
 #include "ro/render/skill_icons.h"
 #include "ro/render/skin_textures.h"
+#include "ro/render/status_head_icon.h"
 #include "ro/render/status_icons.h"
 #include "ro/render/title_table.h"
 #include "ro/sim/banned_words.h"
@@ -146,6 +147,9 @@ struct GamePieces {
   // chacun d'après ce que le serveur a dit de lui. Sans elles, aucun
   // personnage ne se dessine.
   std::optional<ro::render::ActorWardrobe> wardrobe;
+  // LA TÊTE DU PERSONNAGE SUR LE BOUTON DE STATUT. ⚠ APRÈS LA GARDE-ROBE : elle
+  // en compose ses images, et se détruit avant elle.
+  std::optional<ro::render::StatusHeadIcon> status_head;
   // LE GIF DU PANTIN DE LA FICHE : voir `character/doll_gif_export.h`. ⚠ ICI ET
   // NON DANS LA PARTIE, pour survivre à un changement de partie pendant que le
   // dialogue est ouvert. Un pointeur, parce que son fil en garde l'adresse.
