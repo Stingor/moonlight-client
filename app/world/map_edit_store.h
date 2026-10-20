@@ -34,6 +34,10 @@ class MapEditStore {
   // client illisible n'en donne aucun, et le journal le dit : le remplacer en
   // silence par celui de l'installation ferait perdre au staff ce qu'il croit
   // enregistré.
+  //
+  // LE DOCUMENT LIVRÉ PAR LE MIROIR (docs/adr/0128) l'emporte sur celui du
+  // client quand sa révision est plus haute, et tient lieu de document quand le
+  // client n'en a pas. Il ne s'écrit pas dans le dossier du client.
   void Load(std::string_view map_name, ro::vfs::Vfs& vfs);
 
   // Le document de `map_name` ; vide pour une carte pas encore lue.

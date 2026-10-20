@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iterator>
+#include <optional>
 #include <system_error>
 #include <utility>
 
@@ -12,13 +13,48 @@
 
 namespace moonclient {
 
+namespace {
+
+// LE DOCUMENT QUE LE MIROIR A LIVRÉ pour `map_name`, s'il y en a un, lisible et
+// révisé. Un document illisible ou sans révision ne vaut rien ici : il ne
+// saurait se comparer à celui du poste.
+std::optional<ro::mapedit::RevisedMapEdit> ReadServed(std::string_view map_name,
+                                                      ro::vfs::Vfs& vfs) {
+  auto bytes = vfs.Read(ro::mapedit::ServedMapEditPath(map_name));
+  if (!bytes) {
+    return std::nullopt;
+  }
+  auto revised = ro::mapedit::ParseRevisedMapEdit(
+      std::string_view(reinterpret_cast<const char*>(bytes->data()), bytes->size()), map_name);
+  if (!revised) {
+    ro::core::LogWarning("édition de {} livrée par le miroir, écartée — {}", map_name,
+                         ro::core::Describe(revised.error()));
+    return std::nullopt;
+  }
+  if (revised->revision == 0) {
+    ro::core::LogWarning("édition de {} livrée par le miroir sans révision, écartée", map_name);
+    return std::nullopt;
+  }
+  return std::move(*revised);
+}
+
+}  // namespace
+
 void MapEditStore::Load(std::string_view map_name, ro::vfs::Vfs& vfs) {
   if (by_map_.contains(map_name)) {
     return;
   }
   Entry& entry = by_map_[std::string(map_name)];
+  std::optional<ro::mapedit::RevisedMapEdit> served = ReadServed(map_name, vfs);
   std::ifstream stream(FileOf(map_name), std::ios::binary);
   if (!stream) {
+    if (served.has_value()) {
+      ro::core::LogInfo("édition de {}, révision {}, livrée par le miroir", map_name,
+                        served->revision);
+      entry.edit = std::move(served->edit);
+      entry.revision = served->revision;
+      return;
+    }
     entry.edit = ro::render::LoadMapEdit(vfs, map_name);
     return;
   }
@@ -28,6 +64,15 @@ void MapEditStore::Load(std::string_view map_name, ro::vfs::Vfs& vfs) {
   if (!revised) {
     ro::core::LogWarning("{} — {} s'ouvre sans édition", ro::core::Describe(revised.error()),
                          map_name);
+    return;
+  }
+  // LA RÉVISION LA PLUS HAUTE L'EMPORTE. À égalité, celle du poste : elle peut
+  // porter des retouches enregistrées sur cette révision, pas encore publiées.
+  if (served.has_value() && served->revision > revised->revision) {
+    ro::core::LogInfo("édition de {} : révision {} du miroir, plus récente que la {} du poste",
+                      map_name, served->revision, revised->revision);
+    entry.edit = std::move(served->edit);
+    entry.revision = served->revision;
     return;
   }
   ro::core::LogInfo("édition de {}, révision {}, lue dans {}", map_name, revised->revision,

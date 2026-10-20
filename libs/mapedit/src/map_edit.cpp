@@ -11,6 +11,7 @@ namespace ro::mapedit {
 namespace {
 
 constexpr std::string_view kMapEditFolder = "data\\map_edits\\";
+constexpr std::string_view kServedMapEditFolder = "data\\map_edits_served\\";
 // Le nom que porte un modèle ajouté dans le RSW : celui du fichier ne sert
 // qu'aux éditeurs de cartes, et dit d'où il vient.
 constexpr std::string_view kAddedModelName = "map_edit";
@@ -37,6 +38,10 @@ void NoteOpacity(std::size_t rank, const std::optional<float>& opacity, MapEditR
 
 std::string MapEditPath(std::string_view map_name) {
   return std::string(kMapEditFolder) + std::string(map_name) + std::string(kMapEditExtension);
+}
+
+std::string ServedMapEditPath(std::string_view map_name) {
+  return std::string(kServedMapEditFolder) + std::string(map_name) + std::string(kMapEditExtension);
 }
 
 std::optional<float> DocumentOpacity(float opacity) noexcept {

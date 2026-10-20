@@ -37,6 +37,11 @@ inline constexpr float kOriginTolerance = 0.01F;
 
 // Le chemin du document d'une carte, nommée sans extension.
 [[nodiscard]] std::string MapEditPath(std::string_view map_name);
+// LE CHEMIN DU DOCUMENT SERVI PAR LE MIROIR : celui que le serveur tient, sous
+// sa révision, livré dans l'installation par la mise à jour. Un dossier à part :
+// le miroir y remplace ce qui diffère, et ne doit jamais écraser ce que le
+// staff a enregistré sur son poste. Voir docs/adr/0128.
+[[nodiscard]] std::string ServedMapEditPath(std::string_view map_name);
 
 // L'OPACITÉ D'UN MODÈLE, de 0 (invisible) à 1 (plein) : absente du document,
 // elle est pleine, et le document refuse une valeur hors de ces bornes.
