@@ -346,6 +346,8 @@ struct EffectNodeSeed {
   // plus haute et descend vers une plus basse. Sans lui, un vol visé se
   // calcule À PLAT, et la hauteur reste à la chute. Voir `aims_at_target`.
   bool aim_keeps_height = false;
+  // LE NŒUD PORTE OMBRE comme un acteur : voir `PooledEffectNode::casts_shadow`.
+  bool casts_shadow = false;
   // LA VIE QUE SON INSTANCE SE RÉCRIT À CHAQUE SEMIS, quand elle le fait. Voir
   // `EffectNodeFadesWithARewritingInstance`.
   EffectInstanceRewrite instance_rewrite{};

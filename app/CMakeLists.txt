@@ -64,7 +64,8 @@ add_library(moonclient_effect_nodes STATIC
     effects/effect_ring_sow.cpp
     effects/effect_rising_quad_sow.cpp
     effects/effect_screen_node_view.cpp
-    effects/effect_spinning_box_sow.cpp)
+    effects/effect_spinning_box_sow.cpp
+    effects/projectile_casters.cpp)
 
 target_link_libraries(moonclient_effect_nodes
     PUBLIC ro_core ro_formats ro_render ro_vfs

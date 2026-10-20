@@ -38,6 +38,7 @@
 #include "effects/effect_draw_gate.h"
 #include "effects/effect_node_command.h"
 #include "effects/effect_node_sowing.h"
+#include "effects/projectile_casters.h"
 
 // LES NŒUDS procéduraux en jeu : la famille d'effets que le client dessine en
 // CODE, et dont aucun n'a de fichier — voir `docs/adr/0014`.
@@ -220,7 +221,6 @@ class EffectNodesInPlay {
   // `ro/render/effect_render_word.h`). Les lots éprouvés viennent d'abord, comme
   // chez le client qui vide les seaux sans épreuve en dernier. Un nœud sans mot
   // se peint en addition et passe l'épreuve.
-
   //
   // ⚠ ET LES LOTS QUI SE PEIGNENT SOUS LES FICHIERS `.str` VIENNENT EN TÊTE,
   // marqués : voir `ro::render::EffectLotPaintsBeforeStr`.
@@ -232,6 +232,10 @@ class EffectNodesInPlay {
   };
   [[nodiscard]] std::span<const SpriteNodeBatch> SpriteBatches() const noexcept {
     return sprite_batches_;
+  }
+  // LES PROJECTILES DU DERNIER `Drawn`, qui portent ombre : voir `ProjectileCasters`.
+  [[nodiscard]] const ProjectileCasters& projectile_casters() const noexcept {
+    return projectile_casters_;
   }
 
   // LES DEUX BASCULES D'EFFET DU JEU. Posées par `EffectsInPlay`, qui les tient
@@ -710,6 +714,7 @@ class EffectNodesInPlay {
   std::vector<ComposedPlacement> placements_;
   std::vector<ro::render::DrawnActor> drawn_;
   std::vector<SpriteNodeBatch> sprite_batches_;
+  ProjectileCasters projectile_casters_;
   // Les quads des anneaux, et les lots qui les désignent. Les deux vivent
   // jusqu'au prochain `Drawn` : le renderer ne garde rien.
   std::vector<std::vector<ro::render::EffectWorldQuad>> ring_quads_;

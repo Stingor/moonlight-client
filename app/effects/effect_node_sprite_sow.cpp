@@ -229,6 +229,7 @@ bool EffectNodesInPlay::Sow(const std::string& sprite_path, const ro::render::Ef
     pooled.turns_with_flight = seed.turns_with_flight;
     pooled.turns_with_flight_heading = seed.turns_with_flight_heading;
     pooled.flight_heading_turn_degrees = seed.flight_heading_turn_degrees;
+    pooled.casts_shadow = seed.casts_shadow;
     pooled.step_decay = lance.step_decay;
     pooled.fall_speed = lance.fall_speed;
     pooled.fall_acceleration = lance.fall_acceleration;
@@ -373,14 +374,18 @@ bool EffectNodesInPlay::ShootSprite(std::string_view sprite_base, glm::vec3 from
   // montée d'alpha. La montée d'un tic le laissait invisible sur le premier de
   // ses douze.
   seed.alpha_start = ro::render::kEffectNodeChannelMax;
+  // ET IL PORTE L'OMBRE D'UN ACTEUR : voir `ProjectileCasters`.
+  seed.casts_shadow = true;
   const std::string path(sprite_base);
   const bool shot = Sow(path, seed, ro::render::EffectNodeRange{1.0F, 0.0F}, 0.0F, from, 1,
                         kNoOwnerFacingDegrees, to);
   // LA LUEUR ÉLÉMENTAIRE, s'il en porte une : la même image sur le même vol, un
-  // peu plus grande, teinte et AJOUTÉE au décor.
+  // peu plus grande, teinte et AJOUTÉE au décor. Elle n'a pas d'ombre : c'est
+  // de la lumière.
   if (shot && flight.glow_tint.has_value()) {
     const std::array<std::uint8_t, 4>& tint = *flight.glow_tint;
     seed.render_word = ro::render::kEffectRenderWordOfAdditiveSprite;
+    seed.casts_shadow = false;
     seed.color = {static_cast<float>(tint[0]), static_cast<float>(tint[1]),
                   static_cast<float>(tint[2])};
     seed.alpha_start = static_cast<float>(tint[3]);

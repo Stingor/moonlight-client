@@ -34,6 +34,7 @@ void EffectNodesInPlay::Forget() {
   placements_.clear();
   drawn_.clear();
   sprite_batches_.clear();
+  projectile_casters_.Clear();
   ring_quads_.clear();
   world_quads_.clear();
   ground_cell_lots_.clear();

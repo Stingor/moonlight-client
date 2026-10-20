@@ -157,6 +157,7 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
   composed_.clear();
   placements_.clear();
   drawn_.clear();
+  projectile_casters_.Clear();
   ring_quads_.clear();
   world_quads_.clear();
   ground_cell_lots_.clear();

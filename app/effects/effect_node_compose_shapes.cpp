@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -65,6 +66,7 @@
 #include "ro/render/effect_triple_wall.h"
 #include "ro/render/effect_uv_sphere.h"
 #include "ro/render/effect_wandering_motes.h"
+#include "ro/render/sprite_catalog.h"
 
 #include "effects/effect_node_view.h"
 
@@ -703,6 +705,19 @@ void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& 
   for (const ro::render::SpriteQuad& quad : actor.quads) {
     actor.sources.push_back(ro::render::SpriteImageKey{&source->second.sprite, nullptr,
                                                        quad.section, quad.image_index});
+  }
+  // UN PROJECTILE PORTE L'OMBRE D'UN ACTEUR, au sol sous son vol : voir
+  // `ProjectileCasters`.
+  if (pooled.casts_shadow) {
+    if (!projectile_casters_.round_shadow_known()) {
+      projectile_casters_.ComposeRoundShadow(
+          LoadedSprite(std::string(ro::render::kShadowSpritePath)));
+    }
+    const auto& ground_height = pool_.world().ground_height;
+    projectile_casters_.Add(actor, pooled.ground_position,
+                            ground_height ? std::optional<float>(ground_height(
+                                                pooled.ground_position.x, pooled.ground_position.z))
+                                          : std::nullopt);
   }
   composed_.push_back(std::move(actor));
   // Chaque pose emporte le mot de rendu de son nœud : voir `SpriteBatches`.

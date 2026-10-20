@@ -346,6 +346,11 @@ struct PooledEffectNode {
   // NÉ DE L'INSTANCE D'UN CHAPEAU : la porte de dessin retire ses exceptions à
   // ce qu'un chapeau fait naître. Voir `EffectNodePool::SowAsHat`.
   bool from_hat = false;
+  // VRAI POUR UN PROJECTILE D'ACTEUR, qui porte l'ombre d'un acteur — sa
+  // silhouette sous le soleil, l'ombre ronde au sol sans lui. Faux pour tout
+  // autre nœud, et pour la lueur qui accompagne un projectile : c'est de la
+  // lumière.
+  bool casts_shadow = false;
   // LA DERNIÈRE PISTE DE L'ANNEAU EN COUCHES ONDULE SANS FIN : voir
   // `EffectLayeredRingNodePattern::waves_last_track`.
   bool waves_last_track = false;

@@ -160,11 +160,10 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
                      pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
                      &stage_->scene.gnd, camera_.yaw_degrees, now_ms, actor_ground,
                      settings_->options().graphics().cold_light(), !sun_asked});
-  // LES COMPAGNONS QUI PORTENT OMBRE, réunis en un lot.
-  std::vector<ro::render::DrawnActor> companions(carts.begin(), carts.end());
-  companions.insert(companions.end(), falcons.begin(), falcons.end());
-  companions.insert(companions.end(), pieces_.map_sprites.all().begin(),
-                    pieces_.map_sprites.all().end());
+  // LES COMPAGNONS QUI PORTENT OMBRE, réunis en un lot, les projectiles en vol compris.
+  const ProjectileCasters& projectiles = effect_nodes_->projectile_casters();
+  const std::vector<ro::render::DrawnActor> companions =
+      JoinedCasterLots({carts, falcons, pieces_.map_sprites.all(), projectiles.silhouettes()});
   // LE CIEL DE L'IMAGE : la lumière de la carte, à l'heure que l'établi impose.
   const ro::render::SkyLight sky = SkyOfFrame(now_ms);
   // La nuit de cette image décide des effets « nuit seulement » de la suivante.
@@ -358,8 +357,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
     pieces_.actor_model_renderer->Draw(camera_, pieces_.actor_models->drawn(), aspect_ratio_, fog,
                                        sun, sky.light.daylight, points);
   }
-  // LES CORPS ET LEURS OMBRES laissent leur silhouette, que l'eau plonge et que
-  // les halos évitent.
+  // LES CORPS ET LEURS OMBRES laissent leur silhouette, que l'eau plonge et que les halos évitent.
   paint(scene_actors_.drawn, ro::render::SpriteRenderer::DepthWrite::kOn, Silhouette::kLeft,
         /*shaded=*/true);
   // LES CHARRETTES, juste après les corps et avant leurs voiles : une charrette
@@ -377,6 +375,9 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
         Silhouette::kLeft, /*shaded=*/true);
   paint(pieces_.map_sprites.translucent(), ro::render::SpriteRenderer::DepthWrite::kOff,
         Silhouette::kLeft, /*shaded=*/true);
+  // SANS SOLEIL, LES PROJECTILES EN VOL PORTENT L'OMBRE RONDE DES CORPS, que l'eau couvre aussi.
+  paint(projectiles.GroundShadows(sun_asked), ro::render::SpriteRenderer::DepthWrite::kOff,
+        Silhouette::kIgnored, /*shaded=*/true);
   // 🔴 LA NAPPE D'EAU APRÈS LES CORPS, LEURS OMBRES ET LES CHARRETTES : éprouvée contre
   // la profondeur qu'ils ont écrite, elle recouvre ce qui est SOUS sa surface — les pieds
   // de qui patauge, son ombre, les marques au sol. Puis cheminées et émetteurs, dessus.
@@ -688,9 +689,8 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
         }
       }
     }
-    // ⚠ LE BALAYAGE VIENT APRÈS LA COMPOSITION, jamais pendant : oublier un
-    // style détruit les tenues qui le portaient, et le parcours les lirait
-    // mortes.
+    // ⚠ LE BALAYAGE VIENT APRÈS LA COMPOSITION, jamais pendant : oublier un style détruit
+    // les tenues qui le portaient, et le parcours les lirait mortes.
     styles_.Sweep(*pieces_.wardrobe, world_.styles());
     ReportCensus(census, reported_census_);
     // LA MARCHE QU'UN GESTE RETENAIT part dès que la motion a changé, d'après ce
