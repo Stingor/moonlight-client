@@ -28,9 +28,12 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
 
   # UN ARBRE SALE SE DIT. Un binaire bâti sur des retouches non validées ne
   # correspond à aucune révision : le taire ferait chercher la panne dans un
-  # code qui n'est pas celui qui a planté.
+  # code qui n'est pas celui qui a planté. Les carnets du joueur, jamais
+  # compilés, n'en sont pas : même liste que NOTE_FILES de
+  # `scripts/build_identity.py`.
   execute_process(
-      COMMAND "${GIT_EXECUTABLE}" status --porcelain
+      COMMAND "${GIT_EXECUTABLE}" status --porcelain -- .
+              ":(exclude)TODO.txt" ":(exclude)FIXME.txt"
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
       OUTPUT_VARIABLE _dirty
       OUTPUT_STRIP_TRAILING_WHITESPACE
