@@ -64,6 +64,8 @@ constexpr std::string_view kDoramStatusStem = "status_doram";
 constexpr std::string_view kMenuIconFolder = "menu_icon\\bt_";
 constexpr std::string_view kMenuIconExtension = ".bmp";
 constexpr std::string_view kMenuButtonFolder = "basic_interface\\";
+constexpr std::string_view kOurMenuIconPrefix = "menu_";
+constexpr std::string_view kOurIconExtension = ".png";
 
 // Le voile posé sur le carré de secours, et son filet.
 constexpr ImU32 kFallbackFill = IM_COL32(40, 48, 72, 220);
@@ -368,6 +370,37 @@ std::string MenuIconPath(std::string_view stem, MenuIconArt art) {
   }
   path += kMenuIconExtension;
   return path;
+}
+
+std::string OurMenuIconPath(std::string_view stem, MenuIconArt art) {
+  std::string path(kOurIconFolder);
+  path += kOurMenuIconPrefix;
+  path += stem;
+  switch (art) {
+    case MenuIconArt::kNormal:
+      break;
+    case MenuIconArt::kPressed:
+      path += "_pressed";
+      break;
+    case MenuIconArt::kNews:
+      path += "_new";
+      break;
+    case MenuIconArt::kNewsPressed:
+      path += "_new_pressed";
+      break;
+  }
+  path += kOurIconExtension;
+  return path;
+}
+
+SkinImage AtOurDensity(SkinImage ours) {
+  ours.width /= kOurIconDensity;
+  ours.height /= kOurIconDensity;
+  return ours;
+}
+
+SkinImage PreferredMenuIconArt(const SkinImage& ours, const SkinImage& native) {
+  return ours.usable() ? AtOurDensity(ours) : native;
 }
 
 std::string MenuButtonPath(std::string_view stem) {

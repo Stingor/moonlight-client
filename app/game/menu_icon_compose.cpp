@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -29,9 +30,20 @@ constexpr std::string_view kMapWithoutCashShopButton = "new_event";
   return SkinImageOf(images->GetOurs(path));
 }
 
+// L'IMAGE D'UN ÉTAT : la nôtre quand elle est livrée, sinon celle du jeu.
+//
+// ⚠ LA NÔTRE SE CHERCHE EN SILENCE : son absence est le cas ordinaire. Celle
+// du jeu, demandée seulement à défaut, dit la sienne comme avant.
 [[nodiscard]] ro::ui::SkinImage ImageOf(ro::render::GameImages* images, MenuCommand command,
                                         bool doram, ro::ui::MenuIconArt art) {
-  return ImageAt(images, ro::ui::MenuIconPath(ro::ui::MenuIconStem(command, doram), art));
+  if (images == nullptr) {
+    return {};
+  }
+  const std::string_view stem = ro::ui::MenuIconStem(command, doram);
+  const ro::ui::SkinImage ours =
+      SkinImageOf(images->GetOursIfShipped(ro::ui::OurMenuIconPath(stem, art)));
+  return ro::ui::PreferredMenuIconArt(
+      ours, ours.usable() ? ro::ui::SkinImage{} : ImageAt(images, ro::ui::MenuIconPath(stem, art)));
 }
 
 [[nodiscard]] bool Holds(const std::vector<MenuCommand>& commands, MenuCommand command) {

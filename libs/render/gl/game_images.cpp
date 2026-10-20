@@ -55,6 +55,10 @@ const IconTexture& GameImages::GetOurs(std::string_view utf8_path) {
   return Fetch(utf8_path, /*ours=*/true, Treatment::kKeyed);
 }
 
+const IconTexture& GameImages::GetOursIfShipped(std::string_view utf8_path) {
+  return Fetch(utf8_path, /*ours=*/true, Treatment::kKeyed, /*optional=*/true);
+}
+
 const IconTexture& GameImages::GetOpaque(std::string_view utf8_path) {
   return Fetch(utf8_path, /*ours=*/true, Treatment::kOpaque);
 }
@@ -85,7 +89,8 @@ void GameImages::Clear() {
   ++generation_;
 }
 
-const IconTexture& GameImages::Fetch(std::string_view path, bool ours, Treatment treatment) {
+const IconTexture& GameImages::Fetch(std::string_view path, bool ours, Treatment treatment,
+                                     bool optional) {
   const std::string key = SafeGamePath(path);
   std::unordered_map<std::string, IconTexture>& cache =
       caches_[static_cast<std::size_t>(treatment)];
@@ -107,7 +112,9 @@ const IconTexture& GameImages::Fetch(std::string_view path, bool ours, Treatment
     // 🔴 UNE IMAGE INTROUVABLE SE DIT, UNE FOIS. Elle se retient, donc cette
     // ligne ne se répète pas — et sans elle, un fond noir ne se distingue pas
     // d'un décodage raté, d'un chemin mal encodé ou d'une archive absente.
-    core::LogWarning("image : introuvable — {}", key);
+    if (!optional) {
+      core::LogWarning("image : introuvable — {}", key);
+    }
     return image;
   }
   // ⚠ PAR L'EXTENSION ET NON PLUS EN BMP D'OFFICE : une illustration de cet

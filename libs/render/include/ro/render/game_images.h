@@ -53,6 +53,11 @@ class GameImages {
   // une ligne au journal.
   [[nodiscard]] const IconTexture& GetOurs(std::string_view utf8_path);
 
+  // LA MÊME, POUR UNE IMAGE FACULTATIVE : celle qui passe avant une autre quand
+  // elle est livrée. ⚠ SON ABSENCE NE SE DIT PAS AU JOURNAL : c'est le cas
+  // ordinaire, et le dire pour chaque icône noierait les vraies absences.
+  [[nodiscard]] const IconTexture& GetOursIfShipped(std::string_view utf8_path);
+
   // UN FOND PLEIN CADRE, écrit par nous : toujours OPAQUE.
   //
   // 🔴 SANS LA CLÉ MAGENTA : un décor que le joueur dépose n'est pas de l'art
@@ -104,8 +109,10 @@ class GameImages {
   };
   static constexpr std::size_t kTreatmentCount = 5;
 
-  // Le corps commun : `ours` dit par quelle porte du VFS passer.
-  [[nodiscard]] const IconTexture& Fetch(std::string_view path, bool ours, Treatment treatment);
+  // Le corps commun : `ours` dit par quelle porte du VFS passer, `optional` si
+  // une absence se tait.
+  [[nodiscard]] const IconTexture& Fetch(std::string_view path, bool ours, Treatment treatment,
+                                         bool optional = false);
 
   vfs::Vfs* vfs_ = nullptr;
   // ⚠ UN CACHE PAR TRAITEMENT et non une clé bricolée : le même fichier peut

@@ -77,18 +77,16 @@ enum class MenuCommand : std::uint8_t {
   kCraftAtlas,
   // LE CARNET DE CHASSE MVP : album, Atlas, puis carnet.
   kMvpTracker,
-  // LA FICHE DU PET, que le jeu n'ouvre que par le menu du pet. Son art
-  // `bt_pet` se livre comme les trois précédents ; sans lui, le carré de
-  // secours.
+  // LA FICHE DU PET, que le jeu n'ouvre que par le menu du pet.
+  //
+  // ⚠ LES QUATRE SUIVANTES N'ONT AUCUN BITMAP DU JEU : leur art est le nôtre,
+  // livré avec le client — voir `OurMenuIconPath`.
   kPetWindow,
-  // LE TABLEAU DES CLASSEMENTS, que le jeu n'a pas. Aucun art `bt_ranking` ne
-  // se livre : le carré de secours, à sa place.
+  // LE TABLEAU DES CLASSEMENTS, que le jeu n'a pas.
   kRankingBoard,
-  // LE MARCHÉ, qui remplace la recherche d'échoppes. Aucun art `bt_market` ne
-  // se livre : le carré de secours, à sa place.
+  // LE MARCHÉ, qui remplace la recherche d'échoppes.
   kMarket,
-  // LA BASE DE DONNÉES des objets et des monstres. Aucun art `bt_database` ne
-  // se livre : le carré de secours, à sa place.
+  // LA BASE DE DONNÉES des objets et des monstres.
   kDatabase,
   // ── HORS DE LA GRILLE ─────────────────────────────────────────────────────
   //
@@ -145,6 +143,33 @@ enum class MenuIconArt : std::uint8_t {
 
 // Le chemin complet, sous le dossier d'interface, écrit en UTF-8.
 [[nodiscard]] std::string MenuIconPath(std::string_view stem, MenuIconArt art);
+
+// ── NOS ICÔNES, dessinées pour ce client ────────────────────────────────────
+//
+// 🔴 ELLES PASSENT AVANT CELLES DU JEU, état par état : la nôtre si elle est
+// livrée, sinon le bitmap de l'installation, sinon le carré de secours.
+//
+// ⚠ DES NOMS À NOUS, À PLAT, EN PNG : `data\ui_icons\menu_<stem>.png`, puis
+// `_pressed`, `_new` et `_new_pressed`. Le préfixe `menu_` rend le nom unique
+// dans un dossier que toutes nos icônes partageront ; le PNG porte son alpha,
+// sans clé magenta.
+//
+// 🔴 ELLES SONT DESSINÉES À DOUBLE DENSITÉ : un pixel d'interface y vaut
+// `kOurIconDensity` pixels de côté. Elles prennent donc la place exacte du
+// bitmap du jeu, et restent nettes quand l'échelle d'interface grandit.
+inline constexpr std::string_view kOurIconFolder = "data\\ui_icons\\";
+inline constexpr float kOurIconDensity = 2.0F;
+
+// Le chemin de NOTRE image pour cet état, écrit en UTF-8.
+[[nodiscard]] std::string OurMenuIconPath(std::string_view stem, MenuIconArt art);
+
+// NOTRE IMAGE RAMENÉE À SA TAILLE D'INTERFACE : la texture reste entière, seule
+// la place qu'elle prend se divise par la densité. Vide, elle reste vide.
+[[nodiscard]] SkinImage AtOurDensity(SkinImage ours);
+
+// L'IMAGE QU'UN ÉTAT MONTRE : la nôtre, ramenée à sa taille d'interface, quand
+// elle est livrée ; sinon celle du jeu, vide quand l'installation ne l'a pas.
+[[nodiscard]] SkinImage PreferredMenuIconArt(const SkinImage& ours, const SkinImage& native);
 
 // LE CHEMIN DU BITMAP D'UN BOUTON HORS GRILLE : `basic_interface\<stem>.bmp`.
 // ⚠ UN SEUL FICHIER pour les trois états — normal, survol, enfoncé.
