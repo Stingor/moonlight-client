@@ -7399,6 +7399,9 @@ tr: Right-drag
 fr: Clic milieu glissé
 tr: Middle-drag
 
+fr: Clic milieu maintenu
+tr: Middle-button hold
+
 fr: boutique
 tr: shop
 
@@ -7957,6 +7960,9 @@ tr: Apply
 fr: Appuyez sur une touche - Échap annule, Suppr retire le raccourci.
 tr: Press a key - Escape cancels, Delete removes the shortcut.
 
+fr: Appuyez sur une touche, ou sur le bouton du milieu de la souris. Échap annule, Suppr retire le raccourci.
+tr: Press a key, or the middle mouse button. Esc cancels, Del removes the shortcut.
+
 fr: Après chaque tentative, relance Upgrade Weapon pour rouvrir la liste — le serveur n'en autorise qu'une par lancement. Ne refine RIEN tout seul : le choix de l'arme et le déclenchement restent des clics. La chaîne s'arrête d'elle-même quand la liste revient vide, quand il n'y a plus de minerai, ou quand le serveur refuse une condition. Si le skill est jeté par son délai de lancement, la relance est réessayée un peu plus tard (3 fois au plus) au lieu de s'arrêter en silence.
 tr: After each attempt, recasts Upgrade Weapon to reopen the list — the server allows only one per cast. Refines NOTHING on its own: choosing the weapon and triggering it remain clicks. The chain stops by itself when the list comes back empty, when there is no ore left, or when the server refuses a condition. If the skill is dropped by its cast delay, the recast is retried a little later (3 times at most) instead of stopping silently.
 
@@ -8100,6 +8106,18 @@ tr: Zeny bank. Opens, or closes.
 
 fr: Barre
 tr: Bar
+
+fr: Barre de la roue
+tr: Wheel bar
+
+fr: Maintenir le clic milieu sur le monde ouvre cette barre en cercle sous le curseur ; relâcher utilise la case visée, relâcher au centre annule. La barre n'a pas besoin d'être affichée. Le geste se change dans les raccourcis clavier ; un clic milieu glissé lié à la caméra ne tourne plus la vue tant qu'une barre est choisie ici.
+tr: Holding the middle button over the world opens this bar as a circle under the cursor; releasing uses the aimed slot, releasing in the centre cancels. The bar does not need to be shown. The gesture can be changed in the keyboard shortcuts; a middle-drag bound to the camera no longer turns the view while a bar is chosen here.
+
+fr: Roue des raccourcis (maintenir)
+tr: Shortcut wheel (hold)
+
+fr: Case vide
+tr: Empty slot
 
 fr: Barres de raccourcis
 tr: Shortcut bars

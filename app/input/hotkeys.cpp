@@ -107,6 +107,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kMercenaryStandby, "mercenary_standby"},
     {GameAction::kHomunculusOrder, "homunculus_order"},
     {GameAction::kMercenaryOrder, "mercenary_order"},
+    {GameAction::kShortcutWheel, "shortcut_wheel"},
     {GameAction::kCameraReset, "camera_reset"},
     {GameAction::kCameraResetYaw, "camera_reset_yaw"},
     {GameAction::kCameraResetTilt, "camera_reset_tilt"},
@@ -251,6 +252,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kMercenaryStandby:
     case GameAction::kHomunculusOrder:
     case GameAction::kMercenaryOrder:
+    case GameAction::kShortcutWheel:
       return HotkeyTab::kPlay;
     case GameAction::kFrameWholeMap:
     case GameAction::kCameraReset:
@@ -437,6 +439,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Homoncule : ordre (aller ici, attaquer)");
     case GameAction::kMercenaryOrder:
       return ro::core::Tr("Mercenaire : ordre (aller ici, attaquer)");
+    case GameAction::kShortcutWheel:
+      return ro::core::Tr("Roue des raccourcis (maintenir)");
   }
   return ro::core::Tr("Inconnue");
 }
@@ -509,6 +513,9 @@ Hotkeys::Hotkeys() {
       Binding{.key = KeyOfGesture(MouseGesture::kRightClick), .alt = true};
   bindings_[ActionRef(GameAction::kMercenaryOrder).rank()] =
       Binding{.key = KeyOfGesture(MouseGesture::kLeftClick), .alt = true};
+  // ⚠ LE BOUTON DU MILIEU POUR LA ROUE : aucun geste d'usine ne le prend sur le
+  // monde, et la roue ne s'ouvre que si une barre lui est choisie.
+  set(GameAction::kShortcutWheel, KeyOfGesture(MouseGesture::kMiddleHold));
   set(GameAction::kSitOrStand, SDLK_INSERT);
   if constexpr (ro::core::kDevTools) {
     set(GameAction::kEffectBench, SDLK_N);

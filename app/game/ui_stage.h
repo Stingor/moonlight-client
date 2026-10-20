@@ -176,6 +176,7 @@ class UiStage {
   // quatre booléens voisins devient vite un piège.
   struct Windows {
     std::optional<ro::ui::MapSignView> map_sign;  // le bandeau de la carte, composé par `app`
+    ro::ui::ShortcutWheelView shortcut_wheel;     // la roue d'utilisation, composée par `app`
     // La liaison au serveur : bandeau et boîte de perte, composés par `app`.
     ro::ui::LinkNoticeState link_notice;
     BalloonBoards balloons;  // les bulles d'annonce, composées à chaque image
@@ -382,8 +383,7 @@ class UiStage {
     TradeWindows trade;
     // LE COURRIER : la boîte et l'écriture. Voir `ui_stage_mail.cpp`.
     MailWindows mail;
-    // LES SALONS : le formulaire, la salle, l'invite. Voir
-    // `ui_stage_chat_room.cpp`.
+    // LES SALONS : le formulaire, la salle, l'invite. Voir `ui_stage_chat_room.cpp`.
     ChatRoomWindows chat_room;
     WhisperWindows whispers;            // Les conversations 1:1 : `ui_stage_whisper.cpp`.
     AchievementWindows achievements;    // La fenêtre, la bannière : `ui_stage_achievements.cpp`.

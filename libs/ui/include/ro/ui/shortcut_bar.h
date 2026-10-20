@@ -339,6 +339,9 @@ struct ShortcutBarGrid {
   return bar * kShortcutSlotsPerBar + rank;
 }
 
+// AUCUNE BARRE POUR LA ROUE D'UTILISATION : le bouton qui l'ouvre ne fait rien.
+inline constexpr int kNoWheelBar = 0;
+
 struct ShortcutBarsLayout {
   std::array<ShortcutBarLayout, kShortcutBarCount> bars = [] {
     std::array<ShortcutBarLayout, kShortcutBarCount> all{};
@@ -361,7 +364,17 @@ struct ShortcutBarsLayout {
   // ceux des barres affichées — alignés, ou bout à bout. Le même aimant que les
   // jauges entre elles, et la grille garde le dernier mot quand elle aimante.
   bool sticky = true;
+  // LA BARRE QUE MONTRE LA ROUE D'UTILISATION, comptée à partir de UN comme le
+  // joueur la voit, ou `kNoWheelBar`.
+  //
+  // ⚠ UNE SEULE, ET ELLE N'A PAS BESOIN D'ÊTRE AFFICHÉE : une barre masquée peut
+  // ne servir qu'à la roue. ⚠ LE NOMBRE VIENT D'UN FICHIER : il ne se lit que
+  // par `WheelBarOf`, qui ramène tout hors-bornes à « aucune ».
+  int wheel_bar = kNoWheelBar;
 };
+
+// LA BARRE DE LA ROUE, en index à partir de zéro, ou rien.
+[[nodiscard]] std::optional<std::size_t> WheelBarOf(const ShortcutBarsLayout& layout);
 
 // CE QU'UN GLISSER PORTE ENTRE DEUX CASES.
 //
@@ -460,5 +473,62 @@ void SnapMovingShortcutBar(const ShortcutBarsLayout& layout);
 // Centre la barre `bar` sur la largeur de l'écran, à la même hauteur. Les autres
 // ne bougent pas. Sans effet tant que la barre n'a jamais été dessinée.
 void CenterShortcutBar(std::size_t bar);
+
+// ── LA ROUE D'UTILISATION ───────────────────────────────────────────────────
+//
+// Les douze cases d'une barre en cercle, comme une horloge : la case 1 en haut,
+// puis dans le sens des aiguilles. Le bouton tenu l'ouvre centrée sur le
+// curseur ; la direction de la souris depuis le centre vise une case, et le
+// relâcher l'utilise comme un clic sur la case de la barre.
+//
+// 🔴 LA GÉOMÉTRIE EST PURE, ET `app` S'EN SERT AUSSI : c'est elle qui décide, au
+// relâcher, quelle case part. Le dessin et la décision lisent la même fonction,
+// donc la case éclairée est toujours celle qui part.
+
+// LE RAYON DE LA ZONE MORTE, en pixels de fenêtre : la souris dedans ne vise
+// rien, et relâcher là annule.
+//
+// ⚠ PAS À L'ÉCHELLE DE L'INTERFACE : `app` décide sans la connaître, et le
+// cercle dessiné doit être celui où la décision se prend.
+inline constexpr float kWheelDeadZoneRadiusPx = 24.0F;
+// Le rayon du cercle des cases, en côtés de case : douze cases de côté `c` sur
+// un cercle de rayon 2,5 `c` laissent entre elles près d'un tiers de case.
+inline constexpr float kWheelRingRadiusPerSlotSide = 2.5F;
+// Le plus petit rayon du cercle, en pixels : en deçà, les petites cases se
+// collent à la zone morte.
+inline constexpr float kWheelSmallestRingRadiusPx = 72.0F;
+
+// Le rayon du cercle où se posent les centres des cases de côté `slot_side_px`.
+[[nodiscard]] float WheelRingRadius(float slot_side_px);
+
+// LE RANG VISÉ par la souris décalée de (`dx_px`, `dy_px`) depuis le centre —
+// l'axe vertical vers le BAS, comme à l'écran —, ou rien dans la zone morte de
+// rayon `dead_zone_radius_px`. Le rang 0 est en haut, les suivants dans le sens
+// des aiguilles ; chaque secteur couvre un douzième de tour centré sur sa case.
+[[nodiscard]] std::optional<std::size_t> WheelSectorAt(float dx_px, float dy_px,
+                                                       float dead_zone_radius_px);
+
+// LE CENTRE DE LA CASE DE RANG `rank` sur le cercle de rayon `ring_radius_px`.
+[[nodiscard]] ImVec2 WheelSlotCenter(ImVec2 center, std::size_t rank, float ring_radius_px);
+
+// LA ROUE TELLE QU'`app` LA TIENT : ouverte ou non, sur quelle barre, et où.
+struct ShortcutWheelView {
+  bool open = false;
+  // La barre montrée, à partir de zéro.
+  std::size_t bar = 0;
+  // Le centre — le curseur à l'ouverture — et le curseur maintenant, en pixels
+  // de fenêtre.
+  ImVec2 center;
+  ImVec2 pointer;
+};
+
+// Dessine la roue par-dessus tout, quand elle est ouverte, et rend le rang
+// visé. `slots` porte les quatre-vingt-seize cases, comme pour les barres.
+//
+// ⚠ ELLE NE PREND RIEN À LA SOURIS : elle se peint sur la liste de premier plan,
+// sans fenêtre. C'est `app` qui bloque le monde tant qu'elle est ouverte.
+std::optional<std::size_t> DrawShortcutWheel(const ShortcutWheelView& view,
+                                             const ShortcutBarsLayout& layout,
+                                             std::span<const ShortcutSlotView> slots);
 
 }  // namespace ro::ui

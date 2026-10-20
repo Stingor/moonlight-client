@@ -7399,6 +7399,9 @@ tr: Arrastre con clic derecho
 fr: Clic milieu glissé
 tr: Arrastre con clic central
 
+fr: Clic milieu maintenu
+tr: Clic central mantenido
+
 fr: boutique
 tr: tienda
 
@@ -7957,6 +7960,9 @@ tr: Aplicar
 fr: Appuyez sur une touche - Échap annule, Suppr retire le raccourci.
 tr: Pulsa una tecla - Esc cancela, Supr quita el atajo.
 
+fr: Appuyez sur une touche, ou sur le bouton du milieu de la souris. Échap annule, Suppr retire le raccourci.
+tr: Pulsa una tecla, o el botón central del ratón. Esc cancela, Supr quita el atajo.
+
 fr: Après chaque tentative, relance Upgrade Weapon pour rouvrir la liste — le serveur n'en autorise qu'une par lancement. Ne refine RIEN tout seul : le choix de l'arme et le déclenchement restent des clics. La chaîne s'arrête d'elle-même quand la liste revient vide, quand il n'y a plus de minerai, ou quand le serveur refuse une condition. Si le skill est jeté par son délai de lancement, la relance est réessayée un peu plus tard (3 fois au plus) au lieu de s'arrêter en silence.
 tr: Tras cada intento, vuelve a lanzar Upgrade Weapon para reabrir la lista: el servidor solo permite una por lanzamiento. No hace NINGÚN refine por sí solo: elegir el arma y activarlo siguen siendo clics. La cadena se detiene sola cuando la lista vuelve vacía, cuando no queda mineral o cuando el servidor rechaza una condición. Si el skill se pierde por su retardo de lanzamiento, el relanzamiento se reintenta un poco más tarde (3 veces como máximo) en lugar de detenerse en silencio.
 
@@ -8100,6 +8106,18 @@ tr: Banco de zeny. Abre, o cierra.
 
 fr: Barre
 tr: Barra
+
+fr: Barre de la roue
+tr: Barra de la rueda
+
+fr: Maintenir le clic milieu sur le monde ouvre cette barre en cercle sous le curseur ; relâcher utilise la case visée, relâcher au centre annule. La barre n'a pas besoin d'être affichée. Le geste se change dans les raccourcis clavier ; un clic milieu glissé lié à la caméra ne tourne plus la vue tant qu'une barre est choisie ici.
+tr: Mantener el clic central sobre el mundo abre esta barra en círculo bajo el cursor; soltar usa la casilla apuntada, soltar en el centro cancela. La barra no necesita estar visible. El gesto se cambia en los atajos de teclado; un arrastre con clic central ligado a la cámara ya no gira la vista mientras haya una barra elegida aquí.
+
+fr: Roue des raccourcis (maintenir)
+tr: Rueda de atajos (mantener)
+
+fr: Case vide
+tr: Casilla vacía
 
 fr: Barres de raccourcis
 tr: Barras de atajos

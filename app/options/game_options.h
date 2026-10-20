@@ -712,6 +712,7 @@ class GameOptions {
   // traduit meurt au changement de langue et ne se garde pas d'une image à
   // l'autre.
   std::vector<const char*> shortcut_shadow_names_;
+  std::vector<const char*> shortcut_wheel_choices_;  // « Aucune », puis les huit onglets
   // Les deux moitiés du panneau des barres, dans `game_option_bars.cpp` : ce
   // qu'il MONTRE, et ce qu'une de ses lignes CHANGE.
   void ComposeShortcutRows(int shown_bar);

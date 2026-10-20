@@ -210,6 +210,8 @@ add_library(ro_ui STATIC
     src/item_link_cell.cpp
     src/item_obtain_toast.cpp
     src/shortcut_bar.cpp
+    src/shortcut_slot_paint.cpp
+    src/shortcut_wheel.cpp
     src/skin_palette.cpp
     src/system_fonts.cpp
     src/skin_look_sample.cpp

@@ -162,6 +162,11 @@ enum class GameAction : std::uint8_t {
   // gestes du jeu.
   kHomunculusOrder,
   kMercenaryOrder,
+  // LA ROUE D'UTILISATION : tenue, elle ouvre en cercle la barre choisie dans
+  // les options ; relâchée, elle utilise la case visée. ⚠ UN MAINTIEN, jamais
+  // une simple frappe — voir `ActionInput::kHold`. Clic milieu par défaut, sans
+  // effet tant qu'aucune barre n'est choisie.
+  kShortcutWheel,
   // En dernier : leur intertitre coifferait les lignes suivantes, et la remise
   // doit se lire après `kFrameWholeMap` pour reprendre sa touche.
   kCameraReset,
@@ -312,6 +317,9 @@ enum class MouseGesture : std::uint8_t {
   // le rang d'un geste est gravé dans les fichiers.
   kLeftClick,
   kRightClick,
+  // LE BOUTON DU MILIEU TENU, pour la roue : l'appui l'ouvre, le relâcher la
+  // ferme. ⚠ EN DERNIER, pour la même raison.
+  kMiddleHold,
 };
 inline constexpr std::uint32_t kMouseGestureMark = 1U << 28;
 
@@ -320,6 +328,14 @@ inline constexpr std::uint32_t kMouseGestureMark = 1U << 28;
 }
 
 [[nodiscard]] std::optional<MouseGesture> GestureOfKey(std::uint32_t key) noexcept;
+
+// LE GESTE QU'UN APPUI DE BOUTON SDL PEUT LIER : clic gauche ou droit, et le
+// bouton du milieu TENU. Rien pour un autre bouton.
+[[nodiscard]] std::optional<MouseGesture> PressGestureOf(std::uint8_t button) noexcept;
+// Le double-clic de ce bouton : droit ou milieu, rien pour un autre.
+[[nodiscard]] std::optional<MouseGesture> DoubleClickGestureOf(std::uint8_t button) noexcept;
+// Le glissé que font les boutons tenus `held` (masque SDL) : droit d'abord.
+[[nodiscard]] std::optional<MouseGesture> DragGestureOf(std::uint32_t held) noexcept;
 
 enum class ActionInput : std::uint8_t {
   // Une touche ou un double-clic.
@@ -331,6 +347,9 @@ enum class ActionInput : std::uint8_t {
   // clic nu marche ou ouvre le menu d'entité, et Ctrl + clic gauche est
   // l'attaque continue. Les prendre retirerait au joueur un geste du jeu.
   kWorldClick,
+  // UN MAINTIEN : l'appui ouvre, le relâcher conclut. Une touche du clavier, ou
+  // le bouton du milieu tenu.
+  kHold,
 };
 
 [[nodiscard]] ActionInput InputOfAction(ActionRef action);

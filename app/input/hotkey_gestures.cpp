@@ -8,6 +8,7 @@
 
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_mouse.h>
 
 #include "ro/core/i18n.h"
 #include "ro/core/text.h"
@@ -17,7 +18,7 @@
 namespace moonclient {
 namespace {
 
-constexpr auto kLastGesture = MouseGesture::kRightClick;
+constexpr auto kLastGesture = MouseGesture::kMiddleHold;
 
 // Le dernier point de code Unicode : au-delà, un code de touche n'est plus un caractère.
 constexpr std::uint32_t kLastCodePoint = 0x10FFFF;
@@ -55,6 +56,8 @@ constexpr std::uint32_t kAsciiCaseGap = 'a' - 'A';
       return "MouseLeftClick";
     case MouseGesture::kRightClick:
       return "MouseRightClick";
+    case MouseGesture::kMiddleHold:
+      return "MouseMiddleHold";
   }
   return "";
 }
@@ -75,11 +78,47 @@ constexpr std::uint32_t kAsciiCaseGap = 'a' - 'A';
       return ro::core::Tr("Clic gauche");
     case MouseGesture::kRightClick:
       return ro::core::Tr("Clic droit");
+    case MouseGesture::kMiddleHold:
+      return ro::core::Tr("Clic milieu maintenu");
   }
   return "?";
 }
 
 }  // namespace
+
+std::optional<MouseGesture> PressGestureOf(std::uint8_t button) noexcept {
+  switch (button) {
+    case SDL_BUTTON_LEFT:
+      return MouseGesture::kLeftClick;
+    case SDL_BUTTON_RIGHT:
+      return MouseGesture::kRightClick;
+    case SDL_BUTTON_MIDDLE:
+      return MouseGesture::kMiddleHold;
+    default:
+      return std::nullopt;
+  }
+}
+
+std::optional<MouseGesture> DoubleClickGestureOf(std::uint8_t button) noexcept {
+  switch (button) {
+    case SDL_BUTTON_RIGHT:
+      return MouseGesture::kRightDoubleClick;
+    case SDL_BUTTON_MIDDLE:
+      return MouseGesture::kMiddleDoubleClick;
+    default:
+      return std::nullopt;
+  }
+}
+
+std::optional<MouseGesture> DragGestureOf(std::uint32_t held) noexcept {
+  if ((held & SDL_BUTTON_RMASK) != 0) {
+    return MouseGesture::kRightDrag;
+  }
+  if ((held & SDL_BUTTON_MMASK) != 0) {
+    return MouseGesture::kMiddleDrag;
+  }
+  return std::nullopt;
+}
 
 std::optional<MouseGesture> GestureOfKey(std::uint32_t key) noexcept {
   if ((key & kMouseGestureMark) == 0) {
@@ -110,6 +149,8 @@ ActionInput InputOfAction(ActionRef action) {
     case GameAction::kHomunculusOrder:
     case GameAction::kMercenaryOrder:
       return ActionInput::kWorldClick;
+    case GameAction::kShortcutWheel:
+      return ActionInput::kHold;
     default:
       return ActionInput::kPress;
   }
@@ -132,17 +173,27 @@ bool BindingFits(ActionRef action, Binding binding) {
     case ActionInput::kPress:
       return !gesture.has_value() || gesture == MouseGesture::kRightDoubleClick ||
              gesture == MouseGesture::kMiddleDoubleClick;
+    case ActionInput::kHold:
+      // ⚠ UN BOUTON QU'ON TIENT, et seulement celui du milieu : le gauche marche
+      // et le droit tourne la caméra, l'un comme l'autre dès l'appui.
+      return !gesture.has_value() || gesture == MouseGesture::kMiddleHold;
   }
   return false;
 }
 
 const char* CaptureHintOfAction(ActionRef action) {
-  if (InputOfAction(action) != ActionInput::kWorldClick) {
-    return nullptr;
+  switch (InputOfAction(action)) {
+    case ActionInput::kWorldClick:
+      return ro::core::Tr(
+          "Cliquez dans le jeu en tenant Alt ou Ctrl — ni Maj, ni Ctrl + clic gauche seul. "
+          "Échap annule, Suppr retire le raccourci.");
+    case ActionInput::kHold:
+      return ro::core::Tr(
+          "Appuyez sur une touche, ou sur le bouton du milieu de la souris. Échap annule, "
+          "Suppr retire le raccourci.");
+    default:
+      return nullptr;
   }
-  return ro::core::Tr(
-      "Cliquez dans le jeu en tenant Alt ou Ctrl — ni Maj, ni Ctrl + clic gauche seul. "
-      "Échap annule, Suppr retire le raccourci.");
 }
 
 std::string FileNameOfKey(std::uint32_t key) {

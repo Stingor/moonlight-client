@@ -313,6 +313,7 @@ constexpr Language kLanguages[] = {
 constexpr const char* kShortcutBarKeys = "bar%zu_%s";
 constexpr const char* kShortcutShowKeysKey = "bars_keys";
 constexpr const char* kShortcutStickyKey = "bars_magnetized";
+constexpr const char* kShortcutWheelBarKey = "bars_wheel";
 
 [[nodiscard]] std::string BarKey(std::size_t bar, const char* what) {
   return ro::core::Printed(kShortcutBarKeys, bar + 1, what);
@@ -332,6 +333,7 @@ void GameOptions::DeclareShortcutBars(SettingsFile& into) {
   // diverger. Voir `settings_file.h`.
   into.Declare(kShortcutShowKeysKey, &shortcut_bars_.show_keys);
   into.Declare(kShortcutStickyKey, &shortcut_bars_.sticky);
+  into.Declare(kShortcutWheelBarKey, &shortcut_bars_.wheel_bar);
   for (std::size_t bar = 0; bar < ro::ui::kShortcutBarCount; ++bar) {
     ro::ui::ShortcutBarLayout& look = shortcut_bars_.bars[bar];
     into.Declare(BarKey(bar, "shown"), &look.shown);

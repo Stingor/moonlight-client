@@ -215,8 +215,7 @@ void Game::Close() {
   if (item_description_.has_value()) {
     item_description_->books().NoteLeaving(windows_.book);
   }
-  // L'IA DES COMPAGNONS : ses profils en attente, et les délais pour la
-  // session suivante.
+  // L'IA DES COMPAGNONS : ses profils en attente, et les délais pour la session suivante.
   pieces_.companion_ai.Leave(static_cast<std::uint32_t>(SDL_GetTicks()));
   // La minimap quitte le panneau d'options : ses réglages vivent avec la partie.
   settings_->options().pages().minimap_panel.Entrust(nullptr);
@@ -293,6 +292,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .entity_menu = &menu_gestures_,
                 .afk_now = &afk_requested_,
                 .shortcuts = &*shortcuts_,
+                .shortcut_wheel = &pieces_.shortcut_wheel,
                 .escape_closes_a_window = interface_->escape_has_work(),
                 .enter_claimed =
                     CraftStage::ClaimsEnter(windows_.make_item, windows_.weapon_refine,
@@ -532,6 +532,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   RelabelEmojiGroups(emojis_);
   ListUnlockedHudShown(settings_->options(), windows_, windows_.unlocked_hud);
   interface_->SetSkinLook(settings_->options().pages().skin_look.look());
+  windows_.shortcut_wheel = pieces_.shortcut_wheel.Compose(settings_->options().shortcut_bars());
   const UiStage::Answers answers = interface_->Draw(
       frame_tally_, windows_, talk, chat_preview_.preview(), *chat_tabs_, input_links_, emotions_,
       emojis_, sheet_->groups(), skill_points,
@@ -723,7 +724,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
     pieces_.commands.Apply(link_,
                            item_description_.has_value() ? &item_description_->facts() : nullptr);
   }
-  shortcuts_->Apply(answers.shortcuts, grimoire_, link_, world_, now_ms);
+  shortcuts_->Apply(pieces_.shortcut_wheel.WithChosen(answers.shortcuts), grimoire_, link_, world_,
+                    now_ms);
   settings_->Apply(answers, OptionsTargets(), windows_, &running_, now_ms);
   if (answers.lock_hud) {
     LockWholeHud(*settings_, OptionsTargets(), now_ms);

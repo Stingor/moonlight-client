@@ -417,6 +417,8 @@ enum class GameOption : std::uint8_t {
 // ⚠ CES NOMBRES NE SONT PERSISTÉS NULLE PART : ils vivent le temps d'un aller
 // vers la fenêtre et d'un retour. Les clés du fichier, elles, sont les chaînes
 // composées de `DeclareShortcutBars`.
+// La barre que montre la roue d'utilisation : une liste, « Aucune » d'abord.
+inline constexpr int kShortcutWheelBarRow = 988;
 inline constexpr int kShortcutStickyRow = 989;
 inline constexpr int kShortcutShowKeysRow = 990;
 inline constexpr int kShortcutLockedRow = 991;

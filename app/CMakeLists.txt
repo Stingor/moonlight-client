@@ -365,6 +365,18 @@ target_link_libraries(moonclient_hotkeys
 
 target_include_directories(moonclient_hotkeys PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LA ROUE D'UTILISATION, en bibliothèque pour la raison habituelle : ce qu'elle
+# fait d'un appui, d'un glissé et d'un relâcher se vérifie sur un banc, avec des
+# événements fabriqués, sans fenêtre ni partie.
+add_library(moonclient_shortcutwheel STATIC
+    character/shortcut_wheel.cpp)
+
+target_link_libraries(moonclient_shortcutwheel
+    PUBLIC ro_core ro_ui moonclient_hotkeys SDL3::SDL3
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_shortcutwheel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LA GRILLE D'ICÔNES DE MENU, en bibliothèque pour la raison habituelle : ce
 # qu'elle montre — icônes cachées, enfoncées, allumées, la pastille de la file,
 # les raccourcis — se vérifie sur un banc, sans art ni fenêtres.
@@ -1853,7 +1865,7 @@ add_executable(moonclient
 
 target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
-            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
+            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
             moonclient_portraitoptions moonclient_factorylayout

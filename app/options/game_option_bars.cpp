@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -111,6 +112,26 @@ void GameOptions::ComposeShortcutRows(int shown_bar) {
                  "touchent."),
       .kind = OptionKind::kToggle,
       .on = shortcut_bars_.sticky});
+  // LA ROUE D'UTILISATION : « Aucune », puis les huit barres. ⚠ REMPLIE APRÈS
+  // LES ONGLETS, dont elle emprunte les noms, et refaite à chaque image comme
+  // eux. ⚠ UNE VALEUR HORS BORNES, venue du fichier, se montre « Aucune » :
+  // c'est ce que la roue en fait.
+  shortcut_wheel_choices_.clear();
+  shortcut_wheel_choices_.push_back(Tr("Aucune"));
+  shortcut_wheel_choices_.insert(shortcut_wheel_choices_.end(), shortcut_tabs_.begin(),
+                                 shortcut_tabs_.end());
+  const std::optional<std::size_t> wheel_bar = ro::ui::WheelBarOf(shortcut_bars_);
+  shortcut_shared_rows_.push_back(OptionRowView{
+      .id = kShortcutWheelBarRow,
+      .label = Tr("Barre de la roue"),
+      .help = Tr("Maintenir le clic milieu sur le monde ouvre cette barre en cercle sous le "
+                 "curseur ; relâcher utilise la case visée, relâcher au centre annule. La barre "
+                 "n'a pas besoin d'être affichée. Le geste se change dans les raccourcis "
+                 "clavier ; un clic milieu glissé lié à la caméra ne tourne plus la vue tant "
+                 "qu'une barre est choisie ici."),
+      .kind = OptionKind::kChoice,
+      .chosen = wheel_bar.has_value() ? static_cast<int>(*wheel_bar) + 1 : ro::ui::kNoWheelBar,
+      .choices = shortcut_wheel_choices_});
   ComposeArmedSkillRows();
 
   shortcut_rows_.clear();
@@ -295,6 +316,12 @@ bool GameOptions::ChangeShortcutBar(const ro::ui::OptionsWindowAction& asked) {
   }
   if (asked.changed == kShortcutStickyRow) {
     shortcut_bars_.sticky = asked.on;
+    return true;
+  }
+  if (asked.changed == kShortcutWheelBarRow) {
+    // Le rang dans la liste EST la valeur gardée : zéro pour « Aucune », puis
+    // le numéro de la barre.
+    shortcut_bars_.wheel_bar = asked.chosen;
     return true;
   }
   if (asked.changed < kShortcutBarRowBase) {

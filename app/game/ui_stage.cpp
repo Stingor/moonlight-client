@@ -60,8 +60,7 @@ ro::core::Result<UiStage> UiStage::Open(SDL_Window* window, Windows& windows, in
     return std::unexpected(backend.error());
   }
 
-  // OÙ LES RÉGLAGES VIVENT : l'appelant le décide — voir
-  // `ClientShell::OpenWindow`.
+  // OÙ LES RÉGLAGES VIVENT : l'appelant le décide — voir `ClientShell::OpenWindow`.
   if (!settings_file.empty()) {
     ui->UseSettingsFile(settings_file);
   }
@@ -731,6 +730,7 @@ UiStage::Answers UiStage::Draw(
   // ⚠ ET AVANT L'ENREGISTREUR : son témoin doit rester au-dessus de ce qu'il
   // filme, bandeau compris.
   ro::ui::DrawItemObtainToast(obtained, obtained_look, skin_, obtained_grip, &answers.obtained);
+  ro::ui::DrawShortcutWheel(windows.shortcut_wheel, shortcut_bars, shortcuts);
   if (!windows.unlocked_hud.empty()) {
     const ro::ui::UnlockNoticeAnswer notice = ro::ui::DrawUnlockNotice(windows.unlocked_hud);
     answers.lock_hud = notice.lock_all;

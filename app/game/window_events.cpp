@@ -198,16 +198,6 @@ void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_i
   }
 }
 
-[[nodiscard]] std::optional<MouseGesture> ClickOf(std::uint8_t button) {
-  if (button == SDL_BUTTON_LEFT) {
-    return MouseGesture::kLeftClick;
-  }
-  if (button == SDL_BUTTON_RIGHT) {
-    return MouseGesture::kRightClick;
-  }
-  return std::nullopt;
-}
-
 // L'APPUI COMPLÈTE UN DOUBLE-CLIC. Le gauche et le droit suivent la règle du
 // jeu, `DoubleClickClocks` ; le bouton du milieu, que le jeu ne lit pas, garde
 // celle du système.
@@ -221,26 +211,6 @@ void OnKeyDown(const EventRouting& to, const SDL_KeyboardEvent& key, bool text_i
     return to.world_mouse->double_click.NotePress(ClickButton::kRight, to.now_ms);
   }
   return button.clicks >= 2;
-}
-
-[[nodiscard]] std::optional<MouseGesture> DoubleClickOf(std::uint8_t button) {
-  if (button == SDL_BUTTON_RIGHT) {
-    return MouseGesture::kRightDoubleClick;
-  }
-  if (button == SDL_BUTTON_MIDDLE) {
-    return MouseGesture::kMiddleDoubleClick;
-  }
-  return std::nullopt;
-}
-
-[[nodiscard]] std::optional<MouseGesture> DragOf(SDL_MouseButtonFlags held) {
-  if ((held & SDL_BUTTON_RMASK) != 0) {
-    return MouseGesture::kRightDrag;
-  }
-  if ((held & SDL_BUTTON_MMASK) != 0) {
-    return MouseGesture::kMiddleDrag;
-  }
-  return std::nullopt;
 }
 
 // Un événement de souris ne porte pas les modificateurs : on les relit.
@@ -603,6 +573,14 @@ void OnWheel(const EventRouting& to, const SDL_MouseWheelEvent& wheel,
 
 void RouteEvent(const EventRouting& to, const SDL_Event& event) {
   const ro::ui::InputGate gate = to.interface->gate();
+  // LA ROUE D'UTILISATION AVANT LE MONDE : ouverte, elle garde la souris pour viser.
+  const WheelGate wheel_gate{
+      .mouse_over_interface = gate.mouse_to_ui,
+      .capturing_hotkey = to.hotkeys != nullptr && to.hotkeys->capturing >= 0};
+  if (to.shortcut_wheel != nullptr && to.bindings != nullptr &&
+      to.shortcut_wheel->TakeEvent(event, *to.bindings, wheel_gate, SDL_GetModState(), to.mouse)) {
+    return;
+  }
   switch (event.type) {
     case SDL_EVENT_QUIT:
       *to.running = false;
@@ -651,6 +629,10 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
           to.grimoire_keys->TakeKeyDown(event.key, *to.sheet, *to.bindings, to.now_ms)) {
         break;
       }
+      if (to.shortcut_wheel != nullptr && to.bindings != nullptr && to.mouse != nullptr &&
+          to.shortcut_wheel->TakeKeyDown(event.key, *to.bindings, wheel_gate, *to.mouse)) {
+        break;
+      }
       OnKeyDown(to, event.key, gate.text_to_ui);
       break;
 
@@ -691,17 +673,17 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       const bool second_of_double = SecondOfDouble(to, event.button);
       // La capture passe avant le laissez-passer : la souris est encore sur la
       // fenêtre de configuration.
-      // UN CLIC SIMPLE, pour une liaison d'ordre aux compagnons : seule une action
-      // de clic sur le monde le prend, toute autre le laisse passer.
+      // UN APPUI SIMPLE, pour un ordre aux compagnons ou le maintien de la roue :
+      // seule une action qui attend ce geste le prend, toute autre le laisse passer.
       if (!second_of_double) {
-        if (const std::optional<MouseGesture> gesture = ClickOf(event.button.button);
+        if (const std::optional<MouseGesture> gesture = PressGestureOf(event.button.button);
             gesture.has_value() &&
             CaptureGesture(to.hotkeys, to.bindings, *gesture, SDL_GetModState())) {
           break;
         }
       }
       if (second_of_double) {
-        if (const std::optional<MouseGesture> gesture = DoubleClickOf(event.button.button);
+        if (const std::optional<MouseGesture> gesture = DoubleClickGestureOf(event.button.button);
             gesture.has_value()) {
           if (CaptureGesture(to.hotkeys, to.bindings, *gesture, SDL_GetModState())) {
             break;
@@ -762,7 +744,7 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       }
       to.world_mouse->pressed = (event.motion.state & SDL_BUTTON_LMASK) != 0;
       to.world_mouse->double_click.NoteMotion();
-      if (const std::optional<MouseGesture> gesture = DragOf(event.motion.state);
+      if (const std::optional<MouseGesture> gesture = DragGestureOf(event.motion.state);
           gesture.has_value()) {
         if (CaptureGesture(to.hotkeys, to.bindings, *gesture, SDL_GetModState())) {
           break;

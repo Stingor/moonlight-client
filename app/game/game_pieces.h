@@ -48,6 +48,7 @@
 
 #include "character/doll_gif_export.h"
 #include "character/grimoire_keys.h"
+#include "character/shortcut_wheel.h"
 #include "chat/chat_mentions.h"
 #include "chat/chat_web_stage.h"
 #include "chat/emotion_view.h"
@@ -176,6 +177,9 @@ struct GamePieces {
   SpellListStage spell_list;
   // LE MODE CLAVIER DU GRIMOIRE : la touche tenue sur une compétence.
   GrimoireKeys grimoire_keys;
+  // LA ROUE D'UTILISATION : une barre en cercle sous le curseur, tant que le
+  // bouton est tenu.
+  ShortcutWheel shortcut_wheel;
   // LA LISTE DE REPAIR WEAPON, que le serveur ouvre au lancement.
   RepairStage repair;
   // LES TROIS COMPAGNONS QUI ONT UNE FICHE : le familier, l'homoncule et le

@@ -24,6 +24,7 @@
 #include "character/grimoire_keys.h"
 #include "character/preset_view.h"
 #include "character/shortcut_view.h"
+#include "character/shortcut_wheel.h"
 #include "character/skill_book_view.h"
 #include "chat/chat_view.h"
 #include "effects/effect_bench_view.h"
@@ -165,6 +166,8 @@ struct EventRouting {
   // LA DEMANDE D'ÉCRAN DE VEILLE, que la touche arme et que la boucle consomme.
   bool* afk_now = nullptr;
   ShortcutBarView* shortcuts = nullptr;
+  // La roue d'utilisation : elle voit chaque événement avant le monde.
+  ShortcutWheel* shortcut_wheel = nullptr;
   // Le verdict de la pile d'échappement, à l'image précédente.
   bool escape_closes_a_window = false;
   // Un atelier réclame Entrée : voir `CraftStage::ClaimsEnter`.

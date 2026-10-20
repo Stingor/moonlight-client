@@ -632,6 +632,9 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
     case GameAction::kMercenaryOrder:
       // Un clic sur le monde, lu par la souris : aucune touche ne le porte.
       break;
+    case GameAction::kShortcutWheel:
+      // Un maintien, que la roue lit elle-même à l'appui et au relâcher.
+      break;
     case GameAction::kCameraReset:
       if (Wired(to.rig, "caméra : remise")) {
         ResetCamera(*to.camera, to.rig->limits());
