@@ -64,17 +64,13 @@ inline constexpr float kSpriteStandingClearance = 2.5F;
 // personnages se coucheraient au sol vus de haut.
 [[nodiscard]] BillboardBasis MakeBillboardBasis(const Camera& camera);
 
-// La part minimale de sa largeur que le panneau d'ombre montre au soleil : le
-// cosinus de l'angle entre sa face et la trace du soleil au sol, ici 60°.
-inline constexpr float kShadowPanelMinimumSunFacing = 0.5F;
-
-// LE PANNEAU QUI PORTE L'OMBRE D'UN SPRITE : debout sur les pieds, et parallèle
-// à l'ÉCRAN. Son bord bas suit la ligne des pieds telle que la caméra la
-// montre, si bien que l'ombre portée est l'image du sprite cisaillée depuis
-// ses pieds. Quand le soleil rase ce plan, l'ombre se réduirait à un trait :
-// le panneau pivote alors autour de la verticale juste assez pour montrer au
-// soleil `kShadowPanelMinimumSunFacing` de sa largeur. Un soleil au zénith ne
-// donne aucune direction au sol, et le panneau reste parallèle à l'écran.
+// LE PANNEAU QUI PORTE L'OMBRE D'UN SPRITE : debout sur les pieds, et face au
+// SOLEIL. L'ombre portée garde ainsi toute la largeur du sprite et la même
+// direction au sol, quel que soit l'angle de la caméra : seule l'image du
+// sprite, qui suit la direction affichée, la fait changer. La droite du
+// panneau reste du côté de celle de l'écran, pour que la silhouette portée ne
+// soit pas le miroir de celle qu'on voit. Un soleil au zénith ne donne aucune
+// direction au sol, et le panneau reste parallèle à l'écran.
 [[nodiscard]] BillboardBasis ShadowPanelBasis(const glm::vec3& toward_sun,
                                               const BillboardBasis& facing_camera);
 

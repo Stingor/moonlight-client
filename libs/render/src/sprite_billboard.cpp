@@ -34,20 +34,7 @@ BillboardBasis ShadowPanelBasis(const glm::vec3& toward_sun, const BillboardBasi
   if (glm::length(ground_trace) < kShortestGroundTrace) {
     return basis;
   }
-  const glm::vec3 sun_way = glm::normalize(ground_trace);
-  const float facing = glm::dot(basis.forward, sun_way);
-  if (std::abs(facing) >= kShadowPanelMinimumSunFacing) {
-    return basis;
-  }
-  // Le panneau tourne juste assez pour montrer au soleil la part minimale de
-  // sa largeur, du côté où il penchait déjà.
-  const glm::vec3 across_sun = glm::cross(world_up, sun_way);
-  const float toward_side = facing < 0.0F ? -1.0F : 1.0F;
-  const float across_side = glm::dot(basis.forward, across_sun) < 0.0F ? -1.0F : 1.0F;
-  const float across_share =
-      std::sqrt(1.0F - (kShadowPanelMinimumSunFacing * kShadowPanelMinimumSunFacing));
-  basis.forward = (sun_way * (toward_side * kShadowPanelMinimumSunFacing)) +
-                  (across_sun * (across_side * across_share));
+  basis.forward = glm::normalize(ground_trace);
   basis.right = glm::normalize(glm::cross(basis.forward, world_up));
   // LA DROITE DU PANNEAU RESTE DU CÔTÉ DE CELLE DE L'ÉCRAN : la silhouette
   // portée ne se retourne pas.
