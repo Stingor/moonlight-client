@@ -76,6 +76,8 @@ struct SoundStage {
   // DE COMBIEN FLOTTE CHAQUE ACTEUR QUI VOLE, que ses effets attachés suivent :
   // voir `ComposedScene::hover_pixels`. Nul, personne ne flotte.
   const std::map<std::uint32_t, float>* hover_pixels = nullptr;
+  // LA LUEUR ÉLÉMENTAIRE des flèches en vol : voir `ElementGlowHueOf`.
+  bool element_glow = true;
 };
 
 // UN EFFET QUI VIENT D'ÊTRE LANCÉ, et l'endroit du monde où il sonne.

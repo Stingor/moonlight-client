@@ -487,6 +487,10 @@ struct ProjectileFlight {
   // Ce que son image tourne en plus de la face de son vol, en degrés d'écran,
   // sur [0, 360).
   std::int32_t turn_degrees = 0;
+  // LA LUEUR ÉLÉMENTAIRE qui l'accompagne, en rouge, vert, bleu, alpha : la
+  // même image, un peu plus grande, ajoutée au décor sur le même vol. Rien :
+  // aucune. Voir `ro/render/element_glow.h`.
+  std::optional<std::array<std::uint8_t, 4>> glow_tint;
 };
 
 // Le vol du projectile que cet acteur tire en frappant : celui du trait pour

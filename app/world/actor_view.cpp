@@ -32,6 +32,7 @@
 #include "world/actor_tint.h"
 #include "world/battle_log_rules.h"
 #include "world/corpse_agony.h"
+#include "world/element_glow_of.h"
 #include "world/struck_place.h"
 
 namespace moonclient {
@@ -566,7 +567,13 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // LES HALOS D'ABORD : le client soumet ses copies avant le corps qu'elles
     // entourent, et elles n'ont ni ombre ni boîte de clic à elles.
     std::array<ro::render::ActorBodyCopy, ro::render::kMaxBodyCopies> halos;
-    const std::size_t count = ro::render::BodyCopiesAfterEffects(played_effects, halos);
+    std::size_t count = ro::render::BodyCopiesAfterEffects(played_effects, halos);
+    // ET LE HALO DE L'ARME, de l'élément que le serveur dit de son attaque.
+    if (const std::optional<ro::render::ElementHue> hue =
+            ElementGlowHueOf(actor.attack_element, lighting.element_glow);
+        hue.has_value() && count < halos.size()) {
+      halos[count++] = ro::render::WeaponGlowCopy(*hue);
+    }
     for (std::size_t copy_rank = 0; copy_rank < count; ++copy_rank) {
       // ⚠ UN CONTOUR PASSE DEVANT LE CORPS, comme un voile et du même pas : voir
       // `ActorBodyCopy::in_front`. Les autres copies restent derrière lui.

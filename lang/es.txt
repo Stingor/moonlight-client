@@ -19972,3 +19972,9 @@ tr: Apagar sus luces aquí
 
 fr: Éteindre ses lumières sur cette pose
 tr: Apagar sus luces en esta colocación
+
+fr: Lueur élémentaire
+tr: Brillo elemental
+
+fr: La flèche en vol et l'arme d'un joueur se bordent de la couleur de l'élément de son attaque : orange pour le feu, bleu pour l'eau…\n\nSur une carte de combat entre joueurs et pendant un duel, le serveur ne dit l'élément de personne d'autre que toi.
+tr: La flecha en vuelo y el arma de un jugador se bordean del color del elemento de su ataque: naranja para el fuego, azul para el agua…\n\nEn un mapa de combate entre jugadores y durante un duelo, el servidor no dice el elemento de nadie más que el tuyo.

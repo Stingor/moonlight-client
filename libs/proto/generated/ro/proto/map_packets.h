@@ -5256,6 +5256,16 @@ struct CzMoonclientMapEditGet {
   std::string map;
 };
 
+// PACKET_ZC_MOONLIGHT_ATTACK_ELEMENT
+struct ZcMoonlightAttackElement {
+  static constexpr std::uint16_t kOpcode = 0x0f4a;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 9;
+
+  std::uint32_t GID = 0;
+  std::uint8_t element = 0;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8409,6 +8419,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditDoc& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditRevision& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonclientMapEditGet& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightAttackElement& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -9017,6 +9028,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditDoc& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditRevision& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonclientMapEditGet& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightAttackElement& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

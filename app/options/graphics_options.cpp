@@ -32,6 +32,7 @@ constexpr const char* kFogKey = "fog";
 constexpr const char* kScreenQuakeKey = "screen_quake";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
 constexpr const char* kSummonTranslucentKey = "summons_translucent";
+constexpr const char* kElementGlowKey = "element_glow";
 constexpr const char* kCorpseFadeKey = "corpses_duration";
 constexpr const char* kAppearFadeKey = "spawn_fade_ms";
 constexpr const char* kLeaveFadeKey = "exit_of_view_fade_ms";
@@ -179,6 +180,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kScreenQuakeKey, &screen_quake_);
   into.Declare(kDecorVeilKey, &decor_veil_);
   into.Declare(kSummonTranslucentKey, &summon_translucent_);
+  into.Declare(kElementGlowKey, &element_glow_);
   into.Declare(kCorpseFadeKey, &corpse_fade_ms_);
   into.Declare(kAppearFadeKey, &appear_fade_ms_);
   into.Declare(kLeaveFadeKey, &leave_fade_ms_);
@@ -286,6 +288,12 @@ void GraphicsOptions::Compose() {
                          Tr("Certains sorts, coups et évènements de carte font trembler la "
                             "caméra un instant. Décoche pour qu'elle reste immobile."),
                          "/quake", screen_quake_));
+  rows_.push_back(Toggle(GraphicsRow::kElementGlow, Tr("Lueur élémentaire"),
+                         Tr("La flèche en vol et l'arme d'un joueur se bordent de la couleur de "
+                            "l'élément de son attaque : orange pour le feu, bleu pour l'eau…\n\n"
+                            "Sur une carte de combat entre joueurs et pendant un duel, le serveur "
+                            "ne dit l'élément de personne d'autre que toi."),
+                         nullptr, element_glow_));
   rows_.push_back(Toggle(GraphicsRow::kSummonTranslucent, Tr("Invocations translucides"),
                          Tr("Le faucon qui accompagne un chasseur se peint presque transparent : "
                             "il ne cache plus ce qui se passe derrière lui."),
@@ -488,6 +496,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kScreenQuake:
       screen_quake_ = asked.on;
+      break;
+    case GraphicsRow::kElementGlow:
+      element_glow_ = asked.on;
       break;
     case GraphicsRow::kSummonTranslucent:
       summon_translucent_ = asked.on;

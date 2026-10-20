@@ -111,6 +111,7 @@ add_library(ro_sim STATIC
     src/adoption.cpp
     src/actor_traces.cpp
     src/world.cpp
+    src/world_attack_element.cpp
     src/world_bearers.cpp
     src/world_combo.cpp
     src/world_blade_stop.cpp

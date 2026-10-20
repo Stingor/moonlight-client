@@ -43,6 +43,11 @@ void ForgetLastMapTraces(Actor& actor) {
   // rang le ferait revenir à la première image de la carte suivante.
   actor.pvp_rank = 0;
 
+  // 🔴 SON ÉLÉMENT D'ATTAQUE AUSSI : le serveur le redit à l'arrivée, et
+  // seulement si la carte d'arrivée le permet. Le garder montrerait sur une
+  // carte d'affrontement celui d'une carte paisible.
+  actor.attack_element = Element::kNone;
+
   // ⚠ ET SES EFFETS S'ÉTEIGNENT : changer de carte détruit l'acteur du client
   // natif, et ses instances d'effet avec lui. Le serveur s'appuie dessus —
   // `@size 0` ne renvoie aucun effet, il téléporte le joueur sur place et

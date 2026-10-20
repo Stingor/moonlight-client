@@ -73,6 +73,10 @@ inline constexpr std::uint32_t kUiCapGmOutfit = 0x00010000;
 // serveur tient (`ZC 0x0F46` à `0x0F48`), et les lui envoyer (`CZ 0x0F45`,
 // `0x0F49`). Même règle : le serveur ne les envoie qu'à qui l'annonce.
 inline constexpr std::uint32_t kUiCapMapEdits = 0x00020000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire l'élément d'attaque d'un
+// joueur (`ZC 0x0F4A`). Même règle : le serveur ne l'envoie qu'à qui l'annonce.
+// Elle s'annonce lueur élémentaire éteinte : la case ne règle que le dessin.
+inline constexpr std::uint32_t kUiCapAttackElement = 0x00040000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

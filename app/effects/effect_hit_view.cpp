@@ -24,6 +24,7 @@
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
 #include "world/actor_view.h"
+#include "world/element_glow_of.h"
 #include "world/hit_popups.h"
 #include "world/struck_place.h"
 
@@ -315,8 +316,9 @@ void EffectsInPlay::NoticeArrows(const SoundStage& scene) {
       };
       if (scene.world->Find(taken.strike.attacker) != nullptr && caster_cell.has_value() &&
           aimed.has_value()) {
-        QueueArrowShower(per_map_.shower_arrows, *scene.stage, ground_of(*caster_cell),
-                         ground_of(*aimed), aimed->x, aimed->y, scene.now_ms);
+        QueueArrowShower(per_map_.shower_arrows, *scene.stage, taken.strike.attacker,
+                         ground_of(*caster_cell), ground_of(*aimed), aimed->x, aimed->y,
+                         scene.now_ms);
       }
     }
     // LE DRAPEAU D'UN IMPACT QUI DESSINE SES TRAITS se lève à l'arrivée du coup
@@ -419,12 +421,14 @@ void EffectsInPlay::NoticeArrows(const SoundStage& scene) {
     // Et ses images défilent selon sa classe — flèche ou munition en sprite —,
     // à l'horloge du client, ou trois fois plus lentement pour le trait d'une
     // baguette, que le retard du coup attend d'autant : voir `ShootsWandBolts`.
-    nodes_->ShootSprite(projectile, start, arrival, flight_ticks,
-                        ro::render::ProjectileFlightOf(catalog, look));
+    ro::render::ProjectileFlight drawn_flight = ro::render::ProjectileFlightOf(catalog, look);
+    drawn_flight.glow_tint = ArrowGlowOf(actor, scene.element_glow);
+    nodes_->ShootSprite(projectile, start, arrival, flight_ticks, drawn_flight);
     return true;
   };
   std::erase_if(per_map_.arrows_waiting, shoot);
-  ShootDueShowerArrows(per_map_.shower_arrows, *nodes_, scene.now_ms);
+  ShootDueShowerArrows(per_map_.shower_arrows, *nodes_, *scene.world, scene.element_glow,
+                       scene.now_ms);
 }
 
 }  // namespace moonclient

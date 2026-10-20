@@ -151,6 +151,8 @@ void World::Spawn(Actor actor) {
     // ET SES PROTÉGÉS : une réannonce ne défait aucun trait de DEVOTION, et le
     // numéro perdu ferait prendre la liste gardée pour une annonce neuve.
     actor.devotion = found->second.devotion;
+    // ET SON ÉLÉMENT D'ATTAQUE, que le serveur ne redit qu'à l'entrée en vue.
+    actor.attack_element = found->second.attack_element;
     // ET SON MAÎTRE, que seul son propre paquet dit : voir `TellSummonMaster`.
     if (!actor.summon_master_id) actor.summon_master_id = found->second.summon_master_id;
     KeepStateEdges(actor, found->second);

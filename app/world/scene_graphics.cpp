@@ -21,7 +21,8 @@ ActorLighting ActorLightingOf(const GraphicsOptions& graphics,
                               const AilmentTints* ailment_tints) {
   return ActorLighting{.ground = graphics.lightmaps() ? ground : nullptr,
                        .cold = graphics.cold_light(),
-                       .ailment_tints = ailment_tints};
+                       .ailment_tints = ailment_tints,
+                       .element_glow = graphics.element_glow()};
 }
 
 void TimeComposedScene(const GraphicsOptions& graphics, ComposedScene& scene) {

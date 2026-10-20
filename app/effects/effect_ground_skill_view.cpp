@@ -40,7 +40,7 @@ void EffectsInPlay::PlayGroundSkillPacket(const MapStage& stage, ro::sim::WalkPl
         ro::sim::InterpolatedCell(*caster, planner.PathFor(*caster), use.started_ms);
     const std::array<float, 3> caster_feet = GroundPositionAt(stage, caster_cell.x, caster_cell.y);
     const glm::vec3 caster_origin(caster_feet[0], caster_feet[1], caster_feet[2]);
-    QueueArrowShower(per_map_.shower_arrows, stage, caster_origin, caster_origin,
+    QueueArrowShower(per_map_.shower_arrows, stage, caster_id, caster_origin, caster_origin,
                      static_cast<float>(use.cell.x), static_cast<float>(use.cell.y),
                      use.started_ms);
   }

@@ -9,8 +9,10 @@
 
 #include "ro/render/effect_frame.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/sim/world.h"
 
 #include "effects/effect_node_view.h"
+#include "world/element_glow_of.h"
 
 namespace moonclient {
 namespace {
@@ -29,19 +31,21 @@ constexpr std::array<std::array<float, 2>, 8> kNeighbourCells = {
 }  // namespace
 
 void QueueArrowShower(std::vector<ShowerArrow>& waiting, const MapStage& stage,
-                      glm::vec3 caster_ground, glm::vec3 first_target_ground, float centre_x,
-                      float centre_y, std::uint32_t now_ms) {
+                      std::uint32_t shooter_id, glm::vec3 caster_ground,
+                      glm::vec3 first_target_ground, float centre_x, float centre_y,
+                      std::uint32_t now_ms) {
   const std::uint32_t due = now_ms + kShowerWaitMs;
-  waiting.push_back(ShowerArrow{due, caster_ground, first_target_ground});
+  waiting.push_back(ShowerArrow{due, shooter_id, caster_ground, first_target_ground});
   for (const std::array<float, 2>& cell : kNeighbourCells) {
     const std::array<float, 3> ground =
         GroundPositionAt(stage, std::round(centre_x) + cell[0], std::round(centre_y) + cell[1]);
-    waiting.push_back(ShowerArrow{due, caster_ground, glm::vec3(ground[0], ground[1], ground[2])});
+    waiting.push_back(
+        ShowerArrow{due, shooter_id, caster_ground, glm::vec3(ground[0], ground[1], ground[2])});
   }
 }
 
 void ShootDueShowerArrows(std::vector<ShowerArrow>& waiting, EffectNodesInPlay& nodes,
-                          std::uint32_t now_ms) {
+                          const ro::sim::World& world, bool element_glow, std::uint32_t now_ms) {
   std::erase_if(waiting, [&](const ShowerArrow& arrow) {
     if (static_cast<std::int32_t>(now_ms - arrow.due_ms) < 0) {
       return false;
@@ -58,9 +62,11 @@ void ShootDueShowerArrows(std::vector<ShowerArrow>& waiting, EffectNodesInPlay& 
     const float part = std::min(distance / ro::render::kArrowFullFlightDistance, 1.0F);
     const auto vol_ticks = static_cast<std::int32_t>(
         std::lround(part * ro::render::kArrowFlightMs / ro::render::kEffectTickMs));
-    static_cast<void>(nodes.ShootSprite(
-        kShowerArrowSprite, start, arrivee, vol_ticks,
-        ro::render::ProjectileFlight{.image_rule = ro::render::ProjectileImageRule::kArrow}));
+    ro::render::ProjectileFlight flight{.image_rule = ro::render::ProjectileImageRule::kArrow};
+    if (const ro::sim::Actor* shooter = world.Find(arrow.shooter_id); shooter != nullptr) {
+      flight.glow_tint = ArrowGlowOf(*shooter, element_glow);
+    }
+    static_cast<void>(nodes.ShootSprite(kShowerArrowSprite, start, arrivee, vol_ticks, flight));
     return true;
   });
 }

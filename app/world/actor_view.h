@@ -678,6 +678,8 @@ struct ActorLighting {
   // LA TEINTE QUE LES ALTÉRATIONS ONT ÉCRITE, et qui reste : voir
   // `AilmentTints`. Nulle hors du jeu.
   const AilmentTints* ailment_tints = nullptr;
+  // LA LUEUR ÉLÉMENTAIRE autour de l'arme : voir `ElementGlowHueOf`.
+  bool element_glow = true;
 };
 
 [[nodiscard]] SceneCensus ComposeScene(

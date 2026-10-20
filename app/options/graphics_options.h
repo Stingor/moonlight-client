@@ -39,6 +39,7 @@ enum class GraphicsRow : int {
   kFog,
   kDecorVeil,
   kScreenQuake,
+  kElementGlow,
   kSummonTranslucent,
   kCorpseFade,
   kAppearFade,
@@ -130,6 +131,9 @@ class GraphicsOptions {
   // Le décor qui se tient entre la caméra et le personnage s'efface. Éteint par
   // défaut, comme le client d'origine : voir `DecorVeilView`.
   [[nodiscard]] bool decor_veil() const noexcept { return decor_veil_; }
+  // LA LUEUR ÉLÉMENTAIRE : la flèche en vol et l'arme d'un joueur se teintent de
+  // l'élément que le serveur dit de son attaque. Allumée par défaut.
+  [[nodiscard]] bool element_glow() const noexcept { return element_glow_; }
   // Les invocations peintes presque transparentes : aujourd'hui le faucon.
   // Éteint par défaut, comme chez le client.
   [[nodiscard]] bool summon_translucent() const noexcept { return summon_translucent_; }
@@ -186,6 +190,7 @@ class GraphicsOptions {
   bool fog_ = true;
   bool screen_quake_ = true;
   bool decor_veil_ = false;
+  bool element_glow_ = true;
   bool summon_translucent_ = false;
   // ⚠ CENT MILLISECONDES SOUS LE CLIENT : le réglage d'usine que le joueur a
   // choisi.

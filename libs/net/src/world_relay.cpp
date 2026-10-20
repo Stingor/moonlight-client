@@ -3,6 +3,7 @@
 #include "ro/net/actor_guild.h"
 #include "ro/net/actor_name.h"
 #include "ro/net/area_damage.h"
+#include "ro/net/attack_element.h"
 #include "ro/net/attack_reach.h"
 #include "ro/net/bank.h"
 #include "ro/net/buying_store.h"
@@ -227,6 +228,11 @@ FrameOutcome RelayFrame(const Frame& frame, sim::World& world, std::uint32_t now
   }
   // L'HABIT DU GM D'UN JOUEUR — voir ro/net/gm_outfit.h.
   if (const FrameOutcome outcome = ApplyGmOutfitFrame(frame, world);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  // L'ÉLÉMENT D'ATTAQUE D'UN JOUEUR — voir ro/net/attack_element.h.
+  if (const FrameOutcome outcome = ApplyAttackElementFrame(frame, world);
       outcome != FrameOutcome::kUnhandled) {
     return outcome;
   }

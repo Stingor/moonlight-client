@@ -19972,3 +19972,9 @@ tr: Turn its lights off here
 
 fr: Éteindre ses lumières sur cette pose
 tr: Turn its lights off on this placement
+
+fr: Lueur élémentaire
+tr: Elemental glow
+
+fr: La flèche en vol et l'arme d'un joueur se bordent de la couleur de l'élément de son attaque : orange pour le feu, bleu pour l'eau…\n\nSur une carte de combat entre joueurs et pendant un duel, le serveur ne dit l'élément de personne d'autre que toi.
+tr: A player's arrow in flight and weapon are edged with the color of their attack's element: orange for fire, blue for water…\n\nOn a map where players fight each other, and during a duel, the server tells no one's element but yours.

@@ -6,8 +6,10 @@
 // leur place, leur lancer, leur voie — dans la troupe.
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <numbers>
 #include <optional>
 #include <span>
@@ -23,6 +25,7 @@
 #include "ro/render/effect_node_sprite_seed.h"
 #include "ro/render/effect_ring_flight.h"
 #include "ro/render/effect_trail_history.h"
+#include "ro/render/element_glow.h"
 
 #include "effects/effect_node_view.h"
 
@@ -370,8 +373,22 @@ bool EffectNodesInPlay::ShootSprite(std::string_view sprite_base, glm::vec3 from
   // montée d'alpha. La montée d'un tic le laissait invisible sur le premier de
   // ses douze.
   seed.alpha_start = ro::render::kEffectNodeChannelMax;
-  return Sow(std::string(sprite_base), seed, ro::render::EffectNodeRange{1.0F, 0.0F}, 0.0F, from, 1,
-             kNoOwnerFacingDegrees, to);
+  const std::string path(sprite_base);
+  const bool shot = Sow(path, seed, ro::render::EffectNodeRange{1.0F, 0.0F}, 0.0F, from, 1,
+                        kNoOwnerFacingDegrees, to);
+  // LA LUEUR ÉLÉMENTAIRE, s'il en porte une : la même image sur le même vol, un
+  // peu plus grande, teinte et AJOUTÉE au décor.
+  if (shot && flight.glow_tint.has_value()) {
+    const std::array<std::uint8_t, 4>& tint = *flight.glow_tint;
+    seed.render_word = ro::render::kEffectRenderWordOfAdditiveSprite;
+    seed.color = {static_cast<float>(tint[0]), static_cast<float>(tint[1]),
+                  static_cast<float>(tint[2])};
+    seed.alpha_start = static_cast<float>(tint[3]);
+    static_cast<void>(Sow(path, seed,
+                          ro::render::EffectNodeRange{ro::render::kArrowGlowScale, 0.0F}, 0.0F,
+                          from, 1, kNoOwnerFacingDegrees, to));
+  }
+  return shot;
 }
 
 bool EffectNodesInPlay::PlayActOnce(std::string_view sprite_base, glm::vec3 ground_position,

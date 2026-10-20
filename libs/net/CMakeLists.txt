@@ -82,6 +82,7 @@ add_library(ro_net STATIC
     src/turn.cpp
     src/unit_master.cpp
     src/gm_outfit.cpp
+    src/attack_element.cpp
     src/character_ledger.cpp
     src/quest_log.cpp
     src/character_notice.cpp

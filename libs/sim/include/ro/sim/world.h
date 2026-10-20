@@ -514,6 +514,10 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // CE QUE LE SERVEUR DIT DE L'HABIT D'UN JOUEUR EN VUE. Faux, sans rien
   // changer, pour un acteur inconnu.
   bool TellGmOutfit(std::uint32_t id, bool worn);
+  // CE QUE LE SERVEUR DIT DE L'ÉLÉMENT D'ATTAQUE D'UN JOUEUR EN VUE, nous
+  // compris. Voir `Actor::attack_element`. Faux, sans rien changer, pour un
+  // acteur inconnu.
+  bool TellAttackElement(std::uint32_t id, Element element);
 
   // ── LA SÉLECTION : ce que le joueur a DÉSIGNÉ en dernier ──────────────────
   //

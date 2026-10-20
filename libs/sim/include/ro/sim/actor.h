@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "ro/sim/attack_element.h"
 #include "ro/sim/combat_notice.h"
 #include "ro/sim/devotion.h"
 #include "ro/sim/packed_position.h"
@@ -412,6 +413,9 @@ struct Actor {
   // autres (`World::TellGmOutfit`) ; le nôtre suit notre case, à chaque image
   // (`World::DressPlayerAsGameMaster`).
   bool gm_outfit = false;
+  // L'ÉLÉMENT DE SON ATTAQUE NORMALE, tel que le serveur le dit
+  // (`World::TellAttackElement`), le nôtre compris. `kNone` tant qu'il n'a rien dit.
+  Element attack_element = Element::kNone;
   // Les états en cours, tels que le serveur les a posés. Une réapparition
   // repart de rien : le serveur redit alors ce qui tient encore.
   std::set<StatusEffectId> status_effects;

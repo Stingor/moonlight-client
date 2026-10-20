@@ -91,6 +91,7 @@ add_library(ro_render STATIC
     src/battlefield_art.cpp
     src/camera.cpp
     src/entity_names.cpp
+    src/element_glow.cpp
     src/companion_cart.cpp
     src/companion_falcon.cpp
     src/client_tables.cpp

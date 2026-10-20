@@ -29,14 +29,15 @@ namespace moonclient {
 //
 // Et le Marché, qu'un catalogue ouvre à la place de la recherche d'échoppes,
 // l'habit du GM d'un administrateur, qu'il sait dessiner, et les éditions de
-// carte que le serveur tient.
+// carte que le serveur tient. Et l'élément d'attaque des joueurs, même lueur
+// élémentaire éteinte.
 inline constexpr std::uint32_t kAlwaysShownSurfaces =
     ro::net::kUiCapNpcDialog | ro::net::kUiCapChat | ro::net::kUiCapCardAlbum |
     ro::net::kUiCapCardAlbumDropper | ro::net::kUiCapFlagGraffiti | ro::net::kUiCapUnitMaster |
     ro::net::kUiCapServerRules | ro::net::kUiCapMvpTrackerExt | ro::net::kUiCapQuestEnd |
     ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich |
     ro::net::kUiCapEquipAttributes | ro::net::kUiCapInstanceInfo | ro::net::kUiCapMarket |
-    ro::net::kUiCapGmOutfit | ro::net::kUiCapMapEdits;
+    ro::net::kUiCapGmOutfit | ro::net::kUiCapMapEdits | ro::net::kUiCapAttackElement;
 [[nodiscard]] constexpr std::uint32_t ShownSurfaces(bool mvp_tracker_enabled) noexcept {
   return kAlwaysShownSurfaces | (mvp_tracker_enabled ? ro::net::kUiCapMvpTracker : 0U);
 }
