@@ -17,6 +17,7 @@ add_library(ro_core STATIC
     src/file_write.cpp
     src/i18n.cpp
     src/ink.cpp
+    src/load_progress.cpp
     src/log.cpp
     src/printed.cpp
     src/program_arguments.cpp

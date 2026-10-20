@@ -27,6 +27,8 @@
 #include "chat/emotion_catalog.h"
 #include "game/game.h"
 #include "game/store_search_catalogue.h"
+#include "loading/loading_plans.h"
+#include "loading/loading_presenter.h"
 
 namespace moonclient {
 
@@ -124,13 +126,23 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     shell_.KeepAlive();
   };
 
+  // L'ÉCRAN DE CHARGEMENT, de la carte aux effets : il se retire avant ce qui
+  // ne fait que monter des programmes.
+  const bool rounded = settings_->options().graphics().rounded_ground();
+  std::optional<LoadingPresenter> loading;
+  loading.emplace(shell_, GameOpenPlan(rounded, !shell_.world_pieces_loaded()), "entrée en jeu");
+
   // LES DOCUMENTS D'ÉDITION, lus carte par carte à leur entrée : voir
   // `MapEditStore`.
   map_edits_.Open(client_root_);
-  auto first_map =
-      LoadMapStage(*vfs_, map_name,
-                   ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look()),
-                   &map_edits_, settings_->options().graphics().real_time_shadows());
+  auto first_map = LoadMapStage(
+      *vfs_, map_name,
+      MapStageRead{.flatten_relief = ro::render::GreyWorldFlattens(
+                       settings_->options().pages().grey_world.look()),
+                   .edits = &map_edits_,
+                   .real_time_shadows = settings_->options().graphics().real_time_shadows(),
+                   .rounded_ground = rounded,
+                   .progress = loading->progress()});
   if (!first_map) {
     return std::unexpected(first_map.error());
   }
@@ -157,6 +169,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     return std::unexpected(terrain.error());
   }
   terrain_ = std::move(*terrain);
+  ro::core::BeginLoadStep(loading->progress(), ro::core::LoadStep::kUpload);
   if (auto uploaded = terrain_.Upload(stage_->scene.terrain, stage_->scene.terrain_textures,
                                       stage_->scene.atlas.image);
       !uploaded) {
@@ -180,7 +193,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
     return std::unexpected(models.error());
   }
   models_ = std::move(*models);
-  if (auto uploaded = models_.Upload(stage_->scene.models); !uploaded) {
+  if (auto uploaded = models_.Upload(stage_->scene.models, loading->progress()); !uploaded) {
     return std::unexpected(uploaded.error());
   }
   report_stage("modèles");
@@ -191,12 +204,13 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // ⚠ C'EST LA COQUILLE QUI TRANCHE S'IL FAUT LES LIRE : la scène de sélection
   // les a demandés AVANT nous, et les relire ici coûterait une seconde fois le
   // poste le plus long du journal.
-  shell_.EnsureWorldPieces();
+  shell_.EnsureWorldPieces(loading->progress());
   report_stage("pièces du monde");
 
   // Les effets animés : le catalogue les charge une fois chacun, la scène les
   // joue. Sans renderer — un pilote qui refuse le programme —, ils ne
   // paraissent pas, et le reste du jeu tourne quand même.
+  ro::core::BeginLoadStep(loading->progress(), ro::core::LoadStep::kEffects);
   camera_rig_.LoadTables(*vfs_);
   closed_maps_ = LoadClosedMaps(*vfs_);
   effect_catalog_.emplace(*vfs_);
@@ -211,6 +225,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // CELUI DU PORTRAIT RENAÎT À SON PREMIER EFFET : un autre personnage, même
   // costume et même carte, n'hérite pas du porteur de son prédécesseur.
   pieces_.portrait_effects.reset();
+  ro::core::EndLoadStep(loading->progress());
+  loading.reset();
   report_stage("effets");
 
   // LE POST-TRAITEMENT DU MONDE. ⚠ MÊME INDULGENCE : un pilote qui refuse ses

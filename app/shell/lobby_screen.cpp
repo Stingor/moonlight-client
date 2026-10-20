@@ -30,6 +30,8 @@
 #include "character/recent_characters.h"
 #include "game/connected_session.h"
 #include "game/skin_image_of.h"
+#include "loading/loading_plans.h"
+#include "loading/loading_presenter.h"
 #include "options/game_options.h"
 #include "options/option_targets.h"
 #include "world/overlay_view.h"
@@ -152,7 +154,10 @@ ro::core::Result<void> LobbyScreen::Open(std::uint32_t now_ms) {
     return {};
   }
   const std::uint64_t wardrobe_started_ms = SDL_GetTicks();
-  shell_.EnsureBackdropPieces();
+  {
+    LoadingPresenter loading(shell_, WardrobePlan(), "garde-robe");
+    shell_.EnsureBackdropPieces(loading.progress());
+  }
   ro::core::LogInfo("chargement garde-robe : {} ms", SDL_GetTicks() - wardrobe_started_ms);
 
   // LE DÉCOR VIVANT, DEMANDÉ ICI SEULEMENT : l'ouvrir sans le dessiner tiendrait
@@ -184,7 +189,14 @@ void LobbyScreen::AskMount(std::string map_name, bool live) {
 
 void LobbyScreen::MountNow(const PendingMount& mount) {
   const std::uint64_t started_ms = SDL_GetTicks();
-  if (auto opened = backdrop_.Open(shell_.vfs(), mount.map_name); !opened) {
+  // ⚠ L'ÉCRAN EST DÉJÀ LÀ — c'est lui qui autorise ce montage — et il le reste,
+  // sans seuil ni fondu. Le sol arrondi se bâtit dans le montage.
+  const bool rounded = shell_.settings().options().graphics().rounded_ground();
+  LoadingPresenter loading(shell_, MapPlan(rounded), "décor", /*already_shown=*/true);
+  if (auto opened =
+          backdrop_.Open(shell_.vfs(), mount.map_name,
+                         MapStageRead{.rounded_ground = rounded, .progress = loading.progress()});
+      !opened) {
     // ⚠ MUET POUR LE JOUEUR, comme tout ce qui touche au décor : le repli local
     // prend la place d'une ville qui ne se monte pas, et l'illustration celle
     // d'un repli qui ne se monte pas non plus.
@@ -553,7 +565,7 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
   // suivante.
   if (Loading()) {
     shell_.gl().ClearBoundTarget(kLoadingClearColor);
-    shell_.interface().DrawLoadingOnly(ro::core::Tr("Chargement…"));
+    shell_.DrawLoadingFrame(nullptr, 1.0F, now_ms);
     loading_shown_ = pending_mount_.has_value();
     return {};
   }

@@ -22,8 +22,9 @@
 
 namespace moonclient {
 
-ro::core::Result<void> BackdropScene::Open(ro::vfs::Vfs& vfs, std::string_view map_name) {
-  auto loaded = LoadMapStage(vfs, map_name);
+ro::core::Result<void> BackdropScene::Open(ro::vfs::Vfs& vfs, std::string_view map_name,
+                                           const MapStageRead& read) {
+  auto loaded = LoadMapStage(vfs, map_name, read);
   if (!loaded) {
     return std::unexpected(loaded.error());
   }
@@ -35,28 +36,17 @@ ro::core::Result<void> BackdropScene::Open(ro::vfs::Vfs& vfs, std::string_view m
     return std::unexpected(terrain.error());
   }
   terrain_ = std::move(*terrain);
-  if (auto uploaded = terrain_.Upload(stage_->scene.terrain, stage_->scene.terrain_textures,
-                                      stage_->scene.atlas.image);
-      !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-
   auto water = ro::render::WaterRenderer::Create();
   if (!water) {
     return std::unexpected(water.error());
   }
   water_ = std::move(*water);
-  if (auto uploaded = water_.Upload(stage_->scene.water, stage_->scene.water_animations);
-      !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-
   auto models = ro::render::ModelRenderer::Create();
   if (!models) {
     return std::unexpected(models.error());
   }
   models_ = std::move(*models);
-  if (auto uploaded = models_.Upload(stage_->scene.models); !uploaded) {
+  if (auto uploaded = UploadStage(*stage_, terrain_, water_, models_, read.progress); !uploaded) {
     return std::unexpected(uploaded.error());
   }
   model_clock_ = ro::render::ModelClock();

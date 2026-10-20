@@ -41,19 +41,19 @@ ro::core::Result<void> Game::FollowGreyWorldRelief() {
   if (!stage_.has_value() || stage_->flatten_asked == wanted) {
     return {};
   }
-  const MapArrival arrival{
-      .vfs = &*vfs_,
-      .stage = &*stage_,
-      .planner = &planner_,
-      .world = &world_,
-      .terrain = &terrain_,
-      .water = &water_,
-      .models = &models_,
-      .background = &background_,
-      .attempted = &attempted_map_,
-      .flatten_relief = wanted,
-      .map_edits = &map_edits_,
-      .real_time_shadows = settings_->options().graphics().real_time_shadows()};
+  const MapArrival arrival{.vfs = &*vfs_,
+                           .stage = &*stage_,
+                           .planner = &planner_,
+                           .world = &world_,
+                           .terrain = &terrain_,
+                           .water = &water_,
+                           .models = &models_,
+                           .background = &background_,
+                           .attempted = &attempted_map_,
+                           .flatten_relief = wanted,
+                           .map_edits = &map_edits_,
+                           .real_time_shadows = settings_->options().graphics().real_time_shadows(),
+                           .rounded_ground = settings_->options().graphics().rounded_ground()};
   const ro::core::Result<bool> reloaded = ReloadStageRelief(arrival);
   if (!reloaded) {
     return std::unexpected(reloaded.error());

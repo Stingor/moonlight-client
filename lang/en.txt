@@ -12940,6 +12940,27 @@ tr: Cannot write: emblem/
 fr: Chargement…
 tr: Loading…
 
+fr: %d %%
+tr: %d%%
+
+fr: Garde-robe
+tr: Wardrobe
+
+fr: Tables du jeu
+tr: Game tables
+
+fr: Modèles
+tr: Models
+
+fr: Grille de marche
+tr: Walk grid
+
+fr: Envoi à la carte graphique
+tr: Sending to the graphics card
+
+fr: Envoi des modèles
+tr: Sending models
+
 fr: Choisir l'icône dans son inventory, sans connaître les numéros.
 tr: Pick the icon from your bag, without knowing the numbers.
 

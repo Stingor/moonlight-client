@@ -24,6 +24,8 @@
 #include "character/character_styles.h"
 #include "character/recent_characters.h"
 #include "chat/banned_input.h"
+#include "loading/loading_plans.h"
+#include "loading/loading_presenter.h"
 #include "shell/lobby_screen.h"
 
 namespace moonclient {
@@ -81,7 +83,10 @@ void LobbyScreen::OpenBanquet() {
   // suite. Le joueur vient de cliquer « Se connecter » : c'est le seul moment
   // du démarrage où une attente s'explique d'elle-même.
   const std::uint64_t started_ms = SDL_GetTicks();
-  shell_.EnsureWorldPieces();
+  if (!shell_.world_pieces_loaded()) {
+    LoadingPresenter loading(shell_, TablesPlan(), "tablée");
+    shell_.EnsureWorldPieces(loading.progress());
+  }
   ro::core::LogInfo("chargement pièces du monde : {} ms", SDL_GetTicks() - started_ms);
   if (!shell_.pieces().wardrobe.has_value()) {
     // ⚠ PAS UNE PANNE : sans garde-robe la tablée se dessine sans ses pantins,

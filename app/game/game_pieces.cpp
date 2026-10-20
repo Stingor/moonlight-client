@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <format>
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -692,98 +693,68 @@ void FollowQuestLanguage(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   ro::core::LogInfo("quêtes : catalogues relus en « {} »", pieces.quest_language);
 }
 
-void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces) {
-  // ⚠ LA GARDE-ROBE D'ABORD, parce que trois choses la DÉSIGNENT plus bas — le
-  // bandeau d'objet obtenu et les icônes. Elle est souvent déjà là : le décor
-  // vivant l'a montée avant que le joueur ait tapé son compte.
-  LoadBackdropPieces(vfs, pieces);
-  LoadSkillTree(vfs, pieces);
-  LoadJobNames(vfs, pieces);
-  LoadTitles(vfs, pieces);
-  LoadAchievements(vfs, pieces);
-  pieces.quest_language = ro::core::CurrentLanguage();
-  LoadQuestCatalog(vfs, pieces);
-  LoadRecommendedCatalog(vfs, pieces);
-  LoadWorldView(vfs, pieces);
-  LoadStatusTable(vfs, pieces);
-  OpenStatusIcons(vfs, pieces);
-  LoadItemWords(vfs, pieces);
-  LoadPackageItems(vfs, pieces);
-  LoadItemProperties(vfs, pieces);
-  LoadMonsterList(vfs, pieces);
-  LoadRandomOptionNames(vfs, pieces);
-  LoadBooks(vfs, pieces);
-  // ⚠ APRÈS LES MOTS ET LA GARDE-ROBE : il les DÉSIGNE tous les deux.
-  MakeItemObtainToast(pieces);
-  // ⚠ HORS DE LA GARDE DU BANDEAU : le refus parle même sans catalogue.
-  MakeItemPickupReport(pieces);
-  LoadHitPieces(vfs, pieces);
-  LoadEmotionPieces(vfs, pieces);
-  LoadSleepBubblePieces(vfs, pieces);
-  LoadAilmentPieces(vfs, pieces);
-  pieces.boss_badges = ro::render::LoadBossBadges(vfs);
-  pieces.battlefield_art = ro::render::LoadBattlefieldArt(vfs);
-  pieces.signboards = ro::render::LoadSignboardSurfaces(vfs);
-  // Les modèles se chargent à leur première apparition : seul leur renderer
-  // naît ici.
-  if (!pieces.actor_models.has_value()) {
-    pieces.actor_models.emplace(vfs);
-  }
-  if (!pieces.actor_model_renderer.has_value()) {
-    if (auto renderer = ro::render::ActorModelRenderer::Create(); renderer) {
-      pieces.actor_model_renderer = std::move(*renderer);
-    } else {
-      ro::core::LogWarning("acteurs en modèle : {} — ils ne paraîtront pas",
-                           ro::core::Describe(renderer.error()));
-    }
-  }
-}
-
-std::vector<std::span<const ro::render::DrawnActor>> DrawnHeldChildSprites(
-    GamePieces& pieces, std::uint32_t now_ms, std::span<const ro::render::DrawnActor> drawn,
-    std::span<const std::uint32_t> ids, const ro::sim::World& world, bool translucent) {
-  std::vector<std::span<const ro::render::DrawnActor>> lots;
-  const auto keep = [&lots](std::span<const ro::render::DrawnActor> held) {
-    if (!held.empty()) {
-      lots.push_back(held);
-    }
+void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, ro::core::LoadProgress* progress) {
+  // UNE ENTRÉE PAR PIÈCE, DANS L'ORDRE où elles se désignent : l'écran de
+  // chargement les compte une à une.
+  using PieceLoader = void (*)(ro::vfs::Vfs&, GamePieces&);
+  static constexpr PieceLoader kLoaders[] = {
+      // ⚠ LA GARDE-ROBE D'ABORD, parce que trois choses la DÉSIGNENT plus bas —
+      // le bandeau d'objet obtenu et les icônes. Elle est souvent déjà là : le
+      // décor vivant l'a montée avant que le joueur ait tapé son compte.
+      LoadBackdropPieces,
+      LoadSkillTree,
+      LoadJobNames,
+      LoadTitles,
+      LoadAchievements,
+      [](ro::vfs::Vfs& from, GamePieces& into) {
+        into.quest_language = ro::core::CurrentLanguage();
+        LoadQuestCatalog(from, into);
+      },
+      LoadRecommendedCatalog,
+      LoadWorldView,
+      LoadStatusTable,
+      OpenStatusIcons,
+      LoadItemWords,
+      LoadPackageItems,
+      LoadItemProperties,
+      LoadMonsterList,
+      LoadRandomOptionNames,
+      LoadBooks,
+      // ⚠ APRÈS LES MOTS ET LA GARDE-ROBE : il les DÉSIGNE tous les deux.
+      [](ro::vfs::Vfs& /*from*/, GamePieces& into) { MakeItemObtainToast(into); },
+      // ⚠ HORS DE LA GARDE DU BANDEAU : le refus parle même sans catalogue.
+      [](ro::vfs::Vfs& /*from*/, GamePieces& into) { MakeItemPickupReport(into); },
+      LoadHitPieces,
+      LoadEmotionPieces,
+      LoadSleepBubblePieces,
+      LoadAilmentPieces,
+      [](ro::vfs::Vfs& from, GamePieces& into) {
+        into.boss_badges = ro::render::LoadBossBadges(from);
+        into.battlefield_art = ro::render::LoadBattlefieldArt(from);
+        into.signboards = ro::render::LoadSignboardSurfaces(from);
+      },
+      // Les modèles se chargent à leur première apparition : seul leur
+      // renderer naît ici.
+      [](ro::vfs::Vfs& from, GamePieces& into) {
+        if (!into.actor_models.has_value()) {
+          into.actor_models.emplace(from);
+        }
+        if (into.actor_model_renderer.has_value()) {
+          return;
+        }
+        if (auto renderer = ro::render::ActorModelRenderer::Create(); renderer) {
+          into.actor_model_renderer = std::move(*renderer);
+        } else {
+          ro::core::LogWarning("acteurs en modèle : {} — ils ne paraîtront pas",
+                               ro::core::Describe(renderer.error()));
+        }
+      },
   };
-  if (pieces.sleep_bubbles.has_value()) {
-    keep(pieces.sleep_bubbles->Drawn(now_ms, drawn, ids, world, translucent));
+  const ro::core::LoadStepScope tables(progress, ro::core::LoadStep::kTables, std::size(kLoaders));
+  for (const PieceLoader load : kLoaders) {
+    load(vfs, pieces);
+    tables.Advance();
   }
-  if (pieces.silence_dots.has_value()) {
-    keep(pieces.silence_dots->Drawn(now_ms, drawn, ids, world, translucent));
-  }
-  if (pieces.stun_stars.has_value()) {
-    keep(pieces.stun_stars->Drawn(now_ms, drawn, ids, world, translucent));
-  }
-  if (pieces.quest_markers.has_value()) {
-    keep(pieces.quest_markers->Drawn(now_ms, drawn, ids, world, translucent));
-  }
-  if (pieces.companion_target_marks.has_value()) {
-    keep(pieces.companion_target_marks->Drawn(now_ms, pieces.companion_ai.target_marks(), drawn,
-                                              ids, world, translucent));
-  }
-  return lots;
-}
-
-std::span<const ro::render::DrawnActor> DrawnFrozenIce(
-    GamePieces& pieces, std::uint32_t now_ms, std::span<const ro::render::DrawnActor> drawn,
-    std::span<const std::uint32_t> ids, const ro::sim::World& world, bool translucent) {
-  if (!pieces.frozen_ice.has_value()) {
-    return {};
-  }
-  return pieces.frozen_ice->Drawn(now_ms, drawn, ids, world, translucent);
-}
-
-std::span<const ro::render::DrawnActor> DrawnCurseMarks(
-    GamePieces& pieces, std::uint32_t now_ms, float camera_yaw_degrees,
-    std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
-    const ro::sim::World& world, bool translucent) {
-  if (!pieces.curse_marks.has_value()) {
-    return {};
-  }
-  return pieces.curse_marks->Drawn(now_ms, camera_yaw_degrees, drawn, ids, world, translucent);
 }
 
 }  // namespace moonclient

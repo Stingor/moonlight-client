@@ -10,6 +10,7 @@
 
 #include "ro/audio/audio_engine.h"
 #include "ro/core/error.h"
+#include "ro/core/load_progress.h"
 #include "ro/render/gl_context.h"
 #include "ro/vfs/vfs.h"
 
@@ -19,6 +20,7 @@
 #include "game/ui_layouts.h"
 #include "game/ui_stage.h"
 #include "game/zone_stream_capture.h"
+#include "loading/loading_screens.h"
 #include "world/map_music.h"
 
 namespace moonclient {
@@ -201,7 +203,15 @@ class ClientShell {
   //
   // ⚠ ET C'EST LA COQUILLE QUI LES POSSÈDE, donc c'est à elle de savoir s'ils
   // sont là. Un drapeau chez l'appelant serait un drapeau par appelant.
-  void EnsureWorldPieces();
+  //
+  // `progress` compte les tables lues, pour l'écran de chargement.
+  void EnsureWorldPieces(ro::core::LoadProgress* progress = nullptr);
+  [[nodiscard]] bool world_pieces_loaded() const noexcept { return world_pieces_loaded_; }
+
+  // UNE IMAGE DE L'ÉCRAN DE CHARGEMENT, dans l'image d'ImGui qu'elle ouvre et
+  // ferme : voir `LoadingScreens`. Sans `progress`, la barre est indéterminée.
+  void DrawLoadingFrame(const ro::core::LoadProgress* progress, float opacity,
+                        std::uint32_t now_ms);
 
   // LE SKIN CHOISI DANS LES OPTIONS, posé s'il a changé : la surcharge du VFS,
   // l'habillage des fenêtres et tout ce qui en a été tiré. Vrai quand il vient
@@ -215,7 +225,7 @@ class ClientShell {
   // accessoires du monde entier coûteraient six à dix secondes au démarrage —
   // avant le formulaire, ou en le figeant juste après. La garde-robe seule
   // coûte un tiers de seconde ; voir `LoadBackdropPieces`.
-  void EnsureBackdropPieces();
+  void EnsureBackdropPieces(ro::core::LoadProgress* progress = nullptr);
 
  private:
   // Attend, s'il le faut, que l'image ait duré ce que le plafond demande.
@@ -252,6 +262,7 @@ class ClientShell {
   // ⚠ FACULTATIVE PARCE QU'ELLE LIT LA TABLE À SA CONSTRUCTION, donc après le
   // montage du VFS. Elle existe dès l'ouverture de la coquille et ne meurt plus.
   std::optional<MapMusic> music_;
+  LoadingScreens loading_screens_;
 
   // Les accessoires du monde sont-ils lus ? Voir `EnsureWorldPieces`.
   bool world_pieces_loaded_ = false;

@@ -23,6 +23,8 @@
 #include "game/game.h"
 #include "game/save_folder.h"
 #include "game/skin_reload.h"
+#include "loading/loading_plans.h"
+#include "loading/loading_presenter.h"
 #include "options/screen_choice.h"
 #include "shell/skin_folder.h"
 #include "world/map_music.h"
@@ -154,7 +156,11 @@ ro::core::Result<void> ClientShell::OpenArchives() {
   UseSkin(*vfs_, client_root_, skin_shown_);
   ReportStage("archives");
 
+  // L'ÉCRAN DE CHARGEMENT, dès que les archives portent son illustration.
+  LoadingPresenter loading(*this, StartupPlan(), "démarrage");
+
   // L'habillage, le curseur, la police : tout ce qui ne dépend d'aucune partie.
+  ro::core::BeginLoadStep(loading.progress(), ro::core::LoadStep::kInterface);
   LoadShellPieces(*vfs_, pieces_);
   interface_->UseSkin(pieces_.skin);
   interface_->SetSkinLook(settings_->options().pages().skin_look.look());
@@ -163,10 +169,12 @@ ro::core::Result<void> ClientShell::OpenArchives() {
   // Le SON. Une machine sans carte son ne doit pas empêcher de jouer : on le
   // dit une fois, et on continue en silence.
   ro::core::LogInfo("démarrage : son");
+  ro::core::BeginLoadStep(loading.progress(), ro::core::LoadStep::kSound);
   audio_ = OpenAudio();
   // ⚠ AVEC LE SON ET NON AVEC LA PARTIE : l'écran de connexion montre une
   // ville, et il lui faut sa musique. Voir `ClientShell::music`.
   music_.emplace(*vfs_, client_root_);
+  ro::core::EndLoadStep(loading.progress());
   ReportStage("son");
 
   // 🔴 LES RÉGLAGES DE LA COQUILLE S'APPLIQUENT MAINTENANT, et non à la fin du
@@ -187,22 +195,25 @@ ro::core::Result<void> ClientShell::OpenArchives() {
   return {};
 }
 
-void ClientShell::EnsureBackdropPieces() {
+void ClientShell::EnsureBackdropPieces(ro::core::LoadProgress* progress) {
   if (backdrop_pieces_loaded_ || !vfs_.has_value()) {
     return;
   }
   backdrop_pieces_loaded_ = true;
-  LoadBackdropPieces(*vfs_, pieces_);
+  {
+    const ro::core::LoadStepScope wardrobe(progress, ro::core::LoadStep::kWardrobe);
+    LoadBackdropPieces(*vfs_, pieces_);
+  }
   KeepAlive();
 }
 
-void ClientShell::EnsureWorldPieces() {
+void ClientShell::EnsureWorldPieces(ro::core::LoadProgress* progress) {
   if (world_pieces_loaded_ || !vfs_.has_value()) {
     return;
   }
   world_pieces_loaded_ = true;
   backdrop_pieces_loaded_ = true;
-  LoadWorldPieces(*vfs_, pieces_);
+  LoadWorldPieces(*vfs_, pieces_, progress);
   // ⚠ LA FILE SE SERT APRÈS, comme à chaque couture d'étape : c'est le plus
   // long chargement du client, et la fenêtre existe déjà.
   //
@@ -226,6 +237,16 @@ bool ClientShell::FollowSkinChoice() {
   look.Open(SkinFolder(client_root_, skin_shown_), SkinLookProfilePath(client_root_));
   interface_->SetSkinLook(look.look());
   return true;
+}
+
+void ClientShell::DrawLoadingFrame(const ro::core::LoadProgress* progress, float opacity,
+                                   std::uint32_t now_ms) {
+  if (!interface_.has_value()) {
+    return;
+  }
+  loading_screens_.Draw(*interface_, vfs_.has_value() ? &*vfs_ : nullptr,
+                        pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, progress,
+                        opacity, now_ms);
 }
 
 void ClientShell::KeepAlive() const {

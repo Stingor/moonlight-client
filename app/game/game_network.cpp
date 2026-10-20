@@ -41,6 +41,8 @@
 #include "game/interface_sound.h"
 #include "game/level_up_cue.h"
 #include "input/camera_aim.h"
+#include "loading/loading_plans.h"
+#include "loading/loading_presenter.h"
 #include "world/attack_intent.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
@@ -315,19 +317,30 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     const std::string left_map = stage_->name;
     const bool flatten =
         ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look());
-    const MapArrival arrival{
-        &*vfs_,   &*stage_,     &planner_,
-        &world_,  &terrain_,    &water_,
-        &models_, &background_, &attempted_map_,
-        flatten,  &map_edits_,  settings_->options().graphics().real_time_shadows()};
+    const bool rounded = settings_->options().graphics().rounded_ground();
+    // L'ÉCRAN DE CHARGEMENT, POUR UNE AUTRE CARTE SEULEMENT : la même ne se
+    // relit pas, et rien ne s'afficherait qu'un clignotement.
+    std::optional<LoadingPresenter> loading;
+    if (world_.map_name() != attempted_map_) {
+      loading.emplace(shell_, MapPlan(rounded), "changement de carte");
+    }
+    const MapArrival arrival{&*vfs_,          &*stage_,
+                             &planner_,       &world_,
+                             &terrain_,       &water_,
+                             &models_,        &background_,
+                             &attempted_map_, flatten,
+                             &map_edits_,     settings_->options().graphics().real_time_shadows(),
+                             rounded,         loading.has_value() ? loading->progress() : nullptr};
     if (auto entered = EnterAnnouncedMap(arrival); !entered) {
       return std::unexpected(entered.error());
     }
+    loading.reset();
     // Même carte comprise : toute entrée repose la vue d'arrivée.
     camera_rig_.EnterMap(camera_, stage_->name);
     // ⚠ LE CHARGEMENT N'EST PAS UN SILENCE : on ne lisait pas pendant qu'il
-    // bloquait. La garde repart d'ici.
-    link_watch_.Restart(now_ms);
+    // bloquait. La garde repart d'ici, à l'heure de sa FIN et non à celle de
+    // l'image qui l'a commencé.
+    link_watch_.Restart(static_cast<std::uint32_t>(SDL_GetTicks()));
     // 🔴 ET LE CIEL SE REDEMANDE. Ses nœuds vivent aussi longtemps que la carte,
     // donc ceux de la précédente survivraient au voyage — et ceux de la nouvelle
     // ne se lèveraient jamais, le drapeau étant resté posé.

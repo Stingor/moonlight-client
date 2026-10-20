@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "ro/core/load_progress.h"
 #include "ro/formats/image.h"
 #include "ro/render/actor_model_renderer.h"
 #include "ro/render/actor_sprite.h"
@@ -582,7 +583,10 @@ void LoadBackdropPieces(ro::vfs::Vfs& vfs, GamePieces& pieces);
 //
 // ⚠ COÛTEUSE — c'est le poste à six à dix secondes du journal : elle ne se lit
 // qu'une fois, voir `ClientShell::EnsureWorldPieces`.
-void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces);
+//
+// `progress` compte les tables lues, une par une.
+void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces,
+                     ro::core::LoadProgress* progress = nullptr);
 
 // RELIT LES CATALOGUES DE QUÊTES QUAND LA LANGUE CHANGE, en jeu.
 //

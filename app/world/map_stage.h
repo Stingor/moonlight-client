@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/core/load_progress.h"
 #include "ro/formats/gat.h"
 #include "ro/mapedit/map_edit.h"
 #include "ro/render/ground_light.h"
@@ -76,20 +77,27 @@ struct MapStage {
 // qui traverse ce que le serveur contourne mais laisse le jeu jouable. Son
 // absence se dit sur la sortie d'erreur, elle n'empêche pas la carte.
 //
-// `flatten_relief` ramène le sol ET la grille au même niveau (GreyWorld) : n'en
-// aplatir qu'un ferait flotter ou enfoncer tout le monde. ⚠ LA MARCHABILITÉ SE
-// DÉRIVE AVANT, du relief d'origine : c'est celle du serveur, et un sol aplati
-// sous le niveau d'eau changerait sinon des cellules en eau.
-//
-// `edits`, quand il est donné, pose le document qu'il tient pour cette carte,
-// lu à sa première entrée, au lieu de celui de l'installation.
-//
-// `real_time_shadows` : « Ombres en temps réel » est allumé, et le relief
-// retouché du document se pose — voir `ShownGroundEdits`.
+// Ce que la lecture demande en plus de la carte : voir `MapStageRead`.
+struct MapStageRead {
+  // Le sol ET la grille ramenés au même niveau (GreyWorld) : n'en aplatir qu'un
+  // ferait flotter ou enfoncer tout le monde. ⚠ LA MARCHABILITÉ SE DÉRIVE
+  // AVANT, du relief d'origine : c'est celle du serveur, et un sol aplati sous
+  // le niveau d'eau changerait sinon des cellules en eau.
+  bool flatten_relief = false;
+  // Quand il est donné, le document qu'il tient pour cette carte, lu à sa
+  // première entrée, se pose au lieu de celui de l'installation.
+  MapEditStore* edits = nullptr;
+  // « Ombres en temps réel » est allumé, et le relief retouché du document se
+  // pose — voir `ShownGroundEdits`.
+  bool real_time_shadows = false;
+  // LE SOL ARRONDI DÈS LA LECTURE, et non à l'image suivante : le chargement
+  // compte alors tout ce qu'il coûte. Voir `SyncStageGround`.
+  bool rounded_ground = false;
+  // L'avancement, dit à qui le montre. Nul : la lecture se tait.
+  ro::core::LoadProgress* progress = nullptr;
+};
 [[nodiscard]] ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
-                                                      bool flatten_relief = false,
-                                                      MapEditStore* edits = nullptr,
-                                                      bool real_time_shadows = false);
+                                                      const MapStageRead& read = {});
 
 // Où se pose un acteur, en coordonnées du monde.
 //
@@ -224,7 +232,20 @@ struct MapArrival {
   MapEditStore* map_edits = nullptr;
   // « Ombres en temps réel » : le relief retouché se pose. Voir `LoadMapStage`.
   bool real_time_shadows = false;
+  // Le sol arrondi du réglage, bâti dès la lecture : voir `MapStageRead`.
+  bool rounded_ground = false;
+  // L'avancement de la lecture ET du téléversement. Nul : rien ne se dit.
+  ro::core::LoadProgress* progress = nullptr;
 };
+
+// LA CARTE ENVOYÉE À LA CARTE GRAPHIQUE : terrain, eau et modèles, ensemble. Un
+// renderer oublié garderait la géométrie de la carte précédente. L'erreur rendue
+// est celle d'un téléversement refusé.
+[[nodiscard]] ro::core::Result<void> UploadStage(const MapStage& stage,
+                                                 ro::render::TerrainRenderer& terrain,
+                                                 ro::render::WaterRenderer& water,
+                                                 ro::render::ModelRenderer& models,
+                                                 ro::core::LoadProgress* progress = nullptr);
 
 // Charge la carte que le monde annonce, la téléverse, et vise sa grille.
 //

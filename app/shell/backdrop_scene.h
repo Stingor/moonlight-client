@@ -90,7 +90,10 @@ class BackdropScene {
   //
   // ⚠ ÉCHOUE PLUTÔT QUE DE SE TAIRE : un écran de connexion sans fond est un
   // écran noir, et un écran noir ne se distingue pas d'un plantage.
-  [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, std::string_view map_name);
+  //
+  // `read` dit le sol à bâtir et à qui dire l'avancement.
+  [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, std::string_view map_name,
+                                            const MapStageRead& read = {});
 
   // OÙ LA CAMÉRA REGARDE : la case où le serveur a posé son spectateur.
   //

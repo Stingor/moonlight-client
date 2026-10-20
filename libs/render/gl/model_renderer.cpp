@@ -362,7 +362,9 @@ ModelRenderer::Batch* ModelRenderer::TakeSameMesh(std::vector<Batch>& previous,
   return nullptr;
 }
 
-core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& models) {
+core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& models,
+                                         core::LoadProgress* progress) {
+  const core::LoadStepScope step(progress, core::LoadStep::kModelUpload, models.size());
   // Les lots précédents qu'un modèle inchangé ne reprend pas se rendent au
   // pilote à la fin : sinon, ils resteraient en mémoire graphique.
   std::vector<Batch> previous = std::exchange(batches_, {});
@@ -378,6 +380,8 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
 
   for (std::size_t model_index = 0; model_index < models.size(); ++model_index) {
     const ModelInstances& model = models[model_index];
+    // Compté à la fin du tour, modèle sauté compris.
+    const core::LoadItemDone counted(step);
     const bool animated = !model.rig.empty() && !model.animated.empty();
     if (model.mesh.empty() || (model.transforms.empty() && !animated)) {
       continue;

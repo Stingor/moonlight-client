@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/core/load_progress.h"
 #include "ro/formats/gnd.h"
 #include "ro/formats/image.h"
 #include "ro/formats/rsm.h"
@@ -209,6 +210,8 @@ struct MapSceneOptions {
   // L'éditeur y met le document qu'il tient ; un banc ou un outil, celui qu'il
   // éprouve.
   std::optional<mapedit::MapEdit> edit;
+  // L'AVANCEMENT, dit étape par étape à qui le montre. Nul : la lecture se tait.
+  core::LoadProgress* progress = nullptr;
 };
 
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,

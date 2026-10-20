@@ -29,6 +29,15 @@ std::string GatFilePath(const ro::vfs::ResNameTable& res_names, std::string_view
   return res_names.MapFilePath(std::string(map_name) + ".gat");
 }
 
+// La lecture qu'une arrivée demande.
+[[nodiscard]] MapStageRead ReadOf(const MapArrival& arrival) {
+  return MapStageRead{.flatten_relief = arrival.flatten_relief,
+                      .edits = arrival.map_edits,
+                      .real_time_shadows = arrival.real_time_shadows,
+                      .rounded_ground = arrival.rounded_ground,
+                      .progress = arrival.progress};
+}
+
 }  // namespace
 
 std::string WindowTitle(bool test_server) {
@@ -53,21 +62,26 @@ std::string WindowTitle(bool names_shown, const ro::sim::World& world, bool test
 }
 
 ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
-                                        bool flatten_relief, MapEditStore* edits,
-                                        bool real_time_shadows) {
+                                        const MapStageRead& read) {
   const std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
-  ro::render::MapSceneOptions options{.flatten_relief = flatten_relief};
-  if (edits != nullptr) {
-    edits->Load(map_name, vfs);
+  ro::render::MapSceneOptions options{
+      .flatten_relief = read.flatten_relief,
+      .ground_subdivisions = read.rounded_ground ? ro::render::kRoundedGroundSubdivisions
+                                                 : ro::render::kFlatGroundSubdivisions,
+      .progress = read.progress};
+  // Les documents d'édition se lisent avec les fichiers de la carte.
+  ro::core::BeginLoadStep(read.progress, ro::core::LoadStep::kMap);
+  if (read.edits != nullptr) {
+    read.edits->Load(map_name, vfs);
     // Les lumières de modèle valent pour toutes les cartes : lues une fois.
-    edits->Load(ro::mapedit::kModelLightsDocument, vfs);
-    options.edit = edits->Document(map_name);
+    read.edits->Load(ro::mapedit::kModelLightsDocument, vfs);
+    options.edit = read.edits->Document(map_name);
   } else {
     options.edit = ro::render::LoadMapEdit(vfs, map_name);
   }
   // LE RELIEF RETOUCHÉ, seulement sous les ombres en temps réel : la scène
   // reçoit un document sans lui, le magasin garde le sien entier.
-  if (!real_time_shadows) {
+  if (!read.real_time_shadows) {
     options.edit->ClearGround();
   }
   auto scene = ro::render::LoadMapScene(vfs, map_name, options);
@@ -82,7 +96,8 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
   // La scène ne se construit pas vide — sa carte de hauteurs n'a pas de valeur
   // par défaut —, d'où l'agrégation d'un seul tenant.
   MapStage stage{std::string(map_name), std::move(*scene), ro::sim::WalkMap()};
-  stage.flatten_asked = flatten_relief;
+  stage.flatten_asked = read.flatten_relief;
+  const ro::core::LoadStepScope walk_grid(read.progress, ro::core::LoadStep::kWalkGrid);
   if (auto gat_bytes = vfs.Read(GatFilePath(vfs.res_names(), map_name)); gat_bytes) {
     if (auto gat = ro::formats::GatMap::Parse(*gat_bytes); gat) {
       stage.walk_map = ro::sim::WalkMap::FromGat(*gat);
@@ -289,14 +304,34 @@ ro::render::Camera WholeMapCamera(const MapStage& stage, float aspect_ratio) {
                                  aspect_ratio, kEditorFovDegrees);
 }
 
+ro::core::Result<void> UploadStage(const MapStage& stage, ro::render::TerrainRenderer& terrain,
+                                   ro::render::WaterRenderer& water,
+                                   ro::render::ModelRenderer& models,
+                                   ro::core::LoadProgress* progress) {
+  ro::core::BeginLoadStep(progress, ro::core::LoadStep::kUpload);
+  if (auto uploaded = terrain.Upload(stage.scene.terrain, stage.scene.terrain_textures,
+                                     stage.scene.atlas.image);
+      !uploaded) {
+    return std::unexpected(uploaded.error());
+  }
+  // 🔴 L'EAU AVEC LE RESTE, et il n'y a pas de raccourci « la carte n'en a
+  // pas » : c'est justement le cas qui mord. Sans ce téléversement, une carte
+  // sèche garde la nappe de la précédente — sur gonryun, la mer d'à côté
+  // flottait entre les plateaux.
+  if (auto uploaded = water.Upload(stage.scene.water, stage.scene.water_animations); !uploaded) {
+    return std::unexpected(uploaded.error());
+  }
+  ro::core::EndLoadStep(progress);
+  return models.Upload(stage.scene.models, progress);
+}
+
 ro::core::Result<void> EnterAnnouncedMap(const MapArrival& arrival) {
   if (arrival.world->map_name() == *arrival.attempted) {
     return {};
   }
   *arrival.attempted = arrival.world->map_name();
 
-  auto arrived = LoadMapStage(*arrival.vfs, *arrival.attempted, arrival.flatten_relief,
-                              arrival.map_edits, arrival.real_time_shadows);
+  auto arrived = LoadMapStage(*arrival.vfs, *arrival.attempted, ReadOf(arrival));
   if (!arrived) {
     // ⚠ CE QUI RESTE À L'ÉCRAN : on rend un succès juste après, sans toucher à la
     // scène. Le client garde donc la géométrie de la carte PRÉCÉDENTE pendant
@@ -311,34 +346,15 @@ ro::core::Result<void> EnterAnnouncedMap(const MapArrival& arrival) {
   *arrival.planner = ro::sim::WalkPlanner(PlannedMapOf(*arrival.stage));
   arrival.world->SetWalkMap(PlannedMapOf(*arrival.stage));
   *arrival.background = BackgroundOf(*arrival.stage);
-
-  if (auto uploaded = arrival.terrain->Upload(arrival.stage->scene.terrain,
-                                              arrival.stage->scene.terrain_textures,
-                                              arrival.stage->scene.atlas.image);
-      !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-  // 🔴 L'EAU AVEC LE RESTE, et il n'y a pas de raccourci « la carte n'en a
-  // pas » : c'est justement le cas qui mord. Sans ce téléversement, une carte
-  // sèche garde la nappe de la précédente — sur gonryun, la mer d'à côté
-  // flottait entre les plateaux.
-  if (auto uploaded =
-          arrival.water->Upload(arrival.stage->scene.water, arrival.stage->scene.water_animations);
-      !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-  if (auto uploaded = arrival.models->Upload(arrival.stage->scene.models); !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-  return {};
+  return UploadStage(*arrival.stage, *arrival.terrain, *arrival.water, *arrival.models,
+                     arrival.progress);
 }
 
 ro::core::Result<bool> ReloadStageRelief(const MapArrival& arrival) {
   // ⚠ LA DEMANDE EST NOTÉE AVANT LA LECTURE, succès ou non : un échec ne se
   // retente pas à chaque image.
   arrival.stage->flatten_asked = arrival.flatten_relief;
-  auto reread = LoadMapStage(*arrival.vfs, arrival.stage->name, arrival.flatten_relief,
-                             arrival.map_edits, arrival.real_time_shadows);
+  auto reread = LoadMapStage(*arrival.vfs, arrival.stage->name, ReadOf(arrival));
   if (!reread) {
     ro::core::LogError("carte {} : {} — le relief reste celui d'avant", arrival.stage->name,
                        ro::core::Describe(reread.error()));
@@ -357,18 +373,9 @@ ro::core::Result<bool> ReloadStageRelief(const MapArrival& arrival) {
   arrival.stage->ground_laid_light = std::move(reread->ground_laid_light);
   arrival.stage->read_ms = reread->read_ms;
   ReportMapStage(*arrival.stage);
-  if (auto uploaded = arrival.terrain->Upload(arrival.stage->scene.terrain,
-                                              arrival.stage->scene.terrain_textures,
-                                              arrival.stage->scene.atlas.image);
+  if (auto uploaded = UploadStage(*arrival.stage, *arrival.terrain, *arrival.water, *arrival.models,
+                                  arrival.progress);
       !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-  if (auto uploaded =
-          arrival.water->Upload(arrival.stage->scene.water, arrival.stage->scene.water_animations);
-      !uploaded) {
-    return std::unexpected(uploaded.error());
-  }
-  if (auto uploaded = arrival.models->Upload(arrival.stage->scene.models); !uploaded) {
     return std::unexpected(uploaded.error());
   }
   return true;

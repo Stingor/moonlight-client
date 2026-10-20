@@ -12940,6 +12940,27 @@ tr: No se puede escribir: emblem/
 fr: Chargement…
 tr: Cargando…
 
+fr: %d %%
+tr: %d %%
+
+fr: Garde-robe
+tr: Vestuario
+
+fr: Tables du jeu
+tr: Tablas del juego
+
+fr: Modèles
+tr: Modelos
+
+fr: Grille de marche
+tr: Cuadrícula de paso
+
+fr: Envoi à la carte graphique
+tr: Envío a la tarjeta gráfica
+
+fr: Envoi des modèles
+tr: Envío de modelos
+
 fr: Choisir l'icône dans son inventory, sans connaître les numéros.
 tr: Elige el icono de tu bolsa, sin tener que saber los números.
 

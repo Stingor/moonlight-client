@@ -49,6 +49,7 @@
 #include "ro/ui/inventory_window.h"
 #include "ro/ui/item_obtain_toast.h"
 #include "ro/ui/link_notice.h"
+#include "ro/ui/loading_screen.h"
 #include "ro/ui/log_window.h"
 #include "ro/ui/login_window.h"
 #include "ro/ui/make_item_window.h"
@@ -650,10 +651,9 @@ class UiStage {
   // jamais en même temps qu'elles.
   void DrawAfkOnly(const ro::ui::AfkClockView& clock, const OverWorldPaint& over_world = {});
 
-  // UNE IMAGE D'ÉCRAN DE CHARGEMENT, et rien d'autre : voir
-  // `ro/ui/loading_screen.h`. Même règle que ses jumelles — jamais en même
-  // temps qu'elles.
-  void DrawLoadingOnly(const char* text);
+  // UNE IMAGE D'ÉCRAN DE CHARGEMENT, et rien d'autre : voir `ro/ui/loading_screen.h`.
+  // Même règle que ses jumelles — jamais en même temps qu'elles.
+  void DrawLoadingOnly(const ro::ui::LoadingScreenView& view);
 
   // UNE IMAGE D'ÉCRAN DE MISE À JOUR : voir `ro/ui/patch_screen.h`. Même règle
   // que ses jumelles.

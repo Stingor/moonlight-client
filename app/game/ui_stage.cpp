@@ -780,11 +780,11 @@ void UiStage::DrawAfkOnly(const ro::ui::AfkClockView& clock, const OverWorldPain
   backend_.Draw();
 }
 
-void UiStage::DrawLoadingOnly(const char* text) {
+void UiStage::DrawLoadingOnly(const ro::ui::LoadingScreenView& view) {
   // ⚠ MÊME RAISON QUE LA VEILLE : l'image s'ouvre et se ferme, pour qu'ImGui
   // garde le compte de ce que la souris et le clavier font pendant l'attente.
   backend_.BeginFrame(*ui_);
-  ro::ui::DrawLoadingScreen(text);
+  ro::ui::DrawLoadingScreen(view);
   ui_->EndFrame();
   backend_.Draw();
 }

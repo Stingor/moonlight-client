@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/core/error.h"
+#include "ro/core/load_progress.h"
 #include "ro/render/camera.h"
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
@@ -89,7 +90,10 @@ class ModelRenderer {
   // retéléversent à chaque piège posé ou retiré, et renvoyaient toutes leurs
   // textures à chaque fois. Celles que le nouveau téléversement ne cite plus se
   // rendent au pilote.
-  [[nodiscard]] core::Result<void> Upload(const std::vector<ModelInstances>& models);
+  //
+  // `progress`, quand il est donné, compte les modèles envoyés.
+  [[nodiscard]] core::Result<void> Upload(const std::vector<ModelInstances>& models,
+                                          core::LoadProgress* progress = nullptr);
 
   // Combien de textures le dernier téléversement a dû envoyer au pilote : celles
   // qu'aucun précédent n'avait déjà envoyées.

@@ -82,11 +82,14 @@ void KeepModelKeys(MapScene& scene, std::size_t kept) {
 // le chargement : le renderer la remplace par du magenta, et le défaut se voit
 // à l'écran au lieu de faire disparaître la carte.
 std::vector<formats::Image> LoadTerrainTextures(vfs::Vfs& vfs, const formats::GndMap& gnd,
-                                                std::size_t& missing) {
+                                                std::size_t& missing,
+                                                core::LoadProgress* progress) {
   std::vector<formats::Image> textures;
   textures.reserve(gnd.texture_paths().size());
 
+  const core::LoadStepScope step(progress, core::LoadStep::kTerrain, gnd.texture_paths().size());
   for (const std::string& relative : gnd.texture_paths()) {
+    const core::LoadItemDone counted(step);
     std::optional<formats::Image> image = LoadSceneTexture(vfs, relative);
     if (!image) {
       textures.emplace_back();
@@ -199,7 +202,8 @@ const std::vector<mapedit::VertexMove>& MovesOf(const MapScene& scene, const Ins
 // à son ajout, et une variante dont les sommets changent se rebâtit seule. Un
 // jeu de poses que l'édition ne demande plus, ou dont les sommets ont changé,
 // s'en va d'abord.
-void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
+void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene,
+                            core::LoadProgress* progress = nullptr) {
   std::set<InstancesKey> wanted;
   for (std::size_t rank = 0; rank < scene.rsw.models().size(); ++rank) {
     wanted.insert(KeyOf(scene, rank));
@@ -244,7 +248,10 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene) {
   }
   // ⚠ UN MODÈLE MASQUÉ SE LIT AUSSI : l'éditeur peut le démasquer sans relire
   // la carte.
+  const core::LoadStepScope step(progress, core::LoadStep::kModels, wanted.size());
   for (const InstancesKey& key : wanted) {
+    // ⚠ COMPTÉ À LA FIN DU TOUR, même quand la lecture abandonne ce modèle.
+    const core::LoadItemDone counted(step);
     const std::vector<mapedit::VertexMove>& moves = MovesOf(scene, key);
     // UNE VARIANTE repart du fichier gardé, s'il l'est déjà.
     std::optional<formats::RsmModel> model;
@@ -511,6 +518,8 @@ void RebuildSceneTerrain(MapScene& scene) {
 
 core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                     const MapSceneOptions& options) {
+  core::LoadProgress* const progress = options.progress;
+  core::BeginLoadStep(progress, core::LoadStep::kMap);
   auto rsw_bytes = vfs.Read(vfs.res_names().MapFilePath(std::string(map_name) + ".rsw"));
   if (!rsw_bytes) {
     return std::unexpected(rsw_bytes.error());
@@ -549,7 +558,9 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
     return std::unexpected(gnd.error());
   }
 
+  core::BeginLoadStep(progress, core::LoadStep::kLights);
   LightmapAtlas atlas = BuildLightmapAtlas(*gnd);
+  core::EndLoadStep(progress);
   SceneLight light = MakeSceneLight(rsw->light());
 
   MapScene scene{
@@ -587,25 +598,33 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
 
   // Les textures AVANT le maillage : c'est en les lisant que l'on sait quels
   // carreaux sont des trous, et un trou ne s'émet pas.
-  scene.terrain_textures = LoadTerrainTextures(vfs, scene.gnd, scene.missing_terrain_textures);
+  scene.terrain_textures =
+      LoadTerrainTextures(vfs, scene.gnd, scene.missing_terrain_textures, progress);
   scene.invisible_tiles = FindInvisibleTiles(scene.gnd, scene.terrain_textures);
   scene.ground_subdivisions = options.ground_subdivisions;
+  core::BeginLoadStep(progress, core::LoadStep::kGround);
   scene.terrain =
       BuildTerrainMesh(scene.gnd, scene.atlas, scene.invisible_tiles, scene.ground_subdivisions);
   // 🔴 L'EAU PARTAGE LA LISTE DES TROUS AVEC LE TERRAIN, et il le faut : le
   // client ne pose d'eau que là où le sol a dessiné un quad. Sans elle, une
   // carte trouée se couvre d'une nappe par-dessus le vide.
+  core::BeginLoadStep(progress, core::LoadStep::kWater);
   scene.water = BuildWaterPlane(scene.gnd, scene.rsw, scene.invisible_tiles);
   scene.water_animations = LoadWaterAnimations(vfs, scene.water, scene.missing_water_textures);
+  core::EndLoadStep(progress);
   // Le décor est chargé APRÈS le terrain : s'il échoue, la carte reste
   // affichable, ce qui vaut mieux qu'un écran noir.
   //
   // ⚠ SAUF SUR UN RELIEF APLATI : voir `MapSceneOptions::flatten_relief`.
   if (!scene.relief_level.has_value()) {
-    LoadMissingSceneModels(vfs, scene);
+    LoadMissingSceneModels(vfs, scene, progress);
     PlaceSceneInstances(scene);
+  } else {
+    // ⚠ L'ÉTAPE PASSE QUAND MÊME : le plan la compte, et le 100 % la demande.
+    core::BeginLoadStep(progress, core::LoadStep::kModels);
   }
   // LA TABLE DES EFFETS DE LA CARTE.
+  core::BeginLoadStep(progress, core::LoadStep::kMapEffects);
   scene.effect_table = LoadMapEffectTable(vfs, map_name);
   // Le sprite des cheminées, seulement pour une carte qui en a.
   if (std::ranges::any_of(scene.rsw.effects(), [](const formats::RswEffect& object) {
@@ -616,7 +635,11 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   // Les textures des émetteurs et du vent. ⚠ AVEC LA CLÉ MAGENTA : le client
   // les charge par le chargeur d'images commun, celui des textures d'un `.str`,
   // dont le magenta pur est la transparence.
-  for (const std::string& texture : MapEffectTextures(scene.effect_table, scene.rsw.effects())) {
+  const std::set<std::string> effect_textures =
+      MapEffectTextures(scene.effect_table, scene.rsw.effects());
+  const core::LoadStepScope effects(progress, core::LoadStep::kMapEffects, effect_textures.size());
+  for (const std::string& texture : effect_textures) {
+    const core::LoadItemDone counted(effects);
     std::optional<formats::Image> image = LoadSceneTexture(vfs, texture, SceneTextureKey::kEffect);
     if (!image) {
       ++scene.missing_effect_textures;
@@ -634,6 +657,7 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   scene.parameterised_sky_clouds = sky.parameterised_clouds;
   scene.background_fog = sky.background_fog;
   scene.fog = LoadMapFog(vfs, map_name);
+  core::EndLoadStep(progress);
   return scene;
 }
 
