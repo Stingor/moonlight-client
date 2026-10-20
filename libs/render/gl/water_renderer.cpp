@@ -47,6 +47,9 @@ void main() {
 // L'eau ne reçoit PAS la lumière de la carte : le client peint ses quatre
 // sommets d'un blanc fixe et ne module que l'alpha. Lui appliquer l'éclairage
 // la teindrait d'une couleur que le jeu ne lui donne jamais.
+//
+// LA NUIT, ELLE, LA TOUCHE : l'heure et la nuit de la carte l'assombrissent du
+// même facteur que la couleur du sol, un en plein jour.
 constexpr std::string_view kFragmentShader = R"GLSL(
 #version 330 core
 in vec2 v_texture_uv;
@@ -54,6 +57,8 @@ in float v_fog_kept;
 
 uniform sampler2D u_texture;
 uniform float u_opacity;
+// Ce que l'heure et la nuit laissent de la lumière : voir `WaterRenderer::Draw`.
+uniform vec3 u_sky_light;
 
 out vec4 frag_color;
 
@@ -61,7 +66,8 @@ void main() {
     // L'alpha vient du réglage, pas de la texture : les images d'eau sont des
     // JPEG, donc opaques. Sans lui, la nappe cacherait le fond au lieu de le
     // voiler.
-    frag_color = vec4(Fogged(texture(u_texture, v_texture_uv).rgb, v_fog_kept), u_opacity);
+    vec3 color = texture(u_texture, v_texture_uv).rgb * u_sky_light;
+    frag_color = vec4(Fogged(color, v_fog_kept), u_opacity);
 }
 )GLSL";
 
@@ -172,7 +178,7 @@ const GlTexture* WaterRenderer::FrameOf(std::int32_t type, int frame) const {
 }
 
 void WaterRenderer::Draw(const Camera& camera, float aspect_ratio, std::uint32_t elapsed_ms,
-                         const SceneFog& fog) const {
+                         const SceneFog& fog, const glm::vec3& sky_light) const {
   if (zones_.empty() || vertex_array_ == 0) {
     return;
   }
@@ -194,6 +200,7 @@ void WaterRenderer::Draw(const Camera& camera, float aspect_ratio, std::uint32_t
                       camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
   program_.SetInt("u_texture", 0);
   program_.SetFloat("u_opacity", kWaterOpacity);
+  program_.SetVector3("u_sky_light", sky_light);
   SetFogUniforms(program_, fog);
 
   glBindVertexArray(vertex_array_);

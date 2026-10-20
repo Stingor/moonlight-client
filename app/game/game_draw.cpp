@@ -291,7 +291,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // sortie nommée : `LoadCursor` cache celui du système sans condition, si bien
   // que ce retour laisserait sinon l'écran SANS AUCUN pointeur.
   if (!pieces_.wardrobe.has_value()) {
-    water_.Draw(camera_, aspect_ratio_, now_ms, fog);
+    water_.Draw(camera_, aspect_ratio_, now_ms, fog, sky.light.tint * sky.light.daylight);
     DrawMapEffects();
     if (models_shown) {
       pieces_.decor_veil.Draw(models_, camera_, *stage_, sky.light, aspect_ratio_, &model_clock_,
@@ -380,7 +380,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // 🔴 LA NAPPE D'EAU APRÈS LES CORPS, LEURS OMBRES ET LES CHARRETTES : éprouvée contre
   // la profondeur qu'ils ont écrite, elle recouvre ce qui est SOUS sa surface — les pieds
   // de qui patauge, son ombre, les marques au sol. Puis cheminées et émetteurs, dessus.
-  water_.Draw(camera_, aspect_ratio_, now_ms, fog);
+  water_.Draw(camera_, aspect_ratio_, now_ms, fog, sky.light.tint * sky.light.daylight);
   DrawMapEffects();
   // LES HALOS ET LES RÉMANENCES, sur l'eau mais DERRIÈRE tout corps, dont ils évitent la
   // silhouette. Les voiles viennent plus bas : peints avant leur porteur, il les masquerait.

@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 #include "ro/core/error.h"
 #include "ro/render/camera.h"
 #include "ro/render/gl_program.h"
@@ -47,9 +49,12 @@ class WaterRenderer {
                                           const std::vector<WaterAnimation>& animations);
 
   // `elapsed_ms` est l'âge de la scène : il décide de l'image montrée et de la
-  // phase de la houle. Sans nappe, ne dessine rien.
+  // phase de la houle. `sky_light` : ce que l'heure et la nuit de la carte
+  // laissent de la lumière, canal par canal — `SceneLight::tint × daylight`,
+  // le facteur qui assombrit le sol ; un en plein jour. Sans nappe, ne dessine
+  // rien.
   void Draw(const Camera& camera, float aspect_ratio, std::uint32_t elapsed_ms,
-            const SceneFog& fog = SceneFog()) const;
+            const SceneFog& fog = SceneFog(), const glm::vec3& sky_light = glm::vec3(1.0F)) const;
 
   [[nodiscard]] bool empty() const noexcept { return zones_.empty(); }
 

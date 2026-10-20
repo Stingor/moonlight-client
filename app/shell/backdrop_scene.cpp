@@ -176,7 +176,7 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   // L'eau APRÈS les corps des passants, comme dans la partie : elle plonge ce qui
   // est sous sa surface. C'est `elapsed_ms` qui l'anime, la même horloge que
   // l'orbite de la caméra. Les effets de la carte passent dessus.
-  water_.Draw(camera, aspect_ratio, elapsed_ms, fog);
+  water_.Draw(camera, aspect_ratio, elapsed_ms, fog, lit.sky.light.tint * lit.sky.light.daylight);
   if (effects_.has_value()) {
     effects_->DrawMapEffects(*stage_, camera, aspect_ratio, fog);
   }
