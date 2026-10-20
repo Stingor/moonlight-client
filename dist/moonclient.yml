@@ -45,6 +45,10 @@ patcher:
     - name: Moon Patch Server
       list: https://moonlight-destiny.fr/moonpatcher/plist.txt
       archives: https://moonlight-destiny.fr/moonpatcher/data/
+      # Le miroir de fichiers : ce qui est déposé dans `files/` sur le serveur
+      # arrive au même endroit dans le dossier du jeu.
+      manifest: https://moonlight-destiny.fr/moonpatcher/manifest.php
+      files: https://moonlight-destiny.fr/moonpatcher/files/
   # L'archive qu'enrichit un patch qui ne nomme pas la sienne.
   default_grf: moonlight.grf
   # true : un patch sans empreinte SHA-256 dans la liste est refusé. Une

@@ -11,6 +11,7 @@
 #include "ro/formats/grf_merge.h"
 #include "ro/vfs/encoding.h"
 
+#include "patcher/install_path.h"
 #include "patcher/patch_run.h"
 
 namespace moonclient::patcher {
@@ -25,40 +26,20 @@ using ro::core::Result;
 //
 // ⚠ LES SÉPARATEURS SE CONVERTISSENT APRÈS LE PASSAGE EN UTF-8 : un octet de
 // queue CP949 peut valoir « \ ».
-[[nodiscard]] Result<std::filesystem::path> InstallPathOf(const std::filesystem::path& root,
-                                                          std::string_view archive_path) {
+[[nodiscard]] Result<std::filesystem::path> InstallPathOfArchive(const std::filesystem::path& root,
+                                                                 std::string_view archive_path) {
   auto utf8 = ro::vfs::Cp949ToUtf8(archive_path);
   if (!utf8) {
     return std::unexpected(utf8.error());
   }
-  for (char& character : *utf8) {
-    if (character == '\\') {
-      character = '/';
-    }
-  }
-  const std::filesystem::path relative(
-      std::u8string(reinterpret_cast<const char8_t*>(utf8->data()), utf8->size()));
-  const std::filesystem::path normal = relative.lexically_normal();
-  if (relative.empty() || normal.is_absolute() || normal.has_root_name() ||
-      normal.has_root_directory() || (!normal.empty() && *normal.begin() == "..")) {
-    return Fail(ErrorCode::kCorruptData,
-                "le patch vise un chemin hors de l'installation : " + *utf8);
-  }
-  return root / normal;
-}
-
-[[nodiscard]] bool IsRunningExecutable(const std::filesystem::path& candidate,
-                                       const std::filesystem::path& running_executable) {
-  std::error_code ignored;
-  return !running_executable.empty() && std::filesystem::exists(candidate, ignored) &&
-         std::filesystem::equivalent(candidate, running_executable, ignored);
+  return InstallPathOf(root, *utf8);
 }
 
 [[nodiscard]] Result<void> MergeIntoGrf(ro::formats::ThorArchive& archive,
                                         const PatchTarget& target) {
   const std::string& grf_name =
       archive.target_grf_name().empty() ? target.default_grf : archive.target_grf_name();
-  auto grf_path = InstallPathOf(target.install_root, grf_name);
+  auto grf_path = InstallPathOfArchive(target.install_root, grf_name);
   if (!grf_path) {
     return std::unexpected(grf_path.error());
   }
@@ -87,28 +68,12 @@ using ro::core::Result;
       });
 }
 
-// Écarte l'exécutable qui tourne pour que le nouveau prenne son nom. Rend
-// l'ancien chemin écarté, pour le remettre si l'écriture échoue.
-[[nodiscard]] Result<std::filesystem::path> SetRunningExecutableAside(
-    const std::filesystem::path& running_executable) {
-  std::filesystem::path aside = running_executable;
-  aside += kReplacedExecutableSuffix;
-  std::error_code failed;
-  std::filesystem::remove(aside, failed);
-  std::filesystem::rename(running_executable, aside, failed);
-  if (failed) {
-    return Fail(ErrorCode::kIoFailure,
-                "impossible d'écarter l'exécutable en cours : " + failed.message());
-  }
-  return aside;
-}
-
 [[nodiscard]] Result<PatchApplied> WriteToInstall(ro::formats::ThorArchive& archive,
                                                   const PatchTarget& target) {
   // Tous les chemins se vérifient AVANT la première écriture.
   std::vector<std::filesystem::path> disk_paths;
   for (const ro::formats::ThorEntry& entry : archive.entries()) {
-    auto disk_path = InstallPathOf(target.install_root, entry.path);
+    auto disk_path = InstallPathOfArchive(target.install_root, entry.path);
     if (!disk_path) {
       return std::unexpected(disk_path.error());
     }

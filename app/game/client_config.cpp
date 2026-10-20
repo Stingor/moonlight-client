@@ -31,6 +31,8 @@ constexpr const char* kPatcherKey = "patcher";
 constexpr const char* kMirrorsKey = "mirrors";
 constexpr const char* kListKey = "list";
 constexpr const char* kArchivesKey = "archives";
+constexpr const char* kManifestKey = "manifest";
+constexpr const char* kFilesKey = "files";
 constexpr const char* kDefaultGrfKey = "default_grf";
 constexpr const char* kRequireHashesKey = "require_hashes";
 constexpr const char* kCreateGrfKey = "create_grf";
@@ -108,6 +110,19 @@ constexpr std::string_view kSecureScheme = "https://";
     }
     if (!mirror.archive_url.ends_with('/')) {
       mirror.archive_url.push_back('/');
+    }
+    mirror.manifest_url = ScalarAt(entry, kManifestKey);
+    mirror.files_url = ScalarAt(entry, kFilesKey);
+    if (mirror.manifest_url.empty() != mirror.files_url.empty()) {
+      return Broken(which + " : « manifest » et « files » vont ensemble");
+    }
+    if (!mirror.manifest_url.empty()) {
+      if (!IsSecureUrl(mirror.manifest_url) || !IsSecureUrl(mirror.files_url)) {
+        return Broken(which + " : « manifest » et « files » doivent être des adresses https://");
+      }
+      if (!mirror.files_url.ends_with('/')) {
+        mirror.files_url.push_back('/');
+      }
     }
     mirror.name = ScalarAt(entry, kNameKey);
     if (mirror.name.empty()) {

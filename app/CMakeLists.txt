@@ -1477,9 +1477,14 @@ target_include_directories(moonclient_web PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LE PATCHER, SANS PLATEFORME : la liste des patchs du serveur, l'état que
 # l'installation en garde, et la marche d'une chaîne — télécharger, vérifier,
-# appliquer. Ce sont des octets venus du réseau et des fichiers que rien ne
-# protège ; derrière une interface de réseau, tout s'éprouve partout.
+# appliquer —, puis le miroir de fichiers. Ce sont des octets venus du réseau
+# et des fichiers que rien ne protège ; derrière une interface de réseau, tout
+# s'éprouve partout.
 add_library(moonclient_patcher STATIC
+    patcher/install_path.cpp
+    patcher/mirror_cache.cpp
+    patcher/mirror_manifest.cpp
+    patcher/mirror_sync.cpp
     patcher/patch_apply.cpp
     patcher/patch_list.cpp
     patcher/patch_run.cpp

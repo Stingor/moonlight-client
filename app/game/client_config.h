@@ -39,6 +39,8 @@ namespace moonclient {
 //       - name: Moon Patch Server
 //         list: https://moonlight-destiny.fr/moonpatcher/plist.txt
 //         archives: https://moonlight-destiny.fr/moonpatcher/data/
+//         manifest: https://moonlight-destiny.fr/moonpatcher/manifest.php
+//         files: https://moonlight-destiny.fr/moonpatcher/files/
 //     default_grf: moonlight.grf
 //     require_hashes: false
 
@@ -79,6 +81,11 @@ struct PatchMirror {
   // Le dossier des archives, TOUJOURS terminé par `/` : le nom d'une archive
   // s'y ajoute tel quel.
   std::string archive_url;
+  // LE MIROIR DE FICHIERS, facultatif : le manifeste de ce qu'il publie, et le
+  // dossier qui le sert, TOUJOURS terminé par `/`. Les deux, ou aucun. Voir
+  // `patcher/mirror_sync.h`.
+  std::string manifest_url;
+  std::string files_url;
 };
 
 struct PatcherConfig {

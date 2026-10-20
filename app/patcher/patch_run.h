@@ -73,17 +73,22 @@ struct PatchRunSettings {
 
 struct PatchRunOutcome {
   std::size_t applied_patches = 0;
-  // Vrai : l'exécutable a été remplacé, et le client doit se relancer pour
-  // être celui que la chaîne décrit.
-  bool executable_replaced = false;
+  std::size_t mirrored_files = 0;
+  // Vrai : l'exécutable, ou un fichier qu'il a chargé, a été remplacé, et le
+  // client doit se relancer pour être celui que le serveur décrit.
+  bool restart_needed = false;
 };
 
-// APPLIQUE CE QUI MANQUE DE LA CHAÎNE, dans l'ordre, un patch après l'autre.
+// APPLIQUE CE QUI MANQUE DE LA CHAÎNE, dans l'ordre, un patch après l'autre,
+// PUIS SYNCHRONISE LE MIROIR DE FICHIERS (`mirror_sync.h`).
 //
-// Pour chacun : télécharger, vérifier l'empreinte de la liste, ouvrir
+// Pour chaque patch : télécharger, vérifier l'empreinte de la liste, ouvrir
 // l'archive et vérifier son intégrité interne, l'appliquer, puis enregistrer
 // son index. L'état n'avance qu'après un patch ENTIÈREMENT appliqué : un arrêt
 // en route fait reprendre ce patch-là au lancement suivant.
+//
+// La chaîne passe d'abord : une archive qui retire un fichier n'a pas à
+// attendre le miroir, et le miroir pose ensuite ce qu'il publie.
 //
 // 🔴 BLOQUANT, et fait pour un fil à part. `stop` s'éprouve entre deux
 // morceaux de téléchargement et entre deux patchs ; un patch en cours

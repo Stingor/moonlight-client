@@ -178,10 +178,10 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
       const PatchProgress progress = board.Snapshot();
       if (finished && progress.phase == PatchPhase::kDone && result.outcome.has_value() &&
           result.outcome->has_value()) {
-        ro::core::LogInfo("patcher : à jour, {} patch(s) appliqué(s)",
-                          (*result.outcome)->applied_patches);
-        return (*result.outcome)->executable_replaced ? PatchStageEnd::kRestart
-                                                      : PatchStageEnd::kUpToDate;
+        ro::core::LogInfo("patcher : à jour, {} patch(s) appliqué(s), {} fichier(s) du miroir",
+                          (*result.outcome)->applied_patches, (*result.outcome)->mirrored_files);
+        return (*result.outcome)->restart_needed ? PatchStageEnd::kRestart
+                                                 : PatchStageEnd::kUpToDate;
       }
 
       PatchScreenText text;

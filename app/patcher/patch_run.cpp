@@ -13,6 +13,8 @@
 #include "ro/core/utf8_path.h"
 #include "ro/formats/thor.h"
 
+#include "patcher/install_path.h"
+#include "patcher/mirror_sync.h"
 #include "patcher/patch_apply.h"
 #include "patcher/patch_list.h"
 #include "patcher/patcher_state.h"
@@ -29,7 +31,6 @@ constexpr std::uint64_t kPatchListLimitBytes = 1024U * 1024U;
 // Ce qu'une archive peut peser. La plus grosse de la chaîne d'origine fait
 // quelques dizaines de mégaoctets ; un gibioctet laisse toute la marge.
 constexpr std::uint64_t kArchiveLimitBytes = 1024U * 1024U * 1024U;
-constexpr std::size_t kHashChunkBytes = 64U * 1024U;
 
 [[nodiscard]] Result<std::vector<PatchEntry>> FetchPatchList(const PatcherConfig& config,
                                                              PatchFetcher& fetcher,
@@ -56,24 +57,6 @@ constexpr std::size_t kHashChunkBytes = 64U * 1024U;
     return patches;
   }
   return Fail(ErrorCode::kIoFailure, "aucun serveur de patchs n'a répondu :" + failures);
-}
-
-[[nodiscard]] Result<std::string> Sha256OfFile(const std::filesystem::path& path) {
-  std::ifstream file(path, std::ios::binary);
-  if (!file) {
-    return Fail(ErrorCode::kIoFailure, "impossible de relire " + ro::core::Utf8FromPath(path));
-  }
-  ro::core::Sha256 hasher;
-  std::array<char, kHashChunkBytes> chunk{};
-  while (file) {
-    file.read(chunk.data(), chunk.size());
-    const auto read = static_cast<std::size_t>(file.gcount());
-    hasher.Update(std::span(reinterpret_cast<const std::uint8_t*>(chunk.data()), read));
-  }
-  if (file.bad()) {
-    return Fail(ErrorCode::kIoFailure, "lecture interrompue de " + ro::core::Utf8FromPath(path));
-  }
-  return ro::core::Sha256::ToHex(hasher.Finish());
 }
 
 // Un patch, du téléchargement à l'enregistrement de son index.
@@ -201,13 +184,19 @@ Result<PatchRunOutcome> RunPatches(const PatchRunSettings& settings, PatchFetche
     }
     ++outcome.applied_patches;
     if (applied->executable_replaced) {
-      outcome.executable_replaced = true;
+      outcome.restart_needed = true;
       // L'exécutable qui tourne porte désormais le suffixe : sous son ancien
       // nom se trouve le nouveau, qu'un patch suivant réécrit librement.
       target.running_executable.clear();
     }
     ro::core::LogInfo("patcher : {} appliqué (index {})", patch.archive_name, patch.patch_index);
   }
+  auto mirrored = SyncMirror(settings, target.running_executable, fetcher, board, progress, stop);
+  if (!mirrored) {
+    return fail(mirrored.error());
+  }
+  outcome.mirrored_files = mirrored->written_files;
+  outcome.restart_needed = outcome.restart_needed || mirrored->restart_needed;
   progress.phase = PatchPhase::kDone;
   board.Publish(progress);
   return outcome;
