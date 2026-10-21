@@ -48,6 +48,7 @@
 #include "world/follow_action.h"
 #include "world/item_broadcast_report.h"
 #include "world/monster_auras.h"
+#include "world/scene_graphics.h"
 
 namespace moonclient {
 
@@ -377,6 +378,10 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     const ro::render::MapEffectFrame frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
     camera_.look_at = frame.ToWorld(glm::vec3((*point)[0], (*point)[1], (*point)[2]));
   }
+  // LE FLOU DE MOUVEMENT suit la caméra une fois posée : voir `SpinBlurOfFrame`.
+  spin_blur_frame_ =
+      SpinBlurOfFrame(spin_meter_, settings_->options().graphics(), camera_,
+                      aim_.shake.pitch_offset(), camera_rig_.TakeDragged(), now_ms, aspect_ratio_);
 
   // La cible visée se POURSUIT jusqu'à être à portée, puis se frappe. ⚠ APPELÉE
   // MÊME SANS POURSUITE EN COURS : le refus du serveur en rouvre une, et c'est

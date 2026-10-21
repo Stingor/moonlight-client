@@ -179,6 +179,7 @@ add_library(ro_render STATIC
     src/palette_ramps.cpp
     src/post_fx.cpp
     src/post_fx_reference.cpp
+    src/spin_blur.cpp
     src/sprite_action_frames.cpp
     src/sprite_canvas.cpp
     src/sprite_vignette.cpp

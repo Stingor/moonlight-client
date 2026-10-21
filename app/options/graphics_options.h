@@ -10,6 +10,7 @@
 #include "ro/render/model_renderer.h"
 #include "ro/render/post_fx.h"
 #include "ro/render/scene_post_process.h"
+#include "ro/render/spin_blur.h"
 #include "ro/render/vanish_fade.h"
 #include "ro/ui/options_window.h"
 
@@ -50,6 +51,8 @@ enum class GraphicsRow : int {
   kRenderScale,
   kDecorFilter,
   kFrameInterpolation,
+  kSpinBlur,
+  kSpinBlurStrength,
   kPostFx,
   kPreset,
   kBrightness,
@@ -153,6 +156,9 @@ class GraphicsOptions {
   [[nodiscard]] bool cast_spans_bar() const noexcept { return cast_spans_bar_; }
   // Le post-traitement, BORNÉ : le fichier se modifie à la main.
   [[nodiscard]] ro::render::PostFxSettings post_fx() const { return ro::render::Clamped(post_fx_); }
+  // LE FLOU DE MOUVEMENT quand la caméra tourne, intensité BORNÉE. Éteint par
+  // défaut, et indépendant de l'interrupteur du post-traitement.
+  [[nodiscard]] ro::render::SpinBlurSettings spin_blur() const;
   // Où le monde se peint : échantillons et échelle, bornés à ce qu'on propose.
   [[nodiscard]] ro::render::SceneTargetLook scene_target() const;
   // Le filtrage des textures du décor 3D. Le sol n'en reçoit jamais : voir
@@ -209,6 +215,7 @@ class GraphicsOptions {
   int decor_filter_rank_ = 0;
   bool frame_interpolation_ = true;
   ro::render::PostFxSettings post_fx_;
+  ro::render::SpinBlurSettings spin_blur_;
   std::vector<ro::ui::OptionRowView> rows_;
   // Les listes déroulantes. ⚠ REFAITES À CHAQUE COMPOSITION : un libellé doit
   // vivre au moins jusqu'au dessin, et la langue peut changer entre deux.

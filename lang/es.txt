@@ -20041,3 +20041,12 @@ tr: Ajustar el efecto de modelo %zu
 
 fr: Retirer l'effet de modèle %zu
 tr: Quitar el efecto de modelo %zu
+
+fr: Flou de mouvement
+tr: Desenfoque de movimiento
+
+fr: Quand tu fais tourner ou incliner la caméra, le monde s'étire le long de sa rotation, autour du point qu'elle regarde. Quand ton personnage marche, ou que la caméra saute d'un cran, l'image reste nette. Les noms, les jauges et l'interface ne sont jamais floutés.
+tr: Cuando giras o inclinas la cámara, el mundo se estira a lo largo de su rotación, alrededor del punto que mira. Cuando tu personaje camina, o la cámara salta de un golpe, la imagen sigue nítida. Los nombres, las barras y la interfaz nunca se desenfocan.
+
+fr: Intensité du flou
+tr: Intensidad del desenfoque

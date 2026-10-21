@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <optional>
 #include <string_view>
+#include <utility>
 
 #include "ro/render/camera.h"
 #include "ro/ui/camera_hud.h"
@@ -30,6 +31,13 @@ class CameraRig {
   // Faux pour un cran arrivé moins de seize millisecondes après le précédent.
   [[nodiscard]] bool TakeWheel(std::uint32_t now_ms);
 
+  // UN GLISSER DE LA SOURIS a tourné ou incliné la caméra : un geste continu,
+  // que le flou de mouvement suit. Un cran, une remise ou une arrivée n'en sont
+  // pas.
+  void NoteDrag() noexcept { dragged_ = true; }
+  // Vrai si un glisser a eu lieu depuis le dernier appel.
+  [[nodiscard]] bool TakeDragged() noexcept { return std::exchange(dragged_, false); }
+
   // Empêche l'œil de passer sous le sol, sauf sans bornes.
   void FloorEye(ro::render::Camera& camera, const MapStage& stage) const;
 
@@ -54,6 +62,7 @@ class CameraRig {
   bool entered_ = false;
   std::uint32_t last_wheel_ms_ = 0;
   bool wheeled_ = false;
+  bool dragged_ = false;
 };
 
 }  // namespace moonclient

@@ -46,6 +46,8 @@ constexpr const char* kMsaaKey = "render_msaa";
 constexpr const char* kRenderScaleKey = "render_scale";
 constexpr const char* kDecorFilterKey = "render_filtering_scenery";
 constexpr const char* kFrameInterpolationKey = "render_frame_interpolation";
+constexpr const char* kSpinBlurKey = "render_motion_blur";
+constexpr const char* kSpinBlurStrengthKey = "render_motion_blur_strength";
 constexpr const char* kPostFxKey = "post_fx_active";
 constexpr const char* kBrightnessKey = "post_fx_brightness";
 constexpr const char* kContrastKey = "post_fx_contrast";
@@ -162,6 +164,13 @@ ro::render::SceneTargetLook GraphicsOptions::scene_target() const {
       .render_scale = static_cast<float>(percent) / static_cast<float>(kPercent)};
 }
 
+ro::render::SpinBlurSettings GraphicsOptions::spin_blur() const {
+  return ro::render::SpinBlurSettings{
+      .enabled = spin_blur_.enabled,
+      .strength = std::clamp(spin_blur_.strength, ro::render::kSpinBlurStrengthRange.lowest,
+                             ro::render::kSpinBlurStrengthRange.highest)};
+}
+
 ro::render::ModelTextureFilter GraphicsOptions::decor_filter() const {
   const int rank = std::clamp(decor_filter_rank_, 0, static_cast<int>(kDecorAnisotropy.size()) - 1);
   const int anisotropy = kDecorAnisotropy[static_cast<std::size_t>(rank)];
@@ -196,6 +205,8 @@ void GraphicsOptions::Declare(SettingsFile& into) {
     into.Declare(kSunShadowsKey, &sun_shadows_);
   }
   into.Declare(kFrameInterpolationKey, &frame_interpolation_);
+  into.Declare(kSpinBlurKey, &spin_blur_.enabled);
+  into.Declare(kSpinBlurStrengthKey, &spin_blur_.strength);
   into.Declare(kPostFxKey, &post_fx_.enabled);
   into.Declare(kBrightnessKey, &post_fx_.brightness);
   into.Declare(kContrastKey, &post_fx_.contrast);
@@ -408,12 +419,26 @@ void GraphicsOptions::Compose() {
 }
 
 void GraphicsOptions::ComposePostFx() {
+  // LE FLOU DE MOUVEMENT, HORS DE L'INTERRUPTEUR : il ne dépend d'aucun réglage
+  // du post-traitement.
+  const ro::render::SpinBlurSettings spin = spin_blur();
+  rows_.push_back(Toggle(GraphicsRow::kSpinBlur, Tr("Flou de mouvement"),
+                         Tr("Quand tu fais tourner ou incliner la caméra, le monde s'étire le long "
+                            "de sa rotation, autour du point qu'elle regarde. Quand ton personnage "
+                            "marche, ou que la caméra saute d'un cran, l'image reste nette. Les "
+                            "noms, les jauges et l'interface ne sont jamais floutés."),
+                         nullptr, spin.enabled));
+  rows_.back().heading = Tr("Effets d'écran");
+  rows_.push_back(Slider(GraphicsRow::kSpinBlurStrength, Tr("Intensité du flou"), spin.strength,
+                         ro::render::kSpinBlurStrengthRange));
+  rows_.back().indented = true;
+  rows_.back().disabled = !spin.enabled;
+
   rows_.push_back(Toggle(GraphicsRow::kPostFx, Tr("Post-processing (effets d'écran)"),
                          Tr("Étalonnage, effets d'écran et anticrénelage, sur le monde : terrain, "
                             "décor, personnages et effets. Les noms, les jauges et l'interface "
                             "restent tels quels."),
                          nullptr, post_fx_.enabled));
-  rows_.back().heading = Tr("Effets d'écran");
   // TOUT CE QUI SUIT DÉPEND DE L'INTERRUPTEUR : grisé quand il est éteint, pour
   // qu'on voie ce qu'on retrouvera en le rallumant.
   const std::size_t governed_from = rows_.size();
@@ -545,6 +570,12 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kFrameInterpolation:
       frame_interpolation_ = asked.on;
+      break;
+    case GraphicsRow::kSpinBlur:
+      spin_blur_.enabled = asked.on;
+      break;
+    case GraphicsRow::kSpinBlurStrength:
+      spin_blur_.strength = asked.value;
       break;
     case GraphicsRow::kPostFx:
       post_fx_.enabled = asked.on;

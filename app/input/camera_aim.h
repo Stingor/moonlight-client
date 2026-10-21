@@ -37,6 +37,9 @@ class ScreenShake {
   // Ce qui a été posé sur la caméra à l'image précédente, à retirer.
   [[nodiscard]] glm::vec3 look_at_offset() const noexcept { return look_at_offset_; }
 
+  // Ce que la secousse a posé sur l'élévation à cette image, en degrés.
+  [[nodiscard]] float pitch_offset() const noexcept { return pitch_offset_; }
+
   [[nodiscard]] bool shaking() const noexcept {
     return distance_offset_ != 0.0F || pitch_offset_ != 0.0F;
   }

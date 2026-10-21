@@ -283,6 +283,7 @@ void OnDrag(const EventRouting& to, MouseGesture gesture, const SDL_MouseMotionE
       return;
   }
   DragCamera(*to.camera, drag, to.rig->limits(), CtrlHeld());
+  to.rig->NoteDrag();
 }
 
 // `second_of_double` : l'appui complète un double-clic, selon `DoubleClickClock`.

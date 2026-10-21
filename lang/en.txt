@@ -20041,3 +20041,12 @@ tr: Adjust model effect %zu
 
 fr: Retirer l'effet de modèle %zu
 tr: Remove model effect %zu
+
+fr: Flou de mouvement
+tr: Motion blur
+
+fr: Quand tu fais tourner ou incliner la caméra, le monde s'étire le long de sa rotation, autour du point qu'elle regarde. Quand ton personnage marche, ou que la caméra saute d'un cran, l'image reste nette. Les noms, les jauges et l'interface ne sont jamais floutés.
+tr: When you turn or tilt the camera, the world stretches along its rotation, around the point it looks at. When your character walks, or the camera jumps by a notch, the picture stays sharp. Names, gauges and the interface are never blurred.
+
+fr: Intensité du flou
+tr: Blur strength

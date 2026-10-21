@@ -1,6 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
+#include "ro/render/camera.h"
 #include "ro/render/model_clock.h"
+#include "ro/render/spin_blur.h"
 #include "ro/render/terrain_renderer.h"
 
 #include "options/graphics_options.h"
@@ -48,5 +52,20 @@ namespace moonclient {
 // cadavre, apparition, sortie de vue, plancher du geste d'une compétence,
 // incantation déroulée sur sa barre.
 void TimeComposedScene(const GraphicsOptions& graphics, ComposedScene& scene);
+
+// LE FLOU DE MOUVEMENT DE L'IMAGE : la rotation de la caméra depuis l'image
+// précédente, mesurée par `meter`, puis le balayage que la page en demande.
+//
+// ⚠ LA SECOUSSE N'EST PAS UNE ROTATION : `shake_pitch_degrees`, ce qu'elle a posé
+// sur l'élévation, se retire avant la mesure. Et seul un glisser — `dragged` —
+// fait tourner la caméra continûment : un cran ou une remise ne floute rien.
+//
+// ⚠ MESURÉE À CHAQUE IMAGE, flou éteint compris : l'allumer ne doit pas compter
+// d'un coup toute la rotation faite depuis.
+[[nodiscard]] ro::render::SpinBlurFrame SpinBlurOfFrame(ro::render::CameraSpinMeter& meter,
+                                                        const GraphicsOptions& graphics,
+                                                        const ro::render::Camera& camera,
+                                                        float shake_pitch_degrees, bool dragged,
+                                                        std::uint32_t now_ms, float aspect_ratio);
 
 }  // namespace moonclient

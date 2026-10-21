@@ -59,11 +59,12 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       settings_->options().pages().pick_precision.floor_shift());
 
   // LE MONDE, DANS SA CIBLE À LUI quand la page « Graphics » en demande une —
-  // MSAA, échelle de rendu, post-traitement ; droit dans la fenêtre sinon.
-  const ro::render::PostFxSettings post_fx = settings_->options().graphics().post_fx();
+  // MSAA, échelle de rendu, post-traitement, flou de rotation ; droit dans la fenêtre sinon.
+  const GraphicsOptions& graphics = settings_->options().graphics();
+  const ro::render::PostFxSettings post_fx = graphics.post_fx();
   const ro::render::DrawableSize surface = gl_->drawable_size();
-  if (!scene_post_.Begin(surface.width, surface.height,
-                         settings_->options().graphics().scene_target(), post_fx.enabled)) {
+  if (!scene_post_.Begin(surface.width, surface.height, graphics.scene_target(),
+                         post_fx.enabled || spin_blur_frame_.active())) {
     gl_->BindForDisplay();
   }
   // 🔴 ET REPEINT DANS LA FENÊTRE À CHAQUE SORTIE, erreur comprise : ce qui se
@@ -71,7 +72,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // tomberait sinon dans une cible que personne ne montre.
   const auto present_scene = [this, &post_fx, now_ms]() {
     gl_->BindForDisplay();
-    scene_post_.Present(post_fx, now_ms);
+    scene_post_.Present(post_fx, now_ms, spin_blur_frame_);
   };
   // LA COUCHE AU-DESSUS DU MONDE s'ouvre ici, avant toute sortie anticipée :
   // son HUD de l'image précédente ne doit pas survivre à une image sans lui.
@@ -96,7 +97,6 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // LE LECTEUR DE MUSIQUE, même muet : un choix fait son coupé se retient.
   pieces_.music_player.Advance(windows_.music_player, music_, audio_, stage_->name);
 
-  const GraphicsOptions& graphics = settings_->options().graphics();
   // LE SOL UNI, quand l'établi ou GreyWorld le demandent : voir `FlatGroundOf`.
   const ro::render::GreyWorldLook& grey_world = settings_->options().pages().grey_world.look();
   ro::render::TerrainStages stages =

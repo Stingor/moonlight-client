@@ -148,6 +148,42 @@ void main() {
 }
 )GLSL";
 
+// 🔴 LE FLOU DE ROTATION : la moyenne de lectures réparties le long d'un ARC
+// autour du point visé, de bout en bout du balayage.
+//
+// L'écart au point visé se compte en PIXELS, pour que l'arc reste un arc sur une
+// fenêtre qui n'est pas carrée, et se déplie d'abord de l'écrasement vertical :
+// la rotation se fait dans le plan du sol, puis s'y réécrase. L'étirement
+// vertical, lui, suit l'inclinaison qui glisse.
+constexpr std::string_view kSpinBody = R"GLSL(
+in vec2 v_uv;
+
+uniform sampler2D u_source;
+uniform vec2 u_size;
+uniform vec2 u_pivot;
+uniform float u_arc;
+uniform float u_stretch;
+uniform float u_squash;
+
+out vec4 frag_color;
+
+void main() {
+    vec2 d = (v_uv - u_pivot) * u_size;
+    d.y /= u_squash;
+    vec3 sum = vec3(0.0);
+    for (int i = 0; i < kSpinTaps; ++i) {
+        float t = float(i) / float(kSpinTaps - 1) - 0.5;
+        float a = u_arc * t;
+        float s = sin(a);
+        float co = cos(a);
+        vec2 q = vec2(d.x * co - d.y * s, d.x * s + d.y * co);
+        q.y *= u_squash * (1.0 + u_stretch * t);
+        sum += texture(u_source, u_pivot + q / u_size).rgb;
+    }
+    frag_color = vec4(sum / float(kSpinTaps), 1.0);
+}
+)GLSL";
+
 // Un flottant écrit pour GLSL : neuf chiffres significatifs rendent exactement
 // le même flottant, et la forme `#` garde le point décimal.
 std::string Glsl(float value) { return std::format("{:#.9g}", value); }
@@ -186,6 +222,7 @@ std::string SharedConstants() {
   line("float", "kFxaaNearTap", Glsl(post_fx::kFxaaNearTap));
   line("float", "kFxaaFarTap", Glsl(post_fx::kFxaaFarTap));
   line("float", "kFxaaEndTap", Glsl(post_fx::kFxaaEndTap));
+  line("int", "kSpinTaps", std::to_string(spin_blur::kTaps));
   return text;
 }
 
@@ -230,6 +267,33 @@ void DeleteFramebuffer(unsigned int& framebuffer) {
 
 bool Complete() { return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE; }
 
+// Une image intermédiaire entre deux passes, préparée à cette taille : gardée
+// si elle l'a déjà, refaite sinon. Faux quand la carte graphique la refuse.
+bool EnsurePassTarget(unsigned int& framebuffer, unsigned int& color, int& target_width,
+                      int& target_height, int width, int height) {
+  if (framebuffer != 0 && width == target_width && height == target_height) {
+    return true;
+  }
+  DeleteFramebuffer(framebuffer);
+  DeleteTexture(color);
+  glGenFramebuffers(1, &framebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  color = CreateColorTexture(width, height);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color, 0);
+  const bool complete = Complete();
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  if (!complete) {
+    DeleteFramebuffer(framebuffer);
+    DeleteTexture(color);
+    target_width = 0;
+    target_height = 0;
+    return false;
+  }
+  target_width = width;
+  target_height = height;
+  return true;
+}
+
 // La zone d'affichage en place : origine, puis taille.
 struct Viewport {
   std::array<GLint, 4> box{};
@@ -246,6 +310,7 @@ ScenePostProcess& ScenePostProcess::operator=(ScenePostProcess&& other) noexcept
     Release();
     color_program_ = std::move(other.color_program_);
     fxaa_program_ = std::move(other.fxaa_program_);
+    spin_program_ = std::move(other.spin_program_);
     vertex_array_ = std::exchange(other.vertex_array_, 0);
     scene_framebuffer_ = std::exchange(other.scene_framebuffer_, 0);
     scene_color_texture_ = std::exchange(other.scene_color_texture_, 0);
@@ -260,6 +325,10 @@ ScenePostProcess& ScenePostProcess::operator=(ScenePostProcess&& other) noexcept
     chain_color_ = std::exchange(other.chain_color_, 0);
     chain_width_ = std::exchange(other.chain_width_, 0);
     chain_height_ = std::exchange(other.chain_height_, 0);
+    spin_framebuffer_ = std::exchange(other.spin_framebuffer_, 0);
+    spin_color_ = std::exchange(other.spin_color_, 0);
+    spin_width_ = std::exchange(other.spin_width_, 0);
+    spin_height_ = std::exchange(other.spin_height_, 0);
     max_samples_ = std::exchange(other.max_samples_, 0);
     max_size_ = std::exchange(other.max_size_, 0);
     active_ = std::exchange(other.active_, false);
@@ -287,6 +356,10 @@ void ScenePostProcess::Release() noexcept {
   DeleteTexture(chain_color_);
   chain_width_ = 0;
   chain_height_ = 0;
+  DeleteFramebuffer(spin_framebuffer_);
+  DeleteTexture(spin_color_);
+  spin_width_ = 0;
+  spin_height_ = 0;
   if (vertex_array_ != 0) {
     glDeleteVertexArrays(1, &vertex_array_);
     vertex_array_ = 0;
@@ -304,9 +377,14 @@ core::Result<ScenePostProcess> ScenePostProcess::Create() {
   if (!fxaa) {
     return std::unexpected(fxaa.error());
   }
+  auto spin = GlProgram::Link(kVertexShader, constants + std::string(kSpinBody));
+  if (!spin) {
+    return std::unexpected(spin.error());
+  }
   ScenePostProcess post;
   post.color_program_ = std::move(*color);
   post.fxaa_program_ = std::move(*fxaa);
+  post.spin_program_ = std::move(*spin);
   // ⚠ UN TABLEAU DE SOMMETS VIDE, MAIS IL EN FAUT UN : le profil « core »
   // refuse de dessiner sans, même quand le nuanceur ne lit aucun attribut.
   glGenVertexArrays(1, &post.vertex_array_);
@@ -369,36 +447,21 @@ bool ScenePostProcess::EnsureScene(int width, int height, int samples) {
 }
 
 bool ScenePostProcess::EnsureChain(int width, int height) {
-  if (chain_framebuffer_ != 0 && width == chain_width_ && height == chain_height_) {
-    return true;
-  }
-  DeleteFramebuffer(chain_framebuffer_);
-  DeleteTexture(chain_color_);
-  glGenFramebuffers(1, &chain_framebuffer_);
-  glBindFramebuffer(GL_FRAMEBUFFER, chain_framebuffer_);
-  chain_color_ = CreateColorTexture(width, height);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, chain_color_, 0);
-  const bool complete = Complete();
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  if (!complete) {
-    DeleteFramebuffer(chain_framebuffer_);
-    DeleteTexture(chain_color_);
-    chain_width_ = 0;
-    chain_height_ = 0;
-    return false;
-  }
-  chain_width_ = width;
-  chain_height_ = height;
-  return true;
+  return EnsurePassTarget(chain_framebuffer_, chain_color_, chain_width_, chain_height_, width,
+                          height);
+}
+
+bool ScenePostProcess::EnsureSpin(int width, int height) {
+  return EnsurePassTarget(spin_framebuffer_, spin_color_, spin_width_, spin_height_, width, height);
 }
 
 bool ScenePostProcess::Begin(int output_width, int output_height, const SceneTargetLook& look,
-                             bool post_fx_enabled) {
+                             bool passes_wanted) {
   active_ = false;
   const int samples = look.samples > 1 ? std::min(look.samples, max_samples_) : 0;
   const bool scaled = look.render_scale != 1.0F;
   if (output_width <= 0 || output_height <= 0 || vertex_array_ == 0 ||
-      (!post_fx_enabled && samples <= 1 && !scaled)) {
+      (!passes_wanted && samples <= 1 && !scaled)) {
     return false;
   }
   const auto scaled_side = [this, &look](int side) {
@@ -425,7 +488,20 @@ void ScenePostProcess::DrawFullScreen(unsigned int source) const {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ScenePostProcess::Present(const PostFxSettings& settings, std::uint32_t now_ms) {
+void ScenePostProcess::DrawSpin(unsigned int source, const SpinBlurFrame& spin) const {
+  spin_program_.Use();
+  spin_program_.SetInt("u_source", 0);
+  spin_program_.SetVector2(
+      "u_size", glm::vec2(static_cast<float>(scene_width_), static_cast<float>(scene_height_)));
+  spin_program_.SetVector2("u_pivot", glm::vec2(spin.pivot_uv[0], spin.pivot_uv[1]));
+  spin_program_.SetFloat("u_arc", spin.arc_radians);
+  spin_program_.SetFloat("u_stretch", spin.stretch);
+  spin_program_.SetFloat("u_squash", std::max(spin.squash, spin_blur::kSquashFloor));
+  DrawFullScreen(source);
+}
+
+void ScenePostProcess::Present(const PostFxSettings& settings, std::uint32_t now_ms,
+                               const SpinBlurFrame& spin) {
   if (!active_) {
     return;
   }
@@ -451,7 +527,13 @@ void ScenePostProcess::Present(const PostFxSettings& settings, std::uint32_t now
   }
 
   const bool same_size = scene_width_ == output.width() && scene_height_ == output.height();
-  if (!settings.enabled) {
+  // LE FLOU DE ROTATION PASSE EN PREMIER. Seul, il peint droit dans la sortie ;
+  // suivi du post-traitement, dans une image à la taille de la scène que la
+  // passe de couleur relit. ⚠ CETTE IMAGE NE SE CRÉE QU'AU PREMIER FLOU : sans
+  // rotation, rien ne change du chemin ni du coût.
+  const bool spinning =
+      spin.active() && (!settings.enabled || EnsureSpin(scene_width_, scene_height_));
+  if (!settings.enabled && !spinning) {
     // SANS POST-TRAITEMENT, UNE COPIE : au plus proche à la même taille,
     // linéaire quand l'échelle agrandit ou réduit.
     glBindFramebuffer(GL_READ_FRAMEBUFFER, source_framebuffer);
@@ -467,6 +549,24 @@ void ScenePostProcess::Present(const PostFxSettings& settings, std::uint32_t now
   glDepthMask(GL_FALSE);
   // ⚠ SANS MÉLANGE : chaque passe REMPLACE l'image, elle ne se pose pas dessus.
   glDisable(GL_BLEND);
+  const auto restore = [&output]() {
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glViewport(output.box[0], output.box[1], output.width(), output.height());
+  };
+
+  if (spinning) {
+    if (!settings.enabled) {
+      glBindFramebuffer(GL_FRAMEBUFFER, output_id);
+      DrawSpin(source_texture, spin);
+      restore();
+      return;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, spin_framebuffer_);
+    glViewport(0, 0, scene_width_, scene_height_);
+    DrawSpin(source_texture, spin);
+    source_texture = spin_color_;
+  }
 
   // L'anticrénelage lit l'image étalonnée : la passe de couleur écrit alors dans
   // l'image intermédiaire, à la taille de la sortie.
@@ -476,6 +576,7 @@ void ScenePostProcess::Present(const PostFxSettings& settings, std::uint32_t now
     glViewport(0, 0, output.width(), output.height());
   } else {
     glBindFramebuffer(GL_FRAMEBUFFER, output_id);
+    glViewport(output.box[0], output.box[1], output.width(), output.height());
   }
   const ColorPassConstants constants =
       ColorPassConstantsOf(settings, now_ms, scene_width_, scene_height_);
@@ -501,10 +602,7 @@ void ScenePostProcess::Present(const PostFxSettings& settings, std::uint32_t now
                                                     kEffectRange.highest));
     DrawFullScreen(chain_color_);
   }
-
-  glDepthMask(GL_TRUE);
-  glEnable(GL_DEPTH_TEST);
-  glViewport(output.box[0], output.box[1], output.width(), output.height());
+  restore();
 }
 
 }  // namespace ro::render

@@ -9,6 +9,7 @@
 #include "ro/render/model_renderer.h"
 #include "ro/render/point_light_stage.h"
 #include "ro/render/scene_post_process.h"
+#include "ro/render/spin_blur.h"
 #include "ro/render/sprite_renderer.h"
 #include "ro/render/sun_shadow_map.h"
 #include "ro/render/terrain_renderer.h"
@@ -49,6 +50,12 @@ class GameRendering {
   bool void_shade_refused_ = false;
   // LE MONDE PEINT À PART, repeint à travers la page « Graphics ».
   ro::render::ScenePostProcess scene_post_;
+  // LA VITESSE DE ROTATION DE LA CAMÉRA, d'une image à l'autre, que le flou de
+  // mouvement suit.
+  ro::render::CameraSpinMeter spin_meter_;
+  // Le flou de l'image, mesuré là où la caméra se pose et peint par le
+  // post-traitement.
+  ro::render::SpinBlurFrame spin_blur_frame_;
   // LA NAPPE D'EAU. Vide sur une carte qui n'en a pas, et elle ne dessine alors
   // rien : la plupart des souterrains sont dans ce cas.
   ro::render::WaterRenderer water_;

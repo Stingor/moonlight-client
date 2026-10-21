@@ -39,4 +39,14 @@ void TimeComposedScene(const GraphicsOptions& graphics, ComposedScene& scene) {
       .cast_spans_bar = graphics.cast_spans_bar()};
 }
 
+ro::render::SpinBlurFrame SpinBlurOfFrame(ro::render::CameraSpinMeter& meter,
+                                          const GraphicsOptions& graphics,
+                                          const ro::render::Camera& camera,
+                                          float shake_pitch_degrees, bool dragged,
+                                          std::uint32_t now_ms, float aspect_ratio) {
+  const ro::render::CameraTurnRate rate = meter.Measure(
+      camera.yaw_degrees, camera.pitch_degrees - shake_pitch_degrees, dragged, now_ms);
+  return ro::render::SpinBlurFrameOf(graphics.spin_blur(), rate, camera, aspect_ratio);
+}
+
 }  // namespace moonclient
