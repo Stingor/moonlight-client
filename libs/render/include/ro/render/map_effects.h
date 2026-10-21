@@ -114,6 +114,10 @@ class MapEffects {
   // jeu, en rattrapant au plus une seconde. `player_world` est la place du
   // personnage dans NOTRE repère : c'est d'elle que se mesure la portée.
   void Advance(std::uint32_t now_ms, glm::vec3 player_world);
+  // LA PORTÉE DES EFFETS DE CARTE, en unités du monde : celle du client,
+  // `kMapEffectReachUnits`, ou `kUnboundedMapEffectReach` pour qu'ils vivent à
+  // toute distance. Elle vaut dès le pas suivant ; la levée ne la touche pas.
+  void SetReachUnits(float reach_units) noexcept { reach_units_ = reach_units; }
 
   // Les lots à peindre à cette image. Sans l'image des cheminées — une
   // installation qui n'a pas leur sprite —, elles ne se peignent pas.
@@ -150,6 +154,7 @@ class MapEffects {
   std::uint32_t draws_ = 1;
   std::uint32_t last_ms_ = 0;
   std::uint32_t owed_ms_ = 0;
+  float reach_units_ = kMapEffectReachUnits;
   bool started_ = false;
 };
 

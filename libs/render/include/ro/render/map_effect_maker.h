@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/render/map_effect_math.h"
+#include "ro/render/map_emitter.h"
 
 namespace ro::render {
 
@@ -33,8 +34,9 @@ class MapEffectMaker {
   MapEffectMaker(glm::vec3 native_position, std::int32_t effect_id, float emit_speed,
                  std::array<float, 4> param, std::uint32_t& draws);
 
-  // Un pas du jeu. Rend vrai quand le semeur lance son effet à cet instant.
-  [[nodiscard]] bool Tick(glm::vec3 native_player);
+  // Un pas du jeu. Rend vrai quand le semeur lance son effet à cet instant :
+  // seulement à moins de `reach_units` du joueur.
+  [[nodiscard]] bool Tick(glm::vec3 native_player, float reach_units = kMapEffectReachUnits);
 
   [[nodiscard]] std::int32_t effect_id() const noexcept { return effect_id_; }
   [[nodiscard]] glm::vec3 native_position() const noexcept { return position_; }

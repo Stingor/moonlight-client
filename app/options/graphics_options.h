@@ -33,6 +33,7 @@ enum class GraphicsRow : int {
   kColdLight,
   kSunShadows,
   kEffectLights,
+  kMapEffectsUnbounded,
   kRoundedGround,
   kDayNightCycle,
   kFixedSky,
@@ -112,6 +113,10 @@ class GraphicsOptions {
   // LES SORTS ÉCLAIRENT : un effet joué porte une lumière ponctuelle, tirée de
   // ses textures claires. Voir docs/adr/0120.
   [[nodiscard]] bool effect_lights() const noexcept { return effect_lights_; }
+  // LES EFFETS DE CARTE À TOUTE DISTANCE : torches, flammes, lucioles, fumées
+  // et vent vivent où que soit le personnage. Éteint par défaut : le client
+  // d'origine ne les fait vivre qu'à portée de lui.
+  [[nodiscard]] bool map_effects_unbounded() const noexcept { return map_effects_unbounded_; }
   // LE SOL ARRONDI : chaque cube du sol découpé en sous-carreaux posés sur une
   // surface lisse, les falaises gardées. Voir docs/adr/0122.
   [[nodiscard]] bool rounded_ground() const noexcept { return rounded_ground_; }
@@ -194,6 +199,7 @@ class GraphicsOptions {
   bool cold_light_ = false;
   bool sun_shadows_ = false;
   bool effect_lights_ = true;
+  bool map_effects_unbounded_ = false;
   bool rounded_ground_ = true;
   bool day_night_cycle_ = false;
   bool fixed_sky_ = false;

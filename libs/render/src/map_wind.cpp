@@ -76,9 +76,9 @@ MapWind::MapWind(glm::vec3 native_position, MapWindSetting setting, std::uint32_
   }
 }
 
-void MapWind::Tick(glm::vec3 native_player) {
+void MapWind::Tick(glm::vec3 native_player, float reach_units) {
   ticked_ = true;
-  hidden_ = kMapEffectReachUnits <= glm::distance(native_player, position_);
+  hidden_ = reach_units <= glm::distance(native_player, position_);
   if (hidden_) {
     return;
   }

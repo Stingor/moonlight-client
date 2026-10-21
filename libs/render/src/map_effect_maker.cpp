@@ -69,7 +69,7 @@ MapEffectMaker::MapEffectMaker(glm::vec3 native_position, std::int32_t effect_id
       emit_speed - static_cast<float>(SignedDrawBelowOrZero(draws, kStartLagSpread)));
 }
 
-bool MapEffectMaker::Tick(glm::vec3 native_player) {
+bool MapEffectMaker::Tick(glm::vec3 native_player, float reach_units) {
   // ⚠ LA DISTANCE EST PLANE, en X et Z seulement, et non celle
   // d'une cheminée : la hauteur ne compte pas. Un semeur au sommet d'une tour
   // est donc à portée de qui passe à ses pieds.
@@ -78,7 +78,7 @@ bool MapEffectMaker::Tick(glm::vec3 native_player) {
   const float planar = std::sqrt(along_x * along_x + along_z * along_z);
 
   bool sows = false;
-  if (planar < kMapEffectReachUnits && counter_ >= period_) {
+  if (planar < reach_units && counter_ >= period_) {
     counter_ = 0;
     sows = true;
   }

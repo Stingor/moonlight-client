@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -19,6 +20,9 @@ namespace ro::render {
 // de base, et l'épreuve de proximité la lit. Le point de référence est la place
 // du personnage.
 inline constexpr float kMapEffectReachUnits = 130.0F;
+// LA PORTÉE SANS BORNE du réglage « Effets de carte à toute distance » : tout
+// effet de carte vit et sème, où que soit le personnage.
+inline constexpr float kUnboundedMapEffectReach = std::numeric_limits<float>::infinity();
 
 // LE PAS D'UN EFFET DE CARTE, en secondes : un soixantième, écrit en dur dans
 // le constructeur. Toutes les grandeurs de la table
@@ -44,7 +48,9 @@ class MapEmitter {
 
   // UN PAS DU JEU, dans l'ordre du client : le
   // tri par distance, puis, s'il ne cache pas l'émetteur, sa mise à jour.
-  void Tick(glm::vec3 native_player, std::uint32_t& draws);
+  // `reach_units` : la portée au-delà de laquelle il cesse de vivre.
+  void Tick(glm::vec3 native_player, std::uint32_t& draws,
+            float reach_units = kMapEffectReachUnits);
 
   // Faux quand le client ne le dessine pas : loin du joueur ET sans plus
   // aucune particule vivante — ou pas encore mis à jour une seule fois, ce que

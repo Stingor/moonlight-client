@@ -13,6 +13,7 @@
 #include "ro/formats/image.h"
 #include "ro/render/effect_node_world.h"
 #include "ro/render/map_effect_math.h"
+#include "ro/render/map_emitter.h"
 #include "ro/render/sprite_billboard.h"
 #include "ro/vfs/vfs.h"
 
@@ -76,7 +77,9 @@ class MapChimney {
 
   // Un pas du jeu : le tri par distance, puis,
   // à portée, la mise à jour. Loin, ses bouffées se figent.
-  void Tick(glm::vec3 native_player, std::uint32_t& draws);
+  // `reach_units` : la portée au-delà de laquelle elle se cache.
+  void Tick(glm::vec3 native_player, std::uint32_t& draws,
+            float reach_units = kMapEffectReachUnits);
 
   [[nodiscard]] bool drawn() const noexcept { return ticked_ && !hidden_; }
 

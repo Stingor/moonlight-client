@@ -20050,3 +20050,9 @@ tr: When you turn or tilt the camera, the world stretches along its rotation, ar
 
 fr: Intensité du flou
 tr: Blur strength
+
+fr: Effets de carte à toute distance
+tr: Map effects at any distance
+
+fr: Les effets que la carte pose — torches, flammes des braseros, lucioles, vapeurs, fumées et vent — vivent sur toute la carte, et non plus seulement autour du personnage : on les voit en dézoomant.\n\nLe client d'origine ne les fait vivre qu'à treize cases du personnage, et la carte graphique travaille davantage sur une grande carte.
+tr: The effects the map places — torches, brazier flames, fireflies, steam, smoke and wind — live across the whole map, not only around the character: you see them when zooming out.\n\nThe original client only runs them within thirteen cells of the character, and the graphics card works harder on a large map.

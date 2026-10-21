@@ -120,11 +120,11 @@ void MapEmitter::InitParticle(Particle& particle, std::uint32_t& draws) const {
   particle.age_steps = 0;
 }
 
-void MapEmitter::Tick(glm::vec3 native_player, std::uint32_t& draws) {
+void MapEmitter::Tick(glm::vec3 native_player, std::uint32_t& draws, float reach_units) {
   // ⚠ LOIN, IL NE SE CACHE QU'UNE FOIS SA RÉSERVE VIDE : ses particules
   // vivantes finissent leur vie.
   ticked_ = true;
-  near_ = kMapEffectReachUnits > glm::distance(native_player, position_);
+  near_ = reach_units > glm::distance(native_player, position_);
   if (near_) {
     hidden_ = false;
   } else if (used_ == 0) {

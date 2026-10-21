@@ -10,6 +10,7 @@
 #include "ro/render/effect_node_world.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/map_effect_table.h"
+#include "ro/render/map_emitter.h"
 
 namespace ro::render {
 
@@ -35,7 +36,8 @@ class MapWind {
   MapWind(glm::vec3 native_position, MapWindSetting setting, std::uint32_t& draws);
 
   // Un pas : le tri par distance, puis la mise à jour s'il est à portée.
-  void Tick(glm::vec3 native_player);
+  // `reach_units` : la portée au-delà de laquelle il se cache.
+  void Tick(glm::vec3 native_player, float reach_units = kMapEffectReachUnits);
 
   [[nodiscard]] bool drawn() const noexcept { return ticked_ && !hidden_; }
 

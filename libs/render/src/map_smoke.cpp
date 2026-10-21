@@ -117,9 +117,9 @@ const std::string& ChimneySmokeTextureKey() {
 MapChimney::MapChimney(glm::vec3 native_position, std::uint32_t owner_id)
     : position_(native_position), owner_id_(owner_id) {}
 
-void MapChimney::Tick(glm::vec3 native_player, std::uint32_t& draws) {
+void MapChimney::Tick(glm::vec3 native_player, std::uint32_t& draws, float reach_units) {
   ticked_ = true;
-  hidden_ = kMapEffectReachUnits <= glm::distance(native_player, position_);
+  hidden_ = reach_units <= glm::distance(native_player, position_);
   if (hidden_) {
     return;
   }

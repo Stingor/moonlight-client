@@ -37,6 +37,10 @@ namespace moonclient {
 [[nodiscard]] bool SunShadowsApply(const GraphicsOptions& graphics,
                                    const ro::render::TerrainStages& stages, bool indoor);
 
+// LA PORTÉE DES EFFETS DE CARTE : celle du client, ou aucune sous « Effets de
+// carte à toute distance ».
+[[nodiscard]] float MapEffectReachOf(const GraphicsOptions& graphics);
+
 // LA POSE DU DÉCOR ANIMÉ ENTRE DEUX PAS : glissée sous l'interpolation d'images,
 // en crans entiers sinon.
 [[nodiscard]] ro::render::ModelClockBlend ModelClockBlendOf(const GraphicsOptions& graphics);

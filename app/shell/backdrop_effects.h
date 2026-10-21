@@ -77,6 +77,10 @@ class BackdropEffects {
                        const ro::render::SceneFog& fog,
                        std::vector<ro::formats::RswEffect> map_objects);
 
+  // La portée des effets de la ville, que la page « Graphics » règle : voir
+  // `MapEffects::SetReachUnits`.
+  void SetMapEffectReach(float reach_units) noexcept { map_effects_.SetReachUnits(reach_units); }
+
   // Ce que les effets ont demandé au monde des passants — une teinte, un
   // drapeau posé par une suite —, rendu HORS du dessin, qui ne le tient qu'en
   // lecture. Voir `EffectsInPlay::TakeActorEffects`.

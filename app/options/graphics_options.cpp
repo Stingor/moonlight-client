@@ -22,6 +22,7 @@ constexpr const char* kLightmapsKey = "shadows_of_the_map";
 constexpr const char* kColdLightKey = "light_cold";
 constexpr const char* kSunShadowsKey = "render_shadows_of_the_sun";
 constexpr const char* kEffectLightsKey = "light_from_effects";
+constexpr const char* kMapEffectsUnboundedKey = "effects_of_the_map_at_any_distance";
 constexpr const char* kRoundedGroundKey = "ground_rounded";
 constexpr const char* kDayNightCycleKey = "cycle_day_night";
 constexpr const char* kFixedSkyKey = "cycle_day_night_fixed";
@@ -182,6 +183,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kLightmapsKey, &lightmaps_);
   into.Declare(kColdLightKey, &cold_light_);
   into.Declare(kEffectLightsKey, &effect_lights_);
+  into.Declare(kMapEffectsUnboundedKey, &map_effects_unbounded_);
   into.Declare(kRoundedGroundKey, &rounded_ground_);
   into.Declare(kDayNightCycleKey, &day_night_cycle_);
   into.Declare(kFixedSkyKey, &fixed_sky_);
@@ -255,6 +257,14 @@ void GraphicsOptions::Compose() {
                             "et de Ruwach, éclairent aussi autour d'eux.\n\nLe client d'origine "
                             "ne le fait pas."),
                          nullptr, effect_lights_));
+  rows_.push_back(Toggle(GraphicsRow::kMapEffectsUnbounded, Tr("Effets de carte à toute distance"),
+                         Tr("Les effets que la carte pose — torches, flammes des braseros, "
+                            "lucioles, vapeurs, fumées et vent — vivent sur toute la carte, et "
+                            "non plus seulement autour du personnage : on les voit en dézoomant."
+                            "\n\nLe client d'origine ne les fait vivre qu'à treize cases du "
+                            "personnage, et la carte graphique travaille davantage sur une "
+                            "grande carte."),
+                         nullptr, map_effects_unbounded_));
   rows_.push_back(Toggle(GraphicsRow::kRoundedGround, Tr("Sol arrondi"),
                          Tr("Les dunes, les collines et les talus s'arrondissent au lieu de se "
                             "plier en arêtes droites : chaque carreau du sol se découpe en seize, "
@@ -511,6 +521,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kEffectLights:
       effect_lights_ = asked.on;
+      break;
+    case GraphicsRow::kMapEffectsUnbounded:
+      map_effects_unbounded_ = asked.on;
       break;
     case GraphicsRow::kRoundedGround:
       rounded_ground_ = asked.on;

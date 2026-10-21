@@ -1,5 +1,7 @@
 #include "world/scene_graphics.h"
 
+#include "ro/render/map_emitter.h"
+
 namespace moonclient {
 
 ro::render::TerrainStages TerrainStagesOf(const GraphicsOptions& graphics, bool lightmap_hidden) {
@@ -14,6 +16,11 @@ ro::render::TerrainStages TerrainStagesOf(const GraphicsOptions& graphics, bool 
 bool SunShadowsApply(const GraphicsOptions& graphics, const ro::render::TerrainStages& stages,
                      bool indoor) {
   return graphics.sun_shadows() && stages.shadowmap && !stages.flat_color.has_value() && !indoor;
+}
+
+float MapEffectReachOf(const GraphicsOptions& graphics) {
+  return graphics.map_effects_unbounded() ? ro::render::kUnboundedMapEffectReach
+                                          : ro::render::kMapEffectReachUnits;
 }
 
 ro::render::ModelClockBlend ModelClockBlendOf(const GraphicsOptions& graphics) {

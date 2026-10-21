@@ -208,6 +208,7 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   if (audio->sound_audible()) {
     sounds_->HearMapAmbience(scene);
   }
+  effects_->SetMapEffectReach(MapEffectReachOf(graphics));
   // LES OBJETS D'EFFET DE LA VILLE : ceux du RSW, de son document et de ses
   // modèles, comme en partie, à la nuit de cette image.
   effects_->DrawAfterActors(

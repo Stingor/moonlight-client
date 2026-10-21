@@ -97,16 +97,16 @@ void MapEffects::Advance(std::uint32_t now_ms, glm::vec3 player_world) {
   const glm::vec3 player = frame_.ToNative(player_world);
   for (std::uint32_t tick = 0; tick < ticks; ++tick) {
     for (MapEmitter& emitter : emitters_) {
-      emitter.Tick(player, draws_);
+      emitter.Tick(player, draws_, reach_units_);
     }
     for (MapWind& wind : winds_) {
-      wind.Tick(player);
+      wind.Tick(player, reach_units_);
     }
     for (MapChimney& chimney : chimneys_) {
-      chimney.Tick(player, draws_);
+      chimney.Tick(player, draws_, reach_units_);
     }
     for (MapEffectMaker& maker : makers_) {
-      if (maker.Tick(player)) {
+      if (maker.Tick(player, reach_units_)) {
         sown_.push_back({maker.effect_id(), frame_.ToWorld(maker.native_position()),
                          maker.param()[0], maker.param()[1]});
       }
