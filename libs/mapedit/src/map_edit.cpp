@@ -230,6 +230,18 @@ void MapEdit::RemoveModelLight(std::size_t slot) {
   }
 }
 
+void MapEdit::SetModelEffect(std::size_t slot, ModelEffect effect) {
+  if (slot < model_effects_.size()) {
+    model_effects_[slot] = std::move(effect);
+  }
+}
+
+void MapEdit::RemoveModelEffect(std::size_t slot) {
+  if (slot < model_effects_.size()) {
+    model_effects_.erase(model_effects_.begin() + static_cast<std::ptrdiff_t>(slot));
+  }
+}
+
 void MapEdit::SetSprite(std::size_t slot, MapSprite sprite) {
   if (slot < sprites_.size()) {
     sprites_[slot] = std::move(sprite);

@@ -170,13 +170,16 @@ void DrawModelLights(const MapEditorView& view, MapEditorPanelState& panel,
       core::Tr("Toutes les poses de ce fichier, sur toutes les cartes, la portent. Elle "
                "s'enregistre dans le document commun @model_lights, publié avec la "
                "carte."));
-  if (view.model_lights.empty()) {
+  // L'EXTINCTION VAUT AUSSI POUR LES EFFETS DU TYPE : un brasero éteint perd
+  // sa flamme avec sa lumière.
+  if (view.model_lights.empty() && view.model_effects.empty()) {
     return;
   }
   bool unlit = view.selected_unlit;
   if (SkinCheckBox(core::Tr("Éteindre ses lumières sur cette pose"), &unlit, art)) {
     intents.emplace_back(map_editor::SetModelUnlit{unlit});
   }
+  SkinTooltip(core::Tr("Ses effets de modèle ne s'y lèvent pas non plus."));
   for (const MapEditorModelLight& shown : view.model_lights) {
     const bool chosen = view.selected_model_light == shown.slot;
     if (ImGui::Selectable(LightLabel(core::Tr("Lumière de modèle"), shown.slot, shown.light,

@@ -29,4 +29,9 @@ namespace ro::ui {
 void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
                  std::vector<MapEditorIntent>& intents, const SkinArt& art);
 
+// LES EFFETS DU TYPE DU MODÈLE DÉSIGNÉ, sous lui : les assigner, et les régler
+// tels qu'ils se lèvent sur cette pose. Voir docs/adr/0129.
+void DrawModelEffects(const MapEditorView& view, MapEditorPanelState& panel,
+                      std::vector<MapEditorIntent>& intents, const SkinArt& art);
+
 }  // namespace ro::ui

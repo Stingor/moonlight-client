@@ -24,6 +24,24 @@ std::array<float, 3> Lifted(std::array<float, 3> anchor) {
   return anchor;
 }
 
+// Ajoute à `lights` la lueur de chaque effet de `effects` qui en porte une, à
+// sa place, avec sa règle de nuit.
+void AddGlows(std::span<const ro::mapedit::AddedEffect> effects,
+              std::vector<ro::mapedit::AddedLight>& lights) {
+  for (const ro::mapedit::AddedEffect& effect : effects) {
+    if (effect.glow.has_value()) {
+      lights.push_back(ro::mapedit::AddedLight{.position = Lifted(effect.position),
+                                               .color = effect.glow->color,
+                                               .range = effect.glow->range,
+                                               .night_only = effect.night_only,
+                                               .hours = effect.hours,
+                                               .flicker = effect.glow->flicker,
+                                               .shadow = effect.glow->shadow,
+                                               .why = effect.why});
+    }
+  }
+}
+
 }  // namespace
 
 float FlickerFactor(std::size_t slot, double time_ms) {
@@ -41,6 +59,9 @@ std::vector<ro::mapedit::AddedLight> SceneLights(const ro::mapedit::MapEdit& edi
   const std::vector<ro::mapedit::AddedLight> carried = ro::mapedit::ModelLightsOn(
       model_book, scene.rsw.models(), scene.model_keys, scene.hidden_models, scene.unlit_models);
   lights.insert(lights.end(), carried.begin(), carried.end());
+  AddGlows(ro::mapedit::ModelEffectsOn(model_book, scene.rsw.models(), scene.model_keys,
+                                       scene.hidden_models, scene.unlit_models),
+           lights);
   return lights;
 }
 
@@ -62,18 +83,7 @@ std::vector<ro::mapedit::AddedLight> DocumentLights(
         .shadow = retouch.glow->shadow,
         .why = retouch.why});
   }
-  for (const ro::mapedit::AddedEffect& effect : edit.effects()) {
-    if (effect.glow.has_value()) {
-      lights.push_back(ro::mapedit::AddedLight{.position = Lifted(effect.position),
-                                               .color = effect.glow->color,
-                                               .range = effect.glow->range,
-                                               .night_only = effect.night_only,
-                                               .hours = effect.hours,
-                                               .flicker = effect.glow->flicker,
-                                               .shadow = effect.glow->shadow,
-                                               .why = effect.why});
-    }
-  }
+  AddGlows(edit.effects(), lights);
   return lights;
 }
 

@@ -15,18 +15,6 @@ constexpr std::size_t kHourBounds = 2;
 constexpr std::string_view kEntryOpening = "  - ";
 constexpr std::string_view kEntryIndent = "    ";
 
-// Un vecteur de trois réels sous `node`, ou le motif de son refus.
-std::string ReadVector(const YAML::Node& node, const std::string& where,
-                       std::array<float, 3>& vector) {
-  if (!node.IsSequence() || node.size() != kVectorSize) {
-    return where + " n'a pas trois composantes";
-  }
-  for (std::size_t axis = 0; axis < kVectorSize; ++axis) {
-    vector[axis] = node[axis].as<float>();
-  }
-  return {};
-}
-
 // Les champs d'une lumière, chacun à l'alignement d'une entrée de liste.
 std::string LightFieldsText(const AddedLight& light) {
   std::string text = std::format("{}position: {}\n", kEntryIndent, VectorText(light.position));
@@ -47,6 +35,17 @@ std::string LightFieldsText(const AddedLight& light) {
 }
 
 }  // namespace
+
+std::string ReadVector(const YAML::Node& node, const std::string& where,
+                       std::array<float, 3>& vector) {
+  if (!node.IsSequence() || node.size() != kVectorSize) {
+    return where + " n'a pas trois composantes";
+  }
+  for (std::size_t axis = 0; axis < kVectorSize; ++axis) {
+    vector[axis] = node[axis].as<float>();
+  }
+  return {};
+}
 
 std::string ReadHours(const YAML::Node& entry, const std::string& where,
                       std::optional<LitHours>& hours) {

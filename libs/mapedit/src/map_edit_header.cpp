@@ -67,6 +67,12 @@ const std::string_view kMapEditHeader =
 #    glow     : facultatif, la lumière qu'il porte — color, range, flicker,
 #               shadow ;
 #    why      : pourquoi, obligatoire.
+#  model_effects : seul le document @model_lights les porte — les effets que
+#            porte chaque pose d'un fichier de modèle, chacun :
+#    file     : le fichier, relatif à data\model\, sans égard à la casse ;
+#    position : [x, y, z], dans le repère de la pose, comme une lumière de
+#               modèle ;
+#    number, emit_speed, param, night_only, hours, glow, why : comme un effet.
 #  meshes : les retouches de maillages, chacune :
 #    index, file, origin : la pose qu'elle désigne, comme une retouche de
 #               modèle ;

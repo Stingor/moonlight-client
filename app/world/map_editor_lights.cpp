@@ -188,9 +188,11 @@ bool MapEditorSession::Deselect() noexcept {
     vertex_.reset();
     return true;
   }
-  // LA LUMIÈRE DE MODÈLE se lâche avant sa pose.
-  if (selected_model_light_.has_value() && !selection_.empty()) {
+  // LA LUMIÈRE OU L'EFFET DE MODÈLE se lâche avant sa pose.
+  if ((selected_model_light_.has_value() || selected_model_effect_.has_value()) &&
+      !selection_.empty()) {
     selected_model_light_.reset();
+    selected_model_effect_.reset();
     return true;
   }
   const bool held = !selection_.empty() || selected_light_.has_value() ||
@@ -229,6 +231,10 @@ MapEditorSession::Outcome MapEditorSession::Focus(const ro::render::MapScene& sc
     view_point_ = ro::mapedit::ModelLightPosition(
         *SelectedPose(scene),
         store.Document(ro::mapedit::kModelLightsDocument).model_lights()[*carried].light.position);
+  } else if (const std::optional<std::size_t> raised = ChosenModelEffect(scene, store)) {
+    view_point_ = ro::mapedit::ModelLightPosition(
+        *SelectedPose(scene),
+        store.Document(ro::mapedit::kModelLightsDocument).model_effects()[*raised].effect.position);
   } else if (!selection_.empty() && *selection_.model_index < scene.rsw.models().size()) {
     view_point_ = scene.rsw.models()[*selection_.model_index].position;
   }

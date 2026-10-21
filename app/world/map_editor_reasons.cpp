@@ -71,6 +71,15 @@ ro::mapedit::MapEdit WithReasons(ro::mapedit::MapEdit document) {
       document.SetModelLight(slot, std::move(carried));
     }
   }
+  for (std::size_t slot = 0; slot < document.model_effects().size(); ++slot) {
+    if (document.model_effects()[slot].effect.why.empty()) {
+      ro::mapedit::ModelEffect carried = document.model_effects()[slot];
+      std::snprintf(reason.data(), reason.size(), ro::core::Tr("Effet #%d de %s"),
+                    static_cast<int>(carried.effect.number), carried.model_file.c_str());
+      carried.effect.why = reason.data();
+      document.SetModelEffect(slot, std::move(carried));
+    }
+  }
   for (std::size_t slot = 0; slot < document.added().size(); ++slot) {
     if (document.added()[slot].why.empty()) {
       ro::mapedit::AddedModel added = document.added()[slot];

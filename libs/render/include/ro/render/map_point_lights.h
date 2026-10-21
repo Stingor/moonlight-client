@@ -39,7 +39,8 @@ struct MapScene;
 
 // LES LUMIÈRES DE LA CARTE AFFICHÉE : celles de son document `edit`, puis
 // celles que ses modèles portent selon le document des lumières de modèle
-// `model_book` — voir `mapedit::ModelLightsOn` et docs/adr/0126.
+// `model_book` — voir `mapedit::ModelLightsOn` et docs/adr/0126 —, puis la
+// lueur des effets de modèle qui en portent une (docs/adr/0129).
 [[nodiscard]] std::vector<ro::mapedit::AddedLight> SceneLights(
     const ro::mapedit::MapEdit& edit, const ro::mapedit::MapEdit& model_book,
     const MapScene& scene);

@@ -83,6 +83,14 @@ struct MapEditorEffect {
   std::string why;
 };
 
+// UN EFFET DE MODÈLE, tel que le panneau le montre et le rend : son rang dans
+// le document commun, et l'effet tel qu'il se lève sur la pose désignée — sa
+// position dans le repère du RSW. Voir docs/adr/0129.
+struct MapEditorModelEffect {
+  std::size_t slot = 0;
+  MapEditorEffect effect;
+};
+
 // UN EFFET DE LA CARTE — un objet d'effet du RSW —, tel que le panneau le
 // montre et le rend : son rang et son numéro, sa place d'origine et celle que
 // l'édition lui donne, et ce qu'elle en fait.
@@ -274,6 +282,10 @@ struct MapEditorView {
   std::vector<MapEditorModelLight> model_lights;
   std::optional<std::size_t> selected_model_light;
   bool selected_unlit = false;
+  // LES EFFETS DU TYPE DU MODÈLE DÉSIGNÉ, comme ses lumières, et celui qu'on
+  // règle.
+  std::vector<MapEditorModelEffect> model_effects;
+  std::optional<std::size_t> selected_model_effect;
   // LES EFFETS DE CARTE du document, et celui qu'on règle.
   std::vector<MapEditorEffect> effects;
   std::optional<std::size_t> selected_effect;
@@ -474,7 +486,38 @@ struct MoveModelLight {
   std::array<float, 3> native{};
   bool released = true;
 };
-// Éteindre les lumières de modèle sur la pose désignée, ou les rallumer.
+// LES EFFETS DE MODÈLE : voir docs/adr/0129. Ils se désignent et se placent
+// comme les lumières de modèle.
+//
+// Assigner au type du modèle désigné l'effet de numéro `number` à `position`,
+// dans le repère du RSW ; sans position, au-dessus de la pose.
+struct AddModelEffect {
+  std::int32_t number = 0;
+  std::optional<std::array<float, 3>> position;
+};
+// Régler l'effet de modèle de rang `slot`, ou plus aucun.
+struct SelectModelEffect {
+  std::optional<std::size_t> slot;
+};
+// L'effet de modèle de rang `slot` devient `effect`, sa position telle qu'il se
+// lève sur la pose désignée. `released`, comme pour `Place`.
+struct SetModelEffect {
+  std::size_t slot = 0;
+  MapEditorEffect effect;
+  bool released = true;
+};
+struct RemoveModelEffect {
+  std::size_t slot = 0;
+};
+// Déplacer l'effet de modèle de rang `slot` en `native`, sur la pose désignée,
+// à la flèche. `released`, comme pour `Place`.
+struct MoveModelEffect {
+  std::size_t slot = 0;
+  std::array<float, 3> native{};
+  bool released = true;
+};
+// Éteindre les lumières et les effets de modèle sur la pose désignée, ou les
+// rallumer.
 struct SetModelUnlit {
   bool unlit = false;
 };
@@ -522,7 +565,9 @@ using MapEditorIntent = std::variant<
     map_editor::RemoveSprite, map_editor::MoveSprite, map_editor::SelectSound, map_editor::SetSound,
     map_editor::MoveSound, map_editor::RevertSound, map_editor::AddSound, map_editor::ListenSound,
     map_editor::AddModelLight, map_editor::SelectModelLight, map_editor::SetModelLight,
-    map_editor::RemoveModelLight, map_editor::MoveModelLight, map_editor::SetModelUnlit>;
+    map_editor::RemoveModelLight, map_editor::MoveModelLight, map_editor::SetModelUnlit,
+    map_editor::AddModelEffect, map_editor::SelectModelEffect, map_editor::SetModelEffect,
+    map_editor::RemoveModelEffect, map_editor::MoveModelEffect>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -575,6 +620,10 @@ struct MapEditorPanelState {
   std::array<char, kWhyCapacity> map_effect_why{};
   std::optional<std::size_t> map_effect_why_of;
   bool map_effect_why_typing = false;
+  // La raison de l'effet de modèle réglé, comme celle d'un effet ajouté.
+  std::array<char, kWhyCapacity> model_effect_why{};
+  std::optional<std::size_t> model_effect_why_of;
+  bool model_effect_why_typing = false;
   // La raison du relief, comme celle d'un modèle.
   std::array<char, kWhyCapacity> ground_why{};
   bool ground_why_typing = false;

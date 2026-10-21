@@ -118,6 +118,7 @@ MapEditorSession::Outcome MapEditorSession::AddModelLight(
   after.AddModelLight(ro::mapedit::ModelLight{.model_file = file, .light = std::move(light)});
   store.Set(kBook, WithReasons(after));
   selected_model_light_ = after.model_lights().size() - 1;
+  selected_model_effect_.reset();
   Line label{};
   std::snprintf(label.data(), label.size(), ro::core::Tr("Assigner une lumière à %s"),
                 file.c_str());

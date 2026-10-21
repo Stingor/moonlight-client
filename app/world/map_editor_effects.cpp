@@ -29,6 +29,18 @@ constexpr std::array<float, 4> kNewEffectParam{0.6F, 1.0F, 0.0F, 0.0F};
 // nulle.
 constexpr float kSmallestGlowRange = 0.5F;
 
+}  // namespace
+
+ro::mapedit::AddedEffect NewEffect(std::int32_t number, const std::array<float, 3>& position) {
+  return ro::mapedit::AddedEffect{.number = number,
+                                  .position = position,
+                                  .emit_speed = kNewEffectEmitSpeed,
+                                  .param = kNewEffectParam,
+                                  .night_only = false,
+                                  .glow = std::nullopt,
+                                  .why = {}};
+}
+
 ro::ui::MapEditorEffect ShownEffect(const ro::mapedit::AddedEffect& effect) {
   ro::ui::MapEditorEffect shown{.number = effect.number,
                                 .position = effect.position,
@@ -64,8 +76,6 @@ ro::mapedit::AddedEffect DocumentEffect(const ro::ui::MapEditorEffect& shown) {
   }
   return effect;
 }
-
-}  // namespace
 
 std::vector<ro::ui::MapEditorLine> MapEditorSession::EffectTrace() const {
   std::vector<ro::ui::MapEditorLine> marks;
@@ -143,13 +153,7 @@ void MapEditorSession::ViewEffects(const ro::mapedit::MapEdit& document,
 MapEditorSession::Outcome MapEditorSession::AddEffect(std::int32_t number, MapEditStore& store) {
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   ro::mapedit::MapEdit after = before;
-  after.AddEffect(ro::mapedit::AddedEffect{.number = number,
-                                           .position = drop_point_,
-                                           .emit_speed = kNewEffectEmitSpeed,
-                                           .param = kNewEffectParam,
-                                           .night_only = false,
-                                           .glow = std::nullopt,
-                                           .why = {}});
+  after.AddEffect(NewEffect(number, drop_point_));
   store.Set(map_name_, WithReasons(after));
   ChooseEffect(after.effects().size() - 1);
   Record(ro::core::Tr("Ajouter un effet"), before, after);

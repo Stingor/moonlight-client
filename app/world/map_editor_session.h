@@ -56,6 +56,14 @@ enum class NudgeDirection : std::uint8_t { kLeft, kRight, kUp, kDown };
 // La lumière, sa portée et sa couleur ramenées dans les bornes que le document
 // relit.
 [[nodiscard]] ro::mapedit::AddedLight BoundedLight(ro::mapedit::AddedLight light);
+// UN EFFET, du document au panneau et retour : la lueur ramenée dans les
+// bornes que le document relit.
+[[nodiscard]] ro::ui::MapEditorEffect ShownEffect(const ro::mapedit::AddedEffect& effect);
+[[nodiscard]] ro::mapedit::AddedEffect DocumentEffect(const ro::ui::MapEditorEffect& shown);
+// UN EFFET NEUF de numéro `number` à `position`, dans le repère du RSW, à la
+// cadence et aux paramètres d'un semeur ordinaire.
+[[nodiscard]] ro::mapedit::AddedEffect NewEffect(std::int32_t number,
+                                                 const std::array<float, 3>& position);
 
 // LES ACTIONS RAPIDES du menu de Ctrl+Alt+clic droit sur un modèle de la carte.
 enum class QuickModelAction : std::uint8_t {
@@ -68,6 +76,15 @@ enum class QuickModelAction : std::uint8_t {
   // Rend son placement d'origine ; retire un modèle ajouté.
   kRevert,
 };
+
+// Les intentions des effets de modèle : voir map_editor_model_effects.cpp.
+template <typename Intent>
+inline constexpr bool kIsModelEffectIntent =
+    std::is_same_v<Intent, ro::ui::map_editor::AddModelEffect> ||
+    std::is_same_v<Intent, ro::ui::map_editor::SelectModelEffect> ||
+    std::is_same_v<Intent, ro::ui::map_editor::SetModelEffect> ||
+    std::is_same_v<Intent, ro::ui::map_editor::MoveModelEffect> ||
+    std::is_same_v<Intent, ro::ui::map_editor::RemoveModelEffect>;
 
 // Les intentions de la section « Sons » : voir map_editor_sounds.cpp.
 template <typename Intent>
@@ -124,12 +141,14 @@ class MapEditorSession {
     selection_.Clear();
     selected_light_.reset();
     selected_model_light_.reset();
+    selected_model_effect_.reset();
     selected_effect_.reset();
     selected_map_effect_.reset();
     selected_sprite_.reset();
     selected_sound_.reset();
     gesture_before_.reset();
     model_light_gesture_before_.reset();
+    model_effect_gesture_before_.reset();
     ground_stroke_.reset();
     designated_point_.reset();
     selected_points_.clear();
@@ -376,6 +395,23 @@ class MapEditorSession {
   // Retient un geste sur le document des lumières de modèle.
   void RecordModelLights(std::string label, const ro::mapedit::MapEdit& before,
                          const ro::mapedit::MapEdit& after);
+  // LES EFFETS DE MODÈLE : voir map_editor_model_effects.cpp.
+  // L'effet de modèle réglé, s'il appartient au fichier de la pose désignée.
+  [[nodiscard]] std::optional<std::size_t> ChosenModelEffect(const ro::render::MapScene& scene,
+                                                             const MapEditStore& store) const;
+  Outcome ApplyModelEffect(const ro::ui::map_editor::AddModelEffect& asked,
+                           const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplyModelEffect(const ro::ui::map_editor::SelectModelEffect& select,
+                           const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplyModelEffect(const ro::ui::map_editor::SetModelEffect& set,
+                           const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplyModelEffect(const ro::ui::map_editor::MoveModelEffect& move,
+                           const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplyModelEffect(const ro::ui::map_editor::RemoveModelEffect& remove,
+                           const ro::render::MapScene& scene, MapEditStore& store);
+  void ViewModelEffects(const ro::render::MapScene& scene, const MapEditStore& store,
+                        ro::ui::MapEditorView& view) const;
+  [[nodiscard]] bool GrabModelEffectHandle(glm::vec2 pointer, const ro::ui::MapEditorView& view);
   // LES LIGNES DE L'ARBRE DE LA SCÈNE, rebâties seulement quand le document, la
   // carte ou ses modèles changent : les recopier à chaque image coûtait une
   // chaîne par modèle.
@@ -410,6 +446,10 @@ class MapEditorSession {
   // document d'avant le geste qui la glisse.
   std::optional<std::size_t> selected_model_light_;
   std::optional<ro::mapedit::MapEdit> model_light_gesture_before_;
+  // L'effet de modèle qu'on règle, et le document d'avant le geste qui le
+  // glisse, comme pour une lumière de modèle.
+  std::optional<std::size_t> selected_model_effect_;
+  std::optional<ro::mapedit::MapEdit> model_effect_gesture_before_;
   // L'effet qu'on règle, et les losanges de tous à l'écran.
   std::optional<std::size_t> selected_effect_;
   std::vector<LightDot> effect_dots_;
@@ -537,8 +577,10 @@ class MapEditorSession {
     std::optional<std::pair<std::size_t, std::size_t>> vertex;
     // La lumière que la poignée déplace, ou l'effet.
     std::optional<std::size_t> light;
-    // La lumière de modèle que la poignée déplace, sur la pose désignée.
+    // La lumière ou l'effet de modèle que la poignée déplace, sur la pose
+    // désignée.
     std::optional<std::size_t> model_light;
+    std::optional<std::size_t> model_effect;
     std::optional<std::size_t> effect;
     std::optional<std::size_t> map_effect;
     std::optional<std::size_t> sprite;

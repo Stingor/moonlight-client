@@ -77,11 +77,13 @@ void Game::RaiseMapSky(std::uint32_t now_ms) {
 }
 
 void Game::AdvanceMapEffects(std::uint32_t now_ms) {
-  // LES OBJETS D'EFFET : ceux du RSW et ceux que l'édition ajoute, les « nuit
-  // seulement » tant que la nuit de l'image précédente le veut. La liste qui
-  // change — un document retouché, la nuit qui tombe ou se lève — se relève.
-  std::vector<ro::formats::RswEffect> wanted = ro::render::ActiveMapEffects(
-      stage_->scene.rsw.effects(), map_edits_.Document(stage_->name), effect_night_, effect_hour_);
+  // LES OBJETS D'EFFET : ceux du RSW, ceux que l'édition ajoute et ceux que
+  // portent les modèles, les « nuit seulement » tant que la nuit de l'image
+  // précédente le veut. La liste qui change — un document retouché, la nuit
+  // qui tombe ou se lève — se relève.
+  std::vector<ro::formats::RswEffect> wanted = ro::render::SceneMapEffects(
+      stage_->scene, map_edits_.Document(stage_->name),
+      map_edits_.Document(ro::mapedit::kModelLightsDocument), effect_night_, effect_hour_);
   if (!map_effects_raised_ || !ro::render::SameMapEffects(wanted, raised_effects_)) {
     map_effects_.Raise(stage_->scene.effect_table, wanted, stage_->scene.gnd.width(),
                        stage_->scene.gnd.height());

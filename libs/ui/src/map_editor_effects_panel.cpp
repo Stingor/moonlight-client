@@ -72,6 +72,77 @@ constexpr WheelDrag kHourDrag{.drag_step = 0.05F,
   return pasted;
 }
 
+using WhyBuffer = std::array<char, MapEditorPanelState::kWhyCapacity>;
+
+// LA SAISIE D'UNE RAISON, et l'effet dont elle est la saisie.
+struct WhyField {
+  WhyBuffer& text;
+  std::optional<std::size_t>& of;
+  bool& typing;
+};
+
+// Ce que les champs d'un effet ont fait à l'image.
+struct EffectFieldsResult {
+  // Une valeur a changé, un glissé s'est relâché, une case a basculé.
+  bool changed = false;
+  bool released = false;
+  bool toggled = false;
+};
+
+// LES CHAMPS D'UN EFFET AJOUTÉ : son numéro, sa position en cases, sa cadence,
+// ses paramètres, la nuit, sa lueur et sa raison. `chosen` : l'effet dont la
+// raison se saisit ; un autre la recharge.
+EffectFieldsResult DrawEffectFields(MapEditorEffect& effect, std::size_t chosen, MapCubes cubes,
+                                    WhyField why, const SkinArt& art) {
+  EffectFieldsResult result;
+  result.changed |= ImGui::InputInt(core::Tr("Numéro de l'effet"), &effect.number);
+  result.released |= ImGui::IsItemDeactivatedAfterEdit();
+  const WheelDragResult moved =
+      PositionInCells(core::Tr("Position (cases, hauteur)"), effect.position, cubes);
+  result.toggled |= PositionClipboardMenu("position", effect.position, cubes);
+  const WheelDragResult paced =
+      WheelDragFloat(core::Tr("Cadence"), effect.emit_speed, kEmitSpeedDrag);
+  result.changed |= moved.changed || paced.changed;
+  result.released |= moved.released || paced.released;
+  result.changed |= ImGui::DragFloat4(core::Tr("Paramètres"), effect.param.data(), kParamStep);
+  result.released |= ImGui::IsItemDeactivatedAfterEdit();
+  result.toggled |= SkinCheckBox(core::Tr("La nuit seulement"), &effect.night_only, art);
+  if (effect.night_only) {
+    WheelDragResult hours_moved;
+    result.toggled |= LitHoursFields(effect.hours, art, hours_moved);
+    result.changed |= hours_moved.changed;
+    result.released |= hours_moved.released;
+  }
+  result.toggled |= SkinCheckBox(core::Tr("Éclaire"), &effect.glows, art);
+  if (effect.glows) {
+    result.changed |= ImGui::ColorEdit3(core::Tr("Couleur"), effect.glow_color.data(),
+                                        ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
+    result.released |= ImGui::IsItemDeactivatedAfterEdit();
+    const WheelDragResult reach =
+        WheelDragFloat(core::Tr("Portée"), effect.glow_range, kGlowRangeDrag);
+    result.changed |= reach.changed;
+    result.released |= reach.released;
+    result.toggled |= SkinCheckBox(core::Tr("Vacille"), &effect.glow_flicker, art);
+    result.toggled |= SkinCheckBox(core::Tr("Projette des ombres"), &effect.glow_shadow, art);
+    SkinTooltip(ShadowHelp());
+  }
+  const std::string_view typed(why.text.data(), strnlen(why.text.data(), why.text.size()));
+  if (why.of != chosen || (!why.typing && typed != effect.why)) {
+    why.text.fill('\0');
+    const std::size_t kept = std::min(effect.why.size(), why.text.size() - 1);
+    std::copy_n(effect.why.begin(), kept, why.text.begin());
+    why.of = chosen;
+  }
+  static_cast<void>(ImGui::InputText(core::Tr("Pourquoi"), why.text.data(), why.text.size()));
+  why.typing = ImGui::IsItemActive();
+  if (ImGui::IsItemDeactivatedAfterEdit()) {
+    effect.why = std::string(why.text.data(), strnlen(why.text.data(), why.text.size()));
+    result.changed = true;
+    result.released = true;
+  }
+  return result;
+}
+
 // LES EFFETS DE LA CARTE : la liste des objets d'effet du RSW, et celui qu'on
 // règle — sa place, masqué, la nuit, sa lueur, sa raison.
 void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
@@ -265,59 +336,11 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
   // Ses champs portent les noms de ceux du modèle : un autre espace d'ID.
   ImGui::PushID("effet");
   map_editor::SetEffect set{.slot = slot, .effect = view.effects[slot], .released = false};
-  bool changed = false;
-  bool released = false;
-  changed |= ImGui::InputInt(core::Tr("Numéro de l'effet"), &set.effect.number);
-  released |= ImGui::IsItemDeactivatedAfterEdit();
-  const WheelDragResult moved =
-      PositionInCells(core::Tr("Position (cases, hauteur)"), set.effect.position, view.map_cubes);
-  bool toggled = PositionClipboardMenu("position", set.effect.position, view.map_cubes);
-  const WheelDragResult paced =
-      WheelDragFloat(core::Tr("Cadence"), set.effect.emit_speed, kEmitSpeedDrag);
-  changed |= moved.changed || paced.changed;
-  released |= moved.released || paced.released;
-  changed |= ImGui::DragFloat4(core::Tr("Paramètres"), set.effect.param.data(), kParamStep);
-  released |= ImGui::IsItemDeactivatedAfterEdit();
-  toggled |= SkinCheckBox(core::Tr("La nuit seulement"), &set.effect.night_only, art);
-  if (set.effect.night_only) {
-    WheelDragResult hours_moved;
-    toggled |= LitHoursFields(set.effect.hours, art, hours_moved);
-    changed |= hours_moved.changed;
-    released |= hours_moved.released;
-  }
-  toggled |= SkinCheckBox(core::Tr("Éclaire"), &set.effect.glows, art);
-  if (set.effect.glows) {
-    changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.effect.glow_color.data(),
-                                 ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
-    released |= ImGui::IsItemDeactivatedAfterEdit();
-    const WheelDragResult reach =
-        WheelDragFloat(core::Tr("Portée"), set.effect.glow_range, kGlowRangeDrag);
-    changed |= reach.changed;
-    released |= reach.released;
-    toggled |= SkinCheckBox(core::Tr("Vacille"), &set.effect.glow_flicker, art);
-    toggled |= SkinCheckBox(core::Tr("Projette des ombres"), &set.effect.glow_shadow, art);
-    SkinTooltip(ShadowHelp());
-  }
-  const std::string_view typed(panel.effect_why.data(),
-                               strnlen(panel.effect_why.data(), panel.effect_why.size()));
-  if (panel.effect_why_of != view.selected_effect ||
-      (!panel.effect_why_typing && typed != set.effect.why)) {
-    panel.effect_why.fill('\0');
-    const std::size_t kept = std::min(set.effect.why.size(), panel.effect_why.size() - 1);
-    std::copy_n(set.effect.why.begin(), kept, panel.effect_why.begin());
-    panel.effect_why_of = view.selected_effect;
-  }
-  static_cast<void>(
-      ImGui::InputText(core::Tr("Pourquoi"), panel.effect_why.data(), panel.effect_why.size()));
-  panel.effect_why_typing = ImGui::IsItemActive();
-  if (ImGui::IsItemDeactivatedAfterEdit()) {
-    set.effect.why = std::string(panel.effect_why.data(),
-                                 strnlen(panel.effect_why.data(), panel.effect_why.size()));
-    changed = true;
-    released = true;
-  }
-  if (changed || released || toggled) {
-    set.released = released || toggled || !ImGui::IsAnyItemActive();
+  const EffectFieldsResult fields = DrawEffectFields(
+      set.effect, slot, view.map_cubes,
+      WhyField{panel.effect_why, panel.effect_why_of, panel.effect_why_typing}, art);
+  if (fields.changed || fields.released || fields.toggled) {
+    set.released = fields.released || fields.toggled || !ImGui::IsAnyItemActive();
     intents.emplace_back(std::move(set));
   }
   if (SkinButton(core::Tr("Retirer l'effet"), art)) {
@@ -326,6 +349,55 @@ void DrawEffects(const MapEditorView& view, MapEditorPanelState& panel,
   ImGui::SameLine();
   if (SkinButton(core::Tr("Centrer"), art)) {
     intents.emplace_back(map_editor::Focus{});
+  }
+  ImGui::PopID();
+}
+
+void DrawModelEffects(const MapEditorView& view, MapEditorPanelState& panel,
+                      std::vector<MapEditorIntent>& intents, const SkinArt& art) {
+  ImGui::SeparatorText(core::Tr("Effets de ce type de modèle"));
+  // LE NUMÉRO EST CELUI DE « Ajouter un effet », les flammes par défaut, et
+  // l'effet se pose au centre de la boîte : au cœur d'un brasero plutôt qu'à
+  // son pied.
+  static_cast<void>(ImGui::InputInt(core::Tr("Numéro de l'effet"), &panel.effect_number));
+  if (SkinButton(core::Tr("Assigner un effet à ce type de modèle"), art)) {
+    intents.emplace_back(map_editor::AddModelEffect{
+        .number = panel.effect_number, .position = view.selected_center.value_or(view.position)});
+  }
+  SkinTooltip(
+      core::Tr("Toutes les poses de ce fichier, sur toutes les cartes, le portent. Il "
+               "s'enregistre dans le document commun @model_lights, publié avec la "
+               "carte."));
+  for (const MapEditorModelEffect& shown : view.model_effects) {
+    const std::array<float, 3> cells = CellsOfNative(shown.effect.position, view.map_cubes);
+    const std::string label =
+        std::format("{} {} — #{} — {:.1f} {:.1f} {:.1f}{}##effet_modele{}",
+                    core::Tr("Effet de modèle"), shown.slot, shown.effect.number, cells[0],
+                    cells[1], cells[2], WhyTag(shown.effect.why), shown.slot);
+    const bool chosen = view.selected_model_effect == shown.slot;
+    if (ImGui::Selectable(label.c_str(), chosen)) {
+      intents.emplace_back(
+          map_editor::SelectModelEffect{chosen ? std::nullopt : std::optional(shown.slot)});
+    }
+  }
+  const auto chosen = std::ranges::find(
+      view.model_effects, view.selected_model_effect,
+      [](const MapEditorModelEffect& shown) { return std::optional<std::size_t>(shown.slot); });
+  if (chosen == view.model_effects.end()) {
+    return;
+  }
+  ImGui::PushID("effet_modele");
+  map_editor::SetModelEffect set{.slot = chosen->slot, .effect = chosen->effect, .released = false};
+  const EffectFieldsResult fields = DrawEffectFields(
+      set.effect, chosen->slot, view.map_cubes,
+      WhyField{panel.model_effect_why, panel.model_effect_why_of, panel.model_effect_why_typing},
+      art);
+  if (fields.changed || fields.released || fields.toggled) {
+    set.released = fields.released || fields.toggled || !ImGui::IsAnyItemActive();
+    intents.emplace_back(std::move(set));
+  }
+  if (SkinButton(core::Tr("Retirer l'effet de modèle"), art)) {
+    intents.emplace_back(map_editor::RemoveModelEffect{chosen->slot});
   }
   ImGui::PopID();
 }

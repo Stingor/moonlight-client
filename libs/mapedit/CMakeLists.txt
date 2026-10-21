@@ -9,6 +9,7 @@ find_package(yaml-cpp CONFIG REQUIRED)
 
 add_library(ro_mapedit STATIC
     src/edit_history.cpp
+    src/effect_yaml.cpp
     src/ground_edit.cpp
     src/ground_edit_yaml.cpp
     src/light_yaml.cpp

@@ -45,4 +45,13 @@ namespace ro::mapedit {
                                                     std::span<const std::size_t> hidden,
                                                     std::span<const std::size_t> unlit);
 
+// LES EFFETS DE MODÈLE DE `book` SUR LA CARTE, dans le repère du RSW : comme
+// `ModelLightsOn`, pour chaque pose dont le fichier en porte. Une pose masquée
+// ou éteinte n'en lève aucun. Voir docs/adr/0129.
+[[nodiscard]] std::vector<AddedEffect> ModelEffectsOn(const MapEdit& book,
+                                                      std::span<const formats::RswModel> models,
+                                                      std::span<const std::string> model_keys,
+                                                      std::span<const std::size_t> hidden,
+                                                      std::span<const std::size_t> unlit);
+
 }  // namespace ro::mapedit

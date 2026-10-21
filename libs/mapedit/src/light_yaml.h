@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -14,6 +15,10 @@ namespace ro::mapedit::detail {
 // section « model_lights » du document des lumières de modèle.
 //
 // Chaque lecture rend le motif de son refus, vide quand elle est bonne.
+
+// Un vecteur de trois réels sous `node`.
+[[nodiscard]] std::string ReadVector(const YAML::Node& node, const std::string& where,
+                                     std::array<float, 3>& vector);
 
 // La plage d'heures sous la clé « hours » : deux heures de 0 à 24 ; rien sans
 // la clé.

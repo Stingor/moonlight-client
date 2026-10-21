@@ -10,6 +10,8 @@
 
 namespace ro::render {
 
+struct MapScene;
+
 // LA NUIT QUI TOMBE : 0 en plein jour, 1 au cœur de la nuit. Le jour est la
 // composante la plus claire de `daylight × tint` — le ciel à l'heure ET la nuit
 // que le serveur pose. Sur une carte fermée au ciel, `always_night`, rien n'y
@@ -37,6 +39,14 @@ inline constexpr float kEffectNightThreshold = 0.5F;
 [[nodiscard]] std::vector<formats::RswEffect> ActiveMapEffects(
     std::span<const formats::RswEffect> map_objects, const mapedit::MapEdit& document, float night,
     std::optional<float> hour = std::nullopt);
+
+// LES OBJETS D'EFFET DE LA CARTE AFFICHÉE : ceux d'`ActiveMapEffects`, puis
+// ceux que ses modèles portent selon le document des effets de modèle
+// `model_book`, sous la même règle de nuit — voir `mapedit::ModelEffectsOn` et
+// docs/adr/0129.
+[[nodiscard]] std::vector<formats::RswEffect> SceneMapEffects(
+    const MapScene& scene, const mapedit::MapEdit& document, const mapedit::MapEdit& model_book,
+    float night, std::optional<float> hour = std::nullopt);
 
 // Les deux listes portent-elles les mêmes objets, champ par champ ? Une liste
 // qui change se relève ; une liste égale se laisse vivre.

@@ -73,7 +73,8 @@ struct ModelEdit {
   bool hidden = false;
   // Translucide, de 0 à 1 ; rien : plein.
   std::optional<float> opacity;
-  // Vrai : les lumières de son type de modèle ne s'allument pas sur lui.
+  // Vrai : les lumières et les effets de son type de modèle ne se lèvent pas
+  // sur lui.
   bool unlit = false;
   // Pourquoi : le document refuse une opération qui ne le dit pas.
   std::string why;
@@ -97,7 +98,8 @@ struct AddedModel {
   // en boucle sauf avis contraire. Un fichier sans images clés ne bouge pas.
   std::int32_t animation_type = formats::kRswModelPlayLooped;
   float animation_speed = 1.0F;
-  // Vrai : les lumières de son type de modèle ne s'allument pas sur lui.
+  // Vrai : les lumières et les effets de son type de modèle ne se lèvent pas
+  // sur lui.
   bool unlit = false;
   // Pourquoi : le document refuse un ajout qui ne le dit pas.
   std::string why;
@@ -156,7 +158,8 @@ struct AddedLight {
 
 // LE DOCUMENT DES LUMIÈRES DE MODÈLE, partagé par toutes les cartes : voir
 // docs/adr/0126. Il se range, se sert et se publie comme le document d'une
-// carte, sous ce nom réservé, que nulle carte ne porte.
+// carte, sous ce nom réservé, que nulle carte ne porte. Il tient aussi les
+// effets de modèle (docs/adr/0129) : le serveur ne lit pas ses sections.
 inline constexpr std::string_view kModelLightsDocument = "@model_lights";
 
 // UNE LUMIÈRE DE MODÈLE : une lumière que porte chaque pose d'un fichier de
@@ -202,6 +205,19 @@ struct AddedEffect {
   std::string why;
 
   friend bool operator==(const AddedEffect&, const AddedEffect&) = default;
+};
+
+// UN EFFET DE MODÈLE : un effet que porte chaque pose d'un fichier de modèle,
+// sur toutes les cartes — les flammes de tous les braseros. Il se tient dans le
+// document commun `kModelLightsDocument`, avec les lumières de modèle, et sa
+// position est dans le repère de la pose, comme la leur : voir
+// ro/mapedit/model_light.h et docs/adr/0129.
+struct ModelEffect {
+  // Le fichier, relatif à data\model\, en UTF-8 ; voir `ModelFileKey`.
+  std::string model_file;
+  AddedEffect effect;
+
+  friend bool operator==(const ModelEffect&, const ModelEffect&) = default;
 };
 
 // LA RETOUCHE D'UN EFFET DE LA CARTE, un objet d'effet du RSW : déplacé,
@@ -357,8 +373,19 @@ class MapEdit {
   [[nodiscard]] bool empty() const noexcept {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
            effects_.empty() && effect_edits_.empty() && ground_.empty() && sprites_.empty() &&
-           sounds_.empty() && sound_edits_.empty() && model_lights_.empty();
+           sounds_.empty() && sound_edits_.empty() && model_lights_.empty() &&
+           model_effects_.empty();
   }
+  // LES EFFETS DE MODÈLE, dans l'ordre du document : seul celui de
+  // `kModelLightsDocument` en porte.
+  [[nodiscard]] const std::vector<ModelEffect>& model_effects() const noexcept {
+    return model_effects_;
+  }
+  void AddModelEffect(ModelEffect effect) { model_effects_.push_back(std::move(effect)); }
+  // Remplace l'effet de modèle de rang `slot` ; hors de la liste, rien.
+  void SetModelEffect(std::size_t slot, ModelEffect effect);
+  // Retire l'effet de modèle de rang `slot` : les suivants remontent.
+  void RemoveModelEffect(std::size_t slot);
   // LES LUMIÈRES DE MODÈLE, dans l'ordre du document : seul celui de
   // `kModelLightsDocument` en porte.
   [[nodiscard]] const std::vector<ModelLight>& model_lights() const noexcept {
@@ -460,13 +487,14 @@ class MapEdit {
   std::vector<AddedSound> sounds_;
   std::vector<SoundEdit> sound_edits_;
   std::vector<ModelLight> model_lights_;
+  std::vector<ModelEffect> model_effects_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la
 // version n'est pas gérée, qui nomme une autre carte que `map_name`, dont une
 // opération est malformée — un champ manquant, un vecteur qui n'a pas trois
-// composantes, une raison vide —, ou qui porte des lumières de modèle sans être
-// `kModelLightsDocument`.
+// composantes, une raison vide —, ou qui porte des lumières ou des effets de
+// modèle sans être `kModelLightsDocument`.
 [[nodiscard]] core::Result<MapEdit> ParseMapEdit(std::string_view yaml_text,
                                                  std::string_view map_name);
 
@@ -508,7 +536,7 @@ struct MapEditReport {
   // Les modèles translucides, par rangs croissants : ni les pleins, ni les
   // masqués.
   std::vector<ModelOpacity> opacities;
-  // Les rangs des modèles où les lumières de modèle ne s'allument pas,
+  // Les rangs des modèles où les lumières et les effets de modèle ne se lèvent pas,
   // croissants.
   std::vector<std::size_t> unlit;
 };

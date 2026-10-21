@@ -115,6 +115,9 @@ bool MapEditorSession::GrabTool(glm::vec2 pointer, const ro::ui::MapEditorView& 
   if (view.selected_model_light.has_value()) {
     return GrabModelLightHandle(pointer, view);
   }
+  if (view.selected_model_effect.has_value()) {
+    return GrabModelEffectHandle(pointer, view);
+  }
   const std::optional<std::size_t> grabbed = GrabbedHandle(handles_, pointer);
   if (!grabbed.has_value()) {
     return false;
@@ -140,8 +143,9 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   // UN SOMMET, UNE LUMIÈRE se déplacent comme une pose, à la flèche.
   const ro::ui::MapEditorTool tool =
       drag_->vertex.has_value() || drag_->light.has_value() || drag_->model_light.has_value() ||
-              drag_->effect.has_value() || drag_->map_effect.has_value() ||
-              drag_->sprite.has_value() || drag_->sound.has_value() || drag_->ground_points
+              drag_->model_effect.has_value() || drag_->effect.has_value() ||
+              drag_->map_effect.has_value() || drag_->sprite.has_value() ||
+              drag_->sound.has_value() || drag_->ground_points
           ? ro::ui::MapEditorTool::kMove
           : tool_;
   drag_->last = Dragged(tool, drag_->grabbed, drag_->frame, drag_->start, pointer - drag_->from);
@@ -181,6 +185,11 @@ void MapEditorSession::DragTo(glm::vec2 pointer, bool snap) {
   if (drag_->model_light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveModelLight{
         .slot = *drag_->model_light, .native = drag_->last.position, .released = false});
+    return;
+  }
+  if (drag_->model_effect.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveModelEffect{
+        .slot = *drag_->model_effect, .native = drag_->last.position, .released = false});
     return;
   }
   if (drag_->vertex.has_value()) {
@@ -225,6 +234,9 @@ void MapEditorSession::Release() {
   } else if (drag_->model_light.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveModelLight{
         .slot = *drag_->model_light, .native = last.position, .released = true});
+  } else if (drag_->model_effect.has_value()) {
+    queued_.emplace_back(ro::ui::map_editor::MoveModelEffect{
+        .slot = *drag_->model_effect, .native = last.position, .released = true});
   } else if (drag_->vertex.has_value()) {
     queued_.emplace_back(ro::ui::map_editor::MoveVertex{.node = drag_->vertex->first,
                                                         .vertex = drag_->vertex->second,
@@ -367,6 +379,7 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return AddModelLight(asked, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectModelLight>) {
           selected_model_light_ = asked.slot;
+          selected_model_effect_.reset();
           return {};
         } else if constexpr (std::is_same_v<Asked, intents::SetModelLight>) {
           return SetModelLight(asked, scene, store);
@@ -400,6 +413,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return {.publication = Outcome::Publication::kReload};
         } else if constexpr (kIsSoundIntent<Asked>) {
           return ApplySound(asked, scene, store);
+        } else if constexpr (kIsModelEffectIntent<Asked>) {
+          return ApplyModelEffect(asked, scene, store);
         } else {
           static_assert(std::is_same_v<Asked, intents::Save>, "une intention n'est pas routée");
           std::vector<std::string> saved = Save(store);
@@ -706,6 +721,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   ViewGround(document, view);
   ViewGroundPoints(scene, document, view);
   ViewModelLights(scene, store, view);
+  ViewModelEffects(scene, store, view);
   if (selection_.empty()) {
     return view;
   }

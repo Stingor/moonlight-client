@@ -20005,3 +20005,39 @@ tr: Frame interpolation
 
 fr: Le jeu avance par pas de 16 ms, soit 60 fois par seconde. Sur un écran plus rapide, ce qui suit ce pas — carts, faucons, rotation des modèles 3D, décor animé — tiendrait la même place plusieurs images de suite, puis sauterait.\n\nCochée, ces éléments se peignent entre deux pas et glissent d'une position à l'autre, au prix d'au plus un pas de retard. Seul l'affichage change : le jeu garde sa cadence.
 tr: The game advances in 16 ms steps, 60 times per second. On a faster screen, whatever follows that step — carts, falcons, 3D model rotation, animated scenery — would hold the same place for several frames in a row, then jump.\n\nWhen checked, these objects are drawn between two steps and glide from one position to the next, at the cost of at most one step of delay. Only the display changes: the game keeps its pace.
+
+fr: Effets de ce type de modèle
+tr: Effects of this model type
+
+fr: Assigner un effet à ce type de modèle
+tr: Assign an effect to this model type
+
+fr: Toutes les poses de ce fichier, sur toutes les cartes, le portent. Il s'enregistre dans le document commun @model_lights, publié avec la carte.
+tr: Every placement of this file, on every map, carries it. It is saved in the shared @model_lights document, published with the map.
+
+fr: Les flammes par défaut, réglables dans l'éditeur. Toutes les poses de ce fichier, sur toutes les cartes, le portent.
+tr: Flames by default, adjustable in the editor. Every placement of this file, on every map, carries it.
+
+fr: Effet de modèle
+tr: Model effect
+
+fr: Retirer l'effet de modèle
+tr: Remove the model effect
+
+fr: Ses effets de modèle ne s'y lèvent pas non plus.
+tr: Its model effects do not rise there either.
+
+fr: Effet #%d de %s
+tr: Effect #%d of %s
+
+fr: Assigner un effet à %s
+tr: Assign an effect to %s
+
+fr: Toutes les poses de %s portent cet effet, sur toutes les cartes.
+tr: Every placement of %s carries this effect, on every map.
+
+fr: Régler l'effet de modèle %zu
+tr: Adjust model effect %zu
+
+fr: Retirer l'effet de modèle %zu
+tr: Remove model effect %zu

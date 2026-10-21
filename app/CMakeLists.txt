@@ -809,6 +809,7 @@ add_library(moonclient_graphics STATIC
     world/map_editor_lights.cpp
     world/map_editor_map_effects.cpp
     world/map_editor_mesh.cpp
+    world/map_editor_model_effects.cpp
     world/map_editor_model_lights.cpp
     world/map_editor_overlay.cpp
     world/map_editor_reasons.cpp

@@ -5,6 +5,8 @@
 #include <string_view>
 #include <utility>
 
+#include "ro/mapedit/model_light.h"
+#include "ro/render/map_scene.h"
 #include "ro/render/scene_light.h"
 
 namespace ro::render {
@@ -12,6 +14,21 @@ namespace {
 
 // Le nom d'un objet que le document ajoute : il ne vient d'aucun RSW.
 constexpr std::string_view kAddedEffectName = "map_edit";
+
+// Ajoute à `objects` les effets `added` qui se lèvent à cette nuit.
+void RaiseAdded(std::span<const mapedit::AddedEffect> added, float night, std::optional<float> hour,
+                std::vector<formats::RswEffect>& objects) {
+  for (const mapedit::AddedEffect& effect : added) {
+    if (effect.night_only && !LitAtNight(effect.hours, night, hour)) {
+      continue;
+    }
+    objects.push_back(formats::RswEffect{.name = std::string(kAddedEffectName),
+                                         .position = effect.position,
+                                         .number = effect.number,
+                                         .emit_speed = effect.emit_speed,
+                                         .param = effect.param});
+  }
+}
 
 }  // namespace
 
@@ -55,16 +72,19 @@ std::vector<formats::RswEffect> ActiveMapEffects(std::span<const formats::RswEff
     }
     objects.push_back(std::move(object));
   }
-  for (const mapedit::AddedEffect& effect : document.effects()) {
-    if (effect.night_only && !LitAtNight(effect.hours, night, hour)) {
-      continue;
-    }
-    objects.push_back(formats::RswEffect{.name = std::string(kAddedEffectName),
-                                         .position = effect.position,
-                                         .number = effect.number,
-                                         .emit_speed = effect.emit_speed,
-                                         .param = effect.param});
-  }
+  RaiseAdded(document.effects(), night, hour, objects);
+  return objects;
+}
+
+std::vector<formats::RswEffect> SceneMapEffects(const MapScene& scene,
+                                                const mapedit::MapEdit& document,
+                                                const mapedit::MapEdit& model_book, float night,
+                                                std::optional<float> hour) {
+  std::vector<formats::RswEffect> objects =
+      ActiveMapEffects(scene.rsw.effects(), document, night, hour);
+  RaiseAdded(mapedit::ModelEffectsOn(model_book, scene.rsw.models(), scene.model_keys,
+                                     scene.hidden_models, scene.unlit_models),
+             night, hour, objects);
   return objects;
 }
 

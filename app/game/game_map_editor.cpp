@@ -121,6 +121,34 @@ const ro::ui::MapEditorLight* MarkModelLights(ro::ui::MapEditorView& view,
   return chosen;
 }
 
+// LES LOSANGES DES EFFETS DU TYPE de la pose désignée (docs/adr/0129), là où
+// ils s'y lèvent, et la position du désigné d'entre eux : c'est lui qui prend
+// la flèche. Rien sans lui.
+std::optional<std::array<float, 3>> MarkModelEffects(ro::ui::MapEditorView& view,
+                                                     const ro::render::MapScene& scene,
+                                                     const ro::render::Camera& camera,
+                                                     float aspect_ratio, float width,
+                                                     float height) {
+  ro::ui::MapEditorView carried;
+  std::optional<std::array<float, 3>> chosen;
+  for (const ro::ui::MapEditorModelEffect& shown : view.model_effects) {
+    carried.effects.push_back(shown.effect);
+    if (view.selected_model_effect == shown.slot) {
+      chosen = shown.effect.position;
+    }
+  }
+  for (const MapEditorSession::LightDot& dot :
+       EffectDots(carried, scene, camera, aspect_ratio, width, height)) {
+    view.lines.push_back(ro::ui::MapEditorLine{
+        .from = dot.at,
+        .to = dot.at,
+        .kind = view.selected_model_effect == view.model_effects[dot.slot].slot
+                    ? ro::ui::MapEditorLineKind::kEffectSelected
+                    : ro::ui::MapEditorLineKind::kEffect});
+  }
+  return chosen;
+}
+
 }  // namespace
 
 void Game::ServeMapEditor() {
@@ -341,13 +369,17 @@ void Game::ServeMapEditorTools() {
     return;
   }
   // LES POIGNÉES, sur le pivot du placement que montre la vue — ou, une
-  // lumière de son type désignée, la flèche sur elle.
+  // lumière ou un effet de son type désigné, la flèche sur lui.
   const ro::ui::MapEditorLight* carried =
       MarkModelLights(tools.map_editor, stage_->scene, camera_, aspect_ratio_, width, height);
-  const GizmoFrame frame = GizmoFrameOf(
-      map_frame, carried != nullptr ? carried->position : tools.map_editor.position, camera_);
+  const std::optional<std::array<float, 3>> raised =
+      MarkModelEffects(tools.map_editor, stage_->scene, camera_, aspect_ratio_, width, height);
+  const std::optional<std::array<float, 3>> held =
+      carried != nullptr ? std::optional(carried->position) : raised;
+  const GizmoFrame frame =
+      GizmoFrameOf(map_frame, held.value_or(tools.map_editor.position), camera_);
   map_editor_.SetGizmo(
-      frame, GizmoHandles(carried != nullptr ? ro::ui::MapEditorTool::kMove : map_editor_.tool(),
+      frame, GizmoHandles(held.has_value() ? ro::ui::MapEditorTool::kMove : map_editor_.tool(),
                           frame, camera_, aspect_ratio_, width, height));
   const std::vector<ro::ui::MapEditorLine> handles = map_editor_.GizmoTrace();
   tools.map_editor.lines.insert(tools.map_editor.lines.end(), handles.begin(), handles.end());
@@ -437,17 +469,21 @@ enum class MapModelVerb : int {
   kCopy,
   kAssignLight,
   kToggleUnlit,
+  kAssignEffect,
 };
 
-// LE TYPE DU MODÈLE DE RANG `rank` PORTE-T-IL DES LUMIÈRES ? Voir docs/adr/0126.
+// LE TYPE DU MODÈLE DE RANG `rank` PORTE-T-IL DES LUMIÈRES OU DES EFFETS ? Voir
+// docs/adr/0126 et 0129.
 bool CarriesModelLights(const ro::render::MapScene& scene, const ro::mapedit::MapEdit& book,
                         std::size_t rank) {
-  return rank < scene.model_keys.size() &&
-         std::ranges::any_of(
-             book.model_lights(),
-             [&](const ro::mapedit::ModelLight& carried) {
-               return ro::mapedit::ModelFileKey(carried.model_file) == scene.model_keys[rank];
-             });
+  if (rank >= scene.model_keys.size()) {
+    return false;
+  }
+  const auto same_file = [&](const auto& carried) {
+    return ro::mapedit::ModelFileKey(carried.model_file) == scene.model_keys[rank];
+  };
+  return std::ranges::any_of(book.model_lights(), same_file) ||
+         std::ranges::any_of(book.model_effects(), same_file);
 }
 
 }  // namespace
@@ -512,6 +548,13 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
       .separator = true,
       .staff = true,
       .tip = ro::core::Tr("Toutes les poses de ce fichier, sur toutes les cartes, la portent.")});
+  built.items.push_back(ro::ui::EntityMenuItem{
+      .label = ro::core::Tr("Assigner un effet à ce type de modèle"),
+      .verb = static_cast<int>(MapModelVerb::kAssignEffect),
+      .staff = true,
+      .tip = ro::core::Tr(
+          "Les flammes par défaut, réglables dans l'éditeur. Toutes les poses de ce fichier, sur "
+          "toutes les cartes, le portent.")});
   if (CarriesModelLights(stage_->scene, map_edits_.Document(ro::mapedit::kModelLightsDocument),
                          model_index)) {
     built.items.push_back(ro::ui::EntityMenuItem{
@@ -596,6 +639,16 @@ void Game::PlayMapModelVerb(int verb) {
                                                stage_->scene, map_edits_));
       outcome = map_editor_.Apply(
           ro::ui::map_editor::AddModelLight{.position = SelectionCenter(stage_->scene, *model)},
+          stage_->scene, map_edits_);
+      break;
+    case MapModelVerb::kAssignEffect:
+      // L'ÉDITEUR S'OUVRE SUR LA POSE, qui reçoit les flammes au centre de sa
+      // boîte, comme une lumière : on les règle aussitôt.
+      static_cast<void>(map_editor_.QuickModel(QuickModelAction::kOpenEditor, *model, here,
+                                               stage_->scene, map_edits_));
+      outcome = map_editor_.Apply(
+          ro::ui::map_editor::AddModelEffect{.number = ro::ui::MapEditorPanelState::kFlameEffect,
+                                             .position = SelectionCenter(stage_->scene, *model)},
           stage_->scene, map_edits_);
       break;
     case MapModelVerb::kToggleUnlit:

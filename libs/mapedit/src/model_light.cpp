@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <type_traits>
+#include <utility>
 
 namespace ro::mapedit {
 namespace {
@@ -128,19 +130,24 @@ std::array<float, 3> ModelLightOffset(const formats::RswModel& placement,
   return offset;
 }
 
-std::vector<AddedLight> ModelLightsOn(const MapEdit& book,
-                                      std::span<const formats::RswModel> models,
-                                      std::span<const std::string> model_keys,
-                                      std::span<const std::size_t> hidden,
-                                      std::span<const std::size_t> unlit) {
-  std::vector<AddedLight> lights;
-  if (book.model_lights().empty()) {
-    return lights;
+namespace {
+
+// CE QUE PORTENT LES POSES DE LA CARTE : pour chaque pose ni masquée ni
+// éteinte, chaque entrée `carried` de même fichier, `held` en tirant l'objet —
+// lumière ou effet —, posé dans le repère du RSW.
+template <typename Carried, typename Held>
+auto CarriedOn(const std::vector<Carried>& carried, Held held,
+               std::span<const formats::RswModel> models, std::span<const std::string> model_keys,
+               std::span<const std::size_t> hidden, std::span<const std::size_t> unlit) {
+  using Object = std::remove_cvref_t<decltype(carried.front().*held)>;
+  std::vector<Object> placed;
+  if (carried.empty()) {
+    return placed;
   }
   std::vector<std::string> book_keys;
-  book_keys.reserve(book.model_lights().size());
-  for (const ModelLight& carried : book.model_lights()) {
-    book_keys.push_back(ModelFileKey(carried.model_file));
+  book_keys.reserve(carried.size());
+  for (const Carried& entry : carried) {
+    book_keys.push_back(ModelFileKey(entry.model_file));
   }
   const std::size_t count = std::min(models.size(), model_keys.size());
   for (std::size_t rank = 0; rank < count; ++rank) {
@@ -151,12 +158,30 @@ std::vector<AddedLight> ModelLightsOn(const MapEdit& book,
       if (book_keys[slot] != model_keys[rank]) {
         continue;
       }
-      AddedLight light = book.model_lights()[slot].light;
-      light.position = ModelLightPosition(models[rank], light.position);
-      lights.push_back(std::move(light));
+      Object object = carried[slot].*held;
+      object.position = ModelLightPosition(models[rank], object.position);
+      placed.push_back(std::move(object));
     }
   }
-  return lights;
+  return placed;
+}
+
+}  // namespace
+
+std::vector<AddedLight> ModelLightsOn(const MapEdit& book,
+                                      std::span<const formats::RswModel> models,
+                                      std::span<const std::string> model_keys,
+                                      std::span<const std::size_t> hidden,
+                                      std::span<const std::size_t> unlit) {
+  return CarriedOn(book.model_lights(), &ModelLight::light, models, model_keys, hidden, unlit);
+}
+
+std::vector<AddedEffect> ModelEffectsOn(const MapEdit& book,
+                                        std::span<const formats::RswModel> models,
+                                        std::span<const std::string> model_keys,
+                                        std::span<const std::size_t> hidden,
+                                        std::span<const std::size_t> unlit) {
+  return CarriedOn(book.model_effects(), &ModelEffect::effect, models, model_keys, hidden, unlit);
 }
 
 }  // namespace ro::mapedit

@@ -586,6 +586,7 @@ void DrawSelection(const MapEditorView& view, MapEditorPanelState& panel,
     intents.emplace_back(map_editor::Focus{});
   }
   DrawModelLights(view, panel, intents, art);
+  DrawModelEffects(view, panel, intents, art);
 }
 
 }  // namespace
