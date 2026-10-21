@@ -358,8 +358,11 @@ void DrawModelEffects(const MapEditorView& view, MapEditorPanelState& panel,
   ImGui::SeparatorText(core::Tr("Effets de ce type de modèle"));
   // LE NUMÉRO EST CELUI DE « Ajouter un effet », les flammes par défaut, et
   // l'effet se pose au centre de la boîte : au cœur d'un brasero plutôt qu'à
-  // son pied.
+  // son pied. Le champ porte le libellé de celui des effets ajoutés, peint dans
+  // le même panneau : un autre espace d'ID.
+  ImGui::PushID("assigner_effet_modele");
   static_cast<void>(ImGui::InputInt(core::Tr("Numéro de l'effet"), &panel.effect_number));
+  ImGui::PopID();
   if (SkinButton(core::Tr("Assigner un effet à ce type de modèle"), art)) {
     intents.emplace_back(map_editor::AddModelEffect{
         .number = panel.effect_number, .position = view.selected_center.value_or(view.position)});
