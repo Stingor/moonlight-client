@@ -1910,13 +1910,12 @@ if(WIN32 AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/moonclient.ico")
     target_sources(moonclient PRIVATE resources/moonclient.rc)
 endif()
 
-# 🔴 LE FICHIER PORTE LE NOM DU JEU, PAS CELUI DE LA CIBLE, et c'est la raison
-# d'être de ce dépôt : `Moonlight-Destiny.exe` est le nom de l'exécutable que
-# ce client REMPLACE, celui que le joueur lance et celui sous lequel les
-# archives de mise à jour livrent l'exécutable — le patcher intégré ne
-# remplace le programme en cours que s'il porte ce nom. La cible, elle, reste
-# `moonclient` — c'est un identifiant, et le renommer ne rendrait rien.
-set_target_properties(moonclient PROPERTIES OUTPUT_NAME "Moonlight-Destiny")
+# 🔴 LE FICHIER S'APPELLE `MoonClient.exe` : c'est celui que le joueur lance, et
+# celui sous lequel les archives de mise à jour livrent l'exécutable — le
+# patcher intégré ne remplace le programme en cours que si le fichier livré
+# porte son nom. Le nom du jeu, lui, reste dans le titre de la fenêtre. La
+# cible reste `moonclient` : c'est un identifiant.
+set_target_properties(moonclient PROPERTIES OUTPUT_NAME "MoonClient")
 
 # PAS DE CONSOLE HORS DEBUG. Un programme du sous-système console en ouvre une à
 # son lancement, et un joueur n'a rien à y lire : le journal va dans

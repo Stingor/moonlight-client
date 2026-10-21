@@ -227,7 +227,7 @@ void WarnUnwritable(const ro::core::Error& error) {
       "Le dossier du jeu refuse l'écriture :\n\n" + why +
       "\n\nLe jeu risque de se fermer ou de ne rien enregistrer. Causes habituelles : le jeu est"
       " installé dans Program Files, ou un antivirus (protection contre les rançongiciels) bloque"
-      " Moonlight-Destiny.exe. Déplacez le dossier du jeu (par exemple C:\\Jeux) ou autorisez"
+      " MoonClient.exe. Déplacez le dossier du jeu (par exemple C:\\Jeux) ou autorisez"
       " l'exécutable dans l'antivirus.";
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, kStopTitle, shown.c_str(), nullptr);
 }
@@ -311,7 +311,7 @@ int main(int argc, char** argv) {
     const std::string shown = "Le journal ne peut pas s'écrire :\n\n" +
                               ro::core::Describe(logged.error()) +
                               "\n\nSi le jeu se ferme, déplacez son dossier hors de Program Files"
-                              " ou autorisez Moonlight-Destiny.exe dans l'antivirus.";
+                              " ou autorisez MoonClient.exe dans l'antivirus.";
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, kStopTitle, shown.c_str(), nullptr);
   }
   ro::core::LogMachine();

@@ -149,13 +149,11 @@ inline constexpr double kLiveGroundRemeshMs = 33.0;
 [[nodiscard]] ro::core::Result<void> RemeshStageGround(MapStage& stage,
                                                        ro::render::TerrainRenderer& terrain);
 
-// LE NOM QUE LE JOUEUR VOIT, et celui du fichier qu'il lance.
+// LE NOM DU JEU, que le joueur voit dans la barre de titre.
 //
-// ⚠ CE N'EST PAS LE NOM DU DÉPÔT, et les deux n'ont pas à coïncider. Le
-// programme s'appelle `moonclient` dans son arbre, ses cibles, son espace de
-// noms et son journal ; il s'appelle `Moonlight-Destiny` sur l'écran et sur le
-// disque, parce que c'est le client de CE serveur qu'il remplace — et parce que
-// c'est sous ce nom-là que les mises à jour livrent l'exécutable.
+// ⚠ CE N'EST PAS LE NOM DU FICHIER : le joueur lance `MoonClient.exe` (voir
+// OUTPUT_NAME dans app/CMakeLists.txt), et la fenêtre porte le nom du serveur
+// dont elle est le client.
 inline constexpr std::string_view kWindowTitle = "Moonlight-Destiny";
 
 // LA MARQUE D'UN SERVEUR TEST, en tête du titre : on la voit jusque dans la

@@ -50,7 +50,7 @@ int Usage() {
       "Moonlight-Destiny — client Ragnarok\n"
       "\n"
       "Jouer :\n"
-      "  Moonlight-Destiny\n"
+      "  MoonClient\n"
       "\n"
       "  Le dossier du jeu est celui de l'exécutable, et le serveur celui\n"
       "  que moonclient.yml, à côté de lui, déclare en PREMIER.\n"
