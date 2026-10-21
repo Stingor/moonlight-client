@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ro/render/model_clock.h"
 #include "ro/render/terrain_renderer.h"
 
 #include "options/graphics_options.h"
@@ -31,6 +32,10 @@ namespace moonclient {
 // lumière.
 [[nodiscard]] bool SunShadowsApply(const GraphicsOptions& graphics,
                                    const ro::render::TerrainStages& stages, bool indoor);
+
+// LA POSE DU DÉCOR ANIMÉ ENTRE DEUX PAS : glissée sous l'interpolation d'images,
+// en crans entiers sinon.
+[[nodiscard]] ro::render::ModelClockBlend ModelClockBlendOf(const GraphicsOptions& graphics);
 
 // LA LUMIÈRE DE LA CARTE SUR LES CORPS : le sol éclairé `ground` quand le
 // joueur garde les ombres de carte, aucun sinon ; la lumière froide comme sur

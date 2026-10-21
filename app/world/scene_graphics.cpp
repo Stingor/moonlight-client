@@ -16,6 +16,11 @@ bool SunShadowsApply(const GraphicsOptions& graphics, const ro::render::TerrainS
   return graphics.sun_shadows() && stages.shadowmap && !stages.flat_color.has_value() && !indoor;
 }
 
+ro::render::ModelClockBlend ModelClockBlendOf(const GraphicsOptions& graphics) {
+  return graphics.frame_interpolation() ? ro::render::ModelClockBlend::kBetweenSteps
+                                        : ro::render::ModelClockBlend::kWholeSteps;
+}
+
 ActorLighting ActorLightingOf(const GraphicsOptions& graphics,
                               const ro::render::GroundLight* ground,
                               const AilmentTints* ailment_tints) {

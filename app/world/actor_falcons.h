@@ -47,6 +47,9 @@ struct FalconFrame {
   // La lumière de la carte, quand elle est allumée ; nulle sinon.
   const ro::render::GroundLight* light = nullptr;
   bool cold_light = false;
+  // L'INTERPOLATION D'IMAGES du joueur : le faucon se peint entre ses deux
+  // derniers tics. Voir `ro/render/tick_blend.h`.
+  bool blended = false;
 };
 
 class ActorFalcons {

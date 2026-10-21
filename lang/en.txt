@@ -19999,3 +19999,9 @@ tr: Elemental glow
 
 fr: La flèche en vol et l'arme d'un joueur se bordent de la couleur de l'élément de son attaque : orange pour le feu, bleu pour l'eau…\n\nSur une carte de combat entre joueurs et pendant un duel, le serveur ne dit l'élément de personne d'autre que toi.
 tr: A player's arrow in flight and weapon are edged with the color of their attack's element: orange for fire, blue for water…\n\nOn a map where players fight each other, and during a duel, the server tells no one's element but yours.
+
+fr: Interpolation d'images
+tr: Frame interpolation
+
+fr: Le jeu avance par pas de 16 ms, soit 60 fois par seconde. Sur un écran plus rapide, ce qui suit ce pas — carts, faucons, rotation des modèles 3D, décor animé — tiendrait la même place plusieurs images de suite, puis sauterait.\n\nCochée, ces éléments se peignent entre deux pas et glissent d'une position à l'autre, au prix d'au plus un pas de retard. Seul l'affichage change : le jeu garde sa cadence.
+tr: The game advances in 16 ms steps, 60 times per second. On a faster screen, whatever follows that step — carts, falcons, 3D model rotation, animated scenery — would hold the same place for several frames in a row, then jump.\n\nWhen checked, these objects are drawn between two steps and glide from one position to the next, at the cost of at most one step of delay. Only the display changes: the game keeps its pace.

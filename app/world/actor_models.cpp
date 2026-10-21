@@ -15,6 +15,7 @@
 #include "ro/core/log.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/effect_frame.h"
+#include "ro/render/tick_blend.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
@@ -125,6 +126,7 @@ const ro::render::ActorModelAnimation* ActorModels::Bound(const ro::render::Spri
 void ActorModels::Turn(Tracked& tracked, float body_degrees, std::uint32_t now_ms) {
   if (!tracked.yaw_set) {
     tracked.yaw_degrees = ro::render::InitialActorModelYaw(body_degrees);
+    tracked.previous_yaw_degrees = tracked.yaw_degrees;
     tracked.yaw_ticked_ms = now_ms;
     tracked.yaw_set = true;
     return;
@@ -134,6 +136,7 @@ void ActorModels::Turn(Tracked& tracked, float body_degrees, std::uint32_t now_m
   }
   const std::uint32_t ticks = (now_ms - tracked.yaw_ticked_ms) / kGameTickMs;
   for (std::uint32_t tick = 0; tick < std::min(ticks, kMaxCatchUpTicks); ++tick) {
+    tracked.previous_yaw_degrees = tracked.yaw_degrees;
     tracked.yaw_degrees = ro::render::TurnActorModelYaw(tracked.yaw_degrees, body_degrees);
   }
   tracked.yaw_ticked_ms += ticks * kGameTickMs;
@@ -225,7 +228,10 @@ void ActorModels::Paint(const Frame& frame, const ro::sim::Actor& actor, Tracked
   }
   ro::render::ActorModelPlacement placement;
   placement.ground_position = tracked.feet;
-  placement.yaw_degrees = tracked.yaw_degrees;
+  placement.yaw_degrees =
+      ro::render::BlendDegrees(tracked.previous_yaw_degrees, tracked.yaw_degrees,
+                               ro::render::TickBlendWeight(frame.now_ms - tracked.yaw_ticked_ms,
+                                                           kGameTickMs, frame.blended));
   placement.stance = ro::render::ActorModelStanceOf(tracked.job);
   placement.job = tracked.job;
   const ro::formats::Image* emblem =

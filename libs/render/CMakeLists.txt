@@ -128,6 +128,7 @@ add_library(ro_render STATIC
     src/map_wind.cpp
     src/monster_skill_motion.cpp
     src/model_clock.cpp
+    src/tick_blend.cpp
     src/ground_unit_pose.cpp
     src/model_bake.cpp
     src/model_mesh.cpp

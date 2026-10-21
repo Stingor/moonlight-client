@@ -49,6 +49,7 @@ enum class GraphicsRow : int {
   kMsaa,
   kRenderScale,
   kDecorFilter,
+  kFrameInterpolation,
   kPostFx,
   kPreset,
   kBrightness,
@@ -157,6 +158,10 @@ class GraphicsOptions {
   // Le filtrage des textures du décor 3D. Le sol n'en reçoit jamais : voir
   // la fiche 0008.
   [[nodiscard]] ro::render::ModelTextureFilter decor_filter() const;
+  // L'INTERPOLATION D'IMAGES : ce qui avance par tics de seize millisecondes se
+  // peint entre deux tics, au lieu de sauter de l'un à l'autre. Voir
+  // `ro/render/tick_blend.h`. Allumée par défaut ; seul le dessin en dépend.
+  [[nodiscard]] bool frame_interpolation() const noexcept { return frame_interpolation_; }
 
   // Déclare les clés au fichier. ⚠ LA VALEUR DU MEMBRE EST LE DÉFAUT : il n'y
   // en a pas d'autre source.
@@ -202,6 +207,7 @@ class GraphicsOptions {
   int msaa_samples_ = 0;
   int render_scale_percent_ = 100;
   int decor_filter_rank_ = 0;
+  bool frame_interpolation_ = true;
   ro::render::PostFxSettings post_fx_;
   std::vector<ro::ui::OptionRowView> rows_;
   // Les listes déroulantes. ⚠ REFAITES À CHAQUE COMPOSITION : un libellé doit

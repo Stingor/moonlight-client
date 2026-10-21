@@ -33,8 +33,6 @@
 namespace moonclient {
 namespace {
 
-constexpr int kMillisecondsPerSecond = 1000;
-
 // OÙ L'INTERFACE RETIENT SES FENÊTRES : dans `savedata\` du dossier du jeu,
 // avec les autres réglages du joueur — voir `save_folder.h`. Un lancement
 // d'essai, qui a son propre dossier, a donc aussi son propre fichier.
@@ -258,24 +256,22 @@ void ClientShell::KeepAlive() const {
   SDL_PumpEvents();
 }
 
-void ClientShell::WaitForFrameLimit(std::uint32_t frame_started_ms) {
-  const int limit = settings_->options().frame_limit();
-  if (limit <= 0) {
+void ClientShell::WaitForFrameLimit() {
+  // ⚠ L'ÉCHÉANCE EST CELLE DE LA CADENCE, pas une durée comptée depuis la
+  // présentation : compter après coup ajouterait le temps de dessin au temps
+  // d'attente, et le plafond serait toujours manqué. Voir `FramePacer`.
+  const std::optional<std::uint64_t> next_start_ns =
+      frame_pacer_.NextFrameStartNs(SDL_GetTicksNS(), settings_->options().frame_limit());
+  if (!next_start_ns.has_value()) {
     return;
   }
-  // ⚠ ON MESURE DEPUIS LE DÉBUT DE L'IMAGE, pas depuis la présentation : ce
-  // qu'on plafonne est la CADENCE, et compter après coup ajouterait le temps de
-  // dessin au temps d'attente — le plafond serait alors toujours manqué.
-  const auto wanted_ms = static_cast<std::uint32_t>(kMillisecondsPerSecond / limit);
-  const auto spent_ms = static_cast<std::uint32_t>(SDL_GetTicks()) - frame_started_ms;
-  if (spent_ms >= wanted_ms) {
-    return;
+  // 🔴 UNE ATTENTE PRÉCISE : le système rend la main à la milliseconde au
+  // mieux, et 144 images tiennent en 6,94 ms. SDL dort pour le gros de
+  // l'attente et ne tourne activement que sur sa toute fin.
+  const std::uint64_t now_ns = SDL_GetTicksNS();
+  if (*next_start_ns > now_ns) {
+    SDL_DelayPrecise(*next_start_ns - now_ns);
   }
-  // 🔴 CE SOMMEIL N'EST PAS PRÉCIS, et c'est acceptable : le système rend la
-  // main à la milliseconde près au mieux. Un plafond tenu à une image près
-  // demanderait une attente active, qui brûlerait le cœur qu'on cherche
-  // justement à laisser tranquille.
-  SDL_Delay(wanted_ms - spent_ms);
 }
 
 ro::core::Result<void> ClientShell::Run(Screen& screen) {
@@ -289,7 +285,7 @@ ro::core::Result<void> ClientShell::Run(Screen& screen) {
       return ok;
     }
     gl_->SwapBuffers();
-    WaitForFrameLimit(now_ms);
+    WaitForFrameLimit();
   }
   // ⚠ CE QUI ATTENDAIT S'ÉCRIT MAINTENANT. Le délai d'anti-rebond n'a plus le
   // temps d'expirer : un réglage posé juste avant de quitter serait perdu.

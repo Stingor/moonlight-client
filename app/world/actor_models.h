@@ -60,6 +60,9 @@ class ActorModels {
     const ro::sim::GuildBook* guild = nullptr;
     EmblemPlates* plates = nullptr;
     std::uint32_t now_ms = 0;
+    // L'INTERPOLATION D'IMAGES du joueur : l'orientation se peint entre ses deux
+    // derniers tics. Voir `ro/render/tick_blend.h`.
+    bool blended = false;
   };
 
   // Compose les acteurs en modèle de cette image. Chacun rejoint `scene` —
@@ -104,6 +107,9 @@ class ActorModels {
     // L'angle du corps imposé par une attaque, tant qu'elle dure.
     std::optional<float> attack_body_degrees;
     float yaw_degrees = 0.0F;
+    // L'orientation avant le dernier tic : l'image se peint entre elle et
+    // `yaw_degrees`.
+    float previous_yaw_degrees = 0.0F;
     std::uint32_t yaw_ticked_ms = 0;
     bool yaw_set = false;
     glm::vec3 feet{0.0F};

@@ -53,6 +53,14 @@ constexpr std::int32_t kNoiseCenter = 2;
 constexpr float kNoiseDivisor = 10.0F;
 constexpr float kPitchNoiseDivisor = 15.0F;
 
+// LES INVERSIONS DU TREMBLEMENT PAR SECONDE : une par image d'un écran à
+// soixante hertz, la cadence sur laquelle le client l'a réglée.
+constexpr std::uint64_t kShakeFlipsPerSecond = 60;
+constexpr std::uint64_t kMillisecondsPerSecond = 1000;
+
+// La part d'or de 2³² : deux phases voisines en tirent des graines éloignées.
+constexpr std::uint32_t kPhaseSpread = 0x9E3779B9U;
+
 // Quand la secousse que cet effet demande COMMENCE et FINIT, en tics depuis
 // son départ. Rien s'il n'en demande aucune.
 //
@@ -135,12 +143,19 @@ void ScreenShake::Apply(ro::render::Camera& camera, const ro::sim::World& world,
   if (!Requested(world, now_ms) && now_ms >= requested_until_ms_) {
     return;
   }
-  // Un mélange bon marché : on ne lui demande que de ne pas se répéter.
-  const auto draw = [this](float divisor) {
-    seed_ ^= seed_ << 13U;
-    seed_ ^= seed_ >> 17U;
-    seed_ ^= seed_ << 5U;
-    return static_cast<float>(static_cast<std::int32_t>(seed_ % kNoiseValues) - kNoiseCenter) /
+  // LA PHASE DU TREMBLEMENT : le signe et le bruit ne dépendent que d'elle.
+  const std::uint64_t phase =
+      static_cast<std::uint64_t>(now_ms) * kShakeFlipsPerSecond / kMillisecondsPerSecond;
+  const float sign = phase % 2 == 0 ? 1.0F : -1.0F;
+  // Un mélange bon marché : on ne lui demande que de ne pas se répéter. Jamais
+  // nulle, la graine : le mélange resterait à zéro.
+  std::uint32_t seed = (static_cast<std::uint32_t>(phase) + 1U) * kPhaseSpread;
+  seed = seed == 0U ? 1U : seed;
+  const auto draw = [&seed](float divisor) {
+    seed ^= seed << 13U;
+    seed ^= seed >> 17U;
+    seed ^= seed << 5U;
+    return static_cast<float>(static_cast<std::int32_t>(seed % kNoiseValues) - kNoiseCenter) /
            divisor;
   };
   // 🔴 LE POINT VISÉ BOUGE LE LONG DE `(cos, 0, −sin)` DE LA LONGITUDE DU CLIENT,
@@ -151,17 +166,16 @@ void ScreenShake::Apply(ro::render::Camera& camera, const ro::sim::World& world,
   // cet ordre ; son élévation monte quand notre inclinaison descend.
   const float longitude =
       ro::render::NativeTableRadians(static_cast<std::int32_t>(-camera.yaw_degrees));
-  const float le_long_x = sign_ * (kLookAtUnits + draw(kNoiseDivisor));
-  const float le_long_z = sign_ * (kLookAtUnits + draw(kNoiseDivisor));
+  const float le_long_x = sign * (kLookAtUnits + draw(kNoiseDivisor));
+  const float le_long_z = sign * (kLookAtUnits + draw(kNoiseDivisor));
   look_at_offset_ = ro::render::EffectClientOffsetInWorld(std::cos(longitude) * le_long_x, 0.0F,
                                                           -std::sin(longitude) * le_long_z);
-  distance_offset_ = sign_ * (kDistanceUnits + draw(kNoiseDivisor));
-  pitch_offset_ = -sign_ * (kPitchDegrees + draw(kPitchNoiseDivisor));
+  distance_offset_ = sign * (kDistanceUnits + draw(kNoiseDivisor));
+  pitch_offset_ = -sign * (kPitchDegrees + draw(kPitchNoiseDivisor));
   camera.look_at += look_at_offset_;
   camera.distance += distance_offset_;
   camera.pitch_degrees = std::clamp(camera.pitch_degrees + pitch_offset_,
                                     -ro::render::kMaxPitchDegrees, ro::render::kMaxPitchDegrees);
-  sign_ = -sign_;
 }
 
 void AimCamera(ro::render::Camera& camera, const MapStage& stage, const ro::sim::World& world,

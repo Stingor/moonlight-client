@@ -72,6 +72,9 @@ inline constexpr std::uint8_t kCartOpaqueAlpha = 255;
 // Une charrette, telle que le jeu la fait vivre tic après tic.
 struct Cart {
   FalconPoint position;
+  // LA POSITION AU TIC PRÉCÉDENT : l'image se peint entre elle et `position`.
+  // Voir `tick_blend.h`.
+  FalconPoint previous_position;
   // LE CAP, en degrés du client : vers le maître, recalculé à chaque tic.
   float heading_degrees = 0.0F;
   // Le cap que l'action MONTRE : celui du tic PRÉCÉDENT, comme le faucon.
@@ -99,6 +102,11 @@ void StepCart(Cart& cart, const FalconMaster& master, const FalconGround& ground
 
 // L'action que la charrette montre : la direction d'écran de son cap précédent.
 [[nodiscard]] std::size_t CartAction(const Cart& cart, float camera_yaw_degrees) noexcept;
+
+// Où la charrette se peint, au poids du tic courant : voir `TickBlendWeight`.
+// ⚠ SEULE LA POSITION GLISSE : l'action reste celle du tic, une direction
+// d'écran parmi huit n'ayant pas d'entre-deux.
+[[nodiscard]] FalconPoint CartDrawnPosition(const Cart& cart, float weight) noexcept;
 
 // ── LE BOUTON DE LA LISTE DES CHARRETTES ───────────────────────────────────
 

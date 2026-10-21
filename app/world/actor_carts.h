@@ -53,6 +53,9 @@ struct CartFrame {
   // L'OMBRE RONDE sous chaque charrette. Sous le soleil, sa silhouette en porte
   // une, et la ronde se tait.
   bool round_shadow = true;
+  // L'INTERPOLATION D'IMAGES du joueur : la charrette se peint entre ses deux
+  // derniers tics. Voir `ro/render/tick_blend.h`.
+  bool blended = false;
 };
 
 class ActorCarts {

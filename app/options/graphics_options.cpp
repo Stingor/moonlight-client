@@ -45,6 +45,7 @@ constexpr std::uint32_t kLongestSkillGestureFloorMs = 1000;
 constexpr const char* kMsaaKey = "render_msaa";
 constexpr const char* kRenderScaleKey = "render_scale";
 constexpr const char* kDecorFilterKey = "render_filtering_scenery";
+constexpr const char* kFrameInterpolationKey = "render_frame_interpolation";
 constexpr const char* kPostFxKey = "post_fx_active";
 constexpr const char* kBrightnessKey = "post_fx_brightness";
 constexpr const char* kContrastKey = "post_fx_contrast";
@@ -194,6 +195,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
     into.Declare(kDecorFilterKey, &decor_filter_rank_);
     into.Declare(kSunShadowsKey, &sun_shadows_);
   }
+  into.Declare(kFrameInterpolationKey, &frame_interpolation_);
   into.Declare(kPostFxKey, &post_fx_.enabled);
   into.Declare(kBrightnessKey, &post_fx_.brightness);
   into.Declare(kContrastKey, &post_fx_.contrast);
@@ -392,6 +394,15 @@ void GraphicsOptions::Compose() {
          "jamais : ses planches de motifs en sortiraient en damier."),
       decor_names_,
       std::clamp(decor_filter_rank_, 0, static_cast<int>(kDecorAnisotropy.size()) - 1)));
+  rows_.push_back(
+      Toggle(GraphicsRow::kFrameInterpolation, Tr("Interpolation d'images"),
+             Tr("Le jeu avance par pas de 16 ms, soit 60 fois par seconde. Sur un écran plus "
+                "rapide, ce qui suit ce pas — carts, faucons, rotation des modèles 3D, décor "
+                "animé — tiendrait la même place plusieurs images de suite, puis sauterait.\n\n"
+                "Cochée, ces éléments se peignent entre deux pas et glissent d'une position à "
+                "l'autre, au prix d'au plus un pas de retard. Seul l'affichage change : le jeu "
+                "garde sa cadence."),
+             nullptr, frame_interpolation_));
 
   ComposePostFx();
 }
@@ -531,6 +542,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
     case GraphicsRow::kDecorFilter:
       decor_filter_rank_ =
           std::clamp(asked.chosen, 0, static_cast<int>(kDecorAnisotropy.size()) - 1);
+      break;
+    case GraphicsRow::kFrameInterpolation:
+      frame_interpolation_ = asked.on;
       break;
     case GraphicsRow::kPostFx:
       post_fx_.enabled = asked.on;

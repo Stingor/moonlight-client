@@ -1,6 +1,7 @@
 #include "ro/render/model_clock.h"
 
 #include "ro/render/model_pose.h"
+#include "ro/render/tick_blend.h"
 
 namespace ro::render {
 namespace {
@@ -24,6 +25,15 @@ float NextFrame(const ModelRig& rig, const ModelPlaybackGroup& playback, float f
   return SecondFamilyFrameAt(played.played_ms, rig.frame_rate);
 }
 
+// L'image où prendre la pose : entre celle du pas précédent et celle du pas
+// courant, sauf quand la boucle vient de repartir.
+float ShownBetween(float previous_frame, float frame, float weight) {
+  if (frame < previous_frame) {
+    return frame;
+  }
+  return BlendScalar(previous_frame, frame, weight);
+}
+
 }  // namespace
 
 void ModelClock::Start(const std::vector<ModelInstances>& models, std::uint32_t now_ms) {
@@ -45,32 +55,44 @@ void ModelClock::Start(const std::vector<ModelInstances>& models, std::uint32_t 
   started_ = true;
 }
 
-void ModelClock::Advance(const std::vector<ModelInstances>& models, std::uint32_t now_ms) {
+void ModelClock::Advance(const std::vector<ModelInstances>& models, std::uint32_t now_ms,
+                         ModelClockBlend blend) {
   if (!started_ || models.size() != groups_.size()) {
     return;
   }
+  const bool blended = blend == ModelClockBlend::kBetweenSteps;
   // Soustraction non signée : l'horloge du système peut repasser par zéro.
-  const std::uint64_t steps = (now_ms - origin_ms_) / kModelStepMs;
-  if (steps <= steps_seen_) {
+  const std::uint32_t since_origin_ms = now_ms - origin_ms_;
+  const std::uint64_t steps = since_origin_ms / kModelStepMs;
+  const bool stepped = steps > steps_seen_;
+  if (!stepped && !blended && !blend_shown_) {
     return;
   }
-  steps_seen_ = steps;
+  if (stepped) {
+    steps_seen_ = steps;
+  }
+  const float weight = TickBlendWeight(since_origin_ms % kModelStepMs, kModelStepMs, blended);
   for (std::size_t model = 0; model < models.size(); ++model) {
     const ModelInstances& instances = models[model];
     std::vector<Group>& groups = groups_[model];
     for (std::size_t index = 0; index < groups.size() && index < instances.animated.size();
          ++index) {
       Group& group = groups[index];
-      const float next =
-          NextFrame(instances.rig, instances.animated[index], group.frame, group.start_ms, now_ms);
-      if (next == group.frame) {
+      if (stepped) {
+        group.previous_frame = group.frame;
+        group.frame = NextFrame(instances.rig, instances.animated[index], group.frame,
+                                group.start_ms, now_ms);
+      }
+      const float shown = ShownBetween(group.previous_frame, group.frame, weight);
+      if (shown == group.shown_frame) {
         continue;
       }
-      group.frame = next;
-      group.pose = PoseRig(instances.rig, next);
-      group.texture_motions = RigTextureMotions(instances.rig, next);
+      group.shown_frame = shown;
+      group.pose = PoseRig(instances.rig, shown);
+      group.texture_motions = RigTextureMotions(instances.rig, shown);
     }
   }
+  blend_shown_ = blended;
 }
 
 void ModelClock::Hold(const std::vector<ModelInstances>& models, std::size_t model_index,
@@ -91,6 +113,8 @@ void ModelClock::Hold(const std::vector<ModelInstances>& models, std::size_t mod
   }
   const ModelRig& rig = models[model_index].rig;
   group.frame = frame;
+  group.previous_frame = frame;
+  group.shown_frame = frame;
   group.pose = PoseRig(rig, frame);
   group.texture_motions = RigTextureMotions(rig, frame);
 }
@@ -105,6 +129,11 @@ const ModelClock::Group* ModelClock::Find(std::size_t model_index, std::size_t g
 float ModelClock::Frame(std::size_t model_index, std::size_t group_index) const {
   const Group* group = Find(model_index, group_index);
   return group != nullptr ? group->frame : 0.0F;
+}
+
+float ModelClock::ShownFrame(std::size_t model_index, std::size_t group_index) const {
+  const Group* group = Find(model_index, group_index);
+  return group != nullptr ? group->shown_frame : 0.0F;
 }
 
 std::span<const glm::mat4> ModelClock::Pose(std::size_t model_index,

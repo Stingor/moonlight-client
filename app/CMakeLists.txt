@@ -210,6 +210,7 @@ target_include_directories(moonclient_titles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # chaines et des nombres, donc un essai les atteint sans monter tout le jeu.
 add_library(moonclient_display STATIC
     options/display_options.cpp
+    options/frame_pacer.cpp
     options/screen_choice.cpp)
 
 target_link_libraries(moonclient_display

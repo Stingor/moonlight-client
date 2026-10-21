@@ -96,14 +96,15 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // LE LECTEUR DE MUSIQUE, même muet : un choix fait son coupé se retient.
   pieces_.music_player.Advance(windows_.music_player, music_, audio_, stage_->name);
 
+  const GraphicsOptions& graphics = settings_->options().graphics();
   // LE SOL UNI, quand l'établi ou GreyWorld le demandent : voir `FlatGroundOf`.
   const ro::render::GreyWorldLook& grey_world = settings_->options().pages().grey_world.look();
-  ro::render::TerrainStages stages = TerrainStagesOf(
-      settings_->options().graphics(), ro::render::GreyWorldHidesLightmap(grey_world));
+  ro::render::TerrainStages stages =
+      TerrainStagesOf(graphics, ro::render::GreyWorldHidesLightmap(grey_world));
   stages.flat_color =
       FlatGroundOf(windows_.staff_tools.look.flat_ground, Rights().staff_tools, grey_world);
   // LE BROUILLARD, pour tout ce que le client peint dessous — voir `SceneFog`.
-  const bool fog_shown = settings_->options().graphics().fog();
+  const bool fog_shown = graphics.fog();
   const ro::render::SceneFog fog = FogOf(*stage_, fog_shown);
   // LES MODÈLES ANIMÉS partent de l'image zéro à la première image de la carte,
   // comme chez le natif qui les pose à leur chargement. Posés AVANT l'ombre du
@@ -111,7 +112,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   if (!model_clock_.started()) {
     model_clock_.Start(stage_->scene.models, now_ms);
   }
-  model_clock_.Advance(stage_->scene.models, now_ms);
+  model_clock_.Advance(stage_->scene.models, now_ms, ModelClockBlendOf(graphics));
   const bool models_shown = !ro::render::GreyWorldHidesModels(grey_world);
   // Les unités posées au sol : ce sont des modèles, et elles ne se téléversent
   // que lorsque l'ensemble posé a bougé. Leur horloge à elles les tient figées
@@ -131,35 +132,33 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   ComposeActors(now_ms, pick_tuning, sun_asked);
   // LA LUMIÈRE DE LA CARTE SOUS LES CHARRETTES ET LES FAUCONS : la même que sous
   // les corps, sans l'ombre cuite quand celle du soleil la remplace.
-  const ro::render::GroundLight* actor_ground = !settings_->options().graphics().lightmaps()
-                                                    ? nullptr
-                                                : sun_asked ? &stage_->ground_laid_light
-                                                            : &stage_->ground_light;
+  const ro::render::GroundLight* actor_ground = !graphics.lightmaps() ? nullptr
+                                                : sun_asked           ? &stage_->ground_laid_light
+                                                                      : &stage_->ground_light;
   // LES CHARRETTES AVANCENT ICI, une fois par image : leur silhouette entre dans
   // l'ombre du soleil, avant qu'elles ne se peignent avec les corps.
   std::span<const ro::render::DrawnActor> carts;
   if (link_.is_open() && pieces_.wardrobe.has_value()) {
-    const GraphicsOptions& graphics = settings_->options().graphics();
     carts = pieces_.carts.Update(CartFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees,
                                            now_ms, graphics.summon_translucent(), actor_ground,
-                                           graphics.cold_light(), !sun_asked});
+                                           graphics.cold_light(), !sun_asked,
+                                           graphics.frame_interpolation()});
   }
   // LES FAUCONS AUSSI, avant les ombres : leur silhouette en porte une, comme
   // celle d'une charrette. Ils se peignent plus bas, après les corps.
   std::span<const ro::render::DrawnActor> falcons;
   if (link_.is_open()) {
-    const GraphicsOptions& graphics = settings_->options().graphics();
-    falcons = pieces_.falcons.Update(
-        FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
-                    graphics.summon_translucent(), actor_ground, graphics.cold_light()});
+    falcons =
+        pieces_.falcons.Update(FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees,
+                                           now_ms, graphics.summon_translucent(), actor_ground,
+                                           graphics.cold_light(), graphics.frame_interpolation()});
   }
   // LES SPRITES DE DÉCOR du document d'édition : peints avec les corps, ombrés
   // comme eux, et portant ombre comme une charrette.
-  pieces_.map_sprites.Update(
-      MapSpriteFrame{&map_edits_.Document(stage_->name),
-                     pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-                     &stage_->scene.gnd, camera_.yaw_degrees, now_ms, actor_ground,
-                     settings_->options().graphics().cold_light(), !sun_asked});
+  pieces_.map_sprites.Update(MapSpriteFrame{
+      &map_edits_.Document(stage_->name),
+      pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, &stage_->scene.gnd,
+      camera_.yaw_degrees, now_ms, actor_ground, graphics.cold_light(), !sun_asked});
   // LES COMPAGNONS QUI PORTENT OMBRE, réunis en un lot, les projectiles en vol compris.
   const ProjectileCasters& projectiles = effect_nodes_->projectile_casters();
   const std::vector<ro::render::DrawnActor> companions =
@@ -180,7 +179,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   const std::span<const ro::render::PointLight> carried = actor_lights_.Gather(
       scene_actors_.light_bearers,
       pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().tables : nullptr,
-      settings_->options().graphics().effect_lights(), static_cast<double>(now_ms));
+      graphics.effect_lights(), static_cast<double>(now_ms));
   const ro::render::PointLightSet points = DrawPointShadowsIfAsked(
       ro::render::WithActorLights(
           ro::render::WithEffectLights(
@@ -196,8 +195,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       models_shown, companions);
   terrain_.Draw(camera_, sky.light, aspect_ratio_, ClearColorOf(*stage_, background_, fog_shown),
                 stages, fog, sun, points);
-  models_.SetTextureFilter(settings_->options().graphics().decor_filter());
-  ground_unit_models_.SetTextureFilter(settings_->options().graphics().decor_filter());
+  models_.SetTextureFilter(graphics.decor_filter());
+  ground_unit_models_.SetTextureFilter(graphics.decor_filter());
   // LES FACES À TEXTURE MÊLÉE attendent la passe translucide, plus bas.
   if (models_shown) {
     models_.Draw(camera_, sky.light, aspect_ratio_, ro::render::ModelStages{.blended_apart = true},
@@ -660,7 +659,7 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
   if (!pieces_.wardrobe.has_value()) {
     return;
   }
-  const auto elapsed_ms = static_cast<float>(SDL_GetTicks() - start_ticks_);
+  const auto elapsed_ms = static_cast<float>(now_ms - static_cast<std::uint32_t>(start_ticks_));
   scene_actors_.Clear();
   scene_actors_.ground_units = ground_units_->picks();
   if (link_.is_open()) {
@@ -681,7 +680,7 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
           ActorModels::Frame{&pieces_.wardrobe->catalog(), &*pieces_.wardrobe, &world_, &planner_,
                              &*stage_, &camera_, &guild_book_,
                              guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
-                             now_ms},
+                             now_ms, settings_->options().graphics().frame_interpolation()},
           scene_actors_, census);
       if (effects_.has_value()) {
         for (const ro::render::ActorModelMeshEvent& event : pieces_.actor_models->mesh_events()) {

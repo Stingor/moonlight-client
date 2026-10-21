@@ -52,6 +52,12 @@ class ScreenShake {
   }
 
   // Secoue la caméra si un effet en cours le demande, et ne fait rien sinon.
+  //
+  // 🔴 LE TREMBLEMENT SE CADENCE AU TEMPS, et non aux images : son signe
+  // s'inverse et son bruit se retire soixante fois par seconde, quelle que soit
+  // la cadence de l'écran. Un même instant donne la même secousse à 60, 144 ou
+  // 240 images par seconde — c'est ce qui fait vibrer plutôt que dériver, sans
+  // qu'un écran rapide ne la change en bourdonnement.
   void Apply(ro::render::Camera& camera, const ro::sim::World& world, std::uint32_t now_ms);
 
   // LES TREMBLEMENTS PERMIS, que `/quake` bascule. Faux : `Apply` ne pose
@@ -63,11 +69,6 @@ class ScreenShake {
   glm::vec3 look_at_offset_{0.0F, 0.0F, 0.0F};
   float distance_offset_ = 0.0F;
   float pitch_offset_ = 0.0F;
-  // Le signe du tremblement, qui s'inverse à chaque image : c'est ce qui fait
-  // vibrer plutôt que dériver.
-  float sign_ = 1.0F;
-  // De quoi tirer un nombre sans rien partager avec le reste du programme.
-  std::uint32_t seed_ = 1U;
   std::uint32_t requested_until_ms_ = 0;
 };
 

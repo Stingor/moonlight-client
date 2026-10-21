@@ -113,6 +113,9 @@ inline constexpr std::uint8_t kFalconOpaqueAlpha = 255;
 // Un faucon, tel que le jeu le fait vivre tic après tic.
 struct Falcon {
   FalconPoint position;
+  // LA POSITION AU TIC PRÉCÉDENT : l'image se peint entre elle et `position`.
+  // Voir `tick_blend.h`.
+  FalconPoint previous_position;
   // LE CAP, en degrés du client : zéro vers la profondeur croissante de son
   // repère, quatre-vingt-dix vers l'abscisse croissante.
   float heading_degrees = 0.0F;
@@ -165,6 +168,14 @@ void LaunchFalcon(Falcon& falcon, const FalconPoint& target) noexcept;
 // faucon MONTRE, et celle-ci dépend de la vue.
 void StepFalcon(Falcon& falcon, const FalconMaster& master, const FalconGround& ground,
                 const FalconFrameCount& frame_count, float camera_yaw_degrees);
+
+// Un point entre ses états de deux tics, au poids du tic courant : voir
+// `TickBlendWeight`. Au poids un, `current` tel quel.
+[[nodiscard]] FalconPoint BlendFalconPoints(const FalconPoint& previous, const FalconPoint& current,
+                                            float weight) noexcept;
+
+// Où le faucon se peint, au poids du tic courant.
+[[nodiscard]] FalconPoint FalconDrawnPosition(const Falcon& falcon, float weight) noexcept;
 
 // Le cap, en degrés du client, d'un point vers un autre sur le plan (x, z).
 // Rend `unchanged` quand les deux points coïncident.

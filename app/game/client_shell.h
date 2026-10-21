@@ -21,6 +21,7 @@
 #include "game/ui_stage.h"
 #include "game/zone_stream_capture.h"
 #include "loading/loading_screens.h"
+#include "options/frame_pacer.h"
 #include "world/map_music.h"
 
 namespace moonclient {
@@ -228,11 +229,11 @@ class ClientShell {
   void EnsureBackdropPieces(ro::core::LoadProgress* progress = nullptr);
 
  private:
-  // Attend, s'il le faut, que l'image ait duré ce que le plafond demande.
+  // Attend, s'il le faut, l'échéance de l'image suivante sous le plafond.
   //
   // ⚠ RIEN TANT QU'IL N'Y EN A PAS : sans plafond le jeu dessine aussi vite
   // qu'il peut, et c'est la synchronisation verticale qui le retient d'ordinaire.
-  void WaitForFrameLimit(std::uint32_t frame_started_ms);
+  void WaitForFrameLimit();
 
   // Journalise le temps de l'étape qui s'achève, puis sert la file.
   void ReportStage(const char* what);
@@ -272,6 +273,8 @@ class ClientShell {
 
   int width_ = 0;
   int height_ = 0;
+  // Les échéances du plafond d'images. Voir `WaitForFrameLimit`.
+  FramePacer frame_pacer_;
 };
 
 }  // namespace moonclient

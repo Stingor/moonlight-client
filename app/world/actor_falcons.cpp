@@ -7,6 +7,7 @@
 #include "ro/render/ground_skill_visual.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/render/tick_blend.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
@@ -193,11 +194,18 @@ std::span<const ro::render::DrawnActor> ActorFalcons::Update(const FalconFrame& 
   const auto tick_ms = static_cast<std::uint32_t>(ro::render::kEffectTickMs);
   if (!last_tick_ms_.has_value() || frame.now_ms - *last_tick_ms_ > kMostTicksPerFrame * tick_ms) {
     last_tick_ms_ = frame.now_ms;
+    // LE TEMPS NE SE RATTRAPE PAS : la position d'avant le saut ne vaut plus
+    // rien, et l'image se peindrait encore à mi-chemin d'elle.
+    for (auto& [id, kept] : falcons_) {
+      kept.falcon.previous_position = kept.falcon.position;
+    }
   }
   while (frame.now_ms - *last_tick_ms_ >= tick_ms) {
     *last_tick_ms_ += tick_ms;
     Tick(frame, *last_tick_ms_);
   }
+  const float weight =
+      ro::render::TickBlendWeight(frame.now_ms - *last_tick_ms_, tick_ms, frame.blended);
 
   const std::uint8_t alpha =
       frame.translucent ? ro::render::kFalconTranslucentAlpha : ro::render::kFalconOpaqueAlpha;
@@ -221,7 +229,7 @@ std::span<const ro::render::DrawnActor> ActorFalcons::Update(const FalconFrame& 
     if (kept.frame.quads.empty()) {
       continue;
     }
-    const glm::vec3 placed = OurPoint(kept.falcon.position);
+    const glm::vec3 placed = OurPoint(ro::render::FalconDrawnPosition(kept.falcon, weight));
     std::array<std::uint8_t, 4> tint = {255, 255, 255, alpha};
     if (frame.light != nullptr) {
       const std::array<float, 2> cell =

@@ -7,6 +7,7 @@
 
 #include "ro/render/shown_job.h"
 #include "ro/render/sprite_frame.h"
+#include "ro/render/tick_blend.h"
 
 namespace ro::render {
 namespace {
@@ -201,6 +202,7 @@ Falcon BornFalcon(const FalconMaster& master) noexcept {
   falcon.position.x = master.feet.x - kFalconBirthBehindUnits * std::sin(heading_radians);
   falcon.position.y = master.feet.y - kFalconBirthRiseUnits;
   falcon.position.z = master.feet.z + kFalconBirthBehindUnits * std::cos(heading_radians);
+  falcon.previous_position = falcon.position;
   return falcon;
 }
 
@@ -218,6 +220,7 @@ bool SkillHitSendsFalcon(std::uint32_t skill_id) noexcept {
 
 void StepFalcon(Falcon& falcon, const FalconMaster& master, const FalconGround& ground,
                 const FalconFrameCount& frame_count, float camera_yaw_degrees) {
+  falcon.previous_position = falcon.position;
   // LA FIN DU VOL se décide avant tout le reste, et ce tic-là ne fait rien
   // d'autre : la poursuite reprend au suivant.
   if (falcon.climbing && falcon.counter_ticks > kFalconFlightLastTick && falcon.flying) {
@@ -231,6 +234,17 @@ void StepFalcon(Falcon& falcon, const FalconMaster& master, const FalconGround& 
   }
   Pursue(falcon, master, ground);
   Flap(falcon, frame_count(FalconAction(falcon, camera_yaw_degrees)));
+}
+
+FalconPoint BlendFalconPoints(const FalconPoint& previous, const FalconPoint& current,
+                              float weight) noexcept {
+  return FalconPoint{BlendScalar(previous.x, current.x, weight),
+                     BlendScalar(previous.y, current.y, weight),
+                     BlendScalar(previous.z, current.z, weight)};
+}
+
+FalconPoint FalconDrawnPosition(const Falcon& falcon, float weight) noexcept {
+  return BlendFalconPoints(falcon.previous_position, falcon.position, weight);
 }
 
 float FalconHeadingToward(const FalconPoint& from, float to_x, float to_z,

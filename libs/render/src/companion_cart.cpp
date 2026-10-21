@@ -194,6 +194,7 @@ Cart BornCart(const FalconMaster& master) noexcept {
   cart.position.x = master.feet.x - kCartBirthBehindUnits * std::sin(heading_radians);
   cart.position.y = master.feet.y;
   cart.position.z = master.feet.z + kCartBirthBehindUnits * std::cos(heading_radians);
+  cart.previous_position = cart.position;
   return cart;
 }
 
@@ -205,6 +206,7 @@ float CartFrameDelay(const formats::ActAnimation& animation) noexcept {
 
 void StepCart(Cart& cart, const FalconMaster& master, const FalconGround& ground,
               const CartFrameCount& frame_count, float frame_delay, float camera_yaw_degrees) {
+  cart.previous_position = cart.position;
   const float distance = DistanceXz(cart.position, master.feet);
   // L'ACTION SE CHOISIT AVANT QUE LA CHARRETTE NE SE RETOURNE : elle montre le
   // cap du tic précédent.
@@ -232,6 +234,10 @@ void StepCart(Cart& cart, const FalconMaster& master, const FalconGround& ground
 
 std::size_t CartAction(const Cart& cart, float camera_yaw_degrees) noexcept {
   return FalconScreenDirection(cart.shown_heading_degrees, camera_yaw_degrees);
+}
+
+FalconPoint CartDrawnPosition(const Cart& cart, float weight) noexcept {
+  return BlendFalconPoints(cart.previous_position, cart.position, weight);
 }
 
 std::optional<ButtonLayerCorner> CartButtonLayerCorner(const formats::ActLayer& layer,

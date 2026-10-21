@@ -132,7 +132,7 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   if (!model_clock_.started()) {
     model_clock_.Start(stage_->scene.models, elapsed_ms);
   }
-  model_clock_.Advance(stage_->scene.models, elapsed_ms);
+  model_clock_.Advance(stage_->scene.models, elapsed_ms, ModelClockBlendOf(graphics));
 
   actors_.Clear();
   // 🔴 PERSONNE NE SE PEINT SUR UNE AUTRE VILLE QUE LA SIENNE : voir l'en-tête.
