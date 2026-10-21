@@ -287,7 +287,7 @@ class SpriteRenderer {
             const PointLightSet& points = PointLightSet());
 
   // LES SILHOUETTES DANS LA CARTE D'OMBRE : la seule profondeur des calques
-  // opaques, sur un panneau debout face au soleil — voir
+  // opaques, sur un panneau debout parallèle à l'écran — voir
   // `ShadowPanelBasis`. Ni ombre ronde, ni calque additif. `camera` ne sert qu'aux
   // élargissements comptés en pixels d'écran.
   void DrawDepth(const glm::mat4& light_view_projection, const glm::vec3& toward_sun,
