@@ -308,6 +308,7 @@ class UiStage {
     StatusPortraitRound status_portrait;
     StatusWindowRound status;
     StatPresetRound stat_presets;
+    BasicInfoRound basic_info;
     // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, même aller-retour : sa vue descend
     // d'`app` à l'ouverture, sa réponse remonte à l'image suivante.
     struct EntityMenu {
@@ -344,8 +345,7 @@ class UiStage {
       ro::ui::MenuIconsState state;
       std::vector<ro::ui::MenuIconView> icons;
       std::optional<ro::ui::MenuCommand> clicked;
-      // La place de chaque icône, tenue par les réglages. Nulle, rien ne se
-      // dessine.
+      // La place de chaque icône, tenue par les réglages. Nulle, rien ne se dessine.
       ro::ui::MenuIconsLook* look = nullptr;
     };
     MenuIcons menu_icons;

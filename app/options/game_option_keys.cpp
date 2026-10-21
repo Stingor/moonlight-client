@@ -104,6 +104,7 @@ constexpr const char* kCharacterAvatarGifScaleKey = "sheet_avatar_gif_scale";
 // barres de raccourcis, et deux familles au même préfixe se mêleraient dans un
 // fichier qu'on relit à la main.
 constexpr const char* kStatBarsShownKey = "gauges_shown";
+constexpr const char* kBasicInfoWindowShownKey = "basic_info_window_shown";
 constexpr const char* kStatBarsLockedKey = "gauges_locked";
 constexpr const char* kStatBarsStickyKey = "gauges_snapped";
 constexpr const char* kStatBarsCenterMarkKey = "gauges_marker_center";
@@ -441,6 +442,7 @@ void GameOptions::DeclareEntityNames(SettingsFile& into) {
 
 void GameOptions::DeclareStatBars(SettingsFile& into) {
   into.Declare(kStatBarsShownKey, &stat_bars_.shown);
+  into.Declare(kBasicInfoWindowShownKey, &stat_bars_.basic_info_window);
   into.Declare(kStatBarsLockedKey, &stat_bars_.locked);
   into.Declare(kStatBarsStickyKey, &stat_bars_.sticky);
   into.Declare(kStatBarsCenterMarkKey, &stat_bars_.center_mark);

@@ -58,6 +58,8 @@ enum class GameAction : std::uint8_t {
   // LA PETITE FENÊTRE DE STATUT, à côté de la fiche. ⚠ ALT+A, la touche du jeu
   // pour cette fenêtre-là ; A seul reste à la troisième barre.
   kOpenStatus,
+  // LA FENÊTRE « BASIC INFO » SE REPLIE OU SE DÉPLIE. ⚠ ALT+V, la touche du jeu.
+  kToggleBasicInfo,
   // LA FICHE DU PET. ⚠ SANS TOUCHE D'USINE : le jeu n'en a pas — on n'y
   // accède que par le menu du pet —, et toute touche libre est déjà prise.
   kOpenPetWindow,

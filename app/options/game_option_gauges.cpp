@@ -77,6 +77,15 @@ void GameOptions::BuildStatBarShared(bool gauge_tab) {
       nullptr, stat_bars_.locked));
   // Grisé seulement quand il ne fige plus rien à l'écran.
   stat_bar_shared_rows_.back().disabled = bars_off && !pages_.portrait.look().AnyShown();
+  // ⚠ SUR TOUS LES ONGLETS, comme le verrou : la fenêtre n'est à aucun.
+  stat_bar_shared_rows_.push_back(
+      Toggle(GameOption::kBasicInfoWindowShown, Tr("Montrer la fenêtre Basic Info du jeu"),
+             Tr("La fenêtre du jeu d'origine, au pixel : pseudo, classe, niveaux, HP, SP, "
+                "EXP, zeny et poids. Elle se déplace par sa barre de titre ; son bouton, un "
+                "double-clic sur la barre ou son raccourci la replient et la déplient. La "
+                "grille d'icônes de menu s'accroche dessous et la suit ; les places rangées "
+                "reviennent quand la fenêtre s'éteint."),
+             nullptr, stat_bars_.basic_info_window));
 
   // LES ONGLETS. ⚠ REFAITS À CHAQUE IMAGE comme tout le reste : ces noms se
   // traduisent, et un nom mis en cache resterait dans la langue d'avant.

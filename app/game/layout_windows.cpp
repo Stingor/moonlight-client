@@ -3,6 +3,7 @@
 #include <string>
 
 #include "ro/ui/achievement_window.h"
+#include "ro/ui/basic_info_window.h"
 #include "ro/ui/cart_window.h"
 #include "ro/ui/character_window.h"
 #include "ro/ui/chat_macros.h"
@@ -75,6 +76,7 @@ void RememberLayoutWindows(ro::ui::UiContext& ui, UiStage::Windows& windows) {
   ui.RememberWindow(PinKey(ro::ui::kMvpTrackerWindowId), &windows.mvp_tracker.window.pinned);
 
   // ── LES REPLIS ET LE RANGEMENT ─────────────────────────────────────────
+  ui.RememberWindow(ro::ui::kBasicInfoExpandedKey, &windows.basic_info.state.expanded);
   ui.RememberWindow(kHomunculusSkillsKey, &windows.character.homunculus.skills_open);
   ui.RememberWindow(kMercenarySkillsKey, &windows.character.mercenary.skills_open);
   // La partie en fait la vérité des onglets : voir `ChatTabsView::FollowMeterDock`.

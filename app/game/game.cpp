@@ -253,6 +253,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
                 .sheet = &windows_.character,
                 .status = &windows_.status.state,
+                .basic_info = &windows_.basic_info.state,
                 .grimoire_keys = &pieces_.grimoire_keys,
                 .homunculus_present = pieces_.homunculus.view().present,
                 .mercenary_present = pieces_.mercenary.view().present,

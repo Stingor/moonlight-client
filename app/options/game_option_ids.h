@@ -272,6 +272,8 @@ enum class GameOption : std::uint8_t {
   // les formes existent : deux orbes muets encadrant des barres qui écrivent
   // leurs valeurs ne se règlent pas avec les mêmes nombres.
   kStatBarsShown,
+  // LA FENÊTRE « BASIC INFO » DU JEU, à côté des jauges libres.
+  kBasicInfoWindowShown,
   kStatBarsLocked,
   kStatBarsSticky,
   kStatBarsCenterMark,

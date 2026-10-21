@@ -297,10 +297,25 @@ enum class SkinPiece : std::uint8_t {
   // survolée, enfoncée —, et c'est le dessin du jeu.
   kStatusBackground,
   kStatusRaiseArrow,
+
+  // ── LA FENÊTRE « BASIC INFO » ─────────────────────────────────────────
+  //
+  // Le fond de la vue dépliée, barre de titre comprise, puis les jauges de vie
+  // et de magie : leur gouttière, et les deux remplissages en trois morceaux —
+  // bout gauche, tranche d'un pixel qu'on répète, bout droit. Le bleu sert au
+  // plein, le rouge sous le quart.
+  kBasicInfoBackground,
+  kBasicInfoGaugeTrough,
+  kBasicInfoGaugeBlueLeft,
+  kBasicInfoGaugeBlueMiddle,
+  kBasicInfoGaugeBlueRight,
+  kBasicInfoGaugeRedLeft,
+  kBasicInfoGaugeRedMiddle,
+  kBasicInfoGaugeRedRight,
 };
 
 inline constexpr std::size_t kSkinPieceCount =
-    static_cast<std::size_t>(SkinPiece::kStatusRaiseArrow) + 1;
+    static_cast<std::size_t>(SkinPiece::kBasicInfoGaugeRedRight) + 1;
 
 // LE NOMBRE DE CHEMINS DÉCLARÉS, pour que la table et l'énumération ne puissent
 // pas diverger. ⚠ UN `std::array` SOUS-REMPLI EST LÉGAL : ajouter une pièce sans

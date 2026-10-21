@@ -281,6 +281,12 @@ tr: Toggles battle mode: the input bar folds away.
 fr: Bascule le chat de champ de bataille : ce que tu tapes part à l'équipe.
 tr: Toggles battlefield chat: what you type goes to your team.
 
+fr: Base Lv. %d
+tr: Base Lv. %d
+
+fr: Basic Info : replier ou déplier
+tr: Basic Info: collapse or expand
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Blocks this player's whispers; alone, lists the blocked ones.
 
@@ -394,6 +400,12 @@ tr: Force the sky's hour
 
 fr: Gras
 tr: Bold
+
+fr: HP %d / %d
+tr: HP %d / %d
+
+fr: HP. %d / %d
+tr: HP. %d / %d
 
 fr: Hauteur de midi (°)
 tr: Noon altitude (°)
@@ -1109,6 +1121,9 @@ tr: Invites this player into your guild.
 fr: Invite ce joueur dans ton groupe.
 tr: Invites this player into your party.
 
+fr: Job Lv. %d
+tr: Job Lv. %d
+
 fr: Joue cette émoticône.
 tr: Plays this emoticon.
 
@@ -1120,6 +1135,9 @@ tr: The time of day on the server, the one the day/night cycle follows — not y
 
 fr: Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes —, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
 tr: Shadows computed every frame: the map's sun, outdoors, instead of the one painted into the map — trees and buildings also shade themselves —, and the lights the map editor places, lanterns and braziers, on any map.\n\nThe original client has none, and the graphics card works harder.
+
+fr: La fenêtre du jeu d'origine, au pixel : pseudo, classe, niveaux, HP, SP, EXP, zeny et poids. Elle se déplace par sa barre de titre ; son bouton, un double-clic sur la barre ou son raccourci la replient et la déplient. La grille d'icônes de menu s'accroche dessous et la suit ; les places rangées reviennent quand la fenêtre s'éteint.
+tr: The original game's window, to the pixel: name, job, levels, HP, SP, EXP, zeny and weight. It moves by its title bar; its button, a double-click on the bar or its shortcut collapse and expand it. The menu icon grid hangs below it and follows it; the arranged places come back when the window is turned off.
 
 fr: Le cadre d'un salon est une image du jeu : la teinte la multiplie. Blanche, il reste tel quel.
 tr: A chat room frame is a game image: the tint multiplies it. White leaves it unchanged.
@@ -1138,6 +1156,12 @@ tr: Sunrise (h)
 
 fr: Liste les commandes d'émoticône.
 tr: Lists the emoticon commands.
+
+fr: Lv%2d / %s / Lv%2d / Exp%.1f%%
+tr: Lv%2d / %s / Lv%2d / Exp%.1f%%
+
+fr: Lv.%2d / %s / Lv.%2d / Exp. %.1f %%
+tr: Lv.%2d / %s / Lv.%2d / Exp. %.1f %%
 
 fr: Masque ou montre la parole dans la conversation.
 tr: Hides or shows speech in the chat.
@@ -1174,6 +1198,9 @@ tr: Shows or hides the “Miss” texts.
 
 fr: Montre ou cache ton équipement aux autres.
 tr: Shows or hides your equipment to others.
+
+fr: Montrer la fenêtre Basic Info du jeu
+tr: Show the game's Basic Info window
 
 fr: Mémorise ce point de warp.
 tr: Memorizes this warp point.
@@ -1216,6 +1243,12 @@ tr: Speaks to your battlefield team.
 
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time shadows” is checked in Graphics.
+
+fr: Poids %d%%
+tr: Weight %d%%
+
+fr: Poids : %3d / %3d
+tr: Weight : %3d / %3d
 
 fr: Police du titre
 tr: Title font
@@ -1264,6 +1297,12 @@ tr: Reset the course
 
 fr: S'assied, ou se relève.
 tr: Sits down, or stands up.
+
+fr: SP %d / %d
+tr: SP %d / %d
+
+fr: SP. %d / %d
+tr: SP. %d / %d
 
 fr: Serveur %.*s
 tr: Server %.*s

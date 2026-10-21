@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "ro/ui/basic_info_window.h"
 #include "ro/ui/stat_preset_window.h"
 #include "ro/ui/status_portrait.h"
 #include "ro/ui/status_window.h"
@@ -27,6 +28,14 @@ struct StatusPortraitRound {
   const ro::ui::StatusPortraitView* view = nullptr;
   ro::ui::StatusPortraitLook* look = nullptr;
   ro::ui::StatusPortraitAnswer answer;
+};
+
+// LA FENÊTRE « BASIC INFO » DU JEU : sa vue est recomposée par `app` à chaque
+// image, et elle ne rend que le coin où la grille d'icônes s'accroche. Sa taille
+// repliée ou dépliée est retenue avec la disposition du personnage.
+struct BasicInfoRound {
+  ro::ui::BasicInfoWindowState state;
+  ro::ui::BasicInfoView view;
 };
 
 // LA PETITE FENÊTRE DE STATUT, à côté de la fiche, même aller-retour : sa vue

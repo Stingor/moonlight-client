@@ -287,6 +287,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
     case GameOption::kStatBarsShown:
       stat_bars_.shown = asked.on;
       break;
+    case GameOption::kBasicInfoWindowShown:
+      stat_bars_.basic_info_window = asked.on;
+      break;
     case GameOption::kStatBarsLocked:
       stat_bars_.locked = asked.on;
       break;

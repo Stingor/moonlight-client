@@ -247,6 +247,7 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
       }
       break;
     case GameOption::kStatBarsShown:
+    case GameOption::kBasicInfoWindowShown:
     case GameOption::kStatBarsLocked:
     case GameOption::kStatBarsSticky:
     case GameOption::kStatBarsCenterMark:

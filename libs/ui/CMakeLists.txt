@@ -45,6 +45,7 @@ add_library(ro_ui STATIC
     src/afk_clock.cpp
     src/align_grid.cpp
     src/bank_window.cpp
+    src/basic_info_window.cpp
     src/status_window.cpp
     src/stat_preset_window.cpp
     src/entry_queue_prompts.cpp

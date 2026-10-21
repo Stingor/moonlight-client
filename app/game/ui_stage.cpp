@@ -351,8 +351,7 @@ UiStage::Answers UiStage::Draw(
   }
 
   // LA CHARRETTE SUIT LE SAC, pour la même raison que le sac suit la fiche :
-  // les deux se consultent ensemble, et l'on y déplace des objets de l'une à
-  // l'autre.
+  // les deux se consultent ensemble, et l'on y déplace des objets de l'une à l'autre.
   //
   // ⚠ SANS CHARRETTE, ELLE NE PARAÎT PAS, ouverte ou non : son ouverture est
   // celle du profil de disposition, qu'un personnage sans charrette partage
@@ -410,7 +409,10 @@ UiStage::Answers UiStage::Draw(
   // qu'on ouvre doit passer devant elle.
   answers.shortcuts = ro::ui::DrawShortcutBars(shortcut_bars, shortcuts, skin_);
   // LA GRILLE D'ICÔNES DE MENU AVEC ELLE, et pour la même raison : elle reste à
-  // l'écran, et ce qu'elle ouvre doit passer devant.
+  // l'écran, et ce qu'elle ouvre doit passer devant. Elle s'accroche sous la
+  // fenêtre « Basic Info », dessinée juste avant.
+  windows.menu_icons.state.dock =
+      ro::ui::DrawBasicInfoWindow(windows.basic_info.state, windows.basic_info.view, skin_).dock;
   if (windows.menu_icons.look != nullptr) {
     const ro::ui::MenuIconsAnswer menu =
         ro::ui::DrawMenuIcons(windows.menu_icons.state, windows.menu_icons.icons,
@@ -439,8 +441,7 @@ UiStage::Answers UiStage::Draw(
         ro::ui::DrawPartyGrid(*windows.party.grid_view, *windows.party.grid_look,
                               windows.party.grid_state, grid, hud_grip_);
   }
-  // LE HUD DE CIBLE, cadres libres comme les jauges. Sa vue ne descend que sous
-  // le mode Ciblage.
+  // LE HUD DE CIBLE, cadres libres comme les jauges. Sa vue ne descend que sous le mode Ciblage.
   if (windows.target_hud.view != nullptr && windows.target_hud.look != nullptr) {
     ro::ui::DrawTargetHud(*windows.target_hud.view, grid, *windows.target_hud.look, hud_grip_,
                           windows.target_hud.answer);
@@ -772,8 +773,7 @@ void UiStage::DrawAfkOnly(const ro::ui::AfkClockView& clock, const OverWorldPain
   // ce que la souris survole — donc le laisserait croire, au réveil, qu'un
   // bouton est encore enfoncé.
   backend_.BeginFrame(*ui_);
-  // LE VOILE RESTE PENDANT LA VEILLE : il appartient au monde, que la veille
-  // continue de montrer.
+  // LE VOILE RESTE PENDANT LA VEILLE : il appartient au monde, que la veille continue de montrer.
   PaintOverWorld(over_world);
   ro::ui::DrawAfkClock(clock);
   ui_->EndFrame();

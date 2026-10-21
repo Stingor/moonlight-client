@@ -68,6 +68,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kOpenCharacterHomunculus, "sheet_homunculus"},
     {GameAction::kOpenCharacterMercenary, "sheet_mercenary"},
     {GameAction::kOpenStatus, "status"},
+    {GameAction::kToggleBasicInfo, "basic_info"},
     {GameAction::kOpenPetWindow, "sheet_pet"},
     {GameAction::kOpenInventory, "inventory"},
     {GameAction::kOpenCart, "cart"},
@@ -217,6 +218,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenCharacterHomunculus:
     case GameAction::kOpenCharacterMercenary:
     case GameAction::kOpenStatus:
+    case GameAction::kToggleBasicInfo:
     case GameAction::kOpenPetWindow:
     case GameAction::kOpenInventory:
     case GameAction::kOpenCart:
@@ -336,6 +338,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Fiche : mercenaire");
     case GameAction::kOpenStatus:
       return ro::core::Tr("Statut");
+    case GameAction::kToggleBasicInfo:
+      return ro::core::Tr("Basic Info : replier ou déplier");
     case GameAction::kOpenPetWindow:
       return ro::core::Tr("Fiche du pet");
     case GameAction::kOpenInventory:
@@ -466,6 +470,9 @@ Hotkeys::Hotkeys() {
       Binding{.key = SDLK_R, .ctrl = true};
   // ⚠ ALT+A POUR LA PETITE FENÊTRE DE STATUT : la touche du jeu.
   set(GameAction::kOpenStatus, SDLK_A, /*alt=*/true);
+  // ⚠ ALT+V POUR REPLIER LA FENÊTRE « BASIC INFO » : la touche du jeu. Son
+  // second raccourci, Ctrl+V, reste au coller de la saisie.
+  set(GameAction::kToggleBasicInfo, SDLK_V, /*alt=*/true);
   // ⚠ ALT+T ET CTRL+T POUR LEUR ATTENTE : les touches du jeu, elles aussi.
   set(GameAction::kHomunculusStandby, SDLK_T, /*alt=*/true);
   bindings_[ActionRef(GameAction::kMercenaryStandby).rank()] = Binding{.key = SDLK_T, .ctrl = true};

@@ -281,6 +281,12 @@ tr: Alterna el battle mode: la barra de escritura se pliega.
 fr: Bascule le chat de champ de bataille : ce que tu tapes part à l'équipe.
 tr: Alterna el chat de campo de batalla: lo que escribes va a tu equipo.
 
+fr: Base Lv. %d
+tr: Nv. base %d
+
+fr: Basic Info : replier ou déplier
+tr: Basic Info: plegar o desplegar
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 
@@ -394,6 +400,12 @@ tr: Forzar la hora del cielo
 
 fr: Gras
 tr: Negrita
+
+fr: HP %d / %d
+tr: HP %d / %d
+
+fr: HP. %d / %d
+tr: HP. %d / %d
 
 fr: Hauteur de midi (°)
 tr: Altura de mediodía (°)
@@ -1109,6 +1121,9 @@ tr: Invita a este jugador a tu guild.
 fr: Invite ce joueur dans ton groupe.
 tr: Invita a este jugador a tu grupo.
 
+fr: Job Lv. %d
+tr: Nv. job %d
+
 fr: Joue cette émoticône.
 tr: Muestra este emoticono.
 
@@ -1120,6 +1135,9 @@ tr: La hora que es en el servidor, la que sigue el ciclo día/noche — y no la 
 
 fr: Des ombres calculées à chaque image : celle du soleil de la carte, en plein air, au lieu de celle que la carte a peinte — les arbres et les bâtiments s'ombrent aussi eux-mêmes —, et celle des lumières que l'éditeur de carte pose, lanternes et braseros, sur toute carte.\n\nLe client d'origine n'en a pas, et la carte graphique travaille davantage.
 tr: Sombras calculadas en cada imagen: la del sol del mapa, al aire libre, en lugar de la que el mapa tiene pintada — los árboles y los edificios también se sombrean a sí mismos —, y la de las luces que coloca el editor de mapas, farolillos y braseros, en cualquier mapa.\n\nEl cliente original no las tiene, y la tarjeta gráfica trabaja más.
+
+fr: La fenêtre du jeu d'origine, au pixel : pseudo, classe, niveaux, HP, SP, EXP, zeny et poids. Elle se déplace par sa barre de titre ; son bouton, un double-clic sur la barre ou son raccourci la replient et la déplient. La grille d'icônes de menu s'accroche dessous et la suit ; les places rangées reviennent quand la fenêtre s'éteint.
+tr: La ventana del juego original, al píxel: nombre, job, niveles, HP, SP, EXP, zeny y peso. Se mueve por su barra de título; su botón, un doble clic en la barra o su atajo la pliegan y despliegan. La cuadrícula de iconos de menú se engancha debajo y la sigue; los lugares ordenados vuelven cuando la ventana se apaga.
 
 fr: Le cadre d'un salon est une image du jeu : la teinte la multiplie. Blanche, il reste tel quel.
 tr: El marco de una sala es una imagen del juego: el tinte la multiplica. Blanco, queda tal cual.
@@ -1138,6 +1156,12 @@ tr: Salida (h)
 
 fr: Liste les commandes d'émoticône.
 tr: Lista los comandos de emoticono.
+
+fr: Lv%2d / %s / Lv%2d / Exp%.1f%%
+tr: Nv%2d / %s / Nv%2d / Exp%.1f%%
+
+fr: Lv.%2d / %s / Lv.%2d / Exp. %.1f %%
+tr: Nv.%2d / %s / Nv.%2d / Exp. %.1f %%
 
 fr: Masque ou montre la parole dans la conversation.
 tr: Oculta o muestra lo que se dice en el chat.
@@ -1174,6 +1198,9 @@ tr: Muestra u oculta los «Miss».
 
 fr: Montre ou cache ton équipement aux autres.
 tr: Muestra u oculta tu equipo a los demás.
+
+fr: Montrer la fenêtre Basic Info du jeu
+tr: Mostrar la ventana Basic Info del juego
 
 fr: Mémorise ce point de warp.
 tr: Memoriza este punto de warp.
@@ -1216,6 +1243,12 @@ tr: Habla a tu equipo de campo de batalla.
 
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Coloca el sol, o la luna, a la hora elegida: la luz del suelo y del decorado la sigue, y también las sombras cuando «Sombras en tiempo real» está marcada en Graphics.
+
+fr: Poids %d%%
+tr: Peso %d%%
+
+fr: Poids : %3d / %3d
+tr: Peso : %3d / %3d
 
 fr: Police du titre
 tr: Fuente del título
@@ -1264,6 +1297,12 @@ tr: Restablecer el recorrido
 
 fr: S'assied, ou se relève.
 tr: Se sienta, o se levanta.
+
+fr: SP %d / %d
+tr: SP %d / %d
+
+fr: SP. %d / %d
+tr: SP. %d / %d
 
 fr: Serveur %.*s
 tr: Servidor %.*s

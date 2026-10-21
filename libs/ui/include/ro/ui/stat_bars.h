@@ -379,6 +379,10 @@ struct StatBarsLook {
 
   // Au niveau maximum, les jauges d'expérience restent au lieu de s'effacer.
   bool keep_maxed_exp = false;
+  // LA FENÊTRE « BASIC INFO » DU JEU, à côté des jauges et réglée dans leur
+  // page. ⚠ ÉTEINTE D'USINE : la disposition d'usine pose déjà les jauges
+  // libres, et les deux ensemble montreraient la vie deux fois.
+  bool basic_info_window = false;
 
   // LE MODE RÉGLAGE : des valeurs factices qui ondulent, du vide au plein, pour
   // voir en direct ce qu'un réglage fait à une jauge qui bouge — l'arrondi d'une

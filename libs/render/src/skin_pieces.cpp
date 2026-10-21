@@ -160,6 +160,15 @@ constexpr std::array<std::string_view, kSkinPieceCount> kPaths = {
     // La petite fenêtre de statut. ⚠ LES DEUX NE SONT PAS DANS LE MÊME DOSSIER.
     "statuswnd\\w_statwin_bg.bmp",
     "basic_interface\\arw_right.bmp",
+    // La fenêtre « Basic Info ».
+    "basic_interface\\basewin_bg2.bmp",
+    "basic_interface\\gze_bg1.bmp",
+    "basic_interface\\gzeblue_left.bmp",
+    "basic_interface\\gzeblue_mid.bmp",
+    "basic_interface\\gzeblue_right.bmp",
+    "basic_interface\\gzered_left.bmp",
+    "basic_interface\\gzered_mid.bmp",
+    "basic_interface\\gzered_right.bmp",
 };
 
 }  // namespace

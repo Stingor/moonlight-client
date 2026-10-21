@@ -162,6 +162,7 @@ add_library(moonclient_equip STATIC
     world/entity_traits.cpp
     character/stat_bar_values.cpp
     character/status_window_view.cpp
+    character/basic_info_compose.cpp
     character/equip_slot_map.cpp)
 
 target_link_libraries(moonclient_equip

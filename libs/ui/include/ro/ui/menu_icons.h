@@ -232,7 +232,22 @@ struct MenuIconsState {
   // LA FENÊTRE D'ATTENTE, et la commande qu'elle remplace.
   bool placeholder_open = false;
   MenuCommand placeholder = MenuCommand::kStatus;
+  // LE COIN SOUS LEQUEL LA GRILLE S'ACCROCHE, à l'écran : le bas-gauche de la
+  // fenêtre « Basic Info » quand elle est montrée, posé à chaque image. Vide, la
+  // grille part du coin de l'écran.
+  //
+  // 🔴 ACCROCHÉE, LA GRILLE EST CELLE DU JEU : chaque icône prend sa case sous
+  // la fenêtre et la suit, figée. Les places rangées par le joueur restent dans
+  // le fichier, intactes, et reviennent quand la fenêtre s'éteint. Le bouton
+  // hors grille garde la sienne.
+  std::optional<ImVec2> dock;
 };
+
+// LA PREMIÈRE ICÔNE SOUS LA FENÊTRE « BASIC INFO » : son coin haut-gauche, en
+// pixels d'art depuis le coin d'accroche — la marge que le jeu laisse à la
+// grille autour de ses cases.
+inline constexpr float kMenuIconsDockLeft = 9.0F;
+inline constexpr float kMenuIconsDockTop = 23.0F;
 
 inline constexpr const char* kMenuPlaceholderId = "menu_placeholder";
 

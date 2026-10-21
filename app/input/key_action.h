@@ -10,6 +10,7 @@
 #include "ro/net/connection.h"
 #include "ro/render/camera.h"
 #include "ro/sim/world_fwd.h"
+#include "ro/ui/basic_info_window.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/cart_window.h"
 #include "ro/ui/chat_macros.h"
@@ -76,6 +77,8 @@ struct KeyPress {
   bool mercenary_present = false;
   // LA PETITE FENÊTRE DE STATUT, à côté de la fiche : Alt+A dans le jeu.
   ro::ui::StatusWindowState* status = nullptr;
+  // LA FENÊTRE « BASIC INFO » : Alt+V la replie ou la déplie.
+  ro::ui::BasicInfoWindowState* basic_info = nullptr;
   // L'IA DES DEUX COMPAGNONS : Alt+T et Ctrl+T basculent leur attente, et Échap
   // désarme le skill de compagnon qui attend sa cible.
   CompanionAiStage* companion_ai = nullptr;

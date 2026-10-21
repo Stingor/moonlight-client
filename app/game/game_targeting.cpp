@@ -20,6 +20,7 @@
 #include "ro/sim/guild.h"
 #include "ro/sim/movement.h"
 
+#include "character/basic_info_compose.h"
 #include "game/game.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
@@ -39,6 +40,12 @@ constexpr int kCellsPerCube =
 }  // namespace
 
 void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
+  // LA FENÊTRE « BASIC INFO », recomposée avec le portrait : même source, même
+  // cadence.
+  windows_.basic_info.state.shown =
+      settings_->options().stat_bars().basic_info_window && link_.is_open() &&
+      ComposeBasicInfo(windows_.basic_info.view, world_, pieces_.job_names,
+                       LabelOfBinding(settings_->bindings().Of(GameAction::kToggleBasicInfo)));
   StatusPortraitOptions& options = settings_->options().pages().portrait;
   windows_.status_portrait.look = &options.look();
   // Un cadre déplacé s'écrit, une fois : `Touch` arme l'anti-rebond du fichier.

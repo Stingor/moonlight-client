@@ -219,11 +219,29 @@ struct GridRanks {
 }
 
 // La place d'origine d'une icône : sa case dans la grille, ou celle du bouton.
-[[nodiscard]] ImVec2 HomeCorner(MenuCommand command, const GridRanks& ranks, float scale) {
-  if (MenuIconOf(command).off_grid) {
-    return DefaultMenuButtonCorner(ranks.count, scale);
+//
+// ⚠ ACCROCHÉE, LA GRILLE GLISSE EN BLOC : chaque case garde sa place dans la
+// grille, et c'est l'origine qui passe du coin de l'écran à celui de la
+// fenêtre. La marge réservée au badge « nouveau » reste au-dessus de la
+// première rangée, d'où le retrait de `kMenuIconNewsLift`.
+[[nodiscard]] ImVec2 HomeCorner(MenuCommand command, const GridRanks& ranks,
+                                const MenuIconsState& state, float scale) {
+  const ImVec2 corner =
+      MenuIconOf(command).off_grid
+          ? DefaultMenuButtonCorner(ranks.count, scale)
+          : DefaultMenuIconCorner(ranks.of[static_cast<std::size_t>(command)], scale);
+  if (!state.dock.has_value()) {
+    return corner;
   }
-  return DefaultMenuIconCorner(ranks.of[static_cast<std::size_t>(command)], scale);
+  const float margin = kMenuIconsScreenMargin * scale;
+  return {corner.x - margin + state.dock->x + kMenuIconsDockLeft * scale,
+          corner.y - margin + state.dock->y + (kMenuIconsDockTop - kMenuIconNewsLift) * scale};
+}
+
+// L'ICÔNE SUIT-ELLE LA FENÊTRE « BASIC INFO » ? Toute icône de la grille, tant
+// que la fenêtre est montrée.
+[[nodiscard]] bool FollowsDock(const MenuIconsState& state, MenuCommand command) {
+  return state.dock.has_value() && !MenuIconOf(command).off_grid;
 }
 
 // L'identité ImGui du cadre d'une icône. ⚠ PAR LE NOM DU CATALOGUE, jamais par
@@ -479,8 +497,14 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
       continue;
     }
     const ImVec2 size = IconSize(icon, scale);
+    if (FollowsDock(state, icon.command)) {
+      const ImVec2 corner = HomeCorner(icon.command, ranks, state, scale);
+      rects[index] = HudRect{.x = corner.x, .y = corner.y, .width = size.x, .height = size.y};
+      shown[index] = true;
+      continue;
+    }
     if (!MenuIconPlaced(place) && !look.locked) {
-      const ImVec2 corner = HomeCorner(icon.command, ranks, scale);
+      const ImVec2 corner = HomeCorner(icon.command, ranks, state, scale);
       place.x = corner.x;
       place.y = corner.y;
       answer.moved = true;
@@ -495,7 +519,7 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
                              .across = place.across,
                              .down = place.down};
     } else {
-      const ImVec2 corner = HomeCorner(icon.command, ranks, scale);
+      const ImVec2 corner = HomeCorner(icon.command, ranks, state, scale);
       rects[index] = HudRect{.x = corner.x, .y = corner.y, .width = size.x, .height = size.y};
     }
     shown[index] = true;
@@ -506,14 +530,16 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
     if (!shown[index]) {
       continue;
     }
+    // ⚠ ACCROCHÉE, L'ICÔNE SE CLIQUE TOUJOURS : sa place n'est pas à ranger.
+    const bool locked = look.locked || FollowsDock(state, icon.command);
     HudFrameLook frame;
-    frame.locked = look.locked;
-    frame.clickable = look.locked;
+    frame.locked = locked;
+    frame.clickable = locked;
     frame.resizable = false;
     frame.lit_on_hover = false;
     // Le filet pendant la pose seulement : les icônes n'ont pas de fond, et
     // sans lui on ne voit pas la place qu'on attrape.
-    frame.border = !look.locked;
+    frame.border = !locked;
     frame.sticky = look.sticky;
     frame.grid = &grid;
     frame.least_width = rects[index].width;
@@ -531,7 +557,7 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
       // ⚠ EN POSE, NI ENFONCÉE NI OUVERTE : on range des icônes, l'état des
       // fenêtres n'a rien à y dire.
       MenuIconView painted = icon;
-      if (!look.locked) {
+      if (!locked) {
         painted.shows_open = false;
       }
       PaintIcon(painted, HudOnScreen(rects[index], ImGui::GetIO().DisplaySize), clicks.held,
@@ -557,7 +583,7 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
   // déplace ses frères dans `rects`, et ils doivent s'en souvenir aussi.
   if (answer.moved) {
     for (std::size_t index = 0; index < kMenuCommandCount; ++index) {
-      if (shown[index]) {
+      if (shown[index] && !FollowsDock(state, static_cast<MenuCommand>(index))) {
         look.places[index].x = rects[index].x;
         look.places[index].y = rects[index].y;
         look.places[index].across = rects[index].across;

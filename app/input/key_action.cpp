@@ -411,6 +411,11 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
         to.status->open = !to.status->open;
       }
       break;
+    case GameAction::kToggleBasicInfo:
+      if (Wired(to.basic_info, "fenêtre Basic Info")) {
+        to.basic_info->expanded = !to.basic_info->expanded;
+      }
+      break;
     case GameAction::kOpenPetWindow:
       if (to.pet != nullptr) {
         to.pet->toggle_requested = true;

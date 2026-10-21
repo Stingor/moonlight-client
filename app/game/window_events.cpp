@@ -134,6 +134,7 @@ struct WindowPixels {
           .homunculus_present = to.homunculus_present,
           .mercenary_present = to.mercenary_present,
           .status = to.status,
+          .basic_info = to.basic_info,
           .companion_ai = to.companion_ai,
           .pet = to.pet,
           .inventory = to.inventory,
