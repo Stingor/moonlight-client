@@ -81,7 +81,7 @@ std::vector<glm::vec4> PointLightTexelsOf(const PointLightSet& set) {
   for (std::size_t rank = 0; rank < set.lights.size(); ++rank) {
     const PointLight& light = set.lights[rank];
     const PointShadowSlot slot = rank < set.shadows.size() ? set.shadows[rank] : PointShadowSlot();
-    texels.emplace_back(light.world_position, light.range_world);
+    texels.emplace_back(ShiningFrom(light), light.range_world);
     texels.emplace_back(light.color, std::clamp(light.shadow_depth, 0.0F, 1.0F));
     texels.emplace_back(PointShadowFar(light.range_world), std::max(light.shadow_spread, 0.0F),
                         static_cast<float>(slot.tier), static_cast<float>(slot.layer));

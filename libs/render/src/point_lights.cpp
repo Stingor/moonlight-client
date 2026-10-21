@@ -60,9 +60,8 @@ glm::vec3 PointLightingAt(const PointLightSet& set, glm::vec3 world_position) {
     if (!Shines(light)) {
       continue;
     }
-    const float remaining =
-        std::clamp(1.0F - (glm::distance(world_position, light.world_position) / light.range_world),
-                   0.0F, 1.0F);
+    const float remaining = std::clamp(
+        1.0F - (glm::distance(world_position, ShiningFrom(light)) / light.range_world), 0.0F, 1.0F);
     sum += light.color * remaining * remaining;
   }
   return sum;

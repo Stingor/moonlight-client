@@ -45,6 +45,8 @@ struct PointShadowFace {
   std::uint64_t painted_frame = 0;
   // Les acteurs qu'elle a peints, dans l'ordre où ils sont venus.
   std::vector<ActorShadowKey> actors;
+  // D'où la lumière l'a vue : une flamme qui s'est balancée la fait repeindre.
+  glm::vec3 light_position{0.0F};
 };
 
 // UNE CARTE CUBIQUE, et la génération du sol et du décor qu'elle a peints.

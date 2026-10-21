@@ -86,8 +86,8 @@ struct ShadowActor {
 [[nodiscard]] ShadowSight SightOf(const PointLight& light, std::size_t face) {
   const float far_world = PointShadowFar(light.range_world);
   return ShadowSight{.frustum = WorldFrustum::Of(
-                         PointShadowFaceViewProjections(light.world_position, far_world).at(face)),
-                     .center = light.world_position,
+                         PointShadowFaceViewProjections(ShiningFrom(light), far_world).at(face)),
+                     .center = ShiningFrom(light),
                      .radius = far_world};
 }
 
@@ -126,8 +126,9 @@ class FacePainter {
   void Paint(PointShadowSlot slot, const PointLight& light, const FaceJob& job,
              std::span<const ShadowActor> actors, ModelOpacities& sighted) {
     Begin();
+    const glm::vec3 shining_from = ShiningFrom(light);
     const glm::mat4 view_projection =
-        PointShadowFaceViewProjections(light.world_position, PointShadowFar(light.range_world))
+        PointShadowFaceViewProjections(shining_from, PointShadowFar(light.range_world))
             .at(job.face);
     const ShadowSight sight = SightOf(light, job.face);
     stage_.BeginFace(static_cast<std::size_t>(slot.tier), slot.layer, job.face);
@@ -151,7 +152,7 @@ class FacePainter {
       for (const std::vector<DrawnActor>& lot : lots_) {
         if (!lot.empty()) {
           casters_.sprites->DrawDepth(view_projection, -CubeFaceForward(job.face), camera_, lot,
-                                      &light.world_position);
+                                      &shining_from);
         }
       }
       stage_.SetCasterOffset(true);
@@ -236,7 +237,8 @@ PointLightSet DrawPointShadows(PointLightStage& stage, const SunShadowCasters* c
         }
         job.actor_models_seen = actor_models_box.has_value() && sight.Sees(*actor_models_box);
         const PointShadowFace& painted = cube.faces[face];
-        if (!painted.painted || painted.actors != seen_keys) {
+        if (!painted.painted || painted.actors != seen_keys ||
+            painted.light_position != ShiningFrom(visible.lights[rank])) {
           jobs.push_back(std::move(job));
           continue;
         }
@@ -267,6 +269,7 @@ PointLightSet DrawPointShadows(PointLightStage& stage, const SunShadowCasters* c
       painter.Paint(slot, visible.lights[job.rank], job, actors, sighted);
       painted.painted = true;
       painted.painted_frame = frame;
+      painted.light_position = ShiningFrom(visible.lights[job.rank]);
       painted.actors.clear();
       for (const std::size_t actor : job.actors) {
         painted.actors.push_back(actors[actor].key);

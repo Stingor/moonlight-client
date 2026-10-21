@@ -17,6 +17,11 @@ constexpr double kSlowWave = 0.0047;
 constexpr float kFastWeight = 0.6F;
 constexpr float kSlowWeight = 0.4F;
 constexpr double kSlotPhase = 2.399963;
+// Les deux ondes du balancement, en radians par milliseconde, et leurs poids.
+constexpr double kSwayFastWave = 0.0083;
+constexpr double kSwaySlowWave = 0.0061;
+constexpr float kSwayFastWeight = 0.6F;
+constexpr float kSwaySlowWeight = 0.4F;
 
 // Une position du RSW soulevée à la hauteur d'une flamme : un y négatif monte.
 std::array<float, 3> Lifted(std::array<float, 3> anchor) {
@@ -50,6 +55,15 @@ float FlickerFactor(std::size_t slot, double time_ms) {
                      kSlowWeight * static_cast<float>(std::sin(kSlowWave * time_ms + 2.0 * phase));
   // L'onde va de −1 à 1 : ramenée de 0 à 1, elle retire jusqu'à la profondeur.
   return 1.0F - kFlickerDepth * (0.5F + 0.5F * wave);
+}
+
+glm::vec3 FlameSway(std::size_t slot, double time_ms) {
+  const double step_ms = std::floor(time_ms / kFlameSwayStepMs) * kFlameSwayStepMs;
+  const double phase = static_cast<double>(slot) * kSlotPhase;
+  const float wave =
+      kSwayFastWeight * static_cast<float>(std::sin(kSwayFastWave * step_ms + phase)) +
+      kSwaySlowWeight * static_cast<float>(std::sin(kSwaySlowWave * step_ms + 2.0 * phase));
+  return glm::vec3(0.0F, kFlameSwayWorld * wave, 0.0F);
 }
 
 std::vector<ro::mapedit::AddedLight> SceneLights(const ro::mapedit::MapEdit& edit,
@@ -98,11 +112,14 @@ PointLightSet MapPointLights(const std::vector<ro::mapedit::AddedLight>& lights,
     const float dark = always_night ? night : NightGlow(light.hours, night, hour);
     const float strength =
         (light.night_only ? dark : 1.0F) * (light.flicker ? FlickerFactor(slot, time_ms) : 1.0F);
+    const glm::vec3 sway = light.flicker ? FlameSway(slot, time_ms) : glm::vec3(0.0F);
     placed.push_back(PointLight{
         .world_position =
             frame.ToWorld(glm::vec3(light.position[0], light.position[1], light.position[2])),
+        .sway_world = sway,
         .color = glm::vec3(light.color[0], light.color[1], light.color[2]) * strength,
         .range_world = light.range,
+        .shadow_spread = light.flicker ? kFlameShadowSpread : 0.0F,
         .casts_shadow = light.shadow});
   }
   return PointLightsByDistance(placed, eye);

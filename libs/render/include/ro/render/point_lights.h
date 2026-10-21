@@ -15,6 +15,10 @@ namespace ro::render {
 // `range_world`. Voir `kPointLightFragmentGlsl`.
 struct PointLight {
   glm::vec3 world_position{0};
+  // LE BALANCEMENT DE SA FLAMME autour de `world_position`, sa place de repos.
+  // Il déplace l'éclairage et l'ombre, mais la lumière reste la même : sa carte
+  // d'ombre se repeint au lieu d'être donnée à une autre. Voir `ShiningFrom`.
+  glm::vec3 sway_world{0};
   // Déjà multipliée par son intensité de l'instant : de zéro à un par canal,
   // davantage pour une lumière qui sature.
   glm::vec3 color{0};
@@ -31,6 +35,11 @@ struct PointLight {
   // FAUX : elle n'a pas de carte d'ombre, et n'en prend aucune aux autres.
   bool casts_shadow = true;
 };
+
+// D'OÙ `light` ÉCLAIRE ET OMBRE à l'instant : sa place, balancement compris.
+[[nodiscard]] inline glm::vec3 ShiningFrom(const PointLight& light) {
+  return light.world_position + light.sway_world;
+}
 
 // LA CARTE D'OMBRE D'UNE LUMIÈRE : sa couche dans le tableau de cubes de son
 // palier. Un palier négatif : la lumière éclaire sans ombre. Voir

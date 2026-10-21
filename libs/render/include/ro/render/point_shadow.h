@@ -73,7 +73,8 @@ inline constexpr float kPointShadowClearanceWorld = 10.0F;
 [[nodiscard]] float PointShadowFar(float range_world);
 
 // CE QU'UNE CARTE PORTE : la lumière pour laquelle elle a été peinte. Une
-// lumière qui bouge ou change de portée est une autre lumière.
+// lumière qui bouge ou change de portée est une autre lumière ; une flamme qui
+// se balance reste la même, voir `PointLight::sway_world`.
 struct PaintedPointLight {
   glm::vec3 world_position{0.0F};
   float range_world = 0.0F;

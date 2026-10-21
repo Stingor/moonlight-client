@@ -58,4 +58,26 @@ inline constexpr float kEffectGlowLiftWorld = 12.0F;
 inline constexpr float kFlickerDepth = 0.35F;
 [[nodiscard]] float FlickerFactor(std::size_t slot, double time_ms);
 
+// LE BALANCEMENT D'UNE FLAMME QUI VACILLE à l'instant `time_ms`, en unités du
+// monde : elle monte et descend d'au plus `kFlameSwayWorld`, sur deux ondes
+// décalées par le rang `slot`, et les ombres qu'elle porte s'allongent et
+// raccourcissent.
+//
+// ⚠ JAMAIS DE CÔTÉ : un brasier se tient souvent contre un mur, et une flamme
+// qui s'y balancerait passerait derrière lui. Le mur s'éteindrait alors d'un
+// bloc, puis se rallumerait. Une flamme qui monte reste à la même distance des
+// murs. Il ne change que tous les
+// `kFlameSwayStepMs` : chaque pas repeint la carte d'ombre de la flamme. À
+// trente pas par seconde, un pas ne déplace le bord d'une ombre que d'une
+// fraction de sa pénombre.
+inline constexpr float kFlameSwayWorld = 0.6F;
+inline constexpr double kFlameSwayStepMs = 1000.0 / 30.0;
+[[nodiscard]] glm::vec3 FlameSway(std::size_t slot, double time_ms);
+
+// LA PÉNOMBRE D'UNE FLAMME QUI VACILLE, en part de la distance à la flamme :
+// une flamme est une source large, et le bord de son ombre se fond au lieu de
+// trancher. C'est ce qui fait passer une surface de l'ombre à la lumière en
+// douceur quand la flamme se balance. Voir `PointLight::shadow_spread`.
+inline constexpr float kFlameShadowSpread = 0.06F;
+
 }  // namespace ro::render
