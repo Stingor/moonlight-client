@@ -503,8 +503,11 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
 
 void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& basis,
                                   Blending blending, bool silhouettes,
-                                  const BillboardBasis* panel_basis, const PointLightSet* points) {
+                                  const BillboardBasis* panel_basis, const PointLightSet* points,
+                                  const glm::vec3* panel_light) {
   prepared_.clear();
+  // Le panneau de l'acteur en cours : `basis`, sauf face à une lumière proche.
+  BillboardBasis actor_basis = basis;
   // LA HAUTEUR DE LA VUE EN PIXELS, que seul un élargissement en pixels d'écran
   // consulte.
   std::array<GLint, 4> viewport{};
@@ -589,7 +592,7 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
       // L'OMBRE garde la couleur de son calque : ni la teinte ni la
       // transparence de son porteur ne la touchent.
       const glm::vec3 anchor = layered ? drawn.ground_position : on_ground;
-      const std::array<glm::vec3, 4> corners = BillboardCorners(scaled, anchor, basis);
+      const std::array<glm::vec3, 4> corners = BillboardCorners(scaled, anchor, actor_basis);
       const std::array<glm::vec3, 4> panel_corners =
           silhouettes || panel_basis == nullptr ? corners
                                                 : BillboardCorners(scaled, anchor, *panel_basis);
@@ -598,7 +601,7 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
       prepared_.push_back(
           PreparedQuad{texture,
                        corners,
-                       silhouettes ? corners : BillboardDepthCorners(scaled, anchor, basis),
+                       silhouettes ? corners : BillboardDepthCorners(scaled, anchor, actor_basis),
                        {glm::vec2{left_u, 0.0F}, glm::vec2{right_u, 0.0F}, glm::vec2{right_u, 1.0F},
                         glm::vec2{left_u, 1.0F}},
                        layered ? Tinted(quad.tint, drawn.tint) : quad.tint,
@@ -611,6 +614,11 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
     }
   };
   for (const DrawnActor* drawn : ordered_) {
+    // UNE LUMIÈRE PROCHE se voit de chaque acteur sous un angle propre.
+    if (panel_light != nullptr) {
+      actor_basis =
+          ShadowPanelBasis(*panel_light - drawn->ground_position, MakeBillboardBasis(camera));
+    }
     // L'ombre d'abord : elle est au sol, et tout le reste passe dessus.
     //
     // ⚠ ELLE NE SUIT PAS LE DÉCALAGE D'ÉCRAN. Le client la dessine hors de la
@@ -675,7 +683,8 @@ void SpriteRenderer::UploadPrepared() {
 }
 
 void SpriteRenderer::DrawDepth(const glm::mat4& light_view_projection, const glm::vec3& toward_sun,
-                               const Camera& camera, std::span<const DrawnActor> actors) {
+                               const Camera& camera, std::span<const DrawnActor> actors,
+                               const glm::vec3* light_position) {
   ordered_.clear();
   for (const DrawnActor& actor : actors) {
     if (actor.actor != nullptr && !actor.actor->quads.empty()) {
@@ -686,7 +695,7 @@ void SpriteRenderer::DrawDepth(const glm::mat4& light_view_projection, const glm
     return;
   }
   PrepareQuads(camera, ShadowPanelBasis(toward_sun, MakeBillboardBasis(camera)), Blending::kOver,
-               /*silhouettes=*/true);
+               /*silhouettes=*/true, /*panel_basis=*/nullptr, /*points=*/nullptr, light_position);
   if (prepared_.empty()) {
     return;
   }

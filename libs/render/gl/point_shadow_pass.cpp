@@ -138,9 +138,8 @@ class FacePainter {
       static_cast<void>(casters_.models->Sighted(sight, casters_.model_casting, sighted));
       casters_.models->DrawDepth(view_projection, casters_.clock, &sighted);
     }
-    // UN CORPS PLAT se dresse face à la lumière, le long de l'axe de la face :
-    // ses panneaux, dressés pour le soleil, ne savent tourner que vers une
-    // direction par lot.
+    // UN CORPS PLAT se dresse selon la direction de la lumière vue de ses
+    // pieds, la même dans toutes les faces qui le voient.
     if (casters_.sprites != nullptr && !job.actors.empty()) {
       for (std::vector<DrawnActor>& lot : lots_) {
         lot.clear();
@@ -151,7 +150,8 @@ class FacePainter {
       stage_.SetCasterOffset(false);
       for (const std::vector<DrawnActor>& lot : lots_) {
         if (!lot.empty()) {
-          casters_.sprites->DrawDepth(view_projection, -CubeFaceForward(job.face), camera_, lot);
+          casters_.sprites->DrawDepth(view_projection, -CubeFaceForward(job.face), camera_, lot,
+                                      &light.world_position);
         }
       }
       stage_.SetCasterOffset(true);

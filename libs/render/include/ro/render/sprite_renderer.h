@@ -289,9 +289,12 @@ class SpriteRenderer {
   // LES SILHOUETTES DANS LA CARTE D'OMBRE : la seule profondeur des calques
   // opaques, sur un panneau debout parallèle à l'écran — voir
   // `ShadowPanelBasis`. Ni ombre ronde, ni calque additif. `camera` ne sert qu'aux
-  // élargissements comptés en pixels d'écran.
+  // élargissements comptés en pixels d'écran. `light_position`, pour une
+  // lumière proche, remplace `toward_sun` : chaque panneau se règle sur la
+  // direction de la lumière vue de SES pieds.
   void DrawDepth(const glm::mat4& light_view_projection, const glm::vec3& toward_sun,
-                 const Camera& camera, std::span<const DrawnActor> actors);
+                 const Camera& camera, std::span<const DrawnActor> actors,
+                 const glm::vec3* light_position = nullptr);
 
   // Oublie les textures dont plus aucun acteur ne se sert.
   //
@@ -322,9 +325,11 @@ class SpriteRenderer {
   // `panel_basis`, quand une ombre se lit, pose aussi chaque quad dessiné sur
   // le panneau d'ombre de son acteur.
   // `points`, quand il y en a, éclairent chaque acteur à ses pieds.
+  // `panel_light`, quand il est donné, remplace `basis` par le panneau d'ombre
+  // de chaque acteur face à cette lumière proche.
   void PrepareQuads(const Camera& camera, const BillboardBasis& basis, Blending blending,
                     bool silhouettes, const BillboardBasis* panel_basis = nullptr,
-                    const PointLightSet* points = nullptr);
+                    const PointLightSet* points = nullptr, const glm::vec3* panel_light = nullptr);
   // Glisse sous les pieds le panneau d'ombre des `quads` d'un acteur ancré à
   // la hauteur `anchor_height` : voir `ShadowFootShift`. Des `silhouettes` se
   // déplacent avec lui.
