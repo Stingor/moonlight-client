@@ -241,11 +241,31 @@ struct MenuIconsState {
   // le fichier, intactes, et reviennent quand la fenêtre s'éteint. Le bouton
   // hors grille garde la sienne.
   std::optional<ImVec2> dock;
+  // ACCROCHÉE, LA GRILLE S'OUVRE ET SE FERME par son bandeau de tête. ⚠ FERMÉE
+  // À CHAQUE LANCEMENT, comme dans le jeu, qui ne retient son état que le temps
+  // de la partie.
+  bool grid_open = false;
 };
 
-// LA PREMIÈRE ICÔNE SOUS LA FENÊTRE « BASIC INFO » : son coin haut-gauche, en
-// pixels d'art depuis le coin d'accroche — la marge que le jeu laisse à la
-// grille autour de ses cases.
+// ── LA GRILLE ACCROCHÉE, EN PIXELS D'ART ────────────────────────────────────
+//
+// L'origine est le coin haut-gauche de la grille, QUATRE PIXELS AU-DESSUS du
+// bas de la fenêtre : son bandeau de tête recouvre le bas de « Basic Info ».
+inline constexpr float kMenuGridAboveDock = 4.0F;
+inline constexpr float kMenuGridWidth = 220.0F;
+// Haute de quatre rangées, de cinq au-delà de vingt icônes.
+inline constexpr float kMenuGridHeight = 197.0F;
+inline constexpr float kMenuGridTallHeight = 238.0F;
+inline constexpr std::size_t kMenuGridTallAfter = 20;
+// Le bandeau : 219 × 9, quatre pixels sous le haut ; celui du « nouveau »
+// déborde de quatre pixels au-dessus et se pose au haut même.
+inline constexpr float kMenuGridBandTop = 4.0F;
+inline constexpr float kMenuGridBandWidth = 219.0F;
+inline constexpr float kMenuGridBandHeight = 9.0F;
+inline constexpr float kMenuGridNewsBandHeight = 13.0F;
+// Le panneau sombre commence sous le bandeau.
+inline constexpr float kMenuGridBackgroundTop = 13.0F;
+// La première icône, depuis le coin de la grille.
 inline constexpr float kMenuIconsDockLeft = 9.0F;
 inline constexpr float kMenuIconsDockTop = 23.0F;
 

@@ -312,10 +312,27 @@ enum class SkinPiece : std::uint8_t {
   kBasicInfoGaugeRedLeft,
   kBasicInfoGaugeRedMiddle,
   kBasicInfoGaugeRedRight,
+
+  // ── LA GRILLE D'ICÔNES ACCROCHÉE SOUS « BASIC INFO » ───────────────────
+  //
+  // Son panneau sombre et translucide — un TGA, le seul de la famille —, puis
+  // les trois bandeaux de tête, chacun en trois états : au repos, survolé,
+  // enfoncé. « Ouvrir » porte un ▼, « fermer » un ▲, et « nouveau » le ▼ avec
+  // le N rouge d'une icône qui attend.
+  kMenuGridBackground,
+  kMenuGridOpenOut,
+  kMenuGridOpenOver,
+  kMenuGridOpenDown,
+  kMenuGridNewsOut,
+  kMenuGridNewsOver,
+  kMenuGridNewsDown,
+  kMenuGridCloseOut,
+  kMenuGridCloseOver,
+  kMenuGridCloseDown,
 };
 
 inline constexpr std::size_t kSkinPieceCount =
-    static_cast<std::size_t>(SkinPiece::kBasicInfoGaugeRedRight) + 1;
+    static_cast<std::size_t>(SkinPiece::kMenuGridCloseDown) + 1;
 
 // LE NOMBRE DE CHEMINS DÉCLARÉS, pour que la table et l'énumération ne puissent
 // pas diverger. ⚠ UN `std::array` SOUS-REMPLI EST LÉGAL : ajouter une pièce sans

@@ -39,11 +39,13 @@ constexpr ImU32 kAlertRed = IM_COL32(0xFF, 0x00, 0x00, 0xFF);
 
 // ── LES TAILLES DE TEXTE ────────────────────────────────────────────────────
 //
-// Le jeu écrit en deux polices : les nombres et libellés à 14, le titre, le
-// pseudo et la classe à 12 ; le texte des jauges à 13.
-constexpr float kTextLarge = 14.0F;
-constexpr float kTextSmall = 12.0F;
-constexpr float kTextGauge = 13.0F;
+// Celles qui donnent au texte la LARGEUR qu'il a dans le jeu, mesurée sur une
+// capture côte à côte : la police du jeu n'est pas celle de ce client, et sa
+// taille nominale ne se recopie pas. Le titre et le pseudo s'écrivent plus
+// grand que le reste ; la classe, les libellés, les nombres et le texte des
+// jauges, tous au même corps.
+constexpr float kTextTitle = 13.3F;
+constexpr float kTextBody = 11.4F;
 
 // ── LA BARRE DE TITRE ───────────────────────────────────────────────────────
 //
@@ -186,9 +188,9 @@ void PaintGauge(const Painter& paint, const SkinArt& art, float top, std::int64_
   std::snprintf(text.data(), text.size(), "%3lld  /  %3lld", static_cast<long long>(current),
                 static_cast<long long>(most));
   // ⚠ CENTRÉ À LA DIVISION ENTIÈRE, comme le jeu.
-  const float width = std::floor(paint.TextWidth(text.data(), kTextGauge));
+  const float width = std::floor(paint.TextWidth(text.data(), kTextBody));
   const float left_edge = std::trunc((kGaugeWidth - width) / 2.0F);
-  paint.Text(kGaugeLeft + left_edge, top - kGaugeTextLift, text.data(), kTextGauge,
+  paint.Text(kGaugeLeft + left_edge, top - kGaugeTextLift, text.data(), kTextBody,
              paint.Ink(kBlack));
 }
 
@@ -213,7 +215,7 @@ void PaintExpBar(const Painter& paint, float top, std::int64_t exp, std::int64_t
 // bouton de repli. `room` est ce que la case laisse à droite de la fenêtre.
 void PaintName(const Painter& paint, float left, float top, float room, std::string_view name) {
   paint.PushClip(left, top, kBasicInfoWidthPixels - room, kNameHeight);
-  paint.Text(left, top, name, kTextSmall, paint.Ink(kBlack));
+  paint.Text(left, top, name, kTextTitle, paint.Ink(kBlack));
   paint.PopClip();
 }
 
@@ -250,15 +252,15 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
                 static_cast<int>(view.job_level), percent);
   float left = kFoldedLeft;
   const bool shortened =
-      paint.TextWidth(levels.data(), kTextLarge) + kFoldedLeft > kBasicInfoWidthPixels;
+      paint.TextWidth(levels.data(), kTextBody) + kFoldedLeft > kBasicInfoWidthPixels;
   if (shortened) {
     std::snprintf(levels.data(), levels.size(), core::Tr("Lv%2d / %s / Lv%2d / Exp%.1f%%"),
                   static_cast<int>(view.base_level), view.job.c_str(),
                   static_cast<int>(view.job_level), percent);
-    const float room = kBasicInfoWidthPixels - paint.TextWidth(levels.data(), kTextLarge);
+    const float room = kBasicInfoWidthPixels - paint.TextWidth(levels.data(), kTextBody);
     left = room >= 0.0F ? std::trunc(room / 2.0F) : kFoldedNarrowLeft;
   }
-  paint.Text(left, kFoldedLevelsTop, levels.data(), kTextLarge, ink);
+  paint.Text(left, kFoldedLevelsTop, levels.data(), kTextBody, ink);
 
   // LA LIGNE DES JAUGES : la vie, un séparateur, la magie. ⚠ LE POINT APRÈS
   // « HP » ET « SP » TOMBE avec la forme courte de la ligne du dessus.
@@ -273,12 +275,12 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
       std::snprintf(text.data(), text.size(), core::Tr("HP. %d / %d"), static_cast<int>(view.hp),
                     static_cast<int>(view.max_hp));
     }
-    paint.Text(x, kFoldedGaugesTop, text.data(), kTextLarge,
+    paint.Text(x, kFoldedGaugesTop, text.data(), kTextBody,
                BasicInfoLow(view.hp, view.max_hp) ? alert : ink);
-    x += paint.TextWidth(text.data(), kTextLarge);
+    x += paint.TextWidth(text.data(), kTextBody);
     constexpr const char* kSeparator = " | ";
-    paint.Text(x, kFoldedGaugesTop, kSeparator, kTextLarge, ink);
-    x += paint.TextWidth(kSeparator, kTextLarge);
+    paint.Text(x, kFoldedGaugesTop, kSeparator, kTextBody, ink);
+    x += paint.TextWidth(kSeparator, kTextBody);
   }
   if (view.max_sp >= 0) {
     if (narrow) {
@@ -288,7 +290,7 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
       std::snprintf(text.data(), text.size(), core::Tr("SP. %d / %d"), static_cast<int>(view.sp),
                     static_cast<int>(view.max_sp));
     }
-    paint.Text(x, kFoldedGaugesTop, text.data(), kTextLarge,
+    paint.Text(x, kFoldedGaugesTop, text.data(), kTextBody,
                BasicInfoLow(view.sp, view.max_sp) ? alert : ink);
   }
 }
@@ -298,10 +300,10 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
 void PaintExpanded(const Painter& paint, const BasicInfoView& view, const SkinArt& art) {
   const ImU32 ink = paint.Ink(kBlack);
   PaintName(paint, kNameLeft, kNameTop, kNameRoom, view.name);
-  paint.Text(kNameLeft, kJobTop, view.job, kTextSmall, ink);
+  paint.Text(kNameLeft, kJobTop, view.job, kTextBody, ink);
 
-  paint.Text(kLabelLeft, kHpTop, core::Tr("HP"), kTextLarge, ink);
-  paint.Text(kLabelLeft, kSpTop, core::Tr("SP"), kTextLarge, ink);
+  paint.Text(kLabelLeft, kHpTop, core::Tr("HP"), kTextBody, ink);
+  paint.Text(kLabelLeft, kSpTop, core::Tr("SP"), kTextBody, ink);
   PaintGauge(paint, art, kHpGaugeTop, view.hp, view.max_hp);
   PaintGauge(paint, art, kSpGaugeTop, view.sp, view.max_sp);
   Line text{};
@@ -309,19 +311,19 @@ void PaintExpanded(const Painter& paint, const BasicInfoView& view, const SkinAr
   if (view.max_hp != 0) {
     std::snprintf(text.data(), text.size(), "%lld%%",
                   static_cast<long long>(view.hp * 100 / view.max_hp));
-    paint.Text(kPercentLeft, kHpTop, text.data(), kTextLarge, ink);
+    paint.Text(kPercentLeft, kHpTop, text.data(), kTextBody, ink);
   }
   if (view.max_sp != 0) {
     std::snprintf(text.data(), text.size(), "%lld%%",
                   static_cast<long long>(view.sp * 100 / view.max_sp));
-    paint.Text(kPercentLeft, kSpTop, text.data(), kTextLarge, ink);
+    paint.Text(kPercentLeft, kSpTop, text.data(), kTextBody, ink);
   }
 
   std::snprintf(text.data(), text.size(), core::Tr("Base Lv. %d"),
                 static_cast<int>(view.base_level));
-  paint.Text(kLabelLeft, kBaseLevelTop, text.data(), kTextLarge, ink);
+  paint.Text(kLabelLeft, kBaseLevelTop, text.data(), kTextBody, ink);
   std::snprintf(text.data(), text.size(), core::Tr("Job Lv. %d"), static_cast<int>(view.job_level));
-  paint.Text(kLabelLeft, kJobLevelTop, text.data(), kTextLarge, ink);
+  paint.Text(kLabelLeft, kJobLevelTop, text.data(), kTextBody, ink);
   PaintExpBar(paint, kBaseExpTop, view.base_exp, view.next_base_exp);
   PaintExpBar(paint, kJobExpTop, view.job_exp, view.next_job_exp);
 
@@ -331,14 +333,14 @@ void PaintExpanded(const Painter& paint, const BasicInfoView& view, const SkinAr
   // poids.
   std::snprintf(text.data(), text.size(), "Zeny : %s", grouped.c_str());
   const float purse_right = kBasicInfoWidthPixels - kPurseRightMargin;
-  const float zeny_width = paint.TextWidth(text.data(), kTextLarge);
-  paint.TextRight(purse_right, kPurseTop, text.data(), kTextLarge, ink);
+  const float zeny_width = paint.TextWidth(text.data(), kTextBody);
+  paint.TextRight(purse_right, kPurseTop, text.data(), kTextBody, ink);
   const std::int64_t weight = view.weight_tenths / kTenthsPerUnit;
   const std::int64_t max_weight = view.max_weight_tenths / kTenthsPerUnit;
   std::snprintf(text.data(), text.size(), core::Tr("Poids : %3d / %3d"), static_cast<int>(weight),
                 static_cast<int>(max_weight));
   paint.TextRight(
-      kBasicInfoWidthPixels - zeny_width - kWeightRightMargin, kPurseTop, text.data(), kTextLarge,
+      kBasicInfoWidthPixels - zeny_width - kWeightRightMargin, kPurseTop, text.data(), kTextBody,
       BasicInfoOverweight(weight, max_weight, view.overweight_percent) ? paint.Ink(kAlertRed)
                                                                        : ink);
 }
@@ -481,8 +483,8 @@ BasicInfoAnswer DrawBasicInfoWindow(BasicInfoWindowState& state, const BasicInfo
     if (state.expanded) {
       // LE TITRE, que le jeu écrit en blanc puis en noir par-dessus.
       const char* const title = core::Tr("Basic Info");
-      paint.Text(kTitleLeft + 1.0F, kTitleTop + 1.0F, title, kTextSmall, kWhite);
-      paint.Text(kTitleLeft, kTitleTop, title, kTextSmall, kBlack);
+      paint.Text(kTitleLeft + 1.0F, kTitleTop + 1.0F, title, kTextTitle, kWhite);
+      paint.Text(kTitleLeft, kTitleTop, title, kTextTitle, kBlack);
       PaintExpanded(paint, view, art);
       ShowWeightTip(paint, view);
     } else {

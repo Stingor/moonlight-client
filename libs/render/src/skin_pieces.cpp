@@ -3,6 +3,7 @@
 #include <array>
 
 #include "ro/formats/bmp.h"
+#include "ro/formats/image.h"
 
 namespace ro::render {
 namespace {
@@ -169,6 +170,17 @@ constexpr std::array<std::string_view, kSkinPieceCount> kPaths = {
     "basic_interface\\gzered_left.bmp",
     "basic_interface\\gzered_mid.bmp",
     "basic_interface\\gzered_right.bmp",
+    // La grille accrochée : le panneau, puis les bandeaux.
+    "menu_icon\\bg_menu.tga",
+    "menu_icon\\bt_menu_normal.bmp",
+    "menu_icon\\bt_menu_over.bmp",
+    "menu_icon\\bt_menu_press.bmp",
+    "menu_icon\\bt_menu_new_normal.bmp",
+    "menu_icon\\bt_menu_new_over.bmp",
+    "menu_icon\\bt_menu_new_press.bmp",
+    "menu_icon\\bt_menu_close_normal.bmp",
+    "menu_icon\\bt_menu_close_over.bmp",
+    "menu_icon\\bt_menu_close_press.bmp",
 };
 
 }  // namespace
@@ -193,7 +205,8 @@ SkinPieces LoadSkinPieces(vfs::Vfs& vfs) {
       pieces.missing.push_back(std::move(path));
       continue;
     }
-    auto image = formats::DecodeBmp(*bytes);
+    // ⚠ PAR L'EXTENSION : une pièce est un BMP, sauf le panneau de la grille.
+    auto image = formats::DecodeImage(path, *bytes);
     if (!image) {
       pieces.missing.push_back(std::move(path));
       continue;

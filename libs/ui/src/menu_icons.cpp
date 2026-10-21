@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdio>
 #include <string_view>
 
@@ -10,6 +11,7 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_bounds.h"
 
+#include "achievement_paint.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -208,10 +210,16 @@ struct GridRanks {
   std::size_t count = 0;
 };
 
-[[nodiscard]] GridRanks RanksOf(std::span<const MenuIconView> icons) {
+// LE RANG DE CHAQUE ICÔNE DANS LA GRILLE.
+//
+// ⚠ ACCROCHÉE SOUS LA FENÊTRE « BASIC INFO », LA GRILLE SE TASSE comme celle du
+// jeu : une icône masquée n'y garde pas sa case.
+[[nodiscard]] GridRanks RanksOf(std::span<const MenuIconView> icons, const MenuIconsLook& look,
+                                bool docked) {
   GridRanks ranks;
   for (const MenuIconView& icon : icons) {
-    if (!MenuIconOf(icon.command).off_grid) {
+    const bool hidden = look.places[static_cast<std::size_t>(icon.command)].hidden;
+    if (!MenuIconOf(icon.command).off_grid && !(docked && hidden)) {
       ranks.of[static_cast<std::size_t>(icon.command)] = ranks.count++;
     }
   }
@@ -235,7 +243,62 @@ struct GridRanks {
   }
   const float margin = kMenuIconsScreenMargin * scale;
   return {corner.x - margin + state.dock->x + kMenuIconsDockLeft * scale,
-          corner.y - margin + state.dock->y + (kMenuIconsDockTop - kMenuIconNewsLift) * scale};
+          corner.y - margin + state.dock->y +
+              (kMenuIconsDockTop - kMenuGridAboveDock - kMenuIconNewsLift) * scale};
+}
+
+// LA GRILLE ACCROCHÉE : son panneau sombre et son bandeau de tête, dans une
+// fenêtre à elle, posée sous les icônes. Rend vrai quand les icônes s'y montrent.
+//
+// ⚠ OUVERTE, TOUT SON RECTANGLE ARRÊTE LES CLICS ; fermée, son bandeau seul.
+// Le bandeau du « nouveau » remplace celui qui ouvre quand une icône attend.
+[[nodiscard]] bool DrawDockedGrid(MenuIconsState& state, std::span<const MenuIconView> icons,
+                                  std::size_t grid_count, const SkinArt& art, float scale) {
+  const ImVec2 top_left(state.dock->x, state.dock->y - kMenuGridAboveDock * scale);
+  const float height = grid_count > kMenuGridTallAfter ? kMenuGridTallHeight : kMenuGridHeight;
+  const bool news = std::ranges::any_of(icons, [](const MenuIconView& icon) {
+    return icon.news_lit && !MenuIconOf(icon.command).off_grid;
+  });
+  const bool news_band = !state.grid_open && news;
+  const float band_top = news_band ? 0.0F : kMenuGridBandTop;
+  const float band_height = news_band ? kMenuGridNewsBandHeight : kMenuGridBandHeight;
+  const float shown_height = state.grid_open ? height : band_top + band_height;
+
+  ImGui::SetNextWindowPos(top_left, ImGuiCond_Always);
+  ImGui::SetNextWindowSize(ImVec2(kMenuGridWidth * scale, std::ceil(shown_height * scale)),
+                           ImGuiCond_Always);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0F, 0.0F));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0F);
+  constexpr ImGuiWindowFlags kFlags =
+      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
+      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+      ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav;
+  if (ImGui::Begin("##grille_accrochee", nullptr, kFlags)) {
+    const achievement::Painter paint(ImGui::GetWindowDrawList(), top_left, scale);
+    if (state.grid_open) {
+      // LE PANNEAU COUPÉ au bas de la grille : l'image est plus haute qu'elle.
+      paint.PushClip(0.0F, kMenuGridBackgroundTop, kMenuGridWidth, height - kMenuGridBackgroundTop);
+      paint.Image(art.Get(render::SkinPiece::kMenuGridBackground), 0.0F, kMenuGridBackgroundTop);
+      paint.PopClip();
+      // Le reste du rectangle arrête les clics : rien ne passe au monde.
+      static_cast<void>(paint.Hit("##panneau", 0.0F, band_top + band_height, kMenuGridWidth,
+                                  height - band_top - band_height));
+    }
+    const achievement::HitResult band = paint.Hit("##bandeau", 0.0F, band_top, kMenuGridBandWidth,
+                                                  band_height, achievement::kOnRelease);
+    using render::SkinPiece;
+    const SkinPiece out = state.grid_open ? SkinPiece::kMenuGridCloseOut
+                          : news_band     ? SkinPiece::kMenuGridNewsOut
+                                          : SkinPiece::kMenuGridOpenOut;
+    const auto step = static_cast<int>(band.held ? 2 : band.hovered ? 1 : 0);
+    paint.Image(art.Get(static_cast<SkinPiece>(static_cast<int>(out) + step)), 0.0F, band_top);
+    if (band.pressed) {
+      state.grid_open = !state.grid_open;
+    }
+  }
+  ImGui::End();
+  ImGui::PopStyleVar(2);
+  return state.grid_open;
 }
 
 // L'ICÔNE SUIT-ELLE LA FENÊTRE « BASIC INFO » ? Toute icône de la grille, tant
@@ -483,7 +546,10 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
                               const SkinArt& art) {
   MenuIconsAnswer answer;
   const float scale = Scale();
-  const GridRanks ranks = RanksOf(icons);
+  const GridRanks ranks = RanksOf(icons, look, state.dock.has_value());
+  // ACCROCHÉE ET FERMÉE, la grille ne montre que son bandeau.
+  const bool grid_hidden =
+      state.dock.has_value() && !DrawDockedGrid(state, icons, ranks.count, art, scale);
 
   // LES CADRES DE CETTE IMAGE, un par commande : c'est la liste des frères qui
   // s'aimantent et partent en bloc. ⚠ UNE ICÔNE MASQUÉE N'Y COMPTE PAS : on ne
@@ -497,6 +563,9 @@ MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconVie
       continue;
     }
     const ImVec2 size = IconSize(icon, scale);
+    if (grid_hidden && FollowsDock(state, icon.command)) {
+      continue;
+    }
     if (FollowsDock(state, icon.command)) {
       const ImVec2 corner = HomeCorner(icon.command, ranks, state, scale);
       rects[index] = HudRect{.x = corner.x, .y = corner.y, .width = size.x, .height = size.y};
