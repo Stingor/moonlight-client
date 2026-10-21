@@ -107,9 +107,8 @@ constexpr float kBackgroundResume = kBackgroundSplit - kBasicInfoPurseLinePixels
 // droite que le jeu, mesuré sur une capture côte à côte. Un texte calé à gauche
 // recule d'autant ; calé à droite ou centré, il tombe déjà juste.
 constexpr float kGlyphBearing = 2.0F;
-// Le pseudo tient dans une case de quinze pixels de haut, plus étroite sur la
-// barre repliée, où le bouton de repli la borne.
-constexpr float kNameHeight = 15.0F;
+// Le pseudo s'arrête avant le bord droit, plus tôt sur la barre repliée, où le
+// bouton de repli le borne.
 constexpr float kFoldedNameRoom = 30.0F;
 constexpr float kNameRoom = 20.0F;
 
@@ -224,10 +223,13 @@ void PaintExpBar(const Painter& paint, float top, std::int64_t exp, std::int64_t
 
 // ── LE PSEUDO ───────────────────────────────────────────────────────────────
 
-// LE PSEUDO, coupé au bord de sa case : un nom long ne passe pas sous le
-// bouton de repli. `room` est ce que la case laisse à droite de la fenêtre.
+// LE PSEUDO, coupé à DROITE seulement : un nom long ne passe pas sous le bouton
+// de repli. `room` est ce que la case laisse à droite de la fenêtre.
+//
+// ⚠ JAMAIS EN BAS : la case du jeu fait quinze pixels de haut, et la ligne de
+// cette police est plus haute — la coupe y mangeait la queue d'un « g ».
 void PaintName(const Painter& paint, float left, float top, float room, std::string_view name) {
-  paint.PushClip(left, top, kBasicInfoWidthPixels - room, kNameHeight);
+  paint.PushClip(0.0F, top, left + kBasicInfoWidthPixels - room, kBasicInfoExpandedPixels - top);
   paint.Text(left - kGlyphBearing, top, name, kTextTitle, paint.Ink(kBlack));
   paint.PopClip();
 }
