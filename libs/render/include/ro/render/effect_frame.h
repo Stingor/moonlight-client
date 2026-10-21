@@ -103,6 +103,14 @@ struct PreparedEffect {
 // sauterait, lui, à chaque tour.
 [[nodiscard]] std::int32_t EffectLoopFrameAt(const PreparedEffect& effect, float elapsed_ms);
 
+// LA PART DE L'IMAGE SUIVANTE DÉJÀ ÉCOULÉE après `elapsed_ms`, de zéro à un
+// exclu : ce qu'un tic entamé ajoute à l'image entière d'`EffectFrameAt`. Zéro
+// pour une durée nulle, négative ou qui n'est pas un nombre.
+//
+// ⚠ C'EST UNE DONNÉE DE DESSIN, jamais d'horloge : l'image entière garde seule
+// les sons, les déclencheurs et la fin de l'effet. Voir `EffectLayerAt`.
+[[nodiscard]] float EffectFrameFraction(float elapsed_ms) noexcept;
+
 // L'état d'une couche à une image, prêt à composer un quad.
 struct EffectLayerFrame {
   // Les quatre coins, abscisses puis ordonnées, en pixels autour du centre.
@@ -128,8 +136,17 @@ struct EffectLayerFrame {
 // celle-ci se déforme : la couche tient alors sa pose jusqu'au bout de l'effet.
 // Sans cette fin, une couche qui s'achève opaque reste figée à l'écran pendant
 // que le reste de l'effet se termine.
+//
+// `frame_fraction`, de zéro à un exclu, est la part de l'image suivante déjà
+// écoulée — voir `EffectFrameFraction` — quand le joueur veut l'interpolation
+// d'images. SEULES LES GRANDEURS QUI SE DÉFORMENT D'UNE CLÉ À L'AUTRE la lisent :
+// coins, portion de texture, couleur, centre et angle. La clé en vigueur,
+// l'apparition et l'extinction de la couche et l'image de texture restent
+// celles de l'image entière, et la déformation ne dépasse jamais la clé
+// suivante. À zéro, l'image entière au bit près.
 [[nodiscard]] std::optional<EffectLayerFrame> EffectLayerAt(const PreparedEffectLayer& layer,
                                                             std::int32_t frame,
-                                                            std::int32_t last_frame);
+                                                            std::int32_t last_frame,
+                                                            float frame_fraction = 0.0F);
 
 }  // namespace ro::render

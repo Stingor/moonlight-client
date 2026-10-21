@@ -20,6 +20,7 @@
 #include "ro/render/effect_haunt.h"
 #include "ro/render/effect_launch.h"
 #include "ro/render/effect_node.h"
+#include "ro/render/effect_node_blend.h"
 #include "ro/render/effect_node_seed.h"
 #include "ro/render/effect_pooled_node_shape.h"
 #include "ro/render/effect_track.h"
@@ -354,6 +355,10 @@ struct PooledEffectNode {
   // LA DERNIÈRE PISTE DE L'ANNEAU EN COUCHES ONDULE SANS FIN : voir
   // `EffectLayeredRingNodePattern::waves_last_track`.
   bool waves_last_track = false;
+  // L'ÉTAT DU TIC PRÉCÉDENT, d'où le dessin glisse vers l'état courant : voir
+  // `effect_node_blend.h`. Rien pour un nœud né depuis le dernier tic, ou dont
+  // la forme se peint au tic.
+  std::optional<EffectNodeKinematics> previous_tick;
 };
 
 // UN NŒUD QUI NAÎT À SON ANCRE : sa forme, et le même point pour le sol d'où il
@@ -635,6 +640,10 @@ class EffectNodePool {
   [[nodiscard]] std::int32_t TakeDueTicks(std::uint32_t elapsed_ms);
   void Pass(bool single_frame);
   void FinishFrame();
+
+  // LE POIDS DU TIC COURANT dans l'image, du reste d'un pas entamé : voir
+  // `TickBlendWeight` et `effect_node_blend.h`. Un sans `blended`.
+  [[nodiscard]] float TickWeight(bool blended) const noexcept;
 
   // LES DEUX ANGLES DE BILLBOARD, posés sur toute la troupe avant qu'elle
   // avance. `render` ne connaît pas la caméra : l'appelant les calcule et les

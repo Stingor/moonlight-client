@@ -40,6 +40,7 @@
 #include "ro/render/effect_ground_box.h"
 #include "ro/render/effect_ground_gust.h"
 #include "ro/render/effect_launch.h"
+#include "ro/render/effect_node_blend.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_oriented_pair.h"
 #include "ro/render/effect_palette_billboard.h"
@@ -659,7 +660,7 @@ bool EffectNodesInPlay::ComposeGroundCellsOf(const ro::render::PooledEffectNode&
 // resté là-bas compose des QUADS DU MONDE, celui-ci compose une image d'ACT.
 // Deux dessinateurs, deux repères, deux voies de sortie.
 void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& pooled,
-                                            const ro::render::Camera& camera) {
+                                            const ro::render::Camera& camera, float weight) {
   const auto source =
       pooled.resource_paths.empty() ? sprites_.end() : sprites_.find(pooled.resource_paths[0]);
   if (source == sprites_.end()) {
@@ -667,7 +668,10 @@ void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& 
   }
   // 🔴 L'IMAGE SE COUCHE LE LONG DE SON VOL, et l'angle se calcule ICI parce
   // qu'il dépend de la CAMÉRA. Voir `EffectNodePattern::turns_with_flight`.
-  ro::render::EffectNode live = pooled.node;
+  // ENTRE DEUX TICS, la place, l'angle, l'échelle et la teinte glissent ; un
+  // projectile, sa lueur et son ombre glissent ensemble. Voir `effect_node_blend.h`.
+  ro::render::EffectNode live = ro::render::EffectNodeDrawnBetweenTicks(pooled, weight);
+  const glm::vec3 drawn_position = ro::render::EffectNodeDrawnPosition(pooled, weight);
   if (pooled.turns_with_flight && pooled.launch_direction != glm::vec3{0.0F, 0.0F, 0.0F}) {
     live.draws_rotated = true;
     live.spin_degrees = ro::render::ScreenRotationOfDirection(
@@ -714,10 +718,10 @@ void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& 
           LoadedSprite(std::string(ro::render::kShadowSpritePath)));
     }
     const auto& ground_height = pool_.world().ground_height;
-    projectile_casters_.Add(actor, pooled.ground_position,
-                            ground_height ? std::optional<float>(ground_height(
-                                                pooled.ground_position.x, pooled.ground_position.z))
-                                          : std::nullopt);
+    projectile_casters_.Add(
+        actor, drawn_position,
+        ground_height ? std::optional<float>(ground_height(drawn_position.x, drawn_position.z))
+                      : std::nullopt);
   }
   composed_.push_back(std::move(actor));
   // Chaque pose emporte le mot de rendu de son nœud : voir `SpriteBatches`.
@@ -770,7 +774,7 @@ void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& 
   // traînée, il se dessine une fois PAR CRAN — même acteur, points et alphas
   // différents. C'est le seul endroit où les deux se distinguent.
   if (pooled.trail.empty()) {
-    place(ComposedPlacement{composed_.size() - 1, pooled.ground_position});
+    place(ComposedPlacement{composed_.size() - 1, drawn_position});
     return;
   }
   // ⚠ L'ÉCHELLE D'UN CRAN EST ABSOLUE, celle d'une pose un FACTEUR : voir

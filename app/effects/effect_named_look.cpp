@@ -90,9 +90,9 @@ glm::vec3 EffectsInPlay::ViewOffsetInWorld(glm::vec2 view_offset) const {
 }
 
 void EffectsInPlay::LayOnGround(const EffectMapMemory::Playing& playing, std::int32_t frame,
-                                const MapStage& stage) {
+                                float frame_fraction, const MapStage& stage) {
   std::vector<ro::render::EffectQuad> quads;
-  ro::render::ComposeEffect(playing.effect->prepared, frame, quads);
+  ro::render::ComposeEffect(playing.effect->prepared, frame, quads, frame_fraction);
   ro::render::LaidEffectPose pose;
   pose.center = playing.ground_position;
   pose.turn_degrees = playing.turn_degrees;

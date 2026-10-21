@@ -52,6 +52,7 @@ add_library(moonclient_effect_nodes STATIC
     effects/effect_footprint_sow.cpp
     effects/effect_judge.cpp
     effects/effect_node_compose.cpp
+    effects/effect_node_compose_facing.cpp
     effects/effect_node_compose_multi.cpp
     effects/effect_node_compose_shapes.cpp
     effects/effect_node_sow.cpp

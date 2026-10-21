@@ -204,8 +204,8 @@ class EffectNodesInPlay {
            });
   }
 
-  // Fait battre les troupes et rend les SPRITES à peindre. L'horloge est celle
-  // de l'appelant ; la troupe garde le reste d'un tic incomplet.
+  // Fait battre les troupes et rend les SPRITES à peindre. L'horloge est celle de l'appelant ;
+  // la troupe garde le reste d'un tic incomplet, que `blended` peint entre deux tics.
   //
   // ⚠ C'EST CET APPEL QUI COMPOSE TOUT, anneaux compris : `WorldQuads` ne rend
   // que ce que le même passage a bâti.
@@ -214,7 +214,8 @@ class EffectNodesInPlay {
   // mouvement bâtit sa matrice À PARTIR D'ELLE — le quad orienté — se posent
   // dans un plan arbitraire sans elle, et se voient alors par la tranche.
   [[nodiscard]] std::span<const ro::render::DrawnActor> Drawn(std::uint32_t now_ms,
-                                                              const ro::render::Camera& camera);
+                                                              const ro::render::Camera& camera,
+                                                              bool blended = false);
 
   // LES SPRITES DU DERNIER `Drawn`, par lots qui partagent leur mélange et leur
   // épreuve de profondeur — ce que le MOT DE RENDU de leur nœud décide (voir
@@ -670,12 +671,10 @@ class EffectNodesInPlay {
   // LA GRILLE DE VISÉE : sept cases sur sept, peintes à même le terrain.
   bool PlayMagicTargets(std::uint32_t effect_id, glm::vec3 ground_position);
 
-  // COMPOSE LA GRILLE DE VISÉE d'un nœud, dans la voie des cases de terrain.
-  // Rend VRAI quand quelque chose y est entré.
-  // UN NŒUD QUI SE DESSINE EN SPRITE : son image, ses sources, et où il se
-  // pose. Voir `effect_node_compose_shapes.cpp`.
+  // UN NŒUD QUI SE DESSINE EN SPRITE, au poids `weight` du tic courant, puis LA GRILLE DE VISÉE
+  // d'un nœud — VRAI quand une case y est entrée. Voir `effect_node_compose_shapes.cpp`.
   void ComposeNodeAsSprite(const ro::render::PooledEffectNode& pooled,
-                           const ro::render::Camera& camera);
+                           const ro::render::Camera& camera, float weight);
   bool ComposeGroundCellsOf(const ro::render::PooledEffectNode& pooled, std::size_t& sans_texture,
                             std::size_t& sans_quad);
 

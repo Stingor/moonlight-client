@@ -147,7 +147,7 @@ void EffectLightsOf(std::span<const DrawnEffect> effects,
       continue;
     }
     const LoadedEffect& loaded = *drawn.effect;
-    ComposeEffect(loaded.prepared, drawn.frame, quads);
+    ComposeEffect(loaded.prepared, drawn.frame, quads, drawn.frame_fraction);
     // L'ancre se relève le long de l'axe du panneau, comme au dessin.
     const glm::vec3 anchor =
         drawn.ground_position + basis.up * (drawn.lift_pixels / kSpritePixelsPerWorldUnit);

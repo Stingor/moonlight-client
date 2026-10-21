@@ -12,6 +12,7 @@
 #include "ro/render/effect_render_word.h"
 #include "ro/render/effect_ring_flight.h"
 #include "ro/render/effect_tinted_quad.h"
+#include "ro/render/tick_blend.h"
 
 #include "effect_node_motion.h"
 #include "effect_track_angles.h"
@@ -73,8 +74,13 @@ void EffectNodePool::MoveAnchored(std::uint32_t anchor_id, glm::vec3 ground_posi
     }
     // ⚠ SAUF LA PLUIE QUI RENAÎT : sa place est absolue, et seule sa
     // renaissance relit le porteur. Voir `EffectChasedDriftIsReborn`.
+    // ⚠ L'ÉTAT DU TIC PRÉCÉDENT SUIT AUSSI : le porteur marche au rythme de
+    // l'image, et seul ce que le mouvement fait au tic glisse entre deux tics.
     if (!EffectChasedDriftIsReborn(node.chased_drift)) {
       node.ground_position += step;
+      if (node.previous_tick.has_value()) {
+        node.previous_tick->ground_position += step;
+      }
     }
     node.owner_position += step;
     // ⚠ ET L'ANCRE DE L'ORBITE AVEC, sans quoi un nœud qui tourne autour d'un
@@ -598,6 +604,10 @@ std::int32_t EffectNodePool::TakeDueTicks(std::uint32_t elapsed_ms) {
   return std::min(ticks, kEffectNodeMaxCatchUpTicks);
 }
 
+float EffectNodePool::TickWeight(bool blended) const noexcept {
+  return TickBlendWeight(owed_ms_, static_cast<std::uint32_t>(kEffectTickMs), blended);
+}
+
 void EffectNodePool::Pass(bool single_frame) {
   // Les morts se retirent en TASSANT plutôt qu'en effaçant un à un : une
   // troupe de buff meurt par grappes, et chaque effacement ferait glisser
@@ -621,6 +631,11 @@ void EffectNodePool::Pass(bool single_frame) {
     // que ce qu'il recevra encore de mises à jour, son âge ayant déjà crû.
     // Voir `EffectNode::instance_ticks_left`.
     nodes_[index].node.instance_ticks_left = life_left >= 0 ? life_left + 1 : 0;
+    // L'ÉTAT D'AVANT LA MISE À JOUR, d'où le dessin glissera : voir
+    // `effect_node_blend.h`.
+    if (bat) {
+      RememberEffectNodeTick(nodes_[index], EffectBeatsEveryFrame(nodes_[index].sown_by_effect_id));
+    }
     if (bat && !AdvanceEffectNode(nodes_[index].node)) {
       continue;
     }
@@ -645,9 +660,12 @@ void EffectNodePool::Pass(bool single_frame) {
     HauntPooledNode(nodes_[index], turn_degrees_, draw_);
     // OU LA DÉRIVE D'UN PÉTALE, qui s'intègre. Voir `EffectChasedDrift`.
     nodes_[index].ground_position += AdvanceEffectChasedDrift(nodes_[index].chased_drift, draw_);
-    static_cast<void>(RebirthEffectChasedDrift(nodes_[index].chased_drift,
-                                               nodes_[index].ground_position,
-                                               nodes_[index].owner_position, draw_));
+    // ⚠ UN PÉTALE QUI RENAÎT SAUTE AILLEURS : il se peint là, sans glisser
+    // depuis sa place d'avant.
+    if (RebirthEffectChasedDrift(nodes_[index].chased_drift, nodes_[index].ground_position,
+                                 nodes_[index].owner_position, draw_)) {
+      nodes_[index].previous_tick.reset();
+    }
     // LES PISTES BATTENT AU MÊME TIC QUE LE NŒUD, et par ce chemin-là : les
     // faire avancer au moment de composer les figerait dès qu'une image est
     // sautée, et les ferait courir deux fois si l'on compose deux fois.

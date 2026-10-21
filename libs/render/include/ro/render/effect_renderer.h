@@ -78,6 +78,10 @@ struct DrawnEffect {
   // peint est l'entier de ce facteur fois celui de la couche. Un pour tout effet
   // que rien n'éteint.
   float alpha = 1.0F;
+  // LA PART DE L'IMAGE SUIVANTE DÉJÀ ÉCOULÉE, sous l'interpolation d'images :
+  // les couches s'y déforment entre deux images. Zéro peint `frame` tel quel.
+  // Voir `EffectLayerAt`.
+  float frame_fraction = 0.0F;
 };
 
 // Un lot de quads d'effet DÉJÀ POSÉS DANS LE MONDE, et la texture qui les

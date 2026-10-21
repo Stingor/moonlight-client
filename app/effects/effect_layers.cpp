@@ -368,8 +368,8 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
   // part ailleurs.
   const std::vector<SownNamedSound> named_sounds = effects.TakeSownNamedSounds();
   sounds.HearNamedEffects(scene, named_sounds);
-  const std::span<const ro::render::DrawnEffect> played =
-      effects.Drawn(scene.now_ms, *scene.stage, *scene.world, *scene.planner);
+  const std::span<const ro::render::DrawnEffect> played = effects.Drawn(
+      scene.now_ms, *scene.stage, *scene.world, *scene.planner, scene.frame_interpolation);
   // La troupe des nœuds procéduraux doit BATTRE à chaque image : pas de
   // garde, sans quoi elle s'arrêterait dès qu'il n'y a rien à peindre — et
   // elle ne repartirait jamais.
@@ -384,7 +384,7 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
   // décomposition suit le client jusqu'au vidage des seaux — voir
   // `SpriteBatches` et la composition, `EffectNodesInPlay::Drawn`. Un nœud sans
   // mot s'ajoute et passe l'épreuve.
-  static_cast<void>(nodes.Drawn(scene.now_ms, *scene.camera));
+  static_cast<void>(nodes.Drawn(scene.now_ms, *scene.camera, scene.frame_interpolation));
   const EffectPainters painters{.sprites = &sprites,
                                 .effects = &effect_renderer,
                                 .ground_quads = &ground_quads,

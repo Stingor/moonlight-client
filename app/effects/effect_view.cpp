@@ -277,7 +277,8 @@ bool EffectsInPlay::Play(std::string_view path, glm::vec3 ground_position, std::
 std::span<const ro::render::DrawnEffect> EffectsInPlay::Drawn(std::uint32_t now_ms,
                                                               const MapStage& stage,
                                                               const ro::sim::World& world,
-                                                              ro::sim::WalkPlanner& planner) {
+                                                              ro::sim::WalkPlanner& planner,
+                                                              bool blended) {
   drawn_.clear();
   behind_.clear();
   over_.clear();
@@ -306,8 +307,11 @@ std::span<const ro::render::DrawnEffect> EffectsInPlay::Drawn(std::uint32_t now_
         !world.skill_units().contains(playing.loops_with_actor)) {
       continue;
     }
-    const std::optional<std::int32_t> frame =
-        StrFrameAt(playing, static_cast<float>(now_ms - playing.started_ms));
+    const auto elapsed_ms = static_cast<float>(now_ms - playing.started_ms);
+    const std::optional<std::int32_t> frame = StrFrameAt(playing, elapsed_ms);
+    // ENTRE DEUX IMAGES, pour le dessin seul : la fin de l'effet et ses sons
+    // restent sur l'image entière.
+    const float frame_fraction = blended ? ro::render::EffectFrameFraction(elapsed_ms) : 0.0F;
     if (!frame.has_value() || playing.LostItsBearerAt(now_ms)) {
       continue;
     }
@@ -342,10 +346,11 @@ std::span<const ro::render::DrawnEffect> EffectsInPlay::Drawn(std::uint32_t now_
       continue;
     }
     if (playing.laid_on_ground) {
-      LayOnGround(playing, *frame, stage);
+      LayOnGround(playing, *frame, frame_fraction, stage);
     } else {
       ro::render::DrawnEffect shown{playing.effect, playing.ground_position, *frame,
                                     playing.lift_pixels, playing.behind_actors};
+      shown.frame_fraction = frame_fraction;
       shown.spin_degrees = StrTurnDegrees(playing, camera_ ? camera_->yaw_degrees : 0.0F);
       shown.scale = playing.scale;
       shown.flip_x = playing.flip_x;

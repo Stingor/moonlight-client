@@ -222,6 +222,7 @@ add_library(ro_render STATIC
     src/effect_node_motion.cpp
     src/effect_node_motion_panels.cpp
     src/effect_node_motion_rings.cpp
+    src/effect_node_blend.cpp
     src/effect_node_pool.cpp
     src/effect_node_sprite_seed.cpp
     src/effect_node_world.cpp

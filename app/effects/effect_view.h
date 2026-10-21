@@ -472,11 +472,13 @@ class EffectsInPlay {
   // Un effet PORTÉ suit son acteur d'une image à l'autre, comme le nombre d'un
   // coup : le serveur le joue sur quelqu'un, et ce quelqu'un peut marcher. Un
   // porteur disparu l'emporte, ou le laisse finir là où il était — voir
-  // `Playing::dies_with_actor`.
+  // `Playing::dies_with_actor`. `blended`, l'interpolation d'images du joueur :
+  // les couches se déforment alors entre deux images, voir `EffectLayerAt`.
   [[nodiscard]] std::span<const ro::render::DrawnEffect> Drawn(std::uint32_t now_ms,
                                                                const MapStage& stage,
                                                                const ro::sim::World& world,
-                                                               ro::sim::WalkPlanner& planner);
+                                                               ro::sim::WalkPlanner& planner,
+                                                               bool blended = false);
 
   // CEUX QUI SE PEIGNENT AVANT LES CORPS — puis PAR-DESSUS TOUT, voir
   // `Playing::over_everything` —, rangés par le dernier `Drawn`.
@@ -661,7 +663,7 @@ class EffectsInPlay {
   // lot par quad. `BindLaidLots` rattache ensuite chaque lot à son quad, une
   // fois le tableau fini de grandir.
   void LayOnGround(const EffectMapMemory::Playing& playing, std::int32_t frame,
-                   const MapStage& stage);
+                   float frame_fraction, const MapStage& stage);
   void BindLaidLots();
 
   // Vrai quand le bras de cet effet est celui que la méthode prend : la cible
