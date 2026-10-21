@@ -245,7 +245,8 @@ class BackdropScene {
   // La case que la caméra vise, ou rien.
   std::optional<ro::sim::CellPosition> watched_;
   // LE DOCUMENT D'ÉDITION DE LA VILLE et celui des lumières de modèle, copiés au
-  // montage : leurs lumières s'allument comme en partie. Vides sans magasin.
+  // montage : leurs lumières s'allument et leurs effets se lèvent comme en
+  // partie. Vides sans magasin.
   ro::mapedit::MapEdit document_;
   ro::mapedit::MapEdit model_book_;
   // Le premier convive peint a-t-il été annoncé au journal ? Remis à faux à

@@ -9,6 +9,7 @@
 
 #include "ro/core/log.h"
 #include "ro/mapedit/map_edit.h"
+#include "ro/render/edited_map_effects.h"
 #include "ro/render/map_point_lights.h"
 #include "ro/render/point_shadow_pass.h"
 #include "ro/render/sky_body.h"
@@ -207,8 +208,14 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   if (audio->sound_audible()) {
     sounds_->HearMapAmbience(scene);
   }
-  effects_->DrawAfterActors(*stage_, scene, *sounds_, drops_, sprites_, LookAt(), aspect_ratio,
-                            viewport_width, viewport_height, fog);
+  // LES OBJETS D'EFFET DE LA VILLE : ceux du RSW, de son document et de ses
+  // modèles, comme en partie, à la nuit de cette image.
+  effects_->DrawAfterActors(
+      *stage_, scene, *sounds_, drops_, sprites_, LookAt(), aspect_ratio, viewport_width,
+      viewport_height, fog,
+      ro::render::SceneMapEffects(stage_->scene, document_, model_book_,
+                                  ro::render::NightStrength(lit.sky.light, closed_to_sky_),
+                                  lit.sky.hour));
 }
 
 void BackdropScene::ComposePassersby(const ro::render::Camera& camera, std::uint32_t elapsed_ms,

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ro/core/log.h"
+#include "ro/render/edited_map_effects.h"
 #include "ro/render/map_effect_lots.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/map_smoke.h"
@@ -68,12 +69,13 @@ void BackdropEffects::DrawMapEffects(const MapStage& stage, const ro::render::Ca
 void BackdropEffects::DrawAfterActors(MapStage& stage, const SoundStage& scene, ActorSounds& sounds,
                                       ItemDrops& drops, ro::render::SpriteRenderer& sprites,
                                       glm::vec3 anchor, float aspect_ratio, float viewport_width,
-                                      float viewport_height, const ro::render::SceneFog& fog) {
+                                      float viewport_height, const ro::render::SceneFog& fog,
+                                      std::vector<ro::formats::RswEffect> map_objects) {
   if (!renderer_.has_value() || !ground_.has_value()) {
     return;
   }
   RaiseSky(stage, anchor);
-  AdvanceMapEffects(stage, scene, sounds, anchor);
+  AdvanceMapEffects(stage, scene, sounds, anchor, std::move(map_objects));
   DrawEffectLayers(effects_, nodes_, sounds, footprints_, drops, scene, sprites, *renderer_,
                    *ground_, aspect_ratio, viewport_width, viewport_height, fog);
   // ⚠ LA SECOUSSE SE DÉPOSE ET SE JETTE : la caméra du décor tourne sur son
@@ -108,10 +110,16 @@ void BackdropEffects::RaiseSky(const MapStage& stage, glm::vec3 anchor) {
 }
 
 void BackdropEffects::AdvanceMapEffects(MapStage& stage, const SoundStage& scene,
-                                        ActorSounds& sounds, glm::vec3 anchor) {
-  if (!map_raised_) {
-    map_effects_.Raise(stage.scene.effect_table, stage.scene.rsw.effects(), stage.scene.gnd.width(),
+                                        ActorSounds& sounds, glm::vec3 anchor,
+                                        std::vector<ro::formats::RswEffect> map_objects) {
+  // LES OBJETS D'EFFET, comme en partie : la liste qui change — la nuit qui
+  // tombe ou se lève — se relève.
+  if (!map_raised_ || !ro::render::SameMapEffects(map_objects, raised_objects_)) {
+    map_effects_.Raise(stage.scene.effect_table, map_objects, stage.scene.gnd.width(),
                        stage.scene.gnd.height());
+    raised_objects_ = std::move(map_objects);
+  }
+  if (!map_raised_) {
     // LES SOURCES DE SON DE LA CARTE, dans la même passe, comme la partie.
     sounds.RaiseMapAmbience(
         stage.scene.rsw.sounds(),
