@@ -37,7 +37,14 @@ inline constexpr const char* kBasicInfoExpandedKey = "basic_info.expanded";
 // le jeu dessine sa barre dans la fenêtre, et tout ce qui suit s'y mesure.
 inline constexpr float kBasicInfoWidthPixels = 220.0F;
 inline constexpr float kBasicInfoCollapsedPixels = 55.0F;
-inline constexpr float kBasicInfoExpandedPixels = 134.0F;
+// 🔴 DÉPLIÉE, UNE LIGNE DE PLUS QUE LE JEU : le zeny passe sous le poids, au lieu
+// de partager sa ligne. Le jeu les met côte à côte, et la ligne déborde à gauche
+// dès que les deux nombres sont longs — un zeny au plafond n'en laisse que
+// « s : ». Écart choisi par le joueur.
+inline constexpr float kBasicInfoGameExpandedPixels = 134.0F;
+inline constexpr float kBasicInfoPurseLinePixels = 12.0F;
+inline constexpr float kBasicInfoExpandedPixels =
+    kBasicInfoGameExpandedPixels + kBasicInfoPurseLinePixels;
 inline constexpr float kBasicInfoTitleBarPixels = 17.0F;
 
 // LE SEUIL DE LA COULEUR D'ALERTE de la vie et de la magie : sous un quart, la

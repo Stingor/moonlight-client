@@ -88,10 +88,25 @@ constexpr float kPercentLeft = 173.0F;
 constexpr float kBaseLevelTop = 84.0F;
 constexpr float kJobLevelTop = 96.0F;
 constexpr float kPurseTop = 116.0F;
-// Le zeny se cale à droite à cinq pixels du bord ; le poids, à dix pixels du
-// bord moins la largeur du zeny — soit cinq pixels entre les deux.
+// Le poids, puis le zeny une ligne dessous, calés à droite à cinq pixels du
+// bord — la place que le jeu donne au zeny.
 constexpr float kPurseRightMargin = 5.0F;
-constexpr float kWeightRightMargin = 10.0F;
+constexpr float kZenyTop = kPurseTop + kBasicInfoPurseLinePixels;
+
+// ── LE FOND ALLONGÉ ─────────────────────────────────────────────────────────
+//
+// Le fond du jeu est d'une pièce, sa bande du bas comprise. Sous le séparateur,
+// cette bande n'est qu'une rayure de quatre pixels répétée jusqu'au liseré :
+// le fond se peint en deux morceaux, le haut à sa place et le bas descendu
+// d'une ligne, et les rayures se raccordent puisque la ligne en compte trois.
+//
+// La coupe, dans la bande ; le bas reprend la rayure une ligne plus haut.
+constexpr float kBackgroundSplit = 128.0F;
+constexpr float kBackgroundResume = kBackgroundSplit - kBasicInfoPurseLinePixels;
+// L'APPROCHE DE LA POLICE : ce client pose ses glyphes deux pixels plus à
+// droite que le jeu, mesuré sur une capture côte à côte. Un texte calé à gauche
+// recule d'autant ; calé à droite ou centré, il tombe déjà juste.
+constexpr float kGlyphBearing = 2.0F;
 // Le pseudo tient dans une case de quinze pixels de haut, plus étroite sur la
 // barre repliée, où le bouton de repli la borne.
 constexpr float kNameHeight = 15.0F;
@@ -116,10 +131,8 @@ constexpr float kExpWidth = 112.0F;
 constexpr float kExpHeight = 6.0F;
 constexpr float kExpFramePixels = 1.0F;
 
-// La bulle du poids : le bas-gauche du panneau, sur cent pixels et vingt de
-// haut.
-constexpr float kWeightTipWidth = 100.0F;
-constexpr float kWeightTipHeight = 20.0F;
+// La bulle du poids : sur la ligne du poids, de toute la largeur.
+constexpr float kWeightTipTop = 114.0F;
 
 constexpr double kPercent = 100.0;
 constexpr double kPerMille = 1000.0;
@@ -215,7 +228,7 @@ void PaintExpBar(const Painter& paint, float top, std::int64_t exp, std::int64_t
 // bouton de repli. `room` est ce que la case laisse à droite de la fenêtre.
 void PaintName(const Painter& paint, float left, float top, float room, std::string_view name) {
   paint.PushClip(left, top, kBasicInfoWidthPixels - room, kNameHeight);
-  paint.Text(left, top, name, kTextTitle, paint.Ink(kBlack));
+  paint.Text(left - kGlyphBearing, top, name, kTextTitle, paint.Ink(kBlack));
   paint.PopClip();
 }
 
@@ -260,7 +273,7 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
     const float room = kBasicInfoWidthPixels - paint.TextWidth(levels.data(), kTextBody);
     left = room >= 0.0F ? std::trunc(room / 2.0F) : kFoldedNarrowLeft;
   }
-  paint.Text(left, kFoldedLevelsTop, levels.data(), kTextBody, ink);
+  paint.Text(left - kGlyphBearing, kFoldedLevelsTop, levels.data(), kTextBody, ink);
 
   // LA LIGNE DES JAUGES : la vie, un séparateur, la magie. ⚠ LE POINT APRÈS
   // « HP » ET « SP » TOMBE avec la forme courte de la ligne du dessus.
@@ -275,11 +288,11 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
       std::snprintf(text.data(), text.size(), core::Tr("HP. %d / %d"), static_cast<int>(view.hp),
                     static_cast<int>(view.max_hp));
     }
-    paint.Text(x, kFoldedGaugesTop, text.data(), kTextBody,
+    paint.Text(x - kGlyphBearing, kFoldedGaugesTop, text.data(), kTextBody,
                BasicInfoLow(view.hp, view.max_hp) ? alert : ink);
     x += paint.TextWidth(text.data(), kTextBody);
     constexpr const char* kSeparator = " | ";
-    paint.Text(x, kFoldedGaugesTop, kSeparator, kTextBody, ink);
+    paint.Text(x - kGlyphBearing, kFoldedGaugesTop, kSeparator, kTextBody, ink);
     x += paint.TextWidth(kSeparator, kTextBody);
   }
   if (view.max_sp >= 0) {
@@ -290,7 +303,7 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
       std::snprintf(text.data(), text.size(), core::Tr("SP. %d / %d"), static_cast<int>(view.sp),
                     static_cast<int>(view.max_sp));
     }
-    paint.Text(x, kFoldedGaugesTop, text.data(), kTextBody,
+    paint.Text(x - kGlyphBearing, kFoldedGaugesTop, text.data(), kTextBody,
                BasicInfoLow(view.sp, view.max_sp) ? alert : ink);
   }
 }
@@ -300,10 +313,10 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
 void PaintExpanded(const Painter& paint, const BasicInfoView& view, const SkinArt& art) {
   const ImU32 ink = paint.Ink(kBlack);
   PaintName(paint, kNameLeft, kNameTop, kNameRoom, view.name);
-  paint.Text(kNameLeft, kJobTop, view.job, kTextBody, ink);
+  paint.Text(kNameLeft - kGlyphBearing, kJobTop, view.job, kTextBody, ink);
 
-  paint.Text(kLabelLeft, kHpTop, core::Tr("HP"), kTextBody, ink);
-  paint.Text(kLabelLeft, kSpTop, core::Tr("SP"), kTextBody, ink);
+  paint.Text(kLabelLeft - kGlyphBearing, kHpTop, core::Tr("HP"), kTextBody, ink);
+  paint.Text(kLabelLeft - kGlyphBearing, kSpTop, core::Tr("SP"), kTextBody, ink);
   PaintGauge(paint, art, kHpGaugeTop, view.hp, view.max_hp);
   PaintGauge(paint, art, kSpGaugeTop, view.sp, view.max_sp);
   Line text{};
@@ -311,46 +324,56 @@ void PaintExpanded(const Painter& paint, const BasicInfoView& view, const SkinAr
   if (view.max_hp != 0) {
     std::snprintf(text.data(), text.size(), "%lld%%",
                   static_cast<long long>(view.hp * 100 / view.max_hp));
-    paint.Text(kPercentLeft, kHpTop, text.data(), kTextBody, ink);
+    paint.Text(kPercentLeft - kGlyphBearing, kHpTop, text.data(), kTextBody, ink);
   }
   if (view.max_sp != 0) {
     std::snprintf(text.data(), text.size(), "%lld%%",
                   static_cast<long long>(view.sp * 100 / view.max_sp));
-    paint.Text(kPercentLeft, kSpTop, text.data(), kTextBody, ink);
+    paint.Text(kPercentLeft - kGlyphBearing, kSpTop, text.data(), kTextBody, ink);
   }
 
   std::snprintf(text.data(), text.size(), core::Tr("Base Lv. %d"),
                 static_cast<int>(view.base_level));
-  paint.Text(kLabelLeft, kBaseLevelTop, text.data(), kTextBody, ink);
+  paint.Text(kLabelLeft - kGlyphBearing, kBaseLevelTop, text.data(), kTextBody, ink);
   std::snprintf(text.data(), text.size(), core::Tr("Job Lv. %d"), static_cast<int>(view.job_level));
-  paint.Text(kLabelLeft, kJobLevelTop, text.data(), kTextBody, ink);
+  paint.Text(kLabelLeft - kGlyphBearing, kJobLevelTop, text.data(), kTextBody, ink);
   PaintExpBar(paint, kBaseExpTop, view.base_exp, view.next_base_exp);
   PaintExpBar(paint, kJobExpTop, view.job_exp, view.next_job_exp);
 
-  // LE ZENY CALÉ À DROITE, PUIS LE POIDS CALÉ CONTRE LUI.
-  const std::string grouped = BasicInfoGrouped(view.zeny);
-  // ⚠ SANS TRADUCTION : le jeu écrit « Zeny : » partout, et sa largeur place le
-  // poids.
-  std::snprintf(text.data(), text.size(), "Zeny : %s", grouped.c_str());
+  // LE POIDS, PUIS LE ZENY SOUS LUI, tous deux calés à droite.
   const float purse_right = kBasicInfoWidthPixels - kPurseRightMargin;
-  const float zeny_width = paint.TextWidth(text.data(), kTextBody);
-  paint.TextRight(purse_right, kPurseTop, text.data(), kTextBody, ink);
   const std::int64_t weight = view.weight_tenths / kTenthsPerUnit;
   const std::int64_t max_weight = view.max_weight_tenths / kTenthsPerUnit;
   std::snprintf(text.data(), text.size(), core::Tr("Poids : %3d / %3d"), static_cast<int>(weight),
                 static_cast<int>(max_weight));
-  paint.TextRight(
-      kBasicInfoWidthPixels - zeny_width - kWeightRightMargin, kPurseTop, text.data(), kTextBody,
-      BasicInfoOverweight(weight, max_weight, view.overweight_percent) ? paint.Ink(kAlertRed)
-                                                                       : ink);
+  paint.TextRight(purse_right, kPurseTop, text.data(), kTextBody,
+                  BasicInfoOverweight(weight, max_weight, view.overweight_percent)
+                      ? paint.Ink(kAlertRed)
+                      : ink);
+  // ⚠ « ZENY : » SANS TRADUCTION : le jeu l'écrit ainsi partout.
+  const std::string grouped = BasicInfoGrouped(view.zeny);
+  std::snprintf(text.data(), text.size(), "Zeny : %s", grouped.c_str());
+  paint.TextRight(purse_right, kZenyTop, text.data(), kTextBody, ink);
+}
+
+// LE FOND DÉPLIÉ, allongé d'une ligne dans sa bande du bas.
+void PaintExpandedBackground(const Painter& paint, const SkinImage& background) {
+  const float extra = kBasicInfoPurseLinePixels;
+  const float split_v = kBackgroundSplit / background.height;
+  const float resume_v = kBackgroundResume / background.height;
+  PaintOnPaper(paint.into(), background, paint.At(0.0F, 0.0F),
+               paint.At(background.width, kBackgroundSplit), paint.paper(), ImVec2(0.0F, 0.0F),
+               ImVec2(1.0F, split_v));
+  PaintOnPaper(paint.into(), background, paint.At(0.0F, kBackgroundSplit),
+               paint.At(background.width, background.height + extra), paint.paper(),
+               ImVec2(0.0F, resume_v), ImVec2(1.0F, 1.0F));
 }
 
 // LA BULLE DU POIDS, au survol du bas-gauche du panneau.
 void ShowWeightTip(const Painter& paint, const BasicInfoView& view) {
-  const float top = kBasicInfoExpandedPixels - kWeightTipHeight;
   if (!ImGui::IsWindowHovered() ||
-      !ImGui::IsMouseHoveringRect(paint.At(0.0F, top),
-                                  paint.At(kWeightTipWidth, kBasicInfoExpandedPixels))) {
+      !ImGui::IsMouseHoveringRect(paint.At(0.0F, kWeightTipTop),
+                                  paint.At(kBasicInfoWidthPixels, kZenyTop))) {
     return;
   }
   const std::int64_t weight = view.weight_tenths / kTenthsPerUnit;
@@ -450,7 +473,7 @@ BasicInfoAnswer DrawBasicInfoWindow(BasicInfoWindowState& state, const BasicInfo
     const SkinImage& background = art.Get(SkinPiece::kBasicInfoBackground);
     if (state.expanded) {
       if (background.usable()) {
-        paint.Art(background, 0.0F, 0.0F);
+        PaintExpandedBackground(paint, background);
       } else {
         PaintFoldedBody(paint, height);
       }
@@ -483,8 +506,8 @@ BasicInfoAnswer DrawBasicInfoWindow(BasicInfoWindowState& state, const BasicInfo
     if (state.expanded) {
       // LE TITRE, que le jeu écrit en blanc puis en noir par-dessus.
       const char* const title = core::Tr("Basic Info");
-      paint.Text(kTitleLeft + 1.0F, kTitleTop + 1.0F, title, kTextTitle, kWhite);
-      paint.Text(kTitleLeft, kTitleTop, title, kTextTitle, kBlack);
+      paint.Text(kTitleLeft - kGlyphBearing + 1.0F, kTitleTop + 1.0F, title, kTextTitle, kWhite);
+      paint.Text(kTitleLeft - kGlyphBearing, kTitleTop, title, kTextTitle, kBlack);
       PaintExpanded(paint, view, art);
       ShowWeightTip(paint, view);
     } else {

@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <string_view>
 
+#include <imgui_internal.h>
+
 #include "ro/render/skin_pieces.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
@@ -274,6 +276,10 @@ struct GridRanks {
       ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
       ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav;
   if (ImGui::Begin("##grille_accrochee", nullptr, kFlags)) {
+    // 🔴 TOUT AU FOND, À CHAQUE IMAGE : née après les icônes — la fenêtre qu'on
+    // allume en jeu —, elle passerait devant elles, les assombrirait et
+    // prendrait leurs clics.
+    ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
     const achievement::Painter paint(ImGui::GetWindowDrawList(), top_left, scale);
     if (state.grid_open) {
       // LE PANNEAU COUPÉ au bas de la grille : l'image est plus haute qu'elle.
