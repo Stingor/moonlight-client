@@ -260,7 +260,7 @@ class ChatTabsView {
   // récente. Vide si leur case est décochée.
   [[nodiscard]] std::span<const std::string> restored_typed() const noexcept { return past_.typed; }
 
-  // ── LE JOURNAL SUR LE DISQUE (ADR 0033, entrée A4) ────────────────
+  // ── LE JOURNAL SUR LE DISQUE (voir `chat_log_file.h`) ────────────
   // Ouvre ou ferme le journal du jour. Appelée à chaque image : c'est une CASE,
   // pas un évènement, et l'ordre de chargement des réglages n'est pas quelque
   // chose sur quoi il faut parier.

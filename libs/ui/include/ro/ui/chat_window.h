@@ -37,9 +37,7 @@ namespace ro::ui {
 // l'attrapant là où il n'y a rien à cliquer, et on la redimensionne par ses
 // QUATRE BORDS — voir `chat_frame.h` et `chat_strip.h`, où vivent les raisons.
 //
-// Ce qui lui manque encore par rapport au client d'origine est inventorié dans
-// ADR 0033 : les genres de message que le client COMPOSE lui-même, et les liens
-// d'objet.
+// Ce qui la sépare encore du client d'origine est inventorié dans ADR 0033.
 
 inline constexpr const char* kChatWindowTitle = core::TrText("Conversation");
 inline constexpr const char* kChatWindowId = "chat";

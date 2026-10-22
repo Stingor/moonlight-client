@@ -369,7 +369,7 @@ void ChatLinePreviewMaker::Refresh(const char* outgoing, const ChatWireSpeaker& 
 
   // ⚠ LE CHUCHOTEMENT N'EST PAS UNE DESTINATION QU'ON ARME : il lui faut un
   // destinataire, et un mode armé sans nom enverrait dans le vide. Il se dit
-  // par son sigil, ou par la box qui vient avec (entrée A10).
+  // par son sigil, ou par la box destinataire qui vient avec.
   choices_.clear();
   for (const ChatTarget fixed : {ChatTarget::kPublic, ChatTarget::kParty, ChatTarget::kGuild,
                                  ChatTarget::kClan, ChatTarget::kAlly}) {

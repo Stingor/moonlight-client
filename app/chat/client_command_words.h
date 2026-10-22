@@ -121,7 +121,7 @@ inline constexpr std::string_view kScaleAltCommand = "/scale";
 //
 // ⚠ C'EST CELLE DU CLIENT, au même nom et au même endroit — `<racine>\Chat\`.
 // Un joueur qui la connaît doit la retrouver là où il l'a laissée ; voir
-// `chat_log_file.h` et ADR 0033, entrée A4.
+// `chat_log_file.h`.
 inline constexpr std::string_view kSaveChatCommand = "/savechat";
 
 inline constexpr std::string_view kMusicCommand = "/bgm";
