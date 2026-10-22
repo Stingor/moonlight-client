@@ -69,6 +69,12 @@ struct ChatBubbleLook {
   float corner_radius = 4.0F;
   float padding_x = 6.0F;
   float padding_y = 3.0F;
+
+  // LA TAILLE DU TEXTE, en pour cent de celle de l'interface. Le texte se pose
+  // à sa vraie taille de police, et TOUTE LA BULLE SUIT la même échelle : cadre,
+  // marges, arrondi, largeur de coupure et montée. Un texte grossi dans un
+  // cadre resté petit déborderait, et viendrait mordre sur la jauge de vie.
+  int text_scale_percent = 100;
 };
 
 // Les bornes des réglages, là où un nombre libre n'aurait pas de sens.
@@ -78,6 +84,16 @@ inline constexpr float kMostBubblePerCharacterMs = 500.0F;
 inline constexpr float kMostBubbleRisePixels = 120.0F;
 inline constexpr float kMostBubbleCornerRadius = 12.0F;
 inline constexpr float kMostBubblePadding = 20.0F;
+inline constexpr int kLeastBubbleTextPercent = 80;
+inline constexpr int kMostBubbleTextPercent = 160;
+
+// La taille du texte réglée, RAMENÉE DANS SES BORNES : un fichier de réglages
+// se modifie à la main, et une valeur relue hors bornes ne doit ni écraser la
+// bulle ni lui faire couvrir l'écran.
+[[nodiscard]] int ChatBubbleTextPercent(int asked_percent);
+
+// L'échelle de toute la bulle, texte compris : un pour la taille d'origine.
+[[nodiscard]] float ChatBubbleScale(const ChatBubbleLook& look);
 
 // Ce que le client d'origine donne à toute bulle, quelle qu'en soit la longueur.
 inline constexpr float kClientBubbleMs = 5000.0F;

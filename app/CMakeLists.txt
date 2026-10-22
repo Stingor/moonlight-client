@@ -802,6 +802,17 @@ target_link_libraries(moonclient_portraitoptions
 
 target_include_directories(moonclient_portraitoptions PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LA TAILLE DU TEXTE DES BULLES DE PAROLE, en bibliothèque : sa clé, ses bornes
+# et la valeur relue hors bornes se vérifient sur un banc.
+add_library(moonclient_bubbleoptions STATIC
+    options/bubble_text_options.cpp)
+
+target_link_libraries(moonclient_bubbleoptions
+    PUBLIC ro_core ro_ui moonclient_settings
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_bubbleoptions PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # LA PAGE « GRAPHICS » ET CE QU'ELLE DEMANDE À UNE SCÈNE DE CARTE, en
 # bibliothèque : la partie et la ville de fond de l'écran de connexion lisent
 # les mêmes réglages par les mêmes fonctions, et un étage oublié par l'une ne se
@@ -1898,7 +1909,7 @@ target_link_libraries(moonclient
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_loading moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
-            moonclient_portraitoptions moonclient_factorylayout
+            moonclient_portraitoptions moonclient_bubbleoptions moonclient_factorylayout
             moonclient_seatlayout moonclient_settings moonclient_settinglinks ro_audio ro_core ro_formats
             ro_net ro_sim ro_vfs
             ro_render ro_render_gl ro_ui ro_ui_gl SDL3::SDL3 yaml-cpp::yaml-cpp

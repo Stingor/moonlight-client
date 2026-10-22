@@ -25,7 +25,18 @@ using chat_log_detail::PlaceTarget;
 // une bulle qui pâlit dès son apparition se lit comme un défaut d'affichage.
 constexpr float kFadeFraction = 0.25F;
 
+constexpr int kWholePercent = 100;
+
 }  // namespace
+
+int ChatBubbleTextPercent(int asked_percent) {
+  return std::clamp(asked_percent, kLeastBubbleTextPercent, kMostBubbleTextPercent);
+}
+
+float ChatBubbleScale(const ChatBubbleLook& look) {
+  return static_cast<float>(ChatBubbleTextPercent(look.text_scale_percent)) /
+         static_cast<float>(kWholePercent);
+}
 
 std::size_t ChatBubbleShownCharacters(std::string_view text,
                                       std::span<const ChatInlineImage> images) {
@@ -57,8 +68,15 @@ void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bub
   }
   ImDrawList* into = &into_list;
   ImFont* const font = ImGui::GetFont();
-  const float line_height = ImGui::GetTextLineHeight();
-  const float most_width = std::max(0.0F, most_width_px);
+  // ⚠ LA VRAIE TAILLE DE POLICE, et non une image étirée : le texte reste net.
+  // Tout ce qui mesure la bulle suit la même échelle.
+  const float scale = ChatBubbleScale(look);
+  const float line_height = ImGui::GetTextLineHeight() * scale;
+  const float most_width = std::max(0.0F, most_width_px) * scale;
+  const float rise = look.rise_pixels * scale;
+  const float padding_x = look.padding_x * scale;
+  const float padding_y = look.padding_y * scale;
+  const float corner_radius = look.corner_radius * scale;
 
   // Ce que le fil sait peindre, SANS SES VIGNETTES : leur rangée grandirait, et
   // leur attente demanderait un téléchargement que la bulle n'a pas à lancer.
@@ -68,7 +86,7 @@ void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bub
     bubble_rich.picture_pixels = 0.0F;
     bubble_rich.seen_pictures = nullptr;
   }
-  const ChatLogStyle style{.font_size = ImGui::GetFontSize(),
+  const ChatLogStyle style{.font_size = ImGui::GetFontSize() * scale,
                            .rich = rich != nullptr ? &bubble_rich : nullptr};
   // Une largeur nulle laisse la bulle d'un seul tenant.
   PlaceFrame frame{.font = font,
@@ -119,17 +137,17 @@ void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bub
     // ⚠ LA BULLE POUSSE VERS LE HAUT depuis la tête : son BAS est le point
     // donné, moins la montée. Prendre le haut pour référence la ferait descendre
     // sur le personnage à mesure que la phrase s'allonge.
-    const float bottom = bubble.head.y - look.rise_pixels;
-    const ImVec2 top_left(bubble.head.x - widest * 0.5F - look.padding_x,
-                          bottom - tall - look.padding_y * 2.0F);
-    const ImVec2 bottom_right(bubble.head.x + widest * 0.5F + look.padding_x, bottom);
+    const float bottom = bubble.head.y - rise;
+    const ImVec2 top_left(bubble.head.x - widest * 0.5F - padding_x,
+                          bottom - tall - padding_y * 2.0F);
+    const ImVec2 bottom_right(bubble.head.x + widest * 0.5F + padding_x, bottom);
 
     const int first_vertex = into->VtxBuffer.Size;
     if (look.background) {
-      into->AddRectFilled(top_left, bottom_right, look.background_color, look.corner_radius);
-      into->AddRect(top_left, bottom_right, look.border_color, look.corner_radius);
+      into->AddRectFilled(top_left, bottom_right, look.background_color, corner_radius);
+      into->AddRect(top_left, bottom_right, look.border_color, corner_radius);
     }
-    frame.origin = ImVec2(bubble.head.x - widest * 0.5F, top_left.y + look.padding_y);
+    frame.origin = ImVec2(bubble.head.x - widest * 0.5F, top_left.y + padding_y);
     frame.row_shift = row_shift;
     Pen pen{.row = line_height};
     // ⚠ NI ZONES DE CLIC NI MÉMOIRE DES RÉVÉLATIONS : un spoiler reste masqué.

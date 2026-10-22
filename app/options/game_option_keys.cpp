@@ -22,6 +22,7 @@
 #include "ro/ui/ui_context.h"
 
 #include "chat/chat_history_file.h"
+#include "options/bubble_text_options.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
 #include "options/staff_sky_keys.h"
@@ -762,6 +763,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Declare(kBubbleClientTimingKey, &bubbles_.client_timing);
   into.Declare(kBubbleBaseMsKey, &bubbles_.base_ms);
   into.Declare(kBubblePerCharacterMsKey, &bubbles_.per_character_ms);
+  DeclareBubbleTextScale(into, bubbles_);
   into.Declare(kBubbleRiseKey, &bubbles_.rise_pixels);
   into.Declare(kBubbleWidthKey, &bubbles_.width_fraction);
   into.Declare(kBubbleOpacityKey, &bubbles_.opacity);

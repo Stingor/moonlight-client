@@ -19,6 +19,7 @@
 #include "ro/ui/ui_context.h"
 
 #include "chat/chat_history_file.h"
+#include "options/bubble_text_options.h"
 #include "options/display_options.h"
 #include "options/option_row_kinds.h"
 
@@ -604,6 +605,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
       break;
     case GameOption::kBubblePerCharacterMs:
       bubbles_.per_character_ms = asked.value;
+      break;
+    case GameOption::kBubbleTextScale:
+      ChangeBubbleTextScale(bubbles_, asked.value);
       break;
     case GameOption::kBubbleRise:
       bubbles_.rise_pixels = asked.value;

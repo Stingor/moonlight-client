@@ -20,6 +20,7 @@
 #include "ro/ui/system_fonts.h"
 
 #include "options/bubble_samples.h"
+#include "options/bubble_text_options.h"
 #include "options/entity_page_tabs.h"
 #include "options/game_options.h"
 #include "options/option_row_kinds.h"
@@ -264,6 +265,8 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                                        .lowest = 0.0F,
                                        .highest = ro::ui::kMostBubblePerCharacterMs,
                                        .format = "%.0f ms"});
+  bubble_rows_.push_back(
+      BubbleTextScaleRow(static_cast<int>(GameOption::kBubbleTextScale), bubbles_));
   bubble_rows_.push_back(OptionRowView{.id = static_cast<int>(GameOption::kBubbleRise),
                                        .label = Tr("Décalage vertical"),
                                        .kind = OptionKind::kSlider,

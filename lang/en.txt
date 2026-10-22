@@ -20155,3 +20155,9 @@ tr: Paint the cells
 
 fr: Raison des cases
 tr: Reason for the cells
+
+fr: Taille du texte des bulles
+tr: Speech bubble text size
+
+fr: La bulle entière suit : cadre, marges, largeur avant le retour à la ligne et hauteur au-dessus de la tête.
+tr: The whole bubble follows: frame, margins, width before wrapping and height above the head.

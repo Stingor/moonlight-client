@@ -146,8 +146,11 @@ float PaintSampleBalloons(ImDrawList* into, std::span<const SampleBalloon> sampl
 }  // namespace
 
 OptionRowView ChatBubbleSampleRow(const ro::ui::ChatBubbleLook& look) {
-  const float height = kSampleMarginPx * 2.0F + kChatSampleRows * ImGui::GetTextLineHeight() +
-                       look.padding_y * 2.0F + look.rise_pixels + kHeadRadiusPx * 2.0F;
+  // ⚠ LA BULLE GRANDIT AVEC SON TEXTE : le cadre réserve sa hauteur à l'échelle.
+  const float scale = ro::ui::ChatBubbleScale(look);
+  const float height =
+      kSampleMarginPx * 2.0F + kChatSampleRows * ImGui::GetTextLineHeight() * scale +
+      look.padding_y * 2.0F * scale + look.rise_pixels * scale + kHeadRadiusPx * 2.0F;
   return OptionRowView{
       .id = kChatBubbleSampleRow,
       .kind = OptionKind::kCanvas,

@@ -189,6 +189,7 @@ enum class GameOption : std::uint8_t {
   kBubbleClientTiming,
   kBubbleBaseMs,
   kBubblePerCharacterMs,
+  kBubbleTextScale,
   kBubbleRise,
   kBubbleWidth,
   kBubbleOpacity,

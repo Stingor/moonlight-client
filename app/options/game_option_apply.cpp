@@ -387,6 +387,7 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
     case GameOption::kBubbleClientTiming:
     case GameOption::kBubbleBaseMs:
     case GameOption::kBubblePerCharacterMs:
+    case GameOption::kBubbleTextScale:
     case GameOption::kBubbleRise:
     case GameOption::kBubbleWidth:
     case GameOption::kBubbleOpacity:

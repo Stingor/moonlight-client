@@ -20155,3 +20155,9 @@ tr: Pintar las casillas
 
 fr: Raison des cases
 tr: Motivo de las casillas
+
+fr: Taille du texte des bulles
+tr: Tamaño del texto de las burbujas
+
+fr: La bulle entière suit : cadre, marges, largeur avant le retour à la ligne et hauteur au-dessus de la tête.
+tr: Toda la burbuja lo sigue: marco, márgenes, ancho antes del salto de línea y altura sobre la cabeza.
