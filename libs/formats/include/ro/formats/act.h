@@ -94,6 +94,10 @@ class ActAnimation {
  public:
   [[nodiscard]] static core::Result<ActAnimation> Parse(std::span<const std::uint8_t> data);
 
+  // UNE ANIMATION FAITE EN CODE, sans fichier : ces actions, sans son ni
+  // ancre perdue. Sa version est nulle : aucun fichier ne l'a déclarée.
+  [[nodiscard]] static ActAnimation FromActions(std::vector<ActAction> actions);
+
   // Version condensée : majeure × 10 + mineure, donc 25 pour la 2.5.
   [[nodiscard]] std::int32_t version() const noexcept { return version_; }
 

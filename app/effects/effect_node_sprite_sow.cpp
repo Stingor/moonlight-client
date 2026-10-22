@@ -26,6 +26,7 @@
 #include "ro/render/effect_ring_flight.h"
 #include "ro/render/effect_trail_history.h"
 #include "ro/render/element_glow.h"
+#include "ro/render/wand_orb.h"
 
 #include "effects/effect_node_view.h"
 
@@ -332,6 +333,42 @@ bool EffectNodesInPlay::ShootSprite(std::string_view sprite_base, glm::vec3 from
   // tenue de chaque image. Le pas reste la distance divisée par la vie, si bien
   // que le projectile va d'autant moins vite sans arriver ailleurs.
   const std::int32_t slowdown = std::max(flight.clock_slowdown, 1);
+  // LA BOULE D'ÉNERGIE prend la place du sprite : ses pièces, chacune un nœud
+  // du sprite fait en code, toutes ajoutées au décor. Voir `ro/render/wand_orb.h`.
+  if (flight.wand_orb_rgb.has_value()) {
+    const std::string orb_path(ro::render::kWandOrbSpritePath);
+    if (!sprites_.contains(orb_path)) {
+      sprites_.emplace(orb_path, ro::render::WandOrbSprite());
+    }
+    std::uint32_t generator = static_cast<std::uint32_t>(pool_.size()) + beat_ms_ + 1U;
+    bool shot = false;
+    for (const ro::render::WandOrbPiece& piece : ro::render::WandOrbPieces(
+             from, to, std::max(life_ticks, 1) * slowdown, *flight.wand_orb_rgb, generator)) {
+      ro::render::EffectNodeSeed seed;
+      seed.life_ticks = piece.life_ticks;
+      seed.fade_out_ticks = piece.fade_out_ticks;
+      seed.orbit_degrees = ro::render::EffectNodeRange{0.0F, 0.0F};
+      seed.action = ro::render::WandOrbActionOf(piece.part);
+      seed.first_frame_hold_ticks = piece.hidden_ticks;
+      seed.frame_hold_ticks = piece.frame_hold_ticks;
+      seed.frame_hold_ticks_high = 0;
+      seed.loops_frames = piece.loops_frames;
+      seed.render_word = ro::render::kEffectRenderWordOfAdditiveSprite;
+      seed.alpha_start = piece.alpha;
+      seed.color = {static_cast<float>(piece.rgb[0]), static_cast<float>(piece.rgb[1]),
+                    static_cast<float>(piece.rgb[2])};
+      seed.casts_shadow = piece.casts_shadow;
+      seed.aims_at_target = piece.flies_to.has_value();
+      // TOUTES NAISSENT AU POINT EXACT DU VOL, dix unités au-dessus du sol, sans
+      // le lever d'un nœud semé au sol : une étincelle et l'éclat restent ainsi
+      // à la hauteur où la boule est passée.
+      seed.aim_keeps_height = true;
+      shot = Sow(orb_path, seed, ro::render::EffectNodeRange{1.0F, 0.0F}, 0.0F, piece.birth, 1,
+                 kNoOwnerFacingDegrees, piece.flies_to) ||
+             shot;
+    }
+    return shot;
+  }
   ro::render::EffectNodeSeed seed;
   seed.life_ticks = std::max(life_ticks, 1) * slowdown;
   // Ni dispersion ni orbite : il n'y a qu'un projectile, et il part d'un point.

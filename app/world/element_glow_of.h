@@ -3,10 +3,15 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <string_view>
 
 #include "ro/render/element_glow.h"
+#include "ro/render/sprite_catalog.h"
+#include "ro/render/wand_orb.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/attack_element.h"
+
+#include "world/projectile_looks.h"
 
 namespace moonclient {
 
@@ -59,6 +64,22 @@ namespace moonclient {
     return std::nullopt;
   }
   return ro::render::ArrowGlowTint(*hue);
+}
+
+// LA BOULE D'ÉNERGIE QUE `shooter` TIRE à la place de `projectile`, de sa
+// couleur — ou RIEN, et le projectile garde son sprite : l'option coupée, ou un
+// projectile qui n'est pas le trait d'une baguette.
+//
+// La couleur est celle de la lueur élémentaire, au même élément reçu du
+// serveur ; neutre, inconnu ou la lueur coupée, c'est l'arcane. Un autre
+// joueur en combat entre joueurs n'a pas d'élément reçu : arcane, sans fuite.
+[[nodiscard]] inline std::optional<std::array<std::uint8_t, 3>> WandOrbRgbOf(
+    const ro::sim::Actor& shooter, std::string_view projectile,
+    const ProjectileLooks& looks) noexcept {
+  if (!looks.wand_orb || projectile != ro::render::kWandBoltSpriteBase) {
+    return std::nullopt;
+  }
+  return ro::render::WandOrbRgb(ElementGlowHueOf(shooter.attack_element, looks.element_glow));
 }
 
 }  // namespace moonclient

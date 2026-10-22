@@ -41,6 +41,11 @@ class SprSprite {
  public:
   [[nodiscard]] static core::Result<SprSprite> Parse(std::span<const std::uint8_t> data);
 
+  // UN SPRITE FAIT EN CODE, sans fichier : ces images, déjà en RGBA8, forment
+  // sa section BGRA — la section 1 d'un calque —, sans image palettisée ni
+  // palette. Sa version est nulle : aucun fichier ne l'a déclarée.
+  [[nodiscard]] static SprSprite FromRgbaFrames(std::vector<Image> frames);
+
   // Version condensée : majeure × 10 + mineure, donc 21 pour la 2.1.
   [[nodiscard]] std::int32_t version() const noexcept { return version_; }
 

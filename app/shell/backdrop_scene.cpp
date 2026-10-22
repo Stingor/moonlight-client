@@ -204,7 +204,8 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                          &effects_->in_play(),
                          {},
                          peopled ? &actors_.head_shifts : nullptr,
-                         peopled ? &actors_.hover_pixels : nullptr};
+                         peopled ? &actors_.hover_pixels : nullptr,
+                         ProjectileLooksOf(graphics)};
   if (audio->sound_audible()) {
     sounds_->HearMapAmbience(scene);
   }

@@ -71,10 +71,10 @@ class EffectNodesInPlay {
   // baguette, la munition d'un monstre. De `from` à `to`, hauteur comprise, en
   // `life_ticks` à l'horloge du client — que `flight` peut diviser —, tourné de
   // la face de son vol vue de la caméra à chaque image : voir
-  // `ro::render::EffectProjectileScreenAngleDegrees`. Opaque dès sa naissance,
-  // au mélange ordinaire. Ses images, son horloge et l'angle ajouté à son image
-  // suivent `flight` : voir `ro::render::ProjectileFlight`. Faux quand le
-  // sprite ne se lit pas.
+  // `ro::render::EffectProjectileScreenAngleDegrees`. Opaque, au mélange
+  // ordinaire. Images, horloge, angle ajouté et boule d'énergie qui remplace le
+  // sprite suivent `flight` : voir `ro::render::ProjectileFlight`. Faux quand
+  // le sprite ne se lit pas.
   bool ShootSprite(std::string_view sprite_base, glm::vec3 from, glm::vec3 to,
                    std::int32_t life_ticks, const ro::render::ProjectileFlight& flight);
 

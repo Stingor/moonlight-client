@@ -42,6 +42,7 @@ enum class GraphicsRow : int {
   kDecorVeil,
   kScreenQuake,
   kElementGlow,
+  kWandOrb,
   kSummonTranslucent,
   kCorpseFade,
   kAppearFade,
@@ -143,6 +144,9 @@ class GraphicsOptions {
   // LA LUEUR ÉLÉMENTAIRE : la flèche en vol et l'arme d'un joueur se teintent de
   // l'élément que le serveur dit de son attaque. Allumée par défaut.
   [[nodiscard]] bool element_glow() const noexcept { return element_glow_; }
+  // LE TIR DE BAGUETTE AMÉLIORÉ : le trait d'une baguette se dessine en boule
+  // d'énergie. Allumé par défaut ; éteint, le sprite du trait.
+  [[nodiscard]] bool wand_orb() const noexcept { return wand_orb_; }
   // Les invocations peintes presque transparentes : aujourd'hui le faucon.
   // Éteint par défaut, comme chez le client.
   [[nodiscard]] bool summon_translucent() const noexcept { return summon_translucent_; }
@@ -208,6 +212,7 @@ class GraphicsOptions {
   bool screen_quake_ = true;
   bool decor_veil_ = false;
   bool element_glow_ = true;
+  bool wand_orb_ = true;
   bool summon_translucent_ = false;
   // ⚠ CENT MILLISECONDES SOUS LE CLIENT : le réglage d'usine que le joueur a
   // choisi.

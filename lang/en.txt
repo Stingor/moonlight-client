@@ -20039,6 +20039,12 @@ tr: Elemental glow
 fr: La flèche en vol et l'arme d'un joueur se bordent de la couleur de l'élément de son attaque : orange pour le feu, bleu pour l'eau…\n\nSur une carte de combat entre joueurs et pendant un duel, le serveur ne dit l'élément de personne d'autre que toi.
 tr: A player's arrow in flight and weapon are edged with the color of their attack's element: orange for fire, blue for water…\n\nOn a map where players fight each other, and during a duel, the server tells no one's element but yours.
 
+fr: Tir de baguette amélioré
+tr: Enhanced wand shot
+
+fr: Le trait d'une baguette devient une boule d'énergie qui sème une courte traînée d'étincelles et éclate à l'arrivée. Elle prend la couleur de l'élément de l'attaque quand la lueur élémentaire est cochée, un bleu-violet sinon.\n\nDécoche pour retrouver le trait d'origine.
+tr: A wand's bolt becomes an energy orb that leaves a short trail of sparks and bursts on arrival. It takes the color of the attack's element when the elemental glow is checked, a blue-violet otherwise.\n\nUncheck to get the original bolt back.
+
 fr: Interpolation d'images
 tr: Frame interpolation
 

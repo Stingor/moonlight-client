@@ -92,6 +92,7 @@ add_library(ro_render STATIC
     src/camera.cpp
     src/entity_names.cpp
     src/element_glow.cpp
+    src/wand_orb.cpp
     src/companion_cart.cpp
     src/companion_falcon.cpp
     src/client_tables.cpp

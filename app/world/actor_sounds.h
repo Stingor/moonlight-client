@@ -32,6 +32,7 @@
 #include "ro/vfs/vfs.h"
 
 #include "world/map_stage.h"
+#include "world/projectile_looks.h"
 #include "world/sprite_sound_mutes.h"
 
 namespace ro::render {
@@ -76,8 +77,8 @@ struct SoundStage {
   // DE COMBIEN FLOTTE CHAQUE ACTEUR QUI VOLE, que ses effets attachés suivent :
   // voir `ComposedScene::hover_pixels`. Nul, personne ne flotte.
   const std::map<std::uint32_t, float>* hover_pixels = nullptr;
-  // LA LUEUR ÉLÉMENTAIRE des flèches en vol : voir `ElementGlowHueOf`.
-  bool element_glow = true;
+  // L'ALLURE DES PROJECTILES : lueur élémentaire et boule de la baguette.
+  ProjectileLooks projectiles;
   // L'INTERPOLATION D'IMAGES du joueur : les effets se peignent entre deux tics.
   // Voir `ro/render/tick_blend.h`.
   bool frame_interpolation = false;

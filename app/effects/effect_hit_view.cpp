@@ -422,13 +422,15 @@ void EffectsInPlay::NoticeArrows(const SoundStage& scene) {
     // à l'horloge du client, ou trois fois plus lentement pour le trait d'une
     // baguette, que le retard du coup attend d'autant : voir `ShootsWandBolts`.
     ro::render::ProjectileFlight drawn_flight = ro::render::ProjectileFlightOf(catalog, look);
-    drawn_flight.glow_tint = ArrowGlowOf(actor, scene.element_glow);
+    drawn_flight.glow_tint = ArrowGlowOf(actor, scene.projectiles.element_glow);
+    // LE TRAIT D'UNE BAGUETTE DEVIENT UNE BOULE D'ÉNERGIE, si le joueur le veut.
+    drawn_flight.wand_orb_rgb = WandOrbRgbOf(actor, projectile, scene.projectiles);
     nodes_->ShootSprite(projectile, start, arrival, flight_ticks, drawn_flight);
     return true;
   };
   std::erase_if(per_map_.arrows_waiting, shoot);
-  ShootDueShowerArrows(per_map_.shower_arrows, *nodes_, *scene.world, scene.element_glow,
-                       scene.now_ms);
+  ShootDueShowerArrows(per_map_.shower_arrows, *nodes_, *scene.world,
+                       scene.projectiles.element_glow, scene.now_ms);
 }
 
 }  // namespace moonclient

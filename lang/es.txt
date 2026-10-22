@@ -20039,6 +20039,12 @@ tr: Brillo elemental
 fr: La flèche en vol et l'arme d'un joueur se bordent de la couleur de l'élément de son attaque : orange pour le feu, bleu pour l'eau…\n\nSur une carte de combat entre joueurs et pendant un duel, le serveur ne dit l'élément de personne d'autre que toi.
 tr: La flecha en vuelo y el arma de un jugador se bordean del color del elemento de su ataque: naranja para el fuego, azul para el agua…\n\nEn un mapa de combate entre jugadores y durante un duelo, el servidor no dice el elemento de nadie más que el tuyo.
 
+fr: Tir de baguette amélioré
+tr: Disparo de varita mejorado
+
+fr: Le trait d'une baguette devient une boule d'énergie qui sème une courte traînée d'étincelles et éclate à l'arrivée. Elle prend la couleur de l'élément de l'attaque quand la lueur élémentaire est cochée, un bleu-violet sinon.\n\nDécoche pour retrouver le trait d'origine.
+tr: El rayo de una varita se convierte en una esfera de energía que deja una breve estela de chispas y estalla al llegar. Toma el color del elemento del ataque cuando el brillo elemental está marcado, y un azul violáceo si no.\n\nDesmárcalo para recuperar el rayo original.
+
 fr: Interpolation d'images
 tr: Interpolación de imágenes
 

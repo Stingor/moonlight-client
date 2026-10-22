@@ -491,6 +491,10 @@ struct ProjectileFlight {
   // même image, un peu plus grande, ajoutée au décor sur le même vol. Rien :
   // aucune. Voir `ro/render/element_glow.h`.
   std::optional<std::array<std::uint8_t, 4>> glow_tint;
+  // LA BOULE D'ÉNERGIE qui remplace le sprite, en rouge, vert, bleu : le
+  // projectile se dessine alors en boule de cette couleur, sans son image ni
+  // sa lueur. Rien : le sprite. Voir `ro/render/wand_orb.h`.
+  std::optional<std::array<std::uint8_t, 3>> wand_orb_rgb;
 };
 
 // Le vol du projectile que cet acteur tire en frappant : celui du trait pour

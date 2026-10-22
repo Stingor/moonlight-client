@@ -289,4 +289,10 @@ Image ApplyPalette(const SprIndexedFrame& frame, const Palette& palette) {
   return image;
 }
 
+SprSprite SprSprite::FromRgbaFrames(std::vector<Image> frames) {
+  SprSprite sprite;
+  sprite.bgra_frames_ = std::move(frames);
+  return sprite;
+}
+
 }  // namespace ro::formats

@@ -37,6 +37,10 @@ ActorLighting ActorLightingOf(const GraphicsOptions& graphics,
                        .element_glow = graphics.element_glow()};
 }
 
+ProjectileLooks ProjectileLooksOf(const GraphicsOptions& graphics) {
+  return ProjectileLooks{.element_glow = graphics.element_glow(), .wand_orb = graphics.wand_orb()};
+}
+
 void TimeComposedScene(const GraphicsOptions& graphics, ComposedScene& scene) {
   scene.corpse_fade_ms = graphics.corpse_fade_ms();
   scene.appear_fade_ms = graphics.appear_fade_ms();

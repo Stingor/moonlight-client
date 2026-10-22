@@ -423,7 +423,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
                          settings_->options().pages().sprite_sounds.mutes(),
                          &scene_actors_.head_shifts,
                          &scene_actors_.hover_pixels,
-                         settings_->options().graphics().element_glow(),
+                         ProjectileLooksOf(settings_->options().graphics()),
                          settings_->options().graphics().frame_interpolation()};
   if (audio_.sound_audible()) {
     actor_sounds_->Hear(scene, scene_actors_.drawn, scene_actors_.ids);

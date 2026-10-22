@@ -9,6 +9,7 @@
 
 #include "options/graphics_options.h"
 #include "world/actor_view.h"
+#include "world/projectile_looks.h"
 
 namespace moonclient {
 
@@ -51,6 +52,10 @@ namespace moonclient {
 [[nodiscard]] ActorLighting ActorLightingOf(const GraphicsOptions& graphics,
                                             const ro::render::GroundLight* ground,
                                             const AilmentTints* ailment_tints);
+
+// L'ALLURE DES PROJECTILES que la page demande : lueur élémentaire et boule de
+// la baguette.
+[[nodiscard]] ProjectileLooks ProjectileLooksOf(const GraphicsOptions& graphics);
 
 // LES FONDUS ET LE GESTE LISIBLE, posés sur la scène avant sa composition :
 // cadavre, apparition, sortie de vue, plancher du geste d'une compétence,

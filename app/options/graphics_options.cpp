@@ -34,6 +34,7 @@ constexpr const char* kScreenQuakeKey = "screen_quake";
 constexpr const char* kDecorVeilKey = "scenery_veil_front_the_player";
 constexpr const char* kSummonTranslucentKey = "summons_translucent";
 constexpr const char* kElementGlowKey = "element_glow";
+constexpr const char* kWandOrbKey = "enhanced_wand_shot";
 constexpr const char* kCorpseFadeKey = "corpses_duration";
 constexpr const char* kAppearFadeKey = "spawn_fade_ms";
 constexpr const char* kLeaveFadeKey = "exit_of_view_fade_ms";
@@ -193,6 +194,7 @@ void GraphicsOptions::Declare(SettingsFile& into) {
   into.Declare(kDecorVeilKey, &decor_veil_);
   into.Declare(kSummonTranslucentKey, &summon_translucent_);
   into.Declare(kElementGlowKey, &element_glow_);
+  into.Declare(kWandOrbKey, &wand_orb_);
   into.Declare(kCorpseFadeKey, &corpse_fade_ms_);
   into.Declare(kAppearFadeKey, &appear_fade_ms_);
   into.Declare(kLeaveFadeKey, &leave_fade_ms_);
@@ -317,6 +319,13 @@ void GraphicsOptions::Compose() {
                             "Sur une carte de combat entre joueurs et pendant un duel, le serveur "
                             "ne dit l'élément de personne d'autre que toi."),
                          nullptr, element_glow_));
+  rows_.push_back(Toggle(GraphicsRow::kWandOrb, Tr("Tir de baguette amélioré"),
+                         Tr("Le trait d'une baguette devient une boule d'énergie qui sème une "
+                            "courte traînée d'étincelles et éclate à l'arrivée. Elle prend la "
+                            "couleur de l'élément de l'attaque quand la lueur élémentaire est "
+                            "cochée, un bleu-violet sinon.\n\nDécoche pour retrouver le trait "
+                            "d'origine."),
+                         nullptr, wand_orb_));
   rows_.push_back(Toggle(GraphicsRow::kSummonTranslucent, Tr("Invocations translucides"),
                          Tr("Le faucon qui accompagne un chasseur se peint presque transparent : "
                             "il ne cache plus ce qui se passe derrière lui."),
@@ -548,6 +557,9 @@ bool GraphicsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case GraphicsRow::kElementGlow:
       element_glow_ = asked.on;
+      break;
+    case GraphicsRow::kWandOrb:
+      wand_orb_ = asked.on;
       break;
     case GraphicsRow::kSummonTranslucent:
       summon_translucent_ = asked.on;

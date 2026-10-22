@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include "ro/core/byte_reader.h"
 
@@ -254,6 +256,12 @@ core::Result<ActAnimation> ActAnimation::Parse(std::span<const std::uint8_t> dat
   }
   animation.actions_ = std::move(*without_anchors);
   animation.anchors_dropped_ = true;
+  return animation;
+}
+
+ActAnimation ActAnimation::FromActions(std::vector<ActAction> actions) {
+  ActAnimation animation;
+  animation.actions_ = std::move(actions);
   return animation;
 }
 
