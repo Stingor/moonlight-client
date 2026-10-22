@@ -20095,3 +20095,6 @@ tr: Efectos del mapa a cualquier distancia
 
 fr: Les effets que la carte pose — torches, flammes des braseros, lucioles, vapeurs, fumées et vent — vivent sur toute la carte, et non plus seulement autour du personnage : on les voit en dézoomant.\n\nLe client d'origine ne les fait vivre qu'à treize cases du personnage, et la carte graphique travaille davantage sur une grande carte.
 tr: Los efectos que coloca el mapa — antorchas, llamas de los braseros, luciérnagas, vapores, humo y viento — viven en todo el mapa, y no solo alrededor del personaje: se ven al alejar la cámara.\n\nEl cliente original solo los activa a trece casillas del personaje, y la tarjeta gráfica trabaja más en un mapa grande.
+
+fr: Intensité
+tr: Intensidad

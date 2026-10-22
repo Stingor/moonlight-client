@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/mapedit/model_light.h"
+#include "ro/ui/map_editor_effects_panel.h"
 
 #include "world/map_editor_reasons.h"
 #include "world/map_editor_session.h"
@@ -36,9 +37,6 @@ constexpr float kNewLightToHour = 9.0F;
 // La plus petite portée qu'une lumière garde : le document refuse une portée
 // nulle, et la relecture rejetterait tout le document avec elle.
 constexpr float kSmallestLightRange = 0.5F;
-// Une composante de couleur ni négative, ni plus de quatre fois la pleine
-// intensité.
-constexpr float kLargestLightColor = 4.0F;
 
 }  // namespace
 
@@ -81,7 +79,8 @@ std::array<float, 3> AboveDropPoint(const std::array<float, 3>& point) {
 ro::mapedit::AddedLight BoundedLight(ro::mapedit::AddedLight light) {
   light.range = std::max(light.range, kSmallestLightRange);
   for (float& component : light.color) {
-    component = std::clamp(component, 0.0F, kLargestLightColor);
+    // Ni négative, ni au-delà de ce que le curseur d'intensité propose.
+    component = std::clamp(component, 0.0F, ro::ui::kLargestLightColor);
   }
   return light;
 }

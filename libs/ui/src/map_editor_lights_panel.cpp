@@ -58,11 +58,9 @@ LightFieldsResult DrawLightFields(MapEditorLight& light, std::size_t chosen, Map
   result.changed |= moved.changed;
   result.released |= moved.released;
   result.toggled |= PositionClipboardMenu("position", light.position, cubes);
-  // UNE PASTILLE ET SON SÉLECTEUR : la couleur se choisit à l'œil. Au-delà de
-  // 1, une composante éclaire plus fort ; la session borne ce que l'on tape.
-  result.changed |= ImGui::ColorEdit3(core::Tr("Couleur"), light.color.data(),
-                                      ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
-  result.released |= ImGui::IsItemDeactivatedAfterEdit();
+  const WheelDragResult colored = LightColorFields(light.color);
+  result.changed |= colored.changed;
+  result.released |= colored.released;
   const WheelDragResult reach = WheelDragFloat(core::Tr("Portée"), light.range,
                                                WheelDrag{.drag_step = kLightRangeStep,
                                                          .wheel_step = kLightRangeWheelStep,

@@ -42,6 +42,15 @@ constexpr WheelDrag kGlowRangeDrag{.drag_step = 0.5F,
                                    .highest = kLargestGlowRange,
                                    .format = "%.1f"};
 constexpr float kParamStep = 0.01F;
+// L'intensité d'une couleur de lumière : un cran de molette vaut un dixième de
+// la pleine intensité. Elle ne descend pas à zéro, où la couleur perdrait sa
+// teinte.
+constexpr float kSmallestLightIntensity = 0.01F;
+constexpr WheelDrag kLightIntensityDrag{.drag_step = 0.01F,
+                                        .wheel_step = 0.1F,
+                                        .lowest = kSmallestLightIntensity,
+                                        .highest = kLargestLightColor,
+                                        .format = "%.2f"};
 // Une borne de plage d'heures : un cran de molette vaut un quart d'heure.
 constexpr float kHoursPerDay = 24.0F;
 constexpr WheelDrag kHourDrag{.drag_step = 0.05F,
@@ -115,9 +124,9 @@ EffectFieldsResult DrawEffectFields(MapEditorEffect& effect, std::size_t chosen,
   }
   result.toggled |= SkinCheckBox(core::Tr("Éclaire"), &effect.glows, art);
   if (effect.glows) {
-    result.changed |= ImGui::ColorEdit3(core::Tr("Couleur"), effect.glow_color.data(),
-                                        ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
-    result.released |= ImGui::IsItemDeactivatedAfterEdit();
+    const WheelDragResult colored = LightColorFields(effect.glow_color);
+    result.changed |= colored.changed;
+    result.released |= colored.released;
     const WheelDragResult reach =
         WheelDragFloat(core::Tr("Portée"), effect.glow_range, kGlowRangeDrag);
     result.changed |= reach.changed;
@@ -206,9 +215,9 @@ void DrawMapEffects(const MapEditorView& view, MapEditorPanelState& panel,
   }
   toggled |= SkinCheckBox(core::Tr("Éclaire"), &set.effect.glows, art);
   if (set.effect.glows) {
-    changed |= ImGui::ColorEdit3(core::Tr("Couleur"), set.effect.glow_color.data(),
-                                 ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
-    released |= ImGui::IsItemDeactivatedAfterEdit();
+    const WheelDragResult colored = LightColorFields(set.effect.glow_color);
+    changed |= colored.changed;
+    released |= colored.released;
     const WheelDragResult reach =
         WheelDragFloat(core::Tr("Portée"), set.effect.glow_range, kGlowRangeDrag);
     changed |= reach.changed;
@@ -258,6 +267,35 @@ const char* ShadowHelp() {
       "Décochez pour une lumière posée DANS un modèle du décor — une lanterne, un lampion : le "
       "modèle la boucherait et noircirait ce qu'il cache. Seules les quatre lumières qui portent "
       "ombre les plus proches de la caméra en projettent une.");
+}
+
+float LightIntensityOf(const std::array<float, 3>& color) {
+  return std::max({color[0], color[1], color[2]});
+}
+
+std::array<float, 3> WithLightIntensity(const std::array<float, 3>& color, float intensity) {
+  const float before = LightIntensityOf(color);
+  if (before <= 0.0F) {
+    return {intensity, intensity, intensity};
+  }
+  const float scale = intensity / before;
+  return {color[0] * scale, color[1] * scale, color[2] * scale};
+}
+
+WheelDragResult LightColorFields(std::array<float, 3>& color) {
+  WheelDragResult result;
+  result.changed |= ImGui::ColorEdit3(core::Tr("Couleur"), color.data(),
+                                      ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
+  result.released |= ImGui::IsItemDeactivatedAfterEdit();
+  float intensity = LightIntensityOf(color);
+  const WheelDragResult strength =
+      WheelDragFloat(core::Tr("Intensité"), intensity, kLightIntensityDrag);
+  if (strength.changed) {
+    color = WithLightIntensity(color, intensity);
+  }
+  result.changed |= strength.changed;
+  result.released |= strength.released;
+  return result;
 }
 
 std::string WhyTag(std::string_view why) {
