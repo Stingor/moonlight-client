@@ -115,16 +115,31 @@ void SunShadowProject(vec3 world, vec3 normal) {
 )GLSL";
 
 // CELUI DES FRAGMENTS rend la part du soleil que le fragment reçoit — un en
-// pleine lumière —, moyennée sur un carré de texels pour adoucir le bord.
+// pleine lumière —, moyennée sur un disque de lectures pour adoucir le bord.
 // Hors de la carte, tout est éclairé : sa bordure vaut la profondeur la plus
 // lointaine.
+//
+// 🔴 LE DISQUE TOURNE D'UN PIXEL À L'AUTRE. Un carré de lectures aligné sur la
+// grille de la carte adoucit le bord sans effacer cette grille : un bord
+// d'ombre oblique y montrait ses marches, d'autant plus longues que le soleil
+// bas étire chaque texel au sol. Tourné selon un bruit propre à chaque pixel,
+// le disque fond les marches en un grain fin.
 inline constexpr std::string_view kSunShadowFragmentGlsl = R"GLSL(
 uniform sampler2DShadow u_sun_shadow;
 uniform float u_sun_shadow_strength;
 uniform float u_sun_texel;
 in vec4 v_sun_position;
 
-const int kSunTapRadius = 1;
+// Les lectures, réparties dans le disque unité, et son rayon en texels.
+const int kSunDiskTaps = 12;
+const vec2 kSunDisk[kSunDiskTaps] = vec2[](
+    vec2(-0.326, -0.406), vec2(-0.840, -0.074), vec2(-0.696, 0.457), vec2(-0.203, 0.621),
+    vec2(0.962, -0.195), vec2(0.473, -0.480), vec2(0.519, 0.767), vec2(0.185, -0.893),
+    vec2(0.507, 0.064), vec2(0.896, 0.412), vec2(-0.322, -0.933), vec2(-0.792, -0.598));
+const float kSunDiskRadiusTexels = 2.0;
+// Le bruit à gradients entrelacés : un angle par pixel, sans motif visible.
+const vec3 kSunNoiseWeights = vec3(0.06711056, 0.00583715, 52.9829189);
+const float kSunFullTurn = 6.2831853;
 
 float SunVisibility() {
     if (u_sun_shadow_strength <= 0.0) {
@@ -132,16 +147,16 @@ float SunVisibility() {
     }
     vec3 projected = v_sun_position.xyz / v_sun_position.w * 0.5 + 0.5;
     projected.z = min(projected.z, 1.0);
+    float angle = kSunFullTurn *
+                  fract(kSunNoiseWeights.z * fract(dot(gl_FragCoord.xy, kSunNoiseWeights.xy)));
+    mat2 spin = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+    float reach = kSunDiskRadiusTexels * u_sun_texel;
     float lit = 0.0;
-    float taps = 0.0;
-    for (int row = -kSunTapRadius; row <= kSunTapRadius; ++row) {
-        for (int column = -kSunTapRadius; column <= kSunTapRadius; ++column) {
-            vec2 offset = vec2(float(column), float(row)) * u_sun_texel;
-            lit += texture(u_sun_shadow, vec3(projected.xy + offset, projected.z));
-            taps += 1.0;
-        }
+    for (int tap = 0; tap < kSunDiskTaps; ++tap) {
+        vec2 offset = spin * kSunDisk[tap] * reach;
+        lit += texture(u_sun_shadow, vec3(projected.xy + offset, projected.z));
     }
-    return mix(1.0, lit / taps, u_sun_shadow_strength);
+    return mix(1.0, lit / float(kSunDiskTaps), u_sun_shadow_strength);
 }
 )GLSL";
 
