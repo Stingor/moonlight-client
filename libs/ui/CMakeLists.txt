@@ -98,6 +98,7 @@ add_library(ro_ui STATIC
     src/chat_input_chips.cpp
     src/chat_input_commands.cpp
     src/chat_whisper_box.cpp
+    src/chat_whisper_list.cpp
     src/chat_emote_names.cpp
     src/chat_link.cpp
     src/chat_link_offer.cpp

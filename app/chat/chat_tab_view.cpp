@@ -733,7 +733,7 @@ ChatLogDump ChatTabsView::SaveLogs() const {
   return DumpChatLogs(client_root_, tabs_.tabs(), parts);
 }
 
-void ChatTabsView::SavePast(bool keep_chat, int keep, std::span<const std::string> whispered,
+void ChatTabsView::SavePast(bool keep_chat, int keep, std::span<const WhisperPeer> whispered,
                             bool keep_typed, std::span<const std::string> typed) const {
   if (!keep_chat && !keep_typed) {
     return;
@@ -750,7 +750,7 @@ void ChatTabsView::SavePast(bool keep_chat, int keep, std::span<const std::strin
   // ⚠ CHAQUE MOITIÉ N'ÉCRIT QUE SOUS SA PROPRE CASE : le fichier est commun,
   // les deux refus ne le sont pas.
   static_cast<void>(SaveChatHistory(client_root_, all, keep, StampNow(),
-                                    keep_chat ? whispered : std::span<const std::string>(),
+                                    keep_chat ? whispered : std::span<const WhisperPeer>(),
                                     keep_typed ? typed : std::span<const std::string>()));
 }
 

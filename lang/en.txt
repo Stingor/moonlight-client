@@ -8584,8 +8584,14 @@ tr: Right click: description — drag onto a bar
 fr: Clic droit : les options de « %s »
 tr: Right click: options for « %s »
 
-fr: Clic droit : les récents.
-tr: Right-click: the recent ones.
+fr: Tes derniers correspondants se déroulent dessous dès que la case a le clavier : flèches pour choisir, Entrée ou Tab pour prendre, Échap pour fermer. Clic droit : la même liste.
+tr: Your latest correspondents drop down below as soon as the box has the keyboard: arrows to choose, Enter or Tab to take, Escape to close. Right-click: the same list.
+
+fr: Il t'a chuchoté en dernier.
+tr: The last whisper came from them.
+
+fr: Tu lui as chuchoté en dernier.
+tr: The last whisper was yours.
 
 fr: Clic gauche          réserve un point (et ses prérequis manquants)\nCtrl + clic gauche   réserve jusqu'au niveau maximum\nDouble-clic          lance le skill (aucun point réservé)\nClic droit           menu (monter, lancer, niveau d'utilisation, description)\nCtrl + clic droit    description du skill\nMolette              règle le niveau auquel le skill part\nGlisser              pose le skill sur une barre d'action\nSurvol               flèches de prérequis (ambre) et de suites (bleu)\nMode clavier         survol + touche tenue : pose le skill sur sa case\n\nRien n'est envoyé au serveur tant que « Appliquer » n'est pas cliqué.
 tr: Left click           reserves a point (and its missing prerequisites)\nCtrl + left click    reserves up to the maximum level\nDouble click         casts the skill (no point reserved)\nRight click          menu (raise, cast, use level, description)\nCtrl + right click   skill description\nWheel                sets the level the skill is cast at\nDrag                 puts the skill on an action bar\nHover                prerequisite (amber) and follow-up (blue) arrows\nKeyboard mode        hover + hold a key: puts the skill in its slot\n\nNothing is sent to the server until « Appliquer » is clicked.

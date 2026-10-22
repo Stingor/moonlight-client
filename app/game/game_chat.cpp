@@ -27,6 +27,7 @@
 #include "ro/net/player_settings.h"
 #include "ro/sim/chat_mention.h"
 #include "ro/ui/chat_input.h"
+#include "ro/ui/chat_whisper_list.h"
 #include "ro/ui/chat_window.h"
 
 #include "chat/chat_image_cache.h"
@@ -116,6 +117,9 @@ void Game::StageChat(std::uint32_t now_ms) {
   if (whisper_rang && vfs_ != nullptr) {
     PlayWhisperAlarm(audio_, *vfs_, client_root_, whisper_page.setup().alarm);
   }
+  // QUI VIENT DE NOUS CHUCHOTER entre dans les récents de la box « Pseudo » :
+  // c'est souvent à lui qu'on veut répondre.
+  chat_preview_.recent_whispers().FollowChat(world_.chat_lines(), world_.player_name());
   // LA BARRE A REPRIS LE CLAVIER : un lien posé y retourne, plus dans la
   // dernière conversation 1:1.
   if (windows_.chat.main.input.was_active) {
@@ -294,7 +298,9 @@ void Game::SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms) 
       // ⚠ LE DESTINATAIRE SE RETIENT D'APRÈS CE QUI PART VRAIMENT, pas d'après
       // la box : une ligne peut nommer quelqu'un d'autre par son `/w`, et c'est
       // celui-là qu'on voudra retrouver dans la liste.
-      chat_preview_.NoteWhisper(ro::net::ReadChatIntent(*ask.asked.said, armed_chat_).recipient);
+      chat_preview_.recent_whispers().Note(
+          ro::net::ReadChatIntent(*ask.asked.said, armed_chat_).recipient,
+          ro::ui::ChatWhisperWay::kOutgoing);
     }
   }
   // L'ÉMOTICONE CLIQUÉE part en `:nom:`, seule sur sa ligne, par le mode armé.
@@ -358,7 +364,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
           ro::net::RequestEmotion(link_, static_cast<std::uint16_t>(ask.asked.chose_emotion)));
     }
     if (ask.asked.forget_whispers) {
-      chat_preview_.ForgetWhispers();
+      chat_preview_.recent_whispers().Forget();
     }
     // LE MOT QUI REMPLACE LA BARRE PRÊTÉE ramène la salle devant.
     if (ask.asked.lent_input_asked) {

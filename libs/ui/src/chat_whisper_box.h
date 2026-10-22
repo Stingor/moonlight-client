@@ -5,10 +5,11 @@
 // En-tête PRIVÉ de `libs/ui/src` : seule la rangée de saisie la dessine.
 
 #include "ro/ui/chat_input.h"
+#include "ro/ui/skin_art.h"
 
 namespace ro::ui {
 
-// LA BOX « PSEUDO », et le bouton qui déroule les derniers destinataires.
+// LA BOX « PSEUDO », et la liste qui déroule les derniers correspondants.
 //
 // ⚠ ELLE VIENT AVANT LE TEXTE, là où le client la met après. Notre champ de
 // saisie GRANDIT en hauteur quand la phrase est longue ; une box posée après
@@ -26,6 +27,7 @@ struct WhisperBoxGesture {
 };
 
 [[nodiscard]] WhisperBoxGesture DrawWhisperBox(ChatInputState& state,
-                                               const ChatLinePreview& preview, ChatInputAsk* asked);
+                                               const ChatLinePreview& preview, ChatInputAsk* asked,
+                                               const SkinArt& art);
 
 }  // namespace ro::ui

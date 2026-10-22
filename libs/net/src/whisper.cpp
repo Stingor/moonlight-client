@@ -88,7 +88,8 @@ FrameOutcome ApplyWhisperFrame(const Frame& frame, sim::World& world, const Whis
         world.RecordWhisper(sim::WhisperFacts{.side = sim::WhisperSide::kReceived,
                                               .peer_name = std::move(sender),
                                               .relation = relation,
-                                              .from_staff = packet.from_staff},
+                                              .from_staff = packet.from_staff,
+                                              .sender_id = packet.sender_id},
                             std::move(message), now_ms);
         return FrameOutcome::kApplied;
       });

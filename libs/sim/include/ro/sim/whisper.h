@@ -76,6 +76,12 @@ struct WhisperFacts {
   // paquet. ⚠ PAS LA RELATION : un ami de l'équipe reste un ami pour l'en-tête,
   // mais son chuchotement se pose quand même en haut de l'écran.
   bool from_staff = false;
+  // L'IDENTIFIANT DE L'AUTEUR d'une ligne reçue, tel que le paquet le porte.
+  // ⚠ ZÉRO QUAND LE SERVEUR NE L'A PAS TROUVÉ PARMI LES PERSONNAGES CONNECTÉS
+  // à son serveur de carte : c'est le cas de ce qu'il chuchote lui-même, sous
+  // un nom de sa configuration, et d'un PNJ. Un nom ne permet pas de les
+  // reconnaître ; ce zéro, si.
+  std::uint32_t sender_id = 0;
 };
 
 // UN ENVOI QUI ATTEND SON ACCUSÉ. Le texte est celui que le joueur a écrit,

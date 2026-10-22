@@ -8584,8 +8584,14 @@ tr: Clic derecho: descripción — arrastrar a una barra
 fr: Clic droit : les options de « %s »
 tr: Clic derecho: opciones de "%s"
 
-fr: Clic droit : les récents.
-tr: Clic derecho: los recientes.
+fr: Tes derniers correspondants se déroulent dessous dès que la case a le clavier : flèches pour choisir, Entrée ou Tab pour prendre, Échap pour fermer. Clic droit : la même liste.
+tr: Tus últimos interlocutores se despliegan debajo en cuanto la casilla tiene el teclado: flechas para elegir, Intro o Tab para tomar, Escape para cerrar. Clic derecho: la misma lista.
+
+fr: Il t'a chuchoté en dernier.
+tr: El último susurro fue suyo.
+
+fr: Tu lui as chuchoté en dernier.
+tr: El último susurro fue tuyo.
 
 fr: Clic gauche          réserve un point (et ses prérequis manquants)\nCtrl + clic gauche   réserve jusqu'au niveau maximum\nDouble-clic          lance le skill (aucun point réservé)\nClic droit           menu (monter, lancer, niveau d'utilisation, description)\nCtrl + clic droit    description du skill\nMolette              règle le niveau auquel le skill part\nGlisser              pose le skill sur une barre d'action\nSurvol               flèches de prérequis (ambre) et de suites (bleu)\nMode clavier         survol + touche tenue : pose le skill sur sa case\n\nRien n'est envoyé au serveur tant que « Appliquer » n'est pas cliqué.
 tr: Clic izquierdo         reserva un punto (y los requisitos que le falten)\nCtrl + clic izquierdo  reserva hasta el nivel máximo\nDoble clic             lanza la habilidad (sin reservar ningún punto)\nClic derecho           menú (subir, lanzar, nivel de uso, descripción)\nCtrl + clic derecho    descripción de la habilidad\nRueda                  ajusta el nivel al que se lanza la habilidad\nArrastrar              coloca la habilidad en una barra de acción\nPasar el ratón         flechas de requisitos (ámbar) y de continuaciones (azul)\nModo teclado           pasar el ratón + mantener una tecla: coloca la habilidad en su casilla\n\nNo se envía nada al servidor hasta que se hace clic en "Aplicar".

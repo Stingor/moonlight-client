@@ -300,34 +300,6 @@ constexpr std::string_view kLocalBroadcastReplayPrefix = "@lkami ";
 
 }  // namespace
 
-void ChatLinePreviewMaker::NoteWhisper(std::string_view name) {
-  if (name.empty()) {
-    return;
-  }
-  const auto seen = std::find(whispered_.begin(), whispered_.end(), name);
-  if (seen != whispered_.end()) {
-    whispered_.erase(seen);
-  }
-  whispered_.push_front(std::string(name));
-  while (whispered_.size() > static_cast<std::size_t>(ro::ui::kChatWhisperNamesKept)) {
-    whispered_.pop_back();
-  }
-}
-
-void ChatLinePreviewMaker::ForgetWhispers() {
-  whispered_.clear();
-  whispered_views_.clear();
-}
-
-void ChatLinePreviewMaker::RestoreWhispers(std::span<const std::string> names) {
-  whispered_.assign(names.begin(), names.end());
-  // ⚠ BORNÉE À LA RELECTURE AUSSI : un fichier retouché à la main peut en porter
-  // cent, et la liste déroulante les montrerait tous.
-  while (whispered_.size() > static_cast<std::size_t>(ro::ui::kChatWhisperNamesKept)) {
-    whispered_.pop_back();
-  }
-}
-
 void ChatLinePreviewMaker::FollowSentCommand(std::string_view text,
                                              std::span<const ro::sim::ChatChannel> channels) {
   if (text.empty() || text.front() != ro::net::kAtCommandSymbol) {
@@ -475,11 +447,8 @@ void ChatLinePreviewMaker::Refresh(const char* outgoing, const ChatWireSpeaker& 
     }
     preview_.mode = rank;
   }
-  // ⚠ DES VUES REFAITES À CHAQUE IMAGE sur une file qui, elle, ne bouge qu'à
-  // l'envoi : un `deque` ne déplace pas ses éléments, mais la LISTE de vues, si
-  // on la gardait, périmerait au premier nom ajouté.
-  whispered_views_.assign(whispered_.begin(), whispered_.end());
-  preview_.recent_whispers = whispered_views_;
+  // ⚠ DES VUES REFAITES À CHAQUE IMAGE : voir `RecentWhispers::Views`.
+  preview_.recent_whispers = recent_.Views();
 
   // Un chuchotement montre SON destinataire : c'est la seule information que le
   // mot « Chuchotement » n'apporte pas, et celle qu'on vérifie avant d'envoyer.

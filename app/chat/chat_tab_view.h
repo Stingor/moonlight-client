@@ -237,7 +237,7 @@ class ChatTabsView {
   // ne supprime donc pas le fichier tant que l'autre y tient encore — ce qu'elle
   // gardait en est RETIRÉ, et le fichier réécrit sur-le-champ.
   void RestorePast(bool keep_chat, bool keep_typed);
-  void SavePast(bool keep_chat, int keep, std::span<const std::string> whispered, bool keep_typed,
+  void SavePast(bool keep_chat, int keep, std::span<const WhisperPeer> whispered, bool keep_typed,
                 std::span<const std::string> typed) const;
 
   // EFFACE CE QUI EST GARDÉ : le fichier, ET ce qui l'aurait réécrit à la
@@ -252,7 +252,7 @@ class ChatTabsView {
 
   // Les destinataires que le fichier portait. Vide si l'option est décochée :
   // `RestorePast` a alors effacé le fichier sans rien en lire.
-  [[nodiscard]] std::span<const std::string> restored_whispers() const noexcept {
+  [[nodiscard]] std::span<const WhisperPeer> restored_whispers() const noexcept {
     return past_.whispered;
   }
 

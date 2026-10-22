@@ -13,6 +13,7 @@
 #include "ro/ui/chat_bar.h"
 #include "ro/ui/chat_command_hints.h"
 #include "ro/ui/chat_link.h"
+#include "ro/ui/chat_whisper_list.h"
 #include "ro/ui/skin_art.h"
 
 namespace ro::ui {
@@ -70,10 +71,6 @@ inline constexpr std::size_t kChatWhisperNameSize = 24;
 // la phrase : un nom plus long s'y écrit quand même, le champ défile.
 inline constexpr float kChatWhisperBoxWidth = 110.0F;
 
-// Combien de destinataires la barre se rappelle. Le client en garde une liste
-// déroulante ; au-delà d'une poignée, la chercher coûte plus que de retaper.
-inline constexpr int kChatWhisperNamesKept = 8;
-
 // Ce que la boîte de destination garde au moins, sans aucun mode à proposer.
 inline constexpr float kChatTargetLeastText = 48.0F;
 
@@ -119,9 +116,10 @@ struct ChatLinePreview {
   // dans `net`.
   std::span<const ChatSendMode> modes;
   int mode = 0;
-  // Les derniers destinataires, pour la liste déroulante de la box. Vide tant
-  // qu'on n'a chuchoté à personne : le bouton ne s'ouvre alors sur rien.
-  std::span<const std::string_view> recent_whispers;
+  // Les derniers correspondants, le plus récent en tête, pour la liste de la
+  // box. Vide tant que personne n'a chuchoté dans un sens ou dans l'autre :
+  // la liste ne se déroule alors pas.
+  std::span<const ChatRecentWhisper> recent_whispers;
   // De quoi expliquer les sigils, DÉJÀ COMPOSÉ. ⚠ LES CARACTÈRES SONT CEUX DU
   // CLIENT, pas ceux d'une documentation : une aide qui annoncerait le mauvais
   // sigil enverrait le joueur droit dans le mur.
@@ -240,6 +238,9 @@ struct ChatInputState {
   // chuchote rarement une seule phrase. C'est au joueur de l'effacer, et la
   // couleur de l'étiquette le lui rappelle à chaque ligne.
   std::array<char, kChatWhisperNameSize> whisper_to = {};
+  // La liste des derniers correspondants sous la box : voir
+  // `chat_whisper_list.h`.
+  ChatWhisperListState whisper_list;
 
   // DU TEXTE À POSER EN FIN DE SAISIE, dès la prochaine image.
   //

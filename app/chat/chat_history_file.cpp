@@ -3,7 +3,10 @@
 #include <algorithm>
 #include <optional>
 #include <span>
+#include <string>
 #include <system_error>
+#include <utility>
+#include <vector>
 
 #include <yaml-cpp/yaml.h>
 
@@ -25,8 +28,11 @@ constexpr const char* kTypeField = "type";
 constexpr int kNoType = -1;
 constexpr const char* kTimeField = "time";
 constexpr const char* kTextField = "text";
-// Les derniers destinataires, dans l'ordre où la box les propose.
+// Les derniers correspondants, dans l'ordre où la box les propose.
 constexpr const char* kWhisperedField = "recipients";
+// Ceux d'entre eux qui NOUS ont chuchoté en dernier. Absent : tous dans
+// l'autre sens.
+constexpr const char* kHeardFromField = "heard_from";
 // Les lignes tapées, de la plus ancienne à la plus récente.
 constexpr const char* kTypedField = "typed";
 constexpr const char* kColorField = "color";
@@ -53,9 +59,11 @@ constexpr const char* kFileHeader =
     "# « color » est celle que la ligne avait à l'écran, en 0xRRGGBB ; absente,\n"
     "# c'est la couleur ordinaire du fil.\n"
     "#\n"
-    "# « recipients » est la liste des derniers pseudos à qui l'on a chuchoté,\n"
-    "# le plus récent en tête. Elle dit À QUI l'on parle en privé, et vit donc\n"
-    "# sous la même option que le reste de ce fichier.\n"
+    "# « recipients » est la liste des derniers pseudos avec qui l'on a échangé\n"
+    "# un chuchotement, le plus récent en tête. Elle dit À QUI l'on parle en\n"
+    "# privé, et vit donc sous la même option que le reste de ce fichier.\n"
+    "# « heard_from » nomme ceux d'entre eux qui nous ont chuchoté en dernier ;\n"
+    "# les autres sont ceux à qui l'on a chuchoté en dernier.\n"
     "#\n"
     "# « typed » est ce qu'on a TAPÉ, de la plus ancienne à la plus récente —\n"
     "# ce que la flèche ↑ rappelle dans la barre de saisie. Elle a sa PROPRE\n"
@@ -136,7 +144,14 @@ PastChat LoadChatHistory(const std::filesystem::path& client_root) {
     return past;
   }
   past.saved_at = (*whole)[kSavedAtField].as<std::string>(std::string());
-  ReadTexts((*whole)[kWhisperedField], &past.whispered);
+  std::vector<std::string> names;
+  ReadTexts((*whole)[kWhisperedField], &names);
+  std::vector<std::string> heard_from;
+  ReadTexts((*whole)[kHeardFromField], &heard_from);
+  for (std::string& name : names) {
+    const bool incoming = std::ranges::find(heard_from, name) != heard_from.end();
+    past.whispered.push_back(WhisperPeer{.name = std::move(name), .incoming = incoming});
+  }
   ReadTexts((*whole)[kTypedField], &past.typed);
   const YAML::Node listed = (*whole)[kLinesField];
   if (!listed || !listed.IsSequence()) {
@@ -175,7 +190,7 @@ PastChat LoadChatHistory(const std::filesystem::path& client_root) {
 
 bool SaveChatHistory(const std::filesystem::path& client_root,
                      const std::vector<PastChatLine>& lines, int keep, std::string_view saved_at,
-                     std::span<const std::string> whispered, std::span<const std::string> typed) {
+                     std::span<const WhisperPeer> whispered, std::span<const std::string> typed) {
   const auto kept =
       static_cast<std::size_t>(std::clamp(keep, kSmallestChatHistory, kLargestChatHistory));
   const std::size_t first = lines.size() > kept ? lines.size() - kept : 0;
@@ -183,7 +198,16 @@ bool SaveChatHistory(const std::filesystem::path& client_root,
   YAML::Emitter out;
   out << YAML::BeginMap;
   out << YAML::Key << kSavedAtField << YAML::Value << std::string(saved_at);
-  WriteTexts(out, kWhisperedField, whispered, /*flow=*/true);
+  std::vector<std::string> names;
+  std::vector<std::string> heard_from;
+  for (const WhisperPeer& peer : whispered) {
+    names.push_back(peer.name);
+    if (peer.incoming) {
+      heard_from.push_back(peer.name);
+    }
+  }
+  WriteTexts(out, kWhisperedField, names, /*flow=*/true);
+  WriteTexts(out, kHeardFromField, heard_from, /*flow=*/true);
   WriteTexts(out, kTypedField, typed, /*flow=*/false);
   out << YAML::Key << kLinesField << YAML::Value << YAML::BeginSeq;
   for (std::size_t rank = first; rank < lines.size(); ++rank) {

@@ -9,6 +9,7 @@
 
 #include "ro/sim/chat_line.h"
 
+#include "chat/whisper_peer.h"
 #include "game/save_folder.h"
 
 namespace moonclient {
@@ -66,8 +67,13 @@ struct PastChatLine {
 struct PastChat {
   std::vector<PastChatLine> lines;
   std::string saved_at;
-  // ── LES DERNIERS DESTINATAIRES ─────────────────────────
-  // Ceux que la box « Pseudo » propose, le plus récent en tête.
+  // ── LES DERNIERS CORRESPONDANTS ────────────────────────
+  // Ceux que la box « Pseudo » propose, le plus récent en tête, avec le sens
+  // du dernier échange.
+  //
+  // ⚠ LE SENS S'ÉCRIT À PART, sous sa propre clé : la liste des noms garde la
+  // forme qu'elle avait. Un fichier d'avant, qui n'a pas cette clé, se relit
+  // donc tout entier en « je lui ai chuchoté » — ce qu'il voulait dire.
   //
   // 🔴 DANS CE FICHIER-CI, ET SOUS LA MÊME OPTION, parce que c'est la
   // MÊME confidence : il porte déjà les chuchotements en clair, et savoir À QUI
@@ -79,7 +85,7 @@ struct PastChat {
   // blocage, les macros d'émotes et les raccourcis. Ce n'est donc pas une
   // régression qu'on rattrape, c'est un service qu'on ajoute — raison de plus
   // pour qu'il suive l'option que le joueur a déjà refusée ou acceptée.
-  std::vector<std::string> whispered;
+  std::vector<WhisperPeer> whispered;
   // ── LES LIGNES TAPÉES ──────────────────────────────────
   // Ce que la flèche ↑ rappelle, de la plus ancienne à la plus récente.
   //
@@ -109,7 +115,7 @@ struct PastChat {
 [[nodiscard]] bool SaveChatHistory(const std::filesystem::path& client_root,
                                    const std::vector<PastChatLine>& lines, int keep,
                                    std::string_view saved_at,
-                                   std::span<const std::string> whispered,
+                                   std::span<const WhisperPeer> whispered,
                                    std::span<const std::string> typed = {});
 
 // Efface le fichier. C'est le geste de qui décoche l'option : garder sur le

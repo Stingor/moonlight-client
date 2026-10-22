@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <deque>
 #include <optional>
 #include <span>
 #include <string>
@@ -15,6 +14,7 @@
 #include "ro/ui/chat_input.h"
 
 #include "chat/chat_item_link.h"
+#include "chat/recent_whispers.h"
 
 namespace moonclient {
 
@@ -200,23 +200,10 @@ class ChatLinePreviewMaker {
   // Le canal où la parole publique est liée, sans croisillon ; vide sinon.
   [[nodiscard]] std::string_view bound_channel() const noexcept { return bound_channel_; }
 
-  // Retient un destinataire. ⚠ LE PLUS RÉCENT EN TÊTE, et un nom déjà connu
-  // REMONTE au lieu de se dupliquer : une liste où le même nom paraît trois
-  // fois ne sert plus à choisir.
-  void NoteWhisper(std::string_view name);
-
-  // Ce que la partie d'avant avait retenu. ⚠ REMPLACE la liste, elle ne s'y
-  // ajoute pas : appelée à l'ouverture, avant qu'on ait chuchoté à quiconque.
-  void RestoreWhispers(std::span<const std::string> names);
-
-  // Oublie tous les destinataires retenus. ⚠ LE FICHIER SUIT À LA FERMETURE :
-  // c'est la même liste qui s'écrit, et la vider ici la vide aussi là-bas.
-  void ForgetWhispers();
-
-  // Les derniers destinataires, pour les écrire. Le plus récent en tête.
-  [[nodiscard]] std::vector<std::string> whispered() const {
-    return std::vector<std::string>(whispered_.begin(), whispered_.end());
-  }
+  // Les derniers correspondants, que la box « Pseudo » propose. `app` y note
+  // les deux sens ; l'aperçu en tire les vues à chaque image.
+  [[nodiscard]] RecentWhispers& recent_whispers() noexcept { return recent_; }
+  [[nodiscard]] const RecentWhispers& recent_whispers() const noexcept { return recent_; }
 
   // OÙ LA LIGNE PARTIRAIT SI ON LA VALIDAIT MAINTENANT.
   //
@@ -264,13 +251,7 @@ class ChatLinePreviewMaker {
   // vecteur ferait pendre.
   std::vector<SendChoice> choices_;
   std::vector<std::string> channel_labels_;
-  // Les derniers destinataires, et les vues que la barre en reçoit.
-  //
-  // ⚠ IL NE SURVIT PAS À LA PARTIE, pas encore : le client garde le sien, et
-  // c'est un fichier de plus — qui porterait, lui aussi, avec qui l'on parle en
-  // privé. Voir ADR 0033, entrée A10.
-  std::deque<std::string> whispered_;
-  std::vector<std::string_view> whispered_views_;
+  RecentWhispers recent_;
 };
 
 }  // namespace moonclient

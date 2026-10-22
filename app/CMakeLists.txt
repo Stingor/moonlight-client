@@ -327,7 +327,8 @@ target_include_directories(moonclient_skillrules PUBLIC ${CMAKE_CURRENT_SOURCE_D
 # qu'à l'envoi.
 add_library(moonclient_chatpreview STATIC
     chat/chat_line_color.cpp
-    chat/chat_line_preview.cpp)
+    chat/chat_line_preview.cpp
+    chat/recent_whispers.cpp)
 
 target_link_libraries(moonclient_chatpreview
     # La lecture d'une annonce (/b, /lb…) pour mesurer sa ligne, et les liens

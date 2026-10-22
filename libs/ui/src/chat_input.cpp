@@ -418,7 +418,7 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
   // destinataire est le plus précis des trois chemins — un nom désigne quelqu'un,
   // un mode désigne un groupe — et c'est celui qu'on relit avant d'envoyer.
   ImGui::PushStyleColor(ImGuiCol_Text, kChatDarkTextColor);
-  const WhisperBoxGesture whisper = DrawWhisperBox(state, preview, asked);
+  const WhisperBoxGesture whisper = DrawWhisperBox(state, preview, asked, art);
   ImGui::PopStyleColor();
   ImGui::SameLine();
   DrawTarget(preview, target_width, &asked->chose_mode, art);
@@ -670,6 +670,9 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
       // Et il revient à la boîte d'où l'on a validé — le client ne déplace pas
       // le curseur du joueur pour lui.
       state.focus_on_whisper = whisper.submitted && !submitted;
+      // ⚠ LA BOX QUI REPREND LE CLAVIER APRÈS UN ENVOI NE DÉROULE PAS SA
+      // LISTE : on continue la conversation, on ne cherche personne.
+      state.whisper_list.quiet_next = state.focus_on_whisper;
       state.wants_focus = true;
     } else if (state.battle_mode) {
       // Rien à envoyer : c'est la SORTIE, en une frappe.

@@ -388,7 +388,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                           settings_->options().chat_look().keep_typed);
   // Les destinataires viennent du MÊME fichier, et donc de la même option :
   // décochée, `RestorePast` l'a effacé et la liste est vide.
-  chat_preview_.RestoreWhispers(chat_tabs_->restored_whispers());
+  chat_preview_.recent_whispers().Restore(chat_tabs_->restored_whispers());
   // ── CE QU'ON AVAIT TAPÉ, REMIS SOUS LA FLÈCHE ↑ ─────────────────────────
   // ⚠ SEULE LA FENÊTRE PRINCIPALE A UNE SAISIE — une flottante renvoie le
   // clavier à celle-ci —, il n'y a donc qu'un historique à remplir.
@@ -548,6 +548,9 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   windows_.chat_room.make.open = false;
   // LES CONVERSATIONS 1:1 : aucune n'est ouverte, aucun envoi n'attend.
   pieces_.whispers.StartSession(world_.last_chat_seq());
+  // Ni les récents de la box « Pseudo » : ce qui a été chuchoté avant n'est
+  // pas neuf.
+  chat_preview_.recent_whispers().StartSession(world_.last_chat_seq());
   pieces_.banned_words = LoadBannedWords(vfs_);
   windows_.whispers = WhisperWindows{};
   // LA LISTE DE BLOCAGE DU COMPTE, que le service web garde d'une connexion à

@@ -207,8 +207,9 @@ void Game::Close() {
   // que les LIRE, pour savoir ce que le joueur veut garder.
   if (chat_tabs_.has_value()) {
     const ro::ui::ChatAppearance& look = settings_->options().chat_look();
-    chat_tabs_->SavePast(look.keep_history, look.kept_lines, chat_preview_.whispered(),
-                         look.keep_typed, windows_.chat.main.input.history.lines);
+    chat_tabs_->SavePast(look.keep_history, look.kept_lines,
+                         chat_preview_.recent_whispers().saved(), look.keep_typed,
+                         windows_.chat.main.input.history.lines);
   }
   // Le livre encore ouvert garde sa page, comme s'il venait d'être refermé.
   if (item_description_.has_value()) {
