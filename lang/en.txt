@@ -20098,3 +20098,9 @@ tr: The effects the map places — torches, brazier flames, fireflies, steam, sm
 
 fr: Intensité
 tr: Intensity
+
+fr: Félicitations ! Vous êtes le MVP ! Votre récompense : %s
+tr: Congratulations! You are the MVP! Your reward item is %s
+
+fr: Vous êtes le MVP, mais vous ne pouvez pas prendre la récompense : vous dépassez votre limite de poids.
+tr: You are the MVP, but you can't take the reward because you are over your weight limit.

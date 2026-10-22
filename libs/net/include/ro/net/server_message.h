@@ -24,6 +24,10 @@ namespace ro::net {
 //                                         gabarit — ou le nom de l'item qu'elle
 //                                         désigne, pour le message 3278
 //   ZC 0x07E6 [op][skill:2][msg:4]        en lavande, « [compétence] message »
+//   ZC 0x010A [op][item:4]                le message 143 suivi du nom de l'item,
+//                                         en cyan : l'objet reçu par le MVP
+//   ZC 0x010D [op]                        le message 147 en rouge : le MVP trop
+//                                         chargé pour sa récompense
 //
 // Chaque message devient une ligne `kServer` de la conversation. Sa case est la
 // générale, sauf l'issue d'une compétence (« échecs de compétence ») et, par
@@ -44,7 +48,7 @@ namespace ro::net {
 // `item_names` sert au message 3278 de 0x07E2, « %s ne peut pas être utilisé
 // sur cette carte », dont la VALEUR est l'identifiant de l'item : le gabarit
 // prend son nom de base, sans affinage ni emplacements. Absent, ou pour un item
-// inconnu, le nom est une espace.
+// inconnu, le nom est une espace. L'objet du MVP, par 0x010A, se nomme de même.
 //
 // LE NOM D'UN ITEM PAR SON IDENTIFIANT, vide s'il est inconnu. `net` ne lit pas
 // la table des items de l'installation : c'est `app` qui la tient.

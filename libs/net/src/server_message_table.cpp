@@ -22,6 +22,10 @@ using core::TrText;
 // TRIÉE PAR NUMÉRO CROISSANT, sans doublon : la recherche est dichotomique.
 constexpr std::array kServerMessages = {
     ServerMessageEntry{52, TrText("Vous ne pouvez plus porter d'items : vous êtes en surcharge.")},
+    ServerMessageEntry{143, TrText("Félicitations ! Vous êtes le MVP ! Votre récompense : %s")},
+    ServerMessageEntry{147,
+                       TrText("Vous êtes le MVP, mais vous ne pouvez pas prendre la récompense : "
+                              "vous dépassez votre limite de poids.")},
     ServerMessageEntry{
         220, TrText("Vous ne pouvez pas prendre cet item : la limite de poids serait dépassée.")},
     ServerMessageEntry{372, TrText("Vous ne pouvez pas équiper cet item.")},

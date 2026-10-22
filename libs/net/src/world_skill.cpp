@@ -25,6 +25,9 @@ constexpr std::uint8_t kGraffitiHasMessage = 1;
 // métier d'un acteur, le numéro d'une unité au sol.
 constexpr std::uint8_t kBaseLook = 0;
 
+// La bannière du MVP : `Mvp.str` et sa fanfare, `st_mvp.wav`, au premier tic.
+constexpr std::uint32_t kMvpBannerEffect = 68;
+
 }  // namespace
 
 FrameOutcome ApplyWorldSkillFrame(const Frame& frame, sim::World& world, std::uint32_t now_ms) {
@@ -107,6 +110,16 @@ FrameOutcome ApplyWorldSkillFrame(const Frame& frame, sim::World& world, std::ui
         return world.RecordEffect(packet.actor_id, packet.effect_id, now_ms)
                    ? FrameOutcome::kApplied
                    : FrameOutcome::kIgnored;
+      });
+
+    // LE MVP : le serveur nomme, à tous ceux qui l'entourent, le personnage qui
+    // a abattu le boss. La bannière naît sur LUI — le joueur compris, et sans
+    // écart —, pas sur le monstre, qui est déjà mort. Un personnage hors de vue
+    // ne la montre pas.
+    case proto::ZcMvp::kOpcode:
+      return Decoded<proto::ZcMvp>(frame, [&world, now_ms](const auto& packet) {
+        return world.RecordEffect(packet.AID, kMvpBannerEffect, now_ms) ? FrameOutcome::kApplied
+                                                                        : FrameOutcome::kIgnored;
       });
 
     // 🔴 L'EFFET DIVERS, qui ne dit pas son effet mais son TYPE. C'est le

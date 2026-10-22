@@ -20098,3 +20098,9 @@ tr: Los efectos que coloca el mapa — antorchas, llamas de los braseros, lucié
 
 fr: Intensité
 tr: Intensidad
+
+fr: Félicitations ! Vous êtes le MVP ! Votre récompense : %s
+tr: ¡Felicidades! ¡Eres el MVP! Tu recompensa: %s
+
+fr: Vous êtes le MVP, mais vous ne pouvez pas prendre la récompense : vous dépassez votre limite de poids.
+tr: Eres el MVP, pero no puedes recoger la recompensa: superas tu límite de peso.

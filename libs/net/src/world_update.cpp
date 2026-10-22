@@ -673,6 +673,7 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
     case proto::ZcSkillDisappear::kOpcode:
     case proto::ZcNotifyEffect::kOpcode:
     case proto::SpecialEffectNotice::kOpcode:
+    case proto::ZcMvp::kOpcode:
     case proto::ValuedEffectNotice::kOpcode:
     case proto::ZcRemoveEffect::kOpcode:
     case proto::ZcSkillScale::kOpcode:

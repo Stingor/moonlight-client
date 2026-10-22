@@ -33,6 +33,13 @@ constexpr std::uint32_t kRedMessageColor = 0xFF0000;
 constexpr std::uint32_t kValueMessageColor = 0xFFFF00;
 // L'issue d'une compétence : un lavande.
 constexpr std::uint32_t kSkillMessageColor = 0xCDCDFF;
+// L'objet que le MVP reçoit : du cyan.
+constexpr std::uint32_t kMvpRewardColor = 0x00FFFF;
+
+// LES DEUX MESSAGES DU MVP : l'objet reçu, et la récompense perdue à cause
+// du poids.
+constexpr std::uint16_t kMvpItemMessage = 143;
+constexpr std::uint16_t kMvpOverweightMessage = 147;
 
 // LE TROU D'UN GABARIT, rempli par substitution et non par printf : une
 // traduction qui changerait ses spécifications écrirait de travers, elle ne
@@ -162,6 +169,22 @@ FrameOutcome ApplyServerMessageFrame(const Frame& frame, sim::World& world,
         }
         return Say(world, frame.opcode, static_cast<std::uint32_t>(packet.msgId),
                    SkillPrefix(packet.skillId, world, skills), kSkillMessageColor, now_ms);
+      });
+    // L'OBJET DU MVP : le nom suit le message, sans rien après — la table du
+    // client porte une fin de phrase pour ce message, et le client ne
+    // l'écrit pas. Le nom est le nom nu de l'objet : ni affinage, ni cartes.
+    case proto::ZcMvpGettingItem::kOpcode:
+      return Decoded<proto::ZcMvpGettingItem>(frame, [&](const proto::ZcMvpGettingItem& packet) {
+        std::string name = item_names ? item_names(packet.itemId) : std::string{};
+        if (name.empty()) {
+          name = kUnknownItemName;
+        }
+        return Say(world, frame.opcode, kMvpItemMessage, {}, kMvpRewardColor, now_ms,
+                   {.name = std::move(name)});
+      });
+    case proto::ZcThrowMvpitem::kOpcode:
+      return Decoded<proto::ZcThrowMvpitem>(frame, [&](const proto::ZcThrowMvpitem&) {
+        return Say(world, frame.opcode, kMvpOverweightMessage, {}, kRedMessageColor, now_ms);
       });
     default:
       return FrameOutcome::kUnhandled;
