@@ -130,6 +130,13 @@ PendingMove AdvancePendingAction(const World& world, WalkPlanner& planner, const
   if (player == nullptr || (target == nullptr && !aims_unit && !aims_cell)) {
     return {PendingStep::kGiveUp, {}};
   }
+  // UNE ÉCHOPPE SE VISITE TANT QUE SON ENSEIGNE TIENT : le marchand qui la
+  // ferme, ou passe d'une sorte à l'autre, n'a plus ce qu'on allait voir.
+  if (action.deed == PendingDeed::kVisitStore &&
+      (target == nullptr || !target->signboard.has_value() ||
+       target->signboard->kind != action.store_kind)) {
+    return {PendingStep::kGiveUp, {}};
+  }
   // Le client abandonne une ATTAQUE sur une cible morte (l'état trois de la
   // cible) ; un lanceur mort n'a rien à lancer non plus.
   //

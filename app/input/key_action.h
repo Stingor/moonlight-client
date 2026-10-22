@@ -9,6 +9,8 @@
 
 #include "ro/net/connection.h"
 #include "ro/render/camera.h"
+#include "ro/sim/pending_action.h"
+#include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/basic_info_window.h"
 #include "ro/ui/bug_report_window.h"
@@ -172,6 +174,10 @@ struct KeyPress {
   const CameraRig* rig = nullptr;
   ro::net::Connection* link = nullptr;
   ro::sim::World* world = nullptr;
+  // L'ACTION EN ATTENTE ET LES CHEMINS : Échap défait une approche lointaine
+  // qui n'est pas un combat, et arrête le personnage en route.
+  std::optional<ro::sim::PendingAction>* attack = nullptr;
+  ro::sim::WalkPlanner* planner = nullptr;
   // La fenêtre, que la saisie de texte ouvre et ferme.
   SDL_Window* window = nullptr;
   // ⚠ ÉCHAP NE QUITTE QU'EN DERNIER RECOURS : tant qu'une fenêtre est ouverte,

@@ -393,11 +393,17 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   //
   // ⚠ LE RÉARMEMENT REPREND LE TYPE DU DERNIER CLIC D'ACTION, et non l'état de
   // Ctrl à l'arrivée du refus : voir `RearmedAttackRepeats`.
+  //
+  // UNE ÉCHOPPE ATTEINTE se demande aux commerces, plus bas dans l'image.
+  std::optional<StoreVisitDue> store_reached;
   if (AdvanceAttack(link_, world_, planner_, PlannedMapOf(*stage_), attack_,
                     grimoire_.approach_clock(), refused_target,
                     RearmedAttackRepeats(world_mouse_.engagement), now_ms, &targeting_,
-                    &world_mouse_.engagement)) {
+                    &world_mouse_.engagement, &store_reached)) {
     grimoire_.CancelPending();
+  }
+  if (store_reached.has_value()) {
+    pieces_.trade.VisitStore(store_reached->owner_id, store_reached->kind);
   }
 
   // L'ACTION EN ATTENTE AVANCE D'UN TOUR : on marche vers la cible désignée

@@ -5,6 +5,7 @@
 #include <optional>
 
 #include "ro/sim/movement.h"
+#include "ro/sim/signboard.h"
 #include "ro/sim/walk_map.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
@@ -126,7 +127,7 @@ inline constexpr std::array<CellStep, 8> kApproachFallbacks = {
     CellStep{-1, 1}, CellStep{-1, -1}, CellStep{0, 1},  CellStep{0, -1}};
 
 // Ce qu'une action ordinaire fait en arrivant.
-enum class PendingDeed : std::uint8_t { kStrike, kTalk, kPickUp };
+enum class PendingDeed : std::uint8_t { kStrike, kTalk, kPickUp, kVisitStore };
 
 // Ce qu'une action en attente garde entre deux tics.
 struct PendingAction {
@@ -180,8 +181,12 @@ struct PendingAction {
 
   // CE QUI PART À L'ARRIVÉE, quand ce n'est pas une compétence : un coup, ou,
   // pour une cible au-delà de ce que le serveur accepte d'ouvrir de loin, la
-  // parole à un PNJ ou le ramassage d'un objet.
+  // parole à un PNJ, le ramassage d'un objet ou la visite d'une échoppe.
   PendingDeed deed = PendingDeed::kStrike;
+  // L'ÉCHOPPE VISITÉE, de vente ou d'achat : celle dont la cible tenait
+  // l'enseigne au clic. Lue seulement pour `PendingDeed::kVisitStore` ; une
+  // enseigne retirée ou changée en chemin fait renoncer.
+  SignboardKind store_kind = SignboardKind::kVendingShop;
 
   // LA CASE VISÉE PAR UNE COMPÉTENCE AU SOL, à la place d'une entité.
   //
@@ -202,7 +207,7 @@ enum class PendingStep : std::uint8_t {
   // À portée : LÂCHER L'ACTION — lancer la compétence, ou porter le coup.
   // L'action est alors CONSOMMÉE — le client l'efface au même endroit.
   kRelease,
-  // La cible a disparu ou est morte : abandonner.
+  // La cible a disparu ou est morte, ou l'échoppe visitée a fermé : abandonner.
   kGiveUp,
 };
 

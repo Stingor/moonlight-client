@@ -9,7 +9,9 @@
 #include "ro/net/movement.h"
 #include "ro/net/npc_dialog.h"
 #include "ro/sim/chat_line.h"
+#include "ro/sim/movement.h"
 #include "ro/sim/player_status.h"
+#include "ro/sim/store_approach.h"
 #include "ro/sim/world.h"
 
 #include "world/click_action.h"
@@ -21,7 +23,25 @@ namespace {
 // Le refus d'attaquer sur une monture s'écrit en rouge, en `0xRRGGBB`.
 constexpr std::uint32_t kRidingRefusalColor = 0xFF0000;
 
+// L'échoppe perdue en chemin le dit dans la couleur des refus.
+constexpr std::uint32_t kLostStoreColor = kRidingRefusalColor;
+
 }  // namespace
+
+void HaltPlayerWalk(ro::net::Connection& link, const ro::sim::World& world,
+                    ro::sim::WalkPlanner& planner, ro::sim::ApproachWalkClock& clock,
+                    std::uint32_t now_ms) {
+  const ro::sim::Actor* self = world.player();
+  if (self == nullptr) {
+    return;
+  }
+  const ro::sim::WalkPath& path = planner.PathFor(*self);
+  if (!ro::sim::IsWalking(*self, path, now_ms)) {
+    return;
+  }
+  static_cast<void>(ro::sim::AdmitWalkRequest(world, clock, now_ms));
+  ReportRefusal(ro::net::RequestMove(link, ro::sim::StoppedCell(*self, path, now_ms)));
+}
 
 std::uint16_t AttackRangeCells(const ro::sim::World& world) {
   const std::int64_t told = world.player_status().attack_range;
@@ -71,6 +91,22 @@ ro::sim::PendingAction ArmFarPickup(const ro::sim::Actor& item) {
   return action;
 }
 
+bool ArmStoreApproach(const ro::sim::World& world, std::uint32_t owner_id,
+                      std::optional<ro::sim::PendingAction>& attack,
+                      std::optional<ro::sim::PickupIntent>& pickup) {
+  const ro::sim::Actor* merchant = world.Find(owner_id);
+  if (merchant == nullptr) {
+    return false;
+  }
+  std::optional<ro::sim::PendingAction> far = ro::sim::ArmFarStoreVisit(world, *merchant);
+  if (!far.has_value()) {
+    return false;
+  }
+  pickup.reset();
+  attack = *far;
+  return true;
+}
+
 ro::sim::PendingAction ArmAttackOnGroundUnit(const ro::sim::World& world,
                                              const ro::sim::SkillUnit& unit, bool repeat) {
   ro::sim::PendingAction action;
@@ -84,7 +120,8 @@ bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world, ro::sim::Wa
                    const ro::sim::WalkMap* walk, std::optional<ro::sim::PendingAction>& attack,
                    ro::sim::ApproachWalkClock& approach,
                    std::optional<std::uint32_t> refused_target, bool repeat_on_rearm,
-                   std::uint32_t now_ms, Targeting* targeting, MouseEngagement* engagement) {
+                   std::uint32_t now_ms, Targeting* targeting, MouseEngagement* engagement,
+                   std::optional<StoreVisitDue>* store_visit) {
   // LE REFUS DU SERVEUR D'ABORD. ⚠ IL NE VAUT QUE POUR L'IMAGE OÙ IL ARRIVE :
   // le gardé plus longtemps relancerait la poursuite bien après que le joueur
   // a visé autre chose.
@@ -126,6 +163,13 @@ bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world, ro::sim::Wa
         ReportRefusal(ro::net::RequestPickup(link, target_id));
         break;
       }
+      if (attack->deed == ro::sim::PendingDeed::kVisitStore) {
+        if (store_visit != nullptr) {
+          *store_visit = StoreVisitDue{.owner_id = target_id, .kind = attack->store_kind};
+        }
+        attack.reset();
+        break;
+      }
       const int asked = engagement != nullptr
                             ? BasicAttackAction(attack->repeat, engagement->action, target_id)
                             : (attack->repeat ? kAttackActionRepeat : kAttackActionOnce);
@@ -148,9 +192,22 @@ bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world, ro::sim::Wa
       }
       break;
     }
-    case ro::sim::PendingStep::kGiveUp:
+    case ro::sim::PendingStep::kGiveUp: {
+      // L'ÉCHOPPE PERDUE EN CHEMIN — fermée, ou son marchand hors de vue — :
+      // la marche n'a plus de but, et le joueur doit savoir pourquoi il s'arrête.
+      // Un personnage mort ne marche plus, et sait pourquoi.
+      const ro::sim::Actor* self = world.player();
+      if (attack->deed == ro::sim::PendingDeed::kVisitStore && self != nullptr &&
+          self->posture != ro::sim::Posture::kDead) {
+        HaltPlayerWalk(link, world, planner, approach, now_ms);
+        world.RecordChat(ro::sim::ChatKind::kServer, 0,
+                         ro::core::Tr("L'échoppe a fermé ou n'est plus en vue : la marche "
+                                      "s'arrête."),
+                         now_ms, kLostStoreColor);
+      }
       attack.reset();
       break;
+    }
   }
   return rearmed;
 }

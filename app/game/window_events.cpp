@@ -17,6 +17,7 @@
 #include "game/trade_stages.h"
 #include "input/key_action.h"
 #include "input/key_gate.h"
+#include "world/attack_intent.h"
 #include "world/click_action.h"
 #include "world/entity_menu.h"
 #include "world/follow_action.h"
@@ -70,6 +71,16 @@ struct WindowPixels {
 //
 // ⚠ UNE ENSEIGNE EST UNE FENÊTRE, LE MARCHAND EST DU MONDE : sous une souris
 // figée (`world_takes_clicks` faux), seule l'enseigne répond encore.
+// 🔴 UN MARCHAND TROP LOIN se rejoint d'abord : voir `ArmStoreApproach`.
+void VisitOrApproachStore(const EventRouting& to, std::uint32_t owner_id,
+                          ro::sim::SignboardKind kind) {
+  if (ArmStoreApproach(*to.world, owner_id, *to.attack, *to.pickup)) {
+    to.grimoire->CancelPending();
+  } else {
+    to.trade->VisitStore(owner_id, kind);
+  }
+}
+
 [[nodiscard]] bool OpensStore(const EventRouting& to, glm::vec2 pointer, WindowPixels window,
                               bool shift_held, bool second_of_double, bool world_takes_clicks) {
   if (to.trade == nullptr || to.grimoire->aim() != SkillAim::kNothing) {
@@ -90,7 +101,7 @@ struct WindowPixels {
   const bool opens = to.shop_one_click || second_of_double;
   if (const std::optional<SignboardHit> board = to.trade->SignboardAt(pointer); board.has_value()) {
     if (opens) {
-      to.trade->VisitStore(board->owner_id, board->kind);
+      VisitOrApproachStore(to, board->owner_id, board->kind);
     }
     return true;
   }
@@ -112,7 +123,7 @@ struct WindowPixels {
       ActorTakesClick(*merchant, VersusGateOf(*to.world, shift_held, to.no_shift))) {
     return false;
   }
-  to.trade->VisitStore(merchant->id, merchant->signboard->kind);
+  VisitOrApproachStore(to, merchant->id, merchant->signboard->kind);
   return true;
 }
 
@@ -173,6 +184,8 @@ struct WindowPixels {
           .rig = to.rig,
           .link = to.link,
           .world = to.world,
+          .attack = to.attack,
+          .planner = to.planner,
           .window = to.gl->window(),
           .escape_closes_a_window = to.escape_closes_a_window,
           .enter_claimed = to.enter_claimed,

@@ -82,6 +82,7 @@ add_library(ro_sim STATIC
     src/player_status.cpp
     src/shortcut_bar.cpp
     src/sight_purge.cpp
+    src/store_approach.cpp
     src/skill_banner.cpp
     src/skill_side_effects.cpp
     src/party_booking.cpp

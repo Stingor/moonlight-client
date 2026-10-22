@@ -20161,3 +20161,6 @@ tr: Speech bubble text size
 
 fr: La bulle entière suit : cadre, marges, largeur avant le retour à la ligne et hauteur au-dessus de la tête.
 tr: The whole bubble follows: frame, margins, width before wrapping and height above the head.
+
+fr: L'échoppe a fermé ou n'est plus en vue : la marche s'arrête.
+tr: The shop has closed or is out of sight: the walk stops.

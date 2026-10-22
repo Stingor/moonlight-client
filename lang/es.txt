@@ -20161,3 +20161,6 @@ tr: Tamaño del texto de las burbujas
 
 fr: La bulle entière suit : cadre, marges, largeur avant le retour à la ligne et hauteur au-dessus de la tête.
 tr: Toda la burbuja lo sigue: marco, márgenes, ancho antes del salto de línea y altura sobre la cabeza.
+
+fr: L'échoppe a fermé ou n'est plus en vue : la marche s'arrête.
+tr: La tienda ha cerrado o ya no está a la vista: la marcha se detiene.

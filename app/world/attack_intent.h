@@ -6,6 +6,7 @@
 #include "ro/net/connection.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/pending_action.h"
+#include "ro/sim/pickup_intent.h"
 #include "ro/sim/walk_map.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
@@ -55,6 +56,14 @@ inline constexpr std::uint16_t kDefaultAttackRangeCells = 1;
                                                    const ro::sim::Actor& npc);
 [[nodiscard]] ro::sim::PendingAction ArmFarPickup(const ro::sim::Actor& item);
 
+// L'ÉCHOPPE D'UN MARCHAND TROP LOIN, vente ou achat : l'approche s'inscrit à la
+// place de l'action et du ramassage d'avant, et la demande partira à l'arrivée
+// — voir `ro/sim/store_approach.h`. Rend faux, sans rien toucher, quand
+// l'échoppe se demande d'ici.
+[[nodiscard]] bool ArmStoreApproach(const ro::sim::World& world, std::uint32_t owner_id,
+                                    std::optional<ro::sim::PendingAction>& attack,
+                                    std::optional<ro::sim::PickupIntent>& pickup);
+
 // LA PORTÉE D'APPROCHE D'UNE UNITÉ AU SOL qu'on frappe, en cases : le client ne
 // s'approche pas plus près, quelle que soit l'arme, et ne va plus loin que si
 // la portée d'attaque le dépasse.
@@ -65,6 +74,24 @@ inline constexpr std::uint16_t kGroundUnitAttackReachCells = 5;
 [[nodiscard]] ro::sim::PendingAction ArmAttackOnGroundUnit(const ro::sim::World& world,
                                                            const ro::sim::SkillUnit& unit,
                                                            bool repeat);
+
+// L'ÉCHOPPE ATTEINTE AU BOUT D'UNE APPROCHE : la visite à demander, que la
+// partie remet aux commerces — ils seuls savent si elle peut partir.
+struct StoreVisitDue {
+  std::uint32_t owner_id = 0;
+  ro::sim::SignboardKind kind = ro::sim::SignboardKind::kVendingShop;
+};
+
+// ARRÊTE LE PERSONNAGE en chemin : une marche vers la case où il s'arrêterait,
+// que le serveur prend comme un changement de destination. Rien s'il ne marche
+// pas.
+//
+// ⚠ L'ARRÊT NE TOMBE PAS SOUS LE PLANCHER des marches : tombé, il laisserait
+// courir jusqu'au bout l'étape qu'il défait. Il compte pourtant comme une marche
+// partie, pour celles qui suivent.
+void HaltPlayerWalk(ro::net::Connection& link, const ro::sim::World& world,
+                    ro::sim::WalkPlanner& planner, ro::sim::ApproachWalkClock& clock,
+                    std::uint32_t now_ms);
 
 // Fait avancer la poursuite d'une image : marcher, frapper, ou renoncer.
 //
@@ -89,12 +116,17 @@ inline constexpr std::uint16_t kGroundUnitAttackReachCells = 5;
 //
 // `engagement` apprend le coup qui part : une attaque qui ne se poursuit pas,
 // relâchée en chemin, s'achève avec lui. Nul hors partie.
+//
+// `store_visit` reçoit l'échoppe atteinte (`ro::sim::PendingDeed::kVisitStore`).
+// Une échoppe fermée, ou un marchand sorti de la vue, ARRÊTE le personnage et
+// le dit dans le chat.
 [[nodiscard]] bool AdvanceAttack(ro::net::Connection& link, ro::sim::World& world,
                                  ro::sim::WalkPlanner& planner, const ro::sim::WalkMap* walk,
                                  std::optional<ro::sim::PendingAction>& attack,
                                  ro::sim::ApproachWalkClock& approach,
                                  std::optional<std::uint32_t> refused_target, bool repeat_on_rearm,
                                  std::uint32_t now_ms, Targeting* targeting = nullptr,
-                                 MouseEngagement* engagement = nullptr);
+                                 MouseEngagement* engagement = nullptr,
+                                 std::optional<StoreVisitDue>* store_visit = nullptr);
 
 }  // namespace moonclient

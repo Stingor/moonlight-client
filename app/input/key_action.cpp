@@ -8,6 +8,7 @@
 #include "ro/core/log.h"
 #include "ro/net/action.h"
 #include "ro/render/actor_sprite.h"
+#include "ro/sim/store_approach.h"
 #include "ro/sim/world.h"
 
 #include "game/achievement_stage.h"
@@ -21,6 +22,7 @@
 #include "game/quest_stage.h"
 #include "input/key_gate.h"
 #include "mvp/mvp_tracker_stage.h"
+#include "world/attack_intent.h"
 #include "world/click_action.h"
 
 namespace moonclient {
@@ -359,6 +361,15 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
       }
       if (to.companion_ai != nullptr && to.companion_ai->aim().has_value()) {
         to.companion_ai->Disarm();
+        break;
+      }
+      // UNE APPROCHE LOINTAINE QUI N'EST PAS UN COMBAT — un PNJ, un objet, une
+      // échoppe — se défait de même, et le personnage s'arrête en route.
+      if (to.attack != nullptr && ro::sim::DropErrandApproach(*to.attack)) {
+        if (to.link != nullptr && to.world != nullptr && to.planner != nullptr &&
+            to.skills != nullptr) {
+          HaltPlayerWalk(*to.link, *to.world, *to.planner, to.skills->approach_clock(), to.now_ms);
+        }
         break;
       }
       // ⚠ LA PILE ENSUITE, et le menu en dernier. Échap ferme d'abord ce qui est
