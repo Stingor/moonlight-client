@@ -234,7 +234,8 @@ ro::ui::map_editor::Place Snapped(ro::ui::MapEditorTool tool,
       snap(placed.scale, start.scale, kSnapScale);
       break;
     case ro::ui::MapEditorTool::kRelief:
-      // La brosse n'a pas de poignée : rien ne s'aimante.
+    case ro::ui::MapEditorTool::kCells:
+      // La brosse et le pinceau n'ont pas de poignée : rien ne s'aimante.
       break;
   }
   return placed;

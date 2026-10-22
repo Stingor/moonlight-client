@@ -53,6 +53,8 @@ std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_he
       return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kVertices};
     case '5':
       return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRelief};
+    case '6':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kCells};
     default:
       return std::nullopt;
   }
@@ -76,6 +78,7 @@ void MapEditorSession::Leave() noexcept {
   gesture_before_.reset();
   drag_.reset();
   ground_stroke_.reset();
+  cell_stroke_ = false;
   handles_.clear();
 }
 
@@ -100,6 +103,9 @@ bool MapEditorSession::Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view
   // LA BROSSE DE RELIEF prend tout appui sur le sol : elle n'a pas de poignée.
   if (active_ && tool_ == ro::ui::MapEditorTool::kRelief) {
     return GrabGround();
+  }
+  if (active_ && tool_ == ro::ui::MapEditorTool::kCells) {
+    return GrabCells();
   }
   return active_ && ((view.selected.has_value() && GrabTool(pointer, view)) ||
                      GrabLightHandle(pointer, view) || GrabEffectHandle(pointer, view) ||
@@ -208,7 +214,7 @@ void MapEditorSession::Release() {
     queued_.emplace_back(ro::ui::map_editor::EndGroundStroke{});
     return;
   }
-  if (!drag_.has_value()) {
+  if (ReleaseCells() || !drag_.has_value()) {
     return;
   }
   ro::ui::map_editor::Place last = drag_->last;
@@ -316,6 +322,7 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           tool_ = asked.tool;
           drag_.reset();
           ground_stroke_.reset();
+          cell_stroke_ = false;
           return {};
         } else if constexpr (std::is_same_v<Asked, intents::AddModel>) {
           return AddModel(asked, scene, store);
@@ -415,6 +422,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return ApplySound(asked, scene, store);
         } else if constexpr (kIsModelEffectIntent<Asked>) {
           return ApplyModelEffect(asked, scene, store);
+        } else if constexpr (kIsCellIntent<Asked>) {
+          return ApplyCells(asked, scene, store);
         } else {
           static_assert(std::is_same_v<Asked, intents::Save>, "une intention n'est pas routée");
           std::vector<std::string> saved = Save(store);
@@ -720,6 +729,7 @@ ro::ui::MapEditorView MapEditorSession::View(const ro::render::MapScene& scene,
   ViewSounds(scene, document, view);
   ViewGround(document, view);
   ViewGroundPoints(scene, document, view);
+  ViewCells(document, view);
   ViewModelLights(scene, store, view);
   ViewModelEffects(scene, store, view);
   if (selection_.empty()) {

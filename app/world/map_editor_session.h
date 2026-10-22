@@ -86,6 +86,15 @@ inline constexpr bool kIsModelEffectIntent =
     std::is_same_v<Intent, ro::ui::map_editor::MoveModelEffect> ||
     std::is_same_v<Intent, ro::ui::map_editor::RemoveModelEffect>;
 
+// Les intentions de l'outil Cases : voir map_editor_cells.cpp.
+template <typename Intent>
+inline constexpr bool kIsCellIntent =
+    std::is_same_v<Intent, ro::ui::map_editor::SetCellBrush> ||
+    std::is_same_v<Intent, ro::ui::map_editor::EndCellStroke> ||
+    std::is_same_v<Intent, ro::ui::map_editor::ClearCells> ||
+    std::is_same_v<Intent, ro::ui::map_editor::SetCellsWhy> ||
+    std::is_same_v<Intent, ro::ui::map_editor::BlockModelFootprint>;
+
 // Les intentions de la section « Sons » : voir map_editor_sounds.cpp.
 template <typename Intent>
 inline constexpr bool kIsSoundIntent = std::is_same_v<Intent, ro::ui::map_editor::SelectSound> ||
@@ -150,6 +159,7 @@ class MapEditorSession {
     model_light_gesture_before_.reset();
     model_effect_gesture_before_.reset();
     ground_stroke_.reset();
+    cell_stroke_ = false;
     designated_point_.reset();
     selected_points_.clear();
     ground_dots_.clear();
@@ -195,7 +205,7 @@ class MapEditorSession {
   [[nodiscard]] bool Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view,
                           bool extend = false);
   [[nodiscard]] bool dragging() const noexcept {
-    return drag_.has_value() || ground_stroke_.has_value();
+    return drag_.has_value() || ground_stroke_.has_value() || cell_stroke_;
   }
   // Le glissé de la poignée saisie jusqu'en `pointer`, puis son relâcher : ils
   // deviennent des intentions de placement, que `TakeQueued` rend.
@@ -295,6 +305,21 @@ class MapEditorSession {
   // l'historique qu'au relâcher.
   void StrokeGround(double now_ms, bool lower, const ro::render::MapScene& scene,
                     MapEditStore& store);
+  // L'OUTIL CASES : voir map_editor_cells.cpp.
+  //
+  // La case sous la souris, posée par l'appelant à chaque image ; rien hors du
+  // sol.
+  void SetCellPointer(std::optional<std::array<std::int32_t, 2>> cell) { cell_pointer_ = cell; }
+  [[nodiscard]] const std::optional<std::array<std::int32_t, 2>>& cell_pointer() const noexcept {
+    return cell_pointer_;
+  }
+  // Les cases que couvre le pinceau centré sur `cell`.
+  [[nodiscard]] std::vector<std::array<std::int32_t, 2>> CellsUnderBrush(
+      const std::array<std::int32_t, 2>& cell) const;
+  // UN PAS DU PINCEAU, à chaque image d'un glissé : il bloque les cases sous
+  // lui, ou les libère (`free`, Maj tenue). Le document change ; il ne devient
+  // une entrée de l'historique qu'au relâcher.
+  void StrokeCells(bool free, MapEditStore& store);
   // Ce qu'a coûté le dernier remaillage du sol, et s'il suit le glissé en
   // direct : ce que le panneau en dit.
   void SetGroundRemesh(std::optional<double> remesh_ms, bool live) {
@@ -635,6 +660,24 @@ class MapEditorSession {
   std::vector<GroundDot> ground_dots_;
   std::optional<CornerPoint> designated_point_;
   std::vector<CornerPoint> selected_points_;
+  // L'OUTIL CASES : voir map_editor_cells.cpp.
+  [[nodiscard]] bool GrabCells();
+  // Finit le glissé du pinceau ; faux quand il n'y en avait pas.
+  bool ReleaseCells();
+  Outcome ApplyCells(const ro::ui::map_editor::SetCellBrush& set, const ro::render::MapScene& scene,
+                     MapEditStore& store);
+  Outcome ApplyCells(const ro::ui::map_editor::EndCellStroke& end,
+                     const ro::render::MapScene& scene, MapEditStore& store);
+  Outcome ApplyCells(const ro::ui::map_editor::ClearCells& clear, const ro::render::MapScene& scene,
+                     MapEditStore& store);
+  Outcome ApplyCells(const ro::ui::map_editor::SetCellsWhy& why, const ro::render::MapScene& scene,
+                     MapEditStore& store);
+  Outcome ApplyCells(const ro::ui::map_editor::BlockModelFootprint& footprint,
+                     const ro::render::MapScene& scene, MapEditStore& store);
+  void ViewCells(const ro::mapedit::MapEdit& document, ro::ui::MapEditorView& view) const;
+  bool cell_stroke_ = false;
+  std::optional<std::array<std::int32_t, 2>> cell_pointer_;
+  ro::ui::MapEditorCellBrush cell_brush_;
 };
 
 }  // namespace moonclient

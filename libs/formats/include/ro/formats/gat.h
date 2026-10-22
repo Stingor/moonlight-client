@@ -114,6 +114,11 @@ class GatMap {
   void SetCornerHeights(std::int32_t x, std::int32_t y,
                         const std::array<float, 4>& heights) noexcept;
 
+  // LE TYPE BRUT DE LA CELLULE (x, y), drapeau d'eau compris : c'est par là que
+  // les cases bloquées du document d'édition se posent sur la grille. Une
+  // cellule hors de la grille n'est pas touchée.
+  void SetType(std::int32_t x, std::int32_t y, std::int32_t type) noexcept;
+
  private:
   GatMap() = default;
 

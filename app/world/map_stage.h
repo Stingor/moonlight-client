@@ -50,6 +50,9 @@ struct MapStage {
   // cellule, avant les retouches du relief — aplanies si la carte l'est. Voir
   // `ReshapeStageGround`.
   std::vector<std::array<float, 4>> file_walk_heights;
+  // LES CASES BLOQUÉES QUE `walk_map` PORTE, celles du document : voir
+  // `BlockStageCells`.
+  std::vector<ro::mapedit::BlockedCell> blocked_cells;
   // LE MAILLAGE DU SOL NE PORTE PAS ENCORE le relief des hauteurs : un glissé
   // de brosse trop coûteux à remailler image par image attend son relâcher.
   bool ground_mesh_stale = false;
@@ -125,6 +128,13 @@ struct MapStageRead {
 // hauteurs se recopient, et l'éditeur l'appelle à chaque image. Rend vrai
 // quand le relief a changé. La marchabilité ne bouge jamais.
 bool ReshapeStageGround(MapStage& stage, std::span<const ro::mapedit::GroundEdit> edits);
+
+// LES CASES BLOQUÉES SELON L'ÉDITION : quand `cells` diffère de ce que la grille
+// de marche porte, la refait depuis la grille lue, puis y bloque `cells`
+// (docs/adr/0131). La grille se refait EN PLACE : le planificateur et le monde,
+// qui la désignent, la suivent sans qu'on la leur redonne. La grille lue, que
+// le dessin consulte, ne change pas. Rend vrai quand la grille a changé.
+bool BlockStageCells(MapStage& stage, std::span<const ro::mapedit::BlockedCell> cells);
 
 // LES RETOUCHES DU RELIEF QUI SE VOIENT : celles du document sous « Ombres en
 // temps réel », aucune sinon. L'ombre cuite de la carte est peinte pour le sol

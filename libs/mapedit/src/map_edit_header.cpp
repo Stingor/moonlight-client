@@ -10,8 +10,8 @@ const std::string_view kMapEditHeader =
 #
 #  Donnée de moonclient, tenue par le staff (docs/adr/0118). La carte reste
 #  celle de l'installation : le client applique ces opérations au chargement,
-#  avant de bâtir ses maillages. Le visuel seulement : la marchabilité (GAT)
-#  n'est jamais touchée.
+#  avant de bâtir ses maillages. La marchabilité ne change que par les cases
+#  bloquées, que le serveur applique comme le client (docs/adr/0131).
 #
 #  Écrit par l'éditeur de carte du jeu ; il se relit et se corrige aussi à la
 #  main.
@@ -87,6 +87,12 @@ const std::string_view kMapEditHeader =
 #               du cube (x, y) étant le point (x, y) ; la levée en unités du
 #               monde, positive vers le haut. Elle lève tous les coins de cube
 #               qui touchent le point : une falaise garde sa marche.
+#  blocked_cells : les cases que nul ne traverse, serveur compris :
+#    why      : pourquoi, obligatoire — une raison pour toutes les cases ;
+#    cells    : [colonne, rangée, sorte] — une case de la grille de marche, dans
+#               le repère des paquets ; la sorte vaut wall (ni marche ni tirs)
+#               ou fence (la marche seulement). Une case n'apparaît qu'une
+#               fois, et une case que la carte bloque déjà le reste.
 #  sprites : les sprites de décor — une créature seulement peinte, que le
 #            serveur ne connaît pas et qu'on ne clique pas —, chacun :
 #    sprite   : son nom dans la table des classes (« SAVAGE »), ou le numéro de

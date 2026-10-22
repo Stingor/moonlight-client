@@ -123,4 +123,13 @@ void GatMap::SetCornerHeights(std::int32_t x, std::int32_t y,
       .corner_height = heights;
 }
 
+void GatMap::SetType(std::int32_t x, std::int32_t y, std::int32_t type) noexcept {
+  if (!InBounds(x, y)) {
+    return;
+  }
+  cells_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+         static_cast<std::size_t>(x)]
+      .type = type;
+}
+
 }  // namespace ro::formats

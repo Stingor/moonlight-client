@@ -9,6 +9,7 @@
 #include "ro/core/build_stamp.h"
 #include "ro/core/log.h"
 #include "ro/formats/gat.h"
+#include "ro/mapedit/blocked_cells.h"
 #include "ro/mapedit/ground_edit.h"
 #include "ro/render/map_fog.h"
 #include "ro/render/map_sky.h"
@@ -119,6 +120,11 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
       stage.ground_laid_light = ro::render::BuildGroundLight(
           stage.scene.gnd, *gat, ro::render::GroundLightTerms::kLaidLightOnly);
       stage.gat = std::move(*gat);
+      // LES CASES BLOQUÉES, que le serveur bloque aussi : elles valent sous
+      // tous les réglages, au contraire du relief retouché.
+      if (options.edit.has_value()) {
+        static_cast<void>(BlockStageCells(stage, options.edit->blocked_cells()));
+      }
     } else {
       // ⚠ LES DEUX ÉCHECS NE PORTENT PAS LE MÊME LIBELLÉ : la fenêtre de
       // journal ne garde que le TEXTE, et « illisible » n'envoie pas chercher
@@ -203,6 +209,20 @@ bool ReshapeStageGround(MapStage& stage, std::span<const ro::mapedit::GroundEdit
                                  stage.scene.gnd.height(), gat);
   }
   stage.ground_mesh_stale = true;
+  return true;
+}
+
+bool BlockStageCells(MapStage& stage, std::span<const ro::mapedit::BlockedCell> cells) {
+  if (!stage.gat.has_value() || std::ranges::equal(stage.blocked_cells, cells)) {
+    return false;
+  }
+  ro::formats::GatMap blocked = *stage.gat;
+  const ro::mapedit::MapEditReport report = ro::mapedit::BlockGatCells(cells, blocked);
+  for (const std::string& refusal : report.refused) {
+    ro::core::LogWarning("édition de {} refusée — {}", stage.name, refusal);
+  }
+  stage.walk_map = ro::sim::WalkMap::FromGat(blocked);
+  stage.blocked_cells.assign(cells.begin(), cells.end());
   return true;
 }
 

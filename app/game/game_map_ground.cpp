@@ -85,9 +85,12 @@ void Game::FollowMapGround() {
   if (!stage_.has_value()) {
     return;
   }
+  const ro::mapedit::MapEdit& document = map_edits_.Document(stage_->name);
   static_cast<void>(ReshapeStageGround(
-      *stage_, ShownGroundEdits(map_edits_.Document(stage_->name),
-                                settings_->options().graphics().real_time_shadows())));
+      *stage_, ShownGroundEdits(document, settings_->options().graphics().real_time_shadows())));
+  // LA GRILLE DE MARCHE SUIT LE DOCUMENT : un trait de pinceau, une annulation,
+  // un document reçu du serveur.
+  static_cast<void>(BlockStageCells(*stage_, document.blocked_cells()));
   const bool live = RemeshesWhileStroking(*stage_);
   const bool stroking = map_editor_.stroking_ground();
   if (stage_->ground_mesh_stale && (live || !stroking)) {

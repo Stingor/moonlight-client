@@ -19007,8 +19007,8 @@ tr: Restablecer el modelo %zu
 fr: Un clic dans le monde désigne le modèle du décor sous la souris : la plus petite boîte traversée gagne. Ses retouches se redésignent aussi depuis la liste.
 tr: Un clic en el mundo designa el modelo del decorado bajo el ratón: gana la caja más pequeña atravesada. Sus retoques también se designan desde la lista.
 
-fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
-tr: «Guardar» escribe data/map_edits/<mapa>.yml en la carpeta del cliente. Solo lo visual: el paso sigue siendo el del servidor.
+fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le décor ne change pas la marche ; seules les cases bloquées, que le serveur bloque aussi, la changent.
+tr: «Guardar» escribe data/map_edits/<mapa>.yml en la carpeta del cliente. El decorado no cambia el paso; solo las casillas bloqueadas, que el servidor también bloquea, lo cambian.
 
 fr: « Pourquoi » dit la raison d'une retouche ; sans saisie, une raison générique la dit — « Retouche de l'effet #47 ».
 tr: «Por qué» indica el motivo de un retoque; si se deja vacío, lo indica un motivo genérico — «Retoque del efecto #47».
@@ -19088,8 +19088,8 @@ tr: Restablecer un vértice del modelo %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extender la malla del modelo %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+5 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
-tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+5 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+6 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
+tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+6 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje.
 
 fr: Ajouter une lumière
 tr: Añadir una luz
@@ -20116,3 +20116,42 @@ tr: ¡Felicidades! ¡Eres el MVP! Tu recompensa: %s
 
 fr: Vous êtes le MVP, mais vous ne pouvez pas prendre la récompense : vous dépassez votre limite de poids.
 tr: Eres el MVP, pero no puedes recoger la recompensa: superas tu límite de peso.
+
+fr: Barrière
+tr: Valla
+
+fr: Bloque, avec la sorte choisie, chaque case dont le centre tombe sous la boîte du modèle désigné. Un point de départ, à retoucher au pinceau.
+tr: Bloquea, con el tipo elegido, cada casilla cuyo centro cae bajo la caja del modelo seleccionado. Un punto de partida, para retocar con el pincel.
+
+fr: Bloquer l'emprise du modèle
+tr: Bloquear la huella del modelo
+
+fr: Case sous la souris
+tr: Casilla bajo el ratón
+
+fr: Cases
+tr: Casillas
+
+fr: Cases bloquées
+tr: Casillas bloqueadas
+
+fr: Cases bloquées sous le décor
+tr: Casillas bloqueadas bajo el decorado
+
+fr: Glisser sur le sol bloque les cases ; Maj tenue, les libère. Le serveur les bloque aussi, pour tous. Ctrl+clic fait toujours marcher le personnage.
+tr: Arrastrar sobre el suelo bloquea las casillas; con Mayús pulsada, las libera. El servidor también las bloquea, para todos. Ctrl+clic sigue haciendo caminar al personaje.
+
+fr: La marche seulement : les tirs passent.
+tr: Solo el paso: los disparos pasan.
+
+fr: Libérer toutes les cases
+tr: Liberar todas las casillas
+
+fr: Ni la marche ni les tirs.
+tr: Ni el paso ni los disparos.
+
+fr: Peindre les cases
+tr: Pintar las casillas
+
+fr: Raison des cases
+tr: Motivo de las casillas

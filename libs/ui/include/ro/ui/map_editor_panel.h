@@ -13,6 +13,7 @@
 
 #include "ro/render/model_pose.h"
 #include "ro/ui/map_cells.h"
+#include "ro/ui/map_editor_cells.h"
 #include "ro/ui/map_editor_hours.h"
 #include "ro/ui/map_editor_library.h"
 #include "ro/ui/map_editor_sounds.h"
@@ -146,6 +147,12 @@ enum class MapEditorLineKind : std::uint8_t {
   // Un son d'ambiance, et le son désigné : des carrés, en `from`.
   kSound = 18,
   kSoundSelected = 19,
+  // Une case que la carte bloque, une case que le document bloque en mur ou en
+  // barrière, et une case sous le pinceau de cases : des carrés au sol.
+  kCellMap = 20,
+  kCellWall = 21,
+  kCellFence = 22,
+  kCellBrush = 23,
 };
 
 // L'OUTIL DE LA VUE : les poignées qui déplacent, tournent ou mettent à
@@ -156,6 +163,7 @@ enum class MapEditorTool : std::uint8_t {
   kScale = 2,
   kVertices = 3,
   kRelief = 4,
+  kCells = 5,
 };
 
 // LA BROSSE DE RELIEF, telle que le panneau la montre et la règle.
@@ -303,6 +311,8 @@ struct MapEditorView {
   std::shared_ptr<const std::vector<std::string>> sound_library;
   // LE RELIEF : la brosse, et ce que le document retouche.
   MapEditorGround ground;
+  // LES CASES BLOQUÉES : le pinceau, et ce que le document bloque.
+  MapEditorCells cells;
   // L'aperçu du modèle survolé dans l'arbre, la liste ou la grille : la
   // vignette du fichier que le panneau survolait à l'image précédente.
   MapEditorPreview preview;
@@ -567,7 +577,9 @@ using MapEditorIntent = std::variant<
     map_editor::AddModelLight, map_editor::SelectModelLight, map_editor::SetModelLight,
     map_editor::RemoveModelLight, map_editor::MoveModelLight, map_editor::SetModelUnlit,
     map_editor::AddModelEffect, map_editor::SelectModelEffect, map_editor::SetModelEffect,
-    map_editor::RemoveModelEffect, map_editor::MoveModelEffect>;
+    map_editor::RemoveModelEffect, map_editor::MoveModelEffect, map_editor::SetCellBrush,
+    map_editor::EndCellStroke, map_editor::ClearCells, map_editor::SetCellsWhy,
+    map_editor::BlockModelFootprint>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.
@@ -639,6 +651,8 @@ struct MapEditorPanelState {
   bool sprite_name_typing = false;
   // La section « Sons ».
   MapEditorSoundPanelState sounds;
+  // La section « Cases ».
+  MapEditorCellsPanelState cells;
 };
 
 // Dessine le panneau, et rend les intentions de l'image dans `intents`.

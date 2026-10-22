@@ -27,8 +27,8 @@ namespace ro::mapedit {
 // touchée, et le rapport le dit : toucher le mauvais objet serait pire que ne
 // rien faire.
 //
-// Le visuel seulement : la marchabilité (GAT) n'est jamais touchée, c'est le
-// serveur qui décide où l'on marche.
+// La marchabilité ne change que par les cases bloquées, que le serveur applique
+// comme le client (docs/adr/0131) : c'est lui qui décide où l'on marche.
 
 // L'écart toléré entre la position d'origine qu'une opération attend et celle
 // du RSW, en unités du fichier, sur chaque axe : de quoi absorber l'arrondi
@@ -365,6 +365,25 @@ struct GroundEdit {
 // point quitte le document.
 inline constexpr float kGroundLiftEpsilon = 1.0e-4F;
 
+// CE QU'UNE CASE BLOQUÉE ARRÊTE : voir docs/adr/0131.
+enum class CellBlock : std::uint8_t {
+  // Ni la marche ni les tirs, comme une case de mur de la GAT.
+  kWall,
+  // La marche seulement : les tirs passent, comme une crevasse de la GAT.
+  kFence,
+};
+
+// UNE CASE BLOQUÉE : une case de la grille de marche, dans le repère de la GAT
+// et des paquets, que le serveur bloque comme le client. On ne bloque que : une
+// case que la GAT bloque déjà le reste.
+struct BlockedCell {
+  std::int32_t cell_x = 0;
+  std::int32_t cell_y = 0;
+  CellBlock block = CellBlock::kWall;
+
+  friend bool operator==(const BlockedCell&, const BlockedCell&) = default;
+};
+
 // Le document d'une carte.
 class MapEdit {
  public:
@@ -374,7 +393,25 @@ class MapEdit {
     return models_.empty() && added_.empty() && meshes_.empty() && lights_.empty() &&
            effects_.empty() && effect_edits_.empty() && ground_.empty() && sprites_.empty() &&
            sounds_.empty() && sound_edits_.empty() && model_lights_.empty() &&
-           model_effects_.empty();
+           model_effects_.empty() && blocked_cells_.empty();
+  }
+  // LES CASES BLOQUÉES : une seule par case, rangées par rangée puis par
+  // colonne. Une seule raison les couvre toutes : elles se peignent au pinceau.
+  [[nodiscard]] const std::vector<BlockedCell>& blocked_cells() const noexcept {
+    return blocked_cells_;
+  }
+  [[nodiscard]] const std::string& blocked_cells_why() const noexcept { return blocked_cells_why_; }
+  void SetBlockedCellsWhy(std::string why) { blocked_cells_why_ = std::move(why); }
+  // La case bloquée en (x, y), ou rien.
+  [[nodiscard]] const BlockedCell* BlockedCellAt(std::int32_t cell_x, std::int32_t cell_y) const;
+  // Bloque la case de `cell`, ou change ce qu'elle arrête.
+  void BlockCell(const BlockedCell& cell);
+  // Retire la case (x, y) de la liste.
+  void FreeCell(std::int32_t cell_x, std::int32_t cell_y);
+  // Retire toutes les cases bloquées, et leur raison.
+  void ClearBlockedCells() {
+    blocked_cells_.clear();
+    blocked_cells_why_.clear();
   }
   // LES EFFETS DE MODÈLE, dans l'ordre du document : seul celui de
   // `kModelLightsDocument` en porte.
@@ -488,6 +525,8 @@ class MapEdit {
   std::vector<SoundEdit> sound_edits_;
   std::vector<ModelLight> model_lights_;
   std::vector<ModelEffect> model_effects_;
+  std::vector<BlockedCell> blocked_cells_;
+  std::string blocked_cells_why_;
 };
 
 // Le texte d'un document. Refuse un texte qui n'est pas du YAML, dont la

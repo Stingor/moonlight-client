@@ -19007,8 +19007,8 @@ tr: Restore model %zu
 fr: Un clic dans le monde désigne le modèle du décor sous la souris : la plus petite boîte traversée gagne. Ses retouches se redésignent aussi depuis la liste.
 tr: A click in the world selects the scenery model under the mouse: the smallest box crossed wins. Its fixes can also be selected again from the list.
 
-fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le visuel seulement : la marche reste celle du serveur.
-tr: “Save” writes data/map_edits/<map>.yml in the client folder. Visuals only: walking stays the server's.
+fr: « Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. Le décor ne change pas la marche ; seules les cases bloquées, que le serveur bloque aussi, la changent.
+tr: “Save” writes data/map_edits/<map>.yml in the client folder. Scenery doesn't change walking; only blocked cells, which the server blocks too, change it.
 
 fr: « Pourquoi » dit la raison d'une retouche ; sans saisie, une raison générique la dit — « Retouche de l'effet #47 ».
 tr: “Why” states the reason for an edit; when left empty, a generic reason states it — “Edit of effect #47”.
@@ -19088,8 +19088,8 @@ tr: Restore a vertex of model %zu
 fr: Étendre le maillage du modèle %zu
 tr: Extend the mesh of model %zu
 
-fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+5 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
-tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+5 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character.
+fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+6 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
+tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+6 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character.
 
 fr: Ajouter une lumière
 tr: Add a light
@@ -20116,3 +20116,42 @@ tr: Congratulations! You are the MVP! Your reward item is %s
 
 fr: Vous êtes le MVP, mais vous ne pouvez pas prendre la récompense : vous dépassez votre limite de poids.
 tr: You are the MVP, but you can't take the reward because you are over your weight limit.
+
+fr: Barrière
+tr: Fence
+
+fr: Bloque, avec la sorte choisie, chaque case dont le centre tombe sous la boîte du modèle désigné. Un point de départ, à retoucher au pinceau.
+tr: Blocks, with the chosen kind, every cell whose center falls under the selected model's box. A starting point, to touch up with the brush.
+
+fr: Bloquer l'emprise du modèle
+tr: Block the model's footprint
+
+fr: Case sous la souris
+tr: Cell under the mouse
+
+fr: Cases
+tr: Cells
+
+fr: Cases bloquées
+tr: Blocked cells
+
+fr: Cases bloquées sous le décor
+tr: Cells blocked under the scenery
+
+fr: Glisser sur le sol bloque les cases ; Maj tenue, les libère. Le serveur les bloque aussi, pour tous. Ctrl+clic fait toujours marcher le personnage.
+tr: Dragging on the ground blocks cells; holding Shift frees them. The server blocks them too, for everyone. Ctrl+click still makes the character walk.
+
+fr: La marche seulement : les tirs passent.
+tr: Walking only: shots go through.
+
+fr: Libérer toutes les cases
+tr: Free all cells
+
+fr: Ni la marche ni les tirs.
+tr: Neither walking nor shots.
+
+fr: Peindre les cases
+tr: Paint the cells
+
+fr: Raison des cases
+tr: Reason for the cells

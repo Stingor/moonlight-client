@@ -101,6 +101,9 @@ ro::mapedit::MapEdit WithReasons(ro::mapedit::MapEdit document) {
   if (!document.ground().empty() && document.ground_why().empty()) {
     document.SetGroundWhy(ro::core::Tr("Retouche du relief"));
   }
+  if (!document.blocked_cells().empty() && document.blocked_cells_why().empty()) {
+    document.SetBlockedCellsWhy(ro::core::Tr("Cases bloquées sous le décor"));
+  }
   const std::vector<ro::mapedit::SoundEdit> sound_retouches = document.sound_edits();
   for (ro::mapedit::SoundEdit retouch : sound_retouches) {
     if (retouch.why.empty()) {

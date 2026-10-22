@@ -242,6 +242,7 @@ add_library(ro_ui STATIC
     src/party_grid_tile.cpp
     src/sound_zones.cpp
     src/map_cells.cpp
+    src/map_editor_cells_panel.cpp
     src/map_editor_effects_panel.cpp
     src/map_editor_sprites_panel.cpp
     src/map_editor_ground_panel.cpp

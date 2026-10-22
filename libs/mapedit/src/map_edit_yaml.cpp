@@ -9,6 +9,7 @@
 
 #include "ro/mapedit/map_edit.h"
 
+#include "blocked_cells_yaml.h"
 #include "effect_yaml.h"
 #include "ground_yaml.h"
 #include "light_yaml.h"
@@ -456,6 +457,9 @@ core::Result<RevisedMapEdit> ParseRevisedMapEdit(std::string_view yaml_text,
         return std::unexpected(Refused(map_name, std::move(refusal)));
       }
     }
+    if (std::string refusal = detail::ReadBlockedCells(whole, map_name, edit); !refusal.empty()) {
+      return std::unexpected(Refused(map_name, std::move(refusal)));
+    }
     if (const YAML::Node sprites = whole["sprites"]) {
       if (std::string refusal = detail::ReadSprites(sprites, edit); !refusal.empty()) {
         return std::unexpected(Refused(map_name, std::move(refusal)));
@@ -591,6 +595,8 @@ std::string RevisedMapEditToYaml(const MapEdit& edit, std::string_view map_name,
   text += detail::ModelLightsYaml(edit);
   text += detail::ModelEffectsYaml(edit);
   text += detail::GroundYaml(edit);
+  text += detail::BlockedCellsYaml(edit);
+  text += detail::BlockedCellsYaml(edit);
   text += detail::SpritesYaml(edit);
   text += detail::SoundsYaml(edit);
   return text;

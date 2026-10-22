@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <SDL3/SDL_clipboard.h>
+#include <SDL3/SDL_keyboard.h>
 
 #include "ro/audio/audio_engine.h"
 #include "ro/core/i18n.h"
@@ -30,6 +31,7 @@
 #include "ro/vfs/encoding.h"
 
 #include "game/game.h"
+#include "world/map_editor_cell_marks.h"
 #include "world/map_editor_mesh.h"
 #include "world/map_editor_overlay.h"
 #include "world/map_editor_sound_marks.h"
@@ -269,6 +271,10 @@ void Game::ServeMapEditor() {
     }
   }
   ServeGroundPoints(width, height);
+  const std::vector<ro::ui::MapEditorLine> cell_marks =
+      CellMarks(*stage_, map_edits_.Document(stage_->name), map_editor_, camera_, aspect_ratio_,
+                width, height);
+  view.lines.insert(view.lines.end(), cell_marks.begin(), cell_marks.end());
 }
 
 void Game::ServeMapEditorTools() {
@@ -295,6 +301,14 @@ void Game::ServeMapEditorTools() {
   // LA BROSSE DE RELIEF, avant les intentions : un relâcher de cette image
   // clôt le glissé après son dernier pas.
   ServeGroundBrush();
+  // LE PINCEAU DE CASES, de même ; Maj tenue, il libère.
+  const bool cell_tool =
+      map_editor_.active() && map_editor_.tool() == ro::ui::MapEditorTool::kCells;
+  map_editor_.SetCellPointer(cell_tool ? PointedCell(*stage_, camera_, aspect_ratio_, mouse_.x,
+                                                     mouse_.y, static_cast<float>(shell_.width()),
+                                                     static_cast<float>(shell_.height()))
+                                       : std::nullopt);
+  map_editor_.StrokeCells((SDL_GetModState() & SDL_KMOD_SHIFT) != 0, map_edits_);
   bool replace = false;
   const auto apply = [&](const ro::ui::MapEditorIntent& intent) {
     const MapEditorSession::Outcome outcome = map_editor_.Apply(intent, stage_->scene, map_edits_);
@@ -364,7 +378,8 @@ void Game::ServeMapEditorTools() {
   map_editor_.SetVertexDots({});
   vertex_context_.Forget();
   // LA BROSSE DE RELIEF n'a pas de poignée : le modèle désigné garde sa boîte.
-  if (map_editor_.tool() == ro::ui::MapEditorTool::kRelief) {
+  if (map_editor_.tool() == ro::ui::MapEditorTool::kRelief ||
+      map_editor_.tool() == ro::ui::MapEditorTool::kCells) {
     map_editor_.SetGizmo(GizmoFrame(), {});
     return;
   }

@@ -14,6 +14,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/list_keys.h"
+#include "ro/ui/map_editor_cells_panel.h"
 #include "ro/ui/map_editor_effects_panel.h"
 #include "ro/ui/map_editor_ground_panel.h"
 #include "ro/ui/map_editor_lights_panel.h"
@@ -79,9 +80,10 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
     core::TrText("« Pourquoi » dit la raison d'une retouche ; sans saisie, une raison générique la "
                  "dit — « Retouche de l'effet #47 »."),
     core::TrText("« Enregistrer » écrit data/map_edits/<carte>.yml dans le dossier du client. "
-                 "Le visuel seulement : la marche reste celle du serveur."),
+                 "Le décor ne change pas la marche ; seules les cases bloquées, que le serveur "
+                 "bloque aussi, la changent."),
     core::TrText("Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à "
-                 "Ctrl+5 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
+                 "Ctrl+6 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
                  "Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. "
                  "Ctrl+clic fait marcher le personnage."),
 };
@@ -108,6 +110,11 @@ constexpr ImU32 kBrushColor = IM_COL32(90, 230, 230, 230);
 // Un point du sol que le document retouche : un magenta, distinct du cyan des
 // points intacts, du jaune des sélectionnés et du blanc du désigné.
 constexpr ImU32 kEditedPointColor = IM_COL32(240, 110, 220, 240);
+// LES CASES : grises celles que la carte bloque, rouges les murs du document,
+// orange ses barrières. Le pinceau garde le cyan de la brosse de relief.
+constexpr ImU32 kMapCellColor = IM_COL32(150, 150, 150, 160);
+constexpr ImU32 kWallCellColor = IM_COL32(235, 60, 50, 230);
+constexpr ImU32 kFenceCellColor = IM_COL32(245, 150, 40, 230);
 
 ImU32 ColorOf(MapEditorLineKind kind) {
   switch (kind) {
@@ -144,6 +151,14 @@ ImU32 ColorOf(MapEditorLineKind kind) {
       return kSelectionColor;
     case MapEditorLineKind::kGroundPointDesignated:
       return kActiveColor;
+    case MapEditorLineKind::kCellMap:
+      return kMapCellColor;
+    case MapEditorLineKind::kCellWall:
+      return kWallCellColor;
+    case MapEditorLineKind::kCellFence:
+      return kFenceCellColor;
+    case MapEditorLineKind::kCellBrush:
+      return kBrushColor;
   }
   return kSelectionColor;
 }
@@ -173,6 +188,8 @@ void DrawToolbar(const MapEditorView& view, std::vector<MapEditorIntent>& intent
         core::Tr("Le relief retouché ne se voit qu'avec « Ombres en temps "
                  "réel », page Graphics."));
   }
+  ImGui::SameLine();
+  offer(MapEditorTool::kCells, core::Tr("Cases"));
 }
 
 // Le modèle passe-t-il le filtre ? Un morceau de son fichier, sans égard à la
@@ -639,6 +656,8 @@ void DrawMapEditor(const MapEditorView& view, MapEditorPanelState& panel,
 
   if (view.tool == MapEditorTool::kRelief) {
     DrawGround(view, panel, intents, art);
+  } else if (view.tool == MapEditorTool::kCells) {
+    DrawCells(view, panel, intents, art);
   } else {
     ImGui::SeparatorText(core::Tr("Modèle désigné"));
     DrawSelection(view, panel, intents, art);
