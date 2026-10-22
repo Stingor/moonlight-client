@@ -277,14 +277,21 @@ target_include_directories(moonclient_chatlinks PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # tirée du serveur (`generated/`, par `scripts/gen_server_atcommands.py`), et
 # leur composition pour la liste de la barre et le menu des macros. En
 # bibliothèque pour que leur accord avec les lecteurs de commandes s'essaie :
-# une commande proposée que rien ne lit partirait en public.
+# une commande proposée que rien ne lit partirait en public. Les choix
+# d'argument y vivent aussi : les métiers de « @jobchange », tirés du serveur
+# (`generated/`, par `scripts/gen_server_jobchange.py`) et nommés par
+# `ro/vfs/job_names.h`, d'où `ro_vfs` en PUBLIC. Le menu des classes du volet
+# du staff, qui envoie la même commande, puise dans la même table.
 add_library(moonclient_chatcommands STATIC
+    character/staff_jobs.cpp
+    chat/chat_argument_choices.cpp
     chat/chat_command_catalogue.cpp
     chat/slash_commands.cpp
-    generated/server_atcommand_table.cpp)
+    generated/server_atcommand_table.cpp
+    generated/server_jobchange_table.cpp)
 
 target_link_libraries(moonclient_chatcommands
-    PUBLIC ro_core ro_ui
+    PUBLIC ro_core ro_ui ro_vfs
     PRIVATE moonclient_chatlinks ro_warnings)
 
 target_include_directories(moonclient_chatcommands PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -1691,7 +1698,6 @@ add_executable(moonclient
     character/doll_gif_export.cpp
     character/preset_view.cpp
     character/stat_preset_desk.cpp
-    character/staff_jobs.cpp
     character/staff_view.cpp
     capture/capture_clipboard.cpp
     capture/zone_recorder.cpp

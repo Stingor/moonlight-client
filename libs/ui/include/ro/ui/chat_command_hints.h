@@ -28,6 +28,13 @@ namespace ro::ui {
 //   · Échap ferme la liste, et la ligne reste.
 // Une commande qui attend un argument se complète avec une espace.
 //
+// 🔴 L'ARGUMENT AUSSI, QUAND LA COMMANDE EN DÉCLARE LES CHOIX : « @job » suivi
+// d'un blanc ouvre la même liste sur les choix de son argument, filtrés par ce
+// qu'on tape après le blanc — sur la valeur (« 40 » → 4008, 4054…) comme sur le
+// nom (« kni » → Knight, Lord Knight…). Les mêmes touches valent ; compléter
+// remplace l'argument tapé par la valeur du choix. Une commande sans choix
+// déclarés se tait dès le blanc, comme avant.
+//
 // ⚠ `ui` NE CONNAÎT AUCUNE COMMANDE : `app` lui passe la liste, déjà traduite
 // et déjà filtrée par le groupe du joueur. Ici ne vivent que le filtrage par
 // les lettres tapées et le clavier — ce que la liste montre, pas ce qu'elle
@@ -35,6 +42,19 @@ namespace ro::ui {
 
 // Combien de rangées se voient à la fois ; au-delà, la liste défile.
 inline constexpr std::size_t kChatCommandRowsShown = 8;
+
+// UN CHOIX POUR L'ARGUMENT D'UNE COMMANDE : « 4008  Lord Knight ».
+struct ChatArgumentChoice {
+  // Ce qui s'écrit dans la ligne à la place de l'argument tapé.
+  std::string_view value;
+  // Le nom montré après la valeur.
+  std::string_view label;
+  // Un second nom, en gris entre parenthèses ; vide quand il n'y en a pas.
+  std::string_view detail;
+  // La clé de recherche (`ro/core/search_key.h`) du nom et du second nom :
+  // c'est elle que les lettres tapées filtrent.
+  std::string_view search_key;
+};
 
 // UNE COMMANDE PROPOSÉE.
 struct ChatCommandHint {
@@ -51,6 +71,8 @@ struct ChatCommandHint {
   std::string_view help;
   // La complétion pose une espace après le nom.
   bool takes_argument = false;
+  // Les choix de son argument ; vide, la liste ne propose rien après le nom.
+  std::span<const ChatArgumentChoice> argument_choices;
 };
 
 // UNE RANGÉE DE LA LISTE : la commande, et la graphie qui a répondu aux
@@ -70,8 +92,8 @@ struct ChatCommandListState {
   bool navigated = false;
   // La première rangée visible.
   int first_shown = 0;
-  // Les lettres qui ont donné les rangées en cours : quand elles changent, le
-  // choix revient en tête.
+  // La ligne qui a donné les rangées en cours : quand elle change, le choix
+  // revient en tête.
   std::string query;
   // LA LIGNE SUR LAQUELLE LA LISTE A ÉTÉ FERMÉE — par Échap, une complétion ou
   // un rappel de l'historique. Elle ne s'y rouvre pas ; la première frappe qui
@@ -82,14 +104,46 @@ struct ChatCommandListState {
 };
 
 // Ce que la liste montre pour la ligne en cours.
+//
+// ⚠ DEUX LISTES EXCLUSIVES : les commandes (`matches`) pendant qu'on écrit le
+// nom, ou les choix d'argument (`choice_rows`) quand `argument_of` est posé.
 struct ChatCommandListView {
   bool open = false;
   std::vector<ChatCommandMatch> matches;
+  // La commande dont on écrit l'argument.
+  std::optional<std::size_t> argument_of;
+  // Ce qui précède l'argument dans la ligne, blanc compris : « @job ».
+  std::string argument_head;
+  // Les rangs, dans `argument_choices`, des choix retenus.
+  std::vector<std::size_t> choice_rows;
 };
+
+// Combien de rangées la liste porte, commandes ou choix d'argument.
+[[nodiscard]] std::size_t ChatCommandRowCount(const ChatCommandListView& view) noexcept;
 
 // LES LETTRES CHERCHÉES, sigil compris (« /si », « @ »), ou rien quand la
 // ligne n'est pas un nom de commande en train de s'écrire.
 [[nodiscard]] std::optional<std::string_view> ChatCommandQuery(std::string_view line);
+
+// L'ARGUMENT EN TRAIN DE S'ÉCRIRE : la commande nommée en tête de ligne — par
+// son nom ou un alias, casse latine indifférente —, ce qui précède l'argument,
+// et ce qu'on en a tapé.
+struct ChatArgumentQuery {
+  std::size_t hint = 0;
+  std::string_view head;
+  std::string_view typed;
+};
+
+// Rien quand la ligne ne nomme pas, suivie d'un blanc, une commande qui déclare
+// les choix de son argument.
+[[nodiscard]] std::optional<ChatArgumentQuery> ChatArgumentQueryOf(
+    std::span<const ChatCommandHint> hints, std::string_view line);
+
+// Les rangs des choix que `typed` désigne, dans l'ordre de la source : ceux
+// dont la valeur commence par `typed`, ou dont la clé de recherche le contient.
+// Rien de tapé : tous.
+[[nodiscard]] std::vector<std::size_t> MatchChatArguments(
+    std::span<const ChatArgumentChoice> choices, std::string_view typed);
 
 // Les rangées pour ces lettres : les noms qui commencent ainsi, dans l'ordre
 // de la liste, puis les commandes dont un ALIAS commence ainsi. La casse
@@ -121,7 +175,8 @@ struct ChatCommandKeyAnswer {
                                                        std::span<const ChatCommandHint> hints,
                                                        std::string_view line, ChatCommandKey key);
 
-// Le clic sur la rangée `row` : rend la ligne complétée, et ferme la liste.
+// Le clic sur la rangée `row` : rend la ligne complétée, et ferme la liste —
+// sauf quand la commande complétée propose aussitôt les choix de son argument.
 [[nodiscard]] std::string PickChatCommand(ChatCommandListState& state,
                                           const ChatCommandListView& view,
                                           std::span<const ChatCommandHint> hints, std::size_t row);

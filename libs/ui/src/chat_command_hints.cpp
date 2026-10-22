@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "ro/core/ascii.h"
+#include "ro/core/search_key.h"
 
 namespace ro::ui {
 namespace {
@@ -30,6 +31,21 @@ constexpr int kRowsShown = static_cast<int>(kChatCommandRowsShown);
   return {};
 }
 
+// `word` est-il l'une des graphies de `aliases`, casse latine indifférente ?
+[[nodiscard]] bool IsAlias(std::string_view aliases, std::string_view word) {
+  while (!aliases.empty()) {
+    const std::size_t end = aliases.find(kAliasSeparator);
+    if (core::AsciiEqualsFolded(aliases.substr(0, end), word)) {
+      return true;
+    }
+    if (end == std::string_view::npos) {
+      break;
+    }
+    aliases.remove_prefix(end + 1);
+  }
+  return false;
+}
+
 // La rangée choisie, ramenée dans la fenêtre visible.
 void KeepChosenShown(ChatCommandListState& state, int count) {
   if (state.chosen < state.first_shown) {
@@ -41,16 +57,32 @@ void KeepChosenShown(ChatCommandListState& state, int count) {
 }
 
 // Complète avec la rangée `row` et ferme la liste sur la ligne obtenue.
+//
+// ⚠ SAUF UNE COMMANDE QUI DÉCLARE LES CHOIX DE SON ARGUMENT : la ligne
+// complétée « @jobchange » les propose aussitôt, sans attendre une frappe.
 [[nodiscard]] std::string Complete(ChatCommandListState& state, const ChatCommandListView& view,
                                    std::span<const ChatCommandHint> hints, std::size_t row) {
-  const ChatCommandMatch& match = view.matches[row];
-  std::string line = CompletedChatCommand(hints[match.hint], match);
-  state.dismissed = line;
+  std::string line;
+  if (view.argument_of.has_value()) {
+    const ChatCommandHint& hint = hints[*view.argument_of];
+    line = view.argument_head;
+    line += hint.argument_choices[view.choice_rows[row]].value;
+    state.dismissed = line;
+  } else {
+    const ChatCommandMatch& match = view.matches[row];
+    const ChatCommandHint& hint = hints[match.hint];
+    line = CompletedChatCommand(hint, match);
+    state.dismissed = hint.argument_choices.empty() ? line : std::string();
+  }
   state.navigated = false;
   return line;
 }
 
 }  // namespace
+
+std::size_t ChatCommandRowCount(const ChatCommandListView& view) noexcept {
+  return view.argument_of.has_value() ? view.choice_rows.size() : view.matches.size();
+}
 
 std::optional<std::string_view> ChatCommandQuery(std::string_view line) {
   if (line.empty() || kSigils.find(line.front()) == std::string_view::npos ||
@@ -93,6 +125,47 @@ std::vector<ChatCommandMatch> MatchChatCommands(std::span<const ChatCommandHint>
   return matches;
 }
 
+std::optional<ChatArgumentQuery> ChatArgumentQueryOf(std::span<const ChatCommandHint> hints,
+                                                     std::string_view line) {
+  if (line.empty() || kSigils.find(line.front()) == std::string_view::npos) {
+    return std::nullopt;
+  }
+  const std::size_t blank = line.find_first_of(kBlanks);
+  if (blank == std::string_view::npos) {
+    return std::nullopt;
+  }
+  const std::string_view word = line.substr(1, blank - 1);
+  std::size_t typed_start = line.find_first_not_of(kBlanks, blank);
+  if (typed_start == std::string_view::npos) {
+    typed_start = line.size();
+  }
+  for (std::size_t rank = 0; rank < hints.size(); ++rank) {
+    const ChatCommandHint& hint = hints[rank];
+    if (hint.sigil != line.front() || hint.argument_choices.empty()) {
+      continue;
+    }
+    if (core::AsciiEqualsFolded(hint.name, word) || IsAlias(hint.aliases, word)) {
+      return ChatArgumentQuery{
+          .hint = rank, .head = line.substr(0, typed_start), .typed = line.substr(typed_start)};
+    }
+  }
+  return std::nullopt;
+}
+
+std::vector<std::size_t> MatchChatArguments(std::span<const ChatArgumentChoice> choices,
+                                            std::string_view typed) {
+  std::vector<std::size_t> matches;
+  const std::string typed_key = core::SearchKey(typed);
+  for (std::size_t rank = 0; rank < choices.size(); ++rank) {
+    const ChatArgumentChoice& choice = choices[rank];
+    if (core::AsciiStartsWithFolded(choice.value, typed) ||
+        core::SearchKeyContains(choice.search_key, typed_key)) {
+      matches.push_back(rank);
+    }
+  }
+  return matches;
+}
+
 ChatCommandListView FollowChatCommandLine(ChatCommandListState& state,
                                           std::span<const ChatCommandHint> hints,
                                           std::string_view line) {
@@ -101,19 +174,27 @@ ChatCommandListView FollowChatCommandLine(ChatCommandListState& state,
     state.dismissed.clear();
   }
   const std::optional<std::string_view> query = ChatCommandQuery(line);
-  if (!query.has_value() || !state.dismissed.empty()) {
+  const std::optional<ChatArgumentQuery> argument =
+      query.has_value() ? std::nullopt : ChatArgumentQueryOf(hints, line);
+  if ((!query.has_value() && !argument.has_value()) || !state.dismissed.empty()) {
     state.query.clear();
     state.navigated = false;
     return view;
   }
-  view.matches = MatchChatCommands(hints, *query);
-  if (*query != state.query) {
-    state.query = std::string(*query);
+  if (query.has_value()) {
+    view.matches = MatchChatCommands(hints, *query);
+  } else {
+    view.argument_of = argument->hint;
+    view.argument_head = std::string(argument->head);
+    view.choice_rows = MatchChatArguments(hints[argument->hint].argument_choices, argument->typed);
+  }
+  if (line != state.query) {
+    state.query = std::string(line);
     state.chosen = 0;
     state.first_shown = 0;
     state.navigated = false;
   }
-  const int count = static_cast<int>(view.matches.size());
+  const int count = static_cast<int>(ChatCommandRowCount(view));
   state.chosen = std::clamp(state.chosen, 0, std::max(0, count - 1));
   KeepChosenShown(state, count);
   view.open = count > 0;
@@ -134,10 +215,10 @@ ChatCommandKeyAnswer PressChatCommandKey(ChatCommandListState& state,
                                          std::span<const ChatCommandHint> hints,
                                          std::string_view line, ChatCommandKey key) {
   ChatCommandKeyAnswer answer;
-  if (!view.open || view.matches.empty()) {
+  if (!view.open || ChatCommandRowCount(view) == 0) {
     return answer;
   }
-  const int count = static_cast<int>(view.matches.size());
+  const int count = static_cast<int>(ChatCommandRowCount(view));
   switch (key) {
     case ChatCommandKey::kUp:
     case ChatCommandKey::kDown:
@@ -168,7 +249,7 @@ ChatCommandKeyAnswer PressChatCommandKey(ChatCommandListState& state,
 
 std::string PickChatCommand(ChatCommandListState& state, const ChatCommandListView& view,
                             std::span<const ChatCommandHint> hints, std::size_t row) {
-  if (row >= view.matches.size()) {
+  if (row >= ChatCommandRowCount(view)) {
     return {};
   }
   return Complete(state, view, hints, row);

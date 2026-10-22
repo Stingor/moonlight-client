@@ -9,7 +9,9 @@
 
 #include "ro/ui/chat_command_hints.h"
 #include "ro/ui/chat_macros.h"
+#include "ro/vfs/job_names.h"
 
+#include "chat/chat_argument_choices.h"
 #include "chat/server_atcommands.h"
 
 namespace moonclient {
@@ -28,11 +30,15 @@ namespace moonclient {
 //     serveur lui dit dans ses réglages ; un serveur muet laisse zéro, donc les
 //     seules commandes du groupe des joueurs.
 //
-// ⚠ RECOMPOSÉE AU CHANGEMENT DE LANGUE OU DE GROUPE, et seulement alors : le
-// pointeur que rend `Tr` meurt avec la langue, et les textes sont donc COPIÉS.
+// Une commande « @ » qui déclare une source de choix (`chat_argument_choices.h`)
+// porte ces choix : la liste les propose pour son argument.
+//
+// ⚠ RECOMPOSÉE AU CHANGEMENT DE LANGUE, DE GROUPE OU DE NOMS DE MÉTIER, et
+// seulement alors : le pointeur que rend `Tr` meurt avec la langue, et les
+// textes sont donc COPIÉS.
 class ChatCommandCatalogue {
  public:
-  void Refresh(std::uint8_t group_level);
+  void Refresh(std::uint8_t group_level, const ro::vfs::JobNames& job_names);
 
   [[nodiscard]] std::span<const ro::ui::ChatCommandHint> hints() const noexcept { return hints_; }
   [[nodiscard]] std::span<const ro::ui::ChatMacroCommandGroup> macro_groups() const noexcept {
@@ -46,9 +52,13 @@ class ChatCommandCatalogue {
   std::vector<ro::ui::ChatCommandHint> hints_;
   std::vector<ro::ui::ChatMacroCommand> macro_items_;
   std::vector<ro::ui::ChatMacroCommandGroup> macro_groups_;
+  ChatArgumentChoices argument_choices_;
   // ⚠ COMMENCENT HORS BORNES pour que la première demande compose vraiment.
   std::size_t language_serial_ = static_cast<std::size_t>(-1);
   int group_level_ = -1;
+  // Les noms de métier se lisent une fois, après le premier rafraîchissement
+  // peut-être : leur nombre dit qu'ils sont arrivés.
+  std::size_t job_names_count_ = static_cast<std::size_t>(-1);
 };
 
 // LE GROUPE DE CE NIVEAU ATTEINT-IL CETTE COMMANDE DU SERVEUR ?

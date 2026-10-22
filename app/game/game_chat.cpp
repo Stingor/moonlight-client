@@ -272,7 +272,7 @@ void Game::StageChat(std::uint32_t now_ms) {
                         pieces_.chat_rooms.room().in_room());
   // LES COMMANDES PROPOSÉES, à la mesure du groupe que le serveur a dit : un
   // compte du staff voit les siennes dès que le niveau arrive.
-  chat_commands_.Refresh(world_.group_level());
+  chat_commands_.Refresh(world_.group_level(), pieces_.job_names);
   chat_preview_.SetCommands(chat_commands_.hints());
 }
 

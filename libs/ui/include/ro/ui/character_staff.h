@@ -121,10 +121,14 @@ enum class StaffJobFamily : std::uint8_t {
 // Le libellé d'une famille, traduit à la LECTURE.
 [[nodiscard]] const char* StaffJobFamilyLabel(StaffJobFamily family);
 
-// Une classe que « @job » accepte, telle que la fenêtre la montre.
+// Une classe que « @job » accepte, telle que la fenêtre la montre :
+// « 4011  White Smith (Whitesmith) », comme la complétion de la discussion.
 struct StaffJobView {
   std::uint32_t id = 0;
+  // ⚠ TERMINÉ PAR UN NUL : l'aperçu du menu le passe tel quel à ImGui.
   std::string_view label;
+  // Le nom que le serveur lui donne quand il diffère du libellé ; vide sinon.
+  std::string_view detail;
   StaffJobFamily family = StaffJobFamily::kNovice;
 };
 

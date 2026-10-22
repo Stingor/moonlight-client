@@ -162,8 +162,14 @@ void DrawJobPicker(StaffPaneState& state, const StaffPaneView& view, const SkinA
   int own_rank = kListNoEntry;
   for (const StaffJobView& one : view.jobs) {
     std::array<char, kJobRowBytes> row{};
-    std::snprintf(row.data(), row.size(), "%.*s (%u)", static_cast<int>(one.label.size()),
-                  one.label.data(), one.id);
+    if (one.detail.empty()) {
+      std::snprintf(row.data(), row.size(), "%u  %.*s", one.id, static_cast<int>(one.label.size()),
+                    one.label.data());
+    } else {
+      std::snprintf(row.data(), row.size(), "%u  %.*s (%.*s)", one.id,
+                    static_cast<int>(one.label.size()), one.label.data(),
+                    static_cast<int>(one.detail.size()), one.detail.data());
+    }
     if (!core::AsciiContainsFolded(row.data(), needle)) {
       continue;
     }

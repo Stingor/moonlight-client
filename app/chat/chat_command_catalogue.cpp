@@ -52,12 +52,15 @@ constexpr std::string_view kEllipsis = "…";
 
 }  // namespace
 
-void ChatCommandCatalogue::Refresh(std::uint8_t group_level) {
-  if (language_serial_ == ro::core::LanguageSerial() && group_level_ == group_level) {
+void ChatCommandCatalogue::Refresh(std::uint8_t group_level, const ro::vfs::JobNames& job_names) {
+  if (language_serial_ == ro::core::LanguageSerial() && group_level_ == group_level &&
+      job_names_count_ == job_names.size()) {
     return;
   }
   language_serial_ = ro::core::LanguageSerial();
   group_level_ = group_level;
+  job_names_count_ = job_names.size();
+  argument_choices_.Rebuild(job_names);
   texts_.clear();
   hints_.clear();
   macro_items_.clear();
@@ -109,12 +112,14 @@ void ChatCommandCatalogue::Refresh(std::uint8_t group_level) {
     if (!ServerCommandOffered(command, group_level)) {
       continue;
     }
-    hints_.push_back(ro::ui::ChatCommandHint{.sigil = kAt,
-                                             .name = command.name,
-                                             .aliases = command.aliases,
-                                             .params = command.params,
-                                             .help = command.help,
-                                             .takes_argument = !command.params.empty()});
+    hints_.push_back(ro::ui::ChatCommandHint{
+        .sigil = kAt,
+        .name = command.name,
+        .aliases = command.aliases,
+        .params = command.params,
+        .help = command.help,
+        .takes_argument = !command.params.empty(),
+        .argument_choices = argument_choices_.Of(ServerCommandArgumentSource(command.name))});
   }
 
   // ── LE MENU DES MACROS : les commandes du client, puis celles du serveur

@@ -19,6 +19,8 @@ constexpr const char* kListWindow = "##commandes";
 // L'écart entre la liste et le haut du champ.
 constexpr float kListGap = 2.0F;
 constexpr int kRowsShown = static_cast<int>(kChatCommandRowsShown);
+// L'écart entre la valeur d'un choix et son nom, en espacements d'élément.
+constexpr float kChoiceValueGapSpaces = 2.0F;
 
 // UNE RANGÉE : la graphie tapée, ce que la commande attend, le nom d'origine
 // quand c'est un alias qui a répondu, puis la première ligne de l'aide en gris.
@@ -58,6 +60,36 @@ void PaintRow(const ChatCommandHint& hint, const ChatCommandMatch& match, ImVec2
   ImGui::PopStyleColor();
 }
 
+// UNE RANGÉE DE CHOIX D'ARGUMENT : la valeur, le nom, puis le second nom en
+// gris entre parenthèses — « 4008  Lord Knight ».
+void PaintChoiceRow(const ChatArgumentChoice& choice, ImVec2 at, float right,
+                    const SkinLook& look) {
+  ImDrawList* draw = ImGui::GetWindowDrawList();
+  const float spacing = ImGui::GetStyle().ItemSpacing.x;
+  draw->AddText(at, look.text, choice.value.data(), choice.value.data() + choice.value.size());
+  float x = at.x + TextWidth(choice.value) + kChoiceValueGapSpaces * spacing;
+  std::string shown(choice.label);
+  if (!choice.detail.empty()) {
+    shown += " (";
+    shown += choice.detail;
+    shown += ')';
+  }
+  if (x >= right) {
+    return;
+  }
+  const std::size_t label_end = choice.label.size();
+  ImGui::RenderTextEllipsis(draw, ImVec2(x, at.y), ImVec2(right, at.y + ImGui::GetFontSize()),
+                            right, shown.data(), shown.data() + label_end, nullptr);
+  x += TextWidth(choice.label);
+  if (label_end == shown.size() || x >= right) {
+    return;
+  }
+  ImGui::PushStyleColor(ImGuiCol_Text, look.faint_text);
+  ImGui::RenderTextEllipsis(draw, ImVec2(x, at.y), ImVec2(right, at.y + ImGui::GetFontSize()),
+                            right, shown.data() + label_end, shown.data() + shown.size(), nullptr);
+  ImGui::PopStyleColor();
+}
+
 }  // namespace
 
 std::optional<std::size_t> DrawChatCommandList(ChatCommandListState& state,
@@ -66,12 +98,12 @@ std::optional<std::size_t> DrawChatCommandList(ChatCommandListState& state,
                                                ImVec2 field_corner, float width,
                                                const SkinArt& art) {
   std::optional<std::size_t> picked;
-  if (!view.open || view.matches.empty()) {
+  const int count = static_cast<int>(ChatCommandRowCount(view));
+  if (!view.open || count == 0) {
     return picked;
   }
   const SkinLook& look = art.look();
   const ImGuiStyle& style = ImGui::GetStyle();
-  const int count = static_cast<int>(view.matches.size());
   const int shown = std::min(count, kRowsShown);
   const float row_height = ImGui::GetTextLineHeightWithSpacing();
   const float height =
@@ -106,18 +138,24 @@ std::optional<std::size_t> DrawChatCommandList(ChatCommandListState& state,
     const float right = ImGui::GetWindowPos().x + width - style.WindowPadding.x;
     const int last = std::min(count, state.first_shown + kRowsShown);
     for (int row = state.first_shown; row < last; ++row) {
-      const ChatCommandMatch& match = view.matches[static_cast<std::size_t>(row)];
-      const ChatCommandHint& hint = hints[match.hint];
+      const auto rank = static_cast<std::size_t>(row);
       ImGui::PushID(row);
       const ImVec2 at = ImGui::GetCursorScreenPos();
       if (ImGui::Selectable("##rangee", row == state.chosen, ImGuiSelectableFlags_SelectOnClick,
                             ImVec2(0.0F, ImGui::GetTextLineHeight()))) {
-        picked = static_cast<std::size_t>(row);
+        picked = rank;
       }
-      if (ImGui::IsItemHovered() && !hint.help.empty()) {
-        SkinTooltipFormat("%.*s", static_cast<int>(hint.help.size()), hint.help.data());
+      if (view.argument_of.has_value()) {
+        const ChatCommandHint& hint = hints[*view.argument_of];
+        PaintChoiceRow(hint.argument_choices[view.choice_rows[rank]], at, right, look);
+      } else {
+        const ChatCommandMatch& match = view.matches[rank];
+        const ChatCommandHint& hint = hints[match.hint];
+        if (ImGui::IsItemHovered() && !hint.help.empty()) {
+          SkinTooltipFormat("%.*s", static_cast<int>(hint.help.size()), hint.help.data());
+        }
+        PaintRow(hint, match, at, right, look);
       }
-      PaintRow(hint, match, at, right, look);
       ImGui::PopID();
     }
   }
