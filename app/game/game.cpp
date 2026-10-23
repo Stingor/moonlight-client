@@ -122,6 +122,10 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
                             MinigamePieces::Of(pieces_.wardrobe, pieces_.item_icons), client_root_,
                             now_ms);
   play_sounds(pieces_.minigames.TakeSounds(), "d'un mini-jeu");
+  if (link_.is_open()) {
+    const bool verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified;
+    pieces_.minigames.Announce(link_, verified, client_root_);
+  }
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
   // Le tableau montre le dernier classement, et demande celui d'un onglet.

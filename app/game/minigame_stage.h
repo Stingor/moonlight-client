@@ -18,6 +18,7 @@
 #include "ro/ui/rojeweled_window.h"
 
 #include "game/interface_sound.h"
+#include "game/minigame_trophy_announcer.h"
 #include "world/monster_sprite.h"
 
 namespace moonclient {
@@ -75,7 +76,12 @@ class MinigameStage {
   // LES SONS À JOUER. Consommés.
   [[nodiscard]] std::vector<InterfaceSoundFile> TakeSounds();
 
+  // À CHAQUE IMAGE, liaison ouverte : dit au serveur les trophées qu'il
+  // n'a pas encore appris. Voir `MinigameTrophyAnnouncer`.
+  void Announce(ro::net::Connection& link, bool verified, const std::filesystem::path& client_root);
+
  private:
+  [[nodiscard]] ro::sim::MinigameRecord& Record(const std::filesystem::path& client_root);
   void ApplyAnswers(MinigameWindows& windows, std::uint32_t now_ms);
   void PlayRojeweled(std::uint32_t now_ms);
   void PlayRoggle(std::uint32_t now_ms);
@@ -89,6 +95,7 @@ class MinigameStage {
                                            std::uint32_t now_ms);
 
   std::optional<ro::sim::MinigameRecord> record_;
+  MinigameTrophyAnnouncer announcer_;
   ro::sim::Match3Game rojeweled_{0};
   ro::sim::PegGame roggle_{0};
   bool seeded_ = false;

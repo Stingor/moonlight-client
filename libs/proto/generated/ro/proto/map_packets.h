@@ -5266,6 +5266,16 @@ struct ZcMoonlightAttackElement {
   std::uint8_t element = 0;
 };
 
+// PACKET_CZ_MOONLIGHT_MINIGAME_TROPHY
+struct CzMoonlightMinigameTrophy {
+  static constexpr std::uint16_t kOpcode = 0x0f4b;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 5;
+
+  std::int16_t packetLength = 0;
+  std::uint8_t trophy = 0;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8420,6 +8430,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientMapEditRevision& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonclientMapEditGet& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightAttackElement& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMinigameTrophy& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -9029,6 +9040,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientMapEditRevision& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonclientMapEditGet& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightAttackElement& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightMinigameTrophy& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

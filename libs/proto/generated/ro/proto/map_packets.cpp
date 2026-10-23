@@ -12360,6 +12360,29 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightAttackElement& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMinigameTrophy& packet) {
+  if (frame.size() != CzMoonlightMinigameTrophy::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightMinigameTrophy::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.trophy = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightMinigameTrophy& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightMinigameTrophy::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightMinigameTrophy::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U8(static_cast<std::uint8_t>(packet.trophy));
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

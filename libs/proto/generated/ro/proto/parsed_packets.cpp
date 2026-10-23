@@ -41,7 +41,7 @@ constexpr std::array<std::uint16_t, 475> kOffsets = {{
 }};
 
 // Triée par opcode : la recherche est dichotomique.
-constexpr std::array<Entry, 440> kParsed = {{
+constexpr std::array<Entry, 441> kParsed = {{
     Entry{0x0072, "clif_parse_UseSkillToId", 0, 3},
     Entry{0x007d, "clif_parse_LoadEndAck", 3, 0},
     Entry{0x007e, "clif_parse_UseSkillToPosMoreInfo", 3, 5},
@@ -482,6 +482,7 @@ constexpr std::array<Entry, 440> kParsed = {{
     Entry{0x0f43, "clif_parse_moonlight_gm_outfit", 475, 0},
     Entry{0x0f45, "clif_parse_moonclient_map_edit_put", 475, 0},
     Entry{0x0f49, "clif_parse_moonclient_map_edit_get", 475, 0},
+    Entry{0x0f4b, "clif_parse_moonlight_minigame_trophy", 475, 0},
 }};
 
 }  // namespace

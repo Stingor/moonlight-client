@@ -5706,3 +5706,123 @@ achievements:
       minor: 0
       objectives:
         - {text: "Pochettes ouvertes"}
+  910001:
+    name: "Jusqu'au bout"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Rojeweled"
+      details: "Finir une partie de Rojeweled."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "Finir une partie"}
+  910002:
+    name: "Eleveur de Porings"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Rojeweled"
+      details: "Atteindre 5 000 points dans une partie de Rojeweled."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "5 000 points en une partie"}
+  910003:
+    name: "Dompteur de Porings"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Rojeweled"
+      details: "Atteindre 15 000 points dans une partie de Rojeweled."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "15 000 points en une partie"}
+  910004:
+    name: "Reaction en chaine"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Rojeweled"
+      details: "Enchaîner une cascade de quatre dans Rojeweled."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "Une cascade de quatre"}
+  910005:
+    name: "Tir groupe"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Effacer tous les plots orange dans Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "Gagner une partie"}
+  910006:
+    name: "Sans bavure"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Gagner une partie de Roggle avec cinq billes en réserve."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "Cinq billes en réserve"}
+  910007:
+    name: "Main sure"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Rattraper trois billes dans le seau en une partie de Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "Trois billes rattrapées"}
+  910008:
+    name: "Pluie de gemmes"
+    score: 0
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Atteindre 30 000 points dans une partie de Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 0
+      objectives:
+        - {text: "30 000 points en une partie"}

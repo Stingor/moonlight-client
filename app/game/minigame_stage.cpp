@@ -88,10 +88,7 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
     roggle_last_ms_.reset();
     return;
   }
-  if (!record_.has_value()) {
-    record_ = LoadMinigameRecord(client_root);
-  }
-  const ro::sim::MinigameRecord before = *record_;
+  const ro::sim::MinigameRecord before = Record(client_root);
   if (windows.rojeweled.open) {
     PlayRojeweled(now_ms);
     const std::vector<ro::sim::MinigameTrophy> fresh = RecordRojeweled(*record_, rojeweled_);
@@ -174,6 +171,20 @@ void MinigameStage::PlayRoggle(std::uint32_t now_ms) {
 }
 
 std::vector<InterfaceSoundFile> MinigameStage::TakeSounds() { return std::exchange(sounds_, {}); }
+
+ro::sim::MinigameRecord& MinigameStage::Record(const std::filesystem::path& client_root) {
+  if (!record_.has_value()) {
+    record_ = LoadMinigameRecord(client_root);
+  }
+  return *record_;
+}
+
+void MinigameStage::Announce(ro::net::Connection& link, bool verified,
+                             const std::filesystem::path& client_root) {
+  // ⚠ L'ENREGISTREMENT SE LIT DÈS LA POIGNÉE DE MAIN, fenêtres fermées : les
+  // trophées d'une session précédente sont à redire.
+  announcer_.Pump(link, verified, verified ? Record(client_root) : ro::sim::MinigameRecord{});
+}
 
 const char* MinigameStage::Toast(std::uint32_t now_ms, float& alpha) {
   alpha = 0.0F;

@@ -759,10 +759,11 @@ target_include_directories(moonclient_memorial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 # fenêtre.
 add_library(moonclient_minigames STATIC
     game/minigame_file.cpp
-    game/minigame_stage.cpp)
+    game/minigame_stage.cpp
+    game/minigame_trophy_announcer.cpp)
 
 target_link_libraries(moonclient_minigames
-    PUBLIC ro_audio ro_render ro_sim ro_ui ro_vfs moonclient_monstersheet
+    PUBLIC ro_audio ro_net ro_render ro_sim ro_ui ro_vfs moonclient_monstersheet
     PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_minigames PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
