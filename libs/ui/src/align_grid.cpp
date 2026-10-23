@@ -60,10 +60,7 @@ void DrawAlignGrid(const AlignGrid& grid) {
                 kCenterThickness);
 }
 
-void SnapMovingWindow(const AlignGrid& grid) {
-  if (!grid.magnetic) {
-    return;
-  }
+void SnapMovingWindow(const AlignGrid& grid, const EarlierMagnet& earlier) {
   ImGuiContext* context = ImGui::GetCurrentContext();
   if (context == nullptr || context->MovingWindow == nullptr) {
     return;
@@ -72,10 +69,21 @@ void SnapMovingWindow(const AlignGrid& grid) {
   if (window == nullptr) {
     return;
   }
-  const ImVec2 screen = ImGui::GetIO().DisplaySize;
+  WindowMagnetCatch caught{.at = window->Pos};
+  if (grid.windows_magnetic && !context->IO.KeyAlt) {
+    caught = MagnetizedMovingWindow(*window, earlier);
+    DrawWindowMagnetCatch(caught);
+  }
+  const ImVec2 screen = context->IO.DisplaySize;
   // ⚠ LE COIN HAUT-GAUCHE, PAS LE CENTRE : c'est le bord qu'on voit rejoindre
   // la ligne, et c'est aussi ce qu'ImGui écrit quand il déplace une fenêtre.
-  const ImVec2 posed(grid.Snap(window->Pos.x, screen.x), grid.Snap(window->Pos.y, screen.y));
+  ImVec2 posed = caught.at;
+  if (!caught.across.has_value()) {
+    posed.x = grid.Snap(posed.x, screen.x);
+  }
+  if (!caught.down.has_value()) {
+    posed.y = grid.Snap(posed.y, screen.y);
+  }
   if (posed.x != window->Pos.x || posed.y != window->Pos.y) {
     ImGui::SetWindowPos(window, posed, ImGuiCond_Always);
   }

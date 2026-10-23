@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include "ro/ui/window_magnet.h"
+
 namespace ro::ui {
 
 // LA GRILLE D'ALIGNEMENT DE L'INTERFACE : un quadrillage plein écran, et
@@ -32,6 +34,9 @@ struct AlignGrid {
   // l'éteint en gardant l'aimant — ou l'inverse, on la regarde sans que rien ne
   // colle.
   bool magnetic = false;
+  // L'AIMANT ENTRE FENÊTRES, voir `window_magnet.h`. Rangé ici parce qu'il
+  // passe par le même geste que la grille, et qu'il l'emporte sur elle.
+  bool windows_magnetic = true;
   int cell_pixels = 32;
   ImU32 color = IM_COL32(255, 255, 255, 38);
 
@@ -57,12 +62,15 @@ struct AlignGrid {
 // Peint le quadrillage SOUS toutes les fenêtres et par-dessus le monde.
 void DrawAlignGrid(const AlignGrid& grid);
 
-// Pose la fenêtre qu'on est en train de traîner sur la grille.
+// Aimante la fenêtre qu'on est en train de traîner : aux autres fenêtres et aux
+// bords de l'écran d'abord, à la grille ensuite, sur chaque axe que l'aimant
+// entre fenêtres laisse libre — le plus précis l'emporte. Alt tenu coupe
+// l'aimant entre fenêtres ; la grille, elle, ne dépend que de son réglage.
 //
 // 🔴 À APPELER JUSTE APRÈS L'OUVERTURE DE L'IMAGE, avant que quoi que ce soit
 // n'ait lu une position. ImGui replace la fenêtre déplacée depuis la souris à
 // chaque image, en absolu : corriger après coup ne dérive donc jamais, mais
 // corriger TROP TARD laisserait une image sur deux montrer la position brute.
-void SnapMovingWindow(const AlignGrid& grid);
+void SnapMovingWindow(const AlignGrid& grid, const EarlierMagnet& earlier = {});
 
 }  // namespace ro::ui

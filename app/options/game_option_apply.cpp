@@ -364,6 +364,7 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
     case GameOption::kChatFont:
     case GameOption::kAlignGrid:
     case GameOption::kAlignGridMagnet:
+    case GameOption::kWindowMagnet:
     case GameOption::kAlignGridCell:
     case GameOption::kAlignGridColor:
     case GameOption::kChatPadding:

@@ -251,6 +251,9 @@ tr: Show chat room signboards
 fr: Aimante ou libère les fenêtres.
 tr: Snaps windows together, or frees them.
 
+fr: Aimanter les fenêtres entre elles
+tr: Snap windows to each other
+
 fr: Allège ou rétablit les effets.
 tr: Lightens or restores the effects.
 
@@ -1318,6 +1321,9 @@ tr: Chat room frame tint
 
 fr: Temps réel (1 min / min)
 tr: Real time (1 min / min)
+
+fr: Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre.
+tr: A window you drag sticks to the edge of another window or of the screen, then lines up with it. Holding Alt while dragging leaves it free.
 
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.

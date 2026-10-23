@@ -251,6 +251,9 @@ tr: Mostrar los letreros de las salas de chat
 fr: Aimante ou libère les fenêtres.
 tr: Imanta o libera las ventanas.
 
+fr: Aimanter les fenêtres entre elles
+tr: Imantar las ventanas entre sí
+
 fr: Allège ou rétablit les effets.
 tr: Aligera o restablece los efectos.
 
@@ -1318,6 +1321,9 @@ tr: Tinte del marco de las salas
 
 fr: Temps réel (1 min / min)
 tr: Tiempo real (1 min / min)
+
+fr: Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre.
+tr: Una ventana que arrastras se pega al borde de otra ventana o de la pantalla, y luego se alinea con ella. Mantener Alt mientras arrastras la deja libre.
 
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.

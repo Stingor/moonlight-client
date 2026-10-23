@@ -12,6 +12,7 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/hud_frame.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/window_magnet.h"
 
 namespace ro::ui {
 
@@ -464,11 +465,14 @@ inline constexpr const char* kShortcutBarId = "shortcut_bar";
 // bord, ou bout à bout, dans le rayon d'aimantation des cadres de HUD. Pure.
 [[nodiscard]] ImVec2 SnappedAmongBars(ImVec2 at, ImVec2 size, const HudSiblings& bars);
 
-// Accroche la barre qu'on traîne à ses sœurs, quand `layout.sticky` le veut.
+// Accroche la barre qu'on traîne à ses sœurs, quand `layout.sticky` le veut, et
+// rend ce que l'aimant entre fenêtres doit en savoir : les axes déjà tenus, et
+// les sœurs qu'un bloc CTRL emporte avec elle.
 //
-// 🔴 À APPELER AVANT `SnapMovingWindow`, comme le cadre de HUD aimante ses frères
-// avant la grille : une grille aimantée garde ainsi le dernier mot.
-void SnapMovingShortcutBar(const ShortcutBarsLayout& layout);
+// 🔴 À APPELER AVANT `SnapMovingWindow`, qui reçoit ce qu'elle rend, comme le
+// cadre de HUD aimante ses frères avant la grille : une grille aimantée garde
+// ainsi le dernier mot.
+EarlierMagnet SnapMovingShortcutBar(const ShortcutBarsLayout& layout);
 
 // Centre la barre `bar` sur la largeur de l'écran, à la même hauteur. Les autres
 // ne bougent pas. Sans effet tant que la barre n'a jamais été dessinée.

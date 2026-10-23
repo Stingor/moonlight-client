@@ -5,10 +5,9 @@
 // sur sa voisine, on s'en va. Le fichier d'à côté, lui, se lit : il porte les
 // règles qui disent ce qu'un réglage TOUCHE.
 //
-// 🔴 ET C'EST L'ADRESSE DU CHAMP QU'ON DÉCLARE. La lecture et l'écriture
-// parcourent la même table, donc elles ne peuvent pas diverger — et la valeur
-// présente à la DÉCLARATION du champ est le défaut, ce qui interdit une seconde
-// source.
+// 🔴 ET C'EST L'ADRESSE DU CHAMP QU'ON DÉCLARE. La lecture et l'écriture parcourent la
+// même table, donc elles ne peuvent pas diverger — et la valeur présente à la
+// DÉCLARATION du champ est le défaut, ce qui interdit une seconde source.
 
 #include <algorithm>
 #include <filesystem>
@@ -63,6 +62,7 @@ constexpr const char* kFrameMeterPingKey = "display_meter_ping";
 constexpr const char* kWindowPlaceKey = "display_position";
 constexpr const char* kAlignGridKey = "grid_alignment";
 constexpr const char* kAlignGridMagnetKey = "grid_magnet";
+constexpr const char* kWindowMagnetKey = "window_magnet";
 constexpr const char* kInventoryFilterKey = "bag_filter";
 constexpr const char* kCartFilterKey = "cart_filter";
 constexpr const char* kCartSizeKey = "cart_size_locked";
@@ -97,10 +97,9 @@ constexpr const char* kCharacterAvatarPoseKey = "sheet_avatar_placed";
 constexpr const char* kCharacterAvatarAnimatedKey = "sheet_avatar_animated";
 constexpr const char* kCharacterAvatarDirectionKey = "sheet_avatar_direction";
 constexpr const char* kCharacterAvatarGifScaleKey = "sheet_avatar_gif_scale";
-// LA BARRE D'ÉTATS. ⚠ SES CLÉS SONT PRÉFIXÉES `etats_` et non `statut_` : c'est
-// le mot que le reste du client emploie déjà — `StatusTable`, `ActiveStatus` —,
-// et une clé de fichier ne se renomme pas sans perdre le réglage de qui l'avait
-// posée.
+// LA BARRE D'ÉTATS. ⚠ SES CLÉS SONT PRÉFIXÉES `etats_` et non `statut_` : c'est le mot
+// que le reste du client emploie déjà — `StatusTable`, `ActiveStatus` —, et une clé de
+// fichier ne se renomme pas sans perdre le réglage de qui l'avait posée.
 // LES SIX JAUGES LIBRES. ⚠ PRÉFIXE `gauges_` : « bars » est déjà pris par les
 // barres de raccourcis, et deux familles au même préfixe se mêleraient dans un
 // fichier qu'on relit à la main.
@@ -573,6 +572,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Section("La grille d'alignement");
   into.Declare(kAlignGridKey, &align_grid_.shown);
   into.Declare(kAlignGridMagnetKey, &align_grid_.magnetic);
+  into.Declare(kWindowMagnetKey, &align_grid_.windows_magnetic);
   page(OptionSection::kShortcutBars);
   into.Section("Les huit barres de raccourcis");
   DeclareShortcutBars(into);

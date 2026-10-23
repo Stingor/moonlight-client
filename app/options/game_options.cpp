@@ -540,6 +540,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
     case GameOption::kAlignGridMagnet:
       align_grid_.magnetic = asked.on;
       break;
+    case GameOption::kWindowMagnet:
+      align_grid_.windows_magnetic = asked.on;
+      break;
     case GameOption::kAlignGridCell:
       align_grid_.cell_pixels = static_cast<int>(asked.value);
       break;

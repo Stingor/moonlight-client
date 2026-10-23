@@ -129,10 +129,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                     .kind = OptionKind::kChoice,
                     .chosen = ro::ui::MenuRankOfFontFamily(font_family_),
                     .choices = font_names_});
-  // 🔴 DES PALIERS ET NON UN CURSEUR. Poser l'échelle redimensionne TOUTES les
-  // fenêtres, et la passe est à PERTE : un curseur invite à balayer la plage,
-  // donc à empiler les troncatures, et à s'arrêter sur 1,07 — une valeur que
-  // personne ne voulait. Voir `kInterfaceScalePercents`.
+  // 🔴 DES PALIERS ET NON UN CURSEUR. Poser l'échelle redimensionne TOUTES les fenêtres, et la
+  // passe est à PERTE : un curseur invite à balayer la plage, donc à empiler les troncatures, et à
+  // s'arrêter sur 1,07 — une valeur que personne ne voulait. Voir `kInterfaceScalePercents`.
   //
   // ⚠ LES PALIERS SE COMPOSENT AVANT LA RANGÉE : le facteur courant en fait
   // partie quand il ne tombe sur aucun d'eux.
@@ -157,6 +156,11 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                 "Indépendant de l'affichage : on peut aimanter sans voir la grille."),
              nullptr, align_grid_.magnetic));
   display_rows_.push_back(
+      Toggle(GameOption::kWindowMagnet, Tr("Aimanter les fenêtres entre elles"),
+             Tr("Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, "
+                "puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre."),
+             nullptr, align_grid_.windows_magnetic));
+  display_rows_.push_back(
       OptionRowView{.id = static_cast<int>(GameOption::kAlignGridCell),
                     .label = Tr("Pas de la grille"),
                     .kind = OptionKind::kSlider,
@@ -174,11 +178,10 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                                         .kind = OptionKind::kColor,
                                         .color = align_grid_.color});
 
-  // ⚠ EN BAS, ET SOUS SON PROPRE INTERTITRE. Il reste dans « Interface » —
-  // c'est le seul réglage qu'une page de dialogue porte, et cette section règle
-  // précisément ce que chaque fenêtre fait —, mais posé en tête il séparait la
-  // langue de la police et l'échelle de sa grille. Un réglage seul de sa sorte
-  // se range au bout, pas au milieu de ceux qui vont par paires.
+  // ⚠ EN BAS, ET SOUS SON PROPRE INTERTITRE. Il reste dans « Interface » — c'est le seul réglage
+  // qu'une page de dialogue porte, et cette section règle précisément ce que chaque fenêtre fait —,
+  // mais posé en tête il séparait la langue de la police et l'échelle de sa grille. Un réglage seul
+  // de sa sorte se range au bout, pas au milieu de ceux qui vont par paires.
   display_rows_.push_back(
       Toggle(GameOption::kNpcMenuSearch, Tr("Recherche dans les menus de PNJ"),
              Tr("Ajoute un champ de recherche au-dessus des longs menus de PNJ, à partir "
@@ -194,10 +197,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
              nullptr, unlock_notice_));
   display_rows_.back().heading = Tr("Pose de l'interface");
 
-  // ⚠ LE JEU LES SÉPARE, NOUS LES RASSEMBLONS, et c'est un écart assumé :
-  // `gamesettings.lub` range « Display Effects » dans son onglet EFFECT et
-  // « /mineffect » dans ETC, avec /emblem et /font. Ses onglets ne sont pas les
-  // nôtres — mais le joueur qui cherche l'un cherche l'autre.
+  // ⚠ LE JEU LES SÉPARE, NOUS LES RASSEMBLONS, et c'est un écart assumé : `gamesettings.lub` range
+  // « Display Effects » dans son onglet EFFECT et « /mineffect » dans ETC, avec /emblem et /font.
+  // Ses onglets ne sont pas les nôtres — mais le joueur qui cherche l'un cherche l'autre.
   display_rows_.push_back(Toggle(GameOption::kEffectsShown, Tr("Afficher les effets"),
                                  Tr("Les effets des skills et des items. Une liste du "
                                     "client en garde cent quatorze visibles quand même."),
@@ -232,10 +234,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   // LE RENONCEMENT AU RAPPORT DE BUG, en fin d'interface.
   pages_.bug_report.AppendRows(display_rows_);
 
-  // ⚠ LEUR PROPRE SECTION, et non celle de la conversation : une bulle n'est
-  // pas la chatbox. L'une se lit à son rythme, l'autre passe au-dessus d'une
-  // tête et disparaît ; les ranger ensemble ferait chercher un réglage de
-  // durée parmi des filtres de fil.
+  // ⚠ LEUR PROPRE SECTION, et non celle de la conversation : une bulle n'est pas la chatbox. L'une
+  // se lit à son rythme, l'autre passe au-dessus d'une tête et disparaît ; les ranger ensemble
+  // ferait chercher un réglage de durée parmi des filtres de fil.
   bubble_rows_.clear();
   bubble_rows_.push_back(
       Toggle(GameOption::kBubbleShowOwn, Tr("Voir aussi les miennes"),

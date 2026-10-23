@@ -44,6 +44,7 @@ add_library(ro_ui STATIC
     src/tracker_panel.cpp
     src/afk_clock.cpp
     src/align_grid.cpp
+    src/window_magnet.cpp
     src/bank_window.cpp
     src/basic_info_window.cpp
     src/status_window.cpp

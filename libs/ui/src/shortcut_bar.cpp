@@ -532,11 +532,12 @@ ImVec2 SnappedAmongBars(ImVec2 at, ImVec2 size, const HudSiblings& bars) {
                 SnappedToSiblings(at.y, size.y, bars, true));
 }
 
-void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
+EarlierMagnet SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
+  static_assert(kShortcutBarCount <= kMostMagnetRiders);
   const ImGuiContext* context = ImGui::GetCurrentContext();
   if (layout.locked || context == nullptr || context->MovingWindow == nullptr) {
     g_block = BarBlock();
-    return;
+    return {};
   }
   const ImGuiWindow* moving = context->MovingWindow->RootWindow;
   std::array<HudRect, kShortcutBarCount> frames{};
@@ -561,7 +562,7 @@ void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
   }
   if (mine == nullptr) {
     g_block = BarBlock();
-    return;
+    return {};
   }
 
   // LE BLOC SE DÉCIDE AU DÉBUT DU GESTE, CTRL TENU, ⚠ SUR LA PLACE DU CLIC : ImGui
@@ -585,8 +586,17 @@ void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
       }
     }
   }
+  // LES SŒURS DU BLOC SUIVENT LA BARRE : l'aimant entre fenêtres ne doit pas
+  // les prendre pour des voisines.
+  EarlierMagnet decided;
+  for (std::size_t bar = 0; bar < kShortcutBarCount; ++bar) {
+    if ((g_block.members & (1U << bar)) != 0) {
+      const ImGuiWindow* rider = ImGui::FindWindowByName(names[bar].Get());
+      decided.riders[bar] = rider != nullptr ? rider->ID : 0;
+    }
+  }
   if (!layout.sticky) {
-    return;
+    return decided;
   }
   // ⚠ LE BLOC N'AIMANTE PAS SA PROPRE BARRE : ses sœurs la suivent, et la
   // retenir sur leur place d'avant la collerait sur place.
@@ -597,9 +607,12 @@ void SnapMovingShortcutBar(const ShortcutBarsLayout& layout) {
   }
   const HudSiblings bars{.frames = frames, .shown = shown, .mine = mine_rank};
   const ImVec2 posed = SnappedAmongBars(mine->Pos, mine->Size, bars);
-  if (posed.x != mine->Pos.x || posed.y != mine->Pos.y) {
+  decided.held_across = posed.x != mine->Pos.x;
+  decided.held_down = posed.y != mine->Pos.y;
+  if (decided.held_across || decided.held_down) {
     ImGui::SetWindowPos(mine, posed, ImGuiCond_Always);
   }
+  return decided;
 }
 
 void CenterShortcutBar(std::size_t bar) {

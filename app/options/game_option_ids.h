@@ -58,6 +58,7 @@ enum class GameOption : std::uint8_t {
   // à la grille visible, puis on l'éteint en gardant l'aimant — ou l'inverse.
   kAlignGrid,
   kAlignGridMagnet,
+  kWindowMagnet,
   kAlignGridCell,
   kAlignGridColor,
   kFixedCamera,
