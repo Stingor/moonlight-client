@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <optional>
+#include <vector>
 
 #include "ro/audio/audio_engine.h"
 #include "ro/net/connection.h"
@@ -24,6 +25,7 @@
 #include "game/client_shell.h"
 #include "game/game_pieces.h"
 #include "game/game_settings.h"
+#include "game/interface_sound.h"
 #include "game/ui_stage.h"
 #include "world/entity_menu.h"
 #include "world/native_marker.h"
@@ -38,7 +40,7 @@ namespace moonclient {
 
 // LE SOCLE DE LA PARTIE : ce qu'elle tient de la coquille, et ce qui ne change
 // pas d'elle — la liaison, le monde, les livres hors du monde, le mode Ciblage,
-// le menu du clic droit.
+// le menu du clic droit, les sons d'interface dont l'échec est déjà dit.
 //
 // 🔴 C'EST LA PREMIÈRE BASE DE `Game`, ET C'EST TOUT CE QU'ELLE PROMET : elle se
 // construit avant tout le reste de la partie et se détruit après. Ce qui suit
@@ -136,6 +138,10 @@ class GameFoundation {
   // composée une fois, et ce qu'on sait avoir basculé chez le serveur. ⚠ À LA
   // PARTIE ET NON À LA FENÊTRE : le serveur oublie ses bascules à la déconnexion.
   StaffSession staff_;
+  // ── LES SONS D'INTERFACE ───────────────────────────────────────────────────
+  // CEUX DONT L'ÉCHEC EST DÉJÀ AU JOURNAL : un son qui manque ne s'y dit qu'une
+  // fois par partie. Voir `PlayInterfaceSounds`.
+  std::vector<InterfaceSoundFile> interface_sound_failures_said_;
 };
 
 }  // namespace moonclient

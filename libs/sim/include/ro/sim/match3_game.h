@@ -29,6 +29,8 @@ namespace ro::sim {
 inline constexpr int kMatch3Side = 8;
 inline constexpr int kMatch3Kinds = 6;
 inline constexpr int kMatch3Cells = kMatch3Side * kMatch3Side;
+// Le plus petit alignement qui s'efface.
+inline constexpr int kMatch3ShortestRun = 3;
 // Une case vide, le temps d'une chute.
 inline constexpr int kMatch3Empty = -1;
 // Les coups d'une partie.
@@ -124,6 +126,9 @@ class Match3Game {
   void SetCells(const std::array<int, kMatch3Cells>& kinds, std::uint32_t now_ms);
   // Un échange possible, ou aucun : la grille est bloquée.
   [[nodiscard]] std::optional<std::array<Match3Cell, 2>> FindMove() const;
+  // Remélange une grille bloquée, et en tire une neuve quand les remélanges
+  // échouent trop longtemps. Rend une grille sans alignement qui offre un échange.
+  void Reshuffle();
 
  private:
   using Marks = std::array<bool, kMatch3Cells>;
@@ -137,7 +142,8 @@ class Match3Game {
   // Efface ce qui est aligné, fait tomber, remplit : un pas de cascade. Faux
   // quand rien n'était aligné.
   bool ClearStep(std::uint32_t now_ms);
-  void Reshuffle();
+  // Tire une grille entière sans alignement. Elle peut n'offrir aucun échange.
+  void FillWithoutMatches();
   void Settle(std::uint32_t now_ms);
 
   std::mt19937 random_;

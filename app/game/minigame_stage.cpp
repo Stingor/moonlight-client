@@ -73,6 +73,17 @@ void DrawMinigameWindows(MinigameWindows& windows, const ro::ui::SkinArt& art,
 static_assert(ro::ui::kRojeweledSide == ro::sim::kMatch3Side);
 static_assert(ro::ui::kRojeweledKinds == ro::sim::kMatch3Kinds);
 
+std::uint32_t WatchedClock::Follow(bool watched, std::uint32_t now_ms) {
+  if (!watched) {
+    last_ms_.reset();
+    return 0;
+  }
+  const std::uint32_t step_ms = std::min(now_ms - last_ms_.value_or(now_ms), kMostWatchedStepMs);
+  last_ms_ = now_ms;
+  watched_ms_ += step_ms;
+  return step_ms;
+}
+
 void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& pieces,
                             const std::filesystem::path& client_root, std::uint32_t now_ms) {
   if (!seeded_) {
@@ -81,45 +92,59 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
     roggle_ = ro::sim::PegGame(entropy());
     seeded_ = true;
   }
-  ApplyAnswers(windows, now_ms);
+  // ⚠ LES RÉPONSES AVANT LES HORLOGES : un clic date de l'image qui l'a reçu.
+  ApplyAnswers(windows);
+  rojeweled_clock_.Follow(windows.rojeweled.open, now_ms);
+  const std::uint32_t roggle_step_ms = roggle_clock_.Follow(windows.roggle.open, now_ms);
 
+  const bool was_composed = windows.composed;
   windows.composed = windows.hub.open || windows.rojeweled.open || windows.roggle.open;
   if (!windows.composed) {
-    roggle_last_ms_.reset();
+    if (was_composed && record_unsaved_) {
+      Save(client_root);
+    }
     return;
   }
   const ro::sim::MinigameRecord before = Record(client_root);
   if (windows.rojeweled.open) {
-    PlayRojeweled(now_ms);
+    PlayRojeweled();
     const std::vector<ro::sim::MinigameTrophy> fresh = RecordRojeweled(*record_, rojeweled_);
     toasts_.insert(toasts_.end(), fresh.begin(), fresh.end());
   }
   if (windows.roggle.open) {
-    PlayRoggle(now_ms);
+    PlayRoggle(roggle_step_ms);
     const std::vector<ro::sim::MinigameTrophy> fresh = RecordRoggle(*record_, roggle_);
     toasts_.insert(toasts_.end(), fresh.begin(), fresh.end());
-  } else {
-    roggle_last_ms_.reset();
   }
   if (*record_ != before) {
-    static_cast<void>(SaveMinigameRecord(client_root, *record_));
+    Save(client_root);
   }
   ComposeHub(windows);
   ComposeRojeweled(windows, pieces, now_ms);
   ComposeRoggle(windows, pieces, now_ms);
 }
 
-void MinigameStage::ApplyAnswers(MinigameWindows& windows, std::uint32_t now_ms) {
+void MinigameStage::Leave(const std::filesystem::path& client_root) {
+  if (record_unsaved_) {
+    Save(client_root);
+  }
+}
+
+void MinigameStage::Save(const std::filesystem::path& client_root) {
+  record_unsaved_ = !SaveMinigameRecord(client_root, *record_);
+}
+
+void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
   const ro::ui::MinigamesAsk hub = std::exchange(windows.hub_answer, {});
   windows.rojeweled.open = windows.rojeweled.open || hub.open_rojeweled;
   windows.roggle.open = windows.roggle.open || hub.open_roggle;
 
   const ro::ui::RojeweledAsk jewels = std::exchange(windows.rojeweled_answer, {});
   if (jewels.new_game) {
-    rojeweled_.NewGame(now_ms);
+    rojeweled_.NewGame(rojeweled_clock_.watched_ms());
   }
   if (jewels.clicked.has_value()) {
-    rojeweled_.Click({jewels.clicked->row, jewels.clicked->column}, now_ms);
+    rojeweled_.Click({jewels.clicked->row, jewels.clicked->column}, rojeweled_clock_.watched_ms());
   }
 
   const ro::ui::RoggleAsk pegs = std::exchange(windows.roggle_answer, {});
@@ -134,11 +159,11 @@ void MinigameStage::ApplyAnswers(MinigameWindows& windows, std::uint32_t now_ms)
   }
 }
 
-void MinigameStage::PlayRojeweled(std::uint32_t now_ms) {
+void MinigameStage::PlayRojeweled() {
   if (!rojeweled_.started()) {
-    rojeweled_.NewGame(now_ms);
+    rojeweled_.NewGame(rojeweled_clock_.watched_ms());
   }
-  rojeweled_.Advance(now_ms);
+  rojeweled_.Advance(rojeweled_clock_.watched_ms());
   const ro::sim::Match3News news = rojeweled_.TakeNews();
   for (int burst = 0; burst < news.bursts; ++burst) {
     sounds_.push_back(SoundOf(kBurstSound));
@@ -148,16 +173,12 @@ void MinigameStage::PlayRojeweled(std::uint32_t now_ms) {
   }
 }
 
-void MinigameStage::PlayRoggle(std::uint32_t now_ms) {
+void MinigameStage::PlayRoggle(std::uint32_t step_ms) {
   if (!roggle_.started()) {
     roggle_.NewGame();
   }
-  // ⚠ LE TEMPS NE COURT QUE FENÊTRE OUVERTE : la première image après une
-  // ouverture n'avance de rien, plutôt que de rattraper la fermeture.
-  const std::uint32_t last_ms = roggle_last_ms_.value_or(now_ms);
-  roggle_last_ms_ = now_ms;
   constexpr float kMsPerSecond = 1000.0F;
-  roggle_.Advance(static_cast<float>(now_ms - last_ms) / kMsPerSecond);
+  roggle_.Advance(static_cast<float>(step_ms) / kMsPerSecond);
   const ro::sim::PegNews news = roggle_.TakeNews();
   if (news.orange_hits > 0) {
     sounds_.push_back(SoundOf(kOrangeHitSound));
@@ -179,11 +200,12 @@ ro::sim::MinigameRecord& MinigameStage::Record(const std::filesystem::path& clie
   return *record_;
 }
 
-void MinigameStage::Announce(ro::net::Connection& link, bool verified,
+void MinigameStage::Announce(ro::net::Connection& link, bool verified, std::uint32_t map_entries,
                              const std::filesystem::path& client_root) {
   // ⚠ L'ENREGISTREMENT SE LIT DÈS LA POIGNÉE DE MAIN, fenêtres fermées : les
   // trophées d'une session précédente sont à redire.
-  announcer_.Pump(link, verified, verified ? Record(client_root) : ro::sim::MinigameRecord{});
+  announcer_.Pump(link, verified, map_entries,
+                  verified ? Record(client_root) : ro::sim::MinigameRecord{});
 }
 
 const char* MinigameStage::Toast(std::uint32_t now_ms, float& alpha) {
@@ -245,9 +267,10 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
     return;
   }
   ro::ui::RojeweledView& view = windows.rojeweled_view;
+  const std::uint32_t watched_ms = rojeweled_clock_.watched_ms();
   for (int index = 0; index < ro::ui::kRojeweledCells; ++index) {
     const ro::sim::Match3Cell cell{index / ro::ui::kRojeweledSide, index % ro::ui::kRojeweledSide};
-    const ro::sim::Match3Game::Offset offset = rojeweled_.OffsetAt(cell, now_ms);
+    const ro::sim::Match3Game::Offset offset = rojeweled_.OffsetAt(cell, watched_ms);
     view.gems[static_cast<std::size_t>(index)] =
         ro::ui::RojeweledGem{.kind = rojeweled_.KindAt(cell),
                              .offset_rows = offset.rows,
@@ -258,7 +281,7 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
     bursts_.push_back(ro::ui::RojeweledBurst{
         .cell = {burst.cell.row, burst.cell.column},
         .kind = burst.kind,
-        .progress = std::min(1.0F, static_cast<float>(now_ms - burst.started_ms) /
+        .progress = std::min(1.0F, static_cast<float>(watched_ms - burst.started_ms) /
                                        static_cast<float>(ro::sim::kMatch3BurstMs))});
   }
   view.bursts = bursts_;
@@ -267,7 +290,7 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
     view.selected = ro::ui::RojeweledCell{selected->row, selected->column};
   }
   view.hint.reset();
-  if (const auto hint = rojeweled_.Hint(now_ms)) {
+  if (const auto hint = rojeweled_.Hint(watched_ms)) {
     view.hint = std::array<ro::ui::RojeweledCell, 2>{
         ro::ui::RojeweledCell{(*hint)[0].row, (*hint)[0].column},
         ro::ui::RojeweledCell{(*hint)[1].row, (*hint)[1].column}};

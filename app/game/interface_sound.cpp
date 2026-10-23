@@ -161,15 +161,18 @@ ro::core::Result<void> PlayInterfaceSound(ro::audio::AudioEngine& audio, ro::vfs
 
 void PlayInterfaceSounds(ro::audio::AudioEngine& audio, ro::vfs::Vfs* vfs,
                          const std::filesystem::path& client_root,
-                         std::span<const InterfaceSoundFile> files, std::string_view from) {
+                         std::span<const InterfaceSoundFile> files, std::string_view from,
+                         std::vector<InterfaceSoundFile>& failures_said) {
   if (vfs == nullptr) {
     return;
   }
   for (const InterfaceSoundFile& file : files) {
-    if (const ro::core::Result<void> played = PlayInterfaceSound(audio, *vfs, client_root, file);
-        !played) {
-      ro::core::LogWarning("son {} : {}", from, ro::core::Describe(played.error()));
+    const ro::core::Result<void> played = PlayInterfaceSound(audio, *vfs, client_root, file);
+    if (played || std::ranges::find(failures_said, file) != failures_said.end()) {
+      continue;
     }
+    failures_said.push_back(file);
+    ro::core::LogWarning("son {} : {}", from, ro::core::Describe(played.error()));
   }
 }
 

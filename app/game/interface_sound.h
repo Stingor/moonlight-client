@@ -5,6 +5,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ro/audio/audio_engine.h"
 #include "ro/core/error.h"
@@ -76,10 +77,15 @@ struct InterfaceSoundFile {
                                                         const InterfaceSoundFile& file,
                                                         std::string* held_name = nullptr);
 
-// JOUE UNE SUITE DE SONS, et dit chaque échec au journal — « son <from> :
+// JOUE UNE SUITE DE SONS, et dit l'échec de chacun au journal — « son <from> :
 // <cause> ». Sans archives, rien ne se joue.
+//
+// ⚠ UN ÉCHEC SE DIT UNE SEULE FOIS PAR FICHIER : `failures_said` retient les
+// fichiers déjà dits, et son propriétaire fixe pour combien de temps. Un son
+// qui manque se redirait sinon au journal à chaque fois qu'on le demande.
 void PlayInterfaceSounds(ro::audio::AudioEngine& audio, ro::vfs::Vfs* vfs,
                          const std::filesystem::path& client_root,
-                         std::span<const InterfaceSoundFile> files, std::string_view from);
+                         std::span<const InterfaceSoundFile> files, std::string_view from,
+                         std::vector<InterfaceSoundFile>& failures_said);
 
 }  // namespace moonclient

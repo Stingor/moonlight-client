@@ -113,7 +113,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // LES SONS D'INTERFACE de l'image : ceux du champ de bataille, puis l'arrivée
   // d'un membre au salon.
   const auto play_sounds = [this](std::vector<InterfaceSoundFile> sounds, std::string_view from) {
-    PlayInterfaceSounds(audio_, vfs_, client_root_, sounds, from);
+    PlayInterfaceSounds(audio_, vfs_, client_root_, sounds, from, interface_sound_failures_said_);
   };
   play_sounds(pieces_.battleground.TakeSounds(), "du champ de bataille");
   play_sounds(pieces_.chat_rooms.TakeSounds(), "du salon");
@@ -124,7 +124,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   play_sounds(pieces_.minigames.TakeSounds(), "d'un mini-jeu");
   if (link_.is_open()) {
     const bool verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified;
-    pieces_.minigames.Announce(link_, verified, client_root_);
+    pieces_.minigames.Announce(link_, verified, world_.map_entries(), client_root_);
   }
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
@@ -218,6 +218,7 @@ void Game::Close() {
   }
   // L'IA DES COMPAGNONS : ses profils en attente, et les délais pour la session suivante.
   pieces_.companion_ai.Leave(static_cast<std::uint32_t>(SDL_GetTicks()));
+  pieces_.minigames.Leave(client_root_);
   // La minimap quitte le panneau d'options : ses réglages vivent avec la partie.
   settings_->options().pages().minimap_panel.Entrust(nullptr);
   // Le suivi des quêtes aussi : ses réglages vivent avec la partie.

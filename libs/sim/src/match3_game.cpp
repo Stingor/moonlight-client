@@ -10,8 +10,6 @@ namespace {
 using Cells = std::array<int, kMatch3Cells>;
 using Marks = std::array<bool, kMatch3Cells>;
 
-// Le plus petit alignement qui s'efface.
-constexpr int kShortestRun = 3;
 // Les remélanges tentés avant de repartir d'une grille neuve.
 constexpr int kMostReshuffles = 400;
 
@@ -48,8 +46,8 @@ constexpr int kMostReshuffles = 400;
           ++run;
           continue;
         }
-        if (run >= kShortestRun) {
-          long_bonus += run - kShortestRun;
+        if (run >= kMatch3ShortestRun) {
+          long_bonus += run - kMatch3ShortestRun;
           for (int at = along - run; at < along; ++at) {
             bool& mark = marks[static_cast<std::size_t>(IndexOf(cell(at)))];
             if (!mark) {
@@ -112,8 +110,16 @@ int Match3Game::RandomKind() {
 }
 
 void Match3Game::NewGame(std::uint32_t now_ms) {
-  // Une grille sans alignement : chaque gemme évite de compléter les deux
-  // précédentes de sa rangée et de sa colonne.
+  FillWithoutMatches();
+  if (!FindMove().has_value()) {
+    Reshuffle();
+  }
+  SetCells(cells_, now_ms);
+}
+
+void Match3Game::FillWithoutMatches() {
+  // Chaque gemme évite de compléter les deux précédentes de sa rangée et de sa
+  // colonne.
   for (int row = 0; row < kMatch3Side; ++row) {
     for (int column = 0; column < kMatch3Side; ++column) {
       int kind = 0;
@@ -125,10 +131,6 @@ void Match3Game::NewGame(std::uint32_t now_ms) {
       At({row, column}) = kind;
     }
   }
-  if (!FindMove().has_value()) {
-    Reshuffle();
-  }
-  SetCells(cells_, now_ms);
 }
 
 void Match3Game::SetCells(const std::array<int, kMatch3Cells>& kinds, std::uint32_t now_ms) {
@@ -164,11 +166,12 @@ void Match3Game::Reshuffle() {
       return;
     }
   }
-  // ⚠ MALCHANCE PERSISTANTE : une grille tirée au hasard. Elle peut porter un
-  // alignement, que la première cascade effacera.
-  for (int& kind : cells_) {
-    kind = RandomKind();
-  }
+  // ⚠ MALCHANCE PERSISTANTE : une grille neuve, tirée sans alignement comme au
+  // début d'une partie, jusqu'à ce qu'elle offre un échange. Chaque tirage
+  // réussit presque toujours.
+  do {
+    FillWithoutMatches();
+  } while (!FindMove().has_value());
 }
 
 void Match3Game::Click(Match3Cell cell, std::uint32_t now_ms) {

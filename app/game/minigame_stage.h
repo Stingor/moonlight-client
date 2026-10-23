@@ -60,31 +60,67 @@ struct MinigamePieces {
   }
 };
 
+// LE PLUS LONG PAS D'UNE IMAGE : un gel de l'affichage, comme le chargement
+// d'une carte derrière son écran, ne se rattrape qu'à hauteur d'un quart de
+// seconde.
+inline constexpr std::uint32_t kMostWatchedStepMs = 250;
+
+// UNE HORLOGE QUI NE COURT QUE FENÊTRE OUVERTE.
+//
+// ⚠ LA PREMIÈRE IMAGE APRÈS UNE OUVERTURE N'AVANCE DE RIEN, plutôt que de
+// rattraper la fermeture ; aucun pas ne dépasse `kMostWatchedStepMs`.
+class WatchedClock {
+ public:
+  // À CHAQUE IMAGE, fenêtre ouverte ou non. Rend le temps couru depuis l'image
+  // précédente : nul fenêtre fermée.
+  std::uint32_t Follow(bool watched, std::uint32_t now_ms);
+  // Le temps couru fenêtre ouverte, en tout.
+  [[nodiscard]] std::uint32_t watched_ms() const noexcept { return watched_ms_; }
+
+ private:
+  std::uint32_t watched_ms_ = 0;
+  // L'image précédente ; vide quand la fenêtre y était fermée.
+  std::optional<std::uint32_t> last_ms_;
+};
+
 // L'ÉTAGE DES MINI-JEUX : les parties en cours, les trophées, et ce qu'il faut
 // dessiner et faire entendre.
 //
 // ⚠ UNE PARTIE SE FIGE FENÊTRE FERMÉE, et reprend à sa réouverture : le temps
-// ne court que pendant qu'on regarde.
+// ne court que pendant qu'on regarde. Chaque jeu a sa `WatchedClock` ; l'avis
+// d'un trophée et l'animation des monstres suivent l'heure du client.
 //
 // ⚠ L'ENREGISTREMENT SE LIT À LA PREMIÈRE AVANCÉE, et s'écrit à chaque
-// trophée ou meilleur score : rien ne se perd si le client se ferme mal.
+// trophée ou meilleur score : rien ne se perd si le client se ferme mal. Une
+// écriture ratée se retente au changement suivant, à la fermeture des fenêtres
+// et à la fin de la partie, jamais à chaque image.
 class MinigameStage {
  public:
   void Advance(MinigameWindows& windows, const MinigamePieces& pieces,
                const std::filesystem::path& client_root, std::uint32_t now_ms);
 
+  // À LA FIN DE LA PARTIE : une écriture ratée se retente une dernière fois.
+  void Leave(const std::filesystem::path& client_root);
+
   // LES SONS À JOUER. Consommés.
   [[nodiscard]] std::vector<InterfaceSoundFile> TakeSounds();
 
   // À CHAQUE IMAGE, liaison ouverte : dit au serveur les trophées qu'il
-  // n'a pas encore appris. Voir `MinigameTrophyAnnouncer`.
-  void Announce(ro::net::Connection& link, bool verified, const std::filesystem::path& client_root);
+  // n'a pas encore appris. `map_entries` est le compte d'entrées en carte du
+  // monde. Voir `MinigameTrophyAnnouncer`.
+  //
+  // ⚠ APRÈS `PumpNetwork`, qui envoie l'avis de chargement dans l'image même où
+  // `map_entries` change : redits avant lui, les trophées seraient jetés une
+  // seconde fois.
+  void Announce(ro::net::Connection& link, bool verified, std::uint32_t map_entries,
+                const std::filesystem::path& client_root);
 
  private:
   [[nodiscard]] ro::sim::MinigameRecord& Record(const std::filesystem::path& client_root);
-  void ApplyAnswers(MinigameWindows& windows, std::uint32_t now_ms);
-  void PlayRojeweled(std::uint32_t now_ms);
-  void PlayRoggle(std::uint32_t now_ms);
+  void Save(const std::filesystem::path& client_root);
+  void ApplyAnswers(MinigameWindows& windows);
+  void PlayRojeweled();
+  void PlayRoggle(std::uint32_t step_ms);
   void ComposeHub(MinigameWindows& windows);
   void ComposeRojeweled(MinigameWindows& windows, const MinigamePieces& pieces,
                         std::uint32_t now_ms);
@@ -95,12 +131,14 @@ class MinigameStage {
                                            std::uint32_t now_ms);
 
   std::optional<ro::sim::MinigameRecord> record_;
+  // La dernière écriture de `record_` a échoué.
+  bool record_unsaved_ = false;
   MinigameTrophyAnnouncer announcer_;
   ro::sim::Match3Game rojeweled_{0};
   ro::sim::PegGame roggle_{0};
   bool seeded_ = false;
-  // La dernière avancée de Roggle, pour le temps écoulé ; vide fenêtre fermée.
-  std::optional<std::uint32_t> roggle_last_ms_;
+  WatchedClock rojeweled_clock_;
+  WatchedClock roggle_clock_;
   std::vector<InterfaceSoundFile> sounds_;
   // Les trophées à annoncer, le premier à l'écran depuis `toast_started_ms_`.
   std::deque<ro::sim::MinigameTrophy> toasts_;

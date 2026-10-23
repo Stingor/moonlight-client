@@ -16,6 +16,8 @@ namespace moonclient {
 //
 // Un trophée se range par sa CLÉ, jamais par son rang : le catalogue peut
 // grandir, et une clé que ce client ne connaît pas se lit sans rien gagner.
+// ⚠ ELLE SE RÉÉCRIT TELLE QUELLE : revenir à une version antérieure du client
+// ne fait pas perdre les trophées d'une plus récente.
 
 inline constexpr std::string_view kMinigameFileName = "minigames.yml";
 

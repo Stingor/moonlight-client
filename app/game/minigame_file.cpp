@@ -54,14 +54,19 @@ ro::core::Result<ro::sim::MinigameRecord> ReadMinigameRecord(std::string_view te
     record.roggle_best = BestIn(whole, kRoggleBestField);
     const YAML::Node trophies = whole[kTrophiesField];
     if (trophies && trophies.IsSequence()) {
+      const auto catalog = ro::sim::MinigameTrophies();
       for (const YAML::Node& key : trophies) {
         if (!key.IsScalar()) {
           continue;
         }
-        for (const ro::sim::MinigameTrophyText& text_of : ro::sim::MinigameTrophies()) {
-          if (key.Scalar() == text_of.key) {
-            record.unlocked[static_cast<std::size_t>(text_of.trophy)] = true;
-          }
+        const auto known =
+            std::ranges::find_if(catalog, [&key](const ro::sim::MinigameTrophyText& text_of) {
+              return key.Scalar() == text_of.key;
+            });
+        if (known == catalog.end()) {
+          record.foreign_trophy_keys.push_back(key.Scalar());
+        } else {
+          record.unlocked[static_cast<std::size_t>(known->trophy)] = true;
         }
       }
     }
@@ -81,6 +86,9 @@ std::string WriteMinigameRecord(const ro::sim::MinigameRecord& record) {
     if (record.Has(text.trophy)) {
       out << text.key;
     }
+  }
+  for (const std::string& key : record.foreign_trophy_keys) {
+    out << key;
   }
   out << YAML::EndSeq << YAML::EndMap;
   return std::string(kFileHeader) + out.c_str() + "\n";

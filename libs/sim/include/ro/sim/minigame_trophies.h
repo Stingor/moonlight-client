@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <span>
+#include <string>
 #include <vector>
 
 #include "ro/core/i18n.h"
@@ -51,6 +52,9 @@ struct MinigameRecord {
   int rojeweled_best = 0;
   int roggle_best = 0;
   std::array<bool, kMinigameTrophyCount> unlocked = {};
+  // LES CLÉS DE TROPHÉE QUE CE CATALOGUE NE CONNAÎT PAS, telles que lues : un
+  // client plus récent les a gagnées, et elles se réécrivent avec le reste.
+  std::vector<std::string> foreign_trophy_keys;
 
   [[nodiscard]] bool operator==(const MinigameRecord&) const = default;
   [[nodiscard]] bool Has(MinigameTrophy trophy) const noexcept {
