@@ -212,6 +212,11 @@ struct EntityNamesLook {
   // c'est le défaut de sa table de réglages.
   bool guild_emblem = true;
 
+  // L'EMBLÈME DE CLAN, à la même place, chez qui n'a PAS de guilde. ⚠ UNE
+  // GUILDE LE FAIT TAIRE, même sans emblème ou sa case décochée : voir
+  // `ChoosePlateEmblem`. « /emblem » ne touche pas cette case-ci.
+  bool clan_emblem = true;
+
   std::array<EntityNameLook, kNamePlateKindCount> kinds = DefaultEntityNames();
 };
 

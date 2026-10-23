@@ -1271,6 +1271,7 @@ target_include_directories(moonclient_entitybars PUBLIC ${CMAKE_CURRENT_SOURCE_D
 # c'est le réglage ou le protocole.
 add_library(moonclient_names STATIC
     guild/emblem_plates.cpp
+    guild/plate_emblem.cpp
     world/name_card_asker.cpp
     world/name_plate_view.cpp)
 
@@ -1806,6 +1807,7 @@ add_executable(moonclient
     guild/guild_emblem_editor.cpp
     guild/guild_emblems.cpp
     guild/guild_panel.cpp
+    guild/sample_emblem.cpp
     guild/guild_skill_rows.cpp
     game/game_open.cpp
     game/game_targeting.cpp

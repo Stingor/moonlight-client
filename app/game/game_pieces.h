@@ -15,6 +15,7 @@
 #include "ro/render/battlefield_art.h"
 #include "ro/render/boss_badge.h"
 #include "ro/render/card_thumbnails.h"
+#include "ro/render/clan_emblem.h"
 #include "ro/render/emotion_icons.h"
 #include "ro/render/font_atlas.h"
 #include "ro/render/game_images.h"
@@ -312,6 +313,9 @@ struct GamePieces {
   // d'un MVP. ⚠ ELLES VIVENT ICI ET NE SE RECOPIENT PAS — la couche d'écran les
   // reconnaît par leur ADRESSE pour ne les téléverser qu'une fois.
   ro::render::BossBadges boss_badges;
+  // LES EMBLÈMES DE CLAN de l'installation. ⚠ MÊME RÈGLE : reconnus par leur
+  // adresse.
+  ro::render::ClanEmblems clan_emblems;
   // LA MARQUE DES ENNEMIS ET LES EMBLÈMES DU SCORE du champ de bataille. ⚠ MÊME
   // RÈGLE : la couche d'écran les reconnaît par leur adresse.
   ro::render::BattlefieldArt battlefield_art;

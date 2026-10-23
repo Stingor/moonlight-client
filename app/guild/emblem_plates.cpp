@@ -42,12 +42,17 @@ void EmblemPlates::Reject(std::int32_t guild_id, std::int32_t version) {
   rejected_.insert(Key{guild_id, version});
 }
 
+std::int32_t PlateGuildIdOf(const ro::sim::Actor& actor, const ro::sim::World& world,
+                            const ro::sim::GuildBook& guild) {
+  if (actor.id == world.player_id()) {
+    return guild.in_guild() ? guild.belonging()->guild_id : 0;
+  }
+  return static_cast<std::int32_t>(actor.guild_id);
+}
+
 const ro::formats::Image* EmblemOnPlate(const ro::sim::Actor& actor, const ro::sim::World& world,
                                         const ro::sim::GuildBook& guild, EmblemPlates& plates) {
-  std::int32_t guild_id = static_cast<std::int32_t>(actor.guild_id);
-  if (actor.id == world.player_id()) {
-    guild_id = guild.in_guild() ? guild.belonging()->guild_id : 0;
-  }
+  const std::int32_t guild_id = PlateGuildIdOf(actor, world, guild);
   if (guild_id <= 0) {
     return nullptr;
   }

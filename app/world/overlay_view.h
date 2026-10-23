@@ -135,7 +135,8 @@ inline constexpr int kNameFontPixels = 12;
 // `name` REMPLACE celui de l'acteur quand il n'est pas vide : c'est par là que
 // passe le nom composé d'un objet au sol, que le monde ne porte pas.
 //
-// `emblem` est l'emblème de guilde de l'acteur, ou nul — voir `EmblemOnPlate`.
+// `emblem` est l'emblème de guilde de l'acteur, celui de son clan faute de
+// guilde, ou nul — voir `NamePlateEmblem`.
 // Il ne se possède pas non plus.
 //
 // ⚠ ELLE NE DÉCIDE PAS SI L'ÉTIQUETTE PARAÎT : c'est `ShowsEntityName` qui le

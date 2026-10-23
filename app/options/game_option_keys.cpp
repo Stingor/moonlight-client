@@ -149,7 +149,6 @@ constexpr std::array<const char*, ro::ui::kEntityBarKindCount> kEntityBarNames =
 // seule dans un fichier qu'on relit à la main.
 constexpr const char* kEntityNamesShownKey = "names_shown";
 constexpr const char* kEntityNamesFontKey = "names_font";
-constexpr const char* kEntityNamesEmblemKey = "names_emblem_guild";
 
 constexpr std::array<const char*, ro::render::kNamePlateKindCount> kEntityNameNames = {
     "self", "players", "npc", "monsters", "boss", "items",
@@ -415,7 +414,8 @@ void GameOptions::DeclareSkillArea(SettingsFile& into) {
 void GameOptions::DeclareEntityNames(SettingsFile& into) {
   into.Declare(kEntityNamesShownKey, &entity_names_.shown);
   into.Declare(kEntityNamesFontKey, &entity_names_.font_pixels);
-  into.Declare(kEntityNamesEmblemKey, &entity_names_.guild_emblem);
+  into.Declare("names_emblem_guild", &entity_names_.guild_emblem);
+  into.Declare("names_emblem_clan", &entity_names_.clan_emblem);
 
   // ⚠ UNE BOUCLE, COMME LES BARRES ET LES JAUGES : six espèces fois douze clés
   // écrites à la main seraient soixante-douze occasions de se tromper de champ,

@@ -185,8 +185,9 @@ void PaintName(ImDrawList& into, const EntitySamplePlace& place, const EntitySam
   const float top =
       SampleNameTop(sample, how, static_cast<float>(lines.size()), step, place.feet.y, bars);
   // L'EMBLÈME PREND SA PLACE À GAUCHE, comme en jeu : le widget s'élargit pour
-  // lui, et toutes les lignes partent du même bord.
-  const bool emblem = names.guild_emblem && sample.emblem.usable();
+  // lui, et toutes les lignes partent du même bord. ⚠ `app` A DÉJÀ APPLIQUÉ LES
+  // CASES de guilde et de clan : une image présente est une image à montrer.
+  const bool emblem = sample.emblem.usable();
   const render::NamePlateLayout placed = render::PlaceNamePlate(
       place.feet.x, top, widest, lines.size(), step,
       emblem ? render::NamePlateLead::kEmblem : render::NamePlateLead::kNone);

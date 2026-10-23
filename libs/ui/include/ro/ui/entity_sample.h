@@ -51,7 +51,8 @@ struct EntitySample {
   // CE QUI SUIT LA SECONDE LIGNE, entre crochets : le rang dans la guilde pour
   // un joueur, l'élément pour un monstre (`@showmobinfo`).
   std::string badge;
-  // L'EMBLÈME DE GUILDE posé à gauche de l'étiquette, ou une image vide.
+  // L'EMBLÈME DE GUILDE OU DE CLAN posé à gauche de l'étiquette, ou une image
+  // vide — choisi par `app` selon les cases de l'étiquette.
   SkinImage emblem;
   // LE SORT QU'IL INCANTE dans le cadre, plausible pour l'espèce.
   std::string cast_skill;

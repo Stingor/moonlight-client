@@ -270,6 +270,7 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
     case GameOption::kEntityNamesShown:
     case GameOption::kEntityNamesFont:
     case GameOption::kEntityNamesEmblem:
+    case GameOption::kEntityNamesClanEmblem:
     case GameOption::kSkillAreaCastShown:
     case GameOption::kSkillAreaArmedShown:
     case GameOption::kSkillAreaPattern:

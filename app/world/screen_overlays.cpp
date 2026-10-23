@@ -13,6 +13,7 @@
 #include "ro/sim/world.h"
 
 #include "chat/chat_view.h"
+#include "guild/plate_emblem.h"
 #include "world/armed_cursor.h"
 #include "world/battlefield_view.h"
 #include "world/cast_bar_view.h"
@@ -207,9 +208,9 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
       }
       const std::string item_name = GroundItemName(*actor, items, pieces.item_words);
       const ro::formats::Image* emblem =
-          what.entity_names.guild_emblem && what.guild != nullptr && what.emblems != nullptr
-              ? EmblemOnPlate(*actor, world, *what.guild, *what.emblems)
-              : nullptr;
+          what.guild != nullptr ? NamePlateEmblem(*actor, world, *what.guild, what.emblems,
+                                                  pieces.clan_emblems, what.entity_names)
+                                : nullptr;
       // ⚠ LES INSIGNES ET LES EMBLÈMES SE PASSENT PAR RÉFÉRENCE, sans copie : la
       // couche d'écran retient leur ADRESSE pour ne les téléverser qu'une fois.
       const std::vector<ro::render::ScreenQuad> one =

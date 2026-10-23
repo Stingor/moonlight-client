@@ -55,7 +55,11 @@ class EmblemPlates {
   std::set<Key> wanted_;
 };
 
-// L'EMBLÈME QUE L'ÉTIQUETTE DE CET ACTEUR PORTE, ou nul.
+// LA GUILDE QUE L'ÉTIQUETTE DE CET ACTEUR MONTRE, ou zéro. Voir `EmblemOnPlate`.
+[[nodiscard]] std::int32_t PlateGuildIdOf(const ro::sim::Actor& actor, const ro::sim::World& world,
+                                          const ro::sim::GuildBook& guild);
+
+// L'EMBLÈME DE GUILDE QUE L'ÉTIQUETTE DE CET ACTEUR PORTE, ou nul.
 //
 // La guilde d'un autre est celle que son apparition déclare ; la mienne, celle
 // du carnet — le serveur ne m'annonce jamais à moi-même. La version se lit au

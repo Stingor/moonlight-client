@@ -315,6 +315,8 @@ enum class GameOption : std::uint8_t {
   // L'emblème de guilde à gauche de l'étiquette : un seul interrupteur, comme
   // le « /emblem » du client.
   kEntityNamesEmblem,
+  // L'emblème de clan, à la même place, chez qui n'a pas de guilde.
+  kEntityNamesClanEmblem,
   kStatusBarShown,
   kStatusBarLocked,
   kStatusBarBorder,

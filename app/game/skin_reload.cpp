@@ -8,6 +8,7 @@
 #include "ro/formats/image.h"
 #include "ro/render/battlefield_art.h"
 #include "ro/render/boss_badge.h"
+#include "ro/render/clan_emblem.h"
 #include "ro/render/signboard.h"
 #include "ro/render/skin_pieces.h"
 
@@ -31,6 +32,9 @@ void ForgetWorldArt(GamePieces& pieces) {
                                                             &pieces.signboards.spotlit_buying};
   for (const ro::formats::Image* image : images) {
     pieces.overlay.ForgetAtlas(*image);
+  }
+  for (const auto& [clan_id, emblem] : pieces.clan_emblems.by_clan) {
+    pieces.overlay.ForgetAtlas(emblem);
   }
 }
 
@@ -78,6 +82,7 @@ void ReloadSkinPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, bool world_loaded) 
   if (world_loaded) {
     ForgetWorldArt(pieces);
     pieces.boss_badges = ro::render::LoadBossBadges(vfs);
+    pieces.clan_emblems = ro::render::LoadClanEmblems(vfs);
     pieces.battlefield_art = ro::render::LoadBattlefieldArt(vfs);
     pieces.signboards = ro::render::LoadSignboardSurfaces(vfs);
   }

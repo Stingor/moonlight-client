@@ -7693,6 +7693,9 @@ tr: Current emblem unreadable (not downloaded yet?): the drawing in progress is 
 fr: Emblème actuel illisible (pas encore téléchargé ?).
 tr: Current emblem unreadable (not downloaded yet?).
 
+fr: Emblème de clan
+tr: Clan emblem
+
 fr: Emblème de guilde
 tr: Guild emblem
 
@@ -9681,6 +9684,9 @@ tr: Water, sky and fog are NOT affected.
 
 fr: L'emblème de la guilde à gauche de l'étiquette, comme « /emblem » dans le client d'origine. Il passe devant l'insigne de boss.\n\nIl ne paraît qu'une fois téléchargé : la première étiquette d'une guilde peut s'écrire sans lui, le temps qu'il arrive.
 tr: The guild's emblem to the left of the label, like "/emblem" in the original client. It takes precedence over the boss badge.\n\nIt only shows once downloaded: a guild's first label may be drawn without it while it arrives.
+
+fr: L'emblème du clan à la même place, chez qui n'a pas de guilde.\n\nUne guilde le remplace toujours, même quand elle n'a pas d'emblème ou que l'emblème de guilde est masqué. « /emblem » ne touche pas cette case.
+tr: The clan's emblem in the same place, for characters without a guild.\n\nA guild always replaces it, even when the guild has no emblem or the guild emblem is hidden. "/emblem" does not change this box.
 
 fr: L'emporte sur la cible : jaune chez le client, même sur un monstre.
 tr: Prevails over the target: yellow in the client, even on a monster.

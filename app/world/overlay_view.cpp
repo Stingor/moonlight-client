@@ -338,8 +338,8 @@ std::vector<ro::render::ScreenQuad> DrawnName(
       feet->y + how.offset_pixels * anchor, static_cast<float>(lines.size()) * font.line_height(),
       bars_under_feet);
 
-  // L'IMAGE DE TÊTE PREND SA PLACE À GAUCHE : l'emblème de guilde, sinon
-  // l'insigne de boss — le client ne dessine l'insigne que sans emblème. Voir
+  // L'IMAGE DE TÊTE PREND SA PLACE À GAUCHE : l'emblème de guilde ou de clan,
+  // sinon l'insigne de boss — le client ne dessine l'insigne que sans emblème. Voir
   // `PlaceNamePlate` : le widget s'élargit pour elle, et toutes les lignes
   // partent du même bord.
   const ro::formats::Image* badge = how.boss_badge ? BossBadgeOf(actor.boss, badges) : nullptr;

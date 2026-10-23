@@ -21,6 +21,7 @@
 #include "ro/render/ailment_sprites.h"
 #include "ro/render/battlefield_art.h"
 #include "ro/render/boss_badge.h"
+#include "ro/render/clan_emblem.h"
 #include "ro/render/cursor.h"
 #include "ro/render/damage_mark.h"
 #include "ro/render/emotion.h"
@@ -731,6 +732,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, ro::core::LoadProgre
       LoadAilmentPieces,
       [](ro::vfs::Vfs& from, GamePieces& into) {
         into.boss_badges = ro::render::LoadBossBadges(from);
+        into.clan_emblems = ro::render::LoadClanEmblems(from);
         into.battlefield_art = ro::render::LoadBattlefieldArt(from);
         into.signboards = ro::render::LoadSignboardSurfaces(from);
       },

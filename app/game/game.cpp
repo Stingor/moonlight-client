@@ -38,6 +38,7 @@
 #include "game/skin_image_of.h"
 #include "game/warp_list_stage.h"
 #include "game/window_events.h"
+#include "guild/sample_emblem.h"
 #include "items/inventory_view.h"
 #include "options/damage_page_names.h"
 #include "options/entity_page_tabs.h"
@@ -489,13 +490,12 @@ void Game::DrawInterface(std::uint32_t now_ms) {
           pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, &styles_,
           EntityPageDrawn(EntityPageTabOf(windows_.options.section_tab)), world_, sprite_scale,
           anchor, now_ms);
-      // L'EMBLÈME DE SA GUILDE, pour le joueur et ceux qui lui ressemblent : le
-      // cadre montre son personnage à lui.
+      // L'EMBLÈME DE SA GUILDE OU DE SON CLAN : le cadre montre son personnage.
       ro::ui::EntitySample& sample = settings_->options().pages().entity_sample;
-      if (guild_emblems_.has_value() && guild_book_.in_guild() && !sample.banner.empty() &&
-          sample.name == world_.player_name()) {
-        sample.emblem = guild_emblems_->Of(guild_book_.belonging()->guild_id);
-      }
+      sample.emblem = SampleEmblem(
+          sample, world_, guild_book_, guild_emblems_.has_value() ? &*guild_emblems_ : nullptr,
+          pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
+          settings_->options().entity_names());
     }
   }
   // LA PAGE « COMMANDS SETTINGS », seulement quand elle est sous les yeux : sa

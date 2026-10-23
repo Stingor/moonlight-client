@@ -90,6 +90,7 @@ add_library(ro_render STATIC
     src/battle_score_hud.cpp
     src/battlefield_art.cpp
     src/camera.cpp
+    src/clan_emblem.cpp
     src/entity_names.cpp
     src/element_glow.cpp
     src/wand_orb.cpp

@@ -72,6 +72,13 @@ void GameOptions::BuildEntityNameShared() {
                 "s'écrire sans lui, le temps qu'il arrive."),
              nullptr, entity_names_.guild_emblem));
   entity_name_shared_rows_.back().disabled = !entity_names_.shown;
+  entity_name_shared_rows_.push_back(
+      Toggle(GameOption::kEntityNamesClanEmblem, Tr("Emblème de clan"),
+             Tr("L'emblème du clan à la même place, chez qui n'a pas de guilde.\n\n"
+                "Une guilde le remplace toujours, même quand elle n'a pas d'emblème ou que "
+                "l'emblème de guilde est masqué. « /emblem » ne touche pas cette case."),
+             nullptr, entity_names_.clan_emblem));
+  entity_name_shared_rows_.back().disabled = !entity_names_.shown;
   // LES ONGLETS. ⚠ REFAITS À CHAQUE IMAGE : ces noms se traduisent, et un nom
   // mis en cache resterait dans la langue d'avant.
   entity_name_tabs_.clear();

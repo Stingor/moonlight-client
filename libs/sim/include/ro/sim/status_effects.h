@@ -47,6 +47,11 @@ inline constexpr StatusEffectId kEfstSuHide = 933;
 // pose, et les bulles au-dessus de la tête. Voir `NoteSleep`.
 inline constexpr StatusEffectId kEfstDeepSleep = 435;
 
+// LE CLAN DE L'ACTEUR (EFST_CLAN_INFO) : un état sans échéance, dont la SECONDE
+// valeur est l'identifiant du clan. Le serveur le pose sur chaque membre, et
+// sur les PNJ qui en portent un.
+inline constexpr StatusEffectId kEfstClanInfo = 696;
+
 // LES ÉTATS QUI COUPENT LA PAROLE : ceux qui portent `NoChat` dans la table
 // des états de CE serveur — `db/pre-re/status.yml`, surchargée par
 // `db/import/status.yml` —, avec le sommeil profond ci-dessus. Le serveur jette

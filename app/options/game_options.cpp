@@ -337,6 +337,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
     case GameOption::kEntityNamesEmblem:
       entity_names_.guild_emblem = asked.on;
       break;
+    case GameOption::kEntityNamesClanEmblem:
+      entity_names_.clan_emblem = asked.on;
+      break;
     case GameOption::kStatusBarShown:
       status_bar_.shown = asked.on;
       break;
