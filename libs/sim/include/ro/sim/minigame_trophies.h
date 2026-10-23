@@ -30,7 +30,7 @@ enum class MinigameTrophy : std::uint8_t {
   kRoggleWon,
   kRoggleFlawless,
   kRoggleThreeCatches,
-  kRoggleScore30000,
+  kRoggleScore20000,
 };
 
 inline constexpr std::size_t kMinigameTrophyCount = 8;

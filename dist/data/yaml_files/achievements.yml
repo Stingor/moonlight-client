@@ -5718,7 +5718,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "Finir une partie"}
   910002:
@@ -5733,7 +5733,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "5 000 points en une partie"}
   910003:
@@ -5748,7 +5748,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "15 000 points en une partie"}
   910004:
@@ -5763,7 +5763,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "Une cascade de quatre"}
   910005:
@@ -5778,7 +5778,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "Gagner une partie"}
   910006:
@@ -5793,7 +5793,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "Cinq billes en réserve"}
   910007:
@@ -5808,7 +5808,7 @@ achievements:
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
         - {text: "Trois billes rattrapées"}
   910008:
@@ -5819,10 +5819,10 @@ achievements:
     dependents: []
     window:
       summary: "Roggle"
-      details: "Atteindre 30 000 points dans une partie de Roggle."
+      details: "Atteindre 20 000 points dans une partie de Roggle."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
-      minor: 0
+      minor: 1
       objectives:
-        - {text: "30 000 points en une partie"}
+        - {text: "20 000 points en une partie"}

@@ -278,8 +278,8 @@ tr: Anuncia a todo el servidor, con tu nombre delante.
 fr: Atteindre 15 000 points dans une partie de Rojeweled.
 tr: Alcanza 15 000 puntos en una partida de Rojeweled.
 
-fr: Atteindre 30 000 points dans une partie de Roggle.
-tr: Alcanza 30 000 puntos en una partida de Roggle.
+fr: Atteindre 20 000 points dans une partie de Roggle.
+tr: Alcanza 20 000 puntos en una partida de Roggle.
 
 fr: Atteindre 5 000 points dans une partie de Rojeweled.
 tr: Alcanza 5000 puntos en una partida de Rojeweled.

@@ -50,8 +50,15 @@ inline constexpr std::size_t kAchievementCategoryCount = 6;
 // LA FORME DE L'ARBRE : combien de sous-onglets chaque onglet range, dans
 // l'ordre des onglets. Un sous-onglet est le numéro de sous-catégorie du
 // catalogue, compté à partir de zéro.
+//
+// ⚠ « EXPLOIT » A DEUX SOUS-ONGLETS À NOUS : l'album de cartes, puis les
+// mini-jeux. Le jeu d'origine n'en range aucun sous cet onglet, et sa table de
+// mots ne les nomme pas.
 inline constexpr std::array<int, kAchievementTabCount> kAchievementSubtabCounts = {0, 0, 3, 6,
-                                                                                   2, 2, 3, 0};
+                                                                                   2, 2, 3, 2};
+// Les sous-onglets d'« Exploit », dans l'ordre de l'arbre.
+inline constexpr int kAchievementFeatCardAlbum = 0;
+inline constexpr int kAchievementFeatMinigames = 1;
 
 // L'onglet d'une catégorie du catalogue — 1 pour la première —, et
 // l'inverse. Hors des catégories, l'onglet rendu n'en est aucun.

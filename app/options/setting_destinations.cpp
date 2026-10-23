@@ -242,6 +242,10 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     AchievementSubtab("achievements_memorial_new_world", TrText("Nouveau Monde"),
                       kAchievementMemorialTab, 1),
     AchievementSubtab("achievements_memorial_other", TrText("Autre"), kAchievementMemorialTab, 2),
+    AchievementSubtab("achievements_feat_card_album", TrText("Album de cartes"),
+                      kAchievementFeatTab, ro::ui::kAchievementFeatCardAlbum),
+    AchievementSubtab("achievements_feat_minigames", TrText("Mini-jeux"), kAchievementFeatTab,
+                      ro::ui::kAchievementFeatMinigames),
 
     // ── LES ONGLETS DE GROUPE / AMIS ──
     WindowTab("party_window_party", TrText("Groupe"), Kind::kPartyFriend, PartyFriendTab::kParty),

@@ -12,7 +12,7 @@ constexpr int kRojeweledHighScore = 15000;
 constexpr int kRojeweledLongCombo = 4;
 constexpr int kRoggleCatches = 3;
 constexpr int kRoggleSpareBalls = 5;
-constexpr int kRoggleHighScore = 30000;
+constexpr int kRoggleHighScore = 20000;
 
 constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
     {MinigameTrophy::kRojeweledFinished, "rojeweled_finished", core::TrText("Jusqu'au bout"),
@@ -31,8 +31,8 @@ constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
      core::TrText("Gagner une partie de Roggle avec cinq billes en réserve.")},
     {MinigameTrophy::kRoggleThreeCatches, "roggle_three_catches", core::TrText("Main sûre"),
      core::TrText("Rattraper trois billes dans le seau en une partie de Roggle.")},
-    {MinigameTrophy::kRoggleScore30000, "roggle_score_30000", core::TrText("Pluie de gemmes"),
-     core::TrText("Atteindre 30 000 points dans une partie de Roggle.")},
+    {MinigameTrophy::kRoggleScore20000, "roggle_score_20000", core::TrText("Pluie de gemmes"),
+     core::TrText("Atteindre 20 000 points dans une partie de Roggle.")},
 }};
 
 // Gagne `trophy` si `earned` ; l'ajoute alors à `fresh`.
@@ -79,7 +79,7 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
   Earn(record, MinigameTrophy::kRoggleFlawless, won && game.balls_left() >= kRoggleSpareBalls,
        fresh);
   Earn(record, MinigameTrophy::kRoggleThreeCatches, game.catches() >= kRoggleCatches, fresh);
-  Earn(record, MinigameTrophy::kRoggleScore30000, game.score() >= kRoggleHighScore, fresh);
+  Earn(record, MinigameTrophy::kRoggleScore20000, game.score() >= kRoggleHighScore, fresh);
   return fresh;
 }
 

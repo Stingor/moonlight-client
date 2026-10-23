@@ -44,6 +44,9 @@ constexpr std::string_view kRadioOff = "radiobtn_off.bmp";
 // libellé est à nous, et il ne consomme aucun mot.
 constexpr AchievementWord kFirstTabWord = AchievementWord::kTabSummary;
 constexpr const auto& kSubtabCounts = ro::ui::kAchievementSubtabCounts;
+// L'onglet « Exploit », la dernière catégorie.
+constexpr std::size_t kFeatTab = ro::ui::kAchievementTabCount - 1;
+static_assert(kSubtabCounts[kFeatTab] == 2);
 
 // Une réclamation sans réponse au bout de ce temps se tient pour close.
 constexpr std::uint32_t kClaimSilenceMs = 10000;
@@ -494,8 +497,14 @@ void AchievementStage::ComposeWords() {
                           ? std::string_view(ro::core::Tr("Tous"))
                           : Word(static_cast<AchievementWord>(rank++));
     subtab_words_[tab].clear();
-    for (int sub = 0; sub < kSubtabCounts[tab]; ++sub) {
-      subtab_words_[tab].push_back(Word(static_cast<AchievementWord>(rank++)));
+    if (tab == kFeatTab) {
+      // ⚠ À NOUS, comme « Tous » : la table du jeu ne nomme aucun sous-onglet
+      // d'« Exploit », et ceux-ci ne consomment aucun mot.
+      subtab_words_[tab] = {ro::core::Tr("Album de cartes"), ro::core::Tr("Mini-jeux")};
+    } else {
+      for (int sub = 0; sub < kSubtabCounts[tab]; ++sub) {
+        subtab_words_[tab].push_back(Word(static_cast<AchievementWord>(rank++)));
+      }
     }
     words.subtabs[tab] = subtab_words_[tab];
   }
