@@ -31,6 +31,9 @@ add_library(ro_sim STATIC
     src/mailbox.cpp
     src/monster_sheet.cpp
     src/mvp_tracker.cpp
+    src/match3_game.cpp
+    src/minigame_trophies.cpp
+    src/peg_game.cpp
     src/quest_log.cpp
     src/motion_events.cpp
     src/movement.cpp

@@ -70,6 +70,7 @@
 #include "game/mail_stage.h"
 #include "game/memorial_stage.h"
 #include "game/mercenary_stage.h"
+#include "game/minigame_stage.h"
 #include "game/over_world_layer.h"
 #include "game/pet_stage.h"
 #include "game/repair_stage.h"
@@ -545,6 +546,8 @@ struct GamePieces {
   PartyBookingBoard party_booking;
   // LE LECTEUR DE MUSIQUE : voir `MusicPlayerStage`.
   MusicPlayerStage music_player;
+  // LES MINI-JEUX : voir `MinigameStage`.
+  MinigameStage minigames;
   // CE QUE CE CLIENT SAIT MONTRER, annoncé au serveur : voir `SurfaceAnnouncer`.
   SurfaceAnnouncer surfaces;
   // L'HABIT DU GM DE L'ADMINISTRATEUR, dit au serveur : voir `GmOutfitAnnouncer`.

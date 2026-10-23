@@ -44,6 +44,8 @@ enum class GameMenuChoice : std::uint8_t {
   // LE LECTEUR DE MUSIQUE. ⚠ UN AJOUT DE CE CLIENT : voir
   // `music_player_window.h`.
   kMusicPlayer,
+  // LA SALLE DES MINI-JEUX. ⚠ UN AJOUT DE CE CLIENT : voir `minigames_window.h`.
+  kMinigames,
   // L'établi du staff. ⚠ Ce bouton n'apparaît que pour qui y a droit : voir
   // `staff_tools.h`, qui dit d'où vient ce droit et pourquoi il ne se mémorise
   // pas.

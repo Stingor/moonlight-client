@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -74,5 +75,11 @@ struct InterfaceSoundFile {
                                                         const std::filesystem::path& client_root,
                                                         const InterfaceSoundFile& file,
                                                         std::string* held_name = nullptr);
+
+// JOUE UNE SUITE DE SONS, et dit chaque échec au journal — « son <from> :
+// <cause> ». Sans archives, rien ne se joue.
+void PlayInterfaceSounds(ro::audio::AudioEngine& audio, ro::vfs::Vfs* vfs,
+                         const std::filesystem::path& client_root,
+                         std::span<const InterfaceSoundFile> files, std::string_view from);
 
 }  // namespace moonclient

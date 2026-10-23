@@ -510,6 +510,7 @@ UiStage::Answers UiStage::Draw(
     windows.music_player.answer = ro::ui::DrawMusicPlayerWindow(windows.music_player.window,
                                                                 windows.music_player.view, skin_);
   }
+  DrawMinigameWindows(windows.minigames, skin_, escape_);
 
   // L'APERÇU AU SURVOL, APRÈS LES TROIS FENÊTRES D'OBJETS.
   //

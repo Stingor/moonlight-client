@@ -89,6 +89,9 @@ tr: Como máximo %d reglas por perfil.
 fr: %d s
 tr: %d s
 
+fr: %d sur %d
+tr: %d de %d
+
 fr: %d zones — 1 sous le curseur
 tr: %d zonas — 1 bajo el cursor
 
@@ -254,6 +257,9 @@ tr: Imanta o libera las ventanas.
 fr: Aimanter les fenêtres entre elles
 tr: Imantar las ventanas entre sí
 
+fr: Alignez trois monstres de la même couleur, en trente coups.
+tr: Alinea tres monstruos del mismo color, en treinta movimientos.
+
 fr: Allège ou rétablit les effets.
 tr: Aligera o restablece los efectos.
 
@@ -268,6 +274,18 @@ tr: Anuncia a todo el servidor, sin tu nombre.
 
 fr: Annonce à tout le serveur, ton nom en tête.
 tr: Anuncia a todo el servidor, con tu nombre delante.
+
+fr: Atteindre 15 000 points dans une partie de Rojeweled.
+tr: Alcanza 15 000 puntos en una partida de Rojeweled.
+
+fr: Atteindre 30 000 points dans une partie de Roggle.
+tr: Alcanza 30 000 puntos en una partida de Roggle.
+
+fr: Atteindre 5 000 points dans une partie de Rojeweled.
+tr: Alcanza 5000 puntos en una partida de Rojeweled.
+
+fr: Aucune partie finie
+tr: Ninguna partida terminada
 
 fr: Autorise de nouveau ses chuchotements.
 tr: Vuelve a permitir sus susurros.
@@ -290,11 +308,17 @@ tr: Nv. base %d
 fr: Basic Info : replier ou déplier
 tr: Basic Info: plegar o desplegar
 
+fr: Billes : %d
+tr: Bolas: %d
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 
 fr: Bloque les chuchotements de tout le monde.
 tr: Bloquea los susurros de todo el mundo.
+
+fr: Cascade ×%d
+tr: Cascada ×%d
 
 fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
 tr: Se aplica a todo el letrero, marco y título. El cliente los pinta opacos; más transparentes, una calle de mercaderes tapa menos el mapa.
@@ -313,6 +337,9 @@ tr: Susurra a un jugador; sola, cuenta los jugadores conectados.
 
 fr: Ciel
 tr: Cielo
+
+fr: Cliquez deux monstres voisins pour les échanger.
+tr: Haz clic en dos monstruos vecinos para intercambiarlos.
 
 fr: Colle la caméra au personnage, ou la laisse rattraper.
 tr: Pega la cámara al personaje, o la deja alcanzarlo.
@@ -341,6 +368,9 @@ tr: Desactiva o restablece los efectos del cielo.
 fr: Coupe ou rétablit les effets.
 tr: Desactiva o restablece los efectos.
 
+fr: Coups : %d
+tr: Movimientos: %d
+
 fr: Crée un groupe.
 tr: Crea un grupo.
 
@@ -368,11 +398,23 @@ tr: Disuelve tu guild.
 fr: Dit ta position.
 tr: Dice tu posición.
 
+fr: Dompteur de Porings
+tr: Domador de Porings
+
 fr: Décalage d'azimut (°)
 tr: Desfase de acimut (°)
 
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Desmarcada, es el recorrido sacado de la luz del mapa.
+
+fr: Effacer tous les plots orange dans Roggle.
+tr: Elimina todas las clavijas naranjas en Roggle.
+
+fr: Effacez tous les plots orange avant d'épuiser vos billes.
+tr: Elimina todas las clavijas naranjas antes de quedarte sin bolas.
+
+fr: Enchaîner une cascade de quatre dans Rojeweled.
+tr: Encadena una cascada de cuatro en Rojeweled.
 
 fr: Enregistre le journal de conversation.
 tr: Guarda el registro del chat.
@@ -389,6 +431,9 @@ tr: Hacer correr el tiempo
 fr: Filet des échoppes
 tr: Contorno de las tiendas
 
+fr: Finir une partie de Rojeweled.
+tr: Termina una partida de Rojeweled.
+
 fr: Fond de l'échoppe recherchée
 tr: Fondo de la tienda buscada
 
@@ -400,6 +445,12 @@ tr: Fuerza el objetivo sin mantener Mayús.
 
 fr: Forcer l'heure du ciel
 tr: Forzar la hora del cielo
+
+fr: Gagner une partie de Roggle avec cinq billes en réserve.
+tr: Gana una partida de Roggle con cinco bolas de reserva.
+
+fr: Gagné !
+tr: ¡Has ganado!
 
 fr: Gras
 tr: Negrita
@@ -1133,6 +1184,9 @@ tr: Muestra este emoticono.
 fr: Joue l'émoticône de ce numéro.
 tr: Muestra el emoticono de este número.
 
+fr: Jusqu'au bout
+tr: Hasta el final
+
 fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
 tr: La hora que es en el servidor, la que sigue el ciclo día/noche — y no la de tu ordenador.
 
@@ -1166,11 +1220,23 @@ tr: Nv%2d / %s / Nv%2d / Exp%.1f%%
 fr: Lv.%2d / %s / Lv.%2d / Exp. %.1f %%
 tr: Nv.%2d / %s / Nv.%2d / Exp. %.1f %%
 
+fr: Main sûre
+tr: Mano firme
+
 fr: Masque ou montre la parole dans la conversation.
 tr: Oculta o muestra lo que se dice en el chat.
 
 fr: Masque ou montre la parole, celle de la guilde comprise.
 tr: Oculta o muestra lo que se dice, incluida la guild.
+
+fr: Meilleur :
+tr: Mejor:
+
+fr: Meilleur score : %d
+tr: Mejor puntuación: %d
+
+fr: Mini-jeux
+tr: Minijuegos
 
 fr: Monte cette caractéristique de ce nombre de points.
 tr: Sube esta característica tantos puntos.
@@ -1208,11 +1274,17 @@ tr: Mostrar la ventana Basic Info del juego
 fr: Mémorise ce point de warp.
 tr: Memoriza este punto de warp.
 
+fr: Nouvelle partie
+tr: Nueva partida
+
 fr: Ombres en temps réel
 tr: Sombras en tiempo real
 
 fr: Opacité, couleurs et police reviennent à ceux du jeu. Ce qui se montre ne change pas.
 tr: La opacidad, los colores y la fuente vuelven a los del juego. Lo que se muestra no cambia.
+
+fr: Orange : %d
+tr: Naranja: %d
 
 fr: Ouvre l'atlas des recettes.
 tr: Abre el atlas de recetas.
@@ -1244,8 +1316,17 @@ tr: Habla a tu clan.
 fr: Parle à ton équipe de champ de bataille.
 tr: Habla a tu equipo de campo de batalla.
 
+fr: Partie finie !
+tr: ¡Fin de la partida!
+
+fr: Perdu…
+tr: Has perdido…
+
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Coloca el sol, o la luna, a la hora elegida: la luz del suelo y del decorado la sigue, y también las sombras cuando «Sombras en tiempo real» está marcada en Graphics.
+
+fr: Pluie de gemmes
+tr: Lluvia de gemas
 
 fr: Poids %d%%
 tr: Peso %d%%
@@ -1268,6 +1349,9 @@ tr: Sale de la sala de chat.
 fr: Quitte ton groupe.
 tr: Sale de tu grupo.
 
+fr: Rattraper trois billes dans le seau en une partie de Roggle.
+tr: Atrapa tres bolas en el cubo en una partida de Roggle.
+
 fr: Refuse les invitations de groupe.
 tr: Rechaza las invitaciones de grupo.
 
@@ -1280,6 +1364,12 @@ tr: Restaurar el aspecto del cliente
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: No se guarda nada: cada inicio devuelve el cielo del mapa.
 
+fr: Roggle
+tr: Roggle
+
+fr: Rojeweled
+tr: Rojeweled
+
 fr: Règle l'échelle de l'interface ; seule, la dit.
 tr: Ajusta la escala de la interfaz; sola, la dice.
 
@@ -1291,6 +1381,9 @@ tr: Ajusta el volumen de la música; sola, lo dice.
 
 fr: Règle le volume des bruits ; seule, le dit.
 tr: Ajusta el volumen de los sonidos; sola, lo dice.
+
+fr: Réaction en chaîne
+tr: Reacción en cadena
 
 fr: Régler la course des astres
 tr: Ajustar el recorrido de los astros
@@ -1307,6 +1400,12 @@ tr: SP %d / %d
 fr: SP. %d / %d
 tr: SP. %d / %d
 
+fr: Sans bavure
+tr: Sin fallos
+
+fr: Score : %d
+tr: Puntuación: %d
+
 fr: Serveur %.*s
 tr: Servidor %.*s
 
@@ -1322,11 +1421,23 @@ tr: Tinte del marco de las salas
 fr: Temps réel (1 min / min)
 tr: Tiempo real (1 min / min)
 
+fr: Tir groupé
+tr: En el blanco
+
+fr: Trophée gagné : %s
+tr: Trofeo conseguido: %s
+
+fr: Trophées
+tr: Trofeos
+
 fr: Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre.
 tr: Una ventana que arrastras se pega al borde de otra ventana o de la pantalla, y luego se alinea con ella. Mantener Alt mientras arrastras la deja libre.
 
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.
+
+fr: Visez à la souris, cliquez pour tirer.
+tr: Apunta con el ratón y haz clic para disparar.
 
 fr: Vitesse du temps
 tr: Velocidad del tiempo
@@ -3402,6 +3513,9 @@ tr: un miembro del equipo desconectó esta cuenta
 fr: Le soleil se lève et se couche aux heures que règle la course des astres ; la lune prend la nuit, plus faible et bleutée.
 tr: El sol sale y se pone a las horas que fija el recorrido de los astros; la luna toma la noche, más tenue y azulada.
 
+fr: « Nouvelle partie » pour rejouer.
+tr: «Nueva partida» para volver a jugar.
+
 fr: Échec du GIF
 tr: Error al crear el GIF
 
@@ -4619,6 +4733,9 @@ tr: Sigues a %s.
 
 fr: ce site
 tr: este sitio
+
+fr: Éleveur de Porings
+tr: Criador de Porings
 
 fr: Étape franchie
 tr: Etapa superada

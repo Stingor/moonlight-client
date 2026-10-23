@@ -25,7 +25,6 @@
 #include "ro/ui/card_insert_window.h"
 #include "ro/ui/cart_choice_window.h"
 #include "ro/ui/cart_window.h"
-#include "ro/ui/cash_shop_window.h"
 #include "ro/ui/cast_bars.h"
 #include "ro/ui/character_create_window.h"
 #include "ro/ui/character_delete_window.h"
@@ -90,11 +89,13 @@
 #include "chat/chat_tab_view.h"
 #include "game/achievement_stage.h"
 #include "game/battleground_stage.h"
+#include "game/cash_shop_windows.h"
 #include "game/chat_room_stage.h"
 #include "game/database_windows.h"
 #include "game/hud_rounds.h"
 #include "game/mail_stage.h"
 #include "game/memorial_stage.h"
+#include "game/minigame_stage.h"
 #include "game/navigation_windows.h"
 #include "game/over_world_paint.h"
 #include "game/party_windows.h"
@@ -371,14 +372,7 @@ class UiStage {
     // LA NAVIGATION ET LA CARTE DU MONDE : voir `NavigationWindows`.
     using Navigation = NavigationWindows;
     Navigation navigation;
-    // LA BOUTIQUE DE VOTE, même aller-retour. Vue nulle, rien ne se dessine :
-    // c'est le serveur qui ouvre.
-    struct CashShop {
-      ro::ui::CashShopWindowState state;
-      const ro::ui::CashShopView* view = nullptr;
-      ro::ui::CashShopWindowAction answer;
-    };
-    CashShop cash_shop;
+    CashShopWindows cash_shop;  // La boutique de vote : `game/cash_shop_windows.h`.
     // LES COMMERCES — boutiques de PNJ, échoppes, troc —, groupés à part : voir
     // `game/trade_windows.h` et `ui_stage_trade.cpp`.
     TradeWindows trade;
@@ -397,6 +391,7 @@ class UiStage {
     PartyBookingWindows party_booking;  // Voir `ui_stage_party_booking.cpp`.
     PartyWindows party;                 // Groupe, amis et grille : `game/party_windows.h`.
     MusicPlayerWindows music_player;    // Le lecteur : `world/music_player_stage.h`.
+    MinigameWindows minigames;          // Les mini-jeux : `game/minigame_stage.h`.
     // Les éléments déverrouillés à l'écran, déjà traduits : l'avis de pose
     // (`game/hud_lock.h`) paraît tant qu'il y en a un, et les nomme.
     std::vector<const char*> unlocked_hud;

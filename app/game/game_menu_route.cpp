@@ -87,6 +87,7 @@ void Game::ApplyMenuGesture(ro::ui::GameMenuChoice chosen, std::uint32_t now_ms)
     case ro::ui::GameMenuChoice::kChatMacros:
     case ro::ui::GameMenuChoice::kStyleEditor:
     case ro::ui::GameMenuChoice::kMusicPlayer:
+    case ro::ui::GameMenuChoice::kMinigames:
     case ro::ui::GameMenuChoice::kStaffTools:
     case ro::ui::GameMenuChoice::kQuit:
       // Les autres ne parlent à personne : les réglages les ont déjà joués.

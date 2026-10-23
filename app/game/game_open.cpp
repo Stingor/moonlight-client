@@ -470,7 +470,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                         pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
                         pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
   pieces_.cash_shop.StartSession();
-  windows_.cash_shop = UiStage::Windows::CashShop{};
+  windows_.cash_shop = CashShopWindows{};
   // LES COMMERCES AUSSI : aucune boutique, aucune échoppe ne survit à la partie.
   pieces_.trade.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
                     pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,

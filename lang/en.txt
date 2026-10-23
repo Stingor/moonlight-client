@@ -89,6 +89,9 @@ tr: At most %d rules per profile.
 fr: %d s
 tr: %d s
 
+fr: %d sur %d
+tr: %d of %d
+
 fr: %d zones — 1 sous le curseur
 tr: %d zones — 1 under the cursor
 
@@ -254,6 +257,9 @@ tr: Snaps windows together, or frees them.
 fr: Aimanter les fenêtres entre elles
 tr: Snap windows to each other
 
+fr: Alignez trois monstres de la même couleur, en trente coups.
+tr: Line up three monsters of the same colour, in thirty moves.
+
 fr: Allège ou rétablit les effets.
 tr: Lightens or restores the effects.
 
@@ -268,6 +274,18 @@ tr: Announces to the whole server, without your name.
 
 fr: Annonce à tout le serveur, ton nom en tête.
 tr: Announces to the whole server, your name first.
+
+fr: Atteindre 15 000 points dans une partie de Rojeweled.
+tr: Reach 15,000 points in a game of Rojeweled.
+
+fr: Atteindre 30 000 points dans une partie de Roggle.
+tr: Reach 30,000 points in a game of Roggle.
+
+fr: Atteindre 5 000 points dans une partie de Rojeweled.
+tr: Reach 5,000 points in a game of Rojeweled.
+
+fr: Aucune partie finie
+tr: No finished game
 
 fr: Autorise de nouveau ses chuchotements.
 tr: Allows their whispers again.
@@ -290,11 +308,17 @@ tr: Base Lv. %d
 fr: Basic Info : replier ou déplier
 tr: Basic Info: collapse or expand
 
+fr: Billes : %d
+tr: Balls: %d
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Blocks this player's whispers; alone, lists the blocked ones.
 
 fr: Bloque les chuchotements de tout le monde.
 tr: Blocks everyone's whispers.
+
+fr: Cascade ×%d
+tr: Cascade ×%d
 
 fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
 tr: Applies to the whole signboard, frame and title. The client paints them solid; more transparent, a street of merchants hides less of the map.
@@ -313,6 +337,9 @@ tr: Whispers to a player; alone, counts the players online.
 
 fr: Ciel
 tr: Sky
+
+fr: Cliquez deux monstres voisins pour les échanger.
+tr: Click two neighbouring monsters to swap them.
 
 fr: Colle la caméra au personnage, ou la laisse rattraper.
 tr: Sticks the camera to the character, or lets it catch up.
@@ -341,6 +368,9 @@ tr: Turns the sky effects off or back on.
 fr: Coupe ou rétablit les effets.
 tr: Turns the effects off or back on.
 
+fr: Coups : %d
+tr: Moves: %d
+
 fr: Crée un groupe.
 tr: Creates a party.
 
@@ -368,11 +398,23 @@ tr: Disbands your guild.
 fr: Dit ta position.
 tr: Tells your position.
 
+fr: Dompteur de Porings
+tr: Poring Tamer
+
 fr: Décalage d'azimut (°)
 tr: Azimuth offset (°)
 
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Unchecked, it is the course drawn from the map's light.
+
+fr: Effacer tous les plots orange dans Roggle.
+tr: Clear every orange peg in Roggle.
+
+fr: Effacez tous les plots orange avant d'épuiser vos billes.
+tr: Clear every orange peg before you run out of balls.
+
+fr: Enchaîner une cascade de quatre dans Rojeweled.
+tr: Chain a cascade of four in Rojeweled.
 
 fr: Enregistre le journal de conversation.
 tr: Saves the chat log.
@@ -389,6 +431,9 @@ tr: Let time run
 fr: Filet des échoppes
 tr: Shop outline
 
+fr: Finir une partie de Rojeweled.
+tr: Finish a game of Rojeweled.
+
 fr: Fond de l'échoppe recherchée
 tr: Searched shop background
 
@@ -400,6 +445,12 @@ tr: Forces the target without holding Shift.
 
 fr: Forcer l'heure du ciel
 tr: Force the sky's hour
+
+fr: Gagner une partie de Roggle avec cinq billes en réserve.
+tr: Win a game of Roggle with five balls to spare.
+
+fr: Gagné !
+tr: You win!
 
 fr: Gras
 tr: Bold
@@ -1133,6 +1184,9 @@ tr: Plays this emoticon.
 fr: Joue l'émoticône de ce numéro.
 tr: Plays the emoticon with this number.
 
+fr: Jusqu'au bout
+tr: All the Way
+
 fr: L'heure qu'il fait sur le serveur, celle que suit le cycle jour/nuit — et non celle de votre ordinateur.
 tr: The time of day on the server, the one the day/night cycle follows — not your computer's.
 
@@ -1166,11 +1220,23 @@ tr: Lv%2d / %s / Lv%2d / Exp%.1f%%
 fr: Lv.%2d / %s / Lv.%2d / Exp. %.1f %%
 tr: Lv.%2d / %s / Lv.%2d / Exp. %.1f %%
 
+fr: Main sûre
+tr: Steady Hand
+
 fr: Masque ou montre la parole dans la conversation.
 tr: Hides or shows speech in the chat.
 
 fr: Masque ou montre la parole, celle de la guilde comprise.
 tr: Hides or shows speech, guild speech included.
+
+fr: Meilleur :
+tr: Best:
+
+fr: Meilleur score : %d
+tr: Best score: %d
+
+fr: Mini-jeux
+tr: Mini-games
 
 fr: Monte cette caractéristique de ce nombre de points.
 tr: Raises this stat by this many points.
@@ -1208,11 +1274,17 @@ tr: Show the game's Basic Info window
 fr: Mémorise ce point de warp.
 tr: Memorizes this warp point.
 
+fr: Nouvelle partie
+tr: New game
+
 fr: Ombres en temps réel
 tr: Real-time shadows
 
 fr: Opacité, couleurs et police reviennent à ceux du jeu. Ce qui se montre ne change pas.
 tr: Opacity, colors and font return to the game's. What is shown does not change.
+
+fr: Orange : %d
+tr: Orange: %d
 
 fr: Ouvre l'atlas des recettes.
 tr: Opens the recipe atlas.
@@ -1244,8 +1316,17 @@ tr: Speaks to your clan.
 fr: Parle à ton équipe de champ de bataille.
 tr: Speaks to your battlefield team.
 
+fr: Partie finie !
+tr: Game over!
+
+fr: Perdu…
+tr: You lose…
+
 fr: Place le soleil, ou la lune, à l'heure choisie : la lumière du sol et du décor suit, et les ombres aussi quand « Ombres en temps réel » est cochée dans Graphics.
 tr: Places the sun, or the moon, at the chosen hour: the light on the ground and scenery follows, and so do the shadows when “Real-time shadows” is checked in Graphics.
+
+fr: Pluie de gemmes
+tr: Gem Shower
 
 fr: Poids %d%%
 tr: Weight %d%%
@@ -1268,6 +1349,9 @@ tr: Leaves the chat room.
 fr: Quitte ton groupe.
 tr: Leaves your party.
 
+fr: Rattraper trois billes dans le seau en une partie de Roggle.
+tr: Catch three balls in the bucket in one game of Roggle.
+
 fr: Refuse les invitations de groupe.
 tr: Refuses party invitations.
 
@@ -1280,6 +1364,12 @@ tr: Restore the client's look
 fr: Rien n'est retenu : chaque lancement rend le ciel de la carte.
 tr: Nothing is saved: every launch brings back the map's own sky.
 
+fr: Roggle
+tr: Roggle
+
+fr: Rojeweled
+tr: Rojeweled
+
 fr: Règle l'échelle de l'interface ; seule, la dit.
 tr: Sets the interface scale; alone, tells it.
 
@@ -1291,6 +1381,9 @@ tr: Sets the music volume; alone, tells it.
 
 fr: Règle le volume des bruits ; seule, le dit.
 tr: Sets the sound volume; alone, tells it.
+
+fr: Réaction en chaîne
+tr: Chain Reaction
 
 fr: Régler la course des astres
 tr: Adjust the course of the sky
@@ -1307,6 +1400,12 @@ tr: SP %d / %d
 fr: SP. %d / %d
 tr: SP. %d / %d
 
+fr: Sans bavure
+tr: Clean Sweep
+
+fr: Score : %d
+tr: Score: %d
+
 fr: Serveur %.*s
 tr: Server %.*s
 
@@ -1322,11 +1421,23 @@ tr: Chat room frame tint
 fr: Temps réel (1 min / min)
 tr: Real time (1 min / min)
 
+fr: Tir groupé
+tr: Bullseye
+
+fr: Trophée gagné : %s
+tr: Trophy earned: %s
+
+fr: Trophées
+tr: Trophies
+
 fr: Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre.
 tr: A window you drag sticks to the edge of another window or of the screen, then lines up with it. Holding Alt while dragging leaves it free.
 
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
+
+fr: Visez à la souris, cliquez pour tirer.
+tr: Aim with the mouse, click to shoot.
 
 fr: Vitesse du temps
 tr: Speed of time
@@ -3402,6 +3513,9 @@ tr: a staff member disconnected this account
 fr: Le soleil se lève et se couche aux heures que règle la course des astres ; la lune prend la nuit, plus faible et bleutée.
 tr: The sun rises and sets at the hours the celestial course sets; the moon takes the night, dimmer and bluish.
 
+fr: « Nouvelle partie » pour rejouer.
+tr: “New game” to play again.
+
 fr: Échec du GIF
 tr: GIF failed
 
@@ -4619,6 +4733,9 @@ tr: You are following %s.
 
 fr: ce site
 tr: this site
+
+fr: Éleveur de Porings
+tr: Poring Breeder
 
 fr: Étape franchie
 tr: Step cleared

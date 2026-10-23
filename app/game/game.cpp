@@ -113,19 +113,15 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // LES SONS D'INTERFACE de l'image : ceux du champ de bataille, puis l'arrivée
   // d'un membre au salon.
   const auto play_sounds = [this](std::vector<InterfaceSoundFile> sounds, std::string_view from) {
-    for (const InterfaceSoundFile& sound : sounds) {
-      if (vfs_ == nullptr) {
-        return;
-      }
-      if (const ro::core::Result<void> played =
-              PlayInterfaceSound(audio_, *vfs_, client_root_, sound);
-          !played) {
-        ro::core::LogWarning("son {} : {}", from, ro::core::Describe(played.error()));
-      }
-    }
+    PlayInterfaceSounds(audio_, vfs_, client_root_, sounds, from);
   };
   play_sounds(pieces_.battleground.TakeSounds(), "du champ de bataille");
   play_sounds(pieces_.chat_rooms.TakeSounds(), "du salon");
+  // LES MINI-JEUX, et leurs sons d'interface.
+  pieces_.minigames.Advance(windows_.minigames,
+                            MinigamePieces::Of(pieces_.wardrobe, pieces_.item_icons), client_root_,
+                            now_ms);
+  play_sounds(pieces_.minigames.TakeSounds(), "d'un mini-jeu");
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
   // Le tableau montre le dernier classement, et demande celui d'un onglet.

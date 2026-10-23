@@ -195,6 +195,10 @@ add_library(ro_ui STATIC
     src/damage_meter_group.cpp
     src/game_menu.cpp
     src/music_player_window.cpp
+    src/minigame_trophy_text.cpp
+    src/minigames_window.cpp
+    src/roggle_window.cpp
+    src/rojeweled_window.cpp
     src/menu_icons.cpp
     src/map_sign_banner.cpp
     src/skin_popup.cpp

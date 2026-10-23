@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/log.h"
 #include "ro/render/skill_sound_table.h"
 
 #include "game/save_folder.h"
@@ -156,6 +157,20 @@ ro::core::Result<void> PlayInterfaceSound(ro::audio::AudioEngine& audio, ro::vfs
     *held_name_out = held_name;
   }
   return {};
+}
+
+void PlayInterfaceSounds(ro::audio::AudioEngine& audio, ro::vfs::Vfs* vfs,
+                         const std::filesystem::path& client_root,
+                         std::span<const InterfaceSoundFile> files, std::string_view from) {
+  if (vfs == nullptr) {
+    return;
+  }
+  for (const InterfaceSoundFile& file : files) {
+    if (const ro::core::Result<void> played = PlayInterfaceSound(audio, *vfs, client_root, file);
+        !played) {
+      ro::core::LogWarning("son {} : {}", from, ro::core::Describe(played.error()));
+    }
+  }
 }
 
 }  // namespace moonclient
