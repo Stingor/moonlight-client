@@ -69,4 +69,8 @@ struct MinigameRecord {
                                                           const Match3Game& game);
 [[nodiscard]] std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& game);
 
+// DEUX ENREGISTREMENTS EN UN : le meilleur de chaque score, chaque trophée
+// gagné de l'un ou de l'autre, chaque clé étrangère une seule fois.
+void MergeMinigameRecord(MinigameRecord& into, const MinigameRecord& from);
+
 }  // namespace ro::sim

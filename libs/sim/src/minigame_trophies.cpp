@@ -1,5 +1,7 @@
 #include "ro/sim/minigame_trophies.h"
 
+#include <algorithm>
+
 #include "ro/sim/match3_game.h"
 #include "ro/sim/peg_game.h"
 
@@ -81,6 +83,19 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
   Earn(record, MinigameTrophy::kRoggleThreeCatches, game.catches() >= kRoggleCatches, fresh);
   Earn(record, MinigameTrophy::kRoggleScore20000, game.score() >= kRoggleHighScore, fresh);
   return fresh;
+}
+
+void MergeMinigameRecord(MinigameRecord& into, const MinigameRecord& from) {
+  into.rojeweled_best = std::max(into.rojeweled_best, from.rojeweled_best);
+  into.roggle_best = std::max(into.roggle_best, from.roggle_best);
+  for (std::size_t trophy = 0; trophy < kMinigameTrophyCount; ++trophy) {
+    into.unlocked[trophy] = into.unlocked[trophy] || from.unlocked[trophy];
+  }
+  for (const std::string& key : from.foreign_trophy_keys) {
+    if (std::ranges::find(into.foreign_trophy_keys, key) == into.foreign_trophy_keys.end()) {
+      into.foreign_trophy_keys.push_back(key);
+    }
+  }
 }
 
 }  // namespace ro::sim

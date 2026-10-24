@@ -4,7 +4,6 @@
 #include <random>
 #include <utility>
 
-#include "game/minigame_file.h"
 #include "game/skin_image_of.h"
 
 namespace moonclient {
@@ -108,15 +107,15 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
   const ro::sim::MinigameRecord before = Record(client_root);
   if (windows.rojeweled.open) {
     PlayRojeweled();
-    const std::vector<ro::sim::MinigameTrophy> fresh = RecordRojeweled(*record_, rojeweled_);
+    const std::vector<ro::sim::MinigameTrophy> fresh = RecordRojeweled(record_->record, rojeweled_);
     toasts_.insert(toasts_.end(), fresh.begin(), fresh.end());
   }
   if (windows.roggle.open) {
     PlayRoggle(roggle_step_ms);
-    const std::vector<ro::sim::MinigameTrophy> fresh = RecordRoggle(*record_, roggle_);
+    const std::vector<ro::sim::MinigameTrophy> fresh = RecordRoggle(record_->record, roggle_);
     toasts_.insert(toasts_.end(), fresh.begin(), fresh.end());
   }
-  if (*record_ != before) {
+  if (record_->record != before) {
     Save(client_root);
   }
   ComposeHub(windows);
@@ -197,7 +196,7 @@ ro::sim::MinigameRecord& MinigameStage::Record(const std::filesystem::path& clie
   if (!record_.has_value()) {
     record_ = LoadMinigameRecord(client_root);
   }
-  return *record_;
+  return record_->record;
 }
 
 void MinigameStage::Announce(ro::net::Connection& link, bool verified, std::uint32_t map_entries,
@@ -253,11 +252,12 @@ ro::ui::SkinImage MinigameStage::SpriteOf(std::size_t slot, std::uint32_t sprite
 void MinigameStage::ComposeHub(MinigameWindows& windows) {
   trophy_rows_.clear();
   for (const ro::sim::MinigameTrophyText& text : ro::sim::MinigameTrophies()) {
-    trophy_rows_.push_back(ro::ui::MinigameTrophyRow{
-        .name = text.name, .description = text.description, .unlocked = record_->Has(text.trophy)});
+    trophy_rows_.push_back(ro::ui::MinigameTrophyRow{.name = text.name,
+                                                     .description = text.description,
+                                                     .unlocked = record_->record.Has(text.trophy)});
   }
-  windows.hub_view = ro::ui::MinigamesView{.rojeweled_best = record_->rojeweled_best,
-                                           .roggle_best = record_->roggle_best,
+  windows.hub_view = ro::ui::MinigamesView{.rojeweled_best = record_->record.rojeweled_best,
+                                           .roggle_best = record_->record.roggle_best,
                                            .trophies = trophy_rows_};
 }
 
@@ -298,7 +298,7 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
   view.score = rojeweled_.score();
   view.moves_left = rojeweled_.moves_left();
   view.combo = rojeweled_.combo();
-  view.best_score = record_->rojeweled_best;
+  view.best_score = record_->record.rojeweled_best;
   view.over = rojeweled_.phase() == ro::sim::Match3Phase::kOver;
   for (std::size_t kind = 0; kind < kGemClasses.size(); ++kind) {
     view.art[kind] = SpriteOf(kind, kGemClasses[kind], kGemBoxPx, pieces.wardrobe, now_ms);
@@ -341,7 +341,7 @@ void MinigameStage::ComposeRoggle(MinigameWindows& windows, const MinigamePieces
   view.score = roggle_.score();
   view.orange_left = roggle_.orange_left();
   view.multiplier = roggle_.multiplier();
-  view.best_score = record_->roggle_best;
+  view.best_score = record_->record.roggle_best;
   view.orange_art = ItemIconImage(pieces.item_icons, kOrangePegItem);
   view.blue_art = ItemIconImage(pieces.item_icons, kBluePegItem);
   view.ball_art = SpriteOf(kBallSlot, kBallClass, kBallBoxPx, pieces.wardrobe, now_ms);

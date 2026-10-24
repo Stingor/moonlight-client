@@ -47,8 +47,11 @@ ro::core::Result<ro::sim::MinigameRecord> ReadMinigameRecord(std::string_view te
   ro::sim::MinigameRecord record;
   try {
     const YAML::Node whole = YAML::Load(std::string(text));
-    if (!whole.IsMap()) {
+    if (whole.IsNull()) {
       return record;
+    }
+    if (!whole.IsMap()) {
+      return ro::core::Fail(ro::core::ErrorCode::kCorruptData, "la racine n'est pas une table");
     }
     record.rojeweled_best = BestIn(whole, kRojeweledBestField);
     record.roggle_best = BestIn(whole, kRoggleBestField);
@@ -94,27 +97,38 @@ std::string WriteMinigameRecord(const ro::sim::MinigameRecord& record) {
   return std::string(kFileHeader) + out.c_str() + "\n";
 }
 
-ro::sim::MinigameRecord LoadMinigameRecord(const std::filesystem::path& client_root) {
+MinigameRecordHeld LoadMinigameRecord(const std::filesystem::path& client_root) {
   const std::filesystem::path path = MinigameFilePath(client_root);
   const std::optional<std::string> text = ReadFileText(path);
   if (!text.has_value()) {
-    ro::core::LogWarning("mini-jeux : {} illisible — scores et trophées repartent de zéro",
+    ro::core::LogWarning("mini-jeux : {} ne s'ouvre pas — il ne sera réécrit qu'une fois relu",
                          ro::core::Utf8FromPath(path));
-    return {};
+    return {.file_unread = true};
   }
   ro::core::Result<ro::sim::MinigameRecord> read = ReadMinigameRecord(*text);
   if (!read) {
-    ro::core::LogWarning("mini-jeux : {} abîmé ({}) — scores et trophées repartent de zéro",
+    ro::core::LogWarning("mini-jeux : {} abîmé ({}) — il ne sera réécrit qu'une fois relu",
                          ro::core::Utf8FromPath(path), ro::core::Describe(read.error()));
-    return {};
+    return {.file_unread = true};
   }
-  return *read;
+  return {.record = std::move(*read)};
 }
 
-bool SaveMinigameRecord(const std::filesystem::path& client_root,
-                        const ro::sim::MinigameRecord& record) {
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(MinigameFilePath(client_root), WriteMinigameRecord(record));
+bool SaveMinigameRecord(const std::filesystem::path& client_root, MinigameRecordHeld& held) {
+  if (held.file_unread) {
+    const std::optional<std::string> text = ReadFileText(MinigameFilePath(client_root));
+    if (!text.has_value()) {
+      return false;
+    }
+    const ro::core::Result<ro::sim::MinigameRecord> on_disk = ReadMinigameRecord(*text);
+    if (!on_disk) {
+      return false;
+    }
+    ro::sim::MergeMinigameRecord(held.record, *on_disk);
+    held.file_unread = false;
+  }
+  if (const ro::core::Result<void> written = ro::core::WriteFileAtomically(
+          MinigameFilePath(client_root), WriteMinigameRecord(held.record));
       !written) {
     ro::core::LogWarning("mini-jeux : écriture impossible ({})",
                          ro::core::Describe(written.error()));

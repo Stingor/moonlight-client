@@ -18,6 +18,7 @@
 #include "ro/ui/rojeweled_window.h"
 
 #include "game/interface_sound.h"
+#include "game/minigame_file.h"
 #include "game/minigame_trophy_announcer.h"
 #include "world/monster_sprite.h"
 
@@ -130,7 +131,7 @@ class MinigameStage {
                                            ro::render::ActorWardrobe* wardrobe,
                                            std::uint32_t now_ms);
 
-  std::optional<ro::sim::MinigameRecord> record_;
+  std::optional<MinigameRecordHeld> record_;
   // La dernière écriture de `record_` a échoué.
   bool record_unsaved_ = false;
   MinigameTrophyAnnouncer announcer_;
