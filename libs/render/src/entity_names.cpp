@@ -38,13 +38,9 @@ std::array<EntityNameLook, kNamePlateKindCount> DefaultEntityNames() {
   boss.color = PackedColor(kMonsterNameColor);
   boss.level_gap = true;
 
-  // LES OBJETS AU SOL : EN PERMANENCE, et c'est le seul défaut qui s'écarte
-  // franchement du client. Un butin par terre est ce qu'on cherche des yeux
-  // après un combat, et il disparaît tout seul au bout d'un moment.
+  // LES OBJETS AU SOL : PAS D'ÉTIQUETTE DE CLAN SUR UNE POTION. Ces trois
+  // places sont vides sur un objet, sauf l'aside, où nous mettons la QUANTITÉ.
   EntityNameLook& drop = names[static_cast<std::size_t>(NamePlateKind::kGroundItem)];
-  drop.when = NamePlateWhen::kAlways;
-  // ⚠ ET PAS D'ÉTIQUETTE DE CLAN SUR UNE POTION : ces trois places sont vides
-  // sur un objet, sauf l'aside, où nous mettons la QUANTITÉ.
   drop.title = false;
   drop.banner = false;
 

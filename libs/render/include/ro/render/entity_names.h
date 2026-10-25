@@ -121,8 +121,9 @@ inline constexpr float kDefaultNamePlateFont = 12.0F;
 //
 // 🔴 TOUT EST PAR ESPÈCE, sauf ce qui ne peut pas différer. C'est la leçon des
 // six jauges libres et des six barres d'entité : un réglage commun n'est pas
-// plus simple, il est plus pauvre — on veut le nom des monstres au survol et
-// celui des objets au sol en permanence, parce qu'un butin se cherche des yeux.
+// plus simple, il est plus pauvre — on peut vouloir le nom des monstres au
+// survol et celui des objets au sol en permanence, parce qu'un butin se cherche
+// des yeux.
 //
 // ⚠ TOUS N'EXISTENT PAS SUR TOUTES LES ESPÈCES. Un objet au sol n'a pas de
 // titre, un PNJ pas de seconde ligne, et seul un boss porte un insigne : le
