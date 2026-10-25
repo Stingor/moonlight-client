@@ -29,12 +29,6 @@ std::array<EntityNameLook, kNamePlateKindCount> DefaultEntityNames() {
   own.shown = false;
   own.color = PackedColor(kOwnNameColor);
 
-  // LES PNJ : EN PERMANENCE. ⚠ CONTRE LE CLIENT, ET DÉLIBÉRÉMENT : un PNJ ne
-  // bouge pas, il n'y en a jamais trente à l'écran, et c'est ce qu'on cherche
-  // des yeux en arrivant sur une carte de ville.
-  EntityNameLook& npc = names[static_cast<std::size_t>(NamePlateKind::kNonPlayer)];
-  npc.when = NamePlateWhen::kAlways;
-
   // LES MONSTRES ET LES BOSS : l'écart de niveau, qui est le leur. Voir
   // `EntityNameLook::level_gap` — ailleurs, il ne ferait rien.
   EntityNameLook& monster = names[static_cast<std::size_t>(NamePlateKind::kMonster)];
