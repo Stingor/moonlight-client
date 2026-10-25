@@ -328,8 +328,9 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
       // de ce que l'image précédente a montré. La chatbox tranche en tête
       // d'image, voir `ro/ui/chat_bar.h`.
       //
-      // ⚠ SAUF SI UN ATELIER LA RÉCLAME, et qu'aucun champ n'écrit : la touche
-      // est alors à lui — c'est le prix du réglage « Entrée lance… ».
+      // ⚠ SAUF SI UNE FENÊTRE LA RÉCLAME, et qu'aucun champ n'écrit : la touche
+      // est alors à elle — un atelier par son réglage « Entrée lance… », la
+      // méta survivors par son focus.
       if (to.chat != nullptr && !(to.enter_claimed && !to.text_input)) {
         to.chat->open = true;
         to.chat->input.enter_pending = true;

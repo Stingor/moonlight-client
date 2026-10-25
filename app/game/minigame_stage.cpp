@@ -4,6 +4,14 @@
 #include <random>
 #include <utility>
 
+#include "ro/sim/survivors_trophies.h"
+#include "ro/ui/survivors_album_window.h"
+#include "ro/ui/survivors_church_window.h"
+#include "ro/ui/survivors_kafra_window.h"
+#include "ro/ui/survivors_ranking_window.h"
+#include "ro/ui/survivors_records_window.h"
+#include "ro/ui/window_focus.h"
+
 #include "game/skin_image_of.h"
 
 namespace moonclient {
@@ -53,10 +61,37 @@ constexpr const char* kRewardSound = "_heal_effect.wav";
   return ro::ui::RogglePhase::kAiming;
 }
 
+// LES FENÊTRES DE LA MÉTA, par-dessus l'accueil, chacune déclarée à Échap.
+void DrawSurvivorsMetaWindows(SurvivorsMetaWindows& meta, const ro::ui::SkinArt& art,
+                              ro::ui::EscapeStack& escape) {
+  escape.Register(ro::ui::kSurvivorsChurchId, &meta.church.open);
+  escape.Register(ro::ui::kSurvivorsKafraId, &meta.kafra.open);
+  escape.Register(ro::ui::kSurvivorsAlbumId, &meta.album.open);
+  escape.Register(ro::ui::kSurvivorsRecordsId, &meta.records.open);
+  escape.Register(ro::ui::kSurvivorsRankingId, &meta.ranking.open);
+  if (meta.church.open) {
+    meta.church_answer = ro::ui::DrawSurvivorsChurchWindow(meta.church, meta.church_view, art);
+  }
+  if (meta.kafra.open) {
+    meta.kafra_answer = ro::ui::DrawSurvivorsKafraWindow(meta.kafra, meta.kafra_view, art);
+  }
+  if (meta.album.open) ro::ui::DrawSurvivorsAlbumWindow(meta.album, meta.album_view, art);
+  if (meta.records.open) ro::ui::DrawSurvivorsRecordsWindow(meta.records, meta.records_view, art);
+  if (meta.ranking.open) {
+    meta.ranking_answer = ro::ui::DrawSurvivorsRankingWindow(meta.ranking, meta.ranking_view, art);
+  }
+}
+
 }  // namespace
 
 void DrawMinigameWindows(MinigameWindows& windows, const ro::ui::SkinArt& art,
                          ro::ui::EscapeStack& escape) {
+  if (windows.survivors_prepare.open && windows.survivors_prepare_composed) {
+    escape.Register(ro::ui::kSurvivorsPrepareId, &windows.survivors_prepare.open);
+    windows.survivors_prepare_answer = ro::ui::DrawSurvivorsPrepareWindow(
+        windows.survivors_prepare, windows.survivors_prepare_view, art);
+    DrawSurvivorsMetaWindows(windows.survivors_meta, art, escape);
+  }
   if (!windows.composed) {
     return;
   }
@@ -67,6 +102,18 @@ void DrawMinigameWindows(MinigameWindows& windows, const ro::ui::SkinArt& art,
   windows.rojeweled_answer =
       ro::ui::DrawRojeweledWindow(windows.rojeweled, windows.rojeweled_view, art);
   windows.roggle_answer = ro::ui::DrawRoggleWindow(windows.roggle, windows.roggle_view, art);
+}
+
+bool SurvivorsClaimsEnter(const MinigameWindows& windows) {
+  if (!windows.survivors_prepare.open || !windows.survivors_prepare_composed) return false;
+  const SurvivorsMetaWindows& meta = windows.survivors_meta;
+  const auto claims = [](bool open, const char* window_id) {
+    return open && ro::ui::WindowHasFocus(window_id);
+  };
+  return claims(true, ro::ui::kSurvivorsPrepareId) ||
+         claims(meta.church.open, ro::ui::kSurvivorsChurchId) ||
+         claims(meta.kafra.open, ro::ui::kSurvivorsKafraId) ||
+         claims(meta.album.open, ro::ui::kSurvivorsAlbumId);
 }
 
 static_assert(ro::ui::kRojeweledSide == ro::sim::kMatch3Side);
@@ -129,6 +176,15 @@ void MinigameStage::Leave(const std::filesystem::path& client_root) {
   }
 }
 
+std::vector<ro::sim::MinigameTrophy> MinigameStage::RecordSurvivorsRun(
+    const ro::sim::SurvivorsRun& run, const std::filesystem::path& client_root) {
+  std::vector<ro::sim::MinigameTrophy> fresh = ro::sim::RecordSurvivors(Record(client_root), run);
+  if (!fresh.empty()) {
+    Save(client_root);
+  }
+  return fresh;
+}
+
 void MinigameStage::Save(const std::filesystem::path& client_root) {
   record_unsaved_ = !SaveMinigameRecord(client_root, *record_);
 }
@@ -137,6 +193,7 @@ void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
   const ro::ui::MinigamesAsk hub = std::exchange(windows.hub_answer, {});
   windows.rojeweled.open = windows.rojeweled.open || hub.open_rojeweled;
   windows.roggle.open = windows.roggle.open || hub.open_roggle;
+  windows.survivors_prepare.open = windows.survivors_prepare.open || hub.open_survivors;
 
   const ro::ui::RojeweledAsk jewels = std::exchange(windows.rojeweled_answer, {});
   if (jewels.new_game) {
@@ -258,7 +315,8 @@ void MinigameStage::ComposeHub(MinigameWindows& windows) {
   }
   windows.hub_view = ro::ui::MinigamesView{.rojeweled_best = record_->record.rojeweled_best,
                                            .roggle_best = record_->record.roggle_best,
-                                           .trophies = trophy_rows_};
+                                           .trophies = trophy_rows_,
+                                           .survivors_offered = true};
 }
 
 void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePieces& pieces,

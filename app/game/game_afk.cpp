@@ -170,4 +170,25 @@ ro::ui::AfkClockView Game::AfkClock(std::uint32_t now_ms) {
                               .fade = afk_screen_.blend()};
 }
 
+// LA TEINTE DE LA VEILLE : ENTRE LE MONDE ET L'INTERFACE.
+//
+// 🔴 AVANT L'INTERFACE : l'horloge de la veille, peinte ensuite, n'est donc ni
+// assombrie ni grenée — et elle doit rester lisible, puisque c'est tout ce qui
+// reste à l'écran.
+//
+// 🔴 ET HORS DE `DrawWorld`, PARCE QU'IL A UNE SORTIE ANTICIPÉE. Une
+// installation sans garde-robe rend la main avant la fin, et une teinte posée
+// là-bas n'y serait jamais peinte : la veille s'installerait, l'interface
+// disparaîtrait, l'image resterait intacte. Entre les deux étapes, aucun
+// chemin ne la saute.
+//
+// ⚠ LA TAILLE EST CELLE DU TAMPON DE DESSIN, pas celle de la fenêtre : sur un
+// écran à facteur d'échelle les deux diffèrent, et le transfert d'image à image
+// se compte en pixels réels.
+void Game::TintForAfk(std::uint32_t now_ms) {
+  const ro::render::DrawableSize surface = gl_->drawable_size();
+  screen_tint_.Draw(afk_screen_.tint(settings_->options().afk()), surface.width, surface.height,
+                    now_ms);
+}
+
 }  // namespace moonclient

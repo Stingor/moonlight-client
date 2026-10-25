@@ -103,6 +103,41 @@ add_library(ro_sim STATIC
     src/stat_raise_run.cpp
     src/style_code.cpp
     src/summon_master.cpp
+    src/survivors_behaviours.cpp
+    src/survivors_blasts.cpp
+    src/survivors_bosses.cpp
+    src/survivors_bot.cpp
+    src/survivors_events.cpp
+    src/survivors_flow.cpp
+    src/survivors_geometry.cpp
+    src/survivors_grid.cpp
+    src/survivors_hero.cpp
+    src/survivors_horde.cpp
+    src/survivors_journal.cpp
+    src/survivors_loot.cpp
+    src/survivors_meta.cpp
+    src/survivors_play.cpp
+    src/survivors_openness.cpp
+    src/survivors_progress.cpp
+    src/survivors_ranked.cpp
+    src/survivors_records.cpp
+    src/survivors_rules.cpp
+    src/survivors_rules_check.cpp
+    src/survivors_rules_bosses.cpp
+    src/survivors_rules_check_content.cpp
+    src/survivors_rules_events.cpp
+    src/survivors_rules_foes.cpp
+    src/survivors_rules_mage.cpp
+    src/survivors_rules_wizard.cpp
+    src/survivors_run.cpp
+    src/survivors_score.cpp
+    src/survivors_shots.cpp
+    src/survivors_skills.cpp
+    src/survivors_spawner.cpp
+    src/survivors_threats.cpp
+    src/survivors_trophies.cpp
+    src/survivors_week.cpp
+    src/survivors_zones.cpp
     src/title_book.cpp
     src/vending.cpp
     src/walk_map.cpp

@@ -305,6 +305,22 @@ class SpriteRenderer {
 
   [[nodiscard]] std::size_t cached_texture_count() const noexcept { return textures_.size(); }
 
+  // LE COMPTE DES LOTS, cumulé depuis la dernière remise à zéro, `Draw` et
+  // `DrawDepth` ensemble : ce qu'un banc lit pour savoir si des quads voisins
+  // partagent leur texture. Une addition par appel et une par lot, rien par
+  // quad.
+  struct BatchTally {
+    // Les quads versés au tampon de sommets, une fois par appel : la passe de
+    // profondeur d'un `Draw` qui l'écrit les redessine sans les recompter.
+    std::size_t quads = 0;
+    // Les appels de dessin, un par lot de quads voisins de même texture, sur
+    // toutes les passes : celle de profondeur double ceux de sa passe de
+    // couleur.
+    std::size_t draw_calls = 0;
+  };
+  [[nodiscard]] const BatchTally& batch_tally() const noexcept { return batch_tally_; }
+  void ResetBatchTally() noexcept { batch_tally_ = BatchTally(); }
+
  private:
   void Release() noexcept;
   // Rend la texture d'une image, en la téléversant à la première demande.
@@ -349,6 +365,7 @@ class SpriteRenderer {
   std::vector<PreparedQuad> prepared_;
   std::vector<SpriteVertex> vertices_;
   std::vector<LayerDraw> layer_draws_;
+  BatchTally batch_tally_;
 };
 
 }  // namespace ro::render

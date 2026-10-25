@@ -77,6 +77,12 @@ inline constexpr std::uint32_t kUiCapMapEdits = 0x00020000;
 // joueur (`ZC 0x0F4A`). Même règle : le serveur ne l'envoie qu'à qui l'annonce.
 // Elle s'annonce lueur élémentaire éteinte : la case ne règle que le dessin.
 inline constexpr std::uint32_t kUiCapAttackElement = 0x00040000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire les ZC du classement
+// survivors (`ZC 0x0F4D`, `0x0F4F`, `0x0F51`, `0x0F53`, voir
+// `survivors_ranking.h`). Un serveur qui le classe répond par `ZC 0x0F53` à
+// chaque annonce qui porte le bit. ⚠ ELLE N'ENTRE DANS LE MASQUE QUE SI LA TABLE DES LONGUEURS
+// CONNAÎT CES QUATRE ZC : un ZC inconnu de la table arrête la liaison.
+inline constexpr std::uint32_t kUiCapSurvivors = 0x00080000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

@@ -173,7 +173,8 @@ struct EventRouting {
   ShortcutWheel* shortcut_wheel = nullptr;
   // Le verdict de la pile d'échappement, à l'image précédente.
   bool escape_closes_a_window = false;
-  // Un atelier réclame Entrée : voir `CraftStage::ClaimsEnter`.
+  // Une fenêtre réclame Entrée : voir `CraftStage::ClaimsEnter` et
+  // `SurvivorsClaimsEnter`.
   bool enter_claimed = false;
   // `/noshift` : MAJ n'est plus nécessaire pour forcer une cible. ⚠ LA VALEUR
   // ET NON LES OPTIONS : le routage des événements n'a aucune raison de

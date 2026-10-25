@@ -126,6 +126,19 @@ std::vector<CellPosition> WalkField::PathFrom(std::int32_t x, std::int32_t y) co
   return {};
 }
 
+std::optional<CellPosition> WalkField::NextCellFrom(std::int32_t x, std::int32_t y) const {
+  if (!CostFrom(x, y)) return std::nullopt;
+  // L'index d'un voisin EST la direction serveur : 0 nord, puis dans le sens
+  // trigonométrique.
+  const std::uint8_t direction =
+      toward_source_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+                     static_cast<std::size_t>(x)];
+  if (direction == kNoStep) return std::nullopt;
+  const Neighbour& step = kNeighbours[direction];
+  return CellPosition{static_cast<std::uint16_t>(x + step.dx),
+                      static_cast<std::uint16_t>(y + step.dy), direction};
+}
+
 std::optional<CellPosition> NearestPassable(const WalkMap& map, std::int32_t x, std::int32_t y,
                                             std::int32_t max_ring) {
   for (std::int32_t ring = 0; ring <= max_ring; ++ring) {

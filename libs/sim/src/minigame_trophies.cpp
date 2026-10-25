@@ -5,6 +5,8 @@
 #include "ro/sim/match3_game.h"
 #include "ro/sim/peg_game.h"
 
+#include "minigame_trophy_earn.h"
+
 namespace ro::sim {
 namespace {
 
@@ -35,17 +37,24 @@ constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
      core::TrText("Rattraper trois billes dans le seau en une partie de Roggle.")},
     {MinigameTrophy::kRoggleScore20000, "roggle_score_20000", core::TrText("Pluie de gemmes"),
      core::TrText("Atteindre 20 000 points dans une partie de Roggle.")},
+    {MinigameTrophy::kSurvivorsFiveMinutes, "survivors_5min", core::TrText("Tenir bon"),
+     core::TrText("Survivre 5:00 dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsVictory, "survivors_victory", core::TrText("Tombeur de Baphomet"),
+     core::TrText("Vaincre Baphomet dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsFirstEvolution, "survivors_first_evolution",
+     core::TrText("Métamorphose"),
+     core::TrText("Faire évoluer un skill dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsKills1000, "survivors_kills_1000", core::TrText("Marée repoussée"),
+     core::TrText("Vaincre 1 000 monstres dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsLevel40, "survivors_level_40", core::TrText("Mage aguerri"),
+     core::TrText("Atteindre le niveau 40 dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsFirstCard, "survivors_first_card", core::TrText("Première carte"),
+     core::TrText("Ramasser une carte tombée dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsPyromaniac, "survivors_pyromaniac", core::TrText("Pyromane"),
+     core::TrText("Vaincre Baphomet avec des skills Fire seulement.")},
+    {MinigameTrophy::kSurvivorsPureMind, "survivors_pure_mind", core::TrText("Esprit pur"),
+     core::TrText("Vaincre Baphomet sans aucune carte.")},
 }};
-
-// Gagne `trophy` si `earned` ; l'ajoute alors à `fresh`.
-void Earn(MinigameRecord& record, MinigameTrophy trophy, bool earned,
-          std::vector<MinigameTrophy>& fresh) {
-  bool& unlocked = record.unlocked[static_cast<std::size_t>(trophy)];
-  if (earned && !unlocked) {
-    unlocked = true;
-    fresh.push_back(trophy);
-  }
-}
 
 }  // namespace
 
@@ -60,10 +69,13 @@ std::vector<MinigameTrophy> RecordRojeweled(MinigameRecord& record, const Match3
   if (over && game.score() > record.rojeweled_best) {
     record.rojeweled_best = game.score();
   }
-  Earn(record, MinigameTrophy::kRojeweledFinished, over, fresh);
-  Earn(record, MinigameTrophy::kRojeweledScore5000, game.score() >= kRojeweledLowScore, fresh);
-  Earn(record, MinigameTrophy::kRojeweledScore15000, game.score() >= kRojeweledHighScore, fresh);
-  Earn(record, MinigameTrophy::kRojeweledCombo4, game.best_combo() >= kRojeweledLongCombo, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRojeweledFinished, over, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRojeweledScore5000,
+                     game.score() >= kRojeweledLowScore, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRojeweledScore15000,
+                     game.score() >= kRojeweledHighScore, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRojeweledCombo4,
+                     game.best_combo() >= kRojeweledLongCombo, fresh);
   return fresh;
 }
 
@@ -77,11 +89,13 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
   if (over && game.score() > record.roggle_best) {
     record.roggle_best = game.score();
   }
-  Earn(record, MinigameTrophy::kRoggleWon, won, fresh);
-  Earn(record, MinigameTrophy::kRoggleFlawless, won && game.balls_left() >= kRoggleSpareBalls,
-       fresh);
-  Earn(record, MinigameTrophy::kRoggleThreeCatches, game.catches() >= kRoggleCatches, fresh);
-  Earn(record, MinigameTrophy::kRoggleScore20000, game.score() >= kRoggleHighScore, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleWon, won, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleFlawless,
+                     won && game.balls_left() >= kRoggleSpareBalls, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleThreeCatches, game.catches() >= kRoggleCatches,
+                     fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleScore20000, game.score() >= kRoggleHighScore,
+                     fresh);
   return fresh;
 }
 

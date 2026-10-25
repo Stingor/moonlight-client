@@ -231,7 +231,8 @@ SpriteRenderer::SpriteRenderer(SpriteRenderer&& other) noexcept
       ordered_(std::move(other.ordered_)),
       prepared_(std::move(other.prepared_)),
       vertices_(std::move(other.vertices_)),
-      layer_draws_(std::move(other.layer_draws_)) {
+      layer_draws_(std::move(other.layer_draws_)),
+      batch_tally_(other.batch_tally_) {
   other.vertex_array_ = 0;
   other.vertex_buffer_ = 0;
 }
@@ -247,6 +248,7 @@ SpriteRenderer& SpriteRenderer::operator=(SpriteRenderer&& other) noexcept {
     prepared_ = std::move(other.prepared_);
     vertices_ = std::move(other.vertices_);
     layer_draws_ = std::move(other.layer_draws_);
+    batch_tally_ = other.batch_tally_;
     other.vertex_array_ = 0;
     other.vertex_buffer_ = 0;
   }
@@ -435,6 +437,7 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
       while (end < lot_end && prepared_[end].texture == prepared_[first].texture) {
         ++end;
       }
+      ++batch_tally_.draw_calls;
       glBlendFunc(GL_SRC_ALPHA, prepared_[first].additive ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
       prepared_[first].texture->Bind(0);
       glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first * kVerticesPerQuad),
@@ -660,6 +663,7 @@ void SpriteRenderer::SlideUnderFeet(std::span<PreparedQuad> quads, float anchor_
 }
 
 void SpriteRenderer::UploadPrepared() {
+  batch_tally_.quads += prepared_.size();
   vertices_.clear();
   vertices_.reserve(prepared_.size() * kVerticesPerQuad);
   for (const PreparedQuad& quad : prepared_) {
@@ -721,6 +725,7 @@ void SpriteRenderer::DrawDepth(const glm::mat4& light_view_projection, const glm
     while (end < prepared_.size() && prepared_[end].texture == prepared_[first].texture) {
       ++end;
     }
+    ++batch_tally_.draw_calls;
     prepared_[first].texture->Bind(0);
     glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first * kVerticesPerQuad),
                  static_cast<GLsizei>((end - first) * kVerticesPerQuad));

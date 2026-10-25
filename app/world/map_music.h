@@ -74,6 +74,13 @@ class MapMusic {
     followed_.clear();
   }
 
+  // UN MORCEAU IMPOSÉ PAR UN MODE, comme la musique de l'arène survivors : il
+  // joue sans devenir le choix du joueur, et `Forget` rend la carte au
+  // prochain `Follow`.
+  void PlayForMode(ro::audio::AudioEngine& audio, std::string_view track) {
+    static_cast<void>(PlayTrack(audio, track, "mode"));
+  }
+
   // Le morceau choisi, ou vide quand la carte décide.
   [[nodiscard]] const std::string& chosen() const noexcept { return chosen_; }
 

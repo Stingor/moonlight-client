@@ -46,6 +46,12 @@ class WalkField {
   // compris. Vide si la case est injoignable.
   [[nodiscard]] std::vector<CellPosition> PathFrom(std::int32_t x, std::int32_t y) const;
 
+  // La case voisine où mène le pas qui RAPPROCHE de la source, depuis (x, y) ;
+  // son `direction` porte la direction serveur du pas (0 nord, 1 nord-ouest…
+  // 7 nord-est). Rien pour une source, une case injoignable ou hors champ. Sans
+  // allocation : c'est ce qu'une horde lit à chaque pas.
+  [[nodiscard]] std::optional<CellPosition> NextCellFrom(std::int32_t x, std::int32_t y) const;
+
   [[nodiscard]] bool empty() const noexcept { return cost_.empty(); }
   [[nodiscard]] std::int32_t width() const noexcept { return width_; }
   [[nodiscard]] std::int32_t height() const noexcept { return height_; }

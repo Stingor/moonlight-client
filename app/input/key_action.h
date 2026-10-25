@@ -184,8 +184,9 @@ struct KeyPress {
   // il la ferme. Ce drapeau porte le verdict de l'image précédente — voir
   // `EscapeStack::has_work`.
   bool escape_closes_a_window = false;
-  // UN ATELIER RÉCLAME ENTRÉE — son réglage « Entrée lance… », ou la
-  // confirmation d'un refine : la touche ne va pas au chat.
+  // UNE FENÊTRE RÉCLAME ENTRÉE — un atelier par son réglage « Entrée lance… »
+  // ou la confirmation d'un refine, la méta survivors qui a le focus : la
+  // touche ne va pas au chat.
   bool enter_claimed = false;
   // Vrai tant que la fenêtre tourne ; l'échappement le met à faux.
   bool* running = nullptr;

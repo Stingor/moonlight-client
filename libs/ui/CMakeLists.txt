@@ -197,6 +197,20 @@ add_library(ro_ui STATIC
     src/music_player_window.cpp
     src/minigame_trophy_text.cpp
     src/minigames_window.cpp
+    src/survivors_album_window.cpp
+    src/survivors_chest_window.cpp
+    src/survivors_church_window.cpp
+    src/survivors_hud.cpp
+    src/survivors_kafra_window.cpp
+    src/survivors_meta_text.cpp
+    src/survivors_offer_window.cpp
+    src/survivors_pause_window.cpp
+    src/survivors_prepare_window.cpp
+    src/survivors_ranking_window.cpp
+    src/survivors_records_window.cpp
+    src/survivors_shop_list.cpp
+    src/survivors_summary_window.cpp
+    src/survivors_text.cpp
     src/roggle_window.cpp
     src/rojeweled_window.cpp
     src/menu_icons.cpp
@@ -309,6 +323,7 @@ add_library(ro_ui STATIC
     src/desc_panel_frame.cpp
     src/ui_context.cpp
     src/window_bounds.cpp
+    src/window_focus.cpp
     src/window_places.cpp
     src/triple_clipboard.cpp
     src/hour_range_text.cpp

@@ -332,6 +332,9 @@ tr: The game's
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: The game's is the original client's font. The title keeps its room: a wider font gets cut into "..." sooner, and hovering the title shows it in full.
 
+fr: Chance d'une quatrième offre à la montée de niveau.
+tr: Chance of a fourth offer on level up.
+
 fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
 tr: Whispers to a player; alone, counts the players online.
 
@@ -392,6 +395,81 @@ tr: Asks for the blacksmith ranking.
 fr: Demande le classement des taekwons.
 tr: Asks for the taekwon ranking.
 
+fr: Des boules de feu tournent autour de vous.
+tr: Fireballs circle around you.
+
+fr: Des éclats d'esprit frappent là où les monstres se pressent.
+tr: Spirit bursts strike where monsters crowd together.
+
+fr: Il faut être en ville ou dans un intérieur.
+tr: You must be in a town or indoors.
+
+fr: Le personnage est mort.
+tr: Your character is dead.
+
+fr: Le storage est ouvert.
+tr: The storage is open.
+
+fr: La liaison avec le serveur est perdue.
+tr: The connection to the server is lost.
+
+fr: On vous propose un échange.
+tr: Someone is offering you a trade.
+
+fr: Un PNJ vous parle.
+tr: An NPC is talking to you.
+
+fr: Un chargement de carte est en cours.
+tr: A map is loading.
+
+fr: Un dialogue avec un PNJ est ouvert.
+tr: An NPC dialogue is open.
+
+fr: Un monstre hostile est trop proche.
+tr: A hostile monster is too close.
+
+fr: Un mur de feu devant vous brûle et repousse les monstres.
+tr: A wall of fire in front of you burns and pushes back monsters.
+
+fr: Un trait de glace file droit, transperce et gèle.
+tr: A bolt of ice flies straight, pierces and freezes.
+
+fr: Des météores s'abattent là où les monstres se pressent.
+tr: Meteors crash down where monsters crowd together.
+
+fr: Six boules de feu tournent sans cesse et repoussent.
+tr: Six fireballs circle endlessly and push back.
+
+fr: Un cercle de piliers de feu brûle qui s'en approche.
+tr: A circle of fire pillars burns whoever comes near.
+
+fr: Un échange est ouvert.
+tr: A trade is open.
+
+fr: Une onde de glace gèle les monstres autour de vous.
+tr: A wave of ice freezes the monsters around you.
+
+fr: Récupération de PV au fil du temps.
+tr: HP recovery over time.
+
+fr: Portée de ramassage des gemmes augmentée.
+tr: Increased gem pickup range.
+
+fr: Armure : chaque coup reçu est réduit.
+tr: Armor: every hit taken is reduced.
+
+fr: Un projectile de plus pour chaque skill.
+tr: One more projectile for every skill.
+
+fr: Des esprits poursuivent les monstres et les transpercent.
+tr: Spirits chase monsters and pierce through them.
+
+fr: Des éclairs de feu frappent le monstre le plus proche.
+tr: Fire bolts strike the nearest monster.
+
+fr: Des éclairs de glace frappent au hasard et ralentissent.
+tr: Ice bolts strike at random and slow their targets.
+
 fr: Dissout ta guilde.
 tr: Disbands your guild.
 
@@ -406,6 +484,9 @@ tr: Azimuth offset (°)
 
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Unchecked, it is the course drawn from the map's light.
+
+fr: Dégâts de tous les skills augmentés.
+tr: Increased damage for all skills.
 
 fr: Effacer tous les plots orange dans Roggle.
 tr: Clear every orange peg in Roggle.
@@ -1196,6 +1277,9 @@ tr: Shadows computed every frame: the map's sun, outdoors, instead of the one pa
 fr: La fenêtre du jeu d'origine, au pixel : pseudo, classe, niveaux, HP, SP, EXP, zeny et poids. Elle se déplace par sa barre de titre ; son bouton, un double-clic sur la barre ou son raccourci la replient et la déplient. La grille d'icônes de menu s'accroche dessous et la suit ; les places rangées reviennent quand la fenêtre s'éteint.
 tr: The original game's window, to the pixel: name, job, levels, HP, SP, EXP, zeny and weight. It moves by its title bar; its button, a double-click on the bar or its shortcut collapse and expand it. The menu icon grid hangs below it and follows it; the arranged places come back when the window is turned off.
 
+fr: La foudre frappe le monstre le plus robuste.
+tr: Lightning strikes the toughest monster.
+
 fr: Le cadre d'un salon est une image du jeu : la teinte la multiplie. Blanche, il reste tel quel.
 tr: A chat room frame is a game image: the tint multiplies it. White leaves it unchanged.
 
@@ -1306,6 +1390,9 @@ tr: Opens or closes the macro window.
 
 fr: Ouvre une échoppe d'un simple clic.
 tr: Opens a shop with a single click.
+
+fr: PV maximum augmentés.
+tr: Increased max HP.
 
 fr: Parle à ta guilde.
 tr: Speaks to your guild.
@@ -1433,14 +1520,32 @@ tr: Trophies
 fr: Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre.
 tr: A window you drag sticks to the edge of another window or of the screen, then lines up with it. Holding Alt while dragging leaves it free.
 
+fr: Une vente est ouverte.
+tr: A shop is open.
+
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
 
 fr: Visez à la souris, cliquez pour tirer.
 tr: Aim with the mouse, click to shoot.
 
+fr: Vitesse de marche augmentée.
+tr: Increased walk speed.
+
 fr: Vitesse du temps
 tr: Speed of time
+
+fr: Votre personnage a changé de carte.
+tr: Your character changed maps.
+
+fr: Votre personnage est attaqué !
+tr: Your character is under attack!
+
+fr: Votre personnage est mort dans le jeu.
+tr: Your character died in the game.
+
+fr: Vous avez reçu une invitation.
+tr: You received an invitation.
 
 fr: aucun morceau
 tr: no track
@@ -20293,3 +20398,582 @@ tr: The whole bubble follows: frame, margins, width before wrapping and height a
 
 fr: L'échoppe a fermé ou n'est plus en vue : la marche s'arrête.
 tr: The shop has closed or is out of sight: the walk stops.
+
+fr: %d — Prendre
+tr: %d — Take
+
+fr: %s %s %s %s ou les flèches : se déplacer
+tr: %s %s %s %s or the arrow keys: move
+
+fr: %s — niveau %d
+tr: %s — level %d
+
+fr: 1 à 4 : choisir une carte au niveau supérieur
+tr: 1 to 4: pick a card on level up
+
+fr: Abandonner la partie ?
+tr: Give up the run?
+
+fr: Afficher les mesures
+tr: Show measurements
+
+fr: Aucune carte
+tr: No cards
+
+fr: B — Bannir (%d)
+tr: B — Banish (%d)
+
+fr: Bouton gauche tenu : marcher vers le curseur
+tr: Hold left button: walk toward the cursor
+
+fr: Choisissez la carte à bannir.
+tr: Choose the card to banish.
+
+fr: Cliquez pour continuer.
+tr: Click to continue.
+
+fr: Cliquez pour passer.
+tr: Click to skip.
+
+fr: Continuer
+tr: Continue
+
+fr: Contrôles
+tr: Controls
+
+fr: Dégâts par skill
+tr: Damage by skill
+
+fr: Effets réduits
+tr: Reduced effects
+
+fr: Job : %s
+tr: Job: %s
+
+fr: La fenêtre du jeu a perdu le focus.
+tr: The game window lost focus.
+
+fr: Les sorts partent seuls.
+tr: Spells cast themselves.
+
+fr: Lv %d
+tr: Lv %d
+
+fr: Lv %d » %d
+tr: Lv %d » %d
+
+fr: Messages privés : %d
+tr: Whispers: %d
+
+fr: Mesures
+tr: Measurements
+
+fr: NEW!
+tr: NEW!
+
+fr: Niveau : %d
+tr: Level: %d
+
+fr: Niveau supérieur !
+tr: Level up!
+
+fr: Old Blue Box
+tr: Old Blue Box
+
+fr: Ombres du soleil de la horde
+tr: Horde sun shadows
+
+fr: Oui, abandonner
+tr: Yes, give up
+
+fr: P — Passer (%d)
+tr: P — Skip (%d)
+
+fr: Partie interrompue
+tr: Run interrupted
+
+fr: Partir
+tr: Start
+
+fr: Pause
+tr: Pause
+
+fr: Premier sort
+tr: First spell
+
+fr: R — Relancer (%d)
+tr: R — Reroll (%d)
+
+fr: Rejouer
+tr: Play again
+
+fr: Survivants de Midgard
+tr: Midgard Survivors
+
+fr: Survivez quinze minutes à la horde de Prontera Field.
+tr: Survive fifteen minutes against the Prontera Field horde.
+
+fr: Temps : %s
+tr: Time: %s
+
+fr: Tués : %u
+tr: Kills: %u
+
+fr: Tués par espèce
+tr: Kills by species
+
+fr: Victoire !
+tr: Victory!
+
+fr: Vous êtes mort
+tr: You are dead
+
+fr: Zeny : %u
+tr: Zeny: %u
+
+fr: max (ms)
+tr: max (ms)
+
+fr: p50 (ms)
+tr: p50 (ms)
+
+fr: p95 (ms)
+tr: p95 (ms)
+
+fr: Échap : pause
+tr: Esc: pause
+
+fr: Évolution
+tr: Evolution
+
+fr: Évolution : %s
+tr: Evolution: %s
+
+fr: Composition
+tr: Composition
+
+fr: L'arène des Survivants de Midgard ne peut pas se monter.
+tr: The Midgard Survivors arena cannot be loaded.
+
+fr: Scène
+tr: Scene
+
+fr: Simulation
+tr: Simulation
+
+fr: Tenir bon
+tr: Hold the Line
+
+fr: Survivre 5:00 dans une partie de Survivants de Midgard.
+tr: Survive 5:00 in a game of Midgard Survivors.
+
+fr: Tombeur de Baphomet
+tr: Baphomet Slayer
+
+fr: Vaincre Baphomet dans une partie de Survivants de Midgard.
+tr: Defeat Baphomet in a game of Midgard Survivors.
+
+fr: Métamorphose
+tr: Metamorphosis
+
+fr: Faire évoluer un skill dans une partie de Survivants de Midgard.
+tr: Evolve a skill in a game of Midgard Survivors.
+
+fr: Marée repoussée
+tr: Tide Turned Back
+
+fr: Vaincre 1 000 monstres dans une partie de Survivants de Midgard.
+tr: Defeat 1,000 monsters in a game of Midgard Survivors.
+
+fr: Mage aguerri
+tr: Seasoned Mage
+
+fr: Atteindre le niveau 40 dans une partie de Survivants de Midgard.
+tr: Reach level 40 in a game of Midgard Survivors.
+
+fr: Première carte
+tr: First Card
+
+fr: Ramasser une carte tombée dans une partie de Survivants de Midgard.
+tr: Pick up a dropped card in a game of Midgard Survivors.
+
+fr: Pyromane
+tr: Pyromaniac
+
+fr: Vaincre Baphomet avec des skills Fire seulement.
+tr: Defeat Baphomet with Fire skills only.
+
+fr: Esprit pur
+tr: Pure Mind
+
+fr: Vaincre Baphomet sans aucune carte.
+tr: Defeat Baphomet without any card.
+
+fr: Recharge de tous les skills raccourcie.
+tr: Shorter cooldown for every skill.
+
+fr: Zone de tous les skills élargie.
+tr: Larger area for every skill.
+
+fr: Durée de tous les skills allongée.
+tr: Longer duration for every skill.
+
+fr: Expérience gagnée augmentée.
+tr: More experience gained.
+
+fr: Une vie de plus : le héros se relève une fois.
+tr: One extra life: the hero gets back up once.
+
+fr: %d charge(s) par partie
+tr: %d charge(s) per run
+
+fr: %s Zeny
+tr: %s Zeny
+
+fr: +%s Zeny (solde %s)
+tr: +%s Zeny (balance %s)
+
+fr: Album
+tr: Album
+
+fr: Album des Survivants
+tr: Survivors' Album
+
+fr: Armure +%d
+tr: Armor +%d
+
+fr: Aucune partie
+tr: No run
+
+fr: Aucune partie cette semaine.
+tr: No run this week.
+
+fr: Bannir : retirer une carte des offres de la partie.
+tr: Banish: remove a card from this run's offers.
+
+fr: Bénir
+tr: Bless
+
+fr: Bénédictions : %d rang(s), %d vie(s), %d charge(s)
+tr: Blessings: %d rank(s), %d life(s), %d charge(s)
+
+fr: Carnet
+tr: Logbook
+
+fr: Carte non trouvée
+tr: Card not found yet
+
+fr: Cartes portées
+tr: Cards held
+
+fr: Cartes tombées
+tr: Cards dropped
+
+fr: Chance +%d %%
+tr: Luck +%d %%
+
+fr: Cursed Water
+tr: Cursed Water
+
+fr: Cursed Water %d
+tr: Cursed Water %d
+
+fr: Durée +%d %%
+tr: Duration +%d %%
+
+fr: Débloqué
+tr: Unlocked
+
+fr: Défi
+tr: Challenge
+
+fr: Défi de la semaine
+tr: Weekly challenge
+
+fr: Départ neutre : sans Bénédictions, sans charges, toutes les cartes.
+tr: Neutral start: no Blessings, no charges, every card.
+
+fr: Exploit atteint : %s
+tr: Feat reached: %s
+
+fr: Exploits
+tr: Feats
+
+fr: Expérience +%d %%
+tr: Experience +%d %%
+
+fr: Glaçages par Cold Bolt, au cumul
+tr: Chills by Cold Bolt, in total
+
+fr: Hors des records du défi : départ non neutre ou autre semaine.
+tr: Not on the challenge records: start not neutral, or another week.
+
+fr: Interrompue
+tr: Interrupted
+
+fr: Issue
+tr: Outcome
+
+fr: Kafra
+tr: Kafra
+
+fr: Kafra des Survivants
+tr: Survivors' Kafra
+
+fr: Marche +%d %%
+tr: Walk +%d %%
+
+fr: Meilleur score de la semaine : %s
+tr: Best score this week: %s
+
+fr: NOUVELLE
+tr: NEW
+
+fr: Nouveau record ! Rang %d des parties libres
+tr: New record! Rank %d of free runs
+
+fr: Nouveau record ! Rang %d du défi
+tr: New record! Rank %d of the challenge
+
+fr: PV +%d %%
+tr: HP +%d %%
+
+fr: PV +%d par minute
+tr: HP +%d per minute
+
+fr: Partie interrompue : hors des records.
+tr: Interrupted run: not on the records.
+
+fr: Partie libre
+tr: Free run
+
+fr: Parties libres
+tr: Free runs
+
+fr: Passer : laisser une offre sans rien prendre.
+tr: Skip: pass an offer without taking anything.
+
+fr: Première trouvaille : %s
+tr: First found: %s
+
+fr: Puissance +%d %%
+tr: Power +%d %%
+
+fr: Rang maximal
+tr: Highest rank
+
+fr: Recharge –%d %%
+tr: Cooldown –%d %%
+
+fr: Records
+tr: Records
+
+fr: Records des Survivants
+tr: Survivors' Records
+
+fr: Relancer : une offre de cartes neuve.
+tr: Reroll: a fresh card offer.
+
+fr: Rendre %s Zeny ?
+tr: Refund %s Zeny?
+
+fr: Score et Zeny +%d %%, monstres plus durs
+tr: Score and Zeny +%d %%, tougher monsters
+
+fr: Score à battre : %s
+tr: Score to beat: %s
+
+fr: Se termine dans %d j %d h
+tr: Ends in %d d %d h
+
+fr: Semaine
+tr: Week
+
+fr: Semaine %d de %d
+tr: Week %d of %d
+
+fr: Semaines passées
+tr: Past weeks
+
+fr: Skills à débloquer
+tr: Skills to unlock
+
+fr: Solde : %s Zeny
+tr: Balance: %s Zeny
+
+fr: Sort imposé
+tr: Imposed spell
+
+fr: Survivre en une seule partie
+tr: Survive in a single run
+
+fr: Temps
+tr: Time
+
+fr: Tombe de : %s
+tr: Dropped by: %s
+
+fr: Tout rembourser
+tr: Refund all
+
+fr: Trouvée %u fois
+tr: Found %u time(s)
+
+fr: Tués
+tr: Kills
+
+fr: Vies +%d
+tr: Lives +%d
+
+fr: Zeny insuffisants
+tr: Not enough Zeny
+
+fr: Zone +%d %%
+tr: Area +%d %%
+
+fr: ancien équilibrage
+tr: older balance
+
+fr: bientôt
+tr: soon
+
+fr: Église
+tr: Church
+
+fr: Église de Prontera
+tr: Prontera Church
+
+fr: Le carnet des Survivants était abîmé : copié sous %s, un carnet neuf le remplace.
+tr: The Survivors notebook was damaged: copied as %s, a new notebook replaces it.
+
+fr: Le carnet des Survivants ne s'écrit pas : rien n'a changé.
+tr: The Survivors notebook cannot be written: nothing has changed.
+
+fr: Achat refusé : Zeny insuffisants, le carnet a changé.
+tr: Purchase refused: not enough Zeny, the notebook has changed.
+
+fr: Achat refusé : rang maximal déjà atteint, le carnet a changé.
+tr: Purchase refused: highest rank already reached, the notebook has changed.
+
+fr: %d résultat(s) en attente d'envoi
+tr: %d result(s) waiting to be sent
+
+fr: %de
+tr: #%d
+
+fr: Aucune partie classée.
+tr: No ranked runs.
+
+fr: Classement
+tr: Ranking
+
+fr: Classement : %s (votre meilleur : %s)
+tr: Ranking: %s (your best: %s)
+
+fr: Classement : %s — meilleur personnel !
+tr: Ranking: %s — personal best!
+
+fr: Classement : hors tableau (votre meilleur : %s)
+tr: Ranking: off the board (your best: %s)
+
+fr: Classement : hors tableau — meilleur personnel !
+tr: Ranking: off the board — personal best!
+
+fr: Classement des Survivants
+tr: Survivors Ranking
+
+fr: Classement en ligne
+tr: Online ranking
+
+fr: Classé si le serveur répond.
+tr: Ranked if the server answers.
+
+fr: Classée
+tr: Ranked
+
+fr: En attente du serveur : le résultat sera renvoyé à la prochaine connexion de ce personnage.
+tr: Waiting for the server: the result will be sent again the next time this character logs in.
+
+fr: Envoi au serveur…
+tr: Sending to the server…
+
+fr: Graine tirée par le serveur.
+tr: Seed drawn by the server.
+
+fr: Nouveau record ! Rang %d des parties classées
+tr: New record! Rank %d of ranked runs
+
+fr: Partie classée
+tr: Ranked run
+
+fr: Partie libre : ce compte n'est rattaché à aucun joueur.
+tr: Free run: this account is not linked to any player.
+
+fr: Partie libre : demande trop proche de la précédente.
+tr: Free run: request too soon after the previous one.
+
+fr: Partie libre : le serveur compte une autre semaine.
+tr: Free run: the server counts a different week.
+
+fr: Partie libre : le serveur n'a pas répondu.
+tr: Free run: the server did not answer.
+
+fr: Partie libre : le serveur ne classe pas ces règles.
+tr: Free run: the server does not rank these rules.
+
+fr: Partie libre : le serveur ne classe pas une partie lancée d'ici.
+tr: Free run: the server does not rank a run started here.
+
+fr: Partie libre : refusée par le serveur.
+tr: Free run: refused by the server.
+
+fr: Parties classées
+tr: Ranked runs
+
+fr: Refusée par le serveur : partie invraisemblable.
+tr: Refused by the server: implausible run.
+
+fr: Refusée par le serveur, sans raison connue.
+tr: Refused by the server, for no known reason.
+
+fr: Règles %d
+tr: Rules %d
+
+fr: Résultat non compté : déjà reçu ou oublié par le serveur.
+tr: Result not counted: already received or forgotten by the server.
+
+fr: Score : %s
+tr: Score: %s
+
+fr: Votre meilleur : %s, %s
+tr: Your best: %s, %s
+
+fr: Vous : %s — %s
+tr: You: %s — %s
+
+fr: Vous n'êtes pas encore classé.
+tr: You are not ranked yet.
+
+fr: il y a %d min
+tr: %d min ago
+
+fr: il y a %d s
+tr: %d s ago
+
+fr: Défi de la semaine non classé : il se joue en local.
+tr: Weekly challenge not ranked: it is played locally.
+
+fr: Survivants de Midgard : votre partie du %s est classée %s.
+tr: Midgard Survivors: your run of %s is ranked %s.
+
+fr: Survivants de Midgard : votre partie du %s est comptée, hors tableau.
+tr: Midgard Survivors: your run of %s is counted, outside the table.
+
+fr: Survivants de Midgard : votre partie du %s est refusée par le serveur.
+tr: Midgard Survivors: your run of %s was refused by the server.
+
+fr: Survivants de Midgard : votre partie du %s n'a pas été comptée : déjà reçue ou perdue par le serveur.
+tr: Midgard Survivors: your run of %s was not counted: already received or lost by the server.
+
+fr: Survivants de Midgard : votre partie du %s est oubliée : son jeton a expiré.
+tr: Midgard Survivors: your run of %s is forgotten: its ticket expired.

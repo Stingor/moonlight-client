@@ -9,7 +9,7 @@ namespace moonclient {
 
 void PumpHandshake(ro::net::Connection& link, ro::net::MoonclientHandshake& handshake,
                    ro::net::MoonclientHandshakeState& reported, GamePieces& pieces,
-                   bool mvp_tracker_enabled, std::uint32_t now_ms) {
+                   bool mvp_tracker_enabled, std::uint32_t reading_caps, std::uint32_t now_ms) {
   handshake.Pump(link, now_ms);
   if (handshake.state() != reported) {
     reported = handshake.state();
@@ -36,7 +36,7 @@ void PumpHandshake(ro::net::Connection& link, ro::net::MoonclientHandshake& hand
   // d'album et dépouille les dialogues de leurs images. Le carnet y entre et en
   // sort avec son interrupteur.
   pieces.surfaces.Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
-                       ShownSurfaces(mvp_tracker_enabled));
+                       ShownSurfaces(mvp_tracker_enabled) | reading_caps);
 }
 
 }  // namespace moonclient

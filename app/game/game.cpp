@@ -2,9 +2,12 @@
 //
 // Le dessin du monde vit à côté, dans `game_draw.cpp` : c'est la plus grosse des
 // étapes, et la seule dont l'ordre des couches soit un sujet à part entière.
+// La boucle des événements SDL vit dans `game_events.cpp`.
 
 #include "game/game.h"
 
+#include <cstdint>
+#include <ctime>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -36,8 +39,8 @@
 #include "game/menu_icon_route.h"
 #include "game/setting_destination_open.h"
 #include "game/skin_image_of.h"
+#include "game/survivors_mode.h"
 #include "game/warp_list_stage.h"
-#include "game/window_events.h"
 #include "guild/sample_emblem.h"
 #include "items/inventory_view.h"
 #include "options/damage_page_names.h"
@@ -54,6 +57,9 @@ namespace moonclient {
 ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   PumpEvents(now_ms);
   if (auto ok = PumpNetwork(now_ms); !ok) {
+    // LA PARTIE DE SURVIVORS EN COURS SE FIGE ET S'ÉCRIT (Q3) : la partie de
+    // jeu s'arrête ici, et l'étage du mode avec elle.
+    survivors_mode_->Freeze(survivors_, pieces_.minigames, client_root_);
     return ok;
   }
   FollowGmOutfit();  // Après le réseau, qui a pu faire réapparaître le joueur.
@@ -126,6 +132,19 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
     const bool verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified;
     pieces_.minigames.Announce(link_, verified, world_.map_entries(), client_root_);
   }
+  // LE CLASSEMENT SURVIVORS, muet tant que le serveur n'a pas annoncé le
+  // service, après l'avis de chargement pour la même raison que les trophées.
+  survivors_ranking_.Pump(
+      link_,
+      SurvivorsRankingFacts{
+          .verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
+          .map_entries = world_.map_entries(),
+          .server_key = SurvivorsServerKeyOf(shell_.login_address()),
+          .character_id = ticket_.character_id,
+          .character_name = world_.player_name(),
+          .now = SurvivorsRankingNow{.steady_ms = now_ms,
+                                     .utc_s = static_cast<std::int64_t>(std::time(nullptr))}},
+      client_root_);
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
   // Le tableau montre le dernier classement, et demande celui d'un onglet.
@@ -136,6 +155,22 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
         InterfaceSoundFile{.place = InterfaceSoundPlace::kSoundArchive, .path = std::move(sound)});
   }
   play_sounds(std::move(star_sounds), "d'un avis d'étoile");
+  // 🔴 LE MODE SURVIVORS : sa porte à chaque image, et quand une partie tient
+  // l'écran, l'arène au lieu du monde. La veille, le relief, la caméra, le
+  // voile et le dessin du monde sont sautés ; l'interface sort au même point
+  // que la veille. Voir `game_survivors.cpp`.
+  FrameSurvivors(now_ms);
+  if (survivors_.owns_screen()) {
+    DrawInterface(now_ms);
+    const ro::render::DrawableSize drawable = gl_->drawable_size();
+    const ro::render::Resolution points = gl_->size();
+    recorder_.GrabIfDue(FrameSurface{.drawable_width = drawable.width,
+                                     .drawable_height = drawable.height,
+                                     .point_width = points.width,
+                                     .point_height = points.height},
+                        now_ms);
+    return {};
+  }
   // ⚠ APRÈS LE RÉSEAU, DONC APRÈS `AimCamera`, ET AVANT LE DESSIN : la veille
   // écrit la pose de la caméra, et elle doit écraser le cadrage du personnage,
   // pas être écrasée par lui.
@@ -200,6 +235,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
 Game::~Game() {
   // Le rappel des profils de réglages désigne cette partie.
   settings_->profiles().AfterPose({});
+  // L'arène de survivors habille ses corps par la garde-robe de la partie.
+  survivors_mode_->Forget();
 }
 
 void Game::Close() {
@@ -218,6 +255,10 @@ void Game::Close() {
   }
   // L'IA DES COMPAGNONS : ses profils en attente, et les délais pour la session suivante.
   pieces_.companion_ai.Leave(static_cast<std::uint32_t>(SDL_GetTicks()));
+  // Une partie de survivors en cours se fige et s'écrit, comme sur une liaison
+  // perdue (Q3). ⚠ AVANT LES MINI-JEUX : ses trophées s'y inscrivent, et une
+  // écriture ratée s'y retente une dernière fois.
+  survivors_mode_->Freeze(survivors_, pieces_.minigames, client_root_);
   pieces_.minigames.Leave(client_root_);
   // La minimap quitte le panneau d'options : ses réglages vivent avec la partie.
   settings_->options().pages().minimap_panel.Entrust(nullptr);
@@ -225,100 +266,6 @@ void Game::Close() {
   settings_->options().pages().quest_tracker.Entrust(nullptr);
   // Le pseudo et la carte quittent le titre avec la partie.
   gl_->SetTitle(WindowTitle(shell_.test_server()));
-}
-
-void Game::PumpEvents(std::uint32_t now_ms) {
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    // 🔴 LE COMPTEUR D'INACTIVITÉ VOIT L'ÉVÉNEMENT LE PREMIER, ET PEUT L'AVALER. Il
-    // faut décider d'avaler AU MOMENT MÊME où l'on constate le geste : un drapeau
-    // « on s'est réveillé » consommé plus tard laisserait passer le clic de l'image
-    // en cours — celui-là même qui déplacerait le personnage dans une direction que
-    // le joueur n'a pas choisie, puisqu'il visait un décor vu sous un autre angle.
-    if (NoteAfkInput(event, now_ms)) {
-      continue;
-    }
-    // L'INTERFACE VOIT TOUT, AVANT TOUT LE MONDE : il lui faut avoir vu la souris
-    // bouger, et ce qu'elle en dit décide à qui revient le geste (`window_events.h`).
-    interface_->TakeEvent(event);
-    RouteEvent({.gl = &*gl_,
-                .interface = &*interface_,
-                .link = &link_,
-                .world = &world_,
-                .stage = &*stage_,
-                .planner = &planner_,
-                .effects = &*effects_,
-                .effect_nodes = &*effect_nodes_,
-                .camera = &camera_,
-                .rig = &camera_rig_,
-                .chat = &windows_.chat.main,
-                .grimoire = &grimoire_,
-                .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                .sheet = &windows_.character,
-                .status = &windows_.status.state,
-                .basic_info = &windows_.basic_info.state,
-                .grimoire_keys = &pieces_.grimoire_keys,
-                .homunculus_present = pieces_.homunculus.view().present,
-                .mercenary_present = pieces_.mercenary.view().present,
-                .companion_ai = &pieces_.companion_ai,
-                .pet = &windows_.pet,
-                .inventory = &windows_.inventory,
-                .cart = &windows_.cart,
-                .party = &windows_.party.window,
-                .bank = &bank_,
-                .card_album = &card_album_,
-                .card_album_window = &windows_.card_album,
-                .cash_shop = &pieces_.cash_shop,
-                .mail = &pieces_.mail,
-                .achievements = &pieces_.achievements,
-                .quests = &pieces_.quests,
-                .memorial = &pieces_.memorial,
-                .trade = &pieces_.trade,
-                .chat_rooms = &pieces_.chat_rooms,
-                .chat_room_form_open = windows_.chat_room.make.open,
-                .menu = &windows_.menu,
-                .macros = &windows_.macros,
-                .style = &windows_.style,
-                .craft_atlas = &windows_.craft_atlas.state,
-                .navigation = &windows_.navigation.state,
-                .world_map = &windows_.navigation.world_map,
-                .minimap_shown = &shell_.layouts().minimap().shown,
-                .mvp_tracker = &pieces_.mvp_tracker,
-                .database_toggle = &windows_.monster_sheet.database.toggle_asked,
-                .bug_report = &windows_.bug_report,
-                .recorder = &recorder_,
-                .hotkeys = &windows_.hotkeys,
-                .bindings = &settings_->bindings(),
-                .presets = &*presets_,
-                .targeting = &targeting_,
-                .quick_cast = &quick_cast_,
-                .entity_menu = &menu_gestures_,
-                .afk_now = &afk_requested_,
-                .shortcuts = &*shortcuts_,
-                .shortcut_wheel = &pieces_.shortcut_wheel,
-                .escape_closes_a_window = interface_->escape_has_work(),
-                .enter_claimed =
-                    CraftStage::ClaimsEnter(windows_.make_item, windows_.weapon_refine,
-                                            settings_->options().pages().make_item.settings(),
-                                            settings_->options().pages().weapon_refine.settings()),
-                .no_shift = settings_->options().no_shift(),
-                .no_ctrl = settings_->options().no_ctrl(),
-                .shop_one_click = settings_->options().shops().one_click(),
-                .bench = &effect_bench_,
-                .map_editor = Rights().staff_tools && map_editor_.active() ? &map_editor_ : nullptr,
-                .map_editor_view = &windows_.staff_tools.map_editor,
-                .chat_dispatch = &*chat_dispatch_,
-                .scene_actors = &scene_actors_,
-                .mouse = &mouse_,
-                .world_mouse = &world_mouse_,
-                .running = &running_,
-                .size = &size_,
-                .aspect_ratio = &aspect_ratio_,
-                .pickup = &pickup_,
-                .attack = &attack_,
-                .now_ms = now_ms},
-               event);
-  }
 }
 
 void Game::DrawInterface(std::uint32_t now_ms) {
@@ -425,6 +372,19 @@ void Game::DrawInterface(std::uint32_t now_ms) {
     // ⚠ LE CURSEUR RESTE S'IL N'EST PAS MASQUÉ : les deux cases sont
     // indépendantes, et rien ne justifie de les lier ici.
     PaintCursor();
+    settings_->Tick(now_ms);
+    return;
+  }
+  // ── UNE PARTIE DE SURVIVORS TIENT L'ÉCRAN : sortie jumelle de la veille ──
+  //
+  // Même règle : rien n'est fermé ni déplacé, et tout ce qui précède a tourné.
+  // L'image de l'écran de chargement n'a pas d'autre interface.
+  if (survivors_.owns_screen()) {
+    if (!survivors_mode_->loading_shown_now()) {
+      survivors_mode_->NoteAsk(interface_->DrawSurvivorsOnly(
+          survivors_mode_->View(survivors_, survivors_mode_->context())));
+      PaintCursor();
+    }
     settings_->Tick(now_ms);
     return;
   }
@@ -784,17 +744,6 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // la même image ce que la fenêtre vient de changer.
   settings_->NoteWindowPlace(OptionsTargets());
   settings_->Tick(now_ms);
-}
-
-// ET LE CURSEUR APRÈS TOUT, y compris après les fenêtres. Il n'y en a qu'un dans
-// ce client, et c'est celui-ci.
-void Game::PaintCursor() {
-  if (cursor_quads_.empty()) {
-    return;
-  }
-  pieces_.overlay.Draw(cursor_quads_, static_cast<float>(shell_.width()),
-                       static_cast<float>(shell_.height()));
-  cursor_quads_.clear();
 }
 
 }  // namespace moonclient

@@ -15,7 +15,7 @@ struct Entry {
 
 // Triée par opcode : la recherche est dichotomique, et un paquet arrive à
 // chaque tour de boucle réseau.
-constexpr std::array<Entry, 1387> kLengths = {{
+constexpr std::array<Entry, 1395> kLengths = {{
     Entry{0x0064, 55},  Entry{0x0065, 17},  Entry{0x0066, 3},   Entry{0x0067, 37},
     Entry{0x0068, 46},  Entry{0x0069, -1},  Entry{0x006a, 23},  Entry{0x006b, -1},
     Entry{0x006c, 3},   Entry{0x006d, 149}, Entry{0x006e, 3},   Entry{0x006f, 2},
@@ -362,7 +362,9 @@ constexpr std::array<Entry, 1387> kLengths = {{
     Entry{0x0f3d, -1},  Entry{0x0f3e, 8},   Entry{0x0f3f, -1},  Entry{0x0f40, -1},
     Entry{0x0f41, -1},  Entry{0x0f42, -1},  Entry{0x0f43, 5},   Entry{0x0f44, -1},
     Entry{0x0f45, -1},  Entry{0x0f46, -1},  Entry{0x0f47, -1},  Entry{0x0f48, -1},
-    Entry{0x0f49, 20},  Entry{0x0f4a, -1},  Entry{0x0f4b, 5},
+    Entry{0x0f49, 20},  Entry{0x0f4a, -1},  Entry{0x0f4b, 5},   Entry{0x0f4c, 11},
+    Entry{0x0f4d, -1},  Entry{0x0f4e, 29},  Entry{0x0f4f, -1},  Entry{0x0f50, 11},
+    Entry{0x0f51, -1},  Entry{0x0f52, -1},  Entry{0x0f53, -1},
 }};
 
 }  // namespace

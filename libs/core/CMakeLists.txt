@@ -19,6 +19,7 @@ add_library(ro_core STATIC
     src/ink.cpp
     src/load_progress.cpp
     src/log.cpp
+    src/pcg32.cpp
     src/printed.cpp
     src/program_arguments.cpp
     src/search_key.cpp

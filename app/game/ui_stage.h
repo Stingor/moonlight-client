@@ -102,6 +102,7 @@
 #include "game/quest_stage.h"
 #include "game/staff_window_rounds.h"
 #include "game/trade_windows.h"
+#include "game/ui_stage_survivors.h"
 #include "game/whisper_stage.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "party/party_booking_board.h"
@@ -653,6 +654,8 @@ class UiStage {
   // UNE IMAGE D'ÉCRAN DE MISE À JOUR : voir `ro/ui/patch_screen.h`. Même règle
   // que ses jumelles.
   [[nodiscard]] ro::ui::PatchScreenAnswers DrawPatchOnly(const ro::ui::PatchScreenView& view);
+  // UNE IMAGE DE PARTIE DE SURVIVORS : voir `game/ui_stage_survivors.h`.
+  [[nodiscard]] SurvivorsAsk DrawSurvivorsOnly(const SurvivorsFrameView& view);
 
   // `skills` porte les onglets du grimoire, DÉJÀ composés : `ui` ne connaît ni
   // l'arbre du client ni le livre du serveur.

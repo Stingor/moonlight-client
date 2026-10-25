@@ -75,6 +75,7 @@ add_library(ro_net STATIC
     src/spell_list.cpp
     src/status_chat.cpp
     src/status_chat_texts.cpp
+    src/survivors_ranking.cpp
     src/talkbox.cpp
     src/flag_graffiti.cpp
     src/target_info.cpp

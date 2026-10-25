@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>
@@ -161,6 +162,12 @@ class AudioEngine {
                                              std::span<const std::uint8_t> bytes);
 
   [[nodiscard]] bool KnowsSound(const std::string& name) const;
+
+  // LA DURÉE D'UN BRUIT RETENU, en millisecondes de son décodé ; rien pour un
+  // nom inconnu, sur un mélangeur fermé, ou quand le décodeur ne la dit pas.
+  // C'est ce qui permet à un appelant d'estimer quand une voix se libère sans
+  // interroger les pistes.
+  [[nodiscard]] std::optional<std::uint64_t> SoundLengthMs(const std::string& name) const;
 
   // OUBLIE UN BRUIT RETENU : son nom redevient inconnu, et le décodé se libère.
   // Sans effet sur un nom inconnu.

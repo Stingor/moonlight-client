@@ -12,14 +12,17 @@
 #include "ro/sim/match3_game.h"
 #include "ro/sim/minigame_trophies.h"
 #include "ro/sim/peg_game.h"
+#include "ro/sim/survivors_run.h"
 #include "ro/ui/escape_stack.h"
 #include "ro/ui/minigames_window.h"
 #include "ro/ui/roggle_window.h"
 #include "ro/ui/rojeweled_window.h"
+#include "ro/ui/survivors_prepare_window.h"
 
 #include "game/interface_sound.h"
 #include "game/minigame_file.h"
 #include "game/minigame_trophy_announcer.h"
+#include "game/ui_stage_survivors.h"
 #include "world/monster_sprite.h"
 
 namespace moonclient {
@@ -36,15 +39,31 @@ struct MinigameWindows {
   ro::ui::RoggleState roggle;
   ro::ui::RoggleView roggle_view;
   ro::ui::RoggleAsk roggle_answer;
+  // LA PRÉPARATION D'UNE PARTIE DE SURVIVORS, que la troisième ligne de la
+  // salle ouvre : dessinée dans l'image du jeu, le jeu restant visible. Sa vue
+  // est composée par la partie (`SurvivorsMode`), qui lit sa réponse.
+  ro::ui::SurvivorsPrepareState survivors_prepare;
+  ro::ui::SurvivorsPrepareView survivors_prepare_view;
+  ro::ui::SurvivorsPrepareAsk survivors_prepare_answer;
+  bool survivors_prepare_composed = false;
+  // Les fenêtres de la méta que l'accueil ouvre, dessinées avec lui.
+  SurvivorsMetaWindows survivors_meta;
   // Les vues ont été composées pour l'image : sans elles, une fenêtre
   // désignerait ce que l'étage d'une autre partie a rangé.
   bool composed = false;
 };
 
-// DESSINE LES TROIS FENÊTRES, quand leurs vues sont composées, et les déclare
-// à Échap.
+// DESSINE LES FENÊTRES, quand leurs vues sont composées, et les déclare à
+// Échap : la salle, les deux jeux, la préparation de survivors et les
+// fenêtres de méta qu'elle ouvre.
 void DrawMinigameWindows(MinigameWindows& windows, const ro::ui::SkinArt& art,
                          ro::ui::EscapeStack& escape);
+
+// ENTRÉE EST-ELLE À LA MÉTA SURVIVORS ? L'accueil, l'Église, la Kafra ou
+// l'Album qui a le focus en fait son geste — partir, acheter, déplier une
+// carte —, et la touche ne va pas alors à la barre de conversation. Le focus
+// est celui de l'image précédente : voir `ro::ui::WindowHasFocus`.
+[[nodiscard]] bool SurvivorsClaimsEnter(const MinigameWindows& windows);
 
 // CE QUE L'ÉTAGE EMPRUNTE À LA PARTIE. ⚠ TOUT PEUT MANQUER : sans art, les
 // jeux se jouent avec leurs formes de repli.
@@ -102,6 +121,13 @@ class MinigameStage {
 
   // À LA FIN DE LA PARTIE : une écriture ratée se retente une dernière fois.
   void Leave(const std::filesystem::path& client_root);
+
+  // UNE PARTIE DE SURVIVORS FINIE, ou figée par une liaison perdue : ses
+  // trophées s'inscrivent et s'écrivent aussitôt, et se rendent : leur avis
+  // est une ligne de l'écran de fin du mode (Q13), jamais la file des avis des
+  // autres jeux. `Announce` les dit au serveur. Voir `ro::sim::RecordSurvivors`.
+  [[nodiscard]] std::vector<ro::sim::MinigameTrophy> RecordSurvivorsRun(
+      const ro::sim::SurvivorsRun& run, const std::filesystem::path& client_root);
 
   // LES SONS À JOUER. Consommés.
   [[nodiscard]] std::vector<InterfaceSoundFile> TakeSounds();

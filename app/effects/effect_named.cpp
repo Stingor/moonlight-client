@@ -37,7 +37,6 @@
 #include "ro/sim/world.h"
 
 #include "effects/effect_actor_change.h"
-#include "effects/effect_layers.h"
 #include "effects/effect_named_sounds.h"
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"

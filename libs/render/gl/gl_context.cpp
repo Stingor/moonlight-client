@@ -1,7 +1,10 @@
 #include "ro/render/gl_context.h"
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
+#include <cstdint>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -423,5 +426,28 @@ core::Result<void> GlContext::SetDisplayMode(DisplayMode mode, Resolution wanted
 }
 
 bool GlContext::SetVerticalSync(bool on) const { return SDL_GL_SetSwapInterval(on ? 1 : 0); }
+
+std::optional<std::int64_t> GlContext::FreeVideoMemoryKib() {
+  // Les jetons des deux extensions : la mémoire dédiée encore libre chez
+  // NVIDIA, et quatre entiers chez AMD dont le premier est la mémoire libre
+  // des textures. Les deux comptent en kibioctets.
+  constexpr GLenum kNvidiaFreeVideoMemory = 0x9049;
+  constexpr GLenum kAmdFreeTextureMemory = 0x87FC;
+  constexpr std::size_t kAmdMemoryFields = 4;
+  // Ce qui a été demandé à la carte s'achève d'abord : un téléversement encore
+  // en file n'a rien pris.
+  glFinish();
+  if (SDL_GL_ExtensionSupported("GL_NVX_gpu_memory_info")) {
+    GLint free_kib = 0;
+    glGetIntegerv(kNvidiaFreeVideoMemory, &free_kib);
+    return glGetError() == GL_NO_ERROR ? std::optional<std::int64_t>(free_kib) : std::nullopt;
+  }
+  if (SDL_GL_ExtensionSupported("GL_ATI_meminfo")) {
+    std::array<GLint, kAmdMemoryFields> fields{};
+    glGetIntegerv(kAmdFreeTextureMemory, fields.data());
+    return glGetError() == GL_NO_ERROR ? std::optional<std::int64_t>(fields[0]) : std::nullopt;
+  }
+  return std::nullopt;
+}
 
 }  // namespace ro::render

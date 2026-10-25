@@ -67,6 +67,19 @@ void DrawTrophies(const MinigamesView& view) {
   return play;
 }
 
+// LA LIGNE DES SURVIVANTS : sans meilleur score avant les records (lot 6), le
+// bouton ouvre la préparation.
+[[nodiscard]] bool DrawSurvivorsLine(const SkinArt& art) {
+  const char* name = core::Tr("Survivants de Midgard");
+  ImGui::SeparatorText(name);
+  ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - SkinButtonWidth(core::Tr("Jouer"), art));
+  ImGui::PushID(name);
+  const bool play = SkinButton(core::Tr("Jouer"), art);
+  ImGui::PopID();
+  FaintText(core::Tr("Survivez quinze minutes à la horde de Prontera Field."));
+  return play;
+}
+
 }  // namespace
 
 MinigamesAsk DrawMinigamesWindow(MinigamesState& state, const MinigamesView& view,
@@ -86,6 +99,9 @@ MinigamesAsk DrawMinigamesWindow(MinigamesState& state, const MinigamesView& vie
   FaintText(core::Tr("Alignez trois monstres de la même couleur, en trente coups."));
   asked.open_roggle = DrawGameLine(core::Tr("Roggle"), view.roggle_best, art);
   FaintText(core::Tr("Effacez tous les plots orange avant d'épuiser vos billes."));
+  if (view.survivors_offered) {
+    asked.open_survivors = DrawSurvivorsLine(art);
+  }
   DrawTrophies(view);
   EndSkinnedWindow();
   return asked;

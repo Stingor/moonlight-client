@@ -30,6 +30,9 @@ struct MinigamesView {
   int rojeweled_best = 0;
   int roggle_best = 0;
   std::span<const MinigameTrophyRow> trophies;
+  // La troisième ligne, « Survivants de Midgard » (U1, U2) : posée par `app`
+  // dès que le mode peut s'ouvrir.
+  bool survivors_offered = false;
 };
 
 struct MinigamesState {
@@ -39,6 +42,7 @@ struct MinigamesState {
 struct MinigamesAsk {
   bool open_rojeweled = false;
   bool open_roggle = false;
+  bool open_survivors = false;
 };
 
 [[nodiscard]] MinigamesAsk DrawMinigamesWindow(MinigamesState& state, const MinigamesView& view,

@@ -27,6 +27,8 @@ class CameraRig {
   void SetExpandedZoom(bool expanded);
 
   [[nodiscard]] const CameraLimits& limits() const noexcept { return limits_; }
+  // La carte où l'on est entré est un intérieur.
+  [[nodiscard]] bool indoor() const noexcept { return rules_.indoor; }
 
   // Faux pour un cran arrivé moins de seize millisecondes après le précédent.
   [[nodiscard]] bool TakeWheel(std::uint32_t now_ms);

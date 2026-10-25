@@ -59,4 +59,13 @@ bool QueueActorChange(EffectMapMemory& memory,
                       const std::array<float, 3>& ground, std::uint32_t now_ms,
                       ro::sim::StatusEffectId state, bool withdrawn);
 
+// INSCRIT SUR LES ACTEURS les effets que `EffectsInPlay::TakeActorEffects` a
+// rendus, et en retire ceux qu'une levée d'état emporte.
+//
+// ⚠ LES RETRAITS D'ABORD. Un même passage peut lever un état et en poser un
+// autre qui porte le même effet — Energy Coat qui tombe pendant qu'Overthrust
+// se pose : la traînée du second doit survivre au retrait du premier.
+void SettleActorEffects(ro::sim::World& world,
+                        const std::vector<EffectsInPlay::ActorEffectToRecord>& poses);
+
 }  // namespace moonclient

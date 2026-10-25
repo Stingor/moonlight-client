@@ -1,5 +1,6 @@
 // LE CURSEUR DE LA SOURIS : sa forme, décidée là où l'on sait ce qu'elle
-// désigne, et le rang du sort en main qui l'accompagne.
+// désigne, le rang du sort en main qui l'accompagne, et sa peinture, après
+// toutes les fenêtres (`PaintCursor`).
 
 #include <cstdint>
 #include <optional>
@@ -195,6 +196,17 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
       cursor_quads_.insert(cursor_quads_.end(), level.begin(), level.end());
     }
   }
+}
+
+// ET LE CURSEUR APRÈS TOUT, y compris après les fenêtres. Il n'y en a qu'un dans
+// ce client, et c'est celui-ci.
+void Game::PaintCursor() {
+  if (cursor_quads_.empty()) {
+    return;
+  }
+  pieces_.overlay.Draw(cursor_quads_, static_cast<float>(shell_.width()),
+                       static_cast<float>(shell_.height()));
+  cursor_quads_.clear();
 }
 
 }  // namespace moonclient

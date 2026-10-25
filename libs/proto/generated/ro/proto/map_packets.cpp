@@ -192,6 +192,10 @@ constexpr std::size_t kMaxFrameSize = 0xFFFF;
 [[maybe_unused]] void ReadMoonlightMarketEntry(ByteReader& reader, MoonlightMarketEntry& value);
 [[maybe_unused]] void WriteMoonlightMarketEntry(ByteWriter& writer,
                                                 const MoonlightMarketEntry& value);
+[[maybe_unused]] void ReadZcMoonlightSurvivorsBoardEntry(ByteReader& reader,
+                                                         ZcMoonlightSurvivorsBoardEntry& value);
+[[maybe_unused]] void WriteZcMoonlightSurvivorsBoardEntry(
+    ByteWriter& writer, const ZcMoonlightSurvivorsBoardEntry& value);
 [[maybe_unused]] void ReadCzSePcBuyCashitemListSub(ByteReader& reader,
                                                    CzSePcBuyCashitemListSub& value);
 [[maybe_unused]] void WriteCzSePcBuyCashitemListSub(ByteWriter& writer,
@@ -1152,6 +1156,25 @@ void WriteMoonlightMarketEntry(ByteWriter& writer, const MoonlightMarketEntry& v
   writer.U8(static_cast<std::uint8_t>(value.currency));
   writer.U32(static_cast<std::uint32_t>(value.currency_item));
   writer.FixedString(value.currency_name, 32);
+}
+
+void ReadZcMoonlightSurvivorsBoardEntry(ByteReader& reader, ZcMoonlightSurvivorsBoardEntry& value) {
+  value.rank = static_cast<std::uint16_t>(reader.U16());
+  value.score = static_cast<std::uint64_t>(reader.U64());
+  value.survived_steps = static_cast<std::uint32_t>(reader.U32());
+  value.level = static_cast<std::uint16_t>(reader.U16());
+  value.verified = static_cast<std::uint8_t>(reader.U8());
+  value.name = reader.FixedString(24);
+}
+
+void WriteZcMoonlightSurvivorsBoardEntry(ByteWriter& writer,
+                                         const ZcMoonlightSurvivorsBoardEntry& value) {
+  writer.U16(static_cast<std::uint16_t>(value.rank));
+  writer.U64(static_cast<std::uint64_t>(value.score));
+  writer.U32(static_cast<std::uint32_t>(value.survived_steps));
+  writer.U16(static_cast<std::uint16_t>(value.level));
+  writer.U8(static_cast<std::uint8_t>(value.verified));
+  writer.FixedString(value.name, 24);
 }
 
 void ReadCzSePcBuyCashitemListSub(ByteReader& reader, CzSePcBuyCashitemListSub& value) {
@@ -12380,6 +12403,300 @@ std::vector<std::uint8_t> Encode(const CzMoonlightMinigameTrophy& packet) {
   writer.U16(CzMoonlightMinigameTrophy::kOpcode);
   writer.I16(static_cast<std::int16_t>(packet.packetLength));
   writer.U8(static_cast<std::uint8_t>(packet.trophy));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightSurvivorsBegin& packet) {
+  if (frame.size() != CzMoonlightSurvivorsBegin::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightSurvivorsBegin::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.ruleset = static_cast<std::uint16_t>(reader.U16());
+  packet.arena = static_cast<std::uint16_t>(reader.U16());
+  packet.class_id = static_cast<std::uint16_t>(reader.U16());
+  packet.board = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsBegin& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightSurvivorsBegin::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightSurvivorsBegin::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U16(static_cast<std::uint16_t>(packet.ruleset));
+  writer.U16(static_cast<std::uint16_t>(packet.arena));
+  writer.U16(static_cast<std::uint16_t>(packet.class_id));
+  writer.U8(static_cast<std::uint8_t>(packet.board));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightSurvivorsTicket& packet) {
+  if (frame.size() < ZcMoonlightSurvivorsTicket::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightSurvivorsTicket::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.result = static_cast<std::uint8_t>(reader.U8());
+  packet.ticket = static_cast<std::uint32_t>(reader.U32());
+  packet.seed = static_cast<std::uint64_t>(reader.U64());
+  packet.issued_at = static_cast<std::int64_t>(reader.I64());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsTicket& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightSurvivorsTicket::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightSurvivorsTicket::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.result));
+  writer.U32(static_cast<std::uint32_t>(packet.ticket));
+  writer.U64(static_cast<std::uint64_t>(packet.seed));
+  writer.I64(static_cast<std::int64_t>(packet.issued_at));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightSurvivorsEnd& packet) {
+  if (frame.size() != CzMoonlightSurvivorsEnd::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightSurvivorsEnd::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.ticket = static_cast<std::uint32_t>(reader.U32());
+  packet.survived_steps = static_cast<std::uint32_t>(reader.U32());
+  packet.kill_points = static_cast<std::uint32_t>(reader.U32());
+  packet.kills = static_cast<std::uint32_t>(reader.U32());
+  packet.boss_kills = static_cast<std::uint16_t>(reader.U16());
+  packet.level = static_cast<std::uint16_t>(reader.U16());
+  packet.outcome = static_cast<std::uint8_t>(reader.U8());
+  packet.journal_bytes = static_cast<std::uint32_t>(reader.U32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsEnd& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightSurvivorsEnd::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightSurvivorsEnd::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U32(static_cast<std::uint32_t>(packet.ticket));
+  writer.U32(static_cast<std::uint32_t>(packet.survived_steps));
+  writer.U32(static_cast<std::uint32_t>(packet.kill_points));
+  writer.U32(static_cast<std::uint32_t>(packet.kills));
+  writer.U16(static_cast<std::uint16_t>(packet.boss_kills));
+  writer.U16(static_cast<std::uint16_t>(packet.level));
+  writer.U8(static_cast<std::uint8_t>(packet.outcome));
+  writer.U32(static_cast<std::uint32_t>(packet.journal_bytes));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightSurvivorsResult& packet) {
+  if (frame.size() < ZcMoonlightSurvivorsResult::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightSurvivorsResult::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.ticket = static_cast<std::uint32_t>(reader.U32());
+  packet.verdict = static_cast<std::uint8_t>(reader.U8());
+  packet.score = static_cast<std::uint64_t>(reader.U64());
+  packet.rank = static_cast<std::uint16_t>(reader.U16());
+  packet.best = static_cast<std::uint64_t>(reader.U64());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsResult& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightSurvivorsResult::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightSurvivorsResult::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U32(static_cast<std::uint32_t>(packet.ticket));
+  writer.U8(static_cast<std::uint8_t>(packet.verdict));
+  writer.U64(static_cast<std::uint64_t>(packet.score));
+  writer.U16(static_cast<std::uint16_t>(packet.rank));
+  writer.U64(static_cast<std::uint64_t>(packet.best));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightSurvivorsBoard& packet) {
+  if (frame.size() != CzMoonlightSurvivorsBoard::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightSurvivorsBoard::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.ruleset = static_cast<std::uint16_t>(reader.U16());
+  packet.arena = static_cast<std::uint16_t>(reader.U16());
+  packet.class_id = static_cast<std::uint16_t>(reader.U16());
+  packet.board = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsBoard& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightSurvivorsBoard::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightSurvivorsBoard::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U16(static_cast<std::uint16_t>(packet.ruleset));
+  writer.U16(static_cast<std::uint16_t>(packet.arena));
+  writer.U16(static_cast<std::uint16_t>(packet.class_id));
+  writer.U8(static_cast<std::uint8_t>(packet.board));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightSurvivorsBoard& packet) {
+  if (frame.size() < ZcMoonlightSurvivorsBoard::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightSurvivorsBoard::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.ruleset = static_cast<std::uint16_t>(reader.U16());
+  packet.arena = static_cast<std::uint16_t>(reader.U16());
+  packet.class_id = static_cast<std::uint16_t>(reader.U16());
+  packet.board = static_cast<std::uint8_t>(reader.U8());
+  packet.own_rank = static_cast<std::uint16_t>(reader.U16());
+  packet.own_score = static_cast<std::uint64_t>(reader.U64());
+  packet.count = static_cast<std::uint8_t>(reader.U8());
+  if (reader.remaining() % ZcMoonlightSurvivorsBoardEntry::kWireSize != 0) {
+    reader.Invalidate();
+  } else {
+    packet.entries.resize(reader.remaining() / ZcMoonlightSurvivorsBoardEntry::kWireSize);
+    for (ZcMoonlightSurvivorsBoardEntry& element : packet.entries) {
+      ReadZcMoonlightSurvivorsBoardEntry(reader, element);
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsBoard& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightSurvivorsBoard::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightSurvivorsBoard::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U16(static_cast<std::uint16_t>(packet.ruleset));
+  writer.U16(static_cast<std::uint16_t>(packet.arena));
+  writer.U16(static_cast<std::uint16_t>(packet.class_id));
+  writer.U8(static_cast<std::uint8_t>(packet.board));
+  writer.U16(static_cast<std::uint16_t>(packet.own_rank));
+  writer.U64(static_cast<std::uint64_t>(packet.own_score));
+  writer.U8(static_cast<std::uint8_t>(packet.count));
+  for (const ZcMoonlightSurvivorsBoardEntry& element : packet.entries) {
+    WriteZcMoonlightSurvivorsBoardEntry(writer, element);
+  }
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightSurvivorsJournal& packet) {
+  if (frame.size() < CzMoonlightSurvivorsJournal::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightSurvivorsJournal::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.ticket = static_cast<std::uint32_t>(reader.U32());
+  packet.offset = static_cast<std::uint32_t>(reader.U32());
+  if (reader.remaining() % 1 != 0) {
+    reader.Invalidate();
+  } else {
+    packet.data.resize(reader.remaining() / 1);
+    for (std::uint8_t& element : packet.data) {
+      element = static_cast<std::uint8_t>(reader.U8());
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsJournal& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightSurvivorsJournal::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightSurvivorsJournal::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U32(static_cast<std::uint32_t>(packet.ticket));
+  writer.U32(static_cast<std::uint32_t>(packet.offset));
+  for (const std::uint8_t element : packet.data) {
+    writer.U8(static_cast<std::uint8_t>(element));
+  }
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightSurvivorsService& packet) {
+  if (frame.size() < ZcMoonlightSurvivorsService::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightSurvivorsService::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.ruleset_low = static_cast<std::uint16_t>(reader.U16());
+  packet.ruleset_high = static_cast<std::uint16_t>(reader.U16());
+  packet.server_utc = static_cast<std::int64_t>(reader.I64());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsService& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightSurvivorsService::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightSurvivorsService::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U16(static_cast<std::uint16_t>(packet.ruleset_low));
+  writer.U16(static_cast<std::uint16_t>(packet.ruleset_high));
+  writer.I64(static_cast<std::int64_t>(packet.server_utc));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
   return out;
 }
 

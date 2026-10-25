@@ -332,6 +332,9 @@ tr: La del juego
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: La del juego es la fuente del cliente original. El título conserva su espacio: una fuente más ancha se corta antes con «...», y pasar el ratón por el título lo muestra entero.
 
+fr: Chance d'une quatrième offre à la montée de niveau.
+tr: Probabilidad de una cuarta oferta al subir de nivel.
+
 fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
 tr: Susurra a un jugador; sola, cuenta los jugadores conectados.
 
@@ -392,6 +395,81 @@ tr: Pide la clasificación de herreros.
 fr: Demande le classement des taekwons.
 tr: Pide la clasificación de taekwons.
 
+fr: Des boules de feu tournent autour de vous.
+tr: Bolas de fuego giran a tu alrededor.
+
+fr: Des éclats d'esprit frappent là où les monstres se pressent.
+tr: Estallidos de espíritu golpean donde se agolpan los monstruos.
+
+fr: Il faut être en ville ou dans un intérieur.
+tr: Debes estar en una ciudad o en un interior.
+
+fr: Le personnage est mort.
+tr: Tu personaje está muerto.
+
+fr: Le storage est ouvert.
+tr: El storage está abierto.
+
+fr: La liaison avec le serveur est perdue.
+tr: Se perdió la conexión con el servidor.
+
+fr: On vous propose un échange.
+tr: Alguien te propone un intercambio.
+
+fr: Un PNJ vous parle.
+tr: Un PNJ te está hablando.
+
+fr: Un chargement de carte est en cours.
+tr: Se está cargando un mapa.
+
+fr: Un dialogue avec un PNJ est ouvert.
+tr: Hay un diálogo con un PNJ abierto.
+
+fr: Un monstre hostile est trop proche.
+tr: Un monstruo hostil está demasiado cerca.
+
+fr: Un mur de feu devant vous brûle et repousse les monstres.
+tr: Un muro de fuego delante de ti quema y repele a los monstruos.
+
+fr: Un trait de glace file droit, transperce et gèle.
+tr: Un rayo de hielo vuela recto, atraviesa y congela.
+
+fr: Des météores s'abattent là où les monstres se pressent.
+tr: Caen meteoros donde se agolpan los monstruos.
+
+fr: Six boules de feu tournent sans cesse et repoussent.
+tr: Seis bolas de fuego giran sin cesar y repelen.
+
+fr: Un cercle de piliers de feu brûle qui s'en approche.
+tr: Un círculo de pilares de fuego quema a quien se acerca.
+
+fr: Un échange est ouvert.
+tr: Hay un intercambio abierto.
+
+fr: Une onde de glace gèle les monstres autour de vous.
+tr: Una onda de hielo congela a los monstruos a tu alrededor.
+
+fr: Récupération de PV au fil du temps.
+tr: Recuperación de PV con el tiempo.
+
+fr: Portée de ramassage des gemmes augmentée.
+tr: Mayor alcance para recoger gemas.
+
+fr: Armure : chaque coup reçu est réduit.
+tr: Armadura: cada golpe recibido se reduce.
+
+fr: Un projectile de plus pour chaque skill.
+tr: Un proyectil más para cada habilidad.
+
+fr: Des esprits poursuivent les monstres et les transpercent.
+tr: Espíritus persiguen a los monstruos y los atraviesan.
+
+fr: Des éclairs de feu frappent le monstre le plus proche.
+tr: Rayos de fuego golpean al monstruo más cercano.
+
+fr: Des éclairs de glace frappent au hasard et ralentissent.
+tr: Rayos de hielo golpean al azar y ralentizan.
+
 fr: Dissout ta guilde.
 tr: Disuelve tu guild.
 
@@ -406,6 +484,9 @@ tr: Desfase de acimut (°)
 
 fr: Décochée, c'est la course tirée de la lumière de la carte.
 tr: Desmarcada, es el recorrido sacado de la luz del mapa.
+
+fr: Dégâts de tous les skills augmentés.
+tr: Daño de todas las habilidades aumentado.
 
 fr: Effacer tous les plots orange dans Roggle.
 tr: Elimina todas las clavijas naranjas en Roggle.
@@ -1196,6 +1277,9 @@ tr: Sombras calculadas en cada imagen: la del sol del mapa, al aire libre, en lu
 fr: La fenêtre du jeu d'origine, au pixel : pseudo, classe, niveaux, HP, SP, EXP, zeny et poids. Elle se déplace par sa barre de titre ; son bouton, un double-clic sur la barre ou son raccourci la replient et la déplient. La grille d'icônes de menu s'accroche dessous et la suit ; les places rangées reviennent quand la fenêtre s'éteint.
 tr: La ventana del juego original, al píxel: nombre, job, niveles, HP, SP, EXP, zeny y peso. Se mueve por su barra de título; su botón, un doble clic en la barra o su atajo la pliegan y despliegan. La cuadrícula de iconos de menú se engancha debajo y la sigue; los lugares ordenados vuelven cuando la ventana se apaga.
 
+fr: La foudre frappe le monstre le plus robuste.
+tr: El rayo golpea al monstruo más resistente.
+
 fr: Le cadre d'un salon est une image du jeu : la teinte la multiplie. Blanche, il reste tel quel.
 tr: El marco de una sala es una imagen del juego: el tinte la multiplica. Blanco, queda tal cual.
 
@@ -1306,6 +1390,9 @@ tr: Abre o cierra la ventana de macros.
 
 fr: Ouvre une échoppe d'un simple clic.
 tr: Abre una tienda con un simple clic.
+
+fr: PV maximum augmentés.
+tr: HP máx. aumentados.
 
 fr: Parle à ta guilde.
 tr: Habla a tu guild.
@@ -1433,14 +1520,32 @@ tr: Trofeos
 fr: Une fenêtre qu'on déplace colle au bord d'une autre fenêtre ou de l'écran, puis s'aligne sur elle. Alt tenu pendant le glisser la laisse libre.
 tr: Una ventana que arrastras se pega al borde de otra ventana o de la pantalla, y luego se alinea con ella. Mantener Alt mientras arrastras la deja libre.
 
+fr: Une vente est ouverte.
+tr: Hay una tienda abierta.
+
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.
 
 fr: Visez à la souris, cliquez pour tirer.
 tr: Apunta con el ratón y haz clic para disparar.
 
+fr: Vitesse de marche augmentée.
+tr: Velocidad de marcha aumentada.
+
 fr: Vitesse du temps
 tr: Velocidad del tiempo
+
+fr: Votre personnage a changé de carte.
+tr: Tu personaje ha cambiado de mapa.
+
+fr: Votre personnage est attaqué !
+tr: ¡Tu personaje está siendo atacado!
+
+fr: Votre personnage est mort dans le jeu.
+tr: Tu personaje ha muerto en el juego.
+
+fr: Vous avez reçu une invitation.
+tr: Has recibido una invitación.
 
 fr: aucun morceau
 tr: ninguna pista
@@ -20293,3 +20398,582 @@ tr: Toda la burbuja lo sigue: marco, márgenes, ancho antes del salto de línea 
 
 fr: L'échoppe a fermé ou n'est plus en vue : la marche s'arrête.
 tr: La tienda ha cerrado o ya no está a la vista: la marcha se detiene.
+
+fr: %d — Prendre
+tr: %d — Tomar
+
+fr: %s %s %s %s ou les flèches : se déplacer
+tr: %s %s %s %s o las flechas: moverse
+
+fr: %s — niveau %d
+tr: %s — nivel %d
+
+fr: 1 à 4 : choisir une carte au niveau supérieur
+tr: 1 a 4: elegir una carta al subir de nivel
+
+fr: Abandonner la partie ?
+tr: ¿Abandonar la partida?
+
+fr: Afficher les mesures
+tr: Mostrar las mediciones
+
+fr: Aucune carte
+tr: Ninguna carta
+
+fr: B — Bannir (%d)
+tr: B — Desterrar (%d)
+
+fr: Bouton gauche tenu : marcher vers le curseur
+tr: Botón izquierdo mantenido: caminar hacia el cursor
+
+fr: Choisissez la carte à bannir.
+tr: Elija la carta que desterrar.
+
+fr: Cliquez pour continuer.
+tr: Haga clic para continuar.
+
+fr: Cliquez pour passer.
+tr: Haga clic para saltar.
+
+fr: Continuer
+tr: Continuar
+
+fr: Contrôles
+tr: Controles
+
+fr: Dégâts par skill
+tr: Daño por habilidad
+
+fr: Effets réduits
+tr: Efectos reducidos
+
+fr: Job : %s
+tr: Job: %s
+
+fr: La fenêtre du jeu a perdu le focus.
+tr: La ventana del juego perdió el foco.
+
+fr: Les sorts partent seuls.
+tr: Los hechizos se lanzan solos.
+
+fr: Lv %d
+tr: Nv %d
+
+fr: Lv %d » %d
+tr: Nv %d » %d
+
+fr: Messages privés : %d
+tr: Susurros: %d
+
+fr: Mesures
+tr: Mediciones
+
+fr: NEW!
+tr: ¡NUEVO!
+
+fr: Niveau : %d
+tr: Nivel: %d
+
+fr: Niveau supérieur !
+tr: ¡Subida de nivel!
+
+fr: Old Blue Box
+tr: Old Blue Box
+
+fr: Ombres du soleil de la horde
+tr: Sombras solares de la horda
+
+fr: Oui, abandonner
+tr: Sí, abandonar
+
+fr: P — Passer (%d)
+tr: P — Pasar (%d)
+
+fr: Partie interrompue
+tr: Partida interrumpida
+
+fr: Partir
+tr: Partir
+
+fr: Pause
+tr: Pausa
+
+fr: Premier sort
+tr: Primer hechizo
+
+fr: R — Relancer (%d)
+tr: R — Volver a tirar (%d)
+
+fr: Rejouer
+tr: Jugar de nuevo
+
+fr: Survivants de Midgard
+tr: Supervivientes de Midgard
+
+fr: Survivez quinze minutes à la horde de Prontera Field.
+tr: Sobreviva quince minutos a la horda de Prontera Field.
+
+fr: Temps : %s
+tr: Tiempo: %s
+
+fr: Tués : %u
+tr: Muertes: %u
+
+fr: Tués par espèce
+tr: Muertes por especie
+
+fr: Victoire !
+tr: ¡Victoria!
+
+fr: Vous êtes mort
+tr: Ha muerto
+
+fr: Zeny : %u
+tr: Zeny: %u
+
+fr: max (ms)
+tr: máx. (ms)
+
+fr: p50 (ms)
+tr: p50 (ms)
+
+fr: p95 (ms)
+tr: p95 (ms)
+
+fr: Échap : pause
+tr: Esc: pausa
+
+fr: Évolution
+tr: Evolución
+
+fr: Évolution : %s
+tr: Evolución: %s
+
+fr: Composition
+tr: Composición
+
+fr: L'arène des Survivants de Midgard ne peut pas se monter.
+tr: La arena de Supervivientes de Midgard no se puede cargar.
+
+fr: Scène
+tr: Escena
+
+fr: Simulation
+tr: Simulación
+
+fr: Tenir bon
+tr: Resistir
+
+fr: Survivre 5:00 dans une partie de Survivants de Midgard.
+tr: Sobrevivir 5:00 en una partida de Supervivientes de Midgard.
+
+fr: Tombeur de Baphomet
+tr: Azote de Baphomet
+
+fr: Vaincre Baphomet dans une partie de Survivants de Midgard.
+tr: Vencer a Baphomet en una partida de Supervivientes de Midgard.
+
+fr: Métamorphose
+tr: Metamorfosis
+
+fr: Faire évoluer un skill dans une partie de Survivants de Midgard.
+tr: Hacer evolucionar un skill en una partida de Supervivientes de Midgard.
+
+fr: Marée repoussée
+tr: Marea contenida
+
+fr: Vaincre 1 000 monstres dans une partie de Survivants de Midgard.
+tr: Vencer a 1000 monstruos en una partida de Supervivientes de Midgard.
+
+fr: Mage aguerri
+tr: Mago curtido
+
+fr: Atteindre le niveau 40 dans une partie de Survivants de Midgard.
+tr: Alcanzar el nivel 40 en una partida de Supervivientes de Midgard.
+
+fr: Première carte
+tr: Primera carta
+
+fr: Ramasser une carte tombée dans une partie de Survivants de Midgard.
+tr: Recoger una carta caída en una partida de Supervivientes de Midgard.
+
+fr: Pyromane
+tr: Pirómano
+
+fr: Vaincre Baphomet avec des skills Fire seulement.
+tr: Vencer a Baphomet solo con skills Fire.
+
+fr: Esprit pur
+tr: Mente pura
+
+fr: Vaincre Baphomet sans aucune carte.
+tr: Vencer a Baphomet sin ninguna carta.
+
+fr: Recharge de tous les skills raccourcie.
+tr: Recarga más corta para todas las habilidades.
+
+fr: Zone de tous les skills élargie.
+tr: Área más amplia para todas las habilidades.
+
+fr: Durée de tous les skills allongée.
+tr: Duración más larga para todas las habilidades.
+
+fr: Expérience gagnée augmentée.
+tr: Más experiencia obtenida.
+
+fr: Une vie de plus : le héros se relève une fois.
+tr: Una vida extra: el héroe se levanta una vez.
+
+fr: %d charge(s) par partie
+tr: %d carga(s) por partida
+
+fr: %s Zeny
+tr: %s Zeny
+
+fr: +%s Zeny (solde %s)
+tr: +%s Zeny (saldo %s)
+
+fr: Album
+tr: Álbum
+
+fr: Album des Survivants
+tr: Álbum de los Supervivientes
+
+fr: Armure +%d
+tr: Armadura +%d
+
+fr: Aucune partie
+tr: Ninguna partida
+
+fr: Aucune partie cette semaine.
+tr: Ninguna partida esta semana.
+
+fr: Bannir : retirer une carte des offres de la partie.
+tr: Desterrar: retirar una carta de las ofertas de la partida.
+
+fr: Bénir
+tr: Bendecir
+
+fr: Bénédictions : %d rang(s), %d vie(s), %d charge(s)
+tr: Bendiciones: %d rango(s), %d vida(s), %d carga(s)
+
+fr: Carnet
+tr: Cuaderno
+
+fr: Carte non trouvée
+tr: Carta aún no encontrada
+
+fr: Cartes portées
+tr: Cartas llevadas
+
+fr: Cartes tombées
+tr: Cartas caídas
+
+fr: Chance +%d %%
+tr: Suerte +%d %%
+
+fr: Cursed Water
+tr: Cursed Water
+
+fr: Cursed Water %d
+tr: Cursed Water %d
+
+fr: Durée +%d %%
+tr: Duración +%d %%
+
+fr: Débloqué
+tr: Desbloqueado
+
+fr: Défi
+tr: Desafío
+
+fr: Défi de la semaine
+tr: Desafío de la semana
+
+fr: Départ neutre : sans Bénédictions, sans charges, toutes les cartes.
+tr: Salida neutra: sin Bendiciones, sin cargas, todas las cartas.
+
+fr: Exploit atteint : %s
+tr: Hazaña lograda: %s
+
+fr: Exploits
+tr: Hazañas
+
+fr: Expérience +%d %%
+tr: Experiencia +%d %%
+
+fr: Glaçages par Cold Bolt, au cumul
+tr: Congelaciones con Cold Bolt, en total
+
+fr: Hors des records du défi : départ non neutre ou autre semaine.
+tr: Fuera de los récords del desafío: salida no neutra u otra semana.
+
+fr: Interrompue
+tr: Interrumpida
+
+fr: Issue
+tr: Resultado
+
+fr: Kafra
+tr: Kafra
+
+fr: Kafra des Survivants
+tr: Kafra de los Supervivientes
+
+fr: Marche +%d %%
+tr: Marcha +%d %%
+
+fr: Meilleur score de la semaine : %s
+tr: Mejor puntuación de la semana: %s
+
+fr: NOUVELLE
+tr: NUEVA
+
+fr: Nouveau record ! Rang %d des parties libres
+tr: ¡Nuevo récord! Puesto %d de las partidas libres
+
+fr: Nouveau record ! Rang %d du défi
+tr: ¡Nuevo récord! Puesto %d del desafío
+
+fr: PV +%d %%
+tr: PV +%d %%
+
+fr: PV +%d par minute
+tr: PV +%d por minuto
+
+fr: Partie interrompue : hors des records.
+tr: Partida interrumpida: fuera de los récords.
+
+fr: Partie libre
+tr: Partida libre
+
+fr: Parties libres
+tr: Partidas libres
+
+fr: Passer : laisser une offre sans rien prendre.
+tr: Pasar: dejar una oferta sin tomar nada.
+
+fr: Première trouvaille : %s
+tr: Primer hallazgo: %s
+
+fr: Puissance +%d %%
+tr: Poder +%d %%
+
+fr: Rang maximal
+tr: Rango máximo
+
+fr: Recharge –%d %%
+tr: Recarga –%d %%
+
+fr: Records
+tr: Récords
+
+fr: Records des Survivants
+tr: Récords de los Supervivientes
+
+fr: Relancer : une offre de cartes neuve.
+tr: Relanzar: una oferta de cartas nueva.
+
+fr: Rendre %s Zeny ?
+tr: ¿Devolver %s Zeny?
+
+fr: Score et Zeny +%d %%, monstres plus durs
+tr: Puntuación y Zeny +%d %%, monstruos más duros
+
+fr: Score à battre : %s
+tr: Puntuación a batir: %s
+
+fr: Se termine dans %d j %d h
+tr: Termina en %d d %d h
+
+fr: Semaine
+tr: Semana
+
+fr: Semaine %d de %d
+tr: Semana %d de %d
+
+fr: Semaines passées
+tr: Semanas pasadas
+
+fr: Skills à débloquer
+tr: Skills por desbloquear
+
+fr: Solde : %s Zeny
+tr: Saldo: %s Zeny
+
+fr: Sort imposé
+tr: Hechizo impuesto
+
+fr: Survivre en une seule partie
+tr: Sobrevivir en una sola partida
+
+fr: Temps
+tr: Tiempo
+
+fr: Tombe de : %s
+tr: Cae de: %s
+
+fr: Tout rembourser
+tr: Reembolsar todo
+
+fr: Trouvée %u fois
+tr: Encontrada %u vez/veces
+
+fr: Tués
+tr: Muertes
+
+fr: Vies +%d
+tr: Vidas +%d
+
+fr: Zeny insuffisants
+tr: Zeny insuficientes
+
+fr: Zone +%d %%
+tr: Área +%d %%
+
+fr: ancien équilibrage
+tr: equilibrio antiguo
+
+fr: bientôt
+tr: pronto
+
+fr: Église
+tr: Iglesia
+
+fr: Église de Prontera
+tr: Iglesia de Prontera
+
+fr: Le carnet des Survivants était abîmé : copié sous %s, un carnet neuf le remplace.
+tr: El cuaderno de los Supervivientes estaba dañado: copiado como %s, un cuaderno nuevo lo sustituye.
+
+fr: Le carnet des Survivants ne s'écrit pas : rien n'a changé.
+tr: El cuaderno de los Supervivientes no se puede escribir: nada ha cambiado.
+
+fr: Achat refusé : Zeny insuffisants, le carnet a changé.
+tr: Compra rechazada: Zeny insuficientes, el cuaderno ha cambiado.
+
+fr: Achat refusé : rang maximal déjà atteint, le carnet a changé.
+tr: Compra rechazada: rango máximo ya alcanzado, el cuaderno ha cambiado.
+
+fr: %d résultat(s) en attente d'envoi
+tr: %d resultado(s) pendiente(s) de envío
+
+fr: %de
+tr: %d.º
+
+fr: Aucune partie classée.
+tr: Ninguna partida clasificada.
+
+fr: Classement
+tr: Clasificación
+
+fr: Classement : %s (votre meilleur : %s)
+tr: Clasificación: %s (tu mejor: %s)
+
+fr: Classement : %s — meilleur personnel !
+tr: Clasificación: %s — ¡mejor marca personal!
+
+fr: Classement : hors tableau (votre meilleur : %s)
+tr: Clasificación: fuera de la tabla (tu mejor: %s)
+
+fr: Classement : hors tableau — meilleur personnel !
+tr: Clasificación: fuera de la tabla — ¡mejor marca personal!
+
+fr: Classement des Survivants
+tr: Clasificación de los Supervivientes
+
+fr: Classement en ligne
+tr: Clasificación en línea
+
+fr: Classé si le serveur répond.
+tr: Clasificada si el servidor responde.
+
+fr: Classée
+tr: Clasificada
+
+fr: En attente du serveur : le résultat sera renvoyé à la prochaine connexion de ce personnage.
+tr: Esperando al servidor: el resultado se reenviará en la próxima conexión de este personaje.
+
+fr: Envoi au serveur…
+tr: Enviando al servidor…
+
+fr: Graine tirée par le serveur.
+tr: Semilla elegida por el servidor.
+
+fr: Nouveau record ! Rang %d des parties classées
+tr: ¡Nuevo récord! Puesto %d de las partidas clasificadas
+
+fr: Partie classée
+tr: Partida clasificada
+
+fr: Partie libre : ce compte n'est rattaché à aucun joueur.
+tr: Partida libre: esta cuenta no está vinculada a ningún jugador.
+
+fr: Partie libre : demande trop proche de la précédente.
+tr: Partida libre: solicitud demasiado cercana a la anterior.
+
+fr: Partie libre : le serveur compte une autre semaine.
+tr: Partida libre: el servidor cuenta otra semana.
+
+fr: Partie libre : le serveur n'a pas répondu.
+tr: Partida libre: el servidor no respondió.
+
+fr: Partie libre : le serveur ne classe pas ces règles.
+tr: Partida libre: el servidor no clasifica estas reglas.
+
+fr: Partie libre : le serveur ne classe pas une partie lancée d'ici.
+tr: Partida libre: el servidor no clasifica una partida iniciada aquí.
+
+fr: Partie libre : refusée par le serveur.
+tr: Partida libre: rechazada por el servidor.
+
+fr: Parties classées
+tr: Partidas clasificadas
+
+fr: Refusée par le serveur : partie invraisemblable.
+tr: Rechazada por el servidor: partida inverosímil.
+
+fr: Refusée par le serveur, sans raison connue.
+tr: Rechazada por el servidor, sin motivo conocido.
+
+fr: Règles %d
+tr: Reglas %d
+
+fr: Résultat non compté : déjà reçu ou oublié par le serveur.
+tr: Resultado no contado: ya recibido u olvidado por el servidor.
+
+fr: Score : %s
+tr: Puntuación: %s
+
+fr: Votre meilleur : %s, %s
+tr: Tu mejor: %s, %s
+
+fr: Vous : %s — %s
+tr: Tú: %s — %s
+
+fr: Vous n'êtes pas encore classé.
+tr: Aún no estás clasificado.
+
+fr: il y a %d min
+tr: hace %d min
+
+fr: il y a %d s
+tr: hace %d s
+
+fr: Défi de la semaine non classé : il se joue en local.
+tr: Desafío de la semana sin clasificar: se juega en local.
+
+fr: Survivants de Midgard : votre partie du %s est classée %s.
+tr: Supervivientes de Midgard: tu partida del %s queda en el puesto %s.
+
+fr: Survivants de Midgard : votre partie du %s est comptée, hors tableau.
+tr: Supervivientes de Midgard: tu partida del %s cuenta, fuera de la tabla.
+
+fr: Survivants de Midgard : votre partie du %s est refusée par le serveur.
+tr: Supervivientes de Midgard: el servidor rechazó tu partida del %s.
+
+fr: Survivants de Midgard : votre partie du %s n'a pas été comptée : déjà reçue ou perdue par le serveur.
+tr: Supervivientes de Midgard: tu partida del %s no se contó: el servidor ya la recibió o la perdió.
+
+fr: Survivants de Midgard : votre partie du %s est oubliée : son jeton a expiré.
+tr: Supervivientes de Midgard: tu partida del %s se olvida: su ficha caducó.

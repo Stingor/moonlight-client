@@ -5708,7 +5708,7 @@ achievements:
         - {text: "Pochettes ouvertes"}
   910001:
     name: "Jusqu'au bout"
-    score: 0
+    score: 10
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5723,7 +5723,7 @@ achievements:
         - {text: "Finir une partie"}
   910002:
     name: "Eleveur de Porings"
-    score: 0
+    score: 20
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5738,7 +5738,7 @@ achievements:
         - {text: "5 000 points en une partie"}
   910003:
     name: "Dompteur de Porings"
-    score: 0
+    score: 20
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5753,7 +5753,7 @@ achievements:
         - {text: "15 000 points en une partie"}
   910004:
     name: "Reaction en chaine"
-    score: 0
+    score: 30
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5768,7 +5768,7 @@ achievements:
         - {text: "Une cascade de quatre"}
   910005:
     name: "Tir groupe"
-    score: 0
+    score: 10
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5783,7 +5783,7 @@ achievements:
         - {text: "Gagner une partie"}
   910006:
     name: "Sans bavure"
-    score: 0
+    score: 20
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5798,7 +5798,7 @@ achievements:
         - {text: "Cinq billes en réserve"}
   910007:
     name: "Main sure"
-    score: 0
+    score: 30
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5813,7 +5813,7 @@ achievements:
         - {text: "Trois billes rattrapées"}
   910008:
     name: "Pluie de gemmes"
-    score: 0
+    score: 50
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
@@ -5826,3 +5826,123 @@ achievements:
       minor: 1
       objectives:
         - {text: "20 000 points en une partie"}
+  910009:
+    name: "Tenir bon"
+    score: 10
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Survivre 5:00 dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Survivre 5:00"}
+  910010:
+    name: "Tombeur de Baphomet"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Vaincre Baphomet dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Vaincre Baphomet"}
+  910011:
+    name: "Metamorphose"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Faire évoluer un skill dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Une évolution"}
+  910012:
+    name: "Maree repoussee"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Vaincre 1 000 monstres dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "1 000 monstres en une partie"}
+  910013:
+    name: "Mage aguerri"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Atteindre le niveau 40 dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Niveau 40"}
+  910014:
+    name: "Premiere carte"
+    score: 10
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Ramasser une carte tombée dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Une carte"}
+  910015:
+    name: "Pyromane"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Vaincre Baphomet avec des skills Fire seulement."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Des skills Fire seulement"}
+  910016:
+    name: "Esprit pur"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Vaincre Baphomet sans aucune carte."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Aucune carte"}

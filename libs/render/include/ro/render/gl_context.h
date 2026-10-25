@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>
@@ -219,6 +220,14 @@ class GlContext {
   // aussi vite qu'elle peut, chauffe, et l'écran n'en montre qu'une sur trois.
   // Faux quand le pilote refuse — certains l'imposent ou l'interdisent.
   [[nodiscard]] bool SetVerticalSync(bool on) const;
+
+  // LA MÉMOIRE VIDÉO LIBRE, en kibioctets, quand le pilote la dit (extensions
+  // NVIDIA ou AMD) ; rien sinon. Une mesure, pas une décision : deux lectures
+  // encadrent un montage pour dire ce qu'il a pris.
+  //
+  // ⚠ LE CONTEXTE DOIT ÊTRE COURANT, et la lecture attend la fin de ce qui a
+  // été demandé à la carte : elle ne se fait pas à chaque image.
+  [[nodiscard]] static std::optional<std::int64_t> FreeVideoMemoryKib();
 
  private:
   GlContext() = default;

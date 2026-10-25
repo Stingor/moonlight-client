@@ -21,7 +21,6 @@
 #include "ro/render/camera.h"
 #include "ro/render/effect_catalog.h"
 #include "ro/render/gl_context.h"
-#include "ro/render/screen_tint.h"
 #include "ro/render/sky_clock.h"
 #include "ro/render/sun_shadow_pass.h"
 #include "ro/sim/character_ledger.h"
@@ -33,7 +32,6 @@
 #include "ro/ui/staff_tools.h"
 #include "ro/vfs/vfs.h"
 
-#include "afk/afk_screen.h"
 #include "capture/zone_recorder.h"
 #include "character/character_view.h"
 #include "character/preset_view.h"
@@ -58,6 +56,7 @@
 #include "game/client_shell.h"
 #include "game/database_stage.h"
 #include "game/game_foundation.h"
+#include "game/game_modes.h"
 #include "game/game_pieces.h"
 #include "game/game_rendering.h"
 #include "game/game_settings.h"
@@ -127,13 +126,18 @@ namespace moonclient {
 // ⚠ ELLE NE SE DÉPLACE NI NE SE COPIE : elle garde l'adresse de ce que la
 // coquille contient, et se construit là où elle vivra.
 //
-// ⚠ TROIS BASES PORTENT UNE PART DE SES CHAMPS, ET C'EST ENCORE L'ORDRE : une
+// ⚠ QUATRE BASES PORTENT UNE PART DE SES CHAMPS, ET C'EST ENCORE L'ORDRE : une
 // base se construit avant tout membre et se détruit après. Le socle
 // (`GameFoundation`) vient le premier et part le dernier ; les tampons que
 // l'interface désigne (`GameUiBuffers`) et les renderers (`GameRendering`)
-// survivent à tout ce qui les vise. Leurs champs gardent leur nom — `world_`,
-// `sprites_` — et la partie les lit comme les siens.
-class Game : public Screen, private GameFoundation, private GameUiBuffers, private GameRendering {
+// survivent à tout ce qui les vise ; les modes qui prennent l'écran
+// (`GameModes`) viennent après eux. Leurs champs gardent leur nom — `world_`,
+// `sprites_`, `afk_screen_` — et la partie les lit comme les siens.
+class Game : public Screen,
+             private GameFoundation,
+             private GameUiBuffers,
+             private GameRendering,
+             private GameModes {
  public:
   // ⚠ LA COQUILLE DOIT ÊTRE OUVERTE : la partie prend l'adresse de ce qu'elle
   // contient, et un `ClientShell` dont `Open` n'a pas réussi n'a ni fenêtre, ni
@@ -493,6 +497,9 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // ordinaire et celle de la veille, qui n'a plus d'interface mais garde sa
   // flèche tant que le joueur ne l'a pas décochée.
   void PaintCursor();
+  // ── LE MODE SURVIVORS : voir `game_survivors.cpp`.
+  void FrameSurvivors(std::uint32_t now_ms);
+  [[nodiscard]] bool SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms);
 
   // ── L'ÉCRAN DE VEILLE, dans `game_afk.cpp` ─────────────────────────────────
   //
@@ -576,19 +583,6 @@ class Game : public Screen, private GameFoundation, private GameUiBuffers, priva
   // la souris désigne dans le monde, mais rien ne doit passer devant lui, pas
   // même une fenêtre.
   std::vector<ro::render::ScreenQuad> cursor_quads_;
-
-  // ── L'ÉCRAN DE VEILLE ──────────────────────────────────────────────────────
-  //
-  // ⚠ LES DEUX VONT ENSEMBLE et ne se séparent pas : le compteur décide QUAND
-  // s'endormir et ce qu'il faut avaler, la veille ce que cela fait à l'image.
-  AfkIdle afk_idle_;
-  AfkScreen afk_screen_;
-  // LA TEINTE DE LA VEILLE, sur l'image entière, après le post-traitement.
-  ro::render::ScreenTint screen_tint_;
-  // « ESSAYER MAINTENANT », armé par la page de réglages. ⚠ CONSOMMÉ À L'IMAGE
-  // SUIVANTE : laissé en place, la veille se relancerait à chaque image.
-  bool afk_requested_ = false;
-  // Les deux lignes de son horloge vivent dans `GameUiBuffers`.
 
   // ── CE QUE L'IMAGE COMPOSE ─────────────────────────────────────────────────
   ComposedScene scene_actors_;

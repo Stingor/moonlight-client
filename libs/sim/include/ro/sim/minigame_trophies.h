@@ -21,7 +21,14 @@ class PegGame;
 //
 // ⚠ UN TROPHÉE SE GAGNE PENDANT LA PARTIE, dès que sa condition tient — une
 // cascade de quatre n'attend pas la fin des coups. Le meilleur score, lui, ne
-// s'inscrit qu'à la fin : une partie abandonnée ne compte pas.
+// s'inscrit qu'à la fin : une partie abandonnée ne compte pas. Les trophées
+// du mode survivors, eux, se comptent à la fin de la partie : voir
+// `ro/sim/survivors_trophies.h`.
+//
+// 🔴 UN TROPHÉE S'AJOUTE EN FIN D'ÉNUMÉRATION, jamais ailleurs : son rang est
+// ce que `CZ 0x0F4B` dit au serveur, qui en tire le numéro de succès (910001
+// pour le rang 0, et ainsi de suite). Un rang déplacé achèverait le succès
+// d'un autre trophée.
 
 enum class MinigameTrophy : std::uint8_t {
   kRojeweledFinished,
@@ -32,9 +39,20 @@ enum class MinigameTrophy : std::uint8_t {
   kRoggleFlawless,
   kRoggleThreeCatches,
   kRoggleScore20000,
+  kSurvivorsFiveMinutes,
+  kSurvivorsVictory,
+  kSurvivorsFirstEvolution,
+  kSurvivorsKills1000,
+  kSurvivorsLevel40,
+  kSurvivorsFirstCard,
+  kSurvivorsPyromaniac,
+  kSurvivorsPureMind,
 };
 
-inline constexpr std::size_t kMinigameTrophyCount = 8;
+inline constexpr std::size_t kMinigameTrophyCount = 16;
+static_assert(kMinigameTrophyCount ==
+                  static_cast<std::size_t>(MinigameTrophy::kSurvivorsPureMind) + 1,
+              "le compte suit le dernier trophée de l'énumération");
 
 struct MinigameTrophyText {
   MinigameTrophy trophy = MinigameTrophy::kRojeweledFinished;

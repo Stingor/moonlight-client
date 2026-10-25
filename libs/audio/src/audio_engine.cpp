@@ -1,6 +1,7 @@
 #include "ro/audio/audio_engine.h"
 
 #include <algorithm>
+#include <optional>
 #include <utility>
 
 #include <SDL3/SDL_init.h>
@@ -334,6 +335,24 @@ core::Result<void> AudioEngine::LoadSound(const std::string& name,
 }
 
 bool AudioEngine::KnowsSound(const std::string& name) const { return sounds_.contains(name); }
+
+std::optional<std::uint64_t> AudioEngine::SoundLengthMs(const std::string& name) const {
+  const auto found = sounds_.find(name);
+  if (found == sounds_.end()) {
+    return std::nullopt;
+  }
+  // Une durée négative est l'aveu du décodeur : inconnue, ou infinie.
+  MIX_Audio* const audio = AsSound(found->second.audio);
+  const Sint64 frames = MIX_GetAudioDuration(audio);
+  if (frames < 0) {
+    return std::nullopt;
+  }
+  const Sint64 length_ms = MIX_AudioFramesToMS(audio, frames);
+  if (length_ms < 0) {
+    return std::nullopt;
+  }
+  return static_cast<std::uint64_t>(length_ms);
+}
 
 void AudioEngine::ForgetSound(const std::string& name) {
   const auto found = sounds_.find(name);

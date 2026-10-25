@@ -166,6 +166,11 @@ if(MOONCLIENT_PLATFORM_LAYERS)
   if(EXISTS "${CMAKE_SOURCE_DIR}/tools/roc-cli/CMakeLists.txt")
     add_subdirectory(tools/roc-cli)
   endif()
+  # Le décor de l'écran de connexion peint hors écran : la preuve d'image de
+  # qui retouche sa scène.
+  if(EXISTS "${CMAKE_SOURCE_DIR}/tools/backdrop-bench/CMakeLists.txt")
+    add_subdirectory(tools/backdrop-bench)
+  endif()
   # L'éditeur des tables source : une fenêtre ImGui, l'aperçu du jeu compris.
   if(EXISTS "${CMAKE_SOURCE_DIR}/tools/table-editor/CMakeLists.txt")
     add_subdirectory(tools/table-editor)

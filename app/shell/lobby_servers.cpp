@@ -38,6 +38,7 @@ constexpr const char* kProbedServerLogName = "serveur test";
 void LobbyScreen::ShowServer() {
   const ServerChoice& server = servers_.current();
   shell_.SetTestServer(server.test);
+  shell_.SetLoginAddress(server.address.host + ":" + std::to_string(server.address.port));
   shell_.gl().SetTitle(WindowTitle(server.test));
   // LA PORTE DU SITE VISE LE SITE DE CE SERVEUR. Sans site, elle reste où
   // elle est : `Compose` la masque, et le formulaire classique s'affiche.

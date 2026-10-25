@@ -121,6 +121,7 @@ add_library(moonclient_effects STATIC
     effects/effect_named_look.cpp
     effects/effect_named_skill.cpp
     effects/effect_named_sounds.cpp
+    effects/effect_paint.cpp
     effects/effect_skill_step.cpp
     effects/effect_skill_view.cpp
     effects/effect_spawn_view.cpp
@@ -140,7 +141,7 @@ add_library(moonclient_effects STATIC
 target_link_libraries(moonclient_effects
     PUBLIC moonclient_effect_nodes moonclient_stage ro_audio ro_core ro_formats ro_render ro_sim
            ro_vfs
-    PRIVATE moonclient_damage moonclient_visibility ro_warnings)
+    PRIVATE moonclient_damage moonclient_postures moonclient_visibility ro_warnings)
 
 target_include_directories(moonclient_effects PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -755,18 +756,58 @@ target_link_libraries(moonclient_memorial
 target_include_directories(moonclient_memorial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LES MINI-JEUX, en bibliothèque pour la raison habituelle : l'enregistrement
-# des scores et des trophées se relit sur un banc, et l'étage s'y avance sans
-# fenêtre.
+# des scores et des trophées, comme le crédit du carnet survivors, se relit sur
+# un banc, et l'étage s'y avance sans fenêtre. Le classement survivors y lit
+# la table des longueurs de `ro_proto` pour décider du bit qu'il annonce.
 add_library(moonclient_minigames STATIC
     game/minigame_file.cpp
     game/minigame_stage.cpp
-    game/minigame_trophy_announcer.cpp)
+    game/minigame_trophy_announcer.cpp
+    game/survivors_book_mode.cpp
+    game/survivors_meta_desk.cpp
+    game/survivors_ranking_desk.cpp
+    game/survivors_ranking_mode.cpp
+    game/survivors_trophy_count.cpp)
 
 target_link_libraries(moonclient_minigames
-    PUBLIC ro_audio ro_net ro_render ro_sim ro_ui ro_vfs moonclient_monstersheet
-    PRIVATE yaml-cpp::yaml-cpp ro_warnings)
+    PUBLIC ro_audio ro_net ro_render ro_sim ro_ui ro_vfs moonclient_monstersheet moonclient_survivors
+    PRIVATE ro_proto yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_minigames PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# L'ÉTAGE DU MODE SURVIVORS SANS ÉCRAN, en bibliothèque : la machine d'états,
+# l'horloge de présentation, la nuit de l'arène, les touches, le journal écrit, les mesures, la
+# porte du mode, la garde d'entrée, les alertes du monde réel, le limiteur de voix et le choix
+# de la musique, la route des événements et le relevé du monde réel ne
+# connaissent que `core` et `sim`, et se vérifient sans GPU ni SDL. La session de classement lit et
+# écrit en plus les trames du service par `net`, sans liaison. yaml-cpp, en privé, lit et écrit le
+# carnet du mode (`savedata\survivors.yml`) : réglages, méta, Album, records et résultats en attente.
+add_library(moonclient_survivors STATIC
+    survivors/arena_measures.cpp
+    survivors/arena_music.cpp
+    survivors/arena_night.cpp
+    survivors/arena_sound_budget.cpp
+    survivors/posture_plan.cpp
+    survivors/presentation_clock.cpp
+    survivors/real_world_watch.cpp
+    survivors/survivors_book.cpp
+    survivors/survivors_door.cpp
+    survivors/survivors_file.cpp
+    survivors/survivors_keys.cpp
+    survivors/survivors_pending.cpp
+    survivors/survivors_ranking_session.cpp
+    survivors/survivors_route.cpp
+    survivors/survivors_save.cpp
+    survivors/survivors_save_file.cpp
+    survivors/survivors_screen_look.cpp
+    survivors/survivors_stage.cpp
+    survivors/survivors_world_facts.cpp)
+
+target_link_libraries(moonclient_survivors
+    PUBLIC ro_core ro_net ro_sim
+    PRIVATE yaml-cpp::yaml-cpp ro_warnings)
+
+target_include_directories(moonclient_survivors PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # CE QUE DISENT LES MONSTRES QUAND ILS FRAPPENT, en bibliothèque : la cible
 # mémorisée par acteur, la ligne et sa bulle, `/notalkmsg` qui tait la ligne
@@ -1432,6 +1473,44 @@ target_link_libraries(moonclient_backdrop
 
 target_include_directories(moonclient_backdrop PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LA SCÈNE ÉCLAIRÉE : une carte, ses renderers, son ciel, ses ombres, et la
+# séquence qui les peint, hors de la partie.
+#
+# 🔴 EN BIBLIOTHÈQUE, parce que backdrop-bench la lie sans lier l'exécutable.
+# Elle ne compose personne et ne peint aucun effet, si bien qu'elle ne tire
+# rien de l'exécutable.
+add_library(moonclient_lit_stage STATIC
+    world/lit_stage.cpp)
+
+target_link_libraries(moonclient_lit_stage
+    PUBLIC ro_core ro_mapedit ro_render ro_render_gl ro_vfs moonclient_graphics moonclient_stage
+    PRIVATE moonclient_camera_rules ro_warnings)
+
+target_include_directories(moonclient_lit_stage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# LA SCÈNE ET LA CAMÉRA DE L'ARÈNE SURVIVORS, peintes par la scène éclairée.
+#
+# 🔴 EN BIBLIOTHÈQUE, parce que `roc-cli survivors render` et les essais la
+# lient sans lier l'exécutable : l'arène se prouve hors écran.
+add_library(moonclient_arena STATIC
+    survivors/arena_camera.cpp
+    survivors/arena_card_cues.cpp
+    survivors/arena_effect_plan.cpp
+    survivors/arena_effects.cpp
+    survivors/arena_numbers.cpp
+    survivors/arena_scene.cpp
+    survivors/arena_session.cpp
+    survivors/horde_composer.cpp
+    survivors/horde_poses.cpp
+    survivors/survivors_looks.cpp)
+
+target_link_libraries(moonclient_arena
+    PUBLIC moonclient_effects moonclient_graphics moonclient_lit_stage moonclient_stage
+           moonclient_survivors ro_core ro_render ro_render_gl ro_sim ro_vfs
+    PRIVATE ro_warnings)
+
+target_include_directories(moonclient_arena PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # L'ÉCRAN DE VEILLE, en bibliothèque, et pour les deux raisons habituelles.
 #
 # 🔴 `ro_render` ET RIEN D'AUTRE : ni SDL, ni le monde, ni la fenêtre. Ce module
@@ -1745,9 +1824,15 @@ add_executable(moonclient
     world/target_hud_view.cpp
     world/status_portrait_view.cpp
     game/game.cpp
+    game/game_events.cpp
     game/game_afk.cpp
+    game/game_survivors.cpp
+    game/survivors_mode.cpp
+    game/survivors_views.cpp
+    game/survivors_meta_views.cpp
     game/game_description.cpp
     game/game_draw.cpp
+    game/game_forget_played.cpp
     game/game_sky.cpp
     game/game_grey_world.cpp
     game/game_map_editor.cpp
@@ -1894,6 +1979,8 @@ add_executable(moonclient
     game/ui_layout_factory.cpp
     game/layout_windows.cpp
     game/ui_stage.cpp
+    game/ui_stage_context.cpp
+    game/ui_stage_modes.cpp
     game/ui_stage_lobby.cpp
     game/ui_stage_trade.cpp
     game/mail_stage.cpp
@@ -1922,7 +2009,7 @@ add_executable(moonclient
 
 target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
-            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_minigames moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
+            moonclient_visibility moonclient_afk moonclient_backdrop moonclient_lit_stage moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_minigames moonclient_survivors moonclient_arena moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_loading moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net
             moonclient_portraitoptions moonclient_bubbleoptions moonclient_factorylayout
