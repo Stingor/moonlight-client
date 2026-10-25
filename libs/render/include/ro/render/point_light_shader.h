@@ -16,7 +16,7 @@ namespace ro::render {
 // le décor, les acteurs-modèles et les sprites.
 //
 // `kPointLightGlsl` déclare les uniformes et `PointLightingOf(position, normale,
-// recul)`, qui somme la lumière que chaque source dépose en un point du monde :
+// recul, angle)`, qui somme la lumière que chaque source dépose en un point du monde :
 // sa couleur, atténuée par le carré de ce qui reste de sa portée, puis masquée
 // par sa carte d'ombre quand elle en a une — voir `PointVisibility`. Il vaut
 // pour l'une ou l'autre étape : un sprite l'évalue par sommet, à ses pieds, par
@@ -37,9 +37,14 @@ out vec3 v_world_position;
 // qu'il peint, tirée des dérivées de sa position : son signe ne compte pas.
 // ⚠ À LIRE AVANT TOUT `discard`, où les dérivées ne sont plus définies.
 // `PointSurfaceLighting(normal)` rend alors la lumière ponctuelle en ce
-// fragment, l'ombre lue au-dessus de sa face — voir `PointShadowTaps`.
+// fragment, l'ombre lue au-dessus de sa face — voir `PointShadowTaps`. Le carré
+// d'une pénombre y tourne d'un pixel à l'autre.
 inline constexpr std::string_view kPointLightFragmentGlsl = R"GLSL(
 in vec3 v_world_position;
+
+// Le bruit à gradients entrelacés : un angle par pixel, sans motif visible.
+const vec3 kPointNoiseWeights = vec3(0.06711056, 0.00583715, 52.9829189);
+const float kPointFullTurn = 6.2831853;
 
 vec3 PointSurfaceNormal() {
     vec3 across = cross(dFdx(v_world_position), dFdy(v_world_position));
@@ -48,7 +53,9 @@ vec3 PointSurfaceNormal() {
 }
 
 vec3 PointSurfaceLighting(vec3 surface_normal) {
-    return PointLightingOf(v_world_position, surface_normal, 0.0);
+    float spin = kPointFullTurn *
+                 fract(kPointNoiseWeights.z * fract(dot(gl_FragCoord.xy, kPointNoiseWeights.xy)));
+    return PointLightingOf(v_world_position, surface_normal, 0.0, spin);
 }
 )GLSL";
 
@@ -126,9 +133,10 @@ float PointShadowLookup(int tier, float layer, vec3 tap, float reference) {
 }
 
 // `surface_normal` : la normale de la face qui reçoit, de signe quelconque, ou
-// zéro pour un point sans face.
+// zéro pour un point sans face. `spin` : l'angle, en radians, dont le carré
+// d'une pénombre tourne dans son plan.
 float PointShadowTaps(int tier, float layer, vec3 from_light, float far_world, float pull,
-                      vec3 surface_normal, float spread) {
+                      vec3 surface_normal, float spread, float spin) {
     if (PointShadowAxis(from_light) <= u_point_shadow_clearance) {
         return 1.0;
     }
@@ -161,6 +169,17 @@ float PointShadowTaps(int tier, float layer, vec3 from_light, float far_world, f
     vec3 other = abs(across.y) < kPointUprightCosine ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
     vec3 side = normalize(cross(across, other));
     vec3 lift = cross(across, side);
+    // 🔴 LE CARRÉ D'UNE PÉNOMBRE TOURNE de `spin`. Ses lectures sont écartées
+    // d'un cinquième de la pénombre : aligné sur les axes du monde, un bord
+    // droit qui leur est parallèle — le pied d'un sprite, face à la caméra —
+    // franchit une rangée entière de lectures d'un coup, et la pénombre se
+    // découpe en cinq bandes nettes. Tourné selon un bruit propre à chaque
+    // pixel, le carré fond ces bandes en un grain fin.
+    if (spread > 0.0) {
+        vec3 turned = cos(spin) * side + sin(spin) * lift;
+        lift = cos(spin) * lift - sin(spin) * side;
+        side = turned;
+    }
     float lit = 0.0;
     float taps = 0.0;
     for (int row = -radius; row <= radius; ++row) {
@@ -177,18 +196,19 @@ float PointShadowTaps(int tier, float layer, vec3 from_light, float far_world, f
 // `world_position` depuis `light_position` : un sans carte. L'ombre n'en
 // retire que sa profondeur.
 float PointVisibility(int first, vec3 light_position, float shadow_depth, vec3 world_position,
-                      float pull, vec3 surface_normal) {
+                      float pull, vec3 surface_normal, float spin) {
     vec4 shadow = texelFetch(u_point_lights, first + 2);
     int tier = int(shadow.z);
     if (tier < 0 || tier >= kPointShadowTierCount) {
         return 1.0;
     }
     float lit = PointShadowTaps(tier, shadow.w, world_position - light_position, shadow.x, pull,
-                                surface_normal, shadow.y);
+                                surface_normal, shadow.y, spin);
     return mix(1.0, lit, shadow_depth);
 }
 
-vec3 PointLightingOf(vec3 world_position, vec3 surface_normal, float pull) {
+// `spin` : voir `PointShadowTaps`.
+vec3 PointLightingOf(vec3 world_position, vec3 surface_normal, float pull, float spin) {
     vec3 sum = vec3(0.0);
     for (int index = 0; index < u_point_count; ++index) {
         int first = index * kPointLightTexels;
@@ -198,15 +218,16 @@ vec3 PointLightingOf(vec3 world_position, vec3 surface_normal, float pull) {
             vec4 color = texelFetch(u_point_lights, first + 1);
             sum += color.rgb * remaining * remaining *
                    PointVisibility(first, place.xyz, color.a, world_position, pull,
-                                   surface_normal);
+                                   surface_normal, spin);
         }
     }
     return sum;
 }
 
-// Un point sans face : un sommet de sprite.
+// Un point sans face : un sommet de sprite. Il est lu une fois pour tout le
+// sprite, et son carré ne tourne pas.
 vec3 PointLightingPulled(vec3 world_position, float pull) {
-    return PointLightingOf(world_position, vec3(0.0), pull);
+    return PointLightingOf(world_position, vec3(0.0), pull, 0.0);
 }
 )GLSL";
 
