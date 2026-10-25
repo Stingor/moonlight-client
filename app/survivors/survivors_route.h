@@ -24,6 +24,10 @@ inline constexpr std::uint32_t kScancodeEscape = 41;
 // La rangée des chiffres, par sa place : sur AZERTY, « 1 » sans Maj est « & ».
 inline constexpr std::uint32_t kScancodeDigit1 = 30;
 inline constexpr std::uint32_t kScancodeDigit4 = 33;
+// Entrée, Espace et l'Entrée du pavé numérique valident le coffre.
+inline constexpr std::uint32_t kScancodeReturn = 40;
+inline constexpr std::uint32_t kScancodeSpace = 44;
+inline constexpr std::uint32_t kScancodeKeypadEnter = 88;
 
 // Le bouton gauche, par son numéro SDL.
 inline constexpr std::uint8_t kLeftMouseButton = 1;
@@ -62,7 +66,11 @@ struct SurvivorsGestures {
   float wheel_notches = 0.0F;
   // La carte dite par la rangée des chiffres, 1 à 4 ; 0 sans touche.
   int pressed_card_key = 0;
+  // Entrée ou Espace : le bouton « Continuer » du coffre.
+  bool confirm = false;
 };
+
+[[nodiscard]] bool IsConfirmKey(std::uint32_t scancode) noexcept;
 
 // LES TOUCHES QUE LA PARTIE LIT : la marche, Échap et les chiffres des
 // cartes. Aucune liaison du jeu ne les lui reprend ; une autre touche peut

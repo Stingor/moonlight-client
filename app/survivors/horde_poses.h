@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -35,6 +36,10 @@ struct HordePose {
   ro::render::Motion motion = ro::render::Motion::kIdle;
   // Depuis le début de la motion, à l'horloge de présentation.
   float motion_ms = 0.0F;
+  // L'image tenue au lieu de celle que donne motion_ms. Le héros au repos tient
+  // le regard droit devant : les trois images de l'attente d'un personnage sont
+  // les trois orientations de sa tête, pas une animation.
+  std::optional<std::size_t> held_frame;
   std::size_t direction = 0;
   // La position interpolée, en cases continues : le centre de la case (x, y)
   // est en (x, y).

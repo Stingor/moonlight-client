@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "ro/render/ailment_sprites.h"
+#include "ro/sim/movement.h"
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_rules.h"
 
@@ -130,6 +131,7 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
     const bool moving = hero.position != hero.previous_position;
     pose.motion = moving ? Motion::kWalk : Motion::kIdle;
     pose.motion_ms = static_cast<float>(presentation_ms);
+    if (!moving) pose.held_frame = ro::sim::kGazeAhead;
   }
   pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
   poses_.push_back(pose);

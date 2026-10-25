@@ -97,7 +97,7 @@ void HordeComposer::Compose(std::span<const HordePose> poses, const GroundOf& gr
     const std::size_t animation = ro::render::AnimationFor(pose.motion, LayoutOf(pose.kind));
     ro::render::DrawnActor drawn;
     drawn.actor = &outfit->Composed(animation, pose.direction, pose.motion_ms,
-                                    ro::render::MotionLoops(pose.motion));
+                                    ro::render::MotionLoops(pose.motion), pose.held_frame);
     // Sous l'ombre du soleil, qui y entre perd son ombre ronde : sa silhouette
     // en porte une.
     const bool sun_casting = shadows.sun_shadows && (hero || shadows.horde_sun_shadows);

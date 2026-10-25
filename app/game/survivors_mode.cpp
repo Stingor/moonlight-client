@@ -367,7 +367,10 @@ SurvivorsIntent SurvivorsMode::IntentOf(const SurvivorsStage& stage,
   intent.world_alert = report.pauses();
   intent.resume = ask_.pause.resume;
   intent.abandon = ask_.pause.abandon;
-  intent.proceed = ask_.chest_proceed || ask_.summary.proceed;
+  // Entrée et Espace valent « Continuer » sur le coffre seul : ailleurs,
+  // l'écran de fin relancerait une partie sans qu'on l'ait demandé.
+  intent.proceed = ask_.chest_proceed || ask_.summary.proceed ||
+                   (gestures.confirm && stage.screen() == SurvivorsScreen::kChest);
   intent.answer = AnswerOf(ask_.offer);
   return intent;
 }

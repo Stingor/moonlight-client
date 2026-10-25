@@ -4,8 +4,13 @@
 
 namespace moonclient {
 
+bool IsConfirmKey(std::uint32_t scancode) noexcept {
+  return scancode == kScancodeReturn || scancode == kScancodeSpace ||
+         scancode == kScancodeKeypadEnter;
+}
+
 bool SurvivorsReadsKey(std::uint32_t scancode) noexcept {
-  return IsMoveKey(scancode) || scancode == kScancodeEscape ||
+  return IsMoveKey(scancode) || scancode == kScancodeEscape || IsConfirmKey(scancode) ||
          (scancode >= kScancodeDigit1 && scancode <= kScancodeDigit4);
 }
 
@@ -18,6 +23,8 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
         gestures_.escape = true;
       } else if (event.scancode >= kScancodeDigit1 && event.scancode <= kScancodeDigit4) {
         gestures_.pressed_card_key = static_cast<int>(event.scancode - kScancodeDigit1) + 1;
+      } else if (IsConfirmKey(event.scancode)) {
+        gestures_.confirm = true;
       }
       return true;
     case SurvivorsEventKind::kKeyUp:

@@ -84,6 +84,13 @@ constexpr std::array<float, 4> kNoArenaClearColor = {0.0F, 0.0F, 0.0F, 1.0F};
 }  // namespace
 
 bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
+  // 🔴 LA FLÈCHE SUIT LA SOURIS que la partie prend : sa position se note ici,
+  // puisque l'événement n'atteindra pas la route du jeu qui la note d'ordinaire.
+  if (event.type == SDL_EVENT_MOUSE_MOTION) {
+    mouse_ = glm::vec2{event.motion.x, event.motion.y};
+  } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+    mouse_ = glm::vec2{event.button.x, event.button.y};
+  }
   // L'ENREGISTREUR GARDE SES TOUCHES, hors de celles que la partie lit : un GIF
   // se lance et s'arrête, une image fixe se prend. Tracer la zone attend le
   // jeu, dont l'interface dessine le tracé.
