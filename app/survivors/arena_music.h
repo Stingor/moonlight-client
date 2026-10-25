@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string_view>
 
 #include "survivors/arena_night.h"
@@ -61,6 +62,33 @@ class ArenaMusic {
 
  private:
   std::string_view cued_;
+};
+
+// LE VOLUME DE LA MUSIQUE PENDANT LA PARTIE : le réglage du joueur, que la
+// pause baisse, et celui que `app` repose en sortant.
+//
+// ⚠ LE RÉGLAGE SE RELIT À CHAQUE CHANGEMENT, et non seulement à l'entrée : un
+// volume changé dans les options ouvertes sur la pause est celui de la suite
+// de la partie, et celui qu'on rend en sortant.
+class ArenaMusicVolume {
+ public:
+  // Le réglage du joueur, à l'entrée ou changé en cours de partie : la
+  // prochaine pose le reprend, pause comprise.
+  void Follow(float player_volume) noexcept {
+    player_volume_ = player_volume;
+    posed_.reset();
+  }
+  // Oublie le dernier volume posé : la prochaine pose le repose.
+  void Forget() noexcept { posed_.reset(); }
+  // Le volume à poser à cette image, `cue_volume` de `ArenaMusic::Advance` ;
+  // rien quand il est déjà posé.
+  [[nodiscard]] std::optional<float> Pose(float cue_volume) noexcept;
+
+  [[nodiscard]] float player_volume() const noexcept { return player_volume_; }
+
+ private:
+  float player_volume_ = 1.0F;
+  std::optional<float> posed_;
 };
 
 }  // namespace moonclient

@@ -160,8 +160,14 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     }
     // LE MODE ÉDITEUR DE CARTE garde la flèche sur le monde : un clic y désigne
     // un modèle, et rien de ce que la souris survole n'y répondrait comme au jeu.
+    //
+    // 🔴 UNE PARTIE DE SURVIVORS TIENT L'ÉCRAN : le monde réel n'est plus sous
+    // la souris, et ni son sol ni ses acteurs ne décident. La flèche, et la
+    // main sur ce qui se clique dans les fenêtres du mode.
     const ro::render::CursorShape shape =
-        gate.mouse_to_ui ? over_interface
+        survivors_.owns_screen()
+            ? (gate.pointing ? ro::render::CursorShape::kPoint : ro::render::CursorShape::kArrow)
+        : gate.mouse_to_ui ? over_interface
         : map_editor_.active()
             ? (CameraTurning() ? ro::render::CursorShape::kRotate : ro::render::CursorShape::kArrow)
             : ArmedCursor(aim, designated,
@@ -188,7 +194,7 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     // ⚠ DANS LES MÊMES QUADS, à la suite : ils se dessinent en un seul envoi,
     // tout en dernier, et l'ordre du vecteur est celui de la peinture.
     const ro::sim::KnownSkill* armed = grimoire_.armed();
-    if (armed != nullptr && !pieces_.hit_sprites.empty()) {
+    if (armed != nullptr && !pieces_.hit_sprites.empty() && !survivors_.owns_screen()) {
       const ro::render::DigitSprite digits{&pieces_.hit_sprites.front().sprite,
                                            &pieces_.hit_sprites.front().animation};
       const std::vector<ro::render::ScreenQuad> level =

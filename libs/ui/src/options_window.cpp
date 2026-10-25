@@ -471,20 +471,35 @@ struct SettingsWindowWords {
   return asked;
 }
 
+// ⚠ UN NOM QUI DURE, partagé par les deux façons de montrer les options du jeu :
+// c'est lui qui porte l'identité sous laquelle ImGui retient la place et la
+// taille de la fenêtre.
+[[nodiscard]] WindowName& GameOptionsName() {
+  static WindowName name(kOptionsWindowTitle, kOptionsWindowId);
+  return name;
+}
+
 }  // namespace
 
 OptionsWindowAction DrawOptionsWindow(OptionsWindowState& state,
                                       std::span<const OptionSectionView> sections,
                                       const SkinArt& art) {
-  // ⚠ UN NOM QUI DURE : c'est lui qui porte l'identité sous laquelle ImGui
-  // retient la place et la taille de la fenêtre.
-  static WindowName name(kOptionsWindowTitle, kOptionsWindowId);
   return DrawSettingsWindow(
-      name, state, sections, art,
+      GameOptionsName(), state, sections, art,
       SettingsWindowWords{
           .restore_all_question = core::Tr("Rendre à tous les réglages leur valeur d'origine ?"),
           .offers_links = true,
           .reports_bugs = true,
+          .filters = true});
+}
+
+OptionsWindowAction DrawOptionsWindowAside(OptionsWindowState& state,
+                                           std::span<const OptionSectionView> sections,
+                                           const SkinArt& art) {
+  return DrawSettingsWindow(
+      GameOptionsName(), state, sections, art,
+      SettingsWindowWords{
+          .restore_all_question = core::Tr("Rendre à tous les réglages leur valeur d'origine ?"),
           .filters = true});
 }
 

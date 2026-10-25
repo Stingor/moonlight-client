@@ -2,7 +2,9 @@
 
 #include <optional>
 #include <span>
+#include <string>
 
+#include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
 
@@ -49,6 +51,17 @@ namespace {
       return SkillBearer::kGround;
   }
   return SkillBearer::kGround;
+}
+
+// Les bruits du lancer : ceux de la compétence, sinon ceux de son effet, sauf
+// quand la troupe de l'effet sonne elle-même.
+[[nodiscard]] std::vector<ro::render::EffectSoundEntry> CastSoundsOf(const SkillLook& look) {
+  std::vector<ro::render::EffectSoundEntry> sounds = ro::render::SkillSounds(look.skill_id);
+  if (!sounds.empty() || ro::render::EffectSoundPlaysAtSowing(look.effect_id)) return sounds;
+  const std::span<const ro::render::EffectSoundEntry> of_effect =
+      ro::render::EffectSounds(look.effect_id);
+  sounds.assign(of_effect.begin(), of_effect.end());
+  return sounds;
 }
 
 }  // namespace
@@ -106,14 +119,17 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   return look;
 }
 
-std::vector<ro::render::EffectSoundEntry> SkillSoundsOf(const SkillLook& look) {
-  std::vector<ro::render::EffectSoundEntry> sounds = ro::render::SkillSounds(look.skill_id);
-  if (sounds.empty()) {
-    const std::span<const ro::render::EffectSoundEntry> of_effect =
-        ro::render::EffectSounds(look.effect_id);
-    sounds.assign(of_effect.begin(), of_effect.end());
+std::vector<std::string> SkillSoundFilesOf(const SkillLook& look, std::uint32_t draw) {
+  std::vector<std::string> files;
+  // Deux bruits d'un même lancer tirent chacun leur variante.
+  for (const ro::render::EffectSoundEntry& entry : CastSoundsOf(look)) {
+    files.push_back(ro::render::EffectSoundFile(entry, draw++));
   }
-  return sounds;
+  return files;
+}
+
+bool SkillThudsOnHit(const SkillLook& look) {
+  return !ro::render::EffectSoundPlaysAtSowing(look.effect_id) && CastSoundsOf(look).empty();
 }
 
 }  // namespace moonclient

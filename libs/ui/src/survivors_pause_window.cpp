@@ -39,6 +39,18 @@ void DrawReason(const SurvivorsPauseView& view) {
   ImGui::Separator();
 }
 
+// LES FENÊTRES QU'ON OUVRE PAR-DESSUS LA PAUSE, sur une rangée qu'elles se
+// partagent à parts égales : une autre s'y ajoute en comptant un bouton de plus.
+constexpr int kOpenerCount = 1;
+
+void DrawOpeners(SurvivorsPauseAsk& asked, const SkinArt& art) {
+  const float spacing = ImGui::GetStyle().ItemSpacing.x;
+  const float width =
+      (ImGui::GetContentRegionAvail().x - spacing * static_cast<float>(kOpenerCount - 1)) /
+      static_cast<float>(kOpenerCount);
+  asked.open_options = SkinButton(core::Tr("Options"), art, ImVec2(width, 0.0F));
+}
+
 // Une case de réglage : la valeur nouvelle quand on la clique.
 [[nodiscard]] std::optional<bool> Setting(const char* label, bool shown, const SkinArt& art) {
   bool ticked = shown;
@@ -114,12 +126,18 @@ SurvivorsPauseAsk DrawSurvivorsPauseWindow(SurvivorsPauseState& state,
   if (!view.accepts_input) {
     ImGui::EndDisabled();
   }
+  // HORS DE LA GARDE DE LA REPRISE : ouvrir une fenêtre ne relance pas la horde.
+  if (!state.confirming_abandon) {
+    DrawOpeners(asked, art);
+  }
   ImGui::SeparatorText(core::Tr("Réglages"));
   asked.reduced_effects = Setting(core::Tr("Effets réduits"), view.reduced_effects, art);
-  asked.show_measures = Setting(core::Tr("Afficher les mesures"), view.show_measures, art);
+  if (view.measures_offered) {
+    asked.show_measures = Setting(core::Tr("Afficher les mesures"), view.show_measures, art);
+  }
   asked.horde_sun_shadows =
       Setting(core::Tr("Ombres du soleil de la horde"), view.horde_sun_shadows, art);
-  if (view.show_measures) {
+  if (view.measures_offered && view.show_measures) {
     DrawMeasures(view);
   }
   EndSkinnedWindow();

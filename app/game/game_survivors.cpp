@@ -134,6 +134,8 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
                           .guild_invited = guild_book_.invitation().has_value(),
                           .friend_invited = friends_.invitation().has_value(),
                           .link_open = link_.is_open()},
+      .options_window = &windows_.options,
+      .option_sections = settings_->options().sections(),
       .graphics = &settings_->options().graphics(),
       .tables =
           SurvivorsTables{

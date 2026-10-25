@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 
+#include "ro/core/build_flavor.h"
 #include "ro/core/i18n.h"
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
@@ -339,7 +340,8 @@ void SurvivorsViews::ComposePause(const SurvivorsStage& stage, const SurvivorsFi
                                   const SurvivorsViewFacts& facts) {
   measure_rows_.clear();
   count_rows_.clear();
-  if (facts.options.show_measures && facts.measures != nullptr) {
+  const bool measures_shown = MeasuresShown(facts.options, ro::core::kDevTools);
+  if (measures_shown && facts.measures != nullptr) {
     for (std::size_t rank = 0; rank < kArenaMeasureCount; ++rank) {
       const MeasureSummary summary = facts.measures->Window(static_cast<ArenaMeasure>(rank));
       measure_rows_.push_back({.label = kMeasureLabels[rank],
@@ -366,7 +368,8 @@ void SurvivorsViews::ComposePause(const SurvivorsStage& stage, const SurvivorsFi
       .alert_banner = facts.banner.has_value() ? BannerText(*facts.banner) : nullptr,
       .accepts_input = stage.accepts_input(),
       .reduced_effects = facts.options.reduced_effects,
-      .show_measures = facts.options.show_measures,
+      .measures_offered = ro::core::kDevTools,
+      .show_measures = measures_shown,
       .horde_sun_shadows = facts.options.horde_sun_shadows,
       .measures = measure_rows_,
       .counts = count_rows_};

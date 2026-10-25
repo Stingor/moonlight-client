@@ -1,6 +1,7 @@
 #include "survivors/arena_music.h"
 
 #include <cstdint>
+#include <optional>
 #include <string_view>
 
 namespace moonclient {
@@ -30,6 +31,12 @@ ArenaMusicCue ArenaMusic::Advance(const ArenaMusicFacts& facts) noexcept {
     cue.start_track = wanted;
   }
   return cue;
+}
+
+std::optional<float> ArenaMusicVolume::Pose(float cue_volume) noexcept {
+  if (posed_ == cue_volume) return std::nullopt;
+  posed_ = cue_volume;
+  return cue_volume;
 }
 
 }  // namespace moonclient

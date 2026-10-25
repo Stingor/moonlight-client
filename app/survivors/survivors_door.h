@@ -40,6 +40,37 @@ enum class SummaryStep : std::uint8_t {
 };
 [[nodiscard]] SummaryStep SummaryStepOf(bool back, bool replay, bool entry_refused) noexcept;
 
+// LES OPTIONS DU JEU OUVERTES DEPUIS LA PAUSE : « Options » les ouvre
+// par-dessus elle, Échap les ferme d'abord et rend la pause, et elles se
+// ferment dès que la pause cesse — reprise, abandon, fin. La partie reste en
+// pause tant qu'elles sont ouvertes : rien ici ne la relance.
+//
+// `window_open` est la case de la fenêtre d'options du jeu, que la porte ouvre
+// et ferme. ⚠ LA PORTE REND LA CASE TELLE QU'ELLE L'A TROUVÉE : des options
+// laissées ouvertes dans le jeu avant la partie s'y retrouvent après, même
+// montrées par « Options » sur la pause.
+class PauseOptionsDoor {
+ public:
+  // AVANT L'AVANCÉE DE L'ÉTAGE. Vrai quand Échap a fermé la fenêtre : il ne va
+  // pas à la partie.
+  [[nodiscard]] bool Follow(bool& window_open, bool open_asked, bool escape,
+                            SurvivorsScreen screen) noexcept;
+  // APRÈS L'AVANCÉE : la pause finie, la fenêtre qu'elle a ouverte se ferme.
+  void Settle(bool& window_open, SurvivorsScreen screen) noexcept;
+  // La fenêtre se dessine par-dessus la pause.
+  [[nodiscard]] bool shown(bool window_open, SurvivorsScreen screen) const noexcept {
+    return opened_here_ && window_open && screen == SurvivorsScreen::kPaused;
+  }
+
+ private:
+  // La pause cesse de montrer la fenêtre : la case reprend son état d'avant.
+  void Release(bool& window_open) noexcept;
+
+  bool opened_here_ = false;
+  // La fenêtre était déjà ouverte quand la pause l'a demandée.
+  bool open_before_ = false;
+};
+
 // LA SALLE ROUVERTE MONTRE LE BILAN D'UNE PARTIE INTERROMPUE (Q3), une fois :
 // à la seule image où elle s'ouvre, l'étage fermé, la fin écrite se lit et
 // s'efface.

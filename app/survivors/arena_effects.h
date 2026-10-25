@@ -5,6 +5,8 @@
 #include <functional>
 #include <optional>
 #include <span>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -114,6 +116,9 @@ class ArenaEffects {
   // Les cartes au sol qui luisent.
   [[nodiscard]] std::size_t card_glows() const noexcept { return card_glows_.size(); }
   [[nodiscard]] std::size_t launched_total() const noexcept { return launched_total_; }
+  // Les fichiers que les effets ont fait sonner à la dernière peinture, noms
+  // formés : à passer par le budget de voix du mode.
+  [[nodiscard]] std::vector<std::string> TakeSounds() { return std::exchange(heard_, {}); }
 
  private:
   // Un mur ou un pilier en train de brûler : un effet par case, relancé à la
@@ -186,6 +191,7 @@ class ArenaEffects {
   ArenaEffectLives lives_;
   std::size_t launched_total_ = 0;
   std::uint32_t step_ = 0;
+  std::vector<std::string> heard_;
 };
 
 }  // namespace moonclient

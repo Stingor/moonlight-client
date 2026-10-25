@@ -57,6 +57,35 @@ SummaryStep SummaryStepOf(bool back, bool replay, bool entry_refused) noexcept {
   return entry_refused ? SummaryStep::kBackToPrepare : SummaryStep::kReplay;
 }
 
+bool PauseOptionsDoor::Follow(bool& window_open, bool open_asked, bool escape,
+                              SurvivorsScreen screen) noexcept {
+  // Fermée par sa propre croix, la fenêtre n'est plus à la pause.
+  if (!window_open) opened_here_ = false;
+  if (escape && opened_here_) {
+    Release(window_open);
+    return true;
+  }
+  if (open_asked && screen == SurvivorsScreen::kPaused && !opened_here_) {
+    open_before_ = window_open;
+    window_open = true;
+    opened_here_ = true;
+  }
+  return false;
+}
+
+void PauseOptionsDoor::Settle(bool& window_open, SurvivorsScreen screen) noexcept {
+  if (!opened_here_ || screen == SurvivorsScreen::kPaused) return;
+  Release(window_open);
+}
+
+void PauseOptionsDoor::Release(bool& window_open) noexcept {
+  // Des options déjà ouvertes dans le jeu le restent : la pause n'a fait que
+  // les montrer.
+  window_open = open_before_;
+  opened_here_ = false;
+  open_before_ = false;
+}
+
 std::optional<SurvivorsEnding> HubDoor::EndingToShow(bool hub_open, SurvivorsScreen screen,
                                                      const std::filesystem::path& client_root) {
   const bool opened = hub_open && !hub_was_open_;

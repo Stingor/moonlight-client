@@ -10,6 +10,8 @@
 
 #include "ro/core/log.h"
 #include "ro/render/effect_frame.h"
+#include "ro/render/effect_launch.h"
+#include "ro/render/effect_sound_table.h"
 #include "ro/render/effect_table.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/movement.h"
@@ -185,6 +187,8 @@ void ArenaEffects::Restart() {
   budget_ = ArenaEffectBudget();
   launched_total_ = 0;
   step_ = 0;
+  // Ni la chauffe ni la partie d'avant ne font entendre leurs bruits.
+  heard_.clear();
 }
 
 void ArenaEffects::PlaceActor(std::uint32_t actor_id, glm::vec2 cell) {
@@ -471,12 +475,26 @@ void ArenaEffects::DrawAfterBodies(ro::render::SpriteRenderer& sprites,
   PaintStrEffects(effects_, nodes_, played, painters);
   effects_.SowRequestedEffects(world_, *stage_, *planner_, now_ms);
   PaintEffectsLast(effects_, nodes_, painters);
-  // ⚠ CE QUE LES EFFETS DEMANDENT EN PLUS SE JETTE : la caméra de l'arène ne
-  // tremble que sur l'ordre du mode, et ses sons ont leur propre budget.
+  // ⚠ LA SECOUSSE ET LES EFFETS LANCÉS SE JETTENT : la caméra de l'arène ne
+  // tremble que sur l'ordre du mode, et le bruit d'un lancer part du mode, au
+  // lancer (`SkillSoundFilesOf`).
   static_cast<void>(effects_.TakeScreenQuake());
   static_cast<void>(effects_.TakeLaunchedEffects());
-  static_cast<void>(effects_.TakeSownNamedSounds());
-  static_cast<void>(nodes_.TakeSounds());
+  // LES BRUITS QUE LES EFFETS FONT EN VIVANT, eux, sont gardés pour le mode,
+  // qui les passe par son budget de voix : chaque boule semée de Soul Strike,
+  // et ce que les effets nommés jouent. Ceux de l'image précédente que
+  // personne n'a pris se perdent.
+  heard_.clear();
+  std::uint32_t draw = now_ms;
+  for (const SownNamedSound& named : effects_.TakeSownNamedSounds()) {
+    ro::render::EffectSoundEntry pattern;
+    pattern.sound = named.sound;
+    pattern.variants = named.variants;
+    heard_.push_back(ro::render::EffectSoundFile(pattern, draw++));
+  }
+  for (ro::render::EffectNodeSound& sown : nodes_.TakeSounds()) {
+    heard_.push_back(std::move(sown.sound));
+  }
   SettleActorEffects(world_, effects_.TakeActorEffects());
 }
 

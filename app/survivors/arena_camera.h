@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/render/camera.h"
+#include "ro/sim/survivors_rules.h"
 #include "ro/sim/world_fwd.h"
 
 #include "input/camera_aim.h"
@@ -15,17 +16,21 @@ namespace moonclient {
 
 // ── LA CAMÉRA DE L'ARÈNE (U9) ───────────────────────────────────────────────
 //
-// Celle de RO, champ 15° et élévation 50°, au recul de 400 que la molette
-// rapproche jusqu'à 300. 🔴 LE LACET EST FIGÉ AU NORD : le cadre d'apparition
-// de la simulation est aligné sur lui, et « haut » reste « haut » pour les
-// touches. Ni la molette, ni la secousse, ni la descente n'y touchent.
+// Celle de RO, champ 15° et élévation 50°, au recul d'entrée de 400. La
+// molette rapproche jusqu'à 300 et recule jusqu'où le cadre d'apparition le
+// permet pour le format de l'image (`ArenaFarthestDistance`). 🔴 LE LACET EST
+// FIGÉ AU NORD : le cadre d'apparition de la simulation est aligné sur lui, et
+// « haut » reste « haut » pour les touches. Ni la molette, ni la secousse, ni
+// la descente n'y touchent.
 
 inline constexpr float kArenaFovDegrees = ro::render::kGameFovDegrees;
 inline constexpr float kArenaElevationDegrees = ro::render::kGameElevationDegrees;
 inline constexpr float kArenaYawDegrees = 0.0F;
-// Le recul de la molette, en unités du monde : le plus loin est celui d'entrée.
-inline constexpr float kArenaFarthestDistance = 400.0F;
+// Les reculs de la molette, en unités du monde : celui d'entrée, le plus
+// proche, et la borne du plus lointain, une fois et demie celui d'entrée.
+inline constexpr float kArenaEntryDistance = 400.0F;
 inline constexpr float kArenaNearestDistance = 300.0F;
+inline constexpr float kArenaFarthestReachDistance = 600.0F;
 // Ce qu'un cran de molette rapproche.
 inline constexpr float kArenaWheelStepDistance = 25.0F;
 
@@ -61,18 +66,37 @@ struct GroundFootprint {
 [[nodiscard]] std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camera,
                                                                float aspect_ratio);
 
+// LE PLUS GRAND MONSTRE ORDINAIRE DE L'ARÈNE, debout, en pixels de sprite :
+// l'Evil Druid. Né sur le côté sud du cadre, il se dresse vers le haut de
+// l'image ; un boss ou une élite grandie n'y est pas compté.
+inline constexpr float kArenaTallestFoeSpritePixels = 147.0F;
+
+// Vrai quand un monstre de cette taille, né au milieu du côté sud du cadre
+// d'apparition, garde la tête sous le bas de l'image de `camera`.
+[[nodiscard]] bool SouthNewbornHidden(const ro::render::Camera& camera, float aspect_ratio,
+                                      const ro::sim::SpawnFrame& frame);
+
+// LE RECUL LE PLUS LOINTAIN pour une image de ce rapport : le plus grand, borné
+// à `kArenaFarthestReachDistance`, dont l'emprise au sol tient encore dans le
+// cadre d'apparition `frame` et où un monstre né au sud reste caché
+// (`SouthNewbornHidden`) — la horde naît donc hors de l'image.
+// Jamais moins que le recul d'entrée : le contenu est réglé pour lui.
+[[nodiscard]] float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame);
+
 // LA CAMÉRA DE L'ARÈNE : suivi rigide du héros, molette, secousse et descente.
 //
 // ⚠ LA SECOUSSE SE RETIRE AVANT CHAQUE POSE (`ScreenShake::Undo`) : posée par
 // dessus la précédente, elle dériverait.
 class ArenaCamera {
  public:
-  ArenaCamera();
+  // `frame` : le cadre d'apparition des règles, qui borne le recul.
+  explicit ArenaCamera(const ro::sim::SpawnFrame& frame);
 
   // L'ENTRÉE DANS L'ARÈNE : le suivi repart du héros.
   void Enter() noexcept;
   // Des crans de molette : positifs, la caméra se rapproche ; le recul reste
-  // dans [`kArenaNearestDistance`, `kArenaFarthestDistance`].
+  // entre `kArenaNearestDistance` et le plus lointain du format de la
+  // dernière pose (`farthest_distance`).
   void Wheel(float notches) noexcept;
   // Le recul de la molette, borné de même.
   void SetDistance(float distance) noexcept;
@@ -90,11 +114,18 @@ class ArenaCamera {
 
   [[nodiscard]] const ro::render::Camera& camera() const noexcept { return camera_; }
   [[nodiscard]] float wheel_distance() const noexcept { return wheel_distance_; }
+  // Le recul le plus lointain du format de la dernière pose ; la borne entière
+  // avant la première.
+  [[nodiscard]] float farthest_distance() const noexcept { return farthest_distance_; }
 
  private:
   ro::render::Camera camera_;
   CameraAim aim_;
-  float wheel_distance_ = kArenaFarthestDistance;
+  ro::sim::SpawnFrame frame_;
+  float wheel_distance_ = kArenaEntryDistance;
+  float farthest_distance_ = kArenaFarthestReachDistance;
+  // Le rapport pour lequel `farthest_distance_` a été cherché.
+  std::optional<float> farthest_aspect_;
 };
 
 }  // namespace moonclient

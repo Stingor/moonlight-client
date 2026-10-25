@@ -441,18 +441,31 @@ void GameSettings::Apply(const UiStage::Answers& answers, const OptionTargets& t
   // du partage en deux GROUPES plutôt qu'en deux jeux de réglages : un
   // réglage n'existe qu'à un seul endroit, quel que soit le panneau qui le
   // montre.
-  if (answers.options.keep_display) {
+  ChangeOptions(answers.options, to, now_ms);
+}
+
+void GameSettings::ChangeOptions(const ro::ui::OptionsWindowAction& asked, const OptionTargets& to,
+                                 std::uint32_t now_ms) {
+  if (asked.keep_display) {
     options_.KeepDisplay();
   }
-  if (answers.options.revert_display) {
+  if (asked.revert_display) {
     options_.RevertDisplay(to);
   }
-  options_.Change(answers.options, to, now_ms);
+  options_.Change(asked, to, now_ms);
   // ⚠ UN PNJ DÉBLOQUÉ DEPUIS LA PAGE S'ÉCRIT TOUT DE SUITE, comme un favori du
   // coffre : c'est une liste, dans son propre fichier.
   if (options_.context_menu().TakeBlockedChanged()) {
     static_cast<void>(SaveBlockedNpcs(client_root_, options_.context_menu().blocked()));
   }
+}
+
+void GameSettings::ApplyOptionsAside(const ro::ui::OptionsWindowAction& asked,
+                                     ro::ui::OptionsWindowState& window, const OptionTargets& to,
+                                     std::uint32_t now_ms) {
+  ChangeOptions(asked, to, now_ms);
+  TickDisplayRevert(to, now_ms);
+  window.revert_seconds = options_.revert_seconds(now_ms);
 }
 
 void GameSettings::SetSwitch(GameOption which, bool on, const OptionTargets& to,

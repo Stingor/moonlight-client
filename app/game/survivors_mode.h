@@ -6,6 +6,7 @@
 #include <functional>
 #include <optional>
 #include <set>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -71,6 +72,10 @@ struct SurvivorsContext {
   // envoie sa fin. Nul, toute partie part libre.
   SurvivorsRankingMode* ranking = nullptr;
   WorldAside aside;
+  // LA FENÊTRE D'OPTIONS DU JEU et ses pages, que « Options » ouvre par-dessus
+  // la pause. Nulle, la pause n'en ouvre pas.
+  ro::ui::OptionsWindowState* options_window = nullptr;
+  std::span<const ro::ui::OptionSectionView> option_sections;
   const GraphicsOptions* graphics = nullptr;
   SurvivorsTables tables;
   const ro::vfs::MapDisplayNames* map_names = nullptr;
@@ -176,9 +181,7 @@ class SurvivorsMode {
   std::set<std::string, std::less<>> missing_sounds_;
   ArenaMusic music_;
   bool music_muted_ = false;
-  // Le volume de la musique à l'entrée, rendu à la sortie.
-  float entry_music_volume_ = 1.0F;
-  std::optional<float> music_volume_set_;
+  ArenaMusicVolume music_volume_;
   ArenaMeasures measures_;
   MapSignStage sign_;
   std::optional<ro::ui::MapSignView> sign_view_;
@@ -187,6 +190,7 @@ class SurvivorsMode {
   // derrière lui à l'image suivante.
   bool loading_shown_ = false;
   HubDoor hub_door_;
+  PauseOptionsDoor pause_options_;
   // Le journal de la partie finie est écrit.
   bool run_saved_ = false;
   SurvivorsTrophyCount trophies_;

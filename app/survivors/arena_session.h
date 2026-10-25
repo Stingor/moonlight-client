@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <string>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -114,6 +115,8 @@ class ArenaSession {
 
   [[nodiscard]] ArenaScene& scene() noexcept { return scene_; }
   [[nodiscard]] const ArenaEffects& effects() const noexcept { return effects_; }
+  // Les bruits des effets de la dernière peinture : voir `ArenaEffects::TakeSounds`.
+  [[nodiscard]] std::vector<std::string> TakeEffectSounds() { return effects_.TakeSounds(); }
   [[nodiscard]] const HordeComposer& composer() const noexcept { return composer_; }
   [[nodiscard]] const ro::render::Camera& camera() const noexcept { return camera_.camera(); }
   // Ce qu'ont coûté les effets à la dernière composition, en millisecondes.

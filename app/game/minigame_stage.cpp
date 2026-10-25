@@ -139,7 +139,7 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
     seeded_ = true;
   }
   // ⚠ LES RÉPONSES AVANT LES HORLOGES : un clic date de l'image qui l'a reçu.
-  ApplyAnswers(windows);
+  ApplyAnswers(windows, pieces.survivors_offered);
   rojeweled_clock_.Follow(windows.rojeweled.open, now_ms);
   const std::uint32_t roggle_step_ms = roggle_clock_.Follow(windows.roggle.open, now_ms);
 
@@ -165,7 +165,7 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
   if (record_->record != before) {
     Save(client_root);
   }
-  ComposeHub(windows);
+  ComposeHub(windows, pieces.survivors_offered);
   ComposeRojeweled(windows, pieces, now_ms);
   ComposeRoggle(windows, pieces, now_ms);
 }
@@ -189,11 +189,15 @@ void MinigameStage::Save(const std::filesystem::path& client_root) {
   record_unsaved_ = !SaveMinigameRecord(client_root, *record_);
 }
 
-void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
-  const ro::ui::MinigamesAsk hub = std::exchange(windows.hub_answer, {});
+void MinigameStage::ApplyAnswers(MinigameWindows& windows, bool survivors_offered) {
+  ro::ui::MinigamesAsk hub = std::exchange(windows.hub_answer, {});
+  hub.open_survivors = hub.open_survivors && survivors_offered;
   windows.rojeweled.open = windows.rojeweled.open || hub.open_rojeweled;
   windows.roggle.open = windows.roggle.open || hub.open_roggle;
   windows.survivors_prepare.open = windows.survivors_prepare.open || hub.open_survivors;
+  // L'ACCUEIL DE SURVIVORS PREND LA PLACE DE LA SALLE : elle se ferme et ne se
+  // rouvre que sur demande du joueur.
+  if (hub.open_survivors) windows.hub.open = false;
 
   const ro::ui::RojeweledAsk jewels = std::exchange(windows.rojeweled_answer, {});
   if (jewels.new_game) {
@@ -306,7 +310,7 @@ ro::ui::SkinImage MinigameStage::SpriteOf(std::size_t slot, std::uint32_t sprite
   return shown.missing ? ro::ui::SkinImage{} : shown.image;
 }
 
-void MinigameStage::ComposeHub(MinigameWindows& windows) {
+void MinigameStage::ComposeHub(MinigameWindows& windows, bool survivors_offered) {
   trophy_rows_.clear();
   for (const ro::sim::MinigameTrophyText& text : ro::sim::MinigameTrophies()) {
     trophy_rows_.push_back(ro::ui::MinigameTrophyRow{.name = text.name,
@@ -316,7 +320,7 @@ void MinigameStage::ComposeHub(MinigameWindows& windows) {
   windows.hub_view = ro::ui::MinigamesView{.rojeweled_best = record_->record.rojeweled_best,
                                            .roggle_best = record_->record.roggle_best,
                                            .trophies = trophy_rows_,
-                                           .survivors_offered = true};
+                                           .survivors_offered = survivors_offered};
 }
 
 void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePieces& pieces,

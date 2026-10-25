@@ -58,6 +58,15 @@ struct SurvivorsOptions {
   [[nodiscard]] bool operator==(const SurvivorsOptions&) const = default;
 };
 
+// « AFFICHER LES MESURES » EST UN OUTIL DE DÉVELOPPEMENT : la case ne paraît,
+// et les mesures ne se montrent, qu'au client de développement
+// (`ro::core::kDevTools`). Ailleurs, une valeur déjà rangée dans le fichier ne
+// montre rien, et elle y reste telle quelle.
+[[nodiscard]] constexpr bool MeasuresShown(const SurvivorsOptions& options,
+                                           bool dev_tools) noexcept {
+  return dev_tools && options.show_measures;
+}
+
 // Ce que ce client ne lit pas — une section, une clé de rang inconnue, une
 // carte ou un exploit d'une autre forme —, recopié tel quel.
 struct SurvivorsForeignEntry {

@@ -72,11 +72,17 @@ struct MinigamePieces {
   ro::render::ActorWardrobe* wardrobe = nullptr;
   // Nul : des plots ronds au lieu des gemmes.
   ro::render::ItemIcons* item_icons = nullptr;
+  // 🔴 SURVIVANTS DE MIDGARD EST RÉSERVÉ AU STAFF tant qu'il est en essai : sans
+  // ce droit, la salle ne montre pas sa ligne et une demande d'ouverture est
+  // ignorée. Le droit se relit à chaque image.
+  bool survivors_offered = false;
 
   [[nodiscard]] static MinigamePieces Of(std::optional<ro::render::ActorWardrobe>& wardrobe,
-                                         std::optional<ro::render::ItemIcons>& item_icons) {
+                                         std::optional<ro::render::ItemIcons>& item_icons,
+                                         bool survivors_offered) {
     return MinigamePieces{.wardrobe = wardrobe.has_value() ? &*wardrobe : nullptr,
-                          .item_icons = item_icons.has_value() ? &*item_icons : nullptr};
+                          .item_icons = item_icons.has_value() ? &*item_icons : nullptr,
+                          .survivors_offered = survivors_offered};
   }
 };
 
@@ -145,10 +151,10 @@ class MinigameStage {
  private:
   [[nodiscard]] ro::sim::MinigameRecord& Record(const std::filesystem::path& client_root);
   void Save(const std::filesystem::path& client_root);
-  void ApplyAnswers(MinigameWindows& windows);
+  void ApplyAnswers(MinigameWindows& windows, bool survivors_offered);
   void PlayRojeweled();
   void PlayRoggle(std::uint32_t step_ms);
-  void ComposeHub(MinigameWindows& windows);
+  void ComposeHub(MinigameWindows& windows, bool survivors_offered);
   void ComposeRojeweled(MinigameWindows& windows, const MinigamePieces& pieces,
                         std::uint32_t now_ms);
   void ComposeRoggle(MinigameWindows& windows, const MinigamePieces& pieces, std::uint32_t now_ms);

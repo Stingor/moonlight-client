@@ -102,6 +102,15 @@ class GameSettings {
   void Apply(const UiStage::Answers& answers, const OptionTargets& to, UiStage::Windows& windows,
              bool* running, std::uint32_t now_ms);
 
+  // LES OPTIONS DU JEU OUVERTES PAR-DESSUS UNE AUTRE IMAGE — la pause d'une
+  // partie de survivors : leur réponse s'applique par le même chemin que le
+  // panneau du jeu, le filet de l'affichage se pose dans `window` et son
+  // échéance tombe. Un geste qui demande le monde (un album, un enregistrement)
+  // n'a pas de suite : il n'est pas là.
+  void ApplyOptionsAside(const ro::ui::OptionsWindowAction& asked,
+                         ro::ui::OptionsWindowState& window, const OptionTargets& to,
+                         std::uint32_t now_ms);
+
   // ── LES DIX MACROS DE CHAT ────────────────────────────────────────
   // Le fichier les descend UNE FOIS dans les tampons de la fenêtre, au
   // démarrage ; ensuite ce sont les tampons qui font foi.
@@ -212,6 +221,11 @@ class GameSettings {
   void Flush();
 
  private:
+  // Ce que la fenêtre d'options a changé : le filet de l'affichage, la ligne,
+  // et la liste des PNJ bloqués, écrite aussitôt.
+  void ChangeOptions(const ro::ui::OptionsWindowAction& asked, const OptionTargets& to,
+                     std::uint32_t now_ms);
+
   std::filesystem::path client_root_;
   Hotkeys bindings_;
   ItemLayout item_layout_;

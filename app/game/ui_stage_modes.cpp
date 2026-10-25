@@ -49,6 +49,10 @@ SurvivorsAsk UiStage::DrawSurvivorsOnly(const SurvivorsFrameView& view) {
   if (view.pause != nullptr && view.pause_state != nullptr) {
     ask.pause = ro::ui::DrawSurvivorsPauseWindow(*view.pause_state, *view.pause, skin_);
   }
+  // LES OPTIONS DU JEU APRÈS LA PAUSE, donc PAR-DESSUS : c'est d'elle qu'on les ouvre.
+  if (view.options_state != nullptr) {
+    ask.options = ro::ui::DrawOptionsWindowAside(*view.options_state, view.options, skin_);
+  }
   if (view.summary != nullptr) {
     ask.summary = ro::ui::DrawSurvivorsSummaryWindow(*view.summary, skin_);
   }

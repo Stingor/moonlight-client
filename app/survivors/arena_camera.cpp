@@ -3,8 +3,12 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
+#include <optional>
 
+#include "ro/render/sprite_billboard.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/sim/survivors_geometry.h"
 
 namespace moonclient {
 namespace {
@@ -15,6 +19,63 @@ constexpr std::array<glm::vec2, 4> kImageCorners = {glm::vec2(-1.0F, -1.0F), glm
                                                     glm::vec2(1.0F, 1.0F), glm::vec2(-1.0F, 1.0F)};
 constexpr float kNearDepth = -1.0F;
 constexpr float kFarDepth = 1.0F;
+// Le bas de l'image en ordonnée normalisée.
+constexpr float kImageBottom = -1.0F;
+
+// La recherche du recul le plus lointain s'arrête quand l'intervalle encore
+// douteux est plus court que ceci, en unités du monde.
+constexpr float kFarthestSearchToleranceDistance = 0.5F;
+// L'emprise reste à ce retrait du cadre : posée sur un héros loin de l'origine,
+// la même caméra rend une emprise qui diffère de quelques dix-millièmes de case.
+constexpr float kFrameSlackCells = 0.01F;
+
+// La part du cadre que l'emprise peut occuper, en cases.
+[[nodiscard]] float CellsOf(std::int32_t units) {
+  return static_cast<float>(units) / static_cast<float>(ro::sim::kSubunitsPerCell) -
+         kFrameSlackCells;
+}
+
+// Le côté sud du cadre, en unités du monde, et la tête du plus grand monstre
+// au-dessus de ses pieds, le long de l'axe haut des panneaux.
+[[nodiscard]] float SouthLineUnits(const ro::sim::SpawnFrame& frame) {
+  return CellsOf(frame.south_units) * ro::render::kWorldUnitsPerCell;
+}
+constexpr float kTallestFoeHeadUnits =
+    kArenaTallestFoeSpritePixels / ro::render::kSpritePixelsPerWorldUnit;
+
+}  // namespace
+
+bool SouthNewbornHidden(const ro::render::Camera& camera, float aspect_ratio,
+                        const ro::sim::SpawnFrame& frame) {
+  // 🔴 LE NORD EST VERS LES Z DÉCROISSANTS : le sud du héros est vers les Z
+  // croissants, du côté de la caméra.
+  const glm::vec3 feet = camera.look_at + glm::vec3(0.0F, 0.0F, SouthLineUnits(frame));
+  const glm::vec3 head = feet + ro::render::MakeBillboardBasis(camera).up * kTallestFoeHeadUnits;
+  const glm::vec4 clip =
+      camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix() * glm::vec4(head, 1.0F);
+  // Derrière la caméra, rien ne se voit ; devant, la tête reste sous le bas de
+  // l'image.
+  return clip.w <= 0.0F || clip.y / clip.w <= kImageBottom;
+}
+
+namespace {
+
+// La caméra de l'arène à ce recul, sans descente ni secousse : l'emprise ne
+// dépend que du recul, de l'élévation et du champ.
+[[nodiscard]] bool FitsSpawnFrame(float distance, float aspect_ratio,
+                                  const ro::sim::SpawnFrame& frame) {
+  ro::render::Camera camera;
+  camera.distance = distance;
+  camera.pitch_degrees = kArenaElevationDegrees;
+  camera.yaw_degrees = kArenaYawDegrees;
+  camera.fov_degrees = ArenaFovDegrees(aspect_ratio);
+  const std::optional<GroundFootprint> seen = GroundFootprintOf(camera, aspect_ratio);
+  return seen.has_value() && seen->west_cells <= CellsOf(frame.half_width_units) &&
+         seen->east_cells <= CellsOf(frame.half_width_units) &&
+         seen->north_cells <= CellsOf(frame.north_units) &&
+         seen->south_cells <= CellsOf(frame.south_units) &&
+         SouthNewbornHidden(camera, aspect_ratio, frame);
+}
 
 // La descente ralentit en cube : vive au départ, posée à l'arrivée.
 [[nodiscard]] float EaseOutCubic(float progress) {
@@ -74,7 +135,23 @@ std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camer
   return footprint;
 }
 
-ArenaCamera::ArenaCamera() {
+float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame) {
+  if (FitsSpawnFrame(kArenaFarthestReachDistance, aspect_ratio, frame)) {
+    return kArenaFarthestReachDistance;
+  }
+  if (!FitsSpawnFrame(kArenaEntryDistance, aspect_ratio, frame)) return kArenaEntryDistance;
+  // L'emprise grandit avec le recul : on coupe en deux l'intervalle entre un
+  // recul qui tient et un recul qui déborde.
+  float fits = kArenaEntryDistance;
+  float overflows = kArenaFarthestReachDistance;
+  while (overflows - fits > kFarthestSearchToleranceDistance) {
+    const float middle = (fits + overflows) * 0.5F;
+    (FitsSpawnFrame(middle, aspect_ratio, frame) ? fits : overflows) = middle;
+  }
+  return fits;
+}
+
+ArenaCamera::ArenaCamera(const ro::sim::SpawnFrame& frame) : frame_(frame) {
   camera_.fov_degrees = kArenaFovDegrees;
   camera_.pitch_degrees = kArenaElevationDegrees;
   camera_.yaw_degrees = kArenaYawDegrees;
@@ -91,12 +168,19 @@ void ArenaCamera::Wheel(float notches) noexcept {
 }
 
 void ArenaCamera::SetDistance(float distance) noexcept {
-  wheel_distance_ = std::clamp(distance, kArenaNearestDistance, kArenaFarthestDistance);
+  wheel_distance_ = std::clamp(distance, kArenaNearestDistance, farthest_distance_);
 }
 
 const ro::render::Camera& ArenaCamera::Pose(const glm::vec3& hero_ground, std::uint32_t arrival_ms,
                                             float aspect_ratio, std::uint32_t now_ms,
                                             const ro::sim::World& effects_world) {
+  // UN FORMAT NOUVEAU — la première pose, une fenêtre redimensionnée — se
+  // cherche son recul le plus lointain, et le recul tenu y rentre.
+  if (farthest_aspect_ != aspect_ratio) {
+    farthest_aspect_ = aspect_ratio;
+    farthest_distance_ = ArenaFarthestDistance(aspect_ratio, frame_);
+    SetDistance(wheel_distance_);
+  }
   aim_.shake.Undo(camera_);
   // Le recul, l'élévation, le lacet et le champ se reposent entiers à chaque
   // image : rien de la précédente n'y survit, et le lacet reste celui du nord.

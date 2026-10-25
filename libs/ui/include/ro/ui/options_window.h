@@ -477,6 +477,12 @@ inline constexpr const char* kOptionsWindowId = "options";
                                                     std::span<const OptionSectionView> sections,
                                                     const SkinArt& art);
 
+// LES OPTIONS DU JEU PAR-DESSUS UNE AUTRE IMAGE — la pause d'une partie de
+// survivors : la même fenêtre, sous la même identité, sans ce qui demande le
+// monde. Ni lien dans le chat, qui n'y est pas, ni « Signaler un bug ».
+[[nodiscard]] OptionsWindowAction DrawOptionsWindowAside(
+    OptionsWindowState& state, std::span<const OptionSectionView> sections, const SkinArt& art);
+
 // LES RÉGLAGES DE L'ÉCRAN DE CONNEXION : la même fenêtre, sur les seules pages
 // qu'on lui donne, avec une note qui dit où trouver le reste.
 //

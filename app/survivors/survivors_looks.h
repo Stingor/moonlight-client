@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "ro/render/effect_sound_table.h"
@@ -107,7 +108,22 @@ struct SkillLook {
 // sont portés par lui, tout le reste se pose au sol.
 [[nodiscard]] SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill);
 
-// Les bruits d'un skill : ceux de la compétence, sinon ceux de son effet.
-[[nodiscard]] std::vector<ro::render::EffectSoundEntry> SkillSoundsOf(const SkillLook& look);
+// LES FICHIERS QU'UN LANCER FAIT ENTENDRE, variantes tirées de `draw` : ceux de
+// la compétence, sinon ceux de son effet. Rien pour un sort qui n'en a aucun :
+// il sonne à l'impact (`SkillThudsOnHit`).
+//
+// 🔴 UN NOM À VARIANTES SE FORME ICI : le `%d` qu'il porte à la place du numéro
+// ne désigne aucun fichier, et un bolt joué sous ce nom resterait muet.
+//
+// ⚠ RIEN POUR UN EFFET DONT LA TROUPE SONNE : chaque pièce semée fait son bruit
+// (`ArenaEffects::TakeSounds`), et en ajouter un au lancer serait un doublon —
+// voir `ro::render::EffectSoundPlaysAtSowing`.
+[[nodiscard]] std::vector<std::string> SkillSoundFilesOf(const SkillLook& look, std::uint32_t draw);
+
+// Vrai pour un sort sans bruit, ni à lui, ni à son effet, ni à la troupe de son
+// effet : chaque coup qu'il porte fait entendre le coup sourd du jeu à
+// l'impact d'une compétence (`ro::render::SkillBlowSound`), et un lancer qui
+// ne touche rien reste muet.
+[[nodiscard]] bool SkillThudsOnHit(const SkillLook& look);
 
 }  // namespace moonclient

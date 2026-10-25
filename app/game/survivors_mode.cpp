@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/build_flavor.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/formats/gat.h"
@@ -18,6 +19,7 @@
 
 #include "game/survivors_mode_slot.h"
 #include "game/survivors_ranking_desk.h"
+#include "options/game_option_ids.h"
 #include "survivors/arena_card_cues.h"
 #include "survivors/survivors_door.h"
 #include "survivors/survivors_file.h"
@@ -147,7 +149,7 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   if (context.ranking != nullptr) SayRankingNotices(*context.ranking, stage, context.say);
   if (std::optional<SurvivorsEnding> ending =
           hub_door_.EndingToShow(windows.hub.open, stage.screen(), context.client_root)) {
-    entry_music_volume_ = context.audio->music_volume();
+    music_volume_.Follow(context.audio->music_volume());
     stage.ShowEnding(std::move(*ending));
     clock_.Follow(false, context.now_ms);
   }
@@ -234,7 +236,7 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   }
   context.minigames->survivors_prepare.open = false;
   context.minigames->survivors_meta.CloseAll();
-  entry_music_volume_ = context.audio->music_volume();
+  music_volume_.Follow(context.audio->music_volume());
   watch_.Start(RealFactsOf(*context.world, context.aside, 0));
   whispers_.Start(context.world->chat_lines());
   banner_.reset();
@@ -282,7 +284,7 @@ bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context
                   : nullptr,
               context.sign_mode, context.now_ms);
   music_.Reset();
-  music_volume_set_.reset();
+  music_volume_.Forget();
   sounds_.Clear();
   measures_.Reset();
   views_.ResetOffer();
@@ -315,7 +317,7 @@ void SurvivorsMode::Exit(SurvivorsStage& stage, const SurvivorsContext& context)
   }
   // LA MUSIQUE REFAIT SUIVRE LA CARTE DU PERSONNAGE, au volume des options.
   context.music->Forget();
-  context.audio->SetMusicVolume(entry_music_volume_);
+  context.audio->SetMusicVolume(music_volume_.player_volume());
   // Les bruits de l'arène se taisent avec elle ; ceux de l'interface restent.
   context.audio->StopSounds(ro::audio::SoundChannel::kEffects);
   sounds_.Clear();
@@ -326,6 +328,9 @@ void SurvivorsMode::Exit(SurvivorsStage& stage, const SurvivorsContext& context)
   banner_.reset();
   clock_.Follow(false, context.now_ms);
   stage.Close();
+  if (context.options_window != nullptr) {
+    pause_options_.Settle(context.options_window->open, stage.screen());
+  }
 }
 
 void SurvivorsMode::Freeze(SurvivorsStage& stage, MinigameStage& minigames,
@@ -379,7 +384,10 @@ void SurvivorsMode::ApplyOptions(const ro::ui::SurvivorsPauseAsk& asked,
                                  const SurvivorsContext& context) {
   const SurvivorsOptions before = options_;
   if (asked.reduced_effects.has_value()) options_.reduced_effects = *asked.reduced_effects;
-  if (asked.show_measures.has_value()) options_.show_measures = *asked.show_measures;
+  // Hors du client de développement, la case ne paraît pas et ne change rien.
+  if (asked.show_measures.has_value() && ro::core::kDevTools) {
+    options_.show_measures = *asked.show_measures;
+  }
   if (asked.horde_sun_shadows.has_value()) options_.horde_sun_shadows = *asked.horde_sun_shadows;
   if (options_ == before) return;
   if (arena_.has_value()) {
@@ -438,11 +446,27 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
     if (const std::optional<RealWorldAlert> banner = report.banner()) banner_ = banner;
   }
 
-  const SurvivorsGestures gestures = route_.TakeGestures();
+  SurvivorsGestures gestures = route_.TakeGestures();
   pressed_card_key_ = gestures.pressed_card_key;
+  // LES OPTIONS DU JEU PAR-DESSUS LA PAUSE prennent Échap d'abord, et la
+  // molette, qui fait défiler leurs pages et non reculer la caméra.
+  bool* options_open = context.options_window != nullptr ? &context.options_window->open : nullptr;
+  if (options_open != nullptr) {
+    const bool shown = pause_options_.shown(*options_open, stage.screen());
+    if (pause_options_.Follow(*options_open, ask_.pause.open_options, gestures.escape,
+                              stage.screen())) {
+      gestures.escape = false;
+    }
+    if (shown) gestures.wheel_notches = 0.0F;
+  }
   if (arena_.has_value() && gestures.wheel_notches != 0.0F) arena_->Wheel(gestures.wheel_notches);
   const SurvivorsIntent intent = IntentOf(stage, context, gestures, report);
   ApplyOptions(ask_.pause, context);
+  // LE VOLUME DE LA MUSIQUE CHANGÉ DANS LES OPTIONS DE LA PAUSE, déjà posé par
+  // elles, devient celui de la partie : la pause le baisse, la sortie le rend.
+  if (ask_.options.changed == static_cast<int>(GameOption::kMusicVolume)) {
+    music_volume_.Follow(context.audio->music_volume());
+  }
   const ro::ui::SurvivorsSummaryAsk summary = ask_.summary;
   // L'ÉGLISE ET LE TABLEAU MONDIAL PAR-DESSUS L'ÉCRAN DE FIN : l'Église
   // achète, le tableau demande ses pages, et Échap ferme celle du dessus.
@@ -479,6 +503,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   const Clock::time_point simulated = Clock::now();
   stage.Advance(elapsed_ms, intent);
   measures_.Record(ArenaMeasure::kSimulation, MsSince(simulated));
+  if (options_open != nullptr) pause_options_.Settle(*options_open, stage.screen());
   FollowEntered(stage, context);
 
   SurvivorsPainted painted;
@@ -584,6 +609,10 @@ void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsConte
 
 void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
                                const SurvivorsContext& context) {
+  // Les bruits des effets se prennent même sous un son coupé : ils ne valent
+  // que pour l'image qui les a fait naître.
+  const std::vector<std::string> effect_sounds =
+      arena_.has_value() ? arena_->TakeEffectSounds() : std::vector<std::string>{};
   if (!context.audio->sound_audible()) return;
   if (news.hero_hurt > 0) PlaySound(kHeroHurtSound, ArenaSoundRank::kHeroHurt, context);
   if (news.level_ups > 0 || !news.evolutions.empty()) {
@@ -592,13 +621,26 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
   const ArenaCardSounds cards = CardSoundsOf(news);
   PlaySound(cards.drop, ArenaSoundRank::kTreasure, context);
   PlaySound(cards.pickup, ArenaSoundRank::kTreasure, context);
+  // Le tirage des variantes change à chaque lancer : deux Fire Bolt de suite
+  // ne sonnent pas forcément pareil.
+  std::uint32_t draw = context.now_ms;
   for (const ro::sim::SurvivorsCast& cast : news.casts) {
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), cast.skill_id);
     if (rule == nullptr) continue;
-    for (const ro::render::EffectSoundEntry& entry : SkillSoundsOf(SkillLookOf(*rule))) {
-      PlaySound(entry.sound, ArenaSoundRank::kSkill, context);
+    for (const std::string& file : SkillSoundFilesOf(SkillLookOf(*rule), draw++)) {
+      PlaySound(file, ArenaSoundRank::kSkill, context);
     }
   }
+  // LES SORTS SANS BRUIT SONNENT À L'IMPACT, du coup sourd d'une compétence :
+  // un par sort et par image, quel que soit le nombre de monstres touchés.
+  std::set<std::uint16_t> thudded;
+  for (const ro::sim::SurvivorsHit& hit : news.hits) {
+    if (hit.skill_id == 0 || !thudded.insert(hit.skill_id).second) continue;
+    const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), hit.skill_id);
+    if (rule == nullptr || !SkillThudsOnHit(SkillLookOf(*rule))) continue;
+    PlaySound(ro::render::SkillBlowSound(draw++), ArenaSoundRank::kSkill, context);
+  }
+  for (const std::string& file : effect_sounds) PlaySound(file, ArenaSoundRank::kSkill, context);
 }
 
 void SurvivorsMode::PlaySound(std::string_view name, ArenaSoundRank rank,
@@ -644,11 +686,10 @@ void SurvivorsMode::FollowMusic(const SurvivorsStage& stage, const SurvivorsCont
       music_.Advance(ArenaMusicFacts{.presentation_ms = stage.presentation_ms(),
                                      .paused = SurvivorsMusicPaused(stage.screen()),
                                      .player_track = context.music->chosen(),
-                                     .music_volume = entry_music_volume_});
+                                     .music_volume = music_volume_.player_volume()});
   if (!cue.start_track.empty()) context.music->PlayForMode(audio, cue.start_track);
-  if (music_volume_set_ != cue.volume) {
-    audio.SetMusicVolume(cue.volume);
-    music_volume_set_ = cue.volume;
+  if (const std::optional<float> posed = music_volume_.Pose(cue.volume)) {
+    audio.SetMusicVolume(*posed);
   }
 }
 
@@ -686,6 +727,11 @@ SurvivorsFrameView SurvivorsMode::View(const SurvivorsStage& stage,
                          .ranking = context.ranking},
       context.tables);
   if (sign_view_.has_value()) view.map_sign = &*sign_view_;
+  if (context.options_window != nullptr &&
+      pause_options_.shown(context.options_window->open, stage.screen())) {
+    view.options_state = context.options_window;
+    view.options = context.option_sections;
+  }
   measures_.Record(ArenaMeasure::kHud, MsSince(started));
   return view;
 }

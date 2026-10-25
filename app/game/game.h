@@ -340,6 +340,8 @@ class Game : public Screen,
   void FollowMapGround();
   void ServeGroundPoints(float width, float height);
   void DrawInterface(std::uint32_t now_ms);
+  // Les cadres d'essai des options, quand leur page est sous les yeux.
+  void ComposeOptionSamples(std::uint32_t now_ms);
 
   // ── L'INTERFACE, PAR FAMILLE DE FENÊTRES ──────────────────────────────────
   //

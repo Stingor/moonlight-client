@@ -1,8 +1,10 @@
 #pragma once
 
 #include <optional>
+#include <span>
 
 #include "ro/ui/map_sign_banner.h"
+#include "ro/ui/options_window.h"
 #include "ro/ui/survivors_album_window.h"
 #include "ro/ui/survivors_chest_window.h"
 #include "ro/ui/survivors_hud.h"
@@ -39,6 +41,10 @@ struct SurvivorsFrameView {
   // Le tableau mondial ouvert par-dessus l'écran de fin d'une partie classée.
   const ro::ui::SurvivorsRankingView* ranking = nullptr;
   ro::ui::SurvivorsRankingState* ranking_state = nullptr;
+  // LES OPTIONS DU JEU par-dessus la pause : la fenêtre du menu Échap, sur ses
+  // pages. Nul quand elles ne s'y montrent pas.
+  ro::ui::OptionsWindowState* options_state = nullptr;
+  std::span<const ro::ui::OptionSectionView> options;
 };
 
 // CE QUE LES FENÊTRES DE L'IMAGE ONT DEMANDÉ : app en fait l'intention de
@@ -47,6 +53,9 @@ struct SurvivorsAsk {
   std::optional<ro::ui::SurvivorsOfferAsk> offer;
   bool chest_proceed = false;
   ro::ui::SurvivorsPauseAsk pause;
+  // Ce que les options du jeu ont changé : appliqué tout de suite, par le même
+  // chemin que le panneau du jeu.
+  ro::ui::OptionsWindowAction options;
   ro::ui::SurvivorsSummaryAsk summary;
   ro::ui::SurvivorsShopAsk church;
   ro::ui::SurvivorsRankingAsk ranking;

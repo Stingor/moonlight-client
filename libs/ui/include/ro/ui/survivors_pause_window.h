@@ -8,11 +8,12 @@
 
 namespace ro::ui {
 
-// LA PAUSE D'UNE PARTIE : Reprendre, Abandonner (confirmé sur place), et les
-// trois réglages du mode — « Effets réduits » (U20), « Afficher les mesures »
-// (U24), « Ombres du soleil de la horde » (U27). En tête, ce qui a mis en
-// pause quand ce n'est pas le joueur ; en pied, les mesures quand elles sont
-// demandées.
+// LA PAUSE D'UNE PARTIE : Reprendre, Abandonner (confirmé sur place), la rangée
+// des fenêtres qu'on ouvre par-dessus — « Options », celles du jeu —, et les
+// réglages du mode — « Effets réduits » (U20), « Afficher les mesures » (U24,
+// offert au seul client de développement), « Ombres du soleil de la horde »
+// (U27). En tête, ce qui a mis en pause quand ce n'est pas le joueur ; en
+// pied, les mesures quand elles sont demandées.
 //
 // Les cases montrent les réglages de la vue : un clic les rend dans
 // l'intention, `app` les applique et les range dans `savedata\survivors.yml`.
@@ -38,6 +39,8 @@ struct SurvivorsPauseView {
   const char* alert_banner = nullptr;
   bool accepts_input = false;
   bool reduced_effects = false;
+  // La case « Afficher les mesures » paraît : un outil de développement.
+  bool measures_offered = false;
   bool show_measures = false;
   bool horde_sun_shadows = false;
   std::span<const SurvivorsMeasureRow> measures;
@@ -52,6 +55,8 @@ struct SurvivorsPauseState {
 struct SurvivorsPauseAsk {
   bool resume = false;
   bool abandon = false;  // confirmé
+  // « Options » : les options du jeu s'ouvrent par-dessus la pause.
+  bool open_options = false;
   std::optional<bool> reduced_effects;
   std::optional<bool> show_measures;
   std::optional<bool> horde_sun_shadows;

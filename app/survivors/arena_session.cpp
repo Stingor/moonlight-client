@@ -26,7 +26,7 @@ constexpr float kFlatDeterminant = 1e-6F;
 
 ArenaSession::ArenaSession(ro::vfs::Vfs& vfs, ro::render::ActorWardrobe& wardrobe,
                            const ro::sim::SurvivorsRules& rules)
-    : composer_(wardrobe), effects_(vfs, wardrobe.catalog(), rules) {}
+    : composer_(wardrobe), effects_(vfs, wardrobe.catalog(), rules), camera_(rules.spawn_frame) {}
 
 ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaRule& arena) {
   if (auto opened = scene_.Open(vfs, arena); !opened) return opened;
