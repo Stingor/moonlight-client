@@ -1966,6 +1966,30 @@ if(MSVC)
         "$<$<NOT:$<CONFIG:Debug>>:/SUBSYSTEM:WINDOWS;/ENTRY:mainCRTStartup>")
 endif()
 
+# 🔴 LE RUNTIME C++ VOYAGE AVEC L'EXÉCUTABLE, à côté de lui.
+#
+# Le client et ses DLL vcpkg sont bâtis par un MSVC récent, et ce code exige un
+# `msvcp140.dll` AU MOINS AUSSI RÉCENT : face à un runtime plus ancien posé dans
+# System32 par un autre programme, le premier `std::mutex` verrouillé lit une
+# adresse nulle. Le client plante alors avant la première ligne de son journal,
+# qui reste vide. Windows charge la DLL du dossier de l'exécutable avant celle
+# du système : la poser là rend le client indépendant de ce que la machine a
+# installé. `deploy_client.py` emporte tous les `*.dll` de ce dossier.
+if(MSVC)
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+    include(InstallRequiredSystemLibraries)
+    if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+        add_custom_command(TARGET moonclient POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                    ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} "$<TARGET_FILE_DIR:moonclient>"
+            COMMENT "runtime C++ à côté de MoonClient.exe"
+            VERBATIM)
+    else()
+        message(WARNING "runtime C++ introuvable : MoonClient.exe dépendra de celui "
+                        "qu'installe la machine du joueur, et plantera sur un ancien.")
+    endif()
+endif()
+
 # LE DÉPÔT AUTOMATIQUE DANS UNE INSTALLATION, quand on en désigne une.
 #
 # ⚠ ÉTEINT PAR DÉFAUT, ET LE CHEMIN N'EST PAS DANS LE DÉPÔT : `E:\Moonlight-Destiny`
