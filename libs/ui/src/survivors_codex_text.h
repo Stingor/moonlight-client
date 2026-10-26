@@ -22,11 +22,18 @@ namespace ro::ui {
 inline constexpr std::size_t kCodexTextSize = 192;
 using CodexText = std::array<char, kCodexTextSize>;
 
+// Ce que montre une entrée ou un lien non vu à la place de son nom, de sa
+// phrase et de ses chiffres.
+inline constexpr const char* kCodexUnknown = "???";
+
 // Le nom d'un onglet, traduit.
 [[nodiscard]] const char* CodexTabLabel(SurvivorsCodexTab tab);
 
-// Le libellé d'une ligne de chiffres, traduit.
-[[nodiscard]] const char* CodexFigureLabelText(SurvivorsCodexFigureLabel label);
+// Le libellé d'une ligne de chiffres, traduit, avec le compte qu'il nomme.
+[[nodiscard]] CodexText CodexFigureLabelText(const SurvivorsCodexFigure& figure);
+
+// Le nom d'un lien vu ; « ??? » pour un lien non vu.
+[[nodiscard]] const char* CodexLinkName(const SurvivorsCodexLink& link);
 
 // UN NOMBRE DIT DANS SON UNITÉ : « 1,5 s », « 4,5 cases », « 175 % ». Les
 // décimales nulles se taisent, et le séparateur décimal est celui de la langue.

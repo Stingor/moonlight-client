@@ -139,10 +139,70 @@ constexpr std::array<SkillRow, 14> kSkillRows{{
   return figures;
 }
 
+// LE COFFRE : le tirage teste le seuil des cinq gains avant celui des trois,
+// si bien que la plage des trois est la part du second seuil au-delà du
+// premier. Chaque ligne dit le compte de gains que la règle donne.
 [[nodiscard]] std::vector<SurvivorsCodexFigure> ChestFiguresOf(const ro::sim::ChestRule& chest) {
-  return {Single(Label::kTripleOdds, Unit::kPercentHundredths, chest.triple_per_10000),
-          Single(Label::kQuintupleOdds, Unit::kPercentHundredths, chest.quintuple_per_10000),
-          Single(Label::kEvolutionsFrom, Unit::kMs, chest.evolution_from_ms)};
+  const std::uint32_t triple_band = chest.triple_per_10000 > chest.quintuple_per_10000
+                                        ? chest.triple_per_10000 - chest.quintuple_per_10000
+                                        : 0;
+  SurvivorsCodexFigure triple = Single(Label::kGainsOdds, Unit::kPercentHundredths, triple_band);
+  triple.gain_count = chest.triple;
+  SurvivorsCodexFigure quintuple =
+      Single(Label::kGainsOdds, Unit::kPercentHundredths, chest.quintuple_per_10000);
+  quintuple.gain_count = chest.quintuple;
+  return {triple, quintuple, Single(Label::kEvolutionsFrom, Unit::kMs, chest.evolution_from_ms)};
+}
+
+// CE QUI EST VU, POUR LES LIENS D'UNE FICHE : la même règle que les entrées,
+// les cartes en plus, vues quand l'Album les a trouvées.
+struct LinkSight {
+  const ro::sim::SurvivorsRules& rules;
+  const SurvivorsCodexSeen& seen;
+  std::span<const std::uint16_t> found_cards;
+
+  [[nodiscard]] bool Foe(std::uint16_t foe_id) const {
+    return seen.Has(CodexCategory::kFoes, CodexFoeKey(foe_id));
+  }
+  [[nodiscard]] bool Skill(std::uint16_t skill_id) const {
+    const ro::sim::SurvivorsSkillRule* skill = ro::sim::FindSkill(rules, skill_id);
+    return skill != nullptr && seen.Has(CodexCategory::kSkills, CodexSkillKey(*skill));
+  }
+  [[nodiscard]] bool Card(std::uint16_t card_item_id) const {
+    return std::ranges::find(found_cards, card_item_id) != found_cards.end();
+  }
+};
+
+void MarkEvolution(ro::ui::SurvivorsCodexEvolution& evolution, const LinkSight& sight) {
+  evolution.card.seen = sight.Card(evolution.card.ro_id);
+  evolution.result.seen = sight.Skill(evolution.result.ro_id);
+}
+
+// Chaque lien d'une entrée reçoit `seen`.
+void MarkEntryLinks(SurvivorsCodexEntry& entry, const LinkSight& sight) {
+  MarkEvolution(entry.evolution, sight);
+  MarkEvolution(entry.evolved_from, sight);
+  entry.card.card.seen = sight.Card(entry.card.card.ro_id);
+  entry.escort.seen = sight.Foe(entry.escort.ro_id);
+  entry.event_foe.seen = sight.Foe(entry.event_foe.ro_id);
+  entry.drop.seen =
+      entry.drop_key[0] != '\0' && sight.seen.Has(CodexCategory::kItems, entry.drop_key);
+}
+
+// LES LIENS VERS D'AUTRES ENTRÉES, marqués vus ou non : ceux des entrées, les
+// porteurs des sources d'arrivée et les espèces des coups de boss.
+void MarkLinks(const LinkSight& sight, SurvivorsCodexRowsHeld& held) {
+  for (std::vector<SurvivorsCodexEntry>& tab : held.entries) {
+    for (SurvivorsCodexEntry& entry : tab) MarkEntryLinks(entry, sight);
+  }
+  for (std::vector<ro::ui::SurvivorsCodexSource>& sources : held.sources) {
+    for (ro::ui::SurvivorsCodexSource& source : sources) {
+      source.bringer.seen = sight.Foe(source.bringer.ro_id);
+    }
+  }
+  for (std::vector<ro::ui::SurvivorsCodexMove>& moves : held.moves) {
+    for (ro::ui::SurvivorsCodexMove& move : moves) move.foe.seen = sight.Foe(move.foe.ro_id);
+  }
 }
 
 [[nodiscard]] std::vector<SurvivorsCodexEntry>& TabOf(SurvivorsCodexRowsHeld& held,
@@ -341,15 +401,29 @@ SurvivorsCodexSeen CodexSeenOf(const ro::sim::SurvivorsRules& rules, const Survi
   return seen;
 }
 
+std::vector<std::uint16_t> FoundCardItemsOf(const ro::sim::SurvivorsRules& rules,
+                                            const SurvivorsSave& save) {
+  std::vector<std::uint16_t> found_cards;
+  for (const SurvivorsAlbumCard& found : save.album.cards) {
+    if (found.found == 0) continue;
+    for (const ro::sim::CardRule& card : rules.cards) {
+      if (found.key == card.key) found_cards.push_back(card.card_item_id);
+    }
+  }
+  return found_cards;
+}
+
 ro::ui::SurvivorsCodexView ComposeSurvivorsCodex(const ro::sim::SurvivorsRules& rules,
                                                  const SurvivorsCodexSeen& seen,
-                                                 SurvivorsCodexRowsHeld& held) {
+                                                 SurvivorsCodexRowsHeld& held,
+                                                 std::span<const std::uint16_t> found_cards) {
   held.Clear();
   CodexSkillsOf(rules, seen, held);
   CodexItemsOf(rules, seen, held);
   CodexPlantsOf(rules, seen, held);
   CodexFoesOf(rules, seen, held);
   CodexBossesOf(rules, seen, held);
+  MarkLinks(LinkSight{.rules = rules, .seen = seen, .found_cards = found_cards}, held);
   ro::ui::SurvivorsCodexView view;
   for (std::size_t tab = 0; tab < ro::ui::kSurvivorsCodexTabCount; ++tab) {
     view.entries[tab] = held.entries[tab];

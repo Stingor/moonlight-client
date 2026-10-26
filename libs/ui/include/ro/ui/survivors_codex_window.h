@@ -87,12 +87,13 @@ enum class SurvivorsCodexFigureLabel : std::uint8_t {
   kExpBoost,
   kWalkBoost,
   kDuration,
-  kTripleOdds,
-  kQuintupleOdds,
+  // La chance qu'un coffre donne `gain_count` gains : la part du tirage qui
+  // tombe sur ce compte, et non le seuil qui l'ouvre.
+  kGainsOdds,
   kEvolutionsFrom,
   kGemExp,
   kDrawWeight,
-  // Les élites.
+  // Les élites : ce qui s'ajoute à un monstre ordinaire (XP par `kExpBoost`).
   kHpBoost,
   kTouchBoost,
 };
@@ -104,13 +105,20 @@ struct SurvivorsCodexFigure {
   SurvivorsCodexUnit unit = SurvivorsCodexUnit::kPlain;
   std::array<std::int64_t, kSurvivorsCodexMostLevels> values = {};
   std::uint8_t count = 1;
+  // Le compte de gains que nomme une ligne `kGainsOdds` ; 0 ailleurs.
+  std::uint8_t gain_count = 0;
 };
 
 // Une autre entrée nommée par la fiche : la carte d'une évolution, l'évolué,
 // l'objet qu'une plante lâche, l'espèce qu'un événement amène… `app` en pose
 // le nom et l'icône.
+//
+// 🔴 UN LIEN SUIT LA RÈGLE DES ENTRÉES : non vu (`seen` faux), il ne montre que
+// la silhouette de son icône et « ??? », même dans la fiche d'une entrée vue.
+// Une carte est vue quand l'Album l'a trouvée.
 struct SurvivorsCodexLink {
   std::uint16_t ro_id = 0;  // compétence, objet ou classe RO
+  bool seen = false;
   SkinImage icon;
   const char* name = "";
 };

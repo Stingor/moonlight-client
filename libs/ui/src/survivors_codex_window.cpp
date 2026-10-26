@@ -22,9 +22,6 @@ namespace ro::ui {
 namespace {
 
 inline constexpr const char* kCodexTitle = core::TrText("Codex des Survivants");
-// Ce que montre une entrée non vue à la place de son nom, de sa phrase et de
-// ses chiffres.
-constexpr const char* kUnknown = "???";
 
 constexpr float kFirstWidth = 780.0F;
 constexpr float kFirstHeight = 560.0F;
@@ -70,11 +67,12 @@ void PaintImage(const SkinImage& image, ImVec2 box, bool seen) {
                                        seen ? kShownTint : kSilhouetteTint);
 }
 
-// Une autre entrée nommée par la fiche : son icône et son nom.
+// Une autre entrée nommée par la fiche : son icône et son nom, ou sa
+// silhouette et « ??? » tant qu'elle n'a pas été vue.
 void DrawLink(const SurvivorsCodexLink& link) {
-  PaintImage(link.icon, ImVec2(kLinkIconSide, kLinkIconSide), true);
+  PaintImage(link.icon, ImVec2(kLinkIconSide, kLinkIconSide), link.seen);
   ImGui::SameLine();
-  ImGui::TextUnformatted(link.name);
+  ImGui::TextUnformatted(CodexLinkName(link));
 }
 
 [[nodiscard]] bool ShowsSprite(SurvivorsCodexSheet sheet) {
@@ -116,7 +114,7 @@ void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> e
     ImGui::PushID(static_cast<int>(index));
     PaintImage(entry.icon, ImVec2(kListIconSide, kListIconSide), entry.seen);
     ImGui::SameLine();
-    if (ImGui::Selectable(entry.seen ? entry.name : kUnknown, index == selected)) {
+    if (ImGui::Selectable(entry.seen ? entry.name : kCodexUnknown, index == selected)) {
       selected = index;
     }
     if (scroll_to_selected && index == selected) ImGui::SetScrollHereY();
@@ -154,7 +152,7 @@ void DrawLevelTable(std::span<const SurvivorsCodexFigure> figures) {
   for (const SurvivorsCodexFigure& figure : figures) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    ImGui::TextUnformatted(CodexFigureLabelText(figure.label));
+    ImGui::TextUnformatted(CodexFigureLabelText(figure).data());
     for (std::uint8_t level = 0; level < levels; ++level) {
       ImGui::TableNextColumn();
       if (level < figure.count) {
@@ -169,7 +167,8 @@ void DrawLevelTable(std::span<const SurvivorsCodexFigure> figures) {
 void DrawFigureLines(std::span<const SurvivorsCodexFigure> figures) {
   Line line = {};
   for (const SurvivorsCodexFigure& figure : figures) {
-    std::snprintf(line.data(), line.size(), core::Tr("%s : %s"), CodexFigureLabelText(figure.label),
+    std::snprintf(line.data(), line.size(), core::Tr("%s : %s"),
+                  CodexFigureLabelText(figure).data(),
                   CodexValueText(figure.unit, figure.values[0]).data());
     ImGui::TextUnformatted(line.data());
   }
@@ -267,7 +266,7 @@ void DrawBossSheet(const SurvivorsCodexEntry& entry) {
   if (entry.final) ColoredText(kHeadingColor, core::Tr("Sa chute est la victoire."));
   if (entry.escort_count > 0) {
     std::snprintf(line.data(), line.size(), core::Tr("Escorte : %d %s"),
-                  static_cast<int>(entry.escort_count), entry.escort.name);
+                  static_cast<int>(entry.escort_count), CodexLinkName(entry.escort));
     ImGui::TextUnformatted(line.data());
   }
   DrawFoeBody(entry);
@@ -296,8 +295,8 @@ void DrawPlantSheet(const SurvivorsCodexEntry& entry) {
 // but de l'exploit qui l'ouvre. Rien d'autre.
 void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
   DrawPortrait(state, entry);
-  ColoredText(kHeadingColor, kUnknown);
-  FaintText(kUnknown);
+  ColoredText(kHeadingColor, kCodexUnknown);
+  FaintText(kCodexUnknown);
   const char* goal = SurvivorsFeatGoal(entry.unlock_feat);
   if (goal[0] == '\0') return;
   Line line = {};
@@ -328,8 +327,11 @@ void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
       case SurvivorsCodexSheet::kSkill:
         DrawSkillSheet(entry);
         break;
-      case SurvivorsCodexSheet::kItem:
       case SurvivorsCodexSheet::kChest:
+        DrawFigureLines(entry.figures);
+        FaintText(core::Tr("La chance du héros majore ces chances."));
+        break;
+      case SurvivorsCodexSheet::kItem:
       case SurvivorsCodexSheet::kGem:
       case SurvivorsCodexSheet::kGroundCard:
         DrawFigureLines(entry.figures);

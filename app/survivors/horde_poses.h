@@ -73,8 +73,13 @@ inline constexpr std::uint32_t kHordeWalkPhaseCount = 4;
 inline constexpr std::uint32_t kHurtReplayMs = 300;
 // UN CORPS DE LA HORDE QUI NAÎT — monstre, élite, invoqué, boss — paraît en
 // fondu d'opacité pendant cette durée, depuis son pas de naissance, au lieu de
-// surgir. Seule la présentation fond : la simulation le compte dès ce pas.
+// surgir. Seule la présentation fond : la simulation le compte dès ce pas. Un
+// monstre qui s'enfouit ressurgit de même, depuis le pas où il sort de terre.
 inline constexpr std::uint32_t kHordeBirthFadeMs = 333;
+// UNE OMBRE RONDE NE FOND PAS : le renderer la peint de la couleur de son
+// calque, sans la transparence de son porteur. Un corps encore transparent —
+// qui naît, ressurgit ou s'efface — n'en pose donc aucune, et un mort non plus.
+[[nodiscard]] bool CastsRoundShadow(const HordePose& pose) noexcept;
 // Un mort, sa chute jouée, s'efface pendant cette durée.
 inline constexpr std::uint32_t kFallFadeMs = 1000;
 // Au plus autant de morts s'effacent à la fois ; le plus ancien cède.

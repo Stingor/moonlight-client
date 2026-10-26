@@ -61,7 +61,12 @@ bool Merge(SurvivorsCodexSeen& into, const SurvivorsCodexSeen& from);
 
 // Vrai quand `at` est dans le cadre autour du héros : le rectangle des règles
 // (`spawn_frame`), aligné sur la caméra figée au nord, sur le périmètre duquel
-// la horde naît. C'est ce que le joueur a sous les yeux, lu sans caméra.
+// la horde naît, lu sans caméra.
+//
+// ⚠ UNE BORNE HAUTE DE L'IMAGE, ASSUMÉE : l'image tient dans ce cadre au recul
+// le plus lointain, mais n'en couvre qu'une part à un recul plus court (la
+// molette rapprochée, l'entrée en 16:9). Un objet près du bord du cadre peut
+// donc compter comme vu sans avoir paru à l'écran ; jamais l'inverse.
 [[nodiscard]] bool InHeroFrame(const ro::sim::SpawnFrame& frame, ro::sim::FieldPoint hero,
                                ro::sim::FieldPoint at) noexcept;
 

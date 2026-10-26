@@ -48,7 +48,8 @@ void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const Survivors
                                   const SurvivorsCodexSeen* live,
                                   const ro::sim::SurvivorsRules& rules,
                                   const SurvivorsTables& tables, std::uint32_t now_ms) {
-  windows.codex_view = ComposeSurvivorsCodex(rules, CodexSeenOf(rules, save, live), codex_rows_);
+  windows.codex_view = ComposeSurvivorsCodex(rules, CodexSeenOf(rules, save, live), codex_rows_,
+                                             FoundCardItemsOf(rules, save));
   for (std::vector<ro::ui::SurvivorsCodexEntry>& tab : codex_rows_.entries) {
     for (ro::ui::SurvivorsCodexEntry& entry : tab) NameCodexEntry(entry, tables);
   }
@@ -108,19 +109,20 @@ void SurvivorsViews::NameCodexEntry(ro::ui::SurvivorsCodexEntry& entry,
 
 void SurvivorsViews::NameCodexLink(ro::ui::SurvivorsCodexLink& link, CodexLinkKind kind,
                                    const SurvivorsTables& tables) {
-  // Un lien sans identifiant (un boss sans escorte) reste vide.
+  // Un lien sans identifiant (un boss sans escorte) reste vide ; un lien non vu
+  // n'a que l'icône de sa silhouette, jamais son nom.
   if (link.ro_id == 0) return;
   switch (kind) {
     case CodexLinkKind::kSkill:
-      link.name = SkillName(link.ro_id, tables);
+      if (link.seen) link.name = SkillName(link.ro_id, tables);
       link.icon = SkillIconImage(link.ro_id, tables);
       return;
     case CodexLinkKind::kItem:
-      link.name = CardName(link.ro_id, tables);
+      if (link.seen) link.name = CardName(link.ro_id, tables);
       link.icon = ItemIconImage(link.ro_id, tables);
       return;
     case CodexLinkKind::kFoe:
-      link.name = FoeName(link.ro_id, tables);
+      if (link.seen) link.name = FoeName(link.ro_id, tables);
       return;
   }
 }

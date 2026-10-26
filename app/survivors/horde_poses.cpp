@@ -64,7 +64,19 @@ constexpr float kFullTurnDegrees = 360.0F;
          (rule->behaviour.traits & ro::sim::kFoeHides) != 0;
 }
 
+// Le pas d'où court le fondu d'un monstre : sa naissance, ou sa sortie de terre
+// quand il s'enfouit.
+[[nodiscard]] std::uint32_t FadeFromStep(const ro::sim::SurvivorsFoe& foe,
+                                         const ro::sim::FoeRule* rule) noexcept {
+  const bool hides = rule != nullptr && (rule->behaviour.traits & ro::sim::kFoeHides) != 0;
+  return hides ? std::max(foe.born_step, foe.act_until_step) : foe.born_step;
+}
+
 }  // namespace
+
+bool CastsRoundShadow(const HordePose& pose) noexcept {
+  return pose.kind != HordeBodyKind::kFalling && pose.tint[kAlpha] == kOpaque;
+}
 
 float WalkingMs(std::uint64_t presentation_ms, float walk_ms, std::uint32_t sim_id) noexcept {
   const float phase_ms = walk_ms * static_cast<float>(sim_id % kHordeWalkPhaseCount) /
@@ -182,7 +194,7 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
       pose.tint = kChilledTint;
     }
     // Le fondu de naissance tempère l'opacité de la teinte retenue.
-    const float born_ms = ElapsedSince(presentation_ms, MsOfStep(foe.born_step));
+    const float born_ms = ElapsedSince(presentation_ms, MsOfStep(FadeFromStep(foe, rule)));
     if (born_ms < static_cast<float>(kHordeBirthFadeMs)) {
       const float shown = born_ms / static_cast<float>(kHordeBirthFadeMs);
       pose.tint[kAlpha] = static_cast<std::uint8_t>(static_cast<float>(pose.tint[kAlpha]) * shown);

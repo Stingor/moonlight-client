@@ -117,6 +117,7 @@ bool Merge(SurvivorsCodexSeen& into, const SurvivorsCodexSeen& from) {
   return changed;
 }
 
+// Le cadre entier, bornes comprises : une borne haute de ce que montre l'image.
 bool InHeroFrame(const ro::sim::SpawnFrame& frame, ro::sim::FieldPoint hero,
                  ro::sim::FieldPoint at) noexcept {
   const std::int64_t across = std::int64_t{at.x} - hero.x;

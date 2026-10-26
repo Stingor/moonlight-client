@@ -21038,11 +21038,8 @@ tr: Carta:
 fr: Chance au tirage
 tr: Probabilidad de sorteo
 
-fr: Chance de cinq gains
-tr: Probabilidad de cinco premios
-
-fr: Chance de trois gains
-tr: Probabilidad de tres premios
+fr: Chance de %d gains
+tr: Probabilidad de %d premios
 
 fr: Charge en ligne droite
 tr: Carga en línea recta
@@ -21442,3 +21439,6 @@ tr: Evoluciones desde
 
 fr: événement de %s
 tr: evento de las %s
+
+fr: La chance du héros majore ces chances.
+tr: La suerte del héroe aumenta estas probabilidades.

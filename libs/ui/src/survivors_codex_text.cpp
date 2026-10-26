@@ -111,7 +111,10 @@ const char* CodexTabLabel(SurvivorsCodexTab tab) {
   return "";
 }
 
-const char* CodexFigureLabelText(SurvivorsCodexFigureLabel label) {
+namespace {
+
+// Le libellé d'une ligne qui ne nomme aucun compte.
+[[nodiscard]] const char* PlainFigureLabel(SurvivorsCodexFigureLabel label) {
   using enum SurvivorsCodexFigureLabel;
   switch (label) {
     case kDamage:
@@ -164,10 +167,8 @@ const char* CodexFigureLabelText(SurvivorsCodexFigureLabel label) {
       return core::Tr("Marche en plus");
     case kDuration:
       return core::Tr("Durée de l'effet");
-    case kTripleOdds:
-      return core::Tr("Chance de trois gains");
-    case kQuintupleOdds:
-      return core::Tr("Chance de cinq gains");
+    case kGainsOdds:
+      return "";
     case kEvolutionsFrom:
       return core::Tr("Évolutions dès");
     case kGemExp:
@@ -180,6 +181,23 @@ const char* CodexFigureLabelText(SurvivorsCodexFigureLabel label) {
       return core::Tr("Contact en plus");
   }
   return "";
+}
+
+}  // namespace
+
+CodexText CodexFigureLabelText(const SurvivorsCodexFigure& figure) {
+  CodexText text = {};
+  if (figure.label == SurvivorsCodexFigureLabel::kGainsOdds) {
+    std::snprintf(text.data(), text.size(), core::Tr("Chance de %d gains"),
+                  static_cast<int>(figure.gain_count));
+  } else {
+    std::snprintf(text.data(), text.size(), "%s", PlainFigureLabel(figure.label));
+  }
+  return text;
+}
+
+const char* CodexLinkName(const SurvivorsCodexLink& link) {
+  return link.seen ? link.name : kCodexUnknown;
 }
 
 CodexText CodexValueText(SurvivorsCodexUnit unit, std::int64_t value) {
@@ -249,12 +267,12 @@ CodexText CodexSourceText(const SurvivorsCodexSource& source) {
       std::snprintf(text.data(), text.size(), core::Tr("événement de %s"), clock.data());
       break;
     case SurvivorsCodexSourceKind::kEscort:
-      std::snprintf(text.data(), text.size(), core::Tr("escorte de %s, à %s"), source.bringer.name,
-                    clock.data());
+      std::snprintf(text.data(), text.size(), core::Tr("escorte de %s, à %s"),
+                    CodexLinkName(source.bringer), clock.data());
       break;
     case SurvivorsCodexSourceKind::kSummon:
       std::snprintf(text.data(), text.size(), core::Tr("invoqué par %s, dès %s"),
-                    source.bringer.name, clock.data());
+                    CodexLinkName(source.bringer), clock.data());
       break;
   }
   return text;
@@ -279,7 +297,7 @@ CodexText CodexMoveText(const SurvivorsCodexMove& move) {
   switch (move.kind) {
     case SurvivorsCodexMoveKind::kSummon:
       std::snprintf(deed.data(), deed.size(), core::Tr("Invoque %d %s toutes les %s"),
-                    static_cast<int>(move.count), move.foe.name, period.data());
+                    static_cast<int>(move.count), CodexLinkName(move.foe), period.data());
       break;
     case SurvivorsCodexMoveKind::kLeap:
       std::snprintf(deed.data(), deed.size(),
@@ -300,7 +318,8 @@ CodexText CodexMoveText(const SurvivorsCodexMove& move) {
     case SurvivorsCodexMoveKind::kHowl:
       std::snprintf(deed.data(), deed.size(),
                     core::Tr("Hurle toutes les %s : les %s marchent %d %% plus vite pendant %s"),
-                    period.data(), move.foe.name, static_cast<int>(move.boost_pct), effect.data());
+                    period.data(), CodexLinkName(move.foe), static_cast<int>(move.boost_pct),
+                    effect.data());
       break;
     case SurvivorsCodexMoveKind::kFlee:
       std::snprintf(deed.data(), deed.size(),
@@ -353,7 +372,7 @@ CodexText CodexEventText(const SurvivorsCodexEntry& entry) {
     case SurvivorsCodexEventKind::kRing:
     case SurvivorsCodexEventKind::kGroup:
       std::snprintf(text.data(), text.size(), core::Tr("À %s : %d %s"), at.data(),
-                    static_cast<int>(entry.event_count), entry.event_foe.name);
+                    static_cast<int>(entry.event_count), CodexLinkName(entry.event_foe));
       break;
   }
   return text;

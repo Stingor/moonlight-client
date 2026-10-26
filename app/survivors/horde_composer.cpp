@@ -102,7 +102,7 @@ void HordeComposer::Compose(std::span<const HordePose> poses, const GroundOf& gr
     // en porte une.
     const bool sun_casting = shadows.sun_shadows && (hero || shadows.horde_sun_shadows);
     const ro::render::ComposedActor& round = outfit->Shadow();
-    if (pose.kind != HordeBodyKind::kFalling && !sun_casting && !round.quads.empty()) {
+    if (CastsRoundShadow(pose) && !sun_casting && !round.quads.empty()) {
       drawn.shadow = &round;
     }
     drawn.ground_position = ground_of(pose);

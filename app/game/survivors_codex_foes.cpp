@@ -173,6 +173,17 @@ void NoteSource(std::vector<SurvivorsCodexSource>& sources, SurvivorsCodexSource
   return moves;
 }
 
+// LES ÉLITES : les règles portent des FACTEURS en % (1000 : dix fois les PV),
+// et la fiche dit ce qui s'ajoute à un monstre ordinaire, le facteur moins
+// cent. Le contact suit la borne que la partie lui applique.
+[[nodiscard]] std::vector<SurvivorsCodexFigure> EliteFiguresOf(const ro::sim::EliteRule& elites) {
+  constexpr std::int64_t kWhole = kWholePct;
+  const std::int64_t touch = std::clamp(elites.touch_pct, 0, ro::sim::kMostStatBonus);
+  return {Single(Label::kHpBoost, Unit::kPercent, std::int64_t{elites.hp_pct} - kWhole),
+          Single(Label::kTouchBoost, Unit::kPercent, touch - kWhole),
+          Single(Label::kExpBoost, Unit::kPercent, std::int64_t{elites.exp_pct} - kWhole)};
+}
+
 // Une ligne de la chronologie, et son heure.
 struct TimedEntry {
   std::uint32_t at_ms = 0;
@@ -277,13 +288,10 @@ void CodexBossesOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSee
   }
   const ro::sim::EliteRule& elites = rules.elites;
   if (elites.interval_ms != 0) {
-    SurvivorsCodexEntry entry{
-        .sheet = SurvivorsCodexSheet::kEvent,
-        .seen = seen.Has(CodexCategory::kEvents, kCodexElitesKey),
-        .key = kCodexElitesKey.data(),
-        .figures = held.Hold({Single(Label::kHpBoost, Unit::kPercent, elites.hp_pct),
-                              Single(Label::kTouchBoost, Unit::kPercent, elites.touch_pct),
-                              Single(Label::kExpBoost, Unit::kPercent, elites.exp_pct)})};
+    SurvivorsCodexEntry entry{.sheet = SurvivorsCodexSheet::kEvent,
+                              .seen = seen.Has(CodexCategory::kEvents, kCodexElitesKey),
+                              .key = kCodexElitesKey.data(),
+                              .figures = held.Hold(EliteFiguresOf(elites))};
     entry.at_ms = elites.first_ms;
     entry.event_kind = ro::ui::SurvivorsCodexEventKind::kElites;
     entry.interval_ms = elites.interval_ms;

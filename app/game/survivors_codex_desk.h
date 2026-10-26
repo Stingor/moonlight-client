@@ -123,10 +123,17 @@ void CodexBossesOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSee
                                              const SurvivorsSave& save,
                                              const SurvivorsCodexSeen* live);
 
+// Les cartes que l'Album a trouvées, par objet de carte.
+[[nodiscard]] std::vector<std::uint16_t> FoundCardItemsOf(const ro::sim::SurvivorsRules& rules,
+                                                          const SurvivorsSave& save);
+
 // La vue entière ; `held` est vidé puis rempli, et doit survivre à la vue.
-[[nodiscard]] ro::ui::SurvivorsCodexView ComposeSurvivorsCodex(const ro::sim::SurvivorsRules& rules,
-                                                               const SurvivorsCodexSeen& seen,
-                                                               SurvivorsCodexRowsHeld& held);
+// Chaque lien d'une fiche vers une autre entrée est marqué vu par la même règle
+// que les entrées — une carte, par `found_cards` —, sans quoi la fiche d'une
+// entrée vue nommerait une entrée encore cachée.
+[[nodiscard]] ro::ui::SurvivorsCodexView ComposeSurvivorsCodex(
+    const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSeen& seen,
+    SurvivorsCodexRowsHeld& held, std::span<const std::uint16_t> found_cards = {});
 
 // ── LE CODEX PAR-DESSUS LA PAUSE ────────────────────────────────────────────
 
