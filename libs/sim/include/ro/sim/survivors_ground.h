@@ -30,6 +30,9 @@ namespace ro::sim {
 // Le côté du cache d'un sol généré, en morceaux : 16 × 16 morceaux couvrent
 // 512 cases, bien au-delà de ce que la partie interroge autour du héros.
 inline constexpr std::int32_t kGroundCacheSideChunks = 16;
+// Le plus grand côté de cache permis : 64 × 64 morceaux d'environ 1 Kio, soit
+// environ 4 Mio. Au-delà, le cache coûterait sans rien servir.
+inline constexpr std::int32_t kMostGroundCacheSideChunks = 64;
 
 class SurvivorsGround {
  public:
@@ -37,7 +40,7 @@ class SurvivorsGround {
   SurvivorsGround() = default;
 
   [[nodiscard]] static SurvivorsGround Bounded(WalkMap map);
-  // `cache_side_chunks` est ramené à 1 au moins.
+  // `cache_side_chunks` est ramené dans [1, kMostGroundCacheSideChunks].
   [[nodiscard]] static SurvivorsGround Generated(
       const TerrainRule& rule, std::uint64_t run_seed,
       std::int32_t cache_side_chunks = kGroundCacheSideChunks);
@@ -59,6 +62,12 @@ class SurvivorsGround {
   [[nodiscard]] bool bounded() const noexcept { return bounded_; }
   // La carte d'un sol borné ; vide pour un sol généré.
   [[nodiscard]] const WalkMap& map() const noexcept { return map_; }
+  // La règle et la graine d'un sol généré : ce qu'un rejeu redérive des
+  // règles et du départ. nullptr et 0 pour un sol borné.
+  [[nodiscard]] const TerrainRule* rule() const noexcept { return rule_; }
+  [[nodiscard]] std::uint64_t run_seed() const noexcept { return run_seed_; }
+  // Le côté du cache d'un sol généré, une fois borné ; 0 pour un sol borné.
+  [[nodiscard]] std::int32_t cache_side_chunks() const noexcept { return cache_side_chunks_; }
   // Le morceau (chunk_x, chunk_y) d'un sol généré, tel que
   // GenerateTerrainChunk le rend ; nullptr pour un sol borné ou hors du monde.
   // Le pointeur ne vaut que jusqu'à la prochaine question posée au sol.

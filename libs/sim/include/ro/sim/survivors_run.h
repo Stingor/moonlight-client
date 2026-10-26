@@ -198,11 +198,12 @@ class SurvivorsRun {
   // strictement croissants, plus de kMostLockedIds, hors des réserves de la
   // classe, ou qui verrouillent le premier skill, sol borné vide ou de plus de
   // kMostArenaSideCells de côté, sol borné pour une arène qui nomme un
-  // terrain, aucune case praticable à moins de spawn_search_ring × 2 du
-  // départ. Le départ pose les plantes d'un sol borné (flux décor), ou éveille
-  // les morceaux d'un sol généré autour du héros, avant le premier pas. Un sol
-  // généré se prend tel quel, même pour une arène qui lit une carte : les
-  // essais y choisissent la taille du cache.
+  // terrain, sol généré qui n'est pas celui que le rejeu redérive (la règle
+  // de terrain de l'arène dans `rules`, à la même adresse, sous `start.seed`),
+  // aucune case praticable à moins de spawn_search_ring × 2 du départ. Le
+  // départ pose les plantes d'un sol borné (flux décor), ou éveille les
+  // morceaux d'un sol généré autour du héros, avant le premier pas. Seule la
+  // taille du cache d'un sol généré reste au choix de l'appelant.
   [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules,
                                                         SurvivorsGround ground,
                                                         const SurvivorsStart& start);

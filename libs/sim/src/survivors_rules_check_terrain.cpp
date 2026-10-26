@@ -135,6 +135,11 @@ template <typename Rule>
   if (has_landmark && terrain.landmark_period_chunks == 0) {
     return Refuse(named + "repères sans période");
   }
+  // Le morceau élu de chaque carré perd ses pièces ordinaires pour un repère :
+  // sans repère à tirer, il resterait nu.
+  if (!has_landmark && terrain.landmark_period_chunks != 0) {
+    return Refuse(named + "période sans repère");
+  }
   return {};
 }
 
@@ -178,6 +183,12 @@ core::Result<void> CheckTerrains(const SurvivorsRules& rules) {
   }
   for (const ArenaRule& arena : rules.arenas) {
     if (arena.terrain_id == 0) continue;
+    // La clairière et l'écart des repères se mesurent depuis le centre du
+    // monde : une arène générée y fait naître le héros, sans départ à elle.
+    if (arena.start) {
+      return Refuse("arène " + std::to_string(arena.arena_id) +
+                    " : générée, elle naît au centre du monde et ne porte pas de départ");
+    }
     bool known = false;
     for (const TerrainRule& terrain : rules.terrains) {
       known = known || terrain.terrain_id == arena.terrain_id;

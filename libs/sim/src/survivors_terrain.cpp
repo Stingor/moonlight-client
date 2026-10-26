@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -239,7 +240,12 @@ std::uint32_t TerrainDensityPerMille(const TerrainRule& rule, std::uint64_t run_
   const std::int64_t node_x = FloorDivide(cell_x, period_cells);
   const std::int64_t node_y = FloorDivide(cell_y, period_cells);
   // Les poids de l'interpolation bilinéaire : entiers, positifs, de somme
-  // period_cells², qui tient en 32 bits pour la plus grande période permise.
+  // period_cells². La plus grande période permise couvre le monde : la somme
+  // vaut alors 2^32, qui ne tient PAS en 32 bits, et la somme pondérée des
+  // densités, au plus kTerrainPerMille × 2^32, se calcule en 64 bits.
+  static_assert(std::uint64_t{kTerrainWorldCells} * std::uint64_t{kTerrainWorldCells} <=
+                    std::numeric_limits<std::uint64_t>::max() / std::uint64_t{kTerrainPerMille},
+                "la somme pondérée des densités doit tenir en 64 bits");
   const auto east = static_cast<std::uint64_t>(cell_x - node_x * period_cells);
   const auto north = static_cast<std::uint64_t>(cell_y - node_y * period_cells);
   const auto period = static_cast<std::uint64_t>(period_cells);

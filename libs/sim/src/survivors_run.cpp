@@ -162,6 +162,13 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
     return Refuse("l'arène " + std::to_string(arena_rule->arena_id) +
                   " est générée : elle ne se joue pas sur une carte");
   }
+  // Le journal ne garde que le départ : un sol généré doit être celui que le
+  // rejeu en redérive, le terrain de l'arène dans ces règles sous la graine.
+  if (!ground.bounded() && (ground.rule() != FindTerrain(rules, arena_rule->terrain_id) ||
+                            ground.run_seed() != start.seed)) {
+    return Refuse("le sol généré n'est pas celui de l'arène " +
+                  std::to_string(arena_rule->arena_id) + " sous la graine du départ");
+  }
   const std::optional<CellPosition> start_cell = SurvivorsStartCell(rules, *arena_rule, ground);
   if (!start_cell) {
     return Refuse("aucune case praticable près du départ de l'arène " +

@@ -182,7 +182,9 @@ struct ArenaRule {
   const char* key = "";
   const char* map_name = "";          // nom RO de la carte, lue par app
   std::optional<CellPosition> start;  // rien : le centre de la carte
-  // La règle de terrain du sol généré ; 0 : la carte de `map_name`.
+  // La règle de terrain du sol généré ; 0 : la carte de `map_name`. Une arène
+  // générée naît au centre du monde, autour de sa clairière : elle ne porte
+  // pas de `start`.
   std::uint16_t terrain_id = 0;
 };
 struct ClassRule {
@@ -272,7 +274,8 @@ struct SurvivorsTuning {
   // touche le carré de ce demi-côté autour du héros ; 0 : aucune plante.
   std::int32_t plant_wake_cells = 0;
   // Sur un sol généré, une plante plus loin du héros que cette distance de
-  // Tchebychev SE PERD ; 0 : aucune ne se perd.
+  // Tchebychev SE PERD ; 0 : aucune ne se perd, ce qui n'est permis que sans
+  // éveil (la liste des plantes resterait sans borne).
   std::int32_t plant_forget_units = 0;
   std::int32_t pickup_radius_units = 0;  // ramassage d'un objet au sol
   std::uint32_t final_overtime_ms = 0;   // au-delà de run_ms, avec un boss final

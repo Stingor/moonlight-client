@@ -359,18 +359,26 @@ core::Result<void> CheckContentTuning(const SurvivorsRules& rules) {
       (tuning.plant_block_cells == 0 || tuning.plant_cells_per_plant == 0)) {
     return Refuse("réglages : plantes sans bloc ou sans densité");
   }
-  if (CellsOutOfBounds(tuning.plant_wake_cells)) {
+  // L'éveil laisse sous la plus grande mesure la place d'un morceau, que
+  // l'oubli doit tenir au-delà de lui.
+  constexpr std::int32_t kMostPlantWakeCells = kMostArenaSideCells - kTerrainChunkCells;
+  if (tuning.plant_wake_cells < 0 || tuning.plant_wake_cells > kMostPlantWakeCells) {
     return Refuse("réglages : éveil des plantes hors de [0, " +
-                  std::to_string(kMostArenaSideCells) + "] cases");
+                  std::to_string(kMostPlantWakeCells) + "] cases");
   }
   if (auto checked =
           CheckMeasures<1>("réglages : ", {{{"oubli des plantes", tuning.plant_forget_units}}});
       !checked) {
     return checked;
   }
+  // Les plantes qui s'éveillent doivent se perdre : sans oubli, leur liste
+  // croîtrait sans borne au fil de la marche.
+  if (tuning.plant_wake_cells > 0 && tuning.plant_forget_units == 0) {
+    return Refuse("réglages : plantes éveillées sans oubli");
+  }
   // Une plante naît au plus à un morceau au-delà du carré d'éveil : l'oubli
   // qui l'atteindrait dès sa naissance la ferait naître pour rien.
-  if (tuning.plant_wake_cells > 0 && tuning.plant_forget_units > 0 &&
+  if (tuning.plant_wake_cells > 0 &&
       tuning.plant_forget_units < Cells(tuning.plant_wake_cells + kTerrainChunkCells)) {
     return Refuse("réglages : oubli des plantes en deçà de l'éveil plus un morceau");
   }

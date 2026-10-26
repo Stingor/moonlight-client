@@ -35,7 +35,7 @@ SurvivorsGround SurvivorsGround::Generated(const TerrainRule& rule, std::uint64_
   ground.bounded_ = false;
   ground.rule_ = &rule;
   ground.run_seed_ = run_seed;
-  ground.cache_side_chunks_ = std::clamp(cache_side_chunks, 1, kTerrainWorldChunks);
+  ground.cache_side_chunks_ = std::clamp(cache_side_chunks, 1, kMostGroundCacheSideChunks);
   const auto side = static_cast<std::size_t>(ground.cache_side_chunks_);
   ground.cache_.resize(side * side);
   return ground;
