@@ -11,6 +11,7 @@
 #include "ro/sim/survivors_flow.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_grid.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_state.h"
@@ -63,7 +64,16 @@ struct SurvivorsStart {
 // anneaux d'apparition au plus. Rien si aucune n'est assez proche.
 [[nodiscard]] std::optional<CellPosition> SurvivorsStartCell(const SurvivorsRules& rules,
                                                              const ArenaRule& arena_rule,
+                                                             const SurvivorsGround& ground);
+// La même règle sur une carte.
+[[nodiscard]] std::optional<CellPosition> SurvivorsStartCell(const SurvivorsRules& rules,
+                                                             const ArenaRule& arena_rule,
                                                              const WalkMap& arena);
+// LA GRILLE DES VOISINS D'UN SOL GÉNÉRÉ : un carré de ce côté, en cases,
+// centré sur le héros à chaque reconstruction. Il couvre le rappel (48 cases)
+// de part et d'autre ; un monstre au-delà tombe dans un seau du bord et reste
+// trouvable.
+inline constexpr std::int32_t kFollowingGridCells = 128;
 // L'entrée d'un pas : le cap du stick, kNoHeading à l'arrêt.
 struct SurvivorsInput {
   std::uint8_t heading = kNoHeading;
@@ -97,7 +107,7 @@ inline constexpr std::uint32_t kFirstCardSerial = 0x80000000U;
 struct SurvivorsField {
   const SurvivorsRules* rules = nullptr;
   const ClassRule* hero_class = nullptr;
-  WalkMap arena;
+  SurvivorsGround ground;
   SurvivorsStart start;
   std::uint32_t step = 0;
   SurvivorsPhase phase = SurvivorsPhase::kRunning;
@@ -173,14 +183,20 @@ class SurvivorsRun {
   // loadout au-delà de ±kMostStatBonus, Cursed Water au-delà de
   // kMostCursedWater ou d'un rang que les règles n'ont pas, Id verrouillés non
   // strictement croissants, plus de kMostLockedIds, hors des réserves de la
-  // classe, ou qui verrouillent le premier skill, arène vide ou de plus de
+  // classe, ou qui verrouillent le premier skill, sol borné vide ou de plus de
   // kMostArenaSideCells de côté, aucune case praticable à moins de
-  // spawn_search_ring × 2 du départ. Le départ pose les plantes de l'arène
+  // spawn_search_ring × 2 du départ. Le départ pose les plantes d'un sol borné
   // (flux décor), avant le premier pas.
+  [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules,
+                                                        SurvivorsGround ground,
+                                                        const SurvivorsStart& start);
+  // Sur la carte `arena`, un sol borné.
   [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules, WalkMap arena,
                                                         const SurvivorsStart& start);
   // La partie garde l'adresse de ses règles : des règles temporaires la
   // laisseraient pointer dans le vide dès la fin de l'expression.
+  static core::Result<SurvivorsRun> Start(const SurvivorsRules&& rules, SurvivorsGround ground,
+                                          const SurvivorsStart& start) = delete;
   static core::Result<SurvivorsRun> Start(const SurvivorsRules&& rules, WalkMap arena,
                                           const SurvivorsStart& start) = delete;
   // Un pas de 20 ms. Sans effet hors kRunning.

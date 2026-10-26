@@ -10,8 +10,9 @@
 #include <utility>
 #include <vector>
 
-#include "ro/sim/walk_field.h"
+#include "ro/sim/survivors_ground.h"
 
+#include "survivors_space.h"
 #include "survivors_systems.h"
 
 namespace ro::sim {
@@ -92,16 +93,27 @@ void CloseStep(SurvivorsField& field) {
 }  // namespace
 
 std::optional<CellPosition> SurvivorsStartCell(const SurvivorsRules& rules,
+                                               const ArenaRule& arena_rule,
+                                               const SurvivorsGround& ground) {
+  const std::int32_t wanted_x = arena_rule.start ? arena_rule.start->x : ground.width() / 2;
+  const std::int32_t wanted_y = arena_rule.start ? arena_rule.start->y : ground.height() / 2;
+  return survivors::NearestPassable(ground, wanted_x, wanted_y,
+                                    kStartSearchRings * rules.tuning.spawn_search_ring);
+}
+
+std::optional<CellPosition> SurvivorsStartCell(const SurvivorsRules& rules,
                                                const ArenaRule& arena_rule, const WalkMap& arena) {
-  const std::int32_t wanted_x = arena_rule.start ? arena_rule.start->x : arena.width() / 2;
-  const std::int32_t wanted_y = arena_rule.start ? arena_rule.start->y : arena.height() / 2;
-  return NearestPassable(arena, wanted_x, wanted_y,
-                         kStartSearchRings * rules.tuning.spawn_search_ring);
+  return SurvivorsStartCell(rules, arena_rule, SurvivorsGround::Bounded(arena));
 }
 
 SurvivorsRun::SurvivorsRun(SurvivorsField field) : field_(std::move(field)) {}
 
 core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, WalkMap arena,
+                                               const SurvivorsStart& start) {
+  return Start(rules, SurvivorsGround::Bounded(std::move(arena)), start);
+}
+
+core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, SurvivorsGround ground,
                                                const SurvivorsStart& start) {
   if (core::Result<void> checked = CheckSurvivorsRules(rules); !checked) {
     return std::unexpected(std::move(checked.error()));
@@ -128,12 +140,13 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Walk
   if (core::Result<void> locked = CheckLockedIds(*hero_class, start); !locked) {
     return std::unexpected(std::move(locked.error()));
   }
-  if (arena.width() <= 0 || arena.height() <= 0 || arena.width() > kMostArenaSideCells ||
-      arena.height() > kMostArenaSideCells) {
-    return Refuse("arène vide ou trop grande : " + std::to_string(arena.width()) + " × " +
-                  std::to_string(arena.height()));
+  if (ground.bounded() &&
+      (ground.width() <= 0 || ground.height() <= 0 || ground.width() > kMostArenaSideCells ||
+       ground.height() > kMostArenaSideCells)) {
+    return Refuse("arène vide ou trop grande : " + std::to_string(ground.width()) + " × " +
+                  std::to_string(ground.height()));
   }
-  const std::optional<CellPosition> start_cell = SurvivorsStartCell(rules, *arena_rule, arena);
+  const std::optional<CellPosition> start_cell = SurvivorsStartCell(rules, *arena_rule, ground);
   if (!start_cell) {
     return Refuse("aucune case praticable près du départ de l'arène " +
                   std::to_string(arena_rule->arena_id));
@@ -143,8 +156,12 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Walk
   field.rules = &rules;
   field.hero_class = hero_class;
   field.start = start;
-  field.foe_grid.Reset(arena.width(), arena.height());
-  field.arena = std::move(arena);
+  if (ground.bounded()) {
+    field.foe_grid.Reset(ground.width(), ground.height());
+  } else {
+    field.foe_grid.Reset(kFollowingGridCells, kFollowingGridCells);
+  }
+  field.ground = std::move(ground);
   field.spawn_random = core::Pcg32(start.seed, kSpawnStream);
   field.offer_random = core::Pcg32(start.seed, kOfferStream);
   field.combat_random = core::Pcg32(start.seed, kCombatStream);

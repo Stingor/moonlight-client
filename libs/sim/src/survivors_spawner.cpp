@@ -9,7 +9,6 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_field.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -128,7 +127,7 @@ std::optional<FieldPoint> DrawSpawnPoint(SurvivorsField& field) {
         field.spawn_random.Below(static_cast<std::uint32_t>(frame.margin_units) + 1U));
     const FieldPoint point = PerimeterPoint(frame, hero, along, outward);
     const std::optional<CellPosition> cell = NearestPassable(
-        field.arena, CellOf(point.x), CellOf(point.y), rules.tuning.spawn_search_ring);
+        field.ground, CellOf(point.x), CellOf(point.y), rules.tuning.spawn_search_ring);
     if (!cell) continue;
     const FieldPoint landing = CellCenter(cell->x, cell->y);
     if (InsideSpawnFrame(frame, hero, landing) || Stranded(field.flow, landing)) continue;

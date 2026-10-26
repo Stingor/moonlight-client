@@ -9,11 +9,10 @@
 
 #include "ro/sim/packed_position.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_field.h"
-#include "ro/sim/walk_map.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -46,8 +45,15 @@ constexpr std::uint32_t kOverlapHeadingFactor = 23;
 }
 
 // `foe_points` et `foe_grid` reflètent `foes`, dans le même ordre : l'index
-// d'un point est celui de son monstre.
+// d'un point est celui de son monstre. Sur un sol généré, l'aire de la grille
+// se centre sur le héros avant chaque reconstruction ; celle d'un sol borné
+// reste sur la carte.
 void FillFoeGrid(SurvivorsField& field) {
+  if (!field.ground.bounded()) {
+    constexpr std::int32_t kHalfSide = kFollowingGridCells / 2;
+    field.foe_grid.Recenter(CellOf(field.hero.position.x) - kHalfSide,
+                            CellOf(field.hero.position.y) - kHalfSide);
+  }
   field.foe_points.clear();
   for (const SurvivorsFoe& foe : field.foes) field.foe_points.push_back(foe.position);
   field.foe_grid.Rebuild(field.foe_points);
@@ -113,7 +119,7 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
     const auto side = static_cast<FrameSide>((faced + turns) % kFrameSideCount);
     const FieldPoint target = RecallTarget(frame, hero, offset, side);
     const std::optional<CellPosition> cell = NearestPassable(
-        field.arena, CellOf(target.x), CellOf(target.y), rules.tuning.spawn_search_ring);
+        field.ground, CellOf(target.x), CellOf(target.y), rules.tuning.spawn_search_ring);
     if (!cell) continue;
     const FieldPoint landing = CellCenter(cell->x, cell->y);
     if (InsideSpawnFrame(frame, hero, landing) || Stranded(field.flow, landing)) continue;
@@ -146,7 +152,7 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
   const std::int32_t speed = PaceOf(field, foe);
   if ((TraitsOf(*field.rules, foe) & kFoePassesWalls) != 0) {
     const FieldPoint delta = StepToward(foe.position, hero, speed);
-    foe.position = Glide(field.arena, foe.position, delta);
+    foe.position = Glide(field.ground, foe.position, delta);
     foe.facing = HeadingOf(delta, foe.facing);
     return false;
   }
@@ -158,11 +164,11 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
                                   OpenGround(field.flow, cell_x, cell_y));
   const FieldPoint from = foe.position;
   FieldPoint delta = StepToward(from, straight ? hero : CellCenter(next->x, next->y), speed);
-  FieldPoint at = Slide(field.arena, from, delta);
+  FieldPoint at = Slide(field.ground, from, delta);
   const bool blocked = SlideBlocked(from, delta, at);
   if (straight && blocked && next) {
     delta = StepToward(from, CellCenter(next->x, next->y), speed);
-    at = Slide(field.arena, from, delta);
+    at = Slide(field.ground, from, delta);
   }
   foe.position = at;
   foe.facing = HeadingOf(delta, foe.facing);
@@ -180,7 +186,7 @@ void Knock(SurvivorsField& field, SurvivorsFoe& foe) {
     foe.knock_left_units = 0;
     return;
   }
-  foe.position = Slide(field.arena, foe.position, TurnVector(foe.knock_heading, stride));
+  foe.position = Slide(field.ground, foe.position, TurnVector(foe.knock_heading, stride));
   foe.knock_left_units -= stride;
 }
 
@@ -242,7 +248,7 @@ void Separate(SurvivorsField& field) {
       if (second_push > 0) {
         const auto length =
             static_cast<std::int32_t>(std::min<std::int64_t>(second_push, most_push));
-        second.position = Slide(field.arena, second.position,
+        second.position = Slide(field.ground, second.position,
                                 AwayFrom(first.position, second.position, length, heading));
         most_drift = std::max(most_drift, DriftOf(second, points[j]));
       }
@@ -251,7 +257,7 @@ void Separate(SurvivorsField& field) {
             static_cast<std::int32_t>(std::min<std::int64_t>(first_push, most_push));
         const auto opposite =
             static_cast<std::uint8_t>((heading + kHeadingSteps / 2) % kHeadingSteps);
-        first.position = Slide(field.arena, first.position,
+        first.position = Slide(field.ground, first.position,
                                AwayFrom(second_from, first.position, length, opposite));
         most_drift = std::max(most_drift, DriftOf(first, points[i]));
       }
@@ -279,14 +285,14 @@ void ShoveHero(SurvivorsField& field) {
     const std::uint8_t heading = OverlapHeading(foe.serial);
     const FieldPoint foe_from = foe.position;
     if (foe_push > 0) {
-      foe.position = Slide(field.arena, foe.position,
+      foe.position = Slide(field.ground, foe.position,
                            AwayFrom(hero.position, foe.position, foe_push, heading));
     }
     if (hero_push > 0) {
       const auto opposite =
           static_cast<std::uint8_t>((heading + kHeadingSteps / 2) % kHeadingSteps);
-      hero.position =
-          Slide(field.arena, hero.position, AwayFrom(foe_from, hero.position, hero_push, opposite));
+      hero.position = Slide(field.ground, hero.position,
+                            AwayFrom(foe_from, hero.position, hero_push, opposite));
     }
   }
 }
@@ -298,12 +304,13 @@ void RefreshFlow(SurvivorsField& field) {
   const std::int32_t cell_y = CellOf(field.hero.position.y);
   // Le héros ne quitte pas l'arène, que ses murs bornent ; une case hors de
   // l'arène laisse le champ tel quel.
-  if (cell_x < 0 || cell_y < 0 || cell_x >= field.arena.width() || cell_y >= field.arena.height()) {
+  if (cell_x < 0 || cell_y < 0 || cell_x >= field.ground.width() ||
+      cell_y >= field.ground.height()) {
     return;
   }
   const SurvivorsTuning& tuning = field.rules->tuning;
   field.flow.Refresh(
-      field.arena,
+      field.ground,
       CellPosition{static_cast<std::uint16_t>(cell_x), static_cast<std::uint16_t>(cell_y), 0},
       field.step, tuning.flow_radius_cells, tuning.flow_refresh_steps);
 }

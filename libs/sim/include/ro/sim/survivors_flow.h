@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "ro/sim/packed_position.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/walk_field.h"
 #include "ro/sim/walk_map.h"
 
@@ -17,8 +18,8 @@ class HordeFlow {
   // Le premier appel inonde toujours ; les suivants seulement si la case du
   // héros a changé ET que `refresh_steps` pas ont passé depuis la dernière
   // inondation. La fenêtre couvre [héros − radius_cells, héros + radius_cells]
-  // sur chaque axe, bornée à l'arène.
-  void Refresh(const WalkMap& arena, CellPosition hero_cell, std::uint32_t step,
+  // sur chaque axe, bornée au sol.
+  void Refresh(const SurvivorsGround& ground, CellPosition hero_cell, std::uint32_t step,
                std::int32_t radius_cells, std::uint32_t refresh_steps);
   // La case de l'arène vers laquelle marcher depuis (x, y) ; rien hors
   // fenêtre, sur la source ou si injoignable. Son `direction` est la direction

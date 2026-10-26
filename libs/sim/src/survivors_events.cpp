@@ -10,7 +10,6 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_field.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -186,7 +185,7 @@ bool HatchNear(SurvivorsField& field, const FoeRule& rule, FieldPoint wanted,
                const HatchOptions& options) {
   if (field.foes.size() >= field.rules->caps.most_foes) return false;
   const std::optional<CellPosition> cell =
-      NearestPassable(field.arena, CellOf(wanted.x), CellOf(wanted.y), kEventSearchRing);
+      NearestPassable(field.ground, CellOf(wanted.x), CellOf(wanted.y), kEventSearchRing);
   if (!cell) return false;
   (void)HatchFoe(field, rule, CellCenter(cell->x, cell->y), options);
   return true;

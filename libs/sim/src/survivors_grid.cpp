@@ -32,9 +32,14 @@ void SurvivorsGrid::Reset(std::int32_t width_cells, std::int32_t height_cells) {
   indexes_.clear();
 }
 
+void SurvivorsGrid::Recenter(std::int32_t origin_x_cells, std::int32_t origin_y_cells) noexcept {
+  origin_x_units_ = std::int64_t{origin_x_cells} * kSubunitsPerCell;
+  origin_y_units_ = std::int64_t{origin_y_cells} * kSubunitsPerCell;
+}
+
 std::size_t SurvivorsGrid::BucketOf(FieldPoint point) const noexcept {
-  const std::int32_t column = ClampedBucket(point.x, columns_);
-  const std::int32_t row = ClampedBucket(point.y, rows_);
+  const std::int32_t column = ClampedBucket(point.x - origin_x_units_, columns_);
+  const std::int32_t row = ClampedBucket(point.y - origin_y_units_, rows_);
   return static_cast<std::size_t>(row) * static_cast<std::size_t>(columns_) +
          static_cast<std::size_t>(column);
 }
@@ -67,10 +72,12 @@ void SurvivorsGrid::Near(FieldPoint center, std::int32_t radius_units,
   if (radius_units < 0 || starts_.empty()) return;
   const std::int64_t radius = radius_units;
   const std::int64_t radius_squared = radius * radius;
-  const std::int32_t first_column = ClampedBucket(center.x - radius, columns_);
-  const std::int32_t last_column = ClampedBucket(center.x + radius, columns_);
-  const std::int32_t first_row = ClampedBucket(center.y - radius, rows_);
-  const std::int32_t last_row = ClampedBucket(center.y + radius, rows_);
+  const std::int64_t center_x = center.x - origin_x_units_;
+  const std::int64_t center_y = center.y - origin_y_units_;
+  const std::int32_t first_column = ClampedBucket(center_x - radius, columns_);
+  const std::int32_t last_column = ClampedBucket(center_x + radius, columns_);
+  const std::int32_t first_row = ClampedBucket(center_y - radius, rows_);
+  const std::int32_t last_row = ClampedBucket(center_y + radius, rows_);
   for (std::int32_t row = first_row; row <= last_row; ++row) {
     for (std::int32_t column = first_column; column <= last_column; ++column) {
       const std::size_t bucket =

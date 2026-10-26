@@ -4,10 +4,10 @@
 #include <limits>
 
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_map.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -85,7 +85,7 @@ void MoveHero(SurvivorsField& field, SurvivorsInput input) {
   if (input.heading == kNoHeading) return;
   const auto heading = static_cast<std::uint8_t>(input.heading % kHeadingSteps);
   hero.facing = heading;
-  hero.position = Slide(field.arena, hero.position, TurnVector(heading, HeroPace(field)));
+  hero.position = Slide(field.ground, hero.position, TurnVector(heading, HeroPace(field)));
 }
 
 bool HurtHero(SurvivorsField& field, std::int32_t damage) {

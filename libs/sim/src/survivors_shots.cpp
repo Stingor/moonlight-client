@@ -4,10 +4,10 @@
 #include <limits>
 
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_map.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -121,7 +121,7 @@ namespace {
   shot.position = shot.position + stride;
   // Un tir qui sort de l'arène s'éteint : sa position reste loin des bornes de
   // l'int32.
-  if (!InsideArena(field.arena, shot.position)) return false;
+  if (!InsideArena(field.ground, shot.position)) return false;
 
   SurvivorsFoe* touched = TouchedFoe(field, shot);
   if (touched == nullptr) return true;

@@ -10,7 +10,7 @@
 
 namespace ro::sim {
 
-void HordeFlow::Refresh(const WalkMap& arena, CellPosition hero_cell, std::uint32_t step,
+void HordeFlow::Refresh(const SurvivorsGround& ground, CellPosition hero_cell, std::uint32_t step,
                         std::int32_t radius_cells, std::uint32_t refresh_steps) {
   if (flooded_from_) {
     const bool moved = flooded_from_->x != hero_cell.x || flooded_from_->y != hero_cell.y;
@@ -19,8 +19,8 @@ void HordeFlow::Refresh(const WalkMap& arena, CellPosition hero_cell, std::uint3
   const std::int32_t radius = std::max(radius_cells, 0);
   const std::int32_t first_x = std::max<std::int32_t>(hero_cell.x - radius, 0);
   const std::int32_t first_y = std::max<std::int32_t>(hero_cell.y - radius, 0);
-  const std::int32_t last_x = std::min<std::int32_t>(hero_cell.x + radius, arena.width() - 1);
-  const std::int32_t last_y = std::min<std::int32_t>(hero_cell.y + radius, arena.height() - 1);
+  const std::int32_t last_x = std::min<std::int32_t>(hero_cell.x + radius, ground.width() - 1);
+  const std::int32_t last_y = std::min<std::int32_t>(hero_cell.y + radius, ground.height() - 1);
   const std::int32_t width = std::max(last_x - first_x + 1, 0);
   const std::int32_t height = std::max(last_y - first_y + 1, 0);
 
@@ -30,7 +30,7 @@ void HordeFlow::Refresh(const WalkMap& arena, CellPosition hero_cell, std::uint3
     for (std::int32_t x = 0; x < width; ++x) {
       passable[static_cast<std::size_t>(y) * static_cast<std::size_t>(width) +
                static_cast<std::size_t>(x)] =
-          arena.Passable(first_x + x, first_y + y) ? std::uint8_t{1} : std::uint8_t{0};
+          ground.Passable(first_x + x, first_y + y) ? std::uint8_t{1} : std::uint8_t{0};
     }
   }
   const WalkMap window(width, height, std::move(passable));

@@ -152,7 +152,7 @@ void Howl(SurvivorsField& field, const BossMoveRule& move) {
 void Dash(SurvivorsField& field, SurvivorsFoe& foe, const BossMoveRule& move) {
   const FieldPoint from = foe.position;
   const FieldPoint delta = TurnVector(foe.act_heading, ChargePerStep(move));
-  foe.position = FoeSlide(field.arena, TraitsOf(*field.rules, foe), from, delta);
+  foe.position = FoeSlide(field.ground, TraitsOf(*field.rules, foe), from, delta);
   foe.facing = HeadingOf(delta, foe.facing);
   if (SlideBlocked(from, delta, foe.position)) foe.act_until_step = Later(field.step, 1);
 }
@@ -165,7 +165,7 @@ void Retreat(SurvivorsField& field, SurvivorsFoe& foe) {
   if (away == FieldPoint{}) {
     away = TurnVector(static_cast<std::uint8_t>((foe.facing + kHalfTurn) % kHeadingSteps), pace);
   }
-  foe.position = FoeSlide(field.arena, TraitsOf(*field.rules, foe), foe.position, away);
+  foe.position = FoeSlide(field.ground, TraitsOf(*field.rules, foe), foe.position, away);
   foe.facing = HeadingOf(away, foe.facing);
 }
 
@@ -237,7 +237,7 @@ void Hold(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track, s
 [[nodiscard]] bool StartLeap(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track,
                              std::size_t index, const BossMoveRule& move) {
   const std::optional<FieldPoint> landing =
-      LeapLanding(field.arena, foe.position, field.hero.position, foe.facing, move.reach_units);
+      LeapLanding(field.ground, foe.position, field.hero.position, foe.facing, move.reach_units);
   if (!landing) return false;
   const std::uint32_t strike_step = Later(field.step, StepsOf(move.telegraph_ms));
   foe.act_target = *landing;

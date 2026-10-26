@@ -12,11 +12,11 @@
 
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_play.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_map.h"
 
 #include "survivors_space.h"
 #include "survivors_volley.h"
@@ -107,8 +107,8 @@ struct Push {
   return {ToUnits(std::int64_t{hero.x} + step.x), ToUnits(std::int64_t{hero.y} + step.y)};
 }
 
-[[nodiscard]] bool PassableAt(const WalkMap& arena, FieldPoint point) noexcept {
-  return arena.Passable(CellOf(point.x), CellOf(point.y));
+[[nodiscard]] bool PassableAt(const SurvivorsGround& ground, FieldPoint point) noexcept {
+  return ground.Passable(CellOf(point.x), CellOf(point.y));
 }
 
 // UNE MENACE ANNONCÉE sous `point` : un séisme ou une flaque qui n'est pas
@@ -141,8 +141,8 @@ struct Push {
 [[nodiscard]] Push EdgePull(const SurvivorsField& field, std::int32_t margin) {
   Push pull;
   const FieldPoint hero = field.hero.position;
-  const std::int64_t width = Cells(field.arena.width());
-  const std::int64_t height = Cells(field.arena.height());
+  const std::int64_t width = Cells(field.ground.width());
+  const std::int64_t height = Cells(field.ground.height());
   pull.x += std::max<std::int64_t>(margin - std::int64_t{hero.x}, 0);
   pull.x -= std::max<std::int64_t>(margin - (width - hero.x), 0);
   pull.y += std::max<std::int64_t>(margin - std::int64_t{hero.y}, 0);
@@ -341,8 +341,8 @@ SurvivorsInput SurvivorsBot::Steer(const SurvivorsField& field) {
   std::int64_t best_score = 0;
   for (std::uint8_t heading = 0; heading < kHeadingSteps; heading += kCandidateStride) {
     const FieldPoint far = Ahead(hero, heading, kFarProbeUnits);
-    barred[heading] = !PassableAt(field.arena, Ahead(hero, heading, kNearProbeUnits)) ||
-                      !PassableAt(field.arena, far);
+    barred[heading] = !PassableAt(field.ground, Ahead(hero, heading, kNearProbeUnits)) ||
+                      !PassableAt(field.ground, far);
     if (barred[heading]) continue;
     menaced[heading] = Threatened(field, far);
     const FieldPoint unit = TurnVector(heading, kSubunitsPerCell);

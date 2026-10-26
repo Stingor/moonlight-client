@@ -111,6 +111,7 @@ add_library(ro_sim STATIC
     src/survivors_flow.cpp
     src/survivors_geometry.cpp
     src/survivors_grid.cpp
+    src/survivors_ground.cpp
     src/survivors_hero.cpp
     src/survivors_horde.cpp
     src/survivors_journal.cpp

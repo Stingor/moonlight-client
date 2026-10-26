@@ -99,7 +99,8 @@ void Regenerate(SurvivorsField& field);
 // lignes du sud au nord puis colonnes d'ouest en est, un Chance du flux décor
 // de (cases praticables du bloc) sur `plant_cells_per_plant` ; si oui, un
 // Below pour la case, parmi les praticables du bloc dans le même ordre, et un
-// PickWeighted pour l'espèce. Rien sans plantes dans les règles.
+// PickWeighted pour l'espèce. Rien sans plantes dans les règles, ni sur un sol
+// généré, qui n'a pas de bord à paver.
 void PlantField(SurvivorsField& field);
 
 // Comment naît un monstre, au-delà de son espèce et de sa place.

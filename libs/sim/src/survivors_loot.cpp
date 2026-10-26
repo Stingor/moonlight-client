@@ -7,11 +7,11 @@
 
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_map.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -277,7 +277,7 @@ void TakeCard(SurvivorsField& field, const SurvivorsPickup& card) {
 }  // namespace
 
 void PlantField(SurvivorsField& field) {
-  if (field.rules == nullptr) return;
+  if (field.rules == nullptr || !field.ground.bounded()) return;
   const SurvivorsRules& rules = *field.rules;
   const std::int32_t block = rules.tuning.plant_block_cells;
   const std::uint32_t cells_per_plant = rules.tuning.plant_cells_per_plant;
@@ -286,16 +286,16 @@ void PlantField(SurvivorsField& field) {
   weights.reserve(rules.plants.size());
   for (const PlantRule& plant : rules.plants) weights.push_back(plant.weight);
 
-  const WalkMap& arena = field.arena;
+  const SurvivorsGround& ground = field.ground;
   std::vector<FieldPoint> open;
-  for (std::int32_t block_y = 0; block_y < arena.height(); block_y += block) {
-    for (std::int32_t block_x = 0; block_x < arena.width(); block_x += block) {
+  for (std::int32_t block_y = 0; block_y < ground.height(); block_y += block) {
+    for (std::int32_t block_x = 0; block_x < ground.width(); block_x += block) {
       open.clear();
-      const std::int32_t last_y = std::min(block_y + block, arena.height());
-      const std::int32_t last_x = std::min(block_x + block, arena.width());
+      const std::int32_t last_y = std::min(block_y + block, ground.height());
+      const std::int32_t last_x = std::min(block_x + block, ground.width());
       for (std::int32_t y = block_y; y < last_y; ++y) {
         for (std::int32_t x = block_x; x < last_x; ++x) {
-          if (arena.Passable(x, y)) open.push_back(CellCenter(x, y));
+          if (ground.Passable(x, y)) open.push_back(CellCenter(x, y));
         }
       }
       // Un tirage par bloc, même vide : le décor d'un bloc ne décale pas les

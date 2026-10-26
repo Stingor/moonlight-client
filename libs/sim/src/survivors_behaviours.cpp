@@ -7,11 +7,11 @@
 
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_map.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -47,14 +47,14 @@ constexpr std::int64_t kLineSampleUnits = kSubunitsPerCell / 2;
 
 // Le pas `delta` d'un monstre aux traits `traits`, et son cap.
 void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, FieldPoint delta) {
-  foe.position = FoeSlide(field.arena, traits, foe.position, delta);
+  foe.position = FoeSlide(field.ground, traits, foe.position, delta);
   foe.facing = HeadingOf(delta, foe.facing);
 }
 
 // Vrai si aucun mur ne coupe le segment de `from` à `to` : ses points, pris de
 // demi-case en demi-case au plus le long de son axe le plus long, tombent tous
 // sur des cases praticables.
-[[nodiscard]] bool ClearLine(const WalkMap& arena, FieldPoint from, FieldPoint to) {
+[[nodiscard]] bool ClearLine(const SurvivorsGround& ground, FieldPoint from, FieldPoint to) {
   const std::int64_t dx = std::int64_t{to.x} - from.x;
   const std::int64_t dy = std::int64_t{to.y} - from.y;
   const std::int64_t span = std::max(dx < 0 ? -dx : dx, dy < 0 ? -dy : dy);
@@ -62,7 +62,7 @@ void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, Field
   for (std::int64_t sample = 1; sample <= samples; ++sample) {
     const auto x = static_cast<std::int32_t>(from.x + dx * sample / samples);
     const auto y = static_cast<std::int32_t>(from.y + dy * sample / samples);
-    if (!arena.Passable(CellOf(x), CellOf(y))) return false;
+    if (!ground.Passable(CellOf(x), CellOf(y))) return false;
   }
   return true;
 }
@@ -74,9 +74,9 @@ void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, Field
 // guide. Un monstre qui traverse les murs passe toujours.
 [[nodiscard]] bool StrideIfClear(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits,
                                  FieldPoint goal, FieldPoint delta) {
-  const FieldPoint at = FoeSlide(field.arena, traits, foe.position, delta);
+  const FieldPoint at = FoeSlide(field.ground, traits, foe.position, delta);
   if ((traits & kFoePassesWalls) == 0 &&
-      (!ClearLine(field.arena, foe.position, goal) || SlideBlocked(foe.position, delta, at))) {
+      (!ClearLine(field.ground, foe.position, goal) || SlideBlocked(foe.position, delta, at))) {
     return false;
   }
   foe.position = at;
@@ -155,7 +155,7 @@ void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, Field
     }
     case FoeAct::kBlink: {
       const std::optional<FieldPoint> landing = LeapLanding(
-          field.arena, foe.position, field.hero.position, foe.facing, behaviour.reach_units);
+          field.ground, foe.position, field.hero.position, foe.facing, behaviour.reach_units);
       if (!landing) return false;
       foe.act_target = *landing;
       warning.kind = WarningKind::kLeap;

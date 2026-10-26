@@ -12,17 +12,19 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <limits>
 #include <optional>
 
+#include "ro/sim/packed_position.h"
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_flow.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
-#include "ro/sim/walk_map.h"
 
 namespace ro::sim::survivors {
 
@@ -85,16 +87,16 @@ inline constexpr std::int64_t kMostScaledBonusPct = std::int64_t{1} << 30;
 // `from` avancé de `delta`, axe par axe (x puis y) : un axe dont la case
 // d'arrivée n'est pas praticable est refusé, et l'autre glisse le long du mur.
 // Un axe est pris en entier ou pas du tout.
-[[nodiscard]] inline FieldPoint Slide(const WalkMap& arena, FieldPoint from,
+[[nodiscard]] inline FieldPoint Slide(const SurvivorsGround& ground, FieldPoint from,
                                       FieldPoint delta) noexcept {
   FieldPoint at = from;
   if (delta.x != 0) {
     const std::optional<std::int32_t> x = Shifted(at.x, delta.x);
-    if (x && arena.Passable(CellOf(*x), CellOf(at.y))) at.x = *x;
+    if (x && ground.Passable(CellOf(*x), CellOf(at.y))) at.x = *x;
   }
   if (delta.y != 0) {
     const std::optional<std::int32_t> y = Shifted(at.y, delta.y);
-    if (y && arena.Passable(CellOf(at.x), CellOf(*y))) at.y = *y;
+    if (y && ground.Passable(CellOf(at.x), CellOf(*y))) at.y = *y;
   }
   return at;
 }
@@ -102,6 +104,32 @@ inline constexpr std::int64_t kMostScaledBonusPct = std::int64_t{1} << 30;
 // Vrai si Slide a refusé un axe que `delta` demandait.
 [[nodiscard]] inline bool SlideBlocked(FieldPoint from, FieldPoint delta, FieldPoint at) noexcept {
   return (delta.x != 0 && at.x == from.x) || (delta.y != 0 && at.y == from.y);
+}
+
+// La case praticable du sol la plus proche de (x, y), cherchée en anneaux
+// carrés jusqu'à `max_ring` : sur un anneau, la plus proche à vol d'oiseau, et
+// à égalité la première dans l'ordre de balayage (du sud au nord, d'ouest en
+// est). La règle est celle du NearestPassable d'une carte, case pour case.
+[[nodiscard]] inline std::optional<CellPosition> NearestPassable(const SurvivorsGround& ground,
+                                                                 std::int32_t x, std::int32_t y,
+                                                                 std::int32_t max_ring) {
+  for (std::int32_t ring = 0; ring <= max_ring; ++ring) {
+    std::optional<CellPosition> best;
+    std::int64_t best_distance = std::numeric_limits<std::int64_t>::max();
+    for (std::int32_t dy = -ring; dy <= ring; ++dy) {
+      for (std::int32_t dx = -ring; dx <= ring; ++dx) {
+        if (std::max(std::abs(dx), std::abs(dy)) != ring) continue;
+        if (!ground.Passable(x + dx, y + dy)) continue;
+        const std::int64_t distance = std::int64_t{dx} * dx + std::int64_t{dy} * dy;
+        if (distance >= best_distance) continue;
+        best_distance = distance;
+        best =
+            CellPosition{static_cast<std::uint16_t>(x + dx), static_cast<std::uint16_t>(y + dy), 0};
+      }
+    }
+    if (best) return best;
+  }
+  return std::nullopt;
 }
 
 // Strictement dans le cadre d'apparition centré sur `hero` ; son périmètre
@@ -264,24 +292,24 @@ enum class FoeAct : std::uint8_t { kNone, kShoot, kCharge, kBlink, kHide };
 }
 
 // Vrai si `at` est sur une case de l'arène, murée ou non.
-[[nodiscard]] inline bool InsideArena(const WalkMap& arena, FieldPoint at) noexcept {
+[[nodiscard]] inline bool InsideArena(const SurvivorsGround& ground, FieldPoint at) noexcept {
   const std::int32_t cell_x = CellOf(at.x);
   const std::int32_t cell_y = CellOf(at.y);
-  return cell_x >= 0 && cell_y >= 0 && cell_x < arena.width() && cell_y < arena.height();
+  return cell_x >= 0 && cell_y >= 0 && cell_x < ground.width() && cell_y < ground.height();
 }
 
 // Comme Slide, pour un monstre qui traverse les murs : un axe n'est refusé que
 // s'il sort de l'arène.
-[[nodiscard]] inline FieldPoint Glide(const WalkMap& arena, FieldPoint from,
+[[nodiscard]] inline FieldPoint Glide(const SurvivorsGround& ground, FieldPoint from,
                                       FieldPoint delta) noexcept {
   FieldPoint at = from;
   if (delta.x != 0) {
     const std::optional<std::int32_t> x = Shifted(at.x, delta.x);
-    if (x && InsideArena(arena, FieldPoint{*x, at.y})) at.x = *x;
+    if (x && InsideArena(ground, FieldPoint{*x, at.y})) at.x = *x;
   }
   if (delta.y != 0) {
     const std::optional<std::int32_t> y = Shifted(at.y, delta.y);
-    if (y && InsideArena(arena, FieldPoint{at.x, *y})) at.y = *y;
+    if (y && InsideArena(ground, FieldPoint{at.x, *y})) at.y = *y;
   }
   return at;
 }
@@ -290,13 +318,14 @@ enum class FoeAct : std::uint8_t { kNone, kShoot, kCharge, kBlink, kHide };
 // mène (`fallback` pour deux points confondus), ou une case plus près tant
 // qu'il tombe sur un mur ou hors de l'arène ; rien si aucun ne convient. Un
 // bond ne se pose jamais sur un mur.
-[[nodiscard]] inline std::optional<FieldPoint> LeapLanding(const WalkMap& arena, FieldPoint from,
-                                                           FieldPoint goal, std::uint8_t fallback,
+[[nodiscard]] inline std::optional<FieldPoint> LeapLanding(const SurvivorsGround& ground,
+                                                           FieldPoint from, FieldPoint goal,
+                                                           std::uint8_t fallback,
                                                            std::int32_t reach) noexcept {
   const std::uint8_t heading = HeadingOf(goal - from, fallback);
   for (std::int32_t length = reach; length > 0; length -= kSubunitsPerCell) {
     const FieldPoint landing = from + TurnVector(heading, length);
-    if (InsideArena(arena, landing) && arena.Passable(CellOf(landing.x), CellOf(landing.y))) {
+    if (InsideArena(ground, landing) && ground.Passable(CellOf(landing.x), CellOf(landing.y))) {
       return landing;
     }
   }
@@ -314,9 +343,9 @@ inline void PublishWarning(SurvivorsNews& news, const SurvivorsWarning& warning)
 
 // Le pas d'un monstre aux traits `traits` : contre les murs, ou au travers
 // s'il les traverse.
-[[nodiscard]] inline FieldPoint FoeSlide(const WalkMap& arena, std::uint8_t traits, FieldPoint from,
-                                         FieldPoint delta) noexcept {
-  return (traits & kFoePassesWalls) != 0 ? Glide(arena, from, delta) : Slide(arena, from, delta);
+[[nodiscard]] inline FieldPoint FoeSlide(const SurvivorsGround& ground, std::uint8_t traits,
+                                         FieldPoint from, FieldPoint delta) noexcept {
+  return (traits & kFoePassesWalls) != 0 ? Glide(ground, from, delta) : Slide(ground, from, delta);
 }
 
 }  // namespace ro::sim::survivors

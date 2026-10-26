@@ -30,8 +30,8 @@ namespace {
   if (field.step >= shot.expires_step) return false;
   shot.previous_position = shot.position;
   shot.position = shot.position + shot.velocity;
-  if (!InsideArena(field.arena, shot.position) ||
-      !field.arena.Passable(CellOf(shot.position.x), CellOf(shot.position.y))) {
+  if (!InsideArena(field.ground, shot.position) ||
+      !field.ground.Passable(CellOf(shot.position.x), CellOf(shot.position.y))) {
     return false;
   }
   if (!HeroWithin(field, shot.position, shot.radius_units)) return true;
