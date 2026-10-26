@@ -102,11 +102,15 @@ core::Result<PointLightStage> PointLightStage::Create() {
   glBindTexture(GL_TEXTURE_BUFFER, 0);
   glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
+  // ⚠ LA CIBLE LIÉE SE RETROUVE APRÈS : l'étage naît à la première lumière, au
+  // milieu d'une image qui peut se peindre hors écran.
+  GLint previous_framebuffer = 0;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
   glGenFramebuffers(1, &stage.framebuffer_);
   glBindFramebuffer(GL_FRAMEBUFFER, stage.framebuffer_);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previous_framebuffer));
   if (const GLenum error = glGetError(); error != GL_NO_ERROR) {
     return Fail(ErrorCode::kCorruptData, "lumières ponctuelles refusées, erreur OpenGL " +
                                              std::to_string(static_cast<unsigned>(error)));

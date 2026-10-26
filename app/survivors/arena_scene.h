@@ -4,11 +4,13 @@
 #include <cstdint>
 #include <span>
 #include <string_view>
+#include <vector>
 
 #include <glm/glm.hpp>
 
 #include "ro/core/error.h"
 #include "ro/render/camera.h"
+#include "ro/render/point_lights.h"
 #include "ro/render/sprite_renderer.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_rules.h"
@@ -42,7 +44,8 @@ struct ArenaOverlays {
 // caméra de l'arène est celle du jeu, et le brouillard que la table des cartes
 // règle pour elle s'y montre comme en partie. L'heure, elle, est celle de la
 // partie (`ArenaSkyHour`), cycle jour/nuit coché ou non : la nuit qui tombe
-// fait partie du jeu.
+// fait partie du jeu. Avec elle viennent la lanterne du héros et la lueur des
+// objets au sol (`arena_night_lights.h`), qui la gardent lisible.
 //
 // 🔴 L'OMBRE DU SOLEIL SUIT AUSSI « GRAPHICS » : éteinte, personne n'en porte ;
 // allumée, le héros en porte une, et l'option U27 (`horde_sun_shadows`) y
@@ -122,6 +125,10 @@ class ArenaScene : private LitLayers {
   bool horde_sun_shadows_ = false;
   // Les effets de l'image en cours de peinture, le temps de `Paint`.
   ArenaEffects* painting_effects_ = nullptr;
+  // LA LANTERNE ET LA LUEUR DES OBJETS de l'image, refaites à chaque `Paint`
+  // dans des listes réutilisées : voir `ArenaLantern` et `ArenaItemHalos`.
+  std::vector<ro::render::PointLight> carried_lights_;
+  std::vector<ro::render::DrawnActor> item_halos_;
 };
 
 }  // namespace moonclient

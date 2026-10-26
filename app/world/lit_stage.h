@@ -44,6 +44,10 @@ struct LitActors {
   // Ils se peignent avec les autres, dans le même tri de l'arrière vers
   // l'avant : seule la passe d'ombre les distingue.
   std::optional<std::span<const ro::render::DrawnActor>> sun_casters;
+  // LES LUMIÈRES QUE LES CORPS PORTENT, ajoutées à celles de la carte : au
+  // plus `ro::render::kMaxActorLights`, les plus proches de ce que vise la
+  // caméra.
+  std::span<const ro::render::PointLight> carried_lights;
 };
 
 // L'IMAGE EN COURS : ce que la page « Graphics » en a décidé à son ouverture,
@@ -171,12 +175,12 @@ class LitStage {
   [[nodiscard]] ro::render::SunShadowView DrawSunShadow(
       bool asked, const ro::render::Camera& camera, float aspect_ratio,
       const ro::render::SkyLight& sky, std::span<const ro::render::DrawnActor> bodies);
-  // LES LUMIÈRES DE LA CARTE, leurs ombres peintes quand le joueur a les
-  // ombres temps réel ; vide si la carte graphique a refusé leur étage.
+  // LES LUMIÈRES DE LA CARTE, puis celles que portent les corps, leurs ombres
+  // peintes quand le joueur a les ombres temps réel ; vide si la carte
+  // graphique a refusé leur étage.
   [[nodiscard]] ro::render::PointLightSet DrawPointLights(
       const GraphicsOptions& graphics, const ro::render::Camera& camera, float aspect_ratio,
-      const ro::render::SkyLight& sky, std::uint32_t now_ms,
-      std::span<const ro::render::DrawnActor> bodies);
+      const ro::render::SkyLight& sky, std::uint32_t now_ms, const LitActors& actors);
   // Le vide sous la carte prend l'heure du ciel, et l'astre s'y montre.
   void ShadeVoid(const ro::render::SkyLight& sky, const ro::render::Camera& camera,
                  float aspect_ratio);

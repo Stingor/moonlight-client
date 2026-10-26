@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -9,6 +10,7 @@
 #include "ro/core/log.h"
 
 #include "survivors/arena_night.h"
+#include "survivors/arena_night_lights.h"
 
 namespace moonclient {
 namespace {
@@ -50,7 +52,20 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
                        const GraphicsOptions& graphics, std::uint64_t presentation_ms,
                        std::uint32_t now_ms, const HordeComposer& horde,
                        const ArenaOverlays& overlays) {
-  const LitActors actors{.bodies = horde.drawn(), .sun_casters = horde.sun_casters()};
+  // LA NUIT RESTE LISIBLE : la lanterne suit le héros, et chaque objet au sol
+  // luit.
+  carried_lights_.clear();
+  if (const std::optional<glm::vec3> hero_feet = ArenaHeroFeet(horde.drawn(), horde.tags())) {
+    if (const std::optional<ro::render::PointLight> lantern =
+            ArenaLantern(presentation_ms, *hero_feet)) {
+      carried_lights_.push_back(*lantern);
+    }
+  }
+  ArenaItemHalos(horde.drawn(), horde.tags(), presentation_ms, item_halos_);
+  const LitActors actors{.bodies = horde.drawn(),
+                         .halos = item_halos_,
+                         .sun_casters = horde.sun_casters(),
+                         .carried_lights = carried_lights_};
   painting_effects_ = overlays.effects;
   lit_.Paint(frame, camera, aspect_ratio, graphics, ArenaSkyHour(presentation_ms),
              RendererMs(presentation_ms), now_ms, actors, *this);

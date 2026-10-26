@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ro/core/log.h"
+#include "ro/render/actor_lights.h"
 #include "ro/render/map_point_lights.h"
 #include "ro/render/point_shadow_pass.h"
 #include "ro/render/sky_body.h"
@@ -99,7 +100,7 @@ void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float as
   if (frame.sun.map != nullptr) {
     frame.stages.shadowmap = false;
   }
-  frame.points = DrawPointLights(graphics, camera, aspect_ratio, frame.sky, now_ms, actors.bodies);
+  frame.points = DrawPointLights(graphics, camera, aspect_ratio, frame.sky, now_ms, actors);
   // ⚠ L'HEURE N'ASSOMBRIT LES CORPS QUE SOUS UN ASTRE, comme en partie.
   frame.body_daylight = frame.sky.body_shown ? frame.sky.light.daylight : glm::vec3(1.0F);
 
@@ -181,15 +182,19 @@ ro::render::SunShadowView LitStage::DrawSunShadow(bool asked, const ro::render::
                                    ro::render::kFullSunShadow * sky.shadow_strength);
 }
 
-ro::render::PointLightSet LitStage::DrawPointLights(
-    const GraphicsOptions& graphics, const ro::render::Camera& camera, float aspect_ratio,
-    const ro::render::SkyLight& sky, std::uint32_t now_ms,
-    std::span<const ro::render::DrawnActor> bodies) {
-  // LES LUMIÈRES DE LA CARTE, retouches comprises, comme en partie.
-  const ro::render::PointLightSet points = ro::render::MapPointLights(
-      ro::render::SceneLights(document_, model_book_, stage_->scene),
-      ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()}, sky.light,
-      closed_to_sky_, camera.look_at, static_cast<double>(now_ms), sky.hour);
+ro::render::PointLightSet LitStage::DrawPointLights(const GraphicsOptions& graphics,
+                                                    const ro::render::Camera& camera,
+                                                    float aspect_ratio,
+                                                    const ro::render::SkyLight& sky,
+                                                    std::uint32_t now_ms, const LitActors& actors) {
+  // LES LUMIÈRES DE LA CARTE, retouches comprises, comme en partie, puis
+  // celles que portent les corps.
+  const ro::render::PointLightSet points = ro::render::WithActorLights(
+      ro::render::MapPointLights(
+          ro::render::SceneLights(document_, model_book_, stage_->scene),
+          ro::render::MapEffectFrame{stage_->scene.gnd.width(), stage_->scene.gnd.height()},
+          sky.light, closed_to_sky_, camera.look_at, static_cast<double>(now_ms), sky.hour),
+      actors.carried_lights, camera.look_at);
   if (points.lights.empty() || point_stage_refused_) {
     return ro::render::PointLightSet();
   }
@@ -204,7 +209,7 @@ ro::render::PointLightSet LitStage::DrawPointLights(
     point_stage_ = std::move(*created);
   }
   // SANS OMBRE, les lumières éclairent quand même.
-  const ro::render::SunShadowCasters casters = ShadowCasters(bodies);
+  const ro::render::SunShadowCasters casters = ShadowCasters(actors.bodies);
   return ro::render::DrawPointShadows(point_stage_,
                                       graphics.real_time_shadows() ? &casters : nullptr, points,
                                       camera, aspect_ratio);
