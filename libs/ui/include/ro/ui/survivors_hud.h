@@ -8,6 +8,8 @@
 
 #include <imgui.h>
 
+#include "ro/ui/survivors_effects.h"
+
 namespace ro::ui {
 
 // LE HUD D'UNE PARTIE DE « SURVIVANTS DE MIDGARD » (U12, U13), peint sur la
@@ -17,12 +19,14 @@ namespace ro::ui {
 //   - le minuteur centré dessous, puis la barre du boss quand il vit ;
 //   - en haut à gauche les skills, puis les cartes (icône et niveau) ;
 //   - en haut à droite les tués, les Zeny et le compteur discret des messages
-//     privés reçus pendant la partie (U5), puis les charges et les vies ;
+//     privés reçus pendant la partie (U5), puis les charges et les vies, puis
+//     la colonne des effets en cours ;
 //   - sous le minuteur, la marque « Classée », « Défi » ou « Cursed Water n » ;
 //   - en bas à droite, l'illustration de la carte ramassée, qui glisse ;
 //   - des flèches au bord de l'écran vers le boss et les Old Blue Box hors du
 //     champ ;
-//   - la jauge verte de RO sous les pieds du héros.
+//   - la jauge verte de RO sous les pieds du héros, et au-dessus de lui l'avis
+//     d'un objet ramassé.
 //
 // 🔴 IL NE LIT AUCUNE ENTRÉE et ne rend rien : il n'ouvre aucune fenêtre, donc
 // ne prend ni le clavier ni la souris. La vue porte des identifiants de
@@ -86,6 +90,10 @@ struct SurvivorsHudView {
   int cursed_water = 0;
   // La vignette de la carte ramassée, dans le coin bas droit.
   SurvivorsHudCard found_card;
+  // Sous les charges et les vies, la colonne des effets en cours ; au-dessus
+  // du héros, les avis des objets ramassés (`survivors_effects.h`).
+  std::span<const SurvivorsHudEffect> effects;
+  std::span<const SurvivorsHudNotice> notices;
 };
 
 void DrawSurvivorsHud(const SurvivorsHudView& view);

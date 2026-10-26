@@ -203,6 +203,7 @@ add_library(ro_ui STATIC
     src/survivors_codex_phrases.cpp
     src/survivors_codex_text.cpp
     src/survivors_codex_window.cpp
+    src/survivors_effects.cpp
     src/survivors_hud.cpp
     src/survivors_kafra_window.cpp
     src/survivors_meta_text.cpp

@@ -141,6 +141,7 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
   if (field != nullptr && screen != SurvivorsScreen::kSummary) {
     ComposeHud(*field, rules, stage.presentation_ms(), facts, tables);
     ComposeHudMeta(stage, *field, tables);
+    ComposeHudEffects(*field, rules, stage.presentation_ms(), tables);
     view.hud = &hud_;
   }
   switch (screen) {
@@ -157,6 +158,7 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
       break;
     case SurvivorsScreen::kPaused:
       ComposePause(stage, field, facts);
+      if (field != nullptr) ComposePauseEffects(*field, rules, tables);
       view.pause = &pause_;
       view.pause_state = &pause_state_;
       // LE CODEX DE LA PAUSE montre déjà ce que la partie a vu, avant tout

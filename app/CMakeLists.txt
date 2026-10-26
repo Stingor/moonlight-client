@@ -766,6 +766,7 @@ add_library(moonclient_minigames STATIC
     game/survivors_book_mode.cpp
     game/survivors_codex_desk.cpp
     game/survivors_codex_foes.cpp
+    game/survivors_effect_desk.cpp
     game/survivors_meta_desk.cpp
     game/survivors_ranking_desk.cpp
     game/survivors_ranking_mode.cpp
@@ -1837,6 +1838,7 @@ add_executable(moonclient
     game/survivors_views.cpp
     game/survivors_meta_views.cpp
     game/survivors_codex_views.cpp
+    game/survivors_effect_views.cpp
     game/game_description.cpp
     game/game_draw.cpp
     game/game_forget_played.cpp

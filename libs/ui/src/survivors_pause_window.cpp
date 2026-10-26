@@ -140,6 +140,7 @@ SurvivorsPauseAsk DrawSurvivorsPauseWindow(SurvivorsPauseState& state,
   if (!state.confirming_abandon) {
     DrawOpeners(asked, view.accepts_input, art);
   }
+  DrawSurvivorsPauseEffects(view.effects);
   ImGui::SeparatorText(core::Tr("Réglages"));
   asked.reduced_effects = Setting(core::Tr("Effets réduits"), view.reduced_effects, art);
   if (view.measures_offered) {

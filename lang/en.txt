@@ -21448,3 +21448,42 @@ tr: event at %s
 
 fr: La chance du héros majore ces chances.
 tr: The hero's luck raises these chances.
+
+fr: PV max +%d
+tr: Max HP +%d
+
+fr: Projectiles +%d
+tr: Projectiles +%d
+
+fr: Aimant +%d %%
+tr: Magnet +%d %%
+
+fr: PV +%d
+tr: HP +%d
+
+fr: Zeny +%d
+tr: Zeny +%d
+
+fr: Purifie les monstres à %d cases
+tr: Purifies monsters within %d cells
+
+fr: Attire toutes les gemmes
+tr: Draws in every gem
+
+fr: Relances restantes : %d
+tr: Rerolls left: %d
+
+fr: Passes restantes : %d
+tr: Skips left: %d
+
+fr: Bannissements restants : %d
+tr: Banishes left: %d
+
+fr: Vies restantes : %d
+tr: Lives left: %d
+
+fr: %s : %s, %u s
+tr: %s: %s, %u s
+
+fr: Effets permanents
+tr: Lasting effects

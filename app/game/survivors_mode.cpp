@@ -521,7 +521,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
     painted.arena = true;
   }
   if (stage.owns_screen()) {
-    views_.NoticeCards(stage.news(), stage.presentation_ms());
+    views_.NoticeFinds(stage.news(), stage.presentation_ms());
     PlaySounds(stage.news(), context);
     FollowMusic(stage, context);
   }

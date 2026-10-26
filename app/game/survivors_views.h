@@ -20,6 +20,7 @@
 
 #include "game/survivors_book_mode.h"
 #include "game/survivors_codex_desk.h"
+#include "game/survivors_effect_desk.h"
 #include "game/survivors_meta_desk.h"
 #include "game/survivors_ranking_desk.h"
 #include "game/survivors_ranking_mode.h"
@@ -117,10 +118,12 @@ class SurvivorsViews {
                                            const SurvivorsViewFacts& facts,
                                            const SurvivorsTables& tables);
 
-  // LES CARTES RAMASSÉES des nouvelles que l'image vient de prendre, une fois
-  // chacune : leur vignette paraît au HUD (Q6).
-  void NoticeCards(const ro::sim::SurvivorsNews& news, std::uint64_t presentation_ms) {
+  // LES CARTES ET LES OBJETS RAMASSÉS des nouvelles que l'image vient de
+  // prendre, une fois chacun : la vignette d'une carte paraît au HUD (Q6),
+  // l'avis d'un objet à effet au-dessus du héros.
+  void NoticeFinds(const ro::sim::SurvivorsNews& news, std::uint64_t presentation_ms) {
     card_vignettes_.Notice(news.cards_found, presentation_ms);
+    pickup_notices_.Notice(news.pickups_taken, presentation_ms);
   }
 
   // Une fenêtre qui s'ouvre repart de son état neuf.
@@ -147,6 +150,12 @@ class SurvivorsViews {
   // boutique et ses lignes.
   void ComposeHudMeta(const SurvivorsStage& stage, const ro::sim::SurvivorsField& field,
                       const SurvivorsTables& tables);
+  // LES EFFETS (`survivors_effect_views.cpp`) : au HUD, ceux qui sont en
+  // cours et les avis des objets ramassés ; dans la pause, les permanents.
+  void ComposeHudEffects(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
+                         std::uint64_t presentation_ms, const SurvivorsTables& tables);
+  void ComposePauseEffects(const ro::sim::SurvivorsField& field,
+                           const ro::sim::SurvivorsRules& rules, const SurvivorsTables& tables);
   void ComposeCredit(const SurvivorsStage& stage, const ro::sim::SurvivorsRules& rules,
                      const SurvivorsViewFacts& facts, const SurvivorsTables& tables);
   void ComposeShop(SurvivorsMetaShop shop, SurvivorsMetaWindows& windows, const SurvivorsSave& save,
@@ -192,6 +201,14 @@ class SurvivorsViews {
   std::vector<ro::ui::SurvivorsSkillDamageRow> skill_rows_;
   std::vector<ro::ui::SurvivorsCardRow> card_rows_;
   CardVignettes card_vignettes_;
+  // LES EFFETS : en cours et avis au HUD, permanents dans la pause.
+  PickupNotices pickup_notices_;
+  std::vector<SurvivorsTimedEffect> timed_effects_;
+  std::vector<PickupNoticeShown> notices_shown_;
+  std::vector<SurvivorsPermanentEffect> permanent_effects_;
+  std::vector<ro::ui::SurvivorsHudEffect> hud_effects_;
+  std::vector<ro::ui::SurvivorsHudNotice> hud_notices_;
+  std::vector<ro::ui::SurvivorsPauseEffectRow> pause_effects_;
   ro::ui::SurvivorsHudView hud_;
   ro::ui::SurvivorsOfferView offer_;
   ro::ui::SurvivorsOfferState offer_state_;

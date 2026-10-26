@@ -5,6 +5,7 @@
 #include <span>
 
 #include "ro/ui/skin_art.h"
+#include "ro/ui/survivors_effects.h"
 
 namespace ro::ui {
 
@@ -13,8 +14,9 @@ namespace ro::ui {
 // « Codex », celui des Survivants, grisé dans la garde de la reprise —, et les
 // réglages du mode — « Effets réduits » (U20), « Afficher les mesures » (U24,
 // offert au seul client de développement), « Ombres du soleil de la horde »
-// (U27). En tête, ce qui a mis en pause quand ce n'est pas le joueur ; en
-// pied, les mesures quand elles sont demandées.
+// (U27). En tête, ce qui a mis en pause quand ce n'est pas le joueur ; avant
+// les réglages, les effets permanents de la partie ; en pied, les mesures
+// quand elles sont demandées.
 //
 // Les cases montrent les réglages de la vue : un clic les rend dans
 // l'intention, `app` les applique et les range dans `savedata\survivors.yml`.
@@ -46,6 +48,8 @@ struct SurvivorsPauseView {
   bool horde_sun_shadows = false;
   std::span<const SurvivorsMeasureRow> measures;
   std::span<const SurvivorsCountRow> counts;
+  // Les effets permanents de la partie, sous les fenêtres qu'on ouvre.
+  std::span<const SurvivorsPauseEffectRow> effects;
 };
 
 // La confirmation de l'abandon tient d'une image à l'autre.

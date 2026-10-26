@@ -98,13 +98,18 @@ void DrawCountedIcon(ImDrawList& draw, float right, float top, ImTextureID icon,
                text.data());
 }
 
-// Sous les compteurs : une ligne par charge, puis les vies.
-void DrawChargesAndLives(ImDrawList& draw, const SurvivorsHudView& view, float right, float top) {
+// Sous les compteurs : une ligne par charge, puis les vies ; rend l'ordonnée
+// sous la dernière ligne.
+float DrawChargesAndLives(ImDrawList& draw, const SurvivorsHudView& view, float right, float top) {
   for (const SurvivorsHudCharge& charge : view.charges) {
     DrawCountedIcon(draw, right, top, charge.icon, charge.count);
     top += kChargeIconSide + kSlotGap;
   }
-  if (view.lives > 0) DrawCountedIcon(draw, right, top, view.life_icon, view.lives);
+  if (view.lives > 0) {
+    DrawCountedIcon(draw, right, top, view.life_icon, view.lives);
+    top += kChargeIconSide + kSlotGap;
+  }
+  return top;
 }
 
 // La marque discrète de la partie sous le minuteur ; rend la hauteur prise.
@@ -255,7 +260,9 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
   const float after_skills = DrawSlots(draw, ImVec2(origin.x + kMargin, slots_top), view.skills);
   DrawSlots(draw, ImVec2(after_skills + kMargin, slots_top), view.cards);
   const float below_counters = DrawCounters(draw, view, far.x - kMargin, below_bar);
-  DrawChargesAndLives(draw, view, far.x - kMargin, below_counters + kSlotGap);
+  const float below_charges =
+      DrawChargesAndLives(draw, view, far.x - kMargin, below_counters + kSlotGap);
+  DrawSurvivorsHudEffects(draw, view.effects, far.x - kMargin, below_charges + kSlotGap);
 
   for (const SurvivorsEdgeTarget& target : view.edge_targets) {
     if (const std::optional<EdgeArrowPlace> place =
@@ -266,6 +273,10 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
   if (view.hero_feet_px.has_value()) {
     DrawHeroGauge(draw, *view.hero_feet_px, view.hero_fill);
   }
+  // Sans pieds connus, les avis se posent au centre de l'écran, où se tient
+  // le héros que la caméra suit.
+  DrawSurvivorsHudNotices(draw, view.notices,
+                          view.hero_feet_px.value_or(ImVec2(screen->GetCenter())));
   DrawFoundCard(draw, view.found_card, far);
 }
 
