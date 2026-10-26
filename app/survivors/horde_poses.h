@@ -71,6 +71,10 @@ inline constexpr std::uint32_t kHordeWalkPhaseCount = 4;
 
 // Une blessure se rejoue au plus une fois par cette durée.
 inline constexpr std::uint32_t kHurtReplayMs = 300;
+// UN CORPS DE LA HORDE QUI NAÎT — monstre, élite, invoqué, boss — paraît en
+// fondu d'opacité pendant cette durée, depuis son pas de naissance, au lieu de
+// surgir. Seule la présentation fond : la simulation le compte dès ce pas.
+inline constexpr std::uint32_t kHordeBirthFadeMs = 333;
 // Un mort, sa chute jouée, s'efface pendant cette durée.
 inline constexpr std::uint32_t kFallFadeMs = 1000;
 // Au plus autant de morts s'effacent à la fois ; le plus ancien cède.

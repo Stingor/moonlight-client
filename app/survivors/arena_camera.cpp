@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <optional>
 
-#include "ro/render/sprite_billboard.h"
 #include "ro/render/terrain_mesh.h"
 #include "ro/sim/survivors_geometry.h"
 
@@ -19,8 +18,6 @@ constexpr std::array<glm::vec2, 4> kImageCorners = {glm::vec2(-1.0F, -1.0F), glm
                                                     glm::vec2(1.0F, 1.0F), glm::vec2(-1.0F, 1.0F)};
 constexpr float kNearDepth = -1.0F;
 constexpr float kFarDepth = 1.0F;
-// Le bas de l'image en ordonnée normalisée.
-constexpr float kImageBottom = -1.0F;
 
 // La recherche du recul le plus lointain s'arrête quand l'intervalle encore
 // douteux est plus court que ceci, en unités du monde.
@@ -35,31 +32,6 @@ constexpr float kFrameSlackCells = 0.01F;
          kFrameSlackCells;
 }
 
-// Le côté sud du cadre, en unités du monde, et la tête du plus grand monstre
-// au-dessus de ses pieds, le long de l'axe haut des panneaux.
-[[nodiscard]] float SouthLineUnits(const ro::sim::SpawnFrame& frame) {
-  return CellsOf(frame.south_units) * ro::render::kWorldUnitsPerCell;
-}
-constexpr float kTallestFoeHeadUnits =
-    kArenaTallestFoeSpritePixels / ro::render::kSpritePixelsPerWorldUnit;
-
-}  // namespace
-
-bool SouthNewbornHidden(const ro::render::Camera& camera, float aspect_ratio,
-                        const ro::sim::SpawnFrame& frame) {
-  // 🔴 LE NORD EST VERS LES Z DÉCROISSANTS : le sud du héros est vers les Z
-  // croissants, du côté de la caméra.
-  const glm::vec3 feet = camera.look_at + glm::vec3(0.0F, 0.0F, SouthLineUnits(frame));
-  const glm::vec3 head = feet + ro::render::MakeBillboardBasis(camera).up * kTallestFoeHeadUnits;
-  const glm::vec4 clip =
-      camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix() * glm::vec4(head, 1.0F);
-  // Derrière la caméra, rien ne se voit ; devant, la tête reste sous le bas de
-  // l'image.
-  return clip.w <= 0.0F || clip.y / clip.w <= kImageBottom;
-}
-
-namespace {
-
 // La caméra de l'arène à ce recul, sans descente ni secousse : l'emprise ne
 // dépend que du recul, de l'élévation et du champ.
 [[nodiscard]] bool FitsSpawnFrame(float distance, float aspect_ratio,
@@ -73,8 +45,7 @@ namespace {
   return seen.has_value() && seen->west_cells <= CellsOf(frame.half_width_units) &&
          seen->east_cells <= CellsOf(frame.half_width_units) &&
          seen->north_cells <= CellsOf(frame.north_units) &&
-         seen->south_cells <= CellsOf(frame.south_units) &&
-         SouthNewbornHidden(camera, aspect_ratio, frame);
+         seen->south_cells <= CellsOf(frame.south_units);
 }
 
 // La descente ralentit en cube : vive au départ, posée à l'arrivée.

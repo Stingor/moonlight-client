@@ -181,6 +181,12 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
     } else if (field.step < foe.chill_until_step) {
       pose.tint = kChilledTint;
     }
+    // Le fondu de naissance tempère l'opacité de la teinte retenue.
+    const float born_ms = ElapsedSince(presentation_ms, MsOfStep(foe.born_step));
+    if (born_ms < static_cast<float>(kHordeBirthFadeMs)) {
+      const float shown = born_ms / static_cast<float>(kHordeBirthFadeMs);
+      pose.tint[kAlpha] = static_cast<std::uint8_t>(static_cast<float>(pose.tint[kAlpha]) * shown);
+    }
     // L'attaque au contact commence au pas du dernier contact, que le pas de la
     // prochaine touche permise désigne.
     const bool touched =

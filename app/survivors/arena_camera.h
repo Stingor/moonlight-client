@@ -66,20 +66,11 @@ struct GroundFootprint {
 [[nodiscard]] std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camera,
                                                                float aspect_ratio);
 
-// LE PLUS GRAND MONSTRE ORDINAIRE DE L'ARÈNE, debout, en pixels de sprite :
-// l'Evil Druid. Né sur le côté sud du cadre, il se dresse vers le haut de
-// l'image ; un boss ou une élite grandie n'y est pas compté.
-inline constexpr float kArenaTallestFoeSpritePixels = 147.0F;
-
-// Vrai quand un monstre de cette taille, né au milieu du côté sud du cadre
-// d'apparition, garde la tête sous le bas de l'image de `camera`.
-[[nodiscard]] bool SouthNewbornHidden(const ro::render::Camera& camera, float aspect_ratio,
-                                      const ro::sim::SpawnFrame& frame);
-
 // LE RECUL LE PLUS LOINTAIN pour une image de ce rapport : le plus grand, borné
 // à `kArenaFarthestReachDistance`, dont l'emprise au sol tient encore dans le
-// cadre d'apparition `frame` et où un monstre né au sud reste caché
-// (`SouthNewbornHidden`) — la horde naît donc hors de l'image.
+// cadre d'apparition `frame` — la horde naît donc les pieds hors de l'image.
+// Un grand monstre né au sud peut y montrer la tête : il paraît en fondu
+// (`kHordeBirthFadeMs`), sans surgir.
 // Jamais moins que le recul d'entrée : le contenu est réglé pour lui.
 [[nodiscard]] float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame);
 
