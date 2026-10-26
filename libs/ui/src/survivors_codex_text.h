@@ -63,4 +63,9 @@ inline constexpr const char* kCodexUnknown = "???";
 // des élites et de la nuit.
 [[nodiscard]] CodexText CodexEventText(const SurvivorsCodexEntry& entry);
 
+// LE NOM D'UNE ENTRÉE VUE, jamais vide : celui que pose `app` ; pour un
+// événement, qui n'en porte pas, sa sorte — suivie de l'espèce qu'il amène,
+// « ??? » tant qu'elle n'est pas vue ; « ??? » pour une entrée sans nom.
+[[nodiscard]] CodexText CodexEntryName(const SurvivorsCodexEntry& entry);
+
 }  // namespace ro::ui

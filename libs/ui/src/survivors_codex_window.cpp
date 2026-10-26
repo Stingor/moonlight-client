@@ -28,6 +28,10 @@ constexpr float kFirstWidth = 780.0F;
 constexpr float kFirstHeight = 560.0F;
 constexpr float kListWidth = 230.0F;
 constexpr float kListIconSide = 24.0F;
+// Une ligne de la liste a la hauteur d'une icône, qu'elle en ait une ou non.
+constexpr float kListRowHeight = kListIconSide;
+// Le nom d'une ligne, centré dans sa hauteur.
+constexpr ImVec2 kListTextAlign(0.0F, 0.5F);
 constexpr float kSheetIconSide = 48.0F;
 constexpr float kLinkIconSide = 20.0F;
 // La boîte où `app` cadre le sprite d'un monstre, d'un boss ou d'une plante.
@@ -82,10 +86,13 @@ void DrawLink(const SurvivorsCodexLink& link) {
          sheet == SurvivorsCodexSheet::kPlant;
 }
 
-// L'image de la fiche : le sprite dans sa boîte relevée, l'icône ailleurs.
+// L'image de la fiche : le sprite dans sa boîte relevée, où `app` le cadre ;
+// ailleurs l'icône, et aucune place quand l'entrée n'en a pas.
 void DrawPortrait(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
   if (!ShowsSprite(entry.sheet)) {
-    PaintImage(entry.icon, ImVec2(kSheetIconSide, kSheetIconSide), entry.seen);
+    if (entry.icon.usable()) {
+      PaintImage(entry.icon, ImVec2(kSheetIconSide, kSheetIconSide), entry.seen);
+    }
     return;
   }
   const ImVec2 box(kSpriteBoxWidth, kSpriteBoxHeight);
@@ -107,22 +114,55 @@ void DrawPortrait(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) 
 
 // ── LA LISTE ────────────────────────────────────────────────────────────────
 
+// L'icône d'une ligne : celle de l'objet ou du sort. Le sprite d'un monstre,
+// d'un boss ou d'une plante appartient à la fiche, et un événement n'a pas
+// d'image : leur ligne n'en réserve pas la place.
+[[nodiscard]] bool ListShowsIcon(const SurvivorsCodexEntry& entry) {
+  return !ShowsSprite(entry.sheet) && entry.icon.usable();
+}
+
+// Une ligne de la chronologie (boss, événement) dit son heure devant son nom.
+[[nodiscard]] bool IsTimed(SurvivorsCodexSheet sheet) {
+  return sheet == SurvivorsCodexSheet::kBoss || sheet == SurvivorsCodexSheet::kEvent;
+}
+
+// LE TEXTE D'UNE LIGNE, jamais vide : « ??? » tant que l'entrée n'est pas vue,
+// sans son heure ; son nom ensuite.
+[[nodiscard]] Line ListLabel(const SurvivorsCodexEntry& entry) {
+  Line label = {};
+  if (!entry.seen) {
+    std::snprintf(label.data(), label.size(), "%s", kCodexUnknown);
+  } else if (IsTimed(entry.sheet)) {
+    std::snprintf(label.data(), label.size(), "%s  %s", SurvivorsClockText(entry.at_ms).data(),
+                  CodexEntryName(entry).data());
+  } else {
+    std::snprintf(label.data(), label.size(), "%s", CodexEntryName(entry).data());
+  }
+  return label;
+}
+
 // La liste et la fiche défilent chacune dans son cadre, ascenseur habillé.
+// Chaque ligne a la même hauteur, icône ou non.
 void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> entries,
               bool scroll_to_selected, const SkinArt& art) {
   std::size_t& selected = state.selected[RankOf(state.tab)];
   ImGui::BeginChild("##codex_list", ImVec2(kListWidth, 0.0F), ImGuiChildFlags_Borders);
+  ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, kListTextAlign);
   for (std::size_t index = 0; index < entries.size(); ++index) {
     const SurvivorsCodexEntry& entry = entries[index];
     ImGui::PushID(static_cast<int>(index));
-    PaintImage(entry.icon, ImVec2(kListIconSide, kListIconSide), entry.seen);
-    ImGui::SameLine();
-    if (ImGui::Selectable(entry.seen ? entry.name : kCodexUnknown, index == selected)) {
+    if (ListShowsIcon(entry)) {
+      PaintImage(entry.icon, ImVec2(kListIconSide, kListIconSide), entry.seen);
+      ImGui::SameLine();
+    }
+    if (ImGui::Selectable(ListLabel(entry).data(), index == selected, ImGuiSelectableFlags_None,
+                          ImVec2(0.0F, kListRowHeight))) {
       selected = index;
     }
     if (scroll_to_selected && index == selected) ImGui::SetScrollHereY();
     ImGui::PopID();
   }
+  ImGui::PopStyleVar();
   PaintWindowScrollbar(art);
   ImGui::EndChild();
 }
@@ -282,8 +322,8 @@ void DrawBossSheet(const SurvivorsCodexEntry& entry) {
   }
 }
 
+// La sorte de l'événement est déjà dans son nom, en tête de la fiche.
 void DrawEventSheet(const SurvivorsCodexEntry& entry) {
-  ColoredText(kHeadingColor, CodexEventKindName(entry.event_kind));
   ImGui::TextWrapped("%s", CodexEventText(entry).data());
   DrawFigureLines(entry.figures);
 }
@@ -295,11 +335,11 @@ void DrawPlantSheet(const SurvivorsCodexEntry& entry) {
   DrawFigureLines(entry.figures);
 }
 
-// Une entrée non vue : sa silhouette, « ??? », et pour un sort verrouillé le
-// but de l'exploit qui l'ouvre. Rien d'autre.
+// Une entrée non vue : « ??? » en titre, sa silhouette, « ??? », et pour un
+// sort verrouillé le but de l'exploit qui l'ouvre. Rien d'autre.
 void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
-  DrawPortrait(state, entry);
   ColoredText(kHeadingColor, kCodexUnknown);
+  DrawPortrait(state, entry);
   FaintText(kCodexUnknown);
   const char* goal = SurvivorsFeatGoal(entry.unlock_feat);
   if (goal[0] == '\0') return;
@@ -308,14 +348,15 @@ void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entr
   ImGui::TextWrapped("%s", line.data());
 }
 
+// LA FICHE commence par le nom de l'entrée, puis son image quand elle en a une.
 void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry, const SkinArt& art) {
   ImGui::BeginChild("##codex_sheet", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders);
   ImGui::PushTextWrapPos(0.0F);
   if (!entry.seen) {
     DrawUnseenSheet(state, entry);
   } else {
+    ColoredText(kHeadingColor, CodexEntryName(entry).data());
     DrawPortrait(state, entry);
-    ColoredText(kHeadingColor, entry.name);
     Line line = {};
     if (const char* element = CodexElementName(entry.element); element[0] != '\0') {
       std::snprintf(line.data(), line.size(), core::Tr("Élément : %s"), element);

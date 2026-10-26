@@ -378,4 +378,30 @@ CodexText CodexEventText(const SurvivorsCodexEntry& entry) {
   return text;
 }
 
+CodexText CodexEntryName(const SurvivorsCodexEntry& entry) {
+  CodexText text = {};
+  if (entry.name != nullptr && entry.name[0] != '\0') {
+    std::snprintf(text.data(), text.size(), "%s", entry.name);
+    return text;
+  }
+  if (entry.sheet != SurvivorsCodexSheet::kEvent) {
+    std::snprintf(text.data(), text.size(), "%s", kCodexUnknown);
+    return text;
+  }
+  switch (entry.event_kind) {
+    case SurvivorsCodexEventKind::kElites:
+    case SurvivorsCodexEventKind::kNight:
+      std::snprintf(text.data(), text.size(), "%s", CodexEventKindName(entry.event_kind));
+      break;
+    case SurvivorsCodexEventKind::kSwarm:
+    case SurvivorsCodexEventKind::kRaid:
+    case SurvivorsCodexEventKind::kRing:
+    case SurvivorsCodexEventKind::kGroup:
+      std::snprintf(text.data(), text.size(), core::Tr("%s : %s"),
+                    CodexEventKindName(entry.event_kind), CodexLinkName(entry.event_foe));
+      break;
+  }
+  return text;
+}
+
 }  // namespace ro::ui
