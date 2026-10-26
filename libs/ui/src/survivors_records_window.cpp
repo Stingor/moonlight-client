@@ -3,6 +3,7 @@
 #include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/survivors_hud.h"
@@ -21,7 +22,8 @@ constexpr float kFirstWidth = 600.0F;
 constexpr float kFirstHeight = 460.0F;
 constexpr ImU32 kLatestBack = IM_COL32(255, 215, 90, 60);
 constexpr ImU32 kOlderText = IM_COL32(150, 150, 150, 255);
-constexpr ImU32 kVictoryColor = IM_COL32(255, 215, 90, 255);
+// Le corps est clair : la victoire s'y écrit en or sombre.
+constexpr ImU32 kVictoryColor = kSkinGoldTextColor;
 constexpr ImU32 kDeathColor = IM_COL32(230, 90, 90, 255);
 constexpr std::size_t kCellSize = 48;
 // Rang ou semaine, score, temps, niveau, issue, tués, date.

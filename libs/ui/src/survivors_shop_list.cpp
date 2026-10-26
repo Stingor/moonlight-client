@@ -5,6 +5,7 @@
 #include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_bounds.h"
@@ -20,7 +21,8 @@ constexpr float kPipGap = 3.0F;
 constexpr ImU32 kPipFull = IM_COL32(255, 215, 90, 255);
 constexpr ImU32 kPipEmpty = IM_COL32(150, 150, 150, 255);
 constexpr ImU32 kSelectedEdge = IM_COL32(255, 215, 90, 200);
-constexpr ImU32 kRefusalColor = IM_COL32(255, 120, 90, 255);
+// Sur le corps clair : la teinte de texte que le fond clair lit.
+constexpr ImU32 kRefusalColor = kSkinCraftMissingColor;
 constexpr std::size_t kLineSize = 160;
 
 // Les pastilles d'un rang : pleines jusqu'au rang tenu, vides au-delà.
@@ -182,6 +184,8 @@ SurvivorsShopAsk DrawSurvivorsShop(SurvivorsShopState& state, const SurvivorsSho
     ImGui::Separator();
     ImGui::PopID();
   }
+  // La liste défile entre le solde et le pied, ascenseur habillé.
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
   ReadKeys(state, view, asked);
   DrawFooter(state, view, asked, art);

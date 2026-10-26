@@ -78,6 +78,14 @@ inline constexpr ImU32 kSkinCraftMissingColor = IM_COL32(166, 38, 38, 255);
 inline constexpr ImU32 kSkinCraftWarnColor = IM_COL32(166, 102, 0, 255);
 // Et ce qui informe : le bleu d'un raffinement, d'une chaîne qui avance.
 inline constexpr ImU32 kSkinInfoColor = IM_COL32(30, 90, 175, 255);
+// L'OR D'UNE RÉUSSITE DANS UNE FENÊTRE — trophée gagné, record, carte neuve,
+// exploit atteint : un or sombre, qui se lit sur le corps clair (contraste au
+// moins 4,5:1). ⚠ L'OR VIF reste celui des avis et du HUD, posés sur un fond
+// sombre : sur le corps presque blanc, il ne se lit plus.
+inline constexpr ImU32 kSkinGoldTextColor = IM_COL32(150, 100, 0, 255);
+// LE VIOLET D'UNE ÉVOLUTION, sombre pour la même raison (contraste au moins
+// 4,5:1 sur le corps clair).
+inline constexpr ImU32 kSkinEvolveTextColor = IM_COL32(120, 60, 180, 255);
 
 // UNE COULEUR DE TEXTE NOMMÉE PAR SON RÔLE.
 //

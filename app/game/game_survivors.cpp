@@ -41,8 +41,9 @@ constexpr std::array<float, 4> kNoArenaClearColor = {0.0F, 0.0F, 0.0F, 1.0F};
   return name != nullptr ? std::string(name) : std::string();
 }
 
-[[nodiscard]] SurvivorsEvent SurvivorsEventOf(const SDL_Event& event) {
+[[nodiscard]] SurvivorsEvent SurvivorsEventOf(const SDL_Event& event, bool over_interface) {
   SurvivorsEvent routed;
+  routed.over_interface = over_interface;
   switch (event.type) {
     case SDL_EVENT_KEY_DOWN:
     case SDL_EVENT_KEY_UP:
@@ -108,7 +109,9 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
       return true;
     }
   }
-  return survivors_mode_->Take(SurvivorsEventOf(event));
+  // La souris au-dessus d'une fenêtre, telle que l'interface l'a vue avant la
+  // route : la molette y fait défiler la fenêtre, pas reculer la caméra.
+  return survivors_mode_->Take(SurvivorsEventOf(event, interface_->gate().mouse_to_ui));
 }
 
 void Game::FrameSurvivors(std::uint32_t now_ms) {

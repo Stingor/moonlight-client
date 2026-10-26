@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
@@ -19,7 +20,8 @@ inline constexpr const char* kPauseId = "survivors_pause";
 constexpr float kPauseWidth = 340.0F;
 // Le libellé, puis p50, p95 et le maximum.
 constexpr int kMeasureColumns = 4;
-constexpr ImU32 kAlertColor = IM_COL32(255, 120, 90, 255);
+// Sur le corps clair : la teinte de texte que le fond clair lit.
+constexpr ImU32 kAlertColor = kSkinCraftMissingColor;
 constexpr ImGuiWindowFlags kModalFlags =
     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings;

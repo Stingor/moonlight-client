@@ -5,6 +5,7 @@
 #include <string>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/survivors_ranking_window.h"
@@ -24,8 +25,10 @@ inline constexpr const char* kPrepareTitle = core::TrText("Survivants de Midgard
 constexpr float kFirstWidth = 420.0F;
 constexpr float kFirstHeight = 460.0F;
 constexpr float kBoltIconSide = 24.0F;
-constexpr ImU32 kRefusalColor = IM_COL32(255, 120, 90, 255);
-constexpr ImU32 kOnlineColor = IM_COL32(120, 220, 120, 255);
+// Le refus et l'état du service, sur le corps clair : les teintes de texte
+// que le fond clair lit.
+constexpr ImU32 kRefusalColor = kSkinCraftMissingColor;
+constexpr ImU32 kOnlineColor = kSkinCraftOkColor;
 constexpr std::int64_t kSecondsPerHour = 3'600;
 constexpr std::int64_t kHoursPerDay = 24;
 constexpr std::size_t kLineSize = 160;

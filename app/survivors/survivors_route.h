@@ -57,6 +57,9 @@ struct SurvivorsEvent {
   float y = 0.0F;
   // Les crans de molette, positifs vers l'avant.
   float wheel_notches = 0.0F;
+  // La souris au-dessus d'une fenêtre de l'interface : la molette y fait
+  // défiler la fenêtre, et n'est pas un geste de la partie.
+  bool over_interface = false;
 };
 
 // CE QUE LES ÉVÉNEMENTS D'UNE IMAGE ONT DEMANDÉ, consommé par l'image.

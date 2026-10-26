@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/survivors_hud.h"
@@ -36,7 +37,8 @@ constexpr ImU32 kShownTint = IM_COL32(255, 255, 255, 255);
 // Une silhouette : l'image peinte en noir, sa forme seule.
 constexpr ImU32 kSilhouetteTint = IM_COL32(0, 0, 0, 255);
 constexpr ImU32 kSpriteBoxBack = IM_COL32(0, 0, 0, 40);
-constexpr ImU32 kHeadingColor = IM_COL32(255, 215, 90, 255);
+// Les titres de la fiche, en or sombre : le corps est clair.
+constexpr ImU32 kHeadingColor = kSkinGoldTextColor;
 constexpr std::size_t kLineSize = 224;
 using Line = std::array<char, kLineSize>;
 constexpr ImGuiTableFlags kLevelTableFlags =
@@ -105,8 +107,9 @@ void DrawPortrait(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) 
 
 // ── LA LISTE ────────────────────────────────────────────────────────────────
 
+// La liste et la fiche défilent chacune dans son cadre, ascenseur habillé.
 void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> entries,
-              bool scroll_to_selected) {
+              bool scroll_to_selected, const SkinArt& art) {
   std::size_t& selected = state.selected[RankOf(state.tab)];
   ImGui::BeginChild("##codex_list", ImVec2(kListWidth, 0.0F), ImGuiChildFlags_Borders);
   for (std::size_t index = 0; index < entries.size(); ++index) {
@@ -120,6 +123,7 @@ void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> e
     if (scroll_to_selected && index == selected) ImGui::SetScrollHereY();
     ImGui::PopID();
   }
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
 }
 
@@ -304,7 +308,7 @@ void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entr
   ImGui::TextWrapped("%s", line.data());
 }
 
-void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
+void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry, const SkinArt& art) {
   ImGui::BeginChild("##codex_sheet", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders);
   ImGui::PushTextWrapPos(0.0F);
   if (!entry.seen) {
@@ -352,6 +356,7 @@ void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
     }
   }
   ImGui::PopTextWrapPos();
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
 }
 
@@ -414,10 +419,10 @@ SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
   std::size_t& selected = state.selected[RankOf(state.tab)];
   if (!entries.empty()) selected = std::min(selected, entries.size() - 1);
   const bool moved = ReadListKeys(state, entries.size());
-  DrawList(state, entries, moved);
+  DrawList(state, entries, moved, art);
   if (!entries.empty()) {
     ImGui::SameLine();
-    DrawSheet(state, entries[selected]);
+    DrawSheet(state, entries[selected], art);
   }
   EndSkinnedWindow();
   return ask;

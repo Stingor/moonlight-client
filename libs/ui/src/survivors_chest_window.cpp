@@ -5,6 +5,7 @@
 #include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
@@ -22,7 +23,8 @@ constexpr float kRowIconSide = 32.0F;
 constexpr float kListWidth = 320.0F;
 constexpr ImU32 kRouletteBack = IM_COL32(10, 14, 30, 255);
 constexpr ImU32 kRouletteEdge = IM_COL32(255, 215, 90, 255);
-constexpr ImU32 kEvolveColor = IM_COL32(200, 140, 255, 255);
+// Sur le corps clair de la liste des gains.
+constexpr ImU32 kEvolveColor = kSkinEvolveTextColor;
 constexpr std::size_t kLineSize = 96;
 constexpr ImGuiWindowFlags kModalFlags =
     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |

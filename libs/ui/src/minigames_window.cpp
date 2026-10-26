@@ -6,6 +6,7 @@
 
 #include <imgui.h>
 
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_bounds.h"
@@ -21,9 +22,8 @@ constexpr float kFirstWidth = 380.0F;
 constexpr float kFirstHeight = 420.0F;
 
 // Un trophée gagné en or, un trophée à gagner effacé. L'or de la liste est
-// sombre : la fenêtre a un fond clair, où l'or vif ne se lit plus (contraste
-// au moins 4,5:1). L'avis, sur son fond sombre, garde l'or vif.
-constexpr ImU32 kUnlockedColor = IM_COL32(150, 100, 0, 255);
+// celui du corps clair ; l'avis, sur son fond sombre, garde l'or vif.
+constexpr ImU32 kUnlockedColor = kSkinGoldTextColor;
 constexpr ImU32 kToastUnlockedColor = IM_COL32(255, 215, 90, 255);
 // Le fond de l'avis d'un trophée gagné, et sa marge.
 constexpr ImU32 kToastBackground = IM_COL32(30, 24, 8, 220);

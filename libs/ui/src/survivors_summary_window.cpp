@@ -7,6 +7,7 @@
 #include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/survivors_hud.h"
@@ -27,7 +28,10 @@ constexpr float kBannerTextScale = 3.0F;
 constexpr float kBannerPadding = 24.0F;
 constexpr ImU32 kBannerBack = IM_COL32(0, 0, 0, 160);
 constexpr ImU32 kDeathColor = IM_COL32(230, 40, 40, 255);
-constexpr ImU32 kVictoryColor = IM_COL32(255, 215, 90, 255);
+// L'or vif sur le ruban sombre du bandeau ; l'or sombre dans le corps clair
+// de la fenêtre, où l'or vif ne se lit plus.
+constexpr ImU32 kBannerVictoryColor = IM_COL32(255, 215, 90, 255);
+constexpr ImU32 kVictoryColor = kSkinGoldTextColor;
 constexpr ImU32 kHintColor = IM_COL32(220, 220, 220, 255);
 
 constexpr float kSummaryWidth = 520.0F;
@@ -125,7 +129,9 @@ void DrawHeadline(const SurvivorsSummaryView& view) {
   ImGui::Text(core::Tr("Zeny : %u"), view.zeny);
 }
 
-void DrawFoes(const SurvivorsSummaryView& view) {
+// La liste défile dans sa hauteur fixe ; ImGui y réserve la gouttière de
+// l'ascenseur, que le compte aligné à droite ne franchit pas.
+void DrawFoes(const SurvivorsSummaryView& view, const SkinArt& art) {
   ImGui::SeparatorText(core::Tr("Tués par espèce"));
   ImGui::BeginChild("##foes", ImVec2(0.0F, kListHeight));
   for (const SurvivorsFoeRow& foe : view.foes) {
@@ -134,6 +140,7 @@ void DrawFoes(const SurvivorsSummaryView& view) {
     ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize(kCountSample).x);
     ImGui::Text("%llu", static_cast<unsigned long long>(foe.kills));
   }
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
 }
 
@@ -294,7 +301,7 @@ SurvivorsSummaryAsk DrawSurvivorsSummaryWindow(const SurvivorsSummaryView& view,
     return asked;
   }
   if (view.phase == SurvivorsEndPhase::kVictoryBanner) {
-    asked.proceed = DrawBanner(core::Tr("Victoire !"), kVictoryColor, view.accepts_input);
+    asked.proceed = DrawBanner(core::Tr("Victoire !"), kBannerVictoryColor, view.accepts_input);
     return asked;
   }
   static WindowName name(kSummaryTitle, kSummaryId);
@@ -307,7 +314,7 @@ SurvivorsSummaryAsk DrawSurvivorsSummaryWindow(const SurvivorsSummaryView& view,
   ImGui::Dummy(ImVec2(kSummaryWidth, 0.0F));
   DrawHeadline(view);
   if (view.ranking.has_value()) DrawStanding(*view.ranking);
-  DrawFoes(view);
+  DrawFoes(view, art);
   DrawDamage(view);
   DrawCards(view);
   if (view.credit.has_value()) {

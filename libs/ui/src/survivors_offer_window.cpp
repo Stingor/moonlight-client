@@ -6,6 +6,7 @@
 #include <cstdio>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_look.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
@@ -22,8 +23,9 @@ inline constexpr const char* kOfferId = "survivors_offer";
 constexpr float kCardWidth = 190.0F;
 constexpr float kCardHeight = 250.0F;
 constexpr float kIconSide = 64.0F;
-constexpr ImU32 kNewColor = IM_COL32(255, 215, 90, 255);
-constexpr ImU32 kEvolveColor = IM_COL32(200, 140, 255, 255);
+// La carte est posée sur le corps clair : « NEW! » s'y écrit en or sombre.
+constexpr ImU32 kNewColor = kSkinGoldTextColor;
+constexpr ImU32 kEvolveColor = kSkinEvolveTextColor;
 constexpr std::size_t kLineSize = 64;
 constexpr ImGuiWindowFlags kModalFlags =
     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
@@ -79,6 +81,8 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
   std::snprintf(line.data(), line.size(), core::Tr("%d — Prendre"), static_cast<int>(index + 1));
   ImGui::SetCursorPosY(kCardHeight - SkinButtonHeight(art) - ImGui::GetStyle().WindowPadding.y);
   const bool taken = SkinButton(line.data(), art, ImVec2(-1.0F, 0.0F));
+  // Une description trop longue fait défiler la carte : l'ascenseur se voit.
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
   ImGui::PopID();
   return taken;

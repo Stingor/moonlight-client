@@ -43,7 +43,10 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
       mouse_y_ = event.y;
       return true;
     case SurvivorsEventKind::kWheel:
-      gestures_.wheel_notches += event.wheel_notches;
+      // Prise dans les deux cas — elle ne parvient pas au jeu —, mais la
+      // caméra de l'arène ne la reçoit que hors des fenêtres : l'interface,
+      // qui l'a vue avant, en fait défiler celle qui est survolée.
+      if (!event.over_interface) gestures_.wheel_notches += event.wheel_notches;
       return true;
     case SurvivorsEventKind::kText:
       return true;
