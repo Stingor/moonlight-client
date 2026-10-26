@@ -20977,3 +20977,471 @@ tr: Supervivientes de Midgard: tu partida del %s no se contó: el servidor ya la
 
 fr: Survivants de Midgard : votre partie du %s est oubliée : son jeton a expiré.
 tr: Supervivientes de Midgard: tu partida del %s se olvida: su ficha caducó.
+
+fr: %lld,%s
+tr: %lld,%s
+
+fr: %s %%
+tr: %s %%
+
+fr: %s case
+tr: %s casilla
+
+fr: %s cases
+tr: %s casillas
+
+fr: %s s
+tr: %s s
+
+fr: %s — de %d %% à %d %% de PV
+tr: %s — del %d %% al %d %% de PV
+
+fr: + niveau %d donne
+tr: + nivel %d da
+
+fr: 1 chance sur %u
+tr: 1 posibilidad entre %u
+
+fr: Abat d'un coup les monstres communs autour du héros ; les boss y résistent.
+tr: Abate de golpe a los monstruos comunes alrededor del héroe; los jefes lo resisten.
+
+fr: Aire
+tr: Área
+
+fr: Arrive dès %s
+tr: Llega desde %s
+
+fr: Arrive à %s
+tr: Llega a las %s
+
+fr: Attaques
+tr: Ataques
+
+fr: Attire au héros toutes les gemmes du terrain.
+tr: Atrae hacia el héroe todas las gemas del terreno.
+
+fr: Aucune source ne l'amène.
+tr: Nada lo trae.
+
+fr: Augmente l'expérience gagnée un moment.
+tr: Aumenta la experiencia ganada durante un rato.
+
+fr: Bondit de %s toutes les %s, annoncé %s avant
+tr: Salta %s cada %s, anunciado %s antes
+
+fr: Bondit vers le héros
+tr: Salta hacia el héroe
+
+fr: Bondit vers le héros après une courte annonce.
+tr: Salta hacia el héroe tras un breve aviso.
+
+fr: Boss et événements
+tr: Jefes y eventos
+
+fr: Carte :
+tr: Carta:
+
+fr: Chance au tirage
+tr: Probabilidad de sorteo
+
+fr: Chance de cinq gains
+tr: Probabilidad de cinco premios
+
+fr: Chance de trois gains
+tr: Probabilidad de tres premios
+
+fr: Charge en ligne droite
+tr: Carga en línea recta
+
+fr: Charge sur %s toutes les %s, annoncée %s avant
+tr: Carga %s cada %s, anunciada %s antes
+
+fr: Chasse en meute : quand l'un vient, les autres suivent.
+tr: Caza en manada: cuando uno llega, los demás le siguen.
+
+fr: Codex des Survivants
+tr: Códice de los Supervivientes
+
+fr: Contact en plus
+tr: Contacto adicional
+
+fr: Des Ghouls referment un anneau autour du héros.
+tr: Unos Ghouls cierran un anillo alrededor del héroe.
+
+fr: Des Pupas se posent en anneau et enferment le héros.
+tr: Unas Pupas se posan en anillo y encierran al héroe.
+
+fr: Des Spores se posent en anneau autour du héros.
+tr: Unos Spores se posan en anillo alrededor del héroe.
+
+fr: Des Zeny gardés au carnet à la fin de la partie.
+tr: Zeny guardados en el cuaderno al final de la partida.
+
+fr: Disparaît par moments : ni visé, ni touché, ni touchant.
+tr: Desaparece a ratos: ni apuntado, ni golpeado, ni golpeando.
+
+fr: Durée de l'effet
+tr: Duración del efecto
+
+fr: Dégâts au contact
+tr: Daño por contacto
+
+fr: Dégâts de base, avant cartes et niveau du héros.
+tr: Daño base, antes de cartas y del nivel del héroe.
+
+fr: Escorte : %d %s
+tr: Escolta: %d %s
+
+fr: Faible à : %s
+tr: Débil a: %s
+
+fr: Fonce en ligne droite après s'être arrêté un instant.
+tr: Se lanza en línea recta tras detenerse un instante.
+
+fr: Gèle
+tr: Congela
+
+fr: Hurle toutes les %s : les %s marchent %d %% plus vite pendant %s
+tr: Aúlla cada %s: los %s caminan un %d %% más rápido durante %s
+
+fr: Immobile
+tr: Inmóvil
+
+fr: Intervalle de contact
+tr: Intervalo de contacto
+
+fr: Invoque %d %s toutes les %s
+tr: Invoca %d %s cada %s
+
+fr: La gemme d'expérience la plus riche.
+tr: La gema de experiencia más rica.
+
+fr: La nuit tombe à %s ; minuit à %s
+tr: La noche cae a las %s; medianoche a las %s
+
+fr: La plus petite gemme d'expérience.
+tr: La gema de experiencia más pequeña.
+
+fr: La plus rare : elle lâche de l'eau bénite.
+tr: La más rara: suelta agua bendita.
+
+fr: Laisse en mourant une flaque de poison qui blesse.
+tr: Al morir deja un charco de veneno que hiere.
+
+fr: Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.
+tr: El cielo se oscurece hasta medianoche, y los no muertos se alzan.
+
+fr: Le héros marche plus vite un moment.
+tr: El héroe camina más rápido durante un rato.
+
+fr: Le premier des morts-vivants, qui annonce la nuit.
+tr: El primero de los no muertos, que anuncia la noche.
+
+fr: Le premier mini-boss : il appelle des Porings à la rescousse.
+tr: El primer minijefe: llama a Porings en su ayuda.
+
+fr: Le premier venu : petit, rapide et fragile.
+tr: El primero en llegar: pequeño, rápido y frágil.
+
+fr: Le seigneur de l'arène : charge, invoque, fait trembler le sol. Sa chute est la victoire.
+tr: El señor de la arena: carga, invoca, hace temblar el suelo. Su caída es la victoria.
+
+fr: Lent, mais il faut frapper longtemps pour l'abattre.
+tr: Lento, pero hay que golpearlo mucho para abatirlo.
+
+fr: Longueur
+tr: Longitud
+
+fr: Lâche :
+tr: Suelta:
+
+fr: Lâché par les élites et les mini-boss : un ou plusieurs gains, parfois une évolution.
+tr: Lo sueltan las élites y los minijefes: uno o varios premios, a veces una evolución.
+
+fr: Marche en plus
+tr: Velocidad adicional
+
+fr: Marche, par case
+tr: Marcha, por casilla
+
+fr: Ne naît que des invocations de Baphomet.
+tr: Solo nace de las invocaciones de Baphomet.
+
+fr: Ne vient qu'en raid, et frappe fort.
+tr: Solo llega en incursión, y golpea fuerte.
+
+fr: Nuée
+tr: Enjambre
+
+fr: PV en plus
+tr: PV adicionales
+
+fr: PV en plus par minute
+tr: PV adicionales por minuto
+
+fr: Perce
+tr: Perfora
+
+fr: Plantes
+tr: Plantas
+
+fr: Poursuit le héros
+tr: Persigue al héroe
+
+fr: Raid
+tr: Incursión
+
+fr: Ralentit
+tr: Ralentiza
+
+fr: Ramasse les gemmes laissées au sol, et rend leur expérience à sa mort.
+tr: Recoge las gemas del suelo, y devuelve su experiencia al morir.
+
+fr: Rebondit droit sur le héros ; sa carte est la plus connue.
+tr: Rebota directo hacia el héroe; su carta es la más conocida.
+
+fr: Rebonds
+tr: Rebotes
+
+fr: Recharge
+tr: Recarga
+
+fr: Rend des PV au héros.
+tr: Devuelve PV al héroe.
+
+fr: Résiste à : %s
+tr: Resiste a: %s
+
+fr: Sa chute est la victoire.
+tr: Su caída es la victoria.
+
+fr: Se débloque : %s
+tr: Se desbloquea: %s
+
+fr: Se tient à distance et tire après avoir visé ; il ne touche pas au contact.
+tr: Se mantiene a distancia y dispara tras apuntar; no golpea por contacto.
+
+fr: Son hurlement presse le pas de ses loups.
+tr: Su aullido apresura a sus lobos.
+
+fr: Sorts
+tr: Hechizos
+
+fr: Séisme : %d cercles de %s toutes les %s, %d dégâts
+tr: Seísmo: %d círculos de %s cada %s, %d de daño
+
+fr: Taille : %s
+tr: Tamaño: %s
+
+fr: Tire à distance
+tr: Dispara a distancia
+
+fr: Touches
+tr: Golpes
+
+fr: Touché, s'éloigne %s, au plus toutes les %s
+tr: Al ser golpeado, se aleja %s, como mucho cada %s
+
+fr: Un Poring de feu, plus coriace que ses cousins.
+tr: Un Poring de fuego, más duro que sus primos.
+
+fr: Un arbre animé, plus solide qu'il n'en a l'air.
+tr: Un árbol animado, más sólido de lo que parece.
+
+fr: Un champignon empoisonné, plus dur que le premier.
+tr: Un hongo venenoso, más duro que el primero.
+
+fr: Un champignon robuste, posé en anneau autour du héros.
+tr: Un hongo robusto, posado en anillo alrededor del héroe.
+
+fr: Un cocon qui ne bouge ni ne frappe : un mur vivant, posé en anneau.
+tr: Un capullo que ni se mueve ni golpea: un muro vivo, posado en anillo.
+
+fr: Un colosse de pierre que rien ne repousse.
+tr: Un coloso de piedra al que nada empuja.
+
+fr: Un criquet qui encaisse et frappe sec.
+tr: Un grillo que aguanta y golpea seco.
+
+fr: Un destrier spectral qui charge en ligne droite.
+tr: Un corcel espectral que carga en línea recta.
+
+fr: Un druide maudit, le plus robuste des communs.
+tr: Un druida maldito, el más robusto de los comunes.
+
+fr: Un esprit d'eau qui hante la fin de la nuit.
+tr: Un espíritu de agua que ronda el final de la noche.
+
+fr: Un essaim de Hornets arrive d'un même côté.
+tr: Un enjambre de Hornets llega por un mismo lado.
+
+fr: Un fantôme qui traverse les murs et survole la horde.
+tr: Un fantasma que atraviesa los muros y sobrevuela la horda.
+
+fr: Un frelon rapide qui pique en essaim.
+tr: Un avispón rápido que pica en enjambre.
+
+fr: Un guerrier solide, qui tient la ligne de front.
+tr: Un guerrero sólido, que aguanta la primera línea.
+
+fr: Un insecte cuirassé aux coups tranchants.
+tr: Un insecto acorazado de golpes cortantes.
+
+fr: Un lapin qui bondit vers le héros, escorté de Lunatics.
+tr: Un conejo que salta hacia el héroe, escoltado por Lunatics.
+
+fr: Un monstre de la vague, bien plus robuste, qui lâche une Old Blue Box.
+tr: Un monstruo de la oleada, mucho más robusto, que suelta una Old Blue Box.
+
+fr: Un mort affamé, qui finit par cerner le héros en anneau.
+tr: Un muerto hambriento que acaba cercando al héroe en anillo.
+
+fr: Un oiseau rapide qui fond sur le héros.
+tr: Un pájaro rápido que se lanza sobre el héroe.
+
+fr: Un ours massif, lent mais redoutable.
+tr: Un oso enorme, lento pero temible.
+
+fr: Un petit sauvageon, lent mais tenace.
+tr: Un pequeño jabato, lento pero tenaz.
+
+fr: Un raid de Goblins charge le héros.
+tr: Una incursión de Goblins carga contra el héroe.
+
+fr: Un singe agile qui se faufile dans la horde.
+tr: Un mono ágil que se cuela entre la horda.
+
+fr: Un spectre lourd parmi les derniers venus.
+tr: Un espectro pesado entre los últimos en llegar.
+
+fr: Un squelette d'orc, plus dur que les morts-vivants d'avant.
+tr: Un esqueleto de orco, más duro que los no muertos anteriores.
+
+fr: Une bande de Thief Bugs vient voler les gemmes.
+tr: Una banda de Thief Bugs viene a robar las gemas.
+
+fr: Une carte tombée d'un monstre : elle reste au sol jusqu'à la fin, et rejoint l'Album.
+tr: Una carta caída de un monstruo: queda en el suelo hasta el final, y se une al Álbum.
+
+fr: Une chauve-souris qui survole la horde pour atteindre le héros.
+tr: Un murciélago que sobrevuela la horda para alcanzar al héroe.
+
+fr: Une gemme d'expérience précieuse.
+tr: Una gema de experiencia valiosa.
+
+fr: Une gemme qui vaut plus d'expérience.
+tr: Una gema que vale más experiencia.
+
+fr: Une larve lente, qui vient en nombre dès le départ.
+tr: Una larva lenta que llega en número desde el principio.
+
+fr: Une libellule qui s'éloigne dès qu'on la touche.
+tr: Una libélula que se aleja en cuanto la golpean.
+
+fr: Une momie lente qui encaisse beaucoup.
+tr: Una momia lenta que aguanta mucho.
+
+fr: Une mouche chasseresse qui survole la horde.
+tr: Una mosca cazadora que sobrevuela la horda.
+
+fr: Une mouche vive qui arrive en nuée avant ses vagues.
+tr: Una mosca viva que llega en enjambre antes de sus oleadas.
+
+fr: Une nuée de Chonchons fond sur le héros.
+tr: Un enjambre de Chonchons se lanza sobre el héroe.
+
+fr: Une nuée de Familiars traverse la horde.
+tr: Un enjambre de Familiars cruza la horda.
+
+fr: Une plante qui lâche de l'or.
+tr: Una planta que suelta oro.
+
+fr: Une plante qui lâche de la viande, pour reprendre des forces.
+tr: Una planta que suelta carne, para recobrar fuerzas.
+
+fr: Une plante qui lâche un manuel de combat.
+tr: Una planta que suelta un manual de combate.
+
+fr: Une plante qui lâche une potion de vitesse.
+tr: Una planta que suelta una poción de velocidad.
+
+fr: Une plante rare qui lâche de quoi attirer toutes les gemmes.
+tr: Una planta rara que suelta con qué atraer todas las gemas.
+
+fr: Une revenante qui frappe dur au contact.
+tr: Una aparecida que golpea fuerte por contacto.
+
+fr: Une élite à %s, puis toutes les %s jusqu'à %s
+tr: Una élite a las %s, luego cada %s hasta las %s
+
+fr: Vient de :
+tr: Viene de:
+
+fr: Vole droit sur le héros
+tr: Vuela directo hacia el héroe
+
+fr: Vole les gemmes
+tr: Roba gemas
+
+fr: XP
+tr: EXP
+
+fr: XP dès
+tr: EXP desde
+
+fr: XP en plus
+tr: EXP adicional
+
+fr: en meute de %d
+tr: en manadas de %d
+
+fr: escorte de %s, à %s
+tr: escolta de %s, a las %s
+
+fr: garantie au premier tué
+tr: garantizada en la primera muerte
+
+fr: insensible au gel
+tr: inmune a la congelación
+
+fr: insensible au recul
+tr: inmune al retroceso
+
+fr: invoqué par %s, dès %s
+tr: invocado por %s, desde %s
+
+fr: niveau %d +
+tr: nivel %d +
+
+fr: passe au-dessus de la horde
+tr: pasa por encima de la horda
+
+fr: se cache par moments
+tr: se oculta a ratos
+
+fr: traverse les murs
+tr: atraviesa los muros
+
+fr: vagues, dès %s
+tr: oleadas, desde %s
+
+fr: À %s : %d %s
+tr: A las %s: %d %s
+
+fr: Éclats
+tr: Esquirlas
+
+fr: Élites
+tr: Élites
+
+fr: Élément : %s
+tr: Elemento: %s
+
+fr: Évolution :
+tr: Evolución:
+
+fr: Évolutions dès
+tr: Evoluciones desde
+
+fr: événement de %s
+tr: evento de las %s

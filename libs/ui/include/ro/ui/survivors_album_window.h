@@ -75,6 +75,10 @@ inline constexpr const char* kSurvivorsAlbumId = "survivors_album";
 void DrawSurvivorsAlbumWindow(SurvivorsAlbumState& state, const SurvivorsAlbumView& view,
                               const SkinArt& art);
 
+// LE CORPS DE L'ALBUM — grille, détail, skills à débloquer —, dans la fenêtre
+// courante : l'onglet Cartes du Codex le dessine.
+void DrawSurvivorsAlbumBody(SurvivorsAlbumState& state, const SurvivorsAlbumView& view);
+
 // LA PROGRESSION D'UN EXPLOIT, « 312 / 500 » ou « 03:12 / 05:00 ».
 inline constexpr std::size_t kSurvivorsFeatProgressTextSize = 48;
 [[nodiscard]] std::array<char, kSurvivorsFeatProgressTextSize> SurvivorsFeatProgressText(

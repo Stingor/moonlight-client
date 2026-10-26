@@ -3,9 +3,12 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <span>
+#include <string_view>
 
 #include "ro/ui/skin_art.h"
+#include "ro/ui/survivors_album_window.h"
 
 namespace ro::ui {
 
@@ -252,6 +255,43 @@ struct SurvivorsCodexState {
   // monstre choisi.
   float sprite_box_width = 0.0F;
   float sprite_box_height = 0.0F;
+  // L'onglet que Tab vient de choisir : imposé à la barre jusqu'à ce qu'elle
+  // le montre, la barre n'obéissant qu'à l'image d'après.
+  std::optional<SurvivorsCodexTab> tab_wanted;
 };
+
+// CE QUE LA FENÊTRE REND : `closed` à l'image où sa croix la ferme. Elle se
+// lit seulement ; aucune autre intention n'en sort.
+struct SurvivorsCodexAsk {
+  bool closed = false;
+};
+
+inline constexpr const char* kSurvivorsCodexId = "survivors_codex";
+
+// LA FENÊTRE. Touches, fenêtre au premier plan : Tab passe à l'onglet suivant ;
+// flèches haut et bas dans la liste. L'onglet Cartes dessine l'Album, qui lit
+// ses propres touches.
+SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
+                                           const SurvivorsCodexView& view,
+                                           SurvivorsAlbumState& album_state,
+                                           const SurvivorsAlbumView& album_view,
+                                           const SkinArt& art);
+
+// ── LES PHRASES ÉCRITES (survivors_codex_phrases.cpp) ───────────────────────
+//
+// Une phrase par entrée hors des sorts et des cartes, désignée par sa clé de
+// Codex : ce que fait l'entrée DANS LE MODE, sans chiffre — les chiffres sont
+// dans la fiche, tirés des règles, et une phrase qui en porterait périmerait.
+// Les sorts et les cartes gardent la phrase de leur catalogue.
+
+// La phrase d'une entrée, traduite ; "" pour une clé inconnue.
+[[nodiscard]] const char* SurvivorsCodexPhrase(std::string_view codex_key);
+
+// La table entière, en français, pour l'essai qui la confronte aux règles.
+struct SurvivorsCodexPhraseRow {
+  const char* key = "";
+  const char* french = "";
+};
+[[nodiscard]] std::span<const SurvivorsCodexPhraseRow> SurvivorsCodexPhrases();
 
 }  // namespace ro::ui

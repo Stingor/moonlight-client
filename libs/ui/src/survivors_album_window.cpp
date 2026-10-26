@@ -175,11 +175,19 @@ std::array<char, kSurvivorsFeatProgressTextSize> SurvivorsFeatProgressText(
   return text;
 }
 
+void DrawSurvivorsAlbumBody(SurvivorsAlbumState& state, const SurvivorsAlbumView& view) {
+  if (!view.cards.empty()) state.cursor = std::min(state.cursor, view.cards.size() - 1);
+  if (state.detail.has_value() && *state.detail >= view.cards.size()) state.detail.reset();
+  const std::size_t columns = ColumnsFor(ImGui::GetContentRegionAvail().x);
+  DrawGrid(state, view, columns);
+  ReadKeys(state, view.cards.size(), columns);
+  if (state.detail.has_value()) DrawDetail(view.cards[*state.detail], view);
+  DrawFeats(view);
+}
+
 void DrawSurvivorsAlbumWindow(SurvivorsAlbumState& state, const SurvivorsAlbumView& view,
                               const SkinArt& art) {
   if (!state.open) return;
-  if (!view.cards.empty()) state.cursor = std::min(state.cursor, view.cards.size() - 1);
-  if (state.detail.has_value() && *state.detail >= view.cards.size()) state.detail.reset();
   static WindowName name(kAlbumTitle, kSurvivorsAlbumId);
   ImGui::SetNextWindowSize(ImVec2(kFirstWidth, kFirstHeight), ImGuiCond_FirstUseEver);
   ConstrainNextWindowToScreen(name.Get());
@@ -187,11 +195,7 @@ void DrawSurvivorsAlbumWindow(SurvivorsAlbumState& state, const SurvivorsAlbumVi
     EndSkinnedWindow();
     return;
   }
-  const std::size_t columns = ColumnsFor(ImGui::GetContentRegionAvail().x);
-  DrawGrid(state, view, columns);
-  ReadKeys(state, view.cards.size(), columns);
-  if (state.detail.has_value()) DrawDetail(view.cards[*state.detail], view);
-  DrawFeats(view);
+  DrawSurvivorsAlbumBody(state, view);
   EndSkinnedWindow();
 }
 

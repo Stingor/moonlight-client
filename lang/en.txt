@@ -20977,3 +20977,471 @@ tr: Midgard Survivors: your run of %s was not counted: already received or lost 
 
 fr: Survivants de Midgard : votre partie du %s est oubliée : son jeton a expiré.
 tr: Midgard Survivors: your run of %s is forgotten: its ticket expired.
+
+fr: %lld,%s
+tr: %lld.%s
+
+fr: %s %%
+tr: %s%%
+
+fr: %s case
+tr: %s cell
+
+fr: %s cases
+tr: %s cells
+
+fr: %s s
+tr: %s s
+
+fr: %s — de %d %% à %d %% de PV
+tr: %s — from %d%% to %d%% HP
+
+fr: + niveau %d donne
+tr: + level %d gives
+
+fr: 1 chance sur %u
+tr: 1 chance in %u
+
+fr: Abat d'un coup les monstres communs autour du héros ; les boss y résistent.
+tr: Fells the common monsters around the hero at once; bosses withstand it.
+
+fr: Aire
+tr: Area
+
+fr: Arrive dès %s
+tr: Arrives from %s
+
+fr: Arrive à %s
+tr: Arrives at %s
+
+fr: Attaques
+tr: Attacks
+
+fr: Attire au héros toutes les gemmes du terrain.
+tr: Pulls every gem on the field to the hero.
+
+fr: Aucune source ne l'amène.
+tr: Nothing brings it.
+
+fr: Augmente l'expérience gagnée un moment.
+tr: Raises the experience gained for a while.
+
+fr: Bondit de %s toutes les %s, annoncé %s avant
+tr: Leaps %s every %s, announced %s before
+
+fr: Bondit vers le héros
+tr: Leaps toward the hero
+
+fr: Bondit vers le héros après une courte annonce.
+tr: Leaps toward the hero after a short warning.
+
+fr: Boss et événements
+tr: Bosses and events
+
+fr: Carte :
+tr: Card:
+
+fr: Chance au tirage
+tr: Draw chance
+
+fr: Chance de cinq gains
+tr: Chance of five rewards
+
+fr: Chance de trois gains
+tr: Chance of three rewards
+
+fr: Charge en ligne droite
+tr: Charges in a straight line
+
+fr: Charge sur %s toutes les %s, annoncée %s avant
+tr: Charges %s every %s, announced %s before
+
+fr: Chasse en meute : quand l'un vient, les autres suivent.
+tr: Hunts in packs: when one comes, the others follow.
+
+fr: Codex des Survivants
+tr: Survivors' Codex
+
+fr: Contact en plus
+tr: Extra contact damage
+
+fr: Des Ghouls referment un anneau autour du héros.
+tr: Ghouls close a ring around the hero.
+
+fr: Des Pupas se posent en anneau et enferment le héros.
+tr: Pupas settle in a ring and trap the hero.
+
+fr: Des Spores se posent en anneau autour du héros.
+tr: Spores settle in a ring around the hero.
+
+fr: Des Zeny gardés au carnet à la fin de la partie.
+tr: Zeny kept in the logbook at the end of the run.
+
+fr: Disparaît par moments : ni visé, ni touché, ni touchant.
+tr: Vanishes at times: neither targeted, nor hit, nor hitting.
+
+fr: Durée de l'effet
+tr: Effect duration
+
+fr: Dégâts au contact
+tr: Contact damage
+
+fr: Dégâts de base, avant cartes et niveau du héros.
+tr: Base damage, before cards and the hero's level.
+
+fr: Escorte : %d %s
+tr: Escort: %d %s
+
+fr: Faible à : %s
+tr: Weak to: %s
+
+fr: Fonce en ligne droite après s'être arrêté un instant.
+tr: Rushes in a straight line after stopping for a moment.
+
+fr: Gèle
+tr: Freezes
+
+fr: Hurle toutes les %s : les %s marchent %d %% plus vite pendant %s
+tr: Howls every %s: the %s walk %d%% faster for %s
+
+fr: Immobile
+tr: Motionless
+
+fr: Intervalle de contact
+tr: Contact interval
+
+fr: Invoque %d %s toutes les %s
+tr: Summons %d %s every %s
+
+fr: La gemme d'expérience la plus riche.
+tr: The richest experience gem.
+
+fr: La nuit tombe à %s ; minuit à %s
+tr: Night falls at %s; midnight at %s
+
+fr: La plus petite gemme d'expérience.
+tr: The smallest experience gem.
+
+fr: La plus rare : elle lâche de l'eau bénite.
+tr: The rarest: it drops holy water.
+
+fr: Laisse en mourant une flaque de poison qui blesse.
+tr: Leaves a harmful poison puddle when it dies.
+
+fr: Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.
+tr: The sky darkens until midnight, and the undead rise.
+
+fr: Le héros marche plus vite un moment.
+tr: The hero walks faster for a while.
+
+fr: Le premier des morts-vivants, qui annonce la nuit.
+tr: The first of the undead, heralding the night.
+
+fr: Le premier mini-boss : il appelle des Porings à la rescousse.
+tr: The first mini-boss: it calls Porings to its aid.
+
+fr: Le premier venu : petit, rapide et fragile.
+tr: The first to come: small, quick and frail.
+
+fr: Le seigneur de l'arène : charge, invoque, fait trembler le sol. Sa chute est la victoire.
+tr: The lord of the arena: charges, summons, shakes the ground. Its fall is victory.
+
+fr: Lent, mais il faut frapper longtemps pour l'abattre.
+tr: Slow, but it takes a long beating to bring down.
+
+fr: Longueur
+tr: Length
+
+fr: Lâche :
+tr: Drops:
+
+fr: Lâché par les élites et les mini-boss : un ou plusieurs gains, parfois une évolution.
+tr: Dropped by elites and mini-bosses: one or more rewards, sometimes an evolution.
+
+fr: Marche en plus
+tr: Extra walk speed
+
+fr: Marche, par case
+tr: Walk, per cell
+
+fr: Ne naît que des invocations de Baphomet.
+tr: Only born from Baphomet's summons.
+
+fr: Ne vient qu'en raid, et frappe fort.
+tr: Only comes in a raid, and hits hard.
+
+fr: Nuée
+tr: Swarm
+
+fr: PV en plus
+tr: Extra HP
+
+fr: PV en plus par minute
+tr: Extra HP per minute
+
+fr: Perce
+tr: Pierce
+
+fr: Plantes
+tr: Plants
+
+fr: Poursuit le héros
+tr: Chases the hero
+
+fr: Raid
+tr: Raid
+
+fr: Ralentit
+tr: Slows
+
+fr: Ramasse les gemmes laissées au sol, et rend leur expérience à sa mort.
+tr: Picks up gems left on the ground, and gives their experience back when it dies.
+
+fr: Rebondit droit sur le héros ; sa carte est la plus connue.
+tr: Bounces straight at the hero; its card is the best known.
+
+fr: Rebonds
+tr: Bounces
+
+fr: Recharge
+tr: Cooldown
+
+fr: Rend des PV au héros.
+tr: Restores HP to the hero.
+
+fr: Résiste à : %s
+tr: Resists: %s
+
+fr: Sa chute est la victoire.
+tr: Its fall is victory.
+
+fr: Se débloque : %s
+tr: Unlocks: %s
+
+fr: Se tient à distance et tire après avoir visé ; il ne touche pas au contact.
+tr: Keeps its distance and shoots after aiming; it does not hit on contact.
+
+fr: Son hurlement presse le pas de ses loups.
+tr: Its howl hastens its wolves.
+
+fr: Sorts
+tr: Spells
+
+fr: Séisme : %d cercles de %s toutes les %s, %d dégâts
+tr: Quake: %d circles of %s every %s, %d damage
+
+fr: Taille : %s
+tr: Size: %s
+
+fr: Tire à distance
+tr: Shoots from afar
+
+fr: Touches
+tr: Hits
+
+fr: Touché, s'éloigne %s, au plus toutes les %s
+tr: When hit, moves away for %s, at most every %s
+
+fr: Un Poring de feu, plus coriace que ses cousins.
+tr: A fire Poring, tougher than its cousins.
+
+fr: Un arbre animé, plus solide qu'il n'en a l'air.
+tr: A living tree, sturdier than it looks.
+
+fr: Un champignon empoisonné, plus dur que le premier.
+tr: A poisonous mushroom, tougher than the first.
+
+fr: Un champignon robuste, posé en anneau autour du héros.
+tr: A sturdy mushroom, set in a ring around the hero.
+
+fr: Un cocon qui ne bouge ni ne frappe : un mur vivant, posé en anneau.
+tr: A cocoon that neither moves nor strikes: a living wall, set in a ring.
+
+fr: Un colosse de pierre que rien ne repousse.
+tr: A stone colossus that nothing pushes back.
+
+fr: Un criquet qui encaisse et frappe sec.
+tr: A cricket that takes hits and strikes hard.
+
+fr: Un destrier spectral qui charge en ligne droite.
+tr: A spectral steed charging in a straight line.
+
+fr: Un druide maudit, le plus robuste des communs.
+tr: A cursed druid, the sturdiest of the common monsters.
+
+fr: Un esprit d'eau qui hante la fin de la nuit.
+tr: A water spirit haunting the end of the night.
+
+fr: Un essaim de Hornets arrive d'un même côté.
+tr: A swarm of Hornets comes from one side.
+
+fr: Un fantôme qui traverse les murs et survole la horde.
+tr: A ghost that passes through walls and flies over the horde.
+
+fr: Un frelon rapide qui pique en essaim.
+tr: A quick hornet that stings in swarms.
+
+fr: Un guerrier solide, qui tient la ligne de front.
+tr: A sturdy warrior holding the front line.
+
+fr: Un insecte cuirassé aux coups tranchants.
+tr: An armoured insect with cutting blows.
+
+fr: Un lapin qui bondit vers le héros, escorté de Lunatics.
+tr: A rabbit leaping toward the hero, escorted by Lunatics.
+
+fr: Un monstre de la vague, bien plus robuste, qui lâche une Old Blue Box.
+tr: A monster of the wave, far sturdier, that drops an Old Blue Box.
+
+fr: Un mort affamé, qui finit par cerner le héros en anneau.
+tr: A hungry corpse that ends up surrounding the hero in a ring.
+
+fr: Un oiseau rapide qui fond sur le héros.
+tr: A quick bird swooping on the hero.
+
+fr: Un ours massif, lent mais redoutable.
+tr: A massive bear, slow but fearsome.
+
+fr: Un petit sauvageon, lent mais tenace.
+tr: A little wild boar, slow but stubborn.
+
+fr: Un raid de Goblins charge le héros.
+tr: A raid of Goblins charges the hero.
+
+fr: Un singe agile qui se faufile dans la horde.
+tr: A nimble monkey weaving through the horde.
+
+fr: Un spectre lourd parmi les derniers venus.
+tr: A heavy wraith among the last to come.
+
+fr: Un squelette d'orc, plus dur que les morts-vivants d'avant.
+tr: An orc skeleton, tougher than the undead before it.
+
+fr: Une bande de Thief Bugs vient voler les gemmes.
+tr: A band of Thief Bugs comes to steal the gems.
+
+fr: Une carte tombée d'un monstre : elle reste au sol jusqu'à la fin, et rejoint l'Album.
+tr: A card dropped by a monster: it stays on the ground until the end, and joins the Album.
+
+fr: Une chauve-souris qui survole la horde pour atteindre le héros.
+tr: A bat that flies over the horde to reach the hero.
+
+fr: Une gemme d'expérience précieuse.
+tr: A precious experience gem.
+
+fr: Une gemme qui vaut plus d'expérience.
+tr: A gem worth more experience.
+
+fr: Une larve lente, qui vient en nombre dès le départ.
+tr: A slow larva that comes in numbers from the start.
+
+fr: Une libellule qui s'éloigne dès qu'on la touche.
+tr: A dragonfly that moves away as soon as it is hit.
+
+fr: Une momie lente qui encaisse beaucoup.
+tr: A slow mummy that takes a lot of punishment.
+
+fr: Une mouche chasseresse qui survole la horde.
+tr: A hunting fly that flies over the horde.
+
+fr: Une mouche vive qui arrive en nuée avant ses vagues.
+tr: A lively fly that arrives in a swarm before its waves.
+
+fr: Une nuée de Chonchons fond sur le héros.
+tr: A swarm of Chonchons swoops on the hero.
+
+fr: Une nuée de Familiars traverse la horde.
+tr: A swarm of Familiars crosses the horde.
+
+fr: Une plante qui lâche de l'or.
+tr: A plant that drops gold.
+
+fr: Une plante qui lâche de la viande, pour reprendre des forces.
+tr: A plant that drops meat, to regain strength.
+
+fr: Une plante qui lâche un manuel de combat.
+tr: A plant that drops a battle manual.
+
+fr: Une plante qui lâche une potion de vitesse.
+tr: A plant that drops a speed potion.
+
+fr: Une plante rare qui lâche de quoi attirer toutes les gemmes.
+tr: A rare plant that drops something to pull in every gem.
+
+fr: Une revenante qui frappe dur au contact.
+tr: A revenant that hits hard on contact.
+
+fr: Une élite à %s, puis toutes les %s jusqu'à %s
+tr: An elite at %s, then every %s until %s
+
+fr: Vient de :
+tr: Comes from:
+
+fr: Vole droit sur le héros
+tr: Flies straight at the hero
+
+fr: Vole les gemmes
+tr: Steals gems
+
+fr: XP
+tr: XP
+
+fr: XP dès
+tr: XP from
+
+fr: XP en plus
+tr: Extra XP
+
+fr: en meute de %d
+tr: in packs of %d
+
+fr: escorte de %s, à %s
+tr: escort of %s, at %s
+
+fr: garantie au premier tué
+tr: guaranteed on the first kill
+
+fr: insensible au gel
+tr: immune to freezing
+
+fr: insensible au recul
+tr: immune to knockback
+
+fr: invoqué par %s, dès %s
+tr: summoned by %s, from %s
+
+fr: niveau %d +
+tr: level %d +
+
+fr: passe au-dessus de la horde
+tr: passes over the horde
+
+fr: se cache par moments
+tr: hides at times
+
+fr: traverse les murs
+tr: passes through walls
+
+fr: vagues, dès %s
+tr: waves, from %s
+
+fr: À %s : %d %s
+tr: At %s: %d %s
+
+fr: Éclats
+tr: Splash
+
+fr: Élites
+tr: Elites
+
+fr: Élément : %s
+tr: Element: %s
+
+fr: Évolution :
+tr: Evolution:
+
+fr: Évolutions dès
+tr: Evolutions from
+
+fr: événement de %s
+tr: event at %s
