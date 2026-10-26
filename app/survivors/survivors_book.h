@@ -131,4 +131,9 @@ SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& s
                           const SurvivorsEnding& ending, const ro::sim::SurvivorsStart& start,
                           std::int64_t now_utc_s);
 
+// CE QU'UNE PARTIE A VU ENTRE AU CODEX DU CARNET, quelle que soit son issue :
+// ajouté dans l'ordre du relevé, sans doublon, et rien n'est jamais retiré.
+// Vrai quand le carnet a changé.
+bool CreditSightings(SurvivorsSave& save, const SurvivorsCodexSeen& sightings);
+
 }  // namespace moonclient

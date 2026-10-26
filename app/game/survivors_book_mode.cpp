@@ -70,6 +70,7 @@ void SurvivorsBookMode::Credit(const SurvivorsStage& stage, const ro::sim::Survi
   const ro::core::Result<SurvivorsSaveRead> written =
       file_.Mutate(client_root, [&](SurvivorsSave& save) {
         credit = CreditRun(rules, save, ending, start, now_utc_s);
+        CreditSightings(save, stage.sightings());
         return true;
       });
   if (!written) {

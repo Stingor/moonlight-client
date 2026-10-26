@@ -16,6 +16,7 @@
 
 #include "survivors/presentation_clock.h"
 #include "survivors/survivors_keys.h"
+#include "survivors/survivors_sightings.h"
 
 namespace moonclient {
 
@@ -162,6 +163,10 @@ class SurvivorsStage {
   [[nodiscard]] const SurvivorsEnding* ending() const noexcept;
   // Le tableau de la partie commencée.
   [[nodiscard]] const SurvivorsRunBoard& board() const noexcept { return board_; }
+  // CE QUE LA PARTIE A VU, pour le Codex : vidé par `Begin`, nourri au départ
+  // puis à chaque prise des nouvelles. Hors de `SurvivorsEnding`, que la partie
+  // interrompue écrit et compare entière.
+  [[nodiscard]] const SurvivorsCodexSeen& sightings() const noexcept { return sightings_; }
 
  private:
   void Enter(SurvivorsScreen screen);
@@ -187,6 +192,7 @@ class SurvivorsStage {
   SurvivorsRunBoard board_;
   ro::sim::SurvivorsNews news_;
   std::vector<ro::sim::SurvivorsChestNews> chests_;
+  SurvivorsCodexSeen sightings_;
   PresentationClock presentation_;
   InputGuard guard_;
   std::uint64_t clock_ms_ = 0;  // temps d'écran depuis l'ouverture

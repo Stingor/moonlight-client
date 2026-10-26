@@ -14,6 +14,7 @@
 #include "ro/sim/survivors_records.h"
 
 #include "survivors/survivors_pending.h"
+#include "survivors/survivors_sightings.h"
 
 namespace moonclient {
 
@@ -31,7 +32,9 @@ namespace moonclient {
 // - `records` : les dix meilleures parties par (classe, arène, tableau, et
 //   semaine pour le défi) ;
 // - `pending_results` : les parties classées dont le serveur n'a pas encore
-//   rendu le verdict, à lui renvoyer.
+//   rendu le verdict, à lui renvoyer ;
+// - `codex` : ce que les parties ont vu, par catégorie (`survivors_codex_save.h`),
+//   écrite seulement quand quelque chose a été vu.
 //
 // Les cartes, classes, arènes, skills et Bénédictions se rangent par leur CLÉ
 // du catalogue, jamais par un rang. ⚠ UNE CLÉ OU UNE SECTION INCONNUE (celle
@@ -140,6 +143,8 @@ struct SurvivorsSave {
   // Le texte YAML d'une entrée que ce client ne sait pas lire, ou qui ne peut
   // pas partir : réécrite après les siennes, jamais envoyée.
   std::vector<std::string> foreign_pending;
+  // Ce que les parties ont vu, pour le Codex.
+  SurvivorsCodexSeen codex;
   // Les sections inconnues, et les sections connues d'une autre forme : une de
   // ces dernières se réécrit à la place de la sienne tant que celle-ci est
   // restée à son défaut.

@@ -9,25 +9,12 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_state.h"
 
+#include "survivors/survivors_gems.h"
+
 // LA TABLE D'APPARENCE DES ACTEURS DU MODE SURVIVORS : ce que la simulation
 // nomme par des identifiants (espèce, objet, classe) devient une apparence que
 // la garde-robe habille. La simulation n'en sait rien ; `app` seul la lit.
 namespace moonclient {
-
-// LES GEMMES D'EXPÉRIENCE (U26) : la valeur se lit à la couleur. Une gemme
-// d'une unité est bleue, puis jaune, rouge, et l'Emperium porte les gemmes
-// fusionnées les plus lourdes.
-inline constexpr std::uint16_t kBlueGemstoneItem = 717;
-inline constexpr std::uint16_t kYellowGemstoneItem = 715;
-inline constexpr std::uint16_t kRedGemstoneItem = 716;
-inline constexpr std::uint16_t kEmperiumItem = 714;
-// Le premier nombre d'XP de chaque couleur au-delà du bleu.
-inline constexpr std::uint32_t kYellowGemFromExp = 2;
-inline constexpr std::uint32_t kRedGemFromExp = 10;
-inline constexpr std::uint32_t kEmperiumFromExp = 50;
-
-// L'objet qui montre une gemme de `exp` points.
-[[nodiscard]] std::uint16_t GemItemOf(std::uint32_t exp) noexcept;
 
 // Un monstre ou une plante : un sprite unique, nommé par sa classe.
 [[nodiscard]] ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept;

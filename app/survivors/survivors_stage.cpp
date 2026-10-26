@@ -61,6 +61,8 @@ ro::core::Result<void> SurvivorsStage::Begin(const ro::sim::SurvivorsRules& rule
   pause_cause_ = PauseCause::kPlayer;
   held_pause_.reset();
   arrival_ms_ = 0;
+  sightings_ = {};
+  NoteSightings(sightings_, play_->run().field(), news_, presentation_.presentation_ms());
   Enter(SurvivorsScreen::kLoading);
   return {};
 }
@@ -268,6 +270,7 @@ void SurvivorsStage::FollowRun() {
 void SurvivorsStage::TakeNews() {
   news_ = play_->TakeNews();
   chests_.insert(chests_.end(), news_.chests.begin(), news_.chests.end());
+  NoteSightings(sightings_, play_->run().field(), news_, presentation_.presentation_ms());
 }
 
 }  // namespace moonclient

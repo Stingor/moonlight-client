@@ -355,4 +355,8 @@ SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& s
   return credit;
 }
 
+bool CreditSightings(SurvivorsSave& save, const SurvivorsCodexSeen& sightings) {
+  return Merge(save.codex, sightings);
+}
+
 }  // namespace moonclient

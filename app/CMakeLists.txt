@@ -764,6 +764,8 @@ add_library(moonclient_minigames STATIC
     game/minigame_stage.cpp
     game/minigame_trophy_announcer.cpp
     game/survivors_book_mode.cpp
+    game/survivors_codex_desk.cpp
+    game/survivors_codex_foes.cpp
     game/survivors_meta_desk.cpp
     game/survivors_ranking_desk.cpp
     game/survivors_ranking_mode.cpp
@@ -781,7 +783,8 @@ target_include_directories(moonclient_minigames PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # de la musique, la route des événements et le relevé du monde réel ne
 # connaissent que `core` et `sim`, et se vérifient sans GPU ni SDL. La session de classement lit et
 # écrit en plus les trames du service par `net`, sans liaison. yaml-cpp, en privé, lit et écrit le
-# carnet du mode (`savedata\survivors.yml`) : réglages, méta, Album, records et résultats en attente.
+# carnet du mode (`savedata\survivors.yml`) : réglages, méta, Album, records, résultats en attente
+# et ce que le Codex a vu.
 add_library(moonclient_survivors STATIC
     survivors/arena_measures.cpp
     survivors/arena_music.cpp
@@ -791,6 +794,8 @@ add_library(moonclient_survivors STATIC
     survivors/presentation_clock.cpp
     survivors/real_world_watch.cpp
     survivors/survivors_book.cpp
+    survivors/survivors_codex_keys.cpp
+    survivors/survivors_codex_save.cpp
     survivors/survivors_door.cpp
     survivors/survivors_file.cpp
     survivors/survivors_keys.cpp
@@ -800,6 +805,7 @@ add_library(moonclient_survivors STATIC
     survivors/survivors_save.cpp
     survivors/survivors_save_file.cpp
     survivors/survivors_screen_look.cpp
+    survivors/survivors_sightings.cpp
     survivors/survivors_stage.cpp
     survivors/survivors_world_facts.cpp)
 

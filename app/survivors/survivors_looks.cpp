@@ -66,13 +66,6 @@ namespace {
 
 }  // namespace
 
-std::uint16_t GemItemOf(std::uint32_t exp) noexcept {
-  if (exp >= kEmperiumFromExp) return kEmperiumItem;
-  if (exp >= kRedGemFromExp) return kRedGemstoneItem;
-  if (exp >= kYellowGemFromExp) return kYellowGemstoneItem;
-  return kBlueGemstoneItem;
-}
-
 ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept {
   return ro::render::ActorLook{.job = foe_id};
 }

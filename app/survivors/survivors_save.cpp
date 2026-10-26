@@ -20,6 +20,8 @@
 
 #include "ro/sim/survivors_week.h"
 
+#include "survivors/survivors_codex_save.h"
+
 namespace moonclient {
 namespace {
 
@@ -70,8 +72,10 @@ constexpr const char* kWeekField = "week";
 
 constexpr const char* kPendingSection = "pending_results";
 
-constexpr std::array<const char*, 5> kKnownSections{kOptionsSection, kMetaSection, kAlbumSection,
-                                                    kRecordsSection, kPendingSection};
+constexpr const char* kCodexSection = "codex";
+
+constexpr std::array<const char*, 6> kKnownSections{
+    kOptionsSection, kMetaSection, kAlbumSection, kRecordsSection, kPendingSection, kCodexSection};
 
 // Les issues d'une partie, par leur clé.
 struct OutcomeKey {
@@ -95,7 +99,8 @@ constexpr const char* kFileHeader =
     "# album : les cartes trouvees, les exploits, les compteurs.\n"
     "# records : les dix meilleures parties de chaque tableau.\n"
     "# pending_results : les parties classees dont le serveur n'a pas encore\n"
-    "# rendu le verdict.\n";
+    "# rendu le verdict.\n"
+    "# codex : ce que les parties ont vu, sorts, monstres, plantes, objets, evenements.\n";
 
 using ro::sim::kSecondsPerDay;
 using ro::sim::kSecondsPerHour;
@@ -585,6 +590,15 @@ void WritePending(YAML::Emitter& out, const PendingPart& pending) {
   out << YAML::EndSeq;
 }
 
+// LE CODEX NE S'ÉCRIT QUE QUAND QUELQUE CHOSE A ÉTÉ VU : un carnet sans
+// `codex` se réécrit sans section vide.
+void WriteCodex(YAML::Emitter& out, const SurvivorsCodexSeen& codex) {
+  if (codex == SurvivorsCodexSeen{}) return;
+  if (const std::optional<YAML::Node> kept = KeptNode(WriteSurvivorsCodex(codex))) {
+    out << YAML::Key << kCodexSection << YAML::Value << *kept;
+  }
+}
+
 [[nodiscard]] bool IsKnownSection(const std::string& key) {
   return std::ranges::find(kKnownSections, key) != kKnownSections.end();
 }
@@ -638,6 +652,9 @@ ro::core::Result<SurvivorsSave> ReadSurvivorsSave(std::string_view text) {
         }
       }
     }
+    if (const YAML::Node codex = whole[kCodexSection]; codex && codex.IsMap()) {
+      save.codex = ReadSurvivorsCodex(YamlText(codex));
+    }
     for (const auto& entry : whole) {
       if (!entry.first.IsScalar()) continue;
       const std::string& key = entry.first.Scalar();
@@ -667,6 +684,7 @@ std::string WriteSurvivorsSave(const SurvivorsSave& save) {
   } else {
     WritePending(out, pending);
   }
+  WriteKnown(out, kCodexSection, save.codex, foreign, WriteCodex);
   WriteKeptUnless(out, foreign, IsKnownSection);
   out << YAML::EndMap;
   return std::string(kFileHeader) + out.c_str() + "\n";
