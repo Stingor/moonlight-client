@@ -17,6 +17,7 @@
 #include "ro/sim/level_up_effect.h"
 #include "ro/sim/survivors_journal.h"
 
+#include "game/survivors_codex_desk.h"
 #include "game/survivors_mode_slot.h"
 #include "game/survivors_ranking_desk.h"
 #include "options/game_option_ids.h"
@@ -189,7 +190,7 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
                         refusal.has_value() ? RefusalText(*refusal) : nullptr, key_labels_,
                         context.tables);
   views_.ComposeMeta(windows.survivors_prepare_view, windows.survivors_meta, desk_, book_, Rules(),
-                     context.tables, context.ranking);
+                     context.tables, context.ranking, context.now_ms);
   windows.survivors_prepare_composed = true;
   if (asked.start && !refusal.has_value()) Enter(stage, context, ChosenBolt());
 }
@@ -448,6 +449,10 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
 
   SurvivorsGestures gestures = route_.TakeGestures();
   pressed_card_key_ = gestures.pressed_card_key;
+  // LE CODEX PAR-DESSUS LA PAUSE prend Échap et la molette avant les options :
+  // ouvert, il est le dernier venu, la pause qui les ouvre étant cachée sous lui.
+  (void)FollowCodexOverPause(stage.screen(), ask_.pause.open_codex, gestures,
+                             context.minigames->survivors_meta.codex);
   // LES OPTIONS DU JEU PAR-DESSUS LA PAUSE prennent Échap d'abord, et la
   // molette, qui fait défiler leurs pages et non reculer la caméra.
   bool* options_open = context.options_window != nullptr ? &context.options_window->open : nullptr;
@@ -724,7 +729,8 @@ SurvivorsFrameView SurvivorsMode::View(const SurvivorsStage& stage,
                          .save = &desk_.save(),
                          .trophies = trophies_.won(),
                          .meta = &context.minigames->survivors_meta,
-                         .ranking = context.ranking},
+                         .ranking = context.ranking,
+                         .now_ms = context.now_ms},
       context.tables);
   if (sign_view_.has_value()) view.map_sign = &*sign_view_;
   if (context.options_window != nullptr &&

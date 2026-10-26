@@ -19,7 +19,7 @@ namespace ro::ui {
 // « Partie libre » (le bolt, la Cursed Water et son bonus, le résumé du
 // départ acheté) et « Défi de la semaine » (sa semaine, le temps qui reste, le
 // bolt imposé, le départ neutre, le meilleur score) ; en pied le solde et
-// quatre boutons qui ouvrent l'Église, la Kafra, l'Album et les records.
+// quatre boutons qui ouvrent l'Église, la Kafra, le Codex et les records.
 // Sans méta, la préparation reste celle d'avant.
 //
 // AVEC LE CLASSEMENT OUVERT PAR LE SERVEUR (`meta->ranking`, Q2, Q4, Q6), un
@@ -43,7 +43,7 @@ struct SurvivorsBoltChoice {
 
 enum class SurvivorsBoardTab : std::uint8_t { kFree, kChallenge, kRanked };
 // Les lieux de la méta qu'ouvre l'accueil.
-enum class SurvivorsMetaPlace : std::uint8_t { kChurch, kKafra, kAlbum, kRecords };
+enum class SurvivorsMetaPlace : std::uint8_t { kChurch, kKafra, kCodex, kRecords };
 
 // Un résultat de partie classée gardé au carnet, pas encore compté.
 struct SurvivorsPendingRow {

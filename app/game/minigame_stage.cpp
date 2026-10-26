@@ -5,8 +5,8 @@
 #include <utility>
 
 #include "ro/sim/survivors_trophies.h"
-#include "ro/ui/survivors_album_window.h"
 #include "ro/ui/survivors_church_window.h"
+#include "ro/ui/survivors_codex_window.h"
 #include "ro/ui/survivors_kafra_window.h"
 #include "ro/ui/survivors_ranking_window.h"
 #include "ro/ui/survivors_records_window.h"
@@ -66,7 +66,7 @@ void DrawSurvivorsMetaWindows(SurvivorsMetaWindows& meta, const ro::ui::SkinArt&
                               ro::ui::EscapeStack& escape) {
   escape.Register(ro::ui::kSurvivorsChurchId, &meta.church.open);
   escape.Register(ro::ui::kSurvivorsKafraId, &meta.kafra.open);
-  escape.Register(ro::ui::kSurvivorsAlbumId, &meta.album.open);
+  escape.Register(ro::ui::kSurvivorsCodexId, &meta.codex.open);
   escape.Register(ro::ui::kSurvivorsRecordsId, &meta.records.open);
   escape.Register(ro::ui::kSurvivorsRankingId, &meta.ranking.open);
   if (meta.church.open) {
@@ -75,7 +75,11 @@ void DrawSurvivorsMetaWindows(SurvivorsMetaWindows& meta, const ro::ui::SkinArt&
   if (meta.kafra.open) {
     meta.kafra_answer = ro::ui::DrawSurvivorsKafraWindow(meta.kafra, meta.kafra_view, art);
   }
-  if (meta.album.open) ro::ui::DrawSurvivorsAlbumWindow(meta.album, meta.album_view, art);
+  // Le Codex se lit seulement : sa croix ferme sa case, rien d'autre à router.
+  if (meta.codex.open) {
+    (void)ro::ui::DrawSurvivorsCodexWindow(meta.codex, meta.codex_view, meta.album, meta.album_view,
+                                           art);
+  }
   if (meta.records.open) ro::ui::DrawSurvivorsRecordsWindow(meta.records, meta.records_view, art);
   if (meta.ranking.open) {
     meta.ranking_answer = ro::ui::DrawSurvivorsRankingWindow(meta.ranking, meta.ranking_view, art);
@@ -113,7 +117,7 @@ bool SurvivorsClaimsEnter(const MinigameWindows& windows) {
   return claims(true, ro::ui::kSurvivorsPrepareId) ||
          claims(meta.church.open, ro::ui::kSurvivorsChurchId) ||
          claims(meta.kafra.open, ro::ui::kSurvivorsKafraId) ||
-         claims(meta.album.open, ro::ui::kSurvivorsAlbumId);
+         claims(meta.codex.open, ro::ui::kSurvivorsCodexId);
 }
 
 static_assert(ro::ui::kRojeweledSide == ro::sim::kMatch3Side);

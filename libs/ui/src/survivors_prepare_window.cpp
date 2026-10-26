@@ -217,7 +217,7 @@ void DrawPlaces(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, co
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Kafra"), art)) asked.open_place = SurvivorsMetaPlace::kKafra;
   ImGui::SameLine();
-  if (SkinSmallButton(core::Tr("Album"), art)) asked.open_place = SurvivorsMetaPlace::kAlbum;
+  if (SkinSmallButton(core::Tr("Codex"), art)) asked.open_place = SurvivorsMetaPlace::kCodex;
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Records"), art)) asked.open_place = SurvivorsMetaPlace::kRecords;
   if (!meta.ranking.has_value()) return;

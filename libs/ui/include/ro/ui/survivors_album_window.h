@@ -8,8 +8,6 @@
 
 #include <imgui.h>
 
-#include "ro/ui/skin_art.h"
-
 namespace ro::ui {
 
 // L'ALBUM DES SURVIVANTS (Q12) : une grille des cartes de l'arène — trouvée,
@@ -21,8 +19,9 @@ namespace ro::ui {
 // 🔴 UNE CARTE NON TROUVÉE NE MONTRE JAMAIS SON ILLUSTRATION, ni dans la
 // grille ni dans le détail : le trou est ce qui donne envie de la chercher.
 //
-// La fenêtre se lit seulement : elle ne rend aucune intention. Touches,
-// fenêtre au premier plan : flèches dans la grille, Entrée ouvre le détail.
+// L'Album est l'onglet Cartes du Codex, qui dessine son corps. Il se lit
+// seulement : il ne rend aucune intention. Touches, fenêtre au premier plan :
+// flèches dans la grille, Entrée ouvre le détail.
 
 // Une carte de l'arène, déjà résolue par `app`.
 struct SurvivorsAlbumEntry {
@@ -65,15 +64,9 @@ struct SurvivorsAlbumView {
 };
 
 struct SurvivorsAlbumState {
-  bool open = false;
   std::size_t cursor = 0;
   std::optional<std::size_t> detail;
 };
-
-inline constexpr const char* kSurvivorsAlbumId = "survivors_album";
-
-void DrawSurvivorsAlbumWindow(SurvivorsAlbumState& state, const SurvivorsAlbumView& view,
-                              const SkinArt& art);
 
 // LE CORPS DE L'ALBUM — grille, détail, skills à débloquer —, dans la fenêtre
 // courante : l'onglet Cartes du Codex le dessine.

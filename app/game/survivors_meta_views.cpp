@@ -1,5 +1,5 @@
 // LA MÉTA DANS LES VUES DU MODE SURVIVORS : l'accueil et ses fenêtres (Église,
-// Kafra, Album, records), le crédit de l'écran de fin et ce que le HUD montre
+// Kafra, Codex, records), le crédit de l'écran de fin et ce que le HUD montre
 // du départ acheté. Les nombres viennent du carnet (`survivors_meta_desk.h`),
 // dans l'ordre qu'il dit ; ici s'ajoutent les noms, les icônes et les
 // illustrations des tables du jeu. Le classement s'y pose de même, lu dans la
@@ -42,8 +42,8 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
                                  SurvivorsMetaWindows& windows, const SurvivorsMetaDesk& desk,
                                  const SurvivorsBookMode& book,
                                  const ro::sim::SurvivorsRules& rules,
-                                 const SurvivorsTables& tables,
-                                 const SurvivorsRankingMode* ranking) {
+                                 const SurvivorsTables& tables, const SurvivorsRankingMode* ranking,
+                                 std::uint32_t now_ms) {
   const SurvivorsSave& save = desk.save();
   const std::int64_t now_utc_s = book.now_utc();
   ro::ui::SurvivorsPrepareMeta meta = PrepareMetaOf(rules, save, book.chosen(), now_utc_s);
@@ -63,7 +63,7 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   prepare.meta = meta;
   if (windows.church.open) ComposeShop(SurvivorsMetaShop::kChurch, windows, save, tables);
   if (windows.kafra.open) ComposeShop(SurvivorsMetaShop::kKafra, windows, save, tables);
-  if (windows.album.open) ComposeAlbum(windows, save, rules, tables);
+  if (windows.codex.open) ComposeCodex(windows, save, nullptr, rules, tables, now_ms);
   if (windows.records.open) {
     const std::optional<SurvivorsCredit>& credit = book.credit();
     windows.records_view = RecordsViewOf(

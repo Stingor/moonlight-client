@@ -159,6 +159,16 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
       ComposePause(stage, field, facts);
       view.pause = &pause_;
       view.pause_state = &pause_state_;
+      // LE CODEX DE LA PAUSE montre déjà ce que la partie a vu, avant tout
+      // crédit au carnet.
+      if (facts.meta != nullptr && facts.meta->codex.open && facts.save != nullptr) {
+        SurvivorsMetaWindows& meta = *facts.meta;
+        ComposeCodex(meta, *facts.save, &stage.sightings(), rules, tables, facts.now_ms);
+        view.codex = &meta.codex_view;
+        view.codex_state = &meta.codex;
+        view.album = &meta.album_view;
+        view.album_state = &meta.album;
+      }
       break;
     case SurvivorsScreen::kDying:
     case SurvivorsScreen::kWon:

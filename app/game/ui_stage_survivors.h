@@ -7,6 +7,7 @@
 #include "ro/ui/options_window.h"
 #include "ro/ui/survivors_album_window.h"
 #include "ro/ui/survivors_chest_window.h"
+#include "ro/ui/survivors_codex_window.h"
 #include "ro/ui/survivors_hud.h"
 #include "ro/ui/survivors_offer_window.h"
 #include "ro/ui/survivors_pause_window.h"
@@ -45,6 +46,12 @@ struct SurvivorsFrameView {
   // pages. Nul quand elles ne s'y montrent pas.
   ro::ui::OptionsWindowState* options_state = nullptr;
   std::span<const ro::ui::OptionSectionView> options;
+  // LE CODEX par-dessus la pause, qu'il recouvre : la pause ne se dessine pas
+  // tant qu'il est ouvert. L'onglet Cartes dessine l'Album. Nul, fermé.
+  const ro::ui::SurvivorsCodexView* codex = nullptr;
+  ro::ui::SurvivorsCodexState* codex_state = nullptr;
+  const ro::ui::SurvivorsAlbumView* album = nullptr;
+  ro::ui::SurvivorsAlbumState* album_state = nullptr;
 };
 
 // CE QUE LES FENÊTRES DE L'IMAGE ONT DEMANDÉ : app en fait l'intention de
@@ -59,12 +66,13 @@ struct SurvivorsAsk {
   ro::ui::SurvivorsSummaryAsk summary;
   ro::ui::SurvivorsShopAsk church;
   ro::ui::SurvivorsRankingAsk ranking;
+  ro::ui::SurvivorsCodexAsk codex;
 };
 
-// LES FENÊTRES DE LA MÉTA (Q1) : l'Église, la Kafra, l'Album et les records,
+// LES FENÊTRES DE LA MÉTA (Q1) : l'Église, la Kafra, le Codex et les records,
 // que l'accueil ouvre par-dessus lui, dans l'image du jeu. L'Église s'ouvre
-// aussi par-dessus l'écran de fin, avec le même état. Les vues sont composées
-// par le mode, qui lit et vide les réponses.
+// aussi par-dessus l'écran de fin, avec le même état, et le Codex par-dessus
+// la pause. Les vues sont composées par le mode, qui lit et vide les réponses.
 //
 // LE TABLEAU MONDIAL DU CLASSEMENT (Q4) les rejoint : l'accueil l'ouvre par
 // « Classement », l'écran de fin d'une partie classée par le sien. Il n'existe
@@ -76,6 +84,10 @@ struct SurvivorsMetaWindows {
   ro::ui::SurvivorsShopState kafra;
   ro::ui::SurvivorsShopView kafra_view;
   ro::ui::SurvivorsShopAsk kafra_answer;
+  ro::ui::SurvivorsCodexState codex;
+  ro::ui::SurvivorsCodexView codex_view;
+  // L'Album, onglet Cartes du Codex : son curseur et son détail tiennent
+  // d'une ouverture à l'autre.
   ro::ui::SurvivorsAlbumState album;
   ro::ui::SurvivorsAlbumView album_view;
   ro::ui::SurvivorsRecordsState records;
@@ -90,7 +102,7 @@ struct SurvivorsMetaWindows {
     church.confirming_refund = false;
     kafra.open = false;
     kafra.confirming_refund = false;
-    album.open = false;
+    codex.open = false;
     records.open = false;
     ranking.open = false;
   }

@@ -396,8 +396,8 @@ void SurvivorsMetaDesk::FollowPrepare(const ro::ui::SurvivorsPrepareAsk& asked,
     case ro::ui::SurvivorsMetaPlace::kKafra:
       windows.kafra.Open();
       return;
-    case ro::ui::SurvivorsMetaPlace::kAlbum:
-      windows.album.open = true;
+    case ro::ui::SurvivorsMetaPlace::kCodex:
+      windows.codex.open = true;
       return;
     case ro::ui::SurvivorsMetaPlace::kRecords:
       windows.records.open = true;

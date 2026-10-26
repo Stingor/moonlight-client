@@ -9,7 +9,8 @@
 namespace ro::ui {
 
 // LA PAUSE D'UNE PARTIE : Reprendre, Abandonner (confirmé sur place), la rangée
-// des fenêtres qu'on ouvre par-dessus — « Options », celles du jeu —, et les
+// des fenêtres qu'on ouvre par-dessus — « Options », celles du jeu, et
+// « Codex », celui des Survivants, grisé dans la garde de la reprise —, et les
 // réglages du mode — « Effets réduits » (U20), « Afficher les mesures » (U24,
 // offert au seul client de développement), « Ombres du soleil de la horde »
 // (U27). En tête, ce qui a mis en pause quand ce n'est pas le joueur ; en
@@ -57,6 +58,8 @@ struct SurvivorsPauseAsk {
   bool abandon = false;  // confirmé
   // « Options » : les options du jeu s'ouvrent par-dessus la pause.
   bool open_options = false;
+  // « Codex » : le Codex des Survivants recouvre la pause.
+  bool open_codex = false;
   std::optional<bool> reduced_effects;
   std::optional<bool> show_measures;
   std::optional<bool> horde_sun_shadows;

@@ -20633,12 +20633,6 @@ tr: %s Zeny
 fr: +%s Zeny (solde %s)
 tr: +%s Zeny (balance %s)
 
-fr: Album
-tr: Album
-
-fr: Album des Survivants
-tr: Survivors' Album
-
 fr: Armure +%d
 tr: Armor +%d
 
@@ -21058,6 +21052,9 @@ tr: Charges %s every %s, announced %s before
 
 fr: Chasse en meute : quand l'un vient, les autres suivent.
 tr: Hunts in packs: when one comes, the others follow.
+
+fr: Codex
+tr: Codex
 
 fr: Codex des Survivants
 tr: Survivors' Codex

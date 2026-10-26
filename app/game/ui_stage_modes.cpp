@@ -46,7 +46,15 @@ SurvivorsAsk UiStage::DrawSurvivorsOnly(const SurvivorsFrameView& view) {
   if (view.chest != nullptr) {
     ask.chest_proceed = ro::ui::DrawSurvivorsChestWindow(*view.chest, skin_);
   }
-  if (view.pause != nullptr && view.pause_state != nullptr) {
+  // LE CODEX RECOUVRE LA PAUSE : elle ne se dessine pas sous lui, si bien
+  // qu'aucun clic ne reprend la partie tant qu'il est ouvert, et le fermer y
+  // ramène.
+  const bool codex_shown = view.codex != nullptr && view.codex_state != nullptr &&
+                           view.album != nullptr && view.album_state != nullptr;
+  if (codex_shown) {
+    ask.codex = ro::ui::DrawSurvivorsCodexWindow(*view.codex_state, *view.codex, *view.album_state,
+                                                 *view.album, skin_);
+  } else if (view.pause != nullptr && view.pause_state != nullptr) {
     ask.pause = ro::ui::DrawSurvivorsPauseWindow(*view.pause_state, *view.pause, skin_);
   }
   // LES OPTIONS DU JEU APRÈS LA PAUSE, donc PAR-DESSUS : c'est d'elle qu'on les ouvre.

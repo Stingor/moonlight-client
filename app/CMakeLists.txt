@@ -1836,6 +1836,7 @@ add_executable(moonclient
     game/survivors_mode.cpp
     game/survivors_views.cpp
     game/survivors_meta_views.cpp
+    game/survivors_codex_views.cpp
     game/game_description.cpp
     game/game_draw.cpp
     game/game_forget_played.cpp

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "ro/render/actor_wardrobe.h"
 #include "ro/render/item_icons.h"
 #include "ro/render/skill_icons.h"
 #include "ro/sim/minigame_trophies.h"
@@ -18,6 +19,7 @@
 #include "ro/vfs/monster_list.h"
 
 #include "game/survivors_book_mode.h"
+#include "game/survivors_codex_desk.h"
 #include "game/survivors_meta_desk.h"
 #include "game/survivors_ranking_desk.h"
 #include "game/survivors_ranking_mode.h"
@@ -29,6 +31,7 @@
 #include "survivors/real_world_watch.h"
 #include "survivors/survivors_save.h"
 #include "survivors/survivors_stage.h"
+#include "world/monster_sprite.h"
 
 namespace moonclient {
 
@@ -37,7 +40,8 @@ namespace moonclient {
 // voit jamais un type de `sim` ni un chemin de fichier.
 
 // LES TABLES DU JEU où se lisent noms et icônes. Toutes facultatives : sans
-// elles, un identifiant s'écrit « #id » et la case reste vide.
+// elles, un identifiant s'écrit « #id » et la case reste vide ; sans
+// garde-robe, la fiche du Codex n'a pas de sprite.
 struct SurvivorsTables {
   const ro::sim::SkillTree* skill_tree = nullptr;
   ro::render::SkillIcons* skill_icons = nullptr;
@@ -45,6 +49,7 @@ struct SurvivorsTables {
   ro::render::ItemIcons* item_icons = nullptr;
   const ro::vfs::MonsterList* monsters = nullptr;
   const ro::vfs::JobNames* jobs = nullptr;
+  ro::render::ActorWardrobe* wardrobe = nullptr;
 };
 
 // CE QUE L'IMAGE AJOUTE À L'ÉTAGE pour ses fenêtres.
@@ -75,6 +80,8 @@ struct SurvivorsViewFacts {
   // LE CLASSEMENT : la marque du HUD, la section de l'écran de fin et le
   // tableau mondial par-dessus lui. Nul, rien du classement ne paraît.
   const SurvivorsRankingMode* ranking = nullptr;
+  // L'heure de l'image : le sprite de la fiche du Codex s'anime sur elle.
+  std::uint32_t now_ms = 0;
 };
 
 // LES ICÔNES ET LES ILLUSTRATIONS, lues dans les tables ; vides sans elles.
@@ -82,6 +89,9 @@ struct SurvivorsViewFacts {
 [[nodiscard]] ImTextureID SurvivorsItemIcon(std::uint16_t item_id, const SurvivorsTables& tables);
 [[nodiscard]] ro::ui::SkinImage SurvivorsCardIllustration(std::uint16_t card_item_id,
                                                           const SurvivorsTables& tables);
+
+// Ce qu'un lien du Codex désigne : un sort, un objet ou une classe RO.
+enum class CodexLinkKind : std::uint8_t { kSkill, kItem, kFoe };
 
 class SurvivorsViews {
  public:
@@ -93,13 +103,13 @@ class SurvivorsViews {
                       const std::array<std::string, 4>& key_labels, const SurvivorsTables& tables);
 
   // L'ACCUEIL ET SES FENÊTRES DE MÉTA (Q1), depuis le carnet relu : la méta de
-  // la préparation, puis l'Église, la Kafra, l'Album et les records ouverts ;
+  // la préparation, puis l'Église, la Kafra, le Codex et les records ouverts ;
   // avec le classement (`ranking`, nul sans lui), ce que l'accueil en montre
   // service ouvert et le tableau mondial. Voir `survivors_meta_views.cpp`.
   void ComposeMeta(ro::ui::SurvivorsPrepareView& prepare, SurvivorsMetaWindows& windows,
                    const SurvivorsMetaDesk& desk, const SurvivorsBookMode& book,
                    const ro::sim::SurvivorsRules& rules, const SurvivorsTables& tables,
-                   const SurvivorsRankingMode* ranking);
+                   const SurvivorsRankingMode* ranking, std::uint32_t now_ms);
 
   // L'IMAGE D'UNE PARTIE : le HUD et la fenêtre de l'écran en cours.
   [[nodiscard]] SurvivorsFrameView Compose(const SurvivorsStage& stage,
@@ -143,6 +153,18 @@ class SurvivorsViews {
                    const SurvivorsTables& tables);
   void ComposeAlbum(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
                     const ro::sim::SurvivorsRules& rules, const SurvivorsTables& tables);
+  // LE CODEX OUVERT (`survivors_codex_views.cpp`), à l'accueil ou sur la
+  // pause : les fiches tirées des règles, du carnet et du relevé de la partie
+  // en cours (`live`, nul hors partie), puis leurs noms, leurs icônes, le
+  // sprite de l'entrée choisie, et l'Album de l'onglet Cartes.
+  void ComposeCodex(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
+                    const SurvivorsCodexSeen* live, const ro::sim::SurvivorsRules& rules,
+                    const SurvivorsTables& tables, std::uint32_t now_ms);
+  void NameCodexEntry(ro::ui::SurvivorsCodexEntry& entry, const SurvivorsTables& tables);
+  void NameCodexLink(ro::ui::SurvivorsCodexLink& link, CodexLinkKind kind,
+                     const SurvivorsTables& tables);
+  void ComposeCodexSprite(const ro::ui::SurvivorsCodexState& state, const SurvivorsTables& tables,
+                          std::uint32_t now_ms);
   // LE CLASSEMENT DANS LA PARTIE : la marque « Classée » du HUD, la section de
   // l'écran de fin et le tableau mondial ouvert par-dessus lui.
   void ComposeRanking(const SurvivorsStage& stage, const SurvivorsViewFacts& facts,
@@ -187,6 +209,11 @@ class SurvivorsViews {
   SurvivorsCreditRowsHeld credit_rows_;
   std::vector<ro::ui::SurvivorsTrophyRow> trophy_rows_;
   SurvivorsRankingRowsHeld ranking_rows_;
+  // LE CODEX : ses lignes, et le sprite de l'entrée choisie, sur la
+  // garde-robe qui l'a vu naître.
+  SurvivorsCodexRowsHeld codex_rows_;
+  std::optional<MonsterSprite> codex_sprite_;
+  const ro::render::ActorWardrobe* codex_sprite_wardrobe_ = nullptr;
 };
 
 }  // namespace moonclient

@@ -59,9 +59,9 @@ struct MinigameWindows {
 void DrawMinigameWindows(MinigameWindows& windows, const ro::ui::SkinArt& art,
                          ro::ui::EscapeStack& escape);
 
-// ENTRÉE EST-ELLE À LA MÉTA SURVIVORS ? L'accueil, l'Église, la Kafra ou
-// l'Album qui a le focus en fait son geste — partir, acheter, déplier une
-// carte —, et la touche ne va pas alors à la barre de conversation. Le focus
+// ENTRÉE EST-ELLE À LA MÉTA SURVIVORS ? L'accueil, l'Église, la Kafra ou le
+// Codex qui a le focus en fait son geste — partir, acheter, déplier une carte
+// de l'onglet Cartes —, et la touche ne va pas alors à la barre de conversation. Le focus
 // est celui de l'image précédente : voir `ro::ui::WindowHasFocus`.
 [[nodiscard]] bool SurvivorsClaimsEnter(const MinigameWindows& windows);
 

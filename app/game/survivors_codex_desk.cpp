@@ -357,4 +357,23 @@ ro::ui::SurvivorsCodexView ComposeSurvivorsCodex(const ro::sim::SurvivorsRules& 
   return view;
 }
 
+bool FollowCodexOverPause(SurvivorsScreen screen, bool open_asked, SurvivorsGestures& gestures,
+                          ro::ui::SurvivorsCodexState& codex) noexcept {
+  if (screen != SurvivorsScreen::kPaused) {
+    codex.open = false;
+    return false;
+  }
+  if (codex.open) {
+    gestures.wheel_notches = 0.0F;
+    if (gestures.escape) {
+      codex.open = false;
+      gestures.escape = false;
+      return true;
+    }
+    return false;
+  }
+  if (open_asked) codex.open = true;
+  return false;
+}
+
 }  // namespace moonclient

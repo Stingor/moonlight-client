@@ -5,10 +5,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_widgets.h"
-#include "ro/ui/skinned_window.h"
 #include "ro/ui/survivors_hud.h"
-#include "ro/ui/window_bounds.h"
-#include "ro/ui/window_name.h"
 
 #include "survivors_meta_text.h"
 #include "survivors_text.h"
@@ -17,10 +14,6 @@
 namespace ro::ui {
 namespace {
 
-inline constexpr const char* kAlbumTitle = core::TrText("Album des Survivants");
-
-constexpr float kFirstWidth = 480.0F;
-constexpr float kFirstHeight = 600.0F;
 // Une case de la grille : une carte debout, au rapport des illustrations.
 constexpr float kCellWidth = 60.0F;
 constexpr float kCellHeight = 80.0F;
@@ -183,20 +176,6 @@ void DrawSurvivorsAlbumBody(SurvivorsAlbumState& state, const SurvivorsAlbumView
   ReadKeys(state, view.cards.size(), columns);
   if (state.detail.has_value()) DrawDetail(view.cards[*state.detail], view);
   DrawFeats(view);
-}
-
-void DrawSurvivorsAlbumWindow(SurvivorsAlbumState& state, const SurvivorsAlbumView& view,
-                              const SkinArt& art) {
-  if (!state.open) return;
-  static WindowName name(kAlbumTitle, kSurvivorsAlbumId);
-  ImGui::SetNextWindowSize(ImVec2(kFirstWidth, kFirstHeight), ImGuiCond_FirstUseEver);
-  ConstrainNextWindowToScreen(name.Get());
-  if (!BeginSkinnedWindow(name.Get(), &state.open, art)) {
-    EndSkinnedWindow();
-    return;
-  }
-  DrawSurvivorsAlbumBody(state, view);
-  EndSkinnedWindow();
 }
 
 }  // namespace ro::ui

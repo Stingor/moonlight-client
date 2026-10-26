@@ -11,8 +11,10 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/ui/survivors_codex_window.h"
 
+#include "survivors/survivors_route.h"
 #include "survivors/survivors_save.h"
 #include "survivors/survivors_sightings.h"
+#include "survivors/survivors_stage.h"
 
 namespace moonclient {
 
@@ -125,5 +127,15 @@ void CodexBossesOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSee
 [[nodiscard]] ro::ui::SurvivorsCodexView ComposeSurvivorsCodex(const ro::sim::SurvivorsRules& rules,
                                                                const SurvivorsCodexSeen& seen,
                                                                SurvivorsCodexRowsHeld& held);
+
+// ── LE CODEX PAR-DESSUS LA PAUSE ────────────────────────────────────────────
+
+// AVANT L'AVANCÉE DE L'ÉTAGE. « Codex » de la pause l'ouvre. Ouvert, Échap le
+// ferme et ne va pas à l'étage — la partie reste en pause, un second Échap la
+// reprend —, et la molette fait défiler sa liste sans aller à la caméra.
+// L'étage hors de la pause le ferme ; une pause qui demeure (le focus perdu
+// puis revenu) le garde. Vrai quand Échap a été retenu.
+bool FollowCodexOverPause(SurvivorsScreen screen, bool open_asked, SurvivorsGestures& gestures,
+                          ro::ui::SurvivorsCodexState& codex) noexcept;
 
 }  // namespace moonclient
