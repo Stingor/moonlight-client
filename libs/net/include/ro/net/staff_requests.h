@@ -48,6 +48,10 @@ enum class PlayerAdminAction : std::uint8_t {
   kNuke = 6,
   // Bannit le COMPTE.
   kBlock = 7,
+  // Niveau de groupe 99. Le serveur rejoue `@client` et répond dans la
+  // conversation de l'émetteur : moonclient ou le client d'origine, avec le
+  // numéro de patch, ou l'absence de poignée de main.
+  kClientInfo = 8,
 };
 
 [[nodiscard]] core::Result<void> RequestNpcAdmin(Connection& link, std::uint32_t npc_id,

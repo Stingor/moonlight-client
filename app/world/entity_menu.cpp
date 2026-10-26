@@ -451,6 +451,15 @@ void AddStaff(Composer& menu, const EntityMenuFacts& facts) {
   menu.Add(Tr("Copier l'identité de pick"), EntityVerb::kCopyPickIdentity);
 
   if (facts.family == EntityFamily::kPlayer) {
+    // 🔴 NIVEAU 99 : `@client` est réservé à l'administrateur. Une question, pas
+    // un geste : la ligne vient avant tout ce qui agit sur la cible.
+    if (facts.admin) {
+      menu.Group();
+      menu.Add(Tr("Quel client ?"), EntityVerb::kClientInfo,
+               Tr("Dit s'il joue avec moonclient ou avec le client d'origine, et le numéro de "
+                  "patch. La réponse arrive dans la conversation.\n"
+                  "Le serveur revérifie le droit avant de répondre."));
+    }
     // LE CONFORT : rien de puni ici — c'est ce qu'on fait pendant un event.
     menu.Group();
     menu.Add(Tr("Le faire venir ici"), EntityVerb::kComeHere,

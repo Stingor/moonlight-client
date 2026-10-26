@@ -18259,6 +18259,12 @@ tr: Quita minutos a su silencio, y lo levanta cuando no queda ninguno.
 fr: Retirer tout son équipement
 tr: Quitarle todo el equipo
 
+fr: Quel client ?
+tr: ¿Qué cliente?
+
+fr: Dit s'il joue avec moonclient ou avec le client d'origine, et le numéro de patch. La réponse arrive dans la conversation.\nLe serveur revérifie le droit avant de répondre.
+tr: Indica si juega con moonclient o con el cliente original, y el número de parche. La respuesta llega al chat.\nEl servidor vuelve a comprobar el permiso antes de responder.
+
 fr: minutes###menu_entite_manieres
 tr: minutos###menu_entite_manieres
 

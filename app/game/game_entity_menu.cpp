@@ -69,6 +69,8 @@ static_assert(ro::ui::kMannerMinutesMost == ro::net::kMannerPointsMostMinutes);
       return ro::net::PlayerAdminAction::kNuke;
     case EntityVerb::kJail:
       return ro::net::PlayerAdminAction::kJailToggle;
+    case EntityVerb::kClientInfo:
+      return ro::net::PlayerAdminAction::kClientInfo;
     case EntityVerb::kBlockAccount:
     default:
       break;
@@ -640,6 +642,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kNuke:
     case EntityVerb::kJail:
     case EntityVerb::kBlockAccount:
+    case EntityVerb::kClientInfo:
       ReportRefusal(ro::net::RequestPlayerAdmin(link_, id, PlayerAdminOf(verb), points));
       return;
     case EntityVerb::kKick:

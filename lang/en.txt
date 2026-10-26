@@ -18259,6 +18259,12 @@ tr: Takes minutes off their silence, and lifts it when none are left.
 fr: Retirer tout son équipement
 tr: Remove all their equipment
 
+fr: Quel client ?
+tr: Which client?
+
+fr: Dit s'il joue avec moonclient ou avec le client d'origine, et le numéro de patch. La réponse arrive dans la conversation.\nLe serveur revérifie le droit avant de répondre.
+tr: Tells whether they play with moonclient or with the original client, and the patch number. The answer arrives in the chat.\nThe server checks the permission again before answering.
+
 fr: minutes###menu_entite_manieres
 tr: minutes###menu_entite_manieres
 

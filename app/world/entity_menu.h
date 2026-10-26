@@ -265,6 +265,9 @@ enum class EntityVerb : int {
   kFullStrip,
   // « COMPARER SUR LE MARCHÉ », sur un joueur qui tient une échoppe.
   kMarketCompare,
+  // « QUEL CLIENT ? », à l'administrateur, sur un joueur : le client qu'il
+  // emploie, que le serveur écrit dans la conversation.
+  kClientInfo,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -286,7 +289,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kMarketCompare) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kClientInfo) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==

@@ -325,6 +325,7 @@ constexpr auto kServerAtCommands = std::to_array<ServerAtCommand>({
      .params = "",
      .help = "Stops all weather effects on the current map.",
      .min_group_level = 80},
+    {.name = "client", .aliases = "", .params = "", .help = "", .min_group_level = 99},
     {.name = "clone",
      .aliases = "",
      .params = "<charname>",
