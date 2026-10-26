@@ -128,11 +128,13 @@ std::optional<FieldPoint> DrawSpawnPoint(SurvivorsField& field) {
     const FieldPoint point = PerimeterPoint(frame, hero, along, outward);
     const std::optional<CellPosition> cell = NearestPassable(
         field.ground, CellOf(point.x), CellOf(point.y), rules.tuning.spawn_search_ring);
-    if (!cell) continue;
-    const FieldPoint landing = CellCenter(cell->x, cell->y);
-    if (InsideSpawnFrame(frame, hero, landing) || Stranded(field.flow, landing)) continue;
-    return landing;
+    if (cell) {
+      const FieldPoint landing = CellCenter(cell->x, cell->y);
+      if (!InsideSpawnFrame(frame, hero, landing) && !Stranded(field.flow, landing)) return landing;
+    }
+    ++field.spawn_tries_failed;
   }
+  ++field.spawn_draws_failed;
   return std::nullopt;
 }
 

@@ -157,6 +157,11 @@ struct SurvivorsField {
   std::uint8_t event_members_placed = 0;
   // L'heure de la prochaine élite, de first_ms à last_ms par interval_ms.
   std::uint64_t next_elite_ms = 0;
+  // LES PLACES DE NAISSANCE INTROUVABLES, depuis le départ : les essais rejetés
+  // d'un point du cadre, et les naissances dont tous les essais l'ont été. Des
+  // mesures pour l'outil d'équilibrage ; rien ne les lit pour décider.
+  std::uint32_t spawn_tries_failed = 0;
+  std::uint32_t spawn_draws_failed = 0;
   SurvivorsTally tally;
   SurvivorsRecap recap;
   core::Pcg32 spawn_random;
