@@ -34,6 +34,10 @@ constexpr std::uint32_t kFirstOrbActorId = kArenaHeroActorId + 1;
   return kFirstOrbActorId + static_cast<std::uint32_t>(orb_index);
 }
 
+// L'orientation qu'un effet de l'arène reçoit de son porteur : celle qu'il a
+// reçue en naissant, que le suivi ne change pas.
+constexpr float kArenaBearerFacingDegrees = 0.0F;
+
 // Une case et la sous-case où l'on se tient dans elle, d'une coordonnée en
 // cases continues dont l'entier est le centre.
 struct CellAndSub {
@@ -279,6 +283,9 @@ void ArenaEffects::KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const G
     const std::uint32_t actor_id = OrbActorId(index);
     PlaceActor(actor_id,
                CellOfField(glm::vec2(static_cast<float>(orb.at.x), static_cast<float>(orb.at.y))));
+    // L'ORBE SE DÉPLACE AVEC SON ACTEUR : sans suivi, ses nœuds déjà semés
+    // resteraient là où elle a été allumée, et l'orbite ne tournerait plus.
+    nodes_.FollowActor(actor_id, ground_of(orb.at), kArenaBearerFacingDegrees);
     if (index < orb_effects_.size()) {
       if (orb_effects_[index] == orb.effect_id) continue;
       effects_.StopById(orb_effects_[index], actor_id);
@@ -325,6 +332,8 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   step_ = field.step;
   PlaceActor(kArenaHeroActorId, CellOfField(glm::vec2(static_cast<float>(field.hero.position.x),
                                                       static_cast<float>(field.hero.position.y))));
+  // Ce que porte le héros le suit, selon la table de suivi de chaque effet.
+  nodes_.FollowActor(kArenaHeroActorId, ground_of(field.hero.position), kArenaBearerFacingDegrees);
   lives_.Expire(now_ms);
   KeepOrbs(orbs, ground_of, now_ms);
   KeepCardGlows(field, ground_of, now_ms);
