@@ -82,5 +82,14 @@ struct SurvivorsJournal {
                                                            WalkMap arena,
                                                            const SurvivorsJournal& journal,
                                                            std::uint32_t stop_step);
+// Les mêmes, pour une ARÈNE GÉNÉRÉE : son sol se redérive des règles et de la
+// graine du journal, sans carte ni installation. Les refus de
+// SurvivorsRun::Start(rules, start) tels quels, dont une arène qui lit une
+// carte.
+[[nodiscard]] core::Result<SurvivorsTally> ReplaySurvivors(const SurvivorsRules& rules,
+                                                           const SurvivorsJournal& journal);
+[[nodiscard]] core::Result<SurvivorsRun> ReplaySurvivorsTo(const SurvivorsRules& rules,
+                                                           const SurvivorsJournal& journal,
+                                                           std::uint32_t stop_step);
 
 }  // namespace ro::sim

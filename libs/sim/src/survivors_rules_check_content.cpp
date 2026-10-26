@@ -12,6 +12,7 @@
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_rules.h"
+#include "ro/sim/survivors_terrain.h"
 
 #include "survivors_rules_check.h"
 #include "survivors_space.h"
@@ -357,6 +358,21 @@ core::Result<void> CheckContentTuning(const SurvivorsRules& rules) {
   if (!rules.plants.empty() &&
       (tuning.plant_block_cells == 0 || tuning.plant_cells_per_plant == 0)) {
     return Refuse("réglages : plantes sans bloc ou sans densité");
+  }
+  if (CellsOutOfBounds(tuning.plant_wake_cells)) {
+    return Refuse("réglages : éveil des plantes hors de [0, " +
+                  std::to_string(kMostArenaSideCells) + "] cases");
+  }
+  if (auto checked =
+          CheckMeasures<1>("réglages : ", {{{"oubli des plantes", tuning.plant_forget_units}}});
+      !checked) {
+    return checked;
+  }
+  // Une plante naît au plus à un morceau au-delà du carré d'éveil : l'oubli
+  // qui l'atteindrait dès sa naissance la ferait naître pour rien.
+  if (tuning.plant_wake_cells > 0 && tuning.plant_forget_units > 0 &&
+      tuning.plant_forget_units < Cells(tuning.plant_wake_cells + kTerrainChunkCells)) {
+    return Refuse("réglages : oubli des plantes en deçà de l'éveil plus un morceau");
   }
   // Un recul qui ne bouge pas d'une sous-unité par pas ne finit jamais.
   if (tuning.knock_units_per_step == 0) {

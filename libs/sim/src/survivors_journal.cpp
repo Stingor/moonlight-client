@@ -258,15 +258,18 @@ struct Replayed {
 };
 
 // Rejoue jusqu'au pas `stop_step`, au plus le pas final du journal, ou jusqu'à
-// la fin de la partie.
-core::Result<Replayed> ReplayUntil(const SurvivorsRules& rules, WalkMap arena,
+// la fin de la partie : sur la carte `arena`, ou sans elle sur le sol généré
+// de l'arène du journal.
+core::Result<Replayed> ReplayUntil(const SurvivorsRules& rules, std::optional<WalkMap> arena,
                                    const SurvivorsJournal& journal, std::uint32_t stop_step) {
   if (journal.ruleset_version != rules.ruleset_version) {
     return Undecodable(core::ErrorCode::kUnsupportedVersion,
                        "règles " + std::to_string(journal.ruleset_version) + ", attendu " +
                            std::to_string(rules.ruleset_version));
   }
-  core::Result<SurvivorsRun> started = SurvivorsRun::Start(rules, std::move(arena), journal.start);
+  core::Result<SurvivorsRun> started =
+      arena ? SurvivorsRun::Start(rules, std::move(*arena), journal.start)
+            : SurvivorsRun::Start(rules, journal.start);
   if (!started) return std::unexpected(std::move(started.error()));
   SurvivorsRun& run = *started;
   const std::uint32_t last_step = std::min(stop_step, journal.final_step);
@@ -318,10 +321,10 @@ core::Result<Replayed> ReplayUntil(const SurvivorsRules& rules, WalkMap arena,
   return Replayed{.run = std::move(run), .next_entry = next_entry};
 }
 
-}  // namespace
-
-core::Result<SurvivorsTally> ReplaySurvivors(const SurvivorsRules& rules, WalkMap arena,
-                                             const SurvivorsJournal& journal) {
+// Le bilan d'un journal rejoué jusqu'à son pas final, qui doit l'avoir lu en
+// entier et s'y être arrêté.
+core::Result<SurvivorsTally> ReplayWhole(const SurvivorsRules& rules, std::optional<WalkMap> arena,
+                                         const SurvivorsJournal& journal) {
   core::Result<Replayed> replayed =
       ReplayUntil(rules, std::move(arena), journal, journal.final_step);
   if (!replayed) return std::unexpected(std::move(replayed.error()));
@@ -335,12 +338,35 @@ core::Result<SurvivorsTally> ReplaySurvivors(const SurvivorsRules& rules, WalkMa
   return replayed->run.tally();
 }
 
-core::Result<SurvivorsRun> ReplaySurvivorsTo(const SurvivorsRules& rules, WalkMap arena,
-                                             const SurvivorsJournal& journal,
-                                             std::uint32_t stop_step) {
+core::Result<SurvivorsRun> ReplayPart(const SurvivorsRules& rules, std::optional<WalkMap> arena,
+                                      const SurvivorsJournal& journal, std::uint32_t stop_step) {
   core::Result<Replayed> replayed = ReplayUntil(rules, std::move(arena), journal, stop_step);
   if (!replayed) return std::unexpected(std::move(replayed.error()));
   return std::move(replayed->run);
+}
+
+}  // namespace
+
+core::Result<SurvivorsTally> ReplaySurvivors(const SurvivorsRules& rules, WalkMap arena,
+                                             const SurvivorsJournal& journal) {
+  return ReplayWhole(rules, std::move(arena), journal);
+}
+
+core::Result<SurvivorsTally> ReplaySurvivors(const SurvivorsRules& rules,
+                                             const SurvivorsJournal& journal) {
+  return ReplayWhole(rules, std::nullopt, journal);
+}
+
+core::Result<SurvivorsRun> ReplaySurvivorsTo(const SurvivorsRules& rules, WalkMap arena,
+                                             const SurvivorsJournal& journal,
+                                             std::uint32_t stop_step) {
+  return ReplayPart(rules, std::move(arena), journal, stop_step);
+}
+
+core::Result<SurvivorsRun> ReplaySurvivorsTo(const SurvivorsRules& rules,
+                                             const SurvivorsJournal& journal,
+                                             std::uint32_t stop_step) {
+  return ReplayPart(rules, std::nullopt, journal, stop_step);
 }
 
 }  // namespace ro::sim

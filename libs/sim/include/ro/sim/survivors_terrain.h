@@ -133,6 +133,10 @@ struct FootprintSize {
 // rendu en dérive sa graine visuelle.
 [[nodiscard]] std::uint64_t TerrainChunkSeed(std::uint64_t run_seed, std::int32_t chunk_x,
                                              std::int32_t chunk_y) noexcept;
+// LA GRAINE DES PLANTES D'UN MORCEAU : le même mélange sous un autre sel. Les
+// plantes d'un morceau ne dépendent ni de l'heure ni de l'ordre de son éveil.
+[[nodiscard]] std::uint64_t TerrainPlantSeed(std::uint64_t run_seed, std::int32_t chunk_x,
+                                             std::int32_t chunk_y) noexcept;
 
 // La chance, pour mille, qu'un emplacement centré sur la case (x, y) porte une
 // pièce : le bruit de valeur entier de la règle, dans [min, max].

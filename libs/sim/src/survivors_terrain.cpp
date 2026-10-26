@@ -14,8 +14,9 @@ namespace {
 
 // Les sels des mélanges, en ASCII : « SURVTERR » pour la graine d'un morceau,
 // « SURVDENS » pour les nœuds de densité, « SURVMARK » pour le morceau à
-// repère de chaque carré.
+// repère de chaque carré, « SURVPLNT » pour les plantes d'un morceau.
 constexpr std::uint64_t kTerrainSalt = 0x5355'5256'5445'5252ULL;
+constexpr std::uint64_t kPlantSalt = 0x5355'5256'504C'4E54ULL;
 constexpr std::uint64_t kDensitySalt = 0x5355'5256'4445'4E53ULL;
 constexpr std::uint64_t kLandmarkSalt = 0x5355'5256'4D41'524BULL;
 // Les constantes publiées de SplitMix64 : l'incrément (partie fractionnaire du
@@ -224,6 +225,11 @@ std::int32_t TerrainChunkOf(std::int32_t cell) noexcept {
 std::uint64_t TerrainChunkSeed(std::uint64_t run_seed, std::int32_t chunk_x,
                                std::int32_t chunk_y) noexcept {
   return Mix(run_seed, kTerrainSalt, chunk_x, chunk_y);
+}
+
+std::uint64_t TerrainPlantSeed(std::uint64_t run_seed, std::int32_t chunk_x,
+                               std::int32_t chunk_y) noexcept {
+  return Mix(run_seed, kPlantSalt, chunk_x, chunk_y);
 }
 
 std::uint32_t TerrainDensityPerMille(const TerrainRule& rule, std::uint64_t run_seed,

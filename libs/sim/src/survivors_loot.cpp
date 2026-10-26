@@ -3,8 +3,10 @@
 #include <cstdint>
 #include <limits>
 #include <optional>
+#include <span>
 #include <vector>
 
+#include "ro/core/pcg32.h"
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_ground.h"
@@ -12,6 +14,7 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
+#include "ro/sim/survivors_terrain.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -19,7 +22,8 @@
 
 namespace ro::sim::survivors {
 
-// LE BUTIN : les plantes posées au départ, les objets au sol que le héros
+// LE BUTIN : les plantes, posées au départ sur une carte, à l'éveil de leur
+// morceau sur un sol généré, les objets au sol que le héros
 // ramasse à son contact, et les coffres, qui font monter ce qu'il possède et
 // évoluer un skill au plus haut niveau dont il porte la carte. Rien n'y est
 // choisi par le joueur : un coffre s'applique seul, et le journal n'en sait
@@ -274,17 +278,73 @@ void TakeCard(SurvivorsField& field, const SurvivorsPickup& card) {
   }
 }
 
+// ── Les plantes ────────────────────────────────────────────────────────────
+
+// Vrai si les règles posent des plantes : une espèce, un bloc et une densité.
+[[nodiscard]] bool PlantsPosed(const SurvivorsRules& rules) noexcept {
+  return !rules.plants.empty() && rules.tuning.plant_block_cells > 0 &&
+         rules.tuning.plant_cells_per_plant != 0;
+}
+
+[[nodiscard]] std::vector<std::uint32_t> PlantWeights(const SurvivorsRules& rules) {
+  std::vector<std::uint32_t> weights;
+  weights.reserve(rules.plants.size());
+  for (const PlantRule& plant : rules.plants) weights.push_back(plant.weight);
+  return weights;
+}
+
+// LA PLANTE D'UN BLOC, parmi ses cases praticables `open` : un Chance du
+// nombre de ces cases sur `plant_cells_per_plant`, même pour un bloc vide
+// (le décor d'un bloc ne décale pas les suivants) ; si oui, un Below pour la
+// case et un PickWeighted pour l'espèce.
+void PlantBlock(SurvivorsField& field, core::Pcg32& random, std::span<const std::uint32_t> weights,
+                std::span<const FieldPoint> open) {
+  const SurvivorsRules& rules = *field.rules;
+  const auto open_count = static_cast<std::uint32_t>(open.size());
+  if (!random.Chance(open_count, rules.tuning.plant_cells_per_plant) || open.empty()) return;
+  const FieldPoint at = open[random.Below(open_count)];
+  const std::size_t pick = random.PickWeighted(weights);
+  if (pick >= rules.plants.size()) return;
+  field.plants.push_back(SurvivorsPlant{
+      .serial = field.next_serial++, .foe_id = rules.plants[pick].foe_id, .position = at});
+}
+
+// L'éveil d'un morceau : ses blocs, du sud au nord puis d'ouest en est,
+// comptés depuis son coin sud-ouest et rognés à son bord.
+void WakeChunk(SurvivorsField& field, std::span<const std::uint32_t> weights, std::int32_t chunk_x,
+               std::int32_t chunk_y) {
+  const TerrainChunk* chunk = field.ground.ChunkAt(chunk_x, chunk_y);
+  if (chunk == nullptr) return;
+  // Une copie : le pointeur du sol ne vaut que jusqu'à sa prochaine question.
+  const TerrainChunk woken = *chunk;
+  const std::int32_t block = field.rules->tuning.plant_block_cells;
+  const std::int32_t west = chunk_x * kTerrainChunkCells;
+  const std::int32_t south = chunk_y * kTerrainChunkCells;
+  core::Pcg32 random(TerrainPlantSeed(field.start.seed, chunk_x, chunk_y), kFieldStream);
+  std::vector<FieldPoint> open;
+  for (std::int32_t block_y = 0; block_y < kTerrainChunkCells; block_y += block) {
+    for (std::int32_t block_x = 0; block_x < kTerrainChunkCells; block_x += block) {
+      open.clear();
+      const std::int32_t last_y = std::min(block_y + block, kTerrainChunkCells);
+      const std::int32_t last_x = std::min(block_x + block, kTerrainChunkCells);
+      for (std::int32_t y = block_y; y < last_y; ++y) {
+        for (std::int32_t x = block_x; x < last_x; ++x) {
+          if (woken.Passable(x, y)) open.push_back(CellCenter(west + x, south + y));
+        }
+      }
+      PlantBlock(field, random, weights, open);
+    }
+  }
+}
+
 }  // namespace
 
 void PlantField(SurvivorsField& field) {
   if (field.rules == nullptr || !field.ground.bounded()) return;
   const SurvivorsRules& rules = *field.rules;
+  if (!PlantsPosed(rules)) return;
   const std::int32_t block = rules.tuning.plant_block_cells;
-  const std::uint32_t cells_per_plant = rules.tuning.plant_cells_per_plant;
-  if (rules.plants.empty() || block <= 0 || cells_per_plant == 0) return;
-  std::vector<std::uint32_t> weights;
-  weights.reserve(rules.plants.size());
-  for (const PlantRule& plant : rules.plants) weights.push_back(plant.weight);
+  const std::vector<std::uint32_t> weights = PlantWeights(rules);
 
   const SurvivorsGround& ground = field.ground;
   std::vector<FieldPoint> open;
@@ -298,17 +358,47 @@ void PlantField(SurvivorsField& field) {
           if (ground.Passable(x, y)) open.push_back(CellCenter(x, y));
         }
       }
-      // Un tirage par bloc, même vide : le décor d'un bloc ne décale pas les
-      // suivants.
-      const auto open_count = static_cast<std::uint32_t>(open.size());
-      if (!field.field_random.Chance(open_count, cells_per_plant) || open.empty()) continue;
-      const FieldPoint at = open[field.field_random.Below(open_count)];
-      const std::size_t pick = field.field_random.PickWeighted(weights);
-      if (pick >= rules.plants.size()) continue;
-      field.plants.push_back(SurvivorsPlant{
-          .serial = field.next_serial++, .foe_id = rules.plants[pick].foe_id, .position = at});
+      PlantBlock(field, field.field_random, weights, open);
     }
   }
+}
+
+void WakePlantChunks(SurvivorsField& field) {
+  if (field.rules == nullptr || field.ground.bounded()) return;
+  const SurvivorsRules& rules = *field.rules;
+  const std::int32_t wake = rules.tuning.plant_wake_cells;
+  if (!PlantsPosed(rules) || wake <= 0) return;
+  const std::int32_t hero_x = CellOf(field.hero.position.x);
+  const std::int32_t hero_y = CellOf(field.hero.position.y);
+  constexpr std::int32_t kLastChunk = kTerrainWorldChunks - 1;
+  const std::int32_t west = std::clamp(TerrainChunkOf(hero_x - wake), 0, kLastChunk);
+  const std::int32_t east = std::clamp(TerrainChunkOf(hero_x + wake), 0, kLastChunk);
+  const std::int32_t south = std::clamp(TerrainChunkOf(hero_y - wake), 0, kLastChunk);
+  const std::int32_t north = std::clamp(TerrainChunkOf(hero_y + wake), 0, kLastChunk);
+  std::vector<std::uint32_t> weights;
+  for (std::int32_t chunk_y = south; chunk_y <= north; ++chunk_y) {
+    for (std::int32_t chunk_x = west; chunk_x <= east; ++chunk_x) {
+      const std::uint32_t key = PlantChunkKey(chunk_x, chunk_y);
+      std::vector<std::uint32_t>& woken = field.woken_chunks;
+      const auto at = std::lower_bound(woken.begin(), woken.end(), key);
+      if (at != woken.end() && *at == key) continue;
+      woken.insert(at, key);
+      if (weights.empty()) weights = PlantWeights(rules);
+      WakeChunk(field, weights, chunk_x, chunk_y);
+    }
+  }
+}
+
+void ForgetFarPlants(SurvivorsField& field) {
+  if (field.rules == nullptr || field.ground.bounded()) return;
+  const std::int64_t forget = field.rules->tuning.plant_forget_units;
+  if (forget <= 0) return;
+  const FieldPoint hero = field.hero.position;
+  std::erase_if(field.plants, [&](const SurvivorsPlant& plant) {
+    const std::int64_t dx = std::int64_t{plant.position.x} - hero.x;
+    const std::int64_t dy = std::int64_t{plant.position.y} - hero.y;
+    return std::max(dx < 0 ? -dx : dx, dy < 0 ? -dy : dy) > forget;
+  });
 }
 
 void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rule) {

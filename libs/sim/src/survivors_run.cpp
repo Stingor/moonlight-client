@@ -113,6 +113,18 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Walk
   return Start(rules, SurvivorsGround::Bounded(std::move(arena)), start);
 }
 
+core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules,
+                                               const SurvivorsStart& start) {
+  const ArenaRule* arena_rule = FindArena(rules, start.arena_id);
+  if (arena_rule == nullptr) return Refuse("arène inconnue " + std::to_string(start.arena_id));
+  const TerrainRule* terrain = FindTerrain(rules, arena_rule->terrain_id);
+  if (arena_rule->terrain_id == 0 || terrain == nullptr) {
+    return Refuse("l'arène " + std::to_string(arena_rule->arena_id) +
+                  " lit une carte : elle ne naît pas sans elle");
+  }
+  return Start(rules, SurvivorsGround::Generated(*terrain, start.seed), start);
+}
+
 core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, SurvivorsGround ground,
                                                const SurvivorsStart& start) {
   if (core::Result<void> checked = CheckSurvivorsRules(rules); !checked) {
@@ -146,6 +158,10 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
     return Refuse("arène vide ou trop grande : " + std::to_string(ground.width()) + " × " +
                   std::to_string(ground.height()));
   }
+  if (ground.bounded() && arena_rule->terrain_id != 0) {
+    return Refuse("l'arène " + std::to_string(arena_rule->arena_id) +
+                  " est générée : elle ne se joue pas sur une carte");
+  }
   const std::optional<CellPosition> start_cell = SurvivorsStartCell(rules, *arena_rule, ground);
   if (!start_cell) {
     return Refuse("aucune case praticable près du départ de l'arène " +
@@ -177,6 +193,7 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   field.banishes_left = start.loadout.banishes;
   field.lives_left = start.lives;
   survivors::PlantField(field);
+  survivors::WakePlantChunks(field);
   survivors::RecomputeStats(field);
   RefreshTally(field);
   return SurvivorsRun(std::move(field));
@@ -187,6 +204,10 @@ void SurvivorsRun::Step(SurvivorsInput input) {
   // ⚠ L'ORDRE DU PAS EST LA RÈGLE DU JEU : le changer change chaque partie
   // rejouée, et monte kSurvivorsRulesetVersion.
   survivors::MoveHero(field_, input);
+  // Sur un sol généré, les plantes suivent le héros qui vient de bouger :
+  // l'éveil d'abord, l'oubli ensuite. Rien sur un sol borné.
+  survivors::WakePlantChunks(field_);
+  survivors::ForgetFarPlants(field_);
   survivors::RefreshFlow(field_);
   survivors::SpawnFoes(field_);
   survivors::SpawnEvents(field_);

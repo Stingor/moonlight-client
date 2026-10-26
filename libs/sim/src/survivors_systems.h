@@ -102,6 +102,21 @@ void Regenerate(SurvivorsField& field);
 // PickWeighted pour l'espèce. Rien sans plantes dans les règles, ni sur un sol
 // généré, qui n'a pas de bord à paver.
 void PlantField(SurvivorsField& field);
+// survivors_loot.cpp. Sur un sol généré, au départ puis après chaque marche du
+// héros : chaque morceau du monde qui touche le carré de `plant_wake_cells`
+// autour de la case du héros et n'est pas encore éveillé s'éveille, par clé
+// croissante. Il pose ses plantes comme PlantField pose celles d'une carte,
+// par bloc de `plant_block_cells` compté depuis son coin sud-ouest et rogné à
+// son bord, mais d'un Pcg32 à lui (TerrainPlantSeed, flux décor) : ses plantes
+// ne dépendent ni de l'heure ni des autres morceaux ; seuls leurs numéros de
+// naissance suivent l'ordre des éveils. Rien sur un sol borné, sans plantes,
+// ou si `plant_wake_cells` est nul.
+void WakePlantChunks(SurvivorsField& field);
+// survivors_loot.cpp. Sur un sol généré, retire, dans l'ordre de pose, chaque
+// plante plus loin du héros que `plant_forget_units` en distance de
+// Tchebychev. Son morceau reste éveillé : elle ne repousse jamais. Rien sur un
+// sol borné, ou si `plant_forget_units` est nul.
+void ForgetFarPlants(SurvivorsField& field);
 
 // Comment naît un monstre, au-delà de son espèce et de sa place.
 struct HatchOptions {

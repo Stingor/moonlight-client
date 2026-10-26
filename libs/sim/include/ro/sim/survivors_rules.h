@@ -268,8 +268,14 @@ struct SurvivorsTuning {
   std::int32_t knock_units_per_step = 0;    // vitesse d'un recul
   std::int32_t plant_block_cells = 0;       // côté d'un bloc qui porte au plus une plante
   std::uint32_t plant_cells_per_plant = 0;  // cases praticables d'un bloc par plante
-  std::int32_t pickup_radius_units = 0;     // ramassage d'un objet au sol
-  std::uint32_t final_overtime_ms = 0;      // au-delà de run_ms, avec un boss final
+  // Sur un sol généré, un morceau S'ÉVEILLE, et pose ses plantes, quand il
+  // touche le carré de ce demi-côté autour du héros ; 0 : aucune plante.
+  std::int32_t plant_wake_cells = 0;
+  // Sur un sol généré, une plante plus loin du héros que cette distance de
+  // Tchebychev SE PERD ; 0 : aucune ne se perd.
+  std::int32_t plant_forget_units = 0;
+  std::int32_t pickup_radius_units = 0;  // ramassage d'un objet au sol
+  std::uint32_t final_overtime_ms = 0;   // au-delà de run_ms, avec un boss final
 };
 
 // LA CHUTE DES CARTES. Un tué qui porte une carte la lâche une fois sur
@@ -379,7 +385,9 @@ struct SurvivorsRules {
 // somme nulle ; des plantes sans bloc ni densité ; des élites sans objet de
 // coffre ; un coffre promet de 1 à kMostChestGains gains hors de cet ordre ;
 // la partie et son dépassement dépassent 32 bits de ms ; une mesure neuve
-// dépasse la plus grande arène ; un plafond neuf est nul.
+// dépasse la plus grande arène ; un plafond neuf est nul ; l'éveil des plantes
+// sort de [0, kMostArenaSideCells] cases, ou leur oubli, non nul, tombe en
+// deçà de l'éveil plus un morceau.
 // La méta est refusée enfin si : un monstre porte une carte absente du
 // catalogue ; la cote de chute est nulle ; la table de la Cursed Water n'est
 // ni vide ni de kMostCursedWater + 1 rangs, son rang 0 majore quelque chose,
@@ -402,6 +410,7 @@ struct SurvivorsRules {
 [[nodiscard]] const FoeRule* FindFoe(const SurvivorsRules& rules, std::uint16_t foe_id);
 [[nodiscard]] const ClassRule* FindClass(const SurvivorsRules& rules, std::uint16_t class_id);
 [[nodiscard]] const ArenaRule* FindArena(const SurvivorsRules& rules, std::uint16_t arena_id);
+[[nodiscard]] const TerrainRule* FindTerrain(const SurvivorsRules& rules, std::uint16_t terrain_id);
 // L'évolution d'un skill de base, et celle qui donne un évolué.
 [[nodiscard]] const EvolutionRule* FindEvolutionOf(const SurvivorsRules& rules,
                                                    std::uint16_t skill_id);

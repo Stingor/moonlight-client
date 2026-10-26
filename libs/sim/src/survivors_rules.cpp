@@ -148,6 +148,11 @@ const ArenaRule* FindArena(const SurvivorsRules& rules, std::uint16_t arena_id) 
   return FindById(rules.arenas, arena_id, [](const ArenaRule& rule) { return rule.arena_id; });
 }
 
+const TerrainRule* FindTerrain(const SurvivorsRules& rules, std::uint16_t terrain_id) {
+  return FindById(rules.terrains, terrain_id,
+                  [](const TerrainRule& rule) { return rule.terrain_id; });
+}
+
 const EvolutionRule* FindEvolutionOf(const SurvivorsRules& rules, std::uint16_t skill_id) {
   return FindById(rules.evolutions, skill_id,
                   [](const EvolutionRule& rule) { return rule.skill_id; });

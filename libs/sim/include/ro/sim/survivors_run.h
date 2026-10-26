@@ -15,6 +15,7 @@
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_state.h"
+#include "ro/sim/survivors_terrain.h"
 #include "ro/sim/walk_map.h"
 
 namespace ro::sim {
@@ -74,6 +75,14 @@ struct SurvivorsStart {
 // de part et d'autre ; un monstre au-delà tombe dans un seau du bord et reste
 // trouvable.
 inline constexpr std::int32_t kFollowingGridCells = 128;
+// LA CLÉ D'UN MORCEAU DU MONDE : ligne puis colonne, dans [0,
+// kTerrainWorldChunks²). Des clés croissantes vont du sud au nord, puis
+// d'ouest en est.
+[[nodiscard]] constexpr std::uint32_t PlantChunkKey(std::int32_t chunk_x,
+                                                    std::int32_t chunk_y) noexcept {
+  return static_cast<std::uint32_t>(chunk_y) * static_cast<std::uint32_t>(kTerrainWorldChunks) +
+         static_cast<std::uint32_t>(chunk_x);
+}
 // L'entrée d'un pas : le cap du stick, kNoHeading à l'arrêt.
 struct SurvivorsInput {
   std::uint8_t heading = kNoHeading;
@@ -91,7 +100,8 @@ inline constexpr std::uint64_t kOfferStream = 2;
 inline constexpr std::uint64_t kCombatStream = 3;
 // Le butin : l'ouverture des coffres.
 inline constexpr std::uint64_t kLootStream = 4;
-// Le décor : les plantes posées au départ.
+// Le décor : les plantes posées au départ. Sur un sol généré, chaque morceau
+// tire ses plantes dans ce flux, sous sa propre graine (TerrainPlantSeed).
 inline constexpr std::uint64_t kFieldStream = 5;
 // La chute des cartes : elle ne décale ni les coffres ni les vagues.
 inline constexpr std::uint64_t kCardStream = 6;
@@ -120,8 +130,11 @@ struct SurvivorsField {
   std::vector<SurvivorsFoeShot> foe_shots;  // ordre de tir
   std::vector<SurvivorsHazard> hazards;     // ordre de pose
   std::vector<SurvivorsGem> gems;           // ordre de naissance
-  std::vector<SurvivorsPlant> plants;       // ordre de pose, au départ
-  std::vector<SurvivorsPickup> pickups;     // ordre de chute
+  std::vector<SurvivorsPlant> plants;       // ordre de pose
+  // Sur un sol généré, les morceaux déjà éveillés, par clé strictement
+  // croissante (PlantChunkKey) : un morceau ne pose ses plantes qu'une fois.
+  std::vector<std::uint32_t> woken_chunks;
+  std::vector<SurvivorsPickup> pickups;  // ordre de chute
   std::vector<SurvivorsOffer> offers;
   std::vector<std::uint16_t> banished;
   std::uint8_t rerolls_left = 0;
@@ -184,20 +197,30 @@ class SurvivorsRun {
   // kMostCursedWater ou d'un rang que les règles n'ont pas, Id verrouillés non
   // strictement croissants, plus de kMostLockedIds, hors des réserves de la
   // classe, ou qui verrouillent le premier skill, sol borné vide ou de plus de
-  // kMostArenaSideCells de côté, aucune case praticable à moins de
-  // spawn_search_ring × 2 du départ. Le départ pose les plantes d'un sol borné
-  // (flux décor), avant le premier pas.
+  // kMostArenaSideCells de côté, sol borné pour une arène qui nomme un
+  // terrain, aucune case praticable à moins de spawn_search_ring × 2 du
+  // départ. Le départ pose les plantes d'un sol borné (flux décor), ou éveille
+  // les morceaux d'un sol généré autour du héros, avant le premier pas. Un sol
+  // généré se prend tel quel, même pour une arène qui lit une carte : les
+  // essais y choisissent la taille du cache.
   [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules,
                                                         SurvivorsGround ground,
                                                         const SurvivorsStart& start);
   // Sur la carte `arena`, un sol borné.
   [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules, WalkMap arena,
                                                         const SurvivorsStart& start);
+  // UNE ARÈNE GÉNÉRÉE naît sans installation : son sol est celui de son
+  // terrain, sous la graine du départ. kInvalidArgument, en plus, pour une
+  // arène inconnue ou qui lit une carte.
+  [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules,
+                                                        const SurvivorsStart& start);
   // La partie garde l'adresse de ses règles : des règles temporaires la
   // laisseraient pointer dans le vide dès la fin de l'expression.
   static core::Result<SurvivorsRun> Start(const SurvivorsRules&& rules, SurvivorsGround ground,
                                           const SurvivorsStart& start) = delete;
   static core::Result<SurvivorsRun> Start(const SurvivorsRules&& rules, WalkMap arena,
+                                          const SurvivorsStart& start) = delete;
+  static core::Result<SurvivorsRun> Start(const SurvivorsRules&& rules,
                                           const SurvivorsStart& start) = delete;
   // Un pas de 20 ms. Sans effet hors kRunning.
   void Step(SurvivorsInput input);
