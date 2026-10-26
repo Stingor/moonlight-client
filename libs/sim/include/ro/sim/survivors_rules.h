@@ -10,6 +10,7 @@
 #include "ro/sim/packed_position.h"
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_terrain.h"
 
 namespace ro::sim {
 
@@ -181,6 +182,8 @@ struct ArenaRule {
   const char* key = "";
   const char* map_name = "";          // nom RO de la carte, lue par app
   std::optional<CellPosition> start;  // rien : le centre de la carte
+  // La règle de terrain du sol généré ; 0 : la carte de `map_name`.
+  std::uint16_t terrain_id = 0;
 };
 struct ClassRule {
   std::uint16_t class_id = 0;
@@ -321,6 +324,8 @@ struct SurvivorsRules {
   // Un rang par entrée, de 0 à kMostCursedWater ; vide : aucune Cursed Water.
   std::span<const CursedWaterRank> cursed_water;
   ReviveRule revive;
+  // Les règles de terrain que nomment les arènes générées.
+  std::span<const TerrainRule> terrains;
 };
 
 // La table livrée : constante, construite une fois.
@@ -380,6 +385,15 @@ struct SurvivorsRules {
 // ni vide ni de kMostCursedWater + 1 rangs, son rang 0 majore quelque chose,
 // ou une majoration sort de [0, kMostStatBonus] ; la relève rend des PV hors
 // de [1, 100] % ou repousse au-delà de la plus grande arène.
+// Les terrains sont refusés pour : un Id nul, un Id ou une clé en double, de
+// terrain comme de pièce d'un terrain ; une emprise vide, sans case bloquée,
+// de lignes inégales, d'un caractère autre que « . » et « # », plus grande que
+// son emplacement moins sa bordure, ou qui enclave une case libre ; des poids
+// de pièces ordinaires de somme nulle ou supérieure à 0xFFFFFFFF, de même pour
+// les repères quand il y en a ; des repères sans période ; des densités hors de
+// [0, 1000] ou inversées ; une période de densité nulle, ou une période au-delà
+// du monde ; une clairière hors de [0, kMostArenaSideCells] ; une arène qui
+// nomme un terrain inconnu.
 [[nodiscard]] core::Result<void> CheckSurvivorsRules(const SurvivorsRules& rules);
 // Recherches linéaires par Id ; nullptr pour un Id inconnu.
 [[nodiscard]] const SurvivorsSkillRule* FindSkill(const SurvivorsRules& rules,

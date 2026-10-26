@@ -339,7 +339,7 @@ core::Result<void> CheckSurvivorsRules(const SurvivorsRules& rules) {
   // Chaque contrôle suppose les précédents : un Id se cherche dans une table
   // déjà sans doublon. Le contenu d'une arène complète passe après le noyau.
   using RulesCheck = core::Result<void> (*)(const SurvivorsRules&);
-  constexpr std::array<RulesCheck, 17> kChecks{CheckUniqueIds,
+  constexpr std::array<RulesCheck, 18> kChecks{CheckUniqueIds,
                                                CheckClasses,
                                                CheckSkills,
                                                CheckCards,
@@ -355,7 +355,8 @@ core::Result<void> CheckSurvivorsRules(const SurvivorsRules& rules) {
                                                survivors::CheckEvolutions,
                                                survivors::CheckLoot,
                                                survivors::CheckContentTuning,
-                                               survivors::CheckMetaRules};
+                                               survivors::CheckMetaRules,
+                                               survivors::CheckTerrains};
   for (const RulesCheck check : kChecks) {
     if (core::Result<void> checked = check(rules); !checked) return checked;
   }

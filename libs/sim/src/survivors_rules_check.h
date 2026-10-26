@@ -79,5 +79,8 @@ template <typename Rule, typename IdOf>
 // Ce que la partie interprète de la méta : cartes des monstres, cote de
 // chute, table de la Cursed Water, relève.
 [[nodiscard]] core::Result<void> CheckMetaRules(const SurvivorsRules& rules);
+// survivors_rules_check_terrain.cpp : les règles de terrain des arènes
+// générées, et le terrain que nomme chaque arène.
+[[nodiscard]] core::Result<void> CheckTerrains(const SurvivorsRules& rules);
 
 }  // namespace ro::sim::survivors
