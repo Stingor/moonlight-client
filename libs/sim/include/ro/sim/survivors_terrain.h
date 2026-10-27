@@ -17,8 +17,9 @@ namespace ro::sim {
 //
 // Le monde se découpe en MORCEAUX de 32 × 32 cases, chacun en 16 EMPLACEMENTS
 // de 8 × 8. Une pièce tient dans son emplacement en laissant libre la bordure
-// d'une case : la praticabilité d'une case ne dépend que de son emplacement, et
-// le réseau des bordures relie tout le monde. Un morceau sur
+// d'une case : la praticabilité d'une case ne dépend que de son emplacement et
+// des chemins (voir plus bas), fonction pure de la graine qu'un morceau calcule
+// sans générer de voisin, et le réseau des bordures relie tout le monde. Un morceau sur
 // `landmark_period_chunks`² devient un GRAND EMPLACEMENT d'un seul tenant, qui
 // porte un repère sous la même règle de bordure.
 //
@@ -60,7 +61,8 @@ inline constexpr std::uint32_t kTerrainDrawsPerLandmark = 4;
 // Un carrefour se tient à au moins kTerrainPathMarginCells du bord de sa
 // cellule : au centre du premier morceau à repère de la cellule s'il y en a un,
 // sinon là où le tire un mélange de la graine (sel « SURVPATH », un mélange par
-// carrefour : la moitié basse pour x, la haute pour y). Un chemin serpente :
+// carrefour : x est son reste entier, y le reste de sa moitié haute). Un
+// chemin serpente :
 // tous les kTerrainPathBendCells cases le long de son axe, un coude s'écarte
 // de la droite d'au plus `path_wiggle_cells` (sel « SURVBEND », un mélange par
 // coude), puis le tracé entier de coude en coude se peint d'un disque de

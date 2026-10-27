@@ -34,8 +34,8 @@ constexpr std::uint64_t kSplitMixSecondMultiplier = 0x94D0'49BB'1331'11EBULL;
 constexpr unsigned kSplitMixFirstShift = 30;
 constexpr unsigned kSplitMixSecondShift = 27;
 constexpr unsigned kSplitMixLastShift = 31;
-// Le mélange du morceau à repère donne deux décalages : l'un dans la moitié
-// basse, l'autre dans la moitié haute.
+// Un mélange donne deux décalages, le morceau à repère comme le carrefour : x
+// est le reste du mot entier de 64 bits, y celui de sa seule moitié haute.
 constexpr unsigned kHalfWordBits = 32;
 constexpr char kBlockedCell = '#';
 
@@ -280,15 +280,14 @@ struct PathCanvas {
   }
 };
 
-// Le chemin du carrefour de la cellule (cell_x, cell_y) à celui de sa voisine
-// à l'est ou au nord : un coude tous les kTerrainPathBendCells cases le long
-// de son axe, écarté de la droite par un mélange.
+// Le chemin du carrefour `from` de la cellule (cell_x, cell_y) au carrefour
+// `to` de sa voisine à l'est ou au nord : un coude tous les
+// kTerrainPathBendCells cases le long de son axe, écarté de la droite par un
+// mélange.
 void PaintPath(const TerrainRule& rule, std::uint64_t run_seed, const PathCanvas& canvas,
-               std::int64_t cell_x, std::int64_t cell_y, std::uint64_t direction) {
+               std::int64_t cell_x, std::int64_t cell_y, std::uint64_t direction, TerrainCell from,
+               TerrainCell to) {
   const bool eastward = direction == kEastward;
-  const TerrainCell from = TerrainPathCrossing(rule, run_seed, cell_x, cell_y);
-  const TerrainCell to = TerrainPathCrossing(rule, run_seed, eastward ? cell_x + 1 : cell_x,
-                                             eastward ? cell_y : cell_y + 1);
   // L'axe du chemin et son travers ; un carrefour se tient loin du bord de sa
   // cellule, si bien que l'axe avance toujours.
   const std::int64_t along_from = eastward ? from.x : from.y;
@@ -315,7 +314,9 @@ void PaintPath(const TerrainRule& rule, std::uint64_t run_seed, const PathCanvas
 
 // Les chemins qui passent dans le morceau : ceux qui partent de sa cellule, et
 // ceux qui y arrivent depuis la cellule à l'ouest ou au sud. Aucun autre ne
-// l'atteint, puisqu'un chemin ne quitte pas les deux cellules qu'il relie.
+// l'atteint, puisqu'un chemin ne quitte pas les deux cellules qu'il relie. Les
+// quatre chemins n'ont que cinq bouts : le carrefour de la cellule et ceux de
+// ses quatre voisines, chacun calculé une fois.
 void PaintPaths(const TerrainRule& rule, std::uint64_t run_seed, TerrainChunk& chunk) {
   if (rule.path_period_chunks <= 0 || rule.path_width_cells <= 0) return;
   const PathCanvas canvas{.chunk = chunk,
@@ -324,10 +325,15 @@ void PaintPaths(const TerrainRule& rule, std::uint64_t run_seed, TerrainChunk& c
                           .width = rule.path_width_cells};
   const std::int64_t cell_x = TerrainPathCellOf(rule, chunk.chunk_x);
   const std::int64_t cell_y = TerrainPathCellOf(rule, chunk.chunk_y);
-  PaintPath(rule, run_seed, canvas, cell_x - 1, cell_y, kEastward);
-  PaintPath(rule, run_seed, canvas, cell_x, cell_y, kEastward);
-  PaintPath(rule, run_seed, canvas, cell_x, cell_y - 1, kNorthward);
-  PaintPath(rule, run_seed, canvas, cell_x, cell_y, kNorthward);
+  const TerrainCell here = TerrainPathCrossing(rule, run_seed, cell_x, cell_y);
+  const TerrainCell west = TerrainPathCrossing(rule, run_seed, cell_x - 1, cell_y);
+  const TerrainCell east = TerrainPathCrossing(rule, run_seed, cell_x + 1, cell_y);
+  const TerrainCell south = TerrainPathCrossing(rule, run_seed, cell_x, cell_y - 1);
+  const TerrainCell north = TerrainPathCrossing(rule, run_seed, cell_x, cell_y + 1);
+  PaintPath(rule, run_seed, canvas, cell_x - 1, cell_y, kEastward, west, here);
+  PaintPath(rule, run_seed, canvas, cell_x, cell_y, kEastward, here, east);
+  PaintPath(rule, run_seed, canvas, cell_x, cell_y - 1, kNorthward, south, here);
+  PaintPath(rule, run_seed, canvas, cell_x, cell_y, kNorthward, here, north);
 }
 
 }  // namespace
