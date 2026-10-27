@@ -108,7 +108,7 @@ constexpr std::array<GroundTextureLook, 7> kPlainsTextures{{
      .quarter_v = 1},
 }};
 
-// LES CHAMPIGNONS se posent aux deux tiers de leur taille : entier, le plus
+// LES CHAMPIGNONS se posent à 0,65 de leur taille : entier, le plus
 // voyant, l'orange, est presque aussi large que le héros (les trois modèles ont
 // la même forme).
 constexpr float kMushroomScale = 0.65F;

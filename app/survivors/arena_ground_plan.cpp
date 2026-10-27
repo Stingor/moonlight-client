@@ -529,9 +529,13 @@ class Planner {
     TextureCube shown{.u = look.quarter_u, .v = look.quarter_v};
     if (tile.role == GroundTextureRole::kPathEdge) {
       // La terre à l'est ou au nord lit l'autre colonne de la bande, tournée
-      // comme la terre à l'ouest ou au sud.
-      if (turn % kQuarterTurns >= kHalfTurn) shown.u = look.east_quarter_u;
-      turn %= kHalfTurn;
+      // comme la terre à l'ouest ou au sud ; sans autre colonne, elle lit la
+      // même, retournée.
+      if (turn % kQuarterTurns >= kHalfTurn &&
+          look.east_quarter_u != GroundTextureLook::kNoEastColumn) {
+        shown.u = look.east_quarter_u;
+        turn %= kHalfTurn;
+      }
       shown.v = TextureCubeOf(cube.quarter_east, cube.quarter_north, turn).v;
     }
     const MotifCube place = MotifCubeShowing(shown, turn);
