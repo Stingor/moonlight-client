@@ -85,16 +85,19 @@ constexpr std::array<PieceLook, 7> kPlainsPieces{{
 // posent pas seuls.
 //
 // Les chemins prennent les carreaux des chemins des champs : la terre de
-// `prt_흙02` ; la colonne ouest de `prt_초원02`, terre à l'ouest et herbe à
-// l'est, lisière au milieu ; le cube (1, 2) de `prt_초원03`, terre au seul
-// coin nord-ouest ; le cube (1, 1) de `prt_초원04`, herbe au seul coin
-// sud-ouest, lisière en biais.
+// `prt_흙02` ; la bande de terre de `prt_초원02`, à cheval sur ses colonnes
+// ouest et est : la colonne 0, terre à l'ouest et herbe à l'est, et la
+// colonne 3, l'inverse, lisière au milieu ; le cube (1, 2) de `prt_초원03`,
+// terre au seul coin nord-ouest ; le cube (1, 1) de `prt_초원04`, herbe au
+// seul coin sud-ouest, lisière en biais.
 constexpr std::array<GroundTextureLook, 7> kPlainsTextures{{
     {.texture = "필드바닥\\prt_초원01.bmp"},
     {.texture = "필드바닥\\prt_초원04.bmp", .role = GroundTextureRole::kPatch},
     {.texture = "필드바닥\\prt_초원04.bmp", .role = GroundTextureRole::kScatter},
     {.texture = "필드바닥\\prt_흙02.bmp", .role = GroundTextureRole::kPathFull},
-    {.texture = "필드바닥\\prt_초원02.bmp", .role = GroundTextureRole::kPathEdge},
+    {.texture = "필드바닥\\prt_초원02.bmp",
+     .role = GroundTextureRole::kPathEdge,
+     .east_quarter_u = 3},
     {.texture = "필드바닥\\prt_초원03.bmp",
      .role = GroundTextureRole::kPathOuter,
      .quarter_u = 1,
@@ -105,18 +108,23 @@ constexpr std::array<GroundTextureLook, 7> kPlainsTextures{{
      .quarter_v = 1},
 }};
 
-// Le long des chemins : des touffes, des buissons bas et des champignons.
-constexpr std::array<SeedLook, 4> kPlainsVergeSeeds{{
+// LES CHAMPIGNONS se posent aux deux tiers de leur taille : entier, le plus
+// voyant, l'orange, est presque aussi large que le héros (les trois modèles ont
+// la même forme).
+constexpr float kMushroomScale = 0.65F;
+
+// Le long des chemins : des touffes, des buissons bas, un champignon sur huit.
+constexpr std::array<SeedLook, 3> kPlainsVergeSeeds{{
     {.model = "나무잡초꽃\\덤불06.rsm", .scale = 0.8F, .weight = 4},
-    {.model = "나무잡초꽃\\덤불05.rsm", .scale = 0.6F, .weight = 2},
-    {.model = "나무잡초꽃\\버섯01.rsm", .weight = 1},
-    {.model = "나무잡초꽃\\버섯02.rsm", .weight = 1},
+    {.model = "나무잡초꽃\\덤불05.rsm", .scale = 0.6F, .weight = 3},
+    {.model = "나무잡초꽃\\버섯03.rsm", .scale = kMushroomScale, .weight = 1},
 }};
 
+// Un champignon sur quatre ; souches et touffes font le reste.
 constexpr std::array<SeedLook, 6> kPlainsSeeds{{
-    {.model = "나무잡초꽃\\버섯01.rsm", .weight = 3},
-    {.model = "나무잡초꽃\\버섯02.rsm", .weight = 3},
-    {.model = "나무잡초꽃\\버섯03.rsm", .weight = 2},
+    {.model = "나무잡초꽃\\버섯01.rsm", .scale = kMushroomScale, .weight = 1},
+    {.model = "나무잡초꽃\\버섯02.rsm", .scale = kMushroomScale, .weight = 1},
+    {.model = "나무잡초꽃\\버섯03.rsm", .scale = kMushroomScale, .weight = 1},
     {.model = "나무잡초꽃\\나무조각01.rsm", .weight = 2},
     {.model = "나무잡초꽃\\나무조각02.rsm", .weight = 3},
     {.model = "나무잡초꽃\\덤불06.rsm", .scale = 0.8F, .weight = 4},

@@ -137,6 +137,8 @@ constexpr std::int32_t kRingSide = kGroundWindowCells + 2 * kRingCells;
 constexpr std::int32_t kDirtCornerLeastCells = 2;
 constexpr std::int32_t kCubeCorners = kGroundWindowCubes + 1;
 constexpr std::uint8_t kNoTexture = 0xFF;
+constexpr std::uint8_t kQuarterTurns = ro::sim::kTerrainQuarterTurns;
+constexpr std::uint8_t kHalfTurn = kQuarterTurns / 2;
 
 [[nodiscard]] float UnitOf(std::uint32_t draw) noexcept {
   return static_cast<float>(draw) * kUnitFromDraw;
@@ -510,8 +512,8 @@ class Planner {
 
   // LE CARREAU DE CHEMIN d'un cube qui a des coins de terre. La terre pleine
   // garde la place du cube dans son motif, comme l'herbe ; un bord glisse le
-  // long de sa colonne avec la case du monde ; un coin montre son cube. Un
-  // biome sans le carreau voulu laisse l'herbe.
+  // long de sa colonne avec la case du monde, sans demi-tour ; un coin montre
+  // son cube. Un biome sans le carreau voulu laisse l'herbe.
   void PaintPathTile(PlannedCube& cube, std::uint8_t dirt_corners) const {
     if (dirt_corners == 0) return;
     const PathTile tile = PathTileOf(dirt_corners);
@@ -523,14 +525,19 @@ class Planner {
       cube.turn = 0;
       return;
     }
+    std::uint8_t turn = tile.turn;
     TextureCube shown{.u = look.quarter_u, .v = look.quarter_v};
     if (tile.role == GroundTextureRole::kPathEdge) {
-      shown.v = TextureCubeOf(cube.quarter_east, cube.quarter_north, tile.turn).v;
+      // La terre à l'est ou au nord lit l'autre colonne de la bande, tournée
+      // comme la terre à l'ouest ou au sud.
+      if (turn % kQuarterTurns >= kHalfTurn) shown.u = look.east_quarter_u;
+      turn %= kHalfTurn;
+      shown.v = TextureCubeOf(cube.quarter_east, cube.quarter_north, turn).v;
     }
-    const MotifCube place = MotifCubeShowing(shown, tile.turn);
+    const MotifCube place = MotifCubeShowing(shown, turn);
     cube.quarter_east = place.quarter_east;
     cube.quarter_north = place.quarter_north;
-    cube.turn = tile.turn;
+    cube.turn = turn;
     // Un coin se découpe dans une texture dont les cubes voisins ne le
     // prolongent pas ; un bord glisse le long d'une colonne qui se prolonge.
     cube.inset = tile.role != GroundTextureRole::kPathEdge;

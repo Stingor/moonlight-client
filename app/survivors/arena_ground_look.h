@@ -60,6 +60,15 @@ struct PieceLook {
 // pour un coin de terre, partout sauf au sud-ouest pour un coin d'herbe. La
 // lisière d'un carreau passe au milieu de ses côtés : d'un carreau à l'autre,
 // elle se raccorde.
+//
+// CE QU'UN CARREAU LIT suit la case du monde là où la texture se prolonge :
+// la terre pleine lit le cube de sa place dans le motif de 4 × 4, comme
+// l'herbe, et un bord glisse le long de sa colonne. Un bord ne fait jamais de
+// demi-tour : la terre à l'est (ou au nord) lit, tournée comme celle de
+// l'ouest (ou du sud), la colonne `east_quarter_u`, qui porte l'autre moitié
+// de la même bande de terre — un chemin d'un cube de large y lit une bande
+// entière, et le grain peint garde son sens. Un coin montre toujours son cube,
+// tourné : aucun cube voisin de la texture ne le prolonge.
 enum class GroundTextureRole : std::uint8_t {
   kGrass,
   kPatch,
@@ -79,6 +88,8 @@ struct GroundTextureLook {
   // axe ; un bord glisse le long de sa colonne `quarter_u`.
   std::uint8_t quarter_u = 0;
   std::uint8_t quarter_v = 0;
+  // La colonne d'un bord dont la terre est à l'est, à son quart de tour nul.
+  std::uint8_t east_quarter_u = 0;
 };
 
 // LE SEMIS : un décor qui ne bloque pas — champignons, souches, touffes, fleurs.
