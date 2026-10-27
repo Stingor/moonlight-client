@@ -23,6 +23,10 @@ constexpr std::uint64_t kLandmarkSalt = 0x5355'5256'4D41'524BULL;
 // « SURVPATH » pour les carrefours, « SURVBEND » pour les coudes des chemins.
 constexpr std::uint64_t kPathSalt = 0x5355'5256'5041'5448ULL;
 constexpr std::uint64_t kBendSalt = 0x5355'5256'4245'4E44ULL;
+// « SURVSIDE » pour le quart du site d'un repère autour de sa place.
+constexpr std::uint64_t kSideSalt = 0x5355'5256'5349'4445ULL;
+constexpr std::uint64_t kSiteEastBit = 1;
+constexpr std::uint64_t kSiteNorthBit = 2;
 // Le coude d'un chemin se mélange à la direction de son chemin.
 constexpr std::uint64_t kEastward = 0;
 constexpr std::uint64_t kNorthward = 1;
@@ -192,9 +196,9 @@ void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const 
                                                         static_cast<std::uint64_t>(period))};
 }
 
-// Vrai si ce morceau porte un repère : l'élu de son carré, hors de la clairière.
-[[nodiscard]] bool CarriesLandmark(const TerrainRule& rule, std::uint64_t run_seed,
-                                   std::int64_t chunk_x, std::int64_t chunk_y) noexcept {
+// Vrai si ce morceau est l'élu de son carré, hors de la clairière.
+[[nodiscard]] bool ElectedOutsideClearing(const TerrainRule& rule, std::uint64_t run_seed,
+                                          std::int64_t chunk_x, std::int64_t chunk_y) noexcept {
   const std::int64_t period = rule.landmark_period_chunks;
   if (period <= 0) return false;
   const TerrainCell elected =
@@ -204,6 +208,63 @@ void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const 
   const std::int64_t south = chunk_y * kTerrainChunkCells;
   return DistanceFromStart(west, south, west + kTerrainChunkCells - 1,
                            south + kTerrainChunkCells - 1) >= rule.clearing_cells;
+}
+
+[[nodiscard]] bool HasPaths(const TerrainRule& rule) noexcept {
+  return rule.path_period_chunks > 0 && rule.path_width_cells > 0;
+}
+
+// Le premier élu hors clairière de la cellule de chemins (cell_x, cell_y), par
+// carré de repères du sud au nord et d'ouest en est : le morceau de sa place.
+struct PlazaChunk {
+  bool exists = false;
+  TerrainCell chunk;
+};
+
+[[nodiscard]] PlazaChunk PlazaChunkOf(const TerrainRule& rule, std::uint64_t run_seed,
+                                      std::int64_t cell_x, std::int64_t cell_y) noexcept {
+  const std::int64_t period = rule.path_period_chunks;
+  const std::int64_t landmark_period = rule.landmark_period_chunks;
+  if (!HasPaths(rule) || landmark_period <= 0) return PlazaChunk{};
+  const std::int64_t first_x = cell_x * period;
+  const std::int64_t first_y = cell_y * period;
+  const std::int64_t last_x = first_x + period - 1;
+  const std::int64_t last_y = first_y + period - 1;
+  for (std::int64_t block_y = FloorDivide(first_y, landmark_period);
+       block_y <= FloorDivide(last_y, landmark_period); ++block_y) {
+    for (std::int64_t block_x = FloorDivide(first_x, landmark_period);
+         block_x <= FloorDivide(last_x, landmark_period); ++block_x) {
+      const TerrainCell elected = ElectedChunk(rule, run_seed, block_x, block_y);
+      if (elected.x < first_x || elected.x > last_x || elected.y < first_y || elected.y > last_y ||
+          !ElectedOutsideClearing(rule, run_seed, elected.x, elected.y)) {
+        continue;
+      }
+      return PlazaChunk{.exists = true, .chunk = elected};
+    }
+  }
+  return PlazaChunk{};
+}
+
+// Vrai si ce morceau porte un repère : l'élu de son carré, hors de la
+// clairière ; avec des chemins, le seul morceau de place de sa cellule.
+[[nodiscard]] bool CarriesLandmark(const TerrainRule& rule, std::uint64_t run_seed,
+                                   std::int64_t chunk_x, std::int64_t chunk_y) noexcept {
+  if (!ElectedOutsideClearing(rule, run_seed, chunk_x, chunk_y)) return false;
+  if (!HasPaths(rule)) return true;
+  const PlazaChunk plaza = PlazaChunkOf(rule, run_seed, TerrainPathCellOf(rule, chunk_x),
+                                        TerrainPathCellOf(rule, chunk_y));
+  return plaza.exists && plaza.chunk.x == chunk_x && plaza.chunk.y == chunk_y;
+}
+
+// La place qu'un morceau de place porte en son centre, et le quart de son site.
+[[nodiscard]] TerrainPlaza PlazaIn(std::uint64_t run_seed, TerrainCell chunk) noexcept {
+  const std::uint64_t mixed = Mix(run_seed, kSideSalt, chunk.x, chunk.y);
+  return TerrainPlaza{
+      .exists = true,
+      .centre = TerrainCell{.x = chunk.x * kTerrainChunkCells + kTerrainChunkCells / 2,
+                            .y = chunk.y * kTerrainChunkCells + kTerrainChunkCells / 2},
+      .site_east = (mixed & kSiteEastBit) != 0U,
+      .site_north = (mixed & kSiteNorthBit) != 0U};
 }
 
 // ── LES CHEMINS.
@@ -280,14 +341,59 @@ struct PathCanvas {
   }
 };
 
+// Le carrefour d'une cellule de chemins, et sa place s'il en a une.
+struct Crossing {
+  TerrainCell centre;
+  TerrainPlaza plaza;
+};
+
+[[nodiscard]] Crossing CrossingOf(const TerrainRule& rule, std::uint64_t run_seed,
+                                  std::int64_t cell_x, std::int64_t cell_y) noexcept {
+  const std::int64_t period = rule.path_period_chunks;
+  if (period <= 0) return Crossing{};
+  const PlazaChunk plaza_chunk = PlazaChunkOf(rule, run_seed, cell_x, cell_y);
+  if (plaza_chunk.exists) {
+    const TerrainPlaza plaza = PlazaIn(run_seed, plaza_chunk.chunk);
+    return Crossing{.centre = plaza.centre, .plaza = plaza};
+  }
+  const std::uint64_t mixed = Mix(run_seed, kPathSalt, cell_x, cell_y);
+  const std::uint64_t span =
+      static_cast<std::uint64_t>(period * kTerrainChunkCells - 2 * kTerrainPathMarginCells) + 1;
+  return Crossing{
+      .centre = TerrainCell{.x = cell_x * period * kTerrainChunkCells + kTerrainPathMarginCells +
+                                 static_cast<std::int64_t>(mixed % span),
+                            .y = cell_y * period * kTerrainChunkCells + kTerrainPathMarginCells +
+                                 static_cast<std::int64_t>((mixed >> kHalfWordBits) % span)}};
+}
+
+// La case à `cells` du centre de la place sur l'axe d'un chemin, vers l'est ou
+// le nord quand `cells` est positif.
+[[nodiscard]] TerrainCell AlongAxis(TerrainCell centre, bool eastward,
+                                    std::int64_t cells) noexcept {
+  return eastward ? TerrainCell{.x = centre.x + cells, .y = centre.y}
+                  : TerrainCell{.x = centre.x, .y = centre.y + cells};
+}
+
 // Le chemin du carrefour `from` de la cellule (cell_x, cell_y) au carrefour
 // `to` de sa voisine à l'est ou au nord : un coude tous les
 // kTerrainPathBendCells cases le long de son axe, écarté de la droite par un
-// mélange.
+// mélange. Une place dont le site est du côté du chemin le fait passer par sa
+// porte, en ligne droite.
 void PaintPath(const TerrainRule& rule, std::uint64_t run_seed, const PathCanvas& canvas,
-               std::int64_t cell_x, std::int64_t cell_y, std::uint64_t direction, TerrainCell from,
-               TerrainCell to) {
+               std::int64_t cell_x, std::int64_t cell_y, std::uint64_t direction,
+               const Crossing& start, const Crossing& end) {
   const bool eastward = direction == kEastward;
+  const std::int64_t gate = TerrainPlazaGateCells(rule.path_width_cells);
+  TerrainCell from = start.centre;
+  if (start.plaza.exists && (eastward ? start.plaza.site_east : start.plaza.site_north)) {
+    from = AlongAxis(start.centre, eastward, gate);
+    canvas.Line(start.centre, from);
+  }
+  TerrainCell to = end.centre;
+  if (end.plaza.exists && !(eastward ? end.plaza.site_east : end.plaza.site_north)) {
+    to = AlongAxis(end.centre, eastward, -gate);
+    canvas.Line(to, end.centre);
+  }
   // L'axe du chemin et son travers ; un carrefour se tient loin du bord de sa
   // cellule, si bien que l'axe avance toujours.
   const std::int64_t along_from = eastward ? from.x : from.y;
@@ -325,16 +431,61 @@ void PaintPaths(const TerrainRule& rule, std::uint64_t run_seed, TerrainChunk& c
                           .width = rule.path_width_cells};
   const std::int64_t cell_x = TerrainPathCellOf(rule, chunk.chunk_x);
   const std::int64_t cell_y = TerrainPathCellOf(rule, chunk.chunk_y);
-  const TerrainCell here = TerrainPathCrossing(rule, run_seed, cell_x, cell_y);
-  const TerrainCell west = TerrainPathCrossing(rule, run_seed, cell_x - 1, cell_y);
-  const TerrainCell east = TerrainPathCrossing(rule, run_seed, cell_x + 1, cell_y);
-  const TerrainCell south = TerrainPathCrossing(rule, run_seed, cell_x, cell_y - 1);
-  const TerrainCell north = TerrainPathCrossing(rule, run_seed, cell_x, cell_y + 1);
+  const Crossing here = CrossingOf(rule, run_seed, cell_x, cell_y);
+  const Crossing west = CrossingOf(rule, run_seed, cell_x - 1, cell_y);
+  const Crossing east = CrossingOf(rule, run_seed, cell_x + 1, cell_y);
+  const Crossing south = CrossingOf(rule, run_seed, cell_x, cell_y - 1);
+  const Crossing north = CrossingOf(rule, run_seed, cell_x, cell_y + 1);
   PaintPath(rule, run_seed, canvas, cell_x - 1, cell_y, kEastward, west, here);
   PaintPath(rule, run_seed, canvas, cell_x, cell_y, kEastward, here, east);
   PaintPath(rule, run_seed, canvas, cell_x, cell_y - 1, kNorthward, south, here);
   PaintPath(rule, run_seed, canvas, cell_x, cell_y, kNorthward, here, north);
+  // La place tient dans son morceau : seule celle de la cellule peut le toucher.
+  if (here.plaza.exists) {
+    const PathCanvas plaza{
+        .chunk = chunk, .west = canvas.west, .south = canvas.south, .width = kTerrainPlazaCells};
+    plaza.Stamp(here.centre.x, here.centre.y);
+  }
 }
+
+// Pose le repère tiré contre la place de son morceau, dans le quart de son site.
+void PlaceBesidePlaza(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, Draw draw,
+                      const TerrainPlaza& plaza) {
+  if (draw.piece_index >= pieces.size() || !draw.corner.fits) return;
+  const FootprintSize size = FootprintSizeOf(pieces[draw.piece_index], draw.quarter);
+  constexpr std::int32_t kCentre = kTerrainChunkCells / 2;
+  draw.corner.east = plaza.site_east ? kCentre + kTerrainSiteOffsetCells
+                                     : kCentre - kTerrainSiteOffsetCells - size.width + 1;
+  draw.corner.north = plaza.site_north ? kCentre + kTerrainSiteOffsetCells
+                                       : kCentre - kTerrainSiteOffsetCells - size.height + 1;
+  Place(chunk, pieces, draw, 0, 0);
+}
+
+// LA GÉOMÉTRIE DE LA PLACE, prouvée pour la plus large route permise. Le site
+// laisse libre la bordure de son morceau ; la place ne touche pas le site.
+constexpr std::int32_t kPlazaCentre = kTerrainChunkCells / 2;
+static_assert(kPlazaCentre + kTerrainSiteOffsetCells + kTerrainLandmarkSiteCells <=
+              kTerrainChunkCells - kTerrainBorderCells);
+static_assert(kPlazaCentre - kTerrainSiteOffsetCells - kTerrainLandmarkSiteCells + 1 >=
+              kTerrainBorderCells);
+static_assert(kPlazaCentre + DiscLow(kTerrainPlazaCells) >= kTerrainBorderCells &&
+              kPlazaCentre + DiscLow(kTerrainPlazaCells) + kTerrainPlazaCells <=
+                  kTerrainChunkCells - kTerrainBorderCells);
+static_assert(DiscLow(kTerrainPlazaCells) * 2 + kTerrainPlazaCells - 1 == 0,
+              "la place est un disque centré sur son carrefour");
+static_assert(!InDisc(kTerrainPlazaCells, kTerrainSiteOffsetCells, kTerrainSiteOffsetCells));
+// Le trait d'une route sur l'axe de la place ne déborde pas vers le site.
+static_assert(-DiscLow(kMostPlazaPathWidthCells) < kTerrainSiteOffsetCells &&
+              DiscLow(kMostPlazaPathWidthCells) + kMostPlazaPathWidthCells - 1 <
+                  kTerrainSiteOffsetCells);
+// Une porte dépasse le site, et reste à moins d'un demi-morceau du centre.
+static_assert(TerrainPlazaGateCells(kMostPlazaPathWidthCells) + DiscLow(kMostPlazaPathWidthCells) >=
+              kTerrainSiteOffsetCells + kTerrainLandmarkSiteCells);
+static_assert(-TerrainPlazaGateCells(kMostPlazaPathWidthCells) + DiscLow(kMostPlazaPathWidthCells) +
+                  kMostPlazaPathWidthCells - 1 <
+              -(kTerrainSiteOffsetCells + kTerrainLandmarkSiteCells - 1));
+static_assert(TerrainPlazaGateCells(kMostPlazaPathWidthCells) < kTerrainChunkCells / 2);
+static_assert(TerrainPlazaGateCells(kMostPlazaPathWidthCells + 1) >= kTerrainChunkCells / 2);
 
 }  // namespace
 
@@ -345,37 +496,12 @@ std::int64_t TerrainPathCellOf(const TerrainRule& rule, std::int64_t chunk) noex
 
 TerrainCell TerrainPathCrossing(const TerrainRule& rule, std::uint64_t run_seed,
                                 std::int64_t cell_x, std::int64_t cell_y) {
-  const std::int64_t period = rule.path_period_chunks;
-  if (period <= 0) return TerrainCell{};
-  const std::int64_t first_x = cell_x * period;
-  const std::int64_t first_y = cell_y * period;
-  // Le premier morceau à repère de la cellule, par carré de repères du sud au
-  // nord et d'ouest en est : le carrefour se tient en son centre.
-  const std::int64_t landmark_period = rule.landmark_period_chunks;
-  if (landmark_period > 0) {
-    const std::int64_t last_x = first_x + period - 1;
-    const std::int64_t last_y = first_y + period - 1;
-    for (std::int64_t block_y = FloorDivide(first_y, landmark_period);
-         block_y <= FloorDivide(last_y, landmark_period); ++block_y) {
-      for (std::int64_t block_x = FloorDivide(first_x, landmark_period);
-           block_x <= FloorDivide(last_x, landmark_period); ++block_x) {
-        const TerrainCell elected = ElectedChunk(rule, run_seed, block_x, block_y);
-        if (elected.x < first_x || elected.x > last_x || elected.y < first_y ||
-            elected.y > last_y || !CarriesLandmark(rule, run_seed, elected.x, elected.y)) {
-          continue;
-        }
-        return TerrainCell{.x = elected.x * kTerrainChunkCells + kTerrainChunkCells / 2,
-                           .y = elected.y * kTerrainChunkCells + kTerrainChunkCells / 2};
-      }
-    }
-  }
-  const std::uint64_t mixed = Mix(run_seed, kPathSalt, cell_x, cell_y);
-  const std::uint64_t span =
-      static_cast<std::uint64_t>(period * kTerrainChunkCells - 2 * kTerrainPathMarginCells) + 1;
-  return TerrainCell{.x = first_x * kTerrainChunkCells + kTerrainPathMarginCells +
-                          static_cast<std::int64_t>(mixed % span),
-                     .y = first_y * kTerrainChunkCells + kTerrainPathMarginCells +
-                          static_cast<std::int64_t>((mixed >> kHalfWordBits) % span)};
+  return CrossingOf(rule, run_seed, cell_x, cell_y).centre;
+}
+
+TerrainPlaza TerrainPathPlaza(const TerrainRule& rule, std::uint64_t run_seed, std::int64_t cell_x,
+                              std::int64_t cell_y) {
+  return CrossingOf(rule, run_seed, cell_x, cell_y).plaza;
 }
 
 bool TerrainChunk::Passable(std::int32_t local_x, std::int32_t local_y) const noexcept {
@@ -500,6 +626,16 @@ TerrainChunk GenerateTerrainChunk(const TerrainRule& rule, std::uint64_t run_see
         Place(chunk, rule.pieces, draw, slot_east, slot_north);
       }
     }
+  }
+  // Avec des chemins, le repère se cale contre sa place : il tient dans son site.
+  if (HasPaths(rule)) {
+    const Draw landmark = DrawPiece(random, rule.pieces, landmarks,
+                                    kTerrainLandmarkSiteCells + 2 * kTerrainBorderCells);
+    if (landmark_chunk) {
+      PlaceBesidePlaza(chunk, rule.pieces, landmark,
+                       PlazaIn(run_seed, TerrainCell{.x = chunk_x, .y = chunk_y}));
+    }
+    return chunk;
   }
   const Draw landmark = DrawPiece(random, rule.pieces, landmarks, kTerrainChunkCells);
   if (landmark_chunk) Place(chunk, rule.pieces, landmark, 0, 0);

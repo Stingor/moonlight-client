@@ -70,6 +70,7 @@ template <typename Rule>
 }
 
 [[nodiscard]] core::Result<void> CheckFootprint(const TerrainPieceRule& piece,
+                                                std::int32_t most_landmark_side_cells,
                                                 const std::string& named) {
   const std::span<const std::string_view> rows = piece.footprint;
   if (rows.empty() || rows.front().empty()) return Refuse(named + "emprise vide");
@@ -84,7 +85,7 @@ template <typename Rule>
     }
   }
   if (!blocks) return Refuse(named + "emprise sans case bloquée");
-  const std::int32_t most = piece.landmark ? kMostLandmarkSideCells : kMostPieceSideCells;
+  const std::int32_t most = piece.landmark ? most_landmark_side_cells : kMostPieceSideCells;
   const FootprintSize size = FootprintSizeOf(piece, 0);
   if (size.width > most || size.height > most) {
     return Refuse(named + "emprise de " + std::to_string(size.width) + " × " +
@@ -115,14 +116,24 @@ template <typename Rule>
   if (const std::string_view key = RepeatedKey(terrain.pieces); !key.empty()) {
     return Refuse(named + "clé de pièce « " + std::string(key) + " » en double");
   }
+  // Avec des chemins, un repère se dresse dans le site qui borde sa place.
+  const std::int32_t most_landmark_side_cells =
+      terrain.path_period_chunks > 0 ? kTerrainLandmarkSiteCells : kMostLandmarkSideCells;
   bool has_landmark = false;
   for (const TerrainPieceRule& piece : terrain.pieces) {
     has_landmark = has_landmark || piece.landmark;
-    if (auto checked =
-            CheckFootprint(piece, named + "pièce " + std::to_string(piece.piece_id) + " : ");
+    if (auto checked = CheckFootprint(piece, most_landmark_side_cells,
+                                      named + "pièce " + std::to_string(piece.piece_id) + " : ");
         !checked) {
       return checked;
     }
+  }
+  // Une route longe le site d'une place sans le toucher.
+  if (has_landmark && terrain.path_period_chunks > 0 &&
+      terrain.path_width_cells > kMostPlazaPathWidthCells) {
+    return Refuse(named + "chemins de " + std::to_string(terrain.path_width_cells) +
+                  " cases de large autour des places, au plus " +
+                  std::to_string(kMostPlazaPathWidthCells));
   }
   if (WeightOutOfBounds(WeightSum(terrain.pieces, false))) {
     return Refuse(named + "somme des poids des pièces ordinaires " +

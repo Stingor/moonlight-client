@@ -71,17 +71,46 @@ inline constexpr std::uint32_t kTerrainDrawsPerLandmark = 4;
 // consulter un voisin.
 //
 // UNE PIÈCE ORDINAIRE dont le rectangle d'emprise tournée touche une case de
-// chemin ne se pose pas : son emplacement reste vide. Un repère se pose
-// toujours, et ses cases bloquées sortent du chemin. Un chemin ne fait donc que
-// libérer des cases : la connexité tient.
+// chemin ne se pose pas : son emplacement reste vide. Un chemin ne fait donc
+// que libérer des cases : la connexité tient.
 inline constexpr std::int32_t kTerrainPathBendCells = 16;
 inline constexpr std::int32_t kTerrainPathMarginCells = kTerrainChunkCells / 2;
+
+// LA PLACE D'UN REPÈRE, quand la règle a des chemins. Seul le PREMIER morceau
+// à repère d'une cellule de chemins (par carré de repères du sud au nord et
+// d'ouest en est) porte son repère ; le carrefour de la cellule est son centre,
+// et une PLACE de terre l'entoure : un disque de kTerrainPlazaCells cases de
+// diamètre, peint comme un chemin, où ne se pose aucune pièce. Le repère se
+// dresse au bord de la place, dans son SITE : un carré de
+// kTerrainLandmarkSiteCells cases dont le coin le plus proche du centre s'en
+// écarte de kTerrainSiteOffsetCells sur chaque axe, dans le quart que tire un
+// mélange de la graine (sel « SURVSIDE », un mélange par morceau : bit 0 l'est,
+// bit 1 le nord). L'emprise s'y cale contre ce coin ; les deux tirages de coin
+// du repère restent faits, et ne servent pas.
+//
+// Un chemin qui part de la place du côté de son site passe d'abord, en ligne
+// droite sur son axe, par une PORTE à TerrainPlazaGateCells(largeur) cases du
+// centre, au-delà du site ; de l'autre côté, il rejoint le centre sans porte.
+// Les tracés sur un axe avancent toujours : aucun chemin n'entre dans un site,
+// ni ne s'arrête dans une emprise. Une porte reste à moins d'un demi-morceau
+// de son centre, si bien que les portes de deux places voisines se suivent.
+inline constexpr std::int32_t kTerrainPlazaCells = 9;
+inline constexpr std::int32_t kTerrainLandmarkSiteCells = 8;
+inline constexpr std::int32_t kTerrainSiteOffsetCells = 4;
+[[nodiscard]] constexpr std::int32_t TerrainPlazaGateCells(std::int32_t path_width_cells) noexcept {
+  return kTerrainSiteOffsetCells + kTerrainLandmarkSiteCells + path_width_cells / 2;
+}
+// La plus large route qui longe un site sans le toucher, et dont la porte
+// reste à moins d'un demi-morceau du centre.
+inline constexpr std::int32_t kMostPlazaPathWidthCells =
+    2 * (kTerrainChunkCells / 2 - kTerrainSiteOffsetCells - kTerrainLandmarkSiteCells) - 1;
 
 // UNE PIÈCE : une règle de jeu, sans aucun fichier. `app` associe sa clé à des
 // modèles. L'emprise est un dessin de lignes de même largeur, « # » bloque,
 // « . » laisse passer, la PREMIÈRE ligne au nord ; d'au plus
 // kMostPieceSideCells de côté pour une pièce ordinaire, kMostLandmarkSideCells
-// pour un repère, et sans case libre enclavée.
+// pour un repère (kTerrainLandmarkSiteCells si la règle a des chemins), et
+// sans case libre enclavée.
 struct TerrainPieceRule {
   std::uint16_t piece_id = 0;
   const char* key = "";
@@ -111,7 +140,8 @@ struct TerrainRule {
   // côté ; 0 : aucun chemin. Un chemin s'écarte de sa droite d'au plus
   // `path_wiggle_cells` ; écart et largeur ensemble tiennent dans
   // kTerrainPathMarginCells, si bien qu'un chemin ne quitte jamais les deux
-  // cellules qu'il relie.
+  // cellules qu'il relie. Avec des repères, la largeur tient dans
+  // kMostPlazaPathWidthCells.
   std::int32_t path_period_chunks = 0;
   std::int32_t path_width_cells = 0;
   std::int32_t path_wiggle_cells = 0;
@@ -191,6 +221,19 @@ struct TerrainCell {
 [[nodiscard]] std::int64_t TerrainPathCellOf(const TerrainRule& rule, std::int64_t chunk) noexcept;
 [[nodiscard]] TerrainCell TerrainPathCrossing(const TerrainRule& rule, std::uint64_t run_seed,
                                               std::int64_t cell_x, std::int64_t cell_y);
+
+// La place de la cellule de chemins (cell_x, cell_y) : son centre, qui est le
+// carrefour, et le quart de son site. `exists` est faux sans repère dans la
+// cellule, ou sans chemin dans la règle.
+struct TerrainPlaza {
+  bool exists = false;
+  TerrainCell centre;
+  bool site_east = false;
+  bool site_north = false;
+  [[nodiscard]] bool operator==(const TerrainPlaza&) const = default;
+};
+[[nodiscard]] TerrainPlaza TerrainPathPlaza(const TerrainRule& rule, std::uint64_t run_seed,
+                                            std::int64_t cell_x, std::int64_t cell_y);
 
 // Le morceau (chunk_x, chunk_y), défini pour tout couple d'entiers. Une règle
 // refusée par CheckSurvivorsRules ne fait pas planter : une pièce qui ne tient
