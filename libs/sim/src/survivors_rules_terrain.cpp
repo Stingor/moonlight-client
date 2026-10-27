@@ -38,30 +38,35 @@ constexpr std::array<std::string_view, 4> kRuins = {
 };
 
 constexpr std::array<TerrainPieceRule, 7> kPlainsPieces{{
-    {.piece_id = 1, .key = "rock", .footprint = kRock, .weight = 3},
-    {.piece_id = 2, .key = "tree", .footprint = kTree, .weight = 4},
-    {.piece_id = 3, .key = "grove", .footprint = kGrove, .weight = 3},
-    {.piece_id = 4, .key = "thicket", .footprint = kThicket, .weight = 2},
+    {.piece_id = 1, .key = "rock", .footprint = kRock, .weight = 9},
+    {.piece_id = 2, .key = "tree", .footprint = kTree, .weight = 8},
+    {.piece_id = 3, .key = "grove", .footprint = kGrove, .weight = 6},
+    {.piece_id = 4, .key = "thicket", .footprint = kThicket, .weight = 12},
     {.piece_id = 5, .key = "windmill", .footprint = kWindmill, .weight = 1, .landmark = true},
     {.piece_id = 6, .key = "well", .footprint = kWell, .weight = 1, .landmark = true},
     {.piece_id = 7, .key = "ruins", .footprint = kRuins, .weight = 1, .landmark = true},
 }};
 
-// La chance d'un emplacement d'avoir une pièce varie de 800 à 1 000 ‰ d'un
+// La chance d'un emplacement d'avoir une pièce varie de 250 à 625 ‰ d'un
 // nœud du bruit de densité à l'autre, un nœud tous les trois morceaux : des
-// zones plus ou moins boisées, environ 8,5 % de cases bloquées en moyenne
-// (une prairie à bosquets : de 8 à 12 %).
+// clairières et des zones plus boisées autour d'une moyenne de 440 ‰. Par
+// emplacement hors chemin, on attend 0,11 rocher, 0,10 arbre, 0,075 bosquet et
+// 0,15 massif.
 // Une clairière de 12 cases autour du départ, un repère par carré de 5 × 5
-// morceaux.
+// morceaux. Un carrefour tous les trois morceaux, des chemins de quatre cases
+// de large qui s'écartent de sept cases au plus de leur droite.
 constexpr std::array<TerrainRule, 1> kTerrains{{
     {.terrain_id = kPlainsTerrainId,
      .key = "midgard_plains",
      .pieces = kPlainsPieces,
-     .density_min_per_mille = 800,
-     .density_max_per_mille = 1000,
+     .density_min_per_mille = 250,
+     .density_max_per_mille = 625,
      .density_period_chunks = 3,
      .clearing_cells = 12,
-     .landmark_period_chunks = 5},
+     .landmark_period_chunks = 5,
+     .path_period_chunks = 3,
+     .path_width_cells = 4,
+     .path_wiggle_cells = 7},
 }};
 
 }  // namespace

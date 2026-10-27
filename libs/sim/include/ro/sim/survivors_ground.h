@@ -30,8 +30,8 @@ namespace ro::sim {
 // Le côté du cache d'un sol généré, en morceaux : 16 × 16 morceaux couvrent
 // 512 cases, bien au-delà de ce que la partie interroge autour du héros.
 inline constexpr std::int32_t kGroundCacheSideChunks = 16;
-// Le plus grand côté de cache permis : 64 × 64 morceaux d'environ 1 Kio, soit
-// environ 4 Mio. Au-delà, le cache coûterait sans rien servir.
+// Le plus grand côté de cache permis : 64 × 64 morceaux d'environ 2 Kio (cases
+// et chemins), soit environ 8 Mio. Au-delà, le cache coûterait sans rien servir.
 inline constexpr std::int32_t kMostGroundCacheSideChunks = 64;
 
 class SurvivorsGround {

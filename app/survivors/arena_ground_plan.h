@@ -17,7 +17,8 @@ namespace moonclient {
 // en données pures, sans GL ni fichier. `sim` décide les cases et les pièces ;
 // le plan en tire tout ce qui ne change pas la partie (ADR 0134, T1) : la
 // texture et la teinte de chaque cube, les ondulations du sol (Q3), une ombre
-// cuite sous chaque pièce, la pose des modèles et un semis qui ne bloque pas.
+// cuite sous chaque pièce, la pose des modèles, un semis qui ne bloque pas, et
+// la terre des chemins, bordée d'un semis le long de ses lisières.
 //
 // Tout ce qui se voit est une fonction de la CASE DU MONDE et de la graine de la
 // partie : deux fenêtres qui se recouvrent dessinent la même chose dans leur
@@ -68,8 +69,14 @@ struct PlannedCube {
   std::array<std::uint8_t, 4> color{};
   // Rang dans `GroundPlan::lightmaps` ; 0 : le plein jour partagé.
   std::uint32_t lightmap = 0;
+  // Vrai : le cube se lit en retrait de kGroundTileInset du bord de son quart
+  // de texture, pour que le filtrage n'y mêle pas un cube voisin qui ne se
+  // raccorde pas (un coin de chemin).
+  bool inset = false;
   [[nodiscard]] bool operator==(const PlannedCube&) const = default;
 };
+// Le retrait d'un cube `inset`, en part de la texture entière.
+inline constexpr float kGroundTileInset = 1.0F / 64.0F;
 
 // Le plan d'ombre d'une lightmap, 8 × 8 texels du sud au nord et d'ouest en
 // est : 255 en plein jour, `kGroundShadeLevel` sous une ombre pleine.
@@ -102,6 +109,8 @@ struct GroundPlan {
   std::vector<PlannedCube> cubes;
   // kGroundWindowCells² cases : 1 praticable, comme `sim` le dit.
   std::vector<std::uint8_t> passable;
+  // kGroundWindowCells² cases : 1 sur un chemin, comme `sim` le dit.
+  std::vector<std::uint8_t> path;
   // Les hauteurs des coins de chaque case, dans l'ordre du fichier GAT.
   std::vector<std::array<float, 4>> cell_heights;
   // Les ombres cuites ; la première est le plein jour que partagent les cubes

@@ -48,13 +48,37 @@ struct PieceLook {
 // elle-même ; une TACHE est un motif entier — de la terre bordée d'herbe —
 // posé, tourné, sur l'emplacement d'une pièce ; une tache ÉPARSE se pose
 // rarement sur un emplacement vide.
-enum class GroundTextureRole : std::uint8_t { kGrass, kPatch, kScatter };
+//
+// LES CHEMINS se peignent cube par cube. Chaque coin de cube est de terre
+// quand au moins la moitié des quatre cases qui le touchent sont de chemin ;
+// un cube prend le carreau qui raccorde ses quatre coins, tourné : la terre
+// pleine (kPathFull), un bord (kPathEdge), un coin de terre seul
+// (kPathOuter) ou un coin d'herbe seul (kPathInner). Hors de la terre pleine,
+// un carreau est UN cube de sa texture, le quart (`quarter_u`, `quarter_v`),
+// qui montre, à son quart de tour nul, l'est vers les u croissants et le nord
+// vers les v croissants : la terre à l'ouest pour un bord, au nord-ouest seul
+// pour un coin de terre, partout sauf au sud-ouest pour un coin d'herbe. La
+// lisière d'un carreau passe au milieu de ses côtés : d'un carreau à l'autre,
+// elle se raccorde.
+enum class GroundTextureRole : std::uint8_t {
+  kGrass,
+  kPatch,
+  kScatter,
+  kPathFull,
+  kPathEdge,
+  kPathOuter,
+  kPathInner,
+};
 
 struct GroundTextureLook {
   std::string_view texture;
   GroundTextureRole role = GroundTextureRole::kGrass;
   // Parmi les textures de même rôle, la part de celle-ci.
   std::uint32_t weight = 1;
+  // Le cube de la texture qu'un carreau de chemin montre, de 0 à 3 sur chaque
+  // axe ; un bord glisse le long de sa colonne `quarter_u`.
+  std::uint8_t quarter_u = 0;
+  std::uint8_t quarter_v = 0;
 };
 
 // LE SEMIS : un décor qui ne bloque pas — champignons, souches, touffes, fleurs.
@@ -75,6 +99,10 @@ struct BiomeLook {
   std::span<const SeedLook> seeds;
   // Combien de semis par morceau de 32 × 32 cases.
   std::uint32_t seeds_per_chunk = 0;
+  // LE SEMIS DE BORDURE : sur une case libre qui longe un chemin, à sa chance
+  // pour mille.
+  std::span<const SeedLook> verge_seeds;
+  std::uint32_t verge_per_mille = 0;
   // Pour mille : la chance qu'un emplacement à pièce porte une tache, et
   // qu'un emplacement vide en porte une éparse.
   std::uint32_t patch_per_mille = 0;

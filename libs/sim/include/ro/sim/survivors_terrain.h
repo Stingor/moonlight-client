@@ -54,6 +54,27 @@ inline constexpr std::uint64_t kTerrainStream = 0x0000'0043'4855'4E4BULL;
 inline constexpr std::uint32_t kTerrainDrawsPerSlot = 5;
 inline constexpr std::uint32_t kTerrainDrawsPerLandmark = 4;
 
+// LES CHEMINS DE TERRE. Le monde se pave de CELLULES de `path_period_chunks`
+// morceaux de côté, et chaque cellule porte un CARREFOUR ; chaque carrefour se
+// relie à celui de la cellule voisine à l'est et à celui de la voisine au nord.
+// Un carrefour se tient à au moins kTerrainPathMarginCells du bord de sa
+// cellule : au centre du premier morceau à repère de la cellule s'il y en a un,
+// sinon là où le tire un mélange de la graine (sel « SURVPATH », un mélange par
+// carrefour : la moitié basse pour x, la haute pour y). Un chemin serpente :
+// tous les kTerrainPathBendCells cases le long de son axe, un coude s'écarte
+// de la droite d'au plus `path_wiggle_cells` (sel « SURVBEND », un mélange par
+// coude), puis le tracé entier de coude en coude se peint d'un disque de
+// `path_width_cells` de diamètre. Aucun tirage du `Pcg32` d'un morceau : les
+// chemins ne décalent aucune pièce, et un morceau les calcule seul, sans
+// consulter un voisin.
+//
+// UNE PIÈCE ORDINAIRE dont le rectangle d'emprise tournée touche une case de
+// chemin ne se pose pas : son emplacement reste vide. Un repère se pose
+// toujours, et ses cases bloquées sortent du chemin. Un chemin ne fait donc que
+// libérer des cases : la connexité tient.
+inline constexpr std::int32_t kTerrainPathBendCells = 16;
+inline constexpr std::int32_t kTerrainPathMarginCells = kTerrainChunkCells / 2;
+
 // UNE PIÈCE : une règle de jeu, sans aucun fichier. `app` associe sa clé à des
 // modèles. L'emprise est un dessin de lignes de même largeur, « # » bloque,
 // « . » laisse passer, la PREMIÈRE ligne au nord ; d'au plus
@@ -84,6 +105,14 @@ struct TerrainRule {
   // Un morceau à repère par carré de `landmark_period_chunks` de côté ; 0 :
   // aucun repère.
   std::int32_t landmark_period_chunks = 0;
+  // Les chemins : un carrefour par cellule de `path_period_chunks` morceaux de
+  // côté ; 0 : aucun chemin. Un chemin s'écarte de sa droite d'au plus
+  // `path_wiggle_cells` ; écart et largeur ensemble tiennent dans
+  // kTerrainPathMarginCells, si bien qu'un chemin ne quitte jamais les deux
+  // cellules qu'il relie.
+  std::int32_t path_period_chunks = 0;
+  std::int32_t path_width_cells = 0;
+  std::int32_t path_wiggle_cells = 0;
 };
 
 // Une pièce posée : `x` et `y` sont la case du monde du coin sud-ouest de son
@@ -102,11 +131,15 @@ struct TerrainChunk {
   std::int32_t chunk_y = 0;
   // Un octet par case, 1 praticable : `local_y × 32 + local_x`, la ligne 0 au sud.
   std::array<std::uint8_t, kTerrainChunkArea> passable{};
+  // Un octet par case, 1 sur un chemin, dans le même ordre ; une case de
+  // chemin est toujours praticable.
+  std::array<std::uint8_t, kTerrainChunkArea> path{};
   // Dans l'ordre des emplacements ; un repère seul dans un morceau à repère.
   std::vector<PlacedPiece> pieces;
 
   // Faux hors du morceau.
   [[nodiscard]] bool Passable(std::int32_t local_x, std::int32_t local_y) const noexcept;
+  [[nodiscard]] bool OnPath(std::int32_t local_x, std::int32_t local_y) const noexcept;
   [[nodiscard]] bool operator==(const TerrainChunk&) const = default;
 };
 
@@ -142,6 +175,20 @@ struct FootprintSize {
 // pièce : le bruit de valeur entier de la règle, dans [min, max].
 [[nodiscard]] std::uint32_t TerrainDensityPerMille(const TerrainRule& rule, std::uint64_t run_seed,
                                                    std::int64_t cell_x, std::int64_t cell_y);
+
+// Une case du monde, sur 64 bits : un carrefour peut tomber hors du monde.
+struct TerrainCell {
+  std::int64_t x = 0;
+  std::int64_t y = 0;
+  [[nodiscard]] bool operator==(const TerrainCell&) const = default;
+};
+
+// La cellule des chemins qui contient le morceau `chunk`, sur un axe (division
+// vers −∞) ; et le carrefour de la cellule (cell_x, cell_y). Sans chemin dans
+// la règle, la cellule 0 et le carrefour (0, 0).
+[[nodiscard]] std::int64_t TerrainPathCellOf(const TerrainRule& rule, std::int64_t chunk) noexcept;
+[[nodiscard]] TerrainCell TerrainPathCrossing(const TerrainRule& rule, std::uint64_t run_seed,
+                                              std::int64_t cell_x, std::int64_t cell_y);
 
 // Le morceau (chunk_x, chunk_y), défini pour tout couple d'entiers. Une règle
 // refusée par CheckSurvivorsRules ne fait pas planter : une pièce qui ne tient

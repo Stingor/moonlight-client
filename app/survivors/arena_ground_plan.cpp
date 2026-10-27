@@ -9,6 +9,8 @@
 
 #include "ro/core/pcg32.h"
 
+#include "survivors/arena_ground_paths.h"
+
 namespace moonclient {
 namespace {
 
@@ -28,6 +30,7 @@ constexpr std::uint64_t kVisualSalt = 0x5649'5355'414C'0000ULL;  // « VISUAL »
 constexpr std::uint64_t kReliefSalt = 0x5245'4C49'4546'0000ULL;  // « RELIEF »
 constexpr std::uint64_t kTintSalt = 0x5449'4E54'0000'0000ULL;    // « TINT »
 constexpr std::uint64_t kPatchSalt = 0x5041'5443'4800'0000ULL;   // « PATCH »
+constexpr std::uint64_t kVergeSalt = 0x5645'5247'4500'0000ULL;   // « VERGE »
 // Le flux du `Pcg32` visuel d'un morceau.
 constexpr std::uint64_t kVisualStream = 0x0000'0056'4953'4955ULL;
 
@@ -125,6 +128,15 @@ constexpr std::size_t kCellCount =
 constexpr std::size_t kCubeCount =
     static_cast<std::size_t>(kGroundWindowCubes) * static_cast<std::size_t>(kGroundWindowCubes);
 constexpr std::int32_t kCornerSide = kGroundWindowCells + 1;
+// Les cases lues de la fenêtre et de son tour de morceaux, et le décalage
+// d'une case de la fenêtre dans ce carré.
+constexpr std::int32_t kRingCells = kRingChunks * kTerrainChunkCells;
+constexpr std::int32_t kRingSide = kGroundWindowCells + 2 * kRingCells;
+// UN COIN DE CUBE EST DE TERRE quand au moins tant des quatre cases qui le
+// touchent sont de chemin.
+constexpr std::int32_t kDirtCornerLeastCells = 2;
+constexpr std::int32_t kCubeCorners = kGroundWindowCubes + 1;
+constexpr std::uint8_t kNoTexture = 0xFF;
 
 [[nodiscard]] float UnitOf(std::uint32_t draw) noexcept {
   return static_cast<float>(draw) * kUnitFromDraw;
@@ -179,6 +191,7 @@ class Planner {
 
   GroundPlan Build() {
     ReadChunks();
+    SowVerges();
     RaiseRelief();
     PaintCubes();
     BakeShade();
@@ -190,6 +203,11 @@ class Planner {
   // découlent, morceau par morceau du sud au nord.
   void ReadChunks() {
     plan_.passable.assign(kCellCount, 0);
+    plan_.path.assign(kCellCount, 0);
+    const auto ring_area =
+        static_cast<std::size_t>(kRingSide) * static_cast<std::size_t>(kRingSide);
+    ring_passable_.assign(ring_area, 0);
+    ring_path_.assign(ring_area, 0);
     const std::int32_t first_x = ro::sim::TerrainChunkOf(origin_.x_cells);
     const std::int32_t first_y = ro::sim::TerrainChunkOf(origin_.y_cells);
     for (std::int32_t row = -kRingChunks; row < kWindowChunks + kRingChunks; ++row) {
@@ -197,20 +215,88 @@ class Planner {
         const ro::sim::TerrainChunk chunk =
             ro::sim::GenerateTerrainChunk(rule_, run_seed_, first_x + column, first_y + row);
         const bool shown = row >= 0 && column >= 0 && row < kWindowChunks && column < kWindowChunks;
-        if (shown) CopyCells(chunk, column, row);
+        CopyCells(chunk, column, row, shown);
         PoseChunk(chunk, column, row, shown);
       }
     }
   }
 
-  void CopyCells(const ro::sim::TerrainChunk& chunk, std::int32_t column, std::int32_t row) {
+  // Les cases du morceau, dans le carré du tour et, s'il se montre, dans la
+  // fenêtre.
+  void CopyCells(const ro::sim::TerrainChunk& chunk, std::int32_t column, std::int32_t row,
+                 bool shown) {
     for (std::int32_t north = 0; north < kTerrainChunkCells; ++north) {
       for (std::int32_t east = 0; east < kTerrainChunkCells; ++east) {
-        plan_.passable[CellIndex(column * kTerrainChunkCells + east,
-                                 row * kTerrainChunkCells + north)] =
-            chunk.Passable(east, north) ? 1U : 0U;
+        const std::int32_t x = column * kTerrainChunkCells + east;
+        const std::int32_t y = row * kTerrainChunkCells + north;
+        const std::uint8_t passable = chunk.Passable(east, north) ? 1U : 0U;
+        const std::uint8_t path = chunk.OnPath(east, north) ? 1U : 0U;
+        ring_passable_[RingIndex(x, y)] = passable;
+        ring_path_[RingIndex(x, y)] = path;
+        if (!shown) continue;
+        plan_.passable[CellIndex(x, y)] = passable;
+        plan_.path[CellIndex(x, y)] = path;
       }
     }
+  }
+
+  // Vrai si la case (x, y) de la fenêtre, ou de son tour, est un chemin ; faux
+  // au-delà du tour.
+  [[nodiscard]] bool PathAt(std::int32_t x, std::int32_t y) const {
+    return InRing(x, y) && ring_path_[RingIndex(x, y)] != 0U;
+  }
+  [[nodiscard]] bool PassableInRing(std::int32_t x, std::int32_t y) const {
+    return InRing(x, y) && ring_passable_[RingIndex(x, y)] != 0U;
+  }
+  [[nodiscard]] static bool InRing(std::int32_t x, std::int32_t y) {
+    return x >= -kRingCells && y >= -kRingCells && x < kGroundWindowCells + kRingCells &&
+           y < kGroundWindowCells + kRingCells;
+  }
+  [[nodiscard]] static std::size_t RingIndex(std::int32_t x, std::int32_t y) {
+    return static_cast<std::size_t>(y + kRingCells) * static_cast<std::size_t>(kRingSide) +
+           static_cast<std::size_t>(x + kRingCells);
+  }
+
+  // LE SEMIS DE BORDURE : chaque case libre qui longe un chemin, sans en être
+  // et loin de toute case bloquée, tire d'un `Pcg32` propre à la case du monde
+  // sa chance, son modèle, son angle et sa place : la même dans toute fenêtre.
+  void SowVerges() {
+    if (biome_.verge_seeds.empty() || biome_.verge_per_mille == 0) return;
+    for (std::int32_t y = 0; y < kGroundWindowCells; ++y) {
+      for (std::int32_t x = 0; x < kGroundWindowCells; ++x) {
+        if (!AlongPath(x, y)) continue;
+        ro::core::Pcg32 random(Mix(run_seed_, kVergeSalt, origin_.x_cells + x, origin_.y_cells + y),
+                               kVisualStream);
+        // Toujours quatre tirages : la chance, le modèle, l'angle, la place.
+        const bool sown = random.Chance(biome_.verge_per_mille, ro::sim::kTerrainPerMille);
+        const SeedLook* seed = Pick(random, biome_.verge_seeds);
+        const std::uint32_t yaw = random.Below(kFullTurnDegrees);
+        const float offset = UnitOf(random.Next());
+        if (!sown || seed == nullptr) continue;
+        plan_.poses.push_back(
+            PlannedPose{.model = seed->model,
+                        .east = static_cast<float>(x) + kSeedInset + kSeedSpan * offset,
+                        .north = static_cast<float>(y) + kSeedInset + kSeedSpan * (1.0F - offset),
+                        .yaw_degrees = static_cast<float>(yaw),
+                        .scale = seed->scale,
+                        .piece = kSeedPose});
+      }
+    }
+  }
+
+  // Une case libre, hors chemin, qu'un chemin touche par un côté et qu'aucune
+  // case bloquée ne touche.
+  [[nodiscard]] bool AlongPath(std::int32_t x, std::int32_t y) const {
+    if (PathAt(x, y)) return false;
+    if (!PathAt(x - 1, y) && !PathAt(x + 1, y) && !PathAt(x, y - 1) && !PathAt(x, y + 1)) {
+      return false;
+    }
+    for (std::int32_t dy = -1; dy <= 1; ++dy) {
+      for (std::int32_t dx = -1; dx <= 1; ++dx) {
+        if (!PassableInRing(x + dx, y + dy)) return false;
+      }
+    }
+    return true;
   }
 
   // Les pièces du morceau puis son semis, d'un `Pcg32` propre au morceau : le
@@ -266,7 +352,8 @@ class Planner {
   }
 
   // Le semis : toujours `seeds_per_chunk` essais de cinq tirages ; une case
-  // bloquée, ou voisine d'une case bloquée, n'en reçoit pas.
+  // bloquée ou voisine d'une case bloquée, et une case de chemin, n'en
+  // reçoivent pas.
   void SowChunk(ro::core::Pcg32& random, const ro::sim::TerrainChunk& chunk, std::int32_t column,
                 std::int32_t row) {
     const auto side = static_cast<std::uint32_t>(kTerrainChunkCells);
@@ -276,7 +363,9 @@ class Planner {
       const SeedLook* seed = Pick(random, biome_.seeds);
       const std::uint32_t yaw = random.Below(kFullTurnDegrees);
       const float offset = UnitOf(random.Next());
-      if (seed == nullptr || !ClearAround(chunk, east, north)) continue;
+      if (seed == nullptr || !ClearAround(chunk, east, north) || chunk.OnPath(east, north)) {
+        continue;
+      }
       plan_.poses.push_back(
           PlannedPose{.model = seed->model,
                       .east = static_cast<float>(column * kTerrainChunkCells + east) + kSeedInset +
@@ -342,20 +431,32 @@ class Planner {
 
   void PaintCubes() {
     const std::set<std::pair<std::int32_t, std::int32_t>> occupied = OccupiedSlots();
+    const std::vector<std::uint8_t> dirt = DirtCornersOfCubes();
+    // Un emplacement qu'un chemin effleure ne porte pas de tache : leurs
+    // lisières ne se raccorderaient pas.
+    std::set<std::pair<std::int32_t, std::int32_t>> pathed;
+    for (std::int32_t j = 0; j < kGroundWindowCubes; ++j) {
+      for (std::int32_t i = 0; i < kGroundWindowCubes; ++i) {
+        if (dirt[CubeIndex(i, j)] == 0) continue;
+        pathed.emplace(FloorDivide(origin_.x_cells / kGroundCellsPerCube + i, kGroundTextureCubes),
+                       FloorDivide(origin_.y_cells / kGroundCellsPerCube + j, kGroundTextureCubes));
+      }
+    }
     plan_.cubes.resize(kCubeCount);
     for (std::int32_t j = 0; j < kGroundWindowCubes; ++j) {
       for (std::int32_t i = 0; i < kGroundWindowCubes; ++i) {
-        PlannedCube& cube = plan_.cubes[static_cast<std::size_t>(j) * kGroundWindowCubes +
-                                        static_cast<std::size_t>(i)];
+        PlannedCube& cube = plan_.cubes[CubeIndex(i, j)];
         const std::int32_t world_cube_x = origin_.x_cells / kGroundCellsPerCube + i;
         const std::int32_t world_cube_y = origin_.y_cells / kGroundCellsPerCube + j;
         const std::int32_t slot_x = FloorDivide(world_cube_x, kGroundTextureCubes);
         const std::int32_t slot_y = FloorDivide(world_cube_y, kGroundTextureCubes);
-        const auto [texture, turn] = MotifOf(slot_x, slot_y, occupied.contains({slot_x, slot_y}));
+        const auto [texture, turn] = MotifOf(slot_x, slot_y, occupied.contains({slot_x, slot_y}),
+                                             pathed.contains({slot_x, slot_y}));
         cube.texture = texture;
         cube.turn = turn;
         cube.quarter_east = static_cast<std::uint8_t>(world_cube_x - slot_x * kGroundTextureCubes);
         cube.quarter_north = static_cast<std::uint8_t>(world_cube_y - slot_y * kGroundTextureCubes);
+        PaintPathTile(cube, dirt[CubeIndex(i, j)]);
         cube.corner_height =
             CornersOf(i * kGroundCellsPerCube, j * kGroundCellsPerCube, kGroundCellsPerCube);
         const double east = static_cast<double>(origin_.x_cells + i * kGroundCellsPerCube + 1);
@@ -371,17 +472,94 @@ class Planner {
     }
   }
 
+  // LES COINS DE TERRE DE CHAQUE CUBE. Le coin (2a, 2b) de la fenêtre, en
+  // cases, touche les cases (2a − 1, 2b − 1) à (2a, 2b) ; celles du bord se
+  // lisent dans le tour, si bien qu'un coin vaut la même chose dans toute
+  // fenêtre.
+  [[nodiscard]] std::vector<std::uint8_t> DirtCornersOfCubes() const {
+    std::vector<std::uint8_t> corner_dirt(static_cast<std::size_t>(kCubeCorners) * kCubeCorners, 0);
+    for (std::int32_t b = 0; b < kCubeCorners; ++b) {
+      for (std::int32_t a = 0; a < kCubeCorners; ++a) {
+        const std::int32_t x = a * kGroundCellsPerCube;
+        const std::int32_t y = b * kGroundCellsPerCube;
+        const std::int32_t paths = static_cast<std::int32_t>(PathAt(x - 1, y - 1)) +
+                                   static_cast<std::int32_t>(PathAt(x, y - 1)) +
+                                   static_cast<std::int32_t>(PathAt(x - 1, y)) +
+                                   static_cast<std::int32_t>(PathAt(x, y));
+        corner_dirt[static_cast<std::size_t>(b) * kCubeCorners + static_cast<std::size_t>(a)] =
+            paths >= kDirtCornerLeastCells ? 1U : 0U;
+      }
+    }
+    const auto at = [&corner_dirt](std::int32_t a, std::int32_t b) {
+      return corner_dirt[static_cast<std::size_t>(b) * kCubeCorners +
+                         static_cast<std::size_t>(a)] != 0U;
+    };
+    std::vector<std::uint8_t> cubes(kCubeCount, 0);
+    for (std::int32_t j = 0; j < kGroundWindowCubes; ++j) {
+      for (std::int32_t i = 0; i < kGroundWindowCubes; ++i) {
+        std::uint8_t corners = 0;
+        if (at(i, j)) corners |= kDirtSouthWest;
+        if (at(i + 1, j)) corners |= kDirtSouthEast;
+        if (at(i, j + 1)) corners |= kDirtNorthWest;
+        if (at(i + 1, j + 1)) corners |= kDirtNorthEast;
+        cubes[CubeIndex(i, j)] = corners;
+      }
+    }
+    return cubes;
+  }
+
+  // LE CARREAU DE CHEMIN d'un cube qui a des coins de terre. La terre pleine
+  // garde la place du cube dans son motif, comme l'herbe ; un bord glisse le
+  // long de sa colonne avec la case du monde ; un coin montre son cube. Un
+  // biome sans le carreau voulu laisse l'herbe.
+  void PaintPathTile(PlannedCube& cube, std::uint8_t dirt_corners) const {
+    if (dirt_corners == 0) return;
+    const PathTile tile = PathTileOf(dirt_corners);
+    const std::uint8_t rank = TextureOfRole(tile.role);
+    if (rank == kNoTexture) return;
+    const GroundTextureLook& look = biome_.textures[rank];
+    cube.texture = rank;
+    if (tile.role == GroundTextureRole::kPathFull) {
+      cube.turn = 0;
+      return;
+    }
+    TextureCube shown{.u = look.quarter_u, .v = look.quarter_v};
+    if (tile.role == GroundTextureRole::kPathEdge) {
+      shown.v = TextureCubeOf(cube.quarter_east, cube.quarter_north, tile.turn).v;
+    }
+    const MotifCube place = MotifCubeShowing(shown, tile.turn);
+    cube.quarter_east = place.quarter_east;
+    cube.quarter_north = place.quarter_north;
+    cube.turn = tile.turn;
+    // Un coin se découpe dans une texture dont les cubes voisins ne le
+    // prolongent pas ; un bord glisse le long d'une colonne qui se prolonge.
+    cube.inset = tile.role != GroundTextureRole::kPathEdge;
+  }
+
+  // Le rang de la première texture du rôle, ou kNoTexture.
+  [[nodiscard]] std::uint8_t TextureOfRole(GroundTextureRole role) const {
+    for (std::size_t rank = 0; rank < biome_.textures.size() && rank < kNoTexture; ++rank) {
+      if (biome_.textures[rank].role == role) return static_cast<std::uint8_t>(rank);
+    }
+    return kNoTexture;
+  }
+
+  [[nodiscard]] static std::size_t CubeIndex(std::int32_t i, std::int32_t j) {
+    return static_cast<std::size_t>(j) * kGroundWindowCubes + static_cast<std::size_t>(i);
+  }
+
   // LE MOTIF D'UN EMPLACEMENT DU MONDE et son quart de tour : une tache sur un
   // emplacement qui porte une pièce, à sa chance ; une tache éparse, plus
-  // rare, sur un emplacement vide ; l'herbe de fond sinon. Un seul mélange par
-  // emplacement : le même dans toute fenêtre.
+  // rare, sur un emplacement vide ; l'herbe de fond sinon, et toujours sur un
+  // emplacement qu'un chemin effleure. Un seul mélange par emplacement : le
+  // même dans toute fenêtre.
   [[nodiscard]] std::pair<std::uint16_t, std::uint8_t> MotifOf(std::int32_t slot_x,
-                                                               std::int32_t slot_y,
-                                                               bool occupied) const {
+                                                               std::int32_t slot_y, bool occupied,
+                                                               bool pathed) const {
     const std::uint64_t mixed = Mix(run_seed_, kPatchSalt, slot_x, slot_y);
     const std::uint32_t chance = occupied ? biome_.patch_per_mille : biome_.scatter_per_mille;
     const GroundTextureRole wanted =
-        mixed % ro::sim::kTerrainPerMille < chance
+        !pathed && mixed % ro::sim::kTerrainPerMille < chance
             ? (occupied ? GroundTextureRole::kPatch : GroundTextureRole::kScatter)
             : GroundTextureRole::kGrass;
     std::uint64_t total = 0;
@@ -521,6 +699,9 @@ class Planner {
   // Les pièces de la fenêtre et de son tour : leurs emplacements portent des
   // taches.
   std::vector<PlannedPiece> ring_pieces_;
+  // Les cases de la fenêtre et de son tour : praticables, de chemin.
+  std::vector<std::uint8_t> ring_passable_;
+  std::vector<std::uint8_t> ring_path_;
   GroundPlan plan_;
 };
 

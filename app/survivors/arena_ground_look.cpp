@@ -80,13 +80,37 @@ constexpr std::array<PieceLook, 7> kPlainsPieces{{
 
 // L'herbe des champs de Prontera : `prt_초원01` se raccorde à elle-même ;
 // `prt_초원04` est une tache de terre ronde bordée d'herbe, qui tourne sans
-// couture. Les autres textures des champs (chemins, pierriers, falaises, la
-// tache carrée de `prt_초원05`) sont des bords dessinés pour leurs voisines, ou
-// trahissent la grille, et ne se posent pas seules.
-constexpr std::array<GroundTextureLook, 3> kPlainsTextures{{
+// couture. Les pierriers, les falaises et la tache carrée de `prt_초원05` sont
+// des bords dessinés pour leurs voisines, ou trahissent la grille, et ne se
+// posent pas seuls.
+//
+// Les chemins prennent les carreaux des chemins des champs : la terre de
+// `prt_흙02` ; la colonne ouest de `prt_초원02`, terre à l'ouest et herbe à
+// l'est, lisière au milieu ; le cube (1, 2) de `prt_초원03`, terre au seul
+// coin nord-ouest ; le cube (1, 1) de `prt_초원04`, herbe au seul coin
+// sud-ouest, lisière en biais.
+constexpr std::array<GroundTextureLook, 7> kPlainsTextures{{
     {.texture = "필드바닥\\prt_초원01.bmp"},
     {.texture = "필드바닥\\prt_초원04.bmp", .role = GroundTextureRole::kPatch},
     {.texture = "필드바닥\\prt_초원04.bmp", .role = GroundTextureRole::kScatter},
+    {.texture = "필드바닥\\prt_흙02.bmp", .role = GroundTextureRole::kPathFull},
+    {.texture = "필드바닥\\prt_초원02.bmp", .role = GroundTextureRole::kPathEdge},
+    {.texture = "필드바닥\\prt_초원03.bmp",
+     .role = GroundTextureRole::kPathOuter,
+     .quarter_u = 1,
+     .quarter_v = 2},
+    {.texture = "필드바닥\\prt_초원04.bmp",
+     .role = GroundTextureRole::kPathInner,
+     .quarter_u = 1,
+     .quarter_v = 1},
+}};
+
+// Le long des chemins : des touffes, des buissons bas et des champignons.
+constexpr std::array<SeedLook, 4> kPlainsVergeSeeds{{
+    {.model = "나무잡초꽃\\덤불06.rsm", .scale = 0.8F, .weight = 4},
+    {.model = "나무잡초꽃\\덤불05.rsm", .scale = 0.6F, .weight = 2},
+    {.model = "나무잡초꽃\\버섯01.rsm", .weight = 1},
+    {.model = "나무잡초꽃\\버섯02.rsm", .weight = 1},
 }};
 
 constexpr std::array<SeedLook, 6> kPlainsSeeds{{
@@ -105,6 +129,8 @@ constexpr std::array<BiomeLook, 1> kBiomes{{
      .pieces = kPlainsPieces,
      .seeds = kPlainsSeeds,
      .seeds_per_chunk = 12,
+     .verge_seeds = kPlainsVergeSeeds,
+     .verge_per_mille = 120,
      .patch_per_mille = 800,
      .scatter_per_mille = 40},
 }};

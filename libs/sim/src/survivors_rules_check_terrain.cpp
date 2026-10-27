@@ -161,6 +161,20 @@ template <typename Rule>
     return Refuse(named + "période des repères de " +
                   std::to_string(terrain.landmark_period_chunks) + " morceaux");
   }
+  if (terrain.path_period_chunks < 0 || terrain.path_period_chunks > kTerrainWorldChunks) {
+    return Refuse(named + "période des chemins de " + std::to_string(terrain.path_period_chunks) +
+                  " morceaux");
+  }
+  // Un chemin ne quitte pas les deux cellules qu'il relie : c'est ce qui permet
+  // à un morceau de ne chercher que quatre chemins.
+  if (terrain.path_period_chunks > 0 &&
+      (terrain.path_width_cells <= 0 || terrain.path_wiggle_cells < 0 ||
+       terrain.path_width_cells + terrain.path_wiggle_cells > kTerrainPathMarginCells)) {
+    return Refuse(named + "chemins de " + std::to_string(terrain.path_width_cells) +
+                  " cases de large, écartés de " + std::to_string(terrain.path_wiggle_cells) +
+                  " cases : hors de [1, " + std::to_string(kTerrainPathMarginCells) +
+                  "] à eux deux");
+  }
   if (CellsOutOfBounds(terrain.clearing_cells)) {
     return Refuse(named + "clairière de " + std::to_string(terrain.clearing_cells) +
                   " cases, hors de [0, " + std::to_string(kMostArenaSideCells) + "]");

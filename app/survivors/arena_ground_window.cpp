@@ -80,6 +80,20 @@ std::pair<float, float> MotifPoint(std::int32_t x, std::int32_t y, std::uint8_t 
   return {static_cast<float>(u) * kTextureQuarter, static_cast<float>(v) * kTextureQuarter};
 }
 
+// Rapproche chaque coin de la tuile du centre de son quart de texture de
+// kGroundTileInset.
+void InsetTile(ro::formats::GndTile& tile) {
+  const auto inward = [](std::array<float, 4>& coordinates) {
+    const float low = *std::ranges::min_element(coordinates);
+    const float high = *std::ranges::max_element(coordinates);
+    for (float& coordinate : coordinates) {
+      coordinate = coordinate == low ? low + kGroundTileInset : high - kGroundTileInset;
+    }
+  };
+  inward(tile.u);
+  inward(tile.v);
+}
+
 // LE SOL DU PLAN, en pièces de GND : une tuile par cube, sa lightmap, le quart
 // de sa texture.
 ro::formats::GndParts GroundOf(const GroundSources& sources, const GroundPlan& plan) {
@@ -113,6 +127,7 @@ ro::formats::GndParts GroundOf(const GroundSources& sources, const GroundPlan& p
       tile.u[corner] = u;
       tile.v[corner] = v;
     }
+    if (cube.inset) InsetTile(tile);
     parts.tiles.push_back(
         ro::formats::GndTile{.u = tile.u,
                              .v = tile.v,
@@ -181,6 +196,7 @@ std::vector<std::string_view> ModelsCited(const BiomeLook& look) {
     }
   }
   for (const SeedLook& seed : look.seeds) cited.push_back(seed.model);
+  for (const SeedLook& seed : look.verge_seeds) cited.push_back(seed.model);
   std::ranges::sort(cited);
   const auto [first, last] = std::ranges::unique(cited);
   cited.erase(first, last);

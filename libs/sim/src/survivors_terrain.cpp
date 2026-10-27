@@ -20,6 +20,12 @@ constexpr std::uint64_t kTerrainSalt = 0x5355'5256'5445'5252ULL;
 constexpr std::uint64_t kPlantSalt = 0x5355'5256'504C'4E54ULL;
 constexpr std::uint64_t kDensitySalt = 0x5355'5256'4445'4E53ULL;
 constexpr std::uint64_t kLandmarkSalt = 0x5355'5256'4D41'524BULL;
+// « SURVPATH » pour les carrefours, « SURVBEND » pour les coudes des chemins.
+constexpr std::uint64_t kPathSalt = 0x5355'5256'5041'5448ULL;
+constexpr std::uint64_t kBendSalt = 0x5355'5256'4245'4E44ULL;
+// Le coude d'un chemin se mélange à la direction de son chemin.
+constexpr std::uint64_t kEastward = 0;
+constexpr std::uint64_t kNorthward = 1;
 // Les constantes publiées de SplitMix64 : l'incrément (partie fractionnaire du
 // nombre d'or) et les deux multiplicateurs du finaliseur.
 constexpr std::uint64_t kSplitMixGamma = 0x9E37'79B9'7F4A'7C15ULL;
@@ -134,7 +140,25 @@ struct Draw {
   return draw;
 }
 
+[[nodiscard]] std::size_t LocalCell(std::int32_t local_x, std::int32_t local_y) noexcept {
+  return static_cast<std::size_t>(local_y) * static_cast<std::size_t>(kTerrainChunkCells) +
+         static_cast<std::size_t>(local_x);
+}
+
+// Vrai si une case du rectangle [west, west + width) × [south, south + height),
+// en coordonnées locales du morceau, est une case de chemin.
+[[nodiscard]] bool TouchesPath(const TerrainChunk& chunk, std::int32_t west, std::int32_t south,
+                               FootprintSize size) noexcept {
+  for (std::int32_t north = 0; north < size.height; ++north) {
+    for (std::int32_t east = 0; east < size.width; ++east) {
+      if (chunk.path[LocalCell(west + east, south + north)] != 0U) return true;
+    }
+  }
+  return false;
+}
+
 // Pose une pièce tirée, coin de l'emplacement en coordonnées locales du morceau.
+// Une pièce ordinaire qui toucherait un chemin ne se pose pas.
 void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const Draw& draw,
            std::int32_t slot_east, std::int32_t slot_north) {
   if (draw.piece_index >= pieces.size() || !draw.corner.fits) return;
@@ -142,13 +166,13 @@ void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const 
   const FootprintSize size = FootprintSizeOf(piece, draw.quarter);
   const std::int32_t west = slot_east + draw.corner.east;
   const std::int32_t south = slot_north + draw.corner.north;
+  if (!piece.landmark && TouchesPath(chunk, west, south, size)) return;
   for (std::int32_t north = 0; north < size.height; ++north) {
     for (std::int32_t east = 0; east < size.width; ++east) {
       if (!FootprintBlocks(piece, draw.quarter, east, north)) continue;
-      const auto cell =
-          static_cast<std::size_t>(south + north) * static_cast<std::size_t>(kTerrainChunkCells) +
-          static_cast<std::size_t>(west + east);
+      const std::size_t cell = LocalCell(west + east, south + north);
       chunk.passable[cell] = 0U;
+      chunk.path[cell] = 0U;
     }
   }
   chunk.pieces.push_back(PlacedPiece{.piece_id = piece.piece_id,
@@ -157,29 +181,211 @@ void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const 
                                      .quarter = draw.quarter});
 }
 
-// Vrai si ce morceau est celui de son carré qui porte un repère.
-[[nodiscard]] bool HostsLandmark(const TerrainRule& rule, std::uint64_t run_seed,
-                                 std::int32_t chunk_x, std::int32_t chunk_y) noexcept {
+// Le morceau élu du carré de repères (block_x, block_y) ; la règle a des repères.
+[[nodiscard]] TerrainCell ElectedChunk(const TerrainRule& rule, std::uint64_t run_seed,
+                                       std::int64_t block_x, std::int64_t block_y) noexcept {
+  const std::int64_t period = rule.landmark_period_chunks;
+  const std::uint64_t mixed = Mix(run_seed, kLandmarkSalt, block_x, block_y);
+  return TerrainCell{
+      .x = block_x * period + static_cast<std::int64_t>(mixed % static_cast<std::uint64_t>(period)),
+      .y = block_y * period + static_cast<std::int64_t>((mixed >> kHalfWordBits) %
+                                                        static_cast<std::uint64_t>(period))};
+}
+
+// Vrai si ce morceau porte un repère : l'élu de son carré, hors de la clairière.
+[[nodiscard]] bool CarriesLandmark(const TerrainRule& rule, std::uint64_t run_seed,
+                                   std::int64_t chunk_x, std::int64_t chunk_y) noexcept {
   const std::int64_t period = rule.landmark_period_chunks;
   if (period <= 0) return false;
-  const std::int64_t block_x = FloorDivide(chunk_x, period);
-  const std::int64_t block_y = FloorDivide(chunk_y, period);
-  const std::uint64_t mixed = Mix(run_seed, kLandmarkSalt, block_x, block_y);
-  const auto chosen_x = static_cast<std::int64_t>(mixed % static_cast<std::uint64_t>(period));
-  const auto chosen_y =
-      static_cast<std::int64_t>((mixed >> kHalfWordBits) % static_cast<std::uint64_t>(period));
-  return chunk_x - block_x * period == chosen_x && chunk_y - block_y * period == chosen_y;
+  const TerrainCell elected =
+      ElectedChunk(rule, run_seed, FloorDivide(chunk_x, period), FloorDivide(chunk_y, period));
+  if (elected.x != chunk_x || elected.y != chunk_y) return false;
+  const std::int64_t west = chunk_x * kTerrainChunkCells;
+  const std::int64_t south = chunk_y * kTerrainChunkCells;
+  return DistanceFromStart(west, south, west + kTerrainChunkCells - 1,
+                           south + kTerrainChunkCells - 1) >= rule.clearing_cells;
+}
+
+// ── LES CHEMINS.
+
+// Le disque d'un chemin, `width` cases de diamètre : les écarts d'une case à
+// son centre, sur un axe, vont de `DiscLow(width)` à `DiscLow(width) + width − 1`.
+[[nodiscard]] constexpr std::int64_t DiscLow(std::int64_t width) noexcept { return -(width / 2); }
+
+// Vrai si l'écart (east, north) tombe dans le disque : comptées en demi-cases
+// depuis le centre du carré qui l'entoure, ses coordonnées tiennent dans un
+// cercle de rayon `width` demi-cases, à une demi-case carrée près pour qu'un
+// disque d'une case garde sa case.
+[[nodiscard]] constexpr bool InDisc(std::int64_t width, std::int64_t east,
+                                    std::int64_t north) noexcept {
+  const std::int64_t centre = 2 * DiscLow(width) + width - 1;
+  const std::int64_t u = 2 * east - centre;
+  const std::int64_t v = 2 * north - centre;
+  return u * u + v * v <= width * width + 1;
+}
+
+// Ce qu'un morceau peint de ses chemins : son coin dans le monde et sa largeur.
+struct PathCanvas {
+  TerrainChunk& chunk;
+  std::int64_t west = 0;
+  std::int64_t south = 0;
+  std::int64_t width = 0;
+
+  // Un disque centré sur la case (x, y) du monde.
+  void Stamp(std::int64_t x, std::int64_t y) const {
+    const std::int64_t low = DiscLow(width);
+    for (std::int64_t north = low; north < low + width; ++north) {
+      for (std::int64_t east = low; east < low + width; ++east) {
+        const std::int64_t local_x = x + east - west;
+        const std::int64_t local_y = y + north - south;
+        if (local_x < 0 || local_y < 0 || local_x >= kTerrainChunkCells ||
+            local_y >= kTerrainChunkCells || !InDisc(width, east, north)) {
+          continue;
+        }
+        chunk.path[LocalCell(static_cast<std::int32_t>(local_x),
+                             static_cast<std::int32_t>(local_y))] = 1U;
+      }
+    }
+  }
+
+  // Le trait de `from` à `to`, case par case (Bresenham, huit voisins), s'il
+  // passe à portée du morceau.
+  void Line(TerrainCell from, TerrainCell to) const {
+    const std::int64_t reach = width;
+    if (std::max(from.x, to.x) + reach < west ||
+        std::min(from.x, to.x) - reach >= west + kTerrainChunkCells ||
+        std::max(from.y, to.y) + reach < south ||
+        std::min(from.y, to.y) - reach >= south + kTerrainChunkCells) {
+      return;
+    }
+    const std::int64_t step_x = from.x < to.x ? 1 : -1;
+    const std::int64_t step_y = from.y < to.y ? 1 : -1;
+    const std::int64_t span_x = from.x < to.x ? to.x - from.x : from.x - to.x;
+    const std::int64_t span_y = -(from.y < to.y ? to.y - from.y : from.y - to.y);
+    std::int64_t error = span_x + span_y;
+    TerrainCell at = from;
+    while (true) {
+      Stamp(at.x, at.y);
+      if (at == to) return;
+      const std::int64_t doubled = 2 * error;
+      if (doubled >= span_y) {
+        error += span_y;
+        at.x += step_x;
+      }
+      if (doubled <= span_x) {
+        error += span_x;
+        at.y += step_y;
+      }
+    }
+  }
+};
+
+// Le chemin du carrefour de la cellule (cell_x, cell_y) à celui de sa voisine
+// à l'est ou au nord : un coude tous les kTerrainPathBendCells cases le long
+// de son axe, écarté de la droite par un mélange.
+void PaintPath(const TerrainRule& rule, std::uint64_t run_seed, const PathCanvas& canvas,
+               std::int64_t cell_x, std::int64_t cell_y, std::uint64_t direction) {
+  const bool eastward = direction == kEastward;
+  const TerrainCell from = TerrainPathCrossing(rule, run_seed, cell_x, cell_y);
+  const TerrainCell to = TerrainPathCrossing(rule, run_seed, eastward ? cell_x + 1 : cell_x,
+                                             eastward ? cell_y : cell_y + 1);
+  // L'axe du chemin et son travers ; un carrefour se tient loin du bord de sa
+  // cellule, si bien que l'axe avance toujours.
+  const std::int64_t along_from = eastward ? from.x : from.y;
+  const std::int64_t along_span = (eastward ? to.x : to.y) - along_from;
+  const std::int64_t across_from = eastward ? from.y : from.x;
+  const std::int64_t across_span = (eastward ? to.y : to.x) - across_from;
+  const std::int64_t bends = std::max<std::int64_t>(1, along_span / kTerrainPathBendCells);
+  const std::uint64_t wiggle_span = 2 * static_cast<std::uint64_t>(rule.path_wiggle_cells) + 1;
+  const std::uint64_t path_mix = MixStep(Mix(run_seed, kBendSalt, cell_x, cell_y), direction);
+  TerrainCell previous = from;
+  for (std::int64_t bend = 1; bend <= bends; ++bend) {
+    const std::int64_t along = along_from + FloorDivide(along_span * bend, bends);
+    std::int64_t across = across_from + FloorDivide(across_span * bend, bends);
+    if (bend < bends) {
+      const std::uint64_t mixed = MixStep(path_mix, Component(bend));
+      across += static_cast<std::int64_t>(mixed % wiggle_span) - rule.path_wiggle_cells;
+    }
+    const TerrainCell next =
+        eastward ? TerrainCell{.x = along, .y = across} : TerrainCell{.x = across, .y = along};
+    canvas.Line(previous, next);
+    previous = next;
+  }
+}
+
+// Les chemins qui passent dans le morceau : ceux qui partent de sa cellule, et
+// ceux qui y arrivent depuis la cellule à l'ouest ou au sud. Aucun autre ne
+// l'atteint, puisqu'un chemin ne quitte pas les deux cellules qu'il relie.
+void PaintPaths(const TerrainRule& rule, std::uint64_t run_seed, TerrainChunk& chunk) {
+  if (rule.path_period_chunks <= 0 || rule.path_width_cells <= 0) return;
+  const PathCanvas canvas{.chunk = chunk,
+                          .west = std::int64_t{chunk.chunk_x} * kTerrainChunkCells,
+                          .south = std::int64_t{chunk.chunk_y} * kTerrainChunkCells,
+                          .width = rule.path_width_cells};
+  const std::int64_t cell_x = TerrainPathCellOf(rule, chunk.chunk_x);
+  const std::int64_t cell_y = TerrainPathCellOf(rule, chunk.chunk_y);
+  PaintPath(rule, run_seed, canvas, cell_x - 1, cell_y, kEastward);
+  PaintPath(rule, run_seed, canvas, cell_x, cell_y, kEastward);
+  PaintPath(rule, run_seed, canvas, cell_x, cell_y - 1, kNorthward);
+  PaintPath(rule, run_seed, canvas, cell_x, cell_y, kNorthward);
 }
 
 }  // namespace
+
+std::int64_t TerrainPathCellOf(const TerrainRule& rule, std::int64_t chunk) noexcept {
+  if (rule.path_period_chunks <= 0) return 0;
+  return FloorDivide(chunk, rule.path_period_chunks);
+}
+
+TerrainCell TerrainPathCrossing(const TerrainRule& rule, std::uint64_t run_seed,
+                                std::int64_t cell_x, std::int64_t cell_y) {
+  const std::int64_t period = rule.path_period_chunks;
+  if (period <= 0) return TerrainCell{};
+  const std::int64_t first_x = cell_x * period;
+  const std::int64_t first_y = cell_y * period;
+  // Le premier morceau à repère de la cellule, par carré de repères du sud au
+  // nord et d'ouest en est : le carrefour se tient en son centre.
+  const std::int64_t landmark_period = rule.landmark_period_chunks;
+  if (landmark_period > 0) {
+    const std::int64_t last_x = first_x + period - 1;
+    const std::int64_t last_y = first_y + period - 1;
+    for (std::int64_t block_y = FloorDivide(first_y, landmark_period);
+         block_y <= FloorDivide(last_y, landmark_period); ++block_y) {
+      for (std::int64_t block_x = FloorDivide(first_x, landmark_period);
+           block_x <= FloorDivide(last_x, landmark_period); ++block_x) {
+        const TerrainCell elected = ElectedChunk(rule, run_seed, block_x, block_y);
+        if (elected.x < first_x || elected.x > last_x || elected.y < first_y ||
+            elected.y > last_y || !CarriesLandmark(rule, run_seed, elected.x, elected.y)) {
+          continue;
+        }
+        return TerrainCell{.x = elected.x * kTerrainChunkCells + kTerrainChunkCells / 2,
+                           .y = elected.y * kTerrainChunkCells + kTerrainChunkCells / 2};
+      }
+    }
+  }
+  const std::uint64_t mixed = Mix(run_seed, kPathSalt, cell_x, cell_y);
+  const std::uint64_t span =
+      static_cast<std::uint64_t>(period * kTerrainChunkCells - 2 * kTerrainPathMarginCells) + 1;
+  return TerrainCell{.x = first_x * kTerrainChunkCells + kTerrainPathMarginCells +
+                          static_cast<std::int64_t>(mixed % span),
+                     .y = first_y * kTerrainChunkCells + kTerrainPathMarginCells +
+                          static_cast<std::int64_t>((mixed >> kHalfWordBits) % span)};
+}
 
 bool TerrainChunk::Passable(std::int32_t local_x, std::int32_t local_y) const noexcept {
   if (local_x < 0 || local_y < 0 || local_x >= kTerrainChunkCells ||
       local_y >= kTerrainChunkCells) {
     return false;
   }
-  return passable[static_cast<std::size_t>(local_y) * static_cast<std::size_t>(kTerrainChunkCells) +
-                  static_cast<std::size_t>(local_x)] != 0U;
+  return passable[LocalCell(local_x, local_y)] != 0U;
+}
+
+bool TerrainChunk::OnPath(std::int32_t local_x, std::int32_t local_y) const noexcept {
+  if (local_x < 0 || local_y < 0 || local_x >= kTerrainChunkCells ||
+      local_y >= kTerrainChunkCells) {
+    return false;
+  }
+  return path[LocalCell(local_x, local_y)] != 0U;
 }
 
 FootprintSize FootprintSizeOf(const TerrainPieceRule& piece, std::uint8_t quarter) noexcept {
@@ -266,10 +472,9 @@ TerrainChunk GenerateTerrainChunk(const TerrainRule& rule, std::uint64_t run_see
   chunk.passable.fill(1U);
   const std::int64_t chunk_west = std::int64_t{chunk_x} * kTerrainChunkCells;
   const std::int64_t chunk_south = std::int64_t{chunk_y} * kTerrainChunkCells;
-  const bool landmark_chunk =
-      HostsLandmark(rule, run_seed, chunk_x, chunk_y) &&
-      DistanceFromStart(chunk_west, chunk_south, chunk_west + kTerrainChunkCells - 1,
-                        chunk_south + kTerrainChunkCells - 1) >= rule.clearing_cells;
+  const bool landmark_chunk = CarriesLandmark(rule, run_seed, chunk_x, chunk_y);
+  // Les chemins d'abord : ils décident où une pièce ordinaire ne se pose pas.
+  PaintPaths(rule, run_seed, chunk);
   const std::vector<std::uint32_t> ordinary = WeightsOf(rule.pieces, false);
   const std::vector<std::uint32_t> landmarks = WeightsOf(rule.pieces, true);
   core::Pcg32 random(TerrainChunkSeed(run_seed, chunk_x, chunk_y), kTerrainStream);
