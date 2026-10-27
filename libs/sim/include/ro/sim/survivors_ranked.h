@@ -33,9 +33,9 @@ struct SurvivorsEndComponents {
 [[nodiscard]] std::optional<SurvivorsEndComponents> EndComponentsOf(
     const SurvivorsTally& tally, std::uint32_t journal_bytes) noexcept;
 
-// LE DÉPART D'UNE PARTIE CLASSÉE : neutre, la classe et l'arène livrées en
-// tête comme les autres départs, la graine tirée par le serveur et le premier
-// bolt choisi par le joueur.
+// LE DÉPART D'UNE PARTIE CLASSÉE : neutre, la classe livrée en tête, la
+// première arène classée, la graine tirée par le serveur et le premier bolt
+// choisi par le joueur.
 [[nodiscard]] SurvivorsStart RankedStartOf(const SurvivorsRules& rules, std::uint64_t seed,
                                            std::uint16_t first_skill_id);
 

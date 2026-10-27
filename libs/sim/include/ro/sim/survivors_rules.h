@@ -17,7 +17,7 @@ namespace ro::sim {
 // LES RÈGLES DU MODE SURVIVORS : des données, injectées dans une partie.
 // Si l'essai de rejeu en or change, montez kSurvivorsRulesetVersion : un journal
 // ne se rejoue que contre la version de règles qui l'a produit.
-inline constexpr std::uint16_t kSurvivorsRulesetVersion = 3;
+inline constexpr std::uint16_t kSurvivorsRulesetVersion = 4;
 inline constexpr std::size_t kMostSkillLevels = 8;
 inline constexpr std::size_t kMostCardLevels = 5;
 inline constexpr std::uint8_t kMostOffers = 4;
@@ -186,6 +186,10 @@ struct ArenaRule {
   // générée naît au centre du monde, autour de sa clairière : elle ne porte
   // pas de `start`.
   std::uint16_t terrain_id = 0;
+  // Classée : la partie classée et le défi s'y jouent. Une arène hors
+  // classement ne se joue qu'en partie libre ; les règles en classent une au
+  // moins.
+  bool ranked = false;
 };
 struct ClassRule {
   std::uint16_t class_id = 0;
@@ -413,6 +417,9 @@ struct SurvivorsRules {
 [[nodiscard]] const FoeRule* FindFoe(const SurvivorsRules& rules, std::uint16_t foe_id);
 [[nodiscard]] const ClassRule* FindClass(const SurvivorsRules& rules, std::uint16_t class_id);
 [[nodiscard]] const ArenaRule* FindArena(const SurvivorsRules& rules, std::uint16_t arena_id);
+// La première arène classée du catalogue, celle de la partie classée et du
+// défi ; nulle quand aucune ne l'est.
+[[nodiscard]] const ArenaRule* FirstRankedArena(const SurvivorsRules& rules);
 [[nodiscard]] const TerrainRule* FindTerrain(const SurvivorsRules& rules, std::uint16_t terrain_id);
 // L'évolution d'un skill de base, et celle qui donne un évolué.
 [[nodiscard]] const EvolutionRule* FindEvolutionOf(const SurvivorsRules& rules,

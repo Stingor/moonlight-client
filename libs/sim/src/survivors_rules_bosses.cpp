@@ -16,7 +16,9 @@ namespace {
 // Quatre mini-boss, un toutes les deux minutes de 3:00 à 9:00, puis Baphomet à
 // 15:00, dont la chute est la victoire. Chacun marche à sa propre vitesse, hors
 // de l'échelle de la horde ; les plus rapides du jeu sont ralentis pour que le
-// héros puisse encore les fuir. Un coup part pour la première fois une période
+// héros puisse encore les fuir. Baphomet marche plus vite que le héros :
+// le combat final ne se fuit pas, et il tient dans 20 à 60 s sur la prairie
+// (ADR 0134). Un coup part pour la première fois une période
 // après l'arrivée du boss.
 
 // Mastering invoque des Porings.
@@ -133,7 +135,7 @@ constexpr std::array<BossRule, 5> kBosses{{
     {.at_ms = 15 * kMinuteMs,
      .foe_id = kBaphometId,
      .final = true,
-     .walk_ms_per_cell = 200,
+     .walk_ms_per_cell = 115,
      .moves = kBaphometMoves},
 }};
 

@@ -273,9 +273,11 @@ void SurvivorsRankingMode::Write(const std::filesystem::path& client_root) {
 
 bool SurvivorsRankingMode::AskBoard(const ro::sim::SurvivorsRules& rules,
                                     rn::SurvivorsBoardKind board) {
-  if (rules.arenas.empty() || rules.classes.empty()) return false;
+  // Les tableaux sont ceux de l'arène classée.
+  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
+  if (ranked_arena == nullptr || rules.classes.empty()) return false;
   return session_.AskBoard(rn::SurvivorsBoardAsk{.ruleset = ruleset_,
-                                                 .arena_id = rules.arenas.front().arena_id,
+                                                 .arena_id = ranked_arena->arena_id,
                                                  .class_id = rules.classes.front().class_id,
                                                  .board = board});
 }

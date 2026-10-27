@@ -336,6 +336,8 @@ template <typename Rule, typename IdOf>
 core::Result<void> CheckSurvivorsRules(const SurvivorsRules& rules) {
   if (rules.ruleset_version == 0) return Refuse("version de règles nulle");
   if (rules.run_ms == 0) return Refuse("durée de partie nulle");
+  // La partie classée et le défi ont une arène où se jouer.
+  if (FirstRankedArena(rules) == nullptr) return Refuse("aucune arène classée");
   // Chaque contrôle suppose les précédents : un Id se cherche dans une table
   // déjà sans doublon. Le contenu d'une arène complète passe après le noyau.
   using RulesCheck = core::Result<void> (*)(const SurvivorsRules&);

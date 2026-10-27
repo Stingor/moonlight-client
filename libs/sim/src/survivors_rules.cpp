@@ -13,7 +13,7 @@ namespace ro::sim {
 
 namespace {
 
-// ── LE RULESET 3 : la première arène complète, quinze minutes et Baphomet ───
+// ── LE RULESET 4 : la carte et la prairie générée, quinze minutes, Baphomet ──
 // Il porte aussi ce que la partie interprète de la méta : la chute des cartes,
 // la Cursed Water et la relève.
 constexpr std::uint32_t kShippedRunMs = 900000;
@@ -63,6 +63,10 @@ constexpr SurvivorsTuning kShippedTuning{
     .knock_units_per_step = CellTenths(2),
     .plant_block_cells = 12,
     .plant_cells_per_plant = 150,
+    // Sur le sol généré, un morceau pose ses plantes à 48 cases du héros, et
+    // une plante laissée à 96 cases se perd. Sans effet sur une carte.
+    .plant_wake_cells = 48,
+    .plant_forget_units = Cells(96),
     .pickup_radius_units = CellTenths(5),
     // Baphomet jamais tué : la partie finit en survie cinq minutes après lui.
     .final_overtime_ms = 300000,
@@ -122,6 +126,7 @@ const SurvivorsRules& ShippedSurvivorsRules() {
       .revive = ReviveRule{.hp_pct = kReviveHpPct,
                            .invulnerable_ms = kReviveInvulnerableMs,
                            .push_units = Cells(kRevivePushCells)},
+      .terrains = survivors::ShippedTerrains(),
   };
   return kRules;
 }
@@ -146,6 +151,12 @@ const ClassRule* FindClass(const SurvivorsRules& rules, std::uint16_t class_id) 
 
 const ArenaRule* FindArena(const SurvivorsRules& rules, std::uint16_t arena_id) {
   return FindById(rules.arenas, arena_id, [](const ArenaRule& rule) { return rule.arena_id; });
+}
+
+const ArenaRule* FirstRankedArena(const SurvivorsRules& rules) {
+  const auto ranked =
+      std::ranges::find_if(rules.arenas, [](const ArenaRule& rule) { return rule.ranked; });
+  return ranked == rules.arenas.end() ? nullptr : &*ranked;
 }
 
 const TerrainRule* FindTerrain(const SurvivorsRules& rules, std::uint16_t terrain_id) {

@@ -53,6 +53,9 @@ inline constexpr std::uint16_t kBaphometId = 1039;
 
 inline constexpr std::uint32_t kMinuteMs = 60000;
 
+// La règle de terrain de la prairie, que nomme l'arène générée.
+inline constexpr std::uint16_t kPlainsTerrainId = 1;
+
 // survivors_rules_mage.cpp : la classe, ses skills et ses cartes. Les skills
 // sont ceux de la réserve, puis les évolués de ShippedEvolvedSkills : une
 // seule table, que FindSkill parcourt.
@@ -66,7 +69,7 @@ inline constexpr std::size_t kShippedEvolvedSkillCount = 4;
 [[nodiscard]] std::span<const SurvivorsSkillRule> ShippedEvolvedSkills();
 [[nodiscard]] std::span<const EvolutionRule> ShippedEvolutions();
 
-// survivors_rules_foes.cpp : les monstres, leurs vagues, l'arène, la courbe
+// survivors_rules_foes.cpp : les monstres, leurs vagues, les arènes, la courbe
 // d'XP et la table des éléments.
 [[nodiscard]] std::span<const FoeRule> ShippedFoes();
 [[nodiscard]] std::span<const WaveRule> ShippedWaves();
@@ -84,5 +87,8 @@ inline constexpr std::size_t kShippedEvolvedSkillCount = 4;
 [[nodiscard]] ChestRule ShippedChest();
 [[nodiscard]] std::span<const PlantRule> ShippedPlants();
 [[nodiscard]] std::span<const PickupRule> ShippedPickups();
+
+// survivors_rules_terrain.cpp : les règles de terrain des arènes générées.
+[[nodiscard]] std::span<const TerrainRule> ShippedTerrains();
 
 }  // namespace ro::sim::survivors

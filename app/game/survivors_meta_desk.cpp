@@ -302,6 +302,13 @@ ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
       }
     }
   }
+  // Les parties d'anciennes règles restent montrées, mais SOUS celles des
+  // règles en vigueur, chacune à son rang parmi les siennes.
+  for (std::vector<ro::ui::SurvivorsRecordRow>* rows :
+       {&held.free_runs, &held.week_runs, &held.ranked_runs}) {
+    std::ranges::stable_partition(
+        *rows, [](const ro::ui::SurvivorsRecordRow& row) { return !row.older_rules; });
+  }
   std::ranges::sort(past, [](const SurvivorsBoard* first, const SurvivorsBoard* second) {
     return ro::sim::IsoWeekOrdinal(first->week) > ro::sim::IsoWeekOrdinal(second->week);
   });

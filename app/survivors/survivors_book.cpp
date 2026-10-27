@@ -326,13 +326,23 @@ std::uint16_t ChallengeFirstSkill(const ro::sim::ClassRule& class_rule,
 ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
                                          const ro::sim::IsoWeek& week) {
   const ro::sim::ClassRule* class_rule = rules.classes.empty() ? nullptr : &rules.classes.front();
+  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
   return ro::sim::SurvivorsStart{
       .seed = ro::sim::SeedOfWeek(week.year, week.week),
       .class_id = class_rule == nullptr ? std::uint16_t{0} : class_rule->class_id,
-      .arena_id = rules.arenas.empty() ? std::uint16_t{0} : rules.arenas.front().arena_id,
+      .arena_id = ranked_arena == nullptr ? std::uint16_t{0} : ranked_arena->arena_id,
       .first_skill_id =
           class_rule == nullptr ? std::uint16_t{0} : ChallengeFirstSkill(*class_rule, week),
       .loadout = {}};
+}
+
+SurvivorsBoardKind MountableBoard(const ro::sim::SurvivorsRules& rules,
+                                  SurvivorsBoardKind chosen) noexcept {
+  if (chosen == SurvivorsBoardKind::kFree) return chosen;
+  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
+  const bool mounted = ranked_arena != nullptr && !rules.arenas.empty() &&
+                       ranked_arena->arena_id == rules.arenas.front().arena_id;
+  return mounted ? chosen : SurvivorsBoardKind::kFree;
 }
 
 SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& save,

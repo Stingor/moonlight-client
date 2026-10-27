@@ -270,11 +270,23 @@ constexpr std::array<WaveRule, 18> kWaves{{
     Wave(kSilenceMs, kWave14Foes, kWave14Weights, 0, 1000, 0),
 }};
 
-// Le départ est le centre de la carte : sur prt_fild08, la case (200, 200),
+// prt_fild08 : le départ est le centre de la carte, la case (200, 200),
 // praticable, dont la fenêtre de 40 × 40 l'est à 99 % (`roc-cli survivors
-// arena-openness`, ADR 0133).
-constexpr std::array<ArenaRule, 1> kArenas{{
-    {.arena_id = 1, .key = "prt_fild08", .map_name = "prt_fild08", .start = std::nullopt},
+// arena-openness`, ADR 0133) ; partie libre seulement, hors classement et sans
+// équilibrage propre (Q6). midgard_plains : le sol généré de la prairie, sans
+// bord, né au centre du monde, l'arène classée et celle du défi (ADR 0134).
+constexpr std::array<ArenaRule, 2> kArenas{{
+    {.arena_id = 1,
+     .key = "prt_fild08",
+     .map_name = "prt_fild08",
+     .start = std::nullopt,
+     .ranked = false},
+    {.arena_id = 2,
+     .key = "midgard_plains",
+     .map_name = "",
+     .start = std::nullopt,
+     .terrain_id = kPlainsTerrainId,
+     .ranked = true},
 }};
 
 constexpr std::array<ExpSegment, 3> kExpCurve{{

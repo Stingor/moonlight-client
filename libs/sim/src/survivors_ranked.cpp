@@ -29,10 +29,11 @@ std::optional<SurvivorsEndComponents> EndComponentsOf(const SurvivorsTally& tall
 
 SurvivorsStart RankedStartOf(const SurvivorsRules& rules, std::uint64_t seed,
                              std::uint16_t first_skill_id) {
+  const ArenaRule* ranked_arena = FirstRankedArena(rules);
   return SurvivorsStart{
       .seed = seed,
       .class_id = rules.classes.empty() ? std::uint16_t{0} : rules.classes.front().class_id,
-      .arena_id = rules.arenas.empty() ? std::uint16_t{0} : rules.arenas.front().arena_id,
+      .arena_id = ranked_arena == nullptr ? std::uint16_t{0} : ranked_arena->arena_id,
       .first_skill_id = first_skill_id,
       .loadout = {}};
 }

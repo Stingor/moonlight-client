@@ -22,6 +22,7 @@
 #include "game/survivors_ranking_desk.h"
 #include "options/game_option_ids.h"
 #include "survivors/arena_card_cues.h"
+#include "survivors/survivors_book.h"
 #include "survivors/survivors_door.h"
 #include "survivors/survivors_file.h"
 #include "survivors/survivors_looks.h"
@@ -213,8 +214,15 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   const std::uint64_t seed = (std::uint64_t{entropy()} << 32U) | entropy();
   // UNE PARTIE CLASSÉE OU UN DÉFI DEMANDE SON JETON (Q2, Q3) : l'écran de
   // chargement couvre l'attente, et `Frame` refait le départ qu'elle règle.
+  // Sur une arène hors classement, elle part libre, sans jeton.
+  const bool board_mountable = MountableBoard(Rules(), book_.chosen()) == book_.chosen();
+  if (!board_mountable) {
+    ro::core::LogInfo("survivors : l'arène montée est hors classement, la partie part libre");
+  }
   const SurvivorsBookMode::Begun book_start =
-      context.ranking != nullptr
+      !board_mountable ? book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root,
+                                       seed, first_skill_id)
+      : context.ranking != nullptr
           ? context.ranking->Launch(book_, Rules(), context.client_root, seed, first_skill_id)
       : book_.chosen() == SurvivorsBoardKind::kRanked
           ? book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root, seed,

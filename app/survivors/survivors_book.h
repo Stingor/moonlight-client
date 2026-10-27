@@ -86,10 +86,17 @@ struct SurvivorsFeat {
 [[nodiscard]] std::uint16_t ChallengeFirstSkill(const ro::sim::ClassRule& class_rule,
                                                 const ro::sim::IsoWeek& week) noexcept;
 
-// LE DÉPART DU DÉFI D'UNE SEMAINE : neutre, sur la graine `SeedOfWeek` et le
-// bolt de la semaine. Le même pour tous les carnets.
+// LE DÉPART DU DÉFI D'UNE SEMAINE : neutre, sur la première arène classée, la
+// graine `SeedOfWeek` et le bolt de la semaine. Le même pour tous les carnets.
 [[nodiscard]] ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
                                                        const ro::sim::IsoWeek& week);
+
+// LE TABLEAU QUE LA SALLE PEUT JOUER : elle ne monte que la première arène du
+// catalogue, et la partie classée comme le défi se jouent sur la première arène
+// classée. Quand ce n'est pas la même, le classement se tait : la partie part
+// libre plutôt que d'être soumise sur une arène hors classement.
+[[nodiscard]] SurvivorsBoardKind MountableBoard(const ro::sim::SurvivorsRules& rules,
+                                                SurvivorsBoardKind chosen) noexcept;
 
 // Ce que devient une partie au tableau des records.
 enum class RecordVerdict : std::uint8_t {
