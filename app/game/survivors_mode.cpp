@@ -217,7 +217,8 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   // Sur une arène hors classement, elle part libre, sans jeton.
   const bool board_mountable = MountableBoard(Rules(), book_.chosen()) == book_.chosen();
   if (!board_mountable) {
-    ro::core::LogInfo("survivors : l'arène montée est hors classement, la partie part libre");
+    context.say(
+        ro::core::Tr("Partie libre : le défi et la partie classée se jouent sur une autre arène."));
   }
   const SurvivorsBookMode::Begun book_start =
       !board_mountable ? book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root,

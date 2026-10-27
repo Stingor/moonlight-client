@@ -20927,6 +20927,9 @@ tr: Partida libre: el servidor no clasifica una partida iniciada aquí.
 fr: Partie libre : refusée par le serveur.
 tr: Partida libre: rechazada por el servidor.
 
+fr: Partie libre : le défi et la partie classée se jouent sur une autre arène.
+tr: Partida libre: el desafío y la partida clasificada se juegan en otra arena.
+
 fr: Parties classées
 tr: Partidas clasificadas
 

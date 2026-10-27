@@ -87,7 +87,9 @@ void FeatEntriesOf(const SurvivorsSave& save, std::vector<ro::ui::SurvivorsFeatE
 // chaque semaine passée, la plus récente d'abord, et les parties classées
 // (Q8), que la vue ne montre que si `ranked_shown` est posé par l'appelant.
 // `latest_utc_s` désigne la dernière partie créditée ; ses lignes se
-// surlignent.
+// surlignent. Les lignes suivent l'ordre du tableau : celles d'anciennes
+// règles, marquées, sous celles des règles en vigueur, dans leur ordre de
+// score, et leur numéro continue celui des lignes qui les précèdent.
 struct SurvivorsRecordRowsHeld {
   std::vector<ro::ui::SurvivorsRecordRow> free_runs;
   std::vector<ro::ui::SurvivorsRecordRow> week_runs;

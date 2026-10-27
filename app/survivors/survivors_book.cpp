@@ -235,7 +235,10 @@ void TrimPastChallengeWeeks(SurvivorsSave& save, const ro::sim::IsoWeek& current
   TrimPastChallengeWeeks(save, current_week);
   if (rank.has_value() && *rank >= board.runs.size()) rank.reset();
   if (rank.has_value()) return RecordVerdict::kPlaced;
-  if (!board.runs.empty()) credit.score_to_beat = board.runs.back().score;
+  // Le score à battre se lit parmi les seules parties des mêmes règles.
+  for (const ro::sim::SurvivorsRecord& kept : board.runs) {
+    if (kept.ruleset == record.ruleset) credit.score_to_beat = kept.score;
+  }
   return RecordVerdict::kBelowBoard;
 }
 

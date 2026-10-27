@@ -7,6 +7,7 @@
 namespace ro::sim {
 
 bool RanksAbove(const SurvivorsRecord& first, const SurvivorsRecord& second) noexcept {
+  if (first.ruleset != second.ruleset) return first.ruleset > second.ruleset;
   if (first.score != second.score) return first.score > second.score;
   if (first.survived_ms != second.survived_ms) return first.survived_ms > second.survived_ms;
   return first.played_at_utc_s < second.played_at_utc_s;

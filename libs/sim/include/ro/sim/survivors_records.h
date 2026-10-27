@@ -33,9 +33,11 @@ struct SurvivorsRecord {
   [[nodiscard]] bool operator==(const SurvivorsRecord&) const = default;
 };
 
-// L'ORDRE D'UN TABLEAU : score décroissant, puis temps survécu décroissant,
-// puis date croissante (la plus ancienne garde sa place). Faux entre deux
-// parties que ces trois champs ne départagent pas.
+// L'ORDRE D'UN TABLEAU : version des règles décroissante d'abord, puis score
+// décroissant, temps survécu décroissant et date croissante (la plus ancienne
+// garde sa place). Une partie d'anciennes règles se range donc sous toutes
+// celles des règles en vigueur, et seules ces dernières l'évincent du tableau.
+// Faux entre deux parties que ces quatre champs ne départagent pas.
 [[nodiscard]] bool RanksAbove(const SurvivorsRecord& first, const SurvivorsRecord& second) noexcept;
 
 // INSCRIT UNE PARTIE dans un tableau rangé, par insertion stable : à égalité
