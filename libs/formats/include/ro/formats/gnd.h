@@ -62,9 +62,39 @@ struct GndWaterZone {
   std::int32_t texture_cycling = 3;
 };
 
+// LES PIÈCES D'UN SOL BÂTI EN MÉMOIRE, dans l'unité, l'ordre et le sens du
+// fichier : ce qu'un sol généré donne à `GndMap::Assemble` au lieu d'octets.
+struct GndParts {
+  std::uint8_t major_version = 1;
+  std::uint8_t minor_version = 7;
+  std::int32_t width = 0;
+  std::int32_t height = 0;
+  float proportion_ratio = 10.0F;
+  std::vector<std::string> texture_paths;
+  std::int32_t lightmap_width = 8;
+  std::int32_t lightmap_height = 8;
+  // Les lightmaps l'une après l'autre, chacune son plan d'ombre puis ses
+  // couleurs RGB : lightmap_width × lightmap_height × 4 octets chacune.
+  std::vector<std::uint8_t> lightmap_data;
+  std::vector<GndTile> tiles;
+  // width × height cubes, ligne par ligne.
+  std::vector<GndCube> cubes;
+  // L'eau, seulement à partir de la version 1.8 : une zone par case de la
+  // découpe.
+  std::vector<GndWaterZone> water_zones;
+  std::int32_t water_split_width = 1;
+  std::int32_t water_split_height = 1;
+};
+
 class GndMap {
  public:
   [[nodiscard]] static core::Result<GndMap> Parse(std::span<const std::uint8_t> data);
+
+  // UN SOL ASSEMBLÉ EN MÉMOIRE, refusé là où `Parse` refuserait le même
+  // fichier : dimensions, nombre et longueur des chemins de textures,
+  // lightmaps, tuiles, eau. Les tailles doivent s'accorder entre elles (cubes,
+  // octets des lightmaps, zones d'eau).
+  [[nodiscard]] static core::Result<GndMap> Assemble(GndParts parts);
 
   [[nodiscard]] std::int32_t width() const noexcept { return width_; }
   [[nodiscard]] std::int32_t height() const noexcept { return height_; }

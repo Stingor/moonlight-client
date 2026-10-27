@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -18,6 +19,8 @@
 
 #include "options/graphics_options.h"
 #include "survivors/arena_effects.h"
+#include "survivors/arena_ground_plan.h"
+#include "survivors/arena_ground_window.h"
 #include "survivors/arena_numbers.h"
 #include "survivors/horde_composer.h"
 #include "world/lit_stage.h"
@@ -72,6 +75,17 @@ class ArenaScene : private LitLayers {
   [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaRule& arena,
                                             const MapStageRead& read = {});
 
+  // LA CARTE OU LE SOL GÉNÉRÉ : quand `arena` nomme un terrain de `rules`, les
+  // ressources de son biome se lisent une fois et la fenêtre de 160 × 160 cases
+  // se bâtit autour du départ, sous la graine `run_seed` (ADR 0134) ; sinon la
+  // carte de `arena`, comme ci-dessus.
+  //
+  // ⚠ ÉCHOUE EN LE DISANT si le terrain n'a pas d'aspect dans le catalogue
+  // d'app, ou si l'installation n'a pas sa carte de référence.
+  [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, const ro::sim::SurvivorsRules& rules,
+                                            const ro::sim::ArenaRule& arena, std::uint64_t run_seed,
+                                            const MapStageRead& read = {});
+
   // OUVRE UNE IMAGE à `presentation_ms` de l'horloge de présentation. Voir
   // `LitStage::Begin` : les corps se composent après, leur ombre ronde dépend
   // de `LitFrame::sun_shadows`.
@@ -93,8 +107,9 @@ class ArenaScene : private LitLayers {
             const ro::render::Camera& camera, float aspect_ratio, float viewport_width,
             float viewport_height, std::uint32_t now_ms);
 
-  // Le sol sous un point de la simulation, en coordonnées du monde : là où se
-  // pose un corps et où la caméra vise.
+  // Le sol sous un point de la simulation, en coordonnées du monde dessiné :
+  // là où se pose un corps et où la caméra vise. Sur le sol généré, la case de
+  // la partie se compte depuis le coin de la fenêtre.
   [[nodiscard]] glm::vec3 GroundAt(ro::sim::FieldPoint point) const;
   // Le sol sous une position en cases continues : voir `HordePose::cell`.
   [[nodiscard]] glm::vec3 GroundAtCell(glm::vec2 cell) const;
@@ -105,6 +120,12 @@ class ArenaScene : private LitLayers {
   [[nodiscard]] HordeShadows ShadowsOf(const LitFrame& frame) const noexcept {
     return HordeShadows{.sun_shadows = frame.sun_shadows, .horde_sun_shadows = horde_sun_shadows_};
   }
+
+  // LE COIN SUD-OUEST DE LA FENÊTRE DESSINÉE, en cases de la partie : (0, 0)
+  // sur une carte.
+  [[nodiscard]] GroundWindowOrigin window_origin() const noexcept { return origin_; }
+  // Les ressources du sol généré, ou nullptr sur une carte.
+  [[nodiscard]] const GroundSources* ground_sources() const noexcept { return ground_.get(); }
 
   [[nodiscard]] bool ready() const noexcept { return lit_.ready(); }
   // ⚠ SEULEMENT QUAND `ready()`.
@@ -122,6 +143,9 @@ class ArenaScene : private LitLayers {
                      const LitFrame& frame) override;
 
   LitStage lit_;
+  // Le sol généré : ses ressources, lues une fois, et la fenêtre montée.
+  std::unique_ptr<GroundSources> ground_;
+  GroundWindowOrigin origin_;
   bool horde_sun_shadows_ = false;
   // Les effets de l'image en cours de peinture, le temps de `Paint`.
   ArenaEffects* painting_effects_ = nullptr;

@@ -66,7 +66,10 @@ class ArenaEffects {
   //
   // ⚠ LA SCÈNE DOIT SURVIVRE AUX EFFETS, ou être rouverte : ils en gardent
   // l'adresse.
-  void Open(const MapStage& stage);
+  //
+  // `origin_cells` : la case de la partie où commence la carte montée, (0, 0)
+  // pour une carte, le coin de la fenêtre pour le sol généré.
+  void Open(const MapStage& stage, glm::ivec2 origin_cells = {});
 
   // UNE PARTIE NEUVE sur l'arène gardée (« Rejouer ») : aucun effet, aucune
   // flamme, aucun tir, aucune annonce ni orbe de la précédente, dont les
@@ -175,6 +178,7 @@ class ArenaEffects {
   ro::formats::Image white_;
   ro::sim::World world_;
   const MapStage* stage_ = nullptr;
+  glm::ivec2 origin_cells_{0};
   std::optional<ro::sim::WalkPlanner> planner_;
   std::vector<ArenaLaunch> plan_;
   std::vector<ArenaOrbLook> orbs_;

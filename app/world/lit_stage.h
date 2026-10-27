@@ -117,6 +117,13 @@ class LitStage {
   [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, std::string_view map_name,
                                             const MapStageRead& read = {});
 
+  // MONTE UNE CARTE DÉJÀ ASSEMBLÉE (`AssembleMapStage`) et téléverse sa
+  // géométrie, sans document d'édition. Son ciel — intérieur ou plein air — se
+  // lit sous le nom `sky_map_name`, celui de la carte dont elle prend la lumière.
+  [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, MapStage stage,
+                                            std::string_view sky_map_name,
+                                            ro::core::LoadProgress* progress = nullptr);
+
   // OUVRE UNE IMAGE : le sol arrondi selon le réglage, le brouillard, les
   // étages du terrain, l'ombre du soleil demandée, et le décor animé posé à
   // `elapsed_ms`.
@@ -165,6 +172,11 @@ class LitStage {
   [[nodiscard]] const ro::mapedit::MapEdit& model_book() const noexcept { return model_book_; }
 
  private:
+  // Pose `stage`, crée les renderers et téléverse ; le ciel se lit sous
+  // `sky_map_name`.
+  [[nodiscard]] ro::core::Result<void> Mount(ro::vfs::Vfs& vfs, MapStage stage,
+                                             std::string_view sky_map_name,
+                                             ro::core::LoadProgress* progress);
   // LE CIEL DE L'IMAGE : la lumière du RSW à l'heure `sky_hour` quand le joueur
   // a le cycle, ou que l'heure est imposée, et que la carte est en plein air ;
   // celle du RSW sinon.

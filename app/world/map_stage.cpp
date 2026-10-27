@@ -146,6 +146,24 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
   return stage;
 }
 
+ro::core::Result<MapStage> AssembleMapStage(std::string name, ro::render::MapScene scene,
+                                            ro::formats::GatMap gat) {
+  if (scene.terrain.empty()) {
+    return ro::core::Fail(ro::core::ErrorCode::kCorruptData,
+                          name + " : la carte ne produit aucune géométrie");
+  }
+  MapStage stage{std::move(name), std::move(scene), ro::sim::WalkMap::FromGat(gat)};
+  stage.file_walk_heights.reserve(gat.cells().size());
+  for (const ro::formats::GatCell& cell : gat.cells()) {
+    stage.file_walk_heights.push_back(cell.corner_height);
+  }
+  stage.ground_light = ro::render::BuildGroundLight(stage.scene.gnd, gat);
+  stage.ground_laid_light = ro::render::BuildGroundLight(
+      stage.scene.gnd, gat, ro::render::GroundLightTerms::kLaidLightOnly);
+  stage.gat = std::move(gat);
+  return stage;
+}
+
 std::array<float, 3> GroundPositionAt(const MapStage& stage, float cell_x, float cell_y) {
   std::array<float, 3> ground = ro::render::CellPositionAt(stage.scene.gnd, cell_x, cell_y);
   const bool rounded = stage.scene.ground_subdivisions > ro::render::kFlatGroundSubdivisions;

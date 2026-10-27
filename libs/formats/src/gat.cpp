@@ -1,6 +1,7 @@
 #include "ro/formats/gat.h"
 
 #include <string>
+#include <utility>
 
 #include "ro/core/byte_reader.h"
 #include "ro/formats/rsw.h"
@@ -65,6 +66,28 @@ core::Result<GatMap> GatMap::Parse(std::span<const std::uint8_t> data) {
   if (!reader.ok()) {
     return Fail(ErrorCode::kUnexpectedEnd, "cellules GAT tronquées");
   }
+  return map;
+}
+
+core::Result<GatMap> GatMap::Assemble(std::int32_t width, std::int32_t height,
+                                      std::vector<GatCell> cells, std::uint8_t major_version,
+                                      std::uint8_t minor_version) {
+  if (width <= 0 || height <= 0 || width > kMaxDimension || height > kMaxDimension) {
+    return Fail(ErrorCode::kCorruptData,
+                "dimensions GAT " + std::to_string(width) + "x" + std::to_string(height));
+  }
+  const std::size_t cell_count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
+  if (cells.size() != cell_count) {
+    return Fail(ErrorCode::kCorruptData, "GAT de " + std::to_string(cell_count) +
+                                             " cellules assemblé avec " +
+                                             std::to_string(cells.size()));
+  }
+  GatMap map;
+  map.major_version_ = major_version;
+  map.minor_version_ = minor_version;
+  map.width_ = width;
+  map.height_ = height;
+  map.cells_ = std::move(cells);
   return map;
 }
 

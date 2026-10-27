@@ -90,9 +90,10 @@ constexpr std::int32_t kWallFlameSpacing = ro::sim::kSubunitsPerCell;
   return Squared(px - nearest_x) + Squared(py - nearest_y) <= Squared(radius);
 }
 
-// Les cases dont le centre est couvert, posées sur le relief et teintes.
-void LayCells(const MapStage& stage, ro::sim::FieldPoint from, ro::sim::FieldPoint to,
-              std::int32_t radius, const std::array<std::uint8_t, 4>& color,
+// Les cases dont le centre est couvert, posées sur le relief et teintes. La
+// carte montée commence à la case `origin` de la partie.
+void LayCells(const MapStage& stage, glm::ivec2 origin, ro::sim::FieldPoint from,
+              ro::sim::FieldPoint to, std::int32_t radius, const std::array<std::uint8_t, 4>& color,
               std::vector<ro::render::GroundQuad>& quads) {
   if (!stage.gat.has_value()) return;
   const std::int32_t reach = std::max(radius, kLeastMarkRadius);
@@ -103,8 +104,8 @@ void LayCells(const MapStage& stage, ro::sim::FieldPoint from, ro::sim::FieldPoi
   for (std::int32_t cell_y = first_y; cell_y <= last_y; ++cell_y) {
     for (std::int32_t cell_x = first_x; cell_x <= last_x; ++cell_x) {
       if (!Covers(from, to, reach, ro::sim::CellCenter(cell_x, cell_y))) continue;
-      if (const auto quad = ro::render::ComposeGroundCellQuad(stage.scene.gnd, *stage.gat, cell_x,
-                                                              cell_y, color)) {
+      if (const auto quad = ro::render::ComposeGroundCellQuad(
+              stage.scene.gnd, *stage.gat, cell_x - origin.x, cell_y - origin.y, color)) {
         quads.push_back(*quad);
       }
     }
@@ -171,8 +172,9 @@ ArenaEffects::ArenaEffects(ro::vfs::Vfs& vfs, const ro::render::SpriteCatalog& s
   world_.Spawn(hero);
 }
 
-void ArenaEffects::Open(const MapStage& stage) {
+void ArenaEffects::Open(const MapStage& stage, glm::ivec2 origin_cells) {
   stage_ = &stage;
+  origin_cells_ = origin_cells;
   planner_.emplace(PlannedMapOf(stage));
   Restart();
 }
@@ -196,8 +198,8 @@ void ArenaEffects::Restart() {
 }
 
 void ArenaEffects::PlaceActor(std::uint32_t actor_id, glm::vec2 cell) {
-  const CellAndSub x = CellAndSubOf(cell.x);
-  const CellAndSub y = CellAndSubOf(cell.y);
+  const CellAndSub x = CellAndSubOf(cell.x - static_cast<float>(origin_cells_.x));
+  const CellAndSub y = CellAndSubOf(cell.y - static_cast<float>(origin_cells_.y));
   // UNE RÉANNONCE, comme le serveur en fait à chaque pas : l'acteur garde les
   // effets qu'il porte, et se tient à la sous-case près.
   ro::sim::Actor actor;
@@ -438,11 +440,11 @@ void ArenaEffects::LayGroundMarks(const ro::sim::SurvivorsField& field) {
                                                alpha};
     const ro::sim::FieldPoint from =
         warning.kind == ro::sim::WarningKind::kCharge ? warning.from : warning.to;
-    LayCells(*stage_, from, warning.to, warning.radius_units, color, mark_quads_);
+    LayCells(*stage_, origin_cells_, from, warning.to, warning.radius_units, color, mark_quads_);
   }
   for (const ro::sim::SurvivorsHazard& hazard : field.hazards) {
     if (field.step >= hazard.until_step) continue;
-    LayCells(*stage_, hazard.center, hazard.center, hazard.radius_units,
+    LayCells(*stage_, origin_cells_, hazard.center, hazard.center, hazard.radius_units,
              hazard.kind == ro::sim::HazardKind::kPuddle ? kPuddleColor : kQuakeColor, mark_quads_);
   }
 }

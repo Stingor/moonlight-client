@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ro/core/log.h"
+#include "ro/sim/survivors_terrain.h"
 
 #include "survivors/arena_night.h"
 #include "survivors/arena_night_lights.h"
@@ -40,7 +41,40 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaR
                                                    ro::core::Describe(opened.error()));
   }
   lit_.set_sky_hour_imposed(true);
+  ground_.reset();
+  origin_ = GroundWindowOrigin();
   ro::core::LogInfo("arène : {} montée", lit_.stage().name);
+  return {};
+}
+
+ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::SurvivorsRules& rules,
+                                        const ro::sim::ArenaRule& arena, std::uint64_t run_seed,
+                                        const MapStageRead& read) {
+  if (arena.terrain_id == 0) return Open(vfs, arena, read);
+  const ro::sim::TerrainRule* rule = ro::sim::FindTerrain(rules, arena.terrain_id);
+  const BiomeLook* look = rule != nullptr ? FindBiomeLook(rule->key) : nullptr;
+  if (look == nullptr) {
+    return ro::core::Fail(ro::core::ErrorCode::kInvalidArgument,
+                          "arène " + std::string(arena.key) + " : terrain sans aspect");
+  }
+  auto sources = OpenGroundSources(vfs, *rule, run_seed, *look, read.progress);
+  if (!sources) {
+    return ro::core::Fail(sources.error().code, "arène " + std::string(arena.key) + " : " +
+                                                    ro::core::Describe(sources.error()));
+  }
+  ground_ = std::make_unique<GroundSources>(std::move(*sources));
+  origin_ = GroundWindowAround(ro::sim::kTerrainStartCell, ro::sim::kTerrainStartCell);
+  auto window = BuildGroundWindow(vfs, *ground_, origin_, std::string(arena.key),
+                                  read.rounded_ground ? ro::render::kRoundedGroundSubdivisions
+                                                      : ro::render::kFlatGroundSubdivisions);
+  if (!window) return std::unexpected(window.error());
+  if (auto opened = lit_.Open(vfs, std::move(*window), look->reference_map, read.progress);
+      !opened) {
+    return std::unexpected(opened.error());
+  }
+  lit_.set_sky_hour_imposed(true);
+  ro::core::LogInfo("arène : {} générée, fenêtre en ({}, {})", arena.key, origin_.x_cells,
+                    origin_.y_cells);
   return {};
 }
 
@@ -85,9 +119,10 @@ void ArenaScene::Warm(HordeComposer& horde, ArenaEffects& effects,
                       float viewport_height, std::uint32_t now_ms) {
   // HORS CHAMP : au nord du héros, au-delà du bord haut de l'image, ou au sud,
   // derrière la caméra, quand le nord sort de la carte.
+  const float hero_north = hero_cell.y - static_cast<float>(origin_.y_cells);
   const bool north_fits =
       !lit_.stage().gat.has_value() ||
-      hero_cell.y + kWarmAwayCells < static_cast<float>(lit_.stage().gat->height());
+      hero_north + kWarmAwayCells < static_cast<float>(lit_.stage().gat->height());
   const glm::vec2 far_cell =
       hero_cell + glm::vec2(0.0F, north_fits ? kWarmAwayCells : -kWarmAwayCells);
   std::vector<HordePose> poses;
@@ -112,7 +147,9 @@ glm::vec3 ArenaScene::GroundAt(ro::sim::FieldPoint point) const {
 }
 
 glm::vec3 ArenaScene::GroundAtCell(glm::vec2 cell) const {
-  const std::array<float, 3> ground = GroundPositionAt(lit_.stage(), cell.x, cell.y);
+  const std::array<float, 3> ground =
+      GroundPositionAt(lit_.stage(), cell.x - static_cast<float>(origin_.x_cells),
+                       cell.y - static_cast<float>(origin_.y_cells));
   return glm::vec3(ground[0], ground[1], ground[2]);
 }
 

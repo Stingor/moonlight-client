@@ -1,6 +1,8 @@
 #include "ro/formats/gnd.h"
 
+#include <string>
 #include <string_view>
+#include <utility>
 
 #include "ro/core/byte_reader.h"
 
@@ -210,6 +212,94 @@ core::Result<GndMap> GndMap::Parse(std::span<const std::uint8_t> data) {
     }
   }
 
+  return map;
+}
+
+core::Result<GndMap> GndMap::Assemble(GndParts parts) {
+  GndMap map;
+  map.major_version_ = parts.major_version;
+  map.minor_version_ = parts.minor_version;
+  map.width_ = parts.width;
+  map.height_ = parts.height;
+  map.proportion_ratio_ = parts.proportion_ratio;
+  const std::int32_t version = map.version();
+
+  if (map.width_ <= 0 || map.height_ <= 0 || map.width_ > kMaxDimension ||
+      map.height_ > kMaxDimension) {
+    return Fail(ErrorCode::kCorruptData,
+                "dimensions GND " + std::to_string(map.width_) + "x" + std::to_string(map.height_));
+  }
+  if (parts.texture_paths.size() > static_cast<std::size_t>(kMaxTextureCount)) {
+    return Fail(
+        ErrorCode::kCorruptData,
+        "table de textures GND : " + std::to_string(parts.texture_paths.size()) + " entrées");
+  }
+  for (const std::string& path : parts.texture_paths) {
+    // Le fichier range chaque chemin dans un champ de taille fixe, terminé par
+    // un zéro : un chemin aussi long que le plus grand champ ne s'y écrirait pas.
+    if (path.size() >= static_cast<std::size_t>(kMaxTexturePathSize)) {
+      return Fail(ErrorCode::kCorruptData,
+                  "chemin de texture GND de " + std::to_string(path.size()) + " octets");
+    }
+  }
+
+  const bool lightmaps_and_tiles = version >= kVersionLightmapsAndTiles;
+  if (!lightmaps_and_tiles && (!parts.lightmap_data.empty() || !parts.tiles.empty())) {
+    return Fail(ErrorCode::kCorruptData, "GND antérieur à 1.1 : ni lightmap ni tuile");
+  }
+  if (lightmaps_and_tiles) {
+    if (parts.lightmap_width <= 0 || parts.lightmap_width > kMaxLightmapSide ||
+        parts.lightmap_height <= 0 || parts.lightmap_height > kMaxLightmapSide) {
+      return Fail(ErrorCode::kCorruptData, "lightmaps GND de " +
+                                               std::to_string(parts.lightmap_width) + "x" +
+                                               std::to_string(parts.lightmap_height));
+    }
+    const std::size_t lightmap_bytes = static_cast<std::size_t>(parts.lightmap_width) *
+                                       static_cast<std::size_t>(parts.lightmap_height) * 4;
+    const std::size_t lightmap_count = parts.lightmap_data.size() / lightmap_bytes;
+    if (parts.lightmap_data.size() % lightmap_bytes != 0 ||
+        lightmap_count > static_cast<std::size_t>(kMaxLightmapCount)) {
+      return Fail(ErrorCode::kCorruptData,
+                  "lightmaps GND : " + std::to_string(parts.lightmap_data.size()) + " octets");
+    }
+    if (parts.tiles.size() > static_cast<std::size_t>(kMaxTileCount)) {
+      return Fail(ErrorCode::kCorruptData,
+                  "GND : " + std::to_string(parts.tiles.size()) + " tuiles");
+    }
+    map.lightmap_count_ = static_cast<std::int32_t>(lightmap_count);
+    map.lightmap_width_ = parts.lightmap_width;
+    map.lightmap_height_ = parts.lightmap_height;
+  }
+
+  const std::size_t cube_count =
+      static_cast<std::size_t>(map.width_) * static_cast<std::size_t>(map.height_);
+  if (parts.cubes.size() != cube_count) {
+    return Fail(ErrorCode::kCorruptData, "GND de " + std::to_string(cube_count) +
+                                             " cubes assemblé avec " +
+                                             std::to_string(parts.cubes.size()));
+  }
+
+  if (version >= kVersionWater) {
+    if (parts.water_split_width <= 0 || parts.water_split_height <= 0 ||
+        parts.water_split_width > kMaxWaterSplit || parts.water_split_height > kMaxWaterSplit ||
+        parts.water_zones.size() != static_cast<std::size_t>(parts.water_split_width) *
+                                        static_cast<std::size_t>(parts.water_split_height)) {
+      return Fail(ErrorCode::kCorruptData, "découpe d'eau GND " +
+                                               std::to_string(parts.water_split_width) + "x" +
+                                               std::to_string(parts.water_split_height) + " pour " +
+                                               std::to_string(parts.water_zones.size()) + " zones");
+    }
+    map.water_split_width_ = parts.water_split_width;
+    map.water_split_height_ = parts.water_split_height;
+    map.water_zones_ = std::move(parts.water_zones);
+  } else if (!parts.water_zones.empty()) {
+    return Fail(ErrorCode::kCorruptData, "GND antérieur à 1.8 : pas d'eau");
+  }
+
+  map.texture_paths_ = std::move(parts.texture_paths);
+  map.lightmap_data_ = std::move(parts.lightmap_data);
+  map.tiles_ = std::move(parts.tiles);
+  map.cubes_ = std::move(parts.cubes);
   return map;
 }
 

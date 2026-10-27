@@ -76,21 +76,36 @@ void KeepModelKeys(MapScene& scene, std::size_t kept) {
   }
 }
 
+// La texture du sol `relative` que `resources` a déjà lue, ou rien.
+std::optional<formats::Image> KeptTerrainTexture(const MapScene* resources,
+                                                 const std::string& relative) {
+  if (resources == nullptr) return std::nullopt;
+  const std::vector<std::string>& paths = resources->gnd.texture_paths();
+  for (std::size_t rank = 0; rank < paths.size() && rank < resources->terrain_textures.size();
+       ++rank) {
+    if (paths[rank] == relative && !resources->terrain_textures[rank].empty()) {
+      return resources->terrain_textures[rank];
+    }
+  }
+  return std::nullopt;
+}
+
 // Décode les textures du terrain, dans l'ordre du GND.
 //
 // Une texture absente laisse une image VIDE à sa place plutôt que d'interrompre
 // le chargement : le renderer la remplace par du magenta, et le défaut se voit
 // à l'écran au lieu de faire disparaître la carte.
 std::vector<formats::Image> LoadTerrainTextures(vfs::Vfs& vfs, const formats::GndMap& gnd,
-                                                std::size_t& missing,
-                                                core::LoadProgress* progress) {
+                                                std::size_t& missing, core::LoadProgress* progress,
+                                                const MapScene* resources) {
   std::vector<formats::Image> textures;
   textures.reserve(gnd.texture_paths().size());
 
   const core::LoadStepScope step(progress, core::LoadStep::kTerrain, gnd.texture_paths().size());
   for (const std::string& relative : gnd.texture_paths()) {
     const core::LoadItemDone counted(step);
-    std::optional<formats::Image> image = LoadSceneTexture(vfs, relative);
+    std::optional<formats::Image> image = KeptTerrainTexture(resources, relative);
+    if (!image) image = LoadSceneTexture(vfs, relative);
     if (!image) {
       textures.emplace_back();
       ++missing;
@@ -191,6 +206,17 @@ const std::vector<mapedit::VertexMove>& MovesOf(const MapScene& scene, const Ins
   return edit != nullptr ? edit->vertices : kNoMoves;
 }
 
+// Le modèle intact du fichier `rsm_file` que `resources` a déjà lu, ou nullptr.
+const ModelInstances* KeptModel(const MapScene* resources, std::string_view rsm_file) {
+  if (resources == nullptr) return nullptr;
+  for (const ModelInstances& kept : resources->models) {
+    if (kept.rsm_file == rsm_file && !kept.variant_rank.has_value() && kept.applied_moves.empty()) {
+      return &kept;
+    }
+  }
+  return nullptr;
+}
+
 // Charge les modèles du décor, une seule fois par fichier .rsm distinct — et
 // une fois de plus par variante.
 //
@@ -202,8 +228,8 @@ const std::vector<mapedit::VertexMove>& MovesOf(const MapScene& scene, const Ins
 // à son ajout, et une variante dont les sommets changent se rebâtit seule. Un
 // jeu de poses que l'édition ne demande plus, ou dont les sommets ont changé,
 // s'en va d'abord.
-void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene,
-                            core::LoadProgress* progress = nullptr) {
+void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene, core::LoadProgress* progress = nullptr,
+                            const MapScene* resources = nullptr) {
   std::set<InstancesKey> wanted;
   for (std::size_t rank = 0; rank < scene.rsw.models().size(); ++rank) {
     wanted.insert(KeyOf(scene, rank));
@@ -253,6 +279,17 @@ void LoadMissingSceneModels(vfs::Vfs& vfs, MapScene& scene,
     // ⚠ COMPTÉ À LA FIN DU TOUR, même quand la lecture abandonne ce modèle.
     const core::LoadItemDone counted(step);
     const std::vector<mapedit::VertexMove>& moves = MovesOf(scene, key);
+    // UN MODÈLE QUE `resources` A DÉJÀ LU se reprend tel quel, sans ses poses.
+    if (const ModelInstances* kept = KeptModel(resources, key.first);
+        kept != nullptr && moves.empty() && !key.second.has_value()) {
+      ModelInstances instances = *kept;
+      instances.transforms.clear();
+      instances.rsw_ranks.clear();
+      instances.animated.clear();
+      scene.model_textures_cited += instances.mesh.textures.size();
+      scene.models.push_back(std::move(instances));
+      continue;
+    }
     // UNE VARIANTE repart du fichier gardé, s'il l'est déjà.
     std::optional<formats::RsmModel> model;
     const auto source = scene.variant_sources.find(std::string(key.first));
@@ -430,6 +467,21 @@ void PlaceSceneInstances(MapScene& scene) {
   }
 }
 
+// Ce que `scene` lit dans les tables de sa carte, repris de `resources` :
+// effets, cheminées, ciel, météo et brouillard.
+void KeepMapTables(const MapScene& resources, MapScene& scene) {
+  scene.effect_table = resources.effect_table;
+  scene.chimney_smoke = resources.chimney_smoke;
+  scene.effect_textures = resources.effect_textures;
+  scene.missing_effect_textures = resources.missing_effect_textures;
+  scene.background = resources.background;
+  scene.sky_effects = resources.sky_effects;
+  scene.weather_effects = resources.weather_effects;
+  scene.parameterised_sky_clouds = resources.parameterised_sky_clouds;
+  scene.background_fog = resources.background_fog;
+  scene.fog = resources.fog;
+}
+
 }  // namespace
 
 mapedit::MapEdit LoadMapEdit(vfs::Vfs& vfs, std::string_view map_name) {
@@ -518,8 +570,7 @@ void RebuildSceneTerrain(MapScene& scene) {
 
 core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                     const MapSceneOptions& options) {
-  core::LoadProgress* const progress = options.progress;
-  core::BeginLoadStep(progress, core::LoadStep::kMap);
+  core::BeginLoadStep(options.progress, core::LoadStep::kMap);
   auto rsw_bytes = vfs.Read(vfs.res_names().MapFilePath(std::string(map_name) + ".rsw"));
   if (!rsw_bytes) {
     return std::unexpected(rsw_bytes.error());
@@ -528,26 +579,6 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   if (!rsw) {
     return std::unexpected(rsw.error());
   }
-  // LES RETOUCHES DU STAFF, sur les données lues et avant tout le reste : voir
-  // docs/adr/0118. Le placement d'origine se garde pour l'éditeur.
-  std::vector<formats::RswModel> unfixed_models = rsw->models();
-  const mapedit::MapEdit edit =
-      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name);
-  std::vector<mapedit::MeshEdit> mesh_edits;
-  mapedit::MapEditReport mesh_report;
-  CheckMeshEdits(edit, *rsw, unfixed_models.size(), MeshTargets::kRswModels, mesh_edits,
-                 mesh_report);
-  mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(edit, *rsw, kFileNames);
-  CheckMeshEdits(edit, *rsw, unfixed_models.size(), MeshTargets::kAddedModels, mesh_edits,
-                 mesh_report);
-  MergeMeshReport(std::move(mesh_report), fixed);
-  for (const std::string& refusal : fixed.refused) {
-    core::LogWarning("édition de {} refusée — {}", map_name, refusal);
-  }
-  if (fixed.applied > 0) {
-    core::LogInfo("{} : {} opération(s) d'édition posée(s)", map_name, fixed.applied);
-  }
-
   // ReadRaw : `ground_file` vient du RSW, donc c'est déjà du CP949.
   auto gnd_bytes = vfs.ReadRaw(GroundFilePath(vfs.res_names(), *rsw, map_name));
   if (!gnd_bytes) {
@@ -557,15 +588,40 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   if (!gnd) {
     return std::unexpected(gnd.error());
   }
+  return AssembleMapScene(vfs, map_name, std::move(*gnd), std::move(*rsw), options);
+}
+
+MapScene AssembleMapScene(vfs::Vfs& vfs, std::string_view map_name, formats::GndMap gnd,
+                          formats::RswScene rsw, const MapSceneOptions& options) {
+  core::LoadProgress* const progress = options.progress;
+  // LES RETOUCHES DU STAFF, sur les données lues et avant tout le reste : voir
+  // docs/adr/0118. Le placement d'origine se garde pour l'éditeur.
+  std::vector<formats::RswModel> unfixed_models = rsw.models();
+  const mapedit::MapEdit edit =
+      options.edit.has_value() ? *options.edit : LoadMapEdit(vfs, map_name);
+  std::vector<mapedit::MeshEdit> mesh_edits;
+  mapedit::MapEditReport mesh_report;
+  CheckMeshEdits(edit, rsw, unfixed_models.size(), MeshTargets::kRswModels, mesh_edits,
+                 mesh_report);
+  mapedit::MapEditReport fixed = mapedit::ApplyMapEdit(edit, rsw, kFileNames);
+  CheckMeshEdits(edit, rsw, unfixed_models.size(), MeshTargets::kAddedModels, mesh_edits,
+                 mesh_report);
+  MergeMeshReport(std::move(mesh_report), fixed);
+  for (const std::string& refusal : fixed.refused) {
+    core::LogWarning("édition de {} refusée — {}", map_name, refusal);
+  }
+  if (fixed.applied > 0) {
+    core::LogInfo("{} : {} opération(s) d'édition posée(s)", map_name, fixed.applied);
+  }
 
   core::BeginLoadStep(progress, core::LoadStep::kLights);
-  LightmapAtlas atlas = BuildLightmapAtlas(*gnd);
+  LightmapAtlas atlas = BuildLightmapAtlas(gnd);
   core::EndLoadStep(progress);
-  SceneLight light = MakeSceneLight(rsw->light());
+  SceneLight light = MakeSceneLight(rsw.light());
 
   MapScene scene{
-      .gnd = std::move(*gnd),
-      .rsw = std::move(*rsw),
+      .gnd = std::move(gnd),
+      .rsw = std::move(rsw),
       .unfixed_models = std::move(unfixed_models),
       .hidden_models = fixed.hidden,
       .model_opacities = fixed.opacities,
@@ -598,8 +654,8 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
 
   // Les textures AVANT le maillage : c'est en les lisant que l'on sait quels
   // carreaux sont des trous, et un trou ne s'émet pas.
-  scene.terrain_textures =
-      LoadTerrainTextures(vfs, scene.gnd, scene.missing_terrain_textures, progress);
+  scene.terrain_textures = LoadTerrainTextures(vfs, scene.gnd, scene.missing_terrain_textures,
+                                               progress, options.resources);
   scene.invisible_tiles = FindInvisibleTiles(scene.gnd, scene.terrain_textures);
   scene.ground_subdivisions = options.ground_subdivisions;
   core::BeginLoadStep(progress, core::LoadStep::kGround);
@@ -617,11 +673,18 @@ core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
   //
   // ⚠ SAUF SUR UN RELIEF APLATI : voir `MapSceneOptions::flatten_relief`.
   if (!scene.relief_level.has_value()) {
-    LoadMissingSceneModels(vfs, scene, progress);
+    LoadMissingSceneModels(vfs, scene, progress, options.resources);
     PlaceSceneInstances(scene);
   } else {
     // ⚠ L'ÉTAPE PASSE QUAND MÊME : le plan la compte, et le 100 % la demande.
     core::BeginLoadStep(progress, core::LoadStep::kModels);
+  }
+  // LES TABLES DE LA CARTE, reprises de `resources` sans relire de fichier.
+  if (options.resources != nullptr) {
+    core::BeginLoadStep(progress, core::LoadStep::kMapEffects);
+    KeepMapTables(*options.resources, scene);
+    core::EndLoadStep(progress);
+    return scene;
   }
   // LA TABLE DES EFFETS DE LA CARTE.
   core::BeginLoadStep(progress, core::LoadStep::kMapEffects);

@@ -85,6 +85,14 @@ class GatMap {
  public:
   [[nodiscard]] static core::Result<GatMap> Parse(std::span<const std::uint8_t> data);
 
+  // UNE GRILLE ASSEMBLÉE EN MÉMOIRE, `cells` ligne par ligne, refusée là où
+  // `Parse` refuserait le même fichier, ou quand le nombre de cellules ne fait
+  // pas width × height.
+  [[nodiscard]] static core::Result<GatMap> Assemble(std::int32_t width, std::int32_t height,
+                                                     std::vector<GatCell> cells,
+                                                     std::uint8_t major_version = 1,
+                                                     std::uint8_t minor_version = 2);
+
   [[nodiscard]] std::int32_t width() const noexcept { return width_; }
   [[nodiscard]] std::int32_t height() const noexcept { return height_; }
   [[nodiscard]] std::uint8_t major_version() const noexcept { return major_version_; }

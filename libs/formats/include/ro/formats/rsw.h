@@ -187,6 +187,12 @@ class RswScene {
  public:
   [[nodiscard]] static core::Result<RswScene> Parse(std::span<const std::uint8_t> data);
 
+  // UNE SCÈNE ASSEMBLÉE EN MÉMOIRE : un en-tête, une lumière et des modèles,
+  // sans eau, son, effet ni arbre de quadrants. C'est le décor d'un sol généré,
+  // qui ne se lit dans aucun fichier.
+  [[nodiscard]] static RswScene Assemble(RswSceneHeader header, RswLight light,
+                                         std::vector<RswModel> models);
+
   [[nodiscard]] const RswSceneHeader& header() const noexcept { return header_; }
   [[nodiscard]] const RswWater& water() const noexcept { return water_; }
   [[nodiscard]] const RswLight& light() const noexcept { return light_; }

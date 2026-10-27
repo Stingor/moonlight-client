@@ -102,6 +102,16 @@ struct MapStageRead {
 [[nodiscard]] ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,
                                                       const MapStageRead& read = {});
 
+// UNE CARTE DÉJÀ EN MÉMOIRE : sa scène assemblée (`ro::render::AssembleMapScene`)
+// et sa grille, sans fichier ni document d'édition. La grille donne la
+// marchabilité, les hauteurs où se posent les acteurs et la lumière qu'ils
+// reçoivent, comme celle d'une carte lue.
+//
+// ⚠ Échoue si la scène ne produit AUCUNE géométrie, comme `LoadMapStage`.
+[[nodiscard]] ro::core::Result<MapStage> AssembleMapStage(std::string name,
+                                                          ro::render::MapScene scene,
+                                                          ro::formats::GatMap gat);
+
 // Où se pose un acteur, en coordonnées du monde.
 //
 // L'altitude vient de la grille de MARCHABILITÉ quand la carte en a une : un

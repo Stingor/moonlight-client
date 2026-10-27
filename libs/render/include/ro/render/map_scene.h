@@ -212,10 +212,28 @@ struct MapSceneOptions {
   std::optional<mapedit::MapEdit> edit;
   // L'AVANCEMENT, dit étape par étape à qui le montre. Nul : la lecture se tait.
   core::LoadProgress* progress = nullptr;
+  // UNE SCÈNE DÉJÀ LUE dont la nouvelle reprend, sans relire de fichier, les
+  // textures du sol de même chemin, les modèles de même fichier et les tables
+  // de la carte (effets, ciel, météo, brouillard). Ce qu'elle n'a pas se lit
+  // dans le VFS. Nulle : tout se lit.
+  const MapScene* resources = nullptr;
 };
 
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                                   const MapSceneOptions& options = {});
+
+// LA SCÈNE D'UN SOL ET D'UN DÉCOR DÉJÀ EN MÉMOIRE : tout ce que fait
+// `LoadMapScene` une fois ses deux fichiers lus — retouches, lumière, relief,
+// textures, maillage, eau, modèles, effets, ciel et brouillard. Un sol généré
+// la prend telle quelle, sans fichier de carte.
+//
+// `map_name` nomme ce que la scène cherche dans les tables de l'installation :
+// son document d'édition (sauf si `options.edit` en donne un), sa table
+// d'effets, son ciel, sa météo et son brouillard. Les textures et les modèles
+// que `gnd` et `rsw` citent se lisent dans `vfs`.
+[[nodiscard]] MapScene AssembleMapScene(vfs::Vfs& vfs, std::string_view map_name,
+                                        formats::GndMap gnd, formats::RswScene rsw,
+                                        const MapSceneOptions& options = {});
 
 // REBÂTIT LE MAILLAGE DU SOL de `scene` en `subdivisions` sous-carreaux par côté
 // de cube, sans relire la carte : c'est ce que demande le réglage « Sol

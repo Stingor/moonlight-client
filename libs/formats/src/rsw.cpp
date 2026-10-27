@@ -312,6 +312,14 @@ void RswScene::MoveEffect(std::size_t effect_index, const std::array<float, 3>& 
   }
 }
 
+RswScene RswScene::Assemble(RswSceneHeader header, RswLight light, std::vector<RswModel> models) {
+  RswScene scene;
+  scene.header_ = std::move(header);
+  scene.light_ = light;
+  scene.models_ = std::move(models);
+  return scene;
+}
+
 std::size_t RswScene::AddModel(RswModel model) {
   models_.push_back(std::move(model));
   return models_.size() - 1;

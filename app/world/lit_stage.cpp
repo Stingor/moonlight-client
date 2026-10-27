@@ -23,10 +23,24 @@ ro::core::Result<void> LitStage::Open(ro::vfs::Vfs& vfs, std::string_view map_na
   if (!loaded) {
     return std::unexpected(loaded.error());
   }
-  stage_ = std::move(*loaded);
   document_ = read.edits != nullptr ? read.edits->Document(map_name) : ro::mapedit::MapEdit();
   model_book_ = read.edits != nullptr ? read.edits->Document(ro::mapedit::kModelLightsDocument)
                                       : ro::mapedit::MapEdit();
+  return Mount(vfs, std::move(*loaded), map_name, read.progress);
+}
+
+ro::core::Result<void> LitStage::Open(ro::vfs::Vfs& vfs, MapStage stage,
+                                      std::string_view sky_map_name,
+                                      ro::core::LoadProgress* progress) {
+  document_ = ro::mapedit::MapEdit();
+  model_book_ = ro::mapedit::MapEdit();
+  return Mount(vfs, std::move(stage), sky_map_name, progress);
+}
+
+ro::core::Result<void> LitStage::Mount(ro::vfs::Vfs& vfs, MapStage stage,
+                                       std::string_view sky_map_name,
+                                       ro::core::LoadProgress* progress) {
+  stage_ = std::move(stage);
   background_ = BackgroundOf(*stage_);
 
   auto terrain = ro::render::TerrainRenderer::Create();
@@ -44,7 +58,7 @@ ro::core::Result<void> LitStage::Open(ro::vfs::Vfs& vfs, std::string_view map_na
     return std::unexpected(models.error());
   }
   models_ = std::move(*models);
-  if (auto uploaded = UploadStage(*stage_, terrain_, water_, models_, read.progress); !uploaded) {
+  if (auto uploaded = UploadStage(*stage_, terrain_, water_, models_, progress); !uploaded) {
     return std::unexpected(uploaded.error());
   }
   model_clock_ = ro::render::ModelClock();
@@ -62,9 +76,9 @@ ro::core::Result<void> LitStage::Open(ro::vfs::Vfs& vfs, std::string_view map_na
   // illisible laisse la carte en plein air.
   auto indoor = ro::vfs::ReadIndoorMaps(vfs);
   const bool indoor_map = MapCameraTables::Parse(indoor ? *indoor : std::vector<std::string>{}, {})
-                              .RulesFor(stage_->name)
+                              .RulesFor(sky_map_name)
                               .indoor;
-  closed_to_sky_ = indoor_map || LoadClosedMaps(vfs).Closes(stage_->name);
+  closed_to_sky_ = indoor_map || LoadClosedMaps(vfs).Closes(sky_map_name);
   return {};
 }
 
