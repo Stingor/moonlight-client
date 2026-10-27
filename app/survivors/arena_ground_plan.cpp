@@ -242,8 +242,7 @@ class Planner {
         const glm::vec2 at =
             corner + TurnInFootprint({slot.east_cells, slot.north_cells}, drawn, placed.quarter);
         const float yaw = slot.any_yaw ? static_cast<float>(yaw_draw)
-                                       : static_cast<float>(placed.quarter) * kQuarterTurnDegrees +
-                                             slot.yaw_degrees;
+                                       : PieceModelYawDegrees(placed.quarter, slot.yaw_degrees);
         const float jitter = slot.any_yaw ? 1.0F + kScaleJitter * (2.0F * scale_draw - 1.0F) : 1.0F;
         if (shown) {
           plan_.poses.push_back(PlannedPose{.model = choice->model,
@@ -532,6 +531,15 @@ GroundWindowOrigin GroundWindowAround(std::int32_t x_cells, std::int32_t y_cells
   return GroundWindowOrigin{
       .x_cells = (ro::sim::TerrainChunkOf(x_cells) - kChunksBeside) * kTerrainChunkCells,
       .y_cells = (ro::sim::TerrainChunkOf(y_cells) - kChunksBeside) * kTerrainChunkCells};
+}
+
+float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees) {
+  const auto full_turn = static_cast<float>(kFullTurnDegrees);
+  const float turned =
+      std::fmod(slot_yaw_degrees - static_cast<float>(quarter % ro::sim::kTerrainQuarterTurns) *
+                                       kQuarterTurnDegrees,
+                full_turn);
+  return turned < 0.0F ? turned + full_turn : turned;
 }
 
 float GroundReliefAt(std::uint64_t run_seed, double world_east, double world_north) {

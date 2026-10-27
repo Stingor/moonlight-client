@@ -127,6 +127,12 @@ struct GroundPlanLight {
                                           const BiomeLook& biome, GroundWindowOrigin origin,
                                           const GroundPlanLight& light);
 
+// L'ANGLE DU RSW (`RswModel::rotation[1]`, en degrés dans [0, 360)) d'un
+// modèle qui suit le quart de tour de sa pièce : l'emprise tourne de `quarter`
+// quarts dans le sens trigonométrique vu du ciel, l'angle du RSW tourne dans
+// l'autre sens, d'où l'angle de la place `slot_yaw_degrees` moins les quarts.
+[[nodiscard]] float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees);
+
 // La hauteur du sol, dans l'unité et le sens du fichier, au coin de case (x, y)
 // du monde : de douces ondulations, les mêmes pour toute fenêtre.
 [[nodiscard]] float GroundReliefAt(std::uint64_t run_seed, double world_east, double world_north);

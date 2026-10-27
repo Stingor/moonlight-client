@@ -74,12 +74,22 @@ static_assert(kGroundForceCells > kGroundRecentreCells);
 // des x, le nord celui des z décroissants ; l'altitude ne change pas.
 [[nodiscard]] glm::vec3 GroundWorldShift(GroundWindowOrigin from, GroundWindowOrigin to);
 
+// LA FENÊTRE D'AVANCE PRÉPARÉE `prepared` SERT-ELLE ENCORE ? Oui quand c'est
+// celle d'avance ; oui encore tant que le héros reste du côté où elle avance,
+// et n'a pas fait la moitié du chemin sur l'autre axe. C'est l'hystérésis de
+// l'avance : elle naît à 16 cases du centre et ne meurt qu'au retour en deçà
+// du centre, si bien qu'un héros qui piétine à 16 cases ne la rebâtit pas.
+[[nodiscard]] bool GroundAheadStillServes(GroundWindowOrigin shown, GroundWindowOrigin prepared,
+                                          glm::vec2 hero_cell);
+
 // CE QUE DEVIENT LA FENÊTRE PRÉPARÉE `prepared` à cette image, la fenêtre
-// `shown` montée et le héros en `hero_cell` : abandonnée quand elle n'est plus
-// ni celle qu'il faut ni celle d'avance ; montée quand c'est celle qu'il faut,
-// que son sol est téléversé (`uploaded`) et que le recentrage peut se faire —
-// les effets se déplacent sans trace (`shifts_without_trace`), ou le bord
-// approche ; gardée sinon.
+// `shown` montée et le héros en `hero_cell`. Quand il faut une autre fenêtre
+// que `shown`, seule celle-là vaut : une autre s'abandonne, pour que la voulue
+// se demande ; celle-là se monte quand son sol est téléversé (`uploaded`) et
+// que le recentrage peut se faire — les effets se déplacent sans trace
+// (`shifts_without_trace`), ou le bord approche —, et se garde sinon. Quand
+// `shown` suffit, la fenêtre d'avance se garde tant qu'elle sert
+// (`GroundAheadStillServes`) et s'abandonne ensuite.
 enum class GroundPreparedFate { kKeep, kDrop, kMount };
 [[nodiscard]] GroundPreparedFate GroundPreparedFateOf(GroundWindowOrigin shown,
                                                       GroundWindowOrigin prepared,

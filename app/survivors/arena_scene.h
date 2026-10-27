@@ -158,6 +158,9 @@ class ArenaScene : private LitLayers {
 
   // Vrai pendant qu'une fenêtre se prépare (`LitStage::Prepare`).
   [[nodiscard]] bool preparing() const noexcept { return lit_.preparing(); }
+  // Libère les renderers de réserve du sol (`LitStage::ReleaseSpares`) et la
+  // fenêtre qui s'y préparait : le banc lit ainsi la mémoire qu'ils retiennent.
+  void ReleaseSpareGround();
 
   // LE COIN SUD-OUEST DE LA FENÊTRE DESSINÉE, en cases de la partie : (0, 0)
   // sur une carte.

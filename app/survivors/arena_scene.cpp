@@ -105,6 +105,15 @@ std::optional<GroundRecentre> ArenaScene::FollowHero(glm::vec2 hero_cell,
                                                      bool shifts_without_trace) {
   if (follow_ == nullptr) return std::nullopt;
   const bool forced = GroundRecentreForced(origin_, hero_cell);
+  // UNE PRÉPARATION QUI NE SERT PLUS s'abandonne d'abord : la fenêtre qu'il faut
+  // se demande dans la même image. L'abandon ne dépend pas du téléversement.
+  if (lit_.preparing() &&
+      GroundPreparedFateOf(origin_, prepared_origin_, hero_cell,
+                           /*uploaded=*/false, shifts_without_trace) == GroundPreparedFate::kDrop) {
+    if (std::optional<MapStage> dropped = lit_.DropPrepared()) {
+      follow_->Retire(std::move(*dropped));
+    }
+  }
   if (!lit_.preparing()) {
     if (std::optional<GroundFollow<MapStage>::Built> built =
             follow_->Next(origin_, hero_cell, forced)) {
@@ -142,6 +151,12 @@ std::optional<GroundRecentre> ArenaScene::FollowHero(glm::vec2 hero_cell,
     return std::nullopt;
   }
   return *mounted;
+}
+
+void ArenaScene::ReleaseSpareGround() {
+  if (std::optional<MapStage> dropped = lit_.ReleaseSpares(); dropped && follow_ != nullptr) {
+    follow_->Retire(std::move(*dropped));
+  }
 }
 
 ro::core::Result<GroundRecentre> ArenaScene::Recentre(GroundWindowOrigin origin) {

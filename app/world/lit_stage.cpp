@@ -41,8 +41,9 @@ ro::core::Result<void> LitStage::Open(ro::vfs::Vfs& vfs, MapStage stage,
 ro::core::Result<void> LitStage::Mount(ro::vfs::Vfs& vfs, MapStage stage,
                                        std::string_view sky_map_name,
                                        ro::core::LoadProgress* progress) {
-  // Une carte préparée pour la précédente ne vaut rien pour celle-ci.
-  static_cast<void>(DropPrepared());
+  // Une carte préparée pour la précédente ne vaut rien pour celle-ci, ni ce que
+  // les réserves gardent de la précédente.
+  static_cast<void>(ReleaseSpares());
   stage_ = std::move(stage);
   background_ = BackgroundOf(*stage_);
 
@@ -146,10 +147,19 @@ ro::core::Result<MapStage> LitStage::MountPrepared() {
 
 std::optional<MapStage> LitStage::DropPrepared() {
   if (!prepared_.has_value()) return std::nullopt;
-  static_cast<void>(spare_terrain_->UploadSlice(std::numeric_limits<std::size_t>::max()));
+  // Le reste du sol ne se copie pas : la réserve ne se dessine qu'après un
+  // nouveau `Prepare`.
+  spare_terrain_->CancelUpload();
   std::optional<MapStage> dropped = std::move(prepared_);
   prepared_.reset();
   spare_models_ready_ = false;
+  return dropped;
+}
+
+std::optional<MapStage> LitStage::ReleaseSpares() {
+  std::optional<MapStage> dropped = DropPrepared();
+  spare_terrain_.reset();
+  spare_models_.reset();
   return dropped;
 }
 

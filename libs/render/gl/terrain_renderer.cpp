@@ -366,6 +366,12 @@ bool TerrainRenderer::UploadSlice(std::size_t most_bytes) {
   return true;
 }
 
+void TerrainRenderer::CancelUpload() noexcept {
+  staged_mesh_ = nullptr;
+  staged_chunks_.reset();
+  staged_bytes_ = 0;
+}
+
 void TerrainRenderer::DescribeVertices() const {
   const auto stride = static_cast<GLsizei>(sizeof(TerrainVertex));
   glEnableVertexAttribArray(0);

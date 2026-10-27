@@ -110,6 +110,10 @@ class TerrainRenderer {
                                                const formats::Image& lightmap,
                                                std::uint64_t later_than);
   [[nodiscard]] bool UploadSlice(std::size_t most_bytes);
+  // ABANDONNE LE TÉLÉVERSEMENT EN COURS sans copier ce qui reste : `mesh` peut
+  // mourir. Les tampons gardent une copie partielle ; seul un nouveau
+  // `BeginUpload` rend le renderer dessinable.
+  void CancelUpload() noexcept;
 
   // `points` sont les lumières ponctuelles que le sol reçoit, en plus de
   // celles de la carte.

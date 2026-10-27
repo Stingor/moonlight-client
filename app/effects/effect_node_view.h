@@ -37,6 +37,7 @@
 #include "effects/effect_clock.h"
 #include "effects/effect_draw_gate.h"
 #include "effects/effect_node_command.h"
+#include "effects/effect_node_placements.h"
 #include "effects/effect_node_sowing.h"
 #include "effects/projectile_casters.h"
 
@@ -116,9 +117,10 @@ class EffectNodesInPlay {
   // ⚠ ET LE PORTEUR, quand l'effet lui est ATTACHÉ : ses semis à venir partent
   // de sa place du moment, voir `FollowActor`. Zéro veut dire « posé là », et
   // c'est le cas de tout ce qui n'est pas un état ou un chapeau.
-  // ⚠ ET LE PARAMÈTRE DE L'INSTANCE : le gestionnaire de coup y pose le nombre de coups d'un
-  // coup multi-coups, et tout autre chemin — le paquet 0x01F3 de `@effect`, un état, un
-  // chapeau — pose UN. Seuls les semis qui le suivent le lisent.
+  // ⚠ ET LE PARAMÈTRE DE L'INSTANCE : le gestionnaire de coup y pose le nombre
+  // de coups d'un coup multi-coups, et tout autre chemin — le paquet 0x01F3 de
+  // `@effect`, un état, un chapeau — pose UN. Seuls les semis qui le suivent le
+  // lisent.
   // ⚠ ET LA VIE MINIMALE, quand l'effet accompagne une action dont la durée est
   // connue : une incantation. Le patron ne connaît que la bouffée ; zéro le
   // laisse décider, ce qui est le cas de tout le reste. Voir
@@ -326,8 +328,9 @@ class EffectNodesInPlay {
     return pool_.nodes();
   }
 
-  // Combien de quads du monde le dernier `Drawn` a composés. Sert à répondre « j'ai semé, et
-  // voici ce que cela donne » plutôt qu'à laisser l'écran seul témoin.
+  // Combien de quads du monde le dernier `Drawn` a composés. Sert à répondre
+  // « j'ai semé, et voici ce que cela donne » plutôt qu'à laisser l'écran seul
+  // témoin.
   [[nodiscard]] std::size_t world_quad_count() const noexcept {
     std::size_t total = 0;
     for (const std::vector<ro::render::EffectWorldQuad>& lot : ring_quads_) {
@@ -694,23 +697,8 @@ class EffectNodesInPlay {
   ro::render::EffectNodePool pool_;
   std::vector<ro::render::ComposedActor> composed_;
 
-  // OÙ UN ACTEUR COMPOSÉ SE POSE, et avec quelle teinte — un par DESSIN et non
-  // un par acteur. Un sprite à traînée se dessine plusieurs fois, au même
-  // acteur, à des points et des alphas différents ; ranger le point à côté de
-  // l'acteur interdirait ce cas.
-  //
-  // ⚠ LE POINTEUR VERS L'ACTEUR SE POSE EN DERNIER. La liste des acteurs n'a pas
-  // fini de grandir quand on remplit celle-ci ; le prendre au fil des ajouts le
-  // laisserait pendre à la première réallocation.
-  struct ComposedPlacement {
-    std::size_t composed_index = 0;
-    glm::vec3 ground_position{0.0F, 0.0F, 0.0F};
-    std::array<std::uint8_t, 4> tint = {255, 255, 255, 255};
-    float scale = 1.0F;
-    // Le mot de rendu du nœud posé. Voir `SpriteBatches`.
-    std::optional<std::uint32_t> render_word;
-    float grow_screen_pixels = 0.0F;  // voir `DrawnActor::grow_screen_pixels`
-  };
+  // Voir `effect_node_placements.h`.
+  using ComposedPlacement = EffectComposedPlacement;
   std::vector<ComposedPlacement> placements_;
   std::vector<ro::render::DrawnActor> drawn_;
   std::vector<SpriteNodeBatch> sprite_batches_;
@@ -725,26 +713,7 @@ class EffectNodesInPlay {
   std::vector<std::vector<ro::render::EffectGroundCellPaint>> ground_cell_lots_;
   std::vector<DrawnGroundCells> ground_cells_;
 
-  // UN NŒUD D'ECRAN EN VIE : son etat, son image, et OU SON PORTEUR SE TIENT
-  // dans le monde.
-  //
-  // ⚠ LA POSITION DU PORTEUR EST GARDEE EN COORDONNEES DU MONDE, et projetee a
-  // chaque image : la projeter une fois pour toutes au semis figerait le nœud a
-  // l'ecran des que la camera bouge.
-  struct ScreenNodeInPlay {
-    ro::render::EffectScreenNode node;
-    // ⚠ PLUSIEURS IMAGES, ET L'INDEX DE VUE CHOISIT. Un batisseur qui COMPOSE le
-    // nom de son image en pose huit, et l'index du noeud tourne dessus. N'en
-    // porter qu'une figerait l'explosion sur sa premiere.
-    std::vector<std::string> texture_paths;
-    glm::vec3 owner_position{0.0F, 0.0F, 0.0F};
-    bool beats_every_frame = false;  // voir `EffectBeatsEveryFrame`
-    // Voir `PooledEffectNode::instance_beats_left`.
-    std::int32_t instance_beats_left = -1;
-    bool instance_beats_every_frame = false;  // voir `EffectInstanceBeatsEveryFrame`
-    std::uint32_t owner_actor_id = 0;         // qui le porte, ou zéro : voir `FollowActor`
-    bool from_hat = false;                    // voir `SowAsHat`
-  };
+  using ScreenNodeInPlay = EffectScreenNodeInPlay;
   std::vector<ScreenNodeInPlay> screen_nodes_;
   EffectDrawGate draw_gate_;
   std::vector<std::vector<ro::render::EffectScreenQuad>> screen_quad_lots_;

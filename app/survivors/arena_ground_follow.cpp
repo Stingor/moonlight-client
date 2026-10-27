@@ -38,6 +38,16 @@ constexpr std::int32_t kLastOriginCells = ro::sim::kTerrainWorldCells - kGroundW
   return 0;
 }
 
+// LA FENÊTRE D'AVANCE PRÉPARÉE SERT ENCORE sur un axe tant que le héros reste
+// du côté où elle avance ; sur un axe où elle n'avance pas, tant qu'il n'a pas
+// fait la moitié du chemin. Une fenêtre à plus d'un pas n'est pas d'avance.
+[[nodiscard]] bool AheadAxisStillServes(std::int32_t step_cells, float offset_cells) {
+  if (std::abs(step_cells) > kGroundRecentreCells) return false;
+  if (step_cells > 0) return offset_cells > 0.0F;
+  if (step_cells < 0) return offset_cells < 0.0F;
+  return std::abs(offset_cells) <= static_cast<float>(kGroundAheadCells);
+}
+
 }  // namespace
 
 glm::vec2 GroundOffsetFromCentre(GroundWindowOrigin origin, glm::vec2 hero_cell) {
@@ -82,13 +92,24 @@ GroundPreparedFate GroundPreparedFateOf(GroundWindowOrigin shown, GroundWindowOr
                                         glm::vec2 hero_cell, bool uploaded,
                                         bool shifts_without_trace) {
   const GroundWindowOrigin wanted = GroundWindowFollowing(shown, hero_cell);
-  if (prepared != wanted) {
-    return prepared == GroundWindowAhead(shown, hero_cell) ? GroundPreparedFate::kKeep
-                                                           : GroundPreparedFate::kDrop;
+  if (wanted != shown) {
+    if (prepared != wanted) return GroundPreparedFate::kDrop;
+    if (!uploaded) return GroundPreparedFate::kKeep;
+    return shifts_without_trace || GroundRecentreForced(shown, hero_cell)
+               ? GroundPreparedFate::kMount
+               : GroundPreparedFate::kKeep;
   }
-  if (wanted == shown || !uploaded) return GroundPreparedFate::kKeep;
-  return shifts_without_trace || GroundRecentreForced(shown, hero_cell) ? GroundPreparedFate::kMount
-                                                                        : GroundPreparedFate::kKeep;
+  return GroundAheadStillServes(shown, prepared, hero_cell) ? GroundPreparedFate::kKeep
+                                                            : GroundPreparedFate::kDrop;
+}
+
+bool GroundAheadStillServes(GroundWindowOrigin shown, GroundWindowOrigin prepared,
+                            glm::vec2 hero_cell) {
+  if (prepared == shown) return false;
+  if (prepared == GroundWindowAhead(shown, hero_cell)) return true;
+  const glm::vec2 offset = GroundOffsetFromCentre(shown, hero_cell);
+  return AheadAxisStillServes(prepared.x_cells - shown.x_cells, offset.x) &&
+         AheadAxisStillServes(prepared.y_cells - shown.y_cells, offset.y);
 }
 
 }  // namespace moonclient

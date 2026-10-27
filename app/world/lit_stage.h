@@ -145,6 +145,11 @@ class LitStage {
   [[nodiscard]] bool preparing() const noexcept { return prepared_.has_value(); }
   [[nodiscard]] ro::core::Result<MapStage> MountPrepared();
   [[nodiscard]] std::optional<MapStage> DropPrepared();
+  // LES RENDERERS DE RÉSERVE gardent, après un montage, la mémoire vidéo de la
+  // carte démontée — sol, textures, atlas de lumière, décor — jusqu'à la
+  // préparation suivante. Les libérer abandonne d'abord la carte préparée, et
+  // la rend. Une carte ouverte (`Open`) les libère d'elle-même.
+  std::optional<MapStage> ReleaseSpares();
 
   // OUVRE UNE IMAGE : le sol arrondi selon le réglage, le brouillard, les
   // étages du terrain, l'ombre du soleil demandée, et le décor animé posé à
